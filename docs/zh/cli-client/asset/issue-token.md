@@ -19,8 +19,8 @@ iriscli asset issue-token [flags]
 | --name             | string  | true     |               | 资产名称, 长度限制在32个unicode字符, e.g. "IRIS Network"     |
 | --gateway          | string  | false    |               | 网关的唯一标识, 当 source 为 gateway 时必填                  |
 | --symbol           | string  | true     |               | Source内全局唯一的资产标识符，字母和数字的组合，首字符必须为字母，长度[3,8]，大小写无关 |
-| --symbol-at-source | string  | false    |               | 当 source 为 gateway 时，用来指定源链上的 Symbol，字母和数字的组合，长度[3,8]，大小写无关 |
-| --symbol-min-alias | string  | false    |               | 资产最小单位别名，字母和数字的组合，首字符必须为字母，长度[3,10]，大小写无关 |
+| --canonical-symbol | string  | false    |               | 当 source 为 gateway 时，用来指定源链上的 Symbol，字母和数字的组合，长度[3,8]，大小写无关 |
+| --min-unit-alias | string  | false    |               | 资产最小单位别名，字母和数字的组合，首字符必须为字母，长度[3,10]，大小写无关 |
 | --initial-supply   | uint64  | true     |               | 以基准单位(Symbol)计的初始发行量；合法取值范围：[0,100 billion] |
 | --max-supply       | uint64  | false    | 1000000000000 | 以基准单位(Symbol)计的最大发行量；合法取值范围：[初始发行量,1000 billion] |
 | --decimal          | uint8   | false    | 0             | 合法取值范围：[0,18]                                         |
@@ -47,7 +47,7 @@ iriscli asset create-gateway --moniker=cats --identity=<identity> --details=<det
 #### 发行网关资产
 
 ```bash
-iriscli asset issue-token --family=fungible --source=gateway --gateway=cats --symbol-at-source=cat --name="Kitty Token" --symbol=kitty --initial-supply=100000000000 --max-supply=1000000000000 --decimal=0 --mintable=true  --fee=1iris --from=<key-name> --commit
+iriscli asset issue-token --family=fungible --source=gateway --gateway=cats --canonical-symbol=cat --name="Kitty Token" --symbol=kitty --initial-supply=100000000000 --max-supply=1000000000000 --decimal=0 --mintable=true  --fee=1iris --from=<key-name> --commit
 ```
 
 ### 转账

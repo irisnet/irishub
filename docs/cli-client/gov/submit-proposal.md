@@ -29,11 +29,11 @@ iriscli gov submit-proposal --help
 | --software           |           " "                 | the software of the new protocol                                                                         |       |
 | --switch-height           |       0                     | the switch height of the new protocol                                                         |       |
 | --threshold | "0.8"   |  the upgrade signal threshold of the software upgrade                                                   |               |
-| --token-symbol-at-source |  | the source symbol of a external token | |
+| --token-canonical-symbol |  | the source symbol of a external token | |
 | --token-symbol |  | the token symbol. Once created, it cannot be modified | |
 | --token-name |  | the token name | |
 | --token-decimal |  | the token decimal. The maximum value is 18 | |
-| --token-symbol-min-alias |  | the token symbol minimum alias | |
+| --token-min-unit-alias |  | the token symbol minimum alias | |
 | --token-initial-supply |  | the initial supply token of token | |
 
 ## Examples
@@ -59,7 +59,7 @@ In this case, 'title'、 'type' and 'description' of the proposal is required pa
 ### Submit a `TokenAddition` type proposal
 
 ```shell
-iriscli gov submit-proposal --chain-id=irishub-test --from=node0 --fee=4iris --type=TokenAddition --description=test --title=test-proposal --deposit=50000iris --commit --home=$iris_root_path --token-symbol=btc --token-symbol-at-source=btc --token-name=btcToken --token-decimal=18 --token-symbol-min-alias=atto --token-initial-supply=200000
+iriscli gov submit-proposal --chain-id=irishub-test --from=node0 --fee=4iris --type=TokenAddition --description=test --title=test-proposal --deposit=50000iris --commit --home=$iris_root_path --token-symbol=btc --token-canonical-symbol=btc --token-name=btcToken --token-decimal=18 --token-min-unit-alias=atto --token-initial-supply=200000
 ```
 
 ###  How to query proposal

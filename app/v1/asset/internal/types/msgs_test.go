@@ -31,11 +31,11 @@ func TestMsgIssueAsset(t *testing.T) {
 		{"native symbol first letter is num", NewMsgIssueToken(FUNGIBLE, NATIVE, "e", "4iris", "btc", "btc", 1, "satoshi", 1, 1, true, addr), false},
 		{"native symbol too long", NewMsgIssueToken(FUNGIBLE, NATIVE, "e", "aaaaaaaaa", "btc", "btc", 1, "satoshi", 1, 1, true, addr), false},
 		{"native symbol too short", NewMsgIssueToken(FUNGIBLE, NATIVE, "e", "a", "btc", "btc", 1, "satoshi", 1, 1, true, addr), false},
-		{"native symbol_at_source ignored", NewMsgIssueToken(FUNGIBLE, NATIVE, "a", "btc", "c", "btc", 18, "satoshi", 1, 1, true, addr), true},
-		{"native symbol_min_alias error", NewMsgIssueToken(FUNGIBLE, NATIVE, "g", "btc", "btc", "btc", 1, "a1,3d", 1, 1, true, addr), false},
-		{"native symbol_min_alias too long", NewMsgIssueToken(FUNGIBLE, NATIVE, "g", "btc", "btc", "btc", 1, "aaaaaaaaaaaaa", 1, 1, true, addr), false},
-		{"native symbol_min_alias too short", NewMsgIssueToken(FUNGIBLE, NATIVE, "g", "btc", "btc", "btc", 1, "a", 1, 1, true, addr), false},
-		{"native symbol_min_alias  first letter is num", NewMsgIssueToken(FUNGIBLE, NATIVE, "g", "btc", "btc", "btc", 1, "1a", 1, 1, true, addr), false},
+		{"native canonical_symbol ignored", NewMsgIssueToken(FUNGIBLE, NATIVE, "a", "btc", "c", "btc", 18, "satoshi", 1, 1, true, addr), true},
+		{"native min_unit_alias error", NewMsgIssueToken(FUNGIBLE, NATIVE, "g", "btc", "btc", "btc", 1, "a1,3d", 1, 1, true, addr), false},
+		{"native min_unit_alias too long", NewMsgIssueToken(FUNGIBLE, NATIVE, "g", "btc", "btc", "btc", 1, "aaaaaaaaaaaaa", 1, 1, true, addr), false},
+		{"native min_unit_alias too short", NewMsgIssueToken(FUNGIBLE, NATIVE, "g", "btc", "btc", "btc", 1, "a", 1, 1, true, addr), false},
+		{"native min_unit_alias  first letter is num", NewMsgIssueToken(FUNGIBLE, NATIVE, "g", "btc", "btc", "btc", 1, "1a", 1, 1, true, addr), false},
 		{"native name empty", NewMsgIssueToken(FUNGIBLE, NATIVE, "h", "btc", "btc", "", 1, "btc", 1, 1, true, addr), false},
 		{"native name blank", NewMsgIssueToken(FUNGIBLE, NATIVE, "h", "btc", "btc", "  ", 1, "btc", 1, 1, true, addr), false},
 		{"native name too long", NewMsgIssueToken(FUNGIBLE, NATIVE, "i", "btc", "btc", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 1, "satoshi", 1, 1, true, addr), false},
@@ -45,9 +45,9 @@ func TestMsgIssueAsset(t *testing.T) {
 		{"native decimal error", NewMsgIssueToken(FUNGIBLE, NATIVE, "m", "btc", "btc", "btc", 19, "satoshi", 1, 1, true, addr), false},
 
 		{"gateway basic good", NewMsgIssueToken(FUNGIBLE, GATEWAY, "abc", "btc", "btc", "btc", 18, "satoshi", 1, 1, true, addr), true},
-		{"gateway symbol_at_source error", NewMsgIssueToken(FUNGIBLE, GATEWAY, "a", "btc", "a1,d", "btc", 18, "satoshi", 1, 1, true, addr), false},
-		{"gateway symbol_at_source too long", NewMsgIssueToken(FUNGIBLE, GATEWAY, "a", "btc", "abcdefghijklmn", "btc", 18, "satoshi", 1, 1, true, addr), false},
-		{"gateway symbol_at_source too short", NewMsgIssueToken(FUNGIBLE, GATEWAY, "a", "btc", "a", "btc", 18, "satoshi", 1, 1, true, addr), false},
+		{"gateway canonical_symbol error", NewMsgIssueToken(FUNGIBLE, GATEWAY, "a", "btc", "a1,d", "btc", 18, "satoshi", 1, 1, true, addr), false},
+		{"gateway canonical_symbol too long", NewMsgIssueToken(FUNGIBLE, GATEWAY, "a", "btc", "abcdefghijklmn", "btc", 18, "satoshi", 1, 1, true, addr), false},
+		{"gateway canonical_symbol too short", NewMsgIssueToken(FUNGIBLE, GATEWAY, "a", "btc", "a", "btc", 18, "satoshi", 1, 1, true, addr), false},
 	}
 
 	for _, tc := range tests {
@@ -236,8 +236,8 @@ func TestMsgEditToken(t *testing.T) {
 		expectPass bool
 	}{
 		{"native basic good", NewMsgEditToken("BTC Token", "btc", "satoshi", "x.btc", 10000, &mintable, owner), true},
-		{"wrong symbol_at_source", NewMsgEditToken("BTC Token", "HT", "satoshi", "x.btc", 10000, &mintable, owner), false},
-		{"wrong symbol_min_alias", NewMsgEditToken("BTC Token", "btc", "btc-min", "x.ht", 10000, &mintable, owner), false},
+		{"wrong canonical_symbol", NewMsgEditToken("BTC Token", "HT", "satoshi", "x.btc", 10000, &mintable, owner), false},
+		{"wrong min_unit_alias", NewMsgEditToken("BTC Token", "btc", "btc-min", "x.ht", 10000, &mintable, owner), false},
 		{"wrong token_id", NewMsgEditToken("BTC Token", "HTC", "HT", "i.ht", 10000, &mintable, owner), false},
 		{"wrong max_supply", NewMsgEditToken("BTC Token", "btc", "satoshi", "x.btc", 10000000000000, &mintable, owner), false},
 		{"loss owner", NewMsgEditToken("BTC Token", "btc", "satoshi", "x.btc", 10000, &mintable, nil), false},
@@ -253,17 +253,17 @@ func TestMsgEditToken(t *testing.T) {
 }
 
 func TestMsgEditTokenRoute(t *testing.T) {
-	symbolAtSource := "btc"
-	symbolMinAlias := "satoshi"
+	canonicalSymbol := "btc"
+	minUnitAlias := "satoshi"
 	tokenId := "x.btc"
 	mintable := false
 	// build a MsgEditToken
 	msg := MsgEditToken{
-		SymbolAtSource: symbolAtSource,
-		SymbolMinAlias: symbolMinAlias,
-		MaxSupply:      10000000,
-		Mintable:       &mintable,
-		TokenId:        tokenId,
+		CanonicalSymbol: canonicalSymbol,
+		MinUnitAlias:    minUnitAlias,
+		MaxSupply:       10000000,
+		Mintable:        &mintable,
+		TokenId:         tokenId,
 	}
 
 	require.Equal(t, "asset", msg.Route())
@@ -272,18 +272,18 @@ func TestMsgEditTokenRoute(t *testing.T) {
 func TestMsgEditTokenGetSignBytes(t *testing.T) {
 	mintable := false
 	var msg = MsgEditToken{
-		Name:           "BTC TOKEN",
-		Owner:          sdk.AccAddress([]byte("owner")),
-		TokenId:        "x.btc",
-		SymbolAtSource: "btc",
-		SymbolMinAlias: "satoshi",
-		MaxSupply:      21000000,
-		Mintable:       &mintable,
+		Name:            "BTC TOKEN",
+		Owner:           sdk.AccAddress([]byte("owner")),
+		TokenId:         "x.btc",
+		CanonicalSymbol: "btc",
+		MinUnitAlias:    "satoshi",
+		MaxSupply:       21000000,
+		Mintable:        &mintable,
 	}
 
 	res := msg.GetSignBytes()
 
-	expected := `{"type":"irishub/asset/MsgEditToken","value":{"max_supply":"21000000","mintable":false,"name":"BTC TOKEN","owner":"faa1damkuetjqqah8w","symbol_at_source":"btc","symbol_min_alias":"satoshi","token_id":"x.btc"}}`
+	expected := `{"type":"irishub/asset/MsgEditToken","value":{"max_supply":"21000000","mintable":false,"name":"BTC TOKEN","owner":"faa1damkuetjqqah8w","canonical_symbol":"btc","min_unit_alias":"satoshi","token_id":"x.btc"}}`
 	require.Equal(t, expected, string(res))
 }
 

@@ -313,22 +313,22 @@ func (msg MsgSubmitProposal) EnsureLength() sdk.Error {
 
 type MsgSubmitAddTokenProposal struct {
 	MsgSubmitProposal
-	Symbol         string `json:"symbol"`
-	SymbolAtSource string `json:"symbol_at_source"`
-	Name           string `json:"name"`
-	Decimal        uint8  `json:"decimal"`
-	SymbolMinAlias string `json:"symbol_min_alias"`
-	InitialSupply  uint64 `json:"initial_supply"`
+	Symbol          string `json:"symbol"`
+	CanonicalSymbol string `json:"canonical_symbol"`
+	Name            string `json:"name"`
+	Decimal         uint8  `json:"decimal"`
+	MinUnitAlias    string `json:"min_unit_alias"`
+	InitialSupply   uint64 `json:"initial_supply"`
 }
 
-func NewMsgSubmitAddTokenProposal(msgSubmitProposal MsgSubmitProposal, symbol, symbolAtSource, name, symbolMinAlias string, decimal uint8, initialSupply uint64) MsgSubmitAddTokenProposal {
+func NewMsgSubmitAddTokenProposal(msgSubmitProposal MsgSubmitProposal, symbol, canonicalSymbol, name, minUnitAlias string, decimal uint8, initialSupply uint64) MsgSubmitAddTokenProposal {
 	return MsgSubmitAddTokenProposal{
 		MsgSubmitProposal: msgSubmitProposal,
 		Symbol:            symbol,
-		SymbolAtSource:    symbolAtSource,
+		CanonicalSymbol:   canonicalSymbol,
 		Name:              name,
 		Decimal:           decimal,
-		SymbolMinAlias:    symbolMinAlias,
+		MinUnitAlias:      minUnitAlias,
 		InitialSupply:     initialSupply,
 	}
 }
@@ -339,7 +339,7 @@ func (msg MsgSubmitAddTokenProposal) ValidateBasic() sdk.Error {
 		return err
 	}
 
-	issueToken := exported.NewMsgIssueToken(exported.FUNGIBLE, exported.EXTERNAL, "", msg.Symbol, msg.SymbolAtSource, msg.Name, msg.Decimal, msg.SymbolMinAlias, msg.InitialSupply, asset.MaximumAssetMaxSupply, false, nil)
+	issueToken := exported.NewMsgIssueToken(exported.FUNGIBLE, exported.EXTERNAL, "", msg.Symbol, msg.CanonicalSymbol, msg.Name, msg.Decimal, msg.MinUnitAlias, msg.InitialSupply, asset.MaximumAssetMaxSupply, false, nil)
 	return exported.ValidateMsgIssueToken(&issueToken, false)
 }
 func (msg MsgSubmitAddTokenProposal) GetSignBytes() []byte {

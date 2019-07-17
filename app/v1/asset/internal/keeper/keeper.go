@@ -99,7 +99,7 @@ func (k Keeper) AddToken(ctx sdk.Context, token types.FungibleToken) (types.Fung
 		owner = gateway.Owner
 	} else if token.GetSource() == types.NATIVE {
 		owner = token.GetOwner()
-		token.SymbolAtSource = ""
+		token.CanonicalSymbol = ""
 		token.Gateway = ""
 	}
 
@@ -269,11 +269,11 @@ func (k Keeper) EditToken(ctx sdk.Context, msg types.MsgEditToken) (sdk.Tags, sd
 	if msg.Name != types.DoNotModify {
 		token.Name = msg.Name
 	}
-	if msg.SymbolAtSource != types.DoNotModify {
-		token.SymbolAtSource = msg.SymbolAtSource
+	if msg.CanonicalSymbol != types.DoNotModify {
+		token.CanonicalSymbol = msg.CanonicalSymbol
 	}
-	if msg.SymbolMinAlias != types.DoNotModify {
-		token.SymbolMinAlias = msg.SymbolMinAlias
+	if msg.MinUnitAlias != types.DoNotModify {
+		token.MinUnitAlias = msg.MinUnitAlias
 	}
 	if maxSupply.GT(sdk.ZeroInt()) {
 		token.MaxSupply = maxSupply
