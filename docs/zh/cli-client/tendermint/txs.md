@@ -113,3 +113,41 @@ iriscli tendermint txs --tags `action:send&sender:iaa1c6al0vufl8efggzsvw34hszua9
 }
 
 ```
+
+## Actions 列表
+| module          | Msg                  | action                                                    |
+| --------------- | -------------------- | --------------------------------------------------------- |
+| asset        | irishub/asset/MsgCreateGateway | create_gateway |
+|              | irishub/asset/MsgEditGateway | edit_gateway |
+|              | irishub/asset/MsgTransferGatewayOwner | transfer_gateway_owner |
+|              | irishub/asset/MsgIssueToken | issue_token |
+|              | irishub/asset/MsgEditToken | edit_token |
+|              | irishub/asset/MsgMintToken | mint_token |
+|              | irishub/asset/MsgTransferTokenOwner | transfer_token_owner |
+| bank         | irishub/bank/Send | send |
+|              | irishub/bank/Burn | burn |
+| distribution | irishub/distr/MsgModifyWithdrawAddress | set_withdraw_address |
+|              | irishub/distr/MsgWithdrawDelegationRewardsAll | withdraw_delegation_rewards_all |
+|              | irishub/distr/MsgWithdrawDelegationReward | withdraw_delegation_reward |
+|              | irishub/distr/MsgWithdrawValidatorRewardsAll | withdraw_validator_rewards_all |
+| gov          | irishub/gov/MsgSubmitProposal | submit_proposal |
+|              | irishub/gov/MsgSubmitTxTaxUsageProposal | submit_proposal |
+|              | irishub/gov/MsgSubmitAddTokenProposal | submit_proposal |
+|              | irishub/gov/MsgDeposit | deposit |
+|              | irishub/gov/MsgVote | vote |
+| stake        | irishub/stake/MsgCreateValidator | create_validator |
+|              | irishub/stake/MsgEditValidator | edit_validator |
+|              | irishub/stake/MsgDelegate | delegate |
+|              | irishub/stake/BeginUnbonding | begin_unbonding |
+|              | irishub/stake/BeginRedelegate | begin_redelegate |
+| slashing     | irishub/slashing/MsgUnjail | unjail |
+| service      | irishub/service/MsgSvcDef | service_define |
+|              | irishub/service/MsgSvcBinding | service_bind |
+|              | irishub/service/MsgSvcBindingUpdate | service_binding_update |
+|              | irishub/service/MsgSvcDisable | service_disable |
+|              | irishub/service/MsgSvcEnable | service_enable |
+|              | irishub/service/MsgSvcRefundDeposit | service_refund_deposit |
+|              | irishub/service/MsgSvcRequest | service_call |
+|              | irishub/service/MsgSvcResponse | service_respond |
+|              | irishub/service/MsgSvcRefundFees | service_withdraw_fees |
+|              | irishub/service/MsgSvcWithdrawTax | service_withdraw_fee_tax |
