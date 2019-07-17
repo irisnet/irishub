@@ -109,7 +109,6 @@ IRISLCD启动以后，您可以在浏览器中访问`localhost:1317/swagger-ui/`
     7. `GET /gov/proposals/{proposalId}`: 查询某个提议
     8. `GET /gov/proposals/{proposalId}/deposits/{depositor}`:查询押金
     9. `GET /gov/proposals/{proposalId}/votes/{voter}`: 查询投票
-    10. `GET /gov/params`: 查询可供治理的参数
 
 7. Slashing模块的APIs
 
@@ -157,6 +156,10 @@ IRISLCD启动以后，您可以在浏览器中访问`localhost:1317/swagger-ui/`
 
     1. `GET /version`: 获取IRISHUB的版本
     2. `GET /node-version`: 查询全节点版本
+
+12. Params 模块的APIs
+    
+    1. `GET /params`: 查询系统预设的参数
 
 ## 特殊参数
 

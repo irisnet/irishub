@@ -103,6 +103,9 @@ func (p *ProtocolV1) Init(ctx sdk.Context) {
 
 	// move community pool balance to AccAddress
 	p.distrKeeper.Init(ctx)
+
+	// modify gov params
+	p.govKeeper.Init(ctx)
 }
 
 func (p *ProtocolV1) GetCodec() *codec.Codec {
@@ -256,7 +259,7 @@ func (p *ProtocolV1) configKeepers() {
 
 	p.upgradeKeeper = upgrade.NewKeeper(p.cdc, protocol.KeyUpgrade, p.protocolKeeper, p.StakeKeeper, upgrade.PrometheusMetrics(p.config))
 
-	p.assetKeeper = asset.NewKeeper(p.cdc, protocol.KeyAsset, p.bankKeeper, p.guardianKeeper, asset.DefaultCodespace, p.paramsKeeper.Subspace(asset.DefaultParamSpace))
+	p.assetKeeper = asset.NewKeeper(p.cdc, protocol.KeyAsset, p.bankKeeper, asset.DefaultCodespace, p.paramsKeeper.Subspace(asset.DefaultParamSpace))
 
 	p.govKeeper = gov.NewKeeper(
 		protocol.KeyGov,
@@ -327,7 +330,7 @@ func (p *ProtocolV1) GetKVStoreKeyList() []*sdk.KVStoreKey {
 
 // configure all Params
 func (p *ProtocolV1) configParams() {
-	p.paramsKeeper.RegisterParamSet(&mint.Params{}, &slashing.Params{}, &service.Params{}, &auth.Params{}, &stake.Params{}, &distr.Params{}, &asset.Params{})
+	p.paramsKeeper.RegisterParamSet(&mint.Params{}, &slashing.Params{}, &service.Params{}, &auth.Params{}, &stake.Params{}, &distr.Params{}, &asset.Params{}, &gov.GovParams{})
 }
 
 // application updates every end block

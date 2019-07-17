@@ -9,6 +9,7 @@ type (
 	Subspace         = subspace.Subspace
 	ReadOnlySubspace = subspace.ReadOnlySubspace
 	ParamSet         = subspace.ParamSet
+	ParamSets        = subspace.ParamSets
 	KeyValuePairs    = subspace.KeyValuePairs
 	TypeTable        = subspace.TypeTable
 )
