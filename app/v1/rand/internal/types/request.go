@@ -43,3 +43,16 @@ func GenerateRequestID(request Request) string {
 
 	return hex.EncodeToString(sdk.SHA256(reqID))
 }
+
+// CheckReqID checks if the given request id is valid
+func CheckReqID(reqID string) sdk.Error {
+	if len(reqID) != 64 {
+		return ErrInvalidReqID(DefaultCodespace, fmt.Sprintf("invalid request id: %s", reqID))
+	}
+
+	if _, err := hex.DecodeString(reqID); err != nil {
+		return ErrInvalidReqID(DefaultCodespace, fmt.Sprintf("invalid request id: %s", reqID))
+	}
+
+	return nil
+}
