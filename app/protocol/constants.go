@@ -35,6 +35,7 @@ const (
 	GuardianRoute = GuardianStore
 	UpgradeRoute  = UpgradeStore
 	AssetRoute    = AssetStore
+	SwapRoute     = SwapStore
 )
 
 var (
