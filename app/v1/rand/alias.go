@@ -36,6 +36,7 @@ var (
 	NewRand           = types.NewRand
 	NewRequest        = types.NewRequest
 	MakePRNG          = types.MakePRNG
+	CheckReqID        = types.CheckReqID
 
 	QueryRand             = types.QueryRand
 	QueryRands            = types.QueryRands

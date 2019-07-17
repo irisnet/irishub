@@ -2,7 +2,6 @@ package rand
 
 import (
 	"fmt"
-	"strconv"
 
 	sdk "github.com/irisnet/irishub/types"
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -37,14 +36,13 @@ func handleMsgRequestRand(ctx sdk.Context, k Keeper, msg MsgRequestRand) sdk.Res
 // BeginBlocker handles block beginning logic for rand
 func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, k Keeper) (tags sdk.Tags) {
 	ctx = ctx.WithLogger(ctx.Logger().With("handler", "beginBlock").With("module", "iris/rand"))
-	tags = sdk.NewTags("height", []byte(strconv.FormatInt(req.Header.Height, 10)))
 
 	// get data of the last block
 	lastBlockHeight := ctx.BlockHeight() - 1
 	lastBlockTimestamp := ctx.BlockHeader().Time.Unix()
 	lastBlockHash := []byte(ctx.BlockHeader().LastBlockId.Hash)
 
-	// get pending random number requests for lastBloskHeight
+	// get pending random number requests for lastBlockHeight
 	iterator := k.IterateRandRequestQueueByHeight(ctx, lastBlockHeight)
 	defer iterator.Close()
 
@@ -68,6 +66,6 @@ func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, k Keeper) (tags s
 		handledRandReqNum++
 	}
 
-	ctx.Logger().Info(fmt.Sprintf("the count of handled rand requests is %d", handledRandReqNum))
+	ctx.Logger().Info(fmt.Sprintf("%d rand requests are handled", handledRandReqNum))
 	return
 }
