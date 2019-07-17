@@ -132,7 +132,7 @@ func GetCmdQueryRequest(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.RandRoute, rand.QueryRandRequestParams), bz)
+			res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.RandRoute, rand.QueryRandRequest), bz)
 			if err != nil {
 				return err
 			}
@@ -184,7 +184,7 @@ func GetCmdQueryRequests(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.RandRoute, rand.QueryRandRequestsParams), bz)
+			res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.RandRoute, rand.QueryRandRequests), bz)
 			if err != nil {
 				return err
 			}
@@ -224,7 +224,7 @@ func GetCmdQueryQueue(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.RandRoute, rand.QueryRandRequestQueueParams), bz)
+			res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.RandRoute, rand.QueryRandRequestQueue), bz)
 			if err != nil {
 				return err
 			}
