@@ -31,7 +31,7 @@ func GetCmdIssueToken(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "issue-token",
 		Short: "issue a new token",
-		Example: "iriscli asset issue-token --family=<family> --source=<source> --gateway=<gateway-moniker>" +
+		Example: "iriscli asset issue-token --family=<family> --source=<source> --gateway=<gateway-moniker> --decimal=<decimal>" +
 			" --symbol=<symbol> --name=<token-name> --initial-supply=<initial-supply> --from=<key-name> --chain-id=<chain-id> --fee=0.6iris",
 		PreRun: preSignCmd,
 		RunE: func(cmd *cobra.Command, args []string) error {
