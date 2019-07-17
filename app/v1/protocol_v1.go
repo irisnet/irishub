@@ -20,7 +20,6 @@ import (
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/guardian"
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/prometheus/client_golang/prometheus"
 	abci "github.com/tendermint/tendermint/abci/types"
 	cfg "github.com/tendermint/tendermint/config"
 	"github.com/tendermint/tendermint/libs/log"
@@ -86,7 +85,6 @@ func NewProtocolV1(version uint64, log log.Logger, pk sdk.ProtocolKeeper, checkI
 
 // load the configuration of this Protocol
 func (p *ProtocolV1) Load() {
-	prometheus.DefaultRegisterer = prometheus.NewRegistry()
 	p.configCodec()
 	p.configKeepers()
 	p.configRouters()
@@ -261,7 +259,7 @@ func (p *ProtocolV1) configKeepers() {
 
 	p.upgradeKeeper = upgrade.NewKeeper(p.cdc, protocol.KeyUpgrade, p.protocolKeeper, p.StakeKeeper, upgrade.PrometheusMetrics(p.config))
 
-	p.assetKeeper = asset.NewKeeper(p.cdc, protocol.KeyAsset, p.bankKeeper, p.guardianKeeper, asset.DefaultCodespace, p.paramsKeeper.Subspace(asset.DefaultParamSpace))
+	p.assetKeeper = asset.NewKeeper(p.cdc, protocol.KeyAsset, p.bankKeeper, asset.DefaultCodespace, p.paramsKeeper.Subspace(asset.DefaultParamSpace))
 
 	p.govKeeper = gov.NewKeeper(
 		protocol.KeyGov,

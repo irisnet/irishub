@@ -10,7 +10,6 @@ import (
 	"github.com/irisnet/irishub/app/v1/bank"
 	"github.com/irisnet/irishub/app/v1/params"
 	"github.com/irisnet/irishub/codec"
-	"github.com/irisnet/irishub/modules/guardian"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -29,7 +28,7 @@ func TestKeeper_IssueToken(t *testing.T) {
 	pk := params.NewKeeper(cdc, paramskey, paramsTkey)
 	ak := auth.NewAccountKeeper(cdc, accountKey, auth.ProtoBaseAccount)
 	bk := bank.NewBaseKeeper(cdc, ak)
-	keeper := NewKeeper(cdc, assetKey, bk, guardian.Keeper{}, types.DefaultCodespace, pk.Subspace(types.DefaultParamSpace))
+	keeper := NewKeeper(cdc, assetKey, bk, types.DefaultCodespace, pk.Subspace(types.DefaultParamSpace))
 	addr := sdk.AccAddress([]byte("addr1"))
 
 	acc := ak.NewAccountWithAddress(ctx, addr)
@@ -62,7 +61,7 @@ func TestKeeper_IssueGatewayToken(t *testing.T) {
 	pk := params.NewKeeper(cdc, paramskey, paramsTkey)
 	ak := auth.NewAccountKeeper(cdc, accountKey, auth.ProtoBaseAccount)
 	bk := bank.NewBaseKeeper(cdc, ak)
-	keeper := NewKeeper(cdc, assetKey, bk, guardian.Keeper{}, types.DefaultCodespace, pk.Subspace(types.DefaultParamSpace))
+	keeper := NewKeeper(cdc, assetKey, bk, types.DefaultCodespace, pk.Subspace(types.DefaultParamSpace))
 
 	owner := ak.NewAccountWithAddress(ctx, []byte("owner"))
 	gatewayOwner := ak.NewAccountWithAddress(ctx, []byte("gatewayOwner"))
@@ -104,11 +103,10 @@ func TestCreateGatewayKeeper(t *testing.T) {
 	auth.RegisterBaseAccount(cdc)
 
 	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewNopLogger())
-	guardianKeeper := guardian.Keeper{}
 	paramsKeeper := params.NewKeeper(cdc, paramskey, paramsTkey)
 	ak := auth.NewAccountKeeper(cdc, accountKey, auth.ProtoBaseAccount)
 	bk := bank.NewBaseKeeper(cdc, ak)
-	keeper := NewKeeper(cdc, assetKey, bk, guardianKeeper, types.DefaultCodespace, paramsKeeper.Subspace(types.DefaultParamSpace))
+	keeper := NewKeeper(cdc, assetKey, bk, types.DefaultCodespace, paramsKeeper.Subspace(types.DefaultParamSpace))
 
 	// define variables
 	owner := ak.NewAccountWithAddress(ctx, []byte("owner"))
@@ -140,11 +138,10 @@ func TestEditGatewayKeeper(t *testing.T) {
 	auth.RegisterBaseAccount(cdc)
 
 	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewNopLogger())
-	guardianKeeper := guardian.Keeper{}
 	paramsKeeper := params.NewKeeper(cdc, paramskey, paramsTkey)
 	ak := auth.NewAccountKeeper(cdc, accountKey, auth.ProtoBaseAccount)
 	bk := bank.NewBaseKeeper(cdc, ak)
-	keeper := NewKeeper(cdc, assetKey, bk, guardianKeeper, types.DefaultCodespace, paramsKeeper.Subspace(types.DefaultParamSpace))
+	keeper := NewKeeper(cdc, assetKey, bk, types.DefaultCodespace, paramsKeeper.Subspace(types.DefaultParamSpace))
 
 	// define variables
 	owner := ak.NewAccountWithAddress(ctx, []byte("owner")).GetAddress()
@@ -205,11 +202,10 @@ func TestQueryGatewayKeeper(t *testing.T) {
 	auth.RegisterBaseAccount(cdc)
 
 	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewNopLogger())
-	guardianKeeper := guardian.Keeper{}
 	paramsKeeper := params.NewKeeper(cdc, paramskey, paramsTkey)
 	ak := auth.NewAccountKeeper(cdc, accountKey, auth.ProtoBaseAccount)
 	bk := bank.NewBaseKeeper(cdc, ak)
-	keeper := NewKeeper(cdc, assetKey, bk, guardianKeeper, types.DefaultCodespace, paramsKeeper.Subspace(types.DefaultParamSpace))
+	keeper := NewKeeper(cdc, assetKey, bk, types.DefaultCodespace, paramsKeeper.Subspace(types.DefaultParamSpace))
 
 	// define variables
 	var (
@@ -297,7 +293,7 @@ func TestKeeper_EditToken(t *testing.T) {
 	pk := params.NewKeeper(cdc, paramskey, paramsTkey)
 	ak := auth.NewAccountKeeper(cdc, accountKey, auth.ProtoBaseAccount)
 	bk := bank.NewBaseKeeper(cdc, ak)
-	keeper := NewKeeper(cdc, assetKey, bk, guardian.Keeper{}, types.DefaultCodespace, pk.Subspace(types.DefaultParamSpace))
+	keeper := NewKeeper(cdc, assetKey, bk, types.DefaultCodespace, pk.Subspace(types.DefaultParamSpace))
 	addr := sdk.AccAddress([]byte("addr1"))
 
 	acc := ak.NewAccountWithAddress(ctx, addr)
@@ -334,11 +330,10 @@ func TestTransferGatewayKeeper(t *testing.T) {
 	auth.RegisterBaseAccount(cdc)
 
 	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewNopLogger())
-	guardianKeeper := guardian.Keeper{}
 	paramsKeeper := params.NewKeeper(cdc, paramskey, paramsTkey)
 	ak := auth.NewAccountKeeper(cdc, accountKey, auth.ProtoBaseAccount)
 	bk := bank.NewBaseKeeper(cdc, ak)
-	keeper := NewKeeper(cdc, assetKey, bk, guardianKeeper, types.DefaultCodespace, paramsKeeper.Subspace(types.DefaultParamSpace))
+	keeper := NewKeeper(cdc, assetKey, bk, types.DefaultCodespace, paramsKeeper.Subspace(types.DefaultParamSpace))
 
 	// define variables
 	originOwner := ak.NewAccountWithAddress(ctx, []byte("originOwner"))
@@ -387,7 +382,7 @@ func TestMintTokenKeeper(t *testing.T) {
 	pk := params.NewKeeper(cdc, paramskey, paramsTkey)
 	ak := auth.NewAccountKeeper(cdc, accountKey, auth.ProtoBaseAccount)
 	bk := bank.NewBaseKeeper(cdc, ak)
-	keeper := NewKeeper(cdc, assetKey, bk, guardian.Keeper{}, types.DefaultCodespace, pk.Subspace(types.DefaultParamSpace))
+	keeper := NewKeeper(cdc, assetKey, bk, types.DefaultCodespace, pk.Subspace(types.DefaultParamSpace))
 	keeper.Init(ctx)
 
 	addr := sdk.AccAddress([]byte("addr1"))
@@ -434,7 +429,7 @@ func TestTransferOwnerKeeper(t *testing.T) {
 	pk := params.NewKeeper(cdc, paramskey, paramsTkey)
 	ak := auth.NewAccountKeeper(cdc, accountKey, auth.ProtoBaseAccount)
 	bk := bank.NewBaseKeeper(cdc, ak)
-	keeper := NewKeeper(cdc, assetKey, bk, guardian.Keeper{}, types.DefaultCodespace, pk.Subspace(types.DefaultParamSpace))
+	keeper := NewKeeper(cdc, assetKey, bk, types.DefaultCodespace, pk.Subspace(types.DefaultParamSpace))
 
 	srcOwner := sdk.AccAddress([]byte("TokenSrcOwner"))
 
