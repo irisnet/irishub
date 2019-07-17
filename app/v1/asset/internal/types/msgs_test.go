@@ -283,7 +283,7 @@ func TestMsgEditTokenGetSignBytes(t *testing.T) {
 
 	res := msg.GetSignBytes()
 
-	expected := `{"type":"irishub/asset/MsgEditToken","value":{"max_supply":"21000000","mintable":false,"name":"BTC TOKEN","owner":"faa1damkuetjqqah8w","canonical_symbol":"btc","min_unit_alias":"satoshi","token_id":"x.btc"}}`
+	expected := `{"type":"irishub/asset/MsgEditToken","value":{"canonical_symbol":"btc","max_supply":"21000000","min_unit_alias":"satoshi","mintable":false,"name":"BTC TOKEN","owner":"faa1damkuetjqqah8w","token_id":"x.btc"}}`
 	require.Equal(t, expected, string(res))
 }
 
