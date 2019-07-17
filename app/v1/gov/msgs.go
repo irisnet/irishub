@@ -3,6 +3,7 @@ package gov
 import (
 	"fmt"
 	"github.com/irisnet/irishub/app/v1/asset"
+	"github.com/irisnet/irishub/app/v1/asset/exported"
 
 	sdk "github.com/irisnet/irishub/types"
 )
@@ -338,14 +339,8 @@ func (msg MsgSubmitAddTokenProposal) ValidateBasic() sdk.Error {
 		return err
 	}
 
-	issueToken := asset.NewMsgIssueToken(asset.FUNGIBLE, asset.EXTERNAL, "", msg.Symbol, msg.SymbolAtSource, msg.Name, msg.Decimal, msg.SymbolMinAlias, msg.InitialSupply, asset.MaximumAssetMaxSupply, false, nil)
-
-	err = issueToken.ValidateBasic()
-	// skip this error code
-	if err.Code() == asset.CodeInvalidAssetSource {
-		return nil
-	}
-	return err
+	issueToken := exported.NewMsgIssueToken(exported.FUNGIBLE, exported.EXTERNAL, "", msg.Symbol, msg.SymbolAtSource, msg.Name, msg.Decimal, msg.SymbolMinAlias, msg.InitialSupply, asset.MaximumAssetMaxSupply, false, nil)
+	return exported.ValidateMsgIssueToken(&issueToken, false)
 }
 func (msg MsgSubmitAddTokenProposal) GetSignBytes() []byte {
 	b, err := msgCdc.MarshalJSON(msg)

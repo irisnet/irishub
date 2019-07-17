@@ -52,18 +52,19 @@ func (k Keeper) IssueToken(ctx sdk.Context, token types.FungibleToken) (sdk.Tags
 		return nil, err
 	}
 
+	initialSupply := sdk.NewCoin(token.GetDenom(), token.GetInitSupply())
 	// for native and gateway tokens
 	if owner != nil {
-		initialSupply := sdk.NewCoin(token.GetDenom(), token.GetInitSupply())
-
 		// Add coins into owner's account
 		_, _, err := k.bk.AddCoins(ctx, owner, sdk.Coins{initialSupply})
 		if err != nil {
 			return nil, err
 		}
+	}
 
-		// Set total supply
-		k.bk.SetTotalSupply(ctx, initialSupply)
+	// Set total supply
+	k.bk.SetTotalSupply(ctx, initialSupply)
+	if initialSupply.Amount.GT(sdk.ZeroInt()) {
 		ctx.CoinFlowTags().AppendCoinFlowTag(ctx, owner.String(), owner.String(), initialSupply.String(), sdk.IssueTokenFlow, "")
 	}
 
@@ -268,7 +269,7 @@ func (k Keeper) EditToken(ctx sdk.Context, msg types.MsgEditToken) (sdk.Tags, sd
 	if msg.Name != types.DoNotModify {
 		token.Name = msg.Name
 	}
-	if msg.SymbolAtSource != types.DoNotModify {
+	if msg.SymbolAtSource != types.DoNotModify && token.Source != types.NATIVE {
 		token.SymbolAtSource = msg.SymbolAtSource
 	}
 	if msg.SymbolMinAlias != types.DoNotModify {
