@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/irisnet/irishub/client/human"
+	"github.com/irisnet/irishub/tools/human"
 	sdk "github.com/irisnet/irishub/types"
 )
 

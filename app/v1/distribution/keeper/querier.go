@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/irisnet/irishub/app/v1/distribution/types"
-	"github.com/irisnet/irishub/client/human"
 	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/tools/human"
 	sdk "github.com/irisnet/irishub/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/log"

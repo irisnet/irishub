@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/irisnet/irishub/client/human"
 	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/tools/human"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/tendermint/tendermint/crypto"
 )
@@ -68,7 +68,7 @@ func (acc BaseAccount) String() string {
   Coins:           %s
   Account Number:  %d
   Sequence:        %d`,
-		acc.Address, pubkey, acc.Coins.String(), acc.AccountNumber, acc.Sequence,
+		acc.Address, pubkey, acc.Coins.MainUnitString(), acc.AccountNumber, acc.Sequence,
 	)
 }
 
