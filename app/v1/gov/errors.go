@@ -70,7 +70,7 @@ func ErrInvalidTitle(codespace sdk.CodespaceType, title string) sdk.Error {
 }
 
 func ErrInvalidDescription(codespace sdk.CodespaceType, description string) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidDescription, fmt.Sprintf("Proposal Desciption '%s' is not valid", description))
+	return sdk.NewError(codespace, CodeInvalidDescription, fmt.Sprintf("Proposal Description '%s' is not valid", description))
 }
 
 func ErrInvalidProposalType(codespace sdk.CodespaceType, proposalType ProposalKind) sdk.Error {
