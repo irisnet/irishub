@@ -13,6 +13,10 @@ type (
 )
 
 var (
+	NewMsgSwapOrder       = types.NewMsgSwapOrder
+	NewMsgAddLiquidity    = types.NewMsgAddLiquidity
+	NewMsgRemoveLiquidity = types.NewMsgRemoveLiquidity
+
 	ErrInvalidDeadline  = types.ErrInvalidDeadline
 	ErrNotPositive      = types.ErrNotPositive
 	ErrConstraintNotMet = types.ErrConstraintNotMet

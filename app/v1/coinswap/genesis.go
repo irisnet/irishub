@@ -1,8 +1,8 @@
 package coinswap
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/irisnet/irishub/app/v1/coinswap/internal/types"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 // TODO: ...
