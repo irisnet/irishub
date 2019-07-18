@@ -13,4 +13,5 @@ var (
 	FUNGIBLE              = types.FUNGIBLE
 	NewMsgIssueToken      = types.NewMsgIssueToken
 	ValidateMsgIssueToken = types.ValidateMsgIssueToken
+	ErrAssetAlreadyExists = types.ErrAssetAlreadyExists
 )
