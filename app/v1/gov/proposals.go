@@ -50,7 +50,7 @@ type Proposal interface {
 	GetProposer() sdk.AccAddress
 
 	String() string
-	Validate(ctx sdk.Context, gk Keeper, isVerifyPropNum bool) sdk.Error
+	Validate(ctx sdk.Context, gk Keeper, verifyPropNum bool) sdk.Error
 	Execute(ctx sdk.Context, gk Keeper) sdk.Error
 }
 
@@ -255,7 +255,7 @@ func (pt ProposalKind) String() string {
 	return ""
 }
 
-func (pt ProposalKind) NewProposal(content Context) (Proposal, sdk.Error) {
+func (pt ProposalKind) NewProposal(content Content) (Proposal, sdk.Error) {
 	typInfo, ok := pTypeMap[pt.String()]
 	if !ok {
 		return nil, ErrInvalidProposalType(DefaultCodespace, pt)

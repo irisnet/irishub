@@ -25,7 +25,7 @@ var (
 
 // Governance ProtocolKeeper
 type Keeper struct {
-	// The (unexposed) keys used to access the stores from the Context.
+	// The (unexposed) keys used to access the stores from the Content.
 	storeKey sdk.StoreKey
 
 	// The codec codec for binary encoding/decoding.
@@ -84,7 +84,7 @@ func NewKeeper(key sdk.StoreKey, cdc *codec.Codec, paramSpace params.Subspace, p
 // =====================================================
 // Proposals
 func (keeper Keeper) SubmitProposal(ctx sdk.Context, msg sdk.Msg) (sdk.Tags, sdk.Error) {
-	content := msg.(Context)
+	content := msg.(Content)
 
 	// construct a proposal
 	proposal, err := content.GetProposalType().NewProposal(content)

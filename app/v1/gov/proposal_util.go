@@ -8,15 +8,15 @@ import (
 type pTypeInfo struct {
 	Type           ProposalKind
 	Level          ProposalLevel
-	createProposal func(content Context) Proposal
+	createProposal func(content Content) Proposal
 }
 
 func createPlainTextInfo() pTypeInfo {
 	return pTypeInfo{
 		ProposalTypePlainText,
 		ProposalLevelNormal,
-		func(content Context) Proposal {
-			return buildProposal(content, func(p BasicProposal, content Context) Proposal {
+		func(content Content) Proposal {
+			return buildProposal(content, func(p BasicProposal, content Content) Proposal {
 				return &PlainTextProposal{
 					p,
 				}
@@ -28,8 +28,8 @@ func createParameterChangeInfo() pTypeInfo {
 	return pTypeInfo{
 		ProposalTypeParameterChange,
 		ProposalLevelImportant,
-		func(content Context) Proposal {
-			return buildProposal(content, func(p BasicProposal, content Context) Proposal {
+		func(content Content) Proposal {
+			return buildProposal(content, func(p BasicProposal, content Content) Proposal {
 				return &ParameterProposal{
 					p,
 					content.GetParams(),
@@ -42,8 +42,8 @@ func createSoftwareUpgradeInfo() pTypeInfo {
 	return pTypeInfo{
 		ProposalTypeSoftwareUpgrade,
 		ProposalLevelCritical,
-		func(content Context) Proposal {
-			return buildProposal(content, func(p BasicProposal, content Context) Proposal {
+		func(content Content) Proposal {
+			return buildProposal(content, func(p BasicProposal, content Content) Proposal {
 				upgradeMsg := content.(MsgSubmitSoftwareUpgradeProposal)
 				proposal := &SoftwareUpgradeProposal{
 					p,
@@ -63,8 +63,8 @@ func createSystemHaltInfo() pTypeInfo {
 	return pTypeInfo{
 		ProposalTypeSystemHalt,
 		ProposalLevelCritical,
-		func(content Context) Proposal {
-			return buildProposal(content, func(p BasicProposal, content Context) Proposal {
+		func(content Content) Proposal {
+			return buildProposal(content, func(p BasicProposal, content Content) Proposal {
 				return &SystemHaltProposal{
 					p,
 				}
@@ -77,8 +77,8 @@ func createTxTaxUsageInfo() pTypeInfo {
 	return pTypeInfo{
 		ProposalTypeCommunityTaxUsage,
 		ProposalLevelImportant,
-		func(content Context) Proposal {
-			return buildProposal(content, func(p BasicProposal, content Context) Proposal {
+		func(content Content) Proposal {
+			return buildProposal(content, func(p BasicProposal, content Content) Proposal {
 				taxMsg := content.(MsgSubmitTxTaxUsageProposal)
 				proposal := &TaxUsageProposal{
 					p,
@@ -97,8 +97,8 @@ func createAddTokenInfo() pTypeInfo {
 	return pTypeInfo{
 		ProposalTypeTokenAddition,
 		ProposalLevelImportant,
-		func(content Context) Proposal {
-			return buildProposal(content, func(p BasicProposal, content Context) Proposal {
+		func(content Content) Proposal {
+			return buildProposal(content, func(p BasicProposal, content Content) Proposal {
 				addTokenMsg := content.(MsgSubmitAddTokenProposal)
 				decimal := int(addTokenMsg.Decimal)
 				initialSupply := sdk.NewIntWithDecimal(int64(addTokenMsg.InitialSupply), decimal)
@@ -115,7 +115,7 @@ func createAddTokenInfo() pTypeInfo {
 	}
 }
 
-func buildProposal(content Context, callback func(p BasicProposal, content Context) Proposal) Proposal {
+func buildProposal(content Content, callback func(p BasicProposal, content Content) Proposal) Proposal {
 	var p = BasicProposal{
 		Title:        content.GetTitle(),
 		Description:  content.GetDescription(),

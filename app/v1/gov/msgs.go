@@ -12,7 +12,7 @@ const MsgRoute = "gov"
 
 var _, _, _, _ sdk.Msg = MsgSubmitProposal{}, MsgSubmitTxTaxUsageProposal{}, MsgDeposit{}, MsgVote{}
 
-type Context interface {
+type Content interface {
 	sdk.Msg
 	GetTitle() string
 	GetDescription() string
