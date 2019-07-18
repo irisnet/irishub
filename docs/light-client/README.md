@@ -64,10 +64,9 @@ Once IRISLCD is started, you can open `localhost:1317/swagger-ui/` in your explo
     6. `DELETE /keys/{name}`: Remove an account
     7. `POST /keys/{name}/recover`: Recover a account from a seed
 
-3. Sign and broadcast transactions
+3. Broadcast transactions
 
-    1. `POST /tx/sign`: Sign a transaction
-    2. `POST /tx/broadcast`: Broadcast a signed StdTx with amino encoding signature and public key
+    1. `POST /tx/broadcast`: Broadcast a signed StdTx with amino encoding signature and public key
 
 4. Bank module APIs
     1. `GET /bank/coins/{type}`: Get coin type

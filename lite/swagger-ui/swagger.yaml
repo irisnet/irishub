@@ -2,7 +2,7 @@
 openapi: 3.0.0
 info:
   description: >-
-    A REST interface for state queries, transaction generation, signing, and
+    A REST interface for state queries, transaction generation and
     broadcast.
   version: "0.15.0-rc1"
   title: IRISLCD Swagger-UI
@@ -20,7 +20,7 @@ tags:
   - name: Key
     description: Key management APIs
   - name: Tx
-    description: 'Sign and broadcast transactions'
+    description: 'Broadcast transactions'
   - name: Bank
     description: Bank module APIs
   - name: Stake
@@ -308,52 +308,6 @@ paths:
           description: Invalid search tags
         '500':
           description: Internal Server Error
-  /tx/sign:
-    post:
-      tags:
-        - Tx
-      summary: Sign a transation
-      description: >-
-        Sign a transation providing locally stored account and according
-        password, return a StdTx with amino encoding signature and public key
-      responses:
-        '200':
-          description: The signed Tx
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/StdTx'
-        '400':
-          description: The Tx was malformated or key doesn't exist
-        '401':
-          description: Key password is wrong
-        '500':
-          description: Server internal error
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                tx:
-                  $ref: '#/components/schemas/StdTx'
-                name:
-                  type: string
-                password:
-                  type: string
-                chain_id:
-                  type: string
-                account_number:
-                  type: string
-                  example: '0'
-                sequence:
-                  type: string
-                  example: '0'
-                append_sig:
-                  type: boolean
-                  example: true
-        description: sign tx
-        required: true
   /tx/broadcast:
     post:
       tags:
