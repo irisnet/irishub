@@ -54,7 +54,7 @@ func TestMsgRequestRandGetSignBytes(t *testing.T) {
 	var msg = NewMsgRequestRand(testAddr, blockInterval)
 	res := msg.GetSignBytes()
 
-	expected := "{\"type\":\"irishub/rand/MsgRequestRand\",\"value\":{\"consumer\":\"faa1w3jhxazpv3j8yxhn3j0\"}}"
+	expected := "{\"type\":\"irishub/rand/MsgRequestRand\",\"value\":{\"block-interval\":\"10\",\"consumer\":\"faa1w3jhxazpv3j8yxhn3j0\"}}"
 	require.Equal(t, expected, string(res))
 }
 
