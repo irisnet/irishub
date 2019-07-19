@@ -70,7 +70,7 @@ func (k Keeper) SetRand(ctx sdk.Context, reqID string, rand types.Rand) {
 func (k Keeper) EnqueueRandRequest(ctx sdk.Context, height int64, reqID string, request types.Request) {
 	store := ctx.KVStore(k.storeKey)
 
-	bz := k.cdc.MustMarshalBinaryLengthPrefixed(reqID)
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(request)
 	store.Set(KeyRandRequestQueue(height, reqID), bz)
 }
 

@@ -56,10 +56,16 @@ func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, k Keeper) (tags s
 
 		// generate a random number
 		rand := MakePRNG(lastBlockHash, lastBlockTimestamp, request.Consumer).GetRand()
-		k.SetRand(ctx, reqID, NewRand(request, lastBlockHeight, rand))
+		k.SetRand(ctx, reqID, NewRand(request.TxHash, lastBlockHeight, rand))
 
 		// remove the request
 		k.DequeueRandRequest(ctx, lastBlockHeight, reqID)
+
+		// add tags
+		tags.AppendTags(sdk.NewTags(
+			TagReqID, []byte(reqID),
+			TagRand, []byte(rand.String()),
+		))
 
 		handledRandReqNum++
 	}

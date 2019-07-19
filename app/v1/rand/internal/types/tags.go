@@ -10,4 +10,5 @@ var (
 
 	TagAction = sdk.TagAction
 	TagReqID  = "request-id"
+	TagRand   = "rand"
 )

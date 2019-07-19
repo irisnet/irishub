@@ -12,8 +12,6 @@ func NewQuerier(k Keeper) sdk.Querier {
 		switch path[0] {
 		case types.QueryRand:
 			return queryRand(ctx, req, k)
-		case types.QueryRands:
-			return queryRands(ctx, req, k)
 		case types.QueryRandRequestQueue:
 			return queryRandRequestQueue(ctx, req, k)
 		default:
@@ -35,35 +33,6 @@ func queryRand(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, s
 	}
 
 	bz, err := codec.MarshalJSONIndent(keeper.cdc, rand)
-	if err != nil {
-		return nil, sdk.MarshalResultErr(err)
-	}
-
-	return bz, nil
-}
-
-func queryRands(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
-	var params types.QueryRandsParams
-	err := keeper.cdc.UnmarshalJSON(req.Data, &params)
-	if err != nil {
-		return nil, sdk.ParseParamsErr(err)
-	}
-
-	var rands []types.Rand
-
-	op := func(r types.Rand) bool {
-		if len(params.Consumer) == 0 {
-			rands = append(rands, r)
-		} else if r.Request.Consumer.Equals(params.Consumer) {
-			rands = append(rands, r)
-		}
-
-		return false
-	}
-
-	keeper.IterateRands(ctx, op)
-
-	bz, err := codec.MarshalJSONIndent(keeper.cdc, rands)
 	if err != nil {
 		return nil, sdk.MarshalResultErr(err)
 	}

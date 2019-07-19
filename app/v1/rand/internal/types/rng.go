@@ -7,11 +7,11 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 )
 
-const RandPrec = 10 // the precision for generated random numbers. Must be LTE the precision of sdk.Dec
+const RandPrec = 20 // the precision for generated random numbers
 
 // RNG is a random number generator
 type RNG interface {
-	GetRand() sdk.Dec // interface which returns a random number between (0,1)
+	GetRand() sdk.Rat // interface which returns a random number between (0,1)
 }
 
 // PRNG represents a pseudo-random number implementation based on future block for RNG
@@ -31,7 +31,7 @@ func MakePRNG(blockHash []byte, blockTimestamp int64, txInitiator sdk.AccAddress
 }
 
 // GetRand implements RNG
-func (p PRNG) GetRand() sdk.Dec {
+func (p PRNG) GetRand() sdk.Rat {
 	seedBT := sdk.NewInt(p.BlockTimestamp)
 	seedBH := sdk.NewIntFromBigInt(new(big.Int).SetBytes(sdk.SHA256(p.BlockHash))).Div(seedBT)
 	seedTI := sdk.NewIntFromBigInt(new(big.Int).SetBytes(sdk.SHA256(p.TxInitiator))).Div(seedBT)
@@ -41,7 +41,7 @@ func (p PRNG) GetRand() sdk.Dec {
 
 	// Generate a random number with `RandPrec` precision between (0,1).
 	// Err will not occur.
-	rand, _ := sdk.NewDecFromStr(fmt.Sprintf("0.%s", seed.Sub(seed.Div(precision).Mul(precision))))
+	rand, _ := sdk.NewRatFromDecimal(fmt.Sprintf("0.%s", seed.Sub(seed.Div(precision).Mul(precision))), RandPrec)
 
 	return rand
 }

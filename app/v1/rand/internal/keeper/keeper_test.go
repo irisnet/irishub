@@ -42,7 +42,6 @@ func TestRequestRandKeeper(t *testing.T) {
 	// build context
 	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewNopLogger())
 	ctx = ctx.WithBlockHeight(txHeight).WithTxBytes(txBytes)
-
 	require.Equal(t, txHeight, ctx.BlockHeight())
 	require.Equal(t, txBytes, ctx.TxBytes())
 
@@ -69,7 +68,6 @@ func TestRequestRandKeeper(t *testing.T) {
 	// decode the request
 	var request types.Request
 	cdc.MustUnmarshalBinaryLengthPrefixed(bz, &request)
-	require.Equal(t, 1, request)
 	require.Equal(t, txHeight, request.Height)
 	require.Equal(t, consumer, request.Consumer)
 	require.Equal(t, sdk.SHA256(txBytes), request.TxHash)

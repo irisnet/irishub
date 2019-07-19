@@ -10,12 +10,12 @@ type (
 	MsgRequestRand = types.MsgRequestRand
 	Rand           = types.Rand
 	Request        = types.Request
+	Requests       = types.Requests
 
 	Params       = types.Params
 	GenesisState = types.GenesisState
 
 	QueryRandParams             = types.QueryRandParams
-	QueryRandsParams            = types.QueryRandsParams
 	QueryRandRequestQueueParams = types.QueryRandRequestQueueParams
 
 	Keeper = keeper.Keeper
@@ -38,8 +38,10 @@ var (
 	DefaultBlockInterval = types.DefaultBlockInterval
 
 	QueryRand             = types.QueryRand
-	QueryRands            = types.QueryRands
 	QueryRandRequestQueue = types.QueryRandRequestQueue
+
+	TagReqID = types.TagReqID
+	TagRand  = types.TagRand
 
 	NewKeeper  = keeper.NewKeeper
 	NewQuerier = keeper.NewQuerier

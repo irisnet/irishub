@@ -7,7 +7,6 @@ import (
 	"github.com/irisnet/irishub/app/v1/rand"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/codec"
-	sdk "github.com/irisnet/irishub/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -56,59 +55,6 @@ func GetCmdQueryRand(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-// GetCmdQueryRands implements the query-rands command.
-func GetCmdQueryRands(cdc *codec.Codec) *cobra.Command {
-	cmd := &cobra.Command{
-		Use:     "query-rands",
-		Short:   "Query all random numbers with an optional consumer",
-		Example: "iriscli rand query-rands [--consumer=<consumer>]",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().WithCodec(cdc)
-
-			var (
-				consumer sdk.AccAddress
-				err      error
-			)
-
-			consumerStr := viper.GetString(FlagConsumer)
-			if consumerStr != "" {
-				consumer, err = sdk.AccAddressFromBech32(consumerStr)
-				if err != nil {
-					return err
-				}
-			}
-
-			params := rand.QueryRandsParams{
-				Consumer: consumer,
-			}
-
-			bz, err := cdc.MarshalJSON(params)
-			if err != nil {
-				return err
-			}
-
-			res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.RandRoute, rand.QueryRands), bz)
-			if err != nil {
-				return err
-			}
-
-			var rands []rand.Rand
-			err = cdc.UnmarshalJSON(res, &rands)
-			if err != nil {
-				return err
-			}
-
-			// TODO
-			// return cliCtx.PrintOutput(rands)
-			return nil
-		},
-	}
-
-	cmd.Flags().AddFlagSet(FsQueryRands)
-
-	return cmd
-}
-
 // GetCmdQueryRandRequestQueue implements the query-queue command.
 func GetCmdQueryRandRequestQueue(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
@@ -132,15 +78,13 @@ func GetCmdQueryRandRequestQueue(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			var requests []rand.Request
+			var requests rand.Requests
 			err = cdc.UnmarshalJSON(res, &requests)
 			if err != nil {
 				return err
 			}
 
-			// TODO
-			// return cliCtx.PrintOutput(requests)
-			return nil
+			return cliCtx.PrintOutput(requests)
 		},
 	}
 

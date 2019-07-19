@@ -34,17 +34,34 @@ func (r Request) String() string {
   Height:            %d
   Consumer:          %s
   TxHash:            %s`,
-		r.Height, r.Consumer.String(), string(r.TxHash))
+		r.Height, r.Consumer.String(), hex.EncodeToString(r.TxHash))
+}
+
+// Requests is a set of requests
+type Requests []Request
+
+// String implements fmt.Stringer
+func (rs Requests) String() string {
+	if len(rs) == 0 {
+		return "[]"
+	}
+
+	var str string
+	for _, r := range rs {
+		str += fmt.Sprintf("Request:\n  Height: %d, Consumer: %s, TxHash: %s", r.Height, r.Consumer.String(), hex.EncodeToString(r.TxHash))
+	}
+
+	return str
 }
 
 // GenerateRequestID generate a request id
 func GenerateRequestID(r Request) string {
-	id := make([]byte, 0)
+	reqID := make([]byte, 0)
 
-	id = append(id, sdk.Uint64ToBigEndian(uint64(r.Height))...)
-	id = append(id, []byte(r.Consumer)...)
+	reqID = append(reqID, sdk.Uint64ToBigEndian(uint64(r.Height))...)
+	reqID = append(reqID, []byte(r.Consumer)...)
 
-	return hex.EncodeToString(sdk.SHA256(id))
+	return hex.EncodeToString(sdk.SHA256(reqID))
 }
 
 // CheckReqID checks if the given request id is valid
