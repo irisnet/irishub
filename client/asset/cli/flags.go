@@ -6,17 +6,17 @@ import (
 )
 
 const (
-	FlagFamily         = "family"
-	FlagSource         = "source"
-	FlagGateway        = "gateway"
-	FlagSymbol         = "symbol"
-	FlagSymbolAtSource = "symbol-at-source"
-	FlagName           = "name"
-	FlagDecimal        = "decimal"
-	FlagSymbolMinAlias = "symbol-min-alias"
-	FlagInitialSupply  = "initial-supply"
-	FlagMaxSupply      = "max-supply"
-	FlagMintable       = "mintable"
+	FlagFamily          = "family"
+	FlagSource          = "source"
+	FlagGateway         = "gateway"
+	FlagSymbol          = "symbol"
+	FlagCanonicalSymbol = "canonical-symbol"
+	FlagName            = "name"
+	FlagDecimal         = "decimal"
+	FlagMinUnitAlias    = "min-unit-alias"
+	FlagInitialSupply   = "initial-supply"
+	FlagMaxSupply       = "max-supply"
+	FlagMintable        = "mintable"
 
 	FlagOwner    = "owner"
 	FlagMoniker  = "moniker"
@@ -46,10 +46,10 @@ func init() {
 	FsTokenIssue.String(FlagSource, "", "the asset source, valid values can be native, external and gateway")
 	FsTokenIssue.String(FlagGateway, "", "the gateway name of gateway token. required if --source=gateway")
 	FsTokenIssue.String(FlagSymbol, "", "the token symbol. Once created, it cannot be modified")
-	FsTokenIssue.String(FlagSymbolAtSource, "", "the source symbol of a gateway or external token")
+	FsTokenIssue.String(FlagCanonicalSymbol, "", "the source symbol of a gateway or external token")
 	FsTokenIssue.String(FlagName, "", "the token name, e.g. IRIS Network")
 	FsTokenIssue.Uint8(FlagDecimal, 0, "the token decimal. The maximum value is 18")
-	FsTokenIssue.String(FlagSymbolMinAlias, "", "the token symbol minimum alias")
+	FsTokenIssue.String(FlagMinUnitAlias, "", "the token symbol minimum alias")
 	FsTokenIssue.Uint64(FlagInitialSupply, 0, "the initial supply token of token")
 	FsTokenIssue.Uint64(FlagMaxSupply, asset.MaximumAssetMaxSupply, "the max supply of the token")
 	FsTokenIssue.Bool(FlagMintable, false, "whether the token can be minted, default false")
@@ -75,8 +75,8 @@ func init() {
 	FsFeeQuery.String(FlagToken, "", "the token id")
 
 	FsEditToken.String(FlagName, "[do-not-modify]", "the token name, e.g. IRIS Network")
-	FsEditToken.String(FlagSymbolAtSource, "[do-not-modify]", "the source symbol of a gateway or external token")
-	FsEditToken.String(FlagSymbolMinAlias, "[do-not-modify]", "the token symbol minimum alias")
+	FsEditToken.String(FlagCanonicalSymbol, "[do-not-modify]", "the source symbol of a gateway or external token")
+	FsEditToken.String(FlagMinUnitAlias, "[do-not-modify]", "the token symbol minimum alias")
 	FsEditToken.Uint64(FlagMaxSupply, 0, "the max supply of token")
 	FsEditToken.Bool(FlagMintable, false, "whether the token can be minted, default false")
 

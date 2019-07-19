@@ -452,9 +452,9 @@ func (coins Coins) Sort() Coins {
 // Parsing
 
 var (
-	// Denominations can be 3 ~ 16 characters long.
-	reDnm  = `[[:alpha:]][[:alnum:]]{2,15}`
-	reAmt  = `[[:digit:]]+`
+	// Denominations can be 3 ~ 21 characters long.
+	reDnm  = `[A-Za-z0-9\.\-]{3,21}`
+	reAmt  = `[0-9]+[.]?[0-9]*`
 	reSpc  = `[[:space:]]*`
 	reCoin = regexp.MustCompile(fmt.Sprintf(`^(%s)%s(%s)$`, reAmt, reSpc, reDnm))
 )
