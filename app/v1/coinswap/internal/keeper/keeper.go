@@ -79,7 +79,7 @@ func (k Keeper) SwapOrder(ctx sdk.Context, msg types.MsgSwapOrder) sdk.Error {
 			k.SwapCoins(ctx, msg.Sender, sdk.NewCoin(msg.Input.Denom, calculatedAmount), msg.Output)
 		}
 
-		// assert that the calculated amount is less than the
+		// assert that the calculated amount is greater than the
 		// maximum amount the sender is willing to sell.
 		if calculatedAmount.GT(msg.Input.Amount) {
 			return types.ErrConstraintNotMet(types.DefaultCodespace, fmt.Sprintf("maximum amount (%s) to be sold was exceeded (%s)", calculatedAmount, msg.Input.Amount))
