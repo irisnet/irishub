@@ -64,8 +64,8 @@ func (k Keeper) SwapOrder(ctx sdk.Context, msg types.MsgSwapOrder) sdk.Error {
 
 		// assert that the calculated amount is greater than or equal to the
 		// minimum amount the buyer is willing to buy.
-		if !calculatedAmount.GTE(msg.Output.Amount) {
-			return types.ErrConstraintNotMet(types.DefaultCodespace, fmt.Sprintf("minimum amount (%s) to be bought was not met (%s)", msg.Output.Amount, calculatedAmount))
+		if calculatedAmount.LT(msg.Output.Amount) {
+			return types.ErrConstraintNotMet(types.DefaultCodespace, fmt.Sprintf("minimum amount (%s) to be bought was not met (%s)", calculatedAmount, msg.Output.Amount))
 		}
 	} else {
 		if doubleSwap {
@@ -79,10 +79,10 @@ func (k Keeper) SwapOrder(ctx sdk.Context, msg types.MsgSwapOrder) sdk.Error {
 			k.SwapCoins(ctx, msg.Sender, sdk.NewCoin(msg.Input.Denom, calculatedAmount), msg.Output)
 		}
 
-		// assert that the calculated amount is greater than or equal to the
-		// minimum amount the sender is willing to sell.
-		if calculatedAmount.LT(msg.Input.Amount) {
-			return types.ErrConstraintNotMet(types.DefaultCodespace, fmt.Sprintf("minimum amount (%d) to be sold was not met (%d)", msg.Input.Amount, calculatedAmount))
+		// assert that the calculated amount is less than the
+		// maximum amount the sender is willing to sell.
+		if calculatedAmount.GT(msg.Input.Amount) {
+			return types.ErrConstraintNotMet(types.DefaultCodespace, fmt.Sprintf("maximum amount (%s) to be sold was exceeded (%s)", calculatedAmount, msg.Input.Amount))
 		}
 	}
 	return nil
