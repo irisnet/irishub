@@ -3308,21 +3308,12 @@ components:
         chain_id:
           type: string
           example: irishub-test
-        account_number:
-          type: string
-          example: '0'
-        sequence:
-          type: string
-          example: '0'
         gas:
           type: string
           example: '20000'
         fee:
           type: string
           example: 0.4iris
-        gas_adjustment:
-          type: string
-          example: '1.2'
         memo:
           type: string
           example: 'memo'
