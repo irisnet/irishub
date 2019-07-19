@@ -28,12 +28,12 @@ type postProposalReq struct {
 }
 
 type token struct {
-	Symbol         string `json:"symbol"`
-	SymbolAtSource string `json:"symbol_at_source"`
-	Name           string `json:"name"`
-	Decimal        uint8  `json:"decimal"`
-	SymbolMinAlias string `json:"symbol_min_alias"`
-	InitialSupply  uint64 `json:"initial_supply"`
+	Symbol          string `json:"symbol"`
+	CanonicalSymbol string `json:"canonical_symbol"`
+	Name            string `json:"name"`
+	Decimal         uint8  `json:"decimal"`
+	MinUnitAlias    string `json:"min_unit_alias"`
+	InitialSupply   uint64 `json:"initial_supply"`
 }
 
 type depositReq struct {
@@ -96,7 +96,7 @@ func postProposalHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Han
 		}
 		if msg.ProposalType == gov.ProposalTypeTokenAddition {
 			token := req.Token
-			tokenMsg := gov.NewMsgSubmitAddTokenProposal(msg, token.Symbol, token.SymbolAtSource, token.Name, token.SymbolMinAlias, token.Decimal, token.InitialSupply)
+			tokenMsg := gov.NewMsgSubmitAddTokenProposal(msg, token.Symbol, token.CanonicalSymbol, token.Name, token.MinUnitAlias, token.Decimal, token.InitialSupply)
 			if tokenMsg.ValidateBasic() != nil {
 				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 				return
