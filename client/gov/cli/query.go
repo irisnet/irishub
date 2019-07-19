@@ -2,7 +2,6 @@ package cli
 
 import (
 	"fmt"
-
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/app/v1/gov"
 	"github.com/irisnet/irishub/client/context"
@@ -84,13 +83,14 @@ func GetCmdQueryProposals(cdc *codec.Codec) *cobra.Command {
 				params.Voter = voterAddr
 			}
 
-			if len(strProposalStatus) != 0 {
-				proposalStatus, err := gov.ProposalStatusFromString(client.NormalizeProposalStatus(strProposalStatus))
-				if err != nil {
+			var status = ""
+			if len(strProposalStatus) > 0 {
+				status = client.NormalizeProposalStatus(strProposalStatus)
+				if _, err := gov.ProposalStatusFromString(status); err != nil {
 					return err
 				}
-				params.ProposalStatus = proposalStatus
 			}
+			params.ProposalStatus = status
 
 			bz, err := cdc.MarshalJSON(params)
 			if err != nil {

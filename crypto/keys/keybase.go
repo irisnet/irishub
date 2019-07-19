@@ -319,9 +319,8 @@ func (kb dbKeybase) ExportPrivateKeyObject(name string, passphrase string) (tmcr
 		if err != nil {
 			return nil, err
 		}
-	case ledgerInfo:
-		return nil, errors.New("Only works on local private keys")
-	case offlineInfo:
+
+	default:
 		return nil, errors.New("Only works on local private keys")
 	}
 	return priv, nil

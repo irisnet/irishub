@@ -442,18 +442,6 @@ func validateParams(p GovParams) sdk.Error {
 
 //______________________________________________________________________
 
-// get inflation params from the global param store
-func (k Keeper) GetParamSet(ctx sdk.Context) GovParams {
-	var params GovParams
-	k.paramSpace.GetParamSet(ctx, &params)
-	return params
-}
-
-// set inflation params from the global param store
-func (k Keeper) SetParamSet(ctx sdk.Context, params GovParams) {
-	k.paramSpace.SetParamSet(ctx, &params)
-}
-
 type DepositProcedure struct {
 	MinDeposit       sdk.Coins
 	MaxDepositPeriod time.Duration
