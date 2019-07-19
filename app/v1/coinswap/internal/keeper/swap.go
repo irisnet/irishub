@@ -23,33 +23,11 @@ func (k Keeper) SwapCoins(ctx sdk.Context, sender sdk.AccAddress, coinSold, coin
 	return nil
 }
 
-// GetInputAmount returns the amount of coins sold (calculated) given the output amount being bought (exact)
-// The fee is included in the output coins being bought
-// https://github.com/runtimeverification/verified-smart-contracts/blob/uniswap/uniswap/x-y-k.pdf
-// TODO: continue using numerator/denominator -> open issue for eventually changing to sdk.Dec
-func (k Keeper) GetInputAmount(ctx sdk.Context, outputAmt sdk.Int, inputDenom, outputDenom string) sdk.Int {
-	moduleName, err := k.GetModuleName(inputDenom, outputDenom)
-	if err != nil {
-		panic(err)
-	}
-	reservePool, found := k.GetReservePool(ctx, moduleName)
-	if !found {
-		panic(fmt.Sprintf("reserve pool for %s not found", moduleName))
-	}
-	inputBalance := reservePool.AmountOf(inputDenom)
-	outputBalance := reservePool.AmountOf(outputDenom)
-	fee := k.GetFeeParam(ctx)
-
-	numerator := inputBalance.Mul(outputAmt).Mul(fee.Denominator)
-	denominator := (outputBalance.Sub(outputAmt)).Mul(fee.Numerator)
-	return numerator.Div(denominator).Add(sdk.OneInt())
-}
-
-// GetOutputAmount returns the amount of coins bought (calculated) given the input amount being sold (exact)
+// GetInputPrice returns the amount of coins bought (calculated) given the input amount being sold (exact)
 // The fee is included in the input coins being bought
 // https://github.com/runtimeverification/verified-smart-contracts/blob/uniswap/uniswap/x-y-k.pdf
 // TODO: continue using numerator/denominator -> open issue for eventually changing to sdk.Dec
-func (k Keeper) GetOutputAmount(ctx sdk.Context, inputAmt sdk.Int, inputDenom, outputDenom string) sdk.Int {
+func (k Keeper) GetInputPrice(ctx sdk.Context, inputAmt sdk.Int, inputDenom, outputDenom string) sdk.Int {
 	moduleName, err := k.GetModuleName(inputDenom, outputDenom)
 	if err != nil {
 		panic(err)
@@ -66,6 +44,28 @@ func (k Keeper) GetOutputAmount(ctx sdk.Context, inputAmt sdk.Int, inputDenom, o
 	numerator := inputAmtWithFee.Mul(outputBalance)
 	denominator := inputBalance.Mul(fee.Denominator).Add(inputAmtWithFee)
 	return numerator.Div(denominator)
+}
+
+// GetOutputPrice returns the amount of coins sold (calculated) given the output amount being bought (exact)
+// The fee is included in the output coins being bought
+// https://github.com/runtimeverification/verified-smart-contracts/blob/uniswap/uniswap/x-y-k.pdf
+// TODO: continue using numerator/denominator -> open issue for eventually changing to sdk.Dec
+func (k Keeper) GetOutputPrice(ctx sdk.Context, outputAmt sdk.Int, inputDenom, outputDenom string) sdk.Int {
+	moduleName, err := k.GetModuleName(inputDenom, outputDenom)
+	if err != nil {
+		panic(err)
+	}
+	reservePool, found := k.GetReservePool(ctx, moduleName)
+	if !found {
+		panic(fmt.Sprintf("reserve pool for %s not found", moduleName))
+	}
+	inputBalance := reservePool.AmountOf(inputDenom)
+	outputBalance := reservePool.AmountOf(outputDenom)
+	fee := k.GetFeeParam(ctx)
+
+	numerator := inputBalance.Mul(outputAmt).Mul(fee.Denominator)
+	denominator := (outputBalance.Sub(outputAmt)).Mul(fee.Numerator)
+	return numerator.Div(denominator).Add(sdk.OneInt())
 }
 
 // IsDoubleSwap returns true if the trade requires a double swap.
