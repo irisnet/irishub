@@ -6,19 +6,19 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 )
 
-// Rand represents a random number related to a height
+// Rand represents a random number with related data
 type Rand struct {
-	Height   int64          `json:"height"`   // the height of the block used to generate the random number
-	Consumer sdk.AccAddress `json:"consumer"` // the address requesting the random number
-	Value    sdk.Dec        `json:"value"`    // the random number
+	Request `json:"request"` // the original request
+	Height  int64            `json:"height"` // the height of the block used to generate the random number
+	Value   sdk.Dec          `json:"value"`  // the actual random number
 }
 
 // NewRand constructs a Rand
-func NewRand(height int64, consumer sdk.AccAddress, value sdk.Dec) Rand {
+func NewRand(request Request, height int64, value sdk.Dec) Rand {
 	return Rand{
-		Height:   height,
-		Consumer: consumer,
-		Value:    value,
+		Request: request,
+		Height:  height,
+		Value:   value,
 	}
 }
 
@@ -30,8 +30,8 @@ func (r Rand) Validate() sdk.Error {
 // String implements fmt.Stringer
 func (r Rand) String() string {
 	return fmt.Sprintf(`Rand:
+  Request:           %s
   Height:            %d,
-  Consumer:          %s,
   Value:             %s`,
-		r.Height, r.Consumer.String(), r.Value.String())
+		r.Request.String(), r.Height, r.Value.String())
 }

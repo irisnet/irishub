@@ -281,7 +281,7 @@ func (p *ProtocolV1) configKeepers() {
 		p.assetKeeper,
 	)
 
-	p.randKeeper = rand.NewKeeper(p.cdc, protocol.KeyRand, rand.DefaultCodespace, p.paramsKeeper.Subspace(rand.DefaultParamSpace))
+	p.randKeeper = rand.NewKeeper(p.cdc, protocol.KeyRand, rand.DefaultCodespace)
 }
 
 // configure all Routers
@@ -341,7 +341,7 @@ func (p *ProtocolV1) GetKVStoreKeyList() []*sdk.KVStoreKey {
 
 // configure all Params
 func (p *ProtocolV1) configParams() {
-	p.paramsKeeper.RegisterParamSet(&mint.Params{}, &slashing.Params{}, &service.Params{}, &auth.Params{}, &stake.Params{}, &distr.Params{}, &asset.Params{}, &gov.GovParams{}, &rand.Params{})
+	p.paramsKeeper.RegisterParamSet(&mint.Params{}, &slashing.Params{}, &service.Params{}, &auth.Params{}, &stake.Params{}, &distr.Params{}, &asset.Params{}, &gov.GovParams{})
 }
 
 // application updates every begin block
@@ -355,11 +355,11 @@ func (p *ProtocolV1) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) a
 	slashTags := slashing.BeginBlocker(ctx, req, p.slashingKeeper)
 
 	// handle pending random number requests
-	rand.BeginBlocker(ctx, req, p.randKeeper)
+	randTags := rand.BeginBlocker(ctx, req, p.randKeeper)
 
 	ctx.CoinFlowTags().TagWrite()
 
-	tags = tags.AppendTags(slashTags)
+	tags = tags.AppendTags(slashTags).AppendTags(randTags)
 	return abci.ResponseBeginBlock{
 		Tags: tags.ToKVPairs(),
 	}

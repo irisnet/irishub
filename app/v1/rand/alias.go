@@ -16,8 +16,6 @@ type (
 
 	QueryRandParams             = types.QueryRandParams
 	QueryRandsParams            = types.QueryRandsParams
-	QueryRandRequestParams      = types.QueryRandRequestParams
-	QueryRandRequestsParams     = types.QueryRandRequestsParams
 	QueryRandRequestQueueParams = types.QueryRandRequestQueueParams
 
 	Keeper = keeper.Keeper
@@ -32,16 +30,15 @@ var (
 	ValidateParams       = types.ValidateParams
 	RegisterCodec        = types.RegisterCodec
 
-	NewMsgRequestRand = types.NewMsgRequestRand
-	NewRand           = types.NewRand
-	NewRequest        = types.NewRequest
-	MakePRNG          = types.MakePRNG
-	CheckReqID        = types.CheckReqID
+	NewMsgRequestRand    = types.NewMsgRequestRand
+	NewRand              = types.NewRand
+	NewRequest           = types.NewRequest
+	MakePRNG             = types.MakePRNG
+	CheckReqID           = types.CheckReqID
+	DefaultBlockInterval = types.DefaultBlockInterval
 
 	QueryRand             = types.QueryRand
 	QueryRands            = types.QueryRands
-	QueryRandRequest      = types.QueryRandRequest
-	QueryRandRequests     = types.QueryRandRequests
 	QueryRandRequestQueue = types.QueryRandRequestQueue
 
 	NewKeeper  = keeper.NewKeeper

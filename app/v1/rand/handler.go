@@ -23,7 +23,7 @@ func NewHandler(k Keeper) sdk.Handler {
 
 // handleMsgRequestRand handles MsgRequestRand
 func handleMsgRequestRand(ctx sdk.Context, k Keeper, msg MsgRequestRand) sdk.Result {
-	tags, err := k.RequestRand(ctx, msg.Consumer)
+	tags, err := k.RequestRand(ctx, msg.Consumer, msg.BlockInterval)
 	if err != nil {
 		return err.Result()
 	}
@@ -51,14 +51,12 @@ func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, k Keeper) (tags s
 		var reqID string
 		k.GetCdc().MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &reqID)
 
-		request, err := k.GetRandRequest(ctx, reqID)
-		if err != nil {
-			continue
-		}
+		var request Request
+		k.GetCdc().MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &request)
 
 		// generate a random number
 		rand := MakePRNG(lastBlockHash, lastBlockTimestamp, request.Consumer).GetRand()
-		k.SetRand(ctx, reqID, NewRand(lastBlockHeight, request.Consumer, rand))
+		k.SetRand(ctx, reqID, NewRand(request, lastBlockHeight, rand))
 
 		// remove the request
 		k.DequeueRandRequest(ctx, lastBlockHeight, reqID)

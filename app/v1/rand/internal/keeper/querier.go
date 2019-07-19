@@ -14,10 +14,6 @@ func NewQuerier(k Keeper) sdk.Querier {
 			return queryRand(ctx, req, k)
 		case types.QueryRands:
 			return queryRands(ctx, req, k)
-		case types.QueryRandRequest:
-			return queryRandRequest(ctx, req, k)
-		case types.QueryRandRequests:
-			return queryRandRequests(ctx, req, k)
 		case types.QueryRandRequestQueue:
 			return queryRandRequestQueue(ctx, req, k)
 		default:
@@ -58,7 +54,7 @@ func queryRands(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, 
 	op := func(r types.Rand) bool {
 		if len(params.Consumer) == 0 {
 			rands = append(rands, r)
-		} else if r.Consumer.Equals(params.Consumer) {
+		} else if r.Request.Consumer.Equals(params.Consumer) {
 			rands = append(rands, r)
 		}
 
@@ -75,55 +71,6 @@ func queryRands(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, 
 	return bz, nil
 }
 
-func queryRandRequest(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
-	var params types.QueryRandRequestParams
-	err := keeper.cdc.UnmarshalJSON(req.Data, &params)
-	if err != nil {
-		return nil, sdk.ParseParamsErr(err)
-	}
-
-	request, err2 := keeper.GetRandRequest(ctx, params.ReqID)
-	if err2 != nil {
-		return nil, err2
-	}
-
-	bz, err := codec.MarshalJSONIndent(keeper.cdc, request)
-	if err != nil {
-		return nil, sdk.MarshalResultErr(err)
-	}
-
-	return bz, nil
-}
-
-func queryRandRequests(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
-	var params types.QueryRandRequestsParams
-	err := keeper.cdc.UnmarshalJSON(req.Data, &params)
-	if err != nil {
-		return nil, sdk.ParseParamsErr(err)
-	}
-
-	var requests []types.Request
-
-	op := func(r types.Request) bool {
-		if len(params.Consumer) == 0 {
-			requests = append(requests, r)
-		} else if r.Consumer.Equals(params.Consumer) {
-			requests = append(requests, r)
-		}
-
-		return false
-	}
-
-	keeper.IterateRandRequests(ctx, op)
-
-	bz, err := codec.MarshalJSONIndent(keeper.cdc, requests)
-	if err != nil {
-		return nil, sdk.MarshalResultErr(err)
-	}
-
-	return bz, nil
-}
-
 func queryRandRequestQueue(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
 	var params types.QueryRandRequestQueueParams
 	err := keeper.cdc.UnmarshalJSON(req.Data, &params)
@@ -133,7 +80,7 @@ func queryRandRequestQueue(ctx sdk.Context, req abci.RequestQuery, keeper Keeper
 
 	var requests []types.Request
 
-	if params.Height == 0 {
+	if params.Height <= 0 {
 		// query all pending requests
 		requests = queryAllRandRequestsInQueue(ctx, keeper)
 	} else {
@@ -156,13 +103,8 @@ func queryRandRequestQueueByHeight(ctx sdk.Context, height int64, keeper Keeper)
 	defer iterator.Close()
 
 	for ; iterator.Valid(); iterator.Next() {
-		var reqID string
-		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &reqID)
-
-		request, err := keeper.GetRandRequest(ctx, reqID)
-		if err != nil {
-			continue
-		}
+		var request types.Request
+		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &request)
 
 		requests = append(requests, request)
 	}

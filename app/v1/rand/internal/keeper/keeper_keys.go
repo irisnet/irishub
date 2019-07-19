@@ -6,7 +6,6 @@ import (
 
 var (
 	PrefixRand             = []byte("rands:")            // key prefix for the random number
-	PrefixRandRequest      = []byte("randRequests:")     // key prefix for the random number request
 	PrefixRandRequestQueue = []byte("randRequestQueue:") // key prefix for the random number request queue
 )
 
@@ -15,12 +14,7 @@ func KeyRand(reqID string) []byte {
 	return []byte(fmt.Sprintf("rands:%s", reqID))
 }
 
-// KeyRandRequest returns the key for a random number request by the specifed request id
-func KeyRandRequest(reqID string) []byte {
-	return []byte(fmt.Sprintf("randRequests:%s", reqID))
-}
-
-// KeyRandomNumberRequestQueue returns the key for the random number request queue by the given height and request id
+// KeyRandRequestQueue returns the key for the random number request queue by the given height and request id
 func KeyRandRequestQueue(height int64, reqID string) []byte {
 	return []byte(fmt.Sprintf("randRequestQueue:%d:%s", height, reqID))
 }

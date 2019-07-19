@@ -7,17 +7,19 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 )
 
-// Request represents a request for random number
+// Request represents a request for a random number
 type Request struct {
 	Height   int64          `json:"height"`   // the height of the block in which the request tx is included
-	Consumer sdk.AccAddress `json:"consumer"` // the address of the request account
+	Consumer sdk.AccAddress `json:"consumer"` // the request address
+	TxHash   []byte         `json:"txhash"`   // the request tx hash
 }
 
 // NewRequest constructs a request
-func NewRequest(height int64, consumer sdk.AccAddress) Request {
+func NewRequest(height int64, consumer sdk.AccAddress, txHash []byte) Request {
 	return Request{
 		Height:   height,
 		Consumer: consumer,
+		TxHash:   txHash,
 	}
 }
 
@@ -30,18 +32,19 @@ func (r Request) Validate() sdk.Error {
 func (r Request) String() string {
 	return fmt.Sprintf(`Request:
   Height:            %d
-  Consumer:          %s`,
-		r.Height, r.Consumer.String())
+  Consumer:          %s
+  TxHash:            %s`,
+		r.Height, r.Consumer.String(), string(r.TxHash))
 }
 
-// GenerateRequestID generates a request id
-func GenerateRequestID(request Request) string {
-	reqID := make([]byte, 0)
+// GenerateRequestID generate a request id
+func GenerateRequestID(r Request) string {
+	id := make([]byte, 0)
 
-	reqID = append(reqID, sdk.Uint64ToBigEndian(uint64(request.Height))...)
-	reqID = append(reqID, []byte(request.Consumer)...)
+	id = append(id, sdk.Uint64ToBigEndian(uint64(r.Height))...)
+	id = append(id, []byte(r.Consumer)...)
 
-	return hex.EncodeToString(sdk.SHA256(reqID))
+	return hex.EncodeToString(sdk.SHA256(id))
 }
 
 // CheckReqID checks if the given request id is valid

@@ -7,8 +7,6 @@ import (
 const (
 	QueryRand             = "rand"
 	QueryRands            = "rands"
-	QueryRandRequest      = "request"
-	QueryRandRequests     = "requests"
 	QueryRandRequestQueue = "queue"
 )
 
@@ -19,16 +17,6 @@ type QueryRandParams struct {
 
 // QueryRandsParams is the query parameters for 'custom/rand/rands'
 type QueryRandsParams struct {
-	Consumer sdk.AccAddress
-}
-
-// QueryRandRequestParams is the query parameters for 'custom/rand/request'
-type QueryRandRequestParams struct {
-	ReqID string
-}
-
-// QueryRandRequestsParams is the query parameters for 'custom/rand/requests'
-type QueryRandRequestsParams struct {
 	Consumer sdk.AccAddress
 }
 

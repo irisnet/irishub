@@ -109,114 +109,17 @@ func GetCmdQueryRands(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-// GetCmdQueryRequest implements the query-request command.
-func GetCmdQueryRequest(cdc *codec.Codec) *cobra.Command {
-	cmd := &cobra.Command{
-		Use:     "query-request",
-		Short:   "Query a random number request by the given request id",
-		Example: "iriscli rand query-request --request-id=<request id>",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().WithCodec(cdc)
-
-			reqID := viper.GetString(FlagReqID)
-			if err := rand.CheckReqID(reqID); err != nil {
-				return err
-			}
-
-			params := rand.QueryRandRequestParams{
-				ReqID: reqID,
-			}
-
-			bz, err := cdc.MarshalJSON(params)
-			if err != nil {
-				return err
-			}
-
-			res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.RandRoute, rand.QueryRandRequest), bz)
-			if err != nil {
-				return err
-			}
-
-			var request rand.Request
-			err = cdc.UnmarshalJSON(res, &request)
-			if err != nil {
-				return err
-			}
-
-			return cliCtx.PrintOutput(request)
-		},
-	}
-
-	cmd.Flags().AddFlagSet(FsQueryRequest)
-	cmd.MarkFlagRequired(FlagReqID)
-
-	return cmd
-}
-
-// GetCmdQueryRequests implements the query-requests command.
-func GetCmdQueryRequests(cdc *codec.Codec) *cobra.Command {
-	cmd := &cobra.Command{
-		Use:     "query-requests",
-		Short:   "Query all random number requests with an optional consumer",
-		Example: "iriscli rand query-requests [--consumer=<consumer>]",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().WithCodec(cdc)
-
-			var (
-				consumer sdk.AccAddress
-				err      error
-			)
-
-			consumerStr := viper.GetString(FlagConsumer)
-			if consumerStr != "" {
-				consumer, err = sdk.AccAddressFromBech32(consumerStr)
-				if err != nil {
-					return err
-				}
-			}
-
-			params := rand.QueryRandRequestsParams{
-				Consumer: consumer,
-			}
-
-			bz, err := cdc.MarshalJSON(params)
-			if err != nil {
-				return err
-			}
-
-			res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.RandRoute, rand.QueryRandRequests), bz)
-			if err != nil {
-				return err
-			}
-
-			var requests []rand.Request
-			err = cdc.UnmarshalJSON(res, &requests)
-			if err != nil {
-				return err
-			}
-
-			// TODO
-			// return cliCtx.PrintOutput(requests)
-			return nil
-		},
-	}
-
-	cmd.Flags().AddFlagSet(FsQueryRequests)
-
-	return cmd
-}
-
-// GetCmdQueryQueue implements the query-queue command.
-func GetCmdQueryQueue(cdc *codec.Codec) *cobra.Command {
+// GetCmdQueryRandRequestQueue implements the query-queue command.
+func GetCmdQueryRandRequestQueue(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "query-queue",
 		Short:   "Query the random number request queue with an optional height",
-		Example: "iriscli rand query-queue [--height=<height>]",
+		Example: "iriscli rand query-queue [--queue-height=<queue height>]",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
 			params := rand.QueryRandRequestQueueParams{
-				Height: viper.GetInt64(FlagHeight),
+				Height: viper.GetInt64(FlagQueueHeight),
 			}
 
 			bz, err := cdc.MarshalJSON(params)

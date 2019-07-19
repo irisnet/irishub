@@ -7,19 +7,24 @@ import (
 const (
 	// MsgRoute identifies transaction types
 	MsgRoute = "rand"
+
+	// DefaultBlockInterval is the default block interval
+	DefaultBlockInterval = uint64(10)
 )
 
 var _ sdk.Msg = &MsgRequestRand{}
 
 // MsgRequestRand represents a msg for requesting a random number
 type MsgRequestRand struct {
-	Consumer sdk.AccAddress `json:"consumer"`
+	Consumer      sdk.AccAddress `json:"consumer"`       // request address
+	BlockInterval uint64         `json:"block-interval"` // block interval after which the requested random number will be generated
 }
 
 // NewMsgRequestRand constructs a MsgRequestRand
-func NewMsgRequestRand(consumer sdk.AccAddress) MsgRequestRand {
+func NewMsgRequestRand(consumer sdk.AccAddress, blockInterval uint64) MsgRequestRand {
 	return MsgRequestRand{
-		Consumer: consumer,
+		Consumer:      consumer,
+		BlockInterval: blockInterval,
 	}
 }
 
@@ -35,6 +40,10 @@ func (msg MsgRequestRand) ValidateBasic() sdk.Error {
 		return ErrInvalidConsumer(DefaultCodespace, "the consumer address must be specified")
 	}
 
+	if msg.BlockInterval == 0 {
+		return ErrInvalidBlockInterval(DefaultCodespace, "the block interval must be greater than 0")
+	}
+
 	return nil
 }
 
@@ -44,6 +53,7 @@ func (msg MsgRequestRand) GetSignBytes() []byte {
 	if err != nil {
 		panic(err)
 	}
+
 	return sdk.MustSortJSON(b)
 }
 

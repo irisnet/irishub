@@ -32,7 +32,7 @@ func getMockApp(t *testing.T, numGenAccs int) (*mock.App, Keeper, stake.Keeper, 
 		mapp.BankKeeper, mapp.ParamsKeeper.Subspace(stake.DefaultParamspace),
 		stake.DefaultCodespace,
 		stake.NopMetrics())
-	rk := NewKeeper(mapp.Cdc, keyRand, DefaultCodespace, mapp.ParamsKeeper.Subspace(DefaultParamSpace))
+	rk := NewKeeper(mapp.Cdc, keyRand, DefaultCodespace)
 
 	mapp.Router().AddRoute("rand", []*sdk.KVStoreKey{keyRand}, NewHandler(rk))
 
