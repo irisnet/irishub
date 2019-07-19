@@ -255,7 +255,7 @@ func GetCmdEditAsset(cdc *codec.Codec) *cobra.Command {
 
 			tokenId := args[0]
 			name := viper.GetString(FlagName)
-			CanonicalSymbol := viper.GetString(FlagCanonicalSymbol)
+			canonicalSymbol := viper.GetString(FlagCanonicalSymbol)
 			minUnitAlias := viper.GetString(FlagMinUnitAlias)
 			maxSupply := uint64(viper.GetInt(FlagMaxSupply))
 			mintable := (*bool)(nil)
@@ -271,7 +271,7 @@ func GetCmdEditAsset(cdc *codec.Codec) *cobra.Command {
 			})
 			var msg sdk.Msg
 			msg = asset.NewMsgEditToken(name,
-				CanonicalSymbol, minUnitAlias, tokenId, maxSupply, mintable, owner)
+				canonicalSymbol, minUnitAlias, tokenId, maxSupply, mintable, owner)
 
 			if err := msg.ValidateBasic(); err != nil {
 				return err

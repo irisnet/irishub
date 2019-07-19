@@ -35,7 +35,7 @@ func TestIrisCLIToken(t *testing.T) {
 	name := "Bitcoin"
 	initialSupply := 2000000000
 	decimal := 18
-	CanonicalSymbol := "Btc"
+	canonicalSymbol := "Btc"
 	minUnitAlias := "Satoshi"
 	gateway := "ABC"
 
@@ -48,7 +48,7 @@ func TestIrisCLIToken(t *testing.T) {
 	spStr += fmt.Sprintf(" --name=%s", name)
 	spStr += fmt.Sprintf(" --initial-supply=%d", initialSupply)
 	spStr += fmt.Sprintf(" --decimal=%d", decimal)
-	spStr += fmt.Sprintf(" --canonical-symbol=%s", CanonicalSymbol)
+	spStr += fmt.Sprintf(" --canonical-symbol=%s", canonicalSymbol)
 	spStr += fmt.Sprintf(" --min-unit-alias=%s", minUnitAlias)
 	spStr += fmt.Sprintf(" --gateway=%s", gateway)
 	spStr += fmt.Sprintf(" --fee=%s", "0.4iris")
