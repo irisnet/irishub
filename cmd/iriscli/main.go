@@ -296,7 +296,6 @@ func main() {
 	randCmd.AddCommand(
 		client.GetCommands(
 			randcmd.GetCmdQueryRand(cdc),
-			randcmd.GetCmdQueryRands(cdc),
 			randcmd.GetCmdQueryRandRequestQueue(cdc),
 		)...)
 
