@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/irisnet/irishub/tools/human"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/pkg/errors"
 )
@@ -46,31 +47,12 @@ type Proposal interface {
 	GetVotingEndTime() time.Time
 	SetVotingEndTime(time.Time)
 
-	GetProtocolDefinition() sdk.ProtocolDefinition
-	SetProtocolDefinition(sdk.ProtocolDefinition)
-
-	GetTaxUsage() TaxUsage
-	SetTaxUsage(TaxUsage)
+	GetProposalLevel() ProposalLevel
+	GetProposer() sdk.AccAddress
 
 	String() string
-}
-
-// checks if two proposals are equal
-func ProposalEqual(proposalA Proposal, proposalB Proposal) bool {
-	if proposalA.GetProposalID() == proposalB.GetProposalID() &&
-		proposalA.GetTitle() == proposalB.GetTitle() &&
-		proposalA.GetDescription() == proposalB.GetDescription() &&
-		proposalA.GetProposalType() == proposalB.GetProposalType() &&
-		proposalA.GetStatus() == proposalB.GetStatus() &&
-		proposalA.GetTallyResult().Equals(proposalB.GetTallyResult()) &&
-		proposalA.GetSubmitTime().Equal(proposalB.GetSubmitTime()) &&
-		proposalA.GetDepositEndTime().Equal(proposalB.GetDepositEndTime()) &&
-		proposalA.GetTotalDeposit().IsEqual(proposalB.GetTotalDeposit()) &&
-		proposalA.GetVotingStartTime().Equal(proposalB.GetVotingStartTime()) &&
-		proposalA.GetVotingEndTime().Equal(proposalB.GetVotingEndTime()) {
-		return true
-	}
-	return false
+	Validate(ctx sdk.Context, gk Keeper, verifyPropNum bool) sdk.Error
+	Execute(ctx sdk.Context, gk Keeper) sdk.Error
 }
 
 //-----------------------------------------------------------
@@ -88,11 +70,30 @@ type BasicProposal struct {
 	DepositEndTime time.Time `json:"deposit_end_time"` // Time that the Proposal would expire if deposit amount isn't met
 	TotalDeposit   sdk.Coins `json:"total_deposit"`    //  Current deposit on this proposal. Initial value is set at InitialDeposit
 
-	VotingStartTime time.Time `json:"voting_start_time"` //  Time of the block where MinDeposit was reached. -1 if MinDeposit is not reached
-	VotingEndTime   time.Time `json:"voting_end_time"`   // Time that the VotingPeriod for this proposal will end and votes will be tallied
+	VotingStartTime time.Time      `json:"voting_start_time"` //  Time of the block where MinDeposit was reached. -1 if MinDeposit is not reached
+	VotingEndTime   time.Time      `json:"voting_end_time"`   // Time that the VotingPeriod for this proposal will end and votes will be tallied
+	Proposer        sdk.AccAddress `json:"proposer"`
 }
 
 func (bp BasicProposal) String() string {
+	return fmt.Sprintf(`Proposal %d:
+  Title:              %s
+  Type:               %s
+  Proposer:           %s
+  Status:             %s
+  Submit Time:        %s
+  Deposit End Time:   %s
+  Total Deposit:      %s
+  Voting Start Time:  %s
+  Voting End Time:    %s
+  Description:        %s`,
+		bp.ProposalID, bp.Title, bp.ProposalType, bp.Proposer.String(),
+		bp.Status, bp.SubmitTime, bp.DepositEndTime,
+		bp.TotalDeposit.MainUnitString(), bp.VotingStartTime, bp.VotingEndTime, bp.GetDescription(),
+	)
+}
+
+func (bp BasicProposal) HumanString(assetConvert human.AssetConvert) string {
 	return fmt.Sprintf(`Proposal %d:
   Title:              %s
   Type:               %s
@@ -105,7 +106,7 @@ func (bp BasicProposal) String() string {
   Description:        %s`,
 		bp.ProposalID, bp.Title, bp.ProposalType,
 		bp.Status, bp.SubmitTime, bp.DepositEndTime,
-		bp.TotalDeposit.MainUnitString(), bp.VotingStartTime, bp.VotingEndTime, bp.GetDescription(),
+		assetConvert.ToMainUnit(bp.TotalDeposit), bp.VotingStartTime, bp.VotingEndTime, bp.GetDescription(),
 	)
 }
 
@@ -126,44 +127,77 @@ func (p Proposals) String() string {
 	return strings.TrimSpace(out)
 }
 
+func (p Proposals) HumanString(assetConvert human.AssetConvert) string {
+	if len(p) == 0 {
+		return "[]"
+	}
+	out := "ID - (Status) [Type] [TotalDeposit] Title\n"
+	for _, prop := range p {
+		out += fmt.Sprintf("%d - (%s) [%s] [%s] %s\n",
+			prop.GetProposalID(), prop.GetStatus(),
+			prop.GetProposalType(), assetConvert.ToMainUnit(prop.GetTotalDeposit()), prop.GetTitle())
+	}
+	return strings.TrimSpace(out)
+}
+
 // Implements Proposal Interface
 var _ Proposal = (*BasicProposal)(nil)
 
 // nolint
-func (tp BasicProposal) GetProposalID() uint64                      { return tp.ProposalID }
-func (tp *BasicProposal) SetProposalID(proposalID uint64)           { tp.ProposalID = proposalID }
-func (tp BasicProposal) GetTitle() string                           { return tp.Title }
-func (tp *BasicProposal) SetTitle(title string)                     { tp.Title = title }
-func (tp BasicProposal) GetDescription() string                     { return tp.Description }
-func (tp *BasicProposal) SetDescription(description string)         { tp.Description = description }
-func (tp BasicProposal) GetProposalType() ProposalKind              { return tp.ProposalType }
-func (tp *BasicProposal) SetProposalType(proposalType ProposalKind) { tp.ProposalType = proposalType }
-func (tp BasicProposal) GetStatus() ProposalStatus                  { return tp.Status }
-func (tp *BasicProposal) SetStatus(status ProposalStatus)           { tp.Status = status }
-func (tp BasicProposal) GetTallyResult() TallyResult                { return tp.TallyResult }
-func (tp *BasicProposal) SetTallyResult(tallyResult TallyResult)    { tp.TallyResult = tallyResult }
-func (tp BasicProposal) GetSubmitTime() time.Time                   { return tp.SubmitTime }
-func (tp *BasicProposal) SetSubmitTime(submitTime time.Time)        { tp.SubmitTime = submitTime }
-func (tp BasicProposal) GetDepositEndTime() time.Time               { return tp.DepositEndTime }
-func (tp *BasicProposal) SetDepositEndTime(depositEndTime time.Time) {
-	tp.DepositEndTime = depositEndTime
+func (bp BasicProposal) GetProposalID() uint64                      { return bp.ProposalID }
+func (bp *BasicProposal) SetProposalID(proposalID uint64)           { bp.ProposalID = proposalID }
+func (bp BasicProposal) GetTitle() string                           { return bp.Title }
+func (bp *BasicProposal) SetTitle(title string)                     { bp.Title = title }
+func (bp BasicProposal) GetDescription() string                     { return bp.Description }
+func (bp *BasicProposal) SetDescription(description string)         { bp.Description = description }
+func (bp BasicProposal) GetProposalType() ProposalKind              { return bp.ProposalType }
+func (bp *BasicProposal) SetProposalType(proposalType ProposalKind) { bp.ProposalType = proposalType }
+func (bp BasicProposal) GetStatus() ProposalStatus                  { return bp.Status }
+func (bp *BasicProposal) SetStatus(status ProposalStatus)           { bp.Status = status }
+func (bp BasicProposal) GetTallyResult() TallyResult                { return bp.TallyResult }
+func (bp *BasicProposal) SetTallyResult(tallyResult TallyResult)    { bp.TallyResult = tallyResult }
+func (bp BasicProposal) GetSubmitTime() time.Time                   { return bp.SubmitTime }
+func (bp *BasicProposal) SetSubmitTime(submitTime time.Time)        { bp.SubmitTime = submitTime }
+func (bp BasicProposal) GetDepositEndTime() time.Time               { return bp.DepositEndTime }
+func (bp *BasicProposal) SetDepositEndTime(depositEndTime time.Time) {
+	bp.DepositEndTime = depositEndTime
 }
-func (tp BasicProposal) GetTotalDeposit() sdk.Coins              { return tp.TotalDeposit }
-func (tp *BasicProposal) SetTotalDeposit(totalDeposit sdk.Coins) { tp.TotalDeposit = totalDeposit }
-func (tp BasicProposal) GetVotingStartTime() time.Time           { return tp.VotingStartTime }
-func (tp *BasicProposal) SetVotingStartTime(votingStartTime time.Time) {
-	tp.VotingStartTime = votingStartTime
+func (bp BasicProposal) GetTotalDeposit() sdk.Coins              { return bp.TotalDeposit }
+func (bp *BasicProposal) SetTotalDeposit(totalDeposit sdk.Coins) { bp.TotalDeposit = totalDeposit }
+func (bp BasicProposal) GetVotingStartTime() time.Time           { return bp.VotingStartTime }
+func (bp *BasicProposal) SetVotingStartTime(votingStartTime time.Time) {
+	bp.VotingStartTime = votingStartTime
 }
-func (tp BasicProposal) GetVotingEndTime() time.Time { return tp.VotingEndTime }
-func (tp *BasicProposal) SetVotingEndTime(votingEndTime time.Time) {
-	tp.VotingEndTime = votingEndTime
+func (bp BasicProposal) GetVotingEndTime() time.Time { return bp.VotingEndTime }
+func (bp *BasicProposal) SetVotingEndTime(votingEndTime time.Time) {
+	bp.VotingEndTime = votingEndTime
 }
-func (tp BasicProposal) GetProtocolDefinition() sdk.ProtocolDefinition {
+func (bp BasicProposal) GetProtocolDefinition() sdk.ProtocolDefinition {
 	return sdk.ProtocolDefinition{}
 }
-func (tp *BasicProposal) SetProtocolDefinition(sdk.ProtocolDefinition) {}
-func (tp BasicProposal) GetTaxUsage() TaxUsage                         { return TaxUsage{} }
-func (tp *BasicProposal) SetTaxUsage(taxUsage TaxUsage)                {}
+func (bp *BasicProposal) SetProtocolDefinition(sdk.ProtocolDefinition) {}
+func (bp BasicProposal) GetTaxUsage() TaxUsage                         { return TaxUsage{} }
+func (bp *BasicProposal) SetTaxUsage(taxUsage TaxUsage)                {}
+func (bp *BasicProposal) Validate(ctx sdk.Context, k Keeper, verify bool) sdk.Error {
+	if !verify {
+		return nil
+	}
+	pLevel := bp.ProposalType.GetProposalLevel()
+	if num, ok := k.HasReachedTheMaxProposalNum(ctx, pLevel); ok {
+		return ErrMoreThanMaxProposal(k.codespace, num, pLevel.string())
+	}
+	return nil
+}
+func (bp *BasicProposal) GetProposalLevel() ProposalLevel {
+	return bp.ProposalType.GetProposalLevel()
+}
+
+func (bp *BasicProposal) GetProposer() sdk.AccAddress {
+	return bp.Proposer
+}
+func (bp *BasicProposal) Execute(ctx sdk.Context, gk Keeper) sdk.Error {
+	return sdk.MarshalResultErr(errors.New("BasicProposal can not execute 'Execute' method"))
+}
 
 //-----------------------------------------------------------
 // ProposalQueue
@@ -186,37 +220,28 @@ const (
 	ProposalTypeTokenAddition     ProposalKind = 0x06
 )
 
+var pTypeMap = map[string]pTypeInfo{
+	"PlainText":         createPlainTextInfo(),
+	"ParameterChange":   createParameterChangeInfo(),
+	"SoftwareUpgrade":   createSoftwareUpgradeInfo(),
+	"SystemHalt":        createSystemHaltInfo(),
+	"CommunityTaxUsage": createTxTaxUsageInfo(),
+	"TokenAddition":     createAddTokenInfo(),
+}
+
 // String to proposalType byte.  Returns ff if invalid.
 func ProposalTypeFromString(str string) (ProposalKind, error) {
-	switch str {
-	case "PlainText":
-		return ProposalTypePlainText, nil
-	case "ParameterChange":
-		return ProposalTypeParameterChange, nil
-	case "SoftwareUpgrade":
-		return ProposalTypeSoftwareUpgrade, nil
-	case "SystemHalt":
-		return ProposalTypeSystemHalt, nil
-	case "CommunityTaxUsage":
-		return ProposalTypeCommunityTaxUsage, nil
-	case "TokenAddition":
-		return ProposalTypeTokenAddition, nil
-	default:
+	kind, ok := pTypeMap[str]
+	if !ok {
 		return ProposalKind(0xff), errors.Errorf("'%s' is not a valid proposal type", str)
 	}
+	return kind.Type, nil
 }
 
 // is defined ProposalType?
 func ValidProposalType(pt ProposalKind) bool {
-	if pt == ProposalTypeParameterChange ||
-		pt == ProposalTypeSoftwareUpgrade ||
-		pt == ProposalTypeSystemHalt ||
-		pt == ProposalTypeCommunityTaxUsage ||
-		pt == ProposalTypePlainText ||
-		pt == ProposalTypeTokenAddition {
-		return true
-	}
-	return false
+	_, ok := pTypeMap[pt.String()]
+	return ok
 }
 
 // Marshal needed for protobuf compatibility
@@ -253,22 +278,20 @@ func (pt *ProposalKind) UnmarshalJSON(data []byte) error {
 
 // Turns VoteOption byte to String
 func (pt ProposalKind) String() string {
-	switch pt {
-	case ProposalTypePlainText:
-		return "PlainText"
-	case ProposalTypeParameterChange:
-		return "ParameterChange"
-	case ProposalTypeSoftwareUpgrade:
-		return "SoftwareUpgrade"
-	case ProposalTypeSystemHalt:
-		return "SystemHalt"
-	case ProposalTypeCommunityTaxUsage:
-		return "CommunityTaxUsage"
-	case ProposalTypeTokenAddition:
-		return "TokenAddition"
-	default:
-		return ""
+	for k, v := range pTypeMap {
+		if v.Type == pt {
+			return k
+		}
 	}
+	return ""
+}
+
+func (pt ProposalKind) NewProposal(content Content) (Proposal, sdk.Error) {
+	typInfo, ok := pTypeMap[pt.String()]
+	if !ok {
+		return nil, ErrInvalidProposalType(DefaultCodespace, pt)
+	}
+	return typInfo.createProposal(content), nil
 }
 
 // For Printf / Sprintf, returns bech32 when using %s
@@ -281,6 +304,10 @@ func (pt ProposalKind) Format(s fmt.State, verb rune) {
 		// TODO: Do this conversion more directly
 		s.Write([]byte(fmt.Sprintf("%v", byte(pt))))
 	}
+}
+
+func (pt ProposalKind) GetProposalLevel() ProposalLevel {
+	return pTypeMap[pt.String()].Level
 }
 
 //-----------------------------------------------------------
@@ -298,33 +325,26 @@ const (
 	StatusRejected      ProposalStatus = 0x04
 )
 
+var pStatusMap = map[string]ProposalStatus{
+	"DepositPeriod": StatusDepositPeriod,
+	"VotingPeriod":  StatusVotingPeriod,
+	"Passed":        StatusPassed,
+	"Rejected":      StatusRejected,
+}
+
 // ProposalStatusToString turns a string into a ProposalStatus
 func ProposalStatusFromString(str string) (ProposalStatus, error) {
-	switch str {
-	case "DepositPeriod":
-		return StatusDepositPeriod, nil
-	case "VotingPeriod":
-		return StatusVotingPeriod, nil
-	case "Passed":
-		return StatusPassed, nil
-	case "Rejected":
-		return StatusRejected, nil
-	case "":
-		return StatusNil, nil
-	default:
+	status, ok := pStatusMap[str]
+	if !ok {
 		return ProposalStatus(0xff), errors.Errorf("'%s' is not a valid proposal status", str)
 	}
+	return status, nil
 }
 
 // is defined ProposalType?
 func ValidProposalStatus(status ProposalStatus) bool {
-	if status == StatusDepositPeriod ||
-		status == StatusVotingPeriod ||
-		status == StatusPassed ||
-		status == StatusRejected {
-		return true
-	}
-	return false
+	_, ok := pStatusMap[status.String()]
+	return ok
 }
 
 // Marshal needed for protobuf compatibility
@@ -361,18 +381,12 @@ func (status *ProposalStatus) UnmarshalJSON(data []byte) error {
 
 // Turns VoteStatus byte to String
 func (status ProposalStatus) String() string {
-	switch status {
-	case StatusDepositPeriod:
-		return "DepositPeriod"
-	case StatusVotingPeriod:
-		return "VotingPeriod"
-	case StatusPassed:
-		return "Passed"
-	case StatusRejected:
-		return "Rejected"
-	default:
-		return ""
+	for k, v := range pStatusMap {
+		if v == status {
+			return k
+		}
 	}
+	return ""
 }
 
 // For Printf / Sprintf, returns bech32 when using %s
