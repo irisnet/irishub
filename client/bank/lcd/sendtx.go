@@ -27,9 +27,6 @@ type burnBody struct {
 // nolint: gocyclo
 func SendRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// build tx context
-		txCtx := utils.NewTxContextFromCLI().WithCodec(cliCtx.Codec)
-
 		vars := mux.Vars(r)
 		bech32addr := vars["address"]
 		sender, err := sdk.AccAddressFromBech32(bech32addr)
@@ -65,6 +62,11 @@ func SendRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Hand
 			return
 		}
 
+		txCtx, ok := utils.BuildReqTxCtx(cliCtx, baseReq, w)
+		if !ok {
+			return
+		}
+
 		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
 	}
 }
@@ -73,9 +75,6 @@ func SendRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Hand
 // nolint: gocyclo
 func BurnRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// build tx context
-		txCtx := utils.NewTxContextFromCLI().WithCodec(cliCtx.Codec)
-
 		vars := mux.Vars(r)
 		bech32addr := vars["address"]
 		owner, err := sdk.AccAddressFromBech32(bech32addr)
@@ -107,6 +106,11 @@ func BurnRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Hand
 		msg := bank.BuildBankBurnMsg(owner, amount)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		txCtx, ok := utils.BuildReqTxCtx(cliCtx, baseReq, w)
+		if !ok {
 			return
 		}
 

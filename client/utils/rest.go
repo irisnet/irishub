@@ -205,6 +205,23 @@ func InitReqCliCtx(cliCtx context.CLIContext, r *http.Request) context.CLIContex
 	return cliCtx
 }
 
+// BuildReqTxCtx builds a tx context for the request.
+// Make sure baseTx has been validated
+func BuildReqTxCtx(cliCtx context.CLIContext, baseTx BaseTx, w http.ResponseWriter) (TxContext, bool) {
+	gas, _ := strconv.ParseUint(baseTx.Gas, 10, 64)
+
+	txCtx := TxContext{
+		ChainID: baseTx.ChainID,
+		Gas:     gas,
+		Fee:     baseTx.Fee,
+		Memo:    baseTx.Memo,
+	}
+
+	txCtx = txCtx.WithCodec(cliCtx.Codec)
+
+	return txCtx, true
+}
+
 // PostProcessResponse performs post process for rest response
 func PostProcessResponse(w http.ResponseWriter, cdc *codec.Codec, response interface{}, indent bool) {
 	var output []byte

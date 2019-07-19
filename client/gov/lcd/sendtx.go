@@ -50,9 +50,6 @@ type voteReq struct {
 
 func postProposalHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
-		txCtx := utils.NewTxContextFromCLI().WithCodec(cliCtx.Codec)
-
 		var req postProposalReq
 		err := utils.ReadPostBody(w, r, cdc, &req)
 		if err != nil {
@@ -73,6 +70,11 @@ func postProposalHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Han
 		initDepositAmount, err := cliCtx.ParseCoins(req.InitialDeposit)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		txCtx, ok := utils.BuildReqTxCtx(cliCtx, baseReq, w)
+		if !ok {
 			return
 		}
 
@@ -117,9 +119,6 @@ func postProposalHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Han
 
 func depositHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
-		txCtx := utils.NewTxContextFromCLI().WithCodec(cliCtx.Codec)
-
 		vars := mux.Vars(r)
 		strProposalID := vars[RestProposalID]
 
@@ -158,15 +157,17 @@ func depositHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerF
 			return
 		}
 
+		txCtx, ok := utils.BuildReqTxCtx(cliCtx, baseReq, w)
+		if !ok {
+			return
+		}
+
 		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
 	}
 }
 
 func voteHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
-		txCtx := utils.NewTxContextFromCLI().WithCodec(cliCtx.Codec)
-
 		vars := mux.Vars(r)
 		strProposalID := vars[RestProposalID]
 
@@ -203,6 +204,11 @@ func voteHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc
 		err = msg.ValidateBasic()
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		txCtx, ok := utils.BuildReqTxCtx(cliCtx, baseReq, w)
+		if !ok {
 			return
 		}
 
