@@ -279,14 +279,15 @@ func queryProposalsWithParameterFn(cdc *codec.Codec, cliCtx context.CLIContext) 
 			params.Depositor = depositorAddr
 		}
 
-		if len(strProposalStatus) != 0 {
-			proposalStatus, err := gov.ProposalStatusFromString(client.NormalizeProposalStatus(strProposalStatus))
-			if err != nil {
+		var status = ""
+		if len(strProposalStatus) > 0 {
+			status = client.NormalizeProposalStatus(strProposalStatus)
+			if _, err := gov.ProposalStatusFromString(status); err != nil {
 				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 				return
 			}
-			params.ProposalStatus = proposalStatus
 		}
+		params.ProposalStatus = status
 		if len(strNumLimit) != 0 {
 			numLatest, ok := utils.ParseUint64OrReturnBadRequest(w, strNumLimit)
 			if !ok {

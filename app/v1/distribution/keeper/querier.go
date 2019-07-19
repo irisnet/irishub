@@ -5,6 +5,7 @@ import (
 
 	"github.com/irisnet/irishub/app/v1/distribution/types"
 	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/tools/human"
 	sdk "github.com/irisnet/irishub/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/log"
@@ -190,6 +191,16 @@ Delegations:  %s
 Commission:   %s`, r.Total.MainUnitString(), delegations, r.Commission.MainUnitString())
 }
 
+func (r Rewards) HumanString(assetConvert human.AssetConvert) string {
+	var delegations string
+	for _, val := range r.Delegations {
+		delegations += "\n  " + val.HumanString(assetConvert)
+	}
+	return fmt.Sprintf(`Total:        %s
+Delegations:  %s
+Commission:   %s`, assetConvert.ToMainUnit(r.Total), delegations, assetConvert.ToMainUnit(r.Commission))
+}
+
 type DelegationsReward struct {
 	Validator sdk.ValAddress `json:"validator"`
 	Reward    sdk.Coins      `json:"reward"`
@@ -198,6 +209,11 @@ type DelegationsReward struct {
 func (dr DelegationsReward) String() string {
 	return fmt.Sprintf(`validator: %s, reward: %s`,
 		dr.Validator, dr.Reward.MainUnitString())
+}
+
+func (dr DelegationsReward) HumanString(assetConvert human.AssetConvert) string {
+	return fmt.Sprintf(`validator: %s, reward: %s`,
+		dr.Validator, assetConvert.ToMainUnit(dr.Reward))
 }
 
 func queryRewards(ctx sdk.Context, _ []string, req abci.RequestQuery, k Keeper) ([]byte, sdk.Error) {

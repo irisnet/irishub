@@ -2,7 +2,7 @@ package gov
 
 import (
 	"fmt"
-	"github.com/irisnet/irishub/app/v1/asset"
+	"github.com/irisnet/irishub/app/v1/asset/exported"
 
 	sdk "github.com/irisnet/irishub/types"
 )
@@ -11,6 +11,16 @@ import (
 const MsgRoute = "gov"
 
 var _, _, _, _ sdk.Msg = MsgSubmitProposal{}, MsgSubmitTxTaxUsageProposal{}, MsgDeposit{}, MsgVote{}
+
+type Content interface {
+	sdk.Msg
+	GetTitle() string
+	GetDescription() string
+	GetProposalType() ProposalKind
+	GetProposer() sdk.AccAddress
+	GetInitialDeposit() sdk.Coins
+	GetParams() Params
+}
 
 //-----------------------------------------------------------
 // MsgSubmitProposal
@@ -32,6 +42,25 @@ func NewMsgSubmitProposal(title string, description string, proposalType Proposa
 		InitialDeposit: initialDeposit,
 		Params:         params,
 	}
+}
+
+func (msg MsgSubmitProposal) GetTitle() string {
+	return msg.Title
+}
+func (msg MsgSubmitProposal) GetDescription() string {
+	return msg.Description
+}
+func (msg MsgSubmitProposal) GetProposalType() ProposalKind {
+	return msg.ProposalType
+}
+func (msg MsgSubmitProposal) GetProposer() sdk.AccAddress {
+	return msg.Proposer
+}
+func (msg MsgSubmitProposal) GetInitialDeposit() sdk.Coins {
+	return msg.InitialDeposit
+}
+func (msg MsgSubmitProposal) GetParams() Params {
+	return msg.Params
 }
 
 //nolint
@@ -338,14 +367,8 @@ func (msg MsgSubmitAddTokenProposal) ValidateBasic() sdk.Error {
 		return err
 	}
 
-	issueToken := asset.NewMsgIssueToken(asset.FUNGIBLE, asset.EXTERNAL, "", msg.Symbol, msg.SymbolAtSource, msg.Name, msg.Decimal, msg.SymbolMinAlias, msg.InitialSupply, asset.MaximumAssetMaxSupply, false, nil)
-
-	err = issueToken.ValidateBasic()
-	// skip this error code
-	if err.Code() == asset.CodeInvalidAssetSource {
-		return nil
-	}
-	return err
+	issueToken := exported.NewMsgIssueToken(exported.FUNGIBLE, exported.EXTERNAL, "", msg.Symbol, msg.SymbolAtSource, msg.Name, msg.Decimal, msg.SymbolMinAlias, msg.InitialSupply, exported.MaximumAssetMaxSupply, false, nil)
+	return exported.ValidateMsgIssueToken(&issueToken, false)
 }
 func (msg MsgSubmitAddTokenProposal) GetSignBytes() []byte {
 	b, err := msgCdc.MarshalJSON(msg)
