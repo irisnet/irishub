@@ -41,10 +41,7 @@ func SetWithdrawAddressHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) ht
 		// Build message
 		msg := types.NewMsgSetWithdrawAddress(delegatorAddress, m.WithdrawAddress)
 
-		txCtx, ok := utils.BuildReqTxCtx(cliCtx, baseReq, w)
-		if !ok {
-			return
-		}
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
 
 		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
 	}
@@ -95,10 +92,7 @@ func WithdrawRewardsHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.
 			msg = types.NewMsgWithdrawDelegatorRewardsAll(delegatorAddress)
 		}
 
-		txCtx, ok := utils.BuildReqTxCtx(cliCtx, baseReq, w)
-		if !ok {
-			return
-		}
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
 
 		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
 	}

@@ -38,10 +38,7 @@ func unrevokeRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.
 
 		msg := slashing.NewMsgUnjail(validatorAddr)
 
-		txCtx, ok := utils.BuildReqTxCtx(cliCtx, baseReq, w)
-		if !ok {
-			return
-		}
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
 
 		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
 	}

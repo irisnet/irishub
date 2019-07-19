@@ -138,10 +138,7 @@ func createGatewayHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Ha
 			return
 		}
 
-		txCtx, ok := utils.BuildReqTxCtx(cliCtx, baseReq, w)
-		if !ok {
-			return
-		}
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
 
 		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
 	}
@@ -171,10 +168,7 @@ func editGatewayHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Hand
 			return
 		}
 
-		txCtx, ok := utils.BuildReqTxCtx(cliCtx, baseReq, w)
-		if !ok {
-			return
-		}
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
 
 		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
 	}
@@ -204,10 +198,7 @@ func transferGatewayOwnerHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) 
 			return
 		}
 
-		txCtx, ok := utils.BuildReqTxCtx(cliCtx, baseReq, w)
-		if !ok {
-			return
-		}
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
 
 		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
 	}
@@ -234,10 +225,7 @@ func issueTokenHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handl
 			return
 		}
 
-		txCtx, ok := utils.BuildReqTxCtx(cliCtx, baseReq, w)
-		if !ok {
-			return
-		}
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
 
 		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
 	}
@@ -267,10 +255,7 @@ func editTokenHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handle
 			return
 		}
 
-		txCtx, ok := utils.BuildReqTxCtx(cliCtx, baseReq, w)
-		if !ok {
-			return
-		}
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
 
 		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
 	}
@@ -299,10 +284,7 @@ func transferOwnerHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Ha
 			return
 		}
 
-		txCtx, ok := utils.BuildReqTxCtx(cliCtx, baseReq, w)
-		if !ok {
-			return
-		}
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
 
 		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
 	}
@@ -331,10 +313,7 @@ func mintTokenHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handle
 			return
 		}
 
-		txCtx, ok := utils.BuildReqTxCtx(cliCtx, baseReq, w)
-		if !ok {
-			return
-		}
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
 
 		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
 	}

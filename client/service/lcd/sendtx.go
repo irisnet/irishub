@@ -101,10 +101,7 @@ func definitionPostHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.H
 			return
 		}
 
-		txCtx, ok := utils.BuildReqTxCtx(cliCtx, baseReq, w)
-		if !ok {
-			return
-		}
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
 
 		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
 	}
@@ -158,10 +155,7 @@ func bindingAddHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handl
 			return
 		}
 
-		txCtx, ok := utils.BuildReqTxCtx(cliCtx, baseReq, w)
-		if !ok {
-			return
-		}
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
 
 		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
 	}
@@ -226,10 +220,7 @@ func bindingUpdateHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Ha
 			return
 		}
 
-		txCtx, ok := utils.BuildReqTxCtx(cliCtx, baseReq, w)
-		if !ok {
-			return
-		}
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
 
 		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
 	}
@@ -266,10 +257,7 @@ func bindingDisableHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.H
 			return
 		}
 
-		txCtx, ok := utils.BuildReqTxCtx(cliCtx, baseReq, w)
-		if !ok {
-			return
-		}
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
 
 		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
 	}
@@ -312,10 +300,7 @@ func bindingEnableHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Ha
 			return
 		}
 
-		txCtx, ok := utils.BuildReqTxCtx(cliCtx, baseReq, w)
-		if !ok {
-			return
-		}
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
 
 		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
 	}
@@ -352,10 +337,7 @@ func bindingRefundHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Ha
 			return
 		}
 
-		txCtx, ok := utils.BuildReqTxCtx(cliCtx, baseReq, w)
-		if !ok {
-			return
-		}
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
 
 		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
 	}
@@ -413,10 +395,7 @@ func requestAddHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handl
 			msgs = append(msgs, msg)
 		}
 
-		txCtx, ok := utils.BuildReqTxCtx(cliCtx, baseReq, w)
-		if !ok {
-			return
-		}
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
 
 		utils.WriteGenerateStdTxResponse(w, txCtx, msgs)
 	}
@@ -463,10 +442,7 @@ func responseAddHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Hand
 			return
 		}
 
-		txCtx, ok := utils.BuildReqTxCtx(cliCtx, baseReq, w)
-		if !ok {
-			return
-		}
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
 
 		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
 	}
@@ -501,10 +477,7 @@ func FeesRefundHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handl
 			return
 		}
 
-		txCtx, ok := utils.BuildReqTxCtx(cliCtx, baseReq, w)
-		if !ok {
-			return
-		}
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
 
 		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
 	}
@@ -539,10 +512,7 @@ func FeesWithdrawHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Han
 			return
 		}
 
-		txCtx, ok := utils.BuildReqTxCtx(cliCtx, baseReq, w)
-		if !ok {
-			return
-		}
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
 
 		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
 	}

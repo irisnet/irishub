@@ -73,10 +73,7 @@ func postProposalHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Han
 			return
 		}
 
-		txCtx, ok := utils.BuildReqTxCtx(cliCtx, baseReq, w)
-		if !ok {
-			return
-		}
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
 
 		// create the message
 		msg := gov.NewMsgSubmitProposal(req.Title, req.Description, proposalType, req.Proposer, initDepositAmount, gov.Params{req.Param})
@@ -157,10 +154,7 @@ func depositHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerF
 			return
 		}
 
-		txCtx, ok := utils.BuildReqTxCtx(cliCtx, baseReq, w)
-		if !ok {
-			return
-		}
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
 
 		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
 	}
@@ -207,10 +201,7 @@ func voteHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc
 			return
 		}
 
-		txCtx, ok := utils.BuildReqTxCtx(cliCtx, baseReq, w)
-		if !ok {
-			return
-		}
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
 
 		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
 	}
