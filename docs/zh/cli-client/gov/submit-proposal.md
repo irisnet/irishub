@@ -27,11 +27,11 @@ iriscli gov submit-proposal --help
 | --software           |           " "                 |  新协议的软件地址                                                                       |       |
 | --switch-height           |       0                     |  新版本协议升级的高度                                                     |       |
 | --threshold        | "0.8"   |  软件升级的阈值                                              |               |
-| token-symbol-at-source   |        | 外部代币名称                                                 | |
+| token-canonical-symbol   |        | 外部代币名称                                                 | |
 | --token-symbol |  | 代币符号 | |
 | --token-name |  | 代币名称 | |
 | --token-decimal |  | 代币最大精度 | |
-| --token-symbol-min-alias |  | 代币最小单温别名 | |
+| --token-min-unit-alias |  | 代币最小单位别名 | |
 | --token-initial-supply |  | 代币初始总量 | |
 
 ## 例子
@@ -57,7 +57,7 @@ iriscli gov submit-proposal --chain-id=<chain-id> --title=<proposal_title> --des
 ### 提交一个`AddToken`类型的提议
 
 ```shell
-iriscli gov submit-proposal --chain-id=irishub-test --from=node0 --fee=4iris --type=AddToken --description=test --title=test-proposal --deposit=50000iris --commit --home=$iris_root_path --token-symbol=btc --token-symbol-at-source=btc --token-name=btcToken --token-decimal=18 --token-symbol-min-alias=atto --token-initial-supply=200000
+iriscli gov submit-proposal --chain-id=irishub-test --from=node0 --fee=4iris --type=AddToken --description=test --title=test-proposal --deposit=50000iris --commit --home=$iris_root_path --token-symbol=btc --token-canonical-symbol=btc --token-name=btcToken --token-decimal=18 --token-min-unit-alias=atto --token-initial-supply=200000
 ```
 
 ###  如何查询提议详情？

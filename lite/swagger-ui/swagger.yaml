@@ -2503,10 +2503,10 @@ paths:
                 symbol:
                   type: string
                   example: 'cat'
-                symbol_at_source:
+                canonical_symbol:
                   type: string
                   example: ''
-                symbol_min_alias:
+                min_unit_alias:
                   type: string
                   example: 'kitty'
                 initial_supply:
@@ -2614,10 +2614,10 @@ paths:
                   $ref: '#/components/schemas/BaseTx'
                 owner:
                   $ref: '#/components/schemas/Address'
-                symbol_at_source:
+                canonical_symbol:
                   type: string
                   example: 'btc'
-                symbol_min_alias:
+                min_unit_alias:
                   type: string
                   example: 'satoshi'
                 max_supply:
@@ -3507,9 +3507,9 @@ components:
           type: string
         decimal:
           type: integer
-        symbol_at_source:
+        canonical_symbol:
           type: string
-        symbol_min_alias:
+        min_unit_alias:
           type: string
         initial_supply:
           type: string

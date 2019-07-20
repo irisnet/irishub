@@ -35,8 +35,8 @@ func TestIrisCLIToken(t *testing.T) {
 	name := "Bitcoin"
 	initialSupply := 2000000000
 	decimal := 18
-	symbolAtSource := "Btc"
-	symbolMinAlias := "Satoshi"
+	canonicalSymbol := "Btc"
+	minUnitAlias := "Satoshi"
 	gateway := "ABC"
 
 	// issue a token
@@ -48,8 +48,8 @@ func TestIrisCLIToken(t *testing.T) {
 	spStr += fmt.Sprintf(" --name=%s", name)
 	spStr += fmt.Sprintf(" --initial-supply=%d", initialSupply)
 	spStr += fmt.Sprintf(" --decimal=%d", decimal)
-	spStr += fmt.Sprintf(" --symbol-at-source=%s", symbolAtSource)
-	spStr += fmt.Sprintf(" --symbol-min-alias=%s", symbolMinAlias)
+	spStr += fmt.Sprintf(" --canonical-symbol=%s", canonicalSymbol)
+	spStr += fmt.Sprintf(" --min-unit-alias=%s", minUnitAlias)
 	spStr += fmt.Sprintf(" --gateway=%s", gateway)
 	spStr += fmt.Sprintf(" --fee=%s", "0.4iris")
 
@@ -70,11 +70,11 @@ func TestIrisCLIToken(t *testing.T) {
 	require.Equal(t, strings.ToLower(strings.TrimSpace(source)), token.Source.String())
 	require.Equal(t, strings.ToLower(strings.TrimSpace(symbol)), token.Symbol)
 	require.Equal(t, strings.TrimSpace(name), token.Name)
-	require.Equal(t, strings.ToLower(strings.TrimSpace(symbolMinAlias)), token.SymbolMinAlias)
+	require.Equal(t, strings.ToLower(strings.TrimSpace(minUnitAlias)), token.MinUnitAlias)
 	require.Equal(t, sdk.NewIntWithDecimal(int64(initialSupply), decimal), token.InitialSupply)
 	require.Equal(t, uint8(decimal), token.Decimal)
-	require.Equal(t, "", token.SymbolAtSource) // ignored by native token
-	require.Equal(t, "", token.Gateway)        // ignored by native token
+	require.Equal(t, "", token.CanonicalSymbol) // ignored by native token
+	require.Equal(t, "", token.Gateway)         // ignored by native token
 
 }
 
@@ -187,8 +187,8 @@ func TestIrisCLIEditToken(t *testing.T) {
 	name := "Bitcoin"
 	initialSupply := 100000000
 	decimal := 18
-	symbolAtSource := "Btc"
-	symbolMinAlias := "Satoshi"
+	canonicalSymbol := "Btc"
+	minUnitAlias := "Satoshi"
 	gateway := "ABC"
 
 	// issue a token
@@ -200,8 +200,8 @@ func TestIrisCLIEditToken(t *testing.T) {
 	spStr += fmt.Sprintf(" --name=%s", name)
 	spStr += fmt.Sprintf(" --initial-supply=%d", initialSupply)
 	spStr += fmt.Sprintf(" --decimal=%d", decimal)
-	spStr += fmt.Sprintf(" --symbol-at-source=%s", symbolAtSource)
-	spStr += fmt.Sprintf(" --symbol-min-alias=%s", symbolMinAlias)
+	spStr += fmt.Sprintf(" --canonical-symbol=%s", canonicalSymbol)
+	spStr += fmt.Sprintf(" --min-unit-alias=%s", minUnitAlias)
 	spStr += fmt.Sprintf(" --gateway=%s", gateway)
 	spStr += fmt.Sprintf(" --fee=%s", "0.4iris")
 
@@ -212,7 +212,7 @@ func TestIrisCLIEditToken(t *testing.T) {
 	editTokenStr := fmt.Sprintf("iriscli asset edit-token %s", strings.ToLower(strings.TrimSpace(symbol)))
 	editTokenStr += fmt.Sprintf(" --from=%s", "foo")
 	editTokenStr += fmt.Sprintf(" --name=%s", "BTC_Token")
-	editTokenStr += fmt.Sprintf(" --symbol-at-source=%s", "BTC1")
+	editTokenStr += fmt.Sprintf(" --canonical-symbol=%s", "BTC1")
 	editTokenStr += fmt.Sprintf(" --max-supply=%d", 200000000)
 	editTokenStr += fmt.Sprintf(" --mintable=%v", true)
 	editTokenStr += fmt.Sprintf(" --fee=%s %v", "0.4iris", flags)
@@ -222,7 +222,7 @@ func TestIrisCLIEditToken(t *testing.T) {
 	token := executeGetToken(t, fmt.Sprintf("iriscli asset query-token %s --output=json %v", strings.ToLower(strings.TrimSpace(symbol)), flags))
 
 	require.Equal(t, "BTC_Token", token.Name)
-	require.Equal(t, "", token.SymbolAtSource)
+	require.Equal(t, "", token.CanonicalSymbol)
 	require.Equal(t, sdk.NewIntWithDecimal(int64(200000000), decimal), token.MaxSupply)
 	require.Equal(t, true, token.Mintable)
 }
