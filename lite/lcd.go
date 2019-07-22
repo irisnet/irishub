@@ -11,7 +11,6 @@ import (
 	"github.com/irisnet/irishub/client/context"
 	distributionhandler "github.com/irisnet/irishub/client/distribution/lcd"
 	govhandler "github.com/irisnet/irishub/client/gov/lcd"
-	keyshandler "github.com/irisnet/irishub/client/keys/lcd"
 	paramshandle "github.com/irisnet/irishub/client/params/lcd"
 	servicehandle "github.com/irisnet/irishub/client/service/lcd"
 	slashinghandler "github.com/irisnet/irishub/client/slashing/lcd"
@@ -98,7 +97,6 @@ func createHandler(cdc *codec.Codec) *mux.Router {
 	r.HandleFunc("/version", CLIVersionRequestHandler).Methods("GET")
 	r.HandleFunc("/node-version", NodeVersionRequestHandler(cliCtx)).Methods("GET")
 
-	keyshandler.RegisterRoutes(r, cliCtx.Indent)
 	assethandler.RegisterRoutes(cliCtx, r, cdc)
 	bankhandler.RegisterRoutes(cliCtx, r, cdc)
 	txhandler.RegisterRoutes(cliCtx, r, cdc)
