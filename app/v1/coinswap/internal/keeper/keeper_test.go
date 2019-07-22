@@ -73,3 +73,39 @@ func TestGetReservePool(t *testing.T) {
 	require.True(t, found)
 	require.Equal(t, amt, reservePool.AmountOf(sdk.NativeTokenMinDenom))
 }
+
+func TestKeeper_UpdateLiquidity(t *testing.T) {
+	ctx, keeper, accs := createTestInput(t, sdk.NewInt(1000), 1)
+
+	liquidityName := "swap:btc:iris-atto"
+	poolAddr := getPoolAccAddr(liquidityName)
+
+	// init liquidity
+	msgAdd := types.NewMsgAddLiquidity(sdk.Coin{Denom: "btc", Amount: sdk.NewInt(100)},
+		sdk.NewInt(10), sdk.NewInt(10), ctx.BlockHeader().Time,
+		accs[0].GetAddress())
+
+	require.Nil(t, keeper.AddLiquidity(ctx, msgAdd))
+
+	poolAccout := keeper.ak.GetAccount(ctx, poolAddr)
+	acc := keeper.ak.GetAccount(ctx, accs[0].GetAddress())
+	require.Equal(t, "100btc,10iris-atto,10swap:btc:iris-atto", poolAccout.GetCoins().String())
+	require.Equal(t, "900btc,990iris-atto,10swap:btc:iris-atto", acc.GetCoins().String())
+
+	require.Nil(t, keeper.AddLiquidity(ctx, msgAdd))
+
+	poolAccout = keeper.ak.GetAccount(ctx, poolAddr)
+	acc = keeper.ak.GetAccount(ctx, accs[0].GetAddress())
+	require.Equal(t, "200btc,20iris-atto,20swap:btc:iris-atto", poolAccout.GetCoins().String())
+	require.Equal(t, "800btc,980iris-atto,20swap:btc:iris-atto", acc.GetCoins().String())
+
+	msgRemove := types.NewMsgRemoveLiquidity(sdk.Coin{Denom: "btc", Amount: sdk.NewInt(100)},
+		sdk.NewInt(10), sdk.NewInt(10), ctx.BlockHeader().Time,
+		accs[0].GetAddress())
+	require.Nil(t, keeper.RemoveLiquidity(ctx, msgRemove))
+
+	poolAccout = keeper.ak.GetAccount(ctx, poolAddr)
+	acc = keeper.ak.GetAccount(ctx, accs[0].GetAddress())
+	require.Equal(t, "100btc,10iris-atto,10swap:btc:iris-atto", poolAccout.GetCoins().String())
+	require.Equal(t, "900btc,990iris-atto,10swap:btc:iris-atto", acc.GetCoins().String())
+}
