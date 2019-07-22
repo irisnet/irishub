@@ -169,13 +169,17 @@ func runAddCmd(_ *cobra.Command, args []string) error {
 	} else if viper.GetBool(flagRecover) {
 		keystoreFile := viper.GetString(flagKeystore)
 		if len(keystoreFile) > 0 {
-			buf := keys.BufferStdin()
-			prompt := fmt.Sprintf("Password of the keystore file:")
-
-			passphrase, err := keys.GetPassword(prompt, buf)
-			if err != nil {
-				return fmt.Errorf("Error reading passphrase: %v", err)
+			var passphrase string
+			if !keys.InputIsTty() {
+				passphrase = pass
+			} else {
+				prompt := fmt.Sprintf("Password of the keystore file:")
+				passphrase, err = keys.GetPassword(prompt, buf)
+				if err != nil {
+					return fmt.Errorf("Error reading passphrase: %v", err)
+				}
 			}
+
 			km, err := keystore.NewKeyStoreKeyManager(keystoreFile, passphrase)
 			if err != nil {
 				return err
