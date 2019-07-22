@@ -116,7 +116,11 @@ func (k Keeper) AddLiquidity(ctx sdk.Context, msg types.MsgAddLiquidity) sdk.Err
 		coinAmountDeposited = msg.Deposit.Amount
 	} else {
 		amtToMint = (liquidityCoinBalance.Mul(msg.DepositAmount)).Div(nativeBalance)
+		mod := coinBalance.Mul(msg.DepositAmount).Mod(nativeBalance)
 		coinAmountDeposited = (coinBalance.Mul(msg.DepositAmount)).Div(nativeBalance)
+		if !mod.IsZero() {
+			coinAmountDeposited = coinAmountDeposited.AddRaw(1)
+		}
 	}
 
 	nativeCoinDeposited := sdk.NewCoin(nativeDenom, msg.DepositAmount)
