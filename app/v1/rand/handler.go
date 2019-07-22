@@ -1,6 +1,7 @@
 package rand
 
 import (
+	"encoding/hex"
 	"fmt"
 
 	sdk "github.com/irisnet/irishub/types"
@@ -37,9 +38,7 @@ func handleMsgRequestRand(ctx sdk.Context, k Keeper, msg MsgRequestRand) sdk.Res
 func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, k Keeper) (tags sdk.Tags) {
 	ctx = ctx.WithLogger(ctx.Logger().With("handler", "beginBlock").With("module", "iris/rand"))
 
-	// get data of the last block
 	lastBlockHeight := ctx.BlockHeight() - 1
-	lastBlockTimestamp := ctx.BlockHeader().Time.Unix()
 	lastBlockHash := []byte(ctx.BlockHeader().LastBlockId.Hash)
 
 	// get pending random number requests for lastBlockHeight
@@ -48,14 +47,13 @@ func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, k Keeper) (tags s
 
 	handledRandReqNum := 0
 	for ; iterator.Valid(); iterator.Next() {
-		var reqID string
-		k.GetCdc().MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &reqID)
+		reqID := iterator.Value()
 
 		var request Request
 		k.GetCdc().MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &request)
 
 		// generate a random number
-		rand := MakePRNG(lastBlockHash, lastBlockTimestamp, request.Consumer).GetRand()
+		rand := MakePRNG(lastBlockHash, request.Consumer).GetRand()
 		k.SetRand(ctx, reqID, NewRand(request.TxHash, lastBlockHeight, rand))
 
 		// remove the request
@@ -63,8 +61,8 @@ func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, k Keeper) (tags s
 
 		// add tags
 		tags.AppendTags(sdk.NewTags(
-			TagReqID, []byte(reqID),
-			TagRand, []byte(rand.String()),
+			TagReqID, []byte(hex.EncodeToString(reqID)),
+			TagRand, []byte(rand.Rat.FloatString(RandPrec)),
 		))
 
 		handledRandReqNum++

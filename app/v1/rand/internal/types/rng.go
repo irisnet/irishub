@@ -1,7 +1,6 @@
 package types
 
 import (
-	"fmt"
 	"math/big"
 
 	sdk "github.com/irisnet/irishub/types"
@@ -16,32 +15,28 @@ type RNG interface {
 
 // PRNG represents a pseudo-random number implementation based on future block for RNG
 type PRNG struct {
-	BlockHash      []byte         // hash of the future block
-	BlockTimestamp int64          // timestamp of the future block
-	TxInitiator    sdk.AccAddress // address initiating the request tx
+	BlockHash   []byte         // hash of the future block
+	TxInitiator sdk.AccAddress // address initiating the request tx
 }
 
 // MakePRNG constructs a PRNG
-func MakePRNG(blockHash []byte, blockTimestamp int64, txInitiator sdk.AccAddress) PRNG {
+func MakePRNG(blockHash []byte, txInitiator sdk.AccAddress) PRNG {
 	return PRNG{
-		BlockHash:      blockHash,
-		BlockTimestamp: blockTimestamp,
-		TxInitiator:    txInitiator,
+		BlockHash:   blockHash,
+		TxInitiator: txInitiator,
 	}
 }
 
 // GetRand implements RNG
 func (p PRNG) GetRand() sdk.Rat {
-	seedBT := sdk.NewInt(p.BlockTimestamp)
-	seedBH := sdk.NewIntFromBigInt(new(big.Int).SetBytes(sdk.SHA256(p.BlockHash))).Div(seedBT)
-	seedTI := sdk.NewIntFromBigInt(new(big.Int).SetBytes(sdk.SHA256(p.TxInitiator))).Div(seedBT)
+	seedBH := sdk.NewIntFromBigInt(new(big.Int).SetBytes(sdk.SHA256(p.BlockHash)))
+	seedTI := sdk.NewIntFromBigInt(new(big.Int).SetBytes(sdk.SHA256(p.TxInitiator)))
 
-	seed := sdk.NewIntFromBigInt(new(big.Int).SetBytes(sdk.SHA256(seedBT.Add(seedBH).Add(seedTI).BigInt().Bytes())))
+	seed := sdk.NewIntFromBigInt(new(big.Int).SetBytes(sdk.SHA256(seedBH.Div(seedTI).BigInt().Bytes())))
 	precision := sdk.NewIntWithDecimal(1, RandPrec)
 
-	// Generate a random number with `RandPrec` precision between (0,1).
-	// Err will not occur.
-	rand, _ := sdk.NewRatFromDecimal(fmt.Sprintf("0.%s", seed.Sub(seed.Div(precision).Mul(precision))), RandPrec)
+	// Generate a random number between [0,1) with `RandPrec` precision from seed
+	rand := sdk.NewRatFromInt(seed.Mod(precision), precision)
 
 	return rand
 }

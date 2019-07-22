@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"encoding/hex"
 	"fmt"
 
 	"github.com/irisnet/irishub/app/v1/rand/internal/types"
@@ -52,14 +53,14 @@ func (k Keeper) RequestRand(ctx sdk.Context, consumer sdk.AccAddress, blockInter
 	k.EnqueueRandRequest(ctx, destHeight, reqID, request)
 
 	reqTags := sdk.NewTags(
-		types.TagReqID, []byte(reqID),
+		types.TagReqID, []byte(hex.EncodeToString(reqID)),
 	)
 
 	return reqTags, nil
 }
 
 // SetRand stores the random number
-func (k Keeper) SetRand(ctx sdk.Context, reqID string, rand types.Rand) {
+func (k Keeper) SetRand(ctx sdk.Context, reqID []byte, rand types.Rand) {
 	store := ctx.KVStore(k.storeKey)
 
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(rand)
@@ -67,7 +68,7 @@ func (k Keeper) SetRand(ctx sdk.Context, reqID string, rand types.Rand) {
 }
 
 // EnqueueRandRequest enqueue the random number request
-func (k Keeper) EnqueueRandRequest(ctx sdk.Context, height int64, reqID string, request types.Request) {
+func (k Keeper) EnqueueRandRequest(ctx sdk.Context, height int64, reqID []byte, request types.Request) {
 	store := ctx.KVStore(k.storeKey)
 
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(request)
@@ -75,7 +76,7 @@ func (k Keeper) EnqueueRandRequest(ctx sdk.Context, height int64, reqID string, 
 }
 
 // DequeueRandRequest removes the random number request by the specified height and request id
-func (k Keeper) DequeueRandRequest(ctx sdk.Context, height int64, reqID string) {
+func (k Keeper) DequeueRandRequest(ctx sdk.Context, height int64, reqID []byte) {
 	store := ctx.KVStore(k.storeKey)
 
 	// delete the key
@@ -83,7 +84,7 @@ func (k Keeper) DequeueRandRequest(ctx sdk.Context, height int64, reqID string) 
 }
 
 // GetRand retrieves the random number by the specified request id
-func (k Keeper) GetRand(ctx sdk.Context, reqID string) (types.Rand, sdk.Error) {
+func (k Keeper) GetRand(ctx sdk.Context, reqID []byte) (types.Rand, sdk.Error) {
 	store := ctx.KVStore(k.storeKey)
 
 	bz := store.Get(KeyRand(reqID))

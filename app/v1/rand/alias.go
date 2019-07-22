@@ -36,6 +36,7 @@ var (
 	MakePRNG             = types.MakePRNG
 	CheckReqID           = types.CheckReqID
 	DefaultBlockInterval = types.DefaultBlockInterval
+	RandPrec             = types.RandPrec
 
 	QueryRand             = types.QueryRand
 	QueryRandRequestQueue = types.QueryRandRequestQueue

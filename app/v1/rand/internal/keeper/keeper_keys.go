@@ -10,13 +10,13 @@ var (
 )
 
 // KeyRand returns the key for a random number by the specified request id
-func KeyRand(reqID string) []byte {
-	return []byte(fmt.Sprintf("rands:%s", reqID))
+func KeyRand(reqID []byte) []byte {
+	return append(PrefixRand, reqID...)
 }
 
 // KeyRandRequestQueue returns the key for the random number request queue by the given height and request id
-func KeyRandRequestQueue(height int64, reqID string) []byte {
-	return []byte(fmt.Sprintf("randRequestQueue:%d:%s", height, reqID))
+func KeyRandRequestQueue(height int64, reqID []byte) []byte {
+	return append([]byte(fmt.Sprintf("randRequestQueue:%d:", height)), reqID...)
 }
 
 // KeyRandRequestQueueSubspace returns the key prefix for iterating through all requests at the specified height

@@ -55,13 +55,13 @@ func (rs Requests) String() string {
 }
 
 // GenerateRequestID generate a request id
-func GenerateRequestID(r Request) string {
+func GenerateRequestID(r Request) []byte {
 	reqID := make([]byte, 0)
 
 	reqID = append(reqID, sdk.Uint64ToBigEndian(uint64(r.Height))...)
 	reqID = append(reqID, []byte(r.Consumer)...)
 
-	return hex.EncodeToString(sdk.SHA256(reqID))
+	return sdk.SHA256(reqID)
 }
 
 // CheckReqID checks if the given request id is valid

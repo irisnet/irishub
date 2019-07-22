@@ -1,6 +1,8 @@
 package keeper
 
 import (
+	"encoding/hex"
+
 	"github.com/irisnet/irishub/app/v1/rand/internal/types"
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
@@ -27,7 +29,12 @@ func queryRand(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, s
 		return nil, sdk.ParseParamsErr(err)
 	}
 
-	rand, err2 := keeper.GetRand(ctx, params.ReqID)
+	reqID, err := hex.DecodeString(params.ReqID)
+	if err != nil {
+		return nil, sdk.ParseParamsErr(err)
+	}
+
+	rand, err2 := keeper.GetRand(ctx, reqID)
 	if err2 != nil {
 		return nil, err2
 	}
