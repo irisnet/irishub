@@ -145,10 +145,10 @@ func (keeper Keeper) SubmitProposal(ctx sdk.Context, msg sdk.Msg) (sdk.Tags, sdk
 		paramBytes, _ = json.Marshal(content.GetParams())
 		resTags = resTags.AppendTag(tags.Param, paramBytes)
 	case ProposalTypeCommunityTaxUsage:
-		msg := msg.(MsgSubmitTxTaxUsageProposal)
+		msg := msg.(MsgSubmitCommunityTaxUsageProposal)
 		resTags = resTags.AppendTag(tags.DestAddress, []byte(msg.DestAddress.String()))
 	case ProposalTypeTokenAddition:
-		tokenId := proposal.(*AddTokenProposal).FToken.GetUniqueID()
+		tokenId := proposal.(*TokenAdditionProposal).FToken.GetUniqueID()
 		resTags = resTags.AppendTag(tags.TokenId, []byte(tokenId))
 	}
 	return resTags, nil

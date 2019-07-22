@@ -79,7 +79,7 @@ func postProposalHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Han
 		// create the message
 		msg := gov.NewMsgSubmitProposal(req.Title, req.Description, proposalType, req.Proposer, initDepositAmount, gov.Params{req.Param})
 		if msg.ProposalType == gov.ProposalTypeCommunityTaxUsage {
-			taxMsg := gov.NewMsgSubmitTaxUsageProposal(msg, req.Usage, req.DestAddress, req.Percent)
+			taxMsg := gov.NewMsgSubmitCommunityTaxUsageProposal(msg, req.Usage, req.DestAddress, req.Percent)
 			err = msg.ValidateBasic()
 			if err != nil {
 				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -96,7 +96,7 @@ func postProposalHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Han
 		}
 		if msg.ProposalType == gov.ProposalTypeTokenAddition {
 			token := req.Token
-			tokenMsg := gov.NewMsgSubmitAddTokenProposal(msg, token.Symbol, token.CanonicalSymbol, token.Name, token.MinUnitAlias, token.Decimal, token.InitialSupply)
+			tokenMsg := gov.NewMsgSubmitTokenAdditionProposal(msg, token.Symbol, token.CanonicalSymbol, token.Name, token.MinUnitAlias, token.Decimal, token.InitialSupply)
 			if tokenMsg.ValidateBasic() != nil {
 				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 				return

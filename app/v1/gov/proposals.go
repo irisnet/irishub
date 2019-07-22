@@ -225,8 +225,8 @@ var pTypeMap = map[string]pTypeInfo{
 	"ParameterChange":   createParameterChangeInfo(),
 	"SoftwareUpgrade":   createSoftwareUpgradeInfo(),
 	"SystemHalt":        createSystemHaltInfo(),
-	"CommunityTaxUsage": createTxTaxUsageInfo(),
-	"TokenAddition":     createAddTokenInfo(),
+	"CommunityTaxUsage": createCommunityTaxUsageInfo(),
+	"TokenAddition":     createTokenAdditionInfo(),
 }
 
 // String to proposalType byte.  Returns ff if invalid.

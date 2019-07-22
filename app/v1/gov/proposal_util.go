@@ -73,14 +73,14 @@ func createSystemHaltInfo() pTypeInfo {
 	}
 }
 
-func createTxTaxUsageInfo() pTypeInfo {
+func createCommunityTaxUsageInfo() pTypeInfo {
 	return pTypeInfo{
 		ProposalTypeCommunityTaxUsage,
 		ProposalLevelImportant,
 		func(content Content) Proposal {
 			return buildProposal(content, func(p BasicProposal, content Content) Proposal {
-				taxMsg := content.(MsgSubmitTxTaxUsageProposal)
-				proposal := &TaxUsageProposal{
+				taxMsg := content.(MsgSubmitCommunityTaxUsageProposal)
+				proposal := &CommunityTaxUsageProposal{
 					p,
 					TaxUsage{
 						taxMsg.Usage,
@@ -93,19 +93,19 @@ func createTxTaxUsageInfo() pTypeInfo {
 	}
 }
 
-func createAddTokenInfo() pTypeInfo {
+func createTokenAdditionInfo() pTypeInfo {
 	return pTypeInfo{
 		ProposalTypeTokenAddition,
 		ProposalLevelImportant,
 		func(content Content) Proposal {
 			return buildProposal(content, func(p BasicProposal, content Content) Proposal {
-				addTokenMsg := content.(MsgSubmitAddTokenProposal)
+				addTokenMsg := content.(MsgSubmitTokenAdditionProposal)
 				decimal := int(addTokenMsg.Decimal)
 				initialSupply := sdk.NewIntWithDecimal(int64(addTokenMsg.InitialSupply), decimal)
 				maxSupply := sdk.NewIntWithDecimal(int64(exported.MaximumAssetMaxSupply), decimal)
 
 				fToken := exported.NewFungibleToken(exported.EXTERNAL, "", addTokenMsg.Symbol, addTokenMsg.Name, addTokenMsg.Decimal, addTokenMsg.CanonicalSymbol, addTokenMsg.MinUnitAlias, initialSupply, maxSupply, false, nil)
-				proposal := &AddTokenProposal{
+				proposal := &TokenAdditionProposal{
 					p,
 					fToken,
 				}
