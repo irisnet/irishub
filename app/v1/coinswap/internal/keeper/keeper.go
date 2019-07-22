@@ -9,7 +9,7 @@ import (
 	"github.com/irisnet/irishub/app/v1/params"
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/tendermint/tendermint/libs/log"
+	"github.com/tendermint/tendermint/crypto"
 )
 
 // Keeper of the coinswap store
@@ -38,11 +38,12 @@ func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, bk bank.Keeper, ak auth.Accou
 // CreateReservePool initializes a new reserve pool by creating a
 // ModuleAccount with minting and burning permissions.
 func (k Keeper) CreateReservePool(ctx sdk.Context, moduleName string) {
-	moduleAcc := k.ak.GetAccount(ctx, auth.SwapPoolAccAddr)
+	swapPoolAccAddr := getPoolAccAddr(moduleName)
+	moduleAcc := k.ak.GetAccount(ctx, swapPoolAccAddr)
 	if moduleAcc != nil {
 		panic(fmt.Sprintf("reserve pool for %s already exists", moduleName))
 	}
-	k.bk.AddCoins(ctx, auth.SwapPoolAccAddr, sdk.Coins{})
+	k.bk.AddCoins(ctx, swapPoolAccAddr, sdk.Coins{})
 }
 
 func (k Keeper) SwapOrder(ctx sdk.Context, msg types.MsgSwapOrder) sdk.Error {
@@ -90,27 +91,34 @@ func (k Keeper) SwapOrder(ctx sdk.Context, msg types.MsgSwapOrder) sdk.Error {
 
 func (k Keeper) AddLiquidity(ctx sdk.Context, msg types.MsgAddLiquidity) sdk.Error {
 	nativeDenom := k.GetNativeDenom(ctx)
-	moduleName, err := k.GetModuleName(nativeDenom, msg.Deposit.Denom)
+	exchangePair, err := k.GetModuleName(nativeDenom, msg.Deposit.Denom)
 
 	if err != nil {
 		return sdk.NewError(types.DefaultCodespace, types.CodeEqualDenom, err.Error())
 	}
 
 	// create reserve pool if it does not exist
-	reservePool, found := k.GetReservePool(ctx, msg.Deposit.Denom)
+	reservePool, found := k.GetReservePool(ctx, exchangePair)
 	if !found {
 		k.CreateReservePool(ctx, msg.Deposit.Denom)
 	}
 
 	nativeBalance := reservePool.AmountOf(nativeDenom)
-	//coinBalance := reservePool.AmountOf(msg.Deposit.Denom)
-	liquidityCoinBalance := reservePool.AmountOf(moduleName)
+	coinBalance := reservePool.AmountOf(msg.Deposit.Denom)
+	liquidityCoinBalance := reservePool.AmountOf(exchangePair)
+
+	var amtToMint, coinAmountDeposited sdk.Int
 
 	// calculate amount of UNI to be minted for sender
 	// and coin amount to be deposited
-	// TODO: verify
-	amtToMint := (liquidityCoinBalance.Mul(msg.DepositAmount)).Div(nativeBalance)
-	coinAmountDeposited := (liquidityCoinBalance.Mul(msg.DepositAmount)).Div(nativeBalance)
+	if liquidityCoinBalance.IsZero() {
+		amtToMint = msg.DepositAmount
+		coinAmountDeposited = msg.Deposit.Amount
+	} else {
+		amtToMint = (liquidityCoinBalance.Mul(msg.DepositAmount)).Div(nativeBalance)
+		coinAmountDeposited = (coinBalance.Mul(msg.DepositAmount)).Div(nativeBalance)
+	}
+
 	nativeCoinDeposited := sdk.NewCoin(nativeDenom, msg.DepositAmount)
 	coinDeposited := sdk.NewCoin(msg.Deposit.Denom, coinAmountDeposited)
 
@@ -119,30 +127,34 @@ func (k Keeper) AddLiquidity(ctx sdk.Context, msg types.MsgAddLiquidity) sdk.Err
 	}
 
 	// transfer deposited liquidity into coinswaps ModuleAccount
-	k.SendCoins(ctx, msg.Sender, moduleName, nativeCoinDeposited, coinDeposited)
+	k.SendCoins(ctx, msg.Sender, exchangePair, nativeCoinDeposited, coinDeposited)
 
 	// mint liquidity vouchers for sender
-	k.MintCoins(ctx, moduleName, amtToMint)
-	k.RecieveCoins(ctx, msg.Sender, moduleName, sdk.NewCoin(moduleName, amtToMint))
+	k.MintCoins(ctx, exchangePair, amtToMint)
+	_, _, err = k.bk.AddCoins(ctx, msg.Sender, sdk.Coins{sdk.NewCoin(exchangePair, amtToMint)}.Sort())
+	if err != nil {
+		return sdk.NewError(types.DefaultCodespace, types.CodeEqualDenom, err.Error())
+	}
 	return nil
 }
 
 func (k Keeper) RemoveLiquidity(ctx sdk.Context, msg types.MsgRemoveLiquidity) sdk.Error {
 	nativeDenom := k.GetNativeDenom(ctx)
-	moduleName, err := k.GetModuleName(nativeDenom, msg.Withdraw.Denom)
+	exchangePair, err := k.GetModuleName(nativeDenom, msg.Withdraw.Denom)
+
 	if err != nil {
 		return sdk.NewError(types.DefaultCodespace, types.CodeEqualDenom, err.Error())
 	}
 
 	// check if reserve pool exists
-	reservePool, found := k.GetReservePool(ctx, msg.Withdraw.Denom)
+	reservePool, found := k.GetReservePool(ctx, exchangePair)
 	if !found {
-		panic(fmt.Sprintf("error retrieving reserve pool for ModuleAccoint name: %s", moduleName))
+		return sdk.NewError(types.DefaultCodespace, types.CodeEqualDenom, fmt.Sprintf("error retrieving reserve pool for ModuleAccoint name: %s", moduleName))
 	}
 
 	nativeBalance := reservePool.AmountOf(nativeDenom)
 	coinBalance := reservePool.AmountOf(msg.Withdraw.Denom)
-	liquidityCoinBalance := reservePool.AmountOf(moduleName)
+	liquidityCoinBalance := reservePool.AmountOf(exchangePair)
 
 	// calculate amount of UNI to be burned for sender
 	// and coin amount to be returned
@@ -151,30 +163,34 @@ func (k Keeper) RemoveLiquidity(ctx sdk.Context, msg types.MsgRemoveLiquidity) s
 	coinWithdrawn := msg.WithdrawAmount.Mul(coinBalance).Div(liquidityCoinBalance)
 	nativeCoin := sdk.NewCoin(nativeDenom, nativeWithdrawn)
 	exchangeCoin := sdk.NewCoin(msg.Withdraw.Denom, coinWithdrawn)
-	amtBurned := exchangeCoin.Amount
 
-	if !k.HasCoins(ctx, msg.Sender, sdk.NewCoin(moduleName, amtBurned)) {
+	if !k.HasCoins(ctx, getPoolAccAddr(exchangePair), sdk.NewCoin(exchangePair, msg.WithdrawAmount)) {
 		return sdk.ErrInsufficientCoins("sender does not have sufficient funds to remove liquidity")
 	}
 
 	// burn liquidity vouchers
-	k.SendCoins(ctx, msg.Sender, moduleName, sdk.NewCoin(moduleName, amtBurned))
-	k.BurnCoins(ctx, moduleName, amtBurned)
+	k.BurnCoins(ctx, exchangePair, msg.WithdrawAmount)
+	_, err = k.bk.BurnCoins(ctx, msg.Sender, sdk.Coins{sdk.NewCoin(exchangePair, msg.WithdrawAmount)})
+	if err != nil {
+		return sdk.NewError(types.DefaultCodespace, types.CodeEqualDenom, err.Error())
+	}
 
 	// transfer withdrawn liquidity from coinswaps ModuleAccount to sender's account
-	k.RecieveCoins(ctx, msg.Sender, moduleName, nativeCoin, msg.Withdraw)
+	k.RecieveCoins(ctx, msg.Sender, exchangePair, nativeCoin, exchangeCoin)
 	return nil
 }
 
 // HasCoins returns whether or not an account has at least coins.
 func (k Keeper) HasCoins(ctx sdk.Context, addr sdk.AccAddress, coins ...sdk.Coin) bool {
+	coins = sdk.Coins(coins).Sort()
 	return k.bk.HasCoins(ctx, addr, coins)
 }
 
 // BurnCoins burns liquidity coins from the ModuleAccount at moduleName. The
 // moduleName and denomination of the liquidity coins are the same.
 func (k Keeper) BurnCoins(ctx sdk.Context, moduleName string, amt sdk.Int) {
-	_, err := k.bk.BurnCoins(ctx, auth.SwapPoolAccAddr, sdk.Coins{sdk.NewCoin(moduleName, amt)})
+	swapPoolAccAddr := getPoolAccAddr(moduleName)
+	_, err := k.bk.BurnCoins(ctx, swapPoolAccAddr, sdk.Coins{sdk.NewCoin(moduleName, amt)})
 	if err != nil {
 		panic(err)
 	}
@@ -183,15 +199,19 @@ func (k Keeper) BurnCoins(ctx sdk.Context, moduleName string, amt sdk.Int) {
 // MintCoins mints liquidity coins to the ModuleAccount at moduleName. The
 // moduleName and denomination of the liquidity coins are the same.
 func (k Keeper) MintCoins(ctx sdk.Context, moduleName string, amt sdk.Int) {
-	//err := k.bk.MintCoins(ctx, moduleName, sdk.NewCoins(sdk.NewCoin(moduleName, amt)))
-	//if err != nil {
-	//	panic(err)
-	//}
+	swapPoolAccAddr := getPoolAccAddr(moduleName)
+	_, _, err := k.bk.AddCoins(ctx, swapPoolAccAddr, sdk.Coins{{Denom: moduleName, Amount: amt}})
+	if err != nil {
+		panic(err)
+	}
 }
 
 // SendCoin sends coins from the address to the ModuleAccount at moduleName.
 func (k Keeper) SendCoins(ctx sdk.Context, addr sdk.AccAddress, moduleName string, coins ...sdk.Coin) {
-	_, err := k.bk.SendCoins(ctx, addr, auth.SwapPoolAccAddr, coins)
+	coins1 := sdk.Coins(coins)
+	coins1 = coins1.Sort()
+	swapPoolAccAddr := getPoolAccAddr(moduleName)
+	_, err := k.bk.SendCoins(ctx, addr, swapPoolAccAddr, coins1)
 	if err != nil {
 		panic(err)
 	}
@@ -200,7 +220,10 @@ func (k Keeper) SendCoins(ctx sdk.Context, addr sdk.AccAddress, moduleName strin
 // RecieveCoin sends coins from the ModuleAccount at moduleName to the
 // address provided.
 func (k Keeper) RecieveCoins(ctx sdk.Context, addr sdk.AccAddress, moduleName string, coins ...sdk.Coin) {
-	_, err := k.bk.SendCoins(ctx, auth.SwapPoolAccAddr, addr, coins)
+	coins1 := sdk.Coins(coins)
+	coins1 = coins1.Sort()
+	swapPoolAccAddr := getPoolAccAddr(moduleName)
+	_, err := k.bk.SendCoins(ctx, swapPoolAccAddr, addr, coins1)
 	if err != nil {
 		panic(err)
 	}
@@ -208,8 +231,9 @@ func (k Keeper) RecieveCoins(ctx sdk.Context, addr sdk.AccAddress, moduleName st
 
 // GetReservePool returns the total balance of an reserve pool at the
 // provided denomination.
-func (k Keeper) GetReservePool(ctx sdk.Context, moduleName string) (coins sdk.Coins, found bool) {
-	acc := k.ak.GetAccount(ctx, auth.SwapPoolAccAddr)
+func (k Keeper) GetReservePool(ctx sdk.Context, liquidityName string) (coins sdk.Coins, found bool) {
+	swapPoolAccAddr := getPoolAccAddr(liquidityName)
+	acc := k.ak.GetAccount(ctx, swapPoolAccAddr)
 	if acc == nil {
 		return nil, false
 	}
@@ -239,7 +263,6 @@ func (k Keeper) SetParams(ctx sdk.Context, params types.Params) {
 	k.paramSpace.SetParamSet(ctx, &params)
 }
 
-// Logger returns a module-specific logger.
-func (k Keeper) Logger(ctx sdk.Context) log.Logger {
-	return ctx.Logger().With("module", fmt.Sprintf("x/%s", types.ModuleName))
+func getPoolAccAddr(liquidityName string) sdk.AccAddress {
+	return sdk.AccAddress(crypto.AddressHash(append([]byte("swapPool:" + liquidityName))))
 }
