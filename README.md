@@ -19,8 +19,8 @@ See the
 ## Resources
 
 * Explorer: https://www.irisplorer.io/#/home
-* Riot chat: #irisvalidators:matrix.org
+* Riot chat: https://riot.im/app/#/room/#irisvalidators:matrix.org
 
 ## How To Contribute
 
-See the [contributing](./CONTRIBUTING.md)
+See the [contributing](./CONTRIBUTING.md).
