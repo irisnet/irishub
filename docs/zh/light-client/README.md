@@ -55,29 +55,19 @@ IRISLCD启动以后，您可以在浏览器中访问`localhost:1317/swagger-ui/`
     9. `GET /txs/{hash}`: 通过交易hash查询交易
     10. `GET /txs`: 搜索交易
 
-2. Key management模块的APIs
-
-    1. `GET /keys`: 列出所有本地的秘钥
-    2. `POST /keys`: 创建新的秘钥
-    3. `GET /keys/seed`: 创建新的助记词
-    4. `GET /keys/{name}`: 根据秘钥名称查询秘钥
-    5. `PUT /keys/{name}`: 更新秘钥的密码
-    6. `DELETE /keys/{name}`: 删除秘钥
-    7. `POST /keys/{name}/recover`: 通过seed恢复一个账户
-
-3. 签名和广播交易的APIs
+2. 签名和广播交易的APIs
 
     1. `POST /tx/sign`: 签名交易
-    2. `POST /tx/broadcast`: 广播一个amino编码的交易
+    2. `POST /tx/broadcast`: 广播一个amino或json编码的交易
     
-4. Bank模块的APIs
+3. Bank模块的APIs
     1. `GET /bank/coins/{coin-type}`: 查询coin的类型信息
     2. `GET /bank/token-stats/{id}`: 查询token统计信息
     3. `GET /bank/accounts/{address}`: 查询秘钥对象账户的信息
     4. `POST /bank/accounts/{address}/send`: 发起转账交易
     5. `POST /bank/accounts/{address}/burn`: 销毁token
 
-5. Stake模块的APIs
+4. Stake模块的APIs
 
     1. `POST /stake/delegators/{delegatorAddr}/delegations`: 发起委托交易
     2. `POST /stake/delegators/{delegatorAddr}/redelegations`: 发起转委托交易
@@ -98,7 +88,7 @@ IRISLCD启动以后，您可以在浏览器中访问`localhost:1317/swagger-ui/`
     17. `GET /stake/pool`: 获取权益池信息
     18. `GET /stake/parameters`: 获取权益证明的参数
 
-6. Governance模块的APIs
+5. Governance模块的APIs
 
     1. `POST /gov/proposals`: 发起提交提议交易
     2. `GET /gov/proposals`: 查询提议
@@ -110,12 +100,12 @@ IRISLCD启动以后，您可以在浏览器中访问`localhost:1317/swagger-ui/`
     8. `GET /gov/proposals/{proposalId}/deposits/{depositor}`:查询押金
     9. `GET /gov/proposals/{proposalId}/votes/{voter}`: 查询投票
 
-7. Slashing模块的APIs
+6. Slashing模块的APIs
 
     1. `GET /slashing/validators/{validatorPubKey}/signing-info`: 获取验证人的签名记录
     2. `POST /slashing/validators/{validatorAddr}/unjail`: 赦免某个作恶的验证人节点
 
-8. Distribution模块的APIs
+7. Distribution模块的APIs
 
     1. `POST /distribution/{delegatorAddr}/withdraw-address`: 设置收益取回地址
     2. `GET /distribution/{delegatorAddr}/withdraw-address`: 查询收益取回地址
@@ -123,7 +113,7 @@ IRISLCD启动以后，您可以在浏览器中访问`localhost:1317/swagger-ui/`
     4. `GET /distribution/{address}/rewards`: 查询收益
     5. `GET /distribution/community-tax`: 查询社区税金
 
-9. Service模块的APIs
+8. Service模块的APIs
 
     1. `POST /service/definitions`: 添加服务定义
     2. `GET /service/definitions/{defChainId}/{serviceName}`: 查询服务定义
@@ -142,7 +132,7 @@ IRISLCD启动以后，您可以在浏览器中访问`localhost:1317/swagger-ui/`
     15. `POST /service/fees/{address}/refund`: 消费者取回（未被响应的）服务费用
     16. `POST /service/fees/{address}/withdraw`: 服务提供者取回服务收益
 
-10. Asset模块的APIs
+9. Asset模块的APIs
     1. `GET /asset/gateways/{moniker}`: 查询指定名字所对应的网关信息
     2. `GET /asset/gateways`: 查询所有网关信息，提供一个可选的owner参数
     3. `GET /asset/fees/gateways/{moniker}`: 查询指定网关的创建费用
@@ -152,14 +142,14 @@ IRISLCD启动以后，您可以在浏览器中访问`localhost:1317/swagger-ui/`
     7. `POST /asset/gateways/{moniker}/transfer`: 转让指定网关的所有权
     8. `PUT /asset/tokens/{token-id}`: 编辑一个已经存在的资产
 
+10. Params模块的APIs
+    
+    1. `GET /params`: 查询系统预设的参数
+
 11. 查询版本
 
     1. `GET /version`: 获取IRISHUB的版本
     2. `GET /node-version`: 查询全节点版本
-
-12. Params 模块的APIs
-    
-    1. `GET /params`: 查询系统预设的参数
 
 ## 特殊参数
 
@@ -173,14 +163,13 @@ IRISLCD启动以后，您可以在浏览器中访问`localhost:1317/swagger-ui/`
 7. `POST /gov/proposals/{proposalId}/votes`
 8. `POST /slashing/validators/{validatorAddr}/unjail`
 
-上述的API都有四个特殊的查询参数，如下表所示。默认情况下，它们的值都是false。每个参数都有其唯一的优先级(这里`0`是最高优先级)。如果多个参数的值都是`true`，则将忽略优先级较低的。例如，如果`generate-only`为`true`，那么其他参数，例如`simulate`和`commit`将被忽略。
+上述API中, `tx/broadcast`支持三个特殊的查询参数，如下表所示。默认情况下，它们的值都是false。每个参数都有其唯一的优先级(这里`0`是最高优先级)。如果多个参数的值都是`true`，则将忽略优先级较低的。例如，如果`simulate`为`true`，那么`commit`和`async`将被忽略。
 
 | 参数名字        | 类型 | 默认值 | 优先级 | 功能描述                 |
 | --------------- | ---- | ------- |--------- |--------------------------- |
-| generate-only   | bool | false | 0 | 构建一个未签名的交易并返回 |
-| simulate        | bool | false | 1 | 用仿真的方式去执行交易 |
-| commit          | bool | false | 2 | 等待交易被打包入块  |
-| async           | bool | false | 3 | 用异步地方式广播交易  |
+| simulate        | bool | false | 0 | 用仿真的方式去执行交易 |
+| commit          | bool | false | 1 | 等待交易被打包入块  |
+| async           | bool | false | 2 | 用异步地方式广播交易  |
 
 ## 更新日志
 请参阅 [CHANGELOG](CHANGELOG.md)

@@ -18,9 +18,12 @@ type broadcastBody struct {
 func BroadcastTxRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		cliCtx = utils.InitReqCliCtx(cliCtx, r)
+
 		var m broadcastBody
 		if err := utils.ReadPostBody(w, r, cliCtx.Codec, &m); err != nil {
-			return
+			if err := utils.ReadPostBody(w, r, cliCtx.Codec, &m.Tx); err != nil {
+				return
+			}
 		}
 
 		txBytes, err := cliCtx.Codec.MarshalBinaryLengthPrefixed(m.Tx)

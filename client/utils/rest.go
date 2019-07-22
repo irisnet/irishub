@@ -95,12 +95,6 @@ func HasDryRunArg(r *http.Request) bool {
 	return urlQueryHasArg(r.URL, queryArgDryRun)
 }
 
-// HasGenerateOnlyArg returns whether a URL's query "generate-only" parameter
-// is set to "true".
-func HasGenerateOnlyArg(r *http.Request) bool {
-	return urlQueryHasArg(r.URL, queryArgGenerateOnly)
-}
-
 // AsyncOnlyArg returns whether a URL's query "async" parameter
 func AsyncOnlyArg(r *http.Request) bool {
 	return urlQueryHasArg(r.URL, Async)
@@ -198,7 +192,6 @@ func ReadPostBody(w http.ResponseWriter, r *http.Request, cdc *codec.Codec, req 
 
 // InitReqCliCtx
 func InitReqCliCtx(cliCtx context.CLIContext, r *http.Request) context.CLIContext {
-	cliCtx.GenerateOnly = HasGenerateOnlyArg(r)
 	cliCtx.Async = AsyncOnlyArg(r)
 	cliCtx.DryRun = HasDryRunArg(r)
 	cliCtx.Commit = CommitOnlyArg(r)
