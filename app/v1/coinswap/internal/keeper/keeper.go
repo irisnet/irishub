@@ -149,7 +149,7 @@ func (k Keeper) RemoveLiquidity(ctx sdk.Context, msg types.MsgRemoveLiquidity) s
 	// check if reserve pool exists
 	reservePool, found := k.GetReservePool(ctx, exchangePair)
 	if !found {
-		return sdk.NewError(types.DefaultCodespace, types.CodeEqualDenom, fmt.Sprintf("error retrieving reserve pool for ModuleAccoint name: %s", moduleName))
+		return sdk.NewError(types.DefaultCodespace, types.CodeEqualDenom, fmt.Sprintf("error retrieving reserve pool for ModuleAccoint name: %s", exchangePair))
 	}
 
 	nativeBalance := reservePool.AmountOf(nativeDenom)
@@ -208,10 +208,8 @@ func (k Keeper) MintCoins(ctx sdk.Context, moduleName string, amt sdk.Int) {
 
 // SendCoin sends coins from the address to the ModuleAccount at moduleName.
 func (k Keeper) SendCoins(ctx sdk.Context, addr sdk.AccAddress, moduleName string, coins ...sdk.Coin) {
-	coins1 := sdk.Coins(coins)
-	coins1 = coins1.Sort()
 	swapPoolAccAddr := getPoolAccAddr(moduleName)
-	_, err := k.bk.SendCoins(ctx, addr, swapPoolAccAddr, coins1)
+	_, err := k.bk.SendCoins(ctx, addr, swapPoolAccAddr, sdk.Coins(coins).Sort())
 	if err != nil {
 		panic(err)
 	}
@@ -220,10 +218,8 @@ func (k Keeper) SendCoins(ctx sdk.Context, addr sdk.AccAddress, moduleName strin
 // RecieveCoin sends coins from the ModuleAccount at moduleName to the
 // address provided.
 func (k Keeper) RecieveCoins(ctx sdk.Context, addr sdk.AccAddress, moduleName string, coins ...sdk.Coin) {
-	coins1 := sdk.Coins(coins)
-	coins1 = coins1.Sort()
 	swapPoolAccAddr := getPoolAccAddr(moduleName)
-	_, err := k.bk.SendCoins(ctx, swapPoolAccAddr, addr, coins1)
+	_, err := k.bk.SendCoins(ctx, swapPoolAccAddr, addr, sdk.Coins(coins).Sort())
 	if err != nil {
 		panic(err)
 	}
@@ -264,5 +260,5 @@ func (k Keeper) SetParams(ctx sdk.Context, params types.Params) {
 }
 
 func getPoolAccAddr(liquidityName string) sdk.AccAddress {
-	return sdk.AccAddress(crypto.AddressHash(append([]byte("swapPool:" + liquidityName))))
+	return sdk.AccAddress(crypto.AddressHash([]byte("swapPool:" + liquidityName)))
 }
