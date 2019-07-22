@@ -1,10 +1,8 @@
 package keeper
 
 import (
-	"fmt"
-	"testing"
-
 	"github.com/stretchr/testify/require"
+	"testing"
 
 	"github.com/irisnet/irishub/app/v1/coinswap/internal/types"
 	sdk "github.com/irisnet/irishub/types"
@@ -103,6 +101,16 @@ func TestKeeper_UpdateLiquidity(t *testing.T) {
 	require.Equal(t, "2btc,13iris-atto,13swap:btc:iris-atto", poolAccout.GetCoins().String())
 	require.Equal(t, "998btc,987iris-atto,13swap:btc:iris-atto", acc.GetCoins().String())
 
+	require.Equal(t, "100btc,10iris-atto,10swap:btc:iris-atto", poolAccout.GetCoins().String())
+	require.Equal(t, "900btc,990iris-atto,10swap:btc:iris-atto", acc.GetCoins().String())
+
+	require.Nil(t, keeper.AddLiquidity(ctx, msgAdd))
+
+	poolAccout = keeper.ak.GetAccount(ctx, poolAddr)
+	acc = keeper.ak.GetAccount(ctx, accs[0].GetAddress())
+	require.Equal(t, "200btc,20iris-atto,20swap:btc:iris-atto", poolAccout.GetCoins().String())
+	require.Equal(t, "800btc,980iris-atto,20swap:btc:iris-atto", acc.GetCoins().String())
+
 	msgRemove := types.NewMsgRemoveLiquidity(sdk.Coin{Denom: "btc", Amount: sdk.NewInt(1)},
 		sdk.NewInt(3), sdk.NewInt(3), ctx.BlockHeader().Time,
 		accs[0].GetAddress())
@@ -112,11 +120,4 @@ func TestKeeper_UpdateLiquidity(t *testing.T) {
 	acc = keeper.ak.GetAccount(ctx, accs[0].GetAddress())
 	require.Equal(t, "2btc,10iris-atto,10swap:btc:iris-atto", poolAccout.GetCoins().String())
 	require.Equal(t, "998btc,990iris-atto,10swap:btc:iris-atto", acc.GetCoins().String())
-}
-
-func TestKeeper_BurnCoins(t *testing.T) {
-	int1 := sdk.NewInt(10)
-	int2 := sdk.NewInt(3)
-	fmt.Println(int1.Mod(int2))
-	fmt.Println(int1.Div(int2))
 }
