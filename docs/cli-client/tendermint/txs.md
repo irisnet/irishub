@@ -151,13 +151,14 @@ You will get the following result.
 |              | irishub/stake/BeginUnbonding | begin_unbonding |
 |              | irishub/stake/BeginRedelegate | begin_redelegate |
 | slashing     | irishub/slashing/MsgUnjail | unjail |
-| service      | irishub/service/MsgSvcDef | service_define |
-|              | irishub/service/MsgSvcBinding | service_bind |
-|              | irishub/service/MsgSvcBindingUpdate | service_binding_update |
-|              | irishub/service/MsgSvcDisable | service_disable |
-|              | irishub/service/MsgSvcEnable | service_enable |
-|              | irishub/service/MsgSvcRefundDeposit | service_refund_deposit |
-|              | irishub/service/MsgSvcRequest | service_call |
-|              | irishub/service/MsgSvcResponse | service_respond |
-|              | irishub/service/MsgSvcRefundFees | service_withdraw_fees |
-|              | irishub/service/MsgSvcWithdrawTax | service_withdraw_fee_tax |
+| service      | irishub/service/MsgSvcDef | define_service |
+|              | irishub/service/MsgSvcBinding | bind_service |
+|              | irishub/service/MsgSvcBindingUpdate | update_service_binding |
+|              | irishub/service/MsgSvcDisable | disable_service |
+|              | irishub/service/MsgSvcEnable | enable_service |
+|              | irishub/service/MsgSvcRefundDeposit | refund_service_deposit |
+|              | irishub/service/MsgSvcRequest | call_service |
+|              | irishub/service/MsgSvcResponse | respond_service |
+|              | irishub/service/MsgSvcRefundFees | refund_service_fees |
+|              | irishub/service/MsgSvcWithdrawFees | withdraw_service_fees |
+|              | irishub/service/MsgSvcWithdrawTax | withdraw_service_tax |
