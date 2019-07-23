@@ -368,7 +368,7 @@ func (msg MsgSubmitTokenAdditionProposal) ValidateBasic() sdk.Error {
 	}
 
 	issueToken := exported.NewMsgIssueToken(exported.FUNGIBLE, exported.EXTERNAL, "", msg.Symbol, msg.CanonicalSymbol, msg.Name, msg.Decimal, msg.MinUnitAlias, msg.InitialSupply, exported.MaximumAssetMaxSupply, false, nil)
-	return exported.ValidateMsgIssueToken(&issueToken, false)
+	return exported.ValidateMsgIssueToken(&issueToken)
 }
 func (msg MsgSubmitTokenAdditionProposal) GetSignBytes() []byte {
 	b, err := msgCdc.MarshalJSON(msg)
