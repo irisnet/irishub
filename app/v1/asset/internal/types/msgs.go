@@ -165,7 +165,7 @@ func (msg MsgIssueToken) ValidateBasic() sdk.Error {
 	if msg.Source == EXTERNAL {
 		return ErrInvalidAssetSource(DefaultCodespace, fmt.Sprintf("invalid source type %s", msg.Source.String()))
 	}
-	return ValidateMsgIssueToken(&msg, true)
+	return ValidateMsgIssueToken(&msg)
 }
 
 // Implements Msg.
