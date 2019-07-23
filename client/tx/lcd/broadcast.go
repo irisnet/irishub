@@ -1,6 +1,8 @@
 package lcd
 
 import (
+	"encoding/json"
+	"io/ioutil"
 	"net/http"
 
 	"github.com/irisnet/irishub/app/v1/auth"
@@ -19,8 +21,26 @@ func BroadcastTxRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) ht
 	return func(w http.ResponseWriter, r *http.Request) {
 		cliCtx = utils.InitReqCliCtx(cliCtx, r)
 
+		body, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		var paramJson map[string]interface{}
+		if err := json.Unmarshal(body, &paramJson); err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
 		var m broadcastBody
-		if err := utils.ReadPostBody(w, r, cliCtx.Codec, &m); err != nil {
+		_, ok := paramJson["type"]
+
+		if !ok {
+			if err := utils.ReadPostBody(w, r, cliCtx.Codec, &m); err != nil {
+				return
+			}
+		} else {
 			if err := utils.ReadPostBody(w, r, cliCtx.Codec, &m.Tx); err != nil {
 				return
 			}
