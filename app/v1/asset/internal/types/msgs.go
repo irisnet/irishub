@@ -623,8 +623,8 @@ func ValidateMoniker(moniker string) sdk.Error {
 	}
 
 	// check the moniker format
-	if !IsBeginWithAlpha(moniker) || !IsAlphaNumeric(moniker){
-		return ErrInvalidMoniker(DefaultCodespace, fmt.Sprintf("the moniker must begin with a letter followed by alphanumric characters"))
+	if !IsBeginWithAlpha(moniker) || !IsAlphaNumeric(moniker) {
+		return ErrInvalidMoniker(DefaultCodespace, fmt.Sprintf("the moniker must begin with a letter followed by alphanumeric characters"))
 	}
 
 	// check if the moniker contains the native token name
