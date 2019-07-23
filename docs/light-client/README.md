@@ -43,6 +43,7 @@ irislcd start --chain-id=<chain-id> --laddr=tcp://0.0.0.0:1317
 Once IRISLCD is started, you can open `localhost:1317/swagger-ui/` in your explorer and all restful APIs will be shown. The `swagger-ui` page has detailed description about APIs' functionality and required parameters. Here we just list all APIs and introduce their functionality briefly.
 
 1. Tendermint APIs, such as query blocks, transactions and validator set
+
     1. `GET /node-info`: The properties of the connected node
     2. `GET /syncing`: Syncing state of node
     3. `GET /blocks/latest`: Get the latest block
@@ -59,6 +60,7 @@ Once IRISLCD is started, you can open `localhost:1317/swagger-ui/` in your explo
     1. `POST /tx/broadcast`: Broadcast a signed StdTx which is amino or json encoded
 
 3. Bank module APIs
+
     1. `GET /bank/coins/{type}`: Get coin type
     2. `GET /bank/token-stats`: Get token statistic
     3. `GET /bank/accounts/{address}`: Get the account information on blockchain
@@ -86,30 +88,31 @@ Once IRISLCD is started, you can open `localhost:1317/swagger-ui/` in your explo
     17. `GET /stake/pool`: Get the current state of the staking pool
     18. `GET /stake/parameters`: Get the current staking parameter values
 
-5. Governance module APIs
-
-    1. `POST /gov/proposals`: Submit a proposal
-    2. `GET /gov/proposals`: Query proposals
-    3. `POST /gov/proposals/{proposalId}/deposits`: Deposit tokens to a proposal
-    4. `GET /gov/proposals/{proposalId}/deposits`: Query deposits
-    5. `POST /gov/proposals/{proposalId}/votes`: Vote a proposal
-    6. `GET /gov/proposals/{proposalId}/votes`: Query voters
-    7. `GET /gov/proposals/{proposalId}`: Query a proposal
-    8. `GET /gov/proposals/{proposalId}/deposits/{depositor}`: Query deposit
-    9. `GET /gov/proposals/{proposalId}/votes/{voter}`: Query vote
-
-6. Slashing module APIs
+5. Slashing module APIs
     1. `GET /slashing/validators/{validatorPubKey}/signing-info`: Get sign info of given validator
     2. `POST /slashing/validators/{validatorAddr}/unjail`: Unjail a jailed validator
 
-7. Distribution module APIs
+6. Distribution module APIs
 
     1. `POST /distribution/{delegatorAddr}/withdraw-address`: Set withdraw address
     2. `GET /distribution/{delegatorAddr}/withdraw-address`: Query withdraw address
     3. `POST /distribution/{delegatorAddr}/rewards/withdraw`: Withdraw reward
     4. `GET /distribution/{address}/rewards`: Query rewards
     5. `GET /distribution/community-tax`: Query community tax
-    
+   
+7.  Asset module APIs
+
+    1. `GET /asset/gateways/{moniker}`: Query the gateway of a given moniker
+    2. `GET /asset/gateways`: Query all the gateways with an optional owner
+    3. `GET /asset/fees/gateways/{moniker}`: Query the creation fee of a given gateway
+    4. `GET /asset/fees/tokens/{id}`: Query the fees for issuing and minting the specified token
+    5. `POST /asset/gateways`: Create a gateway
+    6. `PUT /asset/gateways/{moniker}`: Edit an existing gateway
+    7. `POST /asset/gateways/{moniker}/transfer`: Transfer the ownership of the given gateway
+    8. `PUT /asset/tokens/{token-id}`: Edit an existing token
+    9. `POST /asset/tokens/{token-id}/mint`: The asset owner and operator can directly mint tokens to a specified address
+    10. `POST /asset/tokens/{token-id}/transfer-owner`: transfer the owner of a token to a new owner
+
 8. Service module APIs
 
     1. `POST /service/definitions`: Add a service definition
@@ -129,23 +132,23 @@ Once IRISLCD is started, you can open `localhost:1317/swagger-ui/` in your explo
     15. `POST /service/fees/{address}/refund`: Refund service return fee of consumer
     16. `POST /service/fees/{address}/withdraw`: Withdraw service incoming fee of provider
 
-9. Asset module APIs
-    1. `GET /asset/gateways/{moniker}`: Query the gateway of a given moniker
-    2. `GET /asset/gateways`: Query all the gateways with an optional owner
-    3. `GET /asset/fees/gateways/{moniker}`: Query the creation fee of a given gateway
-    4. `GET /asset/fees/tokens/{id}`: Query the fees for issuing and minting the specified token
-    5. `POST /asset/gateways`: Create a gateway
-    6. `PUT /asset/gateways/{moniker}`: Edit an existing gateway
-    7. `POST /asset/gateways/{moniker}/transfer`: Transfer the ownership of the given gateway
-    8. `PUT /asset/tokens/{token-id}`: Edit an existing token
-    9. `POST /asset/tokens/{token-id}/mint`: The asset owner and operator can directly mint tokens to a specified address
-    10. `POST /asset/tokens/{token-id}/transfer-owner`: transfer the owner of a token to a new owner
-
-10. Params module APIs
+9.  Params module APIs
     
     1. `GET /params`: Query system params
 
-11. Query app version
+10.  Governance module APIs
+
+    1. `POST /gov/proposals`: Submit a proposal
+    2. `GET /gov/proposals`: Query proposals
+    3. `POST /gov/proposals/{proposalId}/deposits`: Deposit tokens to a proposal
+    4. `GET /gov/proposals/{proposalId}/deposits`: Query deposits
+    5. `POST /gov/proposals/{proposalId}/votes`: Vote a proposal
+    6. `GET /gov/proposals/{proposalId}/votes`: Query voters
+    7. `GET /gov/proposals/{proposalId}`: Query a proposal
+    8. `GET /gov/proposals/{proposalId}/deposits/{depositor}`: Query deposit
+    9. `GET /gov/proposals/{proposalId}/votes/{voter}`: Query vote
+
+11.  Query app version
 
     1. `GET /version`: Version of IRISLCD
     2. `GET /node-version`: Version of the connected node

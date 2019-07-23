@@ -23,18 +23,18 @@ tags:
     description: Bank module APIs
   - name: Stake
     description: Stake module APIs
-  - name: Gov
-    description: Governance module APIs
   - name: Slashing
     description: Slashing module APIs
   - name: Distribution
     description: Distribution module APIs
-  - name: Service
-    description: Service module APIs
   - name: Asset
     description: Asset module APIs
+  - name: Service
+    description: Service module APIs
   - name: Params
     description: Params module APIs
+  - name: Gov
+    description: Governance module APIs
   - name: Version
     description: Query app version
 paths:

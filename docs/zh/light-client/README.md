@@ -44,6 +44,7 @@ irislcd start --chain-id=<chain-id> --laddr=tcp://0.0.0.0:1317
 IRISLCD启动以后，您可以在浏览器中访问`localhost:1317/swagger-ui/`，然后你将看到所有的REST APIs。`swagger-ui`页面有关于API功能和所需参数的详细描述。在这里，我们只列出所有API并简要介绍它们的功能。
 
 1. Tendermint相关APIs, 例如查询区块，交易和验证人集
+   
     1. `GET /node-info`: 查询所连接全节点的信息
     2. `GET /syncing`: 查询所连接全节点是否处于追赶区块的状态
     3. `GET /blocks/latest`: 获取最新区块
@@ -60,6 +61,7 @@ IRISLCD启动以后，您可以在浏览器中访问`localhost:1317/swagger-ui/`
     1. `POST /tx/broadcast`: 广播一个amino或者json编码的交易
     
 3. Bank模块的APIs
+
     1. `GET /bank/coins/{coin-type}`: 查询coin的类型信息
     2. `GET /bank/token-stats/{id}`: 查询token统计信息
     3. `GET /bank/accounts/{address}`: 查询秘钥对象账户的信息
@@ -87,30 +89,29 @@ IRISLCD启动以后，您可以在浏览器中访问`localhost:1317/swagger-ui/`
     17. `GET /stake/pool`: 获取权益池信息
     18. `GET /stake/parameters`: 获取权益证明的参数
 
-5. Governance模块的APIs
-
-    1. `POST /gov/proposals`: 发起提交提议交易
-    2. `GET /gov/proposals`: 查询提议
-    3. `POST /gov/proposals/{proposalId}/deposits`: 发起缴纳押金的交易
-    4. `GET /gov/proposals/{proposalId}/deposits`: 查询缴纳的押金
-    5. `POST /gov/proposals/{proposalId}/votes`: 发起投票交易
-    6. `GET /gov/proposals/{proposalId}/votes`: 查询投票
-    7. `GET /gov/proposals/{proposalId}`: 查询某个提议
-    8. `GET /gov/proposals/{proposalId}/deposits/{depositor}`:查询押金
-    9. `GET /gov/proposals/{proposalId}/votes/{voter}`: 查询投票
-
-6. Slashing模块的APIs
+5. Slashing模块的APIs
 
     1. `GET /slashing/validators/{validatorPubKey}/signing-info`: 获取验证人的签名记录
     2. `POST /slashing/validators/{validatorAddr}/unjail`: 赦免某个作恶的验证人节点
 
-7. Distribution模块的APIs
+6. Distribution模块的APIs
 
     1. `POST /distribution/{delegatorAddr}/withdraw-address`: 设置收益取回地址
     2. `GET /distribution/{delegatorAddr}/withdraw-address`: 查询收益取回地址
     3. `POST /distribution/{delegatorAddr}/rewards/withdraw`: 取回收益
     4. `GET /distribution/{address}/rewards`: 查询收益
     5. `GET /distribution/community-tax`: 查询社区税金
+
+7.  Asset模块的APIs
+   
+    1. `GET /asset/gateways/{moniker}`: 查询指定名字所对应的网关信息
+    2. `GET /asset/gateways`: 查询所有网关信息，提供一个可选的owner参数
+    3. `GET /asset/fees/gateways/{moniker}`: 查询指定网关的创建费用
+    4. `GET /asset/fees/tokens/{id}`: 查询指定Token的发行和增发费用
+    5. `POST /asset/gateways`: 创建一个网关
+    6. `PUT /asset/gateways/{moniker}`: 编辑一个存在的网关
+    7. `POST /asset/gateways/{moniker}/transfer`: 转让指定网关的所有权
+    8. `PUT /asset/tokens/{token-id}`: 编辑一个已经存在的资产
 
 8. Service模块的APIs
 
@@ -131,19 +132,21 @@ IRISLCD启动以后，您可以在浏览器中访问`localhost:1317/swagger-ui/`
     15. `POST /service/fees/{address}/refund`: 消费者取回（未被响应的）服务费用
     16. `POST /service/fees/{address}/withdraw`: 服务提供者取回服务收益
 
-9.  Asset模块的APIs
-    1. `GET /asset/gateways/{moniker}`: 查询指定名字所对应的网关信息
-    2. `GET /asset/gateways`: 查询所有网关信息，提供一个可选的owner参数
-    3. `GET /asset/fees/gateways/{moniker}`: 查询指定网关的创建费用
-    4. `GET /asset/fees/tokens/{id}`: 查询指定Token的发行和增发费用
-    5. `POST /asset/gateways`: 创建一个网关
-    6. `PUT /asset/gateways/{moniker}`: 编辑一个存在的网关
-    7. `POST /asset/gateways/{moniker}/transfer`: 转让指定网关的所有权
-    8. `PUT /asset/tokens/{token-id}`: 编辑一个已经存在的资产
-
-10. Params模块的APIs
+9.  Params模块的APIs
     
     1. `GET /params`: 查询系统预设的参数
+
+10.  Governance模块的APIs
+
+    1. `POST /gov/proposals`: 发起提交提议交易
+    2. `GET /gov/proposals`: 查询提议
+    3. `POST /gov/proposals/{proposalId}/deposits`: 发起缴纳押金的交易
+    4. `GET /gov/proposals/{proposalId}/deposits`: 查询缴纳的押金
+    5. `POST /gov/proposals/{proposalId}/votes`: 发起投票交易
+    6. `GET /gov/proposals/{proposalId}/votes`: 查询投票
+    7. `GET /gov/proposals/{proposalId}`: 查询某个提议
+    8. `GET /gov/proposals/{proposalId}/deposits/{depositor}`:查询押金
+    9. `GET /gov/proposals/{proposalId}/votes/{voter}`: 查询投票
 
 11. 查询版本
 
