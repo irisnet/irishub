@@ -26,8 +26,14 @@ iriscli tx multisign <file> <key name> <[signature]...> <flags>
 创建一个包含3个子账户的多签账户，且指定签名人数必须大于等于2人，该交易才能被正常广播。
 
 ```  
-iriscli keys add <multi_account_keyname> --multisig-threshold=2 --multisig=<user_1>,<user_2>,<user_3>
+iriscli keys add <multi_account_keyname> --multisig-threshold=2 --multisig=<signer_keyname_1>,<signer_keyname_2>,<signer_keyname_3>...
 ```
+
+::: tips
+<signer_keyname> 可以为 local/offline/ledger 类型， 但不允许为multi类型。
+
+其中， offline类型的账户可以在add时通过指定 --pubkey 生成。
+:::
 
 ### 多签账户构造交易
 
@@ -42,14 +48,14 @@ iriscli bank send --amount=1iris --fee=0.3iris --chain-id=<chain-id> --from=<mul
 
 由于指定的threshold=2， 则最少需要2人签名就能完成交易签名。分别对Tx-generate.json进行签名， 并生成对应的Tx-sign.json文件。
 
-用user_1对交易进行签名:
+用signer_1对交易进行签名:
 ```  
-iriscli tx sign Tx-generate.json --name=<user_1> --chain-id=<chain-id> --multisig=<multi_account_address> --signature-only >Tx-sign-user_1.json
+iriscli tx sign Tx-generate.json --name=<signer_keyname_1> --chain-id=<chain-id> --multisig=<multi_account_address> --signature-only >Tx-sign-user_1.json
 ```
 
-用user_2对交易进行签名:
+用signer_2对交易进行签名:
 ```  
-iriscli tx sign Tx-generate.json --name=<user_1> --chain-id=<chain-id> --multisig=<multi_account_address> --signature-only >Tx-sign-user_2.json
+iriscli tx sign Tx-generate.json --name=<signer_keyname_2> --chain-id=<chain-id> --multisig=<multi_account_address> --signature-only >Tx-sign-user_2.json
 ```
 
 ### 把多个签名合并，并生成签名后的交易

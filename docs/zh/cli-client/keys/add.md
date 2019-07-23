@@ -82,7 +82,13 @@ iriscli keys add Mykey --recover --keystore=<path_to_backup_keystore>
 例子：创建一个包含3个子账户的多签账户，且指定签名人数必须大于等于2人，该交易才能被正常广播。
 
 ```  
-iriscli keys add <multi_account_keyname> --multisig-threshold=2 --multisig=<user_1>,<user_2>,<user_3>
+iriscli keys add <multi_account_keyname> --multisig-threshold=2 --multisig=<signer_keyname_1>,<signer_keyname_2>,<signer_keyname_3>...
 ```
+
+::: tips
+<signer_keyname> 可以为 local/offline/ledger 类型， 但不允许为multi类型。
+
+其中， offline类型的账户可以在add时通过指定 --pubkey 生成。
+:::
 
 如何使用多签账户发交易， 请参阅 [multisig](../tx/multisig.md)

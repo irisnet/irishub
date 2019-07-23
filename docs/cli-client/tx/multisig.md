@@ -24,8 +24,14 @@ Firstly, you must create a multisig account, please refer to [add](../keys/add.m
 Create a multisig account with 3 sub-accounts，specify the minimum number of signatures，such as 2. The tx could be broadcast only when the number of signatures is greater than or equal to 2.
 
 ```  
-iriscli keys add <multi_account_keyname> --multisig-threshold=2 --multisig=<user_1>,<user_2>,<user_3>
+iriscli keys add <multi_account_keyname> --multisig-threshold=2 --multisig=<signer_keyname_1>,<signer_keyname_2>,<signer_keyname_3>...
 ```
+
+::: tips
+<signer_keyname> could be the type of "local/offline/ledger"， but not "multi" type。
+
+Offline account can be created by "iriscli keys add --pubkey". 
+:::
 
 ### Generate tx with multisig account
 
@@ -40,14 +46,14 @@ Use `iriscli keys show <multi_account_keyname>` to get `<multi_account_address>`
 
 Specify the threshold to 2， sign and generate Tx-sign.json.
 
-Sign the tx with user_1:
+Sign the tx with signer_1:
 ```  
-iriscli tx sign Tx-generate.json --name=<user_1> --chain-id=<chain-id> --multisig=<multi_account_address> --signature-only >Tx-sign-user_1.json
+iriscli tx sign Tx-generate.json --name=<signer_keyname_1> --chain-id=<chain-id> --multisig=<multi_account_address> --signature-only >Tx-sign-user_1.json
 ```
 
-Sign the tx with user_2:
+Sign the tx with signer_2:
 ```  
-iriscli tx sign Tx-generate.json --name=<user_1> --chain-id=<chain-id> --multisig=<multi_account_address> --signature-only >Tx-sign-user_2.json
+iriscli tx sign Tx-generate.json --name=<signer_keyname_2> --chain-id=<chain-id> --multisig=<multi_account_address> --signature-only >Tx-sign-user_2.json
 ```
 
 ### multisign all the signatures
