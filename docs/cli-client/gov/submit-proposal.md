@@ -24,7 +24,7 @@ iriscli gov submit-proposal --help
 | --description    |                            | Description of proposal                                                                                                                     | Yes      |
 | --param          |                            | Parameter of proposal,eg. mint/Inflation=0.050                                                                                 |          |
 | --title          |                            | Title of proposal                                                                                                                           | Yes      |
-| --type           |                            | ProposalType of proposal,eg:PlainText/ParameterChange/SoftwareUpgrade/SoftwareHalt/CommunityTaxUsage/TokenAddition                                                           | Yes      |
+| --type           |                            | ProposalType of proposal,eg:PlainText/Parameter/SoftwareUpgrade/SoftwareHalt/CommunityTaxUsage/TokenAddition                                                           | Yes      |
 | --version           |            0                | the version of the new protocol                                                                            |       |
 | --software           |           " "                 | the software of the new protocol                                                                         |       |
 | --switch-height           |       0                     | the switch height of the new protocol                                                         |       |
@@ -40,10 +40,10 @@ iriscli gov submit-proposal --help
 
 The proposer should deposit at least 30% of `MinDeposit` to submit a proposal,  detailed in [Gov](../../features/governance.md)
 
-### Submit a `ParameterChange` type proposal
+### Submit a `Parameter` type proposal
 
 ```shell
-iriscli gov submit-proposal --chain-id=<chain-id> --title=<proposal_title> --param='mint/Inflation=0.050' --type=ParameterChange --description=<proposal_description> --from=<key_name> --fee=0.3iris --deposit="3000iris" 
+iriscli gov submit-proposal --chain-id=<chain-id> --title=<proposal_title> --param='mint/Inflation=0.050' --type=Parameter --description=<proposal_description> --from=<key_name> --fee=0.3iris --deposit="3000iris" 
 ```
 
 Note: in this case, --path and --param cannot be both empty,param's value can be queried by `iriscli params`,detailed in [parms](../params/README.md)

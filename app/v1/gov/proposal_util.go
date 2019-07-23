@@ -24,9 +24,9 @@ func createPlainTextInfo() pTypeInfo {
 		},
 	}
 }
-func createParameterChangeInfo() pTypeInfo {
+func createParameterInfo() pTypeInfo {
 	return pTypeInfo{
-		ProposalTypeParameterChange,
+		ProposalTypeParameter,
 		ProposalLevelImportant,
 		func(content Content) Proposal {
 			return buildProposal(content, func(p BasicProposal, content Content) Proposal {

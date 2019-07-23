@@ -90,7 +90,7 @@ func (msg MsgSubmitProposal) ValidateBasic() sdk.Error {
 	if err := msg.EnsureLength(); err != nil {
 		return err
 	}
-	if msg.ProposalType == ProposalTypeParameterChange {
+	if msg.ProposalType == ProposalTypeParameter {
 		if len(msg.Params) == 0 {
 			return ErrEmptyParam(DefaultCodespace)
 		}

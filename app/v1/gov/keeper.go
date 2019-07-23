@@ -140,7 +140,7 @@ func (keeper Keeper) SubmitProposal(ctx sdk.Context, msg sdk.Msg) (sdk.Tags, sdk
 	}
 
 	switch proposal.GetProposalType() {
-	case ProposalTypeParameterChange:
+	case ProposalTypeParameter:
 		var paramBytes []byte
 		paramBytes, _ = json.Marshal(content.GetParams())
 		resTags = resTags.AppendTag(tags.Param, paramBytes)

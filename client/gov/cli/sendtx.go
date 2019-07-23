@@ -49,7 +49,7 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 			var params gov.Params
-			if proposalType == gov.ProposalTypeParameterChange {
+			if proposalType == gov.ProposalTypeParameter {
 				paramStr := viper.GetString(flagParam)
 				params, err = getParamFromString(paramStr)
 				if err != nil {

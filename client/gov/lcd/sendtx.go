@@ -88,7 +88,7 @@ func postProposalHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Han
 			utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{taxMsg})
 			return
 		}
-		if proposalType == gov.ProposalTypeParameterChange {
+		if proposalType == gov.ProposalTypeParameter {
 			if err := client.ValidateParam(req.Param); err != nil {
 				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 				return
