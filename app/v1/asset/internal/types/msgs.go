@@ -79,7 +79,7 @@ func NewMsgIssueToken(family AssetFamily, source AssetSource, gateway string, sy
 func (msg MsgIssueToken) Route() string { return MsgRoute }
 func (msg MsgIssueToken) Type() string  { return MsgTypeIssueToken }
 
-func ValidateMsgIssueToken(msg *MsgIssueToken, verifySource bool) sdk.Error {
+func ValidateMsgIssueToken(msg *MsgIssueToken, verify bool) sdk.Error {
 	msg.Gateway = strings.ToLower(strings.TrimSpace(msg.Gateway))
 	msg.Symbol = strings.ToLower(strings.TrimSpace(msg.Symbol))
 	msg.CanonicalSymbol = strings.ToLower(strings.TrimSpace(msg.CanonicalSymbol))
@@ -105,7 +105,7 @@ func ValidateMsgIssueToken(msg *MsgIssueToken, verifySource bool) sdk.Error {
 
 		break
 	case EXTERNAL:
-		if verifySource {
+		if verify {
 			return ErrInvalidAssetSource(DefaultCodespace, fmt.Sprintf("invalid source type %s", msg.Source.String()))
 		}
 	case GATEWAY:
@@ -137,9 +137,11 @@ func ValidateMsgIssueToken(msg *MsgIssueToken, verifySource bool) sdk.Error {
 		return ErrInvalidAssetSymbol(DefaultCodespace, fmt.Sprintf("invalid token symbol %s, can not contain native token symbol %s", msg.Symbol, sdk.NativeTokenName))
 	}
 
-	canonicalSymbolLen := len(msg.CanonicalSymbol)
-	if canonicalSymbolLen > 0 && (canonicalSymbolLen < MinimumAssetSymbolSize || canonicalSymbolLen > MaximumAssetSymbolSize || !IsAlphaNumeric(msg.CanonicalSymbol)) {
-		return ErrInvalidAssetCanonicalSymbol(DefaultCodespace, fmt.Sprintf("invalid token canonical_symbol %s, only accepts alphanumeric characters, length [%d, %d]", msg.CanonicalSymbol, MinimumAssetSymbolSize, MaximumAssetSymbolSize))
+	if verify {
+		canonicalSymbolLen := len(msg.CanonicalSymbol)
+		if canonicalSymbolLen > 0 && (canonicalSymbolLen < MinimumAssetSymbolSize || canonicalSymbolLen > MaximumAssetSymbolSize || !IsAlphaNumeric(msg.CanonicalSymbol)) {
+			return ErrInvalidAssetCanonicalSymbol(DefaultCodespace, fmt.Sprintf("invalid token canonical_symbol %s, only accepts alphanumeric characters, length [%d, %d]", msg.CanonicalSymbol, MinimumAssetSymbolSize, MaximumAssetSymbolSize))
+		}
 	}
 
 	minUnitAliasLen := len(msg.MinUnitAlias)
