@@ -10,20 +10,16 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 )
 
-type broadcastBody struct {
-	Tx auth.StdTx `json:"tx"`
-}
-
 // BroadcastTxRequestHandlerFn returns the broadcast tx REST handler
 func BroadcastTxRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		cliCtx = utils.InitReqCliCtx(cliCtx, r)
-		var m broadcastBody
+		var m auth.StdTx
 		if err := utils.ReadPostBody(w, r, cliCtx.Codec, &m); err != nil {
 			return
 		}
 
-		txBytes, err := cliCtx.Codec.MarshalBinaryLengthPrefixed(m.Tx)
+		txBytes, err := cliCtx.Codec.MarshalBinaryLengthPrefixed(m)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return

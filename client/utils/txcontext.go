@@ -18,38 +18,37 @@ import (
 //----------------------------------------
 // Building / Sending utilities
 
-// BaseReq defines a structure that can be embedded in other request structures
+// BaseTx defines a structure that can be embedded in other request structures
 // that all share common "base" fields.
 type BaseTx struct {
-	ChainID       string `json:"chain_id"`
-	AccountNumber uint64 `json:"account_number"`
-	Sequence      uint64 `json:"sequence"`
-	Gas           string `json:"gas"`
-	GasAdjustment string `json:"gas_adjustment"`
-	Fee           string `json:"fee"`
-	Memo          string `json:"memo"`
+	ChainID string `json:"chain_id"`
+	Gas     string `json:"gas"`
+	Fee     string `json:"fee"`
+	Memo    string `json:"memo"`
 }
 
-// Sanitize performs basic sanitization on a BaseReq object.
+// Sanitize performs basic sanitization on a BaseTx object.
 func (br BaseTx) Sanitize() BaseTx {
 	return BaseTx{
-		ChainID:       strings.TrimSpace(br.ChainID),
-		Gas:           strings.TrimSpace(br.Gas),
-		Fee:           strings.TrimSpace(br.Fee),
-		Memo:          strings.TrimSpace(br.Memo),
-		GasAdjustment: strings.TrimSpace(br.GasAdjustment),
-		AccountNumber: br.AccountNumber,
-		Sequence:      br.Sequence,
+		ChainID: strings.TrimSpace(br.ChainID),
+		Gas:     strings.TrimSpace(br.Gas),
+		Fee:     strings.TrimSpace(br.Fee),
+		Memo:    strings.TrimSpace(br.Memo),
 	}
 }
 
-// ValidateBasic performs basic validation of a BaseReq. If custom validation
+// ValidateBasic performs basic validation of a BaseTx. If custom validation
 // logic is needed, the implementing request handler should perform those
 // checks manually.
 func (br BaseTx) ValidateBasic(w http.ResponseWriter) bool {
 	if len(br.ChainID) == 0 {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte("chainID required but not specified"))
+		return false
+	}
+
+	_, ok := ParseUint64OrReturnBadRequest(w, br.Gas)
+	if !ok {
 		return false
 	}
 
