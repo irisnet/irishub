@@ -20,7 +20,7 @@ func NewFeeAuth(nativeFeeDenom string) FeeAuth {
 }
 
 func InitialFeeAuth() FeeAuth {
-	return NewFeeAuth("iris-atto")
+	return NewFeeAuth(sdk.NativeTokenMinDenom)
 }
 
 func ValidateFee(auth FeeAuth, collectedFee sdk.Coins) error {
@@ -117,13 +117,14 @@ func (fa FeeAuth) feePreprocess(ctx sdk.Context, params Params, coins sdk.Coins,
 	threshold := params.GasPriceThreshold
 
 	if len(coins) < 1 || coins[0].Denom != nativeFeeToken {
-		return sdk.ErrInvalidTxFee(fmt.Sprintf("no native fee token, expected native token is %s", nativeFeeToken))
+		return sdk.ErrInvalidTxFee(fmt.Sprintf("fee is required to be specified with %s", nativeFeeToken))
 	}
 
 	equivalentTotalFee := coins[0].Amount
 	gasPrice := equivalentTotalFee.Div(sdk.NewInt(int64(gasLimit)))
 	if gasPrice.LT(threshold) {
-		return sdk.ErrGasPriceTooLow(fmt.Sprintf("equivalent gas price (%s%s) is less than threshold (%s%s)", gasPrice.String(), nativeFeeToken, threshold.String(), nativeFeeToken))
+		recommendFee := (sdk.NewInt(int64(gasLimit))).Mul(threshold)
+		return sdk.ErrGasPriceTooLow(fmt.Sprintf("insufficient fee, gasPrice = fee / gasLimit(default 50000). The gasPrice(%s%s/Gas) cannot be less than %s%s. Recommended fee: %s%s", gasPrice.String(), nativeFeeToken, threshold.String(), nativeFeeToken, recommendFee, nativeFeeToken))
 	}
 	return nil
 }

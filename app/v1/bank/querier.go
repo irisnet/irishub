@@ -49,7 +49,7 @@ func queryAccount(ctx sdk.Context, req abci.RequestQuery, keeper Keeper, cdc *co
 
 	account := bk.am.GetAccount(ctx, params.Address)
 	if account == nil {
-		return nil, sdk.ErrUnknownAddress(fmt.Sprintf("account %s does not exist", params.Address))
+		return nil, sdk.ErrUnknownAddress(params.Address.String())
 	}
 
 	bz, err := codec.MarshalJSONIndent(cdc, account)
