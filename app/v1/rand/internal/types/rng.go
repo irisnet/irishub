@@ -13,26 +13,32 @@ type RNG interface {
 	GetRand() sdk.Rat // interface which returns a random number between (0,1)
 }
 
-// PRNG represents a pseudo-random number implementation based on future block for RNG
+// PRNG represents a pseudo-random number implementation based on block for RNG
 type PRNG struct {
-	BlockHash   []byte         // hash of the future block
-	TxInitiator sdk.AccAddress // address initiating the request tx
+	BlockHash      []byte         // hash of some block
+	BlockTimestamp int64          // timestamp of the next block
+	TxInitiator    sdk.AccAddress // address initiating the request tx
 }
 
 // MakePRNG constructs a PRNG
-func MakePRNG(blockHash []byte, txInitiator sdk.AccAddress) PRNG {
+func MakePRNG(blockHash []byte, blockTimestampt int64, txInitiator sdk.AccAddress) PRNG {
 	return PRNG{
-		BlockHash:   blockHash,
-		TxInitiator: txInitiator,
+		BlockHash:      blockHash,
+		BlockTimestamp: blockTimestampt,
+		TxInitiator:    txInitiator,
 	}
 }
 
 // GetRand implements RNG
 func (p PRNG) GetRand() sdk.Rat {
-	seedBH := new(big.Int).SetBytes(sdk.SHA256(p.BlockHash))
-	seedTI := new(big.Int).SetBytes(sdk.SHA256(p.TxInitiator))
+	seedBT := big.NewInt(p.BlockTimestamp)
+	seedBH := new(big.Int).Div(new(big.Int).SetBytes(sdk.SHA256(p.BlockHash)), seedBT)
+	seedTI := new(big.Int).Div(new(big.Int).SetBytes(sdk.SHA256(p.TxInitiator)), seedBT)
 
-	seed := new(big.Int).SetBytes(sdk.SHA256(new(big.Int).Add(seedBH, seedTI).Bytes()))
+	seedSum := new(big.Int).Add(seedBT, seedBH)
+	seedSum = new(big.Int).Add(seedSum, seedTI)
+	seed := new(big.Int).SetBytes(sdk.SHA256(seedSum.Bytes()))
+
 	precision := new(big.Int).Exp(big.NewInt(10), big.NewInt(RandPrec), nil)
 
 	// Generate a random number between [0,1) with `RandPrec` precision from seed

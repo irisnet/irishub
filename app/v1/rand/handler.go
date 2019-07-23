@@ -38,6 +38,7 @@ func handleMsgRequestRand(ctx sdk.Context, k Keeper, msg MsgRequestRand) sdk.Res
 func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, k Keeper) (tags sdk.Tags) {
 	ctx = ctx.WithLogger(ctx.Logger().With("handler", "beginBlock").With("module", "iris/rand"))
 
+	currentTimestamp := ctx.BlockHeader().Time.Unix()
 	lastBlockHeight := ctx.BlockHeight() - 1
 	lastBlockHash := []byte(ctx.BlockHeader().LastBlockId.Hash)
 
@@ -53,7 +54,7 @@ func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, k Keeper) (tags s
 		k.GetCdc().MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &request)
 
 		// generate a random number
-		rand := MakePRNG(lastBlockHash, request.Consumer).GetRand()
+		rand := MakePRNG(lastBlockHash, currentTimestamp, request.Consumer).GetRand()
 		k.SetRand(ctx, reqID, NewRand(request.TxHash, lastBlockHeight, rand))
 
 		// remove the request
