@@ -71,8 +71,6 @@ type (
 // If not, we can just use CompleteAndBroadcastTxREST.
 func delegationsRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		txCtx := utils.NewTxContextFromCLI().WithCodec(cliCtx.Codec)
-
 		vars := mux.Vars(r)
 		bech32delegator := vars["delegatorAddr"]
 
@@ -112,6 +110,8 @@ func delegationsRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) ht
 			ValidatorAddr: valAddr,
 			Delegation:    delegationToken}
 
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
+
 		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
 	}
 }
@@ -122,8 +122,6 @@ func delegationsRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) ht
 // If not, we can just use CompleteAndBroadcastTxREST.
 func beginRedelegatesRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		txCtx := utils.NewTxContextFromCLI().WithCodec(cliCtx.Codec)
-
 		vars := mux.Vars(r)
 		bech32delegator := vars["delegatorAddr"]
 
@@ -172,6 +170,8 @@ func beginRedelegatesRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContex
 			SharesAmount:     sharesAmount,
 		}
 
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
+
 		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
 	}
 }
@@ -182,8 +182,6 @@ func beginRedelegatesRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContex
 // If not, we can just use CompleteAndBroadcastTxREST.
 func beginUnbondingRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		txCtx := utils.NewTxContextFromCLI().WithCodec(cliCtx.Codec)
-
 		vars := mux.Vars(r)
 		bech32delegator := vars["delegatorAddr"]
 
@@ -225,6 +223,8 @@ func beginUnbondingRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext)
 			ValidatorAddr: valAddr,
 			SharesAmount:  sharesAmount,
 		}
+
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
 
 		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
 	}

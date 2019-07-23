@@ -65,10 +65,9 @@ IRISLCD启动以后，您可以在浏览器中访问`localhost:1317/swagger-ui/`
     6. `DELETE /keys/{name}`: 删除秘钥
     7. `POST /keys/{name}/recover`: 通过seed恢复一个账户
 
-3. 签名和广播交易的APIs
+3. 广播交易的API
 
-    1. `POST /tx/sign`: 签名交易
-    2. `POST /tx/broadcast`: 广播一个amino编码的交易
+    1. `POST /tx/broadcast`: 广播一个amino编码的交易
     
 4. Bank模块的APIs
     1. `GET /bank/coins/{coin-type}`: 查询coin的类型信息

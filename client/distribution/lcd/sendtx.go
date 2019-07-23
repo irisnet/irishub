@@ -20,9 +20,6 @@ type setWithdrawAddressBody struct {
 // nolint: gocyclo
 func SetWithdrawAddressHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// build tx context
-		txCtx := utils.NewTxContextFromCLI().WithCodec(cliCtx.Codec)
-
 		vars := mux.Vars(r)
 		bech32addr := vars["delegatorAddr"]
 		delegatorAddress, err := sdk.AccAddressFromBech32(bech32addr)
@@ -44,6 +41,8 @@ func SetWithdrawAddressHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) ht
 		// Build message
 		msg := types.NewMsgSetWithdrawAddress(delegatorAddress, m.WithdrawAddress)
 
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
+
 		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
 	}
 }
@@ -56,9 +55,6 @@ type withdrawRewardsBody struct {
 
 func WithdrawRewardsHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// build tx context
-		txCtx := utils.NewTxContextFromCLI().WithCodec(cliCtx.Codec)
-
 		vars := mux.Vars(r)
 		bech32addr := vars["delegatorAddr"]
 		delegatorAddress, err := sdk.AccAddressFromBech32(bech32addr)
@@ -95,6 +91,8 @@ func WithdrawRewardsHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.
 		default:
 			msg = types.NewMsgWithdrawDelegatorRewardsAll(delegatorAddress)
 		}
+
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
 
 		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
 	}
