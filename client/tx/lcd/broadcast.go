@@ -37,11 +37,13 @@ func BroadcastTxRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) ht
 		_, ok := paramJson["type"]
 
 		if !ok {
-			if err := utils.ReadPostBody(w, r, cliCtx.Codec, &m); err != nil {
+			if err := cdc.UnmarshalJSON(body, &m); err != nil {
+				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 				return
 			}
 		} else {
-			if err := utils.ReadPostBody(w, r, cliCtx.Codec, &m.Tx); err != nil {
+			if err := cdc.UnmarshalJSON(body, &m.Tx); err != nil {
+				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 				return
 			}
 		}
@@ -51,20 +53,24 @@ func BroadcastTxRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) ht
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
+
 		if cliCtx.DryRun {
 			rawRes, err := cliCtx.Query("/app/simulate", txBytes)
 			if err != nil {
 				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 				return
 			}
+
 			var simulationResult sdk.Result
 			if err := cdc.UnmarshalBinaryLengthPrefixed(rawRes, &simulationResult); err != nil {
 				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 				return
 			}
+
 			utils.WriteSimulationResponse(w, cliCtx, simulationResult.GasUsed, simulationResult)
 			return
 		}
+
 		res, err := cliCtx.BroadcastTx(txBytes)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
