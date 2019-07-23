@@ -29,14 +29,14 @@ func MakePRNG(blockHash []byte, txInitiator sdk.AccAddress) PRNG {
 
 // GetRand implements RNG
 func (p PRNG) GetRand() sdk.Rat {
-	seedBH := sdk.NewIntFromBigInt(new(big.Int).SetBytes(sdk.SHA256(p.BlockHash)))
-	seedTI := sdk.NewIntFromBigInt(new(big.Int).SetBytes(sdk.SHA256(p.TxInitiator)))
+	seedBH := new(big.Int).SetBytes(sdk.SHA256(p.BlockHash))
+	seedTI := new(big.Int).SetBytes(sdk.SHA256(p.TxInitiator))
 
-	seed := sdk.NewIntFromBigInt(new(big.Int).SetBytes(sdk.SHA256(seedBH.Div(seedTI).BigInt().Bytes())))
-	precision := sdk.NewIntWithDecimal(1, RandPrec)
+	seed := new(big.Int).SetBytes(sdk.SHA256(new(big.Int).Add(seedBH, seedTI).Bytes()))
+	precision := new(big.Int).Exp(big.NewInt(10), big.NewInt(RandPrec), nil)
 
 	// Generate a random number between [0,1) with `RandPrec` precision from seed
-	rand := sdk.NewRatFromInt(seed.Mod(precision), precision)
+	rand := sdk.NewRatFromBigInt(new(big.Int).Mod(seed, precision), precision)
 
 	return rand
 }
