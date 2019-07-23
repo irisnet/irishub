@@ -134,13 +134,6 @@ func ValidateMsgIssueToken(msg *MsgIssueToken) sdk.Error {
 		return ErrInvalidAssetSymbol(DefaultCodespace, fmt.Sprintf("invalid token symbol %s, can not contain native token symbol %s", msg.Symbol, sdk.NativeTokenName))
 	}
 
-	if msg.Source != EXTERNAL {
-		canonicalSymbolLen := len(msg.CanonicalSymbol)
-		if canonicalSymbolLen > 0 && (canonicalSymbolLen < MinimumAssetSymbolSize || canonicalSymbolLen > MaximumAssetSymbolSize || !IsAlphaNumeric(msg.CanonicalSymbol)) {
-			return ErrInvalidAssetCanonicalSymbol(DefaultCodespace, fmt.Sprintf("invalid token canonical_symbol %s, only accepts alphanumeric characters, length [%d, %d]", msg.CanonicalSymbol, MinimumAssetSymbolSize, MaximumAssetSymbolSize))
-		}
-	}
-
 	minUnitAliasLen := len(msg.MinUnitAlias)
 	if minUnitAliasLen > 0 && (minUnitAliasLen < MinimumAssetMinUnitAliasSize || minUnitAliasLen > MaximumAssetMinUnitAliasSize || !IsAlphaNumeric(msg.MinUnitAlias) || !IsBeginWithAlpha(msg.MinUnitAlias)) {
 		return ErrInvalidAssetMinUnitAlias(DefaultCodespace, fmt.Sprintf("invalid token min_unit_alias %s, only accepts alphanumeric characters, and begin with an english letter, length [%d, %d]", msg.MinUnitAlias, MinimumAssetMinUnitAliasSize, MaximumAssetMinUnitAliasSize))
