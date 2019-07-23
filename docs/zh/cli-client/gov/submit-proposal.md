@@ -2,7 +2,7 @@
 
 ## 描述
 
-提交区块链治理提议以及发起提议所涉及的初始保证金，其中提议的类型包括PlainText/ParameterChange/SoftwareUpgrade/AddToken这几种类型。
+提交区块链治理提议以及发起提议所涉及的初始保证金，其中提议的类型包括PlainText/Parameter/SoftwareUpgrade/AddToken这几种类型。
 
 ## 使用方式
 
@@ -22,7 +22,7 @@ iriscli gov submit-proposal --help
 | --description    |                            | 提议的描述                                                                                                           | Yes      |
 | --param          |                            | 提议参数,例如: mint/Inflation=0.050                                                                                |          |
 | --title          |                            | 提议标题                                                                                                                           | Yes      |
-| --type           |                            | 提议类型,例如:PlainText/ParameterChange/SoftwareUpgrade/SoftwareHalt/CommunityTaxUsage/AddToken                                                                  | Yes      |
+| --type           |                            | 提议类型,例如:PlainText/Parameter/SoftwareUpgrade/SoftwareHalt/CommunityTaxUsage/AddToken                                                                  | Yes      |
 | --version           |            0                | 新协议的版本信息                                                                           |       |
 | --software           |           " "                 |  新协议的软件地址                                                                       |       |
 | --switch-height           |       0                     |  新版本协议升级的高度                                                     |       |
@@ -38,12 +38,12 @@ iriscli gov submit-proposal --help
 
 提议者必须抵押至少30%的`MinDeposit`，详情见 [Gov](../../features/governance.md)
 
-### 提交一个`ParameterChange`类型的提议
+### 提交一个`Parameter`类型的提议
 
 修改Inflation参数的提议：
 
 ```shell
-iriscli gov submit-proposal --chain-id=<chain-id> --title=<proposal_title> --param='mint/Inflation=0.050' --type=ParameterChange --description=<proposal_description> --from=<key_name> --fee=0.3iris --deposit="3000iris" 
+iriscli gov submit-proposal --chain-id=<chain-id> --title=<proposal_title> --param='mint/Inflation=0.050' --type=Parameter --description=<proposal_description> --from=<key_name> --fee=0.3iris --deposit="3000iris" 
 ```
 
 param的值可以通过 `iriscli params`查询(Gov模块本身参数不可以修改),详细[请参考](../params/README.md)
