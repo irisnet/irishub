@@ -2,6 +2,7 @@ package lcd
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -20,16 +21,17 @@ type broadcastBody struct {
 func BroadcastTxRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		cliCtx = utils.InitReqCliCtx(cliCtx, r)
+		parseBodyErr := fmt.Errorf("invalid post body")
 
 		body, err := ioutil.ReadAll(r.Body)
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			utils.WriteErrorResponse(w, http.StatusBadRequest, parseBodyErr.Error())
 			return
 		}
 
 		var paramJson map[string]interface{}
 		if err := json.Unmarshal(body, &paramJson); err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			utils.WriteErrorResponse(w, http.StatusBadRequest, parseBodyErr.Error())
 			return
 		}
 
@@ -38,12 +40,12 @@ func BroadcastTxRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) ht
 
 		if !ok {
 			if err := cdc.UnmarshalJSON(body, &m); err != nil {
-				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+				utils.WriteErrorResponse(w, http.StatusBadRequest, parseBodyErr.Error())
 				return
 			}
 		} else {
 			if err := cdc.UnmarshalJSON(body, &m.Tx); err != nil {
-				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+				utils.WriteErrorResponse(w, http.StatusBadRequest, parseBodyErr.Error())
 				return
 			}
 		}

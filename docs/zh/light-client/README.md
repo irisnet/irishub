@@ -55,10 +55,9 @@ IRISLCD启动以后，您可以在浏览器中访问`localhost:1317/swagger-ui/`
     9. `GET /txs/{hash}`: 通过交易hash查询交易
     10. `GET /txs`: 搜索交易
 
-2. 签名和广播交易的APIs
-
-    1. `POST /tx/sign`: 签名交易
-    2. `POST /tx/broadcast`: 广播一个amino或json编码的交易
+2. 广播交易的API
+   
+    1. `POST /tx/broadcast`: 广播一个amino或者json编码的交易
     
 3. Bank模块的APIs
     1. `GET /bank/coins/{coin-type}`: 查询coin的类型信息
@@ -132,7 +131,7 @@ IRISLCD启动以后，您可以在浏览器中访问`localhost:1317/swagger-ui/`
     15. `POST /service/fees/{address}/refund`: 消费者取回（未被响应的）服务费用
     16. `POST /service/fees/{address}/withdraw`: 服务提供者取回服务收益
 
-9. Asset模块的APIs
+9.  Asset模块的APIs
     1. `GET /asset/gateways/{moniker}`: 查询指定名字所对应的网关信息
     2. `GET /asset/gateways`: 查询所有网关信息，提供一个可选的owner参数
     3. `GET /asset/fees/gateways/{moniker}`: 查询指定网关的创建费用

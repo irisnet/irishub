@@ -54,10 +54,9 @@ Once IRISLCD is started, you can open `localhost:1317/swagger-ui/` in your explo
     9. `GET /txs/{hash}`: Get a Tx by hash
     10. `GET /txs`: Search transactions
 
-2. Sign and broadcast transactions
+2. Broadcast transactions
 
-    1. `POST /tx/sign`: Sign a transaction
-    2. `POST /tx/broadcast`: Broadcast a signed StdTx which is amino or json encoded
+    1. `POST /tx/broadcast`: Broadcast a signed StdTx which is amino or json encoded
 
 3. Bank module APIs
     1. `GET /bank/coins/{type}`: Get coin type
