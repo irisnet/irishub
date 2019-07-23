@@ -79,7 +79,7 @@ func NewMsgIssueToken(family AssetFamily, source AssetSource, gateway string, sy
 func (msg MsgIssueToken) Route() string { return MsgRoute }
 func (msg MsgIssueToken) Type() string  { return MsgTypeIssueToken }
 
-func ValidateMsgIssueToken(msg *MsgIssueToken, verifySource bool) sdk.Error {
+func ValidateMsgIssueToken(msg *MsgIssueToken) sdk.Error {
 	msg.Gateway = strings.ToLower(strings.TrimSpace(msg.Gateway))
 	msg.Symbol = strings.ToLower(strings.TrimSpace(msg.Symbol))
 	msg.CanonicalSymbol = strings.ToLower(strings.TrimSpace(msg.CanonicalSymbol))
@@ -102,12 +102,9 @@ func ValidateMsgIssueToken(msg *MsgIssueToken, verifySource bool) sdk.Error {
 		}
 		// ignore CanonicalSymbol for native asset
 		msg.CanonicalSymbol = ""
-
 		break
 	case EXTERNAL:
-		if verifySource {
-			return ErrInvalidAssetSource(DefaultCodespace, fmt.Sprintf("invalid source type %s", msg.Source.String()))
-		}
+		break
 	case GATEWAY:
 		// require gateway moniker for gateway asset
 		if len(msg.Gateway) < MinimumGatewayMonikerSize || len(msg.Gateway) > MaximumGatewayMonikerSize {
@@ -137,11 +134,6 @@ func ValidateMsgIssueToken(msg *MsgIssueToken, verifySource bool) sdk.Error {
 		return ErrInvalidAssetSymbol(DefaultCodespace, fmt.Sprintf("invalid token symbol %s, can not contain native token symbol %s", msg.Symbol, sdk.NativeTokenName))
 	}
 
-	canonicalSymbolLen := len(msg.CanonicalSymbol)
-	if canonicalSymbolLen > 0 && (canonicalSymbolLen < MinimumAssetSymbolSize || canonicalSymbolLen > MaximumAssetSymbolSize || !IsAlphaNumeric(msg.CanonicalSymbol)) {
-		return ErrInvalidAssetCanonicalSymbol(DefaultCodespace, fmt.Sprintf("invalid token canonical_symbol %s, only accepts alphanumeric characters, length [%d, %d]", msg.CanonicalSymbol, MinimumAssetSymbolSize, MaximumAssetSymbolSize))
-	}
-
 	minUnitAliasLen := len(msg.MinUnitAlias)
 	if minUnitAliasLen > 0 && (minUnitAliasLen < MinimumAssetMinUnitAliasSize || minUnitAliasLen > MaximumAssetMinUnitAliasSize || !IsAlphaNumeric(msg.MinUnitAlias) || !IsBeginWithAlpha(msg.MinUnitAlias)) {
 		return ErrInvalidAssetMinUnitAlias(DefaultCodespace, fmt.Sprintf("invalid token min_unit_alias %s, only accepts alphanumeric characters, and begin with an english letter, length [%d, %d]", msg.MinUnitAlias, MinimumAssetMinUnitAliasSize, MaximumAssetMinUnitAliasSize))
@@ -163,7 +155,10 @@ func ValidateMsgIssueToken(msg *MsgIssueToken, verifySource bool) sdk.Error {
 
 // Implements Msg.
 func (msg MsgIssueToken) ValidateBasic() sdk.Error {
-	return ValidateMsgIssueToken(&msg, true)
+	if msg.Source == EXTERNAL {
+		return ErrInvalidAssetSource(DefaultCodespace, fmt.Sprintf("invalid source type %s", msg.Source.String()))
+	}
+	return ValidateMsgIssueToken(&msg)
 }
 
 // Implements Msg.
