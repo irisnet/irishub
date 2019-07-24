@@ -172,7 +172,7 @@ type Tokens []FungibleToken
 
 func (tokens Tokens) String() string {
 	if len(tokens) == 0 {
-		return ""
+		return "[]"
 	}
 
 	out := ""
