@@ -36,8 +36,7 @@ func TestMsgRequestRandValidation(t *testing.T) {
 		expectPass    bool
 	}{
 		{"empty consumer", emptyAddr, blockInterval, false},
-		{"valid consumer", testAddr, blockInterval, true},
-		{"invalid block interval", testAddr, 0, false},
+		{"basic good", testAddr, blockInterval, true},
 	}
 
 	for _, td := range testData {
