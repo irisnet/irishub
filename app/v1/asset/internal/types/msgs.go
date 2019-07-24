@@ -479,12 +479,12 @@ type MsgEditToken struct {
 	CanonicalSymbol string         `json:"canonical_symbol"` //  canonical_symbol of token
 	MinUnitAlias    string         `json:"min_unit_alias"`   //  min_unit_alias of token
 	MaxSupply       uint64         `json:"max_supply"`
-	Mintable        *bool          `json:"mintable"` //  mintable of token
+	Mintable        Bool           `json:"mintable"` //  mintable of token
 	Name            string         `json:"name"`
 }
 
 // NewMsgEditToken creates a MsgEditToken
-func NewMsgEditToken(name, canonicalSymbol, minUnitAlias, tokenId string, maxSupply uint64, mintable *bool, owner sdk.AccAddress) MsgEditToken {
+func NewMsgEditToken(name, canonicalSymbol, minUnitAlias, tokenId string, maxSupply uint64, mintable Bool, owner sdk.AccAddress) MsgEditToken {
 	name = strings.TrimSpace(name)
 	canonicalSymbol = strings.ToLower(strings.TrimSpace(canonicalSymbol))
 	minUnitAlias = strings.ToLower(strings.TrimSpace(minUnitAlias))

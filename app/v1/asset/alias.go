@@ -51,6 +51,7 @@ var (
 	StringToAssetFamilyMap = types.StringToAssetFamilyMap
 	StringToAssetSourceMap = types.StringToAssetSourceMap
 	GetTokenID             = types.GetTokenID
+	ParseBool              = types.ParseBool
 
 	NewFungibleToken           = types.NewFungibleToken
 	NewMsgCreateGateway        = types.NewMsgCreateGateway
