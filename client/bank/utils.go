@@ -4,9 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/app/v1/bank"
-	"github.com/irisnet/irishub/client/context"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/tendermint/tendermint/crypto"
 )
@@ -35,49 +33,6 @@ func (acc BaseAccount) String() string {
   Sequence:        %d`,
 		acc.Address, pubkey, strings.Join(acc.Coins, ","), acc.AccountNumber, acc.Sequence,
 	)
-}
-
-func ConvertToMainUnit(cliCtx context.CLIContext, coins sdk.Coins) (resCoins []string, err error) {
-	for _, coin := range coins {
-		mainUnit, err := sdk.GetCoinName(coin.String())
-		if err != nil {
-			return nil, err
-		}
-
-		ct, err := cliCtx.GetCoinType(mainUnit)
-		if err != nil {
-			return nil, err
-		}
-
-		destCoinStr, err := ct.Convert(coin.String(), mainUnit)
-		if err != nil {
-			return nil, err
-		}
-
-		resCoins = append(resCoins, destCoinStr)
-	}
-
-	return resCoins, nil
-}
-
-func ConvertAccountCoin(cliCtx context.CLIContext, acc auth.BaseAccount) (BaseAccount, error) {
-	var accCoins []string
-	for _, coin := range acc.GetCoins() {
-		coinString, err := cliCtx.ConvertCoinToMainUnit(coin.String())
-		if err == nil {
-			accCoins = append(accCoins, coinString[0])
-		} else {
-			accCoins = append(accCoins, coin.String())
-		}
-
-	}
-	return BaseAccount{
-		Address:       acc.GetAddress(),
-		Coins:         accCoins,
-		PubKey:        acc.GetPubKey(),
-		AccountNumber: acc.GetAccountNumber(),
-		Sequence:      acc.GetSequence(),
-	}, nil
 }
 
 // BuildBankSendMsg builds the sending coins msg

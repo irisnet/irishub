@@ -89,11 +89,11 @@ func queryTokenStats(ctx sdk.Context, req abci.RequestQuery, keeper Keeper, cdc 
 			totalSupplies = append(totalSupplies, ts)
 		}
 
-	} else if params.TokenId == sdk.NativeTokenName { // query iris
+	} else if params.TokenId == sdk.Iris { // query iris
 		looseTokens = bk.GetLoosenCoins(ctx)
-		burnedTokens = sdk.Coins{sdk.NewCoin(sdk.NativeTokenMinDenom, bk.GetCoins(ctx, auth.BurnedCoinsAccAddr).AmountOf(sdk.NativeTokenMinDenom))}
+		burnedTokens = sdk.Coins{sdk.NewCoin(sdk.IrisAtto, bk.GetCoins(ctx, auth.BurnedCoinsAccAddr).AmountOf(sdk.IrisAtto))}
 	} else { // query !iris
-		denom, err := sdk.GetCoinDenom(params.TokenId)
+		denom, err := sdk.GetCoinMinDenom(params.TokenId)
 		if err != nil {
 			return nil, sdk.ParseParamsErr(err)
 		}
@@ -134,4 +134,16 @@ func (ts TokenStats) String() string {
   Burned Tokens:            %s
   Total Supply:             %s`,
 		ts.LooseTokens.String(), ts.BondedTokens.String(), ts.BurnedTokens.String(), ts.TotalSupply.String())
+}
+
+func (ts TokenStats) HumanString(converter sdk.CoinsConverter) string {
+	return fmt.Sprintf(`TokenStats:
+  Loose Tokens:             %s
+  Bonded Tokens:            %s
+  Burned Tokens:            %s
+  Total Supply:             %s`,
+		converter.ToMainUnit(ts.LooseTokens),
+		converter.ToMainUnit(ts.BondedTokens),
+		converter.ToMainUnit(ts.BurnedTokens),
+		converter.ToMainUnit(ts.TotalSupply))
 }

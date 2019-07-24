@@ -234,6 +234,6 @@ func (ctx CLIContext) WithCertifier(verifier tmlite.Verifier) CLIContext {
 }
 
 func (ctx CLIContext) ToMainUnit(coins types.Coins) string {
-	ss, _ := ctx.ConvertCoinToMainUnit(coins.String())
+	ss, _ := ctx.ConvertToMainUnit(coins.String())
 	return strings.Join(ss, ",")
 }

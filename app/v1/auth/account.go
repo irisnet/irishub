@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/irisnet/irishub/codec"
-	"github.com/irisnet/irishub/tools/human"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/tendermint/tendermint/crypto"
 )
@@ -73,7 +72,7 @@ func (acc BaseAccount) String() string {
 }
 
 // String implements human.Stringer
-func (acc BaseAccount) HumanString(assetConvert human.AssetConvert) string {
+func (acc BaseAccount) HumanString(converter sdk.CoinsConverter) string {
 	var pubkey string
 
 	if acc.PubKey != nil {
@@ -86,7 +85,7 @@ func (acc BaseAccount) HumanString(assetConvert human.AssetConvert) string {
   Coins:           %s
   Account Number:  %d
   Sequence:        %d`,
-		acc.Address, pubkey, assetConvert.ToMainUnit(acc.Coins), acc.AccountNumber, acc.Sequence,
+		acc.Address, pubkey, converter.ToMainUnit(acc.Coins), acc.AccountNumber, acc.Sequence,
 	)
 }
 
