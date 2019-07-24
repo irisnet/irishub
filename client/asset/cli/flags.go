@@ -78,7 +78,7 @@ func init() {
 	FsEditToken.String(FlagCanonicalSymbol, "[do-not-modify]", "the source symbol of a gateway or external token")
 	FsEditToken.String(FlagMinUnitAlias, "[do-not-modify]", "the token symbol minimum alias")
 	FsEditToken.Uint64(FlagMaxSupply, 0, "the max supply of token")
-	FsEditToken.Bool(FlagMintable, false, "whether the token can be minted, default false")
+	FsEditToken.String(FlagMintable, "", "whether the token can be minted, default false")
 
 	FsTransferTokenOwner.String(FlagTo, "", "the new owner")
 

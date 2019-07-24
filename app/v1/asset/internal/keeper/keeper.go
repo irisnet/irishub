@@ -279,8 +279,8 @@ func (k Keeper) EditToken(ctx sdk.Context, msg types.MsgEditToken) (sdk.Tags, sd
 	if maxSupply.GT(sdk.ZeroInt()) {
 		token.MaxSupply = maxSupply
 	}
-	if msg.Mintable != nil {
-		token.Mintable = *msg.Mintable
+	if msg.Mintable != types.Nil {
+		token.Mintable = msg.Mintable.ToBool()
 	}
 
 	if err := k.SetToken(ctx, token); err != nil {
