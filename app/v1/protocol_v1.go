@@ -93,6 +93,8 @@ func (p *ProtocolV1) Load() {
 }
 
 func (p *ProtocolV1) Init(ctx sdk.Context) {
+	p.InitMetrics(ctx.MultiStore())
+
 	// initialize asset params
 	p.assetKeeper.Init(ctx)
 
@@ -110,7 +112,7 @@ func (p *ProtocolV1) GetCodec() *codec.Codec {
 	return p.cdc
 }
 
-func (p *ProtocolV1) InitMetrics(store sdk.CommitMultiStore) {
+func (p *ProtocolV1) InitMetrics(store sdk.MultiStore) {
 	p.StakeKeeper.InitMetrics(store.GetKVStore(protocol.KeyStake))
 	p.serviceKeeper.InitMetrics(store.GetKVStore(protocol.KeyService))
 }
@@ -257,7 +259,7 @@ func (p *ProtocolV1) configKeepers() {
 
 	p.upgradeKeeper = upgrade.NewKeeper(p.cdc, protocol.KeyUpgrade, p.protocolKeeper, p.StakeKeeper, upgrade.PrometheusMetrics(p.config))
 
-	p.assetKeeper = asset.NewKeeper(p.cdc, protocol.KeyAsset, p.bankKeeper, p.guardianKeeper, asset.DefaultCodespace, p.paramsKeeper.Subspace(asset.DefaultParamSpace))
+	p.assetKeeper = asset.NewKeeper(p.cdc, protocol.KeyAsset, p.bankKeeper, asset.DefaultCodespace, p.paramsKeeper.Subspace(asset.DefaultParamSpace))
 
 	p.govKeeper = gov.NewKeeper(
 		protocol.KeyGov,
@@ -328,7 +330,7 @@ func (p *ProtocolV1) GetKVStoreKeyList() []*sdk.KVStoreKey {
 
 // configure all Params
 func (p *ProtocolV1) configParams() {
-	p.paramsKeeper.RegisterParamSet(&mint.Params{}, &slashing.Params{}, &service.Params{}, &auth.Params{}, &stake.Params{}, &distr.Params{}, &asset.Params{})
+	p.paramsKeeper.RegisterParamSet(&mint.Params{}, &slashing.Params{}, &service.Params{}, &auth.Params{}, &stake.Params{}, &distr.Params{}, &asset.Params{}, &gov.GovParams{})
 }
 
 // application updates every end block

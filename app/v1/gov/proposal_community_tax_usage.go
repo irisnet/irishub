@@ -97,7 +97,7 @@ func (ut UsageType) Format(s fmt.State, verb rune) {
 }
 
 // Implements Proposal Interface
-var _ Proposal = (*ParameterProposal)(nil)
+var _ Proposal = (*CommunityTaxUsageProposal)(nil)
 
 type TaxUsage struct {
 	Usage       UsageType      `json:"usage"`
@@ -105,12 +105,41 @@ type TaxUsage struct {
 	Percent     sdk.Dec        `json:"percent"`
 }
 
-type TaxUsageProposal struct {
+type CommunityTaxUsageProposal struct {
 	BasicProposal
 	TaxUsage TaxUsage `json:"tax_usage"`
 }
 
-func (tp TaxUsageProposal) GetTaxUsage() TaxUsage { return tp.TaxUsage }
-func (tp *TaxUsageProposal) SetTaxUsage(taxUsage TaxUsage) {
+func (tp CommunityTaxUsageProposal) GetTaxUsage() TaxUsage { return tp.TaxUsage }
+func (tp *CommunityTaxUsageProposal) SetTaxUsage(taxUsage TaxUsage) {
 	tp.TaxUsage = taxUsage
+}
+
+func (tp *CommunityTaxUsageProposal) Validate(ctx sdk.Context, k Keeper, verify bool) sdk.Error {
+	if err := tp.BasicProposal.Validate(ctx, k, verify); err != nil {
+		return err
+	}
+
+	if tp.TaxUsage.Usage != UsageTypeBurn {
+		_, found := k.guardianKeeper.GetTrustee(ctx, tp.TaxUsage.DestAddress)
+		if !found {
+			return ErrNotTrustee(k.codespace, tp.TaxUsage.DestAddress)
+		}
+	}
+	return nil
+}
+
+func (tp *CommunityTaxUsageProposal) Execute(ctx sdk.Context, gk Keeper) sdk.Error {
+	logger := ctx.Logger()
+	if err := tp.Validate(ctx, gk, false); err != nil {
+		logger.Error("Execute CommunityTaxUsageProposal Failure", "info",
+			"the destination address is not a trustee now", "destinationAddress", tp.TaxUsage.DestAddress)
+		return err
+	}
+	burn := false
+	if tp.TaxUsage.Usage == UsageTypeBurn {
+		burn = true
+	}
+	gk.dk.AllocateFeeTax(ctx, tp.TaxUsage.DestAddress, tp.TaxUsage.Percent, burn)
+	return nil
 }

@@ -4,6 +4,7 @@ import (
 	"github.com/go-kit/kit/metrics"
 	"github.com/go-kit/kit/metrics/discard"
 	"github.com/go-kit/kit/metrics/prometheus"
+	promutil "github.com/irisnet/irishub/tools/prometheus"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
 	cfg "github.com/tendermint/tendermint/config"
 )
@@ -19,13 +20,18 @@ func PrometheusMetrics(config *cfg.InstrumentationConfig) *Metrics {
 	if !config.Prometheus {
 		return NopMetrics()
 	}
+
+	missedBlocksVec := stdprometheus.NewGaugeVec(stdprometheus.GaugeOpts{
+		Namespace: config.Namespace,
+		Subsystem: MetricsSubsystem,
+		Name:      "missed_blocks",
+		Help:      "missed blocks",
+	}, []string{"validator_address"})
+
+	promutil.RegisterMetrics(missedBlocksVec)
+
 	return &Metrics{
-		MissedBlocks: prometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
-			Namespace: config.Namespace,
-			Subsystem: MetricsSubsystem,
-			Name:      "missed_blocks",
-			Help:      "missed blocks",
-		}, []string{"validator_address"}),
+		MissedBlocks: prometheus.NewGauge(missedBlocksVec),
 	}
 }
 

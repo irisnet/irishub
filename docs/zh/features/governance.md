@@ -2,10 +2,11 @@
 
 ## 基本功能描述
 
-1. 参数修改提议的链上治理
-2. 软件升级提议的链上治理
-3. 网络终止提议的链上治理
-4. Tax收入分配提议的链上治理
+1. 纯文本提议的链上治理
+2. 参数修改提议的链上治理
+3. 软件升级提议的链上治理
+4. 网络终止提议的链上治理
+5. Tax收入分配提议的链上治理
 
 ## 交互流程
 
@@ -13,7 +14,7 @@
 
 不同级别对应的具体 Proposal：
 - Critical：`SoftwareUpgrade`, `SystemHalt`
-- Important：`ParameterChange`
+- Important：`Parameter`
 - Normal：`CommunityTaxUsage`,`PlainText`
 
 `SoftwareUpgrade Proposal` 和 `SystemHalt Proposal` 只能由profiler发起。
@@ -25,11 +26,11 @@
 | govDepositProcedure/MinDeposit | 4000 iris | 2000 iris | 1000 iris |[10iris,10000iris]|
 | govDepositProcedure/MaxDepositPeriod | 24 hours | 24 hours | 24 hours |[20s,3d]|
 | govVotingProcedure/VotingPeriod | 72 hours | 60 hours | 48 hours |[20s,3d]|
-| govVotingProcedure/MaxProposal | 1 | 5 | 2 |Critical==1, other(1,)|
+| govVotingProcedure/MaxProposal | 1 | 5 | 7 |Critical==1, other(1,)|
 | govTallyingProcedure/Participation | 1/2 | 1/2 | 1/2 |(0,1)|
 | govTallyingProcedure/Threshold | 3/4 | 2/3 | 1/2 |(0,1)|
 | govTallyingProcedure/Veto | 1/3 | 1/3 | 1/3 |(0,1)|
-| govTallyingProcedure/Penalty | 0.0009 | 0.0007 | 0.0005 |(0,1)|
+| govTallyingProcedure/Penalty | 0 | 0 | 0 |(0,1)|
 
 
 * `MinDeposit`  最小抵押金额
@@ -82,7 +83,7 @@ iriscli gov query-params --module=mint --key=mint/Inflation
 mint/Inflation=0.0400000000
 
 # 发送提议，返回参数修改的内容
-iriscli gov submit-proposal --title=<title> --description=<description> --type=ParameterChange --deposit=8iris  --param="mint/Inflation=0.0000000000" --from=<key_name> --chain-id=<chain-id> --fee=0.3iris --commit
+iriscli gov submit-proposal --title=<title> --description=<description> --type=Parameter --deposit=8iris  --param="mint/Inflation=0.0000000000" --from=<key_name> --chain-id=<chain-id> --fee=0.3iris --commit
 
 # 对提议进行抵押
 iriscli gov deposit --proposal-id=<proposal-id> --deposit=1000iris --from=<key_name> --chain-id=<chain-id> --fee=0.3iris --commit

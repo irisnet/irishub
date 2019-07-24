@@ -49,7 +49,7 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 			var params gov.Params
-			if proposalType == gov.ProposalTypeParameterChange {
+			if proposalType == gov.ProposalTypeParameter {
 				paramStr := viper.GetString(flagParam)
 				params, err = getParamFromString(paramStr)
 				if err != nil {
@@ -82,7 +82,7 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 				if err != nil {
 					return err
 				}
-				taxMsg := gov.NewMsgSubmitTaxUsageProposal(msg, usage, destAddr, percent)
+				taxMsg := gov.NewMsgSubmitCommunityTaxUsageProposal(msg, usage, destAddr, percent)
 				return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{taxMsg})
 			}
 
@@ -113,13 +113,13 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 
 			if proposalType == gov.ProposalTypeTokenAddition {
 				symbol := viper.GetString(flagTokenSymbol)
-				symbolAtSource := viper.GetString(flagTokenSymbolAtSource)
+				canonicalSymbol := viper.GetString(flagTokenCanonicalSymbol)
 				name := viper.GetString(flagTokenName)
 				decimal := uint8(viper.GetInt(flagTokenDecimal))
-				alias := viper.GetString(flagTokenSymbolMinAlias)
+				alias := viper.GetString(flagTokenMinUnitAlias)
 				initialSupply := uint64(viper.GetInt64(flagTokenInitialSupply))
 
-				msg := gov.NewMsgSubmitAddTokenProposal(msg, symbol, symbolAtSource, name, alias, decimal, initialSupply)
+				msg := gov.NewMsgSubmitTokenAdditionProposal(msg, symbol, canonicalSymbol, name, alias, decimal, initialSupply)
 				return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 			}
 			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
@@ -140,12 +140,12 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 	cmd.Flags().String(flagSwitchHeight, "0", "the switchheight of the new protocol")
 	cmd.Flags().String(flagThreshold, "0.8", "the upgrade signal threshold of the software upgrade")
 
-	//for AddTokenProposal
+	//for TokenAdditionProposal
 	cmd.Flags().String(flagTokenSymbol, "", "the asset symbol. Once created, it cannot be modified")
-	cmd.Flags().String(flagTokenSymbolAtSource, "", "the source symbol of a external asset")
+	cmd.Flags().String(flagTokenCanonicalSymbol, "", "the source symbol of a external asset")
 	cmd.Flags().String(flagTokenName, "", "the asset name")
 	cmd.Flags().Uint8(flagTokenDecimal, 0, "the asset decimal. The maximum value is 18")
-	cmd.Flags().String(flagTokenSymbolMinAlias, "", "the asset symbol minimum alias")
+	cmd.Flags().String(flagTokenMinUnitAlias, "", "the asset symbol minimum alias")
 	cmd.Flags().Uint64(flagTokenInitialSupply, 0, "the initial supply token of asset")
 
 	cmd.MarkFlagRequired(flagTitle)

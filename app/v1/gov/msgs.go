@@ -2,7 +2,7 @@ package gov
 
 import (
 	"fmt"
-	"github.com/irisnet/irishub/app/v1/asset"
+	"github.com/irisnet/irishub/app/v1/asset/exported"
 
 	sdk "github.com/irisnet/irishub/types"
 )
@@ -10,7 +10,17 @@ import (
 // name to idetify transaction types
 const MsgRoute = "gov"
 
-var _, _, _, _ sdk.Msg = MsgSubmitProposal{}, MsgSubmitTxTaxUsageProposal{}, MsgDeposit{}, MsgVote{}
+var _, _, _, _ sdk.Msg = MsgSubmitProposal{}, MsgSubmitCommunityTaxUsageProposal{}, MsgDeposit{}, MsgVote{}
+
+type Content interface {
+	sdk.Msg
+	GetTitle() string
+	GetDescription() string
+	GetProposalType() ProposalKind
+	GetProposer() sdk.AccAddress
+	GetInitialDeposit() sdk.Coins
+	GetParams() Params
+}
 
 //-----------------------------------------------------------
 // MsgSubmitProposal
@@ -32,6 +42,25 @@ func NewMsgSubmitProposal(title string, description string, proposalType Proposa
 		InitialDeposit: initialDeposit,
 		Params:         params,
 	}
+}
+
+func (msg MsgSubmitProposal) GetTitle() string {
+	return msg.Title
+}
+func (msg MsgSubmitProposal) GetDescription() string {
+	return msg.Description
+}
+func (msg MsgSubmitProposal) GetProposalType() ProposalKind {
+	return msg.ProposalType
+}
+func (msg MsgSubmitProposal) GetProposer() sdk.AccAddress {
+	return msg.Proposer
+}
+func (msg MsgSubmitProposal) GetInitialDeposit() sdk.Coins {
+	return msg.InitialDeposit
+}
+func (msg MsgSubmitProposal) GetParams() Params {
+	return msg.Params
 }
 
 //nolint
@@ -61,7 +90,7 @@ func (msg MsgSubmitProposal) ValidateBasic() sdk.Error {
 	if err := msg.EnsureLength(); err != nil {
 		return err
 	}
-	if msg.ProposalType == ProposalTypeParameterChange {
+	if msg.ProposalType == ProposalTypeParameter {
 		if len(msg.Params) == 0 {
 			return ErrEmptyParam(DefaultCodespace)
 		}
@@ -139,15 +168,15 @@ func (msg MsgSubmitSoftwareUpgradeProposal) GetSignBytes() []byte {
 	return sdk.MustSortJSON(b)
 }
 
-type MsgSubmitTxTaxUsageProposal struct {
+type MsgSubmitCommunityTaxUsageProposal struct {
 	MsgSubmitProposal
 	Usage       UsageType      `json:"usage"`
 	DestAddress sdk.AccAddress `json:"dest_address"`
 	Percent     sdk.Dec        `json:"percent"`
 }
 
-func NewMsgSubmitTaxUsageProposal(msgSubmitProposal MsgSubmitProposal, usage UsageType, destAddress sdk.AccAddress, percent sdk.Dec) MsgSubmitTxTaxUsageProposal {
-	return MsgSubmitTxTaxUsageProposal{
+func NewMsgSubmitCommunityTaxUsageProposal(msgSubmitProposal MsgSubmitProposal, usage UsageType, destAddress sdk.AccAddress, percent sdk.Dec) MsgSubmitCommunityTaxUsageProposal {
+	return MsgSubmitCommunityTaxUsageProposal{
 		MsgSubmitProposal: msgSubmitProposal,
 		Usage:             usage,
 		DestAddress:       destAddress,
@@ -155,7 +184,7 @@ func NewMsgSubmitTaxUsageProposal(msgSubmitProposal MsgSubmitProposal, usage Usa
 	}
 }
 
-func (msg MsgSubmitTxTaxUsageProposal) ValidateBasic() sdk.Error {
+func (msg MsgSubmitCommunityTaxUsageProposal) ValidateBasic() sdk.Error {
 	err := msg.MsgSubmitProposal.ValidateBasic()
 	if err != nil {
 		return err
@@ -172,7 +201,7 @@ func (msg MsgSubmitTxTaxUsageProposal) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg MsgSubmitTxTaxUsageProposal) GetSignBytes() []byte {
+func (msg MsgSubmitCommunityTaxUsageProposal) GetSignBytes() []byte {
 	b, err := msgCdc.MarshalJSON(msg)
 	if err != nil {
 		panic(err)
@@ -310,44 +339,38 @@ func (msg MsgSubmitProposal) EnsureLength() sdk.Error {
 	return nil
 }
 
-type MsgSubmitAddTokenProposal struct {
+type MsgSubmitTokenAdditionProposal struct {
 	MsgSubmitProposal
-	Symbol         string `json:"symbol"`
-	SymbolAtSource string `json:"symbol_at_source"`
-	Name           string `json:"name"`
-	Decimal        uint8  `json:"decimal"`
-	SymbolMinAlias string `json:"symbol_min_alias"`
-	InitialSupply  uint64 `json:"initial_supply"`
+	Symbol          string `json:"symbol"`
+	CanonicalSymbol string `json:"canonical_symbol"`
+	Name            string `json:"name"`
+	Decimal         uint8  `json:"decimal"`
+	MinUnitAlias    string `json:"min_unit_alias"`
+	InitialSupply   uint64 `json:"initial_supply"`
 }
 
-func NewMsgSubmitAddTokenProposal(msgSubmitProposal MsgSubmitProposal, symbol, symbolAtSource, name, symbolMinAlias string, decimal uint8, initialSupply uint64) MsgSubmitAddTokenProposal {
-	return MsgSubmitAddTokenProposal{
+func NewMsgSubmitTokenAdditionProposal(msgSubmitProposal MsgSubmitProposal, symbol, canonicalSymbol, name, minUnitAlias string, decimal uint8, initialSupply uint64) MsgSubmitTokenAdditionProposal {
+	return MsgSubmitTokenAdditionProposal{
 		MsgSubmitProposal: msgSubmitProposal,
 		Symbol:            symbol,
-		SymbolAtSource:    symbolAtSource,
+		CanonicalSymbol:   canonicalSymbol,
 		Name:              name,
 		Decimal:           decimal,
-		SymbolMinAlias:    symbolMinAlias,
+		MinUnitAlias:      minUnitAlias,
 		InitialSupply:     initialSupply,
 	}
 }
 
-func (msg MsgSubmitAddTokenProposal) ValidateBasic() sdk.Error {
+func (msg MsgSubmitTokenAdditionProposal) ValidateBasic() sdk.Error {
 	err := msg.MsgSubmitProposal.ValidateBasic()
 	if err != nil {
 		return err
 	}
 
-	issueToken := asset.NewMsgIssueToken(asset.FUNGIBLE, asset.EXTERNAL, "", msg.Symbol, msg.SymbolAtSource, msg.Name, msg.Decimal, msg.SymbolMinAlias, msg.InitialSupply, asset.MaximumAssetMaxSupply, false, nil)
-
-	err = issueToken.ValidateBasic()
-	// skip this error code
-	if err.Code() == asset.CodeInvalidAssetSource {
-		return nil
-	}
-	return err
+	issueToken := exported.NewMsgIssueToken(exported.FUNGIBLE, exported.EXTERNAL, "", msg.Symbol, msg.CanonicalSymbol, msg.Name, msg.Decimal, msg.MinUnitAlias, msg.InitialSupply, exported.MaximumAssetMaxSupply, false, nil)
+	return exported.ValidateMsgIssueToken(&issueToken)
 }
-func (msg MsgSubmitAddTokenProposal) GetSignBytes() []byte {
+func (msg MsgSubmitTokenAdditionProposal) GetSignBytes() []byte {
 	b, err := msgCdc.MarshalJSON(msg)
 	if err != nil {
 		panic(err)

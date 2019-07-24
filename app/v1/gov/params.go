@@ -104,26 +104,26 @@ type GovParams struct {
 }
 
 func (p GovParams) String() string {
-	return fmt.Sprintf(`System Halt Period: %v
-
-Proposal Parameter:    [Critical]    [Important]    [Normal]
-  DepositPeriod:        %v    %v    %v
-  MinDeposit:           %s    %s    %s
-  Voting Period:        %v    %v    %v
-  Max Num:              %v    %v    %v
-  Threshold:            %s    %s    %s
-  Veto:                 %s    %s    %s
-  Participation:        %s    %s    %s
-  Penalty:              %s    %s    %s
+	return fmt.Sprintf(`Gov Params:
+System Halt Period:     %v
+Proposal Parameter:    [Critical]         [Important]        [Normal]
+  DepositPeriod:        %v         %v        %v
+  MinDeposit:           %s         %s        %s
+  Voting Period:        %v         %v        %v
+  Max Num:              %v         %v        %v
+  Threshold:            %s         %s        %s
+  Veto:                 %s         %s        %s
+  Participation:        %s         %s        %s
+  Penalty:              %s         %s        %s
 `, p.SystemHaltPeriod,
 		p.CriticalDepositPeriod, p.ImportantDepositPeriod, p.NormalDepositPeriod,
-		p.CriticalMinDeposit, p.ImportantMinDeposit, p.NormalMinDeposit,
+		p.CriticalMinDeposit.String(), p.ImportantMinDeposit.String(), p.NormalMinDeposit.String(),
 		p.CriticalVotingPeriod, p.ImportantVotingPeriod, p.NormalVotingPeriod,
 		p.CriticalMaxNum, p.ImportantMaxNum, p.NormalMaxNum,
-		p.CriticalThreshold, p.ImportantThreshold, p.NormalThreshold,
-		p.CriticalVeto, p.ImportantVeto, p.NormalVeto,
-		p.CriticalParticipation, p.ImportantParticipation, p.NormalParticipation,
-		p.CriticalPenalty, p.ImportantPenalty, p.NormalPenalty)
+		p.CriticalThreshold.String(), p.ImportantThreshold.String(), p.NormalThreshold.String(),
+		p.CriticalVeto.String(), p.ImportantVeto.String(), p.NormalVeto.String(),
+		p.CriticalParticipation.String(), p.ImportantParticipation.String(), p.NormalParticipation.String(),
+		p.CriticalPenalty.String(), p.ImportantPenalty.String(), p.NormalPenalty.String())
 }
 
 // Implements params.ParamStruct
@@ -251,6 +251,10 @@ func (p *GovParams) StringFromBytes(cdc *codec.Codec, key string, bytes []byte) 
 	default:
 		return "", fmt.Errorf("%s is not existed", key)
 	}
+}
+
+func (p *GovParams) ReadOnly() bool {
+	return true
 }
 
 // default minting module parameters
@@ -437,18 +441,6 @@ func validateParams(p GovParams) sdk.Error {
 }
 
 //______________________________________________________________________
-
-// get inflation params from the global param store
-func (k Keeper) GetParamSet(ctx sdk.Context) GovParams {
-	var params GovParams
-	k.paramSpace.GetParamSet(ctx, &params)
-	return params
-}
-
-// set inflation params from the global param store
-func (k Keeper) SetParamSet(ctx sdk.Context, params GovParams) {
-	k.paramSpace.SetParamSet(ctx, &params)
-}
 
 type DepositProcedure struct {
 	MinDeposit       sdk.Coins

@@ -11,6 +11,7 @@ import (
 	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/app/v1/bank"
 	"github.com/irisnet/irishub/store"
+	"github.com/irisnet/irishub/tools/human"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/pkg/errors"
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -453,7 +454,12 @@ func (ctx CLIContext) PrintOutput(toPrint fmt.Stringer) (err error) {
 
 	switch ctx.OutputFormat {
 	case "text":
-		out = []byte(toPrint.String())
+		humanStringer, ok := toPrint.(human.Stringer)
+		if ok {
+			out = []byte(humanStringer.HumanString(ctx))
+		} else {
+			out = []byte(toPrint.String())
+		}
 
 	case "json":
 		if ctx.Indent {

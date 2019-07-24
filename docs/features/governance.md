@@ -2,10 +2,11 @@
 
 ## Basic Function Description
 
-1. On-chain governance proposals on parameter change
-2. On-chain governance proposals on software upgrade 
-3. On-chain governance proposals on software halt
-4. On-chain governance proposals on tax usage
+1. On-chain governance proposals on plain text
+2. On-chain governance proposals on parameter change
+3. On-chain governance proposals on software upgrade 
+4. On-chain governance proposals on software halt
+5. On-chain governance proposals on tax usage
 
 ## Interactive process
 
@@ -13,7 +14,7 @@
 
 Specific Proposal for different levels：
 - Critical：`SoftwareUpgrade`, `SystemHalt`
-- Important：`ParameterChange`
+- Important：`Parameter`
 - Normal：`CommunityTaxUsage`,`PlainText`
 
 `SoftwareUpgrade Proposal` and `SystemHalt Proposal` can only be submitted by the profiler.
@@ -29,7 +30,7 @@ Different levels correspond to different parameters：
 | govTallyingProcedure/Participation | 1/2 | 1/2 | 1/2 |(0,1)|
 | govTallyingProcedure/Threshold | 3/4 | 2/3 | 1/2 |(0,1)|
 | govTallyingProcedure/Veto | 1/3 | 1/3 | 1/3 |(0,1)|
-| govTallyingProcedure/Penalty | 0.0009 | 0.0007 | 0.0005 |(0,1)|
+| govTallyingProcedure/Penalty | 0 | 0 | 0 |(0,1)|
 
 
 * `MinDeposit`  The minimum of  deposit
@@ -85,7 +86,7 @@ iriscli gov query-params --module=mint --key=mint/Inflation
 mint/Inflation=0.0400000000
 
 # Send proposal for parameters change
-iriscli gov submit-proposal --title=<title> --description=<description> --type=ParameterChange --deposit=8iris  --param="mint/Inflation=0.0000000000" --from=<key_name> --chain-id=<chain-id> --fee=0.3iris --commit
+iriscli gov submit-proposal --title=<title> --description=<description> --type=Parameter --deposit=8iris  --param="mint/Inflation=0.0000000000" --from=<key_name> --chain-id=<chain-id> --fee=0.3iris --commit
 
 # Deposit for a proposal
 iriscli gov deposit --proposal-id=<proposal-id> --deposit=1000iris --from=<key_name> --chain-id=<chain-id> --fee=0.3iris --commit

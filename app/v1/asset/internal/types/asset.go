@@ -9,27 +9,27 @@ import (
 )
 
 type BaseToken struct {
-	Id             string           `json:"id"`
-	Family         AssetFamily      `json:"family"`
-	Source         AssetSource      `json:"source"`
-	Gateway        string           `json:"gateway"`
-	Symbol         string           `json:"symbol"`
-	Name           string           `json:"name"`
-	Decimal        uint8            `json:"decimal"`
-	SymbolAtSource string           `json:"symbol_at_source"`
-	SymbolMinAlias string           `json:"symbol_min_alias"`
-	InitialSupply  types.Int        `json:"initial_supply"`
-	MaxSupply      types.Int        `json:"max_supply"`
-	Mintable       bool             `json:"mintable"`
-	Owner          types.AccAddress `json:"owner"`
+	Id              string           `json:"id"`
+	Family          AssetFamily      `json:"family"`
+	Source          AssetSource      `json:"source"`
+	Gateway         string           `json:"gateway"`
+	Symbol          string           `json:"symbol"`
+	Name            string           `json:"name"`
+	Decimal         uint8            `json:"decimal"`
+	CanonicalSymbol string           `json:"canonical_symbol"`
+	MinUnitAlias    string           `json:"min_unit_alias"`
+	InitialSupply   types.Int        `json:"initial_supply"`
+	MaxSupply       types.Int        `json:"max_supply"`
+	Mintable        bool             `json:"mintable"`
+	Owner           types.AccAddress `json:"owner"`
 }
 
-func NewBaseToken(family AssetFamily, source AssetSource, gateway string, symbol string, name string, decimal uint8, symbolAtSource string, symbolMinAlias string, initialSupply types.Int, maxSupply types.Int, mintable bool, owner types.AccAddress) BaseToken {
+func NewBaseToken(family AssetFamily, source AssetSource, gateway string, symbol string, name string, decimal uint8, canonicalSymbol string, minUnitAlias string, initialSupply types.Int, maxSupply types.Int, mintable bool, owner types.AccAddress) BaseToken {
 
 	gateway = strings.ToLower(strings.TrimSpace(gateway))
 	symbol = strings.ToLower(strings.TrimSpace(symbol))
-	symbolAtSource = strings.ToLower(strings.TrimSpace(symbolAtSource))
-	symbolMinAlias = strings.ToLower(strings.TrimSpace(symbolMinAlias))
+	canonicalSymbol = strings.ToLower(strings.TrimSpace(canonicalSymbol))
+	minUnitAlias = strings.ToLower(strings.TrimSpace(minUnitAlias))
 	name = strings.TrimSpace(name)
 
 	if maxSupply.IsZero() {
@@ -41,18 +41,18 @@ func NewBaseToken(family AssetFamily, source AssetSource, gateway string, symbol
 	}
 
 	return BaseToken{
-		Family:         family,
-		Source:         source,
-		Gateway:        gateway,
-		Symbol:         symbol,
-		Name:           name,
-		Decimal:        decimal,
-		SymbolAtSource: symbolAtSource,
-		SymbolMinAlias: symbolMinAlias,
-		InitialSupply:  initialSupply,
-		MaxSupply:      maxSupply,
-		Mintable:       mintable,
-		Owner:          owner,
+		Family:          family,
+		Source:          source,
+		Gateway:         gateway,
+		Symbol:          symbol,
+		Name:            name,
+		Decimal:         decimal,
+		CanonicalSymbol: canonicalSymbol,
+		MinUnitAlias:    minUnitAlias,
+		InitialSupply:   initialSupply,
+		MaxSupply:       maxSupply,
+		Mintable:        mintable,
+		Owner:           owner,
 	}
 }
 
@@ -61,10 +61,10 @@ type FungibleToken struct {
 	BaseToken `json:"base_token"`
 }
 
-func NewFungibleToken(source AssetSource, gateway string, symbol string, name string, decimal uint8, symbolAtSource string, symbolMinAlias string, initialSupply types.Int, maxSupply types.Int, mintable bool, owner types.AccAddress) FungibleToken {
+func NewFungibleToken(source AssetSource, gateway string, symbol string, name string, decimal uint8, canonicalSymbol string, minUnitAlias string, initialSupply types.Int, maxSupply types.Int, mintable bool, owner types.AccAddress) FungibleToken {
 	token := FungibleToken{
 		BaseToken: NewBaseToken(
-			FUNGIBLE, source, gateway, symbol, name, decimal, symbolAtSource, symbolMinAlias, initialSupply, maxSupply, mintable, owner,
+			FUNGIBLE, source, gateway, symbol, name, decimal, canonicalSymbol, minUnitAlias, initialSupply, maxSupply, mintable, owner,
 		),
 	}
 
@@ -148,22 +148,22 @@ func (ft FungibleToken) String() string {
   Gateway:           %s
   Name:              %s
   Symbol:            %s
-  Symbol At Source:  %s
-  Symbol Min Alias:  %s
+  CanonicalSymbol:   %s
+  MinUnitAlias:      %s
   Decimal:           %d
   Initial Supply:    %s
   Max Supply:        %s
   Mintable:          %v
   Owner:             %s`,
-		ft.GetUniqueID(), ft.Family, ft.Source, ft.Gateway, ft.Name, ft.Symbol, ft.SymbolAtSource, ft.SymbolMinAlias,
+		ft.GetUniqueID(), ft.Family, ft.Source, ft.Gateway, ft.Name, ft.Symbol, ft.CanonicalSymbol, ft.MinUnitAlias,
 		ft.Decimal, initSupply, maxSupply, ft.Mintable, owner)
 }
 
 func (ft FungibleToken) Sanitize() FungibleToken {
 	ft.Gateway = strings.ToLower(strings.TrimSpace(ft.Gateway))
 	ft.Symbol = strings.ToLower(strings.TrimSpace(ft.Symbol))
-	ft.SymbolAtSource = strings.ToLower(strings.TrimSpace(ft.SymbolAtSource))
-	ft.SymbolMinAlias = strings.ToLower(strings.TrimSpace(ft.SymbolMinAlias))
+	ft.CanonicalSymbol = strings.ToLower(strings.TrimSpace(ft.CanonicalSymbol))
+	ft.MinUnitAlias = strings.ToLower(strings.TrimSpace(ft.MinUnitAlias))
 	ft.Name = strings.TrimSpace(ft.Name)
 	return ft
 }
@@ -172,7 +172,7 @@ type Tokens []FungibleToken
 
 func (tokens Tokens) String() string {
 	if len(tokens) == 0 {
-		return ""
+		return "[]"
 	}
 
 	out := ""
@@ -191,7 +191,7 @@ func (tokens Tokens) Validate() sdk.Error {
 		exp := sdk.NewIntWithDecimal(1, int(token.Decimal))
 		initialSupply := uint64(token.InitialSupply.Div(exp).Int64())
 		maxSupply := uint64(token.MaxSupply.Div(exp).Int64())
-		msg := NewMsgIssueToken(token.Family, token.GetSource(), token.Gateway, token.Symbol, token.SymbolAtSource, token.Name, token.Decimal, token.SymbolMinAlias, initialSupply, maxSupply, token.Mintable, token.Owner)
+		msg := NewMsgIssueToken(token.Family, token.GetSource(), token.Gateway, token.Symbol, token.CanonicalSymbol, token.Name, token.Decimal, token.MinUnitAlias, initialSupply, maxSupply, token.Mintable, token.Owner)
 		if err := msg.ValidateBasic(); err != nil {
 			return err
 		}

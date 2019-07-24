@@ -31,7 +31,7 @@ iriscli默认关闭dry-run模式。如果想打开dry-run模式，可以指定fl
 例子：使用dry-run模式发送命令
 
 ```
-iriscli gov submit-proposal --title="test" --description="test" --type="ParameterChange" --deposit=600iris --param='mint/Inflation=0.050' --from=<user> --chain-id=<chain-id> --fee=0.3iris --dry-run
+iriscli gov submit-proposal --title="test" --description="test" --type="Parameter" --deposit=600iris --param='mint/Inflation=0.050' --from=<user> --chain-id=<chain-id> --fee=0.3iris --dry-run
 ```
 
 返回：
