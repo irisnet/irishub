@@ -2445,8 +2445,8 @@ paths:
                   type: int
                   example: '21000000'
                 mintable:
-                  type: boolean
-                  example: false
+                  type: string
+                  example: ""
                 name:
                   type: string
                   example: 'BTC Token'
