@@ -34,6 +34,7 @@ var (
 	NewRand              = types.NewRand
 	NewRequest           = types.NewRequest
 	MakePRNG             = types.MakePRNG
+	GenerateRequestID    = types.GenerateRequestID
 	CheckReqID           = types.CheckReqID
 	DefaultBlockInterval = types.DefaultBlockInterval
 	RandPrec             = types.RandPrec

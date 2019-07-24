@@ -2,6 +2,5 @@ package types
 
 // GenesisState contains all rand state that must be provided at genesis
 type GenesisState struct {
-	GeneratedRands     []Rand    // generated rands
-	PendingRandRequest []Request // pending rand requests
+	PendingRandRequests map[int64][]Request // pending rand requests
 }

@@ -47,7 +47,7 @@ func TestRequestRandKeeper(t *testing.T) {
 
 	// query rand request queue and assert that the result is empty
 	var requests []types.Request
-	keeper.IterateRandRequestQueue(ctx, func(r types.Request) bool {
+	keeper.IterateRandRequestQueue(ctx, func(h int64, r types.Request) bool {
 		requests = append(requests, r)
 		return false
 	})

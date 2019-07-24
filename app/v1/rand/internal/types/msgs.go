@@ -40,10 +40,6 @@ func (msg MsgRequestRand) ValidateBasic() sdk.Error {
 		return ErrInvalidConsumer(DefaultCodespace, "the consumer address must be specified")
 	}
 
-	if msg.BlockInterval == 0 {
-		return ErrInvalidBlockInterval(DefaultCodespace, "the block interval must be greater than 0")
-	}
-
 	return nil
 }
 

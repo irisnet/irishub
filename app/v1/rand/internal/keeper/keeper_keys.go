@@ -5,6 +5,7 @@ import (
 )
 
 var (
+	KeyDelimiter           = []byte(":")                 // key delimiter
 	PrefixRand             = []byte("rands:")            // key prefix for the random number
 	PrefixRandRequestQueue = []byte("randRequestQueue:") // key prefix for the random number request queue
 )

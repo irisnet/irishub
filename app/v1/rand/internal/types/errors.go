@@ -9,9 +9,8 @@ import (
 const (
 	DefaultCodespace sdk.CodespaceType = "rand"
 
-	CodeInvalidConsumer      sdk.CodeType = 100
-	CodeInvalidBlockInterval sdk.CodeType = 101
-	CodeInvalidReqID         sdk.CodeType = 102
+	CodeInvalidConsumer sdk.CodeType = 100
+	CodeInvalidReqID    sdk.CodeType = 101
 )
 
 //----------------------------------------
@@ -19,10 +18,6 @@ const (
 
 func ErrInvalidConsumer(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidConsumer, msg)
-}
-
-func ErrInvalidBlockInterval(codespace sdk.CodespaceType, msg string) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidBlockInterval, msg)
 }
 
 func ErrInvalidReqID(codespace sdk.CodespaceType, msg string) sdk.Error {

@@ -23,11 +23,6 @@ func NewRequest(height int64, consumer sdk.AccAddress, txHash []byte) Request {
 	}
 }
 
-// Validate checks if a request is valid. Indended to validate requests exported to genesis
-func (r Request) Validate() sdk.Error {
-	return nil
-}
-
 // String implements fmt.Stringer
 func (r Request) String() string {
 	return fmt.Sprintf(`Request:

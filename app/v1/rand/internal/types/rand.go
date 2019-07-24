@@ -23,16 +23,11 @@ func NewRand(requestTxHash []byte, height int64, value sdk.Rat) Rand {
 	}
 }
 
-// Validate checks if a rand is valid. Indended to validate random numbers exported to genesis
-func (r Rand) Validate() sdk.Error {
-	return nil
-}
-
 // String implements fmt.Stringer
 func (r Rand) String() string {
 	return fmt.Sprintf(`Rand:
   RequestTxHash:     %s
-  Height:            %d,
+  Height:            %d
   Value:             %s`,
 		hex.EncodeToString(r.RequestTxHash), r.Height, r.Value.Rat.FloatString(RandPrec))
 }

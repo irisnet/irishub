@@ -1,8 +1,10 @@
 package keeper
 
 import (
+	"bytes"
 	"encoding/hex"
 	"fmt"
+	"strconv"
 
 	"github.com/irisnet/irishub/app/v1/rand/internal/types"
 	"github.com/irisnet/irishub/codec"
@@ -89,19 +91,13 @@ func (k Keeper) GetRand(ctx sdk.Context, reqID []byte) (types.Rand, sdk.Error) {
 
 	bz := store.Get(KeyRand(reqID))
 	if bz == nil {
-		return types.Rand{}, types.ErrInvalidReqID(k.codespace, fmt.Sprintf("the request id does not exist: %s", reqID))
+		return types.Rand{}, types.ErrInvalidReqID(k.codespace, fmt.Sprintf("invalid request id: %s", hex.EncodeToString(reqID)))
 	}
 
 	var rand types.Rand
 	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &rand)
 
 	return rand, nil
-}
-
-// IterateRandRequestQueueByHeight iterates the random number request queue by the specified height
-func (k Keeper) IterateRandRequestQueueByHeight(ctx sdk.Context, height int64) sdk.Iterator {
-	store := ctx.KVStore(k.storeKey)
-	return sdk.KVStorePrefixIterator(store, KeyRandRequestQueueSubspace(height))
 }
 
 // IterateRands iterates through all the random numbers
@@ -121,18 +117,27 @@ func (k Keeper) IterateRands(ctx sdk.Context, op func(r types.Rand) (stop bool))
 	}
 }
 
+// IterateRandRequestQueueByHeight iterates the random number request queue by the specified height
+func (k Keeper) IterateRandRequestQueueByHeight(ctx sdk.Context, height int64) sdk.Iterator {
+	store := ctx.KVStore(k.storeKey)
+	return sdk.KVStorePrefixIterator(store, KeyRandRequestQueueSubspace(height))
+}
+
 // IterateRandRequestQueue iterates through the random number request queue
-func (k Keeper) IterateRandRequestQueue(ctx sdk.Context, op func(r types.Request) (stop bool)) {
+func (k Keeper) IterateRandRequestQueue(ctx sdk.Context, op func(h int64, r types.Request) (stop bool)) {
 	store := ctx.KVStore(k.storeKey)
 
 	iterator := sdk.KVStorePrefixIterator(store, PrefixRandRequestQueue)
 	defer iterator.Close()
 
 	for ; iterator.Valid(); iterator.Next() {
+		keyParts := bytes.Split(iterator.Key(), KeyDelimiter)
+		height, _ := strconv.ParseInt(string(keyParts[1]), 10, 64)
+
 		var request types.Request
 		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &request)
 
-		if stop := op(request); stop {
+		if stop := op(height, request); stop {
 			break
 		}
 	}

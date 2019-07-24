@@ -91,7 +91,7 @@ func queryRandRequestQueueByHeight(ctx sdk.Context, height int64, keeper Keeper)
 func queryAllRandRequestsInQueue(ctx sdk.Context, keeper Keeper) []types.Request {
 	var requests = make([]types.Request, 0)
 
-	keeper.IterateRandRequestQueue(ctx, func(r types.Request) (stop bool) {
+	keeper.IterateRandRequestQueue(ctx, func(h int64, r types.Request) (stop bool) {
 		requests = append(requests, r)
 		return false
 	})
