@@ -33,7 +33,6 @@ var (
 	MaximumGatewayDetailsSize  = 280 // maximal limitation for the length of the gateway's details
 	MaximumGatewayWebsiteSize  = 128 // maximal limitation for the length of the gateway's website
 
-	IsAlpha            = regexp.MustCompile(`^[a-zA-Z]+$`).MatchString
 	IsAlphaNumeric     = regexp.MustCompile(`^[a-zA-Z0-9]+$`).MatchString   // only accepts alphanumeric characters
 	IsAlphaNumericDash = regexp.MustCompile(`^[a-zA-Z0-9_-]+$`).MatchString // only accepts alphanumeric characters, _ and -
 	IsBeginWithAlpha   = regexp.MustCompile(`^[a-zA-Z].*`).MatchString
@@ -619,8 +618,8 @@ func ValidateMoniker(moniker string) sdk.Error {
 	}
 
 	// check the moniker format
-	if !IsAlpha(moniker) {
-		return ErrInvalidMoniker(DefaultCodespace, fmt.Sprintf("the moniker must contain only letters"))
+	if !IsBeginWithAlpha(moniker) || !IsAlphaNumeric(moniker) {
+		return ErrInvalidMoniker(DefaultCodespace, fmt.Sprintf("the moniker must begin with a letter followed by alphanumeric characters"))
 	}
 
 	// check if the moniker contains the native token name

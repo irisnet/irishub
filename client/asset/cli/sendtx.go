@@ -114,6 +114,7 @@ func GetCmdIssueToken(cdc *codec.Codec) *cobra.Command {
 	cmd.MarkFlagRequired(FlagSymbol)
 	cmd.MarkFlagRequired(FlagName)
 	cmd.MarkFlagRequired(FlagInitialSupply)
+	cmd.MarkFlagRequired(FlagDecimal)
 
 	return cmd
 }
