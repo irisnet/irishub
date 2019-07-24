@@ -1,6 +1,7 @@
 package rand
 
 import (
+	"strconv"
 	"testing"
 
 	"github.com/irisnet/irishub/codec"
@@ -66,6 +67,9 @@ func TestExportRandGenesis(t *testing.T) {
 
 	// assert that exported requests are consistant with the requests in queue
 	for height, requests := range exportedRequests {
-		require.Equal(t, storedRequests[height+newBlockHeight-1], requests)
+		h, _ := strconv.ParseInt(height, 10, 64)
+		storedHeight := h + newBlockHeight - 1
+
+		require.Equal(t, storedRequests[storedHeight], requests)
 	}
 }

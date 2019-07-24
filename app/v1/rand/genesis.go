@@ -1,6 +1,9 @@
 package rand
 
 import (
+	"fmt"
+	"strconv"
+
 	sdk "github.com/irisnet/irishub/types"
 )
 
@@ -8,18 +11,23 @@ import (
 func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
 	for height, requests := range data.PendingRandRequests {
 		for _, request := range requests {
+			h, err := strconv.ParseInt(height, 10, 64)
+			if err != nil {
+				continue
+			}
+
 			reqID := GenerateRequestID(request)
-			k.EnqueueRandRequest(ctx, height, reqID, request)
+			k.EnqueueRandRequest(ctx, h, reqID, request)
 		}
 	}
 }
 
 // ExportGenesis outputs genesis data
 func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
-	pendingRequests := make(map[int64][]Request)
+	pendingRequests := make(map[string][]Request)
 
 	k.IterateRandRequestQueue(ctx, func(height int64, request Request) bool {
-		leftHeight := height - ctx.BlockHeight() + 1
+		leftHeight := fmt.Sprintf("%d", height-ctx.BlockHeight()+1)
 		pendingRequests[leftHeight] = append(pendingRequests[leftHeight], request)
 
 		return false
@@ -33,13 +41,13 @@ func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 // DefaultGenesisState gets the default genesis state
 func DefaultGenesisState() GenesisState {
 	return GenesisState{
-		PendingRandRequests: map[int64][]Request{},
+		PendingRandRequests: map[string][]Request{},
 	}
 }
 
 // DefaultGenesisStateForTest gets the default genesis state for test
 func DefaultGenesisStateForTest() GenesisState {
 	return GenesisState{
-		PendingRandRequests: map[int64][]Request{},
+		PendingRandRequests: map[string][]Request{},
 	}
 }
