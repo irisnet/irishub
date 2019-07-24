@@ -316,8 +316,8 @@ func TestKeeper_EditToken(t *testing.T) {
 	assert.Equal(t, msgJson, assetJson)
 
 	//TODO:finish the edit token
-	mintable := false
-	msgEditToken := types.NewMsgEditToken("BTC Token", "btc", "btc", "btc", 0, &mintable, acc.GetAddress())
+	mintable := types.False
+	msgEditToken := types.NewMsgEditToken("BTC Token", "btc", "btc", "btc", 0, mintable, acc.GetAddress())
 	_, err = keeper.EditToken(ctx, msgEditToken)
 	assert.NoError(t, err)
 }

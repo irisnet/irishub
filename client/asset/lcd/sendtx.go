@@ -100,7 +100,7 @@ type editTokenReq struct {
 	CanonicalSymbol string         `json:"canonical_symbol"` //  canonical_symbol of asset
 	MinUnitAlias    string         `json:"min_unit_alias"`   //  min_unit_alias of asset
 	MaxSupply       uint64         `json:"max_supply"`
-	Mintable        *bool          `json:"mintable"` //  mintable of asset
+	Mintable        string         `json:"mintable"` //  mintable of asset
 	Name            string         `json:"name"`
 }
 
@@ -248,7 +248,12 @@ func editTokenHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handle
 		}
 
 		// create the MsgEditToken message
-		msg := asset.NewMsgEditToken(req.Name, req.CanonicalSymbol, req.MinUnitAlias, tokenId, req.MaxSupply, req.Mintable, req.Owner)
+		mintable, err := asset.ParseBool(req.Mintable)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+		msg := asset.NewMsgEditToken(req.Name, req.CanonicalSymbol, req.MinUnitAlias, tokenId, req.MaxSupply, mintable, req.Owner)
 		err = msg.ValidateBasic()
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
