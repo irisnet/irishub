@@ -7,21 +7,21 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 )
 
-var _ Proposal = (*AddTokenProposal)(nil)
+var _ Proposal = (*TokenAdditionProposal)(nil)
 
-type AddTokenProposal struct {
+type TokenAdditionProposal struct {
 	BasicProposal
 	FToken exported.FungibleToken `json:"f_token"`
 }
 
-func (atp AddTokenProposal) HumanString(assetConvert human.AssetConvert) string {
+func (atp TokenAdditionProposal) HumanString(assetConvert human.AssetConvert) string {
 	bps := atp.BasicProposal.HumanString(assetConvert)
 	return fmt.Sprintf(`%s
   %s`,
 		bps, atp.FToken.String())
 }
 
-func (atp *AddTokenProposal) Validate(ctx sdk.Context, k Keeper, verify bool) sdk.Error {
+func (atp *TokenAdditionProposal) Validate(ctx sdk.Context, k Keeper, verify bool) sdk.Error {
 	if err := atp.BasicProposal.Validate(ctx, k, verify); err != nil {
 		return err
 	}
@@ -33,13 +33,13 @@ func (atp *AddTokenProposal) Validate(ctx sdk.Context, k Keeper, verify bool) sd
 	return nil
 }
 
-func (atp *AddTokenProposal) Execute(ctx sdk.Context, gk Keeper) sdk.Error {
+func (atp *TokenAdditionProposal) Execute(ctx sdk.Context, gk Keeper) sdk.Error {
 	logger := ctx.Logger()
 	_, err := gk.ak.IssueToken(ctx, atp.FToken)
 	if err != nil {
-		logger.Error("Execute AddTokenProposal failed", "height", ctx.BlockHeight(), "proposalId", atp.ProposalID, "token_id", atp.FToken.Id, "err", err.Error())
+		logger.Error("Execute TokenAdditionProposal failed", "height", ctx.BlockHeight(), "proposalId", atp.ProposalID, "token_id", atp.FToken.Id, "err", err.Error())
 		return err
 	}
-	logger.Info("Execute AddTokenProposal success", "height", ctx.BlockHeight(), "proposalId", atp.ProposalID, "token_id", atp.FToken.Id)
+	logger.Info("Execute TokenAdditionProposal success", "height", ctx.BlockHeight(), "proposalId", atp.ProposalID, "token_id", atp.FToken.Id)
 	return nil
 }

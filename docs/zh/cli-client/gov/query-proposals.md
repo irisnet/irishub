@@ -41,9 +41,9 @@ ID - (Status) [Type] [TotalDeposit] Title
 2 - (Rejected) [CommunityTaxUsage] [1000iris] t
 6 - (Rejected) [CommunityTaxUsage] [1000iris] t
 8 - (Rejected) [CommunityTaxUsage] [1000iris] t
-9 - (Passed) [ParameterChange] [2000iris] test
-10 - (Passed) [ParameterChange] [2000iris] test
-11 - (Passed) [ParameterChange] [2000iris] test
+9 - (Passed) [Parameter] [2000iris] test
+10 - (Passed) [Parameter] [2000iris] test
+11 - (Passed) [Parameter] [2000iris] test
 ```
 
 当然这里可以查询指定条件的提议。

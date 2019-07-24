@@ -25,10 +25,10 @@ const (
 	flagThreshold    = "threshold"
 
 	//for addTokenProposal
-	flagTokenSymbol         = "token-symbol"
-	flagTokenSymbolAtSource = "token-symbol-at-source"
-	flagTokenName           = "token-name"
-	flagTokenDecimal        = "token-decimal"
-	flagTokenSymbolMinAlias = "token-symbol-min-alias"
-	flagTokenInitialSupply  = "token-initial-supply"
+	flagTokenSymbol          = "token-symbol"
+	flagTokenCanonicalSymbol = "token-canonical-symbol"
+	flagTokenName            = "token-name"
+	flagTokenDecimal         = "token-decimal"
+	flagTokenMinUnitAlias    = "token-min-unit-alias"
+	flagTokenInitialSupply   = "token-initial-supply"
 )

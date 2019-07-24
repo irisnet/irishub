@@ -18,14 +18,14 @@ const (
 )
 
 var (
-	MaximumAssetMaxSupply          = uint64(1000000000000) // maximal limitation for asset max supply，1000 billion
-	MaximumAssetInitSupply         = uint64(100000000000)  // maximal limitation for asset initial supply，100 billion
-	MaximumAssetDecimal            = uint8(18)             // maximal limitation for asset decimal
-	MinimumAssetSymbolSize         = 3                     // minimal limitation for the length of the asset's symbol / symbol_at_source
-	MaximumAssetSymbolSize         = 8                     // maximal limitation for the length of the asset's symbol / symbol_at_source
-	MinimumAssetSymbolMinAliasSize = 3                     // minimal limitation for the length of the asset's symbol_min_alias
-	MaximumAssetSymbolMinAliasSize = 10                    // maximal limitation for the length of the asset's symbol_min_alias
-	MaximumAssetNameSize           = 32                    // maximal limitation for the length of the asset's name
+	MaximumAssetMaxSupply        = uint64(1000000000000) // maximal limitation for asset max supply，1000 billion
+	MaximumAssetInitSupply       = uint64(100000000000)  // maximal limitation for asset initial supply，100 billion
+	MaximumAssetDecimal          = uint8(18)             // maximal limitation for asset decimal
+	MinimumAssetSymbolSize       = 3                     // minimal limitation for the length of the asset's symbol / canonical_symbol
+	MaximumAssetSymbolSize       = 8                     // maximal limitation for the length of the asset's symbol / canonical_symbol
+	MinimumAssetMinUnitAliasSize = 3                     // minimal limitation for the length of the asset's min_unit_alias
+	MaximumAssetMinUnitAliasSize = 10                    // maximal limitation for the length of the asset's min_unit_alias
+	MaximumAssetNameSize         = 32                    // maximal limitation for the length of the asset's name
 
 	MinimumGatewayMonikerSize  = 3   // minimal limitation for the length of the gateway's moniker
 	MaximumGatewayMonikerSize  = 8   // maximal limitation for the length of the gateway's moniker
@@ -33,7 +33,6 @@ var (
 	MaximumGatewayDetailsSize  = 280 // maximal limitation for the length of the gateway's details
 	MaximumGatewayWebsiteSize  = 128 // maximal limitation for the length of the gateway's website
 
-	IsAlpha            = regexp.MustCompile(`^[a-zA-Z]+$`).MatchString
 	IsAlphaNumeric     = regexp.MustCompile(`^[a-zA-Z0-9]+$`).MatchString   // only accepts alphanumeric characters
 	IsAlphaNumericDash = regexp.MustCompile(`^[a-zA-Z0-9_-]+$`).MatchString // only accepts alphanumeric characters, _ and -
 	IsBeginWithAlpha   = regexp.MustCompile(`^[a-zA-Z].*`).MatchString
@@ -43,35 +42,35 @@ var _, _, _, _ sdk.Msg = &MsgIssueToken{}, &MsgCreateGateway{}, &MsgEditGateway{
 
 // MsgIssueToken
 type MsgIssueToken struct {
-	Family         AssetFamily    `json:"family"`
-	Source         AssetSource    `json:"source"`
-	Gateway        string         `json:"gateway"`
-	Symbol         string         `json:"symbol"`
-	SymbolAtSource string         `json:"symbol_at_source"`
-	Name           string         `json:"name"`
-	Decimal        uint8          `json:"decimal"`
-	SymbolMinAlias string         `json:"symbol_min_alias"`
-	InitialSupply  uint64         `json:"initial_supply"`
-	MaxSupply      uint64         `json:"max_supply"`
-	Mintable       bool           `json:"mintable"`
-	Owner          sdk.AccAddress `json:"owner"`
+	Family          AssetFamily    `json:"family"`
+	Source          AssetSource    `json:"source"`
+	Gateway         string         `json:"gateway"`
+	Symbol          string         `json:"symbol"`
+	CanonicalSymbol string         `json:"canonical_symbol"`
+	Name            string         `json:"name"`
+	Decimal         uint8          `json:"decimal"`
+	MinUnitAlias    string         `json:"min_unit_alias"`
+	InitialSupply   uint64         `json:"initial_supply"`
+	MaxSupply       uint64         `json:"max_supply"`
+	Mintable        bool           `json:"mintable"`
+	Owner           sdk.AccAddress `json:"owner"`
 }
 
 // NewMsgIssueToken - construct asset issue msg.
-func NewMsgIssueToken(family AssetFamily, source AssetSource, gateway string, symbol string, symbolAtSource string, name string, decimal uint8, alias string, initialSupply uint64, maxSupply uint64, mintable bool, owner sdk.AccAddress) MsgIssueToken {
+func NewMsgIssueToken(family AssetFamily, source AssetSource, gateway string, symbol string, canonicalSymbol string, name string, decimal uint8, alias string, initialSupply uint64, maxSupply uint64, mintable bool, owner sdk.AccAddress) MsgIssueToken {
 	return MsgIssueToken{
-		Family:         family,
-		Source:         source,
-		Gateway:        gateway,
-		Symbol:         symbol,
-		SymbolAtSource: symbolAtSource,
-		Name:           name,
-		Decimal:        decimal,
-		SymbolMinAlias: alias,
-		InitialSupply:  initialSupply,
-		MaxSupply:      maxSupply,
-		Mintable:       mintable,
-		Owner:          owner,
+		Family:          family,
+		Source:          source,
+		Gateway:         gateway,
+		Symbol:          symbol,
+		CanonicalSymbol: canonicalSymbol,
+		Name:            name,
+		Decimal:         decimal,
+		MinUnitAlias:    alias,
+		InitialSupply:   initialSupply,
+		MaxSupply:       maxSupply,
+		Mintable:        mintable,
+		Owner:           owner,
 	}
 }
 
@@ -79,11 +78,11 @@ func NewMsgIssueToken(family AssetFamily, source AssetSource, gateway string, sy
 func (msg MsgIssueToken) Route() string { return MsgRoute }
 func (msg MsgIssueToken) Type() string  { return MsgTypeIssueToken }
 
-func ValidateMsgIssueToken(msg *MsgIssueToken, verifySource bool) sdk.Error {
+func ValidateMsgIssueToken(msg *MsgIssueToken) sdk.Error {
 	msg.Gateway = strings.ToLower(strings.TrimSpace(msg.Gateway))
 	msg.Symbol = strings.ToLower(strings.TrimSpace(msg.Symbol))
-	msg.SymbolAtSource = strings.ToLower(strings.TrimSpace(msg.SymbolAtSource))
-	msg.SymbolMinAlias = strings.ToLower(strings.TrimSpace(msg.SymbolMinAlias))
+	msg.CanonicalSymbol = strings.ToLower(strings.TrimSpace(msg.CanonicalSymbol))
+	msg.MinUnitAlias = strings.ToLower(strings.TrimSpace(msg.MinUnitAlias))
 	msg.Name = strings.TrimSpace(msg.Name)
 
 	if msg.MaxSupply == 0 {
@@ -100,14 +99,11 @@ func ValidateMsgIssueToken(msg *MsgIssueToken, verifySource bool) sdk.Error {
 		if msg.Owner.Empty() {
 			return ErrNilAssetOwner(DefaultCodespace, "the owner of the asset must be specified")
 		}
-		// ignore SymbolAtSource for native asset
-		msg.SymbolAtSource = ""
-
+		// ignore CanonicalSymbol for native asset
+		msg.CanonicalSymbol = ""
 		break
 	case EXTERNAL:
-		if verifySource {
-			return ErrInvalidAssetSource(DefaultCodespace, fmt.Sprintf("invalid source type %s", msg.Source.String()))
-		}
+		break
 	case GATEWAY:
 		// require gateway moniker for gateway asset
 		if len(msg.Gateway) < MinimumGatewayMonikerSize || len(msg.Gateway) > MaximumGatewayMonikerSize {
@@ -137,14 +133,9 @@ func ValidateMsgIssueToken(msg *MsgIssueToken, verifySource bool) sdk.Error {
 		return ErrInvalidAssetSymbol(DefaultCodespace, fmt.Sprintf("invalid token symbol %s, can not contain native token symbol %s", msg.Symbol, sdk.NativeTokenName))
 	}
 
-	symbolAtSourceLen := len(msg.SymbolAtSource)
-	if symbolAtSourceLen > 0 && (symbolAtSourceLen < MinimumAssetSymbolSize || symbolAtSourceLen > MaximumAssetSymbolSize || !IsAlphaNumeric(msg.SymbolAtSource)) {
-		return ErrInvalidAssetSymbolAtSource(DefaultCodespace, fmt.Sprintf("invalid token symbol_at_source %s, only accepts alphanumeric characters, length [%d, %d]", msg.SymbolAtSource, MinimumAssetSymbolSize, MaximumAssetSymbolSize))
-	}
-
-	symbolMinAliasLen := len(msg.SymbolMinAlias)
-	if symbolMinAliasLen > 0 && (symbolMinAliasLen < MinimumAssetSymbolMinAliasSize || symbolMinAliasLen > MaximumAssetSymbolMinAliasSize || !IsAlphaNumeric(msg.SymbolMinAlias) || !IsBeginWithAlpha(msg.SymbolMinAlias)) {
-		return ErrInvalidAssetSymbolMinAlias(DefaultCodespace, fmt.Sprintf("invalid token symbol_min_alias %s, only accepts alphanumeric characters, and begin with an english letter, length [%d, %d]", msg.SymbolMinAlias, MinimumAssetSymbolMinAliasSize, MaximumAssetSymbolMinAliasSize))
+	minUnitAliasLen := len(msg.MinUnitAlias)
+	if minUnitAliasLen > 0 && (minUnitAliasLen < MinimumAssetMinUnitAliasSize || minUnitAliasLen > MaximumAssetMinUnitAliasSize || !IsAlphaNumeric(msg.MinUnitAlias) || !IsBeginWithAlpha(msg.MinUnitAlias)) {
+		return ErrInvalidAssetMinUnitAlias(DefaultCodespace, fmt.Sprintf("invalid token min_unit_alias %s, only accepts alphanumeric characters, and begin with an english letter, length [%d, %d]", msg.MinUnitAlias, MinimumAssetMinUnitAliasSize, MaximumAssetMinUnitAliasSize))
 	}
 
 	if msg.InitialSupply > MaximumAssetInitSupply {
@@ -163,7 +154,10 @@ func ValidateMsgIssueToken(msg *MsgIssueToken, verifySource bool) sdk.Error {
 
 // Implements Msg.
 func (msg MsgIssueToken) ValidateBasic() sdk.Error {
-	return ValidateMsgIssueToken(&msg, true)
+	if msg.Source == EXTERNAL {
+		return ErrInvalidAssetSource(DefaultCodespace, fmt.Sprintf("invalid source type %s", msg.Source.String()))
+	}
+	return ValidateMsgIssueToken(&msg)
 }
 
 // Implements Msg.
@@ -480,28 +474,28 @@ func (msg MsgTransferGatewayOwner) GetSigners() []sdk.AccAddress {
 
 // MsgEditToken for editing a specified token
 type MsgEditToken struct {
-	TokenId        string         `json:"token_id"`         //  id of token
-	Owner          sdk.AccAddress `json:"owner"`            //  owner of token
-	SymbolAtSource string         `json:"symbol_at_source"` //  symbol_at_source of token
-	SymbolMinAlias string         `json:"symbol_min_alias"` //  symbol_min_alias of token
-	MaxSupply      uint64         `json:"max_supply"`
-	Mintable       *bool          `json:"mintable"` //  mintable of token
-	Name           string         `json:"name"`
+	TokenId         string         `json:"token_id"`         //  id of token
+	Owner           sdk.AccAddress `json:"owner"`            //  owner of token
+	CanonicalSymbol string         `json:"canonical_symbol"` //  canonical_symbol of token
+	MinUnitAlias    string         `json:"min_unit_alias"`   //  min_unit_alias of token
+	MaxSupply       uint64         `json:"max_supply"`
+	Mintable        Bool           `json:"mintable"` //  mintable of token
+	Name            string         `json:"name"`
 }
 
 // NewMsgEditToken creates a MsgEditToken
-func NewMsgEditToken(name, symbolAtSource, symbolMinAlias, tokenId string, maxSupply uint64, mintable *bool, owner sdk.AccAddress) MsgEditToken {
+func NewMsgEditToken(name, canonicalSymbol, minUnitAlias, tokenId string, maxSupply uint64, mintable Bool, owner sdk.AccAddress) MsgEditToken {
 	name = strings.TrimSpace(name)
-	symbolAtSource = strings.ToLower(strings.TrimSpace(symbolAtSource))
-	symbolMinAlias = strings.ToLower(strings.TrimSpace(symbolMinAlias))
+	canonicalSymbol = strings.ToLower(strings.TrimSpace(canonicalSymbol))
+	minUnitAlias = strings.ToLower(strings.TrimSpace(minUnitAlias))
 	return MsgEditToken{
-		Name:           name,
-		SymbolAtSource: symbolAtSource,
-		SymbolMinAlias: symbolMinAlias,
-		TokenId:        tokenId,
-		MaxSupply:      maxSupply,
-		Mintable:       mintable,
-		Owner:          owner,
+		Name:            name,
+		CanonicalSymbol: canonicalSymbol,
+		MinUnitAlias:    minUnitAlias,
+		TokenId:         tokenId,
+		MaxSupply:       maxSupply,
+		Mintable:        mintable,
+		Owner:           owner,
 	}
 }
 
@@ -534,16 +528,16 @@ func (msg MsgEditToken) ValidateBasic() sdk.Error {
 		return err
 	}
 
-	//check symbol_at_source
-	symbolAtSourceLen := len(msg.SymbolAtSource)
-	if DoNotModify != msg.SymbolAtSource && (symbolAtSourceLen < MinimumAssetSymbolSize || symbolAtSourceLen > MaximumAssetSymbolSize || !IsAlphaNumeric(msg.SymbolAtSource)) {
-		return ErrInvalidAssetSymbolAtSource(DefaultCodespace, fmt.Sprintf("invalid token symbol_at_source %s, only accepts alphanumeric characters, length [%d, %d]", msg.SymbolAtSource, MinimumAssetSymbolSize, MaximumAssetSymbolSize))
+	//check canonical_symbol
+	canonicalSymbolLen := len(msg.CanonicalSymbol)
+	if DoNotModify != msg.CanonicalSymbol && (canonicalSymbolLen < MinimumAssetSymbolSize || canonicalSymbolLen > MaximumAssetSymbolSize || !IsAlphaNumeric(msg.CanonicalSymbol)) {
+		return ErrInvalidAssetCanonicalSymbol(DefaultCodespace, fmt.Sprintf("invalid token canonical_symbol %s, only accepts alphanumeric characters, length [%d, %d]", msg.CanonicalSymbol, MinimumAssetSymbolSize, MaximumAssetSymbolSize))
 	}
 
-	//check symbol_min_alias
-	symbolMinAliasLen := len(msg.SymbolMinAlias)
-	if DoNotModify != msg.SymbolMinAlias && (symbolMinAliasLen < MinimumAssetSymbolMinAliasSize || symbolMinAliasLen > MaximumAssetSymbolMinAliasSize || !IsAlphaNumeric(msg.SymbolMinAlias) || !IsBeginWithAlpha(msg.SymbolMinAlias)) {
-		return ErrInvalidAssetSymbolMinAlias(DefaultCodespace, fmt.Sprintf("invalid token symbol_min_alias %s, only accepts alphanumeric characters, and begin with an english letter, length [%d, %d]", msg.SymbolMinAlias, MinimumAssetSymbolMinAliasSize, MaximumAssetSymbolMinAliasSize))
+	//check min_unit_alias
+	minUnitAliasLen := len(msg.MinUnitAlias)
+	if DoNotModify != msg.MinUnitAlias && (minUnitAliasLen < MinimumAssetMinUnitAliasSize || minUnitAliasLen > MaximumAssetMinUnitAliasSize || !IsAlphaNumeric(msg.MinUnitAlias) || !IsBeginWithAlpha(msg.MinUnitAlias)) {
+		return ErrInvalidAssetMinUnitAlias(DefaultCodespace, fmt.Sprintf("invalid token min_unit_alias %s, only accepts alphanumeric characters, and begin with an english letter, length [%d, %d]", msg.MinUnitAlias, MinimumAssetMinUnitAliasSize, MaximumAssetMinUnitAliasSize))
 	}
 
 	return nil
@@ -624,8 +618,8 @@ func ValidateMoniker(moniker string) sdk.Error {
 	}
 
 	// check the moniker format
-	if !IsAlpha(moniker) {
-		return ErrInvalidMoniker(DefaultCodespace, fmt.Sprintf("the moniker must contain only letters"))
+	if !IsBeginWithAlpha(moniker) || !IsAlphaNumeric(moniker) {
+		return ErrInvalidMoniker(DefaultCodespace, fmt.Sprintf("the moniker must begin with a letter followed by alphanumeric characters"))
 	}
 
 	// check if the moniker contains the native token name

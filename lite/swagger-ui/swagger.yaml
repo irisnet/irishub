@@ -2,7 +2,7 @@
 openapi: 3.0.0
 info:
   description: >-
-    A REST interface for state queries, transaction generation, signing, and
+    A REST interface for state queries, transaction generation and
     broadcast.
   version: "0.15.0-rc1"
   title: IRISLCD Swagger-UI
@@ -17,24 +17,24 @@ info:
 tags:
   - name: Tendermint
     description: 'Tendermint APIs, such as query blocks, transactions and validatorset'
-  - name: Key
-    description: Key management APIs
   - name: Tx
-    description: 'Sign and broadcast transactions'
+    description: 'Broadcast transactions'
   - name: Bank
     description: Bank module APIs
   - name: Stake
     description: Stake module APIs
-  - name: Gov
-    description: Governance module APIs
   - name: Slashing
     description: Slashing module APIs
   - name: Distribution
     description: Distribution module APIs
-  - name: Service
-    description: Service module APIs
   - name: Asset
     description: Asset module APIs
+  - name: Service
+    description: Service module APIs
+  - name: Params
+    description: Params module APIs
+  - name: Gov
+    description: Governance module APIs
   - name: Version
     description: Query app version
 paths:
@@ -308,60 +308,14 @@ paths:
           description: Invalid search tags
         '500':
           description: Internal Server Error
-  /tx/sign:
-    post:
-      tags:
-        - Tx
-      summary: Sign a transation
-      description: >-
-        Sign a transation providing locally stored account and according
-        password, return a StdTx with amino encoding signature and public key
-      responses:
-        '200':
-          description: The signed Tx
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/StdTx'
-        '400':
-          description: The Tx was malformated or key doesn't exist
-        '401':
-          description: Key password is wrong
-        '500':
-          description: Server internal error
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                tx:
-                  $ref: '#/components/schemas/StdTx'
-                name:
-                  type: string
-                password:
-                  type: string
-                chain_id:
-                  type: string
-                account_number:
-                  type: string
-                  example: '0'
-                sequence:
-                  type: string
-                  example: '0'
-                append_sig:
-                  type: boolean
-                  example: true
-        description: sign tx
-        required: true
   /tx/broadcast:
     post:
       tags:
         - Tx
-      summary: Broadcast a signed StdTx with amino encoding signature and public key
+      summary: Broadcast a signed StdTx which is amino or json encoded
       description: >-
-        Broadcast a signed StdTx with amino encoding signature and public key to
-        full iris node
+        Broadcast a signed StdTx which is amino or json encoded to
+        a full iris node
       parameters:
         - in: query
           name: async
@@ -634,185 +588,6 @@ paths:
                   example: 1iris
         description: Parameters to burn coins
         required: true
-  /keys:
-    get:
-      summary: List of accounts stored locally
-      tags:
-        - Key
-      responses:
-        '200':
-          description: Array of accounts
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/KeyOutput'
-        '500':
-          description: Server internal error
-    post:
-      summary: Create a new account locally
-      tags:
-        - Key
-      responses:
-        '200':
-          description: Returns account information of the created key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/KeyOutput'
-        '400':
-          description: Invalid request
-        '409':
-          description: Key name confliction
-        '500':
-          description: Server internal error
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - name
-                - password
-                - seed
-              properties:
-                name:
-                  type: string
-                password:
-                  type: string
-                seed:
-                  type: string
-        description: The account to create
-  /keys/seed:
-    get:
-      summary: Create a new seed to create a new account with
-      tags:
-        - Key
-      responses:
-        '200':
-          description: 24 word Seed
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  seed:
-                    type: string
-                    example: >-
-                      blossom pool issue kidney elevator blame furnace winter
-                      account merry vessel security depend exact travel bargain
-                      problem jelly rural net again mask roast chest
-  '/keys/{name}/recover':
-    post:
-      summary: Recover a account from a seed
-      tags:
-        - Key
-      parameters:
-        - in: path
-          name: name
-          description: Account name
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Returns account information of the recovered key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/KeyOutput'
-        '400':
-          description: Invalid request
-        '409':
-          description: Key name confliction
-        '500':
-          description: Server internal error
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - password
-                - seed
-              properties:
-                password:
-                  type: string
-                seed:
-                  type: string
-        description: Provide password and seed to recover a key
-  '/keys/{name}':
-    parameters:
-      - in: path
-        name: name
-        description: Account name
-        required: true
-        schema:
-          type: string
-    get:
-      summary: Get a certain locally stored account
-      tags:
-        - Key
-      parameters:
-        - in: query
-          name: bech
-          description: 'Bech32 prefix encoding, valid prefix `"acc"`, `"val"`, `"cons"`'
-          required: false
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Locally stored account
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/KeyOutput'
-        '404':
-          description: Key doesn't exist
-    put:
-      summary: Update the password for this account in the KMS
-      tags:
-        - Key
-      responses:
-        '200':
-          description: Updated password
-        '404':
-          description: Key doesn't exist
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - new_password
-                - old_password
-              properties:
-                new_password:
-                  type: string
-                old_password:
-                  type: string
-        description: The new and old password
-    delete:
-      summary: Remove an account
-      tags:
-        - Key
-      responses:
-        '200':
-          description: Removed account
-        '404':
-          description: Key doesn't exist
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - password
-              properties:
-                password:
-                  type: string
-        description: The password of the account to remove from the KMS
   '/stake/delegators/{delegatorAddr}/delegations':
     parameters:
       - in: path
@@ -2549,10 +2324,10 @@ paths:
                 symbol:
                   type: string
                   example: 'cat'
-                symbol_at_source:
+                canonical_symbol:
                   type: string
                   example: ''
-                symbol_min_alias:
+                min_unit_alias:
                   type: string
                   example: 'kitty'
                 initial_supply:
@@ -2660,18 +2435,18 @@ paths:
                   $ref: '#/components/schemas/BaseTx'
                 owner:
                   $ref: '#/components/schemas/Address'
-                symbol_at_source:
+                canonical_symbol:
                   type: string
                   example: 'btc'
-                symbol_min_alias:
+                min_unit_alias:
                   type: string
                   example: 'satoshi'
                 max_supply:
                   type: int
                   example: '21000000'
                 mintable:
-                  type: boolean
-                  example: false
+                  type: string
+                  example: ""
                 name:
                   type: string
                   example: 'BTC Token'
@@ -3161,24 +2936,6 @@ components:
               sequence:
                 type: string
                 example: '0'
-    KeyOutput:
-      type: object
-      properties:
-        name:
-          type: string
-          example: Main Account
-        address:
-          type: string
-          example: faa1xp8ptallwun6p0hv5ym4adruupc8q5djc95k30
-        pub_key:
-          type: string
-          example: >-
-            fap1addwnpepqvfp3mzkvpldhd2m6dzmz3q7rzlfww9yr0x0qy9y9vhak26rvtcf6s93txc
-        type:
-          type: string
-          example: local
-        seed:
-          type: string
     BlockID:
       type: object
       properties:
@@ -3354,21 +3111,12 @@ components:
         chain_id:
           type: string
           example: irishub-test
-        account_number:
-          type: string
-          example: '0'
-        sequence:
-          type: string
-          example: '0'
         gas:
           type: string
           example: '20000'
         fee:
           type: string
           example: 0.4iris
-        gas_adjustment:
-          type: string
-          example: '1.2'
         memo:
           type: string
           example: 'memo'
@@ -3562,9 +3310,9 @@ components:
           type: string
         decimal:
           type: integer
-        symbol_at_source:
+        canonical_symbol:
           type: string
-        symbol_min_alias:
+        min_unit_alias:
           type: string
         initial_supply:
           type: string
