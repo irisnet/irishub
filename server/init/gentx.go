@@ -7,7 +7,6 @@ import (
 	"path/filepath"
 
 	"github.com/irisnet/irishub/app"
-	stakeTypes "github.com/irisnet/irishub/app/v1/stake/types"
 	"github.com/irisnet/irishub/client"
 	"github.com/irisnet/irishub/client/stake/cli"
 	stakecmd "github.com/irisnet/irishub/client/stake/cli"
@@ -25,7 +24,7 @@ import (
 )
 
 const (
-	defaultAmount         = "100" + stakeTypes.StakeTokenName
+	defaultAmount         = "100" + sdk.Iris
 	defaultCommissionRate = "0.1"
 )
 
