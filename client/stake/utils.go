@@ -306,12 +306,7 @@ func GetShares(
 			return sharesAmount, errors.Errorf("shares amount must be positive number (ex. 123, 1.23456789)")
 		}
 
-		stakeToken, err := cliCtx.GetCoinType(types.StakeTokenName)
-		if err != nil {
-			panic(err)
-		}
-		decimalDiff := stakeToken.MinUnit.Decimal - stakeToken.GetMainUnit().Decimal
-		exRate := sdk.NewDecFromInt(sdk.NewIntWithDecimal(1, int(decimalDiff)))
+		exRate := sdk.NewDecFromInt(sdk.AttoScaleFactor)
 		sharesAmount = sharesAmount.Mul(exRate)
 	case sharesPercentStr != "":
 		var sharesPercent sdk.Dec
