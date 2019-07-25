@@ -25,9 +25,6 @@ const (
 
 	// Stake token denomination "iris-atto"
 	StakeDenom = sdk.IrisAtto
-
-	// Stake token name "iris"
-	StakeTokenName = sdk.Iris
 )
 
 // nolint - Keys for parameter access
