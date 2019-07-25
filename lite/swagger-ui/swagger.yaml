@@ -2729,6 +2729,7 @@ paths:
                   $ref: '#/components/schemas/Address'
                 block_interval:
                   type: integer
+                  example: '10'
   '/rand/rands/{request-id}':
     get:
       summary: Query a random number by the specified request id

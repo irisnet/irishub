@@ -21,7 +21,7 @@ func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec
 
 type requestRandReq struct {
 	BaseTx        utils.BaseTx   `json:"base_tx"`        // base tx
-	Consumer      sdk.AccAddress `json:"owner"`          // request address
+	Consumer      sdk.AccAddress `json:"consumer"`       // request address
 	BlockInterval uint64         `json:"block_interval"` // block interval
 }
 
