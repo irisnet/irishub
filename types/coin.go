@@ -135,8 +135,8 @@ func (coins Coins) MainUnitString() string {
 	out := ""
 	for _, coin := range coins {
 		// only convert iris now
-		if coin.Denom == NativeTokenMinDenom {
-			destCoinStr, err := IRIS.Convert(coin.String(), NativeTokenName)
+		if coin.Denom == IrisAtto {
+			destCoinStr, err := IrisCoinType.Convert(coin.String(), Iris)
 			if err == nil {
 				out += fmt.Sprintf("%v,", destCoinStr)
 				continue
@@ -459,10 +459,22 @@ var (
 	reCoin = regexp.MustCompile(fmt.Sprintf(`^(%s)%s(%s)$`, reAmt, reSpc, reDnm))
 )
 
+func ParseCoinParts(coinStr string) (denom, amount string, err error) {
+	coinStr = strings.ToLower(strings.TrimSpace(coinStr))
+
+	matches := reCoin.FindStringSubmatch(coinStr)
+	if matches == nil {
+		err = fmt.Errorf("invalid coin string: %s", coinStr)
+		return
+	}
+	denom, amount = matches[2], matches[1]
+	return
+}
+
 // ParseCoin parses a cli input for one coin type, returning errors if invalid.
 // This returns an error on an empty string as well.
 func ParseCoin(coinStr string) (coin Coin, err error) {
-	coinStr = strings.TrimSpace(coinStr)
+	coinStr = strings.ToLower(strings.TrimSpace(coinStr))
 
 	matches := reCoin.FindStringSubmatch(coinStr)
 	if matches == nil {

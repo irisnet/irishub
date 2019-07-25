@@ -74,9 +74,9 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, percentVotes sdk.Dec, proposer s
 	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, "", auth.CommunityTaxCoinsAccAddr.String(), fundingCoins.String(), sdk.CommunityTaxCollectFlow, "")
 
 	communityTaxCoins := k.bankKeeper.GetCoins(ctx, auth.CommunityTaxCoinsAccAddr)
-	communityTaxDec := sdk.NewDecFromInt(communityTaxCoins.AmountOf(sdk.NativeTokenMinDenom))
-	communityTaxFloat, err := strconv.ParseFloat(communityTaxDec.QuoInt(sdk.AttoPrecision).String(), 64)
-	//communityTaxAmount, err := strconv.ParseFloat(feePool.CommunityPool.AmountOf(sdk.NativeTokenMinDenom).QuoInt(sdk.AttoPrecision).String(), 64)
+	communityTaxDec := sdk.NewDecFromInt(communityTaxCoins.AmountOf(sdk.IrisAtto))
+	communityTaxFloat, err := strconv.ParseFloat(communityTaxDec.QuoInt(sdk.AttoScaleFactor).String(), 64)
+	//communityTaxAmount, err := strconv.ParseFloat(feePool.CommunityPool.AmountOf(sdk.IrisAtto).QuoInt(sdk.AttoScaleFactor).String(), 64)
 	if err == nil {
 		k.metrics.CommunityTax.Set(communityTaxFloat)
 	}
@@ -108,9 +108,9 @@ func (k Keeper) AllocateFeeTax(ctx sdk.Context, destAddr sdk.AccAddress, percent
 	allocatedCoins, _ := allocatedDecCoins.TruncateDecimal()
 	taxLeftDecCoins := taxDecCoins.Minus(allocatedDecCoins)
 
-	taxLeftDec := taxLeftDecCoins.AmountOf(sdk.NativeTokenMinDenom)
-	taxLeftFloat, err := strconv.ParseFloat(taxLeftDec.QuoInt(sdk.AttoPrecision).String(), 64)
-	//communityTaxAmount, err := strconv.ParseFloat(feePool.CommunityPool.AmountOf(sdk.NativeTokenMinDenom).QuoInt(sdk.AttoPrecision).String(), 64)
+	taxLeftDec := taxLeftDecCoins.AmountOf(sdk.IrisAtto)
+	taxLeftFloat, err := strconv.ParseFloat(taxLeftDec.QuoInt(sdk.AttoScaleFactor).String(), 64)
+	//communityTaxAmount, err := strconv.ParseFloat(feePool.CommunityPool.AmountOf(sdk.IrisAtto).QuoInt(sdk.AttoScaleFactor).String(), 64)
 	if err == nil {
 		k.metrics.CommunityTax.Set(taxLeftFloat)
 	}

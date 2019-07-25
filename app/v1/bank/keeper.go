@@ -344,7 +344,7 @@ func addCoins(ctx sdk.Context, am auth.AccountKeeper, addr sdk.AccAddress, amt s
 	// adding coins to BurnedCoinsAccAddr is equivalent to burning coins
 	if addr.Equals(auth.BurnedCoinsAccAddr) {
 		for _, coin := range amt {
-			if coin.Denom == sdk.NativeTokenMinDenom {
+			if coin.Denom == sdk.IrisAtto {
 				// Decrease total loose token for iris
 				am.DecreaseTotalLoosenToken(ctx, sdk.Coins{coin})
 			} else {

@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/irisnet/irishub/tools/human"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/pkg/errors"
 )
@@ -54,9 +53,9 @@ func (d Deposit) String() string {
 		d.Depositor, d.ProposalID, d.Amount.MainUnitString())
 }
 
-func (d Deposit) HumanString(assetConvert human.AssetConvert) string {
+func (d Deposit) HumanString(converter sdk.CoinsConverter) string {
 	return fmt.Sprintf("Deposit by %s on Proposal %d is for the amount %s",
-		d.Depositor, d.ProposalID, assetConvert.ToMainUnit(d.Amount))
+		d.Depositor, d.ProposalID, converter.ToMainUnit(d.Amount))
 }
 
 // Deposits is a collection of depoist
@@ -73,13 +72,13 @@ func (d Deposits) String() string {
 	return out
 }
 
-func (d Deposits) HumanString(assetConvert human.AssetConvert) string {
+func (d Deposits) HumanString(converter sdk.CoinsConverter) string {
 	if len(d) == 0 {
 		return "[]"
 	}
 	out := fmt.Sprintf("Deposits for Proposal %d:", d[0].ProposalID)
 	for _, dep := range d {
-		out += fmt.Sprintf("\n  %s: %s", dep.Depositor, assetConvert.ToMainUnit(dep.Amount))
+		out += fmt.Sprintf("\n  %s: %s", dep.Depositor, converter.ToMainUnit(dep.Amount))
 	}
 	return out
 }

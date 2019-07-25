@@ -300,7 +300,7 @@ func ExRateFromStakeTokenToMainUnit(cliCtx context.CLIContext) sdk.Rat {
 		panic(err)
 	}
 	decimalDiff := stakeToken.MinUnit.Decimal - stakeToken.GetMainUnit().Decimal
-	exRate := sdk.NewRat(1).Quo(sdk.NewRatFromInt(sdk.NewIntWithDecimal(1, decimalDiff)))
+	exRate := sdk.NewRat(1).Quo(sdk.NewRatFromInt(sdk.NewIntWithDecimal(1, int(decimalDiff))))
 	return exRate
 }
 

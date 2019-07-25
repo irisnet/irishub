@@ -230,11 +230,11 @@ func (am AccountKeeper) IncreaseTotalLoosenToken(ctx sdk.Context, coins sdk.Coin
 	}
 
 	// loose token only contains iris-atto
-	increaseAmount := coins.AmountOf(sdk.NativeTokenMinDenom)
+	increaseAmount := coins.AmountOf(sdk.IrisAtto)
 	if !increaseAmount.GT(sdk.ZeroInt()) {
 		return
 	}
-	increaseCoins := sdk.Coins{sdk.NewCoin(sdk.NativeTokenMinDenom, increaseAmount)}
+	increaseCoins := sdk.Coins{sdk.NewCoin(sdk.IrisAtto, increaseAmount)}
 
 	// read from db
 	totalLoosenToken := am.GetTotalLoosenToken(ctx)
@@ -259,11 +259,11 @@ func (am AccountKeeper) DecreaseTotalLoosenToken(ctx sdk.Context, coins sdk.Coin
 	}
 
 	// loose token only contains iris-atto
-	decreaseAmount := coins.AmountOf(sdk.NativeTokenMinDenom)
+	decreaseAmount := coins.AmountOf(sdk.IrisAtto)
 	if !decreaseAmount.GT(sdk.ZeroInt()) {
 		return
 	}
-	decreaseCoins := sdk.Coins{sdk.NewCoin(sdk.NativeTokenMinDenom, decreaseAmount)}
+	decreaseCoins := sdk.Coins{sdk.NewCoin(sdk.IrisAtto, decreaseAmount)}
 
 	// read from db
 	totalLoosenToken := am.GetTotalLoosenToken(ctx)

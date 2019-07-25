@@ -7,7 +7,6 @@ import (
 	"github.com/irisnet/irishub/app/v1/auth"
 	bankv1 "github.com/irisnet/irishub/app/v1/bank"
 	"github.com/irisnet/irishub/app/v1/stake"
-	bankcli "github.com/irisnet/irishub/client/bank"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
@@ -71,15 +70,6 @@ func GetCmdQueryCoinType(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-func isIris(assetId string) bool {
-	for _, ir := range sdk.IRIS.Units {
-		if assetId == ir.Denom {
-			return true
-		}
-	}
-	return false
-}
-
 // GetCmdQueryTokenStats performs token statistic query
 func GetCmdQueryTokenStats(cdc *codec.Codec, decoder auth.AccountDecoder) *cobra.Command {
 	cmd := &cobra.Command{
@@ -112,7 +102,7 @@ func GetCmdQueryTokenStats(cdc *codec.Codec, decoder auth.AccountDecoder) *cobra
 			}
 
 			// query bonded tokens for iris
-			if tokenId == "" || tokenId == sdk.NativeTokenName {
+			if tokenId == "" || tokenId == sdk.Iris {
 				resPool, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.StakeRoute, stake.QueryPool), nil)
 				if err != nil {
 					return err
@@ -125,28 +115,6 @@ func GetCmdQueryTokenStats(cdc *codec.Codec, decoder auth.AccountDecoder) *cobra
 
 				tokenStats.BondedTokens = sdk.Coins{sdk.Coin{Denom: stake.BondDenom, Amount: poolStatus.BondedTokens.TruncateInt()}}
 				tokenStats.TotalSupply = tokenStats.TotalSupply.Plus(tokenStats.LooseTokens.Plus(tokenStats.BondedTokens))
-			}
-
-			if cliCtx.OutputFormat == "text" {
-				var tokenStats1 bankcli.TokenStats
-				tokenStats1.LooseTokens, err = cliCtx.ConvertCoinToMainUnit(tokenStats.LooseTokens.String())
-				if err != nil {
-					return err
-				}
-				tokenStats1.BondedTokens, err = cliCtx.ConvertCoinToMainUnit(tokenStats.BondedTokens.String())
-				if err != nil {
-					return err
-				}
-				tokenStats1.BurnedTokens, err = cliCtx.ConvertCoinToMainUnit(tokenStats.BurnedTokens.String())
-				if err != nil {
-					return err
-				}
-				tokenStats1.TotalSupply, err = cliCtx.ConvertCoinToMainUnit(tokenStats.TotalSupply.String())
-				if err != nil {
-					return err
-				}
-
-				return cliCtx.PrintOutput(tokenStats1)
 			}
 
 			return cliCtx.PrintOutput(tokenStats)
