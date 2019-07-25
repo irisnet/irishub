@@ -12,8 +12,9 @@
 
 ### 适用范围
 
-适用于应用层获取基于区块链产生的随机数，比如博彩、游戏等
-不适用于私钥、区块链共识算法等
+**适用于**应用层获取基于区块链产生的随机数，比如博彩、游戏等
+
+**不适用于**私钥、区块链共识算法等
 
 ### PRNG
 
@@ -36,7 +37,7 @@ IRISHub 在 Beta 阶段使用此算法生成随机数。
 #### 计算公式
 
 ```bash
-seed = sha256(timestamp + int(sha256(blockhash)) / timestamp + int(sha256(consumer))/timestamp)
+seed = sha256(timestamp + int(sha256(blockhash)) / timestamp + int(sha256(consumer)) / timestamp)
 rand = seed mod 10^20 / 10^20
 ```
 

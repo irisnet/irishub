@@ -13,6 +13,7 @@ This specification describes the usage and scope of random numbers on IRISHub. T
 ### Scope
 
 **Applicable** to the application layer to obtain random numbers generated based on blockchain, such as gaming, games, etc.
+
 **Not Applicable** to private keys, blockchain consensus algorithms, etc.
 
 ### PRNG
@@ -36,7 +37,7 @@ Since the calculation of block Hash and BFT time is based on the information of 
 #### Calculation Formula
 
 ```bash
-seed = sha256(timestamp + int(sha256(blockhash)) / timestamp + int(sha256(consumer))/timestamp)
+seed = sha256(timestamp + int(sha256(blockhash)) / timestamp + int(sha256(consumer)) / timestamp)
 rand = seed mod 10^20 / 10^20
 ```
 
