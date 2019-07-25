@@ -12,6 +12,7 @@ import (
 	distributionhandler "github.com/irisnet/irishub/client/distribution/lcd"
 	govhandler "github.com/irisnet/irishub/client/gov/lcd"
 	paramshandle "github.com/irisnet/irishub/client/params/lcd"
+	randhandler "github.com/irisnet/irishub/client/rand/lcd"
 	servicehandle "github.com/irisnet/irishub/client/service/lcd"
 	slashinghandler "github.com/irisnet/irishub/client/slashing/lcd"
 	stakehandler "github.com/irisnet/irishub/client/stake/lcd"
@@ -98,6 +99,7 @@ func createHandler(cdc *codec.Codec) *mux.Router {
 	r.HandleFunc("/node-version", NodeVersionRequestHandler(cliCtx)).Methods("GET")
 
 	assethandler.RegisterRoutes(cliCtx, r, cdc)
+	randhandler.RegisterRoutes(cliCtx, r, cdc)
 	bankhandler.RegisterRoutes(cliCtx, r, cdc)
 	txhandler.RegisterRoutes(cliCtx, r, cdc)
 	distributionhandler.RegisterRoutes(cliCtx, r, cdc)
