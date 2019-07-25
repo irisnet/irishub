@@ -22,7 +22,7 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "submit-proposal",
 		Short:   "Submit a proposal along with an initial deposit",
-		Example: "iriscli gov submit-proposal --chain-id=<chain-id> --from=<key name> --fee=0.4iris --type=ParameterChange --description=test --title=test-proposal --param='mint/Inflation=0.050'",
+		Example: "iriscli gov submit-proposal --chain-id=<chain-id> --from=<key name> --fee=0.4iris --type=Parameter --description=test --title=test-proposal --param='mint/Inflation=0.050'",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			title := viper.GetString(flagTitle)
 			description := viper.GetString(flagDescription)
@@ -128,7 +128,7 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 
 	cmd.Flags().String(flagTitle, "", "title of proposal")
 	cmd.Flags().String(flagDescription, "", "description of proposal")
-	cmd.Flags().String(flagProposalType, "", "proposalType of proposal,eg:PlainText/ParameterChange/SoftwareUpgrade/SystemHalt/CommunityTaxUsage/TokenAddition")
+	cmd.Flags().String(flagProposalType, "", "proposalType of proposal,eg:PlainText/Parameter/SoftwareUpgrade/SystemHalt/CommunityTaxUsage/TokenAddition")
 	cmd.Flags().String(flagDeposit, "", "deposit of proposal(at least 30% of MinDeposit)")
 	cmd.Flags().String(flagParam, "", "parameter of proposal,eg. key=value")
 	cmd.Flags().String(flagUsage, "", "the transaction fee tax usage type, valid values can be Burn, Distribute and Grant")

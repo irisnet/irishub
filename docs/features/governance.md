@@ -74,16 +74,11 @@ Change the parameters through the command lines
 
 ```
 # Query parameters can be changed by the modules'name in gov 
-iriscli gov query-params --module=mint
+iriscli params --module=mint
 
 # Result
-mint/Inflation=0.0400000000
-
-# Query parameters can be modified by "key”
-iriscli gov query-params --module=mint --key=mint/Inflation
-
-# Results
-mint/Inflation=0.0400000000
+Mint Params:
+  mint/Inflation=0.0400000000
 
 # Send proposal for parameters change
 iriscli gov submit-proposal --title=<title> --description=<description> --type=Parameter --deposit=8iris  --param="mint/Inflation=0.0000000000" --from=<key_name> --chain-id=<chain-id> --fee=0.3iris --commit

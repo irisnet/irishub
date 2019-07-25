@@ -1160,8 +1160,8 @@ paths:
                   type: string
                   example: 10iris
         description: >-
-          valid value of `"proposal_type"` can be `"PlainText"`, `"ParameterChange"`,
-          `"SoftwareUpgrade"`,`"SystemHalt"`,`"CommunityTaxUsage"`,`TokenAddition`
+          valid value of `"proposal_type"` can be `"PlainText"`, `"Parameter"`,
+          `"SoftwareUpgrade"`, `"SystemHalt"`,`"CommunityTaxUsage"`,`TokenAddition`
         required: true
     get:
       summary: Query proposals
