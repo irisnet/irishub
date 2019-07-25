@@ -87,7 +87,7 @@ func GetGatewayCreateFee(ctx sdk.Context, k Keeper, moniker string) sdk.Coin {
 	// compute the fee
 	fee := calcFeeByBase(moniker, gatewayBaseFee.Amount)
 
-	return sdk.NewCoin(sdk.NativeTokenMinDenom, convertFeeToInt(fee))
+	return sdk.NewCoin(sdk.IrisAtto, convertFeeToInt(fee))
 }
 
 // getTokenIssueFee returns the token issurance fee
@@ -99,7 +99,7 @@ func GetTokenIssueFee(ctx sdk.Context, k Keeper, symbol string) sdk.Coin {
 	// compute the fee
 	fee := calcFeeByBase(symbol, issueTokenBaseFee.Amount)
 
-	return sdk.NewCoin(sdk.NativeTokenMinDenom, convertFeeToInt(fee))
+	return sdk.NewCoin(sdk.IrisAtto, convertFeeToInt(fee))
 }
 
 // getTokenMintFee returns the token mint fee
@@ -112,7 +112,7 @@ func GetTokenMintFee(ctx sdk.Context, k Keeper, symbol string) sdk.Coin {
 	issueFee := GetTokenIssueFee(ctx, k, symbol)
 	mintFee := sdk.NewDecFromInt(issueFee.Amount).Mul(mintTokenFeeRatio)
 
-	return sdk.NewCoin(sdk.NativeTokenMinDenom, convertFeeToInt(mintFee))
+	return sdk.NewCoin(sdk.IrisAtto, convertFeeToInt(mintFee))
 }
 
 // getGatewayTokenIssueFee returns the gateway token issurance fee
@@ -125,7 +125,7 @@ func GetGatewayTokenIssueFee(ctx sdk.Context, k Keeper, symbol string) sdk.Coin 
 	nativeTokenIssueFee := GetTokenIssueFee(ctx, k, symbol)
 	gatewayTokenIssueFee := sdk.NewDecFromInt(nativeTokenIssueFee.Amount).Mul(gatewayAssetFeeRatio)
 
-	return sdk.NewCoin(sdk.NativeTokenMinDenom, convertFeeToInt(gatewayTokenIssueFee))
+	return sdk.NewCoin(sdk.IrisAtto, convertFeeToInt(gatewayTokenIssueFee))
 }
 
 // getGatewayTokenMintFee returns the gateway token mint fee
@@ -138,7 +138,7 @@ func GetGatewayTokenMintFee(ctx sdk.Context, k Keeper, symbol string) sdk.Coin {
 	nativeTokenMintFee := GetTokenMintFee(ctx, k, symbol)
 	gatewayTokenMintFee := sdk.NewDecFromInt(nativeTokenMintFee.Amount).Mul(gatewayAssetFeeRatio)
 
-	return sdk.NewCoin(sdk.NativeTokenMinDenom, convertFeeToInt(gatewayTokenMintFee))
+	return sdk.NewCoin(sdk.IrisAtto, convertFeeToInt(gatewayTokenMintFee))
 }
 
 // calcFeeByBase computes the actual fee according to the given base fee

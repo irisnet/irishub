@@ -36,16 +36,16 @@ func queryToken(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, 
 	}
 
 	var token types.FungibleToken
-	if params.TokenId == sdk.NativeTokenName {
-		initSupply, err := sdk.IRIS.ConvertToMinCoin(sdk.NewCoin(sdk.NativeTokenName, sdk.InitialIssue).String())
+	if params.TokenId == sdk.Iris {
+		initSupply, err := sdk.IrisCoinType.ConvertToMinDenomCoin(sdk.NewCoin(sdk.Iris, sdk.InitialIssue).String())
 		if err != nil {
 			return nil, sdk.MarshalResultErr(err)
 		}
-		maxSupply, err := sdk.IRIS.ConvertToMinCoin(sdk.NewCoin(sdk.NativeTokenName, sdk.NewInt(int64(types.MaximumAssetMaxSupply))).String())
+		maxSupply, err := sdk.IrisCoinType.ConvertToMinDenomCoin(sdk.NewCoin(sdk.Iris, sdk.NewInt(int64(types.MaximumAssetMaxSupply))).String())
 		if err != nil {
 			return nil, sdk.MarshalResultErr(err)
 		}
-		token = types.NewFungibleToken(types.NATIVE, "", sdk.IRIS.GetMainUnit().Denom, sdk.IRIS.Desc, uint8(sdk.IRIS.GetMinUnit().Decimal), "", sdk.IRIS.GetMinUnit().Denom, initSupply.Amount, maxSupply.Amount, true, sdk.AccAddress{})
+		token = types.NewFungibleToken(types.NATIVE, "", sdk.Iris, sdk.IrisCoinType.Desc, sdk.AttoScale, "", sdk.IrisAtto, initSupply.Amount, maxSupply.Amount, true, sdk.AccAddress{})
 	} else {
 		var found bool
 		token, found = keeper.getToken(ctx, params.TokenId)
@@ -114,15 +114,15 @@ func queryTokens(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte,
 
 	// Add iris to the list
 	if source == types.NATIVE && owner.Empty() {
-		initSupply, err := sdk.IRIS.ConvertToMinCoin(sdk.NewCoin(sdk.NativeTokenName, sdk.InitialIssue).String())
+		initSupply, err := sdk.IrisCoinType.ConvertToMinDenomCoin(sdk.NewCoin(sdk.Iris, sdk.InitialIssue).String())
 		if err != nil {
 			return nil, sdk.MarshalResultErr(err)
 		}
-		maxSupply, err := sdk.IRIS.ConvertToMinCoin(sdk.NewCoin(sdk.NativeTokenName, sdk.NewInt(int64(types.MaximumAssetMaxSupply))).String())
+		maxSupply, err := sdk.IrisCoinType.ConvertToMinDenomCoin(sdk.NewCoin(sdk.Iris, sdk.NewInt(int64(types.MaximumAssetMaxSupply))).String())
 		if err != nil {
 			return nil, sdk.MarshalResultErr(err)
 		}
-		token := types.NewFungibleToken(types.NATIVE, "", sdk.IRIS.GetMainUnit().Denom, sdk.IRIS.Desc, uint8(sdk.IRIS.GetMinUnit().Decimal), "", sdk.IRIS.GetMinUnit().Denom, initSupply.Amount, maxSupply.Amount, true, sdk.AccAddress{})
+		token := types.NewFungibleToken(types.NATIVE, "", sdk.Iris, sdk.IrisCoinType.Desc, sdk.AttoScale, "", sdk.IrisAtto, initSupply.Amount, maxSupply.Amount, true, sdk.AccAddress{})
 		tokens = append(tokens, token)
 	}
 

@@ -40,7 +40,7 @@ const (
 )
 
 var (
-	IrisCt = types.NewDefaultCoinType(stakeTypes.StakeTokenName)
+	IrisCt = sdk.IrisCoinType
 )
 */
 // App extends an ABCI application, but with most of its parameters exported.

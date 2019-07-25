@@ -74,7 +74,7 @@ func (p *Params) Validate(key string, value string) (interface{}, sdk.Error) {
 		return rate, nil
 	case string(KeyIssueTokenBaseFee):
 		fee, err := sdk.ParseCoin(value)
-		if err != nil || fee.Denom != sdk.NativeTokenMinDenom {
+		if err != nil || fee.Denom != sdk.IrisAtto {
 			return nil, params.ErrInvalidString(value)
 		}
 		if err := validateIssueTokenBaseFee(fee); err != nil {
@@ -92,7 +92,7 @@ func (p *Params) Validate(key string, value string) (interface{}, sdk.Error) {
 		return ratio, nil
 	case string(KeyCreateGatewayBaseFee):
 		fee, err := sdk.ParseCoin(value)
-		if err != nil || fee.Denom != sdk.NativeTokenMinDenom {
+		if err != nil || fee.Denom != sdk.IrisAtto {
 			return nil, params.ErrInvalidString(value)
 		}
 		if err := validateCreateGatewayBaseFee(fee); err != nil {
@@ -125,9 +125,9 @@ func (p *Params) ReadOnly() bool {
 func DefaultParams() Params {
 	return Params{
 		AssetTaxRate:         sdk.NewDecWithPrec(4, 1), // 0.4 (40%)
-		IssueTokenBaseFee:    sdk.NewCoin(sdk.NativeTokenMinDenom, sdk.NewIntWithDecimal(60000, 18)),
+		IssueTokenBaseFee:    sdk.NewCoin(sdk.IrisAtto, sdk.NewIntWithDecimal(60000, int(sdk.AttoScale))),
 		MintTokenFeeRatio:    sdk.NewDecWithPrec(1, 1), // 0.1 (10%)
-		CreateGatewayBaseFee: sdk.NewCoin(sdk.NativeTokenMinDenom, sdk.NewIntWithDecimal(120000, 18)),
+		CreateGatewayBaseFee: sdk.NewCoin(sdk.IrisAtto, sdk.NewIntWithDecimal(120000, int(sdk.AttoScale))),
 		GatewayAssetFeeRatio: sdk.NewDecWithPrec(1, 1), // 0.1 (10%)
 	}
 }
@@ -136,9 +136,9 @@ func DefaultParams() Params {
 func DefaultParamsForTest() Params {
 	return Params{
 		AssetTaxRate:         sdk.NewDecWithPrec(4, 1), // 0.4 (40%)
-		IssueTokenBaseFee:    sdk.NewCoin(sdk.NativeTokenMinDenom, sdk.NewIntWithDecimal(30, 18)),
+		IssueTokenBaseFee:    sdk.NewCoin(sdk.IrisAtto, sdk.NewIntWithDecimal(30, int(sdk.AttoScale))),
 		MintTokenFeeRatio:    sdk.NewDecWithPrec(1, 1), // 0.1 (10%)
-		CreateGatewayBaseFee: sdk.NewCoin(sdk.NativeTokenMinDenom, sdk.NewIntWithDecimal(60, 18)),
+		CreateGatewayBaseFee: sdk.NewCoin(sdk.IrisAtto, sdk.NewIntWithDecimal(60, int(sdk.AttoScale))),
 		GatewayAssetFeeRatio: sdk.NewDecWithPrec(1, 1), // 0.1 (10%)
 	}
 }

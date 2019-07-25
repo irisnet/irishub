@@ -45,7 +45,7 @@ func (k Keeper) Slash(ctx sdk.Context, consAddr sdk.ConsAddress, infractionHeigh
 	// ref https://github.com/irisnet/irishub/issues/1348
 	// ref https://github.com/irisnet/irishub/issues/1471
 	//Multiply 1*10^18 to calculate equivalent stake denom amount
-	slashAmount = slashAmount.MulInt(sdk.AttoPrecision).TruncateDec()
+	slashAmount = slashAmount.MulInt(sdk.AttoScaleFactor).TruncateDec()
 
 	validator, found := k.GetValidatorByConsAddr(ctx, consAddr)
 	if !found {
@@ -121,7 +121,7 @@ func (k Keeper) Slash(ctx sdk.Context, consAddr sdk.ConsAddress, infractionHeigh
 		panic("slash decimal token in redelegation")
 	}
 	k.bankKeeper.DecreaseLoosenToken(ctx, sdk.Coins{sdk.NewCoin(types.StakeDenom, tokensToBurn.TruncateInt())})
-	slashToken, err := strconv.ParseFloat(tokensToBurn.QuoInt(sdk.AttoPrecision).String(), 64)
+	slashToken, err := strconv.ParseFloat(tokensToBurn.QuoInt(sdk.AttoScaleFactor).String(), 64)
 	if err == nil {
 		k.metrics.SlashedToken.With("validator_address", validator.GetConsAddr().String()).Add(slashToken)
 	}

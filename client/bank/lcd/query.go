@@ -100,7 +100,7 @@ func QueryTokenStatsRequestHandlerFn(cdc *codec.Codec, decoder auth.AccountDecod
 		}
 
 		// query bonded tokens for iris
-		if tokenId == "" || tokenId == sdk.NativeTokenName {
+		if tokenId == "" || tokenId == sdk.Iris {
 			resPool, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.StakeRoute, stake.QueryPool), nil)
 			if err != nil {
 				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -119,13 +119,4 @@ func QueryTokenStatsRequestHandlerFn(cdc *codec.Codec, decoder auth.AccountDecod
 
 		utils.PostProcessResponse(w, cdc, tokenStats, cliCtx.Indent)
 	}
-}
-
-func isIris(assetId string) bool {
-	for _, ir := range sdk.IRIS.Units {
-		if assetId == ir.Denom {
-			return true
-		}
-	}
-	return false
 }
