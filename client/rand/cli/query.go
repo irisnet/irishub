@@ -64,8 +64,13 @@ func GetCmdQueryRandRequestQueue(cdc *codec.Codec) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
+			height := viper.GetInt64(FlagQueueHeight)
+			if height < 0 {
+				return fmt.Errorf("the height must not be less than 0: %d", height)
+			}
+
 			params := rand.QueryRandRequestQueueParams{
-				Height: viper.GetInt64(FlagQueueHeight),
+				Height: height,
 			}
 
 			bz, err := cdc.MarshalJSON(params)

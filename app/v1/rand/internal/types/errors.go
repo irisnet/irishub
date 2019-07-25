@@ -11,6 +11,7 @@ const (
 
 	CodeInvalidConsumer sdk.CodeType = 100
 	CodeInvalidReqID    sdk.CodeType = 101
+	CodeInvalidHeight   sdk.CodeType = 102
 )
 
 //----------------------------------------
@@ -22,4 +23,8 @@ func ErrInvalidConsumer(codespace sdk.CodespaceType, msg string) sdk.Error {
 
 func ErrInvalidReqID(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidReqID, msg)
+}
+
+func ErrInvalidHeight(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidHeight, msg)
 }

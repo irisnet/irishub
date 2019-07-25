@@ -42,8 +42,9 @@ var (
 	QueryRand             = types.QueryRand
 	QueryRandRequestQueue = types.QueryRandRequestQueue
 
-	TagReqID = types.TagReqID
-	TagRand  = types.TagRand
+	TagReqID      = types.TagReqID
+	TagRandHeight = types.TagRandHeight
+	TagRand       = types.TagRand
 
 	NewKeeper  = keeper.NewKeeper
 	NewQuerier = keeper.NewQuerier
