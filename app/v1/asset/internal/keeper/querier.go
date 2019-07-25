@@ -45,7 +45,7 @@ func queryToken(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, 
 		if err != nil {
 			return nil, sdk.MarshalResultErr(err)
 		}
-		token = types.NewFungibleToken(types.NATIVE, "", sdk.IrisCoinType.GetMainUnit().Denom, sdk.IrisCoinType.Desc, sdk.IrisCoinType.MinUnit.Decimal, "", sdk.IrisCoinType.MinUnit.Denom, initSupply.Amount, maxSupply.Amount, true, sdk.AccAddress{})
+		token = types.NewFungibleToken(types.NATIVE, "", sdk.Iris, sdk.IrisCoinType.Desc, sdk.AttoScale, "", sdk.IrisAtto, initSupply.Amount, maxSupply.Amount, true, sdk.AccAddress{})
 	} else {
 		var found bool
 		token, found = keeper.getToken(ctx, params.TokenId)
@@ -122,7 +122,7 @@ func queryTokens(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte,
 		if err != nil {
 			return nil, sdk.MarshalResultErr(err)
 		}
-		token := types.NewFungibleToken(types.NATIVE, "", sdk.IrisCoinType.GetMainUnit().Denom, sdk.IrisCoinType.Desc, sdk.IrisCoinType.MinUnit.Decimal, "", sdk.IrisCoinType.MinUnit.Denom, initSupply.Amount, maxSupply.Amount, true, sdk.AccAddress{})
+		token := types.NewFungibleToken(types.NATIVE, "", sdk.Iris, sdk.IrisCoinType.Desc, sdk.AttoScale, "", sdk.IrisAtto, initSupply.Amount, maxSupply.Amount, true, sdk.AccAddress{})
 		tokens = append(tokens, token)
 	}
 
