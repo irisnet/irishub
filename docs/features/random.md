@@ -8,7 +8,7 @@ This module is in Beta, use at your own risk
 
 This specification describes the usage and scope of random numbers on IRISHub. This feature is currently in beta and please assess the risk yourself before using.
 
-## Concept
+## Concepts
 
 ### Scope
 
