@@ -15,6 +15,7 @@ import (
 	guardiancmd "github.com/irisnet/irishub/client/guardian/cli"
 	keyscmd "github.com/irisnet/irishub/client/keys/cli"
 	paramscmd "github.com/irisnet/irishub/client/params/cli"
+	randcmd "github.com/irisnet/irishub/client/rand/cli"
 	servicecmd "github.com/irisnet/irishub/client/service/cli"
 	slashingcmd "github.com/irisnet/irishub/client/slashing/cli"
 	stakecmd "github.com/irisnet/irishub/client/stake/cli"
@@ -279,6 +280,27 @@ func main() {
 
 	rootCmd.AddCommand(
 		assetCmd,
+	)
+
+	// add rand commands
+	randCmd := &cobra.Command{
+		Use:   "rand",
+		Short: "Rand subcommands",
+	}
+
+	randCmd.AddCommand(
+		client.PostCommands(
+			randcmd.GetCmdRequestRand(cdc),
+		)...)
+
+	randCmd.AddCommand(
+		client.GetCommands(
+			randcmd.GetCmdQueryRand(cdc),
+			randcmd.GetCmdQueryRandRequestQueue(cdc),
+		)...)
+
+	rootCmd.AddCommand(
+		randCmd,
 	)
 
 	paramsCmd := client.GetCommands(paramscmd.Commands(cdc))[0]

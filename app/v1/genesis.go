@@ -15,6 +15,7 @@ import (
 	distr "github.com/irisnet/irishub/app/v1/distribution"
 	"github.com/irisnet/irishub/app/v1/gov"
 	"github.com/irisnet/irishub/app/v1/mint"
+	"github.com/irisnet/irishub/app/v1/rand"
 	"github.com/irisnet/irishub/app/v1/service"
 	"github.com/irisnet/irishub/app/v1/slashing"
 	"github.com/irisnet/irishub/app/v1/stake"
@@ -39,12 +40,13 @@ type GenesisState struct {
 	ServiceData  service.GenesisState  `json:"service"`
 	GuardianData guardian.GenesisState `json:"guardian"`
 	AssetData    asset.GenesisState    `json:"asset"`
+	RandData     rand.GenesisState     `json:"rand"`
 	GenTxs       []json.RawMessage     `json:"gentxs"`
 }
 
 func NewGenesisState(accounts []GenesisAccount, authData auth.GenesisState, stakeData stake.GenesisState, mintData mint.GenesisState,
 	distrData distr.GenesisState, govData gov.GenesisState, upgradeData upgrade.GenesisState, serviceData service.GenesisState,
-	guardianData guardian.GenesisState, slashingData slashing.GenesisState, assetData asset.GenesisState) GenesisState {
+	guardianData guardian.GenesisState, slashingData slashing.GenesisState, assetData asset.GenesisState, randData rand.GenesisState) GenesisState {
 
 	return GenesisState{
 		Accounts:     accounts,
@@ -58,6 +60,7 @@ func NewGenesisState(accounts []GenesisAccount, authData auth.GenesisState, stak
 		GuardianData: guardianData,
 		SlashingData: slashingData,
 		AssetData:    assetData,
+		RandData:     randData,
 	}
 }
 
@@ -336,6 +339,7 @@ func convertToGenesisState(genesisFileState GenesisFileState) GenesisState {
 		ServiceData:  genesisFileState.ServiceData,
 		GuardianData: genesisFileState.GuardianData,
 		AssetData:    genesisFileState.AssetData,
+		RandData:     genesisFileState.RandData,
 		GenTxs:       genesisFileState.GenTxs,
 	}
 }
@@ -352,6 +356,7 @@ type GenesisFileState struct {
 	ServiceData  service.GenesisState  `json:"service"`
 	GuardianData guardian.GenesisState `json:"guardian"`
 	AssetData    asset.GenesisState    `json:"asset"`
+	RandData     rand.GenesisState     `json:"rand"`
 	GenTxs       []json.RawMessage     `json:"gentxs"`
 }
 
@@ -377,7 +382,7 @@ func NewGenesisFileAccount(acc *auth.BaseAccount) GenesisFileAccount {
 
 func NewGenesisFileState(accounts []GenesisFileAccount, authData auth.GenesisState, stakeData stake.GenesisState, mintData mint.GenesisState,
 	distrData distr.GenesisState, govData gov.GenesisState, upgradeData upgrade.GenesisState, serviceData service.GenesisState,
-	guardianData guardian.GenesisState, slashingData slashing.GenesisState, assetData asset.GenesisState) GenesisFileState {
+	guardianData guardian.GenesisState, slashingData slashing.GenesisState, assetData asset.GenesisState, randData rand.GenesisState) GenesisFileState {
 
 	return GenesisFileState{
 		Accounts:     accounts,
@@ -391,6 +396,7 @@ func NewGenesisFileState(accounts []GenesisFileAccount, authData auth.GenesisSta
 		GuardianData: guardianData,
 		SlashingData: slashingData,
 		AssetData:    assetData,
+		RandData:     randData,
 	}
 }
 
@@ -408,6 +414,7 @@ func NewDefaultGenesisFileState() GenesisFileState {
 		GuardianData: guardian.DefaultGenesisState(),
 		SlashingData: slashing.DefaultGenesisState(),
 		AssetData:    asset.DefaultGenesisState(),
+		RandData:     rand.DefaultGenesisState(),
 		GenTxs:       nil,
 	}
 }
