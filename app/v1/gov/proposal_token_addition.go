@@ -3,7 +3,6 @@ package gov
 import (
 	"fmt"
 	"github.com/irisnet/irishub/app/v1/asset/exported"
-	"github.com/irisnet/irishub/tools/human"
 	sdk "github.com/irisnet/irishub/types"
 )
 
@@ -14,8 +13,8 @@ type TokenAdditionProposal struct {
 	FToken exported.FungibleToken `json:"f_token"`
 }
 
-func (atp TokenAdditionProposal) HumanString(assetConvert human.AssetConvert) string {
-	bps := atp.BasicProposal.HumanString(assetConvert)
+func (atp TokenAdditionProposal) HumanString(converter sdk.CoinsConverter) string {
+	bps := atp.BasicProposal.HumanString(converter)
 	return fmt.Sprintf(`%s
   %s`,
 		bps, atp.FToken.String())

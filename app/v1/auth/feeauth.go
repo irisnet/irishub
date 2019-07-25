@@ -20,7 +20,7 @@ func NewFeeAuth(nativeFeeDenom string) FeeAuth {
 }
 
 func InitialFeeAuth() FeeAuth {
-	return NewFeeAuth(sdk.NativeTokenMinDenom)
+	return NewFeeAuth(sdk.IrisAtto)
 }
 
 func ValidateFee(auth FeeAuth, collectedFee sdk.Coins) error {

@@ -5,7 +5,6 @@ import (
 
 	"github.com/irisnet/irishub/app/v1/distribution/types"
 	"github.com/irisnet/irishub/codec"
-	"github.com/irisnet/irishub/tools/human"
 	sdk "github.com/irisnet/irishub/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/log"
@@ -191,14 +190,14 @@ Delegations:  %s
 Commission:   %s`, r.Total.MainUnitString(), delegations, r.Commission.MainUnitString())
 }
 
-func (r Rewards) HumanString(assetConvert human.AssetConvert) string {
+func (r Rewards) HumanString(converter sdk.CoinsConverter) string {
 	var delegations string
 	for _, val := range r.Delegations {
-		delegations += "\n  " + val.HumanString(assetConvert)
+		delegations += "\n  " + val.HumanString(converter)
 	}
 	return fmt.Sprintf(`Total:        %s
 Delegations:  %s
-Commission:   %s`, assetConvert.ToMainUnit(r.Total), delegations, assetConvert.ToMainUnit(r.Commission))
+Commission:   %s`, converter.ToMainUnit(r.Total), delegations, converter.ToMainUnit(r.Commission))
 }
 
 type DelegationsReward struct {
@@ -211,9 +210,9 @@ func (dr DelegationsReward) String() string {
 		dr.Validator, dr.Reward.MainUnitString())
 }
 
-func (dr DelegationsReward) HumanString(assetConvert human.AssetConvert) string {
+func (dr DelegationsReward) HumanString(converter sdk.CoinsConverter) string {
 	return fmt.Sprintf(`validator: %s, reward: %s`,
-		dr.Validator, assetConvert.ToMainUnit(dr.Reward))
+		dr.Validator, converter.ToMainUnit(dr.Reward))
 }
 
 func queryRewards(ctx sdk.Context, _ []string, req abci.RequestQuery, k Keeper) ([]byte, sdk.Error) {

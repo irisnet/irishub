@@ -5,20 +5,19 @@ import (
 )
 
 const (
-	NativeTokenName     = "iris"
-	NativeTokenMinDenom = "iris-atto"
-	DefaultKeyPass      = "1234567890"
-	Testnet             = "testnet"
-	Mainnet             = "mainnet"
-	InvariantPanic      = "panic"
-	InvariantError      = "error"
+	Iris           = "iris"
+	IrisAtto       = "iris-atto"
+	DefaultKeyPass = "1234567890"
+	Testnet        = "testnet"
+	Mainnet        = "mainnet"
+	InvariantPanic = "panic"
+	InvariantError = "error"
 )
 
 var (
-	IRIS             = NewDefaultCoinType(NativeTokenName)
 	InitialIssue     = NewIntWithDecimal(2, 9) // 2 billion
-	FreeToken4Val, _ = IRIS.ConvertToMinCoin(fmt.Sprintf("%d%s", int64(100), NativeTokenName))
-	FreeToken4Acc, _ = IRIS.ConvertToMinCoin(fmt.Sprintf("%d%s", int64(150), NativeTokenName))
+	FreeToken4Val, _ = IrisCoinType.ConvertToMinDenomCoin(fmt.Sprintf("%d%s", int64(100), Iris))
+	FreeToken4Acc, _ = IrisCoinType.ConvertToMinDenomCoin(fmt.Sprintf("%d%s", int64(150), Iris))
 )
 
 // Can be configured through environment variables

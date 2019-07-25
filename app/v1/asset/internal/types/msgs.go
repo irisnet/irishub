@@ -129,8 +129,8 @@ func ValidateMsgIssueToken(msg *MsgIssueToken) sdk.Error {
 		return ErrInvalidAssetSymbol(DefaultCodespace, fmt.Sprintf("invalid token symbol %s, only accepts alphanumeric characters, and begin with an english letter, length [%d, %d]", msg.Symbol, MinimumAssetSymbolSize, MaximumAssetSymbolSize))
 	}
 
-	if strings.Contains(strings.ToLower(msg.Symbol), sdk.NativeTokenName) {
-		return ErrInvalidAssetSymbol(DefaultCodespace, fmt.Sprintf("invalid token symbol %s, can not contain native token symbol %s", msg.Symbol, sdk.NativeTokenName))
+	if strings.Contains(strings.ToLower(msg.Symbol), sdk.Iris) {
+		return ErrInvalidAssetSymbol(DefaultCodespace, fmt.Sprintf("invalid token symbol %s, can not contain native token symbol %s", msg.Symbol, sdk.Iris))
 	}
 
 	minUnitAliasLen := len(msg.MinUnitAlias)
@@ -623,7 +623,7 @@ func ValidateMoniker(moniker string) sdk.Error {
 	}
 
 	// check if the moniker contains the native token name
-	if strings.Contains(strings.ToLower(moniker), sdk.NativeTokenName) {
+	if strings.Contains(strings.ToLower(moniker), sdk.Iris) {
 		return ErrInvalidMoniker(DefaultCodespace, fmt.Sprintf("the moniker must not contain the native token name"))
 	}
 
