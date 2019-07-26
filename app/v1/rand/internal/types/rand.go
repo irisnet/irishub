@@ -31,3 +31,50 @@ func (r Rand) String() string {
   Value:             %s`,
 		hex.EncodeToString(r.RequestTxHash), r.Height, r.Value.Rat.FloatString(RandPrec))
 }
+
+// ReadableRand represents a shadow Rand intended for readable output
+type ReadableRand struct {
+	RequestTxHash string `json:"request_tx_hash"`
+	Height        int64  `json:"height"`
+	Value         string `json:"value"`
+}
+
+// MarshalJSON marshals rand to readable JSON
+func (r Rand) MarshalJSON() ([]byte, error) {
+	readableRand := ReadableRand{
+		RequestTxHash: hex.EncodeToString(r.RequestTxHash),
+		Height:        r.Height,
+		Value:         r.Value.Rat.FloatString(RandPrec),
+	}
+
+	return msgCdc.MarshalJSON(readableRand)
+}
+
+// UnmarshalJSON unmarshals data to Rand
+func (r *Rand) UnmarshalJSON(data []byte) error {
+	var readableRand ReadableRand
+
+	err := msgCdc.UnmarshalJSON(data, &readableRand)
+	if err != nil {
+		return err
+	}
+
+	txHash, err := hex.DecodeString(readableRand.RequestTxHash)
+	if err != nil {
+		return err
+	}
+
+	value, _ := sdk.NewRatFromDecimal(readableRand.Value, RandPrec)
+	if err != nil {
+		return err
+	}
+
+	rawRand := Rand{
+		RequestTxHash: txHash,
+		Height:        readableRand.Height,
+		Value:         value,
+	}
+
+	*r = rawRand
+	return nil
+}
