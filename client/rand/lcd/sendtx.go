@@ -21,14 +21,12 @@ func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec
 
 type requestRandReq struct {
 	BaseTx        utils.BaseTx   `json:"base_tx"`        // base tx
-	Consumer      sdk.AccAddress `json:"owner"`          // request address
+	Consumer      sdk.AccAddress `json:"consumer"`       // request address
 	BlockInterval uint64         `json:"block_interval"` // block interval
 }
 
 func requestRandHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		txCtx := utils.NewTxContextFromCLI().WithCodec(cliCtx.Codec)
-
 		var req requestRandReq
 		err := utils.ReadPostBody(w, r, cdc, &req)
 		if err != nil {
@@ -47,6 +45,8 @@ func requestRandHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Hand
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
+
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
 
 		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
 	}

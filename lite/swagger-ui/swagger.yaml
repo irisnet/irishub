@@ -29,6 +29,8 @@ tags:
     description: Distribution module APIs
   - name: Asset
     description: Asset module APIs
+  - name: Rand
+    description: Rand module APIs
   - name: Service
     description: Service module APIs
   - name: Params
@@ -2703,6 +2705,79 @@ paths:
           description: Invalid id
         '500':
           description: Internal Server Error
+  '/rand/rands':
+    post:
+      summary: Request a random number
+      tags:
+        - Rand
+      responses:
+        '200':
+          description: Unsigned tx was succesfully generated
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_tx:
+                  $ref: '#/components/schemas/BaseTx'
+                consumer:
+                  $ref: '#/components/schemas/Address'
+                block_interval:
+                  type: integer
+                  example: '10'
+  '/rand/rands/{request-id}':
+    get:
+      summary: Query a random number by the specified request id
+      tags:
+        - Rand
+      parameters:
+        - in: path
+          name: request-id
+          description: the request id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rand'
+        '400':
+          description: Invalid request id
+        '500':
+          description: Internal Server Error
+  '/rand/queue':
+    get:
+      summary: Query the pending requests with an optional height
+      tags:
+        - Rand
+      parameters:
+        - in: query
+          name: height
+          description: the destination block height
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Request'
+        '400':
+          description: Invalid height if provided
+        '500':
+          description: Internal Server Error
   '/params':
     get:
       summary: Get the system params with an optional module
@@ -3351,3 +3426,21 @@ components:
           $ref: '#/components/schemas/Coin'
         mint_fee:
           $ref: '#/components/schemas/Coin'
+    Rand:
+      type: object
+      properties:
+        request_tx_hash:
+          type: string
+        height:
+          type: integer
+        value:
+          type: string
+    Request:
+      type: object
+      properties:
+        height:
+          type: integer
+        consumer:
+          $ref: '#/components/schemas/Address'
+        tx_hash:
+          type: string

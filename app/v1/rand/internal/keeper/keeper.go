@@ -56,6 +56,7 @@ func (k Keeper) RequestRand(ctx sdk.Context, consumer sdk.AccAddress, blockInter
 
 	reqTags := sdk.NewTags(
 		types.TagReqID, []byte(hex.EncodeToString(reqID)),
+		types.TagRandHeight, []byte(fmt.Sprintf("%d", destHeight)),
 	)
 
 	return reqTags, nil
