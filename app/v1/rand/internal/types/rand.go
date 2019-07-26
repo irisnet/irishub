@@ -64,7 +64,7 @@ func (r *Rand) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	value, _ := sdk.NewRatFromDecimal(readableRand.Value, RandPrec)
+	value, err := sdk.NewRatFromDecimal(readableRand.Value, RandPrec)
 	if err != nil {
 		return err
 	}
