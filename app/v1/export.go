@@ -10,6 +10,7 @@ import (
 	distr "github.com/irisnet/irishub/app/v1/distribution"
 	"github.com/irisnet/irishub/app/v1/gov"
 	"github.com/irisnet/irishub/app/v1/mint"
+	"github.com/irisnet/irishub/app/v1/rand"
 	"github.com/irisnet/irishub/app/v1/service"
 	"github.com/irisnet/irishub/app/v1/slashing"
 	"github.com/irisnet/irishub/app/v1/stake"
@@ -66,6 +67,7 @@ func (p *ProtocolV1) ExportAppStateAndValidators(ctx sdk.Context, forZeroHeight 
 		guardian.ExportGenesis(ctx, p.guardianKeeper),
 		slashing.ExportGenesis(ctx, p.slashingKeeper),
 		asset.ExportGenesis(ctx, p.assetKeeper),
+		rand.ExportGenesis(ctx, p.randKeeper),
 	)
 	appState, err = codec.MarshalJSONIndent(p.cdc, genState)
 	if err != nil {

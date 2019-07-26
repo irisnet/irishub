@@ -5,9 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/app/v1/gov"
-	"github.com/irisnet/irishub/app/v1/params"
 	"github.com/irisnet/irishub/client/context"
 	client "github.com/irisnet/irishub/client/gov"
 	"github.com/irisnet/irishub/client/utils"
@@ -281,14 +279,15 @@ func queryProposalsWithParameterFn(cdc *codec.Codec, cliCtx context.CLIContext) 
 			params.Depositor = depositorAddr
 		}
 
-		if len(strProposalStatus) != 0 {
-			proposalStatus, err := gov.ProposalStatusFromString(client.NormalizeProposalStatus(strProposalStatus))
-			if err != nil {
+		var status = ""
+		if len(strProposalStatus) > 0 {
+			status = client.NormalizeProposalStatus(strProposalStatus)
+			if _, err := gov.ProposalStatusFromString(status); err != nil {
 				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 				return
 			}
-			params.ProposalStatus = proposalStatus
 		}
+		params.ProposalStatus = status
 		if len(strNumLimit) != 0 {
 			numLatest, ok := utils.ParseUint64OrReturnBadRequest(w, strNumLimit)
 			if !ok {
@@ -346,39 +345,6 @@ func queryTallyOnProposalHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) 
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(err.Error()))
-			return
-		}
-
-		utils.PostProcessResponse(w, cdc, res, cliCtx.Indent)
-	}
-}
-
-// nolint: gocyclo
-func queryParamsHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		vars := mux.Vars(r)
-		moduleStr := vars[Module]
-
-		if len(moduleStr) == 0 {
-			w.WriteHeader(http.StatusBadRequest)
-			err := errors.New("module name required but not specified")
-			w.Write([]byte(err.Error()))
-
-			return
-		}
-
-		params := params.QueryModuleParams{
-			Module: moduleStr,
-		}
-		bz, err := cdc.MarshalJSON(params)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
-		res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/module", protocol.ParamsRoute), bz)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
 

@@ -10,4 +10,8 @@ var (
 	MaximumAssetMaxSupply = types.MaximumAssetMaxSupply
 	NewFungibleToken      = types.NewFungibleToken
 	EXTERNAL              = types.EXTERNAL
+	FUNGIBLE              = types.FUNGIBLE
+	NewMsgIssueToken      = types.NewMsgIssueToken
+	ValidateMsgIssueToken = types.ValidateMsgIssueToken
+	ErrAssetAlreadyExists = types.ErrAssetAlreadyExists
 )

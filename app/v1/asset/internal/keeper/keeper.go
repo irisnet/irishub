@@ -3,19 +3,15 @@ package keeper
 import (
 	"fmt"
 	"github.com/irisnet/irishub/app/v1/asset/internal/types"
-
-	"github.com/irisnet/irishub/app/v1/bank"
 	"github.com/irisnet/irishub/app/v1/params"
 	"github.com/irisnet/irishub/codec"
-	"github.com/irisnet/irishub/modules/guardian"
 	sdk "github.com/irisnet/irishub/types"
 )
 
 type Keeper struct {
 	storeKey sdk.StoreKey
 	cdc      *codec.Codec
-	bk       bank.Keeper
-	gk       guardian.Keeper
+	bk       types.BankKeeper
 
 	// codespace
 	codespace sdk.CodespaceType
@@ -23,12 +19,11 @@ type Keeper struct {
 	paramSpace params.Subspace
 }
 
-func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, bk bank.Keeper, gk guardian.Keeper, codespace sdk.CodespaceType, paramSpace params.Subspace) Keeper {
+func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, bk types.BankKeeper, codespace sdk.CodespaceType, paramSpace params.Subspace) Keeper {
 	return Keeper{
 		storeKey:   key,
 		cdc:        cdc,
 		bk:         bk,
-		gk:         gk,
 		codespace:  codespace,
 		paramSpace: paramSpace.WithTypeTable(types.ParamTypeTable()),
 	}
@@ -57,18 +52,19 @@ func (k Keeper) IssueToken(ctx sdk.Context, token types.FungibleToken) (sdk.Tags
 		return nil, err
 	}
 
+	initialSupply := sdk.NewCoin(token.GetDenom(), token.GetInitSupply())
 	// for native and gateway tokens
 	if owner != nil {
-		initialSupply := sdk.NewCoin(token.GetDenom(), token.GetInitSupply())
-
 		// Add coins into owner's account
 		_, _, err := k.bk.AddCoins(ctx, owner, sdk.Coins{initialSupply})
 		if err != nil {
 			return nil, err
 		}
+	}
 
-		// Set total supply
-		k.bk.SetTotalSupply(ctx, initialSupply)
+	// Set total supply
+	k.bk.SetTotalSupply(ctx, initialSupply)
+	if initialSupply.Amount.GT(sdk.ZeroInt()) {
 		ctx.CoinFlowTags().AppendCoinFlowTag(ctx, owner.String(), owner.String(), initialSupply.String(), sdk.IssueTokenFlow, "")
 	}
 
@@ -103,7 +99,7 @@ func (k Keeper) AddToken(ctx sdk.Context, token types.FungibleToken) (types.Fung
 		owner = gateway.Owner
 	} else if token.GetSource() == types.NATIVE {
 		owner = token.GetOwner()
-		token.SymbolAtSource = ""
+		token.CanonicalSymbol = ""
 		token.Gateway = ""
 	}
 
@@ -273,17 +269,18 @@ func (k Keeper) EditToken(ctx sdk.Context, msg types.MsgEditToken) (sdk.Tags, sd
 	if msg.Name != types.DoNotModify {
 		token.Name = msg.Name
 	}
-	if msg.SymbolAtSource != types.DoNotModify {
-		token.SymbolAtSource = msg.SymbolAtSource
+
+	if msg.CanonicalSymbol != types.DoNotModify && token.Source != types.NATIVE {
+		token.CanonicalSymbol = msg.CanonicalSymbol
 	}
-	if msg.SymbolMinAlias != types.DoNotModify {
-		token.SymbolMinAlias = msg.SymbolMinAlias
+	if msg.MinUnitAlias != types.DoNotModify {
+		token.MinUnitAlias = msg.MinUnitAlias
 	}
 	if maxSupply.GT(sdk.ZeroInt()) {
 		token.MaxSupply = maxSupply
 	}
-	if msg.Mintable != nil {
-		token.Mintable = *msg.Mintable
+	if msg.Mintable != types.Nil {
+		token.Mintable = msg.Mintable.ToBool()
 	}
 
 	if err := k.SetToken(ctx, token); err != nil {
@@ -416,7 +413,22 @@ func (k Keeper) IterateTokens(ctx sdk.Context, op func(token types.FungibleToken
 }
 
 func (k Keeper) Init(ctx sdk.Context) {
+	ctx = ctx.WithLogger(ctx.Logger().With("handler", "Init").With("module", "iris/asset"))
+
 	k.SetParamSet(ctx, types.DefaultParams())
+
+	//Initialize external tokens BTC and ETH
+	maxSupply := sdk.NewIntWithDecimal(int64(types.MaximumAssetMaxSupply), 8)
+	btc := types.NewFungibleToken(types.EXTERNAL, "", "BTC", "Bitcoin", 8, "BTC", "satoshi", sdk.ZeroInt(), maxSupply, true, nil)
+	if _, err := k.IssueToken(ctx, btc); err != nil {
+		ctx.Logger().Error(fmt.Sprintf("initialize external tokens BTC failed:%s", err.Error()))
+	}
+
+	maxSupply = sdk.NewIntWithDecimal(int64(types.MaximumAssetMaxSupply), 18)
+	eth := types.NewFungibleToken(types.EXTERNAL, "", "ETH", "Ethereum", 18, "ETH", "wei", sdk.ZeroInt(), maxSupply, true, nil)
+	if _, err := k.IssueToken(ctx, eth); err != nil {
+		ctx.Logger().Error(fmt.Sprintf("initialize external tokens ETH failed:%s", err.Error()))
+	}
 }
 
 // TransferTokenOwner transfers the owner of the specified token to a new one

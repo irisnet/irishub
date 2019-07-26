@@ -64,6 +64,8 @@ const (
 	CodeInvalidAssetTaxRate         sdk.CodeType = 900
 	CodeInvalidMintTokenFeeRatio    sdk.CodeType = 901
 	CodeInvalidGatewayAssetFeeRatio sdk.CodeType = 902
+	CodeInvalidIssueTokenBaseFee    sdk.CodeType = 903
+	CodeInvalidCreateGatewayBaseFee sdk.CodeType = 904
 )
 
 func ErrInvalidString(valuestr string) sdk.Error {

@@ -39,7 +39,7 @@ func handleIssueToken(ctx sdk.Context, k Keeper, msg MsgIssueToken) sdk.Result {
 	switch msg.Family {
 	case FUNGIBLE:
 		decimal := int(msg.Decimal)
-		token = NewFungibleToken(msg.Source, msg.Gateway, msg.Symbol, msg.Name, msg.Decimal, msg.SymbolAtSource, msg.SymbolMinAlias, sdk.NewIntWithDecimal(int64(msg.InitialSupply), decimal), sdk.NewIntWithDecimal(int64(msg.MaxSupply), decimal), msg.Mintable, msg.Owner)
+		token = NewFungibleToken(msg.Source, msg.Gateway, msg.Symbol, msg.Name, msg.Decimal, msg.CanonicalSymbol, msg.MinUnitAlias, sdk.NewIntWithDecimal(int64(msg.InitialSupply), decimal), sdk.NewIntWithDecimal(int64(msg.MaxSupply), decimal), msg.Mintable, msg.Owner)
 	default:
 		return ErrInvalidAssetFamily(DefaultCodespace, fmt.Sprintf("invalid asset family type %s", msg.Family)).Result()
 	}

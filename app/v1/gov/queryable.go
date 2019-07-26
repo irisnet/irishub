@@ -211,7 +211,7 @@ func queryVotes(ctx sdk.Context, path []string, req abci.RequestQuery, keeper Ke
 type QueryProposalsParams struct {
 	Voter          sdk.AccAddress
 	Depositor      sdk.AccAddress
-	ProposalStatus ProposalStatus
+	ProposalStatus string
 	Limit          uint64
 }
 
@@ -223,7 +223,12 @@ func queryProposals(ctx sdk.Context, path []string, req abci.RequestQuery, keepe
 		return nil, sdk.ParseParamsErr(err)
 	}
 
-	proposals := keeper.GetProposalsFiltered(ctx, params.Voter, params.Depositor, params.ProposalStatus, params.Limit)
+	var status = StatusNil
+	if s, err := ProposalStatusFromString(params.ProposalStatus); err == nil {
+		status = s
+	}
+
+	proposals := keeper.GetProposalsFiltered(ctx, params.Voter, params.Depositor, status, params.Limit)
 	bz, err2 := codec.MarshalJSONIndent(keeper.cdc, proposals)
 	if err2 != nil {
 		return nil, sdk.MarshalResultErr(err)

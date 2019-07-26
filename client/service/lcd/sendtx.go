@@ -77,8 +77,6 @@ func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec
 
 func definitionPostHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		txCtx := utils.NewTxContextFromCLI().WithCodec(cliCtx.Codec)
-
 		var req definition
 		err := utils.ReadPostBody(w, r, cdc, &req)
 		if err != nil {
@@ -103,14 +101,14 @@ func definitionPostHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.H
 			return
 		}
 
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
+
 		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
 	}
 }
 
 func bindingAddHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		txCtx := utils.NewTxContextFromCLI().WithCodec(cliCtx.Codec)
-
 		var req binding
 		err := utils.ReadPostBody(w, r, cdc, &req)
 		if err != nil {
@@ -157,14 +155,14 @@ func bindingAddHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handl
 			return
 		}
 
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
+
 		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
 	}
 }
 
 func bindingUpdateHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		txCtx := utils.NewTxContextFromCLI().WithCodec(cliCtx.Codec)
-
 		vars := mux.Vars(r)
 		DefChainId := vars[DefChainId]
 		serviceName := vars[ServiceName]
@@ -222,14 +220,14 @@ func bindingUpdateHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Ha
 			return
 		}
 
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
+
 		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
 	}
 }
 
 func bindingDisableHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		txCtx := utils.NewTxContextFromCLI().WithCodec(cliCtx.Codec)
-
 		vars := mux.Vars(r)
 		DefChainId := vars[DefChainId]
 		serviceName := vars[ServiceName]
@@ -259,14 +257,14 @@ func bindingDisableHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.H
 			return
 		}
 
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
+
 		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
 	}
 }
 
 func bindingEnableHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		txCtx := utils.NewTxContextFromCLI().WithCodec(cliCtx.Codec)
-
 		vars := mux.Vars(r)
 		DefChainId := vars[DefChainId]
 		serviceName := vars[ServiceName]
@@ -302,14 +300,14 @@ func bindingEnableHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Ha
 			return
 		}
 
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
+
 		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
 	}
 }
 
 func bindingRefundHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		txCtx := utils.NewTxContextFromCLI().WithCodec(cliCtx.Codec)
-
 		vars := mux.Vars(r)
 		DefChainId := vars[DefChainId]
 		serviceName := vars[ServiceName]
@@ -339,14 +337,14 @@ func bindingRefundHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Ha
 			return
 		}
 
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
+
 		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
 	}
 }
 
 func requestAddHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		txCtx := utils.NewTxContextFromCLI().WithCodec(cliCtx.Codec)
-
 		var req serviceRequestWithBasic
 		err := utils.ReadPostBody(w, r, cdc, &req)
 		if err != nil {
@@ -397,14 +395,14 @@ func requestAddHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handl
 			msgs = append(msgs, msg)
 		}
 
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
+
 		utils.WriteGenerateStdTxResponse(w, txCtx, msgs)
 	}
 }
 
 func responseAddHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		txCtx := utils.NewTxContextFromCLI().WithCodec(cliCtx.Codec)
-
 		var req serviceResponse
 		err := utils.ReadPostBody(w, r, cdc, &req)
 		if err != nil {
@@ -444,14 +442,14 @@ func responseAddHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Hand
 			return
 		}
 
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
+
 		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
 	}
 }
 
 func FeesRefundHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		txCtx := utils.NewTxContextFromCLI().WithCodec(cliCtx.Codec)
-
 		vars := mux.Vars(r)
 		bechConsumerAddr := vars[Consumer]
 
@@ -479,14 +477,14 @@ func FeesRefundHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handl
 			return
 		}
 
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
+
 		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
 	}
 }
 
 func FeesWithdrawHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		txCtx := utils.NewTxContextFromCLI().WithCodec(cliCtx.Codec)
-
 		vars := mux.Vars(r)
 		bechProviderAddr := vars[Provider]
 
@@ -513,6 +511,8 @@ func FeesWithdrawHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Han
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
+
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
 
 		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
 	}

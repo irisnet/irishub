@@ -21,6 +21,7 @@ const (
 	GuardianStore        = "guardian"
 	UpgradeStore         = "upgrade"
 	AssetStore           = "asset"
+	RandStore            = "rand"
 	SwapStore            = "swap"
 
 	// all route for query and handler
@@ -35,6 +36,7 @@ const (
 	GuardianRoute = GuardianStore
 	UpgradeRoute  = UpgradeStore
 	AssetRoute    = AssetStore
+	RandRoute     = RandStore
 	SwapRoute     = SwapStore
 )
 
@@ -55,5 +57,6 @@ var (
 	KeyGuardian = sdk.NewKVStoreKey(GuardianStore)
 	KeyUpgrade  = sdk.NewKVStoreKey(UpgradeStore)
 	KeyAsset    = sdk.NewKVStoreKey(AssetStore)
+	KeyRand     = sdk.NewKVStoreKey(RandStore)
 	KeySwap     = sdk.NewKVStoreKey(SwapStore)
 )

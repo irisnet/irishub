@@ -71,6 +71,24 @@ func (acc BaseAccount) String() string {
 	)
 }
 
+// String implements human.Stringer
+func (acc BaseAccount) HumanString(converter sdk.CoinsConverter) string {
+	var pubkey string
+
+	if acc.PubKey != nil {
+		pubkey = sdk.MustBech32ifyAccPub(acc.PubKey)
+	}
+
+	return fmt.Sprintf(`Account:
+  Address:         %s
+  Pubkey:          %s
+  Coins:           %s
+  Account Number:  %d
+  Sequence:        %d`,
+		acc.Address, pubkey, converter.ToMainUnit(acc.Coins), acc.AccountNumber, acc.Sequence,
+	)
+}
+
 // Prototype function for BaseAccount
 func ProtoBaseAccount() Account {
 	return &BaseAccount{}

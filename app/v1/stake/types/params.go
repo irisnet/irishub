@@ -24,10 +24,7 @@ const (
 	ValidatorUpdateDelay int64 = 1
 
 	// Stake token denomination "iris-atto"
-	StakeDenom = sdk.NativeTokenMinDenom
-
-	// Stake token name "iris"
-	StakeTokenName = sdk.NativeTokenName
+	StakeDenom = sdk.IrisAtto
 )
 
 // nolint - Keys for parameter access
@@ -46,8 +43,8 @@ type Params struct {
 
 func (p Params) String() string {
 	return fmt.Sprintf(`Stake Params:
-  Unbonding Time:         %s
-  Max Validators:         %d`,
+  stake/UnbondingTime:  %s
+  stake/MaxValidators:  %d`,
 		p.UnbondingTime, p.MaxValidators)
 }
 
@@ -99,6 +96,10 @@ func (p *Params) StringFromBytes(cdc *codec.Codec, key string, bytes []byte) (st
 	default:
 		return "", fmt.Errorf("%s is not existed", key)
 	}
+}
+
+func (p *Params) ReadOnly() bool {
+	return false
 }
 
 // Equal returns a boolean determining if two Param types are identical.

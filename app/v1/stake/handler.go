@@ -7,7 +7,6 @@ import (
 	"github.com/irisnet/irishub/app/v1/stake/tags"
 	"github.com/irisnet/irishub/app/v1/stake/types"
 	sdk "github.com/irisnet/irishub/types"
-	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/common"
 	tmtypes "github.com/tendermint/tendermint/types"
 )
@@ -30,57 +29,6 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 			return sdk.ErrTxDecode("invalid message parse in staking module").Result()
 		}
 	}
-}
-
-// Called every block, update validator set
-func EndBlocker(ctx sdk.Context, k keeper.Keeper) (validatorUpdates []abci.ValidatorUpdate) {
-	ctx = ctx.WithCoinFlowTrigger(sdk.StakeEndBlocker)
-	ctx = ctx.WithLogger(ctx.Logger().With("handler", "endBlock").With("module", "iris/stake"))
-	endBlockerTags := sdk.EmptyTags()
-	// Calculate validator set changes.
-	//
-	// NOTE: ApplyAndReturnValidatorSetUpdates has to come before
-	// UnbondAllMatureValidatorQueue.
-	// This fixes a bug when the unbonding period is instant (is the case in
-	// some of the tests). The test expected the validator to be completely
-	// unbonded after the Endblocker (go from Bonded -> Unbonding during
-	// ApplyAndReturnValidatorSetUpdates and then Unbonding -> Unbonded during
-	// UnbondAllMatureValidatorQueue).
-	validatorUpdates = k.ApplyAndReturnValidatorSetUpdates(ctx)
-
-	// Unbond all mature validators from the unbonding queue.
-	k.UnbondAllMatureValidatorQueue(ctx)
-
-	// Remove all mature unbonding delegations from the ubd queue.
-	matureUnbonds := k.DequeueAllMatureUnbondingQueue(ctx, ctx.BlockHeader().Time)
-	for _, dvPair := range matureUnbonds {
-		err := k.CompleteUnbonding(ctx, dvPair.DelegatorAddr, dvPair.ValidatorAddr)
-		if err != nil {
-			continue
-		}
-		endBlockerTags.AppendTags(sdk.NewTags(
-			tags.Action, ActionCompleteUnbonding,
-			tags.Delegator, []byte(dvPair.DelegatorAddr.String()),
-			tags.SrcValidator, []byte(dvPair.ValidatorAddr.String()),
-		))
-	}
-
-	// Remove all mature redelegations from the red queue.
-	matureRedelegations := k.DequeueAllMatureRedelegationQueue(ctx, ctx.BlockHeader().Time)
-	for _, dvvTriplet := range matureRedelegations {
-		err := k.CompleteRedelegation(ctx, dvvTriplet.DelegatorAddr, dvvTriplet.ValidatorSrcAddr, dvvTriplet.ValidatorDstAddr)
-		if err != nil {
-			continue
-		}
-		endBlockerTags.AppendTags(sdk.NewTags(
-			tags.Action, tags.ActionCompleteRedelegation,
-			tags.Delegator, []byte(dvvTriplet.DelegatorAddr.String()),
-			tags.SrcValidator, []byte(dvvTriplet.ValidatorSrcAddr.String()),
-			tags.DstValidator, []byte(dvvTriplet.ValidatorDstAddr.String()),
-		))
-	}
-	k.UpdateMetrics(ctx)
-	return
 }
 
 //_____________________________________________________________________

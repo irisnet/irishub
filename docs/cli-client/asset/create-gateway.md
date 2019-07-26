@@ -14,8 +14,8 @@ iriscli asset create-gateway [flags]
 
 | Name, shorthand     | type   | Required | Default  | Description                                                         |
 | --------------------| -----  | -------- | -------- | ------------------------------------------------------------------- |
-| --moniker           | string | true     | ""       | The unique name with a size between 3 and 8 letters|
-| --identity          | string | false    | ""       | Optional identity signature (ex. UPort or Keybase) |
+| --moniker           | string | true     | ""       | The unique name with a size between 3 and 8, beginning with a letter followed by alphanumeric characters|
+| --identity          | string | false    | ""       | Optional identity signature with a maximum length of 128 (ex. UPort or Keybase)|
 | --details           | string | false    | ""       | Optional details with a maximum length of 280|
 | --website           | string | false    | ""       | Optional website with a maximum length of 128|
 

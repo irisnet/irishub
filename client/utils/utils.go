@@ -6,7 +6,6 @@ import (
 	"os"
 
 	"github.com/irisnet/irishub/app/v1/auth"
-	"github.com/irisnet/irishub/app/v1/stake/types"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/keys"
 	"github.com/irisnet/irishub/codec"
@@ -295,12 +294,7 @@ func isTxSigner(user sdk.AccAddress, signers []sdk.AccAddress) bool {
 }
 
 func ExRateFromStakeTokenToMainUnit(cliCtx context.CLIContext) sdk.Rat {
-	stakeToken, err := cliCtx.GetCoinType(types.StakeTokenName)
-	if err != nil {
-		panic(err)
-	}
-	decimalDiff := stakeToken.MinUnit.Decimal - stakeToken.GetMainUnit().Decimal
-	exRate := sdk.NewRat(1).Quo(sdk.NewRatFromInt(sdk.NewIntWithDecimal(1, decimalDiff)))
+	exRate := sdk.NewRat(1).Quo(sdk.NewRatFromInt(sdk.AttoScaleFactor))
 	return exRate
 }
 
