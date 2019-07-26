@@ -12,9 +12,9 @@ import (
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/crypto"
 
+	"github.com/irisnet/irishub/mock"
 	"github.com/irisnet/irishub/modules/bank"
 	"github.com/irisnet/irishub/modules/guardian"
-	"github.com/irisnet/irishub/mock"
 	"github.com/irisnet/irishub/modules/stake"
 	"github.com/irisnet/irishub/types"
 	sdk "github.com/irisnet/irishub/types"
@@ -47,7 +47,7 @@ func getMockApp(t *testing.T, numGenAccs int) (*mock.App, Keeper, stake.Keeper, 
 
 	require.NoError(t, mapp.CompleteSetup(keyService))
 
-	coin, _ := types.NewDefaultCoinType("iris").ConvertToMinCoin(fmt.Sprintf("%d%s", 1042, "iris"))
+	coin, _ := types.IrisCoinType.ConvertToMinDenomCoin(fmt.Sprintf("%d%s", 1042, sdk.Iris))
 	genAccs, addrs, pubKeys, privKeys := mock.CreateGenAccounts(numGenAccs, sdk.Coins{coin})
 
 	mock.SetGenesis(mapp, genAccs)

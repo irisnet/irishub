@@ -190,6 +190,16 @@ Delegations:  %s
 Commission:   %s`, r.Total.MainUnitString(), delegations, r.Commission.MainUnitString())
 }
 
+func (r Rewards) HumanString(converter sdk.CoinsConverter) string {
+	var delegations string
+	for _, val := range r.Delegations {
+		delegations += "\n  " + val.HumanString(converter)
+	}
+	return fmt.Sprintf(`Total:        %s
+Delegations:  %s
+Commission:   %s`, converter.ToMainUnit(r.Total), delegations, converter.ToMainUnit(r.Commission))
+}
+
 type DelegationsReward struct {
 	Validator sdk.ValAddress `json:"validator"`
 	Reward    sdk.Coins      `json:"reward"`
@@ -198,6 +208,11 @@ type DelegationsReward struct {
 func (dr DelegationsReward) String() string {
 	return fmt.Sprintf(`validator: %s, reward: %s`,
 		dr.Validator, dr.Reward.MainUnitString())
+}
+
+func (dr DelegationsReward) HumanString(converter sdk.CoinsConverter) string {
+	return fmt.Sprintf(`validator: %s, reward: %s`,
+		dr.Validator, converter.ToMainUnit(dr.Reward))
 }
 
 func queryRewards(ctx sdk.Context, _ []string, req abci.RequestQuery, k Keeper) ([]byte, sdk.Error) {

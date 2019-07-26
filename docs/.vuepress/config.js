@@ -69,7 +69,8 @@ module.exports = {
                             ['distribution.md', 'Distribution'],
                             ['guardian.md', 'Guardian'],
                             ['mint.md', 'Mint'],
-                            ['asset.md', 'Asset']
+                            ['asset.md', 'Asset'],
+                            ['random.md', 'Random']
                         ]
                     }],
                     '/cli-client/': [{
@@ -148,6 +149,13 @@ module.exports = {
                         children: [
                             ['asset/', 'iriscli asset']
                         ]
+                    },
+                    {
+                        title: 'Random',
+                        collapsable: false,
+                        children: [
+                            ['random/', 'iriscli rand']
+                        ]
                     }],
                     '/resources/': [
                         ['validator-faq.md', 'Validator FAQ'],
@@ -214,7 +222,8 @@ module.exports = {
                             ['distribution.md', '收益分配'],
                             ['guardian.md', '系统用户'],
                             ['mint.md', '通胀'],
-                            ['asset.md', '资产管理']
+                            ['asset.md', '资产管理'],
+                            ['random.md', '随机数']
                         ]
                     }],
                     '/zh/cli-client/': [{
@@ -292,6 +301,13 @@ module.exports = {
                         collapsable: false,
                         children: [
                             ['asset/', 'iriscli asset']
+                        ]
+                    },
+                    {
+                        title: '随机数',
+                        collapsable: false,
+                        children: [
+                            ['random/', 'iriscli rand']
                         ]
                     }],
                     '/zh/resources/': [

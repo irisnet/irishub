@@ -2,8 +2,9 @@ package types
 
 import (
 	"fmt"
-	sdk "github.com/irisnet/irishub/types"
 	"strings"
+
+	sdk "github.com/irisnet/irishub/types"
 )
 
 const (
@@ -64,9 +65,21 @@ func (gfo GatewayFeeOutput) String() string {
 	return out.String()
 }
 
+// HumanString implements human
+func (gfo GatewayFeeOutput) HumanString(converter sdk.CoinsConverter) string {
+	var out strings.Builder
+	if gfo.Exist {
+		out.WriteString("The gateway moniker has existed\n")
+	}
+
+	out.WriteString(fmt.Sprintf("Fee: %s", converter.ToMainUnit(sdk.Coins{gfo.Fee})))
+
+	return out.String()
+}
+
 // TokenFeesOutput is for the token fees query output
 type TokenFeesOutput struct {
-	Exist    bool     `exist`            // indicate if the token has existed
+	Exist    bool     `json:"exist"`     // indicate if the token has existed
 	IssueFee sdk.Coin `json:"issue_fee"` // issue fee
 	MintFee  sdk.Coin `json:"mint_fee"`  // mint fee
 }
@@ -82,6 +95,22 @@ func (tfo TokenFeesOutput) String() string {
   IssueFee: %s
   MintFee:  %s`,
 		tfo.IssueFee.String(), tfo.MintFee.String()))
+
+	return out.String()
+}
+
+// String implements human
+func (tfo TokenFeesOutput) HumanString(converter sdk.CoinsConverter) string {
+	var out strings.Builder
+	if tfo.Exist {
+		out.WriteString("The token id has existed\n")
+	}
+
+	out.WriteString(fmt.Sprintf(`Fees:
+  IssueFee: %s
+  MintFee:  %s`,
+		converter.ToMainUnit(sdk.Coins{tfo.IssueFee}),
+		converter.ToMainUnit(sdk.Coins{tfo.MintFee})))
 
 	return out.String()
 }

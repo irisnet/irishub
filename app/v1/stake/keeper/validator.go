@@ -89,7 +89,7 @@ func (k Keeper) mustGetValidatorByConsAddr(ctx sdk.Context, consAddr sdk.ConsAdd
 func (k Keeper) SetValidator(ctx sdk.Context, validator types.Validator) {
 	store := ctx.KVStore(k.storeKey)
 	bz := types.MustMarshalValidator(k.cdc, validator)
-	bondedToken, err := strconv.ParseFloat(validator.GetTokens().QuoInt(sdk.AttoPrecision).String(), 64)
+	bondedToken, err := strconv.ParseFloat(validator.GetTokens().QuoInt(sdk.AttoScaleFactor).String(), 64)
 	if err == nil {
 		k.metrics.BondedToken.With("validator_address", validator.ConsAddress().String()).Set(bondedToken)
 	}
@@ -420,7 +420,7 @@ func (k Keeper) InitMetrics(store sdk.KVStore) {
 	for ; iterator.Valid(); iterator.Next() {
 		addr := iterator.Key()[1:]
 		validator := types.MustUnmarshalValidator(k.cdc, addr, iterator.Value())
-		bondedToken, err := strconv.ParseFloat(validator.GetTokens().QuoInt(sdk.AttoPrecision).String(), 64)
+		bondedToken, err := strconv.ParseFloat(validator.GetTokens().QuoInt(sdk.AttoScaleFactor).String(), 64)
 		if err == nil {
 			k.metrics.BondedToken.With("validator_address", validator.ConsAddress().String()).Set(bondedToken)
 		}

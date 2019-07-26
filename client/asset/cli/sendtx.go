@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"strconv"
 	"strings"
 
 	"github.com/irisnet/irishub/app/v1/asset"
@@ -14,7 +13,6 @@ import (
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/spf13/cobra"
-	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 )
 
@@ -31,7 +29,7 @@ func GetCmdIssueToken(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "issue-token",
 		Short: "issue a new token",
-		Example: "iriscli asset issue-token --family=<family> --source=<source> --gateway=<gateway-moniker>" +
+		Example: "iriscli asset issue-token --family=<family> --source=<source> --gateway=<gateway-moniker> --decimal=<decimal>" +
 			" --symbol=<symbol> --name=<token-name> --initial-supply=<initial-supply> --from=<key-name> --chain-id=<chain-id> --fee=0.6iris",
 		PreRun: preSignCmd,
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -58,18 +56,18 @@ func GetCmdIssueToken(cdc *codec.Codec) *cobra.Command {
 			}
 
 			msg := asset.MsgIssueToken{
-				Family:         family,
-				Source:         source,
-				Gateway:        viper.GetString(FlagGateway),
-				Symbol:         viper.GetString(FlagSymbol),
-				SymbolAtSource: viper.GetString(FlagSymbolAtSource),
-				Name:           viper.GetString(FlagName),
-				Decimal:        uint8(viper.GetInt(FlagDecimal)),
-				SymbolMinAlias: viper.GetString(FlagSymbolMinAlias),
-				InitialSupply:  uint64(viper.GetInt(FlagInitialSupply)),
-				MaxSupply:      uint64(viper.GetInt(FlagMaxSupply)),
-				Mintable:       viper.GetBool(FlagMintable),
-				Owner:          owner,
+				Family:          family,
+				Source:          source,
+				Gateway:         viper.GetString(FlagGateway),
+				Symbol:          viper.GetString(FlagSymbol),
+				CanonicalSymbol: viper.GetString(FlagCanonicalSymbol),
+				Name:            viper.GetString(FlagName),
+				Decimal:         uint8(viper.GetInt(FlagDecimal)),
+				MinUnitAlias:    viper.GetString(FlagMinUnitAlias),
+				InitialSupply:   uint64(viper.GetInt(FlagInitialSupply)),
+				MaxSupply:       uint64(viper.GetInt(FlagMaxSupply)),
+				Mintable:        viper.GetBool(FlagMintable),
+				Owner:           owner,
 			}
 
 			if err := msg.ValidateBasic(); err != nil {
@@ -116,6 +114,7 @@ func GetCmdIssueToken(cdc *codec.Codec) *cobra.Command {
 	cmd.MarkFlagRequired(FlagSymbol)
 	cmd.MarkFlagRequired(FlagName)
 	cmd.MarkFlagRequired(FlagInitialSupply)
+	cmd.MarkFlagRequired(FlagDecimal)
 
 	return cmd
 }
@@ -238,7 +237,7 @@ func GetCmdEditAsset(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "edit-token",
 		Short:   "edit a existed token",
-		Example: "iriscli asset edit-token <token-id> --name=<name> --symbol-at-source=<symbol-at-source> --symbol-min-alias=<min-alias> --max-supply=<max-supply> --mintable=<mintable> --from=<your account name> --chain-id=<chain-id> --fee=0.6iris",
+		Example: "iriscli asset edit-token <token-id> --name=<name> --canonical-symbol=<canonical-symbol> --min-unit-alias=<min-alias> --max-supply=<max-supply> --mintable=<mintable> --from=<your account name> --chain-id=<chain-id> --fee=0.6iris",
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
@@ -255,23 +254,16 @@ func GetCmdEditAsset(cdc *codec.Codec) *cobra.Command {
 
 			tokenId := args[0]
 			name := viper.GetString(FlagName)
-			symbolAtSource := viper.GetString(FlagSymbolAtSource)
-			symbolMinAlias := viper.GetString(FlagSymbolMinAlias)
+			canonicalSymbol := viper.GetString(FlagCanonicalSymbol)
+			minUnitAlias := viper.GetString(FlagMinUnitAlias)
 			maxSupply := uint64(viper.GetInt(FlagMaxSupply))
-			mintable := (*bool)(nil)
-
-			flags := cmd.Flags()
-			flags.Visit(func(f *pflag.Flag) {
-				if f.Name == FlagMintable {
-					value := f.Value.String()
-					if b, err := strconv.ParseBool(value); err == nil {
-						mintable = &b
-					}
-				}
-			})
+			mintable, err := asset.ParseBool(viper.GetString(FlagMintable))
+			if err != nil {
+				return err
+			}
 			var msg sdk.Msg
 			msg = asset.NewMsgEditToken(name,
-				symbolAtSource, symbolMinAlias, tokenId, maxSupply, mintable, owner)
+				canonicalSymbol, minUnitAlias, tokenId, maxSupply, mintable, owner)
 
 			if err := msg.ValidateBasic(); err != nil {
 				return err

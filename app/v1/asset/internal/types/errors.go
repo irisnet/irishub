@@ -25,8 +25,8 @@ const (
 	CodeInvalidAssetSource            sdk.CodeType = 112
 	CodeInvalidAssetName              sdk.CodeType = 113
 	CodeInvalidAssetSymbol            sdk.CodeType = 114
-	CodeInvalidAssetSymbolAtSource    sdk.CodeType = 115
-	CodeInvalidAssetSymbolMinAlias    sdk.CodeType = 116
+	CodeInvalidAssetCanonicalSymbol   sdk.CodeType = 115
+	CodeInvalidAssetMinUnitAlias      sdk.CodeType = 116
 	CodeInvalidAssetInitSupply        sdk.CodeType = 117
 	CodeInvalidAssetMaxSupply         sdk.CodeType = 118
 	CodeInvalidAssetDecimal           sdk.CodeType = 119
@@ -58,12 +58,12 @@ func ErrInvalidAssetName(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidAssetName, msg)
 }
 
-func ErrInvalidAssetSymbolAtSource(codespace sdk.CodespaceType, msg string) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidAssetSymbolAtSource, msg)
+func ErrInvalidAssetCanonicalSymbol(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidAssetCanonicalSymbol, msg)
 }
 
-func ErrInvalidAssetSymbolMinAlias(codespace sdk.CodespaceType, msg string) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidAssetSymbolMinAlias, msg)
+func ErrInvalidAssetMinUnitAlias(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidAssetMinUnitAlias, msg)
 }
 
 func ErrInvalidAssetSymbol(codespace sdk.CodespaceType, msg string) sdk.Error {

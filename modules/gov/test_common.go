@@ -11,11 +11,11 @@ import (
 	"github.com/tendermint/tendermint/crypto"
 
 	"fmt"
+	"github.com/irisnet/irishub/mock"
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/modules/bank"
 	"github.com/irisnet/irishub/modules/distribution"
 	"github.com/irisnet/irishub/modules/guardian"
-	"github.com/irisnet/irishub/mock"
 	"github.com/irisnet/irishub/modules/params"
 	"github.com/irisnet/irishub/modules/stake"
 	sdk "github.com/irisnet/irishub/types"
@@ -51,7 +51,7 @@ func getMockApp(t *testing.T, numGenAccs int) (*mock.App, Keeper, stake.Keeper, 
 		stake.NopMetrics())
 	dk := distribution.NewKeeper(mapp.Cdc, keyDistr, paramsKeeper.Subspace(distribution.DefaultParamspace), ck, sk, feeKeeper, DefaultCodespace, distribution.NopMetrics())
 	guardianKeeper := guardian.NewKeeper(mapp.Cdc, sdk.NewKVStoreKey("guardian"), guardian.DefaultCodespace)
-	gk := NewKeeper(keyGov, mapp.Cdc, paramsKeeper.Subspace(DefaultParamSpace), paramsKeeper, sdk.NewProtocolKeeper(sdk.NewKVStoreKey("main")), ck, dk, guardianKeeper, sk, DefaultCodespace,NopMetrics())
+	gk := NewKeeper(keyGov, mapp.Cdc, paramsKeeper.Subspace(DefaultParamSpace), paramsKeeper, sdk.NewProtocolKeeper(sdk.NewKVStoreKey("main")), ck, dk, guardianKeeper, sk, DefaultCodespace, NopMetrics())
 
 	mapp.Router().AddRoute("gov", []*sdk.KVStoreKey{keyGov}, NewHandler(gk))
 
@@ -60,7 +60,7 @@ func getMockApp(t *testing.T, numGenAccs int) (*mock.App, Keeper, stake.Keeper, 
 
 	require.NoError(t, mapp.CompleteSetup(keyGov))
 
-	coin, _ := sdk.IRIS.ConvertToMinCoin(fmt.Sprintf("%d%s", 1042, sdk.NativeTokenName))
+	coin, _ := sdk.IrisCoinType.ConvertToMinDenomCoin(fmt.Sprintf("%d%s", 1042, sdk.Iris))
 	genAccs, addrs, pubKeys, privKeys := mock.CreateGenAccounts(numGenAccs, sdk.Coins{coin})
 
 	mock.SetGenesis(mapp, genAccs)

@@ -43,6 +43,7 @@ irislcd start --chain-id=<chain-id> --laddr=tcp://0.0.0.0:1317
 Once IRISLCD is started, you can open `localhost:1317/swagger-ui/` in your explorer and all restful APIs will be shown. The `swagger-ui` page has detailed description about APIs' functionality and required parameters. Here we just list all APIs and introduce their functionality briefly.
 
 1. Tendermint APIs, such as query blocks, transactions and validator set
+
     1. `GET /node-info`: The properties of the connected node
     2. `GET /syncing`: Syncing state of node
     3. `GET /blocks/latest`: Get the latest block
@@ -54,29 +55,19 @@ Once IRISLCD is started, you can open `localhost:1317/swagger-ui/` in your explo
     9. `GET /txs/{hash}`: Get a Tx by hash
     10. `GET /txs`: Search transactions
 
-2. Key management APIs
+2. Broadcast transactions
 
-    1. `GET /keys`: List of accounts stored locally
-    2. `POST /keys`: Create a new account locally
-    3. `GET /keys/seed`: Create a new seed to create a new account with
-    4. `GET /keys/{name}`: Get a certain locally stored account
-    5. `PUT /keys/{name}`: Update the password for this account in the KMS
-    6. `DELETE /keys/{name}`: Remove an account
-    7. `POST /keys/{name}/recover`: Recover a account from a seed
+    1. `POST /tx/broadcast`: Broadcast a signed StdTx which is amino or json encoded
 
-3. Sign and broadcast transactions
+3. Bank module APIs
 
-    1. `POST /tx/sign`: Sign a transaction
-    2. `POST /tx/broadcast`: Broadcast a signed StdTx with amino encoding signature and public key
-
-4. Bank module APIs
     1. `GET /bank/coins/{type}`: Get coin type
     2. `GET /bank/token-stats`: Get token statistic
     3. `GET /bank/accounts/{address}`: Get the account information on blockchain
     4. `POST /bank/accounts/{address}/send`: Send coins (build -> sign -> send)
     5. `POST /bank/accounts/{address}/burn`: Burn coins
     
-5. Stake module APIs
+4. Stake module APIs
 
     1. `POST /stake/delegators/{delegatorAddr}/delegations`: Submit delegation transaction
     2. `POST /stake/delegators/{delegatorAddr}/redelegations`: Submit redelegation transaction
@@ -97,31 +88,37 @@ Once IRISLCD is started, you can open `localhost:1317/swagger-ui/` in your explo
     17. `GET /stake/pool`: Get the current state of the staking pool
     18. `GET /stake/parameters`: Get the current staking parameter values
 
-6. Governance module APIs
-
-    1. `POST /gov/proposals`: Submit a proposal
-    2. `GET /gov/proposals`: Query proposals
-    3. `POST /gov/proposals/{proposalId}/deposits`: Deposit tokens to a proposal
-    4. `GET /gov/proposals/{proposalId}/deposits`: Query deposits
-    5. `POST /gov/proposals/{proposalId}/votes`: Vote a proposal
-    6. `GET /gov/proposals/{proposalId}/votes`: Query voters
-    7. `GET /gov/proposals/{proposalId}`: Query a proposal
-    8. `GET /gov/proposals/{proposalId}/deposits/{depositor}`: Query deposit
-    9. `GET /gov/proposals/{proposalId}/votes/{voter}`: Query vote
-    10. `GET /gov/params`: Query governance parameters
-
-7. Slashing module APIs
+5. Slashing module APIs
     1. `GET /slashing/validators/{validatorPubKey}/signing-info`: Get sign info of given validator
     2. `POST /slashing/validators/{validatorAddr}/unjail`: Unjail a jailed validator
 
-8. Distribution module APIs
+6. Distribution module APIs
 
     1. `POST /distribution/{delegatorAddr}/withdraw-address`: Set withdraw address
     2. `GET /distribution/{delegatorAddr}/withdraw-address`: Query withdraw address
     3. `POST /distribution/{delegatorAddr}/rewards/withdraw`: Withdraw reward
     4. `GET /distribution/{address}/rewards`: Query rewards
     5. `GET /distribution/community-tax`: Query community tax
-    
+   
+7. Asset module APIs
+
+    1. `GET /asset/gateways/{moniker}`: Query the gateway of a given moniker
+    2. `GET /asset/gateways`: Query all the gateways with an optional owner
+    3. `GET /asset/fees/gateways/{moniker}`: Query the creation fee of a given gateway
+    4. `GET /asset/fees/tokens/{id}`: Query the fees for issuing and minting the specified token
+    5. `POST /asset/gateways`: Create a gateway
+    6. `PUT /asset/gateways/{moniker}`: Edit an existing gateway
+    7. `POST /asset/gateways/{moniker}/transfer`: Transfer the ownership of the given gateway
+    8. `PUT /asset/tokens/{token-id}`: Edit an existing token
+    9. `POST /asset/tokens/{token-id}/mint`: The asset owner and operator can directly mint tokens to a specified address
+    10. `POST /asset/tokens/{token-id}/transfer-owner`: transfer the owner of a token to a new owner
+
+8. Rand module APIs
+   
+    1. `POST /rand/rands`: Request a randon number
+    2. `GET /rand/rands/{request-id}`: Query a random number by the specified request id
+    3. `GET /rand/queue`: Query the pending requests with an optional height
+
 9. Service module APIs
 
     1. `POST /service/definitions`: Add a service definition
@@ -141,19 +138,23 @@ Once IRISLCD is started, you can open `localhost:1317/swagger-ui/` in your explo
     15. `POST /service/fees/{address}/refund`: Refund service return fee of consumer
     16. `POST /service/fees/{address}/withdraw`: Withdraw service incoming fee of provider
 
-10. Asset module APIs
-    1. `GET /asset/gateways/{moniker}`: Query the gateway of a given moniker
-    2. `GET /asset/gateways`: Query all the gateways with an optional owner
-    3. `GET /asset/fees/gateways/{moniker}`: Query the creation fee of a given gateway
-    4. `GET /asset/fees/tokens/{id}`: Query the fees for issuing and minting the specified token
-    5. `POST /asset/gateways`: Create a gateway
-    6. `PUT /asset/gateways/{moniker}`: Edit an existing gateway
-    7. `POST /asset/gateways/{moniker}/transfer`: Transfer the ownership of the given gateway
-    8. `PUT /asset/tokens/{token-id}`: Edit an existing token
-    9. `POST /asset/tokens/{token-id}/mint`: The asset owner and operator can directly mint tokens to a specified address
-    10. `POST /asset/tokens/{token-id}/transfer-owner`: transfer the owner of a token to a new owner
+10. Params module APIs
     
-11. Query app version
+    1. `GET /params`: Query system params
+
+11. Governance module APIs
+
+    1. `POST /gov/proposals`: Submit a proposal
+    2. `GET /gov/proposals`: Query proposals
+    3. `POST /gov/proposals/{proposalId}/deposits`: Deposit tokens to a proposal
+    4. `GET /gov/proposals/{proposalId}/deposits`: Query deposits
+    5. `POST /gov/proposals/{proposalId}/votes`: Vote a proposal
+    6. `GET /gov/proposals/{proposalId}/votes`: Query voters
+    7. `GET /gov/proposals/{proposalId}`: Query a proposal
+    8. `GET /gov/proposals/{proposalId}/deposits/{depositor}`: Query deposit
+    9. `GET /gov/proposals/{proposalId}/votes/{voter}`: Query vote
+
+12. Query app version
 
     1. `GET /version`: Version of IRISLCD
     2. `GET /node-version`: Version of the connected node
@@ -170,14 +171,13 @@ These apis are picked out from above section. And they can be used to build and 
 7. `POST /gov/proposals/{proposalId}/votes`: Vote a proposal
 8. `POST /slashing/validators/{validatorAddr}/unjail`: Unjail a jailed validator
 
-They all support the these special query parameters below. By default, their values are all false. And each parameter has its unique priority( Here `0` is the top priority). If multiple parameters are specified to true, then the parameters with lower priority will be ignored. For instance, if `generate-only` is true, then all other parameters, such as `simulate` and `commit` will be ignored.  
+Among these APIs, `/tx/broadcast` supports these special query parameters below. By default, their values are all false. And each parameter has its unique priority( Here `0` is the top priority). If multiple parameters are specified to true, then the parameters with lower priority will be ignored. For instance, if `simulate` is true, then `commit` and `async` will be ignored.  
 
 | parameter name   | Type | Default | Priority | Description                 |
 | --------------- | ---- | ------- |--------- |--------------------------- |
-| generate-only   | bool | false | 0 | Build an unsigned transaction and return it back |
-| simulate        | bool | false | 1 | Ignore the gas field and perform a simulation of a transaction, but don’t broadcast it |
-| commit          | bool | false | 2 | Wait for transaction being included in a block   |
-| async           | bool | false | 3 | Broadcast transaction asynchronously   |
+| simulate        | bool | false | 0 | Ignore the gas field and perform a simulation of a transaction, but don’t broadcast it |
+| commit          | bool | false | 1 | Wait for transaction being included in a block   |
+| async           | bool | false | 2 | Broadcast transaction asynchronously   |
 
 ## Change Log
 Please refer to [CHANGELOG](CHANGELOG.md)
