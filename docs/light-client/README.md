@@ -100,7 +100,7 @@ Once IRISLCD is started, you can open `localhost:1317/swagger-ui/` in your explo
     4. `GET /distribution/{address}/rewards`: Query rewards
     5. `GET /distribution/community-tax`: Query community tax
    
-7.  Asset module APIs
+7. Asset module APIs
 
     1. `GET /asset/gateways/{moniker}`: Query the gateway of a given moniker
     2. `GET /asset/gateways`: Query all the gateways with an optional owner
@@ -113,7 +113,13 @@ Once IRISLCD is started, you can open `localhost:1317/swagger-ui/` in your explo
     9. `POST /asset/tokens/{token-id}/mint`: The asset owner and operator can directly mint tokens to a specified address
     10. `POST /asset/tokens/{token-id}/transfer-owner`: transfer the owner of a token to a new owner
 
-8. Service module APIs
+8. Rand module APIs
+   
+    1. `POST /rand/rands`: Request a randon number
+    2. `GET /rand/rands/{request-id}`: Query a random number by the specified request id
+    3. `GET /rand/queue`: Query the pending requests with an optional height
+
+9. Service module APIs
 
     1. `POST /service/definitions`: Add a service definition
     2. `GET /service/definitions/{defChainId}/{serviceName}`: Query service definition
@@ -132,11 +138,11 @@ Once IRISLCD is started, you can open `localhost:1317/swagger-ui/` in your explo
     15. `POST /service/fees/{address}/refund`: Refund service return fee of consumer
     16. `POST /service/fees/{address}/withdraw`: Withdraw service incoming fee of provider
 
-9.  Params module APIs
+10. Params module APIs
     
     1. `GET /params`: Query system params
 
-10.  Governance module APIs
+11. Governance module APIs
 
     1. `POST /gov/proposals`: Submit a proposal
     2. `GET /gov/proposals`: Query proposals
@@ -148,7 +154,7 @@ Once IRISLCD is started, you can open `localhost:1317/swagger-ui/` in your explo
     8. `GET /gov/proposals/{proposalId}/deposits/{depositor}`: Query deposit
     9. `GET /gov/proposals/{proposalId}/votes/{voter}`: Query vote
 
-11.  Query app version
+12. Query app version
 
     1. `GET /version`: Version of IRISLCD
     2. `GET /node-version`: Version of the connected node
