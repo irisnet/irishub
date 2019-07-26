@@ -5,7 +5,6 @@ import (
 
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/params"
-	stakeTypes "github.com/irisnet/irishub/modules/stake/types"
 	sdk "github.com/irisnet/irishub/types"
 	"strconv"
 	"time"
@@ -255,9 +254,9 @@ func (p *GovParams) StringFromBytes(cdc *codec.Codec, key string, bytes []byte) 
 
 // default minting module parameters
 func DefaultParams() GovParams {
-	var criticalMinDeposit, _ = sdk.IRIS.ConvertToMinCoin(fmt.Sprintf("%d%s", CRITICAL_DEPOSIT, stakeTypes.StakeTokenName))
-	var importantMinDeposit, _ = sdk.IRIS.ConvertToMinCoin(fmt.Sprintf("%d%s", IMPORTANT_DEPOSIT, stakeTypes.StakeTokenName))
-	var normalMinDeposit, _ = sdk.IRIS.ConvertToMinCoin(fmt.Sprintf("%d%s", NORMAL_DEPOSIT, stakeTypes.StakeTokenName))
+	var criticalMinDeposit, _ = sdk.IrisCoinType.ConvertToMinDenomCoin(fmt.Sprintf("%d%s", CRITICAL_DEPOSIT, sdk.Iris))
+	var importantMinDeposit, _ = sdk.IrisCoinType.ConvertToMinDenomCoin(fmt.Sprintf("%d%s", IMPORTANT_DEPOSIT, sdk.Iris))
+	var normalMinDeposit, _ = sdk.IrisCoinType.ConvertToMinDenomCoin(fmt.Sprintf("%d%s", NORMAL_DEPOSIT, sdk.Iris))
 
 	if sdk.NetworkType == sdk.Mainnet {
 		return GovParams{
@@ -323,9 +322,9 @@ func DefaultParams() GovParams {
 }
 
 func DefaultParamsForTest() GovParams {
-	var criticalMinDeposit, _ = sdk.IRIS.ConvertToMinCoin(fmt.Sprintf("%d%s", 10, stakeTypes.StakeTokenName))
-	var importantMinDeposit, _ = sdk.IRIS.ConvertToMinCoin(fmt.Sprintf("%d%s", 10, stakeTypes.StakeTokenName))
-	var normalMinDeposit, _ = sdk.IRIS.ConvertToMinCoin(fmt.Sprintf("%d%s", 10, stakeTypes.StakeTokenName))
+	var criticalMinDeposit, _ = sdk.IrisCoinType.ConvertToMinDenomCoin(fmt.Sprintf("%d%s", 10, sdk.Iris))
+	var importantMinDeposit, _ = sdk.IrisCoinType.ConvertToMinDenomCoin(fmt.Sprintf("%d%s", 10, sdk.Iris))
+	var normalMinDeposit, _ = sdk.IrisCoinType.ConvertToMinDenomCoin(fmt.Sprintf("%d%s", 10, sdk.Iris))
 
 	return GovParams{
 		CriticalDepositPeriod: time.Duration(30 * time.Second),
@@ -467,12 +466,12 @@ type TallyingProcedure struct {
 }
 
 func validateDepositProcedure(dp DepositProcedure, level string) sdk.Error {
-	if dp.MinDeposit[0].Denom != stakeTypes.StakeDenom {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidMinDepositDenom, fmt.Sprintf(level+"MinDeposit denom should be %s!", stakeTypes.StakeDenom))
+	if dp.MinDeposit[0].Denom != sdk.IrisAtto {
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidMinDepositDenom, fmt.Sprintf(level+"MinDeposit denom should be %s!", sdk.IrisAtto))
 	}
 
-	LowerBound, _ := sdk.IRIS.ConvertToMinCoin(fmt.Sprintf("%d%s", LOWER_BOUND_AMOUNT, stakeTypes.StakeTokenName))
-	UpperBound, _ := sdk.IRIS.ConvertToMinCoin(fmt.Sprintf("%d%s", UPPER_BOUND_AMOUNT, stakeTypes.StakeTokenName))
+	LowerBound, _ := sdk.IrisCoinType.ConvertToMinDenomCoin(fmt.Sprintf("%d%s", LOWER_BOUND_AMOUNT, sdk.Iris))
+	UpperBound, _ := sdk.IrisCoinType.ConvertToMinDenomCoin(fmt.Sprintf("%d%s", UPPER_BOUND_AMOUNT, sdk.Iris))
 
 	if dp.MinDeposit[0].Amount.LT(LowerBound.Amount) || dp.MinDeposit[0].Amount.GT(UpperBound.Amount) {
 		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidMinDepositAmount, fmt.Sprintf(level+"MinDepositAmount"+dp.MinDeposit[0].String()+" should be larger than 10iris and less than 10000iris"))

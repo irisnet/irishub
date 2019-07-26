@@ -52,15 +52,15 @@ type Params struct {
 
 func (p Params) String() string {
 	return fmt.Sprintf(`Slashing Params:
-  Max Evidence Age:              %d
-  Signed Blocks Window:          %d
-  Min Signed Per Window:         %s
-  DoubleSign Jail Duration:      %s
-  Downtime Jail Duration:        %s
-  Censorship Jail Duration:      %s
-  Slash Fraction DoubleSign:     %s
-  Slash Fraction Downtime:       %s
-  Slash Fraction Censorship:     %s`,
+  slashing/MaxEvidenceAge:           %d
+  slashing/SignedBlocksWindow:       %d
+  slashing/MinSignedPerWindow:       %s
+  slashing/DoubleSignJailDuration:   %s
+  slashing/DowntimeJailDuration:     %s
+  slashing/CensorshipJailDuration:   %s
+  slashing/SlashFractionDoubleSign:  %s
+  slashing/SlashFractionDowntime:    %s
+  slashing/SlashFractionCensorship:  %s`,
 		p.MaxEvidenceAge, p.SignedBlocksWindow, p.MinSignedPerWindow.String(),
 		p.DoubleSignJailDuration, p.DowntimeJailDuration,
 		p.CensorshipJailDuration, p.SlashFractionDoubleSign.String(),
@@ -206,6 +206,10 @@ func (p *Params) StringFromBytes(cdc *codec.Codec, key string, bytes []byte) (st
 	default:
 		return "", fmt.Errorf("%s is not existed", key)
 	}
+}
+
+func (p *Params) ReadOnly() bool {
+	return false
 }
 
 // Default parameters used by Iris Hub

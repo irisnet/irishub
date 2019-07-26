@@ -296,10 +296,9 @@ func (cliCtx CLIContext) GetCoinType(coinName string) (sdk.CoinType, error) {
 	if coinName == "" {
 		return sdk.CoinType{}, fmt.Errorf("coin name is empty")
 	}
-	if coinName == sdk.NativeTokenName {
-		coinType = sdk.IRIS
+	if coinName == sdk.Iris {
+		coinType = sdk.IrisCoinType
 	} else {
-
 		params := asset.QueryTokenParams{
 			TokenId: coinName,
 		}
@@ -320,13 +319,13 @@ func (cliCtx CLIContext) GetCoinType(coinName string) (sdk.CoinType, error) {
 			return sdk.CoinType{}, err
 		}
 
-		return token.GetCoinType(), nil
+		coinType = token.GetCoinType()
 	}
 
 	return coinType, nil
 }
 
-func (cliCtx CLIContext) ConvertCoinToMainUnit(coinsStr string) (coins []string, err error) {
+func (cliCtx CLIContext) ConvertToMainUnit(coinsStr string) (coins []string, err error) {
 	coinsStr = strings.TrimSpace(coinsStr)
 	if len(coinsStr) == 0 {
 		return coins, nil
@@ -356,7 +355,7 @@ func (cliCtx CLIContext) ParseCoin(coinStr string) (sdk.Coin, error) {
 		return sdk.Coin{}, err
 	}
 
-	coin, err := coinType.ConvertToMinCoin(coinStr)
+	coin, err := coinType.ConvertToMinDenomCoin(coinStr)
 	if err != nil {
 		return sdk.Coin{}, err
 	}
@@ -453,7 +452,12 @@ func (ctx CLIContext) PrintOutput(toPrint fmt.Stringer) (err error) {
 
 	switch ctx.OutputFormat {
 	case "text":
-		out = []byte(toPrint.String())
+		humanStringer, ok := toPrint.(sdk.Stringer)
+		if ok {
+			out = []byte(humanStringer.HumanString(ctx))
+		} else {
+			out = []byte(toPrint.String())
+		}
 
 	case "json":
 		if ctx.Indent {

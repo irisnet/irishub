@@ -225,9 +225,9 @@ func (coins DecCoins) MainUnitString() string {
 	out := ""
 	for _, coin := range coins {
 		// only convert iris now
-		if coin.Denom == sdk.NativeTokenMinDenom {
+		if coin.Denom == sdk.IrisAtto {
 			truncateCoin, _ := coin.TruncateDecimal()
-			destCoinStr, err := sdk.IRIS.Convert(truncateCoin.String(), sdk.NativeTokenName)
+			destCoinStr, err := sdk.IrisCoinType.Convert(truncateCoin.String(), sdk.Iris)
 			if err == nil {
 				out += fmt.Sprintf("%v,", destCoinStr)
 				continue

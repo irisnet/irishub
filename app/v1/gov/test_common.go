@@ -53,7 +53,7 @@ func getMockApp(t *testing.T, numGenAccs int) (*mock.App, Keeper, stake.Keeper, 
 		stake.NopMetrics())
 	dk := distribution.NewKeeper(mapp.Cdc, keyDistr, paramsKeeper.Subspace(distribution.DefaultParamspace), ck, sk, feeKeeper, DefaultCodespace, distribution.NopMetrics())
 	guardianKeeper := guardian.NewKeeper(mapp.Cdc, sdk.NewKVStoreKey("guardian"), guardian.DefaultCodespace)
-	ak := asset.NewKeeper(mapp.Cdc, protocol.KeyAsset, ck, guardianKeeper, asset.DefaultCodespace, paramsKeeper.Subspace(asset.DefaultParamSpace))
+	ak := asset.NewKeeper(mapp.Cdc, protocol.KeyAsset, ck, asset.DefaultCodespace, paramsKeeper.Subspace(asset.DefaultParamSpace))
 
 	gk := NewKeeper(keyGov, mapp.Cdc, paramsKeeper.Subspace(DefaultParamSpace), paramsKeeper, sdk.NewProtocolKeeper(sdk.NewKVStoreKey("main")), ck, dk, guardianKeeper, sk, DefaultCodespace, NopMetrics(), ak)
 
@@ -64,7 +64,7 @@ func getMockApp(t *testing.T, numGenAccs int) (*mock.App, Keeper, stake.Keeper, 
 
 	require.NoError(t, mapp.CompleteSetup(keyGov))
 
-	coin, _ := sdk.IRIS.ConvertToMinCoin(fmt.Sprintf("%d%s", 1042, sdk.NativeTokenName))
+	coin, _ := sdk.IrisCoinType.ConvertToMinDenomCoin(fmt.Sprintf("%d%s", 1042, sdk.Iris))
 	genAccs, addrs, pubKeys, privKeys := mock.CreateGenAccounts(numGenAccs, sdk.Coins{coin})
 
 	mock.SetGenesis(mapp, genAccs)

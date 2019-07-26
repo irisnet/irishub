@@ -28,12 +28,12 @@ type postProposalReq struct {
 }
 
 type token struct {
-	Symbol         string `json:"symbol"`
-	SymbolAtSource string `json:"symbol_at_source"`
-	Name           string `json:"name"`
-	Decimal        uint8  `json:"decimal"`
-	SymbolMinAlias string `json:"symbol_min_alias"`
-	InitialSupply  uint64 `json:"initial_supply"`
+	Symbol          string `json:"symbol"`
+	CanonicalSymbol string `json:"canonical_symbol"`
+	Name            string `json:"name"`
+	Decimal         uint8  `json:"decimal"`
+	MinUnitAlias    string `json:"min_unit_alias"`
+	InitialSupply   uint64 `json:"initial_supply"`
 }
 
 type depositReq struct {
@@ -50,9 +50,6 @@ type voteReq struct {
 
 func postProposalHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
-		cliCtx = utils.InitReqCliCtx(cliCtx, r)
-
 		var req postProposalReq
 		err := utils.ReadPostBody(w, r, cdc, &req)
 		if err != nil {
@@ -60,7 +57,7 @@ func postProposalHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Han
 		}
 
 		baseReq := req.BaseTx.Sanitize()
-		if !baseReq.ValidateBasic(w, cliCtx) {
+		if !baseReq.ValidateBasic(w) {
 			return
 		}
 
@@ -76,19 +73,21 @@ func postProposalHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Han
 			return
 		}
 
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
+
 		// create the message
 		msg := gov.NewMsgSubmitProposal(req.Title, req.Description, proposalType, req.Proposer, initDepositAmount, gov.Params{req.Param})
 		if msg.ProposalType == gov.ProposalTypeCommunityTaxUsage {
-			taxMsg := gov.NewMsgSubmitTaxUsageProposal(msg, req.Usage, req.DestAddress, req.Percent)
+			taxMsg := gov.NewMsgSubmitCommunityTaxUsageProposal(msg, req.Usage, req.DestAddress, req.Percent)
 			err = msg.ValidateBasic()
 			if err != nil {
 				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 				return
 			}
-			utils.SendOrReturnUnsignedTx(w, cliCtx, req.BaseTx, []sdk.Msg{taxMsg})
+			utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{taxMsg})
 			return
 		}
-		if proposalType == gov.ProposalTypeParameterChange {
+		if proposalType == gov.ProposalTypeParameter {
 			if err := client.ValidateParam(req.Param); err != nil {
 				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 				return
@@ -96,28 +95,27 @@ func postProposalHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Han
 		}
 		if msg.ProposalType == gov.ProposalTypeTokenAddition {
 			token := req.Token
-			tokenMsg := gov.NewMsgSubmitAddTokenProposal(msg, token.Symbol, token.SymbolAtSource, token.Name, token.SymbolMinAlias, token.Decimal, token.InitialSupply)
+			tokenMsg := gov.NewMsgSubmitTokenAdditionProposal(msg, token.Symbol, token.CanonicalSymbol, token.Name, token.MinUnitAlias, token.Decimal, token.InitialSupply)
 			if tokenMsg.ValidateBasic() != nil {
 				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 				return
 			}
-			utils.SendOrReturnUnsignedTx(w, cliCtx, req.BaseTx, []sdk.Msg{tokenMsg})
+			utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{tokenMsg})
 			return
 		}
+
 		err = msg.ValidateBasic()
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		utils.SendOrReturnUnsignedTx(w, cliCtx, req.BaseTx, []sdk.Msg{msg})
+		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
 	}
 }
 
 func depositHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
-		cliCtx = utils.InitReqCliCtx(cliCtx, r)
 		vars := mux.Vars(r)
 		strProposalID := vars[RestProposalID]
 
@@ -138,7 +136,7 @@ func depositHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerF
 		}
 
 		baseReq := req.BaseTx.Sanitize()
-		if !baseReq.ValidateBasic(w, cliCtx) {
+		if !baseReq.ValidateBasic(w) {
 			return
 		}
 
@@ -147,6 +145,7 @@ func depositHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerF
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
+
 		// create the message
 		msg := gov.NewMsgDeposit(req.Depositor, proposalID, depositAmount)
 		err = msg.ValidateBasic()
@@ -155,14 +154,14 @@ func depositHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerF
 			return
 		}
 
-		utils.SendOrReturnUnsignedTx(w, cliCtx, req.BaseTx, []sdk.Msg{msg})
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
+
+		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
 	}
 }
 
 func voteHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
-		cliCtx = utils.InitReqCliCtx(cliCtx, r)
 		vars := mux.Vars(r)
 		strProposalID := vars[RestProposalID]
 
@@ -184,7 +183,7 @@ func voteHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc
 		}
 
 		baseReq := req.BaseTx.Sanitize()
-		if !baseReq.ValidateBasic(w, cliCtx) {
+		if !baseReq.ValidateBasic(w) {
 			return
 		}
 
@@ -202,6 +201,8 @@ func voteHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc
 			return
 		}
 
-		utils.SendOrReturnUnsignedTx(w, cliCtx, req.BaseTx, []sdk.Msg{msg})
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
+
+		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
 	}
 }

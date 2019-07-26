@@ -56,19 +56,19 @@ func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec
 }
 
 type issueTokenReq struct {
-	BaseTx         utils.BaseTx      `json:"base_tx"`
-	Owner          sdk.AccAddress    `json:"owner"` //  Owner of the token
-	Family         asset.AssetFamily `json:"family"`
-	Source         asset.AssetSource `json:"source"`
-	Gateway        string            `json:"gateway"`
-	Symbol         string            `json:"symbol"`
-	SymbolAtSource string            `json:"symbol_at_source"`
-	Name           string            `json:"name"`
-	Decimal        uint8             `json:"decimal"`
-	SymbolMinAlias string            `json:"symbol_min_alias"`
-	InitialSupply  uint64            `json:"initial_supply"`
-	MaxSupply      uint64            `json:"max_supply"`
-	Mintable       bool              `json:"mintable"`
+	BaseTx          utils.BaseTx      `json:"base_tx"`
+	Owner           sdk.AccAddress    `json:"owner"` //  Owner of the token
+	Family          asset.AssetFamily `json:"family"`
+	Source          asset.AssetSource `json:"source"`
+	Gateway         string            `json:"gateway"`
+	Symbol          string            `json:"symbol"`
+	CanonicalSymbol string            `json:"canonical_symbol"`
+	Name            string            `json:"name"`
+	Decimal         uint8             `json:"decimal"`
+	MinUnitAlias    string            `json:"min_unit_alias"`
+	InitialSupply   uint64            `json:"initial_supply"`
+	MaxSupply       uint64            `json:"max_supply"`
+	Mintable        bool              `json:"mintable"`
 }
 
 type createGatewayReq struct {
@@ -95,13 +95,13 @@ type transferGatewayOwnerReq struct {
 }
 
 type editTokenReq struct {
-	BaseTx         utils.BaseTx   `json:"base_tx"`
-	Owner          sdk.AccAddress `json:"owner"`            //  owner of asset
-	SymbolAtSource string         `json:"symbol_at_source"` //  symbol_at_source of asset
-	SymbolMinAlias string         `json:"symbol_min_alias"` //  symbol_min_alias of asset
-	MaxSupply      uint64         `json:"max_supply"`
-	Mintable       *bool          `json:"mintable"` //  mintable of asset
-	Name           string         `json:"name"`
+	BaseTx          utils.BaseTx   `json:"base_tx"`
+	Owner           sdk.AccAddress `json:"owner"`            //  owner of asset
+	CanonicalSymbol string         `json:"canonical_symbol"` //  canonical_symbol of asset
+	MinUnitAlias    string         `json:"min_unit_alias"`   //  min_unit_alias of asset
+	MaxSupply       uint64         `json:"max_supply"`
+	Mintable        string         `json:"mintable"` //  mintable of asset
+	Name            string         `json:"name"`
 }
 
 type transferTokenOwnerReq struct {
@@ -119,8 +119,6 @@ type mintTokenReq struct {
 
 func createGatewayHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		cliCtx = utils.InitReqCliCtx(cliCtx, r)
-
 		var req createGatewayReq
 		err := utils.ReadPostBody(w, r, cdc, &req)
 		if err != nil {
@@ -128,7 +126,7 @@ func createGatewayHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Ha
 		}
 
 		baseReq := req.BaseTx.Sanitize()
-		if !baseReq.ValidateBasic(w, cliCtx) {
+		if !baseReq.ValidateBasic(w) {
 			return
 		}
 
@@ -140,14 +138,14 @@ func createGatewayHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Ha
 			return
 		}
 
-		utils.SendOrReturnUnsignedTx(w, cliCtx, req.BaseTx, []sdk.Msg{msg})
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
+
+		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
 	}
 }
 
 func editGatewayHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		cliCtx = utils.InitReqCliCtx(cliCtx, r)
-
 		vars := mux.Vars(r)
 		moniker := vars["moniker"]
 
@@ -158,7 +156,7 @@ func editGatewayHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Hand
 		}
 
 		baseReq := req.BaseTx.Sanitize()
-		if !baseReq.ValidateBasic(w, cliCtx) {
+		if !baseReq.ValidateBasic(w) {
 			return
 		}
 
@@ -170,14 +168,14 @@ func editGatewayHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Hand
 			return
 		}
 
-		utils.SendOrReturnUnsignedTx(w, cliCtx, req.BaseTx, []sdk.Msg{msg})
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
+
+		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
 	}
 }
 
 func transferGatewayOwnerHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		cliCtx = utils.InitReqCliCtx(cliCtx, r)
-
 		vars := mux.Vars(r)
 		moniker := vars["moniker"]
 
@@ -188,7 +186,7 @@ func transferGatewayOwnerHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) 
 		}
 
 		baseReq := req.BaseTx.Sanitize()
-		if !baseReq.ValidateBasic(w, cliCtx) {
+		if !baseReq.ValidateBasic(w) {
 			return
 		}
 
@@ -200,8 +198,9 @@ func transferGatewayOwnerHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) 
 			return
 		}
 
-		cliCtx.GenerateOnly = true
-		utils.SendOrReturnUnsignedTx(w, cliCtx, req.BaseTx, []sdk.Msg{msg})
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
+
+		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
 	}
 }
 
@@ -214,20 +213,21 @@ func issueTokenHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handl
 		}
 
 		baseReq := req.BaseTx.Sanitize()
-		if !baseReq.ValidateBasic(w, cliCtx) {
+		if !baseReq.ValidateBasic(w) {
 			return
 		}
 
 		// create the MsgEditGateway message
-		msg := asset.NewMsgIssueToken(req.Family, req.Source, req.Gateway, req.Symbol, req.SymbolAtSource, req.Name, req.Decimal, req.SymbolMinAlias, req.InitialSupply, req.MaxSupply, req.Mintable, req.Owner)
+		msg := asset.NewMsgIssueToken(req.Family, req.Source, req.Gateway, req.Symbol, req.CanonicalSymbol, req.Name, req.Decimal, req.MinUnitAlias, req.InitialSupply, req.MaxSupply, req.Mintable, req.Owner)
 		err = msg.ValidateBasic()
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		cliCtx.GenerateOnly = true
-		utils.SendOrReturnUnsignedTx(w, cliCtx, req.BaseTx, []sdk.Msg{msg})
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
+
+		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
 	}
 }
 
@@ -243,19 +243,26 @@ func editTokenHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handle
 		}
 
 		baseReq := req.BaseTx.Sanitize()
-		if !baseReq.ValidateBasic(w, cliCtx) {
+		if !baseReq.ValidateBasic(w) {
 			return
 		}
 
 		// create the MsgEditToken message
-		msg := asset.NewMsgEditToken(req.Name, req.SymbolAtSource, req.SymbolMinAlias, tokenId, req.MaxSupply, req.Mintable, req.Owner)
+		mintable, err := asset.ParseBool(req.Mintable)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+		msg := asset.NewMsgEditToken(req.Name, req.CanonicalSymbol, req.MinUnitAlias, tokenId, req.MaxSupply, mintable, req.Owner)
 		err = msg.ValidateBasic()
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		utils.SendOrReturnUnsignedTx(w, cliCtx, req.BaseTx, []sdk.Msg{msg})
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
+
+		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
 	}
 }
 
@@ -270,7 +277,7 @@ func transferOwnerHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Ha
 		}
 
 		baseReq := req.BaseTx.Sanitize()
-		if !baseReq.ValidateBasic(w, cliCtx) {
+		if !baseReq.ValidateBasic(w) {
 			return
 		}
 
@@ -282,7 +289,9 @@ func transferOwnerHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Ha
 			return
 		}
 
-		utils.SendOrReturnUnsignedTx(w, cliCtx, req.BaseTx, []sdk.Msg{msg})
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
+
+		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
 	}
 }
 
@@ -297,7 +306,7 @@ func mintTokenHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handle
 		}
 
 		baseReq := req.BaseTx.Sanitize()
-		if !baseReq.ValidateBasic(w, cliCtx) {
+		if !baseReq.ValidateBasic(w) {
 			return
 		}
 
@@ -309,6 +318,8 @@ func mintTokenHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handle
 			return
 		}
 
-		utils.SendOrReturnUnsignedTx(w, cliCtx, req.BaseTx, []sdk.Msg{msg})
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
+
+		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
 	}
 }

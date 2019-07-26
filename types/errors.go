@@ -133,10 +133,10 @@ func ErrUnknownRequest(msg string) Error {
 	return newErrorWithRootCodespace(CodeUnknownRequest, msg)
 }
 func ErrInvalidAddress(msg string) Error {
-	return newErrorWithRootCodespace(CodeInvalidAddress, msg)
+	return newErrorWithRootCodespace(CodeInvalidAddress, fmt.Sprintf("account %s is invalid", msg))
 }
 func ErrUnknownAddress(msg string) Error {
-	return newErrorWithRootCodespace(CodeUnknownAddress, msg)
+	return newErrorWithRootCodespace(CodeUnknownAddress, fmt.Sprintf("account %s does not exist", msg))
 }
 func ErrInvalidPubKey(msg string) Error {
 	return newErrorWithRootCodespace(CodeInvalidPubKey, msg)

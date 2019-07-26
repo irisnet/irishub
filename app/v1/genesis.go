@@ -15,10 +15,10 @@ import (
 	distr "github.com/irisnet/irishub/app/v1/distribution"
 	"github.com/irisnet/irishub/app/v1/gov"
 	"github.com/irisnet/irishub/app/v1/mint"
+	"github.com/irisnet/irishub/app/v1/rand"
 	"github.com/irisnet/irishub/app/v1/service"
 	"github.com/irisnet/irishub/app/v1/slashing"
 	"github.com/irisnet/irishub/app/v1/stake"
-	stakeTypes "github.com/irisnet/irishub/app/v1/stake/types"
 	"github.com/irisnet/irishub/app/v1/upgrade"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/guardian"
@@ -40,12 +40,13 @@ type GenesisState struct {
 	ServiceData  service.GenesisState  `json:"service"`
 	GuardianData guardian.GenesisState `json:"guardian"`
 	AssetData    asset.GenesisState    `json:"asset"`
+	RandData     rand.GenesisState     `json:"rand"`
 	GenTxs       []json.RawMessage     `json:"gentxs"`
 }
 
 func NewGenesisState(accounts []GenesisAccount, authData auth.GenesisState, stakeData stake.GenesisState, mintData mint.GenesisState,
 	distrData distr.GenesisState, govData gov.GenesisState, upgradeData upgrade.GenesisState, serviceData service.GenesisState,
-	guardianData guardian.GenesisState, slashingData slashing.GenesisState, assetData asset.GenesisState) GenesisState {
+	guardianData guardian.GenesisState, slashingData slashing.GenesisState, assetData asset.GenesisState, randData rand.GenesisState) GenesisState {
 
 	return GenesisState{
 		Accounts:     accounts,
@@ -59,6 +60,7 @@ func NewGenesisState(accounts []GenesisAccount, authData auth.GenesisState, stak
 		GuardianData: guardianData,
 		SlashingData: slashingData,
 		AssetData:    assetData,
+		RandData:     randData,
 	}
 }
 
@@ -277,37 +279,37 @@ func CollectStdTxs(cdc *codec.Codec, moniker string, genTxsDir string, genDoc tm
 	return appGenTxs, persistentPeers, nil
 }
 
-// normalize stake token to mini-unit
-func normalizeNativeToken(coins []string) sdk.Coins {
+// convert string array into min-denom coins
+func convertToMinDenomCoins(coinStrArray []string) sdk.Coins {
 	var accountCoins sdk.Coins
-	nativeCoin := sdk.NewInt64Coin(stakeTypes.StakeDenom, 0)
-	for _, coin := range coins {
-		coinName, err := types.GetCoinName(coin)
+	irisCoin := sdk.NewInt64Coin(sdk.IrisAtto, 0)
+	for _, coinStr := range coinStrArray {
+		coinName, err := types.GetCoinName(coinStr)
 		if err != nil {
-			panic(fmt.Sprintf("fatal error: failed pick out demon from coin: %s", coin))
+			panic(fmt.Sprintf("fatal error: failed to parse coin name from %s", coinStr))
 		}
-		if coinName == sdk.NativeTokenName {
-			normalizeNativeToken, err := sdk.IRIS.ConvertToMinCoin(coin)
+		if coinName == sdk.Iris {
+			convertedIrisCoin, err := sdk.IrisCoinType.ConvertToMinDenomCoin(coinStr)
 			if err != nil {
-				panic(fmt.Sprintf("fatal error in converting %s to %s", coin, stakeTypes.StakeDenom))
+				panic(fmt.Sprintf("fatal error in converting %s to %s", coinStr, sdk.IrisAtto))
 			}
-			nativeCoin = nativeCoin.Plus(normalizeNativeToken)
+			irisCoin = irisCoin.Plus(convertedIrisCoin)
 		} else {
-			// not native token
-			denom, amount, err := types.GetCoin(coin)
+			// non-iris tokens
+			denom, amount, err := types.ParseCoinParts(coinStr)
 			if err != nil {
-				panic(fmt.Sprintf("fatal error: genesis file contains invalid coin: %s", coin))
+				panic(fmt.Sprintf("fatal error: genesis file contains invalid coin: %s", coinStr))
 			}
 
 			amt, ok := sdk.NewIntFromString(amount)
 			if !ok {
-				panic(fmt.Sprintf("non-native coin(%s) amount should be integer ", coin))
+				panic(fmt.Sprintf("coin (%s) amount should be integer ", coinStr))
 			}
 			denom = strings.ToLower(denom)
 			accountCoins = append(accountCoins, sdk.NewCoin(denom, amt))
 		}
 	}
-	accountCoins = append(accountCoins, nativeCoin)
+	accountCoins = append(accountCoins, irisCoin)
 	if accountCoins.IsZero() {
 		panic("invalid genesis file, found account without any token")
 	}
@@ -319,7 +321,7 @@ func convertToGenesisState(genesisFileState GenesisFileState) GenesisState {
 	for _, gacc := range genesisFileState.Accounts {
 		acc := GenesisAccount{
 			Address:       gacc.Address,
-			Coins:         normalizeNativeToken(gacc.Coins),
+			Coins:         convertToMinDenomCoins(gacc.Coins),
 			AccountNumber: gacc.AccountNumber,
 			Sequence:      gacc.Sequence,
 		}
@@ -337,6 +339,7 @@ func convertToGenesisState(genesisFileState GenesisFileState) GenesisState {
 		ServiceData:  genesisFileState.ServiceData,
 		GuardianData: genesisFileState.GuardianData,
 		AssetData:    genesisFileState.AssetData,
+		RandData:     genesisFileState.RandData,
 		GenTxs:       genesisFileState.GenTxs,
 	}
 }
@@ -353,6 +356,7 @@ type GenesisFileState struct {
 	ServiceData  service.GenesisState  `json:"service"`
 	GuardianData guardian.GenesisState `json:"guardian"`
 	AssetData    asset.GenesisState    `json:"asset"`
+	RandData     rand.GenesisState     `json:"rand"`
 	GenTxs       []json.RawMessage     `json:"gentxs"`
 }
 
@@ -378,7 +382,7 @@ func NewGenesisFileAccount(acc *auth.BaseAccount) GenesisFileAccount {
 
 func NewGenesisFileState(accounts []GenesisFileAccount, authData auth.GenesisState, stakeData stake.GenesisState, mintData mint.GenesisState,
 	distrData distr.GenesisState, govData gov.GenesisState, upgradeData upgrade.GenesisState, serviceData service.GenesisState,
-	guardianData guardian.GenesisState, slashingData slashing.GenesisState, assetData asset.GenesisState) GenesisFileState {
+	guardianData guardian.GenesisState, slashingData slashing.GenesisState, assetData asset.GenesisState, randData rand.GenesisState) GenesisFileState {
 
 	return GenesisFileState{
 		Accounts:     accounts,
@@ -392,6 +396,7 @@ func NewGenesisFileState(accounts []GenesisFileAccount, authData auth.GenesisSta
 		GuardianData: guardianData,
 		SlashingData: slashingData,
 		AssetData:    assetData,
+		RandData:     randData,
 	}
 }
 
@@ -409,6 +414,7 @@ func NewDefaultGenesisFileState() GenesisFileState {
 		GuardianData: guardian.DefaultGenesisState(),
 		SlashingData: slashing.DefaultGenesisState(),
 		AssetData:    asset.DefaultGenesisState(),
+		RandData:     rand.DefaultGenesisState(),
 		GenTxs:       nil,
 	}
 }

@@ -3,102 +3,43 @@ package types
 import (
 	"errors"
 	"fmt"
-	"regexp"
 	"strings"
 )
 
 const (
 	//1 iris = 10^3 iris-milli
-	Milli = "milli"
+	Milli      = "milli"
+	MilliScale = 3
 
 	//1 iris = 10^6 iris-micro
-	Micro = "micro"
+	Micro      = "micro"
+	MicroScale = 6
 
 	//1 iris = 10^9 iris-nano
-	Nano = "nano"
+	Nano      = "nano"
+	NanoScale = 9
 
 	//1 iris = 10^12 iris-pico
-	Pico = "pico"
+	Pico      = "pico"
+	PicoScale = 12
 
 	//1 iris = 10^15 iris-femto
-	Femto = "femto"
+	Femto      = "femto"
+	FemtoScale = 15
 
 	//1 iris = 10^18 iris-atto
-	Atto = "atto"
-
-	Native     Origin = 0x01
-	External   Origin = 0x02
-	UserIssued Origin = 0x03
+	Atto      = "atto"
+	AttoScale = 18
 )
 
 var (
-	MainUnit = func(coinName string) Unit {
-		return NewUnit(coinName, 0)
-	}
-
-	MilliUnit = func(coinName string) Unit {
-		denom := fmt.Sprintf("%s-%s", coinName, Milli)
-		return NewUnit(denom, 3)
-	}
-
-	MicroUnit = func(coinName string) Unit {
-		denom := fmt.Sprintf("%s-%s", coinName, Micro)
-		return NewUnit(denom, 6)
-	}
-
-	NanoUnit = func(coinName string) Unit {
-		denom := fmt.Sprintf("%s-%s", coinName, Nano)
-		return NewUnit(denom, 9)
-	}
-
-	PicoUnit = func(coinName string) Unit {
-		denom := fmt.Sprintf("%s-%s", coinName, Pico)
-		return NewUnit(denom, 12)
-	}
-
-	FemtoUnit = func(coinName string) Unit {
-		denom := fmt.Sprintf("%s-%s", coinName, Femto)
-		return NewUnit(denom, 15)
-	}
-
-	AttoUnit = func(coinName string) Unit {
-		denom := fmt.Sprintf("%s-%s", coinName, Atto)
-		return NewUnit(denom, 18)
-	}
-
-	AttoPrecision = NewIntWithDecimal(1, 18)
+	IrisCoinType    = NewIrisCoinType()
+	AttoScaleFactor = IrisCoinType.MinUnit.GetScaleFactor()
 )
-
-type Origin byte
-
-func (o Origin) String() string {
-	switch o {
-	case Native:
-		return "native"
-	case External:
-		return "external"
-	case UserIssued:
-		return "userissued"
-	default:
-		return ""
-	}
-}
-
-func ToOrigin(origin string) (og Origin, err error) {
-	switch strings.ToLower(origin) {
-	case "native":
-		return Native, nil
-	case "external":
-		return External, nil
-	case "userissued":
-		return UserIssued, nil
-	}
-	return og, errors.New("not support type:" + origin)
-}
 
 type Unit struct {
 	Denom   string `json:"denom"`
-	Decimal int    `json:"decimal"`
+	Decimal uint8  `json:"decimal"`
 }
 
 func (u Unit) String() string {
@@ -107,14 +48,15 @@ func (u Unit) String() string {
 	)
 }
 
-func NewUnit(denom string, decimal int) Unit {
+func NewUnit(denom string, decimal uint8) Unit {
 	return Unit{
 		Denom:   denom,
 		Decimal: decimal,
 	}
 }
-func (u Unit) GetPrecision() Int {
-	return NewIntWithDecimal(1, u.Decimal)
+
+func (u Unit) GetScaleFactor() Int {
+	return NewIntWithDecimal(1, int(u.Decimal))
 }
 
 type Units []Unit
@@ -133,41 +75,41 @@ type CoinType struct {
 	Name    string `json:"name"`
 	MinUnit Unit   `json:"min_unit"`
 	Units   Units  `json:"units"`
-	Origin  Origin `json:"origin"`
 	Desc    string `json:"desc"`
 }
 
-func (ct CoinType) Convert(orgCoinStr string, denom string) (destCoinStr string, err error) {
-	orgDenom, orgAmt, err := GetCoin(orgCoinStr)
+func (ct CoinType) Convert(srcCoinStr string, destDenom string) (destCoinStr string, err error) {
+	srcDenom, srcAmt, err := ParseCoinParts(srcCoinStr)
 	if err != nil {
 		return destCoinStr, err
 	}
-	var destUint Unit
-	if destUint, err = ct.GetUnit(denom); err != nil {
-		return destCoinStr, errors.New("not exist unit " + orgDenom)
+	var destUnit Unit
+	if destUnit, err = ct.GetUnit(destDenom); err != nil {
+		return destCoinStr, errors.New("destination unit (%s) not defined" + destDenom)
 	}
-	// target Coin = original amount * (10^(target decimal) / 10^(original decimal))
-	if orgUnit, err := ct.GetUnit(orgDenom); err == nil {
-		rat := NewRatFromInt(destUint.GetPrecision(), orgUnit.GetPrecision())
-		amount, err := NewRatFromDecimal(orgAmt, ct.MinUnit.Decimal) //Convert the original amount to the target accuracy
+
+	if srcUnit, err := ct.GetUnit(srcDenom); err == nil {
+		if srcUnit.Denom == destDenom {
+			return srcCoinStr, nil
+		}
+		// dest amount = src amount * (10^(dest scale) / 10^(src scale))
+		rat := NewRatFromInt(destUnit.GetScaleFactor(), srcUnit.GetScaleFactor())
+		amount, err := NewRatFromDecimal(srcAmt, int(ct.MinUnit.Decimal)) // convert src amount to dest unit
 		if err != nil {
 			return destCoinStr, err
 		}
-		amt := amount.Mul(rat).DecimalString(ct.MinUnit.Decimal)
-		destCoinStr = fmt.Sprintf("%s%s", amt, destUint.Denom)
+		amt := amount.Mul(rat).DecimalString(int(ct.MinUnit.Decimal))
+		destCoinStr = fmt.Sprintf("%s%s", amt, destUnit.Denom)
 		return destCoinStr, nil
 	}
-	return destCoinStr, errors.New("not exist unit " + orgDenom)
+	return destCoinStr, errors.New("source unit (%s) not defined" + srcDenom)
 }
 
-func (ct CoinType) ConvertToMinCoin(coinStr string) (coin Coin, err error) {
-	minUint := ct.GetMinUnit()
-
-	if destCoinStr, err := ct.Convert(coinStr, minUint.Denom); err == nil {
-		coin, err = parseCoin(destCoinStr)
+func (ct CoinType) ConvertToMinDenomCoin(srcCoinStr string) (coin Coin, err error) {
+	if destCoinStr, err := ct.Convert(srcCoinStr, ct.MinUnit.Denom); err == nil {
+		coin, err = ParseCoin(destCoinStr)
 		return coin, err
 	}
-
 	return coin, errors.New("convert error")
 }
 
@@ -177,11 +119,7 @@ func (ct CoinType) GetUnit(denom string) (u Unit, err error) {
 			return unit, nil
 		}
 	}
-	return u, errors.New("not find unit " + denom)
-}
-
-func (ct CoinType) GetMinUnit() (unit Unit) {
-	return ct.MinUnit
+	return u, errors.New("unit (%s) not found" + denom)
 }
 
 func (ct CoinType) GetMainUnit() (unit Unit) {
@@ -194,75 +132,32 @@ func (ct CoinType) String() string {
   Name:     %s
   MinUnit:  %s
   Units:    %s
-  Origin:   %s
   Desc:     %s`,
-		ct.Name, ct.MinUnit, ct.Units, ct.Origin, ct.Desc,
+		ct.Name, ct.MinUnit, ct.Units, ct.Desc,
 	)
 }
 
-func NewDefaultCoinType(name string) CoinType {
-	units := GetDefaultUnits(name)
+func NewIrisCoinType() CoinType {
+	units := make(Units, 7)
+
+	units[0] = NewUnit(Iris, 0)
+	units[1] = NewUnit(fmt.Sprintf("%s-%s", Iris, Milli), MilliScale)
+	units[2] = NewUnit(fmt.Sprintf("%s-%s", Iris, Micro), MicroScale)
+	units[3] = NewUnit(fmt.Sprintf("%s-%s", Iris, Nano), NanoScale)
+	units[4] = NewUnit(fmt.Sprintf("%s-%s", Iris, Pico), PicoScale)
+	units[5] = NewUnit(fmt.Sprintf("%s-%s", Iris, Femto), FemtoScale)
+	units[6] = NewUnit(fmt.Sprintf("%s-%s", Iris, Atto), AttoScale)
+
 	return CoinType{
-		Name:    name,
+		Name:    Iris,
 		Units:   units,
 		MinUnit: units[6],
-		Origin:  Native,
 		Desc:    "IRIS Network",
 	}
 }
 
-//TODO currently only iris token is supported
-func CoinTypeKey(coinName string) string {
-	return fmt.Sprintf("%s/%s/%s", "global", "coin_types", coinName)
-}
-
-func GetDefaultUnits(coin string) Units {
-	units := make(Units, 7)
-	units[0] = MainUnit(coin)
-	units[1] = MilliUnit(coin)
-	units[2] = MicroUnit(coin)
-	units[3] = NanoUnit(coin)
-	units[4] = PicoUnit(coin)
-	units[5] = FemtoUnit(coin)
-	units[6] = AttoUnit(coin)
-	return units
-}
-
-func GetCoin(coinStr string) (denom, amount string, err error) {
-	var (
-		reDnm  = `[A-Za-z0-9\.\-]{3,21}`
-		reAmt  = `[0-9]+[.]?[0-9]*`
-		reSpc  = `[[:space:]]*`
-		reCoin = regexp.MustCompile(fmt.Sprintf(`^(%s)%s(%s)$`, reAmt, reSpc, reDnm))
-	)
-
-	coinStr = strings.TrimSpace(coinStr)
-
-	matches := reCoin.FindStringSubmatch(coinStr)
-	if matches == nil {
-		err = fmt.Errorf("invalid coin expression: %s", coinStr)
-		return
-	}
-	denom, amount = matches[2], matches[1]
-	return
-}
-
-func parseCoin(coinStr string) (coin Coin, err error) {
-	denom, amount, err := GetCoin(coinStr)
-	if err != nil {
-		return Coin{}, err
-	}
-
-	amt, ok := NewIntFromString(amount)
-	if !ok {
-		return Coin{}, fmt.Errorf("invalid coin amount: %s", amount)
-	}
-	denom = strings.ToLower(denom)
-	return NewCoin(denom, amt), nil
-}
-
 func GetCoinName(coinStr string) (coinName string, err error) {
-	denom, _, err := GetCoin(coinStr)
+	denom, _, err := ParseCoinParts(coinStr)
 	if err != nil {
 		return coinName, err
 	}
@@ -274,16 +169,12 @@ func GetCoinName(coinStr string) (coinName string, err error) {
 	return coinName, nil
 }
 
-func GetCoinDenom(coinName string) (denom string, err error) {
-	name := strings.ToLower(strings.TrimSpace(coinName))
-	isMainUnit := regexp.MustCompile(`^[a-zA-Z0-9\.]+$`).MatchString
-	if !isMainUnit(name) {
-		return "", fmt.Errorf("invalid coin expression: %s", coinName)
+func GetCoinMinDenom(coinName string) (denom string, err error) {
+	coinName = strings.ToLower(strings.TrimSpace(coinName))
+
+	if coinName == Iris {
+		return IrisAtto, nil
 	}
 
-	if name == IRIS.GetMainUnit().Denom {
-		return IRIS.MinUnit.Denom, nil
-	}
-
-	return fmt.Sprintf("%s-min", name), nil
+	return fmt.Sprintf("%s-min", coinName), nil
 }

@@ -209,11 +209,11 @@ func ConvertDelegationToDelegationOutput(cliCtx context.CLIContext, delegation s
 }
 
 func ConvertUBDToUBDOutput(cliCtx context.CLIContext, ubd stake.UnbondingDelegation) UnbondingDelegationOutput {
-	initialBalance, err := cliCtx.ConvertCoinToMainUnit(sdk.Coins{ubd.InitialBalance}.String())
+	initialBalance, err := cliCtx.ConvertToMainUnit(sdk.Coins{ubd.InitialBalance}.String())
 	if err != nil && len(initialBalance) != 1 {
 		panic(err)
 	}
-	balance, err := cliCtx.ConvertCoinToMainUnit(sdk.Coins{ubd.Balance}.String())
+	balance, err := cliCtx.ConvertToMainUnit(sdk.Coins{ubd.Balance}.String())
 	if err != nil && len(balance) != 1 {
 		panic(err)
 	}
@@ -229,11 +229,11 @@ func ConvertUBDToUBDOutput(cliCtx context.CLIContext, ubd stake.UnbondingDelegat
 
 func ConvertREDToREDOutput(cliCtx context.CLIContext, red stake.Redelegation) RedelegationOutput {
 	exRate := utils.ExRateFromStakeTokenToMainUnit(cliCtx)
-	initialBalance, err := cliCtx.ConvertCoinToMainUnit(sdk.Coins{red.InitialBalance}.String())
+	initialBalance, err := cliCtx.ConvertToMainUnit(sdk.Coins{red.InitialBalance}.String())
 	if err != nil && len(initialBalance) != 1 {
 		panic(err)
 	}
-	balance, err := cliCtx.ConvertCoinToMainUnit(sdk.Coins{red.Balance}.String())
+	balance, err := cliCtx.ConvertToMainUnit(sdk.Coins{red.Balance}.String())
 	if err != nil && len(balance) != 1 {
 		panic(err)
 	}
@@ -306,12 +306,7 @@ func GetShares(
 			return sharesAmount, errors.Errorf("shares amount must be positive number (ex. 123, 1.23456789)")
 		}
 
-		stakeToken, err := cliCtx.GetCoinType(types.StakeTokenName)
-		if err != nil {
-			panic(err)
-		}
-		decimalDiff := stakeToken.MinUnit.Decimal - stakeToken.GetMainUnit().Decimal
-		exRate := sdk.NewDecFromInt(sdk.NewIntWithDecimal(1, decimalDiff))
+		exRate := sdk.NewDecFromInt(sdk.AttoScaleFactor)
 		sharesAmount = sharesAmount.Mul(exRate)
 	case sharesPercentStr != "":
 		var sharesPercent sdk.Dec

@@ -27,8 +27,6 @@ type burnBody struct {
 // nolint: gocyclo
 func SendRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// Init context and read request parameters
-		cliCtx = utils.InitReqCliCtx(cliCtx, r)
 		vars := mux.Vars(r)
 		bech32addr := vars["address"]
 		sender, err := sdk.AccAddressFromBech32(bech32addr)
@@ -42,9 +40,10 @@ func SendRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Hand
 			return
 		}
 		baseReq := m.BaseTx.Sanitize()
-		if !baseReq.ValidateBasic(w, cliCtx) {
+		if !baseReq.ValidateBasic(w) {
 			return
 		}
+
 		// Build message
 		amount, err := cliCtx.ParseCoins(m.Amount)
 		if err != nil {
@@ -62,8 +61,10 @@ func SendRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Hand
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
-		// Broadcast or return unsigned transaction
-		utils.SendOrReturnUnsignedTx(w, cliCtx, m.BaseTx, []sdk.Msg{msg})
+
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
+
+		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
 	}
 }
 
@@ -71,8 +72,6 @@ func SendRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Hand
 // nolint: gocyclo
 func BurnRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// Init context and read request parameters
-		cliCtx = utils.InitReqCliCtx(cliCtx, r)
 		vars := mux.Vars(r)
 		bech32addr := vars["address"]
 		owner, err := sdk.AccAddressFromBech32(bech32addr)
@@ -86,9 +85,10 @@ func BurnRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Hand
 			return
 		}
 		baseReq := m.BaseTx.Sanitize()
-		if !baseReq.ValidateBasic(w, cliCtx) {
+		if !baseReq.ValidateBasic(w) {
 			return
 		}
+
 		// Build message
 		amount, err := cliCtx.ParseCoins(m.Amount)
 		if err != nil {
@@ -105,7 +105,9 @@ func BurnRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Hand
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
-		// Broadcast or return unsigned transaction
-		utils.SendOrReturnUnsignedTx(w, cliCtx, m.BaseTx, []sdk.Msg{msg})
+
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
+
+		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
 	}
 }

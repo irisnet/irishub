@@ -60,7 +60,7 @@ func getMockApp(t *testing.T, numGenAccs int) (*mock.App, Keeper, stake.Keeper, 
 
 	require.NoError(t, mapp.CompleteSetup(keyGov))
 
-	coin, _ := sdk.IRIS.ConvertToMinCoin(fmt.Sprintf("%d%s", 1042, sdk.NativeTokenName))
+	coin, _ := sdk.IrisCoinType.ConvertToMinDenomCoin(fmt.Sprintf("%d%s", 1042, sdk.Iris))
 	genAccs, addrs, pubKeys, privKeys := mock.CreateGenAccounts(numGenAccs, sdk.Coins{coin})
 
 	mock.SetGenesis(mapp, genAccs)
