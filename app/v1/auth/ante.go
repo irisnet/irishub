@@ -267,7 +267,7 @@ func adjustFeesByGas(fees sdk.Coins, gas uint64) sdk.Coins {
 	for i := 0; i < len(fees); i++ {
 		gasFees[i] = sdk.NewInt64Coin(fees[i].Denom, int64(gasCost))
 	}
-	return fees.Plus(gasFees)
+	return fees.Add(gasFees)
 }
 
 // Deduct the fee from the account.
@@ -280,7 +280,7 @@ func deductFees(acc Account, fee StdFee) (Account, sdk.Result) {
 	if !feeAmount.IsValid() {
 		return nil, sdk.ErrInsufficientFee(fmt.Sprintf("invalid fee amount: %s", feeAmount)).Result()
 	}
-	newCoins, ok := coins.SafeMinus(feeAmount)
+	newCoins, ok := coins.SafeSub(feeAmount)
 	if ok {
 		errMsg := fmt.Sprintf("account balance (%s) is less than %s", coins, feeAmount)
 		return nil, sdk.ErrInsufficientFunds(errMsg).Result()

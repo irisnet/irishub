@@ -326,7 +326,6 @@ func (cliCtx CLIContext) GetCoinType(coinName string) (sdk.CoinType, error) {
 }
 
 func (cliCtx CLIContext) ConvertToMainUnit(coinsStr string) (coins []string, err error) {
-	coinsStr = strings.TrimSpace(coinsStr)
 	if len(coinsStr) == 0 {
 		return coins, nil
 	}
@@ -363,7 +362,6 @@ func (cliCtx CLIContext) ParseCoin(coinStr string) (sdk.Coin, error) {
 }
 
 func (cliCtx CLIContext) ParseCoins(coinsStr string) (coins sdk.Coins, err error) {
-	coinsStr = strings.TrimSpace(coinsStr)
 	if len(coinsStr) == 0 {
 		return coins, nil
 	}
@@ -376,7 +374,7 @@ func (cliCtx CLIContext) ParseCoins(coinsStr string) (coins sdk.Coins, err error
 			return sdk.Coins{}, err
 		}
 		if _, ok := coinMap[coin.Denom]; ok {
-			coinMap[coin.Denom] = coinMap[coin.Denom].Plus(coin)
+			coinMap[coin.Denom] = coinMap[coin.Denom].Add(coin)
 		} else {
 			coinMap[coin.Denom] = coin
 		}

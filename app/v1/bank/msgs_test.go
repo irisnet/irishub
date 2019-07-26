@@ -137,7 +137,7 @@ func TestMsgSendValidation(t *testing.T) {
 		},
 		{false, MsgSend{
 			Inputs:  []Input{input1},
-			Outputs: []Output{output3}}, // amounts dont match
+			Outputs: []Output{output3}}, // denoms dont match
 		},
 		{false, MsgSend{
 			Inputs:  []Input{input1},

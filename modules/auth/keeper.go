@@ -187,16 +187,15 @@ func (am AccountKeeper) GetBurnedToken(ctx sdk.Context) sdk.Coins {
 }
 
 func (am AccountKeeper) IncreaseBurnedToken(ctx sdk.Context, coins sdk.Coins) {
-	// parameter checking
-	if coins == nil || !coins.IsValid() {
-		return
+	if coins == nil { return }
+
+	if !coins.IsValid() {
+		panic(fmt.Sprintf("invalid coins [%s]", coins))
 	}
+
 	burnToken := am.GetBurnedToken(ctx)
 	// increase burn token amount
-	burnToken = burnToken.Plus(coins)
-	if !burnToken.IsNotNegative() {
-		panic(fmt.Errorf("burn token is negative"))
-	}
+	burnToken = burnToken.Add(coins)
 	// write back to db
 	bzNew := am.cdc.MustMarshalBinaryLengthPrefixed(burnToken)
 	store := ctx.KVStore(am.key)
@@ -217,17 +216,16 @@ func (am AccountKeeper) GetTotalLoosenToken(ctx sdk.Context) sdk.Coins {
 }
 
 func (am AccountKeeper) IncreaseTotalLoosenToken(ctx sdk.Context, coins sdk.Coins) {
-	// parameter checking
-	if coins == nil || !coins.IsValid() {
-		return
+	if coins == nil { return }
+
+	if !coins.IsValid() {
+		panic(fmt.Sprintf("invalid coins [%s]", coins))
 	}
+
 	// read from db
 	totalLoosenToken := am.GetTotalLoosenToken(ctx)
 	// increase totalLoosenToken
-	totalLoosenToken = totalLoosenToken.Plus(coins)
-	if !totalLoosenToken.IsNotNegative() {
-		panic(fmt.Errorf("total loosen token is overflow"))
-	}
+	totalLoosenToken = totalLoosenToken.Add(coins)
 	// write back to db
 	bzNew := am.cdc.MustMarshalBinaryLengthPrefixed(totalLoosenToken)
 	store := ctx.KVStore(am.key)
@@ -238,16 +236,18 @@ func (am AccountKeeper) IncreaseTotalLoosenToken(ctx sdk.Context, coins sdk.Coin
 }
 
 func (am AccountKeeper) DecreaseTotalLoosenToken(ctx sdk.Context, coins sdk.Coins) {
-	// parameter checking
-	if coins == nil || !coins.IsValid() {
-		return
+	if coins == nil { return }
+
+	if !coins.IsValid() {
+		panic(fmt.Sprintf("invalid coins [%s]", coins))
 	}
+
 	// read from db
 	totalLoosenToken := am.GetTotalLoosenToken(ctx)
 	// decrease totalLoosenToken
-	totalLoosenToken, negative := totalLoosenToken.SafeMinus(coins)
+	totalLoosenToken, negative := totalLoosenToken.SafeSub(coins)
 	if negative {
-		panic(fmt.Errorf("total loosen token is negative"))
+		panic(fmt.Errorf("total loose token is negative"))
 	}
 	// write back to db
 	bzNew := am.cdc.MustMarshalBinaryLengthPrefixed(totalLoosenToken)
