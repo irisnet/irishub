@@ -47,9 +47,9 @@ func TestQueryAccount(t *testing.T) {
 func TestQueryTokenStats(t *testing.T) {
 	input := setupTestInput()
 
-	// Test IRIS Start ---------------
+	// Test IrisCoinType Start ---------------
 	params := QueryTokenStatsParams{
-		TokenId: sdk.NativeTokenName,
+		TokenId: sdk.Iris,
 	}
 
 	bz, err := json.Marshal(params)
@@ -63,14 +63,14 @@ func TestQueryTokenStats(t *testing.T) {
 	require.NotNil(t, err)
 	require.Nil(t, res)
 
-	totalToken := sdk.Coins{sdk.NewCoin(sdk.NativeTokenMinDenom, sdk.NewInt(100))}
+	totalToken := sdk.Coins{sdk.NewCoin(sdk.IrisAtto, sdk.NewInt(100))}
 	input.bk.IncreaseLoosenToken(input.ctx, totalToken)
 
 	_, _, addr := keyPubAddr()
 	input.bk.am.SetAccount(input.ctx, input.bk.am.NewAccountWithAddress(input.ctx, addr))
 	input.bk.AddCoins(input.ctx, addr, totalToken)
 
-	burnedToken := sdk.Coins{sdk.NewCoin(sdk.NativeTokenMinDenom, sdk.NewInt(50))}
+	burnedToken := sdk.Coins{sdk.NewCoin(sdk.IrisAtto, sdk.NewInt(50))}
 	input.bk.BurnCoins(input.ctx, addr, burnedToken)
 
 	res, err = queryTokenStats(input.ctx, req, input.bk, input.cdc)
@@ -82,9 +82,9 @@ func TestQueryTokenStats(t *testing.T) {
 	require.Equal(t, totalToken.String(), (tokenStats.LooseTokens.Plus(burnedToken)).String())
 	require.Equal(t, burnedToken.String(), tokenStats.BurnedTokens.String())
 
-	// Test IRIS End ---------------
+	// Test IrisCoinType End ---------------
 
-	// Test !IRIS Start ---------------
+	// Test !IrisCoinType Start ---------------
 	params = QueryTokenStatsParams{
 		TokenId: "abc",
 	}

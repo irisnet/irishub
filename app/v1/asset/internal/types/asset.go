@@ -25,7 +25,6 @@ type BaseToken struct {
 }
 
 func NewBaseToken(family AssetFamily, source AssetSource, gateway string, symbol string, name string, decimal uint8, canonicalSymbol string, minUnitAlias string, initialSupply types.Int, maxSupply types.Int, mintable bool, owner types.AccAddress) BaseToken {
-
 	gateway = strings.ToLower(strings.TrimSpace(gateway))
 	symbol = strings.ToLower(strings.TrimSpace(symbol))
 	canonicalSymbol = strings.ToLower(strings.TrimSpace(canonicalSymbol))
@@ -79,6 +78,7 @@ func (ft FungibleToken) GetDecimal() uint8 {
 func (ft FungibleToken) IsMintable() bool {
 	return ft.Mintable
 }
+
 func (ft FungibleToken) GetOwner() types.AccAddress {
 	return ft.Owner
 }
@@ -109,7 +109,7 @@ func (ft FungibleToken) GetUniqueID() string {
 }
 
 func (ft FungibleToken) GetDenom() string {
-	denom, _ := sdk.GetCoinDenom(ft.GetUniqueID())
+	denom, _ := sdk.GetCoinMinDenom(ft.GetUniqueID())
 	return denom
 }
 
@@ -118,12 +118,11 @@ func (ft FungibleToken) GetInitSupply() types.Int {
 }
 
 func (ft FungibleToken) GetCoinType() types.CoinType {
-
 	units := make(types.Units, 2)
 	units[0] = types.NewUnit(ft.GetUniqueID(), 0)
-	units[1] = types.NewUnit(ft.GetDenom(), int(ft.Decimal))
+	units[1] = types.NewUnit(ft.GetDenom(), ft.Decimal)
 	return types.CoinType{
-		Name:    ft.GetUniqueID(),
+		Name:    ft.GetUniqueID(), // UniqueID == Coin Name
 		MinUnit: units[1],
 		Units:   units,
 		Desc:    ft.Name,
@@ -172,7 +171,7 @@ type Tokens []FungibleToken
 
 func (tokens Tokens) String() string {
 	if len(tokens) == 0 {
-		return ""
+		return "[]"
 	}
 
 	out := ""
@@ -192,7 +191,7 @@ func (tokens Tokens) Validate() sdk.Error {
 		initialSupply := uint64(token.InitialSupply.Div(exp).Int64())
 		maxSupply := uint64(token.MaxSupply.Div(exp).Int64())
 		msg := NewMsgIssueToken(token.Family, token.GetSource(), token.Gateway, token.Symbol, token.CanonicalSymbol, token.Name, token.Decimal, token.MinUnitAlias, initialSupply, maxSupply, token.Mintable, token.Owner)
-		if err := msg.ValidateBasic(); err != nil {
+		if err := ValidateMsgIssueToken(&msg); err != nil {
 			return err
 		}
 	}
@@ -226,7 +225,7 @@ func CheckTokenID(id string) sdk.Error {
 	}
 
 	// check symbol
-	if len(symbol) < MinimumAssetSymbolSize || len(symbol) > MaximumAssetSymbolSize || !IsBeginWithAlpha(symbol) || !IsAlphaNumeric(symbol) || strings.Contains(symbol, sdk.NativeTokenName) {
+	if len(symbol) < MinimumAssetSymbolSize || len(symbol) > MaximumAssetSymbolSize || !IsBeginWithAlpha(symbol) || !IsAlphaNumeric(symbol) || strings.Contains(symbol, sdk.Iris) {
 		return ErrInvalidAssetSymbol(DefaultCodespace, fmt.Sprintf("invalid asset symbol: %s", symbol))
 	}
 

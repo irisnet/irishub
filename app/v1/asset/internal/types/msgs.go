@@ -33,7 +33,6 @@ var (
 	MaximumGatewayDetailsSize  = 280 // maximal limitation for the length of the gateway's details
 	MaximumGatewayWebsiteSize  = 128 // maximal limitation for the length of the gateway's website
 
-	IsAlpha            = regexp.MustCompile(`^[a-zA-Z]+$`).MatchString
 	IsAlphaNumeric     = regexp.MustCompile(`^[a-zA-Z0-9]+$`).MatchString   // only accepts alphanumeric characters
 	IsAlphaNumericDash = regexp.MustCompile(`^[a-zA-Z0-9_-]+$`).MatchString // only accepts alphanumeric characters, _ and -
 	IsBeginWithAlpha   = regexp.MustCompile(`^[a-zA-Z].*`).MatchString
@@ -130,8 +129,8 @@ func ValidateMsgIssueToken(msg *MsgIssueToken) sdk.Error {
 		return ErrInvalidAssetSymbol(DefaultCodespace, fmt.Sprintf("invalid token symbol %s, only accepts alphanumeric characters, and begin with an english letter, length [%d, %d]", msg.Symbol, MinimumAssetSymbolSize, MaximumAssetSymbolSize))
 	}
 
-	if strings.Contains(strings.ToLower(msg.Symbol), sdk.NativeTokenName) {
-		return ErrInvalidAssetSymbol(DefaultCodespace, fmt.Sprintf("invalid token symbol %s, can not contain native token symbol %s", msg.Symbol, sdk.NativeTokenName))
+	if strings.Contains(strings.ToLower(msg.Symbol), sdk.Iris) {
+		return ErrInvalidAssetSymbol(DefaultCodespace, fmt.Sprintf("invalid token symbol %s, can not contain native token symbol %s", msg.Symbol, sdk.Iris))
 	}
 
 	minUnitAliasLen := len(msg.MinUnitAlias)
@@ -480,12 +479,12 @@ type MsgEditToken struct {
 	CanonicalSymbol string         `json:"canonical_symbol"` //  canonical_symbol of token
 	MinUnitAlias    string         `json:"min_unit_alias"`   //  min_unit_alias of token
 	MaxSupply       uint64         `json:"max_supply"`
-	Mintable        *bool          `json:"mintable"` //  mintable of token
+	Mintable        Bool           `json:"mintable"` //  mintable of token
 	Name            string         `json:"name"`
 }
 
 // NewMsgEditToken creates a MsgEditToken
-func NewMsgEditToken(name, canonicalSymbol, minUnitAlias, tokenId string, maxSupply uint64, mintable *bool, owner sdk.AccAddress) MsgEditToken {
+func NewMsgEditToken(name, canonicalSymbol, minUnitAlias, tokenId string, maxSupply uint64, mintable Bool, owner sdk.AccAddress) MsgEditToken {
 	name = strings.TrimSpace(name)
 	canonicalSymbol = strings.ToLower(strings.TrimSpace(canonicalSymbol))
 	minUnitAlias = strings.ToLower(strings.TrimSpace(minUnitAlias))
@@ -619,12 +618,12 @@ func ValidateMoniker(moniker string) sdk.Error {
 	}
 
 	// check the moniker format
-	if !IsAlpha(moniker) {
-		return ErrInvalidMoniker(DefaultCodespace, fmt.Sprintf("the moniker must contain only letters"))
+	if !IsBeginWithAlpha(moniker) || !IsAlphaNumeric(moniker) {
+		return ErrInvalidMoniker(DefaultCodespace, fmt.Sprintf("the moniker must begin with a letter followed by alphanumeric characters"))
 	}
 
 	// check if the moniker contains the native token name
-	if strings.Contains(strings.ToLower(moniker), sdk.NativeTokenName) {
+	if strings.Contains(strings.ToLower(moniker), sdk.Iris) {
 		return ErrInvalidMoniker(DefaultCodespace, fmt.Sprintf("the moniker must not contain the native token name"))
 	}
 

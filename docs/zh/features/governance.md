@@ -2,10 +2,11 @@
 
 ## 基本功能描述
 
-1. 参数修改提议的链上治理
-2. 软件升级提议的链上治理
-3. 网络终止提议的链上治理
-4. Tax收入分配提议的链上治理
+1. 纯文本提议的链上治理
+2. 参数修改提议的链上治理
+3. 软件升级提议的链上治理
+4. 网络终止提议的链上治理
+5. Tax收入分配提议的链上治理
 
 ## 交互流程
 
@@ -70,16 +71,11 @@
 
 ```
 # 根据gov模块名查询的可修改的参数
-iriscli gov query-params --module=mint
+iriscli params --module=mint
 
 # 结果
-mint/Inflation=0.0400000000
-
-# 根据Key查询可修改参数的内容
-iriscli gov query-params --module=mint --key=mint/Inflation                           
-
-# 结果
-mint/Inflation=0.0400000000
+Mint Params:
+  mint/Inflation=0.0400000000
 
 # 发送提议，返回参数修改的内容
 iriscli gov submit-proposal --title=<title> --description=<description> --type=Parameter --deposit=8iris  --param="mint/Inflation=0.0000000000" --from=<key_name> --chain-id=<chain-id> --fee=0.3iris --commit

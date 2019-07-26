@@ -6,7 +6,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/irisnet/irishub/tools/human"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/pkg/errors"
 )
@@ -93,7 +92,7 @@ func (bp BasicProposal) String() string {
 	)
 }
 
-func (bp BasicProposal) HumanString(assetConvert human.AssetConvert) string {
+func (bp BasicProposal) HumanString(converter sdk.CoinsConverter) string {
 	return fmt.Sprintf(`Proposal %d:
   Title:              %s
   Type:               %s
@@ -106,7 +105,7 @@ func (bp BasicProposal) HumanString(assetConvert human.AssetConvert) string {
   Description:        %s`,
 		bp.ProposalID, bp.Title, bp.ProposalType,
 		bp.Status, bp.SubmitTime, bp.DepositEndTime,
-		assetConvert.ToMainUnit(bp.TotalDeposit), bp.VotingStartTime, bp.VotingEndTime, bp.GetDescription(),
+		converter.ToMainUnit(bp.TotalDeposit), bp.VotingStartTime, bp.VotingEndTime, bp.GetDescription(),
 	)
 }
 
@@ -127,7 +126,7 @@ func (p Proposals) String() string {
 	return strings.TrimSpace(out)
 }
 
-func (p Proposals) HumanString(assetConvert human.AssetConvert) string {
+func (p Proposals) HumanString(converter sdk.CoinsConverter) string {
 	if len(p) == 0 {
 		return "[]"
 	}
@@ -135,7 +134,7 @@ func (p Proposals) HumanString(assetConvert human.AssetConvert) string {
 	for _, prop := range p {
 		out += fmt.Sprintf("%d - (%s) [%s] [%s] %s\n",
 			prop.GetProposalID(), prop.GetStatus(),
-			prop.GetProposalType(), assetConvert.ToMainUnit(prop.GetTotalDeposit()), prop.GetTitle())
+			prop.GetProposalType(), converter.ToMainUnit(prop.GetTotalDeposit()), prop.GetTitle())
 	}
 	return strings.TrimSpace(out)
 }

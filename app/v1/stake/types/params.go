@@ -24,10 +24,7 @@ const (
 	ValidatorUpdateDelay int64 = 1
 
 	// Stake token denomination "iris-atto"
-	StakeDenom = sdk.NativeTokenMinDenom
-
-	// Stake token name "iris"
-	StakeTokenName = sdk.NativeTokenName
+	StakeDenom = sdk.IrisAtto
 )
 
 // nolint - Keys for parameter access

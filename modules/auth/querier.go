@@ -1,8 +1,6 @@
 package auth
 
 import (
-	"fmt"
-
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -48,7 +46,7 @@ func queryAccount(ctx sdk.Context, req abci.RequestQuery, keeper AccountKeeper) 
 
 	account := keeper.GetAccount(ctx, params.Address)
 	if account == nil {
-		return nil, sdk.ErrUnknownAddress(fmt.Sprintf("account %s does not exist", params.Address))
+		return nil, sdk.ErrUnknownAddress(params.Address.String())
 	}
 
 	bz, err := codec.MarshalJSONIndent(keeper.cdc, account)
@@ -61,7 +59,7 @@ func queryAccount(ctx sdk.Context, req abci.RequestQuery, keeper AccountKeeper) 
 
 func queryTokenStats(ctx sdk.Context, keeper AccountKeeper) ([]byte, sdk.Error) {
 	tokenStats := TokenStats{
-		LooseTokens: keeper.GetTotalLoosenToken(ctx),
+		LooseTokens:  keeper.GetTotalLoosenToken(ctx),
 		BurnedTokens: keeper.GetBurnedToken(ctx),
 	}
 	bz, err := codec.MarshalJSONIndent(keeper.cdc, tokenStats)

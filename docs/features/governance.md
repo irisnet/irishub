@@ -2,10 +2,11 @@
 
 ## Basic Function Description
 
-1. On-chain governance proposals on parameter change
-2. On-chain governance proposals on software upgrade 
-3. On-chain governance proposals on software halt
-4. On-chain governance proposals on tax usage
+1. On-chain governance proposals on plain text
+2. On-chain governance proposals on parameter change
+3. On-chain governance proposals on software upgrade 
+4. On-chain governance proposals on software halt
+5. On-chain governance proposals on tax usage
 
 ## Interactive process
 
@@ -73,16 +74,11 @@ Change the parameters through the command lines
 
 ```
 # Query parameters can be changed by the modules'name in gov 
-iriscli gov query-params --module=mint
+iriscli params --module=mint
 
 # Result
-mint/Inflation=0.0400000000
-
-# Query parameters can be modified by "key”
-iriscli gov query-params --module=mint --key=mint/Inflation
-
-# Results
-mint/Inflation=0.0400000000
+Mint Params:
+  mint/Inflation=0.0400000000
 
 # Send proposal for parameters change
 iriscli gov submit-proposal --title=<title> --description=<description> --type=Parameter --deposit=8iris  --param="mint/Inflation=0.0000000000" --from=<key_name> --chain-id=<chain-id> --fee=0.3iris --commit

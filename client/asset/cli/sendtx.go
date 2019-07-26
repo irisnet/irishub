@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"strconv"
 	"strings"
 
 	"github.com/irisnet/irishub/app/v1/asset"
@@ -14,7 +13,6 @@ import (
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/spf13/cobra"
-	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 )
 
@@ -116,6 +114,7 @@ func GetCmdIssueToken(cdc *codec.Codec) *cobra.Command {
 	cmd.MarkFlagRequired(FlagSymbol)
 	cmd.MarkFlagRequired(FlagName)
 	cmd.MarkFlagRequired(FlagInitialSupply)
+	cmd.MarkFlagRequired(FlagDecimal)
 
 	return cmd
 }
@@ -258,17 +257,10 @@ func GetCmdEditAsset(cdc *codec.Codec) *cobra.Command {
 			canonicalSymbol := viper.GetString(FlagCanonicalSymbol)
 			minUnitAlias := viper.GetString(FlagMinUnitAlias)
 			maxSupply := uint64(viper.GetInt(FlagMaxSupply))
-			mintable := (*bool)(nil)
-
-			flags := cmd.Flags()
-			flags.Visit(func(f *pflag.Flag) {
-				if f.Name == FlagMintable {
-					value := f.Value.String()
-					if b, err := strconv.ParseBool(value); err == nil {
-						mintable = &b
-					}
-				}
-			})
+			mintable, err := asset.ParseBool(viper.GetString(FlagMintable))
+			if err != nil {
+				return err
+			}
 			var msg sdk.Msg
 			msg = asset.NewMsgEditToken(name,
 				canonicalSymbol, minUnitAlias, tokenId, maxSupply, mintable, owner)

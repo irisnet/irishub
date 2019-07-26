@@ -63,7 +63,7 @@ func NewAnteHandler(k Keeper) sdk.AnteHandler {
 				break
 
 			default:
-				msgFee = sdk.NewCoin(sdk.NativeTokenMinDenom, sdk.ZeroInt())
+				msgFee = sdk.NewCoin(sdk.IrisAtto, sdk.ZeroInt())
 			}
 
 			totalFee = totalFee.Plus(sdk.Coins{msgFee})
