@@ -8,11 +8,11 @@
 * [\#1473](https://github.com/irisnet/irishub/issues/1473) Add APIs for Tokens
 * [\#1521](https://github.com/irisnet/irishub/issues/1521) Add APIs for Gateways
 * [\#1745](https://github.com/irisnet/irishub/issues/1745) POST APIs only generate transactions, not broadcast transactions
-* [\#1750](https://github.com/irisnet/irishub/issues/1750) Move params query from `/gov/prams` to `/params`
+* [\#1750](https://github.com/irisnet/irishub/issues/1750) Move params query from `/gov/params` to `/params`
 * [\#1802](https://github.com/irisnet/irishub/issues/1802) Remove key related APIs and enhance API `tx/broadcast`
 
 ### CLI
-* [\#1750](https://github.com/irisnet/irishub/issues/1750) Replace `iriscli gov query-prams` by `iriscli params`
+* [\#1750](https://github.com/irisnet/irishub/issues/1750) Replace `iriscli gov query-params` by `iriscli params`
 
 ### Application
 * [\#1336](https://github.com/irisnet/irishub/issues/1336) Ensure field length checking in the service module
@@ -25,7 +25,7 @@
 * [\#1603](https://github.com/irisnet/irishub/issues/1603) Refactor total supply to support multiple tokens
 * [\#1604](https://github.com/irisnet/irishub/issues/1604) Enhance gov TallyResult
 * [\#1677](https://github.com/irisnet/irishub/issues/1677) Refactor coin_type to support multiple tokens
-* [\#1728](https://github.com/irisnet/irishub/issues/1728) Refactor gov module and add a new proposal type `PlainText`
+* [\#1728](https://github.com/irisnet/irishub/issues/1728) Refactor gov module and add proposal types `PlainText` and `TokenAddition`
 * [\#1757](https://github.com/irisnet/irishub/issues/1757) Add a random number generator
 * [\#1783](https://github.com/irisnet/irishub/issues/1783) Optimize error messages 
 * [\#1643](https://github.com/irisnet/irishub/issues/1643) Fix tx search by tx.height
