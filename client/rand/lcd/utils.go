@@ -1,6 +1,7 @@
 package lcd
 
 import (
+	"encoding/hex"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -9,6 +10,7 @@ import (
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/app/v1/rand"
 	"github.com/irisnet/irishub/client/context"
+	"github.com/irisnet/irishub/client/rand/types"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/codec"
 )
@@ -40,7 +42,20 @@ func queryRand(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string) htt
 			return
 		}
 
-		utils.PostProcessResponse(w, cliCtx.Codec, res, cliCtx.Indent)
+		var rawRand rand.Rand
+		err = cdc.UnmarshalJSON(res, &rawRand)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		readableRand := types.ReadableRand{
+			RequestTxHash: hex.EncodeToString(rawRand.RequestTxHash),
+			Height:        rawRand.Height,
+			Value:         rawRand.Value.Rat.FloatString(rand.RandPrec),
+		}
+
+		utils.PostProcessResponse(w, cliCtx.Codec, readableRand, cliCtx.Indent)
 	}
 }
 

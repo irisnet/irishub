@@ -50,3 +50,7 @@ rand = seed mod 10^20 / 10^20
 ## 操作
 
 [TODO]
+
+- [请求随机数](../cli-client/rand/request-rand.md)
+- [查询随机数](../cli-client/rand/query-rand.md)
+- [查询随机数队列](../cli-client/rand/query-queue.md)

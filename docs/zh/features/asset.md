@@ -2,7 +2,7 @@
 
 ## 简介
 
-该规范描述了IRISHub上的资产管理。任何人都可以在IRISHub上发布新资产，或者建议通过On-Chain Governance将现有资产与任何其他区块链挂钩。
+该规范描述了IRISHub上的资产管理。任何人都可以在IRISHub上发布新资产，或者通过On-Chain Governance将现有资产与任何其他区块链挂钩。
 
 ## 概念
 
