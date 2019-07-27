@@ -488,6 +488,8 @@ func (coins Coins) AmountOf(denom string) Int {
 }
 
 // IsAllPositive returns true if all coins have positive values.
+//
+// TODO: Remove once unsigned integers are used.
 func (coins Coins) IsAllPositive() bool {
 	if len(coins) == 0 {
 		return false

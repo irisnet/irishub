@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/irisnet/irishub/app/protocol"
-	"github.com/irisnet/irishub/app/v1/asset"
 	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/app/v1/bank"
 	"github.com/irisnet/irishub/store"
@@ -288,103 +287,6 @@ func parseQueryStorePath(path string) (storeName string, err error) {
 		return "", errors.New("expected format like /store/<storeName>/key")
 	}
 	return paths[1], nil
-}
-
-func (cliCtx CLIContext) GetCoinType(coinName string) (sdk.CoinType, error) {
-	var coinType sdk.CoinType
-	coinName = strings.ToLower(coinName)
-	if coinName == "" {
-		return sdk.CoinType{}, fmt.Errorf("coin name is empty")
-	}
-	if coinName == sdk.Iris {
-		coinType = sdk.IrisCoinType
-	} else {
-		params := asset.QueryTokenParams{
-			TokenId: coinName,
-		}
-
-		bz, err := cliCtx.Codec.MarshalJSON(params)
-		if err != nil {
-			return sdk.CoinType{}, err
-		}
-
-		res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.AssetRoute, asset.QueryToken), bz)
-		if err != nil {
-			return sdk.CoinType{}, fmt.Errorf("unsupported coin type \"%s\"", coinName)
-		}
-
-		var token asset.FungibleToken
-		err = cliCtx.Codec.UnmarshalJSON(res, &token)
-		if err != nil {
-			return sdk.CoinType{}, err
-		}
-
-		coinType = token.GetCoinType()
-	}
-
-	return coinType, nil
-}
-
-func (cliCtx CLIContext) ConvertToMainUnit(coinsStr string) (coins []string, err error) {
-	if len(coinsStr) == 0 {
-		return coins, nil
-	}
-
-	coinStrs := strings.Split(coinsStr, ",")
-	for _, coinStr := range coinStrs {
-		mainUnit, err := sdk.GetCoinName(coinStr)
-		coinType, err := cliCtx.GetCoinType(mainUnit)
-		if err != nil {
-			return nil, err
-		}
-
-		coin, err := coinType.Convert(coinStr, mainUnit)
-		if err != nil {
-			return nil, err
-		}
-		coins = append(coins, coin)
-	}
-	return coins, nil
-}
-
-func (cliCtx CLIContext) ParseCoin(coinStr string) (sdk.Coin, error) {
-	mainUnit, err := sdk.GetCoinName(coinStr)
-	coinType, err := cliCtx.GetCoinType(mainUnit)
-	if err != nil {
-		return sdk.Coin{}, err
-	}
-
-	coin, err := coinType.ConvertToMinDenomCoin(coinStr)
-	if err != nil {
-		return sdk.Coin{}, err
-	}
-	return coin, nil
-}
-
-func (cliCtx CLIContext) ParseCoins(coinsStr string) (coins sdk.Coins, err error) {
-	if len(coinsStr) == 0 {
-		return coins, nil
-	}
-
-	coinStrs := strings.Split(coinsStr, ",")
-	coinMap := make(map[string]sdk.Coin)
-	for _, coinStr := range coinStrs {
-		coin, err := cliCtx.ParseCoin(coinStr)
-		if err != nil {
-			return sdk.Coins{}, err
-		}
-		if _, ok := coinMap[coin.Denom]; ok {
-			coinMap[coin.Denom] = coinMap[coin.Denom].Add(coin)
-		} else {
-			coinMap[coin.Denom] = coin
-		}
-	}
-
-	for _, coin := range coinMap {
-		coins = append(coins, coin)
-	}
-	coins = coins.Sort()
-	return coins, nil
 }
 
 func (cliCtx CLIContext) NetInfo() (*ctypes.ResultNetInfo, error) {
