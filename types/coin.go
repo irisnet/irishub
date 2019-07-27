@@ -174,7 +174,8 @@ func (coins Coins) String() string {
 	return out[:len(out)-1]
 }
 
-// TODO: Move to Parsing section as a util function
+// MainUnitString() returns a string representation of coins,
+// with iris-atto coin converted to its corresponding iris denomination
 func (coins Coins) MainUnitString() string {
 	if len(coins) == 0 {
 		return ""
@@ -567,7 +568,7 @@ func (coins Coins) Sort() Coins {
 
 var (
 	// Denominations can be 3 ~ 21 characters long.
-	reDenom         = `(([a-z][a-z0-9]{2,7}|x)\.)?([a-z][a-z0-9]{2,7})(-[a-z]{3,})?`
+	reDenom         = `(([a-z][a-z0-9]{2,7}|x)\.)?([a-z][a-z0-9]{2,7})(-[a-z]{3,5})?`
 	reAmount        = `[0-9]+(\.[0-9]+)?`
 	reSpace         = `[[:space:]]*`
 	reDenomCompiled = regexp.MustCompile(fmt.Sprintf(`^%s$`, reDenom))

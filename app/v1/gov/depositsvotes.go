@@ -50,7 +50,7 @@ type Deposit struct {
 
 func (d Deposit) String() string {
 	return fmt.Sprintf("Deposit by %s on Proposal %d is for the amount %s",
-		d.Depositor, d.ProposalID, d.Amount.MainUnitString())
+		d.Depositor, d.ProposalID, d.Amount.String())
 }
 
 func (d Deposit) HumanString(converter sdk.CoinsConverter) string {
@@ -67,7 +67,7 @@ func (d Deposits) String() string {
 	}
 	out := fmt.Sprintf("Deposits for Proposal %d:", d[0].ProposalID)
 	for _, dep := range d {
-		out += fmt.Sprintf("\n  %s: %s", dep.Depositor, dep.Amount.MainUnitString())
+		out += fmt.Sprintf("\n  %s: %s", dep.Depositor, dep.Amount.String())
 	}
 	return out
 }

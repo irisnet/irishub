@@ -67,7 +67,7 @@ func (acc BaseAccount) String() string {
   Coins:           %s
   Account Number:  %d
   Sequence:        %d`,
-		acc.Address, pubkey, acc.Coins.MainUnitString(), acc.AccountNumber, acc.Sequence,
+		acc.Address, pubkey, acc.Coins.String(), acc.AccountNumber, acc.Sequence,
 	)
 }
 
