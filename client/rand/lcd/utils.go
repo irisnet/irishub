@@ -1,6 +1,7 @@
 package lcd
 
 import (
+	"encoding/hex"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -9,6 +10,7 @@ import (
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/app/v1/rand"
 	"github.com/irisnet/irishub/client/context"
+	"github.com/irisnet/irishub/client/rand/types"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/codec"
 )
@@ -18,6 +20,10 @@ func queryRand(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string) htt
 		vars := mux.Vars(r)
 
 		reqID := vars["request-id"]
+		if err := rand.CheckReqID(reqID); err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
 
 		params := rand.QueryRandParams{
 			ReqID: reqID,
@@ -36,16 +42,43 @@ func queryRand(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string) htt
 			return
 		}
 
-		utils.PostProcessResponse(w, cliCtx.Codec, res, cliCtx.Indent)
+		var rawRand rand.Rand
+		err = cdc.UnmarshalJSON(res, &rawRand)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		readableRand := types.ReadableRand{
+			RequestTxHash: hex.EncodeToString(rawRand.RequestTxHash),
+			Height:        rawRand.Height,
+			Value:         rawRand.Value.Rat.FloatString(rand.RandPrec),
+		}
+
+		utils.PostProcessResponse(w, cliCtx.Codec, readableRand, cliCtx.Indent)
 	}
 }
 
 func queryQueue(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		height, err := strconv.ParseInt(r.FormValue("height"), 10, 64)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
+		heightStr := r.FormValue("height")
+
+		var (
+			height int64
+			err    error
+		)
+
+		if len(heightStr) != 0 {
+			height, err = strconv.ParseInt(heightStr, 10, 64)
+			if err != nil {
+				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+				return
+			}
+
+			if height < 0 {
+				utils.WriteErrorResponse(w, http.StatusBadRequest, "the height must not be less than 0")
+				return
+			}
 		}
 
 		params := rand.QueryRandRequestQueueParams{

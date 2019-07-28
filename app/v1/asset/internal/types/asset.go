@@ -122,7 +122,7 @@ func (ft FungibleToken) GetCoinType() types.CoinType {
 	units[0] = types.NewUnit(ft.GetUniqueID(), 0)
 	units[1] = types.NewUnit(ft.GetDenom(), ft.Decimal)
 	return types.CoinType{
-		Name:    ft.GetUniqueID(),	// UniqueID == Coin Name
+		Name:    ft.GetUniqueID(), // UniqueID == Coin Name
 		MinUnit: units[1],
 		Units:   units,
 		Desc:    ft.Name,
@@ -191,7 +191,7 @@ func (tokens Tokens) Validate() sdk.Error {
 		initialSupply := uint64(token.InitialSupply.Div(exp).Int64())
 		maxSupply := uint64(token.MaxSupply.Div(exp).Int64())
 		msg := NewMsgIssueToken(token.Family, token.GetSource(), token.Gateway, token.Symbol, token.CanonicalSymbol, token.Name, token.Decimal, token.MinUnitAlias, initialSupply, maxSupply, token.Mintable, token.Owner)
-		if err := msg.ValidateBasic(); err != nil {
+		if err := ValidateMsgIssueToken(&msg); err != nil {
 			return err
 		}
 	}

@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"encoding/hex"
+	"fmt"
 
 	"github.com/irisnet/irishub/app/v1/rand/internal/types"
 	"github.com/irisnet/irishub/codec"
@@ -54,9 +55,13 @@ func queryRandRequestQueue(ctx sdk.Context, req abci.RequestQuery, keeper Keeper
 		return nil, sdk.ParseParamsErr(err)
 	}
 
+	if params.Height < 0 {
+		return nil, types.ErrInvalidHeight(types.DefaultCodespace, fmt.Sprintf("the height must not be less than 0: %d", params.Height))
+	}
+
 	var requests []types.Request
 
-	if params.Height <= 0 {
+	if params.Height == 0 {
 		// query all pending requests
 		requests = queryAllRandRequestsInQueue(ctx, keeper)
 	} else {

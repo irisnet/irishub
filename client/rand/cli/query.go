@@ -1,11 +1,13 @@
 package cli
 
 import (
+	"encoding/hex"
 	"fmt"
 
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/app/v1/rand"
 	"github.com/irisnet/irishub/client/context"
+	"github.com/irisnet/irishub/client/rand/types"
 	"github.com/irisnet/irishub/codec"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -39,13 +41,19 @@ func GetCmdQueryRand(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			var rand rand.Rand
-			err = cdc.UnmarshalJSON(res, &rand)
+			var rawRand rand.Rand
+			err = cdc.UnmarshalJSON(res, &rawRand)
 			if err != nil {
 				return err
 			}
 
-			return cliCtx.PrintOutput(rand)
+			readableRand := types.ReadableRand{
+				RequestTxHash: hex.EncodeToString(rawRand.RequestTxHash),
+				Height:        rawRand.Height,
+				Value:         rawRand.Value.Rat.FloatString(rand.RandPrec),
+			}
+
+			return cliCtx.PrintOutput(readableRand)
 		},
 	}
 
@@ -64,8 +72,13 @@ func GetCmdQueryRandRequestQueue(cdc *codec.Codec) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
+			height := viper.GetInt64(FlagQueueHeight)
+			if height < 0 {
+				return fmt.Errorf("the height must not be less than 0: %d", height)
+			}
+
 			params := rand.QueryRandRequestQueueParams{
-				Height: viper.GetInt64(FlagQueueHeight),
+				Height: height,
 			}
 
 			bz, err := cdc.MarshalJSON(params)
