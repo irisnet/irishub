@@ -17,6 +17,36 @@ func TestCoin(t *testing.T) {
 	require.Equal(t, NewInt(5), NewCoin("atom", NewInt(5)).Amount)
 }
 
+func TestNewCoins(t *testing.T) {
+	tenatom := NewInt64Coin("atom", 10)
+	tenbtc := NewInt64Coin("btc", 10)
+	zeroeth := NewInt64Coin("eth", 0)
+
+	println(NewCoins(zeroeth, tenatom, tenbtc).String())
+	tests := []struct {
+		name      string
+		coins     Coins
+		want      Coins
+		wantPanic bool
+	}{
+		{"empty args", []Coin{}, Coins{}, false},
+		{"one coin", []Coin{tenatom}, Coins{tenatom}, false},
+		{"sort after create", []Coin{tenbtc, tenatom}, Coins{tenatom, tenbtc}, false},
+		{"sort and remove zeroes", []Coin{zeroeth, tenbtc, tenatom}, Coins{tenatom, tenbtc}, false},
+		{"panic on dups", []Coin{tenatom, tenatom}, Coins{}, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.wantPanic {
+				require.Panics(t, func() { NewCoins(tt.coins...) })
+				return
+			}
+			got := NewCoins(tt.coins...)
+			require.True(t, got.IsEqual(tt.want))
+		})
+	}
+}
+
 func TestSameDenomAsCoin(t *testing.T) {
 	cases := []struct {
 		inputOne Coin
@@ -368,10 +398,10 @@ func TestParse(t *testing.T) {
 		{"98 bar , 1 foo  ", true, Coins{{"bar", NewInt(98)}, {"foo", one}}},
 		{"  55\t \t bling\n", true, Coins{{"bling", NewInt(55)}}},
 		{"2foo, 97 bar", true, Coins{{"bar", NewInt(97)}, {"foo", NewInt(2)}}},
-		{"5 mycoin,", false, nil},                                                 // no empty coins in a list
+		{"5 mycoin,", false, nil},                                                  // no empty coins in a list
 		{"2 3foo, 97 bar", false, Coins{{"3foo", NewInt(2)}, {"bar", NewInt(97)}}}, // 3foo is invalid coin name
-		{"11me coin, 12you coin", false, nil},                                     // no spaces in coin names
-		{"1.2btc", false, nil},                                                    // amount must be integer
+		{"11me coin, 12you coin", false, nil},                                      // no spaces in coin names
+		{"1.2btc", false, nil},                                                     // amount must be integer
 		{"5foo-bar", true, Coins{{"foo-bar", NewInt(5)}}},
 	}
 
