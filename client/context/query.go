@@ -347,23 +347,23 @@ func (cliCtx CLIContext) NumUnconfirmedTxs() (*ctypes.ResultUnconfirmedTxs, erro
 // PrintOutput prints output while respecting output and indent flags
 // NOTE: pass in marshalled structs that have been unmarshaled
 // because this function will panic on marshaling errors
-func (ctx CLIContext) PrintOutput(toPrint fmt.Stringer) (err error) {
+func (cliCtx CLIContext) PrintOutput(toPrint fmt.Stringer) (err error) {
 	var out []byte
 
-	switch ctx.OutputFormat {
+	switch cliCtx.OutputFormat {
 	case "text":
 		humanStringer, ok := toPrint.(sdk.Stringer)
 		if ok {
-			out = []byte(humanStringer.HumanString(ctx))
+			out = []byte(humanStringer.HumanString(cliCtx))
 		} else {
 			out = []byte(toPrint.String())
 		}
 
 	case "json":
-		if ctx.Indent {
-			out, err = ctx.Codec.MarshalJSONIndent(toPrint, "", "  ")
+		if cliCtx.Indent {
+			out, err = cliCtx.Codec.MarshalJSONIndent(toPrint, "", "  ")
 		} else {
-			out, err = ctx.Codec.MarshalJSON(toPrint)
+			out, err = cliCtx.Codec.MarshalJSON(toPrint)
 		}
 	}
 

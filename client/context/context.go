@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/irisnet/irishub/app/protocol"
+	"github.com/irisnet/irishub/app/v1/asset"
 	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/client"
 	"github.com/irisnet/irishub/client/keys"
@@ -20,7 +21,6 @@ import (
 	tmlite "github.com/tendermint/tendermint/lite"
 	tmliteProxy "github.com/tendermint/tendermint/lite/proxy"
 	rpcclient "github.com/tendermint/tendermint/rpc/client"
-	"github.com/irisnet/irishub/app/v1/asset"
 )
 
 // CLIContext implements a typical CLI context created in SDK modules for
@@ -172,66 +172,66 @@ func fromFields(from string) (fromAddr sdk.AccAddress, fromName string) {
 }
 
 // WithCodec returns a copy of the context with an updated codec.
-func (ctx CLIContext) WithCodec(cdc *codec.Codec) CLIContext {
-	ctx.Codec = cdc
-	return ctx
+func (cliCtx CLIContext) WithCodec(cdc *codec.Codec) CLIContext {
+	cliCtx.Codec = cdc
+	return cliCtx
 }
 
 // WithHeight returns a copy of the context with an updated height.
-func (ctx CLIContext) WithHeight(height int64) CLIContext {
-	ctx.Height = height
-	return ctx
+func (cliCtx CLIContext) WithHeight(height int64) CLIContext {
+	cliCtx.Height = height
+	return cliCtx
 }
 
 // WithAccountDecoder returns a copy of the context with an updated account
 // decoder.
-func (ctx CLIContext) WithAccountDecoder(decoder auth.AccountDecoder) CLIContext {
-	ctx.AccDecoder = decoder
-	return ctx
+func (cliCtx CLIContext) WithAccountDecoder(decoder auth.AccountDecoder) CLIContext {
+	cliCtx.AccDecoder = decoder
+	return cliCtx
 }
 
 // WithLogger returns a copy of the context with an updated logger.
-func (ctx CLIContext) WithLogger(w io.Writer) CLIContext {
-	ctx.Logger = w
-	return ctx
+func (cliCtx CLIContext) WithLogger(w io.Writer) CLIContext {
+	cliCtx.Logger = w
+	return cliCtx
 }
 
 // WithAccountStore returns a copy of the context with an updated AccountStore.
-func (ctx CLIContext) WithAccountStore(accountStore string) CLIContext {
-	ctx.AccountStore = accountStore
-	return ctx
+func (cliCtx CLIContext) WithAccountStore(accountStore string) CLIContext {
+	cliCtx.AccountStore = accountStore
+	return cliCtx
 }
 
 // WithTrustNode returns a copy of the context with an updated TrustNode flag.
-func (ctx CLIContext) WithTrustNode(trustNode bool) CLIContext {
-	ctx.TrustNode = trustNode
-	return ctx
+func (cliCtx CLIContext) WithTrustNode(trustNode bool) CLIContext {
+	cliCtx.TrustNode = trustNode
+	return cliCtx
 }
 
 // WithNodeURI returns a copy of the context with an updated node URI.
-func (ctx CLIContext) WithNodeURI(nodeURI string) CLIContext {
-	ctx.NodeURI = nodeURI
-	ctx.Client = rpcclient.NewHTTP(nodeURI, "/websocket")
-	return ctx
+func (cliCtx CLIContext) WithNodeURI(nodeURI string) CLIContext {
+	cliCtx.NodeURI = nodeURI
+	cliCtx.Client = rpcclient.NewHTTP(nodeURI, "/websocket")
+	return cliCtx
 }
 
 // WithClient returns a copy of the context with an updated RPC client
 // instance.
-func (ctx CLIContext) WithClient(client rpcclient.Client) CLIContext {
-	ctx.Client = client
-	return ctx
+func (cliCtx CLIContext) WithClient(client rpcclient.Client) CLIContext {
+	cliCtx.Client = client
+	return cliCtx
 }
 
 // WithUseLedger returns a copy of the context with an updated UseLedger flag.
-func (ctx CLIContext) WithUseLedger(useLedger bool) CLIContext {
-	ctx.UseLedger = useLedger
-	return ctx
+func (cliCtx CLIContext) WithUseLedger(useLedger bool) CLIContext {
+	cliCtx.UseLedger = useLedger
+	return cliCtx
 }
 
 // WithCertifier - return a copy of the context with an updated Certifier
-func (ctx CLIContext) WithCertifier(verifier tmlite.Verifier) CLIContext {
-	ctx.Verifier = verifier
-	return ctx
+func (cliCtx CLIContext) WithCertifier(verifier tmlite.Verifier) CLIContext {
+	cliCtx.Verifier = verifier
+	return cliCtx
 }
 
 func (cliCtx CLIContext) GetCoinType(coinName string) (sdk.CoinType, error) {
@@ -327,11 +327,11 @@ func (cliCtx CLIContext) ParseCoins(coinsStr string) (coins sdk.Coins, err error
 	for _, coin := range coinMap {
 		coins = append(coins, coin)
 	}
-	coins = coins.Sort()
-	return coins, nil
+
+	return sdk.NewCoins(coins...), nil
 }
 
-func (ctx CLIContext) ToMainUnit(coins sdk.Coins) string {
-	ss, _ := ctx.ConvertToMainUnit(coins.String())
+func (cliCtx CLIContext) ToMainUnit(coins sdk.Coins) string {
+	ss, _ := cliCtx.ConvertToMainUnit(coins.String())
 	return strings.Join(ss, ",")
 }
