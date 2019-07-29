@@ -2,6 +2,7 @@ package v1
 
 import (
 	"fmt"
+	"github.com/irisnet/irishub/app/v1/coinswap"
 	"sort"
 	"strings"
 
@@ -52,6 +53,7 @@ type ProtocolV1 struct {
 	upgradeKeeper  upgrade.Keeper
 	assetKeeper    asset.Keeper
 	randKeeper     rand.Keeper
+	coinswapKeeper coinswap.Keeper
 
 	router      protocol.Router      // handle any kind of message
 	queryRouter protocol.QueryRouter // router for redirecting query calls
@@ -140,6 +142,7 @@ func MakeCodec() *codec.Codec {
 	asset.RegisterCodec(cdc)
 	rand.RegisterCodec(cdc)
 	codec.RegisterCrypto(cdc)
+	coinswap.RegisterCodec(cdc)
 	return cdc
 }
 
@@ -280,6 +283,7 @@ func (p *ProtocolV1) configKeepers() {
 	)
 
 	p.randKeeper = rand.NewKeeper(p.cdc, protocol.KeyRand, rand.DefaultCodespace)
+	p.coinswapKeeper = coinswap.NewKeeper(p.cdc, protocol.KeySwap, p.bankKeeper, p.accountMapper, p.paramsKeeper.Subspace(coinswap.DefaultParamSpace))
 }
 
 // configure all Routers
@@ -293,7 +297,8 @@ func (p *ProtocolV1) configRouters() {
 		AddRoute(protocol.ServiceRoute, service.NewHandler(p.serviceKeeper)).
 		AddRoute(protocol.GuardianRoute, guardian.NewHandler(p.guardianKeeper)).
 		AddRoute(protocol.AssetRoute, asset.NewHandler(p.assetKeeper)).
-		AddRoute(protocol.RandRoute, rand.NewHandler(p.randKeeper))
+		AddRoute(protocol.RandRoute, rand.NewHandler(p.randKeeper)).
+		AddRoute(protocol.SwapRoute, coinswap.NewHandler(p.coinswapKeeper))
 
 	p.queryRouter.
 		AddRoute(protocol.AccountRoute, bank.NewQuerier(p.bankKeeper, p.cdc)).
@@ -334,12 +339,13 @@ func (p *ProtocolV1) GetKVStoreKeyList() []*sdk.KVStoreKey {
 		protocol.KeyGuardian,
 		protocol.KeyAsset,
 		protocol.KeyRand,
+		protocol.KeySwap,
 	}
 }
 
 // configure all Params
 func (p *ProtocolV1) configParams() {
-	p.paramsKeeper.RegisterParamSet(&mint.Params{}, &slashing.Params{}, &service.Params{}, &auth.Params{}, &stake.Params{}, &distr.Params{}, &asset.Params{}, &gov.GovParams{})
+	p.paramsKeeper.RegisterParamSet(&mint.Params{}, &slashing.Params{}, &service.Params{}, &auth.Params{}, &stake.Params{}, &distr.Params{}, &asset.Params{}, &gov.GovParams{}, &coinswap.Params{})
 }
 
 // application updates every begin block
@@ -424,6 +430,7 @@ func (p *ProtocolV1) InitChainer(ctx sdk.Context, DeliverTx sdk.DeliverTx, req a
 	upgrade.InitGenesis(ctx, p.upgradeKeeper, genesisState.UpgradeData)
 	asset.InitGenesis(ctx, p.assetKeeper, genesisState.AssetData)
 	rand.InitGenesis(ctx, p.randKeeper, genesisState.RandData)
+	coinswap.InitGenesis(ctx, p.coinswapKeeper, genesisState.SwapData)
 
 	// load the address to pubkey map
 	err = IrisValidateGenesisState(genesisState)

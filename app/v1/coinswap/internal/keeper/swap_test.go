@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	native = sdk.NativeTokenMinDenom
+	native = sdk.IrisAtto
 )
 
 func TestIsDoubleSwap(t *testing.T) {

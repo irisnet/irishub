@@ -10,6 +10,7 @@ type (
 	MsgSwapOrder       = types.MsgSwapOrder
 	MsgAddLiquidity    = types.MsgAddLiquidity
 	MsgRemoveLiquidity = types.MsgRemoveLiquidity
+	Params             = types.Params
 )
 
 var (
@@ -20,6 +21,9 @@ var (
 	ErrInvalidDeadline  = types.ErrInvalidDeadline
 	ErrNotPositive      = types.ErrNotPositive
 	ErrConstraintNotMet = types.ErrConstraintNotMet
+	RegisterCodec       = types.RegisterCodec
+	NewKeeper           = keeper.NewKeeper
+	DefaultParamSpace   = types.DefaultParamSpace
 )
 
 const (

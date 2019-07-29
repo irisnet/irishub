@@ -1,6 +1,7 @@
 package coinswap
 
 import (
+	"fmt"
 	"github.com/irisnet/irishub/app/v1/coinswap/internal/types"
 	sdk "github.com/irisnet/irishub/types"
 )
@@ -25,8 +26,12 @@ func DefaultGenesisState() GenesisState {
 }
 
 // InitGenesis new coinswap genesis
-func InitGenesis(ctx sdk.Context, keeper Keeper, data GenesisState) {
-
+func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
+	//
+	if err := ValidateGenesis(data); err != nil {
+		panic(fmt.Errorf("panic for ValidateGenesis,%v", err))
+	}
+	k.SetParams(ctx, data.Params)
 }
 
 // ExportGenesis returns a GenesisState for a given context and keeper.

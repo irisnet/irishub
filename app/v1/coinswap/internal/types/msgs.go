@@ -136,12 +136,12 @@ func (msg MsgAddLiquidity) ValidateBasic() sdk.Error {
 	if !msg.DepositAmount.IsPositive() {
 		return ErrNotPositive(DefaultCodespace, "deposit amount provided is not positive")
 	}
-	if !msg.MinReward.IsPositive() {
-		return ErrNotPositive(DefaultCodespace, "minimum liquidity is not positive")
-	}
-	if msg.Deadline.IsZero() {
-		return ErrInvalidDeadline(DefaultCodespace, "deadline for MsgAddLiquidity not initialized")
-	}
+	//if !msg.MinReward.IsPositive() {
+	//	return ErrNotPositive(DefaultCodespace, "minimum liquidity is not positive")
+	//}
+	//if msg.Deadline.IsZero() {
+	//	return ErrInvalidDeadline(DefaultCodespace, "deadline for MsgAddLiquidity not initialized")
+	//}
 	if msg.Sender.Empty() {
 		return sdk.ErrInvalidAddress("invalid sender address")
 	}

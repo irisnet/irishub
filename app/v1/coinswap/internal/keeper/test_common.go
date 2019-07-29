@@ -56,7 +56,7 @@ func createTestInput(t *testing.T, amt sdk.Int, nAccs int64) (sdk.Context, Keepe
 	bk := bank.NewBaseKeeper(cdc, ak)
 
 	initialCoins := sdk.Coins{
-		sdk.NewCoin(sdk.NativeTokenMinDenom, amt),
+		sdk.NewCoin(sdk.IrisAtto, amt),
 		sdk.NewCoin("btc", amt),
 	}
 	initialCoins = initialCoins.Sort()

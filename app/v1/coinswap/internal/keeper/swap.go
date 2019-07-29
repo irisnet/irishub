@@ -87,3 +87,17 @@ func (k Keeper) GetModuleName(denom1, denom2 string) (string, error) {
 		return "", types.ErrEqualDenom(types.DefaultCodespace, "denomnations for forming module name are equal")
 	}
 }
+
+func (k Keeper) GetUNIDenom(moduleName string) (string, error) {
+	s := strings.Split(moduleName, ":")
+	if len(s) != 3 {
+		return "", types.ErrEqualDenom(types.DefaultCodespace, "denomnations for forming module name are invalid")
+	}
+
+	denom1 := strings.Split(s[1], "-")[0]
+	denom2 := strings.Split(s[2], "-")[0]
+	uniDenom := strings.Join([]string{"uni", denom1, denom2}, "-")
+
+	//TODO should validate by asset module
+	return uniDenom, nil
+}

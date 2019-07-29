@@ -3,6 +3,7 @@ package v1
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/irisnet/irishub/app/v1/coinswap"
 
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/app/v1/asset"
@@ -68,6 +69,7 @@ func (p *ProtocolV1) ExportAppStateAndValidators(ctx sdk.Context, forZeroHeight 
 		slashing.ExportGenesis(ctx, p.slashingKeeper),
 		asset.ExportGenesis(ctx, p.assetKeeper),
 		rand.ExportGenesis(ctx, p.randKeeper),
+		coinswap.ExportGenesis(ctx, p.coinswapKeeper),
 	)
 	appState, err = codec.MarshalJSONIndent(p.cdc, genState)
 	if err != nil {

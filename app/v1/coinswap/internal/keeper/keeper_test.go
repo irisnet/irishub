@@ -66,11 +66,11 @@ func TestGetReservePool(t *testing.T) {
 	reservePool, found = keeper.GetReservePool(ctx, moduleName)
 	require.True(t, found)
 
-	keeper.bk.SendCoins(ctx, accs[0].GetAddress(), poolAcc, sdk.Coins{sdk.NewCoin(sdk.NativeTokenMinDenom, amt)})
+	keeper.bk.SendCoins(ctx, accs[0].GetAddress(), poolAcc, sdk.Coins{sdk.NewCoin(sdk.IrisAtto, amt)})
 	reservePool, found = keeper.GetReservePool(ctx, moduleName)
 	reservePool, found = keeper.GetReservePool(ctx, moduleName)
 	require.True(t, found)
-	require.Equal(t, amt, reservePool.AmountOf(sdk.NativeTokenMinDenom))
+	require.Equal(t, amt, reservePool.AmountOf(sdk.IrisAtto))
 }
 
 func TestKeeper_UpdateLiquidity(t *testing.T) {

@@ -86,12 +86,16 @@ func (p *Params) StringFromBytes(cdc *codec.Codec, key string, bytes []byte) (st
 	}
 }
 
+func (p *Params) ReadOnly() bool {
+	return false
+}
+
 // DefaultParams returns the default coinswap module parameters
 func DefaultParams() Params {
 	feeParam := NewFeeParam(sdk.NewInt(997), sdk.NewInt(1000))
 
 	return Params{
-		NativeDenom: sdk.NativeTokenMinDenom,
+		NativeDenom: sdk.IrisAtto,
 		Fee:         feeParam,
 	}
 }
@@ -99,7 +103,7 @@ func DefaultParams() Params {
 // ValidateParams validates a set of params
 func ValidateParams(p Params) error {
 	// TODO: ensure equivalent sdk.validateDenom validation
-	if strings.TrimSpace(p.NativeDenom) != "" {
+	if strings.TrimSpace(p.NativeDenom) == "" {
 		return fmt.Errorf("native denomination must not be empty")
 	}
 	if !p.Fee.Numerator.IsPositive() {
