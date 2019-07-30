@@ -414,6 +414,7 @@ func (p *ProtocolV1) InitChainer(ctx sdk.Context, DeliverTx sdk.DeliverTx, req a
 	if err != nil {
 		panic(err)
 	}
+	asset.InitGenesis(ctx, p.assetKeeper, genesisState.AssetData)
 	gov.InitGenesis(ctx, p.govKeeper, genesisState.GovData)
 	auth.InitGenesis(ctx, p.feeKeeper, p.accountMapper, genesisState.AuthData)
 	slashing.InitGenesis(ctx, p.slashingKeeper, genesisState.SlashingData, genesisState.StakeData)
@@ -422,7 +423,6 @@ func (p *ProtocolV1) InitChainer(ctx sdk.Context, DeliverTx sdk.DeliverTx, req a
 	service.InitGenesis(ctx, p.serviceKeeper, genesisState.ServiceData)
 	guardian.InitGenesis(ctx, p.guardianKeeper, genesisState.GuardianData)
 	upgrade.InitGenesis(ctx, p.upgradeKeeper, genesisState.UpgradeData)
-	asset.InitGenesis(ctx, p.assetKeeper, genesisState.AssetData)
 	rand.InitGenesis(ctx, p.randKeeper, genesisState.RandData)
 
 	// load the address to pubkey map
