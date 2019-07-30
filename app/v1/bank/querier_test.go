@@ -79,7 +79,7 @@ func TestQueryTokenStats(t *testing.T) {
 
 	var tokenStats TokenStats
 	require.Nil(t, input.cdc.UnmarshalJSON(res, &tokenStats))
-	require.Equal(t, totalToken.String(), (tokenStats.LooseTokens.Plus(burnedToken)).String())
+	require.Equal(t, totalToken.String(), (tokenStats.LooseTokens.Add(burnedToken)).String())
 	require.Equal(t, burnedToken.String(), tokenStats.BurnedTokens.String())
 
 	// Test IrisCoinType End ---------------
@@ -117,6 +117,6 @@ func TestQueryTokenStats(t *testing.T) {
 
 	tokenStats = TokenStats{}
 	require.Nil(t, input.cdc.UnmarshalJSON(res, &tokenStats))
-	require.Equal(t, totalToken.String(), (tokenStats.TotalSupply.Plus(burnedToken)).String())
+	require.Equal(t, totalToken.String(), (tokenStats.TotalSupply.Add(burnedToken)).String())
 	require.Equal(t, burnedToken.String(), tokenStats.BurnedTokens.String())
 }

@@ -53,7 +53,7 @@ func (fk FeeKeeper) setCollectedFees(ctx sdk.Context, coins sdk.Coins) {
 
 // add to the fee pool
 func (fk FeeKeeper) AddCollectedFees(ctx sdk.Context, coins sdk.Coins) sdk.Coins {
-	newCoins := fk.GetCollectedFees(ctx).Plus(coins)
+	newCoins := fk.GetCollectedFees(ctx).Add(coins)
 	fk.setCollectedFees(ctx, newCoins)
 
 	return newCoins
@@ -61,8 +61,8 @@ func (fk FeeKeeper) AddCollectedFees(ctx sdk.Context, coins sdk.Coins) sdk.Coins
 
 // RefundCollectedFees deducts fees from fee collector
 func (fk FeeKeeper) RefundCollectedFees(ctx sdk.Context, coins sdk.Coins) sdk.Coins {
-	newCoins := fk.GetCollectedFees(ctx).Minus(coins)
-	if !newCoins.IsNotNegative() {
+	newCoins := fk.GetCollectedFees(ctx).Sub(coins)
+	if newCoins.IsAnyNegative() {
 		panic("fee collector contains negative coins")
 	}
 	fk.setCollectedFees(ctx, newCoins)

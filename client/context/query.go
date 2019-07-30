@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/irisnet/irishub/app/protocol"
-	"github.com/irisnet/irishub/app/v1/asset"
 	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/app/v1/bank"
 	"github.com/irisnet/irishub/store"
@@ -290,105 +289,6 @@ func parseQueryStorePath(path string) (storeName string, err error) {
 	return paths[1], nil
 }
 
-func (cliCtx CLIContext) GetCoinType(coinName string) (sdk.CoinType, error) {
-	var coinType sdk.CoinType
-	coinName = strings.ToLower(coinName)
-	if coinName == "" {
-		return sdk.CoinType{}, fmt.Errorf("coin name is empty")
-	}
-	if coinName == sdk.Iris {
-		coinType = sdk.IrisCoinType
-	} else {
-		params := asset.QueryTokenParams{
-			TokenId: coinName,
-		}
-
-		bz, err := cliCtx.Codec.MarshalJSON(params)
-		if err != nil {
-			return sdk.CoinType{}, err
-		}
-
-		res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.AssetRoute, asset.QueryToken), bz)
-		if err != nil {
-			return sdk.CoinType{}, fmt.Errorf("unsupported coin type \"%s\"", coinName)
-		}
-
-		var token asset.FungibleToken
-		err = cliCtx.Codec.UnmarshalJSON(res, &token)
-		if err != nil {
-			return sdk.CoinType{}, err
-		}
-
-		coinType = token.GetCoinType()
-	}
-
-	return coinType, nil
-}
-
-func (cliCtx CLIContext) ConvertToMainUnit(coinsStr string) (coins []string, err error) {
-	coinsStr = strings.TrimSpace(coinsStr)
-	if len(coinsStr) == 0 {
-		return coins, nil
-	}
-
-	coinStrs := strings.Split(coinsStr, ",")
-	for _, coinStr := range coinStrs {
-		mainUnit, err := sdk.GetCoinName(coinStr)
-		coinType, err := cliCtx.GetCoinType(mainUnit)
-		if err != nil {
-			return nil, err
-		}
-
-		coin, err := coinType.Convert(coinStr, mainUnit)
-		if err != nil {
-			return nil, err
-		}
-		coins = append(coins, coin)
-	}
-	return coins, nil
-}
-
-func (cliCtx CLIContext) ParseCoin(coinStr string) (sdk.Coin, error) {
-	mainUnit, err := sdk.GetCoinName(coinStr)
-	coinType, err := cliCtx.GetCoinType(mainUnit)
-	if err != nil {
-		return sdk.Coin{}, err
-	}
-
-	coin, err := coinType.ConvertToMinDenomCoin(coinStr)
-	if err != nil {
-		return sdk.Coin{}, err
-	}
-	return coin, nil
-}
-
-func (cliCtx CLIContext) ParseCoins(coinsStr string) (coins sdk.Coins, err error) {
-	coinsStr = strings.TrimSpace(coinsStr)
-	if len(coinsStr) == 0 {
-		return coins, nil
-	}
-
-	coinStrs := strings.Split(coinsStr, ",")
-	coinMap := make(map[string]sdk.Coin)
-	for _, coinStr := range coinStrs {
-		coin, err := cliCtx.ParseCoin(coinStr)
-		if err != nil {
-			return sdk.Coins{}, err
-		}
-		if _, ok := coinMap[coin.Denom]; ok {
-			coinMap[coin.Denom] = coinMap[coin.Denom].Plus(coin)
-		} else {
-			coinMap[coin.Denom] = coin
-		}
-	}
-
-	for _, coin := range coinMap {
-		coins = append(coins, coin)
-	}
-	coins = coins.Sort()
-	return coins, nil
-}
-
 func (cliCtx CLIContext) NetInfo() (*ctypes.ResultNetInfo, error) {
 	client, err := cliCtx.GetNode()
 	if err != nil {
@@ -447,23 +347,23 @@ func (cliCtx CLIContext) NumUnconfirmedTxs() (*ctypes.ResultUnconfirmedTxs, erro
 // PrintOutput prints output while respecting output and indent flags
 // NOTE: pass in marshalled structs that have been unmarshaled
 // because this function will panic on marshaling errors
-func (ctx CLIContext) PrintOutput(toPrint fmt.Stringer) (err error) {
+func (cliCtx CLIContext) PrintOutput(toPrint fmt.Stringer) (err error) {
 	var out []byte
 
-	switch ctx.OutputFormat {
+	switch cliCtx.OutputFormat {
 	case "text":
 		humanStringer, ok := toPrint.(sdk.Stringer)
 		if ok {
-			out = []byte(humanStringer.HumanString(ctx))
+			out = []byte(humanStringer.HumanString(cliCtx))
 		} else {
 			out = []byte(toPrint.String())
 		}
 
 	case "json":
-		if ctx.Indent {
-			out, err = ctx.Codec.MarshalJSONIndent(toPrint, "", "  ")
+		if cliCtx.Indent {
+			out, err = cliCtx.Codec.MarshalJSONIndent(toPrint, "", "  ")
 		} else {
-			out, err = ctx.Codec.MarshalJSON(toPrint)
+			out, err = cliCtx.Codec.MarshalJSON(toPrint)
 		}
 	}
 

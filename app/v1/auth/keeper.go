@@ -180,36 +180,6 @@ func (am AccountKeeper) GetNextAccountNumber(ctx sdk.Context) uint64 {
 	return accNumber
 }
 
-//func (am AccountKeeper) GetBurnedToken(ctx sdk.Context) sdk.Coins {
-//	// read from db
-//	var burnToken sdk.Coins
-//	store := ctx.KVStore(am.key)
-//	bz := store.Get(BurnedTokenKey)
-//	if bz == nil {
-//		burnToken = nil
-//	} else {
-//		am.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &burnToken)
-//	}
-//	return burnToken
-//}
-
-//func (am AccountKeeper) IncreaseBurnedToken(ctx sdk.Context, coins sdk.Coins) {
-//	// parameter checking
-//	if coins == nil || !coins.IsValid() {
-//		return
-//	}
-//	burnToken := am.GetBurnedToken(ctx)
-//	// increase burn token amount
-//	burnToken = burnToken.Plus(coins)
-//	if !burnToken.IsNotNegative() {
-//		panic(fmt.Errorf("burn token is negative"))
-//	}
-//	// write back to db
-//	bzNew := am.cdc.MustMarshalBinaryLengthPrefixed(burnToken)
-//	store := ctx.KVStore(am.key)
-//	store.Set(BurnedTokenKey, bzNew)
-//}
-
 func (am AccountKeeper) GetTotalLoosenToken(ctx sdk.Context) sdk.Coins {
 	// read from db
 	var totalLoosenToken sdk.Coins
@@ -224,9 +194,10 @@ func (am AccountKeeper) GetTotalLoosenToken(ctx sdk.Context) sdk.Coins {
 }
 
 func (am AccountKeeper) IncreaseTotalLoosenToken(ctx sdk.Context, coins sdk.Coins) {
-	// parameter checking
-	if coins == nil {
-		return
+	if coins == nil { return }
+
+	if !coins.IsValid() {
+		panic(fmt.Sprintf("invalid coins [%s]", coins))
 	}
 
 	// loose token only contains iris-atto
@@ -239,10 +210,7 @@ func (am AccountKeeper) IncreaseTotalLoosenToken(ctx sdk.Context, coins sdk.Coin
 	// read from db
 	totalLoosenToken := am.GetTotalLoosenToken(ctx)
 	// increase totalLoosenToken
-	totalLoosenToken = totalLoosenToken.Plus(increaseCoins)
-	if !totalLoosenToken.IsNotNegative() {
-		panic(fmt.Errorf("total loosen token is overflow"))
-	}
+	totalLoosenToken = totalLoosenToken.Add(increaseCoins)
 	// write back to db
 	bzNew := am.cdc.MustMarshalBinaryLengthPrefixed(totalLoosenToken)
 	store := ctx.KVStore(am.key)
@@ -253,9 +221,10 @@ func (am AccountKeeper) IncreaseTotalLoosenToken(ctx sdk.Context, coins sdk.Coin
 }
 
 func (am AccountKeeper) DecreaseTotalLoosenToken(ctx sdk.Context, coins sdk.Coins) {
-	// parameter checking
-	if coins == nil {
-		return
+	if coins == nil { return }
+
+	if !coins.IsValid() {
+		panic(fmt.Sprintf("invalid coins [%s]", coins))
 	}
 
 	// loose token only contains iris-atto
@@ -268,9 +237,9 @@ func (am AccountKeeper) DecreaseTotalLoosenToken(ctx sdk.Context, coins sdk.Coin
 	// read from db
 	totalLoosenToken := am.GetTotalLoosenToken(ctx)
 	// decrease totalLoosenToken
-	totalLoosenToken, negative := totalLoosenToken.SafeMinus(decreaseCoins)
+	totalLoosenToken, negative := totalLoosenToken.SafeSub(decreaseCoins)
 	if negative {
-		panic(fmt.Errorf("total loosen token is negative"))
+		panic(fmt.Errorf("total loose token is negative"))
 	}
 	// write back to db
 	bzNew := am.cdc.MustMarshalBinaryLengthPrefixed(totalLoosenToken)
@@ -302,22 +271,18 @@ func (am AccountKeeper) IterateTotalSupply(ctx sdk.Context, op func(coin sdk.Coi
 	}
 }
 func (am AccountKeeper) IncreaseTotalSupply(ctx sdk.Context, coin sdk.Coin) sdk.Error {
-	// parameter checking
-	if coin == (sdk.Coin{}) || !coin.IsPositive() {
-		return sdk.ErrInsufficientCoins("total supply amount to increase must be positive")
+	if coin == (sdk.Coin{}) || !coin.IsValid() {
+		return sdk.ErrInvalidCoins(fmt.Sprintf("invalid coin [%s]", coin))
 	}
 
 	// read from db
 	totalSupply, found := am.GetTotalSupply(ctx, coin.Denom)
 	if !found {
-		return sdk.ErrInvalidCoins(fmt.Sprintf("invalid denom %s, unable to get total supply", coin.Denom))
+		return sdk.ErrInvalidCoins(fmt.Sprintf("unable to get total supply for denom %s", coin.Denom))
 	}
 
 	// increase totalSupply
-	totalSupply = totalSupply.Plus(coin)
-	if !totalSupply.IsNotNegative() {
-		panic(fmt.Errorf("total supply is overflow"))
-	}
+	totalSupply = totalSupply.Add(coin)
 
 	// write back to db
 	am.SetTotalSupply(ctx, totalSupply)
@@ -329,20 +294,19 @@ func (am AccountKeeper) IncreaseTotalSupply(ctx sdk.Context, coin sdk.Coin) sdk.
 }
 
 func (am AccountKeeper) DecreaseTotalSupply(ctx sdk.Context, coin sdk.Coin) sdk.Error {
-	// parameter checking
-	if coin == (sdk.Coin{}) || !coin.IsPositive() {
-		return sdk.ErrInsufficientCoins("total supply amount to decrease must be positive")
+	if coin == (sdk.Coin{}) || !coin.IsValid() {
+		return sdk.ErrInvalidCoins(fmt.Sprintf("invalid coin [%s]", coin))
 	}
 
 	// read from db
 	totalSupply, found := am.GetTotalSupply(ctx, coin.Denom)
 	if !found {
-		return sdk.ErrInvalidCoins(fmt.Sprintf("invalid denom %s, unable to get total supply", coin.Denom))
+		return sdk.ErrInvalidCoins(fmt.Sprintf("unable to get total supply for denom %s", coin.Denom))
 	}
 
 	// decrease totalSupply
-	totalSupply = totalSupply.Minus(coin)
-	if !totalSupply.IsNotNegative() {
+	totalSupply = totalSupply.Sub(coin)
+	if totalSupply.IsNegative() {
 		panic(fmt.Errorf("total supply is negative"))
 	}
 

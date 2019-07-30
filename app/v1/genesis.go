@@ -293,7 +293,7 @@ func convertToMinDenomCoins(coinStrArray []string) sdk.Coins {
 			if err != nil {
 				panic(fmt.Sprintf("fatal error in converting %s to %s", coinStr, sdk.IrisAtto))
 			}
-			irisCoin = irisCoin.Plus(convertedIrisCoin)
+			irisCoin = irisCoin.Add(convertedIrisCoin)
 		} else {
 			// non-iris tokens
 			denom, amount, err := types.ParseCoinParts(coinStr)
