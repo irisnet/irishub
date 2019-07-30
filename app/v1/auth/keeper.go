@@ -194,7 +194,9 @@ func (am AccountKeeper) GetTotalLoosenToken(ctx sdk.Context) sdk.Coins {
 }
 
 func (am AccountKeeper) IncreaseTotalLoosenToken(ctx sdk.Context, coins sdk.Coins) {
-	if coins == nil { return }
+	if coins == nil {
+		return
+	}
 
 	if !coins.IsValid() {
 		panic(fmt.Sprintf("invalid coins [%s]", coins))
@@ -221,7 +223,9 @@ func (am AccountKeeper) IncreaseTotalLoosenToken(ctx sdk.Context, coins sdk.Coin
 }
 
 func (am AccountKeeper) DecreaseTotalLoosenToken(ctx sdk.Context, coins sdk.Coins) {
-	if coins == nil { return }
+	if coins == nil {
+		return
+	}
 
 	if !coins.IsValid() {
 		panic(fmt.Sprintf("invalid coins [%s]", coins))
@@ -339,7 +343,7 @@ func (am AccountKeeper) InitTotalSupply(ctx sdk.Context) {
 			if !ok {
 				tsMap[coin.Denom] = coin
 			} else {
-				tsMap[coin.Denom] = coin.Plus(totalSupply)
+				tsMap[coin.Denom] = coin.Add(totalSupply)
 			}
 		}
 		return false
