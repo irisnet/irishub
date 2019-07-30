@@ -179,8 +179,8 @@ func (k Keeper) UpdateServiceBinding(ctx sdk.Context, svcBinding SvcBinding) sdk
 	}
 
 	// Add coins to svcBinding deposit
-	if svcBinding.Deposit.IsNotNegative() {
-		oldBinding.Deposit = oldBinding.Deposit.Plus(svcBinding.Deposit)
+	if !svcBinding.Deposit.IsAnyNegative() {
+		oldBinding.Deposit = oldBinding.Deposit.Add(svcBinding.Deposit)
 	}
 
 	// Subtract coins from provider's account
@@ -204,7 +204,7 @@ func (k Keeper) UpdateServiceBinding(ctx sdk.Context, svcBinding SvcBinding) sdk
 		}
 
 		if !oldBinding.Deposit.IsAllGTE(minDeposit) {
-			return ErrLtMinProviderDeposit(k.Codespace(), minDeposit.Minus(oldBinding.Deposit).Plus(svcBinding.Deposit))
+			return ErrLtMinProviderDeposit(k.Codespace(), minDeposit.Sub(oldBinding.Deposit).Add(svcBinding.Deposit))
 		}
 	}
 
@@ -242,8 +242,8 @@ func (k Keeper) Enable(ctx sdk.Context, defChainID, defName, bindChainID string,
 	}
 
 	// Add coins to svcBinding deposit
-	if deposit.IsNotNegative() {
-		binding.Deposit = binding.Deposit.Plus(deposit)
+	if !deposit.IsAnyNegative() {
+		binding.Deposit = binding.Deposit.Add(deposit)
 	}
 
 	minDeposit, err := k.getMinDeposit(ctx, binding.Prices)
@@ -252,7 +252,7 @@ func (k Keeper) Enable(ctx sdk.Context, defChainID, defName, bindChainID string,
 	}
 
 	if !binding.Deposit.IsAllGTE(minDeposit) {
-		return ErrLtMinProviderDeposit(k.Codespace(), minDeposit.Minus(binding.Deposit).Plus(deposit))
+		return ErrLtMinProviderDeposit(k.Codespace(), minDeposit.Sub(binding.Deposit).Add(deposit))
 	}
 
 	// Subtract coins from provider's account
@@ -442,7 +442,7 @@ func (k Keeper) AddReturnFee(ctx sdk.Context, address sdk.AccAddress, coins sdk.
 		k.SetReturnFee(ctx, address, coins)
 		return
 	}
-	k.SetReturnFee(ctx, address, fee.Coins.Plus(coins))
+	k.SetReturnFee(ctx, address, fee.Coins.Add(coins))
 }
 
 // refund fees from a particular consumer, and delete it
@@ -495,7 +495,7 @@ func (k Keeper) AddIncomingFee(ctx sdk.Context, address sdk.AccAddress, coins sd
 		return err
 	}
 
-	incomingFee, hasNeg := coins.SafeMinus(taxCoins)
+	incomingFee, hasNeg := coins.SafeSub(taxCoins)
 	if hasNeg {
 		errMsg := fmt.Sprintf("%s is less than %s", coins, taxCoins)
 		return sdk.ErrInsufficientFunds(errMsg)
@@ -506,7 +506,7 @@ func (k Keeper) AddIncomingFee(ctx sdk.Context, address sdk.AccAddress, coins sd
 		k.SetIncomingFee(ctx, address, coins)
 	}
 
-	k.SetIncomingFee(ctx, address, fee.Coins.Plus(incomingFee))
+	k.SetIncomingFee(ctx, address, fee.Coins.Add(incomingFee))
 	return nil
 }
 
@@ -528,7 +528,7 @@ func (k Keeper) WithdrawFee(ctx sdk.Context, address sdk.AccAddress) sdk.Error {
 
 func (k Keeper) Slash(ctx sdk.Context, binding SvcBinding, slashCoins sdk.Coins) sdk.Error {
 	store := ctx.KVStore(k.storeKey)
-	deposit, hasNeg := binding.Deposit.SafeMinus(slashCoins)
+	deposit, hasNeg := binding.Deposit.SafeSub(slashCoins)
 	if hasNeg {
 		errMsg := fmt.Sprintf("%s is less than %s", binding.Deposit, slashCoins)
 		panic(errMsg)
@@ -579,7 +579,7 @@ func (k Keeper) getMinDeposit(ctx sdk.Context, prices []sdk.Coin) (sdk.Coins, sd
 			return minDeposit, sdk.NewError(DefaultCodespace, CodeIntOverflow, fmt.Sprintf("Int Overflow"))
 		}
 		minInt := price.Amount.Mul(minDepositMultiple)
-		minDeposit = minDeposit.Plus(sdk.Coins{sdk.NewCoin(price.Denom, minInt)})
+		minDeposit = minDeposit.Add(sdk.Coins{sdk.NewCoin(price.Denom, minInt)})
 	}
 	return minDeposit, nil
 }

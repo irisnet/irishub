@@ -462,7 +462,7 @@ func (keeper Keeper) AddDeposit(ctx sdk.Context, proposalID uint64, depositorAdd
 	}
 
 	// Update Proposal
-	proposal.SetTotalDeposit(proposal.GetTotalDeposit().Plus(depositAmount))
+	proposal.SetTotalDeposit(proposal.GetTotalDeposit().Add(depositAmount))
 	keeper.SetProposal(ctx, proposal)
 
 	// Check if deposit tipped proposal into voting period
@@ -479,7 +479,7 @@ func (keeper Keeper) AddDeposit(ctx sdk.Context, proposalID uint64, depositorAdd
 		newDeposit := Deposit{depositorAddr, proposalID, depositAmount}
 		keeper.setDeposit(ctx, proposalID, depositorAddr, newDeposit)
 	} else {
-		currDeposit.Amount = currDeposit.Amount.Plus(depositAmount)
+		currDeposit.Amount = currDeposit.Amount.Add(depositAmount)
 		keeper.setDeposit(ctx, proposalID, depositorAddr, currDeposit)
 	}
 
@@ -503,7 +503,7 @@ func (keeper Keeper) RefundDeposits(ctx sdk.Context, proposalID uint64) {
 		deposit := &Deposit{}
 		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(depositsIterator.Value(), deposit)
 		deposits = append(deposits, deposit)
-		depositSum = depositSum.Plus(deposit.Amount)
+		depositSum = depositSum.Add(deposit.Amount)
 		store.Delete(depositsIterator.Key())
 	}
 

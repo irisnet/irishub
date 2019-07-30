@@ -16,7 +16,11 @@ func equal(i *big.Int, i2 *big.Int) bool { return i.Cmp(i2) == 0 }
 
 func gt(i *big.Int, i2 *big.Int) bool { return i.Cmp(i2) == 1 }
 
+func gte(i *big.Int, i2 *big.Int) bool { return i.Cmp(i2) >= 0 }
+
 func lt(i *big.Int, i2 *big.Int) bool { return i.Cmp(i2) == -1 }
+
+func lte(i *big.Int, i2 *big.Int) bool { return i.Cmp(i2) <= 0 }
 
 func add(i *big.Int, i2 *big.Int) *big.Int { return new(big.Int).Add(i, i2) }
 
@@ -167,9 +171,20 @@ func (i Int) GT(i2 Int) bool {
 	return gt(i.i, i2.i)
 }
 
+// GTE returns true if receiver Int is greater than or equal to the parameter
+// Int.
+func (i Int) GTE(i2 Int) bool {
+	return gte(i.i, i2.i)
+}
+
 // LT returns true if first Int is lesser than second
 func (i Int) LT(i2 Int) bool {
 	return lt(i.i, i2.i)
+}
+
+// LTE returns true if first Int is less than or equal to second
+func (i Int) LTE(i2 Int) bool {
+	return lte(i.i, i2.i)
 }
 
 // Add adds Int from another
@@ -383,6 +398,16 @@ func (i Uint) IsUint64() bool {
 // IsZero returns true if Uint is zero
 func (i Uint) IsZero() bool {
 	return i.i.Sign() == 0
+}
+
+// IsNegative returns true if Int is negative
+func (i Int) IsNegative() bool {
+	return i.i.Sign() == -1
+}
+
+// IsPositive returns true if Int is positive
+func (i Int) IsPositive() bool {
+	return i.i.Sign() == 1
 }
 
 // Sign returns sign of Uint

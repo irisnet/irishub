@@ -195,11 +195,11 @@ func (msg MsgSvcBind) ValidateBasic() sdk.Error {
 	if len(msg.Provider) == 0 {
 		return sdk.ErrInvalidAddress(msg.Provider.String())
 	}
-	if !msg.Deposit.IsNotNegative() {
+	if msg.Deposit.IsAnyNegative() {
 		return sdk.ErrInvalidCoins(msg.Deposit.String())
 	}
 	for _, price := range msg.Prices {
-		if !price.IsNotNegative() {
+		if price.IsNegative() {
 			return sdk.ErrInvalidCoins(price.String())
 		}
 	}
@@ -275,11 +275,11 @@ func (msg MsgSvcBindingUpdate) ValidateBasic() sdk.Error {
 	if msg.BindingType != 0x00 && !validBindingType(msg.BindingType) {
 		return ErrInvalidBindingType(DefaultCodespace, msg.BindingType)
 	}
-	if !msg.Deposit.IsNotNegative() {
+	if msg.Deposit.IsAnyNegative() {
 		return sdk.ErrInvalidCoins(msg.Deposit.String())
 	}
 	for _, price := range msg.Prices {
-		if !price.IsNotNegative() {
+		if price.IsNegative() {
 			return sdk.ErrInvalidCoins(price.String())
 		}
 	}
@@ -403,7 +403,7 @@ func (msg MsgSvcEnable) ValidateBasic() sdk.Error {
 	if err := ensureNameLength(msg.DefName); err != nil {
 		return err
 	}
-	if !msg.Deposit.IsNotNegative() {
+	if msg.Deposit.IsAnyNegative() {
 		return sdk.ErrInvalidCoins(msg.Deposit.String())
 	}
 	if len(msg.Provider) == 0 {
@@ -717,7 +717,7 @@ func (msg MsgSvcWithdrawTax) ValidateBasic() sdk.Error {
 	if !msg.Amount.IsValid() {
 		return sdk.ErrInvalidCoins(msg.Amount.String())
 	}
-	if !msg.Amount.IsPositive() {
+	if !msg.Amount.IsAllPositive() {
 		return sdk.ErrInvalidCoins(msg.Amount.String())
 	}
 	return nil

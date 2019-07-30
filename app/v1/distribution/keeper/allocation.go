@@ -31,7 +31,7 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, percentVotes sdk.Dec, proposer s
 	feePool := k.GetFeePool(ctx)
 	if k.stakeKeeper.GetLastTotalPower(ctx).IsZero() {
 		k.bankKeeper.AddCoins(ctx, auth.CommunityTaxCoinsAccAddr, feesCollected)
-		//		feePool.CommunityPool = feePool.CommunityPool.Plus(feesCollectedDec)
+		//		feePool.CommunityPool = feePool.CommunityPool.Add(feesCollectedDec)
 		//		k.SetFeePool(ctx, feePool)
 		k.feeKeeper.ClearCollectedFees(ctx)
 		ctx.CoinFlowTags().AppendCoinFlowTag(ctx, "", auth.CommunityTaxCoinsAccAddr.String(), feesCollected.String(), sdk.CommunityTaxCollectFlow, "")
@@ -68,7 +68,7 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, percentVotes sdk.Dec, proposer s
 	communityTax := k.GetCommunityTax(ctx)
 	communityFunding := feesCollectedDec.MulDec(communityTax)
 
-	//	feePool.CommunityPool = feePool.CommunityPool.Plus(communityFunding)
+	//	feePool.CommunityPool = feePool.CommunityPool.Add(communityFunding)
 	fundingCoins, change := communityFunding.TruncateDecimal()
 	k.bankKeeper.AddCoins(ctx, auth.CommunityTaxCoinsAccAddr, fundingCoins)
 	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, "", auth.CommunityTaxCoinsAccAddr.String(), fundingCoins.String(), sdk.CommunityTaxCollectFlow, "")
@@ -101,7 +101,7 @@ func (k Keeper) AllocateFeeTax(ctx sdk.Context, destAddr sdk.AccAddress, percent
 	//communityPool := feePool.CommunityPool
 	//allocateCoins, _ := communityPool.MulDec(percent).TruncateDecimal()
 
-	//feePool.CommunityPool = communityPool.Minus(types.NewDecCoins(allocateCoins))
+	//feePool.CommunityPool = communityPool.Sub(types.NewDecCoins(allocateCoins))
 	taxCoins := k.bankKeeper.GetCoins(ctx, auth.CommunityTaxCoinsAccAddr)
 	taxDecCoins := types.NewDecCoins(taxCoins)
 	allocatedDecCoins := taxDecCoins.MulDec(percent)

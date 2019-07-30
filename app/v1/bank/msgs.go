@@ -40,13 +40,13 @@ func (msg MsgSend) ValidateBasic() sdk.Error {
 		if err := in.ValidateBasic(); err != nil {
 			return err.TraceSDK("")
 		}
-		totalIn = totalIn.Plus(in.Coins)
+		totalIn = totalIn.Add(in.Coins)
 	}
 	for _, out := range msg.Outputs {
 		if err := out.ValidateBasic(); err != nil {
 			return err.TraceSDK("")
 		}
-		totalOut = totalOut.Plus(out.Coins)
+		totalOut = totalOut.Add(out.Coins)
 	}
 	// make sure inputs and outputs match
 	if !totalIn.IsEqual(totalOut) {
@@ -112,7 +112,7 @@ func (in Input) ValidateBasic() sdk.Error {
 	if !in.Coins.IsValid() {
 		return sdk.ErrInvalidCoins(in.Coins.String())
 	}
-	if !in.Coins.IsPositive() {
+	if !in.Coins.IsAllPositive() {
 		return sdk.ErrInvalidCoins(in.Coins.String())
 	}
 	return nil
@@ -153,7 +153,7 @@ func (out Output) ValidateBasic() sdk.Error {
 	if !out.Coins.IsValid() {
 		return sdk.ErrInvalidCoins(out.Coins.String())
 	}
-	if !out.Coins.IsPositive() {
+	if !out.Coins.IsAllPositive() {
 		return sdk.ErrInvalidCoins(out.Coins.String())
 	}
 	return nil

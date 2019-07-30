@@ -62,25 +62,25 @@ func TestAssetAnteHandler(t *testing.T) {
 	anteHandler := NewAnteHandler(keeper)
 
 	// assert that the ante handler will return with `abort` set to true
-	acc1.SetCoins(sdk.Coins{gatewayCreateFee.Plus(nativeTokenIssueFee)})
+	acc1.SetCoins(sdk.Coins{gatewayCreateFee.Add(nativeTokenIssueFee)})
 	_, res, abort := anteHandler(newCtx, tx1, false)
 	require.Equal(t, true, abort)
 	require.Equal(t, false, res.IsOK())
 
 	// assert that the ante handler will return with `abort` set to true
-	acc1.SetCoins(acc1.GetCoins().Plus(sdk.Coins{gatewayTokenIssueFee}))
+	acc1.SetCoins(acc1.GetCoins().Add(sdk.Coins{gatewayTokenIssueFee}))
 	_, res, abort = anteHandler(newCtx, tx1, false)
 	require.Equal(t, true, abort)
 	require.Equal(t, false, res.IsOK())
 
 	// assert that the ante handler will return with `abort` set to false
-	acc1.SetCoins(acc1.GetCoins().Plus(sdk.Coins{nativeTokenMintFee}))
+	acc1.SetCoins(acc1.GetCoins().Add(sdk.Coins{nativeTokenMintFee}))
 	_, res, abort = anteHandler(newCtx, tx1, false)
 	require.Equal(t, false, abort)
 	require.Equal(t, true, res.IsOK())
 
 	// assert that the ante handler will return with `abort` set to false
-	acc1.SetCoins(sdk.Coins{gatewayCreateFee.Plus(nativeTokenIssueFee)})
+	acc1.SetCoins(sdk.Coins{gatewayCreateFee.Add(nativeTokenIssueFee)})
 	_, res, abort = anteHandler(newCtx, tx2, false)
 	require.Equal(t, false, abort)
 	require.Equal(t, true, res.IsOK())

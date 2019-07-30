@@ -267,11 +267,14 @@ func hasCoins(ctx sdk.Context, am auth.AccountKeeper, addr sdk.AccAddress, amt s
 
 // SubtractCoins subtracts amt from the coins at the addr.
 func subtractCoins(ctx sdk.Context, am auth.AccountKeeper, addr sdk.AccAddress, amt sdk.Coins) (sdk.Coins, sdk.Tags, sdk.Error) {
+	if !amt.IsValid() {
+		panic(fmt.Sprintf("invalid coins [%s]", amt))
+	}
 	ctx.GasMeter().ConsumeGas(costSubtractCoins, "subtractCoins")
 	oldCoins := getCoins(ctx, am, addr)
-	newCoins, hasNeg := oldCoins.SafeMinus(amt)
+	newCoins, hasNeg := oldCoins.SafeSub(amt)
 	if hasNeg {
-		return amt, nil, sdk.ErrInsufficientCoins(fmt.Sprintf("%s is less than %s", oldCoins, amt))
+		return amt, nil, sdk.ErrInsufficientCoins(fmt.Sprintf("subtracting [%s] from [%s] yields negative coin(s)", amt, oldCoins))
 	}
 	err := setCoins(ctx, am, addr, newCoins)
 	tags := sdk.NewTags("sender", []byte(addr.String()))
@@ -280,12 +283,12 @@ func subtractCoins(ctx sdk.Context, am auth.AccountKeeper, addr sdk.AccAddress, 
 
 // AddCoins adds amt to the coins at the addr.
 func addCoins(ctx sdk.Context, am auth.AccountKeeper, addr sdk.AccAddress, amt sdk.Coins) (sdk.Coins, sdk.Tags, sdk.Error) {
+	if !amt.IsValid() {
+		panic(fmt.Sprintf("invalid coins [%s]", amt))
+	}
 	ctx.GasMeter().ConsumeGas(costAddCoins, "addCoins")
 	oldCoins := getCoins(ctx, am, addr)
-	newCoins := oldCoins.Plus(amt)
-	if !newCoins.IsNotNegative() {
-		return amt, nil, sdk.ErrInsufficientCoins(fmt.Sprintf("%s is less than %s", oldCoins, amt))
-	}
+	newCoins := oldCoins.Add(amt)
 	err := setCoins(ctx, am, addr, newCoins)
 	tags := sdk.NewTags("recipient", []byte(addr.String()))
 	return newCoins, tags, err
