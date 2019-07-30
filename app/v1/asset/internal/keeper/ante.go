@@ -66,7 +66,7 @@ func NewAnteHandler(k Keeper) sdk.AnteHandler {
 				msgFee = sdk.NewCoin(sdk.IrisAtto, sdk.ZeroInt())
 			}
 
-			totalFee = totalFee.Plus(sdk.Coins{msgFee})
+			totalFee = totalFee.Add(sdk.Coins{msgFee})
 		}
 
 		if !totalFee.IsAllLTE(payer.GetCoins()) {

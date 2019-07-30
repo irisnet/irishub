@@ -26,14 +26,14 @@ const (
 // between accounts.
 type Keeper interface {
 	SendKeeper
-	IncreaseLoosenToken(ctx sdk.Context, amt sdk.Coins)
-	DecreaseLoosenToken(ctx sdk.Context, amt sdk.Coins)
 	SubtractCoins(ctx sdk.Context, addr sdk.AccAddress, amt sdk.Coins) (sdk.Coins, sdk.Tags, sdk.Error)
 	AddCoins(ctx sdk.Context, addr sdk.AccAddress, amt sdk.Coins) (sdk.Coins, sdk.Tags, sdk.Error)
 	BurnCoins(ctx sdk.Context, fromAddr sdk.AccAddress, amt sdk.Coins) (sdk.Tags, sdk.Error)
-	SetTotalSupply(ctx sdk.Context, totalSupply sdk.Coin)
+	IncreaseLoosenToken(ctx sdk.Context, amt sdk.Coins)
+	DecreaseLoosenToken(ctx sdk.Context, amt sdk.Coins)
 	IncreaseTotalSupply(ctx sdk.Context, amt sdk.Coin) sdk.Error
 	DecreaseTotalSupply(ctx sdk.Context, amt sdk.Coin) sdk.Error
+	SetTotalSupply(ctx sdk.Context, totalSupply sdk.Coin)
 }
 
 var _ Keeper = (*BaseKeeper)(nil)
@@ -320,11 +320,14 @@ func hasCoins(ctx sdk.Context, am auth.AccountKeeper, addr sdk.AccAddress, amt s
 
 // SubtractCoins subtracts amt from the coins at the addr.
 func subtractCoins(ctx sdk.Context, am auth.AccountKeeper, addr sdk.AccAddress, amt sdk.Coins) (sdk.Coins, sdk.Tags, sdk.Error) {
+	if !amt.IsValid() {
+		panic(fmt.Sprintf("invalid coins [%s]", amt))
+	}
 	ctx.GasMeter().ConsumeGas(costSubtractCoins, "subtractCoins")
 	oldCoins := getCoins(ctx, am, addr)
-	newCoins, hasNeg := oldCoins.SafeMinus(amt)
+	newCoins, hasNeg := oldCoins.SafeSub(amt)
 	if hasNeg {
-		return amt, nil, sdk.ErrInsufficientCoins(fmt.Sprintf("%s is less than %s", oldCoins, amt))
+		return amt, nil, sdk.ErrInsufficientCoins(fmt.Sprintf("subtracting [%s] from [%s] yields negative coin(s)", amt, oldCoins))
 	}
 	err := setCoins(ctx, am, addr, newCoins)
 	tags := sdk.NewTags("sender", []byte(addr.String()))
@@ -333,12 +336,12 @@ func subtractCoins(ctx sdk.Context, am auth.AccountKeeper, addr sdk.AccAddress, 
 
 // AddCoins adds amt to the coins at the addr.
 func addCoins(ctx sdk.Context, am auth.AccountKeeper, addr sdk.AccAddress, amt sdk.Coins) (sdk.Coins, sdk.Tags, sdk.Error) {
+	if !amt.IsValid() {
+		panic(fmt.Sprintf("invalid coins [%s]", amt))
+	}
 	ctx.GasMeter().ConsumeGas(costAddCoins, "addCoins")
 	oldCoins := getCoins(ctx, am, addr)
-	newCoins := oldCoins.Plus(amt)
-	if !newCoins.IsNotNegative() {
-		return amt, nil, sdk.ErrInsufficientCoins(fmt.Sprintf("%s is less than %s", oldCoins, amt))
-	}
+	newCoins := oldCoins.Add(amt)
 	err := setCoins(ctx, am, addr, newCoins)
 
 	// adding coins to BurnedCoinsAccAddr is equivalent to burning coins

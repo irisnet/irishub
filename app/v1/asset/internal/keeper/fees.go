@@ -61,7 +61,7 @@ func feeHandler(ctx sdk.Context, k Keeper, feeAcc sdk.AccAddress, fee sdk.Coin) 
 
 	// compute community tax and burned coin
 	communityTaxCoin := sdk.NewCoin(fee.Denom, sdk.NewDecFromInt(fee.Amount).Mul(assetTaxRate).TruncateInt())
-	burnedCoin := fee.Minus(communityTaxCoin)
+	burnedCoin := fee.Sub(communityTaxCoin)
 
 	// send community tax
 	if _, err := k.bk.SendCoins(ctx, feeAcc, auth.CommunityTaxCoinsAccAddr, sdk.Coins{communityTaxCoin}); err != nil {
