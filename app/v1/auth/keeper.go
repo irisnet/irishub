@@ -287,20 +287,6 @@ func TotalSupplyStoreKey(denom string) []byte {
 	return append(totalSupplyKeyPrefix, keyId...)
 }
 
-func (am AccountKeeper) IterateTotalSupply(ctx sdk.Context, op func(coin sdk.Coin) (stop bool)) {
-	store := ctx.KVStore(am.key)
-
-	iterator := sdk.KVStorePrefixIterator(store, totalSupplyKeyPrefix)
-	defer iterator.Close()
-
-	for ; iterator.Valid(); iterator.Next() {
-		var coin sdk.Coin
-		am.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &coin)
-		if stop := op(coin); stop {
-			break
-		}
-	}
-}
 func (am AccountKeeper) IncreaseTotalSupply(ctx sdk.Context, coin sdk.Coin) sdk.Error {
 	// parameter checking
 	if coin == (sdk.Coin{}) || !coin.IsPositive() {
@@ -376,6 +362,27 @@ func (am AccountKeeper) SetTotalSupply(ctx sdk.Context, totalSupply sdk.Coin) {
 	bzNew := am.cdc.MustMarshalBinaryLengthPrefixed(totalSupply)
 	store := ctx.KVStore(am.key)
 	store.Set(TotalSupplyStoreKey(totalSupply.Denom), bzNew)
+}
+
+func (am AccountKeeper) InitTotalSupply(ctx sdk.Context) {
+	tsMap := make(map[string]sdk.Coin)
+	am.IterateAccounts(ctx, func(account Account) (stop bool) {
+		for _, coin := range account.GetCoins() {
+			if sdk.IrisAtto == coin.Denom || sdk.Iris == coin.Denom {
+				continue
+			}
+			totalSupply, ok := tsMap[coin.Denom]
+			if !ok {
+				tsMap[coin.Denom] = coin
+			} else {
+				tsMap[coin.Denom] = coin.Plus(totalSupply)
+			}
+		}
+		return false
+	})
+	for _, coin := range tsMap {
+		am.SetTotalSupply(ctx, coin)
+	}
 }
 
 //----------------------------------------
