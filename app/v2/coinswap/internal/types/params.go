@@ -2,13 +2,15 @@ package types
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/irisnet/irishub/app/v1/params"
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
-	"strings"
 )
 
 const (
+	// DefaultParamSpace for coinswap
 	DefaultParamSpace = ModuleName
 )
 
@@ -24,6 +26,7 @@ type Params struct {
 	Fee         FeeParam `json:"fee"`
 }
 
+// NewParams coinswap params constructor
 func NewParams(nativeDenom string, fee FeeParam) Params {
 	return Params{
 		NativeDenom: nativeDenom,
@@ -40,6 +43,7 @@ type FeeParam struct {
 	Denominator sdk.Int `json:"fee_denominator"`
 }
 
+// NewFeeParam coinswap fee param constructor
 func NewFeeParam(numerator, denominator sdk.Int) FeeParam {
 	return FeeParam{
 		Numerator:   numerator,
@@ -47,7 +51,7 @@ func NewFeeParam(numerator, denominator sdk.Int) FeeParam {
 	}
 }
 
-// ParamKeyTable returns the KeyTable for coinswap module
+// ParamTypeTable returns the TypeTable for coinswap module
 func ParamTypeTable() params.TypeTable {
 	return params.NewTypeTable().RegisterParamSet(&Params{})
 }
@@ -60,18 +64,20 @@ func (p Params) String() string {
 	)
 }
 
-// Implements params.ParamStruct
+// GetParamSpace Implements params.ParamStruct
 func (p *Params) GetParamSpace() string {
 	return DefaultParamSpace
 }
 
+// KeyValuePairs  Implements params.KeyValuePairs
 func (p *Params) KeyValuePairs() params.KeyValuePairs {
 	return params.KeyValuePairs{
-		{nativeDenomKey, &p.NativeDenom},
-		{feeKey, &p.Fee},
+		{Key: nativeDenomKey, Value: &p.NativeDenom},
+		{Key: feeKey, Value: &p.Fee},
 	}
 }
 
+// Validate Implements params.Validate
 func (p *Params) Validate(key string, value string) (interface{}, sdk.Error) {
 	switch key {
 	default:
@@ -79,6 +85,7 @@ func (p *Params) Validate(key string, value string) (interface{}, sdk.Error) {
 	}
 }
 
+// StringFromBytes Implements params.StringFromBytes
 func (p *Params) StringFromBytes(cdc *codec.Codec, key string, bytes []byte) (string, error) {
 	switch key {
 	default:
@@ -86,6 +93,7 @@ func (p *Params) StringFromBytes(cdc *codec.Codec, key string, bytes []byte) (st
 	}
 }
 
+// ReadOnly Implements params.ReadOnly
 func (p *Params) ReadOnly() bool {
 	return false
 }

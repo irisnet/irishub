@@ -1,4 +1,4 @@
-// nolint
+// Package types nolint
 package types
 
 import (

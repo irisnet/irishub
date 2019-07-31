@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/irisnet/irishub/app/v1/bank"
+	v2 "github.com/irisnet/irishub/app/v2"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -12,7 +13,6 @@ import (
 	"testing"
 
 	"github.com/irisnet/irishub/app"
-	v1 "github.com/irisnet/irishub/app/v1"
 	"github.com/irisnet/irishub/app/v1/asset"
 	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/app/v1/gov"
@@ -64,7 +64,7 @@ func getAmountFromCoinStr(coinStr string) float64 {
 	return num
 }
 
-func modifyGenesisState(genesisState v1.GenesisFileState) v1.GenesisFileState {
+func modifyGenesisState(genesisState v2.GenesisFileState) v2.GenesisFileState {
 	genesisState.GovData = gov.DefaultGenesisStateForCliTest()
 	genesisState.UpgradeData = upgrade.DefaultGenesisStateForTest()
 	genesisState.ServiceData = service.DefaultGenesisStateForTest()
@@ -116,11 +116,11 @@ func initializeFixtures(t *testing.T) (chainID, servAddr, port, irisHome, iriscl
 	chainID = executeInit(t, fmt.Sprintf("iris init -o --moniker=foo --home=%s", irisHome))
 	genFile := filepath.Join(irisHome, "config", "genesis.json")
 	genDoc := readGenesisFile(t, genFile)
-	var appState v1.GenesisFileState
+	var appState v2.GenesisFileState
 	cdc := app.MakeLatestCodec()
 	err := cdc.UnmarshalJSON(genDoc.AppState, &appState)
 	require.NoError(t, err)
-	appState.Accounts = []v1.GenesisFileAccount{v1.NewDefaultGenesisFileAccount(fooAddr)}
+	appState.Accounts = []v2.GenesisFileAccount{v2.NewDefaultGenesisFileAccount(fooAddr)}
 	appState = modifyGenesisState(appState)
 	appStateJSON, err := codec.Cdc.MarshalJSON(appState)
 	require.NoError(t, err)

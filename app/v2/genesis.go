@@ -1,4 +1,4 @@
-package v0
+package v2
 
 import (
 	"encoding/json"
@@ -10,22 +10,26 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/irisnet/irishub/app/v2/coinswap"
+
+	"github.com/irisnet/irishub/app/v1/asset"
+	"github.com/irisnet/irishub/app/v1/auth"
+	distr "github.com/irisnet/irishub/app/v1/distribution"
+	"github.com/irisnet/irishub/app/v1/gov"
+	"github.com/irisnet/irishub/app/v1/mint"
+	"github.com/irisnet/irishub/app/v1/rand"
+	"github.com/irisnet/irishub/app/v1/service"
+	"github.com/irisnet/irishub/app/v1/slashing"
+	"github.com/irisnet/irishub/app/v1/stake"
+	"github.com/irisnet/irishub/app/v1/upgrade"
 	"github.com/irisnet/irishub/codec"
-	"github.com/irisnet/irishub/modules/auth"
-	distr "github.com/irisnet/irishub/modules/distribution"
-	"github.com/irisnet/irishub/modules/gov"
 	"github.com/irisnet/irishub/modules/guardian"
-	"github.com/irisnet/irishub/modules/mint"
-	"github.com/irisnet/irishub/modules/service"
-	"github.com/irisnet/irishub/modules/slashing"
-	"github.com/irisnet/irishub/modules/stake"
-	"github.com/irisnet/irishub/modules/upgrade"
 	"github.com/irisnet/irishub/types"
 	sdk "github.com/irisnet/irishub/types"
 	tmtypes "github.com/tendermint/tendermint/types"
 )
 
-// State to Unmarshal
+// GenesisState state to unmarshal
 type GenesisState struct {
 	Accounts     []GenesisAccount      `json:"accounts"`
 	AuthData     auth.GenesisState     `json:"auth"`
@@ -37,12 +41,16 @@ type GenesisState struct {
 	SlashingData slashing.GenesisState `json:"slashing"`
 	ServiceData  service.GenesisState  `json:"service"`
 	GuardianData guardian.GenesisState `json:"guardian"`
+	AssetData    asset.GenesisState    `json:"asset"`
+	RandData     rand.GenesisState     `json:"rand"`
+	SwapData     coinswap.GenesisState `json:"swap"`
 	GenTxs       []json.RawMessage     `json:"gentxs"`
 }
 
+// NewGenesisState genesis state constructor
 func NewGenesisState(accounts []GenesisAccount, authData auth.GenesisState, stakeData stake.GenesisState, mintData mint.GenesisState,
 	distrData distr.GenesisState, govData gov.GenesisState, upgradeData upgrade.GenesisState, serviceData service.GenesisState,
-	guardianData guardian.GenesisState, slashingData slashing.GenesisState) GenesisState {
+	guardianData guardian.GenesisState, slashingData slashing.GenesisState, assetData asset.GenesisState, randData rand.GenesisState, swapData coinswap.GenesisState) GenesisState {
 
 	return GenesisState{
 		Accounts:     accounts,
@@ -55,6 +63,9 @@ func NewGenesisState(accounts []GenesisAccount, authData auth.GenesisState, stak
 		ServiceData:  serviceData,
 		GuardianData: guardianData,
 		SlashingData: slashingData,
+		AssetData:    assetData,
+		RandData:     randData,
+		SwapData:     swapData,
 	}
 }
 
@@ -66,6 +77,7 @@ type GenesisAccount struct {
 	AccountNumber uint64         `json:"account_number"`
 }
 
+// NewGenesisAccount genesis account constructor
 func NewGenesisAccount(acc *auth.BaseAccount) GenesisAccount {
 	return GenesisAccount{
 		Address:       acc.Address,
@@ -75,6 +87,7 @@ func NewGenesisAccount(acc *auth.BaseAccount) GenesisAccount {
 	}
 }
 
+// NewGenesisAccountI genesis account constructor
 func NewGenesisAccountI(acc auth.Account) GenesisAccount {
 	return GenesisAccount{
 		Address:       acc.GetAddress(),
@@ -84,7 +97,7 @@ func NewGenesisAccountI(acc auth.Account) GenesisAccount {
 	}
 }
 
-// convert GenesisAccount to auth.BaseAccount
+// ToAccount convert GenesisAccount to auth.BaseAccount
 func (ga *GenesisAccount) ToAccount() (acc *auth.BaseAccount) {
 	return &auth.BaseAccount{
 		Address:       ga.Address,
@@ -94,7 +107,7 @@ func (ga *GenesisAccount) ToAccount() (acc *auth.BaseAccount) {
 	}
 }
 
-// Create the core parameters for genesis initialization for iris
+// IrisAppGenState create the core parameters for genesis initialization for iris;
 // note that the pubkey input is this machines pubkey
 func IrisAppGenState(cdc *codec.Codec, genDoc tmtypes.GenesisDoc, appGenTxs []json.RawMessage) (
 	genesisState GenesisFileState, err error) {
@@ -159,7 +172,7 @@ func validateGenesisStateAccounts(accs []GenesisAccount) (err error) {
 	return
 }
 
-// IrisAppGenState but with JSON
+// IrisAppGenStateJSON but with JSON
 func IrisAppGenStateJSON(cdc *codec.Codec, genDoc tmtypes.GenesisDoc, appGenTxs []json.RawMessage) (
 	appState json.RawMessage, err error) {
 
@@ -287,6 +300,19 @@ func convertToMinDenomCoins(coinStrArray []string) sdk.Coins {
 				panic(fmt.Sprintf("fatal error in converting %s to %s", coinStr, sdk.IrisAtto))
 			}
 			irisCoin = irisCoin.Plus(convertedIrisCoin)
+		} else {
+			// non-iris tokens
+			denom, amount, err := types.ParseCoinParts(coinStr)
+			if err != nil {
+				panic(fmt.Sprintf("fatal error: genesis file contains invalid coin: %s", coinStr))
+			}
+
+			amt, ok := sdk.NewIntFromString(amount)
+			if !ok {
+				panic(fmt.Sprintf("coin (%s) amount should be integer ", coinStr))
+			}
+			denom = strings.ToLower(denom)
+			accountCoins = append(accountCoins, sdk.NewCoin(denom, amt))
 		}
 	}
 	accountCoins = append(accountCoins, irisCoin)
@@ -318,10 +344,14 @@ func convertToGenesisState(genesisFileState GenesisFileState) GenesisState {
 		SlashingData: genesisFileState.SlashingData,
 		ServiceData:  genesisFileState.ServiceData,
 		GuardianData: genesisFileState.GuardianData,
+		AssetData:    genesisFileState.AssetData,
+		RandData:     genesisFileState.RandData,
 		GenTxs:       genesisFileState.GenTxs,
+		SwapData:     genesisFileState.SwapData,
 	}
 }
 
+// GenesisFileState genesis file state
 type GenesisFileState struct {
 	Accounts     []GenesisFileAccount  `json:"accounts"`
 	AuthData     auth.GenesisState     `json:"auth"`
@@ -333,9 +363,13 @@ type GenesisFileState struct {
 	SlashingData slashing.GenesisState `json:"slashing"`
 	ServiceData  service.GenesisState  `json:"service"`
 	GuardianData guardian.GenesisState `json:"guardian"`
+	AssetData    asset.GenesisState    `json:"asset"`
+	RandData     rand.GenesisState     `json:"rand"`
+	SwapData     coinswap.GenesisState `json:"swap"`
 	GenTxs       []json.RawMessage     `json:"gentxs"`
 }
 
+// GenesisFileAccount genesis file account
 type GenesisFileAccount struct {
 	Address       sdk.AccAddress `json:"address"`
 	Coins         []string       `json:"coins"`
@@ -343,6 +377,7 @@ type GenesisFileAccount struct {
 	AccountNumber uint64         `json:"account_number"`
 }
 
+// NewGenesisFileAccount genesis file account constructor
 func NewGenesisFileAccount(acc *auth.BaseAccount) GenesisFileAccount {
 	var coins []string
 	for _, coin := range acc.Coins {
@@ -356,9 +391,10 @@ func NewGenesisFileAccount(acc *auth.BaseAccount) GenesisFileAccount {
 	}
 }
 
+// NewGenesisFileState genesis file state constructor
 func NewGenesisFileState(accounts []GenesisFileAccount, authData auth.GenesisState, stakeData stake.GenesisState, mintData mint.GenesisState,
 	distrData distr.GenesisState, govData gov.GenesisState, upgradeData upgrade.GenesisState, serviceData service.GenesisState,
-	guardianData guardian.GenesisState, slashingData slashing.GenesisState) GenesisFileState {
+	guardianData guardian.GenesisState, slashingData slashing.GenesisState, assetData asset.GenesisState, randData rand.GenesisState, swapData coinswap.GenesisState) GenesisFileState {
 
 	return GenesisFileState{
 		Accounts:     accounts,
@@ -371,10 +407,13 @@ func NewGenesisFileState(accounts []GenesisFileAccount, authData auth.GenesisSta
 		ServiceData:  serviceData,
 		GuardianData: guardianData,
 		SlashingData: slashingData,
+		AssetData:    assetData,
+		RandData:     randData,
+		SwapData:     swapData,
 	}
 }
 
-// NewDefaultGenesisState generates the default state for iris.
+// NewDefaultGenesisFileState generates the default state for iris.
 func NewDefaultGenesisFileState() GenesisFileState {
 	return GenesisFileState{
 		Accounts:     nil,
@@ -387,10 +426,14 @@ func NewDefaultGenesisFileState() GenesisFileState {
 		ServiceData:  service.DefaultGenesisState(),
 		GuardianData: guardian.DefaultGenesisState(),
 		SlashingData: slashing.DefaultGenesisState(),
+		AssetData:    asset.DefaultGenesisState(),
+		RandData:     rand.DefaultGenesisState(),
+		SwapData:     coinswap.DefaultGenesisState(),
 		GenTxs:       nil,
 	}
 }
 
+// NewDefaultGenesisFileAccount generates the default account for iris.
 func NewDefaultGenesisFileAccount(addr sdk.AccAddress) GenesisFileAccount {
 	accAuth := auth.NewBaseAccountWithAddress(addr)
 	accAuth.Coins = []sdk.Coin{

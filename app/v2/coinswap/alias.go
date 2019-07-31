@@ -1,8 +1,8 @@
 package coinswap
 
 import (
-	"github.com/irisnet/irishub/app/v1/coinswap/internal/keeper"
-	"github.com/irisnet/irishub/app/v1/coinswap/internal/types"
+	"github.com/irisnet/irishub/app/v2/coinswap/internal/keeper"
+	"github.com/irisnet/irishub/app/v2/coinswap/internal/types"
 )
 
 type (

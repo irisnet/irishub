@@ -2,7 +2,7 @@ package cli
 
 import (
 	"fmt"
-	"github.com/irisnet/irishub/app/v1/coinswap"
+	"github.com/irisnet/irishub/app/v2/coinswap"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/codec"

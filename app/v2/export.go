@@ -1,8 +1,9 @@
-package v1
+package v2
 
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/irisnet/irishub/app/v2/coinswap"
 
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/app/v1/asset"
@@ -22,7 +23,7 @@ import (
 )
 
 // export the state of iris for a genesis file
-func (p *ProtocolV1) ExportAppStateAndValidators(ctx sdk.Context, forZeroHeight bool) (
+func (p *ProtocolV2) ExportAppStateAndValidators(ctx sdk.Context, forZeroHeight bool) (
 	appState json.RawMessage, validators []tmtypes.GenesisValidator, err error) {
 
 	if forZeroHeight {
@@ -68,6 +69,7 @@ func (p *ProtocolV1) ExportAppStateAndValidators(ctx sdk.Context, forZeroHeight 
 		slashing.ExportGenesis(ctx, p.slashingKeeper),
 		asset.ExportGenesis(ctx, p.assetKeeper),
 		rand.ExportGenesis(ctx, p.randKeeper),
+		coinswap.ExportGenesis(ctx, p.coinswapKeeper),
 	)
 	appState, err = codec.MarshalJSONIndent(p.cdc, genState)
 	if err != nil {
@@ -79,7 +81,7 @@ func (p *ProtocolV1) ExportAppStateAndValidators(ctx sdk.Context, forZeroHeight 
 }
 
 // prepare for fresh start at zero height
-func (p *ProtocolV1) prepForZeroHeightGenesis(ctx sdk.Context) {
+func (p *ProtocolV2) prepForZeroHeightGenesis(ctx sdk.Context) {
 
 	/* Handle fee distribution state. */
 
