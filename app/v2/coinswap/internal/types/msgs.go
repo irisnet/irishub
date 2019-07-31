@@ -16,7 +16,7 @@ var (
 // MsgSwapOrder
 /* --------------------------------------------------------------------------- */
 
-// MsgSwap Order - struct for swapping a coin
+// MsgSwapOrder - struct for swapping a coin
 // Input and Output can either be exact or calculated.
 // An exact coin has the senders desired buy or sell amount.
 // A calculated coin has the desired denomination and bounded amount
@@ -119,7 +119,7 @@ func NewMsgAddLiquidity(
 	}
 }
 
-// Type Implements Msg.
+// Route Implements Msg.
 func (msg MsgAddLiquidity) Route() string { return RouterKey }
 
 // Type Implements Msg.
@@ -186,7 +186,7 @@ func NewMsgRemoveLiquidity(
 	}
 }
 
-// Type Implements Msg.
+// Route Implements Msg.
 func (msg MsgRemoveLiquidity) Route() string { return RouterKey }
 
 // Type Implements Msg.

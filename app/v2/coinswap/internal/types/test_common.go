@@ -11,10 +11,10 @@ import (
 var (
 	amt = sdk.NewInt(100)
 
-	sender_pk    = ed25519.GenPrivKey().PubKey()
-	recipient_pk = ed25519.GenPrivKey().PubKey()
-	sender       = sdk.AccAddress(sender_pk.Address())
-	recipient    = sdk.AccAddress(recipient_pk.Address())
+	senderPk    = ed25519.GenPrivKey().PubKey()
+	recipientPk = ed25519.GenPrivKey().PubKey()
+	sender      = sdk.AccAddress(senderPk.Address())
+	recipient   = sdk.AccAddress(recipientPk.Address())
 
 	denom0 = "atom"
 	denom1 = "btc"

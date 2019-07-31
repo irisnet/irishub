@@ -4,6 +4,8 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"fmt"
+	v1 "github.com/irisnet/irishub/app/v1"
+	v2 "github.com/irisnet/irishub/app/v2"
 	"os"
 	"path"
 
@@ -135,6 +137,8 @@ func NewIrisApp(logger log.Logger, db dbm.DB, baseAppOptions ...func(*bam.BaseAp
 	}
 
 	engine.Add(v0.NewProtocolV0(0, logger, protocolKeeper, true, false, cfg.DefaultInstrumentationConfig()))
+	engine.Add(v1.NewProtocolV1(1, logger, protocolKeeper, true, false, cfg.DefaultInstrumentationConfig()))
+	engine.Add(v2.NewProtocolV2(2, logger, protocolKeeper, true, false, cfg.DefaultInstrumentationConfig()))
 	// engine.Add(v1.NewProtocolV1(1, ...))
 
 	engine.LoadCurrentProtocol(app.GetKVStore(protocol.KeyMain))

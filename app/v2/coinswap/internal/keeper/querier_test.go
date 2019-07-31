@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/require"
 	abci "github.com/tendermint/tendermint/abci/types"
 
-	"github.com/irisnet/irishub/app/v1/coinswap/internal/types"
+	"github.com/irisnet/irishub/app/v2/coinswap/internal/types"
 	sdk "github.com/irisnet/irishub/types"
 )
 

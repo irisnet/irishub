@@ -1,9 +1,11 @@
-package v1
+package v2
 
 import (
 	"fmt"
 	"sort"
 	"strings"
+
+	"github.com/irisnet/irishub/app/v2/coinswap"
 
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/app/v1/asset"
@@ -26,9 +28,10 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 )
 
-var _ protocol.Protocol = (*ProtocolV1)(nil)
+var _ protocol.Protocol = (*ProtocolV2)(nil)
 
-type ProtocolV1 struct {
+// ProtocolV2 define the protocol
+type ProtocolV2 struct {
 	version        uint64
 	cdc            *codec.Codec
 	logger         log.Logger
@@ -52,6 +55,7 @@ type ProtocolV1 struct {
 	upgradeKeeper  upgrade.Keeper
 	assetKeeper    asset.Keeper
 	randKeeper     rand.Keeper
+	coinswapKeeper coinswap.Keeper
 
 	router      protocol.Router      // handle any kind of message
 	queryRouter protocol.QueryRouter // router for redirecting query calls
@@ -69,8 +73,9 @@ type ProtocolV1 struct {
 	metrics *Metrics
 }
 
-func NewProtocolV1(version uint64, log log.Logger, pk sdk.ProtocolKeeper, checkInvariant bool, trackCoinFlow bool, config *cfg.InstrumentationConfig) *ProtocolV1 {
-	p0 := ProtocolV1{
+// NewProtocolV2 protocol v2 constructor
+func NewProtocolV2(version uint64, log log.Logger, pk sdk.ProtocolKeeper, checkInvariant bool, trackCoinFlow bool, config *cfg.InstrumentationConfig) *ProtocolV2 {
+	p0 := ProtocolV2{
 		version:        version,
 		logger:         log,
 		protocolKeeper: pk,
@@ -85,8 +90,8 @@ func NewProtocolV1(version uint64, log log.Logger, pk sdk.ProtocolKeeper, checkI
 	return &p0
 }
 
-// load the configuration of this Protocol
-func (p *ProtocolV1) Load() {
+// Load load the configuration of this Protocol
+func (p *ProtocolV2) Load() {
 	p.configCodec()
 	p.configKeepers()
 	p.configRouters()
@@ -94,7 +99,8 @@ func (p *ProtocolV1) Load() {
 	p.configParams()
 }
 
-func (p *ProtocolV1) Init(ctx sdk.Context) {
+// Init init the configuration of this Protocol
+func (p *ProtocolV2) Init(ctx sdk.Context) {
 	p.InitMetrics(ctx.MultiStore())
 
 	// initialize asset params
@@ -110,19 +116,22 @@ func (p *ProtocolV1) Init(ctx sdk.Context) {
 	p.govKeeper.Init(ctx)
 }
 
-func (p *ProtocolV1) GetCodec() *codec.Codec {
+// GetCodec get codec
+func (p *ProtocolV2) GetCodec() *codec.Codec {
 	return p.cdc
 }
 
-func (p *ProtocolV1) InitMetrics(store sdk.MultiStore) {
+// InitMetrics init prometheus metrics
+func (p *ProtocolV2) InitMetrics(store sdk.MultiStore) {
 	p.StakeKeeper.InitMetrics(store.GetKVStore(protocol.KeyStake))
 	p.serviceKeeper.InitMetrics(store.GetKVStore(protocol.KeyService))
 }
 
-func (p *ProtocolV1) configCodec() {
+func (p *ProtocolV2) configCodec() {
 	p.cdc = MakeCodec()
 }
 
+// MakeCodec register codec
 func MakeCodec() *codec.Codec {
 	var cdc = codec.New()
 	params.RegisterCodec(cdc) // only used by querier
@@ -140,14 +149,17 @@ func MakeCodec() *codec.Codec {
 	asset.RegisterCodec(cdc)
 	rand.RegisterCodec(cdc)
 	codec.RegisterCrypto(cdc)
+	coinswap.RegisterCodec(cdc)
 	return cdc
 }
 
-func (p *ProtocolV1) GetVersion() uint64 {
+// GetVersion get protocol version
+func (p *ProtocolV2) GetVersion() uint64 {
 	return p.version
 }
 
-func (p *ProtocolV1) ValidateTx(ctx sdk.Context, txBytes []byte, msgs []sdk.Msg) sdk.Error {
+// ValidateTx validate txs
+func (p *ProtocolV2) ValidateTx(ctx sdk.Context, txBytes []byte, msgs []sdk.Msg) sdk.Error {
 
 	serviceMsgNum := 0
 	for _, msg := range msgs {
@@ -192,7 +204,7 @@ func (p *ProtocolV1) ValidateTx(ctx sdk.Context, txBytes []byte, msgs []sdk.Msg)
 }
 
 // create all Keepers
-func (p *ProtocolV1) configKeepers() {
+func (p *ProtocolV2) configKeepers() {
 	// define the AccountKeeper
 	p.accountMapper = auth.NewAccountKeeper(
 		p.cdc,
@@ -280,10 +292,11 @@ func (p *ProtocolV1) configKeepers() {
 	)
 
 	p.randKeeper = rand.NewKeeper(p.cdc, protocol.KeyRand, rand.DefaultCodespace)
+	p.coinswapKeeper = coinswap.NewKeeper(p.cdc, protocol.KeySwap, p.bankKeeper, p.accountMapper, p.paramsKeeper.Subspace(coinswap.DefaultParamSpace))
 }
 
 // configure all Routers
-func (p *ProtocolV1) configRouters() {
+func (p *ProtocolV2) configRouters() {
 	p.router.
 		AddRoute(protocol.BankRoute, bank.NewHandler(p.bankKeeper)).
 		AddRoute(protocol.StakeRoute, stake.NewHandler(p.StakeKeeper)).
@@ -293,7 +306,8 @@ func (p *ProtocolV1) configRouters() {
 		AddRoute(protocol.ServiceRoute, service.NewHandler(p.serviceKeeper)).
 		AddRoute(protocol.GuardianRoute, guardian.NewHandler(p.guardianKeeper)).
 		AddRoute(protocol.AssetRoute, asset.NewHandler(p.assetKeeper)).
-		AddRoute(protocol.RandRoute, rand.NewHandler(p.randKeeper))
+		AddRoute(protocol.RandRoute, rand.NewHandler(p.randKeeper)).
+		AddRoute(protocol.SwapRoute, coinswap.NewHandler(p.coinswapKeeper))
 
 	p.queryRouter.
 		AddRoute(protocol.AccountRoute, bank.NewQuerier(p.bankKeeper, p.cdc)).
@@ -309,7 +323,7 @@ func (p *ProtocolV1) configRouters() {
 }
 
 // configure all FeeHandlers
-func (p *ProtocolV1) configFeeHandlers() {
+func (p *ProtocolV2) configFeeHandlers() {
 	authAnteHandler := auth.NewAnteHandler(p.accountMapper, p.feeKeeper)
 	assetAnteHandler := asset.NewAnteHandler(p.assetKeeper)
 
@@ -318,7 +332,8 @@ func (p *ProtocolV1) configFeeHandlers() {
 	p.feePreprocessHandler = auth.NewFeePreprocessHandler(p.feeKeeper)
 }
 
-func (p *ProtocolV1) GetKVStoreKeyList() []*sdk.KVStoreKey {
+// GetKVStoreKeyList get KVStore Key List
+func (p *ProtocolV2) GetKVStoreKeyList() []*sdk.KVStoreKey {
 	return []*sdk.KVStoreKey{
 		protocol.KeyMain,
 		protocol.KeyAccount,
@@ -339,12 +354,12 @@ func (p *ProtocolV1) GetKVStoreKeyList() []*sdk.KVStoreKey {
 }
 
 // configure all Params
-func (p *ProtocolV1) configParams() {
-	p.paramsKeeper.RegisterParamSet(&mint.Params{}, &slashing.Params{}, &service.Params{}, &auth.Params{}, &stake.Params{}, &distr.Params{}, &asset.Params{}, &gov.GovParams{})
+func (p *ProtocolV2) configParams() {
+	p.paramsKeeper.RegisterParamSet(&mint.Params{}, &slashing.Params{}, &service.Params{}, &auth.Params{}, &stake.Params{}, &distr.Params{}, &asset.Params{}, &gov.GovParams{}, &coinswap.Params{})
 }
 
-// application updates every begin block
-func (p *ProtocolV1) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
+// BeginBlocker application updates every begin block
+func (p *ProtocolV2) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
 	// mint new tokens for this new block
 	tags := mint.BeginBlocker(ctx, p.mintKeeper)
 
@@ -364,8 +379,8 @@ func (p *ProtocolV1) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) a
 	}
 }
 
-// application updates every end block
-func (p *ProtocolV1) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
+// EndBlocker application updates every end block
+func (p *ProtocolV2) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
 	tags := gov.EndBlocker(ctx, p.govKeeper)
 	tags = tags.AppendTags(slashing.EndBlocker(ctx, req, p.slashingKeeper))
 	tags = tags.AppendTags(service.EndBlocker(ctx, p.serviceKeeper))
@@ -383,9 +398,9 @@ func (p *ProtocolV1) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.
 	}
 }
 
-// Custom logic for iris initialization
+// InitChainer Custom logic for iris initialization
 // Only v0 needs InitChainer
-func (p *ProtocolV1) InitChainer(ctx sdk.Context, DeliverTx sdk.DeliverTx, req abci.RequestInitChain) abci.ResponseInitChain {
+func (p *ProtocolV2) InitChainer(ctx sdk.Context, DeliverTx sdk.DeliverTx, req abci.RequestInitChain) abci.ResponseInitChain {
 	stateJSON := req.AppStateBytes
 
 	var genesisFileState GenesisFileState
@@ -425,6 +440,7 @@ func (p *ProtocolV1) InitChainer(ctx sdk.Context, DeliverTx sdk.DeliverTx, req a
 	upgrade.InitGenesis(ctx, p.upgradeKeeper, genesisState.UpgradeData)
 	asset.InitGenesis(ctx, p.assetKeeper, genesisState.AssetData)
 	rand.InitGenesis(ctx, p.randKeeper, genesisState.RandData)
+	coinswap.InitGenesis(ctx, p.coinswapKeeper, genesisState.SwapData)
 
 	// load the address to pubkey map
 	err = IrisValidateGenesisState(genesisState)
@@ -468,28 +484,28 @@ func (p *ProtocolV1) InitChainer(ctx sdk.Context, DeliverTx sdk.DeliverTx, req a
 	}
 }
 
-func (p *ProtocolV1) GetRouter() protocol.Router {
+func (p *ProtocolV2) GetRouter() protocol.Router {
 	return p.router
 }
-func (p *ProtocolV1) GetQueryRouter() protocol.QueryRouter {
+func (p *ProtocolV2) GetQueryRouter() protocol.QueryRouter {
 	return p.queryRouter
 }
-func (p *ProtocolV1) GetAnteHandlers() []sdk.AnteHandler {
+func (p *ProtocolV2) GetAnteHandlers() []sdk.AnteHandler {
 	return p.anteHandlers
 }
-func (p *ProtocolV1) GetFeeRefundHandler() sdk.FeeRefundHandler {
+func (p *ProtocolV2) GetFeeRefundHandler() sdk.FeeRefundHandler {
 	return p.feeRefundHandler
 }
-func (p *ProtocolV1) GetFeePreprocessHandler() sdk.FeePreprocessHandler {
+func (p *ProtocolV2) GetFeePreprocessHandler() sdk.FeePreprocessHandler {
 	return p.feePreprocessHandler
 }
-func (p *ProtocolV1) GetInitChainer() sdk.InitChainer1 {
+func (p *ProtocolV2) GetInitChainer() sdk.InitChainer1 {
 	return p.InitChainer
 }
-func (p *ProtocolV1) GetBeginBlocker() sdk.BeginBlocker {
+func (p *ProtocolV2) GetBeginBlocker() sdk.BeginBlocker {
 	return p.BeginBlocker
 }
-func (p *ProtocolV1) GetEndBlocker() sdk.EndBlocker {
+func (p *ProtocolV2) GetEndBlocker() sdk.EndBlocker {
 	return p.EndBlocker
 }
 

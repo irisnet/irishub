@@ -5,8 +5,8 @@ import (
 
 	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/app/v1/bank"
-	"github.com/irisnet/irishub/app/v1/coinswap/internal/types"
 	"github.com/irisnet/irishub/app/v1/params"
+	"github.com/irisnet/irishub/app/v2/coinswap/internal/types"
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/tendermint/tendermint/crypto"
