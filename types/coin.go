@@ -1,7 +1,6 @@
 package types
 
 import (
-	"encoding/json"
 	"fmt"
 	"regexp"
 	"sort"
@@ -148,18 +147,6 @@ func NewCoins(coins ...Coin) Coins {
 	}
 
 	return newCoins
-}
-
-type coinsJSON Coins
-
-// MarshalJSON implements a custom JSON marshaller for the Coins type to allow
-// nil Coins to be encoded as an empty array.
-func (coins Coins) MarshalJSON() ([]byte, error) {
-	if coins == nil {
-		return json.Marshal(coinsJSON(Coins{}))
-	}
-
-	return json.Marshal(coinsJSON(coins))
 }
 
 func (coins Coins) String() string {
