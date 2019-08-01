@@ -642,3 +642,32 @@ func ParseCoins(coinsStr string) (coins Coins, err error) {
 
 	return coins, nil
 }
+
+func (coins Coins) IsValidV0() bool {
+	switch len(coins) {
+	case 0:
+		return true
+	case 1:
+		return coins[0].IsPositive()
+	default:
+		if !coins[0].IsPositive() {
+			return false
+		}
+
+		lowDenom := coins[0].Denom
+
+		for _, coin := range coins[1:] {
+			if coin.Denom <= lowDenom {
+				return false
+			}
+			if !coin.IsPositive() {
+				return false
+			}
+
+			// we compare each coin against the last denom
+			lowDenom = coin.Denom
+		}
+
+		return true
+	}
+}

@@ -11,10 +11,10 @@ import (
 )
 
 const (
-	BlockStoreCostPerByte         = 10
-	ed25519VerifyCost             = 59
-	secp256k1VerifyCost           = 100
-	maxMemoCharacters             = 100
+	BlockStoreCostPerByte = 10
+	ed25519VerifyCost     = 59
+	secp256k1VerifyCost   = 100
+	maxMemoCharacters     = 100
 	// how much gas = 1 atom
 	gasPerUnitCost = 1000
 	// max total number of sigs per tx
@@ -243,7 +243,7 @@ func deductFees(acc Account, fee StdFee) (Account, sdk.Result) {
 	coins := acc.GetCoins()
 	feeAmount := fee.Amount
 
-	if !feeAmount.IsValid() {
+	if !feeAmount.IsValidV0() {
 		return nil, sdk.ErrInsufficientFee(fmt.Sprintf("invalid fee amount: %s", feeAmount)).Result()
 	}
 	newCoins, ok := coins.SafeSub(feeAmount)
