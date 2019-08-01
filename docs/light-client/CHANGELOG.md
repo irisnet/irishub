@@ -6,7 +6,7 @@
 
 ### BREAKING CHANGES:
 
-In this version, all POST methods (except '/tx/broadcast') just generate unsigned transactions, but don't broadcast them. Since '/tx/sign' is removed， users are required to sign the tx locally and use '/tx/broadcast' to broadcast the signed tx. 
+In this version, all POST methods (except '/tx/broadcast') just generate unsigned transactions, but don't broadcast them. Since '/tx/sign' is removed, users are required to sign the tx locally and use '/tx/broadcast' to broadcast the signed tx. 
 
 - Remove Key management APIs
 - Remove POST /tx/sign
