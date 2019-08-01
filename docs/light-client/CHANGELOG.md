@@ -1,5 +1,30 @@
 # IRISLCD Change Log
 
+## v0.15.0
+
+*Aug 1th, 2019*
+
+### BREAKING CHANGES:
+
+In this version, all POST methods (except '/tx/broadcast') just generate unsigned transactions, but don't broadcast them. Since '/tx/sign' is removed, users are required to sign the tx locally and use '/tx/broadcast' to broadcast the signed tx. 
+
+- Remove Key management APIs
+- Remove POST /tx/sign
+- Remove GET /distribution/community-tax
+- Remove GET /gov/params/{module}
+- Add Asset module APIs
+- Add Rand module APIs
+- Add Params module APIs
+- Add GET /bank/token-stats/{id}
+
+#### Tendermint module APIs
+
+| [v0.14.1]      | [v0.15.0]        | input changed | output changed |
+| --------------- | --------------- | --------------- | --------------- |
+| /txs/{hash} | /txs/{hash} | No | Yes |
+| /txs | /txs | No | Yes |
+
+
 ## v0.14.1
 
 *May 31th, 2019*

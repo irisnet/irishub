@@ -1,5 +1,29 @@
 # IRISLCD 更新日志
 
+## v0.15.0
+
+*Aug 1th, 2019*
+
+### 不兼容修改:
+
+在这个版本中，除'/tx/broadcast'以外的所有POST方法都只生成未签名交易，并不会对这些交易进行广播。用户需要在本地签名交易，并使用'/tx/broadcast'进行广播。
+
+- 删除 Key 模块
+- 删除 POST /tx/sign
+- 删除 GET /distribution/community-tax
+- 删除 GET /gov/params/{module}
+- 增加 Asset 模块
+- 增加 Rand 模块
+- 增加 Params 模块
+- 增加 GET /bank/token-stats/{id}
+
+#### Tendermint 模块
+
+| [v0.14.1]      | [v0.15.0]        | 输入改变 | 输出改变 |
+| --------------- | --------------- | --------------- | --------------- |
+| /txs/{hash} | /txs/{hash} | No | Yes |
+| /txs | /txs | No | Yes |
+
 ## v0.14.1
 
 *May 30th, 2019*
