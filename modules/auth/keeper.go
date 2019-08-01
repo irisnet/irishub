@@ -2,7 +2,6 @@ package auth
 
 import (
 	"fmt"
-
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/tendermint/tendermint/crypto"
@@ -187,15 +186,16 @@ func (am AccountKeeper) GetBurnedToken(ctx sdk.Context) sdk.Coins {
 }
 
 func (am AccountKeeper) IncreaseBurnedToken(ctx sdk.Context, coins sdk.Coins) {
-	if coins == nil { return }
-
-	if !coins.IsValid() {
-		panic(fmt.Sprintf("invalid coins [%s]", coins))
+	if coins == nil || !coins.IsValidV0() {
+		return
 	}
 
 	burnToken := am.GetBurnedToken(ctx)
 	// increase burn token amount
 	burnToken = burnToken.Add(coins)
+	if burnToken.IsAnyNegative() {
+		panic(fmt.Errorf("burn token is negative"))
+	}
 	// write back to db
 	bzNew := am.cdc.MustMarshalBinaryLengthPrefixed(burnToken)
 	store := ctx.KVStore(am.key)
@@ -216,16 +216,17 @@ func (am AccountKeeper) GetTotalLoosenToken(ctx sdk.Context) sdk.Coins {
 }
 
 func (am AccountKeeper) IncreaseTotalLoosenToken(ctx sdk.Context, coins sdk.Coins) {
-	if coins == nil { return }
-
-	if !coins.IsValid() {
-		panic(fmt.Sprintf("invalid coins [%s]", coins))
+	if coins == nil || !coins.IsValidV0() {
+		return
 	}
 
 	// read from db
 	totalLoosenToken := am.GetTotalLoosenToken(ctx)
 	// increase totalLoosenToken
 	totalLoosenToken = totalLoosenToken.Add(coins)
+	if totalLoosenToken.IsAnyNegative() {
+		panic(fmt.Errorf("total loosen token is overflow"))
+	}
 	// write back to db
 	bzNew := am.cdc.MustMarshalBinaryLengthPrefixed(totalLoosenToken)
 	store := ctx.KVStore(am.key)
@@ -236,10 +237,8 @@ func (am AccountKeeper) IncreaseTotalLoosenToken(ctx sdk.Context, coins sdk.Coin
 }
 
 func (am AccountKeeper) DecreaseTotalLoosenToken(ctx sdk.Context, coins sdk.Coins) {
-	if coins == nil { return }
-
-	if !coins.IsValid() {
-		panic(fmt.Sprintf("invalid coins [%s]", coins))
+	if coins == nil || !coins.IsValidV0() {
+		return
 	}
 
 	// read from db

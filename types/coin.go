@@ -1,7 +1,6 @@
 package types
 
 import (
-	"encoding/json"
 	"fmt"
 	"regexp"
 	"sort"
@@ -148,18 +147,6 @@ func NewCoins(coins ...Coin) Coins {
 	}
 
 	return newCoins
-}
-
-type coinsJSON Coins
-
-// MarshalJSON implements a custom JSON marshaller for the Coins type to allow
-// nil Coins to be encoded as an empty array.
-func (coins Coins) MarshalJSON() ([]byte, error) {
-	if coins == nil {
-		return json.Marshal(coinsJSON(Coins{}))
-	}
-
-	return json.Marshal(coinsJSON(coins))
 }
 
 func (coins Coins) String() string {
@@ -336,11 +323,11 @@ func (coins Coins) SafeSub(coinsB Coins) (Coins, bool) {
 // IsAllGT returns true if for every denom in coinsB,
 // the denom is present at a greater amount in coins.
 func (coins Coins) IsAllGT(coinsB Coins) bool {
-	if len(coins) == 0 {
+	if coins.IsZero() {
 		return false
 	}
 
-	if len(coinsB) == 0 {
+	if coinsB.IsZero() {
 		return true
 	}
 
@@ -356,11 +343,11 @@ func (coins Coins) IsAllGT(coinsB Coins) bool {
 // IsAllGTE returns true if for every denom in coinsB,
 // the denom is present at a greater or equal amount in coins.
 func (coins Coins) IsAllGTE(coinsB Coins) bool {
-	if len(coinsB) == 0 {
+	if coinsB.IsZero() {
 		return true
 	}
 
-	if len(coins) == 0 {
+	if coins.IsZero() {
 		return false
 	}
 
@@ -641,4 +628,33 @@ func ParseCoins(coinsStr string) (coins Coins, err error) {
 	coins.Sort()
 
 	return coins, nil
+}
+
+func (coins Coins) IsValidV0() bool {
+	switch len(coins) {
+	case 0:
+		return true
+	case 1:
+		return coins[0].IsPositive()
+	default:
+		if !coins[0].IsPositive() {
+			return false
+		}
+
+		lowDenom := coins[0].Denom
+
+		for _, coin := range coins[1:] {
+			if coin.Denom <= lowDenom {
+				return false
+			}
+			if !coin.IsPositive() {
+				return false
+			}
+
+			// we compare each coin against the last denom
+			lowDenom = coin.Denom
+		}
+
+		return true
+	}
 }
