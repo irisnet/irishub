@@ -336,11 +336,11 @@ func (coins Coins) SafeSub(coinsB Coins) (Coins, bool) {
 // IsAllGT returns true if for every denom in coinsB,
 // the denom is present at a greater amount in coins.
 func (coins Coins) IsAllGT(coinsB Coins) bool {
-	if len(coins) == 0 {
+	if coins.IsZero() {
 		return false
 	}
 
-	if len(coinsB) == 0 {
+	if coinsB.IsZero() {
 		return true
 	}
 
@@ -356,11 +356,11 @@ func (coins Coins) IsAllGT(coinsB Coins) bool {
 // IsAllGTE returns true if for every denom in coinsB,
 // the denom is present at a greater or equal amount in coins.
 func (coins Coins) IsAllGTE(coinsB Coins) bool {
-	if len(coinsB) == 0 {
+	if coinsB.IsZero() {
 		return true
 	}
 
-	if len(coins) == 0 {
+	if coins.IsZero() {
 		return false
 	}
 

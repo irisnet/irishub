@@ -321,7 +321,7 @@ func TestCoins(t *testing.T) {
 	assert.False(t, null.IsAllPositive(), "Expected coins to not be positive: %v", null)
 	assert.True(t, good.IsAllGTE(empty), "Expected %v to be >= %v", good, empty)
 	assert.False(t, good.IsAllLT(empty), "Expected %v to be < %v", good, empty)
-	assert.False(t, empty.IsAllLT(good), "Expected %v to be < %v", empty, good)
+	assert.True(t, empty.IsAllLT(good), "Expected %v to be < %v", empty, good)
 	assert.False(t, badSort1.IsValid(), "Coins are not sorted")
 	assert.False(t, badSort2.IsValid(), "Coins are not sorted")
 	assert.True(t, badAmt.IsValid(), "Coins can include 0 amounts")
@@ -334,6 +334,7 @@ func TestCoinsGT(t *testing.T) {
 	two := NewInt(2)
 
 	assert.False(t, Coins{}.IsAllGT(Coins{}))
+	assert.False(t, Coins{}.IsAllGT(Coins{Coin{"atom", ZeroInt()}}))
 	assert.True(t, Coins{{"atom", one}}.IsAllGT(Coins{}))
 	assert.False(t, Coins{{"atom", one}}.IsAllGT(Coins{{"atom", one}}))
 	assert.False(t, Coins{{"atom", one}}.IsAllGT(Coins{{"btc", one}}))
@@ -346,6 +347,7 @@ func TestCoinsGTE(t *testing.T) {
 	two := NewInt(2)
 
 	assert.True(t, Coins{}.IsAllGTE(Coins{}))
+	assert.True(t, Coins{}.IsAllGTE(Coins{Coin{"atom", ZeroInt()}}))
 	assert.True(t, Coins{{"atom", one}}.IsAllGTE(Coins{}))
 	assert.True(t, Coins{{"atom", one}}.IsAllGTE(Coins{{"atom", one}}))
 	assert.False(t, Coins{{"atom", one}}.IsAllGTE(Coins{{"btc", one}}))
@@ -358,6 +360,7 @@ func TestCoinsLT(t *testing.T) {
 	two := NewInt(2)
 
 	assert.False(t, Coins{}.IsAllLT(Coins{}))
+	assert.False(t, Coins{}.IsAllLT(Coins{Coin{"atom", ZeroInt()}}))
 	assert.False(t, Coins{{"atom", one}}.IsAllLT(Coins{}))
 	assert.False(t, Coins{{"atom", one}}.IsAllLT(Coins{{"atom", one}}))
 	assert.False(t, Coins{{"atom", one}}.IsAllLT(Coins{{"btc", one}}))
@@ -373,6 +376,7 @@ func TestCoinsLTE(t *testing.T) {
 	two := NewInt(2)
 
 	assert.True(t, Coins{}.IsAllLTE(Coins{}))
+	assert.True(t, Coins{}.IsAllLTE(Coins{Coin{"atom", ZeroInt()}}))
 	assert.False(t, Coins{{"atom", one}}.IsAllLTE(Coins{}))
 	assert.True(t, Coins{{"atom", one}}.IsAllLTE(Coins{{"atom", one}}))
 	assert.False(t, Coins{{"atom", one}}.IsAllLTE(Coins{{"btc", one}}))
