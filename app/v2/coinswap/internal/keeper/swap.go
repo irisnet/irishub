@@ -70,8 +70,7 @@ func (k Keeper) GetOutputPrice(ctx sdk.Context, boughtCoin sdk.Coin, soldDenom s
 
 // IsDoubleSwap returns true if the trade requires a double swap.
 func (k Keeper) IsDoubleSwap(ctx sdk.Context, denom1, denom2 string) bool {
-	nativeDenom := k.GetNativeDenom(ctx)
-	return denom1 != nativeDenom && denom2 != nativeDenom
+	return denom1 != sdk.IrisAtto && denom2 != sdk.IrisAtto
 }
 
 // GetModuleName returns the ModuleAccount name for the provided denominations.

@@ -98,8 +98,7 @@ func (k Keeper) SwapOrder(ctx sdk.Context, msg types.MsgSwapOrder) sdk.Error {
 }
 
 func (k Keeper) AddLiquidity(ctx sdk.Context, msg types.MsgAddLiquidity) sdk.Error {
-	nativeDenom := k.GetNativeDenom(ctx)
-	exchangePair, err := k.GetModuleName(nativeDenom, msg.Deposit.Denom)
+	exchangePair, err := k.GetModuleName(sdk.IrisAtto, msg.Deposit.Denom)
 
 	if err != nil {
 		return sdk.NewError(types.DefaultCodespace, types.CodeEqualDenom, err.Error())
@@ -111,38 +110,47 @@ func (k Keeper) AddLiquidity(ctx sdk.Context, msg types.MsgAddLiquidity) sdk.Err
 		k.CreateReservePool(ctx, exchangePair)
 	}
 
-	nativeBalance := reservePool.AmountOf(nativeDenom)
-	coinBalance := reservePool.AmountOf(msg.Deposit.Denom)
-	liquidityCoinBalance := reservePool.AmountOf(exchangePair)
+	nativeReserveAmt := reservePool.AmountOf(sdk.IrisAtto)
+	depositedReserveAmt := reservePool.AmountOf(msg.Deposit.Denom)
+	liquidity := reservePool.AmountOf(exchangePair)
 
-	var amtToMint, coinAmountDeposited sdk.Int
+	var mintLiquidityAmt sdk.Int
+	var depositedCoin sdk.Coin
+	var nativeCoin = sdk.NewCoin(sdk.IrisAtto, msg.DepositAmount)
 
 	// calculate amount of UNI to be minted for sender
 	// and coin amount to be deposited
-	if liquidityCoinBalance.IsZero() {
-		amtToMint = msg.DepositAmount
-		coinAmountDeposited = msg.Deposit.Amount
+	if liquidity.IsZero() {
+		mintLiquidityAmt = msg.DepositAmount
+		depositedCoin = sdk.NewCoin(msg.Deposit.Denom, msg.Deposit.Amount)
 	} else {
-		amtToMint = (liquidityCoinBalance.Mul(msg.DepositAmount)).Div(nativeBalance)
-		mod := coinBalance.Mul(msg.DepositAmount).Mod(nativeBalance)
-		coinAmountDeposited = (coinBalance.Mul(msg.DepositAmount)).Div(nativeBalance)
+		mintLiquidityAmt = (liquidity.Mul(msg.DepositAmount)).Div(nativeReserveAmt)
+		if mintLiquidityAmt.LT(msg.MinReward) {
+			return types.ErrLessThanMinReward(types.DefaultCodespace, fmt.Sprintf("liquidity[%s] is less than user 's min reward[%s]", mintLiquidityAmt.String(), msg.MinReward.String()))
+		}
+
+		mod := depositedReserveAmt.Mul(msg.DepositAmount).Mod(nativeReserveAmt)
+		depositAmt := (depositedReserveAmt.Mul(msg.DepositAmount)).Div(nativeReserveAmt)
 		if !mod.IsZero() {
-			coinAmountDeposited = coinAmountDeposited.AddRaw(1)
+			depositAmt = depositAmt.AddRaw(1)
+		}
+
+		depositedCoin = sdk.NewCoin(msg.Deposit.Denom, depositAmt)
+
+		if depositAmt.GT(msg.Deposit.Amount) {
+			return types.ErrGreaterThanMaxDeposit(types.DefaultCodespace, fmt.Sprintf("amount[%s] of token depositd is greater than user 's max deposited amount[%s]", depositedCoin.String(), msg.Deposit.String()))
 		}
 	}
 
-	nativeCoinDeposited := sdk.NewCoin(nativeDenom, msg.DepositAmount)
-	coinDeposited := sdk.NewCoin(msg.Deposit.Denom, coinAmountDeposited)
-
-	if !k.HasCoins(ctx, msg.Sender, nativeCoinDeposited, coinDeposited) {
+	if !k.HasCoins(ctx, msg.Sender, nativeCoin, depositedCoin) {
 		return sdk.ErrInsufficientCoins("sender does not have sufficient funds to add liquidity")
 	}
 
 	// transfer deposited liquidity into coinswaps ModuleAccount
-	k.SendCoins(ctx, msg.Sender, exchangePair, nativeCoinDeposited, coinDeposited)
+	k.SendCoins(ctx, msg.Sender, exchangePair, nativeCoin, depositedCoin)
 
 	// mint liquidity vouchers for sender
-	coins := k.MintCoins(ctx, exchangePair, amtToMint)
+	coins := k.MintCoins(ctx, exchangePair, mintLiquidityAmt)
 	_, _, err = k.bk.AddCoins(ctx, msg.Sender, coins.Sort())
 	if err != nil {
 		return sdk.NewError(types.DefaultCodespace, types.CodeEqualDenom, err.Error())
@@ -151,8 +159,7 @@ func (k Keeper) AddLiquidity(ctx sdk.Context, msg types.MsgAddLiquidity) sdk.Err
 }
 
 func (k Keeper) RemoveLiquidity(ctx sdk.Context, msg types.MsgRemoveLiquidity) sdk.Error {
-	nativeDenom := k.GetNativeDenom(ctx)
-	exchangePair, err := k.GetModuleName(nativeDenom, msg.Withdraw.Denom)
+	exchangePair, err := k.GetModuleName(sdk.IrisAtto, msg.Withdraw.Denom)
 
 	if err != nil {
 		return sdk.NewError(types.DefaultCodespace, types.CodeEqualDenom, err.Error())
@@ -164,31 +171,40 @@ func (k Keeper) RemoveLiquidity(ctx sdk.Context, msg types.MsgRemoveLiquidity) s
 		return sdk.NewError(types.DefaultCodespace, types.CodeEqualDenom, fmt.Sprintf("error retrieving reserve pool for ModuleAccoint name: %s", exchangePair))
 	}
 
-	nativeBalance := reservePool.AmountOf(nativeDenom)
-	coinBalance := reservePool.AmountOf(msg.Withdraw.Denom)
-	liquidityCoinBalance := reservePool.AmountOf(exchangePair)
+	nativeReserveAmt := reservePool.AmountOf(sdk.IrisAtto)
+	depositedReserveAmt := reservePool.AmountOf(msg.Withdraw.Denom)
+	liquidityReserve := reservePool.AmountOf(exchangePair)
 
 	// calculate amount of UNI to be burned for sender
 	// and coin amount to be returned
-	// TODO: verify, add amt burned
-	nativeWithdrawn := msg.WithdrawAmount.Mul(nativeBalance).Div(liquidityCoinBalance)
-	coinWithdrawn := msg.WithdrawAmount.Mul(coinBalance).Div(liquidityCoinBalance)
-	nativeCoin := sdk.NewCoin(nativeDenom, nativeWithdrawn)
-	exchangeCoin := sdk.NewCoin(msg.Withdraw.Denom, coinWithdrawn)
+	nativeWithdrawnAmt := msg.WithdrawAmount.Mul(nativeReserveAmt).Div(liquidityReserve)
+	depositedWithdrawnAmt := msg.WithdrawAmount.Mul(depositedReserveAmt).Div(liquidityReserve)
 
-	if !k.HasCoins(ctx, getPoolAccAddr(exchangePair), sdk.NewCoin(exchangePair, msg.WithdrawAmount)) {
-		return sdk.ErrInsufficientCoins("sender does not have sufficient funds to remove liquidity")
+	nativeWithdrawCoin := sdk.NewCoin(sdk.IrisAtto, nativeWithdrawnAmt)
+	depositedWithdrawCoin := sdk.NewCoin(msg.Withdraw.Denom, depositedWithdrawnAmt)
+	deltaLiquidityCoin := sdk.NewCoin(exchangePair, msg.WithdrawAmount)
+
+	if nativeWithdrawCoin.Amount.LT(msg.MinNative) {
+		return types.ErrLessThanMinWithdrawAmount(types.DefaultCodespace, fmt.Sprintf("The amount of cash available [%s] is less than the minimum amount specified [%s] by the user.", nativeWithdrawCoin.String(), sdk.NewCoin(sdk.IrisAtto, msg.MinNative).String()))
+	}
+	if depositedWithdrawCoin.Amount.LT(msg.Withdraw.Amount) {
+		return types.ErrLessThanMinWithdrawAmount(types.DefaultCodespace, fmt.Sprintf("The amount of cash available [%s] is less than the minimum amount specified [%s] by the user.", depositedWithdrawCoin.String(), msg.Withdraw.String()))
 	}
 
-	// burn liquidity vouchers
-	k.BurnCoins(ctx, exchangePair, msg.WithdrawAmount)
-	_, err = k.bk.BurnCoins(ctx, msg.Sender, sdk.Coins{sdk.NewCoin(exchangePair, msg.WithdrawAmount)})
+	// burn liquidity from reserve Pool
+	err = k.BurnLiquidity(ctx, exchangePair, deltaLiquidityCoin)
+	if err != nil {
+		return sdk.NewError(types.DefaultCodespace, types.CodeEqualDenom, err.Error())
+	}
+	// burn liquidity from account
+	_, err = k.bk.BurnCoins(ctx, msg.Sender, sdk.Coins{deltaLiquidityCoin})
+
 	if err != nil {
 		return sdk.NewError(types.DefaultCodespace, types.CodeEqualDenom, err.Error())
 	}
 
 	// transfer withdrawn liquidity from coinswaps ModuleAccount to sender's account
-	k.RecieveCoins(ctx, msg.Sender, exchangePair, nativeCoin, exchangeCoin)
+	k.RecieveCoins(ctx, msg.Sender, exchangePair, nativeWithdrawCoin, depositedWithdrawCoin)
 	return nil
 }
 
@@ -200,12 +216,17 @@ func (k Keeper) HasCoins(ctx sdk.Context, addr sdk.AccAddress, coins ...sdk.Coin
 
 // BurnCoins burns liquidity coins from the ModuleAccount at moduleName. The
 // moduleName and denomination of the liquidity coins are the same.
-func (k Keeper) BurnCoins(ctx sdk.Context, moduleName string, amt sdk.Int) {
+func (k Keeper) BurnLiquidity(ctx sdk.Context, moduleName string, deltaCoin sdk.Coin) sdk.Error {
 	swapPoolAccAddr := getPoolAccAddr(moduleName)
-	_, err := k.bk.BurnCoins(ctx, swapPoolAccAddr, sdk.Coins{sdk.NewCoin(moduleName, amt)})
-	if err != nil {
-		panic(err)
+	if !k.HasCoins(ctx, swapPoolAccAddr, deltaCoin) {
+		return sdk.ErrInsufficientCoins("sender does not have sufficient funds to remove liquidity")
 	}
+	coins := sdk.Coins{deltaCoin}
+	_, err := k.bk.BurnCoins(ctx, swapPoolAccAddr, coins)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // MintCoins mints liquidity coins to the ModuleAccount at moduleName. The
@@ -252,12 +273,6 @@ func (k Keeper) GetReservePool(ctx sdk.Context, liquidityName string) (coins sdk
 		return nil, false
 	}
 	return acc.GetCoins(), true
-}
-
-// GetNativeDenom returns the native denomination for this module from the
-// global param store.
-func (k Keeper) GetNativeDenom(ctx sdk.Context) (nativeDenom string) {
-	return k.GetParams(ctx).NativeDenom
 }
 
 // GetFeeParam returns the current FeeParam from the global param store

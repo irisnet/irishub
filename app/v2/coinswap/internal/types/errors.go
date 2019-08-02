@@ -8,11 +8,14 @@ import (
 const (
 	DefaultCodespace sdk.CodespaceType = ModuleName
 
-	CodeReservePoolAlreadyExists sdk.CodeType = 101
-	CodeEqualDenom               sdk.CodeType = 102
-	CodeInvalidDeadline          sdk.CodeType = 103
-	CodeNotPositive              sdk.CodeType = 104
-	CodeConstraintNotMet         sdk.CodeType = 105
+	CodeReservePoolAlreadyExists  sdk.CodeType = 101
+	CodeEqualDenom                sdk.CodeType = 102
+	CodeInvalidDeadline           sdk.CodeType = 103
+	CodeNotPositive               sdk.CodeType = 104
+	CodeConstraintNotMet          sdk.CodeType = 105
+	CodeLessThanMinReward         sdk.CodeType = 106
+	CodeGreaterThanMaxDeposit     sdk.CodeType = 107
+	CodeLessThanMinWithdrawAmount sdk.CodeType = 108
 )
 
 func ErrReservePoolAlreadyExists(codespace sdk.CodespaceType, msg string) sdk.Error {
@@ -48,4 +51,25 @@ func ErrConstraintNotMet(codespace sdk.CodespaceType, msg string) sdk.Error {
 		return sdk.NewError(codespace, CodeConstraintNotMet, msg)
 	}
 	return sdk.NewError(codespace, CodeConstraintNotMet, "constraint not met")
+}
+
+func ErrLessThanMinReward(codespace sdk.CodespaceType, msg string) sdk.Error {
+	if msg != "" {
+		return sdk.NewError(codespace, CodeLessThanMinReward, msg)
+	}
+	return sdk.NewError(codespace, CodeLessThanMinReward, "min liquidity is less than MinReward")
+}
+
+func ErrGreaterThanMaxDeposit(codespace sdk.CodespaceType, msg string) sdk.Error {
+	if msg != "" {
+		return sdk.NewError(codespace, CodeGreaterThanMaxDeposit, msg)
+	}
+	return sdk.NewError(codespace, CodeGreaterThanMaxDeposit, "deposited amount is greater than max deposited amount of user")
+}
+
+func ErrLessThanMinWithdrawAmount(codespace sdk.CodespaceType, msg string) sdk.Error {
+	if msg != "" {
+		return sdk.NewError(codespace, CodeLessThanMinWithdrawAmount, msg)
+	}
+	return sdk.NewError(codespace, CodeLessThanMinWithdrawAmount, "less than min withdraw amount")
 }

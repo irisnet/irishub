@@ -33,8 +33,7 @@ func queryLiquidity(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, s
 		return nil, sdk.ErrUnknownRequest(sdk.AppendMsgToErr("incorrectly formatted request data", err.Error()))
 	}
 
-	nativeDenom := k.GetNativeDenom(ctx)
-	moduleName, err := k.GetModuleName(nativeDenom, denom)
+	moduleName, err := k.GetModuleName(sdk.IrisAtto, denom)
 	if err != nil {
 		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not retrieve module name", err.Error()))
 	}
@@ -61,7 +60,7 @@ func queryParameters(ctx sdk.Context, path []string, req abci.RequestQuery, k Ke
 		}
 		return bz, nil
 	case types.ParamNativeDenom:
-		bz, err := k.cdc.MarshalJSONIndent(k.GetNativeDenom(ctx), "", " ")
+		bz, err := k.cdc.MarshalJSONIndent(sdk.IrisAtto, "", " ")
 		if err != nil {
 			return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", err.Error()))
 		}

@@ -46,9 +46,6 @@ func TestParams(t *testing.T) {
 
 		feeParam := keeper.GetFeeParam(ctx)
 		require.Equal(t, tc.params.Fee, feeParam)
-
-		nativeDenom := keeper.GetNativeDenom(ctx)
-		require.Equal(t, tc.params.NativeDenom, nativeDenom)
 	}
 }
 
