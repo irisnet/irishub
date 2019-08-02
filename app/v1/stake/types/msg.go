@@ -93,7 +93,7 @@ func (msg MsgCreateValidator) ValidateBasic() sdk.Error {
 	if msg.ValidatorAddr == nil {
 		return ErrNilValidatorAddr(DefaultCodespace)
 	}
-	if !(msg.Delegation.Amount.GT(sdk.ZeroInt())) {
+	if !msg.Delegation.IsValidIrisAtto() {
 		return ErrBadDelegationAmount(DefaultCodespace)
 	}
 	if msg.Description == (Description{}) {
@@ -210,7 +210,7 @@ func (msg MsgDelegate) ValidateBasic() sdk.Error {
 	if msg.ValidatorAddr == nil {
 		return ErrNilValidatorAddr(DefaultCodespace)
 	}
-	if !(msg.Delegation.Amount.GT(sdk.ZeroInt())) {
+	if !msg.Delegation.IsValidIrisAtto() {
 		return ErrBadDelegationAmount(DefaultCodespace)
 	}
 	return nil
@@ -274,7 +274,7 @@ func (msg MsgBeginRedelegate) ValidateBasic() sdk.Error {
 	if msg.ValidatorDstAddr == nil {
 		return ErrNilValidatorAddr(DefaultCodespace)
 	}
-	if msg.SharesAmount.LTE(sdk.ZeroDec()) {
+	if msg.SharesAmount.Int == nil || msg.SharesAmount.LTE(sdk.ZeroDec()) {
 		return ErrBadSharesAmount(DefaultCodespace)
 	}
 	return nil
@@ -327,7 +327,7 @@ func (msg MsgBeginUnbonding) ValidateBasic() sdk.Error {
 	if msg.ValidatorAddr == nil {
 		return ErrNilValidatorAddr(DefaultCodespace)
 	}
-	if msg.SharesAmount.LTE(sdk.ZeroDec()) {
+	if msg.SharesAmount.Int == nil || msg.SharesAmount.LTE(sdk.ZeroDec()) {
 		return ErrBadSharesAmount(DefaultCodespace)
 	}
 	return nil

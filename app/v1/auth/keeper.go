@@ -5,6 +5,7 @@ import (
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/tendermint/tendermint/crypto"
+	"strings"
 )
 
 var (
@@ -194,20 +195,21 @@ func (am AccountKeeper) GetTotalLoosenToken(ctx sdk.Context) sdk.Coins {
 }
 
 func (am AccountKeeper) IncreaseTotalLoosenToken(ctx sdk.Context, coins sdk.Coins) {
-	if coins == nil {
+	if coins == nil || coins.Empty() {
 		return
-	}
-
-	if !coins.IsValid() {
-		panic(fmt.Sprintf("invalid coins [%s]", coins))
 	}
 
 	// loose token only contains iris-atto
-	increaseAmount := coins.AmountOf(sdk.IrisAtto)
-	if !increaseAmount.GT(sdk.ZeroInt()) {
+	deltaCoin, err := coins.GetCoin(sdk.IrisAtto)
+	if err != nil {
+		panic(fmt.Sprintf("invalid coins [%s]", coins))
+	}
+
+	if !deltaCoin.IsPositive() {
 		return
 	}
-	increaseCoins := sdk.Coins{sdk.NewCoin(sdk.IrisAtto, increaseAmount)}
+
+	increaseCoins := sdk.Coins{deltaCoin}
 
 	// read from db
 	totalLoosenToken := am.GetTotalLoosenToken(ctx)
@@ -223,26 +225,27 @@ func (am AccountKeeper) IncreaseTotalLoosenToken(ctx sdk.Context, coins sdk.Coin
 }
 
 func (am AccountKeeper) DecreaseTotalLoosenToken(ctx sdk.Context, coins sdk.Coins) {
-	if coins == nil {
+	if coins == nil || coins.Empty() {
 		return
-	}
-
-	if !coins.IsValid() {
-		panic(fmt.Sprintf("invalid coins [%s]", coins))
 	}
 
 	// loose token only contains iris-atto
-	decreaseAmount := coins.AmountOf(sdk.IrisAtto)
-	if !decreaseAmount.GT(sdk.ZeroInt()) {
+	deltaCoin, err := coins.GetCoin(sdk.IrisAtto)
+	if err != nil {
+		panic(fmt.Sprintf("invalid coins [%s]", coins))
+	}
+
+	if !deltaCoin.IsPositive() {
 		return
 	}
-	decreaseCoins := sdk.Coins{sdk.NewCoin(sdk.IrisAtto, decreaseAmount)}
+
+	decreaseCoins := sdk.Coins{deltaCoin}
 
 	// read from db
 	totalLoosenToken := am.GetTotalLoosenToken(ctx)
 	// decrease totalLoosenToken
-	totalLoosenToken, negative := totalLoosenToken.SafeSub(decreaseCoins)
-	if negative {
+	totalLoosenToken, hasNeg := totalLoosenToken.SafeSub(decreaseCoins)
+	if hasNeg {
 		panic(fmt.Errorf("total loose token is negative"))
 	}
 	// write back to db
@@ -261,8 +264,12 @@ func TotalSupplyStoreKey(denom string) []byte {
 }
 
 func (am AccountKeeper) IncreaseTotalSupply(ctx sdk.Context, coin sdk.Coin) sdk.Error {
-	if coin == (sdk.Coin{}) || !coin.IsValid() {
+	if !strings.HasSuffix(coin.Denom, sdk.MinDenomSuffix) {
 		return sdk.ErrInvalidCoins(fmt.Sprintf("invalid coin [%s]", coin))
+	}
+
+	if !coin.IsPositive() {
+		return nil
 	}
 
 	// read from db
@@ -284,8 +291,12 @@ func (am AccountKeeper) IncreaseTotalSupply(ctx sdk.Context, coin sdk.Coin) sdk.
 }
 
 func (am AccountKeeper) DecreaseTotalSupply(ctx sdk.Context, coin sdk.Coin) sdk.Error {
-	if coin == (sdk.Coin{}) || !coin.IsValid() {
+	if !strings.HasSuffix(coin.Denom, sdk.MinDenomSuffix) {
 		return sdk.ErrInvalidCoins(fmt.Sprintf("invalid coin [%s]", coin))
+	}
+
+	if !coin.IsPositive() {
+		return nil
 	}
 
 	// read from db

@@ -11,16 +11,16 @@ import (
 // Coin tests
 
 func TestCoin(t *testing.T) {
-	require.Panics(t, func() { NewInt64Coin("atom", -1) })
-	require.Panics(t, func() { NewCoin("atom", NewInt(-1)) })
-	require.Equal(t, NewInt(5), NewInt64Coin("atom", 5).Amount)
-	require.Equal(t, NewInt(5), NewCoin("atom", NewInt(5)).Amount)
+	require.Panics(t, func() { NewInt64Coin("atom-min", -1) })
+	require.Panics(t, func() { NewCoin("atom-min", NewInt(-1)) })
+	require.Equal(t, NewInt(5), NewInt64Coin("atom-min", 5).Amount)
+	require.Equal(t, NewInt(5), NewCoin("atom-min", NewInt(5)).Amount)
 }
 
 func TestNewCoins(t *testing.T) {
-	tenatom := NewInt64Coin("atom", 10)
-	tenbtc := NewInt64Coin("btc", 10)
-	zeroeth := NewInt64Coin("eth", 0)
+	tenatom := NewInt64Coin("atom-min", 10)
+	tenbtc := NewInt64Coin("btc-min", 10)
+	zeroeth := NewInt64Coin("eth-min", 0)
 
 	println(NewCoins(zeroeth, tenatom, tenbtc).String())
 	tests := []struct {
@@ -53,10 +53,10 @@ func TestSameDenomAsCoin(t *testing.T) {
 		inputTwo Coin
 		expected bool
 	}{
-		{NewInt64Coin("atom", 1), NewInt64Coin("atom", 1), true},
-		{NewInt64Coin("atom", 1), NewInt64Coin("atom2", 1), false},
-		{NewInt64Coin("atom", 1), NewInt64Coin("btc", 1), false},
-		{NewInt64Coin("steak", 1), NewInt64Coin("steak", 10), true},
+		{NewInt64Coin("atom-min", 1), NewInt64Coin("atom-min", 1), true},
+		{NewInt64Coin("atom-min", 1), NewInt64Coin("atom2-min", 1), false},
+		{NewInt64Coin("atom-min", 1), NewInt64Coin("btc-min", 1), false},
+		{NewInt64Coin("steak-min", 1), NewInt64Coin("steak-min", 10), true},
 	}
 
 	for tcIndex, tc := range cases {
@@ -71,10 +71,10 @@ func TestIsEqualCoin(t *testing.T) {
 		inputTwo Coin
 		expected bool
 	}{
-		{NewInt64Coin("atom", 1), NewInt64Coin("atom", 1), true},
-		{NewInt64Coin("atom", 1), NewInt64Coin("atom2", 1), false},
-		{NewInt64Coin("atom", 1), NewInt64Coin("btc", 1), false},
-		{NewInt64Coin("steak", 1), NewInt64Coin("steak", 10), false},
+		{NewInt64Coin("atom-min", 1), NewInt64Coin("atom-min", 1), true},
+		{NewInt64Coin("atom-min", 1), NewInt64Coin("atom2-min", 1), false},
+		{NewInt64Coin("atom-min", 1), NewInt64Coin("btc-min", 1), false},
+		{NewInt64Coin("steak-min", 1), NewInt64Coin("steak-min", 10), false},
 	}
 
 	for tcIndex, tc := range cases {
@@ -90,9 +90,9 @@ func TestPlusCoin(t *testing.T) {
 		expected    Coin
 		shouldPanic bool
 	}{
-		{NewInt64Coin("atom", 1), NewInt64Coin("atom", 1), NewInt64Coin("atom", 2), false},
-		{NewInt64Coin("atom", 1), NewInt64Coin("atom", 0), NewInt64Coin("atom", 1), false},
-		{NewInt64Coin("atom", 1), NewInt64Coin("btc", 1), NewInt64Coin("atom", 1), true},
+		{NewInt64Coin("atom-min", 1), NewInt64Coin("atom-min", 1), NewInt64Coin("atom-min", 2), false},
+		{NewInt64Coin("atom-min", 1), NewInt64Coin("atom-min", 0), NewInt64Coin("atom-min", 1), false},
+		{NewInt64Coin("atom-min", 1), NewInt64Coin("btc-min", 1), NewInt64Coin("atom-min", 1), true},
 	}
 
 	for tcIndex, tc := range cases {
@@ -112,11 +112,11 @@ func TestMinusCoin(t *testing.T) {
 		expected    Coin
 		shouldPanic bool
 	}{
-		{NewInt64Coin("atom", 1), NewInt64Coin("btc", 1), NewInt64Coin("atom", 1), true},
-		{NewInt64Coin("atom", 10), NewInt64Coin("atom", 1), NewInt64Coin("atom", 9), false},
-		{NewInt64Coin("atom", 5), NewInt64Coin("atom", 3), NewInt64Coin("atom", 2), false},
-		{NewInt64Coin("atom", 5), NewInt64Coin("atom", 0), NewInt64Coin("atom", 5), false},
-		{NewInt64Coin("atom", 1), NewInt64Coin("atom", 5), Coin{}, true},
+		{NewInt64Coin("atom-min", 1), NewInt64Coin("btc-min", 1), NewInt64Coin("atom-min", 1), true},
+		{NewInt64Coin("atom-min", 10), NewInt64Coin("atom-min", 1), NewInt64Coin("atom-min", 9), false},
+		{NewInt64Coin("atom-min", 5), NewInt64Coin("atom-min", 3), NewInt64Coin("atom-min", 2), false},
+		{NewInt64Coin("atom-min", 5), NewInt64Coin("atom-min", 0), NewInt64Coin("atom-min", 5), false},
+		{NewInt64Coin("atom-min", 1), NewInt64Coin("atom-min", 5), Coin{}, true},
 	}
 
 	for tcIndex, tc := range cases {
@@ -132,7 +132,7 @@ func TestMinusCoin(t *testing.T) {
 		inputOne Coin
 		inputTwo Coin
 		expected int64
-	}{NewInt64Coin("atom", 1), NewInt64Coin("atom", 1), 0}
+	}{NewInt64Coin("atom-min", 1), NewInt64Coin("atom-min", 1), 0}
 	res := tc.inputOne.Sub(tc.inputTwo)
 	require.Equal(t, tc.expected, res.Amount.Int64())
 }
@@ -143,9 +143,9 @@ func TestIsGTECoin(t *testing.T) {
 		inputTwo Coin
 		expected bool
 	}{
-		{NewInt64Coin("atom", 1), NewInt64Coin("atom", 1), true},
-		{NewInt64Coin("atom", 2), NewInt64Coin("atom", 1), true},
-		{NewInt64Coin("atom", 1), NewInt64Coin("btc", 1), false},
+		{NewInt64Coin("atom-min", 1), NewInt64Coin("atom-min", 1), true},
+		{NewInt64Coin("atom-min", 2), NewInt64Coin("atom-min", 1), true},
+		{NewInt64Coin("atom-min", 1), NewInt64Coin("btc-min", 1), false},
 	}
 
 	for tcIndex, tc := range cases {
@@ -160,12 +160,12 @@ func TestIsLTCoin(t *testing.T) {
 		inputTwo Coin
 		expected bool
 	}{
-		{NewInt64Coin("atom", 1), NewInt64Coin("atom", 1), false},
-		{NewInt64Coin("atom", 2), NewInt64Coin("atom", 1), false},
-		{NewInt64Coin("atom", 0), NewInt64Coin("btc", 1), false},
-		{NewInt64Coin("atom", 1), NewInt64Coin("btc", 1), false},
-		{NewInt64Coin("atom", 1), NewInt64Coin("atom", 1), false},
-		{NewInt64Coin("atom", 1), NewInt64Coin("atom", 2), true},
+		{NewInt64Coin("atom-min", 1), NewInt64Coin("atom-min", 1), false},
+		{NewInt64Coin("atom-min", 2), NewInt64Coin("atom-min", 1), false},
+		{NewInt64Coin("atom-min", 0), NewInt64Coin("btc-min", 1), false},
+		{NewInt64Coin("atom-min", 1), NewInt64Coin("btc-min", 1), false},
+		{NewInt64Coin("atom-min", 1), NewInt64Coin("atom-min", 1), false},
+		{NewInt64Coin("atom-min", 1), NewInt64Coin("atom-min", 2), true},
 	}
 
 	for tcIndex, tc := range cases {
@@ -175,11 +175,11 @@ func TestIsLTCoin(t *testing.T) {
 }
 
 func TestCoinIsZero(t *testing.T) {
-	coin := NewInt64Coin("atom", 0)
+	coin := NewInt64Coin("atom-min", 0)
 	res := coin.IsZero()
 	require.True(t, res)
 
-	coin = NewInt64Coin("atom", 1)
+	coin = NewInt64Coin("atom-min", 1)
 	res = coin.IsZero()
 	require.False(t, res)
 }
@@ -193,10 +193,10 @@ func TestIsZeroCoins(t *testing.T) {
 		expected bool
 	}{
 		{Coins{}, true},
-		{Coins{NewInt64Coin("atom", 0)}, true},
-		{Coins{NewInt64Coin("atom", 0), NewInt64Coin("btc", 0)}, true},
-		{Coins{NewInt64Coin("atom", 1)}, false},
-		{Coins{NewInt64Coin("atom", 0), NewInt64Coin("btc", 1)}, false},
+		{Coins{NewInt64Coin("atom-min", 0)}, true},
+		{Coins{NewInt64Coin("atom-min", 0), NewInt64Coin("btc-min", 0)}, true},
+		{Coins{NewInt64Coin("atom-min", 1)}, false},
+		{Coins{NewInt64Coin("atom-min", 0), NewInt64Coin("btc-min", 1)}, false},
 	}
 
 	for _, tc := range cases {
@@ -212,12 +212,12 @@ func TestEqualCoins(t *testing.T) {
 		expected bool
 	}{
 		{Coins{}, Coins{}, true},
-		{Coins{NewInt64Coin("atom", 0)}, Coins{NewInt64Coin("atom", 0)}, true},
-		{Coins{NewInt64Coin("atom", 0), NewInt64Coin("btc", 1)}, Coins{NewInt64Coin("atom", 0), NewInt64Coin("btc", 1)}, true},
-		{Coins{NewInt64Coin("atom", 0)}, Coins{NewInt64Coin("btc", 0)}, false},
-		{Coins{NewInt64Coin("atom", 0)}, Coins{NewInt64Coin("atom", 1)}, false},
-		{Coins{NewInt64Coin("atom", 0)}, Coins{NewInt64Coin("atom", 0), NewInt64Coin("btc", 1)}, false},
-		{Coins{NewInt64Coin("atom", 0), NewInt64Coin("btc", 1)}, Coins{NewInt64Coin("btc", 1), NewInt64Coin("atom", 0)}, true},
+		{Coins{NewInt64Coin("atom-min", 0)}, Coins{NewInt64Coin("atom-min", 0)}, true},
+		{Coins{NewInt64Coin("atom-min", 0), NewInt64Coin("btc-min", 1)}, Coins{NewInt64Coin("atom-min", 0), NewInt64Coin("btc-min", 1)}, true},
+		{Coins{NewInt64Coin("atom-min", 0)}, Coins{NewInt64Coin("btc-min", 0)}, false},
+		{Coins{NewInt64Coin("atom-min", 0)}, Coins{NewInt64Coin("atom-min", 1)}, false},
+		{Coins{NewInt64Coin("atom-min", 0)}, Coins{NewInt64Coin("atom-min", 0), NewInt64Coin("btc-min", 1)}, false},
+		{Coins{NewInt64Coin("atom-min", 0), NewInt64Coin("btc-min", 1)}, Coins{NewInt64Coin("btc-min", 1), NewInt64Coin("atom-min", 0)}, true},
 	}
 
 	for tcnum, tc := range cases {
@@ -236,11 +236,11 @@ func TestPlusCoins(t *testing.T) {
 		inputTwo Coins
 		expected Coins
 	}{
-		{Coins{{"atom", one}, {"btc", one}}, Coins{{"atom", one}, {"btc", one}}, Coins{{"atom", two}, {"btc", two}}},
-		{Coins{{"atom", zero}, {"btc", one}}, Coins{{"atom", zero}, {"btc", zero}}, Coins{{"btc", one}}},
-		{Coins{{"atom", two}}, Coins{{"btc", zero}}, Coins{{"atom", two}}},
-		{Coins{{"atom", one}}, Coins{{"atom", one}, {"btc", two}}, Coins{{"atom", two}, {"btc", two}}},
-		{Coins{{"atom", zero}, {"btc", zero}}, Coins{{"atom", zero}, {"btc", zero}}, Coins(nil)},
+		{Coins{{"atom-min", one}, {"btc-min", one}}, Coins{{"atom-min", one}, {"btc-min", one}}, Coins{{"atom-min", two}, {"btc-min", two}}},
+		{Coins{{"atom-min", zero}, {"btc-min", one}}, Coins{{"atom-min", zero}, {"btc-min", zero}}, Coins{{"btc-min", one}}},
+		{Coins{{"atom-min", two}}, Coins{{"btc-min", zero}}, Coins{{"atom-min", two}}},
+		{Coins{{"atom-min", one}}, Coins{{"atom-min", one}, {"btc-min", two}}, Coins{{"atom-min", two}, {"btc-min", two}}},
+		{Coins{{"atom-min", zero}, {"btc-min", zero}}, Coins{{"atom-min", zero}, {"btc-min", zero}}, Coins(nil)},
 	}
 
 	for tcIndex, tc := range cases {
@@ -261,11 +261,11 @@ func TestMinusCoins(t *testing.T) {
 		expected    Coins
 		shouldPanic bool
 	}{
-		{Coins{{"atom", two}}, Coins{{"atom", one}, {"btc", two}}, Coins{{"atom", one}, {"btc", two}}, true},
-		{Coins{{"atom", two}}, Coins{{"btc", zero}}, Coins{{"atom", two}}, false},
-		{Coins{{"atom", one}}, Coins{{"btc", zero}}, Coins{{"atom", one}}, false},
-		{Coins{{"atom", one}, {"btc", one}}, Coins{{"atom", one}}, Coins{{"btc", one}}, false},
-		{Coins{{"atom", one}, {"btc", one}}, Coins{{"atom", two}}, Coins{}, true},
+		{Coins{{"atom-min", two}}, Coins{{"atom-min", one}, {"btc-min", two}}, Coins{{"atom-min", one}, {"btc-min", two}}, true},
+		{Coins{{"atom-min", two}}, Coins{{"btc-min", zero}}, Coins{{"atom-min", two}}, false},
+		{Coins{{"atom-min", one}}, Coins{{"btc-min", zero}}, Coins{{"atom-min", one}}, false},
+		{Coins{{"atom-min", one}, {"btc-min", one}}, Coins{{"atom-min", one}}, Coins{{"btc-min", one}}, false},
+		{Coins{{"atom-min", one}, {"btc-min", one}}, Coins{{"atom-min", two}}, Coins{}, true},
 	}
 
 	for i, tc := range testCases {
@@ -281,39 +281,39 @@ func TestMinusCoins(t *testing.T) {
 
 func TestCoins(t *testing.T) {
 	good := Coins{
-		{"gas", NewInt(1)},
-		{"mineral", NewInt(1)},
-		{"tree", NewInt(1)},
+		{"gas-min", NewInt(1)},
+		{"mineral-min", NewInt(1)},
+		{"tree-min", NewInt(1)},
 	}
 	empty := Coins{
-		{"gold", NewInt(0)},
+		{"gold-min", NewInt(0)},
 	}
 	null := Coins{}
 	badSort1 := Coins{
-		{"tree", NewInt(1)},
-		{"gas", NewInt(1)},
-		{"mineral", NewInt(1)},
+		{"tree-min", NewInt(1)},
+		{"gas-min", NewInt(1)},
+		{"mineral-min", NewInt(1)},
 	}
 
 	// both are after the first one, but the second and third are in the wrong order
 	badSort2 := Coins{
-		{"gas", NewInt(1)},
-		{"tree", NewInt(1)},
-		{"mineral", NewInt(1)},
+		{"gas-min", NewInt(1)},
+		{"tree-min", NewInt(1)},
+		{"mineral-min", NewInt(1)},
 	}
 	badAmt := Coins{
-		{"gas", NewInt(1)},
-		{"mineral", NewInt(1)},
-		{"tree", NewInt(0)},
+		{"gas-min", NewInt(1)},
+		{"mineral-min", NewInt(1)},
+		{"tree-min", NewInt(0)},
 	}
 	dup := Coins{
-		{"gas", NewInt(1)},
-		{"gas", NewInt(1)},
-		{"mineral", NewInt(1)},
+		{"gas-min", NewInt(1)},
+		{"gas-min", NewInt(1)},
+		{"mineral-min", NewInt(1)},
 	}
 	neg := Coins{
-		{"gas", NewInt(-1)},
-		{"mineral", NewInt(1)},
+		{"gas-min", NewInt(-1)},
+		{"mineral-min", NewInt(1)},
 	}
 
 	assert.True(t, good.IsValid(), "Coins are valid")
@@ -334,12 +334,12 @@ func TestCoinsGT(t *testing.T) {
 	two := NewInt(2)
 
 	assert.False(t, Coins{}.IsAllGT(Coins{}))
-	assert.False(t, Coins{}.IsAllGT(Coins{Coin{"atom", ZeroInt()}}))
-	assert.True(t, Coins{{"atom", one}}.IsAllGT(Coins{}))
-	assert.False(t, Coins{{"atom", one}}.IsAllGT(Coins{{"atom", one}}))
-	assert.False(t, Coins{{"atom", one}}.IsAllGT(Coins{{"btc", one}}))
-	assert.True(t, Coins{{"atom", one}, {"btc", two}}.IsAllGT(Coins{{"btc", one}}))
-	assert.False(t, Coins{{"atom", one}, {"btc", one}}.IsAllGT(Coins{{"btc", two}}))
+	assert.False(t, Coins{}.IsAllGT(Coins{Coin{"atom-min", ZeroInt()}}))
+	assert.True(t, Coins{{"atom-min", one}}.IsAllGT(Coins{}))
+	assert.False(t, Coins{{"atom-min", one}}.IsAllGT(Coins{{"atom-min", one}}))
+	assert.False(t, Coins{{"atom-min", one}}.IsAllGT(Coins{{"btc-min", one}}))
+	assert.True(t, Coins{{"atom-min", one}, {"btc-min", two}}.IsAllGT(Coins{{"btc-min", one}}))
+	assert.False(t, Coins{{"atom-min", one}, {"btc-min", one}}.IsAllGT(Coins{{"btc-min", two}}))
 }
 
 func TestCoinsGTE(t *testing.T) {
@@ -347,12 +347,12 @@ func TestCoinsGTE(t *testing.T) {
 	two := NewInt(2)
 
 	assert.True(t, Coins{}.IsAllGTE(Coins{}))
-	assert.True(t, Coins{}.IsAllGTE(Coins{Coin{"atom", ZeroInt()}}))
-	assert.True(t, Coins{{"atom", one}}.IsAllGTE(Coins{}))
-	assert.True(t, Coins{{"atom", one}}.IsAllGTE(Coins{{"atom", one}}))
-	assert.False(t, Coins{{"atom", one}}.IsAllGTE(Coins{{"btc", one}}))
-	assert.True(t, Coins{{"atom", one}, {"btc", one}}.IsAllGTE(Coins{{"btc", one}}))
-	assert.False(t, Coins{{"atom", one}, {"btc", one}}.IsAllGTE(Coins{{"btc", two}}))
+	assert.True(t, Coins{}.IsAllGTE(Coins{Coin{"atom-min", ZeroInt()}}))
+	assert.True(t, Coins{{"atom-min", one}}.IsAllGTE(Coins{}))
+	assert.True(t, Coins{{"atom-min", one}}.IsAllGTE(Coins{{"atom-min", one}}))
+	assert.False(t, Coins{{"atom-min", one}}.IsAllGTE(Coins{{"btc-min", one}}))
+	assert.True(t, Coins{{"atom-min", one}, {"btc-min", one}}.IsAllGTE(Coins{{"btc-min", one}}))
+	assert.False(t, Coins{{"atom-min", one}, {"btc-min", one}}.IsAllGTE(Coins{{"btc-min", two}}))
 }
 
 func TestCoinsLT(t *testing.T) {
@@ -360,15 +360,15 @@ func TestCoinsLT(t *testing.T) {
 	two := NewInt(2)
 
 	assert.False(t, Coins{}.IsAllLT(Coins{}))
-	assert.False(t, Coins{}.IsAllLT(Coins{Coin{"atom", ZeroInt()}}))
-	assert.False(t, Coins{{"atom", one}}.IsAllLT(Coins{}))
-	assert.False(t, Coins{{"atom", one}}.IsAllLT(Coins{{"atom", one}}))
-	assert.False(t, Coins{{"atom", one}}.IsAllLT(Coins{{"btc", one}}))
-	assert.False(t, Coins{{"atom", one}, {"btc", one}}.IsAllLT(Coins{{"btc", one}}))
-	assert.False(t, Coins{{"atom", one}, {"btc", one}}.IsAllLT(Coins{{"btc", two}}))
-	assert.False(t, Coins{{"atom", one}, {"btc", one}}.IsAllLT(Coins{{"atom", one}, {"btc", one}}))
-	assert.True(t, Coins{{"atom", one}, {"btc", one}}.IsAllLT(Coins{{"atom", two}, {"btc", two}}))
-	assert.True(t, Coins{}.IsAllLT(Coins{{"atom", one}}))
+	assert.False(t, Coins{}.IsAllLT(Coins{Coin{"atom-min", ZeroInt()}}))
+	assert.False(t, Coins{{"atom-min", one}}.IsAllLT(Coins{}))
+	assert.False(t, Coins{{"atom-min", one}}.IsAllLT(Coins{{"atom-min", one}}))
+	assert.False(t, Coins{{"atom-min", one}}.IsAllLT(Coins{{"btc-min", one}}))
+	assert.False(t, Coins{{"atom-min", one}, {"btc-min", one}}.IsAllLT(Coins{{"btc-min", one}}))
+	assert.False(t, Coins{{"atom-min", one}, {"btc-min", one}}.IsAllLT(Coins{{"btc-min", two}}))
+	assert.False(t, Coins{{"atom-min", one}, {"btc-min", one}}.IsAllLT(Coins{{"atom-min", one}, {"btc-min", one}}))
+	assert.True(t, Coins{{"atom-min", one}, {"btc-min", one}}.IsAllLT(Coins{{"atom-min", two}, {"btc-min", two}}))
+	assert.True(t, Coins{}.IsAllLT(Coins{{"atom-min", one}}))
 }
 
 func TestCoinsLTE(t *testing.T) {
@@ -376,15 +376,15 @@ func TestCoinsLTE(t *testing.T) {
 	two := NewInt(2)
 
 	assert.True(t, Coins{}.IsAllLTE(Coins{}))
-	assert.True(t, Coins{}.IsAllLTE(Coins{Coin{"atom", ZeroInt()}}))
-	assert.False(t, Coins{{"atom", one}}.IsAllLTE(Coins{}))
-	assert.True(t, Coins{{"atom", one}}.IsAllLTE(Coins{{"atom", one}}))
-	assert.False(t, Coins{{"atom", one}}.IsAllLTE(Coins{{"btc", one}}))
-	assert.False(t, Coins{{"atom", one}, {"btc", one}}.IsAllLTE(Coins{{"btc", one}}))
-	assert.False(t, Coins{{"atom", one}, {"btc", one}}.IsAllLTE(Coins{{"btc", two}}))
-	assert.True(t, Coins{{"atom", one}, {"btc", one}}.IsAllLTE(Coins{{"atom", one}, {"btc", one}}))
-	assert.True(t, Coins{{"atom", one}, {"btc", one}}.IsAllLTE(Coins{{"atom", one}, {"btc", two}}))
-	assert.True(t, Coins{}.IsAllLTE(Coins{{"atom", one}}))
+	assert.True(t, Coins{}.IsAllLTE(Coins{Coin{"atom-min", ZeroInt()}}))
+	assert.False(t, Coins{{"atom-min", one}}.IsAllLTE(Coins{}))
+	assert.True(t, Coins{{"atom-min", one}}.IsAllLTE(Coins{{"atom-min", one}}))
+	assert.False(t, Coins{{"atom-min", one}}.IsAllLTE(Coins{{"btc-min", one}}))
+	assert.False(t, Coins{{"atom-min", one}, {"btc-min", one}}.IsAllLTE(Coins{{"btc-min", one}}))
+	assert.False(t, Coins{{"atom-min", one}, {"btc-min", one}}.IsAllLTE(Coins{{"btc-min", two}}))
+	assert.True(t, Coins{{"atom-min", one}, {"btc-min", one}}.IsAllLTE(Coins{{"atom-min", one}, {"btc-min", one}}))
+	assert.True(t, Coins{{"atom-min", one}, {"btc-min", one}}.IsAllLTE(Coins{{"atom-min", one}, {"btc-min", two}}))
+	assert.True(t, Coins{}.IsAllLTE(Coins{{"atom-min", one}}))
 }
 
 func TestParse(t *testing.T) {
@@ -395,7 +395,7 @@ func TestParse(t *testing.T) {
 		valid    bool  // if false, we expect an error on parse
 		expected Coins // if valid is true, make sure this is returned
 	}{
-		{"", true, nil},
+		{"", true, Coins{}},
 		{"1foo", true, Coins{{"foo", one}}},
 		{"10bar", true, Coins{{"bar", NewInt(10)}}},
 		{"99bar,1foo", true, Coins{{"bar", NewInt(99)}, {"foo", one}}},
@@ -421,32 +421,32 @@ func TestParse(t *testing.T) {
 
 func TestSortCoins(t *testing.T) {
 	good := Coins{
-		NewInt64Coin("gas", 1),
-		NewInt64Coin("mineral", 1),
-		NewInt64Coin("tree", 1),
+		NewInt64Coin("gas-min", 1),
+		NewInt64Coin("mineral-min", 1),
+		NewInt64Coin("tree-min", 1),
 	}
 	empty := Coins{
-		NewInt64Coin("gold", 0),
+		NewInt64Coin("gold-min", 0),
 	}
 	badSort1 := Coins{
-		NewInt64Coin("tree", 1),
-		NewInt64Coin("gas", 1),
-		NewInt64Coin("mineral", 1),
+		NewInt64Coin("tree-min", 1),
+		NewInt64Coin("gas-min", 1),
+		NewInt64Coin("mineral-min", 1),
 	}
 	badSort2 := Coins{ // both are after the first one, but the second and third are in the wrong order
-		NewInt64Coin("gas", 1),
-		NewInt64Coin("tree", 1),
-		NewInt64Coin("mineral", 1),
+		NewInt64Coin("gas-min", 1),
+		NewInt64Coin("tree-min", 1),
+		NewInt64Coin("mineral-min", 1),
 	}
 	badAmt := Coins{
-		NewInt64Coin("gas", 1),
-		NewInt64Coin("tree", 0),
-		NewInt64Coin("mineral", 1),
+		NewInt64Coin("gas-min", 1),
+		NewInt64Coin("tree-min", 0),
+		NewInt64Coin("mineral-min", 1),
 	}
 	dup := Coins{
-		NewInt64Coin("gas", 1),
-		NewInt64Coin("gas", 1),
-		NewInt64Coin("mineral", 1),
+		NewInt64Coin("gas-min", 1),
+		NewInt64Coin("gas-min", 1),
+		NewInt64Coin("mineral-min", 1),
 	}
 
 	cases := []struct {
@@ -471,19 +471,19 @@ func TestSortCoins(t *testing.T) {
 func TestAmountOf(t *testing.T) {
 	case0 := Coins{}
 	case3 := Coins{
-		NewInt64Coin("gold", 0),
+		NewInt64Coin("gold-min", 0),
 	}
 	case4 := Coins{
-		NewInt64Coin("gas", 1),
-		NewInt64Coin("mineral", 1),
-		NewInt64Coin("tree", 1),
+		NewInt64Coin("gas-min", 1),
+		NewInt64Coin("mineral-min", 1),
+		NewInt64Coin("tree-min", 1),
 	}
 	case5 := Coins{
-		NewInt64Coin("mineral", 1),
-		NewInt64Coin("tree", 1),
+		NewInt64Coin("mineral-min", 1),
+		NewInt64Coin("tree-min", 1),
 	}
 	case8 := Coins{
-		NewInt64Coin("gas", 8),
+		NewInt64Coin("gas-min", 8),
 	}
 
 	cases := []struct {
@@ -501,8 +501,8 @@ func TestAmountOf(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		assert.Equal(t, NewInt(tc.amountOfGAS), tc.coins.AmountOf("gas"))
-		assert.Equal(t, NewInt(tc.amountOfMINERAL), tc.coins.AmountOf("mineral"))
-		assert.Equal(t, NewInt(tc.amountOfTREE), tc.coins.AmountOf("tree"))
+		assert.Equal(t, NewInt(tc.amountOfGAS), tc.coins.AmountOf("gas-min"))
+		assert.Equal(t, NewInt(tc.amountOfMINERAL), tc.coins.AmountOf("mineral-min"))
+		assert.Equal(t, NewInt(tc.amountOfTREE), tc.coins.AmountOf("tree-min"))
 	}
 }
