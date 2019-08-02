@@ -76,21 +76,21 @@ func (k Keeper) IsDoubleSwap(ctx sdk.Context, denom1, denom2 string) bool {
 // GetModuleName returns the ModuleAccount name for the provided denominations.
 // The module name is in the format of 'swap:denom:denom' where the denominations
 // are sorted alphabetically.
-func (k Keeper) GetModuleName(denom1, denom2 string) (string, error) {
+func (k Keeper) GetModuleName(denom1, denom2 string) (string, sdk.Error) {
 	switch strings.Compare(denom1, denom2) {
 	case -1:
 		return "swap:" + denom1 + ":" + denom2, nil
 	case 1:
 		return "swap:" + denom2 + ":" + denom1, nil
 	default:
-		return "", types.ErrEqualDenom(types.DefaultCodespace, "denomnations for forming module name are equal")
+		return "", types.ErrEqualDenom("denomnations for forming module name are equal")
 	}
 }
 
 func (k Keeper) GetUNIDenom(moduleName string) (string, error) {
 	s := strings.Split(moduleName, ":")
 	if len(s) != 3 {
-		return "", types.ErrEqualDenom(types.DefaultCodespace, "denomnations for forming module name are invalid")
+		return "", types.ErrEqualDenom("denomnations for forming module name are invalid")
 	}
 
 	denom1 := strings.Split(s[1], "-")[0]

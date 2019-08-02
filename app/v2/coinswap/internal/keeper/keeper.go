@@ -70,7 +70,7 @@ func (k Keeper) SwapOrder(ctx sdk.Context, msg types.MsgSwapOrder) sdk.Error {
 		// assert that the calculated amount is greater than or equal to the
 		// minimum amount the buyer is willing to buy.
 		if targetAmt.LT(msg.Output.Amount) {
-			return types.ErrConstraintNotMet(types.DefaultCodespace, fmt.Sprintf("minimum amount (%s) to be bought was not met (%s)", targetAmt, msg.Output.Amount))
+			return types.ErrConstraintNotMet(fmt.Sprintf("minimum amount (%s) to be bought was not met (%s)", targetAmt, msg.Output.Amount))
 		}
 	} else {
 		if doubleSwap {
@@ -91,7 +91,7 @@ func (k Keeper) SwapOrder(ctx sdk.Context, msg types.MsgSwapOrder) sdk.Error {
 		// assert that the calculated amount is greater than the
 		// maximum amount the sender is willing to sell.
 		if targetAmt.GT(msg.Input.Amount) {
-			return types.ErrConstraintNotMet(types.DefaultCodespace, fmt.Sprintf("maximum amount (%s) to be sold was exceeded (%s)", targetAmt, msg.Input.Amount))
+			return types.ErrConstraintNotMet(fmt.Sprintf("maximum amount (%s) to be sold was exceeded (%s)", targetAmt, msg.Input.Amount))
 		}
 	}
 	return nil
@@ -101,7 +101,7 @@ func (k Keeper) AddLiquidity(ctx sdk.Context, msg types.MsgAddLiquidity) sdk.Err
 	exchangePair, err := k.GetModuleName(sdk.IrisAtto, msg.Deposit.Denom)
 
 	if err != nil {
-		return sdk.NewError(types.DefaultCodespace, types.CodeEqualDenom, err.Error())
+		return err
 	}
 
 	// create reserve pool if it does not exist
@@ -126,7 +126,7 @@ func (k Keeper) AddLiquidity(ctx sdk.Context, msg types.MsgAddLiquidity) sdk.Err
 	} else {
 		mintLiquidityAmt = (liquidity.Mul(msg.DepositAmount)).Div(nativeReserveAmt)
 		if mintLiquidityAmt.LT(msg.MinReward) {
-			return types.ErrLessThanMinReward(types.DefaultCodespace, fmt.Sprintf("liquidity[%s] is less than user 's min reward[%s]", mintLiquidityAmt.String(), msg.MinReward.String()))
+			return types.ErrLessThanMinReward(fmt.Sprintf("liquidity[%s] is less than user 's min reward[%s]", mintLiquidityAmt.String(), msg.MinReward.String()))
 		}
 
 		mod := depositedReserveAmt.Mul(msg.DepositAmount).Mod(nativeReserveAmt)
@@ -138,7 +138,7 @@ func (k Keeper) AddLiquidity(ctx sdk.Context, msg types.MsgAddLiquidity) sdk.Err
 		depositedCoin = sdk.NewCoin(msg.Deposit.Denom, depositAmt)
 
 		if depositAmt.GT(msg.Deposit.Amount) {
-			return types.ErrGreaterThanMaxDeposit(types.DefaultCodespace, fmt.Sprintf("amount[%s] of token depositd is greater than user 's max deposited amount[%s]", depositedCoin.String(), msg.Deposit.String()))
+			return types.ErrGreaterThanMaxDeposit(fmt.Sprintf("amount[%s] of token depositd is greater than user 's max deposited amount[%s]", depositedCoin.String(), msg.Deposit.String()))
 		}
 	}
 
@@ -153,7 +153,7 @@ func (k Keeper) AddLiquidity(ctx sdk.Context, msg types.MsgAddLiquidity) sdk.Err
 	coins := k.MintCoins(ctx, exchangePair, mintLiquidityAmt)
 	_, _, err = k.bk.AddCoins(ctx, msg.Sender, coins.Sort())
 	if err != nil {
-		return sdk.NewError(types.DefaultCodespace, types.CodeEqualDenom, err.Error())
+		return err
 	}
 	return nil
 }
@@ -162,13 +162,13 @@ func (k Keeper) RemoveLiquidity(ctx sdk.Context, msg types.MsgRemoveLiquidity) s
 	exchangePair, err := k.GetModuleName(sdk.IrisAtto, msg.Withdraw.Denom)
 
 	if err != nil {
-		return sdk.NewError(types.DefaultCodespace, types.CodeEqualDenom, err.Error())
+		return err
 	}
 
 	// check if reserve pool exists
 	reservePool, found := k.GetReservePool(ctx, exchangePair)
 	if !found {
-		return sdk.NewError(types.DefaultCodespace, types.CodeEqualDenom, fmt.Sprintf("error retrieving reserve pool for ModuleAccoint name: %s", exchangePair))
+		return types.ErrReservePoolNotExists("")
 	}
 
 	nativeReserveAmt := reservePool.AmountOf(sdk.IrisAtto)
@@ -185,22 +185,22 @@ func (k Keeper) RemoveLiquidity(ctx sdk.Context, msg types.MsgRemoveLiquidity) s
 	deltaLiquidityCoin := sdk.NewCoin(exchangePair, msg.WithdrawAmount)
 
 	if nativeWithdrawCoin.Amount.LT(msg.MinNative) {
-		return types.ErrLessThanMinWithdrawAmount(types.DefaultCodespace, fmt.Sprintf("The amount of cash available [%s] is less than the minimum amount specified [%s] by the user.", nativeWithdrawCoin.String(), sdk.NewCoin(sdk.IrisAtto, msg.MinNative).String()))
+		return types.ErrLessThanMinWithdrawAmount(fmt.Sprintf("The amount of cash available [%s] is less than the minimum amount specified [%s] by the user.", nativeWithdrawCoin.String(), sdk.NewCoin(sdk.IrisAtto, msg.MinNative).String()))
 	}
 	if depositedWithdrawCoin.Amount.LT(msg.Withdraw.Amount) {
-		return types.ErrLessThanMinWithdrawAmount(types.DefaultCodespace, fmt.Sprintf("The amount of cash available [%s] is less than the minimum amount specified [%s] by the user.", depositedWithdrawCoin.String(), msg.Withdraw.String()))
+		return types.ErrLessThanMinWithdrawAmount(fmt.Sprintf("The amount of cash available [%s] is less than the minimum amount specified [%s] by the user.", depositedWithdrawCoin.String(), msg.Withdraw.String()))
 	}
 
 	// burn liquidity from reserve Pool
 	err = k.BurnLiquidity(ctx, exchangePair, deltaLiquidityCoin)
 	if err != nil {
-		return sdk.NewError(types.DefaultCodespace, types.CodeEqualDenom, err.Error())
+		return err
 	}
 	// burn liquidity from account
 	_, err = k.bk.BurnCoins(ctx, msg.Sender, sdk.Coins{deltaLiquidityCoin})
 
 	if err != nil {
-		return sdk.NewError(types.DefaultCodespace, types.CodeEqualDenom, err.Error())
+		return err
 	}
 
 	// transfer withdrawn liquidity from coinswaps ModuleAccount to sender's account
