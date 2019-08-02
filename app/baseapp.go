@@ -739,6 +739,7 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 		if fees != nil && !fees.Empty() {
 			if !fees.IsValidIrisAtto() {
 				result = sdk.ErrInvalidCoins(fmt.Sprintf("invalid tx fee [%s]", fees)).Result()
+				return
 			}
 		}
 	}
