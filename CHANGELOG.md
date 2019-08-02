@@ -29,6 +29,7 @@
 * [\#1757](https://github.com/irisnet/irishub/issues/1757) Add a random number generator
 * [\#1783](https://github.com/irisnet/irishub/issues/1783) Optimize error messages 
 * [\#1643](https://github.com/irisnet/irishub/issues/1643) Fix tx search by tx.height
+* [\#1854](https://github.com/irisnet/irishub/issues/1854) Enforce unbonding_time for redelegation
 
 
 ### Tendermint
