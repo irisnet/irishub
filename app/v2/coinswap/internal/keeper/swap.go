@@ -27,8 +27,8 @@ func (k Keeper) SwapCoins(ctx sdk.Context, sender sdk.AccAddress, coinSold, coin
 // The fee is included in the input coins being bought
 // https://github.com/runtimeverification/verified-smart-contracts/blob/uniswap/uniswap/x-y-k.pdf
 // TODO: continue using numerator/denominator -> open issue for eventually changing to sdk.Dec
-func (k Keeper) GetInputPrice(ctx sdk.Context, inputAmt sdk.Int, inputDenom, outputDenom string) sdk.Int {
-	moduleName, err := k.GetModuleName(inputDenom, outputDenom)
+func (k Keeper) GetInputPrice(ctx sdk.Context, soldCoin sdk.Coin, boughtDenom string) sdk.Int {
+	moduleName, err := k.GetModuleName(soldCoin.Denom, boughtDenom)
 	if err != nil {
 		panic(err)
 	}
@@ -36,11 +36,11 @@ func (k Keeper) GetInputPrice(ctx sdk.Context, inputAmt sdk.Int, inputDenom, out
 	if !found {
 		panic(fmt.Sprintf("reserve pool for %s not found", moduleName))
 	}
-	inputBalance := reservePool.AmountOf(inputDenom)
-	outputBalance := reservePool.AmountOf(outputDenom)
+	inputBalance := reservePool.AmountOf(soldCoin.Denom)
+	outputBalance := reservePool.AmountOf(boughtDenom)
 	fee := k.GetFeeParam(ctx)
 
-	inputAmtWithFee := inputAmt.Mul(fee.Numerator)
+	inputAmtWithFee := soldCoin.Amount.Mul(fee.Numerator)
 	numerator := inputAmtWithFee.Mul(outputBalance)
 	denominator := inputBalance.Mul(fee.Denominator).Add(inputAmtWithFee)
 	return numerator.Div(denominator)
@@ -50,8 +50,8 @@ func (k Keeper) GetInputPrice(ctx sdk.Context, inputAmt sdk.Int, inputDenom, out
 // The fee is included in the output coins being bought
 // https://github.com/runtimeverification/verified-smart-contracts/blob/uniswap/uniswap/x-y-k.pdf
 // TODO: continue using numerator/denominator -> open issue for eventually changing to sdk.Dec
-func (k Keeper) GetOutputPrice(ctx sdk.Context, outputAmt sdk.Int, inputDenom, outputDenom string) sdk.Int {
-	moduleName, err := k.GetModuleName(inputDenom, outputDenom)
+func (k Keeper) GetOutputPrice(ctx sdk.Context, boughtCoin sdk.Coin, soldDenom string) sdk.Int {
+	moduleName, err := k.GetModuleName(boughtCoin.Denom, soldDenom)
 	if err != nil {
 		panic(err)
 	}
@@ -59,12 +59,12 @@ func (k Keeper) GetOutputPrice(ctx sdk.Context, outputAmt sdk.Int, inputDenom, o
 	if !found {
 		panic(fmt.Sprintf("reserve pool for %s not found", moduleName))
 	}
-	inputBalance := reservePool.AmountOf(inputDenom)
-	outputBalance := reservePool.AmountOf(outputDenom)
+	inputBalance := reservePool.AmountOf(boughtCoin.Denom)
+	outputBalance := reservePool.AmountOf(soldDenom)
 	fee := k.GetFeeParam(ctx)
 
-	numerator := inputBalance.Mul(outputAmt).Mul(fee.Denominator)
-	denominator := (outputBalance.Sub(outputAmt)).Mul(fee.Numerator)
+	numerator := inputBalance.Mul(boughtCoin.Amount).Mul(fee.Denominator)
+	denominator := (outputBalance.Sub(boughtCoin.Amount)).Mul(fee.Numerator)
 	return numerator.Div(denominator).Add(sdk.OneInt())
 }
 

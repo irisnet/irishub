@@ -47,43 +47,51 @@ func (k Keeper) CreateReservePool(ctx sdk.Context, moduleName string) {
 }
 
 func (k Keeper) SwapOrder(ctx sdk.Context, msg types.MsgSwapOrder) sdk.Error {
-	var calculatedAmount sdk.Int
+	var targetAmt sdk.Int
 	doubleSwap := k.IsDoubleSwap(ctx, msg.Input.Denom, msg.Output.Denom)
-	nativeDenom := k.GetNativeDenom(ctx)
 
 	if msg.IsBuyOrder {
 		if doubleSwap {
-			nativeAmount := k.GetInputPrice(ctx, msg.Input.Amount, msg.Input.Denom, nativeDenom)
-			calculatedAmount = k.GetInputPrice(ctx, nativeAmount, nativeDenom, msg.Output.Denom)
-			nativeCoin := sdk.NewCoin(nativeDenom, nativeAmount)
+			nativeAmount := k.GetInputPrice(ctx, msg.Input, sdk.IrisAtto)
+			nativeCoin := sdk.NewCoin(sdk.IrisAtto, nativeAmount)
+
+			targetAmt = k.GetInputPrice(ctx, nativeCoin, msg.Output.Denom)
+			targetCoin := sdk.NewCoin(msg.Output.Denom, targetAmt)
+
 			k.SwapCoins(ctx, msg.Sender, msg.Input, nativeCoin)
-			k.SwapCoins(ctx, msg.Sender, nativeCoin, sdk.NewCoin(msg.Output.Denom, calculatedAmount))
+			k.SwapCoins(ctx, msg.Sender, nativeCoin, targetCoin)
+
 		} else {
-			calculatedAmount = k.GetInputPrice(ctx, msg.Input.Amount, msg.Input.Denom, msg.Output.Denom)
-			k.SwapCoins(ctx, msg.Sender, msg.Input, sdk.NewCoin(msg.Output.Denom, calculatedAmount))
+			targetAmt = k.GetInputPrice(ctx, msg.Input, msg.Output.Denom)
+			targetCoin := sdk.NewCoin(msg.Output.Denom, targetAmt)
+			k.SwapCoins(ctx, msg.Sender, msg.Input, targetCoin)
 		}
 
 		// assert that the calculated amount is greater than or equal to the
 		// minimum amount the buyer is willing to buy.
-		if calculatedAmount.LT(msg.Output.Amount) {
-			return types.ErrConstraintNotMet(types.DefaultCodespace, fmt.Sprintf("minimum amount (%s) to be bought was not met (%s)", calculatedAmount, msg.Output.Amount))
+		if targetAmt.LT(msg.Output.Amount) {
+			return types.ErrConstraintNotMet(types.DefaultCodespace, fmt.Sprintf("minimum amount (%s) to be bought was not met (%s)", targetAmt, msg.Output.Amount))
 		}
 	} else {
 		if doubleSwap {
-			nativeAmount := k.GetOutputPrice(ctx, msg.Output.Amount, nativeDenom, msg.Output.Denom)
-			calculatedAmount = k.GetOutputPrice(ctx, nativeAmount, msg.Input.Denom, nativeDenom)
-			nativeCoin := sdk.NewCoin(nativeDenom, nativeAmount)
-			k.SwapCoins(ctx, msg.Sender, sdk.NewCoin(msg.Input.Denom, calculatedAmount), nativeCoin)
+			nativeAmount := k.GetOutputPrice(ctx, msg.Output, sdk.IrisAtto)
+			nativeCoin := sdk.NewCoin(sdk.IrisAtto, nativeAmount)
+
+			targetAmt = k.GetOutputPrice(ctx, nativeCoin, msg.Input.Denom)
+			targetCoin := sdk.NewCoin(msg.Input.Denom, targetAmt)
+
+			k.SwapCoins(ctx, msg.Sender, targetCoin, nativeCoin)
 			k.SwapCoins(ctx, msg.Sender, nativeCoin, msg.Output)
 		} else {
-			calculatedAmount = k.GetOutputPrice(ctx, msg.Output.Amount, msg.Input.Denom, msg.Output.Denom)
-			k.SwapCoins(ctx, msg.Sender, sdk.NewCoin(msg.Input.Denom, calculatedAmount), msg.Output)
+			targetAmt = k.GetOutputPrice(ctx, msg.Output, msg.Input.Denom)
+			targetCoin := sdk.NewCoin(msg.Input.Denom, targetAmt)
+			k.SwapCoins(ctx, msg.Sender, targetCoin, msg.Output)
 		}
 
 		// assert that the calculated amount is greater than the
 		// maximum amount the sender is willing to sell.
-		if calculatedAmount.GT(msg.Input.Amount) {
-			return types.ErrConstraintNotMet(types.DefaultCodespace, fmt.Sprintf("maximum amount (%s) to be sold was exceeded (%s)", calculatedAmount, msg.Input.Amount))
+		if targetAmt.GT(msg.Input.Amount) {
+			return types.ErrConstraintNotMet(types.DefaultCodespace, fmt.Sprintf("maximum amount (%s) to be sold was exceeded (%s)", targetAmt, msg.Input.Amount))
 		}
 	}
 	return nil
