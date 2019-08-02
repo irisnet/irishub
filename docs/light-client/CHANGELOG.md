@@ -2,7 +2,7 @@
 
 ## v0.15.0
 
-*Aug 1th, 2019*
+*Aug 2th, 2019*
 
 ### BREAKING CHANGES:
 

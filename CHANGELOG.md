@@ -2,7 +2,7 @@
 
 ## 0.15.0
 
-*July 26th, 2019*
+*Aug 2, 2019*
 
 ### LCD (REST API)
 * [\#1473](https://github.com/irisnet/irishub/issues/1473) Add APIs for Tokens
