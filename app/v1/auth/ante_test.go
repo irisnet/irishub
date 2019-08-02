@@ -626,26 +626,6 @@ func TestConsumeSignatureVerificationGas(t *testing.T) {
 	}
 }
 
-func TestAdjustFeesByGas(t *testing.T) {
-	type args struct {
-		fee sdk.Coins
-		gas uint64
-	}
-	tests := []struct {
-		name string
-		args args
-		want sdk.Coins
-	}{
-		{"nil coins", args{sdk.Coins{}, 10000}, sdk.Coins{}},
-		{"nil coins", args{sdk.Coins{sdk.NewInt64Coin("token1", 10), sdk.NewInt64Coin("token2", 0)}, 10000}, sdk.Coins{sdk.NewInt64Coin("token1", 20), sdk.NewInt64Coin("token2", 10)}},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			require.True(t, tt.want.IsEqual(adjustFeesByGas(tt.args.fee, tt.args.gas)))
-		})
-	}
-}
-
 func generatePubKeysAndSignatures(n int, msg []byte, keyTypeed25519 bool) (pubkeys []crypto.PubKey, signatures [][]byte) {
 	pubkeys = make([]crypto.PubKey, n)
 	signatures = make([][]byte, n)
