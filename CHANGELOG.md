@@ -1,6 +1,63 @@
 # Changelog
 
+## 0.15.0
+
+*Aug 2, 2019*
+
+### LCD (REST API)
+* [\#1473](https://github.com/irisnet/irishub/issues/1473) Add APIs for Tokens
+* [\#1521](https://github.com/irisnet/irishub/issues/1521) Add APIs for Gateways
+* [\#1745](https://github.com/irisnet/irishub/issues/1745) POST APIs only generate transactions, not broadcast transactions
+* [\#1750](https://github.com/irisnet/irishub/issues/1750) Move params query from `/gov/params` to `/params`
+* [\#1802](https://github.com/irisnet/irishub/issues/1802) Remove key related APIs and enhance API `tx/broadcast`
+
+### CLI
+* [\#1750](https://github.com/irisnet/irishub/issues/1750) Replace `iriscli gov query-params` by `iriscli params`
+
+### Application
+* [\#1336](https://github.com/irisnet/irishub/issues/1336) Ensure field length checking in the service module
+* [\#1466](https://github.com/irisnet/irishub/issues/1466) Support multi signature account
+* [\#1468](https://github.com/irisnet/irishub/issues/1468) Add asset module
+* [\#1493](https://github.com/irisnet/irishub/issues/1493) Back up keys using keystore file
+* [\#1511](https://github.com/irisnet/irishub/issues/1511) Split the export command into reset and export
+* [\#1544](https://github.com/irisnet/irishub/issues/1544) Refactor CommunityPool and BurnedCoins into AccAddresses
+* [\#1568](https://github.com/irisnet/irishub/issues/1568) Optimize Dockerfile
+* [\#1603](https://github.com/irisnet/irishub/issues/1603) Refactor total supply to support multiple tokens
+* [\#1604](https://github.com/irisnet/irishub/issues/1604) Enhance gov TallyResult
+* [\#1677](https://github.com/irisnet/irishub/issues/1677) Refactor coin_type to support multiple tokens
+* [\#1728](https://github.com/irisnet/irishub/issues/1728) Refactor gov module and add proposal types `PlainText` and `TokenAddition`
+* [\#1757](https://github.com/irisnet/irishub/issues/1757) Add a random number generator
+* [\#1783](https://github.com/irisnet/irishub/issues/1783) Optimize error messages 
+* [\#1643](https://github.com/irisnet/irishub/issues/1643) Fix tx search by tx.height
+* [\#1854](https://github.com/irisnet/irishub/issues/1854) Enforce unbonding_time for redelegation
+
+
+### Tendermint
+* Update to irisnet/tendermint [v0.31.0](https://github.com/irisnet/tendermint/releases/tag/v0.31.0)
+  * [\#1379](https://github.com/irisnet/irishub/issues/1379) [p2p] Simplify GetSelectionWithBias for addressbook
+  * [\#1432](https://github.com/irisnet/irishub/issues/1432) [crypto] Allow PubKeyMultisigThreshold to unmarshal into crypto.PubKey
+  * [\#1451](https://github.com/irisnet/irishub/issues/1451) [db] Close WriteBatch to prevent memory leak
+  * [\#1460](https://github.com/irisnet/irishub/issues/1460) [kms] Shutting down tmkms when a validator enters proposal round crashes the app
+  * [\#1554](https://github.com/irisnet/irishub/issues/1554) [consensus] Log block status on replay block
+  * [\#1646](https://github.com/irisnet/irishub/issues/1646) [consensus] Fix possible halt by resetting TriggeredTimeoutPrecommit before starting next height
+  * [\#1647](https://github.com/irisnet/irishub/issues/1647) [consensus] Flush WAL on stop to prevent data corruption during graceful shutdown
+  * [\#1648](https://github.com/irisnet/irishub/issues/1648) [p2p] Fix reconnecting report duplicate ID error due to race condition between adding peer to peerSet and starting it
+  * [\#1649](https://github.com/irisnet/irishub/issues/1649) [p2p] Do not panic when filter times out
+  * [\#1650](https://github.com/irisnet/irishub/issues/1650) [p2p] Reject all-zero shared secrets in the Diffie-Hellman step of secret-connection
+  * [\#1660](https://github.com/irisnet/irishub/issues/1660) [instrumentation] Add chain_id label for all metrics
+  * [\#1665](https://github.com/irisnet/irishub/issues/1665) [rpc] Return maxPerPage if per_page is greater than max
+  * [\#1679](https://github.com/irisnet/irishub/issues/1679) [p2p] Fix nil pointer deference on DNS resolution failure 
+  * [\#1692](https://github.com/irisnet/irishub/issues/1692) [blockchain] Fix pool timer leak bug
+  * [\#1693](https://github.com/irisnet/irishub/issues/1693) [db] Close Iterator in RemoteDB 
+  * [\#1697](https://github.com/irisnet/irishub/issues/1697) [lite] Fix error proxy endpoints `validators` in lite client
+  * [\#1702](https://github.com/irisnet/irishub/issues/1702) [blockchain] Update the maxHeight when a peer is removed
+  * [\#1703](https://github.com/irisnet/irishub/issues/1703) [mempool] Mempool no gossip back
+  * [\#1704](https://github.com/irisnet/irishub/issues/1704) [rpc] Disable compression for HTTP client to prevent GZIP-bomb DoS attacks
+  * [\#1714](https://github.com/irisnet/irishub/issues/1714) [mempool] Bound mempool memory usage
+
 ## 0.14.1
+
+*May 31th, 2019*
 
 ### LCD (REST API)
 * [\#1486](https://github.com/irisnet/irishub/issues/1486) Ensure `/bank/account/{address}` has consistent json output
@@ -10,6 +67,8 @@
 * [\#1506](https://github.com/irisnet/irishub/issues/1506) Enforce `unbonding_time` regardless of validator status
 
 ## 0.14.0
+
+*May 27th, 2019*
 
 ### LCD (REST API)
 * [\#1245](https://github.com/irisnet/irishub/issues/1245) Follow best-practice URI naming guide -- API BREAKING!
@@ -49,6 +108,8 @@
 * [\#1376](https://github.com/irisnet/irishub/issues/1376) Improve v0.13.1 docs
 
 ## 0.13.1
+
+*Mar 22th, 2019*
 
 ### LCD (REST API)
 * [\#1339](https://github.com/irisnet/irishub/pull/1339) Add pagination params for lcd validators query
