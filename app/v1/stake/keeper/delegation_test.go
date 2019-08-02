@@ -758,8 +758,8 @@ func TestRedelegateFromUnbondingValidator(t *testing.T) {
 	ubd, found := keeper.GetRedelegation(ctx, addrDels[0], addrVals[0], addrVals[1])
 	require.True(t, found)
 	require.True(t, ubd.Balance.IsEqual(sdk.NewCoin(keeper.BondDenom(), sdk.NewIntWithDecimal(6, 18))))
-	assert.Equal(t, blockHeight, ubd.CreationHeight)
-	assert.True(t, blockTime.Add(params.UnbondingTime).Equal(ubd.MinTime))
+	assert.Equal(t, ctx.BlockHeight(), ubd.CreationHeight)
+	assert.True(t, ctx.BlockHeader().Time.Add(params.UnbondingTime).Equal(ubd.MinTime))
 }
 
 func TestRedelegateFromUnbondedValidator(t *testing.T) {
@@ -829,7 +829,7 @@ func TestRedelegateFromUnbondedValidator(t *testing.T) {
 	_, err = keeper.BeginRedelegation(ctx, addrDels[0], addrVals[0], addrVals[1], sdk.NewDecFromInt(sdk.NewIntWithDecimal(6, 18)))
 	require.NoError(t, err)
 
-	// no red should have been found
+	// red should always be found
 	red, found := keeper.GetRedelegation(ctx, addrDels[0], addrVals[0], addrVals[1])
-	require.False(t, found, "%v", red)
+	require.True(t, found, "%v", red)
 }
