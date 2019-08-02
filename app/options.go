@@ -35,6 +35,14 @@ func SetMinimumFees(minFees string) func(*BaseApp) {
 	if err != nil {
 		panic(err)
 	}
+	for i, coin := range fees {
+		if coin.Denom == sdk.Iris {
+			fees[i], err = sdk.IrisCoinType.ConvertToMinDenomCoin(coin.String())
+			if err != nil {
+				panic(fmt.Sprintf("invalid minimum fees [%s]", fees))
+			}
+		}
+	}
 	if !fees.Empty() && !fees.IsValidIrisAtto() {
 		panic(fmt.Sprintf("invalid minimum fees [%s]", fees))
 	}
