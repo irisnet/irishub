@@ -102,7 +102,7 @@ func checkFee(params Params, coins sdk.Coins, gasLimit uint64) sdk.Error {
 
 	if gasPrice.LT(threshold) {
 		recommendFee := (sdk.NewInt(int64(gasLimit))).Mul(threshold)
-		return sdk.ErrGasPriceTooLow(fmt.Sprintf("insufficient fee, gasPrice = fee / gasLimit(default 50000). The gasPrice(%s%s/Gas) cannot be less than %s%s. Recommended fee: %s%s", gasPrice.String(), nativeFeeToken, threshold.String(), nativeFeeToken, recommendFee, nativeFeeToken))
+		return sdk.ErrGasPriceTooLow(fmt.Sprintf("insufficient fee, gasPrice = fee / gasLimit(default 50000). The gasPrice(%s%s/Gas) cannot be less than %s%s. Recommended fee: %s%s", gasPrice.String(), sdk.IrisAtto, threshold.String(), sdk.IrisAtto, recommendFee, sdk.IrisAtto))
 	}
 
 	return nil

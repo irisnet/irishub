@@ -35,7 +35,7 @@ func SetMinimumFees(minFees string) func(*BaseApp) {
 	if err != nil {
 		panic(err)
 	}
-	if !fees.IsValidIrisAtto() {
+	if !fees.Empty() && !fees.IsValidIrisAtto() {
 		panic(fmt.Sprintf("invalid minimum fees [%s]", fees))
 	}
 	return func(bap *BaseApp) { bap.SetMinimumFees(fees) }

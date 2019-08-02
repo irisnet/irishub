@@ -52,13 +52,16 @@ func (coin Coin) String() string {
 	return fmt.Sprintf("%v%v", coin.Amount, coin.Denom)
 }
 
-// IsValid returns true if the coin amount is positive
-// and the coin is denominated in min unit
+// IsValid returns true if the coin amount is non-negative
+// and the coin is denominated in its minimum unit
 func (coin Coin) IsValid() bool {
-	if !coin.IsPositive() {
+	if coin.IsNegative() {
 		return false
 	}
 	if coin.Denom != IrisAtto && !strings.HasSuffix(coin.Denom, MinDenomSuffix) {
+		return false
+	}
+	if !reDenomCompiled.MatchString(coin.Denom) {
 		return false
 	}
 	return true
@@ -611,7 +614,7 @@ func ParseCoin(coinStr string) (coin Coin, err error) {
 // Returned coins are sorted.
 func ParseCoins(coinsStr string) (coins Coins, err error) {
 	if len(coinsStr) == 0 {
-		return nil, nil
+		return Coins{}, nil
 	}
 
 	coinStrs := strings.Split(coinsStr, ",")

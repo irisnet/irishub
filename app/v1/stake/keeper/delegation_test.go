@@ -14,7 +14,7 @@ import (
 
 // tests GetDelegation, GetDelegatorDelegations, SetDelegation, RemoveDelegation, GetDelegatorDelegations
 func TestDelegation(t *testing.T) {
-	ctx, _, keeper := CreateTestInput(t, false, sdk.NewIntWithDecimal(10, 0))
+	ctx, _, keeper := CreateTestInput(t, false, sdk.NewInt(10))
 	pool := keeper.GetPool(ctx)
 
 	//construct the validators
@@ -220,7 +220,6 @@ func TestUnbondDelegation(t *testing.T) {
 // test removing all self delegation from a validator which should
 // shift it from the bonded to unbonded state
 func TestUndelegateSelfDelegation(t *testing.T) {
-
 	ctx, _, keeper := CreateTestInput(t, false, sdk.ZeroInt())
 	pool := keeper.GetPool(ctx)
 	pool.BankKeeper.IncreaseLoosenToken(ctx, sdk.Coins{sdk.NewCoin(types.StakeDenom, sdk.NewIntWithDecimal(20, 18))})
@@ -598,7 +597,6 @@ func TestRedelegation(t *testing.T) {
 }
 
 func TestRedelegateToSameValidator(t *testing.T) {
-
 	ctx, _, keeper := CreateTestInput(t, false, sdk.ZeroInt())
 	pool := keeper.GetPool(ctx)
 	pool.BankKeeper.IncreaseLoosenToken(ctx, sdk.Coins{sdk.NewCoin(types.StakeDenom, sdk.NewInt(30))})
@@ -624,7 +622,6 @@ func TestRedelegateToSameValidator(t *testing.T) {
 }
 
 func TestRedelegateSelfDelegation(t *testing.T) {
-
 	ctx, _, keeper := CreateTestInput(t, false, sdk.ZeroInt())
 	pool := keeper.GetPool(ctx)
 	pool.BankKeeper.IncreaseLoosenToken(ctx, sdk.Coins{sdk.NewCoin(types.StakeDenom, sdk.NewIntWithDecimal(30, 18))})

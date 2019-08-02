@@ -42,69 +42,69 @@ func TestKeeper(t *testing.T) {
 	accountKeeper.SetAccount(ctx, acc)
 	require.True(t, bankKeeper.GetCoins(ctx, addr).IsEqual(sdk.Coins{}))
 
-	bankKeeper.AddCoins(ctx, addr, sdk.Coins{sdk.NewInt64Coin("foocoin", 10)})
-	require.True(t, bankKeeper.GetCoins(ctx, addr).IsEqual(sdk.Coins{sdk.NewInt64Coin("foocoin", 10)}))
+	bankKeeper.AddCoins(ctx, addr, sdk.Coins{sdk.NewInt64Coin("foo-min", 10)})
+	require.True(t, bankKeeper.GetCoins(ctx, addr).IsEqual(sdk.Coins{sdk.NewInt64Coin("foo-min", 10)}))
 
 	// Test HasCoins
-	require.True(t, bankKeeper.HasCoins(ctx, addr, sdk.Coins{sdk.NewInt64Coin("foocoin", 10)}))
-	require.True(t, bankKeeper.HasCoins(ctx, addr, sdk.Coins{sdk.NewInt64Coin("foocoin", 5)}))
-	require.False(t, bankKeeper.HasCoins(ctx, addr, sdk.Coins{sdk.NewInt64Coin("foocoin", 15)}))
-	require.False(t, bankKeeper.HasCoins(ctx, addr, sdk.Coins{sdk.NewInt64Coin("barcoin", 5)}))
+	require.True(t, bankKeeper.HasCoins(ctx, addr, sdk.Coins{sdk.NewInt64Coin("foo-min", 10)}))
+	require.True(t, bankKeeper.HasCoins(ctx, addr, sdk.Coins{sdk.NewInt64Coin("foo-min", 5)}))
+	require.False(t, bankKeeper.HasCoins(ctx, addr, sdk.Coins{sdk.NewInt64Coin("foo-min", 15)}))
+	require.False(t, bankKeeper.HasCoins(ctx, addr, sdk.Coins{sdk.NewInt64Coin("bar-min", 5)}))
 
 	// Test AddCoins
-	bankKeeper.AddCoins(ctx, addr, sdk.Coins{sdk.NewInt64Coin("foocoin", 15)})
-	require.True(t, bankKeeper.GetCoins(ctx, addr).IsEqual(sdk.Coins{sdk.NewInt64Coin("foocoin", 25)}))
+	bankKeeper.AddCoins(ctx, addr, sdk.Coins{sdk.NewInt64Coin("foo-min", 15)})
+	require.True(t, bankKeeper.GetCoins(ctx, addr).IsEqual(sdk.Coins{sdk.NewInt64Coin("foo-min", 25)}))
 
-	bankKeeper.AddCoins(ctx, addr, sdk.Coins{sdk.NewInt64Coin("barcoin", 15)})
-	require.True(t, bankKeeper.GetCoins(ctx, addr).IsEqual(sdk.Coins{sdk.NewInt64Coin("barcoin", 15), sdk.NewInt64Coin("foocoin", 25)}))
+	bankKeeper.AddCoins(ctx, addr, sdk.Coins{sdk.NewInt64Coin("bar-min", 15)})
+	require.True(t, bankKeeper.GetCoins(ctx, addr).IsEqual(sdk.Coins{sdk.NewInt64Coin("bar-min", 15), sdk.NewInt64Coin("foo-min", 25)}))
 
 	// Test SubtractCoins
-	bankKeeper.SubtractCoins(ctx, addr, sdk.Coins{sdk.NewInt64Coin("foocoin", 10)})
-	bankKeeper.SubtractCoins(ctx, addr, sdk.Coins{sdk.NewInt64Coin("barcoin", 5)})
-	require.True(t, bankKeeper.GetCoins(ctx, addr).IsEqual(sdk.Coins{sdk.NewInt64Coin("barcoin", 10), sdk.NewInt64Coin("foocoin", 15)}))
+	bankKeeper.SubtractCoins(ctx, addr, sdk.Coins{sdk.NewInt64Coin("foo-min", 10)})
+	bankKeeper.SubtractCoins(ctx, addr, sdk.Coins{sdk.NewInt64Coin("bar-min", 5)})
+	require.True(t, bankKeeper.GetCoins(ctx, addr).IsEqual(sdk.Coins{sdk.NewInt64Coin("bar-min", 10), sdk.NewInt64Coin("foo-min", 15)}))
 
-	bankKeeper.SubtractCoins(ctx, addr, sdk.Coins{sdk.NewInt64Coin("barcoin", 11)})
-	require.True(t, bankKeeper.GetCoins(ctx, addr).IsEqual(sdk.Coins{sdk.NewInt64Coin("barcoin", 10), sdk.NewInt64Coin("foocoin", 15)}))
+	bankKeeper.SubtractCoins(ctx, addr, sdk.Coins{sdk.NewInt64Coin("bar-min", 11)})
+	require.True(t, bankKeeper.GetCoins(ctx, addr).IsEqual(sdk.Coins{sdk.NewInt64Coin("bar-min", 10), sdk.NewInt64Coin("foo-min", 15)}))
 
-	bankKeeper.SubtractCoins(ctx, addr, sdk.Coins{sdk.NewInt64Coin("barcoin", 10)})
-	require.True(t, bankKeeper.GetCoins(ctx, addr).IsEqual(sdk.Coins{sdk.NewInt64Coin("foocoin", 15)}))
-	require.False(t, bankKeeper.HasCoins(ctx, addr, sdk.Coins{sdk.NewInt64Coin("barcoin", 1)}))
+	bankKeeper.SubtractCoins(ctx, addr, sdk.Coins{sdk.NewInt64Coin("bar-min", 10)})
+	require.True(t, bankKeeper.GetCoins(ctx, addr).IsEqual(sdk.Coins{sdk.NewInt64Coin("foo-min", 15)}))
+	require.False(t, bankKeeper.HasCoins(ctx, addr, sdk.Coins{sdk.NewInt64Coin("bar-min", 1)}))
 
 	// Test SendCoins
-	bankKeeper.SendCoins(ctx, addr, addr2, sdk.Coins{sdk.NewInt64Coin("foocoin", 5)})
-	require.True(t, bankKeeper.GetCoins(ctx, addr).IsEqual(sdk.Coins{sdk.NewInt64Coin("foocoin", 10)}))
-	require.True(t, bankKeeper.GetCoins(ctx, addr2).IsEqual(sdk.Coins{sdk.NewInt64Coin("foocoin", 5)}))
+	bankKeeper.SendCoins(ctx, addr, addr2, sdk.Coins{sdk.NewInt64Coin("foo-min", 5)})
+	require.True(t, bankKeeper.GetCoins(ctx, addr).IsEqual(sdk.Coins{sdk.NewInt64Coin("foo-min", 10)}))
+	require.True(t, bankKeeper.GetCoins(ctx, addr2).IsEqual(sdk.Coins{sdk.NewInt64Coin("foo-min", 5)}))
 
-	_, err2 := bankKeeper.SendCoins(ctx, addr, addr2, sdk.Coins{sdk.NewInt64Coin("foocoin", 50)})
+	_, err2 := bankKeeper.SendCoins(ctx, addr, addr2, sdk.Coins{sdk.NewInt64Coin("foo-min", 50)})
 	assert.Implements(t, (*sdk.Error)(nil), err2)
-	require.True(t, bankKeeper.GetCoins(ctx, addr).IsEqual(sdk.Coins{sdk.NewInt64Coin("foocoin", 10)}))
-	require.True(t, bankKeeper.GetCoins(ctx, addr2).IsEqual(sdk.Coins{sdk.NewInt64Coin("foocoin", 5)}))
+	require.True(t, bankKeeper.GetCoins(ctx, addr).IsEqual(sdk.Coins{sdk.NewInt64Coin("foo-min", 10)}))
+	require.True(t, bankKeeper.GetCoins(ctx, addr2).IsEqual(sdk.Coins{sdk.NewInt64Coin("foo-min", 5)}))
 
-	bankKeeper.AddCoins(ctx, addr, sdk.Coins{sdk.NewInt64Coin("barcoin", 30)})
-	bankKeeper.SendCoins(ctx, addr, addr2, sdk.Coins{sdk.NewInt64Coin("barcoin", 10), sdk.NewInt64Coin("foocoin", 5)})
-	require.True(t, bankKeeper.GetCoins(ctx, addr).IsEqual(sdk.Coins{sdk.NewInt64Coin("barcoin", 20), sdk.NewInt64Coin("foocoin", 5)}))
-	require.True(t, bankKeeper.GetCoins(ctx, addr2).IsEqual(sdk.Coins{sdk.NewInt64Coin("barcoin", 10), sdk.NewInt64Coin("foocoin", 10)}))
+	bankKeeper.AddCoins(ctx, addr, sdk.Coins{sdk.NewInt64Coin("bar-min", 30)})
+	bankKeeper.SendCoins(ctx, addr, addr2, sdk.Coins{sdk.NewInt64Coin("bar-min", 10), sdk.NewInt64Coin("foo-min", 5)})
+	require.True(t, bankKeeper.GetCoins(ctx, addr).IsEqual(sdk.Coins{sdk.NewInt64Coin("bar-min", 20), sdk.NewInt64Coin("foo-min", 5)}))
+	require.True(t, bankKeeper.GetCoins(ctx, addr2).IsEqual(sdk.Coins{sdk.NewInt64Coin("bar-min", 10), sdk.NewInt64Coin("foo-min", 10)}))
 
 	// Test InputOutputCoins
-	input1 := NewInput(addr2, sdk.Coins{sdk.NewInt64Coin("foocoin", 2)})
-	output1 := NewOutput(addr, sdk.Coins{sdk.NewInt64Coin("foocoin", 2)})
+	input1 := NewInput(addr2, sdk.Coins{sdk.NewInt64Coin("foo-min", 2)})
+	output1 := NewOutput(addr, sdk.Coins{sdk.NewInt64Coin("foo-min", 2)})
 	bankKeeper.InputOutputCoins(ctx, []Input{input1}, []Output{output1})
-	require.True(t, bankKeeper.GetCoins(ctx, addr).IsEqual(sdk.Coins{sdk.NewInt64Coin("barcoin", 20), sdk.NewInt64Coin("foocoin", 7)}))
-	require.True(t, bankKeeper.GetCoins(ctx, addr2).IsEqual(sdk.Coins{sdk.NewInt64Coin("barcoin", 10), sdk.NewInt64Coin("foocoin", 8)}))
+	require.True(t, bankKeeper.GetCoins(ctx, addr).IsEqual(sdk.Coins{sdk.NewInt64Coin("bar-min", 20), sdk.NewInt64Coin("foo-min", 7)}))
+	require.True(t, bankKeeper.GetCoins(ctx, addr2).IsEqual(sdk.Coins{sdk.NewInt64Coin("bar-min", 10), sdk.NewInt64Coin("foo-min", 8)}))
 
 	inputs := []Input{
-		NewInput(addr, sdk.Coins{sdk.NewInt64Coin("foocoin", 3)}),
-		NewInput(addr2, sdk.Coins{sdk.NewInt64Coin("barcoin", 3), sdk.NewInt64Coin("foocoin", 2)}),
+		NewInput(addr, sdk.Coins{sdk.NewInt64Coin("foo-min", 3)}),
+		NewInput(addr2, sdk.Coins{sdk.NewInt64Coin("bar-min", 3), sdk.NewInt64Coin("foo-min", 2)}),
 	}
 
 	outputs := []Output{
-		NewOutput(addr, sdk.Coins{sdk.NewInt64Coin("barcoin", 1)}),
-		NewOutput(addr3, sdk.Coins{sdk.NewInt64Coin("barcoin", 2), sdk.NewInt64Coin("foocoin", 5)}),
+		NewOutput(addr, sdk.Coins{sdk.NewInt64Coin("bar-min", 1)}),
+		NewOutput(addr3, sdk.Coins{sdk.NewInt64Coin("bar-min", 2), sdk.NewInt64Coin("foo-min", 5)}),
 	}
 	bankKeeper.InputOutputCoins(ctx, inputs, outputs)
-	require.True(t, bankKeeper.GetCoins(ctx, addr).IsEqual(sdk.Coins{sdk.NewInt64Coin("barcoin", 21), sdk.NewInt64Coin("foocoin", 4)}))
-	require.True(t, bankKeeper.GetCoins(ctx, addr2).IsEqual(sdk.Coins{sdk.NewInt64Coin("barcoin", 7), sdk.NewInt64Coin("foocoin", 6)}))
-	require.True(t, bankKeeper.GetCoins(ctx, addr3).IsEqual(sdk.Coins{sdk.NewInt64Coin("barcoin", 2), sdk.NewInt64Coin("foocoin", 5)}))
+	require.True(t, bankKeeper.GetCoins(ctx, addr).IsEqual(sdk.Coins{sdk.NewInt64Coin("bar-min", 21), sdk.NewInt64Coin("foo-min", 4)}))
+	require.True(t, bankKeeper.GetCoins(ctx, addr2).IsEqual(sdk.Coins{sdk.NewInt64Coin("bar-min", 7), sdk.NewInt64Coin("foo-min", 6)}))
+	require.True(t, bankKeeper.GetCoins(ctx, addr3).IsEqual(sdk.Coins{sdk.NewInt64Coin("bar-min", 2), sdk.NewInt64Coin("foo-min", 5)}))
 
 }
 
@@ -128,56 +128,56 @@ func TestSendKeeper(t *testing.T) {
 	accountKeeper.SetAccount(ctx, acc)
 	require.True(t, sendKeeper.GetCoins(ctx, addr).IsEqual(sdk.Coins{}))
 
-	bankKeeper.AddCoins(ctx, addr, sdk.Coins{sdk.NewInt64Coin("foocoin", 10)})
-	bankKeeper.IncreaseLoosenToken(ctx, sdk.Coins{sdk.NewInt64Coin("foocoin", 10)})
-	require.True(t, sendKeeper.GetCoins(ctx, addr).IsEqual(sdk.Coins{sdk.NewInt64Coin("foocoin", 10)}))
+	bankKeeper.AddCoins(ctx, addr, sdk.Coins{sdk.NewInt64Coin("foo-min", 10)})
+	bankKeeper.IncreaseTotalSupply(ctx, sdk.NewInt64Coin("foo-min", 10))
+	require.True(t, sendKeeper.GetCoins(ctx, addr).IsEqual(sdk.Coins{sdk.NewInt64Coin("foo-min", 10)}))
 
 	// Test HasCoins
-	require.True(t, sendKeeper.HasCoins(ctx, addr, sdk.Coins{sdk.NewInt64Coin("foocoin", 10)}))
-	require.True(t, sendKeeper.HasCoins(ctx, addr, sdk.Coins{sdk.NewInt64Coin("foocoin", 5)}))
-	require.False(t, sendKeeper.HasCoins(ctx, addr, sdk.Coins{sdk.NewInt64Coin("foocoin", 15)}))
-	require.False(t, sendKeeper.HasCoins(ctx, addr, sdk.Coins{sdk.NewInt64Coin("barcoin", 5)}))
+	require.True(t, sendKeeper.HasCoins(ctx, addr, sdk.Coins{sdk.NewInt64Coin("foo-min", 10)}))
+	require.True(t, sendKeeper.HasCoins(ctx, addr, sdk.Coins{sdk.NewInt64Coin("foo-min", 5)}))
+	require.False(t, sendKeeper.HasCoins(ctx, addr, sdk.Coins{sdk.NewInt64Coin("foo-min", 15)}))
+	require.False(t, sendKeeper.HasCoins(ctx, addr, sdk.Coins{sdk.NewInt64Coin("bar-min", 5)}))
 
 	bankKeeper.BurnCoins(ctx, addr, bankKeeper.GetCoins(ctx, addr))
-	bankKeeper.AddCoins(ctx, addr, sdk.Coins{sdk.NewInt64Coin("foocoin", 15)})
-	bankKeeper.IncreaseLoosenToken(ctx, sdk.Coins{sdk.NewInt64Coin("foocoin", 15)})
+	bankKeeper.AddCoins(ctx, addr, sdk.Coins{sdk.NewInt64Coin("foo-min", 15)})
+	bankKeeper.IncreaseTotalSupply(ctx, sdk.NewInt64Coin("foo-min", 15))
 	// Test SendCoins
-	sendKeeper.SendCoins(ctx, addr, addr2, sdk.Coins{sdk.NewInt64Coin("foocoin", 5)})
-	require.True(t, sendKeeper.GetCoins(ctx, addr).IsEqual(sdk.Coins{sdk.NewInt64Coin("foocoin", 10)}))
-	require.True(t, sendKeeper.GetCoins(ctx, addr2).IsEqual(sdk.Coins{sdk.NewInt64Coin("foocoin", 5)}))
+	sendKeeper.SendCoins(ctx, addr, addr2, sdk.Coins{sdk.NewInt64Coin("foo-min", 5)})
+	require.True(t, sendKeeper.GetCoins(ctx, addr).IsEqual(sdk.Coins{sdk.NewInt64Coin("foo-min", 10)}))
+	require.True(t, sendKeeper.GetCoins(ctx, addr2).IsEqual(sdk.Coins{sdk.NewInt64Coin("foo-min", 5)}))
 
-	_, err2 := sendKeeper.SendCoins(ctx, addr, addr2, sdk.Coins{sdk.NewInt64Coin("foocoin", 50)})
+	_, err2 := sendKeeper.SendCoins(ctx, addr, addr2, sdk.Coins{sdk.NewInt64Coin("foo-min", 50)})
 	assert.Implements(t, (*sdk.Error)(nil), err2)
-	require.True(t, sendKeeper.GetCoins(ctx, addr).IsEqual(sdk.Coins{sdk.NewInt64Coin("foocoin", 10)}))
-	require.True(t, sendKeeper.GetCoins(ctx, addr2).IsEqual(sdk.Coins{sdk.NewInt64Coin("foocoin", 5)}))
+	require.True(t, sendKeeper.GetCoins(ctx, addr).IsEqual(sdk.Coins{sdk.NewInt64Coin("foo-min", 10)}))
+	require.True(t, sendKeeper.GetCoins(ctx, addr2).IsEqual(sdk.Coins{sdk.NewInt64Coin("foo-min", 5)}))
 
-	bankKeeper.AddCoins(ctx, addr, sdk.Coins{sdk.NewInt64Coin("barcoin", 30)})
-	bankKeeper.IncreaseLoosenToken(ctx, sdk.Coins{sdk.NewInt64Coin("barcoin", 30)})
+	bankKeeper.AddCoins(ctx, addr, sdk.Coins{sdk.NewInt64Coin("bar-min", 30)})
+	bankKeeper.IncreaseTotalSupply(ctx, sdk.NewInt64Coin("bar-min", 30))
 
-	sendKeeper.SendCoins(ctx, addr, addr2, sdk.Coins{sdk.NewInt64Coin("barcoin", 10), sdk.NewInt64Coin("foocoin", 5)})
-	require.True(t, sendKeeper.GetCoins(ctx, addr).IsEqual(sdk.Coins{sdk.NewInt64Coin("barcoin", 20), sdk.NewInt64Coin("foocoin", 5)}))
-	require.True(t, sendKeeper.GetCoins(ctx, addr2).IsEqual(sdk.Coins{sdk.NewInt64Coin("barcoin", 10), sdk.NewInt64Coin("foocoin", 10)}))
+	sendKeeper.SendCoins(ctx, addr, addr2, sdk.Coins{sdk.NewInt64Coin("bar-min", 10), sdk.NewInt64Coin("foo-min", 5)})
+	require.True(t, sendKeeper.GetCoins(ctx, addr).IsEqual(sdk.Coins{sdk.NewInt64Coin("bar-min", 20), sdk.NewInt64Coin("foo-min", 5)}))
+	require.True(t, sendKeeper.GetCoins(ctx, addr2).IsEqual(sdk.Coins{sdk.NewInt64Coin("bar-min", 10), sdk.NewInt64Coin("foo-min", 10)}))
 
 	// Test InputOutputCoins
-	input1 := NewInput(addr2, sdk.Coins{sdk.NewInt64Coin("foocoin", 2)})
-	output1 := NewOutput(addr, sdk.Coins{sdk.NewInt64Coin("foocoin", 2)})
+	input1 := NewInput(addr2, sdk.Coins{sdk.NewInt64Coin("foo-min", 2)})
+	output1 := NewOutput(addr, sdk.Coins{sdk.NewInt64Coin("foo-min", 2)})
 	sendKeeper.InputOutputCoins(ctx, []Input{input1}, []Output{output1})
-	require.True(t, sendKeeper.GetCoins(ctx, addr).IsEqual(sdk.Coins{sdk.NewInt64Coin("barcoin", 20), sdk.NewInt64Coin("foocoin", 7)}))
-	require.True(t, sendKeeper.GetCoins(ctx, addr2).IsEqual(sdk.Coins{sdk.NewInt64Coin("barcoin", 10), sdk.NewInt64Coin("foocoin", 8)}))
+	require.True(t, sendKeeper.GetCoins(ctx, addr).IsEqual(sdk.Coins{sdk.NewInt64Coin("bar-min", 20), sdk.NewInt64Coin("foo-min", 7)}))
+	require.True(t, sendKeeper.GetCoins(ctx, addr2).IsEqual(sdk.Coins{sdk.NewInt64Coin("bar-min", 10), sdk.NewInt64Coin("foo-min", 8)}))
 
 	inputs := []Input{
-		NewInput(addr, sdk.Coins{sdk.NewInt64Coin("foocoin", 3)}),
-		NewInput(addr2, sdk.Coins{sdk.NewInt64Coin("barcoin", 3), sdk.NewInt64Coin("foocoin", 2)}),
+		NewInput(addr, sdk.Coins{sdk.NewInt64Coin("foo-min", 3)}),
+		NewInput(addr2, sdk.Coins{sdk.NewInt64Coin("bar-min", 3), sdk.NewInt64Coin("foo-min", 2)}),
 	}
 
 	outputs := []Output{
-		NewOutput(addr, sdk.Coins{sdk.NewInt64Coin("barcoin", 1)}),
-		NewOutput(addr3, sdk.Coins{sdk.NewInt64Coin("barcoin", 2), sdk.NewInt64Coin("foocoin", 5)}),
+		NewOutput(addr, sdk.Coins{sdk.NewInt64Coin("bar-min", 1)}),
+		NewOutput(addr3, sdk.Coins{sdk.NewInt64Coin("bar-min", 2), sdk.NewInt64Coin("foo-min", 5)}),
 	}
 	sendKeeper.InputOutputCoins(ctx, inputs, outputs)
-	require.True(t, sendKeeper.GetCoins(ctx, addr).IsEqual(sdk.Coins{sdk.NewInt64Coin("barcoin", 21), sdk.NewInt64Coin("foocoin", 4)}))
-	require.True(t, sendKeeper.GetCoins(ctx, addr2).IsEqual(sdk.Coins{sdk.NewInt64Coin("barcoin", 7), sdk.NewInt64Coin("foocoin", 6)}))
-	require.True(t, sendKeeper.GetCoins(ctx, addr3).IsEqual(sdk.Coins{sdk.NewInt64Coin("barcoin", 2), sdk.NewInt64Coin("foocoin", 5)}))
+	require.True(t, sendKeeper.GetCoins(ctx, addr).IsEqual(sdk.Coins{sdk.NewInt64Coin("bar-min", 21), sdk.NewInt64Coin("foo-min", 4)}))
+	require.True(t, sendKeeper.GetCoins(ctx, addr2).IsEqual(sdk.Coins{sdk.NewInt64Coin("bar-min", 7), sdk.NewInt64Coin("foo-min", 6)}))
+	require.True(t, sendKeeper.GetCoins(ctx, addr3).IsEqual(sdk.Coins{sdk.NewInt64Coin("bar-min", 2), sdk.NewInt64Coin("foo-min", 5)}))
 
 }
 
@@ -199,13 +199,13 @@ func TestViewKeeper(t *testing.T) {
 	accountKeeper.SetAccount(ctx, acc)
 	require.True(t, viewKeeper.GetCoins(ctx, addr).IsEqual(sdk.Coins{}))
 
-	bankKeeper.AddCoins(ctx, addr, sdk.Coins{sdk.NewInt64Coin("foocoin", 10)})
-	bankKeeper.IncreaseLoosenToken(ctx, sdk.Coins{sdk.NewInt64Coin("foocoin", 10)})
-	require.True(t, viewKeeper.GetCoins(ctx, addr).IsEqual(sdk.Coins{sdk.NewInt64Coin("foocoin", 10)}))
+	bankKeeper.AddCoins(ctx, addr, sdk.Coins{sdk.NewInt64Coin("foo-min", 10)})
+	bankKeeper.IncreaseTotalSupply(ctx, sdk.NewInt64Coin("foo-min", 10))
+	require.True(t, viewKeeper.GetCoins(ctx, addr).IsEqual(sdk.Coins{sdk.NewInt64Coin("foo-min", 10)}))
 
 	// Test HasCoins
-	require.True(t, viewKeeper.HasCoins(ctx, addr, sdk.Coins{sdk.NewInt64Coin("foocoin", 10)}))
-	require.True(t, viewKeeper.HasCoins(ctx, addr, sdk.Coins{sdk.NewInt64Coin("foocoin", 5)}))
-	require.False(t, viewKeeper.HasCoins(ctx, addr, sdk.Coins{sdk.NewInt64Coin("foocoin", 15)}))
-	require.False(t, viewKeeper.HasCoins(ctx, addr, sdk.Coins{sdk.NewInt64Coin("barcoin", 5)}))
+	require.True(t, viewKeeper.HasCoins(ctx, addr, sdk.Coins{sdk.NewInt64Coin("foo-min", 10)}))
+	require.True(t, viewKeeper.HasCoins(ctx, addr, sdk.Coins{sdk.NewInt64Coin("foo-min", 5)}))
+	require.False(t, viewKeeper.HasCoins(ctx, addr, sdk.Coins{sdk.NewInt64Coin("foo-min", 15)}))
+	require.False(t, viewKeeper.HasCoins(ctx, addr, sdk.Coins{sdk.NewInt64Coin("bar-min", 5)}))
 }
