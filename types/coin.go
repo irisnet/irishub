@@ -1,7 +1,6 @@
 package types
 
 import (
-	"encoding/json"
 	"fmt"
 	"regexp"
 	"sort"
@@ -28,8 +27,12 @@ type Coin struct {
 // NewCoin returns a new coin with a denomination and amount. It will panic if
 // the amount is negative.
 func NewCoin(denom string, amount Int) Coin {
-	if err := validate(denom, amount); err != nil {
-		panic(err)
+	if amount.i == nil {
+		amount = ZeroInt()
+	}
+
+	if amount.IsNegative() {
+		panic("negative coin amount")
 	}
 
 	return Coin{
@@ -49,29 +52,23 @@ func (coin Coin) String() string {
 	return fmt.Sprintf("%v%v", coin.Amount, coin.Denom)
 }
 
-// validate returns an error if the Coin has a negative amount or if
-// the denom is invalid.
-func validate(denom string, amount Int) error {
-	if err := validateDenom(denom); err != nil {
-		return err
-	}
-
-	if amount.IsNegative() {
-		return fmt.Errorf("negative coin amount: %v", amount)
-	}
-
-	return nil
-}
-
-// IsValid returns true if the Coin has a non-negative amount and the denom is vaild.
+// IsValid returns true if the coin amount is positive
+// and the coin is denominated in min unit
 func (coin Coin) IsValid() bool {
-	if err := validate(coin.Denom, coin.Amount); err != nil {
+	if !coin.IsPositive() {
+		return false
+	}
+	if coin.Denom != IrisAtto && !strings.HasSuffix(coin.Denom, MinDenomSuffix) {
 		return false
 	}
 	return true
 }
 
-// IsZero returns if this represents no money
+func (coin Coin) IsValidIrisAtto() bool {
+	return coin.Denom == IrisAtto && coin.IsPositive()
+}
+
+// IsZero returns if this coin has zero amount
 func (coin Coin) IsZero() bool {
 	return coin.Amount.i == nil || coin.Amount.IsZero()
 }
@@ -117,14 +114,14 @@ func (coin Coin) Sub(coinB Coin) Coin {
 //
 // TODO: Remove once unsigned integers are used.
 func (coin Coin) IsPositive() bool {
-	return coin.Amount.IsPositive()
+	return coin.Amount.i != nil && coin.Amount.IsPositive()
 }
 
 // IsNegative returns true if the coin amount is negative and false otherwise.
 //
 // TODO: Remove once unsigned integers are used.
 func (coin Coin) IsNegative() bool {
-	return coin.Amount.IsNegative()
+	return coin.Amount.i != nil && coin.Amount.IsNegative()
 }
 
 //-----------------------------------------------------------------------------
@@ -148,18 +145,6 @@ func NewCoins(coins ...Coin) Coins {
 	}
 
 	return newCoins
-}
-
-type coinsJSON Coins
-
-// MarshalJSON implements a custom JSON marshaller for the Coins type to allow
-// nil Coins to be encoded as an empty array.
-func (coins Coins) MarshalJSON() ([]byte, error) {
-	if coins == nil {
-		return json.Marshal(coinsJSON(Coins{}))
-	}
-
-	return json.Marshal(coinsJSON(coins))
 }
 
 func (coins Coins) String() string {
@@ -198,7 +183,7 @@ func (coins Coins) MainUnitString() string {
 	return out
 }
 
-// IsValid asserts the set of coins is valid and sorted.
+// IsValid asserts the coins are valid and sorted.
 func (coins Coins) IsValid() bool {
 	switch len(coins) {
 	case 0:
@@ -226,6 +211,13 @@ func (coins Coins) IsValid() bool {
 
 		return true
 	}
+}
+
+func (coins Coins) IsValidIrisAtto() bool {
+	if coins == nil || len(coins) != 1 {
+		return false
+	}
+	return coins[0].IsValidIrisAtto()
 }
 
 // Add adds two sets of coins.
@@ -461,8 +453,6 @@ func (coins Coins) Empty() bool {
 
 // Returns the amount of a denom from coins
 func (coins Coins) AmountOf(denom string) Int {
-	mustValidateDenom(denom)
-
 	switch len(coins) {
 	case 0:
 		return ZeroInt()
@@ -531,6 +521,15 @@ func (coins Coins) negative() Coins {
 	return res
 }
 
+func (coins Coins) GetCoin(denom string) (Coin, error) {
+	for _, coin := range coins {
+		if coin.Denom == denom {
+			return coin, nil
+		}
+	}
+	return Coin{}, fmt.Errorf("cannot find coin with denom %s", denom)
+}
+
 // removeZeroCoins removes all zero coins from the given coin set in-place.
 func removeZeroCoins(coins Coins) Coins {
 	i, l := 0, len(coins)
@@ -574,19 +573,6 @@ var (
 	reDenomCompiled = regexp.MustCompile(fmt.Sprintf(`^%s$`, reDenom))
 	reCoinCompiled  = regexp.MustCompile(fmt.Sprintf(`^(%s)%s(%s)$`, reAmount, reSpace, reDenom))
 )
-
-func validateDenom(denom string) error {
-	if !reDenomCompiled.MatchString(denom) {
-		return fmt.Errorf("invalid denom: %s", denom)
-	}
-	return nil
-}
-
-func mustValidateDenom(denom string) {
-	if err := validateDenom(denom); err != nil {
-		panic(err)
-	}
-}
 
 func ParseCoinParts(coinStr string) (denom, amount string, err error) {
 	coinStr = strings.ToLower(strings.TrimSpace(coinStr))

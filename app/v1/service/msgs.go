@@ -195,12 +195,12 @@ func (msg MsgSvcBind) ValidateBasic() sdk.Error {
 	if len(msg.Provider) == 0 {
 		return sdk.ErrInvalidAddress(msg.Provider.String())
 	}
-	if msg.Deposit.IsAnyNegative() {
-		return sdk.ErrInvalidCoins(msg.Deposit.String())
+	if !msg.Deposit.IsValidIrisAtto() {
+		return sdk.ErrInvalidCoins(fmt.Sprintf("invalid deposit [%s]", msg.Deposit))
 	}
 	for _, price := range msg.Prices {
-		if price.IsNegative() {
-			return sdk.ErrInvalidCoins(price.String())
+		if !price.IsValidIrisAtto() {
+			return sdk.ErrInvalidCoins(fmt.Sprintf("invalid price [%s]", price))
 		}
 	}
 	if !validLevel(msg.Level) {
@@ -275,12 +275,12 @@ func (msg MsgSvcBindingUpdate) ValidateBasic() sdk.Error {
 	if msg.BindingType != 0x00 && !validBindingType(msg.BindingType) {
 		return ErrInvalidBindingType(DefaultCodespace, msg.BindingType)
 	}
-	if msg.Deposit.IsAnyNegative() {
-		return sdk.ErrInvalidCoins(msg.Deposit.String())
+	if !msg.Deposit.IsValidIrisAtto() {
+		return sdk.ErrInvalidCoins(fmt.Sprintf("invalid deposit [%s]", msg.Deposit))
 	}
 	for _, price := range msg.Prices {
-		if price.IsNegative() {
-			return sdk.ErrInvalidCoins(price.String())
+		if !price.IsValidIrisAtto() {
+			return sdk.ErrInvalidCoins(fmt.Sprintf("invalid price [%s]", price))
 		}
 	}
 	if !validUpdateLevel(msg.Level) {
@@ -403,8 +403,8 @@ func (msg MsgSvcEnable) ValidateBasic() sdk.Error {
 	if err := ensureNameLength(msg.DefName); err != nil {
 		return err
 	}
-	if msg.Deposit.IsAnyNegative() {
-		return sdk.ErrInvalidCoins(msg.Deposit.String())
+	if !msg.Deposit.IsValidIrisAtto() {
+		return sdk.ErrInvalidCoins(fmt.Sprintf("invalid deposit [%s]", msg.Deposit))
 	}
 	if len(msg.Provider) == 0 {
 		return sdk.ErrInvalidAddress(msg.Provider.String())
@@ -550,6 +550,9 @@ func (msg MsgSvcRequest) ValidateBasic() sdk.Error {
 	}
 	if len(msg.Consumer) == 0 {
 		return sdk.ErrInvalidAddress(msg.Consumer.String())
+	}
+	if !msg.ServiceFee.IsValidIrisAtto() {
+		return sdk.ErrInvalidCoins(fmt.Sprintf("invalid service fee [%s]", msg.ServiceFee))
 	}
 	return nil
 }
@@ -714,11 +717,8 @@ func (msg MsgSvcWithdrawTax) ValidateBasic() sdk.Error {
 	if len(msg.DestAddress) == 0 {
 		return sdk.ErrInvalidAddress(msg.DestAddress.String())
 	}
-	if !msg.Amount.IsValid() {
-		return sdk.ErrInvalidCoins(msg.Amount.String())
-	}
-	if !msg.Amount.IsAllPositive() {
-		return sdk.ErrInvalidCoins(msg.Amount.String())
+	if !msg.Amount.IsValidIrisAtto() {
+		return sdk.ErrInvalidCoins(fmt.Sprintf("invalid withdraw amount [%s]", msg.Amount))
 	}
 	return nil
 }

@@ -2,6 +2,7 @@ package auth
 
 import (
 	sdk "github.com/irisnet/irishub/types"
+	"fmt"
 )
 
 // GenesisState - all auth state that must be provided at genesis
@@ -56,9 +57,19 @@ func ValidateGenesis(data GenesisState) error {
 	if err != nil {
 		return err
 	}
-	err = ValidateFee(data.FeeAuth, data.CollectedFees)
+	err = ValidateFee(data.CollectedFees)
 	if err != nil {
 		return err
+	}
+	return nil
+}
+
+func ValidateFee(collectedFee sdk.Coins) error {
+	if collectedFee == nil || collectedFee.Empty() {
+		return nil
+	}
+	if !collectedFee.IsValidIrisAtto() {
+		return sdk.ErrInvalidCoins(fmt.Sprintf("invalid collected fees [%s]", collectedFee))
 	}
 	return nil
 }

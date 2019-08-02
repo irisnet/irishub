@@ -277,19 +277,18 @@ func deductFees(acc Account, fee StdFee) (Account, sdk.Result) {
 	coins := acc.GetCoins()
 	feeAmount := fee.Amount
 
-	if !feeAmount.IsValid() {
-		return nil, sdk.ErrInsufficientFee(fmt.Sprintf("invalid fee amount: %s", feeAmount)).Result()
-	}
-	newCoins, ok := coins.SafeSub(feeAmount)
-	if ok {
-		errMsg := fmt.Sprintf("account balance (%s) is less than %s", coins, feeAmount)
+	newCoins, hasNeg := coins.SafeSub(feeAmount)
+	if hasNeg {
+		errMsg := fmt.Sprintf("account balance [%s] is not enough to cover fee [%s]", coins, feeAmount)
 		return nil, sdk.ErrInsufficientFunds(errMsg).Result()
 	}
+
 	err := acc.SetCoins(newCoins)
 	if err != nil {
 		// Handle w/ #870
 		panic(err)
 	}
+
 	return acc, sdk.Result{}
 }
 
