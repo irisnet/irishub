@@ -395,7 +395,7 @@ func TestParse(t *testing.T) {
 		valid    bool  // if false, we expect an error on parse
 		expected Coins // if valid is true, make sure this is returned
 	}{
-		{"", true, nil},
+		{"", true, Coins{}},
 		{"1foo", true, Coins{{"foo", one}}},
 		{"10bar", true, Coins{{"bar", NewInt(10)}}},
 		{"99bar,1foo", true, Coins{{"bar", NewInt(99)}, {"foo", one}}},
