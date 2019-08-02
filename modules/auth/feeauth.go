@@ -24,7 +24,7 @@ func InitialFeeAuth() FeeAuth {
 }
 
 func ValidateFee(auth FeeAuth, collectedFee sdk.Coins) error {
-	if !collectedFee.IsValid() {
+	if !collectedFee.IsValidV0() {
 		return sdk.ErrInvalidCoins("")
 	}
 	if len(auth.NativeFeeDenom) == 0 {

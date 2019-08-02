@@ -1,10 +1,10 @@
 package service
 
 import (
+	"fmt"
 	"github.com/irisnet/irishub/tools/protoidl"
 	sdk "github.com/irisnet/irishub/types"
 	"regexp"
-	"fmt"
 )
 
 const (
@@ -671,7 +671,7 @@ func (msg MsgSvcWithdrawTax) ValidateBasic() sdk.Error {
 	if len(msg.DestAddress) == 0 {
 		return sdk.ErrInvalidAddress(msg.DestAddress.String())
 	}
-	if !msg.Amount.IsValid() {
+	if !msg.Amount.IsValidV0() {
 		return sdk.ErrInvalidCoins(msg.Amount.String())
 	}
 	if !msg.Amount.IsAllPositive() {

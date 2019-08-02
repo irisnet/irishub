@@ -2,6 +2,7 @@ package protocol
 
 import (
 	sdk "github.com/irisnet/irishub/types"
+	"log"
 )
 
 // QueryRouter provides queryables for each query path.
@@ -29,7 +30,7 @@ func (rtr *queryrouter) AddRoute(r string, q sdk.Querier) QueryRouter {
 		panic("route expressions can only contain alphanumeric characters")
 	}
 	if rtr.routes[r] != nil {
-		panic("route has already been initialized")
+		log.Printf("route [%s] has already been initialized", r)
 	}
 	rtr.routes[r] = q
 	return rtr

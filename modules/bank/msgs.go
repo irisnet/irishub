@@ -168,7 +168,7 @@ func (in Input) ValidateBasic() sdk.Error {
 	if len(in.Address) == 0 {
 		return sdk.ErrInvalidAddress(in.Address.String())
 	}
-	if !in.Coins.IsValid() {
+	if !in.Coins.IsValidV0() {
 		return sdk.ErrInvalidCoins(in.Coins.String())
 	}
 	if !in.Coins.IsAllPositive() {
@@ -209,7 +209,7 @@ func (out Output) ValidateBasic() sdk.Error {
 	if len(out.Address) == 0 {
 		return sdk.ErrInvalidAddress(out.Address.String())
 	}
-	if !out.Coins.IsValid() {
+	if !out.Coins.IsValidV0() {
 		return sdk.ErrInvalidCoins(out.Coins.String())
 	}
 	if !out.Coins.IsAllPositive() {
@@ -256,7 +256,7 @@ func (msg MsgBurn) ValidateBasic() sdk.Error {
 	if len(msg.Coins) == 0 {
 		return ErrBurnEmptyCoins(DefaultCodespace).TraceSDK("")
 	}
-	if !msg.Coins.IsValid() {
+	if !msg.Coins.IsValidV0() {
 		return sdk.ErrInvalidCoins(msg.Coins.String())
 	}
 	return nil

@@ -41,6 +41,8 @@ github.com/hashicorp/hcl v1.0.0/go.mod h1:E5yfLk+7swimpb2L/Alb/PJmXilQ/rhwaUYs4T
 github.com/inconshreveable/mousetrap v1.0.0/go.mod h1:PxqpIevigyE2G7u3NXJIT2ANytuPF1OarO4DADm73n8=
 github.com/irisnet/iavl v0.8.2-0.20190621103457-d534994fdffd h1:1A13Pi7ARSgk8XxGE84t/8VfuWAiF8jsfvdVWRfdbYw=
 github.com/irisnet/iavl v0.8.2-0.20190621103457-d534994fdffd/go.mod h1:JRGfj9mLdUSdoBSpYjo14FRe/qyKv3YKHwHnhuxzKaQ=
+github.com/irisnet/iavl v0.8.2-0.20190731074149-9b64a287a116 h1:8ntnRf98cXvKEAsHxiSB4k70tstElo9OtTtf8eisBRo=
+github.com/irisnet/iavl v0.8.2-0.20190731074149-9b64a287a116/go.mod h1:JRGfj9mLdUSdoBSpYjo14FRe/qyKv3YKHwHnhuxzKaQ=
 github.com/irisnet/iavl v0.12.0-iris h1:NDizAhUNgcJaxHEpTf6iiTD5IvZw5S5VKfWcx3KnlhI=
 github.com/irisnet/iavl v0.12.0-iris/go.mod h1:JRGfj9mLdUSdoBSpYjo14FRe/qyKv3YKHwHnhuxzKaQ=
 github.com/irisnet/iavl v0.12.1 h1:amL3Qp8dSDeDU1KnF8GGWhS3IjgP2JuawSzUBDY07GQ=
