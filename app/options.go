@@ -33,7 +33,18 @@ func SetPruning(pruning string) func(*BaseApp) {
 func SetMinimumFees(minFees string) func(*BaseApp) {
 	fees, err := sdk.ParseCoins(minFees)
 	if err != nil {
-		panic(fmt.Sprintf("invalid minimum fees: %v", err))
+		panic(err)
+	}
+	for i, coin := range fees {
+		if coin.Denom == sdk.Iris {
+			fees[i], err = sdk.IrisCoinType.ConvertToMinDenomCoin(coin.String())
+			if err != nil {
+				panic(fmt.Sprintf("invalid minimum fees [%s]", fees))
+			}
+		}
+	}
+	if !fees.Empty() && !fees.IsValidIrisAtto() {
+		panic(fmt.Sprintf("invalid minimum fees [%s]", fees))
 	}
 	return func(bap *BaseApp) { bap.SetMinimumFees(fees) }
 }
