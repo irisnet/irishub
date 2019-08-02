@@ -4,6 +4,7 @@ import (
 	"github.com/go-kit/kit/metrics"
 	"github.com/go-kit/kit/metrics/discard"
 	"github.com/go-kit/kit/metrics/prometheus"
+	promutil "github.com/irisnet/irishub/tools/prometheus"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
 	cfg "github.com/tendermint/tendermint/config"
 )
@@ -24,19 +25,26 @@ func PrometheusMetrics(config *cfg.InstrumentationConfig) *Metrics {
 	if !config.Prometheus {
 		return NopMetrics()
 	}
+
+	signalVec := stdprometheus.NewGaugeVec(stdprometheus.GaugeOpts{
+		Namespace: config.Namespace,
+		Subsystem: MetricsSubsystem,
+		Name:      "signal",
+		Help:      "validator runs the new software",
+	}, []string{ValidatorLabel, VersionLabel})
+
+	upgradeVec := stdprometheus.NewGaugeVec(stdprometheus.GaugeOpts{
+		Namespace: config.Namespace,
+		Subsystem: MetricsSubsystem,
+		Name:      "upgrade",
+		Help:      "alert the validators to install new version",
+	}, []string{})
+
+	promutil.RegisterMetrics(signalVec, upgradeVec)
+
 	return &Metrics{
-		Signal: prometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
-			Namespace: config.Namespace,
-			Subsystem: MetricsSubsystem,
-			Name:      "signal",
-			Help:      "validator runs the new software",
-		}, []string{ValidatorLabel, VersionLabel}),
-		Upgrade: prometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
-			Namespace: config.Namespace,
-			Subsystem: MetricsSubsystem,
-			Name:      "upgrade",
-			Help:      "alert the validators to install new version",
-		}, []string{}),
+		Signal:  prometheus.NewGauge(signalVec),
+		Upgrade: prometheus.NewGauge(upgradeVec),
 	}
 }
 
