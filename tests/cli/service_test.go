@@ -2,16 +2,16 @@ package cli
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"testing"
-	"io/ioutil"
 
+	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/tests"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/stretchr/testify/require"
 	"regexp"
 	"strings"
-	"github.com/irisnet/irishub/client/context"
 )
 
 func TestIrisCLIService(t *testing.T) {
@@ -139,7 +139,7 @@ func TestIrisCLIService(t *testing.T) {
 	serviceBindings = executeGetServiceBindings(t, fmt.Sprintf("iriscli service bindings --service-name=%s --def-chain-id=%s %v", serviceName, chainID, flags))
 	var totalDeposit sdk.Coins
 	for _, bind := range serviceBindings {
-		totalDeposit = totalDeposit.Plus(bind.Deposit)
+		totalDeposit = totalDeposit.Add(bind.Deposit)
 	}
 	require.Equal(t, "21000000000000000000iris-atto", totalDeposit.String())
 

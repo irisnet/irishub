@@ -62,6 +62,13 @@ func NewIrisApp(logger log.Logger, db dbm.DB, config *cfg.InstrumentationConfig,
 	if viper.GetBool(FlagReplay) {
 		lastHeight := Replay(app.Logger)
 		err = app.LoadVersion(lastHeight, protocol.KeyMain, true)
+
+		// If reset to another protocol version, should reload Protocol and reset txDecoder
+		loaded, current := app.Engine.LoadCurrentProtocol(app.GetKVStore(protocol.KeyMain))
+		if !loaded {
+			cmn.Exit(fmt.Sprintf("Your software doesn't support the required protocol (version %d)!", current))
+		}
+		app.BaseApp.txDecoder = auth.DefaultTxDecoder(app.Engine.GetCurrentProtocol().GetCodec())
 	} else {
 		err = app.LoadLatestVersion(protocol.KeyMain)
 	} // app is now sealed
@@ -136,6 +143,13 @@ func (app *IrisApp) ResetOrReplay(replayHeight int64) (replay bool, height int64
 	if err != nil {
 		cmn.Exit(err.Error())
 	}
+
+	// If reset to another protocol version, should reload Protocol and reset txDecoder
+	loaded, current := app.Engine.LoadCurrentProtocol(app.GetKVStore(protocol.KeyMain))
+	if !loaded {
+		cmn.Exit(fmt.Sprintf("Your software doesn't support the required protocol (version %d)!", current))
+	}
+	app.BaseApp.txDecoder = auth.DefaultTxDecoder(app.Engine.GetCurrentProtocol().GetCodec())
 
 	app.Logger.Info(fmt.Sprintf("The last block height is %d, want to load store at %d", lastBlockHeight, replayHeight))
 

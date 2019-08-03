@@ -30,6 +30,8 @@ const (
 	//1 iris = 10^18 iris-atto
 	Atto      = "atto"
 	AttoScale = 18
+
+	MinDenomSuffix = "-min"
 )
 
 var (
@@ -176,5 +178,5 @@ func GetCoinMinDenom(coinName string) (denom string, err error) {
 		return IrisAtto, nil
 	}
 
-	return fmt.Sprintf("%s-min", coinName), nil
+	return fmt.Sprintf("%s%s", coinName, MinDenomSuffix), nil
 }

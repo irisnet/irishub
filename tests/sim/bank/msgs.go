@@ -6,11 +6,11 @@ import (
 	"math/big"
 	"math/rand"
 
-	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/modules/auth"
-	"github.com/irisnet/irishub/modules/bank"
 	"github.com/irisnet/irishub/mock"
 	"github.com/irisnet/irishub/mock/simulation"
+	"github.com/irisnet/irishub/modules/auth"
+	"github.com/irisnet/irishub/modules/bank"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/tendermint/tendermint/crypto"
 
 	"github.com/irisnet/irishub/mock/baseapp"
@@ -129,13 +129,13 @@ func sendAndVerifyMsgSend(app *baseapp.BaseApp, mapper auth.AccountKeeper, msg b
 
 	for i := 0; i < len(msg.Inputs); i++ {
 		terminalInputCoins := mapper.GetAccount(ctx, msg.Inputs[i].Address).GetCoins()
-		if !initialInputAddrCoins[i].Minus(msg.Inputs[i].Coins).IsEqual(terminalInputCoins) {
+		if !initialInputAddrCoins[i].Sub(msg.Inputs[i].Coins).IsEqual(terminalInputCoins) {
 			return fmt.Errorf("input #%d had an incorrect amount of coins", i)
 		}
 	}
 	for i := 0; i < len(msg.Outputs); i++ {
 		terminalOutputCoins := mapper.GetAccount(ctx, msg.Outputs[i].Address).GetCoins()
-		if !terminalOutputCoins.IsEqual(initialOutputAddrCoins[i].Plus(msg.Outputs[i].Coins)) {
+		if !terminalOutputCoins.IsEqual(initialOutputAddrCoins[i].Add(msg.Outputs[i].Coins)) {
 			return fmt.Errorf("output #%d had an incorrect amount of coins", i)
 		}
 	}

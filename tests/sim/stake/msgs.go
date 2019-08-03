@@ -2,16 +2,16 @@ package stake
 
 import (
 	"fmt"
-	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/mock"
+	"github.com/irisnet/irishub/mock/baseapp"
+	"github.com/irisnet/irishub/mock/simulation"
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/modules/stake"
 	"github.com/irisnet/irishub/modules/stake/keeper"
-	"github.com/irisnet/irishub/mock/baseapp"
-	"github.com/irisnet/irishub/mock"
-	"github.com/irisnet/irishub/mock/simulation"
+	"github.com/irisnet/irishub/modules/stake/types"
+	sdk "github.com/irisnet/irishub/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"math/rand"
-	"github.com/irisnet/irishub/modules/stake/types"
 )
 
 // SimulateMsgCreateValidator
@@ -241,7 +241,7 @@ func Setup(mapp *mock.App, k stake.Keeper) simulation.RandSetup {
 		loose := sdk.ZeroInt()
 		mapp.AccountKeeper.IterateAccounts(ctx, func(acc auth.Account) bool {
 			balance := simulation.RandomAmount(r, sdk.NewInt(1000000))
-			acc.SetCoins(acc.GetCoins().Plus(sdk.Coins{sdk.NewCoin(denom, balance)}))
+			acc.SetCoins(acc.GetCoins().Add(sdk.Coins{sdk.NewCoin(denom, balance)}))
 			mapp.AccountKeeper.SetAccount(ctx, acc)
 			loose = loose.Add(balance)
 			return false

@@ -410,6 +410,16 @@ func (i Uint) IsZero() bool {
 	return i.i.Sign() == 0
 }
 
+// IsNegative returns true if Int is negative
+func (i Int) IsNegative() bool {
+	return i.i.Sign() == -1
+}
+
+// IsPositive returns true if Int is positive
+func (i Int) IsPositive() bool {
+	return i.i.Sign() == 1
+}
+
 // Sign returns sign of Uint
 func (i Uint) Sign() int {
 	return i.i.Sign()

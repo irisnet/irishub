@@ -3,16 +3,16 @@ package slashing
 import (
 	"testing"
 
-	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/mock"
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/modules/bank"
-	"github.com/irisnet/irishub/mock"
 	"github.com/irisnet/irishub/modules/params"
 	"github.com/irisnet/irishub/modules/stake"
+	stakeTypes "github.com/irisnet/irishub/modules/stake/types"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/stretchr/testify/require"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/crypto/ed25519"
-	stakeTypes "github.com/irisnet/irishub/modules/stake/types"
 )
 
 var (
@@ -105,7 +105,7 @@ func TestSlashingMsgs(t *testing.T) {
 		sdk.ValAddress(addr1), priv1.PubKey(), bondCoin, description, commission,
 	)
 	mock.SignCheckDeliver(t, mapp.BaseApp, []sdk.Msg{createValidatorMsg}, []uint64{0}, []uint64{0}, true, true, priv1)
-	mock.CheckBalance(t, mapp, addr1, sdk.Coins{genCoin.Minus(bondCoin)})
+	mock.CheckBalance(t, mapp, addr1, sdk.Coins{genCoin.Sub(bondCoin)})
 	mapp.BeginBlock(abci.RequestBeginBlock{})
 
 	validator := checkValidator(t, mapp, stakeKeeper, addr1, true)

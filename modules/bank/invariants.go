@@ -27,7 +27,7 @@ func NonnegativeBalanceInvariant(mapper auth.AccountKeeper) sdk.Invariant {
 		accts := mapper.GetAllAccounts(ctx)
 		for _, acc := range accts {
 			coins := acc.GetCoins()
-			if !coins.IsNotNegative() {
+			if coins.IsAnyNegative() {
 				return fmt.Errorf("%s has a negative denomination of %s",
 					acc.GetAddress().String(),
 					coins.String())
@@ -57,7 +57,7 @@ func TotalCoinsInvariant(mapper auth.AccountKeeper, totalSupplyFn func() sdk.Coi
 
 		chkAccount := func(acc auth.Account) bool {
 			coins := acc.GetCoins()
-			totalCoins = totalCoins.Plus(coins)
+			totalCoins = totalCoins.Add(coins)
 			return false
 		}
 

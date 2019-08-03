@@ -3,6 +3,7 @@ package bank
 import (
 	"encoding/json"
 
+	"fmt"
 	sdk "github.com/irisnet/irishub/types"
 )
 
@@ -40,13 +41,13 @@ func (msg MsgSend) ValidateBasic() sdk.Error {
 		if err := in.ValidateBasic(); err != nil {
 			return err.TraceSDK("")
 		}
-		totalIn = totalIn.Plus(in.Coins)
+		totalIn = totalIn.Add(in.Coins)
 	}
 	for _, out := range msg.Outputs {
 		if err := out.ValidateBasic(); err != nil {
 			return err.TraceSDK("")
 		}
-		totalOut = totalOut.Plus(out.Coins)
+		totalOut = totalOut.Add(out.Coins)
 	}
 	// make sure inputs and outputs match
 	if !totalIn.IsEqual(totalOut) {
@@ -109,11 +110,11 @@ func (in Input) ValidateBasic() sdk.Error {
 	if len(in.Address) == 0 {
 		return sdk.ErrInvalidAddress(in.Address.String())
 	}
-	if !in.Coins.IsValid() {
-		return sdk.ErrInvalidCoins(in.Coins.String())
+	if in.Coins.Empty() {
+		return sdk.ErrInvalidCoins("empty input coins")
 	}
-	if !in.Coins.IsPositive() {
-		return sdk.ErrInvalidCoins(in.Coins.String())
+	if !in.Coins.IsValid() {
+		return sdk.ErrInvalidCoins(fmt.Sprintf("invalid input coins [%s]", in.Coins))
 	}
 	return nil
 }
@@ -150,11 +151,11 @@ func (out Output) ValidateBasic() sdk.Error {
 	if len(out.Address) == 0 {
 		return sdk.ErrInvalidAddress(out.Address.String())
 	}
-	if !out.Coins.IsValid() {
-		return sdk.ErrInvalidCoins(out.Coins.String())
+	if out.Coins.Empty() {
+		return sdk.ErrInvalidCoins("empty output coins")
 	}
-	if !out.Coins.IsPositive() {
-		return sdk.ErrInvalidCoins(out.Coins.String())
+	if !out.Coins.IsValid() {
+		return sdk.ErrInvalidCoins(fmt.Sprintf("invalid output coins [%s]", out.Coins))
 	}
 	return nil
 }
@@ -194,11 +195,11 @@ func (msg MsgBurn) ValidateBasic() sdk.Error {
 	if len(msg.Owner) == 0 {
 		return sdk.ErrInvalidAddress(msg.Owner.String())
 	}
-	if len(msg.Coins) == 0 {
-		return ErrBurnEmptyCoins(DefaultCodespace).TraceSDK("")
+	if msg.Coins.Empty() {
+		return sdk.ErrInvalidCoins("empty coins to burn")
 	}
 	if !msg.Coins.IsValid() {
-		return sdk.ErrInvalidCoins(msg.Coins.String())
+		return sdk.ErrInvalidCoins(fmt.Sprintf("invalid coins to burn [%s]", msg.Coins))
 	}
 	return nil
 }

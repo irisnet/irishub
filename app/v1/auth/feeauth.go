@@ -23,16 +23,6 @@ func InitialFeeAuth() FeeAuth {
 	return NewFeeAuth(sdk.IrisAtto)
 }
 
-func ValidateFee(auth FeeAuth, collectedFee sdk.Coins) error {
-	if !collectedFee.IsValid() {
-		return sdk.ErrInvalidCoins("")
-	}
-	if len(auth.NativeFeeDenom) == 0 {
-		return sdk.ErrInvalidFeeDenom("")
-	}
-	return nil
-}
-
 // NewFeePreprocessHandler creates a fee token preprocesser
 func NewFeePreprocessHandler(fk FeeKeeper) types.FeePreprocessHandler {
 	return func(ctx sdk.Context, tx sdk.Tx) sdk.Error {
@@ -41,12 +31,11 @@ func NewFeePreprocessHandler(fk FeeKeeper) types.FeePreprocessHandler {
 			return sdk.ErrInternal("tx must be StdTx")
 		}
 
-		fa := fk.GetFeeAuth(ctx)
+		fee := getFee(stdTx.Fee.Amount)
+
 		feeParams := fk.GetParamSet(ctx)
 
-		totalNativeFee := fa.getNativeFeeToken(ctx, stdTx.Fee.Amount)
-
-		return fa.feePreprocess(ctx, feeParams, sdk.Coins{totalNativeFee}, stdTx.Fee.Gas)
+		return checkFee(feeParams, sdk.Coins{fee}, stdTx.Fee.Gas)
 	}
 }
 
@@ -69,21 +58,20 @@ func NewFeeRefundHandler(am AccountKeeper, fk FeeKeeper) types.FeeRefundHandler 
 		// It is not reasonable to consume users' gas. So the context gas is reset to transaction gas
 		ctx = ctx.WithGasMeter(sdk.NewInfiniteGasMeter())
 
-		fm := fk.GetFeeAuth(ctx)
-		totalNativeFee := fm.getNativeFeeToken(ctx, stdTx.Fee.Amount)
+		fee := getFee(stdTx.Fee.Amount)
 
 		//If all gas has been consumed, then there is no necessary to run fee refund process
 		if txResult.GasWanted <= txResult.GasUsed {
-			actualCostFee = totalNativeFee
+			actualCostFee = fee
 			return actualCostFee, nil
 		}
 
 		unusedGas := txResult.GasWanted - txResult.GasUsed
-		refundCoin := sdk.NewCoin(totalNativeFee.Denom,
-			totalNativeFee.Amount.Mul(sdk.NewInt(int64(unusedGas))).Div(sdk.NewInt(int64(txResult.GasWanted))))
+		refundCoin := sdk.NewCoin(fee.Denom,
+			fee.Amount.Mul(sdk.NewInt(int64(unusedGas))).Div(sdk.NewInt(int64(txResult.GasWanted))))
 
 		coins := am.GetAccount(ctx, firstAccount.GetAddress()).GetCoins() // consume gas
-		err = firstAccount.SetCoins(coins.Plus(sdk.Coins{refundCoin}))
+		err = firstAccount.SetCoins(coins.Add(sdk.Coins{refundCoin}))
 		if err != nil {
 			return sdk.Coin{}, err
 		}
@@ -91,40 +79,31 @@ func NewFeeRefundHandler(am AccountKeeper, fk FeeKeeper) types.FeeRefundHandler 
 		am.SetAccount(ctx, firstAccount)
 		fk.RefundCollectedFees(ctx, sdk.Coins{refundCoin})
 
-		actualCostFee = sdk.NewCoin(totalNativeFee.Denom, totalNativeFee.Amount.Sub(refundCoin.Amount))
+		actualCostFee = sdk.NewCoin(fee.Denom, fee.Amount.Sub(refundCoin.Amount))
 		return actualCostFee, nil
 	}
 }
 
-func (fa FeeAuth) getNativeFeeToken(ctx sdk.Context, coins sdk.Coins) sdk.Coin {
-	nativeFeeToken := fa.NativeFeeDenom
-	for _, coin := range coins {
-		if coin.Denom == nativeFeeToken {
-			if coin.Amount.BigInt() == nil {
-				return sdk.NewCoin(coin.Denom, sdk.ZeroInt())
-			}
-			return coin
-		}
+func getFee(coins sdk.Coins) sdk.Coin {
+	if coins == nil || coins.Empty() {
+		return sdk.NewCoin(sdk.IrisAtto, sdk.ZeroInt())
 	}
-	return sdk.NewCoin("", sdk.ZeroInt())
+	return sdk.NewCoin(sdk.IrisAtto, coins.AmountOf(sdk.IrisAtto))
 }
 
-func (fa FeeAuth) feePreprocess(ctx sdk.Context, params Params, coins sdk.Coins, gasLimit uint64) sdk.Error {
+func checkFee(params Params, coins sdk.Coins, gasLimit uint64) sdk.Error {
 	if gasLimit == 0 || int64(gasLimit) < 0 {
 		return sdk.ErrInvalidGas(fmt.Sprintf("gaslimit %d should be positive and no more than %d", gasLimit, math.MaxInt64))
 	}
-	nativeFeeToken := fa.NativeFeeDenom
+
 	threshold := params.GasPriceThreshold
-
-	if len(coins) < 1 || coins[0].Denom != nativeFeeToken {
-		return sdk.ErrInvalidTxFee(fmt.Sprintf("fee is required to be specified with %s", nativeFeeToken))
-	}
-
 	equivalentTotalFee := coins[0].Amount
 	gasPrice := equivalentTotalFee.Div(sdk.NewInt(int64(gasLimit)))
+
 	if gasPrice.LT(threshold) {
 		recommendFee := (sdk.NewInt(int64(gasLimit))).Mul(threshold)
-		return sdk.ErrGasPriceTooLow(fmt.Sprintf("insufficient fee, gasPrice = fee / gasLimit(default 50000). The gasPrice(%s%s/Gas) cannot be less than %s%s. Recommended fee: %s%s", gasPrice.String(), nativeFeeToken, threshold.String(), nativeFeeToken, recommendFee, nativeFeeToken))
+		return sdk.ErrGasPriceTooLow(fmt.Sprintf("insufficient fee, gasPrice = fee / gasLimit(default 50000). The gasPrice(%s%s/Gas) cannot be less than %s%s. Recommended fee: %s%s", gasPrice.String(), sdk.IrisAtto, threshold.String(), sdk.IrisAtto, recommendFee, sdk.IrisAtto))
 	}
+
 	return nil
 }

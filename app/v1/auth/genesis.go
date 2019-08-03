@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"fmt"
 	sdk "github.com/irisnet/irishub/types"
 )
 
@@ -9,16 +10,14 @@ type GenesisState struct {
 	CollectedFees sdk.Coins `json:"collected_fee"`
 	FeeAuth       FeeAuth   `json:"data"`
 	Params        Params    `json:"params"`
-	TotalSupply   sdk.Coins `json:"total_supply"`
 }
 
 // Create a new genesis state
-func NewGenesisState(collectedFees, totalSupply sdk.Coins, feeAuth FeeAuth, params Params) GenesisState {
+func NewGenesisState(collectedFees sdk.Coins, feeAuth FeeAuth, params Params) GenesisState {
 	return GenesisState{
 		CollectedFees: collectedFees,
 		FeeAuth:       feeAuth,
 		Params:        params,
-		TotalSupply:   totalSupply,
 	}
 }
 
@@ -32,19 +31,17 @@ func DefaultGenesisState() GenesisState {
 }
 
 // Init store state from genesis data
-func InitGenesis(ctx sdk.Context, keeper FeeKeeper, accountKeeper AccountKeeper, data GenesisState) {
+func InitGenesis(ctx sdk.Context, keeper FeeKeeper, ak AccountKeeper, data GenesisState) {
 	if err := ValidateGenesis(data); err != nil {
 		panic(err)
 	}
 
 	keeper.setCollectedFees(ctx, data.CollectedFees)
-	accountKeeper.IncreaseTotalLoosenToken(ctx, data.CollectedFees)
+	ak.IncreaseTotalLoosenToken(ctx, data.CollectedFees)
 
 	keeper.SetFeeAuth(ctx, data.FeeAuth)
 	keeper.SetParamSet(ctx, data.Params)
-	for _, coin := range data.TotalSupply {
-		accountKeeper.SetTotalSupply(ctx, coin)
-	}
+	ak.InitTotalSupply(ctx)
 }
 
 // ExportGenesis returns a GenesisState for a given context and keeper
@@ -52,12 +49,7 @@ func ExportGenesis(ctx sdk.Context, keeper FeeKeeper, ak AccountKeeper) GenesisS
 	collectedFees := keeper.GetCollectedFees(ctx)
 	feeAuth := keeper.GetFeeAuth(ctx)
 	params := keeper.GetParamSet(ctx)
-	var totalSupply sdk.Coins
-	ak.IterateTotalSupply(ctx, func(coin sdk.Coin) (stop bool) {
-		totalSupply = append(totalSupply, coin)
-		return false
-	})
-	return NewGenesisState(collectedFees, totalSupply, feeAuth, params)
+	return NewGenesisState(collectedFees, feeAuth, params)
 }
 
 func ValidateGenesis(data GenesisState) error {
@@ -65,9 +57,19 @@ func ValidateGenesis(data GenesisState) error {
 	if err != nil {
 		return err
 	}
-	err = ValidateFee(data.FeeAuth, data.CollectedFees)
+	err = ValidateFee(data.CollectedFees)
 	if err != nil {
 		return err
+	}
+	return nil
+}
+
+func ValidateFee(collectedFee sdk.Coins) error {
+	if collectedFee == nil || collectedFee.Empty() {
+		return nil
+	}
+	if !collectedFee.IsValidIrisAtto() {
+		return sdk.ErrInvalidCoins(fmt.Sprintf("invalid collected fees [%s]", collectedFee))
 	}
 	return nil
 }
