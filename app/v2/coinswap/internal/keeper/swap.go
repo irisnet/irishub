@@ -9,7 +9,7 @@ import (
 )
 
 func (k Keeper) SwapCoins(ctx sdk.Context, sender sdk.AccAddress, coinSold, coinBought sdk.Coin) error {
-	if !k.HasCoins(ctx, sender, coinSold) {
+	if !k.bk.HasCoins(ctx, sender, sdk.NewCoins(coinSold)) {
 		return sdk.ErrInsufficientCoins(fmt.Sprintf("sender account does not have sufficient amount of %s to fulfill the swap order", coinSold.Denom))
 	}
 
@@ -18,8 +18,8 @@ func (k Keeper) SwapCoins(ctx sdk.Context, sender sdk.AccAddress, coinSold, coin
 		return err
 	}
 
-	k.SendCoins(ctx, sender, moduleName, coinSold)
-	k.RecieveCoins(ctx, sender, moduleName, coinBought)
+	k.SendCoins(ctx, sender, moduleName, sdk.NewCoins(coinSold))
+	k.ReceiveCoins(ctx, sender, moduleName, sdk.NewCoins(coinBought))
 	return nil
 }
 

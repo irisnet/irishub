@@ -141,17 +141,16 @@ func (k Keeper) AddLiquidity(ctx sdk.Context, msg types.MsgAddLiquidity) sdk.Err
 			return types.ErrGreaterThanMaxDeposit(fmt.Sprintf("amount[%s] of token depositd is greater than user 's max deposited amount[%s]", depositedCoin.String(), msg.Deposit.String()))
 		}
 	}
-
-	if !k.HasCoins(ctx, msg.Sender, nativeCoin, depositedCoin) {
+	if !k.bk.HasCoins(ctx, msg.Sender, sdk.NewCoins(nativeCoin, depositedCoin)) {
 		return sdk.ErrInsufficientCoins("sender does not have sufficient funds to add liquidity")
 	}
 
 	// transfer deposited liquidity into coinswaps ModuleAccount
-	k.SendCoins(ctx, msg.Sender, exchangePair, nativeCoin, depositedCoin)
+	k.SendCoins(ctx, msg.Sender, exchangePair, sdk.NewCoins(nativeCoin, depositedCoin))
 
 	// mint liquidity vouchers for sender
 	coins := k.MintCoins(ctx, exchangePair, mintLiquidityAmt)
-	_, _, err = k.bk.AddCoins(ctx, msg.Sender, coins.Sort())
+	_, _, err = k.bk.AddCoins(ctx, msg.Sender, coins)
 	if err != nil {
 		return err
 	}
@@ -204,24 +203,19 @@ func (k Keeper) RemoveLiquidity(ctx sdk.Context, msg types.MsgRemoveLiquidity) s
 	}
 
 	// transfer withdrawn liquidity from coinswaps ModuleAccount to sender's account
-	k.RecieveCoins(ctx, msg.Sender, exchangePair, nativeWithdrawCoin, depositedWithdrawCoin)
+	coins := sdk.NewCoins(nativeWithdrawCoin, depositedWithdrawCoin)
+	k.ReceiveCoins(ctx, msg.Sender, exchangePair, coins)
 	return nil
-}
-
-// HasCoins returns whether or not an account has at least coins.
-func (k Keeper) HasCoins(ctx sdk.Context, addr sdk.AccAddress, coins ...sdk.Coin) bool {
-	coins = sdk.Coins(coins).Sort()
-	return k.bk.HasCoins(ctx, addr, coins)
 }
 
 // BurnCoins burns liquidity coins from the ModuleAccount at moduleName. The
 // moduleName and denomination of the liquidity coins are the same.
 func (k Keeper) BurnLiquidity(ctx sdk.Context, moduleName string, deltaCoin sdk.Coin) sdk.Error {
 	swapPoolAccAddr := getPoolAccAddr(moduleName)
-	if !k.HasCoins(ctx, swapPoolAccAddr, deltaCoin) {
+	if !k.bk.HasCoins(ctx, swapPoolAccAddr, sdk.NewCoins(deltaCoin)) {
 		return sdk.ErrInsufficientCoins("sender does not have sufficient funds to remove liquidity")
 	}
-	coins := sdk.Coins{deltaCoin}
+	coins := sdk.NewCoins(deltaCoin)
 	_, err := k.bk.BurnCoins(ctx, swapPoolAccAddr, coins)
 	if err != nil {
 		return err
@@ -237,7 +231,7 @@ func (k Keeper) MintCoins(ctx sdk.Context, moduleName string, amt sdk.Int) sdk.C
 	if err != nil {
 		panic(err)
 	}
-	coins := sdk.Coins{sdk.NewCoin(uniDenom, amt)}
+	coins := sdk.NewCoins(sdk.NewCoin(uniDenom, amt))
 	_, _, err = k.bk.AddCoins(ctx, swapPoolAccAddr, coins)
 	if err != nil {
 		panic(err)
@@ -246,9 +240,9 @@ func (k Keeper) MintCoins(ctx sdk.Context, moduleName string, amt sdk.Int) sdk.C
 }
 
 // SendCoin sends coins from the address to the ModuleAccount at moduleName.
-func (k Keeper) SendCoins(ctx sdk.Context, addr sdk.AccAddress, moduleName string, coins ...sdk.Coin) {
+func (k Keeper) SendCoins(ctx sdk.Context, addr sdk.AccAddress, moduleName string, coins sdk.Coins) {
 	swapPoolAccAddr := getPoolAccAddr(moduleName)
-	_, err := k.bk.SendCoins(ctx, addr, swapPoolAccAddr, sdk.Coins(coins).Sort())
+	_, err := k.bk.SendCoins(ctx, addr, swapPoolAccAddr, coins)
 	if err != nil {
 		panic(err)
 	}
@@ -256,9 +250,9 @@ func (k Keeper) SendCoins(ctx sdk.Context, addr sdk.AccAddress, moduleName strin
 
 // RecieveCoin sends coins from the ModuleAccount at moduleName to the
 // address provided.
-func (k Keeper) RecieveCoins(ctx sdk.Context, addr sdk.AccAddress, moduleName string, coins ...sdk.Coin) {
+func (k Keeper) ReceiveCoins(ctx sdk.Context, addr sdk.AccAddress, moduleName string, coins sdk.Coins) {
 	swapPoolAccAddr := getPoolAccAddr(moduleName)
-	_, err := k.bk.SendCoins(ctx, swapPoolAccAddr, addr, sdk.Coins(coins).Sort())
+	_, err := k.bk.SendCoins(ctx, swapPoolAccAddr, addr, coins)
 	if err != nil {
 		panic(err)
 	}
