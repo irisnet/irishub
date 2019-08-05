@@ -291,6 +291,7 @@ func main() {
 	swapCmd.AddCommand(
 		client.PostCommands(
 			swap.GetCmdAddLiquidity(cdc),
+			swap.GetCmdRemoveLiquidity(cdc),
 			swap.GetCmdPlaceOrder(cdc),
 		)...)
 	rootCmd.AddCommand(
