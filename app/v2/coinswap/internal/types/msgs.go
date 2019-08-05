@@ -67,10 +67,10 @@ func (msg MsgSwapOrder) ValidateBasic() sdk.Error {
 		return sdk.ErrInvalidCoins("output coin is zero: " + msg.Output.String())
 	}
 	if msg.Input.Denom == msg.Output.Denom {
-		return ErrEqualDenom(DefaultCodespace, "")
+		return ErrEqualDenom("")
 	}
 	if msg.Deadline.IsZero() {
-		return ErrInvalidDeadline(DefaultCodespace, "deadline for MsgSwapOrder not initialized")
+		return ErrInvalidDeadline("deadline for MsgSwapOrder not initialized")
 	}
 	if msg.Sender.Empty() {
 		return sdk.ErrInvalidAddress("invalid sender address")
@@ -134,14 +134,14 @@ func (msg MsgAddLiquidity) ValidateBasic() sdk.Error {
 		return sdk.ErrInvalidCoins("coin is zero: " + msg.Deposit.String())
 	}
 	if !msg.DepositAmount.IsPositive() {
-		return ErrNotPositive(DefaultCodespace, "deposit amount provided is not positive")
+		return ErrNotPositive("deposit amount provided is not positive")
 	}
-	//if !msg.MinReward.IsPositive() {
-	//	return ErrNotPositive(DefaultCodespace, "minimum liquidity is not positive")
-	//}
-	//if msg.Deadline.IsZero() {
-	//	return ErrInvalidDeadline(DefaultCodespace, "deadline for MsgAddLiquidity not initialized")
-	//}
+	if !msg.MinReward.IsPositive() {
+		return ErrNotPositive("minimum liquidity is not positive")
+	}
+	if msg.Deadline.IsZero() {
+		return ErrInvalidDeadline("deadline for MsgAddLiquidity not initialized")
+	}
 	if msg.Sender.Empty() {
 		return sdk.ErrInvalidAddress("invalid sender address")
 	}
@@ -195,7 +195,7 @@ func (msg MsgRemoveLiquidity) Type() string { return "remove_liquidity" }
 // ValidateBasic Implements Msg.
 func (msg MsgRemoveLiquidity) ValidateBasic() sdk.Error {
 	if !msg.WithdrawAmount.IsPositive() {
-		return ErrNotPositive(DefaultCodespace, "withdraw amount is not positive")
+		return ErrNotPositive("withdraw amount is not positive")
 	}
 	if !msg.Withdraw.IsPositive() {
 		return sdk.ErrInvalidCoins("coin is invalid: " + msg.Withdraw.String())
@@ -204,10 +204,10 @@ func (msg MsgRemoveLiquidity) ValidateBasic() sdk.Error {
 		return sdk.ErrInvalidCoins("coin is zero: " + msg.Withdraw.String())
 	}
 	if !msg.MinNative.IsPositive() {
-		return ErrNotPositive(DefaultCodespace, "minimum native amount is not positive")
+		return ErrNotPositive("minimum native amount is not positive")
 	}
 	if msg.Deadline.IsZero() {
-		return ErrInvalidDeadline(DefaultCodespace, "deadline for MsgRemoveLiquidity not initialized")
+		return ErrInvalidDeadline("deadline for MsgRemoveLiquidity not initialized")
 	}
 	if msg.Sender.Empty() {
 		return sdk.ErrInvalidAddress("invalid sender address")
