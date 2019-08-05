@@ -14,7 +14,7 @@ func TestMsgSendRoute(t *testing.T) {
 	// Construct a MsgSend
 	addr1 := sdk.AccAddress([]byte("input"))
 	addr2 := sdk.AccAddress([]byte("output"))
-	coins := sdk.Coins{sdk.NewInt64Coin("atom", 10)}
+	coins := sdk.Coins{sdk.NewInt64Coin("atom-min", 10)}
 	var msg = MsgSend{
 		Inputs:  []Input{NewInput(addr1, coins)},
 		Outputs: []Output{NewOutput(addr2, coins)},
@@ -27,14 +27,14 @@ func TestMsgSendRoute(t *testing.T) {
 func TestInputValidation(t *testing.T) {
 	addr1 := sdk.AccAddress([]byte{1, 2})
 	addr2 := sdk.AccAddress([]byte{7, 8})
-	someCoins := sdk.Coins{sdk.NewInt64Coin("atom", 123)}
-	multiCoins := sdk.Coins{sdk.NewInt64Coin("atom", 123), sdk.NewInt64Coin("eth", 20)}
+	someCoins := sdk.Coins{sdk.NewInt64Coin("atom-min", 123)}
+	multiCoins := sdk.Coins{sdk.NewInt64Coin("atom-min", 123), sdk.NewInt64Coin("eth-min", 20)}
 
 	var emptyAddr sdk.AccAddress
 	emptyCoins := sdk.Coins{}
-	emptyCoins2 := sdk.Coins{sdk.NewInt64Coin("eth", 0)}
-	someEmptyCoins := sdk.Coins{sdk.NewInt64Coin("eth", 10), sdk.NewInt64Coin("atom", 0)}
-	unsortedCoins := sdk.Coins{sdk.NewInt64Coin("eth", 1), sdk.NewInt64Coin("atom", 1)}
+	zeroCoins := sdk.Coins{sdk.NewInt64Coin("eth-min", 0)}
+	someZeroCoins := sdk.Coins{sdk.NewInt64Coin("atom-min", 10), sdk.NewInt64Coin("eth-min", 0)}
+	unsortedCoins := sdk.Coins{sdk.NewInt64Coin("eth-min", 1), sdk.NewInt64Coin("atom-min", 1)}
 
 	cases := []struct {
 		valid bool
@@ -45,11 +45,11 @@ func TestInputValidation(t *testing.T) {
 		{true, NewInput(addr2, someCoins)},
 		{true, NewInput(addr2, multiCoins)},
 
-		{false, NewInput(emptyAddr, someCoins)},  // empty address
+		{false, NewInput(emptyAddr, someCoins)}, // empty address
 		{false, NewInput(addr1, emptyCoins)},     // invalid coins
-		{false, NewInput(addr1, emptyCoins2)},    // invalid coins
-		{false, NewInput(addr1, someEmptyCoins)}, // invalid coins
-		{false, NewInput(addr1, unsortedCoins)},  // unsorted coins
+		{true, NewInput(addr1, zeroCoins)},      // invalid coins
+		{true, NewInput(addr1, someZeroCoins)},  // invalid coins
+		{false, NewInput(addr1, unsortedCoins)}, // unsorted coins
 	}
 
 	for i, tc := range cases {
@@ -65,14 +65,14 @@ func TestInputValidation(t *testing.T) {
 func TestOutputValidation(t *testing.T) {
 	addr1 := sdk.AccAddress([]byte{1, 2})
 	addr2 := sdk.AccAddress([]byte{7, 8})
-	someCoins := sdk.Coins{sdk.NewInt64Coin("atom", 123)}
-	multiCoins := sdk.Coins{sdk.NewInt64Coin("atom", 123), sdk.NewInt64Coin("eth", 20)}
+	someCoins := sdk.Coins{sdk.NewInt64Coin("atom-min", 123)}
+	multiCoins := sdk.Coins{sdk.NewInt64Coin("atom-min", 123), sdk.NewInt64Coin("eth-min", 20)}
 
 	var emptyAddr sdk.AccAddress
 	emptyCoins := sdk.Coins{}
-	emptyCoins2 := sdk.Coins{sdk.NewInt64Coin("eth", 0)}
-	someEmptyCoins := sdk.Coins{sdk.NewInt64Coin("eth", 10), sdk.NewInt64Coin("atom", 0)}
-	unsortedCoins := sdk.Coins{sdk.NewInt64Coin("eth", 1), sdk.NewInt64Coin("atom", 1)}
+	zeroCoins := sdk.Coins{sdk.NewInt64Coin("eth-min", 0)}
+	someZeroCoins := sdk.Coins{sdk.NewInt64Coin("atom-min", 10), sdk.NewInt64Coin("eth-min", 0)}
+	unsortedCoins := sdk.Coins{sdk.NewInt64Coin("eth-min", 1), sdk.NewInt64Coin("atom-min", 1)}
 
 	cases := []struct {
 		valid bool
@@ -83,11 +83,11 @@ func TestOutputValidation(t *testing.T) {
 		{true, NewOutput(addr2, someCoins)},
 		{true, NewOutput(addr2, multiCoins)},
 
-		{false, NewOutput(emptyAddr, someCoins)},  // empty address
-		{false, NewOutput(addr1, emptyCoins)},     // invalid coins
-		{false, NewOutput(addr1, emptyCoins2)},    // invalid coins
-		{false, NewOutput(addr1, someEmptyCoins)}, // invalid coins
-		{false, NewOutput(addr1, unsortedCoins)},  // unsorted coins
+		{false, NewOutput(emptyAddr, someCoins)}, // empty address
+		{false, NewOutput(addr1, emptyCoins)},    // invalid coins
+		{true, NewOutput(addr1, zeroCoins)},      // invalid coins
+		{true, NewOutput(addr1, someZeroCoins)},  // invalid coins
+		{false, NewOutput(addr1, unsortedCoins)}, // unsorted coins
 	}
 
 	for i, tc := range cases {
@@ -103,10 +103,10 @@ func TestOutputValidation(t *testing.T) {
 func TestMsgSendValidation(t *testing.T) {
 	addr1 := sdk.AccAddress([]byte{1, 2})
 	addr2 := sdk.AccAddress([]byte{7, 8})
-	atom123 := sdk.Coins{sdk.NewInt64Coin("atom", 123)}
-	atom124 := sdk.Coins{sdk.NewInt64Coin("atom", 124)}
-	eth123 := sdk.Coins{sdk.NewInt64Coin("eth", 123)}
-	atom123eth123 := sdk.Coins{sdk.NewInt64Coin("atom", 123), sdk.NewInt64Coin("eth", 123)}
+	atom123 := sdk.Coins{sdk.NewInt64Coin("atom-min", 123)}
+	atom124 := sdk.Coins{sdk.NewInt64Coin("atom-min", 124)}
+	eth123 := sdk.Coins{sdk.NewInt64Coin("eth-min", 123)}
+	atom123eth123 := sdk.Coins{sdk.NewInt64Coin("atom-min", 123), sdk.NewInt64Coin("eth-min", 123)}
 
 	input1 := NewInput(addr1, atom123)
 	input2 := NewInput(addr1, eth123)
@@ -137,7 +137,7 @@ func TestMsgSendValidation(t *testing.T) {
 		},
 		{false, MsgSend{
 			Inputs:  []Input{input1},
-			Outputs: []Output{output3}}, // amounts dont match
+			Outputs: []Output{output3}}, // denoms dont match
 		},
 		{false, MsgSend{
 			Inputs:  []Input{input1},
@@ -171,14 +171,14 @@ func TestMsgSendValidation(t *testing.T) {
 func TestMsgSendGetSignBytes(t *testing.T) {
 	addr1 := sdk.AccAddress([]byte("input"))
 	addr2 := sdk.AccAddress([]byte("output"))
-	coins := sdk.Coins{sdk.NewInt64Coin("atom", 10)}
+	coins := sdk.Coins{sdk.NewInt64Coin("atom-min", 10)}
 	var msg = MsgSend{
 		Inputs:  []Input{NewInput(addr1, coins)},
 		Outputs: []Output{NewOutput(addr2, coins)},
 	}
 	res := msg.GetSignBytes()
 
-	expected := `{"inputs":[{"address":"faa1d9h8qat5umnd2g","coins":[{"amount":"10","denom":"atom"}]}],"outputs":[{"address":"faa1da6hgur4wstza6a7","coins":[{"amount":"10","denom":"atom"}]}]}`
+	expected := `{"inputs":[{"address":"faa1d9h8qat5umnd2g","coins":[{"amount":"10","denom":"atom-min"}]}],"outputs":[{"address":"faa1da6hgur4wstza6a7","coins":[{"amount":"10","denom":"atom-min"}]}]}`
 	require.Equal(t, expected, string(res))
 }
 
@@ -204,7 +204,7 @@ func TestMsgSendSigners(t *testing.T) {
 		{7, 8, 9},
 	}
 
-	someCoins := sdk.Coins{sdk.NewInt64Coin("atom", 123)}
+	someCoins := sdk.Coins{sdk.NewInt64Coin("atom-min", 123)}
 	inputs := make([]Input, len(signers))
 	for i, signer := range signers {
 		inputs[i] = NewInput(signer, someCoins)

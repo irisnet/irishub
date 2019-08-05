@@ -173,7 +173,7 @@ func (k Keeper) WithdrawToDelegator(ctx sdk.Context, feePool types.FeePool,
 
 	withdrawAddr := k.GetDelegatorWithdrawAddr(ctx, delAddr)
 	coinsToAdd, change := amount.TruncateDecimal()
-	//	feePool.CommunityPool = feePool.CommunityPool.Plus(change)
+	//	feePool.CommunityPool = feePool.CommunityPool.Add(change)
 	feePool.ValPool = feePool.ValPool.Plus(change)
 	k.SetFeePool(ctx, feePool)
 

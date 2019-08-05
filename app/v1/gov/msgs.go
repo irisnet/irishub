@@ -81,11 +81,8 @@ func (msg MsgSubmitProposal) ValidateBasic() sdk.Error {
 	if len(msg.Proposer) == 0 {
 		return sdk.ErrInvalidAddress(msg.Proposer.String())
 	}
-	if !msg.InitialDeposit.IsValid() {
-		return sdk.ErrInvalidCoins(msg.InitialDeposit.String())
-	}
-	if !msg.InitialDeposit.IsNotNegative() {
-		return sdk.ErrInvalidCoins(msg.InitialDeposit.String())
+	if !msg.InitialDeposit.IsValidIrisAtto() {
+		return sdk.ErrInvalidCoins(fmt.Sprintf("invalid initial deposit [%s]", msg.InitialDeposit))
 	}
 	if err := msg.EnsureLength(); err != nil {
 		return err
@@ -152,7 +149,7 @@ func (msg MsgSubmitSoftwareUpgradeProposal) ValidateBasic() sdk.Error {
 		return sdk.ErrInvalidLength(DefaultCodespace, CodeInvalidProposal, "software", len(msg.Software), 70)
 	}
 
-	// if threshold not in [0.85,1), then print error
+	// if threshold not in [0.8,1), then print error
 	if msg.Threshold.LT(sdk.NewDecWithPrec(80, 2)) || msg.Threshold.GTE(sdk.NewDec(1)) {
 		return ErrInvalidUpgradeThreshold(DefaultCodespace, msg.Threshold)
 	}
@@ -235,11 +232,8 @@ func (msg MsgDeposit) ValidateBasic() sdk.Error {
 	if len(msg.Depositor) == 0 {
 		return sdk.ErrInvalidAddress(msg.Depositor.String())
 	}
-	if !msg.Amount.IsValid() {
-		return sdk.ErrInvalidCoins(msg.Amount.String())
-	}
-	if !msg.Amount.IsNotNegative() {
-		return sdk.ErrInvalidCoins(msg.Amount.String())
+	if !msg.Amount.IsValidIrisAtto() {
+		return sdk.ErrInvalidCoins(fmt.Sprintf("invalid deposit [%s]", msg.Amount))
 	}
 	if msg.ProposalID < 0 {
 		return ErrUnknownProposal(DefaultCodespace, msg.ProposalID)

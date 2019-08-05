@@ -241,7 +241,7 @@ func Setup(mapp *mock.App, k stake.Keeper) simulation.RandSetup {
 		loose := sdk.ZeroInt()
 		mapp.AccountKeeper.IterateAccounts(ctx, func(acc auth.Account) bool {
 			balance := simulation.RandomAmount(r, sdk.NewInt(1000000))
-			acc.SetCoins(acc.GetCoins().Plus(sdk.Coins{sdk.NewCoin(denom, balance)}))
+			acc.SetCoins(acc.GetCoins().Add(sdk.Coins{sdk.NewCoin(denom, balance)}))
 			mapp.AccountKeeper.SetAccount(ctx, acc)
 			loose = loose.Add(balance)
 			return false

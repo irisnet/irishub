@@ -14,7 +14,7 @@ import (
 
 // tests GetDelegation, GetDelegatorDelegations, SetDelegation, RemoveDelegation, GetDelegatorDelegations
 func TestDelegation(t *testing.T) {
-	ctx, _, keeper := CreateTestInput(t, false, sdk.NewIntWithDecimal(10, 0))
+	ctx, _, keeper := CreateTestInput(t, false, sdk.NewInt(10))
 	pool := keeper.GetPool(ctx)
 
 	//construct the validators
@@ -220,7 +220,6 @@ func TestUnbondDelegation(t *testing.T) {
 // test removing all self delegation from a validator which should
 // shift it from the bonded to unbonded state
 func TestUndelegateSelfDelegation(t *testing.T) {
-
 	ctx, _, keeper := CreateTestInput(t, false, sdk.ZeroInt())
 	pool := keeper.GetPool(ctx)
 	pool.BankKeeper.IncreaseLoosenToken(ctx, sdk.Coins{sdk.NewCoin(types.StakeDenom, sdk.NewIntWithDecimal(20, 18))})
@@ -598,7 +597,6 @@ func TestRedelegation(t *testing.T) {
 }
 
 func TestRedelegateToSameValidator(t *testing.T) {
-
 	ctx, _, keeper := CreateTestInput(t, false, sdk.ZeroInt())
 	pool := keeper.GetPool(ctx)
 	pool.BankKeeper.IncreaseLoosenToken(ctx, sdk.Coins{sdk.NewCoin(types.StakeDenom, sdk.NewInt(30))})
@@ -624,7 +622,6 @@ func TestRedelegateToSameValidator(t *testing.T) {
 }
 
 func TestRedelegateSelfDelegation(t *testing.T) {
-
 	ctx, _, keeper := CreateTestInput(t, false, sdk.ZeroInt())
 	pool := keeper.GetPool(ctx)
 	pool.BankKeeper.IncreaseLoosenToken(ctx, sdk.Coins{sdk.NewCoin(types.StakeDenom, sdk.NewIntWithDecimal(30, 18))})
@@ -758,8 +755,8 @@ func TestRedelegateFromUnbondingValidator(t *testing.T) {
 	ubd, found := keeper.GetRedelegation(ctx, addrDels[0], addrVals[0], addrVals[1])
 	require.True(t, found)
 	require.True(t, ubd.Balance.IsEqual(sdk.NewCoin(keeper.BondDenom(), sdk.NewIntWithDecimal(6, 18))))
-	assert.Equal(t, blockHeight, ubd.CreationHeight)
-	assert.True(t, blockTime.Add(params.UnbondingTime).Equal(ubd.MinTime))
+	assert.Equal(t, ctx.BlockHeight(), ubd.CreationHeight)
+	assert.True(t, ctx.BlockHeader().Time.Add(params.UnbondingTime).Equal(ubd.MinTime))
 }
 
 func TestRedelegateFromUnbondedValidator(t *testing.T) {
@@ -829,7 +826,7 @@ func TestRedelegateFromUnbondedValidator(t *testing.T) {
 	_, err = keeper.BeginRedelegation(ctx, addrDels[0], addrVals[0], addrVals[1], sdk.NewDecFromInt(sdk.NewIntWithDecimal(6, 18)))
 	require.NoError(t, err)
 
-	// no red should have been found
+	// red should always be found
 	red, found := keeper.GetRedelegation(ctx, addrDels[0], addrVals[0], addrVals[1])
-	require.False(t, found, "%v", red)
+	require.True(t, found, "%v", red)
 }

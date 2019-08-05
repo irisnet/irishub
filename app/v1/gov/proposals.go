@@ -88,7 +88,7 @@ func (bp BasicProposal) String() string {
   Description:        %s`,
 		bp.ProposalID, bp.Title, bp.ProposalType, bp.Proposer.String(),
 		bp.Status, bp.SubmitTime, bp.DepositEndTime,
-		bp.TotalDeposit.MainUnitString(), bp.VotingStartTime, bp.VotingEndTime, bp.GetDescription(),
+		bp.TotalDeposit.String(), bp.VotingStartTime, bp.VotingEndTime, bp.GetDescription(),
 	)
 }
 
@@ -121,7 +121,7 @@ func (p Proposals) String() string {
 	for _, prop := range p {
 		out += fmt.Sprintf("%d - (%s) [%s] [%s] %s\n",
 			prop.GetProposalID(), prop.GetStatus(),
-			prop.GetProposalType(), prop.GetTotalDeposit().MainUnitString(), prop.GetTitle())
+			prop.GetProposalType(), prop.GetTotalDeposit().String(), prop.GetTitle())
 	}
 	return strings.TrimSpace(out)
 }

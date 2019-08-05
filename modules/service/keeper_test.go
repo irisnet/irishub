@@ -70,7 +70,7 @@ func TestKeeper_service_Definition(t *testing.T) {
 
 	upSvcBinding, found := keeper.GetServiceBinding(ctx, svcBinding.DefChainID, svcBinding.DefName, svcBinding.BindChainID, svcBinding.Provider)
 	require.True(t, found)
-	require.True(t, upSvcBinding.Deposit.IsEqual(gotSvcBinding.Deposit.Plus(svcBindingUpdate.Deposit)))
+	require.True(t, upSvcBinding.Deposit.IsEqual(gotSvcBinding.Deposit.Add(svcBindingUpdate.Deposit)))
 }
 
 func TestKeeper_service_Call(t *testing.T) {

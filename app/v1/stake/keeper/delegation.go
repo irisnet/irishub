@@ -486,36 +486,6 @@ func (k Keeper) unbond(ctx sdk.Context, delAddr sdk.AccAddress, valAddr sdk.ValA
 	return amount, nil
 }
 
-//______________________________________________________________________________________________________
-
-// get info for begin functions: MinTime and CreationHeight
-func (k Keeper) getBeginInfo(ctx sdk.Context, valSrcAddr sdk.ValAddress) (
-	minTime time.Time, height int64, completeNow bool) {
-
-	validator, found := k.GetValidator(ctx, valSrcAddr)
-
-	switch {
-	case !found || validator.Status == sdk.Bonded:
-
-		// the longest wait - just unbonding period from now
-		minTime = ctx.BlockHeader().Time.Add(k.UnbondingTime(ctx))
-		height = ctx.BlockHeight()
-		return minTime, height, false
-
-	case validator.Status == sdk.Unbonded:
-		minTime = ctx.BlockHeader().Time
-		return minTime, height, true
-
-	case validator.Status == sdk.Unbonding:
-		minTime = validator.UnbondingMinTime
-		height = validator.UnbondingHeight
-		return minTime, height, false
-
-	default:
-		panic("unknown validator status")
-	}
-}
-
 // begin unbonding an unbonding record
 func (k Keeper) BeginUnbonding(ctx sdk.Context,
 	delAddr sdk.AccAddress, valAddr sdk.ValAddress, sharesAmount sdk.Dec) (types.UnbondingDelegation, sdk.Error) {
@@ -608,23 +578,17 @@ func (k Keeper) BeginRedelegation(ctx sdk.Context, delAddr sdk.AccAddress,
 	}
 
 	// create the unbonding delegation
-	minTime, height, completeNow := k.getBeginInfo(ctx, valSrcAddr)
-
 	ctx.Logger().Info("Begin redelegation", "shares", sharesAmount.String(),
 		"src_address", valSrcAddr.String(), "dst_address", valDstAddr.String(),
 		"shares_src", sharesAmount.String(), "shares_dst", sharesCreated, "balance", returnCoin)
 
-	if completeNow { // no need to create the redelegation object
-		return types.Redelegation{MinTime: minTime, SharesDst: sharesCreated, SharesSrc: sharesAmount,
-			Balance: returnCoin}, nil
-	}
-
+	completionTime := ctx.BlockHeader().Time.Add(k.UnbondingTime(ctx))
 	red := types.Redelegation{
 		DelegatorAddr:    delAddr,
 		ValidatorSrcAddr: valSrcAddr,
 		ValidatorDstAddr: valDstAddr,
-		CreationHeight:   height,
-		MinTime:          minTime,
+		CreationHeight:   ctx.BlockHeight(),
+		MinTime:          completionTime,
 		SharesDst:        sharesCreated,
 		SharesSrc:        sharesAmount,
 		Balance:          returnCoin,

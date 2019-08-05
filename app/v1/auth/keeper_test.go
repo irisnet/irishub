@@ -251,5 +251,5 @@ func TestTotalSupply(t *testing.T) {
 	decreaseAmt := sdk.NewInt(50)
 	mapper.DecreaseTotalSupply(ctx, sdk.NewCoin("bcd-min", decreaseAmt))
 	getTotalSupply2, found := mapper.GetTotalSupply(ctx, totalSupply2.Denom)
-	require.Equal(t, getTotalSupply2.Amount, totalSupply2.Minus(sdk.NewCoin("bcd-min", decreaseAmt)).Amount)
+	require.Equal(t, getTotalSupply2.Amount, totalSupply2.Sub(sdk.NewCoin("bcd-min", decreaseAmt)).Amount)
 }

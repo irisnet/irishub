@@ -187,7 +187,7 @@ func (r Rewards) String() string {
 	}
 	return fmt.Sprintf(`Total:        %s
 Delegations:  %s
-Commission:   %s`, r.Total.MainUnitString(), delegations, r.Commission.MainUnitString())
+Commission:   %s`, r.Total.String(), delegations, r.Commission.String())
 }
 
 func (r Rewards) HumanString(converter sdk.CoinsConverter) string {
@@ -207,7 +207,7 @@ type DelegationsReward struct {
 
 func (dr DelegationsReward) String() string {
 	return fmt.Sprintf(`validator: %s, reward: %s`,
-		dr.Validator, dr.Reward.MainUnitString())
+		dr.Validator, dr.Reward.String())
 }
 
 func (dr DelegationsReward) HumanString(converter sdk.CoinsConverter) string {

@@ -260,16 +260,6 @@ func consumeMultisignatureVerificationGas(meter sdk.GasMeter,
 	}
 }
 
-func adjustFeesByGas(fees sdk.Coins, gas uint64) sdk.Coins {
-	gasCost := gas / gasPerUnitCost
-	gasFees := make(sdk.Coins, len(fees))
-	// TODO: Make this not price all coins in the same way
-	for i := 0; i < len(fees); i++ {
-		gasFees[i] = sdk.NewInt64Coin(fees[i].Denom, int64(gasCost))
-	}
-	return fees.Plus(gasFees)
-}
-
 // Deduct the fee from the account.
 // We could use the CoinKeeper (in addition to the AccountKeeper,
 // because the CoinKeeper doesn't give us accounts), but it seems easier to do this.
@@ -277,19 +267,18 @@ func deductFees(acc Account, fee StdFee) (Account, sdk.Result) {
 	coins := acc.GetCoins()
 	feeAmount := fee.Amount
 
-	if !feeAmount.IsValid() {
-		return nil, sdk.ErrInsufficientFee(fmt.Sprintf("invalid fee amount: %s", feeAmount)).Result()
-	}
-	newCoins, ok := coins.SafeMinus(feeAmount)
-	if ok {
-		errMsg := fmt.Sprintf("account balance (%s) is less than %s", coins, feeAmount)
+	newCoins, hasNeg := coins.SafeSub(feeAmount)
+	if hasNeg {
+		errMsg := fmt.Sprintf("account balance [%s] is not enough to cover fee [%s]", coins, feeAmount)
 		return nil, sdk.ErrInsufficientFunds(errMsg).Result()
 	}
+
 	err := acc.SetCoins(newCoins)
 	if err != nil {
 		// Handle w/ #870
 		panic(err)
 	}
+
 	return acc, sdk.Result{}
 }
 
@@ -303,13 +292,12 @@ func ensureSufficientMempoolFees(ctx sdk.Context, stdTx StdTx) sdk.Result {
 	if stdTx.Fee.Gas <= 0 {
 		return sdk.ErrInternal(fmt.Sprintf("invalid gas supplied: %d", stdTx.Fee.Gas)).Result()
 	}
-	requiredFees := adjustFeesByGas(ctx.MinimumFees(), stdTx.Fee.Gas)
 
 	// NOTE: !A.IsAllGTE(B) is not the same as A.IsAllLT(B).
-	if !ctx.MinimumFees().IsZero() && !stdTx.Fee.Amount.IsAllGTE(requiredFees) {
+	if !ctx.MinimumFees().IsZero() && !stdTx.Fee.Amount.IsAllGTE(ctx.MinimumFees()) {
 		// validators reject any tx from the mempool with less than the minimum fee per gas * gas factor
 		return sdk.ErrInsufficientFee(fmt.Sprintf(
-			"insufficient fee, got: %q required: %q", stdTx.Fee.Amount, requiredFees)).Result()
+			"insufficient fee, got: %q required: %q", stdTx.Fee.Amount, ctx.MinimumFees())).Result()
 	}
 	return sdk.Result{}
 }

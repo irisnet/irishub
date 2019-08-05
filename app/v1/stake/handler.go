@@ -48,9 +48,10 @@ func handleMsgCreateValidator(ctx sdk.Context, msg types.MsgCreateValidator, k k
 		return ErrValidatorPubKeyExists(k.Codespace()).Result()
 	}
 
-	if msg.Delegation.Denom != k.BondDenom() {
-		return ErrBadDenom(k.Codespace()).Result()
-	}
+	// This is now guaranteed by msg.ValidateBasic()
+	//if msg.Delegation.Denom != k.BondDenom() {
+	//	return ErrBadDenom(k.Codespace()).Result()
+	//}
 
 	if ctx.ConsensusParams() != nil {
 		tmPubKey := tmtypes.TM2PB.PubKey(msg.PubKey)
@@ -142,9 +143,10 @@ func handleMsgDelegate(ctx sdk.Context, msg types.MsgDelegate, k keeper.Keeper) 
 		return ErrNoValidatorFound(k.Codespace()).Result()
 	}
 
-	if msg.Delegation.Denom != k.BondDenom() {
-		return ErrBadDenom(k.Codespace()).Result()
-	}
+	// This is now guaranteed by msg.ValidateBasic()
+	//if msg.Delegation.Denom != k.BondDenom() {
+	//	return ErrBadDenom(k.Codespace()).Result()
+	//}
 
 	if validator.Jailed && !bytes.Equal(validator.OperatorAddr, msg.DelegatorAddr) {
 		return ErrValidatorJailed(k.Codespace()).Result()

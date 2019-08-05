@@ -197,7 +197,7 @@ func validateGatewayAssetFeeRatio(v sdk.Dec) sdk.Error {
 }
 
 func validateIssueTokenBaseFee(coin sdk.Coin) sdk.Error {
-	if !coin.IsNotNegative() {
+	if coin.IsNegative() {
 		return sdk.NewError(
 			params.DefaultCodespace,
 			params.CodeInvalidIssueTokenBaseFee,
@@ -208,7 +208,7 @@ func validateIssueTokenBaseFee(coin sdk.Coin) sdk.Error {
 }
 
 func validateCreateGatewayBaseFee(coin sdk.Coin) sdk.Error {
-	if !coin.IsNotNegative() {
+	if coin.IsNegative() {
 		return sdk.NewError(
 			params.DefaultCodespace,
 			params.CodeInvalidCreateGatewayBaseFee,

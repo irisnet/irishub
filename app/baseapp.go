@@ -733,6 +733,17 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 		return err.Result()
 	}
 
+	if app.Engine.GetCurrentVersion() > 0 {
+		stdTx := tx.(auth.StdTx)
+		fees := stdTx.Fee.Amount
+		if fees != nil && !fees.Empty() {
+			if !fees.IsValidIrisAtto() {
+				result = sdk.ErrInvalidCoins(fmt.Sprintf("invalid tx fee [%s]", fees)).Result()
+				return
+			}
+		}
+	}
+
 	if mode == RunTxModeDeliver {
 		app.deliverState.ctx = app.deliverState.ctx.WithCheckValidNum(app.deliverState.ctx.CheckValidNum() + 1)
 	}
@@ -756,7 +767,6 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 	// Add cache in fee refund. If an error is returned or panic happes during refund,
 	// no value will be written into blockchain state.
 	defer func() {
-
 		result.GasUsed = ctx.GasMeter().GasConsumed()
 		var refundCtx sdk.Context
 		var refundCache sdk.CacheMultiStore
@@ -787,7 +797,7 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 	}()
 
 	feePreprocessHandler := app.Engine.GetCurrentProtocol().GetFeePreprocessHandler()
-	// run the fee handler
+	// skip fee pre-processing for gentx's
 	if feePreprocessHandler != nil && ctx.BlockHeight() != 0 {
 		err := feePreprocessHandler(ctx, tx)
 		if err != nil {
