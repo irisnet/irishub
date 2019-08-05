@@ -2,8 +2,6 @@ package types
 
 import (
 	"fmt"
-	"strings"
-
 	"github.com/irisnet/irishub/app/v1/params"
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
@@ -16,21 +14,18 @@ const (
 
 // Parameter store keys
 var (
-	nativeDenomKey = []byte("nativeDenom")
-	feeKey         = []byte("fee")
+	feeKey = []byte("fee")
 )
 
 // Params defines the fee and native denomination for coinswap
 type Params struct {
-	NativeDenom string   `json:"native_denom"`
-	Fee         FeeParam `json:"fee"`
+	Fee sdk.Rat `json:"fee"`
 }
 
 // NewParams coinswap params constructor
-func NewParams(nativeDenom string, fee FeeParam) Params {
+func NewParams(nativeDenom string, fee sdk.Rat) Params {
 	return Params{
-		NativeDenom: nativeDenom,
-		Fee:         fee,
+		Fee: fee,
 	}
 }
 
@@ -59,8 +54,7 @@ func ParamTypeTable() params.TypeTable {
 // String returns a human readable string representation of the parameters.
 func (p Params) String() string {
 	return fmt.Sprintf(`Params:
-  Native Denom:	%s
-  Fee:			%s`, p.NativeDenom, p.Fee,
+  Fee:			%s`, p.Fee.String(),
 	)
 }
 
@@ -72,7 +66,6 @@ func (p *Params) GetParamSpace() string {
 // KeyValuePairs  Implements params.KeyValuePairs
 func (p *Params) KeyValuePairs() params.KeyValuePairs {
 	return params.KeyValuePairs{
-		{Key: nativeDenomKey, Value: &p.NativeDenom},
 		{Key: feeKey, Value: &p.Fee},
 	}
 }
@@ -100,28 +93,16 @@ func (p *Params) ReadOnly() bool {
 
 // DefaultParams returns the default coinswap module parameters
 func DefaultParams() Params {
-	feeParam := NewFeeParam(sdk.NewInt(997), sdk.NewInt(1000))
-
+	feeParam := sdk.NewRat(997, 1000)
 	return Params{
-		NativeDenom: sdk.IrisAtto,
-		Fee:         feeParam,
+		Fee: feeParam,
 	}
 }
 
 // ValidateParams validates a set of params
 func ValidateParams(p Params) error {
-	// TODO: ensure equivalent sdk.validateDenom validation
-	if strings.TrimSpace(p.NativeDenom) == "" {
-		return fmt.Errorf("native denomination must not be empty")
-	}
-	if !p.Fee.Numerator.IsPositive() {
-		return fmt.Errorf("fee numerator is not positive: %v", p.Fee.Numerator)
-	}
-	if !p.Fee.Denominator.IsPositive() {
-		return fmt.Errorf("fee denominator is not positive: %v", p.Fee.Denominator)
-	}
-	if p.Fee.Numerator.GTE(p.Fee.Denominator) {
-		return fmt.Errorf("fee numerator is greater than or equal to fee numerator")
+	if !p.Fee.GT(sdk.ZeroRat()) {
+		return fmt.Errorf("fee is not positive: %s", p.Fee.String())
 	}
 	return nil
 }

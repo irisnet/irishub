@@ -271,7 +271,8 @@ func (k Keeper) GetReservePool(ctx sdk.Context, liquidityName string) (coins sdk
 
 // GetFeeParam returns the current FeeParam from the global param store
 func (k Keeper) GetFeeParam(ctx sdk.Context) (feeParam types.FeeParam) {
-	return k.GetParams(ctx).Fee
+	fee := k.GetParams(ctx).Fee
+	return types.NewFeeParam(fee.Num(), fee.Denom())
 }
 
 // GetParams gets the parameters for the coinswap module.

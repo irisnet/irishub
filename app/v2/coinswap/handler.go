@@ -30,7 +30,7 @@ func NewHandler(k Keeper) sdk.Handler {
 func HandleMsgSwapOrder(ctx sdk.Context, msg MsgSwapOrder, k Keeper) sdk.Result {
 	// check that deadline has not passed
 	if ctx.BlockHeader().Time.After(msg.Deadline) {
-		return ErrInvalidDeadline(DefaultCodespace, "deadline has passed for MsgSwapOrder").Result()
+		return ErrInvalidDeadline("deadline has passed for MsgSwapOrder").Result()
 	}
 	err := k.SwapOrder(ctx, msg)
 	if err != nil {
@@ -45,7 +45,7 @@ func HandleMsgSwapOrder(ctx sdk.Context, msg MsgSwapOrder, k Keeper) sdk.Result 
 func HandleMsgAddLiquidity(ctx sdk.Context, msg MsgAddLiquidity, k Keeper) sdk.Result {
 	// check that deadline has not passed
 	if ctx.BlockHeader().Time.After(msg.Deadline) {
-		return ErrInvalidDeadline(DefaultCodespace, "deadline has passed for MsgAddLiquidity").Result()
+		return ErrInvalidDeadline("deadline has passed for MsgAddLiquidity").Result()
 	}
 
 	err := k.AddLiquidity(ctx, msg)
@@ -60,7 +60,7 @@ func HandleMsgAddLiquidity(ctx sdk.Context, msg MsgAddLiquidity, k Keeper) sdk.R
 func HandleMsgRemoveLiquidity(ctx sdk.Context, msg MsgRemoveLiquidity, k Keeper) sdk.Result {
 	// check that deadline has not passed
 	if ctx.BlockHeader().Time.After(msg.Deadline) {
-		return ErrInvalidDeadline(DefaultCodespace, "deadline has passed for MsgRemoveLiquidity").Result()
+		return ErrInvalidDeadline("deadline has passed for MsgRemoveLiquidity").Result()
 	}
 
 	err := k.RemoveLiquidity(ctx, msg)
