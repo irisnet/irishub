@@ -287,6 +287,11 @@ func (k Keeper) SetParams(ctx sdk.Context, params types.Params) {
 	k.paramSpace.SetParamSet(ctx, &params)
 }
 
+func (k Keeper) Init(ctx sdk.Context) {
+	paramSet := types.DefaultParams()
+	k.paramSpace.SetParamSet(ctx, &paramSet)
+}
+
 func getPoolAccAddr(liquidityName string) sdk.AccAddress {
 	return sdk.AccAddress(crypto.AddressHash([]byte("swapPool:" + liquidityName)))
 }

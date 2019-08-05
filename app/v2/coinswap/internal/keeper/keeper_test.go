@@ -38,14 +38,14 @@ func TestParams(t *testing.T) {
 		params types.Params
 	}{
 		{types.DefaultParams()},
-		{types.NewParams("pineapple", types.NewFeeParam(sdk.NewInt(5), sdk.NewInt(10)))},
+		{types.NewParams(sdk.NewRat(5, 10))},
 	}
 
 	for _, tc := range cases {
 		keeper.SetParams(ctx, tc.params)
 
-		feeParam := keeper.GetFeeParam(ctx)
-		require.Equal(t, tc.params.Fee, feeParam)
+		feeParam := keeper.GetParams(ctx)
+		require.Equal(t, tc.params.Fee, feeParam.Fee)
 	}
 }
 

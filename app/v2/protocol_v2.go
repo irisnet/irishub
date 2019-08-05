@@ -114,6 +114,9 @@ func (p *ProtocolV2) Init(ctx sdk.Context) {
 
 	// modify gov params
 	p.govKeeper.Init(ctx)
+
+	// initialize coinswap params
+	p.coinswapKeeper.Init(ctx)
 }
 
 // GetCodec get codec
