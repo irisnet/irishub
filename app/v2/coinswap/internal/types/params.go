@@ -23,7 +23,7 @@ type Params struct {
 }
 
 // NewParams coinswap params constructor
-func NewParams(nativeDenom string, fee sdk.Rat) Params {
+func NewParams(fee sdk.Rat) Params {
 	return Params{
 		Fee: fee,
 	}

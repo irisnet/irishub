@@ -18,21 +18,22 @@ func TestValidateParams(t *testing.T) {
 	invalidTests := []struct {
 		name   string
 		params Params
+		result bool
 	}{
-		{"empty native denom", NewParams("     ", defaultParams.Fee)},
-		{"native denom with caps", NewParams("aTom", defaultParams.Fee)},
-		{"native denom too short", NewParams("a", defaultParams.Fee)},
-		{"native denom too long", NewParams("a very long coin denomination", defaultParams.Fee)},
-		{"fee numerator == denominator", NewParams(defaultParams.NativeDenom, NewFeeParam(sdk.NewInt(1000), sdk.NewInt(1000)))},
-		{"fee numerator > denominator", NewParams(defaultParams.NativeDenom, NewFeeParam(sdk.NewInt(10000), sdk.NewInt(10)))},
-		{"fee numerator negative", NewParams(defaultParams.NativeDenom, NewFeeParam(sdk.NewInt(-1), sdk.NewInt(10)))},
-		{"fee denominator negative", NewParams(defaultParams.NativeDenom, NewFeeParam(sdk.NewInt(10), sdk.NewInt(-1)))},
+		{"fee == 0 ", NewParams(sdk.ZeroRat()), false},
+		{"fee > 0", NewParams(sdk.NewRat(1000, 100)), true},
+		{"fee numerator < 0", NewParams(sdk.NewRat(-1, 10)), false},
+		{"fee denominator < 0", NewParams(sdk.NewRat(1, -10)), false},
 	}
 
 	for _, tc := range invalidTests {
 		t.Run(tc.name, func(t *testing.T) {
 			err := ValidateParams(tc.params)
-			require.NotNil(t, err)
+			if err != nil {
+				require.False(t, tc.result)
+			} else {
+				require.True(t, tc.result)
+			}
 		})
 	}
 }
