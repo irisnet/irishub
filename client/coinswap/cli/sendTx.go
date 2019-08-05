@@ -18,7 +18,7 @@ func GetCmdAddLiquidity(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "add-liquidity",
 		Short:   "Create and sign a send tx",
-		Example: "iriscli swap send --to=<account address> --from <key name> --fee=0.4iris --chain-id=<chain-id> --amount=10iris",
+		Example: "iriscli swap add-liquidity --deposit=1eth --amount=1500iris --period=10s --from=<key name> --fee=0.4iris --chain-id=<chain-id>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
@@ -67,15 +67,12 @@ func GetCmdAddLiquidity(cdc *codec.Codec) *cobra.Command {
 			}
 
 			// ensure account has enough coins
-			if !account.GetCoins().IsAllGTE(sdk.Coins{depositToken, nativeToken}) {
+			coins := sdk.NewCoins(depositToken, nativeToken)
+			if !account.GetCoins().IsAllGTE(coins) {
 				return fmt.Errorf("Address %s doesn't have enough coins to pay for this transaction", from.String())
 			}
 
 			msg := coinswap.NewMsgAddLiquidity(depositToken, nativeToken.Amount, minReward, deadline, from)
-			if cliCtx.GenerateOnly {
-				return utils.PrintUnsignedStdTx(txCtx, cliCtx, []sdk.Msg{msg}, true)
-			}
-
 			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 		},
 	}
@@ -85,6 +82,84 @@ func GetCmdAddLiquidity(cdc *codec.Codec) *cobra.Command {
 	cmd.MarkFlagRequired(flagAmount)
 	cmd.MarkFlagRequired(flagPeriod)
 
+	return cmd
+}
+
+func GetCmdRemoveLiquidity(cdc *codec.Codec) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "remove-liquidity",
+		Short:   "Create and sign a send tx",
+		Example: "iriscli swap remove-liquidity --min-token=1eth --min-native=1000 --amount=1000uni --from <key name> --fee=0.4iris --chain-id=<chain-id> --amount=10iris",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().
+				WithCodec(cdc).
+				WithLogger(os.Stdout).
+				WithAccountDecoder(utils.GetAccountDecoder(cdc))
+			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).WithCliCtx(cliCtx)
+
+			var minToken, liquidity sdk.Coin
+			var minNative = sdk.ZeroInt()
+			// parse coins trying to be sent
+			minTokenStr := viper.GetString(flagMinToken)
+			if len(minTokenStr) > 0 {
+				coin, err := cliCtx.ParseCoin(minTokenStr)
+				if err != nil {
+					return err
+				} else {
+					minToken = coin
+				}
+			}
+
+			minNativeStr := viper.GetString(flagMinNative)
+			if len(minNativeStr) > 0 {
+				amt, ok := sdk.NewIntFromString(minNativeStr)
+				if !ok {
+					return fmt.Errorf("invalid amount:%s", minNativeStr)
+				} else {
+					minNative = amt
+				}
+			}
+
+			liquidityStr := viper.GetString(flagAmount)
+			if len(liquidityStr) > 0 {
+				coin, err := cliCtx.ParseCoin(liquidityStr)
+				if err != nil {
+					return err
+				} else {
+					liquidity = coin
+				}
+			}
+
+			from, err := cliCtx.GetFromAddress()
+			if err != nil {
+				return err
+			}
+
+			account, err := cliCtx.GetAccount(from)
+			if err != nil {
+				return err
+			}
+			// ensure account has enough coins
+			coins := sdk.NewCoins(liquidity)
+			if !account.GetCoins().IsAllGTE(coins) {
+				return fmt.Errorf("Address %s doesn't have enough coins to pay for this transaction", from.String())
+			}
+
+			periodStr := viper.GetString(flagPeriod)
+			period, err := time.ParseDuration(periodStr)
+			if err != nil {
+				return err
+			}
+			deadline := time.Now().Add(period)
+
+			msg := coinswap.NewMsgRemoveLiquidity(minToken, liquidity.Amount, minNative, deadline, from)
+			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
+		},
+	}
+
+	cmd.Flags().AddFlagSet(FsRemoveLiquidity)
+	cmd.MarkFlagRequired(flagAmount)
+	cmd.MarkFlagRequired(flagPeriod)
 	return cmd
 }
 
@@ -101,12 +176,12 @@ func GetCmdPlaceOrder(cdc *codec.Codec) *cobra.Command {
 			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).WithCliCtx(cliCtx)
 
 			// parse coins trying to be sent
-			inputStr := viper.GetString(flagInputToken)
+			inputStr := viper.GetString(flagInput)
 			input, err := cliCtx.ParseCoin(inputStr)
 			if err != nil {
 				return err
 			}
-			outputStr := viper.GetString(flagInputToken)
+			outputStr := viper.GetString(flagOutput)
 			output, err := cliCtx.ParseCoin(outputStr)
 			if err != nil {
 				return err

@@ -104,5 +104,9 @@ func ValidateParams(p Params) error {
 	if !p.Fee.GT(sdk.ZeroRat()) {
 		return fmt.Errorf("fee is not positive: %s", p.Fee.String())
 	}
+
+	if !p.Fee.LT(sdk.OneRat()) {
+		return fmt.Errorf("fee must be less than 1: %s", p.Fee.String())
+	}
 	return nil
 }
