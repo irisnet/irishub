@@ -139,6 +139,7 @@ func IrisAppGenState(cdc *codec.Codec, genDoc tmtypes.GenesisDoc, appGenTxs []js
 
 	genesisState.StakeData = stakeData
 	genesisState.GenTxs = appGenTxs
+	genesisState.UpgradeData = genesisState.UpgradeData
 	return genesisState, nil
 }
 
@@ -299,7 +300,7 @@ func convertToMinDenomCoins(coinStrArray []string) sdk.Coins {
 			if err != nil {
 				panic(fmt.Sprintf("fatal error in converting %s to %s", coinStr, sdk.IrisAtto))
 			}
-			irisCoin = irisCoin.Plus(convertedIrisCoin)
+			irisCoin = irisCoin.Add(convertedIrisCoin)
 		} else {
 			// non-iris tokens
 			denom, amount, err := types.ParseCoinParts(coinStr)
@@ -369,7 +370,6 @@ type GenesisFileState struct {
 	GenTxs       []json.RawMessage     `json:"gentxs"`
 }
 
-// GenesisFileAccount genesis file account
 type GenesisFileAccount struct {
 	Address       sdk.AccAddress `json:"address"`
 	Coins         []string       `json:"coins"`
@@ -377,7 +377,6 @@ type GenesisFileAccount struct {
 	AccountNumber uint64         `json:"account_number"`
 }
 
-// NewGenesisFileAccount genesis file account constructor
 func NewGenesisFileAccount(acc *auth.BaseAccount) GenesisFileAccount {
 	var coins []string
 	for _, coin := range acc.Coins {
@@ -391,7 +390,6 @@ func NewGenesisFileAccount(acc *auth.BaseAccount) GenesisFileAccount {
 	}
 }
 
-// NewGenesisFileState genesis file state constructor
 func NewGenesisFileState(accounts []GenesisFileAccount, authData auth.GenesisState, stakeData stake.GenesisState, mintData mint.GenesisState,
 	distrData distr.GenesisState, govData gov.GenesisState, upgradeData upgrade.GenesisState, serviceData service.GenesisState,
 	guardianData guardian.GenesisState, slashingData slashing.GenesisState, assetData asset.GenesisState, randData rand.GenesisState, swapData coinswap.GenesisState) GenesisFileState {
@@ -413,7 +411,7 @@ func NewGenesisFileState(accounts []GenesisFileAccount, authData auth.GenesisSta
 	}
 }
 
-// NewDefaultGenesisFileState generates the default state for iris.
+// NewDefaultGenesisState generates the default state for iris.
 func NewDefaultGenesisFileState() GenesisFileState {
 	return GenesisFileState{
 		Accounts:     nil,
@@ -433,7 +431,6 @@ func NewDefaultGenesisFileState() GenesisFileState {
 	}
 }
 
-// NewDefaultGenesisFileAccount generates the default account for iris.
 func NewDefaultGenesisFileAccount(addr sdk.AccAddress) GenesisFileAccount {
 	accAuth := auth.NewBaseAccountWithAddress(addr)
 	accAuth.Coins = []sdk.Coin{
