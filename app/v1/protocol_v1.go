@@ -334,7 +334,6 @@ func (p *ProtocolV1) GetKVStoreKeyList() []*sdk.KVStoreKey {
 		protocol.KeyGuardian,
 		protocol.KeyAsset,
 		protocol.KeyRand,
-		protocol.KeySwap,
 	}
 }
 
