@@ -2,16 +2,16 @@ package cli
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"testing"
-	"io/ioutil"
 
+	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/tests"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/stretchr/testify/require"
 	"regexp"
 	"strings"
-	"github.com/irisnet/irishub/client/context"
 )
 
 func TestIrisCLIService(t *testing.T) {

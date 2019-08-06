@@ -36,7 +36,7 @@ func TestConvert(t *testing.T) {
 func TestGetCoin(t *testing.T) {
 	testData := []struct {
 		name, coinStr, expectAmount, expectDenom string
-		expectPass                   bool
+		expectPass                               bool
 	}{
 		{"standard", "1000iris", "1000", "iris", true},
 		{"with -", "1000iris-atto", "1000", "iris-atto", true},

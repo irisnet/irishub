@@ -10,6 +10,7 @@ import (
 	"github.com/irisnet/irishub/client"
 	assetcmd "github.com/irisnet/irishub/client/asset/cli"
 	bankcmd "github.com/irisnet/irishub/client/bank/cli"
+	swap "github.com/irisnet/irishub/client/coinswap/cli"
 	distributioncmd "github.com/irisnet/irishub/client/distribution/cli"
 	govcmd "github.com/irisnet/irishub/client/gov/cli"
 	guardiancmd "github.com/irisnet/irishub/client/guardian/cli"
@@ -280,6 +281,21 @@ func main() {
 
 	rootCmd.AddCommand(
 		assetCmd,
+	)
+
+	//Add bank commands
+	swapCmd := &cobra.Command{
+		Use:   "swap",
+		Short: "coin swap subcommands",
+	}
+	swapCmd.AddCommand(
+		client.PostCommands(
+			swap.GetCmdAddLiquidity(cdc),
+			swap.GetCmdRemoveLiquidity(cdc),
+			swap.GetCmdPlaceOrder(cdc),
+		)...)
+	rootCmd.AddCommand(
+		swapCmd,
 	)
 
 	// add rand commands

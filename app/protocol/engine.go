@@ -16,7 +16,7 @@ type ProtocolEngine struct {
 func NewProtocolEngine(protocolKeeper sdk.ProtocolKeeper) ProtocolEngine {
 	engine := ProtocolEngine{
 		make(map[uint64]Protocol),
-		0,
+		0, 
 		0,
 		protocolKeeper,
 	}

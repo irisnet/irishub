@@ -11,6 +11,7 @@ import (
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/app/v0"
 	"github.com/irisnet/irishub/app/v1"
+	"github.com/irisnet/irishub/app/v2"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/store"
@@ -80,6 +81,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, config *cfg.InstrumentationConfig,
 	appPrometheusConfig.Namespace = appPrometheusNamespace
 	engine.Add(v0.NewProtocolV0(0, logger, protocolKeeper, app.checkInvariant, app.trackCoinFlow, &appPrometheusConfig))
 	engine.Add(v1.NewProtocolV1(1, logger, protocolKeeper, app.checkInvariant, app.trackCoinFlow, &appPrometheusConfig))
+	engine.Add(v2.NewProtocolV2(2, logger, protocolKeeper, app.checkInvariant, app.trackCoinFlow, &appPrometheusConfig))
 	// engine.Add(v1.NewProtocolV1(1, ...))
 	// engine.Add(v2.NewProtocolV1(2, ...))
 
@@ -94,7 +96,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, config *cfg.InstrumentationConfig,
 
 // latest version of codec
 func MakeLatestCodec() *codec.Codec {
-	var cdc = v1.MakeCodec() // replace with latest protocol version
+	var cdc = v2.MakeCodec() // replace with latest protocol version
 	return cdc
 }
 
