@@ -13,13 +13,13 @@ func (k Keeper) SwapCoins(ctx sdk.Context, sender sdk.AccAddress, coinSold, coin
 		return sdk.ErrInsufficientCoins(fmt.Sprintf("sender account does not have sufficient amount of %s to fulfill the swap order", coinSold.Denom))
 	}
 
-	moduleName, err := k.GetModuleName(coinSold.Denom, coinBought.Denom)
+	exchangeName, err := k.GetExchangeName(coinSold.Denom, coinBought.Denom)
 	if err != nil {
 		return err
 	}
 
-	k.SendCoins(ctx, sender, moduleName, sdk.NewCoins(coinSold))
-	k.ReceiveCoins(ctx, sender, moduleName, sdk.NewCoins(coinBought))
+	k.SendCoins(ctx, sender, exchangeName, sdk.NewCoins(coinSold))
+	k.ReceiveCoins(ctx, sender, exchangeName, sdk.NewCoins(coinBought))
 	return nil
 }
 
@@ -28,13 +28,13 @@ func (k Keeper) SwapCoins(ctx sdk.Context, sender sdk.AccAddress, coinSold, coin
 // https://github.com/runtimeverification/verified-smart-contracts/blob/uniswap/uniswap/x-y-k.pdf
 // TODO: continue using numerator/denominator -> open issue for eventually changing to sdk.Dec
 func (k Keeper) GetInputPrice(ctx sdk.Context, soldCoin sdk.Coin, boughtDenom string) sdk.Int {
-	moduleName, err := k.GetModuleName(soldCoin.Denom, boughtDenom)
+	exchangeName, err := k.GetExchangeName(soldCoin.Denom, boughtDenom)
 	if err != nil {
 		panic(err)
 	}
-	reservePool, found := k.GetReservePool(ctx, moduleName)
+	reservePool, found := k.GetExchange(ctx, exchangeName)
 	if !found {
-		panic(fmt.Sprintf("reserve pool for %s not found", moduleName))
+		panic(fmt.Sprintf("reserve pool for %s not found", exchangeName))
 	}
 	inputBalance := reservePool.AmountOf(soldCoin.Denom)
 	outputBalance := reservePool.AmountOf(boughtDenom)
@@ -51,13 +51,13 @@ func (k Keeper) GetInputPrice(ctx sdk.Context, soldCoin sdk.Coin, boughtDenom st
 // https://github.com/runtimeverification/verified-smart-contracts/blob/uniswap/uniswap/x-y-k.pdf
 // TODO: continue using numerator/denominator -> open issue for eventually changing to sdk.Dec
 func (k Keeper) GetOutputPrice(ctx sdk.Context, boughtCoin sdk.Coin, soldDenom string) sdk.Int {
-	moduleName, err := k.GetModuleName(boughtCoin.Denom, soldDenom)
+	exchangeName, err := k.GetExchangeName(boughtCoin.Denom, soldDenom)
 	if err != nil {
 		panic(err)
 	}
-	reservePool, found := k.GetReservePool(ctx, moduleName)
+	reservePool, found := k.GetExchange(ctx, exchangeName)
 	if !found {
-		panic(fmt.Sprintf("reserve pool for %s not found", moduleName))
+		panic(fmt.Sprintf("reserve pool for %s not found", exchangeName))
 	}
 	inputBalance := reservePool.AmountOf(boughtCoin.Denom)
 	outputBalance := reservePool.AmountOf(soldDenom)
@@ -73,10 +73,10 @@ func (k Keeper) IsDoubleSwap(ctx sdk.Context, denom1, denom2 string) bool {
 	return denom1 != sdk.IrisAtto && denom2 != sdk.IrisAtto
 }
 
-// GetModuleName returns the ModuleAccount name for the provided denominations.
+// GetExchangeName returns the ModuleAccount name for the provided denominations.
 // The module name is in the format of 'swap:denom:denom' where the denominations
 // are sorted alphabetically.
-func (k Keeper) GetModuleName(denom1, denom2 string) (string, sdk.Error) {
+func (k Keeper) GetExchangeName(denom1, denom2 string) (string, sdk.Error) {
 	switch strings.Compare(denom1, denom2) {
 	case -1:
 		return "swap:" + denom1 + ":" + denom2, nil
@@ -87,8 +87,9 @@ func (k Keeper) GetModuleName(denom1, denom2 string) (string, sdk.Error) {
 	}
 }
 
-func (k Keeper) GetUNIDenom(moduleName string) (string, error) {
-	s := strings.Split(moduleName, ":")
+//TODO
+func (k Keeper) GetUNIDenom(exchangeName string) (string, error) {
+	s := strings.Split(exchangeName, ":")
 	if len(s) != 3 {
 		return "", types.ErrEqualDenom("denomnations for forming module name are invalid")
 	}
