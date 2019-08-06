@@ -227,12 +227,9 @@ func (k Keeper) BurnLiquidity(ctx sdk.Context, exchangeName string, deltaCoin sd
 // exchangeName and denomination of the liquidity coins are the same.
 func (k Keeper) MintCoins(ctx sdk.Context, exchangeName string, amt sdk.Int) sdk.Coins {
 	swapPoolAccAddr := getExchangeAddr(exchangeName)
-	uniDenom, err := k.GetUNIDenom(exchangeName)
-	if err != nil {
-		panic(err)
-	}
+	uniDenom := k.GetLiquidityDenom(exchangeName)
 	coins := sdk.NewCoins(sdk.NewCoin(uniDenom, amt))
-	_, _, err = k.bk.AddCoins(ctx, swapPoolAccAddr, coins)
+	_, _, err := k.bk.AddCoins(ctx, swapPoolAccAddr, coins)
 	if err != nil {
 		panic(err)
 	}

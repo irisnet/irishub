@@ -88,16 +88,6 @@ func (k Keeper) GetExchangeName(denom1, denom2 string) (string, sdk.Error) {
 }
 
 //TODO
-func (k Keeper) GetUNIDenom(exchangeName string) (string, error) {
-	s := strings.Split(exchangeName, ":")
-	if len(s) != 3 {
-		return "", types.ErrEqualDenom("denomnations for forming module name are invalid")
-	}
-
-	denom1 := strings.Split(s[1], "-")[0]
-	denom2 := strings.Split(s[2], "-")[0]
-	uniDenom := strings.Join([]string{"uni", denom1, denom2}, "-")
-
-	//TODO should validate by asset module
-	return uniDenom, nil
+func (k Keeper) GetLiquidityDenom(tokenId string) string {
+	return fmt.Sprintf("s-%s", tokenId)
 }
