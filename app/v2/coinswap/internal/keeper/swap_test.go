@@ -28,7 +28,7 @@ func TestIsDoubleSwap(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			doubleSwap := keeper.IsDoubleSwap(ctx, tc.denom1, tc.denom2)
+			doubleSwap := keeper.IsDoubleSwap(tc.denom1, tc.denom2)
 			require.Equal(t, tc.isDoubleSwap, doubleSwap)
 		})
 	}
