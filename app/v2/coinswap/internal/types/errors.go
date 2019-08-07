@@ -16,6 +16,7 @@ const (
 	CodeLessThanMinReward         sdk.CodeType = 106
 	CodeGreaterThanMaxDeposit     sdk.CodeType = 107
 	CodeLessThanMinWithdrawAmount sdk.CodeType = 108
+	CodeIllegalDenom              sdk.CodeType = 109
 )
 
 func ErrReservePoolNotExists(msg string) sdk.Error {
@@ -30,6 +31,13 @@ func ErrEqualDenom(msg string) sdk.Error {
 		return sdk.NewError(DefaultCodespace, CodeEqualDenom, msg)
 	}
 	return sdk.NewError(DefaultCodespace, CodeEqualDenom, "input and output denomination are equal")
+}
+
+func ErrIllegalDenom(msg string) sdk.Error {
+	if msg != "" {
+		return sdk.NewError(DefaultCodespace, CodeIllegalDenom, msg)
+	}
+	return sdk.NewError(DefaultCodespace, CodeIllegalDenom, "illegal denomination")
 }
 
 func ErrInvalidDeadline(msg string) sdk.Error {
