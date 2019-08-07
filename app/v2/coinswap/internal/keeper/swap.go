@@ -2,8 +2,6 @@ package keeper
 
 import (
 	"fmt"
-	"strings"
-
 	"github.com/irisnet/irishub/app/v2/coinswap/internal/types"
 	sdk "github.com/irisnet/irishub/types"
 )
@@ -13,13 +11,13 @@ func (k Keeper) SwapCoins(ctx sdk.Context, sender sdk.AccAddress, coinSold, coin
 		return sdk.ErrInsufficientCoins(fmt.Sprintf("sender account does not have sufficient amount of %s to fulfill the swap order", coinSold.Denom))
 	}
 
-	exchangeName, err := k.GetExchangeName(coinSold.Denom, coinBought.Denom)
+	reservePoolName, err := k.GetReservePoolName(coinSold.Denom, coinBought.Denom)
 	if err != nil {
 		return err
 	}
 
-	k.SendCoins(ctx, sender, exchangeName, sdk.NewCoins(coinSold))
-	k.ReceiveCoins(ctx, sender, exchangeName, sdk.NewCoins(coinBought))
+	k.SendCoins(ctx, sender, reservePoolName, sdk.NewCoins(coinSold))
+	k.ReceiveCoins(ctx, sender, reservePoolName, sdk.NewCoins(coinBought))
 	return nil
 }
 
@@ -28,13 +26,13 @@ func (k Keeper) SwapCoins(ctx sdk.Context, sender sdk.AccAddress, coinSold, coin
 // https://github.com/runtimeverification/verified-smart-contracts/blob/uniswap/uniswap/x-y-k.pdf
 // TODO: continue using numerator/denominator -> open issue for eventually changing to sdk.Dec
 func (k Keeper) GetInputPrice(ctx sdk.Context, soldCoin sdk.Coin, boughtDenom string) sdk.Int {
-	exchangeName, err := k.GetExchangeName(soldCoin.Denom, boughtDenom)
+	reservePoolName, err := k.GetReservePoolName(soldCoin.Denom, boughtDenom)
 	if err != nil {
 		panic(err)
 	}
-	reservePool, found := k.GetExchange(ctx, exchangeName)
+	reservePool, found := k.GetReservePool(ctx, reservePoolName)
 	if !found {
-		panic(fmt.Sprintf("reserve pool for %s not found", exchangeName))
+		panic(fmt.Sprintf("reserve pool for %s not found", reservePoolName))
 	}
 	inputBalance := reservePool.AmountOf(soldCoin.Denom)
 	outputBalance := reservePool.AmountOf(boughtDenom)
@@ -51,13 +49,13 @@ func (k Keeper) GetInputPrice(ctx sdk.Context, soldCoin sdk.Coin, boughtDenom st
 // https://github.com/runtimeverification/verified-smart-contracts/blob/uniswap/uniswap/x-y-k.pdf
 // TODO: continue using numerator/denominator -> open issue for eventually changing to sdk.Dec
 func (k Keeper) GetOutputPrice(ctx sdk.Context, boughtCoin sdk.Coin, soldDenom string) sdk.Int {
-	exchangeName, err := k.GetExchangeName(boughtCoin.Denom, soldDenom)
+	reservePoolName, err := k.GetReservePoolName(boughtCoin.Denom, soldDenom)
 	if err != nil {
 		panic(err)
 	}
-	reservePool, found := k.GetExchange(ctx, exchangeName)
+	reservePool, found := k.GetReservePool(ctx, reservePoolName)
 	if !found {
-		panic(fmt.Sprintf("reserve pool for %s not found", exchangeName))
+		panic(fmt.Sprintf("reserve pool for %s not found", reservePoolName))
 	}
 	inputBalance := reservePool.AmountOf(boughtCoin.Denom)
 	outputBalance := reservePool.AmountOf(soldDenom)
@@ -73,21 +71,29 @@ func (k Keeper) IsDoubleSwap(ctx sdk.Context, denom1, denom2 string) bool {
 	return denom1 != sdk.IrisAtto && denom2 != sdk.IrisAtto
 }
 
-// GetExchangeName returns the ModuleAccount name for the provided denominations.
-// The module name is in the format of 'swap:denom:denom' where the denominations
-// are sorted alphabetically.
-func (k Keeper) GetExchangeName(denom1, denom2 string) (string, sdk.Error) {
-	switch strings.Compare(denom1, denom2) {
-	case -1:
-		return "swap:" + denom1 + ":" + denom2, nil
-	case 1:
-		return "swap:" + denom2 + ":" + denom1, nil
-	default:
-		return "", types.ErrEqualDenom("denomnations for forming module name are equal")
+// GetReservePoolName returns the reserve pool name for the provided denominations.
+// The reserve pool name is in the format of 's-denom' which the denomination
+// is not iris-atto.
+func (k Keeper) GetReservePoolName(denom1, denom2 string) (string, sdk.Error) {
+	if denom1 == denom2 {
+		return "", types.ErrEqualDenom("denomnations for forming reserve pool name are equal")
+	}
+
+	if denom1 != sdk.IrisAtto && denom2 != sdk.IrisAtto {
+		return "", types.ErrIllegalDenom(fmt.Sprintf("illegal denomnations for forming reserve pool name, must have one native denom: %s", sdk.IrisAtto))
+	}
+
+	if denom1 != sdk.IrisAtto {
+		return k.GetUniDenom(denom1)
+	} else {
+		return k.GetUniDenom(denom2)
 	}
 }
 
-//TODO
-func (k Keeper) GetLiquidityDenom(tokenId string) string {
-	return fmt.Sprintf("s-%s", tokenId)
+// GetUniDenom returns the liquidity token denom, which is the same as the reserve pool name
+func (k Keeper) GetUniDenom(denom string) (string, sdk.Error) {
+	if denom == sdk.IrisAtto {
+		return "", types.ErrIllegalDenom("illegal denomnation for forming liquidity token denom")
+	}
+	return fmt.Sprintf("s-%s", denom), nil
 }

@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	exchangeName = "swap:iris:btc"
+	reservePoolName = "swap:iris:btc"
 )
 
 // test that the module account gets created with an initial
@@ -17,17 +17,17 @@ const (
 func TestCreateReservePool(t *testing.T) {
 	ctx, keeper, _ := createTestInput(t, sdk.NewInt(0), 0)
 
-	poolAcc := getExchangeAddr(exchangeName)
+	poolAcc := getReservePoolAddr(reservePoolName)
 	moduleAcc := keeper.ak.GetAccount(ctx, poolAcc)
 	require.Nil(t, moduleAcc)
 
-	keeper.CreateExchange(ctx, exchangeName)
+	keeper.CreateReservePool(ctx, reservePoolName)
 	moduleAcc = keeper.ak.GetAccount(ctx, poolAcc)
 	require.NotNil(t, moduleAcc)
 	require.Equal(t, true, moduleAcc.GetCoins().Empty(), "module account has non zero balance after creation")
 
 	// attempt to recreate existing ModuleAccount
-	require.Panics(t, func() { keeper.CreateExchange(ctx, exchangeName) })
+	require.Panics(t, func() { keeper.CreateReservePool(ctx, reservePoolName) })
 }
 
 // test that the params can be properly set and retrieved
@@ -55,17 +55,17 @@ func TestGetReservePool(t *testing.T) {
 	amt := sdk.NewInt(100)
 	ctx, keeper, accs := createTestInput(t, amt, 1)
 
-	poolAcc := getExchangeAddr(exchangeName)
-	reservePool, found := keeper.GetExchange(ctx, exchangeName)
+	poolAcc := getReservePoolAddr(reservePoolName)
+	reservePool, found := keeper.GetReservePool(ctx, reservePoolName)
 	require.False(t, found)
 
-	keeper.CreateExchange(ctx, exchangeName)
-	reservePool, found = keeper.GetExchange(ctx, exchangeName)
+	keeper.CreateReservePool(ctx, reservePoolName)
+	reservePool, found = keeper.GetReservePool(ctx, reservePoolName)
 	require.True(t, found)
 
 	keeper.bk.SendCoins(ctx, accs[0].GetAddress(), poolAcc, sdk.Coins{sdk.NewCoin(sdk.IrisAtto, amt)})
-	reservePool, found = keeper.GetExchange(ctx, exchangeName)
-	reservePool, found = keeper.GetExchange(ctx, exchangeName)
+	reservePool, found = keeper.GetReservePool(ctx, reservePoolName)
+	reservePool, found = keeper.GetReservePool(ctx, reservePoolName)
 	require.True(t, found)
 	require.Equal(t, amt, reservePool.AmountOf(sdk.IrisAtto))
 }
@@ -74,7 +74,7 @@ func TestGetReservePool(t *testing.T) {
 //	ctx, keeper, accs := createTestInput(t, sdk.NewInt(1000), 1)
 //
 //	liquidityName := "swap:btc:iris-atto"
-//	poolAddr := getExchangeAddr(liquidityName)
+//	poolAddr := getReservePoolAddr(liquidityName)
 //
 //	// init liquidity
 //	msgAdd := types.NewMsgAddLiquidity(sdk.Coin{Denom: "btc", Amount: sdk.NewInt(1)},
