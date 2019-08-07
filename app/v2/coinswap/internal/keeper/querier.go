@@ -33,11 +33,11 @@ func queryLiquidity(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, s
 		return nil, sdk.ErrUnknownRequest(sdk.AppendMsgToErr("incorrectly formatted request data", err.Error()))
 	}
 
-	exchangeName, err := k.GetExchangeName(sdk.IrisAtto, denom)
+	reservePoolName, err := k.GetReservePoolName(sdk.IrisAtto, denom)
 	if err != nil {
 		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not retrieve module name", err.Error()))
 	}
-	reservePool, found := k.GetExchange(ctx, exchangeName)
+	reservePool, found := k.GetReservePool(ctx, reservePoolName)
 	if !found {
 		return nil, sdk.ErrInternal("reserve pool does not exist")
 	}
