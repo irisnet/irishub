@@ -113,20 +113,11 @@ func (k Keeper) CheckUniDenom(uniDenom string) sdk.Error {
 	return nil
 }
 
-// NewEmptyReservePool returns a new empty reserve pool
-func (k Keeper) NewEmptyReservePool(uniDenom string) (sdk.Coins, sdk.Error) {
-	tokenDenom, err := k.getTokenDenom(uniDenom)
-	if err != nil {
-		return nil, err
-	}
-
-	// sdk.NewCoins will remove the zero coins, which we do not expect here
-	return sdk.Coins{sdk.NewCoin(sdk.IrisAtto, sdk.ZeroInt()), sdk.NewCoin(tokenDenom, sdk.ZeroInt()), sdk.NewCoin(uniDenom, sdk.ZeroInt())}, nil
-}
-
-
 // CleanReservePool remove non-pool coins
 func (k Keeper) CleanReservePool(reservePool sdk.Coins, uniDenom string) (sdk.Coins, sdk.Error) {
+	if reservePool == nil {
+		return sdk.Coins{}, nil
+	}
 	tokenDenom, err := k.getTokenDenom(uniDenom)
 	if err != nil {
 		return nil, err

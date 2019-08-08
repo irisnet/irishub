@@ -42,21 +42,7 @@ func queryLiquidity(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, s
 	if err != nil {
 		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not retrieve reserve pool name", err.Error()))
 	}
-	reservePool, found := k.GetReservePool(ctx, reservePoolName)
-	if !found {
-		// return empty pool if the reserve pool does not exist
-		reservePool, err := k.NewEmptyReservePool(reservePoolName)
-		if err != nil {
-			return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not retrieve reserve pool name", err.Error()))
-		}
-
-		bz, err1 := k.cdc.MarshalJSONIndent(reservePool, "", "")
-		if err1 != nil {
-			return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", err.Error()))
-		}
-		return bz, nil
-	}
-
+	reservePool, _ := k.GetReservePool(ctx, reservePoolName)
 	// clean reserve pool to remove non-pool coins
 	cleanedReservePool, err := k.CleanReservePool(reservePool, reservePoolName)
 	bz, err := k.cdc.MarshalJSONIndent(cleanedReservePool, "", " ")
