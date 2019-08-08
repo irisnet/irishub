@@ -133,7 +133,7 @@ func TestGetOutputPrice(t *testing.T) {
 	}
 }
 
-func TestSwapByInput(t *testing.T) {
+func TestKeeperSwap(t *testing.T) {
 	ctx, keeper, accs := createTestInput(t, sdk.NewInt(100000000), 1)
 	sender := accs[0].GetAddress()
 	denom1 := "btc-min"
@@ -155,11 +155,12 @@ func TestSwapByInput(t *testing.T) {
 	senderBlances := keeper.bk.GetCoins(ctx, sender)
 	require.Equal(t, "99999000btc-min,99999000iris-atto,1000s-btc-min", senderBlances.String())
 
-	exactSoldCoin := sdk.NewCoin("btc-min", sdk.NewInt(100))
-	minExpect := sdk.NewCoin(sdk.IrisAtto, sdk.NewInt(1))
-	reward, err := keeper.SwapByInput(ctx, exactSoldCoin, minExpect, accs[0].GetAddress(), nil)
+	input := sdk.NewCoin("btc-min", sdk.NewInt(100))
+	output := sdk.NewCoin(sdk.IrisAtto, sdk.NewInt(1))
+	deadline1 := time.Now().Add(1 * time.Minute)
+	msg1 := types.NewMsgSwapOrder(input, output, deadline1, sender, nil, false)
+	_, err = keeper.Swap(ctx, msg1)
 	require.Nil(t, err)
-	require.Equal(t, sdk.NewInt(90), reward)
 
 	reservePoolBalances = keeper.bk.GetCoins(ctx, reservePoolAddr)
 	require.Equal(t, "1100btc-min,910iris-atto,1000s-btc-min", reservePoolBalances.String())
