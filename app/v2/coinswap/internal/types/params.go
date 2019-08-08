@@ -29,23 +29,6 @@ func NewParams(fee sdk.Rat) Params {
 	}
 }
 
-// FeeParam defines the numerator and denominator used in calculating the
-// amount to be reserved as a liquidity fee.
-// TODO: come up with a more descriptive name than Numerator/Denominator
-// Fee = 1 - (Numerator / Denominator) TODO: move this to spec
-type FeeParam struct {
-	Numerator   sdk.Int `json:"fee_numerator"`
-	Denominator sdk.Int `json:"fee_denominator"`
-}
-
-// NewFeeParam coinswap fee param constructor
-func NewFeeParam(numerator, denominator sdk.Int) FeeParam {
-	return FeeParam{
-		Numerator:   numerator,
-		Denominator: denominator,
-	}
-}
-
 // ParamTypeTable returns the TypeTable for coinswap module
 func ParamTypeTable() params.TypeTable {
 	return params.NewTypeTable().RegisterParamSet(&Params{})
@@ -93,9 +76,9 @@ func (p *Params) ReadOnly() bool {
 
 // DefaultParams returns the default coinswap module parameters
 func DefaultParams() Params {
-	feeParam := sdk.NewRat(3, 1000)
+	fee := sdk.NewRat(3, 1000)
 	return Params{
-		Fee: sdk.OneRat().Sub(feeParam),
+		Fee: fee,
 	}
 }
 

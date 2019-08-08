@@ -75,9 +75,9 @@ func (k Keeper) GetPriceByInput(ctx sdk.Context, exactSoldCoin sdk.Coin, boughtT
 	if !outputReserve.IsPositive() {
 		return sdk.ZeroInt(), types.ErrInsufficientFunds(fmt.Sprintf("the bought token is insufficient in the reserve Pool"))
 	}
-	fee := k.GetFeeParam(ctx)
+	param := k.GetFeeParam(ctx)
 
-	boughtTokenAmt := GetInputPrice(exactSoldCoin.Amount, inputReserve, outputReserve, fee)
+	boughtTokenAmt := GetInputPrice(exactSoldCoin.Amount, inputReserve, outputReserve, param.Fee)
 	return boughtTokenAmt, nil
 }
 
@@ -168,9 +168,9 @@ func (k Keeper) GetPriceByOutput(ctx sdk.Context, exactBoughtCoin sdk.Coin, sold
 	if !outputReserve.IsPositive() {
 		return sdk.ZeroInt(), types.ErrInsufficientFunds(fmt.Sprintf("the bought token is insufficient in the reserve Pool"))
 	}
-	fee := k.GetFeeParam(ctx)
+	param := k.GetFeeParam(ctx)
 
-	soldTokenAmt := GetOutputPrice(exactBoughtCoin.Amount, inputReserve, outputReserve, fee)
+	soldTokenAmt := GetOutputPrice(exactBoughtCoin.Amount, inputReserve, outputReserve, param.Fee)
 	return soldTokenAmt, nil
 }
 
@@ -273,17 +273,19 @@ func (k Keeper) GetUniDenom(denom string) (string, sdk.Error) {
 // GetInputPrice returns the amount of coins bought (calculated) given the input amount being sold (exact)
 // The fee is included in the input coins being bought
 // https://github.com/runtimeverification/verified-smart-contracts/blob/uniswap/uniswap/x-y-k.pdf
-func GetInputPrice(inputAmt, inputReserve, outputReserve sdk.Int, fee types.FeeParam) sdk.Int {
-	inputAmtWithFee := inputAmt.Mul(fee.Numerator)
+func GetInputPrice(inputAmt, inputReserve, outputReserve sdk.Int, fee sdk.Rat) sdk.Int {
+	deltaFee := sdk.OneRat().Sub(fee)
+	inputAmtWithFee := inputAmt.Mul(deltaFee.Num())
 	numerator := inputAmtWithFee.Mul(outputReserve)
-	denominator := inputReserve.Mul(fee.Denominator).Add(inputAmtWithFee)
+	denominator := inputReserve.Mul(deltaFee.Denom()).Add(inputAmtWithFee)
 	return numerator.Div(denominator)
 }
 
 // GetOutputPrice returns the amount of coins sold (calculated) given the output amount being bought (exact)
 // The fee is included in the output coins being bought
-func GetOutputPrice(outputAmt, inputReserve, outputReserve sdk.Int, fee types.FeeParam) sdk.Int {
-	numerator := inputReserve.Mul(outputAmt).Mul(fee.Denominator)
-	denominator := (outputReserve.Sub(outputAmt)).Mul(fee.Numerator)
+func GetOutputPrice(outputAmt, inputReserve, outputReserve sdk.Int, fee sdk.Rat) sdk.Int {
+	deltaFee := sdk.OneRat().Sub(fee)
+	numerator := inputReserve.Mul(outputAmt).Mul(deltaFee.Denom())
+	denominator := (outputReserve.Sub(outputAmt)).Mul(deltaFee.Num())
 	return numerator.Div(denominator).Add(sdk.OneInt())
 }

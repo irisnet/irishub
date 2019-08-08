@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"github.com/irisnet/irishub/app/v2/coinswap/internal/types"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -63,11 +64,21 @@ func TestGetReservePoolName(t *testing.T) {
 }
 
 func TestGetInputPrice(t *testing.T) {
-
+	inputAmt := sdk.NewInt(100)
+	inputReserve := sdk.NewInt(1000)
+	outputReserve := sdk.NewInt(1000)
+	fee := types.DefaultParams().Fee // fee=0.003
+	amount := GetInputPrice(inputAmt, inputReserve, outputReserve, fee)
+	require.Equal(t, "90", amount.String())
 }
 
 func TestGetOutputPrice(t *testing.T) {
-
+	inputAmt := sdk.NewInt(100)
+	inputReserve := sdk.NewInt(1000)
+	outputReserve := sdk.NewInt(1000)
+	fee := types.DefaultParams().Fee // fee=0.003
+	amount := GetOutputPrice(inputAmt, inputReserve, outputReserve, fee)
+	require.Equal(t, "90", amount.String())
 }
 
 func TestSwapByInput(t *testing.T) {
