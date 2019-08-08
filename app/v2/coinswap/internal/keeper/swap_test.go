@@ -2,8 +2,10 @@ package keeper
 
 import (
 	"fmt"
+	"github.com/irisnet/irishub/app/v2/coinswap/internal/types"
 	"github.com/stretchr/testify/require"
 	"testing"
+	"time"
 
 	sdk "github.com/irisnet/irishub/types"
 )
@@ -131,25 +133,36 @@ func TestGetOutputPrice(t *testing.T) {
 	}
 }
 
-//func TestSwapByInput(t *testing.T) {
-//	ctx, keeper, accs := createTestInput(t, sdk.NewInt(100000000), 1)
-//	sender := accs[0].GetAddress()
-//
-//	depositCoin := sdk.NewCoin("btc-min",sdk.NewInt(1000))
-//	depositAmount := sdk.NewInt(1000)
-//	minReward := sdk.NewInt(1)
-//	deadline := time.Now().Add(1 * time.Minute)
-//	msg := types.NewMsgAddLiquidity(depositCoin,depositAmount,minReward,deadline,sender)
-//	err := keeper.AddLiquidity(ctx,msg)
-//	require.Nil(t,err)
-//
-//	exactSoldCoin := sdk.NewCoin("btc-min",sdk.NewInt(100))
-//	minExpect := sdk.NewCoin(sdk.IrisAtto,sdk.NewInt(100))
-//	reward,err := keeper.SwapByInput(ctx,exactSoldCoin,minExpect,accs[0].GetAddress(),nil)
-//	require.Nil(t,err)
-//	require.Equal(t,sdk.NewInt(90),reward)
-//}
-//
-//func TestSwapByOutput(t *testing.T) {
-//
-//}
+func TestSwapByInput(t *testing.T) {
+	ctx, keeper, accs := createTestInput(t, sdk.NewInt(100000000), 1)
+	sender := accs[0].GetAddress()
+	denom1 := "btc-min"
+	denom2 := sdk.IrisAtto
+	reservePoolName, _ := keeper.GetReservePoolName(denom1, denom2)
+	reservePoolAddr := getReservePoolAddr(reservePoolName)
+
+	depositCoin := sdk.NewCoin("btc-min", sdk.NewInt(1000))
+	depositAmount := sdk.NewInt(1000)
+	minReward := sdk.NewInt(1)
+	deadline := time.Now().Add(1 * time.Minute)
+	msg := types.NewMsgAddLiquidity(depositCoin, depositAmount, minReward, deadline, sender)
+	err := keeper.AddLiquidity(ctx, msg)
+
+	//assert
+	require.Nil(t, err)
+	reservePoolBalances := keeper.bk.GetCoins(ctx, reservePoolAddr)
+	require.Equal(t, "1000btc-min,1000iris-atto,1000s-btc-min", reservePoolBalances.String())
+	senderBlances := keeper.bk.GetCoins(ctx, sender)
+	require.Equal(t, "99999000btc-min,99999000iris-atto,1000s-btc-min", senderBlances.String())
+
+	exactSoldCoin := sdk.NewCoin("btc-min", sdk.NewInt(100))
+	minExpect := sdk.NewCoin(sdk.IrisAtto, sdk.NewInt(1))
+	reward, err := keeper.SwapByInput(ctx, exactSoldCoin, minExpect, accs[0].GetAddress(), nil)
+	require.Nil(t, err)
+	require.Equal(t, sdk.NewInt(90), reward)
+
+	reservePoolBalances = keeper.bk.GetCoins(ctx, reservePoolAddr)
+	require.Equal(t, "1100btc-min,910iris-atto,1000s-btc-min", reservePoolBalances.String())
+	senderBlances = keeper.bk.GetCoins(ctx, sender)
+	require.Equal(t, "99998900btc-min,99999090iris-atto,1000s-btc-min", senderBlances.String())
+}

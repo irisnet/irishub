@@ -255,17 +255,9 @@ func (k Keeper) GetReservePoolName(denom1, denom2 string) (string, sdk.Error) {
 		return "", types.ErrIllegalDenom(fmt.Sprintf("illegal denomnations for forming reserve pool name, must have one native denom: %s", sdk.IrisAtto))
 	}
 
+	var denom = denom2
 	if denom1 != sdk.IrisAtto {
-		return k.GetUniDenom(denom1)
-	} else {
-		return k.GetUniDenom(denom2)
-	}
-}
-
-// GetUniDenom returns the liquidity token denom, which is the same as the reserve pool name
-func (k Keeper) GetUniDenom(denom string) (string, sdk.Error) {
-	if denom == sdk.IrisAtto {
-		return "", types.ErrIllegalDenom("illegal denomnation for forming liquidity token denom")
+		denom = denom1
 	}
 	return fmt.Sprintf("s-%s", denom), nil
 }
