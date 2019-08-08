@@ -6,11 +6,12 @@ import (
 )
 
 type (
-	Keeper             = keeper.Keeper
-	MsgSwapOrder       = types.MsgSwapOrder
-	MsgAddLiquidity    = types.MsgAddLiquidity
-	MsgRemoveLiquidity = types.MsgRemoveLiquidity
-	Params             = types.Params
+	Keeper               = keeper.Keeper
+	MsgSwapOrder         = types.MsgSwapOrder
+	MsgAddLiquidity      = types.MsgAddLiquidity
+	MsgRemoveLiquidity   = types.MsgRemoveLiquidity
+	Params               = types.Params
+	QueryLiquidityParams = types.QueryLiquidityParams
 )
 
 var (
@@ -23,7 +24,10 @@ var (
 	ErrConstraintNotMet = types.ErrConstraintNotMet
 	RegisterCodec       = types.RegisterCodec
 	NewKeeper           = keeper.NewKeeper
+	NewQuerier          = keeper.NewQuerier
 	DefaultParamSpace   = types.DefaultParamSpace
+
+	QueryLiquidity = types.QueryLiquidity
 )
 
 const (

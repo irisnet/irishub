@@ -10,3 +10,8 @@ const (
 	// ParamNativeDenom native denom query endpoint supported by the coinswap querier
 	ParamNativeDenom = "nativeDenom"
 )
+
+// QueryLiquidityParams is the query parameters for 'custom/swap/liquidity/{id}'
+type QueryLiquidityParams struct {
+	TokenId string
+}

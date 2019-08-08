@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/irisnet/irishub/app/v2/coinswap/internal/types"
 	sdk "github.com/irisnet/irishub/types"
+	"strings"
 )
 
 func (k Keeper) SwapCoins(ctx sdk.Context, sender sdk.AccAddress, coinSold, coinBought sdk.Coin) error {
@@ -22,7 +23,7 @@ func (k Keeper) SwapCoins(ctx sdk.Context, sender sdk.AccAddress, coinSold, coin
 }
 
 // GetInputPrice returns the amount of coins bought (calculated) given the input amount being sold (exact)
-// The fee is included in the input coins being bought
+// The fee is included in the input coins being sold
 // https://github.com/runtimeverification/verified-smart-contracts/blob/uniswap/uniswap/x-y-k.pdf
 // TODO: continue using numerator/denominator -> open issue for eventually changing to sdk.Dec
 func (k Keeper) GetInputPrice(ctx sdk.Context, soldCoin sdk.Coin, boughtDenom string) sdk.Int {
@@ -96,4 +97,40 @@ func (k Keeper) GetUniDenom(denom string) (string, sdk.Error) {
 		return "", types.ErrIllegalDenom("illegal denomnation for forming liquidity token denom")
 	}
 	return fmt.Sprintf("s-%s", denom), nil
+}
+
+// GetTokenDenom returns the token denom by uni denom
+func (k Keeper) getTokenDenom(uniDenom string) (string, sdk.Error) {
+	k.CheckUniDenom(uniDenom)
+	return strings.TrimPrefix(uniDenom, "s-"), nil
+}
+
+// CheckUniDenom returns nil if the uni denom is valid
+func (k Keeper) CheckUniDenom(uniDenom string) sdk.Error {
+	if !strings.HasPrefix(uniDenom, "s-") {
+		return types.ErrIllegalDenom("illegal uni denomnation")
+	}
+	return nil
+}
+
+// NewEmptyReservePool returns a new empty reserve pool
+func (k Keeper) NewEmptyReservePool(uniDenom string) (sdk.Coins, sdk.Error) {
+	tokenDenom, err := k.getTokenDenom(uniDenom)
+	if err != nil {
+		return nil, err
+	}
+
+	// sdk.NewCoins will remove the zero coins, which we do not expect here
+	return sdk.Coins{sdk.NewCoin(sdk.IrisAtto, sdk.ZeroInt()), sdk.NewCoin(tokenDenom, sdk.ZeroInt()), sdk.NewCoin(uniDenom, sdk.ZeroInt())}, nil
+}
+
+
+// CleanReservePool remove non-pool coins
+func (k Keeper) CleanReservePool(reservePool sdk.Coins, uniDenom string) (sdk.Coins, sdk.Error) {
+	tokenDenom, err := k.getTokenDenom(uniDenom)
+	if err != nil {
+		return nil, err
+	}
+
+	return sdk.NewCoins(sdk.NewCoin(sdk.IrisAtto, reservePool.AmountOf(sdk.IrisAtto)), sdk.NewCoin(tokenDenom, reservePool.AmountOf(tokenDenom)), sdk.NewCoin(uniDenom, reservePool.AmountOf(uniDenom))), nil
 }

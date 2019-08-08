@@ -27,22 +27,39 @@ func NewQuerier(k Keeper) sdk.Querier {
 // queryLiquidity returns the total liquidity available for the provided denomination
 // upon success or an error if the query fails.
 func queryLiquidity(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sdk.Error) {
-	var denom string
-	err := k.cdc.UnmarshalJSON(req.Data, &denom)
+	var params types.QueryLiquidityParams
+	err := k.cdc.UnmarshalJSON(req.Data, &params)
 	if err != nil {
 		return nil, sdk.ErrUnknownRequest(sdk.AppendMsgToErr("incorrectly formatted request data", err.Error()))
 	}
 
+	denom, err := sdk.GetCoinMinDenom(params.TokenId)
+	if err != nil {
+		return nil, sdk.ErrUnknownRequest(sdk.AppendMsgToErr("illegal token id", err.Error()))
+	}
+
 	reservePoolName, err := k.GetReservePoolName(sdk.IrisAtto, denom)
 	if err != nil {
-		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not retrieve module name", err.Error()))
+		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not retrieve reserve pool name", err.Error()))
 	}
 	reservePool, found := k.GetReservePool(ctx, reservePoolName)
 	if !found {
-		return nil, sdk.ErrInternal("reserve pool does not exist")
+		// return empty pool if the reserve pool does not exist
+		reservePool, err := k.NewEmptyReservePool(reservePoolName)
+		if err != nil {
+			return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not retrieve reserve pool name", err.Error()))
+		}
+
+		bz, err1 := k.cdc.MarshalJSONIndent(reservePool, "", "")
+		if err1 != nil {
+			return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", err.Error()))
+		}
+		return bz, nil
 	}
 
-	bz, err := k.cdc.MarshalJSONIndent(reservePool.AmountOf(denom), "", " ")
+	// clean reserve pool to remove non-pool coins
+	cleanedReservePool, err := k.CleanReservePool(reservePool, reservePoolName)
+	bz, err := k.cdc.MarshalJSONIndent(cleanedReservePool, "", " ")
 	if err != nil {
 		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", err.Error()))
 	}
