@@ -6,6 +6,8 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 )
 
+type HandlerFun func(ctx sdk.Context, input, output sdk.Coin, sender, receipt sdk.AccAddress) (sdk.Int, sdk.Error)
+
 func (k Keeper) SwapCoins(ctx sdk.Context, sender, recipient sdk.AccAddress, coinSold, coinBought sdk.Coin) sdk.Error {
 	if !k.bk.HasCoins(ctx, sender, sdk.NewCoins(coinSold)) {
 		return sdk.ErrInsufficientCoins(fmt.Sprintf("sender account does not have sufficient amount of %s to fulfill the swap order", coinSold.Denom))
@@ -26,6 +28,27 @@ func (k Keeper) SwapCoins(ctx sdk.Context, sender, recipient sdk.AccAddress, coi
 	}
 	err = k.ReceiveCoins(ctx, recipient, reservePoolName, sdk.NewCoins(coinBought))
 	return err
+}
+
+func (k Keeper) GetHandler(msg types.MsgSwapOrder) HandlerFun {
+	var handlerMap = map[bool]map[bool]HandlerFun{
+		// BuyOrder
+		true: map[bool]HandlerFun{
+			// Double swap
+			true: k.SwapDoubleByOutput,
+			// Single swap
+			false: k.SwapByOutput,
+		},
+		// SellOrder
+		false: map[bool]HandlerFun{
+			// Double swap
+			true: k.SwapDoubleByInput,
+			// Single swap
+			false: k.SwapByInput,
+		},
+	}
+	hMap := handlerMap[msg.IsBuyOrder]
+	return hMap[k.IsDoubleSwap(msg.Input.Denom, msg.Output.Denom)]
 }
 
 /**
@@ -159,7 +182,7 @@ Purchase a exact amount of another token with a token,one of token denom is iris
 @param receipt : address of  receiver bought Token
 @return : token amount that needs to be spent
 */
-func (k Keeper) SwapByOutput(ctx sdk.Context, exactBoughtCoin, maxExpect sdk.Coin, sender, receipt sdk.AccAddress) (sdk.Int, sdk.Error) {
+func (k Keeper) SwapByOutput(ctx sdk.Context, maxExpect, exactBoughtCoin sdk.Coin, sender, receipt sdk.AccAddress) (sdk.Int, sdk.Error) {
 	soldTokenAmt, err := k.GetPriceByOutput(ctx, exactBoughtCoin, maxExpect.Denom)
 	if err != nil {
 		return sdk.ZeroInt(), err
@@ -185,7 +208,7 @@ Purchase a exact amount of another non-iris token with a non-iris token
 @param receipt : address of  receiver bought Token
 @return : token amount that needs to be spent
 */
-func (k Keeper) SwapDoubleByOutput(ctx sdk.Context, exactBoughtCoin, maxExpect sdk.Coin, sender, receipt sdk.AccAddress) (sdk.Int, sdk.Error) {
+func (k Keeper) SwapDoubleByOutput(ctx sdk.Context, maxExpect, exactBoughtCoin sdk.Coin, sender, receipt sdk.AccAddress) (sdk.Int, sdk.Error) {
 	soldIrisAmount, err := k.GetPriceByOutput(ctx, exactBoughtCoin, sdk.IrisAtto)
 	if err != nil {
 		return sdk.ZeroInt(), err

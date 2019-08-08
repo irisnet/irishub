@@ -47,39 +47,12 @@ func (k Keeper) CreateReservePool(ctx sdk.Context, reservePoolName string) {
 
 func (k Keeper) Swap(ctx sdk.Context, msg types.MsgSwapOrder) (sdk.Tags, sdk.Error) {
 	tags := sdk.EmptyTags()
-	doubleSwap := k.IsDoubleSwap(msg.Input.Denom, msg.Output.Denom)
-	// if buy order
-	if msg.IsBuyOrder {
-		if doubleSwap {
-			soldTokenAmt, err := k.SwapDoubleByOutput(ctx, msg.Output, msg.Input, msg.Sender, msg.Recipient)
-			if err != nil {
-				return nil, err
-			}
-			tags.AppendTag(types.TagSoldTokenAmount, []byte(soldTokenAmt.String()))
-			return tags, nil
-		}
-		soldTokenAmt, err := k.SwapByOutput(ctx, msg.Output, msg.Input, msg.Sender, msg.Recipient)
-		if err != nil {
-			return nil, err
-		}
-		tags.AppendTag(types.TagSoldTokenAmount, []byte(soldTokenAmt.String()))
-		return tags, nil
-	}
-
-	// if sell order
-	if doubleSwap {
-		boughtAmt, err := k.SwapDoubleByInput(ctx, msg.Input, msg.Output, msg.Sender, msg.Recipient)
-		if err != nil {
-			return nil, err
-		}
-		tags.AppendTag(types.TagBoughtTokenAmount, []byte(boughtAmt.String()))
-		return tags, nil
-	}
-	boughtAmt, err := k.SwapByInput(ctx, msg.Input, msg.Output, msg.Sender, msg.Recipient)
+	handler := k.GetHandler(msg)
+	amount, err := handler(ctx, msg.Input, msg.Output, msg.Sender, msg.Recipient)
 	if err != nil {
 		return nil, err
 	}
-	tags.AppendTag(types.TagBoughtTokenAmount, []byte(boughtAmt.String()))
+	tags.AppendTag(types.TagAmount, []byte(amount.String()))
 	return tags, nil
 }
 

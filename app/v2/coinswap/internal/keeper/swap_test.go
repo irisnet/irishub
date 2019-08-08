@@ -13,7 +13,7 @@ var (
 )
 
 func TestIsDoubleSwap(t *testing.T) {
-	ctx, keeper, _ := createTestInput(t, sdk.NewInt(0), 0)
+	_, keeper, _ := createTestInput(t, sdk.NewInt(0), 0)
 
 	cases := []struct {
 		name         string
@@ -60,4 +60,20 @@ func TestGetReservePoolName(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestGetInputPrice(t *testing.T) {
+
+}
+
+func TestGetOutputPrice(t *testing.T) {
+
+}
+
+func TestSwapByInput(t *testing.T) {
+
+}
+
+func TestSwapByOutput(t *testing.T) {
+
 }

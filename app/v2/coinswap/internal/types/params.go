@@ -93,9 +93,9 @@ func (p *Params) ReadOnly() bool {
 
 // DefaultParams returns the default coinswap module parameters
 func DefaultParams() Params {
-	feeParam := sdk.NewRat(997, 1000)
+	feeParam := sdk.NewRat(3, 1000)
 	return Params{
-		Fee: feeParam,
+		Fee: sdk.OneRat().Sub(feeParam),
 	}
 }
 
