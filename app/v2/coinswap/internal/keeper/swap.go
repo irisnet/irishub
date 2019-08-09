@@ -75,7 +75,7 @@ func (k Keeper) GetPriceByInput(ctx sdk.Context, exactSoldCoin sdk.Coin, boughtT
 	if !outputReserve.IsPositive() {
 		return sdk.ZeroInt(), types.ErrInsufficientFunds(fmt.Sprintf("insufficient funds,actual:%s", outputReserve.String()))
 	}
-	param := k.GetFeeParam(ctx)
+	param := k.GetParams(ctx)
 
 	boughtTokenAmt := GetInputPrice(exactSoldCoin.Amount, inputReserve, outputReserve, param.Fee)
 	return boughtTokenAmt, nil
@@ -171,7 +171,7 @@ func (k Keeper) GetPriceByOutput(ctx sdk.Context, exactBoughtCoin sdk.Coin, sold
 	if exactBoughtCoin.Amount.GTE(outputReserve) {
 		return sdk.ZeroInt(), types.ErrInsufficientFunds(fmt.Sprintf("insufficient funds,want:%s,actual:%s", exactBoughtCoin.String(), outputReserve.String()))
 	}
-	param := k.GetFeeParam(ctx)
+	param := k.GetParams(ctx)
 
 	soldTokenAmt := GetOutputPrice(exactBoughtCoin.Amount, inputReserve, outputReserve, param.Fee)
 	return soldTokenAmt, nil
