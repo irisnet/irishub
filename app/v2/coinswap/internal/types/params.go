@@ -55,7 +55,16 @@ func (p *Params) KeyValuePairs() params.KeyValuePairs {
 
 // Validate Implements params.Validate
 func (p *Params) Validate(key string, value string) (interface{}, sdk.Error) {
-	switch key {
+	switch []byte(key) {
+	case feeKey:
+		fee, err := sdk.NewRatFromDecimal(value, 4)
+		if err != nil {
+			return nil, err
+		}
+		if err := validateFee(fee); err != nil {
+			return nil, err
+		}
+		return fee, nil
 	default:
 		return nil, sdk.NewError(params.DefaultCodespace, params.CodeInvalidKey, fmt.Sprintf("%s is not found", key))
 	}
@@ -84,12 +93,16 @@ func DefaultParams() Params {
 
 // ValidateParams validates a set of params
 func ValidateParams(p Params) error {
-	if !p.Fee.GT(sdk.ZeroRat()) {
-		return fmt.Errorf("fee is not positive: %s", p.Fee.String())
+	return validateFee(p.Fee)
+}
+
+func validateFee(fee sdk.Rat) sdk.Error {
+	if !fee.GT(sdk.ZeroRat()) {
+		return sdk.ParseParamsErr(fmt.Errorf("fee is not positive: %s", fee.String()))
 	}
 
-	if !p.Fee.LT(sdk.OneRat()) {
-		return fmt.Errorf("fee must be less than 1: %s", p.Fee.String())
+	if !fee.LT(sdk.OneRat()) {
+		return sdk.ParseParamsErr(fmt.Errorf("fee must be less than 1: %s", fee.String()))
 	}
 	return nil
 }
