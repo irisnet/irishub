@@ -57,7 +57,7 @@ func (p *Params) KeyValuePairs() params.KeyValuePairs {
 func (p *Params) Validate(key string, value string) (interface{}, sdk.Error) {
 	switch key {
 	case string(feeKey):
-		fee, err := sdk.NewRatFromDecimal(value, 4)
+		fee, err := sdk.NewRatFromDecimal(value, 10)
 		if err != nil {
 			return nil, err
 		}
