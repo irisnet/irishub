@@ -45,55 +45,15 @@ func (k Keeper) CreateReservePool(ctx sdk.Context, reservePoolName string) {
 	k.bk.AddCoins(ctx, reservePoolAccAddr, sdk.Coins{})
 }
 
-func (k Keeper) SwapOrder(ctx sdk.Context, msg types.MsgSwapOrder) sdk.Error {
-	var targetAmt sdk.Int
-	doubleSwap := k.IsDoubleSwap(ctx, msg.Input.Denom, msg.Output.Denom)
-
-	if msg.IsBuyOrder {
-		if doubleSwap {
-			nativeAmount := k.GetInputPrice(ctx, msg.Input, sdk.IrisAtto)
-			nativeCoin := sdk.NewCoin(sdk.IrisAtto, nativeAmount)
-
-			targetAmt = k.GetInputPrice(ctx, nativeCoin, msg.Output.Denom)
-			targetCoin := sdk.NewCoin(msg.Output.Denom, targetAmt)
-
-			k.SwapCoins(ctx, msg.Sender, msg.Input, nativeCoin)
-			k.SwapCoins(ctx, msg.Sender, nativeCoin, targetCoin)
-
-		} else {
-			targetAmt = k.GetInputPrice(ctx, msg.Input, msg.Output.Denom)
-			targetCoin := sdk.NewCoin(msg.Output.Denom, targetAmt)
-			k.SwapCoins(ctx, msg.Sender, msg.Input, targetCoin)
-		}
-
-		// assert that the calculated amount is greater than or equal to the
-		// minimum amount the buyer is willing to buy.
-		if targetAmt.LT(msg.Output.Amount) {
-			return types.ErrConstraintNotMet(fmt.Sprintf("minimum amount (%s) to be bought was not met (%s)", targetAmt, msg.Output.Amount))
-		}
-	} else {
-		if doubleSwap {
-			nativeAmount := k.GetOutputPrice(ctx, msg.Output, sdk.IrisAtto)
-			nativeCoin := sdk.NewCoin(sdk.IrisAtto, nativeAmount)
-
-			targetAmt = k.GetOutputPrice(ctx, nativeCoin, msg.Input.Denom)
-			targetCoin := sdk.NewCoin(msg.Input.Denom, targetAmt)
-
-			k.SwapCoins(ctx, msg.Sender, targetCoin, nativeCoin)
-			k.SwapCoins(ctx, msg.Sender, nativeCoin, msg.Output)
-		} else {
-			targetAmt = k.GetOutputPrice(ctx, msg.Output, msg.Input.Denom)
-			targetCoin := sdk.NewCoin(msg.Input.Denom, targetAmt)
-			k.SwapCoins(ctx, msg.Sender, targetCoin, msg.Output)
-		}
-
-		// assert that the calculated amount is greater than the
-		// maximum amount the sender is willing to sell.
-		if targetAmt.GT(msg.Input.Amount) {
-			return types.ErrConstraintNotMet(fmt.Sprintf("maximum amount (%s) to be sold was exceeded (%s)", targetAmt, msg.Input.Amount))
-		}
+func (k Keeper) Swap(ctx sdk.Context, msg types.MsgSwapOrder) (sdk.Tags, sdk.Error) {
+	tags := sdk.EmptyTags()
+	handler := k.GetHandler(msg)
+	amount, err := handler(ctx, msg.Input, msg.Output, msg.Sender, msg.Recipient)
+	if err != nil {
+		return nil, err
 	}
-	return nil
+	tags.AppendTag(types.TagAmount, []byte(amount.String()))
+	return tags, nil
 }
 
 func (k Keeper) AddLiquidity(ctx sdk.Context, msg types.MsgAddLiquidity) sdk.Error {
@@ -125,7 +85,7 @@ func (k Keeper) AddLiquidity(ctx sdk.Context, msg types.MsgAddLiquidity) sdk.Err
 	} else {
 		mintLiquidityAmt = (liquidity.Mul(msg.DepositAmount)).Div(nativeReserveAmt)
 		if mintLiquidityAmt.LT(msg.MinReward) {
-			return types.ErrLessThanMinReward(fmt.Sprintf("liquidity[%s] is less than user 's min reward[%s]", mintLiquidityAmt.String(), msg.MinReward.String()))
+			return types.ErrConstraintNotMet(fmt.Sprintf("liquidity[%s] is less than user 's min reward[%s]", mintLiquidityAmt.String(), msg.MinReward.String()))
 		}
 
 		mod := depositedReserveAmt.Mul(msg.DepositAmount).Mod(nativeReserveAmt)
@@ -137,7 +97,7 @@ func (k Keeper) AddLiquidity(ctx sdk.Context, msg types.MsgAddLiquidity) sdk.Err
 		depositedCoin = sdk.NewCoin(msg.Deposit.Denom, depositAmt)
 
 		if depositAmt.GT(msg.Deposit.Amount) {
-			return types.ErrGreaterThanMaxDeposit(fmt.Sprintf("amount[%s] of token depositd is greater than user 's max deposited amount[%s]", depositedCoin.String(), msg.Deposit.String()))
+			return types.ErrConstraintNotMet(fmt.Sprintf("amount[%s] of token depositd is greater than user 's max deposited amount[%s]", depositedCoin.String(), msg.Deposit.String()))
 		}
 	}
 	if !k.bk.HasCoins(ctx, msg.Sender, sdk.NewCoins(nativeCoin, depositedCoin)) {
@@ -183,10 +143,10 @@ func (k Keeper) RemoveLiquidity(ctx sdk.Context, msg types.MsgRemoveLiquidity) s
 	deltaLiquidityCoin := sdk.NewCoin(reservePoolName, msg.WithdrawAmount)
 
 	if nativeWithdrawCoin.Amount.LT(msg.MinNative) {
-		return types.ErrLessThanMinWithdrawAmount(fmt.Sprintf("The amount of cash available [%s] is less than the minimum amount specified [%s] by the user.", nativeWithdrawCoin.String(), sdk.NewCoin(sdk.IrisAtto, msg.MinNative).String()))
+		return types.ErrConstraintNotMet(fmt.Sprintf("The amount of cash available [%s] is less than the minimum amount specified [%s] by the user.", nativeWithdrawCoin.String(), sdk.NewCoin(sdk.IrisAtto, msg.MinNative).String()))
 	}
 	if depositedWithdrawCoin.Amount.LT(msg.Withdraw.Amount) {
-		return types.ErrLessThanMinWithdrawAmount(fmt.Sprintf("The amount of cash available [%s] is less than the minimum amount specified [%s] by the user.", depositedWithdrawCoin.String(), msg.Withdraw.String()))
+		return types.ErrConstraintNotMet(fmt.Sprintf("The amount of cash available [%s] is less than the minimum amount specified [%s] by the user.", depositedWithdrawCoin.String(), msg.Withdraw.String()))
 	}
 
 	// burn liquidity from reserve Pool
@@ -226,12 +186,8 @@ func (k Keeper) BurnLiquidity(ctx sdk.Context, reservePoolName string, deltaCoin
 // reservePoolName and denomination of the liquidity coins are the same.
 func (k Keeper) MintCoins(ctx sdk.Context, reservePoolName string, amt sdk.Int) sdk.Coins {
 	reservePoolAccAddr := getReservePoolAddr(reservePoolName)
-	uniDenom, err := k.GetUniDenom(reservePoolName)
-	if err != nil {
-		panic(err)
-	}
-	coins := sdk.NewCoins(sdk.NewCoin(uniDenom, amt))
-	_, _, err = k.bk.AddCoins(ctx, reservePoolAccAddr, coins)
+	coins := sdk.NewCoins(sdk.NewCoin(reservePoolName, amt))
+	_, _, err := k.bk.AddCoins(ctx, reservePoolAccAddr, coins)
 	if err != nil {
 		panic(err)
 	}
@@ -239,22 +195,18 @@ func (k Keeper) MintCoins(ctx sdk.Context, reservePoolName string, amt sdk.Int) 
 }
 
 // SendCoin sends coins from the address to the ModuleAccount at reservePoolName.
-func (k Keeper) SendCoins(ctx sdk.Context, addr sdk.AccAddress, reservePoolName string, coins sdk.Coins) {
+func (k Keeper) SendCoins(ctx sdk.Context, addr sdk.AccAddress, reservePoolName string, coins sdk.Coins) sdk.Error {
 	swapPoolAccAddr := getReservePoolAddr(reservePoolName)
 	_, err := k.bk.SendCoins(ctx, addr, swapPoolAccAddr, coins)
-	if err != nil {
-		panic(err)
-	}
+	return err
 }
 
 // RecieveCoin sends coins from the ModuleAccount at reservePoolName to the
 // address provided.
-func (k Keeper) ReceiveCoins(ctx sdk.Context, addr sdk.AccAddress, reservePoolName string, coins sdk.Coins) {
+func (k Keeper) ReceiveCoins(ctx sdk.Context, addr sdk.AccAddress, reservePoolName string, coins sdk.Coins) sdk.Error {
 	swapPoolAccAddr := getReservePoolAddr(reservePoolName)
 	_, err := k.bk.SendCoins(ctx, swapPoolAccAddr, addr, coins)
-	if err != nil {
-		panic(err)
-	}
+	return err
 }
 
 // GetReservePool returns the total balance of an reserve pool at the
@@ -266,12 +218,6 @@ func (k Keeper) GetReservePool(ctx sdk.Context, reservePoolName string) (coins s
 		return nil, false
 	}
 	return acc.GetCoins(), true
-}
-
-// GetFeeParam returns the current FeeParam from the global param store
-func (k Keeper) GetFeeParam(ctx sdk.Context) (feeParam types.FeeParam) {
-	fee := k.GetParams(ctx).Fee
-	return types.NewFeeParam(fee.Num(), fee.Denom())
 }
 
 // GetParams gets the parameters for the coinswap module.
