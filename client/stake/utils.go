@@ -188,8 +188,8 @@ func ConvertValidatorToValidatorOutput(cliCtx context.CLIContext, v stake.Valida
 		ConsPubKey:       bechConsPubkey,
 		Jailed:           v.Jailed,
 		Status:           v.Status,
-		Tokens:           utils.ConvertDecToRat(v.Tokens).Mul(exRate).FloatString(),
-		DelegatorShares:  utils.ConvertDecToRat(v.DelegatorShares).Mul(exRate).FloatString(),
+		Tokens:           utils.ConvertDecToRat(v.Tokens).Mul(exRate).FloatStringPrec28(),
+		DelegatorShares:  utils.ConvertDecToRat(v.DelegatorShares).Mul(exRate).FloatStringPrec28(),
 		Description:      v.Description,
 		BondHeight:       v.BondHeight,
 		UnbondingHeight:  v.UnbondingHeight,
@@ -203,7 +203,7 @@ func ConvertDelegationToDelegationOutput(cliCtx context.CLIContext, delegation s
 	return DelegationOutput{
 		DelegatorAddr: delegation.DelegatorAddr,
 		ValidatorAddr: delegation.ValidatorAddr,
-		Shares:        utils.ConvertDecToRat(delegation.Shares).Mul(exRate).FloatString(),
+		Shares:        utils.ConvertDecToRat(delegation.Shares).Mul(exRate).FloatStringPrec28(),
 		Height:        delegation.Height,
 	}
 }
@@ -245,18 +245,18 @@ func ConvertREDToREDOutput(cliCtx context.CLIContext, red stake.Redelegation) Re
 		MinTime:          red.MinTime,
 		InitialBalance:   initialBalance[0],
 		Balance:          balance[0],
-		SharesSrc:        utils.ConvertDecToRat(red.SharesSrc).Mul(exRate).FloatString(),
-		SharesDst:        utils.ConvertDecToRat(red.SharesDst).Mul(exRate).FloatString(),
+		SharesSrc:        utils.ConvertDecToRat(red.SharesSrc).Mul(exRate).FloatStringPrec28(),
+		SharesDst:        utils.ConvertDecToRat(red.SharesDst).Mul(exRate).FloatStringPrec28(),
 	}
 }
 
 func ConvertPoolToPoolOutput(cliCtx context.CLIContext, pool stake.PoolStatus) PoolOutput {
 	exRate := utils.ExRateFromStakeTokenToMainUnit(cliCtx)
 	return PoolOutput{
-		LooseTokens:  utils.ConvertDecToRat(pool.LooseTokens).Mul(exRate).FloatString(),
-		BondedTokens: utils.ConvertDecToRat(pool.BondedTokens).Mul(exRate).FloatString(),
-		TokenSupply:  utils.ConvertDecToRat(pool.BondedTokens.Add(pool.LooseTokens)).Mul(exRate).FloatString(),
-		BondedRatio:  utils.ConvertDecToRat(pool.BondedTokens.Quo(pool.BondedTokens.Add(pool.LooseTokens))).FloatString(),
+		LooseTokens:  utils.ConvertDecToRat(pool.LooseTokens).Mul(exRate).FloatString(18),
+		BondedTokens: utils.ConvertDecToRat(pool.BondedTokens).Mul(exRate).FloatString(18),
+		TokenSupply:  utils.ConvertDecToRat(pool.BondedTokens.Add(pool.LooseTokens)).Mul(exRate).FloatString(18),
+		BondedRatio:  utils.ConvertDecToRat(pool.BondedTokens.Quo(pool.BondedTokens.Add(pool.LooseTokens))).FloatString(18),
 	}
 }
 
