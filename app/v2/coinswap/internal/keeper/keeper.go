@@ -3,8 +3,6 @@ package keeper
 import (
 	"fmt"
 
-	"github.com/irisnet/irishub/app/v1/auth"
-	"github.com/irisnet/irishub/app/v1/bank"
 	"github.com/irisnet/irishub/app/v1/params"
 	"github.com/irisnet/irishub/app/v2/coinswap/internal/types"
 	"github.com/irisnet/irishub/codec"
@@ -16,8 +14,8 @@ import (
 type Keeper struct {
 	cdc        *codec.Codec
 	storeKey   sdk.StoreKey
-	bk         bank.Keeper
-	ak         auth.AccountKeeper
+	bk         types.BankKeeper
+	ak         types.AuthKeeper
 	paramSpace params.Subspace
 }
 
@@ -25,7 +23,7 @@ type Keeper struct {
 // - creating new ModuleAccounts for each trading pair
 // - burning minting liquidity coins
 // - sending to and from ModuleAccounts
-func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, bk bank.Keeper, ak auth.AccountKeeper, paramSpace params.Subspace) Keeper {
+func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, bk types.BankKeeper, ak types.AuthKeeper, paramSpace params.Subspace) Keeper {
 	return Keeper{
 		storeKey:   key,
 		bk:         bk,
@@ -35,20 +33,32 @@ func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, bk bank.Keeper, ak auth.Accou
 	}
 }
 
-// CreateReservePool initializes a new reserve pool by creating a special account.
-func (k Keeper) CreateReservePool(ctx sdk.Context, reservePoolName string) {
-	reservePoolAccAddr := getReservePoolAddr(reservePoolName)
-	moduleAcc := k.ak.GetAccount(ctx, reservePoolAccAddr)
-	if moduleAcc != nil {
-		panic(fmt.Sprintf("reserve pool for %s already exists", reservePoolName))
-	}
-	k.bk.AddCoins(ctx, reservePoolAccAddr, sdk.Coins{})
-}
-
-func (k Keeper) Swap(ctx sdk.Context, msg types.MsgSwapOrder) (sdk.Tags, sdk.Error) {
+func (k Keeper) HandleSwap(ctx sdk.Context, msg types.MsgSwapOrder) (sdk.Tags, sdk.Error) {
 	tags := sdk.EmptyTags()
-	handler := k.GetHandler(msg)
-	amount, err := handler(ctx, msg.Input, msg.Output, msg.Sender, msg.Recipient)
+	var amount sdk.Int
+	var err sdk.Error
+	var isDoubleSwap = msg.Input.Coin.Denom != sdk.IrisAtto && msg.Output.Coin.Denom != sdk.IrisAtto
+
+	switch msg.IsBuyOrder {
+	case true:
+		switch isDoubleSwap {
+		case true:
+			amount, err = k.doubleTradeInputForExactOutput(ctx, msg.Input, msg.Output)
+			break
+		case false:
+			amount, err = k.tradeInputForExactOutput(ctx, msg.Input, msg.Output)
+			break
+		}
+	case false:
+		switch isDoubleSwap {
+		case true:
+			amount, err = k.doubleTradeExactInputForOutput(ctx, msg.Input, msg.Output)
+			break
+		case false:
+			amount, err = k.tradeExactInputForOutput(ctx, msg.Input, msg.Output)
+			break
+		}
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -56,168 +66,124 @@ func (k Keeper) Swap(ctx sdk.Context, msg types.MsgSwapOrder) (sdk.Tags, sdk.Err
 	return tags, nil
 }
 
-func (k Keeper) AddLiquidity(ctx sdk.Context, msg types.MsgAddLiquidity) sdk.Error {
-	reservePoolName, err := k.GetReservePoolName(sdk.IrisAtto, msg.Deposit.Denom)
-
+func (k Keeper) HandleAddLiquidity(ctx sdk.Context, msg types.MsgAddLiquidity) sdk.Error {
+	reservePoolName, err := k.GetReservePoolName(sdk.IrisAtto, msg.MaxToken.Denom)
 	if err != nil {
 		return err
 	}
-
-	// create reserve pool if it does not exist
-	reservePool, found := k.GetReservePool(ctx, reservePoolName)
-	if !found {
-		k.CreateReservePool(ctx, reservePoolName)
-	}
-
-	nativeReserveAmt := reservePool.AmountOf(sdk.IrisAtto)
-	depositedReserveAmt := reservePool.AmountOf(msg.Deposit.Denom)
+	reservePool := k.GetReservePool(ctx, reservePoolName)
+	irisReserveAmt := reservePool.AmountOf(sdk.IrisAtto)
+	tokenReserveAmt := reservePool.AmountOf(msg.MaxToken.Denom)
 	liquidity := reservePool.AmountOf(reservePoolName)
 
 	var mintLiquidityAmt sdk.Int
-	var depositedCoin sdk.Coin
-	var nativeCoin = sdk.NewCoin(sdk.IrisAtto, msg.DepositAmount)
+	var depositToken sdk.Coin
+	var irisCoin = sdk.NewCoin(sdk.IrisAtto, msg.ExactIrisAmt)
 
 	// calculate amount of UNI to be minted for sender
 	// and coin amount to be deposited
 	if liquidity.IsZero() {
-		mintLiquidityAmt = msg.DepositAmount
-		depositedCoin = sdk.NewCoin(msg.Deposit.Denom, msg.Deposit.Amount)
+		mintLiquidityAmt = msg.ExactIrisAmt
+		depositToken = sdk.NewCoin(msg.MaxToken.Denom, msg.MaxToken.Amount)
 	} else {
-		mintLiquidityAmt = (liquidity.Mul(msg.DepositAmount)).Div(nativeReserveAmt)
-		if mintLiquidityAmt.LT(msg.MinReward) {
-			return types.ErrConstraintNotMet(fmt.Sprintf("liquidity[%s] is less than user 's min reward[%s]", mintLiquidityAmt.String(), msg.MinReward.String()))
+		mintLiquidityAmt = (liquidity.Mul(msg.ExactIrisAmt)).Div(irisReserveAmt)
+		if mintLiquidityAmt.LT(msg.MinLiquidity) {
+			return types.ErrConstraintNotMet(fmt.Sprintf("liquidity[%s] is less than user 's min reward[%s]", mintLiquidityAmt.String(), msg.MinLiquidity.String()))
 		}
+		depositAmt := (tokenReserveAmt.Mul(msg.ExactIrisAmt)).Div(irisReserveAmt)
+		depositToken = sdk.NewCoin(msg.MaxToken.Denom, depositAmt)
 
-		mod := depositedReserveAmt.Mul(msg.DepositAmount).Mod(nativeReserveAmt)
-		depositAmt := (depositedReserveAmt.Mul(msg.DepositAmount)).Div(nativeReserveAmt)
-		if !mod.IsZero() {
-			depositAmt = depositAmt.AddRaw(1)
-		}
-
-		depositedCoin = sdk.NewCoin(msg.Deposit.Denom, depositAmt)
-
-		if depositAmt.GT(msg.Deposit.Amount) {
-			return types.ErrConstraintNotMet(fmt.Sprintf("amount[%s] of token depositd is greater than user 's max deposited amount[%s]", depositedCoin.String(), msg.Deposit.String()))
+		if depositAmt.GT(msg.MaxToken.Amount) {
+			return types.ErrConstraintNotMet(fmt.Sprintf("amount[%s] of depositToken depositd is greater than user 's max deposited amount[%s]", depositToken.String(), msg.MaxToken.String()))
 		}
 	}
-	if !k.bk.HasCoins(ctx, msg.Sender, sdk.NewCoins(nativeCoin, depositedCoin)) {
-		return sdk.ErrInsufficientCoins("sender does not have sufficient funds to add liquidity")
-	}
+	return k.addLiquidity(ctx, msg.Sender, irisCoin, depositToken, reservePoolName, mintLiquidityAmt)
+}
 
-	// transfer deposited liquidity into coinswaps ModuleAccount
-	k.SendCoins(ctx, msg.Sender, reservePoolName, sdk.NewCoins(nativeCoin, depositedCoin))
-
-	// mint liquidity vouchers for sender
-	coins := k.MintCoins(ctx, reservePoolName, mintLiquidityAmt)
-	_, _, err = k.bk.AddCoins(ctx, msg.Sender, coins)
+func (k Keeper) addLiquidity(ctx sdk.Context, sender sdk.AccAddress, irisCoin, token sdk.Coin, reservePoolName string, mintLiquidityAmt sdk.Int) sdk.Error {
+	depositedTokens := sdk.NewCoins(irisCoin, token)
+	poolAddr := getReservePoolAddr(reservePoolName)
+	// transfer deposited token into coinswaps Account
+	_, err := k.bk.SendCoins(ctx, sender, poolAddr, depositedTokens)
 	if err != nil {
 		return err
 	}
+	// mint liquidity vouchers for reserve Pool
+	mintToken := sdk.NewCoins(sdk.NewCoin(reservePoolName, mintLiquidityAmt))
+	k.bk.AddCoins(ctx, poolAddr, mintToken)
+	// mint liquidity vouchers for sender
+	k.bk.AddCoins(ctx, sender, mintToken)
 	return nil
 }
 
-func (k Keeper) RemoveLiquidity(ctx sdk.Context, msg types.MsgRemoveLiquidity) sdk.Error {
-	reservePoolName, err := k.GetReservePoolName(sdk.IrisAtto, msg.Withdraw.Denom)
-
+func (k Keeper) HandleRemoveLiquidity(ctx sdk.Context, msg types.MsgRemoveLiquidity) sdk.Error {
+	reservePoolName, err := k.GetReservePoolName(sdk.IrisAtto, msg.MinToken.Denom)
 	if err != nil {
 		return err
 	}
 
 	// check if reserve pool exists
-	reservePool, found := k.GetReservePool(ctx, reservePoolName)
-	if !found {
+	reservePool := k.GetReservePool(ctx, reservePoolName)
+	if reservePool == nil {
 		return types.ErrReservePoolNotExists("")
 	}
 
-	nativeReserveAmt := reservePool.AmountOf(sdk.IrisAtto)
-	depositedReserveAmt := reservePool.AmountOf(msg.Withdraw.Denom)
+	irisReserveAmt := reservePool.AmountOf(sdk.IrisAtto)
+	tokenReserveAmt := reservePool.AmountOf(msg.MinToken.Denom)
 	liquidityReserve := reservePool.AmountOf(reservePoolName)
+	if irisReserveAmt.LT(msg.MinIrisAmt) {
+		return types.ErrInsufficientFunds(fmt.Sprintf("insufficient funds,actual:%s,expect:%s", irisReserveAmt.String(), msg.MinIrisAmt.String()))
+	}
+	if tokenReserveAmt.LT(msg.MinToken.Amount) {
+		return types.ErrInsufficientFunds(fmt.Sprintf("insufficient funds,actual:%s,expect:%s", tokenReserveAmt.String(), msg.MinToken.Amount.String()))
+	}
 
 	// calculate amount of UNI to be burned for sender
 	// and coin amount to be returned
-	nativeWithdrawnAmt := msg.WithdrawAmount.Mul(nativeReserveAmt).Div(liquidityReserve)
-	depositedWithdrawnAmt := msg.WithdrawAmount.Mul(depositedReserveAmt).Div(liquidityReserve)
+	irisWithdrawnAmt := msg.WithdrawLiquidity.Mul(irisReserveAmt).Div(liquidityReserve)
+	tokenWithdrawnAmt := msg.WithdrawLiquidity.Mul(tokenReserveAmt).Div(liquidityReserve)
 
-	nativeWithdrawCoin := sdk.NewCoin(sdk.IrisAtto, nativeWithdrawnAmt)
-	depositedWithdrawCoin := sdk.NewCoin(msg.Withdraw.Denom, depositedWithdrawnAmt)
-	deltaLiquidityCoin := sdk.NewCoin(reservePoolName, msg.WithdrawAmount)
+	irisWithdrawCoin := sdk.NewCoin(sdk.IrisAtto, irisWithdrawnAmt)
+	tokenWithdrawCoin := sdk.NewCoin(msg.MinToken.Denom, tokenWithdrawnAmt)
+	deductUniCoin := sdk.NewCoin(reservePoolName, msg.WithdrawLiquidity)
 
-	if nativeWithdrawCoin.Amount.LT(msg.MinNative) {
-		return types.ErrConstraintNotMet(fmt.Sprintf("The amount of cash available [%s] is less than the minimum amount specified [%s] by the user.", nativeWithdrawCoin.String(), sdk.NewCoin(sdk.IrisAtto, msg.MinNative).String()))
+	if irisWithdrawCoin.Amount.LT(msg.MinIrisAmt) {
+		return types.ErrConstraintNotMet(fmt.Sprintf("The amount of iris available [%s] is less than the minimum amount specified [%s] by the user.", irisWithdrawCoin.String(), sdk.NewCoin(sdk.IrisAtto, msg.MinIrisAmt).String()))
 	}
-	if depositedWithdrawCoin.Amount.LT(msg.Withdraw.Amount) {
-		return types.ErrConstraintNotMet(fmt.Sprintf("The amount of cash available [%s] is less than the minimum amount specified [%s] by the user.", depositedWithdrawCoin.String(), msg.Withdraw.String()))
+	if tokenWithdrawCoin.Amount.LT(msg.MinToken.Amount) {
+		return types.ErrConstraintNotMet(fmt.Sprintf("The amount of token available [%s] is less than the minimum amount specified [%s] by the user.", tokenWithdrawCoin.String(), msg.MinToken.String()))
 	}
+	poolAddr := getReservePoolAddr(reservePoolName)
+	return k.removeLiquidity(ctx, poolAddr, msg.Sender, deductUniCoin, irisWithdrawCoin, tokenWithdrawCoin)
+}
 
+func (k Keeper) removeLiquidity(ctx sdk.Context, poolAddr, sender sdk.AccAddress, deductUniCoin, irisWithdrawCoin, tokenWithdrawCoin sdk.Coin) sdk.Error {
 	// burn liquidity from reserve Pool
-	err = k.BurnLiquidity(ctx, reservePoolName, deltaLiquidityCoin)
+	deltaCoins := sdk.NewCoins(deductUniCoin)
+	_, _, err := k.bk.SubtractCoins(ctx, poolAddr, deltaCoins)
 	if err != nil {
 		return err
 	}
 	// burn liquidity from account
-	_, err = k.bk.BurnCoins(ctx, msg.Sender, sdk.Coins{deltaLiquidityCoin})
-
+	_, _, err = k.bk.SubtractCoins(ctx, sender, deltaCoins)
 	if err != nil {
 		return err
 	}
-
 	// transfer withdrawn liquidity from coinswaps ModuleAccount to sender's account
-	coins := sdk.NewCoins(nativeWithdrawCoin, depositedWithdrawCoin)
-	k.ReceiveCoins(ctx, msg.Sender, reservePoolName, coins)
-	return nil
-}
-
-// BurnCoins burns liquidity coins from the ModuleAccount at reservePoolName. The
-// reservePoolName and denomination of the liquidity coins are the same.
-func (k Keeper) BurnLiquidity(ctx sdk.Context, reservePoolName string, deltaCoin sdk.Coin) sdk.Error {
-	swapPoolAccAddr := getReservePoolAddr(reservePoolName)
-	if !k.bk.HasCoins(ctx, swapPoolAccAddr, sdk.NewCoins(deltaCoin)) {
-		return sdk.ErrInsufficientCoins("sender does not have sufficient funds to remove liquidity")
-	}
-	coins := sdk.NewCoins(deltaCoin)
-	_, err := k.bk.BurnCoins(ctx, swapPoolAccAddr, coins)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-// MintCoins mints liquidity coins to the ModuleAccount at reservePoolName. The
-// reservePoolName and denomination of the liquidity coins are the same.
-func (k Keeper) MintCoins(ctx sdk.Context, reservePoolName string, amt sdk.Int) sdk.Coins {
-	reservePoolAccAddr := getReservePoolAddr(reservePoolName)
-	coins := sdk.NewCoins(sdk.NewCoin(reservePoolName, amt))
-	_, _, err := k.bk.AddCoins(ctx, reservePoolAccAddr, coins)
-	if err != nil {
-		panic(err)
-	}
-	return coins
-}
-
-// SendCoin sends coins from the address to the ModuleAccount at reservePoolName.
-func (k Keeper) SendCoins(ctx sdk.Context, addr sdk.AccAddress, reservePoolName string, coins sdk.Coins) sdk.Error {
-	swapPoolAccAddr := getReservePoolAddr(reservePoolName)
-	_, err := k.bk.SendCoins(ctx, addr, swapPoolAccAddr, coins)
-	return err
-}
-
-// RecieveCoin sends coins from the ModuleAccount at reservePoolName to the
-// address provided.
-func (k Keeper) ReceiveCoins(ctx sdk.Context, addr sdk.AccAddress, reservePoolName string, coins sdk.Coins) sdk.Error {
-	swapPoolAccAddr := getReservePoolAddr(reservePoolName)
-	_, err := k.bk.SendCoins(ctx, swapPoolAccAddr, addr, coins)
+	coins := sdk.NewCoins(irisWithdrawCoin, tokenWithdrawCoin)
+	_, err = k.bk.SendCoins(ctx, poolAddr, sender, coins)
 	return err
 }
 
 // GetReservePool returns the total balance of an reserve pool at the
 // provided denomination.
-func (k Keeper) GetReservePool(ctx sdk.Context, reservePoolName string) (coins sdk.Coins, found bool) {
+func (k Keeper) GetReservePool(ctx sdk.Context, reservePoolName string) (coins sdk.Coins) {
 	swapPoolAccAddr := getReservePoolAddr(reservePoolName)
 	acc := k.ak.GetAccount(ctx, swapPoolAccAddr)
 	if acc == nil {
-		return nil, false
+		return nil
 	}
-	return acc.GetCoins(), true
+	return acc.GetCoins()
 }
 
 // GetParams gets the parameters for the coinswap module.
