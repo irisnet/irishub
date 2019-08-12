@@ -136,7 +136,7 @@ func (msg MsgAddLiquidity) ValidateBasic() sdk.Error {
 	if msg.ExactIrisAmt.IsNil() || !msg.ExactIrisAmt.IsPositive() {
 		return ErrNotPositive("deposit amount provided is not positive")
 	}
-	if msg.ExactIrisAmt.IsNil() || msg.MinLiquidity.IsNegative() {
+	if msg.MinLiquidity.IsNil() || msg.MinLiquidity.IsNegative() {
 		return ErrNotPositive("minimum liquidity is negative")
 	}
 	if msg.Deadline.IsZero() {
