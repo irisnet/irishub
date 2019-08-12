@@ -39,25 +39,14 @@ func (k Keeper) HandleSwap(ctx sdk.Context, msg types.MsgSwapOrder) (sdk.Tags, s
 	var err sdk.Error
 	var isDoubleSwap = msg.Input.Coin.Denom != sdk.IrisAtto && msg.Output.Coin.Denom != sdk.IrisAtto
 
-	switch msg.IsBuyOrder {
-	case true:
-		switch isDoubleSwap {
-		case true:
-			amount, err = k.doubleTradeInputForExactOutput(ctx, msg.Input, msg.Output)
-			break
-		case false:
-			amount, err = k.tradeInputForExactOutput(ctx, msg.Input, msg.Output)
-			break
-		}
-	case false:
-		switch isDoubleSwap {
-		case true:
-			amount, err = k.doubleTradeExactInputForOutput(ctx, msg.Input, msg.Output)
-			break
-		case false:
-			amount, err = k.tradeExactInputForOutput(ctx, msg.Input, msg.Output)
-			break
-		}
+	if isDoubleSwap && msg.IsBuyOrder {
+		amount, err = k.doubleTradeInputForExactOutput(ctx, msg.Input, msg.Output)
+	} else if isDoubleSwap && !msg.IsBuyOrder {
+		amount, err = k.doubleTradeExactInputForOutput(ctx, msg.Input, msg.Output)
+	} else if !isDoubleSwap && msg.IsBuyOrder {
+		amount, err = k.tradeInputForExactOutput(ctx, msg.Input, msg.Output)
+	} else if !isDoubleSwap && !msg.IsBuyOrder {
+		amount, err = k.tradeExactInputForOutput(ctx, msg.Input, msg.Output)
 	}
 	if err != nil {
 		return nil, err
