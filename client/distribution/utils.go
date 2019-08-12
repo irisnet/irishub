@@ -18,8 +18,8 @@ type ValidatorDistInfoOutput struct {
 
 func ConvertToValidatorDistInfoOutput(cliCtx context.CLIContext, vdi distribution.ValidatorDistInfo) ValidatorDistInfoOutput {
 	exRate := utils.ExRateFromStakeTokenToMainUnit(cliCtx)
-	delPool := utils.ConvertDecToRat(vdi.DelPool.AmountOf(sdk.IrisAtto)).Mul(exRate).FloatString() + sdk.Iris
-	valCommission := utils.ConvertDecToRat(vdi.ValCommission.AmountOf(sdk.IrisAtto)).Mul(exRate).FloatString() + sdk.Iris
+	delPool := utils.ConvertDecToRat(vdi.DelPool.AmountOf(sdk.IrisAtto)).Mul(exRate).FloatStringPrec28() + sdk.Iris
+	valCommission := utils.ConvertDecToRat(vdi.ValCommission.AmountOf(sdk.IrisAtto)).Mul(exRate).FloatStringPrec28() + sdk.Iris
 	return ValidatorDistInfoOutput{
 		OperatorAddr:            vdi.OperatorAddr,
 		FeePoolWithdrawalHeight: vdi.FeePoolWithdrawalHeight,
