@@ -6,7 +6,7 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 )
 
-const PrefixReservePool = "u-%s"
+const FormatReservePool = "u-%s"
 
 func (k Keeper) SwapCoins(ctx sdk.Context, sender, recipient sdk.AccAddress, coinSold, coinBought sdk.Coin) sdk.Error {
 	reservePoolName, err := k.GetReservePoolName(coinSold.Denom, coinBought.Denom)
@@ -233,7 +233,7 @@ func (k Keeper) GetReservePoolName(denom1, denom2 string) (string, sdk.Error) {
 	if denom1 != sdk.IrisAtto {
 		denom = denom1
 	}
-	return fmt.Sprintf(PrefixReservePool, denom), nil
+	return fmt.Sprintf(FormatReservePool, denom), nil
 }
 
 // getInputPrice returns the amount of coins bought (calculated) given the input amount being sold (exact)

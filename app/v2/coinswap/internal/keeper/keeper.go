@@ -126,6 +126,9 @@ func (k Keeper) HandleRemoveLiquidity(ctx sdk.Context, msg types.MsgRemoveLiquid
 	if tokenReserveAmt.LT(msg.MinToken.Amount) {
 		return types.ErrInsufficientFunds(fmt.Sprintf("insufficient funds,actual:%s,expect:%s", tokenReserveAmt.String(), msg.MinToken.Amount.String()))
 	}
+	if liquidityReserve.LT(msg.WithdrawLiquidity) {
+		return types.ErrInsufficientFunds(fmt.Sprintf("insufficient funds,actual:%s,expect:%s", liquidityReserve.String(), msg.WithdrawLiquidity.String()))
+	}
 
 	// calculate amount of UNI to be burned for sender
 	// and coin amount to be returned
