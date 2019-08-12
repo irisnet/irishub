@@ -16,12 +16,14 @@ var (
 	sender      = sdk.AccAddress(senderPk.Address())
 	recipient   = sdk.AccAddress(recipientPk.Address())
 
-	denom0 = "atom"
-	denom1 = "btc"
+	denom0   = "atom-min"
+	denom1   = "btc-min"
+	unidenom = "u-btc-min"
 
-	input    = sdk.NewCoin(denom0, sdk.NewInt(1000))
-	output   = sdk.NewCoin(denom1, sdk.NewInt(500))
-	deadline = time.Now()
+	input             = sdk.NewCoin(denom0, sdk.NewInt(1000))
+	output            = sdk.NewCoin(denom1, sdk.NewInt(500))
+	withdrawLiquidity = sdk.NewCoin(unidenom, sdk.NewInt(500))
+	deadline          = time.Now()
 
 	emptyAddr sdk.AccAddress
 	emptyTime time.Time

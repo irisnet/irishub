@@ -57,7 +57,7 @@ func createTestInput(t *testing.T, amt sdk.Int, nAccs int64) (sdk.Context, Keepe
 
 	initialCoins := sdk.Coins{
 		sdk.NewCoin(sdk.IrisAtto, amt),
-		sdk.NewCoin("btc", amt),
+		sdk.NewCoin("btc-min", amt),
 	}
 	initialCoins = initialCoins.Sort()
 	accs := createTestAccs(ctx, int(nAccs), initialCoins, &ak)

@@ -38,13 +38,13 @@ func queryLiquidity(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, s
 		return nil, sdk.ErrUnknownRequest(sdk.AppendMsgToErr("illegal token id", err.Error()))
 	}
 
-	reservePoolName, err := k.GetReservePoolName(sdk.IrisAtto, denom)
+	reservePoolName, err := types.GetReservePoolName(sdk.IrisAtto, denom)
 	if err != nil {
 		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not retrieve reserve pool name", err.Error()))
 	}
-	reservePool, _ := k.GetReservePool(ctx, reservePoolName)
+	reservePool := k.GetReservePool(ctx, reservePoolName)
 	// clean reserve pool to remove non-pool coins
-	cleanedReservePool, err := k.CleanReservePool(reservePool, reservePoolName)
+	cleanedReservePool, err := types.CleanReservePool(reservePool, reservePoolName)
 	bz, err := k.cdc.MarshalJSONIndent(cleanedReservePool, "", " ")
 	if err != nil {
 		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", err.Error()))
@@ -57,13 +57,7 @@ func queryLiquidity(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, s
 func queryParameters(ctx sdk.Context, path []string, req abci.RequestQuery, k Keeper) ([]byte, sdk.Error) {
 	switch path[0] {
 	case types.ParamFee:
-		bz, err := k.cdc.MarshalJSONIndent(k.GetFeeParam(ctx), "", " ")
-		if err != nil {
-			return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", err.Error()))
-		}
-		return bz, nil
-	case types.ParamNativeDenom:
-		bz, err := k.cdc.MarshalJSONIndent(sdk.IrisAtto, "", " ")
+		bz, err := k.cdc.MarshalJSONIndent(k.GetParams(ctx), "", " ")
 		if err != nil {
 			return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", err.Error()))
 		}

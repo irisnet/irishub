@@ -15,16 +15,70 @@ func TestMsgSwapOrder(t *testing.T) {
 		msg        MsgSwapOrder
 		expectPass bool
 	}{
-		{"no input coin", NewMsgSwapOrder(sdk.Coin{}, output, deadline, sender, recipient, true), false},
-		{"zero input coin", NewMsgSwapOrder(sdk.NewCoin(denom0, sdk.ZeroInt()), output, deadline, sender, recipient, true), false},
-		{"no output coin", NewMsgSwapOrder(input, sdk.Coin{}, deadline, sender, recipient, false), false},
-		{"zero output coin", NewMsgSwapOrder(input, sdk.NewCoin(denom1, sdk.ZeroInt()), deadline, sender, recipient, true), false},
-		{"swap and coin denomination are equal", NewMsgSwapOrder(input, sdk.NewCoin(denom0, amt), deadline, sender, recipient, true), false},
-		{"deadline not initialized", NewMsgSwapOrder(input, output, emptyTime, sender, recipient, true), false},
-		{"no sender", NewMsgSwapOrder(input, output, deadline, emptyAddr, recipient, true), false},
-		{"no recipient", NewMsgSwapOrder(input, output, deadline, sender, emptyAddr, true), false},
-		{"valid MsgSwapOrder", NewMsgSwapOrder(input, output, deadline, sender, recipient, true), true},
-		{"sender and recipient are same", NewMsgSwapOrder(input, output, deadline, sender, sender, true), true},
+		{"no input coin", NewMsgSwapOrder(Input{Address: sender}, Output{recipient, output}, deadline, true), false},
+		{"zero input coin", NewMsgSwapOrder(Input{
+			Address: sender,
+			Coin:    sdk.NewCoin(denom0, sdk.ZeroInt()),
+		}, Output{
+			Address: recipient,
+			Coin:    output,
+		}, deadline, true), false},
+		{"no output coin", NewMsgSwapOrder(Input{
+			Address: sender,
+			Coin:    input,
+		}, Output{
+			Address: recipient,
+			Coin:    sdk.Coin{},
+		}, deadline, false), false},
+		{"zero output coin", NewMsgSwapOrder(Input{
+			Address: sender,
+			Coin:    input,
+		}, Output{
+			Address: recipient,
+			Coin:    sdk.NewCoin(denom1, sdk.ZeroInt()),
+		}, deadline, true), false},
+		{"swap and coin denomination are equal", NewMsgSwapOrder(Input{
+			Address: sender,
+			Coin:    input,
+		}, Output{
+			Address: recipient,
+			Coin:    sdk.NewCoin(denom0, amt),
+		}, deadline, true), false},
+		{"deadline not initialized", NewMsgSwapOrder(Input{
+			Address: sender,
+			Coin:    input,
+		}, Output{
+			Address: recipient,
+			Coin:    output,
+		}, emptyTime, true), false},
+		{"no sender", NewMsgSwapOrder(Input{
+			Address: emptyAddr,
+			Coin:    input,
+		}, Output{
+			Address: recipient,
+			Coin:    output,
+		}, deadline, true), false},
+		{"no recipient", NewMsgSwapOrder(Input{
+			Address: sender,
+			Coin:    input,
+		}, Output{
+			Address: emptyAddr,
+			Coin:    output,
+		}, deadline, true), true},
+		{"valid MsgSwapOrder", NewMsgSwapOrder(Input{
+			Address: sender,
+			Coin:    input,
+		}, Output{
+			Address: recipient,
+			Coin:    output,
+		}, deadline, true), true},
+		{"sender and recipient are same", NewMsgSwapOrder(Input{
+			Address: sender,
+			Coin:    input,
+		}, Output{
+			Address: sender,
+			Coin:    output,
+		}, deadline, true), true},
 	}
 
 	for _, tc := range tests {
@@ -49,7 +103,6 @@ func TestMsgAddLiquidity(t *testing.T) {
 		{"no deposit coin", NewMsgAddLiquidity(sdk.Coin{}, amt, sdk.OneInt(), deadline, sender), false},
 		{"zero deposit coin", NewMsgAddLiquidity(sdk.NewCoin(denom1, sdk.ZeroInt()), amt, sdk.OneInt(), deadline, sender), false},
 		{"invalid withdraw amount", NewMsgAddLiquidity(input, sdk.ZeroInt(), sdk.OneInt(), deadline, sender), false},
-		{"invalid minumum reward bound", NewMsgAddLiquidity(input, amt, sdk.ZeroInt(), deadline, sender), false},
 		{"deadline not initialized", NewMsgAddLiquidity(input, amt, sdk.OneInt(), emptyTime, sender), false},
 		{"empty sender", NewMsgAddLiquidity(input, amt, sdk.OneInt(), deadline, emptyAddr), false},
 		{"valid MsgAddLiquidity", NewMsgAddLiquidity(input, amt, sdk.OneInt(), deadline, sender), true},
@@ -74,13 +127,13 @@ func TestMsgRemoveLiquidity(t *testing.T) {
 		msg        MsgRemoveLiquidity
 		expectPass bool
 	}{
-		{"no withdraw coin", NewMsgRemoveLiquidity(sdk.Coin{}, amt, sdk.OneInt(), deadline, sender), false},
-		{"zero withdraw coin", NewMsgRemoveLiquidity(sdk.NewCoin(denom1, sdk.ZeroInt()), amt, sdk.OneInt(), deadline, sender), false},
-		{"invalid deposit amount", NewMsgRemoveLiquidity(input, sdk.ZeroInt(), sdk.OneInt(), deadline, sender), false},
-		{"invalid minimum native bound", NewMsgRemoveLiquidity(input, amt, sdk.ZeroInt(), deadline, sender), false},
-		{"deadline not initialized", NewMsgRemoveLiquidity(input, amt, sdk.OneInt(), emptyTime, sender), false},
-		{"empty sender", NewMsgRemoveLiquidity(input, amt, sdk.OneInt(), deadline, emptyAddr), false},
-		{"valid MsgRemoveLiquidity", NewMsgRemoveLiquidity(input, amt, sdk.OneInt(), deadline, sender), true},
+		{"no withdraw coin", NewMsgRemoveLiquidity(amt, sdk.Coin{}, sdk.OneInt(), deadline, sender), false},
+		{"zero withdraw coin", NewMsgRemoveLiquidity(amt, sdk.NewCoin(unidenom, sdk.ZeroInt()), sdk.OneInt(), deadline, sender), false},
+		{"invalid minimum token amount", NewMsgRemoveLiquidity(sdk.NewInt(-100), withdrawLiquidity, sdk.OneInt(), deadline, sender), false},
+		{"invalid minimum iris amount", NewMsgRemoveLiquidity(amt, withdrawLiquidity, sdk.NewInt(-100), deadline, sender), false},
+		{"deadline not initialized", NewMsgRemoveLiquidity(amt, withdrawLiquidity, sdk.OneInt(), emptyTime, sender), false},
+		{"empty sender", NewMsgRemoveLiquidity(amt, withdrawLiquidity, sdk.OneInt(), deadline, emptyAddr), false},
+		{"valid MsgRemoveLiquidity", NewMsgRemoveLiquidity(amt, withdrawLiquidity, sdk.OneInt(), deadline, sender), true},
 	}
 
 	for _, tc := range tests {
