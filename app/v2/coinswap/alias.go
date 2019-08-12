@@ -27,7 +27,7 @@ var (
 	NewQuerier          = keeper.NewQuerier
 	DefaultParamSpace   = types.DefaultParamSpace
 
-	QueryLiquidity = types.QueryLiquidity
+	QueryLiquidity = types.QueryLiquidities
 )
 
 const (

@@ -13,12 +13,12 @@ import (
 
 func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec) {
 	r.HandleFunc(
-		"/swap/liquidity/{address}/deposit",
+		"/swap/liquidities/{address}/deposit",
 		addLiquidityHandlerFn(cdc, cliCtx),
 	).Methods("POST")
 
 	r.HandleFunc(
-		"/swap/liquidity/{address}/withdraw",
+		"/swap/liquidities/{address}/withdraw",
 		removeLiquidityHandlerFn(cdc, cliCtx),
 	).Methods("POST")
 }

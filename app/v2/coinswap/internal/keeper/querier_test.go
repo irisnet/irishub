@@ -27,7 +27,7 @@ func TestNewQuerier(t *testing.T) {
 	require.Nil(t, res)
 
 	// query for non existent reserve pool should return an error
-	req.Path = fmt.Sprintf("custom/%s/%s", types.QuerierRoute, types.QueryLiquidity)
+	req.Path = fmt.Sprintf("custom/%s/%s", types.QuerierRoute, types.QueryLiquidities)
 	req.Data = keeper.cdc.MustMarshalJSON("btc")
 	res, err = querier(ctx, []string{"liquidity"}, req)
 	require.Error(t, err)

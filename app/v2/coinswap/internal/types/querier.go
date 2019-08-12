@@ -3,8 +3,8 @@ package types
 import "github.com/irisnet/irishub/types"
 
 const (
-	// QueryLiquidity liquidity query endpoint supported by the coinswap querier
-	QueryLiquidity = "liquidity"
+	// QueryLiquidities liquidity query endpoint supported by the coinswap querier
+	QueryLiquidities = "liquidities"
 )
 
 // QueryLiquidityParams is the query parameters for 'custom/swap/liquidity'
