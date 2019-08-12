@@ -46,10 +46,10 @@ func (k Keeper) calculateWithExactInput(ctx sdk.Context, exactSoldCoin sdk.Coin,
 	outputReserve := reservePool.AmountOf(boughtTokenDenom)
 
 	if !inputReserve.IsPositive() {
-		return sdk.ZeroInt(), types.ErrInsufficientFunds(fmt.Sprintf("insufficient funds,actual:%s", inputReserve.String()))
+		return sdk.ZeroInt(), types.ErrInsufficientFunds(fmt.Sprintf("insufficient funds, actual:%s", inputReserve.String()))
 	}
 	if !outputReserve.IsPositive() {
-		return sdk.ZeroInt(), types.ErrInsufficientFunds(fmt.Sprintf("insufficient funds,actual:%s", outputReserve.String()))
+		return sdk.ZeroInt(), types.ErrInsufficientFunds(fmt.Sprintf("insufficient funds, actual:%s", outputReserve.String()))
 	}
 	param := k.GetParams(ctx)
 
@@ -139,13 +139,13 @@ func (k Keeper) calculateWithExactOutput(ctx sdk.Context, exactBoughtCoin sdk.Co
 	outputReserve := reservePool.AmountOf(soldTokenDenom)
 
 	if !inputReserve.IsPositive() {
-		return sdk.ZeroInt(), types.ErrInsufficientFunds(fmt.Sprintf("insufficient funds,actual:%s", inputReserve.String()))
+		return sdk.ZeroInt(), types.ErrInsufficientFunds(fmt.Sprintf("insufficient funds, actual:%s", inputReserve.String()))
 	}
 	if !outputReserve.IsPositive() {
-		return sdk.ZeroInt(), types.ErrInsufficientFunds(fmt.Sprintf("insufficient funds,actual:%s", outputReserve.String()))
+		return sdk.ZeroInt(), types.ErrInsufficientFunds(fmt.Sprintf("insufficient funds, actual:%s", outputReserve.String()))
 	}
 	if exactBoughtCoin.Amount.GTE(outputReserve) {
-		return sdk.ZeroInt(), types.ErrInsufficientFunds(fmt.Sprintf("insufficient funds,want:%s,actual:%s", exactBoughtCoin.String(), outputReserve.String()))
+		return sdk.ZeroInt(), types.ErrInsufficientFunds(fmt.Sprintf("insufficient funds, want:%s,actual:%s", exactBoughtCoin.String(), outputReserve.String()))
 	}
 	param := k.GetParams(ctx)
 
