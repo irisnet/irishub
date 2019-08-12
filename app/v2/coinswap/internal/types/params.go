@@ -29,23 +29,6 @@ func NewParams(fee sdk.Rat) Params {
 	}
 }
 
-// FeeParam defines the numerator and denominator used in calculating the
-// amount to be reserved as a liquidity fee.
-// TODO: come up with a more descriptive name than Numerator/Denominator
-// Fee = 1 - (Numerator / Denominator) TODO: move this to spec
-type FeeParam struct {
-	Numerator   sdk.Int `json:"fee_numerator"`
-	Denominator sdk.Int `json:"fee_denominator"`
-}
-
-// NewFeeParam coinswap fee param constructor
-func NewFeeParam(numerator, denominator sdk.Int) FeeParam {
-	return FeeParam{
-		Numerator:   numerator,
-		Denominator: denominator,
-	}
-}
-
 // ParamTypeTable returns the TypeTable for coinswap module
 func ParamTypeTable() params.TypeTable {
 	return params.NewTypeTable().RegisterParamSet(&Params{})
@@ -73,6 +56,15 @@ func (p *Params) KeyValuePairs() params.KeyValuePairs {
 // Validate Implements params.Validate
 func (p *Params) Validate(key string, value string) (interface{}, sdk.Error) {
 	switch key {
+	case string(feeKey):
+		fee, err := sdk.NewRatFromDecimal(value, 10)
+		if err != nil {
+			return nil, err
+		}
+		if err := validateFee(fee); err != nil {
+			return nil, err
+		}
+		return fee, nil
 	default:
 		return nil, sdk.NewError(params.DefaultCodespace, params.CodeInvalidKey, fmt.Sprintf("%s is not found", key))
 	}
@@ -93,20 +85,24 @@ func (p *Params) ReadOnly() bool {
 
 // DefaultParams returns the default coinswap module parameters
 func DefaultParams() Params {
-	feeParam := sdk.NewRat(997, 1000)
+	fee := sdk.NewRat(3, 1000)
 	return Params{
-		Fee: feeParam,
+		Fee: fee,
 	}
 }
 
 // ValidateParams validates a set of params
 func ValidateParams(p Params) error {
-	if !p.Fee.GT(sdk.ZeroRat()) {
-		return fmt.Errorf("fee is not positive: %s", p.Fee.String())
+	return validateFee(p.Fee)
+}
+
+func validateFee(fee sdk.Rat) sdk.Error {
+	if !fee.GT(sdk.ZeroRat()) {
+		return sdk.ParseParamsErr(fmt.Errorf("fee is not positive: %s", fee.String()))
 	}
 
-	if !p.Fee.LT(sdk.OneRat()) {
-		return fmt.Errorf("fee must be less than 1: %s", p.Fee.String())
+	if !fee.LT(sdk.OneRat()) {
+		return sdk.ParseParamsErr(fmt.Errorf("fee must be less than 1: %s", fee.String()))
 	}
 	return nil
 }

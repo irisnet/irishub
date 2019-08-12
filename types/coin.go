@@ -570,7 +570,7 @@ func (coins Coins) Sort() Coins {
 
 var (
 	// Denominations can be 3 ~ 21 characters long.
-	reDenom         = `(([a-z][a-z0-9]{2,7}|x)\.)?([a-z][a-z0-9]{2,7})(-[a-z]{3,5})?`
+	reDenom         = `(u\-)?(([a-z][a-z0-9]{2,7}|x)\.)?([a-z][a-z0-9]{2,7})(-[a-z]{3,5})?`
 	reAmount        = `[0-9]+(\.[0-9]+)?`
 	reSpace         = `[[:space:]]*`
 	reDenomCompiled = regexp.MustCompile(fmt.Sprintf(`^%s$`, reDenom))

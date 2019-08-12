@@ -37,8 +37,8 @@ func queryLiquidity(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, s
 	if err != nil {
 		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not retrieve module name", err.Error()))
 	}
-	reservePool, found := k.GetReservePool(ctx, reservePoolName)
-	if !found {
+	reservePool := k.GetReservePool(ctx, reservePoolName)
+	if reservePool == nil {
 		return nil, sdk.ErrInternal("reserve pool does not exist")
 	}
 
@@ -54,13 +54,7 @@ func queryLiquidity(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, s
 func queryParameters(ctx sdk.Context, path []string, req abci.RequestQuery, k Keeper) ([]byte, sdk.Error) {
 	switch path[0] {
 	case types.ParamFee:
-		bz, err := k.cdc.MarshalJSONIndent(k.GetFeeParam(ctx), "", " ")
-		if err != nil {
-			return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", err.Error()))
-		}
-		return bz, nil
-	case types.ParamNativeDenom:
-		bz, err := k.cdc.MarshalJSONIndent(sdk.IrisAtto, "", " ")
+		bz, err := k.cdc.MarshalJSONIndent(k.GetParams(ctx), "", " ")
 		if err != nil {
 			return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", err.Error()))
 		}

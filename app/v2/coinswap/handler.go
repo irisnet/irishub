@@ -32,12 +32,12 @@ func HandleMsgSwapOrder(ctx sdk.Context, msg MsgSwapOrder, k Keeper) sdk.Result 
 	if ctx.BlockHeader().Time.After(msg.Deadline) {
 		return ErrInvalidDeadline("deadline has passed for MsgSwapOrder").Result()
 	}
-	err := k.SwapOrder(ctx, msg)
+	tag, err := k.HandleSwap(ctx, msg)
 	if err != nil {
 		return err.Result()
 	}
 
-	return sdk.Result{}
+	return sdk.Result{Tags: tag}
 }
 
 // Handle MsgAddLiquidity. If the reserve pool does not exist, it will be
@@ -48,7 +48,7 @@ func HandleMsgAddLiquidity(ctx sdk.Context, msg MsgAddLiquidity, k Keeper) sdk.R
 		return ErrInvalidDeadline("deadline has passed for MsgAddLiquidity").Result()
 	}
 
-	err := k.AddLiquidity(ctx, msg)
+	err := k.HandleAddLiquidity(ctx, msg)
 	if err != nil {
 		return err.Result()
 	}
@@ -63,7 +63,7 @@ func HandleMsgRemoveLiquidity(ctx sdk.Context, msg MsgRemoveLiquidity, k Keeper)
 		return ErrInvalidDeadline("deadline has passed for MsgRemoveLiquidity").Result()
 	}
 
-	err := k.RemoveLiquidity(ctx, msg)
+	err := k.HandleRemoveLiquidity(ctx, msg)
 	if err != nil {
 		return err.Result()
 	}

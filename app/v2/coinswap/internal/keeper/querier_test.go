@@ -41,13 +41,6 @@ func TestNewQuerier(t *testing.T) {
 	keeper.cdc.UnmarshalJSON(res, &fee)
 	require.Nil(t, err)
 	require.Equal(t, fee, types.DefaultParams().Fee)
-
-	// query for native denom param
-	var nativeDenom string
-	req.Path = fmt.Sprintf("custom/%s/%s/%s", types.QuerierRoute, types.QueryParameters, types.ParamNativeDenom)
-	res, err = querier(ctx, []string{types.QueryParameters, types.ParamNativeDenom}, req)
-	keeper.cdc.UnmarshalJSON(res, &nativeDenom)
-	require.Nil(t, err)
 }
 
 // TODO: Add tests for valid liquidity queries
