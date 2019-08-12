@@ -38,16 +38,3 @@ func CheckUniDenom(uniDenom string) sdk.Error {
 	}
 	return nil
 }
-
-// CleanReservePool remove non-pool coins
-func CleanReservePool(reservePool sdk.Coins, uniDenom string) (sdk.Coins, sdk.Error) {
-	if reservePool == nil {
-		return sdk.Coins{}, nil
-	}
-	tokenDenom, err := GetTokenDenom(uniDenom)
-	if err != nil {
-		return nil, err
-	}
-
-	return sdk.NewCoins(sdk.NewCoin(sdk.IrisAtto, reservePool.AmountOf(sdk.IrisAtto)), sdk.NewCoin(tokenDenom, reservePool.AmountOf(tokenDenom)), sdk.NewCoin(uniDenom, reservePool.AmountOf(uniDenom))), nil
-}

@@ -1,15 +1,21 @@
 package types
 
+import "github.com/irisnet/irishub/types"
+
 const (
 	// QueryLiquidity liquidity query endpoint supported by the coinswap querier
 	QueryLiquidity = "liquidity"
-	// QueryParameters parameters query endpoint supported by the coinswap querier
-	QueryParameters = "parameters"
-	// ParamFee fee query endpoint supported by the coinswap querier
-	ParamFee = "fee"
 )
 
-// QueryLiquidityParams is the query parameters for 'custom/swap/liquidity/{id}'
+// QueryLiquidityParams is the query parameters for 'custom/swap/liquidity'
 type QueryLiquidityParams struct {
 	TokenId string
+}
+
+// QueryLiquidityResponse is the query response for 'custom/swap/liquidity'
+type QueryLiquidityResponse struct {
+	Iris      types.Coin `json:"iris"`
+	Token     types.Coin `json:"token"`
+	Liquidity types.Coin `json:"liquidity"`
+	Fee       string     `json:"fee"`
 }

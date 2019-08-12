@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/irisnet/irishub/app/v2/coinswap/internal/types"
 	sdk "github.com/irisnet/irishub/types"
@@ -14,9 +15,6 @@ func NewQuerier(k Keeper) sdk.Querier {
 		switch path[0] {
 		case types.QueryLiquidity:
 			return queryLiquidity(ctx, req, k)
-
-		case types.QueryParameters:
-			return queryParameters(ctx, path[1:], req, k)
 
 		default:
 			return nil, sdk.ErrUnknownRequest(fmt.Sprintf("%s is not a valid query request path", req.Path))
@@ -33,6 +31,10 @@ func queryLiquidity(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, s
 		return nil, sdk.ErrUnknownRequest(sdk.AppendMsgToErr("incorrectly formatted request data", err.Error()))
 	}
 
+	if len(strings.TrimSpace(params.TokenId)) == 0 {
+		return nil, sdk.ErrUnknownRequest("token id can not be empty")
+	}
+
 	denom, err := sdk.GetCoinMinDenom(params.TokenId)
 	if err != nil {
 		return nil, sdk.ErrUnknownRequest(sdk.AppendMsgToErr("illegal token id", err.Error()))
@@ -43,26 +45,23 @@ func queryLiquidity(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, s
 		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not retrieve reserve pool name", err.Error()))
 	}
 	reservePool := k.GetReservePool(ctx, reservePoolName)
-	// clean reserve pool to remove non-pool coins
-	cleanedReservePool, err := types.CleanReservePool(reservePool, reservePoolName)
-	bz, err := k.cdc.MarshalJSONIndent(cleanedReservePool, "", " ")
+
+	iris := sdk.NewCoin(sdk.IrisAtto, reservePool.AmountOf(sdk.IrisAtto))
+	token := sdk.NewCoin(denom, reservePool.AmountOf(denom))
+	liquidity := sdk.NewCoin(reservePoolName, reservePool.AmountOf(reservePoolName))
+
+	swapParams := k.GetParams(ctx)
+	fee := swapParams.Fee.DecimalString(types.MaxFeePrecision)
+	res := types.QueryLiquidityResponse{
+		Iris:      iris,
+		Token:     token,
+		Liquidity: liquidity,
+		Fee:       fee,
+	}
+
+	bz, err := k.cdc.MarshalJSONIndent(res, "", " ")
 	if err != nil {
 		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", err.Error()))
 	}
 	return bz, nil
-}
-
-// queryParameters returns coinswap module parameter queried for upon success
-// or an error if the query fails
-func queryParameters(ctx sdk.Context, path []string, req abci.RequestQuery, k Keeper) ([]byte, sdk.Error) {
-	switch path[0] {
-	case types.ParamFee:
-		bz, err := k.cdc.MarshalJSONIndent(k.GetParams(ctx), "", " ")
-		if err != nil {
-			return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", err.Error()))
-		}
-		return bz, nil
-	default:
-		return nil, sdk.ErrUnknownRequest(fmt.Sprintf("%s is not a valid query request path", req.Path))
-	}
 }
