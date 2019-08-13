@@ -2,8 +2,6 @@ package cli
 
 import (
 	"fmt"
-	"os"
-
 	"github.com/irisnet/irishub/client/bank"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
@@ -11,11 +9,13 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"os"
 )
 
 const (
 	flagTo     = "to"
 	flagAmount = "amount"
+	flagRegexp = "regexp"
 )
 
 // SendTxCmd will create a send tx and sign it with the given key.
@@ -125,6 +125,46 @@ func BurnTxCmd(cdc *codec.Codec) *cobra.Command {
 
 	cmd.Flags().String(flagAmount, "", "Amount of coins to burn, for instance: 10iris")
 	cmd.MarkFlagRequired(flagAmount)
+
+	return cmd
+}
+
+// SetMemoRegCmd will create a set regexp tx and sign it with the given key.
+func SetMemoRegCmd(cdc *codec.Codec) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "set-memo-regexp",
+		Short:   "Create and sign a tx to set memo regexp",
+		Example: "iriscli bank set-memo-regexp --regexp=^[A-Za-z0-9]+$ --from=<key name> --fee=0.4iris --chain-id=<chain-id>",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().
+				WithCodec(cdc).
+				WithLogger(os.Stdout).
+				WithAccountDecoder(utils.GetAccountDecoder(cdc))
+			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).WithCliCtx(cliCtx)
+
+			regStr := viper.GetString(flagRegexp)
+
+			from, err := cliCtx.GetFromAddress()
+			if err != nil {
+				return err
+			}
+
+			// build and sign the transaction, then broadcast to Tendermint
+			msg := bank.BuildSetMemoRegexp(from, regStr)
+			if cliCtx.GenerateOnly {
+				return utils.PrintUnsignedStdTx(txCtx, cliCtx, []sdk.Msg{msg}, true)
+			}
+
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+
+			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
+		},
+	}
+
+	cmd.Flags().String(flagRegexp, "", "Regexp for memo check, for instance: \"^[A-Za-z0-9]+$\"")
+	cmd.MarkFlagRequired(flagRegexp)
 
 	return cmd
 }

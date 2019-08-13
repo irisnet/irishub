@@ -30,6 +30,9 @@ type Account interface {
 
 	GetCoins() sdk.Coins
 	SetCoins(sdk.Coins) error
+
+	GetRegexp() string
+	SetRegexp(string)
 }
 
 // AccountDecoder unmarshals account bytes
@@ -51,6 +54,7 @@ type BaseAccount struct {
 	PubKey        crypto.PubKey  `json:"public_key"`
 	AccountNumber uint64         `json:"account_number"`
 	Sequence      uint64         `json:"sequence"`
+	MemoRegexp    string         `json:"memo_regexp"`
 }
 
 // String implements fmt.Stringer
@@ -66,8 +70,14 @@ func (acc BaseAccount) String() string {
   Pubkey:          %s
   Coins:           %s
   Account Number:  %d
-  Sequence:        %d`,
-		acc.Address, pubkey, acc.Coins.String(), acc.AccountNumber, acc.Sequence,
+  Sequence:        %d
+  Memo Regexp:     %s`,
+		acc.Address,
+		pubkey,
+		acc.Coins.String(),
+		acc.AccountNumber,
+		acc.Sequence,
+		acc.MemoRegexp,
 	)
 }
 
@@ -84,8 +94,14 @@ func (acc BaseAccount) HumanString(converter sdk.CoinsConverter) string {
   Pubkey:          %s
   Coins:           %s
   Account Number:  %d
-  Sequence:        %d`,
-		acc.Address, pubkey, converter.ToMainUnit(acc.Coins), acc.AccountNumber, acc.Sequence,
+  Sequence:        %d 
+  Memo Regexp:     %s`,
+		acc.Address,
+		pubkey,
+		converter.ToMainUnit(acc.Coins),
+		acc.AccountNumber,
+		acc.Sequence,
+		acc.MemoRegexp,
 	)
 }
 
@@ -156,6 +172,16 @@ func (acc *BaseAccount) GetSequence() uint64 {
 func (acc *BaseAccount) SetSequence(seq uint64) error {
 	acc.Sequence = seq
 	return nil
+}
+
+// Implements sdk.Account.
+func (acc *BaseAccount) GetRegexp() string {
+	return acc.MemoRegexp
+}
+
+// Implements sdk.Account.
+func (acc *BaseAccount) SetRegexp(regexp string) {
+	acc.MemoRegexp = regexp
 }
 
 //----------------------------------------

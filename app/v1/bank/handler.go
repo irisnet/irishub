@@ -12,6 +12,8 @@ func NewHandler(k Keeper) sdk.Handler {
 			return handleMsgSend(ctx, k, msg)
 		case MsgBurn:
 			return handleMsgBurn(ctx, k, msg)
+		case MsgSetMemoRegexp:
+			return handleMsgSetMemoRegexp(ctx, k, msg)
 		default:
 			errMsg := "Unrecognized bank Msg type: %s" + msg.Type()
 			return sdk.ErrUnknownRequest(errMsg).Result()
@@ -41,6 +43,19 @@ func handleMsgBurn(ctx sdk.Context, k Keeper, msg MsgBurn) sdk.Result {
 		return err.Result()
 	}
 	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, msg.Owner.String(), "", msg.Coins.String(), sdk.BurnFlow, "")
+	return sdk.Result{
+		Tags: tags,
+	}
+}
+
+// Handle MsgSetMemoRegexp.
+func handleMsgSetMemoRegexp(ctx sdk.Context, k Keeper, msg MsgSetMemoRegexp) sdk.Result {
+
+	tags, err := k.SetMemoRegexp(ctx, msg.Owner, msg.MemoRegexp)
+
+	if err != nil {
+		return err.Result()
+	}
 	return sdk.Result{
 		Tags: tags,
 	}
