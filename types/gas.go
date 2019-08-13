@@ -1,5 +1,9 @@
 package types
 
+import (
+	"math"
+)
+
 // Gas consumption descriptors.
 const (
 	GasIterNextCostFlatDesc = "IterNextFlat"
@@ -44,6 +48,7 @@ type GasMeter interface {
 type basicGasMeter struct {
 	limit    Gas
 	consumed Gas
+	log      float64
 }
 
 // NewGasMeter returns a reference to a new basicGasMeter.
@@ -51,6 +56,14 @@ func NewGasMeter(limit Gas) GasMeter {
 	return &basicGasMeter{
 		limit:    limit,
 		consumed: 0,
+	}
+}
+
+func NewGasMeterWithLog(limit Gas, log float64) GasMeter {
+	return &basicGasMeter{
+		limit:    limit,
+		consumed: 0,
+		log:      log,
 	}
 }
 
@@ -70,6 +83,10 @@ func (g *basicGasMeter) GasConsumedToLimit() Gas {
 
 func (g *basicGasMeter) ConsumeGas(amount Gas, descriptor string) {
 	var overflow bool
+	if g.log > 1 && amount > 0 && amount < math.MaxInt64 &&
+		(descriptor == GasWritePerByteDesc || descriptor == GasReadPerByteDesc) {
+		amount = uint64(math.Log(float64(int64(amount))) / math.Log(g.log))
+	}
 	// TODO: Should we set the consumed field after overflow checking?
 	g.consumed, overflow = AddUint64Overflow(g.consumed, amount)
 	if overflow {

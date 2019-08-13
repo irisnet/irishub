@@ -43,3 +43,28 @@ func TestGasMeter(t *testing.T) {
 
 	}
 }
+
+func TestGasMeterWithLog(t *testing.T) {
+	cases := []struct {
+		limit  Gas
+		usage  Gas
+		log    float64
+		desc   string
+		expect Gas
+	}{
+		{1000, 100, 10, GasWritePerByteDesc, 2},
+		{1000, 100, 10, GasReadPerByteDesc, 2},
+		{1000, 100, 10, "", 100},
+		{1000, 100, 1, GasWritePerByteDesc, 100},
+		{1000, 100, 0, GasWritePerByteDesc, 100},
+		{1000, 100, 0.99, GasWritePerByteDesc, 100},
+		{1000, 100, -0.1, GasWritePerByteDesc, 100},
+	}
+
+	for tcnum, tc := range cases {
+		meter := NewGasMeterWithLog(tc.limit, tc.log)
+
+		meter.ConsumeGas(tc.usage, tc.desc)
+		require.Equal(t, tc.expect, meter.GasConsumed(), "Gas consumption not match. tc #%d", tcnum)
+	}
+}
