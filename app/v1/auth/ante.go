@@ -22,6 +22,7 @@ const (
 	gasPerUnitCost = 1000
 	// max total number of sigs per tx
 	txSigLimit = 7
+	gasLog     = 1.1 // gas logarithm
 )
 
 // NewAnteHandler returns an AnteHandler that checks
@@ -308,7 +309,7 @@ func setGasMeter(simulate bool, ctx sdk.Context, gasLimit uint64) sdk.Context {
 	if simulate || ctx.BlockHeight() == 0 {
 		return ctx.WithGasMeter(sdk.NewInfiniteGasMeter())
 	}
-	return ctx.WithGasMeter(sdk.NewGasMeter(gasLimit))
+	return ctx.WithGasMeter(sdk.NewGasMeterWithLog(gasLimit, gasLog))
 }
 
 func getSignBytesList(chainID string, stdTx StdTx, stdSigs []StdSignature) (signatureBytesList [][]byte) {
