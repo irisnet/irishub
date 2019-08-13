@@ -14,15 +14,9 @@ import (
 )
 
 const (
-	BlockStoreCostPerByte = 10
-	ed25519VerifyCost     = 59
-	secp256k1VerifyCost   = 100
-	maxMemoCharacters     = 100
-	// how much gas = 1 atom
-	gasPerUnitCost = 1000
-	// max total number of sigs per tx
-	txSigLimit = 7
-	gasLog     = 1.1 // gas logarithm
+	ed25519VerifyCost   = 59
+	secp256k1VerifyCost = 100
+	gasLog              = 1.1 // gas logarithm
 )
 
 // NewAnteHandler returns an AnteHandler that checks
