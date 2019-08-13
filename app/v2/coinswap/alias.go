@@ -32,7 +32,7 @@ var (
 	ErrNotPositive      = types.ErrNotPositive
 	ErrConstraintNotMet = types.ErrConstraintNotMet
 
-	GetReservePoolName          = types.GetUniId
+	GetUniId                    = types.GetUniId
 	GetCoinMinDenomFromUniDenom = types.GetCoinMinDenomFromUniDenom
 	GetUniDenom                 = types.GetUniDenom
 	CheckUniDenom               = types.CheckUniDenom

@@ -28,7 +28,7 @@ func GetUniId(denom1, denom2 string) (string, sdk.Error) {
 			return "", ErrIllegalDenom(err.Error())
 		}
 	}
-	return fmt.Sprintf(FormatReservePool, coinName), nil
+	return fmt.Sprintf(FormatUniId, coinName), nil
 }
 
 // GetCoinMinDenomFromUniDenom returns the token denom by uni denom
@@ -37,12 +37,12 @@ func GetCoinMinDenomFromUniDenom(uniDenom string) (string, sdk.Error) {
 	if err != nil {
 		return "", err
 	}
-	return strings.TrimPrefix(uniDenom, FormatReservePoolPrefix), nil
+	return strings.TrimPrefix(uniDenom, FormatUniIdPrefix), nil
 }
 
 // CheckUniDenom returns nil if the uni denom is valid
 func CheckUniDenom(uniDenom string) sdk.Error {
-	if !sdk.IsCoinMinDenomValid(uniDenom) || !strings.HasPrefix(uniDenom, FormatReservePoolPrefix) {
+	if !sdk.IsCoinMinDenomValid(uniDenom) || !strings.HasPrefix(uniDenom, FormatUniIdPrefix) {
 		return ErrIllegalDenom(fmt.Sprintf("illegal liquidity denomnation: %s", uniDenom))
 	}
 	return nil
@@ -50,7 +50,7 @@ func CheckUniDenom(uniDenom string) sdk.Error {
 
 // CheckUniId returns nil if the uni id is valid
 func CheckUniId(uniId string) sdk.Error {
-	if !sdk.IsCoinNameValid(uniId) || !strings.HasPrefix(uniId, FormatReservePoolPrefix) {
+	if !sdk.IsCoinNameValid(uniId) || !strings.HasPrefix(uniId, FormatUniIdPrefix) {
 		return ErrIllegalUniId(fmt.Sprintf("illegal liquidity id: %s", uniId))
 	}
 	return nil
