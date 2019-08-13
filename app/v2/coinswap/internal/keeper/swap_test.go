@@ -14,7 +14,7 @@ var (
 	native = sdk.IrisAtto
 )
 
-func TestGetReservePoolName(t *testing.T) {
+func TestGetUniId(t *testing.T) {
 
 	cases := []struct {
 		name         string
@@ -23,10 +23,10 @@ func TestGetReservePoolName(t *testing.T) {
 		expectResult string
 		expectPass   bool
 	}{
-		{"denom1 is native", native, "btc", "u-btc", true},
-		{"denom2 is native", "btc", native, "u-btc", true},
-		{"denom1 equals denom2", "btc", "btc", "u-btc", false},
-		{"neither denom is native", "eth", "btc", "u-btc", false},
+		{"denom1 is native", native, "btc-min", "u-btc", true},
+		{"denom2 is native", "btc-min", native, "u-btc", true},
+		{"denom1 equals denom2", "btc-min", "btc-min", "u-btc", false},
+		{"neither denom is native", "eth-min", "btc-min", "u-btc", false},
 	}
 
 	for _, tc := range cases {
