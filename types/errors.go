@@ -50,6 +50,7 @@ const (
 	CodeExceedsTxSize     CodeType = 21
 	CodeServiceTxLimit    CodeType = 22
 	CodePaginationParams  CodeType = 23
+	CodeInvalidMemoRegexp CodeType = 24
 	// CodespaceRoot is a codespace for error codes in this file only.
 	// Notice that 0 is an "unset" codespace, which can be overridden with
 	// Error.WithDefaultCodespace().
@@ -185,6 +186,10 @@ func ErrInvalidLength(codespace CodespaceType, codeType CodeType, descriptor str
 }
 func ErrInvalidPaginationParams(msg string) Error {
 	return newErrorWithRootCodespace(CodePaginationParams, msg)
+}
+
+func ErrInvalidMemoRegexp(msg string) Error {
+	return newErrorWithRootCodespace(CodeInvalidMemoRegexp, msg)
 }
 
 //----------------------------------------

@@ -15,6 +15,7 @@ type BaseAccount struct {
 	PubKey        crypto.PubKey  `json:"public_key"`
 	AccountNumber uint64         `json:"account_number"`
 	Sequence      uint64         `json:"sequence"`
+	MemoRegexp    string         `json:"memo_regexp"`
 }
 
 // String implements fmt.Stringer
@@ -30,8 +31,14 @@ func (acc BaseAccount) String() string {
   Pubkey:          %s
   Coins:           %s
   Account Number:  %d
-  Sequence:        %d`,
-		acc.Address, pubkey, strings.Join(acc.Coins, ","), acc.AccountNumber, acc.Sequence,
+  Sequence:        %d
+  Memo Regexp:     %s`,
+		acc.Address,
+		pubkey,
+		strings.Join(acc.Coins, ","),
+		acc.AccountNumber,
+		acc.Sequence,
+		acc.MemoRegexp,
 	)
 }
 
@@ -49,6 +56,12 @@ func BuildBankBurnMsg(from sdk.AccAddress, coins sdk.Coins) sdk.Msg {
 	return msg
 }
 
+// SetMemoRegexp builds the set memo regexp msg
+func BuildSetMemoRegexp(from sdk.AccAddress, regexp string) sdk.Msg {
+	msg := bank.NewMsgSetMemoRegexp(from, regexp)
+	return msg
+}
+
 type TokenStats struct {
 	LooseTokens  []string `json:"loose_tokens"`
 	BurnedTokens []string `json:"burned_tokens"`
@@ -63,6 +76,9 @@ func (ts TokenStats) String() string {
   Bonded Tokens:  %s
   Burned Tokens:  %s
   Total Supply:   %s`,
-		strings.Join(ts.LooseTokens, ","), strings.Join(ts.BondedTokens, ","), strings.Join(ts.BurnedTokens, ","), strings.Join(ts.TotalSupply, ","),
+		strings.Join(ts.LooseTokens, ","),
+		strings.Join(ts.BondedTokens, ","),
+		strings.Join(ts.BurnedTokens, ","),
+		strings.Join(ts.TotalSupply, ","),
 	)
 }

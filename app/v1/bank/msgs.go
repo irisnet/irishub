@@ -2,6 +2,7 @@ package bank
 
 import (
 	"encoding/json"
+	"regexp"
 
 	"fmt"
 	sdk "github.com/irisnet/irishub/types"
@@ -215,5 +216,51 @@ func (msg MsgBurn) GetSignBytes() []byte {
 
 // Implements Msg.
 func (msg MsgBurn) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{msg.Owner}
+}
+
+//----------------------------------------
+// MsgSetMemoRegexp
+
+// MsgSetMemoRegexp - set memo regexp
+type MsgSetMemoRegexp struct {
+	Owner      sdk.AccAddress `json:"owner"`
+	MemoRegexp string         `json:"memo_regexp"`
+}
+
+var _ sdk.Msg = MsgSetMemoRegexp{}
+
+// NewMsgIssue - construct arbitrary multi-in, multi-out send msg.
+func NewMsgSetMemoRegexp(owner sdk.AccAddress, memoRegexp string) MsgSetMemoRegexp {
+	return MsgSetMemoRegexp{Owner: owner, MemoRegexp: memoRegexp}
+}
+
+// Implements Msg.
+// nolint
+func (msg MsgSetMemoRegexp) Route() string { return "bank" }
+func (msg MsgSetMemoRegexp) Type() string  { return "set-memo-regexp" }
+
+// Implements Msg.
+func (msg MsgSetMemoRegexp) ValidateBasic() sdk.Error {
+	if len(msg.Owner) == 0 {
+		return sdk.ErrInvalidAddress(msg.Owner.String())
+	}
+	if _, err := regexp.MatchString(msg.MemoRegexp, ""); err != nil {
+		return sdk.ErrInvalidMemoRegexp("invalid memo regexp")
+	}
+	return nil
+}
+
+// Implements Msg.
+func (msg MsgSetMemoRegexp) GetSignBytes() []byte {
+	b, err := msgCdc.MarshalJSON(msg)
+	if err != nil {
+		panic(err)
+	}
+	return sdk.MustSortJSON(b)
+}
+
+// Implements Msg.
+func (msg MsgSetMemoRegexp) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Owner}
 }

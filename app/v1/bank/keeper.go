@@ -2,7 +2,6 @@ package bank
 
 import (
 	"fmt"
-
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/codec"
@@ -29,6 +28,7 @@ type Keeper interface {
 	SubtractCoins(ctx sdk.Context, addr sdk.AccAddress, amt sdk.Coins) (sdk.Coins, sdk.Tags, sdk.Error)
 	AddCoins(ctx sdk.Context, addr sdk.AccAddress, amt sdk.Coins) (sdk.Coins, sdk.Tags, sdk.Error)
 	BurnCoins(ctx sdk.Context, fromAddr sdk.AccAddress, amt sdk.Coins) (sdk.Tags, sdk.Error)
+	SetMemoRegexp(ctx sdk.Context, fromAddr sdk.AccAddress, regexp string) (sdk.Tags, sdk.Error)
 	IncreaseLoosenToken(ctx sdk.Context, amt sdk.Coins)
 	DecreaseLoosenToken(ctx sdk.Context, amt sdk.Coins)
 	IncreaseTotalSupply(ctx sdk.Context, amt sdk.Coin) sdk.Error
@@ -108,6 +108,21 @@ func (keeper BaseKeeper) IncreaseLoosenToken(
 func (keeper BaseKeeper) DecreaseLoosenToken(
 	ctx sdk.Context, amt sdk.Coins) {
 	keeper.am.DecreaseTotalLoosenToken(ctx, amt)
+}
+
+// SetMemoRegexp set memo regexp for sender account
+func (keeper BaseKeeper) SetMemoRegexp(ctx sdk.Context, fromAddr sdk.AccAddress, regexp string) (sdk.Tags, sdk.Error) {
+	acc := keeper.am.GetAccount(ctx, fromAddr)
+
+	acc.SetRegexp(regexp)
+
+	keeper.am.SetAccount(ctx, acc)
+
+	tags := sdk.NewTags(
+		"memoRegexp", []byte(regexp),
+	)
+
+	return tags, nil
 }
 
 // BurnCoins burns coins from the given account
@@ -308,6 +323,7 @@ func setCoins(ctx sdk.Context, am auth.AccountKeeper, addr sdk.AccAddress, amt s
 		// Handle w/ #870
 		panic(err)
 	}
+
 	am.SetAccount(ctx, acc)
 	return nil
 }
