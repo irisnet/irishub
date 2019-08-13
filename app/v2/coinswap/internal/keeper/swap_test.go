@@ -31,9 +31,9 @@ func TestGetReservePoolName(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			reservePoolName, err := types.GetReservePoolName(tc.denom1, tc.denom2)
+			uniId, err := types.GetUniId(tc.denom1, tc.denom2)
 			if tc.expectPass {
-				require.Equal(t, tc.expectResult, reservePoolName)
+				require.Equal(t, tc.expectResult, uniId)
 			} else {
 				require.NotNil(t, err)
 			}
@@ -115,8 +115,8 @@ func TestKeeperSwap(t *testing.T) {
 	sender := accs[0].GetAddress()
 	denom1 := "btc-min"
 	denom2 := sdk.IrisAtto
-	reservePoolName, _ := types.GetReservePoolName(denom1, denom2)
-	reservePoolAddr := getReservePoolAddr(reservePoolName)
+	uniId, _ := types.GetUniId(denom1, denom2)
+	reservePoolAddr := getReservePoolAddr(uniId)
 
 	depositCoin := sdk.NewCoin("btc-min", sdk.NewInt(1000))
 	depositAmount := sdk.NewInt(1000)

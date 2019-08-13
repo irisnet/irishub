@@ -100,11 +100,6 @@ func NewIntFromBigInt(i *big.Int) Int {
 	return Int{i}
 }
 
-// NewIntFromUint64 constructs Int from uint64
-func NewIntFromUint64(i uint64) Int {
-	return NewIntFromBigInt(new(big.Int).SetUint64(i))
-}
-
 // NewIntFromString constructs Int from string
 func NewIntFromString(s string) (res Int, ok bool) {
 	i, ok := newIntegerFromString(s)

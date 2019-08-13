@@ -22,7 +22,7 @@ const (
 	UpgradeStore         = "upgrade"
 	AssetStore           = "asset"
 	RandStore            = "rand"
-	SwapStore            = "swap"
+	SwapStore            = "coinswap"
 
 	// all route for query and handler
 	BankRoute     = "bank"

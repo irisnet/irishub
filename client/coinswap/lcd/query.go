@@ -11,12 +11,12 @@ import (
 func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec) {
 	// Query liquidity
 	r.HandleFunc(
-		"/swap/liquidities",
+		"/coinswap/liquidities/{id}",
 		queryLiquidityHandlerFn(cliCtx, cdc),
 	).Methods("GET")
 }
 
 // queryLiquidityHandlerFn performs liquidity information query
 func queryLiquidityHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
-	return queryLiquidity(cliCtx, cdc, "custom/swap/liquidities")
+	return queryLiquidity(cliCtx, cdc, "custom/coinswap/liquidities/{id}")
 }

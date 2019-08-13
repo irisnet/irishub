@@ -2,8 +2,6 @@ package keeper
 
 import (
 	"fmt"
-	"strings"
-
 	"github.com/irisnet/irishub/app/v2/coinswap/internal/types"
 	sdk "github.com/irisnet/irishub/types"
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -31,24 +29,21 @@ func queryLiquidity(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, s
 		return nil, sdk.ErrUnknownRequest(sdk.AppendMsgToErr("incorrectly formatted request data", err.Error()))
 	}
 
-	if len(strings.TrimSpace(params.TokenId)) == 0 {
-		return nil, sdk.ErrUnknownRequest("token id can not be empty")
+	uniDenom, err := types.GetUniDenom(params.Id)
+	if err != nil {
+		return nil, sdk.ErrUnknownRequest(err.Error())
 	}
 
-	denom, err := sdk.GetCoinMinDenom(params.TokenId)
+	tokenDenom, err := types.GetCoinMinDenomFromUniDenom(uniDenom)
 	if err != nil {
-		return nil, sdk.ErrUnknownRequest(sdk.AppendMsgToErr("illegal token id", err.Error()))
+		return nil, sdk.ErrUnknownRequest(err.Error())
 	}
 
-	reservePoolName, err := types.GetReservePoolName(sdk.IrisAtto, denom)
-	if err != nil {
-		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not retrieve reserve pool name", err.Error()))
-	}
-	reservePool := k.GetReservePool(ctx, reservePoolName)
+	reservePool := k.GetReservePool(ctx, params.Id)
 
 	iris := sdk.NewCoin(sdk.IrisAtto, reservePool.AmountOf(sdk.IrisAtto))
-	token := sdk.NewCoin(denom, reservePool.AmountOf(denom))
-	liquidity := sdk.NewCoin(reservePoolName, reservePool.AmountOf(reservePoolName))
+	token := sdk.NewCoin(tokenDenom, reservePool.AmountOf(tokenDenom))
+	liquidity := sdk.NewCoin(uniDenom, reservePool.AmountOf(uniDenom))
 
 	swapParams := k.GetParams(ctx)
 	fee := swapParams.Fee.DecimalString(types.MaxFeePrecision)

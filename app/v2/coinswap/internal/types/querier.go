@@ -9,7 +9,7 @@ const (
 
 // QueryLiquidityParams is the query parameters for 'custom/swap/liquidity'
 type QueryLiquidityParams struct {
-	TokenId string
+	Id string
 }
 
 // QueryLiquidityResponse is the query response for 'custom/swap/liquidity'

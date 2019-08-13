@@ -1,6 +1,7 @@
 package types
 
 import (
+	"strings"
 	"time"
 
 	sdk "github.com/irisnet/irishub/types"
@@ -38,7 +39,7 @@ type Output struct {
 
 type MsgSwapOrder struct {
 	Input      Input     `json:"input"`        // the amount the sender is trading
-	Output     Output    `json:"output"`       // the amount the sender is recieivng
+	Output     Output    `json:"output"`       // the amount the sender is receiving
 	Deadline   time.Time `json:"deadline"`     // deadline for the transaction to still be considered valid
 	IsBuyOrder bool      `json:"is_buy_order"` // boolean indicating whether the order should be treated as a buy or sell
 }
@@ -67,21 +68,23 @@ func (msg MsgSwapOrder) ValidateBasic() sdk.Error {
 	if !(msg.Input.Coin.IsValid() && msg.Input.Coin.IsPositive()) {
 		return sdk.ErrInvalidCoins("input coin is invalid: " + msg.Input.Coin.String())
 	}
-
+	if strings.HasPrefix(msg.Input.Coin.Denom, FormatReservePoolPrefix) {
+		return sdk.ErrInvalidCoins("unsupported input coin type: " + msg.Input.Coin.String())
+	}
 	if !(msg.Output.Coin.IsValid() && msg.Output.Coin.IsPositive()) {
 		return sdk.ErrInvalidCoins("output coin is invalid: " + msg.Output.Coin.String())
 	}
-
+	if strings.HasPrefix(msg.Output.Coin.Denom, FormatReservePoolPrefix) {
+		return sdk.ErrInvalidCoins("unsupported output coin type: " + msg.Output.Coin.String())
+	}
 	if msg.Input.Coin.Denom == msg.Output.Coin.Denom {
 		return ErrEqualDenom("")
 	}
-
 	if msg.Deadline.IsZero() {
 		return ErrInvalidDeadline("deadline for MsgSwapOrder not initialized")
 	}
-
 	if msg.Input.Address.Empty() {
-		return sdk.ErrInvalidAddress("invalid sender address")
+		return sdk.ErrInvalidAddress("invalid input address")
 	}
 	return nil
 }
@@ -137,6 +140,9 @@ func (msg MsgAddLiquidity) ValidateBasic() sdk.Error {
 	}
 	if msg.MaxToken.Denom == sdk.IrisAtto {
 		return sdk.ErrInvalidCoins("max token must be non-iris token")
+	}
+	if strings.HasPrefix(msg.MaxToken.Denom, FormatReservePoolPrefix) {
+		return sdk.ErrInvalidCoins("max token must be non-liquidity token")
 	}
 	if !msg.ExactIrisAmt.IsNil() && !msg.ExactIrisAmt.IsPositive() {
 		return ErrNotPositive("iris amount must be positive")

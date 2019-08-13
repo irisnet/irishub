@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/app/v2/coinswap"
 	"github.com/irisnet/irishub/client/context"
@@ -13,9 +14,10 @@ import (
 
 func queryLiquidity(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		tokenId := r.FormValue("tokenId")
+		vars := mux.Vars(r)
+		id := vars["id"]
 		params := coinswap.QueryLiquidityParams {
-			TokenId: tokenId,
+			Id: id,
 		}
 
 		bz, err := cliCtx.Codec.MarshalJSON(params)
@@ -25,7 +27,7 @@ func queryLiquidity(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string
 		}
 
 		res, err := cliCtx.QueryWithData(
-			fmt.Sprintf("custom/%s/%s", protocol.SwapRoute, coinswap.QueryLiquidity), bz)
+			fmt.Sprintf("custom/%s/%s", protocol.SwapRoute, coinswap.QueryLiquidities), bz)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return

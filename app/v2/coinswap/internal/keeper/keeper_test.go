@@ -8,10 +8,6 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 )
 
-const (
-	reservePoolName = "swap:iris:btc"
-)
-
 // test that the params can be properly set and retrieved
 func TestParams(t *testing.T) {
 	ctx, keeper, _ := createTestInput(t, sdk.NewInt(0), 0)

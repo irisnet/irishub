@@ -12,22 +12,31 @@ type (
 	MsgRemoveLiquidity   = types.MsgRemoveLiquidity
 	Params               = types.Params
 	QueryLiquidityParams = types.QueryLiquidityParams
+	Input                = types.Input
+	Output               = types.Output
 )
 
 var (
+	DefaultParamSpace = types.DefaultParamSpace
+	QueryLiquidities  = types.QueryLiquidities
+
+	RegisterCodec = types.RegisterCodec
+
 	NewMsgSwapOrder       = types.NewMsgSwapOrder
 	NewMsgAddLiquidity    = types.NewMsgAddLiquidity
 	NewMsgRemoveLiquidity = types.NewMsgRemoveLiquidity
+	NewKeeper             = keeper.NewKeeper
+	NewQuerier            = keeper.NewQuerier
 
 	ErrInvalidDeadline  = types.ErrInvalidDeadline
 	ErrNotPositive      = types.ErrNotPositive
 	ErrConstraintNotMet = types.ErrConstraintNotMet
-	RegisterCodec       = types.RegisterCodec
-	NewKeeper           = keeper.NewKeeper
-	NewQuerier          = keeper.NewQuerier
-	DefaultParamSpace   = types.DefaultParamSpace
 
-	QueryLiquidity = types.QueryLiquidities
+	GetReservePoolName          = types.GetUniId
+	GetCoinMinDenomFromUniDenom = types.GetCoinMinDenomFromUniDenom
+	GetUniDenom                 = types.GetUniDenom
+	CheckUniDenom               = types.CheckUniDenom
+	CheckUniId                  = types.CheckUniId
 )
 
 const (
