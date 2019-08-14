@@ -23,8 +23,8 @@ var (
 	input             = sdk.NewCoin(denom0, sdk.NewInt(1000))
 	output            = sdk.NewCoin(denom1, sdk.NewInt(500))
 	withdrawLiquidity = sdk.NewCoin(unidenom, sdk.NewInt(500))
-	deadline          = time.Now()
+	deadline          = time.Now().Unix()
 
 	emptyAddr sdk.AccAddress
-	emptyTime time.Time
+	emptyTime int64
 )

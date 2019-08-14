@@ -2,6 +2,7 @@ package coinswap
 
 import (
 	"fmt"
+	"time"
 
 	sdk "github.com/irisnet/irishub/types"
 )
@@ -29,7 +30,7 @@ func NewHandler(k Keeper) sdk.Handler {
 // Handle MsgSwapOrder.
 func HandleMsgSwapOrder(ctx sdk.Context, msg MsgSwapOrder, k Keeper) sdk.Result {
 	// check that deadline has not passed
-	if ctx.BlockHeader().Time.After(msg.Deadline) {
+	if ctx.BlockHeader().Time.After(time.Unix(msg.Deadline, 0)) {
 		return ErrInvalidDeadline("deadline has passed for MsgSwapOrder").Result()
 	}
 	tag, err := k.HandleSwap(ctx, msg)
@@ -44,7 +45,7 @@ func HandleMsgSwapOrder(ctx sdk.Context, msg MsgSwapOrder, k Keeper) sdk.Result 
 // created. The first liquidity provider sets the exchange rate.
 func HandleMsgAddLiquidity(ctx sdk.Context, msg MsgAddLiquidity, k Keeper) sdk.Result {
 	// check that deadline has not passed
-	if ctx.BlockHeader().Time.After(msg.Deadline) {
+	if ctx.BlockHeader().Time.After(time.Unix(msg.Deadline, 0)) {
 		return ErrInvalidDeadline("deadline has passed for MsgAddLiquidity").Result()
 	}
 
@@ -59,7 +60,7 @@ func HandleMsgAddLiquidity(ctx sdk.Context, msg MsgAddLiquidity, k Keeper) sdk.R
 // HandleMsgRemoveLiquidity handler for MsgRemoveLiquidity
 func HandleMsgRemoveLiquidity(ctx sdk.Context, msg MsgRemoveLiquidity, k Keeper) sdk.Result {
 	// check that deadline has not passed
-	if ctx.BlockHeader().Time.After(msg.Deadline) {
+	if ctx.BlockHeader().Time.After(time.Unix(msg.Deadline, 0)) {
 		return ErrInvalidDeadline("deadline has passed for MsgRemoveLiquidity").Result()
 	}
 
