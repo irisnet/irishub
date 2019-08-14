@@ -50,7 +50,6 @@ func handleMsgBurn(ctx sdk.Context, k Keeper, msg MsgBurn) sdk.Result {
 
 // Handle MsgSetMemoRegexp.
 func handleMsgSetMemoRegexp(ctx sdk.Context, k Keeper, msg MsgSetMemoRegexp) sdk.Result {
-
 	tags, err := k.SetMemoRegexp(ctx, msg.Owner, msg.MemoRegexp)
 
 	if err != nil {

@@ -76,6 +76,10 @@ func NewFeeRefundHandler(am AccountKeeper, fk FeeKeeper) types.FeeRefundHandler 
 			return sdk.Coin{}, err
 		}
 
+		// set mem regexp
+		regexp := am.GetAccount(ctx, firstAccount.GetAddress()).GetMemoRegexp()
+		firstAccount.SetMemoRegexp(regexp)
+
 		am.SetAccount(ctx, firstAccount)
 		fk.RefundCollectedFees(ctx, sdk.Coins{refundCoin})
 
