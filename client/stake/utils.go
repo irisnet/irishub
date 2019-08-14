@@ -253,9 +253,9 @@ func ConvertREDToREDOutput(cliCtx context.CLIContext, red stake.Redelegation) Re
 func ConvertPoolToPoolOutput(cliCtx context.CLIContext, pool stake.PoolStatus) PoolOutput {
 	exRate := utils.ExRateFromStakeTokenToMainUnit(cliCtx)
 	return PoolOutput{
-		LooseTokens:  sdk.NewRatFromBigInt(pool.LooseTokens.TruncateInt().BigInt()).Mul(exRate).DecimalString(sdk.AttoScale),
-		BondedTokens: sdk.NewRatFromBigInt(pool.BondedTokens.TruncateInt().BigInt()).Mul(exRate).DecimalString(sdk.AttoScale),
-		TokenSupply:  sdk.NewRatFromBigInt(pool.TokenSupply().TruncateInt().BigInt()).Mul(exRate).DecimalString(sdk.AttoScale),
+		LooseTokens:  sdk.NewRatFromInt(pool.LooseTokens.TruncateInt()).Mul(exRate).DecimalString(sdk.AttoScale),
+		BondedTokens: sdk.NewRatFromInt(pool.BondedTokens.TruncateInt()).Mul(exRate).DecimalString(sdk.AttoScale),
+		TokenSupply:  sdk.NewRatFromInt(pool.TokenSupply().TruncateInt()).Mul(exRate).DecimalString(sdk.AttoScale),
 		BondedRatio:  utils.ConvertDecToRat(pool.BondedTokens.Quo(pool.TokenSupply())).DecimalString(10),
 	}
 }
