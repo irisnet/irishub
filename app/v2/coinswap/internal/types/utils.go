@@ -18,18 +18,13 @@ func GetUniId(denom1, denom2 string) (string, sdk.Error) {
 		return "", ErrIllegalDenom(fmt.Sprintf("illegal denomnations for forming uni id, must have one native denom: %s", sdk.IrisAtto))
 	}
 
-        denom := denom1
-        if denom != sdk.IrisAtto
-            denom = denom2
+	denom := denom1
+	if denom == sdk.IrisAtto {
+		denom = denom2
+	}
 	coinName, err := sdk.GetCoinNameByDenom(denom)
 	if err != nil {
 		return "", ErrIllegalDenom(err.Error())
-	}
-	if denom1 != sdk.IrisAtto {
-		coinName, err = sdk.GetCoinNameByDenom(denom1)
-		if err != nil {
-			return "", ErrIllegalDenom(err.Error())
-		}
 	}
 	return fmt.Sprintf(FormatUniId, coinName), nil
 }
