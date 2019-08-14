@@ -31,8 +31,8 @@ type Account interface {
 	GetCoins() sdk.Coins
 	SetCoins(sdk.Coins) error
 
-	GetRegexp() string
-	SetRegexp(string)
+	GetMemoRegexp() string
+	SetMemoRegexp(string)
 }
 
 // AccountDecoder unmarshals account bytes
@@ -175,12 +175,12 @@ func (acc *BaseAccount) SetSequence(seq uint64) error {
 }
 
 // Implements sdk.Account.
-func (acc *BaseAccount) GetRegexp() string {
+func (acc *BaseAccount) GetMemoRegexp() string {
 	return acc.MemoRegexp
 }
 
 // Implements sdk.Account.
-func (acc *BaseAccount) SetRegexp(regexp string) {
+func (acc *BaseAccount) SetMemoRegexp(regexp string) {
 	acc.MemoRegexp = regexp
 }
 

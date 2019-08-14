@@ -149,8 +149,8 @@ func SetMemoRegCmd(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			// build and sign the transaction, then broadcast to Tendermint
 			msg := bank.BuildSetMemoRegexp(from, regStr)
+
 			if cliCtx.GenerateOnly {
 				return utils.PrintUnsignedStdTx(txCtx, cliCtx, []sdk.Msg{msg}, true)
 			}

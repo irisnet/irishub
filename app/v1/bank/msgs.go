@@ -2,10 +2,10 @@ package bank
 
 import (
 	"encoding/json"
-	"regexp"
-
 	"fmt"
+
 	sdk "github.com/irisnet/irishub/types"
+	"regexp"
 )
 
 // MsgSend - high level transaction of the coin module
