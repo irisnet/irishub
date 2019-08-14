@@ -58,13 +58,7 @@ func (coin Coin) IsValid() bool {
 	if coin.IsNegative() {
 		return false
 	}
-	if coin.Denom != IrisAtto && (!strings.HasSuffix(coin.Denom, MinDenomSuffix) || strings.HasPrefix(coin.Denom, Iris + "-")) {
-		return false
-	}
-	if !reDenomCompiled.MatchString(coin.Denom) {
-		return false
-	}
-	return true
+	return IsCoinMinDenomValid(coin.Denom)
 }
 
 func (coin Coin) IsValidIrisAtto() bool {
@@ -635,20 +629,14 @@ func ParseCoins(coinsStr string) (coins Coins, err error) {
 }
 
 func IsCoinNameValid(coinName string) bool  {
-	if !reCoinNameCompiled.MatchString(coinName) {
-		return false
-	}
-	return true
+	return reCoinNameCompiled.MatchString(coinName)
 }
 
 func IsCoinMinDenomValid(denom string) bool  {
-	if denom != IrisAtto && !strings.HasSuffix(denom, MinDenomSuffix) {
+	if denom != IrisAtto && (!strings.HasSuffix(denom, MinDenomSuffix) || strings.HasPrefix(denom, Iris + "-")) {
 		return false
 	}
-	if !reDenomCompiled.MatchString(denom) {
-		return false
-	}
-	return true
+	return reDenomCompiled.MatchString(denom)
 }
 
 func (coins Coins) IsValidV0() bool {
