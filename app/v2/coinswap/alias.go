@@ -18,7 +18,7 @@ type (
 
 var (
 	DefaultParamSpace = types.DefaultParamSpace
-	QueryLiquidities  = types.QueryLiquidities
+	QueryLiquidity    = types.QueryLiquidity
 
 	RegisterCodec = types.RegisterCodec
 

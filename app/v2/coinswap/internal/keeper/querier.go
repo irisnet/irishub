@@ -11,7 +11,7 @@ import (
 func NewQuerier(k Keeper) sdk.Querier {
 	return func(ctx sdk.Context, path []string, req abci.RequestQuery) (res []byte, err sdk.Error) {
 		switch path[0] {
-		case types.QueryLiquidities:
+		case types.QueryLiquidity:
 			return queryLiquidity(ctx, req, k)
 
 		default:

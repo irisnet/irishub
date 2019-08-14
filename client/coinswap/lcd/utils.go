@@ -27,7 +27,7 @@ func queryLiquidity(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string
 		}
 
 		res, err := cliCtx.QueryWithData(
-			fmt.Sprintf("custom/%s/%s", protocol.SwapRoute, coinswap.QueryLiquidities), bz)
+			fmt.Sprintf("custom/%s/%s", protocol.SwapRoute, coinswap.QueryLiquidity), bz)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
