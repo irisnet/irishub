@@ -1,10 +1,8 @@
 package types
 
 import (
-	"strings"
-	"time"
-
 	sdk "github.com/irisnet/irishub/types"
+	"strings"
 )
 
 var (
@@ -38,15 +36,15 @@ type Output struct {
 }
 
 type MsgSwapOrder struct {
-	Input      Input     `json:"input"`        // the amount the sender is trading
-	Output     Output    `json:"output"`       // the amount the sender is receiving
-	Deadline   time.Time `json:"deadline"`     // deadline for the transaction to still be considered valid
-	IsBuyOrder bool      `json:"is_buy_order"` // boolean indicating whether the order should be treated as a buy or sell
+	Input      Input  `json:"input"`        // the amount the sender is trading
+	Output     Output `json:"output"`       // the amount the sender is receiving
+	Deadline   int64  `json:"deadline"`     // deadline for the transaction to still be considered valid
+	IsBuyOrder bool   `json:"is_buy_order"` // boolean indicating whether the order should be treated as a buy or sell
 }
 
 // NewMsgSwapOrder creates a new MsgSwapOrder object.
 func NewMsgSwapOrder(
-	input Input, output Output, deadline time.Time, isBuyOrder bool,
+	input Input, output Output, deadline int64, isBuyOrder bool,
 ) MsgSwapOrder {
 
 	return MsgSwapOrder{
@@ -80,7 +78,7 @@ func (msg MsgSwapOrder) ValidateBasic() sdk.Error {
 	if msg.Input.Coin.Denom == msg.Output.Coin.Denom {
 		return ErrEqualDenom("")
 	}
-	if msg.Deadline.IsZero() {
+	if msg.Deadline <= 0 {
 		return ErrInvalidDeadline("deadline for MsgSwapOrder not initialized")
 	}
 	if msg.Input.Address.Empty() {
@@ -108,14 +106,14 @@ type MsgAddLiquidity struct {
 	MaxToken     sdk.Coin       `json:"max_token"`      // coin to be deposited as liquidity with an upper bound for its amount
 	ExactIrisAmt sdk.Int        `json:"exact_iris_amt"` // exact amount of native asset being add to the liquidity pool
 	MinLiquidity sdk.Int        `json:"min_liquidity"`  // lower bound UNI sender is willing to accept for deposited coins
-	Deadline     time.Time      `json:"deadline"`
+	Deadline     int64          `json:"deadline"`
 	Sender       sdk.AccAddress `json:"sender"`
 }
 
 // NewMsgAddLiquidity creates a new MsgAddLiquidity object.
 func NewMsgAddLiquidity(
 	maxToken sdk.Coin, exactIrisAmt, minLiquidity sdk.Int,
-	deadline time.Time, sender sdk.AccAddress,
+	deadline int64, sender sdk.AccAddress,
 ) MsgAddLiquidity {
 
 	return MsgAddLiquidity{
@@ -150,7 +148,7 @@ func (msg MsgAddLiquidity) ValidateBasic() sdk.Error {
 	if msg.MinLiquidity.IsNil() || msg.MinLiquidity.IsNegative() {
 		return ErrNotPositive("minimum liquidity can not be negative")
 	}
-	if msg.Deadline.IsZero() {
+	if msg.Deadline <= 0 {
 		return ErrInvalidDeadline("deadline for MsgAddLiquidity not initialized")
 	}
 	if msg.Sender.Empty() {
@@ -178,14 +176,14 @@ type MsgRemoveLiquidity struct {
 	MinToken          sdk.Int        `json:"min_token"`          // coin to be withdrawn with a lower bound for its amount
 	WithdrawLiquidity sdk.Coin       `json:"withdraw_liquidity"` // amount of UNI to be burned to withdraw liquidity from a reserve pool
 	MinIrisAmt        sdk.Int        `json:"min_iris_amt"`       // minimum amount of the native asset the sender is willing to accept
-	Deadline          time.Time      `json:"deadline"`
+	Deadline          int64          `json:"deadline"`
 	Sender            sdk.AccAddress `json:"sender"`
 }
 
 // NewMsgRemoveLiquidity creates a new MsgRemoveLiquidity object
 func NewMsgRemoveLiquidity(
 	minToken sdk.Int, withdrawLiquidity sdk.Coin, minIrisAmt sdk.Int,
-	deadline time.Time, sender sdk.AccAddress,
+	deadline int64, sender sdk.AccAddress,
 ) MsgRemoveLiquidity {
 
 	return MsgRemoveLiquidity{
@@ -217,7 +215,7 @@ func (msg MsgRemoveLiquidity) ValidateBasic() sdk.Error {
 	if msg.MinIrisAmt.IsNil() || msg.MinIrisAmt.IsNegative() {
 		return ErrNotPositive("minimum iris amount can not be negative")
 	}
-	if msg.Deadline.IsZero() {
+	if msg.Deadline <= 0 {
 		return ErrInvalidDeadline("deadline for MsgRemoveLiquidity not initialized")
 	}
 	if msg.Sender.Empty() {

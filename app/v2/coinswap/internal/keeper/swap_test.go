@@ -122,7 +122,7 @@ func TestKeeperSwap(t *testing.T) {
 	depositAmount := sdk.NewInt(1000)
 	minReward := sdk.NewInt(1)
 	deadline := time.Now().Add(1 * time.Minute)
-	msg := types.NewMsgAddLiquidity(depositCoin, depositAmount, minReward, deadline, sender)
+	msg := types.NewMsgAddLiquidity(depositCoin, depositAmount, minReward, deadline.Unix(), sender)
 	err := keeper.HandleAddLiquidity(ctx, msg)
 
 	//assert
@@ -145,7 +145,7 @@ func TestKeeperSwap(t *testing.T) {
 	}
 
 	deadline1 := time.Now().Add(1 * time.Minute)
-	msg1 := types.NewMsgSwapOrder(input, output, deadline1, false)
+	msg1 := types.NewMsgSwapOrder(input, output, deadline1.Unix(), false)
 	_, err = keeper.HandleSwap(ctx, msg1)
 	require.Nil(t, err)
 

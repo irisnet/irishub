@@ -131,7 +131,7 @@ func addLiquidityHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Han
 			return
 		}
 
-		msg := coinswap.NewMsgAddLiquidity(sdk.NewCoin(tokenDenom, maxToken), exactIrisAmt, minLiquidity, deadline, senderAddress)
+		msg := coinswap.NewMsgAddLiquidity(sdk.NewCoin(tokenDenom, maxToken), exactIrisAmt, minLiquidity, deadline.Unix(), senderAddress)
 		err = msg.ValidateBasic()
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -199,7 +199,7 @@ func removeLiquidityHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.
 			return
 		}
 
-		msg := coinswap.NewMsgRemoveLiquidity(minToken, sdk.NewCoin(uniDenom, liquidityAmt), minIris, deadline, senderAddress)
+		msg := coinswap.NewMsgRemoveLiquidity(minToken, sdk.NewCoin(uniDenom, liquidityAmt), minIris, deadline.Unix(), senderAddress)
 		err = msg.ValidateBasic()
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -251,7 +251,7 @@ func swapOrderHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext, isBuyOrder 
 		output := coinswap.Output{Address: recipientAddress, Coin: req.Output.Coin}
 		deadline := time.Now().Add(duration)
 
-		msg := coinswap.NewMsgSwapOrder(input, output, deadline, isBuyOrder)
+		msg := coinswap.NewMsgSwapOrder(input, output, deadline.Unix(), isBuyOrder)
 		err = msg.ValidateBasic()
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
