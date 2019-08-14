@@ -144,10 +144,10 @@ func (msg MsgAddLiquidity) ValidateBasic() sdk.Error {
 	if strings.HasPrefix(msg.MaxToken.Denom, FormatUniIdPrefix) {
 		return sdk.ErrInvalidCoins("max token must be non-liquidity token")
 	}
-	if !msg.ExactIrisAmt.IsNil() && !msg.ExactIrisAmt.IsPositive() {
+	if msg.ExactIrisAmt.IsNil() || !msg.ExactIrisAmt.IsPositive() {
 		return ErrNotPositive("iris amount must be positive")
 	}
-	if !msg.MinLiquidity.IsNil() && msg.MinLiquidity.IsNegative() {
+	if msg.MinLiquidity.IsNil() || msg.MinLiquidity.IsNegative() {
 		return ErrNotPositive("minimum liquidity can not be negative")
 	}
 	if msg.Deadline.IsZero() {
@@ -205,7 +205,7 @@ func (msg MsgRemoveLiquidity) Type() string { return "remove_liquidity" }
 
 // ValidateBasic Implements Msg.
 func (msg MsgRemoveLiquidity) ValidateBasic() sdk.Error {
-	if !msg.MinToken.IsNil() && msg.MinToken.IsNegative() {
+	if msg.MinToken.IsNil() || msg.MinToken.IsNegative() {
 		return sdk.ErrInvalidCoins("minimum token amount can not be negative")
 	}
 	if !msg.WithdrawLiquidity.IsValid() || !msg.WithdrawLiquidity.IsPositive() {
@@ -214,7 +214,7 @@ func (msg MsgRemoveLiquidity) ValidateBasic() sdk.Error {
 	if err := CheckUniDenom(msg.WithdrawLiquidity.Denom); err != nil {
 		return err
 	}
-	if !msg.MinIrisAmt.IsNil() && msg.MinIrisAmt.IsNegative() {
+	if msg.MinIrisAmt.IsNil() || msg.MinIrisAmt.IsNegative() {
 		return ErrNotPositive("minimum iris amount can not be negative")
 	}
 	if msg.Deadline.IsZero() {
