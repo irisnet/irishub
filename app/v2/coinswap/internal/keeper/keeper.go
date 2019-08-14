@@ -56,14 +56,19 @@ func (k Keeper) HandleSwap(ctx sdk.Context, msg types.MsgSwapOrder) (sdk.Tags, s
 }
 
 func (k Keeper) HandleAddLiquidity(ctx sdk.Context, msg types.MsgAddLiquidity) sdk.Error {
-	reservePoolName, err := k.GetReservePoolName(sdk.IrisAtto, msg.MaxToken.Denom)
+	uniId, err := types.GetUniId(sdk.IrisAtto, msg.MaxToken.Denom)
 	if err != nil {
 		return err
 	}
-	reservePool := k.GetReservePool(ctx, reservePoolName)
+	uniDenom, err := types.GetUniDenom(uniId)
+	if err != nil {
+		return err
+	}
+
+	reservePool := k.GetReservePool(ctx, uniId)
 	irisReserveAmt := reservePool.AmountOf(sdk.IrisAtto)
 	tokenReserveAmt := reservePool.AmountOf(msg.MaxToken.Denom)
-	liquidity := reservePool.AmountOf(reservePoolName)
+	liquidity := reservePool.AmountOf(uniDenom)
 
 	var mintLiquidityAmt sdk.Int
 	var depositToken sdk.Coin
@@ -86,19 +91,24 @@ func (k Keeper) HandleAddLiquidity(ctx sdk.Context, msg types.MsgAddLiquidity) s
 			return types.ErrConstraintNotMet(fmt.Sprintf("amount[%s] of depositToken depositd is greater than user 's max deposited amount[%s]", depositToken.String(), msg.MaxToken.String()))
 		}
 	}
-	return k.addLiquidity(ctx, msg.Sender, irisCoin, depositToken, reservePoolName, mintLiquidityAmt)
+	return k.addLiquidity(ctx, msg.Sender, irisCoin, depositToken, uniId, mintLiquidityAmt)
 }
 
-func (k Keeper) addLiquidity(ctx sdk.Context, sender sdk.AccAddress, irisCoin, token sdk.Coin, reservePoolName string, mintLiquidityAmt sdk.Int) sdk.Error {
+func (k Keeper) addLiquidity(ctx sdk.Context, sender sdk.AccAddress, irisCoin, token sdk.Coin, uniId string, mintLiquidityAmt sdk.Int) sdk.Error {
 	depositedTokens := sdk.NewCoins(irisCoin, token)
-	poolAddr := getReservePoolAddr(reservePoolName)
+	poolAddr := getReservePoolAddr(uniId)
 	// transfer deposited token into coinswaps Account
 	_, err := k.bk.SendCoins(ctx, sender, poolAddr, depositedTokens)
 	if err != nil {
 		return err
 	}
+
+	uniDenom, err := types.GetUniDenom(uniId)
+	if err != nil {
+		return err
+	}
 	// mint liquidity vouchers for reserve Pool
-	mintToken := sdk.NewCoins(sdk.NewCoin(reservePoolName, mintLiquidityAmt))
+	mintToken := sdk.NewCoins(sdk.NewCoin(uniDenom, mintLiquidityAmt))
 	k.bk.AddCoins(ctx, poolAddr, mintToken)
 	// mint liquidity vouchers for sender
 	k.bk.AddCoins(ctx, sender, mintToken)
@@ -106,46 +116,51 @@ func (k Keeper) addLiquidity(ctx sdk.Context, sender sdk.AccAddress, irisCoin, t
 }
 
 func (k Keeper) HandleRemoveLiquidity(ctx sdk.Context, msg types.MsgRemoveLiquidity) sdk.Error {
-	reservePoolName, err := k.GetReservePoolName(sdk.IrisAtto, msg.MinToken.Denom)
+	uniDenom := msg.WithdrawLiquidity.Denom
+	uniId, err1 := sdk.GetCoinNameByDenom(uniDenom)
+	if err1 != nil {
+		return types.ErrIllegalDenom(err1.Error())
+	}
+	minTokenDenom, err := types.GetCoinMinDenomFromUniDenom(uniDenom)
 	if err != nil {
 		return err
 	}
 
 	// check if reserve pool exists
-	reservePool := k.GetReservePool(ctx, reservePoolName)
+	reservePool := k.GetReservePool(ctx, uniId)
 	if reservePool == nil {
 		return types.ErrReservePoolNotExists("")
 	}
 
 	irisReserveAmt := reservePool.AmountOf(sdk.IrisAtto)
-	tokenReserveAmt := reservePool.AmountOf(msg.MinToken.Denom)
-	liquidityReserve := reservePool.AmountOf(reservePoolName)
+	tokenReserveAmt := reservePool.AmountOf(minTokenDenom)
+	liquidityReserve := reservePool.AmountOf(uniDenom)
 	if irisReserveAmt.LT(msg.MinIrisAmt) {
-		return types.ErrInsufficientFunds(fmt.Sprintf("insufficient funds,actual:%s,expect:%s", irisReserveAmt.String(), msg.MinIrisAmt.String()))
+		return types.ErrInsufficientFunds(fmt.Sprintf("insufficient funds, actual:%s, expect:%s", irisReserveAmt.String(), msg.MinIrisAmt.String()))
 	}
-	if tokenReserveAmt.LT(msg.MinToken.Amount) {
-		return types.ErrInsufficientFunds(fmt.Sprintf("insufficient funds,actual:%s,expect:%s", tokenReserveAmt.String(), msg.MinToken.Amount.String()))
+	if tokenReserveAmt.LT(msg.MinToken) {
+		return types.ErrInsufficientFunds(fmt.Sprintf("insufficient funds, actual:%s, expect:%s", tokenReserveAmt.String(), msg.MinToken.String()))
 	}
-	if liquidityReserve.LT(msg.WithdrawLiquidity) {
-		return types.ErrInsufficientFunds(fmt.Sprintf("insufficient funds,actual:%s,expect:%s", liquidityReserve.String(), msg.WithdrawLiquidity.String()))
+	if liquidityReserve.LT(msg.WithdrawLiquidity.Amount) {
+		return types.ErrInsufficientFunds(fmt.Sprintf("insufficient funds, actual:%s, expect:%s", liquidityReserve.String(), msg.WithdrawLiquidity.Amount.String()))
 	}
 
 	// calculate amount of UNI to be burned for sender
 	// and coin amount to be returned
-	irisWithdrawnAmt := msg.WithdrawLiquidity.Mul(irisReserveAmt).Div(liquidityReserve)
-	tokenWithdrawnAmt := msg.WithdrawLiquidity.Mul(tokenReserveAmt).Div(liquidityReserve)
+	irisWithdrawnAmt := msg.WithdrawLiquidity.Amount.Mul(irisReserveAmt).Div(liquidityReserve)
+	tokenWithdrawnAmt := msg.WithdrawLiquidity.Amount.Mul(tokenReserveAmt).Div(liquidityReserve)
 
 	irisWithdrawCoin := sdk.NewCoin(sdk.IrisAtto, irisWithdrawnAmt)
-	tokenWithdrawCoin := sdk.NewCoin(msg.MinToken.Denom, tokenWithdrawnAmt)
-	deductUniCoin := sdk.NewCoin(reservePoolName, msg.WithdrawLiquidity)
+	tokenWithdrawCoin := sdk.NewCoin(minTokenDenom, tokenWithdrawnAmt)
+	deductUniCoin := msg.WithdrawLiquidity
 
 	if irisWithdrawCoin.Amount.LT(msg.MinIrisAmt) {
 		return types.ErrConstraintNotMet(fmt.Sprintf("The amount of iris available [%s] is less than the minimum amount specified [%s] by the user.", irisWithdrawCoin.String(), sdk.NewCoin(sdk.IrisAtto, msg.MinIrisAmt).String()))
 	}
-	if tokenWithdrawCoin.Amount.LT(msg.MinToken.Amount) {
-		return types.ErrConstraintNotMet(fmt.Sprintf("The amount of token available [%s] is less than the minimum amount specified [%s] by the user.", tokenWithdrawCoin.String(), msg.MinToken.String()))
+	if tokenWithdrawCoin.Amount.LT(msg.MinToken) {
+		return types.ErrConstraintNotMet(fmt.Sprintf("The amount of token available [%s] is less than the minimum amount specified [%s] by the user.", tokenWithdrawCoin.String(), sdk.NewCoin(minTokenDenom, msg.MinToken).String()))
 	}
-	poolAddr := getReservePoolAddr(reservePoolName)
+	poolAddr := getReservePoolAddr(uniId)
 	return k.removeLiquidity(ctx, poolAddr, msg.Sender, deductUniCoin, irisWithdrawCoin, tokenWithdrawCoin)
 }
 
@@ -169,8 +184,8 @@ func (k Keeper) removeLiquidity(ctx sdk.Context, poolAddr, sender sdk.AccAddress
 
 // GetReservePool returns the total balance of an reserve pool at the
 // provided denomination.
-func (k Keeper) GetReservePool(ctx sdk.Context, reservePoolName string) (coins sdk.Coins) {
-	swapPoolAccAddr := getReservePoolAddr(reservePoolName)
+func (k Keeper) GetReservePool(ctx sdk.Context, uniId string) (coins sdk.Coins) {
+	swapPoolAccAddr := getReservePoolAddr(uniId)
 	acc := k.ak.GetAccount(ctx, swapPoolAccAddr)
 	if acc == nil {
 		return nil

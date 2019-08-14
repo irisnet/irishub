@@ -10,6 +10,7 @@ import (
 const (
 	// DefaultParamSpace for coinswap
 	DefaultParamSpace = ModuleName
+	MaxFeePrecision   = 10
 )
 
 // Parameter store keys
@@ -57,7 +58,7 @@ func (p *Params) KeyValuePairs() params.KeyValuePairs {
 func (p *Params) Validate(key string, value string) (interface{}, sdk.Error) {
 	switch key {
 	case string(feeKey):
-		fee, err := sdk.NewRatFromDecimal(value, 10)
+		fee, err := sdk.NewRatFromDecimal(value, MaxFeePrecision)
 		if err != nil {
 			return nil, err
 		}

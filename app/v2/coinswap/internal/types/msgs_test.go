@@ -127,13 +127,13 @@ func TestMsgRemoveLiquidity(t *testing.T) {
 		msg        MsgRemoveLiquidity
 		expectPass bool
 	}{
-		{"no withdraw coin", NewMsgRemoveLiquidity(sdk.Coin{}, amt, sdk.OneInt(), deadline, sender), false},
-		{"zero withdraw coin", NewMsgRemoveLiquidity(sdk.NewCoin(denom1, sdk.ZeroInt()), amt, sdk.OneInt(), deadline, sender), false},
-		{"invalid deposit amount", NewMsgRemoveLiquidity(input, sdk.ZeroInt(), sdk.OneInt(), deadline, sender), false},
-		{"invalid minimum native bound", NewMsgRemoveLiquidity(input, amt, sdk.ZeroInt(), deadline, sender), false},
-		{"deadline not initialized", NewMsgRemoveLiquidity(input, amt, sdk.OneInt(), emptyTime, sender), false},
-		{"empty sender", NewMsgRemoveLiquidity(input, amt, sdk.OneInt(), deadline, emptyAddr), false},
-		{"valid MsgRemoveLiquidity", NewMsgRemoveLiquidity(input, amt, sdk.OneInt(), deadline, sender), true},
+		{"no withdraw coin", NewMsgRemoveLiquidity(amt, sdk.Coin{}, sdk.OneInt(), deadline, sender), false},
+		{"zero withdraw coin", NewMsgRemoveLiquidity(amt, sdk.NewCoin(unidenom, sdk.ZeroInt()), sdk.OneInt(), deadline, sender), false},
+		{"invalid minimum token amount", NewMsgRemoveLiquidity(sdk.NewInt(-100), withdrawLiquidity, sdk.OneInt(), deadline, sender), false},
+		{"invalid minimum iris amount", NewMsgRemoveLiquidity(amt, withdrawLiquidity, sdk.NewInt(-100), deadline, sender), false},
+		{"deadline not initialized", NewMsgRemoveLiquidity(amt, withdrawLiquidity, sdk.OneInt(), emptyTime, sender), false},
+		{"empty sender", NewMsgRemoveLiquidity(amt, withdrawLiquidity, sdk.OneInt(), deadline, emptyAddr), false},
+		{"valid MsgRemoveLiquidity", NewMsgRemoveLiquidity(amt, withdrawLiquidity, sdk.OneInt(), deadline, sender), true},
 	}
 
 	for _, tc := range tests {

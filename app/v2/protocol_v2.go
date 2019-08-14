@@ -321,7 +321,8 @@ func (p *ProtocolV2) configRouters() {
 		AddRoute(protocol.ServiceRoute, service.NewQuerier(p.serviceKeeper)).
 		AddRoute(protocol.ParamsRoute, params.NewQuerier(p.paramsKeeper)).
 		AddRoute(protocol.AssetRoute, asset.NewQuerier(p.assetKeeper)).
-		AddRoute(protocol.RandRoute, rand.NewQuerier(p.randKeeper))
+		AddRoute(protocol.RandRoute, rand.NewQuerier(p.randKeeper)).
+		AddRoute(protocol.SwapRoute, coinswap.NewQuerier(p.coinswapKeeper))
 
 }
 
