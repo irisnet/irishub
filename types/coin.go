@@ -58,13 +58,7 @@ func (coin Coin) IsValid() bool {
 	if coin.IsNegative() {
 		return false
 	}
-	if coin.Denom != IrisAtto && !strings.HasSuffix(coin.Denom, MinDenomSuffix) {
-		return false
-	}
-	if !reDenomCompiled.MatchString(coin.Denom) {
-		return false
-	}
-	return true
+	return IsCoinMinDenomValid(coin.Denom)
 }
 
 func (coin Coin) IsValidIrisAtto() bool {
@@ -566,15 +560,17 @@ func (coins Coins) Sort() Coins {
 }
 
 //-----------------------------------------------------------------------------
-// Parsing
+// Parsing & Checking
 
 var (
 	// Denominations can be 3 ~ 21 characters long.
-	reDenom         = `(([a-z][a-z0-9]{2,7}|x)\.)?([a-z][a-z0-9]{2,7})(-[a-z]{3,5})?`
-	reAmount        = `[0-9]+(\.[0-9]+)?`
-	reSpace         = `[[:space:]]*`
-	reDenomCompiled = regexp.MustCompile(fmt.Sprintf(`^%s$`, reDenom))
-	reCoinCompiled  = regexp.MustCompile(fmt.Sprintf(`^(%s)%s(%s)$`, reAmount, reSpace, reDenom))
+	reCoinName         = `(u\-)?(([a-z][a-z0-9]{2,7}|x)\.)?([a-z][a-z0-9]{2,7})`
+	reDenom            = reCoinName + `(-[a-z]{3,5})?`
+	reAmount           = `[0-9]+(\.[0-9]+)?`
+	reSpace            = `[[:space:]]*`
+	reCoinNameCompiled = regexp.MustCompile(fmt.Sprintf(`^%s$`, reCoinName))
+	reDenomCompiled    = regexp.MustCompile(fmt.Sprintf(`^%s$`, reDenom))
+	reCoinCompiled     = regexp.MustCompile(fmt.Sprintf(`^(%s)%s(%s)$`, reAmount, reSpace, reDenom))
 )
 
 func ParseCoinParts(coinStr string) (denom, amount string, err error) {
@@ -630,6 +626,17 @@ func ParseCoins(coinsStr string) (coins Coins, err error) {
 	coins.Sort()
 
 	return coins, nil
+}
+
+func IsCoinNameValid(coinName string) bool  {
+	return reCoinNameCompiled.MatchString(coinName)
+}
+
+func IsCoinMinDenomValid(denom string) bool  {
+	if denom != IrisAtto && (!strings.HasSuffix(denom, MinDenomSuffix) || strings.HasPrefix(denom, Iris + "-")) {
+		return false
+	}
+	return reDenomCompiled.MatchString(denom)
 }
 
 func (coins Coins) IsValidV0() bool {

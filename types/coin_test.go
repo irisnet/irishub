@@ -506,3 +506,55 @@ func TestAmountOf(t *testing.T) {
 		assert.Equal(t, NewInt(tc.amountOfTREE), tc.coins.AmountOf("tree-min"))
 	}
 }
+
+func TestIsCoinNameValid(t *testing.T) {
+
+	cases := []struct {
+		name         string
+		coinName     string
+		expectedPass bool
+	}{
+		{"standard iris", "iris", true},
+		{"standard native", "abc", true},
+		{"standard external", "x.abc", true},
+		{"standard gateway", "gdex.abc", true},
+		{"standard uni", "u-gdex.abc", true},
+		{"with-suffix", "iris-atto", false},
+		{"with-suffix-min", "abc-min", false},
+	}
+
+	for _, tc := range cases {
+		res := IsCoinNameValid(tc.coinName)
+		if tc.expectedPass {
+			require.True(t, res)
+		} else {
+			require.False(t, res)
+		}
+	}
+}
+
+func TestIsCoinMinDenomValid(t *testing.T) {
+
+	cases := []struct {
+		name         string
+		denom        string
+		expectedPass bool
+	}{
+		{"standard iris", "iris-atto", true},
+		{"standard native", "abc-min", true},
+		{"standard external", "x.abc-min", true},
+		{"standard gateway", "gdex.abc-min", true},
+		{"standard uni", "u-gdex.abc-min", true},
+		{"non-suffix", "iris", false},
+		{"non-suffix !iris", "abc", false},
+	}
+
+	for _, tc := range cases {
+		res := IsCoinMinDenomValid(tc.denom)
+		if tc.expectedPass {
+			require.True(t, res)
+		} else {
+			require.False(t, res)
+		}
+	}
+}
