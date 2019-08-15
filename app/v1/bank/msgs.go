@@ -3,9 +3,9 @@ package bank
 import (
 	"encoding/json"
 	"fmt"
+	"regexp"
 
 	sdk "github.com/irisnet/irishub/types"
-	"regexp"
 )
 
 const memoRegexpLengthLimit = 50
@@ -183,7 +183,7 @@ type MsgBurn struct {
 
 var _ sdk.Msg = MsgBurn{}
 
-// NewMsgIssue - construct arbitrary multi-in, multi-out send msg.
+// NewMsgBurn - construct MsgBurn
 func NewMsgBurn(owner sdk.AccAddress, coins sdk.Coins) MsgBurn {
 	return MsgBurn{Owner: owner, Coins: coins}
 }
@@ -248,10 +248,10 @@ func (msg MsgSetMemoRegexp) ValidateBasic() sdk.Error {
 		return sdk.ErrInvalidAddress(msg.Owner.String())
 	}
 	if _, err := regexp.Compile(msg.MemoRegexp); err != nil {
-		return sdk.ErrInvalidMemoRegexp("invalid memo regexp")
+		return ErrInvalidMemoRegexp(DefaultCodespace, "invalid memo regexp")
 	}
 	if len(msg.MemoRegexp) > memoRegexpLengthLimit {
-		return sdk.ErrInvalidMemoRegexp("memo regexp length exceeds limit")
+		return ErrInvalidMemoRegexp(DefaultCodespace, "memo regexp length exceeds limit")
 	}
 	return nil
 }
