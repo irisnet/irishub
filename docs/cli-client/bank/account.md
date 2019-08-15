@@ -7,7 +7,7 @@ This command is used for querying balance information of certain address.
 ## Usage:
 
 ```
-iriscli bank account <address> <flags>
+iriscli bank account <address> [flags]
 ```
 
 ## Flags
