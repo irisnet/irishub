@@ -8,6 +8,8 @@ import (
 	"regexp"
 )
 
+const memoRegexpLengthLimit = 50
+
 // MsgSend - high level transaction of the coin module
 type MsgSend struct {
 	Inputs  []Input  `json:"inputs"`
@@ -245,8 +247,11 @@ func (msg MsgSetMemoRegexp) ValidateBasic() sdk.Error {
 	if len(msg.Owner) == 0 {
 		return sdk.ErrInvalidAddress(msg.Owner.String())
 	}
-	if _, err := regexp.MatchString(msg.MemoRegexp, ""); err != nil {
+	if _, err := regexp.Compile(msg.MemoRegexp); err != nil {
 		return sdk.ErrInvalidMemoRegexp("invalid memo regexp")
+	}
+	if len(msg.MemoRegexp) > memoRegexpLengthLimit {
+		return sdk.ErrInvalidMemoRegexp("memo regexp length exceeds limit")
 	}
 	return nil
 }
