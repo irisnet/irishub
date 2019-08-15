@@ -3,9 +3,9 @@ package bank
 import (
 	"encoding/json"
 	"fmt"
+	"regexp"
 
 	sdk "github.com/irisnet/irishub/types"
-	"regexp"
 )
 
 const memoRegexpLengthLimit = 50
@@ -183,7 +183,7 @@ type MsgBurn struct {
 
 var _ sdk.Msg = MsgBurn{}
 
-// NewMsgIssue - construct arbitrary multi-in, multi-out send msg.
+// NewMsgBurn - construct MsgBurn
 func NewMsgBurn(owner sdk.AccAddress, coins sdk.Coins) MsgBurn {
 	return MsgBurn{Owner: owner, Coins: coins}
 }
@@ -232,7 +232,7 @@ type MsgSetMemoRegexp struct {
 
 var _ sdk.Msg = MsgSetMemoRegexp{}
 
-// NewMsgIssue - construct arbitrary multi-in, multi-out send msg.
+// NewMsgSetMemoRegexp - construct MsgSetMemoRegexp
 func NewMsgSetMemoRegexp(owner sdk.AccAddress, memoRegexp string) MsgSetMemoRegexp {
 	return MsgSetMemoRegexp{Owner: owner, MemoRegexp: memoRegexp}
 }

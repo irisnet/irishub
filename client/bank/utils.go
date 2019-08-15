@@ -56,7 +56,7 @@ func BuildBankBurnMsg(from sdk.AccAddress, coins sdk.Coins) sdk.Msg {
 	return msg
 }
 
-// SetMemoRegexp builds the set memo regexp msg
+// BuildSetMemoRegexp builds the set memo regexp msg
 func BuildSetMemoRegexp(from sdk.AccAddress, regexp string) sdk.Msg {
 	msg := bank.NewMsgSetMemoRegexp(from, regexp)
 	return msg

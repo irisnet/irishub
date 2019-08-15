@@ -2,6 +2,7 @@ package bank
 
 import (
 	"fmt"
+
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/codec"
@@ -110,12 +111,12 @@ func (keeper BaseKeeper) DecreaseLoosenToken(
 	keeper.am.DecreaseTotalLoosenToken(ctx, amt)
 }
 
-// SetMemoRegexp set memo regexp for sender account
+// SetMemoRegexp sets memo regexp for sender account
 func (keeper BaseKeeper) SetMemoRegexp(ctx sdk.Context, fromAddr sdk.AccAddress, regexp string) (sdk.Tags, sdk.Error) {
 	acc := keeper.am.GetAccount(ctx, fromAddr)
 
 	if acc == nil {
-		return nil, ErrInvalidAccount(DefaultCodespace, "account is not existed")
+		return nil, ErrInvalidAccount(DefaultCodespace, "account does not exist")
 	}
 
 	acc.SetMemoRegexp(regexp)
