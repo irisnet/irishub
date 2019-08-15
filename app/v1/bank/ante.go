@@ -33,8 +33,8 @@ func NewAnteHandler(ak auth.AccountKeeper) sdk.AnteHandler {
 						memoRegexp := acc.GetMemoRegexp()
 
 						if memoRegexp != "" {
-							_, err := regexp.MatchString(memoRegexp, memo)
-							if err != nil {
+							matched, _ := regexp.MatchString(memoRegexp, memo)
+							if !matched {
 								return newCtx, ErrInvalidMemo(DefaultCodespace, fmt.Sprintf("invalid memo %s, expected regular expression: %s", memo, memoRegexp)).Result(), true
 							}
 						}
