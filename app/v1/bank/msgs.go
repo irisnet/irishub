@@ -248,10 +248,10 @@ func (msg MsgSetMemoRegexp) ValidateBasic() sdk.Error {
 		return sdk.ErrInvalidAddress(msg.Owner.String())
 	}
 	if _, err := regexp.Compile(msg.MemoRegexp); err != nil {
-		return sdk.ErrInvalidMemoRegexp("invalid memo regexp")
+		return ErrInvalidMemoRegexp(DefaultCodespace, "invalid memo regexp")
 	}
 	if len(msg.MemoRegexp) > memoRegexpLengthLimit {
-		return sdk.ErrInvalidMemoRegexp("memo regexp length exceeds limit")
+		return ErrInvalidMemoRegexp(DefaultCodespace, "memo regexp length exceeds limit")
 	}
 	return nil
 }

@@ -9,10 +9,12 @@ import (
 const (
 	DefaultCodespace sdk.CodespaceType = "bank"
 
-	CodeInvalidInput   sdk.CodeType = 101
-	CodeInvalidOutput  sdk.CodeType = 102
-	CodeBurnEmptyCoins sdk.CodeType = 103
-	CodeInvalidMemo    sdk.CodeType = 104
+	CodeInvalidInput      sdk.CodeType = 101
+	CodeInvalidOutput     sdk.CodeType = 102
+	CodeBurnEmptyCoins    sdk.CodeType = 103
+	CodeInvalidMemo       sdk.CodeType = 104
+	CodeInvalidMemoRegexp sdk.CodeType = 105
+	CodeInvalidAccount    sdk.CodeType = 106
 )
 
 // NOTE: Don't stringer this, we'll put better messages in later.
@@ -54,6 +56,14 @@ func ErrBurnEmptyCoins(codespace sdk.CodespaceType) sdk.Error {
 
 func ErrInvalidMemo(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return newError(codespace, CodeInvalidMemo, msg)
+}
+
+func ErrInvalidMemoRegexp(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return newError(codespace, CodeInvalidMemoRegexp, msg)
+}
+
+func ErrInvalidAccount(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return newError(codespace, CodeInvalidAccount, msg)
 }
 
 //----------------------------------------
