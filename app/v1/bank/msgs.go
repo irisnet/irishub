@@ -247,11 +247,11 @@ func (msg MsgSetMemoRegexp) ValidateBasic() sdk.Error {
 	if len(msg.Owner) == 0 {
 		return sdk.ErrInvalidAddress(msg.Owner.String())
 	}
-	if _, err := regexp.Compile(msg.MemoRegexp); err != nil {
-		return ErrInvalidMemoRegexp(DefaultCodespace, "invalid memo regexp")
-	}
 	if len(msg.MemoRegexp) > memoRegexpLengthLimit {
 		return ErrInvalidMemoRegexp(DefaultCodespace, "memo regexp length exceeds limit")
+	}
+	if _, err := regexp.Compile(msg.MemoRegexp); err != nil {
+		return ErrInvalidMemoRegexp(DefaultCodespace, "invalid memo regexp")
 	}
 	return nil
 }
