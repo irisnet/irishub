@@ -70,17 +70,15 @@ func NewFeeRefundHandler(am AccountKeeper, fk FeeKeeper) types.FeeRefundHandler 
 		refundCoin := sdk.NewCoin(fee.Denom,
 			fee.Amount.Mul(sdk.NewInt(int64(unusedGas))).Div(sdk.NewInt(int64(txResult.GasWanted))))
 
-		coins := am.GetAccount(ctx, firstAccount.GetAddress()).GetCoins() // consume gas
-		err = firstAccount.SetCoins(coins.Add(sdk.Coins{refundCoin}))
+		acc := am.GetAccount(ctx, firstAccount.GetAddress())
+
+		coins := acc.GetCoins() // consume gas
+		err = acc.SetCoins(coins.Add(sdk.Coins{refundCoin}))
 		if err != nil {
 			return sdk.Coin{}, err
 		}
 
-		// set mem regexp
-		regexp := am.GetAccount(ctx, firstAccount.GetAddress()).GetMemoRegexp()
-		firstAccount.SetMemoRegexp(regexp)
-
-		am.SetAccount(ctx, firstAccount)
+		am.SetAccount(ctx, acc)
 		fk.RefundCollectedFees(ctx, sdk.Coins{refundCoin})
 
 		actualCostFee = sdk.NewCoin(fee.Denom, fee.Amount.Sub(refundCoin.Amount))
