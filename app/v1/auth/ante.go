@@ -17,9 +17,9 @@ const (
 	ed25519VerifyCost   = 59
 	secp256k1VerifyCost = 100
 
-	// gas = log(gas-gasOffset)/log(gasBase)
-	gasBase   = 1.03 // gas logarithm base
-	gasOffset = 90   // gas logarithm offset
+	// gas = log(gas-gasShift)/log(gasBase)
+	gasBase  = 1.03 // gas logarithm base
+	gasShift = 90   // gas logarithm shift
 )
 
 // NewAnteHandler returns an AnteHandler that checks
@@ -306,7 +306,7 @@ func setGasMeter(simulate bool, ctx sdk.Context, gasLimit uint64) sdk.Context {
 	if simulate || ctx.BlockHeight() == 0 {
 		return ctx.WithGasMeter(sdk.NewInfiniteGasMeter())
 	}
-	return ctx.WithGasMeter(sdk.NewGasMeterWithBase(gasLimit, gasBase, gasOffset))
+	return ctx.WithGasMeter(sdk.NewGasMeterWithBase(gasLimit, gasBase, gasShift))
 }
 
 func getSignBytesList(chainID string, stdTx StdTx, stdSigs []StdSignature) (signatureBytesList [][]byte) {

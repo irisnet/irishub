@@ -49,7 +49,7 @@ type basicGasMeter struct {
 	limit    Gas
 	consumed Gas
 	base     float64
-	offset   uint64
+	shift    uint64
 }
 
 // NewGasMeter returns a reference to a new basicGasMeter.
@@ -60,12 +60,12 @@ func NewGasMeter(limit Gas) GasMeter {
 	}
 }
 
-func NewGasMeterWithBase(limit Gas, base float64, offset uint64) GasMeter {
+func NewGasMeterWithBase(limit Gas, base float64, shift uint64) GasMeter {
 	return &basicGasMeter{
 		limit:    limit,
 		consumed: 0,
 		base:     base,
-		offset:   offset,
+		shift:    shift,
 	}
 }
 
@@ -86,10 +86,10 @@ func (g *basicGasMeter) GasConsumedToLimit() Gas {
 func (g *basicGasMeter) ConsumeGas(amount Gas, descriptor string) {
 	var overflow bool
 
-	// amount = log(amount-g.offset)/log(g.base)
-	if g.base > 1 && amount > g.offset && amount < math.MaxInt64 &&
+	// amount = log(amount-g.shift)/log(g.base)
+	if g.base > 1 && amount > g.shift && amount < math.MaxInt64 &&
 		(descriptor == GasWritePerByteDesc || descriptor == GasReadPerByteDesc) {
-		amount = uint64(math.Log(float64(int64(amount-g.offset))) / math.Log(g.base))
+		amount = uint64(math.Log(float64(int64(amount-g.shift))) / math.Log(g.base))
 	}
 	// TODO: Should we set the consumed field after overflow checking?
 	g.consumed, overflow = AddUint64Overflow(g.consumed, amount)
