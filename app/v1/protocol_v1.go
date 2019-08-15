@@ -312,8 +312,9 @@ func (p *ProtocolV1) configRouters() {
 func (p *ProtocolV1) configFeeHandlers() {
 	authAnteHandler := auth.NewAnteHandler(p.accountMapper, p.feeKeeper)
 	assetAnteHandler := asset.NewAnteHandler(p.assetKeeper)
+	bankAnteHandler := bank.NewAccountKeeper(p.accountMapper)
 
-	p.anteHandlers = []sdk.AnteHandler{authAnteHandler, assetAnteHandler}
+	p.anteHandlers = []sdk.AnteHandler{authAnteHandler, bankAnteHandler, assetAnteHandler}
 	p.feeRefundHandler = auth.NewFeeRefundHandler(p.accountMapper, p.feeKeeper)
 	p.feePreprocessHandler = auth.NewFeePreprocessHandler(p.feeKeeper)
 }

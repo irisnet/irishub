@@ -12,6 +12,7 @@ const (
 	CodeInvalidInput   sdk.CodeType = 101
 	CodeInvalidOutput  sdk.CodeType = 102
 	CodeBurnEmptyCoins sdk.CodeType = 103
+	CodeInvalidMemo    sdk.CodeType = 104
 )
 
 // NOTE: Don't stringer this, we'll put better messages in later.
@@ -49,6 +50,10 @@ func ErrNoOutputs(codespace sdk.CodespaceType) sdk.Error {
 
 func ErrBurnEmptyCoins(codespace sdk.CodespaceType) sdk.Error {
 	return newError(codespace, CodeBurnEmptyCoins, "")
+}
+
+func ErrInvalidMemo(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return newError(codespace, CodeInvalidMemo, msg)
 }
 
 //----------------------------------------
