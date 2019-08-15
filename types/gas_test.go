@@ -62,7 +62,7 @@ func TestGasMeterWithLog(t *testing.T) {
 	}
 
 	for tcnum, tc := range cases {
-		meter := NewGasMeterWithLog(tc.limit, tc.log)
+		meter := NewGasMeterWithBase(tc.limit, tc.log, 0)
 
 		meter.ConsumeGas(tc.usage, tc.desc)
 		require.Equal(t, tc.expect, meter.GasConsumed(), "Gas consumption not match. tc #%d", tcnum)
