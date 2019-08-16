@@ -54,9 +54,10 @@ func TestGasMeterWithLog(t *testing.T) {
 		expect Gas
 	}{
 		{1000, 100, 10, 0, GasWritePerByteDesc, 2},
-		{1000, 174, 1.03, 174, GasWritePerByteDesc, 174},
-		{1000, 175, 1.03, 174, GasWritePerByteDesc, 174},
-		{1000, 177, 1.03, 174, GasWritePerByteDesc, 175},
+		{1000, 285, 1.02, 285, GasWritePerByteDesc, 285},
+		{1000, 286, 1.02, 285, GasWritePerByteDesc, 285},
+		{1000, 288, 1.02, 285, GasWritePerByteDesc, 285},
+		{1000, 289, 1.02, 285, GasWritePerByteDesc, 286},
 		{1000, 100, 10, 100, GasWritePerByteDesc, 100},
 		{1000, 100, 10, 0, GasReadPerByteDesc, 2},
 		{1000, 100, 10, 0, "", 100},

@@ -19,8 +19,8 @@ const (
 
 	// if gas > gasShift, gas = log(gas)/log(gasBase)
 	// else gasConsumed = gas
-	gasBase  = 1.03 // gas logarithm base
-	gasShift = 174  // gas logarithm shift
+	gasBase  = 1.02 // gas logarithm base
+	gasShift = 285  // gas logarithm shift
 )
 
 // NewAnteHandler returns an AnteHandler that checks
