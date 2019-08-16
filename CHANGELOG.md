@@ -9,7 +9,7 @@
 * [\#1521](https://github.com/irisnet/irishub/issues/1521) Add APIs for Gateways
 * [\#1745](https://github.com/irisnet/irishub/issues/1745) POST APIs only generate transactions, not broadcast transactions
 * [\#1750](https://github.com/irisnet/irishub/issues/1750) Move params query from `/gov/params` to `/params`
-* [\#1802](https://github.com/irisnet/irishub/issues/1802) Remove key related APIs and enhance API `tx/broadcast`
+* [\#1802](https://github.com/irisnet/irishub/issues/1802) Remove key-related APIs and enhance API `tx/broadcast`
 
 ### CLI
 * [\#1750](https://github.com/irisnet/irishub/issues/1750) Replace `iriscli gov query-params` by `iriscli params`
@@ -31,14 +31,14 @@
 * [\#1643](https://github.com/irisnet/irishub/issues/1643) Fix tx search by tx.height
 * [\#1854](https://github.com/irisnet/irishub/issues/1854) Enforce unbonding_time for redelegation
 * [\#1867](https://github.com/irisnet/irishub/issues/1867) Enable memo validation for "flagged" accounts
-* [\#1851](https://github.com/irisnet/irishub/issues/1851) Reducing gas consumption supports larger data storage
+* [\#1851](https://github.com/irisnet/irishub/issues/1851) Reduce gas consumption supports larger data storage
 
 ### Tendermint
 * Update to irisnet/tendermint [v0.31.0](https://github.com/irisnet/tendermint/releases/tag/v0.31.0)
   * [\#1379](https://github.com/irisnet/irishub/issues/1379) [p2p] Simplify GetSelectionWithBias for addressbook
   * [\#1432](https://github.com/irisnet/irishub/issues/1432) [crypto] Allow PubKeyMultisigThreshold to unmarshal into crypto.PubKey
   * [\#1451](https://github.com/irisnet/irishub/issues/1451) [db] Close WriteBatch to prevent memory leak
-  * [\#1460](https://github.com/irisnet/irishub/issues/1460) [kms] Shutting down tmkms when a validator enters proposal round crashes the app
+  * [\#1460](https://github.com/irisnet/irishub/issues/1460) [kms] Shut down tmkms when a validator enters proposal round crashes the app
   * [\#1554](https://github.com/irisnet/irishub/issues/1554) [consensus] Log block status on replay block
   * [\#1646](https://github.com/irisnet/irishub/issues/1646) [consensus] Fix possible halt by resetting TriggeredTimeoutPrecommit before starting next height
   * [\#1647](https://github.com/irisnet/irishub/issues/1647) [consensus] Flush WAL on stop to prevent data corruption during graceful shutdown
