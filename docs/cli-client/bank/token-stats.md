@@ -7,7 +7,7 @@ Query the token statistic, including total loose tokens, total burned token and 
 ## Usage:
 
 ```
- iriscli bank token-stats <tokenId> <flags>
+ iriscli bank token-stats <tokenId> [flags]
 ```
 
 ## Flags

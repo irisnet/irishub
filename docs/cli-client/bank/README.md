@@ -7,7 +7,7 @@ Bank allows you to manage assets in your local account
 ## Usage:
 
 ```
- iriscli bank <command>
+ iriscli bank [command]
 ```
 
 

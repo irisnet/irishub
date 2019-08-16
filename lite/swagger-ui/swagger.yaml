@@ -590,6 +590,39 @@ paths:
                   example: 1iris
         description: Parameters to burn coins
         required: true
+  '/bank/accounts/{address}/set-memo-regexp':
+    post:
+      summary: Set memo regexp
+      description: Set memo regexp
+      tags:
+        - Bank
+      parameters:
+        - in: path
+          name: address
+          description: Account address in bech32 format
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Unsigned tx was succesfully generated
+        '400':
+          description: Invalid request
+        '500':
+          description: Server internal error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_tx:
+                  $ref: '#/components/schemas/BaseTx'
+                memo_regexp:
+                  type: string
+                  example: ^[A-Za-z0-9]+$
+        description: Parameters to set memo regexp
+        required: true
   '/stake/delegators/{delegatorAddr}/delegations':
     parameters:
       - in: path
