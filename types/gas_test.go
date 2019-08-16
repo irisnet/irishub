@@ -48,21 +48,26 @@ func TestGasMeterWithLog(t *testing.T) {
 	cases := []struct {
 		limit  Gas
 		usage  Gas
-		log    float64
+		base   float64
+		shift  uint64
 		desc   string
 		expect Gas
 	}{
-		{1000, 100, 10, GasWritePerByteDesc, 2},
-		{1000, 100, 10, GasReadPerByteDesc, 2},
-		{1000, 100, 10, "", 100},
-		{1000, 100, 1, GasWritePerByteDesc, 100},
-		{1000, 100, 0, GasWritePerByteDesc, 100},
-		{1000, 100, 0.99, GasWritePerByteDesc, 100},
-		{1000, 100, -0.1, GasWritePerByteDesc, 100},
+		{1000, 100, 10, 0, GasWritePerByteDesc, 2},
+		{1000, 174, 1.03, 174, GasWritePerByteDesc, 174},
+		{1000, 175, 1.03, 174, GasWritePerByteDesc, 174},
+		{1000, 177, 1.03, 174, GasWritePerByteDesc, 175},
+		{1000, 100, 10, 100, GasWritePerByteDesc, 100},
+		{1000, 100, 10, 0, GasReadPerByteDesc, 2},
+		{1000, 100, 10, 0, "", 100},
+		{1000, 100, 1, 0, GasWritePerByteDesc, 100},
+		{1000, 100, 0, 0, GasWritePerByteDesc, 100},
+		{1000, 100, 0.99, 0, GasWritePerByteDesc, 100},
+		{1000, 100, -0.1, 0, GasWritePerByteDesc, 100},
 	}
 
 	for tcnum, tc := range cases {
-		meter := NewGasMeterWithBase(tc.limit, tc.log, 0)
+		meter := NewGasMeterWithBase(tc.limit, tc.base, tc.shift)
 
 		meter.ConsumeGas(tc.usage, tc.desc)
 		require.Equal(t, tc.expect, meter.GasConsumed(), "Gas consumption not match. tc #%d", tcnum)
