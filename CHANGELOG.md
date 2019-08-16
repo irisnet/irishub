@@ -52,7 +52,7 @@
   * [\#1693](https://github.com/irisnet/irishub/issues/1693) [db] Close Iterator in RemoteDB 
   * [\#1697](https://github.com/irisnet/irishub/issues/1697) [lite] Fix error proxy endpoints `validators` in lite client
   * [\#1702](https://github.com/irisnet/irishub/issues/1702) [blockchain] Update the maxHeight when a peer is removed
-  * [\#1703](https://github.com/irisnet/irishub/issues/1703) [mempool] Mempool don't gossip back
+  * [\#1703](https://github.com/irisnet/irishub/issues/1703) [mempool] Stop gossiping tx's back to where they come from
   * [\#1704](https://github.com/irisnet/irishub/issues/1704) [rpc] Disable compression for HTTP client to prevent GZIP-bomb DoS attacks
   * [\#1714](https://github.com/irisnet/irishub/issues/1714) [mempool] Bound mempool memory usage
 

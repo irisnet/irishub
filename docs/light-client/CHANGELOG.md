@@ -24,7 +24,7 @@ In this version, all POST methods (except '/tx/broadcast') just generate unsigne
 
 | [v0.14.1]      | [v0.15.0]        | input changed | output changed | details | 
 | --------------- | --------------- | --------------- | --------------- | ----- |
-| GET /bank/accounts/{address} | GET /bank/accounts/{address} | No | Yes | Add `memo_regexp` in output, support multiple tokens |
+| GET /bank/accounts/{address} | GET /bank/accounts/{address} | No | Yes | 1. Add `memo_regexp` in output; <br> 2. Tokens other than iris-atto could show up in output when people start using the newly introduced asset functionality. |
 
 #### Tendermint module APIs
 
