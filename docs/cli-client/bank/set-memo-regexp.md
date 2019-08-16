@@ -18,8 +18,8 @@ iriscli bank set-memo-regexp --regexp=<regular-expression> --from=<key-name> --f
 
 ## Examples
 
-### Send tokens to another address
+### Set memo regexp for sender account
 
 ```bash
-iriscli bank set-memo-regexp --regexp=^[A-Za-z0-9]+$ --from=<key-name> --amount=10iris --fee=0.3iris --chain-id=irishub
+iriscli bank set-memo-regexp --regexp=^[A-Za-z0-9]+$ --from=<key-name> --fee=0.3iris --chain-id=irishub
 ```
