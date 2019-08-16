@@ -13,7 +13,7 @@ In this version, all POST methods (except '/tx/broadcast') just generate unsigne
 - Remove GET /distribution/community-tax
 - Remove GET /gov/params/{module}
 
-### NON BREAKING CHANGES:
+### NON-BREAKING CHANGES:
 - Add Asset module APIs
 - Add Rand module APIs
 - Add Params module APIs
@@ -22,16 +22,16 @@ In this version, all POST methods (except '/tx/broadcast') just generate unsigne
 
 #### Bank module APIs
 
-| [v0.14.0]      | [v0.14.1]        | input changed | output changed | details | 
+| [v0.14.1]      | [v0.15.0]        | input changed | output changed | details | 
 | --------------- | --------------- | --------------- | --------------- | ----- |
-| GET /bank/accounts/{address} | GET /bank/accounts/{address} | No | Yes | Add `memo_regexp` in Output |
+| GET /bank/accounts/{address} | GET /bank/accounts/{address} | No | Yes | Add `memo_regexp` in output, support multiple tokens |
 
 #### Tendermint module APIs
 
 | [v0.14.1]      | [v0.15.0]        | input changed | output changed | details |
 | --------------- | --------------- | --------------- | --------------- | ---- |
-| /txs/{hash} | /txs/{hash} | No | Yes | Add `timestamp` in Output |
-| /txs | /txs | No | Yes | Add `timestamp` in Output |
+| /txs/{hash} | /txs/{hash} | No | Yes | Add `timestamp` in output |
+| /txs | /txs | No | Yes | Add `timestamp` in output |
 
 
 ## v0.14.1

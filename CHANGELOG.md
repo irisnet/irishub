@@ -16,7 +16,7 @@
 
 ### Application
 * [\#1336](https://github.com/irisnet/irishub/issues/1336) Ensure field length checking in the service module
-* [\#1466](https://github.com/irisnet/irishub/issues/1466) Support multi signature account
+* [\#1466](https://github.com/irisnet/irishub/issues/1466) Support multi-signature account
 * [\#1468](https://github.com/irisnet/irishub/issues/1468) Add asset module
 * [\#1493](https://github.com/irisnet/irishub/issues/1493) Back up keys using keystore file
 * [\#1511](https://github.com/irisnet/irishub/issues/1511) Split the export command into reset and export
@@ -31,7 +31,7 @@
 * [\#1643](https://github.com/irisnet/irishub/issues/1643) Fix tx search by tx.height
 * [\#1854](https://github.com/irisnet/irishub/issues/1854) Enforce unbonding_time for redelegation
 * [\#1867](https://github.com/irisnet/irishub/issues/1867) Enable memo validation for "flagged" accounts
-* [\#1851](https://github.com/irisnet/irishub/issues/1851) Reduce gas consumption supports larger data storage
+* [\#1851](https://github.com/irisnet/irishub/issues/1851) Reduce gas consumption to support larger data storage
 
 ### Tendermint
 * Update to irisnet/tendermint [v0.31.0](https://github.com/irisnet/tendermint/releases/tag/v0.31.0)
@@ -40,8 +40,8 @@
   * [\#1451](https://github.com/irisnet/irishub/issues/1451) [db] Close WriteBatch to prevent memory leak
   * [\#1460](https://github.com/irisnet/irishub/issues/1460) [kms] Shut down tmkms when a validator enters proposal round crashes the app
   * [\#1554](https://github.com/irisnet/irishub/issues/1554) [consensus] Log block status on replay block
-  * [\#1646](https://github.com/irisnet/irishub/issues/1646) [consensus] Fix possible halt by resetting TriggeredTimeoutPrecommit before starting next height
-  * [\#1647](https://github.com/irisnet/irishub/issues/1647) [consensus] Flush WAL on stop to prevent data corruption during graceful shutdown
+  * [\#1646](https://github.com/irisnet/irishub/issues/1646) [consensus] Fix possible halt by resetting TriggeredTimeoutPrecommit before starting the next height
+  * [\#1647](https://github.com/irisnet/irishub/issues/1647) [consensus] Flush WAL on stop to prevent data corruption during a graceful shutdown
   * [\#1648](https://github.com/irisnet/irishub/issues/1648) [p2p] Fix reconnecting report duplicate ID error due to race condition between adding peer to peerSet and starting it
   * [\#1649](https://github.com/irisnet/irishub/issues/1649) [p2p] Do not panic when filter times out
   * [\#1650](https://github.com/irisnet/irishub/issues/1650) [p2p] Reject all-zero shared secrets in the Diffie-Hellman step of secret-connection
@@ -52,7 +52,7 @@
   * [\#1693](https://github.com/irisnet/irishub/issues/1693) [db] Close Iterator in RemoteDB 
   * [\#1697](https://github.com/irisnet/irishub/issues/1697) [lite] Fix error proxy endpoints `validators` in lite client
   * [\#1702](https://github.com/irisnet/irishub/issues/1702) [blockchain] Update the maxHeight when a peer is removed
-  * [\#1703](https://github.com/irisnet/irishub/issues/1703) [mempool] Mempool no gossip back
+  * [\#1703](https://github.com/irisnet/irishub/issues/1703) [mempool] Mempool don't gossip back
   * [\#1704](https://github.com/irisnet/irishub/issues/1704) [rpc] Disable compression for HTTP client to prevent GZIP-bomb DoS attacks
   * [\#1714](https://github.com/irisnet/irishub/issues/1714) [mempool] Bound mempool memory usage
 
