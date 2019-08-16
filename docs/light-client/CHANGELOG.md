@@ -2,7 +2,7 @@
 
 ## v0.15.0
 
-*Aug 2th, 2019*
+*Aug 16th, 2019*
 
 ### BREAKING CHANGES:
 
@@ -16,6 +16,7 @@ In this version, all POST methods (except '/tx/broadcast') just generate unsigne
 - Add Rand module APIs
 - Add Params module APIs
 - Add GET /bank/token-stats/{id}
+- Add POST /bank/accounts/{address}/set-memo-regexp
 
 #### Tendermint module APIs
 
@@ -23,6 +24,7 @@ In this version, all POST methods (except '/tx/broadcast') just generate unsigne
 | --------------- | --------------- | --------------- | --------------- |
 | /txs/{hash} | /txs/{hash} | No | Yes |
 | /txs | /txs | No | Yes |
+| /bank/accounts/{address} | /bank/accounts/{address} | No | Yes |
 
 
 ## v0.14.1

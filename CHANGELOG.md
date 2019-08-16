@@ -2,7 +2,7 @@
 
 ## 0.15.0
 
-*Aug 2, 2019*
+*Aug 16th, 2019*
 
 ### LCD (REST API)
 * [\#1473](https://github.com/irisnet/irishub/issues/1473) Add APIs for Tokens
@@ -30,7 +30,8 @@
 * [\#1783](https://github.com/irisnet/irishub/issues/1783) Optimize error messages 
 * [\#1643](https://github.com/irisnet/irishub/issues/1643) Fix tx search by tx.height
 * [\#1854](https://github.com/irisnet/irishub/issues/1854) Enforce unbonding_time for redelegation
-
+* [\#1867](https://github.com/irisnet/irishub/issues/1867) Enable memo validation for "flagged" accounts
+* [\#1851](https://github.com/irisnet/irishub/issues/1851) Reducing gas consumption supports larger data storage
 
 ### Tendermint
 * Update to irisnet/tendermint [v0.31.0](https://github.com/irisnet/tendermint/releases/tag/v0.31.0)
