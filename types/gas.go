@@ -86,10 +86,10 @@ func (g *basicGasMeter) GasConsumedToLimit() Gas {
 func (g *basicGasMeter) ConsumeGas(amount Gas, descriptor string) {
 	var overflow bool
 
-	// amount = log(amount-g.shift)/log(g.base)
+	// amount = log(gas)/log(gasBase)
 	if g.base > 1 && amount > g.shift && amount < math.MaxInt64 &&
 		(descriptor == GasWritePerByteDesc || descriptor == GasReadPerByteDesc) {
-		amount = uint64(math.Log(float64(int64(amount-g.shift))) / math.Log(g.base))
+		amount = uint64(math.Log(float64(int64(amount))) / math.Log(g.base))
 	}
 	// TODO: Should we set the consumed field after overflow checking?
 	g.consumed, overflow = AddUint64Overflow(g.consumed, amount)

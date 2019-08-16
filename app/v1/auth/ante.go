@@ -17,9 +17,10 @@ const (
 	ed25519VerifyCost   = 59
 	secp256k1VerifyCost = 100
 
-	// gas = log(gas-gasShift)/log(gasBase)
+	// if gas > gasShift, gas = log(gas)/log(gasBase)
+	// else gasConsumed = gas
 	gasBase  = 1.03 // gas logarithm base
-	gasShift = 90   // gas logarithm shift
+	gasShift = 174  // gas logarithm shift
 )
 
 // NewAnteHandler returns an AnteHandler that checks
