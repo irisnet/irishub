@@ -4,7 +4,7 @@ info:
   description: >-
     A REST interface for state queries, transaction generation and
     broadcast.
-  version: "0.15.0-rc3"
+  version: "0.16.0-rc0"
   title: IRISLCD Swagger-UI
   termsOfService: 'https://www.irisnet.org'
   contact:
@@ -33,6 +33,8 @@ tags:
     description: Rand module APIs
   - name: Service
     description: Service module APIs
+  - name: CoinSwap
+    description: CoinSwap module APIs
   - name: Params
     description: Params module APIs
   - name: Gov
@@ -2811,6 +2813,165 @@ paths:
           description: Invalid height if provided
         '500':
           description: Internal Server Error
+  '/coinswap/liquidities/{id}':
+    get:
+      summary: Query liquidity by token id
+      tags:
+        - CoinSwap
+      parameters:
+        - in: path
+          name: id
+          description: the unique liquidity id of the token-iris pair
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoinSwapLiquidity'
+        '400':
+          description: Invalid Liquidity Id
+        '500':
+          description: Internal Server Error
+  '/coinswap/liquidities/{id}/deposit':
+    post:
+      summary: Add liquidity by exact iris amount, calculated token and liquidity amount
+      tags:
+        - CoinSwap
+      parameters:
+        - in: path
+          name: id
+          description: the unique liquidity id of the token-iris pair
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Unsigned tx was succesfully generated
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_tx:
+                  $ref: '#/components/schemas/BaseTx'
+                max_token:
+                  type: integer
+                  example: '10'
+                exact_iris_amt:
+                  type: integer
+                  example: '10000000000000000000'
+                min_liquidity:
+                  type: integer
+                  example: '10000000000000000000'
+                deadline:
+                  type: string
+                  example: '30s'
+                sender:
+                  $ref: '#/components/schemas/Address'
+  '/coinswap/liquidities/{id}/withdraw':
+    post:
+      summary: Remove liquidity by exact liquidity amount, calculated iris and token amount
+      tags:
+        - CoinSwap
+      parameters:
+        - in: path
+          name: id
+          description: the unique liquidity id of the token-iris pair
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Unsigned tx was succesfully generated
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_tx:
+                  $ref: '#/components/schemas/BaseTx'
+                min_token:
+                  type: integer
+                  example: '100'
+                min_iris_amt:
+                  type: integer
+                  example: '10000000000000000000'
+                withdraw_liquidity:
+                  type: integer
+                  example: '10000000000000000000'
+                deadline:
+                  type: string
+                  example: '30s'
+                sender:
+                  $ref: '#/components/schemas/Address'
+  '/coinswap/liquidities/buy':
+    post:
+      summary: Swap coin by exact output, calculated input
+      tags:
+        - CoinSwap
+      responses:
+        '200':
+          description: Unsigned tx was succesfully generated
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_tx:
+                  $ref: '#/components/schemas/BaseTx'
+                input:
+                  $ref: '#/components/schemas/CoinSwapInputOutput'
+                output:
+                  $ref: '#/components/schemas/CoinSwapInputOutput'
+                deadline:
+                  type: string
+                  example: '30s'
+  '/coinswap/liquidities/sell':
+    post:
+      summary: Swap coin by exact input, calculated output
+      tags:
+        - CoinSwap
+      responses:
+        '200':
+          description: Unsigned tx was succesfully generated
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_tx:
+                  $ref: '#/components/schemas/BaseTx'
+                input:
+                  $ref: '#/components/schemas/CoinSwapInputOutput'
+                output:
+                  $ref: '#/components/schemas/CoinSwapInputOutput'
+                deadline:
+                  type: string
+                  example: '30s'
   '/params':
     get:
       summary: Get the system params with an optional module
@@ -2963,7 +3124,7 @@ components:
       properties:
         denom:
           type: string
-          example: iris
+          example: 'iris-atto'
         amount:
           type: string
           example: '50'
@@ -3477,3 +3638,23 @@ components:
           $ref: '#/components/schemas/Address'
         tx_hash:
           type: string
+    CoinSwapLiquidity:
+      type: object
+      properties:
+        iris:
+          $ref: '#/components/schemas/Coin'
+        token:
+          $ref: '#/components/schemas/Coin'
+        liquidity:
+          $ref: '#/components/schemas/Coin'
+        fee:
+          type: string
+          example: '0.003'
+    CoinSwapInputOutput:
+      type: object
+      properties:
+        address:
+          type: string
+          example: faa1ezzh0humhy3329xg4avhcjtay985nll0zswc5j
+        coin:
+          $ref: '#/components/schemas/Coin'

@@ -32,15 +32,4 @@ func TestNewQuerier(t *testing.T) {
 	res, err = querier(ctx, []string{"liquidity"}, req)
 	require.Error(t, err)
 	require.Nil(t, res)
-
-	// query for fee params
-	fee := types.DefaultParams().Fee
-	req.Path = fmt.Sprintf("custom/%s/%s/%s", types.QuerierRoute, types.QueryParameters, types.ParamFee)
-	req.Data = []byte{}
-	res, err = querier(ctx, []string{types.QueryParameters, types.ParamFee}, req)
-	keeper.cdc.UnmarshalJSON(res, &fee)
-	require.Nil(t, err)
-	require.Equal(t, fee, types.DefaultParams().Fee)
 }
-
-// TODO: Add tests for valid liquidity queries

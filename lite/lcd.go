@@ -8,6 +8,7 @@ import (
 	"github.com/irisnet/irishub/client"
 	assethandler "github.com/irisnet/irishub/client/asset/lcd"
 	bankhandler "github.com/irisnet/irishub/client/bank/lcd"
+	coinswaphandler "github.com/irisnet/irishub/client/coinswap/lcd"
 	"github.com/irisnet/irishub/client/context"
 	distributionhandler "github.com/irisnet/irishub/client/distribution/lcd"
 	govhandler "github.com/irisnet/irishub/client/gov/lcd"
@@ -108,6 +109,7 @@ func createHandler(cdc *codec.Codec) *mux.Router {
 	govhandler.RegisterRoutes(cliCtx, r, cdc)
 	servicehandle.RegisterRoutes(cliCtx, r, cdc)
 	paramshandle.RegisterRoutes(cliCtx, r, cdc)
+	coinswaphandler.RegisterRoutes(cliCtx, r, cdc)
 	// tendermint apis
 	rpchandler.RegisterRoutes(cliCtx, r, cdc)
 	ttxhandler.RegisterRoutes(cliCtx, r, cdc)

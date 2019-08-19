@@ -6,15 +6,13 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 )
 
-const FormatReservePool = "u-%s"
-
 func (k Keeper) SwapCoins(ctx sdk.Context, sender, recipient sdk.AccAddress, coinSold, coinBought sdk.Coin) sdk.Error {
-	reservePoolName, err := k.GetReservePoolName(coinSold.Denom, coinBought.Denom)
+	uniId, err := types.GetUniId(coinSold.Denom, coinBought.Denom)
 	if err != nil {
 		return err
 	}
 
-	poolAddr := getReservePoolAddr(reservePoolName)
+	poolAddr := getReservePoolAddr(uniId)
 	_, err = k.bk.SendCoins(ctx, sender, poolAddr, sdk.NewCoins(coinSold))
 	if err != nil {
 		return err
@@ -34,13 +32,13 @@ Calculate the amount of another token to be received based on the exact amount o
 @return : token amount that will to be received
 */
 func (k Keeper) calculateWithExactInput(ctx sdk.Context, exactSoldCoin sdk.Coin, boughtTokenDenom string) (sdk.Int, sdk.Error) {
-	reservePoolName, err := k.GetReservePoolName(exactSoldCoin.Denom, boughtTokenDenom)
+	uniId, err := types.GetUniId(exactSoldCoin.Denom, boughtTokenDenom)
 	if err != nil {
 		return sdk.ZeroInt(), err
 	}
-	reservePool := k.GetReservePool(ctx, reservePoolName)
+	reservePool := k.GetReservePool(ctx, uniId)
 	if reservePool == nil {
-		return sdk.ZeroInt(), types.ErrReservePoolNotExists(fmt.Sprintf("reserve pool for %s not found", reservePoolName))
+		return sdk.ZeroInt(), types.ErrReservePoolNotExists(fmt.Sprintf("reserve pool for %s not found", uniId))
 	}
 	inputReserve := reservePool.AmountOf(exactSoldCoin.Denom)
 	outputReserve := reservePool.AmountOf(boughtTokenDenom)
@@ -127,13 +125,13 @@ Calculate the amount of another token to be spent based on the exact amount of t
 @return : token amount that needs to be sold
 */
 func (k Keeper) calculateWithExactOutput(ctx sdk.Context, exactBoughtCoin sdk.Coin, soldTokenDenom string) (sdk.Int, sdk.Error) {
-	reservePoolName, err := k.GetReservePoolName(exactBoughtCoin.Denom, soldTokenDenom)
+	uniId, err := types.GetUniId(exactBoughtCoin.Denom, soldTokenDenom)
 	if err != nil {
-		return sdk.ZeroInt(), types.ErrReservePoolNotExists(fmt.Sprintf("reserve pool for %s not found", reservePoolName))
+		return sdk.ZeroInt(), types.ErrReservePoolNotExists(fmt.Sprintf("reserve pool not found: %s", err.Error()))
 	}
-	reservePool := k.GetReservePool(ctx, reservePoolName)
+	reservePool := k.GetReservePool(ctx, uniId)
 	if reservePool == nil {
-		return sdk.ZeroInt(), types.ErrReservePoolNotExists(fmt.Sprintf("reserve pool for %s not found", reservePoolName))
+		return sdk.ZeroInt(), types.ErrReservePoolNotExists(fmt.Sprintf("reserve pool for %s not found", uniId))
 	}
 	inputReserve := reservePool.AmountOf(exactBoughtCoin.Denom)
 	outputReserve := reservePool.AmountOf(soldTokenDenom)
@@ -215,25 +213,6 @@ func (k Keeper) doubleTradeInputForExactOutput(ctx sdk.Context, input types.Inpu
 		return sdk.ZeroInt(), err
 	}
 	return soldTokenAmt, nil
-}
-
-// GetReservePoolName returns the reserve pool name for the provided denominations.
-// The reserve pool name is in the format of 'u-denom' which the denomination
-// is not iris-atto.
-func (k Keeper) GetReservePoolName(denom1, denom2 string) (string, sdk.Error) {
-	if denom1 == denom2 {
-		return "", types.ErrEqualDenom("denomnations for forming reserve pool name are equal")
-	}
-
-	if denom1 != sdk.IrisAtto && denom2 != sdk.IrisAtto {
-		return "", types.ErrIllegalDenom(fmt.Sprintf("illegal denomnations for forming reserve pool name, must have one native denom: %s", sdk.IrisAtto))
-	}
-
-	var denom = denom2
-	if denom1 != sdk.IrisAtto {
-		denom = denom1
-	}
-	return fmt.Sprintf(FormatReservePool, denom), nil
 }
 
 // getInputPrice returns the amount of coins bought (calculated) given the input amount being sold (exact)

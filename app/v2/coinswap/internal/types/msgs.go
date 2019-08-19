@@ -1,15 +1,19 @@
 package types
 
 import (
-	"time"
-
 	sdk "github.com/irisnet/irishub/types"
+	"strings"
 )
 
 var (
 	_ sdk.Msg = MsgSwapOrder{}
 	_ sdk.Msg = MsgAddLiquidity{}
 	_ sdk.Msg = MsgRemoveLiquidity{}
+)
+
+const (
+	FormatUniIdPrefix = "u-"
+	FormatUniId       = FormatUniIdPrefix + "%s"
 )
 
 /* --------------------------------------------------------------------------- */
@@ -32,15 +36,15 @@ type Output struct {
 }
 
 type MsgSwapOrder struct {
-	Input      Input     `json:"input"`        // the amount the sender is trading
-	Output     Output    `json:"output"`       // the amount the sender is recieivng
-	Deadline   time.Time `json:"deadline"`     // deadline for the transaction to still be considered valid
-	IsBuyOrder bool      `json:"is_buy_order"` // boolean indicating whether the order should be treated as a buy or sell
+	Input      Input  `json:"input"`        // the amount the sender is trading
+	Output     Output `json:"output"`       // the amount the sender is receiving
+	Deadline   int64  `json:"deadline"`     // deadline for the transaction to still be considered valid
+	IsBuyOrder bool   `json:"is_buy_order"` // boolean indicating whether the order should be treated as a buy or sell
 }
 
 // NewMsgSwapOrder creates a new MsgSwapOrder object.
 func NewMsgSwapOrder(
-	input Input, output Output, deadline time.Time, isBuyOrder bool,
+	input Input, output Output, deadline int64, isBuyOrder bool,
 ) MsgSwapOrder {
 
 	return MsgSwapOrder{
@@ -62,21 +66,23 @@ func (msg MsgSwapOrder) ValidateBasic() sdk.Error {
 	if !(msg.Input.Coin.IsValid() && msg.Input.Coin.IsPositive()) {
 		return sdk.ErrInvalidCoins("input coin is invalid: " + msg.Input.Coin.String())
 	}
-
+	if strings.HasPrefix(msg.Input.Coin.Denom, FormatUniIdPrefix) {
+		return sdk.ErrInvalidCoins("unsupported input coin type: " + msg.Input.Coin.String())
+	}
 	if !(msg.Output.Coin.IsValid() && msg.Output.Coin.IsPositive()) {
 		return sdk.ErrInvalidCoins("output coin is invalid: " + msg.Output.Coin.String())
 	}
-
+	if strings.HasPrefix(msg.Output.Coin.Denom, FormatUniIdPrefix) {
+		return sdk.ErrInvalidCoins("unsupported output coin type: " + msg.Output.Coin.String())
+	}
 	if msg.Input.Coin.Denom == msg.Output.Coin.Denom {
 		return ErrEqualDenom("")
 	}
-
-	if msg.Deadline.IsZero() {
+	if msg.Deadline <= 0 {
 		return ErrInvalidDeadline("deadline for MsgSwapOrder not initialized")
 	}
-
 	if msg.Input.Address.Empty() {
-		return sdk.ErrInvalidAddress("invalid sender address")
+		return sdk.ErrInvalidAddress("invalid input address")
 	}
 	return nil
 }
@@ -100,14 +106,14 @@ type MsgAddLiquidity struct {
 	MaxToken     sdk.Coin       `json:"max_token"`      // coin to be deposited as liquidity with an upper bound for its amount
 	ExactIrisAmt sdk.Int        `json:"exact_iris_amt"` // exact amount of native asset being add to the liquidity pool
 	MinLiquidity sdk.Int        `json:"min_liquidity"`  // lower bound UNI sender is willing to accept for deposited coins
-	Deadline     time.Time      `json:"deadline"`
+	Deadline     int64          `json:"deadline"`
 	Sender       sdk.AccAddress `json:"sender"`
 }
 
 // NewMsgAddLiquidity creates a new MsgAddLiquidity object.
 func NewMsgAddLiquidity(
 	maxToken sdk.Coin, exactIrisAmt, minLiquidity sdk.Int,
-	deadline time.Time, sender sdk.AccAddress,
+	deadline int64, sender sdk.AccAddress,
 ) MsgAddLiquidity {
 
 	return MsgAddLiquidity{
@@ -128,18 +134,21 @@ func (msg MsgAddLiquidity) Type() string { return "add_liquidity" }
 // ValidateBasic Implements Msg.
 func (msg MsgAddLiquidity) ValidateBasic() sdk.Error {
 	if !(msg.MaxToken.IsValid() && msg.MaxToken.IsPositive()) {
-		return sdk.ErrInvalidCoins("maxToken is invalid: " + msg.MaxToken.String())
+		return sdk.ErrInvalidCoins("max token is invalid: " + msg.MaxToken.String())
 	}
 	if msg.MaxToken.Denom == sdk.IrisAtto {
-		return sdk.ErrInvalidCoins("max token should be non-iris token: " + msg.MaxToken.String())
+		return sdk.ErrInvalidCoins("max token must be non-iris token")
+	}
+	if strings.HasPrefix(msg.MaxToken.Denom, FormatUniIdPrefix) {
+		return sdk.ErrInvalidCoins("max token must be non-liquidity token")
 	}
 	if msg.ExactIrisAmt.IsNil() || !msg.ExactIrisAmt.IsPositive() {
-		return ErrNotPositive("deposit amount provided is not positive")
+		return ErrNotPositive("iris amount must be positive")
 	}
 	if msg.MinLiquidity.IsNil() || msg.MinLiquidity.IsNegative() {
-		return ErrNotPositive("minimum liquidity is negative")
+		return ErrNotPositive("minimum liquidity can not be negative")
 	}
-	if msg.Deadline.IsZero() {
+	if msg.Deadline <= 0 {
 		return ErrInvalidDeadline("deadline for MsgAddLiquidity not initialized")
 	}
 	if msg.Sender.Empty() {
@@ -164,17 +173,17 @@ func (msg MsgAddLiquidity) GetSigners() []sdk.AccAddress {
 
 // MsgRemoveLiquidity - struct for removing liquidity from a reserve pool
 type MsgRemoveLiquidity struct {
-	MinToken          sdk.Coin       `json:"min_token"`          // coin to be withdrawn with a lower bound for its amount
-	WithdrawLiquidity sdk.Int        `json:"withdraw_liquidity"` // amount of UNI to be burned to withdraw liquidity from a reserve pool
+	MinToken          sdk.Int        `json:"min_token"`          // coin to be withdrawn with a lower bound for its amount
+	WithdrawLiquidity sdk.Coin       `json:"withdraw_liquidity"` // amount of UNI to be burned to withdraw liquidity from a reserve pool
 	MinIrisAmt        sdk.Int        `json:"min_iris_amt"`       // minimum amount of the native asset the sender is willing to accept
-	Deadline          time.Time      `json:"deadline"`
+	Deadline          int64          `json:"deadline"`
 	Sender            sdk.AccAddress `json:"sender"`
 }
 
 // NewMsgRemoveLiquidity creates a new MsgRemoveLiquidity object
 func NewMsgRemoveLiquidity(
-	minToken sdk.Coin, withdrawLiquidity, minIrisAmt sdk.Int,
-	deadline time.Time, sender sdk.AccAddress,
+	minToken sdk.Int, withdrawLiquidity sdk.Coin, minIrisAmt sdk.Int,
+	deadline int64, sender sdk.AccAddress,
 ) MsgRemoveLiquidity {
 
 	return MsgRemoveLiquidity{
@@ -194,19 +203,19 @@ func (msg MsgRemoveLiquidity) Type() string { return "remove_liquidity" }
 
 // ValidateBasic Implements Msg.
 func (msg MsgRemoveLiquidity) ValidateBasic() sdk.Error {
-	if !(msg.MinToken.IsValid() && msg.MinToken.IsPositive()) {
-		return sdk.ErrInvalidCoins("minToken is invalid: " + msg.MinToken.String())
+	if msg.MinToken.IsNil() || msg.MinToken.IsNegative() {
+		return sdk.ErrInvalidCoins("minimum token amount can not be negative")
 	}
-	if msg.MinToken.Denom == sdk.IrisAtto {
-		return sdk.ErrInvalidCoins("min token should be non-iris token: " + msg.MinToken.String())
+	if !msg.WithdrawLiquidity.IsValid() || !msg.WithdrawLiquidity.IsPositive() {
+		return ErrNotPositive("withdraw liquidity is not valid: " + msg.WithdrawLiquidity.String())
 	}
-	if msg.WithdrawLiquidity.IsNil() || !msg.WithdrawLiquidity.IsPositive() {
-		return ErrNotPositive("withdraw liquidity is not positive")
+	if err := CheckUniDenom(msg.WithdrawLiquidity.Denom); err != nil {
+		return err
 	}
-	if msg.MinIrisAmt.IsNil() || !msg.MinIrisAmt.IsPositive() {
-		return ErrNotPositive("minimum iris amount is not positive")
+	if msg.MinIrisAmt.IsNil() || msg.MinIrisAmt.IsNegative() {
+		return ErrNotPositive("minimum iris amount can not be negative")
 	}
-	if msg.Deadline.IsZero() {
+	if msg.Deadline <= 0 {
 		return ErrInvalidDeadline("deadline for MsgRemoveLiquidity not initialized")
 	}
 	if msg.Sender.Empty() {

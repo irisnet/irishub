@@ -93,6 +93,10 @@ func queryTokenStats(ctx sdk.Context, req abci.RequestQuery, keeper Keeper, cdc 
 		looseTokens = bk.GetLoosenCoins(ctx)
 		burnedTokens = sdk.Coins{sdk.NewCoin(sdk.IrisAtto, bk.GetCoins(ctx, auth.BurnedCoinsAccAddr).AmountOf(sdk.IrisAtto))}
 	} else { // query !iris
+		if !sdk.IsCoinNameValid(params.TokenId) {
+			return nil, sdk.ErrUnknownRequest("unknown token id")
+		}
+
 		denom, err := sdk.GetCoinMinDenom(params.TokenId)
 		if err != nil {
 			return nil, sdk.ParseParamsErr(err)

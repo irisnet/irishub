@@ -6,24 +6,37 @@ import (
 )
 
 type (
-	Keeper             = keeper.Keeper
-	MsgSwapOrder       = types.MsgSwapOrder
-	MsgAddLiquidity    = types.MsgAddLiquidity
-	MsgRemoveLiquidity = types.MsgRemoveLiquidity
-	Params             = types.Params
+	Keeper               = keeper.Keeper
+	MsgSwapOrder         = types.MsgSwapOrder
+	MsgAddLiquidity      = types.MsgAddLiquidity
+	MsgRemoveLiquidity   = types.MsgRemoveLiquidity
+	Params               = types.Params
+	QueryLiquidityParams = types.QueryLiquidityParams
+	Input                = types.Input
+	Output               = types.Output
 )
 
 var (
+	DefaultParamSpace = types.DefaultParamSpace
+	QueryLiquidity    = types.QueryLiquidity
+
+	RegisterCodec = types.RegisterCodec
+
 	NewMsgSwapOrder       = types.NewMsgSwapOrder
 	NewMsgAddLiquidity    = types.NewMsgAddLiquidity
 	NewMsgRemoveLiquidity = types.NewMsgRemoveLiquidity
+	NewKeeper             = keeper.NewKeeper
+	NewQuerier            = keeper.NewQuerier
 
 	ErrInvalidDeadline  = types.ErrInvalidDeadline
 	ErrNotPositive      = types.ErrNotPositive
 	ErrConstraintNotMet = types.ErrConstraintNotMet
-	RegisterCodec       = types.RegisterCodec
-	NewKeeper           = keeper.NewKeeper
-	DefaultParamSpace   = types.DefaultParamSpace
+
+	GetUniId                    = types.GetUniId
+	GetCoinMinDenomFromUniDenom = types.GetCoinMinDenomFromUniDenom
+	GetUniDenom                 = types.GetUniDenom
+	CheckUniDenom               = types.CheckUniDenom
+	CheckUniId                  = types.CheckUniId
 )
 
 const (

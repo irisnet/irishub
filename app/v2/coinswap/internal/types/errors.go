@@ -14,7 +14,8 @@ const (
 	CodeNotPositive                  sdk.CodeType = 104
 	CodeConstraintNotMet             sdk.CodeType = 105
 	CodeIllegalDenom                 sdk.CodeType = 106
-	CodeReservePoolInsufficientFunds sdk.CodeType = 107
+	CodeIllegalUniId                 sdk.CodeType = 107
+	CodeReservePoolInsufficientFunds sdk.CodeType = 108
 )
 
 func ErrReservePoolNotExists(msg string) sdk.Error {
@@ -29,6 +30,13 @@ func ErrEqualDenom(msg string) sdk.Error {
 		return sdk.NewError(DefaultCodespace, CodeEqualDenom, msg)
 	}
 	return sdk.NewError(DefaultCodespace, CodeEqualDenom, "input and output denomination are equal")
+}
+
+func ErrIllegalUniId(msg string) sdk.Error {
+	if msg != "" {
+		return sdk.NewError(DefaultCodespace, CodeIllegalUniId, msg)
+	}
+	return sdk.NewError(DefaultCodespace, CodeIllegalUniId, "illegal liquidity id")
 }
 
 func ErrIllegalDenom(msg string) sdk.Error {
