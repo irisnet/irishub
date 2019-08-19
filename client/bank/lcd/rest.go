@@ -19,4 +19,5 @@ func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec) 
 		QueryTokenStatsRequestHandlerFn(cdc, utils.GetAccountDecoder(cdc), cliCtx)).Methods("GET")
 	r.HandleFunc("/bank/accounts/{address}/send", SendRequestHandlerFn(cdc, cliCtx)).Methods("POST")
 	r.HandleFunc("/bank/accounts/{address}/burn", BurnRequestHandlerFn(cdc, cliCtx)).Methods("POST")
+	r.HandleFunc("/bank/accounts/{address}/set-memo-regexp", SetMemoRegexpRequestHandlerFn(cdc, cliCtx)).Methods("POST")
 }

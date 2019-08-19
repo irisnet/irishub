@@ -23,6 +23,11 @@ type burnBody struct {
 	BaseTx utils.BaseTx `json:"base_tx"`
 }
 
+type setMemoRegexpBody struct {
+	MemoRegexp string       `json:"memo_regexp"`
+	BaseTx     utils.BaseTx `json:"base_tx"`
+}
+
 // SendRequestHandlerFn - http request handler to send coins to a address
 // nolint: gocyclo
 func SendRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
@@ -105,6 +110,37 @@ func BurnRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Hand
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
+
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
+
+		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
+	}
+}
+
+// SetMemoRegexpRequestHandlerFn - http request handler to set memo regexp
+// nolint: gocyclo
+func SetMemoRegexpRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		bech32addr := vars["address"]
+		owner, err := sdk.AccAddressFromBech32(bech32addr)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+		var m setMemoRegexpBody
+		err = utils.ReadPostBody(w, r, cdc, &m)
+		if err != nil {
+			return
+		}
+		baseReq := m.BaseTx.Sanitize()
+		if !baseReq.ValidateBasic(w) {
+			return
+		}
+
+		// Build message
+		regexp := m.MemoRegexp
+		msg := bank.BuildSetMemoRegexp(owner, regexp)
 
 		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
 

@@ -8,6 +8,7 @@ import (
 func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(MsgSend{}, "irishub/bank/Send", nil)
 	cdc.RegisterConcrete(MsgBurn{}, "irishub/bank/Burn", nil)
+	cdc.RegisterConcrete(MsgSetMemoRegexp{}, "irishub/bank/SetMemoRegexp", nil)
 }
 
 var msgCdc = codec.New()

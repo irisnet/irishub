@@ -2,10 +2,13 @@ package bank
 
 import (
 	"encoding/json"
-
 	"fmt"
+	"regexp"
+
 	sdk "github.com/irisnet/irishub/types"
 )
+
+const memoRegexpLengthLimit = 50
 
 // MsgSend - high level transaction of the coin module
 type MsgSend struct {
@@ -180,7 +183,7 @@ type MsgBurn struct {
 
 var _ sdk.Msg = MsgBurn{}
 
-// NewMsgIssue - construct arbitrary multi-in, multi-out send msg.
+// NewMsgBurn - construct MsgBurn
 func NewMsgBurn(owner sdk.AccAddress, coins sdk.Coins) MsgBurn {
 	return MsgBurn{Owner: owner, Coins: coins}
 }
@@ -215,5 +218,54 @@ func (msg MsgBurn) GetSignBytes() []byte {
 
 // Implements Msg.
 func (msg MsgBurn) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{msg.Owner}
+}
+
+//----------------------------------------
+// MsgSetMemoRegexp
+
+// MsgSetMemoRegexp - set memo regexp
+type MsgSetMemoRegexp struct {
+	Owner      sdk.AccAddress `json:"owner"`
+	MemoRegexp string         `json:"memo_regexp"`
+}
+
+var _ sdk.Msg = MsgSetMemoRegexp{}
+
+// NewMsgIssue - construct arbitrary multi-in, multi-out send msg.
+func NewMsgSetMemoRegexp(owner sdk.AccAddress, memoRegexp string) MsgSetMemoRegexp {
+	return MsgSetMemoRegexp{Owner: owner, MemoRegexp: memoRegexp}
+}
+
+// Implements Msg.
+// nolint
+func (msg MsgSetMemoRegexp) Route() string { return "bank" }
+func (msg MsgSetMemoRegexp) Type() string  { return "set-memo-regexp" }
+
+// Implements Msg.
+func (msg MsgSetMemoRegexp) ValidateBasic() sdk.Error {
+	if len(msg.Owner) == 0 {
+		return sdk.ErrInvalidAddress(msg.Owner.String())
+	}
+	if len(msg.MemoRegexp) > memoRegexpLengthLimit {
+		return ErrInvalidMemoRegexp(DefaultCodespace, "memo regexp length exceeds limit")
+	}
+	if _, err := regexp.Compile(msg.MemoRegexp); err != nil {
+		return ErrInvalidMemoRegexp(DefaultCodespace, "invalid memo regexp")
+	}
+	return nil
+}
+
+// Implements Msg.
+func (msg MsgSetMemoRegexp) GetSignBytes() []byte {
+	b, err := msgCdc.MarshalJSON(msg)
+	if err != nil {
+		panic(err)
+	}
+	return sdk.MustSortJSON(b)
+}
+
+// Implements Msg.
+func (msg MsgSetMemoRegexp) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Owner}
 }

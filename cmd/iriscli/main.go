@@ -100,6 +100,7 @@ func main() {
 		client.PostCommands(
 			bankcmd.SendTxCmd(cdc),
 			bankcmd.BurnTxCmd(cdc),
+			bankcmd.SetMemoRegCmd(cdc),
 		)...)
 	rootCmd.AddCommand(
 		bankCmd,
