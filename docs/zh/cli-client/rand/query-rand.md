@@ -2,7 +2,7 @@
 
 ## 描述
 
-Query the generated random number by the request id
+使用ID查询链上生成的随机数
 
 ## 使用方式
 
