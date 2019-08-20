@@ -232,7 +232,7 @@ type MsgSetMemoRegexp struct {
 
 var _ sdk.Msg = MsgSetMemoRegexp{}
 
-// NewMsgIssue - construct arbitrary multi-in, multi-out send msg.
+// NewMsgSetMemoRegexp - construct MsgSetMemoRegexp
 func NewMsgSetMemoRegexp(owner sdk.AccAddress, memoRegexp string) MsgSetMemoRegexp {
 	return MsgSetMemoRegexp{Owner: owner, MemoRegexp: memoRegexp}
 }
