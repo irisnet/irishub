@@ -2,10 +2,9 @@ package bank
 
 import (
 	"fmt"
+	"strings"
 
-	"github.com/irisnet/irishub/client/context"
-	"github.com/irisnet/irishub/modules/auth"
-	"github.com/irisnet/irishub/modules/bank"
+	"github.com/irisnet/irishub/app/v1/bank"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/tendermint/tendermint/crypto"
 )
@@ -16,26 +15,31 @@ type BaseAccount struct {
 	PubKey        crypto.PubKey  `json:"public_key"`
 	AccountNumber uint64         `json:"account_number"`
 	Sequence      uint64         `json:"sequence"`
+	MemoRegexp    string         `json:"memo_regexp"`
 }
 
-func ConvertAccountCoin(cliCtx context.CLIContext, acc auth.Account) (BaseAccount, error) {
-	var accCoins []string
-	for _, coin := range acc.GetCoins() {
-		coinString, err := cliCtx.ConvertCoinToMainUnit(coin.String())
-		if err == nil {
-			accCoins = append(accCoins, coinString[0])
-		} else {
-			accCoins = append(accCoins, coin.String())
-		}
+// String implements fmt.Stringer
+func (acc BaseAccount) String() string {
+	var pubkey string
 
+	if acc.PubKey != nil {
+		pubkey = sdk.MustBech32ifyAccPub(acc.PubKey)
 	}
-	return BaseAccount{
-		Address:       acc.GetAddress(),
-		Coins:         accCoins,
-		PubKey:        acc.GetPubKey(),
-		AccountNumber: acc.GetAccountNumber(),
-		Sequence:      acc.GetSequence(),
-	}, nil
+
+	return fmt.Sprintf(`Account:
+  Address:         %s
+  Pubkey:          %s
+  Coins:           %s
+  Account Number:  %d
+  Sequence:        %d
+  Memo Regexp:     %s`,
+		acc.Address,
+		pubkey,
+		strings.Join(acc.Coins, ","),
+		acc.AccountNumber,
+		acc.Sequence,
+		acc.MemoRegexp,
+	)
 }
 
 // BuildBankSendMsg builds the sending coins msg
@@ -52,18 +56,29 @@ func BuildBankBurnMsg(from sdk.AccAddress, coins sdk.Coins) sdk.Msg {
 	return msg
 }
 
+// BuildSetMemoRegexp builds the set memo regexp msg
+func BuildSetMemoRegexp(from sdk.AccAddress, regexp string) sdk.Msg {
+	msg := bank.NewMsgSetMemoRegexp(from, regexp)
+	return msg
+}
+
 type TokenStats struct {
-	LooseTokens  sdk.Coins `json:"loose_tokens"`
-	BurnedTokens sdk.Coins `json:"burned_tokens"`
-	BondedTokens sdk.Coins `json:"bonded_tokens"`
+	LooseTokens  []string `json:"loose_tokens"`
+	BurnedTokens []string `json:"burned_tokens"`
+	BondedTokens []string `json:"bonded_tokens"`
+	TotalSupply  []string `json:"total_supply"`
 }
 
 // String implements fmt.Stringer
 func (ts TokenStats) String() string {
 	return fmt.Sprintf(`TokenStats:
-  Loose Tokens:  %s
+  Loose Tokens:   %s
+  Bonded Tokens:  %s
   Burned Tokens:  %s
-  Bonded Tokens:  %s`,
-		ts.LooseTokens.MainUnitString(), ts.BurnedTokens.MainUnitString(), ts.BondedTokens.MainUnitString(),
+  Total Supply:   %s`,
+		strings.Join(ts.LooseTokens, ","),
+		strings.Join(ts.BondedTokens, ","),
+		strings.Join(ts.BurnedTokens, ","),
+		strings.Join(ts.TotalSupply, ","),
 	)
 }

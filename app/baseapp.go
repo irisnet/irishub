@@ -5,24 +5,23 @@ import (
 	"fmt"
 	"io"
 	"runtime/debug"
+	"strconv"
 	"strings"
-
-	"github.com/pkg/errors"
-
-	abci "github.com/tendermint/tendermint/abci/types"
-	"github.com/tendermint/tendermint/crypto/tmhash"
-	dbm "github.com/tendermint/tendermint/libs/db"
-	"github.com/tendermint/tendermint/libs/log"
 
 	"github.com/gogo/protobuf/proto"
 	"github.com/irisnet/irishub/app/protocol"
+	v0 "github.com/irisnet/irishub/app/v0"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/store"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/version"
+	"github.com/pkg/errors"
+	abci "github.com/tendermint/tendermint/abci/types"
+	"github.com/tendermint/tendermint/crypto/tmhash"
+	dbm "github.com/tendermint/tendermint/libs/db"
+	"github.com/tendermint/tendermint/libs/log"
 	tmstate "github.com/tendermint/tendermint/state"
-	"strconv"
 )
 
 // Key to store the consensus params in the main store.
@@ -312,6 +311,16 @@ func (app *BaseApp) InitChain(req abci.RequestInitChain) (res abci.ResponseInitC
 	app.setDeliverState(abci.Header{ChainID: req.ChainId})
 	app.setCheckState(abci.Header{ChainID: req.ChainId})
 
+	// Load the protocol defined in the genesis file, for Class4 upgrade or to test any protocol version.
+	stateJSON := req.AppStateBytes
+	var genesisFileState v0.GenesisFileState
+	v0.MakeCodec().MustUnmarshalJSON(stateJSON, &genesisFileState)
+	genesisProtocol := genesisFileState.UpgradeData.GenesisVersion.UpgradeInfo.Protocol.Version
+	if genesisProtocol != app.Engine.GetCurrentVersion() {
+		app.Engine.LoadProtocol(genesisProtocol)
+		app.txDecoder = auth.DefaultTxDecoder(app.Engine.GetCurrentProtocol().GetCodec())
+	}
+
 	initChainer := app.Engine.GetCurrentProtocol().GetInitChainer()
 	if initChainer == nil {
 		return
@@ -322,6 +331,9 @@ func (app *BaseApp) InitChain(req abci.RequestInitChain) (res abci.ResponseInitC
 		WithBlockGasMeter(sdk.NewInfiniteGasMeter())
 
 	res = initChainer(app.deliverState.ctx, app.DeliverTx, req)
+
+	// There may be some application state in the genesis file, so always init the metrics.
+	app.Engine.GetCurrentProtocol().InitMetrics(app.cms)
 
 	// NOTE: we don't commit, but BeginBlock for block 1
 	// starts from this deliverState
@@ -721,6 +733,17 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 		return err.Result()
 	}
 
+	if app.Engine.GetCurrentVersion() > 0 {
+		stdTx := tx.(auth.StdTx)
+		fees := stdTx.Fee.Amount
+		if fees != nil && !fees.Empty() {
+			if !fees.IsValidIrisAtto() {
+				result = sdk.ErrInvalidCoins(fmt.Sprintf("invalid tx fee [%s]", fees)).Result()
+				return
+			}
+		}
+	}
+
 	if mode == RunTxModeDeliver {
 		app.deliverState.ctx = app.deliverState.ctx.WithCheckValidNum(app.deliverState.ctx.CheckValidNum() + 1)
 	}
@@ -744,7 +767,6 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 	// Add cache in fee refund. If an error is returned or panic happes during refund,
 	// no value will be written into blockchain state.
 	defer func() {
-
 		result.GasUsed = ctx.GasMeter().GasConsumed()
 		var refundCtx sdk.Context
 		var refundCache sdk.CacheMultiStore
@@ -775,7 +797,7 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 	}()
 
 	feePreprocessHandler := app.Engine.GetCurrentProtocol().GetFeePreprocessHandler()
-	// run the fee handler
+	// skip fee pre-processing for gentx's
 	if feePreprocessHandler != nil && ctx.BlockHeight() != 0 {
 		err := feePreprocessHandler(ctx, tx)
 		if err != nil {
@@ -783,11 +805,14 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 		}
 	}
 
-	anteHandler := app.Engine.GetCurrentProtocol().GetAnteHandler()
-	// run the ante handler
-	if anteHandler != nil {
+	// get ante handlers
+	anteHandlers := app.Engine.GetCurrentProtocol().GetAnteHandlers()
+
+	// run the ante handlers
+	if len(anteHandlers) > 0 {
 		var anteCtx sdk.Context
 		var msCache sdk.CacheMultiStore
+
 		// Cache wrap context before anteHandler call in case it aborts.
 		// This is required for both CheckTx and DeliverTx.
 		// https://github.com/cosmos/cosmos-sdk/issues/2772
@@ -796,26 +821,40 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 		// performance benefits, but it'll be more difficult to get right.
 		anteCtx, msCache = app.cacheTxContext(ctx, txBytes)
 
-		newCtx, result, abort := anteHandler(anteCtx, tx, (mode == RunTxModeSimulate))
-		if !newCtx.IsZero() {
-			// At this point, newCtx.MultiStore() is cache-wrapped, or something else
-			// replaced by the ante handler. We want the original multistore, not one
-			// which was cache-wrapped for the ante handler.
-			//
-			// Also, in the case of the tx aborting, we need to track gas consumed via
-			// the instantiated gas meter in the ante handler, so we update the context
-			// prior to returning.
-			ctx = newCtx.WithMultiStore(ms)
-		}
+		var newCtx sdk.Context
+		var result sdk.Result
+		var abort bool
 
-		if abort {
-			return result
+		for _, anteHandler := range anteHandlers {
+			newCtx, result, abort = anteHandler(anteCtx, tx, (mode == RunTxModeSimulate))
+
+			if !newCtx.IsZero() {
+				// At this point, newCtx.MultiStore() is cache-wrapped, or something else
+				// replaced by the ante handler. We want the original multistore, not one
+				// which was cache-wrapped for the ante handler.
+				//
+				// Also, in the case of the tx aborting, we need to track gas consumed via
+				// the instantiated gas meter in the ante handler, so we update the context
+				// prior to returning.
+				ctx = newCtx.WithMultiStore(ms)
+
+				// iterate with the new ctx
+				anteCtx = newCtx
+			} else {
+				// follow the sdk.AnteHandler specification
+				newCtx = anteCtx
+			}
+
+			if abort {
+				return result
+			}
+
+			// accumulate gasWanted
+			gasWanted += result.GasWanted
 		}
 
 		newCtx.GasMeter().ConsumeGas(auth.BlockStoreCostPerByte*sdk.Gas(len(txBytes)), "blockstore")
-
 		msCache.Write()
-		gasWanted = result.GasWanted
 	}
 
 	if mode == RunTxModeCheck {
@@ -863,7 +902,7 @@ func (app *BaseApp) EndBlock(req abci.RequestEndBlock) (res abci.ResponseEndBloc
 		return
 	}
 
-	success := app.Engine.Activate(appVersion)
+	success := app.Engine.Activate(appVersion, app.deliverState.ctx)
 	if success {
 		app.txDecoder = auth.DefaultTxDecoder(app.Engine.GetCurrentProtocol().GetCodec())
 		return

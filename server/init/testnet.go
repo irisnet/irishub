@@ -7,16 +7,18 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/irisnet/irishub/codec"
-	"github.com/irisnet/irishub/crypto/keys"
-	"github.com/irisnet/irishub/server"
-	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/modules/auth"
-	"github.com/irisnet/irishub/modules/stake"
-	"github.com/irisnet/irishub/app/v0"
+	"github.com/irisnet/irishub/app/v1"
+	"github.com/irisnet/irishub/app/v1/auth"
+	"github.com/irisnet/irishub/app/v1/stake"
 	"github.com/irisnet/irishub/client"
 	clkeys "github.com/irisnet/irishub/client/keys"
+	"github.com/irisnet/irishub/client/utils"
+	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/crypto/keys"
+	"github.com/irisnet/irishub/modules/guardian"
+	"github.com/irisnet/irishub/server"
 	srvconfig "github.com/irisnet/irishub/server/config"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	cfg "github.com/tendermint/tendermint/config"
@@ -24,8 +26,6 @@ import (
 	cmn "github.com/tendermint/tendermint/libs/common"
 	"github.com/tendermint/tendermint/types"
 	tmtime "github.com/tendermint/tendermint/types/time"
-	"github.com/irisnet/irishub/modules/guardian"
-	"github.com/irisnet/irishub/client/utils"
 )
 
 var (
@@ -97,7 +97,7 @@ func initTestnet(config *cfg.Config, cdc *codec.Codec) error {
 	valPubKeys := make([]crypto.PubKey, numValidators)
 
 	var (
-		accs     []v0.GenesisFileAccount
+		accs     []v1.GenesisFileAccount
 		genFiles []string
 	)
 
@@ -180,7 +180,7 @@ func initTestnet(config *cfg.Config, cdc *codec.Codec) error {
 			return err
 		}
 
-		accs = append(accs, v0.GenesisFileAccount{
+		accs = append(accs, v1.GenesisFileAccount{
 			Address: addr,
 			Coins:   []string{sdk.FreeToken4Acc.String()},
 		})
@@ -235,11 +235,11 @@ func initTestnet(config *cfg.Config, cdc *codec.Codec) error {
 }
 
 func initGenFiles(
-	cdc *codec.Codec, chainID string, accs []v0.GenesisFileAccount,
+	cdc *codec.Codec, chainID string, accs []v1.GenesisFileAccount,
 	genFiles []string, numValidators int,
 ) error {
 
-	appGenState := v0.NewDefaultGenesisFileState()
+	appGenState := v1.NewDefaultGenesisFileState()
 	appGenState.Accounts = accs
 
 	// genesis add a profiler

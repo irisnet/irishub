@@ -2,9 +2,9 @@
 openapi: 3.0.0
 info:
   description: >-
-    A REST interface for state queries, transaction generation, signing, and
+    A REST interface for state queries, transaction generation and
     broadcast.
-  version: "0.14.1"
+  version: "0.15.0"
   title: IRISLCD Swagger-UI
   termsOfService: 'https://www.irisnet.org'
   contact:
@@ -17,22 +17,26 @@ info:
 tags:
   - name: Tendermint
     description: 'Tendermint APIs, such as query blocks, transactions and validatorset'
-  - name: Key
-    description: Key management APIs
   - name: Tx
-    description: 'Sign and broadcast transactions'
+    description: 'Broadcast transactions'
   - name: Bank
     description: Bank module APIs
   - name: Stake
     description: Stake module APIs
-  - name: Gov
-    description: Governance module APIs
   - name: Slashing
     description: Slashing module APIs
   - name: Distribution
     description: Distribution module APIs
+  - name: Asset
+    description: Asset module APIs
+  - name: Rand
+    description: Rand module APIs
   - name: Service
     description: Service module APIs
+  - name: Params
+    description: Params module APIs
+  - name: Gov
+    description: Governance module APIs
   - name: Version
     description: Query app version
 paths:
@@ -306,92 +310,14 @@ paths:
           description: Invalid search tags
         '500':
           description: Internal Server Error
-#    post:
-#      tags:
-#        - Tendermint
-#      summary: broadcast Tx
-#      description: broadcast tx with tendermint rpc
-#      responses:
-#        '200':
-#          description: Broadcast tx result
-#          content:
-#            application/json:
-#              schema:
-#                $ref: '#/components/schemas/BroadcastTxCommitResult'
-#        '500':
-#          description: Internal Server Error
-#      requestBody:
-#        content:
-#          application/json:
-#            schema:
-#              type: object
-#              properties:
-#                tx:
-#                  type: string
-#                return:
-#                  type: string
-#                  example: block
-#        description: >-
-#          Build a StdTx transaction and serilize it to a byte array with amino,
-#          then the `"tx"` field in the post body will be the base64 encoding of
-#          the byte array. The supported return types includes `"block"`(return
-#          after tx commit), `"sync"`(return afer CheckTx) and `"async"`(return
-#          right away).
-#        required: true
-  /tx/sign:
-    post:
-      tags:
-        - Tx
-      summary: Sign a transation
-      description: >-
-        Sign a transation providing locally stored account and according
-        password, return a StdTx with amino encoding signature and public key
-      responses:
-        '200':
-          description: The signed Tx
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/StdTx'
-        '400':
-          description: The Tx was malformated or key doesn't exist
-        '401':
-          description: Key password is wrong
-        '500':
-          description: Server internal error
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                tx:
-                  $ref: '#/components/schemas/StdTx'
-                name:
-                  type: string
-                password:
-                  type: string
-                chain_id:
-                  type: string
-                account_number:
-                  type: string
-                  example: '0'
-                sequence:
-                  type: string
-                  example: '0'
-                append_sig:
-                  type: boolean
-                  example: true
-        description: sign tx
-        required: true
   /tx/broadcast:
     post:
       tags:
         - Tx
-      summary: Broadcast a signed StdTx with amino encoding signature and public key
+      summary: Broadcast a signed StdTx which is amino or json encoded
       description: >-
-        Broadcast a signed StdTx with amino encoding signature and public key to
-        full iris node
+        Broadcast a signed StdTx which is amino or json encoded to
+        a full iris node
       parameters:
         - in: query
           name: async
@@ -488,7 +414,7 @@ paths:
     get:
       tags:
         - Bank
-      summary: Get token statistics
+      summary: Get all token statistics
       description: >-
         Get token statistics, such as total loose tokens, total bonded token and
         total burned token
@@ -503,13 +429,51 @@ paths:
                   loose_tokens:
                     type: array
                     items:
-                      type: string
+                      $ref: '#/components/schemas/Coin'
                   bonded_tokens:
-                    type: string
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Coin'
                   burned_tokens:
                     type: array
                     items:
-                      type: string
+                      $ref: '#/components/schemas/Coin'
+        '500':
+          description: Internal Server Error
+  /bank/token-stats/{id}:
+    get:
+      tags:
+        - Bank
+      summary: Get token statistics
+      description: >-
+        Get token statistics, such as total loose tokens, total bonded token and
+        total burned token
+      parameters:
+        - name: id
+          in: path
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  loose_tokens:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Coin'
+                  bonded_tokens:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Coin'
+                  burned_tokens:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Coin'
         '500':
           description: Internal Server Error
   '/bank/accounts/{address}':
@@ -560,39 +524,11 @@ paths:
           description: Server internel error
   '/bank/accounts/{address}/send':
     post:
-      summary: Send coins (build -> sign -> send)
-      description: Send coins (build -> sign -> send)
+      summary: Send coins
+      description: Send coins
       tags:
         - Bank
       parameters:
-        - in: query
-          name: async
-          description: 'if true, broadcast transaction asynchronously'
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: commit
-          description: >-
-            if true, response will be returned after the transaction is included
-            in a block.
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: simulate
-          description: >-
-            if true, ignore the gas field and perform a simulation of a
-            transaction, but don't broadcast it
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: generate-only
-          description: 'if true, build an unsigned transaction and write it back'
-          required: false
-          schema:
-            type: boolean
         - in: path
           name: address
           description: Account address in bech32 format
@@ -601,15 +537,9 @@ paths:
             type: string
       responses:
         '200':
-          description: Tx was send and will probably be added to the next block
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BroadcastTxCommitResult'
+          description: Unsigned tx was succesfully generated
         '400':
           description: Invalid request
-        '401':
-          description: Key password is wrong
         '500':
           description: Server internal error
       requestBody:
@@ -634,34 +564,6 @@ paths:
       tags:
         - Bank
       parameters:
-        - in: query
-          name: async
-          description: 'if true, broadcast transaction asynchronously'
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: commit
-          description: >-
-            if true, response will be returned after the transaction is included
-            in a block.
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: simulate
-          description: >-
-            if true, ignore the gas field and perform a simulation of a
-            transaction, but don't broadcast it
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: generate-only
-          description: 'if true, build an unsigned transaction and write it back'
-          required: false
-          schema:
-            type: boolean
         - in: path
           name: address
           description: Account address in bech32 format
@@ -670,15 +572,9 @@ paths:
             type: string
       responses:
         '200':
-          description: Tx was send and will probably be added to the next block
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BroadcastTxCommitResult'
+          description: Unsigned tx was succesfully generated
         '400':
           description: Invalid request
-        '401':
-          description: Key password is wrong
         '500':
           description: Server internal error
       requestBody:
@@ -694,98 +590,24 @@ paths:
                   example: 1iris
         description: Parameters to burn coins
         required: true
-  /keys:
-    get:
-      summary: List of accounts stored locally
-      tags:
-        - Key
-      responses:
-        '200':
-          description: Array of accounts
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/KeyOutput'
-        '500':
-          description: Server internal error
+  '/bank/accounts/{address}/set-memo-regexp':
     post:
-      summary: Create a new account locally
+      summary: Set memo regexp
+      description: Set memo regexp
       tags:
-        - Key
-      responses:
-        '200':
-          description: Returns account information of the created key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/KeyOutput'
-        '400':
-          description: Invalid request
-        '409':
-          description: Key name confliction
-        '500':
-          description: Server internal error
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - name
-                - password
-                - seed
-              properties:
-                name:
-                  type: string
-                password:
-                  type: string
-                seed:
-                  type: string
-        description: The account to create
-  /keys/seed:
-    get:
-      summary: Create a new seed to create a new account with
-      tags:
-        - Key
-      responses:
-        '200':
-          description: 24 word Seed
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  seed:
-                    type: string
-                    example: >-
-                      blossom pool issue kidney elevator blame furnace winter
-                      account merry vessel security depend exact travel bargain
-                      problem jelly rural net again mask roast chest
-  '/keys/{name}/recover':
-    post:
-      summary: Recover a account from a seed
-      tags:
-        - Key
+        - Bank
       parameters:
         - in: path
-          name: name
-          description: Account name
+          name: address
+          description: Account address in bech32 format
           required: true
           schema:
             type: string
       responses:
         '200':
-          description: Returns account information of the recovered key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/KeyOutput'
+          description: Unsigned tx was succesfully generated
         '400':
           description: Invalid request
-        '409':
-          description: Key name confliction
         '500':
           description: Server internal error
       requestBody:
@@ -793,90 +615,14 @@ paths:
           application/json:
             schema:
               type: object
-              required:
-                - password
-                - seed
               properties:
-                password:
+                base_tx:
+                  $ref: '#/components/schemas/BaseTx'
+                memo_regexp:
                   type: string
-                seed:
-                  type: string
-        description: Provide password and seed to recover a key
-  '/keys/{name}':
-    parameters:
-      - in: path
-        name: name
-        description: Account name
+                  example: ^[A-Za-z0-9]+$
+        description: Parameters to set memo regexp
         required: true
-        schema:
-          type: string
-    get:
-      summary: Get a certain locally stored account
-      tags:
-        - Key
-      parameters:
-        - in: query
-          name: bech
-          description: 'Bech32 prefix encoding, valid prefix `"acc"`, `"val"`, `"cons"`'
-          required: false
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Locally stored account
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/KeyOutput'
-        '404':
-          description: Key doesn't exist
-    put:
-      summary: Update the password for this account in the KMS
-      tags:
-        - Key
-      responses:
-        '200':
-          description: Updated password
-        '401':
-          description: Key password is wrong
-        '404':
-          description: Key doesn't exist
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - new_password
-                - old_password
-              properties:
-                new_password:
-                  type: string
-                old_password:
-                  type: string
-        description: The new and old password
-    delete:
-      summary: Remove an account
-      tags:
-        - Key
-      responses:
-        '200':
-          description: Removed account
-        '401':
-          description: Key password is wrong
-        '404':
-          description: Key doesn't exist
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - password
-              properties:
-                password:
-                  type: string
-        description: The password of the account to remove from the KMS
   '/stake/delegators/{delegatorAddr}/delegations':
     parameters:
       - in: path
@@ -905,48 +651,13 @@ paths:
           description: Internal Server Error
     post:
       summary: Submit delegation
-      parameters:
-        - in: query
-          name: async
-          description: 'if true, broadcast transaction asynchronously'
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: commit
-          description: >-
-            if true, response will be returned after the transaction is included
-            in a block.
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: simulate
-          description: >-
-            if true, ignore the gas field and perform a simulation of a
-            transaction, but don't broadcast it
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: generate-only
-          description: 'if true, build an unsigned transaction and write it back'
-          required: false
-          schema:
-            type: boolean
       tags:
         - Stake
       responses:
         '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BroadcastTxCommitResult'
+          description: Unsigned tx was succesfully generated
         '400':
           description: Invalid delegator address or delegation body
-        '401':
-          description: Key password is wrong
         '500':
           description: Internal Server Error
       requestBody:
@@ -994,48 +705,13 @@ paths:
           description: Internal Server Error
     post:
       summary: Submit unbonding
-      parameters:
-        - in: query
-          name: async
-          description: 'if true, broadcast transaction asynchronously'
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: commit
-          description: >-
-            if true, response will be returned after the transaction is included
-            in a block.
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: simulate
-          description: >-
-            if true, ignore the gas field and perform a simulation of a
-            transaction, but don't broadcast it
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: generate-only
-          description: 'if true, build an unsigned transaction and write it back'
-          required: false
-          schema:
-            type: boolean
       tags:
         - Stake
       responses:
         '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BroadcastTxCommitResult'
+          description: Unsigned tx was succesfully generated
         '400':
           description: Invalid delegator address or delegation body
-        '401':
-          description: Key password is wrong
         '500':
           description: Internal Server Error
       requestBody:
@@ -1086,48 +762,13 @@ paths:
           description: Internal Server Error
     post:
       summary: Submit redelegation
-      parameters:
-        - in: query
-          name: async
-          description: 'if true, broadcast transaction asynchronously'
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: commit
-          description: >-
-            if true, response will be returned after the transaction is included
-            in a block.
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: simulate
-          description: >-
-            if true, ignore the gas field and perform a simulation of a
-            transaction, but don't broadcast it
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: generate-only
-          description: 'if true, build an unsigned transaction and write it back'
-          required: false
-          schema:
-            type: boolean
       tags:
         - Stake
       responses:
         '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BroadcastTxCommitResult'
+          description: Unsigned tx was succesfully generated
         '400':
           description: Invalid delegator address or delegation body
-        '401':
-          description: Key password is wrong
         '500':
           description: Internal Server Error
       requestBody:
@@ -1505,34 +1146,6 @@ paths:
       tags:
         - Slashing
       parameters:
-        - in: query
-          name: async
-          description: 'if true, broadcast transaction asynchronously'
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: commit
-          description: >-
-            if true, response will be returned after the transaction is included
-            in a block.
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: simulate
-          description: >-
-            if true, ignore the gas field and perform a simulation of a
-            transaction, but don't broadcast it
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: generate-only
-          description: 'if true, build an unsigned transaction and write it back'
-          required: false
-          schema:
-            type: boolean
         - description: Bech32 validator operator address
           name: validatorAddr
           required: true
@@ -1541,15 +1154,9 @@ paths:
             type: string
       responses:
         '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BroadcastTxCommitResult'
+          description: Unsigned tx was succesfully generated
         '400':
           description: Invalid validator address or base_tx
-        '401':
-          description: Key password is wrong
         '500':
           description: Internal Server Error
       requestBody:
@@ -1560,46 +1167,11 @@ paths:
       description: Send transaction to submit a proposal
       tags:
         - Gov
-      parameters:
-        - in: query
-          name: async
-          description: 'if true, broadcast transaction asynchronously'
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: commit
-          description: >-
-            if true, response will be returned after the transaction is included
-            in a block.
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: simulate
-          description: >-
-            if true, ignore the gas field and perform a simulation of a
-            transaction, but don't broadcast it
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: generate-only
-          description: 'if true, build an unsigned transaction and write it back'
-          required: false
-          schema:
-            type: boolean
       responses:
         '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BroadcastTxCommitResult'
+          description: Unsigned tx was succesfully generated
         '400':
           description: Invalid proposal body
-        '401':
-          description: Key password is wrong
         '500':
           description: Internal Server Error
       requestBody:
@@ -1616,15 +1188,15 @@ paths:
                   type: string
                 proposal_type:
                   type: string
-                  example: Text
+                  example: PlainText
                 proposer:
                   $ref: '#/components/schemas/Address'
                 initial_deposit:
                   type: string
                   example: 10iris
         description: >-
-          valid value of `"proposal_type"` can be `"Text"`, `"ParameterChange"`,
-          `"SoftwareUpgrade"`
+          valid value of `"proposal_type"` can be `"PlainText"`, `"Parameter"`,
+          `"SoftwareUpgrade"`, `"SystemHalt"`,`"CommunityTaxUsage"`,`TokenAddition`
         required: true
     get:
       summary: Query proposals
@@ -1678,34 +1250,6 @@ paths:
       tags:
         - Gov
       parameters:
-        - in: query
-          name: async
-          description: 'if true, broadcast transaction asynchronously'
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: commit
-          description: >-
-            if true, response will be returned after the transaction is included
-            in a block.
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: simulate
-          description: >-
-            if true, ignore the gas field and perform a simulation of a
-            transaction, but don't broadcast it
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: generate-only
-          description: 'if true, build an unsigned transaction and write it back'
-          required: false
-          schema:
-            type: boolean
         - description: proposal id
           name: proposalId
           required: true
@@ -1714,15 +1258,9 @@ paths:
             type: string
       responses:
         '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BroadcastTxCommitResult'
+          description: Unsigned tx was succesfully generated
         '400':
           description: Invalid proposal id or deposit body
-        '401':
-          description: Key password is wrong
         '500':
           description: Internal Server Error
       requestBody:
@@ -1770,34 +1308,6 @@ paths:
       tags:
         - Gov
       parameters:
-        - in: query
-          name: async
-          description: 'if true, broadcast transaction asynchronously'
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: commit
-          description: >-
-            if true, response will be returned after the transaction is included
-            in a block.
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: simulate
-          description: >-
-            if true, ignore the gas field and perform a simulation of a
-            transaction, but don't broadcast it
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: generate-only
-          description: 'if true, build an unsigned transaction and write it back'
-          required: false
-          schema:
-            type: boolean
         - description: proposal id
           name: proposalId
           required: true
@@ -1806,15 +1316,9 @@ paths:
             type: string
       responses:
         '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BroadcastTxCommitResult'
+          description: Unsigned tx was succesfully generated
         '400':
           description: Invalid proposal id or vote body
-        '401':
-          description: Key password is wrong
         '500':
           description: Internal Server Error
       requestBody:
@@ -1946,24 +1450,6 @@ paths:
           description: Found no vote
         '500':
           description: Internal Server Error
-  /gov/params/{module}:
-    get:
-      summary: Query governance parameters
-      description: Query governance parameters
-      tags:
-        - Gov
-      parameters:
-        - description: module name
-          name: module
-          required: true
-          in: path
-          schema:
-            type: string
-      responses:
-        '200':
-          description: OK
-        '500':
-          description: Internal Server Error
 
   '/distribution/{delegatorAddr}/withdraw-address':
     parameters:
@@ -1977,46 +1463,11 @@ paths:
       summary: Set withdraw address
       tags:
         - Distribution
-      parameters:
-        - in: query
-          name: async
-          description: 'if true, broadcast transaction asynchronously'
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: commit
-          description: >-
-            if true, response will be returned after the transaction is included
-            in a block.
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: simulate
-          description: >-
-            if true, ignore the gas field and perform a simulation of a
-            transaction, but don't broadcast it
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: generate-only
-          description: 'if true, build an unsigned transaction and write it back'
-          required: false
-          schema:
-            type: boolean
       responses:
         '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BroadcastTxCommitResult'
+          description: Unsigned tx was succesfully generated
         '400':
           description: Invalid proposal body
-        '401':
-          description: Key password is wrong
         '500':
           description: Internal Server Error
       requestBody:
@@ -2062,46 +1513,11 @@ paths:
       summary: Withdraw rewards
       tags:
         - Distribution
-      parameters:
-        - in: query
-          name: async
-          description: 'if true, broadcast transaction asynchronously'
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: commit
-          description: >-
-            if true, response will be returned after the transaction is included
-            in a block.
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: simulate
-          description: >-
-            if true, ignore the gas field and perform a simulation of a
-            transaction, but don't broadcast it
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: generate-only
-          description: 'if true, build an unsigned transaction and write it back'
-          required: false
-          schema:
-            type: boolean
       responses:
         '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BroadcastTxCommitResult'
+          description: Unsigned tx was succesfully generated
         '400':
           description: Invalid proposal body
-        '401':
-          description: Key password is wrong
         '500':
           description: Internal Server Error
       requestBody:
@@ -2118,108 +1534,6 @@ paths:
                   type: boolean
         description: 'if is_validator is true, validator_address should not be presented'
         required: true
-#  '/distribution/{delegatorAddr}/distrInfo/{validatorAddr}':
-#    parameters:
-#      - in: path
-#        name: delegatorAddr
-#        description: Bech32 AccAddress of Delegator
-#        required: true
-#        schema:
-#          type: string
-#      - in: path
-#        name: validatorAddr
-#        description: Bech32 OperatorAddress of validator
-#        required: true
-#        schema:
-#          type: string
-#    get:
-#      summary: Query distribution information for a delegation
-#      tags:
-#        - Distribution
-#      responses:
-#        '200':
-#          description: OK
-#          content:
-#            '*/*':
-#              schema:
-#                $ref: '#/components/schemas/DelegationDistInfo'
-#        '204':
-#          description: No content
-#        '400':
-#          description: Invalid delegator address or validator address
-#        '500':
-#          description: Internal Server Error
-#  '/distribution/{delegatorAddr}/distrInfo':
-#    parameters:
-#      - in: path
-#        name: delegatorAddr
-#        description: Bech32 AccAddress of Delegator
-#        required: true
-#        schema:
-#          type: string
-#    get:
-#      summary: Query distribution information list for a given delegator
-#      tags:
-#        - Distribution
-#      responses:
-#        '200':
-#          description: OK
-#          content:
-#            '*/*':
-#              schema:
-#                type: array
-#                items:
-#                  $ref: '#/components/schemas/DelegationDistInfo'
-#        '400':
-#          description: Invalid delegator address
-#        '500':
-#          description: Internal Server Error
-#  '/distribution/{validatorAddr}/valDistrInfo':
-#    parameters:
-#      - in: path
-#        name: validatorAddr
-#        description: Bech32 ValAddress of Validator
-#        required: true
-#        schema:
-#          type: string
-#    get:
-#      summary: Query withdraw address
-#      tags:
-#        - Distribution
-#      responses:
-#        '200':
-#          description: OK
-#          content:
-#            '*/*':
-#              schema:
-#                type: object
-#                properties:
-#                  operator_addr:
-#                    type: string
-#                  fee_pool_withdrawal_height:
-#                    type: string
-#                    example: '0'
-#                  del_accum:
-#                    type: object
-#                    properties:
-#                      update_height:
-#                        type: string
-#                        example: '0'
-#                      accum:
-#                        type: string
-#                        example: '0.0000000000'
-#                  del_pool:
-#                    type: string
-#                    example: 0.1iris
-#                  val_commission:
-#                    type: string
-#                    example: 0.1iris
-#        '204':
-#          description: Invalid delegator address
-#        '400':
-#          description: Invalid delegator address
-#        '500':
-#          description: Internal Server Error
   '/distribution/{address}/rewards':
     parameters:
       - in: path
@@ -2263,71 +1577,17 @@ paths:
           description: Invalid address
         '500':
           description: Internal Server Error
-  '/distribution/community-tax':
-    get:
-      summary: Query community tax
-      tags:
-        - Distribution
-      responses:
-        '200':
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: object
-                properties:
-                  amout:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Coin'
-        '500':
-          description: Internal Server Error
   /service/definitions:
     post:
       summary: Add a service definition
       description: Send transaction to define a service
       tags:
         - Service
-      parameters:
-        - in: query
-          name: async
-          description: 'if true, broadcast transaction asynchronously'
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: commit
-          description: >-
-            if true, response will be returned after the transaction is included
-            in a block.
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: simulate
-          description: >-
-            if true, ignore the gas field and perform a simulation of a
-            transaction, but don't broadcast it
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: generate-only
-          description: 'if true, build an unsigned transaction and write it back'
-          required: false
-          schema:
-            type: boolean
       responses:
         '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BroadcastTxCommitResult'
+          description: Unsigned tx was succesfully generated
         '400':
           description: Invalid service define body
-        '401':
-          description: Key password is wrong
         '500':
           description: Internal Server Error
       requestBody:
@@ -2426,46 +1686,11 @@ paths:
       description: Send transaction to add a binding to a service definition
       tags:
         - Service
-      parameters:
-        - in: query
-          name: async
-          description: 'if true, broadcast transaction asynchronously'
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: commit
-          description: >-
-            if true, response will be returned after the transaction is included
-            in a block.
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: simulate
-          description: >-
-            if true, ignore the gas field and perform a simulation of a
-            transaction, but don't broadcast it
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: generate-only
-          description: 'if true, build an unsigned transaction and write it back'
-          required: false
-          schema:
-            type: boolean
       responses:
         '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BroadcastTxCommitResult'
+          description: Unsigned tx was succesfully generated
         '400':
           description: Invalid service bind body
-        '401':
-          description: Key password is wrong
         '500':
           description: Internal Server Error
       requestBody:
@@ -2654,34 +1879,6 @@ paths:
       tags:
         - Service
       parameters:
-        - in: query
-          name: async
-          description: 'if true, broadcast transaction asynchronously'
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: commit
-          description: >-
-            if true, response will be returned after the transaction is included
-            in a block.
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: simulate
-          description: >-
-            if true, ignore the gas field and perform a simulation of a
-            transaction, but don't broadcast it
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: generate-only
-          description: 'if true, build an unsigned transaction and write it back'
-          required: false
-          schema:
-            type: boolean
         - in: path
           name: defChainId
           description: service defined chain id
@@ -2702,15 +1899,9 @@ paths:
             type: string
       responses:
         '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BroadcastTxCommitResult'
+          description: Unsigned tx was succesfully generated
         '400':
           description: Invalid service binding update body
-        '401':
-          description: Key password is wrong
         '500':
           description: Internal Server Error
       requestBody:
@@ -2750,34 +1941,6 @@ paths:
       tags:
         - Service
       parameters:
-        - in: query
-          name: async
-          description: 'if true, broadcast transaction asynchronously'
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: commit
-          description: >-
-            if true, response will be returned after the transaction is included
-            in a block.
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: simulate
-          description: >-
-            if true, ignore the gas field and perform a simulation of a
-            transaction, but don't broadcast it
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: generate-only
-          description: 'if true, build an unsigned transaction and write it back'
-          required: false
-          schema:
-            type: boolean
         - in: path
           name: defChainId
           description: service defined chain id
@@ -2798,15 +1961,9 @@ paths:
             type: string
       responses:
         '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BroadcastTxCommitResult'
+          description: Unsigned tx was succesfully generated
         '400':
           description: Invalid service binding disable body
-        '401':
-          description: Key password is wrong
         '500':
           description: Internal Server Error
       requestBody:
@@ -2818,34 +1975,6 @@ paths:
       tags:
         - Service
       parameters:
-        - in: query
-          name: async
-          description: 'if true, broadcast transaction asynchronously'
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: commit
-          description: >-
-            if true, response will be returned after the transaction is included
-            in a block.
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: simulate
-          description: >-
-            if true, ignore the gas field and perform a simulation of a
-            transaction, but don't broadcast it
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: generate-only
-          description: 'if true, build an unsigned transaction and write it back'
-          required: false
-          schema:
-            type: boolean
         - in: path
           name: defChainId
           description: service defined chain id
@@ -2866,15 +1995,9 @@ paths:
             type: string
       responses:
         '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BroadcastTxCommitResult'
+          description: Unsigned tx was succesfully generated
         '400':
           description: Invalid service binding enable body
-        '401':
-          description: Key password is wrong
         '500':
           description: Internal Server Error
       requestBody:
@@ -2896,34 +2019,6 @@ paths:
       tags:
         - Service
       parameters:
-        - in: query
-          name: async
-          description: 'if true, broadcast transaction asynchronously'
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: commit
-          description: >-
-            if true, response will be returned after the transaction is included
-            in a block.
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: simulate
-          description: >-
-            if true, ignore the gas field and perform a simulation of a
-            transaction, but don't broadcast it
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: generate-only
-          description: 'if true, build an unsigned transaction and write it back'
-          required: false
-          schema:
-            type: boolean
         - in: path
           name: defChainId
           description: service defined chain id
@@ -2944,15 +2039,9 @@ paths:
             type: string
       responses:
         '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BroadcastTxCommitResult'
+          description: Unsigned tx was succesfully generated
         '400':
           description: Invalid service binding deposit refund body
-        '401':
-          description: Key password is wrong
         '500':
           description: Internal Server Error
       requestBody:
@@ -2963,46 +2052,11 @@ paths:
       description: Send transaction to call a method of service which a provider bound it
       tags:
         - Service
-      parameters:
-        - in: query
-          name: async
-          description: 'if true, broadcast transaction asynchronously'
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: commit
-          description: >-
-            if true, response will be returned after the transaction is included
-            in a block.
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: simulate
-          description: >-
-            if true, ignore the gas field and perform a simulation of a
-            transaction, but don't broadcast it
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: generate-only
-          description: 'if true, build an unsigned transaction and write it back'
-          required: false
-          schema:
-            type: boolean
       responses:
         '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BroadcastTxCommitResult'
+          description: Unsigned tx was succesfully generated
         '400':
           description: Invalid service request body
-        '401':
-          description: Key password is wrong
         '500':
           description: Internal Server Error
       requestBody:
@@ -3116,46 +2170,11 @@ paths:
       description: Send transaction to respond a service call
       tags:
         - Service
-      parameters:
-        - in: query
-          name: async
-          description: 'if true, broadcast transaction asynchronously'
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: commit
-          description: >-
-            if true, response will be returned after the transaction is included
-            in a block.
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: simulate
-          description: >-
-            if true, ignore the gas field and perform a simulation of a
-            transaction, but don't broadcast it
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: generate-only
-          description: 'if true, build an unsigned transaction and write it back'
-          required: false
-          schema:
-            type: boolean
       responses:
         '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BroadcastTxCommitResult'
+          description: Unsigned tx was succesfully generated
         '400':
           description: Invalid service response body
-        '401':
-          description: Key password is wrong
         '500':
           description: Internal Server Error
       requestBody:
@@ -3240,8 +2259,8 @@ paths:
         schema:
           type: string
     get:
-      summary: Query service fees of a address
-      description: Query service fees of a address
+      summary: Query service fees of an address
+      description: Query service fees of an address
       tags:
         - Service
       responses:
@@ -3273,34 +2292,6 @@ paths:
       tags:
         - Service
       parameters:
-        - in: query
-          name: async
-          description: 'if true, broadcast transaction asynchronously'
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: commit
-          description: >-
-            if true, response will be returned after the transaction is included
-            in a block.
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: simulate
-          description: >-
-            if true, ignore the gas field and perform a simulation of a
-            transaction, but don't broadcast it
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: generate-only
-          description: 'if true, build an unsigned transaction and write it back'
-          required: false
-          schema:
-            type: boolean
         - in: path
           name: address
           description: address of consumer
@@ -3309,15 +2300,9 @@ paths:
             type: string
       responses:
         '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BroadcastTxCommitResult'
+          description: Unsigned tx was succesfully generated
         '400':
           description: Invalid service fees refund body
-        '401':
-          description: Key password is wrong
         '500':
           description: Internal Server Error
       requestBody:
@@ -3329,37 +2314,120 @@ paths:
       tags:
         - Service
       parameters:
-        - in: query
-          name: async
-          description: 'if true, broadcast transaction asynchronously'
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: commit
-          description: >-
-            if true, response will be returned after the transaction is included
-            in a block.
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: simulate
-          description: >-
-            if true, ignore the gas field and perform a simulation of a
-            transaction, but don't broadcast it
-          required: false
-          schema:
-            type: boolean
-        - in: query
-          name: generate-only
-          description: 'if true, build an unsigned transaction and write it back'
-          required: false
-          schema:
-            type: boolean
         - in: path
           name: address
           description: address of provider
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Unsigned tx was succesfully generated
+        '400':
+          description: Invalid service fees withdraw body
+        '500':
+          description: Internal Server Error
+      requestBody:
+        $ref: '#/components/requestBodies/Unjailbody'
+  '/asset/tokens':
+    post:
+      summary: Issue a token
+      tags:
+        - Asset
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_tx:
+                  $ref: '#/components/schemas/BaseTx'
+                owner:
+                  $ref: '#/components/schemas/Address'
+                family:
+                  type: string
+                  example: 'fungible'
+                source:
+                  type: string
+                  example: 'native'
+                gateway:
+                  type: string
+                  example: ''
+                name:
+                  type: string
+                  example: 'Hello Kitty'
+                symbol:
+                  type: string
+                  example: 'cat'
+                canonical_symbol:
+                  type: string
+                  example: ''
+                min_unit_alias:
+                  type: string
+                  example: 'kitty'
+                initial_supply:
+                  type: string
+                  example: '1000000000'
+                max_supply:
+                  type: string
+                  example: '2000000000'
+                decimal:
+                  type: integer
+                  example: 18
+                mintable:
+                  type: boolean
+                  example: true
+        required: true
+      responses:
+        '200':
+          description: Unsigned tx was succesfully generated
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
+    get:
+      summary: Query tokens by condition
+      tags:
+        - Asset
+      parameters:
+        - in: query
+          name: source
+          description: 'the source of the destination token, options: native, external, gateway'
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: owner
+          description: 'the owner address of the destination token, optional when source is native, ignored when source is not native'
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: gateway
+          description: 'the gateway moniker of the destination token, optional when source is gateway'
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Token'
+        '400':
+          description: Invalid token id
+        '500':
+          description: Internal Server Error
+  '/asset/tokens/{id}':
+    get:
+      summary: Query token by unique id
+      tags:
+        - Asset
+      parameters:
+        - in: path
+          name: id
+          description: the unique id of the token
           required: true
           schema:
             type: string
@@ -3369,15 +2437,398 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BroadcastTxCommitResult'
+                $ref: '#/components/schemas/Token'
         '400':
-          description: Invalid service fees withdraw body
-        '401':
-          description: Key password is wrong
+          description: Invalid token id
+        '500':
+          description: Internal Server Error
+    put:
+      summary: Edit token information
+      parameters:
+        - in: path
+          name: id
+          description: unique id of token
+          required: true
+          schema:
+            type: string
+      tags:
+        - Asset
+      responses:
+        '200':
+          description: Unsigned tx was succesfully generated
+        '400':
+          description: Invalid parameters
         '500':
           description: Internal Server Error
       requestBody:
-        $ref: '#/components/requestBodies/Unjailbody'
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_tx:
+                  $ref: '#/components/schemas/BaseTx'
+                owner:
+                  $ref: '#/components/schemas/Address'
+                canonical_symbol:
+                  type: string
+                  example: 'btc'
+                min_unit_alias:
+                  type: string
+                  example: 'satoshi'
+                max_supply:
+                  type: int
+                  example: '21000000'
+                mintable:
+                  type: string
+                  example: ""
+                name:
+                  type: string
+                  example: 'BTC Token'
+  '/asset/tokens/{id}/mint':
+    post:
+      summary: The asset owner and operator can directly mint tokens to a specified address
+      parameters:
+        - in: path
+          name: id
+          description: unique id of token
+          required: true
+          schema:
+            type: string
+      tags:
+        - Asset
+      responses:
+        '200':
+          description: Unsigned tx was succesfully generated
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_tx:
+                  $ref: '#/components/schemas/BaseTx'
+                owner:
+                  $ref: '#/components/schemas/Address'
+                to:
+                  $ref: '#/components/schemas/Address'
+                amount:
+                  type: int
+                  example: '21000000'
+  '/asset/tokens/{id}/transfer-owner':
+    post:
+      summary: Transfer token to a new owner
+      parameters:
+        - in: path
+          name: id
+          description: unique id of token
+          required: true
+          schema:
+            type: string
+      tags:
+        - Asset
+      responses:
+        '200':
+          description: Unsigned tx was succesfully generated
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_tx:
+                  $ref: '#/components/schemas/BaseTx'
+                src_owner:
+                  $ref: '#/components/schemas/Address'
+                dst_owner:
+                  $ref: '#/components/schemas/Address'
+  '/asset/gateways/{moniker}':
+    get:
+      summary: Query the gateway with the specified moniker
+      tags:
+        - Asset
+      parameters:
+        - in: path
+          name: moniker
+          description: the unique name of the destination gateway
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Gateway'
+        '400':
+          description: Invalid moniker
+        '500':
+          description: Internal Server Error
+    put:
+      summary: Edit an existing gateway
+      tags:
+        - Asset
+      parameters:
+        - in: path
+          name: moniker
+          description: the unique name of the destination gateway
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Unsigned tx was succesfully generated
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_tx:
+                  $ref: '#/components/schemas/BaseTx'
+                owner:
+                  $ref: '#/components/schemas/Address'
+                identity:
+                  type: string
+                details:
+                  type: string
+                website:
+                  type: string
+  '/asset/gateways':
+    get:
+      summary: Get all the gateways with an optional owner
+      tags:
+        - Asset
+      parameters:
+        - in: query
+          name: owner
+          description: the owner address to be queried
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Gateway'
+        '400':
+          description: Invalid owner address if the owner is given
+        '500':
+          description: Internal Server Error
+    post:
+      summary: Create a gateway
+      tags:
+        - Asset
+      responses:
+        '200':
+          description: Unsigned tx was succesfully generated
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_tx:
+                  $ref: '#/components/schemas/BaseTx'
+                owner:
+                  $ref: '#/components/schemas/Address'
+                moniker:
+                  type: string
+                identity:
+                  type: string
+                details:
+                  type: string
+                website:
+                  type: string
+  '/asset/gateways/{moniker}/transfer':
+    post:
+      summary: Transfer the owner of a gateway
+      tags:
+        - Asset
+      parameters:
+        - in: path
+          name: moniker
+          description: the unique name of the destination gateway
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Unsigned tx was succesfully generated
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_tx:
+                  $ref: '#/components/schemas/BaseTx'
+                owner:
+                  $ref: '#/components/schemas/Address'
+                to:
+                  $ref: '#/components/schemas/Address'
+  '/asset/fees/gateways/{moniker}':
+    get:
+      summary: Query the fee for the creation of the gateway with the given moniker
+      tags:
+        - Asset
+      parameters:
+        - in: path
+          name: moniker
+          description: the unique name of a gateway
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GatewayFeeOutput'
+        '400':
+          description: Invalid moniker
+        '500':
+          description: Internal Server Error
+  '/asset/fees/tokens/{id}':
+    get:
+      summary: Query the fees for the issuance and minting of the token with the given id
+      tags:
+        - Asset
+      parameters:
+        - in: path
+          name: id
+          description: the token id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenFeesOutput'
+        '400':
+          description: Invalid id
+        '500':
+          description: Internal Server Error
+  '/rand/rands':
+    post:
+      summary: Request a random number
+      tags:
+        - Rand
+      responses:
+        '200':
+          description: Unsigned tx was succesfully generated
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_tx:
+                  $ref: '#/components/schemas/BaseTx'
+                consumer:
+                  $ref: '#/components/schemas/Address'
+                block_interval:
+                  type: integer
+                  example: '10'
+  '/rand/rands/{request-id}':
+    get:
+      summary: Query a random number by the specified request id
+      tags:
+        - Rand
+      parameters:
+        - in: path
+          name: request-id
+          description: the request id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rand'
+        '400':
+          description: Invalid request id
+        '500':
+          description: Internal Server Error
+  '/rand/queue':
+    get:
+      summary: Query the pending requests with an optional height
+      tags:
+        - Rand
+      parameters:
+        - in: query
+          name: height
+          description: the destination block height
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Request'
+        '400':
+          description: Invalid height if provided
+        '500':
+          description: Internal Server Error
+  '/params':
+    get:
+      summary: Get the system params with an optional module
+      tags:
+        - Params
+      parameters:
+        - in: query
+          name: module
+          description: the name of the module,options:stake/mint/distr/slashing/service/asset/auth
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+        '500':
+          description: Internal Server Error
+
 components:
   requestBodies:
     Unjailbody:
@@ -3543,7 +2994,10 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/KVPair'
-        coin-flow-record:
+        timestamp:
+          type: string
+          example: '2006-01-02T15:04:05Z07:00'
+        coin_flow:
           type: array
           items:
             type: string
@@ -3590,24 +3044,6 @@ components:
               sequence:
                 type: string
                 example: '0'
-    KeyOutput:
-      type: object
-      properties:
-        name:
-          type: string
-          example: Main Account
-        address:
-          type: string
-          example: faa1xp8ptallwun6p0hv5ym4adruupc8q5djc95k30
-        pub_key:
-          type: string
-          example: >-
-            fap1addwnpepqvfp3mzkvpldhd2m6dzmz3q7rzlfww9yr0x0qy9y9vhak26rvtcf6s93txc
-        type:
-          type: string
-          example: local
-        seed:
-          type: string
     BlockID:
       type: object
       properties:
@@ -3780,30 +3216,18 @@ components:
     BaseTx:
       type: object
       properties:
-        name:
-          type: string
-          example: faucet
-        password:
-          type: string
-          example: '1234567890'
         chain_id:
           type: string
           example: irishub-test
-        account_number:
-          type: string
-          example: '0'
-        sequence:
-          type: string
-          example: '0'
         gas:
           type: string
           example: '20000'
         fee:
           type: string
           example: 0.4iris
-        gas_adjustment:
+        memo:
           type: string
-          example: '1.2'
+          example: 'memo'
     TendermintValidator:
       type: object
       properties:
@@ -3979,3 +3403,77 @@ components:
         del_pool_withdrawal_height:
           type: string
           example: '0'
+    Token:
+      type: object
+      properties:
+        family:
+          type: string
+        source:
+          type: string
+        gateway:
+          type: string
+        symbol:
+          type: string
+        name:
+          type: string
+        decimal:
+          type: integer
+        canonical_symbol:
+          type: string
+        min_unit_alias:
+          type: string
+        initial_supply:
+          type: string
+        max_supply:
+          type: string
+        mintable:
+          type: boolean
+        owner:
+          $ref: '#/components/schemas/Address'
+    Gateway:
+      type: object
+      properties:
+        owner:
+          $ref: '#/components/schemas/Address'
+        moniker:
+          type: string
+        identity:
+          type: string
+        details:
+          type: string
+        website:
+          type: string
+    GatewayFeeOutput:
+      type: object
+      properties:
+        exist:
+          type: boolean
+        fee:
+          $ref: '#/components/schemas/Coin'
+    TokenFeesOutput:
+      type: object
+      properties:
+        exist:
+          type: boolean
+        issue_fee:
+          $ref: '#/components/schemas/Coin'
+        mint_fee:
+          $ref: '#/components/schemas/Coin'
+    Rand:
+      type: object
+      properties:
+        request_tx_hash:
+          type: string
+        height:
+          type: integer
+        value:
+          type: string
+    Request:
+      type: object
+      properties:
+        height:
+          type: integer
+        consumer:
+          $ref: '#/components/schemas/Address'
+        tx_hash:
+          type: string

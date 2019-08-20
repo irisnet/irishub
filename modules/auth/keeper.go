@@ -2,7 +2,6 @@ package auth
 
 import (
 	"fmt"
-
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/tendermint/tendermint/crypto"
@@ -187,14 +186,14 @@ func (am AccountKeeper) GetBurnedToken(ctx sdk.Context) sdk.Coins {
 }
 
 func (am AccountKeeper) IncreaseBurnedToken(ctx sdk.Context, coins sdk.Coins) {
-	// parameter checking
-	if coins == nil || !coins.IsValid() {
+	if coins == nil || !coins.IsValidV0() {
 		return
 	}
+
 	burnToken := am.GetBurnedToken(ctx)
 	// increase burn token amount
-	burnToken = burnToken.Plus(coins)
-	if !burnToken.IsNotNegative() {
+	burnToken = burnToken.Add(coins)
+	if burnToken.IsAnyNegative() {
 		panic(fmt.Errorf("burn token is negative"))
 	}
 	// write back to db
@@ -217,15 +216,15 @@ func (am AccountKeeper) GetTotalLoosenToken(ctx sdk.Context) sdk.Coins {
 }
 
 func (am AccountKeeper) IncreaseTotalLoosenToken(ctx sdk.Context, coins sdk.Coins) {
-	// parameter checking
-	if coins == nil || !coins.IsValid() {
+	if coins == nil || !coins.IsValidV0() {
 		return
 	}
+
 	// read from db
 	totalLoosenToken := am.GetTotalLoosenToken(ctx)
 	// increase totalLoosenToken
-	totalLoosenToken = totalLoosenToken.Plus(coins)
-	if !totalLoosenToken.IsNotNegative() {
+	totalLoosenToken = totalLoosenToken.Add(coins)
+	if totalLoosenToken.IsAnyNegative() {
 		panic(fmt.Errorf("total loosen token is overflow"))
 	}
 	// write back to db
@@ -238,16 +237,16 @@ func (am AccountKeeper) IncreaseTotalLoosenToken(ctx sdk.Context, coins sdk.Coin
 }
 
 func (am AccountKeeper) DecreaseTotalLoosenToken(ctx sdk.Context, coins sdk.Coins) {
-	// parameter checking
-	if coins == nil || !coins.IsValid() {
+	if coins == nil || !coins.IsValidV0() {
 		return
 	}
+
 	// read from db
 	totalLoosenToken := am.GetTotalLoosenToken(ctx)
 	// decrease totalLoosenToken
-	totalLoosenToken, negative := totalLoosenToken.SafeMinus(coins)
+	totalLoosenToken, negative := totalLoosenToken.SafeSub(coins)
 	if negative {
-		panic(fmt.Errorf("total loosen token is negative"))
+		panic(fmt.Errorf("total loose token is negative"))
 	}
 	// write back to db
 	bzNew := am.cdc.MustMarshalBinaryLengthPrefixed(totalLoosenToken)

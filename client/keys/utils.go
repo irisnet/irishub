@@ -102,6 +102,19 @@ func ReadPassphraseFromStdin(name string) (string, error) {
 	return passphrase, nil
 }
 
+func ReadKeystorePassphraseFromStdin() (string, error) {
+	buf := BufferStdin()
+	prompt1 := fmt.Sprintf("Enter the password for the keystore file signature:")
+	prompt2 := fmt.Sprintf("Repeat the password:")
+
+	passphrase, err := GetCheckPassword(prompt1, prompt2, buf)
+	if err != nil {
+		return passphrase, err
+	}
+
+	return passphrase, nil
+}
+
 // initialize a keybase based on the configuration
 func GetKeyBaseFromDir(rootDir string) (keys.Keybase, error) {
 	if keybase == nil {

@@ -3,13 +3,15 @@ package version
 import (
 	"fmt"
 	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/types"
 	"github.com/spf13/cobra"
 	"strconv"
 )
 
 // Version - Iris Version
-const ProtocolVersion = 0
-const Version = "0.14.1"
+const ProtocolVersion = 1
+const Version = "0.15.0"
+
 // GitCommit set by build flags
 var GitCommit = ""
 
@@ -17,7 +19,7 @@ var GitCommit = ""
 func GetVersion() string {
 	v := Version
 	if GitCommit != "" {
-		v = v + "-" + GitCommit + "-" + strconv.Itoa(ProtocolVersion)
+		v = v + "-" + GitCommit + "-" + strconv.Itoa(ProtocolVersion) + "-" + types.NetworkType
 	}
 	return v
 }

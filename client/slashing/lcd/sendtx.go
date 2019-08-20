@@ -4,10 +4,10 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/irisnet/irishub/app/v1/slashing"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/codec"
-	"github.com/irisnet/irishub/modules/slashing"
 	sdk "github.com/irisnet/irishub/types"
 )
 
@@ -18,9 +18,7 @@ type UnjailBody struct {
 
 func unrevokeRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		cliCtx = utils.InitReqCliCtx(cliCtx, r)
 		vars := mux.Vars(r)
-
 		validatorAddr, err := sdk.ValAddressFromBech32(vars["validatorAddr"])
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -34,12 +32,14 @@ func unrevokeRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.
 		}
 
 		baseReq := m.BaseTx.Sanitize()
-		if !baseReq.ValidateBasic(w, cliCtx) {
+		if !baseReq.ValidateBasic(w) {
 			return
 		}
 
 		msg := slashing.NewMsgUnjail(validatorAddr)
 
-		utils.SendOrReturnUnsignedTx(w, cliCtx, m.BaseTx, []sdk.Msg{msg})
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
+
+		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
 	}
 }

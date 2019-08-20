@@ -1,13 +1,14 @@
 package lcd
 
 import (
+	"net/http"
+
+	"github.com/irisnet/irishub/app/v1/upgrade"
 	"github.com/irisnet/irishub/client/context"
-	sdk "github.com/irisnet/irishub/types"
 	upgcli "github.com/irisnet/irishub/client/upgrade"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/codec"
-	"github.com/irisnet/irishub/modules/upgrade"
-	"net/http"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 type VersionInfo struct {

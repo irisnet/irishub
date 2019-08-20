@@ -69,7 +69,7 @@ func ErrInvalidTitle(codespace sdk.CodespaceType, title string) sdk.Error {
 }
 
 func ErrInvalidDescription(codespace sdk.CodespaceType, description string) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidDescription, fmt.Sprintf("Proposal Desciption '%s' is not valid", description))
+	return sdk.NewError(codespace, CodeInvalidDescription, fmt.Sprintf("Proposal Description '%s' is not valid", description))
 }
 
 func ErrInvalidProposalType(codespace sdk.CodespaceType, proposalType ProposalKind) sdk.Error {
@@ -151,7 +151,7 @@ func ErrMoreThanMaxProposal(codespace sdk.CodespaceType, num uint64, proposalLev
 }
 
 func ErrInvalidUpgradeThreshold(codespace sdk.CodespaceType, Threshold sdk.Dec) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidUpgradeParams, fmt.Sprintf("Invalid Upgrade Threshold( "+Threshold.String()+" ) should be [0.85, 1)"))
+	return sdk.NewError(codespace, CodeInvalidUpgradeParams, fmt.Sprintf("Invalid Upgrade Threshold( "+Threshold.String()+" ) should be [0.8, 1)"))
 }
 
 func ErrNotEnoughInitialDeposit(codespace sdk.CodespaceType, initialDeposit sdk.Coins, minDeposit sdk.Coins) sdk.Error {

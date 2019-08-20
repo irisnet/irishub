@@ -51,12 +51,13 @@ func ExportCmd(ctx *Context, cdc *codec.Codec, appExporter AppExporter) *cobra.C
 			if err != nil {
 				return err
 			}
+
 			height := viper.GetInt64(flagHeight)
 			if height < 0 {
 				return errors.Errorf("Height must greater than or equal to zero")
 			}
 			forZeroHeight := viper.GetBool(flagForZeroHeight)
-			appState, validators, err := appExporter(ctx, ctx.Logger, db, traceWriter, height, forZeroHeight)
+			exportHeight, appState, validators, err := appExporter(ctx, ctx.Logger, db, traceWriter, height, forZeroHeight)
 			if err != nil {
 				return errors.Errorf("error exporting state: %v\n", err)
 			}
@@ -81,11 +82,11 @@ func ExportCmd(ctx *Context, cdc *codec.Codec, appExporter AppExporter) *cobra.C
 			if err != nil {
 				return err
 			}
-			fmt.Printf("export state to file %s successfully\n", outputFile)
+			fmt.Printf("export state from height %d to file %s successfully\n", exportHeight, outputFile)
 			return nil
 		},
 	}
-	cmd.Flags().Int64(flagHeight, 0, "Export state from a particular height (0 means latest height)")
+	cmd.Flags().Uint64(flagHeight, 0, "Export state from a particular height (0 means latest height)")
 	cmd.Flags().Bool(flagForZeroHeight, false, "Export state to start at height zero (perform preproccessing)")
 	cmd.Flags().String(flagOutputFile, "genesis.json", "Target file to save exported state")
 	return cmd

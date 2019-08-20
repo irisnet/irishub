@@ -8,7 +8,7 @@ IRISnet introduce two types of privileged system user controlled by foundations,
     2. Invocate a service by `profiling` mode, under which service fees can be exempted.
     
 * Trustee privileges
-    1. To be the destination address if the usage type of a `TxTaxUsage` proposal is `Distribute` or `grant`.
+    1. To be the destination address if the usage type of a `CommunityTaxUsage` proposal is `Distribute` or `grant`.
     2. Send `withdraw-tax` transaction to withdraw coins to an account from system service fee tax pool.
     
 * Genesis Profiler/Genesis Trustee (Defined in genesis.json)
@@ -50,7 +50,7 @@ IRISnet introduce two types of privileged system user controlled by foundations,
     iriscli service call --def-chain-id=<def-chain-id> --service-name=<service_name> --method-id=<method_id> --bind-chain-id=<bind-chain-id> --provider=<provider_address> --service-fee=1iris --request-data=<request_data> --chain-id=<chain-id> --from=<key_name> --fee=0.3iris --profiling=true
     ```
     
-5. Trustee to be the destination address of `TxTaxUsage` proposal
+5. Trustee to be the destination address of `CommunityTaxUsage` proposal
 
     Details in [governance](governance.md#proposals-on-community-funds-usage)
     

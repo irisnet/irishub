@@ -2,14 +2,18 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
+	"strings"
 
 	"github.com/irisnet/irishub/app"
 	bam "github.com/irisnet/irishub/app"
+	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/client"
 	"github.com/irisnet/irishub/server"
 	irisInit "github.com/irisnet/irishub/server/init"
 	"github.com/irisnet/irishub/version"
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -61,6 +65,7 @@ func main() {
 		server.UnsafeResetAllCmd(ctx),
 		client.LineBreak,
 		tendermintCmd,
+		server.ResetCmd(ctx, cdc, resetAppState),
 		server.ExportCmd(ctx, cdc, exportAppStateAndTMValidators),
 		client.LineBreak,
 	)
@@ -85,17 +90,40 @@ func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, config *cfg.Inst
 
 func exportAppStateAndTMValidators(ctx *server.Context,
 	logger log.Logger, db dbm.DB, traceStore io.Writer, height int64, forZeroHeight bool,
-) (json.RawMessage, []tmtypes.GenesisValidator, error) {
+) (int64, json.RawMessage, []tmtypes.GenesisValidator, error) {
+	gApp := app.NewIrisApp(logger, db, ctx.Config.Instrumentation, traceStore)
+	lastBlockHeight := gApp.LastBlockHeight()
+	if height > 0 && height < lastBlockHeight {
+		err := gApp.LoadVersion(height, protocol.KeyMain, false)
+		if err != nil {
+			if strings.Contains(err.Error(), fmt.Sprintf("wanted to load target %v but only found up to", height)) {
+				return height, nil, nil, fmt.Errorf("unable to export snapshot height state %v that does not exist. "+
+					"If necessary, reset the application state to the specified height using command reset, and then export the state", height)
+			}
+			return height, nil, nil, err
+		}
+	} else {
+		height = lastBlockHeight
+	}
+	appState, validators, err := gApp.ExportAppStateAndValidators(forZeroHeight)
+	return height, appState, validators, err
+}
+
+func resetAppState(ctx *server.Context,
+	logger log.Logger, db dbm.DB, traceStore io.Writer, height int64) error {
 	gApp := app.NewIrisApp(logger, db, ctx.Config.Instrumentation, traceStore)
 	if height > 0 {
-		if replay, replayHeight := gApp.ExportOrReplay(height); replay {
+		if replay, replayHeight := gApp.ResetOrReplay(height); replay {
 			_, err := startNodeAndReplay(ctx, gApp, replayHeight)
 			if err != nil {
-				return nil, nil, err
+				return err
 			}
 		}
 	}
-	return gApp.ExportAppStateAndValidators(forZeroHeight)
+	if height == 0 {
+		return errors.New("No need to reset to zero height, it is always consistent with genesis.json")
+	}
+	return nil
 }
 
 func startNodeAndReplay(ctx *server.Context, app *app.IrisApp, height int64) (n *node.Node, err error) {

@@ -38,13 +38,13 @@ You could query all the proposals by default.
 
 ```txt
 ID - (Status) [Type] [TotalDeposit] Title
-1 - (Rejected) [TxTaxUsage] [1000iris] t
-2 - (Rejected) [TxTaxUsage] [1000iris] t
-6 - (Rejected) [TxTaxUsage] [1000iris] t
-8 - (Rejected) [TxTaxUsage] [1000iris] t
-9 - (Passed) [ParameterChange] [2000iris] test
-10 - (Passed) [ParameterChange] [2000iris] test
-11 - (Passed) [ParameterChange] [2000iris] test
+1 - (Rejected) [CommunityTaxUsage] [1000iris] t
+2 - (Rejected) [CommunityTaxUsage] [1000iris] t
+6 - (Rejected) [CommunityTaxUsage] [1000iris] t
+8 - (Rejected) [CommunityTaxUsage] [1000iris] t
+9 - (Passed) [Parameter] [2000iris] test
+10 - (Passed) [Parameter] [2000iris] test
+11 - (Passed) [Parameter] [2000iris] test
 ```
 
 Also you can query proposal by filters, such as:
@@ -57,7 +57,7 @@ Finally, here shows the proposal who's depositor address is iaa14q5rf9sl2dqd2uxr
 
 ```txt
 ID - (Status) [Type] [TotalDeposit] Title
-97 - (VotingPeriod) [TxTaxUsage] [1090iris] t
+97 - (VotingPeriod) [CommunityTaxUsage] [1090iris] t
 ```
 
 Query latest 3 proposals

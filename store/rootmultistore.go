@@ -5,12 +5,12 @@ import (
 	"io"
 	"strings"
 
+	sdk "github.com/irisnet/irishub/types"
+	"github.com/tendermint/iavl"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/crypto/merkle"
 	"github.com/tendermint/tendermint/crypto/tmhash"
 	dbm "github.com/tendermint/tendermint/libs/db"
-
-	sdk "github.com/irisnet/irishub/types"
 )
 
 const (
@@ -132,6 +132,9 @@ func (rs *rootMultiStore) LoadVersion(ver int64, overwrite bool) error {
 		info, ok := infos[key]
 		if ok {
 			id = info.Core.CommitID
+		} else {
+			// reset all not existing store
+			rs.resetStore(key, storeParams)
 		}
 
 		store, err := rs.loadCommitStoreFromParams(key, id, storeParams, overwrite)
@@ -144,6 +147,13 @@ func (rs *rootMultiStore) LoadVersion(ver int64, overwrite bool) error {
 	// Success.
 	rs.lastCommitID = cInfo.CommitID()
 	rs.stores = newStores
+
+	// update latest version
+	if overwrite {
+		batch := rs.db.NewBatch()
+		setLatestVersion(batch, ver)
+		batch.Write()
+	}
 	return nil
 }
 
@@ -371,6 +381,38 @@ func (rs *rootMultiStore) loadCommitStoreFromParams(key sdk.StoreKey, id CommitI
 	}
 }
 
+func (rs *rootMultiStore) resetStore(key sdk.StoreKey, params storeParams) (err error) {
+	var db dbm.DB
+	if params.db != nil {
+		db = dbm.NewPrefixDB(params.db, []byte("s/_/"))
+	} else {
+		db = dbm.NewPrefixDB(rs.db, []byte("s/k:"+params.key.Name()+"/"))
+	}
+	switch params.typ {
+	case sdk.StoreTypeMulti:
+		panic("recursive MultiStores not yet supported")
+		// TODO: id?
+		// return NewCommitMultiStore(db, id)
+	case sdk.StoreTypeIAVL:
+		tree := iavl.NewMutableTree(db, defaultIAVLCacheSize)
+		tree.Reset()
+		//store = newIAVLStore(tree, int64(0), int64(0))
+		//store.SetPruning(rs.pruning)
+		return
+	case sdk.StoreTypeDB:
+		panic("dbm.DB is not a CommitStore")
+	case sdk.StoreTypeTransient:
+		_, ok := key.(*sdk.TransientStoreKey)
+		if !ok {
+			err = fmt.Errorf("invalid StoreKey for StoreTypeTransient: %s", key.String())
+			return
+		}
+		return
+	default:
+		panic(fmt.Sprintf("unrecognized store type %v", params.typ))
+	}
+}
+
 func (rs *rootMultiStore) nameToKey(name string) StoreKey {
 	for key := range rs.storesParams {
 		if key.Name() == name {
@@ -394,7 +436,6 @@ type storeParams struct {
 
 // NOTE: Keep commitInfo a simple immutable struct.
 type commitInfo struct {
-
 	// Version
 	Version int64
 

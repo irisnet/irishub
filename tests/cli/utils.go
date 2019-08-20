@@ -3,6 +3,7 @@ package cli
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/irisnet/irishub/app/v1/bank"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -11,17 +12,18 @@ import (
 	"testing"
 
 	"github.com/irisnet/irishub/app"
-	"github.com/irisnet/irishub/app/v0"
+	v1 "github.com/irisnet/irishub/app/v1"
+	"github.com/irisnet/irishub/app/v1/asset"
+	"github.com/irisnet/irishub/app/v1/auth"
+	"github.com/irisnet/irishub/app/v1/gov"
+	"github.com/irisnet/irishub/app/v1/service"
+	"github.com/irisnet/irishub/app/v1/upgrade"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/keys"
 	servicecli "github.com/irisnet/irishub/client/service"
 	"github.com/irisnet/irishub/client/stake"
 	"github.com/irisnet/irishub/codec"
-	"github.com/irisnet/irishub/modules/auth"
-	"github.com/irisnet/irishub/modules/gov"
 	"github.com/irisnet/irishub/modules/guardian"
-	"github.com/irisnet/irishub/modules/service"
-	"github.com/irisnet/irishub/modules/upgrade"
 	"github.com/irisnet/irishub/server"
 	"github.com/irisnet/irishub/tests"
 	sdk "github.com/irisnet/irishub/types"
@@ -41,7 +43,7 @@ func convertToIrisBaseAccount(t *testing.T, acc auth.BaseAccount) string {
 		WithCodec(cdc)
 
 	coinstr := acc.Coins.String()
-	coins, err := cliCtx.ConvertCoinToMainUnit(coinstr)
+	coins, err := cliCtx.ConvertToMainUnit(coinstr)
 	require.NoError(t, err, "coins %v, err %v", coinstr, err)
 
 	return coins[0]
@@ -62,11 +64,12 @@ func getAmountFromCoinStr(coinStr string) float64 {
 	return num
 }
 
-func modifyGenesisState(genesisState v0.GenesisFileState) v0.GenesisFileState {
+func modifyGenesisState(genesisState v1.GenesisFileState) v1.GenesisFileState {
 	genesisState.GovData = gov.DefaultGenesisStateForCliTest()
 	genesisState.UpgradeData = upgrade.DefaultGenesisStateForTest()
 	genesisState.ServiceData = service.DefaultGenesisStateForTest()
 	genesisState.GuardianData = guardian.DefaultGenesisStateForTest()
+	genesisState.AssetData = asset.DefaultGenesisStateForTest()
 
 	// genesis add a profiler
 	if len(genesisState.Accounts) > 0 {
@@ -113,10 +116,11 @@ func initializeFixtures(t *testing.T) (chainID, servAddr, port, irisHome, iriscl
 	chainID = executeInit(t, fmt.Sprintf("iris init -o --moniker=foo --home=%s", irisHome))
 	genFile := filepath.Join(irisHome, "config", "genesis.json")
 	genDoc := readGenesisFile(t, genFile)
-	var appState v0.GenesisFileState
-	err := codec.Cdc.UnmarshalJSON(genDoc.AppState, &appState)
+	var appState v1.GenesisFileState
+	cdc := app.MakeLatestCodec()
+	err := cdc.UnmarshalJSON(genDoc.AppState, &appState)
 	require.NoError(t, err)
-	appState.Accounts = []v0.GenesisFileAccount{v0.NewDefaultGenesisFileAccount(fooAddr)}
+	appState.Accounts = []v1.GenesisFileAccount{v1.NewDefaultGenesisFileAccount(fooAddr)}
 	appState = modifyGenesisState(appState)
 	appStateJSON, err := codec.Cdc.MarshalJSON(appState)
 	require.NoError(t, err)
@@ -229,6 +233,20 @@ func executeGetAccount(t *testing.T, cmdStr string) (acc auth.BaseAccount) {
 	require.NoError(t, err, "acc %v, err %v", string(out), err)
 
 	return acc
+}
+
+func executeGetTokenStatsForAsset(t *testing.T, cmdStr string) (tokenStats bank.TokenStats) {
+	out, _ := tests.ExecuteT(t, cmdStr, "")
+	var initRes map[string]json.RawMessage
+	err := json.Unmarshal([]byte(out), &initRes)
+	require.NoError(t, err, "out %v, err %v", out, err)
+
+	cdc := app.MakeLatestCodec()
+
+	err = cdc.UnmarshalJSON([]byte(out), &tokenStats)
+	require.NoError(t, err, "token-stats %v, err %v", string(out), err)
+
+	return tokenStats
 }
 
 func executeGetValidatorPK(t *testing.T, cmdStr string) string {
@@ -344,6 +362,33 @@ func executeGetServiceFees(t *testing.T, cmdStr string) servicecli.FeesOutput {
 	err := cdc.UnmarshalJSON([]byte(out), &feesOutput)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
 	return feesOutput
+}
+
+func executeGetToken(t *testing.T, cmdStr string) asset.FungibleToken {
+	out, _ := tests.ExecuteT(t, cmdStr, "")
+	var token asset.FungibleToken
+	cdc := app.MakeLatestCodec()
+	err := cdc.UnmarshalJSON([]byte(out), &token)
+	require.NoError(t, err, "out %v\n, err %v", out, err)
+	return token
+}
+
+func executeGetGateway(t *testing.T, cmdStr string) asset.Gateway {
+	out, _ := tests.ExecuteT(t, cmdStr, "")
+	var gateway asset.Gateway
+	cdc := app.MakeLatestCodec()
+	err := cdc.UnmarshalJSON([]byte(out), &gateway)
+	require.NoError(t, err, "out %v\n, err %v", out, err)
+	return gateway
+}
+
+func executeGetGateways(t *testing.T, cmdStr string) []asset.Gateway {
+	out, _ := tests.ExecuteT(t, cmdStr, "")
+	var gateways []asset.Gateway
+	cdc := app.MakeLatestCodec()
+	err := cdc.UnmarshalJSON([]byte(out), &gateways)
+	require.NoError(t, err, "out %v\n, err %v", out, err)
+	return gateways
 }
 
 func executeWriteCheckErr(t *testing.T, cmdStr string, writes ...string) {

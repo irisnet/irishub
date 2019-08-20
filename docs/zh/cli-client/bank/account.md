@@ -7,20 +7,20 @@
 ## 使用方式
 
 ```
-iriscli bank account <address> <flags>
+iriscli bank account <address> [flags]
 ```
 
 
 ## 标志
 
-| 命令，速记   | 类型   | 是否必须 | 默认值                | 描述                                      |
+| 命令，速记   | 类型   | 是否必须 | 默认值                | 描述                                          |
 | ------------ | ------ | -------- | --------------------- | ----------------------------------------- |
-| -h, --help   |        | 否       |                       | 打印帮助信息                              |
-| --chain-id   | String | 否       |                       | tendermint 节点Chain ID                     |
-| --height     | Int    | 否       |                       | 查询的区块高度用于获取最新的区块。        |
-| --ledger     | String | 否       |                       | 使用ledger设备                    |
-| --node       | String | 否       | tcp://localhost:26657 | <主机>:<端口> 链上的tendermint rpc 接口。 |
-| --trust-node | String | 否       | True                  | 不验证响应的证明                          |
+| -h, --help   |        | 否       |                       | 打印帮助信息                                |
+| --chain-id   | String | 否       |                       | tendermint 节点Chain ID                    |
+| --height     | Int    | 否       |                       | 查询的区块高度用于获取最新的区块。             |
+| --ledger     | String | 否       |                       | 使用ledger设备                             |
+| --node       | String | 否       | tcp://localhost:26657 | `<主机>:<端口>` 链上的tendermint rpc 接口。  |
+| --trust-node | String | 否       | True                  | 不验证响应的证明                            |
 
 
 
@@ -40,6 +40,7 @@ Account:
   Coins:           50iris
   Account Number:  0
   Sequence:        2
+  Memo Regexp:
 ```
 
 如果你查询一个错误的地址，将会返回如下信息

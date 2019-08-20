@@ -1,10 +1,9 @@
 package distribution
 
 import (
+	"github.com/irisnet/irishub/app/v1/distribution"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
-	"github.com/irisnet/irishub/modules/distribution"
-	stakeTypes "github.com/irisnet/irishub/modules/stake/types"
 	sdk "github.com/irisnet/irishub/types"
 )
 
@@ -19,8 +18,8 @@ type ValidatorDistInfoOutput struct {
 
 func ConvertToValidatorDistInfoOutput(cliCtx context.CLIContext, vdi distribution.ValidatorDistInfo) ValidatorDistInfoOutput {
 	exRate := utils.ExRateFromStakeTokenToMainUnit(cliCtx)
-	delPool := utils.ConvertDecToRat(vdi.DelPool.AmountOf(stakeTypes.StakeDenom)).Mul(exRate).FloatString() + stakeTypes.StakeTokenName
-	valCommission := utils.ConvertDecToRat(vdi.ValCommission.AmountOf(stakeTypes.StakeDenom)).Mul(exRate).FloatString() + stakeTypes.StakeTokenName
+	delPool := utils.ConvertDecToRat(vdi.DelPool.AmountOf(sdk.IrisAtto)).Mul(exRate).FloatString() + sdk.Iris
+	valCommission := utils.ConvertDecToRat(vdi.ValCommission.AmountOf(sdk.IrisAtto)).Mul(exRate).FloatString() + sdk.Iris
 	return ValidatorDistInfoOutput{
 		OperatorAddr:            vdi.OperatorAddr,
 		FeePoolWithdrawalHeight: vdi.FeePoolWithdrawalHeight,

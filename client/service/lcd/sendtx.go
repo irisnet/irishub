@@ -6,10 +6,10 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/irisnet/irishub/app/v1/service"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/codec"
-	"github.com/irisnet/irishub/modules/service"
 	sdk "github.com/irisnet/irishub/types"
 )
 
@@ -77,8 +77,6 @@ func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec
 
 func definitionPostHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		cliCtx = utils.InitReqCliCtx(cliCtx, r)
-
 		var req definition
 		err := utils.ReadPostBody(w, r, cdc, &req)
 		if err != nil {
@@ -86,7 +84,7 @@ func definitionPostHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.H
 		}
 
 		baseReq := req.BaseTx.Sanitize()
-		if !baseReq.ValidateBasic(w, cliCtx) {
+		if !baseReq.ValidateBasic(w) {
 			return
 		}
 
@@ -102,14 +100,15 @@ func definitionPostHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.H
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
-		utils.SendOrReturnUnsignedTx(w, cliCtx, baseReq, []sdk.Msg{msg})
+
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
+
+		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
 	}
 }
 
 func bindingAddHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		cliCtx = utils.InitReqCliCtx(cliCtx, r)
-
 		var req binding
 		err := utils.ReadPostBody(w, r, cdc, &req)
 		if err != nil {
@@ -117,7 +116,7 @@ func bindingAddHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handl
 		}
 
 		baseReq := req.BaseTx.Sanitize()
-		if !baseReq.ValidateBasic(w, cliCtx) {
+		if !baseReq.ValidateBasic(w) {
 			return
 		}
 
@@ -155,14 +154,15 @@ func bindingAddHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handl
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
-		utils.SendOrReturnUnsignedTx(w, cliCtx, baseReq, []sdk.Msg{msg})
+
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
+
+		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
 	}
 }
 
 func bindingUpdateHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		cliCtx = utils.InitReqCliCtx(cliCtx, r)
-
 		vars := mux.Vars(r)
 		DefChainId := vars[DefChainId]
 		serviceName := vars[ServiceName]
@@ -181,7 +181,7 @@ func bindingUpdateHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Ha
 		}
 
 		baseReq := req.BaseTx.Sanitize()
-		if !baseReq.ValidateBasic(w, cliCtx) {
+		if !baseReq.ValidateBasic(w) {
 			return
 		}
 
@@ -219,14 +219,15 @@ func bindingUpdateHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Ha
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
-		utils.SendOrReturnUnsignedTx(w, cliCtx, baseReq, []sdk.Msg{msg})
+
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
+
+		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
 	}
 }
 
 func bindingDisableHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		cliCtx = utils.InitReqCliCtx(cliCtx, r)
-
 		vars := mux.Vars(r)
 		DefChainId := vars[DefChainId]
 		serviceName := vars[ServiceName]
@@ -245,7 +246,7 @@ func bindingDisableHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.H
 		}
 
 		baseReq := req.BaseTx.Sanitize()
-		if !baseReq.ValidateBasic(w, cliCtx) {
+		if !baseReq.ValidateBasic(w) {
 			return
 		}
 
@@ -255,14 +256,15 @@ func bindingDisableHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.H
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
-		utils.SendOrReturnUnsignedTx(w, cliCtx, baseReq, []sdk.Msg{msg})
+
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
+
+		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
 	}
 }
 
 func bindingEnableHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		cliCtx = utils.InitReqCliCtx(cliCtx, r)
-
 		vars := mux.Vars(r)
 		DefChainId := vars[DefChainId]
 		serviceName := vars[ServiceName]
@@ -281,7 +283,7 @@ func bindingEnableHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Ha
 		}
 
 		baseReq := req.BaseTx.Sanitize()
-		if !baseReq.ValidateBasic(w, cliCtx) {
+		if !baseReq.ValidateBasic(w) {
 			return
 		}
 
@@ -297,14 +299,15 @@ func bindingEnableHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Ha
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
-		utils.SendOrReturnUnsignedTx(w, cliCtx, baseReq, []sdk.Msg{msg})
+
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
+
+		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
 	}
 }
 
 func bindingRefundHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		cliCtx = utils.InitReqCliCtx(cliCtx, r)
-
 		vars := mux.Vars(r)
 		DefChainId := vars[DefChainId]
 		serviceName := vars[ServiceName]
@@ -323,7 +326,7 @@ func bindingRefundHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Ha
 		}
 
 		baseReq := req.BaseTx.Sanitize()
-		if !baseReq.ValidateBasic(w, cliCtx) {
+		if !baseReq.ValidateBasic(w) {
 			return
 		}
 
@@ -333,14 +336,15 @@ func bindingRefundHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Ha
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
-		utils.SendOrReturnUnsignedTx(w, cliCtx, baseReq, []sdk.Msg{msg})
+
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
+
+		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
 	}
 }
 
 func requestAddHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		cliCtx = utils.InitReqCliCtx(cliCtx, r)
-
 		var req serviceRequestWithBasic
 		err := utils.ReadPostBody(w, r, cdc, &req)
 		if err != nil {
@@ -348,7 +352,7 @@ func requestAddHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handl
 		}
 
 		baseReq := req.BaseTx.Sanitize()
-		if !baseReq.ValidateBasic(w, cliCtx) {
+		if !baseReq.ValidateBasic(w) {
 			return
 		}
 
@@ -390,14 +394,15 @@ func requestAddHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handl
 			}
 			msgs = append(msgs, msg)
 		}
-		utils.SendOrReturnUnsignedTx(w, cliCtx, baseReq, msgs)
+
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
+
+		utils.WriteGenerateStdTxResponse(w, txCtx, msgs)
 	}
 }
 
 func responseAddHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		cliCtx = utils.InitReqCliCtx(cliCtx, r)
-
 		var req serviceResponse
 		err := utils.ReadPostBody(w, r, cdc, &req)
 		if err != nil {
@@ -405,7 +410,7 @@ func responseAddHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Hand
 		}
 
 		baseReq := req.BaseTx.Sanitize()
-		if !baseReq.ValidateBasic(w, cliCtx) {
+		if !baseReq.ValidateBasic(w) {
 			return
 		}
 
@@ -436,14 +441,15 @@ func responseAddHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Hand
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
-		utils.SendOrReturnUnsignedTx(w, cliCtx, baseReq, []sdk.Msg{msg})
+
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
+
+		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
 	}
 }
 
 func FeesRefundHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		cliCtx = utils.InitReqCliCtx(cliCtx, r)
-
 		vars := mux.Vars(r)
 		bechConsumerAddr := vars[Consumer]
 
@@ -460,7 +466,7 @@ func FeesRefundHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handl
 		}
 
 		baseReq := req.BaseTx.Sanitize()
-		if !baseReq.ValidateBasic(w, cliCtx) {
+		if !baseReq.ValidateBasic(w) {
 			return
 		}
 
@@ -470,14 +476,15 @@ func FeesRefundHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handl
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
-		utils.SendOrReturnUnsignedTx(w, cliCtx, baseReq, []sdk.Msg{msg})
+
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
+
+		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
 	}
 }
 
 func FeesWithdrawHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		cliCtx = utils.InitReqCliCtx(cliCtx, r)
-
 		vars := mux.Vars(r)
 		bechProviderAddr := vars[Provider]
 
@@ -494,7 +501,7 @@ func FeesWithdrawHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Han
 		}
 
 		baseReq := req.BaseTx.Sanitize()
-		if !baseReq.ValidateBasic(w, cliCtx) {
+		if !baseReq.ValidateBasic(w) {
 			return
 		}
 
@@ -504,7 +511,10 @@ func FeesWithdrawHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Han
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
-		utils.SendOrReturnUnsignedTx(w, cliCtx, baseReq, []sdk.Msg{msg})
+
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
+
+		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
 	}
 }
 

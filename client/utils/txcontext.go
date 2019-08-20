@@ -5,66 +5,50 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/client"
+	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/keys"
 	"github.com/irisnet/irishub/codec"
-	"github.com/irisnet/irishub/modules/auth"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
-	"github.com/irisnet/irishub/client/context"
 )
 
 //----------------------------------------
 // Building / Sending utilities
 
-// BaseReq defines a structure that can be embedded in other request structures
+// BaseTx defines a structure that can be embedded in other request structures
 // that all share common "base" fields.
 type BaseTx struct {
-	Name          string `json:"name"`
-	Password      string `json:"password"`
-	ChainID       string `json:"chain_id"`
-	AccountNumber uint64 `json:"account_number"`
-	Sequence      uint64 `json:"sequence"`
-	Gas           string `json:"gas"`
-	GasAdjustment string `json:"gas_adjustment"`
-	Fee           string `json:"fee"`
-	Memo          string `json:"memo"`
+	ChainID string `json:"chain_id"`
+	Gas     string `json:"gas"`
+	Fee     string `json:"fee"`
+	Memo    string `json:"memo"`
 }
 
-// Sanitize performs basic sanitization on a BaseReq object.
+// Sanitize performs basic sanitization on a BaseTx object.
 func (br BaseTx) Sanitize() BaseTx {
 	return BaseTx{
-		Name:          strings.TrimSpace(br.Name),
-		Password:      strings.TrimSpace(br.Password),
-		ChainID:       strings.TrimSpace(br.ChainID),
-		Gas:           strings.TrimSpace(br.Gas),
-		Fee:           strings.TrimSpace(br.Fee),
-		Memo:          strings.TrimSpace(br.Memo),
-		GasAdjustment: strings.TrimSpace(br.GasAdjustment),
-		AccountNumber: br.AccountNumber,
-		Sequence:      br.Sequence,
+		ChainID: strings.TrimSpace(br.ChainID),
+		Gas:     strings.TrimSpace(br.Gas),
+		Fee:     strings.TrimSpace(br.Fee),
+		Memo:    strings.TrimSpace(br.Memo),
 	}
 }
 
-// ValidateBasic performs basic validation of a BaseReq. If custom validation
+// ValidateBasic performs basic validation of a BaseTx. If custom validation
 // logic is needed, the implementing request handler should perform those
 // checks manually.
-func (br BaseTx) ValidateBasic(w http.ResponseWriter, cliCtx context.CLIContext) bool {
-	switch {
-	case !cliCtx.GenerateOnly && len(br.Name) == 0:
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("name required but not specified"))
-		return false
-
-	case !cliCtx.DryRun && !cliCtx.GenerateOnly && len(br.Password) == 0:
-		w.WriteHeader(http.StatusUnauthorized)
-		w.Write([]byte("password required but not specified"))
-		return false
-
-	case len(br.ChainID) == 0:
+func (br BaseTx) ValidateBasic(w http.ResponseWriter) bool {
+	if len(br.ChainID) == 0 {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte("chainID required but not specified"))
+		return false
+	}
+
+	_, ok := ParseUint64OrReturnBadRequest(w, br.Gas)
+	if !ok {
 		return false
 	}
 

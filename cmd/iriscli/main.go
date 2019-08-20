@@ -8,11 +8,14 @@ import (
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/client"
+	assetcmd "github.com/irisnet/irishub/client/asset/cli"
 	bankcmd "github.com/irisnet/irishub/client/bank/cli"
 	distributioncmd "github.com/irisnet/irishub/client/distribution/cli"
 	govcmd "github.com/irisnet/irishub/client/gov/cli"
 	guardiancmd "github.com/irisnet/irishub/client/guardian/cli"
 	keyscmd "github.com/irisnet/irishub/client/keys/cli"
+	paramscmd "github.com/irisnet/irishub/client/params/cli"
+	randcmd "github.com/irisnet/irishub/client/rand/cli"
 	servicecmd "github.com/irisnet/irishub/client/service/cli"
 	slashingcmd "github.com/irisnet/irishub/client/slashing/cli"
 	stakecmd "github.com/irisnet/irishub/client/stake/cli"
@@ -61,6 +64,7 @@ func main() {
 	txCmd.AddCommand(
 		client.PostCommands(
 			txcmd.GetSignCommand(cdc, utils.GetAccountDecoder(cdc)),
+			txcmd.GetMultiSignCommand(cdc, utils.GetAccountDecoder(cdc)),
 			txcmd.GetBroadcastCommand(cdc),
 		)...)
 	rootCmd.AddCommand(
@@ -90,12 +94,13 @@ func main() {
 		client.GetCommands(
 			bankcmd.GetCmdQueryCoinType(cdc),
 			bankcmd.GetAccountCmd(cdc, utils.GetAccountDecoder(cdc)),
-			bankcmd.GetCmdQueryTokenStats(cdc),
+			bankcmd.GetCmdQueryTokenStats(cdc, utils.GetAccountDecoder(cdc)),
 		)...)
 	bankCmd.AddCommand(
 		client.PostCommands(
 			bankcmd.SendTxCmd(cdc),
 			bankcmd.BurnTxCmd(cdc),
+			bankcmd.SetMemoRegCmd(cdc),
 		)...)
 	rootCmd.AddCommand(
 		bankCmd,
@@ -109,11 +114,7 @@ func main() {
 	distributionCmd.AddCommand(
 		client.GetCommands(
 			distributioncmd.GetWithdrawAddress(cdc),
-			//distributioncmd.GetDelegationDistInfo(cdc),
-			//distributioncmd.GetValidatorDistInfo(cdc),
-			//distributioncmd.GetAllDelegationDistInfo(cdc),
 			distributioncmd.GetRewards(cdc),
-			distributioncmd.GetCommunityTax(cdc),
 		)...)
 	distributionCmd.AddCommand(
 		client.PostCommands(
@@ -138,7 +139,6 @@ func main() {
 			govcmd.GetCmdQueryDeposit(cdc),
 			govcmd.GetCmdQueryDeposits(cdc),
 			govcmd.GetCmdQueryTally(cdc),
-			govcmd.GetCmdQueryGovConfig(cdc),
 		)...)
 	govCmd.AddCommand(
 		client.PostCommands(
@@ -253,10 +253,64 @@ func main() {
 		guardianCmd,
 	)
 
+	// add asset commands
+	assetCmd := &cobra.Command{
+		Use:   "asset",
+		Short: "Asset subcommands",
+	}
+
+	assetCmd.AddCommand(
+		client.PostCommands(
+			assetcmd.GetCmdCreateGateway(cdc),
+			assetcmd.GetCmdEditGateway(cdc),
+			assetcmd.GetCmdTransferGatewayOwner(cdc),
+			assetcmd.GetCmdIssueToken(cdc),
+			assetcmd.GetCmdTransferTokenOwner(cdc),
+			assetcmd.GetCmdEditAsset(cdc),
+			assetcmd.GetCmdMintToken(cdc),
+		)...)
+
+	assetCmd.AddCommand(
+		client.GetCommands(
+			assetcmd.GetCmdQueryToken(cdc),
+			assetcmd.GetCmdQueryTokens(cdc),
+			assetcmd.GetCmdQueryGateway(cdc),
+			assetcmd.GetCmdQueryGateways(cdc),
+			assetcmd.GetCmdQueryFee(cdc),
+		)...)
+
+	rootCmd.AddCommand(
+		assetCmd,
+	)
+
+	// add rand commands
+	randCmd := &cobra.Command{
+		Use:   "rand",
+		Short: "Rand subcommands",
+	}
+
+	randCmd.AddCommand(
+		client.PostCommands(
+			randcmd.GetCmdRequestRand(cdc),
+		)...)
+
+	randCmd.AddCommand(
+		client.GetCommands(
+			randcmd.GetCmdQueryRand(cdc),
+			randcmd.GetCmdQueryRandRequestQueue(cdc),
+		)...)
+
+	rootCmd.AddCommand(
+		randCmd,
+	)
+
+	paramsCmd := client.GetCommands(paramscmd.Commands(cdc))[0]
+
 	//Add keys and version commands
 	rootCmd.AddCommand(
 		client.LineBreak,
 		keyscmd.Commands(),
+		paramsCmd,
 		client.LineBreak,
 		version.ServeVersionCommand(cdc),
 	)

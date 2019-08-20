@@ -32,7 +32,7 @@ iriscli bank send --amount=1iris --fee=0.3iris  --chain-id=<chain-id> --from=<us
 Example: Send a command using dry-run mode
 
 ```
-iriscli gov submit-proposal --title="test" --description="test" --type="ParameterChange" --deposit=600iris --param='mint/Inflation=0.050' --from=<user> --chain-id=<chain-id> --fee=0.3iris --dry-run
+iriscli gov submit-proposal --title="test" --description="test" --type="Parameter" --deposit=600iris --param='mint/Inflation=0.050' --from=<user> --chain-id=<chain-id> --fee=0.3iris --dry-run
 ```
 
 Print：
@@ -72,7 +72,7 @@ Print：
         "MsgSubmitProposal": {
           "title": "test",
           "description": "test",
-          "proposal_type": "TxTaxUsage",
+          "proposal_type": "CommunityTaxUsage",
           "proposer": "iaa1ljemm0yznz58qxxs8xyak7fashcfxf5lgl4zjx",
           "initial_deposit": [
             {

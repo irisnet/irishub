@@ -23,4 +23,12 @@ const (
 	flagSoftware     = "software"
 	flagSwitchHeight = "switch-height"
 	flagThreshold    = "threshold"
+
+	//for addTokenProposal
+	flagTokenSymbol          = "token-symbol"
+	flagTokenCanonicalSymbol = "token-canonical-symbol"
+	flagTokenName            = "token-name"
+	flagTokenDecimal         = "token-decimal"
+	flagTokenMinUnitAlias    = "token-min-unit-alias"
+	flagTokenInitialSupply   = "token-initial-supply"
 )

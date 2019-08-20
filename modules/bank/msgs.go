@@ -40,13 +40,13 @@ func (msg MsgSend) ValidateBasic() sdk.Error {
 		if err := in.ValidateBasic(); err != nil {
 			return err.TraceSDK("")
 		}
-		totalIn = totalIn.Plus(in.Coins)
+		totalIn = totalIn.Add(in.Coins)
 	}
 	for _, out := range msg.Outputs {
 		if err := out.ValidateBasic(); err != nil {
 			return err.TraceSDK("")
 		}
-		totalOut = totalOut.Plus(out.Coins)
+		totalOut = totalOut.Add(out.Coins)
 	}
 	// make sure inputs and outputs match
 	if !totalIn.IsEqual(totalOut) {
@@ -168,10 +168,10 @@ func (in Input) ValidateBasic() sdk.Error {
 	if len(in.Address) == 0 {
 		return sdk.ErrInvalidAddress(in.Address.String())
 	}
-	if !in.Coins.IsValid() {
+	if !in.Coins.IsValidV0() {
 		return sdk.ErrInvalidCoins(in.Coins.String())
 	}
-	if !in.Coins.IsPositive() {
+	if !in.Coins.IsAllPositive() {
 		return sdk.ErrInvalidCoins(in.Coins.String())
 	}
 	return nil
@@ -209,10 +209,10 @@ func (out Output) ValidateBasic() sdk.Error {
 	if len(out.Address) == 0 {
 		return sdk.ErrInvalidAddress(out.Address.String())
 	}
-	if !out.Coins.IsValid() {
+	if !out.Coins.IsValidV0() {
 		return sdk.ErrInvalidCoins(out.Coins.String())
 	}
-	if !out.Coins.IsPositive() {
+	if !out.Coins.IsAllPositive() {
 		return sdk.ErrInvalidCoins(out.Coins.String())
 	}
 	return nil
@@ -256,7 +256,7 @@ func (msg MsgBurn) ValidateBasic() sdk.Error {
 	if len(msg.Coins) == 0 {
 		return ErrBurnEmptyCoins(DefaultCodespace).TraceSDK("")
 	}
-	if !msg.Coins.IsValid() {
+	if !msg.Coins.IsValidV0() {
 		return sdk.ErrInvalidCoins(msg.Coins.String())
 	}
 	return nil

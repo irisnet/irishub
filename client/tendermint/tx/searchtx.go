@@ -3,19 +3,19 @@ package tx
 import (
 	"errors"
 	"fmt"
+	"net/http"
+	"net/url"
 	"strings"
 
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
-
-	"github.com/irisnet/irishub/codec"
-	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/client"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
+	"github.com/irisnet/irishub/codec"
+	sdk "github.com/irisnet/irishub/types"
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"
-	"net/http"
-	"net/url"
+	"github.com/tendermint/tendermint/types"
 )
 
 const (
@@ -60,13 +60,17 @@ $ iriscli tendermint txs --tags '<tag1>:<value1>&<tag2>:<value2>'
 					return fmt.Errorf("%s should only contain one <key>:<value> pair", tagsStr)
 				}
 				keyValue := strings.Split(tag, ":")
-				tag = fmt.Sprintf("%s='%s'", keyValue[0], keyValue[1])
+				if keyValue[0] == types.TxHeightKey {
+					tag = fmt.Sprintf("%s=%s", keyValue[0], keyValue[1])
+				} else {
+					tag = fmt.Sprintf("%s='%s'", keyValue[0], keyValue[1])
+				}
 				tmTags = append(tmTags, tag)
 			}
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			txs, err := searchTxs(cliCtx, cdc, tmTags, page, size)
+			txs, err := SearchTxs(cliCtx, cdc, tmTags, page, size)
 			if err != nil {
 				return err
 			}
@@ -92,7 +96,7 @@ $ iriscli tendermint txs --tags '<tag1>:<value1>&<tag2>:<value2>'
 	return cmd
 }
 
-func searchTxs(cliCtx context.CLIContext, cdc *codec.Codec, tags []string, page, size int) ([]Info, error) {
+func SearchTxs(cliCtx context.CLIContext, cdc *codec.Codec, tags []string, page, size int) ([]Info, error) {
 	if len(tags) == 0 {
 		return nil, errors.New("must declare at least one tag to search")
 	}
@@ -122,7 +126,12 @@ func searchTxs(cliCtx context.CLIContext, cdc *codec.Codec, tags []string, page,
 		}
 	}
 
-	info, err := FormatTxResults(cdc, res.Txs)
+	resBlocks, err := getBlocksForTxResults(cliCtx, res.Txs)
+	if err != nil {
+		return nil, err
+	}
+
+	info, err := FormatTxResults(cdc, res.Txs, resBlocks)
 	if err != nil {
 		return nil, err
 	}
@@ -131,11 +140,11 @@ func searchTxs(cliCtx context.CLIContext, cdc *codec.Codec, tags []string, page,
 }
 
 // parse the indexed txs into an array of Info
-func FormatTxResults(cdc *codec.Codec, res []*ctypes.ResultTx) ([]Info, error) {
+func FormatTxResults(cdc *codec.Codec, res []*ctypes.ResultTx, resBlocks map[int64]*ctypes.ResultBlock) ([]Info, error) {
 	var err error
 	out := make([]Info, len(res))
 	for i := range res {
-		out[i], err = formatTxResult(cdc, res[i])
+		out[i], err = formatTxResult(cdc, res[i], resBlocks[res[i].Height])
 		if err != nil {
 			return nil, err
 		}
@@ -168,9 +177,11 @@ func SearchTxRequestHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.
 				utils.WriteErrorResponse(w, http.StatusBadRequest, sdk.AppendMsgToErr("could not decode query value", err.Error()))
 				return
 			}
-
-			tag := fmt.Sprintf("%s='%s'", key, value)
-			tags = append(tags, tag)
+			if key == types.TxHeightKey {
+				tags = append(tags, fmt.Sprintf("%s=%s", key, value))
+			} else {
+				tags = append(tags, fmt.Sprintf("%s='%s'", key, value))
+			}
 		}
 		pageString := r.FormValue("search_request_page")
 		sizeString := r.FormValue("search_request_size")
@@ -196,7 +207,7 @@ func SearchTxRequestHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.
 			return
 		}
 
-		txs, err = searchTxs(cliCtx, cdc, tags, int(page), int(size))
+		txs, err = SearchTxs(cliCtx, cdc, tags, int(page), int(size))
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(err.Error()))

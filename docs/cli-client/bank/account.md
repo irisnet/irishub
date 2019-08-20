@@ -7,7 +7,7 @@ This command is used for querying balance information of certain address.
 ## Usage:
 
 ```
-iriscli bank account <address> <flags>
+iriscli bank account <address> [flags]
 ```
 
 ## Flags
@@ -16,9 +16,9 @@ iriscli bank account <address> <flags>
 | -------------- | ------ | -------- | --------------------- | ------------------------------------------------------------ |
 | -h, --help     |        | False    |                       | help for account                                             |
 | --chain-id     | String | False    |                       | Chain ID of tendermint node                                  |
-| --height       | Int    | False    |                       | Block height to query, omit to get most recent provable block |
+| --height       | Int    | False    |                       | Block height to query, omit to get most recent provable block|
 | --ledger       | String | False    |                       | Use a connected Ledger device                                |
-| --node         | String | False    | tcp://localhost:26657 | <host>:<port> to tendermint rpc interface for this chain     |
+| --node         | String | False    | tcp://localhost:26657 | `<host>:<port>`to tendermint rpc interface for this chain    |
 | --trust-node   | String | False    | True                  | Don't verify proofs for responses                            |
 
 
@@ -38,6 +38,7 @@ Account:
   Coins:           50iris
   Account Number:  0
   Sequence:        2
+  Memo Regexp:
 ```
 
 ### Common Issue

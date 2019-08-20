@@ -12,7 +12,7 @@ type Protocol interface {
 	GetVersion() uint64
 	GetRouter() Router
 	GetQueryRouter() QueryRouter
-	GetAnteHandler() sdk.AnteHandler                   // ante handler for fee and auth
+	GetAnteHandlers() []sdk.AnteHandler                // ante handlers for fee and auth
 	GetFeeRefundHandler() sdk.FeeRefundHandler         // fee handler for fee refund
 	GetFeePreprocessHandler() sdk.FeePreprocessHandler // fee handler for fee preprocessor
 	ExportAppStateAndValidators(ctx sdk.Context, forZeroHeight bool) (appState json.RawMessage, validators []tmtypes.GenesisValidator, err error)
@@ -25,7 +25,7 @@ type Protocol interface {
 
 	GetKVStoreKeyList() []*sdk.KVStoreKey
 	Load()
-	Init()
+	Init(ctx sdk.Context)
 	GetCodec() *codec.Codec
-	InitMetrics(store sdk.CommitMultiStore) // init metrics
+	InitMetrics(store sdk.MultiStore) // init metrics
 }

@@ -2,18 +2,18 @@ package lcd
 
 import (
 	"fmt"
+	"github.com/irisnet/irishub/app/v1/asset"
+	"github.com/irisnet/irishub/app/v1/bank"
+	"github.com/irisnet/irishub/app/v1/stake"
 	"net/http"
 	"strings"
 
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/app/protocol"
-	"github.com/irisnet/irishub/client/bank"
+	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/codec"
-	"github.com/irisnet/irishub/modules/auth"
-	"github.com/irisnet/irishub/modules/stake"
-	stakeTypes "github.com/irisnet/irishub/modules/stake/types"
 	sdk "github.com/irisnet/irishub/types"
 )
 
@@ -73,33 +73,49 @@ func QueryCoinTypeRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) 
 }
 
 // QueryTokenStatsRequestHandlerFn performs token statistic query
-func QueryTokenStatsRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+func QueryTokenStatsRequestHandlerFn(cdc *codec.Codec, decoder auth.AccountDecoder, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		resToken, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.AccountRoute, auth.QueryTokenStats), nil)
+		vars := mux.Vars(r)
+		tokenId := vars["id"]
+		params := asset.QueryTokenParams{
+			TokenId: tokenId,
+		}
+		bz, err := cdc.MarshalJSON(params)
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.AccountRoute, bank.QueryTokenStats), bz)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
 		}
 
 		var tokenStats bank.TokenStats
-		err = cdc.UnmarshalJSON(resToken, &tokenStats)
+		err = cdc.UnmarshalJSON(res, &tokenStats)
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		resPool, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.StakeRoute, stake.QueryPool), nil)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-			return
-		}
-		var poolStatus stakeTypes.PoolStatus
-		err = cdc.UnmarshalJSON(resPool, &poolStatus)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-			return
-		}
+		// query bonded tokens for iris
+		if tokenId == "" || tokenId == sdk.Iris {
+			resPool, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.StakeRoute, stake.QueryPool), nil)
+			if err != nil {
+				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+				return
+			}
+			var poolStatus stake.PoolStatus
+			err = cdc.UnmarshalJSON(resPool, &poolStatus)
+			if err != nil {
+				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+				return
+			}
 
-		tokenStats.BondedTokens = sdk.Coins{sdk.Coin{Denom: stakeTypes.StakeDenom, Amount: poolStatus.BondedTokens.TruncateInt()}}
+			tokenStats.BondedTokens = sdk.Coins{sdk.Coin{Denom: stake.BondDenom, Amount: poolStatus.BondedTokens.TruncateInt()}}
+			tokenStats.TotalSupply = tokenStats.TotalSupply.Add(tokenStats.LooseTokens.Add(tokenStats.BondedTokens))
+		}
 
 		utils.PostProcessResponse(w, cdc, tokenStats, cliCtx.Indent)
 	}

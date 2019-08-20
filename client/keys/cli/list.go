@@ -1,9 +1,9 @@
 package keys
 
 import (
+	"github.com/irisnet/irishub/client"
 	"github.com/irisnet/irishub/client/keys"
 	"github.com/spf13/cobra"
-	"github.com/irisnet/irishub/client"
 )
 
 // CMD

@@ -106,10 +106,6 @@ func DefaultParams() Params {
 }
 
 func ValidateParams(p Params) error {
-	if sdk.NetworkType != sdk.Mainnet {
-		return nil
-	}
-
 	if err := validateCommunityTax(p.CommunityTax); err != nil {
 		return err
 	}

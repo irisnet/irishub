@@ -75,7 +75,7 @@ People that cannot, or do not want to run validator operations, can still partic
 ###  IRISnet Profiler
 Profiler is a type of user that they are a special type of user who can submit software upgrade/halt proposals
 ###  IRISnet Trustee
-Trustee is a type of user that  they are a special type of user who will receive funds from TxTaxUsage proposals
+Trustee is a type of user that  they are a special type of user who will receive funds from CommunityTaxUsage proposals
 
 ##  Profit and Loss Analysis for IRISnet Valdiators
 

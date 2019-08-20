@@ -1,23 +1,18 @@
 package keys
 
 import (
-	"bufio"
 	"fmt"
-	"os"
 	"strings"
 
-	"github.com/pkg/errors"
-
 	"github.com/cosmos/go-bip39"
-
 	"github.com/irisnet/irishub/crypto"
 	"github.com/irisnet/irishub/crypto/keys/hd"
+	"github.com/irisnet/irishub/crypto/keys/keyerror"
 	"github.com/irisnet/irishub/crypto/keys/mintkey"
 	"github.com/irisnet/irishub/types"
-
-	"github.com/irisnet/irishub/crypto/keys/keyerror"
+	"github.com/pkg/errors"
 	tmcrypto "github.com/tendermint/tendermint/crypto"
-	"github.com/tendermint/tendermint/crypto/encoding/amino"
+	cryptoAmino "github.com/tendermint/tendermint/crypto/encoding/amino"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
 	dbm "github.com/tendermint/tendermint/libs/db"
 )
@@ -113,6 +108,17 @@ func (kb dbKeybase) CreateMnemonic(name string, language Language, passwd string
 	return
 }
 
+func (kb dbKeybase) ImportPrivateKey(name string, passwd string, privKey tmcrypto.PrivKey) (info Info, err error) {
+	switch privKey.(type) {
+	case secp256k1.PrivKeySecp256k1:
+		info = kb.writeLocalKey(privKey, name, passwd)
+		return
+	default:
+		return nil, ErrUnsupportedSigningAlgo
+	}
+	return
+}
+
 // TEMPORARY METHOD UNTIL WE FIGURE OUT USER FACING HD DERIVATION API
 func (kb dbKeybase) CreateKey(name, mnemonic, passwd string) (info Info, err error) {
 	words := strings.Split(mnemonic, " ")
@@ -173,6 +179,12 @@ func (kb dbKeybase) CreateLedger(name string, path crypto.DerivationPath, algo S
 // It returns the created key info
 func (kb dbKeybase) CreateOffline(name string, pub tmcrypto.PubKey) (Info, error) {
 	return kb.writeOfflineKey(pub, name), nil
+}
+
+// CreateMulti creates a new reference to a multisig (offline) keypair. It
+// returns the created key info.
+func (kb dbKeybase) CreateMulti(name string, pub tmcrypto.PubKey) (Info, error) {
+	return kb.writeMultisigKey(name, pub), nil
 }
 
 func (kb *dbKeybase) persistDerivedKey(seed []byte, passwd, name, fullHdPath string) (info Info, err error) {
@@ -258,23 +270,29 @@ func (kb dbKeybase) Sign(name, passphrase string, msg []byte) (sig []byte, pub t
 			return
 		}
 	case offlineInfo:
-		linfo := info.(offlineInfo)
-		_, err := fmt.Fprintf(os.Stderr, "Bytes to sign:\n%s", msg)
-		if err != nil {
-			return nil, nil, err
-		}
-		buf := bufio.NewReader(os.Stdin)
-		_, err = fmt.Fprintf(os.Stderr, "\nEnter Amino-encoded signature:\n")
-		if err != nil {
-			return nil, nil, err
-		}
-		// Will block until user inputs the signature
-		signed, err := buf.ReadString('\n')
-		if err != nil {
-			return nil, nil, err
-		}
-		cdc.MustUnmarshalBinaryLengthPrefixed([]byte(signed), sig)
-		return sig, linfo.GetPubKey(), nil
+		err = fmt.Errorf("can not sign tx using offline key")
+		return
+	case multiInfo:
+		err = fmt.Errorf("can not sign tx using multi-sign key")
+		return
+		//_, err := fmt.Fprintf(os.Stderr, "Bytes to sign:\n%s", msg)
+		//if err != nil {
+		//	return nil, nil, err
+		//}
+		//buf := bufio.NewReader(os.Stdin)
+		//_, err = fmt.Fprintf(os.Stderr, "\nEnter Amino-encoded signature:\n")
+		//if err != nil {
+		//	return nil, nil, err
+		//}
+		//// Will block until user inputs the signature
+		//signed, err := buf.ReadString('\n')
+		//if err != nil {
+		//	return nil, nil, err
+		//}
+		//if err := cdc.UnmarshalBinaryLengthPrefixed([]byte(signed), sig); err != nil {
+		//	return nil, nil, errors.Wrap(err, "failed to decode signature")
+		//}
+		//return sig, info.GetPubKey(), nil
 	}
 	sig, err = priv.Sign(msg)
 	if err != nil {
@@ -301,9 +319,8 @@ func (kb dbKeybase) ExportPrivateKeyObject(name string, passphrase string) (tmcr
 		if err != nil {
 			return nil, err
 		}
-	case ledgerInfo:
-		return nil, errors.New("Only works on local private keys")
-	case offlineInfo:
+
+	default:
 		return nil, errors.New("Only works on local private keys")
 	}
 	return priv, nil
@@ -437,6 +454,12 @@ func (kb dbKeybase) writeLedgerKey(pub tmcrypto.PubKey, path crypto.DerivationPa
 
 func (kb dbKeybase) writeOfflineKey(pub tmcrypto.PubKey, name string) Info {
 	info := newOfflineInfo(name, pub)
+	kb.writeInfo(info, name)
+	return info
+}
+
+func (kb dbKeybase) writeMultisigKey(name string, pub tmcrypto.PubKey) Info {
+	info := NewMultiInfo(name, pub)
 	kb.writeInfo(info, name)
 	return info
 }

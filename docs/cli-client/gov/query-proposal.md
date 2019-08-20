@@ -35,7 +35,7 @@ You could query the details of a specific proposal.
 ```txt
 Proposal 94:
   Title:              test proposal
-  Type:               TxTaxUsage
+  Type:               CommunityTaxUsage
   Status:             Rejected
   Submit Time:        2019-05-10 06:37:18.776274942 +0000 UTC
   Deposit End Time:   2019-05-10 06:37:28.776274942 +0000 UTC

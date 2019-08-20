@@ -618,7 +618,7 @@ func TestAdjustFeesByGas(t *testing.T) {
 		want sdk.Coins
 	}{
 		{"nil coins", args{sdk.Coins{}, 10000}, sdk.Coins{}},
-		{"nil coins", args{sdk.Coins{sdk.NewInt64Coin("A", 10), sdk.NewInt64Coin("B", 0)}, 10000}, sdk.Coins{sdk.NewInt64Coin("A", 20), sdk.NewInt64Coin("B", 10)}},
+		{"nil coins", args{sdk.Coins{sdk.NewInt64Coin("token1", 10), sdk.NewInt64Coin("token2", 0)}, 10000}, sdk.Coins{sdk.NewInt64Coin("token1", 20), sdk.NewInt64Coin("token2", 10)}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -642,7 +642,7 @@ func TestCountSubkeys(t *testing.T) {
 		pub crypto.PubKey
 	}
 	mkey := genMultiKey(5, 4, genPubKeys)
-	mkeyType := mkey.(*multisig.PubKeyMultisigThreshold)
+	mkeyType := mkey.(multisig.PubKeyMultisigThreshold)
 	mkeyType.PubKeys = append(mkeyType.PubKeys, genMultiKey(6, 5, genPubKeys))
 	tests := []struct {
 		name string
@@ -651,7 +651,7 @@ func TestCountSubkeys(t *testing.T) {
 	}{
 		{"single key", args{secp256k1.GenPrivKey().PubKey()}, 1},
 		{"multi sig key", args{genMultiKey(5, 4, genPubKeys)}, 5},
-		{"multi multi sig", args{mkey}, 11},
+		{"multi multi sig", args{mkey}, 5},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(T *testing.T) {

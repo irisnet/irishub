@@ -40,7 +40,7 @@ const (
 )
 
 var (
-	IrisCt = types.NewDefaultCoinType(stakeTypes.StakeTokenName)
+	IrisCt = sdk.IrisCoinType
 )
 */
 // App extends an ABCI application, but with most of its parameters exported.
@@ -294,7 +294,7 @@ func RandomSetGenesis(r *rand.Rand, app *App, addrs []sdk.AccAddress, denoms []s
 			coins[j] = sdk.NewCoin(denoms[j], amount)
 		}
 
-		app.TotalCoinsSupply = app.TotalCoinsSupply.Plus(coins)
+		app.TotalCoinsSupply = app.TotalCoinsSupply.Add(coins)
 		baseAcc := auth.NewBaseAccountWithAddress(addrs[i])
 
 		(&baseAcc).SetCoins(coins)

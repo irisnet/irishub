@@ -2,13 +2,11 @@ package cli
 
 import (
 	"fmt"
-
 	"github.com/irisnet/irishub/app/protocol"
+	"github.com/irisnet/irishub/app/v1/gov"
 	"github.com/irisnet/irishub/client/context"
 	client "github.com/irisnet/irishub/client/gov"
 	"github.com/irisnet/irishub/codec"
-	"github.com/irisnet/irishub/modules/gov"
-	paramsType "github.com/irisnet/irishub/modules/params"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -43,7 +41,6 @@ func GetCmdQueryProposal(cdc *codec.Codec) *cobra.Command {
 			if err != nil {
 				return err
 			}
-
 			return cliCtx.PrintOutput(proposal)
 		},
 	}
@@ -86,13 +83,14 @@ func GetCmdQueryProposals(cdc *codec.Codec) *cobra.Command {
 				params.Voter = voterAddr
 			}
 
-			if len(strProposalStatus) != 0 {
-				proposalStatus, err := gov.ProposalStatusFromString(client.NormalizeProposalStatus(strProposalStatus))
-				if err != nil {
+			var status = ""
+			if len(strProposalStatus) > 0 {
+				status = client.NormalizeProposalStatus(strProposalStatus)
+				if _, err := gov.ProposalStatusFromString(status); err != nil {
 					return err
 				}
-				params.ProposalStatus = proposalStatus
 			}
+			params.ProposalStatus = status
 
 			bz, err := cdc.MarshalJSON(params)
 			if err != nil {
@@ -324,43 +322,5 @@ func GetCmdQueryTally(cdc *codec.Codec) *cobra.Command {
 
 	cmd.Flags().String(flagProposalID, "", "proposalID of which proposal is being tallied")
 
-	return cmd
-}
-
-func GetCmdQueryGovConfig(cdc *codec.Codec) *cobra.Command {
-	cmd := &cobra.Command{
-		Use:     "query-params",
-		Short:   "query parameter proposal's config",
-		Example: "iriscli gov query-params --module=<module name>",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			moduleStr := viper.GetString(flagModule)
-
-			cliCtx := context.NewCLIContext().WithCodec(cdc)
-
-			params := paramsType.QueryModuleParams{
-				Module: moduleStr,
-			}
-			bz, err := cdc.MarshalJSON(params)
-			if err != nil {
-				return err
-			}
-
-			res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/module", protocol.ParamsRoute), bz)
-			if err != nil {
-				return err
-			}
-
-			var paramSet paramsType.ParamSet
-			if err := cdc.UnmarshalJSON(res, &paramSet); err != nil {
-				return err
-			}
-
-			return cliCtx.PrintOutput(paramSet)
-			return nil
-		},
-	}
-
-	cmd.Flags().String(flagModule, "", "module name")
-	cmd.MarkFlagRequired(flagModule)
 	return cmd
 }

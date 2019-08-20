@@ -23,7 +23,7 @@ func BufferStdin() *bufio.Reader {
 // GetPassword will prompt for a password one-time (to sign a tx)
 // It enforces the password length
 func GetPassword(prompt string, buf *bufio.Reader) (pass string, err error) {
-	if inputIsTty() {
+	if InputIsTty() {
 		pass, err = speakeasy.FAsk(os.Stderr, prompt)
 	} else {
 		pass, err = readLineFromBuf(buf)
@@ -45,7 +45,7 @@ func GetPassword(prompt string, buf *bufio.Reader) (pass string, err error) {
 // GetSeed will request a seed phrase from stdin and trims off
 // leading/trailing spaces
 func GetSeed(prompt string, buf *bufio.Reader) (seed string, err error) {
-	if inputIsTty() {
+	if InputIsTty() {
 		fmt.Println(prompt)
 	}
 	seed, err = readLineFromBuf(buf)
@@ -59,7 +59,7 @@ func GetSeed(prompt string, buf *bufio.Reader) (seed string, err error) {
 // input is piped in.
 func GetCheckPassword(prompt, prompt2 string, buf *bufio.Reader) (string, error) {
 	// simple read on no-tty
-	if !inputIsTty() {
+	if !InputIsTty() {
 		return GetPassword(prompt, buf)
 	}
 
@@ -83,7 +83,7 @@ func GetCheckPassword(prompt, prompt2 string, buf *bufio.Reader) (string, error)
 // If the input is not recognized, it will ask again.
 func GetConfirmation(prompt string, buf *bufio.Reader) (bool, error) {
 	for {
-		if inputIsTty() {
+		if InputIsTty() {
 			fmt.Print(fmt.Sprintf("%s [y/n]:", prompt))
 		}
 		response, err := readLineFromBuf(buf)
@@ -103,7 +103,7 @@ func GetConfirmation(prompt string, buf *bufio.Reader) (bool, error) {
 // inputIsTty returns true iff we have an interactive prompt,
 // where we can disable echo and request to repeat the password.
 // If false, we can optimize for piped input from another command
-func inputIsTty() bool {
+func InputIsTty() bool {
 	return isatty.IsTerminal(os.Stdin.Fd()) || isatty.IsCygwinTerminal(os.Stdin.Fd())
 }
 

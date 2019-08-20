@@ -1,7 +1,7 @@
 package client
 
 import (
-	"github.com/irisnet/irishub/modules/auth"
+	"github.com/irisnet/irishub/app/v1/auth"
 	sdk "github.com/irisnet/irishub/types"
 )
 

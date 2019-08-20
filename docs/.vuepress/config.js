@@ -31,7 +31,8 @@ module.exports = {
                         ['How-to-install-irishub.md', 'Install'],
                         ['cli-client.md', 'CLI Client'],
                         ['light-client.md', 'Light Client'],
-                        ['export.md', 'Export'],
+                        ['reset.md', 'Reset Blockchain State'],
+                        ['export.md', 'Export Blockchain State'],
                         ['sentry.md', 'Sentry'],
                         ['tool.md', 'Tool'],
                         ['monitor.md', 'Monitor'],
@@ -67,7 +68,9 @@ module.exports = {
                             ['upgrade.md', 'Upgrade'],
                             ['distribution.md', 'Distribution'],
                             ['guardian.md', 'Guardian'],
-                            ['mint.md', 'Mint']
+                            ['mint.md', 'Mint'],
+                            ['asset.md', 'Asset'],
+                            ['random.md', 'Random']
                         ]
                     }],
                     '/cli-client/': [{
@@ -75,6 +78,13 @@ module.exports = {
                         collapsable: false,
                         children: [
                             ['status/', 'iriscli status']
+                        ]
+                    },
+                    {
+                        title: 'Tx(sign/broadcast)',
+                        collapsable: false,
+                        children: [
+                            ['tx/', 'iriscli tx']
                         ]
                     },
                     {
@@ -132,6 +142,20 @@ module.exports = {
                         children: [
                             ['service/', 'iriscli service']
                         ]
+                    },
+                    {
+                        title: 'Asset',
+                        collapsable: false,
+                        children: [
+                            ['asset/', 'iriscli asset']
+                        ]
+                    },
+                    {
+                        title: 'Random',
+                        collapsable: false,
+                        children: [
+                            ['random/', 'iriscli rand']
+                        ]
                     }],
                     '/resources/': [
                         ['validator-faq.md', 'Validator FAQ'],
@@ -160,6 +184,7 @@ module.exports = {
                         ['How-to-install-irishub.md', '安装'],
                         ['cli-client.md', '命令行客户端'],
                         ['light-client.md', '轻节点客户端(LCD)'],
+                        ['reset.md', '重置区块链状态'],
                         ['export.md', '导出区块链状态'],
                         ['sentry.md', '哨兵节点'],
                         ['tool.md', '调试工具'],
@@ -196,7 +221,9 @@ module.exports = {
                             ['upgrade.md', '升级'],
                             ['distribution.md', '收益分配'],
                             ['guardian.md', '系统用户'],
-                            ['mint.md', '通胀']
+                            ['mint.md', '通胀'],
+                            ['asset.md', '资产管理'],
+                            ['random.md', '随机数']
                         ]
                     }],
                     '/zh/cli-client/': [{
@@ -211,6 +238,13 @@ module.exports = {
                         collapsable: false,
                         children: [
                             ['tendermint/', 'iriscli tendermint']
+                        ]
+                    },
+                    {
+                        title: '交易（签名/广播）',
+                        collapsable: false,
+                        children: [
+                            ['tx/', 'iriscli tx']
                         ]
                     },
                     {
@@ -260,6 +294,20 @@ module.exports = {
                         collapsable: false,
                         children: [
                             ['service/', 'iriscli service']
+                        ]
+                    },
+                    {
+                        title: '资产管理',
+                        collapsable: false,
+                        children: [
+                            ['asset/', 'iriscli asset']
+                        ]
+                    },
+                    {
+                        title: '随机数',
+                        collapsable: false,
+                        children: [
+                            ['random/', 'iriscli rand']
                         ]
                     }],
                     '/zh/resources/': [

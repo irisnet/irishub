@@ -1,8 +1,42 @@
 # IRISLCD 更新日志
 
+## v0.15.0
+
+*Aug 20th, 2019*
+
+### 不兼容修改:
+
+在这个版本中，除'/tx/broadcast'以外的所有POST方法都只生成未签名交易，并不会对这些交易进行广播。用户需要在本地签名交易，并使用'/tx/broadcast'进行广播。
+
+- 删除 Key 模块
+- 删除 POST /tx/sign
+- 删除 GET /distribution/community-tax
+- 删除 GET /gov/params/{module}
+
+### 兼容修改:
+
+- 增加 Asset 模块
+- 增加 Rand 模块
+- 增加 Params 模块
+- 增加 GET /bank/token-stats/{id}
+- 增加 POST /bank/accounts/{address}/set-memo-regexp
+
+#### Bank 模块
+
+| [v0.14.1]      | [v0.15.0]        | 输入改变 | 输出改变 | 备注 |
+| --------------- | --------------- | --------------- | --------------- | ----- |
+| GET /bank/accounts/{address} | GET /bank/accounts/{address} | No | Yes | 1. 添加 `memo_regexp` 字段; <br> 2. 添加多资产支持 |
+
+#### Tendermint 模块
+
+| [v0.14.1]      | [v0.15.0]        | 输入改变 | 输出改变 | 备注 |
+| --------------- | --------------- | --------------- | --------------- | ---- |
+| /txs/{hash} | /txs/{hash} | No | Yes | 添加 `timestamp` 字段 |
+| /txs | /txs | No | Yes | 添加 `timestamp` 字段 |
+
 ## v0.14.1
 
-*May 30th, 2019*
+*May 31th, 2019*
 
 ### 不兼容修改:
 

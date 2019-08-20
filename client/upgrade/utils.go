@@ -3,7 +3,7 @@ package upgrade
 import (
 	"fmt"
 
-	"github.com/irisnet/irishub/modules/upgrade"
+	"github.com/irisnet/irishub/app/v1/upgrade"
 	sdk "github.com/irisnet/irishub/types"
 )
 

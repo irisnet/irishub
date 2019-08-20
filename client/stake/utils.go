@@ -5,11 +5,11 @@ import (
 	"strings"
 	"time"
 
+	"github.com/irisnet/irishub/app/v1/stake"
+	"github.com/irisnet/irishub/app/v1/stake/types"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/codec"
-	"github.com/irisnet/irishub/modules/stake"
-	"github.com/irisnet/irishub/modules/stake/types"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/pkg/errors"
 )
@@ -209,11 +209,11 @@ func ConvertDelegationToDelegationOutput(cliCtx context.CLIContext, delegation s
 }
 
 func ConvertUBDToUBDOutput(cliCtx context.CLIContext, ubd stake.UnbondingDelegation) UnbondingDelegationOutput {
-	initialBalance, err := cliCtx.ConvertCoinToMainUnit(sdk.Coins{ubd.InitialBalance}.String())
+	initialBalance, err := cliCtx.ConvertToMainUnit(sdk.Coins{ubd.InitialBalance}.String())
 	if err != nil && len(initialBalance) != 1 {
 		panic(err)
 	}
-	balance, err := cliCtx.ConvertCoinToMainUnit(sdk.Coins{ubd.Balance}.String())
+	balance, err := cliCtx.ConvertToMainUnit(sdk.Coins{ubd.Balance}.String())
 	if err != nil && len(balance) != 1 {
 		panic(err)
 	}
@@ -229,11 +229,11 @@ func ConvertUBDToUBDOutput(cliCtx context.CLIContext, ubd stake.UnbondingDelegat
 
 func ConvertREDToREDOutput(cliCtx context.CLIContext, red stake.Redelegation) RedelegationOutput {
 	exRate := utils.ExRateFromStakeTokenToMainUnit(cliCtx)
-	initialBalance, err := cliCtx.ConvertCoinToMainUnit(sdk.Coins{red.InitialBalance}.String())
+	initialBalance, err := cliCtx.ConvertToMainUnit(sdk.Coins{red.InitialBalance}.String())
 	if err != nil && len(initialBalance) != 1 {
 		panic(err)
 	}
-	balance, err := cliCtx.ConvertCoinToMainUnit(sdk.Coins{red.Balance}.String())
+	balance, err := cliCtx.ConvertToMainUnit(sdk.Coins{red.Balance}.String())
 	if err != nil && len(balance) != 1 {
 		panic(err)
 	}
@@ -253,10 +253,10 @@ func ConvertREDToREDOutput(cliCtx context.CLIContext, red stake.Redelegation) Re
 func ConvertPoolToPoolOutput(cliCtx context.CLIContext, pool stake.PoolStatus) PoolOutput {
 	exRate := utils.ExRateFromStakeTokenToMainUnit(cliCtx)
 	return PoolOutput{
-		LooseTokens:  utils.ConvertDecToRat(pool.LooseTokens).Mul(exRate).FloatString(),
-		BondedTokens: utils.ConvertDecToRat(pool.BondedTokens).Mul(exRate).FloatString(),
-		TokenSupply:  utils.ConvertDecToRat(pool.BondedTokens.Add(pool.LooseTokens)).Mul(exRate).FloatString(),
-		BondedRatio:  utils.ConvertDecToRat(pool.BondedTokens.Quo(pool.BondedTokens.Add(pool.LooseTokens))).FloatString(),
+		LooseTokens:  sdk.NewRatFromInt(pool.LooseTokens.TruncateInt()).Mul(exRate).DecimalString(sdk.AttoScale),
+		BondedTokens: sdk.NewRatFromInt(pool.BondedTokens.TruncateInt()).Mul(exRate).DecimalString(sdk.AttoScale),
+		TokenSupply:  sdk.NewRatFromInt(pool.TokenSupply().TruncateInt()).Mul(exRate).DecimalString(sdk.AttoScale),
+		BondedRatio:  utils.ConvertDecToRat(pool.BondedTokens.Quo(pool.TokenSupply())).DecimalString(10),
 	}
 }
 
@@ -306,12 +306,7 @@ func GetShares(
 			return sharesAmount, errors.Errorf("shares amount must be positive number (ex. 123, 1.23456789)")
 		}
 
-		stakeToken, err := cliCtx.GetCoinType(types.StakeTokenName)
-		if err != nil {
-			panic(err)
-		}
-		decimalDiff := stakeToken.MinUnit.Decimal - stakeToken.GetMainUnit().Decimal
-		exRate := sdk.NewDecFromInt(sdk.NewIntWithDecimal(1, decimalDiff))
+		exRate := sdk.NewDecFromInt(sdk.AttoScaleFactor)
 		sharesAmount = sharesAmount.Mul(exRate)
 	case sharesPercentStr != "":
 		var sharesPercent sdk.Dec

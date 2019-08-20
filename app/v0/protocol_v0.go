@@ -52,7 +52,7 @@ type ProtocolV0 struct {
 	router      protocol.Router      // handle any kind of message
 	queryRouter protocol.QueryRouter // router for redirecting query calls
 
-	anteHandler          sdk.AnteHandler          // ante handler for fee and auth
+	anteHandlers         []sdk.AnteHandler        // ante handlers for fee and auth
 	feeRefundHandler     sdk.FeeRefundHandler     // fee handler for fee refund
 	feePreprocessHandler sdk.FeePreprocessHandler // fee handler for fee preprocessor
 
@@ -81,7 +81,7 @@ func NewProtocolV0(version uint64, log log.Logger, pk sdk.ProtocolKeeper, checkI
 	return &p0
 }
 
-// load the configuration of this Protocol
+// Load the configuration of this Protocol
 func (p *ProtocolV0) Load() {
 	p.configCodec()
 	p.configKeepers()
@@ -90,17 +90,16 @@ func (p *ProtocolV0) Load() {
 	p.configParams()
 }
 
-// verison0 don't need the init
-func (p *ProtocolV0) Init() {
-
+// Initialize this Protocol, only needed for version > 0
+func (p *ProtocolV0) Init(ctx sdk.Context) {
+	p.InitMetrics(ctx.MultiStore())
 }
 
-// verison0 tx codec
 func (p *ProtocolV0) GetCodec() *codec.Codec {
 	return p.cdc
 }
 
-func (p *ProtocolV0) InitMetrics(store sdk.CommitMultiStore) {
+func (p *ProtocolV0) InitMetrics(store sdk.MultiStore) {
 	p.StakeKeeper.InitMetrics(store.GetKVStore(protocol.KeyStake))
 	p.serviceKeeper.InitMetrics(store.GetKVStore(protocol.KeyService))
 }
@@ -281,7 +280,7 @@ func (p *ProtocolV0) configRouters() {
 
 // configure all Stores
 func (p *ProtocolV0) configFeeHandlers() {
-	p.anteHandler = auth.NewAnteHandler(p.accountMapper, p.feeKeeper)
+	p.anteHandlers = []sdk.AnteHandler{auth.NewAnteHandler(p.accountMapper, p.feeKeeper)}
 	p.feeRefundHandler = auth.NewFeeRefundHandler(p.accountMapper, p.feeKeeper)
 	p.feePreprocessHandler = auth.NewFeePreprocessHandler(p.feeKeeper)
 }
@@ -432,8 +431,8 @@ func (p *ProtocolV0) GetRouter() protocol.Router {
 func (p *ProtocolV0) GetQueryRouter() protocol.QueryRouter {
 	return p.queryRouter
 }
-func (p *ProtocolV0) GetAnteHandler() sdk.AnteHandler {
-	return p.anteHandler
+func (p *ProtocolV0) GetAnteHandlers() []sdk.AnteHandler {
+	return p.anteHandlers
 }
 func (p *ProtocolV0) GetFeeRefundHandler() sdk.FeeRefundHandler {
 	return p.feeRefundHandler

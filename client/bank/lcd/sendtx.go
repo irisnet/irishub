@@ -23,12 +23,15 @@ type burnBody struct {
 	BaseTx utils.BaseTx `json:"base_tx"`
 }
 
+type setMemoRegexpBody struct {
+	MemoRegexp string       `json:"memo_regexp"`
+	BaseTx     utils.BaseTx `json:"base_tx"`
+}
+
 // SendRequestHandlerFn - http request handler to send coins to a address
 // nolint: gocyclo
 func SendRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// Init context and read request parameters
-		cliCtx = utils.InitReqCliCtx(cliCtx, r)
 		vars := mux.Vars(r)
 		bech32addr := vars["address"]
 		sender, err := sdk.AccAddressFromBech32(bech32addr)
@@ -42,9 +45,10 @@ func SendRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Hand
 			return
 		}
 		baseReq := m.BaseTx.Sanitize()
-		if !baseReq.ValidateBasic(w, cliCtx) {
+		if !baseReq.ValidateBasic(w) {
 			return
 		}
+
 		// Build message
 		amount, err := cliCtx.ParseCoins(m.Amount)
 		if err != nil {
@@ -62,8 +66,10 @@ func SendRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Hand
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
-		// Broadcast or return unsigned transaction
-		utils.SendOrReturnUnsignedTx(w, cliCtx, m.BaseTx, []sdk.Msg{msg})
+
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
+
+		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
 	}
 }
 
@@ -71,8 +77,6 @@ func SendRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Hand
 // nolint: gocyclo
 func BurnRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// Init context and read request parameters
-		cliCtx = utils.InitReqCliCtx(cliCtx, r)
 		vars := mux.Vars(r)
 		bech32addr := vars["address"]
 		owner, err := sdk.AccAddressFromBech32(bech32addr)
@@ -86,9 +90,10 @@ func BurnRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Hand
 			return
 		}
 		baseReq := m.BaseTx.Sanitize()
-		if !baseReq.ValidateBasic(w, cliCtx) {
+		if !baseReq.ValidateBasic(w) {
 			return
 		}
+
 		// Build message
 		amount, err := cliCtx.ParseCoins(m.Amount)
 		if err != nil {
@@ -105,7 +110,40 @@ func BurnRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Hand
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
-		// Broadcast or return unsigned transaction
-		utils.SendOrReturnUnsignedTx(w, cliCtx, m.BaseTx, []sdk.Msg{msg})
+
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
+
+		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
+	}
+}
+
+// SetMemoRegexpRequestHandlerFn - http request handler to set memo regexp
+// nolint: gocyclo
+func SetMemoRegexpRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		bech32addr := vars["address"]
+		owner, err := sdk.AccAddressFromBech32(bech32addr)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+		var m setMemoRegexpBody
+		err = utils.ReadPostBody(w, r, cdc, &m)
+		if err != nil {
+			return
+		}
+		baseReq := m.BaseTx.Sanitize()
+		if !baseReq.ValidateBasic(w) {
+			return
+		}
+
+		// Build message
+		regexp := m.MemoRegexp
+		msg := bank.BuildSetMemoRegexp(owner, regexp)
+
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
+
+		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
 	}
 }

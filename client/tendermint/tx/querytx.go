@@ -5,15 +5,16 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/client"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/tendermint"
 	"github.com/irisnet/irishub/client/tendermint/rpc"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/codec"
-	"github.com/irisnet/irishub/modules/auth"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/spf13/cobra"
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -91,26 +92,28 @@ func MakeResponseHumanReadable(dtx abci.ResponseDeliverTx) ResponseDeliverTx {
 	}
 }
 
-func formatTxResult(cdc *codec.Codec, res *ctypes.ResultTx) (Info, error) {
+func formatTxResult(cdc *codec.Codec, res *ctypes.ResultTx, resBlock *ctypes.ResultBlock) (Info, error) {
 	tx, err := parseTx(cdc, res.Tx)
 	if err != nil {
 		return Info{}, err
 	}
 
 	return Info{
-		Hash:   res.Hash,
-		Height: res.Height,
-		Tx:     tx,
-		Result: MakeResponseHumanReadable(res.TxResult),
+		Hash:      res.Hash,
+		Height:    res.Height,
+		Tx:        tx,
+		Result:    MakeResponseHumanReadable(res.TxResult),
+		Timestamp: resBlock.Block.Time.Format(time.RFC3339),
 	}, nil
 }
 
 // Info is used to prepare info to display
 type Info struct {
-	Hash   common.HexBytes   `json:"hash"`
-	Height int64             `json:"height"`
-	Tx     sdk.Tx            `json:"tx"`
-	Result ResponseDeliverTx `json:"result"`
+	Hash      common.HexBytes   `json:"hash"`
+	Height    int64             `json:"height"`
+	Tx        sdk.Tx            `json:"tx"`
+	Result    ResponseDeliverTx `json:"result"`
+	Timestamp string            `json:"timestamp,omitempty"`
 }
 
 func parseTx(cdc *codec.Codec, txBytes []byte) (sdk.Tx, error) {
@@ -126,11 +129,12 @@ func parseTx(cdc *codec.Codec, txBytes []byte) (sdk.Tx, error) {
 
 // Info is used to prepare info to display
 type InfoCoinFlow struct {
-	Hash     common.HexBytes   `json:"hash"`
-	Height   int64             `json:"height"`
-	Tx       sdk.Tx            `json:"tx"`
-	Result   ResponseDeliverTx `json:"result"`
-	CoinFlow []string          `json:"coin_flow"`
+	Hash      common.HexBytes   `json:"hash"`
+	Height    int64             `json:"height"`
+	Tx        sdk.Tx            `json:"tx"`
+	Result    ResponseDeliverTx `json:"result"`
+	Timestamp string            `json:"timestamp,omitempty"`
+	CoinFlow  []string          `json:"coin_flow"`
 }
 
 func queryTxWithCoinFlow(cdc *codec.Codec, cliCtx context.CLIContext, hashHexStr string) ([]byte, error) {
@@ -161,17 +165,23 @@ func queryTxWithCoinFlow(cdc *codec.Codec, cliCtx context.CLIContext, hashHexStr
 		return nil, err
 	}
 
+	resBlocks, err := getBlocksForTxResults(cliCtx, []*ctypes.ResultTx{res})
+	if err != nil {
+		return nil, err
+	}
+
 	tx, err := parseTx(cdc, res.Tx)
 	if err != nil {
 		return nil, err
 	}
 
 	info := InfoCoinFlow{
-		Hash:     res.Hash,
-		Height:   res.Height,
-		Tx:       tx,
-		Result:   MakeResponseHumanReadable(res.TxResult),
-		CoinFlow: coinFlow,
+		Hash:      res.Hash,
+		Height:    res.Height,
+		Tx:        tx,
+		Result:    MakeResponseHumanReadable(res.TxResult),
+		CoinFlow:  coinFlow,
+		Timestamp: resBlocks[res.Height].Block.Time.Format(time.RFC3339),
 	}
 
 	if cliCtx.Indent {
@@ -194,4 +204,26 @@ func QueryTxRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.H
 
 		utils.PostProcessResponse(w, cdc, output, cliCtx.Indent)
 	}
+}
+
+func getBlocksForTxResults(cliCtx context.CLIContext, resTxs []*ctypes.ResultTx) (map[int64]*ctypes.ResultBlock, error) {
+	node, err := cliCtx.GetNode()
+	if err != nil {
+		return nil, err
+	}
+
+	resBlocks := make(map[int64]*ctypes.ResultBlock)
+
+	for _, resTx := range resTxs {
+		if _, ok := resBlocks[resTx.Height]; !ok {
+			resBlock, err := node.Block(&resTx.Height)
+			if err != nil {
+				return nil, err
+			}
+
+			resBlocks[resTx.Height] = resBlock
+		}
+	}
+
+	return resBlocks, nil
 }

@@ -6,11 +6,13 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client"
+	assethandler "github.com/irisnet/irishub/client/asset/lcd"
 	bankhandler "github.com/irisnet/irishub/client/bank/lcd"
 	"github.com/irisnet/irishub/client/context"
 	distributionhandler "github.com/irisnet/irishub/client/distribution/lcd"
 	govhandler "github.com/irisnet/irishub/client/gov/lcd"
-	keyshandler "github.com/irisnet/irishub/client/keys/lcd"
+	paramshandle "github.com/irisnet/irishub/client/params/lcd"
+	randhandler "github.com/irisnet/irishub/client/rand/lcd"
 	servicehandle "github.com/irisnet/irishub/client/service/lcd"
 	slashinghandler "github.com/irisnet/irishub/client/slashing/lcd"
 	stakehandler "github.com/irisnet/irishub/client/stake/lcd"
@@ -96,7 +98,8 @@ func createHandler(cdc *codec.Codec) *mux.Router {
 	r.HandleFunc("/version", CLIVersionRequestHandler).Methods("GET")
 	r.HandleFunc("/node-version", NodeVersionRequestHandler(cliCtx)).Methods("GET")
 
-	keyshandler.RegisterRoutes(r, cliCtx.Indent)
+	assethandler.RegisterRoutes(cliCtx, r, cdc)
+	randhandler.RegisterRoutes(cliCtx, r, cdc)
 	bankhandler.RegisterRoutes(cliCtx, r, cdc)
 	txhandler.RegisterRoutes(cliCtx, r, cdc)
 	distributionhandler.RegisterRoutes(cliCtx, r, cdc)
@@ -104,6 +107,7 @@ func createHandler(cdc *codec.Codec) *mux.Router {
 	stakehandler.RegisterRoutes(cliCtx, r, cdc)
 	govhandler.RegisterRoutes(cliCtx, r, cdc)
 	servicehandle.RegisterRoutes(cliCtx, r, cdc)
+	paramshandle.RegisterRoutes(cliCtx, r, cdc)
 	// tendermint apis
 	rpchandler.RegisterRoutes(cliCtx, r, cdc)
 	ttxhandler.RegisterRoutes(cliCtx, r, cdc)

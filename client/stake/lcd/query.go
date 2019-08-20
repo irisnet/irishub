@@ -1,15 +1,15 @@
 package lcd
 
 import (
-	"github.com/irisnet/irishub/codec"
-	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/modules/stake/tags"
-	"github.com/irisnet/irishub/modules/stake/types"
 	"github.com/gorilla/mux"
+	"github.com/irisnet/irishub/app/v1/stake/tags"
+	"github.com/irisnet/irishub/app/v1/stake/types"
 	"github.com/irisnet/irishub/client/context"
 	stakeClient "github.com/irisnet/irishub/client/stake"
 	"github.com/irisnet/irishub/client/tendermint/tx"
 	"github.com/irisnet/irishub/client/utils"
+	"github.com/irisnet/irishub/codec"
+	sdk "github.com/irisnet/irishub/types"
 	"net/http"
 	"strings"
 )
@@ -138,12 +138,6 @@ func delegatorTxsHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.Han
 			return
 		}
 
-		node, err := cliCtx.GetNode()
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-			return
-		}
-
 		// Get values from query
 
 		typesQuery := r.URL.Query().Get("type")
@@ -180,7 +174,7 @@ func delegatorTxsHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.Han
 		}
 
 		for _, action := range actions {
-			foundTxs, errQuery := queryTxs(node, cliCtx, cdc, action, delegatorAddr)
+			foundTxs, errQuery := queryTxs(cliCtx, cdc, action, delegatorAddr)
 			if errQuery != nil {
 				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			}

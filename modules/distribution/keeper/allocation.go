@@ -66,7 +66,7 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, percentVotes sdk.Dec, proposer s
 	communityFunding := feesCollectedDec.MulDec(communityTax)
 	feePool.CommunityPool = feePool.CommunityPool.Plus(communityFunding)
 
-	communityTaxAmount, err := strconv.ParseFloat(feePool.CommunityPool.AmountOf(sdk.NativeTokenMinDenom).QuoInt(sdk.AttoPrecision).String(), 64)
+	communityTaxAmount, err := strconv.ParseFloat(feePool.CommunityPool.AmountOf(sdk.IrisAtto).QuoInt(sdk.AttoScaleFactor).String(), 64)
 	if err == nil {
 		k.metrics.CommunityTax.Set(communityTaxAmount)
 	}
@@ -92,7 +92,7 @@ func (k Keeper) AllocateFeeTax(ctx sdk.Context, destAddr sdk.AccAddress, percent
 	allocateCoins, _ := communityPool.MulDec(percent).TruncateDecimal()
 	feePool.CommunityPool = communityPool.Minus(types.NewDecCoins(allocateCoins))
 
-	communityTaxAmount, err := strconv.ParseFloat(feePool.CommunityPool.AmountOf(sdk.NativeTokenMinDenom).QuoInt(sdk.AttoPrecision).String(), 64)
+	communityTaxAmount, err := strconv.ParseFloat(feePool.CommunityPool.AmountOf(sdk.IrisAtto).QuoInt(sdk.AttoScaleFactor).String(), 64)
 	if err == nil {
 		k.metrics.CommunityTax.Set(communityTaxAmount)
 	}
@@ -108,7 +108,7 @@ func (k Keeper) AllocateFeeTax(ctx sdk.Context, destAddr sdk.AccAddress, percent
 	} else {
 		logger.Info("Grant community tax to account", "grant_amount", allocateCoins.String(), "grant_address", destAddr.String())
 		if !allocateCoins.IsZero() {
-			ctx.CoinFlowTags().AppendCoinFlowTag(ctx, "", destAddr.String(), allocateCoins.String(), sdk.CommunityTaxUseFlow, "")
+			ctx.CoinFlowTags().AppendCoinFlowTag(ctx, "", destAddr.String(), allocateCoins.String(), sdk.CommunityTaxCollectFlow, "")
 		}
 		_, _, err := k.bankKeeper.AddCoins(ctx, destAddr, allocateCoins)
 		if err != nil {

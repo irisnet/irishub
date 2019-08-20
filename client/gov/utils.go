@@ -1,21 +1,22 @@
 package gov
 
 import (
+	"github.com/irisnet/irishub/app/v1/asset"
+	"github.com/irisnet/irishub/app/v1/auth"
+	distr "github.com/irisnet/irishub/app/v1/distribution"
+	"github.com/irisnet/irishub/app/v1/gov"
+	"github.com/irisnet/irishub/app/v1/mint"
+	"github.com/irisnet/irishub/app/v1/params"
+	"github.com/irisnet/irishub/app/v1/service"
+	"github.com/irisnet/irishub/app/v1/slashing"
+	"github.com/irisnet/irishub/app/v1/stake"
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/modules/params"
-	"github.com/irisnet/irishub/modules/mint"
-	"github.com/irisnet/irishub/modules/slashing"
-	"github.com/irisnet/irishub/modules/service"
-	"github.com/irisnet/irishub/modules/auth"
-	"github.com/irisnet/irishub/modules/stake"
-	"github.com/irisnet/irishub/modules/gov"
-	distr "github.com/irisnet/irishub/modules/distribution"
 )
 
 var ParamSets = make(map[string]params.ParamSet)
 
 func init() {
-	params.RegisterParamSet(ParamSets, &mint.Params{}, &slashing.Params{}, &service.Params{}, &auth.Params{}, &stake.Params{}, &distr.Params{})
+	params.RegisterParamSet(ParamSets, &mint.Params{}, &slashing.Params{}, &service.Params{}, &auth.Params{}, &stake.Params{}, &distr.Params{}, &asset.Params{}, &gov.GovParams{})
 }
 
 // Deposit
@@ -48,12 +49,12 @@ func NormalizeVoteOption(option string) string {
 //NormalizeProposalType - normalize user specified proposal type
 func NormalizeProposalType(proposalType string) string {
 	switch proposalType {
-	case "ParameterChange", "parameter_change":
-		return "ParameterChange"
+	case "Parameter", "parameter":
+		return "Parameter"
 	case "SoftwareUpgrade", "software_upgrade":
 		return "SoftwareUpgrade"
-	case "TxTaxUsage", "tx_tax_usage":
-		return "TxTaxUsage"
+	case "CommunityTaxUsage", "community_tax_usage":
+		return "CommunityTaxUsage"
 	}
 	return proposalType
 }
@@ -73,15 +74,16 @@ func NormalizeProposalStatus(status string) string {
 	return status
 }
 
-func ValidateParam(params gov.Params) error {
-	for _, param := range params {
-		if p, ok := ParamSets[param.Subspace]; ok {
-			if _, err := p.Validate(param.Key, param.Value); err != nil {
-				return err
-			}
-		} else {
+func ValidateParam(param gov.Param) error {
+	if p, ok := ParamSets[param.Subspace]; ok {
+		if p.ReadOnly() {
 			return gov.ErrInvalidParam(gov.DefaultCodespace, param.Subspace)
 		}
+		if _, err := p.Validate(param.Key, param.Value); err != nil {
+			return err
+		}
+	} else {
+		return gov.ErrInvalidParam(gov.DefaultCodespace, param.Subspace)
 	}
 	return nil
 }
