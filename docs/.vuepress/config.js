@@ -154,7 +154,7 @@ module.exports = {
                         title: 'Random',
                         collapsable: false,
                         children: [
-                            ['random/', 'iriscli rand']
+                            ['rand/', 'iriscli rand']
                         ]
                     }],
                     '/resources/': [
@@ -307,7 +307,7 @@ module.exports = {
                         title: '随机数',
                         collapsable: false,
                         children: [
-                            ['random/', 'iriscli rand']
+                            ['rand/', 'iriscli rand']
                         ]
                     }],
                     '/zh/resources/': [
