@@ -2,7 +2,6 @@ package v1
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/app/v1/asset"
@@ -120,11 +119,6 @@ func (p *ProtocolV1) prepForZeroHeightGenesis(ctx sdk.Context) {
 	feePool := p.distrKeeper.GetFeePool(ctx)
 	if !feePool.TotalValAccum.Accum.IsZero() {
 		panic("unexpected leftover validator accum")
-	}
-	bondDenom := p.StakeKeeper.BondDenom()
-	if !feePool.ValPool.AmountOf(bondDenom).IsZero() {
-		panic(fmt.Sprintf("unexpected leftover validator pool coins: %v",
-			feePool.ValPool.AmountOf(bondDenom).String()))
 	}
 
 	// reset fee pool height, save fee pool
