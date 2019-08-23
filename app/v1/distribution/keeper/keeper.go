@@ -54,9 +54,12 @@ func (k Keeper) GetFeePool(ctx sdk.Context) (feePool types.FeePool) {
 
 // set the global fee pool distribution info
 func (k Keeper) SetGenesisFeePool(ctx sdk.Context, feePool types.FeePool) {
-	//coins, _ := feePool.CommunityPool.TruncateDecimal()
-	//k.bankKeeper.IncreaseLoosenToken(ctx, coins)
-	//feePool.CommunityPool = types.NewDecCoins(coins)
+	if !feePool.ValPool.IsZero() {
+		coins, _ := feePool.ValPool.TruncateDecimal()
+		k.bankKeeper.IncreaseLoosenToken(ctx, coins)
+		feePool.ValPool = types.NewDecCoins(coins)
+	}
+
 	store := ctx.KVStore(k.storeKey)
 	b := k.cdc.MustMarshalBinaryLengthPrefixed(feePool)
 	store.Set(FeePoolKey, b)
