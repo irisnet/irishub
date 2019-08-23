@@ -40,17 +40,17 @@ func (k Keeper) HandleSwap(ctx sdk.Context, msg types.MsgSwapOrder) (sdk.Tags, s
 	var err sdk.Error
 	var isDoubleSwap = msg.Input.Coin.Denom != sdk.IrisAtto && msg.Output.Coin.Denom != sdk.IrisAtto
 
-	if isDoubleSwap && msg.IsBuyOrder {
+	if msg.IsBuyOrder && isDoubleSwap {
 		amount, err = k.doubleTradeInputForExactOutput(ctx, msg.Input, msg.Output)
-	} else if isDoubleSwap && !msg.IsBuyOrder {
-		amount, err = k.doubleTradeExactInputForOutput(ctx, msg.Input, msg.Output)
-	} else if !isDoubleSwap && msg.IsBuyOrder {
+	} else if msg.IsBuyOrder && !isDoubleSwap {
 		amount, err = k.tradeInputForExactOutput(ctx, msg.Input, msg.Output)
-	} else if !isDoubleSwap && !msg.IsBuyOrder {
+	} else if !msg.IsBuyOrder && isDoubleSwap {
+		amount, err = k.doubleTradeExactInputForOutput(ctx, msg.Input, msg.Output)
+	} else if !msg.IsBuyOrder && !isDoubleSwap {
 		amount, err = k.tradeExactInputForOutput(ctx, msg.Input, msg.Output)
 	}
 	if err != nil {
-		return nil, err
+		return tags, err
 	}
 
 	tags = sdk.NewTags(
