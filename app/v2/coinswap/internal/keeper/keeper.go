@@ -53,11 +53,13 @@ func (k Keeper) HandleSwap(ctx sdk.Context, msg types.MsgSwapOrder) (sdk.Tags, s
 		return nil, err
 	}
 
-	tags.AppendTag(types.TagAmount, []byte(amount.String()))
-	tags.AppendTag(types.TagSender, msg.Input.Address)
-	tags.AppendTag(types.TagRecipient, msg.Output.Address)
-	tags.AppendTag(types.TagIsBuyOrder, []byte(strconv.FormatBool(msg.IsBuyOrder)))
-	tags.AppendTag(types.TagTokenPair, []byte(getTokenPairByDenom(msg.Input.Coin.Denom, msg.Output.Coin.Denom)))
+	tags = sdk.NewTags(
+		types.TagAmount, []byte(amount.String()),
+		types.TagSender, []byte(msg.Input.Address.String()),
+		types.TagRecipient, []byte(msg.Output.Address.String()),
+		types.TagIsBuyOrder, []byte(strconv.FormatBool(msg.IsBuyOrder)),
+		types.TagTokenPair, []byte(getTokenPairByDenom(msg.Input.Coin.Denom, msg.Output.Coin.Denom)),
+	)
 	return tags, nil
 }
 
@@ -99,8 +101,10 @@ func (k Keeper) HandleAddLiquidity(ctx sdk.Context, msg types.MsgAddLiquidity) (
 		}
 	}
 
-	tags.AppendTag(types.TagSender, msg.Sender)
-	tags.AppendTag(types.TagTokenPair, []byte(getTokenPairByDenom(msg.MaxToken.Denom, sdk.IrisAtto)))
+	tags = sdk.NewTags(
+		types.TagSender, []byte(msg.Sender.String()),
+		types.TagTokenPair, []byte(getTokenPairByDenom(msg.MaxToken.Denom, sdk.IrisAtto)),
+	)
 	return tags, k.addLiquidity(ctx, msg.Sender, irisCoin, depositToken, uniId, mintLiquidityAmt)
 }
 
@@ -172,8 +176,10 @@ func (k Keeper) HandleRemoveLiquidity(ctx sdk.Context, msg types.MsgRemoveLiquid
 		return tags, types.ErrConstraintNotMet(fmt.Sprintf("The amount of token available [%s] is less than the minimum amount specified [%s] by the user.", tokenWithdrawCoin.String(), sdk.NewCoin(minTokenDenom, msg.MinToken).String()))
 	}
 	poolAddr := getReservePoolAddr(uniId)
-	tags.AppendTag(types.TagSender, msg.Sender)
-	tags.AppendTag(types.TagTokenPair, []byte(getTokenPairByDenom(minTokenDenom, sdk.IrisAtto)))
+	tags = sdk.NewTags(
+		types.TagSender, []byte(msg.Sender.String()),
+		types.TagTokenPair, []byte(getTokenPairByDenom(minTokenDenom, sdk.IrisAtto)),
+	)
 	return tags, k.removeLiquidity(ctx, poolAddr, msg.Sender, deductUniCoin, irisWithdrawCoin, tokenWithdrawCoin)
 }
 
@@ -237,5 +243,5 @@ func getTokenPairByDenom(inputDenom, outputDenom string) string {
 		panic(err)
 	}
 
-	return fmt.Sprintf("%s-%s", inputToken, outputToken)
+	return fmt.Sprintf("%s-%s", outputToken, inputToken)
 }
