@@ -14,14 +14,13 @@ import (
 )
 
 const (
-	BlockStoreCostPerByte = 10
-	ed25519VerifyCost     = 59
-	secp256k1VerifyCost   = 100
-	maxMemoCharacters     = 100
-	// how much gas = 1 atom
-	gasPerUnitCost = 1000
-	// max total number of sigs per tx
-	txSigLimit = 7
+	ed25519VerifyCost   = 59
+	secp256k1VerifyCost = 100
+
+	// if gas > gasShift, gas = log(gas)/log(gasBase)
+	// else gasConsumed = gas
+	gasBase  = 1.02 // gas logarithm base
+	gasShift = 285  // gas logarithm shift
 )
 
 // NewAnteHandler returns an AnteHandler that checks
@@ -308,7 +307,7 @@ func setGasMeter(simulate bool, ctx sdk.Context, gasLimit uint64) sdk.Context {
 	if simulate || ctx.BlockHeight() == 0 {
 		return ctx.WithGasMeter(sdk.NewInfiniteGasMeter())
 	}
-	return ctx.WithGasMeter(sdk.NewGasMeter(gasLimit))
+	return ctx.WithGasMeter(sdk.NewGasMeterWithBase(gasLimit, gasBase, gasShift))
 }
 
 func getSignBytesList(chainID string, stdTx StdTx, stdSigs []StdSignature) (signatureBytesList [][]byte) {

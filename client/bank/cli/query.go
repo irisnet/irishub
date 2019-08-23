@@ -2,6 +2,7 @@ package cli
 
 import (
 	"fmt"
+
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/app/v1/asset"
 	"github.com/irisnet/irishub/app/v1/auth"
@@ -53,7 +54,7 @@ func GetAccountCmd(cdc *codec.Codec, decoder auth.AccountDecoder) *cobra.Command
 func GetCmdQueryCoinType(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "coin-type [coin_name]",
-		Short:   "query coin type",
+		Short:   "Query coin type",
 		Example: "iriscli bank coin-type iris",
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -74,7 +75,7 @@ func GetCmdQueryCoinType(cdc *codec.Codec) *cobra.Command {
 func GetCmdQueryTokenStats(cdc *codec.Codec, decoder auth.AccountDecoder) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "token-stats [id]",
-		Short:   "query token statistics",
+		Short:   "Query token statistics",
 		Example: "iriscli bank token-stats iris",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithAccountDecoder(decoder)
