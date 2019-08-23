@@ -12,4 +12,8 @@ const (
 
 	// QuerierRoute is the querier route for the coinswap module.
 	QuerierRoute = StoreKey
+
+	MsgTypeAddLiquidity    = "add_liquidity"
+	MsgTypeRemoveLiquidity = "remove_liquidity"
+	MsgTypeSwapOrder       = "swap_order"
 )

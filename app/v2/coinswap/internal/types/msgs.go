@@ -59,7 +59,7 @@ func NewMsgSwapOrder(
 func (msg MsgSwapOrder) Route() string { return RouterKey }
 
 // Type Implements Msg.
-func (msg MsgSwapOrder) Type() string { return "swap_order" }
+func (msg MsgSwapOrder) Type() string { return MsgTypeSwapOrder }
 
 // ValidateBasic Implements Msg.
 func (msg MsgSwapOrder) ValidateBasic() sdk.Error {
@@ -129,7 +129,7 @@ func NewMsgAddLiquidity(
 func (msg MsgAddLiquidity) Route() string { return RouterKey }
 
 // Type Implements Msg.
-func (msg MsgAddLiquidity) Type() string { return "add_liquidity" }
+func (msg MsgAddLiquidity) Type() string { return MsgTypeAddLiquidity }
 
 // ValidateBasic Implements Msg.
 func (msg MsgAddLiquidity) ValidateBasic() sdk.Error {
@@ -199,7 +199,7 @@ func NewMsgRemoveLiquidity(
 func (msg MsgRemoveLiquidity) Route() string { return RouterKey }
 
 // Type Implements Msg.
-func (msg MsgRemoveLiquidity) Type() string { return "remove_liquidity" }
+func (msg MsgRemoveLiquidity) Type() string { return MsgTypeRemoveLiquidity }
 
 // ValidateBasic Implements Msg.
 func (msg MsgRemoveLiquidity) ValidateBasic() sdk.Error {
