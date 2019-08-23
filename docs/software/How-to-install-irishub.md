@@ -1,9 +1,9 @@
 # How to install `iris` 
 
-### The Latest version of IRIShub : v0.14.1
+### The Latest version of IRIShub : v0.15.1
 refer to : https://github.com/irisnet/irishub/releases/latest
 ```
-Please replace <latest_iris_version> with v0.14.1 while using "git checkout" 
+Please replace <latest_iris_version> with v0.15.1 while using "git checkout" 
 ```
 
 You can download the source code from github and compile it locally.
@@ -24,7 +24,7 @@ It's recommended that you run a validator node on Linux Server.
 #### Install Go
 
 ::: tip
-**Go 1.12.1+** is required for the IRIShub.
+**Go 1.12.5+** is required for the IRIShub.
 :::
 
 Install `go` by following the [official docs](https://golang.org/doc/install).
