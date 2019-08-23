@@ -5,6 +5,6 @@ var (
 	TagAmount     = "amount"
 	TagSender     = "sender"
 	TagRecipient  = "recipient"
-	TagIsBuyOrder = "is_buy_order"
-	TagTokenPair  = "token_pair"
+	TagIsBuyOrder = "is-buy-order"
+	TagTokenPair  = "token-pair"
 )
