@@ -1,9 +1,9 @@
 # 如何安装`iris`
 
-### 当前IRIShub最新版本为 ： v0.14.1
+### 当前IRIShub最新版本为： v0.15.1
 获取最新版本 https://github.com/irisnet/irishub/releases/latest
 ```
-注意：使用 git checkout 命令时，请将 <latest_iris_version> 替换成 v0.14.1
+注意：使用 git checkout 命令时，请将 <latest_iris_version> 替换成 v0.15.1
 ```
 
 ### 源码编译安装
@@ -26,7 +26,7 @@ IRIShub是用Go语言编写的。它可以在任何能够编译并运行Go语言
 #### 安装Go
 
 ::: tip
-IRIShub需要 **Go 1.12.1+**.
+IRIShub需要 **Go 1.12.5+**.
 :::
 
 参照[官方文档](https://golang.org/doc/install)安装 `go`。
