@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.15.1
+
+*Aug 22th, 2019*
+
+### Application
+* [\#1895](https://github.com/irisnet/irishub/issues/1895) Run tendermint cleanupFunc before Exit
+* [\#1897](https://github.com/irisnet/irishub/issues/1897) Fix possible panic on exporting genesis file
+
 ## 0.15.0
 
 *Aug 20th, 2019*

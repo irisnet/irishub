@@ -14,9 +14,6 @@ func InitGenesis(ctx sdk.Context, keeper Keeper, data types.GenesisState) {
 	}
 	keeper.SetParams(ctx, data.Params)
 
-	if !data.FeePool.ValPool.IsZero() {
-		panic(fmt.Sprintf("Global validator pool(%s) is not zero", data.FeePool.ValPool.ToString()))
-	}
 	keeper.SetGenesisFeePool(ctx, data.FeePool)
 
 	for _, vdi := range data.ValidatorDistInfos {
