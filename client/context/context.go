@@ -3,6 +3,7 @@ package context
 import (
 	"bytes"
 	"fmt"
+	"github.com/irisnet/irishub/app/v2/coinswap"
 	"io"
 	"os"
 	"strings"
@@ -242,6 +243,8 @@ func (cliCtx CLIContext) GetCoinType(coinName string) (sdk.CoinType, error) {
 	}
 	if coinName == sdk.Iris {
 		coinType = sdk.IrisCoinType
+	} else if strings.HasPrefix(coinName, coinswap.FormatUniIdPrefix) {
+		return coinswap.GetUniCoinType(coinName)
 	} else {
 		params := asset.QueryTokenParams{
 			TokenId: coinName,
