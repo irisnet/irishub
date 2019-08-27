@@ -6,7 +6,7 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 )
 
-func (k Keeper) SwapCoins(ctx sdk.Context, sender, recipient sdk.AccAddress, coinSold, coinBought sdk.Coin) sdk.Error {
+func (k Keeper) swapCoins(ctx sdk.Context, sender, recipient sdk.AccAddress, coinSold, coinBought sdk.Coin) sdk.Error {
 	uniId, err := types.GetUniId(coinSold.Denom, coinBought.Denom)
 	if err != nil {
 		return err
@@ -18,10 +18,15 @@ func (k Keeper) SwapCoins(ctx sdk.Context, sender, recipient sdk.AccAddress, coi
 		return err
 	}
 
+	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, sender.String(), poolAddr.String(), coinSold.String(), sdk.CoinSwapInputFlow, "")
+
 	if recipient.Empty() {
 		recipient = sender
 	}
 	_, err = k.bk.SendCoins(ctx, poolAddr, recipient, sdk.NewCoins(coinBought))
+
+	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, poolAddr.String(), recipient.String(), coinBought.String(), sdk.CoinSwapOutputFlow, "")
+
 	return err
 }
 
@@ -74,7 +79,7 @@ func (k Keeper) tradeExactInputForOutput(ctx sdk.Context, input types.Input, out
 		return sdk.ZeroInt(), types.ErrConstraintNotMet(fmt.Sprintf("token amount (%s) to be bought was less than the minimum amount (%s)", boughtTokenAmt, output.Coin.Amount))
 	}
 	boughtToken := sdk.NewCoin(output.Coin.Denom, boughtTokenAmt)
-	err = k.SwapCoins(ctx, input.Address, output.Address, input.Coin, boughtToken)
+	err = k.swapCoins(ctx, input.Address, output.Address, input.Coin, boughtToken)
 	if err != nil {
 		return sdk.ZeroInt(), err
 	}
@@ -95,7 +100,7 @@ func (k Keeper) doubleTradeExactInputForOutput(ctx sdk.Context, input types.Inpu
 		return sdk.ZeroInt(), err
 	}
 	nativeCoin := sdk.NewCoin(sdk.IrisAtto, nativeAmount)
-	err = k.SwapCoins(ctx, input.Address, output.Address, input.Coin, nativeCoin)
+	err = k.swapCoins(ctx, input.Address, output.Address, input.Coin, nativeCoin)
 	if err != nil {
 		return sdk.ZeroInt(), err
 	}
@@ -111,7 +116,7 @@ func (k Keeper) doubleTradeExactInputForOutput(ctx sdk.Context, input types.Inpu
 		return sdk.ZeroInt(), types.ErrConstraintNotMet(fmt.Sprintf("token amount (%s) to be bought was less than the minimum amount (%s)", boughtAmt, output.Coin.Amount))
 	}
 
-	err = k.SwapCoins(ctx, input.Address, output.Address, nativeCoin, boughtToken)
+	err = k.swapCoins(ctx, input.Address, output.Address, nativeCoin, boughtToken)
 	if err != nil {
 		return sdk.ZeroInt(), err
 	}
@@ -170,7 +175,7 @@ func (k Keeper) tradeInputForExactOutput(ctx sdk.Context, input types.Input, out
 		return sdk.ZeroInt(), types.ErrConstraintNotMet(fmt.Sprintf("token amount (%s) to be bought was less than the minimum amount (%s)", soldTokenAmt, input.Coin.Amount))
 	}
 	soldToken := sdk.NewCoin(input.Coin.Denom, soldTokenAmt)
-	err = k.SwapCoins(ctx, input.Address, output.Address, soldToken, output.Coin)
+	err = k.swapCoins(ctx, input.Address, output.Address, soldToken, output.Coin)
 	if err != nil {
 		return sdk.ZeroInt(), err
 	}
@@ -204,11 +209,11 @@ func (k Keeper) doubleTradeInputForExactOutput(ctx sdk.Context, input types.Inpu
 		return sdk.ZeroInt(), types.ErrConstraintNotMet(fmt.Sprintf("token amount (%s) to be bought was less than the minimum amount (%s)", soldTokenAmt, input.Coin.Amount))
 	}
 
-	err = k.SwapCoins(ctx, input.Address, output.Address, soldTokenCoin, soldIrisCoin)
+	err = k.swapCoins(ctx, input.Address, output.Address, soldTokenCoin, soldIrisCoin)
 	if err != nil {
 		return sdk.ZeroInt(), err
 	}
-	err = k.SwapCoins(ctx, input.Address, output.Address, soldIrisCoin, output.Coin)
+	err = k.swapCoins(ctx, input.Address, output.Address, soldIrisCoin, output.Coin)
 	if err != nil {
 		return sdk.ZeroInt(), err
 	}
