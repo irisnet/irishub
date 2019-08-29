@@ -69,7 +69,7 @@ func GetCmdQuerySignals(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "query-signals",
 		Short:   "query the information of signals",
-		Example: "iriscli upgrade status",
+		Example: "iriscli upgrade query-signals",
 		RunE: func(cmd *cobra.Command, args []string) error {
 
 			cliCtx := context.NewCLIContext().
