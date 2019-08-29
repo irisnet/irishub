@@ -32,7 +32,7 @@ blast change tumble toddler rival ordinary chicken dirt physical club few langua
 ```
 iriscli keys add <key_name> --recover
 ```
-### 获得IRIS代币(仅限Testnet 测试网)
+### 获得IRIS代币(仅限 Fuxi Testnet 测试网)
 
 
 一旦你完成了账户的创建，你可以通过[水龙头](https://testnet.irisplorer.io/#/faucet)获得用于测试网的IRIS token,然后你就可以将这部分IRIS用于绑定成为验证人。

@@ -34,6 +34,6 @@ If you plan to use a KMS (key management system), you should go through these st
 
 ##  Useful Links
 
-* Riot chat: #irisvalidators:matrix.org
+- Riot chat: #irisvalidators:matrix.org
 
-* Explorer: https://www.irisplorer.io/#/home
+- Explorer: <https://www.irisplorer.io>
