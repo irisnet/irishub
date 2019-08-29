@@ -138,8 +138,8 @@ func (k Keeper) calculateWithExactOutput(ctx sdk.Context, exactBoughtCoin sdk.Co
 	if reservePool == nil {
 		return sdk.ZeroInt(), types.ErrReservePoolNotExists(fmt.Sprintf("reserve pool for %s not found", uniId))
 	}
-	inputReserve := reservePool.AmountOf(exactBoughtCoin.Denom)
-	outputReserve := reservePool.AmountOf(soldTokenDenom)
+	outputReserve := reservePool.AmountOf(exactBoughtCoin.Denom)
+	inputReserve := reservePool.AmountOf(soldTokenDenom)
 
 	if !inputReserve.IsPositive() {
 		return sdk.ZeroInt(), types.ErrInsufficientFunds(fmt.Sprintf("insufficient funds, actual:%s", inputReserve.String()))
