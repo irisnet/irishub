@@ -48,7 +48,9 @@ go version
 
 ### 安装 `iris`
 
-在完成Go的安装后，通过以下命令下载并安装IRIShub相关程序.(请确保你的电脑可以访问`google.com`， `iris`很多库的依赖由google提供)
+在完成Go的安装后，通过以下命令下载并安装IRIShub相关程序.
+
+请确保你的电脑可以访问`google.com`， `iris`很多库的依赖由google提供（如果无法访问，你也可以尝试添加一个代理: `export GOPROXY=https://goproxy.io`）
 
 ```bash
 git clone --branch <latest_iris_version> https://github.com/irisnet/irishub
