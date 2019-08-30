@@ -40,10 +40,12 @@ module.exports = {
                         ['kms/kms.md', 'Kms']
                     ],
                     '/get-started/': [
-                        ['Join-the-Testnet.md', 'Use the Testnet'],
-                        ['Join-the-Mainnet.md', 'Join the Mainnet'],
+                        ['Join-the-Mainnet.md', 'Mainnet'],
+                        ['Join-the-Testnet.md', 'Testnet'],
                         ['Full-Node.md', 'Full Node'],
-                        ['Validator-Node.md', 'Validator Node']
+                        ['Validator-Node.md', 'Validator Node'],
+                        ['Wallets.md', 'Wallets'],
+                        ['Explorers.md', 'Explorers']
                     ],
                     '/features/': [{
                         title: 'Basic Concepts',
@@ -193,10 +195,12 @@ module.exports = {
                         ['kms/kms.md', 'Kms']
                     ],
                     '/zh/get-started/': [
-                        ['Join-the-Testnet.md', '使用测试网'],
-                        ['Join-the-Mainnet.md', '加入主网'],
+                        ['Join-the-Mainnet.md', '主网'],
+                        ['Join-the-Testnet.md', '测试网'],
                         ['Full-Node.md', '全节点'],
-                        ['Validator-Node.md', '验证人节点']
+                        ['Validator-Node.md', '验证人节点'],
+                        ['Wallets.md', '钱包'],
+                        ['Explorers.md', '浏览器']
                     ],
                     '/zh/features/': [{
                         title: '基础概念',
