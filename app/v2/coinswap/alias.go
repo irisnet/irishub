@@ -35,11 +35,13 @@ var (
 	GetUniId                    = types.GetUniId
 	GetCoinMinDenomFromUniDenom = types.GetCoinMinDenomFromUniDenom
 	GetUniDenom                 = types.GetUniDenom
+	GetUniCoinType              = types.GetUniCoinType
 	CheckUniDenom               = types.CheckUniDenom
 	CheckUniId                  = types.CheckUniId
 )
 
 const (
-	DefaultCodespace = types.DefaultCodespace
-	ModuleName       = types.ModuleName
+	DefaultCodespace  = types.DefaultCodespace
+	ModuleName        = types.ModuleName
+	FormatUniIdPrefix = types.FormatUniIdPrefix
 )

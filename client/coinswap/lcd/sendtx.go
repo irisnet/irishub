@@ -114,7 +114,7 @@ func addLiquidityHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Han
 		deadline := time.Now().Add(duration)
 
 		maxToken, ok := sdk.NewIntFromString(req.MaxToken)
-		if !ok {
+		if !ok || !maxToken.IsPositive() {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, "invalid max token amount: " + req.MaxToken)
 			return
 		}
@@ -194,7 +194,7 @@ func removeLiquidityHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.
 		}
 
 		liquidityAmt, ok := sdk.NewIntFromString(req.WithdrawLiquidity)
-		if !ok {
+		if !ok || !liquidityAmt.IsPositive() {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, "invalid liquidity amount: " + req.WithdrawLiquidity)
 			return
 		}

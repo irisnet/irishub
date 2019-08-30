@@ -38,6 +38,22 @@ func GetCoinMinDenomFromUniDenom(uniDenom string) (string, sdk.Error) {
 	return strings.TrimPrefix(uniDenom, FormatUniIdPrefix), nil
 }
 
+// GetUniCoinType returns the uni coin type
+func GetUniCoinType(uniId string) (sdk.CoinType, sdk.Error) {
+	uniDenom, err := GetUniDenom(uniId)
+	if err != nil {
+		return sdk.CoinType{}, err
+	}
+	units := make(sdk.Units, 2)
+	units[0] = sdk.NewUnit(uniId, 0)
+	units[1] = sdk.NewUnit(uniDenom, sdk.AttoScale) // the uni denom has the same decimal with iris-atto
+	return sdk.CoinType{
+		Name:    uniId,
+		MinUnit: units[1],
+		Units:   units,
+	}, nil
+}
+
 // CheckUniDenom returns nil if the uni denom is valid
 func CheckUniDenom(uniDenom string) sdk.Error {
 	if !sdk.IsCoinMinDenomValid(uniDenom) || !strings.HasPrefix(uniDenom, FormatUniIdPrefix) {
