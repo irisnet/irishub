@@ -49,10 +49,10 @@ func (k Keeper) calculateWithExactInput(ctx sdk.Context, exactSoldCoin sdk.Coin,
 	outputReserve := reservePool.AmountOf(boughtTokenDenom)
 
 	if !inputReserve.IsPositive() {
-		return sdk.ZeroInt(), types.ErrInsufficientFunds(fmt.Sprintf("insufficient funds, actual:%s", inputReserve.String()))
+		return sdk.ZeroInt(), types.ErrInsufficientFunds(fmt.Sprintf("reserve pool insufficient funds, actual [%s%s]", inputReserve.String(), exactSoldCoin.Denom))
 	}
 	if !outputReserve.IsPositive() {
-		return sdk.ZeroInt(), types.ErrInsufficientFunds(fmt.Sprintf("insufficient funds, actual:%s", outputReserve.String()))
+		return sdk.ZeroInt(), types.ErrInsufficientFunds(fmt.Sprintf("reserve pool insufficient funds, actual [%s%s]", outputReserve.String(), boughtTokenDenom))
 	}
 	param := k.GetParams(ctx)
 
@@ -142,13 +142,13 @@ func (k Keeper) calculateWithExactOutput(ctx sdk.Context, exactBoughtCoin sdk.Co
 	inputReserve := reservePool.AmountOf(soldTokenDenom)
 
 	if !inputReserve.IsPositive() {
-		return sdk.ZeroInt(), types.ErrInsufficientFunds(fmt.Sprintf("insufficient funds, actual:%s", inputReserve.String()))
+		return sdk.ZeroInt(), types.ErrInsufficientFunds(fmt.Sprintf("reserve pool insufficient funds, actual [%s%s]", inputReserve.String(), soldTokenDenom))
 	}
 	if !outputReserve.IsPositive() {
-		return sdk.ZeroInt(), types.ErrInsufficientFunds(fmt.Sprintf("insufficient funds, actual:%s", outputReserve.String()))
+		return sdk.ZeroInt(), types.ErrInsufficientFunds(fmt.Sprintf("reserve pool insufficient funds, actual [%s%s]", outputReserve.String(), exactBoughtCoin.Denom))
 	}
 	if exactBoughtCoin.Amount.GTE(outputReserve) {
-		return sdk.ZeroInt(), types.ErrInsufficientFunds(fmt.Sprintf("insufficient funds, want:%s,actual:%s", exactBoughtCoin.String(), outputReserve.String()))
+		return sdk.ZeroInt(), types.ErrInsufficientFunds(fmt.Sprintf("reserve pool insufficient funds, tokens[%s] to be brought could be not greater than or equal to %s", exactBoughtCoin.Denom, outputReserve.String()))
 	}
 	param := k.GetParams(ctx)
 
