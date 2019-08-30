@@ -23,10 +23,10 @@ func TestGetUniId(t *testing.T) {
 		expectResult string
 		expectPass   bool
 	}{
-		{"denom1 is native", native, "btc-min", "u-btc", true},
-		{"denom2 is native", "btc-min", native, "u-btc", true},
-		{"denom1 equals denom2", "btc-min", "btc-min", "u-btc", false},
-		{"neither denom is native", "eth-min", "btc-min", "u-btc", false},
+		{"denom1 is native", native, "btc-min", "uni:btc", true},
+		{"denom2 is native", "btc-min", native, "uni:btc", true},
+		{"denom1 equals denom2", "btc-min", "btc-min", "uni:btc", false},
+		{"neither denom is native", "eth-min", "btc-min", "uni:btc", false},
 	}
 
 	for _, tc := range cases {
@@ -132,23 +132,23 @@ func TestKeeperSwap(t *testing.T) {
 	_, err = keeper.HandleSwap(ctx, msg1)
 	require.Nil(t, err)
 	reservePoolBalances = keeper.ak.GetAccount(ctx, reservePoolAddr).GetCoins()
-	require.Equal(t, "900btc-min,1112iris-atto,1000u-btc-min", reservePoolBalances.String())
+	require.Equal(t, "900btc-min,1112iris-atto,1000uni:btc-min", reservePoolBalances.String())
 	senderBlances = keeper.ak.GetAccount(ctx, sender).GetCoins()
-	require.Equal(t, "99999100btc-min,99998888iris-atto,1000u-btc-min", senderBlances.String())
+	require.Equal(t, "99999100btc-min,99998888iris-atto,1000uni:btc-min", senderBlances.String())
 
 	// second swap
 	_, err = keeper.HandleSwap(ctx, msg1)
 	require.Nil(t, err)
 	reservePoolBalances = keeper.ak.GetAccount(ctx, reservePoolAddr).GetCoins()
-	require.Equal(t, "800btc-min,1252iris-atto,1000u-btc-min", reservePoolBalances.String())
+	require.Equal(t, "800btc-min,1252iris-atto,1000uni:btc-min", reservePoolBalances.String())
 	senderBlances = keeper.ak.GetAccount(ctx, sender).GetCoins()
-	require.Equal(t, "99999200btc-min,99998748iris-atto,1000u-btc-min", senderBlances.String())
+	require.Equal(t, "99999200btc-min,99998748iris-atto,1000uni:btc-min", senderBlances.String())
 
 	// third swap
 	_, err = keeper.HandleSwap(ctx, msg1)
 	require.Nil(t, err)
 	reservePoolBalances = keeper.ak.GetAccount(ctx, reservePoolAddr).GetCoins()
-	require.Equal(t, "700btc-min,1432iris-atto,1000u-btc-min", reservePoolBalances.String())
+	require.Equal(t, "700btc-min,1432iris-atto,1000uni:btc-min", reservePoolBalances.String())
 }
 
 func createReservePool(t *testing.T) (sdk.Context, Keeper, sdk.AccAddress, sdk.AccAddress, sdk.Error, sdk.Coins, sdk.Coins) {
@@ -170,9 +170,9 @@ func createReservePool(t *testing.T) (sdk.Context, Keeper, sdk.AccAddress, sdk.A
 	//assert
 	require.Nil(t, err)
 	reservePoolBalances := keeper.ak.GetAccount(ctx, reservePoolAddr).GetCoins()
-	require.Equal(t, "1000btc-min,1000iris-atto,1000u-btc-min", reservePoolBalances.String())
+	require.Equal(t, "1000btc-min,1000iris-atto,1000uni:btc-min", reservePoolBalances.String())
 	senderBlances := keeper.ak.GetAccount(ctx, sender).GetCoins()
-	require.Equal(t, "99999000btc-min,99999000iris-atto,1000u-btc-min", senderBlances.String())
+	require.Equal(t, "99999000btc-min,99999000iris-atto,1000uni:btc-min", senderBlances.String())
 	return ctx, keeper, sender, reservePoolAddr, err, reservePoolBalances, senderBlances
 }
 

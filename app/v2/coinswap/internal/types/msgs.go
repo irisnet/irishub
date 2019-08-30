@@ -12,8 +12,8 @@ var (
 )
 
 const (
-	FormatUniIdPrefix = "u-"
-	FormatUniId       = FormatUniIdPrefix + "%s"
+	FormatUniABSPrefix = "uni:"
+	FormatUniId        = FormatUniABSPrefix + "%s"
 )
 
 /* --------------------------------------------------------------------------- */
@@ -66,13 +66,13 @@ func (msg MsgSwapOrder) ValidateBasic() sdk.Error {
 	if !(msg.Input.Coin.IsValid() && msg.Input.Coin.IsPositive()) {
 		return sdk.ErrInvalidCoins("input coin is invalid: " + msg.Input.Coin.String())
 	}
-	if strings.HasPrefix(msg.Input.Coin.Denom, FormatUniIdPrefix) {
+	if strings.HasPrefix(msg.Input.Coin.Denom, FormatUniABSPrefix) {
 		return sdk.ErrInvalidCoins("unsupported input coin type: " + msg.Input.Coin.String())
 	}
 	if !(msg.Output.Coin.IsValid() && msg.Output.Coin.IsPositive()) {
 		return sdk.ErrInvalidCoins("output coin is invalid: " + msg.Output.Coin.String())
 	}
-	if strings.HasPrefix(msg.Output.Coin.Denom, FormatUniIdPrefix) {
+	if strings.HasPrefix(msg.Output.Coin.Denom, FormatUniABSPrefix) {
 		return sdk.ErrInvalidCoins("unsupported output coin type: " + msg.Output.Coin.String())
 	}
 	if msg.Input.Coin.Denom == msg.Output.Coin.Denom {
@@ -139,7 +139,7 @@ func (msg MsgAddLiquidity) ValidateBasic() sdk.Error {
 	if msg.MaxToken.Denom == sdk.IrisAtto {
 		return sdk.ErrInvalidCoins("max token must be non-iris token")
 	}
-	if strings.HasPrefix(msg.MaxToken.Denom, FormatUniIdPrefix) {
+	if strings.HasPrefix(msg.MaxToken.Denom, FormatUniABSPrefix) {
 		return sdk.ErrInvalidCoins("max token must be non-liquidity token")
 	}
 	if msg.ExactIrisAmt.IsNil() || !msg.ExactIrisAmt.IsPositive() {
