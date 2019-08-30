@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This specification describes asset managerment on IRISHub. Anyone could issue a new asset on IRISHub, or propose pegging an existing asset from any other blockchains via On-Chain Governance.
+This specification describes asset management on IRISHub. Anyone could issue a new asset on IRISHub, or propose pegging an existing asset from any other blockchains via On-Chain Governance.
 
 ## Concepts
 
