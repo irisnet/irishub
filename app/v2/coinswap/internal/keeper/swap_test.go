@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/irisnet/irishub/app/v2/coinswap/internal/types"
 	sdk "github.com/irisnet/irishub/types"
@@ -110,26 +111,7 @@ func TestGetOutputPrice(t *testing.T) {
 }
 
 func TestKeeperSwap(t *testing.T) {
-	ctx, keeper, accs := createTestInput(t, sdk.NewInt(100000000), 1)
-	sender := accs[0].GetAddress()
-	denom1 := "btc-min"
-	denom2 := sdk.IrisAtto
-	uniId, _ := types.GetUniId(denom1, denom2)
-	reservePoolAddr := getReservePoolAddr(uniId)
-
-	depositCoin := sdk.NewCoin("btc-min", sdk.NewInt(1000))
-	depositAmount := sdk.NewInt(1000)
-	minReward := sdk.NewInt(1)
-	deadline := time.Now().Add(1 * time.Minute)
-	msg := types.NewMsgAddLiquidity(depositCoin, depositAmount, minReward, deadline.Unix(), sender)
-	_, err := keeper.HandleAddLiquidity(ctx, msg)
-
-	//assert
-	require.Nil(t, err)
-	reservePoolBalances := keeper.ak.GetAccount(ctx, reservePoolAddr).GetCoins()
-	require.Equal(t, "1000btc-min,1000iris-atto,1000u-btc-min", reservePoolBalances.String())
-	senderBlances := keeper.ak.GetAccount(ctx, sender).GetCoins()
-	require.Equal(t, "99999000btc-min,99999000iris-atto,1000u-btc-min", senderBlances.String())
+	ctx, keeper, sender, reservePoolAddr, err, reservePoolBalances, senderBlances := createReservePool(t)
 
 	outputCoin := sdk.NewCoin("btc-min", sdk.NewInt(100))
 	inputCoin := sdk.NewCoin(sdk.IrisAtto, sdk.NewInt(1000))
@@ -167,4 +149,143 @@ func TestKeeperSwap(t *testing.T) {
 	require.Nil(t, err)
 	reservePoolBalances = keeper.ak.GetAccount(ctx, reservePoolAddr).GetCoins()
 	require.Equal(t, "700btc-min,1432iris-atto,1000u-btc-min", reservePoolBalances.String())
+}
+
+func createReservePool(t *testing.T) (sdk.Context, Keeper, sdk.AccAddress, sdk.AccAddress, sdk.Error, sdk.Coins, sdk.Coins) {
+	ctx, keeper, accs := createTestInput(t, sdk.NewInt(100000000), 1)
+	sender := accs[0].GetAddress()
+	denom1 := "btc-min"
+	denom2 := sdk.IrisAtto
+	uniId, _ := types.GetUniId(denom1, denom2)
+	reservePoolAddr := getReservePoolAddr(uniId)
+
+	btcAmt, _ := sdk.NewIntFromString("1000")
+	depositCoin := sdk.NewCoin("btc-min", btcAmt)
+
+	irisAmt, _ := sdk.NewIntFromString("1000")
+	minReward := sdk.NewInt(1)
+	deadline := time.Now().Add(1 * time.Minute)
+	msg := types.NewMsgAddLiquidity(depositCoin, irisAmt, minReward, deadline.Unix(), sender)
+	_, err := keeper.HandleAddLiquidity(ctx, msg)
+	//assert
+	require.Nil(t, err)
+	reservePoolBalances := keeper.ak.GetAccount(ctx, reservePoolAddr).GetCoins()
+	require.Equal(t, "1000btc-min,1000iris-atto,1000u-btc-min", reservePoolBalances.String())
+	senderBlances := keeper.ak.GetAccount(ctx, sender).GetCoins()
+	require.Equal(t, "99999000btc-min,99999000iris-atto,1000u-btc-min", senderBlances.String())
+	return ctx, keeper, sender, reservePoolAddr, err, reservePoolBalances, senderBlances
+}
+
+func TestTradeInputForExactOutput(t *testing.T) {
+	ctx, keeper, sender, poolAddr, _, poolBalances, senderBlances := createReservePool(t)
+
+	outputCoin := sdk.NewCoin("btc-min", sdk.NewInt(100))
+	inputCoin := sdk.NewCoin(sdk.IrisAtto, sdk.NewInt(100000))
+	input := types.Input{
+		Address: sender,
+		Coin:    inputCoin,
+	}
+	output := types.Output{
+		Coin: outputCoin,
+	}
+
+	initSupplyOutput := poolBalances.AmountOf(outputCoin.Denom)
+	maxCnt := int(initSupplyOutput.Div(outputCoin.Amount).Int64())
+
+	fmt.Println("===============================================================")
+	fmt.Println(fmt.Sprintf("init pool state:[%s]", poolBalances.String()))
+	fmt.Println(fmt.Sprintf("init sender state:[%s]", senderBlances.String()))
+	fmt.Println(fmt.Sprintf("sender buy [%s%s] every times", outputCoin.Amount, outputCoin.Denom))
+	fmt.Println("===============================================================")
+
+	for i := 1; i < 100; i++ {
+		amt, err := keeper.tradeInputForExactOutput(ctx, input, output)
+		if i == maxCnt {
+			require.NotNil(t, err)
+			break
+		}
+		ifNil(t, err)
+
+		bought := sdk.NewCoins(outputCoin)
+		sold := sdk.NewCoins(sdk.NewCoin(sdk.IrisAtto, amt))
+
+		pb := poolBalances.Add(sold).Sub(bought)
+		sb := senderBlances.Add(bought).Sub(sold)
+
+		assertResult(t, keeper, ctx, poolAddr, sender, pb, sb)
+
+		poolBalances = pb
+		senderBlances = sb
+		showMsg(i, pb, sb, input.Coin.Denom, output.Coin.Denom)
+	}
+}
+
+func TestTradeExactInputForOutput(t *testing.T) {
+	ctx, keeper, sender, poolAddr, _, poolBalances, senderBlances := createReservePool(t)
+
+	outputCoin := sdk.NewCoin("btc-min", sdk.NewInt(0))
+	inputCoin := sdk.NewCoin(sdk.IrisAtto, sdk.NewInt(100))
+	input := types.Input{
+		Address: sender,
+		Coin:    inputCoin,
+	}
+	output := types.Output{
+		Coin: outputCoin,
+	}
+
+	fmt.Println("===============================================================")
+	fmt.Println(fmt.Sprintf("init pool state:[%s]", poolBalances.String()))
+	fmt.Println(fmt.Sprintf("init sender state:[%s]", senderBlances.String()))
+	fmt.Println(fmt.Sprintf("sender sold [%s%s] every times", inputCoin.Amount, inputCoin.Denom))
+	fmt.Println("===============================================================")
+
+	for i := 1; i < 1000; i++ {
+		amt, err := keeper.tradeExactInputForOutput(ctx, input, output)
+		ifNil(t, err)
+
+		sold := sdk.NewCoins(inputCoin)
+		bought := sdk.NewCoins(sdk.NewCoin("btc-min", amt))
+
+		pb := poolBalances.Add(sold).Sub(bought)
+		sb := senderBlances.Add(bought).Sub(sold)
+
+		assertResult(t, keeper, ctx, poolAddr, sender, pb, sb)
+
+		poolBalances = pb
+		senderBlances = sb
+		showMsg(i, pb, sb, input.Coin.Denom, output.Coin.Denom)
+	}
+}
+
+func assertResult(t *testing.T, keeper Keeper, ctx sdk.Context, reservePoolAddr, sender sdk.AccAddress, expectPoolBalance, expectSenderBalance sdk.Coins) {
+	reservePoolBalances := keeper.ak.GetAccount(ctx, reservePoolAddr).GetCoins()
+	require.Equal(t, expectPoolBalance.String(), reservePoolBalances.String())
+	senderBlances := keeper.ak.GetAccount(ctx, sender).GetCoins()
+	require.Equal(t, expectSenderBalance.String(), senderBlances.String())
+}
+
+func ifNil(t *testing.T, err sdk.Error) {
+	msg := ""
+	if err != nil {
+		msg = err.Error()
+	}
+	require.Nil(t, err, msg)
+}
+
+func showMsg(index int, pb, sb sdk.Coins, intputDenom, outputDenom string) {
+	var msg bytes.Buffer
+	pool := fmt.Sprintf("[%dth] swap,pool:[%s]", index, pb.String())
+	msg.WriteString(pool)
+	msg.WriteString(" ")
+
+	sender := fmt.Sprintf("sender:[%s]", sb.String())
+	msg.WriteString(sender)
+	msg.WriteString(" ")
+
+	iAmt := sdk.NewDecFromInt(pb.AmountOf(intputDenom))
+	oAmt := sdk.NewDecFromInt(pb.AmountOf(outputDenom))
+	rate := fmt.Sprintf("rate:[1 %s = %s %s]", outputDenom, iAmt.Quo(oAmt).String(), intputDenom)
+	msg.WriteString(rate)
+
+	fmt.Println(msg.String())
 }
