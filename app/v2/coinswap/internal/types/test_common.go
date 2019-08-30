@@ -18,7 +18,7 @@ var (
 
 	denom0   = "atom-min"
 	denom1   = "btc-min"
-	unidenom = "u-btc-min"
+	unidenom = FormatUniABSPrefix + "btc-min"
 
 	input             = sdk.NewCoin(denom0, sdk.NewInt(1000))
 	output            = sdk.NewCoin(denom1, sdk.NewInt(500))

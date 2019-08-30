@@ -61,7 +61,7 @@ func TestGetCoin(t *testing.T) {
 func TestGetCoinName(t *testing.T) {
 	testData := []struct {
 		name, coinStr, expectName string
-		expectPass                              bool
+		expectPass                bool
 	}{
 		{"standard", "1000iris", "iris", true},
 		{"with -", "1000iris-atto", "iris", true},
@@ -69,7 +69,7 @@ func TestGetCoinName(t *testing.T) {
 		{"with x.", "1000x.btc-min", "x.btc", true},
 		{"with decimal", "1000.001gdex.btc-min", "gdex.btc", true},
 		{"with decimal and numeric", "1000.001gdex1.btc1d-min", "gdex1.btc1d", true},
-		{"with u-", "1000.001u-btc-min", "u-btc", true},
+		{"with uni:", "1000.001uni:btc-min", "uni:btc", true},
 		{"invalid", "1000.001iris-min", "", false},
 	}
 
@@ -92,10 +92,9 @@ func TestGetCoinNameByDenom(t *testing.T) {
 		{"with -", "iris-atto", "iris", true},
 		{"with gateway", "gdex.btc-min", "gdex.btc", true},
 		{"with x.", "x.btc-min", "x.btc", true},
-		{"with u-", "u-btc-min", "u-btc", true},
+		{"with uni:", "uni:btc-min", "uni:btc", true},
 		{"invalid 1", "iris-min", "", false},
 		{"invalid 2", "iris", "iris", false},
-
 	}
 
 	for _, td := range testData {
