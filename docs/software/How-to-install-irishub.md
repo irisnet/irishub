@@ -50,7 +50,7 @@ go version
 
 After setting up Go correctly, you should be able to compile and run `iris`.
 
-Make sure that your server can access to google.com because our project depends on some libraries provided by google.
+Make sure that your server can access to google.com because our project depends on some libraries provided by google. (If you are not able to access google.com, you can also try to add a proxy: `export GOPROXY=https://goproxy.io`)
 
 ```bash
 git clone --branch <latest_iris_version> https://github.com/irisnet/irishub
