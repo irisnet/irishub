@@ -3,11 +3,10 @@ package keeper
 import (
 	"fmt"
 	"github.com/irisnet/irishub/app/v2/coinswap/internal/types"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/stretchr/testify/require"
 	"testing"
 	"time"
-
-	sdk "github.com/irisnet/irishub/types"
 )
 
 var (
@@ -132,8 +131,8 @@ func TestKeeperSwap(t *testing.T) {
 	senderBlances := keeper.ak.GetAccount(ctx, sender).GetCoins()
 	require.Equal(t, "99999000btc-min,99999000iris-atto,1000u-btc-min", senderBlances.String())
 
-	inputCoin := sdk.NewCoin("btc-min", sdk.NewInt(100))
-	outputCoin := sdk.NewCoin(sdk.IrisAtto, sdk.NewInt(1))
+	outputCoin := sdk.NewCoin("btc-min", sdk.NewInt(100))
+	inputCoin := sdk.NewCoin(sdk.IrisAtto, sdk.NewInt(1000))
 
 	input := types.Input{
 		Address: sender,
@@ -145,12 +144,27 @@ func TestKeeperSwap(t *testing.T) {
 	}
 
 	deadline1 := time.Now().Add(1 * time.Minute)
-	msg1 := types.NewMsgSwapOrder(input, output, deadline1.Unix(), false)
+	msg1 := types.NewMsgSwapOrder(input, output, deadline1.Unix(), true)
+
+	// first swap
 	_, err = keeper.HandleSwap(ctx, msg1)
 	require.Nil(t, err)
-
 	reservePoolBalances = keeper.ak.GetAccount(ctx, reservePoolAddr).GetCoins()
-	require.Equal(t, "1100btc-min,910iris-atto,1000u-btc-min", reservePoolBalances.String())
+	require.Equal(t, "900btc-min,1112iris-atto,1000u-btc-min", reservePoolBalances.String())
 	senderBlances = keeper.ak.GetAccount(ctx, sender).GetCoins()
-	require.Equal(t, "99998900btc-min,99999090iris-atto,1000u-btc-min", senderBlances.String())
+	require.Equal(t, "99999100btc-min,99998888iris-atto,1000u-btc-min", senderBlances.String())
+
+	// second swap
+	_, err = keeper.HandleSwap(ctx, msg1)
+	require.Nil(t, err)
+	reservePoolBalances = keeper.ak.GetAccount(ctx, reservePoolAddr).GetCoins()
+	require.Equal(t, "800btc-min,1252iris-atto,1000u-btc-min", reservePoolBalances.String())
+	senderBlances = keeper.ak.GetAccount(ctx, sender).GetCoins()
+	require.Equal(t, "99999200btc-min,99998748iris-atto,1000u-btc-min", senderBlances.String())
+
+	// third swap
+	_, err = keeper.HandleSwap(ctx, msg1)
+	require.Nil(t, err)
+	reservePoolBalances = keeper.ak.GetAccount(ctx, reservePoolAddr).GetCoins()
+	require.Equal(t, "700btc-min,1432iris-atto,1000u-btc-min", reservePoolBalances.String())
 }
