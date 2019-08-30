@@ -120,13 +120,13 @@ func addLiquidityHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Han
 		}
 
 		exactIrisAmt, ok := sdk.NewIntFromString(req.ExactIrisAmt)
-		if !ok || exactIrisAmt.IsNegative() {
+		if !ok {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, "invalid exact iris amount: " + req.ExactIrisAmt)
 			return
 		}
 
 		minLiquidity, ok := sdk.NewIntFromString(req.MinLiquidity)
-		if !ok || minLiquidity.IsNegative() {
+		if !ok {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, "invalid min liquidity amount: " + req.MinLiquidity)
 			return
 		}
@@ -182,13 +182,13 @@ func removeLiquidityHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.
 		deadline := time.Now().Add(duration)
 
 		minToken, ok := sdk.NewIntFromString(req.MinToken)
-		if !ok || minToken.IsNegative() {
+		if !ok {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, "invalid min token amount: " + req.MinToken)
 			return
 		}
 
 		minIris, ok := sdk.NewIntFromString(req.MinIrisAmt)
-		if !ok || minIris.IsNegative() {
+		if !ok {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, "invalid min iris amount: " + req.MinIrisAmt)
 			return
 		}
