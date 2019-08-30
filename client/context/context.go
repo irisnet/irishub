@@ -243,7 +243,7 @@ func (cliCtx CLIContext) GetCoinType(coinName string) (sdk.CoinType, error) {
 	}
 	if coinName == sdk.Iris {
 		coinType = sdk.IrisCoinType
-	} else if strings.HasPrefix(coinName, coinswap.FormatUniIdPrefix) {
+	} else if strings.HasPrefix(coinName, coinswap.FormatUniABSPrefix) {
 		return coinswap.GetUniCoinType(coinName)
 	} else {
 		params := asset.QueryTokenParams{
