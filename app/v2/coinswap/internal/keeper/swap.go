@@ -49,10 +49,10 @@ func (k Keeper) calculateWithExactInput(ctx sdk.Context, exactSoldCoin sdk.Coin,
 	outputReserve := reservePool.AmountOf(boughtTokenDenom)
 
 	if !inputReserve.IsPositive() {
-		return sdk.ZeroInt(), types.ErrInsufficientFunds(fmt.Sprintf("insufficient funds, actual:%s", inputReserve.String()))
+		return sdk.ZeroInt(), types.ErrInsufficientFunds(fmt.Sprintf("reserve pool insufficient funds, actual [%s%s]", inputReserve.String(), exactSoldCoin.Denom))
 	}
 	if !outputReserve.IsPositive() {
-		return sdk.ZeroInt(), types.ErrInsufficientFunds(fmt.Sprintf("insufficient funds, actual:%s", outputReserve.String()))
+		return sdk.ZeroInt(), types.ErrInsufficientFunds(fmt.Sprintf("reserve pool insufficient funds, actual [%s%s]", outputReserve.String(), boughtTokenDenom))
 	}
 	param := k.GetParams(ctx)
 
@@ -73,10 +73,10 @@ func (k Keeper) tradeExactInputForOutput(ctx sdk.Context, input types.Input, out
 	if err != nil {
 		return sdk.ZeroInt(), err
 	}
-	// assert that the calculated amount is less than the
+	// assert that the calculated amount is more than the
 	// minimum amount the buyer is willing to buy.
 	if boughtTokenAmt.LT(output.Coin.Amount) {
-		return sdk.ZeroInt(), types.ErrConstraintNotMet(fmt.Sprintf("token amount (%s) to be bought was less than the minimum amount (%s)", boughtTokenAmt, output.Coin.Amount))
+		return sdk.ZeroInt(), types.ErrConstraintNotMet(fmt.Sprintf("the actual amount (%s) of tokens (%s) to be bought is less than the minimum amount (%s) the buyer is willing to buy", boughtTokenAmt, output.Coin.Denom, output.Coin.Amount))
 	}
 	boughtToken := sdk.NewCoin(output.Coin.Denom, boughtTokenAmt)
 	err = k.swapCoins(ctx, input.Address, output.Address, input.Coin, boughtToken)
@@ -113,7 +113,7 @@ func (k Keeper) doubleTradeExactInputForOutput(ctx sdk.Context, input types.Inpu
 	// assert that the calculated amount is less than the
 	// minimum amount the buyer is willing to buy.
 	if boughtAmt.LT(output.Coin.Amount) {
-		return sdk.ZeroInt(), types.ErrConstraintNotMet(fmt.Sprintf("token amount (%s) to be bought was less than the minimum amount (%s)", boughtAmt, output.Coin.Amount))
+		return sdk.ZeroInt(), types.ErrConstraintNotMet(fmt.Sprintf("the actual amount (%s) of tokens (%s) to be bought is less than the minimum amount (%s) the buyer is willing to buy", boughtAmt, output.Coin.Denom, output.Coin.Amount))
 	}
 
 	err = k.swapCoins(ctx, input.Address, output.Address, nativeCoin, boughtToken)
@@ -142,13 +142,13 @@ func (k Keeper) calculateWithExactOutput(ctx sdk.Context, exactBoughtCoin sdk.Co
 	inputReserve := reservePool.AmountOf(soldTokenDenom)
 
 	if !inputReserve.IsPositive() {
-		return sdk.ZeroInt(), types.ErrInsufficientFunds(fmt.Sprintf("insufficient funds, actual:%s", inputReserve.String()))
+		return sdk.ZeroInt(), types.ErrInsufficientFunds(fmt.Sprintf("reserve pool insufficient funds, actual [%s%s]", inputReserve.String(), soldTokenDenom))
 	}
 	if !outputReserve.IsPositive() {
-		return sdk.ZeroInt(), types.ErrInsufficientFunds(fmt.Sprintf("insufficient funds, actual:%s", outputReserve.String()))
+		return sdk.ZeroInt(), types.ErrInsufficientFunds(fmt.Sprintf("reserve pool insufficient funds, actual [%s%s]", outputReserve.String(), exactBoughtCoin.Denom))
 	}
 	if exactBoughtCoin.Amount.GTE(outputReserve) {
-		return sdk.ZeroInt(), types.ErrInsufficientFunds(fmt.Sprintf("insufficient funds, want:%s,actual:%s", exactBoughtCoin.String(), outputReserve.String()))
+		return sdk.ZeroInt(), types.ErrInsufficientFunds(fmt.Sprintf("reserve pool insufficient funds, tokens[%s] to be brought could be not greater than or equal to %s", exactBoughtCoin.Denom, outputReserve.String()))
 	}
 	param := k.GetParams(ctx)
 
@@ -170,9 +170,9 @@ func (k Keeper) tradeInputForExactOutput(ctx sdk.Context, input types.Input, out
 		return sdk.ZeroInt(), err
 	}
 	// assert that the calculated amount is less than the
-	// minimum amount the buyer is willing to buy.
+	// max amount the buyer is willing to sell.
 	if soldTokenAmt.GT(input.Coin.Amount) {
-		return sdk.ZeroInt(), types.ErrConstraintNotMet(fmt.Sprintf("token amount (%s) to be bought was less than the minimum amount (%s)", soldTokenAmt, input.Coin.Amount))
+		return sdk.ZeroInt(), types.ErrConstraintNotMet(fmt.Sprintf("the actual amount (%s) of tokens (%s) to be paid was greater than the maximum amount (%s) the sellers is willing to pay", soldTokenAmt, output.Coin.Denom, input.Coin.Amount))
 	}
 	soldToken := sdk.NewCoin(input.Coin.Denom, soldTokenAmt)
 	err = k.swapCoins(ctx, input.Address, output.Address, soldToken, output.Coin)
@@ -204,9 +204,9 @@ func (k Keeper) doubleTradeInputForExactOutput(ctx sdk.Context, input types.Inpu
 	soldTokenCoin := sdk.NewCoin(input.Coin.Denom, soldTokenAmt)
 
 	// assert that the calculated amount is less than the
-	// minimum amount the buyer is willing to buy.
+	// max amount the buyer is willing to sell.
 	if soldTokenAmt.GT(input.Coin.Amount) {
-		return sdk.ZeroInt(), types.ErrConstraintNotMet(fmt.Sprintf("token amount (%s) to be bought was less than the minimum amount (%s)", soldTokenAmt, input.Coin.Amount))
+		return sdk.ZeroInt(), types.ErrConstraintNotMet(fmt.Sprintf("the actual amount (%s) of tokens (%s) to be paid was greater than the maximum amount (%s) the sellers is willing to pay", soldTokenAmt, input.Coin.Denom, input.Coin.Amount))
 	}
 
 	err = k.swapCoins(ctx, input.Address, output.Address, soldTokenCoin, soldIrisCoin)
