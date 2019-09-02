@@ -15,17 +15,17 @@ import (
 	"github.com/tendermint/tendermint/crypto/ed25519"
 
 	cmn "github.com/tendermint/tendermint/libs/common"
-	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
+	dbm "github.com/tendermint/tm-db"
 
 	bam "github.com/irisnet/irishub/app"
-	"github.com/irisnet/irishub/app/v0"
 	"github.com/irisnet/irishub/app/protocol"
+	"github.com/irisnet/irishub/app/v0"
 
-	sdk "github.com/irisnet/irishub/types"
 	"encoding/json"
-	tmtypes "github.com/tendermint/tendermint/types"
+	sdk "github.com/irisnet/irishub/types"
 	cfg "github.com/tendermint/tendermint/config"
+	tmtypes "github.com/tendermint/tendermint/types"
 )
 
 func runHackCmd(cmd *cobra.Command, args []string) error {
@@ -111,7 +111,7 @@ func hexToBytes(h string) []byte {
 // so we can access internal fields!
 
 const (
-	appName    = "IrisApp"
+	appName = "IrisApp"
 )
 
 // Extended ABCI application

@@ -11,13 +11,13 @@ import (
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/crypto/tmhash"
 	cmn "github.com/tendermint/tendermint/libs/common"
-	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
+	dbm "github.com/tendermint/tm-db"
 
-	"github.com/irisnet/irishub/store"
-	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/store"
 	"github.com/irisnet/irishub/types"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/version"
 )
 
@@ -147,6 +147,7 @@ func (app *BaseApp) MountStore(key sdk.StoreKey, typ sdk.StoreType) {
 func (app *BaseApp) GetKVStore(key sdk.StoreKey) sdk.KVStore {
 	return app.cms.GetKVStore(key)
 }
+
 ////////////////////  iris/cosmos-sdk end  ///////////////////////////
 
 func (app *BaseApp) SetRunMsg(runMsg RunMsg) {

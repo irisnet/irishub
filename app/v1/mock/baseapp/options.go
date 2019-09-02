@@ -6,7 +6,7 @@ import (
 	"github.com/irisnet/irishub/store"
 	"github.com/irisnet/irishub/types"
 	sdk "github.com/irisnet/irishub/types"
-	dbm "github.com/tendermint/tendermint/libs/db"
+	dbm "github.com/tendermint/tm-db"
 )
 
 // File for storing in-package BaseApp optional functions,
