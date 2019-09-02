@@ -1,4 +1,8 @@
-# IRISnet Testnet Codename Fuxi
+---
+order: 3
+---
+
+# Testnet
 
 ## Fuxi  Testnet
 

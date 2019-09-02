@@ -143,13 +143,13 @@ https://www.irisplorer.io
 
 IRISnet testnet is called Fuxi. The Fuxi testnet is used to provide a stable test environment for developers such as third-party wallets, browsers and other applications。 
 
-Learn more: [How to use Testnet](../get-started/Join-the-Testnet.md)
+Learn more: [How to use Testnet](../get-started/testnet.md)
 
 **IRISnet Betanet**
 
 Betanet is the first part of launching IRISnet mainnet. Betanet started at mid-Feb. More news will be available in [IRISnet Official Website](https://www.irisnet.org/mainnet?lang=CN)。 
 
-Learn more: [How to_join_Mainnet](../get-started/Join-the-Mainnet.md)
+Learn more: [How to_join_Mainnet](../get-started/mainnet.md)
 
 ## Validator Communication Channel
 
