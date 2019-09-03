@@ -1,6 +1,8 @@
 package htlc
 
 import (
+	"encoding/hex"
+
 	sdk "github.com/irisnet/irishub/types"
 )
 
@@ -25,8 +27,9 @@ func handleMsgCreateHTLC(ctx sdk.Context, k Keeper, msg MsgCreateHTLC) sdk.Resul
 	state := uint8(0)
 
 	htlc := NewHTLC(msg.Sender, msg.Receiver, msg.ReceiverOnOtherChain, msg.OutAmount, msg.InAmount, secret, msg.Timestamp, expireHeight, state)
+	secretHashLock, _ := hex.DecodeString(msg.SecretHashLock)
 
-	tags, err := k.CreateHTLC(ctx, htlc)
+	tags, err := k.CreateHTLC(ctx, htlc, secretHashLock)
 	if err != nil {
 		return err.Result()
 	}

@@ -38,13 +38,10 @@ func (k Keeper) Codespace() sdk.CodespaceType {
 }
 
 // CreateHTLC creates a HTLC
-func (k Keeper) CreateHTLC(ctx sdk.Context, htlc types.HTLC) (sdk.Tags, sdk.Error) {
-	// get the secret hash lock
-	secretHash := htlc.GetSecretHashLock()
-
+func (k Keeper) CreateHTLC(ctx sdk.Context, htlc types.HTLC, secretHashLock []byte) (sdk.Tags, sdk.Error) {
 	// check if the secret hash lock already exists
-	if k.HasSecretHashLock(ctx, secretHash) {
-		return nil, types.ErrSecretHashLockAlreadyExists(types.DefaultCodespace, "the secret hash lock already exists")
+	if k.HasSecretHashLock(ctx, secretHashLock) {
+		return nil, types.ErrSecretHashLockAlreadyExists(types.DefaultCodespace, fmt.Sprintf("the secret hash lock already exists: %s", hex.EncodeToString(secretHashLock)))
 	}
 
 	// transfer the specified tokens to HTLCCoinsAccAddr
@@ -54,10 +51,10 @@ func (k Keeper) CreateHTLC(ctx sdk.Context, htlc types.HTLC) (sdk.Tags, sdk.Erro
 	}
 
 	// set the htlc
-	k.SetHTLC(ctx, htlc)
+	k.SetHTLC(ctx, htlc, secretHashLock)
 
 	// add to the expiration queue
-	k.AddHTLCToExpireQueue(ctx, htlc.ExpireHeight, secretHash)
+	k.AddHTLCToExpireQueue(ctx, htlc.ExpireHeight, secretHashLock)
 
 	createTags := sdk.NewTags(
 		types.TagSender, []byte(htlc.Sender),
@@ -65,7 +62,7 @@ func (k Keeper) CreateHTLC(ctx sdk.Context, htlc types.HTLC) (sdk.Tags, sdk.Erro
 		types.TagReceiverOnOtherChain, []byte(htlc.ReceiverOnOtherChain),
 		types.TagOutAmount, []byte(htlc.OutAmount.String()),
 		types.TagInAmount, sdk.Uint64ToBigEndian(htlc.InAmount),
-		types.TagSecretHashLock, []byte(hex.EncodeToString(htlc.GetSecretHashLock())),
+		types.TagSecretHashLock, []byte(hex.EncodeToString(secretHashLock)),
 		types.TagTimestamp, sdk.Uint64ToBigEndian(htlc.Timestamp),
 		types.TagExpireHeight, sdk.Uint64ToBigEndian(htlc.ExpireHeight),
 	)
@@ -79,11 +76,11 @@ func (k Keeper) HasSecretHashLock(ctx sdk.Context, secretHashLock []byte) bool {
 }
 
 // SetHTLC stores the htlc
-func (k Keeper) SetHTLC(ctx sdk.Context, htlc types.HTLC) {
+func (k Keeper) SetHTLC(ctx sdk.Context, htlc types.HTLC, secretHashLock []byte) {
 	store := ctx.KVStore(k.storeKey)
 
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(htlc)
-	store.Set(KeyHTLC(htlc.GetSecretHashLock()), bz)
+	store.Set(KeyHTLC(secretHashLock), bz)
 }
 
 // GetHTLC retrieves the htlc by the specified secret hash lock
