@@ -3,6 +3,7 @@ package tx
 import (
 	"encoding/hex"
 	"fmt"
+	"math"
 	"net/http"
 	"strings"
 	"time"
@@ -226,4 +227,25 @@ func getBlocksForTxResults(cliCtx context.CLIContext, resTxs []*ctypes.ResultTx)
 	}
 
 	return resBlocks, nil
+}
+
+// SearchTxsResult defines a structure for querying txs pageable
+type SearchTxsResult struct {
+	TotalCount int    `json:"total_count"` // Count of all txs
+	Count      int    `json:"count"`       // Count of txs in current page
+	PageNumber int    `json:"page_number"` // Index of current page, start from 1
+	PageTotal  int    `json:"page_total"`  // Count of total pages
+	Size       int    `json:"size"`        // Max count txs per page
+	Txs        []Info `json:"txs"`         // List of txs in current page
+}
+
+func NewSearchTxsResult(totalCount, count, page, size int, txs []Info) SearchTxsResult {
+	return SearchTxsResult{
+		TotalCount: totalCount,
+		Count:      count,
+		PageNumber: page,
+		PageTotal:  int(math.Ceil(float64(totalCount) / float64(size))),
+		Size:       size,
+		Txs:        txs,
+	}
 }
