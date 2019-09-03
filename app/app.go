@@ -9,8 +9,8 @@ import (
 	"strings"
 
 	"github.com/irisnet/irishub/app/protocol"
-	"github.com/irisnet/irishub/app/v0"
-	"github.com/irisnet/irishub/app/v1"
+	v0 "github.com/irisnet/irishub/app/v0"
+	v1 "github.com/irisnet/irishub/app/v1"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/store"
@@ -61,13 +61,6 @@ func NewIrisApp(logger log.Logger, db dbm.DB, config *cfg.InstrumentationConfig,
 	if viper.GetBool(FlagReplay) {
 		lastHeight := Replay(app.Logger)
 		err = app.LoadVersion(lastHeight, protocol.KeyMain, true)
-
-		// If reset to another protocol version, should reload Protocol and reset txDecoder
-		loaded, current := app.Engine.LoadCurrentProtocol(app.GetKVStore(protocol.KeyMain))
-		if !loaded {
-			cmn.Exit(fmt.Sprintf("Your software doesn't support the required protocol (version %d)!", current))
-		}
-		app.BaseApp.txDecoder = auth.DefaultTxDecoder(app.Engine.GetCurrentProtocol().GetCodec())
 	} else {
 		err = app.LoadLatestVersion(protocol.KeyMain)
 	} // app is now sealed
