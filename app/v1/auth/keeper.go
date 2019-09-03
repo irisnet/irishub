@@ -2,10 +2,11 @@ package auth
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/tendermint/tendermint/crypto"
-	"strings"
 )
 
 var (
@@ -23,6 +24,7 @@ var (
 	ServiceRequestCoinsAccAddr = sdk.AccAddress(crypto.AddressHash([]byte("serviceRequestCoins")))
 	CommunityTaxCoinsAccAddr   = sdk.AccAddress(crypto.AddressHash([]byte("communityTaxCoins")))
 	ServiceTaxCoinsAccAddr     = sdk.AccAddress(crypto.AddressHash([]byte("serviceTaxCoins")))
+	HTLCCoinsAccAddr           = sdk.AccAddress(crypto.AddressHash([]byte("HTLCCoins")))
 )
 
 // This AccountKeeper encodes/decodes accounts using the

@@ -4,6 +4,7 @@ import (
 	"encoding/hex"
 	"fmt"
 
+	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/app/v1/params"
 	"github.com/irisnet/irishub/app/v2/htlc/internal/types"
 	"github.com/irisnet/irishub/codec"
@@ -46,11 +47,17 @@ func (k Keeper) CreateHTLC(ctx sdk.Context, htlc types.HTLC) (sdk.Tags, sdk.Erro
 		return nil, types.ErrSecretHashLockAlreadyExists(types.DefaultCodespace, "the secret hash lock already exists")
 	}
 
-	// lock the specified tokens
-	// TODO
+	// transfer the specified tokens to HTLCCoinsAccAddr
+	_, err := k.bk.SendCoins(ctx, htlc.Sender, auth.HTLCCoinsAccAddr, sdk.Coins{htlc.OutAmount})
+	if err != nil {
+		return nil, err
+	}
 
 	// set the htlc
 	k.SetHTLC(ctx, htlc)
+
+	// add to the expiration queue
+	k.AddHTLCToExpireQueue(ctx, htlc.ExpireHeight, secretHash)
 
 	createTags := sdk.NewTags(
 		types.TagSender, []byte(htlc.Sender),
@@ -92,4 +99,20 @@ func (k Keeper) GetHTLC(ctx sdk.Context, secretHashLock []byte) (types.HTLC, sdk
 	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &htlc)
 
 	return htlc, nil
+}
+
+// AddHTLCToExpireQueue adds the htlc to the expiration queue
+func (k Keeper) AddHTLCToExpireQueue(ctx sdk.Context, expireHeight uint64, secretHashLock []byte) {
+	store := ctx.KVStore(k.storeKey)
+
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(secretHashLock)
+	store.Set(KeyHTLCExpireQueue(expireHeight, secretHashLock), bz)
+}
+
+// DeleteHTLCFromExpireQueue removes the htlc from the expiration queue
+func (k Keeper) DeleteHTLCFromExpireQueue(ctx sdk.Context, expireHeight uint64, secretHashLock []byte) {
+	store := ctx.KVStore(k.storeKey)
+
+	// delete the key
+	store.Delete(KeyHTLCExpireQueue(expireHeight, secretHashLock))
 }
