@@ -11,7 +11,7 @@ import (
 type HTLC struct {
 	Sender               sdk.AccAddress `json:"sender"`                  // the initiator address
 	Receiver             sdk.AccAddress `json:"receiver"`                // the recipient address
-	ReceiverOnOtherChain []byte         `json:"receiver_in_other_chain"` // the recipient address on other chain
+	ReceiverOnOtherChain []byte         `json:"receiver_on_other_chain"` // the recipient address on other chain
 	OutAmount            sdk.Coin       `json:"out_amount"`              // the amount to be transferred
 	InAmount             uint64         `json:"in_amount"`               // expected amount to be received from another HTLC
 	Secret               []byte         `json:"secret"`                  // the random secret
