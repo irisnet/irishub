@@ -24,7 +24,6 @@ var (
 	ServiceRequestCoinsAccAddr = sdk.AccAddress(crypto.AddressHash([]byte("serviceRequestCoins")))
 	CommunityTaxCoinsAccAddr   = sdk.AccAddress(crypto.AddressHash([]byte("communityTaxCoins")))
 	ServiceTaxCoinsAccAddr     = sdk.AccAddress(crypto.AddressHash([]byte("serviceTaxCoins")))
-	HTLCCoinsAccAddr           = sdk.AccAddress(crypto.AddressHash([]byte("HTLCCoins")))
 )
 
 // This AccountKeeper encodes/decodes accounts using the

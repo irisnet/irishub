@@ -4,11 +4,11 @@ import (
 	"encoding/hex"
 	"fmt"
 
-	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/app/v1/params"
 	"github.com/irisnet/irishub/app/v2/htlc/internal/types"
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
+	"github.com/tendermint/tendermint/crypto"
 )
 
 type Keeper struct {
@@ -37,6 +37,11 @@ func (k Keeper) Codespace() sdk.CodespaceType {
 	return k.codespace
 }
 
+// GetCdc returns the cdc
+func (k Keeper) GetCdc() *codec.Codec {
+	return k.cdc
+}
+
 // CreateHTLC creates a HTLC
 func (k Keeper) CreateHTLC(ctx sdk.Context, htlc types.HTLC, secretHashLock []byte) (sdk.Tags, sdk.Error) {
 	// check if the secret hash lock already exists
@@ -44,9 +49,9 @@ func (k Keeper) CreateHTLC(ctx sdk.Context, htlc types.HTLC, secretHashLock []by
 		return nil, types.ErrSecretHashLockAlreadyExists(types.DefaultCodespace, fmt.Sprintf("the secret hash lock already exists: %s", hex.EncodeToString(secretHashLock)))
 	}
 
-	// transfer the specified tokens to HTLCCoinsAccAddr
-	_, err := k.bk.SendCoins(ctx, htlc.Sender, auth.HTLCCoinsAccAddr, sdk.Coins{htlc.OutAmount})
-	if err != nil {
+	// transfer the specified tokens to a dedicated HTLC Address
+	htlcAddr := getHTLCAddress(htlc.OutAmount.Denom)
+	if _, err := k.bk.SendCoins(ctx, htlc.Sender, htlcAddr, sdk.Coins{htlc.OutAmount}); err != nil {
 		return nil, err
 	}
 
@@ -58,13 +63,9 @@ func (k Keeper) CreateHTLC(ctx sdk.Context, htlc types.HTLC, secretHashLock []by
 
 	createTags := sdk.NewTags(
 		types.TagSender, []byte(htlc.Sender),
-		types.TagReceiver, []byte(htlc.Sender),
-		types.TagReceiverOnOtherChain, []byte(htlc.ReceiverOnOtherChain),
-		types.TagOutAmount, []byte(htlc.OutAmount.String()),
-		types.TagInAmount, sdk.Uint64ToBigEndian(htlc.InAmount),
+		types.TagReceiver, []byte(htlc.Receiver),
+		types.TagReceiverOnOtherChain, htlc.ReceiverOnOtherChain,
 		types.TagSecretHashLock, []byte(hex.EncodeToString(secretHashLock)),
-		types.TagTimestamp, sdk.Uint64ToBigEndian(htlc.Timestamp),
-		types.TagExpireHeight, sdk.Uint64ToBigEndian(htlc.ExpireHeight),
 	)
 
 	return createTags, nil
@@ -112,4 +113,9 @@ func (k Keeper) DeleteHTLCFromExpireQueue(ctx sdk.Context, expireHeight uint64, 
 
 	// delete the key
 	store.Delete(KeyHTLCExpireQueue(expireHeight, secretHashLock))
+}
+
+// getHTLCAddress returns a dedicated address for locking tokens by the specified denom
+func getHTLCAddress(denom string) sdk.AccAddress {
+	return sdk.AccAddress(crypto.AddressHash([]byte(denom)))
 }
