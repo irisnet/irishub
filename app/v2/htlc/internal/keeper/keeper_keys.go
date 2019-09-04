@@ -14,7 +14,7 @@ func KeyHTLC(secretHashLock []byte) []byte {
 	return append(PrefixHTLC, secretHashLock...)
 }
 
-// KeyHTLCExpireQueue returns the key prefix for HTLC expiration queue
+// KeyHTLCExpireQueue returns the key for HTLC expiration queue
 func KeyHTLCExpireQueue(expireHeight uint64, secretHashLock []byte) []byte {
 	return append(append(PrefixHTLCExpireQueue, sdk.Uint64ToBigEndian(expireHeight)...), secretHashLock...)
 }
