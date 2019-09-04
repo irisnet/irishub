@@ -9,15 +9,15 @@ import (
 
 // HTLC represents a HTLC
 type HTLC struct {
-	Sender               sdk.AccAddress `json:"sender"`                 // the initiator address
-	Receiver             sdk.AccAddress `json:"receiver"`               // the recipient address
-	ReceiverOnOtherChain []byte         `json:"receiver_in_other_htlc"` // the recipient address on other chain
-	OutAmount            sdk.Coin       `json:"out_amount"`             // the amount to be transferred
-	InAmount             uint64         `json:"in_amount"`              // expected amount to be received from another HTLC
-	Secret               []byte         `json:"secret"`                 // the random secret
-	Timestamp            uint64         `json:"timestamp"`              // the time used to generate the hash lock together with secret
-	ExpireHeight         uint64         `json:"expire_height"`          // the block height by which the HTLC expires
-	State                uint8          `json:"state"`                  // the state of the HTLC(0:open,1:completed,2:expired)
+	Sender               sdk.AccAddress `json:"sender"`                  // the initiator address
+	Receiver             sdk.AccAddress `json:"receiver"`                // the recipient address
+	ReceiverOnOtherChain []byte         `json:"receiver_in_other_chain"` // the recipient address on other chain
+	OutAmount            sdk.Coin       `json:"out_amount"`              // the amount to be transferred
+	InAmount             uint64         `json:"in_amount"`               // expected amount to be received from another HTLC
+	Secret               []byte         `json:"secret"`                  // the random secret
+	Timestamp            uint64         `json:"timestamp"`               // the time used to generate the hash lock together with secret
+	ExpireHeight         uint64         `json:"expire_height"`           // the block height by which the HTLC expires
+	State                uint8          `json:"state"`                   // the state of the HTLC(0:open,1:completed,2:expired)
 }
 
 // NewHTLC constructs a HTLC
