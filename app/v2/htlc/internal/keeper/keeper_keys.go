@@ -1,7 +1,7 @@
 package keeper
 
 import (
-	"fmt"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 var (
@@ -16,5 +16,5 @@ func KeyHTLC(secretHashLock []byte) []byte {
 
 // KeyHTLCExpireQueue returns the key prefix for HTLC expiration queue
 func KeyHTLCExpireQueue(expireHeight uint64, secretHashLock []byte) []byte {
-	return append([]byte(fmt.Sprintf("PrefixHTLCExpireQueue:%d:", expireHeight)), secretHashLock...)
+	return append(append(PrefixHTLCExpireQueue, sdk.Uint64ToBigEndian(expireHeight)...), secretHashLock...)
 }
