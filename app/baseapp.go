@@ -19,9 +19,9 @@ import (
 	"github.com/pkg/errors"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/crypto/tmhash"
-	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
 	tmstate "github.com/tendermint/tendermint/state"
+	dbm "github.com/tendermint/tm-db"
 )
 
 // Key to store the consensus params in the main store.
