@@ -66,8 +66,8 @@ func (k Keeper) CreateHTLC(ctx sdk.Context, htlc types.HTLC, secretHashLock []by
 	k.AddHTLCToExpireQueue(ctx, htlc.ExpireHeight, secretHashLock)
 
 	createTags := sdk.NewTags(
-		types.TagSender, []byte(htlc.Sender),
-		types.TagReceiver, []byte(htlc.Receiver),
+		types.TagSender, []byte(htlc.Sender.String()),
+		types.TagReceiver, []byte(htlc.Receiver.String()),
 		types.TagReceiverOnOtherChain, htlc.ReceiverOnOtherChain,
 		types.TagSecretHashLock, []byte(hex.EncodeToString(secretHashLock)),
 	)
@@ -108,8 +108,8 @@ func (k Keeper) ClaimHTLC(ctx sdk.Context, secret []byte, secretHashLock []byte)
 	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, htlcAddr.String(), htlc.Receiver.String(), htlc.OutAmount.String(), sdk.CoinHTLCClaimFlow, "")
 
 	calimTags := sdk.NewTags(
-		types.TagSender, []byte(htlc.Sender),
-		types.TagReceiver, []byte(htlc.Receiver),
+		types.TagSender, []byte(htlc.Sender.String()),
+		types.TagReceiver, []byte(htlc.Receiver.String()),
 		types.TagSecretHashLock, []byte(hex.EncodeToString(secretHashLock)),
 		types.TagSecret, []byte(hex.EncodeToString(secret)),
 	)
@@ -144,7 +144,7 @@ func (k Keeper) RefundHTLC(ctx sdk.Context, secretHashLock []byte) (sdk.Tags, sd
 	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, htlcAddr.String(), htlc.Sender.String(), htlc.OutAmount.String(), sdk.CoinHTLCRefundFlow, "")
 
 	refundTags := sdk.NewTags(
-		types.TagSender, []byte(htlc.Sender),
+		types.TagSender, []byte(htlc.Sender.String()),
 		types.TagSecretHashLock, []byte(hex.EncodeToString(secretHashLock)),
 	)
 
