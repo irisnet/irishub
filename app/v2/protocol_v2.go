@@ -101,20 +101,6 @@ func (p *ProtocolV2) Load() {
 
 // Init init the configuration of this Protocol
 func (p *ProtocolV2) Init(ctx sdk.Context) {
-	p.InitMetrics(ctx.MultiStore())
-
-	// initialize asset params
-	p.assetKeeper.Init(ctx)
-
-	// move burned coins into AccAddress
-	p.bankKeeper.(bank.BaseKeeper).Init(ctx)
-
-	// move community pool balance to AccAddress
-	p.distrKeeper.Init(ctx)
-
-	// modify gov params
-	p.govKeeper.Init(ctx)
-
 	// initialize coinswap params
 	p.coinswapKeeper.Init(ctx)
 }

@@ -41,7 +41,7 @@ var (
 )
 
 const (
-	DefaultCodespace  = types.DefaultCodespace
-	ModuleName        = types.ModuleName
-	FormatUniIdPrefix = types.FormatUniIdPrefix
+	DefaultCodespace   = types.DefaultCodespace
+	ModuleName         = types.ModuleName
+	FormatUniABSPrefix = types.FormatUniABSPrefix
 )

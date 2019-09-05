@@ -407,6 +407,12 @@ func TestParse(t *testing.T) {
 		{"11me coin, 12you coin", false, nil},                                      // no spaces in coin names
 		{"1.2btc", false, nil},                                                     // amount must be integer
 		{"5foo-bar", true, Coins{{"foo-bar", NewInt(5)}}},
+		{"5uni:gdex.eth-min", true, Coins{{"uni:gdex.eth-min", NewInt(5)}}},
+		{"1un:x.btc", false, Coins{{"un:x.btc", NewInt(1)}}},
+		{"1uni:x.btc", true, Coins{{"uni:x.btc", NewInt(1)}}},
+		{"1 uni:x.btc", true, Coins{{"uni:x.btc", NewInt(1)}}},
+		{"1uni:x.btc-min", true, Coins{{"uni:x.btc-min", NewInt(1)}}},
+		{"1uni:iris-atto", true, Coins{{"uni:iris-atto", NewInt(1)}}},
 	}
 
 	for tcIndex, tc := range cases {
@@ -518,7 +524,7 @@ func TestIsCoinNameValid(t *testing.T) {
 		{"standard native", "abc", true},
 		{"standard external", "x.abc", true},
 		{"standard gateway", "gdex.abc", true},
-		{"standard uni", "u-gdex.abc", true},
+		{"standard uni", "uni:gdex.abc", true},
 		{"with-suffix", "iris-atto", false},
 		{"with-suffix-min", "abc-min", false},
 	}
@@ -544,7 +550,7 @@ func TestIsCoinMinDenomValid(t *testing.T) {
 		{"standard native", "abc-min", true},
 		{"standard external", "x.abc-min", true},
 		{"standard gateway", "gdex.abc-min", true},
-		{"standard uni", "u-gdex.abc-min", true},
+		{"standard uni", "uni:gdex.abc-min", true},
 		{"non-suffix", "iris", false},
 		{"non-suffix !iris", "abc", false},
 	}

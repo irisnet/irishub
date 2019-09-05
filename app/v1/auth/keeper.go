@@ -2,10 +2,11 @@ package auth
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/tendermint/tendermint/crypto"
-	"strings"
 )
 
 var (

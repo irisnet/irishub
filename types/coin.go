@@ -564,7 +564,8 @@ func (coins Coins) Sort() Coins {
 
 var (
 	// Denominations can be 3 ~ 21 characters long.
-	reCoinName         = `(u\-)?(([a-z][a-z0-9]{2,7}|x)\.)?([a-z][a-z0-9]{2,7})`
+	reABS              = `([a-z][0-9a-z]{2}[:])?`
+	reCoinName         = reABS + `(([a-z][a-z0-9]{2,7}|x)\.)?([a-z][a-z0-9]{2,7})`
 	reDenom            = reCoinName + `(-[a-z]{3,5})?`
 	reAmount           = `[0-9]+(\.[0-9]+)?`
 	reSpace            = `[[:space:]]*`
