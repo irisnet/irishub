@@ -53,6 +53,18 @@ Details in [distribution](../mint.md)
 
 Details in [slashing](../slashing.md)
 
+## Parameters in Asset
+
+| key |Description | Range|
+|----| ---|---|
+| `asset/AssetTaxRate` | Asset tax | [0, 1]
+| `asset/IssueTokenBaseFee`| Issue token's  fee| [0,+∞)
+| `asset/MintTokenFeeRatio`  | Mint token's fee | [0, 1]
+| `asset/CreateGatewayBaseFee`| Create gateway Token's fee | [0,+∞)          
+| `asset/GatewayAssetFeeRatio`| Issue gateway token's fee | [0, 1]      
+
+Details in [asset](../asset.md)
+
 ## Parameters in Service
 
 | key |Description | Range|
