@@ -7,6 +7,14 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 )
 
+// the state of the HTLC
+const (
+	StateOpen      = uint8(0) // can claim
+	StateCompleted = uint8(1) // claimed
+	StateExpired   = uint8(2) // Expired
+	StateRefunded  = uint8(3) // Refunded
+)
+
 // HTLC represents a HTLC
 type HTLC struct {
 	Sender               sdk.AccAddress `json:"sender"`                  // the initiator address
@@ -21,7 +29,17 @@ type HTLC struct {
 }
 
 // NewHTLC constructs a HTLC
-func NewHTLC(sender sdk.AccAddress, receiver sdk.AccAddress, receiverOnOtherChain []byte, outAmount sdk.Coin, inAmount uint64, secret []byte, timestamp uint64, expireHeight uint64, state uint8) HTLC {
+func NewHTLC(
+	sender sdk.AccAddress,
+	receiver sdk.AccAddress,
+	receiverOnOtherChain []byte,
+	outAmount sdk.Coin,
+	inAmount uint64,
+	secret []byte,
+	timestamp uint64,
+	expireHeight uint64,
+	state uint8,
+) HTLC {
 	return HTLC{
 		Sender:               sender,
 		Receiver:             receiver,
@@ -52,5 +70,14 @@ func (h HTLC) String() string {
 	Timestamp:            %d
 	ExpireHeight:         %d
 	State:                %d`,
-		h.Sender, h.Receiver, h.ReceiverOnOtherChain, h.OutAmount.String(), h.InAmount, hex.EncodeToString(h.Secret), h.Timestamp, h.ExpireHeight, h.State)
+		h.Sender,
+		h.Receiver,
+		h.ReceiverOnOtherChain,
+		h.OutAmount.String(),
+		h.InAmount,
+		hex.EncodeToString(h.Secret),
+		h.Timestamp,
+		h.ExpireHeight,
+		h.State,
+	)
 }

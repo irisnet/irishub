@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"bytes"
 	"encoding/hex"
 	"fmt"
 
@@ -55,6 +56,9 @@ func (k Keeper) CreateHTLC(ctx sdk.Context, htlc types.HTLC, secretHashLock []by
 		return nil, err
 	}
 
+	// add to coinflow
+	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, htlc.Sender.String(), htlcAddr.String(), htlc.OutAmount.String(), sdk.CoinHTLCCreateFlow, "")
+
 	// set the htlc
 	k.SetHTLC(ctx, htlc, secretHashLock)
 
@@ -69,6 +73,87 @@ func (k Keeper) CreateHTLC(ctx sdk.Context, htlc types.HTLC, secretHashLock []by
 	)
 
 	return createTags, nil
+}
+
+func (k Keeper) ClaimHTLC(ctx sdk.Context, secret []byte, secretHashLock []byte) (sdk.Tags, sdk.Error) {
+
+	// get the htlc
+	htlc, err := k.GetHTLC(ctx, secretHashLock)
+	if err != nil {
+		return nil, err
+	}
+
+	// check if not open
+	if htlc.State != types.StateOpen {
+		return nil, types.ErrStateIsNotOpen(k.codespace, fmt.Sprintf("HTLC state is not Open."))
+	}
+
+	// check if secret not valid
+	if !bytes.Equal(k.GetSecretHashLock(secret, htlc.Timestamp), secretHashLock) {
+		return nil, types.ErrInvalidSecret(k.codespace, fmt.Sprintf("invalid secret: %s", hex.EncodeToString(secret)))
+	}
+
+	// do claim
+	htlcAddr := getHTLCAddress(htlc.OutAmount.Denom)
+	if _, err := k.bk.SendCoins(ctx, htlcAddr, htlc.Receiver, sdk.Coins{htlc.OutAmount}); err != nil {
+		return nil, err
+	}
+
+	// update secret and state in HTLC
+	htlc.Secret = secret
+	htlc.State = types.StateCompleted
+	k.SetHTLC(ctx, htlc, secretHashLock)
+
+	// add to coinflow
+	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, htlcAddr.String(), htlc.Receiver.String(), htlc.OutAmount.String(), sdk.CoinHTLCClaimFlow, "")
+
+	calimTags := sdk.NewTags(
+		types.TagSender, []byte(htlc.Sender),
+		types.TagReceiver, []byte(htlc.Receiver),
+		types.TagSecretHashLock, []byte(hex.EncodeToString(secretHashLock)),
+		types.TagSecret, []byte(hex.EncodeToString(secret)),
+	)
+
+	return calimTags, nil
+}
+
+func (k Keeper) RefundHTLC(ctx sdk.Context, secretHashLock []byte) (sdk.Tags, sdk.Error) {
+
+	// get the htlc
+	htlc, err := k.GetHTLC(ctx, secretHashLock)
+	if err != nil {
+		return nil, err
+	}
+
+	// check if not expired
+	if htlc.State != types.StateExpired {
+		return nil, types.ErrStateIsNotOpen(k.codespace, fmt.Sprintf("HTLC state is not Expired."))
+	}
+
+	// do refund
+	htlcAddr := getHTLCAddress(htlc.OutAmount.Denom)
+	if _, err := k.bk.SendCoins(ctx, htlcAddr, htlc.Sender, sdk.Coins{htlc.OutAmount}); err != nil {
+		return nil, err
+	}
+
+	// update state in HTLC
+	htlc.State = types.StateRefunded
+	k.SetHTLC(ctx, htlc, secretHashLock)
+
+	// add to coinflow
+	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, htlcAddr.String(), htlc.Sender.String(), htlc.OutAmount.String(), sdk.CoinHTLCRefundFlow, "")
+
+	refundTags := sdk.NewTags(
+		types.TagSender, []byte(htlc.Sender),
+		types.TagSecretHashLock, []byte(hex.EncodeToString(secretHashLock)),
+	)
+
+	return refundTags, nil
+}
+
+// GetSecretHashLock calculates the secret hash lock
+func (k Keeper) GetSecretHashLock(secret []byte, timestamp uint64) []byte {
+	return sdk.SHA256(append(secret, sdk.Uint64ToBigEndian(timestamp)...))
 }
 
 func (k Keeper) HasSecretHashLock(ctx sdk.Context, secretHashLock []byte) bool {
