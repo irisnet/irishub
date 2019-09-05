@@ -53,7 +53,7 @@ Details in [distribution](../mint.md)
 
 Details in [slashing](../slashing.md)
 
-## Parameters is Asset
+## Parameters in Asset
 
 | key |Description | Range|
 |----| ---|---|
