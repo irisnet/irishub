@@ -2,6 +2,7 @@ package v2
 
 import (
 	"fmt"
+	"github.com/irisnet/irishub/app/v2/htlc"
 	"sort"
 	"strings"
 
@@ -56,6 +57,7 @@ type ProtocolV2 struct {
 	assetKeeper    asset.Keeper
 	randKeeper     rand.Keeper
 	coinswapKeeper coinswap.Keeper
+	htlcKeeper     htlc.Keeper
 
 	router      protocol.Router      // handle any kind of message
 	queryRouter protocol.QueryRouter // router for redirecting query calls
@@ -139,6 +141,7 @@ func MakeCodec() *codec.Codec {
 	rand.RegisterCodec(cdc)
 	codec.RegisterCrypto(cdc)
 	coinswap.RegisterCodec(cdc)
+	htlc.RegisterCodec(cdc)
 	return cdc
 }
 
@@ -282,6 +285,7 @@ func (p *ProtocolV2) configKeepers() {
 
 	p.randKeeper = rand.NewKeeper(p.cdc, protocol.KeyRand, rand.DefaultCodespace)
 	p.coinswapKeeper = coinswap.NewKeeper(p.cdc, protocol.KeySwap, p.bankKeeper, p.accountMapper, p.paramsKeeper.Subspace(coinswap.DefaultParamSpace))
+	p.htlcKeeper = htlc.NewKeeper(p.cdc, protocol.KeyHtlc, p.bankKeeper, htlc.DefaultCodespace, p.paramsKeeper.Subspace(htlc.DefaultParamSpace))
 }
 
 // configure all Routers
@@ -296,7 +300,8 @@ func (p *ProtocolV2) configRouters() {
 		AddRoute(protocol.GuardianRoute, guardian.NewHandler(p.guardianKeeper)).
 		AddRoute(protocol.AssetRoute, asset.NewHandler(p.assetKeeper)).
 		AddRoute(protocol.RandRoute, rand.NewHandler(p.randKeeper)).
-		AddRoute(protocol.SwapRoute, coinswap.NewHandler(p.coinswapKeeper))
+		AddRoute(protocol.SwapRoute, coinswap.NewHandler(p.coinswapKeeper)).
+		AddRoute(protocol.HtlcRoute, htlc.NewHandler(p.htlcKeeper))
 
 	p.queryRouter.
 		AddRoute(protocol.AccountRoute, bank.NewQuerier(p.bankKeeper, p.cdc)).
@@ -308,8 +313,8 @@ func (p *ProtocolV2) configRouters() {
 		AddRoute(protocol.ParamsRoute, params.NewQuerier(p.paramsKeeper)).
 		AddRoute(protocol.AssetRoute, asset.NewQuerier(p.assetKeeper)).
 		AddRoute(protocol.RandRoute, rand.NewQuerier(p.randKeeper)).
-		AddRoute(protocol.SwapRoute, coinswap.NewQuerier(p.coinswapKeeper))
-
+		AddRoute(protocol.SwapRoute, coinswap.NewQuerier(p.coinswapKeeper)).
+		AddRoute(protocol.HtlcRoute, htlc.NewQuerier(p.htlcKeeper))
 }
 
 // configure all FeeHandlers
@@ -341,6 +346,7 @@ func (p *ProtocolV2) GetKVStoreKeyList() []*sdk.KVStoreKey {
 		protocol.KeyAsset,
 		protocol.KeyRand,
 		protocol.KeySwap,
+		protocol.KeyHtlc,
 	}
 }
 

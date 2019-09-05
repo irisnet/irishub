@@ -23,6 +23,7 @@ const (
 	AssetStore           = "asset"
 	RandStore            = "rand"
 	SwapStore            = "coinswap"
+	HtlcStore            = "htlc"
 
 	// all route for query and handler
 	BankRoute     = "bank"
@@ -38,6 +39,7 @@ const (
 	AssetRoute    = AssetStore
 	RandRoute     = RandStore
 	SwapRoute     = SwapStore
+	HtlcRoute     = HtlcStore
 )
 
 var (
@@ -59,4 +61,5 @@ var (
 	KeyAsset    = sdk.NewKVStoreKey(AssetStore)
 	KeyRand     = sdk.NewKVStoreKey(RandStore)
 	KeySwap     = sdk.NewKVStoreKey(SwapStore)
+	KeyHtlc     = sdk.NewKVStoreKey(HtlcStore)
 )
