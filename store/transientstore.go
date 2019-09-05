@@ -2,7 +2,7 @@ package store
 
 import (
 	sdk "github.com/irisnet/irishub/types"
-	dbm "github.com/tendermint/tendermint/libs/db"
+	dbm "github.com/tendermint/tm-db"
 )
 
 var _ KVStore = (*transientStore)(nil)

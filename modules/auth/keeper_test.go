@@ -3,16 +3,16 @@ package auth
 import (
 	"testing"
 
-	codec "github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/store"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/stretchr/testify/require"
 	abci "github.com/tendermint/tendermint/abci/types"
-	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
+	dbm "github.com/tendermint/tm-db"
 )
 
-func setupMultiStore() (sdk.MultiStore, *sdk.KVStoreKey, *sdk.KVStoreKey, *sdk.KVStoreKey ,*sdk.TransientStoreKey) {
+func setupMultiStore() (sdk.MultiStore, *sdk.KVStoreKey, *sdk.KVStoreKey, *sdk.KVStoreKey, *sdk.TransientStoreKey) {
 	db := dbm.NewMemDB()
 	capKey := sdk.NewKVStoreKey("capkey")
 	capKey2 := sdk.NewKVStoreKey("capkey2")
@@ -28,7 +28,7 @@ func setupMultiStore() (sdk.MultiStore, *sdk.KVStoreKey, *sdk.KVStoreKey, *sdk.K
 }
 
 func TestAccountMapperGetSet(t *testing.T) {
-	ms, capKey, _, _, _:= setupMultiStore()
+	ms, capKey, _, _, _ := setupMultiStore()
 	cdc := codec.New()
 	RegisterBaseAccount(cdc)
 
