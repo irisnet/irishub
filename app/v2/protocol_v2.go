@@ -2,11 +2,8 @@ package v2
 
 import (
 	"fmt"
-	"github.com/irisnet/irishub/app/v2/htlc"
 	"sort"
 	"strings"
-
-	"github.com/irisnet/irishub/app/v2/coinswap"
 
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/app/v1/asset"
@@ -21,6 +18,8 @@ import (
 	"github.com/irisnet/irishub/app/v1/slashing"
 	"github.com/irisnet/irishub/app/v1/stake"
 	"github.com/irisnet/irishub/app/v1/upgrade"
+	"github.com/irisnet/irishub/app/v2/coinswap"
+	"github.com/irisnet/irishub/app/v2/htlc"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/guardian"
 	sdk "github.com/irisnet/irishub/types"

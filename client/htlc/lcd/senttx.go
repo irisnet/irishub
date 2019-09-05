@@ -2,13 +2,14 @@ package lcd
 
 import (
 	"encoding/hex"
+	"net/http"
+
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/app/v2/htlc"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
-	"net/http"
 )
 
 func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec) {

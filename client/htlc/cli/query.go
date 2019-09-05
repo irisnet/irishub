@@ -2,6 +2,7 @@ package cli
 
 import (
 	"fmt"
+
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/app/v2/htlc"
 	"github.com/irisnet/irishub/client/context"
