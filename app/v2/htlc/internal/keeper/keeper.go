@@ -103,6 +103,7 @@ func (k Keeper) ClaimHTLC(ctx sdk.Context, secret []byte, secretHashLock []byte)
 	htlc.Secret = secret
 	htlc.State = types.StateCompleted
 	k.SetHTLC(ctx, htlc, secretHashLock)
+	k.DeleteHTLCFromExpireQueue(ctx, uint64(ctx.BlockHeight()), secretHashLock)
 
 	// add to coinflow
 	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, htlcAddr.String(), htlc.Receiver.String(), htlc.OutAmount.String(), sdk.CoinHTLCClaimFlow, "")
@@ -203,4 +204,10 @@ func (k Keeper) DeleteHTLCFromExpireQueue(ctx sdk.Context, expireHeight uint64, 
 // getHTLCAddress returns a dedicated address for locking tokens by the specified denom
 func getHTLCAddress(denom string) sdk.AccAddress {
 	return sdk.AccAddress(crypto.AddressHash([]byte(denom)))
+}
+
+// IterateHTLCExpireQueueByHeight iterates the HTLC expire queue by the specified height
+func (k Keeper) IterateHTLCExpireQueueByHeight(ctx sdk.Context, height uint64) sdk.Iterator {
+	store := ctx.KVStore(k.storeKey)
+	return sdk.KVStorePrefixIterator(store, KeyHTLCExpireQueueSubspace(height))
 }
