@@ -60,8 +60,8 @@ Details in [slashing](../slashing.md)
 | `asset/AssetTaxRate` | 资产税率，即Community Tax的比例 | [0, 1]
 | `asset/IssueTokenBaseFee`| 发行Token的基准费用| [0,+∞)
 | `asset/MintTokenFeeRatio`  | 增发Token的费率(相对于发行费用) | [0, 1]
-| `asset/CreateGatewayBaseFee`|创建网关的基准费用 | [0,+∞)          
-| `asset/GatewayAssetFeeRatio`|发行网关资产的费率(相对于native资产的发行费用) |[0, 1]      
+| `asset/CreateGatewayBaseFee`| 创建网关的基准费用 | [0,+∞)          
+| `asset/GatewayAssetFeeRatio`| 发行网关资产的费率(相对于native资产的发行费用) | [0, 1]      
 
 Details in [asset](../asset.md)
 
