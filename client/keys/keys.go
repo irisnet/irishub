@@ -2,7 +2,7 @@ package keys
 
 import (
 	"github.com/irisnet/irishub/crypto/keys"
-	dbm "github.com/tendermint/tendermint/libs/db"
+	dbm "github.com/tendermint/tm-db"
 )
 
 // GetKeyBase initializes a keybase based on the given db.

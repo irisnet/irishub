@@ -23,7 +23,10 @@ import (
 	tmflags "github.com/tendermint/tendermint/libs/cli/flags"
 	"github.com/tendermint/tendermint/libs/log"
 	"github.com/tendermint/tendermint/privval"
+	dbm "github.com/tendermint/tm-db"
 )
+
+const LevelDBBackend = "leveldb"
 
 // server context
 type Context struct {
@@ -101,6 +104,9 @@ func interceptLoadConfig() (conf *cfg.Config, err error) {
 
 	if conf == nil {
 		conf, err = tcmd.ParseConfig() // NOTE: ParseConfig() creates dir/files as necessary.
+		if conf != nil && conf.DBBackend == LevelDBBackend {
+			conf.DBBackend = string(dbm.GoLevelDBBackend)
+		}
 	}
 
 	// create a default iris config file if it does not exist

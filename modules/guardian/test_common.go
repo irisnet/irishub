@@ -1,22 +1,22 @@
 package guardian
 
 import (
-	"testing"
 	"os"
+	"testing"
 
-	"github.com/irisnet/irishub/modules/stake"
-	"github.com/irisnet/irishub/modules/bank"
-	"github.com/stretchr/testify/require"
-	sdk "github.com/irisnet/irishub/types"
-	dbm "github.com/tendermint/tendermint/libs/db"
-	abci "github.com/tendermint/tendermint/abci/types"
-	"github.com/tendermint/tendermint/libs/log"
+	"encoding/hex"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/auth"
+	"github.com/irisnet/irishub/modules/bank"
+	"github.com/irisnet/irishub/modules/stake"
+	"github.com/irisnet/irishub/store"
+	sdk "github.com/irisnet/irishub/types"
+	"github.com/stretchr/testify/require"
+	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/crypto"
 	"github.com/tendermint/tendermint/crypto/ed25519"
-	"github.com/irisnet/irishub/store"
-	"encoding/hex"
+	"github.com/tendermint/tendermint/libs/log"
+	dbm "github.com/tendermint/tm-db"
 )
 
 var (
