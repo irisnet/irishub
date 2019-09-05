@@ -61,7 +61,7 @@ Details in [slashing](../slashing.md)
 | `asset/IssueTokenBaseFee`| Issue token's  fee| [0,+∞)
 | `asset/MintTokenFeeRatio`  | Mint token's fee | [0, 1]
 | `asset/CreateGatewayBaseFee`| Create gateway Token's fee | [0,+∞)          
-| `asset/GatewayAssetFeeRatio`| Issue gateway token's fee |[0, 1]      
+| `asset/GatewayAssetFeeRatio`| Issue gateway token's fee | [0, 1]      
 
 Details in [asset](../asset.md)
 
