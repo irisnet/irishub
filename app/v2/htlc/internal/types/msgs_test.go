@@ -61,3 +61,47 @@ func TestMsgCreateHTLCGetSigners(t *testing.T) {
 	expected := "[73656E646572]"
 	require.Equal(t, expected, fmt.Sprintf("%v", res))
 }
+
+// TODO: Claim HTLC test
+
+func TestNewMsgClaimHTLC(t *testing.T) {
+	// TODO:
+}
+
+func TestMsgClaimHTLCRoute(t *testing.T) {
+	// TODO:
+}
+
+func TestMsgClaimHTLCValidation(t *testing.T) {
+	// TODO:
+}
+
+func TestMsgClaimHTLCGetSignBytes(t *testing.T) {
+	// TODO:
+}
+
+func TestMsgClaimHTLCGetSigners(t *testing.T) {
+	// TODO:
+}
+
+// TODO: Refund HTLC test
+
+func TestNewMsgRefundHTLC(t *testing.T) {
+// TODO:
+}
+
+func TestMsgRefundHTLCRoute(t *testing.T) {
+	// TODO:
+}
+
+func TestMsgRefundHTLCValidation(t *testing.T) {
+	// TODO:
+}
+
+func TestMsgRefundHTLCGetSignBytes(t *testing.T) {
+	// TODO:
+}
+
+func TestMsgRefundHTLCGetSigners(t *testing.T) {
+	// TODO:
+}

@@ -6,4 +6,5 @@ var (
 	TagReceiver             = "receiver"
 	TagReceiverOnOtherChain = "receiver-on-other-chain"
 	TagSecretHashLock       = "secret-hash-lock"
+	TagSecret               = "secret"
 )
