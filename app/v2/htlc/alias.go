@@ -8,7 +8,10 @@ import (
 // exported types
 type (
 	MsgCreateHTLC = types.MsgCreateHTLC
-	HTLC          = types.HTLC
+	MsgClaimHTLC  = types.MsgClaimHTLC
+	MsgRefundHTLC = types.MsgRefundHTLC
+
+	HTLC = types.HTLC
 
 	Params       = types.Params
 	GenesisState = types.GenesisState
@@ -28,7 +31,13 @@ var (
 	RegisterCodec        = types.RegisterCodec
 
 	NewMsgCreateHTLC = types.NewMsgCreateHTLC
+	NewMsgClaimHTLC  = types.NewMsgClaimHTLC
+	NewMsgRefundHTLC = types.NewMsgRefundHTLC
 	NewHTLC          = types.NewHTLC
+
+	StateOpen      = types.StateOpen
+	StateCompleted = types.StateCompleted
+	StateExpired   = types.StateExpired
 
 	ValidateSecretHashLock = types.ValidateSecretHashLock
 

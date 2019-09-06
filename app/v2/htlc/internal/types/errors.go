@@ -14,6 +14,9 @@ const (
 	CodeInvalidSecretHashLock       sdk.CodeType = 102
 	CodeSecretHashLockAlreadyExists sdk.CodeType = 103
 	CodeInvalidTimeLock             sdk.CodeType = 104
+	CodeInvalidSecret               sdk.CodeType = 105
+	CodeStateIsNotOpen              sdk.CodeType = 106
+	CodeStateIsNotExpired           sdk.CodeType = 107
 )
 
 //----------------------------------------
@@ -37,4 +40,16 @@ func ErrSecretHashLockAlreadyExists(codespace sdk.CodespaceType, msg string) sdk
 
 func ErrInvalidTimeLock(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidTimeLock, msg)
+}
+
+func ErrInvalidSecret(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidSecret, msg)
+}
+
+func ErrStateIsNotOpen(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeStateIsNotOpen, msg)
+}
+
+func ErrStateIsNotExpired(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeStateIsNotExpired, msg)
 }

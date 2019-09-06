@@ -12,7 +12,7 @@ var (
 )
 
 const (
-	FormatUniABSPrefix = "uni:"
+	FormatUniABSPrefix = sdk.FormatUniABSPrefix
 	FormatUniId        = FormatUniABSPrefix + "%s"
 )
 

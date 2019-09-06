@@ -348,7 +348,7 @@ func (am AccountKeeper) InitTotalSupply(ctx sdk.Context) {
 	tsMap := make(map[string]sdk.Coin)
 	am.IterateAccounts(ctx, func(account Account) (stop bool) {
 		for _, coin := range account.GetCoins() {
-			if sdk.IrisAtto == coin.Denom || sdk.Iris == coin.Denom {
+			if sdk.IrisAtto == coin.Denom || sdk.Iris == coin.Denom || strings.HasPrefix(coin.Denom, sdk.FormatUniABSPrefix) {
 				continue
 			}
 			totalSupply, ok := tsMap[coin.Denom]
@@ -360,7 +360,15 @@ func (am AccountKeeper) InitTotalSupply(ctx sdk.Context) {
 		}
 		return false
 	})
+
+	// Defense against empty token's keyId
+	var coins sdk.Coins
 	for _, coin := range tsMap {
+		coins = append(coins, coin)
+	}
+
+	coins = coins.Sort()
+	for _, coin := range coins {
 		am.SetTotalSupply(ctx, coin)
 	}
 }
