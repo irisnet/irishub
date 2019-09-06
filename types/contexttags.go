@@ -27,6 +27,9 @@ const (
 	CoinSwapOutputFlow          = "CoinSwapOutput"
 	CoinSwapAddLiquidityFlow    = "AddLiquidity"
 	CoinSwapRemoveLiquidityFlow = "RemoveLiquidity"
+	CoinHTLCCreateFlow          = "CreateHTLC"
+	CoinHTLCClaimFlow           = "ClaimHTLC"
+	CoinHTLCRefundFlow          = "RefundHTLC"
 
 	//Trigger: transaction hash, module endBlock
 	GovEndBlocker     = "govEndBlocker"
