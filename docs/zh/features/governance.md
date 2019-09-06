@@ -7,6 +7,7 @@
 3. 软件升级提议的链上治理
 4. 网络终止提议的链上治理
 5. Tax收入分配提议的链上治理
+6. 添加外部资产提议的链上治理
 
 ## 交互流程
 
@@ -14,7 +15,7 @@
 
 不同级别对应的具体 Proposal：
 - Critical：`SoftwareUpgrade`, `SystemHalt`
-- Important：`Parameter`
+- Important：`Parameter`,`TokenAddition`
 - Normal：`CommunityTaxUsage`,`PlainText`
 
 `SoftwareUpgrade Proposal` 和 `SystemHalt Proposal` 只能由profiler发起。
@@ -23,20 +24,20 @@
 
 | Gov参数 | Critical | Important | Normal |Range|
 | ------ | ------ | ------ | ------|------|
-| govDepositProcedure/MinDeposit | 4000 iris | 2000 iris | 1000 iris |[10iris,10000iris]|
-| govDepositProcedure/MaxDepositPeriod | 24 hours | 24 hours | 24 hours |[20s,3d]|
-| govVotingProcedure/VotingPeriod | 72 hours | 60 hours | 48 hours |[20s,3d]|
-| govVotingProcedure/MaxProposal | 1 | 5 | 7 |Critical==1, other(1,)|
-| govTallyingProcedure/Participation | 1/2 | 1/2 | 1/2 |(0,1)|
-| govTallyingProcedure/Threshold | 3/4 | 2/3 | 1/2 |(0,1)|
-| govTallyingProcedure/Veto | 1/3 | 1/3 | 1/3 |(0,1)|
-| govTallyingProcedure/Penalty | 0 | 0 | 0 |(0,1)|
+| MinDeposit | 4000 iris | 2000 iris | 1000 iris |[10iris,10000iris]|
+| DepositPeriod | 24 hours | 24 hours | 24 hours |[20s,3d]|
+| VotingPeriod | 120 hours | 120 hours | 120 hours |[20s,3d]|
+| MaxNum | 1 | 5 | 7 |Critical==1, other(1,)|
+| Participation | 0.5 | 0.5 | 0.5 |(0,1)|
+| Threshold | 0.75 | 0.67 | 0.5 |(0,1)|
+| Veto | 0.33 | 0.33 | 0.33 |(0,1)|
+| Penalty | 0 | 0 | 0 |(0,1)|
 
 
 * `MinDeposit`  最小抵押金额
-* `MaxDepositPeriod` 抵押阶段的窗口期
+* `DepositPeriod` 抵押阶段的窗口期
 * `VotingPeriod` 投票阶段的窗口期
-* `MaxProposal` 该类型提议在网络中同时能存在的最大个数
+* `MaxNum` 该类型提议在网络中同时能存在的最大个数
 * `Penalty`  slash验证人绑定通证的比例
 * `Veto`  强烈反对的power占参与投票power的比例， 如果达到这个比例则提议被拒绝， 提议结果为“强烈反对”
 * `Threshold`  提议通过所需"赞成"的power占参与投票power的比例， 如果达到这个比例则提议通过， 提议结果为“同意”
