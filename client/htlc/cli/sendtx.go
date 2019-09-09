@@ -19,7 +19,7 @@ func GetCmdCreateHtlc(cdc *codec.Codec) *cobra.Command {
 		Use:   "create",
 		Short: "create a HTLC",
 		Example: "iriscli htlc create --receiver=<receiver> --receiver-on-other-chain=<receiver-on-other-chain> --hash-lock=<hash-lock> " +
-			"--in-amount=<in-amount> --amount=<amount> --time-lock=<time-lock>",
+			"--in-amount=<in-amount> --amount=<amount> --time-lock=<time-lock> --timestamp=<timestamp>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
@@ -79,6 +79,86 @@ func GetCmdCreateHtlc(cdc *codec.Codec) *cobra.Command {
 	cmd.MarkFlagRequired(FlagTimeLock)
 	cmd.MarkFlagRequired(FlagTimestamp)
 	cmd.MarkFlagRequired(FlagSecret)
+
+	return cmd
+}
+
+// GetCmdClaimHtlc implements the claim htlc command
+func GetCmdClaimHtlc(cdc *codec.Codec) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "claim",
+		Short:   "claim an opened HTLC",
+		Example: "iriscli htlc claim --hash-lock=<hash-lock> --secret=<secret>",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().
+				WithCodec(cdc).
+				WithLogger(os.Stdout).
+				WithAccountDecoder(utils.GetAccountDecoder(cdc))
+			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).
+				WithCliCtx(cliCtx)
+
+			sender, err := cliCtx.GetFromAddress()
+			if err != nil {
+				return err
+			}
+
+			hashLock := viper.GetString(FlagHashLock)
+			secret := viper.GetString(FlagSecret)
+
+			var msg sdk.Msg
+			msg = htlc.NewMsgClaimHTLC(
+				sender, hashLock, secret)
+
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+
+			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
+		},
+	}
+
+	cmd.Flags().AddFlagSet(FsClaimHTLC)
+	cmd.MarkFlagRequired(FlagHashLock)
+	cmd.MarkFlagRequired(FlagSecret)
+
+	return cmd
+}
+
+// GetCmdRefundHtlc implements the refund htlc command
+func GetCmdRefundHtlc(cdc *codec.Codec) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "refund",
+		Short:   "refund from an expired HTLC",
+		Example: "iriscli refund claim --hash-lock=<hash-lock>",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().
+				WithCodec(cdc).
+				WithLogger(os.Stdout).
+				WithAccountDecoder(utils.GetAccountDecoder(cdc))
+			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).
+				WithCliCtx(cliCtx)
+
+			sender, err := cliCtx.GetFromAddress()
+			if err != nil {
+				return err
+			}
+
+			hashLock := viper.GetString(FlagHashLock)
+
+			var msg sdk.Msg
+			msg = htlc.NewMsgRefundHTLC(
+				sender, hashLock)
+
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+
+			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
+		},
+	}
+
+	cmd.Flags().AddFlagSet(FsRefundHTLC)
+	cmd.MarkFlagRequired(FlagHashLock)
 
 	return cmd
 }

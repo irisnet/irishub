@@ -18,6 +18,7 @@ const (
 var (
 	FsCreateHTLC = flag.NewFlagSet("", flag.ContinueOnError)
 	FsClaimHTLC  = flag.NewFlagSet("", flag.ContinueOnError)
+	FsRefundHTLC = flag.NewFlagSet("", flag.ContinueOnError)
 )
 
 func init() {
@@ -29,5 +30,8 @@ func init() {
 	FsCreateHTLC.String(FlagAmount, "", "similar to the amount in the original transfer")
 	FsCreateHTLC.String(FlagTimeLock, "", "the number of blocks to wait before the asset may be returned to")
 
+	FsClaimHTLC.BytesHex(FlagHashLock, nil, "the secret for generating hashLock")
 	FsClaimHTLC.String(FlagSecret, "", "the secret for generating hashLock")
+
+	FsRefundHTLC.BytesHex(FlagHashLock, nil, "the secret for generating hashLock")
 }

@@ -313,6 +313,8 @@ func main() {
 	htlcCmd.AddCommand(
 		client.PostCommands(
 			htlcmd.GetCmdCreateHtlc(cdc),
+			htlcmd.GetCmdClaimHtlc(cdc),
+			htlcmd.GetCmdRefundHtlc(cdc),
 		)...)
 
 	htlcCmd.AddCommand(
