@@ -2,31 +2,35 @@
 order: 3
 ---
 
-# Testnet
+# Join The Testnet
 
-## Fuxi  Testnet
+We have 2 testnets: Fuxi and Nyancat.
 
-The Fuxi Testnet is used to provide a stable test environment for developers such as third-party wallets, browsers and other applications.
+Since the launch of mainnet, **Fuxi Testnet** starts to operate as a stable application testnet which has the same version as the mainnet, 
+so that the service providers of IRISnet can develop their apps on or interact with IRIShub without running a node or lcd instance. 
 
-## How to Use Fuxi Testnet
+However there is also a need for validators to test the new version of IRIShub before it can be relased to production, 
+and this is **Nyancat Testnet**'s focus. And new validators can also use the Nyancat Testnet to practice the validator operations.
 
-### Step 1: Install `iriscli` on Your Server
+## Install
 
-Please follow this [instruction](../software/How-to-install-irishub.md) to get `iriscli` installed locally.
+We use different bech32 prefixes to distinguish the mainnet and testnet, 
+all you need to do is to run the following command in the source root before [building or installing](#TODO) the iris binaries:
 
-### Step 2: Connect to nodes
+```bash
+source scripts/setTestEnv.sh # to build or install the testnet version
+```
 
-* RPC
+## Fuxi Testnet
 
-please use the following url as `node` in your `iriscli` query: http://rpc.testnet.irisnet.org:80
+There are no options to run nodes connect to the Fuxi Testnet, you can use the public RPC and LCD to develop and test your apps.
 
-* LCD
+- RPC: <http://rpc.testnet.irisnet.org:80>
 
-please visit lcd site for information: https://lcd.testnet.irisnet.org/swagger-ui/
+- LCD: <https://lcd.testnet.irisnet.org/swagger-ui/>
 
+- Explorer: <https://testnet.irisplorer.io>
 
-##  Useful Links
+## Nyancat Testnet
 
-* Riot chat: #irisvalidators:matrix.org
-
-* Explorer: https://testnet.irisplorer.io/#/home
+Please refer to: <https://github.com/irisnet/testnets/tree/master/nyancat#how-to-join-nyancat-testnet>

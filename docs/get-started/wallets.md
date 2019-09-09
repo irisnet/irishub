@@ -1,3 +1,7 @@
+---
+order: 4
+---
+
 # IRISnet Wallets
 
 These web and mobile wallets allow you to store & transfer IRIS, delegate IRIS to validators, and some of them also support ATOM. Note that we do not endorse any of the wallets, they are listed for your convenience.
