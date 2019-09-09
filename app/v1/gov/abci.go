@@ -1,8 +1,6 @@
 package gov
 
 import (
-	"strconv"
-
 	"github.com/irisnet/irishub/app/v1/gov/tags"
 	sdk "github.com/irisnet/irishub/types"
 	tmstate "github.com/tendermint/tendermint/state"
@@ -49,18 +47,18 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 
 		var action []byte
 		if result == PASS {
-			keeper.metrics.ProposalStatus.With(ProposalIDLabel, strconv.FormatUint(proposalID, 10)).Set(2)
+			keeper.metrics.setProposalStatus(proposalID, 2)
 			keeper.RefundDeposits(ctx, activeProposal.GetProposalID())
 			activeProposal.SetStatus(StatusPassed)
 			action = tags.ActionProposalPassed
 			activeProposal.Execute(ctx, keeper)
 		} else if result == REJECT {
-			keeper.metrics.ProposalStatus.With(ProposalIDLabel, strconv.FormatUint(proposalID, 10)).Set(3)
+			keeper.metrics.setProposalStatus(proposalID, 3)
 			keeper.RefundDeposits(ctx, activeProposal.GetProposalID())
 			activeProposal.SetStatus(StatusRejected)
 			action = tags.ActionProposalRejected
 		} else if result == REJECTVETO {
-			keeper.metrics.ProposalStatus.With(ProposalIDLabel, strconv.FormatUint(proposalID, 10)).Set(3)
+			keeper.metrics.setProposalStatus(proposalID, 3)
 			keeper.DeleteDeposits(ctx, activeProposal.GetProposalID())
 			activeProposal.SetStatus(StatusRejected)
 			action = tags.ActionProposalRejected
@@ -73,16 +71,21 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 		resTags = resTags.AppendTag(tags.ProposalID, []byte(string(proposalID)))
 
 		for _, valAddr := range keeper.GetValidatorSet(ctx, proposalID) {
+			validator := keeper.ds.GetValidatorSet().Validator(ctx, valAddr)
+			if validator == nil {
+				ctx.Logger().Error("validator not existed", "ProposalID", proposalID, "result", result, "ValAddress", valAddr)
+				continue
+			}
 			if _, ok := votingVals[valAddr.String()]; !ok {
-				val := keeper.ds.GetValidatorSet().Validator(ctx, valAddr)
-				if val != nil && val.GetStatus() == sdk.Bonded {
+				if validator.GetStatus() == sdk.Bonded {
 					keeper.ds.GetValidatorSet().Slash(ctx,
-						val.GetConsAddr(),
+						validator.GetConsAddr(),
 						ctx.BlockHeight(),
-						val.GetPower().RoundInt64(),
+						validator.GetPower().RoundInt64(),
 						keeper.GetTallyingProcedure(ctx, activeProposal.GetProposalLevel()).Penalty)
 				}
 			}
+			keeper.metrics.deleteVote(validator.GetConsAddr().String(), proposalID)
 		}
 
 		keeper.SubProposalNum(ctx, activeProposal.GetProposalLevel())
