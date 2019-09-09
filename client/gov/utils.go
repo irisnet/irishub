@@ -53,8 +53,12 @@ func NormalizeProposalType(proposalType string) string {
 		return "Parameter"
 	case "SoftwareUpgrade", "software_upgrade":
 		return "SoftwareUpgrade"
+	case "SystemHalt", "system_halt":
+		return "SystemHalt"
 	case "CommunityTaxUsage", "community_tax_usage":
 		return "CommunityTaxUsage"
+	case "TokenAddition", "token_addition":
+		return "TokenAddition"
 	}
 	return proposalType
 }
