@@ -35,7 +35,11 @@ func queryTxs(cliCtx context.CLIContext, cdc *codec.Codec, tag string, delegator
 		fmt.Sprintf("%s='%s'", tags.Action, tag),
 		fmt.Sprintf("%s='%s'", tags.Delegator, delegatorAddr),
 	}
-	return tx.SearchTxs(cliCtx, cdc, tags, page, perPage)
+	result, err := tx.SearchTxs(cliCtx, cdc, tags, page, perPage)
+	if result != nil {
+		return result.Txs, err
+	}
+	return []tx.Info{}, err
 }
 
 func queryBonds(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string) http.HandlerFunc {

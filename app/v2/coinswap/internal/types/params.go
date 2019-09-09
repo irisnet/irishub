@@ -37,7 +37,7 @@ func ParamTypeTable() params.TypeTable {
 
 // String returns a human readable string representation of the parameters.
 func (p Params) String() string {
-	return fmt.Sprintf(`Params:
+	return fmt.Sprintf(`Coinswap Params:
   Fee:			%s`, p.Fee.String(),
 	)
 }

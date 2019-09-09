@@ -3,15 +3,12 @@ package store
 import (
 	"testing"
 
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/stretchr/testify/require"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/crypto/merkle"
-	dbm "github.com/tendermint/tendermint/libs/db"
-
-	sdk "github.com/irisnet/irishub/types"
+	dbm "github.com/tendermint/tm-db"
 )
-
-const useDebugDB = false
 
 func TestStoreType(t *testing.T) {
 	db := dbm.NewMemDB()
@@ -38,9 +35,6 @@ func TestStoreMount(t *testing.T) {
 
 func TestMultistoreCommitLoad(t *testing.T) {
 	var db dbm.DB = dbm.NewMemDB()
-	if useDebugDB {
-		db = dbm.NewDebugDB("CMS", db)
-	}
 	store := newMultiStoreWithMounts(db)
 	err := store.LoadLatestVersion()
 	require.Nil(t, err)
@@ -102,9 +96,6 @@ func TestMultistoreCommitLoad(t *testing.T) {
 ////////////////////  iris/cosmos-sdk begin ///////////////////////////
 func TestCommitStoreLoadersNotUsed(t *testing.T) {
 	var db dbm.DB = dbm.NewMemDB()
-	if useDebugDB {
-		db = dbm.NewDebugDB("CMS", db)
-	}
 	store := newMultiStoreWithMounts(db)
 	err := store.LoadLatestVersion()
 	require.Nil(t, err)
@@ -143,6 +134,7 @@ func newMultiStoreWithMountsNewVersion(db dbm.DB) *rootMultiStore {
 		sdk.NewKVStoreKey("store5"), sdk.StoreTypeIAVL, db)
 	return store
 }
+
 ////////////////////  iris/cosmos-sdk end ///////////////////////////
 
 func TestParsePath(t *testing.T) {

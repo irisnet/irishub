@@ -176,7 +176,7 @@ func (iter *prefixIterator) Close() {
 	iter.iter.Close()
 }
 
-// copied from github.com/tendermint/tendermint/libs/db/prefix_db.go
+// copied from github.com/tendermint/tm-db/prefix_db.go
 func stripPrefix(key []byte, prefix []byte) []byte {
 	if len(key) < len(prefix) || !bytes.Equal(key[:len(prefix)], prefix) {
 		panic("should not happen")
@@ -189,7 +189,7 @@ func cpIncr(bz []byte) []byte {
 	return sdk.PrefixEndBytes(bz)
 }
 
-// copied from github.com/tendermint/tendermint/libs/db/util.go
+// copied from github.com/tendermint/tm-db/util.go
 func cpDecr(bz []byte) (ret []byte) {
 	if len(bz) == 0 {
 		panic("cpDecr expects non-zero bz length")

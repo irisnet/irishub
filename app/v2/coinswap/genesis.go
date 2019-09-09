@@ -36,7 +36,7 @@ func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
 
 // ExportGenesis returns a GenesisState for a given context and keeper.
 func ExportGenesis(ctx sdk.Context, keeper Keeper) GenesisState {
-	return NewGenesisState(types.DefaultParams())
+	return NewGenesisState(keeper.GetParams(ctx))
 }
 
 // ValidateGenesis - placeholder function
