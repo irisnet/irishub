@@ -20,5 +20,13 @@ func setupMultiStore() (sdk.MultiStore, *sdk.KVStoreKey) {
 }
 
 func TestKeeper_CreateHTLC(t *testing.T) {
-	// TODO
+	// TODO:
+}
+
+func TestKeeper_ClaimHTLC(t *testing.T) {
+	// TODO:
+}
+
+func TestKeeper_RefundHTLC(t *testing.T) {
+	// TODO:
 }
