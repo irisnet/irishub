@@ -1,4 +1,4 @@
-# Welcome to the IRISnet Docs!
+# Welcome to the IRISnet Documents!
 ![irisnet](./pics/iris.jpg)
 
 IRIS Network (a.k.a. IRISnet) aims to establish a technology foundation to facilitate construction of next-generation distributed applications. By incorporating a comprehensive service infrastructure and an enhanced IBC protocol into Tendermint & Cosmos stack, IRISnet enables service interoperability as well as token transfers across an internet of blockchains.

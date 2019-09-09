@@ -31,7 +31,7 @@ const sidebar = (directory, array) => {
 };
 
 module.exports = {
-    title: "IRISnet Docs",
+    title: "IRISnet Documents",
     base: process.env.VUEPRESS_BASE || "/",
     locales: {
         "/": {

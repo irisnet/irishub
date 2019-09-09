@@ -26,31 +26,67 @@ iris start
 You may see some connection errors, it does not matter, the P2P network is trying to find available connections
 
 [Advanced Configurations](#TODO)
+
+[Community Peers](https://github.com/irisnet/betanet/blob/master/config/community-peers.md)
+:::
+
+:::tip
+It will take a long time to catch up the latest block, you can also download the [mainnet data snapshot](#TODO) to reduce the time spent on synchronization
 :::
 
 ## Upgrade to Validator Node
 
-You now have an active full node. What's the next step? 
+### Create a Wallet
 
-If you have participated in the genesis file generation process, you should be a validator once you are fully synced. 
+You can [create a new wallet](../cli-client/keys/add.md#create-a-new-key) or [import an existing one](../cli-client/keys/add.md#recover-an-existing-key), then get some IRIS from the exchanges or anywhere else into the wallet you just created, .e.g.
 
-If you miss the genesis file generation process, you can still upgrade your full node to become an IRISnet Validator. The top 100 validators have the ability to propose new blocks to the IRIS Hub. 
+```bash
+# create a new wallet
+iriscli keys add <key_name>
+```
 
-Please follow this [instruction](Validator-Node.md) to upgrade your full node to validator node.
+:::warning
+**Important** 
 
-## Deploy IRIShub Monitor
+write the seed phrase in a safe place! It is the only way to recover your account if you ever forget your password.
+:::
 
-Please follow this [guide](../software/monitor.md) to deploy IRIHub Monitor.
+### Confirm your node has caught-up
 
-## Setup a Sentry Node
+```bash
+# if you have not installed jq
+# apt-get update && apt-get install -y jq
 
-A validator is under the risk of being attacked. You could follow this [guide](../software/sentry.md) to setup a sentry node to protect yourself.
+# if the output is false, means your node has caught-up
+iriscli status | jq .sync_info.catching_up
+```
 
-## Use a KMS
-If you plan to use a KMS (key management system), you should go through these steps first: [Using a KMS](../software/kms/kms.md).
+### Create Validator
 
-##  Useful Links
+Only if your node has caught-up, you can run the following command to upgrade your node to be a validator.
 
-- Riot chat: #irisvalidators:matrix.org
+```bash
+iriscli stake create-validator \
+	--pubkey=$(iris tendermint show-validator) \
+	--moniker=<your_validator_name> \
+	--amount=<amount_to_be_delegated, e.g. 10000iris> \	
+	--commission-rate=0.1 \
+	--gas=100000 \
+	--fee=0.6iris \	
+	--chain-id=irishub \	
+	--from=<key_name> \
+	--commit
+``` 
 
-- Explorer: <https://www.irisplorer.io>
+:::warning
+**Important** 
+
+Backup the `config` directory located in your iris home (default ~/.iris/) carefully! It is the only way to recover your validator.
+:::
+
+If there are no errors, then your node is now a validator or candidate (depending on whether your delegation amount is in the top 100)
+
+More details:
+
+- [Concepts](#TODO)
+- [Validator FAQ](#TODO)
