@@ -26,8 +26,8 @@ The resource needed for every transactions are varied for different type of tran
 | operations       | gas needed | 
 | --------------- | ---- |
 | writing the tx to the database | 10 * the size of the transaction data (in bytes) | 
-| for reading some data from database | 10 + data length(in bytes) |
-| writing some data to database | 10 + 10 * data length(in bytes) | 
+| for reading some data from database | 10 + ln(data_length)/ln(1.02), data_length is the length of the read data(in bytes) |
+| writing some data to database | 10 + 10 * ln(data_length)/ln(1.02), data_length is the length of the write data(in bytes) | 
 | signature verification | 100 | 
 
 
