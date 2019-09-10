@@ -20,12 +20,14 @@ type HTLC struct {
 	Sender               sdk.AccAddress `json:"sender"`                  // the initiator address
 	Receiver             sdk.AccAddress `json:"receiver"`                // the recipient address
 	ReceiverOnOtherChain []byte         `json:"receiver_on_other_chain"` // the recipient address on other chain
+	OtherChainName       string         `json:"other_chain_name"`        // the name of the other chain
 	OutAmount            sdk.Coin       `json:"out_amount"`              // the amount to be transferred
-	InAmount             uint64         `json:"in_amount"`               // expected amount to be received from another HTLC
-	Secret               []byte         `json:"secret"`                  // the random secret
-	Timestamp            uint64         `json:"timestamp"`               // the time used to generate the hash lock together with secret
+	InTokenName          string         `json:"in_token_name"`           // the name of the expected token to be received from other chain
+	InAmount             uint64         `json:"in_amount"`               // expected amount to be received from other chain, which is of 8 decimals
+	Secret               []byte         `json:"secret"`                  // the random secret which is 32 bytes length
+	Timestamp            uint64         `json:"timestamp"`               // the time used to generate the hash lock together with secret if provided
 	ExpireHeight         uint64         `json:"expire_height"`           // the block height by which the HTLC expires
-	State                uint8          `json:"state"`                   // the state of the HTLC(0:open,1:completed,2:expired)
+	State                uint8          `json:"state"`                   // the state of the HTLC(0:open,1:completed,2:expired,3:refunded)
 }
 
 // NewHTLC constructs a HTLC
@@ -55,7 +57,11 @@ func NewHTLC(
 
 // GetSecretHashLock calculates the secret hash lock
 func (h HTLC) GetSecretHashLock() []byte {
-	return sdk.SHA256(append(h.Secret, sdk.Uint64ToBigEndian(h.Timestamp)...))
+	if h.Timestamp > 0 {
+		return sdk.SHA256(append(h.Secret, sdk.Uint64ToBigEndian(h.Timestamp)...))
+	}
+
+	return sdk.SHA256(h.Secret)
 }
 
 // String implements fmt.Stringer
