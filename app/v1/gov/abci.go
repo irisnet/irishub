@@ -71,21 +71,17 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 		resTags = resTags.AppendTag(tags.ProposalID, []byte(string(proposalID)))
 
 		for _, valAddr := range keeper.GetValidatorSet(ctx, proposalID) {
-			validator := keeper.ds.GetValidatorSet().Validator(ctx, valAddr)
-			if validator == nil {
-				ctx.Logger().Error("validator not existed", "ProposalID", proposalID, "result", result, "ValAddress", valAddr)
-				continue
-			}
 			if _, ok := votingVals[valAddr.String()]; !ok {
-				if validator.GetStatus() == sdk.Bonded {
+				val := keeper.ds.GetValidatorSet().Validator(ctx, valAddr)
+				if val != nil && val.GetStatus() == sdk.Bonded {
 					keeper.ds.GetValidatorSet().Slash(ctx,
-						validator.GetConsAddr(),
+						val.GetConsAddr(),
 						ctx.BlockHeight(),
-						validator.GetPower().RoundInt64(),
+						val.GetPower().RoundInt64(),
 						keeper.GetTallyingProcedure(ctx, activeProposal.GetProposalLevel()).Penalty)
 				}
 			}
-			keeper.metrics.deleteVote(validator.GetOperator().String(), proposalID)
+			keeper.metrics.deleteVote(valAddr.String(), proposalID)
 		}
 
 		keeper.SubProposalNum(ctx, activeProposal.GetProposalLevel())
