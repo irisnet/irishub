@@ -35,6 +35,8 @@ tags:
     description: Service module APIs
   - name: CoinSwap
     description: CoinSwap module APIs
+  - name: HTLC
+    description: HTLC module APIs
   - name: Params
     description: Params module APIs
   - name: Gov
@@ -2972,6 +2974,127 @@ paths:
                 deadline:
                   type: string
                   example: '30s'
+  '/htlc/htlcs':
+    post:
+      summary: create a HTLC
+      tags:
+        - HTLC
+      responses:
+        '200':
+          description: Unsigned tx was succesfully generated
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_tx:
+                  $ref: '#/components/schemas/BaseTx'
+                sender:
+                  $ref: '#/components/schemas/Address'
+                receiver:
+                  $ref: '#/components/schemas/Address'
+                receiver_on_other_chain:
+                  type: string
+                  example: '327a66212cbee3756816e617b38f9dfeaa6bc765'
+                hash_lock:
+                  type: string
+                  example: '327a66212cbee3756816e617b38f9dfe327a66212cbee3756816e617b38f9dfe'
+                in_amount:
+                  type: integer
+                  example: '10000000000000000000'
+                amount:
+                  $ref: '#/components/schemas/Coin'
+                time_lock:
+                  type: integer
+                  example: '20'
+                timestamp:
+                  type: integer
+                  example: '1568011909'
+  '/htlc/htlcs/{hash-lock}':
+    get:
+      summary: query HTLC by hash-lock
+      tags:
+        - HTLC
+      parameters:
+        - in: path
+          name: hash-lock
+          description: the hash-lock of the HTLC
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Unsigned tx was succesfully generated
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
+  '/htlc/htlcs/{hash-lock}/claim':
+    post:
+      summary: claim an opened HTLC
+      tags:
+        - HTLC
+      parameters:
+        - in: path
+          name: hash-lock
+          description: the hash-lock of the HTLC
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Unsigned tx was succesfully generated
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_tx:
+                  $ref: '#/components/schemas/BaseTx'
+                claimer:
+                  $ref: '#/components/schemas/Address'
+                secret:
+                  type: string
+                  example: '327a66212cbee3756816e617b38f9dfe327a66212cbee3756816e617b38f9dfe'
+  '/htlc/htlcs/{hash-lock}/refund':
+    post:
+      summary: refund from an expired HTLC
+      tags:
+        - HTLC
+      parameters:
+        - in: path
+          name: hash-lock
+          description: the hash-lock of the HTLC
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Unsigned tx was succesfully generated
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_tx:
+                  $ref: '#/components/schemas/BaseTx'
+                sender:
+                  $ref: '#/components/schemas/Address'
   '/params':
     get:
       summary: Get the system params with an optional module

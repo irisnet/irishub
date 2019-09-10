@@ -93,6 +93,7 @@ func (pe *ProtocolEngine) GetKVStoreKeys() []*sdk.KVStoreKey {
 		KeyAsset,
 		KeyRand,
 		KeySwap,
+		KeyHtlc,
 	}
 }
 
