@@ -156,7 +156,7 @@ func TestMsgClaimHTLCValidation(t *testing.T) {
 func TestMsgClaimHTLCGetSignBytes(t *testing.T) {
 	msg := NewMsgClaimHTLC(senderAddr, secret, secretHashLock)
 	res := msg.GetSignBytes()
-	expected := `{"secret":"5f5f5f6162636465666768696a6b6c6d6e6f707172737475767778797a5f5f5f","secret_hash_lock":"e8d4133e1a82c74e2746e78c19385706ea7958a0ca441a08dacfa10c48ce2561","sender":"faa128nh833v43sggcj65nk7khjka9dwngpl6j29hj"}`
+	expected := `{"type":"irishub/htlc/MsgClaimHTLC","value":{"secret":"5f5f5f6162636465666768696a6b6c6d6e6f707172737475767778797a5f5f5f","secret_hash_lock":"e8d4133e1a82c74e2746e78c19385706ea7958a0ca441a08dacfa10c48ce2561","sender":"faa128nh833v43sggcj65nk7khjka9dwngpl6j29hj"}}`
 	require.Equal(t, expected, string(res))
 }
 
@@ -212,7 +212,7 @@ func TestMsgRefundHTLCValidation(t *testing.T) {
 func TestMsgRefundHTLCGetSignBytes(t *testing.T) {
 	msg := NewMsgRefundHTLC(senderAddr, secretHashLock)
 	res := msg.GetSignBytes()
-	expected := `{"secret_hash_lock":"e8d4133e1a82c74e2746e78c19385706ea7958a0ca441a08dacfa10c48ce2561","sender":"faa128nh833v43sggcj65nk7khjka9dwngpl6j29hj"}`
+	expected := `{"type":"irishub/htlc/MsgRefundHTLC","value":{"secret_hash_lock":"e8d4133e1a82c74e2746e78c19385706ea7958a0ca441a08dacfa10c48ce2561","sender":"faa128nh833v43sggcj65nk7khjka9dwngpl6j29hj"}}`
 	require.Equal(t, expected, string(res))
 }
 
