@@ -85,7 +85,7 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 						keeper.GetTallyingProcedure(ctx, activeProposal.GetProposalLevel()).Penalty)
 				}
 			}
-			keeper.metrics.deleteVote(validator.GetConsAddr().String(), proposalID)
+			keeper.metrics.deleteVote(validator.GetOperator().String(), proposalID)
 		}
 
 		keeper.SubProposalNum(ctx, activeProposal.GetProposalLevel())

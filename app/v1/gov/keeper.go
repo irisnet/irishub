@@ -328,7 +328,7 @@ func (keeper Keeper) AddVote(ctx sdk.Context, proposalID uint64, voterAddr sdk.A
 	}
 	keeper.setVote(ctx, proposalID, voterAddr, vote)
 	if validator != nil {
-		keeper.metrics.addVote(validator.GetConsAddr().String(), proposalID, option)
+		keeper.metrics.addVote(validator.GetOperator().String(), proposalID, option)
 	}
 	return nil
 }

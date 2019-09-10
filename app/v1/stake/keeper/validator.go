@@ -91,7 +91,7 @@ func (k Keeper) SetValidator(ctx sdk.Context, validator types.Validator) {
 	bz := types.MustMarshalValidator(k.cdc, validator)
 	bondedToken, err := strconv.ParseFloat(validator.GetTokens().QuoInt(sdk.AttoScaleFactor).String(), 64)
 	if err == nil {
-		k.metrics.BondedToken.With("validator_address", validator.ConsAddress().String()).Set(bondedToken)
+		k.metrics.BondedToken.With("validator_address", validator.GetOperator().String()).Set(bondedToken)
 	}
 	store.Set(GetValidatorKey(validator.OperatorAddr), bz)
 }
@@ -202,7 +202,7 @@ func (k Keeper) RemoveValidator(ctx sdk.Context, address sdk.ValAddress) {
 	store.Delete(GetValidatorByConsAddrKey(sdk.ConsAddress(validator.ConsPubKey.Address())))
 	store.Delete(GetValidatorsByPowerIndexKey(validator, pool))
 	ctx.Logger().Info("Remove validator", "consensus_address", validator.ConsAddress().String(), "operator_address", validator.OperatorAddr.String())
-	k.metrics.BondedToken.With("validator_address", validator.ConsAddress().String()).Set(0)
+	k.metrics.BondedToken.With("validator_address", validator.GetOperator().String()).Set(0)
 
 	// call hook if present
 	if k.hooks != nil {
@@ -422,14 +422,14 @@ func (k Keeper) InitMetrics(store sdk.KVStore) {
 		validator := types.MustUnmarshalValidator(k.cdc, addr, iterator.Value())
 		bondedToken, err := strconv.ParseFloat(validator.GetTokens().QuoInt(sdk.AttoScaleFactor).String(), 64)
 		if err == nil {
-			k.metrics.BondedToken.With("validator_address", validator.ConsAddress().String()).Set(bondedToken)
+			k.metrics.BondedToken.With("validator_address", validator.GetOperator().String()).Set(bondedToken)
 		}
 		if validator.Jailed {
-			k.metrics.Jailed.With("validator_address", validator.GetConsAddr().String()).Set(1)
+			k.metrics.Jailed.With("validator_address", validator.GetOperator().String()).Set(1)
 		}
 		power, err := strconv.ParseFloat(validator.GetPower().RoundInt().String(), 64)
 		if err == nil {
-			k.metrics.Power.With("validator_address", validator.GetConsAddr().String()).Set(power)
+			k.metrics.Power.With("validator_address", validator.GetOperator().String()).Set(power)
 		}
 	}
 }
