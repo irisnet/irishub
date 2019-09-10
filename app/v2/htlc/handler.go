@@ -28,7 +28,17 @@ func handleMsgCreateHTLC(ctx sdk.Context, k Keeper, msg MsgCreateHTLC) sdk.Resul
 	expireHeight := msg.TimeLock + uint64(ctx.BlockHeight())
 	state := StateOpen
 
-	htlc := NewHTLC(msg.Sender, msg.Receiver, msg.ReceiverOnOtherChain, msg.OutAmount, msg.InAmount, secret, msg.Timestamp, expireHeight, state)
+	htlc := NewHTLC(
+		msg.Sender,
+		msg.Receiver,
+		msg.ReceiverOnOtherChain,
+		msg.OutAmount,
+		msg.InAmount,
+		secret,
+		msg.Timestamp,
+		expireHeight,
+		state,
+	)
 	secretHashLock, _ := hex.DecodeString(msg.SecretHashLock)
 
 	tags, err := k.CreateHTLC(ctx, htlc, secretHashLock)
