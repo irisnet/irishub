@@ -26,7 +26,7 @@ func EndBlocker(ctx sdk.Context, uk Keeper) (tags sdk.Tags) {
 
 		if ctx.BlockHeader().Version.App == upgradeConfig.Protocol.Version {
 			uk.SetSignal(ctx, upgradeConfig.Protocol.Version, validator.ConsAddress().String())
-			uk.metrics.Signal.With(ValidatorLabel, validator.ConsAddress().String(), VersionLabel, versionIDstr).Set(1)
+			uk.metrics.Signal.With(ValidatorLabel, validator.GetOperator().String(), VersionLabel, versionIDstr).Set(1)
 
 			ctx.Logger().Info("Validator has downloaded the latest software ",
 				"validator", validator.GetOperator().String(), "version", upgradeConfig.Protocol.Version)
@@ -34,7 +34,7 @@ func EndBlocker(ctx sdk.Context, uk Keeper) (tags sdk.Tags) {
 		} else {
 
 			ok := uk.DeleteSignal(ctx, upgradeConfig.Protocol.Version, validator.ConsAddress().String())
-			uk.metrics.Signal.With(ValidatorLabel, validator.ConsAddress().String(), VersionLabel, versionIDstr).Set(0)
+			uk.metrics.Signal.With(ValidatorLabel, validator.GetOperator().String(), VersionLabel, versionIDstr).Set(0)
 
 			if ok {
 				ctx.Logger().Info("Validator has restarted the old software ",
