@@ -17,11 +17,19 @@ func BeginBlocker(ctx sdk.Context, k Keeper) (tags sdk.Tags) {
 	defer iterator.Close()
 
 	for ; iterator.Valid(); iterator.Next() {
-		hashLock := iterator.Key()
+		v := iterator.Value()
+
+		// get the hash lock
+		var hashLock []byte
+		k.GetCdc().MustUnmarshalBinaryLengthPrefixed(v, &hashLock)
+
 		htlc, _ := k.GetHTLC(ctx, hashLock)
 
+		// update the state
 		htlc.State = types.StateExpired
 		k.SetHTLC(ctx, htlc, hashLock)
+
+		// delete from the expiration queue
 		k.DeleteHTLCFromExpireQueue(ctx, currentBlockHeight, hashLock)
 
 		// add tags
