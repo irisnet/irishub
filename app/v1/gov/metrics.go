@@ -75,12 +75,6 @@ func (metrics *Metrics) setProposalStatus(proposalID uint64, status float64) {
 	})
 }
 
-func (metrics *Metrics) deleteProposal(proposalID uint64) {
-	promutil.SafeExec(func() {
-		metrics.ProposalStatus.DeleteLabelValues(strconv.FormatUint(proposalID, 10))
-	})
-}
-
 func (metrics *Metrics) addParameter(key string, value interface{}) {
 	promutil.SafeExec(func() {
 		switch key {
