@@ -26,6 +26,7 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 		keeper.SubProposalNum(ctx, inactiveProposal.GetProposalLevel())
 		keeper.DeleteDeposits(ctx, proposalID)
 		keeper.DeleteProposal(ctx, proposalID)
+		keeper.metrics.deleteProposal(proposalID)
 
 		resTags = resTags.AppendTag(tags.Action, tags.ActionProposalDropped)
 		resTags = resTags.AppendTag(tags.ProposalID, []byte(string(proposalID)))

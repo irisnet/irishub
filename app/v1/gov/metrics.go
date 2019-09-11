@@ -70,30 +70,48 @@ func NopMetrics() *Metrics {
 }
 
 func (metrics *Metrics) setProposalStatus(proposalID uint64, status float64) {
-	metrics.ProposalStatus.WithLabelValues(strconv.FormatUint(proposalID, 10)).Set(status)
+	promutil.SafeExec(func() {
+		metrics.ProposalStatus.WithLabelValues(strconv.FormatUint(proposalID, 10)).Set(status)
+	})
 }
+
+func (metrics *Metrics) deleteProposal(proposalID uint64) {
+	promutil.SafeExec(func() {
+		metrics.ProposalStatus.DeleteLabelValues(strconv.FormatUint(proposalID, 10))
+	})
+}
+
 func (metrics *Metrics) addParameter(key string, value interface{}) {
-	switch key {
-	case string(mint.KeyInflation), string(distr.KeyBaseProposerReward), string(distr.KeyBonusProposerReward), string(distr.KeyCommunityTax):
-		valueFloat64, err := strconv.ParseFloat(value.(sdk.Dec).String(), 64)
-		if err == nil {
-			metrics.Param.WithLabelValues(key).Set(valueFloat64)
+	promutil.SafeExec(func() {
+		switch key {
+		case string(mint.KeyInflation), string(distr.KeyBaseProposerReward), string(distr.KeyBonusProposerReward), string(distr.KeyCommunityTax):
+			valueFloat64, err := strconv.ParseFloat(value.(sdk.Dec).String(), 64)
+			if err == nil {
+				promutil.SafeExec(func() {
+					metrics.Param.WithLabelValues(key).Set(valueFloat64)
+				})
+			}
+		default:
 		}
-	default:
-	}
+	})
 }
 func (metrics *Metrics) addVote(consAddr string, proposalID uint64, option VoteOption) {
-	labels := Label{
-		ValidatorLabel:  consAddr,
-		ProposalIDLabel: strconv.FormatUint(proposalID, 10),
-	}
-	metrics.Vote.With(labels).Set(float64(option))
+	promutil.SafeExec(func() {
+		labels := Label{
+			ValidatorLabel:  consAddr,
+			ProposalIDLabel: strconv.FormatUint(proposalID, 10),
+		}
+		metrics.Vote.With(labels).Set(float64(option))
+	})
+
 }
 
 func (metrics *Metrics) deleteVote(valAddr string, proposalID uint64) {
-	labels := Label{
-		ValidatorLabel:  valAddr,
-		ProposalIDLabel: strconv.FormatUint(proposalID, 10),
-	}
-	metrics.Vote.Delete(labels)
+	promutil.SafeExec(func() {
+		labels := Label{
+			ValidatorLabel:  valAddr,
+			ProposalIDLabel: strconv.FormatUint(proposalID, 10),
+		}
+		metrics.Vote.Delete(labels)
+	})
 }
