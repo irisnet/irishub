@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This specification describes asset managerment on IRISHub. Anyone could issue a new asset on IRISHub, or propose pegging an existing asset from any other blockchains via On-Chain Governance.
+This specification describes asset management on IRISHub. Anyone could issue a new asset on IRISHub, or propose pegging an existing asset from any other blockchains via On-Chain Governance.
 
 ## Concepts
 
@@ -30,8 +30,8 @@ A gateway is a trusted party that facilitates moving value into and out of the I
 | name                   | Type      | Default     | Description                                    |
 | ---------------------- |-----------|-------------|------------------------------------------------|
 | AssetTaxRate           | Dec       | 0.4         | Asset Tax Rate, which is the ratio of Community Tax |
-| IssueFTBaseFee         | Coin      | 60000iris   | Benchmark fees for issuing Fungible Token |
-| MintFTFeeRatio         | Dec       | 0.1         | Fungible Token mint rate (relative to the issue fee) |
+| IssueTokenBaseFee         | Coin      | 60000iris   | Benchmark fees for issuing Fungible Token |
+| MintTokenFeeRatio         | Dec       | 0.1         | Fungible Token mint rate (relative to the issue fee) |
 | CreateGatewayBaseFee   | Coin      | 120000iris  | Benchmark fees for creating Gateways |
 | GatewayAssetFeeRatio   | Dec       | 0.1         | Rate of issuing gateway tokens (relative to the issue fee of native tokens) |
 

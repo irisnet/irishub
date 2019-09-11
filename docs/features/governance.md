@@ -7,6 +7,7 @@
 3. On-chain governance proposals on software upgrade 
 4. On-chain governance proposals on software halt
 5. On-chain governance proposals on tax usage
+6. On-chain governance proposals on token addition
 
 ## Interactive process
 
@@ -14,7 +15,7 @@
 
 Specific Proposal for different levels：
 - Critical：`SoftwareUpgrade`, `SystemHalt`
-- Important：`Parameter`
+- Important：`Parameter`,`TokenAddition`
 - Normal：`CommunityTaxUsage`,`PlainText`
 
 `SoftwareUpgrade Proposal` and `SystemHalt Proposal` can only be submitted by the profiler.
@@ -23,20 +24,20 @@ Different levels correspond to different parameters：
 
 | GovParams | Critical | Important | Normal |Range|
 | ------ | ------ | ------ | ------|------|
-| govDepositProcedure/MinDeposit | 4000 iris | 2000 iris | 1000 iris |[10iris,10000iris]|
-| govDepositProcedure/MaxDepositPeriod | 24 hours | 24 hours | 24 hours |[20s,3d]|
-| govVotingProcedure/VotingPeriod | 72 hours | 60 hours | 48 hours |[20s,3d]|
-| govVotingProcedure/MaxProposal | 1 | 5 | 7 |Critical==1, other(1,)|
-| govTallyingProcedure/Participation | 1/2 | 1/2 | 1/2 |(0,1)|
-| govTallyingProcedure/Threshold | 3/4 | 2/3 | 1/2 |(0,1)|
-| govTallyingProcedure/Veto | 1/3 | 1/3 | 1/3 |(0,1)|
-| govTallyingProcedure/Penalty | 0 | 0 | 0 |(0,1)|
+| MinDeposit | 4000 iris | 2000 iris | 1000 iris |[10iris,10000iris]|
+| DepositPeriod | 24 hours | 24 hours | 24 hours |[20s,3d]|
+| VotingPeriod | 120 hours | 120 hours | 120 hours |[20s,3d]|
+| MaxNum | 1 | 5 | 7 |Critical==1, other(1,)|
+| Participation | 0.5 | 0.5 | 0.5 |(0,1)|
+| Threshold | 0.75 | 0.67 | 0.5 |(0,1)|
+| Veto | 0.33 | 0.33 | 0.33 |(0,1)|
+| Penalty | 0 | 0 | 0 |(0,1)|
 
 
 * `MinDeposit`  The minimum of  deposit
-* `MaxDepositPeriod`  Window period for deposit
+* `DepositPeriod`  Window period for deposit
 * `VotingPeriod` Window period for voting
-* `MaxProposal` The maximum number of proposal that can exist at the same time
+* `MaxNum` The maximum number of proposal that can exist at the same time
 * `Penalty`   The proportion of the slash
 * `Veto`  the power of Veto / all voted power
 * `Threshold` the power of Yes / all voted power
