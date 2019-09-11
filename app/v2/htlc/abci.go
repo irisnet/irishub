@@ -17,11 +17,9 @@ func BeginBlocker(ctx sdk.Context, k Keeper) (tags sdk.Tags) {
 	defer iterator.Close()
 
 	for ; iterator.Valid(); iterator.Next() {
-		v := iterator.Value()
-
 		// get the hash lock
 		var hashLock []byte
-		k.GetCdc().MustUnmarshalBinaryLengthPrefixed(v, &hashLock)
+		k.GetCdc().MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &hashLock)
 
 		htlc, _ := k.GetHTLC(ctx, hashLock)
 
