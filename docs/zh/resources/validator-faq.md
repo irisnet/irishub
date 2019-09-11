@@ -150,6 +150,6 @@ IRISnet主网的第一步：Betanet已在2019年3月中旬启动，主网启动�
 
 ##  验证人交流渠道
 
-- Riot chat: #irisvalidators:matrix.org
+- Riot chat: <https://riot.im/app/#/room/#irisvalidators:matrix.org>
 - IRIShub验证人工作QQ群：834063323
 

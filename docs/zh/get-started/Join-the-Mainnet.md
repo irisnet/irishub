@@ -40,6 +40,6 @@ IRIS Hub是在Cosmos生态中的区域性枢纽，提供iService服务
 
 * Explorer: <https://www.irisplorer.io>
 
-* Riot chat: #irisvalidators:matrix.org
+* Riot chat: <https://riot.im/app/#/room/#irisvalidators:matrix.org>
 
 * IRIShub验证人工作QQ群：834063323

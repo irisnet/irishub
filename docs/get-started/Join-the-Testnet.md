@@ -23,6 +23,6 @@ please visit lcd site for information: https://lcd.testnet.irisnet.org/swagger-u
 
 ##  Useful Links
 
-* Riot chat: #irisvalidators:matrix.org
+* Riot chat: <https://riot.im/app/#/room/#irisvalidators:matrix.org>
 
-* Explorer: https://testnet.irisplorer.io/#/home
+* Explorer: <https://testnet.irisplorer.io>

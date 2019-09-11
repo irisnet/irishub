@@ -23,8 +23,8 @@
 ##  更多链接
 
 
-* Explorer: https://testnet.irisplorer.io/#/home
+* Explorer: <https://testnet.irisplorer.io>
 
-* Riot chat: #irisvalidators:matrix.org
+* Riot chat: <https://riot.im/app/#/room/#irisvalidators:matrix.org>
 
 * IRIShub验证人工作QQ群：834063323

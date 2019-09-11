@@ -153,6 +153,6 @@ Learn more: [How to_join_Mainnet](../get-started/Join-the-Mainnet.md)
 
 ## Validator Communication Channel
 
-- Riot chat: #irisvalidators:matrix.org
+- Riot chat: <https://riot.im/app/#/room/#irisvalidators:matrix.org>
 - IRIShub Validator Working Group QQ Group：834063323
 
