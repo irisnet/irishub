@@ -8,35 +8,25 @@ order: 1
 
 ### Full Node
 
-A full node is a fully functional peer in IRIShub network
-
-- Voting power is 0
-- Save a full backup of transaction history
-- Could be upgrade to validator node
+A full-node is a program that fully validates transactions and blocks of a blockchain. It is distinct from a light-node that only processes block headers and a small subset of transactions. Running a full-node requires more resources than a light-node but is necessary in order to be a validator. In practice, running a full-node only implies running a non-compromised and up-to-date version of the software with low network latency and without downtime.
 
 ### Validator Node
 
-- Validator node is a staking pool, which is responsible for signing votes to reach consensus, and verify/execute transactions in blocks. It could be seen as miners in PoW blockchains.
-- Participate in on-chain governance, vote for proposals
-- Upgrade software to latest version
+The [IRIS Hub](../get-started/intro.md#iris-hub) is based on [Cosmos SDK](https://cosmos.network/docs/intro/) and [Tendermint](https://tendermint.com/docs/introduction/what-is-tendermint.html), which relies on a set of validators to secure the network. The role of validators is to run a full-node and participate in consensus by broadcasting votes which contain cryptographic signatures signed by their private key. Validators commit new blocks in the blockchain and receive revenue in exchange for their work. They must also participate in governance by voting on proposals. Validators are weighted according to their total stake.
 
 ### Validator Candidate Node
 
-At the start of IRIShub, only top 100 bonded full node will become validator nodes, the rest will become candidates. The situation will change as delegation amount changes.
-
-- Voting power is 0；
-- No Block provision
+Only top 100 bonded full nodes can become validator nodes, the rest will become candidates. The situation will change as delegation amount changes.
 
 ## IRIShub User Types
 
-### Validator
+### Validator Operator
 
-People that operator validator nodes. They must first stake some tokens with certain transaction and is responsible for maintain the validator nodes
-and get rewards in return.
+A Validator Operator is the only one who can operate his Validator's informations or participate in governance as the validator.
 
 ### Delegator
 
-People that cannot, or do not want to run validator operations, can still participate in the staking process as delegators.
+Delegators are IRIS holders who cannot, or do not want to run a validator themselves. IRIS holders can delegate IRIS to a validator and obtain a part of their revenue in exchange. They can earn as much as the validators and only need to pay some commission.
 
 ### Profiler
 
@@ -113,3 +103,4 @@ Additionally, validators are expected to be active members of the community. The
 - **Censorship**: If the protocol detects that a proposer included invalid transactions in a block, this validator will get jailed and removed from current validatorset for 2 days.
 
 All metrics mentioned can be adjusted by `parameter-change` proposals.
+
