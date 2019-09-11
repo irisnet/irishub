@@ -168,7 +168,7 @@ func validateAssetTaxRate(v sdk.Dec) sdk.Error {
 		return sdk.NewError(
 			params.DefaultCodespace,
 			params.CodeInvalidAssetTaxRate,
-			fmt.Sprintf("Asset tax rate [%s] should be between [0, 1]", v.String()),
+			fmt.Sprintf("Asset tax rate [%s] should be between 0, 1[]", v.String()),
 		)
 	}
 	return nil

@@ -39,9 +39,9 @@ var (
 	StateCompleted = types.StateCompleted
 	StateExpired   = types.StateExpired
 
-	ValidateSecretHashLock = types.ValidateSecretHashLock
-
 	QueryHTLC = types.QueryHTLC
+
+	TagHashLock = types.TagHashLock
 
 	NewKeeper  = keeper.NewKeeper
 	NewQuerier = keeper.NewQuerier

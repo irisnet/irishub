@@ -1,6 +1,7 @@
 package lcd
 
 import (
+	"encoding/hex"
 	"fmt"
 	"net/http"
 
@@ -24,10 +25,15 @@ func queryHtlcHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.Handle
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 
-		hashLock := vars["hash-lock"]
+		hashLockStr := vars["hash-lock"]
+		hashLock, err := hex.DecodeString(hashLockStr)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
 
 		params := htlc.QueryHTLCParams{
-			SecretHashLock: hashLock,
+			HashLock: hashLock,
 		}
 
 		bz, err := cliCtx.Codec.MarshalJSON(params)

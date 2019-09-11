@@ -1,6 +1,7 @@
 vendor
 .DS_Store
 .idea
+.vscode
 build/
 .out
 docs/.vuepress/dist/
@@ -9,4 +10,3 @@ package.json
 yarn.lock
 lite/statik/statik.go
 dependency-graph.png
-
