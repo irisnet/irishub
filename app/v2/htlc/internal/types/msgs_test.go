@@ -100,14 +100,14 @@ func TestMsgCreateHTLCGetSigners(t *testing.T) {
 }
 
 func TestNewMsgClaimHTLC(t *testing.T) {
-	msg := NewMsgClaimHTLC(senderAddr, secret, hashLock)
+	msg := NewMsgClaimHTLC(senderAddr, hashLock, secret)
 	require.Equal(t, senderAddr, msg.Sender)
 	require.Equal(t, secret, msg.Secret)
 	require.Equal(t, hashLock, msg.HashLock)
 }
 
 func TestMsgClaimHTLCRoute(t *testing.T) {
-	msg := NewMsgClaimHTLC(senderAddr, secret, hashLock)
+	msg := NewMsgClaimHTLC(senderAddr, hashLock, secret)
 	require.Equal(t, "htlc", msg.Route())
 }
 
@@ -137,7 +137,7 @@ func TestMsgClaimHTLCValidation(t *testing.T) {
 	}
 
 	for i, td := range testData {
-		msg := NewMsgClaimHTLC(td.sender, td.secret, td.hashLock)
+		msg := NewMsgClaimHTLC(td.sender, td.hashLock, td.secret)
 		err := msg.ValidateBasic()
 
 		if td.expectPass {
@@ -149,14 +149,14 @@ func TestMsgClaimHTLCValidation(t *testing.T) {
 }
 
 func TestMsgClaimHTLCGetSignBytes(t *testing.T) {
-	msg := NewMsgClaimHTLC(senderAddr, secret, hashLock)
+	msg := NewMsgClaimHTLC(senderAddr, hashLock, secret)
 	res := msg.GetSignBytes()
 	expected := `{"type":"irishub/htlc/MsgClaimHTLC","value":{"hash_lock":"6NQTPhqCx04nRueMGThXBup5WKDKRBoI2s+hDEjOJWE=","secret":"X19fYWJjZGVmZ2hpamtsbW5vcHFyc3R1dnd4eXpfX18=","sender":"faa128nh833v43sggcj65nk7khjka9dwngpl6j29hj"}}`
 	require.Equal(t, expected, string(res))
 }
 
 func TestMsgClaimHTLCGetSigners(t *testing.T) {
-	msg := NewMsgClaimHTLC(senderAddr, secret, hashLock)
+	msg := NewMsgClaimHTLC(senderAddr, hashLock, secret)
 	res := msg.GetSigners()
 	expected := "[51E773C62CAC6084625AA4EDEB5E56E95AE9A03F]"
 	require.Equal(t, expected, fmt.Sprintf("%v", res))

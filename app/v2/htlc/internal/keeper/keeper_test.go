@@ -105,7 +105,7 @@ func TestKeeper_ClaimHTLC(t *testing.T) {
 	originHTLCAmount := ak.GetAccount(ctx, htlcAddr).GetCoins().AmountOf(amount.Denom)
 	originReceiverAmount := ak.GetAccount(ctx, receiverAddr).GetCoins().AmountOf(amount.Denom)
 
-	_, err = keeper.ClaimHTLC(ctx, secret, hashLock)
+	_, err = keeper.ClaimHTLC(ctx, hashLock, secret)
 	require.Nil(t, err)
 
 	htlc, _ = keeper.GetHTLC(ctx, hashLock)

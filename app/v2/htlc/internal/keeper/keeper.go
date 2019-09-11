@@ -75,7 +75,7 @@ func (k Keeper) CreateHTLC(ctx sdk.Context, htlc types.HTLC, hashLock []byte) (s
 	return createTags, nil
 }
 
-func (k Keeper) ClaimHTLC(ctx sdk.Context, secret []byte, hashLock []byte) (sdk.Tags, sdk.Error) {
+func (k Keeper) ClaimHTLC(ctx sdk.Context, hashLock []byte, secret []byte) (sdk.Tags, sdk.Error) {
 	// get the htlc
 	htlc, err := k.GetHTLC(ctx, hashLock)
 	if err != nil {
