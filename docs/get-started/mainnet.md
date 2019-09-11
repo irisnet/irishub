@@ -11,7 +11,7 @@ We assume that you already have `iris` installed, or you need to [install iris](
 ## Run a Full Node
 
 ```bash
-# initialize node configurations 
+# initialize node configurations
 iris init --moniker=<your_custom_name> --chain-id=irishub
 
 # download mainnet public config.toml and genesis.json
@@ -46,7 +46,7 @@ iriscli keys add <key_name>
 ```
 
 :::warning
-**Important** 
+**Important**
 
 write the seed phrase in a safe place! It is the only way to recover your account if you ever forget your password.
 :::
@@ -67,19 +67,19 @@ Only if your node has caught-up, you can run the following command to upgrade yo
 
 ```bash
 iriscli stake create-validator \
-	--pubkey=$(iris tendermint show-validator) \
-	--moniker=<your_validator_name> \
-	--amount=<amount_to_be_delegated, e.g. 10000iris> \	
-	--commission-rate=0.1 \
-	--gas=100000 \
-	--fee=0.6iris \	
-	--chain-id=irishub \	
-	--from=<key_name> \
-	--commit
-``` 
+    --pubkey=$(iris tendermint show-validator) \
+    --moniker=<your_validator_name> \
+    --amount=<amount_to_be_delegated, e.g. 10000iris> \
+    --commission-rate=0.1 \
+    --gas=100000 \
+    --fee=0.6iris \
+    --chain-id=irishub \
+    --from=<key_name> \
+    --commit
+```
 
 :::warning
-**Important** 
+**Important**
 
 Backup the `config` directory located in your iris home (default ~/.iris/) carefully! It is the only way to recover your validator.
 :::

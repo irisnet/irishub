@@ -1,8 +1,12 @@
-# Coin_Type
+---
+order: 4
+---
+
+# Coin Type
 
 ##  Definitions
 
-Coin_type defines the available units of a kind of token in IRISnet. The developers can specify different coin_type for  their tokens. The native token in IRIShub is `iris`, which has following available units: `iris-milli`, `iris-micro`, `iris-nano`, `iris-pico`, `iris-femto` and `iris-atto`. The conversion relationship between them are as follows:
+Coin type defines the available units of a kind of token in IRISnet. The developers can specify different coin_type for  their tokens. The native token in IRIShub is `iris`, which has following available units: `iris-milli`, `iris-micro`, `iris-nano`, `iris-pico`, `iris-femto` and `iris-atto`. The conversion relationship between them are as follows:
 
 ```
 1 iris = 10^3 iris-milli
