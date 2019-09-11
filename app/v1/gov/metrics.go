@@ -90,9 +90,9 @@ func (metrics *Metrics) addVote(consAddr string, proposalID uint64, option VoteO
 	metrics.Vote.With(labels).Set(float64(option))
 }
 
-func (metrics *Metrics) deleteVote(consAddr string, proposalID uint64) {
+func (metrics *Metrics) deleteVote(valAddr string, proposalID uint64) {
 	labels := Label{
-		ValidatorLabel:  consAddr,
+		ValidatorLabel:  valAddr,
 		ProposalIDLabel: strconv.FormatUint(proposalID, 10),
 	}
 	metrics.Vote.Delete(labels)
