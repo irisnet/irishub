@@ -20,7 +20,7 @@ func TestKeeper_CreateHTLC(t *testing.T) {
 	hashLock := sdk.SHA256(append(secret, sdk.Uint64ToBigEndian(timestamp)...))
 	timeLock := uint64(50)
 	expireHeight := timeLock + uint64(ctx.BlockHeight())
-	state := types.StateOpen
+	state := types.OPEN
 	initSecret := make([]byte, 32)
 
 	_, err := keeper.GetHTLC(ctx, hashLock)
@@ -79,7 +79,7 @@ func TestKeeper_ClaimHTLC(t *testing.T) {
 	hashLock := sdk.SHA256(append(secret, sdk.Uint64ToBigEndian(timestamp)...))
 	timeLock := uint64(50)
 	expireHeight := timeLock + uint64(ctx.BlockHeight())
-	state := types.StateOpen
+	state := types.OPEN
 	initSecret := make([]byte, 32)
 
 	htlc := types.NewHTLC(
@@ -98,7 +98,7 @@ func TestKeeper_ClaimHTLC(t *testing.T) {
 
 	htlc, err = keeper.GetHTLC(ctx, hashLock)
 	require.Nil(t, err)
-	require.Equal(t, types.StateOpen, htlc.State)
+	require.Equal(t, types.OPEN, htlc.State)
 
 	htlcAddr := getHTLCAddress(amount.Denom)
 
@@ -109,7 +109,7 @@ func TestKeeper_ClaimHTLC(t *testing.T) {
 	require.Nil(t, err)
 
 	htlc, _ = keeper.GetHTLC(ctx, hashLock)
-	require.Equal(t, types.StateCompleted, htlc.State)
+	require.Equal(t, types.COMPLETED, htlc.State)
 
 	claimedHTLCAmount := ak.GetAccount(ctx, htlcAddr).GetCoins().AmountOf(amount.Denom)
 	claimedReceiverAmount := ak.GetAccount(ctx, receiverAddr).GetCoins().AmountOf(amount.Denom)
@@ -130,7 +130,7 @@ func TestKeeper_RefundHTLC(t *testing.T) {
 	hashLock := sdk.SHA256(append(secret, sdk.Uint64ToBigEndian(timestamp)...))
 	timeLock := uint64(50)
 	expireHeight := timeLock + uint64(ctx.BlockHeight())
-	state := types.StateExpired
+	state := types.EXPIRED
 	initSecret := make([]byte, 32)
 
 	htlc := types.NewHTLC(
@@ -149,7 +149,7 @@ func TestKeeper_RefundHTLC(t *testing.T) {
 
 	htlc, err = keeper.GetHTLC(ctx, hashLock)
 	require.Nil(t, err)
-	require.Equal(t, types.StateExpired, htlc.State)
+	require.Equal(t, types.EXPIRED, htlc.State)
 
 	htlcAddr := getHTLCAddress(amount.Denom)
 
@@ -160,7 +160,7 @@ func TestKeeper_RefundHTLC(t *testing.T) {
 	require.Nil(t, err)
 
 	htlc, _ = keeper.GetHTLC(ctx, hashLock)
-	require.Equal(t, types.StateRefunded, htlc.State)
+	require.Equal(t, types.REFUNDED, htlc.State)
 
 	claimedHTLCAmount := ak.GetAccount(ctx, htlcAddr).GetCoins().AmountOf(amount.Denom)
 	claimedSenderAmount := ak.GetAccount(ctx, senderAddr).GetCoins().AmountOf(amount.Denom)

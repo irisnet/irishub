@@ -24,7 +24,7 @@ func BeginBlocker(ctx sdk.Context, k Keeper) (tags sdk.Tags) {
 		htlc, _ := k.GetHTLC(ctx, hashLock)
 
 		// update the state
-		htlc.State = types.StateExpired
+		htlc.State = types.EXPIRED
 		k.SetHTLC(ctx, htlc, hashLock)
 
 		// delete from the expiration queue

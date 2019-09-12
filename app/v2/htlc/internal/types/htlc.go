@@ -2,17 +2,11 @@ package types
 
 import (
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
+	"strings"
 
 	sdk "github.com/irisnet/irishub/types"
-)
-
-// the states of the HTLC
-const (
-	StateOpen      = uint8(0) // not claimed
-	StateCompleted = uint8(1) // claimed
-	StateExpired   = uint8(2) // Expired
-	StateRefunded  = uint8(3) // Refunded
 )
 
 // HTLC represents a HTLC
@@ -24,7 +18,7 @@ type HTLC struct {
 	Secret               []byte         `json:"secret"`                  // the random secret which is of 32 bytes
 	Timestamp            uint64         `json:"timestamp"`               // the timestamp, if provided, used to generate the hash lock together with secret
 	ExpireHeight         uint64         `json:"expire_height"`           // the block height by which the HTLC expires
-	State                uint8          `json:"state"`                   // the state of the HTLC
+	State                HTLCState      `json:"state"`                   // the state of the HTLC
 }
 
 // NewHTLC constructs a HTLC
@@ -36,7 +30,7 @@ func NewHTLC(
 	secret []byte,
 	timestamp uint64,
 	expireHeight uint64,
-	state uint8,
+	state HTLCState,
 ) HTLC {
 	return HTLC{
 		Sender:               sender,
@@ -69,7 +63,7 @@ func (h HTLC) String() string {
 	Secret:               %s
 	Timestamp:            %d
 	ExpireHeight:         %d
-	State:                %d`,
+	State:                %s`,
 		h.Sender,
 		h.Receiver,
 		hex.EncodeToString(h.ReceiverOnOtherChain),
@@ -79,4 +73,86 @@ func (h HTLC) String() string {
 		h.ExpireHeight,
 		h.State,
 	)
+}
+
+// HTLCState represents the state of a HTLC
+type HTLCState byte
+
+const (
+	OPEN      HTLCState = 0x00 // claimable
+	COMPLETED HTLCState = 0x01 // claimed
+	EXPIRED   HTLCState = 0x02 // expired
+	REFUNDED  HTLCState = 0x03 // refunded
+)
+
+var (
+	HTLCStateToStringMap = map[HTLCState]string{
+		OPEN:      "open",
+		COMPLETED: "completed",
+		EXPIRED:   "expired",
+		REFUNDED:  "refunded",
+	}
+	StringToHTLCStateMap = map[string]HTLCState{
+		"open":      OPEN,
+		"completed": COMPLETED,
+		"expired":   EXPIRED,
+		"refunded":  REFUNDED,
+	}
+)
+
+func HTLCStateFromString(str string) (HTLCState, error) {
+	if state, ok := StringToHTLCStateMap[strings.ToLower(str)]; ok {
+		return state, nil
+	}
+	return HTLCState(0xff), fmt.Errorf("'%s' is not a valid htlc state", str)
+}
+
+func IsValidHTLCState(state HTLCState) bool {
+	_, ok := HTLCStateToStringMap[state]
+	return ok
+}
+
+func (state HTLCState) Format(s fmt.State, verb rune) {
+	switch verb {
+	case 's':
+		s.Write([]byte(fmt.Sprintf("%s", state.String())))
+	default:
+		s.Write([]byte(fmt.Sprintf("%v", byte(state))))
+	}
+}
+
+func (state HTLCState) String() string {
+	return HTLCStateToStringMap[state]
+}
+
+// Marshal needed for protobuf compatibility
+func (state HTLCState) Marshal() ([]byte, error) {
+	return []byte{byte(state)}, nil
+}
+
+// Unmarshal needed for protobuf compatibility
+func (state *HTLCState) Unmarshal(data []byte) error {
+	*state = HTLCState(data[0])
+	return nil
+}
+
+// Marshals to JSON using string
+func (state HTLCState) MarshalJSON() ([]byte, error) {
+	return json.Marshal(state.String())
+}
+
+// Unmarshals from JSON assuming Bech32 encoding
+func (state *HTLCState) UnmarshalJSON(data []byte) error {
+	var s string
+	err := json.Unmarshal(data, &s)
+	if err != nil {
+		return nil
+	}
+
+	bz, err := HTLCStateFromString(s)
+	if err != nil {
+		return err
+	}
+	*state = bz
+	return nil
 }

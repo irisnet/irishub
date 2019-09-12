@@ -84,7 +84,7 @@ func (k Keeper) ClaimHTLC(ctx sdk.Context, hashLock []byte, secret []byte) (sdk.
 	}
 
 	// check if the htlc is open
-	if htlc.State != types.StateOpen {
+	if htlc.State != types.OPEN {
 		return nil, types.ErrStateIsNotOpen(k.codespace, fmt.Sprintf("the htlc is not open"))
 	}
 
@@ -101,7 +101,7 @@ func (k Keeper) ClaimHTLC(ctx sdk.Context, hashLock []byte, secret []byte) (sdk.
 
 	// update the secret and state in HTLC
 	htlc.Secret = secret
-	htlc.State = types.StateCompleted
+	htlc.State = types.COMPLETED
 	k.SetHTLC(ctx, htlc, hashLock)
 
 	// delete from the expiration queue
@@ -128,7 +128,7 @@ func (k Keeper) RefundHTLC(ctx sdk.Context, hashLock []byte) (sdk.Tags, sdk.Erro
 	}
 
 	// check if the htlc is expired
-	if htlc.State != types.StateExpired {
+	if htlc.State != types.EXPIRED {
 		return nil, types.ErrStateIsNotOpen(k.codespace, fmt.Sprintf("the htlc is not expired"))
 	}
 
@@ -139,7 +139,7 @@ func (k Keeper) RefundHTLC(ctx sdk.Context, hashLock []byte) (sdk.Tags, sdk.Erro
 	}
 
 	// update the state in HTLC
-	htlc.State = types.StateRefunded
+	htlc.State = types.REFUNDED
 	k.SetHTLC(ctx, htlc, hashLock)
 
 	// add to coinflow
