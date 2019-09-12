@@ -6,5 +6,5 @@ const (
 
 // QueryHTLCParams is the query parameters for 'custom/htlc/htlc'
 type QueryHTLCParams struct {
-	SecretHashLock string
+	HashLock []byte
 }

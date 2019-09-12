@@ -5,21 +5,23 @@ import (
 )
 
 var (
+	KeyDelimiter          = []byte(":")                // key separator
 	PrefixHTLC            = []byte("htlcs:")           // key prefix for HTLC
 	PrefixHTLCExpireQueue = []byte("htlcExpireQueue:") // key prefix for the HTLC expiration queue
 )
 
-// KeyHTLC returns the key for a HTLC by the specified secret hash
-func KeyHTLC(secretHashLock []byte) []byte {
-	return append(PrefixHTLC, secretHashLock...)
+// KeyHTLC returns the key for a HTLC by the specified hash lock
+func KeyHTLC(hashLock []byte) []byte {
+	return append(PrefixHTLC, hashLock...)
 }
 
-// KeyHTLCExpireQueue returns the key for HTLC expiration queue
-func KeyHTLCExpireQueue(expireHeight uint64, secretHashLock []byte) []byte {
-	return append(append(PrefixHTLCExpireQueue, sdk.Uint64ToBigEndian(expireHeight)...), secretHashLock...)
+// KeyHTLCExpireQueue returns the key for HTLC expiration queue by the specified height and hash lock
+func KeyHTLCExpireQueue(expireHeight uint64, hashLock []byte) []byte {
+	prefix := append(PrefixHTLCExpireQueue, sdk.Uint64ToBigEndian(expireHeight)...)
+	return append(append(prefix, KeyDelimiter...), hashLock...)
 }
 
-// KeyHTLCExpireQueueSubspace returns the key prefix for HTLC expiration queue
+// KeyHTLCExpireQueueSubspace returns the key prefix for HTLC expiration queue by the given height
 func KeyHTLCExpireQueueSubspace(expireHeight uint64) []byte {
-	return append(PrefixHTLCExpireQueue, sdk.Uint64ToBigEndian(expireHeight)...)
+	return append(append(PrefixHTLCExpireQueue, sdk.Uint64ToBigEndian(expireHeight)...), KeyDelimiter...)
 }

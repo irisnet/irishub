@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"encoding/hex"
 	"fmt"
 
 	"github.com/irisnet/irishub/app/protocol"
@@ -20,8 +21,13 @@ func GetCmdQueryHtlc(cdc *codec.Codec) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
+			hashLock, err := hex.DecodeString(args[0])
+			if err != nil {
+				return err
+			}
+
 			params := htlc.QueryHTLCParams{
-				SecretHashLock: args[0],
+				HashLock: hashLock,
 			}
 
 			bz, err := cdc.MarshalJSON(params)

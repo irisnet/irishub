@@ -33,9 +33,8 @@ type createHtlcReq struct {
 	Sender               sdk.AccAddress `json:"sender"`
 	Receiver             sdk.AccAddress `json:"receiver"`
 	ReceiverOnOtherChain string         `json:"receiver_on_other_chain"`
-	HashLock             string         `json:"hash_lock"`
-	InAmount             uint64         `json:"in_amount"`
 	Amount               sdk.Coin       `json:"amount"`
+	HashLock             string         `json:"hash_lock"`
 	TimeLock             uint64         `json:"time_lock"`
 	Timestamp            uint64         `json:"timestamp"`
 }
@@ -58,10 +57,17 @@ func createHtlcHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handl
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
+
+		hashLock, err := hex.DecodeString(req.HashLock)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
 		// create the NewMsgCreateHTLC message
 		msg := htlc.NewMsgCreateHTLC(
-			req.Sender, req.Receiver, receiverOnOtherChain, req.Amount, uint64(req.InAmount),
-			req.HashLock, req.Timestamp, req.TimeLock)
+			req.Sender, req.Receiver, receiverOnOtherChain, req.Amount,
+			hashLock, req.Timestamp, req.TimeLock)
 		err = msg.ValidateBasic()
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -75,18 +81,24 @@ func createHtlcHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handl
 }
 
 type claimHtlcReq struct {
-	BaseTx  utils.BaseTx   `json:"base_tx"`
-	Claimer sdk.AccAddress `json:"claimer"`
-	Secret  string         `json:"secret"`
+	BaseTx utils.BaseTx   `json:"base_tx"`
+	Sender sdk.AccAddress `json:"sender"`
+	Secret string         `json:"secret"`
 }
 
 func claimHtlcHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		hashLock := vars["hash-lock"]
+
+		hashLockStr := vars["hash-lock"]
+		hashLock, err := hex.DecodeString(hashLockStr)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
 
 		var req claimHtlcReq
-		err := utils.ReadPostBody(w, r, cdc, &req)
+		err = utils.ReadPostBody(w, r, cdc, &req)
 		if err != nil {
 			return
 		}
@@ -98,7 +110,7 @@ func claimHtlcHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handle
 
 		// create the NewMsgClaimHTLC message
 		msg := htlc.NewMsgClaimHTLC(
-			req.Claimer, hashLock, req.Secret)
+			req.Sender, []byte(req.Secret), hashLock)
 		err = msg.ValidateBasic()
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -119,10 +131,16 @@ type RefundHtlcReq struct {
 func refundHtlcHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		hashLock := vars["hash-lock"]
+
+		hashLockStr := vars["hash-lock"]
+		hashLock, err := hex.DecodeString(hashLockStr)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
 
 		var req RefundHtlcReq
-		err := utils.ReadPostBody(w, r, cdc, &req)
+		err = utils.ReadPostBody(w, r, cdc, &req)
 		if err != nil {
 			return
 		}
