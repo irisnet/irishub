@@ -17,7 +17,7 @@ import (
 func GetCmdQueryRand(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "query-rand",
-		Short:   "query a random number by the request id",
+		Short:   "Query a random number by the request id",
 		Example: "iriscli rand query-rand --request-id=<request id>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
