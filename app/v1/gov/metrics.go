@@ -81,9 +81,7 @@ func (metrics *Metrics) addParameter(key string, value interface{}) {
 		case string(mint.KeyInflation), string(distr.KeyBaseProposerReward), string(distr.KeyBonusProposerReward), string(distr.KeyCommunityTax):
 			valueFloat64, err := strconv.ParseFloat(value.(sdk.Dec).String(), 64)
 			if err == nil {
-				promutil.SafeExec(func() {
-					metrics.Param.WithLabelValues(key).Set(valueFloat64)
-				})
+				metrics.Param.WithLabelValues(key).Set(valueFloat64)
 			}
 		default:
 		}
