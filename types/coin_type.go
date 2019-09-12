@@ -168,7 +168,7 @@ func GetCoinName(coinStr string) (coinName string, err error) {
 		return Iris, nil
 	}
 
-	if !strings.HasPrefix(denom, Iris + "-") && !strings.HasSuffix(denom, MinDenomSuffix) {
+	if !strings.HasPrefix(denom, Iris+"-") && !strings.HasSuffix(denom, MinDenomSuffix) {
 		return denom, nil
 	}
 
@@ -176,17 +176,16 @@ func GetCoinName(coinStr string) (coinName string, err error) {
 }
 
 func GetCoinNameByDenom(denom string) (coinName string, err error) {
-	if !IsCoinMinDenomValid(denom) {
-		return "", fmt.Errorf("invalid denom for getting coin name: %s", denom)
-	}
-
 	denom = strings.ToLower(denom)
-	if strings.HasPrefix(denom, Iris + "-") {
+	if strings.HasPrefix(denom, Iris+"-") {
 		_, err := IrisCoinType.GetUnit(denom)
 		if err != nil {
 			return "", fmt.Errorf("invalid denom for getting coin name: %s", denom)
 		}
 		return Iris, nil
+	}
+	if !IsCoinMinDenomValid(denom) {
+		return "", fmt.Errorf("invalid denom for getting coin name: %s", denom)
 	}
 	coinName = strings.TrimSuffix(denom, MinDenomSuffix)
 	if coinName == "" {
