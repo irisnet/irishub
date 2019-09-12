@@ -4,7 +4,6 @@ import (
 	"encoding/hex"
 	"fmt"
 
-	"github.com/irisnet/irishub/app/v2/htlc/internal/types"
 	sdk "github.com/irisnet/irishub/types"
 )
 
@@ -24,7 +23,7 @@ func BeginBlocker(ctx sdk.Context, k Keeper) (tags sdk.Tags) {
 		htlc, _ := k.GetHTLC(ctx, hashLock)
 
 		// update the state
-		htlc.State = types.EXPIRED
+		htlc.State = EXPIRED
 		k.SetHTLC(ctx, htlc, hashLock)
 
 		// delete from the expiration queue

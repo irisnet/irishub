@@ -35,9 +35,8 @@ var (
 	NewMsgRefundHTLC = types.NewMsgRefundHTLC
 	NewHTLC          = types.NewHTLC
 
-	OPEN      = types.OPEN
-	COMPLETED = types.COMPLETED
-	EXPIRED   = types.EXPIRED
+	OPEN    = types.OPEN
+	EXPIRED = types.EXPIRED
 
 	QueryHTLC = types.QueryHTLC
 
