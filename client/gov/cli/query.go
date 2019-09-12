@@ -55,7 +55,7 @@ func GetCmdQueryProposal(cdc *codec.Codec) *cobra.Command {
 func GetCmdQueryProposals(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "query-proposals",
-		Short:   "query proposals with optional filters",
+		Short:   "Query proposals with optional filters",
 		Example: "iriscli gov query-proposals --status=Passed",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			bechDepositorAddr := viper.GetString(flagDepositor)
@@ -127,7 +127,7 @@ func GetCmdQueryProposals(cdc *codec.Codec) *cobra.Command {
 func GetCmdQueryVote(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "query-vote",
-		Short:   "query vote",
+		Short:   "Query vote",
 		Example: "iriscli gov query-vote --proposal-id=1 --voter=<voter address>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
@@ -172,7 +172,7 @@ func GetCmdQueryVote(cdc *codec.Codec) *cobra.Command {
 func GetCmdQueryVotes(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "query-votes",
-		Short:   "query votes on a proposal",
+		Short:   "Query votes on a proposal",
 		Example: "iriscli gov query-votes --proposal-id=1",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)

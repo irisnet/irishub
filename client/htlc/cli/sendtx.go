@@ -17,7 +17,7 @@ import (
 func GetCmdCreateHtlc(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create",
-		Short: "create a HTLC",
+		Short: "Create a HTLC",
 		Example: "iriscli htlc create --receiver=<receiver> --receiver-on-other-chain=<receiver-on-other-chain> --amount=<amount> --hash-lock=<hash-lock> " +
 			"--time-lock=<time-lock> --timestamp=<timestamp>",
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -87,7 +87,7 @@ func GetCmdCreateHtlc(cdc *codec.Codec) *cobra.Command {
 func GetCmdClaimHtlc(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "claim",
-		Short:   "claim an opened HTLC",
+		Short:   "Claim an opened HTLC",
 		Example: "iriscli htlc claim --hash-lock=<hash-lock> --secret=<secret>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
@@ -133,7 +133,7 @@ func GetCmdClaimHtlc(cdc *codec.Codec) *cobra.Command {
 func GetCmdRefundHtlc(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "refund",
-		Short:   "refund from an expired HTLC",
+		Short:   "Refund from an expired HTLC",
 		Example: "iriscli htlc refund --hash-lock=<hash-lock>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
