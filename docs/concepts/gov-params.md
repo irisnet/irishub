@@ -35,7 +35,7 @@ Details in [distribution](../features/distribution.md)
 | ---------------- | --------------------- | ------- | ------- |
 | `mint/Inflation` | Inflation coefficient | [0,0.2] | 0.04    |
 
-Details in [distribution](../features/mint.md)
+Details in [mint](../features/mint.md)
 
 ## Parameters in Slashing
 

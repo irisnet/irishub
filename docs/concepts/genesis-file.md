@@ -51,6 +51,9 @@ Each genesis state starts with a list of account balances. Social consensus on t
 * **service**  Params related to service
   * params Detail in [Gov-Params](gov-params.md#parameters-in-service)
   
+* **asset**  Params related to asset
+  * params Detail in [Gov-Params](gov-params.md#parameters-in-asset)
+
 * **guardian** Params related to guardian
   * `profilers` The profiler list
   * `trustees` The trustees list
