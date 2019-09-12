@@ -18,8 +18,8 @@ func GetCmdCreateHtlc(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create",
 		Short: "create a HTLC",
-		Example: "iriscli htlc create --receiver=<receiver> --receiver-on-other-chain=<receiver-on-other-chain> --hash-lock=<hash-lock> " +
-			"--in-amount=<in-amount> --amount=<amount> --time-lock=<time-lock> --timestamp=<timestamp>",
+		Example: "iriscli htlc create --receiver=<receiver> --receiver-on-other-chain=<receiver-on-other-chain> --amount=<amount> --hash-lock=<hash-lock> " +
+			"--time-lock=<time-lock> --timestamp=<timestamp>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
@@ -40,26 +40,29 @@ func GetCmdCreateHtlc(cdc *codec.Codec) *cobra.Command {
 			}
 
 			receiverOnOtherChainStr := viper.GetString(FlagReceiverOnOtherChain)
-
 			receiverOnOtherChain, err := hex.DecodeString(receiverOnOtherChainStr)
 			if err != nil {
 				return err
 			}
 
-			inAmount := viper.GetInt64(FlagInAmount)
 			amountStr := viper.GetString(FlagAmount)
 			coin, err := cliCtx.ParseCoin(amountStr)
 			if err != nil {
 				return err
 			}
 
-			hashLock := viper.GetString(FlagHashLock)
+			hashLockStr := viper.GetString(FlagHashLock)
+			hashLock, err := hex.DecodeString(hashLockStr)
+			if err != nil {
+				return err
+			}
+
 			timestamp := viper.GetInt64(FlagTimestamp)
 			timeLock := viper.GetInt64(FlagTimeLock)
 
 			var msg sdk.Msg
 			msg = htlc.NewMsgCreateHTLC(
-				sender, receiver, receiverOnOtherChain, coin, uint64(inAmount),
+				sender, receiver, receiverOnOtherChain, coin,
 				hashLock, uint64(timestamp), uint64(timeLock))
 
 			if err := msg.ValidateBasic(); err != nil {
@@ -73,12 +76,9 @@ func GetCmdCreateHtlc(cdc *codec.Codec) *cobra.Command {
 	cmd.Flags().AddFlagSet(FsCreateHTLC)
 	cmd.MarkFlagRequired(FlagReceiver)
 	cmd.MarkFlagRequired(FlagReceiverOnOtherChain)
-	cmd.MarkFlagRequired(FlagHashLock)
-	cmd.MarkFlagRequired(FlagInAmount)
 	cmd.MarkFlagRequired(FlagAmount)
+	cmd.MarkFlagRequired(FlagHashLock)
 	cmd.MarkFlagRequired(FlagTimeLock)
-	cmd.MarkFlagRequired(FlagTimestamp)
-	cmd.MarkFlagRequired(FlagSecret)
 
 	return cmd
 }
@@ -102,12 +102,17 @@ func GetCmdClaimHtlc(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			hashLock := viper.GetString(FlagHashLock)
+			hashLockStr := viper.GetString(FlagHashLock)
+			hashLock, err := hex.DecodeString(hashLockStr)
+			if err != nil {
+				return err
+			}
+
 			secret := viper.GetString(FlagSecret)
 
 			var msg sdk.Msg
 			msg = htlc.NewMsgClaimHTLC(
-				sender, hashLock, secret)
+				sender, hashLock, []byte(secret))
 
 			if err := msg.ValidateBasic(); err != nil {
 				return err
@@ -129,7 +134,7 @@ func GetCmdRefundHtlc(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "refund",
 		Short:   "refund from an expired HTLC",
-		Example: "iriscli refund claim --hash-lock=<hash-lock>",
+		Example: "iriscli htlc refund --hash-lock=<hash-lock>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
@@ -143,7 +148,11 @@ func GetCmdRefundHtlc(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			hashLock := viper.GetString(FlagHashLock)
+			hashLockStr := viper.GetString(FlagHashLock)
+			hashLock, err := hex.DecodeString(hashLockStr)
+			if err != nil {
+				return err
+			}
 
 			var msg sdk.Msg
 			msg = htlc.NewMsgRefundHTLC(
