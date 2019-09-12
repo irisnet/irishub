@@ -69,13 +69,19 @@ func NopMetrics() *Metrics {
 	}
 }
 
-func (metrics *Metrics) setProposalStatus(proposalID uint64, status float64) {
+func (metrics *Metrics) SetProposalStatus(proposalID uint64, status float64) {
 	promutil.SafeExec(func() {
 		metrics.ProposalStatus.WithLabelValues(strconv.FormatUint(proposalID, 10)).Set(status)
 	})
 }
 
-func (metrics *Metrics) addParameter(key string, value interface{}) {
+func (metrics *Metrics) DeleteProposalStatus(proposalID uint64) {
+	promutil.SafeExec(func() {
+		metrics.ProposalStatus.DeleteLabelValues(strconv.FormatUint(proposalID, 10))
+	})
+}
+
+func (metrics *Metrics) AddParameter(key string, value interface{}) {
 	promutil.SafeExec(func() {
 		switch key {
 		case string(mint.KeyInflation), string(distr.KeyBaseProposerReward), string(distr.KeyBonusProposerReward), string(distr.KeyCommunityTax):
@@ -87,7 +93,7 @@ func (metrics *Metrics) addParameter(key string, value interface{}) {
 		}
 	})
 }
-func (metrics *Metrics) addVote(consAddr string, proposalID uint64, option VoteOption) {
+func (metrics *Metrics) AddVote(consAddr string, proposalID uint64, option VoteOption) {
 	promutil.SafeExec(func() {
 		labels := Label{
 			ValidatorLabel:  consAddr,
@@ -98,7 +104,7 @@ func (metrics *Metrics) addVote(consAddr string, proposalID uint64, option VoteO
 
 }
 
-func (metrics *Metrics) deleteVote(valAddr string, proposalID uint64) {
+func (metrics *Metrics) DeleteVote(valAddr string, proposalID uint64) {
 	promutil.SafeExec(func() {
 		labels := Label{
 			ValidatorLabel:  valAddr,

@@ -162,12 +162,12 @@ func (k Keeper) UpdateMetrics(ctx sdk.Context) {
 	burnedCoins := k.bankKeeper.GetCoins(ctx, auth.BurnedCoinsAccAddr)
 	burnedAmount, err := strconv.ParseFloat(sdk.NewDecFromInt(burnedCoins.AmountOf(types.StakeDenom)).QuoInt(sdk.AttoScaleFactor).String(), 64)
 	if err == nil {
-		k.metrics.BurnedToken.Set(burnedAmount)
+		k.metrics.SetBurnedToken(burnedAmount)
 	}
 
 	looseCoins := k.bankKeeper.GetLoosenCoins(ctx)
 	looseAmount, err := strconv.ParseFloat(sdk.NewDecFromInt(looseCoins.AmountOf(types.StakeDenom)).QuoInt(sdk.AttoScaleFactor).String(), 64)
 	if err == nil {
-		k.metrics.LoosenToken.Set(looseAmount)
+		k.metrics.SetLoosenToken(looseAmount)
 	}
 }

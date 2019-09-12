@@ -26,6 +26,7 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 		keeper.SubProposalNum(ctx, inactiveProposal.GetProposalLevel())
 		keeper.DeleteDeposits(ctx, proposalID)
 		keeper.DeleteProposal(ctx, proposalID)
+		keeper.metrics.DeleteProposalStatus(proposalID)
 
 		resTags = resTags.AppendTag(tags.Action, tags.ActionProposalDropped)
 		resTags = resTags.AppendTag(tags.ProposalID, []byte(string(proposalID)))
@@ -47,18 +48,18 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 
 		var action []byte
 		if result == PASS {
-			keeper.metrics.setProposalStatus(proposalID, 2)
+			keeper.metrics.SetProposalStatus(proposalID, 2)
 			keeper.RefundDeposits(ctx, activeProposal.GetProposalID())
 			activeProposal.SetStatus(StatusPassed)
 			action = tags.ActionProposalPassed
 			activeProposal.Execute(ctx, keeper)
 		} else if result == REJECT {
-			keeper.metrics.setProposalStatus(proposalID, 3)
+			keeper.metrics.SetProposalStatus(proposalID, 3)
 			keeper.RefundDeposits(ctx, activeProposal.GetProposalID())
 			activeProposal.SetStatus(StatusRejected)
 			action = tags.ActionProposalRejected
 		} else if result == REJECTVETO {
-			keeper.metrics.setProposalStatus(proposalID, 3)
+			keeper.metrics.SetProposalStatus(proposalID, 3)
 			keeper.DeleteDeposits(ctx, activeProposal.GetProposalID())
 			activeProposal.SetStatus(StatusRejected)
 			action = tags.ActionProposalRejected
@@ -81,11 +82,12 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 						keeper.GetTallyingProcedure(ctx, activeProposal.GetProposalLevel()).Penalty)
 				}
 			}
-			keeper.metrics.deleteVote(valAddr.String(), proposalID)
+			keeper.metrics.DeleteVote(valAddr.String(), proposalID)
 		}
 
 		keeper.SubProposalNum(ctx, activeProposal.GetProposalLevel())
 		keeper.DeleteValidatorSet(ctx, activeProposal.GetProposalID())
+		keeper.metrics.DeleteProposalStatus(proposalID)
 	}
 	return resTags
 }
