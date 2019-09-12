@@ -1,7 +1,3 @@
----
-order: 3
----
-
 # Fee Model
 
 Specify the maximum fee you want to pay by `--fee`. Gas is the unit used to measure how much resource needed to execute the transaction. 
