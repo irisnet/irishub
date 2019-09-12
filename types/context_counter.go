@@ -2,7 +2,7 @@ package types
 
 type TxCounter interface {
 	Count() int64
-	Add()
+	Incr()
 }
 
 type ValidTxCounter struct {
@@ -13,7 +13,7 @@ func (vtc *ValidTxCounter) Count() int64 {
 	return vtc.count
 }
 
-func (vtc *ValidTxCounter) Add() {
+func (vtc *ValidTxCounter) Incr() {
 	vtc.count++
 }
 
