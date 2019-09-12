@@ -12,12 +12,12 @@ iriscli service requests <flags>
 
 ## Flags
 
-| Name, shorthand       | Default                 | Description                                                                                                                                           | Required |
-| --------------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| --def-chain-id        |                         | the ID of the blockchain defined of the service                                                                                              |  Yes     |
-| --service-name        |                         | service name                                                                                                                                 |  Yes     |
-| --bind-chain-id       |                         | the ID of the blockchain bond of the service                                                                                                                                 |  Yes     |
-| --provider            |                         | bech32 encoded account created the service binding                                                                       |  Yes     |
+| Name, shorthand       | Default | Description                                        | Required |
+| --------------------- | ------- | -------------------------------------------------- | -------- |
+| --def-chain-id        |         | The ID of the blockchain defined of the service    | true     |
+| --service-name        |         | Service name                                       | true     |
+| --bind-chain-id       |         | The ID of the blockchain bond of the service       | true     |
+| --provider            |         | Bech32 encoded account created the service binding | true     |
 
 ## Examples
 

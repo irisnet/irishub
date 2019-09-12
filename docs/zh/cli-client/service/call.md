@@ -12,15 +12,15 @@ iriscli service call <flags>
 
 ## 特殊标志
 
-| Name, shorthand       | Default                 | Description                          | Required |
-| --------------------- | ----------------------- | ------------------------------------ | -------- |
-| --def-chain-id        |                         | 定义该服务的区块链ID           | 是       |
-| --service-name        |                         | 服务名称                     | 是       |
-| --method-id           |                         | 调用的服务方法ID                 | 是       |
-| --bind-chain-id       |                         | 绑定该服务的区块链ID           | 是       |
-| --provider            |                         | bech32编码的服务提供商账户地址  | 是       |
-| --service-fee         |                         | 服务调用支付的服务费            |          |
-| --request-data        |                         | hex编码的服务调用请求数据        |          |
+| Name, shorthand       | Default | Description                | Required |
+| --------------------- | ------- | -------------------------- | -------- |
+| --def-chain-id        |         | 定义该服务的区块链ID          | 是       |
+| --service-name        |         | 服务名称                    | 是       |
+| --method-id           |         | 调用的服务方法ID             | 是       |
+| --bind-chain-id       |         | 绑定该服务的区块链ID          | 是       |
+| --provider            |         | bech32编码的服务提供商账户地址 | 是       |
+| --service-fee         |         | 服务调用支付的服务费          |          |
+| --request-data        |         | hex编码的服务调用请求数据      |          |
 
 ## 示例
 

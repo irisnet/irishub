@@ -25,7 +25,7 @@ There are three main types:
 
 ## Long Downtime
 
-In the fixed time window `SignedBlocksWindow`, the ratio of the time of the validator's absence from the block is less than the value of `MinSignedPerWindow`，the validator's bonded token will be penalized in the `SlashFractionDowntime` ratio, and the validator will be jailed. Until the jail time exceeds `DowntimeJailDuration`, the validator can be released by executing `unjail` command.
+In the fixed time window `SignedBlocksWindow`, the ratio of the time of the validator's absence from the block is less than the value of `MinSignedPerWindow`, the validator's bonded token will be penalized in the `SlashFractionDowntime` ratio, and the validator will be jailed. Until the jail time exceeds `DowntimeJailDuration`, the validator can be released by executing `unjail` command.
 
 ### parameters
 
@@ -36,7 +36,7 @@ In the fixed time window `SignedBlocksWindow`, the ratio of the time of the vali
 
 ## Double Sign
 
-When executing a block, it receives evidence that a validator has voted for conflicting votes of the same round at the same height. If the time of the evidence from the current block time is less than `MaxEvidenceAge`，the validator's bonded token will be penalized in the `SlashFractionDoubleSign` ratio, and the validator will be jailed. Until the jail time exceeds `DoubleSignJailDuration`, the validator can be released by executing `unjail` command.
+When executing a block, it receives evidence that a validator has voted for conflicting votes of the same round at the same height. If the time of the evidence from the current block time is less than `MaxEvidenceAge`, the validator's bonded token will be penalized in the `SlashFractionDoubleSign` ratio, and the validator will be jailed. Until the jail time exceeds `DoubleSignJailDuration`, the validator can be released by executing `unjail` command.
 
 ### parameters
 

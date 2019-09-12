@@ -17,10 +17,10 @@ iriscli gov deposit --help
 ```
 ## Flags
  
-| Name, shorthand  | Default                    | Description                                                                                                                                         | Required |
-| ---------------- | -------------------------- | --------------------------------------------------------------------------------------------------------------- | ---------- |
-| --deposit        |                                       | Deposit of proposal                                                                                                                 | Yes          |
-| --proposal-id  |                                       | ProposalID of proposal depositing on                                                                                    | Yes      |
+| Name, shorthand | Default | Description                          | Required |
+| --------------- | ------- | ------------------------------------ | -------- |
+| --deposit       |         | Deposit of proposal                  | true     |
+| --proposal-id   |         | ProposalID of proposal depositing on | true     |
 
 ## Examples
 
@@ -51,8 +51,8 @@ Committed at block 7 (tx hash: C1156A7D383492AE5C2EB1BADE0080C3A36BE8AED491DC5B2
 
 When the total deposit amount exceeds `MinDeposit`, the proposal enter the voting procedure. 
 
-| GovParams | Critical | Important | Normal |
-| ------ | ------ | ------ | ------|
+| GovParams  | Critical  | Important | Normal    |
+| ---------- | --------- | --------- | ----------|
 | MinDeposit | 4000 iris | 2000 iris | 1000 iris |
 
 

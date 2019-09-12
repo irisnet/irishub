@@ -12,10 +12,10 @@ iriscli asset transfer-gateway-owner [flags]
 
 ## Unique Flags
 
-| Name, shorthand     | type   | Required | Default   | Description                                                       |
-| --------------------| -----  | -------- | --------  |-------------------------------------------------------- |
-| --moniker           | string  | true     | ""       | the unique name of the gateway to be transferred       |
-| --to                | Address | true     |          | the new owner to which the gateway will be transferred |
+| Name, shorthand     | type    | Required | Default  | Description                                            |
+| --------------------| ------- | -------- | -------- |------------------------------------------------------- |
+| --moniker           | string  | true     |          | The unique name of the gateway to be transferred       |
+| --to                | Address | true     |          | The new owner to which the gateway will be transferred |
 
 ## Examples
 

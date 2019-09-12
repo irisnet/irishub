@@ -19,14 +19,14 @@ iriscli stake edit-validator --help
 
 ## 特有标志
 
-| 名称                | 类型   | 是否必填 | 默认值   | 功能描述         |
-| --------------------| -----  | -------- | -------- | ------------------------------------------------------------------- |
-| --commission-rate   | string | float    | 0.0      | 佣金比率 |
-| --moniker           | string | false    | ""       | 验证人名称 |
-| --identity          | string | false    | ""       | 身份签名 |
-| --website           | string | false    | ""       | 网址  |
-| --details           | string | false    | ""       | 验证人节点详细信息 |
-| --commit         | String | 否     | True                  |是否等到交易有明确的返回值，如果是True，则忽略--async的内容|
+| 名称               | 类型   | 是否必须 | 默认值 | 功能描述                                             |
+| ----------------- | ------ | ------ | ----- | --------------------------------------------------- |
+| --commission-rate | float  |        | 0.0   | 佣金比率                                              |
+| --moniker         | string |        |       | 验证人名称                                            |
+| --identity        | string |        |       | 身份签名                                             |
+| --website         | string |        |       | 网址                                                 |
+| --details         | string |        |       | 验证人节点详细信息                                     |
+| --commit          | string |        | true  | 是否等到交易有明确的返回值，如果是True，则忽略--async的内容 |
 
 
 ## 示例

@@ -12,9 +12,9 @@ iriscli asset query-gateways [flags]
 
 ## Unique Flags
 
-| Name, shorthand     | type   | Required | Default  | Description                                                         |
-| --------------------| -----  | -------- | -------- | ------------------------------------------------------------------- |
-| --owner           | Address | false     |        | the owner address to be queried by|
+| Name, shorthand  | type    | Required | Default  | Description                        |
+| ---------------- | ------- | -------- | -------- | ---------------------------------- |
+| --owner          | Address |          |          | The owner address to be queried by |
 
 ## Examples
 

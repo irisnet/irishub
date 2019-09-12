@@ -12,13 +12,13 @@ iriscli keys show <name> <flags>
 
 ## 标志
 
-| 名称, 速记            | 默认值             | 描述                                                           | 是否必须  |
-| -------------------- | ----------------- | -------------------------------------------------------------- | -------- |
-| --address            |                   | 仅输出地址                                                      |          |
-| --bech               | acc               | 密钥的Bech32前缀编码 (acc/val/cons)                     |          |
-| --help, -h           |                   | 查询命令帮助                                                    |          |
-| --multisig-threshold | 1                 | K out of N required signatures                          |          |
-| --pubkey             |                   | 仅输出公钥                                                      |          |
+| 名称, 速记            | 默认值 | 描述                               | 是否必须  |
+| -------------------- | ---- | ---------------------------------- | -------- |
+| --address            |      | 仅输出地址                           |          |
+| --bech               | acc  | 密钥的Bech32前缀编码 (acc/val/cons)  |          |
+| --help, -h           |      | 查询命令帮助                         |          |
+| --multisig-threshold | 1    | K out of N required signatures     |          |
+| --pubkey             |      | 仅输出公钥                          |          |
 
 ## 例子
 

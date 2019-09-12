@@ -4,7 +4,7 @@ order: 3
 
 # Genesis File
 
-The Genesis file (~/.iris/config/genesis.json) is the basis for the entire network initialization，which contains most info for creating a Genesis block (such as ChainID, consensus params,app state), initialize account balances, parameters for each module, and validators info.
+The Genesis file (~/.iris/config/genesis.json) is the basis for the entire network initialization，which contains most info for creating a Genesis block (such as ChainID, consensus params, app state), initialize account balances, parameters for each module, and validators info.
 The genesis file sets the initial parameters of any new IRIS network. Establishing a robust social consensus over the genesis file is critical to starting a network.
 
 Each genesis state starts with a list of account balances. Social consensus on these account balances must be bootstrapped from some external process be it events on another blockchain to a token generation event.

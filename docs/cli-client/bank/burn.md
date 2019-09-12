@@ -12,9 +12,9 @@ iriscli bank burn --from=<key-name> --amount=<amount-to-burn> --fee=<native-fee>
 
 ## Flags
 
-| Name,shorthand   | Type   | Required | Default               | Description                                                  |
-| ---------------- | ------ | -------- | --------------------- | ------------------------------------------------------------ |
-| --amount         | String | True     |                       | Amount of coins to burn, e.g. 10iris                         |
+| Name,shorthand   | Type   | Required | Default | Description                          |
+| ---------------- | ------ | -------- | ------- | ------------------------------------ |
+| --amount         | string | true     |         | Amount of coins to burn, e.g. 10iris |
 
 ## Examples
 

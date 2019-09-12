@@ -18,10 +18,10 @@ iriscli gov query-vote --help
 
 ## Flags
 
-| Name, shorthand | Default                    | Description                                                                                                                                          | Required |
-| --------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| --proposal-id   |                            | ProposalID of proposal depositing on                                                                                                        | Yes      |
-| --voter         |                            | Bech32 voter address                                                                                                                        | Yes      |
+| Name, shorthand | Default | Description                          | Required |
+| --------------- | ------- | ------------------------------------ | -------- |
+| --proposal-id   |         | ProposalID of proposal depositing on | true     |
+| --voter         |         | Bech32 voter address                 | true     |
 
 ## Examples
 

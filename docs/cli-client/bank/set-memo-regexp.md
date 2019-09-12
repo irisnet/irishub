@@ -14,7 +14,7 @@ iriscli bank set-memo-regexp --regexp=<regular-expression> --from=<key-name> --f
 
 | Name,shorthand   | Type   | Required | Default               | Description                                                  |
 | ---------------- | ------ | -------- | --------------------- | ------------------------------------------------------------ |
-| --regexp         | String | True     |                       | Regular expression, maximum length 50, e.g. ^[A-Za-z0-9]+$   |
+| --regexp         | string | true     |                       | Regular expression, maximum length 50, e.g. ^[A-Za-z0-9]+$   |
 
 ## Examples
 

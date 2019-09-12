@@ -13,9 +13,9 @@ iriscli keys list <flags>
 
 ## Flags
 
-| Name, shorthand | Default   | Description                                                  | Required |
-| --------------- | --------- | ------------------------------------------------------------ | -------- |
-| --help, -h      |           | help for list                                                |          |
+| Name, shorthand | Default   | Description   | Required |
+| --------------- | --------- | ------------- | -------- |
+| --help, -h      |           | Help for list |          |
 
 ## Examples
 

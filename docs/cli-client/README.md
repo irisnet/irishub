@@ -4,22 +4,22 @@
 
 All query commands has these global flags. Their unique flags will be introduced later.
 
-| Name, shorthand | type   | Required | Default Value         | Description                                                          |
-| --------------- | ----   | -------- | --------------------- | -------------------------------------------------------------------- |
-| --chain-id      | string | false    | ""                    | Chain ID of tendermint node |
-| --height        | int    | false    | 0                     | Block height to query, omit to get most recent provable block |
-| --help, -h      | string | false    |                       | Print help message |
-| --output        | string | false    | text                  | Response format text or json|
-| --indent        | bool   | false    | false                 | Add indent to JSON response |
-| --ledger        | bool   | false    | false                 | Use a connected Ledger device |
-| --node          | string | false    | tcp://localhost:26657 | \<host>:\<port> to tendermint rpc interface for this chain |
-| --trust-node    | bool   | false    | true                  | Don't verify proofs for responses |
+| Name, shorthand | type   | Required | Default Value         | Description                                                   |
+| --------------- | ----   | -------- | --------------------- | ------------------------------------------------------------- |
+| --chain-id      | string |          |                       | Chain ID of tendermint node                                   |
+| --height        | int    |          | 0                     | Block height to query, omit to get most recent provable block |
+| --help, -h      | string |          |                       | Print help message                                            |
+| --output        | string |          | text                  | Response format text or json                                  |
+| --indent        | bool   |          | false                 | Add indent to JSON response                                   |
+| --ledger        | bool   |          | false                 | Use a connected Ledger device                                 |
+| --node          | string |          | tcp://localhost:26657 | \<host>:\<port> to tendermint rpc interface for this chain    |
+| --trust-node    | bool   |          | true                  | Don't verify proofs for responses                             |
 
 ### Json indent response
 
 `output` specify the output format of the query:
 
-Not specified, return text format as default：
+Not specified, return text format as default:
 
 ```
 root@ubuntu:~# iriscli stake validators
@@ -71,28 +71,28 @@ root@ubuntu:~# iriscli stake validators --output=json --indent
 
 All commands which can be used to send transactions have these global flags. Their unique flags will be introduced later.
 
-| Name, shorthand  | type   | Required | Default               | Description                                                         |
-| -----------------| -----  | -------- | --------------------- | ------------------------------------------------------------------- |
-| --account-number | int    | false    | 0                     | AccountNumber to sign the tx |
-| --async          | bool   | false    | false                 | broadcast transactions asynchronously(only works with commit = false) |
-| --commit         | bool   | false    | false                 | broadcast transaction and wait until the transaction is included by a block |
-| --chain-id       | string | true     | ""                    | Chain ID of tendermint node  |
-| --dry-run        | bool   | false    | false                 | Ignore the --gas flag and perform a simulation of a transaction, but don't broadcast it |
-| --fee            | string | true     | ""                    | Fee to pay along with transaction |
-| --from           | string | false    | ""                    | Name of private key with which to sign |
-| --from-addr      | string | false    | ""                    | Specify from address in generate-only mode |
-| --gas            | int    | false    | 50000                | Gas limit to set per-transaction; set to "simulate" to calculate required gas automatically |
-| --gas-adjustment | int    | false    | 1.5                   | Adjustment factor to be multiplied against the estimate returned by the tx simulation; if the gas limit is set |
-| --generate-only  | bool   | false    | false                 | Build an unsigned transaction and write it to STDOUT |
-| --help, -h       | string | false    |                       | Print help message |
-| --indent         | bool   | false    | false                 | Add indent to JSON response |
-| --json           | string | false    | false                 | Return output in json format |
-| --ledger         | bool   | false    | false                 | Use a connected Ledger device |
-| --memo           | string | false    | ""                    | Memo to send along with transaction |
-| --node           | string | false    | tcp://localhost:26657 | \<host>:\<port> to tendermint rpc interface for this chain |
-| --print-response | bool   | false    | false                 | return tx response (only works with async = false)|
-| --sequence       | int    | false    | 0                     | Sequence number to sign the tx |
-| --trust-node     | bool   | false    | true                  | Don't verify proofs for responses | 
+| Name, shorthand  | type   | Required | Default               | Description                                                                                                    |
+| -----------------| -----  | -------- | --------------------- | -------------------------------------------------------------------------------------------------------------- |
+| --account-number | int    |          | 0                     | AccountNumber to sign the tx                                                                                   |
+| --async          | bool   |          | false                 | Broadcast transactions asynchronously(only works with commit = false)                                          |
+| --commit         | bool   |          | false                 | Broadcast transaction and wait until the transaction is included by a block                                    |
+| --chain-id       | string | true     |                       | Chain ID of tendermint node                                                                                    |
+| --dry-run        | bool   |          | false                 | Ignore the --gas flag and perform a simulation of a transaction, but don't broadcast it                        |
+| --fee            | string | true     |                       | Fee to pay along with transaction                                                                              |
+| --from           | string |          |                       | Name of private key with which to sign                                                                         |
+| --from-addr      | string |          |                       | Specify from address in generate-only mode                                                                     |
+| --gas            | int    |          | 50000                 | Gas limit to set per-transaction; set to "simulate" to calculate required gas automatically                    |
+| --gas-adjustment | int    |          | 1.5                   | Adjustment factor to be multiplied against the estimate returned by the tx simulation; if the gas limit is set |
+| --generate-only  | bool   |          | false                 | Build an unsigned transaction and write it to STDOUT                                                           |
+| --help, -h       | string |          |                       | Print help message                                                                                             |
+| --indent         | bool   |          | false                 | Add indent to JSON response                                                                                    |
+| --json           | string |          | false                 | Return output in json format                                                                                   |
+| --ledger         | bool   |          | false                 | Use a connected Ledger device                                                                                  |
+| --memo           | string |          |                       | Memo to send along with transaction                                                                            |
+| --node           | string |          | tcp://localhost:26657 | \<host>:\<port> to tendermint rpc interface for this chain                                                     |
+| --print-response | bool   |          | false                 | Return tx response (only works with async = false)                                                             |
+| --sequence       | int    |          | 0                     | Sequence number to sign the tx                                                                                 |
+| --trust-node     | bool   |          | true                  | Don't verify proofs for responses                                                                              | 
 
 ## Module command list
 
@@ -112,7 +112,7 @@ Each module provides a set of command line interfaces. Here we sort these comman
 
 The `iriscli config` command interactively configures some default parameters, such as chain-id, home, fee, and node.
 
-Example：
+Example:
 
 ```
 root@ubuntu16:~# iriscli config

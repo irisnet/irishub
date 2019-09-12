@@ -19,13 +19,13 @@ iriscli stake edit-validator --help
 
 ## Unique Flags
 
-| Name, shorthand     | type   | Required | Default  | Description                                                         |
-| --------------------| -----  | -------- | -------- | ------------------------------------------------------------------- |
-| --commission-rate   | string | float    | 0.0      | Commission rate percentage |
-| --moniker           | string | false    | ""       | Validator name |
-| --identity          | string | false    | ""       | Optional identity signature (ex. UPort or Keybase) |
-| --website           | string | false    | ""       | Optional website  |
-| --details           | string | false    | ""       | Optional details |
+| Name, shorthand     | type   | Required | Default  | Description                                        |
+| --------------------| -----  | -------- | -------- | -------------------------------------------------- |
+| --commission-rate   | float  |          | 0.0      | Commission rate percentage                         |
+| --moniker           | string |          |          | Validator name                                     |
+| --identity          | string |          |          | Optional identity signature (ex. UPort or Keybase) |
+| --website           | string |          |          | Optional website                                   |
+| --details           | string |          |          | Optional details                                   |
 
 
 ## Examples

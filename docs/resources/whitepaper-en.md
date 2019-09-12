@@ -987,7 +987,7 @@ Tom has been tracking trends in the blockchain, cloud computing, IoT and smart m
 * [2] Ethereum Foundation, "Ethereum Homestead Documentation",
   http://ethdocs.org/en/latest/
 
-* [3] Jae Kwon, Ethan Buchman，"Cosmos, A Network of Distributed
+* [3] Jae Kwon, Ethan Buchman, "Cosmos, A Network of Distributed
   Ledgers", https://cosmos.network/whitepaper
 
 * [4] Gavin Wood, "Polkadot: Vision For a Heterogeneous Muilti-chain

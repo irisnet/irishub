@@ -6,9 +6,9 @@ Query the current information of signals.
 
 ## Flags
 
-| Name, shorthand | Default               | Description                                                                                                                                 | Required |
-| --------------- | --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------| -------- |
-| --detail        | false                 | details of signals                                                                                                                 |          |
+| Name, shorthand | Default | Description        | Required |
+| --------------- | ------- | ------------------ | -------- |
+| --detail        | false   | Details of signals |          |
 
 ## Usage
 

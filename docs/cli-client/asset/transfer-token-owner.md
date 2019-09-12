@@ -12,9 +12,9 @@ iriscli asset transfer-token-owner <token-id> [flags]
 
 ## Flags
 
-| Name | Type | Required | Default | Description                                              |
-| --------------------| -----  | -------- | -------- | ------------------------------------------------------------------- |
-| --to           | string | True | "" | the new owner address |
+| Name | Type   | Required | Default | Description           |
+| ---- | ------ | -------- | ------- | --------------------- |
+| --to | string | true     |         | The new owner address |
 
 ## Example
 

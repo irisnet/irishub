@@ -17,12 +17,12 @@ iriscli stake redelegate --help
 
 ## 特有的flags
 
-| 名称                       | 类型   | 是否必填 | 默认值   | 功能描述         |
-| -------------------------- | -----  | -------- | -------- | ------------------------------------------------------------------- |
-| --address-validator-dest   | string | true     | ""       | 目标验证人地址 |
-| --address-validator-source | string | true     | ""       | 源验证人地址 |
-| --shares-amount            | float  | false    | 0.0      | 转移的share数量，正数 |
-| --shares-percent           | float  | false    | 0.0      | 转移的比率，0到1之间的正数 |
+| 名称                        | 类型   | 是否必须 | 默认值 | 功能描述                |
+| -------------------------- | -----  | ------ | ----- | ---------------------- |
+| --address-validator-dest   | string | 是     |       | 目标验证人地址            |
+| --address-validator-source | string | 是     |       | 源验证人地址             |
+| --shares-amount            | float  |        | 0.0   | 转移的share数量，正数     |
+| --shares-percent           | float  |        | 0.0   | 转移的比率，0到1之间的正数 |
 
 用户可以用`--shares-amount`或者`--shares-percent`指定转委托的token数量(这两个参数不可同时使用)。
 

@@ -42,7 +42,7 @@ Refer to [redelegate](../cli-client/stake/redelegate.md)
 
 Once a delegator has delegated his own IRIS to certain validator, he/she could withdraw the delegation at anytime. If the transaction is executed, the delegation will become liquid after after the specified period of the system parameter `unbonding_time`.  
 
-Unbond 50% shares：
+Unbond 50% shares: 
 ```$xslt
 iriscli stake unbond begin  --address-validator=<address-validator> --address-delegator=<address-delegator> --chain-id=<chain-id>  --from=<key_name> --fee=0.3iris --shares-percent=0.5
 ```

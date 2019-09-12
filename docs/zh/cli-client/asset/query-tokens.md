@@ -12,11 +12,11 @@ iriscli asset query-tokens [flags]
 
 ## 标志
 
-| 命令，缩写         | 类型    | 是否必须 | 默认值        | 描述                                                         |
-| ------------------ | ------- | -------- | ------------- | ------------------------------------------------------------ |
-| --source           | string  | false    | all           | 资产源: native / gateway / external                           |
-| --gateway          | string  | false    |               | 网关的唯一标识，当 source 为 gateway 时必填                  |
-| --owner            | string  | false    |               | 资产所有人                   |
+| 命令，速记   | 类型    | 是否必须   | 默认值 | 描述                                    |
+| ---------- | ------- | -------- | ----- | -------------------------------------- |
+| --source   | string  |          | all   | 资产源: native / gateway / external     |
+| --gateway  | string  |          |       | 网关的唯一标识，当 source 为 gateway 时必填 |
+| --owner    | string  |          |       | 资产所有人                               |
 
 ## 查询规则
 

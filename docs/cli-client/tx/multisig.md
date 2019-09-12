@@ -11,9 +11,9 @@ iriscli tx multisign <file> <key name> <[signature]...> <flags>
 ```
 
 ## Flags
-| Name,shorthand | Type   | Required | Default               | Description                                                  |
-| -------------- | ------ | -------- | --------------------- | ------------------------------------------------------------ |
-| -h, --help       |        | false     |                       |  Help for sign                                        |
+| Name,shorthand | Type | Required | Default | Description   |
+| -------------- | ---- | -------- | ------- | ------------- |
+| -h, --help     |      |          |         | Help for sign |
 
 ## Example
 
@@ -21,14 +21,14 @@ iriscli tx multisign <file> <key name> <[signature]...> <flags>
 
 Firstly, you must create a multisig account, please refer to [add](../keys/add.md)
 
-Create a multisig account with 3 sub-accounts，specify the minimum number of signatures，such as 2. The tx could be broadcast only when the number of signatures is greater than or equal to 2.
+Create a multisig account with 3 sub-accounts, specify the minimum number of signatures, such as 2. The tx could be broadcast only when the number of signatures is greater than or equal to 2.
 
 ```  
 iriscli keys add <multi_account_keyname> --multisig-threshold=2 --multisig=<signer_keyname_1>,<signer_keyname_2>,<signer_keyname_3>...
 ```
 
 ::: tips
-<signer_keyname> could be the type of "local/offline/ledger"， but not "multi" type。
+<signer_keyname> could be the type of "local/offline/ledger", but not "multi" type.
 
 Offline account can be created by "iriscli keys add --pubkey". 
 :::
@@ -44,7 +44,7 @@ iriscli bank send --amount=1iris --fee=0.3iris --chain-id=<chain-id> --from=<mul
 
 Use `iriscli keys show <multi_account_keyname>` to get `<multi_account_address>`
 
-Specify the threshold to 2， sign and generate Tx-sign.json.
+Specify the threshold to 2, sign and generate Tx-sign.json.
 
 Sign the tx with signer_1:
 ```  
@@ -58,7 +58,7 @@ iriscli tx sign Tx-generate.json --name=<signer_keyname_2> --chain-id=<chain-id>
 
 ### multisign all the signatures
 
-Create the signed tx and generate Tx-signed.json：
+Create the signed tx and generate Tx-signed.json:
 
 ```  
 iriscli tx multisign --chain-id=<chain-id> Tx-generate.json <multi_account_keyname> Tx-sign-user_1.json Tx-sign-user_2.json > Tx-signed.json

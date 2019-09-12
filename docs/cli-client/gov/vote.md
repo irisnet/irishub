@@ -17,10 +17,10 @@ iriscli gov vote --help
 ```
 ## Flags
 
-| Name, shorthand  | Default                    | Description                                                                                                                                          | Required |
-| ---------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| --option         |                            | Vote option {Yes, No, NoWithVeto, Abstain}                                                                                                  | Yes      |
-| --proposal-id    |                            | ProposalID of proposal voting on                                                                                                            | Yes      |
+| Name, shorthand  | Default | Description                                | Required |
+| ---------------- | ------- | ------------------------------------------ | -------- |
+| --option         |         | Vote option {Yes, No, NoWithVeto, Abstain} | true     |
+| --proposal-id    |         | ProposalID of proposal voting on           | true     |
 
 ## Examples
 

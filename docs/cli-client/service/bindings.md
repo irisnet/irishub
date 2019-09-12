@@ -12,11 +12,11 @@ iriscli service bindings <flags>
 
 ## Flags
 
-| Name, shorthand | Default                    | Description                                                         | Required |
-| --------------- | -------------------------- | ------------------------------------------------------------------- | -------- |
-| --def-chain-id  |                            | the ID of the blockchain defined of the service            | Yes      |
-| --service-name  |                            | service name                                               | Yes      |
-| --help, -h      |                            | help for bindings                                                   |          |
+| Name, shorthand | Default | Description                                     | Required |
+| --------------- | ------- | ----------------------------------------------- | -------- |
+| --def-chain-id  |         | The ID of the blockchain defined of the service | true     |
+| --service-name  |         | Service name                                    | true     |
+| --help, -h      |         | Help for bindings                               |          |
 
 ## Examples
 

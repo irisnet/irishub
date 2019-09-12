@@ -2,7 +2,7 @@
 
 ## Description
 
-Sending tokens to another address， this command includes `generate/sign/broadcast` transactions.
+Sending tokens to another address, this command includes `generate/sign/broadcast` transactions.
 
 ## Usage
 
@@ -14,8 +14,8 @@ iriscli bank send --from=<key-name> --to=<address> --amount=<amount> --fee=<nati
 
 | Name,shorthand   | Type   | Required | Default               | Description                                                  |
 | ---------------- | ------ | -------- | --------------------- | ------------------------------------------------------------ |
-| --amount         | String | True     |                       | Amount of coins to send, for instance: 10iris                |
-| --to             | String |          |                       | Bech32 encoding address to receive coins                     |
+| --amount         | string | true     |                       | Amount of coins to send, for instance: 10iris                |
+| --to             | string |          |                       | Bech32 encoding address to receive coins                     |
 
 ## Examples
 

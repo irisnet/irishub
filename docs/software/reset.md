@@ -10,10 +10,10 @@ IRISnet can reset blockchain state at any height. This can be accomplished by co
 ```
 ## Flags
 
- | Name，shorthand     | type   | Required | Default  | Description    |		
- | ------------------- | -----  | -------- | -------- | -------------- |		
- | --height            | uint   | false    | 0        | Reset state to a particular height (greater than latest height means latest height) |		
- | --home              | string | false    | $HOME/.iris       | Specify the directory which stores node config and blockchain data |		
+ | Name, shorthand | type   | Required | Default     | Description                                                                         |		
+ | --------------- | -----  | -------- | ----------- | ----------------------------------------------------------------------------------- |		
+ | --height        | uint   |          | 0           | Reset state to a particular height (greater than latest height means latest height) |		
+ | --home          | string |          | $HOME/.iris | Specify the directory which stores node config and blockchain data                  |		
  
 ## Examples
 

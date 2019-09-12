@@ -17,10 +17,10 @@ iriscli gov query-deposit --help
 ```
 ## Flags
 
-| Name, shorthand | Default               | Description                                                                                                                                          | Required |
-| --------------- | --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| --chain-id      |                       | Chain ID of tendermint node                                                                                                                 | Yes      |
-| --depositor     |                       | Bech32 depositor address                                                                                                                    | Yes      |
+| Name, shorthand | Default | Description                 | Required |
+| --------------- | ------- | --------------------------- | -------- |
+| --chain-id      |         | Chain ID of tendermint node | true     |
+| --depositor     |         | Bech32 depositor address    | true     |
  
 ## Examples
 

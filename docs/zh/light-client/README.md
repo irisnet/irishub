@@ -10,22 +10,22 @@
 
 IRISLCD有两个子命令:
 
-| 子命令      | 功能                 | 示例命令 |
-| --------------- | --------------------------- | --------------- |
-| version         | 打印版本信息   | `irislcd version` |
-| start           | 启动一个IRISLCD节点  | `irislcd start --node=tcp://localhost:26657 --laddr=tcp://0.0.0.0:1317 --chain-id=<chain-id> --home=$HOME/.iriscli/ --trust-node` |
+| 子命令   | 功能               | 示例命令                                                                                                                           |
+| ------- | ----------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| version | 打印版本信息        | `irislcd version`                                                                                                                 |
+| start   | 启动一个IRISLCD节点 | `irislcd start --node=tcp://localhost:26657 --laddr=tcp://0.0.0.0:1317 --chain-id=<chain-id> --home=$HOME/.iriscli/ --trust-node` |
 
 `start`子命令有如下参数可配置
 
-| 参数名称        | 类型      | 默认值                 | 是否必填 | 功能描述                                          |
-| --------------- | --------- | ----------------------- | -------- | ---------------------------------------------------- |
-| chain-id        | string    | null                    | true     | Tendermint节点的chain ID |
-| home            | string    | "$HOME/.irislcd"        | false    | 配置home目录，key和proof相关的信息都存于此 |
-| node            | string    | "tcp://localhost:26657" | false    | 全节点的rpc地址 |
-| laddr           | string    | "tcp://localhost:1317"  | false    | 侦听的地址和端口 |
-| trust-node      | bool      | false                   | false    | 是否信任全节点 |
-| max-open        | int       | 1000                    | false    | 最大连接数 |
-| cors            | string    | ""                      | false    | 允许跨域访问的地址 |
+| 参数名称         | 类型       | 默认值                   | 是否必须 | 功能描述                                |
+| --------------- | --------- | ----------------------- | ------- | ------------------------------------- |
+| chain-id        | string    |                         | 是      | Tendermint节点的chain ID               |
+| home            | string    | "$HOME/.irislcd"        |         | 配置home目录，key和proof相关的信息都存于此 |
+| node            | string    | "tcp://localhost:26657" |         | 全节点的rpc地址                         |
+| laddr           | string    | "tcp://localhost:1317"  |         | 侦听的地址和端口                         |
+| trust-node      | bool      | false                   |         | 是否信任全节点                          |
+| max-open        | int       | 1000                    |         | 最大连接数                              |
+| cors            | string    |                         |         | 允许跨域访问的地址                       |
 
 ## 示例命令
 

@@ -18,11 +18,11 @@ iriscli stake unbond --help
 
 ## 特有标志
 
-| 名称                | 类型   | 是否必填 | 默认值   | 功能描述         |
-| --------------------| -----  | -------- | -------- | ------------------------------------------------------------------- |
-| --address-validator | string | true     | ""       | 验证人地址 |
-| --shares-amount     | float  | false    | 0.0      | 解绑的share数量，正数 |
-| --shares-percent    | float  | false    | 0.0      | 解绑的比率，0到1之间的正数 |
+| 名称                 | 类型   | 是否必须 | 默认值 | 功能描述                |
+| --------------------| -----  | ------ | ----- | ---------------------- |
+| --address-validator | string | 是     |       | 验证人地址               |
+| --shares-amount     | float  |        | 0.0   | 解绑的share数量，正数     |
+| --shares-percent    | float  |        | 0.0   | 解绑的比率，0到1之间的正数 |
 
 用户可以用`--shares-amount`或者`--shares-percent`指定转委托的token数量(这两个参数不可同时使用)。
 

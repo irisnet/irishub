@@ -12,14 +12,14 @@ iriscli service define <flags>
 
 ## 特有标志
 
-| Name, shorthand       | Default                 | Description                                                                       | Required |
-| --------------------- | ----------------------- | --------------------------------------------------------------------------------- | -------- |
-| --service-description |                         | 服务的描述                                                                 |          |
-| --author-description  |                         | 服务创建者的描述                                                            |          |
-| --service-name        |                         | 服务名称                                                                   |   Yes    |
-| --tags                |                         | 该服务的关键字                                                             |          |
-| --idl-content         |                         | 对该服务描述的接口定义语言内容                                                 |          |
-| --file                |                         | 对该服务描述的接口定义语言内容的文件路径                                         |          |
+| Name, shorthand       | Default | Description                       | Required |
+| --------------------- | ------- | --------------------------------- | -------- |
+| --service-description |         | 服务的描述                          |          |
+| --author-description  |         | 服务创建者的描述                     |          |
+| --service-name        |         | 服务名称                            | 是       |
+| --tags                |         | 该服务的关键字                       |          |
+| --idl-content         |         | 对该服务描述的接口定义语言内容         |          |
+| --file                |         | 对该服务描述的接口定义语言内容的文件路径 |          |
 
 ## 示例
 

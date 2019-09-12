@@ -41,7 +41,7 @@ echo "export PATH=$PATH:$GOBIN" >> ~/.bashrc
 source ~/.bashrc
 ```
 
-Verify that Go has been installed successfully：
+Verify that Go has been installed successfully: 
 ```bash
 go version
 ```

@@ -15,7 +15,7 @@ In IRISnet, a sentry node is just a  full node. The validator node will only con
 
 On the sentry node's side, you need to get fully initialized first. 
 
-Then, you should edit its `config.toml` file, and change `private_peers_id` field：
+Then, you should edit its `config.toml` file, and change `private_peers_id` field: 
 
 ```
 private_peer_ids =<validator_node_id>

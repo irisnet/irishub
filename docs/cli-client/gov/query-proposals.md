@@ -19,12 +19,12 @@ iriscli gov query-proposals --help
 
 ## Flags
 
-| Name, shorthand | Default                    | Description                                                                                                                                          | Required |
-| --------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| --depositor     |                            | Filter by proposals deposited on by depositor                                                                                    |  false     |
-| --limit         |                            | Limit to latest [number] proposals. Default to all proposals                                                                    |    false      |
-| --status        |                            | filter proposals by proposal status                                                                                                        |    false      |
-| --voter         |                            | Filter by proposals voted on by voted                                                                                            |     false     |
+| Name, shorthand | Default | Description                                                  | Required |
+| --------------- | ------- | ------------------------------------------------------------ | -------- |
+| --depositor     |         | Filter by proposals deposited on by depositor                |          |
+| --limit         |         | Limit to latest [number] proposals. Default to all proposals |          |
+| --status        |         | Filter proposals by proposal status                          |          |
+| --voter         |         | Filter by proposals voted on by voted                        |          |
 
 ## Examples
 

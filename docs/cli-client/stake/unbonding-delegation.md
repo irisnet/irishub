@@ -17,10 +17,10 @@ iriscli stake unbonding-delegation --help
 
 ## Unique Flags
 
-| Name, shorthand     | Default                    | Description                                                         | Required |
-| ------------------- | -------------------------- | ------------------------------------------------------------------- | -------- |
-| --address-delegator |                            | Bech address of the delegator                              | Yes      |
-| --address-validator |                            | Bech address of the validator                              | Yes      |
+| Name, shorthand     | Default | Description                   | Required |
+| ------------------- | ------- | ----------------------------- | -------- |
+| --address-delegator |         | Bech address of the delegator | true     |
+| --address-validator |         | Bech address of the validator | true     |
 
 
 ## Examples

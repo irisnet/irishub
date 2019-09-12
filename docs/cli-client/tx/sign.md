@@ -12,13 +12,13 @@ iriscli tx sign <file> <flags>
 
 ## Flags
 
-| Name,shorthand | Type   | Required | Default               | Description                                                  |
-| -------------- | ------ | -------- | --------------------- | ------------------------------------------------------------ |
-| -h, --help       |        | false     |                       |  Help for sign                                        |
-| --append         | Bool  | true       | True                  | Attach a signature to an existing signature.               |
-| --name           | String | true       |                       | Key name for signature                                      |
-| --offline        | Boole | true       | False                 | Offline mode.                                    |
-| --print-sigs     | Bool  | true       | False                 | Print the address where the transaction must be signed and the signed address, then exit  |
+| Name,shorthand | Type   | Required | Default | Description                                                                              |
+| -------------- | ------ | -------- | ------- | ---------------------------------------------------------------------------------------- |
+| -h, --help     |        |          |         | Help for sign                                                                            |
+| --append       | bool   | true     | true    | Attach a signature to an existing signature.                                             |
+| --name         | string | true     |         | Key name for signature                                                                   |
+| --offline      | boole  | true     |         | Offline mode.                                                                            |
+| --print-sigs   | bool   | true     |         | Print the address where the transaction must be signed and the signed address, then exit |
 
 ## Examples
 
