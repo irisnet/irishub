@@ -103,4 +103,3 @@ Additionally, validators are expected to be active members of the community. The
 - **Censorship**: If the protocol detects that a proposer included invalid transactions in a block, this validator will get jailed and removed from current validatorset for 2 days.
 
 All metrics mentioned can be adjusted by `parameter-change` proposals.
-
