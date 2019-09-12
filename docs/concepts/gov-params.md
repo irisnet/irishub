@@ -1,7 +1,7 @@
 # Parameters
 
 In IRISnet, there are some special parameters can be modified through on-chain governance.
-All the IRIS holders may participate in the on-chain governance. If the community is not satisfied with certain modifiable parameters, it is available to submit a `parameter-change` proposal in governance module.
+All the IRIS holders may participate in the on-chain governance. If the community is not satisfied with certain modifiable parameters, it is available to submit a [parameter-change](../features/governance.md#usage-scenario-of-parameter-change) proposal in governance module.
 
 ## Parameters in Auth
 
