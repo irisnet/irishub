@@ -68,7 +68,8 @@ func (k Keeper) CreateHTLC(ctx sdk.Context, htlc types.HTLC, hashLock []byte) (s
 	createTags := sdk.NewTags(
 		types.TagSender, []byte(htlc.Sender.String()),
 		types.TagReceiver, []byte(htlc.Receiver.String()),
-		types.TagReceiverOnOtherChain, htlc.ReceiverOnOtherChain,
+		types.TagReceiverOnOtherChain, []byte(hex.EncodeToString(htlc.ReceiverOnOtherChain)),
+		types.TagAmount, []byte(htlc.Amount.String()),
 		types.TagHashLock, []byte(hex.EncodeToString(hashLock)),
 	)
 
