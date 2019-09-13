@@ -12,7 +12,7 @@ iriscli asset issue-token [flags]
 
 ## Flags
 
-| Name,shorthand     | Type    | Required | Default       | Description                                                  |
+| Name, shorthand    | Type    | Required | Default       | Description                                                  |
 | ------------------ | ------- | -------- | ------------- | ------------------------------------------------------------ |
 | --family           | string  | true     | fungible      | The token type: fungible, non-fungible (unsupported) |
 | --source           | string  |          | native        | The token source: native, gateway                              |

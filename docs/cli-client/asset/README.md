@@ -31,7 +31,7 @@ Asset allows you to manage assets on IRIS Hub
 
 ## Global Flags
 
-| Name,shorthand        | Default        | Description                                 | Required | Type   |
+| Name, shorthand       | Default        | Description                                 | Required | Type   |
 | --------------------- | -------------- | ------------------------------------------- | -------- | ------ |
 | -e, --encoding        | hex            | String binary encoding (hex\b64\btc )       |          | string |
 | --home                | /root/.iriscli | Directory for config and data               |          | string |
@@ -40,6 +40,6 @@ Asset allows you to manage assets on IRIS Hub
 
 ## Flags
 
-| Name,shorthand | Default | Description    | Required |
-| -------------- | ------- | -------------- | -------- |
-| -h, --help     |         | Help for asset |          |
+| Name, shorthand | Default | Description    | Required |
+| --------------- | ------- | -------------- | -------- |
+| -h, --help      |         | Help for asset |          |

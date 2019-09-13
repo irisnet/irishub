@@ -12,10 +12,10 @@ Params allows you to query system parameters, some parameters can be governed by
 
 ## Flags
 
-| Name,shorthand | Default | Description     | Required |
-| -------------- | ------- | --------------- | -------- |
-| -h, --help     |         | Help for params |          |
-| --module       |         | Name for module |          |
+| Name, shorthand | Default | Description     | Required |
+| --------------- | ------- | --------------- | -------- |
+| -h, --help      |         | Help for params |          |
+| --module        |         | Name for module |          |
 ## Examples
 
 ```

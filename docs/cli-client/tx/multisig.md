@@ -11,9 +11,9 @@ iriscli tx multisign <file> <key name> <[signature]...> <flags>
 ```
 
 ## Flags
-| Name,shorthand | Type | Required | Default | Description   |
-| -------------- | ---- | -------- | ------- | ------------- |
-| -h, --help     |      |          |         | Help for sign |
+| Name, shorthand | Type | Required | Default | Description   |
+| --------------- | ---- | -------- | ------- | ------------- |
+| -h, --help      |      |          |         | Help for sign |
 
 ## Example
 

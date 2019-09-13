@@ -19,7 +19,7 @@ iris tendermint show-validator <flags>
 
 ## Global Flags
 
-| Name,shorthand        | Default        | Description                                 | Required | Type   |
+| Name, shorthand       | Default        | Description                                 | Required | Type   |
 | --------------------- | -------------- | ------------------------------------------- | -------- | ------ |
 | -e, --encoding string | hex            | String binary encoding (hex \|b64 \|btc )   |          | string |
 | --home string         | /root/.iriscli | Directory for config and data               |          | string |

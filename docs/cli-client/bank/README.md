@@ -4,7 +4,7 @@
 
 Bank allows you to manage assets in your local account 
 
-## Usage:
+## Usage
 
 ```
  iriscli bank [command]
@@ -24,7 +24,7 @@ Bank allows you to manage assets in your local account
 
 ## Global Flags
 
-| Name,shorthand        | Default        | Description                                 | Required | Type   |
+| Name, shorthand       | Default        | Description                                 | Required | Type   |
 | --------------------- | -------------- | ------------------------------------------- | -------- | ------ |
 | -e, --encoding        | hex            | String binary encoding (hex\b64\btc )       |          | string |
 | --home                | /root/.iriscli | Directory for config and data               |          | string |
@@ -33,6 +33,6 @@ Bank allows you to manage assets in your local account
 
 ## Flags
 
-| Name,shorthand | Default | Description   | Required |
-| -------------- | ------- | ------------- | -------- |
-| -h, --help     |         | Help for bank |          |
+| Name, shorthand | Default | Description   | Required |
+| --------------- | ------- | ------------- | -------- |
+| -h, --help      |         | Help for bank |          |

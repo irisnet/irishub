@@ -12,10 +12,10 @@ iriscli bank send --from=<key-name> --to=<address> --amount=<amount> --fee=<nati
 
 ## Flags
 
-| Name,shorthand   | Type   | Required | Default               | Description                                                  |
-| ---------------- | ------ | -------- | --------------------- | ------------------------------------------------------------ |
-| --amount         | string | true     |                       | Amount of coins to send, for instance: 10iris                |
-| --to             | string |          |                       | Bech32 encoding address to receive coins                     |
+| Name, shorthand | Type   | Required | Default | Description                                   |
+| --------------- | ------ | -------- | ------- | --------------------------------------------- |
+| --amount        | string | true     |         | Amount of coins to send, for instance: 10iris |
+| --to            | string |          |         | Bech32 encoding address to receive coins      |
 
 ## Examples
 

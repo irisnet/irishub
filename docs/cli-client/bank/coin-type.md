@@ -4,7 +4,7 @@
 
 Query a special kind of token in IRISnet. The native token in IRIShub is `iris`, which has following available units: `iris-milli`, `iris-micro`, `iris-nano`, `iris-pico`, `iris-femto` and `iris-atto`. 
 
-## Usage:
+## Usage
 
 ```
  iriscli bank coin-type <coin_name> [flags]
@@ -12,15 +12,15 @@ Query a special kind of token in IRISnet. The native token in IRIShub is `iris`,
 
 ## Flags
 
-| Name,shorthand | Type   | Required | Default               | Description                                                  |
-| -------------- | ------ | -------- | --------------------- | ------------------------------------------------------------ |
-| -h, --help     |        |          |                       | Help for coin-type                                           |
-| --chain-id     | string |          |                       | Chain ID of tendermint node                                  |
-| --height       | int    |          |                       | Block height to query, omit to get most recent provable block|
-| --indent       | string |          |                       | Add indent to JSON response                                  |
-| --ledger       | string |          |                       | Use a connected Ledger device                                |
-| --node         | string |          | tcp://localhost:26657 | `<host>:<port>`to tendermint rpc interface for this chain    |
-| --trust-node   | string |          | true                  | Don't verify proofs for responses                            |
+| Name, shorthand | Type   | Required | Default               | Description                                                  |
+| --------------- | ------ | -------- | --------------------- | ------------------------------------------------------------ |
+| -h, --help      |        |          |                       | Help for coin-type                                           |
+| --chain-id      | string |          |                       | Chain ID of tendermint node                                  |
+| --height        | int    |          |                       | Block height to query, omit to get most recent provable block|
+| --indent        | string |          |                       | Add indent to JSON response                                  |
+| --ledger        | string |          |                       | Use a connected Ledger device                                |
+| --node          | string |          | tcp://localhost:26657 | `<host>:<port>`to tendermint rpc interface for this chain    |
+| --trust-node    | string |          | true                  | Don't verify proofs for responses                            |
 
 ## Examples
 

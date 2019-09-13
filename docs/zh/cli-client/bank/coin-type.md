@@ -2,7 +2,7 @@
 
 ## 描述
 
-查询IRISnet中某一个特殊通证. IRIShub的原始通证`iris`,其可用的单位如下： `iris-milli`, `iris-micro`, `iris-nano`, `iris-pico`, `iris-femto` 和 `iris-atto`. 
+查询IRISnet中某一个特殊通证。IRIShub的原始通证`iris`，其可用的单位如下： `iris-milli`，`iris-micro`，`iris-nano`，`iris-pico`，`iris-femto` 和 `iris-atto`。
 
 ## 使用方式
 
