@@ -3004,14 +3004,11 @@ paths:
                 hash_lock:
                   type: string
                   example: '327a66212cbee3756816e617b38f9dfe327a66212cbee3756816e617b38f9dfe'
-                in_amount:
-                  type: integer
-                  example: '10000000000000000000'
                 amount:
                   $ref: '#/components/schemas/Coin'
                 time_lock:
                   type: integer
-                  example: '20'
+                  example: '100'
                 timestamp:
                   type: integer
                   example: '1568011909'
@@ -3065,7 +3062,7 @@ paths:
                   $ref: '#/components/schemas/Address'
                 secret:
                   type: string
-                  example: '327a66212cbee3756816e617b38f9dfe327a66212cbee3756816e617b38f9dfe'
+                  example: '___abcdefghijklmnopqrstuvwxyz___'
   '/htlc/htlcs/{hash-lock}/refund':
     post:
       summary: refund from an expired HTLC
