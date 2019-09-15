@@ -3,14 +3,16 @@ package cli
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/irisnet/irishub/app/v1/bank"
-	v2 "github.com/irisnet/irishub/app/v2"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
 	"testing"
+
+	"github.com/irisnet/irishub/app/v1/bank"
+	v2 "github.com/irisnet/irishub/app/v2"
+	"github.com/irisnet/irishub/app/v2/htlc"
 
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/app/v1/asset"
@@ -393,4 +395,13 @@ func executeGetGateways(t *testing.T, cmdStr string) []asset.Gateway {
 
 func executeWriteCheckErr(t *testing.T, cmdStr string, writes ...string) {
 	require.True(t, executeWrite(t, cmdStr, writes...))
+}
+
+func executeGetHtlc(t *testing.T, cmdStr string) htlc.HTLC {
+	out, _ := tests.ExecuteT(t, cmdStr, "")
+	var htlc htlc.HTLC
+	cdc := app.MakeLatestCodec()
+	err := cdc.UnmarshalJSON([]byte(out), &htlc)
+	require.NoError(t, err, "out %v\n, err %v", out, err)
+	return htlc
 }

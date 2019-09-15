@@ -60,8 +60,7 @@ func GetCmdCreateHtlc(cdc *codec.Codec) *cobra.Command {
 			timestamp := viper.GetInt64(FlagTimestamp)
 			timeLock := viper.GetInt64(FlagTimeLock)
 
-			var msg sdk.Msg
-			msg = htlc.NewMsgCreateHTLC(
+			msg := htlc.NewMsgCreateHTLC(
 				sender, receiver, receiverOnOtherChain, coin,
 				hashLock, uint64(timestamp), uint64(timeLock))
 
@@ -74,11 +73,11 @@ func GetCmdCreateHtlc(cdc *codec.Codec) *cobra.Command {
 	}
 
 	cmd.Flags().AddFlagSet(FsCreateHTLC)
-	cmd.MarkFlagRequired(FlagReceiver)
-	cmd.MarkFlagRequired(FlagReceiverOnOtherChain)
-	cmd.MarkFlagRequired(FlagAmount)
-	cmd.MarkFlagRequired(FlagHashLock)
-	cmd.MarkFlagRequired(FlagTimeLock)
+	_ = cmd.MarkFlagRequired(FlagReceiver)
+	_ = cmd.MarkFlagRequired(FlagReceiverOnOtherChain)
+	_ = cmd.MarkFlagRequired(FlagAmount)
+	_ = cmd.MarkFlagRequired(FlagHashLock)
+	_ = cmd.MarkFlagRequired(FlagTimeLock)
 
 	return cmd
 }
@@ -110,8 +109,7 @@ func GetCmdClaimHtlc(cdc *codec.Codec) *cobra.Command {
 
 			secret := viper.GetString(FlagSecret)
 
-			var msg sdk.Msg
-			msg = htlc.NewMsgClaimHTLC(
+			msg := htlc.NewMsgClaimHTLC(
 				sender, hashLock, []byte(secret))
 
 			if err := msg.ValidateBasic(); err != nil {
@@ -123,8 +121,8 @@ func GetCmdClaimHtlc(cdc *codec.Codec) *cobra.Command {
 	}
 
 	cmd.Flags().AddFlagSet(FsClaimHTLC)
-	cmd.MarkFlagRequired(FlagHashLock)
-	cmd.MarkFlagRequired(FlagSecret)
+	_ = cmd.MarkFlagRequired(FlagHashLock)
+	_ = cmd.MarkFlagRequired(FlagSecret)
 
 	return cmd
 }
@@ -154,8 +152,7 @@ func GetCmdRefundHtlc(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			var msg sdk.Msg
-			msg = htlc.NewMsgRefundHTLC(
+			msg := htlc.NewMsgRefundHTLC(
 				sender, hashLock)
 
 			if err := msg.ValidateBasic(); err != nil {
@@ -167,7 +164,7 @@ func GetCmdRefundHtlc(cdc *codec.Codec) *cobra.Command {
 	}
 
 	cmd.Flags().AddFlagSet(FsRefundHTLC)
-	cmd.MarkFlagRequired(FlagHashLock)
+	_ = cmd.MarkFlagRequired(FlagHashLock)
 
 	return cmd
 }
