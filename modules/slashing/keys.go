@@ -3,8 +3,8 @@ package slashing
 import (
 	"encoding/binary"
 
-	sdk "github.com/irisnet/irishub/types"
 	stake "github.com/irisnet/irishub/modules/stake/types"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 // key prefix bytes

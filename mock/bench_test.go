@@ -5,9 +5,9 @@ import (
 
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/modules/bank"
+	stakeTypes "github.com/irisnet/irishub/modules/stake/types"
 	sdk "github.com/irisnet/irishub/types"
 	abci "github.com/tendermint/tendermint/abci/types"
-	stakeTypes "github.com/irisnet/irishub/modules/stake/types"
 )
 
 // getBenchmarkMockApp initializes a mock application for this module, for purposes of benchmarking

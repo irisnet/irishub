@@ -134,7 +134,7 @@ func (c Context) withValue(key interface{}, value interface{}) Context {
 type contextKey int // local to the context module
 
 const (
-	contextKeyMultiStore      contextKey = iota
+	contextKeyMultiStore contextKey = iota
 	contextKeyBlockHeader
 	contextKeyBlockHeight
 	contextKeyConsensusParams
@@ -246,9 +246,13 @@ func (c Context) WithMinimumFees(minFees Coins) Context {
 	return c.withValue(contextKeyMinimumFees, minFees)
 }
 
-func (c Context) WithCoinFlowTrigger(trigger string) Context { return c.withValue(contextKeyCoinFlowTrigger, trigger) }
+func (c Context) WithCoinFlowTrigger(trigger string) Context {
+	return c.withValue(contextKeyCoinFlowTrigger, trigger)
+}
 
-func (c Context) WithCoinFlowTags(cTag CoinFlowTags) Context { return c.withValue(contextKeyCoinFlowTags, cTag) }
+func (c Context) WithCoinFlowTags(cTag CoinFlowTags) Context {
+	return c.withValue(contextKeyCoinFlowTags, cTag)
+}
 
 // Cache the multistore and return a new cached context. The cached context is
 // written to the context when writeCache is called.

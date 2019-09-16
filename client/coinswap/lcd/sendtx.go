@@ -115,19 +115,19 @@ func addLiquidityHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Han
 
 		maxToken, ok := sdk.NewIntFromString(req.MaxToken)
 		if !ok || !maxToken.IsPositive() {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, "invalid max token amount: " + req.MaxToken)
+			utils.WriteErrorResponse(w, http.StatusBadRequest, "invalid max token amount: "+req.MaxToken)
 			return
 		}
 
 		exactIrisAmt, ok := sdk.NewIntFromString(req.ExactIrisAmt)
 		if !ok {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, "invalid exact iris amount: " + req.ExactIrisAmt)
+			utils.WriteErrorResponse(w, http.StatusBadRequest, "invalid exact iris amount: "+req.ExactIrisAmt)
 			return
 		}
 
 		minLiquidity, ok := sdk.NewIntFromString(req.MinLiquidity)
 		if !ok {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, "invalid min liquidity amount: " + req.MinLiquidity)
+			utils.WriteErrorResponse(w, http.StatusBadRequest, "invalid min liquidity amount: "+req.MinLiquidity)
 			return
 		}
 
@@ -183,19 +183,19 @@ func removeLiquidityHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.
 
 		minToken, ok := sdk.NewIntFromString(req.MinToken)
 		if !ok {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, "invalid min token amount: " + req.MinToken)
+			utils.WriteErrorResponse(w, http.StatusBadRequest, "invalid min token amount: "+req.MinToken)
 			return
 		}
 
 		minIris, ok := sdk.NewIntFromString(req.MinIrisAmt)
 		if !ok {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, "invalid min iris amount: " + req.MinIrisAmt)
+			utils.WriteErrorResponse(w, http.StatusBadRequest, "invalid min iris amount: "+req.MinIrisAmt)
 			return
 		}
 
 		liquidityAmt, ok := sdk.NewIntFromString(req.WithdrawLiquidity)
 		if !ok || !liquidityAmt.IsPositive() {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, "invalid liquidity amount: " + req.WithdrawLiquidity)
+			utils.WriteErrorResponse(w, http.StatusBadRequest, "invalid liquidity amount: "+req.WithdrawLiquidity)
 			return
 		}
 

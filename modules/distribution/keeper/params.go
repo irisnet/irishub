@@ -1,8 +1,8 @@
 package keeper
 
 import (
-	"github.com/irisnet/irishub/modules/params"
 	"github.com/irisnet/irishub/modules/distribution/types"
+	"github.com/irisnet/irishub/modules/params"
 	sdk "github.com/irisnet/irishub/types"
 )
 

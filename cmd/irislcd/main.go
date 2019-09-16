@@ -18,7 +18,7 @@ var (
 )
 
 func main() {
-//	sdk.InitBech32Prefix()
+	//	sdk.InitBech32Prefix()
 	cobra.EnableCommandSorting = false
 	cdc := app.MakeLatestCodec()
 
