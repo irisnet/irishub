@@ -35,7 +35,7 @@ func TestIrisCLIHTLC(t *testing.T) {
 	// testdata
 	receiverOnOtherChain := "72656365697665724f6e4f74686572436861696e"
 	hashLock := "e8d4133e1a82c74e2746e78c19385706ea7958a0ca441a08dacfa10c48ce2561"
-	secret := "___abcdefghijklmnopqrstuvwxyz___"
+	secretHex := "5f5f5f6162636465666768696a6b6c6d6e6f707172737475767778797a5f5f5f"
 	amount := "10000000000000000000iris-atto"
 	amountIris := "10000000000000000000iris-atto"
 	timeLock := uint64(100)
@@ -78,7 +78,7 @@ func TestIrisCLIHTLC(t *testing.T) {
 	spStr = fmt.Sprintf("iriscli htlc claim %v", flags)
 	spStr += fmt.Sprintf(" --from=%s", "foo")
 	spStr += fmt.Sprintf(" --hash-lock=%s", hashLock)
-	spStr += fmt.Sprintf(" --secret=%s", secret)
+	spStr += fmt.Sprintf(" --secret=%s", secretHex)
 	spStr += fmt.Sprintf(" --fee=%s", "0.4iris")
 
 	require.True(t, executeWrite(t, spStr, sdk.DefaultKeyPass))

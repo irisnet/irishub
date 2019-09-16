@@ -107,10 +107,13 @@ func GetCmdClaimHtlc(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			secret := viper.GetString(FlagSecret)
+			secretStr := viper.GetString(FlagSecret)
+			secret, err := hex.DecodeString(secretStr)
+			if err != nil {
+				return err
+			}
 
-			msg := htlc.NewMsgClaimHTLC(
-				sender, hashLock, []byte(secret))
+			msg := htlc.NewMsgClaimHTLC(sender, hashLock, secret)
 
 			if err := msg.ValidateBasic(); err != nil {
 				return err

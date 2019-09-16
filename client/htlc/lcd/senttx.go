@@ -109,8 +109,13 @@ func claimHtlcHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handle
 		}
 
 		// create the NewMsgClaimHTLC message
+		secret, err := hex.DecodeString(req.Secret)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
 		msg := htlc.NewMsgClaimHTLC(
-			req.Sender, []byte(req.Secret), hashLock)
+			req.Sender, secret, hashLock)
 		err = msg.ValidateBasic()
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
