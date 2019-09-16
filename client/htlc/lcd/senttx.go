@@ -13,15 +13,19 @@ import (
 )
 
 func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec) {
-	// create a htlc
+	// create an HTLC
 	r.HandleFunc(
 		"/htlc/htlcs",
 		createHtlcHandlerFn(cdc, cliCtx),
 	).Methods("POST")
+
+	// claim an HTLC
 	r.HandleFunc(
 		"/htlc/htlcs/{hash-lock}/claim",
 		claimHtlcHandlerFn(cdc, cliCtx),
 	).Methods("POST")
+
+	// refund an HTLC
 	r.HandleFunc(
 		"/htlc/htlcs/{hash-lock}/refund",
 		refundHtlcHandlerFn(cdc, cliCtx),

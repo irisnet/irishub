@@ -16,7 +16,7 @@ func GetCmdUnrevoke(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "unjail",
 		Args:    cobra.ExactArgs(0),
-		Short:   "unjail validator previously jailed for downtime",
+		Short:   "Unjail validator previously jailed for downtime",
 		Example: "iriscli stake unjail --from <key name> --fee=0.4iris --chain-id=<chain-id>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
