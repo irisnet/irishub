@@ -831,5 +831,8 @@ func (keeper Keeper) HasReachedTheMaxProposalNum(ctx sdk.Context, p ProposalLeve
 }
 
 func (keeper Keeper) Init(ctx sdk.Context) {
+	if sdk.NetworkType != sdk.Mainnet {
+		return
+	}
 	keeper.SetParamSet(ctx, DefaultParams())
 }
