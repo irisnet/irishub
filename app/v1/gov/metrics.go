@@ -21,7 +21,7 @@ type Label = stdprometheus.Labels
 
 type Metrics struct {
 	ProposalStatus *stdprometheus.GaugeVec // 1:DepositPeriod 2:VotingPeriod 3:Passed 4:Rejected
-	Vote           *stdprometheus.GaugeVec // 0:Yes 1:No 2:NoWithVeto 3:Abstain
+	Vote           *stdprometheus.GaugeVec // 1:Yes 2:Abstain 3:No 4:NoWithVeto
 	Param          *stdprometheus.GaugeVec
 }
 
