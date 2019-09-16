@@ -178,7 +178,6 @@ func (keeper Keeper) SetProposal(ctx sdk.Context, proposal Proposal) {
 
 // Implements sdk.AccountKeeper.
 func (keeper Keeper) DeleteProposal(ctx sdk.Context, proposalID uint64) {
-	keeper.metrics.SetProposalStatus(proposalID, StatusNil)
 	store := ctx.KVStore(keeper.storeKey)
 	proposal := keeper.GetProposal(ctx, proposalID)
 	keeper.RemoveFromInactiveProposalQueue(ctx, proposal.GetDepositEndTime(), proposalID)
