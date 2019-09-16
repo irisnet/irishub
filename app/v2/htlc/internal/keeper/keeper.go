@@ -43,7 +43,7 @@ func (k Keeper) GetCdc() *codec.Codec {
 	return k.cdc
 }
 
-// CreateHTLC creates a HTLC
+// CreateHTLC creates an HTLC
 func (k Keeper) CreateHTLC(ctx sdk.Context, htlc types.HTLC, hashLock []byte) (sdk.Tags, sdk.Error) {
 	// check if the hash lock already exists
 	if k.HasHashLock(ctx, hashLock) {
@@ -59,7 +59,7 @@ func (k Keeper) CreateHTLC(ctx sdk.Context, htlc types.HTLC, hashLock []byte) (s
 	// add to coinflow
 	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, htlc.Sender.String(), htlcAddr.String(), htlc.Amount.String(), sdk.CoinHTLCCreateFlow, "")
 
-	// set the htlc
+	// set the HTLC
 	k.SetHTLC(ctx, htlc, hashLock)
 
 	// add to the expiration queue
@@ -77,15 +77,15 @@ func (k Keeper) CreateHTLC(ctx sdk.Context, htlc types.HTLC, hashLock []byte) (s
 }
 
 func (k Keeper) ClaimHTLC(ctx sdk.Context, hashLock []byte, secret []byte) (sdk.Tags, sdk.Error) {
-	// get the htlc
+	// get the HTLC
 	htlc, err := k.GetHTLC(ctx, hashLock)
 	if err != nil {
 		return nil, err
 	}
 
-	// check if the htlc is open
+	// check if the HTLC is open
 	if htlc.State != types.OPEN {
-		return nil, types.ErrStateIsNotOpen(k.codespace, fmt.Sprintf("the htlc is not open"))
+		return nil, types.ErrStateIsNotOpen(k.codespace, fmt.Sprintf("the HTLC is not open"))
 	}
 
 	// check if the secret matches with the hash lock
@@ -93,7 +93,7 @@ func (k Keeper) ClaimHTLC(ctx sdk.Context, hashLock []byte, secret []byte) (sdk.
 		return nil, types.ErrInvalidSecret(k.codespace, fmt.Sprintf("invalid secret: %s", hex.EncodeToString(secret)))
 	}
 
-	// do claim
+	// do the claim
 	htlcAddr := getHTLCAddress(htlc.Amount.Denom)
 	if _, err := k.bk.SendCoins(ctx, htlcAddr, htlc.Receiver, sdk.Coins{htlc.Amount}); err != nil {
 		return nil, err
@@ -121,18 +121,18 @@ func (k Keeper) ClaimHTLC(ctx sdk.Context, hashLock []byte, secret []byte) (sdk.
 }
 
 func (k Keeper) RefundHTLC(ctx sdk.Context, hashLock []byte) (sdk.Tags, sdk.Error) {
-	// get the htlc
+	// get the HTLC
 	htlc, err := k.GetHTLC(ctx, hashLock)
 	if err != nil {
 		return nil, err
 	}
 
-	// check if the htlc is expired
+	// check if the HTLC is expired
 	if htlc.State != types.EXPIRED {
 		return nil, types.ErrStateIsNotOpen(k.codespace, fmt.Sprintf("the htlc is not expired"))
 	}
 
-	// do refund
+	// do the refund
 	htlcAddr := getHTLCAddress(htlc.Amount.Denom)
 	if _, err := k.bk.SendCoins(ctx, htlcAddr, htlc.Sender, sdk.Coins{htlc.Amount}); err != nil {
 		return nil, err
@@ -158,7 +158,7 @@ func (k Keeper) HasHashLock(ctx sdk.Context, hashLock []byte) bool {
 	return store.Has(KeyHTLC(hashLock))
 }
 
-// SetHTLC stores the htlc
+// SetHTLC stores the HTLC
 func (k Keeper) SetHTLC(ctx sdk.Context, htlc types.HTLC, hashLock []byte) {
 	store := ctx.KVStore(k.storeKey)
 
@@ -166,7 +166,7 @@ func (k Keeper) SetHTLC(ctx sdk.Context, htlc types.HTLC, hashLock []byte) {
 	store.Set(KeyHTLC(hashLock), bz)
 }
 
-// GetHTLC retrieves the htlc by the specified hash lock
+// GetHTLC retrieves the HTLC by the specified hash lock
 func (k Keeper) GetHTLC(ctx sdk.Context, hashLock []byte) (types.HTLC, sdk.Error) {
 	store := ctx.KVStore(k.storeKey)
 
@@ -181,7 +181,7 @@ func (k Keeper) GetHTLC(ctx sdk.Context, hashLock []byte) (types.HTLC, sdk.Error
 	return htlc, nil
 }
 
-// AddHTLCToExpireQueue adds the htlc to the expiration queue
+// AddHTLCToExpireQueue adds the specified HTLC to the expiration queue
 func (k Keeper) AddHTLCToExpireQueue(ctx sdk.Context, expireHeight uint64, hashLock []byte) {
 	store := ctx.KVStore(k.storeKey)
 
@@ -189,7 +189,7 @@ func (k Keeper) AddHTLCToExpireQueue(ctx sdk.Context, expireHeight uint64, hashL
 	store.Set(KeyHTLCExpireQueue(expireHeight, hashLock), bz)
 }
 
-// DeleteHTLCFromExpireQueue removes the htlc from the expiration queue
+// DeleteHTLCFromExpireQueue removes the specified HTLC from the expiration queue
 func (k Keeper) DeleteHTLCFromExpireQueue(ctx sdk.Context, expireHeight uint64, hashLock []byte) {
 	store := ctx.KVStore(k.storeKey)
 

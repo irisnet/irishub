@@ -30,7 +30,7 @@ var _ sdk.Msg = &MsgCreateHTLC{}
 var _ sdk.Msg = &MsgClaimHTLC{}
 var _ sdk.Msg = &MsgRefundHTLC{}
 
-// MsgCreateHTLC represents a msg for creating a HTLC
+// MsgCreateHTLC represents a msg for creating an HTLC
 type MsgCreateHTLC struct {
 	Sender               sdk.AccAddress `json:"sender"`                  // the initiator address
 	Receiver             sdk.AccAddress `json:"receiver"`                // the recipient address
@@ -114,7 +114,7 @@ func (msg MsgCreateHTLC) GetSigners() []sdk.AccAddress {
 
 // -----------------------------------------------------------------------------
 
-// MsgClaimHTLC represents a msg for claiming a HTLC
+// MsgClaimHTLC represents a msg for claiming an HTLC
 type MsgClaimHTLC struct {
 	Sender   sdk.AccAddress `json:"sender"`    // the initiator address
 	HashLock []byte         `json:"hash_lock"` // the hash lock identifying the HTLC to be claimed
@@ -174,7 +174,7 @@ func (msg MsgClaimHTLC) GetSigners() []sdk.AccAddress {
 
 // -----------------------------------------------------------------------------
 
-// MsgRefundHTLC represents a msg for refund a HTLC
+// MsgRefundHTLC represents a msg for refund an HTLC
 type MsgRefundHTLC struct {
 	Sender   sdk.AccAddress `json:"sender"`    // the initiator address
 	HashLock []byte         `json:"hash_lock"` // the hash lock identifying the HTLC to be refunded

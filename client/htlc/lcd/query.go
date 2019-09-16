@@ -14,7 +14,7 @@ import (
 )
 
 func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec) {
-	// Get htlc by hash-lock
+	// Get the HTLC by the hash lock
 	r.HandleFunc(
 		"/htlc/htlcs/{hash-lock}",
 		queryHtlcHandlerFn(cliCtx, cdc),

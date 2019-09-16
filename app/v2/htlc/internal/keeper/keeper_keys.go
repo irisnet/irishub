@@ -10,7 +10,7 @@ var (
 	PrefixHTLCExpireQueue = []byte("htlcExpireQueue:") // key prefix for the HTLC expiration queue
 )
 
-// KeyHTLC returns the key for a HTLC by the specified hash lock
+// KeyHTLC returns the key for an HTLC by the specified hash lock
 func KeyHTLC(hashLock []byte) []byte {
 	return append(PrefixHTLC, hashLock...)
 }

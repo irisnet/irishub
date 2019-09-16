@@ -51,12 +51,12 @@ func (p *Params) ReadOnly() bool {
 	return false
 }
 
-// default rand module params
+// default HTLC module params
 func DefaultParams() Params {
 	return Params{}
 }
 
-// default rand module params for test
+// default HTLC module params for test
 func DefaultParamsForTest() Params {
 	return Params{}
 }
