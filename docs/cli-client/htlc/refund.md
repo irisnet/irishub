@@ -12,9 +12,9 @@ iriscli htlc refund --hash-lock=<hash-lock>
 
 ## Flags
 
-| Name, shorthand | Type     | Required | Default | Description                                      |
-| --------------- | -------- | -------- | ------- | ------------------------------------------------ |
-| --hash-lock     | bytesHex | true     |         | The hashLock identifying the htlc to be refunded |
+| Name, shorthand | Type     | Required | Default | Description                                       |
+| --------------- | -------- | -------- | ------- | ------------------------------------------------- |
+| --hash-lock     | bytesHex | true     |         | The hash lock identifying the HTLC to be refunded |
 
 ## Examples
 

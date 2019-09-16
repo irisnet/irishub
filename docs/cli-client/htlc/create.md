@@ -2,7 +2,7 @@
 
 ## Description
 
-Create a htlc
+Create an HTLC
 
 ## Usage
 
@@ -23,7 +23,7 @@ iriscli htlc create --receiver=<receiver> --receiver-on-other-chain=<receiver-on
 
 ## Examples
 
-### Create a htlc
+### Create an HTLC
 
 ```bash
 iriscli htlc create \

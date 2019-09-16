@@ -2,7 +2,7 @@
 
 ## Description
 
-Htlc allows you to manage local htlc for atomic swap with other chains
+HTLC allows you to manage local Hash Time Locked Contracts (HTLCs) for atomic swaps with other chains
 
 ## Usage
 
@@ -14,10 +14,10 @@ Htlc allows you to manage local htlc for atomic swap with other chains
 
 | Name                        | Description                 |
 | --------------------------- | --------------------------- |
-| [create](create.md)         | Create a HTLC               |
+| [create](create.md)         | Create an HTLC              |
 | [claim](claim.md)           | Claim an opened HTLC        |
 | [refund](refund.md)         | Refund from an expired HTLC |
-| [query-htlc](query-htlc.md) | Query details of a htlc     |
+| [query-htlc](query-htlc.md) | Query details of an HTLC    |
 
 ## Global Flags
 
@@ -32,4 +32,4 @@ Htlc allows you to manage local htlc for atomic swap with other chains
 
 | Name, shorthand | Default | Description   | Required |
 | --------------- | ------- | ------------- | -------- |
-| -h, --help      |         | Help for htlc |          |
+| -h, --help      |         | Help for HTLC |          |

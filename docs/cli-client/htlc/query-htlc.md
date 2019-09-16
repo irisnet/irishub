@@ -2,7 +2,7 @@
 
 ## Description
 
-Query details of a htlc
+Query details of an HTLC
 
 ## Usage
 
@@ -12,7 +12,7 @@ iriscli htlc query-htlc <hash-lock>
 
 ## Examples
 
-### Query details of a htlc
+### Query details of an HTLC
 
 ```bash
 iriscli htlc query-htlc f054e34abd9ccc3cab12a5b797b8e9c053507f279e7e53fb3f9f44d178c94b20

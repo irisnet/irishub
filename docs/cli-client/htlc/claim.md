@@ -12,10 +12,10 @@ iriscli htlc claim --hash-lock=<hash-lock> --secret=<secret>
 
 ## Flags
 
-| Name, shorthand | Type     | Required | Default | Description                                     |
-| --------------- | -------- | -------- | ------- | ----------------------------------------------- |
-| --hash-lock     | bytesHex | true     |         | The hashLock identifying the htlc to be claimed |
-| --secret        | string   | true     |         | The secret for generating hashLock              |
+| Name, shorthand | Type     | Required | Default | Description                                      |
+| --------------- | -------- | -------- | ------- | ------------------------------------------------ |
+| --hash-lock     | bytesHex | true     |         | The hash lock identifying the HTLC to be claimed |
+| --secret        | string   | true     |         | The secret for generating hash lock              |
 
 ## Examples
 
