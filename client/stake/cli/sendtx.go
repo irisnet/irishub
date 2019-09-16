@@ -19,7 +19,7 @@ import (
 func GetCmdCreateValidator(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "create-validator",
-		Short:   "Create new validator initialized with a self-delegation to it",
+		Short:   "create new validator initialized with a self-delegation to it",
 		Example: "iriscli stake create-validator --chain-id=<chain-id> --from=<key name> --fee=0.4iris --pubkey=<validator public key> --amount=10iris --moniker=<validator name> --commission-rate=0.1",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
@@ -124,7 +124,7 @@ func GetCmdCreateValidator(cdc *codec.Codec) *cobra.Command {
 func GetCmdEditValidator(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "edit-validator",
-		Short:   "Edit and existing validator account",
+		Short:   "edit and existing validator account",
 		Example: "iriscli stake edit-validator --chain-id=<chain-id> --from=<key name> --fee=0.4iris --moniker=<validator name> --details=<optional details> --website=<optional website>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
@@ -179,7 +179,7 @@ func GetCmdEditValidator(cdc *codec.Codec) *cobra.Command {
 func GetCmdDelegate(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "delegate",
-		Short:   "Delegate liquid tokens to an validator",
+		Short:   "delegate liquid tokens to an validator",
 		Example: "iriscli stake delegate --chain-id=<chain-id> --from=<key name> --fee=0.4iris --amount=10iris --address-validator=<validator owner address>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
@@ -221,7 +221,7 @@ func GetCmdDelegate(cdc *codec.Codec) *cobra.Command {
 func GetCmdRedelegate(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "redelegate",
-		Short:   "Redelegate illiquid tokens from one validator to another",
+		Short:   "redelegate illiquid tokens from one validator to another",
 		Example: "iriscli stake redelegate --chain-id=<chain-id> --from=<key name> --fee=0.4iris --address-validator-source=<source validator address> --address-validator-dest=<destination validator address> --shares-percent=0.5",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
@@ -275,7 +275,7 @@ func GetCmdRedelegate(cdc *codec.Codec) *cobra.Command {
 func GetCmdUnbond(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "unbond",
-		Short:   "Unbond shares from a validator",
+		Short:   "unbond shares from a validator",
 		Example: "iriscli stake unbond --chain-id=<chain-id> --from=<key name> --fee=0.4iris --address-validator=<validator address> --shares-percent=0.5",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
