@@ -88,19 +88,19 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 
 			if proposalType == gov.ProposalTypeSoftwareUpgrade {
 
-				version_ := viper.GetInt64(flagVersion)
-				if version_ < 0 {
+				versionInt := viper.GetInt64(flagVersion)
+				if versionInt < 0 {
 					return errors.Errorf("Version must greater than or equal to zero")
 				}
 
-				version := uint64(version_)
+				version := uint64(versionInt)
 				software := viper.GetString(flagSoftware)
 
-				switchHeight_ := viper.GetInt64(flagSwitchHeight)
-				if switchHeight_ < 0 {
+				switchHeightInt := viper.GetInt64(flagSwitchHeight)
+				if switchHeightInt < 0 {
 					return errors.Errorf("SwitchHeight must greater than or equal to zero")
 				}
-				switchHeight := uint64(switchHeight_)
+				switchHeight := uint64(switchHeightInt)
 
 				thresholdStr := viper.GetString(flagThreshold)
 				threshold, err := sdk.NewDecFromStr(thresholdStr)

@@ -48,7 +48,7 @@ type IrisApp struct {
 	*BaseApp
 }
 
-// NewIrisApp is an ABCI application for iris
+// NewIrisApp generates an iris application
 func NewIrisApp(logger log.Logger, db dbm.DB, config *cfg.InstrumentationConfig, traceStore io.Writer, baseAppOptions ...func(*BaseApp)) *IrisApp {
 	bApp := NewBaseApp(appName, logger, db, baseAppOptions...)
 	bApp.SetCommitMultiStoreTracer(traceStore)
@@ -98,18 +98,18 @@ func NewIrisApp(logger log.Logger, db dbm.DB, config *cfg.InstrumentationConfig,
 	return app
 }
 
-// MakeLatestCodec load the lastest verson codec
+// MakeLatestCodec loads the lastest verson codec
 func MakeLatestCodec() *codec.Codec {
 	var cdc = v2.MakeCodec() // replace with latest protocol version
 	return cdc
 }
 
-// LastBlockHeight return the last blcok height
+// LastBlockHeight returns the last blcok height
 func (app *IrisApp) LastBlockHeight() int64 {
 	return app.BaseApp.LastBlockHeight()
 }
 
-// ResetOrReplay return whether you need to reset or replay
+// ResetOrReplay returns whether you need to reset or replay
 func (app *IrisApp) ResetOrReplay(replayHeight int64) (replay bool, height int64) {
 	lastBlockHeight := app.BaseApp.LastBlockHeight()
 	if replayHeight > lastBlockHeight {
