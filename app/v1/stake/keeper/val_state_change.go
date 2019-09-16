@@ -82,7 +82,7 @@ func (k Keeper) ApplyAndReturnValidatorSetUpdates(ctx sdk.Context) (updates []ab
 
 			power, err := strconv.ParseFloat(validator.GetPower().RoundInt().String(), 64)
 			if err == nil {
-				k.metrics.Power.With("validator_address", validator.GetConsAddr().String()).Set(power)
+				k.metrics.SetVotingPower(validator.GetOperator().String(), power)
 			}
 
 			// Assert that the validator had updated its ValidatorDistInfo.FeePoolWithdrawalHeight.
@@ -124,7 +124,7 @@ func (k Keeper) ApplyAndReturnValidatorSetUpdates(ctx sdk.Context) (updates []ab
 
 		power, err := strconv.ParseFloat(validator.GetPower().RoundInt().String(), 64)
 		if err == nil {
-			k.metrics.Power.With("validator_address", validator.GetConsAddr().String()).Set(power)
+			k.metrics.SetVotingPower(validator.GetOperator().String(), power)
 		}
 
 		logger.Info("Remove no-longer-bonded validator", "consensus_address", validator.GetConsAddr().String(), "operator_address", validator.GetOperator().String(), "tokens", validator.Tokens)
@@ -178,7 +178,7 @@ func (k Keeper) jailValidator(ctx sdk.Context, validator types.Validator) {
 	if validator.Jailed {
 		panic(fmt.Sprintf("cannot jail already jailed validator, validator: %v\n", validator))
 	}
-	k.metrics.Jailed.With("validator_address", validator.GetConsAddr().String()).Set(1)
+	k.metrics.Jail(validator.GetOperator().String())
 	ctx.Logger().Info("Validator jailed", "consensus_address", validator.ConsAddress().String(), "operator_address", validator.OperatorAddr.String())
 	pool := k.GetPool(ctx)
 	validator.Jailed = true
