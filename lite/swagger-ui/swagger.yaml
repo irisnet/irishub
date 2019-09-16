@@ -2974,7 +2974,6 @@ paths:
                 deadline:
                   type: string
                   example: '30s'
- # TODO: fix 
   '/htlc/htlcs':
     post:
       summary: create a HTLC
