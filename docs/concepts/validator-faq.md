@@ -202,6 +202,10 @@ then you can do these:
 
 That means you have **Lost Your Validator Forever!** You can only create a new one and [redelegate](../cli-client/stake/redelegate.md) all of your shares to the new Validator.
 
+#### How to upload my validator's avatar
+
+TODO
+
 ## Community Channels
 
 - Riot chat: <https://riot.im/app/#/room/#irisvalidators:matrix.org>
