@@ -8,8 +8,8 @@ import (
 
 	"github.com/irisnet/irishub/tests"
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/tendermint/crypto"
 	"github.com/stretchr/testify/require"
+	"github.com/tendermint/tendermint/crypto"
 )
 
 func TestIrisCLIHTLC(t *testing.T) {
@@ -41,8 +41,6 @@ func TestIrisCLIHTLC(t *testing.T) {
 	timeLock := uint64(100)
 	timestamp := uint64(1580000000)
 	initSecret := make([]byte, 32)
-	// TODO: get block number
-	expireHeight := timeLock + uint64(4)
 	stateOpen := "open"
 	stateCompleted := "completed"
 	stateExpired := "expired"
@@ -69,7 +67,6 @@ func TestIrisCLIHTLC(t *testing.T) {
 	require.Equal(t, amount, htlc.Amount.String())
 	require.Equal(t, initSecret, htlc.Secret)
 	require.Equal(t, timestamp, htlc.Timestamp)
-	require.Equal(t, expireHeight, htlc.ExpireHeight)
 	require.Equal(t, stateOpen, htlc.State.String())
 
 	htlcAddr := sdk.AccAddress(crypto.AddressHash([]byte(sdk.IrisAtto)))
@@ -101,8 +98,6 @@ func TestIrisCLIHTLC(t *testing.T) {
 	hashLock = "f054e34abd9ccc3cab12a5b797b8e9c053507f279e7e53fb3f9f44d178c94b20"
 	timestamp = uint64(0)
 	timeLock = uint64(50)
-	// TODO: get block number
-	expireHeight = timeLock + uint64(10)
 
 	// create a htlc
 	spStr = fmt.Sprintf("iriscli htlc create %v", flags)
@@ -125,7 +120,6 @@ func TestIrisCLIHTLC(t *testing.T) {
 	require.Equal(t, amount, htlc.Amount.String())
 	require.Equal(t, initSecret, htlc.Secret)
 	require.Equal(t, timestamp, htlc.Timestamp)
-	require.Equal(t, expireHeight, htlc.ExpireHeight)
 	require.Equal(t, stateOpen, htlc.State.String())
 
 	htlcAddr = sdk.AccAddress(crypto.AddressHash([]byte(sdk.IrisAtto)))
@@ -133,16 +127,23 @@ func TestIrisCLIHTLC(t *testing.T) {
 	htlcCoin = convertToIrisBaseAccount(t, htlcAcc)
 	require.Equal(t, "10iris", htlcCoin)
 
-	// TODO:  too lang to wait
-	tests.WaitForNextNBlocksTM(int64(timeLock), port)
-	htlc = executeGetHtlc(t, fmt.Sprintf("iriscli htlc query-htlc %s --output=json %v", strings.ToLower(strings.TrimSpace(hashLock)), flags))
-	require.Equal(t, stateExpired, htlc.State.String())
-
-	// refund a htlc
+	// refund a htlc and expect failure
 	spStr = fmt.Sprintf("iriscli htlc refund %v", flags)
 	spStr += fmt.Sprintf(" --from=%s", "foo")
 	spStr += fmt.Sprintf(" --hash-lock=%s", hashLock)
 	spStr += fmt.Sprintf(" --fee=%s", "0.4iris")
+
+	require.Zero(t, executeWrite(t, spStr, sdk.DefaultKeyPass))
+	tests.WaitForNextNBlocksTM(2, port)
+
+	htlc = executeGetHtlc(t, fmt.Sprintf("iriscli htlc query-htlc %s --output=json %v", strings.ToLower(strings.TrimSpace(hashLock)), flags))
+	require.Equal(t, stateOpen, htlc.State.String())
+
+	// refund a htlc and expect success
+	tests.WaitForNextNBlocksTM(int64(timeLock), port)
+
+	htlc = executeGetHtlc(t, fmt.Sprintf("iriscli htlc query-htlc %s --output=json %v", strings.ToLower(strings.TrimSpace(hashLock)), flags))
+	require.Equal(t, stateExpired, htlc.State.String())
 
 	require.True(t, executeWrite(t, spStr, sdk.DefaultKeyPass))
 	tests.WaitForNextNBlocksTM(2, port)

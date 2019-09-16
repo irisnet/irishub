@@ -1,7 +1,6 @@
 package keeper
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/irisnet/irishub/app/v2/htlc/internal/types"
