@@ -13,15 +13,19 @@ import (
 )
 
 func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec) {
-	// create a htlc
+	// create an HTLC
 	r.HandleFunc(
 		"/htlc/htlcs",
 		createHtlcHandlerFn(cdc, cliCtx),
 	).Methods("POST")
+
+	// claim an HTLC
 	r.HandleFunc(
 		"/htlc/htlcs/{hash-lock}/claim",
 		claimHtlcHandlerFn(cdc, cliCtx),
 	).Methods("POST")
+
+	// refund an HTLC
 	r.HandleFunc(
 		"/htlc/htlcs/{hash-lock}/refund",
 		refundHtlcHandlerFn(cdc, cliCtx),
@@ -109,8 +113,13 @@ func claimHtlcHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handle
 		}
 
 		// create the NewMsgClaimHTLC message
+		secret, err := hex.DecodeString(req.Secret)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
 		msg := htlc.NewMsgClaimHTLC(
-			req.Sender, []byte(req.Secret), hashLock)
+			req.Sender, secret, hashLock)
 		err = msg.ValidateBasic()
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())

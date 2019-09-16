@@ -59,7 +59,7 @@ func TestIrisCLIToken(t *testing.T) {
 	fooAcc = executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", fooAddr, flags))
 	fooCoin = convertToIrisBaseAccount(t, fooAcc)
 	amt := getAmountFromCoinStr(fooCoin)
-	
+
 	// 30iris is used to issue tokens
 	if !(amt > 19 && amt < 20) {
 		t.Error("Test Failed: (19, 20) expected, received:", amt)

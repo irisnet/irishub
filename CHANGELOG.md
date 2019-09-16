@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.15.2
+
+*Sep 11th, 2019*
+
+### Application
+* [\#1940](https://github.com/irisnet/irishub/pull/1940) Do not update gov params when network not equal mainnet
+* [\#1945](https://github.com/irisnet/irishub/pull/1945) Fix protocol loading on replay-last-block
+
 ## 0.15.1
 
 *Aug 22th, 2019*

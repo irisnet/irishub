@@ -2,10 +2,10 @@
 
 ## Latest Version
 
-The Latest version of IRIShub is [v0.15.1](https://github.com/irisnet/irishub/releases/latest)
+The Latest version of IRIShub is [v0.15.2](https://github.com/irisnet/irishub/releases/latest)
 
 ::: tip
-Please replace <latest_iris_version> below with v0.15.1
+Please replace <latest_iris_version> below with v0.15.2
 :::
 
 ## Configure Your Server

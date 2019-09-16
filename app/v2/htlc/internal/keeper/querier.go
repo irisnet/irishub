@@ -15,7 +15,7 @@ func NewQuerier(k Keeper) sdk.Querier {
 		case types.QueryHTLC:
 			return queryHTLC(ctx, req, k)
 		default:
-			return nil, sdk.ErrUnknownRequest("unknown htlc query endpoint")
+			return nil, sdk.ErrUnknownRequest("unknown HTLC query endpoint")
 		}
 	}
 }
