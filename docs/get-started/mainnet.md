@@ -18,7 +18,7 @@ iris init --moniker=<your_custom_name> --chain-id=irishub
 curl -o ~/.iris/config/config.toml https://raw.githubusercontent.com/irisnet/betanet/master/config/config.toml
 curl -o ~/.iris/config/genesis.json https://raw.githubusercontent.com/irisnet/betanet/master/config/genesis.json
 
-# start the node (you can also use "nohup" to run in the background)
+# start the node (you can also use "nohup" or "systemd" to run in the background)
 iris start
 ```
 

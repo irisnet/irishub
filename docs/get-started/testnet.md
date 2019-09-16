@@ -6,16 +6,13 @@ order: 3
 
 We have 2 testnets: Fuxi and Nyancat.
 
-Since the launch of mainnet, **Fuxi Testnet** starts to operate as a stable application testnet which has the same version as the mainnet, 
-so that the service providers of IRISnet can develop their apps on or interact with IRIShub without running a node or lcd instance. 
+Since the launch of mainnet, **Fuxi Testnet** starts to operate as a stable application testnet which has the same version as the mainnet, so that the service providers of IRISnet can develop their apps on or interact with IRIShub without running a node or lcd instance.
 
-However there is also a need for validators to test the new version of IRIShub before it can be relased to production, 
-and this is **Nyancat Testnet**'s focus. And new validators can also use the Nyancat Testnet to practice the validator operations.
+However there is also a need for validators to test the new version of IRIShub before it can be relased to production, and this is **Nyancat Testnet**'s focus. And new validators can also use the Nyancat Testnet to practice the validator operations.
 
 ## Install
 
-We use different bech32 prefixes to distinguish the mainnet and testnet, 
-all you need to do is to run the following command in the source root before [building or installing](#TODO) the iris binaries:
+We use different bech32 prefixes to distinguish the mainnet and testnet, all you need to do is to run the following command in the source root before [building or installing](#TODO) the iris binaries:
 
 ```bash
 source scripts/setTestEnv.sh # to build or install the testnet version
@@ -23,7 +20,7 @@ source scripts/setTestEnv.sh # to build or install the testnet version
 
 ## Fuxi Testnet
 
-There are no options to run nodes connect to the Fuxi Testnet, you can use the public RPC and LCD to develop and test your apps.
+There are no options to run nodes to connect to the Fuxi Testnet, you can use the public RPC and LCD to develop and test your apps.
 
 - RPC: <http://rpc.testnet.irisnet.org:80>
 
