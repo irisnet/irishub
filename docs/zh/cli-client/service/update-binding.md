@@ -11,15 +11,15 @@ iriscli service update-binding <flags>
 ```
 
 ## 特有标志
-| Name, shorthand       | Default                 | Description                                                                        | Required |
-| --------------------- | ----------------------- | ---------------------------------------------------------------------------------- | -------- |
-| --avg-rsp-time        |                         | 服务平均返回时间的毫秒数表示                                                     | 是       |
-| --bind-type           |                         | 对服务是本地还是全局的设置，可选值Local/Global                                  | 是       |
-| --def-chain-id        |                         | 定义该服务的区块链ID                                                          | 是       |
-| --deposit             |                         | 绑定押金, 将会增加当前服务绑定押金                                               |          |
-| --prices              |                         | 服务定价,按照服务方法排序的定价列表                                             |          |
-| --service-name        |                         | 服务名称                                                                    | 是       |
-| --usable-time         |                         | 每一万次服务调用的可用性的整数表示                                                  | 是       |
+| Name, shorthand | Default | Description                              | Required |
+| --------------- | ------- | ---------------------------------------- | -------- |
+| --avg-rsp-time  |         | 服务平均返回时间的毫秒数表示                  | 是       |
+| --bind-type     |         | 对服务是本地还是全局的设置，可选值Local/Global | 是       |
+| --def-chain-id  |         | 定义该服务的区块链ID                        | 是       |
+| --deposit       |         | 绑定押金, 将会增加当前服务绑定押金             |         |
+| --prices        |         | 服务定价,按照服务方法排序的定价列表            |          |
+| --service-name  |         | 服务名称                                   | 是       |
+| --usable-time   |         | 每一万次服务调用的可用性的整数表示             | 是       |
 
 ## 示例
 

@@ -12,10 +12,10 @@ iriscli keys export Mykey --output-file=<path_to_backup_keystore>
 
 ## Flags
 
-| Name, shorthand | Default   | Description                                                       | Required |
-| --------------- | --------- | ----------------------------------------------------------------- | -------- |
-| --output-file    |           | The path of keystore                                             |          |
-| --help, -h      |           | Help for export                                                |          |
+| Name, shorthand | Default   | Description          | Required |
+| --------------- | --------- | -------------------- | -------- |
+| --output-file   |           | The path of keystore |          |
+| --help, -h      |           | Help for export      |          |
 
 
 ## Example

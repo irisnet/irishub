@@ -13,7 +13,7 @@ import (
 var (
 	rootCmd = &cobra.Command{
 		Use:   "irislcd",
-		Short: "irishub lite server interface",
+		Short: "Irishub lite server interface",
 	}
 )
 

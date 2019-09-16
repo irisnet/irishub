@@ -17,10 +17,10 @@ iriscli stake delegate --help
 
 ## Unique Flags
 
-| Name, shorthand     | type   | Required | Default  | Description                                                         |
-| --------------------| -----  | -------- | -------- | ------------------------------------------------------------------- |
-| --address-validator | string | true     | ""       | Bech address of the validator |
-| --amount            | string | true     | ""       | Amount of coins to bond |
+| Name, shorthand     | type   | Required | Default  | Description                   |
+| --------------------| -----  | -------- | -------- | ----------------------------- |
+| --address-validator | string | true     |          | Bech address of the validator |
+| --amount            | string | true     |          | Amount of coins to bond       |
 
 ## Examples
 

@@ -20,17 +20,17 @@ iriscli stake create-validator --help
 
 ## 特有的标志
 
-| 名称                         | 类型   | 是否必填 | 默认值   | 功能描述         |
-| ---------------------------- | -----  | -------- | -------- | ------------------------------------ |
-| --amount                     | string | true     | ""       | 委托token的数量 |
-| --commission-rate            | float  | true     | 0.0      | 初始佣金比例 |
-| --details                    | string | false    | ""       | 验证人节点的详细信息 |
-| --genesis-format             | bool   | false    | false    | 是否已genesis transaction的方式导出 |
-| --identity                   | string | false    | ""       | 身份信息的签名 |
-| --ip                         | string | false    | ""       | 验证人节点的IP |
-| --moniker                    | string | true     | ""       | 验证人节点名称 |
-| --pubkey                     | string | true     | ""       | Amino编码的验证人公钥 |
-| --website                    | string | false    | ""       | 验证人节点的网址 |
+| 名称                          | 类型   | 是否必须 | 默认值 | 功能描述                          |
+| ---------------------------- | -----  | ------ | ----- | -------------------------------- |
+| --amount                     | string | 是     |       | 委托token的数量                    |
+| --commission-rate            | float  | 是     | 0.0   | 初始佣金比例                       |
+| --details                    | string |        |       | 验证人节点的详细信息                 |
+| --genesis-format             | bool   |        | false | 是否已genesis transaction的方式导出 |
+| --identity                   | string |        |       | 身份信息的签名                      |
+| --ip                         | string |        |       | 验证人节点的IP                      |
+| --moniker                    | string | 是     |       | 验证人节点名称                      |
+| --pubkey                     | string | 是     |       | Amino编码的验证人公钥               |
+| --website                    | string |        |       | 验证人节点的网址                    |
 
 ## 示例
 

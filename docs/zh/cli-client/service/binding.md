@@ -12,13 +12,13 @@ iriscli service binding <flags>
 
 ## 标志
 
-| Name, shorthand | Default                    | Description                                            | Required |
-| --------------- | -------------------------- | ----------------------------------------------------   | -------- |
-| --bind-chain-id |                            | 绑定该服务的区块链ID                             | 是        |
-| --def-chain-id  |                            | 定义该服务的区块链ID                             | 是        |
-| --provider      |                            | 服务提供者的区块链地址(bech32编码)                 | 是        |
-| --service-name  |                            | 服务名称                                        | 是        |
-| --help, -h      |                            | 查询绑定命令帮助                                           |          |
+| Name, shorthand | Default | Description                    | Required |
+| --------------- | ------- | ------------------------------ | -------- |
+| --bind-chain-id |         | 绑定该服务的区块链ID              | 是        |
+| --def-chain-id  |         | 定义该服务的区块链ID              | 是        |
+| --provider      |         | 服务提供者的区块链地址(bech32编码)  | 是        |
+| --service-name  |         | 服务名称                         | 是        |
+| --help, -h      |         | 查询绑定命令帮助                  |          |
 
 ## 示例
 

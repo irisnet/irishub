@@ -12,10 +12,10 @@ iriscli status <flags>
 
 ## Flags
 
-| Name, shorthand       | Default               | Description                         | Required |
-| --------------------- | --------------------- | ----------------------------------- | -------- |
-| --help, -h            |                       | Help for status                     |          |
-| --node, -n            | tcp://localhost:26657 |\<host>:\<port> to tendermint rpc interface for this chain |          |
+| Name, shorthand | Default               | Description                         				       | Required |
+| --------------- | --------------------- | ---------------------------------------------------------- | -------- |
+| --help, -h      |                       | Help for status                                            |          |
+| --node, -n      | tcp://localhost:26657 | \<host>:\<port> to tendermint rpc interface for this chain |          |
 
 ## Examples
 

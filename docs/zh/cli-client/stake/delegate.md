@@ -17,11 +17,11 @@ iriscli stake delegate --help
 
 ## 特有的标志
 
-| 名称                | 类型   | 是否必填 | 默认值   | 功能描述         |
-| --------------------| -----  | -------- | -------- | ---------------- |
-| --address-validator | string | true     | ""       | 验证人地址 |
-| --amount            | string | true     | ""       | 委托的token数量 |
-| --commit         | String | 否     | True                  |是否等到交易有明确的返回值，如果是True，则忽略--async的内容|
+| 名称                | 类型    | 是否必须   | 默认值 | 功能描述                                             |
+| --------------------| -----  | -------- | ----- | --------------------------------------------------- |
+| --address-validator | string | 是       |       | 验证人地址                                           |
+| --amount            | string | 是       |       | 委托的token数量                                      |
+| --commit            | string |          | true  | 是否等到交易有明确的返回值，如果是True，则忽略--async的内容 |
 
 ## 示例
 

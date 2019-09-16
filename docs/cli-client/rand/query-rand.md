@@ -12,9 +12,9 @@ iriscli rand query-rand [flags]
 
 ## Unique Flags
 
-| Name, shorthand     | type   | Required | Default  | Description                                                         |
-| --------------------| -----  | -------- | -------- | ------------------------------------------------------------------- |
-| --request-id        | string | true     |  ""      | the request id returned by the request tx|
+| Name, shorthand     | type   | Required | Default | Description                               |
+| --------------------| ------ | -------- | ------- | ----------------------------------------- |
+| --request-id        | string | true     |         | The request id returned by the request tx |
 
 ## Examples
 

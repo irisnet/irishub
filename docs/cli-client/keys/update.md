@@ -12,9 +12,9 @@ iriscli keys update <name> <flags>
 
 ## Flags
 
-| Name, shorthand | Default   | Description                                                  | Required |
-| --------------- | --------- | ------------------------------------------------------------ | -------- |
-| --help, -h      |           | help for update                                              |          |
+| Name, shorthand | Default   | Description      | Required |
+| --------------- | --------- | ---------------- | -------- |
+| --help, -h      |           | Help for update  |          |
 
 ## Examples
 

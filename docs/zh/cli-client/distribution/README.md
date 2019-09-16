@@ -18,9 +18,9 @@ iriscli distribution --help
 
 ## 子命令
 
-| 名称                            | 功能                                                   |
-| --------------------------------| --------------------------------------------------------------|
-| [withdraw-address](withdraw-address.md) | 查询收益取回地址 |
-| [rewards](rewards.md) | 查询验证人或者委托人的所有收益 |
-| [set-withdraw-address](set-withdraw-address.md)  | 设置收益取回地址 |
-| [withdraw-rewards](withdraw-rewards.md) | 发起取回收益的交易 |
+| 名称                                             | 功能                      |
+| ----------------------------------------------- | ------------------------- |
+| [withdraw-address](withdraw-address.md)         | 查询收益取回地址             |
+| [rewards](rewards.md)                           | 查询验证人或者委托人的所有收益 |
+| [set-withdraw-address](set-withdraw-address.md) | 设置收益取回地址             |
+| [withdraw-rewards](withdraw-rewards.md)         | 发起取回收益的交易           |

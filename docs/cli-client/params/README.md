@@ -12,10 +12,10 @@ Params allows you to query system parameters, some parameters can be governed by
 
 ## Flags
 
-| Name,shorthand | Default | Description   | Required |
-| -------------- | ------- | ------------- | -------- |
-| -h, --help     |         | Help for params |          |
-| --module       |    ""   | name for module|    false  |
+| Name, shorthand | Default | Description     | Required |
+| --------------- | ------- | --------------- | -------- |
+| -h, --help      |         | Help for params |          |
+| --module        |         | Name for module |          |
 ## Examples
 
 ```
@@ -58,15 +58,15 @@ Distribution Params:
   distr/CommunityTax:        0.0400000000
 
 Gov Params:
-System Halt Period:     60
-Proposal Parameter:    [Critical]         [Important]        [Normal]
-  DepositPeriod:        24h0m0s         24h0m0s        24h0m0s
-  MinDeposit:           4000000000000000000000iris-atto         2000000000000000000000iris-atto        1000000000000000000000iris-atto
-  Voting Period:        2m0s         2m0s        2m0s
-  Max Num:              1         5        7
-  Threshold:            0.7500000000         0.6700000000        0.5000000000
-  Veto:                 0.3300000000         0.3300000000        0.3300000000
-  Participation:        0.5000000000         0.5000000000        0.5000000000
-  Penalty:              0.0000000000         0.0000000000        0.0000000000
+System Halt Period:  60
+Proposal Parameter:  [Critical]                         [Important]                        [Normal]
+  DepositPeriod:     24h0m0s                            24h0m0s                            24h0m0s
+  MinDeposit:        4000000000000000000000iris-atto    2000000000000000000000iris-atto    1000000000000000000000iris-atto
+  Voting Period:     2m0s                               2m0s                               2m0s
+  Max Num:           1                                  5                                  7
+  Threshold:         0.7500000000                       0.6700000000                       0.5000000000
+  Veto:              0.3300000000                       0.3300000000                       0.3300000000
+  Participation:     0.5000000000                       0.5000000000                       0.5000000000
+  Penalty:           0.0000000000                       0.0000000000                       0.0000000000
 ```
 

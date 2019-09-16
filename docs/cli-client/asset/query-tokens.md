@@ -12,11 +12,11 @@ iriscli asset query-tokens [flags]
 
 ## Unique Flags
 
-| Name      | Type   | Required | Default | Description                                                  |
-| --------- | ------ | -------- | ------- | ------------------------------------------------------------ |
-| --source  | string | false    | all     | Token Source: native / gateway / external                    |
-| --gateway | string | false    |         | The unique moniker of the gateway, required when source is gateway |
-| --owner   | string | false    |         | The owner of the tokens                                      |
+| Name      | Type   | Required | Default | Description                                                        |
+| --------- | ------ | -------- | ------- | ------------------------------------------------------------------ |
+| --source  | string |          | all     | Token Source: native / gateway / external                          |
+| --gateway | string |          |         | The unique moniker of the gateway, required when source is gateway |
+| --owner   | string |          |         | The owner of the tokens                                            |
 
 ## Query rules
 

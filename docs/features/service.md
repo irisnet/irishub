@@ -24,7 +24,7 @@ The following parameters can be modified by [governance](governance.md)
 
 ### Service definition
 
-Any users can define a service. In service definition，use `protobuf` to standardize the definition of the service's method, its input and output parameters. In order to support attributes of iService better, IRISnet has made some extensions to `protobuf`, please refer to [IDL extension](#idl-extension) for details.
+Any users can define a service. In service definition, use `protobuf` to standardize the definition of the service's method, its input and output parameters. In order to support attributes of iService better, IRISnet has made some extensions to `protobuf`, please refer to [IDL extension](#idl-extension) for details.
 
 ```
 # create a new service definition
@@ -36,7 +36,7 @@ iriscli service definition --def-chain-id=<def-chain-id> --service-name=<service
 
 ### Service Binding
 
-The minimum deposit amount for Service Binding is `MinDepositMultiple * Service fee` 。The service provider can update his service binding and adjust the Service fee at any time, disable and enable the service binding. If the provider want to refund the deposit, he needs to disable service binding first and wait for a period of `ComplaintRetrospectParameter` + `ArbitrationTimelimitParameter`.
+The minimum deposit amount for Service Binding is `MinDepositMultiple * Service fee`. The service provider can update his service binding and adjust the Service fee at any time, disable and enable the service binding. If the provider want to refund the deposit, he needs to disable service binding first and wait for a period of `ComplaintRetrospectParameter` + `ArbitrationTimelimitParameter`.
 
 ```
 # create a new service binding
@@ -92,13 +92,13 @@ iriscli service withdraw-fees --chain-id=<chain-id> --from=<key_name> --fee=0.3i
 When using proto file to standardize the definition of the service's method, its input and output parameters, the method attributes can be added through annotations.
 
 ### Annotation standard
-* If `//@Attribute attribute： value` wrote on top of `rpc method`，it will be added to the method attributes. Eg.
+* If `//@Attribute attribute:  value` wrote on top of `rpc method`, it will be added to the method attributes. Eg.
 > //@Attribute description: sayHello
 
 ### Currently supported attributes
 * `description` The name of this method in the service
-* `output_privacy` Whether the output of the method is encrypted，{`NoPrivacy`,`PubKeyEncryption`}
-* `output_cached` Whether the output of the method is cached，{`OffChainCached`，`NoCached`}
+* `output_privacy` Whether the output of the method is encrypted, {`NoPrivacy`,`PubKeyEncryption`}
+* `output_cached` Whether the output of the method is cached, {`OffChainCached`, `NoCached`}
 
 ### IDL content example
 * idl-content example

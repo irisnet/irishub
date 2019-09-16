@@ -9,22 +9,22 @@
 
 IRISLCD has two subcommands:
 
-| subcommand      | Description                 | Example command |
-| --------------- | --------------------------- | --------------- |
-| version         | Print the IRISLCD version   |  `irislcd version` |
-| start           | Start an IRISLCD node        | `irislcd start --node=tcp://localhost:26657 --laddr=tcp://0.0.0.0:1317 --chain-id=<chain-id> --home=$HOME/.iriscli/ --trust-node` |
+| subcommand | Description               | Example command   |
+| ---------- | ------------------------- | ----------------- |
+| version    | Print the IRISLCD version | `irislcd version` |
+| start      | Start an IRISLCD node     | `irislcd start --node=tcp://localhost:26657 --laddr=tcp://0.0.0.0:1317 --chain-id=<chain-id> --home=$HOME/.iriscli/ --trust-node` |
 
 `start` subcommand has these options:
 
-| Parameter       | Type      | Default                 | Required | Description                                          |
-| --------------- | --------- | ----------------------- | -------- | ---------------------------------------------------- |
-| chain-id        | string    | null                    | true     | Chain ID of Tendermint node |
-| home            | string    | "$HOME/.irislcd"        | false    | Directory for config and data, such as key and checkpoint |
-| node            | string    | "tcp://localhost:26657" | false    | Full node to connect to |
-| laddr           | string    | "tcp://localhost:1317"  | false    | Address for server to listen on |
-| trust-node      | bool      | false                   | false    | Trust connected  full nodes (Don't verify proofs for responses) |
-| max-open        | int       | 1000                    | false    | The number of maximum open connections |
-| cors            | string    | ""                      | false    | Set the domains that can make CORS requests |
+| Parameter  | Type   | Default                 | Required | Description                                                     |
+| ---------- | ------ | ----------------------- | -------- | --------------------------------------------------------------- |
+| chain-id   | string |                         | true     | Chain ID of Tendermint node                                     |
+| home       | string | "$HOME/.irislcd"        |          | Directory for config and data, such as key and checkpoint       |
+| node       | string | "tcp://localhost:26657" |          | Full node to connect to                                         |
+| laddr      | string | "tcp://localhost:1317"  |          | Address for server to listen on                                 |
+| trust-node | bool   | false                   |          | Trust connected  full nodes (Don't verify proofs for responses) |
+| max-open   | int    | 1000                    |          | The number of maximum open connections                          |
+| cors       | string |                         |          | Set the domains that can make CORS requests                     |
 
 ## Sample Commands 
 
@@ -173,11 +173,11 @@ These apis are picked out from above section. And they can be used to build and 
 
 Among these APIs, `/tx/broadcast` supports these special query parameters below. By default, their values are all false. And each parameter has its unique priority( Here `0` is the top priority). If multiple parameters are specified to true, then the parameters with lower priority will be ignored. For instance, if `simulate` is true, then `commit` and `async` will be ignored.  
 
-| parameter name   | Type | Default | Priority | Description                 |
-| --------------- | ---- | ------- |--------- |--------------------------- |
-| simulate        | bool | false | 0 | Ignore the gas field and perform a simulation of a transaction, but don’t broadcast it |
-| commit          | bool | false | 1 | Wait for transaction being included in a block   |
-| async           | bool | false | 2 | Broadcast transaction asynchronously   |
+| parameter name | Type | Default | Priority | Description                                                                            |
+| -------------- | ---- | ------- | -------- |--------------------------------------------------------------------------------------- |
+| simulate       | bool | false   | 0        | Ignore the gas field and perform a simulation of a transaction, but don’t broadcast it |
+| commit         | bool | false   | 1        | Wait for transaction being included in a block                                         |
+| async          | bool | false   | 2        | Broadcast transaction asynchronously                                                   |
 
 ## Change Log
 Please refer to [CHANGELOG](CHANGELOG.md)

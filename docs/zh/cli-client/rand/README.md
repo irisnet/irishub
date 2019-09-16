@@ -18,8 +18,8 @@ iriscli rand --help
 
 ## 相关命令
 
-| 命令                             | 描述                                 |
-| ------------------------------- | ------------------------------------ |
-| [request-rand](request-rand.md) | 请求一个随机数                         |
-| [query-rand](query-rand.md)     | 使用ID查询链上生成的随机数               |
-| [query-queue](query-queue.md)   | 查询随机数请求队列，支持可选的高度        |
+| 命令                             | 描述                          |
+| ------------------------------- | ----------------------------- |
+| [request-rand](request-rand.md) | 请求一个随机数                  |
+| [query-rand](query-rand.md)     | 使用ID查询链上生成的随机数        |
+| [query-queue](query-queue.md)   | 查询随机数请求队列，支持可选的高度 |

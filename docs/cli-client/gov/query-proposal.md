@@ -18,9 +18,9 @@ iriscli gov query-proposal --help
 
 ## Flags
 
-| Name, shorthand | Default                    | Description                                                                                                                                          | Required |
-| --------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| --proposal-id   |                            | ProposalID of proposal depositing on                                                                                                        | Yes      |
+| Name, shorthand | Default | Description                          | Required |
+| --------------- | ------- | ------------------------------------ | -------- |
+| --proposal-id   |         | ProposalID of proposal depositing on | true     |
 
 ## Examples
 

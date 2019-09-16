@@ -12,15 +12,15 @@ iriscli service call <flags>
 
 ## Flags
 
-| Name, shorthand       | Default                 | Description                                                  | Required |
-| --------------------- | ----------------------- | ------------------------------------------------------------ | -------- |
-| --def-chain-id        |                         | the ID of the blockchain defined of the service     |  Yes     |
-| --service-name        |                         | service name                                        |  Yes     |
-| --method-id           |                         | the method id called                                   |  Yes     |
-| --bind-chain-id       |                         | the ID of the blockchain bond of the service        |  Yes     |
-| --provider            |                         | bech32 encoded account created the service binding  |  Yes     |
-| --service-fee         |                         | fee to pay for a service invocation                 |          |
-| --request-data        |                         | hex encoded request data of a service invocation    |          |
+| Name, shorthand       | Default | Description                                        | Required |
+| --------------------- | ------- | -------------------------------------------------- | -------- |
+| --def-chain-id        |         | The ID of the blockchain defined of the service    | true     |
+| --service-name        |         | Service name                                       | true     |
+| --method-id           |         | The method id called                               | true     |
+| --bind-chain-id       |         | The ID of the blockchain bond of the service       | true     |
+| --provider            |         | Bech32 encoded account created the service binding | true     |
+| --service-fee         |         | Fee to pay for a service invocation                |          |
+| --request-data        |         | Hex encoded request data of a service invocation   |          |
 
 ## Examples
 

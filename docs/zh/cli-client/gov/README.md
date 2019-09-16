@@ -21,18 +21,18 @@ iriscli gov --help
 
 ## 相关命令
 
-| 命令                                  | 描述                                                             |
-| ------------------------------------- | --------------------------------------------------------------- |
-| [query-proposal](query-proposal.md)   | 查询单个提议的详细信息                                             |
-| [query-proposals](query-proposals.md) | 通过可选过滤器查询提议                                             |
-| [query-vote](query-vote.md)           | 查询投票信息                                                      |
-| [query-votes](query-votes.md)         | 查询提议的投票情况                                                 |
-| [query-deposit](query-deposit.md)     | 查询保证金详情                                                    |
-| [query-deposits](query-deposits.md)   | 查询提议的保证金                                                  |
-| [query-tally](query-tally.md)         | 查询提议投票的统计                                                 |                                                |
-| [submit-proposal](submit-proposal.md) | 提交提议并抵押初始保证金                                  |
-| [deposit](deposit.md)                 | 充值保证金代币以激活提议                                            |
-| [vote](vote.md)                       | 为有效的提议投票，选项：Yes/No/NoWithVeto/Abstain                   |
+| 命令                                   | 描述                                          |
+| ------------------------------------- | --------------------------------------------- |
+| [query-proposal](query-proposal.md)   | 查询单个提议的详细信息                            |
+| [query-proposals](query-proposals.md) | 通过可选过滤器查询提议                            |
+| [query-vote](query-vote.md)           | 查询投票信息                                    |
+| [query-votes](query-votes.md)         | 查询提议的投票情况                               |
+| [query-deposit](query-deposit.md)     | 查询保证金详情                                  |
+| [query-deposits](query-deposits.md)   | 查询提议的保证金                                 |
+| [query-tally](query-tally.md)         | 查询提议投票的统计                               |
+| [submit-proposal](submit-proposal.md) | 提交提议并抵押初始保证金                          |
+| [deposit](deposit.md)                 | 充值保证金代币以激活提议                          |
+| [vote](vote.md)                       | 为有效的提议投票，选项：Yes/No/NoWithVeto/Abstain |
 
 ## 补充描述
 

@@ -12,11 +12,11 @@ iriscli service respond <flags>
 
 ## Flags
 
-| Name, shorthand       | Default                 | Description                                                                                                                                           | Required |
-| --------------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| --request-chain-id    |                         | the ID of the blockchain that the service invocation initiated                                                                                              |  Yes     |
-| --request-id          |                         | the ID of the service invocation                                                                                                                                |  Yes     |
-| --response-data       |                         | hex encoded response data of a service invocation                                                                       |         |
+| Name, shorthand       | Default | Description                                                    | Required |
+| --------------------- | ------- | -------------------------------------------------------------- | -------- |
+| --request-chain-id    |         | The ID of the blockchain that the service invocation initiated | true     |
+| --request-id          |         | The ID of the service invocation                               | true     |
+| --response-data       |         | Hex encoded response data of a service invocation              |          |
 
 ## Examples
 

@@ -12,19 +12,19 @@ iriscli keys add <name> [flags]
 
 ## Flags
 
-| Name, shorthand | Default   | Description                                                       | Required |
-| --------------- | --------- | ----------------------------------------------------------------- | -------- |
-| --account       |           | Account number for HD derivation                         |          |
-| --dry-run       |           | Perform action, but don't add key to local keystore               |          |
-| --help, -h      |           | Help for add                                                      |          |
-| --index         |           | Index number for HD derivation                           |          |
-| --ledger        |           | Store a local reference to a private key on a Ledger device       |          |
-| --no-backup     |           | Don't print out seed phrase (if others are watching the terminal) |          |
-| --recover       |           | Provide seed phrase to recover existing key instead of creating   |          |
-| --keystore      |           | Recover a key from keystore                                  |          |
-| --multisig      |           | Create multisig account                             |          |
-| --multisig-threshold|       | Specify the minimum number of signatures for multisig account                     |          |
-| --type, -t      | secp256k1 | Type of private key (secp256k\ed25519)                  |          |
+| Name, shorthand      | Default   | Description                                                       | Required |
+| -------------------- | --------- | ----------------------------------------------------------------- | -------- |
+| --account            |           | Account number for HD derivation                                  |          |
+| --dry-run            |           | Perform action, but don't add key to local keystore               |          |
+| --help, -h           |           | Help for add                                                      |          |
+| --index              |           | Index number for HD derivation                                    |          |
+| --ledger             |           | Store a local reference to a private key on a Ledger device       |          |
+| --no-backup          |           | Don't print out seed phrase (if others are watching the terminal) |          |
+| --recover            |           | Provide seed phrase to recover existing key instead of creating   |          |
+| --keystore           |           | Recover a key from keystore                                       |          |
+| --multisig           |           | Create multisig account                                           |          |
+| --multisig-threshold |           | Specify the minimum number of signatures for multisig account     |          |
+| --type, -t           | secp256k1 | Type of private key (secp256k\ed25519)                            |          |
 
 ## Examples
 
@@ -85,7 +85,7 @@ iriscli keys add <multi_account_keyname> --multisig-threshold=2 --multisig=<sign
 ```
 
 ::: tips
-<signer_keyname> could be the type of "local/offline/ledger"， but not "multi" type。
+<signer_keyname> could be the type of "local/offline/ledger", but not "multi" type.
 
 Offline account can be created by "iriscli keys add --pubkey". 
 :::

@@ -13,15 +13,15 @@ iriscli tendermint txs <flags>
 
 ## Flags
 
-| Name, shorthand | Default              |Description                                                             | Required     |
-| --------------- | -------------------- | --------------------------------------------------------- | -------- |
-| --chain-id      | ""                   | Chain ID of Tendermint node   | yes     |
-| --node string   | tcp://localhost:26657| Node to connect to  |
-| --help, -h      |                      | Help for txs|    |
-| --trust-node    | true                 | Trust connected full node (don't verify proofs for responses)     |          |
-| --tags          | ""                   | tag:value list of tags that must match     |          |
-| --page          | 0                    | Pagination page     |          |
-| --size          | 100                  | Pagination size     |          |
+| Name, shorthand | Default               | Description                                                   | Required |
+| --------------- | --------------------- | ------------------------------------------------------------- | -------- |
+| --chain-id      |                       | Chain ID of Tendermint node                                   | true     |
+| --node string   | tcp://localhost:26657 | Node to connect to                                            |          |
+| --help, -h      |                       | Help for txs                                                  |          |
+| --trust-node    | true                  | Trust connected full node (don't verify proofs for responses) |          |
+| --tags          |                       | Tag: value list of tags that must match                       |          |
+| --page          | 0                     | Pagination page                                               |          |
+| --size          | 100                   | Pagination size                                               |          |
 
 ## Examples
 

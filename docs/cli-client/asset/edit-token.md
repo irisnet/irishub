@@ -12,13 +12,13 @@ iriscli asset edit-token [flags]
 
 ## Flags
 
-| Name | Type | Required | Default | Description                                              |
-| --------------------| -----  | -------- | -------- | ------------------------------------------------------------------- |
-| --name           | string | No | "" | the token name, e.g. IRIS Network |
-| --canonical-symbol | string | No | "" | the source symbol of a gateway or external token |
-| --min-unit-alias | string | No | "" | the token symbol minimum alias |
-| --max-supply | uint | No | 0 | the max supply of the token |
-| --mintable | bool | No | false | whether the token can be minted, default false |
+| Name                   | Type   | Required | Default | Description                                        |
+| ---------------------- | -----  | -------- | ------- | -------------------------------------------------- |
+| --name                 | string |          |         | The token name, e.g. IRIS Network                  |
+| --canonical-symbol     | string |          |         | The source symbol of a gateway or external token   |
+| --min-unit-alias       | string |          |         | The token symbol minimum alias                     |
+| --max-supply           | uint   |          | 0       | The max supply of the token                        |
+| --mintable             | bool   |          | false   | Whether the token can be minted, default false     |
 
 ## Example
 

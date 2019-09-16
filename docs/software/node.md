@@ -35,7 +35,7 @@ Create the `CreateValidator` transaction and sign the transaction by the validat
 ```bash
 iris gentx --name=<account_name> --home=<path_to_your_home>
 ```
-This command will generate the transaction data in following directory：<path_to_your_home>/config/gentx
+This command will generate the transaction data in following directory: <path_to_your_home>/config/gentx
 
 ### Config genesis
 
@@ -87,7 +87,7 @@ In order to simplify the above configuration process, you can use the following 
 iris testnet --v=2 --output-dir=<path_to_your_home> --chain-id=<chain-id> --starting-ip-address 127.0.0.1
 ```
 
-config the port of node1：modify config.toml of node1 under folder <path_to_your_home>/node0/iris/config/，allocate different port for it 
+config the port of node1：modify config.toml of node1 under folder <path_to_your_home>/node0/iris/config/, allocate different port for it 
 Start 2 nodes separately:
 
 ```bash
@@ -124,4 +124,4 @@ pri_validator.json is the key that the validator will use to sign Pre-vote/Pre-c
 config.toml is the non-consensus configuration information of the node. Different nodes can configure themselves according to their own situation. Common modifications are `persistent_peers`/`moniker`/`laddr`.
 
 ### iris.toml
-iris.toml provides some special configurations for IRIShub，such as "check invariant", "trace coin flow".
+iris.toml provides some special configurations for IRIShub, such as "check invariant", "trace coin flow".

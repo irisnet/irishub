@@ -17,11 +17,11 @@ iriscli stake redelegation --help
 
 ## 特有的flags
 
-| 名称, 速记                  | 默认值                      | 描述                                                                | 必需     |
-| -------------------------- | -------------------------- | ------------------------------------------------------------------- | -------- | 
-| --address-delegator        |                            | 委托者bech地址                                              | Yes      |
-| --address-validator-dest   |                            | 目标验证者bech地址                                          | Yes      |
-| --address-validator-source |                            | 源验证者bech地址                                            | Yes      |
+| 名称, 速记                  | 默认值 | 描述              | 是否必须 |
+| -------------------------- | ----- | ---------------- | ------ | 
+| --address-delegator        |       | 委托者bech地址     | 是     |
+| --address-validator-dest   |       | 目标验证者bech地址 | 是     |
+| --address-validator-source |       | 源验证者bech地址   | 是     |
 
 ## 示例
 

@@ -12,14 +12,14 @@ iriscli service define <flags>
 
 ## Flags
 
-| Name, shorthand       | Default                 | Description                                                                                                                                           | Required |
-| --------------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| --service-description |                         | service description                                                                                                                          |          |
-| --author-description  |                         | service author description                                                                                                                   |          |
-| --service-name        |                         | service name                                                                                                                                 |   Yes    |
-| --tags                |                         | service tags                                                                                                                                |          |
-| --idl-content         |                         | content of service interface description language                                                                                            |          |
-| --file                |                         |  path of file which contains service interface description language                                                                           |          |
+| Name, shorthand       | Default | Description                                                        | Required |
+| --------------------- | ------- | ------------------------------------------------------------------ | -------- |
+| --service-description |         | Service description                                                |          |
+| --author-description  |         | Service author description                                         |          |
+| --service-name        |         | Service name                                                       | true     |
+| --tags                |         | Service tags                                                       |          |
+| --idl-content         |         | Content of service interface description language                  |          |
+| --file                |         | Path of file which contains service interface description language |          |
 
 ## Examples
 

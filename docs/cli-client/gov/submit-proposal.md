@@ -18,23 +18,23 @@ iriscli gov submit-proposal --help
 
 ## Flags
 
-| Name, shorthand  | Default                    | Description                                                                                                                                          | Required |
-| ---------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| --deposit        |                            | Deposit of proposal(at least  30% of minDeposit)                                                                               |          |
-| --description    |                            | Description of proposal                                                                                                                     | Yes      |
-| --param          |                            | Parameter of proposal,eg. mint/Inflation=0.050                                                                                 |          |
-| --title          |                            | Title of proposal                                                                                                                           | Yes      |
-| --type           |                            | ProposalType of proposal,eg:PlainText/Parameter/SoftwareUpgrade/SoftwareHalt/CommunityTaxUsage/TokenAddition                                                           | Yes      |
-| --version           |            0                | the version of the new protocol                                                                            |       |
-| --software           |           " "                 | the software of the new protocol                                                                         |       |
-| --switch-height           |       0                     | the switch height of the new protocol                                                         |       |
-| --threshold | "0.8"   |  the upgrade signal threshold of the software upgrade                                                   |               |
-| --token-canonical-symbol |  | the source symbol of a external token | |
-| --token-symbol |  | the token symbol. Once created, it cannot be modified | |
-| --token-name |  | the token name | |
-| --token-decimal |  | the token decimal. The maximum value is 18 | |
-| --token-min-unit-alias |  | the token symbol minimum alias | |
-| --token-initial-supply |  | the initial supply token of token | |
+| Name, shorthand          | Default | Description                                                                                                  | Required |
+| ------------------------ | ------- | -------------------------------------------------------------------------------------------------------------| -------- |
+| --deposit                |         | Deposit of proposal(at least  30% of minDeposit)                                                             |          |
+| --description            |         | Description of proposal                                                                                      | true     |
+| --param                  |         | Parameter of proposal,eg. mint/Inflation=0.050                                                               |          |
+| --title                  |         | Title of proposal                                                                                            | true     |
+| --type                   |         | ProposalType of proposal,eg:PlainText/Parameter/SoftwareUpgrade/SoftwareHalt/CommunityTaxUsage/TokenAddition | true     |
+| --version                | 0       | The version of the new protocol                                                                              |          |
+| --software               |         | The software of the new protocol                                                                             |          |
+| --switch-height          | 0       | The switch height of the new protocol                                                                        |          |
+| --threshold              | "0.8"   | The upgrade signal threshold of the software upgrade                                                         |          |
+| --token-canonical-symbol |         | The source symbol of a external token                                                                        |          | 
+| --token-symbol           |         | The token symbol. Once created, it cannot be modified                                                        |          |
+| --token-name             |         | The token name                                                                                               |          |
+| --token-decimal          |         | The token decimal. The maximum value is 18                                                                   |          |
+| --token-min-unit-alias   |         | The token symbol minimum alias                                                                               |          |
+| --token-initial-supply   |         | The initial supply token of token                                                                            |          |
 
 ## Examples
 
