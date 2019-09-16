@@ -5,7 +5,6 @@ import (
 	"encoding/hex"
 	"fmt"
 
-	"github.com/irisnet/irishub/app/v1/params"
 	"github.com/irisnet/irishub/app/v2/htlc/internal/types"
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
@@ -19,17 +18,14 @@ type Keeper struct {
 
 	// codespace
 	codespace sdk.CodespaceType
-	// params subspace
-	paramSpace params.Subspace
 }
 
-func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, bk types.BankKeeper, codespace sdk.CodespaceType, paramSpace params.Subspace) Keeper {
+func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, bk types.BankKeeper, codespace sdk.CodespaceType) Keeper {
 	return Keeper{
-		storeKey:   key,
-		cdc:        cdc,
-		bk:         bk,
-		codespace:  codespace,
-		paramSpace: paramSpace.WithTypeTable(types.ParamTypeTable()),
+		storeKey:  key,
+		cdc:       cdc,
+		bk:        bk,
+		codespace: codespace,
 	}
 }
 
@@ -209,6 +205,25 @@ func getHashLock(secret []byte, timestamp uint64) []byte {
 	}
 
 	return sdk.SHA256(secret)
+}
+
+// IterateHTLCs iterates all the HTLCs
+func (k Keeper) IterateHTLCs(ctx sdk.Context, op func(hlock []byte, h types.HTLC) (stop bool)) {
+	store := ctx.KVStore(k.storeKey)
+
+	iterator := sdk.KVStorePrefixIterator(store, PrefixHTLC)
+	defer iterator.Close()
+
+	for ; iterator.Valid(); iterator.Next() {
+		var hashLock []byte
+		k.GetCdc().MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &hashLock)
+
+		htlc, _ := k.GetHTLC(ctx, hashLock)
+
+		if stop := op(hashLock, htlc); stop {
+			break
+		}
+	}
 }
 
 // IterateHTLCExpireQueueByHeight iterates the HTLC expiration queue by the specified height

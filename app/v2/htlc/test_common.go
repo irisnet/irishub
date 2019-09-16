@@ -35,7 +35,7 @@ func getMockApp(t *testing.T, numGenAccs int) (*mock.App, Keeper, stake.Keeper, 
 		stake.DefaultCodespace,
 		stake.NopMetrics())
 
-	hk := NewKeeper(mapp.Cdc, keyHTLC, ck, DefaultCodespace, mapp.ParamsKeeper.Subspace(DefaultParamSpace))
+	hk := NewKeeper(mapp.Cdc, keyHTLC, ck, DefaultCodespace)
 
 	mapp.Router().AddRoute("htlc", []*sdk.KVStoreKey{keyHTLC}, NewHandler(hk))
 
@@ -63,7 +63,11 @@ func getEndBlocker() sdk.EndBlocker {
 // beginblocker
 func getBeginBlocker(htlcKeeper Keeper) sdk.BeginBlocker {
 	return func(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
-		return abci.ResponseBeginBlock{}
+		tags := BeginBlocker(ctx, htlcKeeper)
+
+		return abci.ResponseBeginBlock{
+			Tags: tags,
+		}
 	}
 }
 
