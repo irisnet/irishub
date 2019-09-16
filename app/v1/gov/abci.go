@@ -48,18 +48,18 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 
 		var action []byte
 		if result == PASS {
-			keeper.metrics.SetProposalStatus(proposalID, 2)
+			keeper.metrics.SetProposalStatus(proposalID, StatusPassed)
 			keeper.RefundDeposits(ctx, activeProposal.GetProposalID())
 			activeProposal.SetStatus(StatusPassed)
 			action = tags.ActionProposalPassed
 			activeProposal.Execute(ctx, keeper)
 		} else if result == REJECT {
-			keeper.metrics.SetProposalStatus(proposalID, 3)
+			keeper.metrics.SetProposalStatus(proposalID, StatusRejected)
 			keeper.RefundDeposits(ctx, activeProposal.GetProposalID())
 			activeProposal.SetStatus(StatusRejected)
 			action = tags.ActionProposalRejected
 		} else if result == REJECTVETO {
-			keeper.metrics.SetProposalStatus(proposalID, 3)
+			keeper.metrics.SetProposalStatus(proposalID, StatusRejected)
 			keeper.DeleteDeposits(ctx, activeProposal.GetProposalID())
 			activeProposal.SetStatus(StatusRejected)
 			action = tags.ActionProposalRejected

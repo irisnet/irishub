@@ -20,7 +20,7 @@ const (
 type Label = stdprometheus.Labels
 
 type Metrics struct {
-	ProposalStatus *stdprometheus.GaugeVec // 0:DepositPeriod 1:VotingPeriod 2:Pass 3:Reject 4:Other
+	ProposalStatus *stdprometheus.GaugeVec // 0:Drop 1:DepositPeriod 2:VotingPeriod 3:Passed 4:Rejected
 	Vote           *stdprometheus.GaugeVec // 0:Yes 1:No 2:NoWithVeto 3:Abstain
 	Param          *stdprometheus.GaugeVec
 }
@@ -69,9 +69,10 @@ func NopMetrics() *Metrics {
 	}
 }
 
-func (metrics *Metrics) SetProposalStatus(proposalID uint64, status float64) {
+func (metrics *Metrics) SetProposalStatus(proposalID uint64, status ProposalStatus) {
 	promutil.SafeExec(func() {
-		metrics.ProposalStatus.WithLabelValues(strconv.FormatUint(proposalID, 10)).Set(status)
+		s := float64(status)
+		metrics.ProposalStatus.WithLabelValues(strconv.FormatUint(proposalID, 10)).Set(s)
 	})
 }
 

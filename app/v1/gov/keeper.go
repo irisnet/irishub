@@ -178,7 +178,7 @@ func (keeper Keeper) SetProposal(ctx sdk.Context, proposal Proposal) {
 
 // Implements sdk.AccountKeeper.
 func (keeper Keeper) DeleteProposal(ctx sdk.Context, proposalID uint64) {
-	keeper.metrics.SetProposalStatus(proposalID, 4)
+	keeper.metrics.SetProposalStatus(proposalID, StatusNil)
 	store := ctx.KVStore(keeper.storeKey)
 	proposal := keeper.GetProposal(ctx, proposalID)
 	keeper.RemoveFromInactiveProposalQueue(ctx, proposal.GetDepositEndTime(), proposalID)
@@ -508,7 +508,7 @@ func (keeper Keeper) ActiveProposalQueueIterator(ctx sdk.Context, endTime time.T
 
 // Inserts a ProposalID into the active proposal queue at endTime
 func (keeper Keeper) InsertActiveProposalQueue(ctx sdk.Context, endTime time.Time, proposalID uint64) {
-	keeper.metrics.SetProposalStatus(proposalID, 1)
+	keeper.metrics.SetProposalStatus(proposalID, StatusVotingPeriod)
 	store := ctx.KVStore(keeper.storeKey)
 	bz := keeper.cdc.MustMarshalBinaryLengthPrefixed(proposalID)
 	store.Set(KeyActiveProposalQueueProposal(endTime, proposalID), bz)
@@ -528,7 +528,7 @@ func (keeper Keeper) InactiveProposalQueueIterator(ctx sdk.Context, endTime time
 
 // Inserts a ProposalID into the inactive proposal queue at endTime
 func (keeper Keeper) InsertInactiveProposalQueue(ctx sdk.Context, endTime time.Time, proposalID uint64) {
-	keeper.metrics.SetProposalStatus(proposalID, 0)
+	keeper.metrics.SetProposalStatus(proposalID, StatusDepositPeriod)
 	store := ctx.KVStore(keeper.storeKey)
 	bz := keeper.cdc.MustMarshalBinaryLengthPrefixed(proposalID)
 	store.Set(KeyInactiveProposalQueueProposal(endTime, proposalID), bz)
