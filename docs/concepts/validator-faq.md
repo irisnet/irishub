@@ -202,9 +202,15 @@ then you can do these:
 
 That means you have **Lost Your Validator Forever!** You can only create a new one and [redelegate](../cli-client/stake/redelegate.md) all of your shares to the new Validator.
 
-#### How to upload my validator's avatar
+### How to upload my validator's logo to the [Explorers](../get-started/explorers.md)
 
-TODO
+1. Sign-up [Keybase](https://keybase.io/) with your validator's name
+
+2. Upload your logo as your Keybase account's avatar
+
+3. `Add a PGP key` to your Keybase account (I believe you will see this option after sign-up), and you will get a 16-digit string
+
+4. [Edit your validator](../cli-client/stake/edit-validator.md) and specify `--identity=<the_16_digit_string>`
 
 ## Community Channels
 
