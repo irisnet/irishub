@@ -48,7 +48,8 @@ module.exports = {
                 label: "English",
                 sidebar: sidebar("", [
                     ["Getting Started", "get-started"],
-                    ["Concepts", "concepts"]
+                    ["Concepts", "concepts"],
+                    ["Daemon", "daemon"]
                 ])
             }
         },
