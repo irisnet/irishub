@@ -25,11 +25,11 @@ func init() {
 	FsCreateHTLC.BytesHex(FlagReceiverOnOtherChain, nil, "the receiver address on the other chain")
 	FsCreateHTLC.String(FlagAmount, "", "similar to the amount in the original transfer")
 	FsCreateHTLC.BytesHex(FlagHashLock, nil, "the sha256 hash generated from secret (and timestamp if provided)")
-	FsCreateHTLC.Uint64(FlagTimestamp, 0, "the timestamp in seconds for generating hashLock if provided")
+	FsCreateHTLC.Uint64(FlagTimestamp, 0, "the timestamp in seconds for generating the hash lock if provided")
 	FsCreateHTLC.String(FlagTimeLock, "", "the number of blocks to wait before the asset may be returned to")
 
-	FsClaimHTLC.BytesHex(FlagHashLock, nil, "the hashLock identifying the htlc to be claimed")
-	FsClaimHTLC.String(FlagSecret, "", "the secret for generating hashLock")
+	FsClaimHTLC.BytesHex(FlagHashLock, nil, "the hash lock identifying the HTLC to be claimed")
+	FsClaimHTLC.String(FlagSecret, "", "the secret for generating the hash lock")
 
-	FsRefundHTLC.BytesHex(FlagHashLock, nil, "the hashLock identifying the htlc to be refunded")
+	FsRefundHTLC.BytesHex(FlagHashLock, nil, "the hash lock identifying the HTLC to be refunded")
 }
