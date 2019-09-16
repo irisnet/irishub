@@ -21,7 +21,7 @@ type HTLC struct {
 	State                HTLCState      `json:"state"`                   // the state of the HTLC
 }
 
-// NewHTLC constructs a HTLC
+// NewHTLC constructs an HTLC
 func NewHTLC(
 	sender sdk.AccAddress,
 	receiver sdk.AccAddress,
@@ -75,7 +75,7 @@ func (h HTLC) String() string {
 	)
 }
 
-// HTLCState represents the state of a HTLC
+// HTLCState represents the state of an HTLC
 type HTLCState byte
 
 const (
@@ -104,7 +104,7 @@ func HTLCStateFromString(str string) (HTLCState, error) {
 	if state, ok := StringToHTLCStateMap[strings.ToLower(str)]; ok {
 		return state, nil
 	}
-	return HTLCState(0xff), fmt.Errorf("'%s' is not a valid htlc state", str)
+	return HTLCState(0xff), fmt.Errorf("'%s' is not a valid HTLC state", str)
 }
 
 func IsValidHTLCState(state HTLCState) bool {

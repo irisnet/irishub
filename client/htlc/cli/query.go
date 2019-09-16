@@ -11,11 +11,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// GetCmdQueryHtlc implements the query htlc command.
+// GetCmdQueryHtlc implements the query HTLC command.
 func GetCmdQueryHtlc(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "query-htlc",
-		Short:   "Query details of a htlc",
+		Short:   "Query details of an HTLC",
 		Example: "iriscli htlc query-htlc <hash-lock>",
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
