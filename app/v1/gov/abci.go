@@ -1,8 +1,6 @@
 package gov
 
 import (
-	"strconv"
-
 	"github.com/irisnet/irishub/app/v1/gov/tags"
 	sdk "github.com/irisnet/irishub/types"
 	tmstate "github.com/tendermint/tendermint/state"
@@ -28,6 +26,7 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 		keeper.SubProposalNum(ctx, inactiveProposal.GetProposalLevel())
 		keeper.DeleteDeposits(ctx, proposalID)
 		keeper.DeleteProposal(ctx, proposalID)
+		keeper.metrics.DeleteProposalStatus(proposalID)
 
 		resTags = resTags.AppendTag(tags.Action, tags.ActionProposalDropped)
 		resTags = resTags.AppendTag(tags.ProposalID, []byte(string(proposalID)))
@@ -49,18 +48,18 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 
 		var action []byte
 		if result == PASS {
-			keeper.metrics.ProposalStatus.With(ProposalIDLabel, strconv.FormatUint(proposalID, 10)).Set(2)
+			keeper.metrics.SetProposalStatus(proposalID, StatusPassed)
 			keeper.RefundDeposits(ctx, activeProposal.GetProposalID())
 			activeProposal.SetStatus(StatusPassed)
 			action = tags.ActionProposalPassed
 			activeProposal.Execute(ctx, keeper)
 		} else if result == REJECT {
-			keeper.metrics.ProposalStatus.With(ProposalIDLabel, strconv.FormatUint(proposalID, 10)).Set(3)
+			keeper.metrics.SetProposalStatus(proposalID, StatusRejected)
 			keeper.RefundDeposits(ctx, activeProposal.GetProposalID())
 			activeProposal.SetStatus(StatusRejected)
 			action = tags.ActionProposalRejected
 		} else if result == REJECTVETO {
-			keeper.metrics.ProposalStatus.With(ProposalIDLabel, strconv.FormatUint(proposalID, 10)).Set(3)
+			keeper.metrics.SetProposalStatus(proposalID, StatusRejected)
 			keeper.DeleteDeposits(ctx, activeProposal.GetProposalID())
 			activeProposal.SetStatus(StatusRejected)
 			action = tags.ActionProposalRejected
@@ -83,10 +82,12 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 						keeper.GetTallyingProcedure(ctx, activeProposal.GetProposalLevel()).Penalty)
 				}
 			}
+			keeper.metrics.DeleteVote(valAddr.String(), proposalID)
 		}
 
 		keeper.SubProposalNum(ctx, activeProposal.GetProposalLevel())
 		keeper.DeleteValidatorSet(ctx, activeProposal.GetProposalID())
+		keeper.metrics.DeleteProposalStatus(proposalID)
 	}
 	return resTags
 }
