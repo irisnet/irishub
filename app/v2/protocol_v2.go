@@ -367,9 +367,12 @@ func (p *ProtocolV2) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) a
 	// handle pending random number requests
 	randTags := rand.BeginBlocker(ctx, req, p.randKeeper)
 
+	// handle HTLC expiration queue
+	htlcTags := htlc.BeginBlocker(ctx, p.htlcKeeper)
+
 	ctx.CoinFlowTags().TagWrite()
 
-	tags = tags.AppendTags(slashTags).AppendTags(randTags)
+	tags = tags.AppendTags(slashTags).AppendTags(randTags).AppendTags(htlcTags)
 	return abci.ResponseBeginBlock{
 		Tags: tags.ToKVPairs(),
 	}
