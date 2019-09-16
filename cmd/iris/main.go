@@ -35,7 +35,7 @@ func main() {
 	cobra.EnableCommandSorting = false
 	rootCmd := &cobra.Command{
 		Use:               "iris",
-		Short:             "iris Daemon (server)",
+		Short:             "IRIS Hub Daemon (Server)",
 		PersistentPreRunE: server.PersistentPreRunEFn(ctx),
 	}
 

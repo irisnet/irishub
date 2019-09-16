@@ -28,7 +28,7 @@ func preSignCmd(cmd *cobra.Command, _ []string) {
 func GetCmdIssueToken(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "issue-token",
-		Short: "issue a new token",
+		Short: "Issue a new token",
 		Example: "iriscli asset issue-token --family=<family> --source=<source> --gateway=<gateway-moniker> --decimal=<decimal>" +
 			" --symbol=<symbol> --name=<token-name> --initial-supply=<initial-supply> --from=<key-name> --chain-id=<chain-id> --fee=0.6iris",
 		PreRun: preSignCmd,
@@ -123,7 +123,7 @@ func GetCmdIssueToken(cdc *codec.Codec) *cobra.Command {
 func GetCmdCreateGateway(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create-gateway",
-		Short: "create a gateway",
+		Short: "Create a gateway",
 		Example: "iriscli asset create-gateway --moniker=<moniker> --identity=<identity> --details=<details> " +
 			"--website=<website>",
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -192,7 +192,7 @@ func GetCmdCreateGateway(cdc *codec.Codec) *cobra.Command {
 func GetCmdEditGateway(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "edit-gateway",
-		Short: "edit a gateway",
+		Short: "Edit a gateway",
 		Example: "iriscli asset edit-gateway --moniker=<moniker> --identity=<identity> --details=<details> " +
 			"--website=<website>",
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -236,7 +236,7 @@ func GetCmdEditGateway(cdc *codec.Codec) *cobra.Command {
 func GetCmdEditAsset(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "edit-token",
-		Short:   "edit a existed token",
+		Short:   "Edit a existed token",
 		Example: "iriscli asset edit-token <token-id> --name=<name> --canonical-symbol=<canonical-symbol> --min-unit-alias=<min-alias> --max-supply=<max-supply> --mintable=<mintable> --from=<your account name> --chain-id=<chain-id> --fee=0.6iris",
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -281,7 +281,7 @@ func GetCmdEditAsset(cdc *codec.Codec) *cobra.Command {
 func GetCmdTransferGatewayOwner(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "transfer-gateway-owner",
-		Short: "transfer the owner of a gateway",
+		Short: "Transfer the owner of a gateway",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
@@ -399,7 +399,7 @@ func GetCmdMintToken(cdc *codec.Codec) *cobra.Command {
 func GetCmdTransferTokenOwner(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "transfer-token-owner",
-		Short:   "transfer the owner of a token to a new owner",
+		Short:   "Transfer the owner of a token to a new owner",
 		Example: "iriscli asset transfer-token-owner <token-id> --to=<new owner>",
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
