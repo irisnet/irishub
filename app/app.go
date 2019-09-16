@@ -9,8 +9,9 @@ import (
 	"strings"
 
 	"github.com/irisnet/irishub/app/protocol"
-	v0 "github.com/irisnet/irishub/app/v0"
-	v1 "github.com/irisnet/irishub/app/v1"
+	"github.com/irisnet/irishub/app/v0"
+	"github.com/irisnet/irishub/app/v1"
+	"github.com/irisnet/irishub/app/v2"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/store"
@@ -19,9 +20,9 @@ import (
 	abci "github.com/tendermint/tendermint/abci/types"
 	cfg "github.com/tendermint/tendermint/config"
 	cmn "github.com/tendermint/tendermint/libs/common"
-	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
 	tmtypes "github.com/tendermint/tendermint/types"
+	dbm "github.com/tendermint/tm-db"
 )
 
 const (
@@ -73,6 +74,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, config *cfg.InstrumentationConfig,
 	appPrometheusConfig.Namespace = appPrometheusNamespace
 	engine.Add(v0.NewProtocolV0(0, logger, protocolKeeper, app.checkInvariant, app.trackCoinFlow, &appPrometheusConfig))
 	engine.Add(v1.NewProtocolV1(1, logger, protocolKeeper, app.checkInvariant, app.trackCoinFlow, &appPrometheusConfig))
+	engine.Add(v2.NewProtocolV2(2, logger, protocolKeeper, app.checkInvariant, app.trackCoinFlow, &appPrometheusConfig))
 	// engine.Add(v1.NewProtocolV1(1, ...))
 	// engine.Add(v2.NewProtocolV1(2, ...))
 
@@ -87,7 +89,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, config *cfg.InstrumentationConfig,
 
 // latest version of codec
 func MakeLatestCodec() *codec.Codec {
-	var cdc = v1.MakeCodec() // replace with latest protocol version
+	var cdc = v2.MakeCodec() // replace with latest protocol version
 	return cdc
 }
 

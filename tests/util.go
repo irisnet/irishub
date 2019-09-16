@@ -8,11 +8,11 @@ import (
 	"time"
 
 	sdk "github.com/irisnet/irishub/types"
-	amino "github.com/tendermint/go-amino"
-	dbm "github.com/tendermint/tendermint/libs/db"
+	"github.com/tendermint/go-amino"
 	tmclient "github.com/tendermint/tendermint/rpc/client"
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"
 	rpcclient "github.com/tendermint/tendermint/rpc/lib/client"
+	dbm "github.com/tendermint/tm-db"
 	"strings"
 )
 

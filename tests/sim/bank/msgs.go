@@ -6,11 +6,11 @@ import (
 	"math/big"
 	"math/rand"
 
-	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/modules/auth"
-	"github.com/irisnet/irishub/modules/bank"
 	"github.com/irisnet/irishub/mock"
 	"github.com/irisnet/irishub/mock/simulation"
+	"github.com/irisnet/irishub/modules/auth"
+	"github.com/irisnet/irishub/modules/bank"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/tendermint/tendermint/crypto"
 
 	"github.com/irisnet/irishub/mock/baseapp"

@@ -10,13 +10,14 @@ import (
 	"github.com/irisnet/irishub/app/v1/service"
 	"github.com/irisnet/irishub/app/v1/slashing"
 	"github.com/irisnet/irishub/app/v1/stake"
+	"github.com/irisnet/irishub/app/v2/coinswap"
 	sdk "github.com/irisnet/irishub/types"
 )
 
 var ParamSets = make(map[string]params.ParamSet)
 
 func init() {
-	params.RegisterParamSet(ParamSets, &mint.Params{}, &slashing.Params{}, &service.Params{}, &auth.Params{}, &stake.Params{}, &distr.Params{}, &asset.Params{}, &gov.GovParams{})
+	params.RegisterParamSet(ParamSets, &mint.Params{}, &slashing.Params{}, &service.Params{}, &auth.Params{}, &stake.Params{}, &distr.Params{}, &asset.Params{}, &gov.GovParams{}, &coinswap.Params{})
 }
 
 // Deposit
@@ -53,8 +54,12 @@ func NormalizeProposalType(proposalType string) string {
 		return "Parameter"
 	case "SoftwareUpgrade", "software_upgrade":
 		return "SoftwareUpgrade"
+	case "SystemHalt", "system_halt":
+		return "SystemHalt"
 	case "CommunityTaxUsage", "community_tax_usage":
 		return "CommunityTaxUsage"
+	case "TokenAddition", "token_addition":
+		return "TokenAddition"
 	}
 	return proposalType
 }

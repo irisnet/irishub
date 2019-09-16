@@ -5,8 +5,8 @@ import (
 	"os"
 
 	"fmt"
-	bam "github.com/irisnet/irishub/mock/baseapp"
 	"github.com/irisnet/irishub/codec"
+	bam "github.com/irisnet/irishub/mock/baseapp"
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/modules/bank"
 	"github.com/irisnet/irishub/modules/params"
@@ -16,13 +16,14 @@ import (
 	"github.com/tendermint/tendermint/crypto"
 	"github.com/tendermint/tendermint/crypto/ed25519"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
-	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
+	dbm "github.com/tendermint/tm-db"
 )
 
 const (
 	chainID = ""
 )
+
 /*
 const (
 	// Bech32PrefixAccAddr defines the Bech32 prefix of an account's address
@@ -48,15 +49,15 @@ var (
 // capabilities aren't needed for testing.
 type App struct {
 	*bam.BaseApp
-	Cdc        *codec.Codec // Cdc is public since the codec is passed into the module anyways
-	KeyMain    *sdk.KVStoreKey
-	KeyAccount *sdk.KVStoreKey
-	KeyFee     *sdk.KVStoreKey
-	KeyStake   *sdk.KVStoreKey
-	TkeyStake  *sdk.TransientStoreKey
-	KeyParams  *sdk.KVStoreKey
-	TkeyParams *sdk.TransientStoreKey
-	KeyUpgrade *sdk.KVStoreKey
+	Cdc         *codec.Codec // Cdc is public since the codec is passed into the module anyways
+	KeyMain     *sdk.KVStoreKey
+	KeyAccount  *sdk.KVStoreKey
+	KeyFee      *sdk.KVStoreKey
+	KeyStake    *sdk.KVStoreKey
+	TkeyStake   *sdk.TransientStoreKey
+	KeyParams   *sdk.KVStoreKey
+	TkeyParams  *sdk.TransientStoreKey
+	KeyUpgrade  *sdk.KVStoreKey
 	KeyGuardian *sdk.KVStoreKey
 
 	// TODO: Abstract this out from not needing to be auth specifically

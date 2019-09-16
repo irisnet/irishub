@@ -96,7 +96,7 @@ $ iriscli tendermint txs --tags '<tag1>:<value1>&<tag2>:<value2>'
 	return cmd
 }
 
-func SearchTxs(cliCtx context.CLIContext, cdc *codec.Codec, tags []string, page, size int) ([]Info, error) {
+func SearchTxs(cliCtx context.CLIContext, cdc *codec.Codec, tags []string, page, size int) (*SearchTxsResult, error) {
 	if len(tags) == 0 {
 		return nil, errors.New("must declare at least one tag to search")
 	}
@@ -131,12 +131,14 @@ func SearchTxs(cliCtx context.CLIContext, cdc *codec.Codec, tags []string, page,
 		return nil, err
 	}
 
-	info, err := FormatTxResults(cdc, res.Txs, resBlocks)
+	txs, err := FormatTxResults(cdc, res.Txs, resBlocks)
 	if err != nil {
 		return nil, err
 	}
 
-	return info, nil
+	result := NewSearchTxsResult(res.TotalCount, len(txs), page, size, txs)
+
+	return &result, nil
 }
 
 // parse the indexed txs into an array of Info
@@ -156,7 +158,7 @@ func FormatTxResults(cdc *codec.Codec, res []*ctypes.ResultTx, resBlocks map[int
 func SearchTxRequestHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var tags []string
-		var txs []Info
+		var txs *SearchTxsResult
 		err := r.ParseForm()
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, sdk.AppendMsgToErr("could not parse query parameters", err.Error()))

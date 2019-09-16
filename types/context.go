@@ -49,7 +49,7 @@ func NewContext(ms MultiStore, header abci.Header, isCheckTx bool, logger log.Lo
 	c = c.WithGasMeter(NewInfiniteGasMeter())
 	c = c.WithMinimumFees(Coins{})
 	c = c.WithConsensusParams(nil)
-	c = c.WithCheckValidNum(0)
+	c = c.WithCheckValidNum(NewValidTxCounter())
 	c = c.WithCoinFlowTrigger("")
 	c = c.WithCoinFlowTags(NewCoinFlowRecord(false))
 	return c
@@ -134,7 +134,7 @@ func (c Context) withValue(key interface{}, value interface{}) Context {
 type contextKey int // local to the context module
 
 const (
-	contextKeyMultiStore      contextKey = iota
+	contextKeyMultiStore contextKey = iota
 	contextKeyBlockHeader
 	contextKeyBlockHeight
 	contextKeyConsensusParams
@@ -187,7 +187,7 @@ func (c Context) CoinFlowTrigger() string { return c.Value(contextKeyCoinFlowTri
 
 func (c Context) CoinFlowTags() CoinFlowTags { return c.Value(contextKeyCoinFlowTags).(CoinFlowTags) }
 
-func (c Context) CheckValidNum() uint64 { return c.Value(contextKeyCheckValidNum).(uint64) }
+func (c Context) CheckValidNum() TxCounter { return c.Value(contextKeyCheckValidNum).(TxCounter) }
 
 func (c Context) WithMultiStore(ms MultiStore) Context { return c.withValue(contextKeyMultiStore, ms) }
 
@@ -218,8 +218,8 @@ func (c Context) WithConsensusParams(params *abci.ConsensusParams) Context {
 	return c.withValue(contextKeyConsensusParams, params)
 }
 
-func (c Context) WithCheckValidNum(checkValidNum uint64) Context {
-	return c.withValue(contextKeyCheckValidNum, checkValidNum)
+func (c Context) WithCheckValidNum(txCounter TxCounter) Context {
+	return c.withValue(contextKeyCheckValidNum, txCounter)
 }
 
 func (c Context) WithChainID(chainID string) Context { return c.withValue(contextKeyChainID, chainID) }
@@ -246,9 +246,13 @@ func (c Context) WithMinimumFees(minFees Coins) Context {
 	return c.withValue(contextKeyMinimumFees, minFees)
 }
 
-func (c Context) WithCoinFlowTrigger(trigger string) Context { return c.withValue(contextKeyCoinFlowTrigger, trigger) }
+func (c Context) WithCoinFlowTrigger(trigger string) Context {
+	return c.withValue(contextKeyCoinFlowTrigger, trigger)
+}
 
-func (c Context) WithCoinFlowTags(cTag CoinFlowTags) Context { return c.withValue(contextKeyCoinFlowTags, cTag) }
+func (c Context) WithCoinFlowTags(cTag CoinFlowTags) Context {
+	return c.withValue(contextKeyCoinFlowTags, cTag)
+}
 
 // Cache the multistore and return a new cached context. The cached context is
 // written to the context when writeCache is called.

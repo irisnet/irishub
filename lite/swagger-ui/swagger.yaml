@@ -4,7 +4,7 @@ info:
   description: >-
     A REST interface for state queries, transaction generation and
     broadcast.
-  version: "0.15.2"
+  version: "0.16.0-dev"
   title: IRISLCD Swagger-UI
   termsOfService: 'https://www.irisnet.org'
   contact:
@@ -33,6 +33,10 @@ tags:
     description: Rand module APIs
   - name: Service
     description: Service module APIs
+  - name: CoinSwap
+    description: CoinSwap module APIs
+  - name: HTLC
+    description: HTLC module APIs
   - name: Params
     description: Params module APIs
   - name: Gov
@@ -1196,7 +1200,7 @@ paths:
                   example: 10iris
         description: >-
           valid value of `"proposal_type"` can be `"PlainText"`, `"Parameter"`,
-          `"SoftwareUpgrade"`, `"SystemHalt"`,`"CommunityTaxUsage"`,`TokenAddition`
+          `"SoftwareUpgrade"`, `"SystemHalt"`,`"CommunityTaxUsage"`,`"TokenAddition"`
         required: true
     get:
       summary: Query proposals
@@ -2811,6 +2815,286 @@ paths:
           description: Invalid height if provided
         '500':
           description: Internal Server Error
+  '/coinswap/liquidities/{id}':
+    get:
+      summary: Query liquidity by token id
+      tags:
+        - CoinSwap
+      parameters:
+        - in: path
+          name: id
+          description: the unique liquidity id of the token-iris pair
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoinSwapLiquidity'
+        '400':
+          description: Invalid Liquidity Id
+        '500':
+          description: Internal Server Error
+  '/coinswap/liquidities/{id}/deposit':
+    post:
+      summary: Add liquidity by exact iris amount, calculated token and liquidity amount
+      tags:
+        - CoinSwap
+      parameters:
+        - in: path
+          name: id
+          description: the unique liquidity id of the token-iris pair
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Unsigned tx was succesfully generated
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_tx:
+                  $ref: '#/components/schemas/BaseTx'
+                max_token:
+                  type: integer
+                  example: '10'
+                exact_iris_amt:
+                  type: integer
+                  example: '10000000000000000000'
+                min_liquidity:
+                  type: integer
+                  example: '10000000000000000000'
+                deadline:
+                  type: string
+                  example: '30s'
+                sender:
+                  $ref: '#/components/schemas/Address'
+  '/coinswap/liquidities/{id}/withdraw':
+    post:
+      summary: Remove liquidity by exact liquidity amount, calculated iris and token amount
+      tags:
+        - CoinSwap
+      parameters:
+        - in: path
+          name: id
+          description: the unique liquidity id of the token-iris pair
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Unsigned tx was succesfully generated
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_tx:
+                  $ref: '#/components/schemas/BaseTx'
+                min_token:
+                  type: integer
+                  example: '100'
+                min_iris_amt:
+                  type: integer
+                  example: '10000000000000000000'
+                withdraw_liquidity:
+                  type: integer
+                  example: '10000000000000000000'
+                deadline:
+                  type: string
+                  example: '30s'
+                sender:
+                  $ref: '#/components/schemas/Address'
+  '/coinswap/liquidities/buy':
+    post:
+      summary: Swap coin by exact output, calculated input
+      tags:
+        - CoinSwap
+      responses:
+        '200':
+          description: Unsigned tx was succesfully generated
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_tx:
+                  $ref: '#/components/schemas/BaseTx'
+                input:
+                  $ref: '#/components/schemas/CoinSwapInputOutput'
+                output:
+                  $ref: '#/components/schemas/CoinSwapInputOutput'
+                deadline:
+                  type: string
+                  example: '30s'
+  '/coinswap/liquidities/sell':
+    post:
+      summary: Swap coin by exact input, calculated output
+      tags:
+        - CoinSwap
+      responses:
+        '200':
+          description: Unsigned tx was succesfully generated
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_tx:
+                  $ref: '#/components/schemas/BaseTx'
+                input:
+                  $ref: '#/components/schemas/CoinSwapInputOutput'
+                output:
+                  $ref: '#/components/schemas/CoinSwapInputOutput'
+                deadline:
+                  type: string
+                  example: '30s'
+  '/htlc/htlcs':
+    post:
+      summary: create a HTLC
+      tags:
+        - HTLC
+      responses:
+        '200':
+          description: Unsigned tx was succesfully generated
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_tx:
+                  $ref: '#/components/schemas/BaseTx'
+                sender:
+                  $ref: '#/components/schemas/Address'
+                receiver:
+                  $ref: '#/components/schemas/Address'
+                receiver_on_other_chain:
+                  type: string
+                  example: '327a66212cbee3756816e617b38f9dfeaa6bc765'
+                hash_lock:
+                  type: string
+                  example: '327a66212cbee3756816e617b38f9dfe327a66212cbee3756816e617b38f9dfe'
+                in_amount:
+                  type: integer
+                  example: '10000000000000000000'
+                amount:
+                  $ref: '#/components/schemas/Coin'
+                time_lock:
+                  type: integer
+                  example: '20'
+                timestamp:
+                  type: integer
+                  example: '1568011909'
+  '/htlc/htlcs/{hash-lock}':
+    get:
+      summary: query HTLC by hash-lock
+      tags:
+        - HTLC
+      parameters:
+        - in: path
+          name: hash-lock
+          description: the hash-lock of the HTLC
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Unsigned tx was succesfully generated
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
+  '/htlc/htlcs/{hash-lock}/claim':
+    post:
+      summary: claim an opened HTLC
+      tags:
+        - HTLC
+      parameters:
+        - in: path
+          name: hash-lock
+          description: the hash-lock of the HTLC
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Unsigned tx was succesfully generated
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_tx:
+                  $ref: '#/components/schemas/BaseTx'
+                claimer:
+                  $ref: '#/components/schemas/Address'
+                secret:
+                  type: string
+                  example: '327a66212cbee3756816e617b38f9dfe327a66212cbee3756816e617b38f9dfe'
+  '/htlc/htlcs/{hash-lock}/refund':
+    post:
+      summary: refund from an expired HTLC
+      tags:
+        - HTLC
+      parameters:
+        - in: path
+          name: hash-lock
+          description: the hash-lock of the HTLC
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Unsigned tx was succesfully generated
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_tx:
+                  $ref: '#/components/schemas/BaseTx'
+                sender:
+                  $ref: '#/components/schemas/Address'
   '/params':
     get:
       summary: Get the system params with an optional module
@@ -2963,7 +3247,7 @@ components:
       properties:
         denom:
           type: string
-          example: iris
+          example: 'iris-atto'
         amount:
           type: string
           example: '50'
@@ -3477,3 +3761,23 @@ components:
           $ref: '#/components/schemas/Address'
         tx_hash:
           type: string
+    CoinSwapLiquidity:
+      type: object
+      properties:
+        iris:
+          $ref: '#/components/schemas/Coin'
+        token:
+          $ref: '#/components/schemas/Coin'
+        liquidity:
+          $ref: '#/components/schemas/Coin'
+        fee:
+          type: string
+          example: '0.003'
+    CoinSwapInputOutput:
+      type: object
+      properties:
+        address:
+          type: string
+          example: faa1ezzh0humhy3329xg4avhcjtay985nll0zswc5j
+        coin:
+          $ref: '#/components/schemas/Coin'
