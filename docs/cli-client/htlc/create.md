@@ -35,5 +35,6 @@ iriscli htlc create \
 --time-lock=50 \
 --timestamp=1580000000 \
 --fee=0.3iris \
---chain-id=testNet
+--chain-id=testNet \
+--commit
 ```

@@ -6,10 +6,9 @@ Htlc allows you to manage local htlc for atomic swap with other chains
 
 ## Usage
 
-```
+```bash
  iriscli htlc [command]
 ```
-
 
 ## Available Commands
 
