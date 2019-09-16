@@ -13,11 +13,11 @@ import (
 	"github.com/spf13/viper"
 )
 
-// GetCmdCreateHtlc implements the create htlc command
+// GetCmdCreateHtlc implements the create HTLC command
 func GetCmdCreateHtlc(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create",
-		Short: "Create a HTLC",
+		Short: "Create an HTLC",
 		Example: "iriscli htlc create --receiver=<receiver> --receiver-on-other-chain=<receiver-on-other-chain> --amount=<amount> --hash-lock=<hash-lock> " +
 			"--time-lock=<time-lock> --timestamp=<timestamp>",
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -129,7 +129,7 @@ func GetCmdClaimHtlc(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-// GetCmdRefundHtlc implements the refund htlc command
+// GetCmdRefundHtlc implements the refund HTLC command
 func GetCmdRefundHtlc(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "refund",
