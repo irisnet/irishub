@@ -14,7 +14,7 @@ iriscli asset query-gateway [flags]
 
 | Name, shorthand     | type   | Required | Default  | Description                                                         |
 | --------------------| -----  | -------- | -------- | ------------------------------------------------------------------- |
-| --moniker           | string | true     | ""       | The unique name with a size between 3 and 8, beginning with a letter followed by alphanumeric characters |
+| --moniker           | string | true     |          | The unique name with a size between 3 and 8, beginning with a letter followed by alphanumeric characters |
 
 ## Examples
 

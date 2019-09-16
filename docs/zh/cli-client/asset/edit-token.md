@@ -12,13 +12,13 @@ iriscli asset edit-token <token-id> --name=<name> --canonical-symbol=<canonical-
 
 ## 特有的标志
 
-| Name               | Type   | Required | Default | Description                                                  |
-| ------------------ | ------ | -------- | ------- | ------------------------------------------------------------ |
-| --name             | string | 否       | ""      | 资产名称，例如：IRIS Network                                 |
-| --canonical-symbol | string | 否       | ""      | Source为 external 或 gateway 的时候，可以用来指定在源链上的Symbol |
-| --min-unit-alias | string | 否       | ""      | 资产最小单位别名                                             |
-| --max-supply       | uint   | 否       | 0       | 以基准单位计的最大发行量                                     |
-| --mintable         | bool   | 否       | false   | 初始发行后是否允许增发                                       |
+| Name               | Type   | Required | Default | Description                                                 |
+| ------------------ | ------ | -------- | ------- | ----------------------------------------------------------- |
+| --name             | string |          |         | 资产名称，例如：IRIS Network                                   |
+| --canonical-symbol | string |          |         | Source为 external 或 gateway 的时候，可以用来指定在源链上的Symbol |
+| --min-unit-alias   | string |          |         | 资产最小单位别名                                               |
+| --max-supply       | uint   |          | 0       | 以基准单位计的最大发行量                                        |
+| --mintable         | bool   |          | false   | 初始发行后是否允许增发                                          |
 
 ## 示例
 

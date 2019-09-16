@@ -35,7 +35,7 @@ Example: Send a command using dry-run mode
 iriscli gov submit-proposal --title="test" --description="test" --type="Parameter" --deposit=600iris --param='mint/Inflation=0.050' --from=<user> --chain-id=<chain-id> --fee=0.3iris --dry-run
 ```
 
-Print：
+Print: 
 
 ```
 estimated gas = 18604
@@ -47,7 +47,7 @@ async：Without any validation of the transaction, return the hash of the transa
 
 sync：Verify the legality of the transaction (transaction format and signature), return the result and transaction hash. Transaction waiting to be packaged out in the blockchain
 
-commit：Waiting for the transaction to be packaged in the blockchain before returning the complete execution result of the transaction，the request will be blocked until transaction return or timeout.
+commit：Waiting for the transaction to be packaged in the blockchain before returning the complete execution result of the transaction, the request will be blocked until transaction return or timeout.
 
 The default transaction mode of `iriscli` is `sync`. 
 

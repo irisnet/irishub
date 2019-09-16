@@ -80,13 +80,13 @@ Trustee is a type of user that  they are a special type of user who will receive
 ##  Profit and Loss Analysis for IRISnet Valdiators
 
 ###  IRISnet Validators Profit
-Validator and its delegators could share the following rewards by portion：
+Validator and its delegators could share the following rewards by portion: 
 * **Block Proposer Reward**
   In IRIShub, the probability for validators is proportional to its bonded tokens. If one's proposed block is finalized, it gets extra rewards for it.
   
 * **Block Provision**
   Block provisions exist to incentivize IRIS holders to stake. As more IRIS tokens are staked, more secure the network become. Read more about [Staking](../features/stake.md) here. 
-  Block provision will be [distributed every block](../features/mint.md)。 [Inflation rate](../features/mint.md) in IRISnet for the first year will be 4%.  **This ration could be adjusted by `parameter-change` proposals**。
+  Block provision will be [distributed every block](../features/mint.md). [Inflation rate](../features/mint.md) in IRISnet for the first year will be 4%.  **This ration could be adjusted by `parameter-change` proposals**.
   In this way, loose IRIS will devalue year by year. 
 
 * **Fee** 
@@ -147,7 +147,7 @@ Learn more: [How to use Testnet](../get-started/testnet.md)
 
 **IRISnet Betanet**
 
-Betanet is the first part of launching IRISnet mainnet. Betanet started at mid-Feb. More news will be available in [IRISnet Official Website](https://www.irisnet.org/mainnet?lang=CN)。 
+Betanet is the first part of launching IRISnet mainnet. Betanet started at mid-Feb. More news will be available in [IRISnet Official Website](https://www.irisnet.org/mainnet?lang=CN).
 
 Learn more: [How to_join_Mainnet](../get-started/mainnet.md)
 

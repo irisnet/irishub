@@ -12,12 +12,12 @@ iris tendermint show-address <flags>
 
 ## Global Flags
 
-| Name,shorthand        | Default        | Description                                 | Required | Type   |
-| --------------------- | -------------- | ------------------------------------------- | -------- | ------ |
-| -e, --encoding string | hex            | String   Binary encoding (hex\b64\btc ) | False    | String |
-| --home string         | /root/.iriscli | Directory for config and data               | False    | String |
-| -o, --output string   | text           | Output format (text\json)                 | False    | String |
-| --trace               |                | Print out full stack trace on errors        | False    |        |
+| Name, shorthand       | Default        | Description                             | Required | Type   |
+| --------------------- | -------------- | --------------------------------------- | -------- | ------ |
+| -e, --encoding string | hex            | String binary encoding (hex\b64\btc )   |          | string |
+| --home string         | /root/.iriscli | Directory for config and data           |          | string |
+| -o, --output string   | text           | Output format (text\json)               |          | string |
+| --trace               |                | Print out full stack trace on errors    |          |        |
 
 ## Examples
 

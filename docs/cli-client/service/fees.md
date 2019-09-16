@@ -12,9 +12,9 @@ iriscli service fees <service_provider_address>
 
 ## Flags
 
-| Name, shorthand       | Default                 | Description                                                                                                                                           | Required |
-| --------------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| -h, --help            |                         | help for fees                                                                                                                                         |          |
+| Name, shorthand       | Default | Description   | Required |
+| --------------------- | ------- | ------------- | -------- |
+| -h, --help            |         | Help for fees |          |
 
 ## Examples
 

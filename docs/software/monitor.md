@@ -80,7 +80,7 @@ Then edit `prometheus.yml` and add `jobs` :
               instance: fuxi
 ```
 
-> Note：value of targets is ip:port which used by IRIS monitor 
+> Note: value of targets is ip:port which used by IRIS monitor 
 
 ### Start Prometheus
 

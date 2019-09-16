@@ -12,11 +12,11 @@ iriscli keys delete <name> <flags>
 
 ## Flags
 
-| Name, shorthand | Default   | Description                                                  | Required |
-| --------------- | --------- | ------------------------------------------------------------ | -------- |
-| --help, -h      |           | help for delete                                              |          |
-| --force, -f     |   false   | Remove the key unconditionally without asking for the passphrase | false |
-| --yes, -y       |   false   | Skip confirmation prompt when deleting offline or ledger key references | false | 
+| Name, shorthand | Default   | Description                                                             | Required |
+| --------------- | --------- | ----------------------------------------------------------------------- | -------- |
+| --help, -h      |           | Help for delete                                                         |          |
+| --force, -f     | false     | Remove the key unconditionally without asking for the passphrase        |          |
+| --yes, -y       | false     | Skip confirmation prompt when deleting offline or ledger key references |          | 
 
 ## Examples
 

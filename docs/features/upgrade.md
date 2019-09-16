@@ -40,7 +40,7 @@ iriscli gov query-proposal --proposal-id=<proposal-id>
 
 * Scenario 1
 
-Implement following operations at the certain height（80 block height）：
+Implement following operations at the certain height（80 block height）: 
 
 ```
 # 1. Download the new version:iris1
@@ -48,7 +48,7 @@ Implement following operations at the certain height（80 block height）：
 # 2. Close the old one
 kill -f iris
 
-# 3. Install the new version，iris1 and start it（copy to bin）
+# 3. Install the new version, iris1 and start it（copy to bin）
 iris1 start --home=<path_to_your_home>
 
 # 4. Upgrade automatically when reach the switch-height

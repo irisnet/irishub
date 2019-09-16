@@ -20,8 +20,8 @@ iriscli distribution withdraw-rewards --help
 
 | Name, shorthand       | type   | Required | Default  | Description                                                         |
 | --------------------- | -----  | -------- | -------- | ------------------------------------------------------------------- |
-| --only-from-validator | string | false    | ""       | only withdraw from this validator address (in bech) |
-| --is-validator        | bool   | false    | false    | Also withdraw validator's commission |
+| --only-from-validator | string |          |          | Only withdraw from this validator address (in bech) |
+| --is-validator        | bool   |          | false    | Also withdraw validator's commission |
 
 Keep in mind, don't specify the above options both.
 

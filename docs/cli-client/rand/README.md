@@ -2,7 +2,7 @@
 
 ## Description
 
-this module allows you to post a random number request to the IRIS Hub and query the random numbers or the pending random number requests
+This module allows you to post a random number request to the IRIS Hub and query the random numbers or the pending random number requests
 
 ## Usage
 

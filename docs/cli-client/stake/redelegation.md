@@ -17,11 +17,11 @@ iriscli stake redelegation --help
 
 ## Unique Flags
 
-| Name, shorthand            | Default                    | Description                                                         | Required |
-| -------------------------- | -------------------------- | ------------------------------------------------------------------- | -------- | 
-| --address-delegator        |                            | Bech address of the delegator                              | Yes      |
-| --address-validator-dest   |                            | Bech address of the destination validator                  | Yes      |
-| --address-validator-source |                            | Bech address of the source validator                       | Yes      |
+| Name, shorthand            | Default | Description                               | Required |
+| -------------------------- | ------- | ----------------------------------------- | -------- | 
+| --address-delegator        |         | Bech address of the delegator             | true     |
+| --address-validator-dest   |         | Bech address of the destination validator | true     |
+| --address-validator-source |         | Bech address of the source validator      | true     |
 
 ## Examples
 

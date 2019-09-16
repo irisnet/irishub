@@ -13,7 +13,7 @@
 
 ### Proposal Level
 
-Specific Proposal for different levels：
+Specific Proposal for different levels: 
 - Critical：`SoftwareUpgrade`, `SystemHalt`
 - Important：`Parameter`,`TokenAddition`
 - Normal：`CommunityTaxUsage`,`PlainText`
@@ -22,16 +22,16 @@ Specific Proposal for different levels：
 
 Different levels correspond to different parameters：
 
-| GovParams | Critical | Important | Normal |Range|
-| ------ | ------ | ------ | ------|------|
-| MinDeposit | 4000 iris | 2000 iris | 1000 iris |[10iris,10000iris]|
-| DepositPeriod | 24 hours | 24 hours | 24 hours |[20s,3d]|
-| VotingPeriod | 120 hours | 120 hours | 120 hours |[20s,3d]|
-| MaxNum | 1 | 5 | 7 |Critical==1, other(1,)|
-| Participation | 0.5 | 0.5 | 0.5 |(0,1)|
-| Threshold | 0.75 | 0.67 | 0.5 |(0,1)|
-| Veto | 0.33 | 0.33 | 0.33 |(0,1)|
-| Penalty | 0 | 0 | 0 |(0,1)|
+| GovParams     | Critical  | Important | Normal      | Range                  |
+| ------------- | --------- | --------- | ----------- | ---------------------- |
+| MinDeposit    | 4000 iris | 2000 iris | 1000 iris   | [10iris,10000iris]     |
+| DepositPeriod | 24 hours  | 24 hours  | 24 hours    | [20s,3d]               |
+| VotingPeriod  | 120 hours | 120 hours | 120 hours   | [20s,3d]               |
+| MaxNum        | 1         | 5         | 7           | Critical==1, other(1,) |
+| Participation | 0.5       | 0.5       | 0.5 |(0,1)  |                        |
+| Threshold     | 0.75      | 0.67      | 0.5 |(0,1)  |                        |
+| Veto          | 0.33      | 0.33      | 0.33 |(0,1) |                        |
+| Penalty       | 0         | 0         | 0 |(0,1)    |                        |
 
 
 * `MinDeposit`  The minimum of  deposit
@@ -52,7 +52,7 @@ Only the validator and delegator can vote , and they can't vote twice for one pr
 
 ### Tallying Procedure
 
-There are three tallying results: `PASS`，`REJECT`，`REJECTVETO`。
+There are three tallying results: `PASS`, `REJECT`, `REJECTVETO`.
 
 On the premise that the `voting_power of all voters` / `total voting_power of the system` exceeds `participation`,if the ratio of `NoWithVeto` voting power to all voters' voting power over `veto`, the result is `REJECTVETO`. Then if the ratio of `Yes` voting power to all voter's voting power over `threshold`, the result is `PASS`. Otherwise, the result is `REJECT`. 
 

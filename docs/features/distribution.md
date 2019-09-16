@@ -40,7 +40,7 @@ The delegator could set a new wallet as reward paid address. To set another wall
 iriscli distribution set-withdraw-addr <address_of_wallet_B> --fee=0.3iris --from=<key_name_of_ wallet_A> --chain-id=<chain-id>
 ```  
 
-Query withdraw address：
+Query withdraw address:
 
 ```bash
 iriscli distribution withdraw-address <address_of_wallet_A> 

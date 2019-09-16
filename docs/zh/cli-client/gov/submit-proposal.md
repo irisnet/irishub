@@ -16,23 +16,23 @@ iriscli gov submit-proposal --help
 ```
 ## 标志
 
-| 名称, 速记        | 默认值                      | 描述                                                                                                                                                 | 是否必须  |
-| ---------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| --deposit        |                            | 提议的保证金（至少30%minDeposit）                                                                                                                         |          |
-| --description    |                            | 提议的描述                                                                                                           | Yes      |
-| --param          |                            | 提议参数,例如: mint/Inflation=0.050                                                                                |          |
-| --title          |                            | 提议标题                                                                                                                           | Yes      |
-| --type           |                            | 提议类型,例如:PlainText/Parameter/SoftwareUpgrade/SoftwareHalt/CommunityTaxUsage/AddToken                                                                  | Yes      |
-| --version           |            0                | 新协议的版本信息                                                                           |       |
-| --software           |           " "                 |  新协议的软件地址                                                                       |       |
-| --switch-height           |       0                     |  新版本协议升级的高度                                                     |       |
-| --threshold        | "0.8"   |  软件升级的阈值                                              |               |
-| token-canonical-symbol   |        | 外部代币名称                                                 | |
-| --token-symbol |  | 代币符号 | |
-| --token-name |  | 代币名称 | |
-| --token-decimal |  | 代币最大精度 | |
-| --token-min-unit-alias |  | 代币最小单位别名 | |
-| --token-initial-supply |  | 代币初始总量 | |
+| 名称, 速记              | 默认值 | 描述                                                                                    | 是否必须 |
+| ---------------------- | ----- | -------------------------------------------------------------------------------------- | ------- |
+| --deposit              |       | 提议的保证金（至少30%minDeposit）                                                          |        |
+| --description          |       | 提议的描述                                                                               | 是      |
+| --param                |       | 提议参数,例如: mint/Inflation=0.050                                                       |        |
+| --title                |       | 提议标题                                                                                 | 是      |
+| --type                 |       | 提议类型,例如:PlainText/Parameter/SoftwareUpgrade/SoftwareHalt/CommunityTaxUsage/AddToken | 是      |
+| --version              | 0     | 新协议的版本信息                                                                           |        |
+| --software             |       | 新协议的软件地址                                                                           |        |
+| --switch-height        | 0     | 新版本协议升级的高度                                                                        |        |
+| --threshold            | "0.8" | 软件升级的阈值                                                                             |        |
+| token-canonical-symbol |       | 外部代币名称                                                                               |        |
+| --token-symbol         |       | 代币符号                                                                                  |        |
+| --token-name           |       | 代币名称                                                                                  |        |
+| --token-decimal        |       | 代币最大精度                                                                               |        |
+| --token-min-unit-alias |       | 代币最小单位别名                                                                            |        |
+| --token-initial-supply |       | 代币初始总量                                                                               |        |
 
 ## 例子
 

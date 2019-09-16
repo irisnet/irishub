@@ -12,31 +12,31 @@ iriscli keys <command>
 
 ## 相关命令
 
-| 命令                    | 描述                                                                                          |
-| ----------------------- | -------------------------------------------------------------------------------------------- |
-| [mnemonic](mnemonic.md) | 通过读取系统熵来创建bip39助记词，也可以称为种子短语。                                               |
-| [new](new.md)           | 使用交互式命令派生新的私钥，该命令将提示你每个输入。                                                 |
-| [add](add.md)           | 创建新密钥，或从助记词导入已有密钥，或从已备份的keystore导入秘钥                                       |
-| [list](list.md)         | 列出所有密钥                                                                                   |
-| [show](show.md)         | 显示指定名称的密钥信息                                                                           |
-| [delete](delete.md)     | 删除指定的密钥                                                                                  |
-| [update](update.md)     | 更改用于保护私钥的密码                                                                           |
-| [export](export.md)     | 通过json文件形式备份密钥信息                                                                         |
+| 命令                     | 描述                                                    |
+| ----------------------- | ------------------------------------------------------- |
+| [mnemonic](mnemonic.md) | 通过读取系统熵来创建bip39助记词，也可以称为种子短语。           |
+| [new](new.md)           | 使用交互式命令派生新的私钥，该命令将提示你每个输入。            |
+| [add](add.md)           | 创建新密钥，或从助记词导入已有密钥，或从已备份的keystore导入秘钥 |
+| [list](list.md)         | 列出所有密钥                                             |
+| [show](show.md)         | 显示指定名称的密钥信息                                     |
+| [delete](delete.md)     | 删除指定的密钥                                            |
+| [update](update.md)     | 更改用于保护私钥的密码                                     |
+| [export](export.md)     | 通过json文件形式备份密钥信息                               |
 
 ## 标志
 
-| 名称, 速记       | 默认值   | 描述          | 是否必须  |
+| 名称, 速记       | 默认值   | 描述           | 是否必须  |
 | --------------- | ------- | ------------- | -------- |
-| --help, -h      |         | help for keys |          |
+| --help, -h      |         | Help for keys |          |
 
 ## 全局标志
 
-| 名称, 速记       | 默认值          | 描述                                   | 是否必须  |
-| --------------- | -------------- | -------------------------------------- | -------- |
-| --encoding, -e  | hex            | Binary encoding (hex/b64/btc) |          |
-| --home          | $HOME/.iriscli | directory for config and data |          |
-| --output, -o    | text           | Output format (text/json)     |          |
-| --trace         |                | print out full stack trace on errors   |          |
+| 名称, 速记       | 默认值          | 描述                                  | 是否必须 |
+| --------------- | -------------- | ------------------------------------ | ------- |
+| --encoding, -e  | hex            | Binary encoding (hex/b64/btc)        |         |
+| --home          | $HOME/.iriscli | Directory for config and data        |         |
+| --output, -o    | text           | Output format (text/json)            |         |
+| --trace         |                | Print out full stack trace on errors |         |
 
 ## 补充说明
 

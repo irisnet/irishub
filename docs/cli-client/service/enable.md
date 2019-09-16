@@ -12,11 +12,11 @@ iriscli service enable <flags>
 
 ## Flags
 
-| Name, shorthand       | Default                 | Description                                                                                                                                           | Required |
-| --------------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| --def-chain-id        |                         | the ID of the blockchain defined of the service                                                                                              |  Yes     |
-| --deposit string      |                         | deposit of binding, will add to the current deposit balance                                                                                  |          |
-| --service-name        |                         | service name                                                                                                                                 |  Yes     |
+| Name, shorthand       | Default | Description                                                 | Required |
+| --------------------- | ------- | ----------------------------------------------------------- | -------- |
+| --def-chain-id        |         | The ID of the blockchain defined of the service             | true     |
+| --deposit string      |         | Deposit of binding, will add to the current deposit balance |          |
+| --service-name        |         | Service name                                                | true     |
 
 ## Examples
 

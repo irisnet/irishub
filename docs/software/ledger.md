@@ -1,6 +1,6 @@
 # Ledger Nano Support
 
-It is recommended to have a basic understanding of [IRISnet key](../features/basic-concepts/key.md) before using the ledger。
+It is recommended to have a basic understanding of [IRISnet key](../features/basic-concepts/key.md) before using the ledger.
 
 ## Ledger Support for account keys
 

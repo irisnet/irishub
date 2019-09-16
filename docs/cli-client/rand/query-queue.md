@@ -12,9 +12,9 @@ iriscli rand query-queue [flags]
 
 ## Unique Flags
 
-| Name, shorthand     | type   | Required | Default  | Description                                                         |
-| --------------------| -----  | -------- | -------- | ------------------------------------------------------------------- |
-| --queue-height      | int64  | false     |  0      | the height at which the pending requests will be retrieved |
+| Name, shorthand | type  | Required | Default | Description                                                |
+| --------------- | ----- | -------- | ------- | ---------------------------------------------------------- |
+| --queue-height  | int64 |          | 0       | The height at which the pending requests will be retrieved |
 
 ## Examples
 

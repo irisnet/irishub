@@ -12,19 +12,19 @@ iris tendermint show-validator <flags>
 
 ## Flags
 
-| Name, shorthand      | Default           | Description                                                    | Required |
-| -------------------- | ----------------- | -------------------------------------------------------------- | -------- |
-| --json            |                   | output in json format                  |          |
-| --help, -h           |                   | help for show                                                  |          |
+| Name, shorthand | Default | Description           | Required |
+| --------------- | ------- | --------------------- | -------- |
+| --json          |         | Output in json format |          |
+| --help, -h      |         | Help for show         |          |
 
 ## Global Flags
 
-| Name,shorthand        | Default        | Description                                 | Required | Type   |
+| Name, shorthand       | Default        | Description                                 | Required | Type   |
 | --------------------- | -------------- | ------------------------------------------- | -------- | ------ |
-| -e, --encoding string | hex            | String   Binary encoding (hex \|b64 \|btc ) | False    | String |
-| --home string         | /root/.iriscli | Directory for config and data               | False    | String |
-| -o, --output string   | text           | Output format (text \|json)                 | False    | String |
-| --trace               |                | Print out full stack trace on errors        | False    |        |
+| -e, --encoding string | hex            | String binary encoding (hex \|b64 \|btc )   |          | string |
+| --home string         | /root/.iriscli | Directory for config and data               |          | string |
+| -o, --output string   | text           | Output format (text \|json)                 |          | string |
+| --trace               |                | Print out full stack trace on errors        |          |        |
 
 ## Examples
 

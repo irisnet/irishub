@@ -17,12 +17,12 @@ or
 
 ## Flags
 
-| Name, shorthand | Default                    |Description                                                             | Required     |
-| --------------- | -------------------------- | --------------------------------------------------------- | -------- |
-| --chain-id    |     | Chain ID of Tendermint node   | yes     |
-| --node string     |   tcp://localhost:26657                         | Node to connect to |                                     
-| --help, -h      |       | 	help for block|    |
-| --trust-node    |              true         | Trust connected full node (don't verify proofs for responses)     |          |
+| Name, shorthand | Default               | Description                                                   | Required |
+| --------------- | --------------------- | ------------------------------------------------------------- | -------- |
+| --chain-id      |                       | Chain ID of Tendermint node                                   | true     |
+| --node string   | tcp://localhost:26657 | Node to connect to                                            |          |                           
+| --help, -h      |                       | help for block                                                |          |
+| --trust-node    | true                  | Trust connected full node (don't verify proofs for responses) |          |
 
 ## Examples
 

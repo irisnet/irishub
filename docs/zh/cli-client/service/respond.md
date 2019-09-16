@@ -12,11 +12,11 @@ iriscli service respond <flags>
 
 ## 特有标志
 
-| Name, shorthand       | Default                 | Description                                                                                                                                           | Required |
-| --------------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| --request-chain-id    |                         | 发起该服务调用的区块链ID                                                                                              | 是       |
-| --request-id          |                         | 该服务调用的ID                                                                                                                                | 是       |
-| --response-data       |                         | hex编码的服务调用响应数据                                                                       |        |
+| Name, shorthand       | Default | Description           | Required |
+| --------------------- | ------- | --------------------- | -------- |
+| --request-chain-id    |         | 发起该服务调用的区块链ID  | 是       |
+| --request-id          |         | 该服务调用的ID          | 是        |
+| --response-data       |         | hex编码的服务调用响应数据 |          |
 
 ## 示例
 

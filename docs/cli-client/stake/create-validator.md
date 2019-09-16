@@ -19,17 +19,17 @@ iriscli stake create-validator --help
 
 ## Unique Flags
 
-| Name, shorthand              | type   | Required | Default  | Description                                                         |
-| ---------------------------- | -----  | -------- | -------- | ------------------------------------------------------------------- |
-| --amount                     | string | true     | ""       | Amount of coins to bond |
-| --commission-rate            | float  | true     | 0.0      | The initial commission rate percentage |
-| --details                    | string | false    | ""       | Optional details |
-| --genesis-format             | bool   | false    | false    | Export the transaction in gen-tx format; it implies --generate-only |
-| --identity                   | string | false    | ""       | Optional identity signature (ex. UPort or Keybase) |
-| --ip                         | string | false    | ""       | Node's public IP. It takes effect only when used in combination with |
-| --moniker                    | string | true     | ""       | Validator name |
-| --pubkey                     | string | true     | ""       | Go-Amino encoded hex PubKey of the validator. For Ed25519 the go-amino prepend hex is 1624de6220 |
-| --website                    | string | false    | ""       | Optional website |
+| Name, shorthand   | type   | Required | Default | Description                                                                                      |
+| ----------------- | -----  | -------- | ------- | ------------------------------------------------------------------------------------------------ |
+| --amount          | string | true     |         | Amount of coins to bond                                                                          |
+| --commission-rate | float  | true     | 0.0     | The initial commission rate percentage                                                           |
+| --details         | string |          |         | Optional details                                                                                 |
+| --genesis-format  | bool   |          | false   | Export the transaction in gen-tx format; it implies --generate-only                              |
+| --identity        | string |          |         | Optional identity signature (ex. UPort or Keybase)                                               |
+| --ip              | string |          |         | Node's public IP. It takes effect only when used in combination with                             |
+| --moniker         | string | true     |         | Validator name                                                                                   |
+| --pubkey          | string | true     |         | Go-Amino encoded hex PubKey of the validator. For Ed25519 the go-amino prepend hex is 1624de6220 |
+| --website         | string |          |         | Optional website                                                                                 |
 
 ## Examples
 

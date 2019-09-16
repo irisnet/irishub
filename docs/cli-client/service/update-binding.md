@@ -11,15 +11,15 @@ iriscli service update-binding <flags>
 ```
 
 ## Flags
-| Name, shorthand       | Default                 | Description                                                                                                                                           | Required |
-| --------------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| --avg-rsp-time        |                         | the average service response time in milliseconds                                                                                               |          |
-| --bind-type           |                         | type of binding, valid values can be Local and Global                                                                                        |          |
-| --def-chain-id        |                         | the ID of the blockchain defined of the service                                                                                              |  Yes     |
-| --deposit             |                         | deposit of binding, will add to the current deposit balance                                                                                  |          |
-| --prices              |                         | prices of binding, will contains all method                                                                                                 |          |
-| --service-name        |                         | service name                                                                                                                                 |  Yes     |
-| --usable-time         |                         | an integer represents the number of usable service invocations per 10,000                                                                       |          |
+| Name, shorthand | Default | Description                                                               | Required |
+| --------------- | ------- | ------------------------------------------------------------------------- | -------- |
+| --avg-rsp-time  |         | The average service response time in milliseconds                         |          |
+| --bind-type     |         | Type of binding, valid values can be Local and Global                     |          |
+| --def-chain-id  |         | The ID of the blockchain defined of the service                           | true     |
+| --deposit       |         | Deposit of binding, will add to the current deposit balance               |          |
+| --prices        |         | Prices of binding, will contains all method                               |          |
+| --service-name  |         | Service name                                                              | true     |
+| --usable-time   |         | An integer represents the number of usable service invocations per 10,000 |          |
 
 ## Examples
 

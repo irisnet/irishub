@@ -12,13 +12,13 @@ iriscli keys show <name> <flags>
 
 ## Flags
 
-| Name, shorthand      | Default           | Description                                                    | Required |
-| -------------------- | ----------------- | -------------------------------------------------------------- | -------- |
-| --address            |                   | output the address only (overrides --output)                   |          |
-| --bech               | acc               | The Bech32 prefix encoding for a key (acc/val/cons)   |          |
-| --help, -h           |                   | help for show                                                  |          |
-| --multisig-threshold | 1                 | K out of N required signatures                          |          |
-| --pubkey             |                   | output the public key only (overrides --output)                |          |
+| Name, shorthand      | Default           | Description                                         | Required |
+| -------------------- | ----------------- | ----------------------------------------------------| -------- |
+| --address            |                   | Output the address only (overrides --output)        |          |
+| --bech               | acc               | The Bech32 prefix encoding for a key (acc/val/cons) |          |
+| --help, -h           |                   | help for show                                       |          |
+| --multisig-threshold | 1                 | K out of N required signatures                      |          |
+| --pubkey             |                   | output the public key only (overrides --output)     |          |
 
 ## Examples
 

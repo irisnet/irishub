@@ -12,9 +12,9 @@ iriscli rand request-rand [flags]
 
 ## Unique Flags
 
-| Name, shorthand     | type   | Required | Default  | Description                                                         |
-| --------------------| -----  | -------- | -------- | ------------------------------------------------------------------- |
-| --block-interval           | uint64 | false    | 10      | The block interval after which the requested random number will be generated |
+| Name, shorthand     | type   | Required | Default | Description                                                                  |
+| --------------------| ------ | -------- | ------- | ---------------------------------------------------------------------------- |
+| --block-interval    | uint64 |          | 10      | The block interval after which the requested random number will be generated |
 
 ## Examples
 
