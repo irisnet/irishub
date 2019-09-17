@@ -112,14 +112,21 @@ IRISLCD启动以后，您可以在浏览器中访问`localhost:1317/swagger-ui/`
     6. `PUT /asset/gateways/{moniker}`: 编辑一个存在的网关
     7. `POST /asset/gateways/{moniker}/transfer`: 转让指定网关的所有权
     8. `PUT /asset/tokens/{token-id}`: 编辑一个已经存在的资产
+    
+8. Coinswap模块的APIs
 
-8. Rand模块的APIs
+    1. `POST /coinswap/liquidities/{id}/deposit`: 增加流动性
+    2. `POST /coinswap/liquidities/{id}/withdraw`: 提现流动性
+    3. `POST /coinswap/liquidities/buy`: 兑换代币(购买)
+    4. `POST /coinswap/liquidities/sell`: 兑换代币(出售)
+    5. `GET /coinswap/liquidities/{id}`: 查询流动性池
+9. Rand模块的APIs
    
     1. `POST /rand/rands`: 请求一个随机数
     2. `GET /rand/rands/{request-id}`: 查询指定请求ID对应的随机数
     3. `GET /rand/queue`: 查询请求队列，提供一个可选的高度参数
 
-9. Service模块的APIs
+10. Service模块的APIs
 
     1. `POST /service/definitions`: 添加服务定义
     2. `GET /service/definitions/{defChainId}/{serviceName}`: 查询服务定义
@@ -138,11 +145,11 @@ IRISLCD启动以后，您可以在浏览器中访问`localhost:1317/swagger-ui/`
     15. `POST /service/fees/{address}/refund`: 消费者取回（未被响应的）服务费用
     16. `POST /service/fees/{address}/withdraw`: 服务提供者取回服务收益
 
-10. Params模块的APIs
+11. Params模块的APIs
     
     1. `GET /params`: 查询系统预设的参数
 
-11. Governance模块的APIs
+12. Governance模块的APIs
 
     1. `POST /gov/proposals`: 发起提交提议交易
     2. `GET /gov/proposals`: 查询提议
@@ -154,7 +161,7 @@ IRISLCD启动以后，您可以在浏览器中访问`localhost:1317/swagger-ui/`
     8. `GET /gov/proposals/{proposalId}/deposits/{depositor}`:查询押金
     9. `GET /gov/proposals/{proposalId}/votes/{voter}`: 查询投票
 
-12. 查询版本
+13. 查询版本
 
     1. `GET /version`: 获取IRISHUB的版本
     2. `GET /node-version`: 查询全节点版本
