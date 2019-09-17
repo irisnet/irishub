@@ -4,9 +4,9 @@ import (
 	"testing"
 
 	"github.com/irisnet/irishub/codec"
-	sdk "github.com/irisnet/irishub/types"
 	keep "github.com/irisnet/irishub/modules/stake/keeper"
 	"github.com/irisnet/irishub/modules/stake/types"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/stretchr/testify/require"
 	abci "github.com/tendermint/tendermint/abci/types"
 )
@@ -43,7 +43,7 @@ func TestNewQuerier(t *testing.T) {
 	require.NotNil(t, err)
 	require.Nil(t, bz)
 
-	paginationParams := sdk.NewPaginationParams(0,1)
+	paginationParams := sdk.NewPaginationParams(0, 1)
 	bz, errRes := cdc.MarshalJSON(paginationParams)
 	require.Nil(t, errRes)
 

@@ -37,8 +37,8 @@ func NewGenesisState(params Params, feePool FeePool, vdis []ValidatorDistInfo,
 // get raw genesis raw message for testing
 func DefaultGenesisState() GenesisState {
 	return GenesisState{
-		Params:       DefaultParams(),
-		FeePool:      InitialFeePool(),
+		Params:  DefaultParams(),
+		FeePool: InitialFeePool(),
 	}
 }
 

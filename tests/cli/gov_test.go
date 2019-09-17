@@ -49,7 +49,7 @@ func TestIrisCLISubmitProposal(t *testing.T) {
 	num := getAmountFromCoinStr(fooCoin)
 
 	if !(num > 44 && num < 45) {
-		t.Error("Test Failed: (44, 45) expected, recieved:", num)
+		t.Error("Test Failed: (44, 45) expected, received:", num)
 	}
 
 	proposal1 := executeGetProposal(t, fmt.Sprintf("iriscli gov query-proposal --proposal-id=1 --output=json %v", flags))
@@ -74,7 +74,7 @@ func TestIrisCLISubmitProposal(t *testing.T) {
 	num = getAmountFromCoinStr(fooCoin)
 
 	if !(num > 39 && num < 40) {
-		t.Error("Test Failed: (39, 40) expected, recieved: ", num)
+		t.Error("Test Failed: (39, 40) expected, received: ", num)
 	}
 
 	proposal1 = executeGetProposal(t, fmt.Sprintf("iriscli gov query-proposal --proposal-id=1 --output=json %v", flags))

@@ -5,7 +5,6 @@ import (
 )
 
 var (
-
 	ActionSvcCallTimeOut = []byte("service-call-expiration")
 
 	Action = sdk.TagAction

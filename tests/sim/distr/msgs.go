@@ -5,10 +5,10 @@ import (
 	"math/rand"
 
 	"github.com/irisnet/irishub/mock/baseapp"
-	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/mock/simulation"
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/modules/distribution"
-	"github.com/irisnet/irishub/mock/simulation"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 // SimulateMsgWithdrawDelegatorRewardsAll

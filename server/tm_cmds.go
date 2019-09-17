@@ -72,7 +72,7 @@ func ShowAddressCmd(ctx *Context) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			valConsAddr  := (sdk.ConsAddress)(privValidator.Address)
+			valConsAddr := (sdk.ConsAddress)(privValidator.Address)
 
 			if viper.GetBool(client.FlagJson) {
 				return printlnJSON(valConsAddr)

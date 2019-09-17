@@ -9,26 +9,26 @@ import (
 
 type (
 	Keeper = keeper.Keeper
-	Hooks = keeper.Hooks
+	Hooks  = keeper.Hooks
 	Params = types.Params
 
 	DelegatorWithdrawInfo = types.DelegatorWithdrawInfo
-	DelegationDistInfo = types.DelegationDistInfo
-	ValidatorDistInfo = types.ValidatorDistInfo
-	TotalAccum = types.TotalAccum
-	FeePool = types.FeePool
-	Rewards = keeper.Rewards
-	CommunityTax = keeper.CommunityTax
+	DelegationDistInfo    = types.DelegationDistInfo
+	ValidatorDistInfo     = types.ValidatorDistInfo
+	TotalAccum            = types.TotalAccum
+	FeePool               = types.FeePool
+	Rewards               = keeper.Rewards
+	CommunityTax          = keeper.CommunityTax
 
 	MsgWithdrawDelegatorRewardsAll = types.MsgWithdrawDelegatorRewardsAll
-	MsgWithdrawDelegatorReward = types.MsgWithdrawDelegatorReward
+	MsgWithdrawDelegatorReward     = types.MsgWithdrawDelegatorReward
 	MsgWithdrawValidatorRewardsAll = types.MsgWithdrawValidatorRewardsAll
 
 	GenesisState = types.GenesisState
 
 	// expected keepers
-	StakeKeeper = types.StakeKeeper
-	BankKeeper = types.BankKeeper
+	StakeKeeper         = types.StakeKeeper
+	BankKeeper          = types.BankKeeper
 	FeeCollectionKeeper = types.FeeKeeper
 )
 

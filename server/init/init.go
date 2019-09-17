@@ -6,6 +6,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/irisnet/irishub/app"
+	"github.com/irisnet/irishub/client"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/server"
 	"github.com/spf13/cobra"
@@ -13,8 +15,6 @@ import (
 	cfg "github.com/tendermint/tendermint/config"
 	"github.com/tendermint/tendermint/libs/cli"
 	"github.com/tendermint/tendermint/libs/common"
-	"github.com/irisnet/irishub/client"
-	"github.com/irisnet/irishub/app"
 )
 
 const (

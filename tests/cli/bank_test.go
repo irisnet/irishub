@@ -40,7 +40,7 @@ func TestIrisCLIBankSend(t *testing.T) {
 	num := getAmountFromCoinStr(fooCoin)
 
 	if !(num > 39 && num < 40) {
-		t.Error("Test Failed: (39, 40) expected, recieved: {}", num)
+		t.Error("Test Failed: (39, 40) expected, received: {}", num)
 	}
 
 	// test autosequencing
@@ -56,7 +56,7 @@ func TestIrisCLIBankSend(t *testing.T) {
 	num = getAmountFromCoinStr(fooCoin)
 
 	if !(num > 29 && num < 30) {
-		t.Error("Test Failed: (29, 30) expected, recieved: {}", num)
+		t.Error("Test Failed: (29, 30) expected, received: {}", num)
 	}
 
 	// test memo
@@ -72,7 +72,7 @@ func TestIrisCLIBankSend(t *testing.T) {
 	num = getAmountFromCoinStr(fooCoin)
 
 	if !(num > 19 && num < 20) {
-		t.Error("Test Failed: (69, 70) expected, recieved: {}", num)
+		t.Error("Test Failed: (69, 70) expected, received: {}", num)
 	}
 }
 

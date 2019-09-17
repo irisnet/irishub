@@ -8,10 +8,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/irisnet/irishub/server"
-	"github.com/irisnet/irishub/server/mock"
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/client"
+	"github.com/irisnet/irishub/server"
+	"github.com/irisnet/irishub/server/mock"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/require"
 	abciServer "github.com/tendermint/tendermint/abci/server"
