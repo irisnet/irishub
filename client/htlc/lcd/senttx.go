@@ -16,23 +16,23 @@ func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec
 	// create an HTLC
 	r.HandleFunc(
 		"/htlc/htlcs",
-		createHtlcHandlerFn(cdc, cliCtx),
+		createHTLCHandlerFn(cdc, cliCtx),
 	).Methods("POST")
 
 	// claim an HTLC
 	r.HandleFunc(
 		"/htlc/htlcs/{hash-lock}/claim",
-		claimHtlcHandlerFn(cdc, cliCtx),
+		claimHTLCHandlerFn(cdc, cliCtx),
 	).Methods("POST")
 
 	// refund an HTLC
 	r.HandleFunc(
 		"/htlc/htlcs/{hash-lock}/refund",
-		refundHtlcHandlerFn(cdc, cliCtx),
+		refundHTLCHandlerFn(cdc, cliCtx),
 	).Methods("POST")
 }
 
-type createHtlcReq struct {
+type createHTLCReq struct {
 	BaseTx               utils.BaseTx   `json:"base_tx"`
 	Sender               sdk.AccAddress `json:"sender"`
 	Receiver             sdk.AccAddress `json:"receiver"`
@@ -43,9 +43,9 @@ type createHtlcReq struct {
 	Timestamp            uint64         `json:"timestamp"`
 }
 
-func createHtlcHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+func createHTLCHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req createHtlcReq
+		var req createHTLCReq
 		err := utils.ReadPostBody(w, r, cdc, &req)
 		if err != nil {
 			return
@@ -84,13 +84,13 @@ func createHtlcHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handl
 	}
 }
 
-type claimHtlcReq struct {
+type claimHTLCReq struct {
 	BaseTx utils.BaseTx   `json:"base_tx"`
 	Sender sdk.AccAddress `json:"sender"`
 	Secret string         `json:"secret"`
 }
 
-func claimHtlcHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+func claimHTLCHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 
@@ -101,7 +101,7 @@ func claimHtlcHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handle
 			return
 		}
 
-		var req claimHtlcReq
+		var req claimHTLCReq
 		err = utils.ReadPostBody(w, r, cdc, &req)
 		if err != nil {
 			return
@@ -132,12 +132,12 @@ func claimHtlcHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handle
 	}
 }
 
-type RefundHtlcReq struct {
+type RefundHTLCReq struct {
 	BaseTx utils.BaseTx   `json:"base_tx"`
 	Sender sdk.AccAddress `json:"sender"`
 }
 
-func refundHtlcHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+func refundHTLCHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 
@@ -148,7 +148,7 @@ func refundHtlcHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handl
 			return
 		}
 
-		var req RefundHtlcReq
+		var req RefundHTLCReq
 		err = utils.ReadPostBody(w, r, cdc, &req)
 		if err != nil {
 			return

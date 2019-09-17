@@ -17,11 +17,11 @@ func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Co
 	// Get the HTLC by the hash lock
 	r.HandleFunc(
 		"/htlc/htlcs/{hash-lock}",
-		queryHtlcHandlerFn(cliCtx, cdc),
+		queryHTLCHandlerFn(cliCtx, cdc),
 	).Methods("GET")
 }
 
-func queryHtlcHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
+func queryHTLCHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 
