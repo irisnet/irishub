@@ -12,7 +12,7 @@ func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
 	for hashLockHex, htlc := range data.PendingHTLCs {
 		hashLock, err := hex.DecodeString(hashLockHex)
 		if err != nil {
-			panic(fmt.Sprintf("failed to initialize HTLC genesis state: %s", err.Error()))
+			panic(fmt.Errorf("failed to initialize HTLC genesis state: %s", err.Error()))
 		}
 
 		k.SetHTLC(ctx, htlc, hashLock)
