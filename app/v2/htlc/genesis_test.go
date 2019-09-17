@@ -17,7 +17,7 @@ import (
 
 func setupMultiStore() (sdk.MultiStore, *sdk.KVStoreKey, *sdk.KVStoreKey) {
 	db := dbm.NewMemDB()
-	accountKey := sdk.NewKVStoreKey("accouNtkey")
+	accountKey := sdk.NewKVStoreKey("accountkey")
 	htlcKey := sdk.NewKVStoreKey("htlckey")
 
 	ms := store.NewCommitMultiStore(db)
@@ -73,11 +73,11 @@ func TestExportHTLCGenesis(t *testing.T) {
 	// export genesis
 	exportedGenesis := ExportGenesis(ctx, keeper)
 	exportedHTLCs := exportedGenesis.PendingHTLCs
-	require.Equal(t, 2, len(exportedHTLCs))
+	require.Equal(t, 1, len(exportedHTLCs))
 
 	for hashLockHex, htlc := range exportedHTLCs {
-		// assert the state must be OPEN or EXPIRED
-		require.True(t, htlc.State == OPEN || htlc.State == EXPIRED)
+		// assert the state must be OPEN
+		require.True(t, htlc.State == OPEN)
 
 		hashLock, err := hex.DecodeString(hashLockHex)
 
@@ -85,19 +85,9 @@ func TestExportHTLCGenesis(t *testing.T) {
 		htlcInStore, err := keeper.GetHTLC(ctx, hashLock)
 		require.Nil(t, err)
 
-		var newExpireHeight uint64
-
-		if htlc.State == OPEN {
-			// assert the expiration height is new
-			newExpireHeight = htlcInStore.ExpireHeight - uint64(newBlockHeight) + 1
-			require.Equal(t, newExpireHeight, htlc.ExpireHeight)
-		}
-
-		if htlc.State == EXPIRED {
-			// assert the expiration height is 0
-			newExpireHeight = 0
-			require.Equal(t, newExpireHeight, htlc.ExpireHeight)
-		}
+		// assert the expiration height is new
+		newExpireHeight := htlcInStore.ExpireHeight - uint64(newBlockHeight) + 1
+		require.Equal(t, newExpireHeight, htlc.ExpireHeight)
 
 		// assert the exported HTLC is consistant with the HTLC in store except for the expiration height
 		htlcInStore.ExpireHeight = newExpireHeight

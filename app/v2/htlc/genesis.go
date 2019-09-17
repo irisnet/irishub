@@ -2,6 +2,7 @@ package htlc
 
 import (
 	"encoding/hex"
+	"fmt"
 
 	sdk "github.com/irisnet/irishub/types"
 )
@@ -14,11 +15,8 @@ func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
 			continue
 		}
 
-		if htlc.State == OPEN {
-			k.AddHTLCToExpireQueue(ctx, htlc.ExpireHeight, hashLock)
-		}
-
 		k.SetHTLC(ctx, htlc, hashLock)
+		k.AddHTLCToExpireQueue(ctx, htlc.ExpireHeight, hashLock)
 	}
 }
 
@@ -30,11 +28,13 @@ func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 		if h.State == OPEN || h.State == EXPIRED {
 			if h.State == OPEN {
 				h.ExpireHeight = h.ExpireHeight - uint64(ctx.BlockHeight()) + 1
+				pendingHTLCs[hex.EncodeToString(hlock)] = h
 			} else {
-				h.ExpireHeight = 0
+				_, err := k.RefundHTLC(ctx, hlock)
+				if err != nil {
+					panic(fmt.Errorf("failed to export HTLC genesis state: %s", hex.EncodeToString(hlock)))
+				}
 			}
-
-			pendingHTLCs[hex.EncodeToString(hlock)] = h
 		}
 
 		return false

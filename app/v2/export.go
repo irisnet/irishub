@@ -56,6 +56,8 @@ func (p *ProtocolV2) ExportAppStateAndValidators(ctx sdk.Context, forZeroHeight 
 			})
 	}
 
+	htlcGenesis := htlc.ExportGenesis(ctx, p.htlcKeeper)
+
 	genState := NewGenesisFileState(
 		fileAccounts,
 		auth.ExportGenesis(ctx, p.feeKeeper, p.accountMapper),
@@ -70,7 +72,7 @@ func (p *ProtocolV2) ExportAppStateAndValidators(ctx sdk.Context, forZeroHeight 
 		asset.ExportGenesis(ctx, p.assetKeeper),
 		rand.ExportGenesis(ctx, p.randKeeper),
 		coinswap.ExportGenesis(ctx, p.coinswapKeeper),
-		htlc.ExportGenesis(ctx, p.htlcKeeper),
+		htlcGenesis,
 	)
 	appState, err = codec.MarshalJSONIndent(p.cdc, genState)
 	if err != nil {

@@ -207,7 +207,7 @@ func GetHashLock(secret []byte, timestamp uint64) []byte {
 	return sdk.SHA256(secret)
 }
 
-// IterateHTLCs iterates all the HTLCs
+// IterateHTLCs iterates through the HTLCs
 func (k Keeper) IterateHTLCs(ctx sdk.Context, op func(hlock []byte, h types.HTLC) (stop bool)) {
 	store := ctx.KVStore(k.storeKey)
 
@@ -227,7 +227,7 @@ func (k Keeper) IterateHTLCs(ctx sdk.Context, op func(hlock []byte, h types.HTLC
 	}
 }
 
-// IterateHTLCExpireQueueByHeight iterates the HTLC expiration queue by the specified height
+// IterateHTLCExpireQueueByHeight iterates through the HTLC expiration queue by the specified height
 func (k Keeper) IterateHTLCExpireQueueByHeight(ctx sdk.Context, height uint64) sdk.Iterator {
 	store := ctx.KVStore(k.storeKey)
 	return sdk.KVStorePrefixIterator(store, KeyHTLCExpireQueueSubspace(height))
