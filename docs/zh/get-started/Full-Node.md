@@ -26,8 +26,8 @@ genesis.json文件中定义了区块链网络的初始状态，而config.toml指
 cd <iris_home>/config/
 rm genesis.json
 rm config.toml
-wget https://raw.githubusercontent.com/irisnet/betanet/master/config/genesis.json
-wget https://raw.githubusercontent.com/irisnet/betanet/master/config/config.toml
+wget https://raw.githubusercontent.com/irisnet/mainnet/master/config/genesis.json
+wget https://raw.githubusercontent.com/irisnet/mainnet/master/config/config.toml
 ```
 ### 修改配置文件
 在config.toml文件中可以配置以下信息：
