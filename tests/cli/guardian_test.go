@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/irisnet/irishub/tests"
-	"github.com/stretchr/testify/require"
-	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/guardian"
+	"github.com/irisnet/irishub/tests"
+	sdk "github.com/irisnet/irishub/types"
+	"github.com/stretchr/testify/require"
 )
 
 func TestIrisCLIAddProfiler(t *testing.T) {

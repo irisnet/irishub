@@ -44,7 +44,7 @@ func convertToIrisBaseAccount(t *testing.T, acc auth.BaseAccount) string {
 	cliCtx := context.NewCLIContext().
 		WithCodec(cdc)
 
-	coinstr := acc.Coins.String()
+	coinstr := sdk.NewCoins(sdk.NewCoin(sdk.IrisAtto, acc.Coins.AmountOf(sdk.IrisAtto))).String()
 	coins, err := cliCtx.ConvertToMainUnit(coinstr)
 	require.NoError(t, err, "coins %v, err %v", coinstr, err)
 

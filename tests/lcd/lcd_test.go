@@ -1,41 +1,37 @@
 package lcd
 
 import (
+	"bytes"
 	"encoding/hex"
 	"fmt"
 	"net/http"
 	"regexp"
+	"strconv"
 	"testing"
 	"time"
 
-	"github.com/irisnet/irishub/client/tendermint/tx"
-
-	"github.com/spf13/viper"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-
-	cryptoKeys "github.com/irisnet/irishub/crypto/keys"
-	"github.com/tendermint/tendermint/p2p"
-	ctypes "github.com/tendermint/tendermint/rpc/core/types"
-
-	"bytes"
-	"strconv"
-
-	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/client"
-	"github.com/irisnet/irishub/client/keys"
-	"github.com/irisnet/irishub/client/tendermint/rpc"
-	"github.com/irisnet/irishub/tests"
-	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/modules/auth"
-	"github.com/irisnet/irishub/modules/slashing"
-	"github.com/irisnet/irishub/modules/stake"
 	"github.com/irisnet/irishub/client/bank"
 	"github.com/irisnet/irishub/client/context"
 	govcli "github.com/irisnet/irishub/client/gov"
+	"github.com/irisnet/irishub/client/keys"
 	stakeClient "github.com/irisnet/irishub/client/stake"
 	stakeLcd "github.com/irisnet/irishub/client/stake/lcd"
+	"github.com/irisnet/irishub/client/tendermint/rpc"
+	"github.com/irisnet/irishub/client/tendermint/tx"
+	"github.com/irisnet/irishub/codec"
+	cryptoKeys "github.com/irisnet/irishub/crypto/keys"
+	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/modules/gov"
+	"github.com/irisnet/irishub/modules/slashing"
+	"github.com/irisnet/irishub/modules/stake"
+	"github.com/irisnet/irishub/tests"
+	sdk "github.com/irisnet/irishub/types"
+	"github.com/spf13/viper"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"github.com/tendermint/tendermint/p2p"
+	ctypes "github.com/tendermint/tendermint/rpc/core/types"
 )
 
 var (
@@ -344,7 +340,7 @@ func TestValidatorsQuery(t *testing.T) {
 }
 
 func TestValidatorQuery(t *testing.T) {
-	cleanup, pks,_, port := InitializeTestLCD(t, 1, []sdk.AccAddress{})
+	cleanup, pks, _, port := InitializeTestLCD(t, 1, []sdk.AccAddress{})
 	defer cleanup()
 	require.Equal(t, 1, len(pks))
 

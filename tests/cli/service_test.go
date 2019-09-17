@@ -61,7 +61,7 @@ func TestIrisCLIService(t *testing.T) {
 	num = getAmountFromCoinStr(fooCoin)
 
 	if !(num > 49 && num < 50) {
-		t.Error("Test Failed: (49, 50) expected, recieved: {}", num)
+		t.Error("Test Failed: (49, 50) expected, received: {}", num)
 	}
 
 	serviceDef := executeGetServiceDefinition(t, fmt.Sprintf("iriscli service definition --service-name=%s --def-chain-id=%s %v", serviceName, chainID, flags))
@@ -95,7 +95,7 @@ func TestIrisCLIService(t *testing.T) {
 	num = getAmountFromCoinStr(fooCoin)
 
 	if !(num > 39 && num < 40) {
-		t.Error("Test Failed: (39, 40) expected, recieved: {}", num)
+		t.Error("Test Failed: (39, 40) expected, received: {}", num)
 	}
 
 	executeWrite(t, fmt.Sprintf("iriscli bank send --to=%s --from=%s --amount=20iris --fee=0.4iris %v", barAddr.String(), "foo", flags), sdk.DefaultKeyPass)
@@ -107,7 +107,7 @@ func TestIrisCLIService(t *testing.T) {
 	barNum := getAmountFromCoinStr(barCoin)
 
 	if !(barNum > 9 && barNum < 10) {
-		t.Error("Test Failed: (9, 10) expected, recieved: {}", barNum)
+		t.Error("Test Failed: (9, 10) expected, received: {}", barNum)
 	}
 
 	serviceBinding := executeGetServiceBinding(t, fmt.Sprintf("iriscli service binding --service-name=%s --def-chain-id=%s --bind-chain-id=%s --provider=%s %v", serviceName, chainID, chainID, fooAddr.String(), flags))
@@ -134,7 +134,7 @@ func TestIrisCLIService(t *testing.T) {
 	barNum = getAmountFromCoinStr(barCoin)
 
 	if !(barNum > 8 && barNum < 9) {
-		t.Error("Test Failed: (8, 9) expected, recieved: {}", barNum)
+		t.Error("Test Failed: (8, 9) expected, received: {}", barNum)
 	}
 	serviceBindings = executeGetServiceBindings(t, fmt.Sprintf("iriscli service bindings --service-name=%s --def-chain-id=%s %v", serviceName, chainID, flags))
 	var totalDeposit sdk.Coins
@@ -154,7 +154,7 @@ func TestIrisCLIService(t *testing.T) {
 	barCoin = convertToIrisBaseAccount(t, barAcc)
 	barNum = getAmountFromCoinStr(barCoin)
 	if !(barNum > 18 && barNum < 20) {
-		t.Error("Test Failed: (18, 20) expected, recieved: {}", barNum)
+		t.Error("Test Failed: (18, 20) expected, received: {}", barNum)
 	}
 
 	// call test
@@ -183,7 +183,7 @@ func TestIrisCLIService(t *testing.T) {
 	barCoin = convertToIrisBaseAccount(t, barAcc)
 	barNum = getAmountFromCoinStr(barCoin)
 	if !(barNum > 17 && barNum < 19) {
-		t.Error("Test Failed: (17, 19) expected, recieved: {}", barNum)
+		t.Error("Test Failed: (17, 19) expected, received: {}", barNum)
 	}
 
 	// respond test
@@ -227,7 +227,7 @@ func TestIrisCLIService(t *testing.T) {
 	barCoin = convertToIrisBaseAccount(t, barAcc)
 	barNum = getAmountFromCoinStr(barCoin)
 	if !(barNum > 17 && barNum < 19) {
-		t.Error("Test Failed: (17, 19) expected, recieved: {}", barNum)
+		t.Error("Test Failed: (17, 19) expected, received: {}", barNum)
 	}
 
 	// withdraw fees
@@ -237,7 +237,7 @@ func TestIrisCLIService(t *testing.T) {
 	fooCoin = convertToIrisBaseAccount(t, fooAcc)
 	fooNum := getAmountFromCoinStr(fooCoin)
 	if !(fooNum > 19 && fooNum < 21) {
-		t.Error("Test Failed: (19, 21) expected, recieved: {}", fooNum)
+		t.Error("Test Failed: (19, 21) expected, received: {}", fooNum)
 	}
 
 	// withdraw tax

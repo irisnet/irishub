@@ -8,9 +8,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	sdk "github.com/irisnet/irishub/types"
 	keep "github.com/irisnet/irishub/modules/stake/keeper"
 	"github.com/irisnet/irishub/modules/stake/types"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/stretchr/testify/require"
 	abci "github.com/tendermint/tendermint/abci/types"
 )
@@ -74,7 +74,7 @@ func TestInitGenesisLargeValidatorSet(t *testing.T) {
 
 	// Assigning 2 to the first 100 vals, 1 to the rest
 	pool := keeper.GetPool(ctx)
-	pool.BondedPool.BondedTokens = sdk.NewDecFromInt(sdk.NewIntWithDecimal(int64(200 + (size - 100)), 18))
+	pool.BondedPool.BondedTokens = sdk.NewDecFromInt(sdk.NewIntWithDecimal(int64(200+(size-100)), 18))
 
 	params := keeper.GetParams(ctx)
 	delegations := []Delegation{}

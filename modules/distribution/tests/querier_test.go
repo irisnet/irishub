@@ -9,10 +9,10 @@ import (
 	abci "github.com/tendermint/tendermint/abci/types"
 
 	"github.com/irisnet/irishub/codec"
-	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/modules/distribution/keeper"
 	"github.com/irisnet/irishub/modules/distribution/types"
 	"github.com/irisnet/irishub/modules/stake"
-	"github.com/irisnet/irishub/modules/distribution/keeper"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 const custom = "custom"

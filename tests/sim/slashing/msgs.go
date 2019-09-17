@@ -2,11 +2,11 @@ package slashing
 
 import (
 	"fmt"
-	"math/rand"
 	"github.com/irisnet/irishub/mock/baseapp"
-	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/mock/simulation"
 	"github.com/irisnet/irishub/modules/slashing"
+	sdk "github.com/irisnet/irishub/types"
+	"math/rand"
 )
 
 // SimulateMsgUnjail
