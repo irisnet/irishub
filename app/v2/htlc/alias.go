@@ -18,8 +18,7 @@ type (
 
 	QueryHTLCParams = types.QueryHTLCParams
 
-	Keeper     = keeper.Keeper
-	BankKeeper = types.BankKeeper
+	Keeper = keeper.Keeper
 )
 
 // exported variables and functions
