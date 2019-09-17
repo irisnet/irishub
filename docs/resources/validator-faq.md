@@ -8,7 +8,7 @@ IRISnet is designed to be the foundation for next generation distributed busines
 ## IRIShub
 
 **IRIShub** is the first blockchain in IRISnet. It's based on Tendermint Bond-Proof-of-Stake（BPoS）Consensus. One of key innovations of IRIShub is iService. 
-IRIShub started its betanet in mid-Feb, read more [here](https://medium.com/irisnet-blog/iris-betanet-is-going-to-launch-11d1bf420b9d)
+IRIShub launched its [Betanet](https://medium.com/irisnet-blog/iris-betanet-is-going-to-launch-11d1bf420b9d) in mid-Feb, and upgraded to Mainnet on the 200th day since the launch.
 
 ## IRIS Service
 
