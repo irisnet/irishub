@@ -115,20 +115,14 @@ Once IRISLCD is started, you can open `localhost:1317/swagger-ui/` in your explo
     9. `POST /asset/tokens/{token-id}/mint`: The asset owner and operator can directly mint tokens to a specified address
     10. `POST /asset/tokens/{token-id}/transfer-owner`: transfer the owner of a token to a new owner
 
-8. Rand module APIs
-
-    1. `POST /rand/rands`: Request a randon number
-    2. `GET /rand/rands/{request-id}`: Query a random number by the specified request id
-    3. `GET /rand/queue`: Query the pending requests with an optional height
-
-9. HTLC模块的APIs
+8. HTLC模块的APIs
 
     1. `POST /htlc/htlcs`: 创建一个HTLC
     2. `GET /htlc/htlcs/{hash-lock}`: 通过hash-lock查询一个HTLC
     3. `POST /htlc/htlcs/{hash-lock}/claim`: 将一个OPEN状态的HTLC中锁定的资金发放到收款人地址
     4. `POST /htlc/htlcs/{hash-lock}/refund`: 从一个过期的HTLC中取回退款
 
-10. Service module APIs
+9. Service module APIs
 
     1. `POST /service/definitions`: Add a service definition
     2. `GET /service/definitions/{defChainId}/{serviceName}`: Query service definition
@@ -146,6 +140,12 @@ Once IRISLCD is started, you can open `localhost:1317/swagger-ui/` in your explo
     14. `GET /service/fees/{address}`:  Query service fees of a address
     15. `POST /service/fees/{address}/refund`: Refund service return fee of consumer
     16. `POST /service/fees/{address}/withdraw`: Withdraw service incoming fee of provider
+
+10. Rand module APIs
+
+    1. `POST /rand/rands`: Request a randon number
+    2. `GET /rand/rands/{request-id}`: Query a random number by the specified request id
+    3. `GET /rand/queue`: Query the pending requests with an optional height
 
 11. Params module APIs
 

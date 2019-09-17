@@ -115,20 +115,14 @@ IRISLCD启动以后，您可以在浏览器中访问`localhost:1317/swagger-ui/`
     7. `POST /asset/gateways/{moniker}/transfer`: 转让指定网关的所有权
     8. `PUT /asset/tokens/{token-id}`: 编辑一个已经存在的资产
 
-8. Rand模块的APIs
-
-    1. `POST /rand/rands`: 请求一个随机数
-    2. `GET /rand/rands/{request-id}`: 查询指定请求ID对应的随机数
-    3. `GET /rand/queue`: 查询请求队列，提供一个可选的高度参数
-
-9. HTLC模块的APIs
+8. HTLC模块的APIs
 
     1. `POST /htlc/htlcs`: create an HTLC
     2. `GET /htlc/htlcs/{hash-lock}`: query HTLC by hash-lock
     3. `POST /htlc/htlcs/{hash-lock}/claim`: claim an opened HTLC
     4. `POST /htlc/htlcs/{hash-lock}/refund`: refund from an expired HTLC
 
-10. Service模块的APIs
+9. Service模块的APIs
 
     1. `POST /service/definitions`: 添加服务定义
     2. `GET /service/definitions/{defChainId}/{serviceName}`: 查询服务定义
@@ -146,6 +140,12 @@ IRISLCD启动以后，您可以在浏览器中访问`localhost:1317/swagger-ui/`
     14. `GET /service/fees/{address}`:  查询（某个地址的）服务费用
     15. `POST /service/fees/{address}/refund`: 消费者取回（未被响应的）服务费用
     16. `POST /service/fees/{address}/withdraw`: 服务提供者取回服务收益
+
+10. Rand模块的APIs
+
+    1. `POST /rand/rands`: 请求一个随机数
+    2. `GET /rand/rands/{request-id}`: 查询指定请求ID对应的随机数
+    3. `GET /rand/queue`: 查询请求队列，提供一个可选的高度参数
 
 11. Params模块的APIs
 
