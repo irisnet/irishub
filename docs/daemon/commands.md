@@ -1,8 +1,14 @@
+---
+order: 2
+---
+
 # Commands
 
 ## Description
 
 IRIS Daemon Commands allow you to init, start, reset a node, or generate a genesis file, etc.
+
+You can get familiar with these commands by creating a [Local Testnet](local-testnet.md).
 
 ## Usage
 
@@ -12,19 +18,19 @@ iris <command>
 
 ## Available Commands
 
-| Name                                        | Description                                                  |
-| ------------------------------------------- | ------------------------------------------------------------ |
-| [init](#init)                               | Initialize private validator, p2p, genesis, and application configuration files |
-| [gentx](#gentx)                             | Generate a genesis tx carrying a self delegation             |
-| [add-genesis-account](#add-genesis-account) | Add genesis account to genesis.json                          |
-| [testnet](#testnet)                         | Initialize files for a Irishub testnet                       |
-| [collect-gentxs](#collect-gentxs)           | Collect genesis txs and output a genesis.json file           |
-| [start](#start)                             | Run the full node                                            |
-| [unsafe-reset-all](#unsafe-reset-all)       | Resets the blockchain database, removes address book files, and resets priv_validator.json to the genesis state |
-| [tendermint](#tendermint)                   | Tendermint subcommands                                       |
-| [reset](#reset)                             | Reset app state to the specified height                      |
-| [export](#export)                           | Show executable binary version                               |
-| [version](#version)                         | Query the asset related fees                                 |
+| Name                                                         | Description                                                  |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| [init](local-testnet.md#iris-init)                           | Initialize private validator, p2p, genesis, and application configuration files |
+| [add-genesis-account](local-testnet.md#iris-add-genesis-account) | Add genesis account to genesis.json                          |
+| [gentx](local-testnet.md#iris-gentx)                         | Generate a genesis tx carrying a self delegation             |
+| [collect-gentxs](local-testnet.md#iris-collect-gentxs)       | Collect genesis txs and output a genesis.json file           |
+| [start](local-testnet.md#iris-start)                         | Run the full node                                            |
+| [unsafe-reset-all](local-testnet.md#iris-unsafe-reset-all)   | Resets the blockchain database, removes address book files, and resets priv_validator.json to the genesis state |
+| [tendermint](local-testnet.md#iris-tendermint)               | Tendermint subcommands                                       |
+| [testnet](local-testnet.md#build-and-init)                   | Initialize files for a Irishub testnet                       |
+| [reset](local-testnet.md#iris-reset)                         | Reset app state to the specified height                      |
+| [export](export.md)                                          | Export state to JSON                                         |
+| version                                                      | Show executable binary version                               |
 
 ## Global Flags
 

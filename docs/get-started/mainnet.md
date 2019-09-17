@@ -1,11 +1,11 @@
 ---
-order: 2
+order: 3
 ---
 
 # Join The Mainnet
 
 :::tip
-We assume that you already have `iris` installed, or you need to [install iris](../software/How-to-install-irishub.md) first.
+**Requirements:** [install iris](install.md)
 :::
 
 ## Run a Full Node
@@ -15,8 +15,8 @@ We assume that you already have `iris` installed, or you need to [install iris](
 iris init --moniker=<your_custom_name> --chain-id=irishub
 
 # download mainnet public config.toml and genesis.json
-curl -o ~/.iris/config/config.toml https://raw.githubusercontent.com/irisnet/betanet/master/config/config.toml
-curl -o ~/.iris/config/genesis.json https://raw.githubusercontent.com/irisnet/betanet/master/config/genesis.json
+curl -o ~/.iris/config/config.toml https://raw.githubusercontent.com/irisnet/mainnet/master/config/config.toml
+curl -o ~/.iris/config/genesis.json https://raw.githubusercontent.com/irisnet/mainnet/master/config/genesis.json
 
 # start the node (you can also use "nohup" or "systemd" to run in the background)
 iris start
@@ -27,7 +27,7 @@ You may see some connection errors, it does not matter, the P2P network is tryin
 
 [Advanced Configurations](#TODO)
 
-[Community Peers](https://github.com/irisnet/betanet/blob/master/config/community-peers.md)
+[Community Peers](https://github.com/irisnet/mainnet/blob/master/config/community-peers.md)
 :::
 
 :::tip

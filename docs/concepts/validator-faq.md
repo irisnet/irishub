@@ -43,7 +43,7 @@ In short, there are two types of keys:
 
 #### Tendermint Key
 
-This is a unique key used to sign consensus votes.
+This is an unique key used to sign consensus votes.
 
 - It is associated with a public key `icp` (Get this value with `iris tendermint show-validator`)
 - It is generated when the node is created with `iris init`.
