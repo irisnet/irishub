@@ -9,7 +9,7 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 )
 
-// HTLC represents a HTLC
+// HTLC represents an HTLC
 type HTLC struct {
 	Sender               sdk.AccAddress `json:"sender"`                  // the initiator address
 	Receiver             sdk.AccAddress `json:"receiver"`                // the recipient address
@@ -55,6 +55,14 @@ func (h HTLC) GetHashLock() []byte {
 
 // String implements fmt.Stringer
 func (h HTLC) String() string {
+	var secret string
+
+	if h.State == COMPLETED {
+		secret = hex.EncodeToString(h.Secret)
+	} else {
+		secret = ""
+	}
+
 	return fmt.Sprintf(`HTLC:
 	Sender:               %s
 	Receiver:             %s
@@ -68,7 +76,7 @@ func (h HTLC) String() string {
 		h.Receiver,
 		hex.EncodeToString(h.ReceiverOnOtherChain),
 		h.Amount.String(),
-		hex.EncodeToString(h.Secret),
+		secret,
 		h.Timestamp,
 		h.ExpireHeight,
 		h.State,

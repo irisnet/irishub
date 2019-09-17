@@ -82,7 +82,7 @@ func GetCmdCreateHtlc(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-// GetCmdClaimHtlc implements the claim htlc command
+// GetCmdClaimHtlc implements the claim HTLC command
 func GetCmdClaimHtlc(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "claim",
