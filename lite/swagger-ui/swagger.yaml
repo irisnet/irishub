@@ -1198,6 +1198,14 @@ paths:
                 initial_deposit:
                   type: string
                   example: 10iris
+                param:
+                  $ref: '#/components/schemas/Param'
+                comm_tax:
+                  $ref: '#/components/schemas/CommTax'
+                token:
+                  $ref: '#/components/schemas/TokenAddition'
+                upgrade:
+                  $ref: '#/components/schemas/Upgrade'
         description: >-
           valid value of `"proposal_type"` can be `"PlainText"`, `"Parameter"`,
           `"SoftwareUpgrade"`, `"SystemHalt"`,`"CommunityTaxUsage"`,`"TokenAddition"`
@@ -3778,3 +3786,63 @@ components:
           example: faa1ezzh0humhy3329xg4avhcjtay985nll0zswc5j
         coin:
           $ref: '#/components/schemas/Coin'
+    Param:
+      type: object
+      properties:
+        subspace:
+          type: string
+          example: 'stake'
+        key:
+          type: string
+          example: 'UnbondingTime'
+        value:
+          type: string
+          example: '120h'
+    CommTax:
+      type: object
+      properties:
+        usage:
+          type: string
+          example: 'Burn'
+        dest_address:
+          type: string
+          example: 'faa1ezzh0humhy3329xg4avhcjtay985nll0zswc5j'
+        percent:
+          type: string
+          example: '0.8'
+    TokenAddition:
+      type: object
+      properties:
+        symbol:
+          type: string
+          example: 'eth'
+        canonical_symbol:
+          type: string
+          example: 'ETH'
+        name:
+          type: string
+          example: 'ETH'
+        decimal:
+          type: integer
+          example: 0
+        min_unit_alias:
+          type: string
+          example: 'wei'
+        initial_supply:
+          type: string
+          example: '100000000'
+    Upgrade:
+      type: object
+      properties:
+        version:
+          type: string
+          example: '2'
+        software:
+          type: string
+          example: 'https://github.com/irisnet/irishub/releases/tag/v0.15.2'
+        switch_height:
+          type: string
+          example: '100'
+        threshold:
+          type: string
+          example: '0.8'
