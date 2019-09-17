@@ -192,7 +192,7 @@ func (msg MsgSubmitCommunityTaxUsageProposal) ValidateBasic() sdk.Error {
 	if msg.Usage != UsageTypeBurn && len(msg.DestAddress) == 0 {
 		return sdk.ErrInvalidAddress(msg.DestAddress.String())
 	}
-	if msg.Percent.LTE(sdk.NewDec(0)) || msg.Percent.GT(sdk.NewDec(1)) {
+	if msg.Percent.IsNil() || msg.Percent.LTE(sdk.NewDec(0)) || msg.Percent.GT(sdk.NewDec(1)) {
 		return ErrInvalidPercent(DefaultCodespace, msg.Percent)
 	}
 	return nil
