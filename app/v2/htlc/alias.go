@@ -18,7 +18,8 @@ type (
 
 	QueryHTLCParams = types.QueryHTLCParams
 
-	Keeper = keeper.Keeper
+	Keeper     = keeper.Keeper
+	BankKeeper = types.BankKeeper
 )
 
 // exported variables and functions
@@ -34,6 +35,7 @@ var (
 	NewMsgClaimHTLC  = types.NewMsgClaimHTLC
 	NewMsgRefundHTLC = types.NewMsgRefundHTLC
 	NewHTLC          = types.NewHTLC
+	GetHashLock      = keeper.GetHashLock
 
 	OPEN    = types.OPEN
 	EXPIRED = types.EXPIRED

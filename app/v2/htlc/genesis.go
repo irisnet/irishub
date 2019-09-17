@@ -15,15 +15,10 @@ func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
 		}
 
 		if htlc.State == OPEN {
-			// claimable
-			_, err = k.CreateHTLC(ctx, htlc, hashLock)
-			if err != nil {
-				continue
-			}
-		} else {
-			// refundable
-			k.SetHTLC(ctx, htlc, hashLock)
+			k.AddHTLCToExpireQueue(ctx, htlc.ExpireHeight, hashLock)
 		}
+
+		k.SetHTLC(ctx, htlc, hashLock)
 	}
 }
 

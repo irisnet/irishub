@@ -85,7 +85,7 @@ func (k Keeper) ClaimHTLC(ctx sdk.Context, hashLock []byte, secret []byte) (sdk.
 	}
 
 	// check if the secret matches with the hash lock
-	if !bytes.Equal(getHashLock(secret, htlc.Timestamp), hashLock) {
+	if !bytes.Equal(GetHashLock(secret, htlc.Timestamp), hashLock) {
 		return nil, types.ErrInvalidSecret(k.codespace, fmt.Sprintf("invalid secret: %s", hex.EncodeToString(secret)))
 	}
 
@@ -106,14 +106,14 @@ func (k Keeper) ClaimHTLC(ctx sdk.Context, hashLock []byte, secret []byte) (sdk.
 	// add to coinflow
 	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, htlcAddr.String(), htlc.Receiver.String(), htlc.Amount.String(), sdk.CoinHTLCClaimFlow, "")
 
-	calimTags := sdk.NewTags(
+	claimTags := sdk.NewTags(
 		types.TagSender, []byte(htlc.Sender.String()),
 		types.TagReceiver, []byte(htlc.Receiver.String()),
 		types.TagHashLock, []byte(hex.EncodeToString(hashLock)),
 		types.TagSecret, []byte(hex.EncodeToString(secret)),
 	)
 
-	return calimTags, nil
+	return claimTags, nil
 }
 
 func (k Keeper) RefundHTLC(ctx sdk.Context, hashLock []byte) (sdk.Tags, sdk.Error) {
@@ -198,8 +198,8 @@ func getHTLCAddress(denom string) sdk.AccAddress {
 	return sdk.AccAddress(crypto.AddressHash([]byte(denom)))
 }
 
-// getHashLock calculates the hash lock from the given secret and timestamp
-func getHashLock(secret []byte, timestamp uint64) []byte {
+// GetHashLock calculates the hash lock from the given secret and timestamp
+func GetHashLock(secret []byte, timestamp uint64) []byte {
 	if timestamp > 0 {
 		return sdk.SHA256(append(secret, sdk.Uint64ToBigEndian(timestamp)...))
 	}
@@ -215,10 +215,11 @@ func (k Keeper) IterateHTLCs(ctx sdk.Context, op func(hlock []byte, h types.HTLC
 	defer iterator.Close()
 
 	for ; iterator.Valid(); iterator.Next() {
-		var hashLock []byte
-		k.GetCdc().MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &hashLock)
+		keyParts := bytes.Split(iterator.Key(), KeyDelimiter)
+		hashLock := keyParts[1]
 
-		htlc, _ := k.GetHTLC(ctx, hashLock)
+		var htlc types.HTLC
+		k.GetCdc().MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &htlc)
 
 		if stop := op(hashLock, htlc); stop {
 			break
