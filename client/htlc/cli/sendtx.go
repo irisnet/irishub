@@ -13,8 +13,8 @@ import (
 	"github.com/spf13/viper"
 )
 
-// GetCmdCreateHtlc implements the create HTLC command
-func GetCmdCreateHtlc(cdc *codec.Codec) *cobra.Command {
+// GetCmdCreateHTLC implements the create HTLC command
+func GetCmdCreateHTLC(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create",
 		Short: "Create an HTLC",
@@ -82,8 +82,8 @@ func GetCmdCreateHtlc(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-// GetCmdClaimHtlc implements the claim htlc command
-func GetCmdClaimHtlc(cdc *codec.Codec) *cobra.Command {
+// GetCmdClaimHTLC implements the claim HTLC command
+func GetCmdClaimHTLC(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "claim",
 		Short:   "Claim an opened HTLC",
@@ -130,8 +130,8 @@ func GetCmdClaimHtlc(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-// GetCmdRefundHtlc implements the refund HTLC command
-func GetCmdRefundHtlc(cdc *codec.Codec) *cobra.Command {
+// GetCmdRefundHTLC implements the refund HTLC command
+func GetCmdRefundHTLC(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "refund",
 		Short:   "Refund from an expired HTLC",
