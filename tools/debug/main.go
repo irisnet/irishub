@@ -24,7 +24,7 @@ func init() {
 	RootCmd.AddCommand(addrCmd)
 	RootCmd.AddCommand(rawBytesCmd)
 	RootCmd.AddCommand(randBech32Cmd)
-	RootCmd.AddCommand(hashLock)
+	RootCmd.AddCommand(hashLockCmd)
 }
 
 var RootCmd = &cobra.Command{
@@ -63,7 +63,7 @@ var randBech32Cmd = &cobra.Command{
 	RunE:  runRandBech32Cmd,
 }
 
-var hashLock = &cobra.Command{
+var hashLockCmd = &cobra.Command{
 	Use:   "hash-lock",
 	Short: "Generate a hash lock with secret and timestamp(if provided)",
 	RunE:  runHashLockCmd,
