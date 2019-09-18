@@ -19,13 +19,11 @@ import (
 )
 
 func init() {
-	hackCmd.Flags().String("pruning", "syncable", "Pruning strategy: syncable, nothing, everything")
 	RootCmd.AddCommand(txCmd)
 	RootCmd.AddCommand(pubkeyCmd)
 	RootCmd.AddCommand(addrCmd)
-	RootCmd.AddCommand(hackCmd)
 	RootCmd.AddCommand(rawBytesCmd)
-	RootCmd.AddCommand(randHex64Cmd)
+	RootCmd.AddCommand(randBech32Cmd)
 	RootCmd.AddCommand(hashLock)
 }
 
@@ -53,31 +51,25 @@ var addrCmd = &cobra.Command{
 	RunE:  runAddrCmd,
 }
 
-var hackCmd = &cobra.Command{
-	Use:   "hack",
-	Short: "Boilerplate to Hack on an existing state by scripting some Go...",
-	RunE:  runHackCmd,
-}
-
 var rawBytesCmd = &cobra.Command{
 	Use:   "raw-bytes",
 	Short: "Convert raw bytes output (eg. [10 21 13 255]) to hex",
 	RunE:  runRawBytesCmd,
 }
 
-var randHex64Cmd = &cobra.Command{
-	Use:   "rand-hex64",
-	Short: "Generate a random 64-bit hex",
-	RunE:  runRandHex64Cmd,
+var randBech32Cmd = &cobra.Command{
+	Use:   "rand-bech32",
+	Short: "Generate a random bech32",
+	RunE:  runRandBech32Cmd,
 }
 
 var hashLock = &cobra.Command{
 	Use:   "hash-lock",
-	Short: "Generate a hash lock with secret and timestamp(if privided)",
+	Short: "Generate a hash lock with secret and timestamp(if provided)",
 	RunE:  runHashLockCmd,
 }
 
-func runRandHex64Cmd(cmd *cobra.Command, args []string) error {
+func runRandBech32Cmd(cmd *cobra.Command, args []string) error {
 	if len(args) != 0 {
 		return fmt.Errorf("Expected no arg")
 	}
@@ -98,7 +90,7 @@ func runHashLockCmd(cmd *cobra.Command, args []string) error {
 	}
 
 	if len(args[0]) != 64 {
-		return fmt.Errorf("Expected 64-bit hex")
+		return fmt.Errorf("Expected bech32")
 	}
 
 	secret, err := hex.DecodeString(args[0])
