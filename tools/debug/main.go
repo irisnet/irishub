@@ -83,23 +83,19 @@ func runRandBech32Cmd(cmd *cobra.Command, args []string) error {
 }
 
 func runHashLockCmd(cmd *cobra.Command, args []string) error {
-
 	lenArgs := len(args)
 	if lenArgs != 1 && lenArgs != 2 {
 		return fmt.Errorf("Expected one or two args")
 	}
-
 	if len(args[0]) != 64 {
 		return fmt.Errorf("Expected bech32")
 	}
-
 	secret, err := hex.DecodeString(args[0])
 	if err != nil {
 		return err
 	}
 
 	hashLock := []byte{}
-
 	switch lenArgs {
 	case 1:
 		hashLock = sdk.SHA256(secret)
@@ -110,7 +106,6 @@ func runHashLockCmd(cmd *cobra.Command, args []string) error {
 		}
 		hashLock = sdk.SHA256(append(secret, sdk.Uint64ToBigEndian(timestamp)...))
 	}
-
 	hashLockHexStr := hex.EncodeToString(hashLock)
 	fmt.Printf("%s\n", hashLockHexStr)
 	return nil
