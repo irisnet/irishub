@@ -2,6 +2,7 @@ package debug
 
 import (
 	"bytes"
+	"crypto/rand"
 	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
@@ -24,6 +25,8 @@ func init() {
 	RootCmd.AddCommand(addrCmd)
 	RootCmd.AddCommand(hackCmd)
 	RootCmd.AddCommand(rawBytesCmd)
+	RootCmd.AddCommand(randHex64Cmd)
+	RootCmd.AddCommand(hashLock)
 }
 
 var RootCmd = &cobra.Command{
@@ -60,6 +63,65 @@ var rawBytesCmd = &cobra.Command{
 	Use:   "raw-bytes",
 	Short: "Convert raw bytes output (eg. [10 21 13 255]) to hex",
 	RunE:  runRawBytesCmd,
+}
+
+var randHex64Cmd = &cobra.Command{
+	Use:   "rand-hex64",
+	Short: "Generate a random 64-bit hex",
+	RunE:  runRandHex64Cmd,
+}
+
+var hashLock = &cobra.Command{
+	Use:   "hash-lock",
+	Short: "Generate a hash lock with secret and timestamp(if privided)",
+	RunE:  runHashLockCmd,
+}
+
+func runRandHex64Cmd(cmd *cobra.Command, args []string) error {
+	if len(args) != 0 {
+		return fmt.Errorf("Expected no arg")
+	}
+	b := make([]byte, 32)
+	m, err := rand.Read(b)
+	if err != nil {
+		return err
+	}
+	fmt.Printf("%s\n", hex.EncodeToString(b[:m]))
+	return nil
+}
+
+func runHashLockCmd(cmd *cobra.Command, args []string) error {
+
+	lenArgs := len(args)
+	if lenArgs != 1 && lenArgs != 2 {
+		return fmt.Errorf("Expected one or two args")
+	}
+
+	if len(args[0]) != 64 {
+		return fmt.Errorf("Expected 64-bit hex")
+	}
+
+	secret, err := hex.DecodeString(args[0])
+	if err != nil {
+		return err
+	}
+
+	hashLock := []byte{}
+
+	switch lenArgs {
+	case 1:
+		hashLock = sdk.SHA256(secret)
+	case 2:
+		timestamp, err := strconv.ParseUint(args[1], 10, 64)
+		if err != nil {
+			return err
+		}
+		hashLock = sdk.SHA256(append(secret, sdk.Uint64ToBigEndian(timestamp)...))
+	}
+
+	hashLockHexStr := hex.EncodeToString(hashLock)
+	fmt.Printf("%s\n", hashLockHexStr)
+	return nil
 }
 
 func runRawBytesCmd(cmd *cobra.Command, args []string) error {
