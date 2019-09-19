@@ -20,3 +20,12 @@ func CheckRegisterError(err error) {
 		panic(err)
 	}
 }
+
+func SafeExec(fn func()) {
+	defer func() {
+		if r := recover(); r != nil {
+			//TODO
+		}
+	}()
+	fn()
+}

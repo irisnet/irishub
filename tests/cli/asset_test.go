@@ -31,7 +31,7 @@ func TestIrisCLIToken(t *testing.T) {
 
 	family := "fungible"
 	source := "native"
-	symbol := "AbcdefgH"
+	symbol := "btc"
 	name := "Bitcoin"
 	initialSupply := 2000000000
 	decimal := 18
@@ -56,14 +56,14 @@ func TestIrisCLIToken(t *testing.T) {
 	require.True(t, executeWrite(t, spStr, sdk.DefaultKeyPass))
 	tests.WaitForNextNBlocksTM(2, port)
 
-	// TODO: check balance
-	//fooAcc = executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", fooAddr, flags))
-	//fooCoin = convertToIrisBaseAccount(t, fooAcc)
-	//amt := getAmountFromCoinStr(fooCoin)
-	//
-	//if !(amt > 41 && amt < 45) {
-	//	t.Error("Test Failed: (41, 45) expected, recieved:", amt)
-	//}
+	fooAcc = executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", fooAddr, flags))
+	fooCoin = convertToIrisBaseAccount(t, fooAcc)
+	amt := getAmountFromCoinStr(fooCoin)
+
+	// 30iris is used to issue tokens
+	if !(amt > 19 && amt < 20) {
+		t.Error("Test Failed: (19, 20) expected, received:", amt)
+	}
 
 	token := executeGetToken(t, fmt.Sprintf("iriscli asset query-token %s --output=json %v", strings.ToLower(strings.TrimSpace(symbol)), flags))
 	require.Equal(t, strings.ToLower(strings.TrimSpace(family)), token.Family.String())
@@ -126,7 +126,7 @@ func TestIrisCLIGateway(t *testing.T) {
 
 	// TODO: balance - create-fee
 	if !(num > 41 && num < 45) {
-		t.Error("Test Failed: (41, 45) expected, recieved:", num)
+		t.Error("Test Failed: (41, 45) expected, received:", num)
 	}
 
 	gateway := executeGetGateway(t, fmt.Sprintf("iriscli asset query-gateway --moniker=testgw --output=json %v", flags))

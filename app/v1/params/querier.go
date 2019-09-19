@@ -44,7 +44,7 @@ type QueryModuleParams struct {
 
 func queryAll(ctx sdk.Context, keeper Keeper) ([]byte, sdk.Error) {
 	var paramSets ParamSets
-	for key, _ := range keeper.spaces {
+	for key := range keeper.spaces {
 		ps, _ := queryModule(ctx, key, keeper)
 		paramSets = append(paramSets, ps)
 	}

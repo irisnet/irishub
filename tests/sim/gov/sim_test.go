@@ -7,14 +7,14 @@ import (
 
 	abci "github.com/tendermint/tendermint/abci/types"
 
-	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/modules/bank"
-	"github.com/irisnet/irishub/modules/stake"
-	"github.com/irisnet/irishub/modules/gov"
 	"github.com/irisnet/irishub/mock"
 	"github.com/irisnet/irishub/mock/simulation"
+	"github.com/irisnet/irishub/modules/bank"
 	distr "github.com/irisnet/irishub/modules/distribution"
+	"github.com/irisnet/irishub/modules/gov"
 	"github.com/irisnet/irishub/modules/guardian"
+	"github.com/irisnet/irishub/modules/stake"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 // TestGovWithRandomMessages

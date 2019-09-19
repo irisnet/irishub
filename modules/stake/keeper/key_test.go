@@ -5,8 +5,8 @@ import (
 	"math/big"
 	"testing"
 
-	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/stake/types"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/tendermint/tendermint/crypto/ed25519"
 )

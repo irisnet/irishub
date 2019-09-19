@@ -16,7 +16,7 @@ func queryLiquidity(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		id := vars["id"]
-		params := coinswap.QueryLiquidityParams {
+		params := coinswap.QueryLiquidityParams{
 			Id: id,
 		}
 

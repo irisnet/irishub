@@ -1,9 +1,9 @@
 package service
 
 import (
+	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
 	abci "github.com/tendermint/tendermint/abci/types"
-	"github.com/irisnet/irishub/codec"
 )
 
 const (

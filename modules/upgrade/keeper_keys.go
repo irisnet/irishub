@@ -8,11 +8,11 @@ import (
 )
 
 var (
-	proposalIDKey      = "p/%s"       	// p/<proposalId>
-	successVersionKey  = "success/%s" 	// success/<protocolVersion>
-	failedVersionKey   = "failed/%s/%s"	// failed/<protocolVersion>/<proposalId>
-	signalKey          = "s/%s/%s"		// s/<protocolVersion>/<switchVoterAddress>
-	signalPrefixKey    = "s/%s"
+	proposalIDKey     = "p/%s"         // p/<proposalId>
+	successVersionKey = "success/%s"   // success/<protocolVersion>
+	failedVersionKey  = "failed/%s/%s" // failed/<protocolVersion>/<proposalId>
+	signalKey         = "s/%s/%s"      // s/<protocolVersion>/<switchVoterAddress>
+	signalPrefixKey   = "s/%s"
 )
 
 func GetProposalIDKey(proposalID uint64) []byte {

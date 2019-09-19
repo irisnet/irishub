@@ -23,8 +23,7 @@ func NewHandler(k Keeper) sdk.Handler {
 }
 
 func handleMsgAddProfiler(ctx sdk.Context, k Keeper, msg MsgAddProfiler) sdk.Result {
-	if profiler, found := k.GetProfiler(ctx, msg.AddedBy);
-		!found || profiler.AccountType != Genesis {
+	if profiler, found := k.GetProfiler(ctx, msg.AddedBy); !found || profiler.AccountType != Genesis {
 		return ErrInvalidOperator(DefaultCodespace, msg.AddedBy).Result()
 	}
 	if _, found := k.GetProfiler(ctx, msg.Address); found {
@@ -35,13 +34,11 @@ func handleMsgAddProfiler(ctx sdk.Context, k Keeper, msg MsgAddProfiler) sdk.Res
 	if err != nil {
 		return err.Result()
 	}
-	return sdk.Result{
-	}
+	return sdk.Result{}
 }
 
 func handleMsgAddTrustee(ctx sdk.Context, k Keeper, msg MsgAddTrustee) sdk.Result {
-	if trustee, found := k.GetTrustee(ctx, msg.AddedBy);
-		!found || trustee.AccountType != Genesis {
+	if trustee, found := k.GetTrustee(ctx, msg.AddedBy); !found || trustee.AccountType != Genesis {
 		return ErrInvalidOperator(DefaultCodespace, msg.AddedBy).Result()
 	}
 	if _, found := k.GetTrustee(ctx, msg.Address); found {
@@ -52,13 +49,11 @@ func handleMsgAddTrustee(ctx sdk.Context, k Keeper, msg MsgAddTrustee) sdk.Resul
 	if err != nil {
 		return err.Result()
 	}
-	return sdk.Result{
-	}
+	return sdk.Result{}
 }
 
 func handleMsgDeleteProfiler(ctx sdk.Context, k Keeper, msg MsgDeleteProfiler) sdk.Result {
-	if profiler, found := k.GetProfiler(ctx, msg.DeletedBy);
-		!found || profiler.AccountType != Genesis {
+	if profiler, found := k.GetProfiler(ctx, msg.DeletedBy); !found || profiler.AccountType != Genesis {
 		return ErrInvalidOperator(DefaultCodespace, msg.DeletedBy).Result()
 	}
 	profiler, found := k.GetProfiler(ctx, msg.Address)
@@ -73,13 +68,11 @@ func handleMsgDeleteProfiler(ctx sdk.Context, k Keeper, msg MsgDeleteProfiler) s
 	if err != nil {
 		return err.Result()
 	}
-	return sdk.Result{
-	}
+	return sdk.Result{}
 }
 
 func handleMsgDeleteTrustee(ctx sdk.Context, k Keeper, msg MsgDeleteTrustee) sdk.Result {
-	if trustee, found := k.GetTrustee(ctx, msg.DeletedBy);
-		!found || trustee.AccountType != Genesis {
+	if trustee, found := k.GetTrustee(ctx, msg.DeletedBy); !found || trustee.AccountType != Genesis {
 		return ErrInvalidOperator(DefaultCodespace, msg.DeletedBy).Result()
 	}
 	trustee, found := k.GetTrustee(ctx, msg.Address)
@@ -94,6 +87,5 @@ func handleMsgDeleteTrustee(ctx sdk.Context, k Keeper, msg MsgDeleteTrustee) sdk
 	if err != nil {
 		return err.Result()
 	}
-	return sdk.Result{
-	}
+	return sdk.Result{}
 }

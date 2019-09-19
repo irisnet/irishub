@@ -1,8 +1,8 @@
 package params
 
 import (
-	sdk "github.com/irisnet/irishub/types"
 	"fmt"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 const (
@@ -35,7 +35,7 @@ const (
 	CodeInvalidSlashFraction        sdk.CodeType = 203
 	CodeInvalidArbitrationTimeLimit sdk.CodeType = 204
 	CodeComplaintRetrospect         sdk.CodeType = 205
-	CodeInvalidServiceTxSizeLimit          sdk.CodeType = 206
+	CodeInvalidServiceTxSizeLimit   sdk.CodeType = 206
 
 	//upgrade
 	CodeInvalidUpgradeParams sdk.CodeType = 300

@@ -3,8 +3,8 @@ package tests
 import (
 	"testing"
 
-	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/stake"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/stretchr/testify/require"
 )
 
@@ -142,9 +142,9 @@ func TestWithdrawValidatorRewardsAllMultipleValidator(t *testing.T) {
 	feesInNonProposer := sdk.NewDecFromInt(feeInputs).Mul(sdk.NewDecWithPrec(95, 2))
 	feesInProposer := sdk.NewDecFromInt(feeInputs).Mul(sdk.NewDecWithPrec(5, 2))
 	expRes := sdk.NewDecFromInt(sdk.NewIntWithDecimal(90, 18)). // orig tokens (100 - 10)
-		Add(feesInNonProposer.Quo(sdk.NewDec(10))). // validator 1 has 1/10 total power (non-proposer rewards = 95)
-		Add(feesInProposer). // (proposer rewards = 50)
-		TruncateInt()
+									Add(feesInNonProposer.Quo(sdk.NewDec(10))). // validator 1 has 1/10 total power (non-proposer rewards = 95)
+									Add(feesInProposer).                        // (proposer rewards = 50)
+									TruncateInt()
 	require.True(sdk.IntEq(t, expRes, amt))
 }
 

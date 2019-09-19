@@ -3,13 +3,13 @@ package types
 import (
 	"testing"
 
+	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/modules/auth"
+	"github.com/irisnet/irishub/modules/bank"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/stretchr/testify/require"
-	"github.com/irisnet/irishub/codec"
-	"github.com/tendermint/tendermint/libs/log"
-	"github.com/irisnet/irishub/modules/auth"
 	abci "github.com/tendermint/tendermint/abci/types"
-	"github.com/irisnet/irishub/modules/bank"
+	"github.com/tendermint/tendermint/libs/log"
 )
 
 func TestPoolEqual(t *testing.T) {

@@ -3,8 +3,8 @@ package tests
 import (
 	"testing"
 
-	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/distribution/types"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/stretchr/testify/require"
 )
 

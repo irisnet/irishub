@@ -636,7 +636,7 @@ func (app *BaseApp) initializeContext(ctx sdk.Context, mode RunTxMode) sdk.Conte
 	return ctx
 }
 
-// runTx processes a transaction. The transactions is proccessed via an
+// runTx processes a transaction. The transactions is processed via an
 // anteHandler. txBytes may be nil in some cases, eg. in tests. Also, in the
 // future we may support "internal" transactions.
 func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk.Result) {

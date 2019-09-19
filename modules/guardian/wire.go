@@ -11,7 +11,7 @@ func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(MsgDeleteProfiler{}, "irishub/guardian/MsgDeleteProfiler", nil)
 	cdc.RegisterConcrete(MsgDeleteTrustee{}, "irishub/guardian/MsgDeleteTrustee", nil)
 
-	cdc.RegisterConcrete(Guardian{},"irishub/guardian/Guardian", nil)
+	cdc.RegisterConcrete(Guardian{}, "irishub/guardian/Guardian", nil)
 }
 
 var msgCdc = codec.New()
