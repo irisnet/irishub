@@ -78,7 +78,7 @@ func (m *Metrics) DeleteVersion() {
 
 func NopMetrics() *Metrics {
 	return &Metrics{
-		Signal:  &stdprometheus.GaugeVec{},
-		Version: &stdprometheus.GaugeVec{},
+		Signal:  promutil.NilGaugeVec(),
+		Version: promutil.NilGaugeVec(),
 	}
 }

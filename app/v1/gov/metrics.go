@@ -63,9 +63,9 @@ func PrometheusMetrics(config *cfg.InstrumentationConfig) *Metrics {
 
 func NopMetrics() *Metrics {
 	return &Metrics{
-		ProposalStatus: &stdprometheus.GaugeVec{},
-		Vote:           &stdprometheus.GaugeVec{},
-		Param:          &stdprometheus.GaugeVec{},
+		ProposalStatus: promutil.NilGaugeVec(),
+		Vote:           promutil.NilGaugeVec(),
+		Param:          promutil.NilGaugeVec(),
 	}
 }
 

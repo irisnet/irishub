@@ -142,11 +142,11 @@ func (m *Metrics) SetVotingPower(valAddr string, power float64) {
 
 func NopMetrics() *Metrics {
 	return &Metrics{
-		BondedToken:  &stdprometheus.GaugeVec{},
-		LoosenToken:  &stdprometheus.GaugeVec{},
-		BurnedToken:  &stdprometheus.GaugeVec{},
-		SlashedToken: &stdprometheus.CounterVec{},
-		Jailed:       &stdprometheus.GaugeVec{},
-		Power:        &stdprometheus.GaugeVec{},
+		BondedToken:  promutil.NilGaugeVec(),
+		LoosenToken:  promutil.NilGaugeVec(),
+		BurnedToken:  promutil.NilGaugeVec(),
+		SlashedToken: promutil.NilCounterVec(),
+		Jailed:       promutil.NilGaugeVec(),
+		Power:        promutil.NilGaugeVec(),
 	}
 }
