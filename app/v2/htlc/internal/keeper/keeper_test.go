@@ -65,6 +65,9 @@ func TestKeeper_CreateHTLC(t *testing.T) {
 	require.Equal(t, timestamp, htlc.Timestamp)
 	require.Equal(t, expireHeight, htlc.ExpireHeight)
 	require.Equal(t, state, htlc.State)
+
+	store := ctx.KVStore(keeper.storeKey)
+	require.True(t, store.Has(KeyHTLCExpireQueue(htlc.ExpireHeight, hashLock)))
 }
 
 func newHashLock(secret []byte, timestamp uint64) []byte {
@@ -142,6 +145,9 @@ func TestKeeper_ClaimHTLC(t *testing.T) {
 
 			htlc, _ = keeper.GetHTLC(ctx, td.hashLock)
 			require.Equal(t, types.COMPLETED, htlc.State, "TestData: %d", i)
+
+			store := ctx.KVStore(keeper.storeKey)
+			require.True(t, !store.Has(KeyHTLCExpireQueue(htlc.ExpireHeight, td.hashLock)))
 
 			claimedHTLCAmount := ak.GetAccount(ctx, htlcAddr).GetCoins().AmountOf(amount.Denom)
 			claimedReceiverAmount := ak.GetAccount(ctx, receiverAddr).GetCoins().AmountOf(amount.Denom)

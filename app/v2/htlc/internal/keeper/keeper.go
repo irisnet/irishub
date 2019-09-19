@@ -105,7 +105,7 @@ func (k Keeper) ClaimHTLC(ctx sdk.Context, hashLock []byte, secret []byte) (sdk.
 	k.SetHTLC(ctx, htlc, hashLock)
 
 	// delete from the expiration queue
-	k.DeleteHTLCFromExpireQueue(ctx, uint64(ctx.BlockHeight()), hashLock)
+	k.DeleteHTLCFromExpireQueue(ctx, htlc.ExpireHeight, hashLock)
 
 	// add to coinflow
 	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, htlcAddr.String(), htlc.Receiver.String(), htlc.Amount.String(), sdk.CoinHTLCClaimFlow, "")
