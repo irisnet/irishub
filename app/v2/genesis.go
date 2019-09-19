@@ -10,8 +10,6 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/irisnet/irishub/app/v2/coinswap"
-
 	"github.com/irisnet/irishub/app/v1/asset"
 	"github.com/irisnet/irishub/app/v1/auth"
 	distr "github.com/irisnet/irishub/app/v1/distribution"
@@ -22,6 +20,8 @@ import (
 	"github.com/irisnet/irishub/app/v1/slashing"
 	"github.com/irisnet/irishub/app/v1/stake"
 	"github.com/irisnet/irishub/app/v1/upgrade"
+	"github.com/irisnet/irishub/app/v2/coinswap"
+	"github.com/irisnet/irishub/app/v2/htlc"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/guardian"
 	"github.com/irisnet/irishub/types"
@@ -44,13 +44,15 @@ type GenesisState struct {
 	AssetData    asset.GenesisState    `json:"asset"`
 	RandData     rand.GenesisState     `json:"rand"`
 	SwapData     coinswap.GenesisState `json:"swap"`
+	HtlcData     htlc.GenesisState     `json:"htlc"`
 	GenTxs       []json.RawMessage     `json:"gentxs"`
 }
 
 // NewGenesisState genesis state constructor
 func NewGenesisState(accounts []GenesisAccount, authData auth.GenesisState, stakeData stake.GenesisState, mintData mint.GenesisState,
 	distrData distr.GenesisState, govData gov.GenesisState, upgradeData upgrade.GenesisState, serviceData service.GenesisState,
-	guardianData guardian.GenesisState, slashingData slashing.GenesisState, assetData asset.GenesisState, randData rand.GenesisState, swapData coinswap.GenesisState) GenesisState {
+	guardianData guardian.GenesisState, slashingData slashing.GenesisState, assetData asset.GenesisState, randData rand.GenesisState,
+	swapData coinswap.GenesisState, htlcData htlc.GenesisState) GenesisState {
 
 	return GenesisState{
 		Accounts:     accounts,
@@ -66,6 +68,7 @@ func NewGenesisState(accounts []GenesisAccount, authData auth.GenesisState, stak
 		AssetData:    assetData,
 		RandData:     randData,
 		SwapData:     swapData,
+		HtlcData:     htlcData,
 	}
 }
 
@@ -349,6 +352,7 @@ func convertToGenesisState(genesisFileState GenesisFileState) GenesisState {
 		RandData:     genesisFileState.RandData,
 		GenTxs:       genesisFileState.GenTxs,
 		SwapData:     genesisFileState.SwapData,
+		HtlcData:     genesisFileState.HtlcData,
 	}
 }
 
@@ -367,6 +371,7 @@ type GenesisFileState struct {
 	AssetData    asset.GenesisState    `json:"asset"`
 	RandData     rand.GenesisState     `json:"rand"`
 	SwapData     coinswap.GenesisState `json:"swap"`
+	HtlcData     htlc.GenesisState     `json:"htlc"`
 	GenTxs       []json.RawMessage     `json:"gentxs"`
 }
 
@@ -392,7 +397,8 @@ func NewGenesisFileAccount(acc *auth.BaseAccount) GenesisFileAccount {
 
 func NewGenesisFileState(accounts []GenesisFileAccount, authData auth.GenesisState, stakeData stake.GenesisState, mintData mint.GenesisState,
 	distrData distr.GenesisState, govData gov.GenesisState, upgradeData upgrade.GenesisState, serviceData service.GenesisState,
-	guardianData guardian.GenesisState, slashingData slashing.GenesisState, assetData asset.GenesisState, randData rand.GenesisState, swapData coinswap.GenesisState) GenesisFileState {
+	guardianData guardian.GenesisState, slashingData slashing.GenesisState, assetData asset.GenesisState, randData rand.GenesisState,
+	swapData coinswap.GenesisState, htlcData htlc.GenesisState) GenesisFileState {
 
 	return GenesisFileState{
 		Accounts:     accounts,
@@ -408,6 +414,7 @@ func NewGenesisFileState(accounts []GenesisFileAccount, authData auth.GenesisSta
 		AssetData:    assetData,
 		RandData:     randData,
 		SwapData:     swapData,
+		HtlcData:     htlcData,
 	}
 }
 
@@ -427,6 +434,7 @@ func NewDefaultGenesisFileState() GenesisFileState {
 		AssetData:    asset.DefaultGenesisState(),
 		RandData:     rand.DefaultGenesisState(),
 		SwapData:     coinswap.DefaultGenesisState(),
+		HtlcData:     htlc.DefaultGenesisState(),
 		GenTxs:       nil,
 	}
 }
