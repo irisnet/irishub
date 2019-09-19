@@ -15,6 +15,7 @@ import (
 	"github.com/irisnet/irishub/app/v1/stake"
 	"github.com/irisnet/irishub/app/v1/upgrade"
 	"github.com/irisnet/irishub/app/v2/coinswap"
+	"github.com/irisnet/irishub/app/v2/htlc"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/guardian"
 	sdk "github.com/irisnet/irishub/types"
@@ -55,6 +56,8 @@ func (p *ProtocolV2) ExportAppStateAndValidators(ctx sdk.Context, forZeroHeight 
 			})
 	}
 
+	htlcGenesis := htlc.ExportGenesis(ctx, p.htlcKeeper)
+
 	genState := NewGenesisFileState(
 		fileAccounts,
 		auth.ExportGenesis(ctx, p.feeKeeper, p.accountMapper),
@@ -69,6 +72,7 @@ func (p *ProtocolV2) ExportAppStateAndValidators(ctx sdk.Context, forZeroHeight 
 		asset.ExportGenesis(ctx, p.assetKeeper),
 		rand.ExportGenesis(ctx, p.randKeeper),
 		coinswap.ExportGenesis(ctx, p.coinswapKeeper),
+		htlcGenesis,
 	)
 	appState, err = codec.MarshalJSONIndent(p.cdc, genState)
 	if err != nil {
