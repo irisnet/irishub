@@ -86,7 +86,11 @@ Backup the `config` directory located in your iris home (default ~/.iris/) caref
 
 If there are no errors, then your node is now a validator or candidate (depending on whether your delegation amount is in the top 100)
 
-More details:
+Read more:
 
-- [Concepts](#TODO)
-- [Validator FAQ](#TODO)
+- Concepts
+  - [General Concepts](../concepts/general-concepts.md)
+  - [Validator FAQ](../concepts/validator-faq.md)
+- Validator Security
+  - [Sentry Nodes (DDOS Protection)](../concepts/sentry-nodes.md)
+  - [Key Management](#TODO)

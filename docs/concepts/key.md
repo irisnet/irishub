@@ -54,7 +54,7 @@ The process of derivating accounts from the seed is deterministic. This means th
 
 The funds stored in an account are controlled by the private key. This private key is generated using a one-way function from the mnemonic. If you lose the private key, you can retrieve it using the mnemonic. However, if you lose the mnemonic, you will lose access to all the derived private keys. Likewise, if someone gains access to your mnemonic, they gain access to all the associated accounts.
 
-## IRISnet key
+## IRISnet Key
 
 The IRISnet Wallet is a HD Wallet base on [BIP44](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki). BIP44 defines a logical hierarchy for deterministic wallets based on an algorithm described in [BIP32](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki), which allows the handling of multiple coins, multiple accounts, external and internal chains per account and millions of addresses per chain, such as BTC and ETH.
 
