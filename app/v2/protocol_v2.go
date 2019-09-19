@@ -100,7 +100,7 @@ func (p *ProtocolV2) Load() {
 	p.configParams()
 }
 
-// Init init the configuration of this Protocol
+// Init initializes the configuration of this Protocol
 func (p *ProtocolV2) Init(ctx sdk.Context) {
 	// initialize coinswap params
 	p.coinswapKeeper.Init(ctx)
@@ -284,7 +284,7 @@ func (p *ProtocolV2) configKeepers() {
 
 	p.randKeeper = rand.NewKeeper(p.cdc, protocol.KeyRand, rand.DefaultCodespace)
 	p.coinswapKeeper = coinswap.NewKeeper(p.cdc, protocol.KeySwap, p.bankKeeper, p.accountMapper, p.paramsKeeper.Subspace(coinswap.DefaultParamSpace))
-	p.htlcKeeper = htlc.NewKeeper(p.cdc, protocol.KeyHtlc, p.bankKeeper, htlc.DefaultCodespace, p.paramsKeeper.Subspace(htlc.DefaultParamSpace))
+	p.htlcKeeper = htlc.NewKeeper(p.cdc, protocol.KeyHtlc, p.bankKeeper, htlc.DefaultCodespace)
 }
 
 // configure all Routers
@@ -440,6 +440,7 @@ func (p *ProtocolV2) InitChainer(ctx sdk.Context, DeliverTx sdk.DeliverTx, req a
 	asset.InitGenesis(ctx, p.assetKeeper, genesisState.AssetData)
 	rand.InitGenesis(ctx, p.randKeeper, genesisState.RandData)
 	coinswap.InitGenesis(ctx, p.coinswapKeeper, genesisState.SwapData)
+	htlc.InitGenesis(ctx, p.htlcKeeper, genesisState.HtlcData)
 
 	// load the address to pubkey map
 	err = IrisValidateGenesisState(genesisState)

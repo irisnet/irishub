@@ -34,6 +34,7 @@ var (
 	NewMsgClaimHTLC  = types.NewMsgClaimHTLC
 	NewMsgRefundHTLC = types.NewMsgRefundHTLC
 	NewHTLC          = types.NewHTLC
+	GetHashLock      = keeper.GetHashLock
 
 	OPEN    = types.OPEN
 	EXPIRED = types.EXPIRED
