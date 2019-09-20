@@ -117,7 +117,7 @@ func (k Keeper) addLiquidity(ctx sdk.Context, sender sdk.AccAddress, irisCoin, t
 		return err
 	}
 
-	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, sender.String(), poolAddr.String(), depositedTokens.String(), sdk.CoinSwapAddLiquidityFlow, "")
+	ctx.TagsManager().AddCoinFlow(ctx, sender.String(), poolAddr.String(), depositedTokens.String(), sdk.CoinSwapAddLiquidityFlow, "")
 
 	uniDenom, err := types.GetUniDenom(uniId)
 	if err != nil {
@@ -126,11 +126,11 @@ func (k Keeper) addLiquidity(ctx sdk.Context, sender sdk.AccAddress, irisCoin, t
 	// mint liquidity vouchers for reserve Pool
 	mintToken := sdk.NewCoins(sdk.NewCoin(uniDenom, mintLiquidityAmt))
 	k.bk.AddCoins(ctx, poolAddr, mintToken)
-	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, "", poolAddr.String(), mintToken.String(), sdk.MintTokenFlow, "")
+	ctx.TagsManager().AddCoinFlow(ctx, "", poolAddr.String(), mintToken.String(), sdk.MintTokenFlow, "")
 
 	// mint liquidity vouchers for sender
 	k.bk.AddCoins(ctx, sender, mintToken)
-	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, "", sender.String(), mintToken.String(), sdk.MintTokenFlow, "")
+	ctx.TagsManager().AddCoinFlow(ctx, "", sender.String(), mintToken.String(), sdk.MintTokenFlow, "")
 
 	return nil
 }
@@ -196,20 +196,20 @@ func (k Keeper) removeLiquidity(ctx sdk.Context, poolAddr, sender sdk.AccAddress
 	if err != nil {
 		return err
 	}
-	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, poolAddr.String(), "", deltaCoins.String(), sdk.BurnFlow, "")
+	ctx.TagsManager().AddCoinFlow(ctx, poolAddr.String(), "", deltaCoins.String(), sdk.BurnFlow, "")
 
 	// burn liquidity from account
 	_, _, err = k.bk.SubtractCoins(ctx, sender, deltaCoins)
 	if err != nil {
 		return err
 	}
-	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, sender.String(), "", deltaCoins.String(), sdk.BurnFlow, "")
+	ctx.TagsManager().AddCoinFlow(ctx, sender.String(), "", deltaCoins.String(), sdk.BurnFlow, "")
 
 	// transfer withdrawn liquidity from coinswaps special account to sender's account
 	coins := sdk.NewCoins(irisWithdrawCoin, tokenWithdrawCoin)
 	_, err = k.bk.SendCoins(ctx, poolAddr, sender, coins)
 	if err == nil {
-		ctx.CoinFlowTags().AppendCoinFlowTag(ctx, poolAddr.String(), sender.String(), coins.String(), sdk.CoinSwapRemoveLiquidityFlow, "")
+		ctx.TagsManager().AddCoinFlow(ctx, poolAddr.String(), sender.String(), coins.String(), sdk.CoinSwapRemoveLiquidityFlow, "")
 	}
 	return err
 }

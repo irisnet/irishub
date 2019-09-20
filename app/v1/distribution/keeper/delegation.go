@@ -138,9 +138,9 @@ func (k Keeper) withdrawDelegationReward(ctx sdk.Context,
 	coins, _ := withdraw.TruncateDecimal()
 	if !coins.IsZero() {
 		if delAddr.Equals(sdk.AccAddress(valAddr)) {
-			ctx.CoinFlowTags().AppendCoinFlowTag(ctx, valAddr.String(), recipient.String(), coins.String(), sdk.ValidatorRewardFlow, "")
+			ctx.TagsManager().AddCoinFlow(ctx, valAddr.String(), recipient.String(), coins.String(), sdk.ValidatorRewardFlow, "")
 		} else {
-			ctx.CoinFlowTags().AppendCoinFlowTag(ctx, valAddr.String(), recipient.String(), coins.String(), sdk.DelegatorRewardFlow, "")
+			ctx.TagsManager().AddCoinFlow(ctx, valAddr.String(), recipient.String(), coins.String(), sdk.DelegatorRewardFlow, "")
 		}
 	}
 	return feePool, valInfo, delInfo, withdraw

@@ -346,40 +346,31 @@ func (p *ProtocolV1) configParams() {
 // application updates every begin block
 func (p *ProtocolV1) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
 	// mint new tokens for this new block
-	tags := mint.BeginBlocker(ctx, p.mintKeeper)
+	mint.BeginBlocker(ctx, p.mintKeeper)
 
 	// distribute rewards from previous block
 	distr.BeginBlocker(ctx, req, p.distrKeeper)
 
-	slashTags := slashing.BeginBlocker(ctx, req, p.slashingKeeper)
+	slashing.BeginBlocker(ctx, req, p.slashingKeeper)
 
-	// handle pending random number requests
-	randTags := rand.BeginBlocker(ctx, req, p.randKeeper)
-
-	ctx.CoinFlowTags().TagWrite()
-
-	tags = tags.AppendTags(slashTags).AppendTags(randTags)
+	rand.BeginBlocker(ctx, req, p.randKeeper)
 	return abci.ResponseBeginBlock{
-		Tags: tags.ToKVPairs(),
+		Tags: ctx.TagsManager().Tags(),
 	}
 }
 
 // application updates every end block
 func (p *ProtocolV1) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
-	tags := gov.EndBlocker(ctx, p.govKeeper)
-	tags = tags.AppendTags(slashing.EndBlocker(ctx, req, p.slashingKeeper))
-	tags = tags.AppendTags(service.EndBlocker(ctx, p.serviceKeeper))
-	tags = tags.AppendTags(upgrade.EndBlocker(ctx, p.upgradeKeeper))
+	gov.EndBlocker(ctx, p.govKeeper)
+	slashing.EndBlocker(ctx, req, p.slashingKeeper)
+	service.EndBlocker(ctx, p.serviceKeeper)
+	upgrade.EndBlocker(ctx, p.upgradeKeeper)
 	validatorUpdates := stake.EndBlocker(ctx, p.StakeKeeper)
-	if p.trackCoinFlow {
-		ctx.CoinFlowTags().TagWrite()
-		tags = tags.AppendTags(ctx.CoinFlowTags().GetTags())
-	}
 	p.assertRuntimeInvariants(ctx)
 
 	return abci.ResponseEndBlock{
 		ValidatorUpdates: validatorUpdates,
-		Tags:             tags,
+		Tags:             ctx.TagsManager().Tags(),
 	}
 }
 

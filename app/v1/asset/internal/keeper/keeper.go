@@ -65,7 +65,7 @@ func (k Keeper) IssueToken(ctx sdk.Context, token types.FungibleToken) (sdk.Tags
 	// Set total supply
 	k.bk.SetTotalSupply(ctx, initialSupply)
 	if initialSupply.Amount.GT(sdk.ZeroInt()) {
-		ctx.CoinFlowTags().AppendCoinFlowTag(ctx, owner.String(), owner.String(), initialSupply.String(), sdk.IssueTokenFlow, "")
+		ctx.TagsManager().AddCoinFlow(ctx, owner.String(), owner.String(), initialSupply.String(), sdk.IssueTokenFlow, "")
 	}
 
 	createTags := sdk.NewTags(
@@ -550,7 +550,7 @@ func (k Keeper) MintToken(ctx sdk.Context, msg types.MsgMintToken) (sdk.Tags, sd
 	if err != nil {
 		return nil, err
 	}
-	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, msg.Owner.String(), mintAcc.String(), mintCoin.String(), sdk.MintTokenFlow, "")
+	ctx.TagsManager().AddCoinFlow(ctx, msg.Owner.String(), mintAcc.String(), mintCoin.String(), sdk.MintTokenFlow, "")
 	return tags, nil
 }
 

@@ -455,7 +455,7 @@ func (keeper Keeper) AddDeposit(ctx sdk.Context, proposalID uint64, depositorAdd
 	}
 
 	// Send coins from depositor's account to DepositedCoinsAccAddr account
-	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, depositorAddr.String(), DepositedCoinsAccAddr.String(), depositAmount.String(), sdk.GovDepositFlow, "")
+	ctx.TagsManager().AddCoinFlow(ctx, depositorAddr.String(), DepositedCoinsAccAddr.String(), depositAmount.String(), sdk.GovDepositFlow, "")
 	_, err := keeper.ck.SendCoins(ctx, depositorAddr, DepositedCoinsAccAddr, depositAmount)
 	if err != nil {
 		return err, false
@@ -518,7 +518,7 @@ func (keeper Keeper) RefundDeposits(ctx sdk.Context, proposalID uint64) {
 		RefundSumInt = RefundSumInt.Add(RefundAmountInt)
 		deposit.Amount = sdk.Coins{sdk.NewCoin(stakeTypes.StakeDenom, RefundAmountInt)}
 
-		ctx.CoinFlowTags().AppendCoinFlowTag(ctx, DepositedCoinsAccAddr.String(), deposit.Depositor.String(), deposit.Amount.String(), sdk.GovDepositRefundFlow, "")
+		ctx.TagsManager().AddCoinFlow(ctx, DepositedCoinsAccAddr.String(), deposit.Depositor.String(), deposit.Amount.String(), sdk.GovDepositRefundFlow, "")
 		_, err := keeper.ck.SendCoins(ctx, DepositedCoinsAccAddr, deposit.Depositor, deposit.Amount)
 		if err != nil {
 			panic(err)
@@ -526,7 +526,7 @@ func (keeper Keeper) RefundDeposits(ctx sdk.Context, proposalID uint64) {
 	}
 
 	burnCoin := sdk.NewCoin(stakeTypes.StakeDenom, DepositSumInt.Sub(RefundSumInt))
-	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, DepositedCoinsAccAddr.String(), "", burnCoin.String(), sdk.GovDepositBurnFlow, "")
+	ctx.TagsManager().AddCoinFlow(ctx, DepositedCoinsAccAddr.String(), "", burnCoin.String(), sdk.GovDepositBurnFlow, "")
 	_, err := keeper.ck.BurnCoinsFromAddr(ctx, DepositedCoinsAccAddr, sdk.Coins{burnCoin})
 	if err != nil {
 		panic(err)
@@ -544,7 +544,7 @@ func (keeper Keeper) DeleteDeposits(ctx sdk.Context, proposalID uint64) {
 		deposit := &Deposit{}
 		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(depositsIterator.Value(), deposit)
 
-		ctx.CoinFlowTags().AppendCoinFlowTag(ctx, DepositedCoinsAccAddr.String(), "", deposit.Amount.String(), sdk.GovDepositBurnFlow, "")
+		ctx.TagsManager().AddCoinFlow(ctx, DepositedCoinsAccAddr.String(), "", deposit.Amount.String(), sdk.GovDepositBurnFlow, "")
 		_, err := keeper.ck.BurnCoinsFromAddr(ctx, DepositedCoinsAccAddr, deposit.Amount)
 		if err != nil {
 			panic(err)

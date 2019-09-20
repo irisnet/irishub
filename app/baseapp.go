@@ -519,7 +519,6 @@ func (app *BaseApp) BeginBlock(req abci.RequestBeginBlock) (res abci.ResponseBeg
 	}
 	app.deliverState.ctx = app.deliverState.ctx.WithBlockGasMeter(gasMeter).
 		WithLogger(app.deliverState.ctx.Logger().With("height", app.deliverState.ctx.BlockHeight())).
-		WithCoinFlowTags(sdk.NewCoinFlowRecord(app.trackCoinFlow)).
 		WithTagsManager(sdk.NewTagsManager(app.trackCoinFlow))
 
 	beginBlocker := app.Engine.GetCurrentProtocol().GetBeginBlocker()
@@ -747,7 +746,7 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 	}
 
 	if mode == RunTxModeDeliver {
-		app.deliverState.ctx.CheckValidNum().Incr()
+		app.deliverState.ctx.ValidTxCounter().Incr()
 	}
 
 	defer func() {
@@ -761,7 +760,6 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 				result = sdk.ErrInternal(log).Result()
 			}
 		}
-		ctx.CoinFlowTags().TagClean()
 		result.GasWanted = gasWanted
 		result.GasUsed = ctx.GasMeter().GasConsumed()
 	}()
@@ -876,7 +874,6 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 	// only update state if all messages pass
 	if result.IsOK() {
 		msCache.Write()
-		ctx.CoinFlowTags().TagWrite()
 	}
 
 	return
