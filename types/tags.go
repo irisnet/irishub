@@ -1,11 +1,92 @@
 package types
 
 import (
+	"bytes"
+	"fmt"
 	cmn "github.com/tendermint/tendermint/libs/common"
+	"strings"
 )
+
+type TagsWrapper interface {
+	Tags() Tags
+	AddTag(k string, v []byte)
+	AddTags(tags Tags)
+	SetCoinFlowTrigger(coinFlowTrigger string)
+	AddCoinFlow(ctx Context, from, to, amount, flowType, desc string)
+}
+
+// ----------------------------------------------------------------------------
+// Tags Manager
+// ----------------------------------------------------------------------------
+
+// TagsManager implements a simple wrapper around a slice of Tag objects that
+// can be added from.
+type TagsManager struct {
+	tags              Tags
+	isCoinFlowEnabled bool
+	coinFlowTrigger   string
+}
+
+func NewTagsManager(enableCoinFlow bool) TagsWrapper {
+	return &TagsManager{EmptyTags(), enableCoinFlow, ""}
+}
+
+func (tm *TagsManager) Tags() Tags { return tm.tags }
+
+// AddTag stores a single Tag object.
+func (tm *TagsManager) AddTag(k string, v []byte) {
+	tm.tags = tm.tags.AppendTag(k, v)
+}
+
+// AddTags stores a series of Tag objects.
+func (tm *TagsManager) AddTags(tags Tags) {
+	tm.tags = tm.tags.AppendTags(tags)
+}
+
+func (tm *TagsManager) SetCoinFlowTrigger(coinFlowTrigger string) {
+	tm.coinFlowTrigger = coinFlowTrigger
+}
+
+// AddCoinFlow stores a single CoinFlow Tag object.
+func (tm *TagsManager) AddCoinFlow(ctx Context, from, to, amount, flowType, desc string) {
+	if !tm.isCoinFlowEnabled {
+		return
+	}
+
+	var tagKeyBuffer bytes.Buffer
+	tagKeyBuffer.WriteString(ctx.CoinFlowTrigger())
+
+	var tagValueBuffer bytes.Buffer
+	tagValueBuffer.WriteString(from)
+	tagValueBuffer.WriteString(separate)
+	tagValueBuffer.WriteString(to)
+	tagValueBuffer.WriteString(separate)
+	tagValueBuffer.WriteString(amount)
+	tagValueBuffer.WriteString(separate)
+	tagValueBuffer.WriteString(flowType)
+	tagValueBuffer.WriteString(separate)
+	tagValueBuffer.WriteString(desc)
+	tagValueBuffer.WriteString(separate)
+	tagValueBuffer.WriteString(ctx.BlockHeader().Time.String())
+
+	tm.tags = append(tm.tags, MakeTag(tagKeyBuffer.String(), []byte(tagValueBuffer.String())))
+}
+
+// ----------------------------------------------------------------------------
+// Tag
+// ----------------------------------------------------------------------------
 
 // Type synonym for convenience
 type Tag = cmn.KVPair
+
+// Make a tag from a key and a value
+func MakeTag(k string, v []byte) Tag {
+	return Tag{Key: []byte(k), Value: v}
+}
+
+// ----------------------------------------------------------------------------
+// Tags
+// ----------------------------------------------------------------------------
 
 // Type synonym for convenience
 type Tags cmn.KVPairs
@@ -13,21 +94,6 @@ type Tags cmn.KVPairs
 // New empty tags
 func EmptyTags() Tags {
 	return make(Tags, 0)
-}
-
-// Append a single tag
-func (t Tags) AppendTag(k string, v []byte) Tags {
-	return append(t, MakeTag(k, v))
-}
-
-// Append two lists of tags
-func (t Tags) AppendTags(tags Tags) Tags {
-	return append(t, tags...)
-}
-
-// Turn tags into KVPair list
-func (t Tags) ToKVPairs() []cmn.KVPair {
-	return []cmn.KVPair(t)
 }
 
 // New variadic tags, must be k string, v []byte repeating
@@ -47,9 +113,29 @@ func NewTags(tags ...interface{}) Tags {
 	return ret
 }
 
-// Make a tag from a key and a value
-func MakeTag(k string, v []byte) Tag {
-	return Tag{Key: []byte(k), Value: v}
+// Append a single tag
+func (t Tags) AppendTag(k string, v []byte) Tags {
+	return append(t, MakeTag(k, v))
+}
+
+// Append two lists of tags
+func (t Tags) AppendTags(tags Tags) Tags {
+	return append(t, tags...)
+}
+
+// Turn tags into KVPair list
+func (t Tags) ToKVPairs() []cmn.KVPair {
+	return []cmn.KVPair(t)
+}
+
+func (t Tags) String() string {
+	var sb strings.Builder
+
+	for _, e := range t {
+		sb.WriteString(fmt.Sprintf("%s=%s, ", e.Key, e.Value))
+	}
+
+	return strings.TrimRight(sb.String(), ", ")
 }
 
 //__________________________________________________

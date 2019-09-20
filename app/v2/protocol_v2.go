@@ -356,41 +356,51 @@ func (p *ProtocolV2) configParams() {
 
 // BeginBlocker application updates every begin block
 func (p *ProtocolV2) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
-	// mint new tokens for this new block
-	tags := mint.BeginBlocker(ctx, p.mintKeeper)
+	//// mint new tokens for this new block
+	//tags := mint.BeginBlocker(ctx, p.mintKeeper)
+	//
+	//// distribute rewards from previous block
+	//distr.BeginBlocker(ctx, req, p.distrKeeper)
+	//
+	//slashTags := slashing.BeginBlocker(ctx, req, p.slashingKeeper)
+	//
+	//// handle pending random number requests
+	//randTags := rand.BeginBlocker(ctx, req, p.randKeeper)
+	//
+	//// handle HTLC expiration queue
+	//htlcTags := htlc.BeginBlocker(ctx, p.htlcKeeper)
+	//
+	//ctx.CoinFlowTags().TagWrite()
+	//
+	//tags = tags.AppendTags(slashTags).AppendTags(randTags).AppendTags(htlcTags)
 
-	// distribute rewards from previous block
-	distr.BeginBlocker(ctx, req, p.distrKeeper)
-
-	slashTags := slashing.BeginBlocker(ctx, req, p.slashingKeeper)
-
-	// handle pending random number requests
-	randTags := rand.BeginBlocker(ctx, req, p.randKeeper)
-
-	// handle HTLC expiration queue
-	htlcTags := htlc.BeginBlocker(ctx, p.htlcKeeper)
-
-	ctx.CoinFlowTags().TagWrite()
-
-	tags = tags.AppendTags(slashTags).AppendTags(randTags).AppendTags(htlcTags)
 	return abci.ResponseBeginBlock{
-		Tags: tags.ToKVPairs(),
+		//Tags: tags.ToKVPairs(),
+		Tags: ctx.TagsManager().Tags(),
 	}
 }
 
 // EndBlocker application updates every end block
 func (p *ProtocolV2) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
-	tags := gov.EndBlocker(ctx, p.govKeeper)
-	tags = tags.AppendTags(slashing.EndBlocker(ctx, req, p.slashingKeeper))
-	tags = tags.AppendTags(service.EndBlocker(ctx, p.serviceKeeper))
-	tags = tags.AppendTags(upgrade.EndBlocker(ctx, p.upgradeKeeper))
+	//tags := gov.EndBlocker(ctx, p.govKeeper)
+	//tags = tags.AppendTags(slashing.EndBlocker(ctx, req, p.slashingKeeper))
+	//tags = tags.AppendTags(service.EndBlocker(ctx, p.serviceKeeper))
+	//tags = tags.AppendTags(upgrade.EndBlocker(ctx, p.upgradeKeeper))
+
+	tags := sdk.EmptyTags()
 	validatorUpdates := stake.EndBlocker(ctx, p.StakeKeeper)
 	if p.trackCoinFlow {
-		ctx.CoinFlowTags().TagWrite()
-		tags = tags.AppendTags(ctx.CoinFlowTags().GetTags())
+		//ctx.CoinFlowTags().TagWrite()
+		//tags = tags.AppendTags(ctx.CoinFlowTags().GetTags())
+		tags = ctx.TagsManager().Tags()
 	}
 	p.assertRuntimeInvariants(ctx)
 
+	//if len(tags.ToKVPairs()) > 0 {
+	fmt.Println("----------------------------")
+	fmt.Println(tags.String())
+	fmt.Println("----------------------------")
+	//}
 	return abci.ResponseEndBlock{
 		ValidatorUpdates: validatorUpdates,
 		Tags:             tags,
