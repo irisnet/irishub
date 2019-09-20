@@ -85,9 +85,6 @@ func (tm *TagsManager) AddCoinFlow(ctx Context, from, to, amount, flowType, desc
 		return
 	}
 
-	var tagKeyBuffer bytes.Buffer
-	tagKeyBuffer.WriteString(ctx.CoinFlowTrigger())
-
 	var tagValueBuffer bytes.Buffer
 	tagValueBuffer.WriteString(from)
 	tagValueBuffer.WriteString(separate)
@@ -101,7 +98,7 @@ func (tm *TagsManager) AddCoinFlow(ctx Context, from, to, amount, flowType, desc
 	tagValueBuffer.WriteString(separate)
 	tagValueBuffer.WriteString(ctx.BlockHeader().Time.String())
 
-	tm.tags = append(tm.tags, MakeTag(tagKeyBuffer.String(), []byte(tagValueBuffer.String())))
+	tm.tags = append(tm.tags, MakeTag(ctx.CoinFlowTrigger(), []byte(tagValueBuffer.String())))
 }
 
 // ----------------------------------------------------------------------------

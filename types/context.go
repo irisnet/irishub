@@ -177,6 +177,9 @@ func (c Context) WithTagsManager(tm *TagsManager) Context {
 	return c
 }
 
+// WithCoinFlowTrigger set the coinFlowTrigger for context
+// in handler, coinFlowTrigger = tx.hash
+// in begin/end block, coinFlowTrigger = {modules-name}{begin/end}Blocker
 func (c Context) WithCoinFlowTrigger(coinFlowTrigger string) Context {
 	newTagsManager := c.TagsManager()
 	newTagsManager.SetCoinFlowTrigger(coinFlowTrigger)
