@@ -30,10 +30,10 @@ func SafeExec(fn func()) {
 	fn()
 }
 
-func NilGaugeVec() *stdprometheus.GaugeVec {
+func EmptyGaugeVec() *stdprometheus.GaugeVec {
 	return stdprometheus.NewGaugeVec(stdprometheus.GaugeOpts{}, []string{})
 }
 
-func NilCounterVec() *stdprometheus.CounterVec {
+func EmptyCounterVec() *stdprometheus.CounterVec {
 	return stdprometheus.NewCounterVec(stdprometheus.CounterOpts{}, []string{})
 }
