@@ -119,7 +119,7 @@ Once IRISLCD is started, you can open `localhost:1317/swagger-ui/` in your explo
     2. `POST /coinswap/liquidities/{id}/withdraw`: withdraw liquidities
     3. `POST /coinswap/liquidities/buy`: swap token(buy a fixed number of  token)
     4. `POST /coinswap/liquidities/sell`: swap token(sell a fixed number of  token)
-    5. `GET /coinswap/liquidities/{id}`: query liquidities by a token' id
+    5. `GET /coinswap/liquidities/{id}`: query liquidities by a liquidity id
 9. Rand module APIs
    
     1. `POST /rand/rands`: Request a randon number
