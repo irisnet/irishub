@@ -23,6 +23,7 @@ type Metrics struct {
 	ProposalStatus *stdprometheus.GaugeVec // 1:DepositPeriod 2:VotingPeriod 3:Passed 4:Rejected
 	Vote           *stdprometheus.GaugeVec // 1:Yes 2:Abstain 3:No 4:NoWithVeto
 	Param          *stdprometheus.GaugeVec
+	enabled        bool
 }
 
 // PrometheusMetrics returns Metrics build using Prometheus client library.
@@ -58,6 +59,7 @@ func PrometheusMetrics(config *cfg.InstrumentationConfig) *Metrics {
 		ProposalStatus: proposalStatusVec,
 		Vote:           voteVec,
 		Param:          paramVec,
+		enabled:        config.Prometheus,
 	}
 }
 
@@ -73,13 +75,13 @@ func (metrics *Metrics) SetProposalStatus(proposalID uint64, status ProposalStat
 	promutil.SafeExec(func() {
 		s := float64(status)
 		metrics.ProposalStatus.WithLabelValues(strconv.FormatUint(proposalID, 10)).Set(s)
-	})
+	}, metrics.enabled)
 }
 
 func (metrics *Metrics) DeleteProposalStatus(proposalID uint64) {
 	promutil.SafeExec(func() {
 		metrics.ProposalStatus.DeleteLabelValues(strconv.FormatUint(proposalID, 10))
-	})
+	}, metrics.enabled)
 }
 
 func (metrics *Metrics) AddParameter(key string, value interface{}) {
@@ -92,7 +94,7 @@ func (metrics *Metrics) AddParameter(key string, value interface{}) {
 			}
 		default:
 		}
-	})
+	}, metrics.enabled)
 }
 func (metrics *Metrics) AddVote(consAddr string, proposalID uint64, option VoteOption) {
 	promutil.SafeExec(func() {
@@ -101,7 +103,7 @@ func (metrics *Metrics) AddVote(consAddr string, proposalID uint64, option VoteO
 			ProposalIDLabel: strconv.FormatUint(proposalID, 10),
 		}
 		metrics.Vote.With(labels).Set(float64(option))
-	})
+	}, metrics.enabled)
 
 }
 
@@ -112,5 +114,5 @@ func (metrics *Metrics) DeleteVote(valAddr string, proposalID uint64) {
 			ProposalIDLabel: strconv.FormatUint(proposalID, 10),
 		}
 		metrics.Vote.Delete(labels)
-	})
+	}, metrics.enabled)
 }

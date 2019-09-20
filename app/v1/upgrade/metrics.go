@@ -16,6 +16,7 @@ const (
 type Metrics struct {
 	Signal  *stdprometheus.GaugeVec
 	Version *stdprometheus.GaugeVec
+	enabled bool
 }
 
 // PrometheusMetrics returns Metrics build using Prometheus client library.
@@ -43,6 +44,7 @@ func PrometheusMetrics(config *cfg.InstrumentationConfig) *Metrics {
 	return &Metrics{
 		Signal:  signalVec,
 		Version: upgradeVec,
+		enabled: config.Prometheus,
 	}
 }
 
@@ -52,7 +54,7 @@ func (m *Metrics) SetSignal(valAddr string, version uint64) {
 			ValidatorLabel: valAddr,
 			VersionLabel:   strconv.FormatUint(version, 10),
 		}).Set(1)
-	})
+	}, m.enabled)
 }
 
 func (m *Metrics) DeleteSignal(valAddr string, version uint64) {
@@ -61,19 +63,19 @@ func (m *Metrics) DeleteSignal(valAddr string, version uint64) {
 			ValidatorLabel: valAddr,
 			VersionLabel:   strconv.FormatUint(version, 10),
 		})
-	})
+	}, m.enabled)
 }
 
 func (m *Metrics) SetVersion(version uint64) {
 	promutil.SafeExec(func() {
 		m.Signal.WithLabelValues().Set(float64(version))
-	})
+	}, m.enabled)
 }
 
 func (m *Metrics) DeleteVersion() {
 	promutil.SafeExec(func() {
 		m.Signal.DeleteLabelValues()
-	})
+	}, m.enabled)
 }
 
 func NopMetrics() *Metrics {
