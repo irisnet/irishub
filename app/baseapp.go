@@ -518,7 +518,9 @@ func (app *BaseApp) BeginBlock(req abci.RequestBeginBlock) (res abci.ResponseBeg
 		gasMeter = sdk.NewInfiniteGasMeter()
 	}
 	app.deliverState.ctx = app.deliverState.ctx.WithBlockGasMeter(gasMeter).
-		WithLogger(app.deliverState.ctx.Logger().With("height", app.deliverState.ctx.BlockHeight())).WithCoinFlowTags(sdk.NewCoinFlowRecord(app.trackCoinFlow))
+		WithLogger(app.deliverState.ctx.Logger().With("height", app.deliverState.ctx.BlockHeight())).
+		WithCoinFlowTags(sdk.NewCoinFlowRecord(app.trackCoinFlow)).
+		WithTagsManager(sdk.NewTagsManager(app.trackCoinFlow))
 
 	beginBlocker := app.Engine.GetCurrentProtocol().GetBeginBlocker()
 

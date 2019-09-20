@@ -52,6 +52,7 @@ func NewContext(ms MultiStore, header abci.Header, isCheckTx bool, logger log.Lo
 	c = c.WithCheckValidNum(NewValidTxCounter())
 	c = c.WithCoinFlowTrigger("")
 	c = c.WithCoinFlowTags(NewCoinFlowRecord(false))
+	c = c.WithTagsManager(NewTagsManager(false))
 	return c
 }
 
@@ -149,6 +150,7 @@ const (
 	contextKeyCheckValidNum
 	contextKeyCoinFlowTrigger
 	contextKeyCoinFlowTags
+	contextKeyTagsManager
 )
 
 // NOTE: Do not expose MultiStore.
@@ -186,6 +188,8 @@ func (c Context) MinimumFees() Coins { return c.Value(contextKeyMinimumFees).(Co
 func (c Context) CoinFlowTrigger() string { return c.Value(contextKeyCoinFlowTrigger).(string) }
 
 func (c Context) CoinFlowTags() CoinFlowTags { return c.Value(contextKeyCoinFlowTags).(CoinFlowTags) }
+
+func (c Context) TagsManager() TagsWrapper { return c.Value(contextKeyTagsManager).(TagsWrapper) }
 
 func (c Context) CheckValidNum() TxCounter { return c.Value(contextKeyCheckValidNum).(TxCounter) }
 
@@ -252,6 +256,10 @@ func (c Context) WithCoinFlowTrigger(trigger string) Context {
 
 func (c Context) WithCoinFlowTags(cTag CoinFlowTags) Context {
 	return c.withValue(contextKeyCoinFlowTags, cTag)
+}
+
+func (c Context) WithTagsManager(tm TagsWrapper) Context {
+	return c.withValue(contextKeyTagsManager, tm)
 }
 
 // Cache the multistore and return a new cached context. The cached context is
