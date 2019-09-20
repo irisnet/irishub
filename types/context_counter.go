@@ -1,10 +1,5 @@
 package types
 
-type TxCounter interface {
-	Count() int64
-	Incr()
-}
-
 type ValidTxCounter struct {
 	count int64
 }
@@ -17,7 +12,7 @@ func (vtc *ValidTxCounter) Incr() {
 	vtc.count++
 }
 
-func NewValidTxCounter() TxCounter {
+func NewValidTxCounter() *ValidTxCounter {
 	return &ValidTxCounter{
 		count: 0,
 	}
