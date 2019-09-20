@@ -387,23 +387,18 @@ func (p *ProtocolV2) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.
 	//tags = tags.AppendTags(service.EndBlocker(ctx, p.serviceKeeper))
 	//tags = tags.AppendTags(upgrade.EndBlocker(ctx, p.upgradeKeeper))
 
-	tags := sdk.EmptyTags()
-	validatorUpdates := stake.EndBlocker(ctx, p.StakeKeeper)
-	if p.trackCoinFlow {
+	//tags := sdk.EmptyTags()
+	//if p.trackCoinFlow {
 		//ctx.CoinFlowTags().TagWrite()
 		//tags = tags.AppendTags(ctx.CoinFlowTags().GetTags())
-		tags = ctx.TagsManager().Tags()
-	}
+	//}
+
+	validatorUpdates := stake.EndBlocker(ctx, p.StakeKeeper)
 	p.assertRuntimeInvariants(ctx)
 
-	//if len(tags.ToKVPairs()) > 0 {
-	fmt.Println("----------------------------")
-	fmt.Println(tags.String())
-	fmt.Println("----------------------------")
-	//}
 	return abci.ResponseEndBlock{
 		ValidatorUpdates: validatorUpdates,
-		Tags:             tags,
+		Tags:             ctx.TagsManager().Tags(),
 	}
 }
 
