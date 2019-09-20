@@ -111,9 +111,9 @@ func (m *Metrics) SetBurnedToken(burnedToken float64) {
 
 func (m *Metrics) SetSlashedToken(valAddr string, slashedToken float64) {
 	promutil.SafeExec(func() {
-		m.BondedToken.With(stdprometheus.Labels{
+		m.SlashedToken.With(stdprometheus.Labels{
 			ValidatorLabel: valAddr,
-		}).Set(slashedToken)
+		}).Add(slashedToken)
 	}, m.enabled)
 }
 
