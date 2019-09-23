@@ -49,7 +49,9 @@ module.exports = {
                 sidebar: sidebar("", [
                     ["Getting Started", "get-started"],
                     ["Concepts", "concepts"],
+                    ["Features", "features"],
                     ["Daemon", "daemon"],
+                    ["CLI Client", "cli-client"],
                     ["Tools", "tools"]
                 ])
             }

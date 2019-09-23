@@ -1,8 +1,43 @@
-# Command Line Client
+---
+order: 1
+---
 
-## Global flags of query commands
+# Introduction
 
-All query commands has these global flags. Their unique flags will be introduced later.
+`iriscli` is a command line client for the IRIShub network. IRIShub users can use `iriscli` to send transactions and query the blockchain data.
+
+## Working Directory
+
+The default working directory for the `iriscli` is `$HOME/.iriscli`, which is mainly used to save configuration files and data. The IRIShub `key` data is saved in the working directory of `iriscli`. You can also specify the `iriscli`  working directory by `--home`.
+
+## Connecting to a Full Node
+
+The rpc address of the `iris` node. Transactions and query requests are sent to the process listening to this port. The default is `tcp://localhost:26657`, and the rpc address can also be specified by `--node`.
+
+## Setting Default Configs
+
+The `iriscli config` command interactively configures some default parameters, such as chain-id, home, fee, and node.
+
+E.g.
+
+```bash
+$ iriscli config
+> Where is your iriscli home directory? (Default: ~/.iriscli)
+/root/my_cli_home
+> Where is your validator node running? (Default: tcp://localhost:26657)
+tcp://192.168.0.1:26657
+Do you trust this node? [y/n]:y
+> What is your chainID?
+irishub
+> Please specify default fee
+50000
+```
+
+## Global Flags
+
+### GET Commands
+
+All GET commands has the following global flags:
 
 | Name, shorthand | type   | Required | Default Value         | Description                                                   |
 | --------------- | ----   | -------- | --------------------- | ------------------------------------------------------------- |
@@ -12,17 +47,15 @@ All query commands has these global flags. Their unique flags will be introduced
 | --output        | string |          | text                  | Response format text or json                                  |
 | --indent        | bool   |          | false                 | Add indent to JSON response                                   |
 | --ledger        | bool   |          | false                 | Use a connected Ledger device                                 |
-| --node          | string |          | tcp://localhost:26657 | \<host>:\<port> to tendermint rpc interface for this chain    |
+| --node          | string |          | tcp://localhost:26657 | `<host>:<port>` to tendermint rpc interface for this chain    |
 | --trust-node    | bool   |          | true                  | Don't verify proofs for responses                             |
 
-### Json indent response
+#### Json Indent Response
 
-`output` specify the output format of the query:
+iriscli returns text format as default:
 
-Not specified, return text format as default:
-
-```
-root@ubuntu:~# iriscli stake validators
+```bash
+$ iriscli stake validators
 Validator
   Operator Address:            iva1gfcee5u5f54kfcnufv4ypcfyldw0vu0zpwl52q
   Validator Consensus Pubkey:  icp1zcjduepquednrr0aqw4nkt8jnkhpmg4acfc7vlr0yre4uud4z0ups68hcpfsx4x9ng
@@ -36,10 +69,10 @@ Validator
   Commission:                  rate: 0.1001000000, maxRate: 1.0000000000, maxChangeRate: 1.0000000000, updateTime: 2019-05-09 03:13:39.720700953 +0000 UTC
 ```
 
-Specify `output` and `indent`, return json indent format: 
+By specifing `output` and `indent`, `iriscli` can return json indent format results:
 
-```
-root@ubuntu:~# iriscli stake validators --output=json --indent
+```bash
+$ iriscli stake validators --output=json --indent
 [
   {
     "operator_address": "iva1gfcee5u5f54kfcnufv4ypcfyldw0vu0zpwl52q",
@@ -67,9 +100,9 @@ root@ubuntu:~# iriscli stake validators --output=json --indent
 ]
 ```
 
-## Global flags of commands to send transactions
+### POST Commands
 
-All commands which can be used to send transactions have these global flags. Their unique flags will be introduced later.
+All POST commands have the following global flags:
 
 | Name, shorthand  | type   | Required | Default               | Description                                                                                                    |
 | -----------------| -----  | -------- | --------------------- | -------------------------------------------------------------------------------------------------------------- |
@@ -92,39 +125,25 @@ All commands which can be used to send transactions have these global flags. The
 | --node           | string |          | tcp://localhost:26657 | \<host>:\<port> to tendermint rpc interface for this chain                                                     |
 | --print-response | bool   |          | false                 | Return tx response (only works with async = false)                                                             |
 | --sequence       | int    |          | 0                     | Sequence number to sign the tx                                                                                 |
-| --trust-node     | bool   |          | true                  | Don't verify proofs for responses                                                                              | 
+| --trust-node     | bool   |          | true                  | Don't verify proofs for responses                                                                              |
 
-## Module command list
+## Module Commands
 
 Each module provides a set of command line interfaces. Here we sort these commands by modules.
 
-1. [status command](./status/README.md)
-2. [tendermint command](./tendermint/README.md)
-3. [keys command](./keys/README.md)
-4. [bank command](./bank/README.md)
-5. [stake command](./stake/README.md)
-6. [distribution command](./distribution/README.md)
-7. [gov command](./gov/README.md)
-8. [upgrade command](./upgrade/README.md)
-9. [service command](./service/README.md)
-
-## Config command
-
-The `iriscli config` command interactively configures some default parameters, such as chain-id, home, fee, and node.
-
-Example:
-
-```
-root@ubuntu16:~# iriscli config
-> Where is your iriscli home directory? (Default: ~/.iriscli)
-/root/my_cli_home
-> Where is your validator node running? (Default: tcp://localhost:26657)
-tcp://192.168.0.1:26657
-Do you trust this node? [y/n]:y
-> What is your chainID?
-irishub
-> Please specify default fee
-50000
-
-root@ubuntu16:~# iriscli status --home=/root/my_cli_home
-```
+| **Subcommand**                           | **Description**                                              |
+| ---------------------------------------- | ------------------------------------------------------------ |
+| [status](./status/README.md)             | Query remote node for status                                 |
+| [tx](./tx/README.md)                     | Tx subcommands                                               |
+| [tendermint](./tendermint/README.md)     | Tendermint state querying subcommands                        |
+| [bank](./bank/README.md)                 | Bank subcommands for querying acccounts and sending coins etc. |
+| [distribution](./distribution/README.md) | Distribution subcommands for rewards management              |
+| [gov](./gov/README.md)                   | Governance and voting subcommands                            |
+| [stake](./stake/README.md)               | Staking subcommands for validators and delegators            |
+| [upgrade](./upgrade/README.md)           | Software Upgrade subcommands                                 |
+| [service](./service/README.md)           | Service subcommands                                          |
+| [guardian](./guardian/README.md)         | Guardian subcommands                                         |
+| [asset](./asset.md)                      | Asset subcommands                                            |
+| [rand](./rand/README.md)                 | Random Number subcommands                                    |
+| [keys](./keys/README.md)                 | Keys allows you to manage your local keystore for tendermint |
+| [params](./params/README.md)             | Query parameters of modules                                  |
