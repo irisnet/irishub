@@ -1,3 +1,3 @@
 # Setting up Tendermint KMS + CPU
 
-WORK IN PROGRESS
+WORKING IN PROGRESS

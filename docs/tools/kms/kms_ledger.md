@@ -1,3 +1,3 @@
 # Setting up Tendermint KMS + Ledger
 
-WORK IN PROGRESS
+WORKING IN PROGRESS
