@@ -12,9 +12,9 @@ iriscli tendermint txs <flags>
 
 ## 标志
 
-| 名称，速记   | 默认值                | 功能介绍         | 是否必填 |
+| 名称，速记   | 默认值                | 描述             | 是否必须 |
 | ------------ | --------------------- | ---------------- | -------- |
-| --chain-id   | ""                    | 区块链Chain ID   | yes      |
+| --chain-id   | ""                    | 区块链Chain ID   | 是       |
 | --node       | tcp://localhost:26657 | 节点查询rpc接口  |          |
 | --help, -h   |                       | 帮助信息         |          |
 | --trust-node | true                  | 是否信任查询节点 |          |
@@ -116,7 +116,7 @@ iriscli tendermint txs --tags "action:send&sender:iaa1c6al0vufl8efggzsvw34hszua9
 
 ## Actions 列表
 
-| module       | Msg                                            | action                          |
+| Module       | Msg                                            | Action                          |
 | ------------ | ---------------------------------------------- | ------------------------------- |
 | bank         | irishub/bank/MsgSend                           | send                            |
 |              | irishub/bank/MsgBurn                           | burn                            |

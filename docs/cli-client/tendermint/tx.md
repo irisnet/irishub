@@ -6,7 +6,7 @@ Search for the transaction which has the same hash in all existing blocks
 
 ## Usage
 
-```bash
+```shell
 iriscli tendermint tx <hash> <flags>
 ```
 
@@ -15,7 +15,7 @@ iriscli tendermint tx <hash> <flags>
 | Name, shorthand | Default               | Description                                                   | Required |
 | --------------- | --------------------- | ------------------------------------------------------------- | -------- |
 | --chain-id      |                       | Chain ID of Tendermint node                                   | yes      |
-| --node string   | tcp://localhost:26657 | Node to connect to                                            |
+| --node string   | tcp://localhost:26657 | Node to connect to                                            |          |
 | --help, -h      |                       | help for tx                                                   |          |
 | --trust-node    | true                  | Trust connected full node (don't verify proofs for responses) |          |
 

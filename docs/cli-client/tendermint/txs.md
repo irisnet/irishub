@@ -27,7 +27,7 @@ iriscli tendermint txs <flags>
 ### Search transactions
 
 ```shell
-iriscli tendermint txs --tags=`action:send&sender:iaa1c6al0vufl8efggzsvw34hszua9pr4qqymthxjw` --chain-id=<chain-id> --trust-node
+iriscli tendermint txs --tags="action:send&sender:iaa1c6al0vufl8efggzsvw34hszua9pr4qqymthxjw" --chain-id=<chain-id> --trust-node
 ```
 
 You will get the following result.
@@ -125,7 +125,7 @@ You will get the following result.
 
 ## Actions list
 
-| module       | Msg                                            | action                          |
+| Module       | Msg                                            | Action                          |
 | ------------ | ---------------------------------------------- | ------------------------------- |
 | bank         | irishub/bank/MsgSend                           | send                            |
 |              | irishub/bank/MsgBurn                           | burn                            |
