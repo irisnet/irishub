@@ -6,22 +6,21 @@ Search all transactions which match the given tag list
 
 ## Usage
 
-```
+```shell
 iriscli tendermint txs <flags>
-
 ```
 
 ## Flags
 
-| Name, shorthand | Default              |Description                                                             | Required     |
-| --------------- | -------------------- | --------------------------------------------------------- | -------- |
-| --chain-id      | ""                   | Chain ID of Tendermint node   | yes     |
-| --node string   | tcp://localhost:26657| Node to connect to  |
-| --help, -h      |                      | Help for txs|    |
-| --trust-node    | true                 | Trust connected full node (don't verify proofs for responses)     |          |
-| --tags          | ""                   | tag:value list of tags that must match     |          |
-| --page          | 0                    | Pagination page     |          |
-| --size          | 100                  | Pagination size     |          |
+| Name, shorthand | Default               | Description                                                   | Required |
+| --------------- | --------------------- | ------------------------------------------------------------- | -------- |
+| --chain-id      | ""                    | Chain ID of Tendermint node                                   | yes      |
+| --node string   | tcp://localhost:26657 | Node to connect to                                            |          |
+| --help, -h      |                       | Help for txs                                                  |          |
+| --trust-node    | true                  | Trust connected full node (don't verify proofs for responses) |          |
+| --tags          | ""                    | tag:value list of tags that must match                        |          |
+| --page          | 0                     | Pagination page                                               |          |
+| --size          | 100                   | Pagination size                                               |          |
 
 ## Examples
 
@@ -33,7 +32,7 @@ iriscli tendermint txs --tags=`action:send&sender:iaa1c6al0vufl8efggzsvw34hszua9
 
 You will get the following result.
 
-```
+```json
 [
   {
     "hash": "50F8D75FC1F0C2643A0D09189B7FB44246AB00AF89779215FFBC0740E6C59F3A",
@@ -125,40 +124,50 @@ You will get the following result.
 ```
 
 ## Actions list
-| module          | Msg                  | action                                                    |
-| --------------- | -------------------- | --------------------------------------------------------- |
-| asset        | irishub/asset/MsgCreateGateway | create_gateway |
-|              | irishub/asset/MsgEditGateway | edit_gateway |
-|              | irishub/asset/MsgTransferGatewayOwner | transfer_gateway_owner |
-|              | irishub/asset/MsgIssueToken | issue_token |
-|              | irishub/asset/MsgEditToken | edit_token |
-|              | irishub/asset/MsgMintToken | mint_token |
-|              | irishub/asset/MsgTransferTokenOwner | transfer_token_owner |
-| bank         | irishub/bank/Send | send |
-|              | irishub/bank/Burn | burn |
-| distribution | irishub/distr/MsgModifyWithdrawAddress | set_withdraw_address |
-|              | irishub/distr/MsgWithdrawDelegationRewardsAll | withdraw_delegation_rewards_all |
-|              | irishub/distr/MsgWithdrawDelegationReward | withdraw_delegation_reward |
-|              | irishub/distr/MsgWithdrawValidatorRewardsAll | withdraw_validator_rewards_all |
-| gov          | irishub/gov/MsgSubmitProposal | submit_proposal |
-|              | irishub/gov/MsgSubmitTxTaxUsageProposal | submit_proposal |
-|              | irishub/gov/MsgSubmitAddTokenProposal | submit_proposal |
-|              | irishub/gov/MsgDeposit | deposit |
-|              | irishub/gov/MsgVote | vote |
-| stake        | irishub/stake/MsgCreateValidator | create_validator |
-|              | irishub/stake/MsgEditValidator | edit_validator |
-|              | irishub/stake/MsgDelegate | delegate |
-|              | irishub/stake/BeginUnbonding | begin_unbonding |
-|              | irishub/stake/BeginRedelegate | begin_redelegate |
-| slashing     | irishub/slashing/MsgUnjail | unjail |
-| service      | irishub/service/MsgSvcDef | define_service |
-|              | irishub/service/MsgSvcBinding | bind_service |
-|              | irishub/service/MsgSvcBindingUpdate | update_service_binding |
-|              | irishub/service/MsgSvcDisable | disable_service |
-|              | irishub/service/MsgSvcEnable | enable_service |
-|              | irishub/service/MsgSvcRefundDeposit | refund_service_deposit |
-|              | irishub/service/MsgSvcRequest | call_service |
-|              | irishub/service/MsgSvcResponse | respond_service |
-|              | irishub/service/MsgSvcRefundFees | refund_service_fees |
-|              | irishub/service/MsgSvcWithdrawFees | withdraw_service_fees |
-|              | irishub/service/MsgSvcWithdrawTax | withdraw_service_tax |
+
+| module       | Msg                                            | action                          |
+| ------------ | ---------------------------------------------- | ------------------------------- |
+| bank         | irishub/bank/MsgSend                           | send                            |
+|              | irishub/bank/MsgBurn                           | burn                            |
+|              | irishub/bank/MsgSetMemoRegexp                  | set-memo-regexp                 |
+| distribution | irishub/distr/MsgSetWithdrawAddress            | set_withdraw_address            |
+|              | irishub/distr/MsgWithdrawDelegationRewardsAll  | withdraw_delegation_rewards_all |
+|              | irishub/distr/MsgWithdrawDelegationReward      | withdraw_delegation_reward      |
+|              | irishub/distr/MsgWithdrawValidatorRewardsAll   | withdraw_validator_rewards_all  |
+| gov          | irishub/gov/MsgSubmitProposal                  | submit_proposal                 |
+|              | irishub/gov/MsgSubmitSoftwareUpgradeProposal   | submit_proposal                 |
+|              | irishub/gov/MsgSubmitCommunityTaxUsageProposal | submit_proposal                 |
+|              | irishub/gov/MsgSubmitTokenAdditionProposal     | submit_proposal                 |
+|              | irishub/gov/MsgDeposit                         | deposit                         |
+|              | irishub/gov/MsgVote                            | vote                            |
+| stake        | irishub/stake/MsgCreateValidator               | create_validator                |
+|              | irishub/stake/MsgEditValidator                 | edit_validator                  |
+|              | irishub/stake/MsgDelegate                      | delegate                        |
+|              | irishub/stake/BeginUnbonding                   | begin_unbonding                 |
+|              | irishub/stake/BeginRedelegate                  | begin_redelegate                |
+| slashing     | irishub/slashing/MsgUnjail                     | unjail                          |
+| asset        | irishub/asset/MsgCreateGateway                 | create_gateway                  |
+|              | irishub/asset/MsgEditGateway                   | edit_gateway                    |
+|              | irishub/asset/MsgTransferGatewayOwner          | transfer_gateway_owner          |
+|              | irishub/asset/MsgIssueToken                    | issue_token                     |
+|              | irishub/asset/MsgEditToken                     | edit_token                      |
+|              | irishub/asset/MsgMintToken                     | mint_token                      |
+|              | irishub/asset/MsgTransferTokenOwner            | transfer_token_owner            |
+| coinswap     | irishub/coinswap/MsgSwapOrder                  | swap_order                      |
+|              | irishub/coinswap/MsgAddLiquidity               | add_liquidity                   |
+|              | irishub/coinswap/MsgRemoveLiquidity            | remove_liquidity                |
+| htlc         | irishub/htlc/MsgCreateHTLC                     | create_htlc                     |
+|              | irishub/htlc/MsgClaimHTLC                      | claim_htlc                      |
+|              | irishub/htlc/MsgRefundHTLC                     | refund_htlc                     |
+| service      | irishub/service/MsgSvcDef                      | define_service                  |
+|              | irishub/service/MsgSvcBinding                  | bind_service                    |
+|              | irishub/service/MsgSvcBindingUpdate            | update_service_binding          |
+|              | irishub/service/MsgSvcDisable                  | disable_service                 |
+|              | irishub/service/MsgSvcEnable                   | enable_service                  |
+|              | irishub/service/MsgSvcRefundDeposit            | refund_service_deposit          |
+|              | irishub/service/MsgSvcRequest                  | call_service                    |
+|              | irishub/service/MsgSvcResponse                 | respond_service                 |
+|              | irishub/service/MsgSvcRefundFees               | refund_service_fees             |
+|              | irishub/service/MsgSvcWithdrawFees             | withdraw_service_fees           |
+|              | irishub/service/MsgSvcWithdrawTax              | withdraw_service_tax            |
+| rand         | irishub/rand/MsgRequestRand                    | request_rand                    |

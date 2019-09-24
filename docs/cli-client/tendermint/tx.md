@@ -6,18 +6,18 @@ Search for the transaction which has the same hash in all existing blocks
 
 ## Usage
 
-```
+```bash
 iriscli tendermint tx <hash> <flags>
 ```
 
 ## Flags
 
-| Name, shorthand | Default                    |Description                                                             | Required     |
-| --------------- | -------------------------- | --------------------------------------------------------- | -------- |
-| --chain-id    |     | Chain ID of Tendermint node   | yes     |
-| --node string     |   tcp://localhost:26657                         | Node to connect to  |                 
-| --help, -h      |       | 	help for tx|    |
-| --trust-node    |              true         | Trust connected full node (don't verify proofs for responses)     |          |
+| Name, shorthand | Default               | Description                                                   | Required |
+| --------------- | --------------------- | ------------------------------------------------------------- | -------- |
+| --chain-id      |                       | Chain ID of Tendermint node                                   | yes      |
+| --node string   | tcp://localhost:26657 | Node to connect to                                            |
+| --help, -h      |                       | help for tx                                                   |          |
+| --trust-node    | true                  | Trust connected full node (don't verify proofs for responses) |          |
 
 ## Examples
 
@@ -28,7 +28,8 @@ iriscli tendermint tx CD117378EC1CE0BA4ED0E0EBCED01AF09DA8F6B7 --chain-id=<chain
 ```
 
 You will get the following result.
-```
+
+```json
 {
   "hash": "50F8D75FC1F0C2643A0D09189B7FB44246AB00AF89779215FFBC0740E6C59F3A",
   "height": "3411",
