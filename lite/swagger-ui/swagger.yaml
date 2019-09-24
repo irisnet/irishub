@@ -3066,7 +3066,7 @@ paths:
               properties:
                 base_tx:
                   $ref: '#/components/schemas/BaseTx'
-                claimer:
+                sender:
                   $ref: '#/components/schemas/Address'
                 secret:
                   type: string
