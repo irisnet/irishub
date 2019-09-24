@@ -21,11 +21,21 @@ func CheckRegisterError(err error) {
 	}
 }
 
-func SafeExec(fn func()) {
+func SafeExec(fn func(), enable bool) {
 	defer func() {
 		if r := recover(); r != nil {
 			//TODO
 		}
 	}()
-	fn()
+	if enable {
+		fn()
+	}
+}
+
+func EmptyGaugeVec() *stdprometheus.GaugeVec {
+	return stdprometheus.NewGaugeVec(stdprometheus.GaugeOpts{}, []string{})
+}
+
+func EmptyCounterVec() *stdprometheus.CounterVec {
+	return stdprometheus.NewCounterVec(stdprometheus.CounterOpts{}, []string{})
 }

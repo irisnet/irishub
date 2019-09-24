@@ -93,4 +93,8 @@ func TestExportHTLCGenesis(t *testing.T) {
 		htlcInStore.ExpireHeight = newExpireHeight
 		require.Equal(t, htlcInStore, htlc)
 	}
+
+	// assert the expired HTLCs(htlc1) have been refunded
+	htlc, _ := keeper.GetHTLC(ctx, hashLocks[0])
+	require.Equal(t, REFUNDED, htlc.State)
 }
