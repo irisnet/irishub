@@ -4,20 +4,20 @@ Asset module allows you to manage assets on IRIS Hub
 
 ## Available Commands
 
-| Name                                                | Description                                     |
-| --------------------------------------------------- | ----------------------------------------------- |
-| [create-gateway](create-gateway.md)                 | Create a gateway                                |
-| [edit-gateway](edit-gateway.md)                     | Edit a gateway                                  |
-| [transfer-gateway-owner](transfer-gateway-owner.md) | Transfer the ownership of a gateway             |
-| [issue-token](issue-token.md)                       | Issue a new token                               |
-| [edit-token](edit-token.md)                         | Edit an existing token                          |
-| [transfer-token-owner](transfer-token-owner.md)     | Transfer the ownership of a token               |
-| [mint-token](mint-token.md)                         | Mint tokens to a specified address              |
-| [query-token](query-token.md)                       | Query details of a token                        |
-| [query-tokens](query-tokens.md)                     | Query details of a group of tokens              |
-| [query-gateway](query-gateway.md)                   | Query details of a gateway by the given moniker |
-| [query-gateways](query-gateways.md)                 | Query all gateways with an optional owner       |
-| [query-fee](query-fee.md)                           | Query the asset related fees                    |
+| Name                                                            | Description                                     |
+| --------------------------------------------------------------- | ----------------------------------------------- |
+| [create-gateway](#iriscli-asset-create-gateway)                 | Create a gateway                                |
+| [edit-gateway](#iriscli-asset-edit-gateway)                     | Edit a gateway                                  |
+| [transfer-gateway-owner](#iriscli-asset-transfer-gateway-owner) | Transfer the ownership of a gateway             |
+| [issue-token](#iriscli-asset-issue-token)                       | Issue a new token                               |
+| [edit-token](#iriscli-asset-edit-token)                         | Edit an existing token                          |
+| [transfer-token-owner](#iriscli-asset-transfer-token-owner)     | Transfer the ownership of a token               |
+| [mint-token](#iriscli-asset-mint-token)                         | Mint tokens to a specified address              |
+| [query-token](#iriscli-asset-query-token)                       | Query details of a token                        |
+| [query-tokens](#iriscli-asset-query-tokens)                     | Query details of a group of tokens              |
+| [query-gateway](#iriscli-asset-query-gateway)                   | Query details of a gateway by the given moniker |
+| [query-gateways](#iriscli-asset-query-gateways)                 | Query all gateways with an optional owner       |
+| [query-fee](#iriscli-asset-query-fee)                           | Query the asset related fees                    |
 
 ## iriscli asset create-gateway
 
@@ -36,7 +36,7 @@ iriscli asset create-gateway [flags]
 | --details           | string |          |          | Optional details with a maximum length of 280                                                            |
 | --website           | string |          |          | Optional website with a maximum length of 128|
 
-**Examples:**
+### Create Gateway
 
 ```bash
 iriscli asset create-gateway --moniker=cats --identity=<pgp-id> --details="Cat Tokens" --website="www.example.com" --from=<key-name> --chain-id=irishub --fee=0.3iris
@@ -59,7 +59,7 @@ iriscli asset edit-gateway [flags]
 | --details           | string |          |          | Optional details with a maximum length of 280                                                            |
 | --website           | string |          |          | Optional website with a maximum length of 128                                                            |
 
-**Examples:**
+### Edit Gateway
 
 ```bash
 iriscli asset edit-gateway --moniker=cats --identity=<pgp-id> --details="Cat Tokens" --website="http://www.example.com" --from=<key-name> --chain-id=irishub --fee=0.4iris --commit
@@ -80,7 +80,7 @@ iriscli asset transfer-gateway-owner [flags]
 | --moniker           | string  | true     |          | The unique name of the gateway to be transferred       |
 | --to                | Address | true     |          | The new owner to which the gateway will be transferred |
 
-**Examples:**
+### Transfer Gateway Owner
 
 ```bash
 iriscli asset transfer-gateway-owner --moniker=cats --to=<new-owner-address> --from=<key-name> --chain-id=irishub --fee=0.3iris --commit
@@ -110,8 +110,6 @@ iriscli asset issue-token [flags]
 | --decimal          | uint8   | true     |               | A token can have a maximum of 18 digits of decimal         |
 | --mintable         | boolean |          | false         | Whether this token could be minted(increased) after the initial issuing |
 
-**Examples:**
-
 ### Issue native token
 
 ```bash
@@ -136,7 +134,7 @@ iriscli asset issue-token --family=fungible --source=gateway --gateway=cats --ca
 
 ### Send tokens
 
-You can send any tokens you have just like [sending iris](../bank/send)
+You can send any tokens you have just like [sending iris](./bank.md#iriscli-bank-send)
 
 #### Send native tokens
 
@@ -168,9 +166,9 @@ iriscli asset edit-token <token-id> [flags]
 | --max-supply           | uint   |          | 0       | The max supply of the token                        |
 | --mintable             | bool   |          | false   | Whether the token can be minted, default false     |
 
-**Examples:**
-
 `max-supply` can only be reduced and no less than the current total supply
+
+### Edit Token
 
 ```bash
 iriscli asset edit-token cat --name="Cat Token" --canonical-symbol="cat" --min-unit-alias=kitty --max-supply=100000000000 --mintable=true --from=<key-name> --chain-id=irishub --fee=0.4iris --commit
@@ -190,7 +188,7 @@ iriscli asset transfer-token-owner <token-id> [flags]
 | ---- | ------ | -------- | ------- | --------------------- |
 | --to | string | true     |         | The new owner address |
 
-**Examples:**
+### Transfer Token Owner
 
 ```bash
 iriscli asset transfer-token-owner kitty --to=<new-owner-address> --from=<key-name> --chain-id=irishub --fee=0.4iris --commit
@@ -211,7 +209,7 @@ iriscli asset mint-token <token-id> [flags]
 | --to     | string |          |         | Address of mint token to, default is your own address |
 | --amount | uint64 | true     | 0       | Amount of the token to mint                           |
 
-**Examples:**
+### Mint Token
 
 ```bash
 iriscli asset mint-token kitty --amount=1000000 --from=<key-name> --chain-id=irishub --fee=0.4iris
@@ -232,8 +230,6 @@ iriscli asset query-token <token-id>
 - When Source is external: ID = x.[Symbol], e.g. x.btc
 
 - When Source is gateway: ID = [Gateway].[Symbol], e.g. cats.kitty
-
-**Examples:**
 
 ### Query the native token named "kitty"
 
@@ -282,8 +278,6 @@ iriscli asset query-tokens [flags]
 - when the gateway is not empty
   - source optional
 
-**Examples:**
-
 ### Query all tokens
 
 ```bash
@@ -322,7 +316,7 @@ iriscli asset query-gateway [flags]
 | --------------------| -----  | -------- | -------- | ------------------------------------------------------------------- |
 | --moniker           | string | true     |          | The unique name with a size between 3 and 8, beginning with a letter followed by alphanumeric characters |
 
-**Examples:**
+### Query Gateway
 
 ```bash
 iriscli asset query-gateway --moniker cats
@@ -342,7 +336,7 @@ iriscli asset query-gateways [flags]
 | ---------------- | ------- | -------- | -------- | ---------------------------------- |
 | --owner          | Address |          |          | The owner address to be queried by |
 
-**Examples:**
+### Query Gateways
 
 ```bash
 iriscli asset query-gateways --owner=<owner-address>
@@ -362,8 +356,6 @@ iriscli asset query-fee [flags]
 | --------------------| -----  | -------- | -------- | ------------------------------------------------------ |
 | --gateway           | string |          |          | The gateway moniker, required for querying gateway fee |
 | --token             | string |          |          | The token id, required for querying token fees         |
-
-**Examples:**
 
 ### Query fee of creating a gateway
 
