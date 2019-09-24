@@ -2984,7 +2984,7 @@ paths:
                   example: '30s'
   '/htlc/htlcs':
     post:
-      summary: create a HTLC
+      summary: create an HTLC
       tags:
         - HTLC
       responses:
@@ -3018,7 +3018,7 @@ paths:
                   type: integer
                   example: '100'
                 timestamp:
-                  type: integer
+                  type: string
                   example: '1568011909'
   '/htlc/htlcs/{hash-lock}':
     get:

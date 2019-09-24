@@ -3,6 +3,7 @@ package lcd
 import (
 	"encoding/hex"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/app/v2/htlc"
@@ -40,7 +41,7 @@ type createHTLCReq struct {
 	Amount               sdk.Coin       `json:"amount"`
 	HashLock             string         `json:"hash_lock"`
 	TimeLock             uint64         `json:"time_lock"`
-	Timestamp            uint64         `json:"timestamp"`
+	Timestamp            string         `json:"timestamp"`
 }
 
 func createHTLCHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
@@ -68,10 +69,22 @@ func createHTLCHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handl
 			return
 		}
 
+		var timestamp uint64
+
+		if len(req.Timestamp) == 0 {
+			timestamp = 0
+		} else {
+			timestamp, err = strconv.ParseUint(req.Timestamp, 10, 64)
+			if err != nil {
+				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+				return
+			}
+		}
+
 		// create the NewMsgCreateHTLC message
 		msg := htlc.NewMsgCreateHTLC(
 			req.Sender, req.Receiver, receiverOnOtherChain, req.Amount,
-			hashLock, req.Timestamp, req.TimeLock)
+			hashLock, timestamp, req.TimeLock)
 		err = msg.ValidateBasic()
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
