@@ -1,14 +1,14 @@
 package keeper
 
 import (
-	"github.com/irisnet/irishub/app/v1/asset/internal/types"
-	"github.com/irisnet/irishub/tests"
 	"testing"
 
+	"github.com/irisnet/irishub/app/v1/asset/internal/types"
 	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/app/v1/bank"
 	"github.com/irisnet/irishub/app/v1/params"
 	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/tests"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/stretchr/testify/require"
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -46,9 +46,9 @@ func TestAssetAnteHandler(t *testing.T) {
 
 	// construct msgs
 	msgCreateGateway := types.NewMsgCreateGateway(addr1, "mon", "i", "d", "w")
-	msgIssueNativeToken := types.MsgIssueToken{Source: types.AssetSource(0x00), Symbol: "sym"}
-	msgIssueGatewayToken := types.MsgIssueToken{Source: types.AssetSource(0x02), Symbol: "sym"}
-	msgMintNativeToken := types.MsgMintToken{TokenId: "i.sym"}
+	msgIssueNativeToken := types.MsgIssueToken{Owner: addr1, Source: types.AssetSource(0x00), Symbol: "sym"}
+	msgIssueGatewayToken := types.MsgIssueToken{Owner: addr2, Source: types.AssetSource(0x02), Symbol: "sym"}
+	msgMintNativeToken := types.MsgMintToken{Owner: addr2, TokenId: "i.sym"}
 	msgNonAsset1 := sdk.NewTestMsg(addr1)
 	msgNonAsset2 := sdk.NewTestMsg(addr2)
 
@@ -57,42 +57,51 @@ func TestAssetAnteHandler(t *testing.T) {
 	tx2 := auth.StdTx{Msgs: []sdk.Msg{msgCreateGateway, msgIssueNativeToken, msgNonAsset1, msgIssueGatewayToken, msgMintNativeToken}}
 	tx3 := auth.StdTx{Msgs: []sdk.Msg{msgNonAsset2, msgCreateGateway, msgIssueNativeToken, msgIssueGatewayToken, msgMintNativeToken}}
 
-	// set signers and construct an ante handler
-	newCtx := auth.WithSigners(ctx, []auth.Account{acc1, acc2})
-	anteHandler := NewAnteHandler(keeper)
+	newCtx := ctx.WithKeySignerAddrs([]sdk.AccAddress{addr1, addr2})
+	ak.SetAccount(newCtx, acc1)
+	ak.SetAccount(newCtx, acc2)
+	anteHandler := NewAnteHandler(ak, keeper)
 
 	// assert that the ante handler will return with `abort` set to true
-	acc1.SetCoins(sdk.Coins{gatewayCreateFee.Add(nativeTokenIssueFee)})
+	_ = acc1.SetCoins(sdk.Coins{gatewayCreateFee.Add(nativeTokenIssueFee)})
+	ak.SetAccount(newCtx, acc1)
 	_, res, abort := anteHandler(newCtx, tx1, false)
 	require.Equal(t, true, abort)
 	require.Equal(t, false, res.IsOK())
 
-	// assert that the ante handler will return with `abort` set to true
-	acc1.SetCoins(acc1.GetCoins().Add(sdk.Coins{gatewayTokenIssueFee}))
+	// assert that the ante handle`r will return with `abort` set to true
+	_ = acc1.SetCoins(acc1.GetCoins().Add(sdk.Coins{gatewayTokenIssueFee}))
+	ak.SetAccount(newCtx, acc1)
 	_, res, abort = anteHandler(newCtx, tx1, false)
 	require.Equal(t, true, abort)
 	require.Equal(t, false, res.IsOK())
 
 	// assert that the ante handler will return with `abort` set to false
-	acc1.SetCoins(acc1.GetCoins().Add(sdk.Coins{nativeTokenMintFee}))
+	_ = acc1.SetCoins(acc1.GetCoins().Add(sdk.Coins{nativeTokenMintFee}))
+	ak.SetAccount(newCtx, acc1)
+
 	_, res, abort = anteHandler(newCtx, tx1, false)
 	require.Equal(t, false, abort)
 	require.Equal(t, true, res.IsOK())
 
 	// assert that the ante handler will return with `abort` set to false
-	acc1.SetCoins(sdk.Coins{gatewayCreateFee.Add(nativeTokenIssueFee)})
+	_ = acc1.SetCoins(sdk.Coins{gatewayCreateFee.Add(nativeTokenIssueFee)})
+	ak.SetAccount(newCtx, acc1)
 	_, res, abort = anteHandler(newCtx, tx2, false)
 	require.Equal(t, false, abort)
 	require.Equal(t, true, res.IsOK())
 
 	// assert that the ante handler will return with `abort` set to false
-	acc1.SetCoins(sdk.Coins{})
+	_ = acc1.SetCoins(sdk.Coins{})
+	ak.SetAccount(newCtx, acc1)
 	_, res, abort = anteHandler(newCtx, tx3, false)
 	require.Equal(t, false, abort)
 	require.Equal(t, true, res.IsOK())
 
 	// assert that the ante handler will return with `abort` set to true
-	newCtx = auth.WithSigners(ctx, []auth.Account{})
+	newCtx = ctx.WithKeySignerAddrs([]sdk.AccAddress{})
+	ak.SetAccount(newCtx, acc1)
+	ak.SetAccount(newCtx, acc2)
 	_, res, abort = anteHandler(newCtx, tx3, false)
 	require.Equal(t, true, abort)
 	require.Equal(t, false, res.IsOK())

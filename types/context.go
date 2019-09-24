@@ -3,9 +3,9 @@ package types
 
 import (
 	"context"
-	"github.com/gogo/protobuf/proto"
 	"time"
 
+	"github.com/gogo/protobuf/proto"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/log"
 )
@@ -36,6 +36,7 @@ type Context struct {
 	consParams     *abci.ConsensusParams
 	tagsManager    *TagsManager
 	validTxCounter *ValidTxCounter
+	keySignerAddrs []AccAddress
 }
 
 // Read-only accessors
@@ -53,6 +54,7 @@ func (c Context) IsCheckTx() bool                 { return c.checkTx }
 func (c Context) MinimumFees() Coins              { return c.minimumFee }
 func (c Context) TagsManager() *TagsManager       { return c.tagsManager }
 func (c Context) ValidTxCounter() *ValidTxCounter { return c.validTxCounter }
+func (c Context) KeySignerAddrs() []AccAddress    { return c.keySignerAddrs }
 
 // clone the header before returning
 func (c Context) BlockHeader() abci.Header {
@@ -129,6 +131,11 @@ func (c Context) WithChainID(chainID string) Context {
 
 func (c Context) WithCheckValidNum(txCounter *ValidTxCounter) Context {
 	c.validTxCounter = txCounter
+	return c
+}
+
+func (c Context) WithKeySignerAddrs(accountAddrs []AccAddress) Context {
+	c.keySignerAddrs = accountAddrs
 	return c
 }
 

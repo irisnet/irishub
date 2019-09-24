@@ -42,18 +42,22 @@ func NewFeePreprocessHandler(fk FeeKeeper) types.FeePreprocessHandler {
 // NewFeePreprocessHandler creates a fee token refund handler
 func NewFeeRefundHandler(am AccountKeeper, fk FeeKeeper) types.FeeRefundHandler {
 	return func(ctx sdk.Context, tx sdk.Tx, txResult sdk.Result) (actualCostFee sdk.Coin, err error) {
-		txAccounts := GetSigners(ctx)
-		// If this tx failed in anteHandler, txAccount length will be less than 1
-		if len(txAccounts) < 1 {
-			//panic("invalid transaction, should not reach here")
-			return sdk.Coin{}, nil
-		}
-		firstAccount := txAccounts[0]
-
 		stdTx, ok := tx.(StdTx)
 		if !ok {
 			return sdk.Coin{}, errors.New("transaction is not Stdtx")
 		}
+
+		// get the signing accouts
+		signerAddrs := ctx.KeySignerAddrs()
+		signerAccs, _ := getSignerAccs(ctx, am, signerAddrs)
+
+		// If this tx failed in anteHandler, txAccount length will be less than 1
+		if len(signerAccs) < 1 {
+			//panic("invalid transaction, should not reach here")
+			return sdk.Coin{}, nil
+		}
+		firstAccount := signerAccs[0]
+
 		// Refund process will also cost gas, but this is compensation for previous fee deduction.
 		// It is not reasonable to consume users' gas. So the context gas is reset to transaction gas
 		ctx = ctx.WithGasMeter(sdk.NewInfiniteGasMeter())
