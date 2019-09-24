@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"fmt"
+
 	"github.com/irisnet/irishub/app/v1/asset/internal/types"
 	"github.com/irisnet/irishub/app/v1/params"
 	"github.com/irisnet/irishub/codec"
@@ -523,15 +524,12 @@ func (k Keeper) MintToken(ctx sdk.Context, msg types.MsgMintToken) (sdk.Tags, sd
 		if err := TokenMintFeeHandler(ctx, k, msg.Owner, token.Symbol); err != nil {
 			return nil, err
 		}
-		break
 	case types.GATEWAY:
 		// handle fee for gateway token
 		if err := GatewayTokenMintFeeHandler(ctx, k, msg.Owner, token.Symbol); err != nil {
 			return nil, err
 		}
-		break
 	default:
-		break
 	}
 
 	mintCoin := sdk.NewCoin(expDenom, mintAmt)

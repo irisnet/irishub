@@ -6,6 +6,7 @@ import (
 
 const (
 	// all store name
+	BankStroe            = "bank"
 	AccountStore         = "acc"
 	StakeStore           = "stake"
 	StakeTransientStore  = "transient_stake"
@@ -26,7 +27,7 @@ const (
 	HtlcStore            = "htlc"
 
 	// all route for query and handler
-	BankRoute     = "bank"
+	BankRoute     = BankStroe
 	AccountRoute  = AccountStore
 	StakeRoute    = StakeStore
 	DistrRoute    = DistrStore

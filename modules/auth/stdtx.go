@@ -2,8 +2,8 @@ package auth
 
 import (
 	"encoding/json"
-
 	"fmt"
+
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/tendermint/tendermint/crypto"

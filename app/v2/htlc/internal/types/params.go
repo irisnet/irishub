@@ -11,7 +11,7 @@ import (
 var _ params.ParamSet = (*Params)(nil)
 
 const (
-	DefaultParamSpace = "htlc"
+	DefaultParamSpace = ModuleName
 )
 
 // ParamTable for HTLC module

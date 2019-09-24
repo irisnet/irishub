@@ -7,7 +7,7 @@ import (
 
 // Rand errors reserve 100 ~ 199.
 const (
-	DefaultCodespace sdk.CodespaceType = "htlc"
+	DefaultCodespace sdk.CodespaceType = ModuleName
 
 	CodeInvalidAddress        sdk.CodeType = 100
 	CodeInvalidAmount         sdk.CodeType = 101

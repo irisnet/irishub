@@ -7,9 +7,6 @@ import (
 )
 
 const (
-	// MsgRoute identifies transaction types
-	MsgRoute = "htlc"
-
 	// type for MsgCreateHTLC
 	TypeMsgCreateHTLC = "create_htlc"
 
@@ -63,7 +60,7 @@ func NewMsgCreateHTLC(
 }
 
 // Implements Msg.
-func (msg MsgCreateHTLC) Route() string { return MsgRoute }
+func (msg MsgCreateHTLC) Route() string { return RouterKey }
 
 // Implements Msg.
 func (msg MsgCreateHTLC) Type() string { return TypeMsgCreateHTLC }
@@ -135,7 +132,7 @@ func NewMsgClaimHTLC(
 }
 
 // Implements Msg.
-func (msg MsgClaimHTLC) Route() string { return MsgRoute }
+func (msg MsgClaimHTLC) Route() string { return RouterKey }
 
 // Implements Msg.
 func (msg MsgClaimHTLC) Type() string { return TypeMsgClaimHTLC }
@@ -192,7 +189,7 @@ func NewMsgRefundHTLC(
 }
 
 // Implements Msg.
-func (msg MsgRefundHTLC) Route() string { return MsgRoute }
+func (msg MsgRefundHTLC) Route() string { return RouterKey }
 
 // Implements Msg.
 func (msg MsgRefundHTLC) Type() string { return TypeMsgRefundHTLC }

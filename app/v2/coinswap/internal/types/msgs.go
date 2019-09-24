@@ -1,8 +1,9 @@
 package types
 
 import (
-	sdk "github.com/irisnet/irishub/types"
 	"strings"
+
+	sdk "github.com/irisnet/irishub/types"
 )
 
 var (
@@ -14,6 +15,10 @@ var (
 const (
 	FormatUniABSPrefix = sdk.FormatUniABSPrefix
 	FormatUniId        = FormatUniABSPrefix + "%s"
+
+	MsgTypeAddLiquidity    = "add_liquidity"
+	MsgTypeRemoveLiquidity = "remove_liquidity"
+	MsgTypeSwapOrder       = "swap_order"
 )
 
 /* --------------------------------------------------------------------------- */

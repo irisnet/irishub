@@ -7,15 +7,14 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/stretchr/testify/require"
-
-	abci "github.com/tendermint/tendermint/abci/types"
-	"github.com/tendermint/tendermint/crypto"
-
 	"github.com/irisnet/irishub/app/v1/bank"
 	"github.com/irisnet/irishub/app/v1/mock"
 	"github.com/irisnet/irishub/app/v1/stake"
+	"github.com/irisnet/irishub/app/v2/htlc/internal/types"
 	sdk "github.com/irisnet/irishub/types"
+	"github.com/stretchr/testify/require"
+	abci "github.com/tendermint/tendermint/abci/types"
+	"github.com/tendermint/tendermint/crypto"
 )
 
 // initialize the mock application for this module
@@ -25,7 +24,7 @@ func getMockApp(t *testing.T, numGenAccs int) (*mock.App, Keeper, stake.Keeper, 
 	stake.RegisterCodec(mapp.Cdc)
 	RegisterCodec(mapp.Cdc)
 
-	keyHTLC := sdk.NewKVStoreKey("htlc")
+	keyHTLC := sdk.NewKVStoreKey(types.StoreKey)
 
 	ck := bank.NewBaseKeeper(mapp.Cdc, mapp.AccountKeeper)
 	sk := stake.NewKeeper(
@@ -37,7 +36,7 @@ func getMockApp(t *testing.T, numGenAccs int) (*mock.App, Keeper, stake.Keeper, 
 
 	hk := NewKeeper(mapp.Cdc, keyHTLC, ck, DefaultCodespace)
 
-	mapp.Router().AddRoute("htlc", []*sdk.KVStoreKey{keyHTLC}, NewHandler(hk))
+	mapp.Router().AddRoute(types.RouterKey, []*sdk.KVStoreKey{keyHTLC}, NewHandler(hk))
 
 	mapp.SetBeginBlocker(getBeginBlocker(hk))
 	mapp.SetEndBlocker(getEndBlocker())
