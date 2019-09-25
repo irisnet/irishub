@@ -17,9 +17,9 @@ iriscli htlc create --receiver=<receiver> --receiver-on-other-chain=<receiver-on
 | --receiver                | string   | 是     |       | 收款人地址                                     |
 | --receiver-on-other-chain | bytesHex | 是     |       | 另一条链上的收款地址                            |
 | --amount                  | string   | 是     |       | 要发送的金额                                   |
-| --hash-lock               | bytesHex | 是     |       | 由 Secret 和 时间戳（如果提供）生成的 sha256 哈希 |
+| --hash-lock               | bytesHex | 是     |       | 由 secret 和 时间戳（如果提供）生成的 sha256 哈希 |
 | --time-lock               | string   | 是     |       | 资金锁定的区块数                                |
-| --timestamp               | uint     |        |       | 参与生成 hashlock 的10位时间戳（可选）           |
+| --timestamp               | uint     |        |       | 参与生成 hash lock 的10位时间戳（可选）           |
 
 ## 示例
 
