@@ -5,7 +5,6 @@ import (
 	"encoding/hex"
 	"fmt"
 
-	"github.com/irisnet/irishub/app/v1/params"
 	"github.com/irisnet/irishub/app/v2/htlc/internal/types"
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
@@ -19,17 +18,14 @@ type Keeper struct {
 
 	// codespace
 	codespace sdk.CodespaceType
-	// params subspace
-	paramSpace params.Subspace
 }
 
-func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, bk types.BankKeeper, codespace sdk.CodespaceType, paramSpace params.Subspace) Keeper {
+func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, bk types.BankKeeper, codespace sdk.CodespaceType) Keeper {
 	return Keeper{
-		storeKey:   key,
-		cdc:        cdc,
-		bk:         bk,
-		codespace:  codespace,
-		paramSpace: paramSpace.WithTypeTable(types.ParamTypeTable()),
+		storeKey:  key,
+		cdc:       cdc,
+		bk:        bk,
+		codespace: codespace,
 	}
 }
 
@@ -89,7 +85,7 @@ func (k Keeper) ClaimHTLC(ctx sdk.Context, hashLock []byte, secret []byte) (sdk.
 	}
 
 	// check if the secret matches with the hash lock
-	if !bytes.Equal(getHashLock(secret, htlc.Timestamp), hashLock) {
+	if !bytes.Equal(GetHashLock(secret, htlc.Timestamp), hashLock) {
 		return nil, types.ErrInvalidSecret(k.codespace, fmt.Sprintf("invalid secret: %s", hex.EncodeToString(secret)))
 	}
 
@@ -105,19 +101,19 @@ func (k Keeper) ClaimHTLC(ctx sdk.Context, hashLock []byte, secret []byte) (sdk.
 	k.SetHTLC(ctx, htlc, hashLock)
 
 	// delete from the expiration queue
-	k.DeleteHTLCFromExpireQueue(ctx, uint64(ctx.BlockHeight()), hashLock)
+	k.DeleteHTLCFromExpireQueue(ctx, htlc.ExpireHeight, hashLock)
 
 	// add to coinflow
 	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, htlcAddr.String(), htlc.Receiver.String(), htlc.Amount.String(), sdk.CoinHTLCClaimFlow, "")
 
-	calimTags := sdk.NewTags(
+	claimTags := sdk.NewTags(
 		types.TagSender, []byte(htlc.Sender.String()),
 		types.TagReceiver, []byte(htlc.Receiver.String()),
 		types.TagHashLock, []byte(hex.EncodeToString(hashLock)),
 		types.TagSecret, []byte(hex.EncodeToString(secret)),
 	)
 
-	return calimTags, nil
+	return claimTags, nil
 }
 
 func (k Keeper) RefundHTLC(ctx sdk.Context, hashLock []byte) (sdk.Tags, sdk.Error) {
@@ -202,8 +198,8 @@ func getHTLCAddress(denom string) sdk.AccAddress {
 	return sdk.AccAddress(crypto.AddressHash([]byte(denom)))
 }
 
-// getHashLock calculates the hash lock from the given secret and timestamp
-func getHashLock(secret []byte, timestamp uint64) []byte {
+// GetHashLock calculates the hash lock from the given secret and timestamp
+func GetHashLock(secret []byte, timestamp uint64) []byte {
 	if timestamp > 0 {
 		return sdk.SHA256(append(secret, sdk.Uint64ToBigEndian(timestamp)...))
 	}
@@ -211,7 +207,27 @@ func getHashLock(secret []byte, timestamp uint64) []byte {
 	return sdk.SHA256(secret)
 }
 
-// IterateHTLCExpireQueueByHeight iterates the HTLC expiration queue by the specified height
+// IterateHTLCs iterates through the HTLCs
+func (k Keeper) IterateHTLCs(ctx sdk.Context, op func(hlock []byte, h types.HTLC) (stop bool)) {
+	store := ctx.KVStore(k.storeKey)
+
+	iterator := sdk.KVStorePrefixIterator(store, PrefixHTLC)
+	defer iterator.Close()
+
+	for ; iterator.Valid(); iterator.Next() {
+		keyParts := bytes.Split(iterator.Key(), KeyDelimiter)
+		hashLock := keyParts[1]
+
+		var htlc types.HTLC
+		k.GetCdc().MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &htlc)
+
+		if stop := op(hashLock, htlc); stop {
+			break
+		}
+	}
+}
+
+// IterateHTLCExpireQueueByHeight iterates through the HTLC expiration queue by the specified height
 func (k Keeper) IterateHTLCExpireQueueByHeight(ctx sdk.Context, height uint64) sdk.Iterator {
 	store := ctx.KVStore(k.storeKey)
 	return sdk.KVStorePrefixIterator(store, KeyHTLCExpireQueueSubspace(height))

@@ -46,11 +46,15 @@ func NewHTLC(
 
 // GetHashLock calculates the hash lock
 func (h HTLC) GetHashLock() []byte {
-	if h.Timestamp > 0 {
-		return sdk.SHA256(append(h.Secret, sdk.Uint64ToBigEndian(h.Timestamp)...))
+	if h.State == COMPLETED {
+		if h.Timestamp > 0 {
+			return sdk.SHA256(append(h.Secret, sdk.Uint64ToBigEndian(h.Timestamp)...))
+		}
+
+		return sdk.SHA256(h.Secret)
 	}
 
-	return sdk.SHA256(h.Secret)
+	return nil
 }
 
 // String implements fmt.Stringer

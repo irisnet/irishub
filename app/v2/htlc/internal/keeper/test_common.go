@@ -6,7 +6,6 @@ import (
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/app/v1/bank"
-	"github.com/irisnet/irishub/app/v1/params"
 	"github.com/irisnet/irishub/app/v2/htlc/internal/types"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/store"
@@ -49,7 +48,6 @@ func createTestInput(t *testing.T, amt sdk.Int, nAccs int64) (sdk.Context, Keepe
 	cdc := makeTestCodec()
 	ctx := sdk.NewContext(ms, abci.Header{ChainID: "htlc-chain"}, false, log.NewNopLogger())
 
-	pk := params.NewKeeper(cdc, keyParams, tkeyParams)
 	ak := auth.NewAccountKeeper(cdc, keyAcc, auth.ProtoBaseAccount)
 	bk := bank.NewBaseKeeper(cdc, ak)
 
@@ -58,7 +56,7 @@ func createTestInput(t *testing.T, amt sdk.Int, nAccs int64) (sdk.Context, Keepe
 	}
 	initialCoins = initialCoins.Sort()
 	accs := createTestAccs(ctx, int(nAccs), initialCoins, &ak)
-	keeper := NewKeeper(cdc, htlcKey, bk, types.DefaultCodespace, pk.Subspace(types.DefaultParamSpace))
+	keeper := NewKeeper(cdc, htlcKey, bk, types.DefaultCodespace)
 
 	return ctx, keeper, ak, accs
 }
