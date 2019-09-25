@@ -29,7 +29,7 @@ func init() {
 	FsCreateHTLC.String(FlagTimeLock, "", "the number of blocks to wait before the asset may be returned to")
 
 	FsClaimHTLC.BytesHex(FlagHashLock, nil, "the hash lock identifying the HTLC to be claimed")
-	FsClaimHTLC.String(FlagSecret, "", "the secret for generating the hash lock")
+	FsClaimHTLC.BytesHex(FlagSecret, nil, "the secret for generating the hash lock")
 
 	FsRefundHTLC.BytesHex(FlagHashLock, nil, "the hash lock identifying the HTLC to be refunded")
 }

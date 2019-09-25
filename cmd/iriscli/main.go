@@ -13,7 +13,7 @@ import (
 	distributioncmd "github.com/irisnet/irishub/client/distribution/cli"
 	govcmd "github.com/irisnet/irishub/client/gov/cli"
 	guardiancmd "github.com/irisnet/irishub/client/guardian/cli"
-	htlcmd "github.com/irisnet/irishub/client/htlc/cli"
+	htlccmd "github.com/irisnet/irishub/client/htlc/cli"
 	keyscmd "github.com/irisnet/irishub/client/keys/cli"
 	paramscmd "github.com/irisnet/irishub/client/params/cli"
 	randcmd "github.com/irisnet/irishub/client/rand/cli"
@@ -305,21 +305,21 @@ func main() {
 		randCmd,
 	)
 
-	// add htlc commands
+	// add HTLC commands
 	htlcCmd := &cobra.Command{
 		Use:   "htlc",
 		Short: "HTLC subcommands",
 	}
 	htlcCmd.AddCommand(
 		client.PostCommands(
-			htlcmd.GetCmdCreateHtlc(cdc),
-			htlcmd.GetCmdClaimHtlc(cdc),
-			htlcmd.GetCmdRefundHtlc(cdc),
+			htlccmd.GetCmdCreateHTLC(cdc),
+			htlccmd.GetCmdClaimHTLC(cdc),
+			htlccmd.GetCmdRefundHTLC(cdc),
 		)...)
 
 	htlcCmd.AddCommand(
 		client.GetCommands(
-			htlcmd.GetCmdQueryHtlc(cdc),
+			htlccmd.GetCmdQueryHTLC(cdc),
 		)...)
 
 	rootCmd.AddCommand(

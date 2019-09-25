@@ -9,7 +9,7 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 )
 
-// HTLC represents a HTLC
+// HTLC represents an HTLC
 type HTLC struct {
 	Sender               sdk.AccAddress `json:"sender"`                  // the initiator address
 	Receiver             sdk.AccAddress `json:"receiver"`                // the recipient address
@@ -46,15 +46,27 @@ func NewHTLC(
 
 // GetHashLock calculates the hash lock
 func (h HTLC) GetHashLock() []byte {
-	if h.Timestamp > 0 {
-		return sdk.SHA256(append(h.Secret, sdk.Uint64ToBigEndian(h.Timestamp)...))
+	if h.State == COMPLETED {
+		if h.Timestamp > 0 {
+			return sdk.SHA256(append(h.Secret, sdk.Uint64ToBigEndian(h.Timestamp)...))
+		}
+
+		return sdk.SHA256(h.Secret)
 	}
 
-	return sdk.SHA256(h.Secret)
+	return nil
 }
 
 // String implements fmt.Stringer
 func (h HTLC) String() string {
+	var secret string
+
+	if h.State == COMPLETED {
+		secret = hex.EncodeToString(h.Secret)
+	} else {
+		secret = ""
+	}
+
 	return fmt.Sprintf(`HTLC:
 	Sender:               %s
 	Receiver:             %s
@@ -68,7 +80,37 @@ func (h HTLC) String() string {
 		h.Receiver,
 		hex.EncodeToString(h.ReceiverOnOtherChain),
 		h.Amount.String(),
-		hex.EncodeToString(h.Secret),
+		secret,
+		h.Timestamp,
+		h.ExpireHeight,
+		h.State,
+	)
+}
+
+// HumanString implements human
+func (h HTLC) HumanString(converter sdk.CoinsConverter) string {
+	var secret string
+
+	if h.State == COMPLETED {
+		secret = hex.EncodeToString(h.Secret)
+	} else {
+		secret = ""
+	}
+
+	return fmt.Sprintf(`HTLC:
+	Sender:               %s
+	Receiver:             %s
+	ReceiverOnOtherChain: %s
+	Amount:               %s
+	Secret:               %s
+	Timestamp:            %d
+	ExpireHeight:         %d
+	State:                %s`,
+		h.Sender,
+		h.Receiver,
+		hex.EncodeToString(h.ReceiverOnOtherChain),
+		converter.ToMainUnit(sdk.NewCoins(h.Amount)),
+		secret,
 		h.Timestamp,
 		h.ExpireHeight,
 		h.State,

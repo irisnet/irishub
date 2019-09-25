@@ -58,11 +58,11 @@ IRISLCD启动以后，您可以在浏览器中访问`localhost:1317/swagger-ui/`
     9. `GET /txs/{hash}`: 通过交易hash查询交易
     10. `GET /txs`: 搜索交易
 
-2. 广播交易的API
+1. 广播交易的API
 
     1. `POST /tx/broadcast`: 广播一个amino或者json编码的交易
 
-3. Bank模块的APIs
+1. Bank模块的APIs
 
     1. `GET /bank/coins/{coin-type}`: 查询coin的类型信息
     2. `GET /bank/token-stats/{id}`: 查询token统计信息
@@ -70,7 +70,7 @@ IRISLCD启动以后，您可以在浏览器中访问`localhost:1317/swagger-ui/`
     4. `POST /bank/accounts/{address}/send`: 发起转账交易
     5. `POST /bank/accounts/{address}/burn`: 销毁token
 
-4. Stake模块的APIs
+1. Stake模块的APIs
 
     1. `POST /stake/delegators/{delegatorAddr}/delegations`: 发起委托交易
     2. `POST /stake/delegators/{delegatorAddr}/redelegations`: 发起转委托交易
@@ -91,12 +91,12 @@ IRISLCD启动以后，您可以在浏览器中访问`localhost:1317/swagger-ui/`
     17. `GET /stake/pool`: 获取权益池信息
     18. `GET /stake/parameters`: 获取权益证明的参数
 
-5. Slashing模块的APIs
+1. Slashing模块的APIs
 
     1. `GET /slashing/validators/{validatorPubKey}/signing-info`: 获取验证人的签名记录
     2. `POST /slashing/validators/{validatorAddr}/unjail`: 赦免某个作恶的验证人节点
 
-6. Distribution模块的APIs
+1. Distribution模块的APIs
 
     1. `POST /distribution/{delegatorAddr}/withdraw-address`: 设置收益取回地址
     2. `GET /distribution/{delegatorAddr}/withdraw-address`: 查询收益取回地址
@@ -104,7 +104,19 @@ IRISLCD启动以后，您可以在浏览器中访问`localhost:1317/swagger-ui/`
     4. `GET /distribution/{address}/rewards`: 查询收益
     5. `GET /distribution/community-tax`: 查询社区税金
 
-7. Asset模块的APIs
+1. Governance模块的APIs
+
+    1. `POST /gov/proposals`: 发起提交提议交易
+    2. `GET /gov/proposals`: 查询提议
+    3. `POST /gov/proposals/{proposalId}/deposits`: 发起缴纳押金的交易
+    4. `GET /gov/proposals/{proposalId}/deposits`: 查询缴纳的押金
+    5. `POST /gov/proposals/{proposalId}/votes`: 发起投票交易
+    6. `GET /gov/proposals/{proposalId}/votes`: 查询投票
+    7. `GET /gov/proposals/{proposalId}`: 查询某个提议
+    8. `GET /gov/proposals/{proposalId}/deposits/{depositor}`:查询押金
+    9. `GET /gov/proposals/{proposalId}/votes/{voter}`: 查询投票
+
+1. Asset模块的APIs
 
     1. `GET /asset/gateways/{moniker}`: 查询指定名字所对应的网关信息
     2. `GET /asset/gateways`: 查询所有网关信息，提供一个可选的owner参数
@@ -115,14 +127,22 @@ IRISLCD启动以后，您可以在浏览器中访问`localhost:1317/swagger-ui/`
     7. `POST /asset/gateways/{moniker}/transfer`: 转让指定网关的所有权
     8. `PUT /asset/tokens/{token-id}`: 编辑一个已经存在的资产
 
-8. HTLC模块的APIs
+1. Coinswap模块的APIs
+
+    1. `POST /coinswap/liquidities/{id}/deposit`: 增加流动性
+    2. `POST /coinswap/liquidities/{id}/withdraw`: 提现流动性
+    3. `POST /coinswap/liquidities/buy`: 兑换代币(购买)
+    4. `POST /coinswap/liquidities/sell`: 兑换代币(出售)
+    5. `GET /coinswap/liquidities/{id}`: 查询流动性池
+
+1. HTLC模块的APIs
 
     1. `POST /htlc/htlcs`: create an HTLC
     2. `GET /htlc/htlcs/{hash-lock}`: query HTLC by hash-lock
     3. `POST /htlc/htlcs/{hash-lock}/claim`: claim an opened HTLC
     4. `POST /htlc/htlcs/{hash-lock}/refund`: refund from an expired HTLC
 
-9. Service模块的APIs
+1. Service模块的APIs
 
     1. `POST /service/definitions`: 添加服务定义
     2. `GET /service/definitions/{defChainId}/{serviceName}`: 查询服务定义
@@ -141,29 +161,17 @@ IRISLCD启动以后，您可以在浏览器中访问`localhost:1317/swagger-ui/`
     15. `POST /service/fees/{address}/refund`: 消费者取回（未被响应的）服务费用
     16. `POST /service/fees/{address}/withdraw`: 服务提供者取回服务收益
 
-10. Rand模块的APIs
+1. Rand模块的APIs
 
     1. `POST /rand/rands`: 请求一个随机数
     2. `GET /rand/rands/{request-id}`: 查询指定请求ID对应的随机数
     3. `GET /rand/queue`: 查询请求队列，提供一个可选的高度参数
 
-11. Params模块的APIs
+1. Params模块的APIs
 
     1. `GET /params`: 查询系统预设的参数
 
-12. Governance模块的APIs
-
-    1. `POST /gov/proposals`: 发起提交提议交易
-    2. `GET /gov/proposals`: 查询提议
-    3. `POST /gov/proposals/{proposalId}/deposits`: 发起缴纳押金的交易
-    4. `GET /gov/proposals/{proposalId}/deposits`: 查询缴纳的押金
-    5. `POST /gov/proposals/{proposalId}/votes`: 发起投票交易
-    6. `GET /gov/proposals/{proposalId}/votes`: 查询投票
-    7. `GET /gov/proposals/{proposalId}`: 查询某个提议
-    8. `GET /gov/proposals/{proposalId}/deposits/{depositor}`:查询押金
-    9. `GET /gov/proposals/{proposalId}/votes/{voter}`: 查询投票
-
-13. 查询版本
+1. 查询版本
 
     1. `GET /version`: 获取IRISHUB的版本
     2. `GET /node-version`: 查询全节点版本

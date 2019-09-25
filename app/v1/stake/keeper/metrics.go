@@ -18,6 +18,7 @@ type Metrics struct {
 	SlashedToken *stdprometheus.CounterVec
 	Jailed       *stdprometheus.GaugeVec
 	Power        *stdprometheus.GaugeVec
+	enabled      bool
 }
 
 // PrometheusMetrics returns Metrics build using Prometheus client library.
@@ -25,7 +26,6 @@ func PrometheusMetrics(config *cfg.InstrumentationConfig) *Metrics {
 	if !config.Prometheus {
 		return NopMetrics()
 	}
-
 	bondedTokenVec := stdprometheus.NewGaugeVec(stdprometheus.GaugeOpts{
 		Namespace: config.Namespace,
 		Subsystem: MetricsSubsystem,
@@ -77,6 +77,7 @@ func PrometheusMetrics(config *cfg.InstrumentationConfig) *Metrics {
 		SlashedToken: slashedTokenVec,
 		Jailed:       jailedVec,
 		Power:        powerVec,
+		enabled:      config.Prometheus,
 	}
 }
 
@@ -85,7 +86,7 @@ func (m *Metrics) SetBondedToken(valAddr string, bondedToken float64) {
 		m.BondedToken.With(stdprometheus.Labels{
 			ValidatorLabel: valAddr,
 		}).Set(bondedToken)
-	})
+	}, m.enabled)
 }
 
 func (m *Metrics) DeleteBondedToken(valAddr string) {
@@ -93,27 +94,27 @@ func (m *Metrics) DeleteBondedToken(valAddr string) {
 		m.BondedToken.Delete(stdprometheus.Labels{
 			ValidatorLabel: valAddr,
 		})
-	})
+	}, m.enabled)
 }
 
 func (m *Metrics) SetLoosenToken(loosenToken float64) {
 	promutil.SafeExec(func() {
 		m.LoosenToken.WithLabelValues().Set(loosenToken)
-	})
+	}, m.enabled)
 }
 
 func (m *Metrics) SetBurnedToken(burnedToken float64) {
 	promutil.SafeExec(func() {
 		m.BurnedToken.WithLabelValues().Set(burnedToken)
-	})
+	}, m.enabled)
 }
 
 func (m *Metrics) SetSlashedToken(valAddr string, slashedToken float64) {
 	promutil.SafeExec(func() {
-		m.BondedToken.With(stdprometheus.Labels{
+		m.SlashedToken.With(stdprometheus.Labels{
 			ValidatorLabel: valAddr,
-		}).Set(slashedToken)
-	})
+		}).Add(slashedToken)
+	}, m.enabled)
 }
 
 func (m *Metrics) Jail(valAddr string) {
@@ -121,7 +122,7 @@ func (m *Metrics) Jail(valAddr string) {
 		m.Jailed.With(stdprometheus.Labels{
 			ValidatorLabel: valAddr,
 		}).Set(1)
-	})
+	}, m.enabled)
 }
 
 func (m *Metrics) Unjail(valAddr string) {
@@ -129,7 +130,7 @@ func (m *Metrics) Unjail(valAddr string) {
 		m.Jailed.Delete(stdprometheus.Labels{
 			ValidatorLabel: valAddr,
 		})
-	})
+	}, m.enabled)
 }
 
 func (m *Metrics) SetVotingPower(valAddr string, power float64) {
@@ -137,16 +138,16 @@ func (m *Metrics) SetVotingPower(valAddr string, power float64) {
 		m.BondedToken.With(stdprometheus.Labels{
 			ValidatorLabel: valAddr,
 		}).Set(power)
-	})
+	}, m.enabled)
 }
 
 func NopMetrics() *Metrics {
 	return &Metrics{
-		BondedToken:  &stdprometheus.GaugeVec{},
-		LoosenToken:  &stdprometheus.GaugeVec{},
-		BurnedToken:  &stdprometheus.GaugeVec{},
-		SlashedToken: &stdprometheus.CounterVec{},
-		Jailed:       &stdprometheus.GaugeVec{},
-		Power:        &stdprometheus.GaugeVec{},
+		BondedToken:  promutil.EmptyGaugeVec(),
+		LoosenToken:  promutil.EmptyGaugeVec(),
+		BurnedToken:  promutil.EmptyGaugeVec(),
+		SlashedToken: promutil.EmptyCounterVec(),
+		Jailed:       promutil.EmptyGaugeVec(),
+		Power:        promutil.EmptyGaugeVec(),
 	}
 }

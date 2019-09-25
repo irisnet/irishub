@@ -11,8 +11,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// GetCmdQueryHtlc implements the query HTLC command.
-func GetCmdQueryHtlc(cdc *codec.Codec) *cobra.Command {
+// GetCmdQueryHTLC implements the query HTLC command.
+func GetCmdQueryHTLC(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "query-htlc",
 		Short:   "Query details of an HTLC",
