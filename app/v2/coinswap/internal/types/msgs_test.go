@@ -1,8 +1,6 @@
 package types
 
 import (
-	"fmt"
-	"strconv"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -149,10 +147,4 @@ func TestMsgRemoveLiquidity(t *testing.T) {
 		})
 	}
 
-}
-
-func TestNewMsgSwapOrder(t *testing.T) {
-	var id uint64 = 1
-
-	fmt.Println(string([]byte(strconv.FormatUint(id, 10))))
 }
