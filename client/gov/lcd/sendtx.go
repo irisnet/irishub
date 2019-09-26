@@ -32,7 +32,6 @@ type token struct {
 	Name            string `json:"name"`
 	Decimal         uint8  `json:"decimal"`
 	MinUnitAlias    string `json:"min_unit_alias"`
-	InitialSupply   uint64 `json:"initial_supply"`
 }
 
 type upgrade struct {
@@ -108,7 +107,7 @@ func postProposalHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Han
 			msgs[0] = gov.NewMsgSubmitCommunityTaxUsageProposal(msg, req.CommTax.Usage, req.CommTax.DestAddress, req.CommTax.Percent)
 			break
 		case gov.ProposalTypeTokenAddition:
-			msgs[0] = gov.NewMsgSubmitTokenAdditionProposal(msg, req.Token.Symbol, req.Token.CanonicalSymbol, req.Token.Name, req.Token.MinUnitAlias, req.Token.Decimal, req.Token.InitialSupply)
+			msgs[0] = gov.NewMsgSubmitTokenAdditionProposal(msg, req.Token.Symbol, req.Token.CanonicalSymbol, req.Token.Name, req.Token.MinUnitAlias, req.Token.Decimal)
 			break
 		default:
 			utils.WriteErrorResponse(w, http.StatusBadRequest, "not a valid proposal type")

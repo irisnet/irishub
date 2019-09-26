@@ -117,9 +117,8 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 				name := viper.GetString(flagTokenName)
 				decimal := uint8(viper.GetInt(flagTokenDecimal))
 				alias := viper.GetString(flagTokenMinUnitAlias)
-				initialSupply := uint64(viper.GetInt64(flagTokenInitialSupply))
 
-				msg := gov.NewMsgSubmitTokenAdditionProposal(msg, symbol, canonicalSymbol, name, alias, decimal, initialSupply)
+				msg := gov.NewMsgSubmitTokenAdditionProposal(msg, symbol, canonicalSymbol, name, alias, decimal)
 				return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 			}
 			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
@@ -146,7 +145,6 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 	cmd.Flags().String(flagTokenName, "", "the asset name")
 	cmd.Flags().Uint8(flagTokenDecimal, 0, "the asset decimal. The maximum value is 18")
 	cmd.Flags().String(flagTokenMinUnitAlias, "", "the asset symbol minimum alias")
-	cmd.Flags().Uint64(flagTokenInitialSupply, 0, "the initial supply token of asset")
 
 	cmd.MarkFlagRequired(flagTitle)
 	cmd.MarkFlagRequired(flagDescription)
