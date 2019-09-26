@@ -186,7 +186,7 @@ iriscli bank burn --from=<key-name> --amount=<amount-to-burn> --fee=<native-fee>
 
 ## iriscli bank set-memo-regexp
 
-This command is used to set memo regexp for your own address, so that you can only recieve coins from transactions with the corresponding memo.
+This command is used to set memo regexp for your own address, so that you can only receive coins from transactions with the corresponding memo.
 
 ```bash
 iriscli bank set-memo-regexp --regexp=<regular-expression> --from=<key-name> --fee=<native-fee> --chain-id=<chain-id>
