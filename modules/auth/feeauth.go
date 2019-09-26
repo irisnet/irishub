@@ -58,16 +58,15 @@ func NewFeeRefundHandler(am AccountKeeper, fk FeeKeeper) types.FeeRefundHandler 
 			return sdk.Coin{}, errors.New("transaction is not Stdtx")
 		}
 
-		// get the signing accouts
+		// get the signing addresses
 		signerAddrs := ctx.KeySignerAddrs()
-		signerAccs, _ := getSignerAccs(ctx, am, signerAddrs)
 
 		// If this tx failed in anteHandler, txAccount length will be less than 1
-		if len(signerAccs) < 1 {
+		if len(signerAddrs) < 1 {
 			//panic("invalid transaction, should not reach here")
 			return sdk.Coin{}, nil
 		}
-		firstAccount := signerAccs[0]
+		firstAccountAddr := signerAddrs[0]
 
 		// Refund process will also cost gas, but this is compensation for previous fee deduction.
 		// It is not reasonable to consume users' gas. So the context gas is reset to transaction gas
@@ -86,13 +85,15 @@ func NewFeeRefundHandler(am AccountKeeper, fk FeeKeeper) types.FeeRefundHandler 
 		refundCoin := sdk.NewCoin(totalNativeFee.Denom,
 			totalNativeFee.Amount.Mul(sdk.NewInt(int64(unusedGas))).Div(sdk.NewInt(int64(txResult.GasWanted))))
 
-		coins := am.GetAccount(ctx, firstAccount.GetAddress()).GetCoins() // consume gas
-		err = firstAccount.SetCoins(coins.Add(sdk.Coins{refundCoin}))
+		acc := am.GetAccount(ctx, firstAccountAddr)
+		coins := acc.GetCoins() // consume gas
+
+		err = acc.SetCoins(coins.Add(sdk.Coins{refundCoin}))
 		if err != nil {
 			return sdk.Coin{}, err
 		}
 
-		am.SetAccount(ctx, firstAccount)
+		am.SetAccount(ctx, acc)
 		fk.RefundCollectedFees(ctx, sdk.Coins{refundCoin})
 
 		actualCostFee = sdk.NewCoin(totalNativeFee.Denom, totalNativeFee.Amount.Sub(refundCoin.Amount))

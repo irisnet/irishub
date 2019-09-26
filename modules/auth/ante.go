@@ -111,7 +111,7 @@ func NewAnteHandler(am AccountKeeper, fck FeeKeeper) sdk.AnteHandler {
 		}
 
 		// cache the signer accounts in the context
-		newCtx = ctx.WithKeySignerAddrs(signerAddrs)
+		newCtx = newCtx.WithKeySignerAddrs(signerAddrs)
 
 		// TODO: tx tags (?)
 		return newCtx, sdk.Result{GasWanted: stdTx.Fee.Gas}, false // continue...

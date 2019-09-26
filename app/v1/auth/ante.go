@@ -111,7 +111,7 @@ func NewAnteHandler(am AccountKeeper, fck FeeKeeper) sdk.AnteHandler {
 			am.SetAccount(newCtx, signerAccs[i])
 		}
 
-		newCtx = ctx.WithKeySignerAddrs(signerAddrs)
+		newCtx = newCtx.WithKeySignerAddrs(signerAddrs)
 		// TODO: tx tags (?)
 		return newCtx, sdk.Result{GasWanted: stdTx.Fee.Gas}, false // continue...
 	}
@@ -286,7 +286,7 @@ func ensureSufficientMempoolFees(ctx sdk.Context, stdTx StdTx) sdk.Result {
 	// TODO:
 	// - Make the gasPrice not a constant, and account for tx size.
 	// - Make Gas an unsigned integer and use tx basic validation
-	if stdTx.Fee.Gas <= 0 {
+	if stdTx.Fee.Gas == 0 {
 		return sdk.ErrInternal(fmt.Sprintf("invalid gas supplied: %d", stdTx.Fee.Gas)).Result()
 	}
 
