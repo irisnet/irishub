@@ -35,12 +35,13 @@ const (
 	CoinHTLCClaimFlow           = "ClaimHTLC"
 	CoinHTLCRefundFlow          = "RefundHTLC"
 
-	//Trigger: transaction hash, module endBlock
-	GovEndBlocker     = "govEndBlocker"
-	SlashBeginBlocker = "slashBeginBlocker"
-	SlashEndBlocker   = "slashEndBlocker"
-	StakeEndBlocker   = "stakeEndBlocker"
-	ServiceEndBlocker = "serviceEndBlocker"
+	//Trigger: transaction hash, module endBlock and beginBlock
+	GovEndBlocker            = "govEndBlocker"
+	SlashBeginBlocker        = "slashBeginBlocker"
+	SlashEndBlocker          = "slashEndBlocker"
+	StakeEndBlocker          = "stakeEndBlocker"
+	ServiceEndBlocker        = "serviceEndBlocker"
+	DistributionBeginBlocker = "distributionBeginBlocker"
 )
 
 // ----------------------------------------------------------------------------

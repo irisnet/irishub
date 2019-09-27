@@ -10,6 +10,7 @@ import (
 
 // set the proposer for determining distribution during endblock
 func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, k keeper.Keeper) {
+	ctx = ctx.WithCoinFlowTrigger(sdk.DistributionBeginBlocker)
 	ctx = ctx.WithLogger(ctx.Logger().With("handler", "beginBlock").With("module", "iris/distribution"))
 	if ctx.BlockHeight() > 1 {
 		previousPercentPrecommitVotes := getPreviousPercentPrecommitVotes(req)
