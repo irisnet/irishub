@@ -4,8 +4,8 @@ This module allows you to post a random number request to the IRIS Hub and query
 
 ## Available Commands
 
-| Name                            | Description                                                      |
-| ------------------------------- | ---------------------------------------------------------------- |
+| Name                            | Description                                                                 |
+| ------------------------------- | --------------------------------------------------------------------------- |
 | [request-rand](#iriscli-rand-request-rand) | Request a random number                                          |
 | [query-rand](#iriscli-rand-query-rand)     | Query the generated random number by the request id              |
 | [query-queue](#iriscli-rand-query-queue)   | Query the pending random number requests with an optional height |
