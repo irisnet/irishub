@@ -1,25 +1,26 @@
 # iriscli params
 
-## Description
+Params module allows you to query the system parameters which can be governed (except the gov params) by the [gov module](#TODO)
 
-Params allows you to query system parameters, some parameters can be governed by gov module
-
-## Usage:
-
-```
- iriscli params --module=<module name>
+```bash
+ iriscli params <flags>
 ```
 
-## Flags
+**Unique Flags:**
 
-| Name, shorthand | Default | Description     | Required |
-| --------------- | ------- | --------------- | -------- |
-| -h, --help      |         | Help for params |          |
-| --module        |         | Name for module |          |
-## Examples
+| Name, shorthand | Default | Description        | Required |
+| --------------- | ------- | ------------------ | -------- |
+| --module        |         | Name of the module |          |
 
+## Query all parameters
+
+```bash
+iriscli params
 ```
-○ → iriscli params
+
+Example Output:
+
+```bash
 Slashing Params:
   slashing/MaxEvidenceAge:           51840
   slashing/SignedBlocksWindow:       34560
@@ -70,3 +71,25 @@ Proposal Parameter:  [Critical]                         [Important]             
   Penalty:           0.0000000000                       0.0000000000                       0.0000000000
 ```
 
+## Query parameters of a module
+
+Available module names can be queried by [query all parameters](#query-all-parameters)
+
+```bash
+iriscli params --module=slashing
+```
+
+Example Output:
+
+```bash
+Slashing Params:
+  slashing/MaxEvidenceAge:           51840
+  slashing/SignedBlocksWindow:       34560
+  slashing/MinSignedPerWindow:       0.7000000000
+  slashing/DoubleSignJailDuration:   48h0m0s
+  slashing/DowntimeJailDuration:     36h0m0s
+  slashing/CensorshipJailDuration:   48h0m0s
+  slashing/SlashFractionDoubleSign:  0.0100000000
+  slashing/SlashFractionDowntime:    0.0003000000
+  slashing/SlashFractionCensorship:  0.0000000000
+```
