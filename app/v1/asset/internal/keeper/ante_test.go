@@ -69,7 +69,7 @@ func TestAssetAnteHandler(t *testing.T) {
 	require.Equal(t, true, abort)
 	require.Equal(t, false, res.IsOK())
 
-	// assert that the ante handle`r will return with `abort` set to true
+	// assert that the ante handler will return with `abort` set to true
 	_ = acc1.SetCoins(acc1.GetCoins().Add(sdk.Coins{gatewayTokenIssueFee}))
 	ak.SetAccount(newCtx, acc1)
 	_, res, abort = anteHandler(newCtx, tx1, false)
