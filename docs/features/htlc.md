@@ -18,11 +18,11 @@ Supposed that Alice swaps BTC for IRIS with Bob. The atomic swap process between
 
 ### step 2
 
-  An event is emitted on Iris Hub which indicates that Bob has created an HTLC by the agreement. Alice is informed of this event by monitor tools (wallet) or the platform. The HTLC initiating transaction with the same hash lock will be sent to Bitcoin by Alice once the event is validated against the agreement. Particularly the HTLC will be locked by an quite smaller time span than the one provided by Bob.
+  An event is emitted on Iris Hub which indicates that Bob has created an HTLC. Alice is informed of this event by monitor tools (usually wallets) or the platform. The HTLC initiating transaction with the same hash lock will be sent to Bitcoin by Alice once the event is validated against the agreement. Particularly the HTLC will be locked by an quite smaller time span than the one provided by Bob.
 
 ### step 3
 
-  Bob confirms the event on Bitcoin and claims the HTLC-locked BTC with the owned secret before the time span set by Alice on Bitcoin.
+  Bob is informed of and confirms the event on Bitcoin. Then Bob claims the HTLC-locked BTC with the owned secret before the time span set by Alice on Bitcoin.
 
 ### step 4
 
