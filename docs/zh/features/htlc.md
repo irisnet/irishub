@@ -2,7 +2,7 @@
 
 ## 概念
 
-[Hash Time Locked Contract（HTLC）]() 是一个跨链原子交换协议。它以去中心化的方式完成用户间点对点的跨链交易。HTLC将跨链资产的交换过程分解为若干子过程。HTLC在协议上能够确保参与方之间的所有交换过程要么全部完成，要么一个都没发生。通过Iris Hub的HTLC功能, 用户能够完成与Bitcoin、Ethereum、LTC以及其他所有支持HTLC的链之间的资产交换。
+[Hash Time Locked Contract（HTLC）](https://en.bitcoin.it/wiki/Hash_Time_Locked_Contracts) 是一个跨链原子交换协议。它以去中心化的方式完成用户间点对点的跨链交易。HTLC将跨链资产的交换过程分解为若干子过程。HTLC在协议上能够确保参与方之间的所有交换过程要么全部完成，要么一个都没发生。通过Iris Hub的HTLC功能, 用户能够完成与Bitcoin、Ethereum、LTC以及其他所有支持HTLC的链之间的资产交换。
 
 ## 交互过程
 
@@ -10,11 +10,23 @@
 
 ### 第0步
 
+  Alice and Bob 在链外对此次交换达成协议。这个过程通常在一个第三方交易平台完成。我们假设Alice是一个maker，而Bob是一个taker。这个协议包括BTC与IRIS的兑换率、彼此在对方链上的地址、由一个秘密值secret生成的哈希锁以及一个合适的过期时间。我们这里假定secret由Bob持有。
+
 ### 第1步
+
+  Bob发送一个创建HTLC的交易到Iris Hub，这个交易将通过协商的哈希锁锁定指定数量的IRIS到特定的地址。
 
 ### 第2步
 
+  上述交易将在Iris Hub上触发一个特定事件，监听工具（通常是钱包）或者平台将通知Alice。在验证这个事件符合协议之后，Alice使用相同的哈希锁在Bitcoin上发起一个HTLC创建交易。特别地，这个HTLC将使用一个相较于Bob提供的值足够小的时间锁。
+
 ### 第3步
+
+  Bob通过类似方式接收到Bitcoin上的交易事件，确认之后在Alice提供的时间锁过期之前用secret去claim Bitcoin上锁定的BTC。
+
+### 第4步
+
+  当Bob在Bitcoin上成功claim之后，secret将被披露。通过这个secret，Alice将在Iris Hub上完成相同的claim操作。这个操作也需要在Bob提供的过期时间之前完成。
 
 ## Iris Hub HTLC 规范
 
@@ -44,7 +56,10 @@
 
 ## 行为
 
-### [创建HTLC]()
-### [Claim HTLC]()
-### [退回HTLC]()
-### [查询HTLC]()
+- [创建HTLC](../cli-client/htlc/create.md)
+  
+- [Claim HTLC](../cli-client/htlc/claim.md)
+
+- [Refund HTLC](../cli-client/htlc/refund.md)
+  
+- [查询HTLC](../cli-client/asset/query-htlc.md)
