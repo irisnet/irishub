@@ -6,7 +6,6 @@ import (
 
 	"github.com/irisnet/irishub/modules/gov/tags"
 	sdk "github.com/irisnet/irishub/types"
-
 	tmstate "github.com/tendermint/tendermint/state"
 )
 
@@ -281,7 +280,7 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) (resTags sdk.Tags) {
 		keeper.SetProposal(ctx, activeProposal)
 		ctx.Logger().Info("Proposal tallied", "ProposalID", activeProposal.GetProposalID(), "result", result)
 		resTags = resTags.AppendTag(tags.Action, action)
-		resTags = resTags.AppendTag(tags.ProposalID, []byte(string(proposalID)))
+		resTags = resTags.AppendTag(tags.ProposalID, []byte(strconv.FormatUint(proposalID, 10)))
 
 		for _, valAddr := range keeper.GetValidatorSet(ctx, proposalID) {
 			if _, ok := votingVals[valAddr.String()]; !ok {

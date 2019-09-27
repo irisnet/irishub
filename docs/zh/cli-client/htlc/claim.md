@@ -14,8 +14,8 @@ iriscli htlc claim --hash-lock=<hash-lock> --secret=<secret>
 
 | 命令，速记    | 类型     | 是否必须 | 默认值 | 描述                          |
 | ----------- | -------- | ------ | ----- | ---------------------------- |
-| --hash-lock | bytesHex | 是     |       | 要发送锁定资金 HTLC 的 hashlock |
-| --secret    | bytesHex | 是     |       | 用于生成 hashlock 的 secret    |
+| --hash-lock | bytesHex | 是     |       | 要发送锁定资金 HTLC 的 hash lock |
+| --secret    | bytesHex | 是     |       | 用于生成 hash lock 的 secret    |
 
 ## 示例
 
