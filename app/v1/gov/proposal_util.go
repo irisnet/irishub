@@ -103,7 +103,7 @@ func createTokenAdditionInfo() pTypeInfo {
 				decimal := int(addTokenMsg.Decimal)
 				maxSupply := sdk.NewIntWithDecimal(int64(exported.MaximumAssetMaxSupply), decimal)
 
-				fToken := exported.NewFungibleToken(exported.EXTERNAL, "", addTokenMsg.Symbol, addTokenMsg.Name, addTokenMsg.Decimal, addTokenMsg.CanonicalSymbol, addTokenMsg.MinUnitAlias, sdk.ZeroInt(), maxSupply, false, nil)
+				fToken := exported.NewFungibleToken(exported.EXTERNAL, "", addTokenMsg.Symbol, addTokenMsg.Name, addTokenMsg.Decimal, addTokenMsg.CanonicalSymbol, addTokenMsg.MinUnitAlias, sdk.ZeroInt(), maxSupply, true, nil)
 				proposal := &TokenAdditionProposal{
 					p,
 					fToken,
