@@ -6,7 +6,7 @@ Keys allows you to manage your local keystore for tendermint.
 
 ## Usage
 
-```shell
+```bash
 iriscli keys <command>
 ```
 

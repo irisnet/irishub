@@ -7,7 +7,7 @@ Create a new key, or recover from mnemonic
 ## Usage
 
 ```
-iriscli keys add <name> [flags]
+iriscli keys add <name> <flags>
 ```
 
 ## Flags
@@ -30,7 +30,7 @@ iriscli keys add <name> [flags]
 
 ### Create a new key
 
-```shell
+```bash
 iriscli keys add MyKey
 ```
 
@@ -72,13 +72,13 @@ Enter your recovery seed phrase:
 
 ### Recover a key from keystore
 
-```shell
+```bash
 iriscli keys add Mykey --recover --keystore=<path_to_backup_keystore>
 ```
 
 ### Create multisig account
 
-Create a multisig account with 3 sub-accounts，specify the minimum number of signatures，such as 2. The tx could be broadcast only when the number of signatures is greater than or equal to 2.
+Create a multisig account with 3 sub-accounts, specify the minimum number of signatures, such as 2. The tx could be broadcast only when the number of signatures is greater than or equal to 2.
 
 ```  
 iriscli keys add <multi_account_keyname> --multisig-threshold=2 --multisig=<signer_keyname_1>,<signer_keyname_2>,<signer_keyname_3>...
@@ -90,4 +90,4 @@ iriscli keys add <multi_account_keyname> --multisig-threshold=2 --multisig=<sign
 Offline account can be created by "iriscli keys add --pubkey". 
 :::
 
-How to use multisig account to broadcast a transaction， please refer to [multisig](../tx/multisig.md)
+How to use multisig account to broadcast a transaction,  please refer to [multisig](../tx/multisig.md)

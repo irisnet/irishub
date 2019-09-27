@@ -22,7 +22,7 @@ iriscli keys delete <name> <flags>
 
 ### Delete a given key
 
-```shell
+```bash
 iriscli keys delete MyKey
 ```
 

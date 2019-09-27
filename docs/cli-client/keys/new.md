@@ -26,7 +26,7 @@ iriscli keys new <name> <flags>
 
 ### Create a new key by the specified method
 
-```shell
+```bash
 iriscli keys new MyKey
 ```
 

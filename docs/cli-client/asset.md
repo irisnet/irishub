@@ -24,7 +24,7 @@ Asset module allows you to manage assets on IRIS Hub
 Create a gateway which is used to peg external assets
 
 ```bash
-iriscli asset create-gateway [flags]
+iriscli asset create-gateway <flags>
 ```
 
 **Unique Flags:**
@@ -47,7 +47,7 @@ iriscli asset create-gateway --moniker=cats --identity=<pgp-id> --details="Cat T
 Edit a gateway with the given moniker
 
 ```bash
-iriscli asset edit-gateway [flags]
+iriscli asset edit-gateway <flags>
 ```
 
 **Unique Flags:**
@@ -70,7 +70,7 @@ iriscli asset edit-gateway --moniker=cats --identity=<pgp-id> --details="Cat Tok
 Transfer the ownership of a gateway to a new owner.
 
 ```bash
-iriscli asset transfer-gateway-owner [flags]
+iriscli asset transfer-gateway-owner <flags>
 ```
 
 **Unique Flags:**
@@ -91,7 +91,7 @@ iriscli asset transfer-gateway-owner --moniker=cats --to=<new-owner-address> --f
 This command is used to issue a new token on IRIS Hub.
 
 ```bash
-iriscli asset issue-token [flags]
+iriscli asset issue-token <flags>
 ```
 
 **Unique Flags:**
@@ -153,7 +153,7 @@ iriscli bank send --from=<key-name> --to=<address> --amount=10cats.kitty --fee=0
 Edit token informations
 
 ```bash
-iriscli asset edit-token <token-id> [flags]
+iriscli asset edit-token <token-id> <flags>
 ```
 
 **Unique Flags:**
@@ -179,7 +179,7 @@ iriscli asset edit-token cat --name="Cat Token" --canonical-symbol="cat" --min-u
 Transfer the ownership of a token
 
 ```bash
-iriscli asset transfer-token-owner <token-id> [flags]
+iriscli asset transfer-token-owner <token-id> <flags>
 ```
 
 **Unique Flags:**
@@ -199,7 +199,7 @@ iriscli asset transfer-token-owner kitty --to=<new-owner-address> --from=<key-na
 The asset owner can directly mint tokens to a specified address
 
 ```bash
-iriscli asset mint-token <token-id> [flags]
+iriscli asset mint-token <token-id> <flags>
 ```
 
 **Unique Flags:**
@@ -254,7 +254,7 @@ iriscli asset query-token x.btc
 Query the collection of tokens issued on IRIS Hub based on criteria.
 
 ```bash
-iriscli asset query-tokens [flags]
+iriscli asset query-tokens <flags>
 ```
 
 **Unique Flags:**
@@ -307,7 +307,7 @@ iriscli asset query-tokens --owner=<address>
 Query a gateway by moniker
 
 ```bash
-iriscli asset query-gateway [flags]
+iriscli asset query-gateway <flags>
 ```
 
 **Unique Flags:**
@@ -327,7 +327,7 @@ iriscli asset query-gateway --moniker cats
 Query all the gateways by its' owner
 
 ```bash
-iriscli asset query-gateways [flags]
+iriscli asset query-gateways <flags>
 ```
 
 **Unique Flags:**
@@ -347,7 +347,7 @@ iriscli asset query-gateways --owner=<owner-address>
 Query the asset related fees, including gateway creation and token issuance and minting
 
 ```bash
-iriscli asset query-fee [flags]
+iriscli asset query-fee <flags>
 ```
 
 **Unique Flags:**

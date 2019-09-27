@@ -24,7 +24,7 @@ iriscli keys show <name> <flags>
 
 ### Show a given key
 
-```shell
+```bash
 iriscli keys show MyKey
 ```
 
@@ -39,12 +39,12 @@ MyKey	local	iaa1kkm4w5pvmcw0e3vjcxqtfxwqpm3k0zak83e7nf	iap1addwnpepq0gsl90v9dgac
 
 If an address has bonded to be a validator operator, then you could use `--bech val` to get the operator's address:
 
-```$xslt
+```bash
 iriscli keys show alice --bech val
 ```
 
 Then you could see the following:
-```$xslt
+```bash
 NAME: TYPE: ADDRESS: PUBKEY:
 alice local iva12nda6xwpmp000jghyneazh4kkgl2tnzyx7trze ivp1addwnpepqfw52vyzt9xgshxmw7vgpfqrey30668g36f9z837kj9dy68kn2wxqm8gtmk
 ```

@@ -21,7 +21,7 @@ iriscli keys mnemonic <flags>
 
 ### Create a bip39 mnemonic
 
-```shell
+```bash
 iriscli keys mnemonic
 ```
 
@@ -33,7 +33,7 @@ police possible oval milk network indicate usual blossom spring wasp taste canal
 
 ### Use `unsafe-entropy` mode.
 
-```shell
+```bash
 root@ubuntu16:~# iriscli keys mnemonic --unsafe-entropy
 
 WARNING: Generate at least 256-bits of entropy and enter the results here:

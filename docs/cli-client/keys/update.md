@@ -20,7 +20,7 @@ iriscli keys update <name> <flags>
 
 ### Change the password of a given key
 
-```shell
+```bash
 iriscli keys update MyKey
 ```
 

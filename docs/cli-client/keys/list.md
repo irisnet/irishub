@@ -21,7 +21,7 @@ iriscli keys list <flags>
 
 ### List all public keys 
 
-```shell
+```bash
 iriscli keys list
 ```
 
