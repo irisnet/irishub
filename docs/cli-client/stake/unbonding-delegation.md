@@ -32,7 +32,7 @@ iriscli stake unbonding-delegation --address-delegator=<delegator-address> --add
 
 After that, you will get unbonding delegation's detailed info between specified validator and delegator.
 
-```txt
+```bash
 Unbonding Delegation
 Delegator: iaa13lcwnxpyn2ea3skzmek64vvnp97jsk8qrcezvm
 Validator: iva15grv3xg3ekxh9xrf79zd0w077krgv5xfzzunhs

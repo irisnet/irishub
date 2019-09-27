@@ -23,7 +23,7 @@ iriscli stake pool
 
 After that, you will get the current staking pool values.
 
-```txt
+```bash
 Pool
     Loose Tokens: 49.8289125612
     Bonded Tokens: 100.1800000000

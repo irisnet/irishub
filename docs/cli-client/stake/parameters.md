@@ -24,7 +24,7 @@ iriscli stake parameters
 
 After that, you will get the current staking parameters information.
 
-```txt
+```bash
 Params 
 Unbonding Time: 504h0m0s
 Max Validators: 175: 

@@ -31,7 +31,7 @@ iriscli stake delegation --address-validator=iva106nhdckyf996q69v3qdxwe6y7408pvy
 
 After that, you will get detailed info of the delegation between specified validator and delegator.
 
-```txt
+```bash
 Delegation:
   Delegator:  iaa13lcwnxpyn2ea3skzmek64vvnp97jsk8qrcezvm
   Validator:  iva15grv3xg3ekxh9xrf79zd0w077krgv5xfzzunhs

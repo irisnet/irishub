@@ -7,7 +7,7 @@ Edit an existing validator's settings, such as commission rate, name, etc.
 ## Usage
 
 ```bash
-iriscli stake edit-validator [flags]
+iriscli stake edit-validator <flags>
 ```
 
 Print help messages:

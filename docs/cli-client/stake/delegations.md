@@ -6,7 +6,7 @@ Query all delegations delegated from one delegator
 
 ## Usage
 ```
-iriscli stake delegations <delegator-address> [flags]
+iriscli stake delegations <delegator-address> <flags>
 ```
 
 Print help messages:

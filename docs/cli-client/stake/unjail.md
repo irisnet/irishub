@@ -7,7 +7,7 @@ In Proof-of-Stake blockchain, validators will get block provisions by staking th
 ## Usage
 
 ```bash
-iriscli stake unjail [flags]
+iriscli stake unjail <flags>
 ```
 
 Print help messages:

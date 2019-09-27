@@ -32,7 +32,7 @@ iriscli stake redelegation --address-validator-source=SourceValidatorAddress --a
 
 After that, you will get specified redelegation's info based on delegator and source validator address and destination validator address
 
-```txt
+```bash
 Redelegation
 Delegator: iaa10s0arq9khpl0cfzng3qgxcxq0ny6hmc9gtd2ft
 Source Validator: iva1dayujdfnxjggd5ydlvvgkerp2supknth9a8qhh

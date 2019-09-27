@@ -7,7 +7,7 @@ Send a transaction to apply to be a validator and delegate a certain amount of i
 ## Usage
 
 ```bash
-iriscli stake create-validator [flags]
+iriscli stake create-validator <flags>
 ```
 
 Print help messages:

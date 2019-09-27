@@ -25,7 +25,7 @@ iriscli stake signing-info <validator-pubkey>
 
 After that, you will get specified validator's signing information.
 
-```txt
+```bash
   Signing Info
   Start Height:          0
   Index Offset:          3506
