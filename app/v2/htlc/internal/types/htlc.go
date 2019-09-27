@@ -59,14 +59,6 @@ func (h HTLC) GetHashLock() []byte {
 
 // String implements fmt.Stringer
 func (h HTLC) String() string {
-	var secret string
-
-	if h.State == COMPLETED {
-		secret = hex.EncodeToString(h.Secret)
-	} else {
-		secret = ""
-	}
-
 	return fmt.Sprintf(`HTLC:
 	Sender:               %s
 	Receiver:             %s
@@ -80,7 +72,7 @@ func (h HTLC) String() string {
 		h.Receiver,
 		hex.EncodeToString(h.ReceiverOnOtherChain),
 		h.Amount.String(),
-		secret,
+		hex.EncodeToString(h.Secret),
 		h.Timestamp,
 		h.ExpireHeight,
 		h.State,
@@ -89,14 +81,6 @@ func (h HTLC) String() string {
 
 // HumanString implements human
 func (h HTLC) HumanString(converter sdk.CoinsConverter) string {
-	var secret string
-
-	if h.State == COMPLETED {
-		secret = hex.EncodeToString(h.Secret)
-	} else {
-		secret = ""
-	}
-
 	return fmt.Sprintf(`HTLC:
 	Sender:               %s
 	Receiver:             %s
@@ -110,7 +94,7 @@ func (h HTLC) HumanString(converter sdk.CoinsConverter) string {
 		h.Receiver,
 		hex.EncodeToString(h.ReceiverOnOtherChain),
 		converter.ToMainUnit(sdk.NewCoins(h.Amount)),
-		secret,
+		hex.EncodeToString(h.Secret),
 		h.Timestamp,
 		h.ExpireHeight,
 		h.State,
@@ -183,7 +167,7 @@ func (state HTLCState) MarshalJSON() ([]byte, error) {
 	return json.Marshal(state.String())
 }
 
-// Unmarshals from JSON assuming Bech32 encoding
+// Unmarshals from JSON
 func (state *HTLCState) UnmarshalJSON(data []byte) error {
 	var s string
 	err := json.Unmarshal(data, &s)
