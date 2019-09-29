@@ -1,4 +1,4 @@
-# Asset User Guide
+# Asset
 
 ## Introduction
 

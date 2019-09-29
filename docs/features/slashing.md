@@ -18,16 +18,16 @@ There are three main types:
 4. Penalty rules:
 
     4.1 If the total number of tokens which bonded to current validator is A and the penalty ratio is B, then the maximum number of tokens that can be punished is `A*B`.
-    
+
     4.2 If there is unbonding delegation and redelegation in the unbonding period at the current height, then the tokens which in unbonding period are penalized by the ratio B.
-    
+
     4.3 The total number of tokens penalized for unbonding delegation and redelegation is S. If S is less than `A*B`, the validator token punished will be `A*B-S`. Otherwise, the validator bonded token will not be penalized.
 
 ## Long Downtime
 
 In the fixed time window `SignedBlocksWindow`, the ratio of the time of the validator's absence from the block is less than the value of `MinSignedPerWindow`, the validator's bonded token will be penalized in the `SlashFractionDowntime` ratio, and the validator will be jailed. Until the jail time exceeds `DowntimeJailDuration`, the validator can be released by executing `unjail` command.
 
-### parameters
+**parameters:**
 
 * `SignedBlocksWindow` default: 20000
 * `MinSignedPerWindow` default: 0.5
@@ -38,7 +38,7 @@ In the fixed time window `SignedBlocksWindow`, the ratio of the time of the vali
 
 When executing a block, it receives evidence that a validator has voted for conflicting votes of the same round at the same height. If the time of the evidence from the current block time is less than `MaxEvidenceAge`, the validator's bonded token will be penalized in the `SlashFractionDoubleSign` ratio, and the validator will be jailed. Until the jail time exceeds `DoubleSignJailDuration`, the validator can be released by executing `unjail` command.
 
-### parameters
+**parameters:**
 
 * `MaxEvidenceAge` default: 1Day
 * `DoubleSignJailDuration` default: 5Days
@@ -53,7 +53,7 @@ the validator can be unjailed by executing the `unjail` command after jailing pe
 * `validateTx` Size limit for Tx
 * `validateBasicTxMsgs` Basic check on msg in Tx
 
-### parameters
+**parameters:**
 
 * `CensorshipJailDuration` default: 7Days
 * `SlashFractionCensorship` default: 0.02
@@ -64,6 +64,6 @@ the validator can be unjailed by executing the `unjail` command after jailing pe
 
 If the validator was jailed and the jailing period passed, release the validator by `unjail` command.
 
-```
+```bash
 iriscli stake unjail --from=<key name> --fee=0.3iris --chain-id=<chain-id>
 ```

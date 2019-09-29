@@ -1,4 +1,4 @@
-# Random User Guide
+# Random
 
 ::: warning
 This module is in Beta, use at your own risk
