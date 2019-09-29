@@ -22,7 +22,7 @@ func NewHandler(k Keeper) sdk.Handler {
 
 // handleMsgCreateHTLC handles MsgCreateHTLC
 func handleMsgCreateHTLC(ctx sdk.Context, k Keeper, msg MsgCreateHTLC) sdk.Result {
-	secret := make([]byte, 32)
+	secret := make([]byte, 0)
 	expireHeight := msg.TimeLock + uint64(ctx.BlockHeight())
 	state := OPEN
 
