@@ -14,7 +14,7 @@ For general concepts, please refer to [General Concepts](general-concepts.md)
 
 Refer to [Join The Mainnet](../get-started/mainnet.md)
 
-It is also recommanded to test your validator setup on the [Testnet](../get-started/testnet.md) before launch
+It is also recommended to test your validator setup on the [Testnet](../get-started/testnet.md) before launch
 
 **Advices**
 To earn more delegation for your validator, you are advised to:
@@ -43,7 +43,7 @@ In short, there are two types of keys:
 
 #### Tendermint Key
 
-This is an unique key used to sign consensus votes.
+This is a unique key used to sign consensus votes.
 
 - It is generated when the node is created by `iris init`
 - Query the associated public key prefixed with `icp`
@@ -82,7 +82,7 @@ Or you can use a hardware to manage your [Tendermint Key](#tendermint-key) much 
 
 ### How to migrate the validator
 
-There are many ways to migrate your validator, the most recommand way is:
+There are many ways to migrate your validator, the most recommended way is:
 
 1. [Run a Full Node](../get-started.md#run-a-full-node) on the new server
 
@@ -108,7 +108,7 @@ Even though delegated funds cannot be stolen by their validators, delegators are
 
 ### How often will a validator be chosen to propose the next block? Does it go up with the quantity of bonded Atoms
 
-The validator that is selected to propose the next block is called proposer. Each proposer is selected deterministically, and the frequency of being chosen is proportional to the voting power (i.e. amount of bonded IRIS) of the validator. For example, if the total bonded stake across all validators is 100 IRIS and a validator's total stake is 10, then this validator will proposer ~10% of the blocks.
+The validator that is selected to propose the next block is called proposer. Each proposer is selected deterministically, and the frequency of being chosen is proportional to the voting power (i.e. amount of bonded IRIS) of the validator. For example, if the total bonded stake across all validators is 100 IRIS and a validator's total stake is 10, then this validator will propose ~10% of the blocks.
 
 ### What is the incentive to stake
 
