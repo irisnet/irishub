@@ -30,7 +30,7 @@ Validator
   Status:                      Bonded
   Tokens:                      1361.0004000000246900000000000000
   Delegator Shares:            1361.0004000000246900000000000000
-  Description:                 {B-2  3_C a1_}
+  Description:                 moniker: B-2, identity: , website: 3_C, details: a1_
   Unbonding Height:            0
   Minimum Unbonding Time:      1970-01-01 00:00:00 +0000 UTC
   Commission:                  rate: 0.1001000000, maxRate: 1.0000000000, maxChangeRate: 1.0000000000, updateTime: 2019-05-09 03:13:39.720700953 +0000 UTC
