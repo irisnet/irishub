@@ -297,6 +297,13 @@ func (d Description) EnsureLength() (Description, sdk.Error) {
 	return d, nil
 }
 
+// String implements the Stringer interface for a Description.
+func (d Description) String() string {
+	return fmt.Sprintf("moniker: %s, identity: %s, website: %s, details: %v",
+		d.Moniker, d.Identity, d.Website, d.Details,
+	)
+}
+
 // ABCIValidatorUpdate returns an abci.ValidatorUpdate from a staked validator type
 // with the full validator power
 func (v Validator) ABCIValidatorUpdate() abci.ValidatorUpdate {
