@@ -30,4 +30,4 @@ There are no options to run nodes to connect to the Fuxi Testnet, you can use th
 
 ## Nyancat Testnet
 
-Please refer to: <https://github.com/irisnet/testnets/tree/master/nyancat#how-to-join-nyancat-testnet>
+Please refer to [How to join nyancat testnet](https://github.com/irisnet/testnets/tree/master/nyancat#how-to-join-nyancat-testnet)
