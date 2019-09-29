@@ -32,6 +32,7 @@ const sidebar = (directory, array) => {
 
 module.exports = {
     title: "IRISnet Documents",
+    description: "IRISnet Documents",
     base: process.env.VUEPRESS_BASE || "/",
     plugins: [
         ['@vuepress/search', {
@@ -41,6 +42,9 @@ module.exports = {
     locales: {
         "/": {
             lang: "en-US"
+        },
+        "/zh/": {
+            lang: "简体中文"
         }
     },
     themeConfig: {
@@ -48,9 +52,18 @@ module.exports = {
         docsDir: "docs",
         editLinks: true,
         docsBranch: "master",
+        editLinkText: 'Help us improve this page!',
         locales: {
             "/": {
-                label: "English",
+                selectText: 'Languages',
+                label: 'English',
+                editLinkText: 'Help us improve this page!',
+                nav: [
+                    {
+                        text: 'Back to IRISnet',
+                        link: 'https://www.irisnet.org'
+                    }
+                ],
                 sidebar: sidebar("", [
                     ["Getting Started", "get-started"],
                     ["Concepts", "concepts"],
@@ -58,7 +71,27 @@ module.exports = {
                     ["Daemon", "daemon"],
                     ["CLI Client", "cli-client"],
                     ["API Server", "light-client"],
-                    ["Tools", "tools"]
+                    ["Tools", "tools"],
+                    ["Resources", "resources"]
+                ])
+            },
+            "/zh/": {
+                selectText: '选择语言',
+                label: '简体中文',
+                editLinkText: '帮助我们完善此文档',
+                nav: [{
+                    text: 'IRISnet 官网',
+                    link: 'https://www.irisnet.org'
+                }],
+                sidebar: sidebar("", [
+                    ["Getting Started", "/zh/get-started"],
+                    ["Concepts", "/zh/concepts"],
+                    ["Features", "/zh/features"],
+                    ["Daemon", "/zh/daemon"],
+                    ["CLI Client", "/zh/cli-client"],
+                    ["API Server", "/zh/light-client"],
+                    ["Tools", "/zh/tools"],
+                    ["Resources", "/zh/resources"]
                 ])
             }
         },

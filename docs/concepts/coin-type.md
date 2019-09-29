@@ -2,7 +2,7 @@
 
 ## Definitions
 
-Coin type defines the available units of a kind of token in IRISnet. The developers can specify different coin_type for  their tokens. The native token in IRIShub is `iris`, which has following available units: `iris-milli`, `iris-micro`, `iris-nano`, `iris-pico`, `iris-femto` and `iris-atto`. The conversion relationship between them are as follows:
+Coin type defines the available units of a kind of token in IRISnet. The developers can specify different coin-type for  their tokens. The native token in IRIShub is `iris`, which has following available units: `iris-milli`, `iris-micro`, `iris-nano`, `iris-pico`, `iris-femto` and `iris-atto`. The conversion relationship between them are as follows:
 
 ```toml
 1 iris = 10^3 iris-milli
@@ -37,7 +37,7 @@ type Unit struct {
 ```
 
 * Name : The name of a token, which is also its default unit；for instance,the default unit of IRISnet is `iris`.
-* MinUnit：The minimum unit of coin_type.
+* MinUnit：The minimum unit of coin-type.
 
 The tokens in the system are all stored in the form of minimum unit, such as `iris-atto`. You could choose to use the minimum unit of the tokens when sending a transaction to the IRIShub. If you use the command line client, aka `iriscli`, you can use any system-recognized unit and the system will automatically convert to the minimum unit of this corresponding token. For example, if you execute `send`command to transfer 1iris, the command line will be processed as 10^18 iris-atto in the backend, and you will only see 10^18 `iris-atto` when searching the transaction details by transaction hash.
 
@@ -45,19 +45,19 @@ The tokens in the system are all stored in the form of minimum unit, such as `ir
 
 For example, the precision of iris-atto is 18.
 
-* `Unit` defines a set of units available under coin_type.
-* `Origin` defines the source of the coin_type
+* `Unit` defines a set of units available under coin-type.
+* `Origin` defines the source of the coin-type
   * `Native`: native tokens, such as iris and user-defined tokens
   * `External`: external system tokens, such as eth for Ethereum, etc.
   * `Gateway`: external system tokens issued by gateways
-* `Desc`：Description of the coin_type.
+* `Desc`：Description of the coin-type.
 
 ## Query of CoinType
 
 If you want to query the CoinType configuration of a certain token, you can use the following command:
 
 ```bash
-iriscli bank coin-type <coin_name>
+iriscli bank coin-type <coin-name>
 ```
 
 If you query the `coin-type` of `iris` with `iriscli bank coin-type iris`
