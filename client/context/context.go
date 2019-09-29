@@ -297,6 +297,9 @@ func (cliCtx CLIContext) ConvertToMainUnit(coinsStr string) (coins []string, err
 
 func (cliCtx CLIContext) ParseCoin(coinStr string) (sdk.Coin, error) {
 	mainUnit, err := sdk.GetCoinName(coinStr)
+	if err != nil {
+		return sdk.Coin{}, err
+	}
 	coinType, err := cliCtx.GetCoinType(mainUnit)
 	if err != nil {
 		return sdk.ParseCoin(coinStr)

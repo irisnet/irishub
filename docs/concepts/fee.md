@@ -14,12 +14,12 @@ To secure their own validator node and maintain the availability of blockchain n
 
 The resource needed for every transactions are varied for different type of transactions. For example, only a few computations, queries & modifies are needed for transfer transaction. But more computations, queries & modifies are needed for creating a validator.  Gas is the unit used to measure how much resource needed to execute the transaction. We list the gas needed for some typical operations in the below:
 
-| operations                          | gas needed                                       |
-| ----------------------------------- | ------------------------------------------------ |
-| writing the tx to the database      | 10 * the size of the transaction data (in bytes) |
-| for reading some data from database | 10 + data length(in bytes)                       |
-| writing some data to database       | 10 + 10 * data length(in bytes)                  |
-| signature verification              | 100                                              |
+| operations                          | gas needed                                                   |
+| ----------------------------------- | ------------------------------------------------------------ |
+| writing the tx to the database      | 10 * the size of the transaction data (in bytes)             |
+| for reading some data from database | 10 + ln(data_length)/ln(1.02), data_length is the length of the read data(in bytes) |
+| writing some data to database       | 10 + 10 * ln(data_length)/ln(1.02), data_length is the length of the write data(in bytes) |
+| signature verification              | 100                                                          |
 
 The total gas needed for executing the transaction is the sum of gas needed for every operations performed during executing the transaction. User should specify the maximum gas by `--gas` parameter. If maximum gas is not enough for executing the transaction, the transaction won't be executed successfully and all the fee will be returned to user's account. After the transaction being executed successfully, fee will deduct according to gas used, deducted fee will be  `maximum-fee * gas-used / maximum-gas` and left fee will be returned to user. Gas price is equal to `maximum-fee / maximum-gas` and stands for fee that user want to pay for each unit of gas. To keep the fee is set in a reasonable range, we set a minimum limit for gas price: `6*10^(-6) iris/gas`, transaction won't be executed if the gas price is less than this value.
 

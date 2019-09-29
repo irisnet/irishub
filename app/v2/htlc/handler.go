@@ -1,8 +1,6 @@
 package htlc
 
 import (
-	"encoding/hex"
-
 	sdk "github.com/irisnet/irishub/types"
 )
 
@@ -24,14 +22,22 @@ func NewHandler(k Keeper) sdk.Handler {
 
 // handleMsgCreateHTLC handles MsgCreateHTLC
 func handleMsgCreateHTLC(ctx sdk.Context, k Keeper, msg MsgCreateHTLC) sdk.Result {
-	secret := make([]byte, 32)
+	secret := make([]byte, 0)
 	expireHeight := msg.TimeLock + uint64(ctx.BlockHeight())
-	state := StateOpen
+	state := OPEN
 
-	htlc := NewHTLC(msg.Sender, msg.Receiver, msg.ReceiverOnOtherChain, msg.OutAmount, msg.InAmount, secret, msg.Timestamp, expireHeight, state)
-	secretHashLock, _ := hex.DecodeString(msg.SecretHashLock)
+	htlc := NewHTLC(
+		msg.Sender,
+		msg.Receiver,
+		msg.ReceiverOnOtherChain,
+		msg.Amount,
+		secret,
+		msg.Timestamp,
+		expireHeight,
+		state,
+	)
 
-	tags, err := k.CreateHTLC(ctx, htlc, secretHashLock)
+	tags, err := k.CreateHTLC(ctx, htlc, msg.HashLock)
 	if err != nil {
 		return err.Result()
 	}
@@ -43,9 +49,7 @@ func handleMsgCreateHTLC(ctx sdk.Context, k Keeper, msg MsgCreateHTLC) sdk.Resul
 
 // handleMsgClaimHTLC handles MsgClaimHTLC
 func handleMsgClaimHTLC(ctx sdk.Context, k Keeper, msg MsgClaimHTLC) sdk.Result {
-	secret, _ := hex.DecodeString(msg.Secret)
-	secretHash, _ := hex.DecodeString(msg.SecretHashLock)
-	tags, err := k.ClaimHTLC(ctx, secret, secretHash)
+	tags, err := k.ClaimHTLC(ctx, msg.HashLock, msg.Secret)
 	if err != nil {
 		return err.Result()
 	}
@@ -57,8 +61,7 @@ func handleMsgClaimHTLC(ctx sdk.Context, k Keeper, msg MsgClaimHTLC) sdk.Result 
 
 // handleMsgRefundHTLC handles MsgRefundHTLC
 func handleMsgRefundHTLC(ctx sdk.Context, k Keeper, msg MsgRefundHTLC) sdk.Result {
-	secretHash, _ := hex.DecodeString(msg.SecretHashLock)
-	tags, err := k.RefundHTLC(ctx, secretHash)
+	tags, err := k.RefundHTLC(ctx, msg.HashLock)
 	if err != nil {
 		return err.Result()
 	}

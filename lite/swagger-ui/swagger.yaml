@@ -35,6 +35,8 @@ tags:
     description: Service module APIs
   - name: CoinSwap
     description: CoinSwap module APIs
+  - name: HTLC
+    description: HTLC module APIs
   - name: Params
     description: Params module APIs
   - name: Gov
@@ -1196,9 +1198,17 @@ paths:
                 initial_deposit:
                   type: string
                   example: 10iris
+                param:
+                  $ref: '#/components/schemas/Param'
+                comm_tax:
+                  $ref: '#/components/schemas/CommTax'
+                token:
+                  $ref: '#/components/schemas/TokenAddition'
+                upgrade:
+                  $ref: '#/components/schemas/Upgrade'
         description: >-
           valid value of `"proposal_type"` can be `"PlainText"`, `"Parameter"`,
-          `"SoftwareUpgrade"`, `"SystemHalt"`,`"CommunityTaxUsage"`,`TokenAddition`
+          `"SoftwareUpgrade"`, `"SystemHalt"`,`"CommunityTaxUsage"`,`"TokenAddition"`
         required: true
     get:
       summary: Query proposals
@@ -2972,6 +2982,124 @@ paths:
                 deadline:
                   type: string
                   example: '30s'
+  '/htlc/htlcs':
+    post:
+      summary: create an HTLC
+      tags:
+        - HTLC
+      responses:
+        '200':
+          description: Unsigned tx was succesfully generated
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_tx:
+                  $ref: '#/components/schemas/BaseTx'
+                sender:
+                  $ref: '#/components/schemas/Address'
+                receiver:
+                  $ref: '#/components/schemas/Address'
+                receiver_on_other_chain:
+                  type: string
+                  example: '327a66212cbee3756816e617b38f9dfeaa6bc765'
+                hash_lock:
+                  type: string
+                  example: '327a66212cbee3756816e617b38f9dfe327a66212cbee3756816e617b38f9dfe'
+                amount:
+                  $ref: '#/components/schemas/Coin'
+                time_lock:
+                  type: integer
+                  example: '100'
+                timestamp:
+                  type: integer
+                  example: '1568011909'
+  '/htlc/htlcs/{hash-lock}':
+    get:
+      summary: query HTLC by hash-lock
+      tags:
+        - HTLC
+      parameters:
+        - in: path
+          name: hash-lock
+          description: the hash-lock of the HTLC
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Unsigned tx was succesfully generated
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
+  '/htlc/htlcs/{hash-lock}/claim':
+    post:
+      summary: claim an opened HTLC
+      tags:
+        - HTLC
+      parameters:
+        - in: path
+          name: hash-lock
+          description: the hash-lock of the HTLC
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Unsigned tx was succesfully generated
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_tx:
+                  $ref: '#/components/schemas/BaseTx'
+                sender:
+                  $ref: '#/components/schemas/Address'
+                secret:
+                  type: string
+                  example: '5f5f5f6162636465666768696a6b6c6d6e6f707172737475767778797a5f5f5f'
+  '/htlc/htlcs/{hash-lock}/refund':
+    post:
+      summary: refund from an expired HTLC
+      tags:
+        - HTLC
+      parameters:
+        - in: path
+          name: hash-lock
+          description: the hash-lock of the HTLC
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Unsigned tx was succesfully generated
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_tx:
+                  $ref: '#/components/schemas/BaseTx'
+                sender:
+                  $ref: '#/components/schemas/Address'
   '/params':
     get:
       summary: Get the system params with an optional module
@@ -3658,3 +3786,63 @@ components:
           example: faa1ezzh0humhy3329xg4avhcjtay985nll0zswc5j
         coin:
           $ref: '#/components/schemas/Coin'
+    Param:
+      type: object
+      properties:
+        subspace:
+          type: string
+          example: 'stake'
+        key:
+          type: string
+          example: 'UnbondingTime'
+        value:
+          type: string
+          example: '120h'
+    CommTax:
+      type: object
+      properties:
+        usage:
+          type: string
+          example: 'Burn'
+        dest_address:
+          type: string
+          example: 'faa1ezzh0humhy3329xg4avhcjtay985nll0zswc5j'
+        percent:
+          type: string
+          example: '0.8'
+    TokenAddition:
+      type: object
+      properties:
+        symbol:
+          type: string
+          example: 'eth'
+        canonical_symbol:
+          type: string
+          example: 'ETH'
+        name:
+          type: string
+          example: 'ETH'
+        decimal:
+          type: integer
+          example: 0
+        min_unit_alias:
+          type: string
+          example: 'wei'
+        initial_supply:
+          type: string
+          example: '100000000'
+    Upgrade:
+      type: object
+      properties:
+        version:
+          type: string
+          example: '2'
+        software:
+          type: string
+          example: 'https://github.com/irisnet/irishub/releases/tag/v0.15.2'
+        switch_height:
+          type: string
+          example: '100'
+        threshold:
+          type: string
+          example: '0.8'

@@ -34,14 +34,15 @@ var (
 	NewMsgClaimHTLC  = types.NewMsgClaimHTLC
 	NewMsgRefundHTLC = types.NewMsgRefundHTLC
 	NewHTLC          = types.NewHTLC
+	GetHashLock      = keeper.GetHashLock
 
-	StateOpen      = types.StateOpen
-	StateCompleted = types.StateCompleted
-	StateExpired   = types.StateExpired
-
-	ValidateSecretHashLock = types.ValidateSecretHashLock
+	OPEN     = types.OPEN
+	EXPIRED  = types.EXPIRED
+	REFUNDED = types.REFUNDED
 
 	QueryHTLC = types.QueryHTLC
+
+	TagHashLock = types.TagHashLock
 
 	NewKeeper  = keeper.NewKeeper
 	NewQuerier = keeper.NewQuerier

@@ -1,8 +1,8 @@
 package slashing
 
 import (
-	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/stake/types"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 // GenesisState - all slashing state that must be provided at genesis

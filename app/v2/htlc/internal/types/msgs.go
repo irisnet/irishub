@@ -1,7 +1,6 @@
 package types
 
 import (
-	"encoding/hex"
 	"fmt"
 
 	sdk "github.com/irisnet/irishub/types"
@@ -20,9 +19,9 @@ const (
 	// type for MsgRefundHTLC
 	TypeMsgRefundHTLC = "refund_htlc"
 
-	SecretLength                    = 32    // the length for secret
+	SecretLength                    = 32    // the length for the secret
+	HashLockLength                  = 32    // the length for the hash lock
 	MaxLengthForAddressOnOtherChain = 32    // maximal length in bytes for the address on other chains
-	DecimalNumForInAmount           = 8     // the default decimal number for InAmount
 	MinTimeLock                     = 50    // minimal time span for HTLC
 	MaxTimeLock                     = 25480 // maximal time span for HTLC
 )
@@ -31,15 +30,14 @@ var _ sdk.Msg = &MsgCreateHTLC{}
 var _ sdk.Msg = &MsgClaimHTLC{}
 var _ sdk.Msg = &MsgRefundHTLC{}
 
-// MsgCreateHTLC represents a msg for creating a HTLC
+// MsgCreateHTLC represents a msg for creating an HTLC
 type MsgCreateHTLC struct {
 	Sender               sdk.AccAddress `json:"sender"`                  // the initiator address
 	Receiver             sdk.AccAddress `json:"receiver"`                // the recipient address
 	ReceiverOnOtherChain []byte         `json:"receiver_on_other_chain"` // the recipient address on other chain
-	OutAmount            sdk.Coin       `json:"out_amount"`              // the amount to be transferred
-	InAmount             uint64         `json:"in_amount"`               // expected amount to be received from another HTLC
-	SecretHashLock       string         `json:"secret_hash_lock"`        // the hash lock generated from secret and timestamp
-	Timestamp            uint64         `json:"timestamp"`               // the time used to generate the hash lock together with secret
+	Amount               sdk.Coin       `json:"amount"`                  // the amount to be transferred
+	HashLock             []byte         `json:"hash_lock"`               // the hash lock generated from secret (and timestamp if provided)
+	Timestamp            uint64         `json:"timestamp"`               // if provided, used to generate the hash lock together with secret
 	TimeLock             uint64         `json:"time_lock"`               // the time span after which the HTLC will expire
 }
 
@@ -48,9 +46,8 @@ func NewMsgCreateHTLC(
 	sender sdk.AccAddress,
 	receiver sdk.AccAddress,
 	receiverOnOtherChain []byte,
-	outAmount sdk.Coin,
-	inAmount uint64,
-	secretHashLock string,
+	amount sdk.Coin,
+	hashLock []byte,
 	timestamp uint64,
 	timeLock uint64,
 ) MsgCreateHTLC {
@@ -58,9 +55,8 @@ func NewMsgCreateHTLC(
 		Sender:               sender,
 		Receiver:             receiver,
 		ReceiverOnOtherChain: receiverOnOtherChain,
-		OutAmount:            outAmount,
-		InAmount:             inAmount,
-		SecretHashLock:       secretHashLock,
+		Amount:               amount,
+		HashLock:             hashLock,
 		Timestamp:            timestamp,
 		TimeLock:             timeLock,
 	}
@@ -86,30 +82,16 @@ func (msg MsgCreateHTLC) ValidateBasic() sdk.Error {
 		return ErrInvalidAddress(DefaultCodespace, fmt.Sprintf("the length of the receiver on other chain must be between [0,%d]", MaxLengthForAddressOnOtherChain))
 	}
 
-	if !msg.OutAmount.IsPositive() {
-		return ErrInvalidAmount(DefaultCodespace, "the transferred amount must be positive")
+	if !msg.Amount.IsValid() || !msg.Amount.IsPositive() {
+		return ErrInvalidAmount(DefaultCodespace, "the transferred amount must be valid")
 	}
 
-	if err := ValidateSecretHashLock(msg.SecretHashLock); err != nil {
-		return ErrInvalidSecretHashLock(DefaultCodespace, err.Error())
+	if len(msg.HashLock) != HashLockLength {
+		return ErrInvalidHashLock(DefaultCodespace, fmt.Sprintf("the hash lock must be %d bytes long", HashLockLength))
 	}
 
 	if msg.TimeLock < MinTimeLock || msg.TimeLock > MaxTimeLock {
-		return ErrInvalidSecretHashLock(DefaultCodespace, fmt.Sprintf("the time lock must be between [%d,%d]", MinTimeLock, MaxTimeLock))
-	}
-
-	return nil
-}
-
-// ValidateSecretHashLock validates the secret hash lock
-func ValidateSecretHashLock(secretHashLock string) sdk.Error {
-	secretHash, err := hex.DecodeString(secretHashLock)
-	if err != nil {
-		return ErrInvalidSecretHashLock(DefaultCodespace, fmt.Sprintf("invalid secret hash lock: %s", err.Error()))
-	}
-
-	if len(secretHash) != 32 {
-		return ErrInvalidSecretHashLock(DefaultCodespace, fmt.Sprintf("invalid secret hash lock: %s", secretHashLock))
+		return ErrInvalidTimeLock(DefaultCodespace, fmt.Sprintf("the time lock must be between [%d,%d]", MinTimeLock, MaxTimeLock))
 	}
 
 	return nil
@@ -132,23 +114,23 @@ func (msg MsgCreateHTLC) GetSigners() []sdk.AccAddress {
 
 // -----------------------------------------------------------------------------
 
-// MsgClaimHTLC represents a msg for claim a HTLC
+// MsgClaimHTLC represents a msg for claiming an HTLC
 type MsgClaimHTLC struct {
-	Sender         sdk.AccAddress `json:"sender"`           // the initiator address
-	Secret         string         `json:"secret"`           // the secret for claim
-	SecretHashLock string         `json:"secret_hash_lock"` // the hash lock generated from secret and timestamp
+	Sender   sdk.AccAddress `json:"sender"`    // the initiator address
+	HashLock []byte         `json:"hash_lock"` // the hash lock identifying the HTLC to be claimed
+	Secret   []byte         `json:"secret"`    // the secret with which to claim
 }
 
 // NewMsgClaimHTLC constructs a MsgClaimHTLC
 func NewMsgClaimHTLC(
 	sender sdk.AccAddress,
-	secret string,
-	secretHashLock string,
+	hashLock []byte,
+	secret []byte,
 ) MsgClaimHTLC {
 	return MsgClaimHTLC{
-		Sender:         sender,
-		Secret:         secret,
-		SecretHashLock: secretHashLock,
+		Sender:   sender,
+		HashLock: hashLock,
+		Secret:   secret,
 	}
 }
 
@@ -164,26 +146,12 @@ func (msg MsgClaimHTLC) ValidateBasic() sdk.Error {
 		return ErrInvalidAddress(DefaultCodespace, "the sender address must be specified")
 	}
 
-	if err := ValidateSecret(msg.Secret); err != nil {
-		return ErrInvalidSecret(DefaultCodespace, err.Error())
+	if len(msg.HashLock) != HashLockLength {
+		return ErrInvalidHashLock(DefaultCodespace, fmt.Sprintf("the hash lock must be %d bytes long", HashLockLength))
 	}
 
-	if err := ValidateSecretHashLock(msg.SecretHashLock); err != nil {
-		return ErrInvalidSecretHashLock(DefaultCodespace, err.Error())
-	}
-
-	return nil
-}
-
-// ValidateSecretHashLock validates the secret hash lock
-func ValidateSecret(secret string) sdk.Error {
-	secretHex, err := hex.DecodeString(secret)
-	if err != nil {
-		return ErrInvalidSecret(DefaultCodespace, fmt.Sprintf("invalid secret: %s", err.Error()))
-	}
-
-	if len(secretHex) != 32 {
-		return ErrInvalidSecret(DefaultCodespace, fmt.Sprintf("invalid secret: %s", secretHex))
+	if len(msg.Secret) != SecretLength {
+		return ErrInvalidSecret(DefaultCodespace, fmt.Sprintf("the secret must be %d bytes long", SecretLength))
 	}
 
 	return nil
@@ -206,20 +174,20 @@ func (msg MsgClaimHTLC) GetSigners() []sdk.AccAddress {
 
 // -----------------------------------------------------------------------------
 
-// MsgRefundHTLC represents a msg for refund a HTLC
+// MsgRefundHTLC represents a msg for refund an HTLC
 type MsgRefundHTLC struct {
-	Sender         sdk.AccAddress `json:"sender"`           // the initiator address
-	SecretHashLock string         `json:"secret_hash_lock"` // the hash lock generated from secret and timestamp
+	Sender   sdk.AccAddress `json:"sender"`    // the initiator address
+	HashLock []byte         `json:"hash_lock"` // the hash lock identifying the HTLC to be refunded
 }
 
 // NewMsgClaimHTLC constructs a MsgClaimHTLC
 func NewMsgRefundHTLC(
 	sender sdk.AccAddress,
-	secretHashLock string,
+	hashLock []byte,
 ) MsgRefundHTLC {
 	return MsgRefundHTLC{
-		Sender:         sender,
-		SecretHashLock: secretHashLock,
+		Sender:   sender,
+		HashLock: hashLock,
 	}
 }
 
@@ -235,8 +203,8 @@ func (msg MsgRefundHTLC) ValidateBasic() sdk.Error {
 		return ErrInvalidAddress(DefaultCodespace, "the sender address must be specified")
 	}
 
-	if err := ValidateSecretHashLock(msg.SecretHashLock); err != nil {
-		return ErrInvalidSecretHashLock(DefaultCodespace, err.Error())
+	if len(msg.HashLock) != HashLockLength {
+		return ErrInvalidHashLock(DefaultCodespace, fmt.Sprintf("the hash lock must be %d bytes long", HashLockLength))
 	}
 
 	return nil

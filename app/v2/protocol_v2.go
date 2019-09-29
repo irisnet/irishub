@@ -5,8 +5,6 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/irisnet/irishub/app/v2/coinswap"
-
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/app/v1/asset"
 	"github.com/irisnet/irishub/app/v1/auth"
@@ -20,6 +18,8 @@ import (
 	"github.com/irisnet/irishub/app/v1/slashing"
 	"github.com/irisnet/irishub/app/v1/stake"
 	"github.com/irisnet/irishub/app/v1/upgrade"
+	"github.com/irisnet/irishub/app/v2/coinswap"
+	"github.com/irisnet/irishub/app/v2/htlc"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/guardian"
 	sdk "github.com/irisnet/irishub/types"
@@ -56,6 +56,7 @@ type ProtocolV2 struct {
 	assetKeeper    asset.Keeper
 	randKeeper     rand.Keeper
 	coinswapKeeper coinswap.Keeper
+	htlcKeeper     htlc.Keeper
 
 	router      protocol.Router      // handle any kind of message
 	queryRouter protocol.QueryRouter // router for redirecting query calls
@@ -99,7 +100,7 @@ func (p *ProtocolV2) Load() {
 	p.configParams()
 }
 
-// Init init the configuration of this Protocol
+// Init initializes the configuration of this Protocol
 func (p *ProtocolV2) Init(ctx sdk.Context) {
 	// initialize coinswap params
 	p.coinswapKeeper.Init(ctx)
@@ -139,6 +140,7 @@ func MakeCodec() *codec.Codec {
 	rand.RegisterCodec(cdc)
 	codec.RegisterCrypto(cdc)
 	coinswap.RegisterCodec(cdc)
+	htlc.RegisterCodec(cdc)
 	return cdc
 }
 
@@ -282,6 +284,7 @@ func (p *ProtocolV2) configKeepers() {
 
 	p.randKeeper = rand.NewKeeper(p.cdc, protocol.KeyRand, rand.DefaultCodespace)
 	p.coinswapKeeper = coinswap.NewKeeper(p.cdc, protocol.KeySwap, p.bankKeeper, p.accountMapper, p.paramsKeeper.Subspace(coinswap.DefaultParamSpace))
+	p.htlcKeeper = htlc.NewKeeper(p.cdc, protocol.KeyHtlc, p.bankKeeper, htlc.DefaultCodespace)
 }
 
 // configure all Routers
@@ -296,7 +299,8 @@ func (p *ProtocolV2) configRouters() {
 		AddRoute(protocol.GuardianRoute, guardian.NewHandler(p.guardianKeeper)).
 		AddRoute(protocol.AssetRoute, asset.NewHandler(p.assetKeeper)).
 		AddRoute(protocol.RandRoute, rand.NewHandler(p.randKeeper)).
-		AddRoute(protocol.SwapRoute, coinswap.NewHandler(p.coinswapKeeper))
+		AddRoute(protocol.SwapRoute, coinswap.NewHandler(p.coinswapKeeper)).
+		AddRoute(protocol.HtlcRoute, htlc.NewHandler(p.htlcKeeper))
 
 	p.queryRouter.
 		AddRoute(protocol.AccountRoute, bank.NewQuerier(p.bankKeeper, p.cdc)).
@@ -308,8 +312,8 @@ func (p *ProtocolV2) configRouters() {
 		AddRoute(protocol.ParamsRoute, params.NewQuerier(p.paramsKeeper)).
 		AddRoute(protocol.AssetRoute, asset.NewQuerier(p.assetKeeper)).
 		AddRoute(protocol.RandRoute, rand.NewQuerier(p.randKeeper)).
-		AddRoute(protocol.SwapRoute, coinswap.NewQuerier(p.coinswapKeeper))
-
+		AddRoute(protocol.SwapRoute, coinswap.NewQuerier(p.coinswapKeeper)).
+		AddRoute(protocol.HtlcRoute, htlc.NewQuerier(p.htlcKeeper))
 }
 
 // configure all FeeHandlers
@@ -341,6 +345,7 @@ func (p *ProtocolV2) GetKVStoreKeyList() []*sdk.KVStoreKey {
 		protocol.KeyAsset,
 		protocol.KeyRand,
 		protocol.KeySwap,
+		protocol.KeyHtlc,
 	}
 }
 
@@ -362,9 +367,12 @@ func (p *ProtocolV2) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) a
 	// handle pending random number requests
 	randTags := rand.BeginBlocker(ctx, req, p.randKeeper)
 
+	// handle HTLC expiration queue
+	htlcTags := htlc.BeginBlocker(ctx, p.htlcKeeper)
+
 	ctx.CoinFlowTags().TagWrite()
 
-	tags = tags.AppendTags(slashTags).AppendTags(randTags)
+	tags = tags.AppendTags(slashTags).AppendTags(randTags).AppendTags(htlcTags)
 	return abci.ResponseBeginBlock{
 		Tags: tags.ToKVPairs(),
 	}
@@ -432,6 +440,7 @@ func (p *ProtocolV2) InitChainer(ctx sdk.Context, DeliverTx sdk.DeliverTx, req a
 	asset.InitGenesis(ctx, p.assetKeeper, genesisState.AssetData)
 	rand.InitGenesis(ctx, p.randKeeper, genesisState.RandData)
 	coinswap.InitGenesis(ctx, p.coinswapKeeper, genesisState.SwapData)
+	htlc.InitGenesis(ctx, p.htlcKeeper, genesisState.HtlcData)
 
 	// load the address to pubkey map
 	err = IrisValidateGenesisState(genesisState)

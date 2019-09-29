@@ -3,8 +3,8 @@ package keeper
 import (
 	"fmt"
 
-	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/stake/types"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 // Implements ValidatorSet

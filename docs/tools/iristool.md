@@ -16,23 +16,12 @@ Usually, we encode bytes as hex in the logs, but as base64 in the JSON.
 
 ### iristool debug pubkey
 
-The following 2 commands return the same results:
+The following give the same result:
 
 ```bash
 iristool debug pubkey TZTQnfqOsi89SeoXVnIw+tnFJnr4X8qVC0U8AsEmFk4=
 iristool debug pubkey 4D94D09DFA8EB22F3D49EA17567230FAD9C5267AF85FCA950B453C02C126164E
-```
-
-returns
-
-```bash
-Address: AB848E791827483D950C85F9CFC77D901FEE1E73
-Hex: 4D94D09DFA8EB22F3D49EA17567230FAD9C5267AF85FCA950B453C02C126164E
-JSON (base64): {"type":"tendermint/PubKeyEd25519","value":"TZTQnfqOsi89SeoXVnIw+tnFJnr4X8qVC0U8AsEmFk4="}
-Bech32 Acc: iap1zcjduepqfk2dp80636ez702fagt4vu3sltvu2fn6lp0u49gtg57q9sfxze8qrdvx6k
-Bech32 Val: ivp1zcjduepqfk2dp80636ez702fagt4vu3sltvu2fn6lp0u49gtg57q9sfxze8quy9u3g
-Bech32 Cons: icp1zcjduepqfk2dp80636ez702fagt4vu3sltvu2fn6lp0u49gtg57q9sfxze8qzpqagc
-```
+  ```
 
 ### iristool debug tx
 
@@ -116,4 +105,30 @@ Address (Hex): 1F3F7DFE1E41712BAA2564ED29B8FE7AE9C18F8B
 Bech32 Acc: iaa1rulhmls7g9cjh239vnkjnw870t5urrutsfwvmc
 Bech32 Val: iva1rulhmls7g9cjh239vnkjnw870t5urrut9cyrxl
 Bech32 Cons: ica1rulhmls7g9cjh239vnkjnw870t5urrutvqntyu
+```
+
+### iristool debug raw-bytes
+
+Convert raw bytes output (eg. [10 21 13 255]) to hex
+
+```bash
+iristool debug raw-bytes <raw-bytes>
+iristool debug raw-bytes "[10 21 13 255]"
+```
+
+### iristool debug rand-bech32
+
+Generate a random bech32
+
+```bash
+iristool debug rand-bech32
+```
+
+### iristool debug hash-lock
+
+Generate a hash lock with secret and timestamp (if privided)
+
+```bash
+iristool debug hash-lock <secret-hex64> <timestamp>
+iristool debug hash-lock 10dfd779e15176f3b2867f0acc9e18d29f65ea4002957c632d1bea200b9b2915 1580000000
 ```

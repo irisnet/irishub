@@ -11,8 +11,8 @@ func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(MsgWithdrawValidatorRewardsAll{}, "irishub/distr/MsgWithdrawValidatorRewardsAll", nil)
 	cdc.RegisterConcrete(MsgSetWithdrawAddress{}, "irishub/distr/MsgModifyWithdrawAddress", nil)
 
-	cdc.RegisterConcrete(DelegationDistInfo{},"irishub/distr/DelegationDistInfo", nil)
-	cdc.RegisterConcrete(FeePool{},"irishub/distr/FeePool", nil)
+	cdc.RegisterConcrete(DelegationDistInfo{}, "irishub/distr/DelegationDistInfo", nil)
+	cdc.RegisterConcrete(FeePool{}, "irishub/distr/FeePool", nil)
 
 	cdc.RegisterConcrete(&Params{}, "irishub/distr/Params", nil)
 }

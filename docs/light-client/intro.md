@@ -127,6 +127,18 @@ This api supports the following special parameters. By default, their values are
 4. `GET /distribution/{address}/rewards`: Query rewards
 5. `GET /distribution/community-tax`: Query community tax
 
+### Governance module APIs
+
+1. `POST /gov/proposals`: Submit a proposal
+2. `GET /gov/proposals`: Query proposals
+3. `POST /gov/proposals/{proposalId}/deposits`: Deposit tokens to a proposal
+4. `GET /gov/proposals/{proposalId}/deposits`: Query deposits
+5. `POST /gov/proposals/{proposalId}/votes`: Vote a proposal
+6. `GET /gov/proposals/{proposalId}/votes`: Query voters
+7. `GET /gov/proposals/{proposalId}`: Query a proposal
+8. `GET /gov/proposals/{proposalId}/deposits/{depositor}`: Query deposit
+9. `GET /gov/proposals/{proposalId}/votes/{voter}`: Query vote
+
 ### Asset module APIs
 
 1. `GET /asset/gateways/{moniker}`: Query the gateway of a given moniker
@@ -140,11 +152,20 @@ This api supports the following special parameters. By default, their values are
 9. `POST /asset/tokens/{token-id}/mint`: The asset owner and operator can directly mint tokens to a specified address
 10. `POST /asset/tokens/{token-id}/transfer-owner`: transfer the owner of a token to a new owner
 
-### Rand module APIs
+### Coinswap module APIs
 
-1. `POST /rand/rands`: Request a randon number
-2. `GET /rand/rands/{request-id}`: Query a random number by the specified request id
-3. `GET /rand/queue`: Query the pending requests with an optional height
+1. `POST /coinswap/liquidities/{id}/deposit`: add liquidities
+2. `POST /coinswap/liquidities/{id}/withdraw`: withdraw liquidities
+3. `POST /coinswap/liquidities/buy`: swap token(buy a fixed number of  token)
+4. `POST /coinswap/liquidities/sell`: swap token(sell a fixed number of  token)
+5. `GET /coinswap/liquidities/{id}`: query liquidity by a liquidity id
+
+### HTLC module APIs
+
+1. `POST /htlc/htlcs`: 创建一个HTLC
+2. `GET /htlc/htlcs/{hash-lock}`: 通过hash-lock查询一个HTLC
+3. `POST /htlc/htlcs/{hash-lock}/claim`: 将一个OPEN状态的HTLC中锁定的资金发放到收款人地址
+4. `POST /htlc/htlcs/{hash-lock}/refund`: 从一个过期的HTLC中取回退款
 
 ### Service module APIs
 
@@ -165,21 +186,15 @@ This api supports the following special parameters. By default, their values are
 15. `POST /service/fees/{address}/refund`: Refund service return fee of consumer
 16. `POST /service/fees/{address}/withdraw`: Withdraw service incoming fee of provider
 
+### Rand module APIs
+
+1. `POST /rand/rands`: Request a randon number
+2. `GET /rand/rands/{request-id}`: Query a random number by the specified request id
+3. `GET /rand/queue`: Query the pending requests with an optional height
+
 ### Params module APIs
 
 1. `GET /params`: Query system params
-
-### Governance module APIs
-
-1. `POST /gov/proposals`: Submit a proposal
-2. `GET /gov/proposals`: Query proposals
-3. `POST /gov/proposals/{proposalId}/deposits`: Deposit tokens to a proposal
-4. `GET /gov/proposals/{proposalId}/deposits`: Query deposits
-5. `POST /gov/proposals/{proposalId}/votes`: Vote a proposal
-6. `GET /gov/proposals/{proposalId}/votes`: Query voters
-7. `GET /gov/proposals/{proposalId}`: Query a proposal
-8. `GET /gov/proposals/{proposalId}/deposits/{depositor}`: Query deposit
-9. `GET /gov/proposals/{proposalId}/votes/{voter}`: Query vote
 
 ### Query app version
 

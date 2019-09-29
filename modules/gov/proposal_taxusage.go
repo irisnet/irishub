@@ -3,8 +3,8 @@ package gov
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/pkg/errors"
 	sdk "github.com/irisnet/irishub/types"
+	"github.com/pkg/errors"
 )
 
 type UsageType byte
@@ -100,14 +100,14 @@ func (ut UsageType) Format(s fmt.State, verb rune) {
 var _ Proposal = (*ParameterProposal)(nil)
 
 type TaxUsage struct {
-	Usage       UsageType		`json:"usage"`
-	DestAddress sdk.AccAddress	`json:"dest_address"`
-	Percent     sdk.Dec			`json:"percent"`
+	Usage       UsageType      `json:"usage"`
+	DestAddress sdk.AccAddress `json:"dest_address"`
+	Percent     sdk.Dec        `json:"percent"`
 }
 
 type TaxUsageProposal struct {
 	BasicProposal
-	TaxUsage 	TaxUsage `json:"tax_usage"`
+	TaxUsage TaxUsage `json:"tax_usage"`
 }
 
 func (tp TaxUsageProposal) GetTaxUsage() TaxUsage { return tp.TaxUsage }

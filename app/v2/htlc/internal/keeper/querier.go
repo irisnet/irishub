@@ -1,7 +1,7 @@
 package keeper
 
 import (
-	"encoding/hex"
+	"fmt"
 
 	"github.com/irisnet/irishub/app/v2/htlc/internal/types"
 	"github.com/irisnet/irishub/codec"
@@ -15,7 +15,7 @@ func NewQuerier(k Keeper) sdk.Querier {
 		case types.QueryHTLC:
 			return queryHTLC(ctx, req, k)
 		default:
-			return nil, sdk.ErrUnknownRequest("unknown htlc query endpoint")
+			return nil, sdk.ErrUnknownRequest("unknown HTLC query endpoint")
 		}
 	}
 }
@@ -27,12 +27,11 @@ func queryHTLC(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, s
 		return nil, sdk.ParseParamsErr(err)
 	}
 
-	secretHash, err := hex.DecodeString(params.SecretHashLock)
-	if err != nil {
-		return nil, sdk.ParseParamsErr(err)
+	if len(params.HashLock) != types.HashLockLength {
+		return nil, types.ErrInvalidHashLock(types.DefaultCodespace, fmt.Sprintf("the hash lock must be %d bytes long", types.HashLockLength))
 	}
 
-	htlc, err2 := keeper.GetHTLC(ctx, secretHash)
+	htlc, err2 := keeper.GetHTLC(ctx, params.HashLock)
 	if err2 != nil {
 		return nil, err2
 	}

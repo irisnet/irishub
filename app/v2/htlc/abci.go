@@ -4,33 +4,38 @@ import (
 	"encoding/hex"
 	"fmt"
 
-	"github.com/irisnet/irishub/app/v2/htlc/internal/types"
 	sdk "github.com/irisnet/irishub/types"
 )
 
-// EndBlocker handles block ending logic
-func EndBlocker(ctx sdk.Context, k Keeper) (resTags sdk.Tags) {
-	// check htlc expire and set state from Open to Expired
-	ctx = ctx.WithLogger(ctx.Logger().With("handler", "EndBlock").With("module", "iris/htlc"))
+// BeginBlocker handles block beginning logic
+func BeginBlocker(ctx sdk.Context, k Keeper) (tags sdk.Tags) {
+	ctx = ctx.WithLogger(ctx.Logger().With("handler", "beginBlock").With("module", "iris/htlc"))
 
 	currentBlockHeight := uint64(ctx.BlockHeight())
 	iterator := k.IterateHTLCExpireQueueByHeight(ctx, currentBlockHeight)
 	defer iterator.Close()
 
 	for ; iterator.Valid(); iterator.Next() {
+		// get the hash lock
+		var hashLock []byte
+		k.GetCdc().MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &hashLock)
 
-		secretHashLock := iterator.Key()
-		htlc, _ := k.GetHTLC(ctx, secretHashLock)
+		htlc, _ := k.GetHTLC(ctx, hashLock)
 
-		htlc.State = types.StateExpired
-		k.SetHTLC(ctx, htlc, secretHashLock)
-		k.DeleteHTLCFromExpireQueue(ctx, currentBlockHeight, secretHashLock)
+		// update the state
+		htlc.State = EXPIRED
+		k.SetHTLC(ctx, htlc, hashLock)
 
-		ctx.Logger().Info(fmt.Sprintf("HTLC [%s] is expired", hex.EncodeToString(secretHashLock)))
+		// delete from the expiration queue
+		k.DeleteHTLCFromExpireQueue(ctx, currentBlockHeight, hashLock)
+
+		// add tags
+		tags = tags.AppendTags(sdk.NewTags(
+			TagHashLock, []byte(hex.EncodeToString(hashLock)),
+		))
+
+		ctx.Logger().Info(fmt.Sprintf("HTLC [%s] is expired", hex.EncodeToString(hashLock)))
 	}
 
-	// TODO: alternative
-	// check expire => refund => delete HTLC from expire queue
-
-	return nil
+	return
 }

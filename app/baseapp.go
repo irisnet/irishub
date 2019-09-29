@@ -507,7 +507,7 @@ func (app *BaseApp) BeginBlock(req abci.RequestBeginBlock) (res abci.ResponseBeg
 		// by InitChain. Context is now updated with Header information.
 		app.deliverState.ctx = app.deliverState.ctx.
 			WithBlockHeader(req.Header).
-			WithBlockHeight(req.Header.Height).WithCheckValidNum(0)
+			WithBlockHeight(req.Header.Height).WithCheckValidNum(sdk.NewValidTxCounter())
 	}
 
 	// add block gas meter
@@ -706,7 +706,7 @@ func (app *BaseApp) cacheTxContext(ctx sdk.Context, txBytes []byte) (
 	return ctx.WithMultiStore(msCache), msCache
 }
 
-// runTx processes a transaction. The transactions is proccessed via an
+// runTx processes a transaction. The transactions is processed via an
 // anteHandler. txBytes may be nil in some cases, eg. in tests. Also, in the
 // future we may support "internal" transactions.
 func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk.Result) {
@@ -745,7 +745,7 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 	}
 
 	if mode == RunTxModeDeliver {
-		app.deliverState.ctx = app.deliverState.ctx.WithCheckValidNum(app.deliverState.ctx.CheckValidNum() + 1)
+		app.deliverState.ctx.CheckValidNum().Incr()
 	}
 
 	defer func() {

@@ -9,9 +9,9 @@ import (
 	"strings"
 
 	"github.com/irisnet/irishub/app/protocol"
-	"github.com/irisnet/irishub/app/v0"
-	"github.com/irisnet/irishub/app/v1"
-	"github.com/irisnet/irishub/app/v2"
+	v0 "github.com/irisnet/irishub/app/v0"
+	v1 "github.com/irisnet/irishub/app/v1"
+	v2 "github.com/irisnet/irishub/app/v2"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/store"
@@ -28,9 +28,12 @@ import (
 const (
 	appName                = "IrisApp"
 	appPrometheusNamespace = "iris"
-	FlagReplay             = "replay-last-block"
-	DefaultSyncableHeight  = store.NumStoreEvery // Multistore saves a snapshot every 10000 blocks
-	DefaultCacheSize       = store.NumRecent     // Multistore saves last 100 blocks
+	// FlagReplay used for replaying last block
+	FlagReplay = "replay-last-block"
+	// Multistore saves a snapshot every 10000 blocks
+	DefaultSyncableHeight = store.NumStoreEvery
+	// Multistore saves last 100 blocks
+	DefaultCacheSize = store.NumRecent
 )
 
 // default home directories for expected binaries
@@ -40,11 +43,12 @@ var (
 	DefaultNodeHome = os.ExpandEnv("$HOME/.iris")
 )
 
-// Extended ABCI application
+//IrisApp Extended ABCI application
 type IrisApp struct {
 	*BaseApp
 }
 
+// NewIrisApp generates an iris application
 func NewIrisApp(logger log.Logger, db dbm.DB, config *cfg.InstrumentationConfig, traceStore io.Writer, baseAppOptions ...func(*BaseApp)) *IrisApp {
 	bApp := NewBaseApp(appName, logger, db, baseAppOptions...)
 	bApp.SetCommitMultiStoreTracer(traceStore)
@@ -62,13 +66,6 @@ func NewIrisApp(logger log.Logger, db dbm.DB, config *cfg.InstrumentationConfig,
 	if viper.GetBool(FlagReplay) {
 		lastHeight := Replay(app.Logger)
 		err = app.LoadVersion(lastHeight, protocol.KeyMain, true)
-
-		// If reset to another protocol version, should reload Protocol and reset txDecoder
-		loaded, current := app.Engine.LoadCurrentProtocol(app.GetKVStore(protocol.KeyMain))
-		if !loaded {
-			cmn.Exit(fmt.Sprintf("Your software doesn't support the required protocol (version %d)!", current))
-		}
-		app.BaseApp.txDecoder = auth.DefaultTxDecoder(app.Engine.GetCurrentProtocol().GetCodec())
 	} else {
 		err = app.LoadLatestVersion(protocol.KeyMain)
 	} // app is now sealed
@@ -94,16 +91,18 @@ func NewIrisApp(logger log.Logger, db dbm.DB, config *cfg.InstrumentationConfig,
 	return app
 }
 
-// latest version of codec
+// MakeLatestCodec loads the lastest verson codec
 func MakeLatestCodec() *codec.Codec {
 	var cdc = v2.MakeCodec() // replace with latest protocol version
 	return cdc
 }
 
+// LastBlockHeight returns the last blcok height
 func (app *IrisApp) LastBlockHeight() int64 {
 	return app.BaseApp.LastBlockHeight()
 }
 
+// ResetOrReplay returns whether you need to reset or replay
 func (app *IrisApp) ResetOrReplay(replayHeight int64) (replay bool, height int64) {
 	lastBlockHeight := app.BaseApp.LastBlockHeight()
 	if replayHeight > lastBlockHeight {
@@ -164,12 +163,13 @@ func (app *IrisApp) ResetOrReplay(replayHeight int64) (replay bool, height int64
 
 }
 
-// export the state of iris for a genesis file
+// ExportAppStateAndValidators exports the state of iris for a genesis file
 func (app *IrisApp) ExportAppStateAndValidators(forZeroHeight bool) (appState json.RawMessage, validators []tmtypes.GenesisValidator, err error) {
 	ctx := app.NewContext(true, abci.Header{Height: app.LastBlockHeight()})
 	return app.Engine.GetCurrentProtocol().ExportAppStateAndValidators(ctx, forZeroHeight)
 }
 
+// LoadHeight loads to the specified height
 func (app *IrisApp) LoadHeight(height int64) error {
 	return app.LoadVersion(height, protocol.KeyMain, false)
 }
