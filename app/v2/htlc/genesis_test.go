@@ -55,7 +55,7 @@ func TestExportHTLCGenesis(t *testing.T) {
 	timeLocks := []uint64{50, 100}
 	expireHeights := []uint64{timeLocks[0] + uint64(ctx.BlockHeight()), timeLocks[1] + uint64(ctx.BlockHeight())}
 	state := OPEN
-	initSecret := make([]byte, 32)
+	initSecret := make([]byte, 0)
 
 	// construct HTLCs
 	htlc1 := NewHTLC(senderAddrs[0], receiverAddrs[0], receiverOnOtherChain, amount, initSecret, timestamps[0], expireHeights[0], state)
