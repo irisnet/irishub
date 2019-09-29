@@ -2984,7 +2984,7 @@ paths:
                   example: '30s'
   '/htlc/htlcs':
     post:
-      summary: create a HTLC
+      summary: create an HTLC
       tags:
         - HTLC
       responses:
@@ -3066,7 +3066,7 @@ paths:
               properties:
                 base_tx:
                   $ref: '#/components/schemas/BaseTx'
-                claimer:
+                sender:
                   $ref: '#/components/schemas/Address'
                 secret:
                   type: string

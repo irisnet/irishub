@@ -15,7 +15,7 @@
 | 命令                         | 描述                                           |
 | --------------------------- | --------------------------------------------- |
 | [create](create.md)         | 创建 HTLC                                      |
-| [claim](claim.md)           | 将一个 Open 状态的 HTLC 中锁定的资金发放到收款人地址 |
+| [claim](claim.md)           | 将一个 OPEN 状态的 HTLC 中锁定的资金发放到收款人地址 |
 | [refund](refund.md)         | 从过期的 HTLC 中取回退款                         |
 | [query-htlc](query-htlc.md) | 查询一个 HTLC 的详细信息                         |
 

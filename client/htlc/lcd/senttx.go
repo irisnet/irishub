@@ -119,7 +119,7 @@ func claimHTLCHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handle
 			return
 		}
 		msg := htlc.NewMsgClaimHTLC(
-			req.Sender, secret, hashLock)
+			req.Sender, hashLock, secret)
 		err = msg.ValidateBasic()
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())

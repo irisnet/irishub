@@ -19,7 +19,7 @@ iriscli htlc create --receiver=<receiver> --receiver-on-other-chain=<receiver-on
 | --amount                  | string   | true     |         | Similar to the amount in the original transfer                    |
 | --hash-lock               | bytesHex | true     |         | The sha256 hash generated from secret (and timestamp if provided) |
 | --time-lock               | string   | true     |         | The number of blocks to wait before the asset may be returned to  |
-| --timestamp               | uint     |          |         | The timestamp in seconds for generating hashLock if provided      |
+| --timestamp               | uint     |          |         | The timestamp in seconds for generating hash lock if provided     |
 
 ## Examples
 
