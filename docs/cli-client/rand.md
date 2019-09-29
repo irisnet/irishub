@@ -70,11 +70,11 @@ iriscli rand query-queue <flags>
 
 | Name, shorthand | type  | Required | Default | Description                                                |
 | --------------- | ----- | -------- | ------- | ---------------------------------------------------------- |
-| --queue-height  | int64 |          | 0       | Request queue at a specified block height                  |
+| --queue-height  | int64 |          | 0       | The block height at which random numbers will be generated |
 
 ## Query random number request queue
 
-Query the pending random number requests with an optional block height
+Query the pending random number requests with an optional block height at which random numbers will be generated
 
 ```bash
 iriscli rand query-queue --queue-height=100000

@@ -76,7 +76,7 @@ Note: A validator's operator key is directly tied to an application key, but use
 
 It is really **IMPORTANT** to backup your validator private key carefully, it's the only way to restore your validator. Note the validator private key is a [Tendermint Key](#tendermint-key)
 
-If you are using the software sign (which is the default signing method of tendermint), your [Tendermint Key](#tendermint-key) is located in `<your_iris_home>/config/priv_validator.json`. The easist way is to backup the whole config folder.
+If you are using the software sign (which is the default signing method of tendermint), your [Tendermint Key](#tendermint-key) is located in `<iris-home>/config/priv_validator.json`. The easist way is to backup the whole config folder.
 
 Or you can use a hardware to manage your [Tendermint Key](#tendermint-key) much more safely, such as the [YubiHSM2](https://developers.yubico.com/YubiHSM2/)
 
@@ -227,7 +227,7 @@ Compare the two `Consensus Pubkey`:
 
 - From [Explorer](https://www.irisplorer.io/#/validators), you can find the `Consensus Pubkey` which you declared for your validator in the Validator Detail page.
 
-- Check the `Consensus Pubkey` which you are now using via `iris tendermint show-validator --home=<your_iris_home>`
+- Check the `Consensus Pubkey` which you are now using via `iris tendermint show-validator --home=<iris-home>`
 
 If they are not the same, means you are running a Full Node other than the Validator.
 
@@ -236,8 +236,8 @@ If they are not the same, means you are running a Full Node other than the Valid
 then you can do these:
 
 - Stop the node
-- Replace the current `<iris_home>/config/priv_validator.json` with the one you backed up
-- Confirm the `Consensus Pubkey` is correct via `iris tendermint show-validator --home=<your_iris_home>`
+- Replace the current `<iris-home>/config/priv_validator.json` with the one you backed up
+- Confirm the `Consensus Pubkey` is correct via `iris tendermint show-validator --home=<iris-home>`
 - Start the node
 - Check `voting_power` should now greater than 0: `iriscli status`
 

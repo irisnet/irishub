@@ -49,4 +49,4 @@ config.toml is the non-consensus configuration of the node. Different nodes can 
 
 ### iris.toml
 
-iris.toml provides some special configurations for IRIShub，such as "check invariant", "track coin flow".
+iris.toml provides some special configurations for IRIShub, such as "check invariant", "track coin flow".

@@ -38,7 +38,7 @@ This is usually because the account address you are querying has no transactions
 Query a special kind of token on IRIShub. The native token on IRIShub is `iris`, which has the following available units: `iris-milli`, `iris-micro`, `iris-nano`, `iris-pico`, `iris-femto` and `iris-atto`.
 
 ```bash
- iriscli bank coin-type <coin_name> [flags]
+ iriscli bank coin-type <coin_name> <flags>
 ```
 
 **Unique Flags:**
@@ -75,7 +75,7 @@ CoinType:
 Query the token statistic, including total loose tokens, total burned tokens and total bonded tokens.
 
 ```bash
- iriscli bank token-stats <token-id> [flags]
+ iriscli bank token-stats <token-id> <flags>
 ```
 
 **Unique Flags:**
@@ -111,7 +111,7 @@ TokenStats:
 This command is used for querying balance information of certain address.
 
 ```bash
-iriscli bank account <address> [flags]
+iriscli bank account <address> <flags>
 ```
 
 **Unique Flags:**

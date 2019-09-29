@@ -33,6 +33,11 @@ const sidebar = (directory, array) => {
 module.exports = {
     title: "IRISnet Documents",
     base: process.env.VUEPRESS_BASE || "/",
+    plugins: [
+        ['@vuepress/search', {
+            searchMaxSuggestions: 10
+        }]
+    ],
     locales: {
         "/": {
             lang: "en-US"
@@ -52,6 +57,7 @@ module.exports = {
                     ["Features", "features"],
                     ["Daemon", "daemon"],
                     ["CLI Client", "cli-client"],
+                    ["API Server", "light-client"],
                     ["Tools", "tools"]
                 ])
             }

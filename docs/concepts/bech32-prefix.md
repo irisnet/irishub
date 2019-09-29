@@ -40,7 +40,7 @@ Validator Key, aka. [Tendermint Key](validator-faq.md#tendermint-key). A Tenderm
 You can get this value with
 
 ```bash
-iris tendermint show-validator --home=<iris_home>
+iris tendermint show-validator --home=<iris-home>
 ```
 
 Example output:

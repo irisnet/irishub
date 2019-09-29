@@ -42,7 +42,7 @@ You can [create a new wallet](../cli-client/keys/add.md#create-a-new-key) or [im
 
 ```bash
 # create a new wallet
-iriscli keys add <key_name>
+iriscli keys add <key-name>
 ```
 
 :::warning
@@ -74,7 +74,7 @@ iriscli stake create-validator \
     --gas=100000 \
     --fee=0.6iris \
     --chain-id=irishub \
-    --from=<key_name> \
+    --from=<key-name> \
     --commit
 ```
 
