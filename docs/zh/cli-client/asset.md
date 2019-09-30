@@ -1,6 +1,6 @@
 # iriscli asset
 
-Asset 模块允许你在IRIS Hub管理自己的资产
+Asset模块允许你在IRIS Hub管理自己的资产。
 
 ## 可用命令
 
@@ -21,7 +21,7 @@ Asset 模块允许你在IRIS Hub管理自己的资产
 
 ## iriscli asset create-gateway
 
-创建网关用于管理外部资产
+创建网关用于管理外部资产。
 
 ```bash
 iriscli asset create-gateway <flags>
@@ -44,7 +44,7 @@ iriscli asset create-gateway --moniker=cats --identity=<pgp-id> --details="Cat T
 
 ## iriscli asset edit-gateway
 
-根据指定别名编辑网关
+根据指定别名编辑网关。
 
 ```bash
 iriscli asset edit-gateway <flags>
@@ -67,7 +67,7 @@ iriscli asset edit-gateway --moniker=cats --identity=<pgp-id> --details="Cat Tok
 
 ## iriscli asset transfer-gateway-owner
 
-将网关的所有权转让给新所有者
+将网关的所有权转让给新所有者。
 
 ```bash
 iriscli asset transfer-gateway-owner <flags>
@@ -88,7 +88,7 @@ iriscli asset transfer-gateway-owner --moniker=cats --to=<new-owner-address> --f
 
 ## iriscli asset issue-token
 
-此命令用于在IRIS Hub上发行新通证
+此命令用于在IRIS Hub上发行新通证。
 
 ```bash
 iriscli asset issue-token <flags>
@@ -120,7 +120,7 @@ iriscli asset issue-token --family=fungible --source=native --name="Kitty Token"
 
 #### 创建一个网关
 
-在此示例之前，需要创建一个名为`cats`的网关, [详细信息](#iriscli-asset-create-gateway)
+在此示例之前，需要创建一个名为`cats`的网关, [详细信息](#iriscli-asset-create-gateway)。
 
 ```bash
 iriscli asset create-gateway --moniker=cats --identity=<identity> --details=<details> --website=<website> --from=<key-name> --commit
@@ -134,7 +134,7 @@ iriscli asset issue-token --family=fungible --source=gateway --gateway=cats --ca
 
 ### 发送通证
 
-您可以像发送任何通证一样 [发送iris](./bank.md#iriscli-bank-send)
+您可以像发送任何通证一样 [发送iris](./bank.md#iriscli-bank-send)。
 
 #### 发送本地通证
 
@@ -150,7 +150,7 @@ iriscli bank send --from=<key-name> --to=<address> --amount=10cats.kitty --fee=0
 
 ## iriscli asset edit-token
 
-编辑通证信息
+编辑通证信息。
 
 ```bash
 iriscli asset edit-token <token-id> <flags>
@@ -166,7 +166,7 @@ iriscli asset edit-token <token-id> <flags>
 | --max-supply       | uint   |          | 0     | 通证的最大供应量              |
 | --mintable         | bool   |          | false | 通证是否可以增发，默认为false |
 
-`max-supply` 只能减少，且不得少于当前的总供应量
+`max-supply` 只能减少，且不得少于当前的总供应量。
 
 ### 编辑通证
 
@@ -176,7 +176,7 @@ iriscli asset edit-token cat --name="Cat Token" --canonical-symbol="cat" --min-u
 
 ## iriscli asset transfer-token-owner
 
-转让通证所有权
+转让通证所有权。
 
 ```bash
 iriscli asset transfer-token-owner <token-id> <flags>
@@ -196,7 +196,7 @@ iriscli asset transfer-token-owner kitty --to=<new-owner-address> --from=<key-na
 
 ## iriscli asset mint-token
 
-资产所有者可以直接将通证增发到指定地址
+资产所有者可以直接将通证增发到指定地址。
 
 ```bash
 iriscli asset mint-token <token-id> <flags>
@@ -217,7 +217,7 @@ iriscli asset mint-token kitty --amount=1000000 --from=<key-name> --chain-id=iri
 
 ## iriscli asset query-token
 
-查询在IRIS Hub发行的通证
+查询在IRIS Hub发行的通证。
 
 ```bash
 iriscli asset query-token <token-id>
@@ -251,7 +251,7 @@ iriscli asset query-token x.btc
 
 ## iriscli asset query-tokens
 
-根据条件查询在IRIS Hub上发行的通证的集合
+根据条件查询在IRIS Hub上发行的通证的集合。
 
 ```bash
 iriscli asset query-tokens <flags>
@@ -304,7 +304,7 @@ iriscli asset query-tokens --owner=<address>
 
 ## iriscli asset query-gateway
 
-查询指定别名的网关
+查询指定别名的网关。
 
 ```bash
 iriscli asset query-gateway <flags>
@@ -324,7 +324,7 @@ iriscli asset query-gateway --moniker cats
 
 ## iriscli asset query-gateways
 
-查询指定所有者的所有网关
+查询指定所有者的所有网关。
 
 ```bash
 iriscli asset query-gateways <flags>
@@ -344,7 +344,7 @@ iriscli asset query-gateways --owner=<owner-address>
 
 ## iriscli asset query-fee
 
-查询与资产相关的费用，包括网关创建，通证发行和增发
+查询与资产相关的费用，包括网关创建，通证发行和增发。
 
 ```bash
 iriscli asset query-fee <flags>

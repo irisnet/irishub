@@ -59,7 +59,7 @@ ERROR: {"codespace":"sdk","code":9,"message":"account iaa1kenrwk5k4ng70e5s9zfstt
 iriscli bank coin-type iris
 ```
 
-之后，您将获得本地通证的详细信息 `iris`
+之后，您将获得本地通证的详细信息 `iris`。
 
 ```bash
 CoinType:
@@ -186,7 +186,7 @@ iriscli bank burn --from=<key-name> --amount=<amount-to-burn> --fee=<native-fee>
 
 ## iriscli bank set-memo-regexp
 
-此命令用于为您自己的地址设置备注正则表达式，以便您只能从具有相应备注的交易中接收通证.
+此命令用于为您自己的地址设置备注正则表达式，以便您只能从具有相应备注的交易中接收通证。
 
 ```bash
 iriscli bank set-memo-regexp --regexp=<regular-expression> --from=<key-name> --fee=<native-fee> --chain-id=<chain-id>

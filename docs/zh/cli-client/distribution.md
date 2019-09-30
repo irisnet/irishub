@@ -1,6 +1,6 @@
 # iriscli distribution
 
-distribution模块可让您管理自己的 [Staking 收益](../concepts/general-concepts.md#staking-rewards).
+distribution模块可让您管理自己的 [Staking 收益](../concepts/general-concepts.md#staking-rewards)。
 
 ## 可用命令
 
@@ -13,7 +13,7 @@ distribution模块可让您管理自己的 [Staking 收益](../concepts/general-
 
 ## iriscli distribution withdraw-address
 
-查询委托人的提现地址
+查询委托人的提现地址。
 
 ```bash
 iriscli distribution withdraw-address <delegator-address> <flags>
@@ -29,7 +29,7 @@ iriscli distribution withdraw-address <delegator-address>
 
 ## iriscli distribution rewards
 
-查询验证人或委托人的所有奖励
+查询验证人或委托人的所有奖励。
 
 ```bash
 iriscli distribution rewards <address> <flags>
@@ -54,7 +54,7 @@ Commission:   267.438208089888659537iris
 
 ## iriscli distribution set-withdraw-addr
 
-设置另一个地址以接收奖励，而不是使用委托人地址
+设置另一个地址以接收奖励，而不是使用委托人地址。
 
 ```bash
 iriscli distribution set-withdraw-addr <withdraw-address> <flags>
@@ -68,7 +68,7 @@ iriscli distribution set-withdraw-addr <iaa...> --from=<key-name> --fee=0.3iris 
 
 ## iriscli distribution withdraw-rewards
 
-取回奖励到提款地址（默认为委托人地址，您可以通过 [set-withdraw-addr](#iriscli-distribution-set-withdraw-addr)重新设置提现地址)
+取回奖励到提款地址（默认为委托人地址，您可以通过 [set-withdraw-addr](#iriscli-distribution-set-withdraw-addr)重新设置提现地址)。
 
 ```bash
 iriscli distribution withdraw-rewards <flags>
@@ -82,7 +82,7 @@ iriscli distribution withdraw-rewards <flags>
 | --is-validator        | bool   |          | false   | 同时取回验证人的佣金                |
 
 :::tip
-不要同时指定以上两个标志
+不要同时指定以上两个标志。
 :::
 
 ### 从指定的验证者取回委派奖励

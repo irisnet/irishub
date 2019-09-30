@@ -1,6 +1,6 @@
 # iriscli htlc
 
-HTLC allows you to manage local Hash Time Locked Contracts (HTLCs) for atomic swaps with other chains
+HTLC模块用于管理[哈希锁定合约](../features/htlc)，以便与其他链进行原子交换
 
 ## Available Commands
 
@@ -23,7 +23,7 @@ HTLC allows you to manage local Hash Time Locked Contracts (HTLCs) for atomic sw
 
 ## iriscli htlc create
 
-创建一个 HTLC
+创建一个 HTLC。
 
 ```bash
 iriscli htlc create --receiver=<receiver> --receiver-on-other-chain=<receiver-on-other-chain> --amount=<amount> --hash-lock=<hash-lock> --time-lock=<time-lock> --timestamp=<timestamp>
@@ -58,7 +58,7 @@ iriscli htlc create \
 
 ## iriscli htlc claim
 
-将 HTLC 中锁定的资金发送到收款人地址
+将 HTLC 中锁定的资金发送到收款人地址。
 
 ```bash
 iriscli htlc claim --hash-lock=<hash-lock> --secret=<secret>
@@ -85,7 +85,7 @@ iriscli htlc claim \
 
 ## iriscli htlc refund
 
-从过期的 HTLC 中取回退款
+从过期的 HTLC 中取回退款。
 
 ```bash
 iriscli htlc refund --hash-lock=<hash-lock>
@@ -110,7 +110,7 @@ iriscli htlc refund \
 
 ## iriscli htlc query-htlc
 
-查询一个 HTLC 的详细信息
+查询一个 HTLC 的详细信息。
 
 ```bash
 iriscli htlc query-htlc <hash-lock>

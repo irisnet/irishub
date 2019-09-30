@@ -1,6 +1,6 @@
 # iriscli gov
 
-该模块提供了以下基本功能 [Governance](../features/governance.md).
+该模块提供了以下基本功能 [Governance](../features/governance.md)。
 
 ## 可用命令
 
@@ -19,7 +19,7 @@
 
 ## iriscli gov query-proposal
 
-查询提案的详细信息
+查询提案的详细信息。
 
 ```bash
 iriscli gov query-proposal <flags>
@@ -39,7 +39,7 @@ iriscli gov query-proposal --chain-id=irishub --proposal-id=<proposal-id>
 
 ## iriscli gov query-proposals
 
-按条件查询提案
+按条件查询提案。
 
 ```bash
 iriscli gov query-proposals <flags>
@@ -68,7 +68,7 @@ iriscli gov query-proposals --chain-id=irishub --limit=3 --status=passed --depos
 
 ## iriscli gov query-vote
 
-查询投票信息
+查询投票信息。
 
 ```bash
 iriscli gov query-vote <flags>
@@ -89,7 +89,7 @@ iriscli gov query-vote --chain-id=irishub --proposal-id=<proposal-id> --voter=<i
 
 ## iriscli gov query-votes
 
-查询提案的所有投票信息
+查询提案的所有投票信息。
 
 ```bash
 iriscli gov query-votes <flags>
@@ -109,7 +109,7 @@ iriscli gov query-votes --chain-id=irishub --proposal-id=<proposal-id>
 
 ## iriscli gov query-deposit
 
-查询指定提案的抵押信息
+查询指定提案的抵押信息。
 
 ```bash
 iriscli gov query-deposit <flags>
@@ -130,7 +130,7 @@ iriscli gov query-deposit --chain-id=irishub --proposal-id=<proposal-id> --depos
 
 ## iriscli gov query-deposits
 
-查询指定提案的所有抵押信息
+查询指定提案的所有抵押信息。
 
 ```bash
 iriscli gov query-deposits <flags>
@@ -150,7 +150,7 @@ iriscli gov query-deposits --chain-id=irishub --proposal-id=<proposal-id>
 
 ## iriscli gov query-tally
 
-查询提案投票的统计信息
+查询提案投票的统计信息。
 
 ```bash
 iriscli gov query-tally <flags>
@@ -170,7 +170,7 @@ iriscli gov query-tally --chain-id=irishub --proposal-id=<proposal-id>
 
 ## iriscli gov submit-proposal
 
-提交提案以及初始化抵押金额
+提交提案以及初始化抵押金额。
 
 ```bash
 iriscli gov submit-proposal <flags>
@@ -203,7 +203,7 @@ iriscli gov submit-proposal <flags>
 ### 提交参数修改提案
 
 :::tip
-[可以在线更改哪些参数]
+[可以在线更改哪些参数]。
 :::
 
 **唯一必须参数：** `--param`
@@ -233,7 +233,7 @@ iriscli gov submit-proposal --chain-id=irishub --title=<proposal-title> --descri
 
 ## iriscli gov deposit
 
-为有效的提案抵押通证
+为有效的提案抵押通证。
 
 ```bash
 iriscli gov deposit <flags>
@@ -257,7 +257,7 @@ iriscli gov deposit --chain-id=irishub --proposal-id=<proposal-id> --deposit=50i
 
 ## iriscli gov vote
 
-为有效的提案投票，选项：Yes/No/NoWithVeto/Abstain
+为有效的提案投票，选项：Yes/No/NoWithVeto/Abstain。
 
 :::tip
 在投票期内，只有验证人和委托人可以对提案进行投票。
