@@ -28,7 +28,7 @@ The `start` subcommand has the following flags:
 
 | Flag       | Type   | Default                 | Required | Description                                                     |
 | ---------- | ------ | ----------------------- | -------- | --------------------------------------------------------------- |
-| chain-id   | string |                         | true     | Chain ID of Tendermint node                                     |
+| chain-id   | string |                         | Yes     | Chain ID of Tendermint node                                     |
 | home       | string | "$HOME/.irislcd"        |          | Directory for config and data, such as key and checkpoint       |
 | node       | string | "tcp://localhost:26657" |          | Full node to connect to                                         |
 | laddr      | string | "tcp://localhost:1317"  |          | Address for server to listen on                                 |

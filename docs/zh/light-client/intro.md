@@ -26,15 +26,15 @@ IRISLCD有两个子命令:
 
 `start`子命令具有以下标识:
 
-| 标识       | 类型   | 默认值                  | 是否必须 | 描述                                                            |
-| ---------- | ------ | ----------------------- | -------- | --------------------------------------------------------------- |
-| chain-id   | string |                         | yes      | Chain ID of Tendermint node                                     |
-| home       | string | "$HOME/.irislcd"        |          | Directory for config and data, such as key and checkpoint       |
-| node       | string | "tcp://localhost:26657" |          | Full node to connect to                                         |
-| laddr      | string | "tcp://localhost:1317"  |          | Address for server to listen on                                 |
-| trust-node | bool   | false                   |          | Trust connected  full nodes (Don't verify proofs for responses) |
-| max-open   | int    | 1000                    |          | The number of maximum open connections                          |
-| cors       | string |                         |          | Set the domains that can make CORS requests                     |
+| 标识       | 类型   | 默认值                  | 必须 | 描述                                       |
+| ---------- | ------ | ----------------------- | ---- | ------------------------------------------ |
+| chain-id   | string |                         | 是   | Tendermint节点的chain ID                   |
+| home       | string | "$HOME/.irislcd"        |      | 配置home目录，key和proof相关的信息都存于此 |
+| node       | string | "tcp://localhost:26657" |      | 全节点的rpc地址                            |
+| laddr      | string | "tcp://localhost:1317"  |      | 侦听的地址和端口                           |
+| trust-node | bool   | false                   |      | 是否信任全节点                             |
+| max-open   | int    | 1000                    |      | 最大连接数                                 |
+| cors       | string |                         |      | 允许跨域访问的地址                         |
 
 默认情况下，IRISLCD不信任连接的完整节点。但是，如果确定所连接的完整节点是可信任的，则应使用`--trust-node`标识运行IRISLCD：
 
@@ -58,7 +58,7 @@ irislcd start --node=tcp://localhost:26657 --chain-id=<chain-id> --laddr=tcp://0
 `POST` apis([/tx/broadcast](#broadcast-transactions)除外)只能用于生成未签名的交易，需要在[broadcasting](#broadcast-transactions)之前使用其他方式其进行签名。
 :::
 
-### Tendermint APIs
+### Tendermint相关的APIs
 
 例如查询区块，交易和验证人集
 
@@ -120,7 +120,7 @@ irislcd start --node=tcp://localhost:26657 --chain-id=<chain-id> --laddr=tcp://0
 1. `GET /slashing/validators/{validatorPubKey}/signing-info`: 获取验证人的签名记录
 2. `POST /slashing/validators/{validatorAddr}/unjail`: 解禁某个作恶的验证人节点
    
-### Distribution module APIs
+### Distribution模块的APIs
 
 1. `POST /distribution/{delegatorAddr}/withdraw-address`: 设置收益取回地址
 2. `GET /distribution/{delegatorAddr}/withdraw-address`: 查询收益取回地址
@@ -128,7 +128,7 @@ irislcd start --node=tcp://localhost:26657 --chain-id=<chain-id> --laddr=tcp://0
 4. `GET /distribution/{address}/rewards`: 查询收益
 5. `GET /distribution/community-tax`: 查询社区税金
 
-### Governance module APIs
+### Governance模块的APIs
 
 1. `POST /gov/proposals`: 发起提交提议交易
 2. `GET /gov/proposals`: 查询提议
@@ -140,7 +140,7 @@ irislcd start --node=tcp://localhost:26657 --chain-id=<chain-id> --laddr=tcp://0
 8. `GET /gov/proposals/{proposalId}/deposits/{depositor}`:查询押金
 9. `GET /gov/proposals/{proposalId}/votes/{voter}`: 查询投票
 
-### Asset module APIs
+### Asset模块的APIs
 
 1. `GET /asset/gateways/{moniker}`: 查询指定名字所对应的网关信息
 2. `GET /asset/gateways`: 查询所有网关信息，提供一个可选的owner参数

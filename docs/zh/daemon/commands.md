@@ -18,25 +18,25 @@ iris <command>
 
 ## 可用命令
 
-| Name                                                             | Description                                                                                                     |
-| ---------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| [init](local-testnet.md#iris-init)                               | Initialize private validator, p2p, genesis, and application configuration files                                 |
-| [add-genesis-account](local-testnet.md#iris-add-genesis-account) | Add genesis account to genesis.json                                                                             |
-| [gentx](local-testnet.md#iris-gentx)                             | Generate a genesis tx carrying a self delegation                                                                |
-| [collect-gentxs](local-testnet.md#iris-collect-gentxs)           | Collect genesis txs and output a genesis.json file                                                              |
-| [start](local-testnet.md#iris-start)                             | Run the full node                                                                                               |
-| [unsafe-reset-all](local-testnet.md#iris-unsafe-reset-all)       | Resets the blockchain database, removes address book files, and resets priv_validator.json to the genesis state |
-| [tendermint](local-testnet.md#iris-tendermint)                   | Tendermint subcommands                                                                                          |
-| [testnet](local-testnet.md#build-and-init)                       | Initialize files for a Irishub testnet                                                                          |
-| [reset](local-testnet.md#iris-reset)                             | Reset app state to the specified height                                                                         |
-| [export](export.md)                                              | Export state to JSON                                                                                            |
-| version                                                          | Show executable binary version                                                                                  |
+| Name                                                             | Description                                                               |
+| ---------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| [init](local-testnet.md#iris-init)                               | 初始化验证人，p2p，创世纪和应用程序配置文件                               |
+| [add-genesis-account](local-testnet.md#iris-add-genesis-account) | 将创世帐户添加到genesis.json                                              |
+| [gentx](local-testnet.md#iris-gentx)                             | 生成自抵押的创始TX                                                        |
+| [collect-gentxs](local-testnet.md#iris-collect-gentxs)           | 收集创世txs并输出到genesis.json文件                                       |
+| [start](local-testnet.md#iris-start)                             | 启动全节点                                                                |
+| [unsafe-reset-all](local-testnet.md#iris-unsafe-reset-all)       | 重置区块链数据库，删除address book，并将priv_validator.json重置为创始状态 |
+| [tendermint](local-testnet.md#iris-tendermint)                   | Tendermint子命令                                                          |
+| [testnet](local-testnet.md#build-and-init)                       | 初始化Irishub测试网                                                       |
+| [reset](local-testnet.md#iris-reset)                             | 将app状态重置到指定的高度                                                 |
+| [export](export.md)                                              | 将状态导出为JSON                                                          |
+| version                                                          | 显示版本信息                                                              |
 
 ## 全局标识
 
-| 名称，速记  | 默认值       | 描述                                               | 必须 | 类型   |
-| ----------- | ------------ | -------------------------------------------------- | ---- | ------ |
-| -h, --help  |              | Help for iris                                      |      |        |
-| --home      | /$HOME/.iris | Directory for config and data                      |      | String |
-| --log_level | \*:info      | Log level (default "main:info,state:info,*:error") |      | String |
-| --trace     |              | Print out full stack trace on errors               |      |        |
+| 名称，速记  | 默认值       | 描述                                             | 必须 | 类型   |
+| ----------- | ------------ | ------------------------------------------------ | ---- | ------ |
+| -h, --help  |              | 打印帮助信息                                     |      |        |
+| --home      | /$HOME/.iris | 配置和数据目录                                   |      | String |
+| --log_level | \*:info      | 日志级别（默认为"main:info,state:info,*:error"） |      | String |
+| --trace     |              | 错误是打印出完整的堆栈信息                       |      |        |

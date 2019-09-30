@@ -2,7 +2,7 @@
 order: 2
 ---
 
-# Command Line Tool
+# 命令行工具
 
 ## 介绍
 
