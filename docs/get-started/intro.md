@@ -38,11 +38,11 @@ It is intended that the IRIS network will eventually support all whitelisted fee
 
 ### Lifecycle
 
-* **Definition.** Definition of what an off-chain iService can do in terms of an Interface Definition Language (IDL) file.
+* **Definition:** Definition of what an off-chain iService can do in terms of an Interface Definition Language (IDL) file.
 
-* **Binding.** Declaration of the location (address), pricing and QoS of a provider endpoint that implements a given iService definition.
+* **Binding:** Declaration of the location (address), pricing and QoS of a provider endpoint that implements a given iService definition.
 
-* **Invocation.** Handling of consumer requests to and provider responses from a given iService provider endpoint.
+* **Invocation:** Handling of consumer requests to and provider responses from a given iService provider endpoint.
 
 ### Providers
 
@@ -58,4 +58,4 @@ It is intended that the IRIS network will eventually support all whitelisted fee
 
 ### Arbitrators
 
-*Arbitrators* are self-declared users who, working collectively, arbitrate consumer complaints against provider performance.  The details about the arbitration mechanism are being actively worked on, please keep an eye on our [whitepaper](../resources/whitepaper-en.md).
+*Arbitrators* are self-declared users who, working collectively, arbitrate consumer complaints against provider performance.  The details about the arbitration mechanism are being actively worked on, please keep an eye on our [whitepaper](../resources/whitepaper.md).

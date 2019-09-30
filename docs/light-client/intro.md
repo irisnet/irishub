@@ -22,7 +22,7 @@ IRISLCD has two subcommands:
 | Subcommand | Description               |
 | ---------- | ------------------------- |
 | version    | Print the IRISLCD version |
-| start      | Start an IRISLCD instance     |
+| start      | Start an IRISLCD instance |
 
 The `start` subcommand has the following flags:
 

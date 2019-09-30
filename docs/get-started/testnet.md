@@ -12,7 +12,7 @@ However there is also a need for validators to test the new version of IRIShub b
 
 ## Install
 
-We use different bech32 prefixes to distinguish the mainnet and testnet, all you need to do is to run the following command in the source root before [building or installing](#TODO) the iris binaries:
+We use different bech32 prefixes to distinguish the mainnet and testnet, all you need to do is to run the following command in the [irishub](https://github.com/irisnet/irishub) source root before [building or installing](install.md) the iris binaries:
 
 ```bash
 source scripts/setTestEnv.sh # to build or install the testnet version
