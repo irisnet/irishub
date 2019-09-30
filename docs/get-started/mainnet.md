@@ -12,7 +12,7 @@ order: 3
 
 ```bash
 # initialize node configurations
-iris init --moniker=<your_custom_name> --chain-id=irishub
+iris init --moniker=<your-custom-name> --chain-id=irishub
 
 # download mainnet public config.toml and genesis.json
 curl -o ~/.iris/config/config.toml https://raw.githubusercontent.com/irisnet/mainnet/master/config/config.toml
@@ -68,8 +68,8 @@ Only if your node has caught-up, you can run the following command to upgrade yo
 ```bash
 iriscli stake create-validator \
     --pubkey=$(iris tendermint show-validator) \
-    --moniker=<your_validator_name> \
-    --amount=<amount_to_be_delegated, e.g. 10000iris> \
+    --moniker=<your-validator-name> \
+    --amount=<amount-to-be-delegated, e.g. 10000iris> \
     --commission-rate=0.1 \
     --gas=100000 \
     --fee=0.6iris \
