@@ -4,8 +4,8 @@ order: 4
 
 # Genesis File
 
-The Genesis file (~/.iris/config/genesis.json) is the basis for the entire network initialization, which contains most info for creating a Genesis block (such as ChainID, consensus params, app state), initialize account balances, parameters for each module, and validators info.
-The genesis file sets the initial parameters of any new IRIS network. Establishing a robust social consensus over the genesis file is critical to starting a network.
+The Genesis file (~/.iris/config/genesis.json) is the basis for the entire network initialization, which contains most info for creating a Genesis block (such as ChainID, consensus params, app state, initial account balances, parameters for each module, and validators info).
+The genesis file sets the initial parameters of any new IRIS network. Establishing a robust social consensus over the genesis file is critical to start a network.
 
 Each genesis state starts with a list of account balances. Social consensus on these account balances must be bootstrapped from some external process be it events on another blockchain to a token generation event.
 
@@ -18,12 +18,12 @@ Each genesis state starts with a list of account balances. Social consensus on t
 
 * **block_size**
   * `max_bytes` The max size of a block
-  * `max_gas`  The maximum Gas quantity of a block. Its default value is -1 which means no gas limit. If the accumulation of gas consumption exceeds the block gas limit, the transaction and all subsequent transactions in the same block will fail to deliver.
+  * `max_gas`  The maximum gas quantity of a block. Its default value is -1 which means no gas limit. If the accumulation of gas consumption exceeds the block gas limit, the transaction and all subsequent transactions in the same block will fail to deliver.
 * **evidence**   The lifecycle of deception evidence in the block
 
 ## App State
 
-* **accounts** Initialization account info
+* **accounts** Initial account info
 
 * **auth** Params related to the system
   * params Detail in [Gov-Params](gov-params.md#parameters-in-auth)
@@ -61,5 +61,5 @@ Each genesis state starts with a list of account balances. Social consensus on t
 ## Gentxs
 
 Gentxs contains the transaction set of creating validators in genesis block.
-The IRISnet provides robust tools for bootstrapping the identities that will start chain via the `gen-tx` process. `gen-tx` or a Genesis Transaction are cryptographically signed transactions that are executed during chain initialization that generate a starting set of validators.
-The gen-txs are artifacts that prove that the holders of accounts consent in launching the network and that they putting capital at risk in the process.
+The IRISnet provides robust tools for bootstrapping the identities that will start chain via the `gen-tx` process. `gen-tx` or a Genesis Transaction is cryptographically signed transactions that are executed during chain initialization that generate a starting set of validators.
+The gen-txs are artifacts that prove that the holders of accounts consent in launching the network and that they put capital at risk in the process.
