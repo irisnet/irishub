@@ -42,7 +42,7 @@ order: 4
 
 1. 在[这里](https://www.ledger.com/pages/ledger-live)下载Ledger Live app。
 2. 通过USB连接ledger并更新到最新的firmware。
-3. 在ledger live应用商店中下载`Cosmos`application（这可能需要一段时间）。 **你可能需要在Ledger Live的`Settings`中启用`Dev Mode`才能下载`Cosmos`应用程序。**.
+3. 在ledger live应用商店中下载`Cosmos`application（这可能需要一段时间）。**你可能需要在Ledger Live的`Settings`中启用`Dev Mode`才能下载`Cosmos`应用程序。**
 4. 切换到ledger设备上的COSMOS应用。
 
 然后，要创建帐户，请使用以下命令：

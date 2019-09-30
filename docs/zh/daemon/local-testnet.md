@@ -46,7 +46,7 @@ iris add-genesis-account $(iriscli keys show MyValidator --address) 100000000iri
 
 ### iris gentx
 
-生成创建验证人的交易。 gentx存储在`~/.iris/config/`中
+生成创建验证人的交易。gentx存储在`~/.iris/config/`中
 
 ```bash
 iris gentx --name MyValidator

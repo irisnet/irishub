@@ -105,5 +105,5 @@ docker run -d --name=grafana -p 3000:3000 grafana/grafana
 你可以访问<http://localhost:3000/>打开grafana并创建自己的仪表盘。
 
 :::tip
-默认的用户名和密码均为admin。 强烈建议在登录后立即更改你的用户名和密码。
+默认的用户名和密码均为admin。强烈建议在登录后立即更改你的用户名和密码。
 :::
