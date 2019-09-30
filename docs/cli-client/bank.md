@@ -82,8 +82,8 @@ Query the token statistic, including total loose tokens, total burned tokens and
 
 | Name, shorthand | Type   | Required | Default               | Description                                                  |
 | --------------- | ------ | -------- | --------------------- | ------------------------------------------------------------ |
-| -h, --help      |        |          |                       | Help for coin-type                                           |
-| --chain-id      | string |          |                       | Chain ID of tendermint node                                  |
+| -h, --help      |        |          |                       | Help for token-stats                                           |
+| --chain-id      | string |          |                       | Chain ID of tendermint node                                 |
 | --height        | int    |          |                       | Block height to query, omit to get most recent provable block|
 | --indent        | string |          |                       | Add indent to JSON response                                  |
 | --ledger        | string |          |                       | Use a connected Ledger device                                |
@@ -166,7 +166,7 @@ iriscli bank send --from=<key-name> --to=<address> --amount=10iris --fee=0.3iris
 
 ## iriscli bank burn
 
-This command is used to burn tokens from your own address
+This command is used to burn tokens from your own address.
 
 ```bash
 iriscli bank burn --from=<key-name> --amount=<amount-to-burn> --fee=<native-fee> --chain-id=<chain-id>
