@@ -1,6 +1,6 @@
 # iriscli params
 
-Params模块允许查询系统里预设的参数，查询结果中除了Gov模块的参数，其他都可以通过[Gov模块](./gov)发起提议来修改。
+Params模块允许查询系统里预设的参数，查询结果中除了Gov模块的参数，其他都可以通过[Gov模块](./gov.md)发起提议来修改。
 
 ```bash
  iriscli params <flags>
