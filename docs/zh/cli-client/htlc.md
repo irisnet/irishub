@@ -13,7 +13,7 @@ HTLC allows you to manage local Hash Time Locked Contracts (HTLCs) for atomic sw
 
 ## 全局标识
 
-| 名称, 速记     | 类型   | 是否必须 | 默认           | 描述                           |
+| 名称, 速记     | 类型   | 必须 | 默认           | 描述                           |
 | -------------- | ------ | -------- | -------------- | ------------------------------ |
 | -h, --help     |        |          |                | 提示                           |
 | -e, --encoding | string |          | hex            | 字符串二进制编码 (hex\b64\btc) |
@@ -31,7 +31,7 @@ iriscli htlc create --receiver=<receiver> --receiver-on-other-chain=<receiver-on
 
 **唯一标识：**
 
-| 名称, 速记                | 类型     | 是否必须 | 默认 | 描述                                              |
+| 名称, 速记                | 类型     | 必须 | 默认 | 描述                                              |
 | ------------------------- | -------- | -------- | ---- | ------------------------------------------------- |
 | --receiver                | string   | 是       |      | 收款人地址                                        |
 | --receiver-on-other-chain | bytesHex | 是       |      | 另一条链上的收款地址                              |
@@ -66,7 +66,7 @@ iriscli htlc claim --hash-lock=<hash-lock> --secret=<secret>
 
 **唯一标识：**
 
-| 名称, 速记  | 类型     | 是否必须 | 默认 | 描述                              |
+| 名称, 速记  | 类型     | 必须 | 默认 | 描述                              |
 | ----------- | -------- | -------- | ---- | --------------------------------- |
 | --hash-lock | bytesHex | 是       |      | T要发送锁定资金 HTLC 的 hash lock |
 | --secret    | bytesHex | 是       |      | 用于生成 hash lock 的 secret      |
@@ -93,7 +93,7 @@ iriscli htlc refund --hash-lock=<hash-lock>
 
 **唯一标识：**
 
-| 名称, 速记  | 类型     | 是否必须 | 默认 | 描述                       |
+| 名称, 速记  | 类型     | 必须 | 默认 | 描述                       |
 | ----------- | -------- | -------- | ---- | -------------------------- |
 | --hash-lock | bytesHex | 是       |      | 要退款的 HTLC 的 hash Lock |
 
