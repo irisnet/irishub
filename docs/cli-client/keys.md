@@ -17,7 +17,7 @@ Keys allows you to manage your local tendermint keystore (wallets) for iris.
 
 ## iriscli keys add
 
-Create a new key (wallet), or recover from mnemonic/keystore
+Create a new key (wallet), or recover from mnemonic/keystore.
 
 ```bash
 iriscli keys add <key-name> <flags>
@@ -171,7 +171,7 @@ iriscli keys export Mykey --output-file=<path-to-keystore>
 
 ## iriscli keys delete
 
-Delete a local key by the given name
+Delete a local key by the given name.
 
 ```bash
 iriscli keys delete <key-name> <flags>
@@ -192,7 +192,7 @@ iriscli keys delete MyKey
 
 ## iriscli keys update
 
-Change the password of a key, used to protect the private key
+Change the password of a key, used to protect the private key.
 
 ### Change the password of a local key
 

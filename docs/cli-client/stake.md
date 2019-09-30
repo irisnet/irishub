@@ -5,7 +5,7 @@ Stake module provides a set of subcommands to query staking state and send staki
 ## Available Commands
 
 | Name                                                                    | Description                                                                                   |
-| ------------------------------------------------------------------------| --------------------------------------------------------------------------------------------- |
+| ----------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
 | [validator](#iriscli-stake-validator)                                   | Query a validator                                                                             |
 | [validators](#iriscli-stake-validators)                                 | Query for all validators                                                                      |
 | [delegation](#iriscli-stake-delegation)                                 | Query a delegation based on address and validator address                                     |
@@ -45,18 +45,18 @@ iriscli stake validators
 
 ## iriscli stake delegation
 
-Query a delegation based on delegator address and validator address
+Query a delegation based on delegator address and validator address.
 
 ```bash
 iriscli stake delegation --address-validator=<address-validator> --address-delegator=<address-delegator>
 ```
 
-**Unique Flags:**
+**Flags:**
 
-| Name, shorthand       | Default | Description                   | Required |
-| --------------------- | ------- | ----------------------------- | -------- |
-| --address-delegator   |         | Bech address of the delegator | true     |
-| --address-validator   |         | Bech address of the validator | true     |
+| Name, shorthand     | Default | Description                   | Required |
+| ------------------- | ------- | ----------------------------- | -------- |
+| --address-delegator |         | Bech address of the delegator | yes      |
+| --address-validator |         | Bech address of the validator | yes      |
 
 ### Query a delegation
 
@@ -76,7 +76,7 @@ Delegation:
 
 ## iriscli stake delegations
 
-Query all delegations delegated from one delegator
+Query all delegations delegated from one delegator.
 
 ```bash
 iriscli stake delegations <delegator-address> <flags>
@@ -90,7 +90,7 @@ iriscli stake delegations <iaa...>
 
 ## iriscli stake delegations-to
 
-Query all delegations to one validator
+Query all delegations to one validator.
 
 ```bash
 iriscli stake delegations-to <validator-address> <flags>
@@ -119,18 +119,18 @@ Delegation:
 
 ## iriscli stake unbonding-delegation
 
-Query an unbonding-delegation record based on delegator and validator address
+Query an unbonding-delegation record based on delegator and validator address.
 
 ```bash
 iriscli stake unbonding-delegation --address-delegator=<delegator-address> --address-validator=<validator-address> <flags>
 ```
 
-**Unique Flags:**
+**Flags:**
 
 | Name, shorthand     | Default | Description                   | Required |
 | ------------------- | ------- | ----------------------------- | -------- |
-| --address-delegator |         | Bech address of the delegator | true     |
-| --address-validator |         | Bech address of the validator | true     |
+| --address-delegator |         | Bech address of the delegator | yes      |
+| --address-validator |         | Bech address of the validator | yes      |
 
 ### Query an unbonding delegation record
 
@@ -170,13 +170,13 @@ iriscli stake redelegations-from <iva...>
 
 ## iriscli stake redelegation
 
-Query a redelegation record based on delegator and source validator address and destination validator address
+Query a redelegation record based on delegator and source validator address and destination validator address.
 
 ```bash
 iriscli stake redelegation --address-validator-source=<source-validator-address> --address-validator-dest=<destination-validator-address> --address-delegator=<address-delegator> <flags>
 ```
 
-**Unique Flags:**
+**Flags:**
 
 | Name, shorthand            | Default | Description                               | Required |
 | -------------------------- | ------- | ----------------------------------------- | -------- |
@@ -192,7 +192,7 @@ iriscli stake redelegation --address-validator-source=<iva...> --address-validat
 
 ## iriscli stake redelegations
 
-Query all redelegations records of a delegator
+Query all redelegations records of a delegator.
 
 ```bash
 iriscli stake redelegations <iaa...>
@@ -252,24 +252,24 @@ Signing Info
 
 ## iriscli stake create-validator
 
-Send a transaction to apply to be a validator and delegate a certain amount of iris to it
+Send a transaction to apply to be a validator and delegate a certain amount of iris to it.
 
 ```bash
 iriscli stake create-validator <flags>
 ```
 
-**Unique Flags:**
+**Flags:**
 
 | Name, shorthand   | type   | Required | Default | Description                                                                                      |
-| ----------------- | -----  | -------- | ------- | ------------------------------------------------------------------------------------------------ |
-| --amount          | string | true     |         | Amount of coins to bond                                                                          |
-| --commission-rate | float  | true     | 0.0     | The initial commission rate percentage                                                           |
+| ----------------- | ------ | -------- | ------- | ------------------------------------------------------------------------------------------------ |
+| --amount          | string | yes      |         | Amount of coins to bond                                                                          |
+| --commission-rate | float  | yes      | 0.0     | The initial commission rate percentage                                                           |
 | --details         | string |          |         | Optional details                                                                                 |
 | --genesis-format  | bool   |          | false   | Export the transaction in gen-tx format; it implies --generate-only                              |
 | --identity        | string |          |         | Optional identity signature (ex. UPort or Keybase)                                               |
 | --ip              | string |          |         | Node's public IP. It takes effect only when used in combination with                             |
-| --moniker         | string | true     |         | Validator name                                                                                   |
-| --pubkey          | string | true     |         | Go-Amino encoded hex PubKey of the validator. For Ed25519 the go-amino prepend hex is 1624de6220 |
+| --moniker         | string | yes      |         | Validator name                                                                                   |
+| --pubkey          | string | yes      |         | Go-Amino encoded hex PubKey of the validator. For Ed25519 the go-amino prepend hex is 1624de6220 |
 | --website         | string |          |         | Optional website                                                                                 |
 
 ### Create a validator
@@ -290,15 +290,15 @@ Edit an existing validator's settings, such as commission rate, name, etc.
 iriscli stake edit-validator <flags>
 ```
 
-**Unique Flags:**
+**Flags:**
 
-| Name, shorthand     | type   | Required | Default  | Description                                        |
-| --------------------| -----  | -------- | -------- | -------------------------------------------------- |
-| --commission-rate   | float  |          | 0.0      | Commission rate percentage                         |
-| --moniker           | string |          |          | Validator name                                     |
-| --identity          | string |          |          | Optional identity signature (ex. UPort or Keybase) |
-| --website           | string |          |          | Optional website                                   |
-| --details           | string |          |          | Optional details                                   |
+| Name, shorthand   | type   | Required | Default | Description                                        |
+| ----------------- | ------ | -------- | ------- | -------------------------------------------------- |
+| --commission-rate | float  |          | 0.0     | Commission rate percentage                         |
+| --moniker         | string |          |         | Validator name                                     |
+| --identity        | string |          |         | Optional identity signature (ex. UPort or Keybase) |
+| --website         | string |          |         | Optional website                                   |
+| --details         | string |          |         | Optional details                                   |
 
 ### Edit validator information
 
@@ -312,18 +312,18 @@ Please refer to [How to upload my validator's logo to the Explorers](../concepts
 
 ## iriscli stake delegate
 
-Delegate tokens to a validator
+Delegate tokens to a validator.
 
 ```bash
 iriscli stake delegate --address-validator=<validator-address> <flags>
 ```
 
-**Unique Flags:**
+**Flags:**
 
-| Name, shorthand     | type   | Required | Default  | Description                   |
-| --------------------| -----  | -------- | -------- | ----------------------------- |
-| --address-validator | string | true     |          | Bech address of the validator |
-| --amount            | string | true     |          | Amount of coins to bond       |
+| Name, shorthand     | type   | Required | Default | Description                   |
+| ------------------- | ------ | -------- | ------- | ----------------------------- |
+| --address-validator | string | yes      |         | Bech address of the validator |
+| --amount            | string | yes      |         | Amount of coins to bond       |
 
 ```bash
 iriscli stake delegate --chain-id=irishub --from=<key-name> --fee=0.3iris --amount=10iris --address-validator=<iva...>
@@ -331,19 +331,19 @@ iriscli stake delegate --chain-id=irishub --from=<key-name> --fee=0.3iris --amou
 
 ## iriscli stake unbond
 
-Unbond tokens from a validator
+Unbond tokens from a validator.
 
 ```bash
 iriscli stake unbond <flags>
 ```
 
-**Unique Flags:**
+**Flags:**
 
-| Name, shorthand     | type   | Required | Default  | Description                                                                                         |
-| --------------------| -----  | -------- | -------- | --------------------------------------------------------------------------------------------------- |
-| --address-validator | string | true     |          | Bech address of the validator                                                                       |
-| --shares-amount     | float  |          | 0.0      | Amount of source-shares to either unbond or redelegate as a positive integer or decimal             |
-| --shares-percent    | float  |          | 0.0      | Percent of source-shares to either unbond or redelegate as a positive integer or decimal >0 and <=1 |
+| Name, shorthand     | type   | Required | Default | Description                                                                                         |
+| ------------------- | ------ | -------- | ------- | --------------------------------------------------------------------------------------------------- |
+| --address-validator | string | yes      |         | Bech address of the validator                                                                       |
+| --shares-amount     | float  |          | 0.0     | Amount of source-shares to either unbond or redelegate as a positive integer or decimal             |
+| --shares-percent    | float  |          | 0.0     | Percent of source-shares to either unbond or redelegate as a positive integer or decimal >0 and <=1 |
 
 Users must specify the unbond amount. There two options can do this: `--shares-amount` or `--shares-percent`. Keep in mind, don't specify both of them.
 
@@ -371,14 +371,14 @@ There is no `unbonding time` during the redelegation, so you will not miss the r
 iriscli stake redelegate <flags>
 ```
 
-**Unique Flags:**
+**Flags:**
 
-| Name, shorthand            | type   | Required | Default  | Description                                                                                         |
-| -------------------------- | -----  | -------- | -------- | --------------------------------------------------------------------------------------------------- |
-| --address-validator-dest   | string | true     |          | Bech address of the destination validator                                                           |
-| --address-validator-source | string | true     |          | Bech address of the source validator                                                                |
-| --shares-amount            | float  |          | 0.0      | Amount of source-shares to either unbond or redelegate as a positive integer or decimal             |
-| --shares-percent           | float  |          | 0.0      | Percent of source-shares to either unbond or redelegate as a positive integer or decimal >0 and <=1 |
+| Name, shorthand            | type   | Required | Default | Description                                                                                         |
+| -------------------------- | ------ | -------- | ------- | --------------------------------------------------------------------------------------------------- |
+| --address-validator-dest   | string | yes      |         | Bech address of the destination validator                                                           |
+| --address-validator-source | string | yes      |         | Bech address of the source validator                                                                |
+| --shares-amount            | float  |          | 0.0     | Amount of source-shares to either unbond or redelegate as a positive integer or decimal             |
+| --shares-percent           | float  |          | 0.0     | Percent of source-shares to either unbond or redelegate as a positive integer or decimal >0 and <=1 |
 
 Users must specify the redelegation token amount. There two options can do this: `--shares-amount` or `--shares-percent`. Keep in mind, don't specify both of them.
 
@@ -410,4 +410,4 @@ iriscli stake unjail --from=<key-name> --fee=0.3iris --chain-id=irishub
 
 ### Validator still jailed, cannot yet be unjailed
 
-That means your validator is still in jail period, you can query the [signing-info](#iriscli-stake-signing-info) for the jail end time:
+That means your validator is still in jail period, you can query the [signing-info](#iriscli-stake-signing-info) for the jail end time.

@@ -1,12 +1,12 @@
 # iriscli params
 
-Params module allows you to query the system parameters which can be governed (except the gov params) by the [gov module](./gov)
+Params module allows you to query the system parameters which can be governed (except the gov params) by the [gov module](./gov.md).
 
 ```bash
  iriscli params <flags>
 ```
 
-**Unique Flags:**
+**Flags:**
 
 | Name, shorthand | Default | Description        | Required |
 | --------------- | ------- | ------------------ | -------- |
@@ -73,7 +73,7 @@ Proposal Parameter:  [Critical]                         [Important]             
 
 ## Query parameters of a module
 
-Available module names can be queried by [query all parameters](#query-all-parameters)
+Available module names can be queried by [query all parameters](#query-all-parameters).
 
 ```bash
 iriscli params --module=slashing

@@ -1,35 +1,35 @@
 # iriscli stake
 
-Stake module provides a set of subcommands to query staking state and send staking transactions.
+Stake模块提供了一系列查询staking状态和发送staking交易的命令。
 
 ## Available Commands
 
-| 名称                                                                    | 描述                                                                                          |
-| ----------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| [validator](#iriscli-stake-validator)                                   | Query a validator                                                                             |
-| [validators](#iriscli-stake-validators)                                 | Query for all validators                                                                      |
-| [delegation](#iriscli-stake-delegation)                                 | Query a delegation based on address and validator address                                     |
-| [delegations](#iriscli-stake-delegations)                               | Query all delegations made from one delegator                                                 |
-| [delegations-to](#iriscli-stake-delegations-to)                         | Query all delegations to one validator                                                        |
-| [unbonding-delegation](#iriscli-stake-unbonding-delegation)             | Query an unbonding-delegation record based on delegator and validator address                 |
-| [unbonding-delegations](#iriscli-stake-unbonding-delegations)           | Query all unbonding-delegations records for one delegator                                     |
-| [unbonding-delegations-from](#iriscli-stake-unbonding-delegations-from) | Query all unbonding delegatations from a validator                                            |
-| [redelegations-from](#iriscli-stake-redelegations-from)                 | Query all outgoing redelegatations from a validator                                           |
-| [redelegation](#iriscli-stake-redelegation)                             | Query a redelegation record based on delegator and a source and destination validator address |
-| [redelegations](#iriscli-stake-redelegations)                           | Query all redelegations records for one delegator                                             |
-| [pool](#iriscli-stake-pool)                                             | Query the current staking pool values                                                         |
-| [parameters](#iriscli-stake-parameters)                                 | Query the current staking parameters information                                              |
-| [signing-info](#iriscli-stake-signing-info)                             | Query a validator's signing information                                                       |
-| [create-validator](#iriscli-stake-create-validator)                     | Create new validator initialized with a self-delegation to it                                 |
-| [edit-validator](#iriscli-stake-edit-validator)                         | Edit existing validator account                                                               |
-| [delegate](#iriscli-stake-delegate)                                     | Delegate liquid tokens to an validator                                                        |
-| [unbond](#iriscli-stake-unbond)                                         | Unbond shares from a validator                                                                |
-| [redelegate](#iriscli-stake-redelegate)                                 | Redelegate illiquid tokens from one validator to another                                      |
-| [unjail](#iriscli-stake-unjail)                                         | Unjail validator previously jailed for downtime                                               |
+| 名称                                                                    | 描述                                                         |
+| ----------------------------------------------------------------------- | ------------------------------------------------------------ |
+| [validator](#iriscli-stake-validator)                                   | 查询某个验证者                                               |
+| [validators](#iriscli-stake-validators)                                 | 查询所有的验证者                                             |
+| [delegation](#iriscli-stake-delegation)                                 | 基于委托者地址和验证者地址的委托查询                         |
+| [delegations](#iriscli-stake-delegations)                               | 基于委托者地址的所有委托查询                                 |
+| [delegations-to](#iriscli-stake-delegations-to)                         | 查询在某个验证人上的所有委托                                 |
+| [unbonding-delegation](#iriscli-stake-unbonding-delegation)             | 基于委托者地址和验证者地址的unbonding-delegation记录查询     |
+| [unbonding-delegations](#iriscli-stake-unbonding-delegations)           | 基于委托者地址的所有unbonding-delegation记录查询             |
+| [unbonding-delegations-from](#iriscli-stake-unbonding-delegations-from) | 基于验证者地址的所有unbonding-delegation记录查询             |
+| [redelegations-from](#iriscli-stake-redelegations-from)                 | 基于某一验证者的所有转委托查询                               |
+| [redelegation](#iriscli-stake-redelegation)                             | 基于委托者地址，原验证者地址和目标验证者地址的转委托记录查询 |
+| [redelegations](#iriscli-stake-redelegations)                           | 基于委托者地址的所有转委托记录查询                           |
+| [pool](#iriscli-stake-pool)                                             | 查询最新的权益池                                             |
+| [parameters](#iriscli-stake-parameters)                                 | 查询最新的权益参数信息                                       |
+| [signing-info](#iriscli-stake-signing-info)                             | 查询验证者签名信息                                           |
+| [create-validator](#iriscli-stake-create-validator)                     | 以自委托的方式创建一个新的验证者                             |
+| [edit-validator](#iriscli-stake-edit-validator)                         | 编辑已存在的验证者信息                                       |
+| [delegate](#iriscli-stake-delegate)                                     | 委托一定代币到某个验证者                                     |
+| [unbond](#iriscli-stake-unbond)                                         | 从指定的验证者解绑一定的股份                                 |
+| [redelegate](#iriscli-stake-redelegate)                                 | 转委托一定的token从一个验证者到另一个验证者                  |
+| [unjail](#iriscli-stake-unjail)                                         | 恢复之前由于宕机被惩罚的验证者的身份                         |
 
 ## iriscli stake validator
 
-### Query a validator by validator address
+### 通过地址查询验证人
 
 ```bash
 iriscli stake validator <iva...>
@@ -37,7 +37,7 @@ iriscli stake validator <iva...>
 
 ## iriscli stake validators
 
-### Query all validators
+### 查询所有验证人
 
 ```bash
 iriscli stake validators
@@ -45,7 +45,7 @@ iriscli stake validators
 
 ## iriscli stake delegation
 
-Query a delegation based on delegator address and validator address.
+通过委托人和验证人地址查询委托交易。
 
 ```bash
 iriscli stake delegation --address-validator=<address-validator> --address-delegator=<address-delegator>
@@ -53,18 +53,18 @@ iriscli stake delegation --address-validator=<address-validator> --address-deleg
 
 **标志：**
 
-| 名称，速记          | 默认 | 描述                          | 必须 |
-| ------------------- | ---- | ----------------------------- | ---- |
-| --address-delegator |      | Bech address of the delegator | 是   |
-| --address-validator |      | Bech address of the validator | 是   |
+| 名称，速记          | 默认 | 描述           | 必须 |
+| ------------------- | ---- | -------------- | ---- |
+| --address-delegator |      | 委托人bech地址 | 是   |
+| --address-validator |      | 验证人bech地址 | 是   |
 
-### Query a delegation
+### 查询委托交易
 
 ```bash
 iriscli stake delegation --address-validator=<iva...> --address-delegator=<iaa...>
 ```
 
-Example Output:
+示例输出:
 
 ```bash
 Delegation:
@@ -76,13 +76,13 @@ Delegation:
 
 ## iriscli stake delegations
 
-Query all delegations delegated from one delegator.
+查询某个委托人发起的所有委托记录。
 
 ```bash
 iriscli stake delegations <delegator-address> <flags>
 ```
 
-### Query all delegations of a delegator
+### 查询某个委托人发起的所有委托记录
 
 ```bash
 iriscli stake delegations <iaa...>
@@ -90,19 +90,19 @@ iriscli stake delegations <iaa...>
 
 ## iriscli stake delegations-to
 
-Query all delegations to one validator.
+查询某个验证人接受的所有委托。
 
 ```bash
 iriscli stake delegations-to <validator-address> <flags>
 ```
 
-### Query all delegations to one validator
+### 查询某个验证人接受的所有委托
 
 ```bash
 iriscli stake delegations-to <iva...>
 ```
 
-Example Output:
+示例输出:
 
 ```bash
 Delegation:
@@ -119,7 +119,7 @@ Delegation:
 
 ## iriscli stake unbonding-delegation
 
-Query an unbonding-delegation record based on delegator and validator address.
+通过委托人与验证人地址查询unbonding-delegation记录。
 
 ```bash
 iriscli stake unbonding-delegation --address-delegator=<delegator-address> --address-validator=<validator-address> <flags>
@@ -127,12 +127,12 @@ iriscli stake unbonding-delegation --address-delegator=<delegator-address> --add
 
 **标志：**
 
-| 名称，速记          | 默认 | 描述                          | 必须 |
-| ------------------- | ---- | ----------------------------- | ---- |
-| --address-delegator |      | Bech address of the delegator | 是   |
-| --address-validator |      | Bech address of the validator | 是   |
+| 名称，速记          | 默认 | 描述           | 必须 |
+| ------------------- | ---- | -------------- | ---- |
+| --address-delegator |      | 委托人bech地址 | 是   |
+| --address-validator |      | 验证人bech地址 | 是   |
 
-### Query an unbonding delegation record
+### 查询unbonding-delegation记录
 
 ```bash
 iriscli stake unbonding-delegation --address-delegator=<iaa...> --address-validator=<iva...>
@@ -140,7 +140,7 @@ iriscli stake unbonding-delegation --address-delegator=<iaa...> --address-valida
 
 ## iriscli stake unbonding-delegations
 
-### Query all unbonding delegations records of a delegator
+### 通过委托人与验证人地址查询所有unbonding-delegation记录
 
 ```bash
 iriscli stake unbonding-delegations <iaa...>
@@ -148,7 +148,7 @@ iriscli stake unbonding-delegations <iaa...>
 
 ## iriscli stake unbonding-delegations-from
 
-### Query all unbonding delegatations from a validator
+### 查询所有unbonding-delegation-from记录
 
 ```bash
 iriscli stake unbonding-delegations-from <iva...>
@@ -156,7 +156,7 @@ iriscli stake unbonding-delegations-from <iva...>
 
 ## iriscli stake redelegations-from
 
-Query all outgoing redelegations of a validator
+### Query all outgoing redelegations of a validator
 
 ```bash
 iriscli stake redelegations-from <validator-address> <flags>
