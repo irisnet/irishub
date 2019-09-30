@@ -45,7 +45,7 @@ iriscli stake validators
 
 ## iriscli stake delegation
 
-通过委托人和验证人地址查询委托交易。
+通过委托人地址和验证人地址查询委托交易。
 
 ```bash
 iriscli stake delegation --address-validator=<address-validator> --address-delegator=<address-delegator>
@@ -140,7 +140,7 @@ iriscli stake unbonding-delegation --address-delegator=<iaa...> --address-valida
 
 ## iriscli stake unbonding-delegations
 
-### 通过委托人与验证人地址查询所有unbonding-delegation记录
+### 查询委托人的所有未绑定委托记录
 
 ```bash
 iriscli stake unbonding-delegations <iaa...>
@@ -148,7 +148,7 @@ iriscli stake unbonding-delegations <iaa...>
 
 ## iriscli stake unbonding-delegations-from
 
-### 查询所有unbonding-delegation-from记录
+### 查询验证人的所有未绑定委托记录
 
 ```bash
 iriscli stake unbonding-delegations-from <iva...>
@@ -156,13 +156,13 @@ iriscli stake unbonding-delegations-from <iva...>
 
 ## iriscli stake redelegations-from
 
-### Query all outgoing redelegations of a validator
+查询验证人的所有转委托记录。
 
 ```bash
 iriscli stake redelegations-from <validator-address> <flags>
 ```
 
-### Query all outgoing redelegatations of a validator
+### 查询验证人的所有转委托记录
 
 ```bash
 iriscli stake redelegations-from <iva...>
@@ -170,7 +170,7 @@ iriscli stake redelegations-from <iva...>
 
 ## iriscli stake redelegation
 
-Query a redelegation record based on delegator and source validator address and destination validator address.
+通过委托人地址、原验证人地址、目标验证人地址查询转委托记录。
 
 ```bash
 iriscli stake redelegation --address-validator-source=<source-validator-address> --address-validator-dest=<destination-validator-address> --address-delegator=<address-delegator> <flags>
@@ -178,13 +178,13 @@ iriscli stake redelegation --address-validator-source=<source-validator-address>
 
 **标志：**
 
-| 名称，速记                 | 默认 | 描述                                      | 必须 |
-| -------------------------- | ---- | ----------------------------------------- | ---- |
-| --address-delegator        |      | Bech address of the delegator             | 是   |
-| --address-validator-dest   |      | Bech address of the destination validator | 是   |
-| --address-validator-source |      | Bech address of the source validator      | 是   |
+| 名称，速记                 | 默认 | 描述               | 必须 |
+| -------------------------- | ---- | ------------------ | ---- |
+| --address-delegator        |      | 委托者bech地址     | 是   |
+| --address-validator-dest   |      | 目标验证者bech地址 | 是   |
+| --address-validator-source |      | 源验证者bech地址   | 是   |
 
-### Query a redelegation record
+### 查询转委托记录
 
 ```bash
 iriscli stake redelegation --address-validator-source=<iva...> --address-validator-dest=<iva...> --address-delegator=<iaa...>
@@ -192,7 +192,7 @@ iriscli stake redelegation --address-validator-source=<iva...> --address-validat
 
 ## iriscli stake redelegations
 
-Query all redelegations records of a delegator.
+### 查询委托人的所有转委托记录
 
 ```bash
 iriscli stake redelegations <iaa...>
@@ -200,13 +200,13 @@ iriscli stake redelegations <iaa...>
 
 ## iriscli stake pool
 
-### Query the current staking pool values
+### 查询当前权益池
 
 ```bash
 iriscli stake pool
 ```
 
-Example Output:
+示例输出:
 
 ```bash
 Pool:
@@ -218,13 +218,13 @@ Pool:
 
 ## iriscli stake parameters
 
-### Query the current staking parameters information
+### 查询当前权益参数信息
 
 ```bash
 iriscli stake parameters
 ```
 
-Example Output:
+示例输出:
 
 ```bash
 Stake Params:
@@ -234,13 +234,13 @@ Stake Params:
 
 ## iriscli stake signing-info
 
-### Query a validator's signing information
+### 查询验证人签名信息
 
 ```bash
 iriscli stake signing-info <iva...>
 ```
 
-Example Output:
+示例输出:
 
 ```bash
 Signing Info
@@ -252,7 +252,7 @@ Signing Info
 
 ## iriscli stake create-validator
 
-Send a transaction to apply to be a validator and delegate a certain amount of iris to it.
+发送交易申请成为验证人，并委托一定数量的iris到该验证人。
 
 ```bash
 iriscli stake create-validator <flags>
@@ -260,31 +260,31 @@ iriscli stake create-validator <flags>
 
 **标志：**
 
-| 名称，速记        | 类型   | 必须 | 默认  | 描述                                                                                             |
-| ----------------- | ------ | ---- | ----- | ------------------------------------------------------------------------------------------------ |
-| --amount          | string | 是   |       | Amount of coins to bond                                                                          |
-| --commission-rate | float  | 是   | 0.0   | The initial commission rate percentage                                                           |
-| --details         | string |      |       | Optional details                                                                                 |
-| --genesis-format  | bool   |      | false | Export the transaction in gen-tx format; it implies --generate-only                              |
-| --identity        | string |      |       | Optional identity signature (ex. UPort or Keybase)                                               |
-| --ip              | string |      |       | Node's public IP. It takes effect only when used in combination with                             |
-| --moniker         | string | 是   |       | Validator name                                                                                   |
-| --pubkey          | string | 是   |       | Go-Amino encoded hex PubKey of the validator. For Ed25519 the go-amino prepend hex is 1624de6220 |
-| --website         | string |      |       | Optional website                                                                                 |
+| 名称，速记        | 类型   | 必须 | 默认  | 描述                                |
+| ----------------- | ------ | ---- | ----- | ----------------------------------- |
+| --amount          | string | 是   |       | 委托金额                            |
+| --commission-rate | float  | 是   | 0.0   | 初始佣金比例                        |
+| --details         | string |      |       | 验证人节点的详细信息                |
+| --genesis-format  | bool   |      | false | 是否以genesis transaction的方式导出 |
+| --identity        | string |      |       | 身份信息的签名                      |
+| --ip              | string |      |       | 验证人节点的IP                      |
+| --moniker         | string | 是   |       | 验证人节点名称                      |
+| --pubkey          | string | 是   |       | Amino编码的验证人公钥               |
+| --website         | string |      |       | 验证人节点的网址                    |
 
-### Create a validator
+### 创建验证人
 
 ```bash
 iriscli stake create-validator --chain-id=irishub --from=<key-name> --fee=0.3iris --pubkey=<validator-pubKey> --commission-rate=0.1 --amount=100iris --moniker=<validator-name>
 ```
 
 :::tip
-Follow the [Mainnet](../get-started/mainnet.md#create-validator) instructions to learn more.
+查看 [Mainnet](../../get-started/mainnet.md#create-validator) 说明以了解更多。
 :::
 
 ## iriscli stake edit-validator
 
-Edit an existing validator's settings, such as commission rate, name, etc.
+修改验证的的参数，包括佣金比率，验证人节点名称以及其他描述信息。
 
 ```bash
 iriscli stake edit-validator <flags>
@@ -292,27 +292,27 @@ iriscli stake edit-validator <flags>
 
 **标志：**
 
-| 名称，速记        | 类型   | 必须 | 默认 | 描述                                               |
-| ----------------- | ------ | ---- | ---- | -------------------------------------------------- |
-| --commission-rate | float  |      | 0.0  | Commission rate percentage                         |
-| --moniker         | string |      |      | Validator name                                     |
-| --identity        | string |      |      | Optional identity signature (ex. UPort or Keybase) |
-| --website         | string |      |      | Optional website                                   |
-| --details         | string |      |      | Optional details                                   |
+| 名称，速记        | 类型   | 必须 | 默认 | 描述               |
+| ----------------- | ------ | ---- | ---- | ------------------ |
+| --commission-rate | float  |      | 0.0  | 佣金比率           |
+| --moniker         | string |      |      | 验证人名称         |
+| --identity        | string |      |      | 身份签名           |
+| --website         | string |      |      | 网址               |
+| --details         | string |      |      | 验证人节点详细信息 |
 
-### Edit validator information
+### 编辑验证人信息
 
 ```bash
 iriscli stake edit-validator --from=<key-name> --chain-id=irishub --fee=0.3iris --commission-rate=0.10 --moniker=<validator-name>
 ```
 
-### Upload validator avatar
+### 上传验证人头像
 
-Please refer to [How to upload my validator's logo to the Explorers](../concepts/validator-faq.md#how-to-upload-my-validator-s-logo-to-the-explorers)
+请参考 [How to upload my validator's logo to the Explorers](../../concepts/validator-faq.md#how-to-upload-my-validator-s-logo-to-the-explorers)。
 
 ## iriscli stake delegate
 
-Delegate tokens to a validator.
+向验证人委托通证。
 
 ```bash
 iriscli stake delegate --address-validator=<validator-address> <flags>
@@ -320,10 +320,10 @@ iriscli stake delegate --address-validator=<validator-address> <flags>
 
 **标志：**
 
-| 名称，速记          | 类型   | 必须 | 默认 | 描述                          |
-| ------------------- | ------ | ---- | ---- | ----------------------------- |
-| --address-validator | string | 是   |      | Bech address of the validator |
-| --amount            | string | 是   |      | Amount of coins to bond       |
+| 名称，速记          | 类型   | 必须 | 默认 | 描述       |
+| ------------------- | ------ | ---- | ---- | ---------- |
+| --address-validator | string | 是   |      | 验证人地址 |
+| --amount            | string | 是   |      | 委托金额   |
 
 ```bash
 iriscli stake delegate --chain-id=irishub --from=<key-name> --fee=0.3iris --amount=10iris --address-validator=<iva...>
@@ -331,7 +331,7 @@ iriscli stake delegate --chain-id=irishub --from=<key-name> --fee=0.3iris --amou
 
 ## iriscli stake unbond
 
-Unbond tokens from a validator.
+从验证人解委托通证。
 
 ```bash
 iriscli stake unbond <flags>
@@ -339,21 +339,21 @@ iriscli stake unbond <flags>
 
 **标志：**
 
-| 名称，速记          | 类型   | 必须 | 默认 | 描述                                                                                                |
-| ------------------- | ------ | ---- | ---- | --------------------------------------------------------------------------------------------------- |
-| --address-validator | string | 是   |      | Bech address of the validator                                                                       |
-| --shares-amount     | float  |      | 0.0  | Amount of source-shares to either unbond or redelegate as a positive integer or decimal             |
-| --shares-percent    | float  |      | 0.0  | Percent of source-shares to either unbond or redelegate as a positive integer or decimal >0 and <=1 |
+| 名称，速记          | 类型   | 必须 | 默认 | 描述                    |
+| ------------------- | ------ | ---- | ---- | ----------------------- |
+| --address-validator | string | 是   |      | 验证人地址              |
+| --shares-amount     | float  |      | 0.0  | 解绑的shares数量，正数  |
+| --shares-percent    | float  |      | 0.0  | 解绑的比率，小于1的正数 |
 
-Users must specify the unbond amount. There two options can do this: `--shares-amount` or `--shares-percent`. Keep in mind, don't specify both of them.
+用户必须指定解绑shares的数量，可使用`--shares-amount`或者`--shares-percent`指定。请勿同时使用这两个参数。
 
-### Unbond amounts of shares from a validator
+### 从验证人中解委托一定数量的shares
 
 ```bash
 iriscli stake unbond --address-validator=<iva...> --shares-amount=10 --from=<key-name> --chain-id=irishub --fee=0.3iris
 ```
 
-### Unbond percentage of shares from a validator
+### 从验证人中解委托一定比例的shares
 
 ```bash
 iriscli stake unbond --address-validator=<iva...> --shares-percent=0.1 --from=<key-name> --chain-id=irishub --fee=0.3iris
@@ -361,10 +361,10 @@ iriscli stake unbond --address-validator=<iva...> --shares-percent=0.1 --from=<k
 
 ## iriscli stake redelegate
 
-Transfer delegation from one validator to another.
+把某个委托的一部分或者全部从一个验证人转移到另外一个验证人。
 
 :::tip
-There is no `unbonding time` during the redelegation, so you will not miss the rewards. But you can only redelegate once per validator, until a period (= `unbonding time`) exceed.
+重新委托期间没有`unbonding time`，所以你不会错过奖励。但是每个验证人在每个`unbonding time`时长内只能转委托一次。
 :::
 
 ```bash
@@ -373,22 +373,22 @@ iriscli stake redelegate <flags>
 
 **标志：**
 
-| 名称，速记                 | 类型   | 必须 | 默认 | 描述                                                                                                |
-| -------------------------- | ------ | ---- | ---- | --------------------------------------------------------------------------------------------------- |
-| --address-validator-dest   | string | 是   |      | Bech address of the destination validator                                                           |
-| --address-validator-source | string | 是   |      | Bech address of the source validator                                                                |
-| --shares-amount            | float  |      | 0.0  | Amount of source-shares to either unbond or redelegate as a positive integer or decimal             |
-| --shares-percent           | float  |      | 0.0  | Percent of source-shares to either unbond or redelegate as a positive integer or decimal >0 and <=1 |
+| 名称，速记                 | 类型   | 必须 | 默认 | 描述                          |
+| -------------------------- | ------ | ---- | ---- | ----------------------------- |
+| --address-validator-dest   | string | 是   |      | 目标验证人地址                |
+| --address-validator-source | string | 是   |      | 源验证人地址                  |
+| --shares-amount            | float  |      | 0.0  | 转移的shares数量，正数        |
+| --shares-percent           | float  |      | 0.0  | 转移的shares比例，小于1的正数 |
 
-Users must specify the redelegation token amount. There two options can do this: `--shares-amount` or `--shares-percent`. Keep in mind, don't specify both of them.
+用户必须指定解绑shares的数量，可使用`--shares-amount`或者`--shares-percent`指定。请勿同时使用这两个参数。
 
-### Redelegate amounts of shares to another validator
+### 转委托一定数量shares到其他验证人
 
 ```bash
 iriscli stake redelegate --chain-id=irishub --from=<key-name> --fee=0.3iris --address-validator-source=iva106nhdckyf996q69v3qdxwe6y7408pvyv3hgcms --address-validator-dest=iva1xpqw0kq0ktt3we5gq43vjphh7xcjfy6sfqamll  --shares-amount=10
 ```
 
-### Redelegate percentage of shares to another validator
+### 转委托一定比例shares到其他验证人
 
 ```bash
 iriscli stake redelegate --chain-id=irishub --from=<key-name> --fee=0.3iris --address-validator-source=iva106nhdckyf996q69v3qdxwe6y7408pvyv3hgcms --address-validator-dest=iva1xpqw0kq0ktt3we5gq43vjphh7xcjfy6sfqamll  --shares-percent=0.1
@@ -396,18 +396,18 @@ iriscli stake redelegate --chain-id=irishub --from=<key-name> --fee=0.3iris --ad
 
 ## iriscli stake unjail
 
-In Proof-of-Stake blockchain, validators will get block provisions by staking their token. But if they failed to keep online, they will be punished by slashing a small portion of their staked tokens. The offline validators will be removed from the validator set and put into jail, which means their voting power is zero. During the jail period, these nodes are not even validator candidates. Once the jail period ends, they can send `unjail` transactions to free themselves and become validator candidates again.
+在PoS网络中，验证人的收益主要来自于staking抵押获利，但是若验证人不能保持在线，就会被当作一种作恶行为。系统会剥夺其作为验证人参与共识的资格。这样一来，其的状态会变成jailed，且投票权将立刻变为零。这种状态将持续一段时间。当jailed期结束，验证人节点的operator需要执行unjail操作来让节点的状态变为unjailed，再次成为验证人或者候选验证人。
 
 ```bash
 iriscli stake unjail <flags>
 ```
 
-### Unjail a jailed validator
+### 解禁被监禁的验证人
 
 ```bash
 iriscli stake unjail --from=<key-name> --fee=0.3iris --chain-id=irishub
 ```
 
-### Validator still jailed, cannot yet be unjailed
+### 验证人仍处于监禁状态，无法解禁
 
-That means your validator is still in jail period, you can query the [signing-info](#iriscli-stake-signing-info) for the jail end time:
+That means your validator is still in jail period, you can query the [signing-info](#iriscli-stake-signing-info) for the jail end time。

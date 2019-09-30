@@ -180,9 +180,9 @@ iriscli stake redelegation --address-validator-source=<source-validator-address>
 
 | Name, shorthand            | Default | Description                               | Required |
 | -------------------------- | ------- | ----------------------------------------- | -------- |
-| --address-delegator        |         | Bech address of the delegator             | true     |
-| --address-validator-dest   |         | Bech address of the destination validator | true     |
-| --address-validator-source |         | Bech address of the source validator      | true     |
+| --address-delegator        |         | Bech address of the delegator             | yes      |
+| --address-validator-dest   |         | Bech address of the destination validator | yes      |
+| --address-validator-source |         | Bech address of the source validator      | yes      |
 
 ### Query a redelegation record
 
@@ -192,7 +192,7 @@ iriscli stake redelegation --address-validator-source=<iva...> --address-validat
 
 ## iriscli stake redelegations
 
-Query all redelegations records of a delegator.
+### Query all redelegations records of a delegator
 
 ```bash
 iriscli stake redelegations <iaa...>
