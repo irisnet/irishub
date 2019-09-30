@@ -32,17 +32,17 @@ If you want to export the state from a nonexisting snapshot height, you need to 
 Export the current blockchain state
 
 ```bash
- iris export --home=<path_to_your_home>
+ iris export --home=<path-to-your-home>
 ```
 
 Export blockchain state from a particular height, the height must be an existing snapshot height
 
 ```bash
-iris export --height 10000 --home=<path_to_your_home>
+iris export --height 10000 --home=<path-to-your-home>
 ```
 
 If you want to export the blockchain state from a particular height and use the exported state as genesis state of another blockchain
 
 ```bash
-iris export --height 10000 --for-zero-height --home=<path_to_your_home>
+iris export --height 10000 --for-zero-height --home=<path-to-your-home>
 ```

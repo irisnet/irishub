@@ -116,12 +116,12 @@ iristool debug raw-bytes <raw-bytes>
 iristool debug raw-bytes "[10 21 13 255]"
 ```
 
-### iristool debug rand-bech32
+### iristool debug rand-secret
 
-Generate a random bech32
+Generate a random secret
 
 ```bash
-iristool debug rand-bech32
+iristool debug rand-secret
 ```
 
 ### iristool debug hash-lock

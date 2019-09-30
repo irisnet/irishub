@@ -42,7 +42,7 @@ When you initialize your ledger, a 24-word mnemonic is generated and stored in t
 
 1. Download the Ledger Live app [here](https://www.ledger.com/pages/ledger-live).
 2. Connect your ledger via USB and update to the latest firmware
-3. Go to the ledger live app store, and download the "Cosmos" application (this can take a while). **Note: You may have to enable `Dev Mode` in the `Settings` of Ledger Live to be able to download the "Cosmos" application**.
+3. Go to the ledger live app store, and download the `Cosmos` application (this can take a while). **Note: You may have to enable `Dev Mode` in the `Settings` of Ledger Live to be able to download the "Cosmos" application**.
 4. Navigate to the Cosmos app on your ledger device
 
 Then, to create an account, use the following command:
