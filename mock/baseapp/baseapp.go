@@ -25,7 +25,7 @@ import (
 // Use the db directly instead of a store to avoid
 // conflicts with handlers writing to the store
 // and to avoid affecting the Merkle root.
-var dbHeaderKey = []byte("header")
+// var dbHeaderKey = []byte("header")
 
 // Enum mode for app.runTx
 type RunTxMode uint8
@@ -438,7 +438,7 @@ func (app *BaseApp) BeginBlock(req abci.RequestBeginBlock) (res abci.ResponseBeg
 		// by InitChain. Context is now updated with Header information.
 		app.deliverState.ctx = app.deliverState.ctx.
 			WithBlockHeader(req.Header).
-			WithBlockHeight(req.Header.Height).WithCheckValidNum(sdk.NewValidTxCounter()).
+			WithCheckValidNum(sdk.NewValidTxCounter()).
 			WithLogger(app.deliverState.ctx.Logger().With("height", app.deliverState.ctx.BlockHeight())).
 			WithTagsManager(sdk.NewTagsManager(false))
 	}
@@ -536,7 +536,7 @@ func (app *BaseApp) DeliverTx(txBytes []byte) (res abci.ResponseDeliverTx) {
 
 // Basic validator for msgs
 func validateBasicTxMsgs(msgs []sdk.Msg) sdk.Error {
-	if msgs == nil || len(msgs) == 0 {
+	if len(msgs) == 0 {
 		// TODO: probably shouldn't be ErrInternal. Maybe new ErrInvalidMessage, or ?
 		return sdk.ErrInternal("Tx.GetMsgs() must return at least one message in list")
 	}
