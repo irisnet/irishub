@@ -14,9 +14,8 @@ func NewAnteHandler(am auth.AccountKeeper, k Keeper) sdk.AnteHandler {
 	return func(
 		ctx sdk.Context, tx sdk.Tx, simulate bool,
 	) (newCtx sdk.Context, res sdk.Result, abort bool) {
-		// get the signing accouts
-		signerAddrs := ctx.KeySignerAddrs()
-		signerAccs, _ := getSignerAccs(ctx, am, signerAddrs)
+		// get the signing accouts from context cache
+		signerAccs := am.GetCacheSignerAccs(ctx)
 
 		if len(signerAccs) == 0 {
 			return newCtx, types.ErrSignersMissingInContext(types.DefaultCodespace, "signers missing in context").Result(), true
@@ -71,15 +70,4 @@ func NewAnteHandler(am auth.AccountKeeper, k Keeper) sdk.AnteHandler {
 		// continue
 		return newCtx, sdk.Result{}, false
 	}
-}
-
-func getSignerAccs(ctx sdk.Context, am auth.AccountKeeper, addrs []sdk.AccAddress) (accs []auth.Account, res sdk.Result) {
-	accs = make([]auth.Account, len(addrs))
-	for i := 0; i < len(accs); i++ {
-		accs[i] = am.GetAccount(ctx, addrs[i])
-		if accs[i] == nil {
-			return nil, sdk.ErrUnknownAddress(addrs[i].String()).Result()
-		}
-	}
-	return
 }

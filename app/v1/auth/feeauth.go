@@ -47,15 +47,12 @@ func NewFeeRefundHandler(am AccountKeeper, fk FeeKeeper) types.FeeRefundHandler 
 			return sdk.Coin{}, errors.New("transaction is not Stdtx")
 		}
 
-		// get the signing addresses
-		signerAddrs := ctx.KeySignerAddrs()
-
-		// If this tx failed in anteHandler, txAccount length will be less than 1
-		if len(signerAddrs) < 1 {
-			//panic("invalid transaction, should not reach here")
+		// get the signing accounts from context cache
+		signerAccs := am.GetCacheSignerAccs(ctx)
+		if len(signerAccs) < 1 {
 			return sdk.Coin{}, nil
 		}
-		firstAccountAddr := signerAddrs[0]
+		firstAccountAddr := signerAccs[0].GetAddress()
 
 		// Refund process will also cost gas, but this is compensation for previous fee deduction.
 		// It is not reasonable to consume users' gas. So the context gas is reset to transaction gas

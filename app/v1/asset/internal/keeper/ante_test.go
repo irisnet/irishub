@@ -57,52 +57,43 @@ func TestAssetAnteHandler(t *testing.T) {
 	tx2 := auth.StdTx{Msgs: []sdk.Msg{msgCreateGateway, msgIssueNativeToken, msgNonAsset1, msgIssueGatewayToken, msgMintNativeToken}}
 	tx3 := auth.StdTx{Msgs: []sdk.Msg{msgNonAsset2, msgCreateGateway, msgIssueNativeToken, msgIssueGatewayToken, msgMintNativeToken}}
 
-	newCtx := ctx.WithKeySignerAddrs([]sdk.AccAddress{addr1, addr2})
-	ak.SetAccount(newCtx, acc1)
-	ak.SetAccount(newCtx, acc2)
+	// set signers and construct an ante handler
+	ctx = ak.CacheSignerAccs(ctx, []auth.Account{acc1, acc2})
 	anteHandler := NewAnteHandler(ak, keeper)
 
 	// assert that the ante handler will return with `abort` set to true
 	_ = acc1.SetCoins(sdk.Coins{gatewayCreateFee.Add(nativeTokenIssueFee)})
-	ak.SetAccount(newCtx, acc1)
-	_, res, abort := anteHandler(newCtx, tx1, false)
+	_, res, abort := anteHandler(ctx, tx1, false)
 	require.Equal(t, true, abort)
 	require.Equal(t, false, res.IsOK())
 
 	// assert that the ante handler will return with `abort` set to true
 	_ = acc1.SetCoins(acc1.GetCoins().Add(sdk.Coins{gatewayTokenIssueFee}))
-	ak.SetAccount(newCtx, acc1)
-	_, res, abort = anteHandler(newCtx, tx1, false)
+	_, res, abort = anteHandler(ctx, tx1, false)
 	require.Equal(t, true, abort)
 	require.Equal(t, false, res.IsOK())
 
 	// assert that the ante handler will return with `abort` set to false
 	_ = acc1.SetCoins(acc1.GetCoins().Add(sdk.Coins{nativeTokenMintFee}))
-	ak.SetAccount(newCtx, acc1)
-
-	_, res, abort = anteHandler(newCtx, tx1, false)
+	_, res, abort = anteHandler(ctx, tx1, false)
 	require.Equal(t, false, abort)
 	require.Equal(t, true, res.IsOK())
 
 	// assert that the ante handler will return with `abort` set to false
 	_ = acc1.SetCoins(sdk.Coins{gatewayCreateFee.Add(nativeTokenIssueFee)})
-	ak.SetAccount(newCtx, acc1)
-	_, res, abort = anteHandler(newCtx, tx2, false)
+	_, res, abort = anteHandler(ctx, tx2, false)
 	require.Equal(t, false, abort)
 	require.Equal(t, true, res.IsOK())
 
 	// assert that the ante handler will return with `abort` set to false
 	_ = acc1.SetCoins(sdk.Coins{})
-	ak.SetAccount(newCtx, acc1)
-	_, res, abort = anteHandler(newCtx, tx3, false)
+	_, res, abort = anteHandler(ctx, tx3, false)
 	require.Equal(t, false, abort)
 	require.Equal(t, true, res.IsOK())
 
 	// assert that the ante handler will return with `abort` set to true
-	newCtx = ctx.WithKeySignerAddrs([]sdk.AccAddress{})
-	ak.SetAccount(newCtx, acc1)
-	ak.SetAccount(newCtx, acc2)
-	_, res, abort = anteHandler(newCtx, tx3, false)
+	ctx = ak.CacheSignerAccs(ctx, []auth.Account{})
+	_, res, abort = anteHandler(ctx, tx3, false)
 	require.Equal(t, true, abort)
 	require.Equal(t, false, res.IsOK())
 }

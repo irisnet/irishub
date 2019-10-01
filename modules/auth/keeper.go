@@ -2,6 +2,7 @@ package auth
 
 import (
 	"fmt"
+
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/tendermint/tendermint/crypto"
@@ -75,6 +76,15 @@ func (am AccountKeeper) GetAccount(ctx sdk.Context, addr sdk.AccAddress) Account
 }
 
 // Implements sdk.AccountKeeper.
+func (am AccountKeeper) GetCacheSignerAccs(ctx sdk.Context) []Account {
+	v := ctx.KeySignerAccs()
+	if v == nil {
+		return []Account{}
+	}
+	return v.([]Account)
+}
+
+// Implements sdk.AccountKeeper.
 func (am AccountKeeper) SetGenesisAccount(ctx sdk.Context, acc Account) {
 	am.IncreaseTotalLoosenToken(ctx, acc.GetCoins())
 	am.SetAccount(ctx, acc)
@@ -86,6 +96,11 @@ func (am AccountKeeper) SetAccount(ctx sdk.Context, acc Account) {
 	store := ctx.KVStore(am.key)
 	bz := am.encodeAccount(acc)
 	store.Set(AddressStoreKey(addr), bz)
+}
+
+// Implements sdk.AccountKeeper.
+func (am AccountKeeper) CacheSignerAccs(ctx sdk.Context, accounts []Account) sdk.Context {
+	return ctx.WithKeySignerAccs(accounts)
 }
 
 // RemoveAccount removes an account for the account mapper store.
