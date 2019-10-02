@@ -1,6 +1,6 @@
 # Fee Model
 
-Specify the maximum fee you want to pay by `--fee`. Gas is the unit used to measure how much resource needed to execute the transaction. Specify the maximum gas limit by `-—gas`. If maximum gas is too small, it won't be enough for executing the transaction. If the fee is too low, fee paid for each unit of gas will be less than the minimum gas-price and validators won't execute the transaction neither. The fee(minimum unit)/gas must be greater than 6*10^12 iris-atto. We recommend that you set your maximum gas to 50000 and set your maximum fee to 0.3iris. Fee will be consumed according to actual gas used and spare fee will be reimbursed to users.
+Specify the maximum fee you want to pay by `--fee` when sending txs by cli client. Gas is the unit used to measure how much resource needed to execute the transaction. Specify the maximum gas limit by `-—gas`. If maximum gas is too small, it won't be enough for executing the transaction. If the fee is too low, fee paid for each unit of gas will be less than the minimum gas-price and validators won't execute the transaction neither. The fee(minimum unit)/gas must be greater than 6*10^12 iris-atto. We recommend that you set your maximum gas to 50000 and set your maximum fee to 0.3iris. Fee will be consumed according to actual gas used and spare fee will be reimbursed to users.
 
 :::tip
 Certain types of transactions may consume more gas (e.g. creating validators), so it is recommended to set `--gas=100000 --fee=0.6iris` to ensure the smooth execution of transactions.
