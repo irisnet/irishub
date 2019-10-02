@@ -8,7 +8,7 @@ IRISnet将面向服务的基础设施融入到Cosmos网络中，支持对包括�
 
 ## IRIS枢纽
 
-在IRISnet的第一个区块链称为 *IRIS枢纽* 的区块链，它是一个基于Tendermint共识引擎构建的Bond-Proof-of-Stake（BPoS）区块链。它将成为第一个连接Cosmos枢纽的区域性枢纽。IRIS网络通过标准的ABCI交易实现IRIS服务（也称为iService）的注册，绑定，调用，查询，分析和管理。iService提供商充当公共链、联盟区块链以及现有企业系统中业务逻辑的适配器。IRIShub已经在2019年春节后启动，这也标志着[主网启动](https://github.com/irisnet/iris-foundation/blob/master/iris-betanet-plan_cn.md)的第一步。
+在IRISnet的第一个区块链称为 *IRIS枢纽* 的区块链，它是一个基于Tendermint共识引擎构建的Bond-Proof-of-Stake（BPoS）区块链。它将成为第一个连接Cosmos枢纽的区域性枢纽。IRIS网络通过标准的ABCI交易实现IRIS服务（也称为iService）的注册，绑定，调用，查询，分析和管理。iService提供商充当公共链、联盟区块链以及现有企业系统中业务逻辑的适配器。2019年3月1日，IRIS Hub 的 Betanet 产出创世区块，网络正式启动。并在上线200天之际正式宣布 IRIS Hub 开始以主网（Mainnet）身份运行。
 
 ## IRIS服务
 
