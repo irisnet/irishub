@@ -1,6 +1,6 @@
 # Parameters
 
-In IRISnet, there are some special parameters can be modified through on-chain governance.
+In IRISnet, there are some special parameters that can be modified through on-chain governance.
 All the IRIS holders may participate in the on-chain governance. If the community is not satisfied with certain modifiable parameters, it is available to submit a [parameter-change](../features/governance.md#usage-scenario-of-parameter-change) proposal in governance module.
 
 ## Parameters in Auth
@@ -55,13 +55,13 @@ Details in [slashing](../features/slashing.md)
 
 ## Parameters in Asset
 
-| key                          | Description                     | Range  | Current                           |
-| ---------------------------- | ------------------------------- | ------ | --------------------------------- |
-| `asset/AssetTaxRate`         | Asset tax                       | [0, 1] | 0.4                               |
-| `asset/IssueTokenBaseFee`    | Issue token's  fee              | [0,+∞) | 60000000000000000000000iris-atto  |
-| `asset/MintTokenFeeRatio`    | Mint token's fee ratio          | [0, 1] | 0.1                               |
-| `asset/CreateGatewayBaseFee` | Create gateway Token's fee      | [0,+∞) | 120000000000000000000000iris-atto |
-| `asset/GatewayAssetFeeRatio` | Issue gateway token's fee ratio | [0, 1] | 0.1                               |
+| key                          | Description                                     | Range  | Current                           |
+| ---------------------------- | ----------------------------------------------- | ------ | --------------------------------- |
+| `asset/AssetTaxRate`         | Asset tax rate                                  | [0, 1] | 0.4                               |
+| `asset/IssueTokenBaseFee`    | Base fee for issuing tokens                      | [0,+∞) | 60000000000000000000000iris-atto  |
+| `asset/MintTokenFeeRatio`    | Fee ratio for minting tokens                     | [0, 1] | 0.1                               |
+| `asset/CreateGatewayBaseFee` | Base fee for creating gateway tokens             | [0,+∞) | 120000000000000000000000iris-atto |
+| `asset/GatewayAssetFeeRatio` | Fee ratio for issuing and minting gateway tokens | [0, 1] | 0.1                               |
 
 Details in [asset](../features/asset.md)
 
@@ -70,8 +70,8 @@ Details in [asset](../features/asset.md)
 | key                            | Description                                                 | Range            | Current  |
 | ------------------------------ | ----------------------------------------------------------- | ---------------- | -------- |
 | `service/ArbitrationTimeLimit` | maximum time of dispute resolution                          | [5days, 10days]  | 120h0m0s |
-| `service/ComplaintRetrospect`  | maximum time for submit a dispute                           | [15days, 30days] | 360h0m0s |
-| `service/MaxRequestTimeout`    | maximum number of waiting blocks for service invocation     | [20,)            | 100      |
+| `service/ComplaintRetrospect`  | maximum time for submitting a dispute                       | [15days, 30days] | 360h0m0s |
+| `service/MaxRequestTimeout`    | maximum number of blocks to wait for service invocation     | [20,)            | 100      |
 | `service/MinDepositMultiple`   | a multiple of the minimum deposit amount of service binding | [500, 5000]      | 1000     |
 | `service/ServiceFeeTax`        | tax rate of service fee                                     | (0, 0.2]         | 0.01     |
 | `service/SlashFraction`        | slash fraction                                              | (0, 0.01]        | 0.001    |

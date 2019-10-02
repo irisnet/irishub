@@ -12,7 +12,7 @@ A full-node is a program that fully validates transactions and blocks of a block
 
 ### Validator Node
 
-The [IRIS Hub](../get-started/intro.md#iris-hub) is based on [Cosmos SDK](https://cosmos.network/docs/intro/) and [Tendermint](https://tendermint.com/docs/introduction/what-is-tendermint.html), which relies on a set of validators to secure the network. The role of validators is to run a full-node and participate in consensus by broadcasting votes which contain cryptographic signatures signed by their private key. Validators commit new blocks in the blockchain and receive revenue in exchange for their work. They must also participate in governance by voting on proposals. Validators are weighted according to their total stake.
+The [IRIS Hub](../get-started/intro.md#iris-hub) is based on [Cosmos SDK](https://cosmos.network/docs/intro/) and [Tendermint](https://tendermint.com/docs/introduction/what-is-tendermint.html), which relies on a set of validators to secure the network. The role of validators is to run a full-node and participate in consensus by broadcasting votes which contain cryptographic signatures signed by their private keys. Validators commit new blocks to the blockchain and receive revenue in exchange for their work. They must also participate in governance by voting on proposals. Validators are weighted according to their total stake.
 
 ### Validator Candidate Node
 
@@ -22,7 +22,7 @@ Only top 100 bonded full nodes can become validator nodes, the rest will become 
 
 ### Validator Operator
 
-A Validator Operator is the only one who can operate his Validator's informations or participate in governance as the validator.
+A validator operator is the only one who can operate the Validator's informations or participate in governance as the validator.
 
 ### Delegator
 
@@ -30,11 +30,11 @@ Delegators are IRIS holders who cannot, or do not want to run a validator themse
 
 ### Profiler
 
-Profiler is a type of user that they are a special type of user who can submit software upgrade/halt proposals
+Profiler is a special type of user who can submit software upgrade/halt proposals
 
 ### Trustee
 
-Trustee is a type of user that  they are a special type of user who will receive funds from CommunityTaxUsage proposals
+Trustee is a special type of user who will receive funds from CommunityTaxUsage proposals
 
 ## IRIS Token
 
@@ -48,16 +48,16 @@ It is intended that the IRIS network will eventually support all whitelisted fee
 
 ## Staking Rewards
 
-Validator and its delegators can share the following rewards by portion：
+The validator and its delegators can share the following rewards by proportion：
 
 - **Block Inflation**
-  Block Inflation exists to incentivize IRIS holders to stake. As more IRIS tokens are staked, more secure the network become(Read more about [Staking](../features/stake.md)).
+  Block Inflation exists to incentivize IRIS holders to stake. The more staked IRIS tokens are, more secure the network become(Read more about [Staking](../features/stake.md)).
   Block Inflation will be [distributed every block](../features/mint.md). [Inflation rate](../features/mint.md) in IRISnet for the first year will be 4%.  **This ration could be adjusted by `parameter-change` proposals**.
   In this way, loose IRIS will devalue year by year.
 - **Block Proposer Reward**
-  In IRIShub, the probability for validators is proportional to its bonded tokens. If one's proposed block is finalized, it gets extra rewards for it.  
+  In IRIShub, the probability for being a proposer is proportional to the validator's bonded tokens. If one proposed block is finalized, the proposer gets extra rewards for it.
 - **Fee**
-  Each transaction needs a [fee](fee.md#fee) for compensating validators' work[Gas](fee.md#gas). These fees can be paid with IRIS and may later in any tokens which are whitelisted by the Hub’s governance. Fees are distributed to validators in proportion to their stake. A minimum fee/gas ration is set in IRISnet.
+  Each transaction needs a [fee](fee.md#fee) for compensating validators' work[Gas](fee.md#gas). These fees can be paid with IRIS and may later in any tokens which are whitelisted by the IRISHub’s governance. Fees are distributed to validators in proportion to their stake. A minimum fee/gas ration is set in IRISnet.
 
 Each validator receives revenue in proportion to its total stake. However, before this revenue is distributed to its delegators, the validator can apply a commission for providing staking services.
 
@@ -99,7 +99,7 @@ Additionally, validators are expected to be active members of the community. The
 ## Validator Risks
 
 - **Unavailability**: Validators are expected to keep signing votes for making new blocks. If a validator’s signature has not been included in more than 30% of the last 34,560 blocks (which amounts to approximately 24 hours, assuming an average block-generating time of 5 seconds), this validator will get jailed and removed from current validatorset for 1.5 day, and their bonded tokens will get slashed by 0.03%.
-- **Double Sign**:If the protocol detects that a validator voted multiple different opinions about the same block (same height/round), or voted for different blocks at the same height/round, this validator will get jailed and removed from current validatorset for 2 days. Their bonded tokens will get slashed by 1%.
+- **Double Sign**: If the protocol detects that a validator voted multiple different opinions about the same block (same height/round), or voted for different blocks at the same height/round, this validator will get jailed and removed from current validatorset for 2 days. Their bonded tokens will get slashed by 1%.
 - **Censorship**: If the protocol detects that a proposer included invalid transactions in a block, this validator will get jailed and removed from current validatorset for 2 days.
 
 All metrics mentioned can be adjusted by `parameter-change` proposals.
