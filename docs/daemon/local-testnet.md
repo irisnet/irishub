@@ -54,7 +54,7 @@ iris gentx --name MyValidator
 
 ### iris collect-gentxs
 
-Add the generated bonding transactions to the genesis file
+Add the generated staking transactions to the genesis file
 
 ```bash
 iris collect-gentxs
@@ -95,9 +95,9 @@ iris start --replay-last-block
 
 ### iris tendermint
 
-Query the unique node id which can be used in p2p connection, e.g. the `seeds` and `persistent_peers` in the [config.toml](intro.md#cnofig.toml) are formatted as `<node-id>@ip:26656`
+Query the unique node id which can be used in p2p connection, e.g. the `seeds` and `persistent_peers` in the [config.toml](intro.md#cnofig.toml) are formatted as `<node-id>@ip:26656`.
 
-The node id is stored in the [node_key.json](intro.md#node_key.json)
+The node id is stored in the [node_key.json](intro.md#node_key.json).
 
 ```bash
 iris tendermint show-node-id

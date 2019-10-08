@@ -8,7 +8,7 @@ The IRIShub API Server is also called LCD(Light Client Daemon). An IRISLCD insta
 
 The default home folder of irislcd is `$HOME/.irislcd`. Once an IRISLCD is started, it will create two directories: `keys` and `trust-base.db`.The keys store db locates in `keys`. `trust-base.db` stores all trusted validator set and other verification related files.
 
-When IRISLCD is started in distrust mode, it will check whether `trust-base.db` is empty. If true, it will fetch the latest block as its trust basis and save it under `trust-base.db`. The IRISLCD instance always trust the basis. All query proof will be verified based on the trust basis, which means IRISLCD can only verify the proof on later heights. If you want to query transactions or blocks on lower heights, please start IRISLCD in trust mode. For detailed proof verification algorithm please refer to [tendermint lite](https://github.com/tendermint/tendermint/blob/master/docs/tendermint-core/light-client-protocol.md).
+When IRISLCD is started in distrust mode, it will check whether `trust-base.db` is empty. If true, it will fetch the latest block as its trust basis and save it under `trust-base.db`. The IRISLCD instance always trust the basis. All query proof will be verified based on the trust basis, for detailed proof verification algorithm please refer to [tendermint lite](https://github.com/tendermint/tendermint/blob/master/docs/tendermint-core/light-client-protocol.md).
 
 ## Basic Functionalities
 
@@ -26,9 +26,9 @@ IRISLCD has two subcommands:
 
 The `start` subcommand has the following flags:
 
-| Parameter  | Type   | Default                 | Required | Description                                                     |
+| Flag       | Type   | Default                 | Required | Description                                                     |
 | ---------- | ------ | ----------------------- | -------- | --------------------------------------------------------------- |
-| chain-id   | string |                         | true     | Chain ID of Tendermint node                                     |
+| chain-id   | string |                         | Yes     | Chain ID of Tendermint node                                     |
 | home       | string | "$HOME/.irislcd"        |          | Directory for config and data, such as key and checkpoint       |
 | node       | string | "tcp://localhost:26657" |          | Full node to connect to                                         |
 | laddr      | string | "tcp://localhost:1317"  |          | Address for server to listen on                                 |
@@ -73,14 +73,14 @@ such as query blocks, transactions and validator set
 9. `GET /txs/{hash}`: Get a Tx by hash
 10. `GET /txs`: Search transactions
 
-### Broadcast transactions
+### Broadcast transactions API
 
 1. `POST /tx/broadcast`: Broadcast a signed StdTx which is amino or json encoded
 
 This api supports the following special parameters. By default, their values are all false. And each parameter has its unique priority( Here `0` is the top priority). If multiple parameters are specified to true, then the parameters with lower priority will be ignored. For instance, if `simulate` is true, then `commit` and `async` will be ignored.  
 
 | parameter name | Type | Default | Priority | Description                                                                            |
-| -------------- | ---- | ------- | -------- |--------------------------------------------------------------------------------------- |
+| -------------- | ---- | ------- | -------- | -------------------------------------------------------------------------------------- |
 | simulate       | bool | false   | 0        | Ignore the gas field and perform a simulation of a transaction, but don’t broadcast it |
 | commit         | bool | false   | 1        | Wait for transaction being included in a block                                         |
 | async          | bool | false   | 2        | Broadcast transaction asynchronously                                                   |

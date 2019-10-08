@@ -31,7 +31,7 @@ iriscli asset create-gateway <flags>
 
 | Name, shorthand     | type   | Required | Default  | Description                                                                                              |
 | --------------------| -----  | -------- | -------- | -------------------------------------------------------------------------------------------------------- |
-| --moniker           | string | true     |          | The unique name with a size between 3 and 8, beginning with a letter followed by alphanumeric characters |
+| --moniker           | string | Yes     |          | The unique name with a size between 3 and 8, beginning with a letter followed by alphanumeric characters |
 | --identity          | string |          |          | Optional identity signature with a maximum length of 128 (ex. UPort or Keybase)                          |
 | --details           | string |          |          | Optional details with a maximum length of 280                                                            |
 | --website           | string |          |          | Optional website with a maximum length of 128|
@@ -54,7 +54,7 @@ iriscli asset edit-gateway <flags>
 
 | Name, shorthand     | type   | Required | Default  | Description                                                                                              |
 | --------------------| -----  | -------- | -------- | -------------------------------------------------------------------------------------------------------- |
-| --moniker           | string | true     |          | The unique name with a size between 3 and 8, beginning with a letter followed by alphanumeric characters |
+| --moniker           | string | Yes     |          | The unique name with a size between 3 and 8, beginning with a letter followed by alphanumeric characters |
 | --identity          | string |          |          | Optional identity signature with a maximum length of 128                                                 |
 | --details           | string |          |          | Optional details with a maximum length of 280                                                            |
 | --website           | string |          |          | Optional website with a maximum length of 128                                                            |
@@ -77,8 +77,8 @@ iriscli asset transfer-gateway-owner <flags>
 
 | Name, shorthand     | type    | Required | Default  | Description                                            |
 | --------------------| ------- | -------- | -------- |------------------------------------------------------- |
-| --moniker           | string  | true     |          | The unique name of the gateway to be transferred       |
-| --to                | Address | true     |          | The new owner to which the gateway will be transferred |
+| --moniker           | string  | Yes     |          | The unique name of the gateway to be transferred       |
+| --to                | Address | Yes     |          | The new owner to which the gateway will be transferred |
 
 ### Transfer Gateway Owner
 
@@ -98,16 +98,16 @@ iriscli asset issue-token <flags>
 
 | Name, shorthand    | Type    | Required | Default       | Description                                                  |
 | ------------------ | ------- | -------- | ------------- | ------------------------------------------------------------ |
-| --family           | string  | true     | fungible      | The token type: fungible, non-fungible (unsupported) |
+| --family           | string  | Yes     | fungible      | The token type: fungible, non-fungible (unsupported) |
 | --source           | string  |          | native        | The token source: native, gateway                              |
-| --name             | string  | true     |               | Name of the newly issued token, limited to 32 unicode characters, e.g. "IRIS Network" |
-| --gateway          | string  |          |               | The unique moniker of the gateway, required when the source is gateway |
-| --symbol           | string  | true     |               | The symbol of the token, length between 3 and 8, alphanumeric characters, case insensitive |
-| --canonical-symbol | string  |          |               | When the source is gateway, it is used to identify the symbol on its' original chain |
+| --name             | string  | Yes     |               | Name of the newly issued token, limited to 32 unicode characters, e.g. "IRIS Network" |
+| --gateway          | string  |          |               | The unique moniker of the gateway, required when the `source` is `gateway` |
+| --symbol           | string  | Yes     |               | The symbol of the token, length between 3 and 8, alphanumeric characters, case insensitive |
+| --canonical-symbol | string  |          |               | When the `source` is `gateway`, it is used to identify the symbol on its' original chain |
 | --min-unit-alias   | string  |          |               | The alias of minimum uint                                      |
-| --initial-supply   | uint64  | true     |               | The initial supply of this token. The amount before boosting should not exceed 100 billion. |
+| --initial-supply   | uint64  | Yes     |               | The initial supply of this token. The amount before boosting should not exceed 100 billion. |
 | --max-supply       | uint64  |          | 1000000000000 | The hard cap of this token, total supply can not exceed max supply. The amount before boosting should not exceed 1000 billion.|
-| --decimal          | uint8   | true     |               | A token can have a maximum of 18 digits of decimal         |
+| --decimal          | uint8   | Yes     |               | A token can have a maximum of 18 digits of decimal         |
 | --mintable         | boolean |          | false         | Whether this token could be minted(increased) after the initial issuing |
 
 ### Issue native token
@@ -186,7 +186,7 @@ iriscli asset transfer-token-owner <token-id> <flags>
 
 | Name | Type   | Required | Default | Description           |
 | ---- | ------ | -------- | ------- | --------------------- |
-| --to | string | true     |         | The new owner address |
+| --to | string | Yes     |         | The new owner address |
 
 ### Transfer Token Owner
 
@@ -207,7 +207,7 @@ iriscli asset mint-token <token-id> <flags>
 | Name     | Type   | Required | Default | Description                                           |
 | -------- | ------ | -------- | ------- | ----------------------------------------------------- |
 | --to     | string |          |         | Address of mint token to, default is your own address |
-| --amount | uint64 | true     | 0       | Amount of the token to mint                           |
+| --amount | uint64 | Yes     | 0       | Amount of the token to mint                           |
 
 ### Mint Token
 
@@ -225,25 +225,25 @@ iriscli asset query-token <token-id>
 
 ### Global Unique Token ID Generation Rule
 
-- When Source is native: ID = [Symbol], e.g. iris
+- When `Source` is `native`: ID = [Symbol], e.g. `iris`
 
-- When Source is external: ID = x.[Symbol], e.g. x.btc
+- When `Source` is `external`: ID = x.[Symbol], e.g. `x.btc`
 
-- When Source is gateway: ID = [Gateway].[Symbol], e.g. cats.kitty
+- When `Source` is `gateway`: ID = [Gateway].[Symbol], e.g. `cats.kitty`
 
-### Query the native token named "kitty"
+### Query the native token named `kitty`
 
 ```bash
 iriscli asset query-token kitty
 ```
 
-### Query the token of gateway "cats" named "kitty"
+### Query the token of gateway `cats` named `kitty`
 
 ```bash
 iriscli asset query-token cats.kitty
 ```
 
-### Query the external token named "btc"
+### Query the external token named `btc`
 
 ```bash
 iriscli asset query-token x.btc
@@ -261,22 +261,22 @@ iriscli asset query-tokens <flags>
 
 | Name      | Type   | Required | Default | Description                                                        |
 | --------- | ------ | -------- | ------- | ------------------------------------------------------------------ |
-| --source  | string |          | all     | Token Source: native / gateway / external                          |
+| --source  | string |          |      | Token Source: native / gateway / external                          |
 | --gateway | string |          |         | The unique moniker of the gateway, required when source is gateway |
 | --owner   | string |          |         | The owner of the tokens                                            |
 
 ### Query Rules
 
-- when source is native
-  - gateway will be ignored
-  - owner optional
-- When source is gateway
-  - gateway required
-  - owner will be ignored (because gateway tokens are all owned by the gateway)
-- when source is external
-  - gateway and owner are ignored
-- when the gateway is not empty
-  - source optional
+- when `source` is `native`
+  - `gateway` will be ignored
+  - `owner` optional
+- When `source` is `gateway`
+  - `gateway` required
+  - `owner` will be ignored (because gateway tokens are all owned by the gateway)
+- when `source` is `external`
+  - `gateway` and `owner` are ignored
+- when the `gateway` is not empty
+  - `source` optional
 
 ### Query all tokens
 
@@ -314,7 +314,7 @@ iriscli asset query-gateway <flags>
 
 | Name, shorthand     | type   | Required | Default  | Description                                                         |
 | --------------------| -----  | -------- | -------- | ------------------------------------------------------------------- |
-| --moniker           | string | true     |          | The unique name with a size between 3 and 8, beginning with a letter followed by alphanumeric characters |
+| --moniker           | string | Yes     |          | The unique name with a size between 3 and 8, beginning with a letter followed by alphanumeric characters |
 
 ### Query Gateway
 

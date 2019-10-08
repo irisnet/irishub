@@ -84,14 +84,14 @@ module.exports = {
                     link: 'https://www.irisnet.org'
                 }],
                 sidebar: sidebar("", [
-                    ["Getting Started", "/zh/get-started"],
-                    ["Concepts", "/zh/concepts"],
-                    ["Features", "/zh/features"],
-                    ["Daemon", "/zh/daemon"],
-                    ["CLI Client", "/zh/cli-client"],
-                    ["API Server", "/zh/light-client"],
-                    ["Tools", "/zh/tools"],
-                    ["Resources", "/zh/resources"]
+                    ["快速开始", "/zh/get-started"],
+                    ["概念", "/zh/concepts"],
+                    ["功能模块", "/zh/features"],
+                    ["守护进程", "/zh/daemon"],
+                    ["命令行客户端", "/zh/cli-client"],
+                    ["API 服务", "/zh/light-client"],
+                    ["工具", "/zh/tools"],
+                    ["资源", "/zh/resources"]
                 ])
             }
         },

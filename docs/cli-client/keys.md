@@ -17,13 +17,13 @@ Keys allows you to manage your local tendermint keystore (wallets) for iris.
 
 ## iriscli keys add
 
-Create a new key (wallet), or recover from mnemonic/keystore
+Create a new key (wallet), or recover from mnemonic/keystore.
 
 ```bash
 iriscli keys add <key-name> <flags>
 ```
 
-**Unique Flags:**
+**Flags:**
 
 | Name, shorthand      | Default   | Description                                                       | Required |
 | -------------------- | --------- | ----------------------------------------------------------------- | -------- |
@@ -111,15 +111,15 @@ Get details of a local key.
 iriscli keys show <key-name> <flags>
 ```
 
-**Unique Flags:**
+**Flags:**
 
-| Name, shorthand      | Default           | Description                                         | Required |
-| -------------------- | ----------------- | ----------------------------------------------------| -------- |
-| --address            |                   | Output the address only (overrides --output)        |          |
-| --bech               | acc               | The Bech32 prefix encoding for a key (acc/val/cons) |          |
-| --help, -h           |                   | help for show                                       |          |
-| --multisig-threshold | 1                 | K out of N required signatures                      |          |
-| --pubkey             |                   | output the public key only (overrides --output)     |          |
+| Name, shorthand      | Default | Description                                         | Required |
+| -------------------- | ------- | --------------------------------------------------- | -------- |
+| --address            |         | Output the address only (overrides --output)        |          |
+| --bech               | acc     | The Bech32 prefix encoding for a key (acc/val/cons) |          |
+| --help, -h           |         | help for show                                       |          |
+| --multisig-threshold | 1       | K out of N required signatures                      |          |
+| --pubkey             |         | Output the public key only (overrides --output)     |          |
 
 ### Get details of a local key
 
@@ -127,7 +127,7 @@ iriscli keys show <key-name> <flags>
 iriscli keys show MyKey
 ```
 
-The folloing infos will be shown:
+The following infos will be shown:
 
 ```bash
 NAME:    TYPE:    ADDRESS:                                      PUBKEY:
@@ -157,11 +157,11 @@ Export the keystore of a key to a json file
 iriscli keys export <key-name> <flags>
 ```
 
-**Unique Flags:**
+**Flags:**
 
-| Name, shorthand | Default   | Description          | Required |
-| --------------- | --------- | -------------------- | -------- |
-| --output-file   |           | The path of keystore |          |
+| Name, shorthand | Default | Description          | Required |
+| --------------- | ------- | -------------------- | -------- |
+| --output-file   |         | The path of keystore |          |
 
 ### Export keystore
 
@@ -171,18 +171,18 @@ iriscli keys export Mykey --output-file=<path-to-keystore>
 
 ## iriscli keys delete
 
-Delete a local key by the given name
+Delete a local key by the given name.
 
 ```bash
 iriscli keys delete <key-name> <flags>
 ```
 
-**Unique Flags:**
+**Flags:**
 
-| Name, shorthand | Default   | Description                                                             | Required |
-| --------------- | --------- | ----------------------------------------------------------------------- | -------- |
-| --force, -f     | false     | Remove the key unconditionally without asking for the passphrase        |          |
-| --yes, -y       | false     | Skip confirmation prompt when deleting offline or ledger key references |          |
+| Name, shorthand | Default | Description                                                             | Required |
+| --------------- | ------- | ----------------------------------------------------------------------- | -------- |
+| --force, -f     | false   | Remove the key unconditionally without asking for the passphrase        |          |
+| --yes, -y       | false   | Skip confirmation prompt when deleting offline or ledger key references |          |
 
 ### Delete a local key
 
@@ -192,7 +192,7 @@ iriscli keys delete MyKey
 
 ## iriscli keys update
 
-Change the password of a key, used to protect the private key
+Change the password of a key, used to protect the private key.
 
 ### Change the password of a local key
 
@@ -208,11 +208,11 @@ Create a bip39 mnemonic, sometimes called a seed phrase, by reading from the sys
 iriscli keys mnemonic <flags>
 ```
 
-**Unique Flags:**
+**Flags:**
 
-| Name, shorthand  | Default   | Description                                                                   | Required |
-| ---------------- | --------- | ----------------------------------------------------------------------------- | -------- |
-| --unsafe-entropy |           | Prompt the user to supply their own entropy, instead of relying on the system |          |
+| Name, shorthand  | Default | Description                                                                   | Required |
+| ---------------- | ------- | ----------------------------------------------------------------------------- | -------- |
+| --unsafe-entropy |         | Prompt the user to supply their own entropy, instead of relying on the system |          |
 
 ### Create a bip39 mnemonic
 
@@ -240,14 +240,14 @@ Optionally specify a bip39 mnemonic, a bip39 passphrase to further secure the mn
 iriscli keys new <key-name> <flags>
 ```
 
-**Unique Flags:**
+**Flags:**
 
-| Name, shorthand | Default           | Description                                                     | Required |
-| --------------- | ----------------- | --------------------------------------------------------------- | -------- |
-| --bip44-path    | 44'/118'/0'/0/0   | BIP44 path from which to derive a private key                   |          |
-| --default       |                   | Skip the prompts and just use the default values for everything |          |
-| --help, -h      |                   | Help for new                                                    |          |
-| --ledger        |                   | Store a local reference to a private key on a Ledger device     |          |
+| Name, shorthand | Default         | Description                                                     | Required |
+| --------------- | --------------- | --------------------------------------------------------------- | -------- |
+| --bip44-path    | 44'/118'/0'/0/0 | BIP44 path from which to derive a private key                   |          |
+| --default       |                 | Skip the prompts and just use the default values for everything |          |
+| --help, -h      |                 | Help for new                                                    |          |
+| --ledger        |                 | Store a local reference to a private key on a Ledger device     |          |
 
 ### Create a new key by the specified method
 

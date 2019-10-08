@@ -43,7 +43,7 @@ You can get this value with
 iris tendermint show-validator --home=<iris-home>
 ```
 
-Example output:
+Example Output:
 
 ```bash
 icp1zcjduepqzuz420weqehs3mq0qny54umfk5r78yup6twtdt7mxafrprms5zqsjeuxvx

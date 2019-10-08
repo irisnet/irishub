@@ -2,21 +2,21 @@
 order: 2
 ---
 
-# Command Line Tool
+# 命令行工具
 
-## Introduction
+## 介绍
 
-`iristool` is a tool for simple debugging.
+`iristool`是用于简单调试的工具。
 
-Accept both hex and base64 formats and provide a readable response.
+接受十六进制和base64格式，并提供可读的响应。
 
-Usually, we encode bytes as hex in the logs, but as base64 in the JSON.
+通常，我们在日志中将字节编码为十六进制，但在JSON中将字节编码为base64。
 
-## Usage
+## 用法
 
 ### iristool debug pubkey
 
-The following give the same result:
+下面得到相同的结果:
 
 ```bash
 iristool debug pubkey TZTQnfqOsi89SeoXVnIw+tnFJnr4X8qVC0U8AsEmFk4=
@@ -25,7 +25,7 @@ iristool debug pubkey 4D94D09DFA8EB22F3D49EA17567230FAD9C5267AF85FCA950B453C02C1
 
 ### iristool debug tx
 
-Input a hex/base64 tx and get back the full JSON
+传入hex/base64编码的tx返回完整的JSON
 
 ```bash
 iristool debug tx <hex or base64 transaction>
@@ -109,7 +109,7 @@ Bech32 Cons: ica1rulhmls7g9cjh239vnkjnw870t5urrutvqntyu
 
 ### iristool debug raw-bytes
 
-Convert raw bytes output (eg. [10 21 13 255]) to hex
+将原始字节输出(如[10 21 13 255])转化为hex编码
 
 ```bash
 iristool debug raw-bytes <raw-bytes>
@@ -118,7 +118,7 @@ iristool debug raw-bytes "[10 21 13 255]"
 
 ### iristool debug rand-secret
 
-Generate a random secret
+产生随机密钥
 
 ```bash
 iristool debug rand-secret
@@ -126,7 +126,7 @@ iristool debug rand-secret
 
 ### iristool debug hash-lock
 
-Generate a hash lock with secret and timestamp (if privided)
+生成带有密钥和时间戳（如果提供）的哈希锁
 
 ```bash
 iristool debug hash-lock <secret-hex64> <timestamp>

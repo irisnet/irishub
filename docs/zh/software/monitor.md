@@ -82,7 +82,7 @@ IRISnet可以报告和提供Prometheus metrics，Prometheus收集器可以使用
 
 ### 启动 Prometheus
 
-```bashg
+```bash
 docker run -d --name=prometheus -p 9090:9090 -v ~/volumes/prometheus:/etc/prometheus prom/prometheus
 ```
 
