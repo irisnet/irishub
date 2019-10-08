@@ -1,14 +1,14 @@
 # iriscli distribution
 
-distribution模块可让您管理自己的 [Staking 收益](../concepts/general-concepts.md#staking-rewards)。
+distribution模块用于管理自己的 [Staking 收益](../concepts/general-concepts.md#staking-rewards)。
 
 ## 可用命令
 
-| 名称                                                            | 描述                                                    |
-| --------------------------------------------------------------- | ------------------------------------------------------- |
-| [withdraw-address](#iriscli-distribution-withdraw-address)      | 查询提现地址                                            |
-| [rewards](#iriscli-distribution-rewards)                        | 查询验证人或委托人的所有奖励                            |
-| [set-withdraw-address](#iriscli-distribution-set-withdraw-addr) | 设置提现地址                                            |
+| 名称                                                            | 描述                                                                                           |
+| --------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| [withdraw-address](#iriscli-distribution-withdraw-address)      | 查询提现地址                                                                                   |
+| [rewards](#iriscli-distribution-rewards)                        | 查询验证人或委托人的所有奖励                                                                   |
+| [set-withdraw-address](#iriscli-distribution-set-withdraw-addr) | 设置提现地址                                                                                   |
 | [withdraw-rewards](#iriscli-distribution-withdraw-rewards)      | 取回收益，有以下几种模式: 取回所有奖励、从指定的验证者取回委派奖励、验证人取回所有奖励以及佣金 |
 
 ## iriscli distribution withdraw-address
@@ -76,10 +76,10 @@ iriscli distribution withdraw-rewards <flags>
 
 **唯一标识：**
 
-| 名称, 速记       | 类型   | 必须 | 默认 | 描述                                         |
-| --------------------- | ------ | -------- | ------- | --------------------------------------------------- |
-| --only-from-validator | string |          |         | 仅从此验证者地址中提取（以bech格式） |
-| --is-validator        | bool   |          | false   | 同时取回验证人的佣金                |
+| 名称, 速记            | 类型   | 必须 | 默认 | 描述                                 |
+| --------------------- | ------ | ---- | ---- | ------------------------------------ |
+| --only-from-validator | string |      |      | 仅从此验证者地址中提取（以bech格式） |
+| --is-validator        | bool   |      | 否   | 同时取回验证人的佣金                 |
 
 :::tip
 不要同时指定以上两个标志。
