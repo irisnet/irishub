@@ -39,7 +39,7 @@ Note: The parameters above are all consensus parameters.
 
 #### Fee of creating a gateway
 
-- Baseline-Fee: The base fee required to create a gateway, ie the fee of the gateway `Moniker` length is minimum (3)
+- Baseline-Fee: The base fee required to create a gateway, ie the fee of the gateway with the minimum (3) length of `Moniker`
 - Fee-Factor calculation formula: (ln(len({moniker}))/ln3)^4
 - Gateway-Create-Fee calculation formula: CreateGatewayBaseFee/Fee-Factor; round up the result to iris (rounded to greater than 1 and 1 for less than or equal to 1)
 
@@ -51,7 +51,7 @@ Note: The parameters above are all consensus parameters.
 
 #### Fee of minting a fungible token
 
-- FT-Mint-Rate: Relative to the rate at which FT is issued
+- FT-Mint-Rate: Relative to the rate at which the FT is issued
 - FT-Mint-Fee calculation formula: FT-Issue-Fee * MintFTFeeRatio; the result is rounded to iris (rounded to greater than 1 and 1 for less than or equal to 1)
   
 #### Fee of issuing/minting a gateway token
