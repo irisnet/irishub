@@ -105,5 +105,5 @@ docker run -d --name=grafana -p 3000:3000 grafana/grafana
 You can visit <http://localhost:3000/> to open grafana and create your own dashboard.
 
 :::tip
-The default username and password are both admin. We strongly recommend immediately changing your username & password after login
+The default username and password are both admin. We strongly recommend immediately changing your username & password after login.
 :::

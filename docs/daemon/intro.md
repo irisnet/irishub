@@ -29,7 +29,7 @@ The `iris init` command is responsible for initializing the specified `--home` d
 
 The data of the iris node is stored in the `data` directory of the home, including blockchain data, application layer data, and index data.
 
-All configuration files are stored in the `<home_dir>/config` directory:
+All configuration files are stored in the `<home-dir>/config` directory:
 
 ### genesis.json
 
@@ -49,4 +49,4 @@ config.toml is the non-consensus configuration of the node. Different nodes can 
 
 ### iris.toml
 
-iris.toml provides some special configurations for IRIShub, such as "check invariant", "track coin flow".
+iris.toml provides some special configurations for IRIShub, such as `check invariant`, `track coin flow`.
