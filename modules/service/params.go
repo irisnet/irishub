@@ -5,9 +5,9 @@ import (
 	"strconv"
 	"time"
 
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/params"
-	sdk "github.com/irisnet/irishub/types"
 )
 
 var _ params.ParamSet = (*Params)(nil)

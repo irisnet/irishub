@@ -1,0 +1,5 @@
+---
+
+- name: reload systemd
+  systemd: name=iris enabled=yes daemon_reload=yes
+

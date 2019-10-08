@@ -1,0 +1,17 @@
+[Unit]
+Description=iriscli
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+Restart=on-failure
+User=iris
+Group=iris
+PermissionsStartOnly=true
+ExecStart=/usr/bin/iriscli rest-server --laddr {{GAIACLI_ADDRESS}}
+ExecReload=/bin/kill -HUP $MAINPID
+KillSignal=SIGTERM
+
+[Install]
+WantedBy=multi-user.target
+

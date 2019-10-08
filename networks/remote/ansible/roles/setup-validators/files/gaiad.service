@@ -1,0 +1,17 @@
+[Unit]
+Description=iris
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+Restart=on-failure
+User=iris
+Group=iris
+PermissionsStartOnly=true
+ExecStart=/usr/bin/iris start
+ExecReload=/bin/kill -HUP $MAINPID
+KillSignal=SIGTERM
+
+[Install]
+WantedBy=multi-user.target
+

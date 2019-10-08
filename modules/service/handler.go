@@ -1,8 +1,8 @@
 package service
 
 import (
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/irisnet/irishub/modules/service/tags"
-	sdk "github.com/irisnet/irishub/types"
 )
 
 // handle all "service" type messages.

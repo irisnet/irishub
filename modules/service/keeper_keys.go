@@ -2,7 +2,7 @@ package service
 
 import (
 	"encoding/binary"
-	sdk "github.com/irisnet/irishub/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 var (

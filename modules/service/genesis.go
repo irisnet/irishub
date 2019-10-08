@@ -1,7 +1,7 @@
 package service
 
 import (
-	sdk "github.com/irisnet/irishub/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 // GenesisState - all service state that must be provided at genesis

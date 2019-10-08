@@ -1,0 +1,15 @@
+---
+
+- name: Copy binary
+  copy:
+    src: "{{GAIACLI_BINARY}}"
+    dest: /usr/bin/iriscli
+    mode: 0755
+  notify: restart iriscli
+
+- name: Copy service
+  template:
+    src: iriscli.service.j2
+    dest: /etc/systemd/system/iriscli.service
+  notify: systemctl
+

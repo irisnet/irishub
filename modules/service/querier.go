@@ -1,8 +1,8 @@
 package service
 
 import (
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/irisnet/irishub/codec"
-	sdk "github.com/irisnet/irishub/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 )
 

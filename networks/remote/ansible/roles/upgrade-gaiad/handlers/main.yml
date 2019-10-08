@@ -1,0 +1,5 @@
+---
+
+- name: restart iris
+  service: name=iris state=restarted
+

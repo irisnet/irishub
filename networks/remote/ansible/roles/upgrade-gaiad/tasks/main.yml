@@ -1,0 +1,29 @@
+---
+
+- name: Copy binary
+  copy:
+    src: "{{BINARY}}"
+    dest: /usr/bin/iris
+    mode: 0755
+  notify: restart iris
+
+- name: Copy new genesis.json file, if available
+  when: "GENESISFILE is defined and GENESISFILE != ''" 
+  copy:
+    src: "{{GENESISFILE}}"
+    dest: /home/iris/.iris/config/genesis.json
+  notify: restart iris
+
+- name: Download genesis.json URL, if available
+  when: "GENESISURL is defined and GENESISURL != ''"
+  get_url:
+    url: "{{GENESISURL}}"
+    dest: /home/iris/.iris/config/genesis.json
+    force: yes
+  notify: restart iris
+
+- name: Reset network
+  when: UNSAFE_RESET_ALL | default(false) | bool
+  command: "sudo -u iris iris unsafe-reset-all"
+  notify: restart iris
+

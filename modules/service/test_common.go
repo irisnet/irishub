@@ -12,12 +12,12 @@ import (
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/crypto"
 
+	"github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/irisnet/irishub/mock"
 	"github.com/irisnet/irishub/modules/bank"
 	"github.com/irisnet/irishub/modules/guardian"
 	"github.com/irisnet/irishub/modules/stake"
-	"github.com/irisnet/irishub/types"
-	sdk "github.com/irisnet/irishub/types"
 )
 
 // initialize the mock application for this module

@@ -2,7 +2,7 @@ package service
 
 import (
 	"fmt"
-	sdk "github.com/irisnet/irishub/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 const (
