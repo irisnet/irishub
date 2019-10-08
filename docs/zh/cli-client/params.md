@@ -1,24 +1,24 @@
 # iriscli params
 
-Params module allows you to query the system parameters which can be governed (except the gov params) by the [gov module](./gov.md).
+Params模块允许查询系统里预设的参数，查询结果中除了Gov模块的参数，其他都可以通过[Gov模块](./gov.md)发起提议来修改。
 
 ```bash
  iriscli params <flags>
 ```
 
-**Flags:**
+**标志:**
 
-| Name, shorthand | Default | Description        | Required |
-| --------------- | ------- | ------------------ | -------- |
-| --module        |         | Name of the module |          |
+| 名称，速记 | 默认 | 描述     | 必须 |
+| ---------- | ---- | -------- | ---- |
+| --module   |      | 模块名称 |      |
 
-## Query all parameters
+## 查询所有参数
 
 ```bash
 iriscli params
 ```
 
-Example Output:
+示例输出:
 
 ```bash
 Slashing Params:
@@ -71,15 +71,15 @@ Proposal Parameter:  [Critical]                         [Important]             
   Penalty:           0.0000000000                       0.0000000000                       0.0000000000
 ```
 
-## Query parameters of a module
+## 查询模块参数
 
-Available module names can be queried by [query all parameters](#query-all-parameters).
+可用的模块名称可以通过[查询所有参数](#查询所有参数)查询
 
 ```bash
 iriscli params --module=slashing
 ```
 
-Example Output:
+示例输出：
 
 ```bash
 Slashing Params:
