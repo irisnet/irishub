@@ -23,7 +23,7 @@ func init() {
 	RootCmd.AddCommand(pubkeyCmd)
 	RootCmd.AddCommand(addrCmd)
 	RootCmd.AddCommand(rawBytesCmd)
-	RootCmd.AddCommand(randBech32Cmd)
+	RootCmd.AddCommand(randSecretCmd)
 	RootCmd.AddCommand(hashLockCmd)
 }
 
@@ -57,10 +57,10 @@ var rawBytesCmd = &cobra.Command{
 	RunE:  runRawBytesCmd,
 }
 
-var randBech32Cmd = &cobra.Command{
-	Use:   "rand-bech32",
-	Short: "Generate a random bech32",
-	RunE:  runRandBech32Cmd,
+var randSecretCmd = &cobra.Command{
+	Use:   "rand-secret",
+	Short: "Generate a random secret",
+	RunE:  runRandSecretCmd,
 }
 
 var hashLockCmd = &cobra.Command{
@@ -69,7 +69,7 @@ var hashLockCmd = &cobra.Command{
 	RunE:  runHashLockCmd,
 }
 
-func runRandBech32Cmd(cmd *cobra.Command, args []string) error {
+func runRandSecretCmd(cmd *cobra.Command, args []string) error {
 	if len(args) != 0 {
 		return fmt.Errorf("Expected no arg")
 	}
