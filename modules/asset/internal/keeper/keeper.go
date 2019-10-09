@@ -126,7 +126,7 @@ func (k Keeper) AddToken(ctx sdk.Context, token types.FungibleToken) (types.Fung
 
 func (k Keeper) HasToken(ctx sdk.Context, tokenId string) bool {
 	store := ctx.KVStore(k.storeKey)
-	return store.Has(KeyToken(tokenId))
+	return store.Has(types.KeyToken(tokenId))
 }
 
 func (k Keeper) SetToken(ctx sdk.Context, token types.FungibleToken) sdk.Error {
@@ -142,7 +142,7 @@ func (k Keeper) SetToken(ctx sdk.Context, token types.FungibleToken) sdk.Error {
 		return err
 	}
 
-	store.Set(KeyToken(tokenId), bz)
+	store.Set(types.KeyToken(tokenId), bz)
 	return nil
 }
 
@@ -156,13 +156,13 @@ func (k Keeper) SetTokens(ctx sdk.Context, owner sdk.AccAddress, token types.Fun
 
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(tokenId)
 
-	store.Set(KeyTokens(owner, tokenId), bz)
+	store.Set(types.KeyTokens(owner, tokenId), bz)
 	return nil
 }
 
 func (k Keeper) getToken(ctx sdk.Context, tokenId string) (token types.FungibleToken, found bool) {
 	store := ctx.KVStore(k.storeKey)
-	bz := store.Get(KeyToken(tokenId))
+	bz := store.Get(types.KeyToken(tokenId))
 	if bz == nil {
 		return token, false
 	}
@@ -173,7 +173,7 @@ func (k Keeper) getToken(ctx sdk.Context, tokenId string) (token types.FungibleT
 
 func (k Keeper) getTokens(ctx sdk.Context, owner sdk.AccAddress, nonSymbolTokenId string) sdk.Iterator {
 	store := ctx.KVStore(k.storeKey)
-	return sdk.KVStorePrefixIterator(store, KeyTokens(owner, nonSymbolTokenId))
+	return sdk.KVStorePrefixIterator(store, types.KeyTokens(owner, nonSymbolTokenId))
 }
 
 // CreateGateway creates a gateway
@@ -305,7 +305,7 @@ func (k Keeper) TransferGatewayOwner(ctx sdk.Context, msg types.MsgTransferGatew
 // GetGateway retrieves the gateway of the given moniker
 func (k Keeper) GetGateway(ctx sdk.Context, moniker string) (types.Gateway, sdk.Error) {
 	store := ctx.KVStore(k.storeKey)
-	bz := store.Get(KeyGateway(moniker))
+	bz := store.Get(types.KeyGateway(moniker))
 	if bz == nil {
 		return types.Gateway{}, types.ErrUnkwownGateway(k.codespace, fmt.Sprintf("unknown gateway moniker:%s", moniker))
 	}
@@ -319,7 +319,7 @@ func (k Keeper) GetGateway(ctx sdk.Context, moniker string) (types.Gateway, sdk.
 // HasGateway checks if the given gateway exists. Return true if exists, false otherwise
 func (k Keeper) HasGateway(ctx sdk.Context, moniker string) bool {
 	store := ctx.KVStore(k.storeKey)
-	return store.Has(KeyGateway(moniker))
+	return store.Has(types.KeyGateway(moniker))
 }
 
 // SetGateway stores the given gateway into the underlying storage
@@ -328,7 +328,7 @@ func (k Keeper) SetGateway(ctx sdk.Context, gateway types.Gateway) {
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(gateway)
 
 	// set KeyGateway
-	store.Set(KeyGateway(gateway.Moniker), bz)
+	store.Set(types.KeyGateway(gateway.Moniker), bz)
 }
 
 // SetOwnerGateway stores the gateway moniker into storage by the key KeyOwnerGateway. Intended for iteration on gateways of an owner
@@ -337,7 +337,7 @@ func (k Keeper) SetOwnerGateway(ctx sdk.Context, owner sdk.AccAddress, moniker s
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(moniker)
 
 	// set KeyOwnerGateway
-	store.Set(KeyOwnerGateway(owner, moniker), bz)
+	store.Set(types.KeyOwnerGateway(owner, moniker), bz)
 }
 
 // UpdateOwnerGateway updates the KeyOwnerGateway key of the given moniker from an owner to another
@@ -345,24 +345,24 @@ func (k Keeper) UpdateOwnerGateway(ctx sdk.Context, moniker string, originOwner,
 	store := ctx.KVStore(k.storeKey)
 
 	// delete the old key
-	store.Delete(KeyOwnerGateway(originOwner, moniker))
+	store.Delete(types.KeyOwnerGateway(originOwner, moniker))
 
 	// add the new key
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(moniker)
-	store.Set(KeyOwnerGateway(newOwner, moniker), bz)
+	store.Set(types.KeyOwnerGateway(newOwner, moniker), bz)
 }
 
 // GetGateways retrieves all the gateways of the given owner
 func (k Keeper) GetGateways(ctx sdk.Context, owner sdk.AccAddress) sdk.Iterator {
 	store := ctx.KVStore(k.storeKey)
-	return sdk.KVStorePrefixIterator(store, KeyGatewaysSubspace(owner))
+	return sdk.KVStorePrefixIterator(store, types.KeyGatewaysSubspace(owner))
 }
 
 // IterateGateways iterates through all existing gateways
 func (k Keeper) IterateGateways(ctx sdk.Context, op func(gateway types.Gateway) (stop bool)) {
 	store := ctx.KVStore(k.storeKey)
 
-	iterator := sdk.KVStorePrefixIterator(store, PrefixGateway)
+	iterator := sdk.KVStorePrefixIterator(store, types.PrefixGateway)
 	defer iterator.Close()
 
 	for ; iterator.Valid(); iterator.Next() {
@@ -379,7 +379,7 @@ func (k Keeper) IterateGateways(ctx sdk.Context, op func(gateway types.Gateway) 
 func (k Keeper) IterateTokens(ctx sdk.Context, op func(token types.FungibleToken) (stop bool)) {
 	store := ctx.KVStore(k.storeKey)
 
-	iterator := sdk.KVStorePrefixIterator(store, PrefixToken)
+	iterator := sdk.KVStorePrefixIterator(store, types.PrefixToken)
 	defer iterator.Close()
 
 	for ; iterator.Valid(); iterator.Next() {
@@ -451,7 +451,7 @@ func (k Keeper) resetStoreKeyForQueryToken(ctx sdk.Context, msg types.MsgTransfe
 		return err
 	}
 	// delete the old key
-	store.Delete(KeyTokens(msg.SrcOwner, tokenId))
+	store.Delete(types.KeyTokens(msg.SrcOwner, tokenId))
 
 	// add the new key
 	return k.SetTokens(ctx, msg.DstOwner, token)

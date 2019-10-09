@@ -1,4 +1,4 @@
-package keeper
+package types
 
 import (
 	"fmt"
@@ -6,6 +6,24 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
+const (
+	// ModuleName is the name of the asset module
+	ModuleName = "asset"
+
+	// StoreKey is the string store representation
+	StoreKey = ModuleName
+
+	// TStoreKey is the string transient store representation
+	TStoreKey = "transient_" + ModuleName
+
+	// QuerierRoute is the querier route for the asset module
+	QuerierRoute = ModuleName
+
+	// RouterKey is the msg router key for the asset module
+	RouterKey = ModuleName
+)
+
+// nolint
 var (
 	PrefixGateway = []byte("gateways:") // prefix for the gateway store
 	PrefixToken   = []byte("token:")    // prefix for the token store

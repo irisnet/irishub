@@ -21,8 +21,12 @@ func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(&Gateway{}, "irishub/asset/Gateway", nil)
 }
 
-var msgCdc = codec.New()
+// ModuleCdc defines the module codec
+var ModuleCdc *codec.Codec
 
 func init() {
-	RegisterCodec(msgCdc)
+	ModuleCdc = codec.New()
+	RegisterCodec(ModuleCdc)
+	codec.RegisterCrypto(ModuleCdc)
+	ModuleCdc.Seal()
 }

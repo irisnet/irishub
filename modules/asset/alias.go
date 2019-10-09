@@ -5,6 +5,7 @@ import (
 	"github.com/irisnet/irishub/modules/asset/internal/types"
 )
 
+// nolint
 type (
 	MsgIssueToken           = types.MsgIssueToken
 	MsgCreateGateway        = types.MsgCreateGateway
@@ -33,7 +34,15 @@ type (
 	Keeper = keeper.Keeper
 )
 
+// nolint
 var (
+	ModuleName   = types.ModuleName
+	StoreKey     = types.StoreKey
+	TStoreKey    = types.TStoreKey
+	QuerierRoute = types.QuerierRoute
+	RouterKey    = types.RouterKey
+	ModuleCdc    = types.ModuleCdc
+
 	NATIVE                 = types.NATIVE
 	EXTERNAL               = types.EXTERNAL
 	GATEWAY                = types.GATEWAY
@@ -63,8 +72,6 @@ var (
 	NewMsgTransferTokenOwner   = types.NewMsgTransferTokenOwner
 	NewMsgIssueToken           = types.NewMsgIssueToken
 	DefaultParams              = types.DefaultParams
-	DefaultParamsForTest       = types.DefaultParamsForTest
-	ValidateParams             = types.ValidateParams
 
 	QueryToken                  = types.QueryToken
 	QueryTokens                 = types.QueryTokens
