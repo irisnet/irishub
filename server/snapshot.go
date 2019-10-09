@@ -12,6 +12,8 @@ import (
 	"strings"
 )
 
+const flagTmpDir = "tmp-dir"
+
 // SnapshotCmd delete historical block data and index data
 func SnapshotCmd(ctx *Context) *cobra.Command {
 	cmd := &cobra.Command{
@@ -24,17 +26,22 @@ func SnapshotCmd(ctx *Context) *cobra.Command {
 				fmt.Println("WARNING: State is not initialized.")
 				return nil
 			}
-
 			srcDir := filepath.Join(home, "data")
-			targetDir := filepath.Join(home, "data.bak")
-			snapshotBlock(srcDir, targetDir)
+
+			targetDir := viper.GetString(flagTmpDir)
+			if len(targetDir) == 0 {
+				targetDir = filepath.Join(home, "data.bak")
+			}
+
 			if err = dumpData(srcDir, targetDir); err != nil {
+				os.RemoveAll(targetDir)
 				fmt.Println(fmt.Sprintf("FAILED: %s", err.Error()))
 				return err
 			}
 			return nil
 		},
 	}
+	cmd.Flags().String(flagTmpDir, "", "snapshot file storage directory")
 	return cmd
 }
 
@@ -47,6 +54,9 @@ func loadDb(name, path string) *dbm.GoLevelDB {
 }
 
 func dumpData(home, targetDir string) error {
+	//save last block and flush disk
+	snapshotBlock(home, targetDir)
+
 	//copy application
 	appDir := filepath.Join(home, "application.db")
 	appTargetDir := filepath.Join(targetDir, "application.db")
@@ -68,7 +78,7 @@ func dumpData(home, targetDir string) error {
 		return err
 	}
 
-	//copy cs.wal
+	//copy evidence.db
 	evidenceDir := filepath.Join(home, "evidence.db")
 	evidenceTargetDir := filepath.Join(targetDir, "evidence.db")
 	return copyDir(evidenceDir, evidenceTargetDir)
