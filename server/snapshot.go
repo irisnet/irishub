@@ -10,10 +10,12 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	bc "github.com/tendermint/tendermint/blockchain"
+	"github.com/tendermint/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
 )
 
 const flagTmpDir = "tmp-dir"
+const pathSeparator = string(os.PathSeparator)
 
 // SnapshotCmd delete historical block data and index data
 func SnapshotCmd(ctx *Context) *cobra.Command {
@@ -39,6 +41,7 @@ func SnapshotCmd(ctx *Context) *cobra.Command {
 				fmt.Println(fmt.Sprintf("FAILED: %s", err.Error()))
 				return err
 			}
+			fmt.Println(fmt.Sprintf("snapshot file is stored in [%s]", targetDir))
 			return nil
 		},
 	}
@@ -94,7 +97,7 @@ func snapshotBlock(home, targetDir string) int64 {
 
 	block := originStore.LoadBlock(height)
 	seenCommit := originStore.LoadSeenCommit(height)
-	partSet := block.MakePartSet(65536)
+	partSet := block.MakePartSet(types.BlockPartSizeBytes)
 	targetStore.SaveBlock(block, partSet, seenCommit)
 	return height
 }
@@ -112,7 +115,7 @@ func copyDir(srcPath string, destPath string) error {
 		if f.IsDir() {
 			return nil
 		}
-		path = strings.Replace(path, "\\", string(os.PathSeparator), -1)
+		path = strings.Replace(path, fmt.Sprintf("\\%s", pathSeparator), pathSeparator, -1)
 		destNewPath := strings.Replace(path, srcPath, destPath, -1)
 		_, err = copyFile(path, destNewPath)
 		return err
@@ -121,16 +124,17 @@ func copyDir(srcPath string, destPath string) error {
 
 func copyFile(src, dest string) (w int64, err error) {
 	srcFile, err := os.Open(src)
+	defer srcFile.Close()
 	if err != nil {
 		return
 	}
-	defer srcFile.Close()
-	destSplitPathDirs := strings.Split(dest, string(os.PathSeparator))
+
+	destSplitPathDirs := strings.Split(dest, pathSeparator)
 
 	destSplitPath := ""
 	for index, dir := range destSplitPathDirs {
 		if index < len(destSplitPathDirs)-1 {
-			destSplitPath = destSplitPath + dir + string(os.PathSeparator)
+			destSplitPath = destSplitPath + dir + pathSeparator
 			if b, _ := pathExists(destSplitPath); b == false {
 				err := os.Mkdir(destSplitPath, os.ModePerm)
 				if err != nil {
@@ -140,11 +144,10 @@ func copyFile(src, dest string) (w int64, err error) {
 		}
 	}
 	dstFile, err := os.Create(dest)
+	defer dstFile.Close()
 	if err != nil {
 		return
 	}
-
-	defer dstFile.Close()
 	return io.Copy(dstFile, srcFile)
 }
 
