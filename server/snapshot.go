@@ -2,14 +2,15 @@ package server
 
 import (
 	"fmt"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
-	bc "github.com/tendermint/tendermint/blockchain"
-	dbm "github.com/tendermint/tm-db"
 	"io"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+	bc "github.com/tendermint/tendermint/blockchain"
+	dbm "github.com/tendermint/tm-db"
 )
 
 const flagTmpDir = "tmp-dir"
