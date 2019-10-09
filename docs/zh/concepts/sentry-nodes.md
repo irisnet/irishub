@@ -2,34 +2,34 @@
 order: 3
 ---
 
-# Sentry Nodes
+# 哨兵节点
 
-Validators are responsible for ensuring that the network can sustain denial of service attacks.
+验证人节点需要确保网络可以承受拒绝服务攻击（DDoS）。
 
-One recommended way to mitigate these risks is for validators to carefully structure their network topology in a so-called sentry node architecture.
+减轻这些风险的一种推荐方法是，使用哨兵节点构建可以保护验证人节点的网络拓扑。
 
-Validator nodes should only connect to full-nodes they trust because they operate them themselves or are run by other validators they know socially. A validator node will typically run in a data center. Most data centers provide direct links the networks of major cloud providers. The validator can use those links to connect to sentry nodes in the cloud. This shifts the burden of denial-of-service from the validator's node directly to its sentry nodes, and may require new sentry nodes be spun up or activated to mitigate attacks on existing ones.
+验证人节点应该只连接到他们信任的全节点，比如他们自己维护的全节点或在社区结识的其他验证人运行的节点。验证人节点通常将在数据中心中运行。大多数数据中心都提供与云服务商直连的网络。验证人节点可以通过这样的网络连接到云中的哨兵节点。这将 DDoS 的负担从验证人节点直接转移到其哨兵节点，并且可能需要在受到攻击时，启动或激活新的哨兵节点以降低攻击带来的影响。
 
-Sentry nodes can be quickly spun up or change their IP addresses. Because the links to the sentry nodes are in private IP space, an internet based attacked cannot disturb them directly. This will ensure validator block proposals and votes always make it to the rest of the network.
+哨兵节点可以快速启动或更改其IP地址。由于验证人节点到哨兵节点的链接位于私有IP空间中，因此黑客无法通过网络直接攻击到验证人节点。这将确保验证人节点的区块提议和投票始终能够通过哨兵节点正常的广播。
 
-To setup your sentry node architecture you can follow the instructions below:
+要配置哨兵节点架构，您可以按照以下说明进行操作：
 
-Validators nodes should edit their config.toml:
+验证人节点应编辑其config.toml：
 
 ```bash
-# Comma separated list of nodes to keep persistent connections to
-# Do not add private peers to this list if you don't want them advertised
-persistent_peers =[list of sentry nodes]
+＃ 以英文逗号分隔的节点列表，以保持与之的持久连接
+＃ 如果您不想公开私有节点信息，则不要将其添加到此列表中
+persistent_peers = [哨兵节点列表]
 
-# Set true to enable the peer-exchange reactor
+＃ 关闭P2P网络对等交换
 pex = false
 ```
 
-Sentry Nodes should edit their config.toml:
+哨兵节点应编辑其config.toml：
 
 ```bash
-# Comma separated list of peer IDs to keep private (will not be gossiped to other peers)
-# Example ID: 3e16af0cead27979e1fc3dac57d03df3c7a77acc@3.87.179.235:26656
+＃ 以英文逗号分隔的节点ID列表，以保持私有（不会被广播到P2P网络）
+＃ 示例ID：3e16af0cead27979e1fc3dac57d03df3c7a77acc
 
 private_peer_ids = "node_ids_of_private_peers"
 ```

@@ -48,16 +48,22 @@ It is intended that the IRIS network will eventually support all whitelisted fee
 
 ## Staking Rewards
 
-The validator and its delegators can share the following rewards by proportion：
+The validator and its delegators can share the following rewards by proportion:
 
 - **Block Inflation**
+
   Block Inflation exists to incentivize IRIS holders to stake. The more staked IRIS tokens are, more secure the network become(Read more about [Staking](../features/stake.md)).
+
   Block Inflation will be [distributed every block](../features/mint.md). [Inflation rate](../features/mint.md) in IRISnet for the first year will be 4%.  **This ration could be adjusted by `parameter-change` proposals**.
   In this way, loose IRIS will devalue year by year.
+
 - **Block Proposer Reward**
+
   In IRIShub, the probability for being a proposer is proportional to the validator's bonded tokens. If one proposed block is finalized, the proposer gets extra rewards for it.
+
 - **Fee**
-  Each transaction needs a [fee](fee.md#fee) for compensating validators' work[Gas](fee.md#gas). These fees can be paid with IRIS and may later in any tokens which are whitelisted by the IRISHub’s governance. Fees are distributed to validators in proportion to their stake. A minimum fee/gas ration is set in IRISnet.
+
+  Each transaction needs a [fee](fee.md#fee) for compensating validators' work[Gas](fee.md#gas). These fees can be paid with IRIS and may later in any tokens which are whitelisted by the IRISHub's governance. Fees are distributed to validators in proportion to their stake. A minimum fee/gas ration is set in IRISnet.
 
 Each validator receives revenue in proportion to its total stake. However, before this revenue is distributed to its delegators, the validator can apply a commission for providing staking services.
 
@@ -76,16 +82,12 @@ The following formulas are based on the current [IRIShub Mainnet Params](gov-par
 - **BlockInflation =** `AnnualInflation / (365*24*60*12)` (aka 12.68 iris)
 - **ProposerExtraRewards =** `(BaseProposerReward + BonusProposerReward * PrecommitPower/TotalVotingPower) * (BlockInflation + BlockCollectedFees)`
 - **BlockRewards =** `(BlockInflation + BlockCollectedFees) * (1 - CommunityTax) - ProposerExtraRewards`
-- **Proposer**
-  - **ProposerTotalRewards =** `(BlockRewards / BondedTokens) * ValidatorBondedTokens + ProposerExtraRewards`
-  - **Commission =** `ProposerTotalRewards * ValidatorCommissionRate`
-  - **ProposerValidatorRewards =** `ProposerTotalRewards * (ValidatorSelfDelegation / ValidatorBondedTokens) + Commission`
-  - **ProposerDelegatorRewards =** `(ProposerTotalRewards - Commission) * (DelegatorSelfDelegation / ValidatorBondedTokens)`
-- **NonProposer**
-  - **NonProposerTotalRewards =** `(BlockRewards / BondedTokens) * ValidatorBondedTokens`
-  - **Commission =** `NonProposerTotalRewards * ValidatorCommissionRate`
-  - **NonProposerValidatorRewards =** `NonProposerTotalRewards * (ValidatorSelfDelegation / ValidatorBondedTokens) + Commission`
-  - **NonProposerDelegatorRewards =** `(NonProposerTotalRewards - Commission) * (DelegatorSelfDelegation / ValidatorBondedTokens)`
+- **ValidatorTotalRewards =**
+  - Non-Proposer: `(BlockRewards / BondedTokens) * ValidatorBondedTokens`
+  - Proposer: `NonProposerValidatorTotalRewards + ProposerExtraRewards`
+- **Commission =** `ValidatorTotalRewards * ValidatorCommissionRate`
+- **ValidatorRewards =** `ValidatorTotalRewards * (ValidatorSelfDelegation / ValidatorBondedTokens) + Commission`
+- **DelegatorRewards =** `(ValidatorTotalRewards - Commission) * (DelegatorSelfDelegation / ValidatorBondedTokens)`
 
 ## Validator Responsibilities
 
@@ -98,7 +100,7 @@ Additionally, validators are expected to be active members of the community. The
 
 ## Validator Risks
 
-- **Unavailability**: Validators are expected to keep signing votes for making new blocks. If a validator’s signature has not been included in more than 30% of the last 34,560 blocks (which amounts to approximately 24 hours, assuming an average block-generating time of 5 seconds), this validator will get jailed and removed from current validatorset for 1.5 day, and their bonded tokens will get slashed by 0.03%.
+- **Unavailability**: Validators are expected to keep signing votes for making new blocks. If a validator's signature has not been included in more than 30% of the last 34,560 blocks (which amounts to approximately 48 hours, assuming an average block-generating time of 5 seconds), this validator will get jailed and removed from current validatorset for 1.5 day, and their bonded tokens will get slashed by 0.03%.
 - **Double Sign**: If the protocol detects that a validator voted multiple different opinions about the same block (same height/round), or voted for different blocks at the same height/round, this validator will get jailed and removed from current validatorset for 2 days. Their bonded tokens will get slashed by 1%.
 - **Censorship**: If the protocol detects that a proposer included invalid transactions in a block, this validator will get jailed and removed from current validatorset for 2 days.
 

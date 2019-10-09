@@ -26,38 +26,27 @@ Each genesis state starts with a list of account balances. Social consensus on t
 * **accounts** Initial account info
 
 * **auth** Params related to the system
-  * params Detail in [Gov-Params](gov-params.md#parameters-in-auth)
 
 * **stake** Params related to the staking consensus
-  * pool   Total number of the current bonded token
-  * validators   All the information of validators
-  * params Detail in [Gov-Params](gov-params.md#parameters-in-stake)
   
 * **mint**  Params related to inflation
-  * params Detail in [Gov-Params](gov-params.md#parameters-in-mint)
   
 * **distribution** Params related to distribution & commission
-  * params Detail in [Gov-Params](gov-params.md#parameters-in-distribution)
   
 * **gov**  Params related to on-chain governance
-  * params Detail in [Governance.md](../governance.md#interactive-process)
 
 * **upgrade** Params related to upgrade
-  * GenesisVersion Initialize the genesis version
 
 * **slashing** Params related to slashing validators
-  * params Detail in [Gov-Params](gov-params.md#parameters-in-slashing)
-  
-* **service**  Params related to service
-  * params Detail in [Gov-Params](gov-params.md#parameters-in-service)
-  
+
 * **asset**  Params related to asset
-  * params Detail in [Gov-Params](gov-params.md#parameters-in-asset)
+
+* **service**  Params related to service
 
 * **guardian** Params related to guardian
-  * `profilers` The profiler list
-  * `trustees` The trustees list
-  
+
+Parameters that can be governed: [Gov Parameters](gov-params.md)
+
 ## Gentxs
 
 Gentxs contains the transaction set of creating validators in genesis block.

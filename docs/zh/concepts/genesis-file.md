@@ -2,64 +2,52 @@
 order: 4
 ---
 
-# Genesis File
+# Genesis 文件
 
-The Genesis file (~/.iris/config/genesis.json) is the basis for the entire network initialization, which contains most info for creating a Genesis block (such as ChainID, consensus params, app state), initialize account balances, parameters for each module, and validators info.
-The genesis file sets the initial parameters of any new IRIS network. Establishing a robust social consensus over the genesis file is critical to starting a network.
+Genesis 文件 (~/.iris/config/genesis.json) 是整个网络初始化的基础，其中包含有关创建Genesis区块的大部分信息（例如ChainID，共识参数，应用程序状态），初始化帐户余额，模块级别的参数，以及验证人信息。
+Genesis 文件用于设置IRIS网络的初始参数，在Genesis文件上建立健全的社会共识对于启动网络至关重要。
 
-Each genesis state starts with a list of account balances. Social consensus on these account balances must be bootstrapped from some external process be it events on another blockchain to a token generation event.
+账户余额数据是需要通过链下共识获得的，这个过程可能会依赖其他区块链的数据，或者一个代币产生事件。
 
-## Basic State
+## 基础参数
 
-* **genesis_time** The time to launch
-* **chain_id**     Blockchain’s ID
+* **genesis_time** 区块链启动时间
+* **chain_id**     区块链ID
 
-## Consensus Params
+## 共识参数
 
 * **block_size**
-  * `max_bytes` The max size of a block
-  * `max_gas`  The maximum Gas quantity of a block. Its default value is -1 which means no gas limit. If the accumulation of gas consumption exceeds the block gas limit, the transaction and all subsequent transactions in the same block will fail to deliver.
-* **evidence**   The lifecycle of deception evidence in the block
+  * `max_bytes` 区块大小限制
+  * `max_gas` 区块最大Gas数量，默认值为-1表示无限制。如果累积的Gas超出Gas限制，该交易和之后的交易将执行失败。
+* **evidence** 区块内作恶证据的生命周期
 
-## App State
+## 应用参数
 
-* **accounts** Initialization account info
+* **accounts** 初始账户信息
 
-* **auth** Params related to the system
-  * params Detail in [Gov-Params](gov-params.md#parameters-in-auth)
+* **auth** 系统相关的参数
 
-* **stake** Params related to the staking consensus
-  * pool   Total number of the current bonded token
-  * validators   All the information of validators
-  * params Detail in [Gov-Params](gov-params.md#parameters-in-stake)
+* **stake** 抵押和共识相关的参数
   
-* **mint**  Params related to inflation
-  * params Detail in [Gov-Params](gov-params.md#parameters-in-mint)
+* **mint**  通货膨胀相关的参数
   
-* **distribution** Params related to distribution & commission
-  * params Detail in [Gov-Params](gov-params.md#parameters-in-distribution)
-  
-* **gov**  Params related to on-chain governance
-  * params Detail in [Governance.md](../governance.md#interactive-process)
+* **distribution** 收益分配相关的参数
 
-* **upgrade** Params related to upgrade
-  * GenesisVersion Initialize the genesis version
+* **gov**  链上治理相关的参数
+  
+* **upgrade** 升级相关的参数
 
-* **slashing** Params related to slashing validators
-  * params Detail in [Gov-Params](gov-params.md#parameters-in-slashing)
-  
-* **service**  Params related to service
-  * params Detail in [Gov-Params](gov-params.md#parameters-in-service)
-  
-* **asset**  Params related to asset
-  * params Detail in [Gov-Params](gov-params.md#parameters-in-asset)
+* **slashing** 惩罚机制相关的参数
 
-* **guardian** Params related to guardian
-  * `profilers` The profiler list
-  * `trustees` The trustees list
-  
+* **asset**  资产相关的参数
+
+* **service**  服务相关的参数
+
+* **guardian** 特殊账户相关的参数
+
+可治理参数详见 [治理参数](gov-params.md)
+
 ## Gentxs
 
-Gentxs contains the transaction set of creating validators in genesis block.
-The IRISnet provides robust tools for bootstrapping the identities that will start chain via the `gen-tx` process. `gen-tx` or a Genesis Transaction are cryptographically signed transactions that are executed during chain initialization that generate a starting set of validators.
-The gen-txs are artifacts that prove that the holders of accounts consent in launching the network and that they putting capital at risk in the process.
+Gentxs中包含了创世区块中创建validators的交易集合。Cosmos SDK通过一个`gen-tx`可以有效的对genesis文件的产生进行管控。`gen-tx`即Genesis Transaction是经过签名的交易数据，在区块链启动的过程中，这些交易将被执行，然后确定初始验证人集合。
+通过提交`gen-tx`交易，代币的持有者证明了自己愿意参与到这个区块链网络的启动流程中，并且愿意承担潜在的损失。

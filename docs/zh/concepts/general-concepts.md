@@ -2,104 +2,107 @@
 order: 1
 ---
 
-# General Concepts
+# 基础概念
 
-## IRIShub Node Types
+## IRIShub 节点类型
 
-### Full Node
+### 全节点
 
-A full-node is a program that fully validates transactions and blocks of a blockchain. It is distinct from a light-node that only processes block headers and a small subset of transactions. Running a full-node requires more resources than a light-node but is necessary in order to be a validator. In practice, running a full-node only implies running a non-compromised and up-to-date version of the software with low network latency and without downtime.
+全节点是一个验证区块链交易和区块的程序。不同于仅处理块头和一小部分交易的轻节点，运行全节点需要更多的资源，但要成为验证人，这是必需的。另外，全节点也可用于为应用程序提供稳定的低延迟的区块链API。
 
-### Validator Node
+### 验证人节点
 
-The [IRIS Hub](../get-started/intro.md#iris-hub) is based on [Cosmos SDK](https://cosmos.network/docs/intro/) and [Tendermint](https://tendermint.com/docs/introduction/what-is-tendermint.html), which relies on a set of validators to secure the network. The role of validators is to run a full-node and participate in consensus by broadcasting votes which contain cryptographic signatures signed by their private key. Validators commit new blocks in the blockchain and receive revenue in exchange for their work. They must also participate in governance by voting on proposals. Validators are weighted according to their total stake.
+[IRIS Hub](../get-started/intro.md#iris-hub) 基于 [Cosmos SDK](https://cosmos.network/docs/intro/) 和 [Tendermint](https://tendermint.com/docs/introduction/what-is-tendermint.html) 实现，它依靠一组验证人节点来维护网络的安全。验证人节点的作用是运行一个全节点并通过广播投票（包含由其私钥签名的密文）来参与共识。验证人节点在区块链中提交新区块并获得收入以激励他们的工作。他们还必须对提案进行投票来参与链上治理。验证人节点的投票权重取决于他们的IRIS总质押数量。
 
-### Validator Candidate Node
+### 候选验证人节点
 
-Only top 100 bonded full nodes can become validator nodes, the rest will become candidates. The situation will change as delegation amount changes.
+只有IRIS质押数量的前100名全节点可以成为验证人节点，其余的将成为候选验证人节点。排名情况将随着质押金额的变化而更新。
 
-## IRIShub User Types
+## IRIShub 用户类型
 
-### Validator Operator
+### 验证人节点操作员
 
-A Validator Operator is the only one who can operate his Validator's informations or participate in governance as the validator.
+验证人节点操作员是唯一可以编辑他的验证人节点信息，以及以该验证人节点的身份参与链上治理的人。
 
-### Delegator
+### 委托人
 
-Delegators are IRIS holders who cannot, or do not want to run a validator themselves. IRIS holders can delegate IRIS to a validator and obtain a part of their revenue in exchange. They can earn as much as the validators and only need to pay some commission.
+委托人是指持有IRIS通证，但无法或者不想自己运行验证人节点的人。IRIS通证持有人可以委托他的IRIS给某一个验证人，以获取对应的收益。委托人可以获取和验证人一样多的收益，只需要支付一定比例的佣金给验证人。
 
 ### Profiler
 
-Profiler is a type of user that they are a special type of user who can submit software upgrade/halt proposals
+Profiler是IRIShub系统中的一类特殊账户，只有Profiler账户可以提交链上软件升级SoftwareUpgrade/停止共识Halt提议。
 
 ### Trustee
 
-Trustee is a type of user that  they are a special type of user who will receive funds from CommunityTaxUsage proposals
+Trustee是IRIShub系统中的一类特殊账户，只有Trustee账户能够发起链上治理中的CommunityTaxUsage提议，把社区资金转移给Trustee账户使用。
 
-## IRIS Token
+## IRIS 通证
 
-The IRIS hub has its own native token known as *IRIS*.  It is designed to serve three purposes in the network.
+IRIS枢纽有自己的原生通证，称为 IRIS，在网络中有三个作用：
 
-- **Staking.** Similar to the ATOM token in the Cosmos Hub, the IRIS token will be used as a staking token to secure the PoS blockchain.
-- **Transaction Fee.** The IRIS token will also be used to pay fees for all transactions in the IRIS network.
-- **Service Fee.** It is required that service providers in the IRIS network charge service fees denominated in the IRIS token.
+- **抵押：** 与Cosmos Hub中的ATOM通证类似，IRIS通证将用作抵押通证以保护PoS区块链的安全运行。
+- **交易手续费：** IRIS通证也将用于支付IRIS网络中所有交易的费用。
+- **服务费：** IRIS网络中的服务提供者需要以IRIS通证为单位收取服务费。
 
-It is intended that the IRIS network will eventually support all whitelisted fee tokens from the Cosmos network, which can be used to pay the transaction fees and service fees.
+IRIS网络最终将支持来自Cosmos网络的所有列入白名单的费用通证，它们可用于支付交易费用和服务费用。
 
-## Staking Rewards
+## Staking 收益
 
-Validator and its delegators can share the following rewards by portion：
+验证人和委托人可以获得收益有以下3种：
 
-- **Block Inflation**
-  Block Inflation exists to incentivize IRIS holders to stake. As more IRIS tokens are staked, more secure the network become(Read more about [Staking](../features/stake.md)).
-  Block Inflation will be [distributed every block](../features/mint.md). [Inflation rate](../features/mint.md) in IRISnet for the first year will be 4%.  **This ration could be adjusted by `parameter-change` proposals**.
-  In this way, loose IRIS will devalue year by year.
-- **Block Proposer Reward**
-  In IRIShub, the probability for validators is proportional to its bonded tokens. If one's proposed block is finalized, it gets extra rewards for it.  
-- **Fee**
-  Each transaction needs a [fee](fee.md#fee) for compensating validators' work[Gas](fee.md#gas). These fees can be paid with IRIS and may later in any tokens which are whitelisted by the Hub’s governance. Fees are distributed to validators in proportion to their stake. A minimum fee/gas ration is set in IRISnet.
+- **通胀**
 
-Each validator receives revenue in proportion to its total stake. However, before this revenue is distributed to its delegators, the validator can apply a commission for providing staking services.
+  IRIShub是基于Tendermint的PoS网络，验证人在网络共识中的投票权取决于验证人（包括受委托）抵押通证（IRIS）的数量。网络中抵押的通证数量越多，攻击网络所需的成本也越大，网络也越安全。
 
-### Staking Rewards Calculation Formula
+  为了维护验证人及其委托人抵押通证的价值，IRISnet设定通胀增发机制，用于激励验证人及所有IRIS通证持有人将通证抵押，以获取通胀奖励，通胀奖励将会在[每个区块发放](../features/mint.md)。 IRISnet在第一年将通胀率设定为 4%， 该通胀系数可以通过链上治理来调整。网络中IRIS通证的数量将逐年增加，没有被抵押的IRIS的价值将会逐渐被稀释。
 
-The following formulas are based on the current [IRIShub Mainnet Params](gov-params.md).
+- **出块奖励**
 
-#### Annual Rewards (ignore proposer rewards and fees)
+  在IRISnet网络中，所有验证节点将轮流出块，出块的概率和该验证人抵押（包括受委托）IRIS的数量成正比。作为出块人，验证人将获得额外的出块奖励。
 
-- **AnnualInflation =** `Base * InflationRate` (aka 2 billion * 4% = 80 million iris)
-- **ValidatorRewards =** `(AnnualInflation / BondedTokens) * (1 - CommunityTax) * (ValidatorSelfDelegation +  DelegatorsDelegation * ValidatorCommissionRate)`
-- **DelegatorRewards =** `(AnnualInflation / BondedTokens) * (1 - CommunityTax) * DelegatorSelfDelegation * (1 - ValidatorCommissionRate)`
+- **手续费**
 
-#### Block Rewards
+  在IRIS网络中的各种交易都需要支付一定的[手续费](fee.md)。手续费的多少取决于每种交易的[手续费上限（fee）](fee.md#fee)和[交易消耗资源（Gas）](fee.md#gas)。IRIShub 在系统中设定了Gas的最低单位价格（即 min-gas-price）。
+  
+  手续费目前只能使用IRIS进行支付，以后可能会通过链上治理的方式维护一个手续费白名单，任何白名单内的通证都可以用于支付手续费。
 
-- **BlockInflation =** `AnnualInflation / (365*24*60*12)` (aka 12.68 iris)
-- **ProposerExtraRewards =** `(BaseProposerReward + BonusProposerReward * PrecommitPower/TotalVotingPower) * (BlockInflation + BlockCollectedFees)`
-- **BlockRewards =** `(BlockInflation + BlockCollectedFees) * (1 - CommunityTax) - ProposerExtraRewards`
-- **Proposer**
-  - **ProposerTotalRewards =** `(BlockRewards / BondedTokens) * ValidatorBondedTokens + ProposerExtraRewards`
-  - **Commission =** `ProposerTotalRewards * ValidatorCommissionRate`
-  - **ProposerValidatorRewards =** `ProposerTotalRewards * (ValidatorSelfDelegation / ValidatorBondedTokens) + Commission`
-  - **ProposerDelegatorRewards =** `(ProposerTotalRewards - Commission) * (DelegatorSelfDelegation / ValidatorBondedTokens)`
-- **NonProposer**
-  - **NonProposerTotalRewards =** `(BlockRewards / BondedTokens) * ValidatorBondedTokens`
-  - **Commission =** `NonProposerTotalRewards * ValidatorCommissionRate`
-  - **NonProposerValidatorRewards =** `NonProposerTotalRewards * (ValidatorSelfDelegation / ValidatorBondedTokens) + Commission`
-  - **NonProposerDelegatorRewards =** `(NonProposerTotalRewards - Commission) * (DelegatorSelfDelegation / ValidatorBondedTokens)`
+  手续费收入将会根据验证人的权重进行分配。
 
-## Validator Responsibilities
+### Staking 收益计算公式
 
-Validators have two main responsibilities:
+下面的计算公式基于 [IRIShub 主网治理参数](gov-params.md).
 
-- **Be able to constantly run a correct version of the software:** Validators need to make sure that their servers are always online and their private keys are not compromised.
-- **Actively participate in governance:** Validators are required to vote on every proposal.
+#### 年收益（忽略手续费收益和出块奖励）
 
-Additionally, validators are expected to be active members of the community. They should always be up-to-date with the current state of the ecosystem so that they can easily adapt to any change.
+- **年通胀 =** `基数 * 通胀率` (即 20亿 * 4% = 8千万 iris)
+- **验证人收益 =** `(年通胀 / 抵押总量) * (1 - 社区基金率) * (验证人自抵押 +  委托人抵押 * 佣金率)`
+- **委托人收益 =** `(年通胀 / 抵押总量) * (1 - 社区基金率) * 委托人自抵押 * (1 - 佣金率)`
 
-## Validator Risks
+#### 区块收益
 
-- **Unavailability**: Validators are expected to keep signing votes for making new blocks. If a validator’s signature has not been included in more than 30% of the last 34,560 blocks (which amounts to approximately 24 hours, assuming an average block-generating time of 5 seconds), this validator will get jailed and removed from current validatorset for 1.5 day, and their bonded tokens will get slashed by 0.03%.
-- **Double Sign**:If the protocol detects that a validator voted multiple different opinions about the same block (same height/round), or voted for different blocks at the same height/round, this validator will get jailed and removed from current validatorset for 2 days. Their bonded tokens will get slashed by 1%.
-- **Censorship**: If the protocol detects that a proposer included invalid transactions in a block, this validator will get jailed and removed from current validatorset for 2 days.
+- **区块通胀 =** `年通胀 / (365*24*60*12)` (约为 12.68 iris)
+- **出块人额外奖励 =** `(BaseProposerReward + BonusProposerReward * PrecommitPower/TotalVotingPower) * (区块通胀 + 区块手续费收入)`
+- **区块总收益 =** `(区块通胀 + 区块手续费收入) * (1 - 社区基金率) - 出块人额外奖励`
+- **验证人总收益 =**
+  - 非出块人：`(区块总收益 / 抵押总量) * 该验证人抵押总量`
+  - 出块人：`非出块人收益 + 出块人额外奖励`
+- **佣金 =** `验证人总收益 * 佣金率`
+- **验证人收益 =** `验证人总收益 * (该验证人自抵押 / 该验证人抵押总量) + 佣金`
+- **委托人收益 =** `(验证人总收益 - 佣金) * (委托人自抵押 / 该验证人抵押总量)`
 
-All metrics mentioned can be adjusted by `parameter-change` proposals.
+## 验证人的责任
+
+验证者有两个主要职责：
+
+- **能够持续运行正确版本的软件：** 验证人需要确保其服务器始终在线并且其私钥不受到损害。
+- **积极参与治理：** 要求验证人对每个提案进行投票。
+
+此外，验证人将是社区的积极成员。他们应该始终与生态系统的当前状态保持同步，以便轻松地适应任何变化。
+
+## 验证人风险分析
+
+- **下线：** 即验证节点长期不参与网络共识。如果一个验证节点在过去的 34,560 个区块内（假设5秒一个区块，约为48小时）的签名数量少于30%，则该验证人抵押通证（包括受委托）的0.03%将被罚没。该验证节点将会被处罚不能参加共识36小时，期间无法获得抵押收益。
+- **双签：** 如果监测到某个验证人对同一高度的同一轮的区块数据发表不同投票，或者在同一高度的同一轮中对不同的区块进行投票，则该验证人抵押通证（包括受委托）的1%将被罚没。该验证节点将会被处罚不能参加共识48小时，期间无法获得抵押收益。
+- **打包无效交易：** 如果监测到出块人在区块链打包了无效交易，则出块节点会被处罚不能参加共识2天，期间无法获得抵押收益。
+
+以上参数都可以通过发起链上治理提案进行修改。

@@ -1,21 +1,21 @@
-# Key
+# 钱包
 
-## A note on HD wallet
+## 关于分层确定性钱包(HD wallet)的说明
 
-HD Wallets, originally specified in Bitcoin's [BIP32](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki), are a special kind of wallet that let users derive any number of accounts from a single seed. To understand what that means, let us first define some terminology:
+分层确定性钱包(HD wallet)是一种特殊的钱包，最初在比特币的[BIP32](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki)中详细说明，允许用户从单个种子中获取任意数量的帐户。让我们首先定义一些术语便于更好的理解：
 
-- **Wallet**: Set of accounts obtained from a given seed.
-- **Account**: A pair of public key/private key.
-- **Private Key**: A private key is a secret piece of information used to sign messages. In the blockchain context, a private key identifies the owner of an account. The private key of a user should never be revealed to others.
-- **Public Key**: A public key is a piece of information obtained by applying a one-way mathematical function on a private key. From it, an address can be derived. A private key cannot be found from a public key.
-- **Address**: An address is a public string with a human-readable prefix that identifies an account. It is obtained by applying mathematical transformations to a public key.
-- **Digital Signature**: A digital signature is a piece of cryptographic information that proves the owner of a given private key approved of a given message without revealing the private key.
-- **Seed**: Same as Mnemonic.
-- **Mnemonic**: A mnemonic is a sequence of words that is used as seed to derive private keys. The mnemonic is at the core of each wallet. NEVER LOSE YOUR MNEMONIC. WRITE IT DOWN ON A PIECE OF PAPER AND STORE IT SOMEWHERE SAFE. IF YOU LOSE IT, THERE IS NO WAY TO RETRIEVE IT. IF SOMEONE GAINS ACCESS TO IT, THEY GAIN ACCESS TO ALL THE ASSOCIATED ACCOUNTS.
+- **钱包**: 从给定种子获得的帐户集合。
+- **账号**: 一组公私钥对。
+- **私钥**: 私钥是用于签署消息的秘密信息。在区块链上下文中，私钥标识帐户的所有者。永远不应该向他人透露用户的私钥。
+- **公钥**: 公钥是通过对私钥应用单向数学函数获得的一段信息。从它可以派生出一个地址。无法从公钥中找到私钥。
+- **地址**: 地址是具有人类可读前缀的公共字符串，用于标识帐户。它是通过对公钥应用数学变换得到的。
+- **数字签名**: 数字签名是一段加密信息，它在不透露私钥的情况下证明已批准的给定消息的给定私钥的所有者。
+- **种子**: 和助记词一样。
+- **助记词**: 助记词是一组单词序列，用作派生私钥的种子。助记词是每个钱包的核心。永远不要忘记。把它写在一张纸上，存放在安全的地方。如果你失去了它，就没有办法找回它。如果某人获得了对它的访问权，那么他就获得了对所有相关帐户的访问权。
 
-At the core of a HD wallet, there is a seed. From this seed, users can deterministically generate accounts. To generate an account from a seed, one-way mathematical transformations are applied. To decide which account to generate, the user specifies a `path`, generally an `integer` (`0`, `1`, `2`, ...).
+分层确定性钱包的核心是种子。通过这个种子，用户可以确定地生成账号。要从种子生成账号，应用单向数学转换。要决定生成哪个帐户，用户指定一个`path`，通常是一个`integer`(`0`、`1`、`2`、……)。
 
-By specifying `path` to be `0` for example, the Wallet will generate `Private Key 0` from the seed. Then, `Public Key 0` can be generated from `Private Key 0`.  Finally, `Address 0` can be generated from `Public Key 0`. All these steps are one way only, meaning the `Public Key` cannot be found from the `Address`, the `Private Key` cannot be found from the `Public Key`, ...
+例如，通过将`path`指定为`0`，钱包将从种子生成`私钥0`。然后，可以从`私钥0`生成`公钥0`。最后，可以从`公钥0`生成`地址0`。
 
 ```bash
      Account 0                         Account 1                         Account 2
@@ -50,20 +50,20 @@ By specifying `path` to be `0` for example, the Wallet will generate `Private Ke
                                  +-------------------+
 ```
 
-The process of derivating accounts from the seed is deterministic. This means that given the same path, the derived private key will always be the same.
+从种子中推导出帐号的过程是确定性的。这意味着给定相同的路径，派生的私钥将始终相同。
 
-The funds stored in an account are controlled by the private key. This private key is generated using a one-way function from the mnemonic. If you lose the private key, you can retrieve it using the mnemonic. However, if you lose the mnemonic, you will lose access to all the derived private keys. Likewise, if someone gains access to your mnemonic, they gain access to all the associated accounts.
+存储在帐户中的资金由私钥控制。此私钥是使用助记词通过单向函数生成的。如果丢失了私钥，则可以使用助记词找回它。但是，如果丢失了助记词，则将无法访问所有派生的私钥。同样，如果有人获得了您的助记词访问权限，他们就可以访问所有相关帐户。
 
-## IRISnet Key
+## IRISnet 钱包
 
-The IRISnet Wallet is a HD Wallet base on [BIP44](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki). BIP44 defines a logical hierarchy for deterministic wallets based on an algorithm described in [BIP32](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki), which allows the handling of multiple coins, multiple accounts, external and internal chains per account and millions of addresses per chain, such as BTC and ETH.
+IRISnet钱包是基于[BIP44](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki)的分层确定性钱包。BIP44基于[BIP32](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki)中描述的算法定义确定性钱包的逻辑层次结构，该算法允许处理多种代币，多个帐户，每个帐户的外部和内部链以及每个链的数百万个地址，例如比特币和以太坊。
 
-BIP44 defines the following 5 levels in BIP32 path:
+BIP44在BIP32路径中定义以下5个级别：
 
 ```bash
 m / purpose' / coin_type' / account' / change / address_index
 ```
 
-The IRISnet coin_type is same as cosmos stake token `ATOM` 118 registered in [SLIP44](https://github.com/satoshilabs/slips/blob/master/slip-0044.md).
+IRISnet的coin_type与在[SLIP44](https://github.com/satoshilabs/slips/blob/master/slip-0044.md)登记的cosmos stake token `ATOM` 118相同。
 
-So the prefix of IRISnet key BIP44 path is `44'/118'/`, and its default path is `44'/118'/0'/0/0`.
+所以IRISnet密钥BIP44 path的前缀为`44'/118'/`，它的默认值是`44'/118'/0'/0/0`。

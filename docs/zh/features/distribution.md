@@ -1,4 +1,4 @@
-# distribution模块的用户手册
+# Distribution
 
 ## 简介
 

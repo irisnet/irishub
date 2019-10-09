@@ -5,7 +5,7 @@ order: 2
 # Validator FAQ
 
 :::tip
-For general concepts, please refer to [General Concepts](general-concepts.md)
+IRISnet 基础概念请参考：[General Concepts](general-concepts.md)
 :::
 
 ## General Questions

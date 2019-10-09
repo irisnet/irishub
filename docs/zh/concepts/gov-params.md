@@ -1,80 +1,80 @@
-# Parameters
+# 治理参数
 
-In IRISnet, there are some special parameters can be modified through on-chain governance.
-All the IRIS holders may participate in the on-chain governance. If the community is not satisfied with certain modifiable parameters, it is available to submit a [parameter-change](../features/governance.md#usage-scenario-of-parameter-change) proposal in governance module.
+在IRISnet中，存在一些特殊的参数，它们可通过链上治理被修改。持有IRIS通证的用户都可以参与到参数修改的链上治理。
+如果社区对某些可修改的参数不满意，可以发起[参数修改提案](../features/governance.md#usage-scenario-of-parameter-change)，社区投票通过后即可在线自动完成修改。
 
-## Parameters in Auth
+## Auth 模块可治理参数
 
-| key                      | Description                          | Range               | Current       |
-| ------------------------ | ------------------------------------ | ------------------- | ------------- |
-| `auth/gasPriceThreshold` | minimum of gas price                 | (0, 10^18iris-atto] | 6000000000000 |
-| `auth/txSizeLimit`       | the limitation of the normal tx size | [500, 1500]         | 1000          |
+| 字段                     | 描述             | 有效范围            | 当前值        |
+| ------------------------ | ---------------- | ------------------- | ------------- |
+| `auth/gasPriceThreshold` | 最小的gas单价    | (0, 10^18iris-atto] | 6000000000000 |
+| `auth/txSizeLimit`       | 普通交易大小限制 | [500, 1500]         | 1000          |
 
-## Parameters in Stake
+## Stake 模块可治理参数
 
-| key                   | Description                  | Range      | Current  |
-| --------------------- | ---------------------------- | ---------- | -------- |
-| `stake/MaxValidators` | maximum number of validators | [100, 200] | 100      |
-| `stake/UnbondingTime` | unbonding time               | [2week,)   | 504h0m0s |
+| 字段                  | 描述             | 有效范围    | 当前值   |
+| --------------------- | ---------------- | ----------- | -------- |
+| `stake/MaxValidators` | 验证人的最大数量 | [100, 200]  | 100      |
+| `stake/UnbondingTime` | 解绑时间         | [2week, +∞) | 504h0m0s |
 
-Details in [distribution](../features/stake.md)
+详见 [Staking](../features/stake.md)
 
-## Parameters in Distribution
+## Distribution 模块可治理参数
 
-| key                         | Description                                    | Range     | Current |
-| --------------------------- | ---------------------------------------------- | --------- | ------- |
-| `distr/BaseProposerReward`  | standard ratio of the block reward             | (0, 0.02] | 0.01    |
-| `distr/BonusProposerReward` | maximum additional bonus ratio                 | (0, 0.08] | 0.04    |
-| `distr/CommunityTax`        | proportion of contributions to community funds | (0, 0.2]  | 0.02    |
+| 字段                        | 描述                 | 有效范围  | 当前值 |
+| --------------------------- | -------------------- | --------- | ------ |
+| `distr/BaseProposerReward`  | 出块奖励的基准比例   | (0, 0.02] | 0.01   |
+| `distr/BonusProposerReward` | 最大额外奖励比例     | (0, 0.08] | 0.04   |
+| `distr/CommunityTax`        | 贡献给社区基金的比例 | (0, 0.2]  | 0.02   |
 
-Details in [distribution](../features/distribution.md)
+详见 [Distribution](../features/distribution.md)
 
-## Parameters in Mint
+## Mint 模块可治理参数
 
-| key              | Description           | Range   | Current |
-| ---------------- | --------------------- | ------- | ------- |
-| `mint/Inflation` | Inflation coefficient | [0,0.2] | 0.04    |
+| 字段             | 描述     | 有效范围 | 当前值 |
+| ---------------- | -------- | -------- | ------ |
+| `mint/Inflation` | 通胀系数 | [0, 0.2] | 0.04   |
 
-Details in [mint](../features/mint.md)
+详见 [Mint](../features/mint.md)
 
-## Parameters in Slashing
+## Slashing 模块可治理参数
 
-| key                                | Description                               | Range         | Current |
-| ---------------------------------- | ----------------------------------------- | ------------- | ------- |
-| `slashing/CensorshipJailDuration`  | Censorship Jail Duration                  | (0, 4week)    | 48h0m0s |
-| `slashing/DoubleSignJailDuration`  | DoubleSign Jail Duration                  | (0, 4week)    | 48h0m0s |
-| `slashing/DowntimeJailDuration`    | Downtime Jail Duration                    | (0, 4week)    | 36h0m0s |
-| `slashing/MaxEvidenceAge`          | Acceptable earliest time of the evidence  | [1day,)       | 51840   |
-| `slashing/MinSignedPerWindow`      | Minimum voting ratio in the slash window  | [0.5, 0.9]    | 0.7     |
-| `slashing/SignedBlocksWindow`      | The number of blocks for slash statistics | [100, 140000] | 34560   |
-| `slashing/SlashFractionCensorship` | Slash ratio of censorship                 | [0.005, 0.1]  | 0       |
-| `slashing/SlashFractionDoubleSign` | Slash ratio of double-sign                | [0.01, 0.1]   | 0.01    |
-| `slashing/SlashFractionDowntime`   | Slash ratio of downtime                   | [0.005, 0.1]  | 0.0003  |
+| 字段                               | 描述                       | 有效范围      | 当前值  |
+| ---------------------------------- | -------------------------- | ------------- | ------- |
+| `slashing/CensorshipJailDuration`  | Censorship后Jail的时间     | (0, 4week)    | 48h0m0s |
+| `slashing/DoubleSignJailDuration`  | DoubleSign后Jail的时间     | (0, 4week)    | 48h0m0s |
+| `slashing/DowntimeJailDuration`    | Downtime后Jail的时间       | (0, 4week)    | 36h0m0s |
+| `slashing/MaxEvidenceAge`          | 可接受的最早的作恶证据时间 | [1day, +∞)    | 51840   |
+| `slashing/MinSignedPerWindow`      | slash窗口中最小投票比例    | [0.5, 0.9]    | 0.7     |
+| `slashing/SignedBlocksWindow`      | slash统计窗口区块数        | [100, 140000] | 34560   |
+| `slashing/SlashFractionCensorship` | Censorship后slash的比例    | [0.005, 0.1]  | 0       |
+| `slashing/SlashFractionDoubleSign` | DoubleSign后slash的比例    | [0.01, 0.1]   | 0.01    |
+| `slashing/SlashFractionDowntime`   | Downtime后slash的比例      | [0.005, 0.1]  | 0.0003  |
 
-Details in [slashing](../features/slashing.md)
+详见 [Slashing](../features/slashing.md)
 
-## Parameters in Asset
+## Asset 模块可治理参数
 
-| key                          | Description                     | Range  | Current                           |
-| ---------------------------- | ------------------------------- | ------ | --------------------------------- |
-| `asset/AssetTaxRate`         | Asset tax                       | [0, 1] | 0.4                               |
-| `asset/IssueTokenBaseFee`    | Issue token's  fee              | [0,+∞) | 60000000000000000000000iris-atto  |
-| `asset/MintTokenFeeRatio`    | Mint token's fee ratio          | [0, 1] | 0.1                               |
-| `asset/CreateGatewayBaseFee` | Create gateway Token's fee      | [0,+∞) | 120000000000000000000000iris-atto |
-| `asset/GatewayAssetFeeRatio` | Issue gateway token's fee ratio | [0, 1] | 0.1                               |
+| 字段                         | 描述                                           | 有效范围 | 当前值                            |
+| ---------------------------- | ---------------------------------------------- | -------- | --------------------------------- |
+| `asset/AssetTaxRate`         | 资产税率，即Community Tax的比例                | [0, 1]   | 0.4                               |
+| `asset/IssueTokenBaseFee`    | 发行Token的基准费用                            | [0, +∞)  | 60000000000000000000000iris-atto  |
+| `asset/MintTokenFeeRatio`    | 增发Token的费率(相对于发行费用)                | [0, 1]   | 0.1                               |
+| `asset/CreateGatewayBaseFee` | 创建网关的基准费用                             | [0, +∞)  | 120000000000000000000000iris-atto |
+| `asset/GatewayAssetFeeRatio` | 发行网关资产的费率(相对于native资产的发行费用) | [0, 1]   | 0.1                               |
 
-Details in [asset](../features/asset.md)
+详见 [Asset](../features/asset.md)
 
-## Parameters in Service
+## Service 模块可治理参数
 
-| key                            | Description                                                 | Range            | Current  |
-| ------------------------------ | ----------------------------------------------------------- | ---------------- | -------- |
-| `service/ArbitrationTimeLimit` | maximum time of dispute resolution                          | [5days, 10days]  | 120h0m0s |
-| `service/ComplaintRetrospect`  | maximum time for submit a dispute                           | [15days, 30days] | 360h0m0s |
-| `service/MaxRequestTimeout`    | maximum number of waiting blocks for service invocation     | [20,)            | 100      |
-| `service/MinDepositMultiple`   | a multiple of the minimum deposit amount of service binding | [500, 5000]      | 1000     |
-| `service/ServiceFeeTax`        | tax rate of service fee                                     | (0, 0.2]         | 0.01     |
-| `service/SlashFraction`        | slash fraction                                              | (0, 0.01]        | 0.001    |
-| `service/TxSizeLimit`          | the limit of the service tx size                            | [2000, 6000]     | 4000     |
+| 字段                           | 描述                       | 有效范围         | 当前值   |
+| ------------------------------ | -------------------------- | ---------------- | -------- |
+| `service/ArbitrationTimeLimit` | 争议解决最大时长           | [5days, 10days]  | 120h0m0s |
+| `service/ComplaintRetrospect`  | 可提起争议最大时长         | [15days, 30days] | 360h0m0s |
+| `service/MaxRequestTimeout`    | 服务调用最大等待区块个数   | [20, +∞)         | 100      |
+| `service/MinDepositMultiple`   | 服务绑定最小抵押金额的倍数 | [500, 5000]      | 1000     |
+| `service/ServiceFeeTax`        | 服务费的税收比例           | (0, 0.2]         | 0.01     |
+| `service/SlashFraction`        | 惩罚百分比                 | (0, 0.01]        | 0.001    |
+| `service/TxSizeLimit`          | service类型交易的大小限制  | [2000, 6000]     | 4000     |
 
-Details in [service](../features/service.md)
+详见 [Service](../features/service.md)

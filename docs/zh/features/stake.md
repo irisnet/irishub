@@ -1,4 +1,4 @@
-# Stake用户手册
+# Staking
 
 ## 介绍
 
