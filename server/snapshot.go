@@ -71,13 +71,6 @@ func dumpData(home, targetDir string) error {
 		return err
 	}
 
-	//copy cs.wal
-	csDir := filepath.Join(home, "cs.wal")
-	csTargetDir := filepath.Join(targetDir, "cs.wal")
-	if err := copyDir(csDir, csTargetDir); err != nil {
-		return err
-	}
-
 	//copy evidence.db
 	evidenceDir := filepath.Join(home, "evidence.db")
 	evidenceTargetDir := filepath.Join(targetDir, "evidence.db")
