@@ -27,7 +27,7 @@ func BenchmarkOneBankSendTxPerBlock(b *testing.B) {
 	benchmarkApp, _ := getBenchmarkMockApp()
 
 	// Add an account at genesis
-	acc := &auth.BaseAccount{
+	acc := &sdk.BaseAccount{
 		Address: addr1,
 		// Some value conceivably higher than the benchmarks would ever go
 		Coins: sdk.Coins{sdk.NewInt64Coin(stakeTypes.StakeDenom, 100000000000)},

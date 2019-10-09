@@ -37,6 +37,8 @@ func TestAssetAnteHandler(t *testing.T) {
 	addr2 := sdk.AccAddress([]byte("addr2"))
 	acc1 := ak.NewAccountWithAddress(ctx, addr1)
 	acc2 := ak.NewAccountWithAddress(ctx, addr2)
+	baseAcc1, _ := acc1.(*sdk.BaseAccount)
+	baseAcc2, _ := acc2.(*sdk.BaseAccount)
 
 	// get asset fees
 	gatewayCreateFee := GetGatewayCreateFee(ctx, keeper, "mon")
@@ -58,8 +60,8 @@ func TestAssetAnteHandler(t *testing.T) {
 	tx3 := auth.StdTx{Msgs: []sdk.Msg{msgNonAsset2, msgCreateGateway, msgIssueNativeToken, msgIssueGatewayToken, msgMintNativeToken}}
 
 	// set signers and construct an ante handler
-	ctx = ak.CacheSignerAccs(ctx, []auth.Account{acc1, acc2})
-	anteHandler := NewAnteHandler(ak, keeper)
+	ctx = ctx.WithKeySignerAccs([]*sdk.BaseAccount{baseAcc1, baseAcc2})
+	anteHandler := NewAnteHandler(keeper)
 
 	// assert that the ante handler will return with `abort` set to true
 	_ = acc1.SetCoins(sdk.Coins{gatewayCreateFee.Add(nativeTokenIssueFee)})
@@ -92,7 +94,7 @@ func TestAssetAnteHandler(t *testing.T) {
 	require.Equal(t, true, res.IsOK())
 
 	// assert that the ante handler will return with `abort` set to true
-	ctx = ak.CacheSignerAccs(ctx, []auth.Account{})
+	ctx = ctx.WithKeySignerAccs([]*sdk.BaseAccount{})
 	_, res, abort = anteHandler(ctx, tx3, false)
 	require.Equal(t, true, abort)
 	require.Equal(t, false, res.IsOK())

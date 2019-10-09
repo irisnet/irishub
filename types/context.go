@@ -35,7 +35,7 @@ type Context struct {
 	consParams     *abci.ConsensusParams
 	tagsManager    *TagsManager
 	validTxCounter *ValidTxCounter
-	keySignerAccs  interface{}
+	keySignerAccs  []*BaseAccount
 }
 
 // Read-only accessors
@@ -53,7 +53,7 @@ func (c Context) IsCheckTx() bool                 { return c.checkTx }
 func (c Context) MinimumFees() Coins              { return c.minimumFee }
 func (c Context) TagsManager() *TagsManager       { return c.tagsManager }
 func (c Context) ValidTxCounter() *ValidTxCounter { return c.validTxCounter }
-func (c Context) KeySignerAccs() interface{}      { return c.keySignerAccs }
+func (c Context) KeySignerAccs() []*BaseAccount   { return c.keySignerAccs }
 
 // clone the header before returning
 func (c Context) BlockHeader() abci.Header {
@@ -133,7 +133,7 @@ func (c Context) WithCheckValidNum(txCounter *ValidTxCounter) Context {
 	return c
 }
 
-func (c Context) WithKeySignerAccs(accountAccs interface{}) Context {
+func (c Context) WithKeySignerAccs(accountAccs []*BaseAccount) Context {
 	c.keySignerAccs = accountAccs
 	return c
 }

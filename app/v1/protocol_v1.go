@@ -311,7 +311,7 @@ func (p *ProtocolV1) configRouters() {
 // configure all FeeHandlers
 func (p *ProtocolV1) configFeeHandlers() {
 	authAnteHandler := auth.NewAnteHandler(p.accountMapper, p.feeKeeper)
-	assetAnteHandler := asset.NewAnteHandler(p.accountMapper, p.assetKeeper)
+	assetAnteHandler := asset.NewAnteHandler(p.assetKeeper)
 	bankAnteHandler := bank.NewAnteHandler(p.accountMapper)
 
 	p.anteHandlers = []sdk.AnteHandler{authAnteHandler, bankAnteHandler, assetAnteHandler}

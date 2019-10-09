@@ -66,7 +66,7 @@ func MakeTestCodec() *codec.Codec {
 
 	// Register AppAccount
 	cdc.RegisterInterface((*auth.Account)(nil), nil)
-	cdc.RegisterConcrete(&auth.BaseAccount{}, "test/stake/Account", nil)
+	cdc.RegisterConcrete(&sdk.BaseAccount{}, "test/stake/Account", nil)
 	codec.RegisterCrypto(cdc)
 
 	return cdc
