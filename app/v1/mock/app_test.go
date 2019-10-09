@@ -92,7 +92,7 @@ func getMockApp(t *testing.T) *App {
 
 func TestMsgSendWithAccounts(t *testing.T) {
 	mapp := getMockApp(t)
-	acc := &sdk.BaseAccount{
+	acc := &auth.BaseAccount{
 		Address: addr1,
 		Coins:   sdk.Coins{sdk.NewInt64Coin(stakeTypes.StakeDenom, 67)},
 	}
@@ -103,7 +103,7 @@ func TestMsgSendWithAccounts(t *testing.T) {
 
 	res1 := mapp.AccountKeeper.GetAccount(ctxCheck, addr1)
 	require.NotNil(t, res1)
-	require.Equal(t, acc, res1.(*sdk.BaseAccount))
+	require.Equal(t, acc, res1.(*auth.BaseAccount))
 
 	testCases := []appTestCase{
 		{
@@ -153,11 +153,11 @@ func TestMsgSendWithAccounts(t *testing.T) {
 func TestMsgSendMultipleOut(t *testing.T) {
 	mapp := getMockApp(t)
 
-	acc1 := &sdk.BaseAccount{
+	acc1 := &auth.BaseAccount{
 		Address: addr1,
 		Coins:   sdk.Coins{sdk.NewInt64Coin(stakeTypes.StakeDenom, 42)},
 	}
-	acc2 := &sdk.BaseAccount{
+	acc2 := &auth.BaseAccount{
 		Address: addr2,
 		Coins:   sdk.Coins{sdk.NewInt64Coin(stakeTypes.StakeDenom, 42)},
 	}
@@ -192,15 +192,15 @@ func TestMsgSendMultipleOut(t *testing.T) {
 func TestSengMsgMultipleInOut(t *testing.T) {
 	mapp := getMockApp(t)
 
-	acc1 := &sdk.BaseAccount{
+	acc1 := &auth.BaseAccount{
 		Address: addr1,
 		Coins:   sdk.Coins{sdk.NewInt64Coin(stakeTypes.StakeDenom, 42)},
 	}
-	acc2 := &sdk.BaseAccount{
+	acc2 := &auth.BaseAccount{
 		Address: addr2,
 		Coins:   sdk.Coins{sdk.NewInt64Coin(stakeTypes.StakeDenom, 42)},
 	}
-	acc4 := &sdk.BaseAccount{
+	acc4 := &auth.BaseAccount{
 		Address: addr4,
 		Coins:   sdk.Coins{sdk.NewInt64Coin(stakeTypes.StakeDenom, 42)},
 	}
@@ -236,7 +236,7 @@ func TestSengMsgMultipleInOut(t *testing.T) {
 func TestMsgSendDependent(t *testing.T) {
 	mapp := getMockApp(t)
 
-	acc1 := &sdk.BaseAccount{
+	acc1 := &auth.BaseAccount{
 		Address: addr1,
 		Coins:   sdk.Coins{sdk.NewInt64Coin(stakeTypes.StakeDenom, 42)},
 	}

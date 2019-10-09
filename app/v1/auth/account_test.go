@@ -36,7 +36,7 @@ func TestBaseAddressPubKey(t *testing.T) {
 	//------------------------------------
 
 	// can set address on empty account
-	acc2 := sdk.BaseAccount{}
+	acc2 := BaseAccount{}
 	err = acc2.SetAddress(addr2)
 	require.Nil(t, err)
 	require.EqualValues(t, addr2, acc2.GetAddress())
@@ -86,13 +86,13 @@ func TestBaseAccountMarshal(t *testing.T) {
 	b, err := cdc.MarshalBinaryLengthPrefixed(acc)
 	require.Nil(t, err)
 
-	acc2 := sdk.BaseAccount{}
+	acc2 := BaseAccount{}
 	err = cdc.UnmarshalBinaryLengthPrefixed(b, &acc2)
 	require.Nil(t, err)
 	require.Equal(t, acc, acc2)
 
 	// error on bad bytes
-	acc2 = sdk.BaseAccount{}
+	acc2 = BaseAccount{}
 	err = cdc.UnmarshalBinaryLengthPrefixed(b[:len(b)/2], &acc2)
 	require.NotNil(t, err)
 }

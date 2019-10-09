@@ -111,15 +111,8 @@ func NewAnteHandler(am AccountKeeper, fck FeeKeeper) sdk.AnteHandler {
 			am.SetAccount(newCtx, signerAccs[i])
 		}
 
-		// convert []Account to []*sdk.BaseAccount
-		var signerBaseAccs []*sdk.BaseAccount
-		for _, acc := range signerAccs {
-			baseAcc, _ := acc.(*sdk.BaseAccount)
-			signerBaseAccs = append(signerBaseAccs, baseAcc)
-		}
-
 		// cache the signer accounts in the context
-		newCtx = newCtx.WithKeySignerAccs(signerBaseAccs)
+		newCtx = am.CacheSignerAccs(newCtx, signerAccs)
 
 		// TODO: tx tags (?)
 		return newCtx, sdk.Result{GasWanted: stdTx.Fee.Gas}, false // continue...

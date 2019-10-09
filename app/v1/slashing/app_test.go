@@ -91,7 +91,7 @@ func TestSlashingMsgs(t *testing.T) {
 	genCoin := sdk.NewCoin(stakeTypes.StakeDenom, sdk.NewIntWithDecimal(42, 18))
 	bondCoin := sdk.NewCoin(stakeTypes.StakeDenom, sdk.NewIntWithDecimal(10, 18))
 
-	acc1 := &sdk.BaseAccount{
+	acc1 := &auth.BaseAccount{
 		Address: addr1,
 		Coins:   sdk.Coins{genCoin},
 	}

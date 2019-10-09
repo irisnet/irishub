@@ -81,7 +81,7 @@ type GenesisAccount struct {
 }
 
 // NewGenesisAccount genesis account constructor
-func NewGenesisAccount(acc *sdk.BaseAccount) GenesisAccount {
+func NewGenesisAccount(acc *auth.BaseAccount) GenesisAccount {
 	return GenesisAccount{
 		Address:       acc.Address,
 		Coins:         acc.Coins,
@@ -100,9 +100,9 @@ func NewGenesisAccountI(acc auth.Account) GenesisAccount {
 	}
 }
 
-// ToAccount convert GenesisAccount to sdk.BaseAccount
-func (ga *GenesisAccount) ToAccount() (acc *sdk.BaseAccount) {
-	return &sdk.BaseAccount{
+// ToAccount convert GenesisAccount to auth.BaseAccount
+func (ga *GenesisAccount) ToAccount() (acc *auth.BaseAccount) {
+	return &auth.BaseAccount{
 		Address:       ga.Address,
 		Coins:         ga.Coins.Sort(),
 		AccountNumber: ga.AccountNumber,
@@ -382,7 +382,7 @@ type GenesisFileAccount struct {
 	AccountNumber uint64         `json:"account_number"`
 }
 
-func NewGenesisFileAccount(acc *sdk.BaseAccount) GenesisFileAccount {
+func NewGenesisFileAccount(acc *auth.BaseAccount) GenesisFileAccount {
 	var coins []string
 	for _, coin := range acc.Coins {
 		coins = append(coins, coin.String())

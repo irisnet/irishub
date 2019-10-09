@@ -59,7 +59,7 @@ func NewFeeRefundHandler(am AccountKeeper, fk FeeKeeper) types.FeeRefundHandler 
 		}
 
 		// get the signing accounts from context cache
-		signerAccs := ctx.KeySignerAccs()
+		signerAccs := am.GetCacheSignerAccs(ctx)
 		if len(signerAccs) < 1 {
 			return sdk.Coin{}, nil
 		}

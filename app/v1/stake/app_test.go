@@ -97,11 +97,11 @@ func TestStakeMsgs(t *testing.T) {
 	genCoin := sdk.NewCoin(types.StakeDenom, sdk.NewIntWithDecimal(42, 18))
 	bondCoin := sdk.NewCoin(types.StakeDenom, sdk.NewIntWithDecimal(10, 18))
 
-	acc1 := &sdk.BaseAccount{
+	acc1 := &auth.BaseAccount{
 		Address: addr1,
 		Coins:   sdk.Coins{genCoin},
 	}
-	acc2 := &sdk.BaseAccount{
+	acc2 := &auth.BaseAccount{
 		Address: addr2,
 		Coins:   sdk.Coins{genCoin},
 	}

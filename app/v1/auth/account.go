@@ -1,6 +1,9 @@
 package auth
 
 import (
+	"errors"
+	"fmt"
+
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/tendermint/tendermint/crypto"
@@ -29,25 +32,156 @@ type Account interface {
 	SetCoins(sdk.Coins) error
 
 	GetMemoRegexp() string
-	SetMemoRegexp(string) error
+	SetMemoRegexp(string)
 }
 
 // AccountDecoder unmarshals account bytes
 type AccountDecoder func(accountBytes []byte) (Account, error)
 
 //-----------------------------------------------------------
+// BaseAccount
 
-var _ Account = (*sdk.BaseAccount)(nil)
+var _ Account = (*BaseAccount)(nil)
+
+// BaseAccount - a base account structure.
+// This can be extended by embedding within in your AppAccount.
+// There are examples of this in: examples/basecoin/types/account.go.
+// However one doesn't have to use BaseAccount as long as your struct
+// implements Account.
+type BaseAccount struct {
+	Address       sdk.AccAddress `json:"address"`
+	Coins         sdk.Coins      `json:"coins"`
+	PubKey        crypto.PubKey  `json:"public_key"`
+	AccountNumber uint64         `json:"account_number"`
+	Sequence      uint64         `json:"sequence"`
+	MemoRegexp    string         `json:"memo_regexp"`
+}
+
+// String implements fmt.Stringer
+func (acc BaseAccount) String() string {
+	var pubkey string
+
+	if acc.PubKey != nil {
+		pubkey = sdk.MustBech32ifyAccPub(acc.PubKey)
+	}
+
+	return fmt.Sprintf(`Account:
+  Address:         %s
+  Pubkey:          %s
+  Coins:           %s
+  Account Number:  %d
+  Sequence:        %d
+  Memo Regexp:     %s`,
+		acc.Address,
+		pubkey,
+		acc.Coins.String(),
+		acc.AccountNumber,
+		acc.Sequence,
+		acc.MemoRegexp,
+	)
+}
+
+// String implements human.Stringer
+func (acc BaseAccount) HumanString(converter sdk.CoinsConverter) string {
+	var pubkey string
+
+	if acc.PubKey != nil {
+		pubkey = sdk.MustBech32ifyAccPub(acc.PubKey)
+	}
+
+	return fmt.Sprintf(`Account:
+  Address:         %s
+  Pubkey:          %s
+  Coins:           %s
+  Account Number:  %d
+  Sequence:        %d 
+  Memo Regexp:     %s`,
+		acc.Address,
+		pubkey,
+		converter.ToMainUnit(acc.Coins),
+		acc.AccountNumber,
+		acc.Sequence,
+		acc.MemoRegexp,
+	)
+}
 
 // Prototype function for BaseAccount
 func ProtoBaseAccount() Account {
-	return &sdk.BaseAccount{}
+	return &BaseAccount{}
 }
 
-func NewBaseAccountWithAddress(addr sdk.AccAddress) sdk.BaseAccount {
-	return sdk.BaseAccount{
+func NewBaseAccountWithAddress(addr sdk.AccAddress) BaseAccount {
+	return BaseAccount{
 		Address: addr,
 	}
+}
+
+// Implements sdk.Account.
+func (acc BaseAccount) GetAddress() sdk.AccAddress {
+	return acc.Address
+}
+
+// Implements sdk.Account.
+func (acc *BaseAccount) SetAddress(addr sdk.AccAddress) error {
+	if len(acc.Address) != 0 {
+		return errors.New("cannot override BaseAccount address")
+	}
+	acc.Address = addr
+	return nil
+}
+
+// Implements sdk.Account.
+func (acc BaseAccount) GetPubKey() crypto.PubKey {
+	return acc.PubKey
+}
+
+// Implements sdk.Account.
+func (acc *BaseAccount) SetPubKey(pubKey crypto.PubKey) error {
+	acc.PubKey = pubKey
+	return nil
+}
+
+// Implements sdk.Account.
+func (acc *BaseAccount) GetCoins() sdk.Coins {
+	return acc.Coins
+}
+
+// Implements sdk.Account.
+func (acc *BaseAccount) SetCoins(coins sdk.Coins) error {
+	acc.Coins = coins
+	return nil
+}
+
+// Implements Account
+func (acc *BaseAccount) GetAccountNumber() uint64 {
+	return acc.AccountNumber
+}
+
+// Implements Account
+func (acc *BaseAccount) SetAccountNumber(accNumber uint64) error {
+	acc.AccountNumber = accNumber
+	return nil
+}
+
+// Implements sdk.Account.
+func (acc *BaseAccount) GetSequence() uint64 {
+	return acc.Sequence
+}
+
+// Implements sdk.Account.
+func (acc *BaseAccount) SetSequence(seq uint64) error {
+	acc.Sequence = seq
+	return nil
+}
+
+// Implements sdk.Account.
+func (acc *BaseAccount) GetMemoRegexp() string {
+	return acc.MemoRegexp
+}
+
+// Implements sdk.Account.
+func (acc *BaseAccount) SetMemoRegexp(regexp string) {
+	acc.MemoRegexp = regexp
 }
 
 //----------------------------------------
@@ -56,6 +190,6 @@ func NewBaseAccountWithAddress(addr sdk.AccAddress) sdk.BaseAccount {
 // Most users shouldn't use this, but this comes in handy for tests.
 func RegisterBaseAccount(cdc *codec.Codec) {
 	cdc.RegisterInterface((*Account)(nil), nil)
-	cdc.RegisterConcrete(&sdk.BaseAccount{}, "irishub/bank/BaseAccount", nil)
+	cdc.RegisterConcrete(&BaseAccount{}, "irishub/bank/BaseAccount", nil)
 	codec.RegisterCrypto(cdc)
 }

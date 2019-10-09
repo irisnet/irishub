@@ -4,17 +4,18 @@ import (
 	"fmt"
 
 	"github.com/irisnet/irishub/app/v1/asset/internal/types"
+	"github.com/irisnet/irishub/app/v1/auth"
 	sdk "github.com/irisnet/irishub/types"
 )
 
 // NewAnteHandler returns an AnteHandler that checks if the balance of
 // the fee payer is sufficient for asset related fee
-func NewAnteHandler(k Keeper) sdk.AnteHandler {
+func NewAnteHandler(am auth.AccountKeeper, k Keeper) sdk.AnteHandler {
 	return func(
 		ctx sdk.Context, tx sdk.Tx, simulate bool,
 	) (newCtx sdk.Context, res sdk.Result, abort bool) {
 		// get the signing accouts from context cache
-		signerAccs := ctx.KeySignerAccs()
+		signerAccs := am.GetCacheSignerAccs(ctx)
 
 		if len(signerAccs) == 0 {
 			return newCtx, types.ErrSignersMissingInContext(types.DefaultCodespace, "signers missing in context").Result(), true

@@ -10,15 +10,16 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/irisnet/irishub/app/v1/bank"
+	v2 "github.com/irisnet/irishub/app/v2"
+	"github.com/irisnet/irishub/app/v2/htlc"
+
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/app/v1/asset"
 	"github.com/irisnet/irishub/app/v1/auth"
-	"github.com/irisnet/irishub/app/v1/bank"
 	"github.com/irisnet/irishub/app/v1/gov"
 	"github.com/irisnet/irishub/app/v1/service"
 	"github.com/irisnet/irishub/app/v1/upgrade"
-	v2 "github.com/irisnet/irishub/app/v2"
-	"github.com/irisnet/irishub/app/v2/htlc"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/keys"
 	servicecli "github.com/irisnet/irishub/client/service"
@@ -37,7 +38,7 @@ import (
 //___________________________________________________________________________________
 // irisnet helper methods
 
-func convertToIrisBaseAccount(t *testing.T, acc sdk.BaseAccount) string {
+func convertToIrisBaseAccount(t *testing.T, acc auth.BaseAccount) string {
 	cdc := codec.New()
 	codec.RegisterCrypto(cdc)
 	cliCtx := context.NewCLIContext().
@@ -222,7 +223,7 @@ func executeGetAddrPK(t *testing.T, cmdStr string) (sdk.AccAddress, crypto.PubKe
 
 // irisnet-module-helper function
 
-func executeGetAccount(t *testing.T, cmdStr string) (acc sdk.BaseAccount) {
+func executeGetAccount(t *testing.T, cmdStr string) (acc auth.BaseAccount) {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
 	var initRes map[string]json.RawMessage
 	err := json.Unmarshal([]byte(out), &initRes)

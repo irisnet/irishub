@@ -1,10 +1,10 @@
 package mock
 
 import (
-	"fmt"
 	"math/rand"
 	"os"
 
+	"fmt"
 	"github.com/irisnet/irishub/codec"
 	bam "github.com/irisnet/irishub/mock/baseapp"
 	"github.com/irisnet/irishub/modules/auth"
@@ -176,7 +176,7 @@ func CreateGenAccounts(numAccs int, genCoins sdk.Coins) (genAccs []auth.Account,
 		pubKey := privKey.PubKey()
 		addr := sdk.AccAddress(pubKey.Address())
 
-		genAcc := &sdk.BaseAccount{
+		genAcc := &auth.BaseAccount{
 			Address: addr,
 			Coins:   genCoins,
 		}
