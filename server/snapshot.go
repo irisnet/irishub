@@ -8,6 +8,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	tmsm "github.com/tendermint/tendermint/state"
+
 	"github.com/tendermint/tendermint/consensus"
 
 	"github.com/spf13/cobra"
@@ -61,11 +63,16 @@ func loadDb(name, path string) *dbm.GoLevelDB {
 }
 
 func dumpData(home, targetDir string) error {
-	//save last block and flush disk
+	//save local current block and flush disk
 	lastHeight := snapshotBlock(home, targetDir)
+
+	//save local current block height consensus data
 	if err := snapshotCsWAL(home, targetDir, lastHeight); err != nil {
 		return err
 	}
+
+	//save local current block height state
+	snapshotState(home, targetDir, lastHeight)
 
 	//copy application
 	appDir := filepath.Join(home, "application.db")
@@ -74,17 +81,27 @@ func dumpData(home, targetDir string) error {
 		return err
 	}
 
-	//copy state
-	stateDir := filepath.Join(home, "state.db")
-	targetStateDir := filepath.Join(targetDir, "state.db")
-	if err := copyDir(stateDir, targetStateDir); err != nil {
-		return err
-	}
-
 	//copy evidence.db
 	evidenceDir := filepath.Join(home, "evidence.db")
 	evidenceTargetDir := filepath.Join(targetDir, "evidence.db")
 	return copyDir(evidenceDir, evidenceTargetDir)
+}
+
+func snapshotState(home, targetDir string, height int64) error {
+	originDb := loadDb("state", home)
+	defer originDb.Close()
+
+	targetDb := loadDb("state", targetDir)
+	defer targetDb.Close()
+
+	state := tmsm.LoadState(originDb)
+
+	if height != state.LastBlockHeight {
+		return errors.New(fmt.Sprintf("wrong block height,should: %d, but got %d", height, state.LastBlockHeight))
+	}
+
+	tmsm.SaveState(targetDb, state)
+	return nil
 }
 
 func snapshotBlock(home, targetDir string) int64 {
@@ -123,9 +140,9 @@ func snapshotCsWAL(home, targetDir string, height int64) error {
 		return err
 	}
 	if !found {
-		return fmt.Errorf("cannot replay height %d. WAL does not contain #ENDHEIGHT for %d", height, height-1)
+		return errors.New(fmt.Sprintf("cannot replay height %d. WAL does not contain #ENDHEIGHT for %d", height, height-1))
 	}
-	defer gr.Close() // nolint: errcheck
+	defer gr.Close()
 
 	var msg *consensus.TimedWALMessage
 	dec := consensus.NewWALDecoder(gr)
@@ -134,13 +151,13 @@ func snapshotCsWAL(home, targetDir string, height int64) error {
 		if err == io.EOF {
 			break
 		} else if consensus.IsDataCorruptionError(err) {
-			return fmt.Errorf("data has been corrupted in last height %d of consensus WAL", height)
+			return errors.New(fmt.Sprintf("data has been corrupted in last height %d of consensus WAL", height))
 		} else if err != nil {
 			return err
 		}
 		targetWAL.Write(msg.Msg)
 	}
-	targetWAL.WriteSync(consensus.EndHeightMessage{height})
+	targetWAL.WriteSync(consensus.EndHeightMessage{Height: height})
 	return nil
 }
 
@@ -180,7 +197,7 @@ func copyFile(src, dest string) (w int64, err error) {
 			if b, _ := pathExists(destSplitPath); b == false {
 				err := os.Mkdir(destSplitPath, os.ModePerm)
 				if err != nil {
-					fmt.Println(err)
+					return 0, err
 				}
 			}
 		}
