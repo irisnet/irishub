@@ -55,7 +55,7 @@ Only the validator and delegator can vote , and they can't vote twice for one pr
 
 There are three tallying results: `PASS`, `REJECT`, `REJECTVETO`.
 
-On the premise that the `voting_power of all voters` / `total voting_power of the system` exceeds `participation`,if the ratio of `NoWithVeto` voting power to all voters' voting power over `veto`, the result is `REJECTVETO`. Then if the ratio of `Yes` voting power to all voter's voting power over `threshold`, the result is `PASS`. Otherwise, the result is `REJECT`. 
+On the premise that the `voting_power of all voters` / `total voting_power of the system` exceeds `participation`,if the ratio of `NoWithVeto` voting power to all voters' voting power over `veto`, the result is `REJECTVETO`. Then if the ratio of `Yes` voting power to all voter's voting power over `threshold`, the result is `PASS`. Otherwise, the result is `REJECT`.
 
 ### Burning Mechanism
 
@@ -87,7 +87,7 @@ iriscli gov submit-proposal --title=<title> --description=<description> --type=P
 # Deposit for a proposal
 iriscli gov deposit --proposal-id=<proposal-id> --deposit=1000iris --from=<key-name> --chain-id=<chain-id> --fee=0.3iris --commit
 
-# Vote for a proposal 
+# Vote for a proposal
 iriscli gov vote --proposal-id=<proposal-id> --option=Yes --from=<key-name> --chain-id=<chain-id> --fee=0.3iris --commit
 
 # Query the state of a proposal

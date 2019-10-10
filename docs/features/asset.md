@@ -35,7 +35,7 @@ A gateway is a trusted party that facilitates moving value into and out of the I
 | CreateGatewayBaseFee   | Coin | 120000iris | Benchmark fees for creating Gateways                                        |
 | GatewayAssetFeeRatio   | Dec  | 0.1        | Rate of issuing gateway tokens (relative to the issue fee of native tokens) |
 
-Note: The parameters above are all consensus parameters.
+Note: The parameters above can all be governed.
 
 #### Fee of creating a gateway
 

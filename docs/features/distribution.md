@@ -13,17 +13,14 @@ This module is in charge of distributing collected transaction fee and inflated 
 
 ### Destination
 
-1. Validator Operators: Self delegation benefit and delegation commission
-2. Delegators: Delegation benefit
-3. Community Funding: Community tax
+1. Validator
+2. Delegator
+3. Community Tax
 4. Proposer Reward
 
-If one validator is the proposer of current round, that validator (and their delegators) receives between 1% and 5% of the sum of fee rewards and inflated token as proposer reward.
-It is calculated as:
-
-```bash
- proposerReward = (TxFee + InflatedToken) * (0.01 + 0.04 * sumPowerPrecommitValidators / totalBondedTokens)
-```
+:::tip
+[Calculation Formula](../concepts/general-concepts.md#staking-rewards-calculation-formula)
+:::
 
 ## Usage Scenario
 
@@ -69,7 +66,7 @@ There are 3 ways to withdraw rewards according to different scenarios
 
 There are 2 ways to query rewards according to different scenarios
 
-- Execute `rewards` command.
+- Execute `rewards` query command.
 
   ```bash
   iriscli distribution rewards <delegator-address>

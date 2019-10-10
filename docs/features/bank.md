@@ -4,10 +4,6 @@
 
 This module is mainly used to transfer coins between accounts, query account balances, and provide common offline transaction signing and broadcasting methods. In addition, the available units of tokens in the IRIShub system are defined using [coin-type](../concepts/coin-type.md).
 
-## Actions
-
-- [Query Coin Type](../cli-client/bank.md)
-
 ## Usage Scenario
 
 1. Query the coin-type configuration of a certain token:

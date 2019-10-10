@@ -93,7 +93,6 @@ irislcd start --node=tcp://localhost:26657 --chain-id=<chain-id> --laddr=tcp://0
 4. `POST /bank/accounts/{address}/send`: 发起转账交易
 5. `POST /bank/accounts/{address}/burn`: 销毁token
 
-
 ### Stake模块的APIs
 
 1. `POST /stake/delegators/{delegatorAddr}/delegations`: 发起委托交易
@@ -119,7 +118,7 @@ irislcd start --node=tcp://localhost:26657 --chain-id=<chain-id> --laddr=tcp://0
 
 1. `GET /slashing/validators/{validatorPubKey}/signing-info`: 获取验证人的签名记录
 2. `POST /slashing/validators/{validatorAddr}/unjail`: 解禁某个作恶的验证人节点
-   
+
 ### Distribution模块的APIs
 
 1. `POST /distribution/{delegatorAddr}/withdraw-address`: 设置收益取回地址

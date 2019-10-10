@@ -75,4 +75,6 @@ There are two command line interfaces and two LCD restful APIs which can query t
 
 3. `/stake/pool` and `/bank/token-stats`
 
-    Please refer to LCD swagger document. As for how to run a LCD node please refer to [LCD document](../light-client/intro.md).
+    Please refer to LCD swagger document.
+
+    As for how to run a LCD node please refer to [LCD document](../light-client/intro.md).

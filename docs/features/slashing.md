@@ -1,6 +1,6 @@
-# Slash
+# Slashing
 
-## Basic Function
+## Introduction
 
 Collect the validator's abnormal behavior and implement the corresponding slashing mechanism according to the type of abnormal behavior.
 
@@ -46,8 +46,7 @@ When executing a block, it receives evidence that a validator has voted for conf
 
 ## Proposer Censorship
 
-If the node is in the process of processing a new block, it detects if any transaction does not pass `txDecoder`, `validateTx`, `validateBasicTxMsgs`, the validator's bonded token will be slashed by `SlashFractionCensorship` percent, and the validator will be jailed. Until the jail time exceeds `CensorshipJailDuration`, 
-the validator can be unjailed by executing the `unjail` command after jailing period.
+If the node is in the process of processing a new block, it detects if any transaction does not pass `txDecoder`, `validateTx`, `validateBasicTxMsgs`, the validator's bonded token will be slashed by `SlashFractionCensorship` percent, and the validator will be jailed. Until the jail time exceeds `CensorshipJailDuration`, the validator can be unjailed by executing the `unjail` command after jailing period.
 
 * `txDecode` Deserialization of Tx
 * `validateTx` Size limit for Tx
@@ -57,13 +56,3 @@ the validator can be unjailed by executing the `unjail` command after jailing pe
 
 * `CensorshipJailDuration` default: 7Days
 * `SlashFractionCensorship` default: 0.02
-
-## slash command
-
-### unjail
-
-If the validator was jailed and the jailing period passed, release the validator by `unjail` command.
-
-```bash
-iriscli stake unjail --from=<key name> --fee=0.3iris --chain-id=<chain-id>
-```

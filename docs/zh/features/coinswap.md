@@ -1,4 +1,4 @@
-# 链内资产交换模块用户指南
+# Coinswap 去中心化交易
 
 ## 简介
 
@@ -21,7 +21,6 @@
 ### 做市公式
 
 采用恒定乘积作为做市公式：$x \ast y=k$  `x`代表x代币的数量，`y`代表y代币的数量。在兑换过程中，k值保持不变，只有做市商增加/减少流动性时，该值才会变化。
-
 
 ## 操作
 
@@ -59,4 +58,4 @@
 
 ## 附加说明
 
-本模块没有提供command入口，只提供了相关的REST接口，可以通过该API发起以上交易，这里我们提供了一个[coinswap前端界面](https://github.com/zhiqiang-bianjie/coinswap)，具体使用方法见说明。
+本模块没有提供command入口，只提供了相关的REST接口，可以通过该API发起以上交易，这里我们提供了一个[Coinswap交易所](https://github.com/zhiqiang-bianjie/coinswap)示例，具体使用方法见说明。
