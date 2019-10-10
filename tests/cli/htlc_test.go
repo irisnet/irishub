@@ -38,15 +38,15 @@ func TestIrisCLIHTLC(t *testing.T) {
 	secretHex := "5f5f5f6162636465666768696a6b6c6d6e6f707172737475767778797a5f5f5f"
 	amount := "10000000000000000000iris-atto"
 	amountIris := "10000000000000000000iris-atto"
-	timeLock := uint64(100)
+	timeLock := uint64(50)
 	timestamp := uint64(1580000000)
-	initSecret := make([]byte, 32)
+	initSecret := []byte(nil)
 	stateOpen := "open"
 	stateCompleted := "completed"
 	stateExpired := "expired"
 	stateRefunded := "refunded"
 
-	// create a htlc
+	// create an htlc
 	spStr := fmt.Sprintf("iriscli htlc create %v", flags)
 	spStr += fmt.Sprintf(" --from=%s", "foo")
 	spStr += fmt.Sprintf(" --receiver=%s", barAddr)
@@ -74,7 +74,7 @@ func TestIrisCLIHTLC(t *testing.T) {
 	htlcCoin := convertToIrisBaseAccount(t, htlcAcc)
 	require.Equal(t, "10iris", htlcCoin)
 
-	// claim a htlc
+	// claim an htlc
 	spStr = fmt.Sprintf("iriscli htlc claim %v", flags)
 	spStr += fmt.Sprintf(" --from=%s", "foo")
 	spStr += fmt.Sprintf(" --hash-lock=%s", hashLock)
@@ -99,7 +99,7 @@ func TestIrisCLIHTLC(t *testing.T) {
 	timestamp = uint64(0)
 	timeLock = uint64(50)
 
-	// create a htlc
+	// create an htlc
 	spStr = fmt.Sprintf("iriscli htlc create %v", flags)
 	spStr += fmt.Sprintf(" --from=%s", "foo")
 	spStr += fmt.Sprintf(" --receiver=%s", barAddr)
@@ -127,7 +127,7 @@ func TestIrisCLIHTLC(t *testing.T) {
 	htlcCoin = convertToIrisBaseAccount(t, htlcAcc)
 	require.Equal(t, "10iris", htlcCoin)
 
-	// refund a htlc and expect failure
+	// refund an htlc and expect failure
 	spStr = fmt.Sprintf("iriscli htlc refund %v", flags)
 	spStr += fmt.Sprintf(" --from=%s", "foo")
 	spStr += fmt.Sprintf(" --hash-lock=%s", hashLock)
@@ -139,7 +139,7 @@ func TestIrisCLIHTLC(t *testing.T) {
 	htlc = executeGetHtlc(t, fmt.Sprintf("iriscli htlc query-htlc %s --output=json %v", strings.ToLower(strings.TrimSpace(hashLock)), flags))
 	require.Equal(t, stateOpen, htlc.State.String())
 
-	// refund a htlc and expect success
+	// refund an htlc and expect success
 	tests.WaitForNextNBlocksTM(int64(timeLock), port)
 
 	htlc = executeGetHtlc(t, fmt.Sprintf("iriscli htlc query-htlc %s --output=json %v", strings.ToLower(strings.TrimSpace(hashLock)), flags))
