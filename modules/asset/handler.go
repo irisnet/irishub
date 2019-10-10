@@ -61,14 +61,12 @@ func handleIssueToken(ctx sdk.Context, k Keeper, msg MsgIssueToken) sdk.Result {
 		break
 	}
 
-	tags, err := k.IssueToken(ctx, token)
+	err := k.IssueToken(ctx, token)
 	if err != nil {
 		return err.Result()
 	}
 
-	return sdk.Result{
-		Tags: tags,
-	}
+	return sdk.Result{Events: ctx.EventManager().Events()}
 }
 
 // handleMsgCreateGateway handles MsgCreateGateway
@@ -81,14 +79,12 @@ func handleMsgCreateGateway(ctx sdk.Context, k Keeper, msg MsgCreateGateway) sdk
 	// convert moniker to lowercase
 	msg.Moniker = strings.ToLower(msg.Moniker)
 
-	tags, err := k.CreateGateway(ctx, msg)
+	err := k.CreateGateway(ctx, msg)
 	if err != nil {
 		return err.Result()
 	}
 
-	return sdk.Result{
-		Tags: tags,
-	}
+	return sdk.Result{Events: ctx.EventManager().Events()}
 }
 
 // handleMsgEditGateway handles MsgEditGateway
@@ -96,25 +92,22 @@ func handleMsgEditGateway(ctx sdk.Context, k Keeper, msg MsgEditGateway) sdk.Res
 	// convert moniker to lowercase
 	msg.Moniker = strings.ToLower(msg.Moniker)
 
-	tags, err := k.EditGateway(ctx, msg)
+	err := k.EditGateway(ctx, msg)
 	if err != nil {
 		return err.Result()
 	}
 
-	return sdk.Result{
-		Tags: tags,
-	}
+	return sdk.Result{Events: ctx.EventManager().Events()}
 }
 
 // handleMsgEditToken handles MsgEditToken
 func handleMsgEditToken(ctx sdk.Context, k Keeper, msg MsgEditToken) sdk.Result {
-	tags, err := k.EditToken(ctx, msg)
+	err := k.EditToken(ctx, msg)
 	if err != nil {
 		return err.Result()
 	}
-	return sdk.Result{
-		Tags: tags,
-	}
+
+	return sdk.Result{Events: ctx.EventManager().Events()}
 }
 
 // handleMsgTransferGatewayOwner handles MsgTransferGatewayOwner
@@ -122,36 +115,30 @@ func handleMsgTransferGatewayOwner(ctx sdk.Context, k Keeper, msg MsgTransferGat
 	// convert moniker to lowercase
 	msg.Moniker = strings.ToLower(msg.Moniker)
 
-	tags, err := k.TransferGatewayOwner(ctx, msg)
+	err := k.TransferGatewayOwner(ctx, msg)
 	if err != nil {
 		return err.Result()
 	}
 
-	return sdk.Result{
-		Tags: tags,
-	}
+	return sdk.Result{Events: ctx.EventManager().Events()}
 }
 
 // handleMsgTransferTokenOwner handles MsgTransferTokenOwner
 func handleMsgTransferTokenOwner(ctx sdk.Context, k Keeper, msg MsgTransferTokenOwner) sdk.Result {
-	tags, err := k.TransferTokenOwner(ctx, msg)
+	err := k.TransferTokenOwner(ctx, msg)
 	if err != nil {
 		return err.Result()
 	}
 
-	return sdk.Result{
-		Tags: tags,
-	}
+	return sdk.Result{Events: ctx.EventManager().Events()}
 }
 
 // handleMsgMintToken handles MsgMintToken
 func handleMsgMintToken(ctx sdk.Context, k Keeper, msg MsgMintToken) sdk.Result {
-	tags, err := k.MintToken(ctx, msg)
+	err := k.MintToken(ctx, msg)
 	if err != nil {
 		return err.Result()
 	}
 
-	return sdk.Result{
-		Tags: tags,
-	}
+	return sdk.Result{Events: ctx.EventManager().Events()}
 }
