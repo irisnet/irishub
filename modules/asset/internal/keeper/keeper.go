@@ -70,7 +70,9 @@ func (k Keeper) IssueToken(ctx sdk.Context, token types.FungibleToken) sdk.Error
 		sdk.NewEvent(
 			types.EventTypeIssueToken,
 			sdk.NewAttribute(types.AttributeKeyTokenId, token.GetUniqueID()),
-			sdk.NewAttribute(types.TagDenom, token.GetDenom()),
+			sdk.NewAttribute(types.AttributeKeyDenom, token.GetDenom()),
+			sdk.NewAttribute(types.AttributeKeySource, token.GetSource()),
+			sdk.NewAttribute(types.AttributeKeyGateway, token.GetGateway()),
 			sdk.NewAttribute(types.AttributeKeyOwner, token.GetOwner().String()),
 		),
 	})
@@ -195,6 +197,14 @@ func (k Keeper) CreateGateway(ctx sdk.Context, msg types.MsgCreateGateway) sdk.E
 	k.SetGateway(ctx, gateway)
 	k.SetOwnerGateway(ctx, msg.Owner, msg.Moniker)
 
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			types.EventTypeCreateGateway,
+			sdk.NewAttribute(types.AttributeKeyMoniker, gateway.Moniker),
+			sdk.NewAttribute(types.AttributeKeyOwner, gateway.Owner.String()),
+		),
+	})
+
 	return nil
 }
 
@@ -224,6 +234,14 @@ func (k Keeper) EditGateway(ctx sdk.Context, msg types.MsgEditGateway) sdk.Error
 
 	// set the new gateway
 	k.SetGateway(ctx, gateway)
+
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			types.EventTypeEditGateway,
+			sdk.NewAttribute(types.AttributeKeyMoniker, gateway.Moniker),
+			sdk.NewAttribute(types.AttributeKeyOwner, gateway.Owner.String()),
+		),
+	})
 
 	return nil
 }
@@ -276,6 +294,14 @@ func (k Keeper) EditToken(ctx sdk.Context, msg types.MsgEditToken) sdk.Error {
 		return err
 	}
 
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			types.EventTypeEditToken,
+			sdk.NewAttribute(types.AttributeKeyTokenId, token.GetUniqueID()),
+			sdk.NewAttribute(types.AttributeKeyOwner, token.GetOwner().String()),
+		),
+	})
+
 	return nil
 }
 
@@ -298,6 +324,15 @@ func (k Keeper) TransferGatewayOwner(ctx sdk.Context, msg types.MsgTransferGatew
 	// update the gateway and related keys
 	k.SetGateway(ctx, gateway)
 	k.UpdateOwnerGateway(ctx, gateway.Moniker, msg.Owner, msg.To)
+
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			types.EventTypeTransferGatewayOwner,
+			sdk.NewAttribute(types.AttributeKeyMoniker, gateway.Moniker),
+			sdk.NewAttribute(types.AttributeKeyPreOwner, msg.Owner.String()),
+			sdk.NewAttribute(types.AttributeKeyNewOwner, gateway.Owner.String()),
+		),
+	})
 
 	return nil
 }
@@ -439,6 +474,15 @@ func (k Keeper) TransferTokenOwner(ctx sdk.Context, msg types.MsgTransferTokenOw
 		return err
 	}
 
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			types.EventTypeTransferTokenOwner,
+			sdk.NewAttribute(types.AttributeKeyTokenId, token.GetUniqueID()),
+			sdk.NewAttribute(types.AttributeKeyPreOwner, msg.SrcOwner.String()),
+			sdk.NewAttribute(types.AttributeKeyNewOwner, token.GetOwner().String()),
+		),
+	})
+
 	return nil
 }
 
@@ -527,6 +571,7 @@ func (k Keeper) MintToken(ctx sdk.Context, msg types.MsgMintToken) sdk.Error {
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
