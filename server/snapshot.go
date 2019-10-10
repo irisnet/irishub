@@ -1,11 +1,14 @@
 package server
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/tendermint/tendermint/consensus"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -59,7 +62,10 @@ func loadDb(name, path string) *dbm.GoLevelDB {
 
 func dumpData(home, targetDir string) error {
 	//save last block and flush disk
-	snapshotBlock(home, targetDir)
+	lastHeight := snapshotBlock(home, targetDir)
+	if err := snapshotCsWAL(home, targetDir, lastHeight); err != nil {
+		return err
+	}
 
 	//copy application
 	appDir := filepath.Join(home, "application.db")
@@ -100,6 +106,42 @@ func snapshotBlock(home, targetDir string) int64 {
 	partSet := block.MakePartSet(types.BlockPartSizeBytes)
 	targetStore.SaveBlock(block, partSet, seenCommit)
 	return height
+}
+
+func snapshotCsWAL(home, targetDir string, height int64) error {
+	walTargetDir := filepath.Join(targetDir, "cs.wal", "wal")
+	targetWAL, err := consensus.NewWAL(walTargetDir)
+
+	walSourceDir := filepath.Join(home, "cs.wal", "wal")
+	sourceWAL, err := consensus.NewWAL(walSourceDir)
+	if err != nil {
+		return errors.New("failed to open WAL for consensus state")
+	}
+
+	gr, found, err := sourceWAL.SearchForEndHeight(height, &consensus.WALSearchOptions{IgnoreDataCorruptionErrors: true})
+	if err != nil {
+		return err
+	}
+	if !found {
+		return fmt.Errorf("cannot replay height %d. WAL does not contain #ENDHEIGHT for %d", height, height-1)
+	}
+	defer gr.Close() // nolint: errcheck
+
+	var msg *consensus.TimedWALMessage
+	dec := consensus.NewWALDecoder(gr)
+	for {
+		msg, err = dec.Decode()
+		if err == io.EOF {
+			break
+		} else if consensus.IsDataCorruptionError(err) {
+			return fmt.Errorf("data has been corrupted in last height %d of consensus WAL", height)
+		} else if err != nil {
+			return err
+		}
+		targetWAL.Write(msg.Msg)
+	}
+	targetWAL.WriteSync(consensus.EndHeightMessage{height})
+	return nil
 }
 
 func copyDir(srcPath string, destPath string) error {
