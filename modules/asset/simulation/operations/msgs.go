@@ -112,11 +112,7 @@ func SimulateMsgIssueToken(k asset.Keeper) simulation.Operation {
 		minUnitAlias := simulation.RandStringOfLength(r, 3)
 		initialSupply := r.Uint64()
 		maxSupply := initialSupply + uint64(simulation.RandIntBetween(r, 0, 1000))
-
-		var mintable bool
-		if simulation.RandIntBetween(r, 0, 1) == 1 {
-			mintable = true
-		}
+		mintable, _ := asset.ParseBool(fmt.Sprintf("%d", simulation.RandIntBetween(r, 0, 1)))
 
 		msg := asset.NewMsgIssueToken(family, source, gateway, symbol, canonicalSymbol, name, decimal, minUnitAlias, initialSupply, maxSupply, mintable, owner.Address)
 
@@ -175,11 +171,7 @@ func SimulateMsgEditToken(k asset.Keeper) simulation.Operation {
 		minUnitAlias := simulation.RandStringOfLength(r, 3)
 		tokenId := simulation.RandStringOfLength(r, 5)
 		maxSupply := r.Uint64()
-
-		var mintable bool
-		if simulation.RandIntBetween(r, 0, 1) == 1 {
-			mintable = true
-		}
+		mintable, _ := asset.ParseBool(fmt.Sprintf("%d", simulation.RandIntBetween(r, 0, 1)))
 
 		msg := asset.NewMsgEditToken(name, canonicalSymbol, minUnitAlias, tokenId, maxSupply, mintable, owner.Address)
 
