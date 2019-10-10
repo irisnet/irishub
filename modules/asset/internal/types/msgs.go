@@ -8,15 +8,21 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
+// nolint
 const (
-	// MsgRoute identifies transaction types
-	MsgRoute          = "asset"
-	MsgTypeIssueToken = "issue_token"
+	MsgTypeIssueToken           = "issue_token"
+	MsgTypeEditToken            = "edit_token"
+	MsgTypeMintToken            = "mint_token"
+	MsgTypeTransferTokenOwner   = "transfer_token_owner"
+	MsgTypeCreateGateway        = "create_gateway"
+	MsgTypeEditGateway          = "edit_gateway"
+	MsgTypeTransferGatewayOwner = "transfer_gateway_owner"
 
 	// constant used to indicate that some field should not be updated
 	DoNotModify = "[do-not-modify]"
 )
 
+// nolint
 var (
 	MaximumAssetMaxSupply        = uint64(1000000000000) // maximal limitation for asset max supply，1000 billion
 	MaximumAssetInitSupply       = uint64(100000000000)  // maximal limitation for asset initial supply，100 billion
@@ -75,7 +81,7 @@ func NewMsgIssueToken(family AssetFamily, source AssetSource, gateway string, sy
 }
 
 // Implements Msg.
-func (msg MsgIssueToken) Route() string { return MsgRoute }
+func (msg MsgIssueToken) Route() string { return RouterKey }
 func (msg MsgIssueToken) Type() string  { return MsgTypeIssueToken }
 
 func ValidateMsgIssueToken(msg *MsgIssueToken) sdk.Error {
@@ -195,10 +201,10 @@ func NewMsgCreateGateway(owner sdk.AccAddress, moniker, identity, details, websi
 }
 
 // Route implements Msg
-func (msg MsgCreateGateway) Route() string { return MsgRoute }
+func (msg MsgCreateGateway) Route() string { return RouterKey }
 
 // Type implements Msg
-func (msg MsgCreateGateway) Type() string { return "create_gateway" }
+func (msg MsgCreateGateway) Type() string { return MsgTypeCreateGateway }
 
 // ValidateBasic implements Msg
 func (msg MsgCreateGateway) ValidateBasic() sdk.Error {
@@ -266,10 +272,10 @@ func NewMsgEditGateway(owner sdk.AccAddress, moniker, identity, details, website
 }
 
 // Route implements Msg
-func (msg MsgEditGateway) Route() string { return MsgRoute }
+func (msg MsgEditGateway) Route() string { return RouterKey }
 
 // Type implements Msg
-func (msg MsgEditGateway) Type() string { return "edit_gateway" }
+func (msg MsgEditGateway) Type() string { return MsgTypeEditGateway }
 
 // ValidateBasic implements Msg
 func (msg MsgEditGateway) ValidateBasic() sdk.Error {
@@ -404,10 +410,10 @@ func (msg MsgTransferTokenOwner) ValidateBasic() sdk.Error {
 }
 
 // Route implements Msg
-func (msg MsgTransferTokenOwner) Route() string { return MsgRoute }
+func (msg MsgTransferTokenOwner) Route() string { return RouterKey }
 
 // Type implements Msg
-func (msg MsgTransferTokenOwner) Type() string { return "transfer_token_owner" }
+func (msg MsgTransferTokenOwner) Type() string { return MsgTypeTransferTokenOwner }
 
 // NewMsgTransferGatewayOwner creates a MsgTransferGatewayOwner
 func NewMsgTransferGatewayOwner(owner sdk.AccAddress, moniker string, to sdk.AccAddress) MsgTransferGatewayOwner {
@@ -419,10 +425,10 @@ func NewMsgTransferGatewayOwner(owner sdk.AccAddress, moniker string, to sdk.Acc
 }
 
 // Route implements Msg
-func (msg MsgTransferGatewayOwner) Route() string { return MsgRoute }
+func (msg MsgTransferGatewayOwner) Route() string { return RouterKey }
 
 // Type implements Msg
-func (msg MsgTransferGatewayOwner) Type() string { return "transfer_gateway_owner" }
+func (msg MsgTransferGatewayOwner) Type() string { return MsgTypeTransferGatewayOwner }
 
 // ValidateBasic implements Msg
 func (msg MsgTransferGatewayOwner) ValidateBasic() sdk.Error {
@@ -500,10 +506,10 @@ func NewMsgEditToken(name, canonicalSymbol, minUnitAlias, tokenId string, maxSup
 }
 
 // Route implements Msg
-func (msg MsgEditToken) Route() string { return MsgRoute }
+func (msg MsgEditToken) Route() string { return RouterKey }
 
 // Type implements Msg
-func (msg MsgEditToken) Type() string { return "edit_token" }
+func (msg MsgEditToken) Type() string { return MsgTypeEditToken }
 
 // ValidateBasic implements Msg
 func (msg MsgEditToken) ValidateBasic() sdk.Error {
@@ -577,10 +583,10 @@ func NewMsgMintToken(tokenId string, owner, to sdk.AccAddress, amount uint64) Ms
 }
 
 // Route implements Msg
-func (msg MsgMintToken) Route() string { return MsgRoute }
+func (msg MsgMintToken) Route() string { return RouterKey }
 
 // Type implements Msg
-func (msg MsgMintToken) Type() string { return "mint_token" }
+func (msg MsgMintToken) Type() string { return MsgTypeMintToken }
 
 // GetSignBytes implements Msg
 func (msg MsgMintToken) GetSignBytes() []byte {
