@@ -16,16 +16,17 @@ Refer to [Join The Mainnet](../get-started/mainnet.md)
 
 It is also recommended to test your validator setup on the [Testnet](../get-started/testnet.md) before launch
 
-**Advices**
+:::tip
 To earn more delegation for your validator, you are advised to:
 
 - Undergo a security audit
 - Open-source some dev tools and workflow
 - Setup your own website to build your own image
+:::
 
 ### What are hardware requirements
 
-The minimum hardware requirements are mentioned here [TODO](#TODO)
+The minimum hardware requirements are mentioned here: [Hardware Requeirment](../daemon/intro.md#hardware-requeirment)
 
 ### What are the different states a validator can be in
 
@@ -84,7 +85,7 @@ Or you can use a hardware to manage your [Tendermint Key](#tendermint-key) much 
 
 There are many ways to migrate your validator, the most recommended way is:
 
-1. [Run a Full Node](../get-started.md#run-a-full-node) on the new server
+1. [Run a Full Node](../get-started/mainnet.md#run-a-full-node) on the new server
 
 2. After you have caught-up, stop the Validator Node and the Full Node
 
@@ -243,7 +244,7 @@ then you can do these:
 
 #### What if I lost my Tendermint Key
 
-That means you have **Lost Your Validator Forever!** You can only create a new one and [redelegate](../cli-client/stake.md#iriscli-stake-redelegate.md) all of your shares to the new Validator.
+That means you have **Lost Your Validator Forever!** You can only create a new one and [redelegate](../cli-client/stake.md#iriscli-stake-redelegate) all of your shares to the new Validator.
 
 ## Community Channels
 

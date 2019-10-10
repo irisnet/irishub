@@ -6,16 +6,12 @@ order: 2
 
 ## 最新版本
 
-IRIShub的最新版本是[v0.15.2](https://github.com/irisnet/irishub/releases/latest)
-
-:::tip
-请使用v0.15.2替换下面的<latest_iris_version>
-:::
+IRIShub 主网的最新版本是[v0.15.2](https://github.com/irisnet/irishub/releases/latest)
 
 ## 安装`go`
 
 :::tip
-IRIShub需要** Go 1.12.5 + **。
+编译安装 IRIShub 软件依赖 **Go 1.12.5 +**。
 :::
 
 按照[官方文档](https://golang.org/doc/install)安装`go`。
@@ -43,7 +39,7 @@ go version
 请确保您的服务器可以访问 google.com，因为我们的项目依赖于google提供的某些库（如果您无法访问google.com，也可以尝试添加代理：`export GOPROXY=https://goproxy.io`）
 
 ```bash
-git clone --branch <latest_iris_version> https://github.com/irisnet/irishub
+git clone --branch v0.15.2 https://github.com/irisnet/irishub
 cd irishub
 # source scripts/setTestEnv.sh # to build or install the testnet version
 make get_tools install
@@ -52,8 +48,6 @@ make get_tools install
 如果环境变量配置无误，则通过运行以上命令即可完成`iris`的安装。现在检查您的`iris`版本是否正确：
 
 ```bash
-$ iris version
-<latest_iris_version>
-$ iriscli version
-<latest_iris_version>
+iris version
+iriscli version
 ```

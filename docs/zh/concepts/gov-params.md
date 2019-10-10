@@ -47,9 +47,9 @@
 | `slashing/MaxEvidenceAge`          | 可接受的最早的作恶证据时间 | [1day, +∞)    | 51840   |
 | `slashing/MinSignedPerWindow`      | slash窗口中最小投票比例    | [0.5, 0.9]    | 0.7     |
 | `slashing/SignedBlocksWindow`      | slash统计窗口区块数        | [100, 140000] | 34560   |
-| `slashing/SlashFractionCensorship` | Censorship后slash的比例    | [0.005, 0.1]  | 0       |
-| `slashing/SlashFractionDoubleSign` | DoubleSign后slash的比例    | [0.01, 0.1]   | 0.01    |
-| `slashing/SlashFractionDowntime`   | Downtime后slash的比例      | [0.005, 0.1]  | 0.0003  |
+| `slashing/SlashFractionCensorship` | Censorship后罚款的比例     | [0.005, 0.1]  | 0       |
+| `slashing/SlashFractionDoubleSign` | DoubleSign后罚款的比例     | [0.01, 0.1]   | 0.01    |
+| `slashing/SlashFractionDowntime`   | Downtime后罚款的比例       | [0.005, 0.1]  | 0.0003  |
 
 详见 [Slashing](../features/slashing.md)
 

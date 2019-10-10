@@ -6,16 +6,12 @@ order: 2
 
 ## Latest Version
 
-The Latest version of IRIShub is [v0.15.2](https://github.com/irisnet/irishub/releases/latest)
-
-::: tip
-Please replace <latest_iris_version> below with v0.15.2
-:::
+The Latest IRIShub version for Mainnet is [v0.15.2](https://github.com/irisnet/irishub/releases/latest)
 
 ## Install `go`
 
 ::: tip
-**Go 1.12.5+** is required for the IRIShub.
+**Go 1.12.5+** is required for building and installing the IRIShub software.
 :::
 
 Install `go` by following the [official docs](https://golang.org/doc/install).
@@ -43,7 +39,7 @@ After setting up `go` correctly, you should be able to compile and run `iris`.
 Make sure that your server can access to google.com because our project depends on some libraries provided by google. (If you are not able to access google.com, you can also try to add a proxy: `export GOPROXY=https://goproxy.io`)
 
 ```bash
-git clone --branch <latest_iris_version> https://github.com/irisnet/irishub
+git clone --branch v0.15.2 https://github.com/irisnet/irishub
 cd irishub
 # source scripts/setTestEnv.sh # to build or install the testnet version
 make get_tools install
@@ -54,8 +50,5 @@ Now check your `iris` version.
 
 ```bash
 iris version
-<latest_iris_version>
-
 iriscli version
-<latest_iris_version>
 ```
