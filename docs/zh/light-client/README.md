@@ -10,41 +10,43 @@
 
 IRISLCD有两个子命令:
 
-| 子命令      | 功能                 | 示例命令 |
-| --------------- | --------------------------- | --------------- |
-| version         | 打印版本信息   | `irislcd version` |
-| start           | 启动一个IRISLCD节点  | `irislcd start --node=tcp://localhost:26657 --laddr=tcp://0.0.0.0:1317 --chain-id=<chain-id> --home=$HOME/.iriscli/ --trust-node` |
+| 子命令  | 功能                | 示例命令                                                     |
+| ------- | ------------------- | ------------------------------------------------------------ |
+| version | 打印版本信息        | `irislcd version`                                            |
+| start   | 启动一个IRISLCD节点 | `irislcd start --node=tcp://localhost:26657 --laddr=tcp://0.0.0.0:1317 --chain-id=<chain-id> --home=$HOME/.iriscli/ --trust-node` |
 
 `start`子命令有如下参数可配置
 
-| 参数名称        | 类型      | 默认值                 | 是否必填 | 功能描述                                          |
-| --------------- | --------- | ----------------------- | -------- | ---------------------------------------------------- |
-| chain-id        | string    | null                    | true     | Tendermint节点的chain ID |
-| home            | string    | "$HOME/.irislcd"        | false    | 配置home目录，key和proof相关的信息都存于此 |
-| node            | string    | "tcp://localhost:26657" | false    | 全节点的rpc地址 |
-| laddr           | string    | "tcp://localhost:1317"  | false    | 侦听的地址和端口 |
-| trust-node      | bool      | false                   | false    | 是否信任全节点 |
-| max-open        | int       | 1000                    | false    | 最大连接数 |
-| cors            | string    | ""                      | false    | 允许跨域访问的地址 |
+| 参数名称   | 类型   | 默认值                  | 是否必填 | 功能描述                                   |
+| ---------- | ------ | ----------------------- | -------- | ------------------------------------------ |
+| chain-id   | string | null                    | true     | Tendermint节点的chain ID                   |
+| home       | string | "$HOME/.irislcd"        | false    | 配置home目录，key和proof相关的信息都存于此 |
+| node       | string | "tcp://localhost:26657" | false    | 全节点的rpc地址                            |
+| laddr      | string | "tcp://localhost:1317"  | false    | 侦听的地址和端口                           |
+| trust-node | bool   | false                   | false    | 是否信任全节点                             |
+| max-open   | int    | 1000                    | false    | 最大连接数                                 |
+| cors       | string | ""                      | false    | 允许跨域访问的地址                         |
 
 ## 示例命令
 
 1. 默认情况下，IRISLCD不信任连接全节点。但是如果您确定连接的全节点是可信的，那么您应该在启动IRISLCD时加上`--trust-node`：
-```bash
-irislcd start --chain-id=<chain-id> --trust-node
-```
+
+    ```bash
+    irislcd start --chain-id=<chain-id> --trust-node
+    ```
 
 2. 如果需要在其他机器上访问此IRISLCD节点，还需要配置`--laddr`参数，例如：
-```bash
-irislcd start --chain-id=<chain-id> --laddr=tcp://0.0.0.0:1317
-```
+
+    ```bash
+    irislcd start --chain-id=<chain-id> --laddr=tcp://0.0.0.0:1317
+    ```
 
 ## REST APIs
 
 IRISLCD启动以后，您可以在浏览器中访问`localhost:1317/swagger-ui/`，然后你将看到所有的REST APIs。`swagger-ui`页面有关于API功能和所需参数的详细描述。在这里，我们只列出所有API并简要介绍它们的功能。
 
 1. Tendermint相关APIs, 例如查询区块，交易和验证人集
-   
+
     1. `GET /node-info`: 查询所连接全节点的信息
     2. `GET /syncing`: 查询所连接全节点是否处于追赶区块的状态
     3. `GET /blocks/latest`: 获取最新区块
@@ -56,11 +58,11 @@ IRISLCD启动以后，您可以在浏览器中访问`localhost:1317/swagger-ui/`
     9. `GET /txs/{hash}`: 通过交易hash查询交易
     10. `GET /txs`: 搜索交易
 
-2. 广播交易的API
-   
+1. 广播交易的API
+
     1. `POST /tx/broadcast`: 广播一个amino或者json编码的交易
-    
-3. Bank模块的APIs
+
+1. Bank模块的APIs
 
     1. `GET /bank/coins/{coin-type}`: 查询coin的类型信息
     2. `GET /bank/token-stats/{id}`: 查询token统计信息
@@ -68,7 +70,7 @@ IRISLCD启动以后，您可以在浏览器中访问`localhost:1317/swagger-ui/`
     4. `POST /bank/accounts/{address}/send`: 发起转账交易
     5. `POST /bank/accounts/{address}/burn`: 销毁token
 
-4. Stake模块的APIs
+1. Stake模块的APIs
 
     1. `POST /stake/delegators/{delegatorAddr}/delegations`: 发起委托交易
     2. `POST /stake/delegators/{delegatorAddr}/redelegations`: 发起转委托交易
@@ -89,12 +91,12 @@ IRISLCD启动以后，您可以在浏览器中访问`localhost:1317/swagger-ui/`
     17. `GET /stake/pool`: 获取权益池信息
     18. `GET /stake/parameters`: 获取权益证明的参数
 
-5. Slashing模块的APIs
+1. Slashing模块的APIs
 
     1. `GET /slashing/validators/{validatorPubKey}/signing-info`: 获取验证人的签名记录
     2. `POST /slashing/validators/{validatorAddr}/unjail`: 赦免某个作恶的验证人节点
 
-6. Distribution模块的APIs
+1. Distribution模块的APIs
 
     1. `POST /distribution/{delegatorAddr}/withdraw-address`: 设置收益取回地址
     2. `GET /distribution/{delegatorAddr}/withdraw-address`: 查询收益取回地址
@@ -102,8 +104,20 @@ IRISLCD启动以后，您可以在浏览器中访问`localhost:1317/swagger-ui/`
     4. `GET /distribution/{address}/rewards`: 查询收益
     5. `GET /distribution/community-tax`: 查询社区税金
 
-7. Asset模块的APIs
-   
+1. Governance模块的APIs
+
+    1. `POST /gov/proposals`: 发起提交提议交易
+    2. `GET /gov/proposals`: 查询提议
+    3. `POST /gov/proposals/{proposalId}/deposits`: 发起缴纳押金的交易
+    4. `GET /gov/proposals/{proposalId}/deposits`: 查询缴纳的押金
+    5. `POST /gov/proposals/{proposalId}/votes`: 发起投票交易
+    6. `GET /gov/proposals/{proposalId}/votes`: 查询投票
+    7. `GET /gov/proposals/{proposalId}`: 查询某个提议
+    8. `GET /gov/proposals/{proposalId}/deposits/{depositor}`:查询押金
+    9. `GET /gov/proposals/{proposalId}/votes/{voter}`: 查询投票
+
+1. Asset模块的APIs
+
     1. `GET /asset/gateways/{moniker}`: 查询指定名字所对应的网关信息
     2. `GET /asset/gateways`: 查询所有网关信息，提供一个可选的owner参数
     3. `GET /asset/fees/gateways/{moniker}`: 查询指定网关的创建费用
@@ -113,13 +127,22 @@ IRISLCD启动以后，您可以在浏览器中访问`localhost:1317/swagger-ui/`
     7. `POST /asset/gateways/{moniker}/transfer`: 转让指定网关的所有权
     8. `PUT /asset/tokens/{token-id}`: 编辑一个已经存在的资产
 
-8. Rand模块的APIs
-   
-    1. `POST /rand/rands`: 请求一个随机数
-    2. `GET /rand/rands/{request-id}`: 查询指定请求ID对应的随机数
-    3. `GET /rand/queue`: 查询请求队列，提供一个可选的高度参数
+1. Coinswap模块的APIs
 
-9. Service模块的APIs
+    1. `POST /coinswap/liquidities/{id}/deposit`: 增加流动性
+    2. `POST /coinswap/liquidities/{id}/withdraw`: 提现流动性
+    3. `POST /coinswap/liquidities/buy`: 兑换代币(购买)
+    4. `POST /coinswap/liquidities/sell`: 兑换代币(出售)
+    5. `GET /coinswap/liquidities/{id}`: 查询流动性池
+
+1. HTLC模块的APIs
+
+    1. `POST /htlc/htlcs`: create an HTLC
+    2. `GET /htlc/htlcs/{hash-lock}`: query HTLC by hash-lock
+    3. `POST /htlc/htlcs/{hash-lock}/claim`: claim an opened HTLC
+    4. `POST /htlc/htlcs/{hash-lock}/refund`: refund from an expired HTLC
+
+1. Service模块的APIs
 
     1. `POST /service/definitions`: 添加服务定义
     2. `GET /service/definitions/{defChainId}/{serviceName}`: 查询服务定义
@@ -138,23 +161,17 @@ IRISLCD启动以后，您可以在浏览器中访问`localhost:1317/swagger-ui/`
     15. `POST /service/fees/{address}/refund`: 消费者取回（未被响应的）服务费用
     16. `POST /service/fees/{address}/withdraw`: 服务提供者取回服务收益
 
-10. Params模块的APIs
-    
+1. Rand模块的APIs
+
+    1. `POST /rand/rands`: 请求一个随机数
+    2. `GET /rand/rands/{request-id}`: 查询指定请求ID对应的随机数
+    3. `GET /rand/queue`: 查询请求队列，提供一个可选的高度参数
+
+1. Params模块的APIs
+
     1. `GET /params`: 查询系统预设的参数
 
-11. Governance模块的APIs
-
-    1. `POST /gov/proposals`: 发起提交提议交易
-    2. `GET /gov/proposals`: 查询提议
-    3. `POST /gov/proposals/{proposalId}/deposits`: 发起缴纳押金的交易
-    4. `GET /gov/proposals/{proposalId}/deposits`: 查询缴纳的押金
-    5. `POST /gov/proposals/{proposalId}/votes`: 发起投票交易
-    6. `GET /gov/proposals/{proposalId}/votes`: 查询投票
-    7. `GET /gov/proposals/{proposalId}`: 查询某个提议
-    8. `GET /gov/proposals/{proposalId}/deposits/{depositor}`:查询押金
-    9. `GET /gov/proposals/{proposalId}/votes/{voter}`: 查询投票
-
-12. 查询版本
+1. 查询版本
 
     1. `GET /version`: 获取IRISHUB的版本
     2. `GET /node-version`: 查询全节点版本
@@ -162,6 +179,7 @@ IRISLCD启动以后，您可以在浏览器中访问`localhost:1317/swagger-ui/`
 ## 特殊参数
 
 这些是从部分挑选出来的可用于构建和广播交易的APIs：
+
 1. `POST /bank/accounts/{address}/send`
 2. `POST /stake/delegators/{delegatorAddr}/delegations`
 3. `POST /stake/delegators/{delegatorAddr}/redelegations`
@@ -173,11 +191,12 @@ IRISLCD启动以后，您可以在浏览器中访问`localhost:1317/swagger-ui/`
 
 上述API中, `tx/broadcast`支持三个特殊的查询参数，如下表所示。默认情况下，它们的值都是false。每个参数都有其唯一的优先级(这里`0`是最高优先级)。如果多个参数的值都是`true`，则将忽略优先级较低的。例如，如果`simulate`为`true`，那么`commit`和`async`将被忽略。
 
-| 参数名字        | 类型 | 默认值 | 优先级 | 功能描述                 |
-| --------------- | ---- | ------- |--------- |--------------------------- |
-| simulate        | bool | false | 0 | 用仿真的方式去执行交易 |
-| commit          | bool | false | 1 | 等待交易被打包入块  |
-| async           | bool | false | 2 | 用异步地方式广播交易  |
+| 参数名称 | 类型 | 默认值 | 优先级 | 功能描述               |
+| -------- | ---- | ------ | ------ | ---------------------- |
+| simulate | bool | false  | 0      | 用仿真的方式去执行交易 |
+| commit   | bool | false  | 1      | 等待交易被打包入块     |
+| async    | bool | false  | 2      | 用异步地方式广播交易   |
 
 ## 更新日志
+
 请参阅 [CHANGELOG](CHANGELOG.md)

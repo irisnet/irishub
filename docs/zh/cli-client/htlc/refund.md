@@ -14,7 +14,7 @@ iriscli htlc refund --hash-lock=<hash-lock>
 
 | 命令，速记    | 类型     | 是否必须 | 默认值 | 描述                     |
 | ----------- | -------- | ------ | ----- | ----------------------- |
-| --hash-lock | bytesHex | 是     |       | 要退款的 HTLC 的 hashLock |
+| --hash-lock | bytesHex | 是     |       | 要退款的 HTLC 的 hash Lock |
 
 ## 示例
 

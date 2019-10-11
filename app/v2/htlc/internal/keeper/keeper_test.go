@@ -21,7 +21,7 @@ func TestKeeper_CreateHTLC(t *testing.T) {
 	timeLock := uint64(50)
 	expireHeight := timeLock + uint64(ctx.BlockHeight())
 	state := types.OPEN
-	initSecret := make([]byte, 32)
+	initSecret := make([]byte, 0)
 
 	_, err := keeper.GetHTLC(ctx, hashLock)
 	require.NotNil(t, err)
@@ -61,10 +61,13 @@ func TestKeeper_CreateHTLC(t *testing.T) {
 	require.Equal(t, accs[1].GetAddress(), htlc.Receiver)
 	require.Equal(t, receiverOnOtherChain, htlc.ReceiverOnOtherChain)
 	require.Equal(t, amount, htlc.Amount)
-	require.Equal(t, initSecret, htlc.Secret)
+	require.Equal(t, []byte(nil), htlc.Secret)
 	require.Equal(t, timestamp, htlc.Timestamp)
 	require.Equal(t, expireHeight, htlc.ExpireHeight)
 	require.Equal(t, state, htlc.State)
+
+	store := ctx.KVStore(keeper.storeKey)
+	require.True(t, store.Has(KeyHTLCExpireQueue(htlc.ExpireHeight, hashLock)))
 }
 
 func newHashLock(secret []byte, timestamp uint64) []byte {
@@ -88,7 +91,7 @@ func TestKeeper_ClaimHTLC(t *testing.T) {
 	timeLock := uint64(50)
 	expireHeight := timeLock + uint64(ctx.BlockHeight())
 	state := types.OPEN
-	initSecret := make([]byte, 32)
+	initSecret := make([]byte, 0)
 
 	testData := []struct {
 		expectPass           bool
@@ -142,6 +145,9 @@ func TestKeeper_ClaimHTLC(t *testing.T) {
 
 			htlc, _ = keeper.GetHTLC(ctx, td.hashLock)
 			require.Equal(t, types.COMPLETED, htlc.State, "TestData: %d", i)
+
+			store := ctx.KVStore(keeper.storeKey)
+			require.True(t, !store.Has(KeyHTLCExpireQueue(htlc.ExpireHeight, td.hashLock)))
 
 			claimedHTLCAmount := ak.GetAccount(ctx, htlcAddr).GetCoins().AmountOf(amount.Denom)
 			claimedReceiverAmount := ak.GetAccount(ctx, receiverAddr).GetCoins().AmountOf(amount.Denom)
@@ -201,7 +207,7 @@ func TestKeeper_RefundHTLC(t *testing.T) {
 	timeLock := uint64(50)
 	expireHeight := timeLock + uint64(ctx.BlockHeight())
 	state := types.EXPIRED
-	initSecret := make([]byte, 32)
+	initSecret := make([]byte, 0)
 
 	htlc := types.NewHTLC(
 		senderAddr,
