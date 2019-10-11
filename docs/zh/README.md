@@ -1,10 +1,8 @@
 # IRISnet 文档
 
-![irisnet](../pics/iris.jpg)
+![irisnet](./pics/iris.jpg)
 
 ## 关于IRISnet
-
-- **IRISnet: 可以自进化的BPoS跨链服务枢纽**
 
 IRISnet（主网 IRIS Hub）是支持DeFi等各种复杂分布式应用的跨链服务枢纽。IRIS Hub采用Cosmos SDK开发，是第一个可自进化的BPoS网络，其开发团队包括获得多个技术创新大奖的[边界智能](https://www.bianjie.ai)以及Cosmos核心开发团队[Tendermint](https://tendermint.com)。
 
