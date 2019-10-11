@@ -27,7 +27,7 @@ Asset模块用于管理你在IRIS Hub上发行的资产。
 iriscli asset create-gateway <flags>
 ```
 
-**唯一标识：**
+**标识：**
 
 | 名称, 速记 | 类型   | 必须 | 默认 | 描述                                                   |
 | ---------- | ------ | -------- | ---- | ------------------------------------------------------ |
@@ -50,7 +50,7 @@ iriscli asset create-gateway --moniker=cats --identity=<pgp-id> --details="Cat T
 iriscli asset edit-gateway <flags>
 ```
 
-**唯一标识：**
+**标识：**
 
 | 名称, 速记 | 类型   | 必须 | 默认 | 描述                                                 |
 | ---------- | ------ | -------- | ---- | ---------------------------------------------------- |
@@ -73,7 +73,7 @@ iriscli asset edit-gateway --moniker=cats --identity=<pgp-id> --details="Cat Tok
 iriscli asset transfer-gateway-owner <flags>
 ```
 
-**唯一标识：**
+**标识：**
 
 | 名称, 速记 | 类型    | 必须 | 默认 | 描述                 |
 | ---------- | ------- | -------- | ---- | -------------------- |
@@ -94,7 +94,7 @@ iriscli asset transfer-gateway-owner --moniker=cats --to=<new-owner-address> --f
 iriscli asset issue-token <flags>
 ```
 
-**唯一标识：**
+**标识：**
 
 | 名称, 速记         | 类型    | 必须 | 默认          | 描述                                                         |
 | ------------------ | ------- | -------- | ------------- | ------------------------------------------------------------ |
@@ -156,7 +156,7 @@ iriscli bank send --from=<key-name> --to=<address> --amount=10cats.kitty --fee=0
 iriscli asset edit-token <token-id> <flags>
 ```
 
-**唯一标识：**
+**标识：**
 
 | 名称, 速记         | 类型   | 必须 | 默认  | 描述                          |
 | ------------------ | ------ | -------- | ----- | ----------------------------- |
@@ -182,7 +182,7 @@ iriscli asset edit-token cat --name="Cat Token" --canonical-symbol="cat" --min-u
 iriscli asset transfer-token-owner <token-id> <flags>
 ```
 
-**唯一标识：**
+**标识：**
 
 | 名称, 速记 | 类型   | 必须 | 默认 | 描述       |
 | ---------- | ------ | -------- | ---- | ---------- |
@@ -202,7 +202,7 @@ iriscli asset transfer-token-owner kitty --to=<new-owner-address> --from=<key-na
 iriscli asset mint-token <token-id> <flags>
 ```
 
-**唯一标识：**
+**标识：**
 
 | 名称, 速记 | 类型   | 必须 | 默认 | 描述                               |
 | ---------- | ------ | -------- | ---- | ---------------------------------- |
@@ -257,7 +257,7 @@ iriscli asset query-token x.btc
 iriscli asset query-tokens <flags>
 ```
 
-**唯一标识：**
+**标识：**
 
 | 名称, 速记 | 类型   | 必须 | 默认 | 描述                                        |
 | ---------- | ------ | -------- | ---- | ------------------------------------------- |
@@ -310,7 +310,7 @@ iriscli asset query-tokens --owner=<address>
 iriscli asset query-gateway <flags>
 ```
 
-**唯一标识：**
+**标识：**
 
 | 名称, 速记 | 类型   | 必须 | 默认 | 描述                                               |
 | ---------- | ------ | -------- | ---- | -------------------------------------------------- |
@@ -330,7 +330,7 @@ iriscli asset query-gateway --moniker cats
 iriscli asset query-gateways <flags>
 ```
 
-**唯一标识：**
+**标识：**
 
 | 名称, 速记 | 类型    | 必须 | 默认 | 描述               |
 | ---------- | ------- | -------- | ---- | ------------------ |
@@ -350,7 +350,7 @@ iriscli asset query-gateways --owner=<owner-address>
 iriscli asset query-fee <flags>
 ```
 
-**唯一标识：**
+**标识：**
 
 | 名称, 速记 | 类型   | 必须 | 默认 | 描述                                           |
 | ---------- | ------ | -------- | ---- | ---------------------------------------------- |

@@ -25,7 +25,7 @@ Query details of a proposal
 iriscli gov query-proposal <flags>
 ```
 
-**Unique Flags:**
+**Flags:**
 
 | Name, shorthand | Type | Required | Default | Description            |
 | --------------- | ---- | -------- | ------- | ---------------------- |
@@ -45,7 +45,7 @@ Query proposals by conditions
 iriscli gov query-proposals <flags>
 ```
 
-**Unique Flags:**
+**Flags:**
 
 | Name, shorthand | Type    | Required | Default | Description                                                         |
 | --------------- | ------- | -------- | ------- | ------------------------------------------------------------------- |
@@ -74,7 +74,7 @@ Query a vote
 iriscli gov query-vote <flags>
 ```
 
-**Unique Flags:**
+**Flags:**
 
 | Name, shorthand | Type | Required | Default | Description            |
 | --------------- | ---- | -------- | ------- | ---------------------- |
@@ -95,7 +95,7 @@ Query all votes of a proposal
 iriscli gov query-votes <flags>
 ```
 
-**Unique Flags:**
+**Flags:**
 
 | Name, shorthand | Type | Required | Default | Description            |
 | --------------- | ---- | -------- | ------- | ---------------------- |
@@ -117,7 +117,7 @@ iriscli gov query-deposit <flags>
 
 ```
 
-**Unique Flags:**
+**Flags:**
 
 | Name, shorthand | Type | Required | Default | Description              |
 | --------------- | ---- | -------- | ------- | ------------------------ |
@@ -140,7 +140,7 @@ iriscli gov query-deposits <flags>
 
 ```
 
-**Unique Flags:**
+**Flags:**
 
 | Name, shorthand | Type | Required | Default | Description            |
 | --------------- | ---- | -------- | ------- | ---------------------- |
@@ -162,7 +162,7 @@ iriscli gov query-tally <flags>
 
 ```
 
-**Unique Flags:**
+**Flags:**
 
 | Name, shorthand | Type | Required | Default | Description            |
 | --------------- | ---- | -------- | ------- | ---------------------- |
@@ -184,7 +184,7 @@ iriscli gov submit-proposal <flags>
 
 ```
 
-**Unique Flags:**
+**Flags:**
 
 | Name, shorthand          | Type   | Required | Default | Description                                                                                                    |
 | ------------------------ | ------ | -------- | ------- | -------------------------------------------------------------------------------------------------------------- |
@@ -251,7 +251,7 @@ iriscli gov deposit <flags>
 
 ```
 
-**Unique Flags:**
+**Flags:**
 
 | Name, shorthand | Type | Required | Default | Description             |
 | --------------- | ---- | -------- | ------- | ----------------------- |
@@ -280,7 +280,7 @@ Only validators and delegators can vote for proposals in the voting period.
 iriscli gov vote <flags>
 ```
 
-**Unique Flags:**
+**Flags:**
 
 | Name, shorthand | Type   | Required | Default | Description                            |
 | --------------- | ------ | -------- | ------- | -------------------------------------- |

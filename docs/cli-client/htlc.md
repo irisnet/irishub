@@ -29,7 +29,7 @@ Create an HTLC
 iriscli htlc create --receiver=<receiver> --receiver-on-other-chain=<receiver-on-other-chain> --amount=<amount> --hash-lock=<hash-lock> --time-lock=<time-lock> --timestamp=<timestamp>
 ```
 
-**Unique Flags:**
+**Flags:**
 
 | Name, shorthand           | Type     | Required | Default | Description                                                       |
 | ------------------------- | -------- | -------- | ------- | ----------------------------------------------------------------- |
@@ -64,7 +64,7 @@ Claim an opened HTLC
 iriscli htlc claim --hash-lock=<hash-lock> --secret=<secret>
 ```
 
-**Unique Flags:**
+**Flags:**
 
 | Name, shorthand | Type     | Required | Default | Description                                      |
 | --------------- | -------- | -------- | ------- | ------------------------------------------------ |
@@ -91,7 +91,7 @@ Refund from an expired HTLC
 iriscli htlc refund --hash-lock=<hash-lock>
 ```
 
-**Unique Flags:**
+**Flags:**
 
 | Name, shorthand | Type     | Required | Default | Description                                       |
 | --------------- | -------- | -------- | ------- | ------------------------------------------------- |

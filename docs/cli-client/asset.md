@@ -27,7 +27,7 @@ Create a gateway which is used to peg external assets
 iriscli asset create-gateway <flags>
 ```
 
-**Unique Flags:**
+**Flags:**
 
 | Name, shorthand     | type   | Required | Default  | Description                                                                                              |
 | --------------------| -----  | -------- | -------- | -------------------------------------------------------------------------------------------------------- |
@@ -50,7 +50,7 @@ Edit a gateway with the given moniker
 iriscli asset edit-gateway <flags>
 ```
 
-**Unique Flags:**
+**Flags:**
 
 | Name, shorthand     | type   | Required | Default  | Description                                                                                              |
 | --------------------| -----  | -------- | -------- | -------------------------------------------------------------------------------------------------------- |
@@ -73,7 +73,7 @@ Transfer the ownership of a gateway to a new owner.
 iriscli asset transfer-gateway-owner <flags>
 ```
 
-**Unique Flags:**
+**Flags:**
 
 | Name, shorthand     | type    | Required | Default  | Description                                            |
 | --------------------| ------- | -------- | -------- |------------------------------------------------------- |
@@ -94,7 +94,7 @@ This command is used to issue a new token on IRIS Hub.
 iriscli asset issue-token <flags>
 ```
 
-**Unique Flags:**
+**Flags:**
 
 | Name, shorthand    | Type    | Required | Default       | Description                                                  |
 | ------------------ | ------- | -------- | ------------- | ------------------------------------------------------------ |
@@ -156,7 +156,7 @@ Edit token informations
 iriscli asset edit-token <token-id> <flags>
 ```
 
-**Unique Flags:**
+**Flags:**
 
 | Name                   | Type   | Required | Default | Description                                        |
 | ---------------------- | -----  | -------- | ------- | -------------------------------------------------- |
@@ -182,7 +182,7 @@ Transfer the ownership of a token
 iriscli asset transfer-token-owner <token-id> <flags>
 ```
 
-**Unique Flags:**
+**Flags:**
 
 | Name | Type   | Required | Default | Description           |
 | ---- | ------ | -------- | ------- | --------------------- |
@@ -202,7 +202,7 @@ The asset owner can directly mint tokens to a specified address
 iriscli asset mint-token <token-id> <flags>
 ```
 
-**Unique Flags:**
+**Flags:**
 
 | Name     | Type   | Required | Default | Description                                           |
 | -------- | ------ | -------- | ------- | ----------------------------------------------------- |
@@ -257,7 +257,7 @@ Query the collection of tokens issued on IRIS Hub based on criteria.
 iriscli asset query-tokens <flags>
 ```
 
-**Unique Flags:**
+**Flags:**
 
 | Name      | Type   | Required | Default | Description                                                        |
 | --------- | ------ | -------- | ------- | ------------------------------------------------------------------ |
@@ -310,7 +310,7 @@ Query a gateway by moniker
 iriscli asset query-gateway <flags>
 ```
 
-**Unique Flags:**
+**Flags:**
 
 | Name, shorthand     | type   | Required | Default  | Description                                                         |
 | --------------------| -----  | -------- | -------- | ------------------------------------------------------------------- |
@@ -330,7 +330,7 @@ Query all the gateways by its' owner
 iriscli asset query-gateways <flags>
 ```
 
-**Unique Flags:**
+**Flags:**
 
 | Name, shorthand  | type    | Required | Default  | Description                        |
 | ---------------- | ------- | -------- | -------- | ---------------------------------- |
@@ -350,7 +350,7 @@ Query the asset related fees, including gateway creation and token issuance and 
 iriscli asset query-fee <flags>
 ```
 
-**Unique Flags:**
+**Flags:**
 
 | Name, shorthand     | type   | Required | Default  | Description                                            |
 | --------------------| -----  | -------- | -------- | ------------------------------------------------------ |

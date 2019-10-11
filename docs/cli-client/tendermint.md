@@ -28,7 +28,7 @@ iriscli tendermint txs <flags>
 
 ```
 
-**Unique Flags:**
+**Flags:**
 
 | Name, shorthand | Default | Description                             | Required |
 | --------------- | ------- | --------------------------------------- | -------- |

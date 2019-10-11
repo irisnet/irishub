@@ -25,7 +25,7 @@
 iriscli gov query-proposal <flags>
 ```
 
-**唯一标识：**
+**标识：**
 
 | 名称, 速记    | 类型 | 必须 | 默认 | 描述     |
 | ------------- | ---- | -------- | ---- | -------- |
@@ -45,7 +45,7 @@ iriscli gov query-proposal --chain-id=irishub --proposal-id=<proposal-id>
 iriscli gov query-proposals <flags>
 ```
 
-**唯一标识：**
+**标识：**
 
 | 名称, 速记  | 类型    | 必须 | 默认 | 描述                                  |
 | ----------- | ------- | -------- | ---- | ------------------------------------- |
@@ -74,7 +74,7 @@ iriscli gov query-proposals --chain-id=irishub --limit=3 --status=passed --depos
 iriscli gov query-vote <flags>
 ```
 
-**唯一标识：**
+**标识：**
 
 | 名称, 速记    | 类型    | 必须 | 默认 | 描述       |
 | ------------- | ------- | -------- | ---- | ---------- |
@@ -95,7 +95,7 @@ iriscli gov query-vote --chain-id=irishub --proposal-id=<proposal-id> --voter=<i
 iriscli gov query-votes <flags>
 ```
 
-**唯一标识：**
+**标识：**
 
 | 名称, 速记    | 类型 | 必须 | 默认 | 描述     |
 | ------------- | ---- | -------- | ---- | -------- |
@@ -115,7 +115,7 @@ iriscli gov query-votes --chain-id=irishub --proposal-id=<proposal-id>
 iriscli gov query-deposit <flags>
 ```
 
-**唯一标识：**
+**标识：**
 
 | 名称, 速记    | 类型    | 必须 | 默认 | 描述       |
 | ------------- | ------- | -------- | ---- | ---------- |
@@ -136,7 +136,7 @@ iriscli gov query-deposit --chain-id=irishub --proposal-id=<proposal-id> --depos
 iriscli gov query-deposits <flags>
 ```
 
-**唯一标识：**
+**标识：**
 
 | 名称, 速记    | 类型 | 必须 | 默认 | 描述     |
 | ------------- | ---- | -------- | ---- | -------- |
@@ -156,7 +156,7 @@ iriscli gov query-deposits --chain-id=irishub --proposal-id=<proposal-id>
 iriscli gov query-tally <flags>
 ```
 
-**唯一标识：**
+**标识：**
 
 | 名称, 速记    | 类型 | 必须 | 默认 | 描述     |
 | ------------- | ---- | -------- | ---- | -------- |
@@ -176,7 +176,7 @@ iriscli gov query-tally --chain-id=irishub --proposal-id=<proposal-id>
 iriscli gov submit-proposal <flags>
 ```
 
-**唯一标识：**
+**标识：**
 
 | 名称, 速记               | 类型   | 必须 | 默认  | 描述                                                                                           |
 | ------------------------ | ------ | -------- | ----- | ---------------------------------------------------------------------------------------------- |
@@ -240,7 +240,7 @@ iriscli gov deposit <flags>
 
 ```
 
-**唯一标识：**
+**标识：**
 
 | 名称, 速记    | 类型 | 必须 | 默认 | 描述           |
 | ------------- | ---- | -------- | ---- | -------------- |
@@ -269,7 +269,7 @@ iriscli gov deposit --chain-id=irishub --proposal-id=<proposal-id> --deposit=50i
 iriscli gov vote <flags>
 ```
 
-**唯一标识：**
+**标识：**
 
 | 名称, 速记    | 类型   | 必须 | 默认 | 描述                            |
 | ------------- | ------ | -------- | ---- | ------------------------------- |

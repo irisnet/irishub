@@ -45,7 +45,7 @@ Then it will show the current protocol information and the protocol information 
 
 Query the current information of upgrade signals.
 
-**Unique Flags:**
+**Flags:**
 
 | Name, shorthand | Default | Description        | Required |
 | --------------- | ------- | ------------------ | -------- |

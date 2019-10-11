@@ -74,7 +74,7 @@ Withdraw rewards to the withdraw-address(default is the delegator address, you c
 iriscli distribution withdraw-rewards <flags>
 ```
 
-**Unique Flags:**
+**Flags:**
 
 | Name, shorthand       | type   | Required | Default  | Description                                                         |
 | --------------------- | -----  | -------- | -------- | ------------------------------------------------------------------- |

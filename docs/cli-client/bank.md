@@ -41,7 +41,7 @@ Query a special kind of token on IRIShub. The native token on IRIShub is `iris`,
  iriscli bank coin-type <coin_name> <flags>
 ```
 
-**Unique Flags:**
+**Flags:**
 
 | Name, shorthand | Type   | Required | Default               | Description                                                   |
 | --------------- | ------ | -------- | --------------------- | ------------------------------------------------------------- |
@@ -78,7 +78,7 @@ Query the token statistic, including total loose tokens, total burned tokens and
  iriscli bank token-stats <token-id> <flags>
 ```
 
-**Unique Flags:**
+**Flags:**
 
 | Name, shorthand | Type   | Required | Default               | Description                                                  |
 | --------------- | ------ | -------- | --------------------- | ------------------------------------------------------------ |
@@ -114,7 +114,7 @@ This command is used for querying balance information of certain address.
 iriscli bank account <address> <flags>
 ```
 
-**Unique Flags:**
+**Flags:**
 
 | Name, shorthand | Type   | Required | Default               | Description                                                   |
 | --------------- | ------ | -------- | --------------------- | ------------------------------------------------------------- |
@@ -151,7 +151,7 @@ Sending tokens to another address, this command includes `generate`, `sign` and 
 iriscli bank send --from=<key-name> --to=<address> --amount=<amount> --fee=<native-fee> --chain-id=<chain-id>
 ```
 
-**Unique Flags:**
+**Flags:**
 
 | Name, shorthand | Type   | Required | Default | Description                                   |
 | --------------- | ------ | -------- | ------- | --------------------------------------------- |
@@ -172,7 +172,7 @@ This command is used to burn tokens from your own address.
 iriscli bank burn --from=<key-name> --amount=<amount-to-burn> --fee=<native-fee> --chain-id=<chain-id>
 ```
 
-**Unique Flags:**
+**Flags:**
 
 | Name, shorthand  | Type   | Required | Default | Description                          |
 | ---------------- | ------ | -------- | ------- | ------------------------------------ |
@@ -192,7 +192,7 @@ This command is used to set memo regexp for your own address, so that you can on
 iriscli bank set-memo-regexp --regexp=<regular-expression> --from=<key-name> --fee=<native-fee> --chain-id=<chain-id>
 ```
 
-**Unique Flags:**
+**Flags:**
 
 | Name, shorthand | Type   | Required | Default | Description                                                |
 | --------------- | ------ | -------- | ------- | ---------------------------------------------------------- |

@@ -41,7 +41,7 @@ ERROR: {"codespace":"sdk","code":9,"message":"account iaa1kenrwk5k4ng70e5s9zfstt
  iriscli bank coin-type <coin_name> <flags>
 ```
 
-**唯一标识：**
+**标识：**
 
 | 名称, 速记   | 类型   | 必须 | 默认                  | 描述                                  |
 | ------------ | ------ | -------- | --------------------- | ------------------------------------- |
@@ -78,7 +78,7 @@ CoinType:
  iriscli bank token-stats <token-id> <flags>
 ```
 
-**唯一标识：**
+**标识：**
 
 | 名称, 速记   | 类型   | 必须 | 默认                  | 描述                                 |
 | ------------ | ------ | -------- | --------------------- | ------------------------------------ |
@@ -114,7 +114,7 @@ TokenStats:
 iriscli bank account <address> <flags>
 ```
 
-**唯一标识：**
+**标识：**
 
 | 名称, 速记   | 类型   | 必须 | 默认                  | 描述                                 |
 | ------------ | ------ | -------- | --------------------- | ------------------------------------ |
@@ -151,7 +151,7 @@ Account:
 iriscli bank send --from=<key-name> --to=<address> --amount=<amount> --fee=<native-fee> --chain-id=<chain-id>
 ```
 
-**唯一标识：**
+**标识：**
 
 | 名称, 速记 | 类型   | 必须 | 默认 | 描述                           |
 | ---------- | ------ | -------- | ---- | ------------------------------ |
@@ -172,7 +172,7 @@ iriscli bank send --from=<key-name> --to=<address> --amount=10iris --fee=0.3iris
 iriscli bank burn --from=<key-name> --amount=<amount-to-burn> --fee=<native-fee> --chain-id=<chain-id>
 ```
 
-**唯一标识：**
+**标识：**
 
 | 名称, 速记 | 类型   | 必须 | 默认 | 描述                         |
 | ---------- | ------ | -------- | ---- | ---------------------------- |
@@ -192,7 +192,7 @@ iriscli bank burn --from=<key-name> --amount=<amount-to-burn> --fee=<native-fee>
 iriscli bank set-memo-regexp --regexp=<regular-expression> --from=<key-name> --fee=<native-fee> --chain-id=<chain-id>
 ```
 
-**唯一标识：**
+**标识：**
 
 | 名称, 速记 | 类型   | 必须 | 默认 | 描述                                          |
 | ---------- | ------ | -------- | ---- | --------------------------------------------- |

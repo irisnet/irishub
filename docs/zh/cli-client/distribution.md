@@ -74,7 +74,7 @@ iriscli distribution set-withdraw-addr <iaa...> --from=<key-name> --fee=0.3iris 
 iriscli distribution withdraw-rewards <flags>
 ```
 
-**唯一标识：**
+**标识：**
 
 | 名称, 速记            | 类型   | 必须 | 默认 | 描述                                 |
 | --------------------- | ------ | ---- | ---- | ------------------------------------ |
