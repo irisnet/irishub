@@ -95,9 +95,9 @@ iris start --replay-last-block
 
 ### iris tendermint
 
-Query the unique node id which can be used in p2p connection, e.g. the `seeds` and `persistent_peers` in the [config.toml](intro.md#cnofig.toml) are formatted as `<node-id>@ip:26656`.
+Query the unique node id which can be used in p2p connection, e.g. the `seeds` and `persistent_peers` in the [config.toml](intro.md#cnofig-toml) are formatted as `<node-id>@ip:26656`.
 
-The node id is stored in the [node_key.json](intro.md#node_key.json).
+The node id is stored in the [node_key.json](intro.md#node_key-json).
 
 ```bash
 iris tendermint show-node-id
@@ -105,7 +105,7 @@ iris tendermint show-node-id
 
 Query the [Tendermint Pubkey](../concepts/validator-faq.md#tendermint-key) which is used to [identify your validator](../cli-client/stake/create-validator.md), and the corresponding private key will be used to sign the Pre-vote/Pre-commit in the consensus.
 
-The [Tendermint Key](../concepts/validator-faq.md#tendermint-key) is stored in the [priv_validator.json](intro.md#priv_validator.json) which is [required to be backed up](../concepts/validator-faq.md#how-to-backup-the-validator) once you become a validator.
+The [Tendermint Key](../concepts/validator-faq.md#tendermint-key) is stored in the [priv_validator.json](intro.md#priv_validator-json) which is [required to be backed up](../concepts/validator-faq.md#how-to-backup-the-validator) once you become a validator.
 
 ```bash
 iris tendermint show-validator

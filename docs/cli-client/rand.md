@@ -48,7 +48,7 @@ iriscli rand query-rand <flags>
 
 | Name, shorthand | Type   | Required | Default | Description                               |
 | --------------- | ------ | -------- | ------- | ----------------------------------------- |
-| --request-id    | string | yes      |         | The request id returned by the request tx |
+| --request-id    | string | Yes      |         | The request id returned by the request tx |
 
 ## Query a random number
 

@@ -113,7 +113,7 @@ IRISnet 基础概念请参考 [基础概念](general-concepts.md)
 
 ### 激励计划是什么
 
-请参考[Staking 收益](./general-concepts.md#Staking-收益)
+请参考[Staking 收益](./general-concepts.md#staking-收益)
 
 ### 运行验证人节点有哪些收益
 
@@ -127,7 +127,7 @@ IRISnet 基础概念请参考 [基础概念](general-concepts.md)
 
 ### 收益计算公式是什么
 
-请参考[Staking 收益计算公式](general-concepts.md#Staking-收益计算公式)
+请参考[Staking 收益计算公式](general-concepts.md#staking-收益计算公式)
 
 ### 如何查询我的验证人地址
 
@@ -155,7 +155,7 @@ IRISnet 基础概念请参考 [基础概念](general-concepts.md)
 
 4. [编辑验证人](../cli-client/stake.md#riscli-stake-edit-validator)信息并指定`--identity=<16位的PGP字符串>`
 
-## 常见异常
+## 常见错误
 
 ### 验证人的投票权为0
 
@@ -169,7 +169,7 @@ IRISnet 基础概念请参考 [基础概念](general-concepts.md)
   iris start
   ```
 
-- 等待节点赶上最新的区块，检查验证人会被监禁到什么时间（了解[监禁时长](gov-params.md#Slashing-模块可治理参数)）：
+- 等待节点赶上最新的区块，检查验证人会被监禁到什么时间（了解[监禁时长](gov-params.md#slashing-模块可治理参数)）：
 
   ```bash
   # 查询验证人节点共识公钥
@@ -193,7 +193,7 @@ IRISnet 基础概念请参考 [基础概念](general-concepts.md)
   iris status
   ```
 
-  您可能会注意到您的投票权比以前低，那是因为你被惩罚了（了解[罚款金额](gov-params.md#Slashing-模块可治理参数)）。
+  您可能会注意到您的投票权比以前低，那是因为你被惩罚了（了解[罚款金额](gov-params.md#slashing-模块可治理参数)）。
 
 ### `iris` 异常退出：too many open files
 
@@ -266,4 +266,4 @@ Linux可以打开（每个进程）的默认文件数是 `1024`，而 `iris` 进
 ## 加入社区
 
 - 英文 Riot：<https://riot.im/app/#/room/#irisvalidators:matrix.org>
-- 中文 QQ：834063323
+- 中文 QQ： 834063323

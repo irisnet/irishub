@@ -2,9 +2,9 @@
 order: 1
 ---
 
-# IRIS Hub Monitor
+# 监控工具
 
-## Metrics
+## 简介
 
 IRISnet可以报告和提供Prometheus metrics，Prometheus收集器可以使用这些指标。
 
@@ -12,7 +12,7 @@ IRISnet可以报告和提供Prometheus metrics，Prometheus收集器可以使用
 
 要启用Prometheus metrics，请在配置文件(config.toml)中设置`prometheus = true`。默认情况下，Metrics将在26660端口下的/metrics提供。可以在配置文件中修改服务地址`prometheus_listen_addr = ":26660"`。
 
-### 可用的metrics列表
+## 监控指标
 
 应用层监控参数如下，命名空间: `iris`
 
@@ -68,7 +68,7 @@ IRISnet可以报告和提供Prometheus metrics，Prometheus收集器可以使用
 
 IRIShub metrics也包含tendermint metrics，有关更多信息，请访问[tendermint metrics](https://github.com/irisnet/tendermint/blob/irisnet/v0.27.3-iris/docs/tendermint-core/metrics.md)。
 
-## 启动Monitor
+## 启动监控工具
 
 这是使用docker来启动IRIShub Monitor的示例。
 

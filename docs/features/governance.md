@@ -55,11 +55,11 @@ Only the validator and delegator can vote , and they can't vote twice for one pr
 
 There are three tallying results: `PASS`, `REJECT`, `REJECTVETO`.
 
-On the premise that the `voting_power of all voters` / `total voting_power of the system` exceeds `participation`,if the ratio of `NoWithVeto` voting power to all voters' voting power over `veto`, the result is `REJECTVETO`. Then if the ratio of `Yes` voting power to all voter's voting power over `threshold`, the result is `PASS`. Otherwise, the result is `REJECT`.
+On the premise that the `voting_power of all voters` / `total voting_power of the system` exceeds `participation`, if the ratio of `NoWithVeto` voting power to all voters' voting power over `veto`, the result is `REJECTVETO`. Then if the ratio of `Yes` voting power to all voter's voting power over `threshold`, the result is `PASS`. Otherwise, the result is `REJECT`.
 
 ### Burning Mechanism
 
-Whether the proposal is passed or not passed, 20% `Deposit` will be burned for the cost of governance. The remaining `Deposit` will be returned. But if the result of proposal is `REJECTVETO`,  all `Deposit` will be burned.
+Whether the proposal is passed or not, 20% `Deposit` will be burned for the cost of governance. The remaining `Deposit` will be returned. But if the result of proposal is `REJECTVETO`,  all `Deposit` will be burned.
 
 ### Slashing Mechanism
 

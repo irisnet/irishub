@@ -55,8 +55,8 @@ iriscli stake delegation --address-validator=<address-validator> --address-deleg
 
 | Name, shorthand     | Default | Description                   | Required |
 | ------------------- | ------- | ----------------------------- | -------- |
-| --address-delegator |         | Bech address of the delegator | yes      |
-| --address-validator |         | Bech address of the validator | yes      |
+| --address-delegator |         | Bech address of the delegator | Yes      |
+| --address-validator |         | Bech address of the validator | Yes      |
 
 ### Query a delegation
 
@@ -129,8 +129,8 @@ iriscli stake unbonding-delegation --address-delegator=<delegator-address> --add
 
 | Name, shorthand     | Default | Description                   | Required |
 | ------------------- | ------- | ----------------------------- | -------- |
-| --address-delegator |         | Bech address of the delegator | yes      |
-| --address-validator |         | Bech address of the validator | yes      |
+| --address-delegator |         | Bech address of the delegator | Yes      |
+| --address-validator |         | Bech address of the validator | Yes      |
 
 ### Query an unbonding delegation record
 
@@ -180,9 +180,9 @@ iriscli stake redelegation --address-validator-source=<source-validator-address>
 
 | Name, shorthand            | Default | Description                               | Required |
 | -------------------------- | ------- | ----------------------------------------- | -------- |
-| --address-delegator        |         | Bech address of the delegator             | yes      |
-| --address-validator-dest   |         | Bech address of the destination validator | yes      |
-| --address-validator-source |         | Bech address of the source validator      | yes      |
+| --address-delegator        |         | Bech address of the delegator             | Yes      |
+| --address-validator-dest   |         | Bech address of the destination validator | Yes      |
+| --address-validator-source |         | Bech address of the source validator      | Yes      |
 
 ### Query a redelegation record
 
@@ -262,14 +262,14 @@ iriscli stake create-validator <flags>
 
 | Name, shorthand   | type   | Required | Default | Description                                                                                      |
 | ----------------- | ------ | -------- | ------- | ------------------------------------------------------------------------------------------------ |
-| --amount          | string | yes      |         | Amount of coins to bond                                                                          |
-| --commission-rate | float  | yes      | 0.0     | The initial commission rate percentage                                                           |
+| --amount          | string | Yes      |         | Amount of coins to bond                                                                          |
+| --commission-rate | float  | Yes      | 0.0     | The initial commission rate percentage                                                           |
 | --details         | string |          |         | Optional details                                                                                 |
 | --genesis-format  | bool   |          | false   | Export the transaction in gen-tx format; it implies --generate-only                              |
 | --identity        | string |          |         | Optional identity signature (ex. UPort or Keybase)                                               |
 | --ip              | string |          |         | Node's public IP. It takes effect only when used in combination with                             |
-| --moniker         | string | yes      |         | Validator name                                                                                   |
-| --pubkey          | string | yes      |         | Go-Amino encoded hex PubKey of the validator. For Ed25519 the go-amino prepend hex is 1624de6220 |
+| --moniker         | string | Yes      |         | Validator name                                                                                   |
+| --pubkey          | string | Yes      |         | Go-Amino encoded hex PubKey of the validator. For Ed25519 the go-amino prepend hex is 1624de6220 |
 | --website         | string |          |         | Optional website                                                                                 |
 
 ### Create a validator
@@ -322,8 +322,8 @@ iriscli stake delegate --address-validator=<validator-address> <flags>
 
 | Name, shorthand     | type   | Required | Default | Description                   |
 | ------------------- | ------ | -------- | ------- | ----------------------------- |
-| --address-validator | string | yes      |         | Bech address of the validator |
-| --amount            | string | yes      |         | Amount of coins to bond       |
+| --address-validator | string | Yes      |         | Bech address of the validator |
+| --amount            | string | Yes      |         | Amount of coins to bond       |
 
 ```bash
 iriscli stake delegate --chain-id=irishub --from=<key-name> --fee=0.3iris --amount=10iris --address-validator=<iva...>
@@ -341,7 +341,7 @@ iriscli stake unbond <flags>
 
 | Name, shorthand     | type   | Required | Default | Description                                                                                         |
 | ------------------- | ------ | -------- | ------- | --------------------------------------------------------------------------------------------------- |
-| --address-validator | string | yes      |         | Bech address of the validator                                                                       |
+| --address-validator | string | Yes      |         | Bech address of the validator                                                                       |
 | --shares-amount     | float  |          | 0.0     | Amount of source-shares to either unbond or redelegate as a positive integer or decimal             |
 | --shares-percent    | float  |          | 0.0     | Percent of source-shares to either unbond or redelegate as a positive integer or decimal >0 and <=1 |
 
@@ -375,8 +375,8 @@ iriscli stake redelegate <flags>
 
 | Name, shorthand            | type   | Required | Default | Description                                                                                         |
 | -------------------------- | ------ | -------- | ------- | --------------------------------------------------------------------------------------------------- |
-| --address-validator-dest   | string | yes      |         | Bech address of the destination validator                                                           |
-| --address-validator-source | string | yes      |         | Bech address of the source validator                                                                |
+| --address-validator-dest   | string | Yes      |         | Bech address of the destination validator                                                           |
+| --address-validator-source | string | Yes      |         | Bech address of the source validator                                                                |
 | --shares-amount            | float  |          | 0.0     | Amount of source-shares to either unbond or redelegate as a positive integer or decimal             |
 | --shares-percent           | float  |          | 0.0     | Percent of source-shares to either unbond or redelegate as a positive integer or decimal >0 and <=1 |
 

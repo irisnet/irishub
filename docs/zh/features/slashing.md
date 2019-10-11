@@ -56,4 +56,3 @@
 
 * `CensorshipJailDuration` 默认值: 7天
 * `SlashFractionCensorship` 默认值: 0.02
-

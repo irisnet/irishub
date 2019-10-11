@@ -25,9 +25,7 @@ iris start
 :::tip
 您可能会看到一些连接错误，这没关系，P2P网络正在尝试查找可用的连接
 
-[高级配置](＃TODO)
-
-[社区公开节点](https://github.com/irisnet/mainnet/blob/master/config/community-peers.md)
+可以添加几个[社区公开节点](https://github.com/irisnet/mainnet/blob/master/config/community-peers.md)到`config.toml`中的`persistent_peers`。
 :::
 
 :::tip
@@ -91,4 +89,4 @@ iriscli stake create-validator \
   - [验证人问答](../concepts/validator-faq.md)
 - 验证人安全
   - [哨兵节点 (DDOS 防护)](../concepts/sentry-nodes.md)
-  - [密钥管理](#TODO)
+  - [密钥管理](../tools/kms.md)

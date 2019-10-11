@@ -2,16 +2,15 @@
 order: 1
 ---
 
-# 介绍
+# 简介
 
 iris可执行程序是运行IRIShub节点的入口，包括验证人节点和其他全节点都需要通过安装iris，并启动守护进程来加入到IRISnet网络。你也可以使用iris在本地启动自己的测试网络。
 
+## 硬件要求
 
-## 硬件需求
+建议在Linux服务器上运行IRIShub节点。
 
-建议在Linux服务器上运行irishub节点。
-
-### Minimum Requeirment
+### 最低硬件要求
 
 - 2 CPU
 - 内存: 6GB

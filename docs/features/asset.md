@@ -70,11 +70,11 @@ Note: The parameters above can all be governed.
 
   - [Issue Token](../cli-client/asset/issue-token.md)
 
-    - [Issue a native token](../cli-client/asset/issue-token.md#Issue-a-native-token)
+    - [Issue a native token](../cli-client/asset/issue-token.md#issue-a-native-token)
 
-    - [Issue a gateway token](../cli-client/asset/issue-token.md#Issue-a-gateway-token)
+    - [Issue a gateway token](../cli-client/asset/issue-token.md#issue-a-gateway-token)
 
-    - [Send tokens](../cli-client/asset/issue-token.md#Send-tokens)
+    - [Send tokens](../cli-client/asset/issue-token.md#send-tokens)
 
   - [Query Token](../cli-client/asset/query-token.md)
 
@@ -102,8 +102,8 @@ Note: The parameters above can all be governed.
 
 - **Fees**
 
-  - [Query Gateway Fee](../cli-client/asset/query-fee.md#Query-fee-of-creating-a-gateway)
+  - [Query Gateway Fee](../cli-client/asset/query-fee.md#query-fee-of-creating-a-gateway)
 
-  - [Query Native Token Fee](../cli-client/asset/query-fee.md#Query-fee-of-issuing-and-minting-a-native-token)
+  - [Query Native Token Fee](../cli-client/asset/query-fee.md#query-fee-of-issuing-and-minting-a-native-token)
 
-  - [Query Gateway Token Fee](../cli-client/asset/query-fee.md#Query-fee-of-issuing-and-minting-a-gateway-token)
+  - [Query Gateway Token Fee](../cli-client/asset/query-fee.md#query-fee-of-issuing-and-minting-a-gateway-token)

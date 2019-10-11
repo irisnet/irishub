@@ -37,7 +37,7 @@ iriscli service define <flags>
 | --------------------- | ------- | ------------------------------------------------------------------ | -------- |
 | --service-description |         | Service description                                                |          |
 | --author-description  |         | Service author description                                         |          |
-| --service-name        |         | Service name                                                       | yes      |
+| --service-name        |         | Service name                                                       | Yes      |
 | --tags                |         | Service tags                                                       |          |
 | --idl-content         |         | Content of service interface description language                  |          |
 | --file                |         | Path of file which contains service interface description language |          |
@@ -72,8 +72,8 @@ iriscli service definition <flags>
 
 | Name, shorthand | Default | Description                                     | Required |
 | --------------- | ------- | ----------------------------------------------- | -------- |
-| --def-chain-id  |         | The ID of the blockchain defined of the service | yes      |
-| --service-name  |         | Service name                                    | yes      |
+| --def-chain-id  |         | The ID of the blockchain defined of the service | Yes      |
+| --service-name  |         | Service name                                    | Yes      |
 
 ### Query a service definition
 
@@ -95,13 +95,13 @@ iriscli service bind <flags>
 
 | Name, shorthand | Default | Description                                                               | Required |
 | --------------- | ------- | ------------------------------------------------------------------------- | -------- |
-| --avg-rsp-time  |         | The average service response time in milliseconds                         | yes      |
-| --bind-type     |         | Type of binding, valid values can be Local and Global                     | yes      |
-| --def-chain-id  |         | The ID of the blockchain defined of the service                           | yes      |
-| --deposit       |         | Deposit of binding                                                        | yes      |
+| --avg-rsp-time  |         | The average service response time in milliseconds                         | Yes      |
+| --bind-type     |         | Type of binding, valid values can be Local and Global                     | Yes      |
+| --def-chain-id  |         | The ID of the blockchain defined of the service                           | Yes      |
+| --deposit       |         | Deposit of binding                                                        | Yes      |
 | --prices        |         | Prices of binding, will contains all method                               |          |
-| --service-name  |         | Service name                                                              | yes      |
-| --usable-time   |         | An integer represents the number of usable service invocations per 10,000 | yes      |
+| --service-name  |         | Service name                                                              | Yes      |
+| --usable-time   |         | An integer represents the number of usable service invocations per 10,000 | Yes      |
 
 ### Add a binding to an existing service definition
 
@@ -123,10 +123,10 @@ iriscli service binding <flags>
 
 | Name, shorthand | Default | Description                                        | Required |
 | --------------- | ------- | -------------------------------------------------- | -------- |
-| --bind-chain-id |         | The ID of the blockchain bond of the service       | yes      |
-| --def-chain-id  |         | The ID of the blockchain defined of the service    | yes      |
-| --provider      |         | Bech32 encoded account created the service binding | yes      |
-| --service-name  |         | Service name                                       | yes      |
+| --bind-chain-id |         | The ID of the blockchain bond of the service       | Yes      |
+| --def-chain-id  |         | The ID of the blockchain defined of the service    | Yes      |
+| --provider      |         | Bech32 encoded account created the service binding | Yes      |
+| --service-name  |         | Service name                                       | Yes      |
 
 ### Query a service binding
 
@@ -146,8 +146,8 @@ iriscli service bindings <flags>
 
 | Name, shorthand | Default | Description                                     | Required |
 | --------------- | ------- | ----------------------------------------------- | -------- |
-| --def-chain-id  |         | The ID of the blockchain defined of the service | yes      |
-| --service-name  |         | Service name                                    | yes      |
+| --def-chain-id  |         | The ID of the blockchain defined of the service | Yes      |
+| --service-name  |         | Service name                                    | Yes      |
 
 ### Query service binding list
 
@@ -168,10 +168,10 @@ iriscli service update-binding <flags>
 | --------------- | ------- | ------------------------------------------------------------------------- | -------- |
 | --avg-rsp-time  |         | The average service response time in milliseconds                         |          |
 | --bind-type     |         | Type of binding, valid values can be Local and Global                     |          |
-| --def-chain-id  |         | The ID of the blockchain defined of the service                           | yes      |
+| --def-chain-id  |         | The ID of the blockchain defined of the service                           | Yes      |
 | --deposit       |         | Deposit of binding, will add to the current deposit balance               |          |
 | --prices        |         | Prices of binding, will contains all method                               |          |
-| --service-name  |         | Service name                                                              | yes      |
+| --service-name  |         | Service name                                                              | Yes      |
 | --usable-time   |         | An integer represents the number of usable service invocations per 10,000 |          |
 
 ### Update an existing service binding
@@ -194,8 +194,8 @@ iriscli service disable <flags>
 
 | Name, shorthand | Default | Description                                     | Required |
 | --------------- | ------- | ----------------------------------------------- | -------- |
-| --def-chain-id  |         | The ID of the blockchain defined of the service | yes      |
-| --service-name  |         | Service name                                    | yes      |
+| --def-chain-id  |         | The ID of the blockchain defined of the service | Yes      |
+| --service-name  |         | Service name                                    | Yes      |
 
 ### Disable an active service binding
 
@@ -215,9 +215,9 @@ iriscli service enable <flags>
 
 | Name, shorthand  | Default | Description                                                 | Required |
 | ---------------- | ------- | ----------------------------------------------------------- | -------- |
-| --def-chain-id   |         | The ID of the blockchain defined of the service             | yes      |
+| --def-chain-id   |         | The ID of the blockchain defined of the service             | Yes      |
 | --deposit string |         | Deposit of binding, will add to the current deposit balance |          |
-| --service-name   |         | Service name                                                | yes      |
+| --service-name   |         | Service name                                                | Yes      |
 
 ### Enable an inactive service binding
 
@@ -239,8 +239,8 @@ iriscli service refund-deposit <flags>
 
 | Name, shorthand | Default | Description                                     | Required |
 | --------------- | ------- | ----------------------------------------------- | -------- |
-| --def-chain-id  |         | The ID of the blockchain defined of the service | yes      |
-| --service-name  |         | Service name                                    | yes      |
+| --def-chain-id  |         | The ID of the blockchain defined of the service | Yes      |
+| --service-name  |         | Service name                                    | Yes      |
 
 ### Refund all deposits from an inactive service binding
 
@@ -262,11 +262,11 @@ iriscli service call <flags>
 
 | Name, shorthand | Default | Description                                        | Required |
 | --------------- | ------- | -------------------------------------------------- | -------- |
-| --def-chain-id  |         | The ID of the blockchain defined of the service    | yes      |
-| --service-name  |         | Service name                                       | yes      |
-| --method-id     |         | The method id called                               | yes      |
-| --bind-chain-id |         | The ID of the blockchain bond of the service       | yes      |
-| --provider      |         | Bech32 encoded account created the service binding | yes      |
+| --def-chain-id  |         | The ID of the blockchain defined of the service    | Yes      |
+| --service-name  |         | Service name                                       | Yes      |
+| --method-id     |         | The method id called                               | Yes      |
+| --bind-chain-id |         | The ID of the blockchain bond of the service       | Yes      |
+| --provider      |         | Bech32 encoded account created the service binding | Yes      |
 | --service-fee   |         | Fee to pay for a service invocation                |          |
 | --request-data  |         | Hex encoded request data of a service invocation   |          |
 
@@ -288,10 +288,10 @@ iriscli service requests <flags>
 
 | Name, shorthand | Default | Description                                        | Required |
 | --------------- | ------- | -------------------------------------------------- | -------- |
-| --def-chain-id  |         | The ID of the blockchain defined of the service    | yes      |
-| --service-name  |         | Service name                                       | yes      |
-| --bind-chain-id |         | The ID of the blockchain bond of the service       | yes      |
-| --provider      |         | Bech32 encoded account created the service binding | yes      |
+| --def-chain-id  |         | The ID of the blockchain defined of the service    | Yes      |
+| --service-name  |         | Service name                                       | Yes      |
+| --bind-chain-id |         | The ID of the blockchain bond of the service       | Yes      |
+| --provider      |         | Bech32 encoded account created the service binding | Yes      |
 
 ### Query service request list
 
@@ -311,8 +311,8 @@ iriscli service respond <flags>
 
 | Name, shorthand    | Default | Description                                                    | Required |
 | ------------------ | ------- | -------------------------------------------------------------- | -------- |
-| --request-chain-id |         | The ID of the blockchain that the service invocation initiated | yes      |
-| --request-id       |         | The ID of the service invocation                               | yes      |
+| --request-chain-id |         | The ID of the blockchain that the service invocation initiated | Yes      |
+| --request-id       |         | The ID of the service invocation                               | Yes      |
 | --response-data    |         | Hex encoded response data of a service invocation              |          |
 
 ### Respond to a service invocation
@@ -337,8 +337,8 @@ iriscli service response <flags>
 
 | Name, shorthand    | Default | Description                                                    | Required |
 | ------------------ | ------- | -------------------------------------------------------------- | -------- |
-| --request-chain-id |         | The ID of the blockchain that the service invocation initiated | yes      |
-| --request-id       |         | The ID of the service invocation                               | yes      |
+| --request-chain-id |         | The ID of the blockchain that the service invocation initiated | Yes      |
+| --request-id       |         | The ID of the service invocation                               | Yes      |
 
 ### Query a service response
 

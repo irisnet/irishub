@@ -8,7 +8,7 @@ order: 1
 
 The IRIS network is an internet of blockchains intended to provide a technology foundation that facilitates construction of distributed business applications.
 
-![Figure of IRIS Network](https://github.com/irisnet/irisnet/blob/master/images/chap2-1.png?raw=true)
+![Figure of IRIS Network](../pics/chap2-1.jpg)
 
 The IRIS network is part of the larger Cosmos network -- all zones in the network would be able to interact with any other zone in the Cosmos network over the standard IBC protocol.  By introducing a layer of service semantics into the network, we are going to provide an innovative solution that enables a whole new set of business scenarios, which would result in an increase in scale and diversity of the Cosmos network.
 

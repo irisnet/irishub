@@ -205,13 +205,13 @@ iriscli gov submit-proposal <flags>
 | --token-initial-supply   | uint64 |          |         | The initial supply token of token                                                                              |
 
 :::tip
-The proposer must deposit at least 30% of the [MinDeposit](#TODO) to submit a proposal.
+The proposer must deposit at least 30% of the [MinDeposit](../features/governance.md#proposal-level) to submit a proposal.
 :::
 
 ### Submit a Parameter Change Proposal
 
 :::tip
-[What parameters can be changed online](#TODO)
+[What parameters can be changed online?](../concepts/gov-params.md)
 :::
 
 **Unique Required Params:** `--param`
@@ -260,7 +260,7 @@ iriscli gov deposit <flags>
 
 ### Deposit for an active proposal
 
-When the total deposit amount exceeds the [MinDeposit](#TODO), the proposal will enter the voting procedure.
+When the total deposit amount exceeds the [MinDeposit](../features/governance.md#proposal-level), the proposal will enter the voting procedure.
 
 ```bash
 iriscli gov deposit --chain-id=irishub --proposal-id=<proposal-id> --deposit=50iris --from=<key-name> --fee=0.3iris
@@ -271,7 +271,7 @@ iriscli gov deposit --chain-id=irishub --proposal-id=<proposal-id> --deposit=50i
 Vote for an active proposal, options: Yes/No/NoWithVeto/Abstain
 
 :::tip
-[No VS NoWithVeto](#TODO)
+[No VS NoWithVeto](../features/governance.md#burning-mechanism)
 
 Only validators and delegators can vote for proposals in the voting period.
 :::

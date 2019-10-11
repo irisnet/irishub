@@ -4,7 +4,7 @@ order: 4
 
 # Export Blockchain State
 
-## Description
+## Introduction
 
 IRIShub can export the blockchain state and output to a json-format string which can be used as the genesis file of a new blockchain.
 

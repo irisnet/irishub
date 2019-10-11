@@ -4,7 +4,7 @@ order: 3
 
 # 本地测试网
 
-出于测试或开发目的，您可能需要设置本地测试网。
+出于测试或开发目的，您可能需要运行本地测试网。
 
 ## 单节点测试网
 
@@ -13,7 +13,7 @@ order: 3
 - [安装iris](../get-started/install.md)
 
 :::tip
-对于以下示例，我们使用默认的[主目录](intro.md#home-directory)
+对于以下示例，我们全部使用默认的[主目录](intro.md#主目录)
 :::
 
 ### iris init
@@ -24,9 +24,9 @@ order: 3
 iris init --chain-id=testing --moniker=testing
 ```
 
-### create a key
+### 创建一个钱包
 
-创建一个密钥来保存您的验证人帐户
+创建一个钱包作为您的验证人帐户
 
 ```bash
 iriscli keys add MyValidator
@@ -34,7 +34,7 @@ iriscli keys add MyValidator
 
 ### iris add-genesis-account
 
-将该密钥添加到genesis文件中的genesis.app_state.accounts数组中
+将该钱包地址添加到genesis文件中的genesis.app_state.accounts数组中
 
 :::tip
 此命令使您可以设置通证数量。确保此帐户有iris，这是IRISnet上唯一的质押通证
@@ -95,17 +95,17 @@ iris start --replay-last-block
 
 ### iris tendermint
 
-查询可以在p2p连接中使用的唯一节点ID，例如在[config.toml](intro.md#cnofig.toml)中`seeds`和`persistent_peers`的格式`<node-id>@ip:26656`。
+查询可以在p2p连接中使用的唯一节点ID，例如在[config.toml](intro.md#cnofig-toml)中`seeds`和`persistent_peers`的格式`<node-id>@ip:26656`。
 
-节点ID存储在[node_key.json](intro.md#node_key.json)中。
+节点ID存储在[node_key.json](intro.md#node_key-json)中。
 
 ```bash
 iris tendermint show-node-id
 ```
 
- 查询[Tendermint Pubkey](../concepts/validator-faq.md#tendermint-key)，用于[identify your validator](../cli-client/stake/create-validator.md),并将用于在共识过程中签署Pre-vote/Pre-commit。
+ 查询[Tendermint Pubkey](../concepts/validator-faq.md#tendermint-密钥)，用于[identify your validator](../cli-client/stake/create-validator.md),并将用于在共识过程中签署Pre-vote/Pre-commit。
 
-[Tendermint Key](../concepts/validator-faq.md#tendermint-key)存储在[priv_validator.json](intro.md#priv_validator.json)中，如果成为验证人，[required to be backed up](../concepts/validator-faq.md#how-to-backup-the-validator)。
+[Tendermint Key](../concepts/validator-faq.md#tendermint-密钥)存储在[priv_validator.json](intro.md#priv_validator-json)中，创建验证人后，请一定要记得[备份](../concepts/validator-faq.md#如何备份验证人节点)。
 
 ```bash
 iris tendermint show-validator
@@ -123,14 +123,14 @@ iris tendermint show-address
 
 ## 多节点测试网
 
-**需求:**
+**前提:**
 
-- [Install iris](../get-started/install.md)
-- [Install jq](https://stedolan.github.io/jq/download/)
-- [Install docker](https://docs.docker.com/engine/installation/)
-- [Install docker-compose](https://docs.docker.com/compose/install/)
+- [安装 iris](../get-started/install.md)
+- [安装 jq](https://stedolan.github.io/jq/download/)
+- [安装 docker](https://docs.docker.com/engine/installation/)
+- [安装 docker-compose](https://docs.docker.com/compose/install/)
 
-### Build and Init
+### 构建和初始化
 
 ```bash
 # Work from the irishub repo

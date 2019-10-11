@@ -4,7 +4,7 @@ order: 1
 
 # IRIS Hub Monitor
 
-## Metrics
+## Introduction
 
 IRIShub can report and serve the Prometheus metrics, which can be consumed by Prometheus collector(s).
 
@@ -12,7 +12,7 @@ This functionality is disabled by default.
 
 To enable the Prometheus metrics, set `prometheus = true` in your config file(config.toml). Metrics will be served under /metrics on 26660 port by default. This port can be changed in the config file (`prometheus_listen_addr = ":26660"`).
 
-### List of available metrics
+## Metrics
 
 Application metrics, namespace: `iris`
 

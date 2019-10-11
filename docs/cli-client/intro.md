@@ -12,7 +12,7 @@ The default working directory for the `iriscli` is `$HOME/.iriscli`, which is ma
 
 ## Connecting to a Full Node
 
-The rpc address of the `iris` node. Transactions and query requests are sent to the process listening to this port. The default is `tcp://localhost:26657`, and the rpc address can also be specified by `--node`.
+The `iris` node provides a RPC interface, transactions and query requests are sent to the process listening to it. The default rpc address the `iriscli` is connected to is `tcp://localhost:26657`, it can also be specified by `--node`.
 
 ## Setting Default Configs
 
@@ -30,7 +30,7 @@ Do you trust this node? [y/n]:y
 > What is your chainID?
 irishub
 > Please specify default fee
-50000
+0.3iris
 ```
 
 ## Global Flags
@@ -49,56 +49,6 @@ All GET commands has the following global flags:
 | --ledger        | bool   |          | false                 | Use a connected Ledger device                                 |
 | --node          | string |          | tcp://localhost:26657 | `<host>:<port>` to tendermint rpc interface for this chain    |
 | --trust-node    | bool   |          | true                  | Don't verify proofs for responses                             |
-
-#### Json Indent Response
-
-iriscli returns text format as default:
-
-```bash
-$ iriscli stake validators
-Validator
-  Operator Address:            iva1gfcee5u5f54kfcnufv4ypcfyldw0vu0zpwl52q
-  Validator Consensus Pubkey:  icp1zcjduepquednrr0aqw4nkt8jnkhpmg4acfc7vlr0yre4uud4z0ups68hcpfsx4x9ng
-  Jailed:                      false
-  Status:                      Bonded
-  Tokens:                      1361.0004000000246900000000000000
-  Delegator Shares:            1361.0004000000246900000000000000
-  Description:                 {B-2  3_C a1_}
-  Unbonding Height:            0
-  Minimum Unbonding Time:      1970-01-01 00:00:00 +0000 UTC
-  Commission:                  rate: 0.1001000000, maxRate: 1.0000000000, maxChangeRate: 1.0000000000, updateTime: 2019-05-09 03:13:39.720700953 +0000 UTC
-```
-
-By specifing `output` and `indent`, `iriscli` can return json indent format results:
-
-```bash
-$ iriscli stake validators --output=json --indent
-[
-  {
-    "operator_address": "iva1gfcee5u5f54kfcnufv4ypcfyldw0vu0zpwl52q",
-    "consensus_pubkey": "icp1zcjduepquednrr0aqw4nkt8jnkhpmg4acfc7vlr0yre4uud4z0ups68hcpfsx4x9ng",
-    "jailed": false,
-    "status": 2,
-    "tokens": "1361.0004000000246900000000000000",
-    "delegator_shares": "1361.0004000000246900000000000000",
-    "description": {
-      "moniker": "B-2",
-      "identity": "",
-      "website": "3_C",
-      "details": "a1_"
-    },
-    "bond_height": "0",
-    "unbonding_height": "0",
-    "unbonding_time": "1970-01-01T00:00:00Z",
-    "commission": {
-      "rate": "0.1001000000",
-      "max_rate": "1.0000000000",
-      "max_change_rate": "1.0000000000",
-      "update_time": "2019-05-09T03:13:39.720700953Z"
-    }
-  }
-]
-```
 
 ### POST Commands
 
@@ -129,21 +79,19 @@ All POST commands have the following global flags:
 
 ## Module Commands
 
-Each module provides a set of command line interfaces. Here we sort these commands by modules.
-
 | **Subcommand**                           | **Description**                                              |
 | ---------------------------------------- | ------------------------------------------------------------ |
-| [status](./status/README.md)             | Query remote node for status                                 |
-| [tx](./tx/README.md)                     | Tx subcommands                                               |
-| [tendermint](./tendermint/README.md)     | Tendermint state querying subcommands                        |
-| [bank](./bank/README.md)                 | Bank subcommands for querying acccounts and sending coins etc. |
-| [distribution](./distribution/README.md) | Distribution subcommands for rewards management              |
-| [gov](./gov/README.md)                   | Governance and voting subcommands                            |
-| [stake](./stake/README.md)               | Staking subcommands for validators and delegators            |
-| [upgrade](./upgrade/README.md)           | Software Upgrade subcommands                                 |
-| [service](./service/README.md)           | Service subcommands                                          |
-| [guardian](./guardian/README.md)         | Guardian subcommands                                         |
+| [status](./status.md)             | Query remote node for status                                 |
+| [tx](./tx.md)                     | Tx subcommands                                               |
+| [tendermint](./tendermint.md)     | Tendermint state querying subcommands                        |
+| [bank](./bank.md)                 | Bank subcommands for querying acccounts and sending coins etc. |
+| [distribution](./distribution.md) | Distribution subcommands for rewards management              |
+| [gov](./gov.md)                   | Governance and voting subcommands                            |
+| [stake](./stake.md)               | Staking subcommands for validators and delegators            |
+| [upgrade](./upgrade.md)           | Software Upgrade subcommands                                 |
+| [service](./service.md)           | Service subcommands                                          |
+| [guardian](./guardian.md)         | Guardian subcommands                                         |
 | [asset](./asset.md)                      | Asset subcommands                                            |
-| [rand](./rand/README.md)                 | Random Number subcommands                                    |
-| [keys](./keys/README.md)                 | Keys allows you to manage your local keystore for tendermint |
-| [params](./params/README.md)             | Query parameters of modules                                  |
+| [rand](./rand.md)                 | Random Number subcommands                                    |
+| [keys](./keys.md)                 | Keys allows you to manage your local keystore for tendermint |
+| [params](./params.md)             | Query parameters of modules                                  |

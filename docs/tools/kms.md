@@ -4,7 +4,7 @@ order: 3
 
 # Key Management System
 
-## What is a KMS
+## Introduction
 
 KMS is short for Key Management System, please refer to the [Tendermint KMS](https://github.com/tendermint/kms) for more details.
 
@@ -12,7 +12,7 @@ KMS is short for Key Management System, please refer to the [Tendermint KMS](htt
 
 Detailed build instructions can be found [here](https://github.com/tendermint/kms#installation).
 
-::: tip
+:::tip
 When compiling the KMS, ensure you have enabled the applicable features:
 :::
 

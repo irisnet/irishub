@@ -4,7 +4,7 @@ order: 2
 
 # Commands
 
-## Description
+## Introduction
 
 IRIS Daemon Commands allow you to init, start, reset a node, or generate a genesis file, etc.
 

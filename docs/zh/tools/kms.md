@@ -4,7 +4,7 @@ order: 3
 
 # KMS - 密钥管理系统
 
-## KMS是什么
+## 简介
 
 KMS是密钥管理系统的简称，请参阅[Tendermint KMS](https://github.com/tendermint/kms)获取更多详细信息。
 

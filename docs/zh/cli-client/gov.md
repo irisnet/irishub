@@ -197,13 +197,13 @@ iriscli gov submit-proposal <flags>
 | --token-initial-supply   | uint64 |          |       | 通证初始总量                                                                                   |
 
 :::tip
-提案人必须至少抵押[MinDeposit]的30％才能提交提案。
+提案人必须至少抵押[MinDeposit](../features/governance.md#提议级别)的30％才能提交提案。
 :::
 
 ### 提交参数修改提案
 
 :::tip
-[可以在线更改哪些参数]。
+[有哪些参数可以在线修改？](../concepts/gov-params.md)
 :::
 
 **唯一必须参数：** `--param`
@@ -249,7 +249,7 @@ iriscli gov deposit <flags>
 
 ### 为有效的提案抵押通证
 
-当总抵押金额超过[MinDeposit]时，提案将进入投票阶段。
+当总抵押金额超过[MinDeposit](../features/governance.md#提议级别)时，提案将进入投票阶段。
 
 ```bash
 iriscli gov deposit --chain-id=irishub --proposal-id=<proposal-id> --deposit=50iris --from=<key-name> --fee=0.3iris
@@ -260,6 +260,8 @@ iriscli gov deposit --chain-id=irishub --proposal-id=<proposal-id> --deposit=50i
 为有效的提案投票，选项：Yes/No/NoWithVeto/Abstain。
 
 :::tip
+[No VS NoWithVeto](../features/governance.md#销毁机制)
+
 在投票期内，只有验证人和委托人可以对提案进行投票。
 :::
 
