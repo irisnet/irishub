@@ -11,16 +11,6 @@ HTLC allows you to manage local Hash Time Locked Contracts (HTLCs) for atomic sw
 | [refund](#iriscli-htlc-refund)        | Refund from an expired HTLC |
 | [query-htlc](#iriscli-htlc-query-htlc) | Query details of an HTLC    |
 
-## Global Flags
-
-| Name, shorthand | Type   | Required | Default        | Description                           |
-| --------------- | ------ | -------- | -------------- | ------------------------------------- |
-| -h, --help      |        |          |                | Help for HTLC                         |
-| -e, --encoding  | string |          | hex            | String binary encoding (hex\b64\btc ) |
-| --home          | string |          | /root/.iriscli | Directory for config and data         |
-| -o, --output    | string |          | text           | Output format (text\json)             |
-| --trace         |        |          |                | Print out full stack trace on errors  |
-
 ## iriscli htlc create
 
 Create an HTLC
