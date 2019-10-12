@@ -1,4 +1,4 @@
-# 资产模块用户指南
+# 资产管理
 
 ## 简介
 
@@ -27,15 +27,15 @@ IRISHub 允许个人和公司创建和发行他们自己的资产，用于他们
 
 #### 相关参数
 
-| name                   | Type      | Default     | Description                                    |
-| ---------------------- |-----------|-------------|------------------------------------------------|
-| AssetTaxRate           | Dec       | 0.4         | 资产税率，即Community Tax的比例                |
-| IssueTokenBaseFee         | Coin      | 60000iris   | 发行FT的基准费用                               |
-| MintTokenFeeRatio         | Dec       | 0.1         | 增发FT的费率(相对于发行费用)                   |
-| CreateGatewayBaseFee   | Coin      | 120000iris  | 创建网关的基准费用                             |
-| GatewayAssetFeeRatio   | Dec       | 0.1         | 发行网关资产的费率(相对于native资产的发行费用) |
+| name                 | Type | Default    | Description                              |
+| -------------------- | ---- | ---------- | ---------------------------------------- |
+| AssetTaxRate         | Dec  | 0.4        | 资产税率，即Community Tax的比例             |
+| IssueTokenBaseFee    | Coin | 60000iris  | 发行FT的基准费用                           |
+| MintTokenFeeRatio    | Dec  | 0.1        | 增发FT的费率(相对于发行费用)                 |
+| CreateGatewayBaseFee | Coin | 120000iris | 创建网关的基准费用                          |
+| GatewayAssetFeeRatio | Dec  | 0.1        | 发行网关资产的费率(相对于native资产的发行费用) |
 
-注：以上参数均为可共识参数
+注：以上参数均为可治理参数
 
 #### 创建网关费用
 
