@@ -8,13 +8,12 @@ import (
 	"path/filepath"
 	"strings"
 
-	tmsm "github.com/tendermint/tendermint/state"
-
-	"github.com/tendermint/tendermint/consensus"
-
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	bc "github.com/tendermint/tendermint/blockchain"
+	"github.com/tendermint/tendermint/consensus"
+	tmcli "github.com/tendermint/tendermint/libs/cli"
+	tmsm "github.com/tendermint/tendermint/state"
 	"github.com/tendermint/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
 )
@@ -28,7 +27,7 @@ func SnapshotCmd(ctx *Context) *cobra.Command {
 		Use:   "snapshot",
 		Short: "snapshot current block information and drop other block",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			home := viper.GetString("home")
+			home := viper.GetString(tmcli.HomeFlag)
 			emptyState, err := isEmptyState(home)
 			if err != nil || emptyState {
 				fmt.Println("WARNING: State is not initialized.")
@@ -136,13 +135,13 @@ func snapshotCsWAL(home, targetDir string, height int64) error {
 	}
 
 	gr, found, err := sourceWAL.SearchForEndHeight(height, &consensus.WALSearchOptions{IgnoreDataCorruptionErrors: true})
+	defer gr.Close()
 	if err != nil {
 		return err
 	}
 	if !found {
 		return fmt.Errorf("cannot replay height %d. WAL does not contain #ENDHEIGHT for %d", height, height-1)
 	}
-	defer gr.Close()
 
 	var msg *consensus.TimedWALMessage
 	dec := consensus.NewWALDecoder(gr)
