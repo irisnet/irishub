@@ -97,7 +97,7 @@ func snapshotState(home, targetDir string, height int64) error {
 	state := tmsm.LoadState(originDb)
 
 	if height != state.LastBlockHeight {
-		return errors.New(fmt.Sprintf("wrong block height,should: %d, but got %d", height, state.LastBlockHeight))
+		return fmt.Errorf("wrong block height,should: %d, but got %d", height, state.LastBlockHeight)
 	}
 
 	tmsm.SaveState(targetDb, state)
@@ -140,7 +140,7 @@ func snapshotCsWAL(home, targetDir string, height int64) error {
 		return err
 	}
 	if !found {
-		return errors.New(fmt.Sprintf("cannot replay height %d. WAL does not contain #ENDHEIGHT for %d", height, height-1))
+		return fmt.Errorf("cannot replay height %d. WAL does not contain #ENDHEIGHT for %d", height, height-1)
 	}
 	defer gr.Close()
 
@@ -151,7 +151,7 @@ func snapshotCsWAL(home, targetDir string, height int64) error {
 		if err == io.EOF {
 			break
 		} else if consensus.IsDataCorruptionError(err) {
-			return errors.New(fmt.Sprintf("data has been corrupted in last height %d of consensus WAL", height))
+			return fmt.Errorf("data has been corrupted in last height %d of consensus WAL", height)
 		} else if err != nil {
 			return err
 		}
