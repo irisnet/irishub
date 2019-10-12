@@ -26,8 +26,8 @@ After initializing your node, please download the genesis file and the config fi
 cd <iris_home>/config/
 rm genesis.json
 rm config.toml
-wget https://raw.githubusercontent.com/irisnet/betanet/master/config/genesis.json
-wget https://raw.githubusercontent.com/irisnet/betanet/master/config/config.toml
+wget https://raw.githubusercontent.com/irisnet/mainnet/master/config/genesis.json
+wget https://raw.githubusercontent.com/irisnet/mainnet/master/config/config.toml
 ```
 ## Edit Your Config File
 
