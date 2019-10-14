@@ -52,8 +52,8 @@ github.com/inconshreveable/mousetrap v1.0.0 h1:Z8tu5sraLXCXIcARxBp/8cbvlwVa7Z1NH
 github.com/inconshreveable/mousetrap v1.0.0/go.mod h1:PxqpIevigyE2G7u3NXJIT2ANytuPF1OarO4DADm73n8=
 github.com/irisnet/iavl v0.12.2 h1:M7Y0FwWNRGTq3j+DLbEHAKjTsBaxoovc/A1RaKhdKhY=
 github.com/irisnet/iavl v0.12.2/go.mod h1:JRGfj9mLdUSdoBSpYjo14FRe/qyKv3YKHwHnhuxzKaQ=
-github.com/irisnet/tendermint v0.31.1 h1:RDUdfMVCfya/OJV4FhjlEfvVTXlGSrI0IuKvPf+Chfs=
-github.com/irisnet/tendermint v0.31.1/go.mod h1:cLvoTnSF/1xKjgwfUwqE+frnDCrHCWInffCVfR3eo50=
+github.com/irisnet/tendermint v0.31.2 h1:bpxmRMDx5k7S0xTYuOyagaPnlhw+/Mx5O7q7fQUh3Sc=
+github.com/irisnet/tendermint v0.31.2/go.mod h1:cLvoTnSF/1xKjgwfUwqE+frnDCrHCWInffCVfR3eo50=
 github.com/jmhodges/levigo v0.0.0-20161115193449-c42d9e0ca023 h1:y5P5G9cANJZt3MXlMrgELo5mNLZPXH8aGFFFG7IzPU0=
 github.com/jmhodges/levigo v0.0.0-20161115193449-c42d9e0ca023/go.mod h1:Q6Qx+uH3RAqyK4rFQroq9RL7mdkABMcfhEI+nNuzMJQ=
 github.com/kr/logfmt v0.0.0-20140226030751-b84e30acd515 h1:T+h1c/A9Gawja4Y9mFVWj2vyii2bbUNDw3kt9VxK2EY=

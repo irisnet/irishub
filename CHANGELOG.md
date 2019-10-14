@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.15.4
+
+*Oct 14th, 2019*
+
+### Tendermint
+
+Bump Tendermint version to irisnet/tendermint [v0.31.2](https://github.com/irisnet/tendermint/releases/tag/v0.31.2) to fix the p2p panic error.
+
 ## 0.15.3
 
 *Oct 2th, 2019*
