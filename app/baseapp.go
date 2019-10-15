@@ -745,7 +745,7 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 	}
 
 	if mode == RunTxModeDeliver {
-		app.deliverState.ctx.CheckValidNum().Incr()
+		app.deliverState.ctx.ValidTxCounter().Incr()
 	}
 
 	defer func() {
