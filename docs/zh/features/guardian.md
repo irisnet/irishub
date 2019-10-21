@@ -60,7 +60,7 @@ IRISnet引入了两种由基金会控制且具有一定特殊权益的系统用�
 
 5. 通过`CommunityTaxUsage`治理取回交易税费
 
-    详细参考[governance](governance.md#proposals-on-transaction-fee-community-tax-usage)
+    详细参考[governance](governance.md#社区基金使用提议)
 
 6. Trustee从`iService`服务费税池中提取代币到指定账户
 
