@@ -408,6 +408,6 @@ iriscli stake unjail <flags>
 iriscli stake unjail --from=<key-name> --fee=0.3iris --chain-id=irishub
 ```
 
-### 验证人仍处于监禁状态，无法解禁
+### Validator still jailed, cannot yet be unjailed
 
-That means your validator is still in jail period, you can query the [signing-info](#iriscli-stake-signing-info) for the jail end time。
+如果执行解禁操作的tx报错 `Validator still jailed, cannot yet be unjailed`，意味着该验证人节点还在监禁期内，不能被解禁。您可以查询 [signing-info](#iriscli-stake-signing-info) 获取监禁结束时间。
