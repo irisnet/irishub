@@ -279,7 +279,7 @@ iriscli stake create-validator --chain-id=irishub --from=<key-name> --fee=0.3iri
 ```
 
 :::tip
-查看 [Mainnet](../../get-started/mainnet.md#create-validator) 说明以了解更多。
+查看 [主网](../get-started/mainnet.md#升级为验证人节点) 说明以了解更多。
 :::
 
 ## iriscli stake edit-validator
@@ -364,7 +364,7 @@ iriscli stake unbond --address-validator=<iva...> --shares-percent=0.1 --from=<k
 把某个委托的一部分或者全部从一个验证人转移到另外一个验证人。
 
 :::tip
-重新委托期间没有`unbonding time`，所以你不会错过奖励。但是每个验证人在每个`unbonding time`时长内只能转委托一次。
+转委托没有`unbonding time`，所以你不会错过奖励。但是对每个验证人的转委托，在一个`unbonding time`区间内只能操作一次。
 :::
 
 ```bash
