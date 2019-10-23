@@ -507,7 +507,7 @@ func (app *BaseApp) BeginBlock(req abci.RequestBeginBlock) (res abci.ResponseBeg
 		// by InitChain. Context is now updated with Header information.
 		app.deliverState.ctx = app.deliverState.ctx.
 			WithBlockHeader(req.Header).
-			WithBlockHeight(req.Header.Height).WithCheckValidNum(sdk.NewValidTxCounter())
+			WithCheckValidNum(sdk.NewValidTxCounter())
 	}
 
 	// add block gas meter
