@@ -279,7 +279,7 @@ iriscli stake create-validator --chain-id=irishub --from=<key-name> --fee=0.3iri
 ```
 
 :::tip
-查看 [Mainnet](../../get-started/mainnet.md#create-validator) 说明以了解更多。
+查看 [主网](../get-started/mainnet.md#升级为验证人节点) 说明以了解更多。
 :::
 
 ## iriscli stake edit-validator
@@ -308,7 +308,7 @@ iriscli stake edit-validator --from=<key-name> --chain-id=irishub --fee=0.3iris 
 
 ### 上传验证人头像
 
-请参考 [How to upload my validator's logo to the Explorers](../../concepts/validator-faq.md#how-to-upload-my-validator-s-logo-to-the-explorers)。
+请参考 [如何将验证人的Logo上传到区块浏览器](../concepts/validator-faq.md#如何将验证人的logo上传到区块浏览器)。
 
 ## iriscli stake delegate
 
@@ -364,7 +364,7 @@ iriscli stake unbond --address-validator=<iva...> --shares-percent=0.1 --from=<k
 把某个委托的一部分或者全部从一个验证人转移到另外一个验证人。
 
 :::tip
-重新委托期间没有`unbonding time`，所以你不会错过奖励。但是每个验证人在每个`unbonding time`时长内只能转委托一次。
+转委托没有`unbonding time`，所以你不会错过奖励。但是对每个验证人的转委托，在一个`unbonding time`区间内只能操作一次。
 :::
 
 ```bash
@@ -408,6 +408,6 @@ iriscli stake unjail <flags>
 iriscli stake unjail --from=<key-name> --fee=0.3iris --chain-id=irishub
 ```
 
-### 验证人仍处于监禁状态，无法解禁
+### Validator still jailed, cannot yet be unjailed
 
-That means your validator is still in jail period, you can query the [signing-info](#iriscli-stake-signing-info) for the jail end time。
+如果执行解禁操作的tx报错 `Validator still jailed, cannot yet be unjailed`，意味着该验证人节点还在监禁期内，不能被解禁。您可以查询 [signing-info](#iriscli-stake-signing-info) 获取监禁结束时间。

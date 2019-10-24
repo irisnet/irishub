@@ -244,7 +244,7 @@ iriscli service refund-deposit <flags>
 
 ### Refund all deposits from an inactive service binding
 
-Before refunding, you should [disable](disable) the service binding first.
+Before refunding, you should [disable](#iriscli-service-disable) the service binding first.
 
 ```bash
 iriscli service refund-deposit --chain-id=<chain-id>  --from=<key-name> --fee=0.3iris --def-chain-id=<service-define-chain-id> --service-name=<service-name>

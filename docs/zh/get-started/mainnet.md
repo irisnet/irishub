@@ -29,14 +29,14 @@ iris start
 :::
 
 :::tip
-从零开始追赶区块需要很长时间，您也可以下载[主网数据快照](＃TODO)以减少同步时间
+从零开始追赶区块需要很长时间，您也可以下载[主网数据快照](#TODO)以减少同步时间
 :::
 
 ## 升级为验证人节点
 
 ### 创建钱包
 
-您可以[创建新的钱包](../cli-client/keys/add.md＃create-a-new-key)或[导入现有的钱包](../cli-client/keys/add.md＃recover-an-existing-key)，然后从交易所或其他任何地方转入一些IRIS到您刚刚创建的钱包中：
+您可以[创建新的钱包](../cli-client/keys.md#创建密钥)或[导入现有的钱包](../cli-client/keys.md#通过助记词恢复密钥)，然后从交易所或其他任何地方转入一些IRIS到您刚刚创建的钱包中：
 
 ```bash
 # 创建一个新钱包

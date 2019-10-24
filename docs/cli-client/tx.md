@@ -8,7 +8,7 @@ Tx module allows you to sign or broadcast transactions
 | ---------------------------------- | ---------------------------------------------- |
 | [sign](#iriscli-tx-sign)           | Sign transactions generated offline            |
 | [broadcast](#iriscli-tx-broadcast) | Broadcast a signed transaction to the network  |
-| [multisig](#iriscli-tx-multisig)   | Sign the same transaction by multiple accounts |
+| [multisig](#iriscli-tx-multisign)  | Sign the same transaction by multiple accounts |
 
 ## iriscli tx sign
 
