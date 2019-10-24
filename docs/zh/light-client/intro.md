@@ -55,7 +55,7 @@ irislcd start --node=tcp://localhost:26657 --chain-id=<chain-id> --laddr=tcp://0
 :::tip
 **注意**
 
-`POST` apis([/tx/broadcast](#broadcast-transactions)除外)只能用于生成未签名的交易，需要在[broadcasting](#broadcast-transactions)之前使用其他方式其进行签名。
+`POST` API ([广播交易的API](#广播交易的API)除外) 只能用于生成未签名的交易，需要在[广播](#广播交易的API)之前使用其他方式其进行签名。
 :::
 
 ### Tendermint相关的APIs

@@ -153,7 +153,7 @@ IRISnet 基础概念请参考 [基础概念](general-concepts.md)
 
 3. 点击`Add a PGP key`，创建一个PGP私钥，完成后您将获得一个16位的字符串
 
-4. [编辑验证人](../cli-client/stake.md#riscli-stake-edit-validator)信息并指定`--identity=<16位的PGP字符串>`
+4. [编辑验证人](../cli-client/stake.md#iriscli-stake-edit-validator)信息并指定`--identity=<16位的PGP字符串>`
 
 ## 常见错误
 

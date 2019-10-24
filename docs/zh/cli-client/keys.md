@@ -91,13 +91,13 @@ iriscli keys add <multisig-keyname> --multisig-threshold=2 --multisig=<signer-ke
 其中“offline”类型密钥可以通过“iriscli keys add --pubkey”命令创建。
 :::
 
-如何使用多签密钥签名和广播交易，请参阅 [multisig](../tx.md#multisig)
+如何使用多签密钥签名和广播交易，请参阅 [multisig](tx.md#iriscli-tx-multisign)
 
 ## iriscli keys list
 
 返回此密钥管理器存储的所有密钥的名称、类型、地址和公钥列表。
 
-### List all keys
+### 列出所有密钥
 
 ```bash
 iriscli keys list

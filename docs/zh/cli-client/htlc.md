@@ -1,6 +1,6 @@
 # iriscli htlc
 
-HTLC模块用于管理[哈希锁定合约](../features/htlc)，以便与其他链进行原子交换
+[HTLC模块](../features/htlc)提供了与其他链进行原子交换的相关功能。
 
 ## Available Commands
 

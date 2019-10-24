@@ -18,7 +18,7 @@ This module is mainly used to transfer coins between accounts, query account bal
     iriscli bank coin-type iris
     ```
 
-    Refer to [Query of coin-type](./basic-concepts/coin-type.md#query-of-coin-type) for details.
+    Refer to [Query of CoinType](../concepts/coin-type.md#query-of-cointype) for details.
 
 2. Query an account
 

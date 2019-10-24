@@ -56,7 +56,7 @@
 
 ## 操作
 
-- [创建 HTLC](../cli-client/htlc/create.md)
-- [认领 HTLC](../cli-client/htlc/claim.md)
-- [退款 HTLC](../cli-client/htlc/refund.md)
-- [查询 HTLC](../cli-client/asset/query-htlc.md)
+- [创建 HTLC](../cli-client/htlc.md#iriscli-htlc-create)
+- [认领 HTLC](../cli-client/htlc.md#iriscli-htlc-claim)
+- [退款 HTLC](../cli-client/htlc.md#iriscli-htlc-refund)
+- [查询 HTLC](../cli-client/htlc.md#iriscli-htlc-query-htlc)

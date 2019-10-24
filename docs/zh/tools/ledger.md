@@ -20,7 +20,7 @@ order: 4
 
 - [在Ledger Nano中安装`COSMOS`应用程序并且创建一个账户。](#using-a-ledger-device)
 - [一个连接在区块链网络上的`iris`全节点](../get-started/mainnet.md)
-- [一个已配置`iriscli`（且已经连接到`iris`全节点）的实例。](./cli-client.md)
+- [一个已配置`iriscli`（且已经连接到`iris`全节点）的实例。](../cli-client/intro.md)
 
 至此可以在网络上发送交易。
 

@@ -43,7 +43,7 @@ node_key.json用于存储节点的密钥。`iris tendermint show-node-id`查询�
 
 ### priv_validator.json
 
-pri_validator.json是[Tendermint Key](../concepts/validator-faq.md#tendermint-key)文件，验证人节点将在每轮共识投票中使用该文件来签署Pre-vote/Pre-commit。随着共识的进行，tendermint共识引擎将不断更新`last_height` /`last_round` /`last_step`值。
+pri_validator.json是[Tendermint Key](../concepts/validator-faq.md#tendermint-密钥)文件，验证人节点将在每轮共识投票中使用该文件来签署Pre-vote/Pre-commit。随着共识的进行，tendermint共识引擎将不断更新`last_height` /`last_round` /`last_step`值。
 
 ### config.toml
 

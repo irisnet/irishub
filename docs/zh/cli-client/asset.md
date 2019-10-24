@@ -110,7 +110,7 @@ iriscli asset issue-token <flags>
 | --decimal          | uint8   | 是       |               | 通证最多可以有18位小数                                       |
 | --mintable         | boolean |          | false         | 首次发行后是否可以增发此通证                               |
 
-### 发行本地通证
+### 发行原生通证
 
 ```bash
 iriscli asset issue-token --family=fungible --source=native --name="Kitty Token" --symbol=kitty --initial-supply=100000000000 --max-supply=1000000000000 --decimal=0 --mintable=true --fee=1iris --from=<key-name> --commit
@@ -134,9 +134,9 @@ iriscli asset issue-token --family=fungible --source=gateway --gateway=cats --ca
 
 ### 发送通证
 
-您可以像发送任何通证一样 [发送iris](./bank.md#iriscli-bank-send)。
+您可以像[发送iris](./bank.md#iriscli-bank-send)一样发送任何通证。
 
-#### 发送本地通证
+#### 发送原生通证
 
 ```bash
 iriscli bank send --from=<key-name> --to=<address> --amount=10kitty --fee=0.3iris --chain-id=irishub
@@ -231,7 +231,7 @@ iriscli asset query-token <token-id>
 
 - 当`Source`为`gateway`时：ID = [Gateway].[Symbol]，例如`cats.kitty`
 
-### 查询名为`kitty`的本地通证
+### 查询名为`kitty`的原生通证
 
 ```bash
 iriscli asset query-token kitty
@@ -284,7 +284,7 @@ iriscli asset query-tokens <flags>
 iriscli asset query-tokens
 ```
 
-### 查询所有本地通证
+### 查询所有原生通证
 
 ```bash
 iriscli asset query-tokens --source=native
@@ -363,7 +363,7 @@ iriscli asset query-fee <flags>
 iriscli asset query-fee --gateway=cats
 ```
 
-### 查询发行和增发本地通证的费用
+### 查询发行和增发原生通证的费用
 
 ```bash
 iriscli asset query-fee --token=kitty
