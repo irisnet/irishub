@@ -1,6 +1,6 @@
 # iriscli gov
 
-该模块提供了以下基本功能 [Governance](../features/governance.md)。
+该模块提供了[链上治理](../features/governance.md)的基本功能。
 
 ## 可用命令
 

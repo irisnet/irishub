@@ -31,9 +31,7 @@ const sidebar = (directory, array) => {
 };
 
 module.exports = {
-    title: "IRISnet Documents",
-    description: "IRISnet Documents",
-    base: process.env.VUEPRESS_BASE || "/",
+    base: "/docs/",
     plugins: [
         ['@vuepress/search', {
             searchMaxSuggestions: 10
@@ -41,10 +39,14 @@ module.exports = {
     ],
     locales: {
         "/": {
-            lang: "en-US"
+            lang: "en-US",
+            title: "IRISnet Documents",
+            description: "IRISnet Documents",
         },
         "/zh/": {
-            lang: "简体中文"
+            lang: "简体中文",
+            title: "IRISnet 文档",
+            description: "IRISnet 文档",
         }
     },
     themeConfig: {

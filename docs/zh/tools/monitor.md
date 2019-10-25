@@ -66,7 +66,7 @@ IRISnet可以报告和提供Prometheus metrics，Prometheus收集器可以使用
 | state_recheck_time                   | histogram |                  | recheck消耗的时间                                |
 | state_app_hash_conflict              | count     | proposer, height | appHash冲突的错误                                |
 
-IRIShub metrics也包含tendermint metrics，有关更多信息，请访问[tendermint metrics](https://github.com/irisnet/tendermint/blob/irisnet/v0.27.3-iris/docs/tendermint-core/metrics.md)。
+IRIShub metrics也包含tendermint metrics，有关更多信息，请访问[tendermint metrics](https://github.com/irisnet/tendermint/blob/irisnet/master/docs/tendermint-core/metrics.md)。
 
 ## 启动监控工具
 

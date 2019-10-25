@@ -1,6 +1,6 @@
 # iriscli distribution
 
-distribution模块用于管理自己的 [Staking 收益](../concepts/general-concepts.md#staking-rewards)。
+distribution模块用于管理自己的 [Staking 收益](../concepts/general-concepts.md#staking-收益)。
 
 ## 可用命令
 
@@ -68,7 +68,7 @@ iriscli distribution set-withdraw-addr <iaa...> --from=<key-name> --fee=0.3iris 
 
 ## iriscli distribution withdraw-rewards
 
-取回奖励到提款地址（默认为委托人地址，您可以通过 [set-withdraw-addr](#iriscli-distribution-set-withdraw-addr)重新设置提现地址)。
+取回奖励到提现地址（默认为委托人地址，您可以通过 [set-withdraw-addr](#iriscli-distribution-set-withdraw-addr)重新设置提现地址)。
 
 ```bash
 iriscli distribution withdraw-rewards <flags>

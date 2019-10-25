@@ -8,7 +8,7 @@
 | ---------------------------------- | ------------------------ |
 | [sign](#iriscli-tx-sign)           | 签名生成的离线交易文件   |
 | [broadcast](#iriscli-tx-broadcast) | 广播一个已签名交易到网络 |
-| [multisig](#iriscli-tx-multisig)   | 用多个账户为同一交易签名 |
+| [multisig](#iriscli-tx-multisign)  | 用多个账户为同一交易签名 |
 
 ## iriscli tx sign
 
@@ -80,10 +80,10 @@ iriscli tx broadcast signed.json --chain-id=irishub
 iriscli tx multisign <file> <key-name> <[signature]...> <flags>
 ```
 
-### 用多签key生成离线交易
+### 用多签密钥创建离线交易
 
 :::提示
-没有多签key？[创建一个](keys.md#create-a-multisig-key)
+没有多签密钥？[创建一个](keys.md#创建多签密钥)
 :::
 
 ```bash
@@ -111,7 +111,7 @@ iriscli tx sign unsigned.json --name=<signer-keyname-1> --chain-id=irishub --mul
 用signer-2签名：
 
 ```bash
-iriscli tx sign unsigned.json --name=<signer_keyname_2> --chain-id=irishub --multisig=<multisig-address> --signature-only > signed-2.json
+iriscli tx sign unsigned.json --name=<signer-keyname-2> --chain-id=irishub --multisig=<multisig-address> --signature-only > signed-2.json
 ```
 
 #### 合并签名
@@ -122,4 +122,4 @@ iriscli tx sign unsigned.json --name=<signer_keyname_2> --chain-id=irishub --mul
 iriscli tx multisign --chain-id=irishub unsigned.json <multisig-keyname> signed-1.json signed-2.json > signed.json
 ```
 
-现在可以广播[broadcast the signed tx](#iriscli-tx-broadcast)这个已签名交易了。
+现在可以[广播](#iriscli-tx-broadcast)这个已签名交易了。

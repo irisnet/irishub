@@ -36,7 +36,7 @@ It will take a long time to sync from scratch, you can also download the [mainne
 
 ### Create a Wallet
 
-You can [create a new wallet](../cli-client/keys/add.md#create-a-new-key) or [import an existing one](../cli-client/keys/add.md#recover-an-existing-key), then get some IRIS from the exchanges or anywhere else into the wallet you just created, .e.g.
+You can [create a new wallet](../cli-client/keys.md#create-a-new-key) or [import an existing one](../cli-client/keys.md#recover-an-existing-key-from-seed-phrase), then get some IRIS from the exchanges or anywhere else into the wallet you just created, .e.g.
 
 ```bash
 # create a new wallet

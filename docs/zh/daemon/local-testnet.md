@@ -87,7 +87,7 @@ iris unsafe-reset-all
 iris reset --height 100
 ```
 
-还有一个修复区块链数据库的方式，如果在主网上出现 `Wrong Block.Header.AppHash`的错误，请确认您使用的是正确的[Mainnet Version](../get-started/install.md#latest-version)，然后通过以下方式重新启动节点：
+还有一个修复区块链数据库的方式，如果在主网上出现 `Wrong Block.Header.AppHash`的错误，请确认您使用的是正确的[主网版本](../get-started/install.md#最新版本)，然后通过以下方式重新启动节点：
 
 ```bash
 iris start --replay-last-block
@@ -103,7 +103,7 @@ iris start --replay-last-block
 iris tendermint show-node-id
 ```
 
- 查询[Tendermint Pubkey](../concepts/validator-faq.md#tendermint-密钥)，用于[identify your validator](../cli-client/stake/create-validator.md),并将用于在共识过程中签署Pre-vote/Pre-commit。
+ 查询[Tendermint Pubkey](../concepts/validator-faq.md#tendermint-密钥)，用于[identify your validator](../cli-client/stake.md#iriscli-stake-create-validator),并将用于在共识过程中签署Pre-vote/Pre-commit。
 
 [Tendermint Key](../concepts/validator-faq.md#tendermint-密钥)存储在[priv_validator.json](intro.md#priv_validator-json)中，创建验证人后，请一定要记得[备份](../concepts/validator-faq.md#如何备份验证人节点)。
 
