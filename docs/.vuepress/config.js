@@ -31,7 +31,7 @@ const sidebar = (directory, array) => {
 };
 
 module.exports = {
-    base: "/docs",
+    base: "/docs/",
     plugins: [
         ['@vuepress/search', {
             searchMaxSuggestions: 10
