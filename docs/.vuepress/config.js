@@ -1,328 +1,101 @@
+const glob = require("glob");
+const markdownIt = require("markdown-it");
+const meta = require("markdown-it-meta");
+const fs = require("fs");
+const _ = require("lodash");
+
+const sidebar = (directory, array) => {
+    return array.map(i => {
+        const children = _.sortBy(
+            glob
+                .sync(`./${directory}/${i[1]}/*.md`)
+                .map(path => {
+                    const md = new markdownIt();
+                    const file = fs.readFileSync(path, "utf8");
+                    md.use(meta);
+                    md.render(file);
+                    const order = md.meta.order;
+                    return { path, order };
+                })
+                .filter(f => f.order !== false),
+            ["order", "path"]
+        )
+            .map(f => f.path)
+            .filter(f => !f.match("README"));
+
+        return {
+            title: i[0],
+            children
+        };
+    });
+};
+
 module.exports = {
     base: "/docs/",
+    plugins: [
+        ['@vuepress/search', {
+            searchMaxSuggestions: 10
+        }]
+    ],
     locales: {
-        '/': {
-            lang: 'English',
-            title: 'IRISnet Document'
+        "/": {
+            lang: "en-US",
+            title: "IRISnet Documents",
+            description: "IRISnet Documents",
         },
-        '/zh/': {
-            lang: '简体中文',
-            title: 'IRISnet 文档'
+        "/zh/": {
+            lang: "简体中文",
+            title: "IRISnet 文档",
+            description: "IRISnet 文档",
         }
     },
     themeConfig: {
-        displayAllHeaders: false,
+        repo: "irisnet/irishub",
+        docsDir: "docs",
+        editLinks: true,
+        docsBranch: "master",
+        editLinkText: 'Help us improve this page!',
         locales: {
-            '/': {
+            "/": {
                 selectText: 'Languages',
+                label: 'English',
+                editLinkText: 'Help us improve this page!',
                 nav: [
-                    {text: 'Back to IRISnet', link: 'https://www.irisnet.org'},
-                    {text: 'Introduction', link: '/introduction/'},
-                    {text: 'Getting Started', link: '/get-started/'},
-                    {text: 'Software', link: '/software/node.md'},
-                    {text: 'Features', link: '/features/basic-concepts/coin-type.md'},
-                    {text: 'CLI Client', link: '/cli-client/'},
-                    {text: 'Light Client', link: '/light-client/'},
-                    {text: 'Resources', link: '/resources/'}
+                    {
+                        text: 'Back to IRISnet',
+                        link: 'https://www.irisnet.org'
+                    }
                 ],
-                sidebar: {
-                    '/software/': [
-                        ['node.md', 'Node'],
-                        ['How-to-install-irishub.md', 'Install'],
-                        ['cli-client.md', 'CLI Client'],
-                        ['light-client.md', 'Light Client'],
-                        ['reset.md', 'Reset Blockchain State'],
-                        ['export.md', 'Export Blockchain State'],
-                        ['sentry.md', 'Sentry'],
-                        ['tool.md', 'Tool'],
-                        ['monitor.md', 'Monitor'],
-                        ['ledger.md', 'Ledger'],
-                        ['kms/kms.md', 'Kms']
-                    ],
-                    '/get-started/': [
-                        ['Join-the-Mainnet.md', 'Mainnet'],
-                        ['Join-the-Testnet.md', 'Testnet'],
-                        ['Full-Node.md', 'Full Node'],
-                        ['Validator-Node.md', 'Validator Node'],
-                        ['Wallets.md', 'Wallets'],
-                        ['Explorers.md', 'Explorers']
-                    ],
-                    '/features/': [{
-                        title: 'Basic Concepts',
-                        collapsable: false,
-                        children: [
-                            ["basic-concepts/coin-type.md", 'Coin Type'],
-                            ["basic-concepts/fee.md", 'Fee'],
-                            ["basic-concepts/bech32-prefix.md", 'Bech32 Prefix'],
-                            ["basic-concepts/genesis-file.md", 'Genesis File'],
-                            ["basic-concepts/gov-params.md", 'Gov Params'],
-                            ["basic-concepts/key.md", 'Key']
-                        ]
-                    },{
-                        title: 'Modules',
-                        collapsable: false,
-                        children: [
-                            ['bank.md', 'Bank'],
-                            ['stake.md', 'Stake'],
-                            ['slashing.md', 'Slashing'],
-                            ['service.md', 'Service'],
-                            ['governance.md', 'Governance'],
-                            ['upgrade.md', 'Upgrade'],
-                            ['distribution.md', 'Distribution'],
-                            ['guardian.md', 'Guardian'],
-                            ['mint.md', 'Mint'],
-                            ['asset.md', 'Asset'],
-                            ['random.md', 'Random']
-                        ]
-                    }],
-                    '/cli-client/': [{
-                        title: 'Status',
-                        collapsable: false,
-                        children: [
-                            ['status/', 'iriscli status']
-                        ]
-                    },
-                    {
-                        title: 'Tx(sign/broadcast)',
-                        collapsable: false,
-                        children: [
-                            ['tx/', 'iriscli tx']
-                        ]
-                    },
-                    {
-                        title: 'Tendermint',
-                        collapsable: false,
-                        children: [
-                            ['tendermint/', 'iriscli tendermint']
-                        ]
-                    },
-                    {
-                        title: 'Keys',
-                        collapsable: false,
-                        children: [
-                            ['keys/', 'iriscli keys']
-                        ]
-                    },
-                    {
-                        title: 'Bank',
-                        collapsable: false,
-                        children: [
-                            ['bank/', 'iriscli bank']
-                        ]
-                    },
-                    {
-                        title: 'Stake',
-                        collapsable: false,
-                        children: [
-                            ['stake/', 'iriscli stake']
-                        ]
-                    },
-                    {
-                        title: 'Distribution',
-                        collapsable: false,
-                        children: [
-                            ['distribution/', 'iriscli distribution']
-                        ]
-                    },
-                    {
-                        title: 'Gov',
-                        collapsable: false,
-                        children: [
-                            ['gov/', 'iriscli gov']
-                        ]
-                    },
-                    {
-                        title: 'Upgrade',
-                        collapsable: false,
-                        children: [
-                            ['upgrade/', 'iriscli upgrade']
-                        ]
-                    },
-                    {
-                        title: 'Service',
-                        collapsable: false,
-                        children: [
-                            ['service/', 'iriscli service']
-                        ]
-                    },
-                    {
-                        title: 'Asset',
-                        collapsable: false,
-                        children: [
-                            ['asset/', 'iriscli asset']
-                        ]
-                    },
-                    {
-                        title: 'Random',
-                        collapsable: false,
-                        children: [
-                            ['rand/', 'iriscli rand']
-                        ]
-                    }],
-                    '/resources/': [
-                        ['validator-faq.md', 'Validator FAQ'],
-                        ['delegator-faq.md', 'Delegator FAQ'],
-                        ['whitepaper-zh.md', 'Whitepaper ZH'],
-                        ['whitepaper-en.md', 'Whitepaper EN'],
-                        ['whitepaper-kr.md', 'Whitepaper KR']
-                    ]
-                }
+                sidebar: sidebar("", [
+                    ["Getting Started", "get-started"],
+                    ["Concepts", "concepts"],
+                    ["Features", "features"],
+                    ["Daemon", "daemon"],
+                    ["CLI Client", "cli-client"],
+                    ["API Server", "light-client"],
+                    ["Tools", "tools"],
+                    ["Resources", "resources"]
+                ])
             },
-            '/zh/': {
+            "/zh/": {
                 selectText: '选择语言',
-                nav: [
-                    {text: '返回官网', link: 'https://www.irisnet.org'},
-                    {text: '简介', link: '/zh/introduction/'},
-                    {text: '开始', link: '/zh/get-started/'},
-                    {text: '软件', link: '/zh/software/node.md'},
-                    {text: '功能', link: '/zh/features/basic-concepts/coin-type.md'},
-                    {text: '命令行', link: '/zh/cli-client/'},
-                    {text: '轻客户端', link: '/zh/light-client/'},
-                    {text: '资源', link: '/zh/resources/'}
-                ],
-                sidebar: {
-                    '/zh/software/': [
-                        ['node.md', '节点'],
-                        ['How-to-install-irishub.md', '安装'],
-                        ['cli-client.md', '命令行客户端'],
-                        ['light-client.md', '轻节点客户端(LCD)'],
-                        ['reset.md', '重置区块链状态'],
-                        ['export.md', '导出区块链状态'],
-                        ['sentry.md', '哨兵节点'],
-                        ['tool.md', '调试工具'],
-                        ['monitor.md', '监控'],
-                        ['ledger.md', 'Ledger硬件钱包'],
-                        ['kms/kms.md', 'Kms']
-                    ],
-                    '/zh/get-started/': [
-                        ['Join-the-Mainnet.md', '主网'],
-                        ['Join-the-Testnet.md', '测试网'],
-                        ['Full-Node.md', '全节点'],
-                        ['Validator-Node.md', '验证人节点'],
-                        ['Wallets.md', '钱包'],
-                        ['Explorers.md', '浏览器']
-                    ],
-                    '/zh/features/': [{
-                        title: '基础概念',
-                        collapsable: false,
-                        children: [
-                            ["basic-concepts/coin-type.md", '代币单位'],
-                            ["basic-concepts/fee.md", '交易费'],
-                            ["basic-concepts/bech32-prefix.md", 'Bech32地址前缀'],
-                            ["basic-concepts/genesis-file.md", 'Genesis创世文件'],
-                            ["basic-concepts/gov-params.md", '链上治理参数'],
-                            ["basic-concepts/key.md", '账户钱包']
-                        ]
-                    },{
-                        title: '模块',
-                        collapsable: false,
-                        children: [
-                            ['bank.md', '转账、查询'],
-                            ['stake.md', '委托、股权'],
-                            ['slashing.md', '惩罚机制'],
-                            ['service.md', 'iService服务'],
-                            ['governance.md', '链上治理'],
-                            ['upgrade.md', '升级'],
-                            ['distribution.md', '收益分配'],
-                            ['guardian.md', '系统用户'],
-                            ['mint.md', '通胀'],
-                            ['asset.md', '资产管理'],
-                            ['random.md', '随机数']
-                        ]
-                    }],
-                    '/zh/cli-client/': [{
-                        title: '状态',
-                        collapsable: false,
-                        children: [
-                            ['status/', 'iriscli status']
-                        ]
-                    },
-                    {
-                        title: 'Tendermint',
-                        collapsable: false,
-                        children: [
-                            ['tendermint/', 'iriscli tendermint']
-                        ]
-                    },
-                    {
-                        title: '交易（签名/广播）',
-                        collapsable: false,
-                        children: [
-                            ['tx/', 'iriscli tx']
-                        ]
-                    },
-                    {
-                        title: '钱包',
-                        collapsable: false,
-                        children: [
-                            ['keys/', 'iriscli keys']
-                        ]
-                    },
-                    {
-                        title: '转账、查询',
-                        collapsable: false,
-                        children: [
-                            ['bank/', 'iriscli bank']
-                        ]
-                    },
-                    {
-                        title: '委托、股权',
-                        collapsable: false,
-                        children: [
-                            ['stake/', 'iriscli stake']
-                        ]
-                    },
-                    {
-                        title: '收益分配',
-                        collapsable: false,
-                        children: [
-                            ['distribution/', 'iriscli distribution']
-                        ]
-                    },
-                    {
-                        title: '链上治理',
-                        collapsable: false,
-                        children: [
-                            ['gov/', 'iriscli gov']
-                        ]
-                    },
-                    {
-                        title: '升级',
-                        collapsable: false,
-                        children: [
-                            ['upgrade/', 'iriscli upgrade']
-                        ]
-                    },
-                    {
-                        title: 'iService服务',
-                        collapsable: false,
-                        children: [
-                            ['service/', 'iriscli service']
-                        ]
-                    },
-                    {
-                        title: '资产管理',
-                        collapsable: false,
-                        children: [
-                            ['asset/', 'iriscli asset']
-                        ]
-                    },
-                    {
-                        title: '随机数',
-                        collapsable: false,
-                        children: [
-                            ['rand/', 'iriscli rand']
-                        ]
-                    }],
-                    '/zh/resources/': [
-                        ['validator-faq.md', '验证人 FAQ'],
-                        ['delegator-faq.md', '委托人 FAQ'],
-                        ['whitepaper-zh.md', '白皮书 ZH'],
-                        ['whitepaper-en.md', '白皮书 EN'],
-                        ['whitepaper-kr.md', '白皮书 KR']
-                    ]
-                }
+                label: '简体中文',
+                editLinkText: '帮助我们完善此文档',
+                nav: [{
+                    text: 'IRISnet 官网',
+                    link: 'https://www.irisnet.org'
+                }],
+                sidebar: sidebar("", [
+                    ["快速开始", "/zh/get-started"],
+                    ["概念", "/zh/concepts"],
+                    ["功能模块", "/zh/features"],
+                    ["守护进程", "/zh/daemon"],
+                    ["命令行客户端", "/zh/cli-client"],
+                    ["API 服务", "/zh/light-client"],
+                    ["工具", "/zh/tools"],
+                    ["资源", "/zh/resources"]
+                ])
             }
-        }
+        },
     }
-}
+};

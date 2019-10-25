@@ -1,4 +1,5 @@
 # IRISHub
+
 ![Banner](https://raw.githubusercontent.com/irisnet/irishub/master/docs/pics/iris.jpg)
 
 [![License](https://img.shields.io/github/license/irisnet/irishub.svg)](https://github.com/irisnet/irishub/blob/master/LICENSE)
@@ -9,21 +10,18 @@
 IRIS network (a.k.a. IRISnet) aims to establish a technology foundation to facilitate construction of next-generation distributed applications. By incorporating a comprehensive service infrastructure and an enhanced IBC protocol into the Tendermint & Cosmos stack, IRISnet enables service interoperability as well as token transfers across an internet of blockchains.
 As the centerpiece of IRISnet, IRIS Hub (a.k.a. IRIShub) will be the first regional hub connecting to the main Cosmos Hub, thus making IRISnet an inseparable part of the whole Cosmos network.
 
-
 ## IRIS Hub Mainnet
 
-To join the mainnet, follow
-[this guide](https://www.irisnet.org/docs/get-started/Join-the-Mainnet.html).
+To join the mainnet, follow [this guide](https://www.irisnet.org/docs/get-started/mainnet.html).
 
 ## Install
 
-See the 
-[install instructions](https://www.irisnet.org/docs/software/How-to-install-irishub.html).
+See the [install instructions](https://www.irisnet.org/docs/get-started/install.html).
 
 ## Resources
 
-* Explorer: https://www.irisplorer.io/#/home
-* Riot chat: https://riot.im/app/#/room/#irisvalidators:matrix.org
+* Explorer: <https://www.irisplorer.io>
+* Riot chat: <https://riot.im/app/#/room/#irisvalidators:matrix.org>
 
 ## How To Contribute
 

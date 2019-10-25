@@ -1,5 +1,9 @@
 # IRISnet 文档
-![irisnet](../pics/iris.jpg)
 
-IRIS网络是上海边界智能和Tendermint团队合作打造的跨链区块链网络，将是Cosmos网络生态中的第一个区域性枢纽(Hub)，并专注于为分布式商业应用提供基础设施和协议。
-IRISnet将面向服务的基础设施融入到Cosmos网络中，支持对包括公链、联盟链以及现有传统商业系统的集成，从而实现互联互通。通过对Cosmos网络的跨链协议进行创新扩展，IRISnet允许数据及复杂计算跨异构网络被调用。就像忠实地在人间和天堂传递信息的希腊彩虹女神Iris, IRISnet的目标是成为链接数字经济和实体经济，支持构建复杂分布式商业应用的下一代公链。
+![irisnet](./pics/iris.jpg)
+
+## 关于IRISnet
+
+IRISnet（主网 IRIS Hub）是支持DeFi等各种复杂分布式应用的跨链服务枢纽。IRIS Hub采用Cosmos SDK开发，是第一个可自进化的BPoS网络，其开发团队包括获得多个技术创新大奖的[边界智能](https://www.bianjie.ai)以及Cosmos核心开发团队[Tendermint](https://tendermint.com)。
+
+IRISnet提供支持DeFi应用开发的多种基础模块，并能支持公有链、联盟链以及传统商业系统之间的无缝集成，使得数据和复杂计算能够跨异构网络互联互通，实现服务的跨链调用。
