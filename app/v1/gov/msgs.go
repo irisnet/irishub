@@ -340,10 +340,9 @@ type MsgSubmitTokenAdditionProposal struct {
 	Name            string `json:"name"`
 	Decimal         uint8  `json:"decimal"`
 	MinUnitAlias    string `json:"min_unit_alias"`
-	InitialSupply   uint64 `json:"initial_supply"`
 }
 
-func NewMsgSubmitTokenAdditionProposal(msgSubmitProposal MsgSubmitProposal, symbol, canonicalSymbol, name, minUnitAlias string, decimal uint8, initialSupply uint64) MsgSubmitTokenAdditionProposal {
+func NewMsgSubmitTokenAdditionProposal(msgSubmitProposal MsgSubmitProposal, symbol, canonicalSymbol, name, minUnitAlias string, decimal uint8) MsgSubmitTokenAdditionProposal {
 	return MsgSubmitTokenAdditionProposal{
 		MsgSubmitProposal: msgSubmitProposal,
 		Symbol:            symbol,
@@ -351,7 +350,6 @@ func NewMsgSubmitTokenAdditionProposal(msgSubmitProposal MsgSubmitProposal, symb
 		Name:              name,
 		Decimal:           decimal,
 		MinUnitAlias:      minUnitAlias,
-		InitialSupply:     initialSupply,
 	}
 }
 
@@ -361,7 +359,7 @@ func (msg MsgSubmitTokenAdditionProposal) ValidateBasic() sdk.Error {
 		return err
 	}
 
-	issueToken := exported.NewMsgIssueToken(exported.FUNGIBLE, exported.EXTERNAL, "", msg.Symbol, msg.CanonicalSymbol, msg.Name, msg.Decimal, msg.MinUnitAlias, msg.InitialSupply, exported.MaximumAssetMaxSupply, false, nil)
+	issueToken := exported.NewMsgIssueToken(exported.FUNGIBLE, exported.EXTERNAL, "", msg.Symbol, msg.CanonicalSymbol, msg.Name, msg.Decimal, msg.MinUnitAlias, 0, exported.MaximumAssetMaxSupply, true, nil)
 	return exported.ValidateMsgIssueToken(&issueToken)
 }
 func (msg MsgSubmitTokenAdditionProposal) GetSignBytes() []byte {

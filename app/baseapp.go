@@ -507,7 +507,7 @@ func (app *BaseApp) BeginBlock(req abci.RequestBeginBlock) (res abci.ResponseBeg
 		// by InitChain. Context is now updated with Header information.
 		app.deliverState.ctx = app.deliverState.ctx.
 			WithBlockHeader(req.Header).
-			WithBlockHeight(req.Header.Height).WithCheckValidNum(sdk.NewValidTxCounter())
+			WithCheckValidNum(sdk.NewValidTxCounter())
 	}
 
 	// add block gas meter
@@ -745,7 +745,7 @@ func (app *BaseApp) runTx(mode RunTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 	}
 
 	if mode == RunTxModeDeliver {
-		app.deliverState.ctx.CheckValidNum().Incr()
+		app.deliverState.ctx.ValidTxCounter().Incr()
 	}
 
 	defer func() {

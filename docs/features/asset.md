@@ -21,7 +21,7 @@ The only way to create an `external asset` is by submitting an `AddAssetProposal
 
 ### Gateways
 
-A gateway is a trusted party that facilitates moving value into and out of the IRIS Network. Gateways are basically equivalent to the standard exchange model where you depend on the solvency of the exchange to be able to redeem your coins. Generally gateways issue [native assets](#Native-Assets) prefixed with their symbol, like GDEX, OPEN, and so on. These assets are backed 100% by the real BTC or ETH or any other coin that people deposit in the gateways.
+A gateway is a trusted party that facilitates moving value into and out of the IRIS Network. Gateways are basically equivalent to the standard exchange model where you depend on the solvency of the exchange to be able to redeem your coins. Generally gateways issue [native assets](#native-assets) prefixed with their symbol, like GDEX, OPEN, and so on. These assets are backed 100% by the real BTC or ETH or any other coin that people deposit in the gateways.
 
 ### Fees
 
@@ -68,42 +68,42 @@ Note: The parameters above can all be governed.
 
 - **Tokens**
 
-  - [Issue Token](../cli-client/asset/issue-token.md)
+  - [Issue Token](../cli-client/asset.md#iriscli-asset-issue-token)
 
-    - [Issue a native token](../cli-client/asset/issue-token.md#issue-a-native-token)
+    - [Issue a native token](../cli-client/asset.md#issue-native-token)
 
-    - [Issue a gateway token](../cli-client/asset/issue-token.md#issue-a-gateway-token)
+    - [Issue a gateway token](../cli-client/asset.md#issue-gateway-token)
 
-    - [Send tokens](../cli-client/asset/issue-token.md#send-tokens)
+    - [Send tokens](../cli-client/asset.md#send-tokens)
 
-  - [Query Token](../cli-client/asset/query-token.md)
+  - [Query Token](../cli-client/asset.md#iriscli-asset-query-token)
 
-  - [Query Tokens](../cli-client/asset/query-tokens.md)
+  - [Query Tokens](../cli-client/asset.md#iriscli-asset-query-tokens)
 
-  - [Edit Token](../cli-client/asset/edit-token.md)
+  - [Edit Token](../cli-client/asset.md#iriscli-asset-edit-token)
 
-  - [Mint Token](../cli-client/asset/mint-token.md)
+  - [Mint Token](../cli-client/asset.md#iriscli-asset-mint-token)
 
-  - [Burn Token](../cli-client/bank/burn.md)
+  - [Burn Token](../cli-client/bank.md#iriscli-bank-burn)
 
-  - [Transfer Ownership](../cli-client/asset/transfer-token-owner.md)
+  - [Transfer Ownership](../cli-client/asset.md#iriscli-asset-transfer-token-owner)
 
 - **Gateways**
 
-  - [Create Gateway](../cli-client/asset/create-gateway.md)
+  - [Create Gateway](../cli-client/asset.md#iriscli-asset-create-gateway)
 
-  - [Query Gateway](../cli-client/asset/query-gateway.md)
+  - [Query Gateway](../cli-client/asset.md#iriscli-asset-query-gateway)
 
-  - [Query Gateways](../cli-client/asset/query-gateways.md)
+  - [Query Gateways](../cli-client/asset.md#iriscli-asset-query-gateways)
 
-  - [Edit Gateway](../cli-client/asset/edit-gateway.md)
+  - [Edit Gateway](../cli-client/asset.md#iriscli-asset-edit-gateway)
 
-  - [Transfer Ownership](../cli-client/asset/transfer-gateway-owner.md)
+  - [Transfer Ownership](../cli-client/asset.md#iriscli-asset-transfer-gateway-owner)
 
 - **Fees**
 
-  - [Query Gateway Fee](../cli-client/asset/query-fee.md#query-fee-of-creating-a-gateway)
+  - [Query Gateway Fee](../cli-client/asset.md#query-fee-of-creating-a-gateway)
 
-  - [Query Native Token Fee](../cli-client/asset/query-fee.md#query-fee-of-issuing-and-minting-a-native-token)
+  - [Query Native Token Fee](../cli-client/asset.md#query-fee-of-issuing-and-minting-a-native-token)
 
-  - [Query Gateway Token Fee](../cli-client/asset/query-fee.md#query-fee-of-issuing-and-minting-a-gateway-token)
+  - [Query Gateway Token Fee](../cli-client/asset.md#query-fee-of-issuing-and-minting-a-gateway-token)

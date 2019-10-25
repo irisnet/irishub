@@ -49,6 +49,6 @@ In view of the security risks of PRNG, we plan to introduce TRNG through the ora
 
 ## Actions
 
-- [Request Random Number](../cli-client/rand/request-rand.md)
-- [Query Random Number](../cli-client/rand/query-rand.md)
-- [Query Random Queue](../cli-client/rand/query-queue.md)
+- [Request Random Number](../cli-client/rand.md#iriscli-rand-request-rand)
+- [Query Random Number](../cli-client/rand.md#iriscli-rand-query-rand)
+- [Query Random Queue](../cli-client/rand.md#iriscli-rand-query-queue)

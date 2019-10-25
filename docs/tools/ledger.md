@@ -20,7 +20,7 @@ To use `iriscli` with a Ledger device you will need the following(Since IRISnet 
 
 - [A Ledger Nano with the `COSMOS` app installed and an account.](#using-a-ledger-device)
 - [A running `iris` instance connected to the network you wish to use.](../get-started/mainnet.md)
-- [A `iriscli` instance configured to connect to your chosen `iris` instance.](./cli-client.md)
+- [A `iriscli` instance configured to connect to your chosen `iris` instance.](../cli-client/intro.md)
 
 Now, you are all set to start sending transactions on the network.
 

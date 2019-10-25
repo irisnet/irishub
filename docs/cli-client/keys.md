@@ -91,7 +91,7 @@ If you don't have all the permission of sub-keys, you can ask for the pubkeys to
 Offline key can be created by "iriscli keys add --pubkey".
 :::
 
-How to use multisig key to sign and broadcast a transaction,  please refer to [multisig](../tx.md#multisig)
+How to use multisig key to sign and broadcast a transaction,  please refer to [multisign](tx.md#iriscli-tx-multisign)
 
 ## iriscli keys list
 
