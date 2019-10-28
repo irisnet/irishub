@@ -89,11 +89,11 @@ func (k Keeper) HandleAddLiquidity(ctx sdk.Context, msg types.MsgAddLiquidity) (
 		mintLiquidityAmt = msg.ExactIrisAmt
 		depositToken = sdk.NewCoin(msg.MaxToken.Denom, msg.MaxToken.Amount)
 	} else {
-		mintLiquidityAmt = (liquidity.Mul(msg.ExactIrisAmt)).Div(irisReserveAmt).AddRaw(1)
+		mintLiquidityAmt = (liquidity.Mul(msg.ExactIrisAmt)).Div(irisReserveAmt)
 		if mintLiquidityAmt.LT(msg.MinLiquidity) {
 			return tags, types.ErrConstraintNotMet(fmt.Sprintf("liquidity to be minted to user [%s] is less than user defined min_liquidity[%s]", mintLiquidityAmt.String(), msg.MinLiquidity.String()))
 		}
-		depositAmt := (tokenReserveAmt.Mul(msg.ExactIrisAmt)).Div(irisReserveAmt)
+		depositAmt := (tokenReserveAmt.Mul(msg.ExactIrisAmt)).Div(irisReserveAmt).AddRaw(1)
 		depositToken = sdk.NewCoin(msg.MaxToken.Denom, depositAmt)
 
 		if depositAmt.GT(msg.MaxToken.Amount) {
