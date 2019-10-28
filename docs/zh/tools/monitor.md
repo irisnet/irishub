@@ -6,11 +6,9 @@ order: 1
 
 ## 简介
 
-IRISnet可以报告和提供Prometheus metrics，Prometheus收集器可以使用这些指标。
+IRIShub 软件可以提供Prometheus监控指标，Prometheus可以收集这些指标。
 
-默认情况下禁用此功能。
-
-要启用Prometheus metrics，请在配置文件(config.toml)中设置`prometheus = true`。默认情况下，Metrics将在26660端口下的/metrics提供。可以在配置文件中修改服务地址`prometheus_listen_addr = ":26660"`。
+默认情况下此功能是被禁用的，要启用Prometheus监控指标，请在配置文件(config.toml)中设置`prometheus = true`。默认情况下，Metrics将在26660端口下的/metrics提供，可以在配置文件中修改服务地址`prometheus_listen_addr = ":26660"`。
 
 ## 监控指标
 
@@ -31,14 +29,14 @@ IRISnet可以报告和提供Prometheus metrics，Prometheus收集器可以使用
 | module_gov_proposal_status        | Gauge   | proposal_id                    | 提议状态，0:抵押期 1:投票期 2:通过 3:拒绝 4:其他 |
 | module_gov_vote                   | Gauge   | proposal_id, validator_address | 验证人投票结果，0:同意 1:反对 2:强烈反对 3:弃权  |
 | module_distribution_community_tax | Gauge   | height                         | 社区基金累计值                                   |
-| v0_invariant_failure              | counter | error                          | Invariant检查错误事件                            |
+| v0_invariant_failure              | Counter | error                          | Invariant检查错误事件                            |
 
 共识层监控参数如下，名字空间：`tendermint`
 
 | **Name**                             | **Type**  | **Tags**         | **Description**                                  |
 | ------------------------------------ | --------- | ---------------- | ------------------------------------------------ |
 | consensus_height                     | Gauge     |                  | 共识状态机所在高度                               |
-| consensus_failure                    | counter   | height           | 导致共识状态机终止的错误                         |
+| consensus_failure                    | Counter   | height           | 导致共识状态机终止的错误                         |
 | consensus_validators_power           | Gauge     |                  | 验证人的投票权重之和                             |
 | consensus_missing_validators         | Gauge     |                  | 块中缺失的precommit数量                          |
 | consensus_missing_validators_power   | Gauge     |                  | 块中缺失的precommit对应的验证人所占的投票权重    |
@@ -48,23 +46,23 @@ IRISnet可以报告和提供Prometheus metrics，Prometheus收集器可以使用
 | consensus_rounds                     | Gauge     |                  | 共识状态机所处的round                            |
 | consensus_num_txs                    | Gauge     |                  | 区块中包含的交易数量                             |
 | consensus_num_txs                    | Gauge     |                  | 区块中包含的交易数量                             |
-| consensus_block_parts                | counter   | peer_id          | 区块被切分的块数                                 |
-| consensus_latest_block_height        | gauge     |                  | 共识状态机上一个高度                             |
-| consensus_fast_syncing               | gauge     |                  | 是否处于fast_sync模式                            |
+| consensus_block_parts                | Counter   | peer_id          | 区块被切分的块数                                 |
+| consensus_latest_block_height        | Gauge     |                  | 共识状态机上一个高度                             |
+| consensus_fast_syncing               | Gauge     |                  | 是否处于fast_sync模式                            |
 | consensus_total_txs                  | Gauge     |                  | 区块链打包的交易总数                             |
 | consensus_block_size_bytes           | Gauge     |                  | 区块大小                                         |
 | p2p_peers                            | Gauge     |                  | 连接的peer的数量                                 |
-| p2p_peer_receive_bytes_total         | counter   | peer_id          | 从某个peer接受的字节数量                         |
-| p2p_peer_send_bytes_total            | counter   | peer_id          | 发给某个peer的字节数量                           |
-| p2p_peer_pending_send_bytes          | gauge     | peer_id          | 处于等待发送状态的字节数量                       |
-| p2p_num_txs                          | gauge     | peer_id          | 某个peer广播过来的交易数量                       |
+| p2p_peer_receive_bytes_total         | Counter   | peer_id          | 从某个peer接受的字节数量                         |
+| p2p_peer_send_bytes_total            | Counter   | peer_id          | 发给某个peer的字节数量                           |
+| p2p_peer_pending_send_bytes          | Gauge     | peer_id          | 处于等待发送状态的字节数量                       |
+| p2p_num_txs                          | Gauge     | peer_id          | 某个peer广播过来的交易数量                       |
 | mempool_size                         | Gauge     |                  | mempool中交易数量                                |
-| mempool_tx_size_bytes                | histogram |                  | mempool中新增的交易大小                          |
-| mempool_failed_txs                   | counter   |                  | mempool收到的无法通过checkTx的交易数量           |
-| mempool_recheck_times                | counter   |                  | mempool中对多少交易执行过recheck                 |
-| state_block_processing_time          | histogram |                  | 交易执行所消耗的时间，不包含beginBlock和endBlock |
-| state_recheck_time                   | histogram |                  | recheck消耗的时间                                |
-| state_app_hash_conflict              | count     | proposer, height | appHash冲突的错误                                |
+| mempool_tx_size_bytes                | Histogram |                  | mempool中新增的交易大小                          |
+| mempool_failed_txs                   | Counter   |                  | mempool收到的无法通过checkTx的交易数量           |
+| mempool_recheck_times                | Counter   |                  | mempool中对多少交易执行过recheck                 |
+| state_block_processing_time          | Histogram |                  | 交易执行所消耗的时间，不包含beginBlock和endBlock |
+| state_recheck_time                   | Histogram |                  | Recheck消耗的时间                                |
+| state_app_hash_conflict              | Counter   | proposer, height | AppHash冲突的错误                                |
 
 IRIShub metrics也包含tendermint metrics，有关更多信息，请访问[tendermint metrics](https://github.com/irisnet/tendermint/blob/irisnet/master/docs/tendermint-core/metrics.md)。
 
@@ -102,8 +100,10 @@ docker run -d --name=prometheus -p 9090:9090 -v ~/volumes/prometheus:/etc/promet
 docker run -d --name=grafana -p 3000:3000 grafana/grafana
 ```
 
-你可以访问<http://localhost:3000/>打开grafana并创建自己的仪表盘。
+你可以访问<http://localhost:3000/>打开Grafana并创建自己的仪表盘。
 
 :::tip
 默认的用户名和密码均为admin。强烈建议在登录后立即更改你的用户名和密码。
+
+兼容所有基于 cosmos-sdk 和 tendermint 的区块链的 Grafana 仪表盘: [cosmos-dashboard](https://github.com/zhangyelong/cosmos-dashboard)
 :::

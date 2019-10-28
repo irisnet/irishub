@@ -31,14 +31,14 @@ Application metrics, namespace: `iris`
 | module_gov_proposal_status        | Gauge    | proposal_id                    | Status of proposal, 0:DepositPeriod 1:VotingPeriod 2:Pass 3:Reject 4:Other |
 | module_gov_vote                   | Gauge    | proposal_id, validator_address | Validator vote result of a proposal, 0:Yes 1:No 2:NoWithVeto 3:Abstain |
 | module_distribution_community_tax | Gauge    | height                         | Community tax accumulation                                   |
-| v0_invariant_failure              | counter  | error                          | Invariant failure stats                                      |
+| v0_invariant_failure              | Counter  | error                          | Invariant failure stats                                      |
 
 Consensus metrics, namespace: `tendermint`
 
 | **Name**                             | **Type**  | **Tags**         | **Description**                                              |
 | ------------------------------------ | --------- | ---------------- | ------------------------------------------------------------ |
 | consensus_height                     | Gauge     |                  | Height of the chain                                          |
-| consensus_failure                    | counter   | height           | Consensus failure                                            |
+| consensus_failure                    | Counter   | height           | Consensus failure                                            |
 | consensus_validators                 | Gauge     |                  | Number of validators                                         |
 | consensus_validators_power           | Gauge     |                  | Total voting power of all validators                         |
 | consensus_missing_validators         | Gauge     |                  | Number of validators who did not sign                        |
@@ -48,23 +48,23 @@ Consensus metrics, namespace: `tendermint`
 | consensus_block_interval_seconds     | Histogram |                  | Time between this and last block (Block.Header.Time) in seconds |
 | consensus_rounds                     | Gauge     |                  | Number of rounds                                             |
 | consensus_num_txs                    | Gauge     |                  | Number of transactions                                       |
-| consensus_block_parts                | counter   | peer_id          | number of blockparts transmitted by peer                     |
-| consensus_latest_block_height        | gauge     |                  | /status sync_info number                                     |
-| consensus_fast_syncing               | gauge     |                  | either 0 (not fast syncing) or 1 (syncing)                   |
+| consensus_block_parts                | Counter   | peer_id          | Number of blockparts transmitted by peer                     |
+| consensus_latest_block_height        | Gauge     |                  | /status sync_info number                                     |
+| consensus_fast_syncing               | Gauge     |                  | Either 0 (not fast syncing) or 1 (syncing)                   |
 | consensus_total_txs                  | Gauge     |                  | Total number of transactions committed                       |
 | consensus_block_size_bytes           | Gauge     |                  | Block size in bytes                                          |
 | p2p_peers                            | Gauge     |                  | Number of peers node's connected to                          |
-| p2p_peer_receive_bytes_total         | counter   | peer_id          | number of bytes received from a given peer                   |
-| p2p_peer_send_bytes_total            | counter   | peer_id          | number of bytes sent to a given peer                         |
-| p2p_peer_pending_send_bytes          | gauge     | peer_id          | number of pending bytes to be sent to a given peer           |
-| p2p_num_txs                          | gauge     | peer_id          | number of transactions submitted by each peer_id             |
+| p2p_peer_receive_bytes_total         | Counter   | peer_id          | Number of bytes received from a given peer                   |
+| p2p_peer_send_bytes_total            | Counter   | peer_id          | Number of bytes sent to a given peer                         |
+| p2p_peer_pending_send_bytes          | Gauge     | peer_id          | Number of pending bytes to be sent to a given peer           |
+| p2p_num_txs                          | Gauge     | peer_id          | Number of transactions submitted by each peer_id             |
 | mempool_size                         | Gauge     |                  | Number of uncommitted transactions                           |
-| mempool_tx_size_bytes                | histogram |                  | transaction sizes in bytes                                   |
-| mempool_failed_txs                   | counter   |                  | number of failed transactions                                |
-| mempool_recheck_times                | counter   |                  | number of transactions rechecked in the mempool              |
-| state_block_processing_time          | histogram |                  | time between BeginBlock and EndBlock in ms                   |
-| state_recheck_time                   | histogram |                  | time cost on recheck in ms                                   |
-| state_app_hash_conflict              | count     | proposer, height | App hash conflict error                                      |
+| mempool_tx_size_bytes                | Histogram |                  | Transaction sizes in bytes                                   |
+| mempool_failed_txs                   | Counter   |                  | Number of failed transactions                                |
+| mempool_recheck_times                | Counter   |                  | Number of transactions rechecked in the mempool              |
+| state_block_processing_time          | Histogram |                  | Time between BeginBlock and EndBlock in ms                   |
+| state_recheck_time                   | Histogram |                  | Time cost on recheck in ms                                   |
+| state_app_hash_conflict              | Counter   | proposer, height | App hash conflict error                                      |
 
 IRIShub metrics also contains tendermint metrics, Visit [tendermint metrics](https://github.com/irisnet/tendermint/blob/irisnet/master/docs/tendermint-core/metrics.md) for more information.
 
@@ -106,4 +106,6 @@ You can visit <http://localhost:3000/> to open grafana and create your own dashb
 
 :::tip
 The default username and password are both admin. We strongly recommend immediately changing your username & password after login.
+
+A Grafana dashboard compatible with all the cosmos-sdk and tendermint based blockchains: [cosmos-dashboard](https://github.com/zhangyelong/cosmos-dashboard)
 :::
