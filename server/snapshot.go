@@ -25,7 +25,7 @@ const pathSeparator = string(os.PathSeparator)
 func SnapshotCmd(ctx *Context) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "snapshot",
-		Short: "snapshot current block information and drop other block",
+		Short: "snapshot the latest information and drop the others",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			home := viper.GetString(tmcli.HomeFlag)
 			emptyState, err := isEmptyState(home)
