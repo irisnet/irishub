@@ -101,8 +101,8 @@ func snapshotState(home, targetDir string, height int64, cdc *codec.Codec) error
 		return fmt.Errorf("wrong block height,should: %d, but got %d", height, state.LastBlockHeight)
 	}
 
-	saveValidatorsInfo(originDb, targetDb, height, cdc)
-
+	saveValidatorsInfo(cdc, originDb, targetDb, height)
+	saveConsensusParamsInfo(cdc, originDb, targetDb, height)
 	tmsm.SaveState(targetDb, state)
 
 	return nil
@@ -225,7 +225,7 @@ func pathExists(path string) (bool, error) {
 	return false, err
 }
 
-func loadValidatorsInfo(db dbm.DB, height int64, cdc *codec.Codec) *tmsm.ValidatorsInfo {
+func loadValidatorsInfo(cdc *codec.Codec, db dbm.DB, height int64) *tmsm.ValidatorsInfo {
 	buf := db.Get(calcValidatorsKey(height))
 	if len(buf) == 0 {
 		return nil
@@ -239,17 +239,46 @@ func loadValidatorsInfo(db dbm.DB, height int64, cdc *codec.Codec) *tmsm.Validat
 	return v
 }
 
-func saveValidatorsInfo(originDb, targetDb dbm.DB, height int64, cdc *codec.Codec) {
-	valInfo := loadValidatorsInfo(originDb, height, cdc)
+func saveValidatorsInfo(cdc *codec.Codec, originDb, targetDb dbm.DB, height int64) {
+	valInfo := loadValidatorsInfo(cdc, originDb, height)
 	if valInfo.LastHeightChanged > height {
 		panic("LastHeightChanged cannot be greater than ValidatorsInfo height")
 	}
 	if valInfo.ValidatorSet == nil {
-		valInfo = loadValidatorsInfo(originDb, valInfo.LastHeightChanged, cdc)
+		valInfo = loadValidatorsInfo(cdc, originDb, valInfo.LastHeightChanged)
 	}
 	targetDb.Set(calcValidatorsKey(valInfo.LastHeightChanged), valInfo.Bytes())
 }
 
+func loadConsensusParamsInfo(cdc *codec.Codec, db dbm.DB, height int64) *tmsm.ConsensusParamsInfo {
+	buf := db.Get(calcConsensusParamsKey(height))
+	if len(buf) == 0 {
+		return nil
+	}
+
+	paramsInfo := new(tmsm.ConsensusParamsInfo)
+	err := cdc.UnmarshalBinaryBare(buf, paramsInfo)
+	if err != nil {
+		return paramsInfo
+	}
+	return paramsInfo
+}
+
+func saveConsensusParamsInfo(cdc *codec.Codec, originDb, targetDb dbm.DB, height int64) {
+	consensusParamsInfo := loadConsensusParamsInfo(cdc, originDb, height)
+	if consensusParamsInfo.ConsensusParams.Equals(&types.ConsensusParams{}) {
+		consensusParamsInfo = loadConsensusParamsInfo(cdc, originDb, consensusParamsInfo.LastHeightChanged)
+	}
+	paramsInfo := &tmsm.ConsensusParamsInfo{
+		LastHeightChanged: consensusParamsInfo.LastHeightChanged,
+	}
+	targetDb.Set(calcConsensusParamsKey(consensusParamsInfo.LastHeightChanged), paramsInfo.Bytes())
+}
+
 func calcValidatorsKey(height int64) []byte {
 	return []byte(fmt.Sprintf("validatorsKey:%v", height))
+}
+
+func calcConsensusParamsKey(height int64) []byte {
+	return []byte(fmt.Sprintf("consensusParamsKey:%v", height))
 }
