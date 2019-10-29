@@ -3,6 +3,7 @@ package server
 import (
 	"errors"
 	"fmt"
+	"github.com/irisnet/irishub/codec"
 	"io"
 	"os"
 	"path/filepath"
@@ -22,7 +23,7 @@ const flagTmpDir = "tmp-dir"
 const pathSeparator = string(os.PathSeparator)
 
 // SnapshotCmd delete historical block data and index data
-func SnapshotCmd(ctx *Context) *cobra.Command {
+func SnapshotCmd(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "snapshot",
 		Short: "snapshot the latest information and drop the others",
@@ -40,7 +41,7 @@ func SnapshotCmd(ctx *Context) *cobra.Command {
 				targetDir = filepath.Join(home, "data.bak")
 			}
 
-			if err = dumpData(srcDir, targetDir); err != nil {
+			if err = dumpData(srcDir, targetDir, cdc); err != nil {
 				os.RemoveAll(targetDir)
 				fmt.Println(fmt.Sprintf("FAILED: %s", err.Error()))
 				return err
@@ -61,7 +62,7 @@ func loadDb(name, path string) *dbm.GoLevelDB {
 	return db
 }
 
-func dumpData(home, targetDir string) error {
+func dumpData(home, targetDir string, cdc *codec.Codec) error {
 	//save local current block and flush disk
 	lastHeight := snapshotBlock(home, targetDir)
 
@@ -71,7 +72,7 @@ func dumpData(home, targetDir string) error {
 	}
 
 	//save local current block height state
-	snapshotState(home, targetDir, lastHeight)
+	snapshotState(home, targetDir, lastHeight, cdc)
 
 	//copy application
 	appDir := filepath.Join(home, "application.db")
@@ -86,7 +87,7 @@ func dumpData(home, targetDir string) error {
 	return copyDir(evidenceDir, evidenceTargetDir)
 }
 
-func snapshotState(home, targetDir string, height int64) error {
+func snapshotState(home, targetDir string, height int64, cdc *codec.Codec) error {
 	originDb := loadDb("state", home)
 	defer originDb.Close()
 
@@ -99,7 +100,10 @@ func snapshotState(home, targetDir string, height int64) error {
 		return fmt.Errorf("wrong block height,should: %d, but got %d", height, state.LastBlockHeight)
 	}
 
+	saveValidatorsInfo(originDb, targetDb, height, cdc)
+
 	tmsm.SaveState(targetDb, state)
+
 	return nil
 }
 
@@ -218,4 +222,33 @@ func pathExists(path string) (bool, error) {
 		return false, nil
 	}
 	return false, err
+}
+
+func loadValidatorsInfo(db dbm.DB, height int64, cdc *codec.Codec) *tmsm.ValidatorsInfo {
+	buf := db.Get(calcValidatorsKey(height))
+	if len(buf) == 0 {
+		return nil
+	}
+
+	v := new(tmsm.ValidatorsInfo)
+	err := cdc.UnmarshalBinaryBare(buf, v)
+	if err != nil {
+		return v
+	}
+	return v
+}
+
+func saveValidatorsInfo(originDb, targetDb dbm.DB, height int64, cdc *codec.Codec) {
+	valInfo := loadValidatorsInfo(originDb, height, cdc)
+	if valInfo.LastHeightChanged > height {
+		panic("LastHeightChanged cannot be greater than ValidatorsInfo height")
+	}
+	if valInfo.ValidatorSet == nil {
+		valInfo = loadValidatorsInfo(originDb, valInfo.LastHeightChanged, cdc)
+	}
+	targetDb.Set(calcValidatorsKey(valInfo.LastHeightChanged), valInfo.Bytes())
+}
+
+func calcValidatorsKey(height int64) []byte {
+	return []byte(fmt.Sprintf("validatorsKey:%v", height))
 }
