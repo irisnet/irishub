@@ -3,11 +3,12 @@ package server
 import (
 	"errors"
 	"fmt"
-	"github.com/irisnet/irishub/codec"
 	"io"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/irisnet/irishub/codec"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
