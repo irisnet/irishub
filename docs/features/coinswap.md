@@ -20,7 +20,7 @@ Any individual, organization, or institution that mortgages tokens to a liquidit
 
 ### Maker formula
 
-Use a constant product as the market making formula: $x \ast y=k$  `x` represents the number of x tokens, and `y` represents the number of y tokens. During the redemption process, the value of `k` remains the same, and the value changes only when the market maker increases/decreases the liquidity.
+Use a constant product as the market making formula: `x * y = k`,  `x` represents the number of x tokens, and `y` represents the number of y tokens. During the redemption process, the value of `k` remains the same, and the value changes only when the market maker increases/decreases the liquidity.
 
 ## Actions
 
