@@ -7,6 +7,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	tmcli "github.com/tendermint/tendermint/libs/cli"
 )
 
 // ResetCmd reset app state to particular height
@@ -15,7 +16,7 @@ func ResetCmd(ctx *Context, cdc *codec.Codec, appReset AppReset) *cobra.Command 
 		Use:   "reset",
 		Short: "Reset app state to the specified height",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			home := viper.GetString("home")
+			home := viper.GetString(tmcli.HomeFlag)
 			traceWriterFile := viper.GetString(flagTraceStore)
 			emptyState, err := isEmptyState(home)
 			if err != nil {
