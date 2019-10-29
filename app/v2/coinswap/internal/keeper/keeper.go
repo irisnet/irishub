@@ -34,7 +34,7 @@ func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, bk types.BankKeeper, ak types
 	}
 }
 
-func (k Keeper) HandleSwap(ctx sdk.Context, msg types.MsgSwapOrder) (sdk.Tags, []byte, sdk.Error) {
+func (k Keeper) HandleSwap(ctx sdk.Context, msg types.MsgSwapOrder) (sdk.Tags, sdk.Error) {
 	tags := sdk.EmptyTags()
 	var amount sdk.Int
 	var err sdk.Error
@@ -50,7 +50,7 @@ func (k Keeper) HandleSwap(ctx sdk.Context, msg types.MsgSwapOrder) (sdk.Tags, [
 		amount, err = k.tradeExactInputForOutput(ctx, msg.Input, msg.Output)
 	}
 	if err != nil {
-		return tags, nil, err
+		return tags, err
 	}
 
 	tags = sdk.NewTags(
@@ -61,7 +61,7 @@ func (k Keeper) HandleSwap(ctx sdk.Context, msg types.MsgSwapOrder) (sdk.Tags, [
 		types.TagTokenPair, []byte(getTokenPairByDenom(msg.Input.Coin.Denom, msg.Output.Coin.Denom)),
 	)
 
-	return tags, []byte(amount.String()), nil
+	return tags, nil
 }
 
 func (k Keeper) HandleAddLiquidity(ctx sdk.Context, msg types.MsgAddLiquidity) (sdk.Tags, sdk.Error) {
