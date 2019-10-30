@@ -8,6 +8,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/irisnet/irishub/codec"
+
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	bc "github.com/tendermint/tendermint/blockchain"
@@ -22,7 +24,7 @@ const flagTmpDir = "tmp-dir"
 const pathSeparator = string(os.PathSeparator)
 
 // SnapshotCmd delete historical block data and index data
-func SnapshotCmd(ctx *Context) *cobra.Command {
+func SnapshotCmd(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "snapshot",
 		Short: "snapshot the latest information and drop the others",
@@ -40,7 +42,7 @@ func SnapshotCmd(ctx *Context) *cobra.Command {
 				targetDir = filepath.Join(home, "data.bak")
 			}
 
-			if err = dumpData(srcDir, targetDir); err != nil {
+			if err = dumpData(srcDir, targetDir, cdc); err != nil {
 				os.RemoveAll(targetDir)
 				fmt.Println(fmt.Sprintf("FAILED: %s", err.Error()))
 				return err
@@ -61,7 +63,7 @@ func loadDb(name, path string) *dbm.GoLevelDB {
 	return db
 }
 
-func dumpData(home, targetDir string) error {
+func dumpData(home, targetDir string, cdc *codec.Codec) error {
 	//save local current block and flush disk
 	lastHeight := snapshotBlock(home, targetDir)
 
@@ -71,7 +73,7 @@ func dumpData(home, targetDir string) error {
 	}
 
 	//save local current block height state
-	snapshotState(home, targetDir, lastHeight)
+	snapshotState(home, targetDir, lastHeight, cdc)
 
 	//copy application
 	appDir := filepath.Join(home, "application.db")
@@ -86,7 +88,7 @@ func dumpData(home, targetDir string) error {
 	return copyDir(evidenceDir, evidenceTargetDir)
 }
 
-func snapshotState(home, targetDir string, height int64) error {
+func snapshotState(home, targetDir string, height int64, cdc *codec.Codec) error {
 	originDb := loadDb("state", home)
 	defer originDb.Close()
 
@@ -99,7 +101,10 @@ func snapshotState(home, targetDir string, height int64) error {
 		return fmt.Errorf("wrong block height,should: %d, but got %d", height, state.LastBlockHeight)
 	}
 
+	saveValidatorsInfo(cdc, originDb, targetDb, height)
+	saveConsensusParamsInfo(cdc, originDb, targetDb, height)
 	tmsm.SaveState(targetDb, state)
+
 	return nil
 }
 
@@ -218,4 +223,62 @@ func pathExists(path string) (bool, error) {
 		return false, nil
 	}
 	return false, err
+}
+
+func loadValidatorsInfo(cdc *codec.Codec, db dbm.DB, height int64) *tmsm.ValidatorsInfo {
+	buf := db.Get(calcValidatorsKey(height))
+	if len(buf) == 0 {
+		return nil
+	}
+
+	v := new(tmsm.ValidatorsInfo)
+	err := cdc.UnmarshalBinaryBare(buf, v)
+	if err != nil {
+		return v
+	}
+	return v
+}
+
+func saveValidatorsInfo(cdc *codec.Codec, originDb, targetDb dbm.DB, height int64) {
+	valInfo := loadValidatorsInfo(cdc, originDb, height)
+	if valInfo.LastHeightChanged > height {
+		panic("LastHeightChanged cannot be greater than ValidatorsInfo height")
+	}
+	if valInfo.ValidatorSet == nil {
+		valInfo = loadValidatorsInfo(cdc, originDb, valInfo.LastHeightChanged)
+	}
+	targetDb.Set(calcValidatorsKey(valInfo.LastHeightChanged), valInfo.Bytes())
+}
+
+func loadConsensusParamsInfo(cdc *codec.Codec, db dbm.DB, height int64) *tmsm.ConsensusParamsInfo {
+	buf := db.Get(calcConsensusParamsKey(height))
+	if len(buf) == 0 {
+		return nil
+	}
+
+	paramsInfo := new(tmsm.ConsensusParamsInfo)
+	err := cdc.UnmarshalBinaryBare(buf, paramsInfo)
+	if err != nil {
+		return paramsInfo
+	}
+	return paramsInfo
+}
+
+func saveConsensusParamsInfo(cdc *codec.Codec, originDb, targetDb dbm.DB, height int64) {
+	consensusParamsInfo := loadConsensusParamsInfo(cdc, originDb, height)
+	if consensusParamsInfo.ConsensusParams.Equals(&types.ConsensusParams{}) {
+		consensusParamsInfo = loadConsensusParamsInfo(cdc, originDb, consensusParamsInfo.LastHeightChanged)
+	}
+	paramsInfo := &tmsm.ConsensusParamsInfo{
+		LastHeightChanged: consensusParamsInfo.LastHeightChanged,
+	}
+	targetDb.Set(calcConsensusParamsKey(consensusParamsInfo.LastHeightChanged), paramsInfo.Bytes())
+}
+
+func calcValidatorsKey(height int64) []byte {
+	return []byte(fmt.Sprintf("validatorsKey:%v", height))
+}
+
+func calcConsensusParamsKey(height int64) []byte {
+	return []byte(fmt.Sprintf("consensusParamsKey:%v", height))
 }
