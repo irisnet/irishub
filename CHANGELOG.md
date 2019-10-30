@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.15.5
+
+*Oct 30th, 2019*
+
+### Tendermint
+
+Bump Tendermint version to irisnet/tendermint [v0.31.3](https://github.com/irisnet/tendermint/releases/tag/v0.31.3) to fix the consensus security bug.
+
 ## 0.15.4
 
 *Oct 14th, 2019*
