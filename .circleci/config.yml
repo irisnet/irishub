@@ -17,7 +17,7 @@ workflows:
 jobs:
   BuildAndDeploy:
     machine:
-      docker_layer_caching: true
+      docker_layer_caching: false
     steps:
       - checkout
       - run:
@@ -46,7 +46,7 @@ jobs:
           command: docker push irisnet/irishub:testnet-$TAG
   UnitTest:
     machine:
-      docker_layer_caching: true
+      docker_layer_caching: false
     steps:
       - checkout
       - run:
