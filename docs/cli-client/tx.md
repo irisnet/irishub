@@ -18,7 +18,7 @@ Sign transactions in generated offline file. The file created with the --generat
 iriscli tx sign <file> <flags>
 ```
 
-## Flags
+### Flags
 
 | Name, shorthand | Type   | Required | Default | Description                                                                              |
 | --------------- | ------ | -------- | ------- | ---------------------------------------------------------------------------------------- |
