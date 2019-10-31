@@ -68,7 +68,7 @@ func TestIrisCLIHTLC(t *testing.T) {
 	require.Equal(t, timestamp, htlc.Timestamp)
 	require.Equal(t, stateOpen, htlc.State.String())
 
-	htlcAddr := auth.HTLCLockCoinsAccAddr
+	htlcAddr := auth.HTLCLockedCoinsAccAddr
 	htlcAcc := executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", htlcAddr, flags))
 	htlcCoin := convertToIrisBaseAccount(t, htlcAcc)
 	require.Equal(t, "10iris", htlcCoin)

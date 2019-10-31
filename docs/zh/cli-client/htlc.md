@@ -16,7 +16,7 @@
 创建一个 HTLC。
 
 ```bash
-iriscli htlc create --chain-id=<chain-id> --from=<key name> --fee=0.4iris --to=<to> --receiver-on-other-chain=<receiver-on-other-chain> --amount=<amount> --secret=<secret> --time-lock=<time-lock> --timestamp=<timestamp>
+iriscli htlc create --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --to=<to> --receiver-on-other-chain=<receiver-on-other-chain> --amount=<amount> --secret=<secret> --time-lock=<time-lock> --timestamp=<timestamp>
 ```
 
 **标识：**
@@ -24,7 +24,7 @@ iriscli htlc create --chain-id=<chain-id> --from=<key name> --fee=0.4iris --to=<
 | 名称, 速记                | 类型     | 必须 | 默认 | 描述                                              |
 | ------------------------- | -------- | ---- | ---- | ------------------------------------------------- |
 | --to                      | string   | 是   |      | Bech32编码的收款人地址                                        |
-| --receiver-on-other-chain | bytesHex |      |      | 交换对方在另一条链上的地址                           |
+| --receiver-on-other-chain | bytesHex |      |      | 另一条链上的HTLC认领接收地址                          |
 | --amount                  | string   | 是   |      | 要发送的金额                                      |
 | --secret                  | bytesHex |      |      | 用于生成Hash Lock的secret, 缺省将随机生成    |
 | --hash-lock               | bytesHex | 是   |      | 由secret和时间戳（如果提供）生成的sha256哈希 |
@@ -52,7 +52,7 @@ iriscli htlc create \
 将 HTLC 中锁定的资金发送到收款人地址。
 
 ```bash
-iriscli htlc claim --chain-id=<chain-id> --from=<key name> --fee=0.4iris --hash-lock=<hash-lock> --secret=<secret>
+iriscli htlc claim --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --hash-lock=<hash-lock> --secret=<secret>
 ```
 
 **标识：**
@@ -79,7 +79,7 @@ iriscli htlc claim \
 从过期的 HTLC 中取回退款。
 
 ```bash
-iriscli htlc refund --chain-id=<chain-id> --from=<key name> --fee=0.4iris --hash-lock=<hash-lock>
+iriscli htlc refund --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --hash-lock=<hash-lock>
 ```
 
 **标识：**

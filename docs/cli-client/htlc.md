@@ -16,7 +16,7 @@ HTLC allows you to manage local Hash Time Locked Contracts (HTLCs) for atomic sw
 Create an HTLC
 
 ```bash
-iriscli htlc create --chain-id=<chain-id> --from=<key name> --fee=0.4iris --to=<to> --receiver-on-other-chain=<receiver-on-other-chain> --amount=<amount> --secret=<secret> --time-lock=<time-lock> --timestamp=<timestamp>
+iriscli htlc create --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --to=<to> --receiver-on-other-chain=<receiver-on-other-chain> --amount=<amount> --secret=<secret> --time-lock=<time-lock> --timestamp=<timestamp>
 ```
 
 **Flags:**
@@ -24,7 +24,7 @@ iriscli htlc create --chain-id=<chain-id> --from=<key name> --fee=0.4iris --to=<
 | Name, shorthand           | Type     | Required | Default | Description                                                       |
 | ------------------------- | -------- | -------- | ------- | ----------------------------------------------------------------- |
 | --to                      | string   | Yes      |         | Bech32 encoding address to receive coins                          |
-| --receiver-on-other-chain | string   |          |         | The swap counter party address on the other chain                 |
+| --receiver-on-other-chain | string   |          |         | The claim receiving address on the other chain                 |
 | --amount                  | string   | Yes      |         | Similar to the amount in the original transfer                    |
 | --secret                  | bytesHex |          |         | The secret for generating the hash lock, omission will be randomly generated |
 | --hash-lock               | bytesHex | Yes      |         | The sha256 hash generated from secret (and timestamp if provided) |
@@ -52,7 +52,7 @@ iriscli htlc create \
 Claim an opened HTLC
 
 ```bash
-iriscli htlc claim --chain-id=<chain-id> --from=<key name> --fee=0.4iris --hash-lock=<hash-lock> --secret=<secret>
+iriscli htlc claim --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --hash-lock=<hash-lock> --secret=<secret>
 ```
 
 **Flags:**
@@ -79,7 +79,7 @@ iriscli htlc claim \
 Refund from an expired HTLC
 
 ```bash
-iriscli htlc refund --chain-id=<chain-id> --from=<key name> --fee=0.4iris --hash-lock=<hash-lock>
+iriscli htlc refund --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --hash-lock=<hash-lock>
 ```
 
 **Flags:**

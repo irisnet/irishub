@@ -47,12 +47,12 @@ func (k Keeper) CreateHTLC(ctx sdk.Context, htlc types.HTLC, hashLock []byte) (s
 	}
 
 	// transfer the specified tokens to a dedicated HTLC Address
-	if _, err := k.bk.SendCoins(ctx, htlc.Sender, auth.HTLCLockCoinsAccAddr, htlc.Amount); err != nil {
+	if _, err := k.bk.SendCoins(ctx, htlc.Sender, auth.HTLCLockedCoinsAccAddr, htlc.Amount); err != nil {
 		return nil, err
 	}
 
 	// add to coinflow
-	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, htlc.Sender.String(), auth.HTLCLockCoinsAccAddr.String(), htlc.Amount.String(), sdk.CoinHTLCCreateFlow, "")
+	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, htlc.Sender.String(), auth.HTLCLockedCoinsAccAddr.String(), htlc.Amount.String(), sdk.CoinHTLCCreateFlow, "")
 
 	// set the HTLC
 	k.SetHTLC(ctx, htlc, hashLock)
@@ -89,7 +89,7 @@ func (k Keeper) ClaimHTLC(ctx sdk.Context, hashLock []byte, secret []byte) (sdk.
 	}
 
 	// do the claim
-	if _, err := k.bk.SendCoins(ctx, auth.HTLCLockCoinsAccAddr, htlc.To, htlc.Amount); err != nil {
+	if _, err := k.bk.SendCoins(ctx, auth.HTLCLockedCoinsAccAddr, htlc.To, htlc.Amount); err != nil {
 		return nil, err
 	}
 
@@ -102,7 +102,7 @@ func (k Keeper) ClaimHTLC(ctx sdk.Context, hashLock []byte, secret []byte) (sdk.
 	k.DeleteHTLCFromExpireQueue(ctx, htlc.ExpireHeight, hashLock)
 
 	// add to coinflow
-	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, auth.HTLCLockCoinsAccAddr.String(), htlc.To.String(), htlc.Amount.String(), sdk.CoinHTLCClaimFlow, "")
+	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, auth.HTLCLockedCoinsAccAddr.String(), htlc.To.String(), htlc.Amount.String(), sdk.CoinHTLCClaimFlow, "")
 
 	claimTags := sdk.NewTags(
 		types.TagSender, []byte(htlc.Sender.String()),
@@ -127,7 +127,7 @@ func (k Keeper) RefundHTLC(ctx sdk.Context, hashLock []byte) (sdk.Tags, sdk.Erro
 	}
 
 	// do the refund
-	if _, err := k.bk.SendCoins(ctx, auth.HTLCLockCoinsAccAddr, htlc.Sender, htlc.Amount); err != nil {
+	if _, err := k.bk.SendCoins(ctx, auth.HTLCLockedCoinsAccAddr, htlc.Sender, htlc.Amount); err != nil {
 		return nil, err
 	}
 
@@ -136,7 +136,7 @@ func (k Keeper) RefundHTLC(ctx sdk.Context, hashLock []byte) (sdk.Tags, sdk.Erro
 	k.SetHTLC(ctx, htlc, hashLock)
 
 	// add to coinflow
-	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, auth.HTLCLockCoinsAccAddr.String(), htlc.Sender.String(), htlc.Amount.String(), sdk.CoinHTLCRefundFlow, "")
+	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, auth.HTLCLockedCoinsAccAddr.String(), htlc.Sender.String(), htlc.Amount.String(), sdk.CoinHTLCRefundFlow, "")
 
 	refundTags := sdk.NewTags(
 		types.TagSender, []byte(htlc.Sender.String()),

@@ -13,7 +13,7 @@ import (
 type HTLC struct {
 	Sender               sdk.AccAddress `json:"sender"`                  // the initiator address
 	To                   sdk.AccAddress `json:"to"`                      // the destination address
-	ReceiverOnOtherChain string         `json:"receiver_on_other_chain"` // the swap counter party address on the other chain
+	ReceiverOnOtherChain string         `json:"receiver_on_other_chain"` // the claim receiving address on the other chain
 	Amount               sdk.Coins      `json:"amount"`                  // the amount to be transferred
 	Secret               []byte         `json:"secret"`                  // the random secret which is of 32 bytes
 	Timestamp            uint64         `json:"timestamp"`               // the timestamp, if provided, used to generate the hash lock together with secret
