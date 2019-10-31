@@ -2,7 +2,7 @@
 order: 4
 ---
 
-# Snapshot current blockchain data
+# Snapshot
 
 ## Introduction
 
@@ -10,7 +10,7 @@ IRIShub can snapshot the latest data of the full node, including blocks, consens
 
 * Quickly start a new node and join the main network
   
-* Save disk space
+* Free up disk space
 
 ## Usage
 
