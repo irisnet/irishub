@@ -80,6 +80,7 @@ github.com/irisnet/iavl v0.8.2-0.20190905023710-abef11e7f66b h1:eWPT4ErSsRNoytA3
 github.com/irisnet/iavl v0.8.2-0.20190905023710-abef11e7f66b/go.mod h1:qofGh9236iFgVez+gPk7bC+ef5wCw7aIMvAVBK3lT84=
 github.com/irisnet/tendermint v0.22.3-0.20190905014850-7daf474ce5c0 h1:8n4tArruFdsornnNQirxKsv2Sx1zSCvkv84k3kHfw4s=
 github.com/irisnet/tendermint v0.22.3-0.20190905014850-7daf474ce5c0/go.mod h1:C20fnkXbfqksBfyG2IDD94I+FDimvKNRA08YfUEv4Uw=
+github.com/irisnet/tendermint v0.28.1-0.20191030084935-cc25237a944f h1:b/4iFG4zoJPt0HZwSgso9V21CDI84xAebdQLO92QrzI=
 github.com/irisnet/tendermint v0.28.1-0.20191030084935-cc25237a944f/go.mod h1:36RAXv6V/Ar3H6ofEtmtxU2u80tYRdQh1z51gxoG9Nk=
 github.com/jessevdk/go-flags v0.0.0-20141203071132-1679536dcc89/go.mod h1:4FA24M0QyGHXBuZZK/XkWh8h0e1EYbRYJSGM75WSRxI=
 github.com/jmhodges/levigo v1.0.0 h1:q5EC36kV79HWeTBWsod3mG11EgStG3qArTKcvlksN1U=

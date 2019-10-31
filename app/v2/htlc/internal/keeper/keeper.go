@@ -9,7 +9,6 @@ import (
 	"github.com/irisnet/irishub/app/v2/htlc/internal/types"
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/tendermint/tendermint/crypto"
 )
 
 type Keeper struct {
@@ -189,11 +188,6 @@ func (k Keeper) DeleteHTLCFromExpireQueue(ctx sdk.Context, expireHeight uint64, 
 
 	// delete the key
 	store.Delete(KeyHTLCExpireQueue(expireHeight, hashLock))
-}
-
-// getHTLCAddress returns a dedicated address for locking tokens by the specified denom
-func getHTLCAddress(denom string) sdk.AccAddress {
-	return sdk.AccAddress(crypto.AddressHash([]byte(denom)))
 }
 
 // GetHashLock calculates the hash lock from the given secret and timestamp
