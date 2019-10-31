@@ -2,10 +2,10 @@
 
 ## 最新版本
 
-当前IRIShub最新版本为 [v0.15.4](https://github.com/irisnet/irishub/releases/latest)
+当前IRIShub最新版本为 [v0.15.5](https://github.com/irisnet/irishub/releases/latest)
 
 ::: tip
-请将下文中的 <latest_iris_version> 替换为 v0.15.4
+请将下文中的 <latest_iris_version> 替换为 v0.15.5
 :::
 
 ## 服务器配置要求
