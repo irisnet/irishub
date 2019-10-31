@@ -28,7 +28,7 @@ func handleMsgCreateHTLC(ctx sdk.Context, k Keeper, msg MsgCreateHTLC) sdk.Resul
 
 	htlc := NewHTLC(
 		msg.Sender,
-		msg.Receiver,
+		msg.To,
 		msg.ReceiverOnOtherChain,
 		msg.Amount,
 		secret,
