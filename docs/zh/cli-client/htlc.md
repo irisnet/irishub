@@ -37,9 +37,9 @@ iriscli htlc create --chain-id=<chain-id> --from=<key name> --fee=0.4iris --to=<
 iriscli htlc create \
 --from=node0 \
 --to=faa1zx6n0jussc3lx0dk0rax6zsk80vgzyy7kyfud5 \
---secret=382aa2863398a31474616f1498d7a9feba132c4bcf9903940b8a5c72a46e4a41 \
 --receiver-on-other-chain=0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826 \
 --amount=10iris \
+--secret=382aa2863398a31474616f1498d7a9feba132c4bcf9903940b8a5c72a46e4a41 \
 --time-lock=50 \
 --timestamp=1580000000 \
 --fee=0.3iris \
@@ -66,11 +66,11 @@ iriscli htlc claim --chain-id=<chain-id> --from=<key name> --fee=0.4iris --hash-
 
 ```bash
 iriscli htlc claim \
---from=userX \
---hash-lock=f054e34abd9ccc3cab12a5b797b8e9c053507f279e7e53fb3f9f44d178c94b20 \
---secret=5f5f5f6162636465666768696a6b6c6d6e6f707172737475767778797a5f5f5f \
+--from=node0 \
+--hash-lock=bae5acb11ad90a20cb07023f4bf0fcf4d38549feff486dd40a1fbe871b4aabdf \
+--secret=382aa2863398a31474616f1498d7a9feba132c4bcf9903940b8a5c72a46e4a41 \
 --fee=0.3iris \
---chain-id=testNet \
+--chain-id=test \
 --commit
 ```
 
@@ -92,10 +92,10 @@ iriscli htlc refund --chain-id=<chain-id> --from=<key name> --fee=0.4iris --hash
 
 ```bash
 iriscli htlc refund \
---from=userX \
---hash-lock=f054e34abd9ccc3cab12a5b797b8e9c053507f279e7e53fb3f9f44d178c94b20 \
+--from=node0 \
+--hash-lock=bae5acb11ad90a20cb07023f4bf0fcf4d38549feff486dd40a1fbe871b4aabdf \
 --fee=0.3iris \
---chain-id=testNet \
+--chain-id=test \
 --commit
 ```
 
@@ -110,19 +110,19 @@ iriscli htlc query-htlc <hash-lock>
 ### 查询HTLC详细信息
 
 ```bash
-iriscli htlc query-htlc f054e34abd9ccc3cab12a5b797b8e9c053507f279e7e53fb3f9f44d178c94b20
+iriscli htlc query-htlc bae5acb11ad90a20cb07023f4bf0fcf4d38549feff486dd40a1fbe871b4aabdf
 ```
 
 执行完命令后，获得 HTLC 的详细信息如下。
 
 ```bash
 HTLC:
-    Sender:               iaa19aamjx3xszzxgqhrh0yqd4hkurkea7f646vaym
-    To:             iaa1zx6n0jussc3lx0dk0rax6zsk80vgzyy7kyfud5
-    ReceiverOnOtherChain: 0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826
-    Amount:               10000000000000000000iris-atto
-    Secret:               5f5f5f6162636465666768696a6b6c6d6e6f707172737475767778797a5f5f5f
-    Timestamp:            0
-    ExpireHeight:         107
-    State:                completed
+        Sender:               faa1a2g4k9w3v2d2l4c4q5rvvu7ggjcrfnynvrpqze
+        To:                   faa1zx6n0jussc3lx0dk0rax6zsk80vgzyy7kyfud5
+        ReceiverOnOtherChain: 0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826
+        Amount:               10iris
+        Secret:               382aa2863398a31474616f1498d7a9feba132c4bcf9903940b8a5c72a46e4a41
+        Timestamp:            1580000000
+        ExpireHeight:         59
+        State:                completed
 ```
