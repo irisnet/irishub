@@ -35,9 +35,9 @@ func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec
 type createHTLCReq struct {
 	BaseTx               utils.BaseTx   `json:"base_tx"`
 	Sender               sdk.AccAddress `json:"sender"`
-	Receiver             sdk.AccAddress `json:"receiver"`
+	To                   sdk.AccAddress `json:"to"`
 	ReceiverOnOtherChain string         `json:"receiver_on_other_chain"`
-	Amount               sdk.Coin       `json:"amount"`
+	Amount               sdk.Coins      `json:"amount"`
 	HashLock             string         `json:"hash_lock"`
 	TimeLock             uint64         `json:"time_lock"`
 	Timestamp            uint64         `json:"timestamp"`
@@ -56,12 +56,6 @@ func createHTLCHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handl
 			return
 		}
 
-		receiverOnOtherChain, err := hex.DecodeString(req.ReceiverOnOtherChain)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
 		hashLock, err := hex.DecodeString(req.HashLock)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -70,7 +64,7 @@ func createHTLCHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handl
 
 		// create the NewMsgCreateHTLC message
 		msg := htlc.NewMsgCreateHTLC(
-			req.Sender, req.Receiver, receiverOnOtherChain, req.Amount,
+			req.Sender, req.To, req.ReceiverOnOtherChain, req.Amount,
 			hashLock, req.Timestamp, req.TimeLock)
 		err = msg.ValidateBasic()
 		if err != nil {
