@@ -22,7 +22,7 @@ var (
 
 func init() {
 	FsCreateHTLC.String(cli.FlagTo, "", "Bech32 encoding address to receive coins")
-	FsCreateHTLC.String(FlagReceiverOnOtherChain, "", "The swap counter party address on the other chain ")
+	FsCreateHTLC.String(FlagReceiverOnOtherChain, "", "The swap counter party address on the other chain")
 	FsCreateHTLC.String(FlagAmount, "", "Similar to the amount in the original transfer")
 	FsCreateHTLC.BytesHex(FlagSecret, nil, "The secret for generating the hash lock, omission will be randomly generated")
 	FsCreateHTLC.Uint64(FlagTimestamp, 0, "The timestamp in seconds for generating the hash lock if provided")

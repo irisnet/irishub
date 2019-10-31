@@ -34,7 +34,7 @@ var _ sdk.Msg = &MsgRefundHTLC{}
 type MsgCreateHTLC struct {
 	Sender               sdk.AccAddress `json:"sender"`                  // the initiator address
 	To                   sdk.AccAddress `json:"to"`                      // the destination address
-	ReceiverOnOtherChain string         `json:"receiver_on_other_chain"` // the recipient address on other chain
+	ReceiverOnOtherChain string         `json:"receiver_on_other_chain"` // the swap counter party address on the other chain
 	Amount               sdk.Coins      `json:"amount"`                  // the amount to be transferred
 	HashLock             []byte         `json:"hash_lock"`               // the hash lock generated from secret (and timestamp if provided)
 	Timestamp            uint64         `json:"timestamp"`               // if provided, used to generate the hash lock together with secret
