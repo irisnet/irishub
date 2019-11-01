@@ -62,7 +62,7 @@ iriscli asset edit-gateway <flags>
 ### Edit Gateway
 
 ```bash
-iriscli asset edit-gateway --moniker=cats --identity=<pgp-id> --details="Cat Tokens" --website="http://www.example.com" --from=<key-name> --chain-id=irishub --fee=0.4iris --commit
+iriscli asset edit-gateway --moniker=cats --identity=<pgp-id> --details="Cat Tokens" --website="http://www.example.com" --from=<key-name> --chain-id=irishub --fee=0.3iris --commit
 ```
 
 ## iriscli asset transfer-gateway-owner
@@ -171,7 +171,7 @@ iriscli asset edit-token <token-id> <flags>
 ### Edit Token
 
 ```bash
-iriscli asset edit-token cat --name="Cat Token" --canonical-symbol="cat" --min-unit-alias=kitty --max-supply=100000000000 --mintable=true --from=<key-name> --chain-id=irishub --fee=0.4iris --commit
+iriscli asset edit-token cat --name="Cat Token" --canonical-symbol="cat" --min-unit-alias=kitty --max-supply=100000000000 --mintable=true --from=<key-name> --chain-id=irishub --fee=0.3iris --commit
 ```
 
 ## iriscli asset transfer-token-owner
@@ -191,7 +191,7 @@ iriscli asset transfer-token-owner <token-id> <flags>
 ### Transfer Token Owner
 
 ```bash
-iriscli asset transfer-token-owner kitty --to=<new-owner-address> --from=<key-name> --chain-id=irishub --fee=0.4iris --commit
+iriscli asset transfer-token-owner kitty --to=<new-owner-address> --from=<key-name> --chain-id=irishub --fee=0.3iris --commit
 ```
 
 ## iriscli asset mint-token
@@ -212,7 +212,7 @@ iriscli asset mint-token <token-id> <flags>
 ### Mint Token
 
 ```bash
-iriscli asset mint-token kitty --amount=1000000 --from=<key-name> --chain-id=irishub --fee=0.4iris
+iriscli asset mint-token kitty --amount=1000000 --from=<key-name> --chain-id=irishub --fee=0.3iris
 ```
 
 ## iriscli asset query-token

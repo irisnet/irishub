@@ -28,7 +28,7 @@ func TestIrisCLIDistribution(t *testing.T) {
 	require.Equal(t, "50iris", fooCoin)
 	num := getAmountFromCoinStr(fooCoin)
 
-	executeWrite(t, fmt.Sprintf("iriscli distribution withdraw-rewards --from=foo --fee=0.4iris %s", flags), sdk.DefaultKeyPass)
+	executeWrite(t, fmt.Sprintf("iriscli distribution withdraw-rewards --from=foo --fee=0.3iris %s", flags), sdk.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
 
 	fooAcc = executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", fooAddr, flags))
@@ -58,7 +58,7 @@ func TestIrisCLIWithdrawReward(t *testing.T) {
 
 	valAddr := sdk.ValAddress(fooAddr).String()
 
-	executeWrite(t, fmt.Sprintf("iriscli distribution withdraw-rewards --only-from-validator=%s --from=foo --fee=0.4iris %s", valAddr, flags), sdk.DefaultKeyPass)
+	executeWrite(t, fmt.Sprintf("iriscli distribution withdraw-rewards --only-from-validator=%s --from=foo --fee=0.3iris %s", valAddr, flags), sdk.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
 
 	fooAcc = executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", fooAddr, flags))
@@ -66,7 +66,7 @@ func TestIrisCLIWithdrawReward(t *testing.T) {
 	num := getAmountFromCoinStr(fooCoin)
 	require.True(t, num > 10)
 
-	executeWrite(t, fmt.Sprintf("iriscli distribution withdraw-rewards --is-validator=true --from=foo --fee=0.4iris %s", flags), sdk.DefaultKeyPass)
+	executeWrite(t, fmt.Sprintf("iriscli distribution withdraw-rewards --is-validator=true --from=foo --fee=0.3iris %s", flags), sdk.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
 
 	fooAcc = executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", fooAddr, flags))
