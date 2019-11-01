@@ -24,7 +24,7 @@ func SendTxCmd(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "send",
 		Short:   "Create and sign a send tx",
-		Example: "iriscli bank send --to=<account address> --from <key name> --fee=0.4iris --chain-id=<chain-id> --amount=10iris",
+		Example: "iriscli bank send --to=<account address> --from=<key-name> --fee=0.3iris --chain-id=<chain-id> --amount=10iris",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
@@ -84,7 +84,7 @@ func BurnTxCmd(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "burn",
 		Short:   "Create and sign a tx to burn coins",
-		Example: "iriscli bank burn --from <key name> --fee=0.4iris --chain-id=<chain-id> --amount=10iris",
+		Example: "iriscli bank burn --from=<key-name> --fee=0.3iris --chain-id=<chain-id> --amount=10iris",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
@@ -135,7 +135,7 @@ func SetMemoRegCmd(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "set-memo-regexp",
 		Short:   "Create and sign a tx to set memo regexp",
-		Example: "iriscli bank set-memo-regexp --regexp=^[A-Za-z0-9]+$ --from=<key name> --fee=0.4iris --chain-id=<chain-id>",
+		Example: "iriscli bank set-memo-regexp --regexp=^[A-Za-z0-9]+$ --from=<key-name> --fee=0.3iris --chain-id=<chain-id>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
