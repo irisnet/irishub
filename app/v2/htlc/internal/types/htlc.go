@@ -12,9 +12,9 @@ import (
 // HTLC represents an HTLC
 type HTLC struct {
 	Sender               sdk.AccAddress `json:"sender"`                  // the initiator address
-	Receiver             sdk.AccAddress `json:"receiver"`                // the recipient address
-	ReceiverOnOtherChain []byte         `json:"receiver_on_other_chain"` // the recipient address on other chain
-	Amount               sdk.Coin       `json:"amount"`                  // the amount to be transferred
+	To                   sdk.AccAddress `json:"to"`                      // the destination address
+	ReceiverOnOtherChain string         `json:"receiver_on_other_chain"` // the claim receiving address on the other chain
+	Amount               sdk.Coins      `json:"amount"`                  // the amount to be transferred
 	Secret               []byte         `json:"secret"`                  // the random secret which is of 32 bytes
 	Timestamp            uint64         `json:"timestamp"`               // the timestamp, if provided, used to generate the hash lock together with secret
 	ExpireHeight         uint64         `json:"expire_height"`           // the block height by which the HTLC expires
@@ -24,9 +24,9 @@ type HTLC struct {
 // NewHTLC constructs an HTLC
 func NewHTLC(
 	sender sdk.AccAddress,
-	receiver sdk.AccAddress,
-	receiverOnOtherChain []byte,
-	amount sdk.Coin,
+	to sdk.AccAddress,
+	receiverOnOtherChain string,
+	amount sdk.Coins,
 	secret []byte,
 	timestamp uint64,
 	expireHeight uint64,
@@ -34,7 +34,7 @@ func NewHTLC(
 ) HTLC {
 	return HTLC{
 		Sender:               sender,
-		Receiver:             receiver,
+		To:                   to,
 		ReceiverOnOtherChain: receiverOnOtherChain,
 		Amount:               amount,
 		Secret:               secret,
@@ -68,9 +68,9 @@ func (h HTLC) String() string {
 	Timestamp:            %d
 	ExpireHeight:         %d
 	State:                %s`,
-		h.Sender,
-		h.Receiver,
-		hex.EncodeToString(h.ReceiverOnOtherChain),
+		h.Sender.String(),
+		h.To.String(),
+		h.ReceiverOnOtherChain,
 		h.Amount.String(),
 		hex.EncodeToString(h.Secret),
 		h.Timestamp,
@@ -83,7 +83,7 @@ func (h HTLC) String() string {
 func (h HTLC) HumanString(converter sdk.CoinsConverter) string {
 	return fmt.Sprintf(`HTLC:
 	Sender:               %s
-	Receiver:             %s
+	To:                   %s
 	ReceiverOnOtherChain: %s
 	Amount:               %s
 	Secret:               %s
@@ -91,9 +91,9 @@ func (h HTLC) HumanString(converter sdk.CoinsConverter) string {
 	ExpireHeight:         %d
 	State:                %s`,
 		h.Sender,
-		h.Receiver,
-		hex.EncodeToString(h.ReceiverOnOtherChain),
-		converter.ToMainUnit(sdk.NewCoins(h.Amount)),
+		h.To,
+		h.ReceiverOnOtherChain,
+		converter.ToMainUnit(h.Amount),
 		hex.EncodeToString(h.Secret),
 		h.Timestamp,
 		h.ExpireHeight,
@@ -131,11 +131,6 @@ func HTLCStateFromString(str string) (HTLCState, error) {
 		return state, nil
 	}
 	return HTLCState(0xff), fmt.Errorf("'%s' is not a valid HTLC state", str)
-}
-
-func IsValidHTLCState(state HTLCState) bool {
-	_, ok := HTLCStateToStringMap[state]
-	return ok
 }
 
 func (state HTLCState) Format(s fmt.State, verb rune) {

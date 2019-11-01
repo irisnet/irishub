@@ -5,10 +5,10 @@ import (
 	"encoding/hex"
 	"fmt"
 
+	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/app/v2/htlc/internal/types"
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/tendermint/tendermint/crypto"
 )
 
 type Keeper struct {
@@ -47,13 +47,12 @@ func (k Keeper) CreateHTLC(ctx sdk.Context, htlc types.HTLC, hashLock []byte) (s
 	}
 
 	// transfer the specified tokens to a dedicated HTLC Address
-	htlcAddr := getHTLCAddress(htlc.Amount.Denom)
-	if _, err := k.bk.SendCoins(ctx, htlc.Sender, htlcAddr, sdk.Coins{htlc.Amount}); err != nil {
+	if _, err := k.bk.SendCoins(ctx, htlc.Sender, auth.HTLCLockedCoinsAccAddr, htlc.Amount); err != nil {
 		return nil, err
 	}
 
 	// add to coinflow
-	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, htlc.Sender.String(), htlcAddr.String(), htlc.Amount.String(), sdk.CoinHTLCCreateFlow, "")
+	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, htlc.Sender.String(), auth.HTLCLockedCoinsAccAddr.String(), htlc.Amount.String(), sdk.CoinHTLCCreateFlow, "")
 
 	// set the HTLC
 	k.SetHTLC(ctx, htlc, hashLock)
@@ -63,8 +62,8 @@ func (k Keeper) CreateHTLC(ctx sdk.Context, htlc types.HTLC, hashLock []byte) (s
 
 	createTags := sdk.NewTags(
 		types.TagSender, []byte(htlc.Sender.String()),
-		types.TagReceiver, []byte(htlc.Receiver.String()),
-		types.TagReceiverOnOtherChain, []byte(hex.EncodeToString(htlc.ReceiverOnOtherChain)),
+		types.TagReceiver, []byte(htlc.To.String()),
+		types.TagReceiverOnOtherChain, []byte(htlc.ReceiverOnOtherChain),
 		types.TagAmount, []byte(htlc.Amount.String()),
 		types.TagHashLock, []byte(hex.EncodeToString(hashLock)),
 	)
@@ -90,8 +89,7 @@ func (k Keeper) ClaimHTLC(ctx sdk.Context, hashLock []byte, secret []byte) (sdk.
 	}
 
 	// do the claim
-	htlcAddr := getHTLCAddress(htlc.Amount.Denom)
-	if _, err := k.bk.SendCoins(ctx, htlcAddr, htlc.Receiver, sdk.Coins{htlc.Amount}); err != nil {
+	if _, err := k.bk.SendCoins(ctx, auth.HTLCLockedCoinsAccAddr, htlc.To, htlc.Amount); err != nil {
 		return nil, err
 	}
 
@@ -104,11 +102,11 @@ func (k Keeper) ClaimHTLC(ctx sdk.Context, hashLock []byte, secret []byte) (sdk.
 	k.DeleteHTLCFromExpireQueue(ctx, htlc.ExpireHeight, hashLock)
 
 	// add to coinflow
-	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, htlcAddr.String(), htlc.Receiver.String(), htlc.Amount.String(), sdk.CoinHTLCClaimFlow, "")
+	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, auth.HTLCLockedCoinsAccAddr.String(), htlc.To.String(), htlc.Amount.String(), sdk.CoinHTLCClaimFlow, "")
 
 	claimTags := sdk.NewTags(
 		types.TagSender, []byte(htlc.Sender.String()),
-		types.TagReceiver, []byte(htlc.Receiver.String()),
+		types.TagReceiver, []byte(htlc.To.String()),
 		types.TagHashLock, []byte(hex.EncodeToString(hashLock)),
 		types.TagSecret, []byte(hex.EncodeToString(secret)),
 	)
@@ -129,8 +127,7 @@ func (k Keeper) RefundHTLC(ctx sdk.Context, hashLock []byte) (sdk.Tags, sdk.Erro
 	}
 
 	// do the refund
-	htlcAddr := getHTLCAddress(htlc.Amount.Denom)
-	if _, err := k.bk.SendCoins(ctx, htlcAddr, htlc.Sender, sdk.Coins{htlc.Amount}); err != nil {
+	if _, err := k.bk.SendCoins(ctx, auth.HTLCLockedCoinsAccAddr, htlc.Sender, htlc.Amount); err != nil {
 		return nil, err
 	}
 
@@ -139,7 +136,7 @@ func (k Keeper) RefundHTLC(ctx sdk.Context, hashLock []byte) (sdk.Tags, sdk.Erro
 	k.SetHTLC(ctx, htlc, hashLock)
 
 	// add to coinflow
-	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, htlcAddr.String(), htlc.Sender.String(), htlc.Amount.String(), sdk.CoinHTLCRefundFlow, "")
+	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, auth.HTLCLockedCoinsAccAddr.String(), htlc.Sender.String(), htlc.Amount.String(), sdk.CoinHTLCRefundFlow, "")
 
 	refundTags := sdk.NewTags(
 		types.TagSender, []byte(htlc.Sender.String()),
@@ -191,11 +188,6 @@ func (k Keeper) DeleteHTLCFromExpireQueue(ctx sdk.Context, expireHeight uint64, 
 
 	// delete the key
 	store.Delete(KeyHTLCExpireQueue(expireHeight, hashLock))
-}
-
-// getHTLCAddress returns a dedicated address for locking tokens by the specified denom
-func getHTLCAddress(denom string) sdk.AccAddress {
-	return sdk.AccAddress(crypto.AddressHash([]byte(denom)))
 }
 
 // GetHashLock calculates the hash lock from the given secret and timestamp

@@ -16,16 +16,17 @@ HTLC allows you to manage local Hash Time Locked Contracts (HTLCs) for atomic sw
 Create an HTLC
 
 ```bash
-iriscli htlc create --receiver=<receiver> --receiver-on-other-chain=<receiver-on-other-chain> --amount=<amount> --hash-lock=<hash-lock> --time-lock=<time-lock> --timestamp=<timestamp>
+iriscli htlc create --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --to=<to> --receiver-on-other-chain=<receiver-on-other-chain> --amount=<amount> --secret=<secret> --time-lock=<time-lock> --timestamp=<timestamp>
 ```
 
 **Flags:**
 
 | Name, shorthand           | Type     | Required | Default | Description                                                       |
 | ------------------------- | -------- | -------- | ------- | ----------------------------------------------------------------- |
-| --receiver                | string   | Yes      |         | Bech32 encoding address to receive coins                          |
-| --receiver-on-other-chain | bytesHex | Yes      |         | The receiver address on the other chain                           |
+| --to                      | string   | Yes      |         | Bech32 encoding address to receive coins                          |
+| --receiver-on-other-chain | string   |          |         | The claim receiving address on the other chain                 |
 | --amount                  | string   | Yes      |         | Similar to the amount in the original transfer                    |
+| --secret                  | bytesHex |          |         | The secret for generating the hash lock, omission will be randomly generated |
 | --hash-lock               | bytesHex | Yes      |         | The sha256 hash generated from secret (and timestamp if provided) |
 | --time-lock               | string   | Yes      |         | The number of blocks to wait before the asset may be returned to  |
 | --timestamp               | uint     |          |         | The timestamp in seconds for generating hash lock if provided     |
@@ -34,15 +35,15 @@ iriscli htlc create --receiver=<receiver> --receiver-on-other-chain=<receiver-on
 
 ```bash
 iriscli htlc create \
---from=userX \
---receiver=faa1zx6n0jussc3lx0dk0rax6zsk80vgzyy7kyfud5 \
---receiver-on-other-chain=bb9188215a6112a6f7eb93e3e929197b3d44004cb691f95babde84cc18789364 \
---hash-lock=e8d4133e1a82c74e2746e78c19385706ea7958a0ca441a08dacfa10c48ce2561 \
+--from=node0 \
+--to=faa1zx6n0jussc3lx0dk0rax6zsk80vgzyy7kyfud5 \
+--receiver-on-other-chain=0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826 \
 --amount=10iris \
+--secret=382aa2863398a31474616f1498d7a9feba132c4bcf9903940b8a5c72a46e4a41 \
 --time-lock=50 \
 --timestamp=1580000000 \
 --fee=0.3iris \
---chain-id=testNet \
+--chain-id=test \
 --commit
 ```
 
@@ -51,7 +52,7 @@ iriscli htlc create \
 Claim an opened HTLC
 
 ```bash
-iriscli htlc claim --hash-lock=<hash-lock> --secret=<secret>
+iriscli htlc claim --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --hash-lock=<hash-lock> --secret=<secret>
 ```
 
 **Flags:**
@@ -65,11 +66,11 @@ iriscli htlc claim --hash-lock=<hash-lock> --secret=<secret>
 
 ```bash
 iriscli htlc claim \
---from=userX \
---hash-lock=f054e34abd9ccc3cab12a5b797b8e9c053507f279e7e53fb3f9f44d178c94b20 \
---secret=5f5f5f6162636465666768696a6b6c6d6e6f707172737475767778797a5f5f5f \
+--from=node0 \
+--hash-lock=bae5acb11ad90a20cb07023f4bf0fcf4d38549feff486dd40a1fbe871b4aabdf \
+--secret=382aa2863398a31474616f1498d7a9feba132c4bcf9903940b8a5c72a46e4a41 \
 --fee=0.3iris \
---chain-id=testNet \
+--chain-id=test \
 --commit
 ```
 
@@ -78,7 +79,7 @@ iriscli htlc claim \
 Refund from an expired HTLC
 
 ```bash
-iriscli htlc refund --hash-lock=<hash-lock>
+iriscli htlc refund --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --hash-lock=<hash-lock>
 ```
 
 **Flags:**
@@ -91,10 +92,10 @@ iriscli htlc refund --hash-lock=<hash-lock>
 
 ```bash
 iriscli htlc refund \
---from=userX \
---hash-lock=f054e34abd9ccc3cab12a5b797b8e9c053507f279e7e53fb3f9f44d178c94b20 \
+--from=node0 \
+--hash-lock=bae5acb11ad90a20cb07023f4bf0fcf4d38549feff486dd40a1fbe871b4aabdf \
 --fee=0.3iris \
---chain-id=testNet \
+--chain-id=test \
 --commit
 ```
 
@@ -109,19 +110,19 @@ iriscli htlc query-htlc <hash-lock>
 ### Query details of an HTLC
 
 ```bash
-iriscli htlc query-htlc f054e34abd9ccc3cab12a5b797b8e9c053507f279e7e53fb3f9f44d178c94b20
+iriscli htlc query-htlc bae5acb11ad90a20cb07023f4bf0fcf4d38549feff486dd40a1fbe871b4aabdf
 ```
 
 After that, you will get the detail info for the account.
 
 ```bash
 HTLC:
-    Sender:               iaa19aamjx3xszzxgqhrh0yqd4hkurkea7f646vaym
-    Receiver:             iaa1zx6n0jussc3lx0dk0rax6zsk80vgzyy7kyfud5
-    ReceiverOnOtherChain: 72656365697665724f6e4f74686572436861696e
-    Amount:               10000000000000000000iris-atto
-    Secret:               5f5f5f6162636465666768696a6b6c6d6e6f707172737475767778797a5f5f5f
-    Timestamp:            0
-    ExpireHeight:         107
-    State:                completed
+        Sender:               faa1a2g4k9w3v2d2l4c4q5rvvu7ggjcrfnynvrpqze
+        To:                   faa1zx6n0jussc3lx0dk0rax6zsk80vgzyy7kyfud5
+        ReceiverOnOtherChain: 0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826
+        Amount:               10iris
+        Secret:               382aa2863398a31474616f1498d7a9feba132c4bcf9903940b8a5c72a46e4a41
+        Timestamp:            1580000000
+        ExpireHeight:         59
+        State:                completed
 ```

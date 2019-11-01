@@ -1,15 +1,14 @@
 package cli
 
 import (
-	"encoding/hex"
 	"fmt"
 	"strings"
 	"testing"
 
+	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/tests"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/stretchr/testify/require"
-	"github.com/tendermint/tendermint/crypto"
 )
 
 func TestIrisCLIHTLC(t *testing.T) {
@@ -33,7 +32,7 @@ func TestIrisCLIHTLC(t *testing.T) {
 	require.Equal(t, "50iris", fooCoin)
 
 	// testdata
-	receiverOnOtherChain := "72656365697665724f6e4f74686572436861696e"
+	receiverOnOtherChain := "0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826"
 	hashLock := "e8d4133e1a82c74e2746e78c19385706ea7958a0ca441a08dacfa10c48ce2561"
 	secretHex := "5f5f5f6162636465666768696a6b6c6d6e6f707172737475767778797a5f5f5f"
 	amount := "10000000000000000000iris-atto"
@@ -49,9 +48,9 @@ func TestIrisCLIHTLC(t *testing.T) {
 	// create an htlc
 	spStr := fmt.Sprintf("iriscli htlc create %v", flags)
 	spStr += fmt.Sprintf(" --from=%s", "foo")
-	spStr += fmt.Sprintf(" --receiver=%s", barAddr)
+	spStr += fmt.Sprintf(" --to=%s", barAddr)
 	spStr += fmt.Sprintf(" --receiver-on-other-chain=%s", receiverOnOtherChain)
-	spStr += fmt.Sprintf(" --hash-lock=%s", hashLock)
+	spStr += fmt.Sprintf(" --secret=%s", secretHex)
 	spStr += fmt.Sprintf(" --amount=%s", amountIris)
 	spStr += fmt.Sprintf(" --time-lock=%d", timeLock)
 	spStr += fmt.Sprintf(" --timestamp=%d", timestamp)
@@ -62,14 +61,14 @@ func TestIrisCLIHTLC(t *testing.T) {
 
 	htlc := executeGetHtlc(t, fmt.Sprintf("iriscli htlc query-htlc %s --output=json %v", strings.ToLower(strings.TrimSpace(hashLock)), flags))
 	require.Equal(t, fooAddr, htlc.Sender)
-	require.Equal(t, barAddr, htlc.Receiver)
-	require.Equal(t, receiverOnOtherChain, hex.EncodeToString(htlc.ReceiverOnOtherChain))
+	require.Equal(t, barAddr, htlc.To)
+	require.Equal(t, receiverOnOtherChain, htlc.ReceiverOnOtherChain)
 	require.Equal(t, amount, htlc.Amount.String())
 	require.Equal(t, initSecret, htlc.Secret)
 	require.Equal(t, timestamp, htlc.Timestamp)
 	require.Equal(t, stateOpen, htlc.State.String())
 
-	htlcAddr := sdk.AccAddress(crypto.AddressHash([]byte(sdk.IrisAtto)))
+	htlcAddr := auth.HTLCLockedCoinsAccAddr
 	htlcAcc := executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", htlcAddr, flags))
 	htlcCoin := convertToIrisBaseAccount(t, htlcAcc)
 	require.Equal(t, "10iris", htlcCoin)
@@ -102,9 +101,9 @@ func TestIrisCLIHTLC(t *testing.T) {
 	// create an htlc
 	spStr = fmt.Sprintf("iriscli htlc create %v", flags)
 	spStr += fmt.Sprintf(" --from=%s", "foo")
-	spStr += fmt.Sprintf(" --receiver=%s", barAddr)
+	spStr += fmt.Sprintf(" --to=%s", barAddr)
 	spStr += fmt.Sprintf(" --receiver-on-other-chain=%s", receiverOnOtherChain)
-	spStr += fmt.Sprintf(" --hash-lock=%s", hashLock)
+	spStr += fmt.Sprintf(" --secret=%s", secretHex)
 	spStr += fmt.Sprintf(" --amount=%s", amountIris)
 	spStr += fmt.Sprintf(" --time-lock=%d", timeLock)
 	spStr += fmt.Sprintf(" --timestamp=%d", timestamp)
@@ -115,14 +114,13 @@ func TestIrisCLIHTLC(t *testing.T) {
 
 	htlc = executeGetHtlc(t, fmt.Sprintf("iriscli htlc query-htlc %s --output=json %v", strings.ToLower(strings.TrimSpace(hashLock)), flags))
 	require.Equal(t, fooAddr, htlc.Sender)
-	require.Equal(t, barAddr, htlc.Receiver)
-	require.Equal(t, receiverOnOtherChain, hex.EncodeToString(htlc.ReceiverOnOtherChain))
+	require.Equal(t, barAddr, htlc.To)
+	require.Equal(t, receiverOnOtherChain, htlc.ReceiverOnOtherChain)
 	require.Equal(t, amount, htlc.Amount.String())
 	require.Equal(t, initSecret, htlc.Secret)
 	require.Equal(t, timestamp, htlc.Timestamp)
 	require.Equal(t, stateOpen, htlc.State.String())
 
-	htlcAddr = sdk.AccAddress(crypto.AddressHash([]byte(sdk.IrisAtto)))
 	htlcAcc = executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", htlcAddr, flags))
 	htlcCoin = convertToIrisBaseAccount(t, htlcAcc)
 	require.Equal(t, "10iris", htlcCoin)

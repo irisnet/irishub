@@ -3004,16 +3004,18 @@ paths:
                   $ref: '#/components/schemas/BaseTx'
                 sender:
                   $ref: '#/components/schemas/Address'
-                receiver:
+                to:
                   $ref: '#/components/schemas/Address'
                 receiver_on_other_chain:
                   type: string
-                  example: '327a66212cbee3756816e617b38f9dfeaa6bc765'
+                  example: '0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826'
                 hash_lock:
                   type: string
                   example: '327a66212cbee3756816e617b38f9dfe327a66212cbee3756816e617b38f9dfe'
                 amount:
-                  $ref: '#/components/schemas/Coin'
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Coin'
                 time_lock:
                   type: integer
                   example: '100'

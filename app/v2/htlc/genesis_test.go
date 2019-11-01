@@ -47,8 +47,8 @@ func TestExportHTLCGenesis(t *testing.T) {
 	// define variables
 	senderAddrs := []sdk.AccAddress{sdk.AccAddress([]byte("sender1")), sdk.AccAddress([]byte("sender2"))}
 	receiverAddrs := []sdk.AccAddress{sdk.AccAddress([]byte("receiver1")), sdk.AccAddress([]byte("receiver2"))}
-	receiverOnOtherChain := []byte("receiverOnOtherChain")
-	amount := sdk.NewCoin(sdk.IrisAtto, sdk.NewInt(0))
+	receiverOnOtherChain := "receiverOnOtherChain"
+	amount := sdk.NewCoins(sdk.NewCoin(sdk.IrisAtto, sdk.NewInt(0)))
 	secret := []byte("___abcdefghijklmnopqrstuvwxyz___")
 	timestamps := []uint64{uint64(1580000000), 0}
 	hashLocks := [][]byte{GetHashLock(secret, timestamps[0]), GetHashLock(secret, timestamps[1])}

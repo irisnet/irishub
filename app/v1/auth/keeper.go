@@ -18,12 +18,15 @@ var (
 	totalSupplyKeyPrefix = []byte("totalSupply:")
 
 	//system default special address
-	BurnedCoinsAccAddr         = sdk.AccAddress(crypto.AddressHash([]byte("burnedCoins")))
-	GovDepositCoinsAccAddr     = sdk.AccAddress(crypto.AddressHash([]byte("govDepositedCoins")))
+	BurnedCoinsAccAddr       = sdk.AccAddress(crypto.AddressHash([]byte("burnedCoins")))
+	GovDepositCoinsAccAddr   = sdk.AccAddress(crypto.AddressHash([]byte("govDepositedCoins")))
+	CommunityTaxCoinsAccAddr = sdk.AccAddress(crypto.AddressHash([]byte("communityTaxCoins")))
+
 	ServiceDepositCoinsAccAddr = sdk.AccAddress(crypto.AddressHash([]byte("serviceDepositedCoins")))
 	ServiceRequestCoinsAccAddr = sdk.AccAddress(crypto.AddressHash([]byte("serviceRequestCoins")))
-	CommunityTaxCoinsAccAddr   = sdk.AccAddress(crypto.AddressHash([]byte("communityTaxCoins")))
 	ServiceTaxCoinsAccAddr     = sdk.AccAddress(crypto.AddressHash([]byte("serviceTaxCoins")))
+
+	HTLCLockedCoinsAccAddr = sdk.AccAddress(crypto.AddressHash([]byte("HTLCLockedCoins"))) // HTLCLockedCoinsAccAddr store All HTLC locked coins
 )
 
 // This AccountKeeper encodes/decodes accounts using the

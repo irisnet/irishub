@@ -21,7 +21,7 @@ const (
 
 	SecretLength                    = 32    // the length for the secret
 	HashLockLength                  = 32    // the length for the hash lock
-	MaxLengthForAddressOnOtherChain = 32    // maximal length in bytes for the address on other chains
+	MaxLengthForAddressOnOtherChain = 128   // maximal length for the address on other chains
 	MinTimeLock                     = 50    // minimal time span for HTLC
 	MaxTimeLock                     = 25480 // maximal time span for HTLC
 )
@@ -33,9 +33,9 @@ var _ sdk.Msg = &MsgRefundHTLC{}
 // MsgCreateHTLC represents a msg for creating an HTLC
 type MsgCreateHTLC struct {
 	Sender               sdk.AccAddress `json:"sender"`                  // the initiator address
-	Receiver             sdk.AccAddress `json:"receiver"`                // the recipient address
-	ReceiverOnOtherChain []byte         `json:"receiver_on_other_chain"` // the recipient address on other chain
-	Amount               sdk.Coin       `json:"amount"`                  // the amount to be transferred
+	To                   sdk.AccAddress `json:"to"`                      // the destination address
+	ReceiverOnOtherChain string         `json:"receiver_on_other_chain"` // the claim receiving address on the other chain
+	Amount               sdk.Coins      `json:"amount"`                  // the amount to be transferred
 	HashLock             []byte         `json:"hash_lock"`               // the hash lock generated from secret (and timestamp if provided)
 	Timestamp            uint64         `json:"timestamp"`               // if provided, used to generate the hash lock together with secret
 	TimeLock             uint64         `json:"time_lock"`               // the time span after which the HTLC will expire
@@ -44,16 +44,16 @@ type MsgCreateHTLC struct {
 // NewMsgCreateHTLC constructs a MsgCreateHTLC
 func NewMsgCreateHTLC(
 	sender sdk.AccAddress,
-	receiver sdk.AccAddress,
-	receiverOnOtherChain []byte,
-	amount sdk.Coin,
+	to sdk.AccAddress,
+	receiverOnOtherChain string,
+	amount sdk.Coins,
 	hashLock []byte,
 	timestamp uint64,
 	timeLock uint64,
 ) MsgCreateHTLC {
 	return MsgCreateHTLC{
 		Sender:               sender,
-		Receiver:             receiver,
+		To:                   to,
 		ReceiverOnOtherChain: receiverOnOtherChain,
 		Amount:               amount,
 		HashLock:             hashLock,
@@ -74,7 +74,7 @@ func (msg MsgCreateHTLC) ValidateBasic() sdk.Error {
 		return ErrInvalidAddress(DefaultCodespace, "the sender address must be specified")
 	}
 
-	if len(msg.Receiver) == 0 {
+	if len(msg.To) == 0 {
 		return ErrInvalidAddress(DefaultCodespace, "the receiver address must be specified")
 	}
 
@@ -82,7 +82,7 @@ func (msg MsgCreateHTLC) ValidateBasic() sdk.Error {
 		return ErrInvalidAddress(DefaultCodespace, fmt.Sprintf("the length of the receiver on other chain must be between [0,%d]", MaxLengthForAddressOnOtherChain))
 	}
 
-	if !msg.Amount.IsValid() || !msg.Amount.IsPositive() {
+	if !msg.Amount.IsValid() || !msg.Amount.IsAllPositive() {
 		return ErrInvalidAmount(DefaultCodespace, "the transferred amount must be valid")
 	}
 

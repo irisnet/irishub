@@ -10,7 +10,6 @@ require (
 	github.com/fortytw2/leaktest v1.3.0 // indirect
 	github.com/go-kit/kit v0.6.0
 	github.com/gogo/protobuf v1.1.1
-	github.com/golang/protobuf v1.3.2
 	github.com/gorilla/context v1.1.1 // indirect
 	github.com/gorilla/mux v1.6.2
 	github.com/mattn/go-isatty v0.0.4
