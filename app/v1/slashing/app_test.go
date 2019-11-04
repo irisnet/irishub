@@ -5,10 +5,10 @@ import (
 
 	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/app/v1/bank"
-	"github.com/irisnet/irishub/app/v1/mock"
 	"github.com/irisnet/irishub/app/v1/params"
 	"github.com/irisnet/irishub/app/v1/stake"
 	stakeTypes "github.com/irisnet/irishub/app/v1/stake/types"
+	"github.com/irisnet/irishub/server/mock"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/stretchr/testify/require"
 	abci "github.com/tendermint/tendermint/abci/types"

@@ -2,8 +2,8 @@ package simulation
 
 import (
 	"fmt"
-	"github.com/irisnet/irishub/app/v1/mock"
-	bam "github.com/irisnet/irishub/app/v1/mock/baseapp"
+	"github.com/irisnet/irishub/server/mock"
+	bam "github.com/irisnet/irishub/server/mock/baseapp"
 	sdk "github.com/irisnet/irishub/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/crypto/ed25519"

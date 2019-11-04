@@ -10,7 +10,7 @@ import (
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/crypto"
 
-	"github.com/irisnet/irishub/app/v1/mock/baseapp"
+	"github.com/irisnet/irishub/server/mock/baseapp"
 )
 
 // BigInterval is a representation of the interval [lo, hi), where

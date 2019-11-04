@@ -4,7 +4,7 @@ import (
 	"math/rand"
 	"time"
 
-	bam "github.com/irisnet/irishub/app/v1/mock/baseapp"
+	bam "github.com/irisnet/irishub/server/mock/baseapp"
 	sdk "github.com/irisnet/irishub/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/crypto"

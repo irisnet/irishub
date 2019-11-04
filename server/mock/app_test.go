@@ -3,75 +3,267 @@ package mock
 import (
 	"testing"
 
+	"github.com/irisnet/irishub/app/v1/auth"
+	"github.com/irisnet/irishub/app/v1/bank"
+	stakeTypes "github.com/irisnet/irishub/app/v1/stake/types"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/stretchr/testify/require"
 	abci "github.com/tendermint/tendermint/abci/types"
-	"github.com/tendermint/tendermint/types"
+	"github.com/tendermint/tendermint/crypto"
+	"github.com/tendermint/tendermint/crypto/ed25519"
 )
 
-// TestInitApp makes sure we can initialize this thing without an error
-func TestInitApp(t *testing.T) {
-	// set up an app
-	app, closer, err := SetupApp()
-
-	// closer may need to be run, even when error in later stage
-	if closer != nil {
-		defer closer()
+type (
+	expectedBalance struct {
+		addr  sdk.AccAddress
+		coins sdk.Coins
 	}
+
+	appTestCase struct {
+		expSimPass       bool
+		expPass          bool
+		msgs             []sdk.Msg
+		accNums          []uint64
+		accSeqs          []uint64
+		privKeys         []crypto.PrivKey
+		expectedBalances []expectedBalance
+	}
+)
+
+var (
+	priv1 = ed25519.GenPrivKey()
+	addr1 = sdk.AccAddress(priv1.PubKey().Address())
+	priv2 = ed25519.GenPrivKey()
+	addr2 = sdk.AccAddress(priv2.PubKey().Address())
+	addr3 = sdk.AccAddress(ed25519.GenPrivKey().PubKey().Address())
+	priv4 = ed25519.GenPrivKey()
+	addr4 = sdk.AccAddress(priv4.PubKey().Address())
+
+	coins     = sdk.Coins{sdk.NewInt64Coin(stakeTypes.StakeDenom, 10)}
+	halfCoins = sdk.Coins{sdk.NewInt64Coin(stakeTypes.StakeDenom, 5)}
+
+	sendMsg1 = bank.MsgSend{
+		Inputs:  []bank.Input{bank.NewInput(addr1, coins)},
+		Outputs: []bank.Output{bank.NewOutput(addr2, coins)},
+	}
+	sendMsg2 = bank.MsgSend{
+		Inputs: []bank.Input{bank.NewInput(addr1, coins)},
+		Outputs: []bank.Output{
+			bank.NewOutput(addr2, halfCoins),
+			bank.NewOutput(addr3, halfCoins),
+		},
+	}
+	sendMsg3 = bank.MsgSend{
+		Inputs: []bank.Input{
+			bank.NewInput(addr1, coins),
+			bank.NewInput(addr4, coins),
+		},
+		Outputs: []bank.Output{
+			bank.NewOutput(addr2, coins),
+			bank.NewOutput(addr3, coins),
+		},
+	}
+	sendMsg4 = bank.MsgSend{
+		Inputs: []bank.Input{
+			bank.NewInput(addr2, coins),
+		},
+		Outputs: []bank.Output{
+			bank.NewOutput(addr1, coins),
+		},
+	}
+)
+
+// initialize the mock application for this module
+func getMockApp(t *testing.T) *App {
+	mapp, err := getBenchmarkMockApp()
 	require.NoError(t, err)
-
-	// initialize it future-way
-	appState, err := AppGenState(nil, types.GenesisDoc{}, nil)
-	require.NoError(t, err)
-
-	//TODO test validators in the init chain?
-	req := abci.RequestInitChain{
-		AppStateBytes: appState,
-	}
-	app.InitChain(req)
-	app.Commit()
-
-	// make sure we can query these values
-	query := abci.RequestQuery{
-		Path: "/store/main/key",
-		Data: []byte("foo"),
-	}
-	qres := app.Query(query)
-	require.Equal(t, uint32(0), qres.Code, qres.Log)
-	require.Equal(t, []byte("bar"), qres.Value)
+	return mapp
 }
 
-// TextDeliverTx ensures we can write a tx
-func TestDeliverTx(t *testing.T) {
-	// set up an app
-	app, closer, err := SetupApp()
-	// closer may need to be run, even when error in later stage
-	if closer != nil {
-		defer closer()
+func TestMsgSendWithAccounts(t *testing.T) {
+	mapp := getMockApp(t)
+	acc := &auth.BaseAccount{
+		Address: addr1,
+		Coins:   sdk.Coins{sdk.NewInt64Coin(stakeTypes.StakeDenom, 67)},
 	}
-	require.NoError(t, err)
 
-	key := "my-special-key"
-	value := "top-secret-data!!"
-	tx := NewTx(key, value)
-	txBytes := tx.GetSignBytes()
+	SetGenesis(mapp, []auth.Account{acc})
 
-	header := abci.Header{
-		AppHash: []byte("apphash"),
-		Height:  1,
+	ctxCheck := mapp.BaseApp.NewContext(true, abci.Header{})
+
+	res1 := mapp.AccountKeeper.GetAccount(ctxCheck, addr1)
+	require.NotNil(t, res1)
+	require.Equal(t, acc, res1.(*auth.BaseAccount))
+
+	testCases := []appTestCase{
+		{
+			msgs:       []sdk.Msg{sendMsg1},
+			accNums:    []uint64{0},
+			accSeqs:    []uint64{0},
+			expSimPass: true,
+			expPass:    true,
+			privKeys:   []crypto.PrivKey{priv1},
+			expectedBalances: []expectedBalance{
+				{addr1, sdk.Coins{sdk.NewInt64Coin(stakeTypes.StakeDenom, 57)}},
+				{addr2, sdk.Coins{sdk.NewInt64Coin(stakeTypes.StakeDenom, 10)}},
+			},
+		},
+		{
+			msgs:       []sdk.Msg{sendMsg1, sendMsg2},
+			accNums:    []uint64{0},
+			accSeqs:    []uint64{0},
+			expSimPass: false,
+			expPass:    false,
+			privKeys:   []crypto.PrivKey{priv1},
+		},
 	}
-	app.BeginBlock(abci.RequestBeginBlock{Header: header})
-	dres := app.DeliverTx(txBytes)
-	require.Equal(t, uint32(0), dres.Code, dres.Log)
-	app.EndBlock(abci.RequestEndBlock{})
-	cres := app.Commit()
-	require.NotEmpty(t, cres.Data)
 
-	// make sure we can query these values
-	query := abci.RequestQuery{
-		Path: "/store/main/key",
-		Data: []byte(key),
+	for _, tc := range testCases {
+		SignCheckDeliver(t, mapp.BaseApp, tc.msgs, tc.accNums, tc.accSeqs, tc.expSimPass, tc.expPass, tc.privKeys...)
+
+		for _, eb := range tc.expectedBalances {
+			CheckBalance(t, mapp, eb.addr, eb.coins)
+		}
 	}
-	qres := app.Query(query)
-	require.Equal(t, uint32(0), qres.Code, qres.Log)
-	require.Equal(t, []byte(value), qres.Value)
+
+	// bumping the tx nonce number without resigning should be an auth error
+	mapp.BeginBlock(abci.RequestBeginBlock{})
+
+	tx := GenTx([]sdk.Msg{sendMsg1}, []uint64{0}, []uint64{0}, priv1)
+	tx.Signatures[0].Sequence = 1
+
+	res := mapp.Deliver(tx)
+	require.Equal(t, sdk.CodeUnauthorized, res.Code, res.Log)
+	require.Equal(t, sdk.CodespaceRoot, res.Codespace)
+
+	// resigning the tx with the bumped sequence should work
+	SignCheckDeliver(t, mapp.BaseApp, []sdk.Msg{sendMsg1, sendMsg2}, []uint64{0}, []uint64{1}, true, true, priv1)
+}
+
+func TestMsgSendMultipleOut(t *testing.T) {
+	mapp := getMockApp(t)
+
+	acc1 := &auth.BaseAccount{
+		Address: addr1,
+		Coins:   sdk.Coins{sdk.NewInt64Coin(stakeTypes.StakeDenom, 42)},
+	}
+	acc2 := &auth.BaseAccount{
+		Address: addr2,
+		Coins:   sdk.Coins{sdk.NewInt64Coin(stakeTypes.StakeDenom, 42)},
+	}
+
+	SetGenesis(mapp, []auth.Account{acc1, acc2})
+
+	testCases := []appTestCase{
+		{
+			msgs:       []sdk.Msg{sendMsg2},
+			accNums:    []uint64{0},
+			accSeqs:    []uint64{0},
+			expSimPass: true,
+			expPass:    true,
+			privKeys:   []crypto.PrivKey{priv1},
+			expectedBalances: []expectedBalance{
+				{addr1, sdk.Coins{sdk.NewInt64Coin(stakeTypes.StakeDenom, 32)}},
+				{addr2, sdk.Coins{sdk.NewInt64Coin(stakeTypes.StakeDenom, 47)}},
+				{addr3, sdk.Coins{sdk.NewInt64Coin(stakeTypes.StakeDenom, 5)}},
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		SignCheckDeliver(t, mapp.BaseApp, tc.msgs, tc.accNums, tc.accSeqs, tc.expSimPass, tc.expPass, tc.privKeys...)
+
+		for _, eb := range tc.expectedBalances {
+			CheckBalance(t, mapp, eb.addr, eb.coins)
+		}
+	}
+}
+
+func TestSengMsgMultipleInOut(t *testing.T) {
+	mapp := getMockApp(t)
+
+	acc1 := &auth.BaseAccount{
+		Address: addr1,
+		Coins:   sdk.Coins{sdk.NewInt64Coin(stakeTypes.StakeDenom, 42)},
+	}
+	acc2 := &auth.BaseAccount{
+		Address: addr2,
+		Coins:   sdk.Coins{sdk.NewInt64Coin(stakeTypes.StakeDenom, 42)},
+	}
+	acc4 := &auth.BaseAccount{
+		Address: addr4,
+		Coins:   sdk.Coins{sdk.NewInt64Coin(stakeTypes.StakeDenom, 42)},
+	}
+
+	SetGenesis(mapp, []auth.Account{acc1, acc2, acc4})
+
+	testCases := []appTestCase{
+		{
+			msgs:       []sdk.Msg{sendMsg3},
+			accNums:    []uint64{0, 0},
+			accSeqs:    []uint64{0, 0},
+			expSimPass: true,
+			expPass:    true,
+			privKeys:   []crypto.PrivKey{priv1, priv4},
+			expectedBalances: []expectedBalance{
+				{addr1, sdk.Coins{sdk.NewInt64Coin(stakeTypes.StakeDenom, 32)}},
+				{addr4, sdk.Coins{sdk.NewInt64Coin(stakeTypes.StakeDenom, 32)}},
+				{addr2, sdk.Coins{sdk.NewInt64Coin(stakeTypes.StakeDenom, 52)}},
+				{addr3, sdk.Coins{sdk.NewInt64Coin(stakeTypes.StakeDenom, 10)}},
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		SignCheckDeliver(t, mapp.BaseApp, tc.msgs, tc.accNums, tc.accSeqs, tc.expSimPass, tc.expPass, tc.privKeys...)
+
+		for _, eb := range tc.expectedBalances {
+			CheckBalance(t, mapp, eb.addr, eb.coins)
+		}
+	}
+}
+
+func TestMsgSendDependent(t *testing.T) {
+	mapp := getMockApp(t)
+
+	acc1 := &auth.BaseAccount{
+		Address: addr1,
+		Coins:   sdk.Coins{sdk.NewInt64Coin(stakeTypes.StakeDenom, 42)},
+	}
+
+	SetGenesis(mapp, []auth.Account{acc1})
+
+	testCases := []appTestCase{
+		{
+			msgs:       []sdk.Msg{sendMsg1},
+			accNums:    []uint64{0},
+			accSeqs:    []uint64{0},
+			expSimPass: true,
+			expPass:    true,
+			privKeys:   []crypto.PrivKey{priv1},
+			expectedBalances: []expectedBalance{
+				{addr1, sdk.Coins{sdk.NewInt64Coin(stakeTypes.StakeDenom, 32)}},
+				{addr2, sdk.Coins{sdk.NewInt64Coin(stakeTypes.StakeDenom, 10)}},
+			},
+		},
+		{
+			msgs:       []sdk.Msg{sendMsg4},
+			accNums:    []uint64{0},
+			accSeqs:    []uint64{0},
+			expSimPass: true,
+			expPass:    true,
+			privKeys:   []crypto.PrivKey{priv2},
+			expectedBalances: []expectedBalance{
+				{addr1, sdk.Coins{sdk.NewInt64Coin(stakeTypes.StakeDenom, 42)}},
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		SignCheckDeliver(t, mapp.BaseApp, tc.msgs, tc.accNums, tc.accSeqs, tc.expSimPass, tc.expPass, tc.privKeys...)
+
+		for _, eb := range tc.expectedBalances {
+			CheckBalance(t, mapp, eb.addr, eb.coins)
+		}
+	}
 }
