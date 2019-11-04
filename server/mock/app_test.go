@@ -41,8 +41,6 @@ var (
 
 	coins     = sdk.Coins{sdk.NewInt64Coin(stakeTypes.StakeDenom, 10)}
 	halfCoins = sdk.Coins{sdk.NewInt64Coin(stakeTypes.StakeDenom, 5)}
-	manyCoins = sdk.Coins{sdk.NewInt64Coin(stakeTypes.StakeDenom, 1), sdk.NewInt64Coin("barcoin", 1)}
-	freeFee   = auth.NewStdFee(100000, sdk.Coins{sdk.NewInt64Coin(stakeTypes.StakeDenom, 0)}...)
 
 	sendMsg1 = bank.MsgSend{
 		Inputs:  []bank.Input{bank.NewInput(addr1, coins)},
@@ -71,14 +69,6 @@ var (
 		},
 		Outputs: []bank.Output{
 			bank.NewOutput(addr1, coins),
-		},
-	}
-	sendMsg5 = bank.MsgSend{
-		Inputs: []bank.Input{
-			bank.NewInput(addr1, manyCoins),
-		},
-		Outputs: []bank.Output{
-			bank.NewOutput(addr2, manyCoins),
 		},
 	}
 )
