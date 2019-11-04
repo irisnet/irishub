@@ -52,10 +52,11 @@ func GetCmdCreateHTLC(cdc *codec.Codec) *cobra.Command {
 			}
 
 			secret := make([]byte, 32)
+
 			secretStr := strings.TrimSpace(viper.GetString(FlagSecret))
 			if len(secretStr) > 0 {
 				if len(secretStr) != 2*htlc.SecretLength {
-					return fmt.Errorf(fmt.Sprintf("the secret must be %d bytes long", htlc.SecretLength))
+					return fmt.Errorf("the secret must be %d bytes long", htlc.SecretLength)
 				}
 
 				secret, err = hex.DecodeString(secretStr)
