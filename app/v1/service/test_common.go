@@ -9,15 +9,14 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	abci "github.com/tendermint/tendermint/abci/types"
-	"github.com/tendermint/tendermint/crypto"
-
 	"github.com/irisnet/irishub/app/v1/bank"
-	"github.com/irisnet/irishub/app/v1/mock"
 	"github.com/irisnet/irishub/app/v1/stake"
 	"github.com/irisnet/irishub/modules/guardian"
+	"github.com/irisnet/irishub/server/mock"
 	"github.com/irisnet/irishub/types"
 	sdk "github.com/irisnet/irishub/types"
+	abci "github.com/tendermint/tendermint/abci/types"
+	"github.com/tendermint/tendermint/crypto"
 )
 
 // initialize the mock application for this module
