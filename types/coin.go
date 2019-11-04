@@ -138,7 +138,7 @@ func NewCoins(coins ...Coin) Coins {
 	newCoins.Sort()
 
 	if !newCoins.IsValid() {
-		panic(fmt.Errorf("invalid coin set: %s", newCoins))
+		panic(fmt.Sprintf("invalid coin set: %s", newCoins))
 	}
 
 	return newCoins
