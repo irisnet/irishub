@@ -36,6 +36,8 @@ var (
 	NewHTLC          = types.NewHTLC
 	GetHashLock      = keeper.GetHashLock
 
+	SecretLength = types.SecretLength
+
 	OPEN     = types.OPEN
 	EXPIRED  = types.EXPIRED
 	REFUNDED = types.REFUNDED
