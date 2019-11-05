@@ -2,16 +2,15 @@ package gov
 
 import (
 	"fmt"
-	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/modules/stake"
 	"github.com/irisnet/irishub/modules/gov"
+	"github.com/irisnet/irishub/modules/stake"
+	sdk "github.com/irisnet/irishub/types"
 	"math"
 	"math/rand"
 	"time"
 
 	"github.com/irisnet/irishub/mock/baseapp"
 	"github.com/irisnet/irishub/mock/simulation"
-
 )
 
 const (
@@ -114,15 +113,15 @@ func simulateHandleMsgSubmitProposal(msg gov.MsgSubmitProposal, sk stake.Keeper,
 
 func simulationCreateMsgSubmitProposal(r *rand.Rand, sender simulation.Account) (msg gov.MsgSubmitProposal, err error) {
 	deposit := randomDeposit(r)
-	param :=  gov.Param{
-		Key:   "test",
-		Value: "value",
+	param := gov.Param{
+		Key:      "test",
+		Value:    "value",
 		Subspace: "insert",
 	}
 	msg = gov.NewMsgSubmitProposal(
 		simulation.RandStringOfLength(r, 5),
 		simulation.RandStringOfLength(r, 5),
-		 gov.ProposalTypeSystemHalt,
+		gov.ProposalTypeSystemHalt,
 		sender.Address,
 		deposit,
 		gov.Params{param},
@@ -219,16 +218,16 @@ func randomProposalID(r *rand.Rand, k gov.Keeper, ctx sdk.Context) (proposalID i
 }
 
 // Pick a random voting option
-func randomVotingOption(r *rand.Rand)  gov.VoteOption {
+func randomVotingOption(r *rand.Rand) gov.VoteOption {
 	switch r.Intn(4) {
 	case 0:
-		return  gov.OptionYes
+		return gov.OptionYes
 	case 1:
-		return  gov.OptionAbstain
+		return gov.OptionAbstain
 	case 2:
-		return  gov.OptionNo
+		return gov.OptionNo
 	case 3:
-		return  gov.OptionNoWithVeto
+		return gov.OptionNoWithVeto
 	}
 	panic("should not happen")
 }

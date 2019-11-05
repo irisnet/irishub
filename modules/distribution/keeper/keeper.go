@@ -19,7 +19,7 @@ type Keeper struct {
 	// codespace
 	codespace sdk.CodespaceType
 	// metrics
-	metrics   *Metrics
+	metrics *Metrics
 }
 
 func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, paramSpace params.Subspace, ck types.BankKeeper,

@@ -23,7 +23,7 @@ const (
 func GetInfoCmd(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "info",
-		Short:   "query the information of upgrade module",
+		Short:   "Query the information of upgrade module",
 		Example: "iriscli upgrade info",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
@@ -68,8 +68,8 @@ func GetInfoCmd(storeName string, cdc *codec.Codec) *cobra.Command {
 func GetCmdQuerySignals(storeName string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "query-signals",
-		Short:   "query the information of signals",
-		Example: "iriscli upgrade status",
+		Short:   "Query the information of signals",
+		Example: "iriscli upgrade query-signals",
 		RunE: func(cmd *cobra.Command, args []string) error {
 
 			cliCtx := context.NewCLIContext().

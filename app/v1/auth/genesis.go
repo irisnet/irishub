@@ -1,8 +1,8 @@
 package auth
 
 import (
-	sdk "github.com/irisnet/irishub/types"
 	"fmt"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 // GenesisState - all auth state that must be provided at genesis

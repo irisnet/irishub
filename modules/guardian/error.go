@@ -1,8 +1,8 @@
 package guardian
 
 import (
-	sdk "github.com/irisnet/irishub/types"
 	"fmt"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 const (

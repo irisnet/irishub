@@ -19,8 +19,8 @@ var (
 	VotingPeriodStart = "voting-period-start"
 	Depositor         = "depositor"
 	Voter             = "voter"
-	Param       = "param"
-	Usage       = "usage"
-	Percent     = "percent"
-	DestAddress = "dest-address"
+	Param             = "param"
+	Usage             = "usage"
+	Percent           = "percent"
+	DestAddress       = "dest-address"
 )

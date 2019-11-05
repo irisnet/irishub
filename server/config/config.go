@@ -13,7 +13,7 @@ const (
 // BaseConfig defines the server's basic configuration
 type BaseConfig struct {
 	// Tx minimum fee
-	MinFees        string `mapstructure:"minimum_fees"`
+	MinFees string `mapstructure:"minimum_fees"`
 
 	// Enable invariant check, ignore this flag on testnet
 	CheckInvariant bool `mapstructure:"check_invariant"`

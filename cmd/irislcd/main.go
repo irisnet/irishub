@@ -13,12 +13,12 @@ import (
 var (
 	rootCmd = &cobra.Command{
 		Use:   "irislcd",
-		Short: "irishub lite server interface",
+		Short: "IRIS Hub API Server (Lite Client Daemon)",
 	}
 )
 
 func main() {
-//	sdk.InitBech32Prefix()
+	// sdk.InitBech32Prefix()
 	cobra.EnableCommandSorting = false
 	cdc := app.MakeLatestCodec()
 

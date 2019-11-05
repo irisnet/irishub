@@ -178,7 +178,6 @@ func (keeper Keeper) SetProposal(ctx sdk.Context, proposal Proposal) {
 
 // Implements sdk.AccountKeeper.
 func (keeper Keeper) DeleteProposal(ctx sdk.Context, proposalID uint64) {
-	keeper.metrics.ProposalStatus.With(ProposalIDLabel, strconv.FormatUint(proposalID, 10)).Set(4)
 	store := ctx.KVStore(keeper.storeKey)
 	proposal := keeper.GetProposal(ctx, proposalID)
 	keeper.RemoveFromInactiveProposalQueue(ctx, proposal.GetDepositEndTime(), proposalID)
@@ -328,7 +327,7 @@ func (keeper Keeper) AddVote(ctx sdk.Context, proposalID uint64, voterAddr sdk.A
 	}
 	keeper.setVote(ctx, proposalID, voterAddr, vote)
 	if validator != nil {
-		keeper.metrics.Vote.With(ValidatorLabel, validator.GetConsAddr().String(), ProposalIDLabel, strconv.FormatUint(proposalID, 10)).Set(float64(option))
+		keeper.metrics.AddVote(validator.GetOperator().String(), proposalID, option)
 	}
 	return nil
 }
@@ -508,7 +507,7 @@ func (keeper Keeper) ActiveProposalQueueIterator(ctx sdk.Context, endTime time.T
 
 // Inserts a ProposalID into the active proposal queue at endTime
 func (keeper Keeper) InsertActiveProposalQueue(ctx sdk.Context, endTime time.Time, proposalID uint64) {
-	keeper.metrics.ProposalStatus.With(ProposalIDLabel, strconv.FormatUint(proposalID, 10)).Set(1)
+	keeper.metrics.SetProposalStatus(proposalID, StatusVotingPeriod)
 	store := ctx.KVStore(keeper.storeKey)
 	bz := keeper.cdc.MustMarshalBinaryLengthPrefixed(proposalID)
 	store.Set(KeyActiveProposalQueueProposal(endTime, proposalID), bz)
@@ -528,7 +527,7 @@ func (keeper Keeper) InactiveProposalQueueIterator(ctx sdk.Context, endTime time
 
 // Inserts a ProposalID into the inactive proposal queue at endTime
 func (keeper Keeper) InsertInactiveProposalQueue(ctx sdk.Context, endTime time.Time, proposalID uint64) {
-	keeper.metrics.ProposalStatus.With(ProposalIDLabel, strconv.FormatUint(proposalID, 10)).Set(0)
+	keeper.metrics.SetProposalStatus(proposalID, StatusDepositPeriod)
 	store := ctx.KVStore(keeper.storeKey)
 	bz := keeper.cdc.MustMarshalBinaryLengthPrefixed(proposalID)
 	store.Set(KeyInactiveProposalQueueProposal(endTime, proposalID), bz)

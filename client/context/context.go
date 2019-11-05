@@ -3,6 +3,7 @@ package context
 import (
 	"bytes"
 	"fmt"
+	"github.com/irisnet/irishub/app/v2/coinswap"
 	"io"
 	"os"
 	"strings"
@@ -242,6 +243,8 @@ func (cliCtx CLIContext) GetCoinType(coinName string) (sdk.CoinType, error) {
 	}
 	if coinName == sdk.Iris {
 		coinType = sdk.IrisCoinType
+	} else if strings.HasPrefix(coinName, coinswap.FormatUniABSPrefix) {
+		return coinswap.GetUniCoinType(coinName)
 	} else {
 		params := asset.QueryTokenParams{
 			TokenId: coinName,
@@ -279,7 +282,8 @@ func (cliCtx CLIContext) ConvertToMainUnit(coinsStr string) (coins []string, err
 		mainUnit, err := sdk.GetCoinName(coinStr)
 		coinType, err := cliCtx.GetCoinType(mainUnit)
 		if err != nil {
-			return nil, err
+			coins = append(coins, coinStr)
+			continue
 		}
 
 		coin, err := coinType.Convert(coinStr, mainUnit)
@@ -293,9 +297,12 @@ func (cliCtx CLIContext) ConvertToMainUnit(coinsStr string) (coins []string, err
 
 func (cliCtx CLIContext) ParseCoin(coinStr string) (sdk.Coin, error) {
 	mainUnit, err := sdk.GetCoinName(coinStr)
-	coinType, err := cliCtx.GetCoinType(mainUnit)
 	if err != nil {
 		return sdk.Coin{}, err
+	}
+	coinType, err := cliCtx.GetCoinType(mainUnit)
+	if err != nil {
+		return sdk.ParseCoin(coinStr)
 	}
 
 	coin, err := coinType.ConvertToMinDenomCoin(coinStr)

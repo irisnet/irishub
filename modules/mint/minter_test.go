@@ -12,7 +12,7 @@ import (
 func TestNextInflation(t *testing.T) {
 	minter := NewMinter(time.Now(), stakeTypes.StakeDenom, sdk.NewIntWithDecimal(100, 18))
 	tests := []struct {
-		params        Params
+		params Params
 	}{
 		{DefaultParams()},
 		{DefaultParams()},

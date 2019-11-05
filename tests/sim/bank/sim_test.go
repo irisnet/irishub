@@ -5,11 +5,11 @@ import (
 	"math/rand"
 	"testing"
 
-	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/modules/bank"
 	"github.com/irisnet/irishub/mock"
 	"github.com/irisnet/irishub/mock/simulation"
+	"github.com/irisnet/irishub/modules/bank"
 	stakeTypes "github.com/irisnet/irishub/modules/stake/types"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 func TestBankWithRandomMessages(t *testing.T) {

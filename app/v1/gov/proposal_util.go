@@ -101,10 +101,9 @@ func createTokenAdditionInfo() pTypeInfo {
 			return buildProposal(content, func(p BasicProposal, content Content) Proposal {
 				addTokenMsg := content.(MsgSubmitTokenAdditionProposal)
 				decimal := int(addTokenMsg.Decimal)
-				initialSupply := sdk.NewIntWithDecimal(int64(addTokenMsg.InitialSupply), decimal)
 				maxSupply := sdk.NewIntWithDecimal(int64(exported.MaximumAssetMaxSupply), decimal)
 
-				fToken := exported.NewFungibleToken(exported.EXTERNAL, "", addTokenMsg.Symbol, addTokenMsg.Name, addTokenMsg.Decimal, addTokenMsg.CanonicalSymbol, addTokenMsg.MinUnitAlias, initialSupply, maxSupply, false, nil)
+				fToken := exported.NewFungibleToken(exported.EXTERNAL, "", addTokenMsg.Symbol, addTokenMsg.Name, addTokenMsg.Decimal, addTokenMsg.CanonicalSymbol, addTokenMsg.MinUnitAlias, sdk.ZeroInt(), maxSupply, true, nil)
 				proposal := &TokenAdditionProposal{
 					p,
 					fToken,

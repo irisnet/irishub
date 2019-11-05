@@ -120,7 +120,7 @@ func (msg MsgSubmitSoftwareUpgradeProposal) ValidateBasic() sdk.Error {
 	}
 
 	// if threshold not in [0.8,1), then print error
-	if msg.Threshold.LT(sdk.NewDecWithPrec(80, 2)) || msg.Threshold.GTE(sdk.NewDec(1)) {
+	if msg.Threshold.IsNil() || msg.Threshold.LT(sdk.NewDecWithPrec(80, 2)) || msg.Threshold.GTE(sdk.NewDec(1)) {
 		return ErrInvalidUpgradeThreshold(DefaultCodespace, msg.Threshold)
 	}
 
@@ -162,7 +162,7 @@ func (msg MsgSubmitTxTaxUsageProposal) ValidateBasic() sdk.Error {
 	if msg.Usage != UsageTypeBurn && len(msg.DestAddress) == 0 {
 		return sdk.ErrInvalidAddress(msg.DestAddress.String())
 	}
-	if msg.Percent.LTE(sdk.NewDec(0)) || msg.Percent.GT(sdk.NewDec(1)) {
+	if msg.Percent.IsNil() || msg.Percent.LTE(sdk.NewDec(0)) || msg.Percent.GT(sdk.NewDec(1)) {
 		return ErrInvalidPercent(DefaultCodespace, msg.Percent)
 	}
 	return nil

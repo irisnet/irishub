@@ -114,7 +114,6 @@ func (keeper BaseKeeper) DecreaseLoosenToken(
 // SetMemoRegexp sets memo regexp for sender account
 func (keeper BaseKeeper) SetMemoRegexp(ctx sdk.Context, fromAddr sdk.AccAddress, regexp string) (sdk.Tags, sdk.Error) {
 	acc := keeper.am.GetAccount(ctx, fromAddr)
-
 	if acc == nil {
 		return nil, ErrInvalidAccount(DefaultCodespace, "account does not exist")
 	}

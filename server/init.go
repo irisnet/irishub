@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"github.com/irisnet/irishub/crypto/keys"
 	"github.com/tendermint/tendermint/crypto"
-	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/types"
+	dbm "github.com/tendermint/tm-db"
 
 	clkeys "github.com/irisnet/irishub/client/keys"
 	"github.com/irisnet/irishub/codec"

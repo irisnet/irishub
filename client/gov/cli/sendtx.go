@@ -22,7 +22,7 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "submit-proposal",
 		Short:   "Submit a proposal along with an initial deposit",
-		Example: "iriscli gov submit-proposal --chain-id=<chain-id> --from=<key name> --fee=0.4iris --type=Parameter --description=test --title=test-proposal --param='mint/Inflation=0.050'",
+		Example: "iriscli gov submit-proposal --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --type=Parameter --description=test --title=test-proposal --param='mint/Inflation=0.050'",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			title := viper.GetString(flagTitle)
 			description := viper.GetString(flagDescription)
@@ -88,19 +88,19 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 
 			if proposalType == gov.ProposalTypeSoftwareUpgrade {
 
-				version_ := viper.GetInt64(flagVersion)
-				if version_ < 0 {
+				versionInt := viper.GetInt64(flagVersion)
+				if versionInt < 0 {
 					return errors.Errorf("Version must greater than or equal to zero")
 				}
 
-				version := uint64(version_)
+				version := uint64(versionInt)
 				software := viper.GetString(flagSoftware)
 
-				switchHeight_ := viper.GetInt64(flagSwitchHeight)
-				if switchHeight_ < 0 {
+				switchHeightInt := viper.GetInt64(flagSwitchHeight)
+				if switchHeightInt < 0 {
 					return errors.Errorf("SwitchHeight must greater than or equal to zero")
 				}
-				switchHeight := uint64(switchHeight_)
+				switchHeight := uint64(switchHeightInt)
 
 				thresholdStr := viper.GetString(flagThreshold)
 				threshold, err := sdk.NewDecFromStr(thresholdStr)
@@ -117,9 +117,8 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 				name := viper.GetString(flagTokenName)
 				decimal := uint8(viper.GetInt(flagTokenDecimal))
 				alias := viper.GetString(flagTokenMinUnitAlias)
-				initialSupply := uint64(viper.GetInt64(flagTokenInitialSupply))
 
-				msg := gov.NewMsgSubmitTokenAdditionProposal(msg, symbol, canonicalSymbol, name, alias, decimal, initialSupply)
+				msg := gov.NewMsgSubmitTokenAdditionProposal(msg, symbol, canonicalSymbol, name, alias, decimal)
 				return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 			}
 			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
@@ -146,7 +145,6 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 	cmd.Flags().String(flagTokenName, "", "the asset name")
 	cmd.Flags().Uint8(flagTokenDecimal, 0, "the asset decimal. The maximum value is 18")
 	cmd.Flags().String(flagTokenMinUnitAlias, "", "the asset symbol minimum alias")
-	cmd.Flags().Uint64(flagTokenInitialSupply, 0, "the initial supply token of asset")
 
 	cmd.MarkFlagRequired(flagTitle)
 	cmd.MarkFlagRequired(flagDescription)
@@ -174,8 +172,8 @@ func getParamFromString(paramsStr string) (gov.Params, error) {
 func GetCmdDeposit(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "deposit",
-		Short:   "deposit tokens for activing proposal",
-		Example: "iriscli gov deposit --chain-id=<chain-id> --from=<key name> --fee=0.4iris --proposal-id=1 --deposit=10iris",
+		Short:   "Deposit tokens for activing proposal",
+		Example: "iriscli gov deposit --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --proposal-id=1 --deposit=10iris",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
@@ -218,8 +216,8 @@ func GetCmdDeposit(cdc *codec.Codec) *cobra.Command {
 func GetCmdVote(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "vote",
-		Short:   "vote for an active proposal, options: Yes/No/NoWithVeto/Abstain",
-		Example: "iriscli gov vote --chain-id=<chain-id> --from=<key name> --fee=0.4iris --proposal-id=1 --option=Yes",
+		Short:   "Vote for an active proposal, options: Yes/No/NoWithVeto/Abstain",
+		Example: "iriscli gov vote --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --proposal-id=1 --option=Yes",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).

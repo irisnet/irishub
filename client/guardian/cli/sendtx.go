@@ -17,7 +17,7 @@ func GetCmdCreateProfiler(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "add-profiler",
 		Short: "Add a new profiler",
-		Example: "iriscli guardian add-profiler --chain-id=<chain-id> --from=<key name> --fee=0.4iris " +
+		Example: "iriscli guardian add-profiler --chain-id=<chain-id> --from=<key-name> --fee=0.3iris " +
 			"--address=<added address> --description=<name>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
@@ -54,7 +54,7 @@ func GetCmdDeleteProfiler(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "delete-profiler",
 		Short: "Delete a profiler",
-		Example: "iriscli guardian delete-profiler --chain-id=<chain-id> --from=<key name> --fee=0.4iris " +
+		Example: "iriscli guardian delete-profiler --chain-id=<chain-id> --from=<key-name> --fee=0.3iris " +
 			"--address=<deleted address>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
@@ -86,7 +86,7 @@ func GetCmdCreateTrustee(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "add-trustee",
 		Short: "Add a new trustee",
-		Example: "iriscli guardian add-trustee --chain-id=<chain-id> --from=<key name> --fee=0.4iris " +
+		Example: "iriscli guardian add-trustee --chain-id=<chain-id> --from=<key-name> --fee=0.3iris " +
 			"--address=<added address> --description=<name>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
@@ -121,7 +121,7 @@ func GetCmdDeleteTrustee(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "delete-trustee",
 		Short: "Delete a trustee",
-		Example: "iriscli guardian delete-trustee --chain-id=<chain-id> --from=<key name> --fee=0.4iris " +
+		Example: "iriscli guardian delete-trustee --chain-id=<chain-id> --from=<key-name> --fee=0.3iris " +
 			"--address=<deleted address>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).

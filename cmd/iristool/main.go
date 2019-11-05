@@ -3,9 +3,9 @@ package main
 import (
 	"os"
 
-	"github.com/spf13/cobra"
-	debugcmd "github.com/irisnet/irishub/tools/debug"
 	"github.com/irisnet/irishub/app"
+	debugcmd "github.com/irisnet/irishub/tools/debug"
+	"github.com/spf13/cobra"
 	"github.com/tendermint/tendermint/libs/cli"
 )
 

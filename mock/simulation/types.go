@@ -4,8 +4,8 @@ import (
 	"math/rand"
 	"time"
 
-	sdk "github.com/irisnet/irishub/types"
 	bam "github.com/irisnet/irishub/mock/baseapp"
+	sdk "github.com/irisnet/irishub/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/crypto"
 )

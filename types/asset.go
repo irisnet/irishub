@@ -6,6 +6,8 @@ import (
 	"strings"
 )
 
+const FormatUniABSPrefix = "uni:"
+
 // ConvertIdToTokenKeyId return the store key suffix of a token
 func ConvertIdToTokenKeyId(tokenId string) (key string, err error) {
 	var reToken = `[A-Za-z0-9\.]{3,17}`
