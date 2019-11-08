@@ -140,12 +140,14 @@ func snapshotCsWAL(home, targetDir string, height int64) error {
 	}
 
 	gr, found, err := sourceWAL.SearchForEndHeight(height, &consensus.WALSearchOptions{IgnoreDataCorruptionErrors: true})
-	defer gr.Close()
+	if gr != nil {
+		defer gr.Close()
+	}
 	if err != nil {
 		return err
 	}
 	if !found {
-		return fmt.Errorf("cannot replay height %d. WAL does not contain #ENDHEIGHT for %d", height, height-1)
+		return nil
 	}
 
 	var msg *consensus.TimedWALMessage
