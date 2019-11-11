@@ -20,6 +20,10 @@ IRIShub can snapshot the latest data of the full node, including blocks, consens
 
 After the command is executed, a `data.bak` directory will be generated in the directory specified by `--tmp-dir`. Delete the old `data` directory, rename `data.bak` to `data`, and restart the node.
 
+:::tip
+Please stop your node before executing the command.
+:::
+
 ## Flags
 
 | Name, shorthand | type   | Required | Default          | Description                                                        |
