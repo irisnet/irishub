@@ -3,10 +3,11 @@ package context
 import (
 	"bytes"
 	"fmt"
-	"github.com/irisnet/irishub/app/v2/coinswap"
 	"io"
 	"os"
 	"strings"
+
+	"github.com/irisnet/irishub/app/v2/coinswap"
 
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/app/v1/asset"
@@ -62,19 +63,21 @@ func NewCLIContext() CLIContext {
 		rpc = rpcclient.NewHTTP(nodeURI, "/websocket")
 	}
 
+	verifier, trustNode := createVerifier(rpc)
+
 	return CLIContext{
 		Client:        rpc,
 		NodeURI:       nodeURI,
 		AccountStore:  protocol.AccountStore,
 		Height:        viper.GetInt64(client.FlagHeight),
 		OutputFormat:  viper.GetString(cli.OutputFlag),
-		TrustNode:     viper.GetBool(client.FlagTrustNode),
+		TrustNode:     trustNode,
 		UseLedger:     viper.GetBool(client.FlagUseLedger),
 		Async:         viper.GetBool(client.FlagAsync),
 		Commit:        viper.GetBool(client.FlagCommit),
 		JSON:          viper.GetBool(client.FlagJson),
 		PrintResponse: viper.GetBool(client.FlagPrintResponse),
-		Verifier:      createVerifier(),
+		Verifier:      verifier,
 		DryRun:        viper.GetBool(client.FlagDryRun),
 		GenerateOnly:  viper.GetBool(client.FlagGenerateOnly),
 		fromAddress:   fromAddress,
@@ -83,15 +86,21 @@ func NewCLIContext() CLIContext {
 	}
 }
 
-func createVerifier() tmlite.Verifier {
+func createVerifier(rpc rpcclient.SignClient) (tmlite.Verifier, bool) {
 	trustNodeDefined := viper.IsSet(client.FlagTrustNode)
 	if !trustNodeDefined {
-		return nil
+		return nil, true
 	}
 
 	trustNode := viper.GetBool(client.FlagTrustNode)
 	if trustNode {
-		return nil
+		return nil, trustNode
+	} else {
+		height := int64(1)
+		if _, err := rpc.Commit(&height); err != nil {
+			fmt.Println("Warning: snapshot's node can't verify the proof of result,will set --trust-node=true")
+			return nil, true
+		}
 	}
 
 	chainID := viper.GetString(client.FlagChainID)
@@ -126,7 +135,7 @@ func createVerifier() tmlite.Verifier {
 		os.Exit(1)
 	}
 
-	return verifier
+	return verifier, trustNode
 }
 
 func fromFields(from string) (fromAddr sdk.AccAddress, fromName string) {
