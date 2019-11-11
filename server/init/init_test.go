@@ -98,7 +98,7 @@ func TestStartStandAlone(t *testing.T) {
 		os.RemoveAll(home)
 	}()
 	viper.Set(cli.HomeFlag, home)
-	viper.Set(client.FlagName, "moniker")
+	viper.Set(flagMoniker, "moniker")
 	defer setupClientHome(t)()
 
 	logger := log.NewNopLogger()
@@ -110,7 +110,7 @@ func TestStartStandAlone(t *testing.T) {
 	err = initCmd.RunE(nil, nil)
 	require.NoError(t, err)
 
-	app, err := mock.NewApp(home, logger)
+	app := mock.NewApp()
 	require.Nil(t, err)
 	svrAddr, _, err := server.FreeTCPAddr()
 	require.Nil(t, err)

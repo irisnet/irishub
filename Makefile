@@ -1,4 +1,4 @@
-PACKAGES_NOSIMULATION=$(shell go list ./... | grep -v '/simulation' | grep -v '/server' | grep -v '/tests')
+PACKAGES_NOSIMULATION=$(shell go list ./... | grep -v '/simulation' | grep -v '/tests')
 PACKAGES_SIMTEST=$(shell go list ./... | grep '/simulation')
 
 export GO111MODULE = on
