@@ -2,7 +2,7 @@
 
 HTLC allows you to manage local Hash Time Locked Contracts (HTLCs) for atomic swaps with other chains.
 
-There are the following states involved in the lifecycle:
+There are the following states involved in the lifecycle of an HTLC:
    - open: indicates the HTLC is claimable
    - completed: indicates the HTLC has been claimed
    - expired: indicates the HTLC is expired and refundable
