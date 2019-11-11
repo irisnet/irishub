@@ -1,41 +1,29 @@
 module github.com/irisnet/irishub
 
 require (
-	github.com/bartekn/go-bip39 v0.0.0-20171116152956-a05967ea095d
-	github.com/bgentry/speakeasy v0.1.0
-	github.com/btcsuite/btcd v0.0.0-20190115013929-ed77733ec07d
-	github.com/cosmos/go-bip39 v0.0.0-20180618194314-52158e4697b8
-	github.com/cosmos/ledger-cosmos-go v0.10.3
-	github.com/emicklei/proto v1.6.5
-	github.com/fortytw2/leaktest v1.3.0 // indirect
-	github.com/go-kit/kit v0.6.0
-	github.com/gogo/protobuf v1.1.1
-	github.com/gorilla/context v1.1.1 // indirect
-	github.com/gorilla/mux v1.6.2
-	github.com/mattn/go-isatty v0.0.4
-	github.com/mitchellh/go-homedir v1.0.0
-	github.com/pelletier/go-toml v1.2.0
+	github.com/btcsuite/btcd v0.0.0-20190807005414-4063feeff79a // indirect
+	github.com/cosmos/cosmos-sdk v0.34.4-0.20191108144056-d81d46192a0c
+	github.com/cosmos/go-bip39 v0.0.0-20180819234021-555e2067c45d // indirect
+	github.com/golang/mock v1.3.1 // indirect
+	github.com/onsi/ginkgo v1.8.0 // indirect
+	github.com/onsi/gomega v1.5.0 // indirect
+	github.com/otiai10/copy v1.0.2
+	github.com/otiai10/curr v0.0.0-20190513014714-f5a3d24e5776 // indirect
 	github.com/pkg/errors v0.8.1
-	github.com/prometheus/client_golang v0.9.1
-	github.com/rakyll/statik v0.1.6
-	github.com/spf13/cobra v0.0.1
-	github.com/spf13/pflag v1.0.3
-	github.com/spf13/viper v1.0.0
-	github.com/stretchr/testify v1.3.0
-	github.com/syndtr/goleveldb v1.0.1-0.20190318030020-c3a204f8e965
-	github.com/tendermint/btcd v0.1.1
-	github.com/tendermint/go-amino v0.14.1
-	github.com/tendermint/iavl v0.12.1
-	github.com/tendermint/tendermint v0.31.0
-	github.com/tendermint/tm-db v0.1.1
-	github.com/tendermint/tmlibs v0.9.0
-	golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2
-)
-
-replace (
-	github.com/tendermint/iavl => github.com/irisnet/iavl v0.12.3
-	github.com/tendermint/tendermint => github.com/irisnet/tendermint v0.32.0
-	golang.org/x/crypto => github.com/tendermint/crypto v0.0.0-20180820045704-3764759f34a5
+	github.com/prometheus/client_golang v1.1.0 // indirect
+	github.com/rcrowley/go-metrics v0.0.0-20190706150252-9beb055b7962 // indirect
+	github.com/snikch/goodman v0.0.0-20171125024755-10e37e294daa
+	github.com/spf13/afero v1.2.2 // indirect
+	github.com/spf13/cobra v0.0.5
+	github.com/spf13/viper v1.5.0
+	github.com/stretchr/testify v1.4.0
+	github.com/tendermint/go-amino v0.15.1
+	github.com/tendermint/tendermint v0.32.7
+	github.com/tendermint/tm-db v0.2.0
+	golang.org/x/crypto v0.0.0-20190909091759-094676da4a83 // indirect
+	golang.org/x/net v0.0.0-20190827160401-ba9fcec4b297 // indirect
+	golang.org/x/text v0.3.2 // indirect
+	google.golang.org/genproto v0.0.0-20190801165951-fa694d86fc64 // indirect
 )
 
 go 1.13

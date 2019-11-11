@@ -1,33 +1,24 @@
-PACKAGES_NOSIMULATION=$(shell go list ./... | grep -v '/simulation' | grep -v '/tests')
+#!/usr/bin/make -f
+
 PACKAGES_SIMTEST=$(shell go list ./... | grep '/simulation')
+VERSION := $(shell echo $(shell git describe --tags) | sed 's/^v//')
+COMMIT := $(shell git log -1 --format='%H')
+LEDGER_ENABLED ?= true
+SDK_PACK := $(shell go list -m github.com/cosmos/cosmos-sdk | sed  's/ /\@/g')
+NetworkType := $(shell if [ -z ${NetworkType} ]; then echo "mainnet"; else echo ${NetworkType}; fi)
 
 export GO111MODULE = on
 
-all: get_tools install build_cur
+# process build tags
 
-COMMIT_HASH := $(shell git rev-parse --short HEAD)
-
-InvariantLevel := $(shell if [ -z ${InvariantLevel} ]; then echo "error"; else echo ${InvariantLevel}; fi)
-NetworkType := $(shell if [ -z ${NetworkType} ]; then echo "mainnet"; else echo ${NetworkType}; fi)
-
-BUILD_TAGS = netgo
-
-BUILD_FLAGS = -tags "$(BUILD_TAGS)" -ldflags "\
--X github.com/irisnet/irishub/version.GitCommit=${COMMIT_HASH} \
--X github.com/irisnet/irishub/types.InvariantLevel=${InvariantLevel} \
--X github.com/irisnet/irishub/types.NetworkType=${NetworkType}"
-LEDGER_ENABLED ?= true
-
-########################################
-### Build/Install
-
+build_tags = netgo
 ifeq ($(LEDGER_ENABLED),true)
   ifeq ($(OS),Windows_NT)
     GCCEXE = $(shell where gcc.exe 2> NUL)
     ifeq ($(GCCEXE),)
       $(error gcc.exe not installed for ledger support, please install or set LEDGER_ENABLED=false)
     else
-      BUILD_TAGS += ledger
+      build_tags += ledger
     endif
   else
     UNAME_S = $(shell uname -s)
@@ -38,140 +29,169 @@ ifeq ($(LEDGER_ENABLED),true)
       ifeq ($(GCC),)
         $(error gcc not installed for ledger support, please install or set LEDGER_ENABLED=false)
       else
-        BUILD_TAGS += ledger
+        build_tags += ledger
       endif
     endif
   endif
 endif
 
+ifeq ($(WITH_CLEVELDB),yes)
+  build_tags += gcc
+endif
+build_tags += $(BUILD_TAGS)
+build_tags := $(strip $(build_tags))
+
+whitespace :=
+whitespace += $(whitespace)
+comma := ,
+build_tags_comma_sep := $(subst $(whitespace),$(comma),$(build_tags))
+
+# process linker flags
+
+ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=iris \
+		  -X github.com/cosmos/cosmos-sdk/version.ServerName=iris \
+		  -X github.com/cosmos/cosmos-sdk/version.ClientName=iriscli \
+		  -X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
+		  -X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
+		  -X "github.com/cosmos/cosmos-sdk/version.BuildTags=$(build_tags_comma_sep)" \
+		  -X github.com/irisnet/irishub/cmd/config.NetworkType=${NetworkType}
+
+ifeq ($(WITH_CLEVELDB),yes)
+  ldflags += -X github.com/cosmos/cosmos-sdk/types.DBBackend=cleveldb
+endif
+ldflags += $(LDFLAGS)
+ldflags := $(strip $(ldflags))
+
+BUILD_FLAGS := -tags "$(build_tags)" -ldflags '$(ldflags)'
+
+# The below include contains the tools target.
+
+all: install lint check
+
+build: go.sum
+ifeq ($(OS),Windows_NT)
+	go build $(BUILD_FLAGS) -o build/iris.exe ./cmd/iris
+	go build $(BUILD_FLAGS) -o build/iriscli.exe ./cmd/iriscli
+else
+	go build $(BUILD_FLAGS) -o build/iris ./cmd/iris
+	go build $(BUILD_FLAGS) -o build/iriscli ./cmd/iriscli
+endif
+
+build-linux: go.sum
+	LEDGER_ENABLED=false GOOS=linux GOARCH=amd64 $(MAKE) build
+
+build-contract-tests-hooks:
+ifeq ($(OS),Windows_NT)
+	go build -mod=readonly $(BUILD_FLAGS) -o build/contract_tests.exe ./cmd/contract_tests
+else
+	go build -mod=readonly $(BUILD_FLAGS) -o build/contract_tests ./cmd/contract_tests
+endif
+
+install: go.sum
+	go install $(BUILD_FLAGS) ./cmd/iris
+	go install $(BUILD_FLAGS) ./cmd/iriscli
+
+install-tool: go.sum
+	go install -mod=readonly $(BUILD_FLAGS) ./cmd/iristool
+
 ########################################
 ### Tools & dependencies
 
-echo_bech32_prefix:
-	@echo "If you want to build binaries for testnet, please execute \"source scripts/setTestEnv.sh\" first"
-	@echo InvariantLevel=${InvariantLevel}
-	@echo NetworkType=${NetworkType}
-
-check_tools:
-	cd scripts && $(MAKE) check_tools
-
-check_dev_tools:
-	cd scripts && $(MAKE) check_dev_tools
-
-update_tools:
-	cd scripts && $(MAKE) update_tools
-
-update_dev_tools:
-	cd scripts && $(MAKE) update_dev_tools
-
-get_tools:
-	cd scripts && $(MAKE) get_tools
-
-get_dev_tools:
-	cd scripts && $(MAKE) get_dev_tools
-
-go_mod_cache: go.sum
+go-mod-cache: go.sum
 	@echo "--> Download go modules to local cache"
 	@go mod download
 
-go.sum: tools
+go.sum: go.mod
 	@echo "--> Ensure dependencies have not been modified"
 	@go mod verify
 
-draw_deps:
+draw-deps:
 	@# requires brew install graphviz or apt-get install graphviz
 	go get github.com/RobotsAndPencils/goviz
-	@goviz -i github.com/irisnet/irishub/cmd/iris -d 2 | dot -Tpng -o dependency-graph.png
+	@goviz -i ./cmd/iris -d 2 | dot -Tpng -o dependency-graph.png
 
-########################################
-### Generate swagger docs for irislcd
-update_irislcd_swagger_docs:
-	@statik -src=lite/swagger-ui -dest=lite -f
+clean:
+	rm -rf snapcraft-local.yaml build/
 
-########################################
-### Compile and Install
-install: update_irislcd_swagger_docs echo_bech32_prefix go.sum
-	go install -mod=readonly $(BUILD_FLAGS) ./cmd/iris
-	go install -mod=readonly $(BUILD_FLAGS) ./cmd/iriscli
-	go install -mod=readonly $(BUILD_FLAGS) ./cmd/irislcd
-	go install -mod=readonly $(BUILD_FLAGS) ./cmd/iristool
-
-build_linux: update_irislcd_swagger_docs echo_bech32_prefix go.sum
-	GOOS=linux GOARCH=amd64 go build -mod=readonly $(BUILD_FLAGS) -o build/iris ./cmd/iris && \
-	GOOS=linux GOARCH=amd64 go build -mod=readonly $(BUILD_FLAGS) -o build/iriscli ./cmd/iriscli && \
-	GOOS=linux GOARCH=amd64 go build -mod=readonly $(BUILD_FLAGS) -o build/irislcd ./cmd/irislcd && \
-	GOOS=linux GOARCH=amd64 go build -mod=readonly $(BUILD_FLAGS) -o build/iristool ./cmd/iristool
-
-build_cur: update_irislcd_swagger_docs echo_bech32_prefix go.sum
-	go build -mod=readonly $(BUILD_FLAGS) -o build/iris ./cmd/iris  && \
-	go build -mod=readonly $(BUILD_FLAGS) -o build/iriscli ./cmd/iriscli && \
-	go build -mod=readonly $(BUILD_FLAGS) -o build/irislcd ./cmd/irislcd && \
-	go build -mod=readonly $(BUILD_FLAGS) -o build/iristool ./cmd/iristool
-
+distclean: clean
+	rm -rf vendor/
 
 ########################################
 ### Testing
 
-test: test_unit test_cli test_lcd test_sim
 
-test_sim: test_sim_modules test_sim_benchmark test_sim_iris_nondeterminism test_sim_iris_fast
+test: test-unit test-build
+test-all: check test-race test-cover
 
-test_unit:
-	@go test -mod=readonly $(PACKAGES_NOSIMULATION)
+test-unit:
+	@VERSION=$(VERSION) go test -mod=readonly -tags='ledger test_ledger_mock' ./...
 
-test_cli:
-	@go test -mod=readonly -timeout 20m -count 1 -p 4 tests/cli/*
+test-race:
+	@VERSION=$(VERSION) go test -mod=readonly -race -tags='ledger test_ledger_mock' ./...
 
-test_lcd:
-	@go test -mod=readonly `go list github.com/irisnet/irishub/client/lcd`
+test-cover:
+	@go test -mod=readonly -timeout 30m -race -coverprofile=coverage.txt -covermode=atomic -tags='ledger test_ledger_mock' ./...
 
-test_sim_modules:
-	@echo "Running individual module simulations..."
-	@go test -mod=readonly $(PACKAGES_SIMTEST)
+test-build: build
+	@go test -mod=readonly -p 4 `go list ./cli_test/...` -tags=cli_test -v
 
-test_sim_benchmark:
-	@echo "Running benchmark test..."
-	@go test -mod=readonly ./app -run=none -bench=BenchmarkFullIrisSimulation -v -SimulationCommit=true -SimulationNumBlocks=100 -timeout 24h
 
-test_sim_iris_nondeterminism:
-	@echo "Running nondeterminism test..."
-	@go test -mod=readonly ./app -run TestAppStateDeterminism -v -SimulationEnabled=true -timeout 10m
+lint: golangci-lint
+	golangci-lint run
+	find . -name '*.go' -type f -not -path "./vendor*" -not -path "*.git*" | xargs gofmt -d -s
+	go mod verify
 
-test_sim_iris_fast:
-	@echo "Running quick Iris simulation. This may take several minutes..."
-	@go test -mod=readonly ./app -run TestFullIrisSimulation -v -SimulationEnabled=true -SimulationNumBlocks=100 -timeout 24h
+format:
+	find . -name '*.go' -type f -not -path "./vendor*" -not -path "*.git*" -not -path "./client/lcd/statik/statik.go" | xargs gofmt -w -s
+	find . -name '*.go' -type f -not -path "./vendor*" -not -path "*.git*" -not -path "./client/lcd/statik/statik.go" | xargs misspell -w
+	find . -name '*.go' -type f -not -path "./vendor*" -not -path "*.git*" -not -path "./client/lcd/statik/statik.go" | xargs goimports -w -local github.com/cosmos/cosmos-sdk
 
-test_sim_iris_slow:
-	@echo "Running full Iris simulation. This may take awhile!"
-	@go test -mod=readonly ./app -run TestFullIrisSimulation -v -SimulationEnabled=true -SimulationNumBlocks=1000 -SimulationVerbose=true -timeout 24h
+benchmark:
+	@go test -mod=readonly -bench=. ./...
 
-testnet_init:
-	@if ! [ -f build/iris ]; then $(MAKE) build_linux ; fi
-	@if ! [ -f build/nodecluster/node0/iris/config/genesis.json ]; then docker run --rm -v $(CURDIR)/build:/home ubuntu:16.04 /home/iris testnet --v 4 --output-dir /home/nodecluster --chain-id irishub-test --starting-ip-address 192.168.10.2 ; fi
-	@echo "To install jq command, please refer to this page: https://stedolan.github.io/jq/download/"
-	@if [ ${NetworkType} = "testnet" ]; then jq '.app_state.accounts+= [{"address": "faa1ljemm0yznz58qxxs8xyak7fashcfxf5lssn6jm", "coins": [ "1000000iris" ], "sequence_number": "0", "account_number": "0"}]' build/nodecluster/node0/iris/config/genesis.json > build/genesis_temp.json ; else jq '.app_state.accounts+= [{"address": "iaa1ljemm0yznz58qxxs8xyak7fashcfxf5lgl4zjx", "coins": [ "1000000iris" ], "sequence_number": "0", "account_number": "0"}]' build/nodecluster/node0/iris/config/genesis.json > build/genesis_temp.json ; fi
-	@sudo cp build/genesis_temp.json build/nodecluster/node0/iris/config/genesis.json
-	@sudo cp build/genesis_temp.json build/nodecluster/node1/iris/config/genesis.json
-	@sudo cp build/genesis_temp.json build/nodecluster/node2/iris/config/genesis.json
-	@sudo cp build/genesis_temp.json build/nodecluster/node3/iris/config/genesis.json
-	@rm build/genesis_temp.json
-	@if [ ${NetworkType} = "testnet" ]; then echo "Faucet address: faa1ljemm0yznz58qxxs8xyak7fashcfxf5lssn6jm" ; else echo "Faucet address: iaa1ljemm0yznz58qxxs8xyak7fashcfxf5lgl4zjx" ; fi
-	@echo "Faucet coin amount: 1000000iris"
-	@echo "Faucet key seed: tube lonely pause spring gym veteran know want grid tired taxi such same mesh charge orient bracket ozone concert once good quick dry boss"
 
-testnet_start:
+########################################
+### Local validator nodes using docker and docker-compose
+
+build-docker-irisnode:
+	$(MAKE) -C networks/local
+
+# Run a 4-node testnet locally
+localnet-start: build-linux localnet-stop
+	@if ! [ -f build/node0/iris/config/genesis.json ]; then docker run --rm -v $(CURDIR)/build:/iris:Z tendermint/irisnode testnet --v 4 -o . --starting-ip-address 192.168.10.2 ; fi
 	docker-compose up -d
 
-testnet_stop:
+# Stop testnet
+localnet-stop:
 	docker-compose down
 
-testnet_clean:
-	docker-compose down
-	sudo rm -rf build/*
+setup-contract-tests-data:
+	echo 'Prepare data for the contract tests'
+	rm -rf /tmp/contract_tests ; \
+	mkdir /tmp/contract_tests ; \
+	cp "${GOPATH}/pkg/mod/${SDK_PACK}/client/lcd/swagger-ui/swagger.yaml" /tmp/contract_tests/swagger.yaml ; \
+	./build/iris init --home /tmp/contract_tests/.iris --chain-id lcd contract-tests ; \
+	tar -xzf lcd_test/testdata/state.tar.gz -C /tmp/contract_tests/
 
-testnet_unsafe_reset:
-	docker-compose down
-	@docker run --rm -v $(CURDIR)/build:/home ubuntu:16.04 /home/iris unsafe-reset-all --home=/home/nodecluster/node0/iris
-	@docker run --rm -v $(CURDIR)/build:/home ubuntu:16.04 /home/iris unsafe-reset-all --home=/home/nodecluster/node1/iris
-	@docker run --rm -v $(CURDIR)/build:/home ubuntu:16.04 /home/iris unsafe-reset-all --home=/home/nodecluster/node2/iris
-	@docker run --rm -v $(CURDIR)/build:/home ubuntu:16.04 /home/iris unsafe-reset-all --home=/home/nodecluster/node3/iris
+start-iris: setup-contract-tests-data
+	./build/iris --home /tmp/contract_tests/.iris start &
+	@sleep 2s
+
+setup-transactions: start-iris
+	@bash ./lcd_test/testdata/setup.sh
+
+run-lcd-contract-tests:
+	@echo "Running Gaia LCD for contract tests"
+	./build/iriscli rest-server --laddr tcp://0.0.0.0:8080 --home /tmp/contract_tests/.iriscli --node http://localhost:26657 --chain-id lcd --trust-node true
+
+contract-tests: setup-transactions
+	@echo "Running Gaia LCD for contract tests"
+	dredd && pkill iris
+
+# include simulations
+include sims.mk
+
+.PHONY: all build-linux install install-debug \
+	go-mod-cache draw-deps clean build \
+	setup-transactions setup-contract-tests-data start-iris run-lcd-contract-tests contract-tests \
+	test test-all test-build test-cover test-unit test-race
