@@ -1,6 +1,12 @@
 # iriscli htlc
 
-HTLC allows you to manage local Hash Time Locked Contracts (HTLCs) for atomic swaps with other chains
+HTLC allows you to manage local Hash Time Locked Contracts (HTLCs) for atomic swaps with other chains.
+
+There are the following states involved in the lifecycle of an HTLC:
+   - open: indicates the HTLC is claimable
+   - completed: indicates the HTLC has been claimed
+   - expired: indicates the HTLC is expired and refundable
+   - refunded: indicates the HTLC has been refunded
 
 ## Available Commands
 
@@ -113,7 +119,7 @@ iriscli htlc query-htlc <hash-lock>
 iriscli htlc query-htlc bae5acb11ad90a20cb07023f4bf0fcf4d38549feff486dd40a1fbe871b4aabdf
 ```
 
-After that, you will get the detail info for the account.
+After that, you will get the detailed info for the HTLC.
 
 ```bash
 HTLC:
