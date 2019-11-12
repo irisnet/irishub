@@ -2,6 +2,12 @@
 
 [HTLC模块](../features/htlc)提供了与其他链进行原子交换的相关功能。
 
+在HTLC生命周期中有下面的几种状态：
+   - open: HTLC是可申领的
+   - completed: HTLC已经被申领
+   - expired: HTLC过期并且可退还
+   - refunded: HTLC已退还
+
 ## Available Commands
 
 | Name                                   | Description                                          |
