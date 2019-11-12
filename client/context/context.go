@@ -95,7 +95,7 @@ func createVerifier(rpc rpcclient.SignClient) tmlite.Verifier {
 	} else {
 		height := int64(1)
 		if _, err := rpc.Commit(&height); err != nil {
-			fmt.Printf("snapshot's node can't verify the proof of result,you must set '--trust-node=true'\n")
+			fmt.Printf("snapshot's node can't verify the proof of result, you must set '--trust-node=true'\n")
 			os.Exit(1)
 		}
 	}
