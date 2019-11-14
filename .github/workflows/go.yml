@@ -49,4 +49,4 @@ jobs:
     needs: build-images
     steps:
       - name: Run unit tests
-        run: sudo docker run -it -v $(pwd):/irishub irisnet/golang sh -c "make test_unit"
+        run: sudo docker run -v $(pwd):/irishub irisnet/golang sh -c "make test_unit"
