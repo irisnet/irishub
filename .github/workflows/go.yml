@@ -17,8 +17,6 @@ jobs:
     steps:
       - name: Check out code into the Go module directory
         uses: actions/checkout@v1
-      - name: Login dockerhub
-        run: docker login -u $DOCKER_USER -p $DOCKER_PASS
       - name: Get image tag      
         run: |
           if [[ ${{github.base_ref}} == "master" ]]; then
@@ -37,6 +35,8 @@ jobs:
     runs-on: self-hosted
     needs: test-images
     steps:
+      - name: Login dockerhub
+        run: docker login -u ${{DOCKER_USER}} -p ${{DOCKER_PASS}}
       - name: push irishub testnet image
         run: docker push irisnet/irishub:testnet-$TAG
       - name: push irishub mainnet image
