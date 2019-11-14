@@ -35,7 +35,7 @@ jobs:
   push-images:
     name: Push Images
     runs-on: self-hosted
-    needs: push-images
+    needs: test-images
     steps:
       - name: push irishub testnet image
         run: docker push irisnet/irishub:testnet-$TAG
