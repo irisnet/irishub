@@ -27,9 +27,9 @@ jobs:
           fi
           source ~/.bashrc
       - name: build irishub mainnet image
-        run: source ~/.bashrc; docker build -t irisnet/irishub:$TAG .
+        run: source ~/.bashrc; docker build -t irisnet/irishub .
       - name: build irishub testnet image
-        run: source ~/.bashrc; docker build -t irisnet/irishub:testnet-$TAG --build-arg NetworkType=testnet .
+        run: source ~/.bashrc; docker build -t irisnet/irishub:testnet- --build-arg NetworkType=testnet .
 
   push-images:
     name: Push Images
