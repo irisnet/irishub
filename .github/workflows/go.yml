@@ -20,12 +20,12 @@ jobs:
       - name: Get image tag      
         run: |
           if [[ ${{github.ref}} == "refs/heads/master" ]]; then
-            echo 'export TAG="latest"' >> /etc/profile.d/runner.sh;
+            echo 'export TAG="latest"' >> ~/.bashrc;
           else
-            echo 'export TAG=${{github.ref}}' >> /etc/profile.d/runner.sh;
+            echo 'export TAG=${{github.ref}}' >> ~/.bashrc;
             echo 'export TAG=${{github.base_ref}}, $BASH_ENV';
           fi
-          source /etc/profile.d/runner.sh
+          source ~/.bashrc
       - name: build irishub mainnet image
         run: docker build -t irisnet/irishub:$TAG .
       - name: build irishub testnet image
