@@ -31,7 +31,7 @@ jobs:
         run: docker build -t irisnet/irishub:$TAG .
       - name: build irishub testnet image
         run: docker build -t irisnet/irishub:testnet-$TAG --build-arg NetworkType=testnet .
-jobs:
+
   push-images:
     name: Push Images
     runs-on: self-hosted
@@ -41,7 +41,7 @@ jobs:
         run: docker push irisnet/irishub:testnet-$TAG
       - name: push irishub mainnet image
         run: docker push irisnet/irishub:$TAG
-jobs:
+
   test-images:
     name: Test Images
     runs-on: self-hosted
