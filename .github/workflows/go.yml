@@ -19,10 +19,11 @@ jobs:
         uses: actions/checkout@v1
       - name: Get image tag      
         run: |
-          if [[ ${{github.base_ref}} == "master" ]]; then
+          if [[ ${{github.ref}} == "master" ]]; then
             echo 'export TAG="latest"' >> $BASH_ENV;
           else
-            echo 'export TAG=${{github.base_ref}}' >> $BASH_ENV;
+            echo 'export TAG=${{github.ref}}' >> $BASH_ENV;
+            echo 'export TAG=${{github.base_ref}}';
           fi
           source $BASH_ENV
       - name: build irishub mainnet image
