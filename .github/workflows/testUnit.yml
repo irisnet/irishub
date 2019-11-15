@@ -1,0 +1,13 @@
+name: Test
+on:
+  push:
+    tags:
+      - v.*
+
+jobs:
+  test-images:
+    name: Test Images
+    runs-on: self-hosted
+    steps:
+      - name: Run unit tests
+        run: sudo docker run -v $(pwd):/irishub irisnet/golang sh -c "make test_unit"
