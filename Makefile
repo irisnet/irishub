@@ -66,7 +66,10 @@ BUILD_FLAGS := -tags "$(build_tags)" -ldflags '$(ldflags)'
 
 # The below include contains the tools target.
 
-all: install lint check
+all: tools install lint check
+
+# The below include contains the tools.
+include contrib/devtools/Makefile
 
 build: go.sum
 ifeq ($(OS),Windows_NT)
@@ -138,13 +141,13 @@ test-build: build
 
 lint: golangci-lint
 	golangci-lint run
-	find . -name '*.go' -type f -not -path "./vendor*" -not -path "*.git*" | xargs gofmt -d -s
+	find . -name '*.go' -type f -not -path "./vendor*" -not -path "*.git*" -not -path "./lite/statik/statik.go" | xargs gofmt -d -s
 	go mod verify
 
 format:
-	find . -name '*.go' -type f -not -path "./vendor*" -not -path "*.git*" -not -path "./client/lcd/statik/statik.go" | xargs gofmt -w -s
-	find . -name '*.go' -type f -not -path "./vendor*" -not -path "*.git*" -not -path "./client/lcd/statik/statik.go" | xargs misspell -w
-	find . -name '*.go' -type f -not -path "./vendor*" -not -path "*.git*" -not -path "./client/lcd/statik/statik.go" | xargs goimports -w -local github.com/cosmos/cosmos-sdk
+	find . -name '*.go' -type f -not -path "./vendor*" -not -path "*.git*" -not -path "./lite/statik/statik.go" | xargs gofmt -w -s
+	find . -name '*.go' -type f -not -path "./vendor*" -not -path "*.git*" -not -path "./lite/statik/statik.go" | xargs misspell -w
+	find . -name '*.go' -type f -not -path "./vendor*" -not -path "*.git*" -not -path "./lite/statik/statik.go" | xargs goimports -w -local github.com/irisnet/irishub
 
 benchmark:
 	@go test -mod=readonly -bench=. ./...
@@ -153,45 +156,26 @@ benchmark:
 ########################################
 ### Local validator nodes using docker and docker-compose
 
-build-docker-irisnode:
-	$(MAKE) -C networks/local
+testnet-init:
+	@if ! [ -f build/iris ]; then $(MAKE) build_linux ; fi
+	@if ! [ -f build/nodecluster/node0/iris/config/genesis.json ]; then docker run --rm -v $(CURDIR)/build:/home ubuntu:16.04 /home/iris testnet --v 4 --output-dir /home/nodecluster --chain-id irishub-test --starting-ip-address 192.168.10.2 ; fi
+	@echo "To install jq command, please refer to this page: https://stedolan.github.io/jq/download/"
+	@if [ ${NetworkType} = "testnet" ]; then jq '.app_state.accounts+= [{"address": "faa1ljemm0yznz58qxxs8xyak7fashcfxf5lssn6jm", "coins": [ "1000000iris" ], "sequence_number": "0", "account_number": "0"}]' build/nodecluster/node0/iris/config/genesis.json > build/genesis_temp.json ; else jq '.app_state.accounts+= [{"address": "iaa1ljemm0yznz58qxxs8xyak7fashcfxf5lgl4zjx", "coins": [ "1000000iris" ], "sequence_number": "0", "account_number": "0"}]' build/nodecluster/node0/iris/config/genesis.json > build/genesis_temp.json ; fi
+	@sudo cp build/genesis_temp.json build/nodecluster/node0/iris/config/genesis.json
+	@sudo cp build/genesis_temp.json build/nodecluster/node1/iris/config/genesis.json
+	@sudo cp build/genesis_temp.json build/nodecluster/node2/iris/config/genesis.json
+	@sudo cp build/genesis_temp.json build/nodecluster/node3/iris/config/genesis.json
+	@rm build/genesis_temp.json
+	@if [ ${NetworkType} = "testnet" ]; then echo "Faucet address: faa1ljemm0yznz58qxxs8xyak7fashcfxf5lssn6jm" ; else echo "Faucet address: iaa1ljemm0yznz58qxxs8xyak7fashcfxf5lgl4zjx" ; fi
+	@echo "Faucet coin amount: 1000000iris"
+	@echo "Faucet key seed: tube lonely pause spring gym veteran know want grid tired taxi such same mesh charge orient bracket ozone concert once good quick dry boss"
 
-# Run a 4-node testnet locally
-localnet-start: build-linux localnet-stop
-	@if ! [ -f build/node0/iris/config/genesis.json ]; then docker run --rm -v $(CURDIR)/build:/iris:Z tendermint/irisnode testnet --v 4 -o . --starting-ip-address 192.168.10.2 ; fi
+testnet-start:
 	docker-compose up -d
 
-# Stop testnet
-localnet-stop:
+testnet-stop:
 	docker-compose down
 
-setup-contract-tests-data:
-	echo 'Prepare data for the contract tests'
-	rm -rf /tmp/contract_tests ; \
-	mkdir /tmp/contract_tests ; \
-	cp "${GOPATH}/pkg/mod/${SDK_PACK}/client/lcd/swagger-ui/swagger.yaml" /tmp/contract_tests/swagger.yaml ; \
-	./build/iris init --home /tmp/contract_tests/.iris --chain-id lcd contract-tests ; \
-	tar -xzf lcd_test/testdata/state.tar.gz -C /tmp/contract_tests/
-
-start-iris: setup-contract-tests-data
-	./build/iris --home /tmp/contract_tests/.iris start &
-	@sleep 2s
-
-setup-transactions: start-iris
-	@bash ./lcd_test/testdata/setup.sh
-
-run-lcd-contract-tests:
-	@echo "Running Gaia LCD for contract tests"
-	./build/iriscli rest-server --laddr tcp://0.0.0.0:8080 --home /tmp/contract_tests/.iriscli --node http://localhost:26657 --chain-id lcd --trust-node true
-
-contract-tests: setup-transactions
-	@echo "Running Gaia LCD for contract tests"
-	dredd && pkill iris
-
-# include simulations
-include sims.mk
-
-.PHONY: all build-linux install install-debug \
-	go-mod-cache draw-deps clean build \
-	setup-transactions setup-contract-tests-data start-iris run-lcd-contract-tests contract-tests \
-	test test-all test-build test-cover test-unit test-race
+testnet-clean:
+	docker-compose down
+	sudo rm -rf build/*
