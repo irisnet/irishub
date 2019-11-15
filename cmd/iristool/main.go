@@ -12,10 +12,11 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
-	iris "github.com/irisnet/irishub/app"
 	"github.com/spf13/cobra"
 	"github.com/tendermint/tendermint/crypto"
 	"github.com/tendermint/tendermint/crypto/ed25519"
+
+	iris "github.com/irisnet/irishub/app"
 )
 
 func init() {

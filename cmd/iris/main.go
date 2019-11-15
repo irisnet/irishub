@@ -12,8 +12,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
 	"github.com/cosmos/cosmos-sdk/x/staking"
-	"github.com/irisnet/irishub/app"
-	iconfig "github.com/irisnet/irishub/cmd/config"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -21,6 +19,9 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 	tmtypes "github.com/tendermint/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
+
+	"github.com/irisnet/irishub/app"
+	iconfig "github.com/irisnet/irishub/cmd/config"
 )
 
 const flagInvCheckPeriod = "inv-check-period"

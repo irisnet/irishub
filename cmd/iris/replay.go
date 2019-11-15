@@ -11,7 +11,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/server"
 	"github.com/cosmos/cosmos-sdk/store"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/irisnet/irishub/app"
 	cpm "github.com/otiai10/copy"
 	"github.com/spf13/cobra"
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -20,6 +19,8 @@ import (
 	tmsm "github.com/tendermint/tendermint/state"
 	tmstore "github.com/tendermint/tendermint/store"
 	tm "github.com/tendermint/tendermint/types"
+
+	"github.com/irisnet/irishub/app"
 )
 
 func replayCmd() *cobra.Command {
