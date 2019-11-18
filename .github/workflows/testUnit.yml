@@ -1,8 +1,5 @@
 name: TestUnit
-on:
-  push:
-    tags:
-      - v.*
+on: push
 
 jobs:
   test-images:
