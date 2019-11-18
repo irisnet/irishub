@@ -3,13 +3,18 @@ on:
   pull_request:
     branches:
       - master
+    tags:
+      - v.*
   push:
     branches:
       - master
+    tags:
+      - v.*
 jobs:
   build-images:
     name: Build Images
-    runs-on: self-hosted
+#    runs-on: self-hosted
+    runs-on: ubuntu-16.04
     steps:
       - name: Check out code into the Go module directory
         uses: actions/checkout@v1
