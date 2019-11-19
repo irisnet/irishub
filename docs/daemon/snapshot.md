@@ -41,11 +41,11 @@ Snapshot current node's latest data
 
 ## FAQ
 
-### What happens if everyone delete previous stored blockchain data and a new machine will try to sync up
+### What if every node in the network runs from a snapshot and a new node tries to catch up from genesis
 
-If that happens, a new machine will be unable to sync from scratch, but it can use a snapshot to catch up faster.
+If that happens, a new node will be unable to sync from scratch, but it can use a snapshot to catch up faster.
 
-I think some of the nodes will not delete all the previous data, such as nodes for explorers and wallets. And we, the IRIS Foundation will keep all the data too, also we can offer a full data snapshot. And we encourage snapshot service providers could provide both the minimal and the full snapshot :)
+Presumably not all nodes will delete historical data, such as nodes for explorers and wallets. And we, the IRIS Foundation will keep all the data too, also we can offer a full data snapshot. And we encourage snapshot service providers could provide both the minimal and the full snapshot :)
 
 ### But this will have a slow speed of download probably
 
@@ -53,4 +53,4 @@ Correct, but most people don't need the full data, they can download a latest sn
 
 ### Can I snapshot the validator node
 
-Yes, but better not. Time will tell if we can be brave enough to do that :)
+Yes, but we wouldn't recommend that for the time being.
