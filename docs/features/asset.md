@@ -17,7 +17,7 @@ As the owner of that asset, you don’t need to take care of any technical detai
 #### External Assets
 
 Instead of creating a `native asset` where the full control over supply is under the issuer, we can also create an `external asset` which already exists on another blockchain and let the market deal with demand and supply.
-The only way to create an `external asset` is by submitting an `AddAssetProposal` via Governance, except that the top 20 CMC tokens are pre-configured in the system for users' convenience.
+The only way to create an `external asset` is by submitting an `TokenAddition` proposal via Governance, except that the top 20 CMC tokens are pre-configured in the system for users' convenience.
 
 ### Gateways
 
