@@ -39,8 +39,8 @@ func getBlock(cliCtx context.CLIContext, height *int64) ([]byte, error) {
 	// header, tx -> Block
 	// results -> BlockResults
 	res, err := node.Block(height)
-	if err != nil {
-		return nil, err
+	if err != nil || res.Block == nil {
+		return nil, fmt.Errorf("block %d not found", *height)
 	}
 
 	if !cliCtx.TrustNode {

@@ -21,10 +21,9 @@ type postProposalReq struct {
 	Proposer       sdk.AccAddress `json:"proposer"`        //  Address of the proposer
 	InitialDeposit string         `json:"initial_deposit"` // Coins to add to the proposal's deposit
 	Param          gov.Param      `json:"param"`
-	Usage          gov.UsageType  `json:"usage"`
-	DestAddress    sdk.AccAddress `json:"dest_address"`
-	Percent        sdk.Dec        `json:"percent"`
+	CommTax        commTax        `json:"comm_tax"`
 	Token          token          `json:"token"`
+	Upgrade        upgrade        `json:"upgrade"`
 }
 
 type token struct {
@@ -33,7 +32,19 @@ type token struct {
 	Name            string `json:"name"`
 	Decimal         uint8  `json:"decimal"`
 	MinUnitAlias    string `json:"min_unit_alias"`
-	InitialSupply   uint64 `json:"initial_supply"`
+}
+
+type upgrade struct {
+	Version      uint64  `json:"version"`
+	Software     string  `json:"software"`
+	SwitchHeight uint64  `json:"switch_height"`
+	Threshold    sdk.Dec `json:"threshold"`
+}
+
+type commTax struct {
+	Usage       gov.UsageType  `json:"usage"`
+	DestAddress sdk.AccAddress `json:"dest_address"`
+	Percent     sdk.Dec        `json:"percent"`
 }
 
 type depositReq struct {
@@ -67,6 +78,13 @@ func postProposalHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Han
 			return
 		}
 
+		if proposalType == gov.ProposalTypeParameter {
+			if err := client.ValidateParam(req.Param); err != nil {
+				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+				return
+			}
+		}
+
 		initDepositAmount, err := cliCtx.ParseCoins(req.InitialDeposit)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -76,41 +94,32 @@ func postProposalHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Han
 		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
 
 		// create the message
+		msgs := make([]sdk.Msg, 1)
 		msg := gov.NewMsgSubmitProposal(req.Title, req.Description, proposalType, req.Proposer, initDepositAmount, gov.Params{req.Param})
-		if msg.ProposalType == gov.ProposalTypeCommunityTaxUsage {
-			taxMsg := gov.NewMsgSubmitCommunityTaxUsageProposal(msg, req.Usage, req.DestAddress, req.Percent)
-			err = msg.ValidateBasic()
-			if err != nil {
-				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-				return
-			}
-			utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{taxMsg})
-			return
-		}
-		if proposalType == gov.ProposalTypeParameter {
-			if err := client.ValidateParam(req.Param); err != nil {
-				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-				return
-			}
-		}
-		if msg.ProposalType == gov.ProposalTypeTokenAddition {
-			token := req.Token
-			tokenMsg := gov.NewMsgSubmitTokenAdditionProposal(msg, token.Symbol, token.CanonicalSymbol, token.Name, token.MinUnitAlias, token.Decimal, token.InitialSupply)
-			if tokenMsg.ValidateBasic() != nil {
-				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-				return
-			}
-			utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{tokenMsg})
+		switch msg.ProposalType {
+		case gov.ProposalTypeParameter, gov.ProposalTypeSystemHalt, gov.ProposalTypePlainText:
+			msgs[0] = msg
+			break
+		case gov.ProposalTypeSoftwareUpgrade:
+			msgs[0] = gov.NewMsgSubmitSoftwareUpgradeProposal(msg, req.Upgrade.Version, req.Upgrade.Software, req.Upgrade.SwitchHeight, req.Upgrade.Threshold)
+			break
+		case gov.ProposalTypeCommunityTaxUsage:
+			msgs[0] = gov.NewMsgSubmitCommunityTaxUsageProposal(msg, req.CommTax.Usage, req.CommTax.DestAddress, req.CommTax.Percent)
+			break
+		case gov.ProposalTypeTokenAddition:
+			msgs[0] = gov.NewMsgSubmitTokenAdditionProposal(msg, req.Token.Symbol, req.Token.CanonicalSymbol, req.Token.Name, req.Token.MinUnitAlias, req.Token.Decimal)
+			break
+		default:
+			utils.WriteErrorResponse(w, http.StatusBadRequest, "not a valid proposal type")
 			return
 		}
 
-		err = msg.ValidateBasic()
+		err = msgs[0].ValidateBasic()
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
-
-		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
+		utils.WriteGenerateStdTxResponse(w, txCtx, msgs)
 	}
 }
 

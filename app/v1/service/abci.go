@@ -1,9 +1,9 @@
 package service
 
 import (
-	"github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/app/v1/service/tags"
+	"github.com/irisnet/irishub/types"
 )
 
 func EndBlocker(ctx types.Context, keeper Keeper) (resTags types.Tags) {

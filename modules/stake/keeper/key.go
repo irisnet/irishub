@@ -4,8 +4,8 @@ import (
 	"encoding/binary"
 	"time"
 
-	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/stake/types"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 // TODO remove some of these prefixes once have working multistore

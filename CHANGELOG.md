@@ -1,5 +1,66 @@
 # Changelog
 
+## 0.16.0
+
+*Nov 22th, 2019*
+
+### Breaking Changes
+
+* [API Breaking Changes](./docs/light-client/CHANGELOG.md#v0160)
+* [\#1912](https://github.com/irisnet/irishub/issues/1912) Update prometheus metrics
+
+### LCD (REST API)
+
+* [\#1858](https://github.com/irisnet/irishub/issues/1858) Add new function - AddLiquidity
+* [\#1859](https://github.com/irisnet/irishub/issues/1859) Add new function - RemoveLiquidity
+* [\#1860](https://github.com/irisnet/irishub/issues/1860) Add new function - Swap Coin
+* [\#1861](https://github.com/irisnet/irishub/issues/1861) Add new function - Query Exchange
+* [\#1948](https://github.com/irisnet/irishub/issues/1948) Add client for HTLC
+
+### CLI
+
+* [\#1948](https://github.com/irisnet/irishub/issues/1948) Add client for HTLC
+* [\#2030](https://github.com/irisnet/irishub/issues/2030) Fix CLI test for HTLC
+
+### Application
+
+* [\#1858](https://github.com/irisnet/irishub/issues/1858) Add new function - AddLiquidity
+* [\#1859](https://github.com/irisnet/irishub/issues/1859) Add new function - RemoveLiquidity
+* [\#1860](https://github.com/irisnet/irishub/issues/1860) Add new function - Swap Coin
+* [\#1861](https://github.com/irisnet/irishub/issues/1861) Add new function - Query Exchange
+* [\#1872](https://github.com/irisnet/irishub/issues/1872) Replace time.Time with uint64 in coinswap msgs
+* [\#1811](https://github.com/irisnet/irishub/issues/1811) Add docs for coin-swap
+* [\#1879](https://github.com/irisnet/irishub/issues/1879) Add tags for coinswap module
+* [\#1910](https://github.com/irisnet/irishub/issues/1910) Add coin-flow for coin-swap module
+* [\#1912](https://github.com/irisnet/irishub/issues/1912) Update prometheus metrics
+* [\#1936](https://github.com/irisnet/irishub/issues/1936) Update denom's specification
+* [\#1941](https://github.com/irisnet/irishub/issues/1941) Refactor document website documentation
+* [\#1946](https://github.com/irisnet/irishub/issues/1946) Add new function - Create HTLC
+* [\#1949](https://github.com/irisnet/irishub/issues/1949) Add new function - Claim and Refund in HTLC
+* [\#1965](https://github.com/irisnet/irishub/issues/1965) Add user docs and specification for HTLC
+* [\#1984](https://github.com/irisnet/irishub/issues/1984) Update HTLC docs
+* [\#1985](https://github.com/irisnet/irishub/issues/1985) Code formatting and cleaning
+* [\#1988](https://github.com/irisnet/irishub/issues/1988) Add HTLC genesis
+* [\#1991](https://github.com/irisnet/irishub/issues/1991) Add Coinswap feature doc
+* [\#1995](https://github.com/irisnet/irishub/issues/1995) Improve HTLC
+* [\#2008](https://github.com/irisnet/irishub/issues/2008) Enhance HTLC genesis test
+* [\#2013](https://github.com/irisnet/irishub/issues/2013) Modify timestamp type in LCD
+* [\#2015](https://github.com/irisnet/irishub/issues/2015) Add HTLC feature docs
+
+### Tendermint
+
+* [\#1880](https://github.com/irisnet/irishub/issues/1880) Ensure generated private keys are valid
+* [\#1885](https://github.com/irisnet/irishub/issues/1885) tendermint use Go modules instead of dep
+* [\#1908](https://github.com/irisnet/irishub/issues/1908) Update p2p to v0.32
+* [\#1909](https://github.com/irisnet/irishub/issues/1909) Support boltdb
+* [\#1913](https://github.com/irisnet/irishub/issues/1913) Remove db from in favor of tendermint/tm-db
+* [\#1917](https://github.com/irisnet/irishub/issues/1917) Create a peer state in consensus reactor before the peer is started
+* [\#1918](https://github.com/irisnet/irishub/issues/1918) Improve error message returned from AddSignatureFromPubKey
+* [\#1919](https://github.com/irisnet/irishub/issues/1919) Self node in addrbook.json and node tries to dial itself
+* [\#1920](https://github.com/irisnet/irishub/issues/1920) Fix profiler blocking the entire node
+* [\#1921](https://github.com/irisnet/irishub/issues/1921) Exit if SwitchToConsensus fails
+* [\#1922](https://github.com/irisnet/irishub/issues/1922) Improve transaction search
+
 ## 0.15.5
 
 *Oct 30th, 2019*

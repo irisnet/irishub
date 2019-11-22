@@ -4,7 +4,7 @@ import (
 	"io"
 
 	sdk "github.com/irisnet/irishub/types"
-	dbm "github.com/tendermint/tendermint/libs/db"
+	dbm "github.com/tendermint/tm-db"
 )
 
 // Wrapper type for dbm.Db with implementation of KVStore

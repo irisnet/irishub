@@ -12,9 +12,9 @@ import (
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/crypto"
 
+	"github.com/irisnet/irishub/mock"
 	"github.com/irisnet/irishub/modules/bank"
 	"github.com/irisnet/irishub/modules/guardian"
-	"github.com/irisnet/irishub/mock"
 	"github.com/irisnet/irishub/modules/stake"
 	"github.com/irisnet/irishub/types"
 	sdk "github.com/irisnet/irishub/types"

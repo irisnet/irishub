@@ -1,8 +1,8 @@
 package params
 
 import (
-	"strings"
 	"fmt"
+	"strings"
 )
 
 func RegisterParamSet(paramSets map[string]ParamSet, ps ...ParamSet) {

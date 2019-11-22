@@ -1,10 +1,23 @@
 # IRISLCD 更新日志
 
+## v0.16.0
+
+*Nov 20th, 2019*
+
+### BREAKING CHANGES
+
+- 删除 `TokenAddition` 类型提案 API 中的 `initial_supply` 属性
+
+### NON-BREAKING CHANGES
+
+- 增加 Coinswap 模块
+- 增加 HTLC 模块
+
 ## v0.15.0
 
 *Aug 20th, 2019*
 
-### 不兼容修改:
+### 不兼容修改
 
 在这个版本中，除'/tx/broadcast'以外的所有POST方法都只生成未签名交易，并不会对这些交易进行广播。用户需要在本地签名交易，并使用'/tx/broadcast'进行广播。
 
@@ -13,7 +26,7 @@
 - 删除 GET /distribution/community-tax
 - 删除 GET /gov/params/{module}
 
-### 兼容修改:
+### 兼容修改
 
 - 增加 Asset 模块
 - 增加 Rand 模块
@@ -38,7 +51,7 @@
 
 *May 31th, 2019*
 
-### 不兼容修改:
+### 不兼容修改
 
 - 修改 一些IRISLCD的API接口
 
@@ -52,7 +65,7 @@
 
 *May 20th, 2019*
 
-### 不兼容修改:
+### 不兼容修改
 
 - 修改/删除 一些`IRISLCD`的API接口
 - 添加了bank模块的API
@@ -72,7 +85,7 @@
 | [v0.13.1]      | [v0.14.0]        | 输入改变 | 输出改变 |
 | --------------- | --------------- | --------------- | --------------- |
 | GET /auth/accounts/{address}  |  N/A | / | / |
-    
+
 #### Sign and broadcast 模块
 
 | [v0.13.1]      | [v0.14.0]        | 输入改变 | 输出改变 |

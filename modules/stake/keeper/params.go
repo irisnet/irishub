@@ -3,9 +3,9 @@ package keeper
 import (
 	"time"
 
-	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/params"
 	"github.com/irisnet/irishub/modules/stake/types"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 // ParamTable for stake module

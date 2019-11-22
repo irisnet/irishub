@@ -46,7 +46,7 @@ func EndBlocker(ctx sdk.Context, req abci.RequestEndBlock, sk Keeper) (tags sdk.
 	// Tag the height
 	tags = sdk.NewTags("height", []byte(strconv.FormatInt(req.Height, 10)))
 
-	if int64(ctx.CheckValidNum()) < ctx.BlockHeader().NumTxs {
+	if ctx.ValidTxCounter().Count() < ctx.BlockHeader().NumTxs {
 		proposalCensorshipTag := sk.handleProposerCensorship(ctx,
 			ctx.BlockHeader().ProposerAddress,
 			ctx.BlockHeight())
