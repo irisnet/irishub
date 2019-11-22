@@ -1,7 +1,6 @@
 package keeper
 
 import (
-	"bytes"
 	"fmt"
 	"github.com/irisnet/irishub/app/v2/coinswap/internal/types"
 	sdk "github.com/irisnet/irishub/types"
@@ -216,7 +215,6 @@ func TestTradeInputForExactOutput(t *testing.T) {
 
 		poolBalances = pb
 		senderBlances = sb
-		showMsg(i, pb, sb, input.Coin.Denom, output.Coin.Denom)
 	}
 }
 
@@ -253,7 +251,6 @@ func TestTradeExactInputForOutput(t *testing.T) {
 
 		poolBalances = pb
 		senderBlances = sb
-		showMsg(i, pb, sb, input.Coin.Denom, output.Coin.Denom)
 	}
 }
 
@@ -270,22 +267,4 @@ func ifNil(t *testing.T, err sdk.Error) {
 		msg = err.Error()
 	}
 	require.Nil(t, err, msg)
-}
-
-func showMsg(index int, pb, sb sdk.Coins, intputDenom, outputDenom string) {
-	var msg bytes.Buffer
-	pool := fmt.Sprintf("[%dth] swap,pool:[%s]", index, pb.String())
-	msg.WriteString(pool)
-	msg.WriteString(" ")
-
-	sender := fmt.Sprintf("sender:[%s]", sb.String())
-	msg.WriteString(sender)
-	msg.WriteString(" ")
-
-	iAmt := sdk.NewDecFromInt(pb.AmountOf(intputDenom))
-	oAmt := sdk.NewDecFromInt(pb.AmountOf(outputDenom))
-	rate := fmt.Sprintf("rate:[1 %s = %s %s]", outputDenom, iAmt.Quo(oAmt).String(), intputDenom)
-	msg.WriteString(rate)
-
-	fmt.Println(msg.String())
 }
