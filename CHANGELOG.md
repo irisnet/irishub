@@ -1,6 +1,8 @@
 # Changelog
 
-## Unreleased
+## 0.16.0
+
+*Nov 22th, 2019*
 
 ### Breaking Changes
 
