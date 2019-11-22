@@ -1,7 +1,6 @@
 package server
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -43,8 +42,7 @@ func SnapshotCmd(cdc *codec.Codec) *cobra.Command {
 			}
 
 			if err = dumpData(srcDir, targetDir, cdc); err != nil {
-				os.RemoveAll(targetDir)
-				fmt.Println(fmt.Sprintf("FAILED: %s", err.Error()))
+				_ = os.RemoveAll(targetDir)
 				return err
 			}
 			fmt.Println(fmt.Sprintf("snapshot file is stored in [%s]", targetDir))
@@ -68,12 +66,12 @@ func dumpData(home, targetDir string, cdc *codec.Codec) error {
 	lastHeight := snapshotBlock(home, targetDir)
 
 	//save local current block height consensus data
-	if err := snapshotCsWAL(home, targetDir, lastHeight); err != nil {
-		return err
-	}
+	_ = snapshotCsWAL(home, targetDir, lastHeight)
 
 	//save local current block height state
-	snapshotState(home, targetDir, lastHeight, cdc)
+	if err := snapshotState(home, targetDir, lastHeight, cdc); err != nil {
+		return err
+	}
 
 	//copy application
 	appDir := filepath.Join(home, "application.db")
@@ -98,7 +96,7 @@ func snapshotState(home, targetDir string, height int64, cdc *codec.Codec) error
 	state := tmsm.LoadState(originDb)
 
 	if height != state.LastBlockHeight {
-		return fmt.Errorf("wrong block height,should: %d, but got %d", height, state.LastBlockHeight)
+		return fmt.Errorf("wrong block height,should: %d, but got %d. please restart the node, then try to snapshot again", height, state.LastBlockHeight)
 	}
 
 	saveValidatorsInfo(cdc, originDb, targetDb, height)
@@ -136,16 +134,18 @@ func snapshotCsWAL(home, targetDir string, height int64) error {
 	walSourceDir := filepath.Join(home, "cs.wal", "wal")
 	sourceWAL, err := consensus.NewWAL(walSourceDir)
 	if err != nil {
-		return errors.New("failed to open WAL for consensus state")
+		return fmt.Errorf("failed to open WAL for consensus state")
 	}
 
 	gr, found, err := sourceWAL.SearchForEndHeight(height, &consensus.WALSearchOptions{IgnoreDataCorruptionErrors: true})
-	defer gr.Close()
+	if gr != nil {
+		defer gr.Close()
+	}
 	if err != nil {
 		return err
 	}
 	if !found {
-		return fmt.Errorf("cannot replay height %d. WAL does not contain #ENDHEIGHT for %d", height, height-1)
+		return fmt.Errorf("not found cs.wal file in %s", walSourceDir)
 	}
 
 	var msg *consensus.TimedWALMessage
@@ -159,9 +159,9 @@ func snapshotCsWAL(home, targetDir string, height int64) error {
 		} else if err != nil {
 			return err
 		}
-		targetWAL.Write(msg.Msg)
+		_ = targetWAL.Write(msg.Msg)
 	}
-	targetWAL.WriteSync(consensus.EndHeightMessage{Height: height})
+	_ = targetWAL.WriteSync(consensus.EndHeightMessage{Height: height})
 	return nil
 }
 

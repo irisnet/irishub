@@ -74,7 +74,7 @@ func NewCLIContext() CLIContext {
 		Commit:        viper.GetBool(client.FlagCommit),
 		JSON:          viper.GetBool(client.FlagJson),
 		PrintResponse: viper.GetBool(client.FlagPrintResponse),
-		Verifier:      createVerifier(),
+		Verifier:      createVerifier(rpc),
 		DryRun:        viper.GetBool(client.FlagDryRun),
 		GenerateOnly:  viper.GetBool(client.FlagGenerateOnly),
 		fromAddress:   fromAddress,
@@ -83,7 +83,7 @@ func NewCLIContext() CLIContext {
 	}
 }
 
-func createVerifier() tmlite.Verifier {
+func createVerifier(rpc rpcclient.SignClient) tmlite.Verifier {
 	trustNodeDefined := viper.IsSet(client.FlagTrustNode)
 	if !trustNodeDefined {
 		return nil
@@ -92,6 +92,12 @@ func createVerifier() tmlite.Verifier {
 	trustNode := viper.GetBool(client.FlagTrustNode)
 	if trustNode {
 		return nil
+	} else {
+		height := int64(1)
+		if _, err := rpc.Commit(&height); err != nil {
+			fmt.Printf("snapshot's node can't verify the proof of result, you must set '--trust-node=true'\n")
+			os.Exit(1)
+		}
 	}
 
 	chainID := viper.GetString(client.FlagChainID)
