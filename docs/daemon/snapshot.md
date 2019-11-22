@@ -38,3 +38,19 @@ Snapshot current node's latest data
 ```bash
  iris snapshot --home=<path-to-your-home>
 ```
+
+## FAQ
+
+### What if every node in the network runs from a snapshot and a new node tries to catch up from genesis
+
+If that happens, a new node will be unable to sync from scratch, but it can use a snapshot to catch up faster.
+
+Presumably not all nodes will delete historical data, such as nodes for explorers and wallets. And we, the IRIS Foundation will keep all the data too, also we can offer a full data snapshot. And we encourage snapshot service providers could provide both the minimal and the full snapshot :)
+
+### But this will have a slow speed of download probably
+
+Correct, but most people don't need the full data, they can download a latest snapshot to sync up much faster than before. If they want, they can also download the full data snapshot too.
+
+### Can I snapshot the validator node
+
+Yes, but we wouldn't recommend that for the time being.
