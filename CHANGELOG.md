@@ -6,6 +6,7 @@
 
 ### Breaking Changes
 
+* [API Breaking Changes](./docs/light-client/CHANGELOG.md#v0160)
 * [\#1912](https://github.com/irisnet/irishub/issues/1912) Update prometheus metrics
 
 ### LCD (REST API)
