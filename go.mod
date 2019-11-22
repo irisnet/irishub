@@ -7,7 +7,6 @@ require (
 	github.com/cosmos/go-bip39 v0.0.0-20180618194314-52158e4697b8
 	github.com/cosmos/ledger-cosmos-go v0.10.3
 	github.com/emicklei/proto v1.6.5
-	github.com/fortytw2/leaktest v1.3.0 // indirect
 	github.com/go-kit/kit v0.6.0
 	github.com/gogo/protobuf v1.1.1
 	github.com/gorilla/context v1.1.1 // indirect
@@ -34,7 +33,7 @@ require (
 
 replace (
 	github.com/tendermint/iavl => github.com/irisnet/iavl v0.12.3
-	github.com/tendermint/tendermint => github.com/irisnet/tendermint v0.22.3-0.20191111091141-eb62cce94c30
+	github.com/tendermint/tendermint => github.com/irisnet/tendermint v0.32.1
 	golang.org/x/crypto => github.com/tendermint/crypto v0.0.0-20180820045704-3764759f34a5
 )
 
