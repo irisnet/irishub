@@ -191,12 +191,6 @@ func TestTradeInputForExactOutput(t *testing.T) {
 	initSupplyOutput := poolBalances.AmountOf(outputCoin.Denom)
 	maxCnt := int(initSupplyOutput.Div(outputCoin.Amount).Int64())
 
-	fmt.Println("===============================================================")
-	fmt.Println(fmt.Sprintf("init pool state:[%s]", poolBalances.String()))
-	fmt.Println(fmt.Sprintf("init sender state:[%s]", senderBlances.String()))
-	fmt.Println(fmt.Sprintf("sender buy [%s%s] every times", outputCoin.Amount, outputCoin.Denom))
-	fmt.Println("===============================================================")
-
 	for i := 1; i < 100; i++ {
 		amt, err := keeper.tradeInputForExactOutput(ctx, input, output)
 		if i == maxCnt {
@@ -230,12 +224,6 @@ func TestTradeExactInputForOutput(t *testing.T) {
 	output := types.Output{
 		Coin: outputCoin,
 	}
-
-	fmt.Println("===============================================================")
-	fmt.Println(fmt.Sprintf("init pool state:[%s]", poolBalances.String()))
-	fmt.Println(fmt.Sprintf("init sender state:[%s]", senderBlances.String()))
-	fmt.Println(fmt.Sprintf("sender sold [%s%s] every times", inputCoin.Amount, inputCoin.Denom))
-	fmt.Println("===============================================================")
 
 	for i := 1; i < 1000; i++ {
 		amt, err := keeper.tradeExactInputForOutput(ctx, input, output)
