@@ -22,7 +22,7 @@ import (
 	"github.com/tendermint/tendermint/libs/cli"
 
 	"github.com/irisnet/irishub/app"
-	iconfig "github.com/irisnet/irishub/cmd/config"
+	iconfig "github.com/irisnet/irishub/config"
 )
 
 func main() {

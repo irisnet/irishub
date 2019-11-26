@@ -27,7 +27,18 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/gov"
 	"github.com/cosmos/cosmos-sdk/x/mint"
+	iconfig "github.com/irisnet/irishub/config"
 )
+
+func init() {
+	// set Bech32 config
+	config := sdk.GetConfig()
+	irisConfig := iconfig.GetConfig()
+	config.SetBech32PrefixForAccount(irisConfig.GetBech32AccountAddrPrefix(), irisConfig.GetBech32AccountPubPrefix())
+	config.SetBech32PrefixForValidator(irisConfig.GetBech32ValidatorAddrPrefix(), irisConfig.GetBech32ValidatorPubPrefix())
+	config.SetBech32PrefixForConsensusNode(irisConfig.GetBech32ConsensusAddrPrefix(), irisConfig.GetBech32ConsensusPubPrefix())
+	config.Seal()
+}
 
 func TestIrisCLIKeysAddMultisig(t *testing.T) {
 	t.Parallel()
@@ -61,7 +72,7 @@ func TestIrisCLIKeysAddRecover(t *testing.T) {
 
 	exitSuccess, _, _ = f.KeysAddRecover("test-recover", "dentist task convince chimney quality leave banana trade firm crawl eternal easily")
 	require.True(t, exitSuccess)
-	require.Equal(t, "cosmos1qcfdf69js922qrdr4yaww3ax7gjml6pdds46f4", f.KeyAddress("test-recover").String())
+	require.Equal(t, "faa1qcfdf69js922qrdr4yaww3ax7gjml6pdqannte", f.KeyAddress("test-recover").String())
 
 	// Cleanup testing directories
 	f.Cleanup()

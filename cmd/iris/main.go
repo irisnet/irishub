@@ -21,7 +21,7 @@ import (
 	dbm "github.com/tendermint/tm-db"
 
 	"github.com/irisnet/irishub/app"
-	iconfig "github.com/irisnet/irishub/cmd/config"
+	iconfig "github.com/irisnet/irishub/config"
 )
 
 const flagInvCheckPeriod = "inv-check-period"
