@@ -1,5 +1,18 @@
 # Change Log
 
+## v0.16.0
+
+*Nov 20th, 2019*
+
+### BREAKING CHANGES
+
+- Remove `initial_supply` property in the `TokenAddition` proposal API
+
+### NON-BREAKING CHANGES
+
+- Add Coinswap module APIs
+- Add HTLC module APIs
+
 ## v0.15.0
 
 *Aug 20th, 2019*

@@ -27,7 +27,7 @@
 | ------------- | --------- | --------- | --------- | ---------------------- |
 | MinDeposit    | 4000 iris | 2000 iris | 1000 iris | [10iris,10000iris]     |
 | DepositPeriod | 24 hours  | 24 hours  | 24 hours  | [20s,3d]               |
-| VotingPeriod  | 120 hours | 120 hours | 120 hours | [20s,3d]               |
+| VotingPeriod  | 120 hours | 120 hours | 120 hours | [20s,7d]               |
 | MaxNum        | 1         | 5         | 7         | Critical==1, other(1,) |
 | Participation | 0.5       | 0.5       | 0.5       | (0,1)                  |
 | Threshold     | 0.75      | 0.67      | 0.5       | (0,1)                  |

@@ -1,5 +1,18 @@
 # IRISLCD 更新日志
 
+## v0.16.0
+
+*Nov 20th, 2019*
+
+### BREAKING CHANGES
+
+- 删除 `TokenAddition` 类型提案 API 中的 `initial_supply` 属性
+
+### NON-BREAKING CHANGES
+
+- 增加 Coinswap 模块
+- 增加 HTLC 模块
+
 ## v0.15.0
 
 *Aug 20th, 2019*
