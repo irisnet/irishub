@@ -10,6 +10,7 @@ on:
       - master
     tags:
       - v.*
+
 jobs:
   build-images:
     name: Build Images
