@@ -21,7 +21,7 @@ jobs:
           else
             echo ${${{github.ref}}##/} > ${{github.sha}}.TAG;
           fi
-      - name: build irishub mainnet image
+      - name: Build irishub mainnet image
         run: source ~/.bashrc; sudo docker build -t irisnet/irishub:`cat ${{github.sha}}.TAG` .
       - name: build irishub testnet image
         run: source ~/.bashrc; sudo docker build -t irisnet/irishub:testnet-`cat ${{github.sha}}.TAG` --build-arg NetworkType=testnet .
