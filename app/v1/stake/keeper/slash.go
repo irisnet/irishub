@@ -123,7 +123,7 @@ func (k Keeper) Slash(ctx sdk.Context, consAddr sdk.ConsAddress, infractionHeigh
 	k.bankKeeper.DecreaseLoosenToken(ctx, sdk.Coins{sdk.NewCoin(types.StakeDenom, tokensToBurn.TruncateInt())})
 	slashToken, err := strconv.ParseFloat(tokensToBurn.QuoInt(sdk.AttoScaleFactor).String(), 64)
 	if err == nil {
-		k.metrics.SlashedToken.With("validator_address", validator.GetConsAddr().String()).Add(slashToken)
+		k.metrics.SetSlashedToken(validator.GetOperator().String(), slashToken)
 	}
 	// Log that a slash occurred!
 	logger.Info("Validator slashed", "consensus_address", validator.GetConsAddr().String(),
@@ -144,7 +144,7 @@ func (k Keeper) Jail(ctx sdk.Context, consAddr sdk.ConsAddress) {
 func (k Keeper) Unjail(ctx sdk.Context, consAddr sdk.ConsAddress) {
 	validator := k.mustGetValidatorByConsAddr(ctx, consAddr)
 	k.unjailValidator(ctx, validator)
-	k.metrics.Jailed.With("validator_address", validator.GetConsAddr().String()).Set(0)
+	k.metrics.Unjail(validator.GetOperator().String())
 	// TODO Return event(s), blocked on https://github.com/tendermint/tendermint/pull/1803
 	return
 }

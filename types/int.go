@@ -410,6 +410,10 @@ func (i Int) IsPositive() bool {
 	return i.i.Sign() == 1
 }
 
+func (i Int) IsNil() bool {
+	return i.i == nil
+}
+
 // Sign returns sign of Uint
 func (i Uint) Sign() int {
 	return i.i.Sign()

@@ -3,16 +3,16 @@ package slashing
 import (
 	"testing"
 
-	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/mock"
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/modules/bank"
-	"github.com/irisnet/irishub/mock"
 	"github.com/irisnet/irishub/modules/params"
 	"github.com/irisnet/irishub/modules/stake"
+	stakeTypes "github.com/irisnet/irishub/modules/stake/types"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/stretchr/testify/require"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/crypto/ed25519"
-	stakeTypes "github.com/irisnet/irishub/modules/stake/types"
 )
 
 var (

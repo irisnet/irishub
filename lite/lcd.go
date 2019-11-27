@@ -8,12 +8,14 @@ import (
 	"github.com/irisnet/irishub/client"
 	assethandler "github.com/irisnet/irishub/client/asset/lcd"
 	bankhandler "github.com/irisnet/irishub/client/bank/lcd"
+	coinswaphandler "github.com/irisnet/irishub/client/coinswap/lcd"
 	"github.com/irisnet/irishub/client/context"
 	distributionhandler "github.com/irisnet/irishub/client/distribution/lcd"
 	govhandler "github.com/irisnet/irishub/client/gov/lcd"
-	paramshandle "github.com/irisnet/irishub/client/params/lcd"
+	htlchandler "github.com/irisnet/irishub/client/htlc/lcd"
+	paramshandler "github.com/irisnet/irishub/client/params/lcd"
 	randhandler "github.com/irisnet/irishub/client/rand/lcd"
-	servicehandle "github.com/irisnet/irishub/client/service/lcd"
+	servicehandler "github.com/irisnet/irishub/client/service/lcd"
 	slashinghandler "github.com/irisnet/irishub/client/slashing/lcd"
 	stakehandler "github.com/irisnet/irishub/client/stake/lcd"
 	rpchandler "github.com/irisnet/irishub/client/tendermint/rpc"
@@ -106,8 +108,10 @@ func createHandler(cdc *codec.Codec) *mux.Router {
 	slashinghandler.RegisterRoutes(cliCtx, r, cdc)
 	stakehandler.RegisterRoutes(cliCtx, r, cdc)
 	govhandler.RegisterRoutes(cliCtx, r, cdc)
-	servicehandle.RegisterRoutes(cliCtx, r, cdc)
-	paramshandle.RegisterRoutes(cliCtx, r, cdc)
+	servicehandler.RegisterRoutes(cliCtx, r, cdc)
+	paramshandler.RegisterRoutes(cliCtx, r, cdc)
+	coinswaphandler.RegisterRoutes(cliCtx, r, cdc)
+	htlchandler.RegisterRoutes(cliCtx, r, cdc)
 	// tendermint apis
 	rpchandler.RegisterRoutes(cliCtx, r, cdc)
 	ttxhandler.RegisterRoutes(cliCtx, r, cdc)

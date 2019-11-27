@@ -3,14 +3,14 @@ package stake
 import (
 	"testing"
 
-	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/mock"
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/modules/bank"
-	"github.com/irisnet/irishub/mock"
 	"github.com/irisnet/irishub/modules/params"
+	"github.com/irisnet/irishub/modules/stake/types"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/stretchr/testify/require"
 	abci "github.com/tendermint/tendermint/abci/types"
-	"github.com/irisnet/irishub/modules/stake/types"
 )
 
 // getMockApp returns an initialized mock application for this module.
@@ -94,8 +94,8 @@ func checkDelegation(
 func TestStakeMsgs(t *testing.T) {
 	mApp, keeper := getMockApp(t)
 
-	genCoin := sdk.NewCoin(types.StakeDenom, sdk.NewIntWithDecimal(42,18))
-	bondCoin := sdk.NewCoin(types.StakeDenom, sdk.NewIntWithDecimal(10,18))
+	genCoin := sdk.NewCoin(types.StakeDenom, sdk.NewIntWithDecimal(42, 18))
+	bondCoin := sdk.NewCoin(types.StakeDenom, sdk.NewIntWithDecimal(10, 18))
 
 	acc1 := &auth.BaseAccount{
 		Address: addr1,
@@ -124,7 +124,7 @@ func TestStakeMsgs(t *testing.T) {
 	validator := checkValidator(t, mApp, keeper, sdk.ValAddress(addr1), true)
 	require.Equal(t, sdk.ValAddress(addr1), validator.OperatorAddr)
 	require.Equal(t, sdk.Bonded, validator.Status)
-	require.True(sdk.DecEq(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(10,18)), validator.BondedTokens()))
+	require.True(sdk.DecEq(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)), validator.BondedTokens()))
 
 	// addr1 create validator on behalf of addr2
 	createValidatorMsgOnBehalfOf := NewMsgCreateValidatorOnBehalfOf(
@@ -138,10 +138,10 @@ func TestStakeMsgs(t *testing.T) {
 	validator = checkValidator(t, mApp, keeper, sdk.ValAddress(addr2), true)
 	require.Equal(t, sdk.ValAddress(addr2), validator.OperatorAddr)
 	require.Equal(t, sdk.Bonded, validator.Status)
-	require.True(sdk.DecEq(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(10,18)), validator.Tokens))
+	require.True(sdk.DecEq(t, sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)), validator.Tokens))
 
 	// check the bond that should have been created as well
-	checkDelegation(t, mApp, keeper, addr1, sdk.ValAddress(addr1), true, sdk.NewDecFromInt(sdk.NewIntWithDecimal(10,18)))
+	checkDelegation(t, mApp, keeper, addr1, sdk.ValAddress(addr1), true, sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)))
 
 	// edit the validator
 	description = NewDescription("bar_moniker", "", "", "")
@@ -157,10 +157,10 @@ func TestStakeMsgs(t *testing.T) {
 
 	mock.SignCheckDeliver(t, mApp.BaseApp, []sdk.Msg{delegateMsg}, []uint64{0}, []uint64{1}, true, true, priv2)
 	mock.CheckBalance(t, mApp, addr2, sdk.Coins{genCoin.Sub(bondCoin)})
-	checkDelegation(t, mApp, keeper, addr2, sdk.ValAddress(addr1), true, sdk.NewDecFromInt(sdk.NewIntWithDecimal(10,18)))
+	checkDelegation(t, mApp, keeper, addr2, sdk.ValAddress(addr1), true, sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)))
 
 	// begin unbonding
-	beginUnbondingMsg := NewMsgBeginUnbonding(addr2, sdk.ValAddress(addr1), sdk.NewDecFromInt(sdk.NewIntWithDecimal(10,18)))
+	beginUnbondingMsg := NewMsgBeginUnbonding(addr2, sdk.ValAddress(addr1), sdk.NewDecFromInt(sdk.NewIntWithDecimal(10, 18)))
 	mock.SignCheckDeliver(t, mApp.BaseApp, []sdk.Msg{beginUnbondingMsg}, []uint64{0}, []uint64{2}, true, true, priv2)
 
 	// delegation should exist anymore

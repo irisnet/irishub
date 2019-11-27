@@ -2,15 +2,16 @@ package version
 
 import (
 	"fmt"
+	"strconv"
+
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/types"
 	"github.com/spf13/cobra"
-	"strconv"
 )
 
 // Version - Iris Version
-const ProtocolVersion = 1
-const Version = "0.15.5"
+const ProtocolVersion = 2
+const Version = "0.16.0"
 
 // GitCommit set by build flags
 var GitCommit = ""

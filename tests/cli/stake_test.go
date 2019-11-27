@@ -41,7 +41,7 @@ func TestIrisCLIStakeCreateValidator(t *testing.T) {
 	num := getAmountFromCoinStr(fooCoin)
 
 	if !(num > 39 && num < 40) {
-		t.Error("Test Failed: (39, 40) expected, recieved: {}", num)
+		t.Error("Test Failed: (39, 40) expected, received: {}", num)
 	}
 
 	// create validator
@@ -61,7 +61,7 @@ func TestIrisCLIStakeCreateValidator(t *testing.T) {
 	num = getAmountFromCoinStr(barCoin)
 
 	if !(num > 7 && num < 8) {
-		t.Error("Test Failed: (7, 8) expected, recieved: {}", num)
+		t.Error("Test Failed: (7, 8) expected, received: {}", num)
 	}
 
 	valAddr := sdk.ValAddress(barAddr).String()

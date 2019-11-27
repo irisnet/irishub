@@ -3,6 +3,7 @@ package context
 import (
 	"bytes"
 	"fmt"
+	"github.com/irisnet/irishub/app/v2/coinswap"
 	"io"
 	"os"
 	"strings"
@@ -73,7 +74,7 @@ func NewCLIContext() CLIContext {
 		Commit:        viper.GetBool(client.FlagCommit),
 		JSON:          viper.GetBool(client.FlagJson),
 		PrintResponse: viper.GetBool(client.FlagPrintResponse),
-		Verifier:      createVerifier(),
+		Verifier:      createVerifier(rpc),
 		DryRun:        viper.GetBool(client.FlagDryRun),
 		GenerateOnly:  viper.GetBool(client.FlagGenerateOnly),
 		fromAddress:   fromAddress,
@@ -82,7 +83,7 @@ func NewCLIContext() CLIContext {
 	}
 }
 
-func createVerifier() tmlite.Verifier {
+func createVerifier(rpc rpcclient.SignClient) tmlite.Verifier {
 	trustNodeDefined := viper.IsSet(client.FlagTrustNode)
 	if !trustNodeDefined {
 		return nil
@@ -91,6 +92,12 @@ func createVerifier() tmlite.Verifier {
 	trustNode := viper.GetBool(client.FlagTrustNode)
 	if trustNode {
 		return nil
+	} else {
+		height := int64(1)
+		if _, err := rpc.Commit(&height); err != nil {
+			fmt.Printf("snapshot's node can't verify the proof of result, you must set '--trust-node=true'\n")
+			os.Exit(1)
+		}
 	}
 
 	chainID := viper.GetString(client.FlagChainID)
@@ -242,6 +249,8 @@ func (cliCtx CLIContext) GetCoinType(coinName string) (sdk.CoinType, error) {
 	}
 	if coinName == sdk.Iris {
 		coinType = sdk.IrisCoinType
+	} else if strings.HasPrefix(coinName, coinswap.FormatUniABSPrefix) {
+		return coinswap.GetUniCoinType(coinName)
 	} else {
 		params := asset.QueryTokenParams{
 			TokenId: coinName,
@@ -279,7 +288,8 @@ func (cliCtx CLIContext) ConvertToMainUnit(coinsStr string) (coins []string, err
 		mainUnit, err := sdk.GetCoinName(coinStr)
 		coinType, err := cliCtx.GetCoinType(mainUnit)
 		if err != nil {
-			return nil, err
+			coins = append(coins, coinStr)
+			continue
 		}
 
 		coin, err := coinType.Convert(coinStr, mainUnit)
@@ -293,9 +303,12 @@ func (cliCtx CLIContext) ConvertToMainUnit(coinsStr string) (coins []string, err
 
 func (cliCtx CLIContext) ParseCoin(coinStr string) (sdk.Coin, error) {
 	mainUnit, err := sdk.GetCoinName(coinStr)
-	coinType, err := cliCtx.GetCoinType(mainUnit)
 	if err != nil {
 		return sdk.Coin{}, err
+	}
+	coinType, err := cliCtx.GetCoinType(mainUnit)
+	if err != nil {
+		return sdk.ParseCoin(coinStr)
 	}
 
 	coin, err := coinType.ConvertToMinDenomCoin(coinStr)

@@ -46,7 +46,7 @@ func TestInputValidation(t *testing.T) {
 		{true, NewInput(addr2, multiCoins)},
 
 		{false, NewInput(emptyAddr, someCoins)}, // empty address
-		{false, NewInput(addr1, emptyCoins)},     // invalid coins
+		{false, NewInput(addr1, emptyCoins)},    // invalid coins
 		{true, NewInput(addr1, zeroCoins)},      // invalid coins
 		{true, NewInput(addr1, someZeroCoins)},  // invalid coins
 		{false, NewInput(addr1, unsortedCoins)}, // unsorted coins

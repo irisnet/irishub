@@ -4,8 +4,8 @@ import (
 	"encoding/binary"
 	"fmt"
 
-	sdk "github.com/irisnet/irishub/types"
 	stake "github.com/irisnet/irishub/modules/stake/types"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 // Cap an infraction's slash amount by the slashing period in which it was committed

@@ -2,6 +2,7 @@ package types
 
 import (
 	"fmt"
+
 	"github.com/irisnet/irishub/app/v1/params"
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"

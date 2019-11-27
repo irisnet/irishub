@@ -1,12 +1,10 @@
 package upgrade
 
 import (
-	"github.com/go-kit/kit/metrics"
-	"github.com/go-kit/kit/metrics/discard"
-	"github.com/go-kit/kit/metrics/prometheus"
 	promutil "github.com/irisnet/irishub/tools/prometheus"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
 	cfg "github.com/tendermint/tendermint/config"
+	"strconv"
 )
 
 const (
@@ -16,8 +14,9 @@ const (
 )
 
 type Metrics struct {
-	Signal  metrics.Gauge
-	Upgrade metrics.Gauge
+	Signal  *stdprometheus.GaugeVec
+	Version *stdprometheus.GaugeVec
+	enabled bool
 }
 
 // PrometheusMetrics returns Metrics build using Prometheus client library.
@@ -43,14 +42,45 @@ func PrometheusMetrics(config *cfg.InstrumentationConfig) *Metrics {
 	promutil.RegisterMetrics(signalVec, upgradeVec)
 
 	return &Metrics{
-		Signal:  prometheus.NewGauge(signalVec),
-		Upgrade: prometheus.NewGauge(upgradeVec),
+		Signal:  signalVec,
+		Version: upgradeVec,
+		enabled: config.Prometheus,
 	}
+}
+
+func (m *Metrics) SetSignal(valAddr string, version uint64) {
+	promutil.SafeExec(func() {
+		m.Signal.With(stdprometheus.Labels{
+			ValidatorLabel: valAddr,
+			VersionLabel:   strconv.FormatUint(version, 10),
+		}).Set(1)
+	}, m.enabled)
+}
+
+func (m *Metrics) DeleteSignal(valAddr string, version uint64) {
+	promutil.SafeExec(func() {
+		m.Signal.Delete(stdprometheus.Labels{
+			ValidatorLabel: valAddr,
+			VersionLabel:   strconv.FormatUint(version, 10),
+		})
+	}, m.enabled)
+}
+
+func (m *Metrics) SetVersion(version uint64) {
+	promutil.SafeExec(func() {
+		m.Signal.WithLabelValues().Set(float64(version))
+	}, m.enabled)
+}
+
+func (m *Metrics) DeleteVersion() {
+	promutil.SafeExec(func() {
+		m.Signal.DeleteLabelValues()
+	}, m.enabled)
 }
 
 func NopMetrics() *Metrics {
 	return &Metrics{
-		Signal:  discard.NewGauge(),
-		Upgrade: discard.NewGauge(),
+		Signal:  promutil.EmptyGaugeVec(),
+		Version: promutil.EmptyGaugeVec(),
 	}
 }

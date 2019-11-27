@@ -3,7 +3,6 @@ package cli
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/irisnet/irishub/app/v1/bank"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -11,8 +10,11 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/irisnet/irishub/app/v1/bank"
+	v2 "github.com/irisnet/irishub/app/v2"
+	"github.com/irisnet/irishub/app/v2/htlc"
+
 	"github.com/irisnet/irishub/app"
-	v1 "github.com/irisnet/irishub/app/v1"
 	"github.com/irisnet/irishub/app/v1/asset"
 	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/app/v1/gov"
@@ -42,7 +44,7 @@ func convertToIrisBaseAccount(t *testing.T, acc auth.BaseAccount) string {
 	cliCtx := context.NewCLIContext().
 		WithCodec(cdc)
 
-	coinstr := acc.Coins.String()
+	coinstr := sdk.NewCoins(sdk.NewCoin(sdk.IrisAtto, acc.Coins.AmountOf(sdk.IrisAtto))).String()
 	coins, err := cliCtx.ConvertToMainUnit(coinstr)
 	require.NoError(t, err, "coins %v, err %v", coinstr, err)
 
@@ -64,7 +66,7 @@ func getAmountFromCoinStr(coinStr string) float64 {
 	return num
 }
 
-func modifyGenesisState(genesisState v1.GenesisFileState) v1.GenesisFileState {
+func modifyGenesisState(genesisState v2.GenesisFileState) v2.GenesisFileState {
 	genesisState.GovData = gov.DefaultGenesisStateForCliTest()
 	genesisState.UpgradeData = upgrade.DefaultGenesisStateForTest()
 	genesisState.ServiceData = service.DefaultGenesisStateForTest()
@@ -116,11 +118,11 @@ func initializeFixtures(t *testing.T) (chainID, servAddr, port, irisHome, iriscl
 	chainID = executeInit(t, fmt.Sprintf("iris init -o --moniker=foo --home=%s", irisHome))
 	genFile := filepath.Join(irisHome, "config", "genesis.json")
 	genDoc := readGenesisFile(t, genFile)
-	var appState v1.GenesisFileState
+	var appState v2.GenesisFileState
 	cdc := app.MakeLatestCodec()
 	err := cdc.UnmarshalJSON(genDoc.AppState, &appState)
 	require.NoError(t, err)
-	appState.Accounts = []v1.GenesisFileAccount{v1.NewDefaultGenesisFileAccount(fooAddr)}
+	appState.Accounts = []v2.GenesisFileAccount{v2.NewDefaultGenesisFileAccount(fooAddr)}
 	appState = modifyGenesisState(appState)
 	appStateJSON, err := codec.Cdc.MarshalJSON(appState)
 	require.NoError(t, err)
@@ -393,4 +395,13 @@ func executeGetGateways(t *testing.T, cmdStr string) []asset.Gateway {
 
 func executeWriteCheckErr(t *testing.T, cmdStr string, writes ...string) {
 	require.True(t, executeWrite(t, cmdStr, writes...))
+}
+
+func executeGetHtlc(t *testing.T, cmdStr string) htlc.HTLC {
+	out, _ := tests.ExecuteT(t, cmdStr, "")
+	var htlc htlc.HTLC
+	cdc := app.MakeLatestCodec()
+	err := cdc.UnmarshalJSON([]byte(out), &htlc)
+	require.NoError(t, err, "out %v\n, err %v", out, err)
+	return htlc
 }

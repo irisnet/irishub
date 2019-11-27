@@ -1,8 +1,8 @@
 package guardian
 
 import (
-	"testing"
 	"github.com/stretchr/testify/require"
+	"testing"
 )
 
 func TestKeeper(t *testing.T) {

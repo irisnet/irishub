@@ -1,4 +1,4 @@
-# IRISnet Mint模块用户文档
+# 通货膨胀
 
 ## 介绍
 
@@ -21,11 +21,13 @@ genesis中指定的初始通胀率是4%，这个值可以通过在governance中�
 ### 通胀计算
 
 通胀计算的公式如下：
-```
+
+```bash
  blockCostTime  = (当前区块的BFT time) - (上一个区块的BFT time)
  AnnualInflationAmount = inflationBasement * inflationRate
  blockInflationAmount = AnnualInflationAmount * blockCostTime / (year)
 ```
+
 `inflationBasement`的值被定义在genesis文件中. 默认情况下，genesis里面写入的值是 `2000000000iris`(20亿个iris, `1 iris`等于`1*10^18 iris-atto`)。
 
 假设`blockCostTime`是5000毫秒， 通胀比例`inflationRate`是`4%`, 那么这个块增发的token数量是`12675235125611580094iris-atto` (`12.675235125611580094iris`)
@@ -37,13 +39,16 @@ genesis中指定的初始通胀率是4%，这个值可以通过在governance中�
 这里有两个命令行接口和两个restful api来查询总的loose tokens的数量：
 
 1. `iriscli stake pool`
-    
+
     这个接口执行速度比较快，但是不能做默克尔证明，因此如果连接不上可信的全节点，请不要使用此接口。
-    ```
+
+    ```bash
     iriscli stake pool --node=<iris_node_url>
     ```
-    Output:
-    ```
+
+    示例输出:
+
+    ```bash
     Pool
     Loose Tokens: 1846663.900384156921391687
     Bonded Tokens: 425182.329615843078608313
@@ -54,19 +59,22 @@ genesis中指定的初始通胀率是4%，这个值可以通过在governance中�
 2. `iriscli bank token-stats`
 
     如果不信任连接的全节点，请加上`--trust-node=false`这个标志。如果连接不上可信的全节点，这个接口十分必要。
-    ```
+
+    ```bash
     iriscli bank token-stats --trust-node=false --chain-id=<chain-id> --node=<iris_node_url>
     ```
-    
-    Output:
-    ```
+
+    示例输出:
+
+    ```bash
     TokenStats:
       Loose Tokens:  1864477.596384156921391687iris
       Burned Tokens:  177.59638iris
       Bonded Tokens:  425182.329615843078608313iris
     ```
-    
-    
+
 3. `/stake/pool`和`/bank/token-stats`
+
     这两个restful api的用法请参阅LCD swagger文档。
-    如何运行一个LCD节点，请参阅[LCD文档](../light-client/README.md)。
+
+    如何运行一个LCD节点，请参阅[LCD文档](../light-client/intro.md)。

@@ -2,24 +2,26 @@ package gov
 
 import (
 	"bytes"
-	"github.com/irisnet/irishub/app/protocol"
-	"github.com/irisnet/irishub/app/v1/asset"
-	"github.com/stretchr/testify/require"
 	"log"
 	"sort"
 	"testing"
+
+	"github.com/irisnet/irishub/app/protocol"
+	"github.com/irisnet/irishub/app/v1/asset"
+	"github.com/stretchr/testify/require"
 
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/crypto"
 
 	"fmt"
+
 	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/app/v1/bank"
 	"github.com/irisnet/irishub/app/v1/distribution"
-	"github.com/irisnet/irishub/app/v1/mock"
 	"github.com/irisnet/irishub/app/v1/params"
 	"github.com/irisnet/irishub/app/v1/stake"
 	"github.com/irisnet/irishub/modules/guardian"
+	"github.com/irisnet/irishub/server/mock"
 	sdk "github.com/irisnet/irishub/types"
 )
 

@@ -16,7 +16,7 @@ import (
 func GetCmdRequestRand(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "request-rand",
-		Short:   "request a random number",
+		Short:   "Request a random number",
 		Example: "iriscli rand request-rand --block-interval=10",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().

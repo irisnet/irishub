@@ -7,7 +7,7 @@ import (
 	"sync"
 
 	cmn "github.com/tendermint/tendermint/libs/common"
-	dbm "github.com/tendermint/tendermint/libs/db"
+	dbm "github.com/tendermint/tm-db"
 )
 
 // If value is nil but deleted is false, it means the parent doesn't have the

@@ -1,10 +1,10 @@
 package stake
 
 import (
-	"github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/app/v1/stake/keeper"
-	types2 "github.com/tendermint/tendermint/abci/types"
 	"github.com/irisnet/irishub/app/v1/stake/tags"
+	"github.com/irisnet/irishub/types"
+	types2 "github.com/tendermint/tendermint/abci/types"
 )
 
 func EndBlocker(ctx types.Context, k keeper.Keeper) (validatorUpdates []types2.ValidatorUpdate) {

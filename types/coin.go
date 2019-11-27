@@ -138,7 +138,7 @@ func NewCoins(coins ...Coin) Coins {
 	newCoins.Sort()
 
 	if !newCoins.IsValid() {
-		panic(fmt.Errorf("invalid coin set: %s", newCoins))
+		panic(fmt.Sprintf("invalid coin set: %s", newCoins))
 	}
 
 	return newCoins
@@ -564,7 +564,8 @@ func (coins Coins) Sort() Coins {
 
 var (
 	// Denominations can be 3 ~ 21 characters long.
-	reCoinName         = `(u\-)?(([a-z][a-z0-9]{2,7}|x)\.)?([a-z][a-z0-9]{2,7})`
+	reABS              = `([a-z][0-9a-z]{2}[:])?`
+	reCoinName         = reABS + `(([a-z][a-z0-9]{2,7}|x)\.)?([a-z][a-z0-9]{2,7})`
 	reDenom            = reCoinName + `(-[a-z]{3,5})?`
 	reAmount           = `[0-9]+(\.[0-9]+)?`
 	reSpace            = `[[:space:]]*`
@@ -628,12 +629,12 @@ func ParseCoins(coinsStr string) (coins Coins, err error) {
 	return coins, nil
 }
 
-func IsCoinNameValid(coinName string) bool  {
+func IsCoinNameValid(coinName string) bool {
 	return reCoinNameCompiled.MatchString(coinName)
 }
 
-func IsCoinMinDenomValid(denom string) bool  {
-	if denom != IrisAtto && (!strings.HasSuffix(denom, MinDenomSuffix) || strings.HasPrefix(denom, Iris + "-")) {
+func IsCoinMinDenomValid(denom string) bool {
+	if denom != IrisAtto && (!strings.HasSuffix(denom, MinDenomSuffix) || strings.HasPrefix(denom, Iris+"-")) {
 		return false
 	}
 	return reDenomCompiled.MatchString(denom)

@@ -5,16 +5,16 @@ import (
 	"testing"
 
 	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/modules/auth"
+	"github.com/irisnet/irishub/modules/bank"
 	"github.com/irisnet/irishub/store"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	dbm "github.com/tendermint/tendermint/libs/db"
-	tmtypes "github.com/tendermint/tendermint/types"
-	"github.com/tendermint/tendermint/libs/log"
-	"github.com/irisnet/irishub/modules/auth"
 	abci "github.com/tendermint/tendermint/abci/types"
-	"github.com/irisnet/irishub/modules/bank"
+	"github.com/tendermint/tendermint/libs/log"
+	tmtypes "github.com/tendermint/tendermint/types"
+	dbm "github.com/tendermint/tm-db"
 )
 
 func setupMultiStore() (sdk.MultiStore, *sdk.KVStoreKey) {
@@ -105,7 +105,7 @@ func TestRemoveTokens(t *testing.T) {
 	bondedPool := InitialBondedPool()
 	poolA := Pool{
 		BondedPool: bondedPool,
-		BankKeeper:bankKeeper,
+		BankKeeper: bankKeeper,
 	}
 	poolA.BondedPool.BondedTokens = validator.BondedTokens()
 	poolA.BankKeeper.IncreaseLoosenToken(ctx, sdk.Coins{sdk.NewCoin(StakeDenom, sdk.NewInt(10))})
@@ -144,7 +144,7 @@ func TestAddTokensValidatorBonded(t *testing.T) {
 	bondedPool := InitialBondedPool()
 	poolA := Pool{
 		BondedPool: bondedPool,
-		BankKeeper:bankKeeper,
+		BankKeeper: bankKeeper,
 	}
 	poolA.BankKeeper.IncreaseLoosenToken(ctx, sdk.Coins{sdk.NewCoin(StakeDenom, sdk.NewInt(10))})
 
@@ -171,7 +171,7 @@ func TestAddTokensValidatorUnbonding(t *testing.T) {
 	bondedPool := InitialBondedPool()
 	poolA := Pool{
 		BondedPool: bondedPool,
-		BankKeeper:bankKeeper,
+		BankKeeper: bankKeeper,
 	}
 	poolA.BankKeeper.IncreaseLoosenToken(ctx, sdk.Coins{sdk.NewCoin(StakeDenom, sdk.NewInt(10))})
 
@@ -199,7 +199,7 @@ func TestAddTokensValidatorUnbonded(t *testing.T) {
 	bondedPool := InitialBondedPool()
 	poolA := Pool{
 		BondedPool: bondedPool,
-		BankKeeper:bankKeeper,
+		BankKeeper: bankKeeper,
 	}
 	poolA.BankKeeper.IncreaseLoosenToken(ctx, sdk.Coins{sdk.NewCoin(StakeDenom, sdk.NewInt(10))})
 
@@ -224,7 +224,6 @@ func TestRemoveDelShares(t *testing.T) {
 	accountKeeper := auth.NewAccountKeeper(cdc, authKey, auth.ProtoBaseAccount)
 	bankKeeper := bank.NewBaseKeeper(accountKeeper)
 
-
 	valA := Validator{
 		OperatorAddr:    addr1,
 		ConsPubKey:      pk1,
@@ -235,7 +234,7 @@ func TestRemoveDelShares(t *testing.T) {
 	bondedPool := InitialBondedPool()
 	poolA := Pool{
 		BondedPool: bondedPool,
-		BankKeeper:bankKeeper,
+		BankKeeper: bankKeeper,
 	}
 	poolA.BondedPool.BondedTokens = valA.BondedTokens()
 	poolA.BankKeeper.IncreaseLoosenToken(ctx, sdk.Coins{sdk.NewCoin(StakeDenom, sdk.NewInt(10))})
@@ -266,10 +265,10 @@ func TestRemoveDelShares(t *testing.T) {
 		DelegatorShares: delShares,
 	}
 	poolC := Pool{
-		BondedPool: BondedPool {
+		BondedPool: BondedPool{
 			BondedTokens: sdk.NewDec(248305),
 		},
-		BankKeeper:bankKeeper,
+		BankKeeper: bankKeeper,
 	}
 	shares := sdk.NewDec(29)
 	_, newPool, tokens := validator.RemoveDelShares(ctx, poolC, shares)
@@ -296,7 +295,7 @@ func TestUpdateStatus(t *testing.T) {
 	bondedPool := InitialBondedPool()
 	pool := Pool{
 		BondedPool: bondedPool,
-		BankKeeper:bankKeeper,
+		BankKeeper: bankKeeper,
 	}
 	pool.BankKeeper.IncreaseLoosenToken(ctx, sdk.Coins{sdk.NewCoin(StakeDenom, sdk.NewInt(100))})
 
@@ -329,8 +328,6 @@ func TestPossibleOverflow(t *testing.T) {
 	accountKeeper := auth.NewAccountKeeper(cdc, authKey, auth.ProtoBaseAccount)
 	bankKeeper := bank.NewBaseKeeper(accountKeeper)
 
-
-
 	poolTokens := sdk.NewDec(2159)
 	delShares := sdk.NewDec(391432570689183511).Quo(sdk.NewDec(40113011844664))
 	validator := Validator{
@@ -343,7 +340,7 @@ func TestPossibleOverflow(t *testing.T) {
 	bondedPool := InitialBondedPool()
 	poolA := Pool{
 		BondedPool: bondedPool,
-		BankKeeper:bankKeeper,
+		BankKeeper: bankKeeper,
 	}
 	poolA.BondedPool.BondedTokens = poolTokens
 	poolA.BankKeeper.IncreaseLoosenToken(ctx, sdk.Coins{sdk.NewCoin(StakeDenom, poolTokens.TruncateInt())})

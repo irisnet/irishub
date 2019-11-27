@@ -4,8 +4,8 @@ import (
 	"testing"
 	"time"
 
-	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/modules/stake"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/stretchr/testify/require"
 	abci "github.com/tendermint/tendermint/abci/types"
 )
@@ -56,7 +56,7 @@ func TestHandleDoubleSign(t *testing.T) {
 		t, sdk.NewDecFromInt(amt.Div(sdk.NewIntWithDecimal(1, 18))).Mul(sdk.NewDec(19).Quo(sdk.NewDec(20))),
 		sk.Validator(ctx, operatorAddr).GetPower(),
 	)
-	ctx = ctx.WithBlockHeight(ctx.BlockHeight()+(keeper.MaxEvidenceAge(ctx)))
+	ctx = ctx.WithBlockHeight(ctx.BlockHeight() + (keeper.MaxEvidenceAge(ctx)))
 
 	// double sign past max age
 	keeper.handleDoubleSign(ctx, val.Address(), 0, amtInt.Div(sdk.NewIntWithDecimal(1, 18)).Int64())

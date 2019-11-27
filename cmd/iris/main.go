@@ -19,13 +19,13 @@ import (
 	abci "github.com/tendermint/tendermint/abci/types"
 	cfg "github.com/tendermint/tendermint/config"
 	"github.com/tendermint/tendermint/libs/cli"
-	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
 	"github.com/tendermint/tendermint/node"
 	"github.com/tendermint/tendermint/p2p"
 	pvm "github.com/tendermint/tendermint/privval"
 	"github.com/tendermint/tendermint/proxy"
 	tmtypes "github.com/tendermint/tendermint/types"
+	dbm "github.com/tendermint/tm-db"
 )
 
 func main() {
@@ -35,7 +35,7 @@ func main() {
 	cobra.EnableCommandSorting = false
 	rootCmd := &cobra.Command{
 		Use:               "iris",
-		Short:             "iris Daemon (server)",
+		Short:             "IRIS Hub Daemon (Server)",
 		PersistentPreRunE: server.PersistentPreRunEFn(ctx),
 	}
 
@@ -67,6 +67,7 @@ func main() {
 		tendermintCmd,
 		server.ResetCmd(ctx, cdc, resetAppState),
 		server.ExportCmd(ctx, cdc, exportAppStateAndTMValidators),
+		server.SnapshotCmd(cdc),
 		client.LineBreak,
 	)
 

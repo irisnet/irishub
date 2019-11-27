@@ -2,6 +2,7 @@ package cli
 
 import (
 	"fmt"
+
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/app/v1/gov"
 	"github.com/irisnet/irishub/client/context"
@@ -50,12 +51,11 @@ func GetCmdQueryProposal(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-// nolint: gocyclo
 // GetCmdQueryProposals implements a query proposals command.
 func GetCmdQueryProposals(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "query-proposals",
-		Short:   "query proposals with optional filters",
+		Short:   "Query proposals with optional filters",
 		Example: "iriscli gov query-proposals --status=Passed",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			bechDepositorAddr := viper.GetString(flagDepositor)
@@ -122,12 +122,11 @@ func GetCmdQueryProposals(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-// Command to Get a Proposal Information
 // GetCmdQueryVote implements the query proposal vote command.
 func GetCmdQueryVote(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "query-vote",
-		Short:   "query vote",
+		Short:   "Query vote",
 		Example: "iriscli gov query-vote --proposal-id=1 --voter=<voter address>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
@@ -172,7 +171,7 @@ func GetCmdQueryVote(cdc *codec.Codec) *cobra.Command {
 func GetCmdQueryVotes(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "query-votes",
-		Short:   "query votes on a proposal",
+		Short:   "Query votes on a proposal",
 		Example: "iriscli gov query-votes --proposal-id=1",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
@@ -205,7 +204,6 @@ func GetCmdQueryVotes(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-// Command to Get a specific Deposit Information
 // GetCmdQueryDeposit implements the query proposal deposit command.
 func GetCmdQueryDeposit(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
@@ -288,7 +286,7 @@ func GetCmdQueryDeposits(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-// GetCmdQueryDeposits implements the command to query for proposal deposits.
+// GetCmdQueryTally implements the command to query for proposal deposits.
 func GetCmdQueryTally(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "query-tally",

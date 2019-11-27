@@ -227,7 +227,7 @@ type MsgBeginRedelegate struct {
 }
 
 func NewMsgBeginRedelegate(delAddr sdk.AccAddress, valSrcAddr,
-valDstAddr sdk.ValAddress, sharesAmount sdk.Dec) MsgBeginRedelegate {
+	valDstAddr sdk.ValAddress, sharesAmount sdk.Dec) MsgBeginRedelegate {
 
 	return MsgBeginRedelegate{
 		DelegatorAddr:    delAddr,

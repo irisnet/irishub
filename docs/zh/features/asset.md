@@ -1,4 +1,4 @@
-# 资产模块用户指南
+# 资产管理
 
 ## 简介
 
@@ -17,7 +17,7 @@ IRISHub 允许个人和公司创建和发行他们自己的资产，用于他们
 #### 外部资产（市场挂钩资产）
 
 我们还可以在IRISHub上创建其它区块链上已经存在的外部资产并让市场处理需求和供应，而不是在IRISHub上建立一个完全由发行者控制供应的内部资产。
-创建外部资产的唯一方法是在 IRISHub Governance 上提交一个 AddAssetProposal 提案，但为了用户方便起见，CMC的前20名资产将在系统中预先配置。
+创建外部资产的唯一方法是在 IRISHub Governance 上提交一个 TokenAddition 提案，但为了用户方便起见，CMC的前20名资产将在系统中预先配置。
 
 ### 网关
 
@@ -27,15 +27,15 @@ IRISHub 允许个人和公司创建和发行他们自己的资产，用于他们
 
 #### 相关参数
 
-| name                   | Type      | Default     | Description                                    |
-| ---------------------- |-----------|-------------|------------------------------------------------|
-| AssetTaxRate           | Dec       | 0.4         | 资产税率，即Community Tax的比例                |
-| IssueTokenBaseFee         | Coin      | 60000iris   | 发行FT的基准费用                               |
-| MintTokenFeeRatio         | Dec       | 0.1         | 增发FT的费率(相对于发行费用)                   |
-| CreateGatewayBaseFee   | Coin      | 120000iris  | 创建网关的基准费用                             |
-| GatewayAssetFeeRatio   | Dec       | 0.1         | 发行网关资产的费率(相对于native资产的发行费用) |
+| name                 | Type | Default    | Description                              |
+| -------------------- | ---- | ---------- | ---------------------------------------- |
+| AssetTaxRate         | Dec  | 0.4        | 资产税率，即Community Tax的比例             |
+| IssueTokenBaseFee    | Coin | 60000iris  | 发行FT的基准费用                           |
+| MintTokenFeeRatio    | Dec  | 0.1        | 增发FT的费率(相对于发行费用)                 |
+| CreateGatewayBaseFee | Coin | 120000iris | 创建网关的基准费用                          |
+| GatewayAssetFeeRatio | Dec  | 0.1        | 发行网关资产的费率(相对于native资产的发行费用) |
 
-注：以上参数均为可共识参数
+注：以上参数均为可治理参数
 
 #### 创建网关费用
 
@@ -49,7 +49,7 @@ IRISHub 允许个人和公司创建和发行他们自己的资产，用于他们
 - 费用因子计算公式：(ln(len({symbol}))/ln3)^4
 - 发行FT费用计算公式：IssueFTBaseFee/费用因子；结果取整到iris（大于1时四舍五入，小于等于1时取值为1）
 
-#### 增发Fungible Token 费用
+#### 增发 Fungible Token 费用
 
 - 增发FT费率：相对于发行FT时的费率
 - 增发FT费用计算公式：发行FT费用 * MintFTFeeRatio；结果取整到iris（大于1时四舍五入，小于等于1时取值为1）
@@ -68,42 +68,42 @@ IRISHub 允许个人和公司创建和发行他们自己的资产，用于他们
 
 - **资产**
 
-  - [发行资产](../cli-client/asset/issue-token.md)
+  - [发行资产](../cli-client/asset.md#iriscli-asset-issue-token)
 
-    - [发行原生资产](../cli-client/asset/issue-token.md#发行原生资产)
+    - [发行原生资产](../cli-client/asset.md#发行原生通证)
 
-    - [发行网关资产](../cli-client/asset/issue-token.md#发行网关资产)
+    - [发行网关资产](../cli-client/asset.md#发行网关通证)
 
-    - [转账](../cli-client/asset/issue-token.md#转账)
+    - [转账](../cli-client/asset.md#发送通证)
 
-  - [查询资产](../cli-client/asset/query-token.md)
+  - [查询资产](../cli-client/asset.md#iriscli-asset-query-token)
 
-  - [查询资产列表](../cli-client/asset/query-tokens.md)
+  - [查询资产列表](../cli-client/asset.md#iriscli-asset-query-tokens)
 
-  - [编辑资产信息](../cli-client/asset/edit-token.md)
+  - [编辑资产信息](../cli-client/asset.md#iriscli-asset-edit-token)
 
-  - [增发](../cli-client/asset/mint-token.md)
+  - [增发](../cli-client/asset.md#iriscli-asset-mint-token)
 
-  - [销毁](../cli-client/bank/burn.md)
+  - [销毁](../cli-client/bank.md#iriscli-bank-burn)
 
-  - [转让所有权](../cli-client/asset/transfer-token-owner.md)
+  - [转让所有权](../cli-client/asset.md#iriscli-asset-transfer-token-owner)
 
 - **网关**
 
-  - [创建网关](../cli-client/asset/create-gateway.md)
+  - [创建网关](../cli-client/asset.md#iriscli-asset-create-gateway)
 
-  - [查询网关](../cli-client/asset/query-gateway.md)
+  - [查询网关](../cli-client/asset.md#iriscli-asset-query-gateway)
 
-  - [查询网关列表](../cli-client/asset/query-gateways.md)
+  - [查询网关列表](../cli-client/asset.md#iriscli-asset-query-gateways)
 
-  - [编辑网关信息](../cli-client/asset/edit-gateway.md)
+  - [编辑网关信息](../cli-client/asset.md#iriscli-asset-edit-gateway)
 
-  - [转让所有权](../cli-client/asset/transfer-gateway-owner.md)
+  - [转让所有权](../cli-client/asset.md#iriscli-asset-transfer-gateway-owner)
 
 - **费用**
 
-  - [查询网关创建费用](../cli-client/asset/query-fee.md#查询网关创建费用)
+  - [查询网关创建费用](../cli-client/asset.md#查询创建网关的费用)
 
-  - [查询原生资产发行费用](../cli-client/asset/query-fee.md#查询发行/增发原生资产费用)
+  - [查询原生资产发行费用](../cli-client/asset.md#查询发行和增发原生通证的费用)
 
-  - [查询网关资产发行费用](../cli-client/asset/query-fee.md#查询发行/增发网关资产费用)
+  - [查询网关资产发行费用](../cli-client/asset.md#查询发行和增发网关通证的费用)

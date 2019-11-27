@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 	"time"
 
-	"github.com/irisnet/irishub/app/v1"
+	"github.com/irisnet/irishub/app/v2"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/server"
 	"github.com/tendermint/go-amino"
@@ -128,5 +128,5 @@ func initializeEmptyGenesis(
 		return nil, fmt.Errorf("genesis.json file already exists: %v", genFile)
 	}
 
-	return codec.MarshalJSONIndent(cdc, v1.NewDefaultGenesisFileState())
+	return codec.MarshalJSONIndent(cdc, v2.NewDefaultGenesisFileState())
 }

@@ -2,10 +2,10 @@ package init
 
 import (
 	"encoding/json"
+	v2 "github.com/irisnet/irishub/app/v2"
 	"path/filepath"
 
 	"github.com/irisnet/irishub/app"
-	v1 "github.com/irisnet/irishub/app/v1"
 	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/client"
 	"github.com/irisnet/irishub/codec"
@@ -89,7 +89,7 @@ func genAppStateFromConfig(
 	)
 
 	// process genesis transactions, else create default genesis.json
-	appGenTxs, persistentPeers, err = v1.CollectStdTxs(
+	appGenTxs, persistentPeers, err = v2.CollectStdTxs(
 		cdc, config.Moniker, initCfg.GenTxsDir, genDoc,
 	)
 	if err != nil {
@@ -109,7 +109,7 @@ func genAppStateFromConfig(
 
 	cfg.WriteConfigFile(filepath.Join(config.RootDir, "config", "config.toml"), config)
 
-	appState, err = v1.IrisAppGenStateJSON(cdc, genDoc, genTxs)
+	appState, err = v2.IrisAppGenStateJSON(cdc, genDoc, genTxs)
 	if err != nil {
 		return
 	}
