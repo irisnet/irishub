@@ -35,5 +35,5 @@ jobs:
         run: sudo docker login -u ${{secrets.DOCKER_USER}} -p ${{secrets.DOCKER_PASS}}
       - name: Publish irishub testnet image
         run: sudo docker push irisnet/irishub:testnet-`cat ${{github.sha}}.TAG`
-      - name: push irishub mainnet image
+      - name: Publish irishub mainnet image
         run: sudo docker push irisnet/irishub:`cat ${{github.sha}}.TAG`
