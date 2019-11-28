@@ -12,7 +12,7 @@ func BeginBlocker(ctx sdk.Context, k Keeper) {
 	// Get block BFT time and block height
 	blockTime := ctx.BlockHeader().Time
 	minter := k.GetMinter(ctx)
-	if ctx.BlockHeader().Height <= 1 { // don't inflate token in the first block
+	if ctx.BlockHeight() <= 1 { // don't inflate token in the first block
 		minter.LastUpdate = blockTime
 		k.SetMinter(ctx, minter)
 		return
