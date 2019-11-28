@@ -3,7 +3,6 @@ package keeper
 import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/bank"
 	"github.com/cosmos/cosmos-sdk/x/params"
 	"github.com/irisnet/irishub/modules/mint/internal/types"
 )
@@ -13,19 +12,17 @@ type Keeper struct {
 	storeKey         sdk.StoreKey
 	cdc              *codec.Codec
 	paramSpace       params.Subspace
-	bk               bank.Keeper
 	supplyKeeper     types.SupplyKeeper
 	feeCollectorName string
 }
 
 func NewKeeper(cdc *codec.Codec, key sdk.StoreKey,
-	paramSpace params.Subspace, bk bank.Keeper, supplyKeeper types.SupplyKeeper, feeCollectorName string) Keeper {
+	paramSpace params.Subspace, supplyKeeper types.SupplyKeeper, feeCollectorName string) Keeper {
 
 	keeper := Keeper{
 		storeKey:         key,
 		cdc:              cdc,
 		paramSpace:       paramSpace.WithKeyTable(types.ParamKeyTable()),
-		bk:               bk,
 		supplyKeeper:     supplyKeeper,
 		feeCollectorName: feeCollectorName,
 	}
