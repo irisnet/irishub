@@ -2825,7 +2825,7 @@ paths:
           description: Internal Server Error
   '/coinswap/liquidities/{id}':
     get:
-      summary: Query liquidity by token id
+      summary: Query liquidity by id
       tags:
         - CoinSwap
       parameters:
