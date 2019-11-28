@@ -4,6 +4,7 @@ package simulation
 
 import (
 	"fmt"
+	"github.com/irisnet/irishub/config"
 	"math/rand"
 
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -32,7 +33,7 @@ func RandomizedGenState(simState *module.SimulationState) {
 		func(r *rand.Rand) { inflation = GenInflation(r) },
 	)
 
-	params := types.Params{Inflation: inflation}
+	params := types.Params{Inflation: inflation, MintDenom: config.StakeDenom}
 	mintGenesis := types.NewGenesisState(types.InitialMinter(), params)
 
 	fmt.Printf("Selected randomly generated minting parameters:\n%s\n", codec.MustMarshalJSONIndent(simState.Cdc, mintGenesis))
