@@ -22,7 +22,7 @@ func makeTestCodec() (cdc *codec.Codec) {
 
 func TestDecodeStore(t *testing.T) {
 	cdc := makeTestCodec()
-	minter := types.NewMinter(time.Now().UTC(), "iris", sdk.NewIntWithDecimal(2, 9))
+	minter := types.NewMinter(time.Now().UTC(), sdk.NewIntWithDecimal(2, 9))
 
 	kvPairs := cmn.KVPairs{
 		cmn.KVPair{Key: types.MinterKey, Value: cdc.MustMarshalBinaryLengthPrefixed(minter)},
