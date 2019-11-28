@@ -1,16 +1,18 @@
-package mint
+package types
 
 import (
 	"fmt"
 	"time"
 
-	stakeTypes "github.com/irisnet/irishub/app/v1/stake/types"
-	sdk "github.com/irisnet/irishub/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/irisnet/irishub/config"
 )
 
 const (
 	blocksPerYear = 60 * 60 * 8766 / 5 // 5 second a block, 8766 = 365.25 * 24
 )
+
+var initialIssue = sdk.NewIntWithDecimal(20, 8)
 
 // current inflation state
 type Minter struct {
@@ -32,8 +34,8 @@ func NewMinter(lastUpdate time.Time, mintDenom string, inflationBase sdk.Int) Mi
 func InitialMinter() Minter {
 	return NewMinter(
 		time.Unix(0, 0),
-		stakeTypes.StakeDenom,
-		sdk.InitialIssue.Mul(sdk.NewIntWithDecimal(1, 18)), // 2*(10^9)iris, 2*(10^9)*(10^18)iris-atto
+		config.StakeDenom,
+		initialIssue.Mul(sdk.NewIntWithDecimal(1, 18)), // 20*(10^8)iris, 20*(10^8)*(10^18)iris-atto
 	)
 }
 

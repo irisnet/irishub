@@ -1,16 +1,15 @@
-package mint
+package types
 
 import (
 	"testing"
 	"time"
 
-	stakeTypes "github.com/irisnet/irishub/app/v1/stake/types"
-	sdk "github.com/irisnet/irishub/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
 )
 
 func TestNextInflation(t *testing.T) {
-	minter := NewMinter(time.Now(), stakeTypes.StakeDenom, sdk.NewIntWithDecimal(100, 18))
+	minter := NewMinter(time.Now(), "iris", sdk.NewIntWithDecimal(100, 18))
 	tests := []struct {
 		params Params
 	}{

@@ -1,8 +1,9 @@
 package config
 
 const (
-	Testnet = "testnet"
-	Mainnet = "mainnet"
+	Testnet    = "testnet"
+	Mainnet    = "mainnet"
+	StakeDenom = "iris-atto"
 )
 
 // Can be configured through environment variables
