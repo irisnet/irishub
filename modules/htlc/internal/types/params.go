@@ -1,11 +1,7 @@
 package types
 
 import (
-	"fmt"
-
-	"github.com/irisnet/irishub/app/v1/params"
-	"github.com/irisnet/irishub/codec"
-	sdk "github.com/irisnet/irishub/types"
+	"github.com/cosmos/cosmos-sdk/x/params"
 )
 
 var _ params.ParamSet = (*Params)(nil)
@@ -15,8 +11,8 @@ const (
 )
 
 // ParamTable for HTLC module
-func ParamTypeTable() params.TypeTable {
-	return params.NewTypeTable().RegisterParamSet(&Params{})
+func ParamTypeTable() params.KeyTable {
+	return params.NewKeyTable().RegisterParamSet(&Params{})
 }
 
 // HTLC params
@@ -28,27 +24,8 @@ func (p Params) String() string {
 }
 
 // Implements params.ParamSet
-func (p *Params) GetParamSpace() string {
-	return DefaultParamSpace
-}
-
-func (p *Params) KeyValuePairs() params.KeyValuePairs {
-	return params.KeyValuePairs{}
-}
-
-func (p *Params) Validate(key string, value string) (interface{}, sdk.Error) {
-	switch key {
-	default:
-		return nil, nil
-	}
-}
-
-func (p *Params) StringFromBytes(cdc *codec.Codec, key string, bytes []byte) (string, error) {
-	return "", fmt.Errorf("this method is not implemented")
-}
-
-func (p *Params) ReadOnly() bool {
-	return false
+func (p *Params) ParamSetPairs() params.ParamSetPairs {
+	return params.ParamSetPairs{}
 }
 
 // default HTLC module params

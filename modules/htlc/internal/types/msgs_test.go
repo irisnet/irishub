@@ -4,20 +4,27 @@ import (
 	"fmt"
 	"testing"
 
-	sdk "github.com/irisnet/irishub/types"
 	"github.com/stretchr/testify/require"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 var (
-	senderAddr, _        = sdk.AccAddressFromBech32("faa128nh833v43sggcj65nk7khjka9dwngpl6j29hj")
-	toAddr, _            = sdk.AccAddressFromBech32("faa1mrehjkgeg75nz2gk7lr7dnxvvtg4497jxss8hq")
+	senderAddr           sdk.AccAddress
+	toAddr               sdk.AccAddress
 	receiverOnOtherChain = "receiverOnOtherChain"
-	amount               = sdk.NewCoins(sdk.NewCoin(sdk.IrisAtto, sdk.NewInt(10)))
+	amount               = sdk.NewCoins(sdk.NewCoin("iris", sdk.NewInt(10)))
 	secret               = []byte("___abcdefghijklmnopqrstuvwxyz___")
 	timestamp            = uint64(1580000000)
-	hashLock             = sdk.SHA256(append(secret, sdk.Uint64ToBigEndian(timestamp)...))
+	hashLock             = SHA256(append(secret, sdk.Uint64ToBigEndian(timestamp)...))
 	timeLock             = uint64(50)
 )
+
+func init() {
+	sdk.GetConfig().SetBech32PrefixForAccount("faa", "fap")
+	senderAddr, _ = sdk.AccAddressFromBech32("faa128nh833v43sggcj65nk7khjka9dwngpl6j29hj")
+	toAddr, _ = sdk.AccAddressFromBech32("faa1mrehjkgeg75nz2gk7lr7dnxvvtg4497jxss8hq")
+}
 
 func TestNewMsgCreateHTLC(t *testing.T) {
 	msg := NewMsgCreateHTLC(senderAddr, toAddr, receiverOnOtherChain, amount, hashLock, timestamp, timeLock)
@@ -88,7 +95,7 @@ func TestMsgCreateHTLCValidation(t *testing.T) {
 func TestMsgCreateHTLCGetSignBytes(t *testing.T) {
 	msg := NewMsgCreateHTLC(senderAddr, toAddr, receiverOnOtherChain, amount, hashLock, timestamp, timeLock)
 	res := msg.GetSignBytes()
-	expected := `{"type":"irishub/htlc/MsgCreateHTLC","value":{"amount":[{"amount":"10","denom":"iris-atto"}],"hash_lock":"6NQTPhqCx04nRueMGThXBup5WKDKRBoI2s+hDEjOJWE=","receiver_on_other_chain":"receiverOnOtherChain","sender":"faa128nh833v43sggcj65nk7khjka9dwngpl6j29hj","time_lock":"50","timestamp":"1580000000","to":"faa1mrehjkgeg75nz2gk7lr7dnxvvtg4497jxss8hq"}}`
+	expected := `{"type":"irishub/htlc/MsgCreateHTLC","value":{"amount":[{"amount":"10","denom":"iris"}],"hash_lock":"6NQTPhqCx04nRueMGThXBup5WKDKRBoI2s+hDEjOJWE=","receiver_on_other_chain":"receiverOnOtherChain","sender":"faa128nh833v43sggcj65nk7khjka9dwngpl6j29hj","time_lock":"50","timestamp":"1580000000","to":"faa1mrehjkgeg75nz2gk7lr7dnxvvtg4497jxss8hq"}}`
 	require.Equal(t, expected, string(res))
 }
 

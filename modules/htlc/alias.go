@@ -1,8 +1,8 @@
 package htlc
 
 import (
-	"github.com/irisnet/irishub/app/v2/htlc/internal/keeper"
-	"github.com/irisnet/irishub/app/v2/htlc/internal/types"
+	"github.com/irisnet/irishub/modules/htlc/internal/keeper"
+	"github.com/irisnet/irishub/modules/htlc/internal/types"
 )
 
 // exported types
@@ -43,8 +43,6 @@ var (
 	REFUNDED = types.REFUNDED
 
 	QueryHTLC = types.QueryHTLC
-
-	TagHashLock = types.TagHashLock
 
 	NewKeeper  = keeper.NewKeeper
 	NewQuerier = keeper.NewQuerier

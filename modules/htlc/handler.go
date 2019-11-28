@@ -1,7 +1,7 @@
 package htlc
 
 import (
-	sdk "github.com/irisnet/irishub/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 // NewHandler handles all "htlc" messages
@@ -37,36 +37,42 @@ func handleMsgCreateHTLC(ctx sdk.Context, k Keeper, msg MsgCreateHTLC) sdk.Resul
 		state,
 	)
 
-	tags, err := k.CreateHTLC(ctx, htlc, msg.HashLock)
+	event, err := k.CreateHTLC(ctx, htlc, msg.HashLock)
 	if err != nil {
 		return err.Result()
 	}
 
+	ctx.EventManager().EmitEvents(sdk.Events{event})
+
 	return sdk.Result{
-		Tags: tags,
+		Events: ctx.EventManager().Events(),
 	}
 }
 
 // handleMsgClaimHTLC handles MsgClaimHTLC
 func handleMsgClaimHTLC(ctx sdk.Context, k Keeper, msg MsgClaimHTLC) sdk.Result {
-	tags, err := k.ClaimHTLC(ctx, msg.HashLock, msg.Secret)
+	event, err := k.ClaimHTLC(ctx, msg.HashLock, msg.Secret)
 	if err != nil {
 		return err.Result()
 	}
 
+	ctx.EventManager().EmitEvents(sdk.Events{event})
+
 	return sdk.Result{
-		Tags: tags,
+		Events: ctx.EventManager().Events(),
 	}
 }
 
 // handleMsgRefundHTLC handles MsgRefundHTLC
 func handleMsgRefundHTLC(ctx sdk.Context, k Keeper, msg MsgRefundHTLC) sdk.Result {
-	tags, err := k.RefundHTLC(ctx, msg.HashLock)
+	event, err := k.RefundHTLC(ctx, msg.HashLock)
 	if err != nil {
 		return err.Result()
 	}
 
+	ctx.EventManager().EmitEvents(sdk.Events{event})
+
 	return sdk.Result{
-		Tags: tags,
+		Events: ctx.EventManager().Events(),
 	}
 }

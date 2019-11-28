@@ -1,12 +1,11 @@
 package types
 
 import (
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"strings"
 
-	sdk "github.com/irisnet/irishub/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 // HTLC represents an HTLC
@@ -48,15 +47,16 @@ func NewHTLC(
 func (h HTLC) GetHashLock() []byte {
 	if h.State == COMPLETED {
 		if h.Timestamp > 0 {
-			return sdk.SHA256(append(h.Secret, sdk.Uint64ToBigEndian(h.Timestamp)...))
+			return SHA256(append(h.Secret, sdk.Uint64ToBigEndian(h.Timestamp)...))
 		}
 
-		return sdk.SHA256(h.Secret)
+		return SHA256(h.Secret)
 	}
 
 	return nil
 }
 
+/*
 // String implements fmt.Stringer
 func (h HTLC) String() string {
 	return fmt.Sprintf(`HTLC:
@@ -100,6 +100,7 @@ func (h HTLC) HumanString(converter sdk.CoinsConverter) string {
 		h.State,
 	)
 }
+*/
 
 // HTLCState represents the state of an HTLC
 type HTLCState byte

@@ -3,10 +3,12 @@ package keeper
 import (
 	"fmt"
 
-	"github.com/irisnet/irishub/app/v2/htlc/internal/types"
-	"github.com/irisnet/irishub/codec"
-	sdk "github.com/irisnet/irishub/types"
 	abci "github.com/tendermint/tendermint/abci/types"
+
+	"github.com/cosmos/cosmos-sdk/codec"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	"github.com/irisnet/irishub/modules/htlc/internal/types"
 )
 
 func NewQuerier(k Keeper) sdk.Querier {
@@ -24,7 +26,7 @@ func queryHTLC(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, s
 	var params types.QueryHTLCParams
 	err := keeper.cdc.UnmarshalJSON(req.Data, &params)
 	if err != nil {
-		return nil, sdk.ParseParamsErr(err)
+		return nil, sdk.ErrUnknownRequest(sdk.AppendMsgToErr("incorrectly formatted request data", err.Error()))
 	}
 
 	if len(params.HashLock) != types.HashLockLength {
@@ -38,7 +40,7 @@ func queryHTLC(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, s
 
 	bz, err := codec.MarshalJSONIndent(keeper.cdc, htlc)
 	if err != nil {
-		return nil, sdk.MarshalResultErr(err)
+		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", err.Error()))
 	}
 
 	return bz, nil
