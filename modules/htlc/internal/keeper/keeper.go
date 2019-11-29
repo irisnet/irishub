@@ -10,6 +10,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
+	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/modules/htlc/internal/types"
 )
 
@@ -193,10 +194,10 @@ func (k Keeper) DeleteHTLCFromExpireQueue(ctx sdk.Context, expireHeight uint64, 
 // GetHashLock calculates the hash lock from the given secret and timestamp
 func GetHashLock(secret []byte, timestamp uint64) []byte {
 	if timestamp > 0 {
-		return types.SHA256(append(secret, sdk.Uint64ToBigEndian(timestamp)...))
+		return app.SHA256(append(secret, sdk.Uint64ToBigEndian(timestamp)...))
 	}
 
-	return types.SHA256(secret)
+	return app.SHA256(secret)
 }
 
 // IterateHTLCs iterates through the HTLCs

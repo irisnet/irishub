@@ -1,80 +1,85 @@
 package keeper
 
-// import (
-// 	"testing"
+import (
+	"testing"
 
-// 	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/require"
 
-// 	dbm "github.com/tendermint/tm-db"
-// 	abci "github.com/tendermint/tendermint/abci/types"
-// 	"github.com/tendermint/tendermint/crypto/secp256k1"
-// 	"github.com/tendermint/tendermint/libs/log"
+	abci "github.com/tendermint/tendermint/abci/types"
+	"github.com/tendermint/tendermint/crypto/secp256k1"
+	"github.com/tendermint/tendermint/libs/log"
+	dbm "github.com/tendermint/tm-db"
 
-// 	sdk "github.com/cosmos/cosmos-sdk/types"
-// 	"github.com/cosmos/cosmos-sdk/x/auth"
-// 	"github.com/cosmos/cosmos-sdk/x/bank"
-// 	"github.com/cosmos/cosmos-sdk/codec"
-// 	"github.com/cosmos/cosmos-sdk/store"
+	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/cosmos/cosmos-sdk/store"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/x/auth"
+	"github.com/cosmos/cosmos-sdk/x/auth/exported"
+	"github.com/cosmos/cosmos-sdk/x/bank"
+	"github.com/cosmos/cosmos-sdk/x/params"
 
-// 	"github.com/irisnet/irishub/app/protocol" // TODO
-// 	"github.com/irisnet/irishub/modules/htlc/internal/types"
-// )
+	"github.com/irisnet/irishub/app/protocol"
+	"github.com/irisnet/irishub/modules/htlc/internal/types"
+)
 
-// // create a codec used only for testing
-// func makeTestCodec() *codec.Codec {
-// 	var cdc = codec.New()
+// TODO: denom "iris"
 
-// 	bank.RegisterCodec(cdc)
-// 	auth.RegisterCodec(cdc)
-// 	types.RegisterCodec(cdc)
-// 	sdk.RegisterCodec(cdc)
-// 	codec.RegisterCrypto(cdc)
+// create a codec used only for testing
+func makeTestCodec() *codec.Codec {
+	var cdc = codec.New()
 
-// 	return cdc
-// }
+	bank.RegisterCodec(cdc)
+	auth.RegisterCodec(cdc)
+	types.RegisterCodec(cdc)
+	sdk.RegisterCodec(cdc)
+	codec.RegisterCrypto(cdc)
 
-// func createTestInput(t *testing.T, amt sdk.Int, nAccs int64) (sdk.Context, Keeper, auth.AccountKeeper, []auth.Account) {
-// 	keyAcc := protocol.KeyAccount
-// 	keyParams := protocol.KeyParams
-// 	tkeyParams := protocol.TkeyParams
-// 	htlcKey := sdk.NewKVStoreKey("htlckey")
+	return cdc
+}
 
-// 	db := dbm.NewMemDB()
-// 	ms := store.NewCommitMultiStore(db)
-// 	ms.MountStoreWithDB(keyAcc, sdk.StoreTypeIAVL, db)
-// 	ms.MountStoreWithDB(keyParams, sdk.StoreTypeIAVL, db)
-// 	ms.MountStoreWithDB(tkeyParams, sdk.StoreTypeTransient, db)
-// 	ms.MountStoreWithDB(htlcKey, sdk.StoreTypeIAVL, db)
-// 	err := ms.LoadLatestVersion()
-// 	require.Nil(t, err)
+func createTestInput(t *testing.T, amt sdk.Int, nAccs int64) (sdk.Context, Keeper, auth.AccountKeeper, []exported.Account) {
+	keyAcc := protocol.KeyAccount
+	keyParams := protocol.KeyParams
+	tkeyParams := protocol.TkeyParams
+	htlcKey := sdk.NewKVStoreKey("htlckey")
 
-// 	cdc := makeTestCodec()
-// 	ctx := sdk.NewContext(ms, abci.Header{ChainID: "htlc-chain"}, false, log.NewNopLogger())
+	db := dbm.NewMemDB()
+	ms := store.NewCommitMultiStore(db)
+	ms.MountStoreWithDB(keyAcc, sdk.StoreTypeIAVL, db)
+	ms.MountStoreWithDB(keyParams, sdk.StoreTypeIAVL, db)
+	ms.MountStoreWithDB(tkeyParams, sdk.StoreTypeTransient, db)
+	ms.MountStoreWithDB(htlcKey, sdk.StoreTypeIAVL, db)
+	err := ms.LoadLatestVersion()
+	require.Nil(t, err)
 
-// 	ak := auth.NewAccountKeeper(cdc, keyAcc, auth.ProtoBaseAccount)
-// 	bk := bank.NewBaseKeeper(cdc, ak)
+	cdc := makeTestCodec()
+	ctx := sdk.NewContext(ms, abci.Header{ChainID: "htlc-chain"}, false, log.NewNopLogger())
 
-// 	initialCoins := sdk.Coins{
-// 		sdk.NewCoin(sdk.IrisAtto, amt),
-// 	}
-// 	initialCoins = initialCoins.Sort()
-// 	accs := createTestAccs(ctx, int(nAccs), initialCoins, &ak)
-// 	keeper := NewKeeper(cdc, htlcKey, bk, types.DefaultCodespace)
+	pk := params.NewKeeper(cdc, keyParams, tkeyParams, params.DefaultCodespace)
+	ak := auth.NewAccountKeeper(cdc, keyAcc, pk.Subspace(auth.DefaultParamspace), auth.ProtoBaseAccount)
+	bk := bank.NewBaseKeeper(ak, pk.Subspace(bank.DefaultParamspace), bank.DefaultCodespace, make(map[string]bool))
 
-// 	return ctx, keeper, ak, accs
-// }
+	initialCoins := sdk.Coins{
+		sdk.NewCoin("iris", amt),
+	}
+	initialCoins = initialCoins.Sort()
+	accs := createTestAccs(ctx, int(nAccs), initialCoins, &ak)
+	keeper := NewKeeper(cdc, htlcKey, bk, types.DefaultCodespace)
 
-// func createTestAccs(ctx sdk.Context, numAccs int, initialCoins sdk.Coins, ak *auth.AccountKeeper) (accs []auth.Account) {
-// 	for i := 0; i < numAccs; i++ {
-// 		privKey := secp256k1.GenPrivKey()
-// 		pubKey := privKey.PubKey()
-// 		addr := sdk.AccAddress(pubKey.Address())
-// 		acc := auth.NewBaseAccountWithAddress(addr)
-// 		acc.Coins = initialCoins
-// 		acc.PubKey = pubKey
-// 		acc.AccountNumber = uint64(i)
-// 		ak.SetAccount(ctx, &acc)
-// 		accs = append(accs, &acc)
-// 	}
-// 	return
-// }
+	return ctx, keeper, ak, accs
+}
+
+func createTestAccs(ctx sdk.Context, numAccs int, initialCoins sdk.Coins, ak *auth.AccountKeeper) (accs []exported.Account) {
+	for i := 0; i < numAccs; i++ {
+		privKey := secp256k1.GenPrivKey()
+		pubKey := privKey.PubKey()
+		addr := sdk.AccAddress(pubKey.Address())
+		acc := auth.NewBaseAccountWithAddress(addr)
+		acc.Coins = initialCoins
+		acc.PubKey = pubKey
+		acc.AccountNumber = uint64(i)
+		ak.SetAccount(ctx, &acc)
+		accs = append(accs, &acc)
+	}
+	return
+}

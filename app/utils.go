@@ -2,6 +2,7 @@
 package app
 
 import (
+	"crypto/sha256"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -34,4 +35,10 @@ func NewIrisAppUNSAFE(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLa
 
 	gapp = NewIrisApp(logger, db, traceStore, loadLatest, invCheckPeriod, baseAppOptions...)
 	return gapp, gapp.keys[bam.MainStoreKey], gapp.keys[staking.StoreKey], gapp.stakingKeeper
+}
+
+// SHA256 wraps sha256.Sum256 with result converted to slice
+func SHA256(data []byte) []byte {
+	sum := sha256.Sum256(data)
+	return sum[:]
 }

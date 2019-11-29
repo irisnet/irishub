@@ -7,7 +7,11 @@ import (
 	"github.com/stretchr/testify/require"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	"github.com/irisnet/irishub/app"
 )
+
+// TODO: denom "iris"
 
 var (
 	senderAddr           sdk.AccAddress
@@ -16,7 +20,7 @@ var (
 	amount               = sdk.NewCoins(sdk.NewCoin("iris", sdk.NewInt(10)))
 	secret               = []byte("___abcdefghijklmnopqrstuvwxyz___")
 	timestamp            = uint64(1580000000)
-	hashLock             = SHA256(append(secret, sdk.Uint64ToBigEndian(timestamp)...))
+	hashLock             = app.SHA256(append(secret, sdk.Uint64ToBigEndian(timestamp)...))
 	timeLock             = uint64(50)
 )
 
