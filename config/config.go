@@ -1,8 +1,10 @@
 package config
 
 const (
-	Testnet = "testnet"
-	Mainnet = "mainnet"
+	Iris           = "iris"
+	DefaultKeyPass = "1234567890"
+	Testnet        = "testnet"
+	Mainnet        = "mainnet"
 )
 
 // Can be configured through environment variables

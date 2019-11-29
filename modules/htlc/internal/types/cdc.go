@@ -4,6 +4,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 )
 
+// module codec
+var ModuleCdc = codec.New()
+
 // Register concrete types on codec
 func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(MsgCreateHTLC{}, "irishub/htlc/MsgCreateHTLC", nil)
@@ -14,8 +17,6 @@ func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(&Params{}, "irishub/htlc/Params", nil)
 }
 
-var msgCdc = codec.New()
-
 func init() {
-	RegisterCodec(msgCdc)
+	RegisterCodec(ModuleCdc)
 }

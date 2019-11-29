@@ -9,13 +9,10 @@ import (
 const (
 	// MsgRoute identifies transaction types
 	MsgRoute = "htlc"
-
 	// type for MsgCreateHTLC
 	TypeMsgCreateHTLC = "create_htlc"
-
 	// type for MsgClaimHTLC
 	TypeMsgClaimHTLC = "claim_htlc"
-
 	// type for MsgRefundHTLC
 	TypeMsgRefundHTLC = "refund_htlc"
 
@@ -99,7 +96,7 @@ func (msg MsgCreateHTLC) ValidateBasic() sdk.Error {
 
 // Implements Msg.
 func (msg MsgCreateHTLC) GetSignBytes() []byte {
-	b, err := msgCdc.MarshalJSON(msg)
+	b, err := ModuleCdc.MarshalJSON(msg)
 	if err != nil {
 		panic(err)
 	}
@@ -159,7 +156,7 @@ func (msg MsgClaimHTLC) ValidateBasic() sdk.Error {
 
 // Implements Msg.
 func (msg MsgClaimHTLC) GetSignBytes() []byte {
-	b, err := msgCdc.MarshalJSON(msg)
+	b, err := ModuleCdc.MarshalJSON(msg)
 	if err != nil {
 		panic(err)
 	}
@@ -212,7 +209,7 @@ func (msg MsgRefundHTLC) ValidateBasic() sdk.Error {
 
 // Implements Msg.
 func (msg MsgRefundHTLC) GetSignBytes() []byte {
-	b, err := msgCdc.MarshalJSON(msg)
+	b, err := ModuleCdc.MarshalJSON(msg)
 	if err != nil {
 		panic(err)
 	}

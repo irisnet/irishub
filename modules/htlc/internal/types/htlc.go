@@ -139,9 +139,9 @@ func HTLCStateFromString(str string) (HTLCState, error) {
 func (state HTLCState) Format(s fmt.State, verb rune) {
 	switch verb {
 	case 's':
-		s.Write([]byte(fmt.Sprintf("%s", state.String())))
+		_, _ = s.Write([]byte(fmt.Sprintf("%s", state.String())))
 	default:
-		s.Write([]byte(fmt.Sprintf("%v", byte(state))))
+		_, _ = s.Write([]byte(fmt.Sprintf("%v", byte(state))))
 	}
 }
 

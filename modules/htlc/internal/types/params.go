@@ -38,6 +38,6 @@ func DefaultParamsForTest() Params {
 	return Params{}
 }
 
-func ValidateParams(p Params) error {
+func ValidateParams(_ Params) error {
 	return nil
 }

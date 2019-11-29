@@ -4,9 +4,11 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-// NewHandler handles all "htlc" messages
+// NewHandler handles all htlc messages
 func NewHandler(k Keeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
+		ctx = ctx.WithEventManager(sdk.NewEventManager())
+
 		switch msg := msg.(type) {
 		case MsgCreateHTLC:
 			return handleMsgCreateHTLC(ctx, k, msg)

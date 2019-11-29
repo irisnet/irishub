@@ -19,10 +19,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/params"
 
 	"github.com/irisnet/irishub/app/protocol"
+	"github.com/irisnet/irishub/config"
 	"github.com/irisnet/irishub/modules/htlc/internal/types"
 )
-
-// TODO: denom "iris"
 
 // create a codec used only for testing
 func makeTestCodec() *codec.Codec {
@@ -60,7 +59,7 @@ func createTestInput(t *testing.T, amt sdk.Int, nAccs int64) (sdk.Context, Keepe
 	bk := bank.NewBaseKeeper(ak, pk.Subspace(bank.DefaultParamspace), bank.DefaultCodespace, make(map[string]bool))
 
 	initialCoins := sdk.Coins{
-		sdk.NewCoin("iris", amt),
+		sdk.NewCoin(config.Iris, amt),
 	}
 	initialCoins = initialCoins.Sort()
 	accs := createTestAccs(ctx, int(nAccs), initialCoins, &ak)

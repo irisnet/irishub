@@ -10,14 +10,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/cosmos/cosmos-sdk/client"
-
 	"github.com/stretchr/testify/require"
 
+	"github.com/tendermint/tendermint/crypto"
 	tmtypes "github.com/tendermint/tendermint/types"
 
-	"github.com/irisnet/irishub/app"
-
+	"github.com/cosmos/cosmos-sdk/client"
 	clientkeys "github.com/cosmos/cosmos-sdk/client/keys"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/crypto/keys"
@@ -30,6 +28,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/gov"
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/cosmos/cosmos-sdk/x/staking"
+
+	"github.com/irisnet/irishub/app"
+	htlcmodule "github.com/irisnet/irishub/modules/htlc"
 )
 
 const (
@@ -165,7 +166,7 @@ func InitFixtures(t *testing.T) (f *Fixtures) {
 		f.KeyAddress(keyVesting), startCoins,
 		fmt.Sprintf("--vesting-amount=%s", vestingCoins),
 		fmt.Sprintf("--vesting-start-time=%d", time.Now().UTC().UnixNano()),
-		fmt.Sprintf("--vesting-end-time=%d", time.Now().Add(60*time.Second).UTC().UnixNano()),
+		fmt.Sprintf("--vesting-end-time=%d", time.Now().Add(60 * time.Second).UTC().UnixNano()),
 	)
 
 	f.GenTx(keyFoo)
@@ -729,6 +730,43 @@ func executeWriteRetStdStreams(t *testing.T, cmdStr string, writes ...string) (b
 
 	// Return succes, stdout, stderr
 	return proc.ExitState.Success(), string(stdout), string(stderr)
+}
+
+func executeGetAddrPK(t *testing.T, cmdStr string) (sdk.AccAddress, crypto.PubKey) {
+	cdc := app.MakeCodec()
+	out, _ := tests.ExecuteT(t, cmdStr, "")
+	var ko keys.KeyOutput
+	_ = cdc.UnmarshalJSON([]byte(out), &ko)
+
+	pk, err := sdk.GetAccPubKeyBech32(ko.PubKey)
+	require.NoError(t, err)
+
+	accAddr, err := sdk.AccAddressFromBech32(ko.Address)
+	require.NoError(t, err)
+
+	return accAddr, pk
+}
+
+func executeGetAccount(t *testing.T, cmdStr string) (acc auth.BaseAccount) {
+	cdc := app.MakeCodec()
+	out, _ := tests.ExecuteT(t, cmdStr, "")
+	var initRes map[string]json.RawMessage
+	err := json.Unmarshal([]byte(out), &initRes)
+	require.NoError(t, err, "out %v, err %v", out, err)
+
+	err = cdc.UnmarshalJSON([]byte(out), &acc)
+	require.NoError(t, err, "acc %v, err %v", string(out), err)
+
+	return acc
+}
+
+func executeGetHTLC(t *testing.T, cmdStr string) htlcmodule.HTLC {
+	cdc := app.MakeCodec()
+	out, _ := tests.ExecuteT(t, cmdStr, "")
+	var htlc htlcmodule.HTLC
+	err := cdc.UnmarshalJSON([]byte(out), &htlc)
+	require.NoError(t, err, "out %v\n, err %v", out, err)
+	return htlc
 }
 
 //___________________________________________________________________________________

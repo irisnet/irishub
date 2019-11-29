@@ -4,3 +4,7 @@ package types
 type GenesisState struct {
 	PendingHTLCs map[string]HTLC // claimable HTLCs
 }
+
+func ValidateGenesis(data GenesisState) error {
+	return nil
+}

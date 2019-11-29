@@ -8,10 +8,9 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/irisnet/irishub/app"
+	"github.com/irisnet/irishub/config"
 	"github.com/irisnet/irishub/modules/htlc/internal/types"
 )
-
-// TODO: denom "iris"
 
 func TestKeeper_CreateHTLC(t *testing.T) {
 	ctx, keeper, ak, accs := createTestInput(t, sdk.NewInt(5000000000), 2)
@@ -20,7 +19,7 @@ func TestKeeper_CreateHTLC(t *testing.T) {
 	receiverAddr := accs[1].GetAddress().Bytes()
 	receiverOnOtherChain := "receiverOnOtherChain"
 
-	amount := sdk.NewCoins(sdk.NewCoin("iris", sdk.NewInt(10)))
+	amount := sdk.NewCoins(sdk.NewCoin(config.Iris, sdk.NewInt(10)))
 	secret := []byte("___abcdefghijklmnopqrstuvwxyz___")
 	timestamp := uint64(1580000000)
 	hashLock := app.SHA256(append(secret, sdk.Uint64ToBigEndian(timestamp)...))
@@ -89,7 +88,7 @@ func TestKeeper_ClaimHTLC(t *testing.T) {
 	senderAddr := accs[0].GetAddress().Bytes()
 	receiverAddr := accs[1].GetAddress().Bytes()
 	receiverOnOtherChain := "receiverOnOtherChain"
-	amount := sdk.NewCoins(sdk.NewCoin("iris", sdk.NewInt(10)))
+	amount := sdk.NewCoins(sdk.NewCoin(config.Iris, sdk.NewInt(10)))
 	secret1 := []byte("___abcdefghijklmnopqrstuvwxyz___")
 	secret2 := []byte("___00000000000000000000000000___")
 	timestamp := uint64(1580000000)
@@ -206,7 +205,7 @@ func TestKeeper_RefundHTLC(t *testing.T) {
 	senderAddr := accs[0].GetAddress().Bytes()
 	receiverAddr := accs[1].GetAddress().Bytes()
 	receiverOnOtherChain := "receiverOnOtherChain"
-	amount := sdk.NewCoins(sdk.NewCoin("iris", sdk.NewInt(10)))
+	amount := sdk.NewCoins(sdk.NewCoin(config.Iris, sdk.NewInt(10)))
 	timestamp := uint64(1580000000)
 	secret := []byte("___abcdefghijklmnopqrstuvwxyz___")
 	hashLock := app.SHA256(append(secret, sdk.Uint64ToBigEndian(timestamp)...))

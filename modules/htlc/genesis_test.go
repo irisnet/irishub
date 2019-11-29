@@ -20,9 +20,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/params"
 
 	"github.com/irisnet/irishub/app/protocol"
+	"github.com/irisnet/irishub/config"
 )
-
-// TODO: denom "iris"
 
 func setupMultiStore() (sdk.MultiStore, *sdk.KVStoreKey, *sdk.KVStoreKey) {
 	db := dbm.NewMemDB()
@@ -64,7 +63,7 @@ func TestExportHTLCGenesis(t *testing.T) {
 	senderAddrs := []sdk.AccAddress{sdk.AccAddress([]byte("sender1")), sdk.AccAddress([]byte("sender2"))}
 	receiverAddrs := []sdk.AccAddress{sdk.AccAddress([]byte("receiver1")), sdk.AccAddress([]byte("receiver2"))}
 	receiverOnOtherChain := "receiverOnOtherChain"
-	amount := sdk.NewCoins(sdk.NewCoin("iris", sdk.NewInt(0)))
+	amount := sdk.NewCoins(sdk.NewCoin(config.Iris, sdk.NewInt(0)))
 	secret := []byte("___abcdefghijklmnopqrstuvwxyz___")
 	timestamps := []uint64{uint64(1580000000), 0}
 	hashLocks := [][]byte{GetHashLock(secret, timestamps[0]), GetHashLock(secret, timestamps[1])}
