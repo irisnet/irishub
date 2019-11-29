@@ -29,19 +29,12 @@ func NewKeeper(cdc *codec.Codec, key sdk.StoreKey,
 	return keeper
 }
 
-//____________________________________________________________________
-// Keys
-
-var (
-	minterKey = []byte{0x00} // the one key to use for the keeper store
-)
-
 //______________________________________________________________________
 
 // get the minter
 func (k Keeper) GetMinter(ctx sdk.Context) (minter types.Minter) {
 	store := ctx.KVStore(k.storeKey)
-	b := store.Get(minterKey)
+	b := store.Get(types.MinterKey)
 	if b == nil {
 		panic("Stored minter should not have been nil")
 	}
@@ -68,7 +61,7 @@ func (k Keeper) AddCollectedFees(ctx sdk.Context, coins sdk.Coins) sdk.Error {
 func (k Keeper) SetMinter(ctx sdk.Context, minter types.Minter) {
 	store := ctx.KVStore(k.storeKey)
 	b := k.cdc.MustMarshalBinaryLengthPrefixed(minter)
-	store.Set(minterKey, b)
+	store.Set(types.MinterKey, b)
 }
 
 // get inflation params from the global param store
