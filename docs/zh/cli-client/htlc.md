@@ -32,8 +32,8 @@ iriscli htlc create --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --to=<
 | --to                      | string   | 是   |      | Bech32编码的收款人地址                                        |
 | --receiver-on-other-chain | bytesHex |      |      | 另一条链上的HTLC认领接收地址                          |
 | --amount                  | string   | 是   |      | 要发送的金额                                      |
-| --secret                  | bytesHex |      |      | 用于生成Hash Lock的secret, 缺省将随机生成    |
-| --hash-lock               | bytesHex | 是   |      | 由secret和时间戳（如果提供）生成的sha256哈希 |
+| --secret                  | bytesHex |      |      | 用于生成Hash Lock的secret，缺省将随机生成    |
+| --hash-lock               | bytesHex |      |      | 由secret和时间戳（如果提供）生成的sha256哈希，缺省将使用secret生成 |
 | --time-lock               | string   | 是   |      | 资金锁定的区块数                                  |
 | --timestamp               | uint     |      |      | 参与生成hash lock的10位时间戳（可选）           |
 
