@@ -1,8 +1,7 @@
-//nolint
 package types
 
 import (
-	sdk "github.com/irisnet/irishub/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 // Asset errors reserve 100 ~ 199.
@@ -134,10 +133,6 @@ func ErrInvalidAddress(codespace sdk.CodespaceType, msg string) sdk.Error {
 
 func ErrInvalidToAddress(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidToAddress, msg)
-}
-
-func ErrUnauthorizedIssueGatewayAsset(codespace sdk.CodespaceType, msg string) sdk.Error {
-	return sdk.NewError(codespace, CodeUnauthorizedIssueGatewayAsset, msg)
 }
 
 //----------------------------------------

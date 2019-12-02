@@ -2,9 +2,9 @@ package asset
 
 import (
 	"fmt"
-	"strings"
 
-	sdk "github.com/irisnet/irishub/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/irisnet/irishub/modules/asset/types"
 )
 
 // handle all "asset" type messages.
@@ -13,14 +13,8 @@ func NewHandler(k Keeper) sdk.Handler {
 		switch msg := msg.(type) {
 		case MsgIssueToken:
 			return handleIssueToken(ctx, k, msg)
-		case MsgCreateGateway:
-			return handleMsgCreateGateway(ctx, k, msg)
-		case MsgEditGateway:
-			return handleMsgEditGateway(ctx, k, msg)
 		case MsgEditToken:
 			return handleMsgEditToken(ctx, k, msg)
-		case MsgTransferGatewayOwner:
-			return handleMsgTransferGatewayOwner(ctx, k, msg)
 		case MsgMintToken:
 			return handleMsgMintToken(ctx, k, msg)
 		case MsgTransferTokenOwner:
@@ -51,107 +45,101 @@ func handleIssueToken(ctx sdk.Context, k Keeper, msg MsgIssueToken) sdk.Result {
 			return err.Result()
 		}
 		break
-	case GATEWAY:
-		// handle fee for gateway token
-		if err := GatewayTokenIssueFeeHandler(ctx, k, msg.Owner, msg.Symbol); err != nil {
-			return err.Result()
-		}
-		break
 	default:
 		break
 	}
 
-	tags, err := k.IssueToken(ctx, token)
+	err := k.IssueToken(ctx, token)
 	if err != nil {
 		return err.Result()
 	}
 
-	return sdk.Result{
-		Tags: tags,
-	}
-}
-
-// handleMsgCreateGateway handles MsgCreateGateway
-func handleMsgCreateGateway(ctx sdk.Context, k Keeper, msg MsgCreateGateway) sdk.Result {
-	// handle fee
-	if err := GatewayCreateFeeHandler(ctx, k, msg.Owner, msg.Moniker); err != nil {
-		return err.Result()
-	}
-
-	// convert moniker to lowercase
-	msg.Moniker = strings.ToLower(msg.Moniker)
-
-	tags, err := k.CreateGateway(ctx, msg)
-	if err != nil {
-		return err.Result()
-	}
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+		),
+		sdk.NewEvent(
+			types.EventTypeIssueToken,
+			sdk.NewAttribute(types.AttributeKeyTokenID, token.GetUniqueID()),
+			sdk.NewAttribute(types.AttributeKeyTokenDenom, token.GetDenom()),
+			sdk.NewAttribute(types.AttributeKeyTokenSource, token.GetSource().String()),
+			sdk.NewAttribute(types.AttributeKeyTokenGateway, token.GetGateway()),
+			sdk.NewAttribute(types.AttributeKeyTokenOwner, token.GetOwner().String()),
+		),
+	})
 
 	return sdk.Result{
-		Tags: tags,
-	}
-}
-
-// handleMsgEditGateway handles MsgEditGateway
-func handleMsgEditGateway(ctx sdk.Context, k Keeper, msg MsgEditGateway) sdk.Result {
-	// convert moniker to lowercase
-	msg.Moniker = strings.ToLower(msg.Moniker)
-
-	tags, err := k.EditGateway(ctx, msg)
-	if err != nil {
-		return err.Result()
-	}
-
-	return sdk.Result{
-		Tags: tags,
+		Events: ctx.EventManager().Events(),
 	}
 }
 
 // handleMsgEditToken handles MsgEditToken
 func handleMsgEditToken(ctx sdk.Context, k Keeper, msg MsgEditToken) sdk.Result {
-	tags, err := k.EditToken(ctx, msg)
-	if err != nil {
-		return err.Result()
-	}
-	return sdk.Result{
-		Tags: tags,
-	}
-}
-
-// handleMsgTransferGatewayOwner handles MsgTransferGatewayOwner
-func handleMsgTransferGatewayOwner(ctx sdk.Context, k Keeper, msg MsgTransferGatewayOwner) sdk.Result {
-	// convert moniker to lowercase
-	msg.Moniker = strings.ToLower(msg.Moniker)
-
-	tags, err := k.TransferGatewayOwner(ctx, msg)
+	err := k.EditToken(ctx, msg)
 	if err != nil {
 		return err.Result()
 	}
 
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+		),
+		sdk.NewEvent(
+			types.EventTypeEditToken,
+			sdk.NewAttribute(types.AttributeKeyTokenID, msg.TokenId),
+		),
+	})
+
 	return sdk.Result{
-		Tags: tags,
+		Events: ctx.EventManager().Events(),
 	}
 }
 
 // handleMsgTransferTokenOwner handles MsgTransferTokenOwner
 func handleMsgTransferTokenOwner(ctx sdk.Context, k Keeper, msg MsgTransferTokenOwner) sdk.Result {
-	tags, err := k.TransferTokenOwner(ctx, msg)
+	err := k.TransferTokenOwner(ctx, msg)
 	if err != nil {
 		return err.Result()
 	}
 
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+		),
+		sdk.NewEvent(
+			types.EventTypeTransferTokenOwner,
+			sdk.NewAttribute(types.AttributeKeyTokenID, msg.TokenId),
+		),
+	})
+
 	return sdk.Result{
-		Tags: tags,
+		Events: ctx.EventManager().Events(),
 	}
 }
 
 // handleMsgMintToken handles MsgMintToken
 func handleMsgMintToken(ctx sdk.Context, k Keeper, msg MsgMintToken) sdk.Result {
-	tags, err := k.MintToken(ctx, msg)
+	err := k.MintToken(ctx, msg)
 	if err != nil {
 		return err.Result()
 	}
 
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+		),
+		sdk.NewEvent(
+			types.EventTypeMintToken,
+			sdk.NewAttribute(types.AttributeKeyTokenID, msg.TokenId),
+			sdk.NewAttribute(sdk.AttributeKeyAmount, string(msg.Amount)),
+		),
+	})
+
 	return sdk.Result{
-		Tags: tags,
+		Events: ctx.EventManager().Events(),
 	}
 }

@@ -3,8 +3,9 @@ package types
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/pkg/errors"
 	"strings"
+
+	"github.com/pkg/errors"
 )
 
 type AssetSource byte

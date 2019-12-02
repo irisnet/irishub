@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	sdk "github.com/irisnet/irishub/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 const (
@@ -66,13 +66,13 @@ func (gfo GatewayFeeOutput) String() string {
 }
 
 // HumanString implements human
-func (gfo GatewayFeeOutput) HumanString(converter sdk.CoinsConverter) string {
+func (gfo GatewayFeeOutput) HumanString() string {
 	var out strings.Builder
 	if gfo.Exist {
 		out.WriteString("The gateway moniker has existed\n")
 	}
 
-	out.WriteString(fmt.Sprintf("Fee: %s", converter.ToMainUnit(sdk.Coins{gfo.Fee})))
+	out.WriteString(fmt.Sprintf("Fee: %s", gfo.Fee.String()))
 
 	return out.String()
 }
@@ -100,7 +100,7 @@ func (tfo TokenFeesOutput) String() string {
 }
 
 // String implements human
-func (tfo TokenFeesOutput) HumanString(converter sdk.CoinsConverter) string {
+func (tfo TokenFeesOutput) HumanString() string {
 	var out strings.Builder
 	if tfo.Exist {
 		out.WriteString("The token id has existed\n")
@@ -109,8 +109,8 @@ func (tfo TokenFeesOutput) HumanString(converter sdk.CoinsConverter) string {
 	out.WriteString(fmt.Sprintf(`Fees:
   IssueFee: %s
   MintFee:  %s`,
-		converter.ToMainUnit(sdk.Coins{tfo.IssueFee}),
-		converter.ToMainUnit(sdk.Coins{tfo.MintFee})))
+		tfo.IssueFee.String(),
+		tfo.MintFee.String()))
 
 	return out.String()
 }

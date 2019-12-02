@@ -1,16 +1,13 @@
 package types
 
 import (
-	"github.com/irisnet/irishub/codec"
+	"github.com/cosmos/cosmos-sdk/codec"
 )
 
 // Register concrete types on codec
 func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(MsgIssueToken{}, "irishub/asset/MsgIssueToken", nil)
-	cdc.RegisterConcrete(MsgCreateGateway{}, "irishub/asset/MsgCreateGateway", nil)
-	cdc.RegisterConcrete(MsgEditGateway{}, "irishub/asset/MsgEditGateway", nil)
 	cdc.RegisterConcrete(MsgEditToken{}, "irishub/asset/MsgEditToken", nil)
-	cdc.RegisterConcrete(MsgTransferGatewayOwner{}, "irishub/asset/MsgTransferGatewayOwner", nil)
 	cdc.RegisterConcrete(MsgMintToken{}, "irishub/asset/MsgMintToken", nil)
 	cdc.RegisterConcrete(MsgTransferTokenOwner{}, "irishub/asset/MsgTransferTokenOwner", nil)
 
@@ -21,8 +18,11 @@ func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(&Gateway{}, "irishub/asset/Gateway", nil)
 }
 
-var msgCdc = codec.New()
+// ModuleCdc
+var ModuleCdc *codec.Codec
 
 func init() {
-	RegisterCodec(msgCdc)
+	ModuleCdc = codec.New()
+	RegisterCodec(ModuleCdc)
+	ModuleCdc.Seal()
 }
