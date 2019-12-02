@@ -31,7 +31,7 @@ func NewKeeper(cdc *codec.Codec, key sdk.StoreKey,
 
 //______________________________________________________________________
 
-// get the minter
+// GetMinter returns the minter
 func (k Keeper) GetMinter(ctx sdk.Context) (minter types.Minter) {
 	store := ctx.KVStore(k.storeKey)
 	b := store.Get(types.MinterKey)
@@ -52,26 +52,26 @@ func (k Keeper) MintCoins(ctx sdk.Context, newCoins sdk.Coins) sdk.Error {
 	return k.supplyKeeper.MintCoins(ctx, types.ModuleName, newCoins)
 }
 
-// set inflation params from the global param store
+// AddCollectedFees set inflation params from the global param store
 func (k Keeper) AddCollectedFees(ctx sdk.Context, coins sdk.Coins) sdk.Error {
 	return k.supplyKeeper.SendCoinsFromModuleToModule(ctx, types.ModuleName, k.feeCollectorName, coins)
 }
 
-// set the minter
+// SetMinter set the minter
 func (k Keeper) SetMinter(ctx sdk.Context, minter types.Minter) {
 	store := ctx.KVStore(k.storeKey)
 	b := k.cdc.MustMarshalBinaryLengthPrefixed(minter)
 	store.Set(types.MinterKey, b)
 }
 
-// get inflation params from the global param store
+// GetParamSet returns inflation params from the global param store
 func (k Keeper) GetParamSet(ctx sdk.Context) types.Params {
 	var params types.Params
 	k.paramSpace.GetParamSet(ctx, &params)
 	return params
 }
 
-// set inflation params from the global param store
+// SetParamSet set inflation params from the global param store
 func (k Keeper) SetParamSet(ctx sdk.Context, params types.Params) {
 	k.paramSpace.SetParamSet(ctx, &params)
 }

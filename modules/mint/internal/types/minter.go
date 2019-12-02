@@ -28,7 +28,7 @@ func NewMinter(lastUpdate time.Time, inflationBase sdk.Int) Minter {
 }
 
 // minter object for a new chain
-func InitialMinter() Minter {
+func DefaultMinter() Minter {
 	return NewMinter(
 		time.Unix(0, 0),
 		initialIssue.Mul(sdk.NewIntWithDecimal(1, 18)), // 20*(10^8)iris, 20*(10^8)*(10^18)iris-atto

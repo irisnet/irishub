@@ -34,7 +34,7 @@ func createTestApp(isCheckTx bool) (*simapp.SimApp, sdk.Context) {
 		Inflation: sdk.NewDecWithPrec(4, 2),
 		MintDenom: "iris",
 	})
-	app.MintKeeper.SetMinter(ctx, types.InitialMinter())
+	app.MintKeeper.SetMinter(ctx, types.DefaultMinter())
 	app.SupplyKeeper.SetSupply(ctx, supply.Supply{})
 	app.DistrKeeper.SetFeePool(ctx, distribution.InitialFeePool())
 	return app, ctx

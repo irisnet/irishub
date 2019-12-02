@@ -5,7 +5,6 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/params"
-	"github.com/irisnet/irishub/config"
 )
 
 var _ params.ParamSet = (*Params)(nil)
@@ -13,6 +12,7 @@ var _ params.ParamSet = (*Params)(nil)
 // default paramspace for params keeper
 const (
 	DefaultParamSpace = "mint"
+	StakeDenom        = "iris-atto"
 )
 
 //Parameter store key
@@ -56,7 +56,7 @@ func (p *Params) GetParamSpace() string {
 func DefaultParams() Params {
 	return Params{
 		Inflation: sdk.NewDecWithPrec(4, 2),
-		MintDenom: config.StakeDenom,
+		MintDenom: StakeDenom,
 	}
 }
 
