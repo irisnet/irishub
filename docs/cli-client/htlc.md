@@ -32,8 +32,8 @@ iriscli htlc create --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --to=<
 | --to                      | string   | Yes      |         | Bech32 encoding address to receive coins                          |
 | --receiver-on-other-chain | string   |          |         | The claim receiving address on the other chain                 |
 | --amount                  | string   | Yes      |         | Similar to the amount in the original transfer                    |
-| --secret                  | bytesHex |          |         | The secret for generating the hash lock, omission will be randomly generated |
-| --hash-lock               | bytesHex | Yes      |         | The sha256 hash generated from secret (and timestamp if provided) |
+| --secret                  | bytesHex |          |         | The secret for generating the hash lock, randomly generated if omitted |
+| --hash-lock               | bytesHex | Yes      |         | The sha256 hash generated from secret (and timestamp if provided), generated from the secret flag if omitted |
 | --time-lock               | string   | Yes      |         | The number of blocks to wait before the asset may be returned to  |
 | --timestamp               | uint     |          |         | The timestamp in seconds for generating hash lock if provided     |
 

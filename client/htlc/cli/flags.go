@@ -25,6 +25,7 @@ func init() {
 	FsCreateHTLC.String(FlagReceiverOnOtherChain, "", "The claim receiving address on the other chain")
 	FsCreateHTLC.String(FlagAmount, "", "Similar to the amount in the original transfer")
 	FsCreateHTLC.BytesHex(FlagSecret, nil, "The secret for generating the hash lock, omission will be randomly generated")
+	FsCreateHTLC.BytesHex(FlagHashLock, nil, "The sha256 hash generated from secret (and timestamp if provided), omission will be generated from the secret flag")
 	FsCreateHTLC.Uint64(FlagTimestamp, 0, "The timestamp in seconds for generating the hash lock if provided")
 	FsCreateHTLC.String(FlagTimeLock, "", "The number of blocks to wait before the asset may be returned to")
 
