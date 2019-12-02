@@ -12,7 +12,7 @@ var _ params.ParamSet = (*Params)(nil)
 // default paramspace for params keeper
 const (
 	DefaultParamSpace = "mint"
-	StakeDenom        = "iris-atto"
+	MintDenom         = "iris-atto"
 )
 
 //Parameter store key
@@ -56,7 +56,7 @@ func (p *Params) GetParamSpace() string {
 func DefaultParams() Params {
 	return Params{
 		Inflation: sdk.NewDecWithPrec(4, 2),
-		MintDenom: StakeDenom,
+		MintDenom: MintDenom,
 	}
 }
 

@@ -32,7 +32,7 @@ func RandomizedGenState(simState *module.SimulationState) {
 		func(r *rand.Rand) { inflation = GenInflation(r) },
 	)
 
-	params := types.Params{Inflation: inflation, MintDenom: types.StakeDenom}
+	params := types.Params{Inflation: inflation, MintDenom: types.MintDenom}
 	mintGenesis := types.NewGenesisState(types.DefaultMinter(), params)
 
 	fmt.Printf("Selected randomly generated minting parameters:\n%s\n", codec.MustMarshalJSONIndent(simState.Cdc, mintGenesis))
