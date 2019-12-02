@@ -55,8 +55,8 @@ func GetCmdCreateHTLC(cdc *codec.Codec) *cobra.Command {
 			timestamp := viper.GetInt64(FlagTimestamp)
 			timeLock := viper.GetInt64(FlagTimeLock)
 
-			secret := make([]byte, 32)
-			hashLock := make([]byte, 32)
+			var secret []byte
+			var hashLock []byte
 
 			flags := cmd.Flags()
 			if flags.Changed(FlagHashLock) {
