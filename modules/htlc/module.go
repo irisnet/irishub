@@ -119,10 +119,14 @@ func (AppModule) Name() string {
 func (am AppModule) RegisterInvariants(_ sdk.InvariantRegistry) {}
 
 // Route returns the message routing key for the HTLC module.
-func (AppModule) Route() string { return "" }
+func (AppModule) Route() string {
+	return RouterKey
+}
 
 // NewHandler returns an sdk.Handler for the HTLC module.
-func (am AppModule) NewHandler() sdk.Handler { return nil }
+func (am AppModule) NewHandler() sdk.Handler {
+	return NewHandler(am.keeper)
+}
 
 // QuerierRoute returns the HTLC module's querier route name.
 func (AppModule) QuerierRoute() string {
