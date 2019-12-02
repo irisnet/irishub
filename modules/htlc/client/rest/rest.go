@@ -14,7 +14,8 @@ func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router) {
 	registerTxRoutes(cliCtx, r)
 }
 
-type createHTLCReq struct {
+// CreateHTLCReq defines the properties of a create HTLC request's body.
+type CreateHTLCReq struct {
 	BaseTx               rest.BaseReq   `json:"base_tx"`
 	Sender               sdk.AccAddress `json:"sender"`
 	To                   sdk.AccAddress `json:"to"`
@@ -25,12 +26,14 @@ type createHTLCReq struct {
 	Timestamp            uint64         `json:"timestamp"`
 }
 
-type claimHTLCReq struct {
+// ClaimHTLCReq defines the properties of a claim HTLC request's body.
+type ClaimHTLCReq struct {
 	BaseTx rest.BaseReq   `json:"base_tx"`
 	Sender sdk.AccAddress `json:"sender"`
 	Secret string         `json:"secret"`
 }
 
+// RefundHTLCReq defines the properties of a refund HTLC request's body.
 type RefundHTLCReq struct {
 	BaseTx rest.BaseReq   `json:"base_tx"`
 	Sender sdk.AccAddress `json:"sender"`

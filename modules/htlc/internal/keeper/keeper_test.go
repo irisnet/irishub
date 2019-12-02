@@ -7,7 +7,6 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/config"
 	"github.com/irisnet/irishub/modules/htlc/internal/types"
 )
@@ -22,7 +21,7 @@ func TestKeeper_CreateHTLC(t *testing.T) {
 	amount := sdk.NewCoins(sdk.NewCoin(config.Iris, sdk.NewInt(10)))
 	secret := []byte("___abcdefghijklmnopqrstuvwxyz___")
 	timestamp := uint64(1580000000)
-	hashLock := app.SHA256(append(secret, sdk.Uint64ToBigEndian(timestamp)...))
+	hashLock := types.SHA256(append(secret, sdk.Uint64ToBigEndian(timestamp)...))
 	timeLock := uint64(50)
 	expireHeight := timeLock + uint64(ctx.BlockHeight())
 	state := types.OPEN
@@ -77,9 +76,9 @@ func TestKeeper_CreateHTLC(t *testing.T) {
 
 func newHashLock(secret []byte, timestamp uint64) []byte {
 	if timestamp > 0 {
-		return app.SHA256(append(secret, sdk.Uint64ToBigEndian(timestamp)...))
+		return types.SHA256(append(secret, sdk.Uint64ToBigEndian(timestamp)...))
 	}
-	return app.SHA256(secret)
+	return types.SHA256(secret)
 }
 
 func TestKeeper_ClaimHTLC(t *testing.T) {
@@ -208,7 +207,7 @@ func TestKeeper_RefundHTLC(t *testing.T) {
 	amount := sdk.NewCoins(sdk.NewCoin(config.Iris, sdk.NewInt(10)))
 	timestamp := uint64(1580000000)
 	secret := []byte("___abcdefghijklmnopqrstuvwxyz___")
-	hashLock := app.SHA256(append(secret, sdk.Uint64ToBigEndian(timestamp)...))
+	hashLock := types.SHA256(append(secret, sdk.Uint64ToBigEndian(timestamp)...))
 	timeLock := uint64(50)
 	expireHeight := timeLock + uint64(ctx.BlockHeight())
 	state := types.EXPIRED

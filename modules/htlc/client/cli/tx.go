@@ -4,7 +4,6 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
-
 	"strings"
 
 	"github.com/spf13/cobra"

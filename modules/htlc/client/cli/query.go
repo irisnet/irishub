@@ -10,7 +10,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
 
-	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/modules/htlc/internal/types"
 )
 
@@ -57,7 +56,7 @@ func GetCmdQueryHTLC(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			route := fmt.Sprintf("custom/%s/%s", protocol.HtlcRoute, types.QueryHTLC)
+			route := fmt.Sprintf("custom/%s/%s", types.QuerierRoute, types.QueryHTLC)
 			res, _, err := cliCtx.QueryWithData(route, bz)
 			if err != nil {
 				return err

@@ -10,14 +10,15 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/modules/htlc/internal/types"
 )
 
 var (
-	HTLCLockedCoinsAccAddr = sdk.AccAddress(crypto.AddressHash([]byte("HTLCLockedCoins"))) // HTLCLockedCoinsAccAddr store All HTLC locked coins
+	// HTLCLockedCoinsAccAddr store All HTLC locked coins
+	HTLCLockedCoinsAccAddr = sdk.AccAddress(crypto.AddressHash([]byte("HTLCLockedCoins")))
 )
 
+// Keeper defines the HTLC module Keeper
 type Keeper struct {
 	storeKey sdk.StoreKey
 	cdc      *codec.Codec
@@ -76,6 +77,7 @@ func (k Keeper) CreateHTLC(ctx sdk.Context, htlc types.HTLC, hashLock []byte) (s
 	return createEvent, nil
 }
 
+// ClaimHTLC claim an HTLC
 func (k Keeper) ClaimHTLC(ctx sdk.Context, hashLock []byte, secret []byte) (sdk.Event, sdk.Error) {
 	// get the HTLC
 	htlc, err := k.GetHTLC(ctx, hashLock)
@@ -117,6 +119,7 @@ func (k Keeper) ClaimHTLC(ctx sdk.Context, hashLock []byte, secret []byte) (sdk.
 	return claimEvent, nil
 }
 
+// RefundHTLC refund an HTLC
 func (k Keeper) RefundHTLC(ctx sdk.Context, hashLock []byte) (sdk.Event, sdk.Error) {
 	// get the HTLC
 	htlc, err := k.GetHTLC(ctx, hashLock)
@@ -147,6 +150,7 @@ func (k Keeper) RefundHTLC(ctx sdk.Context, hashLock []byte) (sdk.Event, sdk.Err
 	return refundEvent, nil
 }
 
+// HasHashLock returns whether the hashlock already exists
 func (k Keeper) HasHashLock(ctx sdk.Context, hashLock []byte) bool {
 	store := ctx.KVStore(k.storeKey)
 	return store.Has(KeyHTLC(hashLock))
@@ -194,10 +198,10 @@ func (k Keeper) DeleteHTLCFromExpireQueue(ctx sdk.Context, expireHeight uint64, 
 // GetHashLock calculates the hash lock from the given secret and timestamp
 func GetHashLock(secret []byte, timestamp uint64) []byte {
 	if timestamp > 0 {
-		return app.SHA256(append(secret, sdk.Uint64ToBigEndian(timestamp)...))
+		return types.SHA256(append(secret, sdk.Uint64ToBigEndian(timestamp)...))
 	}
 
-	return app.SHA256(secret)
+	return types.SHA256(secret)
 }
 
 // IterateHTLCs iterates through the HTLCs

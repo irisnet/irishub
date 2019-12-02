@@ -19,7 +19,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	"github.com/cosmos/cosmos-sdk/x/params"
 
-	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/config"
 )
 
@@ -38,8 +37,8 @@ func setupMultiStore() (sdk.MultiStore, *sdk.KVStoreKey, *sdk.KVStoreKey) {
 
 func TestExportHTLCGenesis(t *testing.T) {
 	ms, accountKey, htlcKey := setupMultiStore()
-	keyParams := protocol.KeyParams
-	tkeyParams := protocol.TkeyParams
+	keyParams := sdk.NewKVStoreKey("params")
+	tkeyParams := sdk.NewTransientStoreKey("transient_params")
 
 	cdc := codec.New()
 	RegisterCodec(cdc)

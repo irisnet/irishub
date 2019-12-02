@@ -2,9 +2,10 @@ package htlc
 
 import (
 	"encoding/json"
+	"math/rand"
+
 	"github.com/gorilla/mux"
 	"github.com/spf13/cobra"
-	"math/rand"
 
 	abci "github.com/tendermint/tendermint/abci/types"
 
@@ -61,14 +62,13 @@ func (AppModuleBasic) RegisterRESTRoutes(ctx context.CLIContext, rtr *mux.Router
 }
 
 // GetTxCmd returns no root tx command for the HTLC module.
-func (AppModuleBasic) GetTxCmd(_ *codec.Codec) *cobra.Command {
-	return nil
+func (AppModuleBasic) GetTxCmd(cdc *codec.Codec) *cobra.Command {
+	return cli.GetTxCmd(cdc)
 }
 
 // GetQueryCmd returns the root query command for the HTLC module.
 func (AppModuleBasic) GetQueryCmd(cdc *codec.Codec) *cobra.Command {
 	return cli.GetQueryCmd(cdc)
-
 }
 
 //____________________________________________________________________________

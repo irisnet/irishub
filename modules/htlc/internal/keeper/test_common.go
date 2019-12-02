@@ -18,7 +18,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	"github.com/cosmos/cosmos-sdk/x/params"
 
-	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/config"
 	"github.com/irisnet/irishub/modules/htlc/internal/types"
 )
@@ -37,9 +36,9 @@ func makeTestCodec() *codec.Codec {
 }
 
 func createTestInput(t *testing.T, amt sdk.Int, nAccs int64) (sdk.Context, Keeper, auth.AccountKeeper, []exported.Account) {
-	keyAcc := protocol.KeyAccount
-	keyParams := protocol.KeyParams
-	tkeyParams := protocol.TkeyParams
+	keyAcc := sdk.NewKVStoreKey("acc")
+	keyParams := sdk.NewKVStoreKey("params")
+	tkeyParams := sdk.NewTransientStoreKey("transient_params")
 	htlcKey := sdk.NewKVStoreKey("htlckey")
 
 	db := dbm.NewMemDB()

@@ -6,8 +6,6 @@ import (
 	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-
-	"github.com/irisnet/irishub/app"
 )
 
 // HTLC represents an HTLC
@@ -49,10 +47,10 @@ func NewHTLC(
 func (h HTLC) GetHashLock() []byte {
 	if h.State == COMPLETED {
 		if h.Timestamp > 0 {
-			return app.SHA256(append(h.Secret, sdk.Uint64ToBigEndian(h.Timestamp)...))
+			return SHA256(append(h.Secret, sdk.Uint64ToBigEndian(h.Timestamp)...))
 		}
 
-		return app.SHA256(h.Secret)
+		return SHA256(h.Secret)
 	}
 
 	return nil

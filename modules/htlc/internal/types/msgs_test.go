@@ -8,7 +8,6 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/config"
 )
 
@@ -19,7 +18,7 @@ var (
 	amount               = sdk.NewCoins(sdk.NewCoin(config.Iris, sdk.NewInt(10)))
 	secret               = []byte("___abcdefghijklmnopqrstuvwxyz___")
 	timestamp            = uint64(1580000000)
-	hashLock             = app.SHA256(append(secret, sdk.Uint64ToBigEndian(timestamp)...))
+	hashLock             = SHA256(append(secret, sdk.Uint64ToBigEndian(timestamp)...))
 	timeLock             = uint64(50)
 )
 

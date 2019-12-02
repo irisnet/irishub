@@ -25,7 +25,7 @@ func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router) {
 
 func createHTLCHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req createHTLCReq
+		var req CreateHTLCReq
 		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
 			return
 		}
@@ -66,8 +66,8 @@ func claimHTLCHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		var req claimHTLCReq
-		if ! rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
+		var req ClaimHTLCReq
+		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
 			return
 		}
 
