@@ -1,6 +1,7 @@
 package app
 
 import (
+	"github.com/irisnet/irishub/modules/asset"
 	"io"
 	"os"
 
@@ -54,6 +55,7 @@ var (
 		crisis.AppModuleBasic{},
 		slashing.AppModuleBasic{},
 		supply.AppModuleBasic{},
+		asset.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -104,6 +106,7 @@ type IrisApp struct {
 	crisisKeeper   crisis.Keeper
 	paramsKeeper   params.Keeper
 	evidenceKeeper *evidence.Keeper
+	assetKeeper    asset.Keeper
 
 	// the module manager
 	mm *module.Manager
@@ -125,7 +128,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 	keys := sdk.NewKVStoreKeys(
 		bam.MainStoreKey, auth.StoreKey, staking.StoreKey, supply.StoreKey,
 		mint.StoreKey, distr.StoreKey, slashing.StoreKey, gov.StoreKey,
-		params.StoreKey, evidence.StoreKey,
+		params.StoreKey, evidence.StoreKey, asset.StoreKey,
 	)
 	tKeys := sdk.NewTransientStoreKeys(staking.TStoreKey, params.TStoreKey)
 
@@ -148,6 +151,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 	govSubspace := app.paramsKeeper.Subspace(gov.DefaultParamspace).WithKeyTable(gov.ParamKeyTable())
 	crisisSubspace := app.paramsKeeper.Subspace(crisis.DefaultParamspace)
 	evidenceSubspace := app.paramsKeeper.Subspace(evidence.DefaultParamspace)
+	assetSubspace := app.paramsKeeper.Subspace(asset.DefaultParamspace)
 
 	// add keepers
 	app.accountKeeper = auth.NewAccountKeeper(app.cdc, keys[auth.StoreKey], authSubspace, auth.ProtoBaseAccount)
@@ -188,6 +192,10 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 		staking.NewMultiStakingHooks(app.distrKeeper.Hooks(), app.slashingKeeper.Hooks()),
 	)
 
+	app.assetKeeper = asset.NewKeeper(
+		app.cdc, keys[asset.StoreKey], assetSubspace, asset.DefaultCodespace,
+		app.supplyKeeper, app.distrKeeper)
+
 	// NOTE: Any module instantiated in the module manager that is later modified
 	// must be passed by reference here.
 	app.mm = module.NewManager(
@@ -202,6 +210,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 		slashing.NewAppModule(app.slashingKeeper, app.stakingKeeper),
 		staking.NewAppModule(app.stakingKeeper, app.accountKeeper, app.supplyKeeper),
 		evidence.NewAppModule(*app.evidenceKeeper),
+		asset.NewAppModule(app.assetKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -235,6 +244,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 		distr.NewAppModule(app.distrKeeper, app.supplyKeeper),
 		staking.NewAppModule(app.stakingKeeper, app.accountKeeper, app.supplyKeeper),
 		slashing.NewAppModule(app.slashingKeeper, app.stakingKeeper),
+		asset.NewAppModule(app.assetKeeper),
 	)
 
 	app.sm.RegisterStoreDecoders()
