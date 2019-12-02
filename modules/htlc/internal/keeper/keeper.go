@@ -5,17 +5,10 @@ import (
 	"encoding/hex"
 	"fmt"
 
-	"github.com/tendermint/tendermint/crypto"
-
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/irisnet/irishub/modules/htlc/internal/types"
-)
-
-var (
-	// HTLCLockedCoinsAccAddr store All HTLC locked coins
-	HTLCLockedCoinsAccAddr = sdk.AccAddress(crypto.AddressHash([]byte("HTLCLockedCoins")))
 )
 
 // Keeper defines the HTLC module Keeper
@@ -23,16 +16,23 @@ type Keeper struct {
 	storeKey sdk.StoreKey
 	cdc      *codec.Codec
 	bk       types.BankKeeper
+	sk       types.SupplyKeeper
 
 	// codespace
 	codespace sdk.CodespaceType
 }
 
-func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, bk types.BankKeeper, codespace sdk.CodespaceType) Keeper {
+func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, bk types.BankKeeper, sk types.SupplyKeeper, codespace sdk.CodespaceType) Keeper {
+	// ensure htlc module account is set
+	if addr := sk.GetModuleAddress(types.ModuleName); addr == nil {
+		panic(fmt.Sprintf("%s module account has not been set", types.ModuleName))
+	}
+
 	return Keeper{
 		storeKey:  key,
 		cdc:       cdc,
 		bk:        bk,
+		sk:        sk,
 		codespace: codespace,
 	}
 }
@@ -55,7 +55,7 @@ func (k Keeper) CreateHTLC(ctx sdk.Context, htlc types.HTLC, hashLock []byte) (s
 	}
 
 	// transfer the specified tokens to a dedicated HTLC Address
-	if err := k.bk.SendCoins(ctx, htlc.Sender, HTLCLockedCoinsAccAddr, htlc.Amount); err != nil {
+	if err := k.bk.SendCoins(ctx, htlc.Sender, k.sk.GetModuleAddress(types.ModuleName), htlc.Amount); err != nil {
 		return sdk.Event{}, err
 	}
 
@@ -96,7 +96,7 @@ func (k Keeper) ClaimHTLC(ctx sdk.Context, hashLock []byte, secret []byte) (sdk.
 	}
 
 	// do the claim
-	if err := k.bk.SendCoins(ctx, HTLCLockedCoinsAccAddr, htlc.To, htlc.Amount); err != nil {
+	if err := k.bk.SendCoins(ctx, k.sk.GetModuleAddress(types.ModuleName), htlc.To, htlc.Amount); err != nil {
 		return sdk.Event{}, err
 	}
 
@@ -133,7 +133,7 @@ func (k Keeper) RefundHTLC(ctx sdk.Context, hashLock []byte) (sdk.Event, sdk.Err
 	}
 
 	// do the refund
-	if err := k.bk.SendCoins(ctx, HTLCLockedCoinsAccAddr, htlc.Sender, htlc.Amount); err != nil {
+	if err := k.bk.SendCoins(ctx, k.sk.GetModuleAddress(types.ModuleName), htlc.Sender, htlc.Amount); err != nil {
 		return sdk.Event{}, err
 	}
 

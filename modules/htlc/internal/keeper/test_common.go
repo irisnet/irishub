@@ -17,6 +17,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/exported"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	"github.com/cosmos/cosmos-sdk/x/params"
+	"github.com/cosmos/cosmos-sdk/x/supply"
 
 	"github.com/irisnet/irishub/config"
 	"github.com/irisnet/irishub/modules/htlc/internal/types"
@@ -39,6 +40,7 @@ func createTestInput(t *testing.T, amt sdk.Int, nAccs int64) (sdk.Context, Keepe
 	keyAcc := sdk.NewKVStoreKey("acc")
 	keyParams := sdk.NewKVStoreKey("params")
 	tkeyParams := sdk.NewTransientStoreKey("transient_params")
+	keySupply := sdk.NewKVStoreKey(supply.StoreKey)
 	htlcKey := sdk.NewKVStoreKey("htlckey")
 
 	db := dbm.NewMemDB()
@@ -56,13 +58,17 @@ func createTestInput(t *testing.T, amt sdk.Int, nAccs int64) (sdk.Context, Keepe
 	pk := params.NewKeeper(cdc, keyParams, tkeyParams, params.DefaultCodespace)
 	ak := auth.NewAccountKeeper(cdc, keyAcc, pk.Subspace(auth.DefaultParamspace), auth.ProtoBaseAccount)
 	bk := bank.NewBaseKeeper(ak, pk.Subspace(bank.DefaultParamspace), bank.DefaultCodespace, make(map[string]bool))
+	maccPerms := map[string][]string{
+		types.ModuleName:          nil,
+	}
+	sk := supply.NewKeeper(cdc, keySupply, ak, bk, maccPerms)
 
 	initialCoins := sdk.Coins{
 		sdk.NewCoin(config.Iris, amt),
 	}
 	initialCoins = initialCoins.Sort()
 	accs := createTestAccs(ctx, int(nAccs), initialCoins, &ak)
-	keeper := NewKeeper(cdc, htlcKey, bk, types.DefaultCodespace)
+	keeper := NewKeeper(cdc, htlcKey, bk, sk, types.DefaultCodespace)
 
 	return ctx, keeper, ak, accs
 }

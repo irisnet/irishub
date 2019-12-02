@@ -18,8 +18,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	"github.com/cosmos/cosmos-sdk/x/params"
+	"github.com/cosmos/cosmos-sdk/x/supply"
 
 	"github.com/irisnet/irishub/config"
+	htlctypes "github.com/irisnet/irishub/modules/htlc/internal/types"
 )
 
 func setupMultiStore() (sdk.MultiStore, *sdk.KVStoreKey, *sdk.KVStoreKey) {
@@ -30,7 +32,7 @@ func setupMultiStore() (sdk.MultiStore, *sdk.KVStoreKey, *sdk.KVStoreKey) {
 	ms := store.NewCommitMultiStore(db)
 	ms.MountStoreWithDB(accountKey, sdk.StoreTypeIAVL, db)
 	ms.MountStoreWithDB(htlcKey, sdk.StoreTypeIAVL, db)
-	ms.LoadLatestVersion()
+	_ = ms.LoadLatestVersion()
 
 	return ms, accountKey, htlcKey
 }
@@ -39,6 +41,7 @@ func TestExportHTLCGenesis(t *testing.T) {
 	ms, accountKey, htlcKey := setupMultiStore()
 	keyParams := sdk.NewKVStoreKey("params")
 	tkeyParams := sdk.NewTransientStoreKey("transient_params")
+	keySupply := sdk.NewKVStoreKey(supply.StoreKey)
 
 	cdc := codec.New()
 	RegisterCodec(cdc)
@@ -51,7 +54,11 @@ func TestExportHTLCGenesis(t *testing.T) {
 	pk := params.NewKeeper(cdc, keyParams, tkeyParams, params.DefaultCodespace)
 	ak := auth.NewAccountKeeper(cdc, accountKey, pk.Subspace(auth.DefaultParamspace), auth.ProtoBaseAccount)
 	bk := bank.NewBaseKeeper(ak, pk.Subspace(bank.DefaultParamspace), bank.DefaultCodespace, make(map[string]bool))
-	keeper := NewKeeper(cdc, htlcKey, bk, DefaultCodespace)
+	maccPerms := map[string][]string{
+		htlctypes.ModuleName: nil,
+	}
+	sk := supply.NewKeeper(cdc, keySupply, ak, bk, maccPerms)
+	keeper := NewKeeper(cdc, htlcKey, bk, sk, DefaultCodespace)
 
 	// build context
 	currentBlockHeight := int64(100)

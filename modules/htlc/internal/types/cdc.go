@@ -14,7 +14,6 @@ func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(MsgRefundHTLC{}, "irishub/htlc/MsgRefundHTLC", nil)
 
 	cdc.RegisterConcrete(&HTLC{}, "irishub/htlc/HTLC", nil)
-	cdc.RegisterConcrete(&Params{}, "irishub/htlc/Params", nil)
 }
 
 func init() {

@@ -43,7 +43,7 @@ func TestKeeper_CreateHTLC(t *testing.T) {
 
 	originSenderAccAmt := ak.GetAccount(ctx, senderAddr).GetCoins()
 
-	htlcAddr := HTLCLockedCoinsAccAddr
+	htlcAddr := keeper.sk.GetModuleAddress(types.ModuleName)
 	require.Nil(t, ak.GetAccount(ctx, htlcAddr))
 
 	_, err = keeper.CreateHTLC(ctx, htlc, hashLock)
@@ -139,7 +139,7 @@ func TestKeeper_ClaimHTLC(t *testing.T) {
 			require.Nil(t, err, "TestData: %d", i)
 			require.Equal(t, types.OPEN, htlc.State, "TestData: %d", i)
 
-			htlcAddr := HTLCLockedCoinsAccAddr
+			htlcAddr := keeper.sk.GetModuleAddress(types.ModuleName)
 
 			originHTLCAmount := ak.GetAccount(ctx, htlcAddr).GetCoins()
 			originReceiverAmount := ak.GetAccount(ctx, receiverAddr).GetCoins()
@@ -178,7 +178,7 @@ func TestKeeper_ClaimHTLC(t *testing.T) {
 			require.Nil(t, err, "TestData: %d", i)
 			require.Equal(t, types.OPEN, htlc.State, "TestData: %d", i)
 
-			htlcAddr := HTLCLockedCoinsAccAddr
+			htlcAddr := keeper.sk.GetModuleAddress(types.ModuleName)
 
 			originHTLCAmount := ak.GetAccount(ctx, htlcAddr).GetCoins()
 			originReceiverAmount := ak.GetAccount(ctx, receiverAddr).GetCoins()
@@ -231,7 +231,7 @@ func TestKeeper_RefundHTLC(t *testing.T) {
 	require.Nil(t, err)
 	require.Equal(t, types.EXPIRED, htlc.State)
 
-	htlcAddr := HTLCLockedCoinsAccAddr
+	htlcAddr := keeper.sk.GetModuleAddress(types.ModuleName)
 
 	originHTLCAmount := ak.GetAccount(ctx, htlcAddr).GetCoins()
 	originSenderAmount := ak.GetAccount(ctx, senderAddr).GetCoins()

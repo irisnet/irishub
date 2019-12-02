@@ -1,6 +1,7 @@
 package types
 
 import (
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"strings"
@@ -56,7 +57,6 @@ func (h HTLC) GetHashLock() []byte {
 	return nil
 }
 
-/*
 // String implements fmt.Stringer
 func (h HTLC) String() string {
 	return fmt.Sprintf(`HTLC:
@@ -79,6 +79,7 @@ func (h HTLC) String() string {
 	)
 }
 
+/*
 // HumanString implements human
 func (h HTLC) HumanString(converter sdk.CoinsConverter) string {
 	return fmt.Sprintf(`HTLC:

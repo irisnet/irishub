@@ -8,9 +8,9 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/cosmos/cosmos-sdk/tests"
+	"github.com/cosmos/cosmos-sdk/x/supply"
 
 	"github.com/irisnet/irishub/config"
-	htlcmodule "github.com/irisnet/irishub/modules/htlc"
 )
 
 func TestIrisCLIHTLC(t *testing.T) {
@@ -70,7 +70,7 @@ func TestIrisCLIHTLC(t *testing.T) {
 	require.Equal(t, timestamp, htlc.Timestamp)
 	require.Equal(t, stateOpen, htlc.State.String())
 
-	htlcAddr := htlcmodule.HTLCLockedCoinsAccAddr
+	htlcAddr := supply.NewModuleAddress("htlc")
 	htlcAcc := executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", htlcAddr, flags))
 	htlcCoin := htlcAcc.Coins.AmountOf(config.Iris).String()
 	require.Equal(t, "10iris", htlcCoin)
