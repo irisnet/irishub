@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	abci "github.com/tendermint/tendermint/abci/types"
 	"io"
 	"strings"
 
@@ -16,7 +17,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	abci "github.com/tendermint/tendermint/abci/types"
 	cfg "github.com/tendermint/tendermint/config"
 	"github.com/tendermint/tendermint/libs/cli"
 	"github.com/tendermint/tendermint/libs/log"
@@ -67,7 +67,7 @@ func main() {
 		tendermintCmd,
 		server.ResetCmd(ctx, cdc, resetAppState),
 		server.ExportCmd(ctx, cdc, exportAppStateAndTMValidators),
-		server.SnapshotCmd(cdc),
+		server.SnapshotCmd(ctx, cdc, resetAppState),
 		client.LineBreak,
 	)
 

@@ -9,7 +9,6 @@ import (
 	"strings"
 
 	"github.com/irisnet/irishub/codec"
-
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	bc "github.com/tendermint/tendermint/blockchain"
@@ -24,7 +23,7 @@ const flagTmpDir = "tmp-dir"
 const pathSeparator = string(os.PathSeparator)
 
 // SnapshotCmd delete historical block data and index data
-func SnapshotCmd(cdc *codec.Codec) *cobra.Command {
+func SnapshotCmd(ctx *Context, cdc *codec.Codec, appReset AppReset) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "snapshot",
 		Short: "snapshot the latest information and drop the others",
@@ -32,26 +31,30 @@ func SnapshotCmd(cdc *codec.Codec) *cobra.Command {
 			home := viper.GetString(tmcli.HomeFlag)
 			emptyState, err := isEmptyState(home)
 			if err != nil || emptyState {
-				fmt.Println("WARNING: State is not initialized.")
+				ctx.Logger.Error("State is not initialized")
 				return nil
 			}
-			srcDir := filepath.Join(home, "data")
 
 			targetDir := viper.GetString(flagTmpDir)
 			if len(targetDir) == 0 {
 				targetDir = filepath.Join(home, "data.bak")
 			}
+			dataDir := filepath.Join(home, "data")
 
-			if err = dumpData(srcDir, targetDir, cdc); err != nil {
-				os.RemoveAll(targetDir)
-				fmt.Println(fmt.Sprintf("FAILED: %s", err.Error()))
+			if err = snapshot(ctx, cdc, dataDir, targetDir, appReset); err != nil {
+				_ = os.RemoveAll(targetDir)
+				ctx.Logger.Error("snapshot file is created failed")
 				return err
 			}
-			fmt.Println(fmt.Sprintf("snapshot file is stored in [%s]", targetDir))
+			ctx.Logger.Info("snapshot file is created successful", "location", targetDir)
 			return nil
 		},
 	}
-	cmd.Flags().String(flagTmpDir, "", "snapshot file storage directory")
+	cmd.Flags().String(flagTmpDir, "", "Snapshot file storage directory")
+	// core flags for the ABCI application
+	cmd.Flags().String(flagTraceStore, "", "Enable KVStore tracing to an output file")
+	cmd.Flags().String(flagPruning, "syncable", "Pruning strategy: syncable, nothing, everything")
+	cmd.Flags().Bool(flagCheckInvariant, false, "Enable invariant check on mainnet, ignore this flag on testnet")
 	return cmd
 }
 
@@ -63,58 +66,55 @@ func loadDb(name, path string) *dbm.GoLevelDB {
 	return db
 }
 
-func dumpData(home, targetDir string, cdc *codec.Codec) error {
-	//save local current block and flush disk
-	lastHeight := snapshotBlock(home, targetDir)
+func snapshot(ctx *Context, cdc *codec.Codec, dataDir, targetDir string, appReset AppReset) error {
+	blockDB := loadDb("blockstore", dataDir)
+	blockStore := bc.NewBlockStore(blockDB)
 
-	//save local current block height consensus data
-	if err := snapshotCsWAL(home, targetDir, lastHeight); err != nil {
-		return err
+	stateDB := loadDb("state", dataDir)
+	state := tmsm.LoadState(stateDB)
+
+	defer func() {
+		blockDB.Close()
+		stateDB.Close()
+	}()
+	if blockStore.Height() != state.LastBlockHeight {
+		if err := reset(ctx, appReset, state.LastBlockHeight); err != nil {
+			return err
+		}
 	}
 
+	//save local current block and flush disk
+	snapshotBlock(blockStore, targetDir, state.LastBlockHeight)
 	//save local current block height state
-	snapshotState(home, targetDir, lastHeight, cdc)
+	snapshotState(cdc, stateDB, targetDir)
+	//save local current block height consensus data
+	_ = snapshotCsWAL(dataDir, targetDir, state.LastBlockHeight)
 
 	//copy application
-	appDir := filepath.Join(home, "application.db")
+	appDir := filepath.Join(dataDir, "application.db")
 	appTargetDir := filepath.Join(targetDir, "application.db")
 	if err := copyDir(appDir, appTargetDir); err != nil {
 		return err
 	}
 
 	//copy evidence.db
-	evidenceDir := filepath.Join(home, "evidence.db")
+	evidenceDir := filepath.Join(dataDir, "evidence.db")
 	evidenceTargetDir := filepath.Join(targetDir, "evidence.db")
 	return copyDir(evidenceDir, evidenceTargetDir)
 }
 
-func snapshotState(home, targetDir string, height int64, cdc *codec.Codec) error {
-	originDb := loadDb("state", home)
-	defer originDb.Close()
-
+func snapshotState(cdc *codec.Codec, tmDB *dbm.GoLevelDB, targetDir string) {
 	targetDb := loadDb("state", targetDir)
 	defer targetDb.Close()
 
-	state := tmsm.LoadState(originDb)
+	state := tmsm.LoadState(tmDB)
 
-	if height != state.LastBlockHeight {
-		return fmt.Errorf("wrong block height,should: %d, but got %d", height, state.LastBlockHeight)
-	}
-
-	saveValidatorsInfo(cdc, originDb, targetDb, height)
-	saveConsensusParamsInfo(cdc, originDb, targetDb, height)
+	saveValidatorsInfo(cdc, tmDB, targetDb, state.LastBlockHeight)
+	saveConsensusParamsInfo(cdc, tmDB, targetDb, state.LastBlockHeight)
 	tmsm.SaveState(targetDb, state)
-
-	return nil
 }
 
-func snapshotBlock(home, targetDir string) int64 {
-	originDb := loadDb("blockstore", home)
-	defer originDb.Close()
-
-	originStore := bc.NewBlockStore(originDb)
-	height := originStore.Height()
-
+func snapshotBlock(originStore *bc.BlockStore, targetDir string, height int64) int64 {
 	targetDb := loadDb("blockstore", targetDir)
 	defer targetDb.Close()
 
@@ -140,13 +140,16 @@ func snapshotCsWAL(home, targetDir string, height int64) error {
 	}
 
 	gr, found, err := sourceWAL.SearchForEndHeight(height, &consensus.WALSearchOptions{IgnoreDataCorruptionErrors: true})
-	defer gr.Close()
-	if err != nil {
-		return err
-	}
-	if !found {
+
+	if err != nil || !found {
 		return fmt.Errorf("cannot replay height %d. WAL does not contain #ENDHEIGHT for %d", height, height-1)
 	}
+
+	defer func() {
+		if err = gr.Close(); err != nil {
+			return
+		}
+	}()
 
 	var msg *consensus.TimedWALMessage
 	dec := consensus.NewWALDecoder(gr)
@@ -159,9 +162,11 @@ func snapshotCsWAL(home, targetDir string, height int64) error {
 		} else if err != nil {
 			return err
 		}
-		targetWAL.Write(msg.Msg)
+		if err := targetWAL.Write(msg.Msg); err != nil {
+			return err
+		}
 	}
-	targetWAL.WriteSync(consensus.EndHeightMessage{Height: height})
+	_ = targetWAL.WriteSync(consensus.EndHeightMessage{Height: height})
 	return nil
 }
 
@@ -281,4 +286,19 @@ func calcValidatorsKey(height int64) []byte {
 
 func calcConsensusParamsKey(height int64) []byte {
 	return []byte(fmt.Sprintf("consensusParamsKey:%v", height))
+}
+
+func reset(ctx *Context, appReset AppReset, height int64) error {
+	cfg := ctx.Config
+	home := cfg.RootDir
+	traceWriterFile := viper.GetString(flagTraceStore)
+
+	db, _ := openDB(home)
+	traceWriter, _ := openTraceWriter(traceWriterFile)
+
+	err := appReset(ctx, ctx.Logger, db, traceWriter, height)
+	if err != nil {
+		return err
+	}
+	return nil
 }
