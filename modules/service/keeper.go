@@ -6,7 +6,7 @@ import (
 	"github.com/irisnet/irishub/app/v1/bank"
 	"github.com/irisnet/irishub/app/v1/params"
 	"github.com/irisnet/irishub/codec"
-	"github.com/irisnet/irishub/modules/guardian/internal/keeper"
+	"github.com/irisnet/irishub/modules/guardian"
 	"github.com/irisnet/irishub/tools/protoidl"
 	sdk "github.com/irisnet/irishub/types"
 	"time"
@@ -16,7 +16,7 @@ type Keeper struct {
 	storeKey sdk.StoreKey
 	cdc      *codec.Codec
 	ck       bank.Keeper
-	gk       keeper.Keeper
+	gk       guardian.Keeper
 
 	// codespace
 	codespace sdk.CodespaceType
@@ -26,7 +26,7 @@ type Keeper struct {
 	metrics *Metrics
 }
 
-func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, ck bank.Keeper, gk keeper.Keeper, codespace sdk.CodespaceType, paramSpace params.Subspace, metrics *Metrics) Keeper {
+func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, ck bank.Keeper, gk guardian.Keeper, codespace sdk.CodespaceType, paramSpace params.Subspace, metrics *Metrics) Keeper {
 	keeper := Keeper{
 		storeKey:   key,
 		cdc:        cdc,
