@@ -2,8 +2,9 @@ package types
 
 import (
 	"fmt"
-	sdk "github.com/irisnet/irishub/types"
 	"strings"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 // GetUniId returns the unique uni id for the provided denominations.

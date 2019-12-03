@@ -5,10 +5,12 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+
 	abci "github.com/tendermint/tendermint/abci/types"
 
-	"github.com/irisnet/irishub/app/v2/coinswap/internal/types"
-	sdk "github.com/irisnet/irishub/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	"github.com/irisnet/irishub/modules/coinswap/internal/types"
 )
 
 func TestNewQuerier(t *testing.T) {

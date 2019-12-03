@@ -4,11 +4,13 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/irisnet/irishub/app/v1/params"
-	"github.com/irisnet/irishub/app/v2/coinswap/internal/types"
-	"github.com/irisnet/irishub/codec"
-	sdk "github.com/irisnet/irishub/types"
 	"github.com/tendermint/tendermint/crypto"
+
+	"github.com/cosmos/cosmos-sdk/codec"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/x/params"
+
+	"github.com/irisnet/irishub/modules/coinswap/internal/types"
 )
 
 // Keeper of the coinswap store
@@ -16,7 +18,7 @@ type Keeper struct {
 	cdc        *codec.Codec
 	storeKey   sdk.StoreKey
 	bk         types.BankKeeper
-	ak         types.AuthKeeper
+	ak         types.AccountKeeper
 	paramSpace params.Subspace
 }
 
@@ -24,13 +26,13 @@ type Keeper struct {
 // - creating new ModuleAccounts for each trading pair
 // - burning minting liquidity coins
 // - sending to and from ModuleAccounts
-func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, bk types.BankKeeper, ak types.AuthKeeper, paramSpace params.Subspace) Keeper {
+func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, bk types.BankKeeper, ak types.AccountKeeper, paramSpace params.Subspace) Keeper {
 	return Keeper{
 		storeKey:   key,
 		bk:         bk,
 		ak:         ak,
 		cdc:        cdc,
-		paramSpace: paramSpace.WithTypeTable(types.ParamTypeTable()),
+		paramSpace: paramSpace.WithKeyTable(ParamKeyTable()),
 	}
 }
 
@@ -118,7 +120,8 @@ func (k Keeper) addLiquidity(ctx sdk.Context, sender sdk.AccAddress, irisCoin, t
 		return err
 	}
 
-	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, sender.String(), poolAddr.String(), depositedTokens.String(), sdk.CoinSwapAddLiquidityFlow, "")
+	// TODO
+	//ctx.CoinFlowTags().AppendCoinFlowTag(ctx, sender.String(), poolAddr.String(), depositedTokens.String(), sdk.CoinSwapAddLiquidityFlow, "")
 
 	uniDenom, err := types.GetUniDenom(uniId)
 	if err != nil {
@@ -127,11 +130,14 @@ func (k Keeper) addLiquidity(ctx sdk.Context, sender sdk.AccAddress, irisCoin, t
 	// mint liquidity vouchers for reserve Pool
 	mintToken := sdk.NewCoins(sdk.NewCoin(uniDenom, mintLiquidityAmt))
 	k.bk.AddCoins(ctx, poolAddr, mintToken)
-	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, "", poolAddr.String(), mintToken.String(), sdk.MintTokenFlow, "")
+
+	// TODO
+	//ctx.CoinFlowTags().AppendCoinFlowTag(ctx, "", poolAddr.String(), mintToken.String(), sdk.MintTokenFlow, "")
 
 	// mint liquidity vouchers for sender
 	k.bk.AddCoins(ctx, sender, mintToken)
-	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, "", sender.String(), mintToken.String(), sdk.MintTokenFlow, "")
+	// TODO
+	//ctx.CoinFlowTags().AppendCoinFlowTag(ctx, "", sender.String(), mintToken.String(), sdk.MintTokenFlow, "")
 
 	return nil
 }
@@ -197,20 +203,25 @@ func (k Keeper) removeLiquidity(ctx sdk.Context, poolAddr, sender sdk.AccAddress
 	if err != nil {
 		return err
 	}
-	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, poolAddr.String(), "", deltaCoins.String(), sdk.BurnFlow, "")
+
+	// TODO
+	//ctx.CoinFlowTags().AppendCoinFlowTag(ctx, poolAddr.String(), "", deltaCoins.String(), sdk.BurnFlow, "")
 
 	// burn liquidity from account
 	_, _, err = k.bk.SubtractCoins(ctx, sender, deltaCoins)
 	if err != nil {
 		return err
 	}
-	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, sender.String(), "", deltaCoins.String(), sdk.BurnFlow, "")
+
+	// TODO
+	//ctx.CoinFlowTags().AppendCoinFlowTag(ctx, sender.String(), "", deltaCoins.String(), sdk.BurnFlow, "")
 
 	// transfer withdrawn liquidity from coinswaps special account to sender's account
 	coins := sdk.NewCoins(irisWithdrawCoin, tokenWithdrawCoin)
 	_, err = k.bk.SendCoins(ctx, poolAddr, sender, coins)
 	if err == nil {
-		ctx.CoinFlowTags().AppendCoinFlowTag(ctx, poolAddr.String(), sender.String(), coins.String(), sdk.CoinSwapRemoveLiquidityFlow, "")
+		// TODO
+		//ctx.CoinFlowTags().AppendCoinFlowTag(ctx, poolAddr.String(), sender.String(), coins.String(), sdk.CoinSwapRemoveLiquidityFlow, "")
 	}
 	return err
 }

@@ -2,9 +2,9 @@ package types
 
 import (
 	"fmt"
-	"github.com/irisnet/irishub/app/v1/params"
-	"github.com/irisnet/irishub/codec"
-	sdk "github.com/irisnet/irishub/types"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/x/params"
 )
 
 const (
@@ -31,7 +31,7 @@ func NewParams(fee sdk.Rat) Params {
 }
 
 // ParamTypeTable returns the TypeTable for coinswap module
-func ParamTypeTable() params.TypeTable {
+func ParamKeyTable() params.KeyTable {
 	return params.NewTypeTable().RegisterParamSet(&Params{})
 }
 

@@ -2,8 +2,11 @@ package keeper
 
 import (
 	"fmt"
-	"github.com/irisnet/irishub/app/v2/coinswap/internal/types"
-	sdk "github.com/irisnet/irishub/types"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	"github.com/irisnet/irishub/modules/coinswap/internal/types"
+
 )
 
 func (k Keeper) swapCoins(ctx sdk.Context, sender, recipient sdk.AccAddress, coinSold, coinBought sdk.Coin) sdk.Error {

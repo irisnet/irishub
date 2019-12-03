@@ -1,10 +1,11 @@
 package types
 
 import (
-	"github.com/tendermint/tendermint/crypto/ed25519"
 	"time"
 
-	sdk "github.com/irisnet/irishub/types"
+	"github.com/tendermint/tendermint/crypto/ed25519"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 // nolint: deadcode unused

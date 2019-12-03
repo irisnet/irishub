@@ -2,11 +2,10 @@ package coinswap
 
 import (
 	"fmt"
-	"github.com/irisnet/irishub/app/v2/coinswap/internal/types"
-	sdk "github.com/irisnet/irishub/types"
-)
 
-// TODO: ...
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/irisnet/irishub/modules/coinswap/internal/types"
+)
 
 // GenesisState - coinswap genesis state
 type GenesisState struct {
@@ -27,7 +26,6 @@ func DefaultGenesisState() GenesisState {
 
 // InitGenesis new coinswap genesis
 func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
-	//
 	if err := ValidateGenesis(data); err != nil {
 		panic(fmt.Errorf("panic for ValidateGenesis,%v", err))
 	}

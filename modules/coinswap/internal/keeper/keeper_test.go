@@ -1,12 +1,14 @@
 package keeper
 
 import (
-	"github.com/stretchr/testify/require"
 	"testing"
 	"time"
 
-	"github.com/irisnet/irishub/app/v2/coinswap/internal/types"
-	sdk "github.com/irisnet/irishub/types"
+	"github.com/stretchr/testify/require"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	"github.com/irisnet/irishub/modules/coinswap/internal/types"
 )
 
 // test that the params can be properly set and retrieved

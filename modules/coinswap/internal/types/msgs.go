@@ -1,8 +1,9 @@
 package types
 
 import (
-	sdk "github.com/irisnet/irishub/types"
 	"strings"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 var (
@@ -26,27 +27,26 @@ const (
 // A calculated coin has the desired denomination and bounded amount
 // the sender is willing to buy or sell in this order.
 type Input struct {
-	Address sdk.AccAddress `json:"address"`
-	Coin    sdk.Coin       `json:"coin"`
+	Address sdk.AccAddress `json:"address" yaml:"address"`
+	Coin    sdk.Coin       `json:"coin" yaml:"coin"`
 }
 
 type Output struct {
-	Address sdk.AccAddress `json:"address"`
-	Coin    sdk.Coin       `json:"coin"`
+	Address sdk.AccAddress `json:"address" yaml:"address"`
+	Coin    sdk.Coin       `json:"coin" yaml:"coin"`
 }
 
 type MsgSwapOrder struct {
-	Input      Input  `json:"input"`        // the amount the sender is trading
-	Output     Output `json:"output"`       // the amount the sender is receiving
-	Deadline   int64  `json:"deadline"`     // deadline for the transaction to still be considered valid
-	IsBuyOrder bool   `json:"is_buy_order"` // boolean indicating whether the order should be treated as a buy or sell
+	Input      Input  `json:"input" yaml:"input"`               // the amount the sender is trading
+	Output     Output `json:"output" yaml:"output"`             // the amount the sender is receiving
+	Deadline   int64  `json:"deadline" yaml:"deadline"`         // deadline for the transaction to still be considered valid
+	IsBuyOrder bool   `json:"is_buy_order" yaml:"is_buy_order"` // boolean indicating whether the order should be treated as a buy or sell
 }
 
 // NewMsgSwapOrder creates a new MsgSwapOrder object.
 func NewMsgSwapOrder(
 	input Input, output Output, deadline int64, isBuyOrder bool,
 ) MsgSwapOrder {
-
 	return MsgSwapOrder{
 		Input:      input,
 		Output:     output,
@@ -103,11 +103,11 @@ func (msg MsgSwapOrder) GetSigners() []sdk.AccAddress {
 
 // MsgAddLiquidity - struct for adding liquidity to a reserve pool
 type MsgAddLiquidity struct {
-	MaxToken     sdk.Coin       `json:"max_token"`      // coin to be deposited as liquidity with an upper bound for its amount
-	ExactIrisAmt sdk.Int        `json:"exact_iris_amt"` // exact amount of native asset being add to the liquidity pool
-	MinLiquidity sdk.Int        `json:"min_liquidity"`  // lower bound UNI sender is willing to accept for deposited coins
-	Deadline     int64          `json:"deadline"`
-	Sender       sdk.AccAddress `json:"sender"`
+	MaxToken     sdk.Coin       `json:"max_token" yaml:"max_token"`           // coin to be deposited as liquidity with an upper bound for its amount
+	ExactIrisAmt sdk.Int        `json:"exact_iris_amt" yaml:"exact_iris_amt"` // exact amount of native asset being add to the liquidity pool
+	MinLiquidity sdk.Int        `json:"min_liquidity" yaml:"min_liquidity"`   // lower bound UNI sender is willing to accept for deposited coins
+	Deadline     int64          `json:"deadline" yaml:"deadline"`
+	Sender       sdk.AccAddress `json:"sender" yaml:"sender"`
 }
 
 // NewMsgAddLiquidity creates a new MsgAddLiquidity object.
@@ -115,7 +115,6 @@ func NewMsgAddLiquidity(
 	maxToken sdk.Coin, exactIrisAmt, minLiquidity sdk.Int,
 	deadline int64, sender sdk.AccAddress,
 ) MsgAddLiquidity {
-
 	return MsgAddLiquidity{
 		MaxToken:     maxToken,
 		ExactIrisAmt: exactIrisAmt,
@@ -173,11 +172,11 @@ func (msg MsgAddLiquidity) GetSigners() []sdk.AccAddress {
 
 // MsgRemoveLiquidity - struct for removing liquidity from a reserve pool
 type MsgRemoveLiquidity struct {
-	MinToken          sdk.Int        `json:"min_token"`          // coin to be withdrawn with a lower bound for its amount
-	WithdrawLiquidity sdk.Coin       `json:"withdraw_liquidity"` // amount of UNI to be burned to withdraw liquidity from a reserve pool
-	MinIrisAmt        sdk.Int        `json:"min_iris_amt"`       // minimum amount of the native asset the sender is willing to accept
-	Deadline          int64          `json:"deadline"`
-	Sender            sdk.AccAddress `json:"sender"`
+	MinToken          sdk.Int        `json:"min_token" yaml:"min_token"`                   // coin to be withdrawn with a lower bound for its amount
+	WithdrawLiquidity sdk.Coin       `json:"withdraw_liquidity" yaml:"withdraw_liquidity"` // amount of UNI to be burned to withdraw liquidity from a reserve pool
+	MinIrisAmt        sdk.Int        `json:"min_iris_amt" yaml:"min_iris_amt"`             // minimum amount of the native asset the sender is willing to accept
+	Deadline          int64          `json:"deadline" yaml:"deadline"`
+	Sender            sdk.AccAddress `json:"sender" yaml:"sender"`
 }
 
 // NewMsgRemoveLiquidity creates a new MsgRemoveLiquidity object

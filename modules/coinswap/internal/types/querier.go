@@ -1,6 +1,8 @@
 package types
 
-import "github.com/irisnet/irishub/types"
+import (
+	sdk "github.com/cosmos/cosmos-sdk/types"
+)
 
 const (
 	// QueryLiquidity liquidity query endpoint supported by the coinswap querier
@@ -14,8 +16,8 @@ type QueryLiquidityParams struct {
 
 // QueryLiquidityResponse is the query response for 'custom/swap/liquidity'
 type QueryLiquidityResponse struct {
-	Iris      types.Coin `json:"iris"`
-	Token     types.Coin `json:"token"`
-	Liquidity types.Coin `json:"liquidity"`
-	Fee       string     `json:"fee"`
+	Iris      sdk.Coin `json:"iris" yaml:"iris"`
+	Token     sdk.Coin `json:"token" yaml:"token"`
+	Liquidity sdk.Coin `json:"liquidity" yaml:"liquidity"`
+	Fee       string   `json:"fee" yaml:"fee"`
 }

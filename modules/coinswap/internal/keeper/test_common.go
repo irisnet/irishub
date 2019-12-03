@@ -1,23 +1,23 @@
 package keeper
 
 import (
-	"github.com/irisnet/irishub/app/protocol"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
 	"github.com/tendermint/tendermint/libs/log"
 	dbm "github.com/tendermint/tm-db"
 
-	"github.com/stretchr/testify/require"
+	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/cosmos/cosmos-sdk/store"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/x/auth"
+	"github.com/cosmos/cosmos-sdk/x/bank"
+	"github.com/cosmos/cosmos-sdk/x/params"
 
-	"github.com/irisnet/irishub/app/v1/auth"
-	"github.com/irisnet/irishub/app/v1/bank"
-	"github.com/irisnet/irishub/app/v1/params"
-	"github.com/irisnet/irishub/app/v2/coinswap/internal/types"
-	"github.com/irisnet/irishub/codec"
-	"github.com/irisnet/irishub/store"
-	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/modules/coinswap/internal/types"
 )
 
 // create a codec used only for testing

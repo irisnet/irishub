@@ -1,47 +1,51 @@
 package coinswap
 
 import (
-	"github.com/irisnet/irishub/app/v2/coinswap/internal/keeper"
-	"github.com/irisnet/irishub/app/v2/coinswap/internal/types"
+	"github.com/irisnet/irishub/modules/coinswap/internal/keeper"
+	"github.com/irisnet/irishub/modules/coinswap/internal/types"
+)
+
+const (
+	ModuleName         = types.ModuleName
+	StoreKey           = types.StoreKey
+	RouterKey          = types.RouterKey
+	QuerierRoute       = types.QuerierRoute
+	DefaultParamSpace  = types.DefaultParamSpace
+	DefaultCodespace   = types.DefaultCodespace
+	QueryLiquidity     = types.QueryLiquidity
+	FormatUniABSPrefix = types.FormatUniABSPrefix
 )
 
 type (
-	Keeper               = keeper.Keeper
-	MsgSwapOrder         = types.MsgSwapOrder
-	MsgAddLiquidity      = types.MsgAddLiquidity
-	MsgRemoveLiquidity   = types.MsgRemoveLiquidity
-	Params               = types.Params
+	Keeper = keeper.Keeper
+	MsgSwapOrder = types.MsgSwapOrder
+	MsgAddLiquidity = types.MsgAddLiquidity
+	MsgRemoveLiquidity = types.MsgRemoveLiquidity
+	Params = types.Params
 	QueryLiquidityParams = types.QueryLiquidityParams
-	Input                = types.Input
-	Output               = types.Output
+	Input = types.Input
+	Output = types.Output
 )
 
 var (
-	DefaultParamSpace = types.DefaultParamSpace
-	QueryLiquidity    = types.QueryLiquidity
-
-	RegisterCodec = types.RegisterCodec
-
-	NewMsgSwapOrder       = types.NewMsgSwapOrder
-	NewMsgAddLiquidity    = types.NewMsgAddLiquidity
-	NewMsgRemoveLiquidity = types.NewMsgRemoveLiquidity
-	NewKeeper             = keeper.NewKeeper
-	NewQuerier            = keeper.NewQuerier
-
-	ErrInvalidDeadline  = types.ErrInvalidDeadline
-	ErrNotPositive      = types.ErrNotPositive
-	ErrConstraintNotMet = types.ErrConstraintNotMet
-
+	NewKeeper                   = keeper.NewKeeper
+	NewQuerier                  = keeper.NewQuerier
+	RegisterCodec               = types.RegisterCodec
+	NewMsgSwapOrder             = types.NewMsgSwapOrder
+	NewMsgAddLiquidity          = types.NewMsgAddLiquidity
+	NewMsgRemoveLiquidity       = types.NewMsgRemoveLiquidity
 	GetUniId                    = types.GetUniId
 	GetCoinMinDenomFromUniDenom = types.GetCoinMinDenomFromUniDenom
 	GetUniDenom                 = types.GetUniDenom
 	GetUniCoinType              = types.GetUniCoinType
 	CheckUniDenom               = types.CheckUniDenom
 	CheckUniId                  = types.CheckUniId
+	ErrInvalidDeadline          = types.ErrInvalidDeadline
+	ErrNotPositive              = types.ErrNotPositive
+	ErrConstraintNotMet         = types.ErrConstraintNotMet
 )
 
-const (
-	DefaultCodespace   = types.DefaultCodespace
-	ModuleName         = types.ModuleName
-	FormatUniABSPrefix = types.FormatUniABSPrefix
+// exported variables and functions
+var (
+	ModuleCdc = types.ModuleCdc
 )
