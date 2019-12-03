@@ -2,7 +2,9 @@
 
 ## 简介
 
-该文档描述了[Constant Product Market Maker Model](https://github.com/runtimeverification/verified-smart-contracts/blob/uniswap/uniswap/x-y-k.pdf)代币交换协议在IRISHub上的实现，支持Token对Token、Token对IRIS的兑换，整个兑换过程完全由链上自动完成。
+该文档描述了[Constant Product Market Maker Model](https://github.com/runtimeverification/verified-smart-contracts/blob/uniswap/uniswap/x-y-k.pdf)代币交换协议在IRISHub上的实现。
+
+Coinswap支持Token对IRIS、Token对Token的兑换，整个兑换过程完全由链上自动完成，你可以在IRISHub上使用多资产管理功能。
 
 通过Coinswap交易之前，需要做市商以当前市场价格（以IRIS代币为基准）抵押代币到流动性池，之后两种代币的汇率将根据链上兑换行情产生实时变化。当流动性池中的兑换比例和当前市场上不一致，套利者就会有利可图，他们通过兑换另一种代币，从而使汇率接近市场价格。
 
