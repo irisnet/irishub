@@ -16,25 +16,25 @@ func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router) {
 
 // CreateHTLCReq defines the properties of a create HTLC request's body.
 type CreateHTLCReq struct {
-	BaseTx               rest.BaseReq   `json:"base_tx"`
-	Sender               sdk.AccAddress `json:"sender"`
-	To                   sdk.AccAddress `json:"to"`
-	ReceiverOnOtherChain string         `json:"receiver_on_other_chain"`
-	Amount               sdk.Coins      `json:"amount"`
-	HashLock             string         `json:"hash_lock"`
-	TimeLock             uint64         `json:"time_lock"`
-	Timestamp            uint64         `json:"timestamp"`
+	BaseTx               rest.BaseReq   `json:"base_tx" yaml:"base_tx"`
+	Sender               sdk.AccAddress `json:"sender" yaml:"sender"`
+	To                   sdk.AccAddress `json:"to" yaml:"to"`
+	ReceiverOnOtherChain string         `json:"receiver_on_other_chain" yaml:"receiver_on_other_chain"`
+	Amount               sdk.Coins      `json:"amount" yaml:"amount"`
+	HashLock             string         `json:"hash_lock" yaml:"hash_lock"`
+	TimeLock             uint64         `json:"time_lock" yaml:"time_lock"`
+	Timestamp            uint64         `json:"timestamp" yaml:"timestamp"`
 }
 
 // ClaimHTLCReq defines the properties of a claim HTLC request's body.
 type ClaimHTLCReq struct {
-	BaseTx rest.BaseReq   `json:"base_tx"`
-	Sender sdk.AccAddress `json:"sender"`
-	Secret string         `json:"secret"`
+	BaseTx rest.BaseReq   `json:"base_tx" yaml:"base_tx"`
+	Sender sdk.AccAddress `json:"sender" yaml:"sender"`
+	Secret string         `json:"secret" yaml:"secret"`
 }
 
 // RefundHTLCReq defines the properties of a refund HTLC request's body.
 type RefundHTLCReq struct {
-	BaseTx rest.BaseReq   `json:"base_tx"`
-	Sender sdk.AccAddress `json:"sender"`
+	BaseTx rest.BaseReq   `json:"base_tx" yaml:"base_tx"`
+	Sender sdk.AccAddress `json:"sender" yaml:"sender"`
 }
