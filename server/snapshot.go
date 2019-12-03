@@ -51,10 +51,6 @@ func SnapshotCmd(ctx *Context, cdc *codec.Codec, appReset AppReset) *cobra.Comma
 		},
 	}
 	cmd.Flags().String(flagTmpDir, "", "Snapshot file storage directory")
-	// core flags for the ABCI application
-	cmd.Flags().String(flagTraceStore, "", "Enable KVStore tracing to an output file")
-	cmd.Flags().String(flagPruning, "syncable", "Pruning strategy: syncable, nothing, everything")
-	cmd.Flags().Bool(flagCheckInvariant, false, "Enable invariant check on mainnet, ignore this flag on testnet")
 	return cmd
 }
 
