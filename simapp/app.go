@@ -1,6 +1,7 @@
 package simapp
 
 import (
+	"github.com/irisnet/irishub/modules/guardian"
 	"io"
 	"os"
 
@@ -107,6 +108,7 @@ type SimApp struct {
 	CrisisKeeper   crisis.Keeper
 	ParamsKeeper   params.Keeper
 	EvidenceKeeper evidence.Keeper
+	GuardianKeeper guardian.Keeper
 
 	// the module manager
 	mm *module.Manager
@@ -188,6 +190,11 @@ func NewSimApp(
 	evidenceKeeper := evidence.NewKeeper(
 		app.cdc, keys[evidence.StoreKey], app.subspaces[evidence.ModuleName], evidence.DefaultCodespace,
 	)
+
+	app.GuardianKeeper = guardian.NewKeeper(
+		app.cdc, keys[evidence.StoreKey], guardian.DefaultCodespace,
+	)
+
 	evidenceRouter := evidence.NewRouter()
 	// TODO: Register evidence routes.
 	evidenceKeeper.SetRouter(evidenceRouter)

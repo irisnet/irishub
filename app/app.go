@@ -175,7 +175,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 	// TODO: Register evidence routes.
 	app.evidenceKeeper.SetRouter(evidenceRouter)
 
-	// create guardian keeper with evidence router
+	// create guardian keeper with guardian router
 	app.guardianKeeper = guardian.NewKeeper(
 		app.cdc, keys[evidence.StoreKey], guardian.DefaultCodespace,
 	)

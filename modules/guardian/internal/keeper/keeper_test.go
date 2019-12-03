@@ -1,4 +1,4 @@
-package keeper
+package keeper_test
 
 import (
 	"github.com/irisnet/irishub/modules/guardian/internal/types"
@@ -7,8 +7,11 @@ import (
 )
 
 func TestKeeper(t *testing.T) {
-	ctx, keeper := createTestInput(t)
+	app, ctx := createTestApp(false)
 	profiler := types.NewGuardian("test", types.Genesis, addrs[0], addrs[1])
+
+	keeper := app.GuardianKeeper
+	cdc := app.Codec()
 
 	keeper.AddProfiler(ctx, profiler)
 	AddedProfiler, found := keeper.GetProfiler(ctx, addrs[0])
@@ -26,7 +29,7 @@ func TestKeeper(t *testing.T) {
 	var profilers []types.Guardian
 	for ; profilersIterator.Valid(); profilersIterator.Next() {
 		var profiler types.Guardian
-		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(profilersIterator.Value(), &profiler)
+		cdc.MustUnmarshalBinaryLengthPrefixed(profilersIterator.Value(), &profiler)
 		profilers = append(profilers, profiler)
 	}
 	require.Equal(t, 1, len(profilers))
@@ -37,7 +40,7 @@ func TestKeeper(t *testing.T) {
 	var trustees []types.Guardian
 	for ; trusteesIterator.Valid(); trusteesIterator.Next() {
 		var trustee types.Guardian
-		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(trusteesIterator.Value(), &trustee)
+		cdc.MustUnmarshalBinaryLengthPrefixed(trusteesIterator.Value(), &trustee)
 		trustees = append(trustees, trustee)
 	}
 	require.Equal(t, 1, len(trustees))
