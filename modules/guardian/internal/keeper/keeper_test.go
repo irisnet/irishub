@@ -1,20 +1,21 @@
-package guardian
+package keeper
 
 import (
+	"github.com/irisnet/irishub/modules/guardian/internal/types"
 	"github.com/stretchr/testify/require"
 	"testing"
 )
 
 func TestKeeper(t *testing.T) {
 	ctx, keeper := createTestInput(t)
-	profiler := NewGuardian("test", Genesis, addrs[0], addrs[1])
+	profiler := types.NewGuardian("test", types.Genesis, addrs[0], addrs[1])
 
 	keeper.AddProfiler(ctx, profiler)
 	AddedProfiler, found := keeper.GetProfiler(ctx, addrs[0])
 	require.True(t, found)
 	require.True(t, profiler.Equal(AddedProfiler))
 
-	trustee := NewGuardian("test", Genesis, addrs[0], addrs[1])
+	trustee := types.NewGuardian("test", types.Genesis, addrs[0], addrs[1])
 	keeper.AddTrustee(ctx, trustee)
 	AddedTrustee, found := keeper.GetTrustee(ctx, addrs[0])
 	require.True(t, found)
@@ -22,9 +23,9 @@ func TestKeeper(t *testing.T) {
 
 	profilersIterator := keeper.ProfilersIterator(ctx)
 	defer profilersIterator.Close()
-	var profilers []Guardian
+	var profilers []types.Guardian
 	for ; profilersIterator.Valid(); profilersIterator.Next() {
-		var profiler Guardian
+		var profiler types.Guardian
 		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(profilersIterator.Value(), &profiler)
 		profilers = append(profilers, profiler)
 	}
@@ -33,9 +34,9 @@ func TestKeeper(t *testing.T) {
 
 	trusteesIterator := keeper.TrusteesIterator(ctx)
 	defer trusteesIterator.Close()
-	var trustees []Guardian
+	var trustees []types.Guardian
 	for ; trusteesIterator.Valid(); trusteesIterator.Next() {
-		var trustee Guardian
+		var trustee types.Guardian
 		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(trusteesIterator.Value(), &trustee)
 		trustees = append(trustees, trustee)
 	}

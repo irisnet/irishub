@@ -1,16 +1,16 @@
-package guardian
+package keeper
 
 import (
 	"os"
 	"testing"
 
+	"github.com/irisnet/irishub/modules/guardian/internal/types"
+
 	"encoding/hex"
-	"github.com/irisnet/irishub/codec"
-	"github.com/irisnet/irishub/modules/auth"
-	"github.com/irisnet/irishub/modules/bank"
-	"github.com/irisnet/irishub/modules/stake"
-	"github.com/irisnet/irishub/store"
-	sdk "github.com/irisnet/irishub/types"
+
+	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/cosmos/cosmos-sdk/store"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/crypto"
@@ -45,10 +45,7 @@ func newPubKey(pk string) (res crypto.PubKey) {
 func createTestCodec() *codec.Codec {
 	cdc := codec.New()
 	sdk.RegisterCodec(cdc)
-	RegisterCodec(cdc)
-	auth.RegisterCodec(cdc)
-	bank.RegisterCodec(cdc)
-	stake.RegisterCodec(cdc)
+	types.RegisterCodec(cdc)
 	codec.RegisterCrypto(cdc)
 	return cdc
 }
@@ -65,7 +62,7 @@ func createTestInput(t *testing.T) (sdk.Context, Keeper) {
 	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewTMLogger(os.Stdout))
 	cdc := createTestCodec()
 
-	keeper := NewKeeper(cdc, keyProf, DefaultCodespace)
+	keeper := NewKeeper(cdc, keyProf, types.DefaultCodespace)
 
 	return ctx, keeper
 }

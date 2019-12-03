@@ -3,6 +3,8 @@ package service
 import (
 	"bytes"
 	"fmt"
+	"github.com/irisnet/irishub/modules/guardian/internal/keeper"
+	types2 "github.com/irisnet/irishub/modules/guardian/internal/types"
 	"log"
 	"sort"
 	"testing"
@@ -11,7 +13,6 @@ import (
 
 	"github.com/irisnet/irishub/app/v1/bank"
 	"github.com/irisnet/irishub/app/v1/stake"
-	"github.com/irisnet/irishub/modules/guardian"
 	"github.com/irisnet/irishub/server/mock"
 	"github.com/irisnet/irishub/types"
 	sdk "github.com/irisnet/irishub/types"
@@ -30,7 +31,7 @@ func getMockApp(t *testing.T, numGenAccs int) (*mock.App, Keeper, stake.Keeper, 
 	keyGuardian := sdk.NewKVStoreKey("guardian")
 
 	ck := bank.NewBaseKeeper(mapp.Cdc, mapp.AccountKeeper)
-	gk := guardian.NewKeeper(mapp.Cdc, keyGuardian, guardian.DefaultCodespace)
+	gk := keeper.NewKeeper(mapp.Cdc, keyGuardian, types2.DefaultCodespace)
 	sk := stake.NewKeeper(
 		mapp.Cdc,
 		mapp.KeyStake, mapp.TkeyStake,

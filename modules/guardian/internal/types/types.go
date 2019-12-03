@@ -1,11 +1,12 @@
-package guardian
+package types
 
 import (
 	"encoding/json"
 	"fmt"
-	sdk "github.com/irisnet/irishub/types"
-	"github.com/pkg/errors"
 	"strings"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/pkg/errors"
 )
 
 type Guardian struct {
