@@ -8,13 +8,11 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-
-	"github.com/irisnet/irishub/app/v1/bank"
-	"github.com/irisnet/irishub/app/v1/stake"
+	"github.com/cosmos/cosmos-sdk/x/bank"
+	"github.com/cosmos/cosmos-sdk/x/stake"
 	"github.com/irisnet/irishub/modules/guardian"
-	"github.com/irisnet/irishub/server/mock"
-	"github.com/irisnet/irishub/types"
-	sdk "github.com/irisnet/irishub/types"
+	"github.com/cosmos/cosmos-sdk/server/mock"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/crypto"
 )

@@ -1,9 +1,9 @@
 package service
 
 import (
-	"github.com/irisnet/irishub/app/v1/auth"
-	"github.com/irisnet/irishub/app/v1/service/tags"
-	sdk "github.com/irisnet/irishub/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/x/auth"
+	"github.com/irisnet/irishub/modules/service/internal/types"
 )
 
 // handle all "service" type messages.
@@ -148,19 +148,28 @@ func handleMsgSvcRequest(ctx sdk.Context, k Keeper, msg MsgSvcRequest) sdk.Resul
 		"provider", msg.Provider.String(), "consumer", request.Consumer.String(), "method_id", msg.MethodID,
 		"service_fee", msg.ServiceFee, "request_id", request.RequestID())
 
-	resTags := sdk.NewTags(
-		tags.RequestID, []byte(request.RequestID()),
-		tags.Provider, []byte(request.Provider.String()),
-		tags.Consumer, []byte(request.Consumer.String()),
-		tags.ServiceFee, []byte(request.ServiceFee.String()),
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+			sdk.NewAttribute(sdk.AttributeKeySender, request.Consumer.String()),
+		),
 	)
-	return sdk.Result{
-		Tags: resTags,
-	}
+
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			types.EventTypeRequestSvc,
+			sdk.NewAttribute(types.AttributeKeyRequestID, request.RequestID()),
+			sdk.NewAttribute(types.AttributeKeyProvider, request.Provider.String()),
+			sdk.NewAttribute(types.AttributeKeyServiceFee, request.ServiceFee.String()),
+		),
+	)
+
+	return sdk.Result{Events: ctx.EventManager().Events()}
 }
 
 func handleMsgSvcResponse(ctx sdk.Context, k Keeper, msg MsgSvcResponse) sdk.Result {
-	eHeight, rHeight, counter, _ := ConvertRequestID(msg.RequestID)
+	eHeight, rHeight, counter, _ := types.ConvertRequestID(msg.RequestID)
 	request, found := k.GetActiveRequest(ctx, eHeight, rHeight, counter)
 	if !found {
 		request.ExpirationHeight = eHeight
@@ -191,14 +200,23 @@ func handleMsgSvcResponse(ctx sdk.Context, k Keeper, msg MsgSvcResponse) sdk.Res
 	ctx.Logger().Debug("Service response", "def_name", "request_id", request.RequestID(),
 		"consumer", response.Consumer.String())
 
-	resTags := sdk.NewTags(
-		tags.RequestID, []byte(request.RequestID()),
-		tags.Consumer, []byte(response.Consumer.String()),
-		tags.Provider, []byte(response.Provider.String()),
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+			sdk.NewAttribute(sdk.AttributeKeySender, response.Provider.String()),
+		),
 	)
-	return sdk.Result{
-		Tags: resTags,
-	}
+
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			types.EventTypeRespondSvc,
+			sdk.NewAttribute(types.AttributeKeyRequestID, request.RequestID()),
+			sdk.NewAttribute(types.AttributeKeyConsumer, request.Consumer.String()),
+		),
+	)
+
+	return sdk.Result{Events: ctx.EventManager().Events()}
 }
 
 func handleMsgSvcRefundFees(ctx sdk.Context, k Keeper, msg MsgSvcRefundFees) sdk.Result {

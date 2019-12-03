@@ -3,6 +3,7 @@ package service
 import (
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/irisnet/irishub/modules/service/internal/types"
 )
 
 // EndBlocker handles block ending logic
@@ -49,6 +50,15 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) {
 		keeper.DeleteActiveRequest(ctx, req)
 		keeper.metrics.ActiveRequests.Add(-1)
 		keeper.DeleteRequestExpiration(ctx, req)
+	
+		ctx.EventManager().EmitEvent(
+			sdk.NewEvent(
+				types.EventTypeSvcCallTimeout,
+				sdk.NewAttribute(types.AttributeKeyRequestID, req.RequestID()),
+				sdk.NewAttribute(types.AttributeKeyProvider, req.Provider.String()),
+				sdk.NewAttribute(types.AttributeKeySlashCoins, slashCoins.String()),
+			),
+		)
 
 		logger.Info("Remove timeout request", "request_id", req.RequestID(), "consumer", req.Consumer.String())
 	}

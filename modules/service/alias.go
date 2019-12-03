@@ -69,8 +69,19 @@ var (
 	QueryFees       = types.QueryFees
 
 	NewGenesisState      = types.NewGenesisState
-	DefaultParams        = types.DefaultParam
+	DefaultParams        = types.DefaultParams
 	DefaultParamsForTest = types.DefaultParamsForTest
+
+	ErrSvcDefExists           = types.ErrSvcDefExists
+	ErrSvcBindingNotExists    = types.ErrSvcBindingNotExists
+	ErrSvcBindingNotAvailable = types.ErrSvcBindingNotAvailable
+	ErrMethodNotExists        = types.ErrMethodNotExists
+	ErrNotProfiler            = types.ErrNotProfiler
+	ErrLtServiceFee           = types.ErrLtServiceFee
+	ErrRequestNotActive       = types.ErrRequestNotActive
+	ErrNotMatchingProvider    = types.ErrNotMatchingProvider
+	ErrNotMatchingReqChainID  = types.ErrNotMatchingReqChainID
+	ErrNotTrustee             = types.ErrNotTrustee
 
 	NewKeeper  = keeper.NewKeeper
 	NewQuerier = keeper.NewQuerier
