@@ -4,7 +4,7 @@ import (
 	"encoding/hex"
 	"fmt"
 
-	sdk "github.com/irisnet/irishub/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 // Rand represents a random number with related data

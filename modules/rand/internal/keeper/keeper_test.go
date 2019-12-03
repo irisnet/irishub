@@ -3,10 +3,10 @@ package keeper
 import (
 	"testing"
 
-	"github.com/irisnet/irishub/app/v1/rand/internal/types"
-	"github.com/irisnet/irishub/codec"
-	"github.com/irisnet/irishub/store"
-	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/modules/rand/internal/types"
+	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/cosmos/cosmos-sdk/store"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/log"
@@ -62,7 +62,7 @@ func TestRequestRandKeeper(t *testing.T) {
 
 	// get the pending request and assert the result is not nil
 	store := ctx.KVStore(randKey)
-	bz := store.Get(KeyRandRequestQueue(destHeight, reqID))
+	bz := store.Get(types.KeyRandRequestQueue(destHeight, reqID))
 	require.NotNil(t, bz)
 
 	// decode the request
@@ -73,6 +73,6 @@ func TestRequestRandKeeper(t *testing.T) {
 	require.Equal(t, sdk.SHA256(txBytes), request.TxHash)
 
 	// get the rand and assert the result is nil
-	bz = store.Get(KeyRand(reqID))
+	bz = store.Get(types.KeyRand(reqID))
 	require.Nil(t, bz)
 }

@@ -4,12 +4,12 @@ import (
 	"encoding/hex"
 	"fmt"
 
-	sdk "github.com/irisnet/irishub/types"
+	sdk "github.com/cosmos/cosmos-sdk/types
 	abci "github.com/tendermint/tendermint/abci/types"
 )
 
 // BeginBlocker handles block beginning logic for rand
-func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, k Keeper) (tags sdk.Tags) {
+func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, k Keeper) {
 	ctx = ctx.WithLogger(ctx.Logger().With("handler", "beginBlock").With("module", "iris/rand"))
 
 	currentTimestamp := ctx.BlockHeader().Time.Unix()
@@ -35,11 +35,13 @@ func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, k Keeper) (tags s
 		// remove the request
 		k.DequeueRandRequest(ctx, lastBlockHeight, reqID)
 
-		// add tags
-		tags = tags.AppendTags(sdk.NewTags(
-			TagReqID, []byte(hex.EncodeToString(reqID)),
-			TagRand, []byte(rand.Rat.FloatString(RandPrec)),
-		))
+		ctx.EventManager().EmitEvent(
+			sdk.NewEvent(
+				types.EventTypeGenerateRand,
+				sdk.NewAttribute(types.AttributeKeyRequestID, reqID),
+				sdk.NewAttribute(types.AttributeKeyRand, rand.Rat.FloatString(RandPrec)),
+			),
+		)
 
 		handledRandReqNum++
 	}

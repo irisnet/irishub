@@ -3,7 +3,7 @@ package types
 import (
 	"math/big"
 
-	sdk "github.com/irisnet/irishub/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 const RandPrec = 20 // the precision for generated random numbers

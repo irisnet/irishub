@@ -1,7 +1,10 @@
 package rand
 
 import (
-	sdk "github.com/irisnet/irishub/types"
+	"fmt"
+	
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/irisnet/irishub/modules/rand/internal/types"
 )
 
 // NewHandler handles all "rand" messages
@@ -20,12 +23,26 @@ func NewHandler(k Keeper) sdk.Handler {
 
 // handleMsgRequestRand handles MsgRequestRand
 func handleMsgRequestRand(ctx sdk.Context, k Keeper, msg MsgRequestRand) sdk.Result {
-	tags, err := k.RequestRand(ctx, msg.Consumer, msg.BlockInterval)
+	request, err := k.RequestRand(ctx, msg.Consumer, msg.BlockInterval)
 	if err != nil {
 		return err.Result()
 	}
 
-	return sdk.Result{
-		Tags: tags,
-	}
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.Consumer.String()),
+		),
+	)
+
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			types.EventTypeRequestRand,
+			sdk.NewAttribute(types.AttributeKeyRequestID, GenerateRequestID(request)),
+			sdk.NewAttribute(types.AttributeKeyGenHeight, fmt.Sprintf("%d", request.Height+int64(msg.BlockInterval))),
+		),
+	)
+
+	return 
 }

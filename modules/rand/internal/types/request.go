@@ -4,7 +4,7 @@ import (
 	"encoding/hex"
 	"fmt"
 
-	sdk "github.com/irisnet/irishub/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 // Request represents a request for a random number

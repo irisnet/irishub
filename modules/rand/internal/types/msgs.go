@@ -1,12 +1,12 @@
 package types
 
 import (
-	sdk "github.com/irisnet/irishub/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 const (
-	// MsgRoute identifies transaction types
-	MsgRoute = "rand"
+	// TypeMsgRequestRand represents the type of MsgRequestRand
+	TypeMsgRequestRand = "request_rand"
 
 	// DefaultBlockInterval is the default block interval
 	DefaultBlockInterval = uint64(10)
@@ -28,13 +28,13 @@ func NewMsgRequestRand(consumer sdk.AccAddress, blockInterval uint64) MsgRequest
 	}
 }
 
-// Implements Msg.
-func (msg MsgRequestRand) Route() string { return MsgRoute }
+// Route implements Msg
+func (msg MsgRequestRand) Route() string { return RouterKey }
 
-// Implements Msg.
-func (msg MsgRequestRand) Type() string { return "request_rand" }
+// Type implements Msg
+func (msg MsgRequestRand) Type() string { return TypeMsgRequestRand }
 
-// Implements Msg.
+// ValidateBasic implements Msg
 func (msg MsgRequestRand) ValidateBasic() sdk.Error {
 	if len(msg.Consumer) == 0 {
 		return ErrInvalidConsumer(DefaultCodespace, "the consumer address must be specified")
@@ -43,9 +43,9 @@ func (msg MsgRequestRand) ValidateBasic() sdk.Error {
 	return nil
 }
 
-// Implements Msg.
+// GetSignBytes implements Msg
 func (msg MsgRequestRand) GetSignBytes() []byte {
-	b, err := msgCdc.MarshalJSON(msg)
+	b, err := ModuleCdc.MarshalJSON(msg)
 	if err != nil {
 		panic(err)
 	}
@@ -53,7 +53,7 @@ func (msg MsgRequestRand) GetSignBytes() []byte {
 	return sdk.MustSortJSON(b)
 }
 
-// Implements Msg.
+// GetSigners implements Msg
 func (msg MsgRequestRand) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Consumer}
 }
