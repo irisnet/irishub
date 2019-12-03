@@ -4,13 +4,32 @@ import (
 	"encoding/hex"
 	"fmt"
 
-	"github.com/irisnet/irishub/modules/rand"
-	"github.com/cosmos/cosmos-sdk/context"
-	"github.com/irisnet/irishub/modules/rand/client/types"
+	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/cosmos/cosmos-sdk/context"
+	"github.com/irisnet/irishub/modules/rand"
+	"github.com/irisnet/irishub/modules/rand/client/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
+
+// GetQueryCmd returns the cli query commands for this module
+func GetQueryCmd(queryRoute string, cdc *codec.Codec) *cobra.Command {
+	// Group rand queries under a subcommand
+	randQueryCmd := &cobra.Command{
+		Use:                        rand.ModuleName,
+		Short:                      "Querying commands for the rand module",
+		DisableFlagParsing:         true,
+		SuggestionsMinimumDistance: 2,
+		RunE:                       client.ValidateCmd,
+	}
+
+	randQueryCmd.AddCommand(client.GetCommands(
+		GetCmdQueryRand(queryRoute, cdc),
+		GetCmdQueryRandRequestQueue(queryRoute, cdc))...)
+
+	return randQueryCmd
+}
 
 // GetCmdQueryRand implements the query-rand command.
 func GetCmdQueryRand(cdc *codec.Codec) *cobra.Command {

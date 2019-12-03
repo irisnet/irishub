@@ -1,16 +1,35 @@
 package cli
 
 import (
-	"os"
+	"bufio"
 
+	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/client/utils"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/irisnet/irishub/modules/rand"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
+
+// GetTxCmd returns the transaction commands for this module
+func GetTxCmd(cdc *codec.Codec) *cobra.Command {
+	randTxCmd := &cobra.Command{
+		Use:                        rand.ModuleName,
+		Short:                      "Rand transaction subcommands",
+		DisableFlagParsing:         true,
+		SuggestionsMinimumDistance: 2,
+		RunE:                       client.ValidateCmd,
+	}
+
+	randTxCmd.AddCommand(client.PostCommands(
+		GetCmdRequestRand(cdc),
+	)...)
+
+	return randTxCmd
+}
 
 // GetCmdRequestRand implements the request-rand command
 func GetCmdRequestRand(cdc *codec.Codec) *cobra.Command {
@@ -19,12 +38,9 @@ func GetCmdRequestRand(cdc *codec.Codec) *cobra.Command {
 		Short:   "Request a random number",
 		Example: "iriscli rand request-rand --block-interval=10",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().
-				WithCodec(cdc).
-				WithLogger(os.Stdout).
-				WithAccountDecoder(utils.GetAccountDecoder(cdc))
-			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).
-				WithCliCtx(cliCtx)
+			inBuf := bufio.NewReader(cmd.InOrStdin())
+			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(auth.DefaultTxEncoder(cdc))
+			cliCtx := context.NewCLIContextWithInput(inBuf).WithCodec(cdc)
 
 			consumer, err := cliCtx.GetFromAddress()
 			if err != nil {
@@ -40,7 +56,7 @@ func GetCmdRequestRand(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
+			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
 		},
 	}
 
