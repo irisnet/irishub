@@ -10,10 +10,10 @@ import (
 )
 
 type Guardian struct {
-	Description string         `json:"description"`
-	AccountType AccountType    `json:"type"`
-	Address     sdk.AccAddress `json:"address"`  // this guardian's address
-	AddedBy     sdk.AccAddress `json:"added_by"` // address that initiated the AddGuardian tx
+	Description string         `json:"description" yaml:"description"`
+	AccountType AccountType    `json:"type"  yaml:"account_type"`
+	Address     sdk.AccAddress `json:"address" yaml:"address"`    // this guardian's address
+	AddedBy     sdk.AccAddress `json:"added_by"  yaml:"added_by"` // address that initiated the AddGuardian tx
 }
 
 type Profilers []Guardian

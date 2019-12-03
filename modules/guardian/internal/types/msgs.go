@@ -22,7 +22,7 @@ func NewMsgAddProfiler(description string, address, addedBy sdk.AccAddress) MsgA
 	}
 }
 func (msg MsgAddProfiler) Route() string { return RouterKey }
-func (msg MsgAddProfiler) Type() string  { return "guardian add-profiler" }
+func (msg MsgAddProfiler) Type() string  { return "add_profiler" }
 func (msg MsgAddProfiler) GetSignBytes() []byte {
 	b, err := ModuleCdc.MarshalJSON(msg)
 	if err != nil {
@@ -54,7 +54,7 @@ func NewMsgDeleteProfiler(address, deletedBy sdk.AccAddress) MsgDeleteProfiler {
 	}
 }
 func (msg MsgDeleteProfiler) Route() string { return RouterKey }
-func (msg MsgDeleteProfiler) Type() string  { return "guardian delete-profiler" }
+func (msg MsgDeleteProfiler) Type() string  { return "delete_profiler" }
 func (msg MsgDeleteProfiler) GetSignBytes() []byte {
 	b, err := ModuleCdc.MarshalJSON(msg)
 	if err != nil {
@@ -87,7 +87,7 @@ func NewMsgAddTrustee(description string, address, addedAddress sdk.AccAddress) 
 	}
 }
 func (msg MsgAddTrustee) Route() string { return RouterKey }
-func (msg MsgAddTrustee) Type() string  { return "guardian add-trustee" }
+func (msg MsgAddTrustee) Type() string  { return "add_trustee" }
 func (msg MsgAddTrustee) GetSignBytes() []byte {
 	b, err := ModuleCdc.MarshalJSON(msg)
 	if err != nil {
@@ -119,7 +119,7 @@ func NewMsgDeleteTrustee(address, deletedBy sdk.AccAddress) MsgDeleteTrustee {
 	}
 }
 func (msg MsgDeleteTrustee) Route() string { return RouterKey }
-func (msg MsgDeleteTrustee) Type() string  { return "guardian delete-trustee" }
+func (msg MsgDeleteTrustee) Type() string  { return "delete_trustee" }
 func (msg MsgDeleteTrustee) GetSignBytes() []byte {
 	b, err := ModuleCdc.MarshalJSON(msg)
 	if err != nil {
@@ -139,14 +139,14 @@ func (msg MsgDeleteTrustee) GetSigners() []sdk.AccAddress {
 //______________________________________________________________________
 
 type AddGuardian struct {
-	Description string         `json:"description"`
-	Address     sdk.AccAddress `json:"address"`  // address added
-	AddedBy     sdk.AccAddress `json:"added_by"` // address that initiated the tx
+	Description string         `json:"description" yaml:"description"`
+	Address     sdk.AccAddress `json:"address" yaml:"address"`   // address added
+	AddedBy     sdk.AccAddress `json:"added_by" yaml:"added_by"` // address that initiated the tx
 }
 
 type DeleteGuardian struct {
-	Address   sdk.AccAddress `json:"address"`    // address deleted
-	DeletedBy sdk.AccAddress `json:"deleted_by"` // address that initiated the tx
+	Address   sdk.AccAddress `json:"address" yaml:"address"`       // address deleted
+	DeletedBy sdk.AccAddress `json:"deleted_by" yaml:"deleted_by"` // address that initiated the tx
 }
 
 func (g AddGuardian) ValidateBasic() sdk.Error {

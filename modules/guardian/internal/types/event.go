@@ -7,6 +7,7 @@ const (
 	EventTypeDeleteTrustee  = "delete_trustee"
 
 	AttributeKeyProfilerAddress = "address"
+	AttributeKeyTrusteeAddress  = "address"
 	AttributeKeyAddedBy         = "added_by"
 	AttributeKeyDeletedBy       = "deleted_by"
 

@@ -2,7 +2,6 @@ package guardian
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/irisnet/irishub/modules/guardian/internal/types"
 )
 
 // handle all "guardian" type messages.
@@ -25,10 +24,10 @@ func NewHandler(k Keeper) sdk.Handler {
 
 func handleMsgAddProfiler(ctx sdk.Context, k Keeper, msg MsgAddProfiler) sdk.Result {
 	if profiler, found := k.GetProfiler(ctx, msg.AddedBy); !found || profiler.AccountType != Genesis {
-		return types.ErrInvalidOperator(types.DefaultCodespace, msg.AddedBy).Result()
+		return ErrInvalidOperator(DefaultCodespace, msg.AddedBy).Result()
 	}
 	if _, found := k.GetProfiler(ctx, msg.Address); found {
-		return types.ErrProfilerExists(types.DefaultCodespace, msg.Address).Result()
+		return ErrProfilerExists(DefaultCodespace, msg.Address).Result()
 	}
 	profiler := NewGuardian(msg.Description, Ordinary, msg.Address, msg.AddedBy)
 	k.AddProfiler(ctx, profiler)
@@ -50,10 +49,10 @@ func handleMsgAddProfiler(ctx sdk.Context, k Keeper, msg MsgAddProfiler) sdk.Res
 
 func handleMsgAddTrustee(ctx sdk.Context, k Keeper, msg MsgAddTrustee) sdk.Result {
 	if trustee, found := k.GetTrustee(ctx, msg.AddedBy); !found || trustee.AccountType != Genesis {
-		return types.ErrInvalidOperator(types.DefaultCodespace, msg.AddedBy).Result()
+		return ErrInvalidOperator(DefaultCodespace, msg.AddedBy).Result()
 	}
 	if _, found := k.GetTrustee(ctx, msg.Address); found {
-		return types.ErrTrusteeExists(types.DefaultCodespace, msg.Address).Result()
+		return ErrTrusteeExists(DefaultCodespace, msg.Address).Result()
 	}
 	trustee := NewGuardian(msg.Description, Ordinary, msg.Address, msg.AddedBy)
 	k.AddTrustee(ctx, trustee)
@@ -65,7 +64,7 @@ func handleMsgAddTrustee(ctx sdk.Context, k Keeper, msg MsgAddTrustee) sdk.Resul
 		),
 		sdk.NewEvent(
 			EventTypeAddTrustee,
-			sdk.NewAttribute(AttributeKeyProfilerAddress, msg.Address.String()),
+			sdk.NewAttribute(AttributeKeyTrusteeAddress, msg.Address.String()),
 			sdk.NewAttribute(AttributeKeyAddedBy, msg.AddedBy.String()),
 		),
 	})
@@ -75,14 +74,14 @@ func handleMsgAddTrustee(ctx sdk.Context, k Keeper, msg MsgAddTrustee) sdk.Resul
 
 func handleMsgDeleteProfiler(ctx sdk.Context, k Keeper, msg MsgDeleteProfiler) sdk.Result {
 	if profiler, found := k.GetProfiler(ctx, msg.DeletedBy); !found || profiler.AccountType != Genesis {
-		return types.ErrInvalidOperator(types.DefaultCodespace, msg.DeletedBy).Result()
+		return ErrInvalidOperator(DefaultCodespace, msg.DeletedBy).Result()
 	}
 	profiler, found := k.GetProfiler(ctx, msg.Address)
 	if !found {
-		return types.ErrProfilerNotExists(types.DefaultCodespace, msg.Address).Result()
+		return ErrProfilerNotExists(DefaultCodespace, msg.Address).Result()
 	}
 	if profiler.AccountType == Genesis {
-		return types.ErrDeleteGenesisProfiler(types.DefaultCodespace, msg.Address).Result()
+		return ErrDeleteGenesisProfiler(DefaultCodespace, msg.Address).Result()
 	}
 
 	k.DeleteProfiler(ctx, msg.Address)
@@ -104,14 +103,14 @@ func handleMsgDeleteProfiler(ctx sdk.Context, k Keeper, msg MsgDeleteProfiler) s
 
 func handleMsgDeleteTrustee(ctx sdk.Context, k Keeper, msg MsgDeleteTrustee) sdk.Result {
 	if trustee, found := k.GetTrustee(ctx, msg.DeletedBy); !found || trustee.AccountType != Genesis {
-		return types.ErrInvalidOperator(types.DefaultCodespace, msg.DeletedBy).Result()
+		return ErrInvalidOperator(DefaultCodespace, msg.DeletedBy).Result()
 	}
 	trustee, found := k.GetTrustee(ctx, msg.Address)
 	if !found {
-		return types.ErrTrusteeNotExists(types.DefaultCodespace, msg.Address).Result()
+		return ErrTrusteeNotExists(DefaultCodespace, msg.Address).Result()
 	}
 	if trustee.AccountType == Genesis {
-		return types.ErrDeleteGenesisTrustee(types.DefaultCodespace, msg.Address).Result()
+		return ErrDeleteGenesisTrustee(DefaultCodespace, msg.Address).Result()
 	}
 
 	k.DeleteTrustee(ctx, msg.Address)
@@ -123,7 +122,7 @@ func handleMsgDeleteTrustee(ctx sdk.Context, k Keeper, msg MsgDeleteTrustee) sdk
 		),
 		sdk.NewEvent(
 			EventTypeDeleteTrustee,
-			sdk.NewAttribute(AttributeKeyProfilerAddress, msg.Address.String()),
+			sdk.NewAttribute(AttributeKeyTrusteeAddress, msg.Address.String()),
 			sdk.NewAttribute(AttributeKeyDeletedBy, msg.DeletedBy.String()),
 		),
 	})

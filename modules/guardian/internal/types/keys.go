@@ -17,13 +17,13 @@ const (
 	// default paramspace for params keeper
 	DefaultParamspace = ModuleName
 
-	// StoreKey is the default store key for mint
+	// StoreKey is the default store key for guardian
 	StoreKey = ModuleName
 
-	// RouterKey is the message route for slashing
+	// RouterKey is the message route for guardian
 	RouterKey = ModuleName
 
-	// QuerierRoute is the querier route for the minting store.
+	// QuerierRoute is the querier route for the guardian store.
 	QuerierRoute = StoreKey
 
 	// Query endpoints supported by the guardian querier

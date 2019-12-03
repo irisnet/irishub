@@ -36,7 +36,7 @@ func GetCmdCreateProfiler(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "add-profiler",
 		Short: "Add a new profiler",
-		Example: "iriscli tx guardian add-profiler --chain-id=<chain-id> --from=<key-name> --fee=0.3iris " +
+		Example: "iriscli tx guardian add-profiler --chain-id=<chain-id> --from=<key-name> --fees=0.3iris " +
 			"--address=<added address> --description=<name>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
@@ -70,7 +70,7 @@ func GetCmdDeleteProfiler(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "delete-profiler",
 		Short: "Delete a profiler",
-		Example: "iriscli tx guardian delete-profiler --chain-id=<chain-id> --from=<key-name> --fee=0.3iris " +
+		Example: "iriscli tx guardian delete-profiler --chain-id=<chain-id> --from=<key-name> --fees=0.3iris " +
 			"--address=<deleted address>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
@@ -97,7 +97,7 @@ func GetCmdCreateTrustee(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "add-trustee",
 		Short: "Add a new trustee",
-		Example: "iriscli tx guardian add-trustee --chain-id=<chain-id> --from=<key-name> --fee=0.3iris " +
+		Example: "iriscli tx guardian add-trustee --chain-id=<chain-id> --from=<key-name> --fees=0.3iris " +
 			"--address=<added address> --description=<name>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
@@ -127,7 +127,7 @@ func GetCmdDeleteTrustee(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "delete-trustee",
 		Short: "Delete a trustee",
-		Example: "iriscli tx guardian delete-trustee --chain-id=<chain-id> --from=<key-name> --fee=0.3iris " +
+		Example: "iriscli tx guardian delete-trustee --chain-id=<chain-id> --from=<key-name> --fees=0.3iris " +
 			"--address=<deleted address>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
