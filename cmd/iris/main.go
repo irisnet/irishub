@@ -3,9 +3,10 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	abci "github.com/tendermint/tendermint/abci/types"
 	"io"
 	"strings"
+
+	abci "github.com/tendermint/tendermint/abci/types"
 
 	"github.com/irisnet/irishub/app"
 	bam "github.com/irisnet/irishub/app"
