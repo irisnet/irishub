@@ -1,8 +1,9 @@
-package service
+package keeper
 
 import (
-	"github.com/irisnet/irishub/codec"
-	sdk "github.com/irisnet/irishub/types"
+	"github.com/cosmos/cosmos-sdk/codec"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/irisnet/irishub/modules/service/internal/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 )
 
@@ -42,8 +43,8 @@ type QueryServiceParams struct {
 }
 
 type DefinitionOutput struct {
-	Definition SvcDef           `json:"definition"`
-	Methods    []MethodProperty `json:"methods"`
+	Definition SvcDef                 `json:"definition"`
+	Methods    []types.MethodProperty `json:"methods"`
 }
 
 func queryDefinition(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sdk.Error) {
@@ -54,14 +55,14 @@ func queryDefinition(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, 
 	}
 	svcDef, found := k.GetServiceDefinition(ctx, params.DefChainID, params.ServiceName)
 	if !found {
-		return nil, ErrSvcDefNotExists(DefaultCodespace, params.DefChainID, params.ServiceName)
+		return nil, types.ErrSvcDefNotExists(types.DefaultCodespace, params.DefChainID, params.ServiceName)
 	}
 
 	iterator := k.GetMethods(ctx, params.DefChainID, params.ServiceName)
 	defer iterator.Close()
-	var methods []MethodProperty
+	var methods []types.MethodProperty
 	for ; iterator.Valid(); iterator.Next() {
-		var method MethodProperty
+		var method types.MethodProperty
 		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &method)
 		methods = append(methods, method)
 	}
@@ -90,7 +91,7 @@ func queryBinding(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sdk
 	}
 	svcBinding, found := k.GetServiceBinding(ctx, params.DefChainID, params.ServiceName, params.BindChainId, params.Provider)
 	if !found {
-		return nil, ErrSvcBindingNotExists(DefaultCodespace)
+		return nil, types.ErrSvcBindingNotExists(types.DefaultCodespace)
 	}
 	bz, err := codec.MarshalJSONIndent(k.cdc, svcBinding)
 	if err != nil {
@@ -108,9 +109,9 @@ func queryBindings(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sd
 
 	iterator := k.ServiceBindingsIterator(ctx, params.DefChainID, params.ServiceName)
 	defer iterator.Close()
-	var bindings []SvcBinding
+	var bindings []types.SvcBinding
 	for ; iterator.Valid(); iterator.Next() {
-		var binding SvcBinding
+		var binding types.SvcBinding
 		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &binding)
 		bindings = append(bindings, binding)
 	}
@@ -131,9 +132,9 @@ func queryRequests(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sd
 
 	iterator := k.ActiveBindRequestsIterator(ctx, params.DefChainID, params.ServiceName, params.BindChainId, params.Provider)
 	defer iterator.Close()
-	var requests []SvcRequest
+	var requests []types.SvcRequest
 	for ; iterator.Valid(); iterator.Next() {
-		var request SvcRequest
+		var request types.SvcRequest
 		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &request)
 		requests = append(requests, request)
 	}
@@ -157,13 +158,13 @@ func queryResponse(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sd
 		return nil, sdk.ParseParamsErr(err)
 	}
 
-	eHeight, rHeight, counter, err := ConvertRequestID(params.RequestId)
+	eHeight, rHeight, counter, err := types.ConvertRequestID(params.RequestId)
 	if err != nil {
 		return nil, sdk.ErrUnknownRequest(err.Error())
 	}
 	response, found := k.GetResponse(ctx, params.ReqChainId, eHeight, rHeight, counter)
 	if !found {
-		return nil, ErrNoResponseFound(DefaultCodespace, params.RequestId)
+		return nil, types.ErrNoResponseFound(DefaultCodespace, params.RequestId)
 	}
 
 	bz, err := codec.MarshalJSONIndent(k.cdc, response)

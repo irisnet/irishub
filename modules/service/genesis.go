@@ -1,20 +1,9 @@
 package service
 
 import (
-	"github.com/irisnet/irishub/app/v1/auth"
-	sdk "github.com/irisnet/irishub/types"
+	"github.com/cosmos/cosmos-sdk/x/auth"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
-
-// GenesisState - all service state that must be provided at genesis
-type GenesisState struct {
-	Params Params `json:"params"` // service params
-}
-
-func NewGenesisState(params Params) GenesisState {
-	return GenesisState{
-		Params: params,
-	}
-}
 
 // InitGenesis - store genesis parameters
 func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {

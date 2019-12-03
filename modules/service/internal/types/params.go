@@ -1,13 +1,13 @@
-package service
+package types
 
 import (
 	"fmt"
 	"strconv"
 	"time"
 
-	"github.com/irisnet/irishub/app/v1/params"
-	"github.com/irisnet/irishub/codec"
-	sdk "github.com/irisnet/irishub/types"
+	"github.com/cosmos/cosmos-sdk/x/params"
+	"github.com/cosmos/cosmos-sdk/codec"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 var _ params.ParamSet = (*Params)(nil)

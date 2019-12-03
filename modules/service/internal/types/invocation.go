@@ -1,11 +1,12 @@
-package service
+package types
 
 import (
 	"errors"
 	"fmt"
-	sdk "github.com/irisnet/irishub/types"
 	"strconv"
 	"strings"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 type SvcRequest struct {

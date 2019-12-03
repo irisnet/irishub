@@ -1,8 +1,26 @@
-package service
+package types
 
 import (
 	"encoding/binary"
-	sdk "github.com/irisnet/irishub/types"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
+)
+
+const (
+	// ModuleName is the name of the service module
+	ModuleName = "service"
+
+	// StoreKey is the string store representation
+	StoreKey = ModuleName
+
+	// TStoreKey is the string transient store representation
+	TStoreKey = "transient_" + ModuleName
+
+	// QuerierRoute is the querier route for the service module
+	QuerierRoute = ModuleName
+
+	// RouterKey is the msg router key for the service module
+	RouterKey = ModuleName
 )
 
 var (
@@ -92,6 +110,10 @@ func GetRequestsByExpirationPrefix(height int64) []byte {
 	key[0] = requestsByExpirationIndexKey[0]
 	binary.BigEndian.PutUint64(key[1:9], uint64(height))
 	return key
+}
+
+func GetIntraTxCounterKey() []byte {
+	return intraTxCounterKey
 }
 
 func GetReturnedFeeKey(address sdk.AccAddress) []byte {

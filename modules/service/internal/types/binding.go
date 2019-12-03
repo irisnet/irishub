@@ -1,12 +1,12 @@
-package service
+package types
 
 import (
 	"encoding/json"
 	"fmt"
-
-	sdk "github.com/irisnet/irishub/types"
-	"github.com/pkg/errors"
 	"time"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/pkg/errors"
 )
 
 type SvcBinding struct {

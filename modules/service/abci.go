@@ -1,18 +1,17 @@
 package service
 
 import (
-	"github.com/irisnet/irishub/app/v1/auth"
-	"github.com/irisnet/irishub/app/v1/service/tags"
-	"github.com/irisnet/irishub/types"
+	"github.com/cosmos/cosmos-sdk/x/auth"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func EndBlocker(ctx types.Context, keeper Keeper) (resTags types.Tags) {
+// EndBlocker handles block ending logic
+func EndBlocker(ctx sdk.Context, keeper Keeper) {
 	ctx = ctx.WithLogger(ctx.Logger().With("handler", "endBlock").With("module", "iris/service"))
 	logger := ctx.Logger()
 	// Reset the intra-transaction counter.
 	keeper.SetIntraTxCounter(ctx, 0)
 
-	resTags = types.NewTags()
 	params := keeper.GetParamSet(ctx)
 	slashFraction := params.SlashFraction
 
@@ -23,13 +22,13 @@ func EndBlocker(ctx types.Context, keeper Keeper) (resTags types.Tags) {
 		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(activeIterator.Value(), &req)
 
 		// if not Profiling mode,should slash provider
-		slashCoins := types.Coins{}
+		slashCoins := sdk.Coins{}
 		if !req.Profiling {
 			binding, found := keeper.GetServiceBinding(ctx, req.DefChainID, req.DefName, req.BindChainID, req.Provider)
 			if found {
 				for _, coin := range binding.Deposit {
-					taxAmount := types.NewDecFromInt(coin.Amount).Mul(slashFraction).TruncateInt()
-					slashCoins = append(slashCoins, types.NewCoin(coin.Denom, taxAmount))
+					taxAmount := sdk.NewDecFromInt(coin.Amount).Mul(slashFraction).TruncateInt()
+					slashCoins = append(slashCoins, sdk.NewCoin(coin.Denom, taxAmount))
 				}
 			}
 
@@ -51,12 +50,8 @@ func EndBlocker(ctx types.Context, keeper Keeper) (resTags types.Tags) {
 		keeper.metrics.ActiveRequests.Add(-1)
 		keeper.DeleteRequestExpiration(ctx, req)
 
-		resTags = resTags.AppendTag(tags.Action, tags.ActionSvcCallTimeOut)
-		resTags = resTags.AppendTag(tags.RequestID, []byte(req.RequestID()))
-		resTags = resTags.AppendTag(tags.Provider, []byte(req.Provider))
-		resTags = resTags.AppendTag(tags.SlashCoins, []byte(slashCoins.String()))
 		logger.Info("Remove timeout request", "request_id", req.RequestID(), "consumer", req.Consumer.String())
 	}
 
-	return resTags
+	return 
 }

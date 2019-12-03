@@ -1,12 +1,13 @@
-package service
+package types
 
 import (
 	"fmt"
-	sdk "github.com/irisnet/irishub/types"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 const (
-	DefaultCodespace sdk.CodespaceType = "service"
+	DefaultCodespace sdk.CodespaceType = ModuleName
 
 	CodeInvalidIDL               sdk.CodeType = 100
 	CodeSvcDefExists             sdk.CodeType = 101

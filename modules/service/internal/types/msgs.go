@@ -1,16 +1,28 @@
-package service
+package types
 
 import (
 	"fmt"
 	"regexp"
 
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/irisnet/irishub/tools/protoidl"
-	sdk "github.com/irisnet/irishub/types"
 )
 
 const (
+	// types for msgs
+	TypeMsgSvcDef           = "define_service"
+	TypeMsgSvcBind          = "bind_service"
+	TypeMsgSvcBindingUpdate = "update_service_binding"
+	TypeMsgSvcDisable       = "disable_service"
+	TypeMsgSvcEnable        = "enable_service"
+	TypeMsgSvcRefundDeposit = "refund_service_deposit"
+	TypeMsgSvcRequest       = "call_service"
+	TypeMsgSvcResponse      = "respond_service"
+	TypeMsgSvcRefundFees    = "refund_service_fees"
+	TypeMsgSvcWithdrawFees  = "withdraw_service_fees"
+	TypeMsgSvcWithdrawTax   = "withdraw_service_tax"
+
 	// name to idetify transaction types
-	MsgRoute      = "service"
 	outputPrivacy = "output_privacy"
 	outputCached  = "output_cached"
 	description   = "description"
@@ -39,7 +51,7 @@ func NewMsgSvcDef(name, chainId, description string, tags []string, author sdk.A
 	}
 }
 
-func (msg MsgSvcDef) Route() string { return MsgRoute }
+func (msg MsgSvcDef) Route() string { return RouterKey }
 func (msg MsgSvcDef) Type() string  { return "define_service" }
 
 func (msg MsgSvcDef) GetSignBytes() []byte {
@@ -159,8 +171,8 @@ func NewMsgSvcBind(defChainID, defName, bindChainID string, provider sdk.AccAddr
 	}
 }
 
-func (msg MsgSvcBind) Route() string { return MsgRoute }
-func (msg MsgSvcBind) Type() string  { return "bind_service" }
+func (msg MsgSvcBind) Route() string { return RouterKey }
+func (msg MsgSvcBind) Type() string  { return TypeMsgSvcBind }
 
 func (msg MsgSvcBind) GetSignBytes() []byte {
 	b, err := msgCdc.MarshalJSON(msg)
@@ -239,8 +251,8 @@ func NewMsgSvcBindingUpdate(defChainID, defName, bindChainID string, provider sd
 		Level:       level,
 	}
 }
-func (msg MsgSvcBindingUpdate) Route() string { return MsgRoute }
-func (msg MsgSvcBindingUpdate) Type() string  { return "update_service_binding" }
+func (msg MsgSvcBindingUpdate) Route() string { return RouterKey }
+func (msg MsgSvcBindingUpdate) Type() string  { return MsgSvcBindingUpdate }
 
 func (msg MsgSvcBindingUpdate) GetSignBytes() []byte {
 	b, err := msgCdc.MarshalJSON(msg)
@@ -312,8 +324,8 @@ func NewMsgSvcDisable(defChainID, defName, bindChainID string, provider sdk.AccA
 	}
 }
 
-func (msg MsgSvcDisable) Route() string { return MsgRoute }
-func (msg MsgSvcDisable) Type() string  { return "disable_service" }
+func (msg MsgSvcDisable) Route() string { return RouterKey }
+func (msg MsgSvcDisable) Type() string  { return TypeMsgSvcDisable }
 
 func (msg MsgSvcDisable) GetSignBytes() []byte {
 	b, err := msgCdc.MarshalJSON(msg)
@@ -373,8 +385,8 @@ func NewMsgSvcEnable(defChainID, defName, bindChainID string, provider sdk.AccAd
 	}
 }
 
-func (msg MsgSvcEnable) Route() string { return MsgRoute }
-func (msg MsgSvcEnable) Type() string  { return "enable_service" }
+func (msg MsgSvcEnable) Route() string { return RouterKey }
+func (msg MsgSvcEnable) Type() string  { return TypeMsgSvcEnable }
 
 func (msg MsgSvcEnable) GetSignBytes() []byte {
 	b, err := msgCdc.MarshalJSON(msg)
@@ -435,8 +447,8 @@ func NewMsgSvcRefundDeposit(defChainID, defName, bindChainID string, provider sd
 	}
 }
 
-func (msg MsgSvcRefundDeposit) Route() string { return MsgRoute }
-func (msg MsgSvcRefundDeposit) Type() string  { return "refund_service_deposit" }
+func (msg MsgSvcRefundDeposit) Route() string { return RouterKey }
+func (msg MsgSvcRefundDeposit) Type() string  { return TypeMsgSvcRefundDeposit }
 
 func (msg MsgSvcRefundDeposit) GetSignBytes() []byte {
 	b, err := msgCdc.MarshalJSON(msg)
@@ -506,8 +518,8 @@ func NewMsgSvcRequest(defChainID, defName, bindChainID, reqChainID string, consu
 	}
 }
 
-func (msg MsgSvcRequest) Route() string { return MsgRoute }
-func (msg MsgSvcRequest) Type() string  { return "call_service" }
+func (msg MsgSvcRequest) Route() string { return RouterKey }
+func (msg MsgSvcRequest) Type() string  { return TypeMsgSvcRequest }
 
 func (msg MsgSvcRequest) GetSignBytes() []byte {
 	if len(msg.Input) == 0 {
@@ -582,8 +594,8 @@ func NewMsgSvcResponse(reqChainID string, requestId string, provider sdk.AccAddr
 	}
 }
 
-func (msg MsgSvcResponse) Route() string { return MsgRoute }
-func (msg MsgSvcResponse) Type() string  { return "respond_service" }
+func (msg MsgSvcResponse) Route() string { return RouterKey }
+func (msg MsgSvcResponse) Type() string  { return TypeMsgSvcResponse }
 
 func (msg MsgSvcResponse) GetSignBytes() []byte {
 	if len(msg.Output) == 0 {
@@ -634,8 +646,8 @@ func NewMsgSvcRefundFees(consumer sdk.AccAddress) MsgSvcRefundFees {
 	}
 }
 
-func (msg MsgSvcRefundFees) Route() string { return MsgRoute }
-func (msg MsgSvcRefundFees) Type() string  { return "refund_service_fees" }
+func (msg MsgSvcRefundFees) Route() string { return RouterKey }
+func (msg MsgSvcRefundFees) Type() string  { return TypeMsgSvcRefundFees }
 
 func (msg MsgSvcRefundFees) GetSignBytes() []byte {
 	b := msgCdc.MustMarshalJSON(msg)
@@ -666,8 +678,8 @@ func NewMsgSvcWithdrawFees(provider sdk.AccAddress) MsgSvcWithdrawFees {
 	}
 }
 
-func (msg MsgSvcWithdrawFees) Route() string { return MsgRoute }
-func (msg MsgSvcWithdrawFees) Type() string  { return "withdraw_service_fees" }
+func (msg MsgSvcWithdrawFees) Route() string { return RouterKey }
+func (msg MsgSvcWithdrawFees) Type() string  { return TypeMsgSvcWithdrawFees }
 
 func (msg MsgSvcWithdrawFees) GetSignBytes() []byte {
 	b := msgCdc.MustMarshalJSON(msg)
@@ -702,8 +714,8 @@ func NewMsgSvcWithdrawTax(trustee, destAddress sdk.AccAddress, amount sdk.Coins)
 	}
 }
 
-func (msg MsgSvcWithdrawTax) Route() string { return MsgRoute }
-func (msg MsgSvcWithdrawTax) Type() string  { return "withdraw_service_tax" }
+func (msg MsgSvcWithdrawTax) Route() string { return RouterKey }
+func (msg MsgSvcWithdrawTax) Type() string  { return TypeMsgSvcWithdrawTax }
 
 func (msg MsgSvcWithdrawTax) GetSignBytes() []byte {
 	b := msgCdc.MustMarshalJSON(msg)

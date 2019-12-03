@@ -1,4 +1,4 @@
-package service
+package types
 
 import (
 	"github.com/go-kit/kit/metrics"
