@@ -29,8 +29,6 @@ var (
 // AppModuleBasic defines the basic application module used by the HTLC module.
 type AppModuleBasic struct{}
 
-var _ module.AppModuleBasic = AppModuleBasic{}
-
 // Name returns the HTLC module's name.
 func (AppModuleBasic) Name() string {
 	return ModuleName
