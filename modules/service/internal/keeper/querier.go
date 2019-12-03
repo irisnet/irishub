@@ -43,7 +43,7 @@ type QueryServiceParams struct {
 }
 
 type DefinitionOutput struct {
-	Definition SvcDef                 `json:"definition"`
+	Definition types.SvcDef           `json:"definition"`
 	Methods    []types.MethodProperty `json:"methods"`
 }
 
@@ -164,7 +164,7 @@ func queryResponse(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sd
 	}
 	response, found := k.GetResponse(ctx, params.ReqChainId, eHeight, rHeight, counter)
 	if !found {
-		return nil, types.ErrNoResponseFound(DefaultCodespace, params.RequestId)
+		return nil, types.ErrNoResponseFound(types.DefaultCodespace, params.RequestId)
 	}
 
 	bz, err := codec.MarshalJSONIndent(k.cdc, response)

@@ -58,7 +58,7 @@ func (msg MsgSvcDef) GetSignBytes() []byte {
 	if len(msg.Tags) == 0 {
 		msg.Tags = nil
 	}
-	b, err := msgCdc.MarshalJSON(msg)
+	b, err := ModuleCdc.MarshalJSON(msg)
 	if err != nil {
 		panic(err)
 	}
@@ -175,7 +175,7 @@ func (msg MsgSvcBind) Route() string { return RouterKey }
 func (msg MsgSvcBind) Type() string  { return TypeMsgSvcBind }
 
 func (msg MsgSvcBind) GetSignBytes() []byte {
-	b, err := msgCdc.MarshalJSON(msg)
+	b, err := ModuleCdc.MarshalJSON(msg)
 	if err != nil {
 		panic(err)
 	}
@@ -255,7 +255,7 @@ func (msg MsgSvcBindingUpdate) Route() string { return RouterKey }
 func (msg MsgSvcBindingUpdate) Type() string  { return MsgSvcBindingUpdate }
 
 func (msg MsgSvcBindingUpdate) GetSignBytes() []byte {
-	b, err := msgCdc.MarshalJSON(msg)
+	b, err := ModuleCdc.MarshalJSON(msg)
 	if err != nil {
 		panic(err)
 	}
@@ -328,7 +328,7 @@ func (msg MsgSvcDisable) Route() string { return RouterKey }
 func (msg MsgSvcDisable) Type() string  { return TypeMsgSvcDisable }
 
 func (msg MsgSvcDisable) GetSignBytes() []byte {
-	b, err := msgCdc.MarshalJSON(msg)
+	b, err := ModuleCdc.MarshalJSON(msg)
 	if err != nil {
 		panic(err)
 	}
@@ -389,7 +389,7 @@ func (msg MsgSvcEnable) Route() string { return RouterKey }
 func (msg MsgSvcEnable) Type() string  { return TypeMsgSvcEnable }
 
 func (msg MsgSvcEnable) GetSignBytes() []byte {
-	b, err := msgCdc.MarshalJSON(msg)
+	b, err := ModuleCdc.MarshalJSON(msg)
 	if err != nil {
 		panic(err)
 	}
@@ -451,7 +451,7 @@ func (msg MsgSvcRefundDeposit) Route() string { return RouterKey }
 func (msg MsgSvcRefundDeposit) Type() string  { return TypeMsgSvcRefundDeposit }
 
 func (msg MsgSvcRefundDeposit) GetSignBytes() []byte {
-	b, err := msgCdc.MarshalJSON(msg)
+	b, err := ModuleCdc.MarshalJSON(msg)
 	if err != nil {
 		panic(err)
 	}
@@ -525,7 +525,7 @@ func (msg MsgSvcRequest) GetSignBytes() []byte {
 	if len(msg.Input) == 0 {
 		msg.Input = nil
 	}
-	b, err := msgCdc.MarshalJSON(msg)
+	b, err := ModuleCdc.MarshalJSON(msg)
 	if err != nil {
 		panic(err)
 	}
@@ -604,7 +604,7 @@ func (msg MsgSvcResponse) GetSignBytes() []byte {
 	if len(msg.ErrorMsg) == 0 {
 		msg.ErrorMsg = nil
 	}
-	b, err := msgCdc.MarshalJSON(msg)
+	b, err := ModuleCdc.MarshalJSON(msg)
 	if err != nil {
 		panic(err)
 	}
@@ -650,7 +650,7 @@ func (msg MsgSvcRefundFees) Route() string { return RouterKey }
 func (msg MsgSvcRefundFees) Type() string  { return TypeMsgSvcRefundFees }
 
 func (msg MsgSvcRefundFees) GetSignBytes() []byte {
-	b := msgCdc.MustMarshalJSON(msg)
+	b := ModuleCdc.MustMarshalJSON(msg)
 	return sdk.MustSortJSON(b)
 }
 
@@ -682,7 +682,7 @@ func (msg MsgSvcWithdrawFees) Route() string { return RouterKey }
 func (msg MsgSvcWithdrawFees) Type() string  { return TypeMsgSvcWithdrawFees }
 
 func (msg MsgSvcWithdrawFees) GetSignBytes() []byte {
-	b := msgCdc.MustMarshalJSON(msg)
+	b := ModuleCdc.MustMarshalJSON(msg)
 	return sdk.MustSortJSON(b)
 }
 
@@ -718,7 +718,7 @@ func (msg MsgSvcWithdrawTax) Route() string { return RouterKey }
 func (msg MsgSvcWithdrawTax) Type() string  { return TypeMsgSvcWithdrawTax }
 
 func (msg MsgSvcWithdrawTax) GetSignBytes() []byte {
-	b := msgCdc.MustMarshalJSON(msg)
+	b := ModuleCdc.MustMarshalJSON(msg)
 	return sdk.MustSortJSON(b)
 }
 

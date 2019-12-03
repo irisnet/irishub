@@ -24,6 +24,7 @@ type (
 	SvcRequest       = types.SvcRequest
 	SvcResponse      = types.SvcResponse
 	MethodProperty   = types.MethodProperty
+	Level            = types.Level
 	NoPrivacy        = types.NoPrivacy
 	PubKeyEncryption = types.PubKeyEncryption
 	Unicast          = types.Unicast
@@ -66,6 +67,10 @@ var (
 	QueryRequests   = types.QueryRequests
 	QueryResponse   = types.QueryResponse
 	QueryFees       = types.QueryFees
+
+	NewGenesisState      = types.NewGenesisState
+	DefaultParams        = types.DefaultParam
+	DefaultParamsForTest = types.DefaultParamsForTest
 
 	NewKeeper  = keeper.NewKeeper
 	NewQuerier = keeper.NewQuerier

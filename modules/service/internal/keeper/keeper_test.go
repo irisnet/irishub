@@ -1,9 +1,10 @@
-package service
+package keeper
 
 import (
 	"testing"
 
-	sdk "github.com/irisnet/irishub/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/irisnet/irishub/modules/service/internal/types"
 	"github.com/stretchr/testify/require"
 	abci "github.com/tendermint/tendermint/abci/types"
 )
@@ -17,7 +18,7 @@ func TestKeeper_service_Definition(t *testing.T) {
 	coin, _ := sdk.IrisCoinType.ConvertToMinDenomCoin("1100iris")
 	keeper.ck.AddCoins(ctx, addrs[1], sdk.Coins{coin})
 
-	serviceDef := NewSvcDef("myService",
+	serviceDef := types.NewSvcDef("myService",
 		"testnet",
 		"the service for unit test",
 		[]string{"test", "tutorial"},
@@ -37,7 +38,7 @@ func TestKeeper_service_Definition(t *testing.T) {
 	defer iterator.Close()
 	require.True(t, iterator.Valid())
 	for ; ; iterator.Next() {
-		var method MethodProperty
+		var method types.MethodProperty
 		if !iterator.Valid() {
 			break
 		}
@@ -52,8 +53,8 @@ func TestKeeper_service_Definition(t *testing.T) {
 	deposit, _ := sdk.IrisCoinType.ConvertToMinDenomCoin("1000iris")
 	price, _ := sdk.IrisCoinType.ConvertToMinDenomCoin("1iris")
 	svcBinding := NewSvcBinding(ctx, "testnet", "myService", "testnet",
-		addrs[1], Global, sdk.Coins{deposit}, []sdk.Coin{price},
-		Level{AvgRspTime: 10000, UsableTime: 9999}, true)
+		addrs[1], types.Global, sdk.Coins{deposit}, []sdk.Coin{price},
+		types.Level{AvgRspTime: 10000, UsableTime: 9999}, true)
 	err := keeper.AddServiceBinding(ctx, svcBinding)
 	require.NoError(t, err)
 
@@ -65,9 +66,9 @@ func TestKeeper_service_Definition(t *testing.T) {
 	require.True(t, SvcBindingEqual(svcBinding, gotSvcBinding))
 
 	// test binding update
-	svcBindingUpdate := NewSvcBinding(ctx, "testnet", "myService", "testnet",
-		addrs[1], Global, sdk.Coins{coin}, []sdk.Coin{price},
-		Level{AvgRspTime: 10000, UsableTime: 9999}, true)
+	svcBindingUpdate := types.NewSvcBinding(ctx, "testnet", "myService", "testnet",
+		addrs[1], types.Global, sdk.Coins{coin}, []sdk.Coin{price},
+		types.Level{AvgRspTime: 10000, UsableTime: 9999}, true)
 	err = keeper.UpdateServiceBinding(ctx, svcBindingUpdate)
 	require.NoError(t, err)
 
@@ -88,7 +89,7 @@ func TestKeeper_service_Call(t *testing.T) {
 	keeper.ck.AddCoins(ctx, addrs[1], sdk.Coins{coin})
 	keeper.ck.AddCoins(ctx, addrs[2], sdk.Coins{coin})
 
-	serviceDef := NewSvcDef("myService",
+	serviceDef := types.NewSvcDef("myService",
 		"testnet",
 		"the service for unit test",
 		[]string{"test", "tutorial"},
@@ -100,13 +101,13 @@ func TestKeeper_service_Call(t *testing.T) {
 
 	deposit, _ := sdk.IrisCoinType.ConvertToMinDenomCoin("1000iris")
 	price, _ := sdk.IrisCoinType.ConvertToMinDenomCoin("1iris")
-	svcBinding := NewSvcBinding(ctx, "testnet", "myService", "testnet",
-		addrs[1], Global, sdk.Coins{deposit}, []sdk.Coin{price},
-		Level{AvgRspTime: 10000, UsableTime: 9999}, true)
+	svcBinding := types.NewSvcBinding(ctx, "testnet", "myService", "testnet",
+		addrs[1], types.Global, sdk.Coins{deposit}, []sdk.Coin{price},
+		types.Level{AvgRspTime: 10000, UsableTime: 9999}, true)
 	keeper.AddServiceBinding(ctx, svcBinding)
 
 	// service request
-	svcRequest := NewSvcRequest("testnet", "myService", "testnet", "testnet",
+	svcRequest := types.NewSvcRequest("testnet", "myService", "testnet", "testnet",
 		addrs[2], addrs[1], 1, []byte("1234"), sdk.Coins{price}, false)
 	svcRequest, err := keeper.AddRequest(ctx, svcRequest)
 	require.NoError(t, err)
@@ -119,7 +120,7 @@ func TestKeeper_service_Call(t *testing.T) {
 	defer iterator.Close()
 	require.True(t, iterator.Valid())
 	for ; ; iterator.Next() {
-		var req SvcRequest
+		var req types.SvcRequest
 		if !iterator.Valid() {
 			break
 		}
