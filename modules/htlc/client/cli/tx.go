@@ -16,7 +16,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
 
-	"github.com/irisnet/irishub/modules/htlc/internal/keeper"
 	"github.com/irisnet/irishub/modules/htlc/internal/types"
 )
 
@@ -44,7 +43,7 @@ func GetCmdCreateHTLC(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create",
 		Short: "Create an HTLC",
-		Example: "iriscli htlc create --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --to=<to> --receiver-on-other-chain=<receiver-on-other-chain> --amount=<amount> --secret=<secret> " +
+		Example: "iriscli tx htlc create --chain-id=<chain-id> --from=<key-name> --fees=0.3iris --to=<to> --receiver-on-other-chain=<receiver-on-other-chain> --amount=<amount> --secret=<secret> " +
 			"--time-lock=<time-lock> --timestamp=<timestamp>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(auth.DefaultTxEncoder(cdc))
@@ -86,7 +85,7 @@ func GetCmdCreateHTLC(cdc *codec.Codec) *cobra.Command {
 			}
 
 			timestamp := viper.GetInt64(FlagTimestamp)
-			hashLock := keeper.GetHashLock(secret, uint64(timestamp))
+			hashLock := types.GetHashLock(secret, uint64(timestamp))
 
 			timeLock := viper.GetInt64(FlagTimeLock)
 
@@ -123,7 +122,7 @@ func GetCmdClaimHTLC(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "claim",
 		Short:   "Claim an opened HTLC",
-		Example: "iriscli htlc claim --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --hash-lock=<hash-lock> --secret=<secret>",
+		Example: "iriscli tx htlc claim --chain-id=<chain-id> --from=<key-name> --fees=0.3iris --hash-lock=<hash-lock> --secret=<secret>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(auth.DefaultTxEncoder(cdc))
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
@@ -163,7 +162,7 @@ func GetCmdRefundHTLC(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "refund",
 		Short:   "Refund from an expired HTLC",
-		Example: "iriscli htlc refund --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --hash-lock=<hash-lock>",
+		Example: "iriscli tx htlc refund --chain-id=<chain-id> --from=<key-name> --fees=0.3iris --hash-lock=<hash-lock>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(auth.DefaultTxEncoder(cdc))
 			cliCtx := context.NewCLIContext().WithCodec(cdc)

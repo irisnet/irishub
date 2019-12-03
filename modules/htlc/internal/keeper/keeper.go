@@ -15,14 +15,13 @@ import (
 type Keeper struct {
 	storeKey sdk.StoreKey
 	cdc      *codec.Codec
-	bk       types.BankKeeper
 	sk       types.SupplyKeeper
 
 	// codespace
 	codespace sdk.CodespaceType
 }
 
-func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, bk types.BankKeeper, sk types.SupplyKeeper, codespace sdk.CodespaceType) Keeper {
+func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, sk types.SupplyKeeper, codespace sdk.CodespaceType) Keeper {
 	// ensure htlc module account is set
 	if addr := sk.GetModuleAddress(types.ModuleName); addr == nil {
 		panic(fmt.Sprintf("%s module account has not been set", types.ModuleName))
@@ -31,7 +30,6 @@ func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, bk types.BankKeeper, sk types
 	return Keeper{
 		storeKey:  key,
 		cdc:       cdc,
-		bk:        bk,
 		sk:        sk,
 		codespace: codespace,
 	}
@@ -54,8 +52,8 @@ func (k Keeper) CreateHTLC(ctx sdk.Context, htlc types.HTLC, hashLock []byte) (s
 		return sdk.Event{}, types.ErrHashLockAlreadyExists(types.DefaultCodespace, fmt.Sprintf("the hash lock already exists: %s", hex.EncodeToString(hashLock)))
 	}
 
-	// transfer the specified tokens to a dedicated HTLC Address
-	if err := k.bk.SendCoins(ctx, htlc.Sender, k.sk.GetModuleAddress(types.ModuleName), htlc.Amount); err != nil {
+	// transfer the specified tokens to HTLC module address
+	if err := k.sk.SendCoinsFromAccountToModule(ctx, htlc.Sender, types.ModuleName, htlc.Amount); err != nil {
 		return sdk.Event{}, err
 	}
 
@@ -91,12 +89,12 @@ func (k Keeper) ClaimHTLC(ctx sdk.Context, hashLock []byte, secret []byte) (sdk.
 	}
 
 	// check if the secret matches with the hash lock
-	if !bytes.Equal(GetHashLock(secret, htlc.Timestamp), hashLock) {
+	if !bytes.Equal(types.GetHashLock(secret, htlc.Timestamp), hashLock) {
 		return sdk.Event{}, types.ErrInvalidSecret(k.codespace, fmt.Sprintf("invalid secret: %s", hex.EncodeToString(secret)))
 	}
 
 	// do the claim
-	if err := k.bk.SendCoins(ctx, k.sk.GetModuleAddress(types.ModuleName), htlc.To, htlc.Amount); err != nil {
+	if err := k.sk.SendCoinsFromModuleToAccount(ctx, types.ModuleName, htlc.To, htlc.Amount); err != nil {
 		return sdk.Event{}, err
 	}
 
@@ -133,7 +131,7 @@ func (k Keeper) RefundHTLC(ctx sdk.Context, hashLock []byte) (sdk.Event, sdk.Err
 	}
 
 	// do the refund
-	if err := k.bk.SendCoins(ctx, k.sk.GetModuleAddress(types.ModuleName), htlc.Sender, htlc.Amount); err != nil {
+	if err := k.sk.SendCoinsFromModuleToAccount(ctx, types.ModuleName, htlc.Sender, htlc.Amount); err != nil {
 		return sdk.Event{}, err
 	}
 
@@ -193,15 +191,6 @@ func (k Keeper) DeleteHTLCFromExpireQueue(ctx sdk.Context, expireHeight uint64, 
 
 	// delete the key
 	store.Delete(KeyHTLCExpireQueue(expireHeight, hashLock))
-}
-
-// GetHashLock calculates the hash lock from the given secret and timestamp
-func GetHashLock(secret []byte, timestamp uint64) []byte {
-	if timestamp > 0 {
-		return types.SHA256(append(secret, sdk.Uint64ToBigEndian(timestamp)...))
-	}
-
-	return types.SHA256(secret)
 }
 
 // IterateHTLCs iterates through the HTLCs

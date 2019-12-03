@@ -1,38 +1,67 @@
-package keeper
+package keeper_test
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/suite"
 
+	abci "github.com/tendermint/tendermint/abci/types"
+
+	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/irisnet/irishub/config"
+	"github.com/irisnet/irishub/modules/htlc/internal/keeper"
 	"github.com/irisnet/irishub/modules/htlc/internal/types"
+	"github.com/irisnet/irishub/simapp"
 )
 
-func TestKeeper_CreateHTLC(t *testing.T) {
-	ctx, keeper, ak, accs := createTestInput(t, sdk.NewInt(5000000000), 2)
+type KeeperTestSuite struct {
+	suite.Suite
 
-	senderAddr := accs[0].GetAddress().Bytes()
-	receiverAddr := accs[1].GetAddress().Bytes()
+	cdc *codec.Codec
+	ctx sdk.Context
+	app *simapp.SimApp
+}
+
+func (suite *KeeperTestSuite) SetupTest() {
+	app := simapp.Setup(false)
+
+	suite.cdc = app.Codec()
+	suite.ctx = app.BaseApp.NewContext(false, abci.Header{})
+	suite.app = app
+}
+
+func TestKeeperTestSuite(t *testing.T) {
+	suite.Run(t, new(KeeperTestSuite))
+}
+
+func (suite *KeeperTestSuite) TestCreateHTLC() {
+	addrSender := sdk.AccAddress([]byte("addrSender"))
+	addrTo := sdk.AccAddress([]byte("addrTo"))
+
+	_ = suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, addrSender)
+	_ = suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, addrTo)
+	_ = suite.app.BankKeeper.SetCoins(suite.ctx, addrSender, sdk.NewCoins(sdk.NewInt64Coin(config.Iris, 100000)))
+	require.True(suite.T(), suite.app.BankKeeper.GetCoins(suite.ctx, addrSender).IsEqual(sdk.NewCoins(sdk.NewInt64Coin(config.Iris, 100000))))
+
 	receiverOnOtherChain := "receiverOnOtherChain"
-
 	amount := sdk.NewCoins(sdk.NewCoin(config.Iris, sdk.NewInt(10)))
 	secret := []byte("___abcdefghijklmnopqrstuvwxyz___")
 	timestamp := uint64(1580000000)
 	hashLock := types.SHA256(append(secret, sdk.Uint64ToBigEndian(timestamp)...))
 	timeLock := uint64(50)
-	expireHeight := timeLock + uint64(ctx.BlockHeight())
+	expireHeight := timeLock + uint64(suite.ctx.BlockHeight())
 	state := types.OPEN
 	initSecret := make([]byte, 0)
 
-	_, err := keeper.GetHTLC(ctx, hashLock)
-	require.NotNil(t, err)
+	_, err := suite.app.HTLCKeeper.GetHTLC(suite.ctx, hashLock)
+	require.NotNil(suite.T(), err)
 
 	htlc := types.NewHTLC(
-		senderAddr,
-		receiverAddr,
+		addrSender,
+		addrTo,
 		receiverOnOtherChain,
 		amount,
 		initSecret,
@@ -41,51 +70,49 @@ func TestKeeper_CreateHTLC(t *testing.T) {
 		state,
 	)
 
-	originSenderAccAmt := ak.GetAccount(ctx, senderAddr).GetCoins()
+	originSenderAccAmt := suite.app.AccountKeeper.GetAccount(suite.ctx, addrSender).GetCoins()
 
-	htlcAddr := keeper.sk.GetModuleAddress(types.ModuleName)
-	require.Nil(t, ak.GetAccount(ctx, htlcAddr))
+	htlcAddr := suite.app.SupplyKeeper.GetModuleAddress(types.ModuleName)
+	require.Nil(suite.T(), suite.app.AccountKeeper.GetAccount(suite.ctx, htlcAddr))
 
-	_, err = keeper.CreateHTLC(ctx, htlc, hashLock)
-	require.Nil(t, err)
+	_, err = suite.app.HTLCKeeper.CreateHTLC(suite.ctx, htlc, hashLock)
+	require.Nil(suite.T(), err)
 
-	htlcAcc := ak.GetAccount(ctx, htlcAddr)
-	require.NotNil(t, htlcAcc)
+	htlcAcc := suite.app.SupplyKeeper.GetModuleAccount(suite.ctx, types.ModuleName)
+	require.NotNil(suite.T(), htlcAcc)
 
-	amountCreatedHTLC := ak.GetAccount(ctx, htlcAddr).GetCoins()
-	require.True(t, amount.IsEqual(amountCreatedHTLC))
+	amountCreatedHTLC := htlcAcc.GetCoins()
+	require.True(suite.T(), amount.IsEqual(amountCreatedHTLC))
 
-	finalSenderAccAmt := ak.GetAccount(ctx, senderAddr).GetCoins()
-	require.True(t, originSenderAccAmt.Sub(amount).IsEqual(finalSenderAccAmt))
+	finalSenderAccAmt := suite.app.AccountKeeper.GetAccount(suite.ctx, addrSender).GetCoins()
+	require.True(suite.T(), originSenderAccAmt.Sub(amount).IsEqual(finalSenderAccAmt))
 
-	htlc, err = keeper.GetHTLC(ctx, hashLock)
-	require.Nil(t, err)
+	htlc, err = suite.app.HTLCKeeper.GetHTLC(suite.ctx, hashLock)
+	require.Nil(suite.T(), err)
 
-	require.Equal(t, accs[0].GetAddress(), htlc.Sender)
-	require.Equal(t, accs[1].GetAddress(), htlc.To)
-	require.Equal(t, receiverOnOtherChain, htlc.ReceiverOnOtherChain)
-	require.Equal(t, amount, htlc.Amount)
-	require.Equal(t, []byte(nil), htlc.Secret)
-	require.Equal(t, timestamp, htlc.Timestamp)
-	require.Equal(t, expireHeight, htlc.ExpireHeight)
-	require.Equal(t, state, htlc.State)
+	require.Equal(suite.T(), addrSender, htlc.Sender)
+	require.Equal(suite.T(), addrTo, htlc.To)
+	require.Equal(suite.T(), receiverOnOtherChain, htlc.ReceiverOnOtherChain)
+	require.Equal(suite.T(), amount, htlc.Amount)
+	require.Equal(suite.T(), []byte(nil), htlc.Secret)
+	require.Equal(suite.T(), timestamp, htlc.Timestamp)
+	require.Equal(suite.T(), expireHeight, htlc.ExpireHeight)
+	require.Equal(suite.T(), state, htlc.State)
 
-	store := ctx.KVStore(keeper.storeKey)
-	require.True(t, store.Has(KeyHTLCExpireQueue(htlc.ExpireHeight, hashLock)))
+	store := suite.ctx.KVStore(suite.app.GetKey(types.StoreKey))
+	require.True(suite.T(), store.Has(keeper.KeyHTLCExpireQueue(htlc.ExpireHeight, hashLock)))
 }
 
-func newHashLock(secret []byte, timestamp uint64) []byte {
-	if timestamp > 0 {
-		return types.SHA256(append(secret, sdk.Uint64ToBigEndian(timestamp)...))
-	}
-	return types.SHA256(secret)
-}
+func (suite *KeeperTestSuite) TestClaimHTLC() {
+	addrSender := sdk.AccAddress([]byte("addrSender"))
+	addrTo := sdk.AccAddress([]byte("addrTo"))
 
-func TestKeeper_ClaimHTLC(t *testing.T) {
-	ctx, keeper, ak, accs := createTestInput(t, sdk.NewInt(5000000000), 2)
+	_ = suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, addrSender)
+	_ = suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, addrTo)
+	_ = suite.app.BankKeeper.SetCoins(suite.ctx, addrSender, sdk.NewCoins(sdk.NewInt64Coin(config.Iris, 100000)))
+	_ = suite.app.BankKeeper.SetCoins(suite.ctx, addrTo, sdk.NewCoins(sdk.NewInt64Coin(config.Iris, 50000)))
+	require.True(suite.T(), suite.app.BankKeeper.GetCoins(suite.ctx, addrSender).IsEqual(sdk.NewCoins(sdk.NewInt64Coin(config.Iris, 100000))))
 
-	senderAddr := accs[0].GetAddress().Bytes()
-	receiverAddr := accs[1].GetAddress().Bytes()
 	receiverOnOtherChain := "receiverOnOtherChain"
 	amount := sdk.NewCoins(sdk.NewCoin(config.Iris, sdk.NewInt(10)))
 	secret1 := []byte("___abcdefghijklmnopqrstuvwxyz___")
@@ -93,7 +120,7 @@ func TestKeeper_ClaimHTLC(t *testing.T) {
 	timestamp := uint64(1580000000)
 	timestampNil := uint64(0)
 	timeLock := uint64(50)
-	expireHeight := timeLock + uint64(ctx.BlockHeight())
+	expireHeight := timeLock + uint64(suite.ctx.BlockHeight())
 	state := types.OPEN
 	initSecret := make([]byte, 0)
 
@@ -112,11 +139,11 @@ func TestKeeper_ClaimHTLC(t *testing.T) {
 		initSecret           []byte
 	}{
 		// timestamp > 0
-		{true, senderAddr, receiverAddr, receiverOnOtherChain, amount, secret1, timestamp, newHashLock(secret1, timestamp), timeLock, expireHeight, state, initSecret},
+		{true, addrSender, addrTo, receiverOnOtherChain, amount, secret1, timestamp, types.GetHashLock(secret1, timestamp), timeLock, expireHeight, state, initSecret},
 		// timestamp = 0
-		{true, senderAddr, receiverAddr, receiverOnOtherChain, amount, secret1, timestampNil, newHashLock(secret1, timestampNil), timeLock, expireHeight, state, initSecret},
+		{true, addrSender, addrTo, receiverOnOtherChain, amount, secret1, timestampNil, types.GetHashLock(secret1, timestampNil), timeLock, expireHeight, state, initSecret},
 		// invalid secret
-		{false, senderAddr, receiverAddr, receiverOnOtherChain, amount, secret1, timestampNil, newHashLock(secret2, timestampNil), timeLock, expireHeight, state, initSecret},
+		{false, addrSender, addrTo, receiverOnOtherChain, amount, secret1, timestampNil, types.GetHashLock(secret2, timestampNil), timeLock, expireHeight, state, initSecret},
 	}
 
 	for i, td := range testData {
@@ -132,33 +159,34 @@ func TestKeeper_ClaimHTLC(t *testing.T) {
 				td.state,
 			)
 
-			_, err := keeper.CreateHTLC(ctx, htlc, td.hashLock)
-			require.Nil(t, err, "TestData: %d", i)
+			_, err := suite.app.HTLCKeeper.CreateHTLC(suite.ctx, htlc, td.hashLock)
+			require.Nil(suite.T(), err, "TestData: %d", i)
 
-			htlc, err = keeper.GetHTLC(ctx, td.hashLock)
-			require.Nil(t, err, "TestData: %d", i)
-			require.Equal(t, types.OPEN, htlc.State, "TestData: %d", i)
+			htlc, err = suite.app.HTLCKeeper.GetHTLC(suite.ctx, td.hashLock)
+			require.Nil(suite.T(), err, "TestData: %d", i)
+			require.Equal(suite.T(), types.OPEN, htlc.State, "TestData: %d", i)
 
-			htlcAddr := keeper.sk.GetModuleAddress(types.ModuleName)
+			htlcAcc := suite.app.SupplyKeeper.GetModuleAccount(suite.ctx, types.ModuleName)
 
-			originHTLCAmount := ak.GetAccount(ctx, htlcAddr).GetCoins()
-			originReceiverAmount := ak.GetAccount(ctx, receiverAddr).GetCoins()
+			originHTLCAmount := htlcAcc.GetCoins()
+			originReceiverAmount := suite.app.AccountKeeper.GetAccount(suite.ctx, addrTo).GetCoins()
 
-			_, err = keeper.ClaimHTLC(ctx, td.hashLock, td.secret)
-			require.Nil(t, err, "TestData: %d", i)
+			_, err = suite.app.HTLCKeeper.ClaimHTLC(suite.ctx, td.hashLock, td.secret)
+			require.Nil(suite.T(), err, "TestData: %d", i)
 
-			htlc, _ = keeper.GetHTLC(ctx, td.hashLock)
-			require.Equal(t, types.COMPLETED, htlc.State, "TestData: %d", i)
+			htlc, _ = suite.app.HTLCKeeper.GetHTLC(suite.ctx, td.hashLock)
+			require.Equal(suite.T(), types.COMPLETED, htlc.State, "TestData: %d", i)
 
-			store := ctx.KVStore(keeper.storeKey)
-			require.True(t, !store.Has(KeyHTLCExpireQueue(htlc.ExpireHeight, td.hashLock)))
+			store := suite.ctx.KVStore(suite.app.GetKey(types.StoreKey))
+			require.True(suite.T(), !store.Has(keeper.KeyHTLCExpireQueue(htlc.ExpireHeight, td.hashLock)))
 
-			claimedHTLCAmount := ak.GetAccount(ctx, htlcAddr).GetCoins()
-			claimedReceiverAmount := ak.GetAccount(ctx, receiverAddr).GetCoins()
+			htlcAcc = suite.app.SupplyKeeper.GetModuleAccount(suite.ctx, types.ModuleName)
 
-			require.True(t, originHTLCAmount.Sub(amount).IsEqual(claimedHTLCAmount), "TestData: %d", i)
-			require.True(t, originReceiverAmount.Add(amount).IsEqual(claimedReceiverAmount), "TestData: %d", i)
+			claimedHTLCAmount := htlcAcc.GetCoins()
+			claimedReceiverAmount := suite.app.AccountKeeper.GetAccount(suite.ctx, addrTo).GetCoins()
 
+			require.True(suite.T(), originHTLCAmount.Sub(amount).IsEqual(claimedHTLCAmount), "TestData: %d", i)
+			require.True(suite.T(), originReceiverAmount.Add(amount).IsEqual(claimedReceiverAmount), "TestData: %d", i)
 		} else {
 			htlc := types.NewHTLC(
 				td.senderAddr,
@@ -171,51 +199,55 @@ func TestKeeper_ClaimHTLC(t *testing.T) {
 				td.state,
 			)
 
-			_, err := keeper.CreateHTLC(ctx, htlc, td.hashLock)
-			require.Nil(t, err, "TestData: %d", i)
+			_, err := suite.app.HTLCKeeper.CreateHTLC(suite.ctx, htlc, td.hashLock)
+			require.Nil(suite.T(), err, "TestData: %d", i)
 
-			htlc, err = keeper.GetHTLC(ctx, td.hashLock)
-			require.Nil(t, err, "TestData: %d", i)
-			require.Equal(t, types.OPEN, htlc.State, "TestData: %d", i)
+			htlc, err = suite.app.HTLCKeeper.GetHTLC(suite.ctx, td.hashLock)
+			require.Nil(suite.T(), err, "TestData: %d", i)
+			require.Equal(suite.T(), types.OPEN, htlc.State, "TestData: %d", i)
 
-			htlcAddr := keeper.sk.GetModuleAddress(types.ModuleName)
+			htlcAddr := suite.app.SupplyKeeper.GetModuleAddress(types.ModuleName)
 
-			originHTLCAmount := ak.GetAccount(ctx, htlcAddr).GetCoins()
-			originReceiverAmount := ak.GetAccount(ctx, receiverAddr).GetCoins()
+			originHTLCAmount := suite.app.AccountKeeper.GetAccount(suite.ctx, htlcAddr).GetCoins()
+			originReceiverAmount := suite.app.AccountKeeper.GetAccount(suite.ctx, addrTo).GetCoins()
 
-			_, err = keeper.ClaimHTLC(ctx, td.hashLock, td.secret)
-			require.NotNil(t, err, "TestData: %d", i)
+			_, err = suite.app.HTLCKeeper.ClaimHTLC(suite.ctx, td.hashLock, td.secret)
+			require.NotNil(suite.T(), err, "TestData: %d", i)
 
-			htlc, _ = keeper.GetHTLC(ctx, td.hashLock)
-			require.Equal(t, types.OPEN, htlc.State, "TestData: %d", i)
+			htlc, _ = suite.app.HTLCKeeper.GetHTLC(suite.ctx, td.hashLock)
+			require.Equal(suite.T(), types.OPEN, htlc.State, "TestData: %d", i)
 
-			claimedHTLCAmount := ak.GetAccount(ctx, htlcAddr).GetCoins()
-			claimedReceiverAmount := ak.GetAccount(ctx, receiverAddr).GetCoins()
+			claimedHTLCAmount := suite.app.AccountKeeper.GetAccount(suite.ctx, htlcAddr).GetCoins()
+			claimedReceiverAmount := suite.app.AccountKeeper.GetAccount(suite.ctx, addrTo).GetCoins()
 
-			require.True(t, originHTLCAmount.IsEqual(claimedHTLCAmount), "TestData: %d", i)
-			require.True(t, originReceiverAmount.IsEqual(claimedReceiverAmount), "TestData: %d", i)
+			require.True(suite.T(), originHTLCAmount.IsEqual(claimedHTLCAmount), "TestData: %d", i)
+			require.True(suite.T(), originReceiverAmount.IsEqual(claimedReceiverAmount), "TestData: %d", i)
 		}
 	}
 }
 
-func TestKeeper_RefundHTLC(t *testing.T) {
-	ctx, keeper, ak, accs := createTestInput(t, sdk.NewInt(5000000000), 2)
+func (suite *KeeperTestSuite) TestRefundHTLC() {
+	addrSender := sdk.AccAddress([]byte("addrSender"))
+	addrTo := sdk.AccAddress([]byte("addrTo"))
 
-	senderAddr := accs[0].GetAddress().Bytes()
-	receiverAddr := accs[1].GetAddress().Bytes()
+	_ = suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, addrSender)
+	_ = suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, addrTo)
+	_ = suite.app.BankKeeper.SetCoins(suite.ctx, addrSender, sdk.NewCoins(sdk.NewInt64Coin(config.Iris, 100000)))
+	require.True(suite.T(), suite.app.BankKeeper.GetCoins(suite.ctx, addrSender).IsEqual(sdk.NewCoins(sdk.NewInt64Coin(config.Iris, 100000))))
+
 	receiverOnOtherChain := "receiverOnOtherChain"
 	amount := sdk.NewCoins(sdk.NewCoin(config.Iris, sdk.NewInt(10)))
-	timestamp := uint64(1580000000)
 	secret := []byte("___abcdefghijklmnopqrstuvwxyz___")
+	timestamp := uint64(1580000000)
 	hashLock := types.SHA256(append(secret, sdk.Uint64ToBigEndian(timestamp)...))
 	timeLock := uint64(50)
-	expireHeight := timeLock + uint64(ctx.BlockHeight())
+	expireHeight := timeLock + uint64(suite.ctx.BlockHeight())
 	state := types.EXPIRED
 	initSecret := make([]byte, 0)
 
 	htlc := types.NewHTLC(
-		senderAddr,
-		receiverAddr,
+		addrSender,
+		addrTo,
 		receiverOnOtherChain,
 		amount,
 		initSecret,
@@ -224,27 +256,29 @@ func TestKeeper_RefundHTLC(t *testing.T) {
 		state,
 	)
 
-	_, err := keeper.CreateHTLC(ctx, htlc, hashLock)
-	require.Nil(t, err)
+	_, err := suite.app.HTLCKeeper.CreateHTLC(suite.ctx, htlc, hashLock)
+	require.Nil(suite.T(), err)
 
-	htlc, err = keeper.GetHTLC(ctx, hashLock)
-	require.Nil(t, err)
-	require.Equal(t, types.EXPIRED, htlc.State)
+	htlc, err = suite.app.HTLCKeeper.GetHTLC(suite.ctx, hashLock)
+	require.Nil(suite.T(), err)
+	require.Equal(suite.T(), types.EXPIRED, htlc.State)
 
-	htlcAddr := keeper.sk.GetModuleAddress(types.ModuleName)
+	htlcAcc := suite.app.SupplyKeeper.GetModuleAccount(suite.ctx, types.ModuleName)
 
-	originHTLCAmount := ak.GetAccount(ctx, htlcAddr).GetCoins()
-	originSenderAmount := ak.GetAccount(ctx, senderAddr).GetCoins()
+	originHTLCAmount := htlcAcc.GetCoins()
+	originSenderAmount := suite.app.AccountKeeper.GetAccount(suite.ctx, addrSender).GetCoins()
 
-	_, err = keeper.RefundHTLC(ctx, hashLock)
-	require.Nil(t, err)
+	_, err = suite.app.HTLCKeeper.RefundHTLC(suite.ctx, hashLock)
+	require.Nil(suite.T(), err)
 
-	htlc, _ = keeper.GetHTLC(ctx, hashLock)
-	require.Equal(t, types.REFUNDED, htlc.State)
+	htlc, _ = suite.app.HTLCKeeper.GetHTLC(suite.ctx, hashLock)
+	require.Equal(suite.T(), types.REFUNDED, htlc.State)
 
-	claimedHTLCAmount := ak.GetAccount(ctx, htlcAddr).GetCoins()
-	claimedSenderAmount := ak.GetAccount(ctx, senderAddr).GetCoins()
+	htlcAcc = suite.app.SupplyKeeper.GetModuleAccount(suite.ctx, types.ModuleName)
 
-	require.True(t, originHTLCAmount.Sub(amount).IsEqual(claimedHTLCAmount))
-	require.True(t, originSenderAmount.Add(amount).IsEqual(claimedSenderAmount))
+	claimedHTLCAmount := htlcAcc.GetCoins()
+	claimedSenderAmount := suite.app.AccountKeeper.GetAccount(suite.ctx, addrSender).GetCoins()
+
+	require.True(suite.T(), originHTLCAmount.Sub(amount).IsEqual(claimedHTLCAmount))
+	require.True(suite.T(), originSenderAmount.Add(amount).IsEqual(claimedSenderAmount))
 }

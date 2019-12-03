@@ -11,14 +11,14 @@ import (
 
 // HTLC represents an HTLC
 type HTLC struct {
-	Sender               sdk.AccAddress `json:"sender"`                  // the initiator address
-	To                   sdk.AccAddress `json:"to"`                      // the destination address
-	ReceiverOnOtherChain string         `json:"receiver_on_other_chain"` // the claim receiving address on the other chain
-	Amount               sdk.Coins      `json:"amount"`                  // the amount to be transferred
-	Secret               []byte         `json:"secret"`                  // the random secret which is of 32 bytes
-	Timestamp            uint64         `json:"timestamp"`               // the timestamp, if provided, used to generate the hash lock together with secret
-	ExpireHeight         uint64         `json:"expire_height"`           // the block height by which the HTLC expires
-	State                HTLCState      `json:"state"`                   // the state of the HTLC
+	Sender               sdk.AccAddress `json:"sender" yaml:"sender"`                                   // the initiator address
+	To                   sdk.AccAddress `json:"to" yaml:"to"`                                           // the destination address
+	ReceiverOnOtherChain string         `json:"receiver_on_other_chain" yaml:"receiver_on_other_chain"` // the claim receiving address on the other chain
+	Amount               sdk.Coins      `json:"amount" yaml:"amount"`                                   // the amount to be transferred
+	Secret               []byte         `json:"secret" yaml:"secret"`                                   // the random secret which is of 32 bytes
+	Timestamp            uint64         `json:"timestamp" yaml:"timestamp"`                             // the timestamp, if provided, used to generate the hash lock together with secret
+	ExpireHeight         uint64         `json:"expire_height" yaml:"expire_height"`                     // the block height by which the HTLC expires
+	State                HTLCState      `json:"state" yaml:"state"`                                     // the state of the HTLC
 }
 
 // NewHTLC constructs an HTLC

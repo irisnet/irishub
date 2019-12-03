@@ -1,123 +1,104 @@
-package htlc
+package htlc_test
 
 import (
 	"encoding/hex"
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/suite"
 
 	abci "github.com/tendermint/tendermint/abci/types"
-	"github.com/tendermint/tendermint/libs/log"
-	dbm "github.com/tendermint/tm-db"
 
 	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/cosmos/cosmos-sdk/store"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/auth"
-	"github.com/cosmos/cosmos-sdk/x/auth/exported"
-	"github.com/cosmos/cosmos-sdk/x/auth/types"
-	"github.com/cosmos/cosmos-sdk/x/bank"
-	"github.com/cosmos/cosmos-sdk/x/params"
-	"github.com/cosmos/cosmos-sdk/x/supply"
 
 	"github.com/irisnet/irishub/config"
-	htlctypes "github.com/irisnet/irishub/modules/htlc/internal/types"
+	modulehtlc "github.com/irisnet/irishub/modules/htlc"
+	"github.com/irisnet/irishub/modules/htlc/internal/types"
+	"github.com/irisnet/irishub/simapp"
 )
 
-func setupMultiStore() (sdk.MultiStore, *sdk.KVStoreKey, *sdk.KVStoreKey) {
-	db := dbm.NewMemDB()
-	accountKey := sdk.NewKVStoreKey("accountkey")
-	htlcKey := sdk.NewKVStoreKey("htlckey")
+type KeeperTestSuite struct {
+	suite.Suite
 
-	ms := store.NewCommitMultiStore(db)
-	ms.MountStoreWithDB(accountKey, sdk.StoreTypeIAVL, db)
-	ms.MountStoreWithDB(htlcKey, sdk.StoreTypeIAVL, db)
-	_ = ms.LoadLatestVersion()
-
-	return ms, accountKey, htlcKey
+	cdc *codec.Codec
+	ctx sdk.Context
+	app *simapp.SimApp
 }
 
-func TestExportHTLCGenesis(t *testing.T) {
-	ms, accountKey, htlcKey := setupMultiStore()
-	keyParams := sdk.NewKVStoreKey("params")
-	tkeyParams := sdk.NewTransientStoreKey("transient_params")
-	keySupply := sdk.NewKVStoreKey(supply.StoreKey)
+func (suite *KeeperTestSuite) SetupTest() {
+	app := simapp.Setup(false)
 
-	cdc := codec.New()
-	RegisterCodec(cdc)
+	suite.cdc = app.Codec()
+	suite.ctx = app.BaseApp.NewContext(false, abci.Header{})
+	suite.app = app
+}
 
-	// register BaseAccount
-	cdc.RegisterInterface((*exported.Account)(nil), nil)
-	cdc.RegisterConcrete(&types.BaseAccount{}, "cosmos-sdk/Account", nil)
-	codec.RegisterCrypto(cdc)
+func TestKeeperTestSuite(t *testing.T) {
+	suite.Run(t, new(KeeperTestSuite))
+}
 
-	pk := params.NewKeeper(cdc, keyParams, tkeyParams, params.DefaultCodespace)
-	ak := auth.NewAccountKeeper(cdc, accountKey, pk.Subspace(auth.DefaultParamspace), auth.ProtoBaseAccount)
-	bk := bank.NewBaseKeeper(ak, pk.Subspace(bank.DefaultParamspace), bank.DefaultCodespace, make(map[string]bool))
-	maccPerms := map[string][]string{
-		htlctypes.ModuleName: nil,
-	}
-	sk := supply.NewKeeper(cdc, keySupply, ak, bk, maccPerms)
-	keeper := NewKeeper(cdc, htlcKey, bk, sk, DefaultCodespace)
-
-	// build context
-	currentBlockHeight := int64(100)
-	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewNopLogger())
-	ctx = ctx.WithBlockHeight(currentBlockHeight)
-
+func (suite *KeeperTestSuite) TestExportHTLCGenesis() {
 	// define variables
 	senderAddrs := []sdk.AccAddress{sdk.AccAddress([]byte("sender1")), sdk.AccAddress([]byte("sender2"))}
 	receiverAddrs := []sdk.AccAddress{sdk.AccAddress([]byte("receiver1")), sdk.AccAddress([]byte("receiver2"))}
+
+	_ = suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, senderAddrs[0])
+	_ = suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, senderAddrs[1])
+	_ = suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, receiverAddrs[0])
+	_ = suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, receiverAddrs[1])
+
+	// _ = suite.app.BankKeeper.SetCoins(suite.ctx, senderAddrs[0], sdk.NewCoins(sdk.NewInt64Coin(config.Iris, 100000)))
+
 	receiverOnOtherChain := "receiverOnOtherChain"
 	amount := sdk.NewCoins(sdk.NewCoin(config.Iris, sdk.NewInt(0)))
 	secret := []byte("___abcdefghijklmnopqrstuvwxyz___")
 	timestamps := []uint64{uint64(1580000000), 0}
-	hashLocks := [][]byte{GetHashLock(secret, timestamps[0]), GetHashLock(secret, timestamps[1])}
+	hashLocks := [][]byte{types.GetHashLock(secret, timestamps[0]), types.GetHashLock(secret, timestamps[1])}
 	timeLocks := []uint64{50, 100}
-	expireHeights := []uint64{timeLocks[0] + uint64(ctx.BlockHeight()), timeLocks[1] + uint64(ctx.BlockHeight())}
-	state := OPEN
+	expireHeights := []uint64{timeLocks[0] + uint64(suite.ctx.BlockHeight()), timeLocks[1] + uint64(suite.ctx.BlockHeight())}
+	state := modulehtlc.OPEN
 	initSecret := make([]byte, 0)
 
 	// construct HTLCs
-	htlc1 := NewHTLC(senderAddrs[0], receiverAddrs[0], receiverOnOtherChain, amount, initSecret, timestamps[0], expireHeights[0], state)
-	htlc2 := NewHTLC(senderAddrs[1], receiverAddrs[1], receiverOnOtherChain, amount, initSecret, timestamps[1], expireHeights[1], state)
+	htlc1 := modulehtlc.NewHTLC(senderAddrs[0], receiverAddrs[0], receiverOnOtherChain, amount, initSecret, timestamps[0], expireHeights[0], state)
+	htlc2 := modulehtlc.NewHTLC(senderAddrs[1], receiverAddrs[1], receiverOnOtherChain, amount, initSecret, timestamps[1], expireHeights[1], state)
 
 	// create HTLCs
-	_, err := keeper.CreateHTLC(ctx, htlc1, hashLocks[0])
-	require.Nil(t, err)
-	_, err = keeper.CreateHTLC(ctx, htlc2, hashLocks[1])
-	require.Nil(t, err)
+	_, err := suite.app.HTLCKeeper.CreateHTLC(suite.ctx, htlc1, hashLocks[0])
+	require.Nil(suite.T(), err)
+	_, err = suite.app.HTLCKeeper.CreateHTLC(suite.ctx, htlc2, hashLocks[1])
+	require.Nil(suite.T(), err)
 
-	// preceed to the new block
-	newBlockHeight := int64(150)
-	ctx = ctx.WithBlockHeight(newBlockHeight)
-	BeginBlocker(ctx, keeper)
+	newBlockHeight := int64(50)
+	suite.ctx = suite.ctx.WithBlockHeight(newBlockHeight)
+	modulehtlc.BeginBlocker(suite.ctx, suite.app.HTLCKeeper)
 
 	// export genesis
-	exportedGenesis := ExportGenesis(ctx, keeper)
+	exportedGenesis := modulehtlc.ExportGenesis(suite.ctx, suite.app.HTLCKeeper)
 	exportedHTLCs := exportedGenesis.PendingHTLCs
-	require.Equal(t, 1, len(exportedHTLCs))
+	require.Equal(suite.T(), 1, len(exportedHTLCs))
 
 	for hashLockHex, htlc := range exportedHTLCs {
 		// assert the state must be OPEN
-		require.True(t, htlc.State == OPEN)
+		require.True(suite.T(), htlc.State == modulehtlc.OPEN)
 
 		hashLock, err := hex.DecodeString(hashLockHex)
 
 		// assert the HTLC with the given hash lock exists
-		htlcInStore, err := keeper.GetHTLC(ctx, hashLock)
-		require.Nil(t, err)
+		htlcInStore, err := suite.app.HTLCKeeper.GetHTLC(suite.ctx, hashLock)
+		require.Nil(suite.T(), err)
 
 		// assert the expiration height is new
 		newExpireHeight := htlcInStore.ExpireHeight - uint64(newBlockHeight) + 1
-		require.Equal(t, newExpireHeight, htlc.ExpireHeight)
+		require.Equal(suite.T(), newExpireHeight, htlc.ExpireHeight)
 
 		// assert the exported HTLC is consistant with the HTLC in store except for the expiration height
 		htlcInStore.ExpireHeight = newExpireHeight
-		require.Equal(t, htlcInStore, htlc)
+		require.Equal(suite.T(), htlcInStore, htlc)
 	}
 
 	// assert the expired HTLCs(htlc1) have been refunded
-	htlc, _ := keeper.GetHTLC(ctx, hashLocks[0])
-	require.Equal(t, REFUNDED, htlc.State)
+	htlc, _ := suite.app.HTLCKeeper.GetHTLC(suite.ctx, hashLocks[0])
+	require.Equal(suite.T(), modulehtlc.REFUNDED, htlc.State)
 }

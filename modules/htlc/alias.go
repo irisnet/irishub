@@ -27,7 +27,6 @@ var (
 	// functions aliases
 	NewKeeper       = keeper.NewKeeper
 	NewQuerier      = keeper.NewQuerier
-	GetHashLock     = keeper.GetHashLock
 	RegisterCodec   = types.RegisterCodec
 	NewHTLC         = types.NewHTLC
 	ValidateGenesis = types.ValidateGenesis

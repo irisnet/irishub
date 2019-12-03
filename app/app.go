@@ -194,7 +194,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 		staking.NewMultiStakingHooks(app.distrKeeper.Hooks(), app.slashingKeeper.Hooks()),
 	)
 
-	app.htlcKeeper = htlc.NewKeeper(app.cdc, keys[htlc.StoreKey], app.bankKeeper, app.supplyKeeper, htlc.DefaultCodespace)
+	app.htlcKeeper = htlc.NewKeeper(app.cdc, keys[htlc.StoreKey], app.supplyKeeper, htlc.DefaultCodespace)
 
 	// NOTE: Any module instantiated in the module manager that is later modified
 	// must be passed by reference here.
