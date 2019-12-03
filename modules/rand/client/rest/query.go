@@ -15,20 +15,6 @@ import (
 )
 
 func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router) {
-	// Get rand by the request id
-	r.HandleFunc(
-		"/rand/rands/{request-id}",
-		queryRandHandlerFn(cliCtx),
-	).Methods("GET")
-
-	// Get the pending rand requests from queue
-	r.HandleFunc(
-		"/rand/queue",
-		queryQueueHandlerFn(cliCtx),
-	).Methods("GET")
-}
-
-func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router) {
 	r.HandleFunc(fmt.Sprintf("/rand/rands/{%s}", RestRequestID), queryRandHandlerFn(cliCtx)).Methods("GET")
 	r.HandleFunc("/rand/queue", queryQueueHandlerFn(cliCtx)).Methods("GET")
 }

@@ -2,7 +2,7 @@ package rand
 
 import (
 	"fmt"
-	
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/irisnet/irishub/modules/rand/internal/types"
 )
@@ -44,5 +44,5 @@ func handleMsgRequestRand(ctx sdk.Context, k Keeper, msg MsgRequestRand) sdk.Res
 		),
 	)
 
-	return 
+	return sdk.Result{Events: ctx.EventManager().Events()}
 }
