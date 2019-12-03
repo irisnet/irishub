@@ -11,6 +11,7 @@ func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(&Rand{}, "irishub/rand/Rand", nil)
 	cdc.RegisterConcrete(&Request{}, "irishub/rand/Request", nil)
 }
+
 // ModuleCdc defines the module codec
 var ModuleCdc *codec.Codec
 

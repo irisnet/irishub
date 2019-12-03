@@ -9,9 +9,9 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/irisnet/irishub/app/v1/stake"
-	"github.com/irisnet/irishub/server/mock"
-	sdk "github.com/irisnet/irishub/types"
+	"github.com/cosmos/cosmos-sdk/server/mock"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/x/stake"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/crypto"
 )
@@ -59,11 +59,9 @@ func getEndBlocker() sdk.EndBlocker {
 // rand beginblocker
 func getBeginBlocker(randKeeper Keeper) sdk.BeginBlocker {
 	return func(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
-		tags := BeginBlocker(ctx, req, randKeeper)
+		BeginBlocker(ctx, req, randKeeper)
 
-		return abci.ResponseBeginBlock{
-			Tags: tags,
-		}
+		return abci.ResponseBeginBlock{Events: ctx.EventManager().Events()}
 	}
 }
 

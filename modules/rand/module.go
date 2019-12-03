@@ -1,4 +1,4 @@
-package asset
+package rand
 
 import (
 	"encoding/json"
@@ -23,7 +23,7 @@ var (
 	_ module.AppModuleSimulation = AppModuleSimulation{}
 )
 
-// AppModuleBasic defines the basic application module used by the asset module.
+// AppModuleBasic defines the basic application module used by the rand module.
 type AppModuleBasic struct{}
 
 var _ module.AppModuleBasic = AppModuleBasic{}
@@ -66,7 +66,7 @@ func (AppModuleBasic) GetQueryCmd(cdc *codec.Codec) *cobra.Command {
 
 //____________________________________________________________________________
 
-// AppModuleSimulation defines the module simulation functions used by the asset module.
+// AppModuleSimulation defines the module simulation functions used by the rand module.
 type AppModuleSimulation struct{}
 
 // RegisterStoreDecoder registers a decoder for rand module's types
@@ -86,7 +86,7 @@ func (AppModuleSimulation) RandomizedParams(r *rand.Rand) []sim.ParamChange {
 
 //____________________________________________________________________________
 
-// AppModule implements an application module for the asset module.
+// AppModule implements an application module for the rand module.
 type AppModule struct {
 	AppModuleBasic
 	AppModuleSimulation
@@ -150,12 +150,12 @@ func (am AppModule) ExportGenesis(ctx sdk.Context) json.RawMessage {
 	return ModuleCdc.MustMarshalJSON(gs)
 }
 
-// BeginBlock returns the begin blocker for the asset module.
+// BeginBlock returns the begin blocker for the rand module.
 func (AppModule) BeginBlock(ctx sdk.Context, req abci.RequestBeginBlock) {
 	BeginBlock(ctx, req, am.keeper)
 }
 
-// EndBlock returns the end blocker for the asset module. It returns no validator
+// EndBlock returns the end blocker for the rand module. It returns no validator
 // updates.
 func (am AppModule) EndBlock(ctx sdk.Context, _ abci.RequestEndBlock) []abci.ValidatorUpdate {
 	return []abci.ValidatorUpdate{}
