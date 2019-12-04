@@ -1,4 +1,4 @@
-package lcd
+package rest
 
 import (
 	"encoding/hex"
@@ -6,11 +6,9 @@ import (
 	"net/http"
 
 	"github.com/cosmos/cosmos-sdk/client/context"
-	"github.com/cosmos/cosmos-sdk/client/utils"
-	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/types/rest"
 	"github.com/gorilla/mux"
-	"github.com/irisnet/irishub/modules/client/rand/types"
+	"github.com/irisnet/irishub/modules/rand/client/types"
 	"github.com/irisnet/irishub/modules/rand"
 )
 
@@ -36,11 +34,11 @@ func queryRandHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 
 		bz, err := cliCtx.Codec.MarshalJSON(params)
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		res, err := cliCtx.QueryWithData(
+		res, _, err := cliCtx.QueryWithData(
 			fmt.Sprintf("custom/%s/%s", rand.QuerierRoute, rand.QueryRand), bz)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
@@ -57,7 +55,7 @@ func queryRandHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 		readableRand := types.ReadableRand{
 			RequestTxHash: hex.EncodeToString(rawRand.RequestTxHash),
 			Height:        rawRand.Height,
-			Value:         rawRand.Value.Rat.FloatString(rand.RandPrec),
+			Value:         rawRand.Value.FloatString(rand.RandPrec),
 		}
 
 		rest.PostProcessResponse(w, cliCtx, readableRand)
@@ -65,7 +63,7 @@ func queryRandHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 }
 
 // queryQueueHandlerFn performs rand request queue query by an optional heigth
-func queryQueueHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
+func queryQueueHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		heightStr := r.FormValue("height")
 
@@ -96,7 +94,7 @@ func queryQueueHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.Handl
 			return
 		}
 
-		res, err := cliCtx.QueryWithData(
+		res, _, err := cliCtx.QueryWithData(
 			fmt.Sprintf("custom/%s/%s", rand.QuerierRoute, rand.QueryRandRequestQueue), bz)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())

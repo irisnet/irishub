@@ -5,8 +5,8 @@ import (
 	"fmt"
 
 	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/cosmos/cosmos-sdk/context"
 	"github.com/irisnet/irishub/modules/rand"
 	"github.com/irisnet/irishub/modules/rand/client/types"
 	"github.com/spf13/cobra"
@@ -32,7 +32,7 @@ func GetQueryCmd(queryRoute string, cdc *codec.Codec) *cobra.Command {
 }
 
 // GetCmdQueryRand implements the query-rand command.
-func GetCmdQueryRand(cdc *codec.Codec) *cobra.Command {
+func GetCmdQueryRand(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "query-rand",
 		Short:   "Query a random number by the request id",
@@ -54,7 +54,8 @@ func GetCmdQueryRand(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", rand.QuerierRoute, rand.QueryRand), bz)
+			route := fmt.Sprintf("custom/%s/%s", queryRoute, rand.QueryRand)
+			res, _, err := cliCtx.QueryWithData(route, bz)
 			if err != nil {
 				return err
 			}
@@ -68,7 +69,7 @@ func GetCmdQueryRand(cdc *codec.Codec) *cobra.Command {
 			readableRand := types.ReadableRand{
 				RequestTxHash: hex.EncodeToString(rawRand.RequestTxHash),
 				Height:        rawRand.Height,
-				Value:         rawRand.Value.Rat.FloatString(rand.RandPrec),
+				Value:         rawRand.Value.FloatString(rand.RandPrec),
 			}
 
 			return cliCtx.PrintOutput(readableRand)
@@ -82,11 +83,11 @@ func GetCmdQueryRand(cdc *codec.Codec) *cobra.Command {
 }
 
 // GetCmdQueryRandRequestQueue implements the query-queue command.
-func GetCmdQueryRandRequestQueue(cdc *codec.Codec) *cobra.Command {
+func GetCmdQueryRandRequestQueue(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "query-queue",
 		Short:   "Query the random number request queue with an optional height",
-		Example: "iriscli rand query-queue [--gen-height=<generated height>]",
+		Example: "iriscli rand query-queue [--gen-height=<generation height>]",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
@@ -104,7 +105,8 @@ func GetCmdQueryRandRequestQueue(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", rand.QuerierRoute, rand.QueryRandRequestQueue), bz)
+			route := fmt.Sprintf("custom/%s/%s", queryRoute, rand.QueryRandRequestQueue)
+			res, _, err := cliCtx.QueryWithData(route, bz)
 			if err != nil {
 				return err
 			}

@@ -4,17 +4,17 @@ import (
 	"encoding/json"
 	"math/rand"
 
-	"github.com/gorilla/mux"
-	"github.com/spf13/cobra"
-	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	sim "github.com/cosmos/cosmos-sdk/x/simulation"
+	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/modules/rand/client/cli"
 	"github.com/irisnet/irishub/modules/rand/client/rest"
 	"github.com/irisnet/irishub/modules/rand/simulation"
+	"github.com/spf13/cobra"
+	abci "github.com/tendermint/tendermint/abci/types"
 )
 
 var (
@@ -35,7 +35,7 @@ func (AppModuleBasic) Name() string {
 
 // RegisterCodec registers the rand module's types for the given codec.
 func (AppModuleBasic) RegisterCodec(cdc *codec.Codec) {
-	ModuleCdc.RegisterCodec(cdc)
+	RegisterCodec(cdc)
 }
 
 // DefaultGenesis returns default genesis state as raw bytes for the rand
@@ -143,7 +143,7 @@ func (am AppModule) InitGenesis(ctx sdk.Context, data json.RawMessage) []abci.Va
 	return []abci.ValidatorUpdate{}
 }
 
-// ExportGenesis returns the exported genesis state as raw bytes for the staking
+// ExportGenesis returns the exported genesis state as raw bytes for the rand
 // module.
 func (am AppModule) ExportGenesis(ctx sdk.Context) json.RawMessage {
 	gs := ExportGenesis(ctx, am.keeper)
@@ -151,8 +151,8 @@ func (am AppModule) ExportGenesis(ctx sdk.Context) json.RawMessage {
 }
 
 // BeginBlock returns the begin blocker for the rand module.
-func (AppModule) BeginBlock(ctx sdk.Context, req abci.RequestBeginBlock) {
-	BeginBlock(ctx, req, am.keeper)
+func (am AppModule) BeginBlock(ctx sdk.Context, req abci.RequestBeginBlock) {
+	BeginBlocker(ctx, req, am.keeper)
 }
 
 // EndBlock returns the end blocker for the rand module. It returns no validator
