@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func GetQueryCmd(cdc *codec.Codec) *cobra.Command {
+func GetQueryCmd(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	txCmd := &cobra.Command{
 		Use:                        types.ModuleName,
 		Short:                      "Querying commands for the guardian module",
@@ -19,8 +19,8 @@ func GetQueryCmd(cdc *codec.Codec) *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 	txCmd.AddCommand(client.GetCommands(
-		GetCmdQueryProfilers(types.QuerierRoute, cdc),
-		GetCmdQueryTrustees(types.QuerierRoute, cdc))...)
+		GetCmdQueryProfilers(queryRoute, cdc),
+		GetCmdQueryTrustees(queryRoute, cdc))...)
 	return txCmd
 }
 

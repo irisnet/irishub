@@ -11,21 +11,20 @@ import (
 )
 
 const (
-	ModuleName        = types.ModuleName
-	DefaultParamspace = types.DefaultParamspace
-	DefaultCodespace  = types.DefaultCodespace
-	StoreKey          = types.StoreKey
-	RouterKey         = types.RouterKey
-	QuerierRoute      = types.QuerierRoute
-	Ordinary          = types.Ordinary
-	Genesis           = types.Genesis
+	ModuleName       = types.ModuleName
+	DefaultCodespace = types.DefaultCodespace
+	StoreKey         = types.StoreKey
+	RouterKey        = types.RouterKey
+	QuerierRoute     = types.QuerierRoute
+	Ordinary         = types.Ordinary
+	Genesis          = types.Genesis
 
-	AttributeValueCategory  = types.AttributeValueCategory
 	EventTypeAddProfiler    = types.EventTypeAddProfiler
 	EventTypeAddTrustee     = types.EventTypeAddTrustee
 	EventTypeDeleteProfiler = types.EventTypeDeleteProfiler
 	EventTypeDeleteTrustee  = types.EventTypeDeleteTrustee
 
+	AttributeValueCategory      = types.AttributeValueCategory
 	AttributeKeyProfilerAddress = types.AttributeKeyProfilerAddress
 	AttributeKeyTrusteeAddress  = types.AttributeKeyTrusteeAddress
 	AttributeKeyAddedBy         = types.AttributeKeyAddedBy

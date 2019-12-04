@@ -14,9 +14,6 @@ const (
 	// module name
 	ModuleName = "guardian"
 
-	// default paramspace for params keeper
-	DefaultParamspace = ModuleName
-
 	// StoreKey is the default store key for guardian
 	StoreKey = ModuleName
 
