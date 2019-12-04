@@ -2,9 +2,10 @@ package asset
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/irisnet/irishub/modules/asset/types"
 )
 
-// InitGenesis - store genesis parameters
+// InitGenesis - store genesis parameters and tokens
 func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
 	if err := ValidateGenesis(data); err != nil {
 		panic(err.Error())
@@ -21,7 +22,7 @@ func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
 	}
 }
 
-// ExportGenesis - output genesis parameters
+// ExportGenesis - output genesis parameters and tokens
 func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 	// export created token
 	var tokens Tokens
@@ -35,20 +36,9 @@ func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 	}
 }
 
-// get raw genesis raw message for testing
+// DefaultGenesisState return the default asset genesis state
 func DefaultGenesisState() GenesisState {
-	return GenesisState{
-		Params: DefaultParams(),
-		Tokens: []FungibleToken{},
-	}
-}
-
-// get raw genesis raw message for testing
-func DefaultGenesisStateForTest() GenesisState {
-	return GenesisState{
-		Params: DefaultParams(),
-		Tokens: []FungibleToken{},
-	}
+	return types.NewGenesisState(DefaultParams(), []FungibleToken{})
 }
 
 // ValidateGenesis validates the provided asset genesis state to ensure the
@@ -57,17 +47,6 @@ func ValidateGenesis(data GenesisState) error {
 	// validate tokens
 	if err := data.Tokens.Validate(); err != nil {
 		return err
-	}
-
-	return nil
-}
-
-// ValidateGateways validates the provided gateways
-func validateGateways(gateways []Gateway) error {
-	for _, gateway := range gateways {
-		if err := gateway.Validate(); err != nil {
-			return err
-		}
 	}
 
 	return nil

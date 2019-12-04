@@ -8,7 +8,6 @@ import (
 const (
 	FlagFamily          = "family"
 	FlagSource          = "source"
-	FlagGateway         = "gateway"
 	FlagSymbol          = "symbol"
 	FlagCanonicalSymbol = "canonical-symbol"
 	FlagName            = "name"
@@ -18,33 +17,23 @@ const (
 	FlagMaxSupply       = "max-supply"
 	FlagMintable        = "mintable"
 
-	FlagOwner    = "owner"
-	FlagMoniker  = "moniker"
-	FlagIdentity = "identity"
-	FlagDetails  = "details"
-	FlagWebsite  = "website"
-	FlagTo       = "to"
+	FlagOwner = "owner"
 
-	FlagToken  = "token"
+	FlagTo     = "to"
 	FlagAmount = "amount"
 )
 
 var (
-	FsEditToken            = flag.NewFlagSet("", flag.ContinueOnError)
-	FsTokenIssue           = flag.NewFlagSet("", flag.ContinueOnError)
-	FsTokensQuery          = flag.NewFlagSet("", flag.ContinueOnError)
-	FsGatewayCreate        = flag.NewFlagSet("", flag.ContinueOnError)
-	FsGatewayEdit          = flag.NewFlagSet("", flag.ContinueOnError)
-	FsGatewayOwnerTransfer = flag.NewFlagSet("", flag.ContinueOnError)
-	FsFeeQuery             = flag.NewFlagSet("", flag.ContinueOnError)
-	FsTransferTokenOwner   = flag.NewFlagSet("", flag.ContinueOnError)
-	FsMintToken            = flag.NewFlagSet("", flag.ContinueOnError)
+	FsEditToken          = flag.NewFlagSet("", flag.ContinueOnError)
+	FsTokenIssue         = flag.NewFlagSet("", flag.ContinueOnError)
+	FsTokensQuery        = flag.NewFlagSet("", flag.ContinueOnError)
+	FsTransferTokenOwner = flag.NewFlagSet("", flag.ContinueOnError)
+	FsMintToken          = flag.NewFlagSet("", flag.ContinueOnError)
 )
 
 func init() {
 	FsTokenIssue.String(FlagFamily, "", "the asset family, valid values can be fungible and non-fungible")
 	FsTokenIssue.String(FlagSource, "", "the asset source, valid values can be native, external and gateway")
-	FsTokenIssue.String(FlagGateway, "", "the gateway name of gateway token. required if --source=gateway")
 	FsTokenIssue.String(FlagSymbol, "", "the token symbol. Once created, it cannot be modified")
 	FsTokenIssue.String(FlagCanonicalSymbol, "", "the source symbol of a gateway or external token")
 	FsTokenIssue.String(FlagName, "", "the token name, e.g. IRIS Network")
@@ -55,23 +44,7 @@ func init() {
 	FsTokenIssue.Bool(FlagMintable, false, "whether the token can be minted, default false")
 
 	FsTokensQuery.String(FlagSource, "", "the asset source, valid values can be native, external and gateway")
-	FsTokensQuery.String(FlagGateway, "", "the gateway name of gateway token. required if --source=gateway")
 	FsTokensQuery.String(FlagOwner, "", "the owner address to be queried")
-
-	FsGatewayCreate.String(FlagMoniker, "", "the unique gateway name")
-	FsGatewayCreate.String(FlagIdentity, "", "the gateway identity")
-	FsGatewayCreate.String(FlagDetails, "", "the gateway description")
-	FsGatewayCreate.String(FlagWebsite, "", "the external website")
-
-	FsGatewayEdit.String(FlagMoniker, types.DoNotModify, "the unique gateway name")
-	FsGatewayEdit.String(FlagIdentity, types.DoNotModify, "the gateway identity")
-	FsGatewayEdit.String(FlagDetails, types.DoNotModify, "the gateway description")
-	FsGatewayEdit.String(FlagWebsite, types.DoNotModify, "the external website")
-
-	FsGatewayOwnerTransfer.String(FlagMoniker, "", "the unique name of the gateway to be transferred")
-	FsGatewayOwnerTransfer.String(FlagTo, "", "the new owner")
-
-	FsFeeQuery.String(FlagToken, "", "the token id")
 
 	FsEditToken.String(FlagName, "[do-not-modify]", "the token name, e.g. IRIS Network")
 	FsEditToken.String(FlagCanonicalSymbol, "[do-not-modify]", "the source symbol of a gateway or external token")

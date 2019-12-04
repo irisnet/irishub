@@ -65,12 +65,11 @@ func RandomizedGenState(simState *module.SimulationState) {
 		func(r *rand.Rand) { gatewayAssetFeeRatio = RandomDec(r) },
 	)
 
-	bankGenesis := types.NewGenesisState(
-		types.NewParams(assetTaxRate, issueTokenBaseFee, mintTokenFeeRatio,
-			createGatewayBaseFee, gatewayAssetFeeRatio, ""),
+	assetGenesis := types.NewGenesisState(
+		types.NewParams(assetTaxRate, issueTokenBaseFee, mintTokenFeeRatio, ""),
 		types.Tokens{},
 	)
 
-	fmt.Printf("Selected randomly generated bank parameters:\n%s\n", codec.MustMarshalJSONIndent(simState.Cdc, bankGenesis))
-	simState.GenState[types.ModuleName] = simState.Cdc.MustMarshalJSON(bankGenesis)
+	fmt.Printf("Selected randomly generated bank parameters:\n%s\n", codec.MustMarshalJSONIndent(simState.Cdc, assetGenesis))
+	simState.GenState[types.ModuleName] = simState.Cdc.MustMarshalJSON(assetGenesis)
 }

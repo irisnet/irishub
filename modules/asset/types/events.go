@@ -7,12 +7,11 @@ const (
 	EventTypeTransferTokenOwner = "transfer_token_owner"
 	EventTypeMintToken          = "mint_token"
 
-	AttributeKeyTokenID      = "token_id"
-	AttributeKeyTokenDenom   = "token_denom"
-	AttributeKeyTokenSymbol  = "token_symbol"
-	AttributeKeyTokenOwner   = "token_owner"
-	AttributeKeyTokenGateway = "token_gateway"
-	AttributeKeyTokenSource  = "token_source"
+	AttributeKeyTokenID     = "token_id"
+	AttributeKeyTokenDenom  = "token_denom"
+	AttributeKeyTokenSymbol = "token_symbol"
+	AttributeKeyTokenOwner  = "token_owner"
+	AttributeKeyTokenSource = "token_source"
 
 	AttributeValueCategory = ModuleName
 )

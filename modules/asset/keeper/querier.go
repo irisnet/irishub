@@ -35,9 +35,9 @@ func queryToken(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, 
 	var token types.FungibleToken
 
 	var found bool
-	token, found = keeper.GetToken(ctx, params.TokenId)
+	token, found = keeper.GetToken(ctx, params.TokenID)
 	if !found {
-		return nil, sdk.ErrUnknownRequest(fmt.Sprintf("token %s does not exist", params.TokenId))
+		return nil, sdk.ErrUnknownRequest(fmt.Sprintf("token %s does not exist", params.TokenID))
 	}
 
 	bz, err := codec.MarshalJSONIndent(types.ModuleCdc, token)
@@ -56,7 +56,6 @@ func queryTokens(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte,
 	}
 
 	source := types.NATIVE
-	gateway := ""
 	owner := sdk.AccAddress{}
 	nonSymbolTokenId := ""
 
@@ -64,15 +63,6 @@ func queryTokens(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte,
 		source, err = types.AssetSourceFromString(params.Source)
 		if err != nil {
 			return nil, iristypes.ParseParamsErr(err)
-		}
-	} else if len(params.Gateway) > 0 { // if source is not specified, and gateway is specified
-		source = types.GATEWAY
-	}
-
-	if source == types.GATEWAY { // ignore gateway moniker if source != GATEWAY
-		gateway = params.Gateway
-		if len(gateway) == 0 {
-			return nil, sdk.ErrUnknownRequest("gateway moniker is required for querying gateway tokens")
 		}
 	}
 
@@ -84,7 +74,7 @@ func queryTokens(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte,
 	}
 
 	if len(params.Source) > 0 || len(params.Gateway) > 0 {
-		nonSymbolTokenId, err = types.GetTokenID(source, "", gateway)
+		nonSymbolTokenId, err = types.GetTokenID(source, "")
 	}
 
 	if err != nil {

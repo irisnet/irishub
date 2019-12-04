@@ -13,19 +13,16 @@ type AssetSource byte
 const (
 	NATIVE   AssetSource = 0x00
 	EXTERNAL AssetSource = 0x01
-	GATEWAY  AssetSource = 0x02
 )
 
 var (
 	AssetSourceToStringMap = map[AssetSource]string{
 		NATIVE:   "native",
 		EXTERNAL: "external",
-		GATEWAY:  "gateway",
 	}
 	StringToAssetSourceMap = map[string]AssetSource{
 		"native":   NATIVE,
 		"external": EXTERNAL,
-		"gateway":  GATEWAY,
 	}
 )
 

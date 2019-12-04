@@ -41,7 +41,9 @@ func TestKeeperTestSuite(t *testing.T) {
 }
 
 func (suite *KeeperTestSuite) TestKeeper_IssueToken() {
-	ft := types.NewFungibleToken(types.NATIVE, "", "btc", "btc", 1, "", "satoshi", sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), true, acc.GetAddress())
+	addr := sdk.AccAddress([]byte("addr"))
+
+	ft := types.NewFungibleToken(types.NATIVE, "", "btc", "btc", 1, "", "satoshi", sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), true, addr)
 	err := suite.keeper.IssueToken(suite.ctx, ft)
 	suite.NoError(err)
 
@@ -57,7 +59,7 @@ func (suite *KeeperTestSuite) TestKeeper_IssueToken() {
 }
 
 func (suite *KeeperTestSuite) TestKeeper_EditToken() {
-	addr := sdk.AccAddress([]byte("addr1"))
+	addr := sdk.AccAddress([]byte("addr"))
 
 	ft := types.NewFungibleToken(types.NATIVE, "", "btc", "btc", 1, "", "satoshi", sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(21000000, 0), true, addr)
 
@@ -81,13 +83,13 @@ func (suite *KeeperTestSuite) TestKeeper_EditToken() {
 }
 
 func (suite *KeeperTestSuite) TestMintTokenKeeper(t *testing.T) {
-	addr := sdk.AccAddress([]byte("addr1"))
+	addr := sdk.AccAddress([]byte("addr"))
 
 	amtCoin, _ := sdk.NewIntFromString("1000000000000000000000000000")
 	coin := sdk.Coins{sdk.NewCoin("iris-atto", amtCoin)}
 	suite.bk.AddCoins(suite.ctx, addr, coin)
 
-	ft := types.NewFungibleToken(types.NATIVE, "", "btc", "btc", 0, "", "satoshi", sdk.NewIntWithDecimal(1000, 0), sdk.NewIntWithDecimal(10000, 0), true, acc.GetAddress())
+	ft := types.NewFungibleToken(types.NATIVE, "", "btc", "btc", 0, "", "satoshi", sdk.NewIntWithDecimal(1000, 0), sdk.NewIntWithDecimal(10000, 0), true, addr)
 	err := suite.keeper.IssueToken(suite.ctx, ft)
 	suite.NoError(err)
 

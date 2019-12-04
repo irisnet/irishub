@@ -10,6 +10,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/version"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
 	"github.com/irisnet/irishub/modules/asset/types"
@@ -27,31 +28,23 @@ func GetTxCmd(queryRoute string, cdc *codec.Codec) *cobra.Command {
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
 	}
-	txCmd.AddCommand(
+	txCmd.AddCommand(client.PostCommands(
 		GetCmdIssueToken(queryRoute, cdc),
 		GetCmdTransferTokenOwner(cdc),
 		GetCmdEditToken(cdc),
 		GetCmdMintToken(queryRoute, cdc),
-	)
+	)...)
 	return txCmd
 }
 
-func preSignCmd(cmd *cobra.Command, _ []string) {
-	// Conditionally mark the account and sequence numbers required as no RPC
-	// query will be done.
-	if viper.GetString(FlagSource) == "gateway" {
-		cmd.MarkFlagRequired(FlagGateway)
-	}
-}
-
-// GetCmdIssueToken implements the issue asset command
+// GetCmdIssueToken implements the issue token command
 func GetCmdIssueToken(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "issue-token",
 		Short: "Issue a new token",
-		Example: "iriscli asset issue-token --family=<family> --source=<source> --gateway=<gateway-moniker> --decimal=<decimal>" +
-			" --symbol=<symbol> --name=<token-name> --initial-supply=<initial-supply> --from=<key-name> --chain-id=<chain-id> --fee=0.6iris",
-		PreRun: preSignCmd,
+		Example: fmt.Sprintf("%s asset tx issue-token --family=<family> --source=<source> --decimal=<decimal>"+
+			" --symbol=<symbol> --name=<token-name> --initial-supply=<initial-supply> --from=<key-name>"+
+			" --chain-id=<chain-id> --fee=0.6iris", version.ClientName),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			txBldr := authtypes.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
@@ -71,7 +64,6 @@ func GetCmdIssueToken(queryRoute string, cdc *codec.Codec) *cobra.Command {
 			msg := types.MsgIssueToken{
 				Family:          family,
 				Source:          source,
-				Gateway:         viper.GetString(FlagGateway),
 				Symbol:          viper.GetString(FlagSymbol),
 				CanonicalSymbol: viper.GetString(FlagCanonicalSymbol),
 				Name:            viper.GetString(FlagName),
@@ -90,7 +82,7 @@ func GetCmdIssueToken(queryRoute string, cdc *codec.Codec) *cobra.Command {
 			var prompt = "The token issue transaction will consume extra fee"
 
 			if !viper.GetBool(client.FlagGenerateOnly) {
-				tokenId, err := types.GetTokenID(msg.Source, msg.Symbol, msg.Gateway)
+				tokenId, err := types.GetTokenID(msg.Source, msg.Symbol)
 				if err != nil {
 					return fmt.Errorf("failed to query token issue fee: %s", err.Error())
 				}
@@ -132,13 +124,15 @@ func GetCmdIssueToken(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-// GetCmdEditToken implements the edit asset command
+// GetCmdEditToken implements the edit token command
 func GetCmdEditToken(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "edit-token",
-		Short:   "Edit a existed token",
-		Example: "iriscli asset edit-token <token-id> --name=<name> --canonical-symbol=<canonical-symbol> --min-unit-alias=<min-alias> --max-supply=<max-supply> --mintable=<mintable> --from=<your account name> --chain-id=<chain-id> --fee=0.6iris",
-		Args:    cobra.ExactArgs(1),
+		Use:   "edit-token",
+		Short: "Edit a existed token",
+		Example: fmt.Sprintf("%s tx asset edit-token <token-id> --name=<name> --canonical-symbol=<canonical-symbol>"+
+			" --min-unit-alias=<min-alias> --max-supply=<max-supply> --mintable=<mintable> --from=<your account name>"+
+			" --chain-id=<chain-id> --fee=0.6iris", version.ClientName),
+		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			txBldr := authtypes.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
@@ -170,11 +164,12 @@ func GetCmdEditToken(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
+// GetCmdMintToken implements the mint token command
 func GetCmdMintToken(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "mint-token",
 		Short:   "The asset owner and operator can directly mint tokens to a specified address",
-		Example: "iriscli asset mint-token <token-id> [flags]",
+		Example: fmt.Sprintf("%s tx asset mint-token --to [address] --amount [amount]", version.ClientName),
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
@@ -242,7 +237,7 @@ func GetCmdTransferTokenOwner(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "transfer-token-owner",
 		Short:   "Transfer the owner of a token to a new owner",
-		Example: "iriscli asset transfer-token-owner <token-id> --to=<new owner>",
+		Example: fmt.Sprintf("%s tx asset transfer-token-owner <token-id> --to=<new owner>", version.ClientName),
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)

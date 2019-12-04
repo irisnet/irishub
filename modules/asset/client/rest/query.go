@@ -18,23 +18,6 @@ func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router, queryRoute st
 		"/asset/tokens",
 		queryTokensHandlerFn(cliCtx, queryRoute),
 	).Methods("GET")
-	// Get the gateway from a moniker
-	r.HandleFunc(
-		"/asset/gateways/{moniker}",
-		monikerGatewayHandlerFn(cliCtx, queryRoute),
-	).Methods("GET")
-
-	// Get all gateways with an optional owner
-	r.HandleFunc(
-		"/asset/gateways",
-		gatewaysHandlerFn(cliCtx, queryRoute),
-	).Methods("GET")
-
-	// Get gateway creation fee
-	r.HandleFunc(
-		"/asset/fees/gateways/{moniker}",
-		gatewayFeeHandlerFn(cliCtx, queryRoute),
-	).Methods("GET")
 
 	// Get token fees
 	r.HandleFunc(
@@ -51,21 +34,6 @@ func queryTokenHandlerFn(cliCtx context.CLIContext, queryRoute string) http.Hand
 // queryTokenHandlerFn performs token information query
 func queryTokensHandlerFn(cliCtx context.CLIContext, queryRoute string) http.HandlerFunc {
 	return queryTokens(cliCtx, queryRoute)
-}
-
-// monikerGatewayHandlerFn is the HTTP request handler to query a gateway of the given moniker
-func monikerGatewayHandlerFn(cliCtx context.CLIContext, queryRoute string) http.HandlerFunc {
-	return queryGateway(cliCtx, queryRoute)
-}
-
-// gatewaysHandlerFn is the HTTP request handler to query a set of gateways
-func gatewaysHandlerFn(cliCtx context.CLIContext, queryRoute string) http.HandlerFunc {
-	return queryGateways(cliCtx, queryRoute)
-}
-
-// gatewayFeeHandlerFn is the HTTP request handler to query gateway creation fee
-func gatewayFeeHandlerFn(cliCtx context.CLIContext, queryRoute string) http.HandlerFunc {
-	return queryGatewayFee(cliCtx, queryRoute)
 }
 
 // tokenFeesHandlerFn is the HTTP request handler to query token fees

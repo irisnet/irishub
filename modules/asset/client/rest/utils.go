@@ -5,20 +5,19 @@ import (
 	"net/http"
 
 	"github.com/cosmos/cosmos-sdk/client/context"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/rest"
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/modules/asset/types"
 )
 
+// queryTokens queries the token from the specified token-id
 func queryToken(cliCtx context.CLIContext, queryRoute string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 
-		tokenId := vars["id"]
-
+		tokenID := vars["id"]
 		params := types.QueryTokenParams{
-			TokenId: tokenId,
+			TokenID: tokenID,
 		}
 
 		bz, err := cliCtx.Codec.MarshalJSON(params)
@@ -38,18 +37,15 @@ func queryToken(cliCtx context.CLIContext, queryRoute string) http.HandlerFunc {
 	}
 }
 
+// queryTokens queries the token list from the specified endpoint
 func queryTokens(cliCtx context.CLIContext, queryRoute string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		source := r.FormValue("source")
-		gateway := r.FormValue("gateway")
 		owner := r.FormValue("owner")
 
-		// TODO: pagination support
-
 		params := types.QueryTokensParams{
-			Source:  source,
-			Gateway: gateway,
-			Owner:   owner,
+			Source: source,
+			Owner:  owner,
 		}
 
 		bz, err := cliCtx.Codec.MarshalJSON(params)
@@ -60,109 +56,6 @@ func queryTokens(cliCtx context.CLIContext, queryRoute string) http.HandlerFunc 
 
 		res, _, err := cliCtx.QueryWithData(
 			fmt.Sprintf("custom/%s/%s", queryRoute, types.QueryTokens), bz)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-			return
-		}
-
-		rest.PostProcessResponse(w, cliCtx, res)
-	}
-}
-
-// queryGateway queries a gateway of the given moniker from the specified endpoint
-func queryGateway(cliCtx context.CLIContext, queryRoute string) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		vars := mux.Vars(r)
-
-		moniker := vars["moniker"]
-		if err := types.ValidateMoniker(moniker); err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
-		params := types.QueryGatewayParams{
-			Moniker: moniker,
-		}
-
-		bz, err := cliCtx.Codec.MarshalJSON(params)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
-		res, _, err := cliCtx.QueryWithData(
-			fmt.Sprintf("custom/%s/%s", queryRoute, types.QueryGateway), bz)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-			return
-		}
-
-		rest.PostProcessResponse(w, cliCtx, res)
-	}
-}
-
-// queryGateways queries all gateways with an optional owner from the specified endpoint
-func queryGateways(cliCtx context.CLIContext, queryRoute string) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		ownerStr := r.FormValue("owner")
-
-		var (
-			owner sdk.AccAddress
-			err   error
-		)
-
-		if ownerStr != "" {
-			owner, err = sdk.AccAddressFromBech32(ownerStr)
-			if err != nil {
-				rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-				return
-			}
-		}
-
-		params := types.QueryGatewaysParams{
-			Owner: owner,
-		}
-
-		bz, err := cliCtx.Codec.MarshalJSON(params)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
-		res, _, err := cliCtx.QueryWithData(
-			fmt.Sprintf("custom/%s/%s", queryRoute, types.QueryGateways), bz)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-			return
-		}
-
-		rest.PostProcessResponse(w, cliCtx, res)
-	}
-}
-
-// queryGatewayFee queries the gateway creation fee from the specified endpoint
-func queryGatewayFee(cliCtx context.CLIContext, queryRoute string) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		vars := mux.Vars(r)
-
-		moniker := vars["moniker"]
-		if err := types.ValidateMoniker(moniker); err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
-		params := types.QueryGatewayFeeParams{
-			Moniker: moniker,
-		}
-
-		bz, err := cliCtx.Codec.MarshalJSON(params)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
-		res, _, err := cliCtx.QueryWithData(
-			fmt.Sprintf("custom/%s/%s/gateways", queryRoute, types.QueryFees), bz)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return

@@ -28,7 +28,7 @@ func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, paramSpace params.Subspace,
 		storeKey:           key,
 		cdc:                cdc,
 		codespace:          codespace,
-		paramSpace:         paramSpace,
+		paramSpace:         paramSpace.WithKeyTable(ParamKeyTable()),
 		supplyKeeper:       supplyKeeper,
 		distributionKeeper: distributionKeeper,
 	}
@@ -69,7 +69,7 @@ func (k Keeper) IssueToken(ctx sdk.Context, token types.FungibleToken) sdk.Error
 // save a new token to keystore
 func (k Keeper) AddToken(ctx sdk.Context, token types.FungibleToken) (types.FungibleToken, sdk.AccAddress, sdk.Error) {
 	token.Sanitize()
-	tokenId, err := types.GetTokenID(token.GetSource(), token.GetSymbol(), token.GetGateway())
+	tokenId, err := types.GetTokenID(token.GetSource(), token.GetSymbol())
 	if err != nil {
 		return token, nil, err
 	}
@@ -81,7 +81,6 @@ func (k Keeper) AddToken(ctx sdk.Context, token types.FungibleToken) (types.Fung
 	if token.GetSource() == types.NATIVE {
 		owner = token.GetOwner()
 		token.CanonicalSymbol = ""
-		token.Gateway = ""
 	}
 
 	err = k.SetToken(ctx, token)
@@ -112,14 +111,10 @@ func (k Keeper) HasToken(ctx sdk.Context, tokenId string) bool {
 }
 
 func (k Keeper) SetToken(ctx sdk.Context, token types.FungibleToken) sdk.Error {
-	if token.GetSource() == types.GATEWAY {
-		token.Owner = nil
-	}
-
 	store := ctx.KVStore(k.storeKey)
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(token)
 
-	tokenId, err := types.GetTokenID(token.GetSource(), token.GetSymbol(), token.GetGateway())
+	tokenId, err := types.GetTokenID(token.GetSource(), token.GetSymbol())
 	if err != nil {
 		return err
 	}
@@ -131,7 +126,7 @@ func (k Keeper) SetToken(ctx sdk.Context, token types.FungibleToken) sdk.Error {
 func (k Keeper) SetTokens(ctx sdk.Context, owner sdk.AccAddress, token types.FungibleToken) sdk.Error {
 	store := ctx.KVStore(k.storeKey)
 
-	tokenId, err := types.GetTokenID(token.GetSource(), token.GetSymbol(), token.GetGateway())
+	tokenId, err := types.GetTokenID(token.GetSource(), token.GetSymbol())
 	if err != nil {
 		return err
 	}
@@ -223,13 +218,13 @@ func (k Keeper) Init(ctx sdk.Context) {
 
 	//Initialize external tokens BTC and ETH
 	maxSupply := sdk.NewIntWithDecimal(int64(types.MaximumAssetMaxSupply), 8)
-	btc := types.NewFungibleToken(types.EXTERNAL, "", "BTC", "Bitcoin", 8, "BTC", "satoshi", sdk.ZeroInt(), maxSupply, true, nil)
+	btc := types.NewFungibleToken(types.EXTERNAL, "BTC", "Bitcoin", 8, "BTC", "satoshi", sdk.ZeroInt(), maxSupply, true, nil)
 	if err := k.IssueToken(ctx, btc); err != nil {
 		ctx.Logger().Error(fmt.Sprintf("initialize external tokens BTC failed:%s", err.Error()))
 	}
 
 	maxSupply = sdk.NewIntWithDecimal(int64(types.MaximumAssetMaxSupply), 18)
-	eth := types.NewFungibleToken(types.EXTERNAL, "", "ETH", "Ethereum", 18, "ETH", "wei", sdk.ZeroInt(), maxSupply, true, nil)
+	eth := types.NewFungibleToken(types.EXTERNAL, "ETH", "Ethereum", 18, "ETH", "wei", sdk.ZeroInt(), maxSupply, true, nil)
 	if err := k.IssueToken(ctx, eth); err != nil {
 		ctx.Logger().Error(fmt.Sprintf("initialize external tokens ETH failed:%s", err.Error()))
 	}
@@ -269,7 +264,7 @@ func (k Keeper) TransferTokenOwner(ctx sdk.Context, msg types.MsgTransferTokenOw
 func (k Keeper) resetStoreKeyForQueryToken(ctx sdk.Context, msg types.MsgTransferTokenOwner, token types.FungibleToken) sdk.Error {
 	store := ctx.KVStore(k.storeKey)
 
-	tokenId, err := types.GetTokenID(token.GetSource(), token.GetSymbol(), token.GetGateway())
+	tokenId, err := types.GetTokenID(token.GetSource(), token.GetSymbol())
 	if err != nil {
 		return err
 	}
@@ -339,14 +334,4 @@ func (k Keeper) MintToken(ctx sdk.Context, msg types.MsgMintToken) sdk.Error {
 // AssetTokenSupply asset tokens from the total supply
 func (k Keeper) AssetTokenSupply(ctx sdk.Context, denom string) sdk.Int {
 	return k.supplyKeeper.GetSupply(ctx).GetTotal().AmountOf(denom)
-}
-
-func (k Keeper) SetParamSet(ctx sdk.Context, params types.Params) {
-	k.paramSpace.SetParamSet(ctx, &params)
-}
-
-func (k Keeper) GetParamSet(ctx sdk.Context) types.Params {
-	var params types.Params
-	k.paramSpace.GetParamSet(ctx, &params)
-	return params
 }

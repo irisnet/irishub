@@ -6,12 +6,13 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/irisnet/irishub/modules/asset/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
-// GetQueryCmd returns the query commands for this channels
+// GetQueryCmd returns the query commands for this module
 func GetQueryCmd(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	queryCmd := &cobra.Command{
 		Use:                types.ModuleName,
@@ -31,15 +32,15 @@ func GetQueryCmd(queryRoute string, cdc *codec.Codec) *cobra.Command {
 // GetCmdQueryToken implements the query token command.
 func GetCmdQueryToken(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "query-token",
+		Use:     "token [token-id]",
 		Short:   "Query details of a token",
-		Example: "iriscli asset query-token <token-id>",
+		Example: fmt.Sprintf("%s query asset token [token-id]", version.ClientName),
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
 			params := types.QueryTokenParams{
-				TokenId: args[0],
+				TokenID: args[0],
 			}
 
 			bz, err := cdc.MarshalJSON(params)
@@ -61,23 +62,22 @@ func GetCmdQueryToken(queryRoute string, cdc *codec.Codec) *cobra.Command {
 			return cliCtx.PrintOutput(token)
 		},
 	}
-
 	return cmd
 }
 
 // GetCmdQueryTokens implements the query tokens command.
 func GetCmdQueryTokens(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "query-tokens",
-		Short:   "Query details of a group of tokens",
-		Example: "iriscli asset query-tokens --source=<native|gateway|external> --gateway=<gateway_moniker> --owner=<address>",
+		Use:   "tokens",
+		Short: "Query details of a group of tokens",
+		Example: fmt.Sprintf("%s asset tokens --source=[native|external] --gateway=[gateway_moniker] "+
+			"--owner=[address]", version.ClientName),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
 			params := types.QueryTokensParams{
-				Source:  viper.GetString(FlagSource),
-				Gateway: viper.GetString(FlagGateway),
-				Owner:   viper.GetString(FlagOwner),
+				Source: viper.GetString(FlagSource),
+				Owner:  viper.GetString(FlagOwner),
 			}
 
 			bz, err := cdc.MarshalJSON(params)
@@ -99,24 +99,22 @@ func GetCmdQueryTokens(queryRoute string, cdc *codec.Codec) *cobra.Command {
 			return cliCtx.PrintOutput(tokens)
 		},
 	}
-
 	cmd.Flags().AddFlagSet(FsTokensQuery)
-
 	return cmd
 }
 
 // GetCmdQueryFee implements the query asset related fees command.
 func GetCmdQueryFee(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "query-fee",
+		Use:     "fee [token-id]",
 		Short:   "Query the asset related fees",
-		Example: "iriscli asset query-fee --token=<token id>",
-		PreRunE: preQueryFeeCmd,
+		Example: fmt.Sprintf("%s query asset fee [token-id]", version.ClientName),
+		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
 			// query token fees
-			tokenID := viper.GetString(FlagToken)
+			tokenID := args[0]
 			if err := types.CheckTokenID(tokenID); err != nil {
 				return err
 			}
@@ -129,21 +127,5 @@ func GetCmdQueryFee(queryRoute string, cdc *codec.Codec) *cobra.Command {
 			return cliCtx.PrintOutput(fees)
 		},
 	}
-
-	cmd.Flags().AddFlagSet(FsFeeQuery)
-
 	return cmd
-}
-
-// preQueryFeeCmd is used to check if the specified flags are valid
-func preQueryFeeCmd(cmd *cobra.Command, args []string) error {
-	flags := cmd.Flags()
-
-	if flags.Changed(FlagGateway) && flags.Changed(FlagToken) {
-		return fmt.Errorf("only one flag is allowed among the gateway and token")
-	} else if !flags.Changed(FlagGateway) && !flags.Changed(FlagToken) {
-		return fmt.Errorf("must specify the gateway or token to be queried")
-	}
-
-	return nil
 }

@@ -11,8 +11,6 @@ type (
 	MsgMintToken          = types.MsgMintToken
 	MsgTransferTokenOwner = types.MsgTransferTokenOwner
 	Tokens                = types.Tokens
-	Gateway               = types.Gateway
-	Gateways              = types.Gateways
 	Params                = types.Params
 	FungibleToken         = types.FungibleToken
 	AssetFamily           = types.AssetFamily
@@ -38,7 +36,6 @@ var (
 	QuerierRoute           = types.QuerierRoute
 	NATIVE                 = types.NATIVE
 	EXTERNAL               = types.EXTERNAL
-	GATEWAY                = types.GATEWAY
 	FUNGIBLE               = types.FUNGIBLE
 	DefaultCodespace       = types.DefaultCodespace
 	DefaultParamspace      = types.DefaultParamspace
@@ -56,7 +53,6 @@ var (
 	ParseBool              = types.ParseBool
 
 	NewFungibleToken         = types.NewFungibleToken
-	NewGateway               = types.NewGateway
 	NewMsgEditToken          = types.NewMsgEditToken
 	NewMsgMintToken          = types.NewMsgMintToken
 	NewMsgTransferTokenOwner = types.NewMsgTransferTokenOwner

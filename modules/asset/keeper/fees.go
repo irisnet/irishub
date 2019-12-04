@@ -2,7 +2,6 @@
 package keeper
 
 import (
-	"github.com/irisnet/irishub/modules/asset/types"
 	"math"
 	"strconv"
 
@@ -33,9 +32,8 @@ func TokenMintFeeHandler(ctx sdk.Context, k Keeper, owner sdk.AccAddress, symbol
 
 // feeHandler handles the fee of asset
 func feeHandler(ctx sdk.Context, k Keeper, feeAcc sdk.AccAddress, fee sdk.Coin) sdk.Error {
-	var assetTaxRate sdk.Dec
-	k.paramSpace.Get(ctx, types.KeyAssetTaxRate, &assetTaxRate)
-
+	//assetTaxRate := k.AssetTaxRate(ctx)
+	//
 	// compute community tax and burned coin
 	//communityTaxCoin := sdk.NewCoin(fee.Denom, sdk.NewDecFromInt(fee.Amount).Mul(assetTaxRate).TruncateInt())
 	//burnedCoin := fee.Sub(communityTaxCoin)
@@ -61,33 +59,19 @@ func feeHandler(ctx sdk.Context, k Keeper, feeAcc sdk.AccAddress, fee sdk.Coin) 
 
 // getTokenIssueFee returns the token issurance fee
 func GetTokenIssueFee(ctx sdk.Context, k Keeper, symbol string) sdk.Coin {
-	// get params
-	var issueTokenBaseFee sdk.Int
-	k.paramSpace.Get(ctx, types.KeyIssueTokenBaseFee, &issueTokenBaseFee)
-
-	var assetFeeDenom string
-	k.paramSpace.Get(ctx, types.KeyAssetFeeDenom, &assetFeeDenom)
-
 	// compute the fee
-	fee := calcFeeByBase(symbol, issueTokenBaseFee)
+	fee := calcFeeByBase(symbol, k.IssueTokenBaseFee(ctx))
 
-	return sdk.NewCoin(assetFeeDenom, convertFeeToInt(fee))
+	return sdk.NewCoin(k.AssetFeeDenom(ctx), convertFeeToInt(fee))
 }
 
 // getTokenMintFee returns the token mint fee
 func GetTokenMintFee(ctx sdk.Context, k Keeper, symbol string) sdk.Coin {
-	// get params
-	var mintTokenFeeRatio sdk.Dec
-	k.paramSpace.Get(ctx, types.KeyMintTokenFeeRatio, &mintTokenFeeRatio)
-
-	var assetFeeDenom string
-	k.paramSpace.Get(ctx, types.KeyAssetFeeDenom, &assetFeeDenom)
-
 	// compute the issurance fee and mint fee
 	issueFee := GetTokenIssueFee(ctx, k, symbol)
-	mintFee := sdk.NewDecFromInt(issueFee.Amount).Mul(mintTokenFeeRatio)
+	mintFee := sdk.NewDecFromInt(issueFee.Amount).Mul(k.MintTokenFeeRatio(ctx))
 
-	return sdk.NewCoin(assetFeeDenom, convertFeeToInt(mintFee))
+	return sdk.NewCoin(k.AssetFeeDenom(ctx), convertFeeToInt(mintFee))
 }
 
 // calcFeeByBase computes the actual fee according to the given base fee

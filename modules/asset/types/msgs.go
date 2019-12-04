@@ -40,11 +40,10 @@ var (
 
 var _, _, _, _ sdk.Msg = &MsgIssueToken{}, &MsgEditToken{}, &MsgMintToken{}, &MsgTransferTokenOwner{}
 
-// MsgIssueToken
+// MsgIssueToken for issuing token
 type MsgIssueToken struct {
 	Family          AssetFamily    `json:"family"`
 	Source          AssetSource    `json:"source"`
-	Gateway         string         `json:"gateway"`
 	Symbol          string         `json:"symbol"`
 	CanonicalSymbol string         `json:"canonical_symbol"`
 	Name            string         `json:"name"`
@@ -56,12 +55,13 @@ type MsgIssueToken struct {
 	Owner           sdk.AccAddress `json:"owner"`
 }
 
-// NewMsgIssueToken - construct asset issue msg.
-func NewMsgIssueToken(family AssetFamily, source AssetSource, gateway string, symbol string, canonicalSymbol string, name string, decimal uint8, alias string, initialSupply uint64, maxSupply uint64, mintable bool, owner sdk.AccAddress) MsgIssueToken {
+// NewMsgIssueToken - construct token issue msg
+func NewMsgIssueToken(family AssetFamily, source AssetSource, symbol string, canonicalSymbol string, name string,
+	decimal uint8, alias string, initialSupply uint64, maxSupply uint64, mintable bool, owner sdk.AccAddress,
+) MsgIssueToken {
 	return MsgIssueToken{
 		Family:          family,
 		Source:          source,
-		Gateway:         gateway,
 		Symbol:          symbol,
 		CanonicalSymbol: canonicalSymbol,
 		Name:            name,
@@ -74,12 +74,14 @@ func NewMsgIssueToken(family AssetFamily, source AssetSource, gateway string, sy
 	}
 }
 
-// Implements Msg.
+// Route Implements Msg
 func (msg MsgIssueToken) Route() string { return MsgRoute }
-func (msg MsgIssueToken) Type() string  { return MsgTypeIssueToken }
 
+// Type Implements Msg
+func (msg MsgIssueToken) Type() string { return MsgTypeIssueToken }
+
+// ValidateMsgIssueToken - validate msg
 func ValidateMsgIssueToken(msg *MsgIssueToken) sdk.Error {
-	msg.Gateway = strings.ToLower(strings.TrimSpace(msg.Gateway))
 	msg.Symbol = strings.ToLower(strings.TrimSpace(msg.Symbol))
 	msg.CanonicalSymbol = strings.ToLower(strings.TrimSpace(msg.CanonicalSymbol))
 	msg.MinUnitAlias = strings.ToLower(strings.TrimSpace(msg.MinUnitAlias))
@@ -103,13 +105,6 @@ func ValidateMsgIssueToken(msg *MsgIssueToken) sdk.Error {
 		msg.CanonicalSymbol = ""
 		break
 	case EXTERNAL:
-		break
-	case GATEWAY:
-		// require gateway moniker for gateway asset
-		if len(msg.Gateway) < MinimumGatewayMonikerSize || len(msg.Gateway) > MaximumGatewayMonikerSize {
-			return ErrInvalidMoniker(DefaultCodespace, fmt.Sprintf("invalid gateway moniker, length [%d,%d]", MinimumGatewayMonikerSize, MaximumGatewayMonikerSize))
-		}
-
 		break
 	default:
 		return ErrInvalidAssetSource(DefaultCodespace, fmt.Sprintf("invalid asset source type %s", msg.Source))
@@ -152,7 +147,7 @@ func ValidateMsgIssueToken(msg *MsgIssueToken) sdk.Error {
 	return nil
 }
 
-// Implements Msg.
+// ValidateBasic Implements Msg.
 func (msg MsgIssueToken) ValidateBasic() sdk.Error {
 	if msg.Source == EXTERNAL {
 		return ErrInvalidAssetSource(DefaultCodespace, fmt.Sprintf("invalid source type %s", msg.Source.String()))
@@ -160,7 +155,7 @@ func (msg MsgIssueToken) ValidateBasic() sdk.Error {
 	return ValidateMsgIssueToken(&msg)
 }
 
-// Implements Msg.
+// GetSignBytes Implements Msg.
 func (msg MsgIssueToken) GetSignBytes() []byte {
 	b, err := ModuleCdc.MarshalJSON(msg)
 	if err != nil {
@@ -169,7 +164,7 @@ func (msg MsgIssueToken) GetSignBytes() []byte {
 	return sdk.MustSortJSON(b)
 }
 
-// Implements Msg.
+// GetSigners Implements Msg.
 func (msg MsgIssueToken) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Owner}
 }
@@ -181,6 +176,7 @@ type MsgTransferTokenOwner struct {
 	TokenId  string         `json:"token_id"`
 }
 
+// NewMsgTransferTokenOwner - construct token transfer msg
 func NewMsgTransferTokenOwner(srcOwner, dstOwner sdk.AccAddress, tokenId string) MsgTransferTokenOwner {
 	tokenId = strings.TrimSpace(tokenId)
 	return MsgTransferTokenOwner{
@@ -388,26 +384,6 @@ func ValidateMoniker(moniker string) sdk.Error {
 	//if strings.Contains(strings.ToLower(moniker), sdk.Iris) {
 	//	return ErrInvalidMoniker(DefaultCodespace, fmt.Sprintf("the moniker must not contain the native token name"))
 	//}
-
-	return nil
-}
-
-// validateGatewayDesc checks if the given description fileds are valid
-func validateGatewayDesc(identity, details, website *string) sdk.Error {
-	// check the identity
-	if identity != nil && len(*identity) > MaximumGatewayIdentitySize {
-		return ErrInvalidIdentity(DefaultCodespace, fmt.Sprintf("the length of the identity must be between [0,%d]", MaximumGatewayIdentitySize))
-	}
-
-	// check the details
-	if details != nil && len(*details) > MaximumGatewayDetailsSize {
-		return ErrInvalidDetails(DefaultCodespace, fmt.Sprintf("the length of the details must be between [0,%d]", MaximumGatewayDetailsSize))
-	}
-
-	// check the website
-	if website != nil && len(*website) > MaximumGatewayWebsiteSize {
-		return ErrInvalidWebsite(DefaultCodespace, fmt.Sprintf("the length of the website must be between [0,%d]", MaximumGatewayWebsiteSize))
-	}
 
 	return nil
 }
