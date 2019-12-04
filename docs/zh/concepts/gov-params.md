@@ -43,7 +43,7 @@
 | ---------------------------------- | -------------------------- | ------------- | ------- |
 | `slashing/CensorshipJailDuration`  | Censorship后Jail的时间     | (0, 4week)    | 48h0m0s |
 | `slashing/DoubleSignJailDuration`  | DoubleSign后Jail的时间     | (0, 4week)    | 48h0m0s |
-| `slashing/DowntimeJailDuration`    | Downtime后Jail的时间       | (0, 4week)    | 36h0m0s |
+| `slashing/DowntimeJailDuration`    | Downtime后Jail的时间       | (0, 4week)    | 0h10m0s |
 | `slashing/MaxEvidenceAge`          | 可接受的最早的作恶证据时间 | [1day, +∞)    | 51840   |
 | `slashing/MinSignedPerWindow`      | slash窗口中最小投票比例    | [0.5, 0.9]    | 0.7     |
 | `slashing/SignedBlocksWindow`      | slash统计窗口区块数        | [100, 140000] | 34560   |
