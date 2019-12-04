@@ -30,7 +30,7 @@ func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 				h.ExpireHeight = h.ExpireHeight - uint64(ctx.BlockHeight()) + 1
 				pendingHTLCs[hex.EncodeToString(hlock)] = h
 			} else {
-				_, err := k.RefundHTLC(ctx, hlock)
+				err := k.RefundHTLC(ctx, hlock)
 				if err != nil {
 					panic(fmt.Errorf("failed to export HTLC genesis state: %s", hex.EncodeToString(hlock)))
 				}

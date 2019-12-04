@@ -75,7 +75,7 @@ func (suite *KeeperTestSuite) TestCreateHTLC() {
 	htlcAddr := suite.app.SupplyKeeper.GetModuleAddress(types.ModuleName)
 	require.Nil(suite.T(), suite.app.AccountKeeper.GetAccount(suite.ctx, htlcAddr))
 
-	_, err = suite.app.HTLCKeeper.CreateHTLC(suite.ctx, htlc, hashLock)
+	err = suite.app.HTLCKeeper.CreateHTLC(suite.ctx, htlc, hashLock)
 	require.Nil(suite.T(), err)
 
 	htlcAcc := suite.app.SupplyKeeper.GetModuleAccount(suite.ctx, types.ModuleName)
@@ -159,7 +159,7 @@ func (suite *KeeperTestSuite) TestClaimHTLC() {
 				td.state,
 			)
 
-			_, err := suite.app.HTLCKeeper.CreateHTLC(suite.ctx, htlc, td.hashLock)
+			err := suite.app.HTLCKeeper.CreateHTLC(suite.ctx, htlc, td.hashLock)
 			require.Nil(suite.T(), err, "TestData: %d", i)
 
 			htlc, err = suite.app.HTLCKeeper.GetHTLC(suite.ctx, td.hashLock)
@@ -171,7 +171,7 @@ func (suite *KeeperTestSuite) TestClaimHTLC() {
 			originHTLCAmount := htlcAcc.GetCoins()
 			originReceiverAmount := suite.app.AccountKeeper.GetAccount(suite.ctx, addrTo).GetCoins()
 
-			_, err = suite.app.HTLCKeeper.ClaimHTLC(suite.ctx, td.hashLock, td.secret)
+			err = suite.app.HTLCKeeper.ClaimHTLC(suite.ctx, td.hashLock, td.secret)
 			require.Nil(suite.T(), err, "TestData: %d", i)
 
 			htlc, _ = suite.app.HTLCKeeper.GetHTLC(suite.ctx, td.hashLock)
@@ -199,7 +199,7 @@ func (suite *KeeperTestSuite) TestClaimHTLC() {
 				td.state,
 			)
 
-			_, err := suite.app.HTLCKeeper.CreateHTLC(suite.ctx, htlc, td.hashLock)
+			err := suite.app.HTLCKeeper.CreateHTLC(suite.ctx, htlc, td.hashLock)
 			require.Nil(suite.T(), err, "TestData: %d", i)
 
 			htlc, err = suite.app.HTLCKeeper.GetHTLC(suite.ctx, td.hashLock)
@@ -211,7 +211,7 @@ func (suite *KeeperTestSuite) TestClaimHTLC() {
 			originHTLCAmount := suite.app.AccountKeeper.GetAccount(suite.ctx, htlcAddr).GetCoins()
 			originReceiverAmount := suite.app.AccountKeeper.GetAccount(suite.ctx, addrTo).GetCoins()
 
-			_, err = suite.app.HTLCKeeper.ClaimHTLC(suite.ctx, td.hashLock, td.secret)
+			err = suite.app.HTLCKeeper.ClaimHTLC(suite.ctx, td.hashLock, td.secret)
 			require.NotNil(suite.T(), err, "TestData: %d", i)
 
 			htlc, _ = suite.app.HTLCKeeper.GetHTLC(suite.ctx, td.hashLock)
@@ -256,7 +256,7 @@ func (suite *KeeperTestSuite) TestRefundHTLC() {
 		state,
 	)
 
-	_, err := suite.app.HTLCKeeper.CreateHTLC(suite.ctx, htlc, hashLock)
+	err := suite.app.HTLCKeeper.CreateHTLC(suite.ctx, htlc, hashLock)
 	require.Nil(suite.T(), err)
 
 	htlc, err = suite.app.HTLCKeeper.GetHTLC(suite.ctx, hashLock)
@@ -268,7 +268,7 @@ func (suite *KeeperTestSuite) TestRefundHTLC() {
 	originHTLCAmount := htlcAcc.GetCoins()
 	originSenderAmount := suite.app.AccountKeeper.GetAccount(suite.ctx, addrSender).GetCoins()
 
-	_, err = suite.app.HTLCKeeper.RefundHTLC(suite.ctx, hashLock)
+	err = suite.app.HTLCKeeper.RefundHTLC(suite.ctx, hashLock)
 	require.Nil(suite.T(), err)
 
 	htlc, _ = suite.app.HTLCKeeper.GetHTLC(suite.ctx, hashLock)

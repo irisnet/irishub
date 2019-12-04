@@ -46,15 +46,15 @@ func (k Keeper) GetCdc() *codec.Codec {
 }
 
 // CreateHTLC creates an HTLC
-func (k Keeper) CreateHTLC(ctx sdk.Context, htlc types.HTLC, hashLock []byte) (sdk.Event, sdk.Error) {
+func (k Keeper) CreateHTLC(ctx sdk.Context, htlc types.HTLC, hashLock []byte) sdk.Error {
 	// check if the hash lock already exists
 	if k.HasHashLock(ctx, hashLock) {
-		return sdk.Event{}, types.ErrHashLockAlreadyExists(types.DefaultCodespace, fmt.Sprintf("the hash lock already exists: %s", hex.EncodeToString(hashLock)))
+		return types.ErrHashLockAlreadyExists(types.DefaultCodespace, fmt.Sprintf("the hash lock already exists: %s", hex.EncodeToString(hashLock)))
 	}
 
 	// transfer the specified tokens to HTLC module address
 	if err := k.sk.SendCoinsFromAccountToModule(ctx, htlc.Sender, types.ModuleName, htlc.Amount); err != nil {
-		return sdk.Event{}, err
+		return err
 	}
 
 	// set the HTLC
@@ -71,31 +71,32 @@ func (k Keeper) CreateHTLC(ctx sdk.Context, htlc types.HTLC, hashLock []byte) (s
 		sdk.NewAttribute(types.AttributeValueAmount, htlc.Amount.String()),
 		sdk.NewAttribute(types.AttributeValueHashLock, hex.EncodeToString(hashLock)),
 	)
+	ctx.EventManager().EmitEvents(sdk.Events{createEvent})
 
-	return createEvent, nil
+	return nil
 }
 
 // ClaimHTLC claim an HTLC
-func (k Keeper) ClaimHTLC(ctx sdk.Context, hashLock []byte, secret []byte) (sdk.Event, sdk.Error) {
+func (k Keeper) ClaimHTLC(ctx sdk.Context, hashLock []byte, secret []byte) sdk.Error {
 	// get the HTLC
 	htlc, err := k.GetHTLC(ctx, hashLock)
 	if err != nil {
-		return sdk.Event{}, err
+		return err
 	}
 
 	// check if the HTLC is open
 	if htlc.State != types.OPEN {
-		return sdk.Event{}, types.ErrStateIsNotOpen(k.codespace, fmt.Sprintf("the HTLC is not open"))
+		return types.ErrStateIsNotOpen(k.codespace, fmt.Sprintf("the HTLC is not open"))
 	}
 
 	// check if the secret matches with the hash lock
 	if !bytes.Equal(types.GetHashLock(secret, htlc.Timestamp), hashLock) {
-		return sdk.Event{}, types.ErrInvalidSecret(k.codespace, fmt.Sprintf("invalid secret: %s", hex.EncodeToString(secret)))
+		return types.ErrInvalidSecret(k.codespace, fmt.Sprintf("invalid secret: %s", hex.EncodeToString(secret)))
 	}
 
 	// do the claim
 	if err := k.sk.SendCoinsFromModuleToAccount(ctx, types.ModuleName, htlc.To, htlc.Amount); err != nil {
-		return sdk.Event{}, err
+		return err
 	}
 
 	// update the secret and state in HTLC
@@ -113,26 +114,27 @@ func (k Keeper) ClaimHTLC(ctx sdk.Context, hashLock []byte, secret []byte) (sdk.
 		sdk.NewAttribute(types.AttributeValueHashLock, hex.EncodeToString(hashLock)),
 		sdk.NewAttribute(types.AttributeValueSecret, hex.EncodeToString(secret)),
 	)
+	ctx.EventManager().EmitEvents(sdk.Events{claimEvent})
 
-	return claimEvent, nil
+	return nil
 }
 
 // RefundHTLC refund an HTLC
-func (k Keeper) RefundHTLC(ctx sdk.Context, hashLock []byte) (sdk.Event, sdk.Error) {
+func (k Keeper) RefundHTLC(ctx sdk.Context, hashLock []byte) sdk.Error {
 	// get the HTLC
 	htlc, err := k.GetHTLC(ctx, hashLock)
 	if err != nil {
-		return sdk.Event{}, err
+		return err
 	}
 
 	// check if the HTLC is expired
 	if htlc.State != types.EXPIRED {
-		return sdk.Event{}, types.ErrStateIsNotOpen(k.codespace, fmt.Sprintf("the htlc is not expired"))
+		return types.ErrStateIsNotOpen(k.codespace, fmt.Sprintf("the htlc is not expired"))
 	}
 
 	// do the refund
 	if err := k.sk.SendCoinsFromModuleToAccount(ctx, types.ModuleName, htlc.Sender, htlc.Amount); err != nil {
-		return sdk.Event{}, err
+		return err
 	}
 
 	// update the state in HTLC
@@ -144,8 +146,9 @@ func (k Keeper) RefundHTLC(ctx sdk.Context, hashLock []byte) (sdk.Event, sdk.Err
 		sdk.NewAttribute(types.AttributeValueSender, htlc.Sender.String()),
 		sdk.NewAttribute(types.AttributeValueHashLock, hex.EncodeToString(hashLock)),
 	)
+	ctx.EventManager().EmitEvents(sdk.Events{refundEvent})
 
-	return refundEvent, nil
+	return nil
 }
 
 // HasHashLock returns whether the hashlock already exists

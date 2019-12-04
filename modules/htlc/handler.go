@@ -39,12 +39,10 @@ func handleMsgCreateHTLC(ctx sdk.Context, k Keeper, msg MsgCreateHTLC) sdk.Resul
 		state,
 	)
 
-	event, err := k.CreateHTLC(ctx, htlc, msg.HashLock)
+	err := k.CreateHTLC(ctx, htlc, msg.HashLock)
 	if err != nil {
 		return err.Result()
 	}
-
-	ctx.EventManager().EmitEvents(sdk.Events{event})
 
 	return sdk.Result{
 		Events: ctx.EventManager().Events(),
@@ -53,12 +51,10 @@ func handleMsgCreateHTLC(ctx sdk.Context, k Keeper, msg MsgCreateHTLC) sdk.Resul
 
 // handleMsgClaimHTLC handles MsgClaimHTLC
 func handleMsgClaimHTLC(ctx sdk.Context, k Keeper, msg MsgClaimHTLC) sdk.Result {
-	event, err := k.ClaimHTLC(ctx, msg.HashLock, msg.Secret)
+	err := k.ClaimHTLC(ctx, msg.HashLock, msg.Secret)
 	if err != nil {
 		return err.Result()
 	}
-
-	ctx.EventManager().EmitEvents(sdk.Events{event})
 
 	return sdk.Result{
 		Events: ctx.EventManager().Events(),
@@ -67,12 +63,10 @@ func handleMsgClaimHTLC(ctx sdk.Context, k Keeper, msg MsgClaimHTLC) sdk.Result 
 
 // handleMsgRefundHTLC handles MsgRefundHTLC
 func handleMsgRefundHTLC(ctx sdk.Context, k Keeper, msg MsgRefundHTLC) sdk.Result {
-	event, err := k.RefundHTLC(ctx, msg.HashLock)
+	err := k.RefundHTLC(ctx, msg.HashLock)
 	if err != nil {
 		return err.Result()
 	}
-
-	ctx.EventManager().EmitEvents(sdk.Events{event})
 
 	return sdk.Result{
 		Events: ctx.EventManager().Events(),

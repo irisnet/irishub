@@ -65,9 +65,9 @@ func (suite *KeeperTestSuite) TestExportHTLCGenesis() {
 	htlc2 := modulehtlc.NewHTLC(senderAddrs[1], receiverAddrs[1], receiverOnOtherChain, amount, initSecret, timestamps[1], expireHeights[1], state)
 
 	// create HTLCs
-	_, err := suite.app.HTLCKeeper.CreateHTLC(suite.ctx, htlc1, hashLocks[0])
+	err := suite.app.HTLCKeeper.CreateHTLC(suite.ctx, htlc1, hashLocks[0])
 	require.Nil(suite.T(), err)
-	_, err = suite.app.HTLCKeeper.CreateHTLC(suite.ctx, htlc2, hashLocks[1])
+	err = suite.app.HTLCKeeper.CreateHTLC(suite.ctx, htlc2, hashLocks[1])
 	require.Nil(suite.T(), err)
 
 	newBlockHeight := int64(50)
