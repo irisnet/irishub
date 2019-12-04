@@ -11,7 +11,7 @@ import (
 
 // BeginBlocker handles block beginning logic for rand
 func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, k Keeper) {
-	ctx = ctx.WithLogger(ctx.Logger().With("handler", "beginBlock").With("module", "iris/rand"))
+	logger := k.Logger(ctx)
 
 	currentTimestamp := ctx.BlockHeader().Time.Unix()
 	preBlockHeight := ctx.BlockHeight() - 1
@@ -47,6 +47,6 @@ func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, k Keeper) {
 		handledRandReqNum++
 	}
 
-	ctx.Logger().Info(fmt.Sprintf("%d rand requests are handled", handledRandReqNum))
+	logger.Info(fmt.Sprintf("%d rand requests are handled", handledRandReqNum))
 	return
 }
