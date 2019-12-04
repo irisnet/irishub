@@ -8,6 +8,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
+	"github.com/irisnet/irishub/config"
 	"github.com/irisnet/irishub/modules/coinswap/internal/types"
 )
 
@@ -19,7 +20,7 @@ func TestParams(t *testing.T) {
 		params types.Params
 	}{
 		{types.DefaultParams()},
-		{types.NewParams(sdk.NewRat(5, 10))},
+		{types.NewParams(sdk.NewDec(5, 10))},
 	}
 
 	for _, tc := range cases {
@@ -35,7 +36,7 @@ func TestKeeper_UpdateLiquidity(t *testing.T) {
 	ctx, keeper, accs := createTestInput(t, total, 1)
 	sender := accs[0].GetAddress()
 	denom1 := "btc-min"
-	denom2 := sdk.IrisAtto
+	denom2 := config.IrisAtto
 	uniId, _ := types.GetUniId(denom1, denom2)
 	poolAddr := getReservePoolAddr(uniId)
 

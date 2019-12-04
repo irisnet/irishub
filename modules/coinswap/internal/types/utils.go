@@ -5,6 +5,8 @@ import (
 	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	"github.com/irisnet/irishub/config"
 )
 
 // GetUniId returns the unique uni id for the provided denominations.
@@ -15,12 +17,12 @@ func GetUniId(denom1, denom2 string) (string, sdk.Error) {
 		return "", ErrEqualDenom("denomnations for forming uni id are equal")
 	}
 
-	if denom1 != sdk.IrisAtto && denom2 != sdk.IrisAtto {
-		return "", ErrIllegalDenom(fmt.Sprintf("illegal denomnations for forming uni id, must have one native denom: %s", sdk.IrisAtto))
+	if denom1 != config.IrisAtto && denom2 != config.IrisAtto {
+		return "", ErrIllegalDenom(fmt.Sprintf("illegal denomnations for forming uni id, must have one native denom: %s", config.IrisAtto))
 	}
 
 	denom := denom1
-	if denom == sdk.IrisAtto {
+	if denom == config.IrisAtto {
 		denom = denom2
 	}
 	coinName, err := sdk.GetCoinNameByDenom(denom)

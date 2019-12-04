@@ -9,11 +9,12 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
+	"github.com/irisnet/irishub/config"
 	"github.com/irisnet/irishub/modules/coinswap/internal/types"
 )
 
 var (
-	native = sdk.IrisAtto
+	native = config.IrisAtto
 )
 
 func TestGetUniId(t *testing.T) {
@@ -47,7 +48,7 @@ type Data struct {
 	delta sdk.Int
 	x     sdk.Int
 	y     sdk.Int
-	fee   sdk.Rat
+	fee   sdk.Dec
 }
 type SwapCase struct {
 	data   Data
@@ -57,23 +58,23 @@ type SwapCase struct {
 func TestGetInputPrice(t *testing.T) {
 	var datas = []SwapCase{
 		{
-			data:   Data{delta: sdk.NewInt(100), x: sdk.NewInt(1000), y: sdk.NewInt(1000), fee: sdk.NewRat(3, 1000)},
+			data:   Data{delta: sdk.NewInt(100), x: sdk.NewInt(1000), y: sdk.NewInt(1000), fee: sdk.NewDec(3, 1000)},
 			expect: sdk.NewInt(90),
 		},
 		{
-			data:   Data{delta: sdk.NewInt(200), x: sdk.NewInt(1000), y: sdk.NewInt(1000), fee: sdk.NewRat(3, 1000)},
+			data:   Data{delta: sdk.NewInt(200), x: sdk.NewInt(1000), y: sdk.NewInt(1000), fee: sdk.NewDecWithPrec(3, 3)},
 			expect: sdk.NewInt(166),
 		},
 		{
-			data:   Data{delta: sdk.NewInt(300), x: sdk.NewInt(1000), y: sdk.NewInt(1000), fee: sdk.NewRat(3, 1000)},
+			data:   Data{delta: sdk.NewInt(300), x: sdk.NewInt(1000), y: sdk.NewInt(1000), fee: sdk.NewDecWithPrec(3, 3)},
 			expect: sdk.NewInt(230),
 		},
 		{
-			data:   Data{delta: sdk.NewInt(1000), x: sdk.NewInt(1000), y: sdk.NewInt(1000), fee: sdk.NewRat(3, 1000)},
+			data:   Data{delta: sdk.NewInt(1000), x: sdk.NewInt(1000), y: sdk.NewInt(1000), fee: sdk.NewDecWithPrec(3, 3)},
 			expect: sdk.NewInt(499),
 		},
 		{
-			data:   Data{delta: sdk.NewInt(1000), x: sdk.NewInt(1000), y: sdk.NewInt(1000), fee: sdk.ZeroRat()},
+			data:   Data{delta: sdk.NewInt(1000), x: sdk.NewInt(1000), y: sdk.NewInt(1000), fee: sdk.ZeroDec()},
 			expect: sdk.NewInt(500),
 		},
 	}
@@ -88,19 +89,19 @@ func TestGetInputPrice(t *testing.T) {
 func TestGetOutputPrice(t *testing.T) {
 	var datas = []SwapCase{
 		{
-			data:   Data{delta: sdk.NewInt(100), x: sdk.NewInt(1000), y: sdk.NewInt(1000), fee: sdk.NewRat(3, 1000)},
+			data:   Data{delta: sdk.NewInt(100), x: sdk.NewInt(1000), y: sdk.NewInt(1000), fee: sdk.NewDecWithPrec(3, 3)},
 			expect: sdk.NewInt(112),
 		},
 		{
-			data:   Data{delta: sdk.NewInt(200), x: sdk.NewInt(1000), y: sdk.NewInt(1000), fee: sdk.NewRat(3, 1000)},
+			data:   Data{delta: sdk.NewInt(200), x: sdk.NewInt(1000), y: sdk.NewInt(1000), fee: sdk.NewDecWithPrec(3, 3)},
 			expect: sdk.NewInt(251),
 		},
 		{
-			data:   Data{delta: sdk.NewInt(300), x: sdk.NewInt(1000), y: sdk.NewInt(1000), fee: sdk.NewRat(3, 1000)},
+			data:   Data{delta: sdk.NewInt(300), x: sdk.NewInt(1000), y: sdk.NewInt(1000), fee: sdk.NewDecWithPrec(3, 3)},
 			expect: sdk.NewInt(430),
 		},
 		{
-			data:   Data{delta: sdk.NewInt(300), x: sdk.NewInt(1000), y: sdk.NewInt(1000), fee: sdk.ZeroRat()},
+			data:   Data{delta: sdk.NewInt(300), x: sdk.NewInt(1000), y: sdk.NewInt(1000), fee: sdk.ZeroDec()},
 			expect: sdk.NewInt(429),
 		},
 	}
@@ -116,7 +117,7 @@ func TestKeeperSwap(t *testing.T) {
 	ctx, keeper, sender, reservePoolAddr, err, reservePoolBalances, senderBlances := createReservePool(t)
 
 	outputCoin := sdk.NewCoin("btc-min", sdk.NewInt(100))
-	inputCoin := sdk.NewCoin(sdk.IrisAtto, sdk.NewInt(1000))
+	inputCoin := sdk.NewCoin(config.IrisAtto, sdk.NewInt(1000))
 
 	input := types.Input{
 		Address: sender,
@@ -157,7 +158,7 @@ func createReservePool(t *testing.T) (sdk.Context, Keeper, sdk.AccAddress, sdk.A
 	ctx, keeper, accs := createTestInput(t, sdk.NewInt(100000000), 1)
 	sender := accs[0].GetAddress()
 	denom1 := "btc-min"
-	denom2 := sdk.IrisAtto
+	denom2 := config.IrisAtto
 	uniId, _ := types.GetUniId(denom1, denom2)
 	reservePoolAddr := getReservePoolAddr(uniId)
 
@@ -182,7 +183,7 @@ func TestTradeInputForExactOutput(t *testing.T) {
 	ctx, keeper, sender, poolAddr, _, poolBalances, senderBlances := createReservePool(t)
 
 	outputCoin := sdk.NewCoin("btc-min", sdk.NewInt(100))
-	inputCoin := sdk.NewCoin(sdk.IrisAtto, sdk.NewInt(100000))
+	inputCoin := sdk.NewCoin(config.IrisAtto, sdk.NewInt(100000))
 	input := types.Input{
 		Address: sender,
 		Coin:    inputCoin,
@@ -192,7 +193,7 @@ func TestTradeInputForExactOutput(t *testing.T) {
 	}
 
 	initSupplyOutput := poolBalances.AmountOf(outputCoin.Denom)
-	maxCnt := int(initSupplyOutput.Div(outputCoin.Amount).Int64())
+	maxCnt := int(initSupplyOutput.Quo(outputCoin.Amount).Int64())
 
 	for i := 1; i < 100; i++ {
 		amt, err := keeper.tradeInputForExactOutput(ctx, input, output)
@@ -203,7 +204,7 @@ func TestTradeInputForExactOutput(t *testing.T) {
 		ifNil(t, err)
 
 		bought := sdk.NewCoins(outputCoin)
-		sold := sdk.NewCoins(sdk.NewCoin(sdk.IrisAtto, amt))
+		sold := sdk.NewCoins(sdk.NewCoin(config.IrisAtto, amt))
 
 		pb := poolBalances.Add(sold).Sub(bought)
 		sb := senderBlances.Add(bought).Sub(sold)
@@ -219,7 +220,7 @@ func TestTradeExactInputForOutput(t *testing.T) {
 	ctx, keeper, sender, poolAddr, _, poolBalances, senderBlances := createReservePool(t)
 
 	outputCoin := sdk.NewCoin("btc-min", sdk.NewInt(0))
-	inputCoin := sdk.NewCoin(sdk.IrisAtto, sdk.NewInt(100))
+	inputCoin := sdk.NewCoin(config.IrisAtto, sdk.NewInt(100))
 	input := types.Input{
 		Address: sender,
 		Coin:    inputCoin,

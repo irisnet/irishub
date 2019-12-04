@@ -5,8 +5,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
+	"github.com/irisnet/irishub/config"
 	"github.com/irisnet/irishub/modules/coinswap/internal/types"
-
 )
 
 func (k Keeper) swapCoins(ctx sdk.Context, sender, recipient sdk.AccAddress, coinSold, coinBought sdk.Coin) sdk.Error {
@@ -16,19 +16,15 @@ func (k Keeper) swapCoins(ctx sdk.Context, sender, recipient sdk.AccAddress, coi
 	}
 
 	poolAddr := getReservePoolAddr(uniId)
-	_, err = k.bk.SendCoins(ctx, sender, poolAddr, sdk.NewCoins(coinSold))
+	err = k.bk.SendCoins(ctx, sender, poolAddr, sdk.NewCoins(coinSold))
 	if err != nil {
 		return err
 	}
 
-	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, sender.String(), poolAddr.String(), coinSold.String(), sdk.CoinSwapInputFlow, "")
-
 	if recipient.Empty() {
 		recipient = sender
 	}
-	_, err = k.bk.SendCoins(ctx, poolAddr, recipient, sdk.NewCoins(coinBought))
-
-	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, poolAddr.String(), recipient.String(), coinBought.String(), sdk.CoinSwapOutputFlow, "")
+	err = k.bk.SendCoins(ctx, poolAddr, recipient, sdk.NewCoins(coinBought))
 
 	return err
 }
@@ -98,11 +94,11 @@ Sell exact amount of a token for buying another, non of them are iris
 @return: actual amount of the token to be bought
 */
 func (k Keeper) doubleTradeExactInputForOutput(ctx sdk.Context, input types.Input, output types.Output) (sdk.Int, sdk.Error) {
-	nativeAmount, err := k.calculateWithExactInput(ctx, input.Coin, sdk.IrisAtto)
+	nativeAmount, err := k.calculateWithExactInput(ctx, input.Coin, config.IrisAtto)
 	if err != nil {
 		return sdk.ZeroInt(), err
 	}
-	nativeCoin := sdk.NewCoin(sdk.IrisAtto, nativeAmount)
+	nativeCoin := sdk.NewCoin(config.IrisAtto, nativeAmount)
 	err = k.swapCoins(ctx, input.Address, output.Address, input.Coin, nativeCoin)
 	if err != nil {
 		return sdk.ZeroInt(), err
@@ -194,11 +190,11 @@ Buy exact amount of a token by specifying the max amount of another token, non o
 @return : actual amount of the token to be payed
 */
 func (k Keeper) doubleTradeInputForExactOutput(ctx sdk.Context, input types.Input, output types.Output) (sdk.Int, sdk.Error) {
-	soldIrisAmount, err := k.calculateWithExactOutput(ctx, output.Coin, sdk.IrisAtto)
+	soldIrisAmount, err := k.calculateWithExactOutput(ctx, output.Coin, config.IrisAtto)
 	if err != nil {
 		return sdk.ZeroInt(), err
 	}
-	soldIrisCoin := sdk.NewCoin(sdk.IrisAtto, soldIrisAmount)
+	soldIrisCoin := sdk.NewCoin(config.IrisAtto, soldIrisAmount)
 
 	soldTokenAmt, err := k.calculateWithExactOutput(ctx, soldIrisCoin, input.Coin.Denom)
 	if err != nil {
@@ -226,19 +222,19 @@ func (k Keeper) doubleTradeInputForExactOutput(ctx sdk.Context, input types.Inpu
 // getInputPrice returns the amount of coins bought (calculated) given the input amount being sold (exact)
 // The fee is included in the input coins being bought
 // https://github.com/runtimeverification/verified-smart-contracts/blob/uniswap/uniswap/x-y-k.pdf
-func getInputPrice(inputAmt, inputReserve, outputReserve sdk.Int, fee sdk.Rat) sdk.Int {
-	deltaFee := sdk.OneRat().Sub(fee)
+func getInputPrice(inputAmt, inputReserve, outputReserve sdk.Int, fee sdk.Dec) sdk.Int {
+	deltaFee := sdk.OneDec().Sub(fee)
 	inputAmtWithFee := inputAmt.Mul(deltaFee.Num())
 	numerator := inputAmtWithFee.Mul(outputReserve)
 	denominator := inputReserve.Mul(deltaFee.Denom()).Add(inputAmtWithFee)
-	return numerator.Div(denominator)
+	return numerator.Quo(denominator)
 }
 
 // getOutputPrice returns the amount of coins sold (calculated) given the output amount being bought (exact)
 // The fee is included in the output coins being bought
-func getOutputPrice(outputAmt, inputReserve, outputReserve sdk.Int, fee sdk.Rat) sdk.Int {
-	deltaFee := sdk.OneRat().Sub(fee)
+func getOutputPrice(outputAmt, inputReserve, outputReserve sdk.Int, fee sdk.Dec) sdk.Int {
+	deltaFee := sdk.OneDec().Sub(fee)
 	numerator := inputReserve.Mul(outputAmt).Mul(deltaFee.Denom())
 	denominator := (outputReserve.Sub(outputAmt)).Mul(deltaFee.Num())
-	return numerator.Div(denominator).Add(sdk.OneInt())
+	return numerator.Quo(denominator).Add(sdk.OneInt())
 }

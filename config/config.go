@@ -1,8 +1,10 @@
 package config
 
 const (
-	Testnet = "testnet"
-	Mainnet = "mainnet"
+	Testnet  = "testnet"
+	Mainnet  = "mainnet"
+	Iris     = "iris"
+	IrisAtto = "iris-atto"
 )
 
 // Can be configured through environment variables

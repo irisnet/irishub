@@ -20,10 +20,10 @@ func TestValidateParams(t *testing.T) {
 		params Params
 		result bool
 	}{
-		{"fee == 0 ", NewParams(sdk.ZeroRat()), false},
-		{"fee < 1", NewParams(sdk.NewRat(1000, 100)), false},
-		{"fee numerator < 0", NewParams(sdk.NewRat(-1, 10)), false},
-		{"fee denominator < 0", NewParams(sdk.NewRat(1, -10)), false},
+		{"fee == 0 ", NewParams(sdk.ZeroDec()), false},
+		{"fee < 1", NewParams(sdk.NewDecWithPrec(1000, 2)), false},
+		{"fee numerator < 0", NewParams(sdk.NewDecWithPrec(-1, 1)), false},
+		{"fee denominator < 0", NewParams(sdk.NewDecWithPrec(1, -1)), false},
 	}
 
 	for _, tc := range invalidTests {

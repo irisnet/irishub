@@ -4,6 +4,8 @@ import (
 	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	"github.com/irisnet/irishub/config"
 )
 
 var (
@@ -13,8 +15,8 @@ var (
 )
 
 const (
-	FormatUniABSPrefix = sdk.FormatUniABSPrefix
-	FormatUniId        = FormatUniABSPrefix + "%s"
+	FormatUniABSPrefix = "uni:"
+	FormatUniId        = "uni:%s"
 )
 
 /* --------------------------------------------------------------------------- */
@@ -135,16 +137,16 @@ func (msg MsgAddLiquidity) ValidateBasic() sdk.Error {
 	if !(msg.MaxToken.IsValid() && msg.MaxToken.IsPositive()) {
 		return sdk.ErrInvalidCoins("max token is invalid: " + msg.MaxToken.String())
 	}
-	if msg.MaxToken.Denom == sdk.IrisAtto {
+	if msg.MaxToken.Denom == config.IrisAtto {
 		return sdk.ErrInvalidCoins("max token must be non-iris token")
 	}
 	if strings.HasPrefix(msg.MaxToken.Denom, FormatUniABSPrefix) {
 		return sdk.ErrInvalidCoins("max token must be non-liquidity token")
 	}
-	if msg.ExactIrisAmt.IsNil() || !msg.ExactIrisAmt.IsPositive() {
+	if !msg.ExactIrisAmt.IsPositive() {
 		return ErrNotPositive("iris amount must be positive")
 	}
-	if msg.MinLiquidity.IsNil() || msg.MinLiquidity.IsNegative() {
+	if msg.MinLiquidity.IsNegative() {
 		return ErrNotPositive("minimum liquidity can not be negative")
 	}
 	if msg.Deadline <= 0 {
@@ -202,7 +204,7 @@ func (msg MsgRemoveLiquidity) Type() string { return MsgTypeRemoveLiquidity }
 
 // ValidateBasic Implements Msg.
 func (msg MsgRemoveLiquidity) ValidateBasic() sdk.Error {
-	if msg.MinToken.IsNil() || msg.MinToken.IsNegative() {
+	if msg.MinToken.IsNegative() {
 		return sdk.ErrInvalidCoins("minimum token amount can not be negative")
 	}
 	if !msg.WithdrawLiquidity.IsValid() || !msg.WithdrawLiquidity.IsPositive() {
@@ -211,7 +213,7 @@ func (msg MsgRemoveLiquidity) ValidateBasic() sdk.Error {
 	if err := CheckUniDenom(msg.WithdrawLiquidity.Denom); err != nil {
 		return err
 	}
-	if msg.MinIrisAmt.IsNil() || msg.MinIrisAmt.IsNegative() {
+	if msg.MinIrisAmt.IsNegative() {
 		return ErrNotPositive("minimum iris amount can not be negative")
 	}
 	if msg.Deadline <= 0 {
