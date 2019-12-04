@@ -8,8 +8,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/types/rest"
 	"github.com/gorilla/mux"
-	"github.com/irisnet/irishub/modules/rand/client/types"
 	"github.com/irisnet/irishub/modules/rand"
+	"github.com/irisnet/irishub/modules/rand/client/types"
 )
 
 func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router) {
@@ -28,6 +28,11 @@ func queryRandHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
+		cliCtx, ok := rest.ParseQueryHeightOrReturnBadRequest(w, cliCtx, r)
+		if !ok {
+			return
+		}
+
 		params := rand.QueryRandParams{
 			ReqID: reqID,
 		}
@@ -38,8 +43,8 @@ func queryRandHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		res, _, err := cliCtx.QueryWithData(
-			fmt.Sprintf("custom/%s/%s", rand.QuerierRoute, rand.QueryRand), bz)
+		route := fmt.Sprintf("custom/%s/%s", rand.QuerierRoute, rand.QueryRand)
+		res, height, err := cliCtx.QueryWithData(route, bz)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
@@ -58,6 +63,8 @@ func queryRandHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			Value:         rawRand.Value.FloatString(rand.RandPrec),
 		}
 
+		cliCtx = cliCtx.WithHeight(height)
+
 		rest.PostProcessResponse(w, cliCtx, readableRand)
 	}
 }
@@ -65,27 +72,25 @@ func queryRandHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 // queryQueueHandlerFn performs rand request queue query by an optional heigth
 func queryQueueHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		heightStr := r.FormValue("height")
+		genHeightStr := r.FormValue("gen-height")
 
-		var (
-			height int64
-			err    error
-		)
+		genHeight, ok := rest.ParseInt64OrReturnBadRequest(w, genHeightStr)
+		if !ok {
+			return
+		}
 
-		if len(heightStr) != 0 {
-			height, ok := rest.ParseInt64OrReturnBadRequest(w, heightStr)
-			if !ok {
-				return
-			}
+		if genHeight < 0 {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, "the generation height must not be less than 0")
+			return
+		}
 
-			if height < 0 {
-				rest.WriteErrorResponse(w, http.StatusBadRequest, "the height must not be less than 0")
-				return
-			}
+		cliCtx, ok := rest.ParseQueryHeightOrReturnBadRequest(w, cliCtx, r)
+		if !ok {
+			return
 		}
 
 		params := rand.QueryRandRequestQueueParams{
-			Height: height,
+			Height: genHeight,
 		}
 
 		bz, err := cliCtx.Codec.MarshalJSON(params)
@@ -94,12 +99,14 @@ func queryQueueHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		res, _, err := cliCtx.QueryWithData(
-			fmt.Sprintf("custom/%s/%s", rand.QuerierRoute, rand.QueryRandRequestQueue), bz)
+		route := fmt.Sprintf("custom/%s/%s", rand.QuerierRoute, rand.QueryRandRequestQueue)
+		res, height, err := cliCtx.QueryWithData(route, bz)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
+
+		cliCtx = cliCtx.WithHeight(height)
 
 		rest.PostProcessResponse(w, cliCtx, res)
 	}
