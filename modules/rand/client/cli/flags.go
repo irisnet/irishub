@@ -9,7 +9,7 @@ const (
 	FlagReqID         = "request-id"
 	FlagConsumer      = "consumer"
 	FlagBlockInterval = "block-interval"
-	FlagGenHeight   = "gen-height"
+	FlagGenHeight     = "gen-height"
 )
 
 var (
