@@ -36,7 +36,7 @@ func GetCmdRequestRand(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "request-rand",
 		Short:   "Request a random number",
-		Example: "iriscli rand request-rand --block-interval=100",
+		Example: "iriscli rand request-rand --block-interval=10",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			inBuf := bufio.NewReader(cmd.InOrStdin())
 			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
