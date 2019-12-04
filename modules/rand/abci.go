@@ -4,7 +4,8 @@ import (
 	"encoding/hex"
 	"fmt"
 
-	sdk "github.com/cosmos/cosmos-sdk/types
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/irisnet/irishub/modules/rand/internal/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 )
 
@@ -13,11 +14,11 @@ func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, k Keeper) {
 	ctx = ctx.WithLogger(ctx.Logger().With("handler", "beginBlock").With("module", "iris/rand"))
 
 	currentTimestamp := ctx.BlockHeader().Time.Unix()
-	lastBlockHeight := ctx.BlockHeight() - 1
-	lastBlockHash := []byte(ctx.BlockHeader().LastBlockId.Hash)
+	preBlockHeight := ctx.BlockHeight() - 1
+	preBlockHash := []byte(ctx.BlockHeader().LastBlockId.Hash)
 
 	// get pending random number requests for lastBlockHeight
-	iterator := k.IterateRandRequestQueueByHeight(ctx, lastBlockHeight)
+	iterator := k.IterateRandRequestQueueByHeight(ctx, preBlockHeight)
 	defer iterator.Close()
 
 	handledRandReqNum := 0
@@ -29,17 +30,17 @@ func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, k Keeper) {
 		reqID := GenerateRequestID(request)
 
 		// generate a random number
-		rand := MakePRNG(lastBlockHash, currentTimestamp, request.Consumer).GetRand()
-		k.SetRand(ctx, reqID, NewRand(request.TxHash, lastBlockHeight, rand))
+		rand := MakePRNG(preBlockHash, currentTimestamp, request.Consumer).GetRand()
+		k.SetRand(ctx, reqID, NewRand(request.TxHash, preBlockHeight, rand))
 
 		// remove the request
-		k.DequeueRandRequest(ctx, lastBlockHeight, reqID)
+		k.DequeueRandRequest(ctx, preBlockHeight, reqID)
 
 		ctx.EventManager().EmitEvent(
 			sdk.NewEvent(
 				types.EventTypeGenerateRand,
-				sdk.NewAttribute(types.AttributeKeyRequestID, reqID),
-				sdk.NewAttribute(types.AttributeKeyRand, rand.Rat.FloatString(RandPrec)),
+				sdk.NewAttribute(types.AttributeKeyRequestID, hex.EncodeToString(reqID)),
+				sdk.NewAttribute(types.AttributeKeyRand, rand.FloatString(RandPrec)),
 			),
 		)
 

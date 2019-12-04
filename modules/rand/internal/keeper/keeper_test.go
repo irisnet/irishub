@@ -58,7 +58,7 @@ func TestRequestRandKeeper(t *testing.T) {
 	require.Nil(t, err)
 
 	// get request id
-	reqID := types.GenerateRequestID(types.NewRequest(txHeight, consumer, sdk.SHA256(txBytes)))
+	reqID := types.GenerateRequestID(types.NewRequest(txHeight, consumer, types.SHA256(txBytes)))
 
 	// get the pending request and assert the result is not nil
 	store := ctx.KVStore(randKey)
@@ -70,7 +70,7 @@ func TestRequestRandKeeper(t *testing.T) {
 	cdc.MustUnmarshalBinaryLengthPrefixed(bz, &request)
 	require.Equal(t, txHeight, request.Height)
 	require.Equal(t, consumer, request.Consumer)
-	require.Equal(t, sdk.SHA256(txBytes), request.TxHash)
+	require.Equal(t, types.SHA256(txBytes), request.TxHash)
 
 	// get the rand and assert the result is nil
 	bz = store.Get(types.KeyRand(reqID))

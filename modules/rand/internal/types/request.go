@@ -56,7 +56,7 @@ func GenerateRequestID(r Request) []byte {
 	reqID = append(reqID, sdk.Uint64ToBigEndian(uint64(r.Height))...)
 	reqID = append(reqID, []byte(r.Consumer)...)
 
-	return sdk.SHA256(reqID)
+	return SHA256(reqID)
 }
 
 // CheckReqID checks if the given request id is valid

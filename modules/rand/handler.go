@@ -1,6 +1,7 @@
 package rand
 
 import (
+	"encoding/hex"
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -10,14 +11,16 @@ import (
 // NewHandler handles all "rand" messages
 func NewHandler(k Keeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
+		ctx = ctx.WithEventManager(sdk.NewEventManager())
+
 		switch msg := msg.(type) {
 		case MsgRequestRand:
 			return handleMsgRequestRand(ctx, k, msg)
-		default:
-			return sdk.ErrTxDecode("invalid message parsed in rand module").Result()
-		}
 
-		return sdk.ErrTxDecode("invalid message parsed in rand module").Result()
+		default:
+			errMsg := fmt.Sprintf("unrecognized rand message type: %T", msg)
+			return sdk.ErrUnknownRequest(errMsg).Result()
+		}
 	}
 }
 
@@ -39,7 +42,7 @@ func handleMsgRequestRand(ctx sdk.Context, k Keeper, msg MsgRequestRand) sdk.Res
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
 			types.EventTypeRequestRand,
-			sdk.NewAttribute(types.AttributeKeyRequestID, GenerateRequestID(request)),
+			sdk.NewAttribute(types.AttributeKeyRequestID, hex.EncodeToString(GenerateRequestID(request))),
 			sdk.NewAttribute(types.AttributeKeyGenHeight, fmt.Sprintf("%d", request.Height+int64(msg.BlockInterval))),
 		),
 	)

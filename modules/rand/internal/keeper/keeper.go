@@ -43,7 +43,7 @@ func (k Keeper) RequestRand(ctx sdk.Context, consumer sdk.AccAddress, blockInter
 	destHeight := currentHeight + int64(blockInterval)
 
 	// get tx hash
-	txHash := sdk.SHA256(ctx.TxBytes())
+	txHash := types.SHA256(ctx.TxBytes())
 
 	// build request
 	request := types.NewRequest(currentHeight, consumer, txHash)
@@ -87,7 +87,7 @@ func (k Keeper) GetRand(ctx sdk.Context, reqID []byte) (types.Rand, sdk.Error) {
 
 	bz := store.Get(types.KeyRand(reqID))
 	if bz == nil {
-		return types.Rand{}, types.ErrInvalidReqID(k.codespace, fmt.Sprintf("invalid request id: %s", hex.EncodeToString(reqID)))
+		return types.Rand{}, types.ErrInvalidReqID(k.codespace, fmt.Sprintf("request id does not exist: %s", hex.EncodeToString(reqID)))
 	}
 
 	var rand types.Rand

@@ -1,6 +1,7 @@
 package types
 
 import (
+	"crypto/sha256"
 	"math/big"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -10,7 +11,7 @@ const RandPrec = 20 // the precision for generated random numbers
 
 // RNG is a random number generator
 type RNG interface {
-	GetRand() sdk.Rat // interface which returns a random number between (0,1)
+	GetRand() big.Rat // interface which returns a random number between [0,1)
 }
 
 // PRNG represents a pseudo-random number implementation based on block for RNG
@@ -30,19 +31,25 @@ func MakePRNG(blockHash []byte, blockTimestampt int64, txInitiator sdk.AccAddres
 }
 
 // GetRand implements RNG
-func (p PRNG) GetRand() sdk.Rat {
+func (p PRNG) GetRand() *big.Rat {
 	seedBT := big.NewInt(p.BlockTimestamp)
-	seedBH := new(big.Int).Div(new(big.Int).SetBytes(sdk.SHA256(p.BlockHash)), seedBT)
-	seedTI := new(big.Int).Div(new(big.Int).SetBytes(sdk.SHA256(p.TxInitiator)), seedBT)
+	seedBH := new(big.Int).Div(new(big.Int).SetBytes(SHA256(p.BlockHash)), seedBT)
+	seedTI := new(big.Int).Div(new(big.Int).SetBytes(SHA256(p.TxInitiator)), seedBT)
 
 	seedSum := new(big.Int).Add(seedBT, seedBH)
 	seedSum = new(big.Int).Add(seedSum, seedTI)
-	seed := new(big.Int).SetBytes(sdk.SHA256(seedSum.Bytes()))
+	seed := new(big.Int).SetBytes(SHA256(seedSum.Bytes()))
 
 	precision := new(big.Int).Exp(big.NewInt(10), big.NewInt(RandPrec), nil)
 
 	// Generate a random number between [0,1) with `RandPrec` precision from seed
-	rand := sdk.NewRatFromBigInt(new(big.Int).Mod(seed, precision), precision)
+	rand := new(big.Rat).SetFrac(seed, precision)
 
 	return rand
+}
+
+// SHA256 wraps sha256.Sum256 with result converted to slice
+func SHA256(data []byte) []byte {
+	sum := sha256.Sum256(data)
+	return sum[:]
 }
