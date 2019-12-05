@@ -10,7 +10,7 @@ import (
 )
 
 // BeginBlocker handles block beginning logic
-func BeginBlocker(ctx sdk.Context, k Keeper) (event sdk.Event) {
+func BeginBlocker(ctx sdk.Context, k Keeper) {
 	ctx = ctx.WithLogger(ctx.Logger().With("handler", "beginBlock").With("module", "iris/htlc"))
 
 	currentBlockHeight := uint64(ctx.BlockHeight())
@@ -31,10 +31,11 @@ func BeginBlocker(ctx sdk.Context, k Keeper) (event sdk.Event) {
 		// delete from the expiration queue
 		k.DeleteHTLCFromExpireQueue(ctx, currentBlockHeight, hashLock)
 
-		// add tags
-		event = sdk.NewEvent(
-			types.EventTypeExpiredHTLC,
-			sdk.NewAttribute(types.AttributeValueHashLock, hex.EncodeToString(hashLock)),
+		ctx.EventManager().EmitEvent(
+			sdk.NewEvent(
+				types.EventTypeExpiredHTLC,
+				sdk.NewAttribute(types.AttributeValueHashLock, hex.EncodeToString(hashLock)),
+			),
 		)
 
 		ctx.Logger().Info(fmt.Sprintf("HTLC [%s] is expired", hex.EncodeToString(hashLock)))
