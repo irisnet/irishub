@@ -44,6 +44,9 @@ var (
 	QueryRand             = types.QueryRand
 	QueryRandRequestQueue = types.QueryRandRequestQueue
 
+	DefaultGenesisState = types.DefaultGenesisState
+	ValidateGenesis     = types.ValidateGenesis
+
 	NewKeeper  = keeper.NewKeeper
 	NewQuerier = keeper.NewQuerier
 )

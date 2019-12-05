@@ -37,17 +37,3 @@ func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 		PendingRandRequests: pendingRequests,
 	}
 }
-
-// DefaultGenesisState gets the default genesis state
-func DefaultGenesisState() GenesisState {
-	return GenesisState{
-		PendingRandRequests: map[string][]Request{},
-	}
-}
-
-// DefaultGenesisStateForTest gets the default genesis state for test
-func DefaultGenesisStateForTest() GenesisState {
-	return GenesisState{
-		PendingRandRequests: map[string][]Request{},
-	}
-}
