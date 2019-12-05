@@ -37,7 +37,7 @@ func GetCmdQueryHTLC(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "query-htlc",
 		Short:   "Query details of an HTLC",
-		Example: "iriscli q htlc query-htlc <hash-lock>",
+		Example: "iriscli query htlc query-htlc <hash-lock>",
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
