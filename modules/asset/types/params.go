@@ -41,7 +41,7 @@ func DefaultParams() Params {
 		AssetTaxRate:      sdk.NewDecWithPrec(4, 1), // 0.4 (40%)
 		IssueTokenBaseFee: sdk.NewIntWithDecimal(60000, 18),
 		MintTokenFeeRatio: sdk.NewDecWithPrec(1, 1), // 0.1 (10%)
-		AssetFeeDenom:     "iris-atto",
+		AssetFeeDenom:     sdk.DefaultBondDenom,
 	}
 }
 

@@ -1,7 +1,6 @@
 package simapp
 
 import (
-	"github.com/irisnet/irishub/modules/asset"
 	"io"
 	"os"
 
@@ -30,6 +29,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	"github.com/cosmos/cosmos-sdk/x/supply"
+	"github.com/irisnet/irishub/modules/asset"
 )
 
 const appName = "SimApp"
@@ -215,7 +215,7 @@ func NewSimApp(
 
 	app.AssetKeeper = asset.NewKeeper(
 		app.cdc, keys[asset.StoreKey], app.subspaces[asset.ModuleName], asset.DefaultCodespace,
-		app.SupplyKeeper, app.DistrKeeper)
+		app.SupplyKeeper, auth.FeeCollectorName)
 
 	// NOTE: Any module instantiated in the module manager that is later modified
 	// must be passed by reference here.

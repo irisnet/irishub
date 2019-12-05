@@ -43,7 +43,7 @@ func TestKeeperTestSuite(t *testing.T) {
 func (suite *KeeperTestSuite) TestKeeper_IssueToken() {
 	addr := sdk.AccAddress([]byte("addr"))
 
-	ft := types.NewFungibleToken(types.NATIVE, "", "btc", "btc", 1, "", "satoshi", sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), true, addr)
+	ft := types.NewFungibleToken(types.NATIVE, "btc", "btc", 1, "", "satoshi", sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), true, addr)
 	err := suite.keeper.IssueToken(suite.ctx, ft)
 	suite.NoError(err)
 
@@ -55,13 +55,15 @@ func (suite *KeeperTestSuite) TestKeeper_IssueToken() {
 	suite.Equal(ft.GetDenom(), token.GetDenom())
 	suite.Equal(ft.Owner, ft.Owner)
 
-	suite.Equal(ft.String(), token.String())
+	ftJson, _ := json.Marshal(ft)
+	tokenJson, _ := json.Marshal(token)
+	suite.Equal(ftJson, tokenJson)
 }
 
 func (suite *KeeperTestSuite) TestKeeper_EditToken() {
 	addr := sdk.AccAddress([]byte("addr"))
 
-	ft := types.NewFungibleToken(types.NATIVE, "", "btc", "btc", 1, "", "satoshi", sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(21000000, 0), true, addr)
+	ft := types.NewFungibleToken(types.NATIVE, "btc", "btc", 1, "", "satoshi", sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(21000000, 0), true, addr)
 
 	err := suite.keeper.IssueToken(suite.ctx, ft)
 	suite.NoError(err)
@@ -74,7 +76,9 @@ func (suite *KeeperTestSuite) TestKeeper_EditToken() {
 	suite.Equal(ft.GetDenom(), token.GetDenom())
 	suite.Equal(ft.Owner, token.Owner)
 
-	suite.Equal(ft.String(), token.String())
+	ftJson, _ := json.Marshal(ft)
+	tokenJson, _ := json.Marshal(token)
+	suite.Equal(ftJson, tokenJson)
 
 	mintable := types.False
 	msgEditToken := types.NewMsgEditToken("BTC Token", "btc", "btc", "btc", 0, mintable, addr)
@@ -89,7 +93,7 @@ func (suite *KeeperTestSuite) TestMintTokenKeeper(t *testing.T) {
 	coin := sdk.Coins{sdk.NewCoin("iris-atto", amtCoin)}
 	suite.bk.AddCoins(suite.ctx, addr, coin)
 
-	ft := types.NewFungibleToken(types.NATIVE, "", "btc", "btc", 0, "", "satoshi", sdk.NewIntWithDecimal(1000, 0), sdk.NewIntWithDecimal(10000, 0), true, addr)
+	ft := types.NewFungibleToken(types.NATIVE, "btc", "btc", 0, "", "satoshi", sdk.NewIntWithDecimal(1000, 0), sdk.NewIntWithDecimal(10000, 0), true, addr)
 	err := suite.keeper.IssueToken(suite.ctx, ft)
 	suite.NoError(err)
 
@@ -117,7 +121,7 @@ func (suite *KeeperTestSuite) TestMintTokenKeeper(t *testing.T) {
 func (suite *KeeperTestSuite) TestTransferOwnerKeeper(t *testing.T) {
 	srcOwner := sdk.AccAddress([]byte("TokenSrcOwner"))
 
-	ft := types.NewFungibleToken(types.NATIVE, "", "btc", "btc", 1, "", "satoshi", sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(21000000, 0), true, srcOwner)
+	ft := types.NewFungibleToken(types.NATIVE, "btc", "btc", 1, "", "satoshi", sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(21000000, 0), true, srcOwner)
 
 	err := suite.keeper.IssueToken(suite.ctx, ft)
 	assert.NoError(t, err)

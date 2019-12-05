@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"fmt"
+
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/params"
@@ -17,20 +18,20 @@ type Keeper struct {
 	paramSpace params.Subspace
 	// The supplyKeeper to reduce the supply of the network
 	supplyKeeper types.SupplyKeeper
-	// The distributionKeeper to collect asset fee
-	distributionKeeper types.DistributionKeeper
+
+	feeCollectorName string
 }
 
 func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, paramSpace params.Subspace,
-	codespace sdk.CodespaceType, supplyKeeper types.SupplyKeeper, distributionKeeper types.DistributionKeeper,
+	codespace sdk.CodespaceType, supplyKeeper types.SupplyKeeper, feeCollectorName string,
 ) Keeper {
 	return Keeper{
-		storeKey:           key,
-		cdc:                cdc,
-		codespace:          codespace,
-		paramSpace:         paramSpace.WithKeyTable(ParamKeyTable()),
-		supplyKeeper:       supplyKeeper,
-		distributionKeeper: distributionKeeper,
+		storeKey:         key,
+		cdc:              cdc,
+		codespace:        codespace,
+		paramSpace:       paramSpace.WithKeyTable(ParamKeyTable()),
+		supplyKeeper:     supplyKeeper,
+		feeCollectorName: feeCollectorName,
 	}
 }
 
@@ -275,6 +276,7 @@ func (k Keeper) resetStoreKeyForQueryToken(ctx sdk.Context, msg types.MsgTransfe
 	return k.SetTokens(ctx, msg.DstOwner, token)
 }
 
+// MintToken handles MsgMintToken
 func (k Keeper) MintToken(ctx sdk.Context, msg types.MsgMintToken) sdk.Error {
 	token, exist := k.GetToken(ctx, msg.TokenId)
 	if !exist {
@@ -334,4 +336,10 @@ func (k Keeper) MintToken(ctx sdk.Context, msg types.MsgMintToken) sdk.Error {
 // AssetTokenSupply asset tokens from the total supply
 func (k Keeper) AssetTokenSupply(ctx sdk.Context, denom string) sdk.Int {
 	return k.supplyKeeper.GetSupply(ctx).GetTotal().AmountOf(denom)
+}
+
+// AddCollectedFees implements an alias call to the underlying supply keeper's
+// AddCollectedFees to be used in BeginBlocker.
+func (k Keeper) AddCollectedFees(ctx sdk.Context, fees sdk.Coins) sdk.Error {
+	return k.supplyKeeper.SendCoinsFromModuleToModule(ctx, types.ModuleName, k.feeCollectorName, fees)
 }

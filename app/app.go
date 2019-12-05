@@ -195,7 +195,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 
 	app.assetKeeper = asset.NewKeeper(
 		app.cdc, keys[asset.StoreKey], assetSubspace, asset.DefaultCodespace,
-		app.supplyKeeper, app.distrKeeper)
+		app.supplyKeeper, auth.FeeCollectorName)
 
 	// NOTE: Any module instantiated in the module manager that is later modified
 	// must be passed by reference here.

@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/irisnet/irishub/modules/asset/types"
 )
 
 // fee factor formula: (ln(len({name}))/ln{base})^{exp}
@@ -32,28 +33,26 @@ func TokenMintFeeHandler(ctx sdk.Context, k Keeper, owner sdk.AccAddress, symbol
 
 // feeHandler handles the fee of asset
 func feeHandler(ctx sdk.Context, k Keeper, feeAcc sdk.AccAddress, fee sdk.Coin) sdk.Error {
-	//assetTaxRate := k.AssetTaxRate(ctx)
-	//
+	assetTaxRate := k.AssetTaxRate(ctx)
+
 	// compute community tax and burned coin
-	//communityTaxCoin := sdk.NewCoin(fee.Denom, sdk.NewDecFromInt(fee.Amount).Mul(assetTaxRate).TruncateInt())
-	//burnedCoin := fee.Sub(communityTaxCoin)
+	communityTaxCoin := sdk.NewCoin(fee.Denom, sdk.NewDecFromInt(fee.Amount).Mul(assetTaxRate).TruncateInt())
+	burnedCoins := sdk.NewCoins(fee.Sub(communityTaxCoin))
 
-	// send community tax
-	feePool := k.distributionKeeper.GetFeePool(ctx)
-	feePool.CommunityPool = feePool.CommunityPool.Add(sdk.NewDecCoins(sdk.NewCoins(fee)))
-	k.distributionKeeper.SetFeePool(ctx, feePool)
-	//if _, err := k.distributionKeeper.SendCoins(ctx, feeAcc, auth.CommunityTaxCoinsAccAddr, sdk.Coins{communityTaxCoin}); err != nil {
-	//	return err
-	//}
-	//ctx.CoinFlowTags().AppendCoinFlowTag(ctx, feeAcc.String(), auth.CommunityTaxCoinsAccAddr.String(), communityTaxCoin.String(), sdk.CommunityTaxCollectFlow, "")
-	//
-	//// burn burnedCoin
-	//k.supplyKeeper.b
-	//if _, err := k.bk.BurnCoins(ctx, feeAcc, sdk.Coins{burnedCoin}); err != nil {
-	//	return err
-	//}
-	//ctx.CoinFlowTags().AppendCoinFlowTag(ctx, feeAcc.String(), auth.BurnedCoinsAccAddr.String(), burnedCoin.String(), sdk.BurnFlow, "")
+	// send all fees to module account
+	if err := k.supplyKeeper.SendCoinsFromAccountToModule(ctx, feeAcc, types.ModuleName, sdk.NewCoins(fee)); err != nil {
+		return err
+	}
 
+	// send community tax to collectedFees
+	if err := k.AddCollectedFees(ctx, sdk.NewCoins(communityTaxCoin)); err != nil {
+		return err
+	}
+
+	// burn burnedCoin
+	if err := k.supplyKeeper.BurnCoins(ctx, types.ModuleName, burnedCoins); err != nil {
+		return err
+	}
 	return nil
 }
 
