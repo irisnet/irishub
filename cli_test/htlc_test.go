@@ -1,18 +1,27 @@
 package clitest
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/tendermint/tendermint/crypto"
+
+	"github.com/cosmos/cosmos-sdk/crypto/keys"
 	"github.com/cosmos/cosmos-sdk/tests"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/supply"
 
+	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/config"
+	htlcmodule "github.com/irisnet/irishub/modules/htlc"
 )
 
+// TODO: fix
 func TestIrisCLIHTLC(t *testing.T) {
 	t.Parallel()
 	fixtures := InitFixtures(t)
@@ -153,4 +162,41 @@ func TestIrisCLIHTLC(t *testing.T) {
 
 	htlcAcc = executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", htlcAddr, flags))
 	require.Equal(t, "0", htlcAcc.GetCoins().AmountOf(config.Iris).String())
+}
+
+func executeGetAddrPK(t *testing.T, cmdStr string) (sdk.AccAddress, crypto.PubKey) {
+	cdc := app.MakeCodec()
+	out, _ := tests.ExecuteT(t, cmdStr, "")
+	var ko keys.KeyOutput
+	_ = cdc.UnmarshalJSON([]byte(out), &ko)
+
+	pk, err := sdk.GetAccPubKeyBech32(ko.PubKey)
+	require.NoError(t, err)
+
+	accAddr, err := sdk.AccAddressFromBech32(ko.Address)
+	require.NoError(t, err)
+
+	return accAddr, pk
+}
+
+func executeGetAccount(t *testing.T, cmdStr string) (acc auth.BaseAccount) {
+	cdc := app.MakeCodec()
+	out, _ := tests.ExecuteT(t, cmdStr, "")
+	var initRes map[string]json.RawMessage
+	err := json.Unmarshal([]byte(out), &initRes)
+	require.NoError(t, err, "out %v, err %v", out, err)
+
+	err = cdc.UnmarshalJSON([]byte(out), &acc)
+	require.NoError(t, err, "acc %v, err %v", string(out), err)
+
+	return acc
+}
+
+func executeGetHTLC(t *testing.T, cmdStr string) htlcmodule.HTLC {
+	cdc := app.MakeCodec()
+	out, _ := tests.ExecuteT(t, cmdStr, "")
+	var htlc htlcmodule.HTLC
+	err := cdc.UnmarshalJSON([]byte(out), &htlc)
+	require.NoError(t, err, "out %v\n, err %v", out, err)
+	return htlc
 }
