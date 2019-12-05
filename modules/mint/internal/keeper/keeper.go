@@ -19,6 +19,11 @@ type Keeper struct {
 func NewKeeper(cdc *codec.Codec, key sdk.StoreKey,
 	paramSpace params.Subspace, supplyKeeper types.SupplyKeeper, feeCollectorName string) Keeper {
 
+	// ensure mint module account is set
+	if addr := supplyKeeper.GetModuleAddress(types.ModuleName); addr == nil {
+		panic("the mint module account has not been set")
+	}
+
 	keeper := Keeper{
 		storeKey:         key,
 		cdc:              cdc,
