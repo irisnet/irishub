@@ -21,7 +21,7 @@ func DefaultGenesisState() GenesisState {
 
 // ValidateGenesis validates the provided service genesis state
 func ValidateGenesis(data GenesisState) error {
-	err := validateParams(data.Params)
+	err := data.Params.Validate()
 	if err != nil {
 		return err
 	}

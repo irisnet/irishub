@@ -13,14 +13,14 @@ const (
 	// StoreKey is the string store representation
 	StoreKey = ModuleName
 
-	// TStoreKey is the string transient store representation
-	TStoreKey = "transient_" + ModuleName
-
 	// QuerierRoute is the querier route for the service module
 	QuerierRoute = ModuleName
 
 	// RouterKey is the msg router key for the service module
 	RouterKey = ModuleName
+
+	// DefaultParamspace is the default name for parameter store
+	DefaultParamspace = ModuleName
 )
 
 var (

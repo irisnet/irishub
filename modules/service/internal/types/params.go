@@ -1,8 +1,8 @@
 package types
 
 import (
+	"bytes"
 	"fmt"
-	"strconv"
 	"time"
 
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -10,16 +10,19 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/params"
 )
 
-var _ params.ParamSet = (*Params)(nil)
-
-// default paramSpace for service keeper
-const (
-	DefaultParamSpace = "service"
+// Service params default values
+var (
+	DefaultMaxRequestTimeout    = int64(100)
+	DefaultMinDepositMultiple   = int64(1000)
+	DefaultServiceFeeTax        = sdk.NewDecWithPrec(1, 2)    //1%
+	DefaultSlashFraction        = sdk.NewDecWithPrec(1, 3)    //0.1%
+	DefaultComplaintRetrospect  = time.Duration(15 * sdk.Day) //15 days
+	DefaultArbitrationTimeLimit = time.Duration(5 * sdk.Day)  //5 days
+	DefaultTxSizeLimit          = uint64(4000)
 )
 
-//Parameter store key
+// nolint - Keys for parameter access
 var (
-	// params store for service params
 	KeyMaxRequestTimeout    = []byte("MaxRequestTimeout")
 	KeyMinDepositMultiple   = []byte("MinDepositMultiple")
 	KeyServiceFeeTax        = []byte("ServiceFeeTax")
@@ -29,12 +32,9 @@ var (
 	KeyTxSizeLimit          = []byte("TxSizeLimit")
 )
 
-// ParamTable for service module
-func ParamTypeTable() params.TypeTable {
-	return params.NewTypeTable().RegisterParamSet(&Params{})
-}
+var _ params.ParamSet = (*Params)(nil)
 
-// service params
+// Params defines the high level settings for service
 type Params struct {
 	MaxRequestTimeout    int64         `json:"max_request_timeout"`
 	MinDepositMultiple   int64         `json:"min_deposit_multiple"`
@@ -45,162 +45,92 @@ type Params struct {
 	TxSizeLimit          uint64        `json:"tx_size_limit"`
 }
 
+// NewParams creates a new Params instance
+func NewParams(maxRequestTimeout, minDepositMultiple int64, serviceFeeTax, slashFraction sdk.Dec,
+	complaintRetrospect, arbitrationTimeLimit time.Duration, txSizeLimit uint64) Params {
+
+	return Params{
+		MaxRequestTimeout:    maxRequestTimeout,
+		MinDepositMultiple:   minDepositMultiple,
+		ServiceFeeTax:        serviceFeeTax,
+		SlashFraction:        slashFraction,
+		ComplaintRetrospect:  complaintRetrospect,
+		ArbitrationTimeLimit: arbitrationTimeLimit,
+		TxSizeLimit:          txSizeLimit,
+	}
+}
+
+// Implements params.ParamSet
+func (p *Params) ParamSetPairs() params.ParamSetPairs {
+	return params.ParamSetPairs{
+		{Key: KeyMaxRequestTimeout, Value: &p.MaxRequestTimeout},
+		{Key: KeyMinDepositMultiple, Value: &p.MinDepositMultiple},
+		{Key: KeyServiceFeeTax, Value: &p.ServiceFeeTax},
+		{Key: KeySlashFraction, Value: &p.SlashFraction},
+		{Key: KeyComplaintRetrospect, Value: &p.ComplaintRetrospect},
+		{Key: KeyArbitrationTimeLimit, Value: &p.ArbitrationTimeLimit},
+		{Key: KeyTxSizeLimit, Value: &p.TxSizeLimit},
+	}
+}
+
+// Equal returns a boolean determining if two Param types are identical.
+// TODO: This is slower than comparing struct fields directly
+func (p Params) Equal(p2 Params) bool {
+	bz1 := ModuleCdc.MustMarshalBinaryLengthPrefixed(&p)
+	bz2 := ModuleCdc.MustMarshalBinaryLengthPrefixed(&p2)
+	return bytes.Equal(bz1, bz2)
+}
+
+// DefaultParams returns a default set of parameters.
+func DefaultParams() Params {
+	return NewParams(
+		DefaultMaxRequestTimeout,
+		DefaultMinDepositMultiple,
+		DefaultServiceFeeTax,
+		DefaultSlashFraction,
+		DefaultComplaintRetrospect,
+		DefaultArbitrationTimeLimit,
+		DefaultTxSizeLimit,
+	)
+}
+
+// String implements stringer
 func (p Params) String() string {
-	return fmt.Sprintf(`Service Params:
-  service/MaxRequestTimeout:     %d
-  service/MinDepositMultiple:    %d
-  service/ServiceFeeTax:         %s
-  service/SlashFraction:         %s
-  service/ComplaintRetrospect:   %s
-  service/ArbitrationTimeLimit:  %s
-  service/TxSizeLimit:           %d`,
+	return fmt.Sprintf(`Params:
+  Max Request Timeout:     %d
+  Min Deposit Multiple:    %d
+  Service Fee Tax:         %s
+  Slash Fraction:          %s
+  Complaint Retrospect:    %s
+  Arbitration Time Limit:  %s
+  Tx Size Limit:           %d`,
 		p.MaxRequestTimeout, p.MinDepositMultiple, p.ServiceFeeTax.String(), p.SlashFraction.String(),
 		p.ComplaintRetrospect, p.ArbitrationTimeLimit, p.TxSizeLimit)
 }
 
-// Implements params.ParamStruct
-func (p *Params) GetParamSpace() string {
-	return DefaultParamSpace
-}
-
-func (p *Params) KeyValuePairs() params.KeyValuePairs {
-	return params.KeyValuePairs{
-		{KeyMaxRequestTimeout, &p.MaxRequestTimeout},
-		{KeyMinDepositMultiple, &p.MinDepositMultiple},
-		{KeyServiceFeeTax, &p.ServiceFeeTax},
-		{KeySlashFraction, &p.SlashFraction},
-		{KeyComplaintRetrospect, &p.ComplaintRetrospect},
-		{KeyArbitrationTimeLimit, &p.ArbitrationTimeLimit},
-		{KeyTxSizeLimit, &p.TxSizeLimit},
+// MustUnmarshalParams unmarshals the current service params value from store key or panic
+func MustUnmarshalParams(cdc *codec.Codec, value []byte) Params {
+	params, err := UnmarshalParams(cdc, value)
+	if err != nil {
+		panic(err)
 	}
+
+	return params
 }
 
-func (p *Params) Validate(key string, value string) (interface{}, sdk.Error) {
-	switch key {
-	case string(KeyMaxRequestTimeout):
-		maxRequestTimeout, err := strconv.ParseInt(value, 10, 64)
-		if err != nil {
-			return nil, params.ErrInvalidString(value)
-		}
-		if err := validateMaxRequestTimeout(maxRequestTimeout); err != nil {
-			return nil, err
-		}
-		return maxRequestTimeout, nil
-	case string(KeyMinDepositMultiple):
-		minDepositMultiple, err := strconv.ParseInt(value, 10, 64)
-		if err != nil {
-			return nil, params.ErrInvalidString(value)
-		}
-		if err := validateMinDepositMultiple(minDepositMultiple); err != nil {
-			return nil, err
-		}
-		return minDepositMultiple, nil
-	case string(KeyServiceFeeTax):
-		serviceFeeTax, err := sdk.NewDecFromStr(value)
-		if err != nil {
-			return nil, params.ErrInvalidString(value)
-		}
-		if err := validateServiceFeeTax(serviceFeeTax); err != nil {
-			return nil, err
-		}
-		return serviceFeeTax, nil
-	case string(KeySlashFraction):
-		slashFraction, err := sdk.NewDecFromStr(value)
-		if err != nil {
-			return nil, params.ErrInvalidString(value)
-		}
-		if err := validateSlashFraction(slashFraction); err != nil {
-			return nil, err
-		}
-		return slashFraction, nil
-	case string(KeyComplaintRetrospect):
-		complaintRetrospect, err := time.ParseDuration(value)
-		if err != nil {
-			return nil, params.ErrInvalidString(value)
-		}
-		if err := validateComplaintRetrospect(complaintRetrospect); err != nil {
-			return nil, err
-		}
-		return complaintRetrospect, nil
-	case string(KeyArbitrationTimeLimit):
-		arbitrationTimeLimit, err := time.ParseDuration(value)
-		if err != nil {
-			return nil, params.ErrInvalidString(value)
-		}
-		if err := validateArbitrationTimeLimit(arbitrationTimeLimit); err != nil {
-			return nil, err
-		}
-		return arbitrationTimeLimit, nil
-	case string(KeyTxSizeLimit):
-		txSizeLimit, err := strconv.ParseUint(value, 10, 64)
-		if err != nil {
-			return nil, params.ErrInvalidString(value)
-		}
-		if err := validateTxSizeLimit(txSizeLimit); err != nil {
-			return nil, err
-		}
-		return txSizeLimit, nil
-	default:
-		return nil, sdk.NewError(params.DefaultCodespace, params.CodeInvalidKey, fmt.Sprintf("%s is not found", key))
+// UnmarshalParams unmarshals the current service params value from store key
+func UnmarshalParams(cdc *codec.Codec, value []byte) (params Params, err error) {
+	err = cdc.UnmarshalBinaryLengthPrefixed(value, &params)
+	if err != nil {
+		return
 	}
+
+	return
 }
 
-func (p *Params) StringFromBytes(cdc *codec.Codec, key string, bytes []byte) (string, error) {
-	switch key {
-	case string(KeyMaxRequestTimeout):
-		err := cdc.UnmarshalJSON(bytes, &p.MaxRequestTimeout)
-		return strconv.FormatInt(p.MaxRequestTimeout, 10), err
-	case string(KeyMinDepositMultiple):
-		err := cdc.UnmarshalJSON(bytes, &p.MinDepositMultiple)
-		return strconv.FormatInt(p.MinDepositMultiple, 10), err
-	case string(KeyServiceFeeTax):
-		err := cdc.UnmarshalJSON(bytes, &p.ServiceFeeTax)
-		return p.ServiceFeeTax.String(), err
-	case string(KeySlashFraction):
-		err := cdc.UnmarshalJSON(bytes, &p.SlashFraction)
-		return p.SlashFraction.String(), err
-	case string(KeyComplaintRetrospect):
-		err := cdc.UnmarshalJSON(bytes, &p.ComplaintRetrospect)
-		return p.ComplaintRetrospect.String(), err
-	case string(KeyArbitrationTimeLimit):
-		err := cdc.UnmarshalJSON(bytes, &p.ArbitrationTimeLimit)
-		return p.ArbitrationTimeLimit.String(), err
-	case string(KeyTxSizeLimit):
-		err := cdc.UnmarshalJSON(bytes, &p.TxSizeLimit)
-		return strconv.FormatUint(p.TxSizeLimit, 10), err
-	default:
-		return "", fmt.Errorf("%s is not existed", key)
-	}
-}
-
-func (p *Params) ReadOnly() bool {
-	return false
-}
-
-// default service module params
-func DefaultParams() Params {
-	return Params{
-		MaxRequestTimeout:    100,
-		MinDepositMultiple:   1000,
-		ServiceFeeTax:        sdk.NewDecWithPrec(1, 2),    //1%
-		SlashFraction:        sdk.NewDecWithPrec(1, 3),    //0.1%
-		ComplaintRetrospect:  time.Duration(15 * sdk.Day), //15 days
-		ArbitrationTimeLimit: time.Duration(5 * sdk.Day),  //5 days
-		TxSizeLimit:          4000,
-	}
-}
-
-// default service module params for test
-func DefaultParamsForTest() Params {
-	return Params{
-		MaxRequestTimeout:    5,
-		MinDepositMultiple:   10,
-		ServiceFeeTax:        sdk.NewDecWithPrec(1, 2), //1%
-		SlashFraction:        sdk.NewDecWithPrec(1, 3), //0.1%
-		ComplaintRetrospect:  20 * time.Second,         //20 seconds
-		ArbitrationTimeLimit: 20 * time.Second,         //20 seconds
-		TxSizeLimit:          4000,
-	}
+// Validate validates a set of params
+func (p Params) Validate() error {
+	return validateParams(p)
 }
 
 func validateParams(p Params) error {
@@ -227,22 +157,6 @@ func validateParams(p Params) error {
 	}
 	return nil
 }
-
-//______________________________________________________________________
-
-// get service params from the global param store
-func (k Keeper) GetParamSet(ctx sdk.Context) Params {
-	var params Params
-	k.paramSpace.GetParamSet(ctx, &params)
-	return params
-}
-
-// set service params from the global param store
-func (k Keeper) SetParamSet(ctx sdk.Context, params Params) {
-	k.paramSpace.SetParamSet(ctx, &params)
-}
-
-//______________________________________________________________________
 
 func validateMaxRequestTimeout(v int64) sdk.Error {
 	if sdk.NetworkType == sdk.Mainnet {
