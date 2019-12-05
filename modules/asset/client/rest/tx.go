@@ -8,7 +8,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/rest"
 	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
 	"github.com/gorilla/mux"
-	"github.com/irisnet/irishub/modules/asset/types"
+	"github.com/irisnet/irishub/modules/asset/internal/types"
 )
 
 func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router) {

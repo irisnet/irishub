@@ -3,7 +3,7 @@ package keeper
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/params"
-	"github.com/irisnet/irishub/modules/asset/types"
+	"github.com/irisnet/irishub/modules/asset/internal/types"
 )
 
 // ParamTable for staking module

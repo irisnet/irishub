@@ -5,6 +5,7 @@ require (
 	github.com/cosmos/cosmos-sdk v0.34.4-0.20191108144056-d81d46192a0c
 	github.com/cosmos/go-bip39 v0.0.0-20180819234021-555e2067c45d // indirect
 	github.com/golang/mock v1.3.1 // indirect
+	github.com/gorilla/mux v1.7.3
 	github.com/onsi/ginkgo v1.8.0 // indirect
 	github.com/onsi/gomega v1.5.0 // indirect
 	github.com/otiai10/copy v1.0.2
@@ -16,6 +17,7 @@ require (
 	github.com/snikch/goodman v0.0.0-20171125024755-10e37e294daa
 	github.com/spf13/afero v1.2.2 // indirect
 	github.com/spf13/cobra v0.0.5
+	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.5.0
 	github.com/stretchr/testify v1.4.0
 	github.com/tendermint/go-amino v0.15.1

@@ -5,7 +5,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/rest"
 	"github.com/gorilla/mux"
-	"github.com/irisnet/irishub/modules/asset/types"
+	"github.com/irisnet/irishub/modules/asset/internal/types"
 )
 
 // RegisterRoutes registers asset-related REST handlers to a router

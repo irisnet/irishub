@@ -7,7 +7,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/types/rest"
 	"github.com/gorilla/mux"
-	"github.com/irisnet/irishub/modules/asset/types"
+	"github.com/irisnet/irishub/modules/asset/internal/types"
 )
 
 // queryTokens queries the token from the specified token-id

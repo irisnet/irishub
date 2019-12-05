@@ -1,8 +1,8 @@
 package asset
 
 import (
-	"github.com/irisnet/irishub/modules/asset/keeper"
-	"github.com/irisnet/irishub/modules/asset/types"
+	"github.com/irisnet/irishub/modules/asset/internal/keeper"
+	"github.com/irisnet/irishub/modules/asset/internal/types"
 )
 
 type (
@@ -49,4 +49,5 @@ var (
 	NewFungibleToken      = types.NewFungibleToken
 	DefaultParams         = types.DefaultParams
 	NewParams             = types.NewParams
+	NewGenesisState       = types.NewGenesisState
 )

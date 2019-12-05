@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/cosmos/cosmos-sdk/client/context"
-	"github.com/irisnet/irishub/modules/asset/types"
+	"github.com/irisnet/irishub/modules/asset/internal/types"
 )
 
 // queryTokenFees retrieves the fees of token issuance and minting for the specified id

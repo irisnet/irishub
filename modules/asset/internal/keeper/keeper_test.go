@@ -7,8 +7,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/bank"
-	"github.com/irisnet/irishub/modules/asset/keeper"
-	"github.com/irisnet/irishub/modules/asset/types"
+	"github.com/irisnet/irishub/modules/asset/internal/types"
 	"github.com/irisnet/irishub/simapp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
@@ -20,7 +19,7 @@ type KeeperTestSuite struct {
 
 	cdc    *codec.Codec
 	ctx    sdk.Context
-	keeper keeper.Keeper
+	keeper Keeper
 	bk     bank.Keeper
 	app    *simapp.SimApp
 }

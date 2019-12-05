@@ -139,7 +139,6 @@ func (f Fixtures) GenesisState() simapp.GenesisState {
 // InitFixtures is called at the beginning of a test  and initializes a chain
 // with 1 validator.
 func InitFixtures(t *testing.T) (f *Fixtures) {
-
 	f = NewFixtures(t)
 
 	// reset test state

@@ -51,9 +51,9 @@ func TestMsgIssueAsset(t *testing.T) {
 
 	for _, tc := range tests {
 		if tc.expectPass {
-			require.Nil(t, tc.MsgIssueToken.ValidateBasic(), "test: %v", tc.testCase)
+			require.Nil(t, ValidateBasic(), "test: %v", tc.testCase)
 		} else {
-			require.NotNil(t, tc.MsgIssueToken.ValidateBasic(), "test: %v", tc.testCase)
+			require.NotNil(t, ValidateBasic(), "test: %v", tc.testCase)
 		}
 	}
 }
@@ -77,9 +77,9 @@ func TestMsgEditToken(t *testing.T) {
 
 	for _, tc := range tests {
 		if tc.expectPass {
-			require.Nil(t, tc.MsgEditToken.ValidateBasic(), "test: %v", tc.testCase)
+			require.Nil(t, ValidateBasic(), "test: %v", tc.testCase)
 		} else {
-			require.NotNil(t, tc.MsgEditToken.ValidateBasic(), "test: %v", tc.testCase)
+			require.NotNil(t, ValidateBasic(), "test: %v", tc.testCase)
 		}
 	}
 }
@@ -98,7 +98,7 @@ func TestMsgEditTokenRoute(t *testing.T) {
 		TokenId:         tokenId,
 	}
 
-	require.Equal(t, "asset", msg.Route())
+	require.Equal(t, "asset", Route())
 }
 
 func TestMsgEditTokenGetSignBytes(t *testing.T) {
@@ -113,7 +113,7 @@ func TestMsgEditTokenGetSignBytes(t *testing.T) {
 		Mintable:        mintable,
 	}
 
-	res := msg.GetSignBytes()
+	res := GetSignBytes()
 
 	expected := `{"type":"irishub/asset/MsgEditToken","value":{"canonical_symbol":"btc","max_supply":"21000000","min_unit_alias":"satoshi","mintable":"false","name":"BTC TOKEN","owner":"faa1damkuetjqqah8w","token_id":"x.btc"}}`
 	require.Equal(t, expected, string(res))
@@ -141,9 +141,9 @@ func TestMsgMintTokenValidateBasic(t *testing.T) {
 	for _, td := range testData {
 		msg := NewMsgMintToken(td.tokeId, td.owner, td.to, td.amount)
 		if td.expectPass {
-			require.Nil(t, msg.ValidateBasic(), "test: %v", td.msg)
+			require.Nil(t, ValidateBasic(), "test: %v", td.msg)
 		} else {
-			require.NotNil(t, msg.ValidateBasic(), "test: %v", td.msg)
+			require.NotNil(t, ValidateBasic(), "test: %v", td.msg)
 		}
 	}
 }
@@ -166,9 +166,9 @@ func TestMsgTransferTokenOwnerValidation(t *testing.T) {
 	for _, td := range testData {
 		msg := NewMsgTransferTokenOwner(td.srcOwner, td.dstOwner, td.tokenId)
 		if td.expectPass {
-			require.Nil(t, msg.ValidateBasic(), "test: %v", td.name)
+			require.Nil(t, ValidateBasic(), "test: %v", td.name)
 		} else {
-			require.NotNil(t, msg.ValidateBasic(), "test: %v", td.name)
+			require.NotNil(t, ValidateBasic(), "test: %v", td.name)
 		}
 	}
 }

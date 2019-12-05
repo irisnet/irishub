@@ -2,7 +2,6 @@ package asset
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/irisnet/irishub/modules/asset/types"
 )
 
 // InitGenesis - store genesis parameters and tokens
@@ -38,7 +37,7 @@ func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 
 // DefaultGenesisState return the default asset genesis state
 func DefaultGenesisState() GenesisState {
-	return types.NewGenesisState(DefaultParams(), []FungibleToken{})
+	return NewGenesisState(DefaultParams(), []FungibleToken{})
 }
 
 // ValidateGenesis validates the provided asset genesis state to ensure the
