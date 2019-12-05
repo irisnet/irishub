@@ -18,20 +18,6 @@ func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 	return NewGenesisState(k.GetParamSet(ctx))
 }
 
-// get raw genesis raw message for testing
-func DefaultGenesisState() GenesisState {
-	return GenesisState{
-		Params: DefaultParams(),
-	}
-}
-
-// get raw genesis raw message for testing
-func DefaultGenesisStateForTest() GenesisState {
-	return GenesisState{
-		Params: DefaultParamsForTest(),
-	}
-}
-
 // refund deposit from all bindings
 // refund service fee from all request
 // refund all incoming/return fee
@@ -74,14 +60,4 @@ func PrepForZeroHeightGenesis(ctx sdk.Context, k Keeper) {
 		k.cdc.MustUnmarshalBinaryLengthPrefixed(returnedFeeIterator.Value(), &returnedFee)
 		k.ck.SendCoins(ctx, auth.ServiceRequestCoinsAccAddr, returnedFee.Address, returnedFee.Coins)
 	}
-}
-
-// ValidateGenesis validates the provided service genesis state to ensure the
-// expected invariants holds.
-func ValidateGenesis(data GenesisState) error {
-	err := validateParams(data.Params)
-	if err != nil {
-		return err
-	}
-	return nil
 }

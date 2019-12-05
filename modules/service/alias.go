@@ -68,7 +68,10 @@ var (
 	QueryResponse   = types.QueryResponse
 	QueryFees       = types.QueryFees
 
-	NewGenesisState      = types.NewGenesisState
+	NewGenesisState     = types.NewGenesisState
+	DefaultGenesisState = types.DefaultGenesisState
+	ValidateGenesis     = types.ValidateGenesis
+
 	DefaultParams        = types.DefaultParams
 	DefaultParamsForTest = types.DefaultParamsForTest
 

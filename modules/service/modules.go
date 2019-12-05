@@ -35,7 +35,7 @@ func (AppModuleBasic) Name() string {
 
 // RegisterCodec registers the service module's types for the given codec.
 func (AppModuleBasic) RegisterCodec(cdc *codec.Codec) {
-	ModuleCdc.RegisterCodec(cdc)
+	RegisterCodec(cdc)
 }
 
 // DefaultGenesis returns default genesis state as raw bytes for the service
@@ -46,7 +46,13 @@ func (AppModuleBasic) DefaultGenesis() json.RawMessage {
 
 // ValidateGenesis performs genesis state validation for the service module.
 func (AppModuleBasic) ValidateGenesis(bz json.RawMessage) error {
-	return nil
+	var data GenesisState
+	err := ModuleCdc.UnmarshalJSON(bz, &data)
+	if err != nil {
+		return err
+	}
+
+	return ValidateGenesis(data)
 }
 
 // RegisterRESTRoutes registers the REST routes for the service module.
@@ -156,6 +162,6 @@ func (AppModule) BeginBlock(_ sdk.Context, _ abci.RequestBeginBlock) {}
 // EndBlock returns the end blocker for the service module. It returns no validator
 // updates.
 func (am AppModule) EndBlock(ctx sdk.Context, _ abci.RequestEndBlock) []abci.ValidatorUpdate {
-	EndBlock(ctx, am.keeper)
+	EndBlocker(ctx, am.keeper)
 	return []abci.ValidatorUpdate{}
 }
