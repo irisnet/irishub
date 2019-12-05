@@ -29,8 +29,8 @@ func ParamKeyTable() params.KeyTable {
 
 // mint parameters
 type Params struct {
-	Inflation sdk.Dec `json:"inflation"`  // inflation rate
-	MintDenom string  `json:"mint_denom"` // type of coin to mint
+	Inflation sdk.Dec `json:"inflation" yaml:"inflation"`   // inflation rate
+	MintDenom string  `json:"mint_denom" yaml:"mint_denom"` // type of coin to mint
 }
 
 func (p *Params) ParamSetPairs() params.ParamSetPairs {
