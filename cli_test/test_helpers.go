@@ -11,13 +11,6 @@ import (
 	"time"
 
 	"github.com/cosmos/cosmos-sdk/client"
-
-	"github.com/stretchr/testify/require"
-
-	tmtypes "github.com/tendermint/tendermint/types"
-
-	"github.com/irisnet/irishub/app"
-
 	clientkeys "github.com/cosmos/cosmos-sdk/client/keys"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/crypto/keys"
@@ -30,6 +23,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/gov"
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/cosmos/cosmos-sdk/x/staking"
+	"github.com/irisnet/irishub/app"
+	iconfig "github.com/irisnet/irishub/config"
+	"github.com/stretchr/testify/require"
+	tmtypes "github.com/tendermint/tendermint/types"
 )
 
 const (
@@ -63,6 +60,16 @@ var (
 		sdk.NewCoin(feeDenom, sdk.TokensFromConsensusPower(500000)),
 	)
 )
+
+func init() {
+	// set Bech32 config
+	config := sdk.GetConfig()
+	irisConfig := iconfig.GetConfig()
+	config.SetBech32PrefixForAccount(irisConfig.GetBech32AccountAddrPrefix(), irisConfig.GetBech32AccountPubPrefix())
+	config.SetBech32PrefixForValidator(irisConfig.GetBech32ValidatorAddrPrefix(), irisConfig.GetBech32ValidatorPubPrefix())
+	config.SetBech32PrefixForConsensusNode(irisConfig.GetBech32ConsensusAddrPrefix(), irisConfig.GetBech32ConsensusPubPrefix())
+	config.Seal()
+}
 
 //___________________________________________________________________________________
 // Fixtures
@@ -132,6 +139,7 @@ func (f Fixtures) GenesisState() simapp.GenesisState {
 // InitFixtures is called at the beginning of a test  and initializes a chain
 // with 1 validator.
 func InitFixtures(t *testing.T) (f *Fixtures) {
+
 	f = NewFixtures(t)
 
 	// reset test state

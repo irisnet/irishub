@@ -104,11 +104,11 @@ func calcFeeFactor(name string) sdk.Dec {
 // convertFeeToInt converts the given fee to Int.
 // if greater than 1, rounds it; returns 1 otherwise
 func convertFeeToInt(fee sdk.Dec) sdk.Int {
-	feeNativeToken := fee.Quo(sdk.NewDecFromInt(sdk.NewIntWithDecimal(1, 18)))
+	feeNativeToken := fee.TruncateInt()
 
-	if feeNativeToken.GT(sdk.NewDec(1)) {
-		return feeNativeToken.TruncateInt().Mul(sdk.NewIntWithDecimal(1, 18))
+	if feeNativeToken.GT(sdk.NewInt(1)) {
+		return feeNativeToken
 	} else {
-		return sdk.NewInt(1).Mul(sdk.NewIntWithDecimal(1, 18))
+		return sdk.NewInt(1)
 	}
 }

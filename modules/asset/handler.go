@@ -60,6 +60,7 @@ func handleIssueToken(ctx sdk.Context, k Keeper, msg MsgIssueToken) sdk.Result {
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.Owner.String()),
 		),
 		sdk.NewEvent(
 			types.EventTypeIssueToken,
@@ -86,6 +87,7 @@ func handleMsgEditToken(ctx sdk.Context, k Keeper, msg MsgEditToken) sdk.Result 
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.Owner.String()),
 		),
 		sdk.NewEvent(
 			types.EventTypeEditToken,
@@ -109,6 +111,7 @@ func handleMsgTransferTokenOwner(ctx sdk.Context, k Keeper, msg MsgTransferToken
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.SrcOwner.String()),
 		),
 		sdk.NewEvent(
 			types.EventTypeTransferTokenOwner,
@@ -132,6 +135,7 @@ func handleMsgMintToken(ctx sdk.Context, k Keeper, msg MsgMintToken) sdk.Result 
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.Owner.String()),
 		),
 		sdk.NewEvent(
 			types.EventTypeMintToken,

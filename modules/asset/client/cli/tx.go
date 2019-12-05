@@ -79,8 +79,6 @@ func GetCmdIssueToken(queryRoute string, cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			var prompt = "The token issue transaction will consume extra fee"
-
 			if !viper.GetBool(client.FlagGenerateOnly) {
 				tokenId, err := types.GetTokenID(msg.Source, msg.Symbol)
 				if err != nil {
@@ -95,18 +93,7 @@ func GetCmdIssueToken(queryRoute string, cdc *codec.Codec) *cobra.Command {
 
 				// append issue fee to prompt
 				issueFeeMainUnit := sdk.Coins{fee.IssueFee}.String()
-				prompt += fmt.Sprintf(": %s", issueFeeMainUnit)
-			}
-
-			// a confirmation is needed
-			prompt += "\nAre you sure to proceed?"
-			confirmed, err := client.GetConfirmation(prompt, bufio.NewReader(os.Stdin))
-			if err != nil {
-				return err
-			}
-
-			if !confirmed {
-				return fmt.Errorf("operation aborted")
+				fmt.Printf("The token issue transaction will consume extra fee: %s\n", issueFeeMainUnit)
 			}
 
 			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
