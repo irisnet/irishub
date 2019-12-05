@@ -45,31 +45,31 @@ func (k Keeper) Codespace() sdk.CodespaceType {
 	return k.codespace
 }
 
-func (k Keeper) AddServiceDefinition(ctx sdk.Context, svcDef SvcDef) {
+func (k Keeper) AddServiceDefinition(ctx sdk.Context, svcDef types.SvcDef) {
 	kvStore := ctx.KVStore(k.storeKey)
 
-	svcDefBytes, err := k.cdc.MarshalBinaryLengthPrefixed(svcDef)
-	if err != nil {
-		panic(err)
-	}
-
+	svcDefBytes := k.cdc.MustMarshalBinaryLengthPrefixed(svcDef)
 	kvStore.Set(types.GetServiceDefinitionKey(svcDef.ChainId, svcDef.Name), svcDefBytes)
 }
 
-func (k Keeper) AddMethods(ctx sdk.Context, svcDef SvcDef) sdk.Error {
+func (k Keeper) AddMethods(ctx sdk.Context, svcDef types.SvcDef) sdk.Error {
 	methods, err := protoidl.GetMethods(svcDef.IDLContent)
 	if err != nil {
 		panic(err)
 	}
+
 	kvStore := ctx.KVStore(k.storeKey)
+
 	for index, method := range methods {
-		methodProperty, err := methodToMethodProperty(index+1, method)
+		methodProperty, err := types.MethodToMethodProperty(index+1, method)
 		if err != nil {
 			return err
 		}
+
 		methodBytes := k.cdc.MustMarshalBinaryLengthPrefixed(methodProperty)
 		kvStore.Set(types.GetMethodPropertyKey(svcDef.ChainId, svcDef.Name, methodProperty.ID), methodBytes)
 	}
+
 	return nil
 }
 
@@ -81,17 +81,20 @@ func (k Keeper) GetServiceDefinition(ctx sdk.Context, chainId, name string) (svc
 		k.cdc.MustUnmarshalBinaryLengthPrefixed(serviceDefBytes, &svcDef)
 		return svcDef, true
 	}
+
 	return svcDef, false
 }
 
 // Gets the method in a specific service and methodID
 func (k Keeper) GetMethod(ctx sdk.Context, chainId, name string, id int16) (method types.MethodProperty, found bool) {
 	store := ctx.KVStore(k.storeKey)
+
 	methodBytes := store.Get(types.GetMethodPropertyKey(chainId, name, id))
 	if methodBytes != nil {
 		k.cdc.MustUnmarshalBinaryLengthPrefixed(methodBytes, &method)
 		return method, true
 	}
+
 	return method, false
 }
 
@@ -103,6 +106,7 @@ func (k Keeper) GetMethods(ctx sdk.Context, chainId, name string) sdk.Iterator {
 
 func (k Keeper) AddServiceBinding(ctx sdk.Context, svcBinding types.SvcBinding) sdk.Error {
 	kvStore := ctx.KVStore(k.storeKey)
+
 	_, found := k.GetServiceDefinition(ctx, svcBinding.DefChainID, svcBinding.DefName)
 	if !found {
 		return types.ErrSvcDefNotExists(k.Codespace(), svcBinding.DefChainID, svcBinding.DefName)
@@ -128,7 +132,7 @@ func (k Keeper) AddServiceBinding(ctx sdk.Context, svcBinding types.SvcBinding) 
 	}
 
 	// Subtract coins from provider's account
-	_, err = k.bk.SendCoins(ctx, svcBinding.Provider, auth.ServiceDepositCoinsAccAddr, svcBinding.Deposit)
+	err = k.bk.SendCoins(ctx, svcBinding.Provider, auth.ServiceDepositCoinsAccAddr, svcBinding.Deposit)
 	if err != nil {
 		return err
 	}
@@ -136,6 +140,7 @@ func (k Keeper) AddServiceBinding(ctx sdk.Context, svcBinding types.SvcBinding) 
 	svcBinding.DisableTime = time.Time{}
 	svcBindingBytes := k.cdc.MustMarshalBinaryLengthPrefixed(svcBinding)
 	kvStore.Set(types.GetServiceBindingKey(svcBinding.DefChainID, svcBinding.DefName, svcBinding.BindChainID, svcBinding.Provider), svcBindingBytes)
+
 	return nil
 }
 
@@ -144,10 +149,12 @@ func (k Keeper) GetServiceBinding(ctx sdk.Context, defChainID, defName, bindChai
 
 	svcBindingBytes := kvStore.Get(types.GetServiceBindingKey(defChainID, defName, bindChainID, provider))
 	if svcBindingBytes != nil {
-		var svcBinding SvcBinding
+		var svcBinding types.SvcBinding
 		k.cdc.MustUnmarshalBinaryLengthPrefixed(svcBindingBytes, &svcBinding)
+
 		return svcBinding, true
 	}
+
 	return svcBinding, false
 }
 
@@ -158,6 +165,7 @@ func (k Keeper) ServiceBindingsIterator(ctx sdk.Context, defChainID, defName str
 
 func (k Keeper) UpdateServiceBinding(ctx sdk.Context, svcBinding types.SvcBinding) sdk.Error {
 	kvStore := ctx.KVStore(k.storeKey)
+
 	oldBinding, found := k.GetServiceBinding(ctx, svcBinding.DefChainID, svcBinding.DefName, svcBinding.BindChainID, svcBinding.Provider)
 	if !found {
 		return types.ErrSvcBindingNotExists(k.Codespace())
@@ -168,6 +176,7 @@ func (k Keeper) UpdateServiceBinding(ctx sdk.Context, svcBinding types.SvcBindin
 		if err != nil {
 			return err
 		}
+
 		oldBinding.Prices = svcBinding.Prices
 	}
 
@@ -181,7 +190,7 @@ func (k Keeper) UpdateServiceBinding(ctx sdk.Context, svcBinding types.SvcBindin
 	}
 
 	// Subtract coins from provider's account
-	_, err := k.bk.SendCoins(ctx, svcBinding.Provider, auth.ServiceDepositCoinsAccAddr, svcBinding.Deposit)
+	err := k.bk.SendCoins(ctx, svcBinding.Provider, auth.ServiceDepositCoinsAccAddr, svcBinding.Deposit)
 	if err != nil {
 		return err
 	}
@@ -207,11 +216,13 @@ func (k Keeper) UpdateServiceBinding(ctx sdk.Context, svcBinding types.SvcBindin
 
 	svcBindingBytes := k.cdc.MustMarshalBinaryLengthPrefixed(oldBinding)
 	kvStore.Set(types.GetServiceBindingKey(svcBinding.DefChainID, svcBinding.DefName, svcBinding.BindChainID, svcBinding.Provider), svcBindingBytes)
+
 	return nil
 }
 
 func (k Keeper) Disable(ctx sdk.Context, defChainID, defName, bindChainID string, provider sdk.AccAddress) sdk.Error {
 	kvStore := ctx.KVStore(k.storeKey)
+
 	binding, found := k.GetServiceBinding(ctx, defChainID, defName, bindChainID, provider)
 	if !found {
 		return types.ErrSvcBindingNotExists(k.Codespace())
@@ -220,15 +231,18 @@ func (k Keeper) Disable(ctx sdk.Context, defChainID, defName, bindChainID string
 	if !binding.Available {
 		return types.ErrDisable(k.Codespace(), "service binding is unavailable")
 	}
+
 	binding.Available = false
 	binding.DisableTime = ctx.BlockHeader().Time
 	svcBindingBytes := k.cdc.MustMarshalBinaryLengthPrefixed(binding)
 	kvStore.Set(types.GetServiceBindingKey(binding.DefChainID, binding.DefName, binding.BindChainID, binding.Provider), svcBindingBytes)
+
 	return nil
 }
 
 func (k Keeper) Enable(ctx sdk.Context, defChainID, defName, bindChainID string, provider sdk.AccAddress, deposit sdk.Coins) sdk.Error {
 	kvStore := ctx.KVStore(k.storeKey)
+
 	binding, found := k.GetServiceBinding(ctx, defChainID, defName, bindChainID, provider)
 	if !found {
 		return types.ErrSvcBindingNotExists(k.Codespace())
@@ -253,7 +267,7 @@ func (k Keeper) Enable(ctx sdk.Context, defChainID, defName, bindChainID string,
 	}
 
 	// Subtract coins from provider's account
-	_, err = k.bk.SendCoins(ctx, binding.Provider, auth.ServiceDepositCoinsAccAddr, deposit)
+	err = k.bk.SendCoins(ctx, binding.Provider, auth.ServiceDepositCoinsAccAddr, deposit)
 	if err != nil {
 		return err
 	}
@@ -262,11 +276,13 @@ func (k Keeper) Enable(ctx sdk.Context, defChainID, defName, bindChainID string,
 	binding.DisableTime = time.Time{}
 	svcBindingBytes := k.cdc.MustMarshalBinaryLengthPrefixed(binding)
 	kvStore.Set(types.GetServiceBindingKey(binding.DefChainID, binding.DefName, binding.BindChainID, binding.Provider), svcBindingBytes)
+
 	return nil
 }
 
 func (k Keeper) RefundDeposit(ctx sdk.Context, defChainID, defName, bindChainID string, provider sdk.AccAddress) sdk.Error {
 	kvStore := ctx.KVStore(k.storeKey)
+
 	binding, found := k.GetServiceBinding(ctx, defChainID, defName, bindChainID, provider)
 	if !found {
 		return types.ErrSvcBindingNotExists(k.Codespace())
@@ -282,13 +298,14 @@ func (k Keeper) RefundDeposit(ctx sdk.Context, defChainID, defName, bindChainID 
 
 	blockTime := ctx.BlockHeader().Time
 	params := k.GetParamSet(ctx)
+
 	refundTime := binding.DisableTime.Add(params.ArbitrationTimeLimit).Add(params.ComplaintRetrospect)
 	if blockTime.Before(refundTime) {
 		return types.ErrRefundDeposit(k.Codespace(), fmt.Sprintf("can not refund deposit before %s", refundTime.Format("2006-01-02 15:04:05")))
 	}
 
 	// Add coins to provider's account
-	_, err := k.bk.SendCoins(ctx, auth.ServiceDepositCoinsAccAddr, binding.Provider, binding.Deposit)
+	err := k.bk.SendCoins(ctx, auth.ServiceDepositCoinsAccAddr, binding.Provider, binding.Deposit)
 	if err != nil {
 		return err
 	}
@@ -297,12 +314,14 @@ func (k Keeper) RefundDeposit(ctx sdk.Context, defChainID, defName, bindChainID 
 
 	svcBindingBytes := k.cdc.MustMarshalBinaryLengthPrefixed(binding)
 	kvStore.Set(types.GetServiceBindingKey(binding.DefChainID, binding.DefName, binding.BindChainID, binding.Provider), svcBindingBytes)
+
 	return nil
 }
 
 func (k Keeper) validateMethodPrices(ctx sdk.Context, svcBinding types.SvcBinding) sdk.Error {
 	iterator := k.GetMethods(ctx, svcBinding.DefChainID, svcBinding.DefName)
 	defer iterator.Close()
+
 	var methods []types.MethodProperty
 	for ; iterator.Valid(); iterator.Next() {
 		var method types.MethodProperty
@@ -313,6 +332,7 @@ func (k Keeper) validateMethodPrices(ctx sdk.Context, svcBinding types.SvcBindin
 	if len(methods) != len(svcBinding.Prices) {
 		return types.ErrInvalidPriceCount(k.Codespace(), len(svcBinding.Prices), len(methods))
 	}
+
 	return nil
 }
 
@@ -334,18 +354,21 @@ func (k Keeper) AddRequest(ctx sdk.Context, req types.SvcRequest) (types.SvcRequ
 	store.Set(types.GetRequestKey(req.DefChainID, req.DefName, req.BindChainID, req.Provider,
 		req.RequestHeight, req.RequestIntraTxCounter), bz)
 
-	_, err := k.bk.SendCoins(ctx, req.Consumer, auth.ServiceRequestCoinsAccAddr, req.ServiceFee)
+	err := k.bk.SendCoins(ctx, req.Consumer, auth.ServiceRequestCoinsAccAddr, req.ServiceFee)
 	if err != nil {
 		return req, err
 	}
+
 	k.AddActiveRequest(ctx, req)
 	k.AddRequestExpiration(ctx, req)
 	k.metrics.ActiveRequests.Add(1)
+
 	return req, nil
 }
 
 func (k Keeper) AddActiveRequest(ctx sdk.Context, req types.SvcRequest) {
 	store := ctx.KVStore(k.storeKey)
+
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(req)
 	store.Set(types.GetActiveRequestKey(req.DefChainID, req.DefName, req.BindChainID, req.Provider,
 		req.RequestHeight, req.RequestIntraTxCounter), bz)
@@ -359,6 +382,7 @@ func (k Keeper) DeleteActiveRequest(ctx sdk.Context, req types.SvcRequest) {
 
 func (k Keeper) AddRequestExpiration(ctx sdk.Context, req types.SvcRequest) {
 	store := ctx.KVStore(k.storeKey)
+
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(req)
 	store.Set(types.GetRequestsByExpirationIndexKeyByReq(req), bz)
 }
@@ -370,10 +394,12 @@ func (k Keeper) DeleteRequestExpiration(ctx sdk.Context, req types.SvcRequest) {
 
 func (k Keeper) GetActiveRequest(ctx sdk.Context, eHeight, rHeight int64, counter int16) (req types.SvcRequest, found bool) {
 	store := ctx.KVStore(k.storeKey)
+
 	value := store.Get(types.GetRequestsByExpirationIndexKey(eHeight, rHeight, counter))
 	if value == nil {
 		return req, false
 	}
+
 	k.cdc.MustUnmarshalBinaryLengthPrefixed(value, &req)
 	return req, true
 }
@@ -392,23 +418,26 @@ func (k Keeper) ActiveRequestQueueIterator(ctx sdk.Context, height int64) sdk.It
 
 // Returns an iterator for all the request in the Active Queue
 func (k Keeper) ActiveAllRequestQueueIterator(store sdk.KVStore) sdk.Iterator {
-	return sdk.KVStorePrefixIterator(store, activeRequestKey)
+	return sdk.KVStorePrefixIterator(store, types.ActiveRequestKey)
 }
 
 //__________________________________________________________________________
 
 func (k Keeper) AddResponse(ctx sdk.Context, resp types.SvcResponse) {
 	store := ctx.KVStore(k.storeKey)
+
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(resp)
 	store.Set(types.GetResponseKey(resp.ReqChainID, resp.ExpirationHeight, resp.RequestHeight, resp.RequestIntraTxCounter), bz)
 }
 
 func (k Keeper) GetResponse(ctx sdk.Context, reqChainID string, eHeight, rHeight int64, counter int16) (resp types.SvcResponse, found bool) {
 	store := ctx.KVStore(k.storeKey)
+
 	value := store.Get(types.GetResponseKey(reqChainID, eHeight, rHeight, counter))
 	if value == nil {
 		return resp, false
 	}
+
 	k.cdc.MustUnmarshalBinaryLengthPrefixed(value, &resp)
 	return resp, true
 }
@@ -417,17 +446,21 @@ func (k Keeper) GetResponse(ctx sdk.Context, reqChainID string, eHeight, rHeight
 
 func (k Keeper) SetReturnFee(ctx sdk.Context, address sdk.AccAddress, coins sdk.Coins) {
 	store := ctx.KVStore(k.storeKey)
-	fee := NewReturnedFee(address, coins)
+
+	fee := types.NewReturnedFee(address, coins)
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(fee)
+
 	store.Set(types.GetReturnedFeeKey(address), bz)
 }
 
 func (k Keeper) GetReturnFee(ctx sdk.Context, address sdk.AccAddress) (fee types.ReturnedFee, found bool) {
 	store := ctx.KVStore(k.storeKey)
+
 	value := store.Get(types.GetReturnedFeeKey(address))
 	if value == nil {
 		return fee, false
 	}
+
 	k.cdc.MustUnmarshalBinaryLengthPrefixed(value, &fee)
 	return fee, true
 }
@@ -439,6 +472,7 @@ func (k Keeper) AddReturnFee(ctx sdk.Context, address sdk.AccAddress, coins sdk.
 		k.SetReturnFee(ctx, address, coins)
 		return
 	}
+
 	k.SetReturnFee(ctx, address, fee.Coins.Add(coins))
 }
 
@@ -449,29 +483,36 @@ func (k Keeper) RefundFee(ctx sdk.Context, address sdk.AccAddress) sdk.Error {
 		return types.ErrReturnFeeNotExists(k.Codespace(), address)
 	}
 
-	_, err := k.bk.SendCoins(ctx, auth.ServiceRequestCoinsAccAddr, address, fee.Coins)
+	err := k.bk.SendCoins(ctx, auth.ServiceRequestCoinsAccAddr, address, fee.Coins)
 	if err != nil {
 		return err
 	}
+
 	ctx.Logger().Info("Refund fees", "address", address.String(), "amount", fee.Coins.String())
+
 	store := ctx.KVStore(k.storeKey)
 	store.Delete(types.GetReturnedFeeKey(address))
+
 	return nil
 }
 
 func (k Keeper) SetIncomingFee(ctx sdk.Context, address sdk.AccAddress, coins sdk.Coins) {
 	store := ctx.KVStore(k.storeKey)
+
 	fee := NewIncomingFee(address, coins)
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(fee)
+
 	store.Set(types.GetIncomingFeeKey(address), bz)
 }
 
 func (k Keeper) GetIncomingFee(ctx sdk.Context, address sdk.AccAddress) (fee types.IncomingFee, found bool) {
 	store := ctx.KVStore(k.storeKey)
+
 	value := store.Get(types.GetIncomingFeeKey(address))
 	if value == nil {
 		return fee, false
 	}
+
 	k.cdc.MustUnmarshalBinaryLengthPrefixed(value, &fee)
 	return fee, true
 }
@@ -480,14 +521,16 @@ func (k Keeper) GetIncomingFee(ctx sdk.Context, address sdk.AccAddress) (fee typ
 func (k Keeper) AddIncomingFee(ctx sdk.Context, address sdk.AccAddress, coins sdk.Coins) sdk.Error {
 	params := k.GetParamSet(ctx)
 	feeTax := params.ServiceFeeTax
+
 	taxCoins := sdk.Coins{}
 	for _, coin := range coins {
 		taxAmount := sdk.NewDecFromInt(coin.Amount).Mul(feeTax).TruncateInt()
 		taxCoins = append(taxCoins, sdk.NewCoin(coin.Denom, taxAmount))
 	}
+
 	taxCoins = taxCoins.Sort()
 
-	_, err := k.bk.SendCoins(ctx, auth.ServiceRequestCoinsAccAddr, auth.ServiceTaxCoinsAccAddr, taxCoins)
+	err := k.bk.SendCoins(ctx, auth.ServiceRequestCoinsAccAddr, auth.ServiceTaxCoinsAccAddr, taxCoins)
 	if err != nil {
 		return err
 	}
@@ -511,37 +554,47 @@ func (k Keeper) AddIncomingFee(ctx sdk.Context, address sdk.AccAddress, coins sd
 func (k Keeper) WithdrawFee(ctx sdk.Context, address sdk.AccAddress) sdk.Error {
 	fee, found := k.GetIncomingFee(ctx, address)
 	if !found {
-		return types.ErrWithdrawFeeNotExists(k.Codespace(), address)
+		return types.ErrWithdrawFeeNotExists(k.codespace, address)
 	}
-	_, err := k.bk.SendCoins(ctx, auth.ServiceRequestCoinsAccAddr, address, fee.Coins)
+
+	err := k.bk.SendCoins(ctx, auth.ServiceRequestCoinsAccAddr, address, fee.Coins)
 	if err != nil {
 		return err
 	}
+
 	ctx.Logger().Info("Withdraw fees", "address", address.String(), "amount", fee.Coins.String())
+
 	store := ctx.KVStore(k.storeKey)
 	store.Delete(types.GetIncomingFeeKey(address))
+
 	return nil
 }
 
 func (k Keeper) Slash(ctx sdk.Context, binding types.SvcBinding, slashCoins sdk.Coins) sdk.Error {
 	store := ctx.KVStore(k.storeKey)
+
 	deposit, hasNeg := binding.Deposit.SafeSub(slashCoins)
 	if hasNeg {
 		errMsg := fmt.Sprintf("%s is less than %s", binding.Deposit, slashCoins)
 		panic(errMsg)
 	}
+
 	binding.Deposit = deposit
 	minDeposit, err := k.getMinDeposit(ctx, binding.Prices)
 	if err != nil {
 		return err
 	}
+
 	if !binding.Deposit.IsAllGTE(minDeposit) {
 		binding.Available = false
 		binding.DisableTime = ctx.BlockHeader().Time
 	}
+
 	ctx.Logger().Info("Slash service provider", "provider", binding.Provider.String(), "slash_amount", slashCoins.String())
+
 	svcBindingBytes := k.cdc.MustMarshalBinaryLengthPrefixed(binding)
 	store.Set(types.GetServiceBindingKey(binding.DefChainID, binding.DefName, binding.BindChainID, binding.Provider), svcBindingBytes)
+
 	return nil
 }
 
@@ -550,40 +603,48 @@ func (k Keeper) Slash(ctx sdk.Context, binding types.SvcBinding, slashCoins sdk.
 // get the current in-block request operation counter
 func (k Keeper) GetIntraTxCounter(ctx sdk.Context) int16 {
 	store := ctx.KVStore(k.storeKey)
-	b := store.Get(types.GetIntraTxCounterKey)
+
+	b := store.Get(types.IntraTxCounterKey)
 	if b == nil {
 		return 0
 	}
+
 	var counter int16
 	k.cdc.MustUnmarshalBinaryLengthPrefixed(b, &counter)
+
 	return counter
 }
 
 // set the current in-block request counter
 func (k Keeper) SetIntraTxCounter(ctx sdk.Context, counter int16) {
 	store := ctx.KVStore(k.storeKey)
+
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(counter)
-	store.Set(types.GetIntraTxCounterKey, bz)
+	store.Set(types.IntraTxCounterKey, bz)
 }
 
 func (k Keeper) getMinDeposit(ctx sdk.Context, prices []sdk.Coin) (sdk.Coins, sdk.Error) {
 	params := k.GetParamSet(ctx)
 	// min deposit must >= sum(method price) * minDepositMultiple
 	minDepositMultiple := sdk.NewInt(params.MinDepositMultiple)
+
 	var minDeposit sdk.Coins
 	for _, price := range prices {
 		if price.Amount.BigInt().BitLen()+minDepositMultiple.BigInt().BitLen()-1 > 255 {
-			return minDeposit, sdk.NewError(DefaultCodespace, CodeIntOverflow, fmt.Sprintf("Int Overflow"))
+			return minDeposit, sdk.NewError(k.codespace, types.CodeIntOverflow, fmt.Sprintf("Int Overflow"))
 		}
+
 		minInt := price.Amount.Mul(minDepositMultiple)
 		minDeposit = minDeposit.Add(sdk.Coins{sdk.NewCoin(price.Denom, minInt)})
 	}
+
 	return minDeposit, nil
 }
 
 func (k Keeper) InitMetrics(store sdk.KVStore) {
 	activeIterator := k.ActiveAllRequestQueueIterator(store)
 	defer activeIterator.Close()
+
 	for ; activeIterator.Valid(); activeIterator.Next() {
 		k.metrics.ActiveRequests.Add(1)
 	}
