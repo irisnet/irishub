@@ -19,6 +19,8 @@ func NewQuerier(k Keeper) sdk.Querier {
 			return queryTokens(ctx, req, k)
 		case types.QueryFees:
 			return queryFees(ctx, path[1:], req, k)
+		case types.QueryParameters:
+			return queryParameters(ctx, k)
 		default:
 			return nil, sdk.ErrUnknownRequest("unknown asset query endpoint")
 		}
@@ -170,4 +172,15 @@ func queryTokenFees(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]by
 	}
 
 	return bz, nil
+}
+
+func queryParameters(ctx sdk.Context, k Keeper) ([]byte, sdk.Error) {
+	params := k.GetParamSet(ctx)
+
+	res, err := codec.MarshalJSONIndent(types.ModuleCdc, params)
+	if err != nil {
+		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", err.Error()))
+	}
+
+	return res, nil
 }

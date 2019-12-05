@@ -24,6 +24,7 @@ func GetQueryCmd(queryRoute string, cdc *codec.Codec) *cobra.Command {
 		GetCmdQueryToken(queryRoute, cdc),
 		GetCmdQueryTokens(queryRoute, cdc),
 		GetCmdQueryFee(queryRoute, cdc),
+		GetCmdQueryParams(queryRoute, cdc),
 	)...)
 
 	return queryCmd
@@ -125,6 +126,30 @@ func GetCmdQueryFee(queryRoute string, cdc *codec.Codec) *cobra.Command {
 			}
 
 			return cliCtx.PrintOutput(fees)
+		},
+	}
+	return cmd
+}
+
+// GetCmdQueryParams implements the params query command.
+func GetCmdQueryParams(queryRoute string, cdc *codec.Codec) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "params",
+		Short:   "Query the current asset parameters information",
+		Example: fmt.Sprintf("%s query asset params", version.ClientName),
+		Args:    cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+
+			route := fmt.Sprintf("custom/%s/%s", queryRoute, types.QueryParameters)
+			bz, _, err := cliCtx.QueryWithData(route, nil)
+			if err != nil {
+				return err
+			}
+
+			var params types.Params
+			cdc.MustUnmarshalJSON(bz, &params)
+			return cliCtx.PrintOutput(params)
 		},
 	}
 	return cmd

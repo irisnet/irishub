@@ -5,11 +5,14 @@ import (
 )
 
 const (
-	QueryToken    = "token"
-	QueryTokens   = "tokens"
-	QueryGateway  = "gateway"
-	QueryGateways = "gateways"
-	QueryFees     = "fees"
+	// QueryToken - query token path
+	QueryToken = "token"
+	// QueryTokens - query tokens path
+	QueryTokens = "tokens"
+	// QueryFees - query fees path
+	QueryFees = "fees"
+	// QueryParameters - query parameters path
+	QueryParameters = "parameters"
 )
 
 // QueryTokenParams is the query parameters for 'custom/asset/tokens/{id}'
