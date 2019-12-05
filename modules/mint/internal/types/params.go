@@ -12,7 +12,7 @@ var _ params.ParamSet = (*Params)(nil)
 // default paramspace for params keeper
 const (
 	DefaultParamSpace = "mint"
-	MintDenom         = "iris-atto"
+	MintDenom         = sdk.DefaultBondDenom
 )
 
 //Parameter store key
@@ -38,13 +38,6 @@ func (p *Params) ParamSetPairs() params.ParamSetPairs {
 		{KeyInflation, &p.Inflation},
 		{KeyMintDenom, &p.MintDenom},
 	}
-}
-
-func (p Params) String() string {
-	return fmt.Sprintf(`Mint Params:
-  mint/Inflation:  %s,
-  mint/MintDenom:  %s`,
-		p.Inflation.String(), p.MintDenom)
 }
 
 // Implements params.ParamStruct

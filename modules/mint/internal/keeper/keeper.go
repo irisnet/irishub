@@ -7,7 +7,7 @@ import (
 	"github.com/irisnet/irishub/modules/mint/internal/types"
 )
 
-// keeper of the stake store
+// keeper of the mint store
 type Keeper struct {
 	storeKey         sdk.StoreKey
 	cdc              *codec.Codec
