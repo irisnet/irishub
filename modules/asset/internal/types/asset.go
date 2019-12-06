@@ -9,7 +9,7 @@ import (
 )
 
 type BaseToken struct {
-	Id              string         `json:"id" yaml:"id"`
+	ID              string         `json:"id" yaml:"id"`
 	Family          AssetFamily    `json:"family" yaml:"family"`
 	Source          AssetSource    `json:"source" yaml:"source"`
 	Symbol          string         `json:"symbol" yaml:"symbol"`
@@ -71,7 +71,7 @@ func NewFungibleToken(source AssetSource, symbol string, name string, decimal ui
 		),
 	}
 
-	token.Id = token.GetUniqueID()
+	token.ID = token.GetUniqueID()
 	return token
 }
 

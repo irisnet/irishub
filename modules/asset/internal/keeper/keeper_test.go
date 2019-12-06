@@ -7,9 +7,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/bank"
+	"github.com/cosmos/cosmos-sdk/x/supply"
+	"github.com/irisnet/irishub/modules/asset/internal/keeper"
 	"github.com/irisnet/irishub/modules/asset/internal/types"
 	"github.com/irisnet/irishub/simapp"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 	abci "github.com/tendermint/tendermint/abci/types"
 )
@@ -19,9 +20,9 @@ type KeeperTestSuite struct {
 
 	cdc    *codec.Codec
 	ctx    sdk.Context
-	keeper Keeper
+	keeper keeper.Keeper
+	sk     supply.Keeper
 	bk     bank.Keeper
-	app    *simapp.SimApp
 }
 
 func (suite *KeeperTestSuite) SetupTest() {
@@ -32,7 +33,10 @@ func (suite *KeeperTestSuite) SetupTest() {
 	suite.ctx = app.BaseApp.NewContext(isCheckTx, abci.Header{})
 	suite.keeper = app.AssetKeeper
 	suite.bk = app.BankKeeper
-	suite.app = app
+	suite.sk = app.SupplyKeeper
+
+	// set params
+	suite.keeper.SetParamSet(suite.ctx, types.DefaultParams())
 }
 
 func TestKeeperTestSuite(t *testing.T) {
@@ -85,57 +89,61 @@ func (suite *KeeperTestSuite) TestKeeper_EditToken() {
 	suite.NoError(err)
 }
 
-func (suite *KeeperTestSuite) TestMintTokenKeeper(t *testing.T) {
+func (suite *KeeperTestSuite) TestMintTokenKeeper() {
 	addr := sdk.AccAddress([]byte("addr"))
 
-	amtCoin, _ := sdk.NewIntFromString("1000000000000000000000000000")
-	coin := sdk.Coins{sdk.NewCoin("iris-atto", amtCoin)}
-	suite.bk.AddCoins(suite.ctx, addr, coin)
-
-	ft := types.NewFungibleToken(types.NATIVE, "btc", "btc", 0, "", "satoshi", sdk.NewIntWithDecimal(1000, 0), sdk.NewIntWithDecimal(10000, 0), true, addr)
-	err := suite.keeper.IssueToken(suite.ctx, ft)
+	// mint tokens to addr
+	mintAmount, _ := sdk.NewIntFromString("1000000000000000000000000000")
+	mintCoin := sdk.Coins{sdk.NewCoin(sdk.DefaultBondDenom, mintAmount)}
+	err := suite.sk.MintCoins(suite.ctx, types.ModuleName, mintCoin)
+	suite.NoError(err)
+	err = suite.sk.SendCoinsFromModuleToAccount(suite.ctx, types.ModuleName, addr, mintCoin)
 	suite.NoError(err)
 
-	assert.True(t, suite.keeper.HasToken(suite.ctx, "btc"))
+	ft := types.NewFungibleToken(types.NATIVE, "btc", "btc", 0, "", "satoshi", sdk.NewIntWithDecimal(1000, 0), sdk.NewIntWithDecimal(10000, 0), true, addr)
+	err = suite.keeper.IssueToken(suite.ctx, ft)
+	suite.NoError(err)
+
+	suite.True(suite.keeper.HasToken(suite.ctx, "btc"))
 
 	token, found := suite.keeper.GetToken(suite.ctx, "btc")
-	assert.True(t, found)
+	suite.True(found)
 
-	assert.Equal(t, ft.GetDenom(), token.GetDenom())
-	assert.Equal(t, ft.Owner, ft.Owner)
+	suite.Equal(ft.GetDenom(), token.GetDenom())
+	suite.Equal(ft.Owner, ft.Owner)
 
 	msgJson, _ := json.Marshal(ft)
 	assetJson, _ := json.Marshal(token)
-	suite.Equal(t, msgJson, assetJson)
+	suite.Equal(msgJson, assetJson)
 
 	msgMintToken := types.NewMsgMintToken("btc", addr, nil, 1000)
 	err = suite.keeper.MintToken(suite.ctx, msgMintToken)
-	assert.NoError(t, err)
+	suite.NoError(err)
 
 	balance := suite.bk.GetCoins(suite.ctx, addr)
 	amt := balance.AmountOf("btc-min")
-	assert.Equal(t, "2000", amt.String())
+	suite.Equal("2000", amt.String())
 }
 
-func (suite *KeeperTestSuite) TestTransferOwnerKeeper(t *testing.T) {
+func (suite *KeeperTestSuite) TestTransferOwnerKeeper() {
 	srcOwner := sdk.AccAddress([]byte("TokenSrcOwner"))
 
 	ft := types.NewFungibleToken(types.NATIVE, "btc", "btc", 1, "", "satoshi", sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(21000000, 0), true, srcOwner)
 
 	err := suite.keeper.IssueToken(suite.ctx, ft)
-	assert.NoError(t, err)
+	suite.NoError(err)
 
-	assert.True(t, suite.keeper.HasToken(suite.ctx, "i.btc"))
+	suite.True(suite.keeper.HasToken(suite.ctx, "i.btc"))
 
 	token, found := suite.keeper.GetToken(suite.ctx, "i.btc")
-	assert.True(t, found)
+	suite.True(found)
 
-	assert.Equal(t, ft.GetDenom(), token.GetDenom())
-	assert.Equal(t, ft.Owner, token.Owner)
+	suite.Equal(ft.GetDenom(), token.GetDenom())
+	suite.Equal(ft.Owner, token.Owner)
 
 	msgJson, _ := json.Marshal(ft)
 	assetJson, _ := json.Marshal(token)
-	assert.Equal(t, msgJson, assetJson)
+	suite.Equal(msgJson, assetJson)
 
 	dstOwner := sdk.AccAddress([]byte("TokenDstOwner"))
 	msg := types.MsgTransferTokenOwner{
@@ -144,9 +152,9 @@ func (suite *KeeperTestSuite) TestTransferOwnerKeeper(t *testing.T) {
 		TokenId:  "btc",
 	}
 	err = suite.keeper.TransferTokenOwner(suite.ctx, msg)
-	assert.NoError(t, err)
+	suite.NoError(err)
 
 	token, found = suite.keeper.GetToken(suite.ctx, "i.btc")
-	assert.True(t, found)
-	assert.Equal(t, dstOwner, token.Owner)
+	suite.True(found)
+	suite.Equal(dstOwner, token.Owner)
 }

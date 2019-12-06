@@ -22,38 +22,33 @@ func TestMsgIssueAsset(t *testing.T) {
 		MsgIssueToken
 		expectPass bool
 	}{
-		{"native basic good", NewMsgIssueToken(FUNGIBLE, NATIVE, "a", "btc", "btc", "btc", 18, "satoshi", 1, 1, true, addr), true},
-		{"native family error", NewMsgIssueToken(0x02, NATIVE, "b", "btc", "btc", "btc", 1, "satoshi", 1, 1, true, addr), false},
-		{"native source error", NewMsgIssueToken(FUNGIBLE, 0x03, "c", "btc", "btc", "btc", 1, "satoshi", 1, 1, true, addr), false},
-		{"native symbol empty", NewMsgIssueToken(FUNGIBLE, NATIVE, "d", "", "btc", "btc", 1, "g", 1, 1, true, addr), false},
-		{"native symbol error", NewMsgIssueToken(FUNGIBLE, NATIVE, "e", "ab,c", "btc", "btc", 1, "satoshi", 1, 1, true, addr), false},
-		{"native symbol first letter is num", NewMsgIssueToken(FUNGIBLE, NATIVE, "e", "4iris", "btc", "btc", 1, "satoshi", 1, 1, true, addr), false},
-		{"native symbol too long", NewMsgIssueToken(FUNGIBLE, NATIVE, "e", "aaaaaaaaa", "btc", "btc", 1, "satoshi", 1, 1, true, addr), false},
-		{"native symbol too short", NewMsgIssueToken(FUNGIBLE, NATIVE, "e", "a", "btc", "btc", 1, "satoshi", 1, 1, true, addr), false},
-		{"native canonical_symbol ignored", NewMsgIssueToken(FUNGIBLE, NATIVE, "a", "btc", "c", "btc", 18, "satoshi", 1, 1, true, addr), true},
-		{"native min_unit_alias error", NewMsgIssueToken(FUNGIBLE, NATIVE, "g", "btc", "btc", "btc", 1, "a1,3d", 1, 1, true, addr), false},
-		{"native min_unit_alias too long", NewMsgIssueToken(FUNGIBLE, NATIVE, "g", "btc", "btc", "btc", 1, "aaaaaaaaaaaaa", 1, 1, true, addr), false},
-		{"native min_unit_alias too short", NewMsgIssueToken(FUNGIBLE, NATIVE, "g", "btc", "btc", "btc", 1, "a", 1, 1, true, addr), false},
-		{"native min_unit_alias  first letter is num", NewMsgIssueToken(FUNGIBLE, NATIVE, "g", "btc", "btc", "btc", 1, "1a", 1, 1, true, addr), false},
-		{"native name empty", NewMsgIssueToken(FUNGIBLE, NATIVE, "h", "btc", "btc", "", 1, "btc", 1, 1, true, addr), false},
-		{"native name blank", NewMsgIssueToken(FUNGIBLE, NATIVE, "h", "btc", "btc", "  ", 1, "btc", 1, 1, true, addr), false},
-		{"native name too long", NewMsgIssueToken(FUNGIBLE, NATIVE, "i", "btc", "btc", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 1, "satoshi", 1, 1, true, addr), false},
-		{"native initial supply is zero", NewMsgIssueToken(FUNGIBLE, NATIVE, "j", "btc", "btc", "btc", 1, "satoshi", 0, 1, true, addr), true},
-		{"native max supply is zero", NewMsgIssueToken(FUNGIBLE, NATIVE, "k", "btc", "btc", "btc", 1, "satoshi", 1, 0, true, addr), true},
-		{"native init supply bigger than max supply", NewMsgIssueToken(FUNGIBLE, NATIVE, "l", "btc", "btc", "btc", 1, "satoshi", 2, 1, true, addr), false},
-		{"native decimal error", NewMsgIssueToken(FUNGIBLE, NATIVE, "m", "btc", "btc", "btc", 19, "satoshi", 1, 1, true, addr), false},
-
-		{"gateway basic good", NewMsgIssueToken(FUNGIBLE, GATEWAY, "abc", "btc", "btc", "btc", 18, "satoshi", 1, 1, true, addr), true},
-		{"gateway canonical_symbol error", NewMsgIssueToken(FUNGIBLE, GATEWAY, "a", "btc", "a1,d", "btc", 18, "satoshi", 1, 1, true, addr), false},
-		{"gateway canonical_symbol too long", NewMsgIssueToken(FUNGIBLE, GATEWAY, "a", "btc", "abcdefghijklmn", "btc", 18, "satoshi", 1, 1, true, addr), false},
-		{"gateway canonical_symbol too short", NewMsgIssueToken(FUNGIBLE, GATEWAY, "a", "btc", "a", "btc", 18, "satoshi", 1, 1, true, addr), false},
+		{"native basic good", NewMsgIssueToken(FUNGIBLE, NATIVE, "btc", "btc", "btc", 18, "satoshi", 1, 1, true, addr), true},
+		{"native family error", NewMsgIssueToken(0x02, NATIVE, "btc", "btc", "btc", 1, "satoshi", 1, 1, true, addr), false},
+		{"native source error", NewMsgIssueToken(FUNGIBLE, 0x03, "btc", "btc", "btc", 1, "satoshi", 1, 1, true, addr), false},
+		{"native symbol empty", NewMsgIssueToken(FUNGIBLE, NATIVE, "", "btc", "btc", 1, "g", 1, 1, true, addr), false},
+		{"native symbol error", NewMsgIssueToken(FUNGIBLE, NATIVE, "ab,c", "btc", "btc", 1, "satoshi", 1, 1, true, addr), false},
+		{"native symbol first letter is num", NewMsgIssueToken(FUNGIBLE, NATIVE, "4iris", "btc", "btc", 1, "satoshi", 1, 1, true, addr), false},
+		{"native symbol too long", NewMsgIssueToken(FUNGIBLE, NATIVE, "aaaaaaaaa", "btc", "btc", 1, "satoshi", 1, 1, true, addr), false},
+		{"native symbol too short", NewMsgIssueToken(FUNGIBLE, NATIVE, "a", "btc", "btc", 1, "satoshi", 1, 1, true, addr), false},
+		{"native canonical_symbol ignored", NewMsgIssueToken(FUNGIBLE, NATIVE, "btc", "c", "btc", 18, "satoshi", 1, 1, true, addr), true},
+		{"native min_unit_alias error", NewMsgIssueToken(FUNGIBLE, NATIVE, "btc", "btc", "btc", 1, "a1,3d", 1, 1, true, addr), false},
+		{"native min_unit_alias too long", NewMsgIssueToken(FUNGIBLE, NATIVE, "btc", "btc", "btc", 1, "aaaaaaaaaaaaa", 1, 1, true, addr), false},
+		{"native min_unit_alias too short", NewMsgIssueToken(FUNGIBLE, NATIVE, "btc", "btc", "btc", 1, "a", 1, 1, true, addr), false},
+		{"native min_unit_alias  first letter is num", NewMsgIssueToken(FUNGIBLE, NATIVE, "btc", "btc", "btc", 1, "1a", 1, 1, true, addr), false},
+		{"native name empty", NewMsgIssueToken(FUNGIBLE, NATIVE, "btc", "btc", "", 1, "btc", 1, 1, true, addr), false},
+		{"native name blank", NewMsgIssueToken(FUNGIBLE, NATIVE, "btc", "btc", "  ", 1, "btc", 1, 1, true, addr), false},
+		{"native name too long", NewMsgIssueToken(FUNGIBLE, NATIVE, "btc", "btc", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 1, "satoshi", 1, 1, true, addr), false},
+		{"native initial supply is zero", NewMsgIssueToken(FUNGIBLE, NATIVE, "btc", "btc", "btc", 1, "satoshi", 0, 1, true, addr), true},
+		{"native max supply is zero", NewMsgIssueToken(FUNGIBLE, NATIVE, "btc", "btc", "btc", 1, "satoshi", 1, 0, true, addr), true},
+		{"native init supply bigger than max supply", NewMsgIssueToken(FUNGIBLE, NATIVE, "btc", "btc", "btc", 1, "satoshi", 2, 1, true, addr), false},
+		{"native decimal error", NewMsgIssueToken(FUNGIBLE, NATIVE, "btc", "btc", "btc", 19, "satoshi", 1, 1, true, addr), false},
 	}
 
 	for _, tc := range tests {
 		if tc.expectPass {
-			require.Nil(t, ValidateBasic(), "test: %v", tc.testCase)
+			require.Nil(t, tc.MsgIssueToken.ValidateBasic(), "test: %v", tc.testCase)
 		} else {
-			require.NotNil(t, ValidateBasic(), "test: %v", tc.testCase)
+			require.NotNil(t, tc.MsgIssueToken.ValidateBasic(), "test: %v", tc.testCase)
 		}
 	}
 }
@@ -77,9 +72,9 @@ func TestMsgEditToken(t *testing.T) {
 
 	for _, tc := range tests {
 		if tc.expectPass {
-			require.Nil(t, ValidateBasic(), "test: %v", tc.testCase)
+			require.Nil(t, tc.MsgEditToken.ValidateBasic(), "test: %v", tc.testCase)
 		} else {
-			require.NotNil(t, ValidateBasic(), "test: %v", tc.testCase)
+			require.NotNil(t, tc.MsgEditToken.ValidateBasic(), "test: %v", tc.testCase)
 		}
 	}
 }
@@ -98,7 +93,7 @@ func TestMsgEditTokenRoute(t *testing.T) {
 		TokenId:         tokenId,
 	}
 
-	require.Equal(t, "asset", Route())
+	require.Equal(t, "asset", msg.Route())
 }
 
 func TestMsgEditTokenGetSignBytes(t *testing.T) {
@@ -113,9 +108,9 @@ func TestMsgEditTokenGetSignBytes(t *testing.T) {
 		Mintable:        mintable,
 	}
 
-	res := GetSignBytes()
+	res := msg.GetSignBytes()
 
-	expected := `{"type":"irishub/asset/MsgEditToken","value":{"canonical_symbol":"btc","max_supply":"21000000","min_unit_alias":"satoshi","mintable":"false","name":"BTC TOKEN","owner":"faa1damkuetjqqah8w","token_id":"x.btc"}}`
+	expected := `{"type":"irishub/asset/MsgEditToken","value":{"canonical_symbol":"btc","max_supply":"21000000","min_unit_alias":"satoshi","mintable":"false","name":"BTC TOKEN","owner":"cosmos1damkuetjzyud4a","token_id":"x.btc"}}`
 	require.Equal(t, expected, string(res))
 }
 
@@ -141,9 +136,9 @@ func TestMsgMintTokenValidateBasic(t *testing.T) {
 	for _, td := range testData {
 		msg := NewMsgMintToken(td.tokeId, td.owner, td.to, td.amount)
 		if td.expectPass {
-			require.Nil(t, ValidateBasic(), "test: %v", td.msg)
+			require.Nil(t, msg.ValidateBasic(), "test: %v", td.msg)
 		} else {
-			require.NotNil(t, ValidateBasic(), "test: %v", td.msg)
+			require.NotNil(t, msg.ValidateBasic(), "test: %v", td.msg)
 		}
 	}
 }
@@ -166,9 +161,9 @@ func TestMsgTransferTokenOwnerValidation(t *testing.T) {
 	for _, td := range testData {
 		msg := NewMsgTransferTokenOwner(td.srcOwner, td.dstOwner, td.tokenId)
 		if td.expectPass {
-			require.Nil(t, ValidateBasic(), "test: %v", td.name)
+			require.Nil(t, msg.ValidateBasic(), "test: %v", td.name)
 		} else {
-			require.NotNil(t, ValidateBasic(), "test: %v", td.name)
+			require.NotNil(t, msg.ValidateBasic(), "test: %v", td.name)
 		}
 	}
 }

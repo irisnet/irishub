@@ -1,9 +1,7 @@
 package cli
 
 import (
-	"bufio"
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/cosmos/cosmos-sdk/client"
@@ -154,9 +152,9 @@ func GetCmdEditToken(cdc *codec.Codec) *cobra.Command {
 // GetCmdMintToken implements the mint token command
 func GetCmdMintToken(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "mint-token",
+		Use:     "mint-token [token-id]",
 		Short:   "The asset owner and operator can directly mint tokens to a specified address",
-		Example: fmt.Sprintf("%s tx asset mint-token --to [address] --amount [amount]", version.ClientName),
+		Example: fmt.Sprintf("%s tx asset mint-token [token-id] --to [address] --amount [amount]", version.ClientName),
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
@@ -184,8 +182,6 @@ func GetCmdMintToken(queryRoute string, cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			var prompt = "The token mint transaction will consume extra fee"
-
 			if !viper.GetBool(client.FlagGenerateOnly) {
 				tokenId, _ := iristypes.ConvertIdToTokenKeyId(args[0])
 				// query fee
@@ -196,18 +192,7 @@ func GetCmdMintToken(queryRoute string, cdc *codec.Codec) *cobra.Command {
 
 				// append mint fee to prompt
 				mintFeeMainUnit := sdk.Coins{fee.MintFee}.String()
-				prompt += fmt.Sprintf(": %s", mintFeeMainUnit)
-			}
-
-			// a confirmation is needed
-			prompt += "\nAre you sure to proceed?"
-			confirmed, err := client.GetConfirmation(prompt, bufio.NewReader(os.Stdin))
-			if err != nil {
-				return err
-			}
-
-			if !confirmed {
-				return fmt.Errorf("operation aborted")
+				fmt.Printf("The token mint transaction will consume extra fee: %s\n", mintFeeMainUnit)
 			}
 
 			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
@@ -222,9 +207,9 @@ func GetCmdMintToken(queryRoute string, cdc *codec.Codec) *cobra.Command {
 // GetCmdTransferTokenOwner implements the transfer token owner command
 func GetCmdTransferTokenOwner(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "transfer-token-owner",
+		Use:     "transfer-token-owner [token-id]",
 		Short:   "Transfer the owner of a token to a new owner",
-		Example: fmt.Sprintf("%s tx asset transfer-token-owner <token-id> --to=<new owner>", version.ClientName),
+		Example: fmt.Sprintf("%s tx asset transfer-token-owner [token-id] --to=<new owner>", version.ClientName),
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)

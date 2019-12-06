@@ -15,7 +15,7 @@ import (
 	tmtypes "github.com/tendermint/tendermint/types"
 )
 
-func TestIrisCLIEditToken(t *testing.T) {
+func TestIrisCLIIssueToken(t *testing.T) {
 	t.Parallel()
 	f := InitFixtures(t)
 	cdc := app.MakeCodec()
@@ -41,6 +41,7 @@ func TestIrisCLIEditToken(t *testing.T) {
 	defer proc.Stop(false)
 
 	fooAddr := f.KeyAddress(keyFoo)
+	barAddr := f.KeyAddress(keyBar)
 
 	fooAcc := f.QueryAccount(fooAddr)
 	startTokens := sdk.TokensFromConsensusPower(50)
@@ -51,7 +52,7 @@ func TestIrisCLIEditToken(t *testing.T) {
 
 	family := "fungible"
 	source := "native"
-	symbol := "AbcdefgH"
+	symbol := "abcdefgf"
 	name := "Bitcoin"
 	initialSupply := int64(100000000)
 	decimal := 18
@@ -80,10 +81,22 @@ func TestIrisCLIEditToken(t *testing.T) {
 	require.Equal(t, name, token.Name)
 	require.Equal(t, strings.ToLower(symbol), token.Symbol)
 
-	// Test --dry-run
+	tokenID := token.GetDenom()
+	require.NoError(t, err)
+
+	// check total supply
+	totalSupply := f.QueryTotalSupplyOf(tokenID)
+	require.Equal(t, sdk.NewIntWithDecimal(initialSupply, decimal).String(), totalSupply.String())
+
+	// check foo account
+	fooAmount := f.QueryAccount(fooAddr).Coins.AmountOf(tokenID)
+	require.Equal(t, sdk.NewIntWithDecimal(initialSupply, decimal).String(), fooAmount.String())
+
 	name1 := "BTC_Token"
 	maxSupply1 := int64(200000000)
 	mintable := true
+
+	// Test --dry-run
 	success, _, _ = f.TxAssetEditToken(keyFoo, symbol, name1, maxSupply1,
 		mintable, "--dry-run")
 	require.True(t, success)
@@ -97,14 +110,49 @@ func TestIrisCLIEditToken(t *testing.T) {
 	searchResult = f.QueryTxs(1, 50, "message.action:edit_token", fmt.Sprintf("message.sender:%s", fooAddr))
 	require.Len(t, searchResult.Txs, 1)
 
-	// Ensure token is directly queryable
+	// Ensure token has been edited
 	token1 := f.QueryAssetToken(symbol)
 	require.Equal(t, strings.ToLower(token.Symbol), token1.Symbol)
 	require.Equal(t, name1, token1.Name)
 	require.Equal(t, sdk.NewIntWithDecimal(maxSupply1, decimal).String(), token1.MaxSupply.String())
 	require.Equal(t, mintable, token1.Mintable)
 
-	// TODO: mint token and transfer owner test
+	mintAmount := int64(50000000)
+	// Test --dry-run
+	success, _, _ = f.TxAssetMintToken(keyFoo, symbol, mintAmount, barAddr, "--dry-run")
+	require.True(t, success)
+
+	// mint token
+	f.TxAssetMintToken(keyFoo, symbol, mintAmount, barAddr, "-y")
+	tests.WaitForNextNBlocksTM(1, f.Port)
+
+	// Ensure transaction tags can be queried
+	searchResult = f.QueryTxs(1, 50, "message.action:mint_token", fmt.Sprintf("message.sender:%s", fooAddr))
+	require.Len(t, searchResult.Txs, 1)
+
+	// Ensure token has been minted
+	totalSupply1 := f.QueryTotalSupplyOf(tokenID)
+	require.Equal(t, sdk.NewIntWithDecimal(initialSupply+mintAmount, decimal).String(), totalSupply1.String())
+
+	// check bar account
+	barAmount := f.QueryAccount(barAddr).Coins.AmountOf(tokenID)
+	require.Equal(t, sdk.NewIntWithDecimal(mintAmount, decimal).String(), barAmount.String())
+
+	// Test --dry-run
+	success, _, _ = f.TxAssetTransferTokenOwner(keyFoo, symbol, barAddr, "--dry-run")
+	require.True(t, success)
+
+	// transfer token owner
+	f.TxAssetTransferTokenOwner(keyFoo, symbol, barAddr, "-y")
+	tests.WaitForNextNBlocksTM(1, f.Port)
+
+	// Ensure transaction tags can be queried
+	searchResult = f.QueryTxs(1, 50, "message.action:transfer_token_owner", fmt.Sprintf("message.sender:%s", fooAddr))
+	require.Len(t, searchResult.Txs, 1)
+
+	// Ensure token owner has been modified
+	token2 := f.QueryAssetToken(symbol)
+	require.Equal(t, barAddr.String(), token2.Owner.String())
 }
 
 // QueryAssetTokens is iriscli query asset tokens
@@ -153,5 +201,19 @@ func (f *Fixtures) TxAssetEditToken(from, symbol, name string, maxSupply int64,
 	cmd := fmt.Sprintf("%s tx asset edit-token %v --from=%s", f.IriscliBinary, f.Flags(), from)
 	cmd += fmt.Sprintf(" %s --name=%s --max-supply=%d --mintable=%v",
 		symbol, name, maxSupply, mintable)
+	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), client.DefaultKeyPass)
+}
+
+// TxAssetMintToken is iriscli tx asset mint-token
+func (f *Fixtures) TxAssetMintToken(from, tokenID string, amount int64, to sdk.AccAddress, flags ...string) (bool, string, string) {
+	cmd := fmt.Sprintf("%s tx asset mint-token %v --from=%s", f.IriscliBinary, f.Flags(), from)
+	cmd += fmt.Sprintf(" %s --to=%s --amount=%d", tokenID, to, amount)
+	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), client.DefaultKeyPass)
+}
+
+// TxAssetTransferTokenOwner is iriscli tx asset transfer-token-owner
+func (f *Fixtures) TxAssetTransferTokenOwner(from, tokenID string, to sdk.AccAddress, flags ...string) (bool, string, string) {
+	cmd := fmt.Sprintf("%s tx asset transfer-token-owner %v --from=%s", f.IriscliBinary, f.Flags(), from)
+	cmd += fmt.Sprintf(" %s --to=%s", tokenID, to)
 	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), client.DefaultKeyPass)
 }
