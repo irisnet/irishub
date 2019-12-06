@@ -18,6 +18,8 @@ const (
 	QuerierRoute     = types.QuerierRoute
 	Ordinary         = types.Ordinary
 	Genesis          = types.Genesis
+	QueryProfilers   = types.QueryProfilers
+	QueryTrustees    = types.QueryTrustees
 
 	EventTypeAddProfiler    = types.EventTypeAddProfiler
 	EventTypeAddTrustee     = types.EventTypeAddTrustee
