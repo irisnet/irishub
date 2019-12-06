@@ -29,6 +29,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	"github.com/cosmos/cosmos-sdk/x/supply"
+
+	"github.com/irisnet/irishub/modules/coinswap"
 )
 
 const appName = "SimApp"
@@ -56,6 +58,7 @@ var (
 		crisis.AppModuleBasic{},
 		slashing.AppModuleBasic{},
 		evidence.AppModuleBasic{},
+		coinswap.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -66,6 +69,7 @@ var (
 		staking.BondedPoolName:    {supply.Burner, supply.Staking},
 		staking.NotBondedPoolName: {supply.Burner, supply.Staking},
 		gov.ModuleName:            {supply.Burner},
+		coinswap.ModuleName:       {supply.Minter, supply.Burner},
 	}
 )
 
@@ -107,6 +111,7 @@ type SimApp struct {
 	CrisisKeeper   crisis.Keeper
 	ParamsKeeper   params.Keeper
 	EvidenceKeeper evidence.Keeper
+	CoinswapKeeper coinswap.Keeper
 
 	// the module manager
 	mm *module.Manager
@@ -130,7 +135,7 @@ func NewSimApp(
 	keys := sdk.NewKVStoreKeys(
 		bam.MainStoreKey, auth.StoreKey, staking.StoreKey, supply.StoreKey, mint.StoreKey,
 		distr.StoreKey, slashing.StoreKey, gov.StoreKey, params.StoreKey,
-		evidence.StoreKey,
+		evidence.StoreKey, coinswap.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(params.TStoreKey)
 
@@ -154,6 +159,7 @@ func NewSimApp(
 	app.subspaces[gov.ModuleName] = app.ParamsKeeper.Subspace(gov.DefaultParamspace).WithKeyTable(gov.ParamKeyTable())
 	app.subspaces[crisis.ModuleName] = app.ParamsKeeper.Subspace(crisis.DefaultParamspace)
 	app.subspaces[evidence.ModuleName] = app.ParamsKeeper.Subspace(evidence.DefaultParamspace)
+	app.subspaces[coinswap.ModuleName] = app.ParamsKeeper.Subspace(coinswap.DefaultParamspace)
 
 	// add keepers
 	app.AccountKeeper = auth.NewAccountKeeper(
@@ -182,6 +188,9 @@ func NewSimApp(
 	)
 	app.CrisisKeeper = crisis.NewKeeper(
 		app.subspaces[crisis.ModuleName], invCheckPeriod, app.SupplyKeeper, auth.FeeCollectorName,
+	)
+	app.CoinswapKeeper = coinswap.NewKeeper(
+		app.cdc, keys[coinswap.StoreKey], app.BankKeeper, app.AccountKeeper, app.SupplyKeeper, app.subspaces[coinswap.ModuleName],
 	)
 
 	// create evidence keeper with router
@@ -223,6 +232,7 @@ func NewSimApp(
 		slashing.NewAppModule(app.SlashingKeeper, app.StakingKeeper),
 		staking.NewAppModule(app.StakingKeeper, app.AccountKeeper, app.SupplyKeeper),
 		evidence.NewAppModule(app.EvidenceKeeper),
+		coinswap.NewAppModule(app.CoinswapKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -236,7 +246,7 @@ func NewSimApp(
 	app.mm.SetOrderInitGenesis(
 		auth.ModuleName, distr.ModuleName, staking.ModuleName, bank.ModuleName,
 		slashing.ModuleName, gov.ModuleName, mint.ModuleName, supply.ModuleName,
-		crisis.ModuleName, genutil.ModuleName, evidence.ModuleName,
+		crisis.ModuleName, genutil.ModuleName, evidence.ModuleName, coinswap.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -255,6 +265,7 @@ func NewSimApp(
 		distr.NewAppModule(app.DistrKeeper, app.SupplyKeeper),
 		staking.NewAppModule(app.StakingKeeper, app.AccountKeeper, app.SupplyKeeper),
 		slashing.NewAppModule(app.SlashingKeeper, app.StakingKeeper),
+		coinswap.NewAppModule(app.CoinswapKeeper),
 	)
 
 	app.sm.RegisterStoreDecoders()

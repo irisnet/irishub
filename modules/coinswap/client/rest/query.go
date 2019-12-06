@@ -9,7 +9,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/types/rest"
 
-	"github.com/irisnet/irishub/modules/coinswap"
 	"github.com/irisnet/irishub/modules/coinswap/internal/types"
 )
 
@@ -23,7 +22,7 @@ func queryLiquidityHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		id := vars["id"]
-		params := coinswap.QueryLiquidityParams{
+		params := types.QueryLiquidityParams{
 			Id: id,
 		}
 

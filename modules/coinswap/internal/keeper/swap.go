@@ -15,7 +15,7 @@ func (k Keeper) swapCoins(ctx sdk.Context, sender, recipient sdk.AccAddress, coi
 		return err
 	}
 
-	poolAddr := getReservePoolAddr(uniId)
+	poolAddr := GetReservePoolAddr(uniId)
 	err = k.bk.SendCoins(ctx, sender, poolAddr, sdk.NewCoins(coinSold))
 	if err != nil {
 		return err
@@ -55,7 +55,7 @@ func (k Keeper) calculateWithExactInput(ctx sdk.Context, exactSoldCoin sdk.Coin,
 	}
 	param := k.GetParams(ctx)
 
-	boughtTokenAmt := getInputPrice(exactSoldCoin.Amount, inputReserve, outputReserve, param.Fee)
+	boughtTokenAmt := GetInputPrice(exactSoldCoin.Amount, inputReserve, outputReserve, param.Fee)
 	return boughtTokenAmt, nil
 }
 
@@ -67,7 +67,7 @@ Sell exact amount of a token for buying another, one of them must be iris
 @param receipt: address of the receiver
 @return: actual amount of the token to be bought
 */
-func (k Keeper) tradeExactInputForOutput(ctx sdk.Context, input types.Input, output types.Output) (sdk.Int, sdk.Error) {
+func (k Keeper) TradeExactInputForOutput(ctx sdk.Context, input types.Input, output types.Output) (sdk.Int, sdk.Error) {
 	boughtTokenAmt, err := k.calculateWithExactInput(ctx, input.Coin, output.Coin.Denom)
 	if err != nil {
 		return sdk.ZeroInt(), err
@@ -151,7 +151,7 @@ func (k Keeper) calculateWithExactOutput(ctx sdk.Context, exactBoughtCoin sdk.Co
 	}
 	param := k.GetParams(ctx)
 
-	soldTokenAmt := getOutputPrice(exactBoughtCoin.Amount, inputReserve, outputReserve, param.Fee)
+	soldTokenAmt := GetOutputPrice(exactBoughtCoin.Amount, inputReserve, outputReserve, param.Fee)
 	return soldTokenAmt, nil
 }
 
@@ -163,7 +163,7 @@ Buy exact amount of a token by specifying the max amount of another token, one o
 @param receipt : address of the receiver
 @return : actual amount of the token to be payed
 */
-func (k Keeper) tradeInputForExactOutput(ctx sdk.Context, input types.Input, output types.Output) (sdk.Int, sdk.Error) {
+func (k Keeper) TradeInputForExactOutput(ctx sdk.Context, input types.Input, output types.Output) (sdk.Int, sdk.Error) {
 	soldTokenAmt, err := k.calculateWithExactOutput(ctx, output.Coin, input.Coin.Denom)
 	if err != nil {
 		return sdk.ZeroInt(), err
@@ -222,19 +222,19 @@ func (k Keeper) doubleTradeInputForExactOutput(ctx sdk.Context, input types.Inpu
 // getInputPrice returns the amount of coins bought (calculated) given the input amount being sold (exact)
 // The fee is included in the input coins being bought
 // https://github.com/runtimeverification/verified-smart-contracts/blob/uniswap/uniswap/x-y-k.pdf
-func getInputPrice(inputAmt, inputReserve, outputReserve sdk.Int, fee sdk.Dec) sdk.Int {
+func GetInputPrice(inputAmt, inputReserve, outputReserve sdk.Int, fee sdk.Dec) sdk.Int {
 	deltaFee := sdk.OneDec().Sub(fee)
-	inputAmtWithFee := inputAmt.Mul(deltaFee.Num())
+	inputAmtWithFee := inputAmt.Mul(sdk.NewIntFromBigInt(deltaFee.Int))
 	numerator := inputAmtWithFee.Mul(outputReserve)
-	denominator := inputReserve.Mul(deltaFee.Denom()).Add(inputAmtWithFee)
+	denominator := inputReserve.Mul(sdk.NewIntWithDecimal(1, sdk.Precision)).Add(inputAmtWithFee)
 	return numerator.Quo(denominator)
 }
 
 // getOutputPrice returns the amount of coins sold (calculated) given the output amount being bought (exact)
 // The fee is included in the output coins being bought
-func getOutputPrice(outputAmt, inputReserve, outputReserve sdk.Int, fee sdk.Dec) sdk.Int {
+func GetOutputPrice(outputAmt, inputReserve, outputReserve sdk.Int, fee sdk.Dec) sdk.Int {
 	deltaFee := sdk.OneDec().Sub(fee)
-	numerator := inputReserve.Mul(outputAmt).Mul(deltaFee.Denom())
-	denominator := (outputReserve.Sub(outputAmt)).Mul(deltaFee.Num())
+	numerator := inputReserve.Mul(outputAmt).Mul(sdk.NewIntWithDecimal(1, sdk.Precision))
+	denominator := (outputReserve.Sub(outputAmt)).Mul(sdk.NewIntFromBigInt(deltaFee.Int))
 	return numerator.Quo(denominator).Add(sdk.OneInt())
 }

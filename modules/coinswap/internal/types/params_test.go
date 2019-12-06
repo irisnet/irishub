@@ -14,6 +14,9 @@ func TestValidateParams(t *testing.T) {
 	err := ValidateParams(defaultParams)
 	require.Nil(t, err)
 
+	require.Panics(t, func() { sdk.NewDecWithPrec(1, 19) }, "should panic")
+	require.Panics(t, func() { sdk.NewDecWithPrec(1, -1) }, "should panic")
+
 	// all cases should return an error
 	invalidTests := []struct {
 		name   string
@@ -23,7 +26,6 @@ func TestValidateParams(t *testing.T) {
 		{"fee == 0 ", NewParams(sdk.ZeroDec()), false},
 		{"fee < 1", NewParams(sdk.NewDecWithPrec(1000, 2)), false},
 		{"fee numerator < 0", NewParams(sdk.NewDecWithPrec(-1, 1)), false},
-		{"fee denominator < 0", NewParams(sdk.NewDecWithPrec(1, -1)), false},
 	}
 
 	for _, tc := range invalidTests {

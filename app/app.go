@@ -28,6 +28,8 @@ import (
 	cmn "github.com/tendermint/tendermint/libs/common"
 	"github.com/tendermint/tendermint/libs/log"
 	dbm "github.com/tendermint/tm-db"
+
+	"github.com/irisnet/irishub/modules/coinswap"
 )
 
 const appName = "IrisApp"
@@ -54,6 +56,8 @@ var (
 		crisis.AppModuleBasic{},
 		slashing.AppModuleBasic{},
 		supply.AppModuleBasic{},
+		coinswap.AppModuleBasic{},
+
 	)
 
 	// module account permissions
@@ -64,6 +68,7 @@ var (
 		staking.BondedPoolName:    {supply.Burner, supply.Staking},
 		staking.NotBondedPoolName: {supply.Burner, supply.Staking},
 		gov.ModuleName:            {supply.Burner},
+		coinswap.ModuleName:       {supply.Minter, supply.Burner},
 	}
 )
 
@@ -104,6 +109,7 @@ type IrisApp struct {
 	crisisKeeper   crisis.Keeper
 	paramsKeeper   params.Keeper
 	evidenceKeeper *evidence.Keeper
+	coinswapKeeper coinswap.Keeper
 
 	// the module manager
 	mm *module.Manager
@@ -125,7 +131,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 	keys := sdk.NewKVStoreKeys(
 		bam.MainStoreKey, auth.StoreKey, staking.StoreKey, supply.StoreKey,
 		mint.StoreKey, distr.StoreKey, slashing.StoreKey, gov.StoreKey,
-		params.StoreKey, evidence.StoreKey,
+		params.StoreKey, evidence.StoreKey, coinswap.StoreKey,
 	)
 	tKeys := sdk.NewTransientStoreKeys(staking.TStoreKey, params.TStoreKey)
 
@@ -148,6 +154,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 	govSubspace := app.paramsKeeper.Subspace(gov.DefaultParamspace).WithKeyTable(gov.ParamKeyTable())
 	crisisSubspace := app.paramsKeeper.Subspace(crisis.DefaultParamspace)
 	evidenceSubspace := app.paramsKeeper.Subspace(evidence.DefaultParamspace)
+	coinswapSubspace := app.paramsKeeper.Subspace(coinswap.DefaultParamspace)
 
 	// add keepers
 	app.accountKeeper = auth.NewAccountKeeper(app.cdc, keys[auth.StoreKey], authSubspace, auth.ProtoBaseAccount)
@@ -188,6 +195,10 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 		staking.NewMultiStakingHooks(app.distrKeeper.Hooks(), app.slashingKeeper.Hooks()),
 	)
 
+	app.coinswapKeeper = coinswap.NewKeeper(
+		app.cdc, keys[coinswap.StoreKey], app.bankKeeper, app.accountKeeper, app.supplyKeeper, coinswapSubspace,
+	)
+
 	// NOTE: Any module instantiated in the module manager that is later modified
 	// must be passed by reference here.
 	app.mm = module.NewManager(
@@ -202,6 +213,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 		slashing.NewAppModule(app.slashingKeeper, app.stakingKeeper),
 		staking.NewAppModule(app.stakingKeeper, app.accountKeeper, app.supplyKeeper),
 		evidence.NewAppModule(*app.evidenceKeeper),
+		coinswap.NewAppModule(app.coinswapKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -216,7 +228,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 	app.mm.SetOrderInitGenesis(
 		distr.ModuleName, staking.ModuleName, auth.ModuleName, bank.ModuleName,
 		slashing.ModuleName, gov.ModuleName, mint.ModuleName, supply.ModuleName,
-		crisis.ModuleName, genutil.ModuleName, evidence.ModuleName,
+		crisis.ModuleName, genutil.ModuleName, evidence.ModuleName, coinswap.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.crisisKeeper)
@@ -235,6 +247,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 		distr.NewAppModule(app.distrKeeper, app.supplyKeeper),
 		staking.NewAppModule(app.stakingKeeper, app.accountKeeper, app.supplyKeeper),
 		slashing.NewAppModule(app.slashingKeeper, app.stakingKeeper),
+		coinswap.NewAppModule(app.coinswapKeeper),
 	)
 
 	app.sm.RegisterStoreDecoders()

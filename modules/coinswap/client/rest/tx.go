@@ -11,7 +11,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/rest"
 	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
 
-	"github.com/irisnet/irishub/modules/coinswap"
+	"github.com/irisnet/irishub/modules/coinswap/internal/types"
 )
 
 func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router) {
@@ -26,13 +26,13 @@ func addLiquidityHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 		vars := mux.Vars(r)
 		id := vars["id"]
 
-		uniDenom, err := coinswap.GetUniDenom(id)
+		uniDenom, err := types.GetUniDenom(id)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		tokenDenom, err := coinswap.GetCoinMinDenomFromUniDenom(uniDenom)
+		tokenDenom, err := types.GetCoinMinDenomFromUniDenom(uniDenom)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -80,7 +80,7 @@ func addLiquidityHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		msg := coinswap.NewMsgAddLiquidity(sdk.NewCoin(tokenDenom, maxToken), exactIrisAmt, minLiquidity, deadline.Unix(), senderAddress)
+		msg := types.NewMsgAddLiquidity(sdk.NewCoin(tokenDenom, maxToken), exactIrisAmt, minLiquidity, deadline.Unix(), senderAddress)
 		err = msg.ValidateBasic()
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -96,7 +96,7 @@ func removeLiquidityHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 		vars := mux.Vars(r)
 		id := vars["id"]
 
-		uniDenom, err := coinswap.GetUniDenom(id)
+		uniDenom, err := types.GetUniDenom(id)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -144,7 +144,7 @@ func removeLiquidityHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		msg := coinswap.NewMsgRemoveLiquidity(minToken, sdk.NewCoin(uniDenom, liquidityAmt), minIris, deadline.Unix(), senderAddress)
+		msg := types.NewMsgRemoveLiquidity(minToken, sdk.NewCoin(uniDenom, liquidityAmt), minIris, deadline.Unix(), senderAddress)
 		err = msg.ValidateBasic()
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -188,11 +188,11 @@ func swapOrderHandlerFn(cliCtx context.CLIContext, isBuyOrder bool) http.Handler
 			return
 		}
 
-		input := coinswap.Input{Address: senderAddress, Coin: req.Input.Coin}
-		output := coinswap.Output{Address: recipientAddress, Coin: req.Output.Coin}
+		input := types.Input{Address: senderAddress, Coin: req.Input.Coin}
+		output := types.Output{Address: recipientAddress, Coin: req.Output.Coin}
 		deadline := time.Now().Add(duration)
 
-		msg := coinswap.NewMsgSwapOrder(input, output, deadline.Unix(), isBuyOrder)
+		msg := types.NewMsgSwapOrder(input, output, deadline.Unix(), isBuyOrder)
 		err = msg.ValidateBasic()
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())

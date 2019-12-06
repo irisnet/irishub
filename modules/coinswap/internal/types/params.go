@@ -9,7 +9,7 @@ import (
 
 const (
 	// DefaultParamSpace for coinswap
-	DefaultParamSpace = ModuleName
+	DefaultParamspace = ModuleName
 )
 
 // Parameter store keys
@@ -19,7 +19,7 @@ var (
 
 // Params defines the fee and native denomination for coinswap
 type Params struct {
-	Fee sdk.Dec `json:"fee"`
+	Fee sdk.Dec `json:"fee" yaml:"fee"`
 }
 
 // NewParams coinswap params constructor
