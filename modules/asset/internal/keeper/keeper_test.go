@@ -149,7 +149,7 @@ func (suite *KeeperTestSuite) TestTransferOwnerKeeper() {
 	msg := types.MsgTransferTokenOwner{
 		SrcOwner: srcOwner,
 		DstOwner: dstOwner,
-		TokenId:  "btc",
+		TokenID:  "btc",
 	}
 	err = suite.keeper.TransferTokenOwner(suite.ctx, msg)
 	suite.NoError(err)

@@ -91,7 +91,7 @@ func handleMsgEditToken(ctx sdk.Context, k Keeper, msg MsgEditToken) sdk.Result 
 		),
 		sdk.NewEvent(
 			types.EventTypeEditToken,
-			sdk.NewAttribute(types.AttributeKeyTokenID, msg.TokenId),
+			sdk.NewAttribute(types.AttributeKeyTokenID, msg.TokenID),
 		),
 	})
 
@@ -115,7 +115,7 @@ func handleMsgTransferTokenOwner(ctx sdk.Context, k Keeper, msg MsgTransferToken
 		),
 		sdk.NewEvent(
 			types.EventTypeTransferTokenOwner,
-			sdk.NewAttribute(types.AttributeKeyTokenID, msg.TokenId),
+			sdk.NewAttribute(types.AttributeKeyTokenID, msg.TokenID),
 		),
 	})
 
@@ -139,7 +139,7 @@ func handleMsgMintToken(ctx sdk.Context, k Keeper, msg MsgMintToken) sdk.Result 
 		),
 		sdk.NewEvent(
 			types.EventTypeMintToken,
-			sdk.NewAttribute(types.AttributeKeyTokenID, msg.TokenId),
+			sdk.NewAttribute(types.AttributeKeyTokenID, msg.TokenID),
 			sdk.NewAttribute(sdk.AttributeKeyAmount, string(msg.Amount)),
 		),
 	})

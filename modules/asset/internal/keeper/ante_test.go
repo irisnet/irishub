@@ -48,7 +48,7 @@ package keeper
 //	msgCreateGateway := types.NewMsgCreateGateway(addr1, "mon", "i", "d", "w")
 //	msgIssueNativeToken := types.MsgIssueToken{Source: types.AssetSource(0x00), Symbol: "sym"}
 //	msgIssueGatewayToken := types.MsgIssueToken{Source: types.AssetSource(0x02), Symbol: "sym"}
-//	msgMintNativeToken := types.MsgMintToken{TokenId: "i.sym"}
+//	msgMintNativeToken := types.MsgMintToken{TokenID: "i.sym"}
 //	msgNonAsset1 := sdk.NewTestMsg(addr1)
 //	msgNonAsset2 := sdk.NewTestMsg(addr2)
 //

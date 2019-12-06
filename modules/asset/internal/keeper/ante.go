@@ -52,7 +52,7 @@ package keeper
 //				break
 //
 //			case types.MsgMintToken:
-//				prefix, symbol := types.GetTokenIDParts(msg.TokenId)
+//				prefix, symbol := types.GetTokenIDParts(msg.TokenID)
 //
 //				if prefix == "" || prefix == "i" {
 //					msgFee = GetTokenMintFee(ctx, k, symbol)

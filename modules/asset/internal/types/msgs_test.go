@@ -90,7 +90,7 @@ func TestMsgEditTokenRoute(t *testing.T) {
 		MinUnitAlias:    minUnitAlias,
 		MaxSupply:       10000000,
 		Mintable:        mintable,
-		TokenId:         tokenId,
+		TokenID:         tokenId,
 	}
 
 	require.Equal(t, "asset", msg.Route())
@@ -101,7 +101,7 @@ func TestMsgEditTokenGetSignBytes(t *testing.T) {
 	var msg = MsgEditToken{
 		Name:            "BTC TOKEN",
 		Owner:           sdk.AccAddress([]byte("owner")),
-		TokenId:         "x.btc",
+		TokenID:         "x.btc",
 		CanonicalSymbol: "btc",
 		MinUnitAlias:    "satoshi",
 		MaxSupply:       21000000,

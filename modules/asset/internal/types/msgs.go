@@ -173,16 +173,16 @@ func (msg MsgIssueToken) GetSigners() []sdk.AccAddress {
 type MsgTransferTokenOwner struct {
 	SrcOwner sdk.AccAddress `json:"src_owner"` // the current owner address of the token
 	DstOwner sdk.AccAddress `json:"dst_owner"` // the new owner
-	TokenId  string         `json:"token_id"`
+	TokenID  string         `json:"token_id"`
 }
 
 // NewMsgTransferTokenOwner - construct token transfer msg
-func NewMsgTransferTokenOwner(srcOwner, dstOwner sdk.AccAddress, tokenId string) MsgTransferTokenOwner {
-	tokenId = strings.TrimSpace(tokenId)
+func NewMsgTransferTokenOwner(srcOwner, dstOwner sdk.AccAddress, tokenID string) MsgTransferTokenOwner {
+	tokenID = strings.TrimSpace(tokenID)
 	return MsgTransferTokenOwner{
 		SrcOwner: srcOwner,
 		DstOwner: dstOwner,
-		TokenId:  tokenId,
+		TokenID:  tokenID,
 	}
 }
 
@@ -217,7 +217,7 @@ func (msg MsgTransferTokenOwner) ValidateBasic() sdk.Error {
 	}
 
 	// check the tokenId
-	if err := CheckTokenID(msg.TokenId); err != nil {
+	if err := CheckTokenID(msg.TokenID); err != nil {
 		return err
 	}
 
@@ -232,7 +232,7 @@ func (msg MsgTransferTokenOwner) Type() string { return "transfer_token_owner" }
 
 // MsgEditToken for editing a specified token
 type MsgEditToken struct {
-	TokenId         string         `json:"token_id"`         //  id of token
+	TokenID         string         `json:"token_id"`         //  id of token
 	Owner           sdk.AccAddress `json:"owner"`            //  owner of token
 	CanonicalSymbol string         `json:"canonical_symbol"` //  canonical_symbol of token
 	MinUnitAlias    string         `json:"min_unit_alias"`   //  min_unit_alias of token
@@ -242,7 +242,7 @@ type MsgEditToken struct {
 }
 
 // NewMsgEditToken creates a MsgEditToken
-func NewMsgEditToken(name, canonicalSymbol, minUnitAlias, tokenId string, maxSupply uint64, mintable Bool, owner sdk.AccAddress) MsgEditToken {
+func NewMsgEditToken(name, canonicalSymbol, minUnitAlias, tokenID string, maxSupply uint64, mintable Bool, owner sdk.AccAddress) MsgEditToken {
 	name = strings.TrimSpace(name)
 	canonicalSymbol = strings.ToLower(strings.TrimSpace(canonicalSymbol))
 	minUnitAlias = strings.ToLower(strings.TrimSpace(minUnitAlias))
@@ -250,7 +250,7 @@ func NewMsgEditToken(name, canonicalSymbol, minUnitAlias, tokenId string, maxSup
 		Name:            name,
 		CanonicalSymbol: canonicalSymbol,
 		MinUnitAlias:    minUnitAlias,
-		TokenId:         tokenId,
+		TokenID:         tokenID,
 		MaxSupply:       maxSupply,
 		Mintable:        mintable,
 		Owner:           owner,
@@ -282,7 +282,7 @@ func (msg MsgEditToken) ValidateBasic() sdk.Error {
 	}
 
 	//check token_id
-	if err := CheckTokenID(msg.TokenId); err != nil {
+	if err := CheckTokenID(msg.TokenID); err != nil {
 		return err
 	}
 
@@ -317,17 +317,17 @@ func (msg MsgEditToken) GetSigners() []sdk.AccAddress {
 
 // MsgMintToken for mint the token to a specified address
 type MsgMintToken struct {
-	TokenId string         `json:"token_id"` // the unique id of the token
+	TokenID string         `json:"token_id"` // the unique id of the token
 	Owner   sdk.AccAddress `json:"owner"`    // the current owner address of the token
 	To      sdk.AccAddress `json:"to"`       // address of mint token to
 	Amount  uint64         `json:"amount"`   // amount of mint token
 }
 
 // NewMsgMintToken creates a MsgMintToken
-func NewMsgMintToken(tokenId string, owner, to sdk.AccAddress, amount uint64) MsgMintToken {
-	tokenId = strings.TrimSpace(tokenId)
+func NewMsgMintToken(tokenID string, owner, to sdk.AccAddress, amount uint64) MsgMintToken {
+	tokenID = strings.TrimSpace(tokenID)
 	return MsgMintToken{
-		TokenId: tokenId,
+		TokenID: tokenID,
 		Owner:   owner,
 		To:      to,
 		Amount:  amount,
@@ -365,7 +365,7 @@ func (msg MsgMintToken) ValidateBasic() sdk.Error {
 		return ErrInvalidAssetMaxSupply(DefaultCodespace, fmt.Sprintf("invalid token amount %d, only accepts value (0, %d]", msg.Amount, MaximumAssetMaxSupply))
 	}
 
-	return CheckTokenID(msg.TokenId)
+	return CheckTokenID(msg.TokenID)
 }
 
 // ValidateMoniker checks if the specified moniker is valid

@@ -9,6 +9,7 @@ import (
 	"github.com/irisnet/irishub/modules/asset/internal/types"
 )
 
+// Keeper defines the module module Keeper
 type Keeper struct {
 	storeKey  sdk.StoreKey
 	cdc       *codec.Codec
@@ -22,9 +23,15 @@ type Keeper struct {
 	feeCollectorName string
 }
 
+// NewKeeper returns a asset keeper
 func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, paramSpace params.Subspace,
 	codespace sdk.CodespaceType, supplyKeeper types.SupplyKeeper, feeCollectorName string,
 ) Keeper {
+	// ensure asset module account is set
+	if addr := supplyKeeper.GetModuleAddress(types.ModuleName); addr == nil {
+		panic(fmt.Sprintf("%s module account has not been set", types.ModuleName))
+	}
+
 	return Keeper{
 		storeKey:         key,
 		cdc:              cdc,
@@ -35,12 +42,12 @@ func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, paramSpace params.Subspace,
 	}
 }
 
-// return the codespace
+// Codespace returns the codespace
 func (k Keeper) Codespace() sdk.CodespaceType {
 	return k.codespace
 }
 
-// IssueToken issue a new token
+// IssueToken issues a new token
 func (k Keeper) IssueToken(ctx sdk.Context, token types.FungibleToken) sdk.Error {
 	token, owner, err := k.AddToken(ctx, token)
 	if err != nil {
@@ -67,7 +74,7 @@ func (k Keeper) IssueToken(ctx sdk.Context, token types.FungibleToken) sdk.Error
 	return nil
 }
 
-// save a new token to keystore
+// AddToken adds a new token to keystore
 func (k Keeper) AddToken(ctx sdk.Context, token types.FungibleToken) (types.FungibleToken, sdk.AccAddress, sdk.Error) {
 	token.Sanitize()
 	tokenId, err := types.GetTokenID(token.GetSource(), token.GetSymbol())
@@ -84,21 +91,21 @@ func (k Keeper) AddToken(ctx sdk.Context, token types.FungibleToken) (types.Fung
 		token.CanonicalSymbol = ""
 	}
 
-	err = k.SetToken(ctx, token)
+	err = k.setToken(ctx, token)
 	if err != nil {
 		return token, nil, err
 	}
 
 	// Set token to be prefixed with owner and source
 	if token.GetSource() == types.NATIVE {
-		err = k.SetTokens(ctx, owner, token)
+		err = k.setTokens(ctx, owner, token)
 		if err != nil {
 			return token, nil, err
 		}
 	}
 
 	// Set token to be prefixed with source
-	err = k.SetTokens(ctx, sdk.AccAddress{}, token)
+	err = k.setTokens(ctx, sdk.AccAddress{}, token)
 	if err != nil {
 		return token, nil, err
 	}
@@ -106,12 +113,14 @@ func (k Keeper) AddToken(ctx sdk.Context, token types.FungibleToken) (types.Fung
 	return token, owner, nil
 }
 
+// HasToken checks if the token exists
 func (k Keeper) HasToken(ctx sdk.Context, tokenId string) bool {
 	store := ctx.KVStore(k.storeKey)
 	return store.Has(KeyToken(tokenId))
 }
 
-func (k Keeper) SetToken(ctx sdk.Context, token types.FungibleToken) sdk.Error {
+// save token
+func (k Keeper) setToken(ctx sdk.Context, token types.FungibleToken) sdk.Error {
 	store := ctx.KVStore(k.storeKey)
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(token)
 
@@ -124,9 +133,9 @@ func (k Keeper) SetToken(ctx sdk.Context, token types.FungibleToken) sdk.Error {
 	return nil
 }
 
-func (k Keeper) SetTokens(ctx sdk.Context, owner sdk.AccAddress, token types.FungibleToken) sdk.Error {
+// save tokens' owner
+func (k Keeper) setTokens(ctx sdk.Context, owner sdk.AccAddress, token types.FungibleToken) sdk.Error {
 	store := ctx.KVStore(k.storeKey)
-
 	tokenId, err := types.GetTokenID(token.GetSource(), token.GetSymbol())
 	if err != nil {
 		return err
@@ -138,9 +147,10 @@ func (k Keeper) SetTokens(ctx sdk.Context, owner sdk.AccAddress, token types.Fun
 	return nil
 }
 
-func (k Keeper) GetToken(ctx sdk.Context, tokenId string) (token types.FungibleToken, found bool) {
+// GetToken returns token by specified tokenID
+func (k Keeper) GetToken(ctx sdk.Context, tokenID string) (token types.FungibleToken, found bool) {
 	store := ctx.KVStore(k.storeKey)
-	bz := store.Get(KeyToken(tokenId))
+	bz := store.Get(KeyToken(tokenID))
 	if bz == nil {
 		return token, false
 	}
@@ -149,6 +159,7 @@ func (k Keeper) GetToken(ctx sdk.Context, tokenId string) (token types.FungibleT
 	return token, true
 }
 
+// GetTokens returns tokens by specified owner
 func (k Keeper) GetTokens(ctx sdk.Context, owner sdk.AccAddress, nonSymbolTokenId string) sdk.Iterator {
 	store := ctx.KVStore(k.storeKey)
 	return sdk.KVStorePrefixIterator(store, KeyTokens(owner, nonSymbolTokenId))
@@ -157,13 +168,13 @@ func (k Keeper) GetTokens(ctx sdk.Context, owner sdk.AccAddress, nonSymbolTokenI
 // EditToken edits the specified token
 func (k Keeper) EditToken(ctx sdk.Context, msg types.MsgEditToken) sdk.Error {
 	// get the destination token
-	token, exist := k.GetToken(ctx, msg.TokenId)
+	token, exist := k.GetToken(ctx, msg.TokenID)
 	if !exist {
-		return types.ErrAssetNotExists(k.codespace, fmt.Sprintf("token %s does not exist", msg.TokenId))
+		return types.ErrAssetNotExists(k.codespace, fmt.Sprintf("token %s does not exist", msg.TokenID))
 	}
 
 	if !msg.Owner.Equals(token.Owner) {
-		return types.ErrInvalidOwner(k.codespace, fmt.Sprintf("the address %d is not the owner of the token %s", msg.Owner, msg.TokenId))
+		return types.ErrInvalidOwner(k.codespace, fmt.Sprintf("the address %d is not the owner of the token %s", msg.Owner, msg.TokenID))
 	}
 
 	hasIssuedAmt := k.AssetTokenSupply(ctx, token.GetDenom())
@@ -190,7 +201,7 @@ func (k Keeper) EditToken(ctx sdk.Context, msg types.MsgEditToken) sdk.Error {
 		token.Mintable = msg.Mintable.ToBool()
 	}
 
-	if err := k.SetToken(ctx, token); err != nil {
+	if err := k.setToken(ctx, token); err != nil {
 		return err
 	}
 
@@ -214,6 +225,8 @@ func (k Keeper) IterateTokens(ctx sdk.Context, op func(token types.FungibleToken
 	}
 }
 
+// TODO: delete
+// Init
 func (k Keeper) Init(ctx sdk.Context) {
 	ctx = ctx.WithLogger(ctx.Logger().With("handler", "Init").With("module", "iris/asset"))
 
@@ -234,9 +247,9 @@ func (k Keeper) Init(ctx sdk.Context) {
 // TransferTokenOwner transfers the owner of the specified token to a new one
 func (k Keeper) TransferTokenOwner(ctx sdk.Context, msg types.MsgTransferTokenOwner) sdk.Error {
 	// get the destination token
-	token, exist := k.GetToken(ctx, msg.TokenId)
+	token, exist := k.GetToken(ctx, msg.TokenID)
 	if !exist {
-		return types.ErrAssetNotExists(k.codespace, fmt.Sprintf("token %s does not exist", msg.TokenId))
+		return types.ErrAssetNotExists(k.codespace, fmt.Sprintf("token %s does not exist", msg.TokenID))
 	}
 
 	if token.Source != types.NATIVE {
@@ -244,13 +257,13 @@ func (k Keeper) TransferTokenOwner(ctx sdk.Context, msg types.MsgTransferTokenOw
 	}
 
 	if !msg.SrcOwner.Equals(token.Owner) {
-		return types.ErrInvalidOwner(k.codespace, fmt.Sprintf("the address %s is not the owner of the token %s", msg.SrcOwner.String(), msg.TokenId))
+		return types.ErrInvalidOwner(k.codespace, fmt.Sprintf("the address %s is not the owner of the token %s", msg.SrcOwner.String(), msg.TokenID))
 	}
 
 	token.Owner = msg.DstOwner
 
 	// update token information
-	if err := k.SetToken(ctx, token); err != nil {
+	if err := k.setToken(ctx, token); err != nil {
 		return err
 	}
 
@@ -273,22 +286,22 @@ func (k Keeper) resetStoreKeyForQueryToken(ctx sdk.Context, msg types.MsgTransfe
 	store.Delete(KeyTokens(msg.SrcOwner, tokenId))
 
 	// add the new key
-	return k.SetTokens(ctx, msg.DstOwner, token)
+	return k.setTokens(ctx, msg.DstOwner, token)
 }
 
 // MintToken handles MsgMintToken
 func (k Keeper) MintToken(ctx sdk.Context, msg types.MsgMintToken) sdk.Error {
-	token, exist := k.GetToken(ctx, msg.TokenId)
+	token, exist := k.GetToken(ctx, msg.TokenID)
 	if !exist {
-		return types.ErrAssetNotExists(k.codespace, fmt.Sprintf("token %s does not exist", msg.TokenId))
+		return types.ErrAssetNotExists(k.codespace, fmt.Sprintf("token %s does not exist", msg.TokenID))
 	}
 
 	if !msg.Owner.Equals(token.Owner) {
-		return types.ErrInvalidOwner(k.codespace, fmt.Sprintf("the address %s is not the owner of the token %s", msg.Owner.String(), msg.TokenId))
+		return types.ErrInvalidOwner(k.codespace, fmt.Sprintf("the address %s is not the owner of the token %s", msg.Owner.String(), msg.TokenID))
 	}
 
 	if !token.Mintable {
-		return types.ErrAssetNotMintable(k.codespace, fmt.Sprintf("the token %s is set to be non-mintable", msg.TokenId))
+		return types.ErrAssetNotMintable(k.codespace, fmt.Sprintf("the token %s is set to be non-mintable", msg.TokenID))
 	}
 
 	hasIssuedAmt := k.AssetTokenSupply(ctx, token.GetDenom())
