@@ -7,61 +7,76 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/supply"
 	"github.com/irisnet/irishub/modules/mint/internal/types"
+	"github.com/irisnet/irishub/simapp"
 	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/suite"
+	abci "github.com/tendermint/tendermint/abci/types"
 )
 
-func TestSetGetMinter(t *testing.T) {
-	app, ctx := createTestApp(true)
+type KeeperTestSuite struct {
+	suite.Suite
 
-	minter := types.NewMinter(time.Now().UTC(), sdk.NewInt(100000))
-	app.MintKeeper.SetMinter(ctx, minter)
-	expMinter := app.MintKeeper.GetMinter(ctx)
-
-	require.Equal(t, minter, expMinter)
+	ctx sdk.Context
+	app *simapp.SimApp
 }
 
-func TestSetGetParamSet(t *testing.T) {
-	app, ctx := createTestApp(true)
-
+func (suite *KeeperTestSuite) SetupTest() {
+	app := simapp.Setup(false)
+	ctx := app.BaseApp.NewContext(false, abci.Header{})
 	app.MintKeeper.SetParamSet(ctx, types.DefaultParams())
-	expParamSet := app.MintKeeper.GetParamSet(ctx)
-
-	require.Equal(t, types.DefaultParams(), expParamSet)
+	app.MintKeeper.SetMinter(ctx, types.DefaultMinter())
+	suite.app = app
+	suite.ctx = ctx
 }
 
-func TestMintCoins(t *testing.T) {
-	app, ctx := createTestApp(true)
-
-	app.SupplyKeeper.SetSupply(ctx, supply.Supply{})
-
-	mintCoins := sdk.NewCoins(sdk.NewCoin("iris", sdk.NewInt(1000)))
-	err := app.MintKeeper.MintCoins(ctx, mintCoins)
-	require.NoError(t, err)
-
-	acc := app.SupplyKeeper.GetModuleAccount(ctx, types.ModuleName)
-	require.Equal(t, acc.GetCoins(), mintCoins)
+func TestKeeperTestSuite(t *testing.T) {
+	suite.Run(t, new(KeeperTestSuite))
 }
 
-func TestAddCollectedFees(t *testing.T) {
-	app, ctx := createTestApp(true)
+func (suite *KeeperTestSuite) TestSetGetMinter() {
+	minter := types.NewMinter(time.Now().UTC(), sdk.NewInt(100000))
+	suite.app.MintKeeper.SetMinter(suite.ctx, minter)
+	expMinter := suite.app.MintKeeper.GetMinter(suite.ctx)
 
-	app.SupplyKeeper.SetSupply(ctx, supply.Supply{})
+	require.Equal(suite.T(), minter, expMinter)
+}
+
+func (suite *KeeperTestSuite) TestSetGetParamSet() {
+	suite.app.MintKeeper.SetParamSet(suite.ctx, types.DefaultParams())
+	expParamSet := suite.app.MintKeeper.GetParamSet(suite.ctx)
+
+	require.Equal(suite.T(), types.DefaultParams(), expParamSet)
+}
+
+func (suite *KeeperTestSuite) TestMintCoins() {
+	suite.app.SupplyKeeper.SetSupply(suite.ctx, supply.Supply{})
+
+	mintCoins := sdk.NewCoins(sdk.NewCoin("iris", sdk.NewInt(1000)))
+	err := suite.app.MintKeeper.MintCoins(suite.ctx, mintCoins)
+	require.NoError(suite.T(), err)
+
+	acc := suite.app.SupplyKeeper.GetModuleAccount(suite.ctx, types.ModuleName)
+	require.Equal(suite.T(), acc.GetCoins(), mintCoins)
+}
+
+func (suite *KeeperTestSuite) TestAddCollectedFees() {
+	suite.app.SupplyKeeper.SetSupply(suite.ctx, supply.Supply{})
 
 	mintCoins := sdk.NewCoins(sdk.NewCoin("iris", sdk.NewInt(1000)))
 
-	err := app.MintKeeper.MintCoins(ctx, mintCoins)
-	require.NoError(t, err)
+	err := suite.app.MintKeeper.MintCoins(suite.ctx, mintCoins)
+	require.NoError(suite.T(), err)
 
-	acc := app.SupplyKeeper.GetModuleAccount(ctx, types.ModuleName)
-	require.Equal(t, acc.GetCoins(), mintCoins)
+	acc := suite.app.SupplyKeeper.GetModuleAccount(suite.ctx, types.ModuleName)
+	require.Equal(suite.T(), acc.GetCoins(), mintCoins)
 
-	err = app.MintKeeper.AddCollectedFees(ctx, mintCoins)
-	require.NoError(t, err)
+	err = suite.app.MintKeeper.AddCollectedFees(suite.ctx, mintCoins)
+	require.NoError(suite.T(), err)
 
-	acc = app.SupplyKeeper.GetModuleAccount(ctx, types.ModuleName)
-	require.True(t, acc.GetCoins().Empty())
+	acc = suite.app.SupplyKeeper.GetModuleAccount(suite.ctx, types.ModuleName)
+	require.True(suite.T(), acc.GetCoins().Empty())
 
-	acc1 := app.SupplyKeeper.GetModuleAccount(ctx, "fee_collector")
-	require.Equal(t, acc1.GetCoins(), mintCoins)
+	acc1 := suite.app.SupplyKeeper.GetModuleAccount(suite.ctx, "fee_collector")
+	require.Equal(suite.T(), acc1.GetCoins(), mintCoins)
 
 }
