@@ -9,25 +9,37 @@ import (
 	"github.com/irisnet/irishub/modules/service/internal/types"
 )
 
-func (k Keeper) AddServiceBinding(ctx sdk.Context, svcBinding types.SvcBinding) sdk.Error {
-	_, found := k.GetServiceDefinition(ctx, svcBinding.DefChainID, svcBinding.DefName)
+func (k Keeper) AddServiceBinding(
+	ctx sdk.Context,
+	defChainID,
+	defName,
+	bindChainID string,
+	provider sdk.AccAddress,
+	bindingType types.BindingType,
+	deposit sdk.Coins,
+	prices []sdk.Coin,
+	level types.Level,
+) sdk.Error {
+	_, found := k.GetServiceDefinition(ctx, defChainID, defName)
 	if !found {
-		return types.ErrSvcDefNotExists(k.codespace, svcBinding.DefChainID, svcBinding.DefName)
+		return types.ErrSvcDefNotExists(k.codespace, defChainID, defName)
 	}
 
-	_, found = k.GetServiceBinding(ctx, svcBinding.DefChainID, svcBinding.DefName, svcBinding.BindChainID, svcBinding.Provider)
+	_, found = k.GetServiceBinding(ctx, defChainID, defName, bindChainID, provider)
 	if found {
 		return types.ErrSvcBindingExists(k.codespace)
 	}
 
-	minDeposit, err := k.getMinDeposit(ctx, svcBinding.Prices)
+	minDeposit, err := k.getMinDeposit(ctx, prices)
 	if err != nil {
 		return err
 	}
 
-	if !svcBinding.Deposit.IsAllGTE(minDeposit) {
-		return types.ErrLtMinProviderDeposit(k.Codespace(), minDeposit)
+	if !deposit.IsAllGTE(minDeposit) {
+		return types.ErrLtMinProviderDeposit(k.codespace, minDeposit)
 	}
+
+	svcBinding := types.NewSvcBinding(ctx, defChainID, defName, bindChainID, provider, bindingType, deposit, prices, level, true)
 
 	err = k.validateMethodPrices(ctx, svcBinding)
 	if err != nil {
@@ -70,58 +82,71 @@ func (k Keeper) ServiceBindingsIterator(ctx sdk.Context, defChainID, defName str
 	return sdk.KVStorePrefixIterator(store, types.GetBindingsSubspaceKey(defChainID, defName))
 }
 
-func (k Keeper) UpdateServiceBinding(ctx sdk.Context, svcBinding types.SvcBinding) sdk.Error {
-	oldBinding, found := k.GetServiceBinding(ctx, svcBinding.DefChainID, svcBinding.DefName, svcBinding.BindChainID, svcBinding.Provider)
+func (k Keeper) UpdateServiceBinding(
+	ctx sdk.Context,
+	defChainID,
+	defName,
+	bindChainID string,
+	provider sdk.AccAddress,
+	bindingType types.BindingType,
+	deposit sdk.Coins,
+	prices []sdk.Coin,
+	level types.Level,
+) (svcBinding types.SvcBinding, err sdk.Error) {
+	oldBinding, found := k.GetServiceBinding(ctx, defChainID, defName, bindChainID, provider)
 	if !found {
-		return types.ErrSvcBindingNotExists(k.codespace)
+		return svcBinding, types.ErrSvcBindingNotExists(k.codespace)
 	}
 
-	if len(svcBinding.Prices) > 0 {
-		err := k.validateMethodPrices(ctx, svcBinding)
+	newBinding := types.NewSvcBinding(ctx, defChainID, defName, bindChainID, provider, bindingType,
+		deposit, prices, level, false)
+
+	if len(prices) > 0 {
+		err = k.validateMethodPrices(ctx, newBinding)
 		if err != nil {
-			return err
+			return svcBinding, err
 		}
 
-		oldBinding.Prices = svcBinding.Prices
+		oldBinding.Prices = newBinding.Prices
 	}
 
-	if svcBinding.BindingType != 0x00 {
-		oldBinding.BindingType = svcBinding.BindingType
+	if newBinding.BindingType != 0x00 {
+		oldBinding.BindingType = newBinding.BindingType
 	}
 
 	// Add coins to svcBinding deposit
-	if !svcBinding.Deposit.IsAnyNegative() {
-		oldBinding.Deposit = oldBinding.Deposit.Add(svcBinding.Deposit)
+	if !newBinding.Deposit.IsAnyNegative() {
+		oldBinding.Deposit = oldBinding.Deposit.Add(newBinding.Deposit)
 	}
 
 	// Subtract coins from provider's account
-	err := k.bk.SendCoins(ctx, svcBinding.Provider, auth.ServiceDepositCoinsAccAddr, svcBinding.Deposit)
+	err = k.bk.SendCoins(ctx, svcBinding.Provider, auth.ServiceDepositCoinsAccAddr, newBinding.Deposit)
 	if err != nil {
-		return err
+		return svcBinding, err
 	}
 
-	if svcBinding.Level.UsableTime != 0 {
-		oldBinding.Level.UsableTime = svcBinding.Level.UsableTime
+	if newBinding.Level.UsableTime != 0 {
+		oldBinding.Level.UsableTime = newBinding.Level.UsableTime
 	}
-	if svcBinding.Level.AvgRspTime != 0 {
-		oldBinding.Level.AvgRspTime = svcBinding.Level.AvgRspTime
+	if newBinding.Level.AvgRspTime != 0 {
+		oldBinding.Level.AvgRspTime = newBinding.Level.AvgRspTime
 	}
 
 	// only check deposit if binding is available
 	if oldBinding.Available {
 		minDeposit, err := k.getMinDeposit(ctx, oldBinding.Prices)
 		if err != nil {
-			return err
+			return svcBinding, err
 		}
 
 		if !oldBinding.Deposit.IsAllGTE(minDeposit) {
-			return types.ErrLtMinProviderDeposit(k.Codespace(), minDeposit.Sub(oldBinding.Deposit).Add(svcBinding.Deposit))
+			return svcBinding, types.ErrLtMinProviderDeposit(k.codespace, minDeposit.Sub(oldBinding.Deposit).Add(newBinding.Deposit))
 		}
 	}
 
 	k.SetServiceBinding(ctx, oldBinding)
 
-	return nil
+	return oldBinding, nil
 }
 
 func (k Keeper) Disable(ctx sdk.Context, defChainID, defName, bindChainID string, provider sdk.AccAddress) sdk.Error {

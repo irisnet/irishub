@@ -6,12 +6,22 @@ import (
 	"github.com/irisnet/irishub/tools/protoidl"
 )
 
-func (k Keeper) AddServiceDefinition(ctx sdk.Context, svcDef types.SvcDef) sdk.Error {
-	_, found := k.GetServiceDefinition(ctx, svcDef.ChainId, svcDef.Name)
+func (k Keeper) AddServiceDefinition(
+	ctx sdk.Context,
+	name,
+	chainId,
+	description string,
+	tags []string,
+	author sdk.AccAddress,
+	authorDescription,
+	idlContent string,
+) sdk.Error {
+	_, found := k.GetServiceDefinition(ctx, chainId, name)
 	if found {
-		return types.ErrSvcDefExists(k.codespace, svcDef.ChainId, svcDef.Name)
+		return types.ErrSvcDefExists(k.codespace, chainId, name)
 	}
 
+	svcDef := types.NewSvcDef(name, chainId, description, tags, author, authorDescription, idlContent)
 	k.SetServiceDefinition(ctx, svcDef)
 
 	return k.AddMethods(ctx, svcDef)

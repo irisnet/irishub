@@ -55,7 +55,8 @@ func NewHandler(k Keeper) sdk.Handler {
 }
 
 func handleMsgSvcDef(ctx sdk.Context, k Keeper, msg MsgSvcDef) sdk.Result {
-	err := k.AddServiceDefinition(ctx, msg.SvcDef)
+	err := k.AddServiceDefinition(ctx, msg.Name, msg.ChainId, msg.Description, msg.Tags,
+		msg.Author, msg.AuthorDescription, msg.IDLContent)
 	if err != nil {
 		return err.Result()
 	}
@@ -66,10 +67,8 @@ func handleMsgSvcDef(ctx sdk.Context, k Keeper, msg MsgSvcDef) sdk.Result {
 }
 
 func handleMsgSvcBind(ctx sdk.Context, k Keeper, msg MsgSvcBind) sdk.Result {
-	svcBinding := NewSvcBinding(ctx, msg.DefChainID, msg.DefName, msg.BindChainID, msg.Provider, msg.BindingType,
-		msg.Deposit, msg.Prices, msg.Level, true)
-
-	err := k.AddServiceBinding(ctx, svcBinding)
+	err := k.AddServiceBinding(ctx, msg.DefChainID, msg.DefName, msg.BindChainID,
+		msg.Provider, msg.BindingType, msg.Deposit, msg.Prices, msg.Level)
 	if err != nil {
 		return err.Result()
 	}
@@ -81,16 +80,14 @@ func handleMsgSvcBind(ctx sdk.Context, k Keeper, msg MsgSvcBind) sdk.Result {
 }
 
 func handleMsgSvcBindUpdate(ctx sdk.Context, k Keeper, msg MsgSvcBindingUpdate) sdk.Result {
-	svcBinding := NewSvcBinding(ctx, msg.DefChainID, msg.DefName, msg.BindChainID, msg.Provider, msg.BindingType,
-		msg.Deposit, msg.Prices, msg.Level, false)
-
-	err := k.UpdateServiceBinding(ctx, svcBinding)
+	svcBinding, err := k.UpdateServiceBinding(ctx, msg.DefChainID, msg.DefName, msg.BindChainID,
+		msg.Provider, msg.BindingType, msg.Deposit, msg.Prices, msg.Level)
 	if err != nil {
 		return err.Result()
 	}
 
 	ctx.Logger().Info("Update service binding", "def_name", msg.DefName, "def_chain_id", msg.DefChainID,
-		"provider", msg.Provider.String(), "binding_type", msg.BindingType.String())
+		"provider", msg.Provider.String(), "binding_type", svcBinding.BindingType.String())
 
 	return sdk.Result{}
 }
@@ -132,15 +129,15 @@ func handleMsgSvcRefundDeposit(ctx sdk.Context, k Keeper, msg MsgSvcRefundDeposi
 }
 
 func handleMsgSvcRequest(ctx sdk.Context, k Keeper, msg MsgSvcRequest) sdk.Result {
-	req, err := k.AddSvcRequest(ctx, msg.DefChainID, msg.DefName, msg.BindChainID, msg.ReqChainID,
+	req, err := k.AddRequest(ctx, msg.DefChainID, msg.DefName, msg.BindChainID, msg.ReqChainID,
 		msg.Consumer, msg.Provider, msg.MethodID, msg.Input, msg.ServiceFee, msg.Profiling)
 	if err != nil {
 		return err.Result()
 	}
 
 	ctx.Logger().Debug("Service request", "def_name", req.DefName, "def_chain_id", req.DefChainID,
-		"provider", msg.Provider.String(), "consumer", req.Consumer.String(), "method_id", req.MethodID,
-		"service_fee", msg.ServiceFee, "request_id", req.RequestID())
+		"provider", req.Provider.String(), "consumer", req.Consumer.String(), "method_id", req.MethodID,
+		"service_fee", req.ServiceFee, "request_id", req.RequestID())
 
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
@@ -163,7 +160,7 @@ func handleMsgSvcRequest(ctx sdk.Context, k Keeper, msg MsgSvcRequest) sdk.Resul
 }
 
 func handleMsgSvcResponse(ctx sdk.Context, k Keeper, msg MsgSvcResponse) sdk.Result {
-	resp, err := k.AddSvcResponse(ctx, msg.ReqChainID, msg.RequestID, msg.Provider, msg.Output, msg.ErrorMsg)
+	resp, err := k.AddResponse(ctx, msg.ReqChainID, msg.RequestID, msg.Provider, msg.Output, msg.ErrorMsg)
 	if err != nil {
 		return err.Result()
 	}
