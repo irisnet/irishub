@@ -224,10 +224,10 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 	)
 
 	app.mm.SetOrderEndBlockers(
+		htlc.ModuleName,
 		crisis.ModuleName,
 		gov.ModuleName,
 		staking.ModuleName,
-		htlc.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
