@@ -159,7 +159,7 @@ func TestIrisCLIIssueToken(t *testing.T) {
 func (f *Fixtures) QueryAssetTokens(flags ...string) asset.Tokens {
 	cmd := fmt.Sprintf("%s query asset tokens %v", f.IriscliBinary, f.Flags())
 	stdout, stderr := tests.ExecuteT(f.T, addFlags(cmd, flags), "")
-	if strings.Contains(stderr, "no matching proposals found") {
+	if strings.Contains(stderr, "no matching tokens found") {
 		return asset.Tokens{}
 	}
 	require.Empty(f.T, stderr)
@@ -174,7 +174,7 @@ func (f *Fixtures) QueryAssetTokens(flags ...string) asset.Tokens {
 func (f *Fixtures) QueryAssetToken(symbol string, flags ...string) asset.FungibleToken {
 	cmd := fmt.Sprintf("%s query asset token %s %v", f.IriscliBinary, symbol, f.Flags())
 	stdout, stderr := tests.ExecuteT(f.T, addFlags(cmd, flags), "")
-	if strings.Contains(stderr, "no matching proposals found") {
+	if strings.Contains(stderr, "no matching token found") {
 		return asset.FungibleToken{}
 	}
 	require.Empty(f.T, stderr)
