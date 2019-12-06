@@ -1,7 +1,6 @@
 package server
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -28,6 +27,13 @@ func SnapshotCmd(ctx *Context, cdc *codec.Codec, appReset AppReset) *cobra.Comma
 		Use:   "snapshot",
 		Short: "snapshot the latest information and drop the others",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			defer func() {
+				if r := recover(); r != nil {
+					err := r.(error)
+					ctx.Logger.Error("snapshot file is created failed", "err", err.Error())
+				}
+			}()
+
 			home := viper.GetString(tmcli.HomeFlag)
 			emptyState, err := isEmptyState(home)
 			if err != nil || emptyState {
@@ -57,7 +63,7 @@ func SnapshotCmd(ctx *Context, cdc *codec.Codec, appReset AppReset) *cobra.Comma
 func loadDb(name, path string) *dbm.GoLevelDB {
 	db, err := dbm.NewGoLevelDB(name, path)
 	if err != nil {
-		panic("load db failed")
+		panic(err)
 	}
 	return db
 }
@@ -84,7 +90,7 @@ func snapshot(ctx *Context, cdc *codec.Codec, dataDir, targetDir string, appRese
 	//save local current block height state
 	snapshotState(cdc, stateDB, targetDir)
 	//save local current block height consensus data
-	_ = snapshotCsWAL(dataDir, targetDir, state.LastBlockHeight)
+	snapshotCsWAL(ctx, dataDir, targetDir, state.LastBlockHeight)
 
 	//copy application
 	appDir := filepath.Join(dataDir, "application.db")
@@ -125,24 +131,27 @@ func snapshotBlock(originStore *bc.BlockStore, targetDir string, height int64) i
 	return height
 }
 
-func snapshotCsWAL(home, targetDir string, height int64) error {
+func snapshotCsWAL(ctx *Context, home, targetDir string, height int64) {
 	walTargetDir := filepath.Join(targetDir, "cs.wal", "wal")
 	targetWAL, err := consensus.NewWAL(walTargetDir)
 
 	walSourceDir := filepath.Join(home, "cs.wal", "wal")
 	sourceWAL, err := consensus.NewWAL(walSourceDir)
 	if err != nil {
-		return errors.New("failed to open WAL for consensus state")
+		ctx.Logger.Info("failed to open WAL for consensus state", "err", err.Error())
+		return
 	}
 
 	gr, found, err := sourceWAL.SearchForEndHeight(height, &consensus.WALSearchOptions{IgnoreDataCorruptionErrors: true})
 
 	if err != nil || !found {
-		return fmt.Errorf("cannot replay height %d. WAL does not contain #ENDHEIGHT for %d", height, height-1)
+		ctx.Logger.Info(fmt.Sprintf("cannot replay height %d. WAL does not contain #ENDHEIGHT for %d", height, height-1))
+		return
 	}
 
 	defer func() {
 		if err = gr.Close(); err != nil {
+			ctx.Logger.Info("resource release failed", "err", err.Error())
 			return
 		}
 	}()
@@ -154,16 +163,22 @@ func snapshotCsWAL(home, targetDir string, height int64) error {
 		if err == io.EOF {
 			break
 		} else if consensus.IsDataCorruptionError(err) {
-			return fmt.Errorf("data has been corrupted in last height %d of consensus WAL", height)
+			ctx.Logger.Info("data has been corrupted in last height %d of consensus WAL", height)
+			return
 		} else if err != nil {
-			return err
+			ctx.Logger.Info("decode WALMessage failed", "err", err.Error())
+			return
 		}
 		if err := targetWAL.Write(msg.Msg); err != nil {
-			return err
+			ctx.Logger.Info("write data to file failed", "err", err.Error())
+			return
 		}
 	}
-	_ = targetWAL.WriteSync(consensus.EndHeightMessage{Height: height})
-	return nil
+	err = targetWAL.WriteSync(consensus.EndHeightMessage{Height: height})
+	if err != nil {
+		ctx.Logger.Info("write data to file failed", "err", err.Error())
+		return
+	}
 }
 
 func copyDir(srcPath string, destPath string) error {
@@ -208,10 +223,10 @@ func copyFile(src, dest string) (w int64, err error) {
 		}
 	}
 	dstFile, err := os.Create(dest)
-	defer dstFile.Close()
 	if err != nil {
 		return
 	}
+	defer dstFile.Close()
 	return io.Copy(dstFile, srcFile)
 }
 
@@ -289,11 +304,15 @@ func reset(ctx *Context, appReset AppReset, height int64) error {
 	home := cfg.RootDir
 	traceWriterFile := viper.GetString(flagTraceStore)
 
-	db, _ := openDB(home)
-	traceWriter, _ := openTraceWriter(traceWriterFile)
-
-	err := appReset(ctx, ctx.Logger, db, traceWriter, height)
+	db, err := openDB(home)
 	if err != nil {
+		return err
+	}
+	traceWriter, err := openTraceWriter(traceWriterFile)
+	if err != nil {
+		return err
+	}
+	if err := appReset(ctx, ctx.Logger, db, traceWriter, height); err != nil {
 		return err
 	}
 	return nil
