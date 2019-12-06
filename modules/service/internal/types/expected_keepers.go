@@ -12,5 +12,6 @@ type BankKeeper interface {
 
 // GuardianKeeper defines the expected guardian keeper interface
 type GuardianKeeper interface {
+	GetProfiler(ctx sdk.Context, addr sdk.AccAddress) (guardian guardian.Guardian, found bool)
 	GetTrustee(ctx sdk.Context, addr sdk.AccAddress) (guardian guardian.Guardian, found bool)
 }

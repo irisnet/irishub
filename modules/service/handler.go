@@ -1,77 +1,97 @@
 package service
 
 import (
+	"fmt"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/irisnet/irishub/modules/service/internal/types"
 )
 
 // handle all "service" type messages.
 func NewHandler(k Keeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
+		ctx = ctx.WithEventManager(sdk.NewEventManager())
+
 		switch msg := msg.(type) {
 		case MsgSvcDef:
 			return handleMsgSvcDef(ctx, k, msg)
+
 		case MsgSvcBind:
 			return handleMsgSvcBind(ctx, k, msg)
+
 		case MsgSvcBindingUpdate:
 			return handleMsgSvcBindUpdate(ctx, k, msg)
+
 		case MsgSvcDisable:
 			return handleMsgSvcDisable(ctx, k, msg)
+
 		case MsgSvcEnable:
 			return handleMsgSvcEnable(ctx, k, msg)
+
 		case MsgSvcRefundDeposit:
 			return handleMsgSvcRefundDeposit(ctx, k, msg)
+
 		case MsgSvcRequest:
 			return handleMsgSvcRequest(ctx, k, msg)
+
 		case MsgSvcResponse:
 			return handleMsgSvcResponse(ctx, k, msg)
+
 		case MsgSvcRefundFees:
 			return handleMsgSvcRefundFees(ctx, k, msg)
+
 		case MsgSvcWithdrawFees:
 			return handleMsgSvcWithdrawFees(ctx, k, msg)
+
 		case MsgSvcWithdrawTax:
 			return handleMsgSvcWithdrawTax(ctx, k, msg)
+
 		default:
-			return sdk.ErrTxDecode("invalid message parse in service module").Result()
+			errMsg := fmt.Sprintf("unrecognized service message type: %T", msg)
+			return sdk.ErrUnknownRequest(errMsg).Result()
+
 		}
 	}
 }
+
 func handleMsgSvcDef(ctx sdk.Context, k Keeper, msg MsgSvcDef) sdk.Result {
-	_, found := k.GetServiceDefinition(ctx, msg.ChainId, msg.Name)
-	if found {
-		return ErrSvcDefExists(k.Codespace(), msg.ChainId, msg.Name).Result()
-	}
-	k.AddServiceDefinition(ctx, msg.SvcDef)
-	err := k.AddMethods(ctx, msg.SvcDef)
+	err := k.AddServiceDefinition(ctx, msg.SvcDef)
 	if err != nil {
 		return err.Result()
 	}
+
 	ctx.Logger().Info("Create service definition", "name", msg.Name, "author", msg.Author.String())
+
 	return sdk.Result{}
 }
 
 func handleMsgSvcBind(ctx sdk.Context, k Keeper, msg MsgSvcBind) sdk.Result {
 	svcBinding := NewSvcBinding(ctx, msg.DefChainID, msg.DefName, msg.BindChainID, msg.Provider, msg.BindingType,
 		msg.Deposit, msg.Prices, msg.Level, true)
+
 	err := k.AddServiceBinding(ctx, svcBinding)
 	if err != nil {
 		return err.Result()
 	}
+
 	ctx.Logger().Info("Add service binding", "def_name", msg.DefName, "def_chain_id", msg.DefChainID,
 		"provider", msg.Provider.String(), "binding_type", msg.BindingType.String())
+
 	return sdk.Result{}
 }
 
 func handleMsgSvcBindUpdate(ctx sdk.Context, k Keeper, msg MsgSvcBindingUpdate) sdk.Result {
 	svcBinding := NewSvcBinding(ctx, msg.DefChainID, msg.DefName, msg.BindChainID, msg.Provider, msg.BindingType,
 		msg.Deposit, msg.Prices, msg.Level, false)
+
 	err := k.UpdateServiceBinding(ctx, svcBinding)
 	if err != nil {
 		return err.Result()
 	}
+
 	ctx.Logger().Info("Update service binding", "def_name", msg.DefName, "def_chain_id", msg.DefChainID,
 		"provider", msg.Provider.String(), "binding_type", msg.BindingType.String())
+
 	return sdk.Result{}
 }
 
@@ -80,8 +100,10 @@ func handleMsgSvcDisable(ctx sdk.Context, k Keeper, msg MsgSvcDisable) sdk.Resul
 	if err != nil {
 		return err.Result()
 	}
+
 	ctx.Logger().Info("Disable service binding", "def_name", msg.DefName, "def_chain_id", msg.DefChainID,
 		"provider", msg.Provider.String())
+
 	return sdk.Result{}
 }
 
@@ -90,8 +112,10 @@ func handleMsgSvcEnable(ctx sdk.Context, k Keeper, msg MsgSvcEnable) sdk.Result 
 	if err != nil {
 		return err.Result()
 	}
+
 	ctx.Logger().Info("Enable service binding", "def_name", msg.DefName, "def_chain_id", msg.DefChainID,
 		"provider", msg.Provider.String())
+
 	return sdk.Result{}
 }
 
@@ -100,68 +124,38 @@ func handleMsgSvcRefundDeposit(ctx sdk.Context, k Keeper, msg MsgSvcRefundDeposi
 	if err != nil {
 		return err.Result()
 	}
+
 	ctx.Logger().Info("Refund deposit", "def_name", msg.DefName, "def_chain_id", msg.DefChainID,
 		"provider", msg.Provider.String())
+
 	return sdk.Result{}
 }
 
 func handleMsgSvcRequest(ctx sdk.Context, k Keeper, msg MsgSvcRequest) sdk.Result {
-	bind, bindingFound := k.GetServiceBinding(ctx, msg.DefChainID, msg.DefName, msg.BindChainID, msg.Provider)
-	if !bindingFound {
-		return ErrSvcBindingNotExists(k.Codespace()).Result()
-	}
-	if !bind.Available {
-		return ErrSvcBindingNotAvailable(k.Codespace()).Result()
-	}
-
-	_, methodFound := k.GetMethod(ctx, msg.DefChainID, msg.DefName, msg.MethodID)
-	if !methodFound {
-		return ErrMethodNotExists(k.Codespace(), msg.MethodID).Result()
-	}
-
-	if msg.Profiling {
-		if _, found := k.gk.GetProfiler(ctx, msg.Consumer); !found {
-			return ErrNotProfiler(k.Codespace(), msg.Consumer).Result()
-		}
-	}
-
-	//Method id start at 1
-	if len(bind.Prices) >= int(msg.MethodID) && !msg.ServiceFee.IsAllGTE(sdk.Coins{bind.Prices[msg.MethodID-1]}) {
-		return ErrLtServiceFee(k.Codespace(), sdk.Coins{bind.Prices[msg.MethodID-1]}).Result()
-	}
-
-	request := NewSvcRequest(msg.DefChainID, msg.DefName, msg.BindChainID, msg.ReqChainID, msg.Consumer, msg.Provider, msg.MethodID, msg.Input, msg.ServiceFee, msg.Profiling)
-
-	// request service fee is equal to service binding service fee if not profiling
-	if len(bind.Prices) >= int(msg.MethodID) && !msg.Profiling {
-		request.ServiceFee = sdk.Coins{bind.Prices[msg.MethodID-1]}
-	} else {
-		request.ServiceFee = nil
-	}
-
-	request, err := k.AddRequest(ctx, request)
+	req, err := k.AddSvcRequest(ctx, msg.DefChainID, msg.DefName, msg.BindChainID, msg.ReqChainID,
+		msg.Consumer, msg.Provider, msg.MethodID, msg.Input, msg.ServiceFee, msg.Profiling)
 	if err != nil {
 		return err.Result()
 	}
 
-	ctx.Logger().Debug("Service request", "def_name", msg.DefName, "def_chain_id", msg.DefChainID,
-		"provider", msg.Provider.String(), "consumer", request.Consumer.String(), "method_id", msg.MethodID,
-		"service_fee", msg.ServiceFee, "request_id", request.RequestID())
+	ctx.Logger().Debug("Service request", "def_name", req.DefName, "def_chain_id", req.DefChainID,
+		"provider", msg.Provider.String(), "consumer", req.Consumer.String(), "method_id", req.MethodID,
+		"service_fee", msg.ServiceFee, "request_id", req.RequestID())
 
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, request.Consumer.String()),
+			sdk.NewAttribute(sdk.AttributeKeySender, req.Consumer.String()),
 		),
 	)
 
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
 			types.EventTypeRequestSvc,
-			sdk.NewAttribute(types.AttributeKeyRequestID, request.RequestID()),
-			sdk.NewAttribute(types.AttributeKeyProvider, request.Provider.String()),
-			sdk.NewAttribute(types.AttributeKeyServiceFee, request.ServiceFee.String()),
+			sdk.NewAttribute(types.AttributeKeyRequestID, req.RequestID()),
+			sdk.NewAttribute(types.AttributeKeyProvider, req.Provider.String()),
+			sdk.NewAttribute(types.AttributeKeyServiceFee, req.ServiceFee.String()),
 		),
 	)
 
@@ -169,50 +163,27 @@ func handleMsgSvcRequest(ctx sdk.Context, k Keeper, msg MsgSvcRequest) sdk.Resul
 }
 
 func handleMsgSvcResponse(ctx sdk.Context, k Keeper, msg MsgSvcResponse) sdk.Result {
-	eHeight, rHeight, counter, _ := types.ConvertRequestID(msg.RequestID)
-	request, found := k.GetActiveRequest(ctx, eHeight, rHeight, counter)
-	if !found {
-		request.ExpirationHeight = eHeight
-		request.RequestHeight = rHeight
-		request.RequestIntraTxCounter = counter
-		return ErrRequestNotActive(k.Codespace(), request.RequestID()).Result()
-	}
-	if !(msg.Provider.Equals(request.Provider)) {
-		return ErrNotMatchingProvider(k.Codespace(), request.Provider).Result()
-	}
-	if request.ReqChainID != msg.ReqChainID {
-		return ErrNotMatchingReqChainID(k.Codespace(), msg.ReqChainID).Result()
-	}
-
-	response := NewSvcResponse(msg.ReqChainID, eHeight, rHeight, counter, msg.Provider,
-		request.Consumer, msg.Output, msg.ErrorMsg)
-
-	k.AddResponse(ctx, response)
-
-	// delete request from active request list and expiration list
-	k.DeleteActiveRequest(ctx, request)
-	k.DeleteRequestExpiration(ctx, request)
-
-	err := k.AddIncomingFee(ctx, response.Provider, request.ServiceFee)
+	resp, err := k.AddSvcResponse(ctx, msg.ReqChainID, msg.RequestID, msg.Provider, msg.Output, msg.ErrorMsg)
 	if err != nil {
 		return err.Result()
 	}
-	ctx.Logger().Debug("Service response", "def_name", "request_id", request.RequestID(),
-		"consumer", response.Consumer.String())
+
+	ctx.Logger().Debug("Service response", "request_id", msg.RequestID,
+		"provider", resp.Provider.String(), "consumer", resp.Consumer.String())
 
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, response.Provider.String()),
+			sdk.NewAttribute(sdk.AttributeKeySender, resp.Provider.String()),
 		),
 	)
 
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
 			types.EventTypeRespondSvc,
-			sdk.NewAttribute(types.AttributeKeyRequestID, request.RequestID()),
-			sdk.NewAttribute(types.AttributeKeyConsumer, request.Consumer.String()),
+			sdk.NewAttribute(types.AttributeKeyRequestID, msg.RequestID),
+			sdk.NewAttribute(types.AttributeKeyConsumer, resp.Consumer.String()),
 		),
 	)
 
@@ -224,6 +195,7 @@ func handleMsgSvcRefundFees(ctx sdk.Context, k Keeper, msg MsgSvcRefundFees) sdk
 	if err != nil {
 		return err.Result()
 	}
+
 	return sdk.Result{}
 }
 
@@ -232,17 +204,15 @@ func handleMsgSvcWithdrawFees(ctx sdk.Context, k Keeper, msg MsgSvcWithdrawFees)
 	if err != nil {
 		return err.Result()
 	}
+
 	return sdk.Result{}
 }
 
 func handleMsgSvcWithdrawTax(ctx sdk.Context, k Keeper, msg MsgSvcWithdrawTax) sdk.Result {
-	_, found := k.gk.GetTrustee(ctx, msg.Trustee)
-	if !found {
-		return ErrNotTrustee(k.Codespace(), msg.Trustee).Result()
-	}
-	_, err := k.ck.SendCoins(ctx, auth.ServiceTaxCoinsAccAddr, msg.DestAddress, msg.Amount)
+	err := k.WithdrawTax(ctx, msg.Trustee, msg.DestAddress, msg.Amount)
 	if err != nil {
 		return err.Result()
 	}
+
 	return sdk.Result{}
 }

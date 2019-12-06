@@ -8,7 +8,54 @@ import (
 	"github.com/irisnet/irishub/modules/service/internal/types"
 )
 
-func (k Keeper) AddRequest(ctx sdk.Context, req types.SvcRequest) (types.SvcRequest, sdk.Error) {
+func (k Keeper) AddRequest(
+	ctx sdk.Context,
+	defChainID,
+	defName,
+	bindChainID,
+	reqChainID string,
+	consumer,
+	provider sdk.AccAddress,
+	methodID int16,
+	input []byte,
+	serviceFee sdk.Coins,
+	profiling bool,
+) (req types.SvcRequest, err sdk.Error) {
+	binding, found := k.GetServiceBinding(ctx, defChainID, defName, bindChainID, provider)
+	if !found {
+		return req, types.ErrSvcBindingNotExists(k.codespace)
+	}
+
+	if !binding.Available {
+		return req, types.ErrSvcBindingNotAvailable(k.codespace)
+	}
+
+	_, found = k.GetMethod(ctx, defChainID, defName, methodID)
+	if !found {
+		return req, types.ErrMethodNotExists(k.codespace, methodID)
+	}
+
+	if profiling {
+		if _, found := k.gk.GetProfiler(ctx, consumer); !found {
+			return req, types.ErrNotProfiler(k.codespace, consumer)
+		}
+	}
+
+	//Method id start at 1
+	if len(binding.Prices) >= int(methodID) && !serviceFee.IsAllGTE(sdk.Coins{binding.Prices[methodID-1]}) {
+		return req, types.ErrLtServiceFee(k.codespace, sdk.Coins{binding.Prices[methodID-1]})
+	}
+
+	// request service fee is equal to service binding service fee if not profiling
+	if len(binding.Prices) >= int(methodID) && !profiling {
+		serviceFee = sdk.Coins{binding.Prices[methodID-1]}
+	} else {
+		serviceFee = nil
+	}
+
+	req = types.NewMsgSvcRequest(defChainID, defName, bindChainID, reqChainID,
+		consumer, provider, methodID, input, serviceFee, profiling)
+
 	counter := k.GetIntraTxCounter(ctx)
 	k.SetIntraTxCounter(ctx, counter+1)
 
@@ -18,7 +65,7 @@ func (k Keeper) AddRequest(ctx sdk.Context, req types.SvcRequest) (types.SvcRequ
 	params := k.GetParams(ctx)
 	req.ExpirationHeight = req.RequestHeight + params.MaxRequestTimeout
 
-	err := k.bk.SendCoins(ctx, req.Consumer, auth.ServiceRequestCoinsAccAddr, req.ServiceFee)
+	err = k.bk.SendCoins(ctx, req.Consumer, auth.ServiceRequestCoinsAccAddr, req.ServiceFee)
 	if err != nil {
 		return req, err
 	}
@@ -66,10 +113,10 @@ func (k Keeper) DeleteRequestExpiration(ctx sdk.Context, req types.SvcRequest) {
 	store.Delete(types.GetRequestsByExpirationIndexKeyByReq(req))
 }
 
-func (k Keeper) GetActiveRequest(ctx sdk.Context, expirationHeight, requestHeight int64, counter int16) (req types.SvcRequest, found bool) {
+func (k Keeper) GetActiveRequest(ctx sdk.Context, expHeight, reqHeight int64, counter int16) (req types.SvcRequest, found bool) {
 	store := ctx.KVStore(k.storeKey)
 
-	bz := store.Get(types.GetRequestsByExpirationIndexKey(expirationHeight, requestHeight, counter))
+	bz := store.Get(types.GetRequestsByExpirationIndexKey(expHeight, reqHeight, counter))
 	if bz == nil {
 		return req, false
 	}
@@ -95,7 +142,49 @@ func (k Keeper) ActiveAllRequestQueueIterator(store sdk.KVStore) sdk.Iterator {
 	return sdk.KVStorePrefixIterator(store, types.ActiveRequestKey)
 }
 
-func (k Keeper) AddResponse(ctx sdk.Context, resp types.SvcResponse) {
+func (k Keeper) AddResponse(
+	ctx sdk.Context,
+	reqChainID string,
+	requestID string,
+	provider sdk.AccAddress,
+	output,
+	errorMsg []byte,
+) (resp types.SvcResponse, err sdk.Error) {
+	expHeight, reqHeight, counter, _ := types.ConvertRequestID(requestID)
+
+	req, found := k.GetActiveRequest(ctx, expHeight, reqHeight, counter)
+	if !found {
+		req.ExpirationHeight = expHeight
+		req.RequestHeight = reqHeight
+		req.RequestIntraTxCounter = counter
+
+		return resp, types.ErrRequestNotActive(k.codespace, req.RequestID())
+	}
+
+	if !(provider.Equals(req.Provider)) {
+		return resp, types.ErrNotMatchingProvider(k.codespace, provider)
+	}
+
+	if reqChainID != req.ReqChainID {
+		return resp, types.ErrNotMatchingReqChainID(k.codespace, reqChainID)
+	}
+
+	err = k.AddIncomingFee(ctx, resp.Provider, req.ServiceFee)
+	if err != nil {
+		return resp, err
+	}
+
+	resp = types.NewSvcResponse(reqChainID, expHeight, reqHeight, counter, provider, req.Consumer, output, errorMsg)
+	k.SetResponse(ctx, resp)
+
+	// delete request from active request list and expiration list
+	k.DeleteActiveRequest(ctx, req)
+	k.DeleteRequestExpiration(ctx, req)
+
+	return resp, nil
+}
+
+func (k Keeper) SetResponse(ctx sdk.Context, resp types.SvcResponse) {
 	store := ctx.KVStore(k.storeKey)
 
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(resp)
@@ -269,6 +358,16 @@ func (k Keeper) WithdrawFee(ctx sdk.Context, address sdk.AccAddress) sdk.Error {
 	k.DeleteIncomingFee(ctx, address)
 
 	return nil
+}
+
+func (k Keeper) WithdrawTax(ctx sdk.Context, trustee sdk.AccAddress, destAddress sdk.AccAddress, amt sdk.Coins) sdk.Error {
+	_, found := k.gk.GetTrustee(ctx, trustee)
+	if !found {
+		return types.ErrNotTrustee(k.codespace, trustee)
+	}
+
+	err := k.bk.SendCoins(ctx, auth.ServiceTaxCoinsAccAddr, destAddress, amt)
+	return err
 }
 
 // get the current in-block request operation counter
