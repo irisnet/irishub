@@ -100,7 +100,7 @@ func TestMsgCreateHTLCValidation(t *testing.T) {
 func TestMsgCreateHTLCGetSignBytes(t *testing.T) {
 	msg := NewMsgCreateHTLC(senderAddr, toAddr, receiverOnOtherChain, amount, hashLock, timestamp, timeLock)
 	res := msg.GetSignBytes()
-	expected := `{"type":"irishub/htlc/MsgCreateHTLC","value":{"amount":[{"amount":"10","denom":"iris"}],"hash_lock":"6NQTPhqCx04nRueMGThXBup5WKDKRBoI2s+hDEjOJWE=","receiver_on_other_chain":"receiverOnOtherChain","sender":"faa128nh833v43sggcj65nk7khjka9dwngpl6j29hj","time_lock":"50","timestamp":"1580000000","to":"faa1mrehjkgeg75nz2gk7lr7dnxvvtg4497jxss8hq"}}`
+	expected := `{"type":"irishub/htlc/MsgCreateHTLC","value":{"amount":[{"amount":"10","denom":"stake"}],"hash_lock":"6NQTPhqCx04nRueMGThXBup5WKDKRBoI2s+hDEjOJWE=","receiver_on_other_chain":"receiverOnOtherChain","sender":"faa128nh833v43sggcj65nk7khjka9dwngpl6j29hj","time_lock":"50","timestamp":"1580000000","to":"faa1mrehjkgeg75nz2gk7lr7dnxvvtg4497jxss8hq"}}`
 	require.Equal(t, expected, string(res))
 }
 
