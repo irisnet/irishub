@@ -1,7 +1,6 @@
 package types
 
 import (
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"strings"
@@ -50,58 +49,10 @@ func (h HTLC) GetHashLock() []byte {
 		if h.Timestamp > 0 {
 			return SHA256(append(h.Secret, sdk.Uint64ToBigEndian(h.Timestamp)...))
 		}
-
 		return SHA256(h.Secret)
 	}
-
 	return nil
 }
-
-// String implements fmt.Stringer
-func (h HTLC) String() string {
-	return fmt.Sprintf(`HTLC:
-	Sender:               %s
-	Receiver:             %s
-	ReceiverOnOtherChain: %s
-	Amount:               %s
-	Secret:               %s
-	Timestamp:            %d
-	ExpireHeight:         %d
-	State:                %s`,
-		h.Sender.String(),
-		h.To.String(),
-		h.ReceiverOnOtherChain,
-		h.Amount.String(),
-		hex.EncodeToString(h.Secret),
-		h.Timestamp,
-		h.ExpireHeight,
-		h.State,
-	)
-}
-
-/*
-// HumanString implements human
-func (h HTLC) HumanString(converter sdk.CoinsConverter) string {
-	return fmt.Sprintf(`HTLC:
-	Sender:               %s
-	To:                   %s
-	ReceiverOnOtherChain: %s
-	Amount:               %s
-	Secret:               %s
-	Timestamp:            %d
-	ExpireHeight:         %d
-	State:                %s`,
-		h.Sender,
-		h.To,
-		h.ReceiverOnOtherChain,
-		converter.ToMainUnit(h.Amount),
-		hex.EncodeToString(h.Secret),
-		h.Timestamp,
-		h.ExpireHeight,
-		h.State,
-	)
-}
-*/
 
 // HTLCState represents the state of an HTLC
 type HTLCState byte
