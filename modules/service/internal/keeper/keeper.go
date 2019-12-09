@@ -62,6 +62,16 @@ func (k Keeper) Codespace() sdk.CodespaceType {
 	return k.codespace
 }
 
+// GetCdc returns the cdc
+func (k Keeper) GetCdc() *codec.Codec {
+	return k.cdc
+}
+
+// GetMetrics returns the metrics
+func (k Keeper) GetMetrics() *types.Metrics {
+	return k.metrics
+}
+
 // GetServiceDepositAccount returns the service depost ModuleAccount
 func (k Keeper) GetServiceDepositAccount(ctx sdk.Context) exported.ModuleAccountI {
 	return k.sk.GetModuleAccount(ctx, types.DepositAccName)

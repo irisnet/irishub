@@ -4,7 +4,7 @@ package types
 const (
 	EventTypeRequestSvc     = "request_service"
 	EventTypeRespondSvc     = "respond_service"
-	EventTypeSvcCallTimeOut = "service_call_expiration"
+	EventTypeSvcCallTimeout = "service_call_expiration"
 
 	AttributeKeyProvider   = "provider"
 	AttributeKeyConsumer   = "consumer"

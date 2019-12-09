@@ -220,6 +220,11 @@ func (k Keeper) Slash(ctx sdk.Context, binding types.SvcBinding, slashCoins sdk.
 		binding.DisableTime = ctx.BlockHeader().Time
 	}
 
+	err = k.sk.BurnCoins(ctx, types.DepositAccName, slashCoins)
+	if err != nil {
+		return err
+	}
+
 	ctx.Logger().Info("Slash service provider", "provider", binding.Provider.String(), "slash_amount", slashCoins.String())
 
 	k.SetServiceBinding(ctx, binding)

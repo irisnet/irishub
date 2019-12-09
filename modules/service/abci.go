@@ -2,7 +2,6 @@ package service
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/irisnet/irishub/modules/service/internal/types"
 )
 
@@ -21,7 +20,7 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) {
 
 	for ; activeIterator.Valid(); activeIterator.Next() {
 		var req SvcRequest
-		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(activeIterator.Value(), &req)
+		keeper.GetCdc().MustUnmarshalBinaryLengthPrefixed(activeIterator.Value(), &req)
 
 		// if not Profiling mode,should slash provider
 		slashCoins := sdk.Coins{}
@@ -36,11 +35,7 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) {
 
 			slashCoins = slashCoins.Sort()
 
-			_, err := keeper.sk.BurnCoins(ctx, auth.ServiceDepositCoinsAccAddr, slashCoins)
-			if err != nil {
-				panic(err)
-			}
-			err = keeper.Slash(ctx, binding, slashCoins)
+			err := keeper.Slash(ctx, binding, slashCoins)
 			if err != nil {
 				panic(err)
 			}
@@ -49,7 +44,7 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) {
 		keeper.AddReturnFee(ctx, req.Consumer, req.ServiceFee)
 
 		keeper.DeleteActiveRequest(ctx, req)
-		keeper.metrics.ActiveRequests.Add(-1)
+		keeper.GetMetrics().ActiveRequests.Add(-1)
 		keeper.DeleteRequestExpiration(ctx, req)
 
 		ctx.EventManager().EmitEvent(
