@@ -22,6 +22,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/genutil"
 	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
 	"github.com/cosmos/cosmos-sdk/x/staking"
+	"github.com/irisnet/irishub/modules/guardian"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	tmconfig "github.com/tendermint/tendermint/config"
@@ -269,6 +270,22 @@ func initGenFiles(
 	cdc.MustUnmarshalJSON(authDataBz, &authGenState)
 	authGenState.Accounts = genAccounts
 	appGenState[auth.ModuleName] = cdc.MustMarshalJSON(authGenState)
+
+	// set the guardian accounts in the genesis state
+	guardianDataBz := appGenState[guardian.ModuleName]
+	var guardianGenState guardian.GenesisState
+	cdc.MustUnmarshalJSON(guardianDataBz, &guardianGenState)
+
+	var guardianAddr = genAccounts[0].GetAddress()
+	for i, _ := range guardianGenState.Profilers {
+		guardianGenState.Profilers[i].Address = guardianAddr
+		guardianGenState.Profilers[i].AddedBy = guardianAddr
+	}
+	for i, _ := range guardianGenState.Trustees {
+		guardianGenState.Trustees[i].Address = guardianAddr
+		guardianGenState.Trustees[i].AddedBy = guardianAddr
+	}
+	appGenState[guardian.ModuleName] = cdc.MustMarshalJSON(guardianGenState)
 
 	appGenStateJSON, err := codec.MarshalJSONIndent(cdc, appGenState)
 	if err != nil {

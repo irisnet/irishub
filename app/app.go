@@ -1,7 +1,6 @@
 package app
 
 import (
-	"github.com/irisnet/irishub/modules/guardian"
 	"io"
 	"os"
 
@@ -25,6 +24,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	"github.com/cosmos/cosmos-sdk/x/supply"
+	"github.com/irisnet/irishub/modules/guardian"
 	abci "github.com/tendermint/tendermint/abci/types"
 	cmn "github.com/tendermint/tendermint/libs/common"
 	"github.com/tendermint/tendermint/libs/log"

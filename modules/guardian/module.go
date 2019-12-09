@@ -46,7 +46,7 @@ func (AppModuleBasic) ValidateGenesis(bz json.RawMessage) error {
 	if err != nil {
 		return err
 	}
-	return ValidateGenesis(data)
+	return nil
 }
 
 // RegisterRESTRoutes registers the REST routes for the guardian module.

@@ -40,7 +40,6 @@ var (
 	NewGenesisState     = types.NewGenesisState
 	DefaultGenesisState = types.DefaultGenesisState
 	NewGuardian         = types.NewGuardian
-	ValidateGenesis     = types.ValidateGenesis
 	RegisterCodec       = types.RegisterCodec
 
 	// variable aliases
@@ -60,6 +59,8 @@ type (
 	Keeper            = keeper.Keeper
 	GenesisState      = types.GenesisState
 	Guardian          = types.Guardian
+	Profilers         = types.Profilers
+	Trustees          = types.Trustees
 	MsgAddProfiler    = types.MsgAddProfiler
 	MsgAddTrustee     = types.MsgAddTrustee
 	MsgDeleteProfiler = types.MsgDeleteProfiler

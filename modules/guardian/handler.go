@@ -38,6 +38,7 @@ func handleMsgAddProfiler(ctx sdk.Context, k Keeper, msg MsgAddProfiler) sdk.Res
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, AttributeValueCategory),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.AddedBy.String()),
 		),
 		sdk.NewEvent(
 			EventTypeAddProfiler,
@@ -63,6 +64,7 @@ func handleMsgAddTrustee(ctx sdk.Context, k Keeper, msg MsgAddTrustee) sdk.Resul
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, AttributeValueCategory),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.AddedBy.String()),
 		),
 		sdk.NewEvent(
 			EventTypeAddTrustee,
@@ -92,6 +94,7 @@ func handleMsgDeleteProfiler(ctx sdk.Context, k Keeper, msg MsgDeleteProfiler) s
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, AttributeValueCategory),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.DeletedBy.String()),
 		),
 		sdk.NewEvent(
 			EventTypeDeleteProfiler,
@@ -121,6 +124,7 @@ func handleMsgDeleteTrustee(ctx sdk.Context, k Keeper, msg MsgDeleteTrustee) sdk
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, AttributeValueCategory),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.DeletedBy.String()),
 		),
 		sdk.NewEvent(
 			EventTypeDeleteTrustee,

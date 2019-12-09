@@ -18,20 +18,39 @@ func TestIrisCLIAddProfiler(t *testing.T) {
 	fooAddr := f.KeyAddress(keyFoo)
 	barAddr := f.KeyAddress(keyBar)
 
-	success, _, stderr := f.TxAddProfiler(fooAddr.String(), barAddr.String(), "test")
+	// start iris server
+	proc := f.GDStart()
+	defer proc.Stop(false)
+
+	description := "test"
+
+	success, _, stderr := f.TxAddProfiler(fooAddr.String(), barAddr.String(), description, "-y")
 	require.True(f.T, success)
 	require.Empty(f.T, stderr)
 
-	res := f.QueryProfiler()
-	require.Len(f.T, res, 1)
-	require.Equal(f.T, barAddr, res[0].Address)
+	tests.WaitForNextNBlocksTM(1, f.Port)
+	// Ensure transaction tags can be queried
+	searchResult := f.QueryTxs(1, 50, "message.action:add_profiler", fmt.Sprintf("message.sender:%s", fooAddr))
+	require.Len(t, searchResult.Txs, 1)
 
-	success, _, stderr = f.TxDeleteProfiler(fooAddr.String(), barAddr.String())
+	expGuardian := guardian.NewGuardian(description, guardian.Ordinary, barAddr, fooAddr)
+
+	res := f.QueryProfilers()
+	require.NotEmpty(f.T, res)
+	require.Contains(f.T, res, expGuardian)
+
+	success, _, stderr = f.TxDeleteProfiler(fooAddr.String(), barAddr.String(), "-y")
 	require.True(f.T, success)
 	require.Empty(f.T, stderr)
 
-	res = f.QueryProfiler()
-	require.Len(f.T, res, 0)
+	tests.WaitForNextNBlocksTM(1, f.Port)
+	// Ensure transaction tags can be queried
+	searchResult = f.QueryTxs(1, 50, "message.action:delete_profiler", fmt.Sprintf("message.sender:%s", fooAddr))
+	require.Len(t, searchResult.Txs, 1)
+
+	res = f.QueryProfilers()
+	require.NotEmpty(f.T, res)
+	require.NotContains(f.T, res, expGuardian)
 
 	// Cleanup testing directories
 	f.Cleanup()
@@ -41,23 +60,42 @@ func TestIrisCLIAddTrustee(t *testing.T) {
 	t.Parallel()
 	f := InitFixtures(t)
 
+	// start iris server
+	proc := f.GDStart()
+	defer proc.Stop(false)
+
 	fooAddr := f.KeyAddress(keyFoo)
 	barAddr := f.KeyAddress(keyBar)
 
-	success, _, stderr := f.TxAddTrustee(fooAddr.String(), barAddr.String(), "test")
+	description := "test"
+
+	success, _, stderr := f.TxAddTrustee(fooAddr.String(), barAddr.String(), description, "-y")
 	require.True(f.T, success)
 	require.Empty(f.T, stderr)
 
-	res := f.QueryTrustee()
-	require.Len(f.T, res, 1)
-	require.Equal(f.T, barAddr, res[0].Address)
+	expGuardian := guardian.NewGuardian(description, guardian.Ordinary, barAddr, fooAddr)
 
-	success, _, stderr = f.TxDeleteTrustee(fooAddr.String(), barAddr.String())
+	tests.WaitForNextNBlocksTM(1, f.Port)
+	// Ensure transaction tags can be queried
+	searchResult := f.QueryTxs(1, 50, "message.action:add_trustee", fmt.Sprintf("message.sender:%s", fooAddr))
+	require.Len(t, searchResult.Txs, 1)
+
+	res := f.QueryTrustees()
+	require.NotEmpty(f.T, res)
+	require.Contains(f.T, res, expGuardian)
+
+	success, _, stderr = f.TxDeleteTrustee(fooAddr.String(), barAddr.String(), "-y")
 	require.True(f.T, success)
 	require.Empty(f.T, stderr)
 
-	res = f.QueryTrustee()
-	require.Len(f.T, res, 0)
+	tests.WaitForNextNBlocksTM(1, f.Port)
+	// Ensure transaction tags can be queried
+	searchResult = f.QueryTxs(1, 50, "message.action:delete_trustee", fmt.Sprintf("message.sender:%s", fooAddr))
+	require.Len(t, searchResult.Txs, 1)
+
+	res = f.QueryTrustees()
+	require.NotEmpty(f.T, res)
+	require.NotContains(f.T, res, expGuardian)
 
 	// Cleanup testing directories
 	f.Cleanup()
@@ -91,21 +129,21 @@ func (f *Fixtures) TxDeleteTrustee(from, address string, flags ...string) (bool,
 }
 
 // QueryProfiler is iriscli query guardian profilers
-func (f *Fixtures) QueryProfiler() (result []guardian.Guardian) {
-	cmd := fmt.Sprintf("%s query guardian profilers --output=%s", f.IriscliBinary, "json")
+func (f *Fixtures) QueryProfilers() (result guardian.Profilers) {
+	cmd := fmt.Sprintf("%s query guardian profilers --output=%s %v", f.IriscliBinary, "json", f.Flags())
 	out, _ := tests.ExecuteT(f.T, cmd, "")
 	cdc := app.MakeCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &result)
 	require.NoError(f.T, err, "out %v\n, err %v", out, err)
-	return result
+	return
 }
 
 // QueryTrustee is iriscli query guardian profilers
-func (f *Fixtures) QueryTrustee() (result []guardian.Guardian) {
-	cmd := fmt.Sprintf("%s query guardian trustees --output=%s", f.IriscliBinary, "json")
+func (f *Fixtures) QueryTrustees() (result guardian.Trustees) {
+	cmd := fmt.Sprintf("%s query guardian trustees --output=%s %v", f.IriscliBinary, "json", f.Flags())
 	out, _ := tests.ExecuteT(f.T, cmd, "")
 	cdc := app.MakeCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &result)
 	require.NoError(f.T, err, "out %v\n, err %v", out, err)
-	return result
+	return
 }
