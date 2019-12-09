@@ -153,6 +153,8 @@ func TestIrisCLIIssueToken(t *testing.T) {
 	// Ensure token owner has been modified
 	token2 := f.QueryAssetToken(symbol)
 	require.Equal(t, barAddr.String(), token2.Owner.String())
+
+	f.Cleanup()
 }
 
 // QueryAssetTokens is iriscli query asset tokens
