@@ -10,6 +10,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/require"
+	tmtypes "github.com/tendermint/tendermint/types"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	clientkeys "github.com/cosmos/cosmos-sdk/client/keys"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -27,8 +30,6 @@ import (
 	"github.com/irisnet/irishub/app"
 	iconfig "github.com/irisnet/irishub/config"
 	"github.com/irisnet/irishub/modules/guardian"
-	"github.com/stretchr/testify/require"
-	tmtypes "github.com/tendermint/tendermint/types"
 )
 
 const (
