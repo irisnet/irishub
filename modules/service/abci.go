@@ -1,23 +1,24 @@
 package service
 
 import (
-	"github.com/cosmos/cosmos-sdk/x/auth"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/irisnet/irishub/modules/service/internal/types"
 )
 
 // EndBlocker handles block ending logic
 func EndBlocker(ctx sdk.Context, keeper Keeper) {
-	ctx = ctx.WithLogger(ctx.Logger().With("handler", "endBlock").With("module", "iris/service"))
-	logger := ctx.Logger()
+	logger := keeper.Logger(ctx)
+
 	// Reset the intra-transaction counter.
 	keeper.SetIntraTxCounter(ctx, 0)
 
-	params := keeper.GetParamSet(ctx)
+	params := keeper.GetParams(ctx)
 	slashFraction := params.SlashFraction
 
 	activeIterator := keeper.ActiveRequestQueueIterator(ctx, ctx.BlockHeight())
 	defer activeIterator.Close()
+
 	for ; activeIterator.Valid(); activeIterator.Next() {
 		var req SvcRequest
 		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(activeIterator.Value(), &req)
@@ -35,7 +36,7 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) {
 
 			slashCoins = slashCoins.Sort()
 
-			_, err := keeper.ck.BurnCoins(ctx, auth.ServiceDepositCoinsAccAddr, slashCoins)
+			_, err := keeper.sk.BurnCoins(ctx, auth.ServiceDepositCoinsAccAddr, slashCoins)
 			if err != nil {
 				panic(err)
 			}
@@ -50,7 +51,7 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) {
 		keeper.DeleteActiveRequest(ctx, req)
 		keeper.metrics.ActiveRequests.Add(-1)
 		keeper.DeleteRequestExpiration(ctx, req)
-	
+
 		ctx.EventManager().EmitEvent(
 			sdk.NewEvent(
 				types.EventTypeSvcCallTimeout,
@@ -63,5 +64,5 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) {
 		logger.Info("Remove timeout request", "request_id", req.RequestID(), "consumer", req.Consumer.String())
 	}
 
-	return 
+	return
 }

@@ -8,6 +8,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/params"
 	"github.com/cosmos/cosmos-sdk/x/supply/exported"
 	"github.com/irisnet/irishub/modules/service/internal/types"
+	"github.com/tendermint/tendermint/libs/log"
 )
 
 type Keeper struct {
@@ -49,6 +50,11 @@ func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, sk types.SupplyKeeper, gk typ
 	}
 
 	return keeper
+}
+
+// Logger returns a module-specific logger.
+func (k Keeper) Logger(ctx sdk.Context) log.Logger {
+	return ctx.Logger().With("module", fmt.Sprintf("%s", types.ModuleName))
 }
 
 // return the codespace
