@@ -12,7 +12,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irishub/config"
 	modulehtlc "github.com/irisnet/irishub/modules/htlc"
 	"github.com/irisnet/irishub/modules/htlc/internal/types"
 	"github.com/irisnet/irishub/simapp"
@@ -51,7 +50,7 @@ func (suite *KeeperTestSuite) TestExportHTLCGenesis() {
 	// _ = suite.app.BankKeeper.SetCoins(suite.ctx, senderAddrs[0], sdk.NewCoins(sdk.NewInt64Coin(config.Iris, 100000)))
 
 	receiverOnOtherChain := "receiverOnOtherChain"
-	amount := sdk.NewCoins(sdk.NewCoin(config.Iris, sdk.NewInt(0)))
+	amount := sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(0)))
 	secret := []byte("___abcdefghijklmnopqrstuvwxyz___")
 	timestamps := []uint64{uint64(1580000000), 0}
 	hashLocks := [][]byte{types.GetHashLock(secret, timestamps[0]), types.GetHashLock(secret, timestamps[1])}

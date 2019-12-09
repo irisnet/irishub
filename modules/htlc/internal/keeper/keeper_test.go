@@ -11,7 +11,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irishub/config"
 	"github.com/irisnet/irishub/modules/htlc/internal/keeper"
 	"github.com/irisnet/irishub/modules/htlc/internal/types"
 	"github.com/irisnet/irishub/simapp"
@@ -43,11 +42,11 @@ func (suite *KeeperTestSuite) TestCreateHTLC() {
 
 	_ = suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, addrSender)
 	_ = suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, addrTo)
-	_ = suite.app.BankKeeper.SetCoins(suite.ctx, addrSender, sdk.NewCoins(sdk.NewInt64Coin(config.Iris, 100000)))
-	require.True(suite.T(), suite.app.BankKeeper.GetCoins(suite.ctx, addrSender).IsEqual(sdk.NewCoins(sdk.NewInt64Coin(config.Iris, 100000))))
+	_ = suite.app.BankKeeper.SetCoins(suite.ctx, addrSender, sdk.NewCoins(sdk.NewInt64Coin(sdk.DefaultBondDenom, 100000)))
+	require.True(suite.T(), suite.app.BankKeeper.GetCoins(suite.ctx, addrSender).IsEqual(sdk.NewCoins(sdk.NewInt64Coin(sdk.DefaultBondDenom, 100000))))
 
 	receiverOnOtherChain := "receiverOnOtherChain"
-	amount := sdk.NewCoins(sdk.NewCoin(config.Iris, sdk.NewInt(10)))
+	amount := sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(10)))
 	secret := []byte("___abcdefghijklmnopqrstuvwxyz___")
 	timestamp := uint64(1580000000)
 	hashLock := types.SHA256(append(secret, sdk.Uint64ToBigEndian(timestamp)...))
@@ -109,12 +108,12 @@ func (suite *KeeperTestSuite) TestClaimHTLC() {
 
 	_ = suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, addrSender)
 	_ = suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, addrTo)
-	_ = suite.app.BankKeeper.SetCoins(suite.ctx, addrSender, sdk.NewCoins(sdk.NewInt64Coin(config.Iris, 100000)))
-	_ = suite.app.BankKeeper.SetCoins(suite.ctx, addrTo, sdk.NewCoins(sdk.NewInt64Coin(config.Iris, 50000)))
-	require.True(suite.T(), suite.app.BankKeeper.GetCoins(suite.ctx, addrSender).IsEqual(sdk.NewCoins(sdk.NewInt64Coin(config.Iris, 100000))))
+	_ = suite.app.BankKeeper.SetCoins(suite.ctx, addrSender, sdk.NewCoins(sdk.NewInt64Coin(sdk.DefaultBondDenom, 100000)))
+	_ = suite.app.BankKeeper.SetCoins(suite.ctx, addrTo, sdk.NewCoins(sdk.NewInt64Coin(sdk.DefaultBondDenom, 50000)))
+	require.True(suite.T(), suite.app.BankKeeper.GetCoins(suite.ctx, addrSender).IsEqual(sdk.NewCoins(sdk.NewInt64Coin(sdk.DefaultBondDenom, 100000))))
 
 	receiverOnOtherChain := "receiverOnOtherChain"
-	amount := sdk.NewCoins(sdk.NewCoin(config.Iris, sdk.NewInt(10)))
+	amount := sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(10)))
 	secret1 := []byte("___abcdefghijklmnopqrstuvwxyz___")
 	secret2 := []byte("___00000000000000000000000000___")
 	timestamp := uint64(1580000000)
@@ -232,11 +231,11 @@ func (suite *KeeperTestSuite) TestRefundHTLC() {
 
 	_ = suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, addrSender)
 	_ = suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, addrTo)
-	_ = suite.app.BankKeeper.SetCoins(suite.ctx, addrSender, sdk.NewCoins(sdk.NewInt64Coin(config.Iris, 100000)))
-	require.True(suite.T(), suite.app.BankKeeper.GetCoins(suite.ctx, addrSender).IsEqual(sdk.NewCoins(sdk.NewInt64Coin(config.Iris, 100000))))
+	_ = suite.app.BankKeeper.SetCoins(suite.ctx, addrSender, sdk.NewCoins(sdk.NewInt64Coin(sdk.DefaultBondDenom, 100000)))
+	require.True(suite.T(), suite.app.BankKeeper.GetCoins(suite.ctx, addrSender).IsEqual(sdk.NewCoins(sdk.NewInt64Coin(sdk.DefaultBondDenom, 100000))))
 
 	receiverOnOtherChain := "receiverOnOtherChain"
-	amount := sdk.NewCoins(sdk.NewCoin(config.Iris, sdk.NewInt(10)))
+	amount := sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(10)))
 	secret := []byte("___abcdefghijklmnopqrstuvwxyz___")
 	timestamp := uint64(1580000000)
 	hashLock := types.SHA256(append(secret, sdk.Uint64ToBigEndian(timestamp)...))
