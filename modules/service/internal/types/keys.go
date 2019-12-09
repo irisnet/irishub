@@ -21,6 +21,15 @@ const (
 
 	// DefaultParamspace is the default name for parameter store
 	DefaultParamspace = ModuleName
+
+	// DepositAccName is the root string for the service deposit account address
+	DepositAccName = "service_deposit_account"
+
+	// RequestAccName is the root string for the service request account address
+	RequestAccName = "service_request_account"
+
+	// TaxAccName is the root string for the service tax account address
+	TaxAccName = "service_tax_account"
 )
 
 var (

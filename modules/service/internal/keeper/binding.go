@@ -5,7 +5,6 @@ import (
 	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/irisnet/irishub/modules/service/internal/types"
 )
 
@@ -46,8 +45,8 @@ func (k Keeper) AddServiceBinding(
 		return err
 	}
 
-	// Subtract coins from provider's account
-	err = k.bk.SendCoins(ctx, svcBinding.Provider, auth.ServiceDepositCoinsAccAddr, svcBinding.Deposit)
+	// Send coins from provider's account to the deposit module account
+	err = k.sk.SendCoinsFromAccountToModule(ctx, svcBinding.Provider, types.ServiceDepositAccName, svcBinding.Deposit)
 	if err != nil {
 		return err
 	}
@@ -119,8 +118,8 @@ func (k Keeper) UpdateServiceBinding(
 		oldBinding.Deposit = oldBinding.Deposit.Add(newBinding.Deposit)
 	}
 
-	// Subtract coins from provider's account
-	err = k.bk.SendCoins(ctx, svcBinding.Provider, auth.ServiceDepositCoinsAccAddr, newBinding.Deposit)
+	// Send coins from provider's account to the deposit module account
+	err = k.sk.SendCoinsFromAccountToModule(ctx, svcBinding.Provider, types.ServiceDepositAccName, newBinding.Deposit)
 	if err != nil {
 		return svcBinding, err
 	}
@@ -191,8 +190,8 @@ func (k Keeper) Enable(ctx sdk.Context, defChainID, defName, bindChainID string,
 		return types.ErrLtMinProviderDeposit(k.codespace, minDeposit.Sub(binding.Deposit).Add(deposit))
 	}
 
-	// Subtract coins from provider's account
-	err = k.bk.SendCoins(ctx, binding.Provider, auth.ServiceDepositCoinsAccAddr, deposit)
+	// Send coins from provider's account to the deposit module account
+	err = k.sk.SendCoinsFromAccountToModule(ctx, binding.Provider, types.ServiceDepositAccName, deposit)
 	if err != nil {
 		return err
 	}
@@ -227,8 +226,8 @@ func (k Keeper) RefundDeposit(ctx sdk.Context, defChainID, defName, bindChainID 
 		return types.ErrRefundDeposit(k.Codespace(), fmt.Sprintf("can not refund deposit before %s", refundTime.Format("2006-01-02 15:04:05")))
 	}
 
-	// Add coins to provider's account
-	err := k.bk.SendCoins(ctx, auth.ServiceDepositCoinsAccAddr, binding.Provider, binding.Deposit)
+	// Send coins from the deposit module account to the provider's account
+	err := k.sk.SendCoinsFromModuleToAccount(ctx, types.ServiceDepositAccName, binding.Provider, binding.Deposit)
 	if err != nil {
 		return err
 	}

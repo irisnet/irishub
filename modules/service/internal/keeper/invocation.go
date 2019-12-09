@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/irisnet/irishub/modules/service/internal/types"
 )
 
@@ -53,7 +52,7 @@ func (k Keeper) AddRequest(
 		serviceFee = nil
 	}
 
-	req = types.NewMsgSvcRequest(defChainID, defName, bindChainID, reqChainID,
+	req = types.NewSvcRequest(defChainID, defName, bindChainID, reqChainID,
 		consumer, provider, methodID, input, serviceFee, profiling)
 
 	counter := k.GetIntraTxCounter(ctx)
@@ -65,7 +64,7 @@ func (k Keeper) AddRequest(
 	params := k.GetParams(ctx)
 	req.ExpirationHeight = req.RequestHeight + params.MaxRequestTimeout
 
-	err = k.bk.SendCoins(ctx, req.Consumer, auth.ServiceRequestCoinsAccAddr, req.ServiceFee)
+	err = k.sk.SendCoinsFromAccountToModule(ctx, req.Consumer, types.RequestAccName, req.ServiceFee)
 	if err != nil {
 		return req, err
 	}
@@ -272,7 +271,7 @@ func (k Keeper) RefundFee(ctx sdk.Context, address sdk.AccAddress) sdk.Error {
 		return types.ErrReturnFeeNotExists(k.codespace, address)
 	}
 
-	err := k.bk.SendCoins(ctx, auth.ServiceRequestCoinsAccAddr, address, fee.Coins)
+	err := k.sk.SendCoinsFromModuleToAccount(ctx, types.RequestAccName, address, fee.Coins)
 	if err != nil {
 		return err
 	}
@@ -296,7 +295,7 @@ func (k Keeper) AddIncomingFee(ctx sdk.Context, address sdk.AccAddress, coins sd
 
 	taxCoins = taxCoins.Sort()
 
-	err := k.bk.SendCoins(ctx, auth.ServiceRequestCoinsAccAddr, auth.ServiceTaxCoinsAccAddr, taxCoins)
+	err := k.sk.SendCoinsFromModuleToModule(ctx, types.RequestAccName, types.TaxAccName, taxCoins)
 	if err != nil {
 		return err
 	}
@@ -349,7 +348,7 @@ func (k Keeper) WithdrawFee(ctx sdk.Context, address sdk.AccAddress) sdk.Error {
 		return types.ErrWithdrawFeeNotExists(k.codespace, address)
 	}
 
-	err := k.bk.SendCoins(ctx, auth.ServiceRequestCoinsAccAddr, address, fee.Coins)
+	err := k.sk.SendCoinsFromModuleToAccount(ctx, types.RequestAccName, address, fee.Coins)
 	if err != nil {
 		return err
 	}
@@ -366,7 +365,7 @@ func (k Keeper) WithdrawTax(ctx sdk.Context, trustee sdk.AccAddress, destAddress
 		return types.ErrNotTrustee(k.codespace, trustee)
 	}
 
-	err := k.bk.SendCoins(ctx, auth.ServiceTaxCoinsAccAddr, destAddress, amt)
+	err := k.sk.SendCoinsFromModuleToAccount(ctx, types.ServiceTaxAccName, destAddress, amt)
 	return err
 }
 

@@ -41,10 +41,13 @@ type (
 var (
 	ModuleName   = types.ModuleName
 	StoreKey     = types.StoreKey
-	TStoreKey    = types.TStoreKey
 	QuerierRoute = types.QuerierRoute
 	RouterKey    = types.RouterKey
 	ModuleCdc    = types.ModuleCdc
+
+	DepositAccName = types.RequestAccName
+	RequestAccName = types.RequestAccName
+	TaxAccName     = types.TaxAccName
 
 	DefaultCodespace = types.DefaultCodespace
 	RegisterCodec    = types.RegisterCodec
@@ -72,8 +75,7 @@ var (
 	DefaultGenesisState = types.DefaultGenesisState
 	ValidateGenesis     = types.ValidateGenesis
 
-	DefaultParams        = types.DefaultParams
-	DefaultParamsForTest = types.DefaultParamsForTest
+	DefaultParams = types.DefaultParams
 
 	ErrSvcDefExists           = types.ErrSvcDefExists
 	ErrSvcBindingNotExists    = types.ErrSvcBindingNotExists
