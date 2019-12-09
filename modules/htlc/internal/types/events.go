@@ -11,8 +11,8 @@ const (
 
 	AttributeValueSender               = "sender"
 	AttributeValueReceiver             = "receiver"
-	AttributeValueReceiverOnOtherChain = "receiver-on-other-chain"
+	AttributeValueReceiverOnOtherChain = "receiver_on_other_chain"
 	AttributeValueAmount               = "amount"
-	AttributeValueHashLock             = "hash-lock"
+	AttributeValueHashLock             = "hash_lock"
 	AttributeValueSecret               = "secret"
 )

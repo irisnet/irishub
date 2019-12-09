@@ -43,8 +43,10 @@ func GetCmdCreateHTLC(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create",
 		Short: "Create an HTLC",
-		Example: "iriscli tx htlc create --chain-id=<chain-id> --from=<key-name> --fees=0.3iris --to=<to> --receiver-on-other-chain=<receiver-on-other-chain> --amount=<amount> --secret=<secret> " +
-			"--time-lock=<time-lock> --timestamp=<timestamp>",
+		Example: "iriscli tx htlc create --chain-id=<chain-id> --from=<key-name>" +
+			" --fees=0.3iris --to=<to> --receiver-on-other-chain=<receiver-on-other-chain> --amount=<amount>" +
+			" --secret=<secret> --timestamp=<timestamp> --time-lock=<time-lock>",
+		PreRunE: preCheckCmd,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(auth.DefaultTxEncoder(cdc))
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
@@ -65,29 +67,39 @@ func GetCmdCreateHTLC(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
+			timestamp := viper.GetInt64(FlagTimestamp)
+			timeLock := viper.GetInt64(FlagTimeLock)
+
 			secret := make([]byte, 32)
+			var hashLock []byte
 
-			secretStr := strings.TrimSpace(viper.GetString(FlagSecret))
-			if len(secretStr) > 0 {
-				if len(secretStr) != 2*types.SecretLength {
-					return fmt.Errorf("the secret must be %d bytes long", types.SecretLength)
-				}
-
-				secret, err = hex.DecodeString(secretStr)
+			flags := cmd.Flags()
+			if flags.Changed(FlagHashLock) {
+				hashLockStr := strings.TrimSpace(viper.GetString(FlagHashLock))
+				hashLock, err = hex.DecodeString(hashLockStr)
 				if err != nil {
 					return err
 				}
 			} else {
-				_, err := rand.Read(secret)
-				if err != nil {
-					return err
+				secretStr := strings.TrimSpace(viper.GetString(FlagSecret))
+				if len(secretStr) > 0 {
+					if len(secretStr) != 2*types.SecretLength {
+						return fmt.Errorf("the secret must be %d bytes long", types.SecretLength)
+					}
+
+					secret, err = hex.DecodeString(secretStr)
+					if err != nil {
+						return err
+					}
+				} else {
+					_, err := rand.Read(secret)
+					if err != nil {
+						return err
+					}
 				}
+
+				hashLock = types.GetHashLock(secret, uint64(timestamp))
 			}
-
-			timestamp := viper.GetInt64(FlagTimestamp)
-			hashLock := types.GetHashLock(secret, uint64(timestamp))
-
-			timeLock := viper.GetInt64(FlagTimeLock)
 
 			msg := types.NewMsgCreateHTLC(
 				sender, toAddr, receiverOnOtherChain, amount,
@@ -98,7 +110,7 @@ func GetCmdCreateHTLC(cdc *codec.Codec) *cobra.Command {
 			}
 
 			err = utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
-			if err == nil {
+			if err == nil && !flags.Changed(FlagHashLock) {
 				fmt.Println("**Important** save this secret, hashLock in a safe place.")
 				fmt.Println("It is the only way to claim or refund the locked coins from an HTLC")
 				fmt.Println()
@@ -190,4 +202,14 @@ func GetCmdRefundHTLC(cdc *codec.Codec) *cobra.Command {
 	_ = cmd.MarkFlagRequired(FlagHashLock)
 
 	return cmd
+}
+
+func preCheckCmd(cmd *cobra.Command, _ []string) error {
+	// make sure either the secret or hash lock is provided
+	flags := cmd.Flags()
+	if flags.Changed(FlagSecret) && flags.Changed(FlagHashLock) {
+		return fmt.Errorf("only one flag is allowed among the secret and hash lock")
+	}
+
+	return nil
 }
