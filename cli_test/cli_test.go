@@ -27,18 +27,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/gov"
 	"github.com/cosmos/cosmos-sdk/x/mint"
-	iconfig "github.com/irisnet/irishub/config"
 )
-
-func init() {
-	// set Bech32 config
-	config := sdk.GetConfig()
-	irisConfig := iconfig.GetConfig()
-	config.SetBech32PrefixForAccount(irisConfig.GetBech32AccountAddrPrefix(), irisConfig.GetBech32AccountPubPrefix())
-	config.SetBech32PrefixForValidator(irisConfig.GetBech32ValidatorAddrPrefix(), irisConfig.GetBech32ValidatorPubPrefix())
-	config.SetBech32PrefixForConsensusNode(irisConfig.GetBech32ConsensusAddrPrefix(), irisConfig.GetBech32ConsensusPubPrefix())
-	config.Seal()
-}
 
 func TestIrisCLIKeysAddMultisig(t *testing.T) {
 	t.Parallel()

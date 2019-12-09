@@ -13,19 +13,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/supply"
 
 	"github.com/irisnet/irishub/app"
-	iconfig "github.com/irisnet/irishub/config"
 	htlcmodule "github.com/irisnet/irishub/modules/htlc"
 )
-
-func init() {
-	// set Bech32 config
-	config := sdk.GetConfig()
-	irisConfig := iconfig.GetConfig()
-	config.SetBech32PrefixForAccount(irisConfig.GetBech32AccountAddrPrefix(), irisConfig.GetBech32AccountPubPrefix())
-	config.SetBech32PrefixForValidator(irisConfig.GetBech32ValidatorAddrPrefix(), irisConfig.GetBech32ValidatorPubPrefix())
-	config.SetBech32PrefixForConsensusNode(irisConfig.GetBech32ConsensusAddrPrefix(), irisConfig.GetBech32ConsensusPubPrefix())
-	config.Seal()
-}
 
 func TestIrisCLIHTLC(t *testing.T) {
 	t.Parallel()
