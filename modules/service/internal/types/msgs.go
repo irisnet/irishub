@@ -5,7 +5,6 @@ import (
 	"regexp"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/irisnet/irishub/tools/protoidl"
 )
 
 const (
@@ -22,10 +21,15 @@ const (
 	TypeMsgSvcWithdrawFees  = "withdraw_service_fees"
 	TypeMsgSvcWithdrawTax   = "withdraw_service_tax"
 
-	// name to idetify transaction types
-	outputPrivacy = "output_privacy"
-	outputCached  = "output_cached"
-	description   = "description"
+	MaxNameLength        = 70  // max length of the service name
+	MaxChainIDLength     = 50  // max length of the chain ID
+	MaxDescriptionLength = 280 // max length of the service and author description
+	MaxTagCount          = 10  // max total number of the tags
+	MaxTagLength         = 70  // max length of the tag
+)
+
+var (
+	reSvcName = regexp.MustCompile(`^[a-zA-Z0-9_-]+$`) // the service name only accepts alphanumeric characters, _ and -
 )
 
 var _, _, _, _, _, _, _, _, _, _, _ sdk.Msg = MsgSvcDef{}, MsgSvcBind{}, MsgSvcBindingUpdate{}, MsgSvcDisable{}, MsgSvcEnable{}, MsgSvcRefundDeposit{}, MsgSvcRequest{}, MsgSvcResponse{}, MsgSvcRefundFees{}, MsgSvcWithdrawFees{}, MsgSvcWithdrawTax{}
@@ -52,7 +56,7 @@ func NewMsgSvcDef(name, chainId, description string, tags []string, author sdk.A
 }
 
 func (msg MsgSvcDef) Route() string { return RouterKey }
-func (msg MsgSvcDef) Type() string  { return "define_service" }
+func (msg MsgSvcDef) Type() string  { return TypeMsgSvcDef }
 
 func (msg MsgSvcDef) GetSignBytes() []byte {
 	if len(msg.Tags) == 0 {
@@ -69,25 +73,32 @@ func (msg MsgSvcDef) ValidateBasic() sdk.Error {
 	if len(msg.ChainId) == 0 {
 		return ErrInvalidChainId(DefaultCodespace)
 	}
+
 	if !validServiceName(msg.Name) {
 		return ErrInvalidServiceName(DefaultCodespace, msg.Name)
 	}
+
 	if len(msg.Author) == 0 {
 		return ErrInvalidAuthor(DefaultCodespace)
 	}
+
 	if len(msg.IDLContent) == 0 {
 		return ErrInvalidIDL(DefaultCodespace, "content is empty")
 	}
+
 	if err := msg.EnsureLength(); err != nil {
 		return err
 	}
-	methods, err := protoidl.GetMethods(msg.IDLContent)
+
+	methods, err := ParseMethods(msg.IDLContent)
 	if err != nil {
 		return ErrInvalidIDL(DefaultCodespace, err.Error())
 	}
+
 	if valid, err := validateMethods(methods); !valid {
 		return err
 	}
+
 	return nil
 }
 
@@ -95,24 +106,8 @@ func (msg MsgSvcDef) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Author}
 }
 
-func validateMethods(methods []protoidl.Method) (bool, sdk.Error) {
-	for _, method := range methods {
-		if len(method.Name) == 0 {
-			return false, ErrInvalidMethodName(DefaultCodespace)
-		}
-		if _, ok := method.Attributes[outputPrivacy]; ok {
-			_, err := OutputPrivacyEnumFromString(method.Attributes[outputPrivacy])
-			if err != nil {
-				return false, ErrInvalidOutputPrivacyEnum(DefaultCodespace, method.Attributes[outputPrivacy])
-			}
-		}
-		if _, ok := method.Attributes[outputCached]; ok {
-			_, err := OutputCachedEnumFromString(method.Attributes[outputCached])
-			if err != nil {
-				return false, ErrInvalidOutputCachedEnum(DefaultCodespace, method.Attributes[outputCached])
-			}
-		}
-	}
+// TODO
+func validateMethods(methods []string) (bool, sdk.Error) {
 	return true, nil
 }
 
@@ -158,38 +153,49 @@ func (msg MsgSvcBind) ValidateBasic() sdk.Error {
 	if len(msg.DefChainID) == 0 {
 		return ErrInvalidDefChainId(DefaultCodespace)
 	}
+
 	if len(msg.BindChainID) == 0 {
 		return ErrInvalidChainId(DefaultCodespace)
 	}
+
 	if err := ensureChainIdLength(msg.DefChainID, "def_chain_id"); err != nil {
 		return err
 	}
+
 	if err := ensureChainIdLength(msg.BindChainID, "bind_chain_id"); err != nil {
 		return err
 	}
+
 	if !validServiceName(msg.DefName) {
 		return ErrInvalidServiceName(DefaultCodespace, msg.DefName)
 	}
+
 	if err := ensureNameLength(msg.DefName); err != nil {
 		return err
 	}
+
 	if !validBindingType(msg.BindingType) {
 		return ErrInvalidBindingType(DefaultCodespace, msg.BindingType)
 	}
+
 	if len(msg.Provider) == 0 {
 		return sdk.ErrInvalidAddress(msg.Provider.String())
 	}
-	if !msg.Deposit.IsValidIrisAtto() {
-		return sdk.ErrInvalidCoins(fmt.Sprintf("invalid deposit [%s]", msg.Deposit))
+
+	if !validServiceCoins(msg.Deposit) {
+		return sdk.ErrInvalidCoins(fmt.Sprintf("invalid service deposit [%s]", msg.Deposit))
 	}
+
 	for _, price := range msg.Prices {
-		if !price.IsValidIrisAtto() {
-			return sdk.ErrInvalidCoins(fmt.Sprintf("invalid price [%s]", price))
+		if !validServiceCoins(sdk.Coins{price}) {
+			return sdk.ErrInvalidCoins(fmt.Sprintf("invalid service price [%s]", price))
 		}
 	}
+
 	if !validLevel(msg.Level) {
 		return ErrInvalidLevel(DefaultCodespace, msg.Level)
 	}
+
 	return nil
 }
 
@@ -224,7 +230,7 @@ func NewMsgSvcBindingUpdate(defChainID, defName, bindChainID string, provider sd
 	}
 }
 func (msg MsgSvcBindingUpdate) Route() string { return RouterKey }
-func (msg MsgSvcBindingUpdate) Type() string  { return MsgSvcBindingUpdate }
+func (msg MsgSvcBindingUpdate) Type() string  { return TypeMsgSvcBindingUpdate }
 
 func (msg MsgSvcBindingUpdate) GetSignBytes() []byte {
 	b, err := ModuleCdc.MarshalJSON(msg)
@@ -238,38 +244,49 @@ func (msg MsgSvcBindingUpdate) ValidateBasic() sdk.Error {
 	if len(msg.DefChainID) == 0 {
 		return ErrInvalidDefChainId(DefaultCodespace)
 	}
+
 	if len(msg.BindChainID) == 0 {
 		return ErrInvalidChainId(DefaultCodespace)
 	}
+
 	if err := ensureChainIdLength(msg.DefChainID, "def_chain_id"); err != nil {
 		return err
 	}
+
 	if err := ensureChainIdLength(msg.BindChainID, "bind_chain_id"); err != nil {
 		return err
 	}
+
 	if !validServiceName(msg.DefName) {
 		return ErrInvalidServiceName(DefaultCodespace, msg.DefName)
 	}
+
 	if err := ensureNameLength(msg.DefName); err != nil {
 		return err
 	}
+
 	if len(msg.Provider) == 0 {
 		return sdk.ErrInvalidAddress(msg.Provider.String())
 	}
+
 	if msg.BindingType != 0x00 && !validBindingType(msg.BindingType) {
 		return ErrInvalidBindingType(DefaultCodespace, msg.BindingType)
 	}
-	if !msg.Deposit.IsValidIrisAtto() {
-		return sdk.ErrInvalidCoins(fmt.Sprintf("invalid deposit [%s]", msg.Deposit))
+
+	if !validServiceCoins(msg.Deposit) {
+		return sdk.ErrInvalidCoins(fmt.Sprintf("invalid service deposit [%s]", msg.Deposit))
 	}
+
 	for _, price := range msg.Prices {
-		if !price.IsValidIrisAtto() {
-			return sdk.ErrInvalidCoins(fmt.Sprintf("invalid price [%s]", price))
+		if !validServiceCoins(sdk.Coins{price}) {
+			return sdk.ErrInvalidCoins(fmt.Sprintf("invalid service price [%s]", price))
 		}
 	}
+
 	if !validUpdateLevel(msg.Level) {
 		return ErrInvalidLevel(DefaultCodespace, msg.Level)
 	}
+
 	return nil
 }
 
@@ -311,24 +328,31 @@ func (msg MsgSvcDisable) ValidateBasic() sdk.Error {
 	if len(msg.DefChainID) == 0 {
 		return ErrInvalidDefChainId(DefaultCodespace)
 	}
+
 	if len(msg.BindChainID) == 0 {
 		return ErrInvalidChainId(DefaultCodespace)
 	}
+
 	if err := ensureChainIdLength(msg.DefChainID, "def_chain_id"); err != nil {
 		return err
 	}
+
 	if err := ensureChainIdLength(msg.BindChainID, "bind_chain_id"); err != nil {
 		return err
 	}
+
 	if !validServiceName(msg.DefName) {
 		return ErrInvalidServiceName(DefaultCodespace, msg.DefName)
 	}
+
 	if err := ensureNameLength(msg.DefName); err != nil {
 		return err
 	}
+
 	if len(msg.Provider) == 0 {
 		return sdk.ErrInvalidAddress(msg.Provider.String())
 	}
+
 	return nil
 }
 
@@ -372,27 +396,35 @@ func (msg MsgSvcEnable) ValidateBasic() sdk.Error {
 	if len(msg.DefChainID) == 0 {
 		return ErrInvalidDefChainId(DefaultCodespace)
 	}
+
 	if len(msg.BindChainID) == 0 {
 		return ErrInvalidChainId(DefaultCodespace)
 	}
+
 	if err := ensureChainIdLength(msg.DefChainID, "def_chain_id"); err != nil {
 		return err
 	}
+
 	if err := ensureChainIdLength(msg.BindChainID, "bind_chain_id"); err != nil {
 		return err
 	}
+
 	if !validServiceName(msg.DefName) {
 		return ErrInvalidServiceName(DefaultCodespace, msg.DefName)
 	}
+
 	if err := ensureNameLength(msg.DefName); err != nil {
 		return err
 	}
-	if !msg.Deposit.IsValidIrisAtto() {
-		return sdk.ErrInvalidCoins(fmt.Sprintf("invalid deposit [%s]", msg.Deposit))
+
+	if !validServiceCoins(msg.Deposit) {
+		return sdk.ErrInvalidCoins(fmt.Sprintf("invalid service deposit [%s]", msg.Deposit))
 	}
+
 	if len(msg.Provider) == 0 {
 		return sdk.ErrInvalidAddress(msg.Provider.String())
 	}
+
 	return nil
 }
 
@@ -434,24 +466,31 @@ func (msg MsgSvcRefundDeposit) ValidateBasic() sdk.Error {
 	if len(msg.DefChainID) == 0 {
 		return ErrInvalidDefChainId(DefaultCodespace)
 	}
+
 	if len(msg.BindChainID) == 0 {
 		return ErrInvalidChainId(DefaultCodespace)
 	}
+
 	if err := ensureChainIdLength(msg.DefChainID, "def_chain_id"); err != nil {
 		return err
 	}
+
 	if err := ensureChainIdLength(msg.BindChainID, "bind_chain_id"); err != nil {
 		return err
 	}
+
 	if !validServiceName(msg.DefName) {
 		return ErrInvalidServiceName(DefaultCodespace, msg.DefName)
 	}
+
 	if err := ensureNameLength(msg.DefName); err != nil {
 		return err
 	}
+
 	if len(msg.Provider) == 0 {
 		return sdk.ErrInvalidAddress(msg.Provider.String())
 	}
+
 	return nil
 }
 
@@ -508,36 +547,47 @@ func (msg MsgSvcRequest) ValidateBasic() sdk.Error {
 	if len(msg.DefChainID) == 0 {
 		return ErrInvalidDefChainId(DefaultCodespace)
 	}
+
 	if len(msg.BindChainID) == 0 {
 		return ErrInvalidBindChainId(DefaultCodespace)
 	}
+
 	if len(msg.ReqChainID) == 0 {
 		return ErrInvalidChainId(DefaultCodespace)
 	}
+
 	if err := ensureChainIdLength(msg.DefChainID, "def_chain_id"); err != nil {
 		return err
 	}
+
 	if err := ensureChainIdLength(msg.BindChainID, "bind_chain_id"); err != nil {
 		return err
 	}
+
 	if err := ensureChainIdLength(msg.ReqChainID, "req_chain_id"); err != nil {
 		return err
 	}
+
 	if !validServiceName(msg.DefName) {
 		return ErrInvalidServiceName(DefaultCodespace, msg.DefName)
 	}
+
 	if err := ensureNameLength(msg.DefName); err != nil {
 		return err
 	}
+
 	if len(msg.Provider) == 0 {
 		return sdk.ErrInvalidAddress(msg.Provider.String())
 	}
+
 	if len(msg.Consumer) == 0 {
 		return sdk.ErrInvalidAddress(msg.Consumer.String())
 	}
-	if !msg.ServiceFee.IsValidIrisAtto() {
+
+	if !validServiceCoins(msg.ServiceFee) {
 		return sdk.ErrInvalidCoins(fmt.Sprintf("invalid service fee [%s]", msg.ServiceFee))
 	}
+
 	return nil
 }
 
@@ -573,13 +623,16 @@ func (msg MsgSvcResponse) GetSignBytes() []byte {
 	if len(msg.Output) == 0 {
 		msg.Output = nil
 	}
+
 	if len(msg.ErrorMsg) == 0 {
 		msg.ErrorMsg = nil
 	}
+
 	b, err := ModuleCdc.MarshalJSON(msg)
 	if err != nil {
 		panic(err)
 	}
+
 	return sdk.MustSortJSON(b)
 }
 
@@ -587,12 +640,15 @@ func (msg MsgSvcResponse) ValidateBasic() sdk.Error {
 	if len(msg.ReqChainID) == 0 {
 		return ErrInvalidReqChainId(DefaultCodespace)
 	}
+
 	if err := ensureChainIdLength(msg.ReqChainID, "req_chain_id"); err != nil {
 		return err
 	}
+
 	if len(msg.Provider) == 0 {
 		return sdk.ErrInvalidAddress(msg.Provider.String())
 	}
+
 	_, _, _, err := ConvertRequestID(msg.RequestID)
 	if err != nil {
 		return ErrInvalidReqId(DefaultCodespace, msg.RequestID)
@@ -630,6 +686,7 @@ func (msg MsgSvcRefundFees) ValidateBasic() sdk.Error {
 	if len(msg.Consumer) == 0 {
 		return sdk.ErrInvalidAddress(msg.Consumer.String())
 	}
+
 	return nil
 }
 
@@ -662,6 +719,7 @@ func (msg MsgSvcWithdrawFees) ValidateBasic() sdk.Error {
 	if len(msg.Provider) == 0 {
 		return sdk.ErrInvalidAddress(msg.Provider.String())
 	}
+
 	return nil
 }
 
@@ -698,12 +756,15 @@ func (msg MsgSvcWithdrawTax) ValidateBasic() sdk.Error {
 	if len(msg.Trustee) == 0 {
 		return sdk.ErrInvalidAddress(msg.Trustee.String())
 	}
+
 	if len(msg.DestAddress) == 0 {
 		return sdk.ErrInvalidAddress(msg.DestAddress.String())
 	}
-	if !msg.Amount.IsValidIrisAtto() {
-		return sdk.ErrInvalidCoins(fmt.Sprintf("invalid withdraw amount [%s]", msg.Amount))
+
+	if !validServiceCoins(msg.Amount) {
+		return sdk.ErrInvalidCoins(fmt.Sprintf("invalid service withdrawal amount [%s]", msg.Amount))
 	}
+
 	return nil
 }
 
@@ -714,13 +775,7 @@ func (msg MsgSvcWithdrawTax) GetSigners() []sdk.AccAddress {
 //______________________________________________________________________
 
 func validServiceName(name string) bool {
-	if len(name) == 0 || len(name) > 128 {
-		return false
-	}
-
-	// Must contain alphanumeric characters, _ and - only
-	reg := regexp.MustCompile(`[^a-zA-Z0-9_-]`)
-	return !reg.Match([]byte(name))
+	return !reSvcName.MatchString(name)
 }
 
 func (msg MsgSvcDef) EnsureLength() sdk.Error {
@@ -732,34 +787,47 @@ func (msg MsgSvcDef) EnsureLength() sdk.Error {
 		return err
 	}
 
-	if len(msg.Description) > 280 {
-		return sdk.ErrInvalidLength(DefaultCodespace, CodeInvalidInput, "description", len(msg.Description), 280)
+	if len(msg.Description) > MaxDescriptionLength {
+		return ErrInvalidLength(DefaultCodespace, fmt.Sprintf("length of the description must not be greater than %d", MaxDescriptionLength))
 	}
-	if len(msg.Tags) > 10 {
-		return sdk.ErrInvalidLength(DefaultCodespace, CodeInvalidInput, "tags", len(msg.Tags), 10)
+
+	if len(msg.Tags) > MaxTagCount {
+		return ErrInvalidLength(DefaultCodespace, fmt.Sprintf("the tag count must not be greater than %d", MaxTagCount))
 	} else {
 		for i, tag := range msg.Tags {
-			if len(tag) > 70 {
-				return sdk.ErrInvalidLength(DefaultCodespace, CodeInvalidInput, fmt.Sprintf("tags[%d]", i), len(tag), 70)
+			if len(tag) > MaxTagLength {
+				return ErrInvalidLength(DefaultCodespace, fmt.Sprintf("length of the tag %d must not be greater than %d", i, MaxTagLength))
 			}
 		}
 	}
-	if len(msg.AuthorDescription) > 280 {
-		return sdk.ErrInvalidLength(DefaultCodespace, CodeInvalidInput, "author_description", len(msg.AuthorDescription), 280)
+
+	if len(msg.AuthorDescription) > MaxDescriptionLength {
+		return ErrInvalidLength(DefaultCodespace, fmt.Sprintf("length of the author description must not be greater than %d", MaxDescriptionLength))
 	}
+
 	return nil
 }
 
 func ensureNameLength(name string) sdk.Error {
-	if len(name) > 70 {
-		return sdk.ErrInvalidLength(DefaultCodespace, CodeInvalidInput, "name", len(name), 70)
+	if len(name) > MaxNameLength {
+		return ErrInvalidLength(DefaultCodespace, fmt.Sprintf("length of the name must not be greater than %d", MaxNameLength))
 	}
+
 	return nil
 }
 
 func ensureChainIdLength(chainId, fieldNm string) sdk.Error {
-	if len(chainId) > 50 {
-		return sdk.ErrInvalidLength(DefaultCodespace, CodeInvalidInput, fieldNm, len(chainId), 50)
+	if len(chainId) > MaxChainIDLength {
+		return ErrInvalidLength(DefaultCodespace, fmt.Sprintf("length of the %s must not be greater than %d", fieldNm, MaxChainIDLength))
 	}
+
 	return nil
+}
+
+func validServiceCoins(coins sdk.Coins) bool {
+	if coins == nil || len(coins) != 1 {
+		return false
+	}
+
+	return coins[0].Denom == ServiceDenom && coins[0].IsPositive()
 }

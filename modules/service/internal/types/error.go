@@ -10,40 +10,41 @@ const (
 	DefaultCodespace sdk.CodespaceType = ModuleName
 
 	CodeInvalidIDL               sdk.CodeType = 100
-	CodeSvcDefExists             sdk.CodeType = 101
-	CodeSvcDefNotExists          sdk.CodeType = 102
-	CodeInvalidOutputPrivacyEnum sdk.CodeType = 103
-	CodeInvalidOutputCachedEnum  sdk.CodeType = 104
-	CodeInvalidServiceName       sdk.CodeType = 105
-	CodeInvalidChainId           sdk.CodeType = 106
-	CodeInvalidAuthor            sdk.CodeType = 107
-	CodeInvalidMethodName        sdk.CodeType = 108
+	CodeInvalidLength            sdk.CodeType = 101
+	CodeSvcDefExists             sdk.CodeType = 102
+	CodeSvcDefNotExists          sdk.CodeType = 103
+	CodeInvalidOutputPrivacyEnum sdk.CodeType = 104
+	CodeInvalidOutputCachedEnum  sdk.CodeType = 105
+	CodeInvalidServiceName       sdk.CodeType = 106
+	CodeInvalidChainId           sdk.CodeType = 107
+	CodeInvalidAuthor            sdk.CodeType = 108
+	CodeInvalidMethodName        sdk.CodeType = 109
 
-	CodeSvcBindingExists     sdk.CodeType = 109
-	CodeSvcBindingNotExists  sdk.CodeType = 110
-	CodeInvalidDefChainId    sdk.CodeType = 111
-	CodeInvalidBindingType   sdk.CodeType = 112
-	CodeInvalidLevel         sdk.CodeType = 113
-	CodeInvalidPriceCount    sdk.CodeType = 114
-	CodeInvalidRefundDeposit sdk.CodeType = 115
-	CodeLtMinProviderDeposit sdk.CodeType = 116
-	CodeInvalidDisable       sdk.CodeType = 117
-	CodeInvalidEnable        sdk.CodeType = 118
+	CodeSvcBindingExists     sdk.CodeType = 110
+	CodeSvcBindingNotExists  sdk.CodeType = 111
+	CodeInvalidDefChainId    sdk.CodeType = 112
+	CodeInvalidBindingType   sdk.CodeType = 113
+	CodeInvalidLevel         sdk.CodeType = 114
+	CodeInvalidPriceCount    sdk.CodeType = 115
+	CodeInvalidRefundDeposit sdk.CodeType = 116
+	CodeLtMinProviderDeposit sdk.CodeType = 117
+	CodeInvalidDisable       sdk.CodeType = 118
+	CodeInvalidEnable        sdk.CodeType = 119
 
-	CodeMethodNotExists        sdk.CodeType = 119
-	CodeRequestNotActive       sdk.CodeType = 120
-	CodeReturnFeeNotExists     sdk.CodeType = 121
-	CodeWithdrawFeeNotExists   sdk.CodeType = 122
-	CodeLtServiceFee           sdk.CodeType = 123
-	CodeInvalidReqId           sdk.CodeType = 124
-	CodeSvcBindingNotAvailable sdk.CodeType = 125
-	CodeNotMatchingProvider    sdk.CodeType = 126
-	CodeInvalidReqChainId      sdk.CodeType = 127
-	CodeInvalidBindChainId     sdk.CodeType = 128
-	CodeNotMatchingReqChainID  sdk.CodeType = 129
+	CodeMethodNotExists        sdk.CodeType = 120
+	CodeRequestNotActive       sdk.CodeType = 121
+	CodeReturnFeeNotExists     sdk.CodeType = 122
+	CodeWithdrawFeeNotExists   sdk.CodeType = 123
+	CodeLtServiceFee           sdk.CodeType = 124
+	CodeInvalidReqId           sdk.CodeType = 125
+	CodeSvcBindingNotAvailable sdk.CodeType = 126
+	CodeNotMatchingProvider    sdk.CodeType = 127
+	CodeInvalidReqChainId      sdk.CodeType = 128
+	CodeInvalidBindChainId     sdk.CodeType = 129
+	CodeNotMatchingReqChainID  sdk.CodeType = 130
 
-	CodeIntOverflow  sdk.CodeType = 130
-	CodeInvalidInput sdk.CodeType = 131
+	CodeIntOverflow  sdk.CodeType = 131
+	CodeInvalidInput sdk.CodeType = 132
 )
 
 func codeToDefaultMsg(code sdk.CodeType) string {
@@ -77,6 +78,10 @@ func ErrSvcDefNotExists(codespace sdk.CodespaceType, defChainId, svcDefName stri
 
 func ErrInvalidIDL(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidIDL, fmt.Sprintf("The IDL content cannot be parsed, %s", msg))
+}
+
+func ErrInvalidLength(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidLength, msg)
 }
 
 func ErrInvalidOutputPrivacyEnum(codespace sdk.CodespaceType, value string) sdk.Error {
