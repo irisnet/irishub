@@ -1,7 +1,7 @@
-package guardian
+package types
 
 import (
-	"github.com/irisnet/irishub/codec"
+	"github.com/cosmos/cosmos-sdk/codec"
 )
 
 // Register concrete types on codec codec
@@ -14,8 +14,8 @@ func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(Guardian{}, "irishub/guardian/Guardian", nil)
 }
 
-var msgCdc = codec.New()
+var ModuleCdc = codec.New()
 
 func init() {
-	RegisterCodec(msgCdc)
+	RegisterCodec(ModuleCdc)
 }

@@ -1,12 +1,31 @@
-package guardian
+package types
 
 import (
-	sdk "github.com/irisnet/irishub/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 var (
 	profilerKey = []byte{0x00}
 	trusteeKey  = []byte{0x01}
+)
+
+// nolint
+const (
+	// module name
+	ModuleName = "guardian"
+
+	// StoreKey is the default store key for guardian
+	StoreKey = ModuleName
+
+	// RouterKey is the message route for guardian
+	RouterKey = ModuleName
+
+	// QuerierRoute is the querier route for the guardian store.
+	QuerierRoute = StoreKey
+
+	// Query endpoints supported by the guardian querier
+	QueryProfilers = "profilers"
+	QueryTrustees  = "trustees"
 )
 
 func GetProfilerKey(addr sdk.AccAddress) []byte {

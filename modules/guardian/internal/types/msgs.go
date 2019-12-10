@@ -1,10 +1,8 @@
-package guardian
+package types
 
 import (
-	sdk "github.com/irisnet/irishub/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
-
-const MsgType = "guardian"
 
 var _, _, _, _ sdk.Msg = MsgAddProfiler{}, MsgAddTrustee{}, MsgDeleteProfiler{}, MsgDeleteTrustee{}
 
@@ -23,10 +21,10 @@ func NewMsgAddProfiler(description string, address, addedBy sdk.AccAddress) MsgA
 		},
 	}
 }
-func (msg MsgAddProfiler) Route() string { return MsgType }
-func (msg MsgAddProfiler) Type() string  { return "guardian add-profiler" }
+func (msg MsgAddProfiler) Route() string { return RouterKey }
+func (msg MsgAddProfiler) Type() string  { return "add_profiler" }
 func (msg MsgAddProfiler) GetSignBytes() []byte {
-	b, err := msgCdc.MarshalJSON(msg)
+	b, err := ModuleCdc.MarshalJSON(msg)
 	if err != nil {
 		panic(err)
 	}
@@ -55,10 +53,10 @@ func NewMsgDeleteProfiler(address, deletedBy sdk.AccAddress) MsgDeleteProfiler {
 		},
 	}
 }
-func (msg MsgDeleteProfiler) Route() string { return MsgType }
-func (msg MsgDeleteProfiler) Type() string  { return "guardian delete-profiler" }
+func (msg MsgDeleteProfiler) Route() string { return RouterKey }
+func (msg MsgDeleteProfiler) Type() string  { return "delete_profiler" }
 func (msg MsgDeleteProfiler) GetSignBytes() []byte {
-	b, err := msgCdc.MarshalJSON(msg)
+	b, err := ModuleCdc.MarshalJSON(msg)
 	if err != nil {
 		panic(err)
 	}
@@ -88,10 +86,10 @@ func NewMsgAddTrustee(description string, address, addedAddress sdk.AccAddress) 
 		},
 	}
 }
-func (msg MsgAddTrustee) Route() string { return MsgType }
-func (msg MsgAddTrustee) Type() string  { return "guardian add-trustee" }
+func (msg MsgAddTrustee) Route() string { return RouterKey }
+func (msg MsgAddTrustee) Type() string  { return "add_trustee" }
 func (msg MsgAddTrustee) GetSignBytes() []byte {
-	b, err := msgCdc.MarshalJSON(msg)
+	b, err := ModuleCdc.MarshalJSON(msg)
 	if err != nil {
 		panic(err)
 	}
@@ -120,10 +118,10 @@ func NewMsgDeleteTrustee(address, deletedBy sdk.AccAddress) MsgDeleteTrustee {
 		},
 	}
 }
-func (msg MsgDeleteTrustee) Route() string { return MsgType }
-func (msg MsgDeleteTrustee) Type() string  { return "guardian delete-trustee" }
+func (msg MsgDeleteTrustee) Route() string { return RouterKey }
+func (msg MsgDeleteTrustee) Type() string  { return "delete_trustee" }
 func (msg MsgDeleteTrustee) GetSignBytes() []byte {
-	b, err := msgCdc.MarshalJSON(msg)
+	b, err := ModuleCdc.MarshalJSON(msg)
 	if err != nil {
 		panic(err)
 	}
@@ -141,14 +139,14 @@ func (msg MsgDeleteTrustee) GetSigners() []sdk.AccAddress {
 //______________________________________________________________________
 
 type AddGuardian struct {
-	Description string         `json:"description"`
-	Address     sdk.AccAddress `json:"address"`  // address added
-	AddedBy     sdk.AccAddress `json:"added_by"` // address that initiated the tx
+	Description string         `json:"description" yaml:"description"`
+	Address     sdk.AccAddress `json:"address" yaml:"address"`   // address added
+	AddedBy     sdk.AccAddress `json:"added_by" yaml:"added_by"` // address that initiated the tx
 }
 
 type DeleteGuardian struct {
-	Address   sdk.AccAddress `json:"address"`    // address deleted
-	DeletedBy sdk.AccAddress `json:"deleted_by"` // address that initiated the tx
+	Address   sdk.AccAddress `json:"address" yaml:"address"`       // address deleted
+	DeletedBy sdk.AccAddress `json:"deleted_by" yaml:"deleted_by"` // address that initiated the tx
 }
 
 func (g AddGuardian) ValidateBasic() sdk.Error {
@@ -179,7 +177,7 @@ func (g DeleteGuardian) ValidateBasic() sdk.Error {
 
 func (g AddGuardian) EnsureLength() sdk.Error {
 	if len(g.Description) > 70 {
-		return sdk.ErrInvalidLength(DefaultCodespace, CodeInvalidGuardian, "description", len(g.Description), 70)
+		return sdk.NewError(DefaultCodespace, CodeInvalidGuardian, "description", len(g.Description), 70)
 	}
 	return nil
 }

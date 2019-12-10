@@ -23,6 +23,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	"github.com/cosmos/cosmos-sdk/x/supply"
+	"github.com/irisnet/irishub/modules/guardian"
 	"github.com/irisnet/irishub/modules/mint"
 	abci "github.com/tendermint/tendermint/abci/types"
 	cmn "github.com/tendermint/tendermint/libs/common"
@@ -54,6 +55,7 @@ var (
 		crisis.AppModuleBasic{},
 		slashing.AppModuleBasic{},
 		supply.AppModuleBasic{},
+		guardian.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -104,6 +106,7 @@ type IrisApp struct {
 	crisisKeeper   crisis.Keeper
 	paramsKeeper   params.Keeper
 	evidenceKeeper *evidence.Keeper
+	guardianKeeper guardian.Keeper
 
 	// the module manager
 	mm *module.Manager
@@ -172,6 +175,11 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 	// TODO: Register evidence routes.
 	app.evidenceKeeper.SetRouter(evidenceRouter)
 
+	// create guardian keeper with guardian router
+	app.guardianKeeper = guardian.NewKeeper(
+		app.cdc, keys[evidence.StoreKey], guardian.DefaultCodespace,
+	)
+
 	// register the proposal types
 	govRouter := gov.NewRouter()
 	govRouter.AddRoute(gov.RouterKey, gov.ProposalHandler).
@@ -202,6 +210,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 		slashing.NewAppModule(app.slashingKeeper, app.stakingKeeper),
 		staking.NewAppModule(app.stakingKeeper, app.accountKeeper, app.supplyKeeper),
 		evidence.NewAppModule(*app.evidenceKeeper),
+		guardian.NewAppModule(app.guardianKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -216,7 +225,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 	app.mm.SetOrderInitGenesis(
 		distr.ModuleName, staking.ModuleName, auth.ModuleName, bank.ModuleName,
 		slashing.ModuleName, gov.ModuleName, mint.ModuleName, supply.ModuleName,
-		crisis.ModuleName, genutil.ModuleName, evidence.ModuleName,
+		crisis.ModuleName, genutil.ModuleName, evidence.ModuleName, guardian.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.crisisKeeper)
