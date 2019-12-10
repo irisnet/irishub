@@ -42,7 +42,7 @@ func TestIrisCLIHTLC(t *testing.T) {
 	amount := "1000" + sdk.DefaultBondDenom
 	timeLock := uint64(50)
 	timestamp := uint64(1580000000)
-	initSecret := []byte(nil)
+	initSecret := htlcmodule.HTLCSecret{}
 	stateOpen := "open"
 	stateCompleted := "completed"
 	stateExpired := "expired"

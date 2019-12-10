@@ -16,6 +16,7 @@ const (
 type (
 	Keeper        = keeper.Keeper
 	HTLC          = types.HTLC
+	HTLCSecret    = types.HTLCSecret
 	GenesisState  = types.GenesisState
 	MsgCreateHTLC = types.MsgCreateHTLC
 	MsgClaimHTLC  = types.MsgClaimHTLC

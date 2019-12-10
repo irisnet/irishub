@@ -37,8 +37,8 @@ func TestKeeperTestSuite(t *testing.T) {
 }
 
 func (suite *KeeperTestSuite) TestCreateHTLC() {
-	addrSender := sdk.AccAddress([]byte("addrSender"))
-	addrTo := sdk.AccAddress([]byte("addrTo"))
+	addrSender := sdk.AccAddress("addrSender")
+	addrTo := sdk.AccAddress("addrTo")
 
 	_ = suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, addrSender)
 	_ = suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, addrTo)
@@ -47,13 +47,13 @@ func (suite *KeeperTestSuite) TestCreateHTLC() {
 
 	receiverOnOtherChain := "receiverOnOtherChain"
 	amount := sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(10)))
-	secret := []byte("___abcdefghijklmnopqrstuvwxyz___")
+	secret := types.HTLCSecret("___abcdefghijklmnopqrstuvwxyz___")
 	timestamp := uint64(1580000000)
-	hashLock := types.SHA256(append(secret, sdk.Uint64ToBigEndian(timestamp)...))
+	hashLock := types.HTLCHashLock(types.SHA256(append(secret, sdk.Uint64ToBigEndian(timestamp)...)))
 	timeLock := uint64(50)
 	expireHeight := timeLock + uint64(suite.ctx.BlockHeight())
 	state := types.OPEN
-	initSecret := make([]byte, 0)
+	initSecret := make(types.HTLCSecret, 0)
 
 	_, err := suite.app.HTLCKeeper.GetHTLC(suite.ctx, hashLock)
 	require.NotNil(suite.T(), err)
@@ -93,7 +93,7 @@ func (suite *KeeperTestSuite) TestCreateHTLC() {
 	require.Equal(suite.T(), addrTo, htlc.To)
 	require.Equal(suite.T(), receiverOnOtherChain, htlc.ReceiverOnOtherChain)
 	require.Equal(suite.T(), amount, htlc.Amount)
-	require.Equal(suite.T(), []byte(nil), htlc.Secret)
+	require.Equal(suite.T(), types.HTLCSecret(nil), htlc.Secret)
 	require.Equal(suite.T(), timestamp, htlc.Timestamp)
 	require.Equal(suite.T(), expireHeight, htlc.ExpireHeight)
 	require.Equal(suite.T(), state, htlc.State)
@@ -103,8 +103,8 @@ func (suite *KeeperTestSuite) TestCreateHTLC() {
 }
 
 func (suite *KeeperTestSuite) TestClaimHTLC() {
-	addrSender := sdk.AccAddress([]byte("addrSender"))
-	addrTo := sdk.AccAddress([]byte("addrTo"))
+	addrSender := sdk.AccAddress("addrSender")
+	addrTo := sdk.AccAddress("addrTo")
 
 	_ = suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, addrSender)
 	_ = suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, addrTo)
@@ -114,14 +114,14 @@ func (suite *KeeperTestSuite) TestClaimHTLC() {
 
 	receiverOnOtherChain := "receiverOnOtherChain"
 	amount := sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(10)))
-	secret1 := []byte("___abcdefghijklmnopqrstuvwxyz___")
-	secret2 := []byte("___00000000000000000000000000___")
+	secret1 := types.HTLCSecret("___abcdefghijklmnopqrstuvwxyz___")
+	secret2 := types.HTLCSecret("___00000000000000000000000000___")
 	timestamp := uint64(1580000000)
 	timestampNil := uint64(0)
 	timeLock := uint64(50)
 	expireHeight := timeLock + uint64(suite.ctx.BlockHeight())
 	state := types.OPEN
-	initSecret := make([]byte, 0)
+	initSecret := make(types.HTLCSecret, 0)
 
 	testData := []struct {
 		expectPass           bool
@@ -129,13 +129,13 @@ func (suite *KeeperTestSuite) TestClaimHTLC() {
 		toAddr               []byte
 		receiverOnOtherChain string
 		amount               sdk.Coins
-		secret               []byte
+		secret               types.HTLCSecret
 		timestamp            uint64
-		hashLock             []byte
+		hashLock             types.HTLCHashLock
 		timeLock             uint64
 		expireHeight         uint64
 		state                types.HTLCState
-		initSecret           []byte
+		initSecret           types.HTLCSecret
 	}{
 		// timestamp > 0
 		{true, addrSender, addrTo, receiverOnOtherChain, amount, secret1, timestamp, types.GetHashLock(secret1, timestamp), timeLock, expireHeight, state, initSecret},
@@ -226,8 +226,8 @@ func (suite *KeeperTestSuite) TestClaimHTLC() {
 }
 
 func (suite *KeeperTestSuite) TestRefundHTLC() {
-	addrSender := sdk.AccAddress([]byte("addrSender"))
-	addrTo := sdk.AccAddress([]byte("addrTo"))
+	addrSender := sdk.AccAddress("addrSender")
+	addrTo := sdk.AccAddress("addrTo")
 
 	_ = suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, addrSender)
 	_ = suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, addrTo)
@@ -236,13 +236,13 @@ func (suite *KeeperTestSuite) TestRefundHTLC() {
 
 	receiverOnOtherChain := "receiverOnOtherChain"
 	amount := sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(10)))
-	secret := []byte("___abcdefghijklmnopqrstuvwxyz___")
+	secret := types.HTLCSecret("___abcdefghijklmnopqrstuvwxyz___")
 	timestamp := uint64(1580000000)
-	hashLock := types.SHA256(append(secret, sdk.Uint64ToBigEndian(timestamp)...))
+	hashLock := types.HTLCHashLock(types.SHA256(append(secret, sdk.Uint64ToBigEndian(timestamp)...)))
 	timeLock := uint64(50)
 	expireHeight := timeLock + uint64(suite.ctx.BlockHeight())
 	state := types.EXPIRED
-	initSecret := make([]byte, 0)
+	initSecret := make(types.HTLCSecret, 0)
 
 	htlc := types.NewHTLC(
 		addrSender,

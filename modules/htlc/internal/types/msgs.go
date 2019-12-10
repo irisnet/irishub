@@ -29,7 +29,7 @@ type MsgCreateHTLC struct {
 	To                   sdk.AccAddress `json:"to" yaml:"to"`                                           // the destination address
 	ReceiverOnOtherChain string         `json:"receiver_on_other_chain" yaml:"receiver_on_other_chain"` // the claim receiving address on the other chain
 	Amount               sdk.Coins      `json:"amount" yaml:"amount"`                                   // the amount to be transferred
-	HashLock             []byte         `json:"hash_lock" yaml:"hash_lock"`                             // the hash lock generated from secret (and timestamp if provided)
+	HashLock             HTLCHashLock   `json:"hash_lock" yaml:"hash_lock"`                             // the hash lock generated from secret (and timestamp if provided)
 	Timestamp            uint64         `json:"timestamp" yaml:"timestamp"`                             // if provided, used to generate the hash lock together with secret
 	TimeLock             uint64         `json:"time_lock" yaml:"time_lock"`                             // the time span after which the HTLC will expire
 }
@@ -40,7 +40,7 @@ func NewMsgCreateHTLC(
 	to sdk.AccAddress,
 	receiverOnOtherChain string,
 	amount sdk.Coins,
-	hashLock []byte,
+	hashLock HTLCHashLock,
 	timestamp uint64,
 	timeLock uint64,
 ) MsgCreateHTLC {
@@ -110,15 +110,15 @@ func (msg MsgCreateHTLC) GetSigners() []sdk.AccAddress {
 // MsgClaimHTLC represents a msg for claiming an HTLC
 type MsgClaimHTLC struct {
 	Sender   sdk.AccAddress `json:"sender" yaml:"sender"`       // the initiator address
-	HashLock []byte         `json:"hash_lock" yaml:"hash_lock"` // the hash lock identifying the HTLC to be claimed
-	Secret   []byte         `json:"secret" yaml:"secret"`       // the secret with which to claim
+	HashLock HTLCHashLock   `json:"hash_lock" yaml:"hash_lock"` // the hash lock identifying the HTLC to be claimed
+	Secret   HTLCSecret     `json:"secret" yaml:"secret"`       // the secret with which to claim
 }
 
 // NewMsgClaimHTLC constructs a MsgClaimHTLC
 func NewMsgClaimHTLC(
 	sender sdk.AccAddress,
-	hashLock []byte,
-	secret []byte,
+	hashLock HTLCHashLock,
+	secret HTLCSecret,
 ) MsgClaimHTLC {
 	return MsgClaimHTLC{
 		Sender:   sender,
@@ -170,13 +170,13 @@ func (msg MsgClaimHTLC) GetSigners() []sdk.AccAddress {
 // MsgRefundHTLC represents a msg for refund an HTLC
 type MsgRefundHTLC struct {
 	Sender   sdk.AccAddress `json:"sender" yaml:"sender"`       // the initiator address
-	HashLock []byte         `json:"hash_lock" yaml:"hash_lock"` // the hash lock identifying the HTLC to be refunded
+	HashLock HTLCHashLock   `json:"hash_lock" yaml:"hash_lock"` // the hash lock identifying the HTLC to be refunded
 }
 
 // NewMsgClaimHTLC constructs a MsgClaimHTLC
 func NewMsgRefundHTLC(
 	sender sdk.AccAddress,
-	hashLock []byte,
+	hashLock HTLCHashLock,
 ) MsgRefundHTLC {
 	return MsgRefundHTLC{
 		Sender:   sender,

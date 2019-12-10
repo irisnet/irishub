@@ -70,8 +70,8 @@ func GetCmdCreateHTLC(cdc *codec.Codec) *cobra.Command {
 			timestamp := viper.GetInt64(FlagTimestamp)
 			timeLock := viper.GetInt64(FlagTimeLock)
 
-			secret := make([]byte, 32)
-			var hashLock []byte
+			secret := make(types.HTLCSecret, 32)
+			var hashLock types.HTLCHashLock
 
 			flags := cmd.Flags()
 			if flags.Changed(FlagHashLock) {
@@ -114,8 +114,7 @@ func GetCmdCreateHTLC(cdc *codec.Codec) *cobra.Command {
 				fmt.Println("**Important** save this secret, hashLock in a safe place.")
 				fmt.Println("It is the only way to claim or refund the locked coins from an HTLC")
 				fmt.Println()
-				fmt.Printf("Secret:      %s\nHashLock:    %s\n",
-					hex.EncodeToString(secret), hex.EncodeToString(hashLock))
+				fmt.Printf("Secret:      %s\nHashLock:    %s\n", secret.String(), hashLock.String())
 			}
 			return err
 		},
@@ -187,8 +186,7 @@ func GetCmdRefundHTLC(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgRefundHTLC(
-				sender, hashLock)
+			msg := types.NewMsgRefundHTLC(sender, hashLock)
 
 			if err := msg.ValidateBasic(); err != nil {
 				return err

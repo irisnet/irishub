@@ -1,6 +1,7 @@
 package types
 
 import (
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"strings"
@@ -14,7 +15,7 @@ type HTLC struct {
 	To                   sdk.AccAddress `json:"to" yaml:"to"`                                           // the destination address
 	ReceiverOnOtherChain string         `json:"receiver_on_other_chain" yaml:"receiver_on_other_chain"` // the claim receiving address on the other chain
 	Amount               sdk.Coins      `json:"amount" yaml:"amount"`                                   // the amount to be transferred
-	Secret               []byte         `json:"secret" yaml:"secret"`                                   // the random secret which is of 32 bytes
+	Secret               HTLCSecret     `json:"secret" yaml:"secret"`                                   // the random secret which is of 32 bytes
 	Timestamp            uint64         `json:"timestamp" yaml:"timestamp"`                             // the timestamp, if provided, used to generate the hash lock together with secret
 	ExpireHeight         uint64         `json:"expire_height" yaml:"expire_height"`                     // the block height by which the HTLC expires
 	State                HTLCState      `json:"state" yaml:"state"`                                     // the state of the HTLC
@@ -26,7 +27,7 @@ func NewHTLC(
 	to sdk.AccAddress,
 	receiverOnOtherChain string,
 	amount sdk.Coins,
-	secret []byte,
+	secret HTLCSecret,
 	timestamp uint64,
 	expireHeight uint64,
 	state HTLCState,
@@ -56,6 +57,12 @@ func (h HTLC) GetHashLock() []byte {
 
 // HTLCState represents the state of an HTLC
 type HTLCState byte
+
+// HTLCSecret represents the secret of an HTLC
+type HTLCSecret []byte
+
+// HTLCSecret represents the hash lock of an HTLC
+type HTLCHashLock []byte
 
 const (
 	OPEN      HTLCState = 0x00 // claimable
@@ -110,6 +117,25 @@ func (state *HTLCState) Unmarshal(data []byte) error {
 	return nil
 }
 
+func (state HTLCState) MarshalYAML() (interface{}, error) {
+	return state.String(), nil
+}
+
+func (state *HTLCState) UnmarshalYAML(data []byte) error {
+	var s string
+	err := json.Unmarshal(data, &s)
+	if err != nil {
+		return err
+	}
+
+	bz, err := HTLCStateFromString(s)
+	if err != nil {
+		return err
+	}
+	*state = bz
+	return nil
+}
+
 // Marshals to JSON using string
 func (state HTLCState) MarshalJSON() ([]byte, error) {
 	return json.Marshal(state.String())
@@ -128,5 +154,111 @@ func (state *HTLCState) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	*state = bz
+	return nil
+}
+
+// HTLCSecret
+func (secret HTLCSecret) String() string {
+	return hex.EncodeToString(secret)
+}
+
+func (secret HTLCSecret) Marshal() ([]byte, error) {
+	return secret, nil
+}
+
+func (secret *HTLCSecret) Unmarshal(data []byte) error {
+	*secret = data
+	return nil
+}
+
+func (secret HTLCSecret) MarshalYAML() (interface{}, error) {
+	return secret.String(), nil
+}
+
+func (secret *HTLCSecret) UnmarshalYAML(data []byte) error {
+	var s string
+	err := json.Unmarshal(data, &s)
+	if err != nil {
+		return nil
+	}
+
+	bz, err := hex.DecodeString(s)
+	if err != nil {
+		return err
+	}
+	*secret = bz
+	return nil
+}
+
+func (secret HTLCSecret) MarshalJSON() ([]byte, error) {
+	return json.Marshal(secret.String())
+}
+
+func (secret *HTLCSecret) UnmarshalJSON(data []byte) error {
+	var s string
+	err := json.Unmarshal(data, &s)
+	if err != nil {
+		return err
+	}
+
+	bz, err := hex.DecodeString(s)
+	if err != nil {
+		return err
+	}
+
+	*secret = bz
+	return nil
+}
+
+// HTLCHashLock
+func (hashLock HTLCHashLock) String() string {
+	return hex.EncodeToString(hashLock)
+}
+
+func (hashLock HTLCHashLock) Marshal() ([]byte, error) {
+	return hashLock, nil
+}
+
+func (hashLock *HTLCHashLock) Unmarshal(data []byte) error {
+	*hashLock = data
+	return nil
+}
+
+func (hashLock HTLCHashLock) MarshalYAML() (interface{}, error) {
+	return hashLock.String(), nil
+}
+
+func (hashLock *HTLCHashLock) UnmarshalYAML(data []byte) error {
+	var s string
+	err := json.Unmarshal(data, &s)
+	if err != nil {
+		return nil
+	}
+
+	bz, err := hex.DecodeString(s)
+	if err != nil {
+		return err
+	}
+	*hashLock = bz
+	return nil
+}
+
+func (hashLock HTLCHashLock) MarshalJSON() ([]byte, error) {
+	return json.Marshal(hashLock.String())
+}
+
+func (hashLock *HTLCHashLock) UnmarshalJSON(data []byte) error {
+	var s string
+	err := json.Unmarshal(data, &s)
+	if err != nil {
+		return err
+	}
+
+	bz, err := hex.DecodeString(s)
+	if err != nil {
+		return err
+	}
+
+	*hashLock = bz
 	return nil
 }

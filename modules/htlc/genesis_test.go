@@ -53,11 +53,11 @@ func (suite *KeeperTestSuite) TestExportHTLCGenesis() {
 	amount := sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(0)))
 	secret := []byte("___abcdefghijklmnopqrstuvwxyz___")
 	timestamps := []uint64{uint64(1580000000), 0}
-	hashLocks := [][]byte{types.GetHashLock(secret, timestamps[0]), types.GetHashLock(secret, timestamps[1])}
+	hashLocks := []types.HTLCHashLock{types.GetHashLock(secret, timestamps[0]), types.GetHashLock(secret, timestamps[1])}
 	timeLocks := []uint64{50, 100}
 	expireHeights := []uint64{timeLocks[0] + uint64(suite.ctx.BlockHeight()), timeLocks[1] + uint64(suite.ctx.BlockHeight())}
 	state := modulehtlc.OPEN
-	initSecret := make([]byte, 0)
+	initSecret := make(types.HTLCSecret, 0)
 
 	// construct HTLCs
 	htlc1 := modulehtlc.NewHTLC(senderAddrs[0], receiverAddrs[0], receiverOnOtherChain, amount, initSecret, timestamps[0], expireHeights[0], state)
