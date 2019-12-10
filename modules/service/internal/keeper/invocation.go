@@ -136,8 +136,9 @@ func (k Keeper) ActiveRequestQueueIterator(ctx sdk.Context, height int64) sdk.It
 	return sdk.KVStorePrefixIterator(store, types.GetRequestsByExpirationPrefix(height))
 }
 
-// Returns an iterator for all the request in the Active Queue
-func (k Keeper) ActiveAllRequestQueueIterator(store sdk.KVStore) sdk.Iterator {
+// ActiveAllRequestQueueIterator returns an iterator for all the requests in the active queue
+func (k Keeper) ActiveAllRequestQueueIterator(ctx sdk.Context) sdk.Iterator {
+	store := ctx.KVStore(k.storeKey)
 	return sdk.KVStorePrefixIterator(store, types.ActiveRequestKey)
 }
 
@@ -370,8 +371,74 @@ func (k Keeper) WithdrawTax(ctx sdk.Context, trustee sdk.AccAddress, destAddress
 		return types.ErrNotTrustee(k.codespace, trustee)
 	}
 
-	err := k.sk.SendCoinsFromModuleToAccount(ctx, types.ServiceTaxAccName, destAddress, amt)
+	err := k.sk.SendCoinsFromModuleToAccount(ctx, types.TaxAccName, destAddress, amt)
 	return err
+}
+
+// AllReturnedFeesIterator returns an iterator for all the returned fees
+func (k Keeper) AllReturnedFeesIterator(ctx sdk.Context) sdk.Iterator {
+	store := ctx.KVStore(k.storeKey)
+	return sdk.KVStorePrefixIterator(store, types.ReturnedFeeKey)
+}
+
+// AllIncomingFeesIterator returns an iterator for all the incoming fees
+func (k Keeper) AllIncomingFeesIterator(ctx sdk.Context) sdk.Iterator {
+	store := ctx.KVStore(k.storeKey)
+	return sdk.KVStorePrefixIterator(store, types.IncomingFeeKey)
+}
+
+// RefundReturnedFees refunds all the returned fees
+func (k Keeper) RefundReturnedFees(ctx sdk.Context) sdk.Error {
+	iterator := k.AllReturnedFeesIterator(ctx)
+	defer iterator.Close()
+
+	for ; iterator.Valid(); iterator.Next() {
+		var returnedFee types.ReturnedFee
+		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &returnedFee)
+
+		err := k.sk.SendCoinsFromModuleToAccount(ctx, types.RequestAccName, returnedFee.Address, returnedFee.Coins)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// RefundIncomingFees refunds all the incoming fees
+func (k Keeper) RefundIncomingFees(ctx sdk.Context) sdk.Error {
+	iterator := k.AllIncomingFeesIterator(ctx)
+	defer iterator.Close()
+
+	for ; iterator.Valid(); iterator.Next() {
+		var incomingFee types.IncomingFee
+		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &incomingFee)
+
+		err := k.sk.SendCoinsFromModuleToAccount(ctx, types.RequestAccName, incomingFee.Address, incomingFee.Coins)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// RefundServiceFees refunds the service fees of all the active requests
+func (k Keeper) RefundServiceFees(ctx sdk.Context) sdk.Error {
+	iterator := k.ActiveAllRequestQueueIterator(ctx)
+	defer iterator.Close()
+
+	for ; iterator.Valid(); iterator.Next() {
+		var request types.SvcRequest
+		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &request)
+
+		err := k.sk.SendCoinsFromModuleToAccount(ctx, types.RequestAccName, request.Consumer, request.ServiceFee)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 // get the current in-block request operation counter

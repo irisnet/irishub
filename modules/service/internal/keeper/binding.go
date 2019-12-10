@@ -81,6 +81,12 @@ func (k Keeper) ServiceBindingsIterator(ctx sdk.Context, defChainID, defName str
 	return sdk.KVStorePrefixIterator(store, types.GetBindingsSubspaceKey(defChainID, defName))
 }
 
+// AllServiceBindingsIterator returns an iterator for all the binding services
+func (k Keeper) AllServiceBindingsIterator(ctx sdk.Context) sdk.Iterator {
+	store := ctx.KVStore(k.storeKey)
+	return sdk.KVStorePrefixIterator(store, types.BindingPropertyKey)
+}
+
 func (k Keeper) UpdateServiceBinding(
 	ctx sdk.Context,
 	defChainID,
@@ -234,6 +240,24 @@ func (k Keeper) RefundDeposit(ctx sdk.Context, defChainID, defName, bindChainID 
 
 	binding.Deposit = sdk.Coins{}
 	k.SetServiceBinding(ctx, binding)
+
+	return nil
+}
+
+// RefundDeposits refunds the deposits of all the binding services
+func (k Keeper) RefundDeposits(ctx sdk.Context) sdk.Error {
+	iterator := k.AllServiceBindingsIterator(ctx)
+	defer iterator.Close()
+
+	for ; iterator.Valid(); iterator.Next() {
+		var binding types.SvcBinding
+		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &binding)
+
+		err := k.sk.SendCoinsFromModuleToAccount(ctx, types.DepositAccName, binding.Provider, binding.Deposit)
+		if err != nil {
+			return err
+		}
+	}
 
 	return nil
 }

@@ -1,8 +1,9 @@
 package service
 
 import (
+	"fmt"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/auth"
 )
 
 // InitGenesis - store genesis parameters
@@ -15,49 +16,29 @@ func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
 
 // ExportGenesis - output genesis parameters
 func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
+
 	return NewGenesisState(k.GetParamSet(ctx))
 }
 
-// refund deposit from all bindings
-// refund service fee from all request
-// refund all incoming/return fee
-// no process for service fee tax account
+// PrepForZeroHeightGenesis refunds all deposits, service fees, returned fees and incoming fees
 func PrepForZeroHeightGenesis(ctx sdk.Context, k Keeper) {
-	store := ctx.KVStore(k.storeKey)
-
-	// refund deposit from all bindings
-	bindingIterator := sdk.KVStorePrefixIterator(store, bindingPropertyKey)
-	defer bindingIterator.Close()
-	for ; bindingIterator.Valid(); bindingIterator.Next() {
-		var binding SvcBinding
-		k.cdc.MustUnmarshalBinaryLengthPrefixed(bindingIterator.Value(), &binding)
-		k.ck.SendCoins(ctx, auth.ServiceDepositCoinsAccAddr, binding.Provider, binding.Deposit)
+	// refund deposits from all binding services
+	if err := k.RefundDeposits(ctx); err != nil {
+		panic(fmt.Sprintf("failed to refund deposits: %s", err))
 	}
 
-	// refund service fee from all active request
-	requestIterator := sdk.KVStorePrefixIterator(store, activeRequestKey)
-	defer requestIterator.Close()
-	for ; requestIterator.Valid(); requestIterator.Next() {
-		var request SvcRequest
-		k.cdc.MustUnmarshalBinaryLengthPrefixed(requestIterator.Value(), &request)
-		k.ck.SendCoins(ctx, auth.ServiceRequestCoinsAccAddr, request.Consumer, request.ServiceFee)
+	// refund service fees from all active requests
+	if err := k.RefundServiceFees(ctx); err != nil {
+		panic(fmt.Sprintf("failed to refund service fees: %s", err))
 	}
 
-	// refund all incoming fee
-	incomingFeeIterator := sdk.KVStorePrefixIterator(store, incomingFeeKey)
-	defer incomingFeeIterator.Close()
-	for ; incomingFeeIterator.Valid(); incomingFeeIterator.Next() {
-		var incomingFee IncomingFee
-		k.cdc.MustUnmarshalBinaryLengthPrefixed(incomingFeeIterator.Value(), &incomingFee)
-		k.ck.SendCoins(ctx, auth.ServiceRequestCoinsAccAddr, incomingFee.Address, incomingFee.Coins)
+	// refund all incoming fees
+	if err := k.RefundIncomingFees(ctx); err != nil {
+		panic(fmt.Sprintf("failed to refund incoming fees: %s", err))
 	}
 
-	// refund all return fee
-	returnedFeeIterator := sdk.KVStorePrefixIterator(store, returnedFeeKey)
-	defer returnedFeeIterator.Close()
-	for ; returnedFeeIterator.Valid(); returnedFeeIterator.Next() {
-		var returnedFee ReturnedFee
-		k.cdc.MustUnmarshalBinaryLengthPrefixed(returnedFeeIterator.Value(), &returnedFee)
-		k.ck.SendCoins(ctx, auth.ServiceRequestCoinsAccAddr, returnedFee.Address, returnedFee.Coins)
+	// refund all returned fees
+	if err := k.RefundReturnedFees(ctx); err != nil {
+		panic(fmt.Sprintf("failed to refund rerurned fees: %s", err))
 	}
 }
