@@ -19,38 +19,43 @@ type (
 	MsgSvcWithdrawFees  = types.MsgSvcWithdrawFees
 	MsgSvcWithdrawTax   = types.MsgSvcWithdrawTax
 
-	SvcDef           = types.SvcDef
-	SvcBinding       = types.SvcBinding
-	SvcRequest       = types.SvcRequest
-	SvcResponse      = types.SvcResponse
-	MethodProperty   = types.MethodProperty
-	Level            = types.Level
-	NoPrivacy        = types.NoPrivacy
-	PubKeyEncryption = types.PubKeyEncryption
-	Unicast          = types.Unicast
-	Multicast        = types.Multicast
-	Global           = types.Global
-	Local            = types.Local
+	SvcDef         = types.SvcDef
+	SvcBinding     = types.SvcBinding
+	SvcRequest     = types.SvcRequest
+	SvcResponse    = types.SvcResponse
+	MethodProperty = types.MethodProperty
+	Level          = types.Level
 
 	GenesisState = types.GenesisState
 
 	Keeper = keeper.Keeper
 )
 
-// exported variables and functions
-var (
+// exported constants
+const (
 	ModuleName   = types.ModuleName
 	StoreKey     = types.StoreKey
 	QuerierRoute = types.QuerierRoute
 	RouterKey    = types.RouterKey
-	ModuleCdc    = types.ModuleCdc
 
 	DepositAccName = types.RequestAccName
 	RequestAccName = types.RequestAccName
 	TaxAccName     = types.TaxAccName
 
 	DefaultCodespace = types.DefaultCodespace
-	RegisterCodec    = types.RegisterCodec
+
+	NoPrivacy        = types.NoPrivacy
+	PubKeyEncryption = types.PubKeyEncryption
+	Unicast          = types.Unicast
+	Multicast        = types.Multicast
+	Global           = types.Global
+	Local            = types.Local
+)
+
+// exported variables and functions
+var (
+	ModuleCdc     = types.ModuleCdc
+	RegisterCodec = types.RegisterCodec
 
 	NewMsgSvcDef           = types.NewMsgSvcDef
 	NewMsgSvcBind          = types.NewMsgSvcBind

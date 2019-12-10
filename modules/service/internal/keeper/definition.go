@@ -3,7 +3,6 @@ package keeper
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/irisnet/irishub/modules/service/internal/types"
-	"github.com/irisnet/irishub/tools/protoidl"
 )
 
 func (k Keeper) AddServiceDefinition(
@@ -34,8 +33,9 @@ func (k Keeper) SetServiceDefinition(ctx sdk.Context, svcDef types.SvcDef) {
 	store.Set(types.GetServiceDefinitionKey(svcDef.ChainId, svcDef.Name), bz)
 }
 
+// TODO
 func (k Keeper) AddMethods(ctx sdk.Context, svcDef types.SvcDef) sdk.Error {
-	methods, err := protoidl.GetMethods(svcDef.IDLContent)
+	methods, err := types.ParseMethods(svcDef.IDLContent)
 	if err != nil {
 		panic(err)
 	}

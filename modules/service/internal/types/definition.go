@@ -6,7 +6,6 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/pkg/errors"
-	"github.com/irisnet/irishub/tools/protoidl"
 )
 
 type SvcDef struct {
@@ -250,32 +249,4 @@ func (oe *OutputPrivacyEnum) UnmarshalJSON(data []byte) error {
 	}
 	*oe = bz2
 	return nil
-}
-
-func MethodToMethodProperty(index int, method protoidl.Method) (methodProperty MethodProperty, err sdk.Error) {
-	// set default value
-	opp := NoPrivacy
-	opc := NoCached
-
-	var err1 error
-	if _, ok := method.Attributes[outputPrivacy]; ok {
-		opp, err1 = OutputPrivacyEnumFromString(method.Attributes[outputPrivacy])
-		if err1 != nil {
-			return methodProperty, ErrInvalidOutputPrivacyEnum(DefaultCodespace, method.Attributes[outputPrivacy])
-		}
-	}
-	if _, ok := method.Attributes[outputCached]; ok {
-		opc, err1 = OutputCachedEnumFromString(method.Attributes[outputCached])
-		if err != nil {
-			return methodProperty, ErrInvalidOutputCachedEnum(DefaultCodespace, method.Attributes[outputCached])
-		}
-	}
-	methodProperty = MethodProperty{
-		ID:            int16(index),
-		Name:          method.Name,
-		Description:   method.Attributes[description],
-		OutputPrivacy: opp,
-		OutputCached:  opc,
-	}
-	return
 }

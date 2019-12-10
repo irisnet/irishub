@@ -11,13 +11,13 @@ func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
 	if err := ValidateGenesis(data); err != nil {
 		panic(err.Error())
 	}
-	k.SetParamSet(ctx, data.Params)
+
+	k.SetParams(ctx, data.Params)
 }
 
 // ExportGenesis - output genesis parameters
 func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
-
-	return NewGenesisState(k.GetParamSet(ctx))
+	return NewGenesisState(k.GetParams(ctx))
 }
 
 // PrepForZeroHeightGenesis refunds all deposits, service fees, returned fees and incoming fees
