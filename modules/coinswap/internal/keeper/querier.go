@@ -32,18 +32,18 @@ func queryLiquidity(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, s
 		return nil, sdk.ErrUnknownRequest(sdk.AppendMsgToErr("incorrectly formatted request data", err.Error()))
 	}
 
-	if err := types.CheckUniDenom(params.Id); err != nil {
+	if err := types.CheckUniDenom(params.ID); err != nil {
 		return nil, sdk.ErrUnknownRequest(err.Error())
 	}
 
-	uniDenom := params.Id
+	uniDenom := params.ID
 
 	tokenDenom, err := types.GetCoinDenomFromUniDenom(uniDenom)
 	if err != nil {
 		return nil, sdk.ErrUnknownRequest(err.Error())
 	}
 
-	reservePool := k.GetReservePool(ctx, params.Id)
+	reservePool := k.GetReservePool(ctx, params.ID)
 	// all liquidity vouchers in module account
 	liquidities := k.sk.GetModuleAccount(ctx, types.ModuleName).GetCoins()
 

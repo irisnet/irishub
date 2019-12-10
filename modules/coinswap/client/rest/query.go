@@ -23,7 +23,7 @@ func queryLiquidityHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 		vars := mux.Vars(r)
 		id := vars["id"]
 		params := types.QueryLiquidityParams{
-			Id: id,
+			ID: id,
 		}
 
 		bz, err := cliCtx.Codec.MarshalJSON(params)

@@ -24,15 +24,14 @@ func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router) {
 func addLiquidityHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		id := vars["id"]
+		uniDenom := vars["id"]
 
-		uniDenom, err := types.GetUniDenom(id)
-		if err != nil {
+		if err := types.CheckUniDenom(uniDenom); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		tokenDenom, err := types.GetCoinMinDenomFromUniDenom(uniDenom)
+		tokenDenom, err := types.GetCoinDenomFromUniDenom(uniDenom)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -68,9 +67,9 @@ func addLiquidityHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		exactIrisAmt, ok := sdk.NewIntFromString(req.ExactIrisAmt)
+		exactStandardAmt, ok := sdk.NewIntFromString(req.ExactStandardAmt)
 		if !ok {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, "invalid exact iris amount: "+req.ExactIrisAmt)
+			rest.WriteErrorResponse(w, http.StatusBadRequest, "invalid exact standard token amount: "+req.ExactStandardAmt)
 			return
 		}
 
@@ -80,7 +79,7 @@ func addLiquidityHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgAddLiquidity(sdk.NewCoin(tokenDenom, maxToken), exactIrisAmt, minLiquidity, deadline.Unix(), senderAddress)
+		msg := types.NewMsgAddLiquidity(sdk.NewCoin(tokenDenom, maxToken), exactStandardAmt, minLiquidity, deadline.Unix(), senderAddress)
 		err = msg.ValidateBasic()
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -94,10 +93,9 @@ func addLiquidityHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 func removeLiquidityHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		id := vars["id"]
+		uniDenom := vars["id"]
 
-		uniDenom, err := types.GetUniDenom(id)
-		if err != nil {
+		if err := types.CheckUniDenom(uniDenom); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
@@ -132,9 +130,9 @@ func removeLiquidityHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		minIris, ok := sdk.NewIntFromString(req.MinIrisAmt)
+		minStandard, ok := sdk.NewIntFromString(req.MinStandardAmt)
 		if !ok {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, "invalid min iris amount: "+req.MinIrisAmt)
+			rest.WriteErrorResponse(w, http.StatusBadRequest, "invalid min iris amount: "+req.MinStandardAmt)
 			return
 		}
 
@@ -144,8 +142,8 @@ func removeLiquidityHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgRemoveLiquidity(minToken, sdk.NewCoin(uniDenom, liquidityAmt), minIris, deadline.Unix(), senderAddress)
-		err = msg.ValidateBasic()
+		msg := types.NewMsgRemoveLiquidity(minToken, sdk.NewCoin(uniDenom, liquidityAmt), minStandard, deadline.Unix(), senderAddress)
+		err := msg.ValidateBasic()
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return

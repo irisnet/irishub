@@ -142,7 +142,7 @@ func (msg MsgAddLiquidity) ValidateBasic() sdk.Error {
 		return sdk.ErrInvalidCoins("max token must be non-liquidity token")
 	}
 	if !msg.ExactStandardAmt.IsPositive() {
-		return ErrNotPositive("standard coin amount must be positive")
+		return ErrNotPositive("standard token amount must be positive")
 	}
 	if msg.MinLiquidity.IsNegative() {
 		return ErrNotPositive("minimum liquidity can not be negative")
@@ -212,7 +212,7 @@ func (msg MsgRemoveLiquidity) ValidateBasic() sdk.Error {
 		return err
 	}
 	if msg.MinStandardAmt.IsNegative() {
-		return ErrNotPositive("minimum standard coin amount can not be negative")
+		return ErrNotPositive("minimum standard token amount can not be negative")
 	}
 	if msg.Deadline <= 0 {
 		return ErrInvalidDeadline("deadline for MsgRemoveLiquidity not initialized")

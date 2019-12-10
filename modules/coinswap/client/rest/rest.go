@@ -15,21 +15,21 @@ func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router) {
 }
 
 type AddLiquidityReq struct {
-	BaseTx       rest.BaseReq `json:"base_tx" yaml:"base_tx"`
-	Id           string       `json:"id" yaml:"id"`                         // the unique liquidity id
-	MaxToken     string       `json:"max_token" yaml:"max_token"`           // token to be deposited as liquidity with an upper bound for its amount
-	ExactIrisAmt string       `json:"exact_iris_amt" yaml:"exact_iris_amt"` // exact amount of iris-atto being add to the liquidity pool
-	MinLiquidity string       `json:"min_liquidity" yaml:"min_liquidity"`   // lower bound UNI sender is willing to accept for deposited coins
-	Deadline     string       `json:"deadline" yaml:"deadline"`             // deadline duration, e.g. 10m
-	Sender       string       `json:"sender" yaml:"sender"`
+	BaseTx           rest.BaseReq `json:"base_tx" yaml:"base_tx"`
+	ID               string       `json:"id" yaml:"id"`                                 // the unique liquidity id
+	MaxToken         string       `json:"max_token" yaml:"max_token"`                   // token to be deposited as liquidity with an upper bound for its amount
+	ExactStandardAmt string       `json:"exact_standard_amt" yaml:"exact_standard_amt"` // exact amount of standard token being add to the liquidity pool
+	MinLiquidity     string       `json:"min_liquidity" yaml:"min_liquidity"`           // lower bound UNI sender is willing to accept for deposited coins
+	Deadline         string       `json:"deadline" yaml:"deadline"`                     // deadline duration, e.g. 10m
+	Sender           string       `json:"sender" yaml:"sender"`
 }
 
 type RemoveLiquidityReq struct {
 	BaseTx            rest.BaseReq `json:"base_tx" yaml:"base_tx"`
-	Id                string       `json:"id" yaml:"id"`                                 // the unique liquidity id
+	ID                string       `json:"id" yaml:"id"`                                 // the unique liquidity id
 	MinToken          string       `json:"min_token" yaml:"min_token"`                   // coin to be withdrawn with a lower bound for its amount
 	WithdrawLiquidity string       `json:"withdraw_liquidity" yaml:"withdraw_liquidity"` // amount of UNI to be burned to withdraw liquidity from a reserve pool
-	MinIrisAmt        string       `json:"min_iris_amt" yaml:"min_iris_amt"`             // minimum amount of the native asset the sender is willing to accept
+	MinStandardAmt    string       `json:"min_standard_amt" yaml:"min_standard_amt"`     // minimum amount of the native asset the sender is willing to accept
 	Deadline          string       `json:"deadline" yaml:"deadline"`                     // deadline duration, e.g. 10m
 	Sender            string       `json:"sender" yaml:"sender"`
 }
