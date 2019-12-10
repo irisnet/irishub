@@ -23,6 +23,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	"github.com/cosmos/cosmos-sdk/x/supply"
+	"github.com/cosmos/modules/incubator/nft"
 	"github.com/irisnet/irishub/modules/asset"
 	"github.com/irisnet/irishub/modules/guardian"
 	"github.com/irisnet/irishub/modules/mint"
@@ -58,6 +59,7 @@ var (
 		supply.AppModuleBasic{},
 		asset.AppModuleBasic{},
 		guardian.AppModuleBasic{},
+		nft.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -111,6 +113,7 @@ type IrisApp struct {
 	evidenceKeeper *evidence.Keeper
 	assetKeeper    asset.Keeper
 	guardianKeeper guardian.Keeper
+	NFTKeeper      nft.Keeper
 
 	// the module manager
 	mm *module.Manager
@@ -132,7 +135,8 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 	keys := sdk.NewKVStoreKeys(
 		bam.MainStoreKey, auth.StoreKey, staking.StoreKey, supply.StoreKey,
 		mint.StoreKey, distr.StoreKey, slashing.StoreKey, gov.StoreKey,
-		params.StoreKey, evidence.StoreKey, asset.StoreKey, guardian.StoreKey,
+		params.StoreKey, evidence.StoreKey,
+		asset.StoreKey, guardian.StoreKey, nft.StoreKey,
 	)
 	tKeys := sdk.NewTransientStoreKeys(staking.TStoreKey, params.TStoreKey)
 
@@ -185,6 +189,8 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 		app.cdc, keys[guardian.StoreKey], guardian.DefaultCodespace,
 	)
 
+	app.NFTKeeper = nft.NewKeeper(app.cdc, keys[nft.StoreKey])
+
 	// register the proposal types
 	govRouter := gov.NewRouter()
 	govRouter.AddRoute(gov.RouterKey, gov.ProposalHandler).
@@ -221,6 +227,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 		evidence.NewAppModule(*app.evidenceKeeper),
 		asset.NewAppModule(app.assetKeeper),
 		guardian.NewAppModule(app.guardianKeeper),
+		nft.NewAppModule(app.NFTKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -236,7 +243,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 		distr.ModuleName, staking.ModuleName, auth.ModuleName, bank.ModuleName,
 		slashing.ModuleName, gov.ModuleName, mint.ModuleName, supply.ModuleName,
 		crisis.ModuleName, genutil.ModuleName, evidence.ModuleName,
-		asset.ModuleName, guardian.ModuleName,
+		asset.ModuleName, guardian.ModuleName, nft.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.crisisKeeper)
@@ -256,6 +263,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 		staking.NewAppModule(app.stakingKeeper, app.accountKeeper, app.supplyKeeper),
 		slashing.NewAppModule(app.slashingKeeper, app.stakingKeeper),
 		asset.NewAppModule(app.assetKeeper),
+		//nft.NewAppModule(app.NFTKeeper),
 	)
 
 	app.sm.RegisterStoreDecoders()

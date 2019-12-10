@@ -23,6 +23,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	"github.com/cosmos/cosmos-sdk/x/supply"
+	"github.com/cosmos/modules/incubator/nft"
 	"github.com/irisnet/irishub/modules/asset"
 	"github.com/irisnet/irishub/modules/guardian"
 	"github.com/irisnet/irishub/modules/mint"
@@ -58,6 +59,7 @@ var (
 		slashing.AppModuleBasic{},
 		evidence.AppModuleBasic{},
 		guardian.AppModuleBasic{},
+		nft.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -112,6 +114,7 @@ type SimApp struct {
 	EvidenceKeeper evidence.Keeper
 	AssetKeeper    asset.Keeper
 	GuardianKeeper guardian.Keeper
+	NFTKeeper      nft.Keeper
 
 	// the module manager
 	mm *module.Manager
@@ -135,7 +138,7 @@ func NewSimApp(
 	keys := sdk.NewKVStoreKeys(
 		bam.MainStoreKey, auth.StoreKey, staking.StoreKey, supply.StoreKey, mint.StoreKey,
 		distr.StoreKey, slashing.StoreKey, gov.StoreKey, params.StoreKey, evidence.StoreKey,
-		asset.StoreKey, guardian.StoreKey,
+		asset.StoreKey, guardian.StoreKey, nft.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(params.TStoreKey)
 
@@ -196,6 +199,8 @@ func NewSimApp(
 		app.cdc, keys[guardian.StoreKey], guardian.DefaultCodespace,
 	)
 
+	app.NFTKeeper = nft.NewKeeper(app.cdc, keys[nft.StoreKey])
+
 	evidenceRouter := evidence.NewRouter()
 	// TODO: Register evidence routes.
 	evidenceKeeper.SetRouter(evidenceRouter)
@@ -237,6 +242,7 @@ func NewSimApp(
 		evidence.NewAppModule(app.EvidenceKeeper),
 		asset.NewAppModule(app.AssetKeeper),
 		guardian.NewAppModule(app.GuardianKeeper),
+		nft.NewAppModule(app.NFTKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -251,7 +257,7 @@ func NewSimApp(
 		auth.ModuleName, distr.ModuleName, staking.ModuleName, bank.ModuleName,
 		slashing.ModuleName, gov.ModuleName, mint.ModuleName, supply.ModuleName,
 		crisis.ModuleName, genutil.ModuleName, evidence.ModuleName,
-		asset.ModuleName, guardian.ModuleName,
+		asset.ModuleName, guardian.ModuleName, nft.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -271,6 +277,7 @@ func NewSimApp(
 		staking.NewAppModule(app.StakingKeeper, app.AccountKeeper, app.SupplyKeeper),
 		slashing.NewAppModule(app.SlashingKeeper, app.StakingKeeper),
 		asset.NewAppModule(app.AssetKeeper),
+		//nft.NewAppModule(app.NFTKeeper),
 	)
 
 	app.sm.RegisterStoreDecoders()
