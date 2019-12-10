@@ -5,7 +5,7 @@ import (
 )
 
 // module codec
-var ModuleCdc = codec.New()
+var ModuleCdc *codec.Codec
 
 // Register concrete types on codec
 func RegisterCodec(cdc *codec.Codec) {
@@ -16,5 +16,7 @@ func RegisterCodec(cdc *codec.Codec) {
 }
 
 func init() {
+	ModuleCdc = codec.New()
 	RegisterCodec(ModuleCdc)
+	ModuleCdc.Seal()
 }
