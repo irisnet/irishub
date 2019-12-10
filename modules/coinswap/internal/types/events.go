@@ -6,9 +6,11 @@ const (
 	EventAddLiquidity    = "add_liquidity"
 	EventRemoveLiquidity = "remove_liquidity"
 
+	AttributeValueCategory = ModuleName
+
 	AttributeValueAmount     = "amount"
 	AttributeValueSender     = "sender"
 	AttributeValueRecipient  = "recipient"
-	AttributeValueIsBuyOrder = "is-buy-order"
-	AttributeValueTokenPair  = "token-pair"
+	AttributeValueIsBuyOrder = "is_buy_order"
+	AttributeValueTokenPair  = "token_pair"
 )

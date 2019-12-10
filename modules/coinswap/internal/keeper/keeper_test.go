@@ -11,15 +11,14 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 
-	"github.com/irisnet/irishub/config"
 	"github.com/irisnet/irishub/modules/coinswap/internal/keeper"
 	"github.com/irisnet/irishub/modules/coinswap/internal/types"
 	"github.com/irisnet/irishub/simapp"
 )
 
 const (
-	denomIris      = config.Iris
-	denomIrisAtto  = config.IrisAtto
+	denomIris      = "iris"
+	denomIrisAtto  = "iris-atto"
 	denomBTC       = "btc"
 	denomBTCMin    = "btc-min"
 	denomETH       = "eth"
@@ -67,7 +66,7 @@ func (suite *KeeperTestSuite) TestParams() {
 		params types.Params
 	}{
 		{types.DefaultParams()},
-		{types.NewParams(sdk.NewDecWithPrec(5, 10))},
+		{types.NewParams(sdk.NewDecWithPrec(5, 10), types.StandardDenom)},
 	}
 	for _, tc := range cases {
 		suite.app.CoinswapKeeper.SetParams(suite.ctx, tc.params)
@@ -91,7 +90,7 @@ func (suite *KeeperTestSuite) TestKeeper_UpdateLiquidity() {
 		),
 	)
 
-	uniId, _ := types.GetUniId(denomBTCMin, denomIrisAtto)
+	uniId, _ := types.GetUniDenomFromDenoms(denomBTCMin, denomIrisAtto)
 	poolAddr := keeper.GetReservePoolAddr(uniId)
 
 	btcAmt, _ := sdk.NewIntFromString("1")

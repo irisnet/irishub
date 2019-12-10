@@ -9,13 +9,12 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irishub/config"
 	"github.com/irisnet/irishub/modules/coinswap/internal/keeper"
 	"github.com/irisnet/irishub/modules/coinswap/internal/types"
 )
 
 var (
-	native = config.IrisAtto
+	native = "iris-atto"
 )
 
 func (suite *KeeperTestSuite) TestGetUniId() {
@@ -118,7 +117,7 @@ func (suite *KeeperTestSuite) TestKeeperSwap() {
 	sender, reservePoolAddr, err, reservePoolBalances, senderBlances := createReservePool(suite)
 
 	outputCoin := sdk.NewCoin("btc-min", sdk.NewInt(100))
-	inputCoin := sdk.NewCoin(config.IrisAtto, sdk.NewInt(1000))
+	inputCoin := sdk.NewCoin(native, sdk.NewInt(1000))
 
 	input := types.Input{
 		Address: sender,
@@ -169,7 +168,7 @@ func createReservePool(suite *KeeperTestSuite) (sdk.AccAddress, sdk.AccAddress, 
 	)
 
 	denom1 := "btc-min"
-	denom2 := config.IrisAtto
+	denom2 := native
 	uniId, _ := types.GetUniId(denom1, denom2)
 	reservePoolAddr := keeper.GetReservePoolAddr(uniId)
 
@@ -194,7 +193,7 @@ func (suite *KeeperTestSuite) TestTradeInputForExactOutput() {
 	sender, poolAddr, _, poolBalances, senderBlances := createReservePool(suite)
 
 	outputCoin := sdk.NewCoin("btc-min", sdk.NewInt(100))
-	inputCoin := sdk.NewCoin(config.IrisAtto, sdk.NewInt(100000))
+	inputCoin := sdk.NewCoin(native, sdk.NewInt(100000))
 	input := types.Input{
 		Address: sender,
 		Coin:    inputCoin,
@@ -215,7 +214,7 @@ func (suite *KeeperTestSuite) TestTradeInputForExactOutput() {
 		ifNil(suite, err)
 
 		bought := sdk.NewCoins(outputCoin)
-		sold := sdk.NewCoins(sdk.NewCoin(config.IrisAtto, amt))
+		sold := sdk.NewCoins(sdk.NewCoin(native, amt))
 
 		pb := poolBalances.Add(sold).Sub(bought)
 		sb := senderBlances.Add(bought).Sub(sold)
@@ -231,7 +230,7 @@ func (suite *KeeperTestSuite) TestTradeExactInputForOutput() {
 	sender, poolAddr, _, poolBalances, senderBlances := createReservePool(suite)
 
 	outputCoin := sdk.NewCoin("btc-min", sdk.NewInt(0))
-	inputCoin := sdk.NewCoin(config.IrisAtto, sdk.NewInt(100))
+	inputCoin := sdk.NewCoin(native, sdk.NewInt(100))
 	input := types.Input{
 		Address: sender,
 		Coin:    inputCoin,

@@ -20,28 +20,18 @@ var (
 	sender      = sdk.AccAddress(senderPk.Address())
 	recipient   = sdk.AccAddress(recipientPk.Address())
 
-	denom0   = "atom-min"
-	denom1   = "btc-min"
-	unidenom = FormatUniABSPrefix + "btc-min"
+	denom0   = "atom"
+	denom1   = "btc"
+	unidenom = FormatUniABSPrefix + "btc"
 
-	input             sdk.Coin
-	output            sdk.Coin
-	withdrawLiquidity sdk.Coin
+	input             = sdk.NewCoin(denom0, sdk.NewInt(1000))
+	output            = sdk.NewCoin(denom1, sdk.NewInt(500))
+	withdrawLiquidity = sdk.NewCoin(unidenom, sdk.NewInt(500))
 	deadline          = time.Now().Unix()
 
 	emptyAddr sdk.AccAddress
 	emptyTime int64
 )
-
-func init() {
-	_ = sdk.RegisterDenom(denom0, sdk.NewDecWithPrec(1, sdk.Precision))
-	_ = sdk.RegisterDenom(denom1, sdk.NewDecWithPrec(1, sdk.Precision))
-	_ = sdk.RegisterDenom(unidenom, sdk.NewDecWithPrec(1, sdk.Precision))
-
-	input = sdk.NewCoin(denom0, sdk.NewInt(1000))
-	output = sdk.NewCoin(denom1, sdk.NewInt(500))
-	withdrawLiquidity = sdk.NewCoin(unidenom, sdk.NewInt(500))
-}
 
 // test ValidateBasic for MsgSwapOrder
 func TestMsgSwapOrder(t *testing.T) {
@@ -165,7 +155,7 @@ func TestMsgRemoveLiquidity(t *testing.T) {
 		{"no withdraw coin", NewMsgRemoveLiquidity(amt, sdk.Coin{}, sdk.OneInt(), deadline, sender), false},
 		{"zero withdraw coin", NewMsgRemoveLiquidity(amt, sdk.NewCoin(unidenom, sdk.ZeroInt()), sdk.OneInt(), deadline, sender), false},
 		{"invalid minimum token amount", NewMsgRemoveLiquidity(sdk.NewInt(-100), withdrawLiquidity, sdk.OneInt(), deadline, sender), false},
-		{"invalid minimum iris amount", NewMsgRemoveLiquidity(amt, withdrawLiquidity, sdk.NewInt(-100), deadline, sender), false},
+		{"invalid minimum standard coin amount", NewMsgRemoveLiquidity(amt, withdrawLiquidity, sdk.NewInt(-100), deadline, sender), false},
 		{"deadline not initialized", NewMsgRemoveLiquidity(amt, withdrawLiquidity, sdk.OneInt(), emptyTime, sender), false},
 		{"empty sender", NewMsgRemoveLiquidity(amt, withdrawLiquidity, sdk.OneInt(), deadline, emptyAddr), false},
 		{"valid MsgRemoveLiquidity", NewMsgRemoveLiquidity(amt, withdrawLiquidity, sdk.OneInt(), deadline, sender), true},

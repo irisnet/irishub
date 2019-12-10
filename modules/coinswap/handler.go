@@ -5,11 +5,15 @@ import (
 	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	"github.com/irisnet/irishub/modules/coinswap/internal/types"
 )
 
 // NewHandler returns a handler for "coinswap" type messages.
 func NewHandler(k Keeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
+		ctx = ctx.WithEventManager(sdk.NewEventManager())
+
 		switch msg := msg.(type) {
 		case MsgSwapOrder:
 			return HandleMsgSwapOrder(ctx, k, msg)
@@ -36,6 +40,17 @@ func HandleMsgSwapOrder(ctx sdk.Context, k Keeper, msg MsgSwapOrder) sdk.Result 
 		return err.Result()
 	}
 
+	ctx.EventManager().EmitEvents(
+		sdk.Events{
+			sdk.NewEvent(
+				sdk.EventTypeMessage,
+				sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+				sdk.NewAttribute(sdk.AttributeKeySender, msg.Input.Address.String()),
+			),
+			// TODO
+		},
+	)
+
 	return sdk.Result{
 		Events: ctx.EventManager().Events(),
 	}
@@ -54,6 +69,17 @@ func HandleMsgAddLiquidity(ctx sdk.Context, k Keeper, msg MsgAddLiquidity) sdk.R
 		return err.Result()
 	}
 
+	ctx.EventManager().EmitEvents(
+		sdk.Events{
+			sdk.NewEvent(
+				sdk.EventTypeMessage,
+				sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+				sdk.NewAttribute(sdk.AttributeKeySender, msg.Sender.String()),
+			),
+			// TODO
+		},
+	)
+
 	return sdk.Result{
 		Events: ctx.EventManager().Events(),
 	}
@@ -70,6 +96,17 @@ func HandleMsgRemoveLiquidity(ctx sdk.Context, k Keeper, msg MsgRemoveLiquidity)
 	if err != nil {
 		return err.Result()
 	}
+
+	ctx.EventManager().EmitEvents(
+		sdk.Events{
+			sdk.NewEvent(
+				sdk.EventTypeMessage,
+				sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+				sdk.NewAttribute(sdk.AttributeKeySender, msg.Sender.String()),
+			),
+			// TODO
+		},
+	)
 
 	return sdk.Result{
 		Events: ctx.EventManager().Events(),

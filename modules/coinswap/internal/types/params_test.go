@@ -23,9 +23,9 @@ func TestValidateParams(t *testing.T) {
 		params Params
 		result bool
 	}{
-		{"fee == 0 ", NewParams(sdk.ZeroDec()), false},
-		{"fee < 1", NewParams(sdk.NewDecWithPrec(1000, 2)), false},
-		{"fee numerator < 0", NewParams(sdk.NewDecWithPrec(-1, 1)), false},
+		{"fee == 0 ", NewParams(sdk.ZeroDec(), StandardDenom), false},
+		{"fee < 1", NewParams(sdk.NewDecWithPrec(1000, 2), StandardDenom), false},
+		{"fee numerator < 0", NewParams(sdk.NewDecWithPrec(-1, 1), StandardDenom), false},
 	}
 
 	for _, tc := range invalidTests {

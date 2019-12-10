@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"fmt"
-	"github.com/irisnet/irishub/config"
 
 	abci "github.com/tendermint/tendermint/abci/types"
 
@@ -33,12 +32,13 @@ func queryLiquidity(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, s
 		return nil, sdk.ErrUnknownRequest(sdk.AppendMsgToErr("incorrectly formatted request data", err.Error()))
 	}
 
-	uniDenom, err := types.GetUniDenom(params.Id)
-	if err != nil {
+	if err := types.CheckUniDenom(params.Id); err != nil {
 		return nil, sdk.ErrUnknownRequest(err.Error())
 	}
 
-	tokenDenom, err := types.GetCoinMinDenomFromUniDenom(uniDenom)
+	uniDenom := params.Id
+
+	tokenDenom, err := types.GetCoinDenomFromUniDenom(uniDenom)
 	if err != nil {
 		return nil, sdk.ErrUnknownRequest(err.Error())
 	}
@@ -47,14 +47,14 @@ func queryLiquidity(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, s
 	// all liquidity vouchers in module account
 	liquidities := k.sk.GetModuleAccount(ctx, types.ModuleName).GetCoins()
 
-	iris := sdk.NewCoin(config.IrisAtto, reservePool.AmountOf(config.IrisAtto))
+	standard := sdk.NewCoin(types.StandardDenom, reservePool.AmountOf(types.StandardDenom))
 	token := sdk.NewCoin(tokenDenom, reservePool.AmountOf(tokenDenom))
 	liquidity := sdk.NewCoin(uniDenom, liquidities.AmountOf(uniDenom))
 
 	swapParams := k.GetParams(ctx)
 	fee := swapParams.Fee.String()
 	res := types.QueryLiquidityResponse{
-		Iris:      iris,
+		Standard:  standard,
 		Token:     token,
 		Liquidity: liquidity,
 		Fee:       fee,

@@ -10,22 +10,26 @@ import (
 const (
 	// DefaultParamSpace for coinswap
 	DefaultParamspace = ModuleName
+	StandardDenom     = sdk.DefaultBondDenom
 )
 
 // Parameter store keys
 var (
-	feeKey = []byte("fee")
+	KeyFee           = []byte("Fee")
+	KeyStandardDenom = []byte("StandardDenom")
 )
 
 // Params defines the fee and native denomination for coinswap
 type Params struct {
-	Fee sdk.Dec `json:"fee" yaml:"fee"`
+	Fee           sdk.Dec `json:"fee" yaml:"fee"`
+	StandardDenom string  `json:"standard_denom" yaml:"standard_denom"`
 }
 
 // NewParams coinswap params constructor
-func NewParams(fee sdk.Dec) Params {
+func NewParams(fee sdk.Dec, feeDenom string) Params {
 	return Params{
-		Fee: fee,
+		Fee:           fee,
+		StandardDenom: feeDenom,
 	}
 }
 
@@ -37,7 +41,9 @@ func ParamKeyTable() params.KeyTable {
 // String returns a human readable string representation of the parameters.
 func (p Params) String() string {
 	return fmt.Sprintf(`Coinswap Params:
-  Fee:			%s`, p.Fee.String(),
+  Fee:			%s
+  FeeDenom:		%s`,
+		p.Fee.String(), p.StandardDenom,
 	)
 }
 
@@ -45,8 +51,12 @@ func (p Params) String() string {
 func (p *Params) ParamSetPairs() params.ParamSetPairs {
 	return params.ParamSetPairs{
 		{
-			Key:   feeKey,
+			Key:   KeyFee,
 			Value: &p.Fee,
+		},
+		{
+			Key:   KeyStandardDenom,
+			Value: &p.StandardDenom,
 		},
 	}
 }
@@ -55,7 +65,8 @@ func (p *Params) ParamSetPairs() params.ParamSetPairs {
 func DefaultParams() Params {
 	fee := sdk.NewDecWithPrec(3, 3)
 	return Params{
-		Fee: fee,
+		Fee:           fee,
+		StandardDenom: StandardDenom,
 	}
 }
 
@@ -66,6 +77,9 @@ func ValidateParams(p Params) error {
 	}
 	if !p.Fee.LT(sdk.OneDec()) {
 		return fmt.Errorf("fee must be less than 1: %s", p.Fee.String())
+	}
+	if p.StandardDenom == "" {
+		return fmt.Errorf("coinswap parameter NativeDenom can't be an empty string")
 	}
 	return nil
 }
