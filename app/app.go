@@ -23,6 +23,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	"github.com/cosmos/cosmos-sdk/x/supply"
+	"github.com/irisnet/irishub/modules/asset"
 	"github.com/irisnet/irishub/modules/guardian"
 	"github.com/irisnet/irishub/modules/mint"
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -55,6 +56,7 @@ var (
 		crisis.AppModuleBasic{},
 		slashing.AppModuleBasic{},
 		supply.AppModuleBasic{},
+		asset.AppModuleBasic{},
 		guardian.AppModuleBasic{},
 	)
 
@@ -66,6 +68,7 @@ var (
 		staking.BondedPoolName:    {supply.Burner, supply.Staking},
 		staking.NotBondedPoolName: {supply.Burner, supply.Staking},
 		gov.ModuleName:            {supply.Burner},
+		asset.ModuleName:          {supply.Minter, supply.Burner},
 	}
 )
 
@@ -106,6 +109,7 @@ type IrisApp struct {
 	crisisKeeper   crisis.Keeper
 	paramsKeeper   params.Keeper
 	evidenceKeeper *evidence.Keeper
+	assetKeeper    asset.Keeper
 	guardianKeeper guardian.Keeper
 
 	// the module manager
@@ -128,7 +132,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 	keys := sdk.NewKVStoreKeys(
 		bam.MainStoreKey, auth.StoreKey, staking.StoreKey, supply.StoreKey,
 		mint.StoreKey, distr.StoreKey, slashing.StoreKey, gov.StoreKey,
-		params.StoreKey, evidence.StoreKey, guardian.StoreKey,
+		params.StoreKey, evidence.StoreKey, asset.StoreKey, guardian.StoreKey,
 	)
 	tKeys := sdk.NewTransientStoreKeys(staking.TStoreKey, params.TStoreKey)
 
@@ -151,6 +155,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 	govSubspace := app.paramsKeeper.Subspace(gov.DefaultParamspace).WithKeyTable(gov.ParamKeyTable())
 	crisisSubspace := app.paramsKeeper.Subspace(crisis.DefaultParamspace)
 	evidenceSubspace := app.paramsKeeper.Subspace(evidence.DefaultParamspace)
+	assetSubspace := app.paramsKeeper.Subspace(asset.DefaultParamspace)
 
 	// add keepers
 	app.accountKeeper = auth.NewAccountKeeper(app.cdc, keys[auth.StoreKey], authSubspace, auth.ProtoBaseAccount)
@@ -196,6 +201,10 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 		staking.NewMultiStakingHooks(app.distrKeeper.Hooks(), app.slashingKeeper.Hooks()),
 	)
 
+	app.assetKeeper = asset.NewKeeper(
+		app.cdc, keys[asset.StoreKey], assetSubspace, asset.DefaultCodespace,
+		app.supplyKeeper, auth.FeeCollectorName)
+
 	// NOTE: Any module instantiated in the module manager that is later modified
 	// must be passed by reference here.
 	app.mm = module.NewManager(
@@ -210,6 +219,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 		slashing.NewAppModule(app.slashingKeeper, app.stakingKeeper),
 		staking.NewAppModule(app.stakingKeeper, app.accountKeeper, app.supplyKeeper),
 		evidence.NewAppModule(*app.evidenceKeeper),
+		asset.NewAppModule(app.assetKeeper),
 		guardian.NewAppModule(app.guardianKeeper),
 	)
 
@@ -225,7 +235,8 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 	app.mm.SetOrderInitGenesis(
 		distr.ModuleName, staking.ModuleName, auth.ModuleName, bank.ModuleName,
 		slashing.ModuleName, gov.ModuleName, mint.ModuleName, supply.ModuleName,
-		crisis.ModuleName, genutil.ModuleName, evidence.ModuleName, guardian.ModuleName,
+		crisis.ModuleName, genutil.ModuleName, evidence.ModuleName,
+		asset.ModuleName, guardian.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.crisisKeeper)
@@ -244,6 +255,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 		distr.NewAppModule(app.distrKeeper, app.supplyKeeper),
 		staking.NewAppModule(app.stakingKeeper, app.accountKeeper, app.supplyKeeper),
 		slashing.NewAppModule(app.slashingKeeper, app.stakingKeeper),
+		asset.NewAppModule(app.assetKeeper),
 	)
 
 	app.sm.RegisterStoreDecoders()

@@ -45,11 +45,13 @@ const (
 )
 
 var (
+	mintPerBlock, _ = sdk.NewIntFromString("12675235125611580094")
+
 	totalCoins = sdk.NewCoins(
 		sdk.NewCoin(fee2Denom, sdk.TokensFromConsensusPower(2000000)),
 		sdk.NewCoin(feeDenom, sdk.TokensFromConsensusPower(2000000)),
 		sdk.NewCoin(fooDenom, sdk.TokensFromConsensusPower(2000)),
-		sdk.NewCoin(denom, sdk.TokensFromConsensusPower(300).Add(sdk.NewInt(12))), // add coins from inflation
+		sdk.NewCoin(denom, sdk.TokensFromConsensusPower(300).Add(mintPerBlock)), // add coins from inflation
 	)
 
 	startCoins = sdk.NewCoins(
