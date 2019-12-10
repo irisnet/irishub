@@ -18,13 +18,14 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/evidence"
 	"github.com/cosmos/cosmos-sdk/x/genutil"
 	"github.com/cosmos/cosmos-sdk/x/gov"
-	"github.com/cosmos/cosmos-sdk/x/mint"
 	"github.com/cosmos/cosmos-sdk/x/params"
 	paramsclient "github.com/cosmos/cosmos-sdk/x/params/client"
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	"github.com/cosmos/cosmos-sdk/x/supply"
 	"github.com/irisnet/irishub/modules/asset"
+	"github.com/irisnet/irishub/modules/guardian"
+	"github.com/irisnet/irishub/modules/mint"
 	abci "github.com/tendermint/tendermint/abci/types"
 	cmn "github.com/tendermint/tendermint/libs/common"
 	"github.com/tendermint/tendermint/libs/log"
@@ -56,6 +57,7 @@ var (
 		slashing.AppModuleBasic{},
 		supply.AppModuleBasic{},
 		asset.AppModuleBasic{},
+		guardian.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -108,6 +110,7 @@ type IrisApp struct {
 	paramsKeeper   params.Keeper
 	evidenceKeeper *evidence.Keeper
 	assetKeeper    asset.Keeper
+	guardianKeeper guardian.Keeper
 
 	// the module manager
 	mm *module.Manager
@@ -129,7 +132,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 	keys := sdk.NewKVStoreKeys(
 		bam.MainStoreKey, auth.StoreKey, staking.StoreKey, supply.StoreKey,
 		mint.StoreKey, distr.StoreKey, slashing.StoreKey, gov.StoreKey,
-		params.StoreKey, evidence.StoreKey, asset.StoreKey,
+		params.StoreKey, evidence.StoreKey, asset.StoreKey, guardian.StoreKey,
 	)
 	tKeys := sdk.NewTransientStoreKeys(staking.TStoreKey, params.TStoreKey)
 
@@ -161,7 +164,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 	stakingKeeper := staking.NewKeeper(
 		app.cdc, keys[staking.StoreKey], app.supplyKeeper, stakingSubspace, staking.DefaultCodespace,
 	)
-	app.mintKeeper = mint.NewKeeper(app.cdc, keys[mint.StoreKey], mintSubspace, &stakingKeeper, app.supplyKeeper, auth.FeeCollectorName)
+	app.mintKeeper = mint.NewKeeper(app.cdc, keys[mint.StoreKey], mintSubspace, app.supplyKeeper, auth.FeeCollectorName)
 	app.distrKeeper = distr.NewKeeper(app.cdc, keys[distr.StoreKey], distrSubspace, &stakingKeeper,
 		app.supplyKeeper, distr.DefaultCodespace, auth.FeeCollectorName, app.ModuleAccountAddrs())
 	app.slashingKeeper = slashing.NewKeeper(
@@ -176,6 +179,11 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 	evidenceRouter := evidence.NewRouter()
 	// TODO: Register evidence routes.
 	app.evidenceKeeper.SetRouter(evidenceRouter)
+
+	// create guardian keeper with guardian router
+	app.guardianKeeper = guardian.NewKeeper(
+		app.cdc, keys[guardian.StoreKey], guardian.DefaultCodespace,
+	)
 
 	// register the proposal types
 	govRouter := gov.NewRouter()
@@ -212,6 +220,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 		staking.NewAppModule(app.stakingKeeper, app.accountKeeper, app.supplyKeeper),
 		evidence.NewAppModule(*app.evidenceKeeper),
 		asset.NewAppModule(app.assetKeeper),
+		guardian.NewAppModule(app.guardianKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -226,7 +235,8 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 	app.mm.SetOrderInitGenesis(
 		distr.ModuleName, staking.ModuleName, auth.ModuleName, bank.ModuleName,
 		slashing.ModuleName, gov.ModuleName, mint.ModuleName, supply.ModuleName,
-		crisis.ModuleName, genutil.ModuleName, evidence.ModuleName, asset.ModuleName,
+		crisis.ModuleName, genutil.ModuleName, evidence.ModuleName,
+		asset.ModuleName, guardian.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.crisisKeeper)
