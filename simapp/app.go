@@ -1,7 +1,6 @@
 package simapp
 
 import (
-	"github.com/irisnet/irishub/modules/guardian"
 	"io"
 	"os"
 
@@ -24,6 +23,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	"github.com/cosmos/cosmos-sdk/x/supply"
+	"github.com/irisnet/irishub/modules/guardian"
 	"github.com/irisnet/irishub/modules/mint"
 	abci "github.com/tendermint/tendermint/abci/types"
 	cmn "github.com/tendermint/tendermint/libs/common"
@@ -56,6 +56,7 @@ var (
 		crisis.AppModuleBasic{},
 		slashing.AppModuleBasic{},
 		evidence.AppModuleBasic{},
+		guardian.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -131,7 +132,7 @@ func NewSimApp(
 	keys := sdk.NewKVStoreKeys(
 		bam.MainStoreKey, auth.StoreKey, staking.StoreKey, supply.StoreKey, mint.StoreKey,
 		distr.StoreKey, slashing.StoreKey, gov.StoreKey, params.StoreKey,
-		evidence.StoreKey,
+		evidence.StoreKey, guardian.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(params.TStoreKey)
 
@@ -188,7 +189,7 @@ func NewSimApp(
 	)
 
 	app.GuardianKeeper = guardian.NewKeeper(
-		app.cdc, keys[evidence.StoreKey], guardian.DefaultCodespace,
+		app.cdc, keys[guardian.StoreKey], guardian.DefaultCodespace,
 	)
 
 	evidenceRouter := evidence.NewRouter()
@@ -226,6 +227,7 @@ func NewSimApp(
 		slashing.NewAppModule(app.SlashingKeeper, app.StakingKeeper),
 		staking.NewAppModule(app.StakingKeeper, app.AccountKeeper, app.SupplyKeeper),
 		evidence.NewAppModule(app.EvidenceKeeper),
+		guardian.NewAppModule(app.GuardianKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -239,7 +241,7 @@ func NewSimApp(
 	app.mm.SetOrderInitGenesis(
 		auth.ModuleName, distr.ModuleName, staking.ModuleName, bank.ModuleName,
 		slashing.ModuleName, gov.ModuleName, mint.ModuleName, supply.ModuleName,
-		crisis.ModuleName, genutil.ModuleName, evidence.ModuleName,
+		crisis.ModuleName, genutil.ModuleName, evidence.ModuleName, guardian.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
