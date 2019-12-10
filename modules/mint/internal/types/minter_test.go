@@ -1,30 +1,25 @@
-package mint
+package types
 
 import (
 	"testing"
 	"time"
 
-	stakeTypes "github.com/irisnet/irishub/app/v1/stake/types"
-	sdk "github.com/irisnet/irishub/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
 )
 
 func TestNextInflation(t *testing.T) {
-	minter := NewMinter(time.Now(), stakeTypes.StakeDenom, sdk.NewIntWithDecimal(100, 18))
+	minter := NewMinter(time.Now(), sdk.NewIntWithDecimal(100, 18))
 	tests := []struct {
 		params Params
 	}{
-		{DefaultParams()},
-		{DefaultParams()},
-		{DefaultParams()},
-		{DefaultParams()},
-		{Params{sdk.NewDecWithPrec(20, 2)}},
-		{Params{sdk.NewDecWithPrec(10, 2)}},
-		{Params{sdk.NewDecWithPrec(5, 2)}},
+		{Params{Inflation: sdk.NewDecWithPrec(20, 2), MintDenom: "iris"}},
+		{Params{Inflation: sdk.NewDecWithPrec(10, 2), MintDenom: "iris"}},
+		{Params{Inflation: sdk.NewDecWithPrec(5, 2), MintDenom: "iris"}},
 	}
 	for _, tc := range tests {
 		annualProvisions := minter.NextAnnualProvisions(tc.params)
-		mintCoin := minter.BlockProvision(annualProvisions)
+		mintCoin := minter.BlockProvision(tc.params)
 
 		blockProvision := annualProvisions.QuoInt(sdk.NewInt(12 * 60 * 8766))
 
