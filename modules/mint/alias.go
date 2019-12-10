@@ -21,6 +21,7 @@ var (
 	ValidateGenesis     = types.ValidateGenesis
 	RegisterCodec       = types.RegisterCodec
 	DefaultParams       = types.DefaultParams
+	DefaultMinter       = types.DefaultMinter
 
 	// variable aliases
 	ModuleCdc = types.ModuleCdc
