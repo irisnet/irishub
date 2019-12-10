@@ -64,8 +64,8 @@ func (suite *KeeperTestSuite) TestAddProfiler() {
 		suite.cdc.MustUnmarshalBinaryLengthPrefixed(profilersIterator.Value(), &profiler)
 		profilers = append(profilers, profiler)
 	}
-	require.Equal(suite.T(), 1, len(profilers))
-	require.True(suite.T(), profiler.Equal(profilers[0]))
+	require.Equal(suite.T(), 2, len(profilers))
+	require.Contains(suite.T(), profilers, profiler)
 }
 
 func (suite *KeeperTestSuite) TestDeleteProfiler() {
@@ -97,8 +97,8 @@ func (suite *KeeperTestSuite) TestAddTrustee() {
 		suite.cdc.MustUnmarshalBinaryLengthPrefixed(trusteesIterator.Value(), &trustee)
 		trustees = append(trustees, trustee)
 	}
-	require.Equal(suite.T(), 1, len(trustees))
-	require.True(suite.T(), trustee.Equal(trustees[0]))
+	require.Equal(suite.T(), 2, len(trustees))
+	require.Contains(suite.T(), trustees, trustee)
 }
 
 func (suite *KeeperTestSuite) TestDeleteTrustee() {
@@ -125,8 +125,8 @@ func (suite *KeeperTestSuite) TestQueryProfilers() {
 
 	err := suite.cdc.UnmarshalJSON(res, &profilers)
 	require.NoError(suite.T(), err)
-	require.Len(suite.T(), profilers, 1)
-	require.Equal(suite.T(), profiler, profilers[0])
+	require.Len(suite.T(), profilers, 2)
+	require.Contains(suite.T(), profilers, profiler)
 }
 
 func (suite *KeeperTestSuite) TestQueryTrustees() {
@@ -140,8 +140,8 @@ func (suite *KeeperTestSuite) TestQueryTrustees() {
 
 	err := suite.cdc.UnmarshalJSON(res, &trustees)
 	require.NoError(suite.T(), err)
-	require.Len(suite.T(), trustees, 1)
-	require.Equal(suite.T(), trustee, trustees[0])
+	require.Len(suite.T(), trustees, 2)
+	require.Contains(suite.T(), trustees, trustee)
 }
 
 func newPubKey(pk string) (res crypto.PubKey) {

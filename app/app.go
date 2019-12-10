@@ -128,7 +128,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 	keys := sdk.NewKVStoreKeys(
 		bam.MainStoreKey, auth.StoreKey, staking.StoreKey, supply.StoreKey,
 		mint.StoreKey, distr.StoreKey, slashing.StoreKey, gov.StoreKey,
-		params.StoreKey, evidence.StoreKey,
+		params.StoreKey, evidence.StoreKey, guardian.StoreKey,
 	)
 	tKeys := sdk.NewTransientStoreKeys(staking.TStoreKey, params.TStoreKey)
 
@@ -177,7 +177,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 
 	// create guardian keeper with guardian router
 	app.guardianKeeper = guardian.NewKeeper(
-		app.cdc, keys[evidence.StoreKey], guardian.DefaultCodespace,
+		app.cdc, keys[guardian.StoreKey], guardian.DefaultCodespace,
 	)
 
 	// register the proposal types
