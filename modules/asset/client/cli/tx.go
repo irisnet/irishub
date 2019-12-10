@@ -40,7 +40,7 @@ func GetCmdIssueToken(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "issue-token",
 		Short: "Issue a new token",
-		Example: fmt.Sprintf("%s asset tx issue-token --family=<family> --source=<source> --decimal=<decimal>"+
+		Example: fmt.Sprintf("%s tx asset issue-token --family=<family> --source=<source> --decimal=<decimal>"+
 			" --symbol=<symbol> --name=<token-name> --initial-supply=<initial-supply> --from=<key-name>"+
 			" --chain-id=<chain-id> --fee=0.6iris", version.ClientName),
 		RunE: func(cmd *cobra.Command, args []string) error {

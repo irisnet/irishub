@@ -34,15 +34,12 @@ func queryToken(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, 
 		return nil, iristypes.ParseParamsErr(err)
 	}
 
-	var token types.FungibleToken
-
-	var found bool
-	token, found = keeper.GetToken(ctx, params.TokenID)
+	token, found := keeper.GetToken(ctx, params.TokenID)
 	if !found {
 		return nil, sdk.ErrUnknownRequest(fmt.Sprintf("token %s does not exist", params.TokenID))
 	}
 
-	bz, err := codec.MarshalJSONIndent(types.ModuleCdc, token)
+	bz, err := codec.MarshalJSONIndent(keeper.cdc, token)
 
 	if err != nil {
 		return nil, iristypes.MarshalResultErr(err)
@@ -117,7 +114,7 @@ func queryTokens(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte,
 		tokens = make([]types.FungibleToken, 0)
 	}
 
-	bz, err := codec.MarshalJSONIndent(types.ModuleCdc, tokens)
+	bz, err := codec.MarshalJSONIndent(keeper.cdc, tokens)
 
 	if err != nil {
 		return nil, iristypes.MarshalResultErr(err)
@@ -166,7 +163,7 @@ func queryTokenFees(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]by
 		MintFee:  mintFee,
 	}
 
-	bz, err := codec.MarshalJSONIndent(types.ModuleCdc, fees)
+	bz, err := codec.MarshalJSONIndent(keeper.cdc, fees)
 	if err != nil {
 		return nil, iristypes.MarshalResultErr(err)
 	}
@@ -174,10 +171,10 @@ func queryTokenFees(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]by
 	return bz, nil
 }
 
-func queryParameters(ctx sdk.Context, k Keeper) ([]byte, sdk.Error) {
-	params := k.GetParamSet(ctx)
+func queryParameters(ctx sdk.Context, keeper Keeper) ([]byte, sdk.Error) {
+	params := keeper.GetParamSet(ctx)
 
-	res, err := codec.MarshalJSONIndent(types.ModuleCdc, params)
+	res, err := codec.MarshalJSONIndent(keeper.cdc, params)
 	if err != nil {
 		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", err.Error()))
 	}

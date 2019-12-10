@@ -49,7 +49,7 @@ func issueTokenHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		// create the MsgEditGateway message
+		// create the NewMsgIssueToken message
 		msg := types.NewMsgIssueToken(req.Family, req.Source, req.Symbol, req.CanonicalSymbol, req.Name, req.Decimal,
 			req.MinUnitAlias, req.InitialSupply, req.MaxSupply, req.Mintable, req.Owner)
 		if err := msg.ValidateBasic(); err != nil {
@@ -76,12 +76,13 @@ func editTokenHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		// create the MsgEditToken message
 		mintable, err := types.ParseBool(req.Mintable)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
+
+		// create the MsgEditToken message
 		msg := types.NewMsgEditToken(req.Name, req.CanonicalSymbol, req.MinUnitAlias, tokenId, req.MaxSupply, mintable, req.Owner)
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())

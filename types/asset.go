@@ -8,10 +8,14 @@ import (
 
 const FormatUniABSPrefix = "uni:"
 
+var (
+	reToken = regexp.MustCompile(`[A-Za-z0-9\.]{3,17}`)
+	reDnm   = regexp.MustCompile(`[A-Za-z0-9\.\-]{3,21}`)
+)
+
 // ConvertIdToTokenKeyId return the store key suffix of a token
 func ConvertIdToTokenKeyId(tokenId string) (key string, err error) {
-	var reToken = `[A-Za-z0-9\.]{3,17}`
-	if !regexp.MustCompile(reToken).MatchString(tokenId) {
+	if !reToken.MatchString(tokenId) {
 		return "", fmt.Errorf("token id convert error: invalid denom")
 	}
 
@@ -39,8 +43,7 @@ func ConvertDenomToTokenKeyId(denom string) (key string, err error) {
 
 // ConvertDenomToTokenId return the token id of the given denom
 func ConvertDenomToTokenId(denom string) (tokenId string, err error) {
-	var reDnm = `[A-Za-z0-9\.\-]{3,21}`
-	if !regexp.MustCompile(reDnm).MatchString(denom) {
+	if !reDnm.MatchString(denom) {
 		return "", fmt.Errorf("token id convert error: invalid denom")
 	}
 
