@@ -59,7 +59,12 @@ func addLiquidityHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		deadline := time.Now().Add(duration)
+		status, e := cliCtx.Client.Status()
+		if e != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, e.Error())
+			return
+		}
+		deadline := status.SyncInfo.LatestBlockTime.Add(duration)
 
 		maxToken, ok := sdk.NewIntFromString(req.MaxToken)
 		if !ok || !maxToken.IsPositive() {
@@ -122,7 +127,12 @@ func removeLiquidityHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		deadline := time.Now().Add(duration)
+		status, e := cliCtx.Client.Status()
+		if e != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, e.Error())
+			return
+		}
+		deadline := status.SyncInfo.LatestBlockTime.Add(duration)
 
 		minToken, ok := sdk.NewIntFromString(req.MinToken)
 		if !ok {
@@ -188,7 +198,13 @@ func swapOrderHandlerFn(cliCtx context.CLIContext, isBuyOrder bool) http.Handler
 
 		input := types.Input{Address: senderAddress, Coin: req.Input.Coin}
 		output := types.Output{Address: recipientAddress, Coin: req.Output.Coin}
-		deadline := time.Now().Add(duration)
+
+		status, e := cliCtx.Client.Status()
+		if e != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, e.Error())
+			return
+		}
+		deadline := status.SyncInfo.LatestBlockTime.Add(duration)
 
 		msg := types.NewMsgSwapOrder(input, output, deadline.Unix(), isBuyOrder)
 		err = msg.ValidateBasic()

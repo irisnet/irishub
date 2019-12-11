@@ -61,15 +61,16 @@ func (k Keeper) Swap(ctx sdk.Context, msg types.MsgSwapOrder) sdk.Error {
 		return err
 	}
 
-	swapEvent := sdk.NewEvent(
-		types.EventSwap,
-		sdk.NewAttribute(types.AttributeValueAmount, amount.String()),
-		sdk.NewAttribute(types.AttributeValueSender, msg.Input.Address.String()),
-		sdk.NewAttribute(types.AttributeValueRecipient, msg.Output.Address.String()),
-		sdk.NewAttribute(types.AttributeValueIsBuyOrder, strconv.FormatBool(msg.IsBuyOrder)),
-		sdk.NewAttribute(types.AttributeValueTokenPair, getTokenPairByDenom(msg.Input.Coin.Denom, msg.Output.Coin.Denom)),
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			types.EventSwap,
+			sdk.NewAttribute(types.AttributeValueAmount, amount.String()),
+			sdk.NewAttribute(types.AttributeValueSender, msg.Input.Address.String()),
+			sdk.NewAttribute(types.AttributeValueRecipient, msg.Output.Address.String()),
+			sdk.NewAttribute(types.AttributeValueIsBuyOrder, strconv.FormatBool(msg.IsBuyOrder)),
+			sdk.NewAttribute(types.AttributeValueTokenPair, getTokenPairByDenom(msg.Input.Coin.Denom, msg.Output.Coin.Denom)),
+		),
 	)
-	ctx.EventManager().EmitEvents(sdk.Events{swapEvent})
 
 	return nil
 }
@@ -107,12 +108,13 @@ func (k Keeper) AddLiquidity(ctx sdk.Context, msg types.MsgAddLiquidity) sdk.Err
 		}
 	}
 
-	addLiquidityEvent := sdk.NewEvent(
-		types.EventAddLiquidity,
-		sdk.NewAttribute(types.AttributeValueSender, msg.Sender.String()),
-		sdk.NewAttribute(types.AttributeValueTokenPair, getTokenPairByDenom(msg.MaxToken.Denom, types.StandardDenom)),
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			types.EventAddLiquidity,
+			sdk.NewAttribute(types.AttributeValueSender, msg.Sender.String()),
+			sdk.NewAttribute(types.AttributeValueTokenPair, getTokenPairByDenom(msg.MaxToken.Denom, types.StandardDenom)),
+		),
 	)
-	ctx.EventManager().EmitEvents(sdk.Events{addLiquidityEvent})
 
 	return k.addLiquidity(ctx, msg.Sender, standardCoin, depositToken, uniDenom, mintLiquidityAmt)
 }
@@ -184,12 +186,13 @@ func (k Keeper) RemoveLiquidity(ctx sdk.Context, msg types.MsgRemoveLiquidity) s
 	}
 	poolAddr := GetReservePoolAddr(uniDenom)
 
-	removeLiquidityEvent := sdk.NewEvent(
-		types.EventRemoveLiquidity,
-		sdk.NewAttribute(types.AttributeValueSender, msg.Sender.String()),
-		sdk.NewAttribute(types.AttributeValueTokenPair, getTokenPairByDenom(minTokenDenom, types.StandardDenom)),
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			types.EventRemoveLiquidity,
+			sdk.NewAttribute(types.AttributeValueSender, msg.Sender.String()),
+			sdk.NewAttribute(types.AttributeValueTokenPair, getTokenPairByDenom(minTokenDenom, types.StandardDenom)),
+		),
 	)
-	ctx.EventManager().EmitEvents(sdk.Events{removeLiquidityEvent})
 
 	return k.removeLiquidity(ctx, poolAddr, msg.Sender, deductUniCoin, irisWithdrawCoin, tokenWithdrawCoin)
 }
