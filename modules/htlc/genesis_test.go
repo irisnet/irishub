@@ -4,7 +4,6 @@ import (
 	"encoding/hex"
 	"testing"
 
-	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -12,8 +11,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	modulehtlc "github.com/irisnet/irishub/modules/htlc"
-	"github.com/irisnet/irishub/modules/htlc/internal/types"
+	"github.com/irisnet/irishub/modules/htlc"
 	"github.com/irisnet/irishub/simapp"
 )
 
@@ -53,51 +51,51 @@ func (suite *KeeperTestSuite) TestExportHTLCGenesis() {
 	amount := sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(0)))
 	secret := []byte("___abcdefghijklmnopqrstuvwxyz___")
 	timestamps := []uint64{uint64(1580000000), 0}
-	hashLocks := []types.HTLCHashLock{types.GetHashLock(secret, timestamps[0]), types.GetHashLock(secret, timestamps[1])}
+	hashLocks := []htlc.HTLCHashLock{htlc.GetHashLock(secret, timestamps[0]), htlc.GetHashLock(secret, timestamps[1])}
 	timeLocks := []uint64{50, 100}
 	expireHeights := []uint64{timeLocks[0] + uint64(suite.ctx.BlockHeight()), timeLocks[1] + uint64(suite.ctx.BlockHeight())}
-	state := modulehtlc.OPEN
-	initSecret := make(types.HTLCSecret, 0)
+	state := htlc.OPEN
+	initSecret := make(htlc.HTLCSecret, 0)
 
 	// construct HTLCs
-	htlc1 := modulehtlc.NewHTLC(senderAddrs[0], receiverAddrs[0], receiverOnOtherChain, amount, initSecret, timestamps[0], expireHeights[0], state)
-	htlc2 := modulehtlc.NewHTLC(senderAddrs[1], receiverAddrs[1], receiverOnOtherChain, amount, initSecret, timestamps[1], expireHeights[1], state)
+	htlc1 := htlc.NewHTLC(senderAddrs[0], receiverAddrs[0], receiverOnOtherChain, amount, initSecret, timestamps[0], expireHeights[0], state)
+	htlc2 := htlc.NewHTLC(senderAddrs[1], receiverAddrs[1], receiverOnOtherChain, amount, initSecret, timestamps[1], expireHeights[1], state)
 
 	// create HTLCs
 	err := suite.app.HTLCKeeper.CreateHTLC(suite.ctx, htlc1, hashLocks[0])
-	require.Nil(suite.T(), err)
+	suite.Nil(err)
 	err = suite.app.HTLCKeeper.CreateHTLC(suite.ctx, htlc2, hashLocks[1])
-	require.Nil(suite.T(), err)
+	suite.Nil(err)
 
 	newBlockHeight := int64(50)
 	suite.ctx = suite.ctx.WithBlockHeight(newBlockHeight)
-	modulehtlc.BeginBlocker(suite.ctx, suite.app.HTLCKeeper)
+	htlc.BeginBlocker(suite.ctx, suite.app.HTLCKeeper)
 
 	// export genesis
-	exportedGenesis := modulehtlc.ExportGenesis(suite.ctx, suite.app.HTLCKeeper)
+	exportedGenesis := htlc.ExportGenesis(suite.ctx, suite.app.HTLCKeeper)
 	exportedHTLCs := exportedGenesis.PendingHTLCs
-	require.Equal(suite.T(), 1, len(exportedHTLCs))
+	suite.Equal(1, len(exportedHTLCs))
 
-	for hashLockHex, htlc := range exportedHTLCs {
+	for hashLockHex, tmpHTLC := range exportedHTLCs {
 		// assert the state must be OPEN
-		require.True(suite.T(), htlc.State == modulehtlc.OPEN)
+		suite.True(tmpHTLC.State == htlc.OPEN)
 
 		hashLock, err := hex.DecodeString(hashLockHex)
 
 		// assert the HTLC with the given hash lock exists
 		htlcInStore, err := suite.app.HTLCKeeper.GetHTLC(suite.ctx, hashLock)
-		require.Nil(suite.T(), err)
+		suite.Nil(err)
 
 		// assert the expiration height is new
 		newExpireHeight := htlcInStore.ExpireHeight - uint64(newBlockHeight) + 1
-		require.Equal(suite.T(), newExpireHeight, htlc.ExpireHeight)
+		suite.Equal(newExpireHeight, tmpHTLC.ExpireHeight)
 
 		// assert the exported HTLC is consistant with the HTLC in store except for the expiration height
 		htlcInStore.ExpireHeight = newExpireHeight
-		require.Equal(suite.T(), htlcInStore, htlc)
+		suite.Equal(htlcInStore, tmpHTLC)
 	}
 
 	// assert the expired HTLCs(htlc1) have been refunded
-	htlc, _ := suite.app.HTLCKeeper.GetHTLC(suite.ctx, hashLocks[0])
-	require.Equal(suite.T(), modulehtlc.REFUNDED, htlc.State)
+	tmpHTLC, _ := suite.app.HTLCKeeper.GetHTLC(suite.ctx, hashLocks[0])
+	suite.Equal(htlc.REFUNDED, tmpHTLC.State)
 }

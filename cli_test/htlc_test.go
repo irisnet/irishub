@@ -13,7 +13,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/supply"
 
 	"github.com/irisnet/irishub/app"
-	htlcmodule "github.com/irisnet/irishub/modules/htlc"
+	"github.com/irisnet/irishub/modules/htlc"
 )
 
 func TestIrisCLIHTLC(t *testing.T) {
@@ -42,7 +42,7 @@ func TestIrisCLIHTLC(t *testing.T) {
 	amount := "1000" + sdk.DefaultBondDenom
 	timeLock := uint64(50)
 	timestamp := uint64(1580000000)
-	initSecret := htlcmodule.HTLCSecret{}
+	initSecret := htlc.HTLCSecret{}
 	stateOpen := "open"
 	stateCompleted := "completed"
 	stateExpired := "expired"
@@ -63,15 +63,15 @@ func TestIrisCLIHTLC(t *testing.T) {
 	require.True(t, executeWrite(t, spStr, client.DefaultKeyPass))
 	tests.WaitForNextNBlocksTM(2, f.Port)
 
-	htlc := executeGetHTLC(t, fmt.Sprintf("%s query htlc htlc %s --output=json %v", f.IriscliBinary, strings.ToLower(strings.TrimSpace(hashLock)), flags))
+	tmpHTLC := executeGetHTLC(t, fmt.Sprintf("%s query htlc htlc %s --output=json %v", f.IriscliBinary, strings.ToLower(strings.TrimSpace(hashLock)), flags))
 
-	require.Equal(t, fooAddr, htlc.Sender)
-	require.Equal(t, barAddr, htlc.To)
-	require.Equal(t, receiverOnOtherChain, htlc.ReceiverOnOtherChain)
-	require.Equal(t, amount, htlc.Amount.String())
-	require.Equal(t, initSecret, htlc.Secret)
-	require.Equal(t, timestamp, htlc.Timestamp)
-	require.Equal(t, stateOpen, htlc.State.String())
+	require.Equal(t, fooAddr, tmpHTLC.Sender)
+	require.Equal(t, barAddr, tmpHTLC.To)
+	require.Equal(t, receiverOnOtherChain, tmpHTLC.ReceiverOnOtherChain)
+	require.Equal(t, amount, tmpHTLC.Amount.String())
+	require.Equal(t, initSecret, tmpHTLC.Secret)
+	require.Equal(t, timestamp, tmpHTLC.Timestamp)
+	require.Equal(t, stateOpen, tmpHTLC.State.String())
 
 	htlcAddr := supply.NewModuleAddress("htlc")
 	htlcAcc := f.QueryAccount(htlcAddr, flags)
@@ -89,8 +89,8 @@ func TestIrisCLIHTLC(t *testing.T) {
 	require.True(t, executeWrite(t, spStr, client.DefaultKeyPass))
 	tests.WaitForNextNBlocksTM(2, f.Port)
 
-	htlc = executeGetHTLC(t, fmt.Sprintf("%s query htlc htlc %s --output=json %v", f.IriscliBinary, strings.ToLower(strings.TrimSpace(hashLock)), flags))
-	require.Equal(t, stateCompleted, htlc.State.String())
+	tmpHTLC = executeGetHTLC(t, fmt.Sprintf("%s query htlc htlc %s --output=json %v", f.IriscliBinary, strings.ToLower(strings.TrimSpace(hashLock)), flags))
+	require.Equal(t, stateCompleted, tmpHTLC.State.String())
 
 	htlcAcc = f.QueryAccount(htlcAddr, flags)
 	require.Equal(t, "0", htlcAcc.GetCoins().AmountOf(sdk.DefaultBondDenom).String())
@@ -119,14 +119,14 @@ func TestIrisCLIHTLC(t *testing.T) {
 	require.True(t, executeWrite(t, spStr, client.DefaultKeyPass))
 	tests.WaitForNextNBlocksTM(2, f.Port)
 
-	htlc = executeGetHTLC(t, fmt.Sprintf("%s query htlc htlc %s --output=json %v", f.IriscliBinary, strings.ToLower(strings.TrimSpace(hashLock)), flags))
-	require.Equal(t, fooAddr, htlc.Sender)
-	require.Equal(t, barAddr, htlc.To)
-	require.Equal(t, receiverOnOtherChain, htlc.ReceiverOnOtherChain)
-	require.Equal(t, amount, htlc.Amount.String())
-	require.Equal(t, initSecret, htlc.Secret)
-	require.Equal(t, timestamp, htlc.Timestamp)
-	require.Equal(t, stateOpen, htlc.State.String())
+	tmpHTLC = executeGetHTLC(t, fmt.Sprintf("%s query htlc htlc %s --output=json %v", f.IriscliBinary, strings.ToLower(strings.TrimSpace(hashLock)), flags))
+	require.Equal(t, fooAddr, tmpHTLC.Sender)
+	require.Equal(t, barAddr, tmpHTLC.To)
+	require.Equal(t, receiverOnOtherChain, tmpHTLC.ReceiverOnOtherChain)
+	require.Equal(t, amount, tmpHTLC.Amount.String())
+	require.Equal(t, initSecret, tmpHTLC.Secret)
+	require.Equal(t, timestamp, tmpHTLC.Timestamp)
+	require.Equal(t, stateOpen, tmpHTLC.State.String())
 
 	htlcAcc = f.QueryAccount(htlcAddr, flags)
 	htlcCoin = htlcAcc.Coins.AmountOf(sdk.DefaultBondDenom).String()
@@ -142,30 +142,30 @@ func TestIrisCLIHTLC(t *testing.T) {
 	require.True(t, executeWrite(t, spStr, client.DefaultKeyPass))
 	tests.WaitForNextNBlocksTM(2, f.Port)
 
-	htlc = executeGetHTLC(t, fmt.Sprintf("%s query htlc htlc %s --output=json %v", f.IriscliBinary, strings.ToLower(strings.TrimSpace(hashLock)), flags))
-	require.Equal(t, stateOpen, htlc.State.String())
+	tmpHTLC = executeGetHTLC(t, fmt.Sprintf("%s query htlc htlc %s --output=json %v", f.IriscliBinary, strings.ToLower(strings.TrimSpace(hashLock)), flags))
+	require.Equal(t, stateOpen, tmpHTLC.State.String())
 
 	// refund an htlc and expect success
 	tests.WaitForNextNBlocksTM(int64(timeLock), f.Port)
 
-	htlc = executeGetHTLC(t, fmt.Sprintf("%s query htlc htlc %s --output=json %v", f.IriscliBinary, strings.ToLower(strings.TrimSpace(hashLock)), flags))
-	require.Equal(t, stateExpired, htlc.State.String())
+	tmpHTLC = executeGetHTLC(t, fmt.Sprintf("%s query htlc htlc %s --output=json %v", f.IriscliBinary, strings.ToLower(strings.TrimSpace(hashLock)), flags))
+	require.Equal(t, stateExpired, tmpHTLC.State.String())
 
 	require.True(t, executeWrite(t, spStr, client.DefaultKeyPass))
 	tests.WaitForNextNBlocksTM(2, f.Port)
 
-	htlc = executeGetHTLC(t, fmt.Sprintf("%s query htlc htlc %s --output=json %v", f.IriscliBinary, strings.ToLower(strings.TrimSpace(hashLock)), flags))
-	require.Equal(t, stateRefunded, htlc.State.String())
+	tmpHTLC = executeGetHTLC(t, fmt.Sprintf("%s query htlc htlc %s --output=json %v", f.IriscliBinary, strings.ToLower(strings.TrimSpace(hashLock)), flags))
+	require.Equal(t, stateRefunded, tmpHTLC.State.String())
 
 	htlcAcc = f.QueryAccount(htlcAddr, flags)
 	require.Equal(t, "0", htlcAcc.GetCoins().AmountOf(sdk.DefaultBondDenom).String())
 }
 
-func executeGetHTLC(t *testing.T, cmdStr string) htlcmodule.HTLC {
+func executeGetHTLC(t *testing.T, cmdStr string) htlc.HTLC {
 	cdc := app.MakeCodec()
 	out, _ := tests.ExecuteT(t, cmdStr, "")
-	var htlc htlcmodule.HTLC
-	err := cdc.UnmarshalJSON([]byte(out), &htlc)
+	var tmpHTLC htlc.HTLC
+	err := cdc.UnmarshalJSON([]byte(out), &tmpHTLC)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
-	return htlc
+	return tmpHTLC
 }

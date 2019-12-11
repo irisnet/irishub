@@ -27,18 +27,16 @@ func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 	pendingHTLCs := make(map[string]HTLC)
 
 	k.IterateHTLCs(ctx, func(hlock types.HTLCHashLock, h HTLC) (stop bool) {
-		if h.State == OPEN || h.State == EXPIRED {
-			if h.State == OPEN {
-				h.ExpireHeight = h.ExpireHeight - uint64(ctx.BlockHeight()) + 1
-				pendingHTLCs[hex.EncodeToString(hlock)] = h
-			} else {
-				_, err := k.RefundHTLC(ctx, hlock)
-				if err != nil {
-					panic(fmt.Errorf("failed to export HTLC genesis state: %s", hex.EncodeToString(hlock)))
-				}
+		if h.State == OPEN {
+			h.ExpireHeight = h.ExpireHeight - uint64(ctx.BlockHeight()) + 1
+			pendingHTLCs[hex.EncodeToString(hlock)] = h
+		}
+		if h.State == EXPIRED {
+			_, err := k.RefundHTLC(ctx, hlock)
+			if err != nil {
+				panic(fmt.Errorf("failed to export HTLC genesis state: %s", hex.EncodeToString(hlock)))
 			}
 		}
-
 		return false
 	})
 

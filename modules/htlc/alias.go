@@ -17,6 +17,7 @@ type (
 	Keeper        = keeper.Keeper
 	HTLC          = types.HTLC
 	HTLCSecret    = types.HTLCSecret
+	HTLCHashLock  = types.HTLCHashLock
 	GenesisState  = types.GenesisState
 	MsgCreateHTLC = types.MsgCreateHTLC
 	MsgClaimHTLC  = types.MsgClaimHTLC
@@ -31,6 +32,7 @@ var (
 	RegisterCodec   = types.RegisterCodec
 	NewHTLC         = types.NewHTLC
 	ValidateGenesis = types.ValidateGenesis
+	GetHashLock     = types.GetHashLock
 
 	// const aliases
 	DefaultCodespace = types.DefaultCodespace
