@@ -57,7 +57,7 @@ func (h HTLC) GetHashLock() []byte {
 
 func (h HTLC) Validate(hashLock HTLCHashLock) error {
 	if len(hashLock) != HashLockLength {
-		return fmt.Errorf(fmt.Sprintf("the hash lock must be %d bytes long", HashLockLength))
+		return fmt.Errorf("the hash lock must be %d bytes long", HashLockLength)
 	}
 
 	if h.State != OPEN {
@@ -73,11 +73,11 @@ func (h HTLC) Validate(hashLock HTLCHashLock) error {
 	}
 
 	if len(h.ReceiverOnOtherChain) > MaxLengthForAddressOnOtherChain {
-		return fmt.Errorf(fmt.Sprintf("the length of the receiver on other chain must be between [0,%d]", MaxLengthForAddressOnOtherChain))
+		return fmt.Errorf("the length of the receiver on other chain must be between [0,%d]", MaxLengthForAddressOnOtherChain)
 	}
 
 	if !h.Amount.IsValid() || !h.Amount.IsAllPositive() {
-		return fmt.Errorf(fmt.Sprintf("invalid transferred amount: %s", h.Amount.String()))
+		return fmt.Errorf("invalid transferred amount: %s", h.Amount.String())
 	}
 
 	if len(h.Secret) != 0 {
