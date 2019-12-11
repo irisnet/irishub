@@ -1,10 +1,10 @@
 package keeper_test
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -17,16 +17,11 @@ import (
 )
 
 const (
-	denomIris      = "iris"
-	denomIrisAtto  = "iris-atto"
-	denomBTC       = "btc"
-	denomBTCMin    = "btc-min"
-	denomETH       = "eth"
-	denomETHMin    = "eth-min"
-	unidenomBTC    = types.FormatUniABSPrefix + "btc"
-	unidenomBTCMin = types.FormatUniABSPrefix + "btc-min"
-	unidenomETH    = types.FormatUniABSPrefix + "eth"
-	unidenomETHMin = types.FormatUniABSPrefix + "eth-min"
+	denomStandard = types.StandardDenom
+	denomBTC      = "btc"
+	denomETH      = "eth"
+	unidenomBTC   = types.FormatUniABSPrefix + "btc"
+	unidenomETH   = types.FormatUniABSPrefix + "eth"
 )
 
 // test that the params can be properly set and retrieved
@@ -44,17 +39,6 @@ func (suite *KeeperTestSuite) SetupTest() {
 	suite.cdc = app.Codec()
 	suite.ctx = app.BaseApp.NewContext(false, abci.Header{})
 	suite.app = app
-
-	_ = sdk.RegisterDenom(denomIris, sdk.NewDecWithPrec(1, sdk.Precision))
-	_ = sdk.RegisterDenom(denomIrisAtto, sdk.NewDecWithPrec(1, sdk.Precision))
-	_ = sdk.RegisterDenom(denomBTC, sdk.NewDecWithPrec(1, sdk.Precision))
-	_ = sdk.RegisterDenom(denomBTCMin, sdk.NewDecWithPrec(1, sdk.Precision))
-	_ = sdk.RegisterDenom(denomETH, sdk.NewDecWithPrec(1, sdk.Precision))
-	_ = sdk.RegisterDenom(denomETHMin, sdk.NewDecWithPrec(1, sdk.Precision))
-	_ = sdk.RegisterDenom(unidenomBTC, sdk.NewDecWithPrec(1, sdk.Precision))
-	_ = sdk.RegisterDenom(unidenomBTCMin, sdk.NewDecWithPrec(1, sdk.Precision))
-	_ = sdk.RegisterDenom(unidenomETH, sdk.NewDecWithPrec(1, sdk.Precision))
-	_ = sdk.RegisterDenom(unidenomETHMin, sdk.NewDecWithPrec(1, sdk.Precision))
 }
 
 func TestKeeperTestSuite(t *testing.T) {
@@ -66,13 +50,13 @@ func (suite *KeeperTestSuite) TestParams() {
 		params types.Params
 	}{
 		{types.DefaultParams()},
-		{types.NewParams(sdk.NewDecWithPrec(5, 10), types.StandardDenom)},
+		{types.NewParams(sdk.NewDecWithPrec(5, 10), denomStandard)},
 	}
 	for _, tc := range cases {
 		suite.app.CoinswapKeeper.SetParams(suite.ctx, tc.params)
 
 		feeParam := suite.app.CoinswapKeeper.GetParams(suite.ctx)
-		require.Equal(suite.T(), tc.params.Fee, feeParam.Fee)
+		suite.Equal(tc.params.Fee, feeParam.Fee)
 	}
 }
 
@@ -85,47 +69,48 @@ func (suite *KeeperTestSuite) TestKeeper_UpdateLiquidity() {
 		suite.ctx,
 		addrSender,
 		sdk.NewCoins(
-			sdk.NewCoin(denomIrisAtto, amountInit),
-			sdk.NewCoin(denomBTCMin, amountInit),
+			sdk.NewCoin(denomStandard, amountInit),
+			sdk.NewCoin(denomBTC, amountInit),
 		),
 	)
 
-	uniId, _ := types.GetUniDenomFromDenoms(denomBTCMin, denomIrisAtto)
-	poolAddr := keeper.GetReservePoolAddr(uniId)
+	uniDenom, _ := types.GetUniDenomFromDenoms(denomBTC, denomStandard)
+	suite.Equal(uniDenom, unidenomBTC)
+	poolAddr := keeper.GetReservePoolAddr(uniDenom)
 
 	btcAmt, _ := sdk.NewIntFromString("1")
-	depositCoin := sdk.NewCoin("btc-min", btcAmt)
+	depositCoin := sdk.NewCoin(denomBTC, btcAmt)
 
-	irisAmt, _ := sdk.NewIntFromString("10000000000000000000")
+	standardAmt, _ := sdk.NewIntFromString("10000000000000000000")
 	minReward := sdk.NewInt(1)
 	deadline := time.Now().Add(1 * time.Minute)
-	msg := types.NewMsgAddLiquidity(depositCoin, irisAmt, minReward, deadline.Unix(), addrSender)
+	msg := types.NewMsgAddLiquidity(depositCoin, standardAmt, minReward, deadline.Unix(), addrSender)
 
 	err := suite.app.CoinswapKeeper.AddLiquidity(suite.ctx, msg)
-	require.Nil(suite.T(), err)
+	suite.Nil(err)
 
 	reservePoolBalances := suite.app.AccountKeeper.GetAccount(suite.ctx, poolAddr).GetCoins()
 	moduleAccountBalances := suite.app.SupplyKeeper.GetModuleAccount(suite.ctx, types.ModuleName).GetCoins()
-	require.Equal(suite.T(), "1btc-min,10000000000000000000iris-atto", reservePoolBalances.String())
-	require.Equal(suite.T(), "10000000000000000000", moduleAccountBalances.AmountOf("uni:btc-min").String())
+	suite.Equal(fmt.Sprintf("1%s,10000000000000000000%s", denomBTC, denomStandard), reservePoolBalances.String())
+	suite.Equal("10000000000000000000", moduleAccountBalances.AmountOf(unidenomBTC).String())
 
 	senderBlances := suite.app.AccountKeeper.GetAccount(suite.ctx, addrSender).GetCoins()
-	require.Equal(suite.T(), "9999999999999999999btc-min,10000000000000000000uni:btc-min", senderBlances.String())
+	suite.Equal(fmt.Sprintf("9999999999999999999%s,10000000000000000000%s", denomBTC, unidenomBTC), senderBlances.String())
 
 	withdraw, _ := sdk.NewIntFromString("10000000000000000000")
 	msgRemove := types.NewMsgRemoveLiquidity(
 		sdk.NewInt(1),
-		sdk.NewCoin("uni:btc-min", withdraw),
+		sdk.NewCoin(unidenomBTC, withdraw),
 		sdk.NewInt(1),
 		suite.ctx.BlockHeader().Time.Unix(),
 		addrSender,
 	)
 
 	err = suite.app.CoinswapKeeper.RemoveLiquidity(suite.ctx, msgRemove)
-	require.Nil(suite.T(), err)
+	suite.Nil(err)
 
 	poolAccout := suite.app.AccountKeeper.GetAccount(suite.ctx, poolAddr)
 	acc := suite.app.AccountKeeper.GetAccount(suite.ctx, addrSender)
-	require.Equal(suite.T(), "", poolAccout.GetCoins().String())
-	require.Equal(suite.T(), "10000000000000000000btc-min,10000000000000000000iris-atto", acc.GetCoins().String())
+	suite.Equal("", poolAccout.GetCoins().String())
+	suite.Equal(fmt.Sprintf("10000000000000000000%s,10000000000000000000%s", denomBTC, denomStandard), acc.GetCoins().String())
 }

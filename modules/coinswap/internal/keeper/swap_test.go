@@ -2,10 +2,7 @@ package keeper_test
 
 import (
 	"fmt"
-	"testing"
 	"time"
-
-	"github.com/stretchr/testify/require"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -13,12 +10,7 @@ import (
 	"github.com/irisnet/irishub/modules/coinswap/internal/types"
 )
 
-var (
-	native = "iris-atto"
-)
-
 func (suite *KeeperTestSuite) TestGetUniId() {
-
 	cases := []struct {
 		name         string
 		denom1       string
@@ -26,21 +18,19 @@ func (suite *KeeperTestSuite) TestGetUniId() {
 		expectResult string
 		expectPass   bool
 	}{
-		{"denom1 is native", native, "btc-min", "uni:btc", true},
-		{"denom2 is native", "btc-min", native, "uni:btc", true},
-		{"denom1 equals denom2", "btc-min", "btc-min", "uni:btc", false},
-		{"neither denom is native", "eth-min", "btc-min", "uni:btc", false},
+		{"denom1 is denomStandard", denomStandard, denomBTC, unidenomBTC, true},
+		{"denom2 is denomStandard", denomETH, denomStandard, unidenomETH, true},
+		{"denom1 equals denom2", denomBTC, denomBTC, unidenomBTC, false},
+		{"neither denom is denomStandard", denomETH, denomBTC, unidenomBTC, false},
 	}
 
 	for _, tc := range cases {
-		suite.T().Run(tc.name, func(t *testing.T) {
-			uniId, err := types.GetUniId(tc.denom1, tc.denom2)
-			if tc.expectPass {
-				require.Equal(t, tc.expectResult, uniId)
-			} else {
-				require.NotNil(t, err)
-			}
-		})
+		uniDenom, err := types.GetUniDenomFromDenoms(tc.denom1, tc.denom2)
+		if tc.expectPass {
+			suite.Equal(tc.expectResult, uniDenom)
+		} else {
+			suite.NotNil(err)
+		}
 	}
 }
 
@@ -82,7 +72,7 @@ func (suite *KeeperTestSuite) TestGetInputPrice() {
 		data := tcase.data
 		actual := keeper.GetInputPrice(data.delta, data.x, data.y, data.fee)
 		fmt.Println(fmt.Sprintf("expect:%s,actual:%s", tcase.expect.String(), actual.String()))
-		require.Equal(suite.T(), tcase.expect, actual)
+		suite.Equal(tcase.expect, actual)
 	}
 }
 
@@ -109,15 +99,16 @@ func (suite *KeeperTestSuite) TestGetOutputPrice() {
 		data := tcase.data
 		actual := keeper.GetOutputPrice(data.delta, data.x, data.y, data.fee)
 		fmt.Println(fmt.Sprintf("expect:%s,actual:%s", tcase.expect.String(), actual.String()))
-		require.Equal(suite.T(), tcase.expect, actual)
+		suite.Equal(tcase.expect, actual)
 	}
 }
 
 func (suite *KeeperTestSuite) TestKeeperSwap() {
 	sender, reservePoolAddr, err, reservePoolBalances, senderBlances := createReservePool(suite)
+	moduleAccount := suite.app.SupplyKeeper.GetModuleAccount(suite.ctx, types.ModuleName)
 
-	outputCoin := sdk.NewCoin("btc-min", sdk.NewInt(100))
-	inputCoin := sdk.NewCoin(native, sdk.NewInt(1000))
+	outputCoin := sdk.NewCoin("btc", sdk.NewInt(100))
+	inputCoin := sdk.NewCoin(denomStandard, sdk.NewInt(1000))
 
 	input := types.Input{
 		Address: sender,
@@ -133,25 +124,31 @@ func (suite *KeeperTestSuite) TestKeeperSwap() {
 
 	// first swap
 	err = suite.app.CoinswapKeeper.Swap(suite.ctx, msg1)
-	require.Nil(suite.T(), err)
+	suite.Nil(err)
+	moduleAccountBalances := moduleAccount.GetCoins()
 	reservePoolBalances = suite.app.AccountKeeper.GetAccount(suite.ctx, reservePoolAddr).GetCoins()
-	require.Equal(suite.T(), "900btc-min,1112iris-atto,1000uni:btc-min", reservePoolBalances.String())
+	suite.Equal(fmt.Sprintf("900%s,1112%s", denomBTC, denomStandard), reservePoolBalances.String())
+	suite.Equal("1000", moduleAccountBalances.AmountOf(unidenomBTC).String())
 	senderBlances = suite.app.AccountKeeper.GetAccount(suite.ctx, sender).GetCoins()
-	require.Equal(suite.T(), "99999100btc-min,99998888iris-atto,1000uni:btc-min", senderBlances.String())
+	suite.Equal(fmt.Sprintf("99999100%s,99998888%s,1000%s", denomBTC, denomStandard, unidenomBTC), senderBlances.String())
 
 	// second swap
 	err = suite.app.CoinswapKeeper.Swap(suite.ctx, msg1)
-	require.Nil(suite.T(), err)
+	suite.Nil(err)
+	moduleAccountBalances = moduleAccount.GetCoins()
 	reservePoolBalances = suite.app.AccountKeeper.GetAccount(suite.ctx, reservePoolAddr).GetCoins()
-	require.Equal(suite.T(), "800btc-min,1252iris-atto,1000uni:btc-min", reservePoolBalances.String())
+	suite.Equal(fmt.Sprintf("800%s,1252%s", denomBTC, denomStandard), reservePoolBalances.String())
+	suite.Equal("1000", moduleAccountBalances.AmountOf(unidenomBTC).String())
 	senderBlances = suite.app.AccountKeeper.GetAccount(suite.ctx, sender).GetCoins()
-	require.Equal(suite.T(), "99999200btc-min,99998748iris-atto,1000uni:btc-min", senderBlances.String())
+	suite.Equal(fmt.Sprintf("99999200%s,99998748%s,1000%s", denomBTC, denomStandard, unidenomBTC), senderBlances.String())
 
 	// third swap
 	err = suite.app.CoinswapKeeper.Swap(suite.ctx, msg1)
-	require.Nil(suite.T(), err)
+	suite.Nil(err)
+	moduleAccountBalances = moduleAccount.GetCoins()
 	reservePoolBalances = suite.app.AccountKeeper.GetAccount(suite.ctx, reservePoolAddr).GetCoins()
-	require.Equal(suite.T(), "700btc-min,1432iris-atto,1000uni:btc-min", reservePoolBalances.String())
+	suite.Equal(fmt.Sprintf("700%s,1432%s", denomBTC, denomStandard), reservePoolBalances.String())
+	suite.Equal("1000", moduleAccountBalances.AmountOf(unidenomBTC).String())
 }
 
 func createReservePool(suite *KeeperTestSuite) (sdk.AccAddress, sdk.AccAddress, sdk.Error, sdk.Coins, sdk.Coins) {
@@ -162,38 +159,41 @@ func createReservePool(suite *KeeperTestSuite) (sdk.AccAddress, sdk.AccAddress, 
 		suite.ctx,
 		addrSender,
 		sdk.NewCoins(
-			sdk.NewCoin(denomIrisAtto, amountInit),
-			sdk.NewCoin(denomBTCMin, amountInit),
+			sdk.NewCoin(denomStandard, amountInit),
+			sdk.NewCoin(denomBTC, amountInit),
 		),
 	)
 
-	denom1 := "btc-min"
-	denom2 := native
-	uniId, _ := types.GetUniId(denom1, denom2)
-	reservePoolAddr := keeper.GetReservePoolAddr(uniId)
+	denom1 := denomBTC
+	denom2 := denomStandard
+	uniDenom, _ := types.GetUniDenomFromDenoms(denom1, denom2)
+	reservePoolAddr := keeper.GetReservePoolAddr(uniDenom)
 
 	btcAmt, _ := sdk.NewIntFromString("1000")
-	depositCoin := sdk.NewCoin("btc-min", btcAmt)
+	depositCoin := sdk.NewCoin(denomBTC, btcAmt)
 
-	irisAmt, _ := sdk.NewIntFromString("1000")
+	standardAmt, _ := sdk.NewIntFromString("1000")
 	minReward := sdk.NewInt(1)
 	deadline := time.Now().Add(1 * time.Minute)
-	msg := types.NewMsgAddLiquidity(depositCoin, irisAmt, minReward, deadline.Unix(), addrSender)
+	msg := types.NewMsgAddLiquidity(depositCoin, standardAmt, minReward, deadline.Unix(), addrSender)
 	err := suite.app.CoinswapKeeper.AddLiquidity(suite.ctx, msg)
 	//assert
-	require.Nil(suite.T(), err)
+	suite.Nil(err)
+	moduleAccount := suite.app.SupplyKeeper.GetModuleAccount(suite.ctx, types.ModuleName)
+	moduleAccountBalances := moduleAccount.GetCoins()
 	reservePoolBalances := suite.app.AccountKeeper.GetAccount(suite.ctx, reservePoolAddr).GetCoins()
-	require.Equal(suite.T(), "1000btc-min,1000iris-atto,1000uni:btc-min", reservePoolBalances.String())
+	suite.Equal(fmt.Sprintf("1000%s,1000%s", denomBTC, denomStandard), reservePoolBalances.String())
+	suite.Equal("1000", moduleAccountBalances.AmountOf(unidenomBTC).String())
 	senderBlances := suite.app.AccountKeeper.GetAccount(suite.ctx, addrSender).GetCoins()
-	require.Equal(suite.T(), "99999000btc-min,99999000iris-atto,1000uni:btc-min", senderBlances.String())
+	suite.Equal(fmt.Sprintf("99999000%s,99999000%s,1000%s", denomBTC, denomStandard, unidenomBTC), senderBlances.String())
 	return addrSender, reservePoolAddr, err, reservePoolBalances, senderBlances
 }
 
 func (suite *KeeperTestSuite) TestTradeInputForExactOutput() {
 	sender, poolAddr, _, poolBalances, senderBlances := createReservePool(suite)
 
-	outputCoin := sdk.NewCoin("btc-min", sdk.NewInt(100))
-	inputCoin := sdk.NewCoin(native, sdk.NewInt(100000))
+	outputCoin := sdk.NewCoin(denomBTC, sdk.NewInt(100))
+	inputCoin := sdk.NewCoin(denomStandard, sdk.NewInt(100000))
 	input := types.Input{
 		Address: sender,
 		Coin:    inputCoin,
@@ -208,13 +208,13 @@ func (suite *KeeperTestSuite) TestTradeInputForExactOutput() {
 	for i := 1; i < 100; i++ {
 		amt, err := suite.app.CoinswapKeeper.TradeInputForExactOutput(suite.ctx, input, output)
 		if i == maxCnt {
-			require.NotNil(suite.T(), err)
+			suite.NotNil(err)
 			break
 		}
 		ifNil(suite, err)
 
 		bought := sdk.NewCoins(outputCoin)
-		sold := sdk.NewCoins(sdk.NewCoin(native, amt))
+		sold := sdk.NewCoins(sdk.NewCoin(denomStandard, amt))
 
 		pb := poolBalances.Add(sold).Sub(bought)
 		sb := senderBlances.Add(bought).Sub(sold)
@@ -229,8 +229,8 @@ func (suite *KeeperTestSuite) TestTradeInputForExactOutput() {
 func (suite *KeeperTestSuite) TestTradeExactInputForOutput() {
 	sender, poolAddr, _, poolBalances, senderBlances := createReservePool(suite)
 
-	outputCoin := sdk.NewCoin("btc-min", sdk.NewInt(0))
-	inputCoin := sdk.NewCoin(native, sdk.NewInt(100))
+	outputCoin := sdk.NewCoin(denomBTC, sdk.NewInt(0))
+	inputCoin := sdk.NewCoin(denomStandard, sdk.NewInt(100))
 	input := types.Input{
 		Address: sender,
 		Coin:    inputCoin,
@@ -244,7 +244,7 @@ func (suite *KeeperTestSuite) TestTradeExactInputForOutput() {
 		ifNil(suite, err)
 
 		sold := sdk.NewCoins(inputCoin)
-		bought := sdk.NewCoins(sdk.NewCoin("btc-min", amt))
+		bought := sdk.NewCoins(sdk.NewCoin(denomBTC, amt))
 
 		pb := poolBalances.Add(sold).Sub(bought)
 		sb := senderBlances.Add(bought).Sub(sold)
@@ -258,9 +258,9 @@ func (suite *KeeperTestSuite) TestTradeExactInputForOutput() {
 
 func assertResult(suite *KeeperTestSuite, reservePoolAddr, sender sdk.AccAddress, expectPoolBalance, expectSenderBalance sdk.Coins) {
 	reservePoolBalances := suite.app.AccountKeeper.GetAccount(suite.ctx, reservePoolAddr).GetCoins()
-	require.Equal(suite.T(), expectPoolBalance.String(), reservePoolBalances.String())
+	suite.Equal(expectPoolBalance.String(), reservePoolBalances.String())
 	senderBlances := suite.app.AccountKeeper.GetAccount(suite.ctx, sender).GetCoins()
-	require.Equal(suite.T(), expectSenderBalance.String(), senderBlances.String())
+	suite.Equal(expectSenderBalance.String(), senderBlances.String())
 }
 
 func ifNil(suite *KeeperTestSuite, err sdk.Error) {
@@ -268,5 +268,5 @@ func ifNil(suite *KeeperTestSuite, err sdk.Error) {
 	if err != nil {
 		msg = err.Error()
 	}
-	require.Nil(suite.T(), err, msg)
+	suite.Nil(err, msg)
 }
