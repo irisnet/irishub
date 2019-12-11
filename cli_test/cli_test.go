@@ -14,19 +14,19 @@ import (
 	"testing"
 	"time"
 
-	"github.com/tendermint/tendermint/crypto/ed25519"
-	tmtypes "github.com/tendermint/tendermint/types"
-
 	"github.com/stretchr/testify/require"
 
-	"github.com/irisnet/irishub/app"
+	"github.com/tendermint/tendermint/crypto/ed25519"
+	tmtypes "github.com/tendermint/tendermint/types"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/tests"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/gov"
-	"github.com/cosmos/cosmos-sdk/x/mint"
+
+	"github.com/irisnet/irishub/app"
+	"github.com/irisnet/irishub/modules/mint"
 )
 
 func TestIrisCLIKeysAddMultisig(t *testing.T) {
@@ -420,12 +420,10 @@ func TestIrisCLIQueryRewards(t *testing.T) {
 	cdc := app.MakeCodec()
 
 	genesisState := f.GenesisState()
-	inflationMin := sdk.MustNewDecFromStr("10000.0")
 	var mintData mint.GenesisState
-	cdc.UnmarshalJSON(genesisState[mint.ModuleName], &mintData)
-	mintData.Minter.Inflation = inflationMin
-	mintData.Params.InflationMin = inflationMin
-	mintData.Params.InflationMax = sdk.MustNewDecFromStr("15000.0")
+	cdc.MustUnmarshalJSON(genesisState[mint.ModuleName], &mintData)
+	mintData.Minter = mint.DefaultMinter()
+	mintData.Params = mint.DefaultParams()
 	mintDataBz, err := cdc.MarshalJSON(mintData)
 	require.NoError(t, err)
 	genesisState[mint.ModuleName] = mintDataBz
@@ -680,12 +678,10 @@ func TestIrisCLISubmitCommunityPoolSpendProposal(t *testing.T) {
 	// create some inflation
 	cdc := app.MakeCodec()
 	genesisState := f.GenesisState()
-	inflationMin := sdk.MustNewDecFromStr("10000.0")
 	var mintData mint.GenesisState
-	cdc.UnmarshalJSON(genesisState[mint.ModuleName], &mintData)
-	mintData.Minter.Inflation = inflationMin
-	mintData.Params.InflationMin = inflationMin
-	mintData.Params.InflationMax = sdk.MustNewDecFromStr("15000.0")
+	cdc.MustUnmarshalJSON(genesisState[mint.ModuleName], &mintData)
+	mintData.Minter = mint.DefaultMinter()
+	mintData.Params = mint.DefaultParams()
 	mintDataBz, err := cdc.MarshalJSON(mintData)
 	require.NoError(t, err)
 	genesisState[mint.ModuleName] = mintDataBz

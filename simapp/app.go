@@ -23,14 +23,16 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/evidence"
 	"github.com/cosmos/cosmos-sdk/x/genutil"
 	"github.com/cosmos/cosmos-sdk/x/gov"
-	"github.com/cosmos/cosmos-sdk/x/mint"
 	"github.com/cosmos/cosmos-sdk/x/params"
 	paramsclient "github.com/cosmos/cosmos-sdk/x/params/client"
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	"github.com/cosmos/cosmos-sdk/x/supply"
 
+	"github.com/irisnet/irishub/modules/asset"
+	"github.com/irisnet/irishub/modules/guardian"
 	"github.com/irisnet/irishub/modules/htlc"
+	"github.com/irisnet/irishub/modules/mint"
 )
 
 const appName = "SimApp"
@@ -58,6 +60,7 @@ var (
 		crisis.AppModuleBasic{},
 		slashing.AppModuleBasic{},
 		evidence.AppModuleBasic{},
+		guardian.AppModuleBasic{},
 		htlc.AppModuleBasic{},
 	)
 
@@ -69,6 +72,7 @@ var (
 		staking.BondedPoolName:    {supply.Burner, supply.Staking},
 		staking.NotBondedPoolName: {supply.Burner, supply.Staking},
 		gov.ModuleName:            {supply.Burner},
+		asset.ModuleName:          {supply.Minter, supply.Burner},
 		htlc.ModuleName:           nil,
 	}
 )
@@ -111,6 +115,8 @@ type SimApp struct {
 	CrisisKeeper   crisis.Keeper
 	ParamsKeeper   params.Keeper
 	EvidenceKeeper evidence.Keeper
+	AssetKeeper    asset.Keeper
+	GuardianKeeper guardian.Keeper
 	HTLCKeeper     htlc.Keeper
 
 	// the module manager
@@ -134,8 +140,8 @@ func NewSimApp(
 
 	keys := sdk.NewKVStoreKeys(
 		bam.MainStoreKey, auth.StoreKey, staking.StoreKey, supply.StoreKey, mint.StoreKey,
-		distr.StoreKey, slashing.StoreKey, gov.StoreKey, params.StoreKey,
-		evidence.StoreKey, htlc.StoreKey,
+		distr.StoreKey, slashing.StoreKey, gov.StoreKey, params.StoreKey, evidence.StoreKey,
+		asset.StoreKey, guardian.StoreKey, htlc.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(params.TStoreKey)
 
@@ -159,6 +165,7 @@ func NewSimApp(
 	app.subspaces[gov.ModuleName] = app.ParamsKeeper.Subspace(gov.DefaultParamspace).WithKeyTable(gov.ParamKeyTable())
 	app.subspaces[crisis.ModuleName] = app.ParamsKeeper.Subspace(crisis.DefaultParamspace)
 	app.subspaces[evidence.ModuleName] = app.ParamsKeeper.Subspace(evidence.DefaultParamspace)
+	app.subspaces[asset.ModuleName] = app.ParamsKeeper.Subspace(asset.DefaultParamspace)
 
 	// add keepers
 	app.AccountKeeper = auth.NewAccountKeeper(
@@ -174,10 +181,7 @@ func NewSimApp(
 	stakingKeeper := staking.NewKeeper(
 		app.cdc, keys[staking.StoreKey], app.SupplyKeeper, app.subspaces[staking.ModuleName],
 		staking.DefaultCodespace)
-	app.MintKeeper = mint.NewKeeper(
-		app.cdc, keys[mint.StoreKey], app.subspaces[mint.ModuleName], &stakingKeeper,
-		app.SupplyKeeper, auth.FeeCollectorName,
-	)
+	app.MintKeeper = mint.NewKeeper(app.cdc, keys[mint.StoreKey], app.subspaces[mint.ModuleName], app.SupplyKeeper, auth.FeeCollectorName)
 	app.DistrKeeper = distr.NewKeeper(
 		app.cdc, keys[distr.StoreKey], app.subspaces[distr.ModuleName], &stakingKeeper,
 		app.SupplyKeeper, distr.DefaultCodespace, auth.FeeCollectorName, app.ModuleAccountAddrs(),
@@ -194,6 +198,11 @@ func NewSimApp(
 	evidenceKeeper := evidence.NewKeeper(
 		app.cdc, keys[evidence.StoreKey], app.subspaces[evidence.ModuleName], evidence.DefaultCodespace,
 	)
+
+	app.GuardianKeeper = guardian.NewKeeper(
+		app.cdc, keys[guardian.StoreKey], guardian.DefaultCodespace,
+	)
+
 	evidenceRouter := evidence.NewRouter()
 	// TODO: Register evidence routes.
 	evidenceKeeper.SetRouter(evidenceRouter)
@@ -215,6 +224,10 @@ func NewSimApp(
 		staking.NewMultiStakingHooks(app.DistrKeeper.Hooks(), app.SlashingKeeper.Hooks()),
 	)
 
+	app.AssetKeeper = asset.NewKeeper(
+		app.cdc, keys[asset.StoreKey], app.subspaces[asset.ModuleName], asset.DefaultCodespace,
+		app.SupplyKeeper, auth.FeeCollectorName)
+
 	// NOTE: Any module instantiated in the module manager that is later modified
 	// must be passed by reference here.
 	app.mm = module.NewManager(
@@ -229,6 +242,8 @@ func NewSimApp(
 		slashing.NewAppModule(app.SlashingKeeper, app.StakingKeeper),
 		staking.NewAppModule(app.StakingKeeper, app.AccountKeeper, app.SupplyKeeper),
 		evidence.NewAppModule(app.EvidenceKeeper),
+		asset.NewAppModule(app.AssetKeeper),
+		guardian.NewAppModule(app.GuardianKeeper),
 		htlc.NewAppModule(app.HTLCKeeper),
 	)
 
@@ -253,7 +268,8 @@ func NewSimApp(
 	app.mm.SetOrderInitGenesis(
 		auth.ModuleName, distr.ModuleName, staking.ModuleName, bank.ModuleName,
 		slashing.ModuleName, gov.ModuleName, mint.ModuleName, supply.ModuleName,
-		crisis.ModuleName, genutil.ModuleName, evidence.ModuleName, htlc.ModuleName,
+		crisis.ModuleName, genutil.ModuleName, evidence.ModuleName,
+		asset.ModuleName, guardian.ModuleName, htlc.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -272,6 +288,7 @@ func NewSimApp(
 		distr.NewAppModule(app.DistrKeeper, app.SupplyKeeper),
 		staking.NewAppModule(app.StakingKeeper, app.AccountKeeper, app.SupplyKeeper),
 		slashing.NewAppModule(app.SlashingKeeper, app.StakingKeeper),
+		asset.NewAppModule(app.AssetKeeper),
 		htlc.NewAppModule(app.HTLCKeeper),
 	)
 

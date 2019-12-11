@@ -3,9 +3,10 @@ package types
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/pkg/errors"
 	"strconv"
 	"strings"
+
+	"github.com/pkg/errors"
 )
 
 type AssetFamily byte
