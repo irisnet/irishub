@@ -25,6 +25,12 @@ type (
 	SvcResponse    = types.SvcResponse
 	MethodProperty = types.MethodProperty
 	Level          = types.Level
+	BindingType    = types.BindingType
+
+	QueryServiceParams  = types.QueryServiceParams
+	QueryBindingParams  = types.QueryBindingParams
+	QueryResponseParams = types.QueryResponseParams
+	QueryFeesParams     = types.QueryFeesParams
 
 	GenesisState = types.GenesisState
 
@@ -79,8 +85,9 @@ var (
 	NewGenesisState     = types.NewGenesisState
 	DefaultGenesisState = types.DefaultGenesisState
 	ValidateGenesis     = types.ValidateGenesis
+	DefaultParams       = types.DefaultParams
 
-	DefaultParams = types.DefaultParams
+	BindingTypeFromString = types.BindingTypeFromString
 
 	ErrSvcDefExists           = types.ErrSvcDefExists
 	ErrSvcBindingNotExists    = types.ErrSvcBindingNotExists
