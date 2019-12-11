@@ -45,17 +45,18 @@ func (suite *KeeperTestSuite) TestExportHTLCGenesis() {
 	_ = suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, receiverAddrs[0])
 	_ = suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, receiverAddrs[1])
 
-	// _ = suite.app.BankKeeper.SetCoins(suite.ctx, senderAddrs[0], sdk.NewCoins(sdk.NewInt64Coin(config.Iris, 100000)))
+	_ = suite.app.BankKeeper.SetCoins(suite.ctx, senderAddrs[0], sdk.NewCoins(sdk.NewInt64Coin(sdk.DefaultBondDenom, 100000)))
+	_ = suite.app.BankKeeper.SetCoins(suite.ctx, senderAddrs[1], sdk.NewCoins(sdk.NewInt64Coin(sdk.DefaultBondDenom, 100000)))
 
 	receiverOnOtherChain := "receiverOnOtherChain"
-	amount := sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(0)))
+	amount := sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(1000)))
 	secret := []byte("___abcdefghijklmnopqrstuvwxyz___")
 	timestamps := []uint64{uint64(1580000000), 0}
 	hashLocks := []htlc.HTLCHashLock{htlc.GetHashLock(secret, timestamps[0]), htlc.GetHashLock(secret, timestamps[1])}
 	timeLocks := []uint64{50, 100}
 	expireHeights := []uint64{timeLocks[0] + uint64(suite.ctx.BlockHeight()), timeLocks[1] + uint64(suite.ctx.BlockHeight())}
 	state := htlc.OPEN
-	initSecret := make(htlc.HTLCSecret, 0)
+	initSecret := htlc.HTLCSecret{}
 
 	// construct HTLCs
 	htlc1 := htlc.NewHTLC(senderAddrs[0], receiverAddrs[0], receiverOnOtherChain, amount, initSecret, timestamps[0], expireHeights[0], state)
@@ -81,6 +82,7 @@ func (suite *KeeperTestSuite) TestExportHTLCGenesis() {
 		suite.True(tmpHTLC.State == htlc.OPEN)
 
 		hashLock, err := hex.DecodeString(hashLockHex)
+		suite.Nil(err)
 
 		// assert the HTLC with the given hash lock exists
 		htlcInStore, err := suite.app.HTLCKeeper.GetHTLC(suite.ctx, hashLock)
@@ -94,6 +96,8 @@ func (suite *KeeperTestSuite) TestExportHTLCGenesis() {
 		htlcInStore.ExpireHeight = newExpireHeight
 		suite.Equal(htlcInStore, tmpHTLC)
 	}
+
+	suite.Nil(htlc.ValidateGenesis(exportedGenesis))
 
 	// assert the expired HTLCs(htlc1) have been refunded
 	tmpHTLC, _ := suite.app.HTLCKeeper.GetHTLC(suite.ctx, hashLocks[0])
