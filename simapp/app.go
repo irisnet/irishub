@@ -257,7 +257,6 @@ func NewSimApp(
 		htlc.ModuleName,
 	)
 	app.mm.SetOrderEndBlockers(
-		htlc.ModuleName,
 		crisis.ModuleName,
 		gov.ModuleName,
 		staking.ModuleName,
