@@ -1,151 +1,164 @@
-package keeper
+package keeper_test
 
 import (
 	"testing"
 
+	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/irisnet/irishub/modules/service/internal/types"
-	"github.com/stretchr/testify/require"
+	"github.com/irisnet/irishub/simapp"
+	"github.com/stretchr/testify/suite"
 	abci "github.com/tendermint/tendermint/abci/types"
 )
 
-func TestKeeper_service_Definition(t *testing.T) {
-	mapp, keeper, _, addrs, _, _ := getMockApp(t, 3)
-	SortAddresses(addrs)
-	mapp.BeginBlock(abci.RequestBeginBlock{})
-	ctx := mapp.BaseApp.NewContext(false, abci.Header{})
+var (
+	testChainID     = "test-chain-id"
+	testServiceName = "test-service"
+	testServiceDesc = "test-service-desc"
+	testServiceTags = []string{"tag1", "tag2"}
+	testAuthor      = sdk.AccAddress([]byte("test-author"))
+	testAuthorDesc  = "test-author-desc"
+	testIDLContent  = ""
 
-	coin, _ := sdk.IrisCoinType.ConvertToMinDenomCoin("1100iris")
-	keeper.ck.AddCoins(ctx, addrs[1], sdk.Coins{coin})
+	testBindingType = types.Global
+	testLevel       = types.Level{AvgRspTime: 10000, UsableTime: 9999}
+	testProvider    = sdk.AccAddress([]byte("test-provider"))
+	testDeposit, _  = sdk.ParseCoins("100iris-atto")
+	testPrices      = []sdk.Coin{sdk.NewCoin("iris-atto", sdk.NewInt(50))}
 
-	serviceDef := types.NewSvcDef("myService",
-		"testnet",
-		"the service for unit test",
-		[]string{"test", "tutorial"},
-		addrs[0],
-		"unit test author",
-		idlContent)
+	testConsumer       = sdk.AccAddress([]byte("test-consumer"))
+	testMethodID       = int16(0)
+	testServiceFees, _ = sdk.ParseCoins("50iris-atto")
+	testInput          = []byte{}
 
-	keeper.AddServiceDefinition(ctx, serviceDef)
-	serviceDefB, _ := keeper.GetServiceDefinition(ctx, "testnet", "myService")
+	testProviderCoins, _ = sdk.ParseCoins("200iris-atto")
+	testConsumerCoins, _ = sdk.ParseCoins("50iris-atto")
+)
 
-	require.Equal(t, serviceDefB.IDLContent, idlContent)
-	require.Equal(t, serviceDefB.Name, "myService")
+type KeeperTestSuite struct {
+	suite.Suite
 
-	// test methods
-	keeper.AddMethods(ctx, serviceDef)
-	iterator := keeper.GetMethods(ctx, "testnet", "myService")
-	defer iterator.Close()
-	require.True(t, iterator.Valid())
-	for ; ; iterator.Next() {
-		var method types.MethodProperty
-		if !iterator.Valid() {
-			break
-		}
-		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &method)
-		require.Equal(t, method.Name, "SayHello")
-		require.Equal(t, method.Description, "sayHello")
-		require.Equal(t, method.OutputPrivacy.String(), "NoPrivacy")
-		require.Equal(t, method.OutputCached.String(), "NoCached")
-	}
-
-	// test binding
-	deposit, _ := sdk.IrisCoinType.ConvertToMinDenomCoin("1000iris")
-	price, _ := sdk.IrisCoinType.ConvertToMinDenomCoin("1iris")
-	svcBinding := NewSvcBinding(ctx, "testnet", "myService", "testnet",
-		addrs[1], types.Global, sdk.Coins{deposit}, []sdk.Coin{price},
-		types.Level{AvgRspTime: 10000, UsableTime: 9999}, true)
-	err := keeper.AddServiceBinding(ctx, svcBinding)
-	require.NoError(t, err)
-
-	coin, _ = sdk.IrisCoinType.ConvertToMinDenomCoin("100iris")
-	require.True(t, keeper.ck.HasCoins(ctx, addrs[1], sdk.Coins{coin}))
-
-	gotSvcBinding, found := keeper.GetServiceBinding(ctx, svcBinding.DefChainID, svcBinding.DefName, svcBinding.BindChainID, svcBinding.Provider)
-	require.True(t, found)
-	require.True(t, SvcBindingEqual(svcBinding, gotSvcBinding))
-
-	// test binding update
-	svcBindingUpdate := types.NewSvcBinding(ctx, "testnet", "myService", "testnet",
-		addrs[1], types.Global, sdk.Coins{coin}, []sdk.Coin{price},
-		types.Level{AvgRspTime: 10000, UsableTime: 9999}, true)
-	err = keeper.UpdateServiceBinding(ctx, svcBindingUpdate)
-	require.NoError(t, err)
-
-	require.True(t, keeper.ck.HasCoins(ctx, addrs[1], sdk.Coins{sdk.NewCoin("iris", sdk.NewInt(0))}))
-
-	upSvcBinding, found := keeper.GetServiceBinding(ctx, svcBinding.DefChainID, svcBinding.DefName, svcBinding.BindChainID, svcBinding.Provider)
-	require.True(t, found)
-	require.True(t, upSvcBinding.Deposit.IsEqual(gotSvcBinding.Deposit.Add(svcBindingUpdate.Deposit)))
+	cdc *codec.Codec
+	ctx sdk.Context
+	app *simapp.SimApp
 }
 
-func TestKeeper_service_Call(t *testing.T) {
-	mapp, keeper, _, addrs, _, _ := getMockApp(t, 3)
-	SortAddresses(addrs)
-	mapp.BeginBlock(abci.RequestBeginBlock{})
-	ctx := mapp.BaseApp.NewContext(false, abci.Header{})
+func (suite *KeeperTestSuite) SetupTest() {
+	isCheckTx := false
+	app := simapp.Setup(isCheckTx)
 
-	coin, _ := sdk.IrisCoinType.ConvertToMinDenomCoin("1100iris")
-	keeper.ck.AddCoins(ctx, addrs[1], sdk.Coins{coin})
-	keeper.ck.AddCoins(ctx, addrs[2], sdk.Coins{coin})
+	suite.cdc = app.Codec()
+	suite.ctx = app.BaseApp.NewContext(isCheckTx, abci.Header{})
+	suite.app = app
 
-	serviceDef := types.NewSvcDef("myService",
-		"testnet",
-		"the service for unit test",
-		[]string{"test", "tutorial"},
-		addrs[0],
-		"unit test author",
-		idlContent)
-
-	keeper.AddServiceDefinition(ctx, serviceDef)
-
-	deposit, _ := sdk.IrisCoinType.ConvertToMinDenomCoin("1000iris")
-	price, _ := sdk.IrisCoinType.ConvertToMinDenomCoin("1iris")
-	svcBinding := types.NewSvcBinding(ctx, "testnet", "myService", "testnet",
-		addrs[1], types.Global, sdk.Coins{deposit}, []sdk.Coin{price},
-		types.Level{AvgRspTime: 10000, UsableTime: 9999}, true)
-	keeper.AddServiceBinding(ctx, svcBinding)
-
-	// service request
-	svcRequest := types.NewSvcRequest("testnet", "myService", "testnet", "testnet",
-		addrs[2], addrs[1], 1, []byte("1234"), sdk.Coins{price}, false)
-	svcRequest, err := keeper.AddRequest(ctx, svcRequest)
-	require.NoError(t, err)
-
-	svcRequest1, found := keeper.GetActiveRequest(ctx, svcRequest.ExpirationHeight, svcRequest.RequestHeight, svcRequest.RequestIntraTxCounter)
-	require.True(t, found)
-	require.Equal(t, svcRequest.RequestID(), svcRequest1.RequestID())
-
-	iterator := keeper.ActiveRequestQueueIterator(ctx, svcRequest.ExpirationHeight)
-	defer iterator.Close()
-	require.True(t, iterator.Valid())
-	for ; ; iterator.Next() {
-		var req types.SvcRequest
-		if !iterator.Valid() {
-			break
-		}
-		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &req)
-		require.Equal(t, svcRequest.RequestID(), req.RequestID())
-	}
+	app.bankKeeper.SetCoins(suite.ctx, testProvider, testProviderCoins)
+	app.bankKeeper.SetCoins(suite.ctx, testConsumer, testConsumerCoins)
 }
 
-const idlContent = `
-	syntax = "proto3";
+func (suite *KeeperTestSuite) setServiceDefinition() {
+	svc := types.NewSvcDef(
+		testServiceName, testChainID, testServiceDesc,
+		testServiceTags, testAuthor, testAuthorDesc, testIDLContent,
+	)
 
-	// The greeting service definition.
-	service Greeter {
-		//@Attribute description:sayHello
-		//@Attribute output_privacy:NoPrivacy
-		//@Attribute output_cached:NoCached
-		rpc SayHello (HelloRequest) returns (HelloReply) {}
-	}
+	suite.app.serviceKeeper.SetServiceDefinition(suite.ctx, svc)
+	suite.app.serviceKeeper.AddMethods(suite.ctx, svc)
+}
 
-	// The request message containing the user's name.
-	message HelloRequest {
-		string name = 1;
-	}
+func (suite *KeeperTestSuite) setServiceBinding() {
+	svcBinding := types.NewSvcBinding(
+		suite.ctx, testChainID, testServiceName, testChainID, testProvider,
+		testBindingType, testDeposit, testPrices, testLevel, true,
+	)
 
-	// The response message containing the greetings
-	message HelloReply {
-		string message = 1;
-	}`
+	suite.app.serviceKeeper.SetServiceBinding(suite.ctx, svcBinding)
+}
+func (suite *KeeperTestSuite) TestServiceDefinition() {
+	_, err := suite.app.serviceKeeper.AddServiceDefinition(
+		suite.ctx, testServiceName, testChainID, testServiceDesc,
+		testServiceTags, testAuthor, testAuthorDesc, testIDLContent,
+	)
+	suite.NoError(err)
+
+	svc, found := suite.app.serviceKeeper.GetServiceDefinition(suite.ctx, testChainID, testServiceName)
+	suite.True(found)
+
+	expectedSvc := types.NewSvcDef(
+		testServiceName, testChainID, testServiceDesc,
+		testServiceTags, testAuthor, testAuthorDesc, testIDLContent,
+	)
+	suite.Equal(expectedSvc, svc)
+}
+
+func (suite *KeeperTestSuite) TestServiceBinding() {
+	suite.setServiceDefinition()
+
+	err := suite.app.serviceKeeper.AddServiceBinding(
+		suite.ctx, testChainID, testServiceName, testChainID, testProvider,
+		testBindingType, testDeposit, testPrices, testLevel,
+	)
+	suite.NoError(err)
+
+	providerCoins1 := suite.app.BankKeeper.GetCoins(suite.ctx, testProvider)
+	suite.Equal(testProviderCoins.Sub(testDeposit), providerCoins1)
+
+	depositMaccAddr := suite.app.supplyKeeper.GetModuleAddress(suite.ctx, types.DepositAccName)
+	depositMaccCoins1 := suite.app.BankKeeper.GetCoins(suite.ctx, depositMaccAddr)
+	suite.Equal(testDeposit, depositMaccCoins1)
+
+	binding, found := suite.app.serviceKeeper.GetServiceBinding(suite.ctx, testChainID, testServiceName, testChainID, testProvider)
+	suite.True(found)
+
+	expectedBinding := types.NewSvcBinding(
+		suite.ctx, testChainID, testServiceName, testChainID, testProvider,
+		testBindingType, testDeposit, testPrices, testLevel, true,
+	)
+	suite.Equal(expectedBinding, binding)
+
+	_, err = suite.app.serviceKeeper.UpdateServiceBinding(
+		suite.ctx, testChainID, testServiceName, testChainID, testProvider,
+		testBindingType, testDeposit, testPrices, testLevel,
+	)
+	suite.NoError(err)
+
+	providerCoins2 := suite.app.BankKeeper.GetCoins(suite.ctx, testProvider)
+	suite.Equal(providerCoins1.Sub(testDeposit), providerCoins2)
+
+	depositMaccCoins2 := suite.app.BankKeeper.GetCoins(suite.ctx, depositMaccAddr)
+	suite.Equal(depositMaccCoins1.Add(testDeposit), depositMaccCoins2)
+
+	binding, found = suite.app.serviceKeeper.GetServiceBinding(suite.ctx, testChainID, testServiceName, testChainID, testProvider)
+	suite.True(found)
+	suite.Equal(testDeposit.Add(testDeposit), binding.Deposit)
+}
+
+func (suite *KeeperTestSuite) TestServiceRequest() {
+	suite.setServiceDefinition()
+	suite.setServiceBinding()
+
+	svcReq := types.NewSvcRequest(
+		testChainID, testServiceName, testChainID, testChainID, testConsumer,
+		testProvider, testMethodID, testInput, testServiceFees, false,
+	)
+
+	_, err := suite.app.serviceKeeper.AddRequest(
+		suite.ctx, testChainID, testServiceName, testChainID, testChainID,
+		testConsumer, testProvider, testMethodID, testInput, testServiceFees, false,
+	)
+	suite.NoError(err)
+
+	consumerCoins := suite.app.BankKeeper.GetCoins(suite.ctx, testConsumer)
+	suite.Equal(consumerCoins.Sub(testServiceFees), consumerCoins)
+
+	requestMaccAddr := suite.app.supplyKeeper.GetModuleAddress(suite.ctx, types.RequestAccName)
+	requestMaccCoins := suite.app.BankKeeper.GetCoins(suite.ctx, requestMaccAddr)
+	suite.Equal(testServiceFees, requestMaccCoins)
+
+	activeReq, found := suite.app.serviceKeeper.GetActiveRequest(suite.ctx, svcReq.ExpirationHeight, svcReq.RequestHeight, svcReq.RequestIntraTxCounter)
+	suite.True(found)
+	suite.Equal(svcReq.RequestID(), activeReq.RequestID())
+}
+
+func TestKeeperTestSuite(t *testing.T) {
+	suite.Run(t, new(KeeperTestSuite))
+}
