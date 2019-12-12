@@ -4,6 +4,11 @@ import (
 	"io"
 	"os"
 
+	abci "github.com/tendermint/tendermint/abci/types"
+	cmn "github.com/tendermint/tendermint/libs/common"
+	"github.com/tendermint/tendermint/libs/log"
+	dbm "github.com/tendermint/tm-db"
+
 	bam "github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/simapp"
@@ -23,13 +28,11 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	"github.com/cosmos/cosmos-sdk/x/supply"
+
 	"github.com/irisnet/irishub/modules/asset"
 	"github.com/irisnet/irishub/modules/guardian"
+	"github.com/irisnet/irishub/modules/htlc"
 	"github.com/irisnet/irishub/modules/mint"
-	abci "github.com/tendermint/tendermint/abci/types"
-	cmn "github.com/tendermint/tendermint/libs/common"
-	"github.com/tendermint/tendermint/libs/log"
-	dbm "github.com/tendermint/tm-db"
 )
 
 const appName = "IrisApp"
@@ -58,6 +61,7 @@ var (
 		supply.AppModuleBasic{},
 		asset.AppModuleBasic{},
 		guardian.AppModuleBasic{},
+		htlc.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -69,6 +73,7 @@ var (
 		staking.NotBondedPoolName: {supply.Burner, supply.Staking},
 		gov.ModuleName:            {supply.Burner},
 		asset.ModuleName:          {supply.Minter, supply.Burner},
+		htlc.ModuleName:           nil,
 	}
 )
 
@@ -111,6 +116,7 @@ type IrisApp struct {
 	evidenceKeeper *evidence.Keeper
 	assetKeeper    asset.Keeper
 	guardianKeeper guardian.Keeper
+	htlcKeeper     htlc.Keeper
 
 	// the module manager
 	mm *module.Manager
@@ -133,6 +139,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 		bam.MainStoreKey, auth.StoreKey, staking.StoreKey, supply.StoreKey,
 		mint.StoreKey, distr.StoreKey, slashing.StoreKey, gov.StoreKey,
 		params.StoreKey, evidence.StoreKey, asset.StoreKey, guardian.StoreKey,
+		htlc.StoreKey,
 	)
 	tKeys := sdk.NewTransientStoreKeys(staking.TStoreKey, params.TStoreKey)
 
@@ -203,7 +210,12 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 
 	app.assetKeeper = asset.NewKeeper(
 		app.cdc, keys[asset.StoreKey], assetSubspace, asset.DefaultCodespace,
-		app.supplyKeeper, auth.FeeCollectorName)
+		app.supplyKeeper, auth.FeeCollectorName,
+	)
+
+	app.htlcKeeper = htlc.NewKeeper(
+		app.cdc, keys[htlc.StoreKey], app.supplyKeeper, htlc.DefaultCodespace,
+	)
 
 	// NOTE: Any module instantiated in the module manager that is later modified
 	// must be passed by reference here.
@@ -221,14 +233,24 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 		evidence.NewAppModule(*app.evidenceKeeper),
 		asset.NewAppModule(app.assetKeeper),
 		guardian.NewAppModule(app.guardianKeeper),
+		htlc.NewAppModule(app.htlcKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
 	// there is nothing left over in the validator fee pool, so as to keep the
 	// CanWithdrawInvariant invariant.
-	app.mm.SetOrderBeginBlockers(mint.ModuleName, distr.ModuleName, slashing.ModuleName)
+	app.mm.SetOrderBeginBlockers(
+		mint.ModuleName,
+		distr.ModuleName,
+		slashing.ModuleName,
+		htlc.ModuleName,
+	)
 
-	app.mm.SetOrderEndBlockers(crisis.ModuleName, gov.ModuleName, staking.ModuleName)
+	app.mm.SetOrderEndBlockers(
+		crisis.ModuleName,
+		gov.ModuleName,
+		staking.ModuleName,
+	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
 	// properly initialized with tokens from genesis accounts.
@@ -236,7 +258,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 		distr.ModuleName, staking.ModuleName, auth.ModuleName, bank.ModuleName,
 		slashing.ModuleName, gov.ModuleName, mint.ModuleName, supply.ModuleName,
 		crisis.ModuleName, genutil.ModuleName, evidence.ModuleName,
-		asset.ModuleName, guardian.ModuleName,
+		asset.ModuleName, guardian.ModuleName, htlc.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.crisisKeeper)
@@ -256,6 +278,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 		staking.NewAppModule(app.stakingKeeper, app.accountKeeper, app.supplyKeeper),
 		slashing.NewAppModule(app.slashingKeeper, app.stakingKeeper),
 		asset.NewAppModule(app.assetKeeper),
+		htlc.NewAppModule(app.htlcKeeper),
 	)
 
 	app.sm.RegisterStoreDecoders()

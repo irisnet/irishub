@@ -4,6 +4,11 @@ import (
 	"io"
 	"os"
 
+	abci "github.com/tendermint/tendermint/abci/types"
+	cmn "github.com/tendermint/tendermint/libs/common"
+	"github.com/tendermint/tendermint/libs/log"
+	dbm "github.com/tendermint/tm-db"
+
 	bam "github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -23,13 +28,11 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	"github.com/cosmos/cosmos-sdk/x/supply"
+
 	"github.com/irisnet/irishub/modules/asset"
 	"github.com/irisnet/irishub/modules/guardian"
+	"github.com/irisnet/irishub/modules/htlc"
 	"github.com/irisnet/irishub/modules/mint"
-	abci "github.com/tendermint/tendermint/abci/types"
-	cmn "github.com/tendermint/tendermint/libs/common"
-	"github.com/tendermint/tendermint/libs/log"
-	dbm "github.com/tendermint/tm-db"
 )
 
 const appName = "SimApp"
@@ -58,6 +61,7 @@ var (
 		slashing.AppModuleBasic{},
 		evidence.AppModuleBasic{},
 		guardian.AppModuleBasic{},
+		htlc.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -69,6 +73,7 @@ var (
 		staking.NotBondedPoolName: {supply.Burner, supply.Staking},
 		gov.ModuleName:            {supply.Burner},
 		asset.ModuleName:          {supply.Minter, supply.Burner},
+		htlc.ModuleName:           nil,
 	}
 )
 
@@ -112,6 +117,7 @@ type SimApp struct {
 	EvidenceKeeper evidence.Keeper
 	AssetKeeper    asset.Keeper
 	GuardianKeeper guardian.Keeper
+	HTLCKeeper     htlc.Keeper
 
 	// the module manager
 	mm *module.Manager
@@ -135,7 +141,7 @@ func NewSimApp(
 	keys := sdk.NewKVStoreKeys(
 		bam.MainStoreKey, auth.StoreKey, staking.StoreKey, supply.StoreKey, mint.StoreKey,
 		distr.StoreKey, slashing.StoreKey, gov.StoreKey, params.StoreKey, evidence.StoreKey,
-		asset.StoreKey, guardian.StoreKey,
+		asset.StoreKey, guardian.StoreKey, htlc.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(params.TStoreKey)
 
@@ -186,6 +192,7 @@ func NewSimApp(
 	app.CrisisKeeper = crisis.NewKeeper(
 		app.subspaces[crisis.ModuleName], invCheckPeriod, app.SupplyKeeper, auth.FeeCollectorName,
 	)
+	app.HTLCKeeper = htlc.NewKeeper(app.cdc, keys[htlc.StoreKey], app.SupplyKeeper, htlc.DefaultCodespace)
 
 	// create evidence keeper with router
 	evidenceKeeper := evidence.NewKeeper(
@@ -237,13 +244,23 @@ func NewSimApp(
 		evidence.NewAppModule(app.EvidenceKeeper),
 		asset.NewAppModule(app.AssetKeeper),
 		guardian.NewAppModule(app.GuardianKeeper),
+		htlc.NewAppModule(app.HTLCKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
 	// there is nothing left over in the validator fee pool, so as to keep the
 	// CanWithdrawInvariant invariant.
-	app.mm.SetOrderBeginBlockers(mint.ModuleName, distr.ModuleName, slashing.ModuleName)
-	app.mm.SetOrderEndBlockers(crisis.ModuleName, gov.ModuleName, staking.ModuleName)
+	app.mm.SetOrderBeginBlockers(
+		mint.ModuleName,
+		distr.ModuleName,
+		slashing.ModuleName,
+		htlc.ModuleName,
+	)
+	app.mm.SetOrderEndBlockers(
+		crisis.ModuleName,
+		gov.ModuleName,
+		staking.ModuleName,
+	)
 
 	// NOTE: The genutils moodule must occur after staking so that pools are
 	// properly initialized with tokens from genesis accounts.
@@ -251,7 +268,7 @@ func NewSimApp(
 		auth.ModuleName, distr.ModuleName, staking.ModuleName, bank.ModuleName,
 		slashing.ModuleName, gov.ModuleName, mint.ModuleName, supply.ModuleName,
 		crisis.ModuleName, genutil.ModuleName, evidence.ModuleName,
-		asset.ModuleName, guardian.ModuleName,
+		asset.ModuleName, guardian.ModuleName, htlc.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -271,6 +288,7 @@ func NewSimApp(
 		staking.NewAppModule(app.StakingKeeper, app.AccountKeeper, app.SupplyKeeper),
 		slashing.NewAppModule(app.SlashingKeeper, app.StakingKeeper),
 		asset.NewAppModule(app.AssetKeeper),
+		htlc.NewAppModule(app.HTLCKeeper),
 	)
 
 	app.sm.RegisterStoreDecoders()

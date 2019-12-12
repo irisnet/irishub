@@ -2,7 +2,7 @@
 package types
 
 import (
-	sdk "github.com/irisnet/irishub/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 // Rand errors reserve 100 ~ 199.
@@ -19,37 +19,42 @@ const (
 	CodeStateIsNotExpired     sdk.CodeType = 107
 )
 
-//----------------------------------------
-// HTLC error constructors
-
+// ErrInvalidAddress error for invalid address
 func ErrInvalidAddress(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidAddress, msg)
 }
 
+// ErrInvalidAmount error for invalid amount
 func ErrInvalidAmount(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidAmount, msg)
 }
 
+// ErrInvalidHashLock error for invalid hash lock
 func ErrInvalidHashLock(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidHashLock, msg)
 }
 
+// ErrHashLockAlreadyExists error for hash lock already exists
 func ErrHashLockAlreadyExists(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeHashLockAlreadyExists, msg)
 }
 
+// ErrInvalidTimeLock error for invalid lock time
 func ErrInvalidTimeLock(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidTimeLock, msg)
 }
 
+// ErrInvalidSecret error for invalid secret
 func ErrInvalidSecret(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidSecret, msg)
 }
 
+// ErrStateIsNotOpen error for state is not open
 func ErrStateIsNotOpen(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeStateIsNotOpen, msg)
 }
 
+// ErrStateIsNotExpired error for invalid state is not expired
 func ErrStateIsNotExpired(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeStateIsNotExpired, msg)
 }

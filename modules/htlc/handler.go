@@ -1,12 +1,18 @@
 package htlc
 
 import (
-	sdk "github.com/irisnet/irishub/types"
+	"encoding/hex"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	"github.com/irisnet/irishub/modules/htlc/internal/types"
 )
 
-// NewHandler handles all "htlc" messages
+// NewHandler handles all htlc messages
 func NewHandler(k Keeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
+		ctx = ctx.WithEventManager(sdk.NewEventManager())
+
 		switch msg := msg.(type) {
 		case MsgCreateHTLC:
 			return handleMsgCreateHTLC(ctx, k, msg)
@@ -22,7 +28,7 @@ func NewHandler(k Keeper) sdk.Handler {
 
 // handleMsgCreateHTLC handles MsgCreateHTLC
 func handleMsgCreateHTLC(ctx sdk.Context, k Keeper, msg MsgCreateHTLC) sdk.Result {
-	secret := make([]byte, 0)
+	secret := HTLCSecret{}
 	expireHeight := msg.TimeLock + uint64(ctx.BlockHeight())
 	state := OPEN
 
@@ -37,36 +43,86 @@ func handleMsgCreateHTLC(ctx sdk.Context, k Keeper, msg MsgCreateHTLC) sdk.Resul
 		state,
 	)
 
-	tags, err := k.CreateHTLC(ctx, htlc, msg.HashLock)
+	err := k.CreateHTLC(ctx, htlc, msg.HashLock)
 	if err != nil {
 		return err.Result()
 	}
 
+	ctx.EventManager().EmitEvents(
+		sdk.Events{
+			sdk.NewEvent(
+				sdk.EventTypeMessage,
+				sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+				sdk.NewAttribute(sdk.AttributeKeySender, msg.Sender.String()),
+			),
+			sdk.NewEvent(
+				types.EventTypeCreateHTLC,
+				sdk.NewAttribute(types.AttributeValueSender, htlc.Sender.String()),
+				sdk.NewAttribute(types.AttributeValueReceiver, htlc.To.String()),
+				sdk.NewAttribute(types.AttributeValueReceiverOnOtherChain, htlc.ReceiverOnOtherChain),
+				sdk.NewAttribute(types.AttributeValueAmount, htlc.Amount.String()),
+				sdk.NewAttribute(types.AttributeValueHashLock, hex.EncodeToString(msg.HashLock)),
+			),
+		},
+	)
+
 	return sdk.Result{
-		Tags: tags,
+		Events: ctx.EventManager().Events(),
 	}
 }
 
 // handleMsgClaimHTLC handles MsgClaimHTLC
 func handleMsgClaimHTLC(ctx sdk.Context, k Keeper, msg MsgClaimHTLC) sdk.Result {
-	tags, err := k.ClaimHTLC(ctx, msg.HashLock, msg.Secret)
+	toStr, err := k.ClaimHTLC(ctx, msg.HashLock, msg.Secret)
 	if err != nil {
 		return err.Result()
 	}
 
+	ctx.EventManager().EmitEvents(
+		sdk.Events{
+			sdk.NewEvent(
+				sdk.EventTypeMessage,
+				sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+				sdk.NewAttribute(sdk.AttributeKeySender, msg.Sender.String()),
+			),
+			sdk.NewEvent(
+				types.EventTypeClaimHTLC,
+				sdk.NewAttribute(types.AttributeValueSender, msg.Sender.String()),
+				sdk.NewAttribute(types.AttributeValueReceiver, toStr),
+				sdk.NewAttribute(types.AttributeValueHashLock, hex.EncodeToString(msg.HashLock)),
+				sdk.NewAttribute(types.AttributeValueSecret, hex.EncodeToString(msg.Secret)),
+			),
+		},
+	)
+
 	return sdk.Result{
-		Tags: tags,
+		Events: ctx.EventManager().Events(),
 	}
 }
 
 // handleMsgRefundHTLC handles MsgRefundHTLC
 func handleMsgRefundHTLC(ctx sdk.Context, k Keeper, msg MsgRefundHTLC) sdk.Result {
-	tags, err := k.RefundHTLC(ctx, msg.HashLock)
+	sender, err := k.RefundHTLC(ctx, msg.HashLock)
 	if err != nil {
 		return err.Result()
 	}
 
+	ctx.EventManager().EmitEvents(
+		sdk.Events{
+			sdk.NewEvent(
+				sdk.EventTypeMessage,
+				sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+				sdk.NewAttribute(sdk.AttributeKeySender, msg.Sender.String()),
+			),
+			sdk.NewEvent(
+				types.EventTypeRefundHTLC,
+				sdk.NewAttribute(types.AttributeValueSender, sender),
+				sdk.NewAttribute(types.AttributeValueHashLock, hex.EncodeToString(msg.HashLock)),
+			),
+		},
+	)
+
 	return sdk.Result{
-		Tags: tags,
+		Events: ctx.EventManager().Events(),
 	}
 }

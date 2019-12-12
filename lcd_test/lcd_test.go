@@ -11,8 +11,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/irisnet/irishub/modules/mint"
-
 	"github.com/stretchr/testify/require"
 
 	"github.com/cosmos/cosmos-sdk/client"
@@ -29,6 +27,8 @@ import (
 	disttypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	"github.com/cosmos/cosmos-sdk/x/gov"
 	"github.com/cosmos/cosmos-sdk/x/slashing"
+
+	"github.com/irisnet/irishub/modules/mint"
 )
 
 const (
