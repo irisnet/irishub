@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"encoding/binary"
 	"fmt"
 	"strings"
 
@@ -64,8 +65,7 @@ $ %s query %s supply crypto-kitties
 				return err
 			}
 
-			var out exported.NFT
-			err = cdc.UnmarshalJSON(res, &out)
+			out := binary.LittleEndian.Uint64(res)
 			if err != nil {
 				return err
 			}
@@ -159,7 +159,7 @@ $ %s query %s collection crypto-kitties
 				return err
 			}
 
-			var out types.Collection
+			var out types.Collections
 			err = cdc.UnmarshalJSON(res, &out)
 			if err != nil {
 				return err
