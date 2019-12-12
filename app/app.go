@@ -28,20 +28,12 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	"github.com/cosmos/cosmos-sdk/x/supply"
-<<<<<<< HEAD
-	"github.com/irisnet/irishub/modules/guardian"
-	"github.com/irisnet/irishub/modules/service"
-	abci "github.com/tendermint/tendermint/abci/types"
-	cmn "github.com/tendermint/tendermint/libs/common"
-	"github.com/tendermint/tendermint/libs/log"
-	dbm "github.com/tendermint/tm-db"
-=======
 
 	"github.com/irisnet/irishub/modules/asset"
 	"github.com/irisnet/irishub/modules/guardian"
 	"github.com/irisnet/irishub/modules/htlc"
 	"github.com/irisnet/irishub/modules/mint"
->>>>>>> v1.0.0-refactor
+	"github.com/irisnet/irishub/modules/service"
 )
 
 const appName = "IrisApp"
@@ -68,13 +60,10 @@ var (
 		crisis.AppModuleBasic{},
 		slashing.AppModuleBasic{},
 		supply.AppModuleBasic{},
-<<<<<<< HEAD
-		service.AppModuleBasic{},
-=======
 		asset.AppModuleBasic{},
 		guardian.AppModuleBasic{},
 		htlc.AppModuleBasic{},
->>>>>>> v1.0.0-refactor
+		service.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -85,14 +74,11 @@ var (
 		staking.BondedPoolName:    {supply.Burner, supply.Staking},
 		staking.NotBondedPoolName: {supply.Burner, supply.Staking},
 		gov.ModuleName:            {supply.Burner},
-<<<<<<< HEAD
+		asset.ModuleName:          {supply.Minter, supply.Burner},
+		htlc.ModuleName:           nil,
 		service.DepositAccName:    {supply.Burner},
 		service.RequestAccName:    nil,
 		service.TaxAccName:        nil,
-=======
-		asset.ModuleName:          {supply.Minter, supply.Burner},
-		htlc.ModuleName:           nil,
->>>>>>> v1.0.0-refactor
 	}
 )
 
@@ -133,14 +119,10 @@ type IrisApp struct {
 	crisisKeeper   crisis.Keeper
 	paramsKeeper   params.Keeper
 	evidenceKeeper *evidence.Keeper
-<<<<<<< HEAD
-	guardianKeeper guardian.Keeper
-	serviceKeeper  service.Keeper
-=======
 	assetKeeper    asset.Keeper
 	guardianKeeper guardian.Keeper
 	htlcKeeper     htlc.Keeper
->>>>>>> v1.0.0-refactor
+	serviceKeeper  service.Keeper
 
 	// the module manager
 	mm *module.Manager
@@ -162,12 +144,8 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 	keys := sdk.NewKVStoreKeys(
 		bam.MainStoreKey, auth.StoreKey, staking.StoreKey, supply.StoreKey,
 		mint.StoreKey, distr.StoreKey, slashing.StoreKey, gov.StoreKey,
-<<<<<<< HEAD
-		params.StoreKey, evidence.StoreKey, service.StoreKey,
-=======
 		params.StoreKey, evidence.StoreKey, asset.StoreKey, guardian.StoreKey,
-		htlc.StoreKey,
->>>>>>> v1.0.0-refactor
+		htlc.StoreKey, service.StoreKey,
 	)
 	tKeys := sdk.NewTransientStoreKeys(staking.TStoreKey, params.TStoreKey)
 
@@ -190,11 +168,8 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 	govSubspace := app.paramsKeeper.Subspace(gov.DefaultParamspace).WithKeyTable(gov.ParamKeyTable())
 	crisisSubspace := app.paramsKeeper.Subspace(crisis.DefaultParamspace)
 	evidenceSubspace := app.paramsKeeper.Subspace(evidence.DefaultParamspace)
-<<<<<<< HEAD
-	serviceSubspace := app.paramsKeeper.Subspace(service.DefaultParamspace)
-=======
 	assetSubspace := app.paramsKeeper.Subspace(asset.DefaultParamspace)
->>>>>>> v1.0.0-refactor
+	serviceSubspace := app.paramsKeeper.Subspace(service.DefaultParamspace)
 
 	// add keepers
 	app.accountKeeper = auth.NewAccountKeeper(app.cdc, keys[auth.StoreKey], authSubspace, auth.ProtoBaseAccount)
@@ -240,12 +215,6 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 		staking.NewMultiStakingHooks(app.distrKeeper.Hooks(), app.slashingKeeper.Hooks()),
 	)
 
-<<<<<<< HEAD
-	app.guardianKeeper = guardian.Keeper{}
-	app.serviceKeeper = service.NewKeeper(
-		app.cdc, keys[service.StoreKey], app.supplyKeeper, app.guardianKeeper,
-		&stakingKeeper, service.DefaultCodespace, serviceSubspace,
-=======
 	app.assetKeeper = asset.NewKeeper(
 		app.cdc, keys[asset.StoreKey], assetSubspace, asset.DefaultCodespace,
 		app.supplyKeeper, auth.FeeCollectorName,
@@ -253,7 +222,11 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 
 	app.htlcKeeper = htlc.NewKeeper(
 		app.cdc, keys[htlc.StoreKey], app.supplyKeeper, htlc.DefaultCodespace,
->>>>>>> v1.0.0-refactor
+	)
+
+	app.serviceKeeper = service.NewKeeper(
+		app.cdc, keys[service.StoreKey], app.supplyKeeper, app.guardianKeeper,
+		service.DefaultCodespace, serviceSubspace, nil,
 	)
 
 	// NOTE: Any module instantiated in the module manager that is later modified
@@ -270,13 +243,10 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 		slashing.NewAppModule(app.slashingKeeper, app.stakingKeeper),
 		staking.NewAppModule(app.stakingKeeper, app.accountKeeper, app.supplyKeeper),
 		evidence.NewAppModule(*app.evidenceKeeper),
-<<<<<<< HEAD
-		service.NewAppModule(app.serviceKeeper),
-=======
 		asset.NewAppModule(app.assetKeeper),
 		guardian.NewAppModule(app.guardianKeeper),
 		htlc.NewAppModule(app.htlcKeeper),
->>>>>>> v1.0.0-refactor
+		service.NewAppModule(app.serviceKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -289,27 +259,20 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 		htlc.ModuleName,
 	)
 
-<<<<<<< HEAD
-	app.mm.SetOrderEndBlockers(crisis.ModuleName, gov.ModuleName, staking.ModuleName, service.ModuleName)
-=======
 	app.mm.SetOrderEndBlockers(
 		crisis.ModuleName,
 		gov.ModuleName,
 		staking.ModuleName,
+		service.ModuleName,
 	)
->>>>>>> v1.0.0-refactor
 
 	// NOTE: The genutils module must occur after staking so that pools are
 	// properly initialized with tokens from genesis accounts.
 	app.mm.SetOrderInitGenesis(
 		distr.ModuleName, staking.ModuleName, auth.ModuleName, bank.ModuleName,
 		slashing.ModuleName, gov.ModuleName, mint.ModuleName, supply.ModuleName,
-<<<<<<< HEAD
-		crisis.ModuleName, genutil.ModuleName, evidence.ModuleName, service.ModuleName,
-=======
 		crisis.ModuleName, genutil.ModuleName, evidence.ModuleName,
-		asset.ModuleName, guardian.ModuleName, htlc.ModuleName,
->>>>>>> v1.0.0-refactor
+		asset.ModuleName, guardian.ModuleName, htlc.ModuleName, service.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.crisisKeeper)
@@ -328,12 +291,9 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 		distr.NewAppModule(app.distrKeeper, app.supplyKeeper),
 		staking.NewAppModule(app.stakingKeeper, app.accountKeeper, app.supplyKeeper),
 		slashing.NewAppModule(app.slashingKeeper, app.stakingKeeper),
-<<<<<<< HEAD
-		service.NewAppModule(app.serviceKeeper),
-=======
 		asset.NewAppModule(app.assetKeeper),
 		htlc.NewAppModule(app.htlcKeeper),
->>>>>>> v1.0.0-refactor
+		service.NewAppModule(app.serviceKeeper),
 	)
 
 	app.sm.RegisterStoreDecoders()

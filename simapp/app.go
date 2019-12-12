@@ -33,6 +33,7 @@ import (
 	"github.com/irisnet/irishub/modules/guardian"
 	"github.com/irisnet/irishub/modules/htlc"
 	"github.com/irisnet/irishub/modules/mint"
+	"github.com/irisnet/irishub/modules/service"
 )
 
 const appName = "SimApp"
@@ -62,6 +63,7 @@ var (
 		evidence.AppModuleBasic{},
 		guardian.AppModuleBasic{},
 		htlc.AppModuleBasic{},
+		service.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -74,6 +76,9 @@ var (
 		gov.ModuleName:            {supply.Burner},
 		asset.ModuleName:          {supply.Minter, supply.Burner},
 		htlc.ModuleName:           nil,
+		service.DepositAccName:    {supply.Burner},
+		service.RequestAccName:    nil,
+		service.TaxAccName:        nil,
 	}
 )
 
@@ -118,6 +123,7 @@ type SimApp struct {
 	AssetKeeper    asset.Keeper
 	GuardianKeeper guardian.Keeper
 	HTLCKeeper     htlc.Keeper
+	ServiceKeeper  service.Keeper
 
 	// the module manager
 	mm *module.Manager
@@ -141,7 +147,7 @@ func NewSimApp(
 	keys := sdk.NewKVStoreKeys(
 		bam.MainStoreKey, auth.StoreKey, staking.StoreKey, supply.StoreKey, mint.StoreKey,
 		distr.StoreKey, slashing.StoreKey, gov.StoreKey, params.StoreKey, evidence.StoreKey,
-		asset.StoreKey, guardian.StoreKey, htlc.StoreKey,
+		asset.StoreKey, guardian.StoreKey, htlc.StoreKey, service.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(params.TStoreKey)
 
@@ -166,6 +172,7 @@ func NewSimApp(
 	app.subspaces[crisis.ModuleName] = app.ParamsKeeper.Subspace(crisis.DefaultParamspace)
 	app.subspaces[evidence.ModuleName] = app.ParamsKeeper.Subspace(evidence.DefaultParamspace)
 	app.subspaces[asset.ModuleName] = app.ParamsKeeper.Subspace(asset.DefaultParamspace)
+	app.subspaces[service.ModuleName] = app.ParamsKeeper.Subspace(service.DefaultParamspace)
 
 	// add keepers
 	app.AccountKeeper = auth.NewAccountKeeper(
@@ -228,6 +235,11 @@ func NewSimApp(
 		app.cdc, keys[asset.StoreKey], app.subspaces[asset.ModuleName], asset.DefaultCodespace,
 		app.SupplyKeeper, auth.FeeCollectorName)
 
+	app.ServiceKeeper = service.NewKeeper(
+		app.cdc, keys[service.StoreKey], app.SupplyKeeper, app.GuardianKeeper,
+		service.DefaultCodespace, app.subspaces[service.ModuleName], nil,
+	)
+
 	// NOTE: Any module instantiated in the module manager that is later modified
 	// must be passed by reference here.
 	app.mm = module.NewManager(
@@ -245,6 +257,7 @@ func NewSimApp(
 		asset.NewAppModule(app.AssetKeeper),
 		guardian.NewAppModule(app.GuardianKeeper),
 		htlc.NewAppModule(app.HTLCKeeper),
+		service.NewAppModule(app.ServiceKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -260,6 +273,7 @@ func NewSimApp(
 		crisis.ModuleName,
 		gov.ModuleName,
 		staking.ModuleName,
+		service.ModuleName,
 	)
 
 	// NOTE: The genutils moodule must occur after staking so that pools are
@@ -268,7 +282,7 @@ func NewSimApp(
 		auth.ModuleName, distr.ModuleName, staking.ModuleName, bank.ModuleName,
 		slashing.ModuleName, gov.ModuleName, mint.ModuleName, supply.ModuleName,
 		crisis.ModuleName, genutil.ModuleName, evidence.ModuleName,
-		asset.ModuleName, guardian.ModuleName, htlc.ModuleName,
+		asset.ModuleName, guardian.ModuleName, htlc.ModuleName, service.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -289,6 +303,7 @@ func NewSimApp(
 		slashing.NewAppModule(app.SlashingKeeper, app.StakingKeeper),
 		asset.NewAppModule(app.AssetKeeper),
 		htlc.NewAppModule(app.HTLCKeeper),
+		service.NewAppModule(app.ServiceKeeper),
 	)
 
 	app.sm.RegisterStoreDecoders()

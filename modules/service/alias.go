@@ -44,11 +44,12 @@ const (
 	QuerierRoute = types.QuerierRoute
 	RouterKey    = types.RouterKey
 
-	DepositAccName = types.RequestAccName
+	DefaultCodespace  = types.DefaultCodespace
+	DefaultParamspace = types.DefaultParamspace
+
+	DepositAccName = types.DepositAccName
 	RequestAccName = types.RequestAccName
 	TaxAccName     = types.TaxAccName
-
-	DefaultCodespace = types.DefaultCodespace
 
 	NoPrivacy        = types.NoPrivacy
 	PubKeyEncryption = types.PubKeyEncryption
