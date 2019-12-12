@@ -1,8 +1,8 @@
 package config
 
 const (
-	Testnet  = "testnet"
-	Mainnet  = "mainnet"
+	Testnet = "testnet"
+	Mainnet = "mainnet"
 )
 
 // Can be configured through environment variables

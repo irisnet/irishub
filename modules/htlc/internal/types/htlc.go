@@ -6,19 +6,19 @@ import (
 	"fmt"
 	"strings"
 
-	sdk "github.com/irisnet/irishub/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 // HTLC represents an HTLC
 type HTLC struct {
-	Sender               sdk.AccAddress `json:"sender"`                  // the initiator address
-	To                   sdk.AccAddress `json:"to"`                      // the destination address
-	ReceiverOnOtherChain string         `json:"receiver_on_other_chain"` // the claim receiving address on the other chain
-	Amount               sdk.Coins      `json:"amount"`                  // the amount to be transferred
-	Secret               []byte         `json:"secret"`                  // the random secret which is of 32 bytes
-	Timestamp            uint64         `json:"timestamp"`               // the timestamp, if provided, used to generate the hash lock together with secret
-	ExpireHeight         uint64         `json:"expire_height"`           // the block height by which the HTLC expires
-	State                HTLCState      `json:"state"`                   // the state of the HTLC
+	Sender               sdk.AccAddress `json:"sender" yaml:"sender"`                                   // the initiator address
+	To                   sdk.AccAddress `json:"to" yaml:"to"`                                           // the destination address
+	ReceiverOnOtherChain string         `json:"receiver_on_other_chain" yaml:"receiver_on_other_chain"` // the claim receiving address on the other chain
+	Amount               sdk.Coins      `json:"amount" yaml:"amount"`                                   // the amount to be transferred
+	Secret               HTLCSecret     `json:"secret" yaml:"secret"`                                   // the random secret which is of 32 bytes
+	Timestamp            uint64         `json:"timestamp" yaml:"timestamp"`                             // the timestamp, if provided, used to generate the hash lock together with secret
+	ExpireHeight         uint64         `json:"expire_height" yaml:"expire_height"`                     // the block height by which the HTLC expires
+	State                HTLCState      `json:"state" yaml:"state"`                                     // the state of the HTLC
 }
 
 // NewHTLC constructs an HTLC
@@ -27,7 +27,7 @@ func NewHTLC(
 	to sdk.AccAddress,
 	receiverOnOtherChain string,
 	amount sdk.Coins,
-	secret []byte,
+	secret HTLCSecret,
 	timestamp uint64,
 	expireHeight uint64,
 	state HTLCState,
@@ -48,61 +48,57 @@ func NewHTLC(
 func (h HTLC) GetHashLock() []byte {
 	if h.State == COMPLETED {
 		if h.Timestamp > 0 {
-			return sdk.SHA256(append(h.Secret, sdk.Uint64ToBigEndian(h.Timestamp)...))
+			return SHA256(append(h.Secret, sdk.Uint64ToBigEndian(h.Timestamp)...))
 		}
+		return SHA256(h.Secret)
+	}
+	return nil
+}
 
-		return sdk.SHA256(h.Secret)
+func (h HTLC) Validate(hashLock HTLCHashLock) error {
+	if len(hashLock) != HashLockLength {
+		return fmt.Errorf("the hash lock must be %d bytes long", HashLockLength)
+	}
+
+	if h.State != OPEN {
+		return fmt.Errorf("htlc state must be OPEN")
+	}
+
+	if len(h.Sender) == 0 {
+		return fmt.Errorf("the sender address must be specified")
+	}
+
+	if len(h.To) == 0 {
+		return fmt.Errorf("the receiver address must be specified")
+	}
+
+	if len(h.ReceiverOnOtherChain) > MaxLengthForAddressOnOtherChain {
+		return fmt.Errorf("the length of the receiver on other chain must be between [0,%d]", MaxLengthForAddressOnOtherChain)
+	}
+
+	if !h.Amount.IsValid() || !h.Amount.IsAllPositive() {
+		return fmt.Errorf("invalid transferred amount: %s", h.Amount.String())
+	}
+
+	if len(h.Secret) != 0 {
+		return fmt.Errorf("the secret length must be zero")
+	}
+
+	if h.ExpireHeight < 1 {
+		return fmt.Errorf("expire height must be greater than 0")
 	}
 
 	return nil
 }
 
-// String implements fmt.Stringer
-func (h HTLC) String() string {
-	return fmt.Sprintf(`HTLC:
-	Sender:               %s
-	Receiver:             %s
-	ReceiverOnOtherChain: %s
-	Amount:               %s
-	Secret:               %s
-	Timestamp:            %d
-	ExpireHeight:         %d
-	State:                %s`,
-		h.Sender.String(),
-		h.To.String(),
-		h.ReceiverOnOtherChain,
-		h.Amount.String(),
-		hex.EncodeToString(h.Secret),
-		h.Timestamp,
-		h.ExpireHeight,
-		h.State,
-	)
-}
-
-// HumanString implements human
-func (h HTLC) HumanString(converter sdk.CoinsConverter) string {
-	return fmt.Sprintf(`HTLC:
-	Sender:               %s
-	To:                   %s
-	ReceiverOnOtherChain: %s
-	Amount:               %s
-	Secret:               %s
-	Timestamp:            %d
-	ExpireHeight:         %d
-	State:                %s`,
-		h.Sender,
-		h.To,
-		h.ReceiverOnOtherChain,
-		converter.ToMainUnit(h.Amount),
-		hex.EncodeToString(h.Secret),
-		h.Timestamp,
-		h.ExpireHeight,
-		h.State,
-	)
-}
-
 // HTLCState represents the state of an HTLC
 type HTLCState byte
+
+// HTLCSecret represents the secret of an HTLC
+type HTLCSecret []byte
+
+// HTLCSecret represents the hash lock of an HTLC
+type HTLCHashLock []byte
 
 const (
 	OPEN      HTLCState = 0x00 // claimable
@@ -136,9 +132,9 @@ func HTLCStateFromString(str string) (HTLCState, error) {
 func (state HTLCState) Format(s fmt.State, verb rune) {
 	switch verb {
 	case 's':
-		s.Write([]byte(fmt.Sprintf("%s", state.String())))
+		_, _ = s.Write([]byte(fmt.Sprintf("%s", state.String())))
 	default:
-		s.Write([]byte(fmt.Sprintf("%v", byte(state))))
+		_, _ = s.Write([]byte(fmt.Sprintf("%v", byte(state))))
 	}
 }
 
@@ -154,6 +150,25 @@ func (state HTLCState) Marshal() ([]byte, error) {
 // Unmarshal needed for protobuf compatibility
 func (state *HTLCState) Unmarshal(data []byte) error {
 	*state = HTLCState(data[0])
+	return nil
+}
+
+func (state HTLCState) MarshalYAML() (interface{}, error) {
+	return state.String(), nil
+}
+
+func (state *HTLCState) UnmarshalYAML(data []byte) error {
+	var s string
+	err := json.Unmarshal(data, &s)
+	if err != nil {
+		return err
+	}
+
+	bz, err := HTLCStateFromString(s)
+	if err != nil {
+		return err
+	}
+	*state = bz
 	return nil
 }
 
@@ -175,5 +190,111 @@ func (state *HTLCState) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	*state = bz
+	return nil
+}
+
+// HTLCSecret
+func (secret HTLCSecret) String() string {
+	return hex.EncodeToString(secret)
+}
+
+func (secret HTLCSecret) Marshal() ([]byte, error) {
+	return secret, nil
+}
+
+func (secret *HTLCSecret) Unmarshal(data []byte) error {
+	*secret = data
+	return nil
+}
+
+func (secret HTLCSecret) MarshalYAML() (interface{}, error) {
+	return secret.String(), nil
+}
+
+func (secret *HTLCSecret) UnmarshalYAML(data []byte) error {
+	var s string
+	err := json.Unmarshal(data, &s)
+	if err != nil {
+		return nil
+	}
+
+	bz, err := hex.DecodeString(s)
+	if err != nil {
+		return err
+	}
+	*secret = bz
+	return nil
+}
+
+func (secret HTLCSecret) MarshalJSON() ([]byte, error) {
+	return json.Marshal(secret.String())
+}
+
+func (secret *HTLCSecret) UnmarshalJSON(data []byte) error {
+	var s string
+	err := json.Unmarshal(data, &s)
+	if err != nil {
+		return err
+	}
+
+	bz, err := hex.DecodeString(s)
+	if err != nil {
+		return err
+	}
+
+	*secret = bz
+	return nil
+}
+
+// HTLCHashLock
+func (hashLock HTLCHashLock) String() string {
+	return hex.EncodeToString(hashLock)
+}
+
+func (hashLock HTLCHashLock) Marshal() ([]byte, error) {
+	return hashLock, nil
+}
+
+func (hashLock *HTLCHashLock) Unmarshal(data []byte) error {
+	*hashLock = data
+	return nil
+}
+
+func (hashLock HTLCHashLock) MarshalYAML() (interface{}, error) {
+	return hashLock.String(), nil
+}
+
+func (hashLock *HTLCHashLock) UnmarshalYAML(data []byte) error {
+	var s string
+	err := json.Unmarshal(data, &s)
+	if err != nil {
+		return nil
+	}
+
+	bz, err := hex.DecodeString(s)
+	if err != nil {
+		return err
+	}
+	*hashLock = bz
+	return nil
+}
+
+func (hashLock HTLCHashLock) MarshalJSON() ([]byte, error) {
+	return json.Marshal(hashLock.String())
+}
+
+func (hashLock *HTLCHashLock) UnmarshalJSON(data []byte) error {
+	var s string
+	err := json.Unmarshal(data, &s)
+	if err != nil {
+		return err
+	}
+
+	bz, err := hex.DecodeString(s)
+	if err != nil {
+		return err
+	}
+
+	*hashLock = bz
 	return nil
 }

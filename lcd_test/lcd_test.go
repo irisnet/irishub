@@ -11,8 +11,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/cosmos/cosmos-sdk/x/mint"
-
 	"github.com/stretchr/testify/require"
 
 	"github.com/cosmos/cosmos-sdk/client"
@@ -29,6 +27,8 @@ import (
 	disttypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	"github.com/cosmos/cosmos-sdk/x/gov"
 	"github.com/cosmos/cosmos-sdk/x/slashing"
+
+	"github.com/irisnet/irishub/modules/mint"
 )
 
 const (
@@ -1072,23 +1072,11 @@ func TestMintingQueries(t *testing.T) {
 	require.NoError(t, err)
 	defer cleanup()
 
-	res, body := Request(t, port, "GET", "/minting/parameters", nil)
+	res, body := Request(t, port, "GET", "/mint/parameters", nil)
 	require.Equal(t, http.StatusOK, res.StatusCode, body)
 
 	var params mint.Params
 	require.NoError(t, cdc.UnmarshalJSON(extractResultFromResponse(t, []byte(body)), &params))
-
-	res, body = Request(t, port, "GET", "/minting/inflation", nil)
-	require.Equal(t, http.StatusOK, res.StatusCode, body)
-
-	var inflation sdk.Dec
-	require.NoError(t, cdc.UnmarshalJSON(extractResultFromResponse(t, []byte(body)), &inflation))
-
-	res, body = Request(t, port, "GET", "/minting/annual-provisions", nil)
-	require.Equal(t, http.StatusOK, res.StatusCode, body)
-
-	var annualProvisions sdk.Dec
-	require.NoError(t, cdc.UnmarshalJSON(extractResultFromResponse(t, []byte(body)), &annualProvisions))
 }
 
 func TestAccountBalanceQuery(t *testing.T) {

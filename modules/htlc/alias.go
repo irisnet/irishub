@@ -1,51 +1,45 @@
 package htlc
 
 import (
-	"github.com/irisnet/irishub/app/v2/htlc/internal/keeper"
-	"github.com/irisnet/irishub/app/v2/htlc/internal/types"
+	"github.com/irisnet/irishub/modules/htlc/internal/keeper"
+	"github.com/irisnet/irishub/modules/htlc/internal/types"
 )
 
 // exported types
+const (
+	ModuleName   = types.ModuleName
+	StoreKey     = types.StoreKey
+	RouterKey    = types.ModuleName
+	QuerierRoute = types.QuerierRoute
+)
+
 type (
+	Keeper        = keeper.Keeper
+	HTLC          = types.HTLC
+	HTLCSecret    = types.HTLCSecret
+	HTLCHashLock  = types.HTLCHashLock
+	GenesisState  = types.GenesisState
 	MsgCreateHTLC = types.MsgCreateHTLC
 	MsgClaimHTLC  = types.MsgClaimHTLC
 	MsgRefundHTLC = types.MsgRefundHTLC
-
-	HTLC = types.HTLC
-
-	Params       = types.Params
-	GenesisState = types.GenesisState
-
-	QueryHTLCParams = types.QueryHTLCParams
-
-	Keeper = keeper.Keeper
 )
 
 // exported variables and functions
 var (
-	DefaultCodespace     = types.DefaultCodespace
-	DefaultParamSpace    = types.DefaultParamSpace
-	DefaultParams        = types.DefaultParams
-	DefaultParamsForTest = types.DefaultParamsForTest
-	ValidateParams       = types.ValidateParams
-	RegisterCodec        = types.RegisterCodec
+	// functions aliases
+	NewKeeper       = keeper.NewKeeper
+	NewQuerier      = keeper.NewQuerier
+	RegisterCodec   = types.RegisterCodec
+	NewHTLC         = types.NewHTLC
+	ValidateGenesis = types.ValidateGenesis
+	GetHashLock     = types.GetHashLock
 
-	NewMsgCreateHTLC = types.NewMsgCreateHTLC
-	NewMsgClaimHTLC  = types.NewMsgClaimHTLC
-	NewMsgRefundHTLC = types.NewMsgRefundHTLC
-	NewHTLC          = types.NewHTLC
-	GetHashLock      = keeper.GetHashLock
+	// const aliases
+	DefaultCodespace = types.DefaultCodespace
+	OPEN             = types.OPEN
+	EXPIRED          = types.EXPIRED
+	REFUNDED         = types.REFUNDED
 
-	SecretLength = types.SecretLength
-
-	OPEN     = types.OPEN
-	EXPIRED  = types.EXPIRED
-	REFUNDED = types.REFUNDED
-
-	QueryHTLC = types.QueryHTLC
-
-	TagHashLock = types.TagHashLock
-
-	NewKeeper  = keeper.NewKeeper
-	NewQuerier = keeper.NewQuerier
+	// variable aliases
+	ModuleCdc = types.ModuleCdc
 )
