@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
 	"github.com/irisnet/modules/incubator/nft/internal/types"
 
 	abci "github.com/tendermint/tendermint/abci/types"

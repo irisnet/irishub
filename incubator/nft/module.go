@@ -16,6 +16,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	sim "github.com/cosmos/cosmos-sdk/x/simulation"
+
 	"github.com/irisnet/modules/incubator/nft/client/cli"
 	"github.com/irisnet/modules/incubator/nft/client/rest"
 	"github.com/irisnet/modules/incubator/nft/simulation"

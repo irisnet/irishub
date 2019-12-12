@@ -12,6 +12,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/version"
+
 	"github.com/irisnet/modules/incubator/nft/exported"
 	"github.com/irisnet/modules/incubator/nft/internal/types"
 )

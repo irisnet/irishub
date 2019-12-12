@@ -4,6 +4,7 @@ import (
 	"math/rand"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
 	"github.com/irisnet/modules/incubator/nft/internal/keeper"
 )
 

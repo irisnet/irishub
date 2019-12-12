@@ -8,6 +8,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/rest"
 	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
+
 	"github.com/irisnet/modules/incubator/nft/internal/types"
 
 	"github.com/gorilla/mux"

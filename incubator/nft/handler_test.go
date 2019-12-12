@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
 	"github.com/irisnet/modules/incubator/nft"
 	"github.com/irisnet/modules/incubator/nft/internal/types"
 )

@@ -4,6 +4,7 @@ package types
 
 import (
 	"github.com/cosmos/cosmos-sdk/codec"
+
 	"github.com/irisnet/modules/incubator/nft/exported"
 )
 
