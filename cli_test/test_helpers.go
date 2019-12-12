@@ -10,14 +10,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/cosmos/cosmos-sdk/client"
-
 	"github.com/stretchr/testify/require"
 
 	tmtypes "github.com/tendermint/tendermint/types"
 
-	"github.com/irisnet/irishub/app"
-
+	"github.com/cosmos/cosmos-sdk/client"
 	clientkeys "github.com/cosmos/cosmos-sdk/client/keys"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/crypto/keys"
@@ -27,9 +24,14 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/distribution"
+	"github.com/cosmos/cosmos-sdk/x/genutil"
 	"github.com/cosmos/cosmos-sdk/x/gov"
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/cosmos/cosmos-sdk/x/staking"
+
+	"github.com/irisnet/irishub/app"
+	iconfig "github.com/irisnet/irishub/config"
+	"github.com/irisnet/irishub/modules/guardian"
 )
 
 const (
@@ -45,11 +47,13 @@ const (
 )
 
 var (
+	mintPerBlock, _ = sdk.NewIntFromString("12675235125611580094")
+
 	totalCoins = sdk.NewCoins(
 		sdk.NewCoin(fee2Denom, sdk.TokensFromConsensusPower(2000000)),
 		sdk.NewCoin(feeDenom, sdk.TokensFromConsensusPower(2000000)),
 		sdk.NewCoin(fooDenom, sdk.TokensFromConsensusPower(2000)),
-		sdk.NewCoin(denom, sdk.TokensFromConsensusPower(300).Add(sdk.NewInt(12))), // add coins from inflation
+		sdk.NewCoin(denom, sdk.TokensFromConsensusPower(300).Add(mintPerBlock)), // add coins from inflation
 	)
 
 	startCoins = sdk.NewCoins(
@@ -63,6 +67,16 @@ var (
 		sdk.NewCoin(feeDenom, sdk.TokensFromConsensusPower(500000)),
 	)
 )
+
+func init() {
+	// set Bech32 config
+	config := sdk.GetConfig()
+	irisConfig := iconfig.GetConfig()
+	config.SetBech32PrefixForAccount(irisConfig.GetBech32AccountAddrPrefix(), irisConfig.GetBech32AccountPubPrefix())
+	config.SetBech32PrefixForValidator(irisConfig.GetBech32ValidatorAddrPrefix(), irisConfig.GetBech32ValidatorPubPrefix())
+	config.SetBech32PrefixForConsensusNode(irisConfig.GetBech32ConsensusAddrPrefix(), irisConfig.GetBech32ConsensusPubPrefix())
+	config.Seal()
+}
 
 //___________________________________________________________________________________
 // Fixtures
@@ -170,8 +184,25 @@ func InitFixtures(t *testing.T) (f *Fixtures) {
 
 	f.GenTx(keyFoo)
 	f.CollectGenTxs()
-
+	f.DoPreProcess(AddGuardianAddr)
 	return
+}
+
+type PreProcess func(cdc *codec.Codec, genDoc *tmtypes.GenesisDoc)
+
+func (f *Fixtures) DoPreProcess(ps ...PreProcess) {
+	if len(ps) == 0 {
+		return
+	}
+	genDoc, err := tmtypes.GenesisDocFromFile(f.GenesisFile())
+	require.NoError(f.T, err)
+
+	cdc := app.MakeCodec()
+	for _, p := range ps {
+		p(cdc, genDoc)
+	}
+	err = genutil.ExportGenesisFile(genDoc, f.GenesisFile())
+	require.NoError(f.T, err)
 }
 
 // Cleanup is meant to be run at the end of a test to clean up an remaining test state
@@ -768,4 +799,31 @@ func unmarshalStdTx(t *testing.T, s string) (stdTx auth.StdTx) {
 	cdc := app.MakeCodec()
 	require.Nil(t, cdc.UnmarshalJSON([]byte(s), &stdTx))
 	return
+}
+
+// AddGuardianAddr modify default configuration of guardian in genesis
+func AddGuardianAddr(cdc *codec.Codec, genDoc *tmtypes.GenesisDoc) {
+	var appState simapp.GenesisState
+	cdc.MustUnmarshalJSON(genDoc.AppState, &appState)
+
+	authDataBz := appState[auth.ModuleName]
+	var authGenState auth.GenesisState
+	cdc.MustUnmarshalJSON(authDataBz, &authGenState)
+
+	guardianDataBz := appState[guardian.ModuleName]
+	var guardianGenState guardian.GenesisState
+	cdc.MustUnmarshalJSON(guardianDataBz, &guardianGenState)
+
+	var guardianAddr = authGenState.Accounts[0].GetAddress()
+	for i, _ := range guardianGenState.Profilers {
+		guardianGenState.Profilers[i].Address = guardianAddr
+		guardianGenState.Profilers[i].AddedBy = guardianAddr
+	}
+	for i, _ := range guardianGenState.Trustees {
+		guardianGenState.Trustees[i].Address = guardianAddr
+		guardianGenState.Trustees[i].AddedBy = guardianAddr
+	}
+	appState[guardian.ModuleName] = cdc.MustMarshalJSON(guardianGenState)
+
+	genDoc.AppState = cdc.MustMarshalJSON(appState)
 }

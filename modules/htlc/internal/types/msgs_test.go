@@ -4,20 +4,32 @@ import (
 	"fmt"
 	"testing"
 
-	sdk "github.com/irisnet/irishub/types"
 	"github.com/stretchr/testify/require"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	"github.com/irisnet/irishub/config"
 )
 
 var (
-	senderAddr, _        = sdk.AccAddressFromBech32("faa128nh833v43sggcj65nk7khjka9dwngpl6j29hj")
-	toAddr, _            = sdk.AccAddressFromBech32("faa1mrehjkgeg75nz2gk7lr7dnxvvtg4497jxss8hq")
+	senderAddr           sdk.AccAddress
+	toAddr               sdk.AccAddress
 	receiverOnOtherChain = "receiverOnOtherChain"
-	amount               = sdk.NewCoins(sdk.NewCoin(sdk.IrisAtto, sdk.NewInt(10)))
-	secret               = []byte("___abcdefghijklmnopqrstuvwxyz___")
+	amount               = sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(10)))
+	secret               = HTLCSecret("___abcdefghijklmnopqrstuvwxyz___")
 	timestamp            = uint64(1580000000)
-	hashLock             = sdk.SHA256(append(secret, sdk.Uint64ToBigEndian(timestamp)...))
+	hashLock             = HTLCHashLock(SHA256(append(secret, sdk.Uint64ToBigEndian(timestamp)...)))
 	timeLock             = uint64(50)
 )
+
+func init() {
+	sdk.GetConfig().SetBech32PrefixForAccount(config.GetConfig().GetBech32AccountAddrPrefix(), config.GetConfig().GetBech32AccountPubPrefix())
+	sdk.GetConfig().SetBech32PrefixForValidator(config.GetConfig().GetBech32ValidatorAddrPrefix(), config.GetConfig().GetBech32ValidatorPubPrefix())
+	sdk.GetConfig().SetBech32PrefixForConsensusNode(config.GetConfig().GetBech32ConsensusAddrPrefix(), config.GetConfig().GetBech32ConsensusPubPrefix())
+
+	senderAddr, _ = sdk.AccAddressFromBech32("faa128nh833v43sggcj65nk7khjka9dwngpl6j29hj")
+	toAddr, _ = sdk.AccAddressFromBech32("faa1mrehjkgeg75nz2gk7lr7dnxvvtg4497jxss8hq")
+}
 
 func TestNewMsgCreateHTLC(t *testing.T) {
 	msg := NewMsgCreateHTLC(senderAddr, toAddr, receiverOnOtherChain, amount, hashLock, timestamp, timeLock)
@@ -41,8 +53,8 @@ func TestMsgCreateHTLCValidation(t *testing.T) {
 	emptyAddr := sdk.AccAddress{}
 	errReceiverOnOtherChain := string(make([]byte, 129))
 	errAmount := sdk.Coins{}
-	errHashLock1 := []byte("xx")
-	errHashLock2 := []byte("00")
+	errHashLock1 := HTLCHashLock("xx")
+	errHashLock2 := HTLCHashLock("00")
 	errTimeLock1 := uint64(49)
 	errTimeLock2 := uint64(25481)
 
@@ -52,7 +64,7 @@ func TestMsgCreateHTLCValidation(t *testing.T) {
 		to                   sdk.AccAddress
 		receiverOnOtherChain string
 		amount               sdk.Coins
-		hashLock             []byte
+		hashLock             HTLCHashLock
 		timestamp            uint64
 		timeLock             uint64
 	}{
@@ -88,7 +100,7 @@ func TestMsgCreateHTLCValidation(t *testing.T) {
 func TestMsgCreateHTLCGetSignBytes(t *testing.T) {
 	msg := NewMsgCreateHTLC(senderAddr, toAddr, receiverOnOtherChain, amount, hashLock, timestamp, timeLock)
 	res := msg.GetSignBytes()
-	expected := `{"type":"irishub/htlc/MsgCreateHTLC","value":{"amount":[{"amount":"10","denom":"iris-atto"}],"hash_lock":"6NQTPhqCx04nRueMGThXBup5WKDKRBoI2s+hDEjOJWE=","receiver_on_other_chain":"receiverOnOtherChain","sender":"faa128nh833v43sggcj65nk7khjka9dwngpl6j29hj","time_lock":"50","timestamp":"1580000000","to":"faa1mrehjkgeg75nz2gk7lr7dnxvvtg4497jxss8hq"}}`
+	expected := `{"type":"irishub/htlc/MsgCreateHTLC","value":{"amount":[{"amount":"10","denom":"stake"}],"hash_lock":"e8d4133e1a82c74e2746e78c19385706ea7958a0ca441a08dacfa10c48ce2561","receiver_on_other_chain":"receiverOnOtherChain","sender":"faa128nh833v43sggcj65nk7khjka9dwngpl6j29hj","time_lock":"50","timestamp":"1580000000","to":"faa1mrehjkgeg75nz2gk7lr7dnxvvtg4497jxss8hq"}}`
 	require.Equal(t, expected, string(res))
 }
 
@@ -113,16 +125,16 @@ func TestMsgClaimHTLCRoute(t *testing.T) {
 
 func TestMsgClaimHTLCValidation(t *testing.T) {
 	emptyAddr := sdk.AccAddress{}
-	errSecret1 := []byte("xx")
-	errSecret2 := []byte("00")
-	errHashLock1 := []byte("xx")
-	errHashLock2 := []byte("00")
+	errSecret1 := HTLCSecret("xx")
+	errSecret2 := HTLCSecret("00")
+	errHashLock1 := HTLCHashLock("xx")
+	errHashLock2 := HTLCHashLock("00")
 
 	testData := []struct {
 		expectPass bool
 		sender     sdk.AccAddress
-		secret     []byte
-		hashLock   []byte
+		secret     HTLCSecret
+		hashLock   HTLCHashLock
 	}{
 		// correct
 		{true, senderAddr, secret, hashLock},
@@ -151,7 +163,7 @@ func TestMsgClaimHTLCValidation(t *testing.T) {
 func TestMsgClaimHTLCGetSignBytes(t *testing.T) {
 	msg := NewMsgClaimHTLC(senderAddr, hashLock, secret)
 	res := msg.GetSignBytes()
-	expected := `{"type":"irishub/htlc/MsgClaimHTLC","value":{"hash_lock":"6NQTPhqCx04nRueMGThXBup5WKDKRBoI2s+hDEjOJWE=","secret":"X19fYWJjZGVmZ2hpamtsbW5vcHFyc3R1dnd4eXpfX18=","sender":"faa128nh833v43sggcj65nk7khjka9dwngpl6j29hj"}}`
+	expected := `{"type":"irishub/htlc/MsgClaimHTLC","value":{"hash_lock":"e8d4133e1a82c74e2746e78c19385706ea7958a0ca441a08dacfa10c48ce2561","secret":"5f5f5f6162636465666768696a6b6c6d6e6f707172737475767778797a5f5f5f","sender":"faa128nh833v43sggcj65nk7khjka9dwngpl6j29hj"}}`
 	require.Equal(t, expected, string(res))
 }
 
@@ -175,13 +187,13 @@ func TestMsgRefundHTLCRoute(t *testing.T) {
 
 func TestMsgRefundHTLCValidation(t *testing.T) {
 	emptyAddr := sdk.AccAddress{}
-	errHashLock1 := []byte("xx")
-	errHashLock2 := []byte("00")
+	errHashLock1 := HTLCHashLock("xx")
+	errHashLock2 := HTLCHashLock("00")
 
 	testData := []struct {
 		expectPass bool
 		sender     sdk.AccAddress
-		hashLock   []byte
+		hashLock   HTLCHashLock
 	}{
 		// correct
 		{true, senderAddr, hashLock},
@@ -207,7 +219,7 @@ func TestMsgRefundHTLCValidation(t *testing.T) {
 func TestMsgRefundHTLCGetSignBytes(t *testing.T) {
 	msg := NewMsgRefundHTLC(senderAddr, hashLock)
 	res := msg.GetSignBytes()
-	expected := `{"type":"irishub/htlc/MsgRefundHTLC","value":{"hash_lock":"6NQTPhqCx04nRueMGThXBup5WKDKRBoI2s+hDEjOJWE=","sender":"faa128nh833v43sggcj65nk7khjka9dwngpl6j29hj"}}`
+	expected := `{"type":"irishub/htlc/MsgRefundHTLC","value":{"hash_lock":"e8d4133e1a82c74e2746e78c19385706ea7958a0ca441a08dacfa10c48ce2561","sender":"faa128nh833v43sggcj65nk7khjka9dwngpl6j29hj"}}`
 	require.Equal(t, expected, string(res))
 }
 

@@ -1,22 +1,16 @@
 package asset
 
 import (
-	sdk "github.com/irisnet/irishub/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-// InitGenesis - store genesis parameters
+// InitGenesis - store genesis parameters and tokens
 func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
 	if err := ValidateGenesis(data); err != nil {
 		panic(err.Error())
 	}
 
 	k.SetParamSet(ctx, data.Params)
-
-	// init gateways
-	for _, gateway := range data.Gateways {
-		k.SetGateway(ctx, gateway)
-		k.SetOwnerGateway(ctx, gateway.Owner, gateway.Moniker)
-	}
 
 	//init tokens
 	for _, token := range data.Tokens {
@@ -27,15 +21,8 @@ func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
 	}
 }
 
-// ExportGenesis - output genesis parameters
+// ExportGenesis - output genesis parameters and tokens
 func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
-	// export created gateways
-	var gateways []Gateway
-	k.IterateGateways(ctx, func(gw Gateway) (stop bool) {
-		gateways = append(gateways, gw)
-		return false
-	})
-
 	// export created token
 	var tokens Tokens
 	k.IterateTokens(ctx, func(token FungibleToken) (stop bool) {
@@ -43,56 +30,22 @@ func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 		return false
 	})
 	return GenesisState{
-		Params:   k.GetParamSet(ctx),
-		Tokens:   tokens,
-		Gateways: gateways,
+		Params: k.GetParamSet(ctx),
+		Tokens: tokens,
 	}
 }
 
-// get raw genesis raw message for testing
+// DefaultGenesisState return the default asset genesis state
 func DefaultGenesisState() GenesisState {
-	return GenesisState{
-		Params:   DefaultParams(),
-		Tokens:   []FungibleToken{},
-		Gateways: []Gateway{},
-	}
-}
-
-// get raw genesis raw message for testing
-func DefaultGenesisStateForTest() GenesisState {
-	return GenesisState{
-		Params:   DefaultParamsForTest(),
-		Tokens:   []FungibleToken{},
-		Gateways: []Gateway{},
-	}
+	return NewGenesisState(DefaultParams(), []FungibleToken{})
 }
 
 // ValidateGenesis validates the provided asset genesis state to ensure the
 // expected invariants holds.
 func ValidateGenesis(data GenesisState) error {
-	err := ValidateParams(data.Params)
-	if err != nil {
-		return err
-	}
-
-	// validate gateways
-	if err := validateGateways(data.Gateways); err != nil {
-		return err
-	}
 	// validate tokens
 	if err := data.Tokens.Validate(); err != nil {
 		return err
-	}
-
-	return nil
-}
-
-// ValidateGateways validates the provided gateways
-func validateGateways(gateways []Gateway) error {
-	for _, gateway := range gateways {
-		if err := gateway.Validate(); err != nil {
-			return err
-		}
 	}
 
 	return nil
