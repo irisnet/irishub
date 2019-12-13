@@ -51,8 +51,8 @@ func (suite *KeeperTestSuite) SetupTest() {
 	suite.ctx = app.BaseApp.NewContext(isCheckTx, abci.Header{})
 	suite.app = app
 
-	app.bankKeeper.SetCoins(suite.ctx, testProvider, testProviderCoins)
-	app.bankKeeper.SetCoins(suite.ctx, testConsumer, testConsumerCoins)
+	app.BankKeeper.SetCoins(suite.ctx, testProvider, testProviderCoins)
+	app.BankKeeper.SetCoins(suite.ctx, testConsumer, testConsumerCoins)
 }
 
 func (suite *KeeperTestSuite) setServiceDefinition() {
@@ -61,8 +61,8 @@ func (suite *KeeperTestSuite) setServiceDefinition() {
 		testServiceTags, testAuthor, testAuthorDesc, testIDLContent,
 	)
 
-	suite.app.serviceKeeper.SetServiceDefinition(suite.ctx, svc)
-	suite.app.serviceKeeper.AddMethods(suite.ctx, svc)
+	suite.app.ServiceKeeper.SetServiceDefinition(suite.ctx, svc)
+	suite.app.ServiceKeeper.AddMethods(suite.ctx, svc)
 }
 
 func (suite *KeeperTestSuite) setServiceBinding() {
@@ -71,16 +71,16 @@ func (suite *KeeperTestSuite) setServiceBinding() {
 		testBindingType, testDeposit, testPrices, testLevel, true,
 	)
 
-	suite.app.serviceKeeper.SetServiceBinding(suite.ctx, svcBinding)
+	suite.app.ServiceKeeper.SetServiceBinding(suite.ctx, svcBinding)
 }
 func (suite *KeeperTestSuite) TestServiceDefinition() {
-	_, err := suite.app.serviceKeeper.AddServiceDefinition(
+	err := suite.app.ServiceKeeper.AddServiceDefinition(
 		suite.ctx, testServiceName, testChainID, testServiceDesc,
 		testServiceTags, testAuthor, testAuthorDesc, testIDLContent,
 	)
 	suite.NoError(err)
 
-	svc, found := suite.app.serviceKeeper.GetServiceDefinition(suite.ctx, testChainID, testServiceName)
+	svc, found := suite.app.ServiceKeeper.GetServiceDefinition(suite.ctx, testChainID, testServiceName)
 	suite.True(found)
 
 	expectedSvc := types.NewSvcDef(
@@ -93,7 +93,7 @@ func (suite *KeeperTestSuite) TestServiceDefinition() {
 func (suite *KeeperTestSuite) TestServiceBinding() {
 	suite.setServiceDefinition()
 
-	err := suite.app.serviceKeeper.AddServiceBinding(
+	err := suite.app.ServiceKeeper.AddServiceBinding(
 		suite.ctx, testChainID, testServiceName, testChainID, testProvider,
 		testBindingType, testDeposit, testPrices, testLevel,
 	)
@@ -102,11 +102,11 @@ func (suite *KeeperTestSuite) TestServiceBinding() {
 	providerCoins1 := suite.app.BankKeeper.GetCoins(suite.ctx, testProvider)
 	suite.Equal(testProviderCoins.Sub(testDeposit), providerCoins1)
 
-	depositMaccAddr := suite.app.supplyKeeper.GetModuleAddress(suite.ctx, types.DepositAccName)
+	depositMaccAddr := suite.app.SupplyKeeper.GetModuleAddress(types.DepositAccName)
 	depositMaccCoins1 := suite.app.BankKeeper.GetCoins(suite.ctx, depositMaccAddr)
 	suite.Equal(testDeposit, depositMaccCoins1)
 
-	binding, found := suite.app.serviceKeeper.GetServiceBinding(suite.ctx, testChainID, testServiceName, testChainID, testProvider)
+	binding, found := suite.app.ServiceKeeper.GetServiceBinding(suite.ctx, testChainID, testServiceName, testChainID, testProvider)
 	suite.True(found)
 
 	expectedBinding := types.NewSvcBinding(
@@ -115,7 +115,7 @@ func (suite *KeeperTestSuite) TestServiceBinding() {
 	)
 	suite.Equal(expectedBinding, binding)
 
-	_, err = suite.app.serviceKeeper.UpdateServiceBinding(
+	_, err = suite.app.ServiceKeeper.UpdateServiceBinding(
 		suite.ctx, testChainID, testServiceName, testChainID, testProvider,
 		testBindingType, testDeposit, testPrices, testLevel,
 	)
@@ -127,7 +127,7 @@ func (suite *KeeperTestSuite) TestServiceBinding() {
 	depositMaccCoins2 := suite.app.BankKeeper.GetCoins(suite.ctx, depositMaccAddr)
 	suite.Equal(depositMaccCoins1.Add(testDeposit), depositMaccCoins2)
 
-	binding, found = suite.app.serviceKeeper.GetServiceBinding(suite.ctx, testChainID, testServiceName, testChainID, testProvider)
+	binding, found = suite.app.ServiceKeeper.GetServiceBinding(suite.ctx, testChainID, testServiceName, testChainID, testProvider)
 	suite.True(found)
 	suite.Equal(testDeposit.Add(testDeposit), binding.Deposit)
 }
@@ -141,7 +141,7 @@ func (suite *KeeperTestSuite) TestServiceRequest() {
 		testProvider, testMethodID, testInput, testServiceFees, false,
 	)
 
-	_, err := suite.app.serviceKeeper.AddRequest(
+	_, err := suite.app.ServiceKeeper.AddRequest(
 		suite.ctx, testChainID, testServiceName, testChainID, testChainID,
 		testConsumer, testProvider, testMethodID, testInput, testServiceFees, false,
 	)
@@ -150,11 +150,11 @@ func (suite *KeeperTestSuite) TestServiceRequest() {
 	consumerCoins := suite.app.BankKeeper.GetCoins(suite.ctx, testConsumer)
 	suite.Equal(consumerCoins.Sub(testServiceFees), consumerCoins)
 
-	requestMaccAddr := suite.app.supplyKeeper.GetModuleAddress(suite.ctx, types.RequestAccName)
+	requestMaccAddr := suite.app.SupplyKeeper.GetModuleAddress(types.RequestAccName)
 	requestMaccCoins := suite.app.BankKeeper.GetCoins(suite.ctx, requestMaccAddr)
 	suite.Equal(testServiceFees, requestMaccCoins)
 
-	activeReq, found := suite.app.serviceKeeper.GetActiveRequest(suite.ctx, svcReq.ExpirationHeight, svcReq.RequestHeight, svcReq.RequestIntraTxCounter)
+	activeReq, found := suite.app.ServiceKeeper.GetActiveRequest(suite.ctx, svcReq.ExpirationHeight, svcReq.RequestHeight, svcReq.RequestIntraTxCounter)
 	suite.True(found)
 	suite.Equal(svcReq.RequestID(), activeReq.RequestID())
 }
