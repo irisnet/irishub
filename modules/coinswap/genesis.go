@@ -2,19 +2,17 @@ package coinswap
 
 import (
 	"fmt"
-	"github.com/irisnet/irishub/app/v2/coinswap/internal/types"
-	sdk "github.com/irisnet/irishub/types"
-)
 
-// TODO: ...
+	sdk "github.com/cosmos/cosmos-sdk/types"
+)
 
 // GenesisState - coinswap genesis state
 type GenesisState struct {
-	Params types.Params `json:"params"`
+	Params Params `json:"params"`
 }
 
 // NewGenesisState is the constructor function for GenesisState
-func NewGenesisState(params types.Params) GenesisState {
+func NewGenesisState(params Params) GenesisState {
 	return GenesisState{
 		Params: params,
 	}
@@ -22,12 +20,11 @@ func NewGenesisState(params types.Params) GenesisState {
 
 // DefaultGenesisState creates a default GenesisState object
 func DefaultGenesisState() GenesisState {
-	return NewGenesisState(types.DefaultParams())
+	return NewGenesisState(DefaultParams())
 }
 
 // InitGenesis new coinswap genesis
 func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
-	//
 	if err := ValidateGenesis(data); err != nil {
 		panic(fmt.Errorf("panic for ValidateGenesis,%v", err))
 	}
@@ -41,7 +38,7 @@ func ExportGenesis(ctx sdk.Context, keeper Keeper) GenesisState {
 
 // ValidateGenesis - placeholder function
 func ValidateGenesis(data GenesisState) error {
-	if err := types.ValidateParams(data.Params); err != nil {
+	if err := ValidateParams(data.Params); err != nil {
 		return err
 	}
 	return nil
