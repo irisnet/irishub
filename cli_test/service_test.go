@@ -57,39 +57,40 @@ func TestIrisCLIService(t *testing.T) {
 	consumer := barAddr.String()
 	provider := fooAddr.String()
 
+	// TODO
 	guardianAddr := ""
 	taxWithdrawAddr := ""
-	taxWithdrawAmt := int64(100)
+	taxWithdrawAmt := fmt.Sprintf("0.5%s", service.ServiceDenom)
 
 	// define service
 
 	ioutil.WriteFile(serviceFileName, []byte(serviceIDLContent), 0644)
 	defer tests.ExecuteT(t, fmt.Sprintf("rm -f %s", serviceFileName), "")
 
-	success, _, _ := f.TxServiceDefine(serviceName, serviceDesc, serviceTags, serviceAuthorDesc, serviceFileName, provider, "-y")
+	success, _, _ := f.TxServiceDefine(serviceName, serviceDesc, serviceTags, serviceAuthorDesc, serviceIDLContent, serviceFileName, provider, "-y")
 	require.True(t, success)
 
 	tests.WaitForNextNBlocksTM(2, f.Port)
 
-	svcDef := f.QueryServiceDefinition(serviceName, chainID)
-	require.Equal(t, serviceName, svcDef.Name)
-	require.Equal(t, chainID, svcDef.ChainId)
+	svcDefOutput := f.QueryServiceDefinition(serviceName, chainID)
+	require.Equal(t, serviceName, svcDefOutput.Definition.Name)
+	require.Equal(t, chainID, svcDefOutput.Definition.ChainId)
 
 	// bind service
 
-	success, _, _ = f.TxServiceBind(serviceName, chainID, bindingType, serviceDeposit, servicePrices, avgRspTime, usableTime, "-y")
+	success, _, _ = f.TxServiceBind(chainID, serviceName, bindingType, serviceDeposit, servicePrices, avgRspTime, usableTime, "-y")
 	require.True(t, success)
 
 	tests.WaitForNextNBlocksTM(2, f.Port)
 
-	binding := f.QueryServiceBinding(serviceName, chainID, chainID, provider)
+	binding := f.QueryServiceBinding(chainID, serviceName, chainID, provider)
 	require.Equal(t, serviceName, binding.DefName)
 	require.Equal(t, chainID, binding.DefChainID)
 	require.Equal(t, chainID, binding.BindChainID)
 	require.Equal(t, provider, binding.Provider)
 	require.Equal(t, serviceDeposit, binding.Deposit)
 
-	bindings := f.QueryServiceBindings(serviceName, chainID)
+	bindings := f.QueryServiceBindings(chainID, serviceName)
 	require.Equal(t, 1, len(bindings))
 
 	// TODO: provider and module account balance check
@@ -97,35 +98,34 @@ func TestIrisCLIService(t *testing.T) {
 
 	// update service binding
 
-	success, _, _ = f.TxServiceBindingUpdate(serviceName, chainID, bindingType, serviceDeposit, servicePrices, avgRspTime, usableTime, provider, "-y")
+	success, _, _ = f.TxServiceUpdateBinding(chainID, serviceName, bindingType, serviceDeposit, servicePrices, avgRspTime, usableTime, provider, "-y")
 	require.True(t, success)
 
 	tests.WaitForNextNBlocksTM(2, f.Port)
 
-	binding = f.QueryServiceBinding(serviceName, chainID, chainID, provider)
-	require.Equal(t, serviceDeposit, binding.Deposit.String())
+	binding = f.QueryServiceBinding(chainID, serviceName, chainID, provider)
+	require.Equal(t, serviceDeposit, binding.Deposit)
 
 	// disable service binding
-	success, _, _ = f.TxServiceBindingDisable(serviceName, chainID, "-y")
+	success, _, _ = f.TxServiceDisable(chainID, serviceName, "-y")
 	require.True(t, success)
 
 	tests.WaitForNextNBlocksTM(2, f.Port)
 
-	binding = f.QueryServiceBinding(serviceName, chainID, chainID, provider)
+	binding = f.QueryServiceBinding(chainID, serviceName, chainID, provider)
 	require.Equal(t, false, binding.Available)
 
 	// refund deposit
-	success, _, _ = f.TxServiceBindingRefund(serviceName, chainID, provider, "-y")
+	success, _, _ = f.TxServiceRefundDeposit(chainID, serviceName, provider, "-y")
 	require.True(t, success)
 
 	tests.WaitForNextNBlocksTM(2, f.Port)
 
-	binding = f.QueryServiceBinding(serviceName, chainID, chainID, provider)
-	require.Equal(t, serviceName, binding.Deposit.String())
-	require.Equal(t, false, binding.Available)
+	binding = f.QueryServiceBinding(chainID, serviceName, chainID, provider)
+	require.Equal(t, "", binding.Deposit)
 
 	// service call
-	success, _, _ = f.TxServiceCall(serviceName, chainID, chainID, provider, reqMethodID, reqInput, reqServiceFees, consumer, "-y")
+	success, _, _ = f.TxServiceCall(chainID, serviceName, chainID, provider, reqMethodID, reqInput, reqServiceFees, consumer, "-y")
 	require.True(t, success)
 
 	tests.WaitForNextNBlocksTM(2, f.Port)
@@ -133,7 +133,7 @@ func TestIrisCLIService(t *testing.T) {
 	// TODO
 	reqID := ""
 
-	requests := f.QueryServiceRequests(serviceName, chainID, chainID, consumer)
+	requests := f.QueryServiceRequests(chainID, serviceName, chainID, consumer)
 	require.Equal(t, 1, len(requests))
 	require.Equal(t, reqID, requests[0].RequestID())
 	require.Equal(t, consumer, requests[0].Consumer)
@@ -155,7 +155,7 @@ func TestIrisCLIService(t *testing.T) {
 	require.Equal(t, "", fees.ReturnedFee)
 
 	// refund fees
-	success, _, _ = f.TxServiceFeesRefund(consumer, "-y")
+	success, _, _ = f.TxServiceRefundFees(consumer, "-y")
 	require.True(t, success)
 
 	tests.WaitForNextNBlocksTM(2, f.Port)
@@ -165,7 +165,7 @@ func TestIrisCLIService(t *testing.T) {
 	require.Equal(t, "", fees.ReturnedFee)
 
 	// withdraw fees
-	success, _, _ = f.TxServiceFeesWithdraw(provider, "-y")
+	success, _, _ = f.TxServiceWithdrawFees(provider, "-y")
 	require.True(t, success)
 
 	tests.WaitForNextNBlocksTM(2, f.Port)
@@ -175,45 +175,45 @@ func TestIrisCLIService(t *testing.T) {
 	require.Equal(t, "", fees.IncomingFee)
 
 	// withdraw tax
-	success, _, _ = f.TxServiceTaxWithdraw(taxWithdrawAmt, taxWithdrawAddr, guardianAddr, "-y")
+	success, _, _ = f.TxServiceWithdrawTax(taxWithdrawAddr, taxWithdrawAmt, guardianAddr, "-y")
 	require.True(t, success)
 
 	tests.WaitForNextNBlocksTM(2, f.Port)
 }
 
-// TxServiceDefinition is iriscli tx service define
-func (f *Fixtures) TxServiceDefine(serviceName, serviceDesc, tags, serviceAuthorDesc, serviceFileName, from string, flags ...string) (bool, string, string) {
-	cmd := fmt.Sprintf("%s tx service define --service-name %s --service-description %s --tags %s --author-description %s --file %s --from=%s %v", f.IriscliBinary, serviceName, serviceDesc, tags, serviceAuthorDesc, serviceFileName, from, f.Flags())
+// TxServiceDefine is iriscli tx service define
+func (f *Fixtures) TxServiceDefine(serviceName, serviceDesc, tags, serviceAuthorDesc, serviceIDLContent, serviceFileName, from string, flags ...string) (bool, string, string) {
+	cmd := fmt.Sprintf("%s tx service define --service-name %s --service-description %s --tags %s --author-description %s --idl-content %s --file %s --from=%s %v", f.IriscliBinary, serviceName, serviceDesc, tags, serviceAuthorDesc, serviceIDLContent, serviceFileName, from, f.Flags())
 	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), client.DefaultKeyPass)
 }
 
-// TxServiceDefinition is iriscli tx service bind
+// TxServiceBind is iriscli tx service bind
 func (f *Fixtures) TxServiceBind(serviceName, defChainID, bindType, deposit, prices string, avgRspTime int64, usableTime int64, from string, flags ...string) (bool, string, string) {
-	cmd := fmt.Sprintf("%s tx service bind --service-name %s --def-chain-id %s --bind-type %s --deposit %s --prices %s --avg-rsp-time %d --usable-time %d --from=%s %v", f.IriscliBinary, serviceName, defChainID, bindType, deposit, prices, avgRspTime, usableTime, from, f.Flags())
+	cmd := fmt.Sprintf("%s tx service bind --def-chain-id %s --service-name %s --bind-type %s --deposit %s --prices %s --avg-rsp-time %d --usable-time %d --from=%s %v", f.IriscliBinary, defChainID, serviceName, bindType, deposit, prices, avgRspTime, usableTime, from, f.Flags())
 	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), client.DefaultKeyPass)
 }
 
-// TxServiceBindingRefund is iriscli tx service binding refund
-func (f *Fixtures) TxServiceBindingRefund(serviceName, defChainID, from string, flags ...string) (bool, string, string) {
-	cmd := fmt.Sprintf("%s tx service binding refund --service-name %s --def-chain-id %s --from=%s %v", f.IriscliBinary, serviceName, defChainID, from, f.Flags())
+// TxServiceRefundDeposit is iriscli tx service refund-deposit
+func (f *Fixtures) TxServiceRefundDeposit(defChainID, serviceName, from string, flags ...string) (bool, string, string) {
+	cmd := fmt.Sprintf("%s tx service refund-deposit --def-chain-id %s --service-name %s --from=%s %v", f.IriscliBinary, defChainID, serviceName, from, f.Flags())
 	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), client.DefaultKeyPass)
 }
 
-// TxServiceBindingUpdate is iriscli tx service binding update
-func (f *Fixtures) TxServiceBindingUpdate(serviceName, defChainID, bindType, deposit, prices string, avgRspTime int64, usableTime int64, from string, flags ...string) (bool, string, string) {
-	cmd := fmt.Sprintf("%s tx service binding update --service-name %s --def-chain-id %s --bind-type %s --deposit %s --prices %s --avg-rsp-time %d --usable-time %d --from=%s %v", f.IriscliBinary, serviceName, defChainID, bindType, deposit, prices, avgRspTime, usableTime, from, f.Flags())
+// TxServiceUpdateBinding is iriscli tx service update-binding
+func (f *Fixtures) TxServiceUpdateBinding(defChainID, serviceName, bindType, deposit, prices string, avgRspTime int64, usableTime int64, from string, flags ...string) (bool, string, string) {
+	cmd := fmt.Sprintf("%s tx service update-binding --def-chain-id %s --service-name %s --bind-type %s --deposit %s --prices %s --avg-rsp-time %d --usable-time %d --from=%s %v", f.IriscliBinary, defChainID, serviceName, bindType, deposit, prices, avgRspTime, usableTime, from, f.Flags())
 	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), client.DefaultKeyPass)
 }
 
-// TxServiceBindingDisable is iriscli tx service binding disable
-func (f *Fixtures) TxServiceBindingDisable(serviceName, defChainID, from string, flags ...string) (bool, string, string) {
-	cmd := fmt.Sprintf("%s tx service binding disable --service-name %s --def-chain-id %s --from=%s %v", f.IriscliBinary, serviceName, defChainID, from, f.Flags())
+// TxServiceDisable is iriscli tx service disable
+func (f *Fixtures) TxServiceDisable(defChainID, serviceName, from string, flags ...string) (bool, string, string) {
+	cmd := fmt.Sprintf("%s tx service disable --def-chain-id %s --service-name %s --from=%s %v", f.IriscliBinary, defChainID, serviceName, from, f.Flags())
 	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), client.DefaultKeyPass)
 }
 
 // TxServiceCall is iriscli tx service call
-func (f *Fixtures) TxServiceCall(serviceName, defChainID, bindChainID, provider string, methodID int16, requestData, serviceFees, from string, flags ...string) (bool, string, string) {
-	cmd := fmt.Sprintf("%s tx service call --service-name %s --def-chain-id %s --bind-chain-id %s --provider %s --method-id %d --request-data %s --service-fees %s --from=%s %v", f.IriscliBinary, serviceName, defChainID, bindChainID, provider, methodID, requestData, serviceFees, from, f.Flags())
+func (f *Fixtures) TxServiceCall(defChainID, serviceName, bindChainID, provider string, methodID int16, requestData, serviceFees, from string, flags ...string) (bool, string, string) {
+	cmd := fmt.Sprintf("%s tx service call --def-chain-id %s --service-name %s --bind-chain-id %s --provider %s --method-id %d --request-data %s --service-fees %s --from=%s %v", f.IriscliBinary, defChainID, serviceName, bindChainID, provider, methodID, requestData, serviceFees, from, f.Flags())
 	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), client.DefaultKeyPass)
 }
 
@@ -223,39 +223,39 @@ func (f *Fixtures) TxServiceRespond(reqChainID, requestID, responseData, from st
 	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), client.DefaultKeyPass)
 }
 
-// TxServiceFeesRefund is iriscli tx service fees refund
-func (f *Fixtures) TxServiceFeesRefund(from string, flags ...string) (bool, string, string) {
-	cmd := fmt.Sprintf("%s tx service fees refund --from=%s %v", f.IriscliBinary, from, f.Flags())
+// TxServiceRefundFees is iriscli tx service refund-fees
+func (f *Fixtures) TxServiceRefundFees(from string, flags ...string) (bool, string, string) {
+	cmd := fmt.Sprintf("%s tx service refund-fees --from=%s %v", f.IriscliBinary, from, f.Flags())
 	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), client.DefaultKeyPass)
 }
 
-// TxServiceFeesWithdraw is iriscli tx service fees withdraw
-func (f *Fixtures) TxServiceFeesWithdraw(from string, flags ...string) (bool, string, string) {
-	cmd := fmt.Sprintf("%s tx service fees withdraw --from=%s %v", f.IriscliBinary, from, f.Flags())
+// TxServiceWithdrawFees is iriscli tx service withdraw-fees
+func (f *Fixtures) TxServiceWithdrawFees(from string, flags ...string) (bool, string, string) {
+	cmd := fmt.Sprintf("%s tx service withdraw-fees --from=%s %v", f.IriscliBinary, from, f.Flags())
 	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), client.DefaultKeyPass)
 }
 
-// TxServiceFeesWithdraw is iriscli tx service tax withdraw
-func (f *Fixtures) TxServiceTaxWithdraw(withdrawAmt int64, destAddr string, from string, flags ...string) (bool, string, string) {
-	cmd := fmt.Sprintf("%s tx service tax withdraw --withdraw-amount %d --dest-address %s --from=%s %v", f.IriscliBinary, withdrawAmt, destAddr, from, f.Flags())
+// TxServiceWithdrawTax is iriscli tx service withdraw-tax
+func (f *Fixtures) TxServiceWithdrawTax(destAddr string, withdrawAmt string, from string, flags ...string) (bool, string, string) {
+	cmd := fmt.Sprintf("%s tx service withdraw-tax --dest-address %s --withdraw-amount %s --from=%s %v", f.IriscliBinary, destAddr, withdrawAmt, from, f.Flags())
 	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), client.DefaultKeyPass)
 }
 
 // QueryServiceDefinition is iriscli query service definition
-func (f *Fixtures) QueryServiceDefinition(serviceName, defChainID string) service.SvcDef {
-	cmd := fmt.Sprintf("%s query service definition %s %s", f.IriscliBinary, serviceName, defChainID, f.Flags())
+func (f *Fixtures) QueryServiceDefinition(defChainID, serviceName string) service.DefinitionOutput {
+	cmd := fmt.Sprintf("%s query service definition %s %s", f.IriscliBinary, defChainID, serviceName, f.Flags())
 	res, errStr := tests.ExecuteT(f.T, cmd, "")
 	require.Empty(f.T, errStr)
 	cdc := app.MakeCodec()
-	var svcDef service.SvcDef
-	err := cdc.UnmarshalJSON([]byte(res), &svcDef)
+	var svcDefOutput service.DefinitionOutput
+	err := cdc.UnmarshalJSON([]byte(res), &svcDefOutput)
 	require.NoError(f.T, err)
-	return svcDef
+	return svcDefOutput
 }
 
 // QueryServiceBinding is iriscli query service binding
-func (f *Fixtures) QueryServiceBinding(serviceName, defChainID, bindChainID, provider string) service.SvcBinding {
-	cmd := fmt.Sprintf("%s query service binding %s %s %s %s", f.IriscliBinary, serviceName, defChainID, bindChainID, provider, f.Flags())
+func (f *Fixtures) QueryServiceBinding(defChainID, serviceName, bindChainID, provider string) service.SvcBinding {
+	cmd := fmt.Sprintf("%s query service binding %s %s %s %s", f.IriscliBinary, defChainID, serviceName, bindChainID, provider, f.Flags())
 	res, errStr := tests.ExecuteT(f.T, cmd, "")
 	require.Empty(f.T, errStr)
 	cdc := app.MakeCodec()
@@ -266,8 +266,8 @@ func (f *Fixtures) QueryServiceBinding(serviceName, defChainID, bindChainID, pro
 }
 
 // QueryServiceBindings is iriscli query service bindings
-func (f *Fixtures) QueryServiceBindings(serviceName, defChainID string) []service.SvcBinding {
-	cmd := fmt.Sprintf("%s query service bindings %s %s", f.IriscliBinary, serviceName, defChainID, f.Flags())
+func (f *Fixtures) QueryServiceBindings(defChainID, serviceName string) []service.SvcBinding {
+	cmd := fmt.Sprintf("%s query service bindings %s %s", f.IriscliBinary, defChainID, serviceName, f.Flags())
 	res, errStr := tests.ExecuteT(f.T, cmd, "")
 	require.Empty(f.T, errStr)
 	cdc := app.MakeCodec()
@@ -278,8 +278,8 @@ func (f *Fixtures) QueryServiceBindings(serviceName, defChainID string) []servic
 }
 
 // QueryServiceRequests is iriscli query service requests
-func (f *Fixtures) QueryServiceRequests(serviceName, defChainID, bindChainID, consumer string) []service.SvcRequest {
-	cmd := fmt.Sprintf("%s query service requests %s %s %s %s", f.IriscliBinary, serviceName, defChainID, bindChainID, consumer, f.Flags())
+func (f *Fixtures) QueryServiceRequests(defChainID, serviceName, bindChainID, provider string) []service.SvcRequest {
+	cmd := fmt.Sprintf("%s query service requests %s %s %s %s", f.IriscliBinary, defChainID, serviceName, bindChainID, provider, f.Flags())
 	res, errStr := tests.ExecuteT(f.T, cmd, "")
 	require.Empty(f.T, errStr)
 	cdc := app.MakeCodec()
@@ -300,15 +300,3 @@ func (f *Fixtures) QueryServiceFees(address string) service.FeesOutput {
 	require.NoError(f.T, err)
 	return fees
 }
-
-// // executeGetProfilers is iriscli query service bindings
-// func (f *Fixtures) QueryServiceFees(t *testing.T, cmdStr string) []guardian.Guardian {
-// 	cmd := fmt.Sprintf("%s query service definition %s %s", f.IriscliBinary, serviceName, defChainID, f.Flags())
-// 	res, errStr := tests.ExecuteT(f.T, cmd, "")
-// 	require.Empty(f.T, errStr)
-// 	cdc := app.MakeCodec()
-// 	var guardians []guardian.Guardian
-// 	err := cdc.UnmarshalJSON([]byte(res), &guardians)
-// 	require.NoError(f.T, err)
-// 	return guardians
-// }

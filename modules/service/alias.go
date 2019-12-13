@@ -33,6 +33,7 @@ type (
 	QueryRequestsParams   = types.QueryRequestsParams
 	QueryResponseParams   = types.QueryResponseParams
 	QueryFeesParams       = types.QueryFeesParams
+	DefinitionOutput      = types.DefinitionOutput
 	FeesOutput            = types.FeesOutput
 
 	GenesisState = types.GenesisState
