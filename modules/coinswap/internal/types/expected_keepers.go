@@ -1,18 +1,25 @@
 package types
 
 import (
-	"github.com/irisnet/irishub/app/v1/auth"
-	sdk "github.com/irisnet/irishub/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	auth "github.com/cosmos/cosmos-sdk/x/auth/exported"
+	supply "github.com/cosmos/cosmos-sdk/x/supply/exported"
 )
 
-type BankKeeper interface {
-	SendCoins(ctx sdk.Context, fromAddr sdk.AccAddress, toAddr sdk.AccAddress, amt sdk.Coins) (sdk.Tags, sdk.Error)
-
-	AddCoins(ctx sdk.Context, addr sdk.AccAddress, amt sdk.Coins) (sdk.Coins, sdk.Tags, sdk.Error)
-
-	SubtractCoins(ctx sdk.Context, addr sdk.AccAddress, amt sdk.Coins) (sdk.Coins, sdk.Tags, sdk.Error)
+// SupplyKeeper defines the expected supply keeper
+type SupplyKeeper interface {
+	GetModuleAddress(name string) sdk.AccAddress
+	SendCoinsFromModuleToAccount(ctx sdk.Context, senderModule string, recipientAddr sdk.AccAddress, amt sdk.Coins) sdk.Error
+	SendCoinsFromAccountToModule(ctx sdk.Context, senderAddr sdk.AccAddress, recipientModule string, amt sdk.Coins) sdk.Error
+	MintCoins(ctx sdk.Context, moduleName string, amt sdk.Coins) sdk.Error
+	BurnCoins(ctx sdk.Context, moduleName string, amt sdk.Coins) sdk.Error
+	GetSupply(ctx sdk.Context) (supply supply.SupplyI)
 }
 
-type AuthKeeper interface {
+type BankKeeper interface {
+	SendCoins(ctx sdk.Context, fromAddr sdk.AccAddress, toAddr sdk.AccAddress, amt sdk.Coins) sdk.Error
+}
+
+type AccountKeeper interface {
 	GetAccount(ctx sdk.Context, addr sdk.AccAddress) auth.Account
 }

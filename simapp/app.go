@@ -30,6 +30,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/supply"
 
 	"github.com/irisnet/irishub/modules/asset"
+	"github.com/irisnet/irishub/modules/coinswap"
 	"github.com/irisnet/irishub/modules/guardian"
 	"github.com/irisnet/irishub/modules/htlc"
 	"github.com/irisnet/irishub/modules/mint"
@@ -63,6 +64,7 @@ var (
 		evidence.AppModuleBasic{},
 		guardian.AppModuleBasic{},
 		htlc.AppModuleBasic{},
+		coinswap.AppModuleBasic{},
 		rand.AppModuleBasic{},
 	)
 
@@ -76,6 +78,7 @@ var (
 		gov.ModuleName:            {supply.Burner},
 		asset.ModuleName:          {supply.Minter, supply.Burner},
 		htlc.ModuleName:           nil,
+		coinswap.ModuleName:       {supply.Minter, supply.Burner},
 	}
 )
 
@@ -120,6 +123,7 @@ type SimApp struct {
 	AssetKeeper    asset.Keeper
 	GuardianKeeper guardian.Keeper
 	HTLCKeeper     htlc.Keeper
+	CoinswapKeeper coinswap.Keeper
 	RandKeeper     rand.Keeper
 
 	// the module manager
@@ -144,7 +148,7 @@ func NewSimApp(
 	keys := sdk.NewKVStoreKeys(
 		bam.MainStoreKey, auth.StoreKey, staking.StoreKey, supply.StoreKey, mint.StoreKey,
 		distr.StoreKey, slashing.StoreKey, gov.StoreKey, params.StoreKey, evidence.StoreKey,
-		asset.StoreKey, guardian.StoreKey, htlc.StoreKey,
+		asset.StoreKey, guardian.StoreKey, htlc.StoreKey, coinswap.StoreKey, rand.ModuleName,
 	)
 	tkeys := sdk.NewTransientStoreKeys(params.TStoreKey)
 
@@ -169,6 +173,7 @@ func NewSimApp(
 	app.subspaces[crisis.ModuleName] = app.ParamsKeeper.Subspace(crisis.DefaultParamspace)
 	app.subspaces[evidence.ModuleName] = app.ParamsKeeper.Subspace(evidence.DefaultParamspace)
 	app.subspaces[asset.ModuleName] = app.ParamsKeeper.Subspace(asset.DefaultParamspace)
+	app.subspaces[coinswap.ModuleName] = app.ParamsKeeper.Subspace(coinswap.DefaultParamspace)
 
 	// add keepers
 	app.AccountKeeper = auth.NewAccountKeeper(
@@ -196,7 +201,9 @@ func NewSimApp(
 		app.subspaces[crisis.ModuleName], invCheckPeriod, app.SupplyKeeper, auth.FeeCollectorName,
 	)
 	app.HTLCKeeper = htlc.NewKeeper(app.cdc, keys[htlc.StoreKey], app.SupplyKeeper, htlc.DefaultCodespace)
-
+	app.CoinswapKeeper = coinswap.NewKeeper(
+		app.cdc, keys[coinswap.StoreKey], app.BankKeeper, app.AccountKeeper, app.SupplyKeeper, app.subspaces[coinswap.ModuleName],
+	)
 	// create evidence keeper with router
 	evidenceKeeper := evidence.NewKeeper(
 		app.cdc, keys[evidence.StoreKey], app.subspaces[evidence.ModuleName], evidence.DefaultCodespace,
@@ -250,6 +257,7 @@ func NewSimApp(
 		asset.NewAppModule(app.AssetKeeper),
 		guardian.NewAppModule(app.GuardianKeeper),
 		htlc.NewAppModule(app.HTLCKeeper),
+		coinswap.NewAppModule(app.CoinswapKeeper),
 		rand.NewAppModule(app.RandKeeper),
 	)
 
@@ -275,7 +283,8 @@ func NewSimApp(
 		auth.ModuleName, distr.ModuleName, staking.ModuleName, bank.ModuleName,
 		slashing.ModuleName, gov.ModuleName, mint.ModuleName, supply.ModuleName,
 		crisis.ModuleName, genutil.ModuleName, evidence.ModuleName,
-		asset.ModuleName, guardian.ModuleName, htlc.ModuleName, rand.ModuleName,
+		asset.ModuleName, guardian.ModuleName, htlc.ModuleName,
+		coinswap.ModuleName, rand.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -296,6 +305,7 @@ func NewSimApp(
 		slashing.NewAppModule(app.SlashingKeeper, app.StakingKeeper),
 		asset.NewAppModule(app.AssetKeeper),
 		htlc.NewAppModule(app.HTLCKeeper),
+		coinswap.NewAppModule(app.CoinswapKeeper),
 		rand.NewAppModule(app.RandKeeper),
 	)
 

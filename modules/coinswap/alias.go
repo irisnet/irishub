@@ -1,8 +1,27 @@
 package coinswap
 
 import (
-	"github.com/irisnet/irishub/app/v2/coinswap/internal/keeper"
-	"github.com/irisnet/irishub/app/v2/coinswap/internal/types"
+	"github.com/irisnet/irishub/modules/coinswap/internal/keeper"
+	"github.com/irisnet/irishub/modules/coinswap/internal/types"
+)
+
+const (
+	ModuleName        = types.ModuleName
+	StoreKey          = types.StoreKey
+	RouterKey         = types.RouterKey
+	QuerierRoute      = types.QuerierRoute
+	DefaultParamspace = types.DefaultParamspace
+	DefaultCodespace  = types.DefaultCodespace
+
+	EventTypeSwap            = types.EventTypeSwap
+	EventTypeAddLiquidity    = types.EventTypeAddLiquidity
+	EventTypeRemoveLiquidity = types.EventTypeRemoveLiquidity
+	AttributeValueCategory   = types.AttributeValueCategory
+	AttributeValueAmount     = types.AttributeValueAmount
+	AttributeValueSender     = types.AttributeValueSender
+	AttributeValueRecipient  = types.AttributeValueRecipient
+	AttributeValueIsBuyOrder = types.AttributeValueIsBuyOrder
+	AttributeValueTokenPair  = types.AttributeValueTokenPair
 )
 
 type (
@@ -17,31 +36,15 @@ type (
 )
 
 var (
-	DefaultParamSpace = types.DefaultParamSpace
-	QueryLiquidity    = types.QueryLiquidity
-
-	RegisterCodec = types.RegisterCodec
-
-	NewMsgSwapOrder       = types.NewMsgSwapOrder
-	NewMsgAddLiquidity    = types.NewMsgAddLiquidity
-	NewMsgRemoveLiquidity = types.NewMsgRemoveLiquidity
-	NewKeeper             = keeper.NewKeeper
-	NewQuerier            = keeper.NewQuerier
-
-	ErrInvalidDeadline  = types.ErrInvalidDeadline
-	ErrNotPositive      = types.ErrNotPositive
-	ErrConstraintNotMet = types.ErrConstraintNotMet
-
-	GetUniId                    = types.GetUniId
-	GetCoinMinDenomFromUniDenom = types.GetCoinMinDenomFromUniDenom
-	GetUniDenom                 = types.GetUniDenom
-	GetUniCoinType              = types.GetUniCoinType
-	CheckUniDenom               = types.CheckUniDenom
-	CheckUniId                  = types.CheckUniId
+	NewKeeper          = keeper.NewKeeper
+	NewQuerier         = keeper.NewQuerier
+	RegisterCodec      = types.RegisterCodec
+	ErrInvalidDeadline = types.ErrInvalidDeadline
+	ValidateParams     = types.ValidateParams
+	DefaultParams      = types.DefaultParams
 )
 
-const (
-	DefaultCodespace   = types.DefaultCodespace
-	ModuleName         = types.ModuleName
-	FormatUniABSPrefix = types.FormatUniABSPrefix
+// exported variables and functions
+var (
+	ModuleCdc = types.ModuleCdc
 )
