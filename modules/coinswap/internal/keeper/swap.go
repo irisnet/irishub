@@ -93,11 +93,12 @@ Sell exact amount of a token for buying another, non of them are standard token
 @return: actual amount of the token to be bought
 */
 func (k Keeper) doubleTradeExactInputForOutput(ctx sdk.Context, input types.Input, output types.Output) (sdk.Int, sdk.Error) {
-	standardAmount, err := k.calculateWithExactInput(ctx, input.Coin, types.StandardDenom)
+	standardDenom := k.GetParams(ctx).StandardDenom
+	standardAmount, err := k.calculateWithExactInput(ctx, input.Coin, standardDenom)
 	if err != nil {
 		return sdk.ZeroInt(), err
 	}
-	standardCoin := sdk.NewCoin(types.StandardDenom, standardAmount)
+	standardCoin := sdk.NewCoin(standardDenom, standardAmount)
 	err = k.swapCoins(ctx, input.Address, output.Address, input.Coin, standardCoin)
 	if err != nil {
 		return sdk.ZeroInt(), err
@@ -189,11 +190,12 @@ Buy exact amount of a token by specifying the max amount of another token, non o
 @return : actual amount of the token to be payed
 */
 func (k Keeper) doubleTradeInputForExactOutput(ctx sdk.Context, input types.Input, output types.Output) (sdk.Int, sdk.Error) {
-	soldStandardAmount, err := k.calculateWithExactOutput(ctx, output.Coin, types.StandardDenom)
+	standardDenom := k.GetParams(ctx).StandardDenom
+	soldStandardAmount, err := k.calculateWithExactOutput(ctx, output.Coin, standardDenom)
 	if err != nil {
 		return sdk.ZeroInt(), err
 	}
-	soldStandardCoin := sdk.NewCoin(types.StandardDenom, soldStandardAmount)
+	soldStandardCoin := sdk.NewCoin(standardDenom, soldStandardAmount)
 
 	soldTokenAmt, err := k.calculateWithExactOutput(ctx, soldStandardCoin, input.Coin.Denom)
 	if err != nil {

@@ -90,7 +90,7 @@ func (suite *KeeperTestSuite) TestKeeper_UpdateLiquidity() {
 	suite.Nil(err)
 
 	reservePoolBalances := suite.app.AccountKeeper.GetAccount(suite.ctx, poolAddr).GetCoins()
-	moduleAccountBalances := suite.app.SupplyKeeper.GetModuleAccount(suite.ctx, types.ModuleName).GetCoins()
+	moduleAccountBalances := suite.app.SupplyKeeper.GetSupply(suite.ctx).GetTotal()
 	suite.Equal(fmt.Sprintf("1%s,10000000000000000000%s", denomBTC, denomStandard), reservePoolBalances.String())
 	suite.Equal("10000000000000000000", moduleAccountBalances.AmountOf(unidenomBTC).String())
 

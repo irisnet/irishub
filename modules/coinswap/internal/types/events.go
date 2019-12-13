@@ -2,12 +2,11 @@ package types
 
 // coinswap module event types
 const (
-	EventSwap            = "swap"
-	EventAddLiquidity    = "add_liquidity"
-	EventRemoveLiquidity = "remove_liquidity"
+	EventTypeSwap            = "swap"
+	EventTypeAddLiquidity    = "add_liquidity"
+	EventTypeRemoveLiquidity = "remove_liquidity"
 
-	AttributeValueCategory = ModuleName
-
+	AttributeValueCategory   = ModuleName
 	AttributeValueAmount     = "amount"
 	AttributeValueSender     = "sender"
 	AttributeValueRecipient  = "recipient"

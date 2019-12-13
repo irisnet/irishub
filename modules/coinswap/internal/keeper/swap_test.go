@@ -105,7 +105,6 @@ func (suite *KeeperTestSuite) TestGetOutputPrice() {
 
 func (suite *KeeperTestSuite) TestKeeperSwap() {
 	sender, reservePoolAddr, err, reservePoolBalances, senderBlances := createReservePool(suite)
-	moduleAccount := suite.app.SupplyKeeper.GetModuleAccount(suite.ctx, types.ModuleName)
 
 	outputCoin := sdk.NewCoin("btc", sdk.NewInt(100))
 	inputCoin := sdk.NewCoin(denomStandard, sdk.NewInt(1000))
@@ -125,7 +124,7 @@ func (suite *KeeperTestSuite) TestKeeperSwap() {
 	// first swap
 	err = suite.app.CoinswapKeeper.Swap(suite.ctx, msg1)
 	suite.Nil(err)
-	moduleAccountBalances := moduleAccount.GetCoins()
+	moduleAccountBalances := suite.app.SupplyKeeper.GetSupply(suite.ctx).GetTotal()
 	reservePoolBalances = suite.app.AccountKeeper.GetAccount(suite.ctx, reservePoolAddr).GetCoins()
 	suite.Equal(fmt.Sprintf("900%s,1112%s", denomBTC, denomStandard), reservePoolBalances.String())
 	suite.Equal("1000", moduleAccountBalances.AmountOf(unidenomBTC).String())
@@ -135,7 +134,7 @@ func (suite *KeeperTestSuite) TestKeeperSwap() {
 	// second swap
 	err = suite.app.CoinswapKeeper.Swap(suite.ctx, msg1)
 	suite.Nil(err)
-	moduleAccountBalances = moduleAccount.GetCoins()
+	moduleAccountBalances =suite.app.SupplyKeeper.GetSupply(suite.ctx).GetTotal()
 	reservePoolBalances = suite.app.AccountKeeper.GetAccount(suite.ctx, reservePoolAddr).GetCoins()
 	suite.Equal(fmt.Sprintf("800%s,1252%s", denomBTC, denomStandard), reservePoolBalances.String())
 	suite.Equal("1000", moduleAccountBalances.AmountOf(unidenomBTC).String())
@@ -145,7 +144,7 @@ func (suite *KeeperTestSuite) TestKeeperSwap() {
 	// third swap
 	err = suite.app.CoinswapKeeper.Swap(suite.ctx, msg1)
 	suite.Nil(err)
-	moduleAccountBalances = moduleAccount.GetCoins()
+	moduleAccountBalances = suite.app.SupplyKeeper.GetSupply(suite.ctx).GetTotal()
 	reservePoolBalances = suite.app.AccountKeeper.GetAccount(suite.ctx, reservePoolAddr).GetCoins()
 	suite.Equal(fmt.Sprintf("700%s,1432%s", denomBTC, denomStandard), reservePoolBalances.String())
 	suite.Equal("1000", moduleAccountBalances.AmountOf(unidenomBTC).String())
@@ -179,8 +178,7 @@ func createReservePool(suite *KeeperTestSuite) (sdk.AccAddress, sdk.AccAddress, 
 	err := suite.app.CoinswapKeeper.AddLiquidity(suite.ctx, msg)
 	//assert
 	suite.Nil(err)
-	moduleAccount := suite.app.SupplyKeeper.GetModuleAccount(suite.ctx, types.ModuleName)
-	moduleAccountBalances := moduleAccount.GetCoins()
+	moduleAccountBalances := suite.app.SupplyKeeper.GetSupply(suite.ctx).GetTotal()
 	reservePoolBalances := suite.app.AccountKeeper.GetAccount(suite.ctx, reservePoolAddr).GetCoins()
 	suite.Equal(fmt.Sprintf("1000%s,1000%s", denomBTC, denomStandard), reservePoolBalances.String())
 	suite.Equal("1000", moduleAccountBalances.AmountOf(unidenomBTC).String())

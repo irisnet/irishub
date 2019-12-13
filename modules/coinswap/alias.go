@@ -12,6 +12,16 @@ const (
 	QuerierRoute      = types.QuerierRoute
 	DefaultParamspace = types.DefaultParamspace
 	DefaultCodespace  = types.DefaultCodespace
+
+	EventTypeSwap            = types.EventTypeSwap
+	EventTypeAddLiquidity    = types.EventTypeAddLiquidity
+	EventTypeRemoveLiquidity = types.EventTypeRemoveLiquidity
+	AttributeValueCategory   = types.AttributeValueCategory
+	AttributeValueAmount     = types.AttributeValueAmount
+	AttributeValueSender     = types.AttributeValueSender
+	AttributeValueRecipient  = types.AttributeValueRecipient
+	AttributeValueIsBuyOrder = types.AttributeValueIsBuyOrder
+	AttributeValueTokenPair  = types.AttributeValueTokenPair
 )
 
 type (
@@ -30,6 +40,8 @@ var (
 	NewQuerier         = keeper.NewQuerier
 	RegisterCodec      = types.RegisterCodec
 	ErrInvalidDeadline = types.ErrInvalidDeadline
+	ValidateParams     = types.ValidateParams
+	DefaultParams      = types.DefaultParams
 )
 
 // exported variables and functions

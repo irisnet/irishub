@@ -46,7 +46,9 @@ func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, bk types.BankKeeper, ak types
 func (k Keeper) Swap(ctx sdk.Context, msg types.MsgSwapOrder) sdk.Error {
 	var amount sdk.Int
 	var err sdk.Error
-	var isDoubleSwap = msg.Input.Coin.Denom != types.StandardDenom && msg.Output.Coin.Denom != types.StandardDenom
+	
+	standardDenom := k.GetParams(ctx).StandardDenom
+	isDoubleSwap := (msg.Input.Coin.Denom != standardDenom) && (msg.Output.Coin.Denom != standardDenom)
 
 	if msg.IsBuyOrder && isDoubleSwap {
 		amount, err = k.doubleTradeInputForExactOutput(ctx, msg.Input, msg.Output)
@@ -63,7 +65,7 @@ func (k Keeper) Swap(ctx sdk.Context, msg types.MsgSwapOrder) sdk.Error {
 
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
-			types.EventSwap,
+			types.EventTypeSwap,
 			sdk.NewAttribute(types.AttributeValueAmount, amount.String()),
 			sdk.NewAttribute(types.AttributeValueSender, msg.Input.Address.String()),
 			sdk.NewAttribute(types.AttributeValueRecipient, msg.Output.Address.String()),
@@ -76,19 +78,20 @@ func (k Keeper) Swap(ctx sdk.Context, msg types.MsgSwapOrder) sdk.Error {
 }
 
 func (k Keeper) AddLiquidity(ctx sdk.Context, msg types.MsgAddLiquidity) sdk.Error {
+	standardDenom := k.GetParams(ctx).StandardDenom
 	uniDenom, err := types.GetUniDenomFromDenom(msg.MaxToken.Denom)
 	if err != nil {
 		return err
 	}
 
 	reservePool := k.GetReservePool(ctx, uniDenom)
-	standardReserveAmt := reservePool.AmountOf(types.StandardDenom)
+	standardReserveAmt := reservePool.AmountOf(standardDenom)
 	tokenReserveAmt := reservePool.AmountOf(msg.MaxToken.Denom)
-	liquidity := k.sk.GetModuleAccount(ctx, types.ModuleName).GetCoins().AmountOf(uniDenom)
+	liquidity := k.sk.GetSupply(ctx).GetTotal().AmountOf(uniDenom)
 
 	var mintLiquidityAmt sdk.Int
 	var depositToken sdk.Coin
-	var standardCoin = sdk.NewCoin(types.StandardDenom, msg.ExactStandardAmt)
+	var standardCoin = sdk.NewCoin(standardDenom, msg.ExactStandardAmt)
 
 	// calculate amount of UNI to be minted for sender
 	// and coin amount to be deposited
@@ -110,9 +113,9 @@ func (k Keeper) AddLiquidity(ctx sdk.Context, msg types.MsgAddLiquidity) sdk.Err
 
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
-			types.EventAddLiquidity,
+			types.EventTypeAddLiquidity,
 			sdk.NewAttribute(types.AttributeValueSender, msg.Sender.String()),
-			sdk.NewAttribute(types.AttributeValueTokenPair, getTokenPairByDenom(msg.MaxToken.Denom, types.StandardDenom)),
+			sdk.NewAttribute(types.AttributeValueTokenPair, getTokenPairByDenom(msg.MaxToken.Denom, standardDenom)),
 		),
 	)
 
@@ -127,11 +130,8 @@ func (k Keeper) addLiquidity(ctx sdk.Context, sender sdk.AccAddress, standardCoi
 		return err
 	}
 
-	// mint double liquidity vouchers of reserve pool for module account
-	// the total supply liquidity vouchers in module account will not change except for adding and removing liquidity
-	// the total supply liquidity vouchers in the module acccout is the same as the total supply
 	mintToken := sdk.NewCoins(sdk.NewCoin(uniDenom, mintLiquidityAmt))
-	if err := k.sk.MintCoins(ctx, types.ModuleName, mintToken.Add(mintToken)); err != nil {
+	if err := k.sk.MintCoins(ctx, types.ModuleName, mintToken); err != nil {
 		return err
 	}
 	// send half of the liquidity vouchers from module account to sender
@@ -143,6 +143,7 @@ func (k Keeper) addLiquidity(ctx sdk.Context, sender sdk.AccAddress, standardCoi
 }
 
 func (k Keeper) RemoveLiquidity(ctx sdk.Context, msg types.MsgRemoveLiquidity) sdk.Error {
+	standardDenom := k.GetParams(ctx).StandardDenom
 	uniDenom := msg.WithdrawLiquidity.Denom
 
 	minTokenDenom, err := types.GetCoinDenomFromUniDenom(uniDenom)
@@ -156,11 +157,11 @@ func (k Keeper) RemoveLiquidity(ctx sdk.Context, msg types.MsgRemoveLiquidity) s
 		return types.ErrReservePoolNotExists("")
 	}
 
-	standardReserveAmt := reservePool.AmountOf(types.StandardDenom)
+	standardReserveAmt := reservePool.AmountOf(standardDenom)
 	tokenReserveAmt := reservePool.AmountOf(minTokenDenom)
-	liquidityReserve := k.sk.GetModuleAccount(ctx, types.ModuleName).GetCoins().AmountOf(uniDenom)
+	liquidityReserve := k.sk.GetSupply(ctx).GetTotal().AmountOf(uniDenom)
 	if standardReserveAmt.LT(msg.MinStandardAmt) {
-		return types.ErrInsufficientFunds(fmt.Sprintf("insufficient %s funds, user expected: %s, actual: %s", types.StandardDenom, msg.MinStandardAmt.String(), standardReserveAmt.String()))
+		return types.ErrInsufficientFunds(fmt.Sprintf("insufficient %s funds, user expected: %s, actual: %s", standardDenom, msg.MinStandardAmt.String(), standardReserveAmt.String()))
 	}
 	if tokenReserveAmt.LT(msg.MinToken) {
 		return types.ErrInsufficientFunds(fmt.Sprintf("insufficient %s funds, user expected: %s, actual: %s", minTokenDenom, msg.MinToken.String(), tokenReserveAmt.String()))
@@ -174,12 +175,12 @@ func (k Keeper) RemoveLiquidity(ctx sdk.Context, msg types.MsgRemoveLiquidity) s
 	irisWithdrawnAmt := msg.WithdrawLiquidity.Amount.Mul(standardReserveAmt).Quo(liquidityReserve)
 	tokenWithdrawnAmt := msg.WithdrawLiquidity.Amount.Mul(tokenReserveAmt).Quo(liquidityReserve)
 
-	irisWithdrawCoin := sdk.NewCoin(types.StandardDenom, irisWithdrawnAmt)
+	irisWithdrawCoin := sdk.NewCoin(standardDenom, irisWithdrawnAmt)
 	tokenWithdrawCoin := sdk.NewCoin(minTokenDenom, tokenWithdrawnAmt)
 	deductUniCoin := msg.WithdrawLiquidity
 
 	if irisWithdrawCoin.Amount.LT(msg.MinStandardAmt) {
-		return types.ErrConstraintNotMet(fmt.Sprintf("iris amount not met, user expected: no less than %s, actual: %s", sdk.NewCoin(types.StandardDenom, msg.MinStandardAmt).String(), irisWithdrawCoin.String()))
+		return types.ErrConstraintNotMet(fmt.Sprintf("iris amount not met, user expected: no less than %s, actual: %s", sdk.NewCoin(standardDenom, msg.MinStandardAmt).String(), irisWithdrawCoin.String()))
 	}
 	if tokenWithdrawCoin.Amount.LT(msg.MinToken) {
 		return types.ErrConstraintNotMet(fmt.Sprintf("token amount not met, user expected: no less than %s, actual: %s", sdk.NewCoin(minTokenDenom, msg.MinToken).String(), tokenWithdrawCoin.String()))
@@ -188,9 +189,9 @@ func (k Keeper) RemoveLiquidity(ctx sdk.Context, msg types.MsgRemoveLiquidity) s
 
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
-			types.EventRemoveLiquidity,
+			types.EventTypeRemoveLiquidity,
 			sdk.NewAttribute(types.AttributeValueSender, msg.Sender.String()),
-			sdk.NewAttribute(types.AttributeValueTokenPair, getTokenPairByDenom(minTokenDenom, types.StandardDenom)),
+			sdk.NewAttribute(types.AttributeValueTokenPair, getTokenPairByDenom(minTokenDenom, standardDenom)),
 		),
 	)
 
@@ -206,7 +207,7 @@ func (k Keeper) removeLiquidity(ctx sdk.Context, poolAddr, sender sdk.AccAddress
 		return err
 	}
 	// burn liquidity vouchers of reserve pool form module account
-	if err := k.sk.BurnCoins(ctx, types.ModuleName, deltaCoins.Add(deltaCoins)); err != nil {
+	if err := k.sk.BurnCoins(ctx, types.ModuleName, deltaCoins); err != nil {
 		return err
 	}
 

@@ -27,6 +27,7 @@ func NewQuerier(k Keeper) sdk.Querier {
 // upon success or an error if the query fails.
 func queryLiquidity(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sdk.Error) {
 	var params types.QueryLiquidityParams
+	standardDenom := k.GetParams(ctx).StandardDenom
 	err := k.cdc.UnmarshalJSON(req.Data, &params)
 	if err != nil {
 		return nil, sdk.ErrUnknownRequest(sdk.AppendMsgToErr("incorrectly formatted request data", err.Error()))
@@ -45,9 +46,9 @@ func queryLiquidity(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, s
 
 	reservePool := k.GetReservePool(ctx, params.ID)
 	// all liquidity vouchers in module account
-	liquidities := k.sk.GetModuleAccount(ctx, types.ModuleName).GetCoins()
+	liquidities := k.sk.GetSupply(ctx).GetTotal()
 
-	standard := sdk.NewCoin(types.StandardDenom, reservePool.AmountOf(types.StandardDenom))
+	standard := sdk.NewCoin(standardDenom, reservePool.AmountOf(standardDenom))
 	token := sdk.NewCoin(tokenDenom, reservePool.AmountOf(tokenDenom))
 	liquidity := sdk.NewCoin(uniDenom, liquidities.AmountOf(uniDenom))
 
