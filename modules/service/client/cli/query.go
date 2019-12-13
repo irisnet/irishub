@@ -42,7 +42,7 @@ func GetCmdQuerySvcDef(queryRoute string, cdc *codec.Codec) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			params := service.QueryServiceParams{
+			params := service.QueryDefinitionParams{
 				DefChainID:  args[0],
 				ServiceName: args[1],
 			}
@@ -113,7 +113,7 @@ func GetCmdQuerySvcBinds(queryRoute string, cdc *codec.Codec) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			params := service.QueryServiceParams{
+			params := service.QueryBindingsParams{
 				DefChainID:  args[0],
 				ServiceName: args[1],
 			}

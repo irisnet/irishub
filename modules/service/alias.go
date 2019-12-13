@@ -27,11 +27,13 @@ type (
 	Level          = types.Level
 	BindingType    = types.BindingType
 
-	QueryServiceParams  = types.QueryServiceParams
-	QueryBindingParams  = types.QueryBindingParams
-	QueryResponseParams = types.QueryResponseParams
-	QueryFeesParams     = types.QueryFeesParams
-	FeesOutput          = types.FeesOutput
+	QueryDefinitionParams = types.QueryDefinitionParams
+	QueryBindingParams    = types.QueryBindingParams
+	QueryBindingsParams   = types.QueryBindingsParams
+	QueryRequestsParams   = types.QueryRequestsParams
+	QueryResponseParams   = types.QueryResponseParams
+	QueryFeesParams       = types.QueryFeesParams
+	FeesOutput            = types.FeesOutput
 
 	GenesisState = types.GenesisState
 

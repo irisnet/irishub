@@ -13,7 +13,7 @@ const (
 	QueryFees       = "fees"
 )
 
-type QueryServiceParams struct {
+type QueryDefinitionParams struct {
 	DefChainID  string
 	ServiceName string
 }
@@ -24,6 +24,18 @@ type DefinitionOutput struct {
 }
 
 type QueryBindingParams struct {
+	DefChainID  string
+	ServiceName string
+	BindChainId string
+	Provider    sdk.AccAddress
+}
+
+type QueryBindingsParams struct {
+	DefChainID  string
+	ServiceName string
+}
+
+type QueryRequestsParams struct {
 	DefChainID  string
 	ServiceName string
 	BindChainId string

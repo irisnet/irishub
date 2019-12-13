@@ -31,7 +31,7 @@ func NewQuerier(k Keeper) sdk.Querier {
 }
 
 func queryDefinition(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
-	var params types.QueryServiceParams
+	var params types.QueryDefinitionParams
 	err := keeper.cdc.UnmarshalJSON(req.Data, &params)
 	if err != nil {
 		return nil, sdk.ErrInternal(fmt.Sprintf("failed to parse params: %s", err))
@@ -83,7 +83,7 @@ func queryBinding(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte
 }
 
 func queryBindings(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
-	var params types.QueryServiceParams
+	var params types.QueryBindingsParams
 	err := keeper.cdc.UnmarshalJSON(req.Data, &params)
 	if err != nil {
 		return nil, sdk.ErrInternal(fmt.Sprintf("failed to parse params: %s", err))
@@ -108,7 +108,7 @@ func queryBindings(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byt
 }
 
 func queryRequests(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
-	var params types.QueryBindingParams
+	var params types.QueryRequestsParams
 	err := keeper.cdc.UnmarshalJSON(req.Data, &params)
 	if err != nil {
 		return nil, sdk.ErrInternal(fmt.Sprintf("failed to parse params: %s", err))
