@@ -1,7 +1,9 @@
 package keeper
 
 import (
-	sdk "github.com/irisnet/irishub/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	"github.com/irisnet/irishub/modules/htlc/internal/types"
 )
 
 var (
@@ -11,12 +13,12 @@ var (
 )
 
 // KeyHTLC returns the key for an HTLC by the specified hash lock
-func KeyHTLC(hashLock []byte) []byte {
+func KeyHTLC(hashLock types.HTLCHashLock) []byte {
 	return append(PrefixHTLC, hashLock...)
 }
 
 // KeyHTLCExpireQueue returns the key for HTLC expiration queue by the specified height and hash lock
-func KeyHTLCExpireQueue(expireHeight uint64, hashLock []byte) []byte {
+func KeyHTLCExpireQueue(expireHeight uint64, hashLock types.HTLCHashLock) []byte {
 	prefix := append(PrefixHTLCExpireQueue, sdk.Uint64ToBigEndian(expireHeight)...)
 	return append(append(prefix, KeyDelimiter...), hashLock...)
 }

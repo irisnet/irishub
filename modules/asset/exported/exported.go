@@ -1,7 +1,7 @@
 package exported
 
 import (
-	"github.com/irisnet/irishub/app/v1/asset/internal/types"
+	"github.com/irisnet/irishub/modules/asset/internal/types"
 )
 
 type FungibleToken = types.FungibleToken

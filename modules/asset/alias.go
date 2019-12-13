@@ -1,80 +1,53 @@
 package asset
 
 import (
-	"github.com/irisnet/irishub/app/v1/asset/internal/keeper"
-	"github.com/irisnet/irishub/app/v1/asset/internal/types"
+	"github.com/irisnet/irishub/modules/asset/internal/keeper"
+	"github.com/irisnet/irishub/modules/asset/internal/types"
 )
 
 type (
-	MsgIssueToken           = types.MsgIssueToken
-	MsgCreateGateway        = types.MsgCreateGateway
-	MsgEditGateway          = types.MsgEditGateway
-	MsgEditToken            = types.MsgEditToken
-	MsgTransferGatewayOwner = types.MsgTransferGatewayOwner
-	MsgMintToken            = types.MsgMintToken
-	MsgTransferTokenOwner   = types.MsgTransferTokenOwner
-	Tokens                  = types.Tokens
-	Gateway                 = types.Gateway
-	Gateways                = types.Gateways
-	Params                  = types.Params
-	FungibleToken           = types.FungibleToken
-	AssetFamily             = types.AssetFamily
-	AssetSource             = types.AssetSource
-	QueryTokenParams        = types.QueryTokenParams
-	QueryTokensParams       = types.QueryTokensParams
-	QueryGatewayParams      = types.QueryGatewayParams
-	QueryGatewaysParams     = types.QueryGatewaysParams
-	QueryGatewayFeeParams   = types.QueryGatewayFeeParams
-	QueryTokenFeesParams    = types.QueryTokenFeesParams
-	GatewayFeeOutput        = types.GatewayFeeOutput
-	TokenFeesOutput         = types.TokenFeesOutput
-	GenesisState            = types.GenesisState
-
 	Keeper = keeper.Keeper
+
+	MsgIssueToken         = types.MsgIssueToken
+	MsgEditToken          = types.MsgEditToken
+	MsgMintToken          = types.MsgMintToken
+	MsgTransferTokenOwner = types.MsgTransferTokenOwner
+	Tokens                = types.Tokens
+	Params                = types.Params
+	FungibleToken         = types.FungibleToken
+	QueryTokenParams      = types.QueryTokenParams
+	QueryTokensParams     = types.QueryTokensParams
+	QueryGatewayParams    = types.QueryGatewayParams
+	QueryGatewaysParams   = types.QueryGatewaysParams
+	QueryGatewayFeeParams = types.QueryGatewayFeeParams
+	QueryTokenFeesParams  = types.QueryTokenFeesParams
+	GatewayFeeOutput      = types.GatewayFeeOutput
+	TokenFeesOutput       = types.TokenFeesOutput
+	GenesisState          = types.GenesisState
+)
+
+const (
+	ModuleName        = types.ModuleName
+	RouterKey         = types.RouterKey
+	StoreKey          = types.StoreKey
+	QuerierRoute      = types.QuerierRoute
+	NATIVE            = types.NATIVE
+	EXTERNAL          = types.EXTERNAL
+	FUNGIBLE          = types.FUNGIBLE
+	DefaultCodespace  = types.DefaultCodespace
+	DefaultParamspace = types.DefaultParamspace
 )
 
 var (
-	NATIVE                 = types.NATIVE
-	EXTERNAL               = types.EXTERNAL
-	GATEWAY                = types.GATEWAY
-	FUNGIBLE               = types.FUNGIBLE
-	DefaultCodespace       = types.DefaultCodespace
-	DefaultParamSpace      = types.DefaultParamSpace
-	DoNotModify            = types.DoNotModify
-	CodeInvalidAssetSource = types.CodeInvalidAssetSource
-	MaximumAssetMaxSupply  = types.MaximumAssetMaxSupply
-	RegisterCodec          = types.RegisterCodec
-	ErrInvalidAssetFamily  = types.ErrInvalidAssetFamily
-	ErrAssetAlreadyExists  = types.ErrAssetAlreadyExists
-	CheckTokenID           = types.CheckTokenID
-	ValidateMoniker        = types.ValidateMoniker
-	StringToAssetFamilyMap = types.StringToAssetFamilyMap
-	StringToAssetSourceMap = types.StringToAssetSourceMap
-	GetTokenID             = types.GetTokenID
-	ParseBool              = types.ParseBool
+	NewKeeper            = keeper.NewKeeper
+	TokenIssueFeeHandler = keeper.TokenIssueFeeHandler
+	NewQuerier           = keeper.NewQuerier
 
-	NewFungibleToken           = types.NewFungibleToken
-	NewMsgCreateGateway        = types.NewMsgCreateGateway
-	NewGateway                 = types.NewGateway
-	NewMsgEditGateway          = types.NewMsgEditGateway
-	NewMsgEditToken            = types.NewMsgEditToken
-	NewMsgTransferGatewayOwner = types.NewMsgTransferGatewayOwner
-	NewMsgMintToken            = types.NewMsgMintToken
-	NewMsgTransferTokenOwner   = types.NewMsgTransferTokenOwner
-	NewMsgIssueToken           = types.NewMsgIssueToken
-	DefaultParams              = types.DefaultParams
-	DefaultParamsForTest       = types.DefaultParamsForTest
-	ValidateParams             = types.ValidateParams
-
-	QueryToken                  = types.QueryToken
-	QueryTokens                 = types.QueryTokens
-	QueryGateway                = types.QueryGateway
-	QueryGateways               = types.QueryGateways
-	QueryFees                   = types.QueryFees
-	NewKeeper                   = keeper.NewKeeper
-	TokenIssueFeeHandler        = keeper.TokenIssueFeeHandler
-	GatewayTokenIssueFeeHandler = keeper.GatewayTokenIssueFeeHandler
-	GatewayCreateFeeHandler     = keeper.GatewayCreateFeeHandler
-	NewQuerier                  = keeper.NewQuerier
-	NewAnteHandler              = keeper.NewAnteHandler
+	ModuleCdc             = types.ModuleCdc
+	RegisterCodec         = types.RegisterCodec
+	ErrInvalidAssetFamily = types.ErrInvalidAssetFamily
+	NewFungibleToken      = types.NewFungibleToken
+	DefaultParams         = types.DefaultParams
+	NewParams             = types.NewParams
+	NewGenesisState       = types.NewGenesisState
 )

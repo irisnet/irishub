@@ -1,12 +1,14 @@
 package guardian
 
 import (
-	sdk "github.com/irisnet/irishub/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 // handle all "guardian" type messages.
 func NewHandler(k Keeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
+		ctx = ctx.WithEventManager(sdk.NewEventManager())
+
 		switch msg := msg.(type) {
 		case MsgAddProfiler:
 			return handleMsgAddProfiler(ctx, k, msg)
@@ -30,11 +32,22 @@ func handleMsgAddProfiler(ctx sdk.Context, k Keeper, msg MsgAddProfiler) sdk.Res
 		return ErrProfilerExists(DefaultCodespace, msg.Address).Result()
 	}
 	profiler := NewGuardian(msg.Description, Ordinary, msg.Address, msg.AddedBy)
-	err := k.AddProfiler(ctx, profiler)
-	if err != nil {
-		return err.Result()
-	}
-	return sdk.Result{}
+	k.AddProfiler(ctx, profiler)
+
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, AttributeValueCategory),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.AddedBy.String()),
+		),
+		sdk.NewEvent(
+			EventTypeAddProfiler,
+			sdk.NewAttribute(AttributeKeyProfilerAddress, msg.Address.String()),
+			sdk.NewAttribute(AttributeKeyAddedBy, msg.AddedBy.String()),
+		),
+	})
+
+	return sdk.Result{Events: ctx.EventManager().Events()}
 }
 
 func handleMsgAddTrustee(ctx sdk.Context, k Keeper, msg MsgAddTrustee) sdk.Result {
@@ -45,11 +58,22 @@ func handleMsgAddTrustee(ctx sdk.Context, k Keeper, msg MsgAddTrustee) sdk.Resul
 		return ErrTrusteeExists(DefaultCodespace, msg.Address).Result()
 	}
 	trustee := NewGuardian(msg.Description, Ordinary, msg.Address, msg.AddedBy)
-	err := k.AddTrustee(ctx, trustee)
-	if err != nil {
-		return err.Result()
-	}
-	return sdk.Result{}
+	k.AddTrustee(ctx, trustee)
+
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, AttributeValueCategory),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.AddedBy.String()),
+		),
+		sdk.NewEvent(
+			EventTypeAddTrustee,
+			sdk.NewAttribute(AttributeKeyTrusteeAddress, msg.Address.String()),
+			sdk.NewAttribute(AttributeKeyAddedBy, msg.AddedBy.String()),
+		),
+	})
+
+	return sdk.Result{Events: ctx.EventManager().Events()}
 }
 
 func handleMsgDeleteProfiler(ctx sdk.Context, k Keeper, msg MsgDeleteProfiler) sdk.Result {
@@ -64,11 +88,22 @@ func handleMsgDeleteProfiler(ctx sdk.Context, k Keeper, msg MsgDeleteProfiler) s
 		return ErrDeleteGenesisProfiler(DefaultCodespace, msg.Address).Result()
 	}
 
-	err := k.DeleteProfiler(ctx, msg.Address)
-	if err != nil {
-		return err.Result()
-	}
-	return sdk.Result{}
+	k.DeleteProfiler(ctx, msg.Address)
+
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, AttributeValueCategory),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.DeletedBy.String()),
+		),
+		sdk.NewEvent(
+			EventTypeDeleteProfiler,
+			sdk.NewAttribute(AttributeKeyProfilerAddress, msg.Address.String()),
+			sdk.NewAttribute(AttributeKeyDeletedBy, msg.DeletedBy.String()),
+		),
+	})
+
+	return sdk.Result{Events: ctx.EventManager().Events()}
 }
 
 func handleMsgDeleteTrustee(ctx sdk.Context, k Keeper, msg MsgDeleteTrustee) sdk.Result {
@@ -83,9 +118,20 @@ func handleMsgDeleteTrustee(ctx sdk.Context, k Keeper, msg MsgDeleteTrustee) sdk
 		return ErrDeleteGenesisTrustee(DefaultCodespace, msg.Address).Result()
 	}
 
-	err := k.DeleteTrustee(ctx, msg.Address)
-	if err != nil {
-		return err.Result()
-	}
-	return sdk.Result{}
+	k.DeleteTrustee(ctx, msg.Address)
+
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, AttributeValueCategory),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.DeletedBy.String()),
+		),
+		sdk.NewEvent(
+			EventTypeDeleteTrustee,
+			sdk.NewAttribute(AttributeKeyTrusteeAddress, msg.Address.String()),
+			sdk.NewAttribute(AttributeKeyDeletedBy, msg.DeletedBy.String()),
+		),
+	})
+
+	return sdk.Result{Events: ctx.EventManager().Events()}
 }

@@ -3,21 +3,14 @@ package types
 import (
 	"fmt"
 
-	sdk "github.com/irisnet/irishub/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 const (
-	// MsgRoute identifies transaction types
-	MsgRoute = "htlc"
-
-	// type for MsgCreateHTLC
-	TypeMsgCreateHTLC = "create_htlc"
-
-	// type for MsgClaimHTLC
-	TypeMsgClaimHTLC = "claim_htlc"
-
-	// type for MsgRefundHTLC
-	TypeMsgRefundHTLC = "refund_htlc"
+	MsgRoute          = "htlc"        // MsgRoute identifies transaction types
+	TypeMsgCreateHTLC = "create_htlc" // type for MsgCreateHTLC
+	TypeMsgClaimHTLC  = "claim_htlc"  // type for MsgClaimHTLC
+	TypeMsgRefundHTLC = "refund_htlc" // type for MsgRefundHTLC
 
 	SecretLength                    = 32    // the length for the secret
 	HashLockLength                  = 32    // the length for the hash lock
@@ -32,13 +25,13 @@ var _ sdk.Msg = &MsgRefundHTLC{}
 
 // MsgCreateHTLC represents a msg for creating an HTLC
 type MsgCreateHTLC struct {
-	Sender               sdk.AccAddress `json:"sender"`                  // the initiator address
-	To                   sdk.AccAddress `json:"to"`                      // the destination address
-	ReceiverOnOtherChain string         `json:"receiver_on_other_chain"` // the claim receiving address on the other chain
-	Amount               sdk.Coins      `json:"amount"`                  // the amount to be transferred
-	HashLock             []byte         `json:"hash_lock"`               // the hash lock generated from secret (and timestamp if provided)
-	Timestamp            uint64         `json:"timestamp"`               // if provided, used to generate the hash lock together with secret
-	TimeLock             uint64         `json:"time_lock"`               // the time span after which the HTLC will expire
+	Sender               sdk.AccAddress `json:"sender" yaml:"sender"`                                   // the initiator address
+	To                   sdk.AccAddress `json:"to" yaml:"to"`                                           // the destination address
+	ReceiverOnOtherChain string         `json:"receiver_on_other_chain" yaml:"receiver_on_other_chain"` // the claim receiving address on the other chain
+	Amount               sdk.Coins      `json:"amount" yaml:"amount"`                                   // the amount to be transferred
+	HashLock             HTLCHashLock   `json:"hash_lock" yaml:"hash_lock"`                             // the hash lock generated from secret (and timestamp if provided)
+	Timestamp            uint64         `json:"timestamp" yaml:"timestamp"`                             // if provided, used to generate the hash lock together with secret
+	TimeLock             uint64         `json:"time_lock" yaml:"time_lock"`                             // the time span after which the HTLC will expire
 }
 
 // NewMsgCreateHTLC constructs a MsgCreateHTLC
@@ -47,7 +40,7 @@ func NewMsgCreateHTLC(
 	to sdk.AccAddress,
 	receiverOnOtherChain string,
 	amount sdk.Coins,
-	hashLock []byte,
+	hashLock HTLCHashLock,
 	timestamp uint64,
 	timeLock uint64,
 ) MsgCreateHTLC {
@@ -99,7 +92,7 @@ func (msg MsgCreateHTLC) ValidateBasic() sdk.Error {
 
 // Implements Msg.
 func (msg MsgCreateHTLC) GetSignBytes() []byte {
-	b, err := msgCdc.MarshalJSON(msg)
+	b, err := ModuleCdc.MarshalJSON(msg)
 	if err != nil {
 		panic(err)
 	}
@@ -116,16 +109,16 @@ func (msg MsgCreateHTLC) GetSigners() []sdk.AccAddress {
 
 // MsgClaimHTLC represents a msg for claiming an HTLC
 type MsgClaimHTLC struct {
-	Sender   sdk.AccAddress `json:"sender"`    // the initiator address
-	HashLock []byte         `json:"hash_lock"` // the hash lock identifying the HTLC to be claimed
-	Secret   []byte         `json:"secret"`    // the secret with which to claim
+	Sender   sdk.AccAddress `json:"sender" yaml:"sender"`       // the initiator address
+	HashLock HTLCHashLock   `json:"hash_lock" yaml:"hash_lock"` // the hash lock identifying the HTLC to be claimed
+	Secret   HTLCSecret     `json:"secret" yaml:"secret"`       // the secret with which to claim
 }
 
 // NewMsgClaimHTLC constructs a MsgClaimHTLC
 func NewMsgClaimHTLC(
 	sender sdk.AccAddress,
-	hashLock []byte,
-	secret []byte,
+	hashLock HTLCHashLock,
+	secret HTLCSecret,
 ) MsgClaimHTLC {
 	return MsgClaimHTLC{
 		Sender:   sender,
@@ -159,7 +152,7 @@ func (msg MsgClaimHTLC) ValidateBasic() sdk.Error {
 
 // Implements Msg.
 func (msg MsgClaimHTLC) GetSignBytes() []byte {
-	b, err := msgCdc.MarshalJSON(msg)
+	b, err := ModuleCdc.MarshalJSON(msg)
 	if err != nil {
 		panic(err)
 	}
@@ -176,14 +169,14 @@ func (msg MsgClaimHTLC) GetSigners() []sdk.AccAddress {
 
 // MsgRefundHTLC represents a msg for refund an HTLC
 type MsgRefundHTLC struct {
-	Sender   sdk.AccAddress `json:"sender"`    // the initiator address
-	HashLock []byte         `json:"hash_lock"` // the hash lock identifying the HTLC to be refunded
+	Sender   sdk.AccAddress `json:"sender" yaml:"sender"`       // the initiator address
+	HashLock HTLCHashLock   `json:"hash_lock" yaml:"hash_lock"` // the hash lock identifying the HTLC to be refunded
 }
 
 // NewMsgClaimHTLC constructs a MsgClaimHTLC
 func NewMsgRefundHTLC(
 	sender sdk.AccAddress,
-	hashLock []byte,
+	hashLock HTLCHashLock,
 ) MsgRefundHTLC {
 	return MsgRefundHTLC{
 		Sender:   sender,
@@ -212,7 +205,7 @@ func (msg MsgRefundHTLC) ValidateBasic() sdk.Error {
 
 // Implements Msg.
 func (msg MsgRefundHTLC) GetSignBytes() []byte {
-	b, err := msgCdc.MarshalJSON(msg)
+	b, err := ModuleCdc.MarshalJSON(msg)
 	if err != nil {
 		panic(err)
 	}
