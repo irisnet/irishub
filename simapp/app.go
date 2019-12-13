@@ -33,6 +33,7 @@ import (
 	"github.com/irisnet/irishub/modules/guardian"
 	"github.com/irisnet/irishub/modules/htlc"
 	"github.com/irisnet/irishub/modules/mint"
+	"github.com/irisnet/irishub/modules/rand"
 )
 
 const appName = "SimApp"
@@ -62,6 +63,7 @@ var (
 		evidence.AppModuleBasic{},
 		guardian.AppModuleBasic{},
 		htlc.AppModuleBasic{},
+		rand.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -118,6 +120,7 @@ type SimApp struct {
 	AssetKeeper    asset.Keeper
 	GuardianKeeper guardian.Keeper
 	HTLCKeeper     htlc.Keeper
+	RandKeeper     rand.Keeper
 
 	// the module manager
 	mm *module.Manager
@@ -228,6 +231,8 @@ func NewSimApp(
 		app.cdc, keys[asset.StoreKey], app.subspaces[asset.ModuleName], asset.DefaultCodespace,
 		app.SupplyKeeper, auth.FeeCollectorName)
 
+	app.RandKeeper = rand.NewKeeper(app.cdc, keys[rand.StoreKey], rand.DefaultCodespace)
+
 	// NOTE: Any module instantiated in the module manager that is later modified
 	// must be passed by reference here.
 	app.mm = module.NewManager(
@@ -245,6 +250,7 @@ func NewSimApp(
 		asset.NewAppModule(app.AssetKeeper),
 		guardian.NewAppModule(app.GuardianKeeper),
 		htlc.NewAppModule(app.HTLCKeeper),
+		rand.NewAppModule(app.RandKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -255,6 +261,7 @@ func NewSimApp(
 		distr.ModuleName,
 		slashing.ModuleName,
 		htlc.ModuleName,
+		rand.ModuleName,
 	)
 	app.mm.SetOrderEndBlockers(
 		crisis.ModuleName,
@@ -268,7 +275,7 @@ func NewSimApp(
 		auth.ModuleName, distr.ModuleName, staking.ModuleName, bank.ModuleName,
 		slashing.ModuleName, gov.ModuleName, mint.ModuleName, supply.ModuleName,
 		crisis.ModuleName, genutil.ModuleName, evidence.ModuleName,
-		asset.ModuleName, guardian.ModuleName, htlc.ModuleName,
+		asset.ModuleName, guardian.ModuleName, htlc.ModuleName, rand.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -289,6 +296,7 @@ func NewSimApp(
 		slashing.NewAppModule(app.SlashingKeeper, app.StakingKeeper),
 		asset.NewAppModule(app.AssetKeeper),
 		htlc.NewAppModule(app.HTLCKeeper),
+		rand.NewAppModule(app.RandKeeper),
 	)
 
 	app.sm.RegisterStoreDecoders()
