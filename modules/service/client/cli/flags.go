@@ -25,8 +25,8 @@ const (
 	FlagRespData           = "response-data"
 	FlagErrMsg             = "error-msg"
 	FlagProfiling          = "profiling"
-	FlagReqChainId         = "request-chain-id"
-	FlagReqId              = "request-id"
+	FlagReqChainID         = "request-chain-id"
+	FlagReqID              = "request-id"
 	FlagDestAddress        = "dest-address"
 	FlagWithdrawAmount     = "withdraw-amount"
 )
@@ -75,8 +75,8 @@ func init() {
 
 	FsServiceResponse.BytesHex(FlagRespData, nil, "hex encoded response data of a service invocation")
 	FsServiceResponse.BytesHex(FlagErrMsg, nil, "hex encoded response error msg of a service invocation")
-	FsServiceResponse.String(FlagReqChainId, "", "the ID of the blockchain that the service invocation initiated")
-	FsServiceResponse.String(FlagReqId, "", "the ID of the service invocation")
+	FsServiceResponse.String(FlagReqChainID, "", "the ID of the blockchain that the service invocation initiated")
+	FsServiceResponse.String(FlagReqID, "", "the ID of the service invocation")
 
 	FsServiceWithdrawTax.String(FlagDestAddress, "", "bech32 encoded address of the destination account")
 	FsServiceWithdrawTax.String(FlagWithdrawAmount, "", "withdraw amount")
