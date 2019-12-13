@@ -2,6 +2,7 @@ package cli
 
 import (
 	"bufio"
+	"strconv"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/context"
@@ -11,7 +12,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
 	"github.com/irisnet/irishub/modules/rand"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 // GetTxCmd returns the transaction commands for this module
@@ -35,19 +35,29 @@ func GetTxCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
 func GetCmdRequestRand(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "request-rand",
-		Short:   "Request a random number",
-		Example: "iriscli rand request-rand --block-interval=10",
+		Short:   "Request a random number with an optional block interval",
+		Example: "iriscli tx rand request-rand [block-interval]",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			inBuf := bufio.NewReader(cmd.InOrStdin())
 			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
 			cliCtx := context.NewCLIContextWithInput(inBuf).WithCodec(cdc)
+
+			var blockInterval uint64
+			var err error
+
+			if len(args) > 0 {
+				blockInterval, err = strconv.ParseUint(args[0], 10, 64)
+				if err != nil {
+					return err
+				}
+			}
 
 			consumer, err := cliCtx.GetFromAddress()
 			if err != nil {
 				return err
 			}
 
-			msg := rand.NewMsgRequestRand(consumer, uint64(viper.GetInt64(FlagBlockInterval)))
+			msg := rand.NewMsgRequestRand(consumer, blockInterval)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -55,8 +65,6 @@ func GetCmdRequestRand(cdc *codec.Codec) *cobra.Command {
 			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
 		},
 	}
-
-	cmd.Flags().AddFlagSet(FsRequestRand)
 
 	return cmd
 }

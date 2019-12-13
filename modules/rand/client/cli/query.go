@@ -3,6 +3,7 @@ package cli
 import (
 	"encoding/hex"
 	"fmt"
+	"strconv"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/context"
@@ -10,7 +11,6 @@ import (
 	"github.com/irisnet/irishub/modules/rand"
 	"github.com/irisnet/irishub/modules/rand/client/types"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 // GetQueryCmd returns the cli query commands for this module
@@ -26,27 +26,28 @@ func GetQueryCmd(queryRoute string, cdc *codec.Codec) *cobra.Command {
 
 	randQueryCmd.AddCommand(client.GetCommands(
 		GetCmdQueryRand(queryRoute, cdc),
-		GetCmdQueryRandRequestQueue(queryRoute, cdc))...)
+		GetCmdQueryRandRequestQueue(queryRoute, cdc),
+	)...)
 
 	return randQueryCmd
 }
 
-// GetCmdQueryRand implements the query-rand command.
+// GetCmdQueryRand implements the query rand command.
 func GetCmdQueryRand(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "query-rand",
+		Use:     "rand",
 		Short:   "Query a random number by the request id",
-		Example: "iriscli rand query-rand --request-id=<request id>",
+		Example: "iriscli query rand rand <request id>",
+		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			reqID := viper.GetString(FlagReqID)
-			if err := rand.CheckReqID(reqID); err != nil {
+			if err := rand.CheckReqID(args[0]); err != nil {
 				return err
 			}
 
 			params := rand.QueryRandParams{
-				ReqID: reqID,
+				ReqID: args[0],
 			}
 
 			bz, err := cdc.MarshalJSON(params)
@@ -76,22 +77,28 @@ func GetCmdQueryRand(queryRoute string, cdc *codec.Codec) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().AddFlagSet(FsQueryRand)
-	cmd.MarkFlagRequired(FlagReqID)
-
 	return cmd
 }
 
-// GetCmdQueryRandRequestQueue implements the query-queue command.
+// GetCmdQueryRandRequestQueue implements the query queue command.
 func GetCmdQueryRandRequestQueue(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "query-queue",
 		Short:   "Query the random number request queue with an optional height",
-		Example: "iriscli rand query-queue [--gen-height=<generation height>]",
+		Example: "iriscli query rand queue [gen-height]",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			height := viper.GetInt64(FlagGenHeight)
+			var height int64
+			var err error
+
+			if len(args) > 0 {
+				height, err = strconv.ParseInt(args[0], 10, 64)
+				if err != nil {
+					return err
+				}
+			}
+
 			if height < 0 {
 				return fmt.Errorf("the height must not be less than 0: %d", height)
 			}
@@ -120,8 +127,6 @@ func GetCmdQueryRandRequestQueue(queryRoute string, cdc *codec.Codec) *cobra.Com
 			return cliCtx.PrintOutput(requests)
 		},
 	}
-
-	cmd.Flags().AddFlagSet(FsQueryQueue)
 
 	return cmd
 }
