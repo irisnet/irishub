@@ -20,17 +20,19 @@ type (
 	Keeper = keeper.Keeper
 )
 
+// exported constants
+const (
+	ModuleName       = types.ModuleName
+	StoreKey         = types.StoreKey
+	QuerierRoute     = types.QuerierRoute
+	RouterKey        = types.RouterKey
+	DefaultCodespace = types.DefaultCodespace
+)
+
 // exported variables and functions
 var (
-	ModuleName   = types.ModuleName
-	StoreKey     = types.StoreKey
-	TStoreKey    = types.TStoreKey
-	QuerierRoute = types.QuerierRoute
-	RouterKey    = types.RouterKey
-	ModuleCdc    = types.ModuleCdc
-
-	DefaultCodespace = types.DefaultCodespace
-	RegisterCodec    = types.RegisterCodec
+	ModuleCdc     = types.ModuleCdc
+	RegisterCodec = types.RegisterCodec
 
 	NewMsgRequestRand    = types.NewMsgRequestRand
 	NewRand              = types.NewRand
