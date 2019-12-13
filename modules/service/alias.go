@@ -31,6 +31,7 @@ type (
 	QueryBindingParams  = types.QueryBindingParams
 	QueryResponseParams = types.QueryResponseParams
 	QueryFeesParams     = types.QueryFeesParams
+	FeesOutput          = types.FeesOutput
 
 	GenesisState = types.GenesisState
 
@@ -50,6 +51,8 @@ const (
 	DepositAccName = types.DepositAccName
 	RequestAccName = types.RequestAccName
 	TaxAccName     = types.TaxAccName
+
+	ServiceDenom = types.ServiceDenom
 
 	NoPrivacy        = types.NoPrivacy
 	PubKeyEncryption = types.PubKeyEncryption
