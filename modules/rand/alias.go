@@ -27,6 +27,13 @@ const (
 	QuerierRoute     = types.QuerierRoute
 	RouterKey        = types.RouterKey
 	DefaultCodespace = types.DefaultCodespace
+
+	EventTypeGenerateRand  = types.EventTypeGenerateRand
+	EventTypeRequestRand   = types.EventTypeRequestRand
+	AttributeKeyRequestID  = types.AttributeKeyRequestID
+	AttributeKeyRand       = types.AttributeKeyRand
+	AttributeValueCategory = types.AttributeValueCategory
+	AttributeKeyGenHeight  = types.AttributeKeyGenHeight
 )
 
 // exported variables and functions

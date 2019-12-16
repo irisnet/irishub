@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/irisnet/irishub/modules/rand/internal/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 )
 
@@ -38,9 +37,9 @@ func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, k Keeper) {
 
 		ctx.EventManager().EmitEvent(
 			sdk.NewEvent(
-				types.EventTypeGenerateRand,
-				sdk.NewAttribute(types.AttributeKeyRequestID, hex.EncodeToString(reqID)),
-				sdk.NewAttribute(types.AttributeKeyRand, rand.FloatString(RandPrec)),
+				EventTypeGenerateRand,
+				sdk.NewAttribute(AttributeKeyRequestID, hex.EncodeToString(reqID)),
+				sdk.NewAttribute(AttributeKeyRand, rand.FloatString(RandPrec)),
 			),
 		)
 

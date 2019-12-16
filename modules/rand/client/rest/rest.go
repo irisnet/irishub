@@ -20,7 +20,7 @@ func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router) {
 }
 
 type RequestRandReq struct {
-	BaseReq       rest.BaseReq   `json:"base_req"`       // base req
-	Consumer      sdk.AccAddress `json:"consumer"`       // request address
-	BlockInterval uint64         `json:"block_interval"` // block interval
+	BaseReq       rest.BaseReq   `json:"base_req" yaml:"base_req"`             // base req
+	Consumer      sdk.AccAddress `json:"consumer" yaml:"consumer"`             // request address
+	BlockInterval uint64         `json:"block_interval" yaml:"block_interval'` // block interval
 }

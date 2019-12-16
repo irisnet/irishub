@@ -5,10 +5,9 @@ import (
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/irisnet/irishub/modules/rand/internal/types"
 )
 
-// NewHandler handles all "rand" messages
+// NewHandler handles all rand msgs
 func NewHandler(k Keeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
 		ctx = ctx.WithEventManager(sdk.NewEventManager())
@@ -31,20 +30,19 @@ func handleMsgRequestRand(ctx sdk.Context, k Keeper, msg MsgRequestRand) sdk.Res
 		return err.Result()
 	}
 
-	ctx.EventManager().EmitEvent(
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Consumer.String()),
-		),
-	)
-
-	ctx.EventManager().EmitEvent(
-		sdk.NewEvent(
-			types.EventTypeRequestRand,
-			sdk.NewAttribute(types.AttributeKeyRequestID, hex.EncodeToString(GenerateRequestID(request))),
-			sdk.NewAttribute(types.AttributeKeyGenHeight, fmt.Sprintf("%d", request.Height+int64(msg.BlockInterval))),
-		),
+	ctx.EventManager().EmitEvents(
+		sdk.Events{
+			sdk.NewEvent(
+				sdk.EventTypeMessage,
+				sdk.NewAttribute(sdk.AttributeKeyModule, AttributeValueCategory),
+				sdk.NewAttribute(sdk.AttributeKeySender, msg.Consumer.String()),
+			),
+			sdk.NewEvent(
+				EventTypeRequestRand,
+				sdk.NewAttribute(AttributeKeyRequestID, hex.EncodeToString(GenerateRequestID(request))),
+				sdk.NewAttribute(AttributeKeyGenHeight, fmt.Sprintf("%d", request.Height+int64(msg.BlockInterval))),
+			),
+		},
 	)
 
 	return sdk.Result{Events: ctx.EventManager().Events()}
