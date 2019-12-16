@@ -32,8 +32,8 @@ const (
 	EventTypeRequestRand   = types.EventTypeRequestRand
 	AttributeKeyRequestID  = types.AttributeKeyRequestID
 	AttributeKeyRand       = types.AttributeKeyRand
-	AttributeValueCategory = types.AttributeValueCategory
 	AttributeKeyGenHeight  = types.AttributeKeyGenHeight
+	AttributeValueCategory = types.AttributeValueCategory
 )
 
 // exported variables and functions

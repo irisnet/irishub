@@ -1,75 +1,77 @@
-package rand
+package rand_test
 
 import (
 	"strconv"
 	"testing"
 
 	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/cosmos/cosmos-sdk/store"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/stretchr/testify/require"
+	"github.com/irisnet/irishub/modules/rand"
+	"github.com/irisnet/irishub/simapp"
+	"github.com/stretchr/testify/suite"
 	abci "github.com/tendermint/tendermint/abci/types"
-	"github.com/tendermint/tendermint/libs/log"
-	dbm "github.com/tendermint/tm-db"
 )
 
-func setupMultiStore() (sdk.MultiStore, *sdk.KVStoreKey) {
-	db := dbm.NewMemDB()
-	randKey := sdk.NewKVStoreKey(StoreKey)
+// define testing variables
+var (
+	testTxBytes        = []byte("test-tx")
+	testHeight         = int64(10000)
+	testNewHeight      = testHeight + 50
+	testBlockInterval1 = uint64(100)
+	testBlockInterval2 = uint64(200)
+	testConsumer1      = sdk.AccAddress([]byte("test-consumer1"))
+	testConsumer2      = sdk.AccAddress([]byte("test-consumer2"))
+)
 
-	ms := store.NewCommitMultiStore(db)
-	ms.MountStoreWithDB(randKey, sdk.StoreTypeIAVL, db)
-	ms.LoadLatestVersion()
+type GenesisTestSuite struct {
+	suite.Suite
 
-	return ms, randKey
+	cdc    *codec.Codec
+	ctx    sdk.Context
+	keeper *rand.Keeper
 }
 
-func TestExportRandGenesis(t *testing.T) {
-	ms, randKey := setupMultiStore()
+func (suite *GenesisTestSuite) SetupTest() {
+	isCheckTx := false
+	app := simapp.Setup(isCheckTx)
 
-	cdc := codec.New()
-	RegisterCodec(cdc)
+	suite.cdc = app.Codec()
+	suite.ctx = app.BaseApp.NewContext(isCheckTx, abci.Header{})
+	suite.keeper = &app.RandKeeper
+}
 
-	keeper := NewKeeper(cdc, randKey, DefaultCodespace)
-
-	// define variables
-	txBytes := []byte("testtx")
-	txHeight := int64(10000)
-	newBlockHeight := txHeight + 50
-	consumer1 := sdk.AccAddress([]byte("consumer1"))
-	consumer2 := sdk.AccAddress([]byte("consumer2"))
-	blockInterval1 := uint64(100)
-	blockInterval2 := uint64(200)
-
-	// build context
-	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewNopLogger())
-	ctx = ctx.WithBlockHeight(txHeight).WithTxBytes(txBytes)
+func (suite *GenesisTestSuite) TestExportGenesis() {
+	suite.ctx = suite.ctx.WithBlockHeight(testHeight).WithTxBytes(testTxBytes)
 
 	// request rands
-	keeper.RequestRand(ctx, consumer1, blockInterval1)
-	keeper.RequestRand(ctx, consumer2, blockInterval2)
+	suite.keeper.RequestRand(suite.ctx, testConsumer1, testBlockInterval1)
+	suite.keeper.RequestRand(suite.ctx, testConsumer2, testBlockInterval2)
+
+	// preceed to the new block
+	suite.ctx = suite.ctx.WithBlockHeight(testNewHeight)
 
 	// get the pending requests from queue
-	storedRequests := make(map[int64][]Request)
-	keeper.IterateRandRequestQueue(ctx, func(h int64, r Request) bool {
+	storedRequests := make(map[int64][]rand.Request)
+	suite.keeper.IterateRandRequestQueue(suite.ctx, func(h int64, r rand.Request) bool {
 		storedRequests[h] = append(storedRequests[h], r)
 		return false
 	})
-	require.Equal(t, 2, len(storedRequests))
+	suite.Equal(2, len(storedRequests))
 
-	// preceed to the new block
-	ctx = ctx.WithBlockHeight(newBlockHeight)
+	// export genesis
+	genesis := rand.ExportGenesis(suite.ctx, *suite.keeper)
+	exportedRequests := genesis.PendingRandRequests
+	suite.Equal(2, len(exportedRequests))
 
-	// export requests
-	exportedGenesis := ExportGenesis(ctx, keeper)
-	exportedRequests := exportedGenesis.PendingRandRequests
-	require.Equal(t, 2, len(exportedRequests))
-
-	// assert that exported requests are consistant with the requests in queue
+	// assert that exported requests are consistant with requests in queue
 	for height, requests := range exportedRequests {
 		h, _ := strconv.ParseInt(height, 10, 64)
-		storedHeight := h + newBlockHeight - 1
+		storedHeight := h + testNewHeight - 1
 
-		require.Equal(t, storedRequests[storedHeight], requests)
+		suite.Equal(storedRequests[storedHeight], requests)
 	}
+}
+
+func TestGenesisTestSuite(t *testing.T) {
+	suite.Run(t, new(GenesisTestSuite))
 }

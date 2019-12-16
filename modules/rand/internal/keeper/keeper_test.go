@@ -1,78 +1,74 @@
-package keeper
+package keeper_test
 
 import (
+	"math/big"
 	"testing"
 
 	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/cosmos/cosmos-sdk/store"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/irisnet/irishub/modules/rand/internal/keeper"
 	"github.com/irisnet/irishub/modules/rand/internal/types"
-	"github.com/stretchr/testify/require"
+	"github.com/irisnet/irishub/simapp"
+	"github.com/stretchr/testify/suite"
 	abci "github.com/tendermint/tendermint/abci/types"
-	"github.com/tendermint/tendermint/libs/log"
-	dbm "github.com/tendermint/tm-db"
 )
 
-func setupMultiStore() (sdk.MultiStore, *sdk.KVStoreKey) {
-	db := dbm.NewMemDB()
-	randKey := sdk.NewKVStoreKey(types.StoreKey)
+// define testing variables
+var (
+	testTxBytes        = []byte("test-tx")
+	testHeight         = int64(10000)
+	testBlockInterval  = uint64(100)
+	testConsumer       = sdk.AccAddress([]byte("test-consumer"))
+	testReqID          = []byte("test-req-id")
+	testRandNumerator  = int64(3)
+	testRandDenomiator = int64(4)
+)
 
-	ms := store.NewCommitMultiStore(db)
-	ms.MountStoreWithDB(randKey, sdk.StoreTypeIAVL, db)
-	ms.LoadLatestVersion()
+type KeeperTestSuite struct {
+	suite.Suite
 
-	return ms, randKey
+	cdc    *codec.Codec
+	ctx    sdk.Context
+	keeper *keeper.Keeper
 }
 
-func TestRequestRandKeeper(t *testing.T) {
-	ms, randKey := setupMultiStore()
+func (suite *KeeperTestSuite) SetupTest() {
+	isCheckTx := false
+	app := simapp.Setup(isCheckTx)
 
-	cdc := codec.New()
-	types.RegisterCodec(cdc)
+	suite.cdc = app.Codec()
+	suite.ctx = app.BaseApp.NewContext(isCheckTx, abci.Header{})
+	suite.keeper = &app.RandKeeper
+}
 
-	keeper := NewKeeper(cdc, randKey, types.DefaultCodespace)
+func (suite *KeeperTestSuite) TestSetRand() {
+	rand := types.NewRand(types.SHA256(testTxBytes), testHeight, big.NewRat(testRandNumerator, testRandDenomiator))
+	suite.keeper.SetRand(suite.ctx, testReqID, rand)
 
-	// define variables
-	txBytes := []byte("testtx")
-	txHeight := int64(10000)
-	blockInterval := uint64(100)
-	destHeight := txHeight + int64(blockInterval)
-	consumer := sdk.AccAddress([]byte("consumer"))
+	storedRand, err := suite.keeper.GetRand(suite.ctx, testReqID)
+	suite.NoError(err)
+	suite.Equal(rand, storedRand)
+}
 
-	// build context
-	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewNopLogger())
-	ctx = ctx.WithBlockHeight(txHeight).WithTxBytes(txBytes)
-	require.Equal(t, txHeight, ctx.BlockHeight())
-	require.Equal(t, txBytes, ctx.TxBytes())
+func (suite *KeeperTestSuite) TestRequestRand() {
+	suite.ctx = suite.ctx.WithBlockHeight(testHeight).WithTxBytes(testTxBytes)
 
-	// query rand request queue and assert that the result is empty
-	var requests []types.Request
-	keeper.IterateRandRequestQueue(ctx, func(h int64, r types.Request) bool {
-		requests = append(requests, r)
-		return false
-	})
-	require.True(t, len(requests) == 0)
+	_, err := suite.keeper.RequestRand(suite.ctx, testConsumer, testBlockInterval)
+	suite.NoError(err)
 
-	// request a rand
-	_, err := keeper.RequestRand(ctx, consumer, blockInterval)
-	require.Nil(t, err)
+	expectedRequest := types.NewRequest(testHeight, testConsumer, types.SHA256(testTxBytes))
 
-	// get request id
-	reqID := types.GenerateRequestID(types.NewRequest(txHeight, consumer, types.SHA256(txBytes)))
+	iterator := suite.keeper.IterateRandRequestQueueByHeight(suite.ctx, testHeight+int64(testBlockInterval))
+	defer iterator.Close()
 
-	// get the pending request and assert the result is not nil
-	store := ctx.KVStore(randKey)
-	bz := store.Get(types.KeyRandRequestQueue(destHeight, reqID))
-	require.NotNil(t, bz)
+	for ; iterator.Valid(); iterator.Next() {
+		var request types.Request
+		suite.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), request)
 
-	// decode the request
-	var request types.Request
-	cdc.MustUnmarshalBinaryLengthPrefixed(bz, &request)
-	require.Equal(t, txHeight, request.Height)
-	require.Equal(t, consumer, request.Consumer)
-	require.Equal(t, types.SHA256(txBytes), request.TxHash)
+		suite.Equal(expectedRequest, request)
+	}
+}
 
-	// get the rand and assert the result is nil
-	bz = store.Get(types.KeyRand(reqID))
-	require.Nil(t, bz)
+func TestKeeperTestSuite(t *testing.T) {
+	suite.Run(t, new(KeeperTestSuite))
 }
