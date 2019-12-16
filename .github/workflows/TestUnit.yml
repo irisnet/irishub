@@ -9,4 +9,4 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v1
       - name: Run unit tests
-        run: sudo docker run -v $(pwd):/modules irisnet/golang sh -c "make test-unit"
+        run: sudo docker run -v $(pwd):/irishub irisnet/golang sh -c "make test-unit"
