@@ -1,10 +1,12 @@
 package cli
 
 import (
+	"github.com/spf13/cobra"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
+
 	"github.com/irisnet/irishub/modules/rand/internal/types"
-	"github.com/spf13/cobra"
 )
 
 // GetQueryCmd returns the cli query commands for this module

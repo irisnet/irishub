@@ -5,11 +5,14 @@ import (
 	"math/big"
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
+	cmn "github.com/tendermint/tendermint/libs/common"
+
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
 	"github.com/irisnet/irishub/modules/rand/internal/types"
-	"github.com/stretchr/testify/require"
-	cmn "github.com/tendermint/tendermint/libs/common"
 )
 
 func makeTestCodec() (cdc *codec.Codec) {

@@ -32,13 +32,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	stakingsim "github.com/cosmos/cosmos-sdk/x/staking/simulation"
 	"github.com/cosmos/cosmos-sdk/x/supply"
-<<<<<<< HEAD
-	randm "github.com/irisnet/irishub/modules/rand"
-	randsim "github.com/irisnet/irishub/modules/rand/simulation"
-=======
 
 	"github.com/irisnet/irishub/modules/mint"
->>>>>>> v1.0.0-refactor
+	randmodule "github.com/irisnet/irishub/modules/rand"
+	randsim "github.com/irisnet/irishub/modules/rand/simulation"
 )
 
 func init() {
@@ -466,7 +463,7 @@ func TestAppImportExport(t *testing.T) {
 		{app.keys[supply.StoreKey], newApp.keys[supply.StoreKey], [][]byte{}},
 		{app.keys[params.StoreKey], newApp.keys[params.StoreKey], [][]byte{}},
 		{app.keys[gov.StoreKey], newApp.keys[gov.StoreKey], [][]byte{}},
-		{app.keys[randm.StoreKey], newApp.keys[randm.StoreKey], [][]byte{}},
+		{app.keys[randmodule.StoreKey], newApp.keys[randmodule.StoreKey], [][]byte{}},
 	}
 
 	for _, storeKeysPrefix := range storeKeysPrefixes {

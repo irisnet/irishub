@@ -8,6 +8,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/simapp/helpers"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
+
 	"github.com/irisnet/irishub/modules/rand/internal/keeper"
 	"github.com/irisnet/irishub/modules/rand/internal/types"
 )

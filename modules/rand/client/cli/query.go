@@ -5,11 +5,13 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/spf13/cobra"
+
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
+
 	clienttypes "github.com/irisnet/irishub/modules/rand/client/types"
 	"github.com/irisnet/irishub/modules/rand/internal/types"
-	"github.com/spf13/cobra"
 )
 
 // GetCmdQueryRand implements the query rand command.

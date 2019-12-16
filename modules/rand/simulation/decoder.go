@@ -4,9 +4,11 @@ import (
 	"bytes"
 	"fmt"
 
-	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/irisnet/irishub/modules/rand/internal/types"
 	cmn "github.com/tendermint/tendermint/libs/common"
+
+	"github.com/cosmos/cosmos-sdk/codec"
+
+	"github.com/irisnet/irishub/modules/rand/internal/types"
 )
 
 // DecodeStore unmarshals the KVPair's Value to the corresponding rand type

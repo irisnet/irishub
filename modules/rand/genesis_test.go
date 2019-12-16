@@ -4,12 +4,15 @@ import (
 	"strconv"
 	"testing"
 
+	"github.com/stretchr/testify/suite"
+
+	abci "github.com/tendermint/tendermint/abci/types"
+
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	
 	"github.com/irisnet/irishub/modules/rand"
 	"github.com/irisnet/irishub/simapp"
-	"github.com/stretchr/testify/suite"
-	abci "github.com/tendermint/tendermint/abci/types"
 )
 
 // define testing variables

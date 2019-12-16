@@ -1,10 +1,11 @@
 package rest
 
 import (
+	"github.com/gorilla/mux"
+
 	"github.com/cosmos/cosmos-sdk/client/context"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/rest"
-	"github.com/gorilla/mux"
 )
 
 // Rest variable names
@@ -22,5 +23,5 @@ func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router) {
 type RequestRandReq struct {
 	BaseReq       rest.BaseReq   `json:"base_req" yaml:"base_req"`             // base req
 	Consumer      sdk.AccAddress `json:"consumer" yaml:"consumer"`             // request address
-	BlockInterval uint64         `json:"block_interval" yaml:"block_interval'` // block interval
+	BlockInterval uint64         `json:"block_interval" yaml:"block_interval"` // block interval
 }

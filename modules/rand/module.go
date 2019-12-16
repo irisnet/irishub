@@ -4,17 +4,20 @@ import (
 	"encoding/json"
 	"math/rand"
 
+	"github.com/gorilla/mux"
+	"github.com/spf13/cobra"
+
+	abci "github.com/tendermint/tendermint/abci/types"
+
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	sim "github.com/cosmos/cosmos-sdk/x/simulation"
-	"github.com/gorilla/mux"
+
 	"github.com/irisnet/irishub/modules/rand/client/cli"
 	"github.com/irisnet/irishub/modules/rand/client/rest"
 	"github.com/irisnet/irishub/modules/rand/simulation"
-	"github.com/spf13/cobra"
-	abci "github.com/tendermint/tendermint/abci/types"
 )
 
 var (

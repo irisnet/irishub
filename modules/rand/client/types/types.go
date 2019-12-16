@@ -1,6 +1,8 @@
 package types
 
-import "fmt"
+import (
+	"fmt"
+)
 
 // ReadableRand represents a shadow Rand intended for readable output
 type ReadableRand struct {
