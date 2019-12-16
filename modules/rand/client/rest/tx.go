@@ -8,7 +8,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/rest"
 	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
 	"github.com/gorilla/mux"
-	"github.com/irisnet/irishub/modules/rand"
+	"github.com/irisnet/irishub/modules/rand/internal/types"
 )
 
 func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router) {
@@ -28,7 +28,7 @@ func requestRandHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		// create the MsgRequestRand message
-		msg := rand.NewMsgRequestRand(req.Consumer, req.BlockInterval)
+		msg := types.NewMsgRequestRand(req.Consumer, req.BlockInterval)
 		err := msg.ValidateBasic()
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())

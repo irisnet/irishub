@@ -8,8 +8,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/types/rest"
 	"github.com/gorilla/mux"
-	"github.com/irisnet/irishub/modules/rand"
-	"github.com/irisnet/irishub/modules/rand/client/types"
+	clienttypes "github.com/irisnet/irishub/modules/rand/client/types"
+	"github.com/irisnet/irishub/modules/rand/internal/types"
 )
 
 func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router) {
@@ -23,7 +23,7 @@ func queryRandHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 		vars := mux.Vars(r)
 
 		reqID := vars["request-id"]
-		if err := rand.CheckReqID(reqID); err != nil {
+		if err := types.CheckReqID(reqID); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
@@ -33,7 +33,7 @@ func queryRandHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		params := rand.QueryRandParams{
+		params := types.QueryRandParams{
 			ReqID: reqID,
 		}
 
@@ -43,24 +43,24 @@ func queryRandHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		route := fmt.Sprintf("custom/%s/%s", rand.QuerierRoute, rand.QueryRand)
+		route := fmt.Sprintf("custom/%s/%s", types.QuerierRoute, types.QueryRand)
 		res, height, err := cliCtx.QueryWithData(route, bz)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
 
-		var rawRand rand.Rand
+		var rawRand types.Rand
 		err = cliCtx.Codec.UnmarshalJSON(res, &rawRand)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
 
-		readableRand := types.ReadableRand{
+		readableRand := clienttypes.ReadableRand{
 			RequestTxHash: hex.EncodeToString(rawRand.RequestTxHash),
 			Height:        rawRand.Height,
-			Value:         rawRand.Value.FloatString(rand.RandPrec),
+			Value:         rawRand.Value.FloatString(types.RandPrec),
 		}
 
 		cliCtx = cliCtx.WithHeight(height)
@@ -89,7 +89,7 @@ func queryQueueHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		params := rand.QueryRandRequestQueueParams{
+		params := types.QueryRandRequestQueueParams{
 			Height: genHeight,
 		}
 
@@ -99,7 +99,7 @@ func queryQueueHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		route := fmt.Sprintf("custom/%s/%s", rand.QuerierRoute, rand.QueryRandRequestQueue)
+		route := fmt.Sprintf("custom/%s/%s", types.QuerierRoute, types.QueryRandRequestQueue)
 		res, height, err := cliCtx.QueryWithData(route, bz)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())

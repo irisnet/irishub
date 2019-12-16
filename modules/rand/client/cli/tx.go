@@ -10,14 +10,14 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
-	"github.com/irisnet/irishub/modules/rand"
+	"github.com/irisnet/irishub/modules/rand/internal/types"
 	"github.com/spf13/cobra"
 )
 
 // GetTxCmd returns the transaction commands for this module
 func GetTxCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
 	randTxCmd := &cobra.Command{
-		Use:                        rand.ModuleName,
+		Use:                        types.ModuleName,
 		Short:                      "Rand transaction subcommands",
 		DisableFlagParsing:         true,
 		SuggestionsMinimumDistance: 2,
@@ -57,7 +57,7 @@ func GetCmdRequestRand(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			msg := rand.NewMsgRequestRand(consumer, blockInterval)
+			msg := types.NewMsgRequestRand(consumer, blockInterval)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}

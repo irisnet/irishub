@@ -8,8 +8,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/irisnet/irishub/modules/rand"
-	"github.com/irisnet/irishub/modules/rand/client/types"
+	clienttypes "github.com/irisnet/irishub/modules/rand/client/types"
+	"github.com/irisnet/irishub/modules/rand/internal/types"
 	"github.com/spf13/cobra"
 )
 
@@ -17,7 +17,7 @@ import (
 func GetQueryCmd(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	// Group rand queries under a subcommand
 	randQueryCmd := &cobra.Command{
-		Use:                        rand.ModuleName,
+		Use:                        types.ModuleName,
 		Short:                      "Querying commands for the rand module",
 		DisableFlagParsing:         true,
 		SuggestionsMinimumDistance: 2,
@@ -42,11 +42,11 @@ func GetCmdQueryRand(queryRoute string, cdc *codec.Codec) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			if err := rand.CheckReqID(args[0]); err != nil {
+			if err := types.CheckReqID(args[0]); err != nil {
 				return err
 			}
 
-			params := rand.QueryRandParams{
+			params := types.QueryRandParams{
 				ReqID: args[0],
 			}
 
@@ -55,22 +55,22 @@ func GetCmdQueryRand(queryRoute string, cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			route := fmt.Sprintf("custom/%s/%s", queryRoute, rand.QueryRand)
+			route := fmt.Sprintf("custom/%s/%s", queryRoute, types.QueryRand)
 			res, _, err := cliCtx.QueryWithData(route, bz)
 			if err != nil {
 				return err
 			}
 
-			var rawRand rand.Rand
+			var rawRand types.Rand
 			err = cdc.UnmarshalJSON(res, &rawRand)
 			if err != nil {
 				return err
 			}
 
-			readableRand := types.ReadableRand{
+			readableRand := clienttypes.ReadableRand{
 				RequestTxHash: hex.EncodeToString(rawRand.RequestTxHash),
 				Height:        rawRand.Height,
-				Value:         rawRand.Value.FloatString(rand.RandPrec),
+				Value:         rawRand.Value.FloatString(types.RandPrec),
 			}
 
 			return cliCtx.PrintOutput(readableRand)
@@ -103,7 +103,7 @@ func GetCmdQueryRandRequestQueue(queryRoute string, cdc *codec.Codec) *cobra.Com
 				return fmt.Errorf("the height must not be less than 0: %d", height)
 			}
 
-			params := rand.QueryRandRequestQueueParams{
+			params := types.QueryRandRequestQueueParams{
 				Height: height,
 			}
 
@@ -112,13 +112,13 @@ func GetCmdQueryRandRequestQueue(queryRoute string, cdc *codec.Codec) *cobra.Com
 				return err
 			}
 
-			route := fmt.Sprintf("custom/%s/%s", queryRoute, rand.QueryRandRequestQueue)
+			route := fmt.Sprintf("custom/%s/%s", queryRoute, types.QueryRandRequestQueue)
 			res, _, err := cliCtx.QueryWithData(route, bz)
 			if err != nil {
 				return err
 			}
 
-			var requests rand.Requests
+			var requests types.Requests
 			err = cdc.UnmarshalJSON(res, &requests)
 			if err != nil {
 				return err
