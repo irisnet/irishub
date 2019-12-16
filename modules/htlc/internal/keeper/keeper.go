@@ -118,9 +118,7 @@ func (k Keeper) RefundHTLC(ctx sdk.Context, hashLock types.HTLCHashLock) (string
 		return "", err
 	}
 
-	// update the state in HTLC
-	htlc.State = types.REFUNDED
-	k.SetHTLC(ctx, htlc, hashLock)
+	k.DeleteHTLC(ctx, hashLock)
 
 	return htlc.Sender.String(), nil
 }
@@ -137,6 +135,12 @@ func (k Keeper) SetHTLC(ctx sdk.Context, htlc types.HTLC, hashLock types.HTLCHas
 
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(htlc)
 	store.Set(KeyHTLC(hashLock), bz)
+}
+
+// DeleteHTLC delete the stored HTLC
+func (k Keeper) DeleteHTLC(ctx sdk.Context, hashLock types.HTLCHashLock) {
+	store := ctx.KVStore(k.storeKey)
+	store.Delete(KeyHTLC(hashLock))
 }
 
 // GetHTLC retrieves the HTLC by the specified hash lock

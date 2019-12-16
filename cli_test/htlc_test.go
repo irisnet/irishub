@@ -46,7 +46,6 @@ func TestIrisCLIHTLC(t *testing.T) {
 	stateOpen := "open"
 	stateCompleted := "completed"
 	stateExpired := "expired"
-	stateRefunded := "refunded"
 
 	// create an htlc
 	spStr := fmt.Sprintf("%s tx htlc create %v", f.IriscliBinary, flags)
@@ -153,9 +152,6 @@ func TestIrisCLIHTLC(t *testing.T) {
 
 	require.True(t, executeWrite(t, spStr, client.DefaultKeyPass))
 	tests.WaitForNextNBlocksTM(2, f.Port)
-
-	tmpHTLC = executeGetHTLC(t, fmt.Sprintf("%s query htlc htlc %s --output=json %v", f.IriscliBinary, strings.ToLower(strings.TrimSpace(hashLock)), flags))
-	require.Equal(t, stateRefunded, tmpHTLC.State.String())
 
 	htlcAcc = f.QueryAccount(htlcAddr, flags)
 	require.Equal(t, "0", htlcAcc.GetCoins().AmountOf(sdk.DefaultBondDenom).String())
