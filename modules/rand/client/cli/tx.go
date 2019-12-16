@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"strconv"
 
-	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -13,23 +12,6 @@ import (
 	"github.com/irisnet/irishub/modules/rand/internal/types"
 	"github.com/spf13/cobra"
 )
-
-// GetTxCmd returns the transaction commands for this module
-func GetTxCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
-	randTxCmd := &cobra.Command{
-		Use:                        types.ModuleName,
-		Short:                      "Rand transaction subcommands",
-		DisableFlagParsing:         true,
-		SuggestionsMinimumDistance: 2,
-		RunE:                       client.ValidateCmd,
-	}
-
-	randTxCmd.AddCommand(client.PostCommands(
-		GetCmdRequestRand(cdc),
-	)...)
-
-	return randTxCmd
-}
 
 // GetCmdRequestRand implements the request-rand command
 func GetCmdRequestRand(cdc *codec.Codec) *cobra.Command {
