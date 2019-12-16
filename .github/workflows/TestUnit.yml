@@ -1,0 +1,12 @@
+name: TestUnit
+on: [pull_request]
+
+jobs:
+  test-unit:
+    name: Test Units
+    runs-on: ubuntu-16.04
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v1
+      - name: Run unit tests
+        run: sudo docker run -v $(pwd):/modules irisnet/golang sh -c "make test-unit"
