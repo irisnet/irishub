@@ -2,6 +2,8 @@ package service
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/app/v1/bank"
 	"github.com/irisnet/irishub/app/v1/params"
@@ -9,7 +11,6 @@ import (
 	"github.com/irisnet/irishub/modules/guardian"
 	"github.com/irisnet/irishub/tools/protoidl"
 	sdk "github.com/irisnet/irishub/types"
-	"time"
 )
 
 type Keeper struct {

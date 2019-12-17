@@ -4,10 +4,12 @@ import (
 	"encoding/hex"
 	"fmt"
 
-	"github.com/irisnet/irishub/app/v1/rand/internal/types"
-	"github.com/irisnet/irishub/codec"
-	sdk "github.com/irisnet/irishub/types"
 	abci "github.com/tendermint/tendermint/abci/types"
+
+	"github.com/cosmos/cosmos-sdk/codec"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	"github.com/irisnet/irishub/modules/rand/internal/types"
 )
 
 func NewQuerier(k Keeper) sdk.Querier {
@@ -27,12 +29,12 @@ func queryRand(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, s
 	var params types.QueryRandParams
 	err := keeper.cdc.UnmarshalJSON(req.Data, &params)
 	if err != nil {
-		return nil, sdk.ParseParamsErr(err)
+		return nil, sdk.ErrInternal(fmt.Sprintf("failed to parse params: %s", err))
 	}
 
 	reqID, err := hex.DecodeString(params.ReqID)
 	if err != nil {
-		return nil, sdk.ParseParamsErr(err)
+		return nil, types.ErrInvalidReqID(types.DefaultCodespace, fmt.Sprintf("invalid request id: %s", err))
 	}
 
 	rand, err2 := keeper.GetRand(ctx, reqID)
@@ -42,7 +44,7 @@ func queryRand(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, s
 
 	bz, err := codec.MarshalJSONIndent(keeper.cdc, rand)
 	if err != nil {
-		return nil, sdk.MarshalResultErr(err)
+		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", err.Error()))
 	}
 
 	return bz, nil
@@ -52,7 +54,7 @@ func queryRandRequestQueue(ctx sdk.Context, req abci.RequestQuery, keeper Keeper
 	var params types.QueryRandRequestQueueParams
 	err := keeper.cdc.UnmarshalJSON(req.Data, &params)
 	if err != nil {
-		return nil, sdk.ParseParamsErr(err)
+		return nil, sdk.ErrInternal(fmt.Sprintf("failed to parse params: %s", err))
 	}
 
 	if params.Height < 0 {
@@ -71,7 +73,7 @@ func queryRandRequestQueue(ctx sdk.Context, req abci.RequestQuery, keeper Keeper
 
 	bz, err := codec.MarshalJSONIndent(keeper.cdc, requests)
 	if err != nil {
-		return nil, sdk.MarshalResultErr(err)
+		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", err.Error()))
 	}
 
 	return bz, nil

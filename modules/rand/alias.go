@@ -1,8 +1,8 @@
 package rand
 
 import (
-	"github.com/irisnet/irishub/app/v1/rand/internal/keeper"
-	"github.com/irisnet/irishub/app/v1/rand/internal/types"
+	"github.com/irisnet/irishub/modules/rand/internal/keeper"
+	"github.com/irisnet/irishub/modules/rand/internal/types"
 )
 
 // exported types
@@ -12,7 +12,6 @@ type (
 	Request        = types.Request
 	Requests       = types.Requests
 
-	Params       = types.Params
 	GenesisState = types.GenesisState
 
 	QueryRandParams             = types.QueryRandParams
@@ -21,14 +20,26 @@ type (
 	Keeper = keeper.Keeper
 )
 
+// exported constants
+const (
+	ModuleName       = types.ModuleName
+	StoreKey         = types.StoreKey
+	QuerierRoute     = types.QuerierRoute
+	RouterKey        = types.RouterKey
+	DefaultCodespace = types.DefaultCodespace
+
+	EventTypeGenerateRand  = types.EventTypeGenerateRand
+	EventTypeRequestRand   = types.EventTypeRequestRand
+	AttributeKeyRequestID  = types.AttributeKeyRequestID
+	AttributeKeyRand       = types.AttributeKeyRand
+	AttributeKeyGenHeight  = types.AttributeKeyGenHeight
+	AttributeValueCategory = types.AttributeValueCategory
+)
+
 // exported variables and functions
 var (
-	DefaultCodespace     = types.DefaultCodespace
-	DefaultParamSpace    = types.DefaultParamSpace
-	DefaultParams        = types.DefaultParams
-	DefaultParamsForTest = types.DefaultParamsForTest
-	ValidateParams       = types.ValidateParams
-	RegisterCodec        = types.RegisterCodec
+	ModuleCdc     = types.ModuleCdc
+	RegisterCodec = types.RegisterCodec
 
 	NewMsgRequestRand    = types.NewMsgRequestRand
 	NewRand              = types.NewRand
@@ -42,9 +53,8 @@ var (
 	QueryRand             = types.QueryRand
 	QueryRandRequestQueue = types.QueryRandRequestQueue
 
-	TagReqID      = types.TagReqID
-	TagRandHeight = types.TagRandHeight
-	TagRand       = types.TagRand
+	DefaultGenesisState = types.DefaultGenesisState
+	ValidateGenesis     = types.ValidateGenesis
 
 	NewKeeper  = keeper.NewKeeper
 	NewQuerier = keeper.NewQuerier

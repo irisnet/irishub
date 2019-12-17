@@ -1,7 +1,7 @@
 package types
 
 import (
-	"github.com/irisnet/irishub/codec"
+	"github.com/cosmos/cosmos-sdk/codec"
 )
 
 // Register concrete types on codec
@@ -12,8 +12,12 @@ func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(&Request{}, "irishub/rand/Request", nil)
 }
 
-var msgCdc = codec.New()
+// ModuleCdc defines the module codec
+var ModuleCdc *codec.Codec
 
 func init() {
-	RegisterCodec(msgCdc)
+	ModuleCdc = codec.New()
+	RegisterCodec(ModuleCdc)
+	codec.RegisterCrypto(ModuleCdc)
+	ModuleCdc.Seal()
 }
