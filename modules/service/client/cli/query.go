@@ -3,35 +3,14 @@ package cli
 import (
 	"fmt"
 
-	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/spf13/cobra"
+
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/irisnet/irishub/modules/service"
-	"github.com/spf13/cobra"
+
+	"github.com/irisnet/irishub/modules/service/internal/types"
 )
-
-// GetQueryCmd returns the cli query commands for this module
-func GetQueryCmd(queryRoute string, cdc *codec.Codec) *cobra.Command {
-	// Group service queries under a subcommand
-	serviceQueryCmd := &cobra.Command{
-		Use:                        service.ModuleName,
-		Short:                      "Querying commands for the service module",
-		DisableFlagParsing:         true,
-		SuggestionsMinimumDistance: 2,
-		RunE:                       client.ValidateCmd,
-	}
-
-	serviceQueryCmd.AddCommand(client.GetCommands(
-		GetCmdQuerySvcDef(queryRoute, cdc),
-		GetCmdQuerySvcBind(queryRoute, cdc),
-		GetCmdQuerySvcBinds(queryRoute, cdc),
-		GetCmdQuerySvcRequests(queryRoute, cdc),
-		GetCmdQuerySvcResponse(queryRoute, cdc),
-		GetCmdQuerySvcFees(queryRoute, cdc))...)
-
-	return serviceQueryCmd
-}
 
 func GetCmdQuerySvcDef(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
@@ -42,7 +21,7 @@ func GetCmdQuerySvcDef(queryRoute string, cdc *codec.Codec) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			params := service.QueryDefinitionParams{
+			params := types.QueryDefinitionParams{
 				DefChainID:  args[0],
 				ServiceName: args[1],
 			}
@@ -52,7 +31,7 @@ func GetCmdQuerySvcDef(queryRoute string, cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			route := fmt.Sprintf("custom/%s/%s", queryRoute, service.QueryDefinition)
+			route := fmt.Sprintf("custom/%s/%s", queryRoute, types.QueryDefinition)
 			res, _, err := cliCtx.QueryWithData(route, bz)
 			if err != nil {
 				return err
@@ -79,7 +58,7 @@ func GetCmdQuerySvcBind(queryRoute string, cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			params := service.QueryBindingParams{
+			params := types.QueryBindingParams{
 				DefChainID:  args[0],
 				ServiceName: args[1],
 				BindChainId: args[2],
@@ -91,7 +70,7 @@ func GetCmdQuerySvcBind(queryRoute string, cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			route := fmt.Sprintf("custom/%s/%s", queryRoute, service.QueryBinding)
+			route := fmt.Sprintf("custom/%s/%s", queryRoute, types.QueryBinding)
 			res, _, err := cliCtx.QueryWithData(route, bz)
 			if err != nil {
 				return err
@@ -113,7 +92,7 @@ func GetCmdQuerySvcBinds(queryRoute string, cdc *codec.Codec) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			params := service.QueryBindingsParams{
+			params := types.QueryBindingsParams{
 				DefChainID:  args[0],
 				ServiceName: args[1],
 			}
@@ -123,7 +102,7 @@ func GetCmdQuerySvcBinds(queryRoute string, cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			route := fmt.Sprintf("custom/%s/%s", queryRoute, service.QueryBindings)
+			route := fmt.Sprintf("custom/%s/%s", queryRoute, types.QueryBindings)
 			res, _, err := cliCtx.QueryWithData(route, bz)
 			if err != nil {
 				return err
@@ -150,7 +129,7 @@ func GetCmdQuerySvcRequests(queryRoute string, cdc *codec.Codec) *cobra.Command 
 				return err
 			}
 
-			params := service.QueryBindingParams{
+			params := types.QueryBindingParams{
 				DefChainID:  args[0],
 				ServiceName: args[1],
 				BindChainId: args[2],
@@ -162,7 +141,7 @@ func GetCmdQuerySvcRequests(queryRoute string, cdc *codec.Codec) *cobra.Command 
 				return err
 			}
 
-			route := fmt.Sprintf("custom/%s/%s", queryRoute, service.QueryRequests)
+			route := fmt.Sprintf("custom/%s/%s", queryRoute, types.QueryRequests)
 			res, _, err := cliCtx.QueryWithData(route, bz)
 			if err != nil {
 				return err
@@ -184,7 +163,7 @@ func GetCmdQuerySvcResponse(queryRoute string, cdc *codec.Codec) *cobra.Command 
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			params := service.QueryResponseParams{
+			params := types.QueryResponseParams{
 				ReqChainId: args[0],
 				RequestId:  args[1],
 			}
@@ -194,7 +173,7 @@ func GetCmdQuerySvcResponse(queryRoute string, cdc *codec.Codec) *cobra.Command 
 				return err
 			}
 
-			route := fmt.Sprintf("custom/%s/%s", queryRoute, service.QueryResponse)
+			route := fmt.Sprintf("custom/%s/%s", queryRoute, types.QueryResponse)
 			res, _, err := cliCtx.QueryWithData(route, bz)
 			if err != nil {
 				return err
@@ -221,7 +200,7 @@ func GetCmdQuerySvcFees(queryRoute string, cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			params := service.QueryFeesParams{
+			params := types.QueryFeesParams{
 				Address: addr,
 			}
 
@@ -230,7 +209,7 @@ func GetCmdQuerySvcFees(queryRoute string, cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			route := fmt.Sprintf("custom/%s/%s", queryRoute, service.QueryFees)
+			route := fmt.Sprintf("custom/%s/%s", queryRoute, types.QueryFees)
 			res, _, err := cliCtx.QueryWithData(route, bz)
 			if err != nil {
 				return err

@@ -6,43 +6,20 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+	
+	cmn "github.com/tendermint/tendermint/libs/common"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
-	"github.com/irisnet/irishub/modules/service"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
-	cmn "github.com/tendermint/tendermint/libs/common"
+
+	"github.com/irisnet/irishub/modules/service/internal/types"
 )
-
-// GetTxCmd returns the transaction commands for this module
-func GetTxCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
-	serviceTxCmd := &cobra.Command{
-		Use:                        service.ModuleName,
-		Short:                      "Service transaction subcommands",
-		DisableFlagParsing:         true,
-		SuggestionsMinimumDistance: 2,
-		RunE:                       client.ValidateCmd,
-	}
-
-	serviceTxCmd.AddCommand(client.PostCommands(
-		GetCmdSvcDef(cdc),
-		GetCmdSvcBind(cdc),
-		GetCmdSvcBindUpdate(cdc),
-		GetCmdSvcDisable(cdc),
-		GetCmdSvcEnable(cdc),
-		GetCmdSvcRefundDeposit(cdc),
-		GetCmdSvcCall(cdc),
-		GetCmdSvcRespond(cdc),
-		GetCmdSvcRefundFees(cdc),
-		GetCmdSvcWithdrawFees(cdc),
-		GetCmdSvcWithdrawTax(cdc))...)
-
-	return serviceTxCmd
-}
 
 func GetCmdSvcDef(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
@@ -84,7 +61,7 @@ func GetCmdSvcDef(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			msg := service.NewMsgSvcDef(name, chainID, description, tags, fromAddr, authorDescription, content)
+			msg := types.NewMsgSvcDef(name, chainID, description, tags, fromAddr, authorDescription, content)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -125,7 +102,7 @@ func GetCmdSvcBind(cdc *codec.Codec) *cobra.Command {
 			usableTime := viper.GetInt64(FlagUsableTime)
 			bindingTypeStr := viper.GetString(FlagBindType)
 
-			bindingType, err := service.BindingTypeFromString(bindingTypeStr)
+			bindingType, err := types.BindingTypeFromString(bindingTypeStr)
 			if err != nil {
 				return err
 			}
@@ -144,9 +121,9 @@ func GetCmdSvcBind(cdc *codec.Codec) *cobra.Command {
 				prices = append(prices, price)
 			}
 
-			level := service.Level{AvgRspTime: avgRspTime, UsableTime: usableTime}
+			level := types.Level{AvgRspTime: avgRspTime, UsableTime: usableTime}
 
-			msg := service.NewMsgSvcBind(defChainID, name, chainID, fromAddr, bindingType, deposit, prices, level)
+			msg := types.NewMsgSvcBind(defChainID, name, chainID, fromAddr, bindingType, deposit, prices, level)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -193,9 +170,9 @@ func GetCmdSvcBindUpdate(cdc *codec.Codec) *cobra.Command {
 			usableTime := viper.GetInt64(FlagUsableTime)
 			bindingTypeStr := viper.GetString(FlagBindType)
 
-			var bindingType service.BindingType
+			var bindingType types.BindingType
 			if bindingTypeStr != "" {
-				bindingType, err = service.BindingTypeFromString(bindingTypeStr)
+				bindingType, err = types.BindingTypeFromString(bindingTypeStr)
 				if err != nil {
 					return err
 				}
@@ -218,9 +195,9 @@ func GetCmdSvcBindUpdate(cdc *codec.Codec) *cobra.Command {
 				prices = append(prices, price)
 			}
 
-			level := service.Level{AvgRspTime: avgRspTime, UsableTime: usableTime}
+			level := types.Level{AvgRspTime: avgRspTime, UsableTime: usableTime}
 
-			msg := service.NewMsgSvcBindingUpdate(defChainID, name, chainID, fromAddr, bindingType, deposit, prices, level)
+			msg := types.NewMsgSvcBindingUpdate(defChainID, name, chainID, fromAddr, bindingType, deposit, prices, level)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -257,7 +234,7 @@ func GetCmdSvcDisable(cdc *codec.Codec) *cobra.Command {
 			name := viper.GetString(FlagServiceName)
 			defChainID := viper.GetString(FlagDefChainID)
 
-			msg := service.NewMsgSvcDisable(defChainID, name, chainID, fromAddr)
+			msg := types.NewMsgSvcDisable(defChainID, name, chainID, fromAddr)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -299,7 +276,7 @@ func GetCmdSvcEnable(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			msg := service.NewMsgSvcEnable(defChainID, name, chainID, fromAddr, deposit)
+			msg := types.NewMsgSvcEnable(defChainID, name, chainID, fromAddr, deposit)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -336,7 +313,7 @@ func GetCmdSvcRefundDeposit(cdc *codec.Codec) *cobra.Command {
 			name := viper.GetString(FlagServiceName)
 			defChainID := viper.GetString(FlagDefChainID)
 
-			msg := service.NewMsgSvcRefundDeposit(defChainID, name, chainID, fromAddr)
+			msg := types.NewMsgSvcRefundDeposit(defChainID, name, chainID, fromAddr)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -394,7 +371,7 @@ func GetCmdSvcCall(cdc *codec.Codec) *cobra.Command {
 
 			profiling := viper.GetBool(FlagProfiling)
 
-			msg := service.NewMsgSvcRequest(defChainID, name, bindChainID, chainID, fromAddr, provider, methodID, input, serviceFee, profiling)
+			msg := types.NewMsgSvcRequest(defChainID, name, bindChainID, chainID, fromAddr, provider, methodID, input, serviceFee, profiling)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -447,7 +424,7 @@ func GetCmdSvcRespond(cdc *codec.Codec) *cobra.Command {
 
 			reqID := viper.GetString(FlagReqID)
 
-			msg := service.NewMsgSvcResponse(reqChainID, reqID, fromAddr, output, errMsg)
+			msg := types.NewMsgSvcResponse(reqChainID, reqID, fromAddr, output, errMsg)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -478,7 +455,7 @@ func GetCmdSvcRefundFees(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			msg := service.NewMsgSvcRefundFees(fromAddr)
+			msg := types.NewMsgSvcRefundFees(fromAddr)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -505,7 +482,7 @@ func GetCmdSvcWithdrawFees(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			msg := service.NewMsgSvcWithdrawFees(fromAddr)
+			msg := types.NewMsgSvcWithdrawFees(fromAddr)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -544,7 +521,7 @@ func GetCmdSvcWithdrawTax(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			msg := service.NewMsgSvcWithdrawTax(fromAddr, destAddress, withdrawAmount)
+			msg := types.NewMsgSvcWithdrawTax(fromAddr, destAddress, withdrawAmount)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
