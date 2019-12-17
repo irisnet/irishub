@@ -22,17 +22,15 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) {
 		keeper.GetCdc().MustUnmarshalBinaryLengthPrefixed(activeIterator.Value(), &req)
 
 		// if not Profiling mode,should slash provider
-		slashCoins := sdk.Coins{}
+		slashCoins := sdk.NewCoins()
 		if !req.Profiling {
 			binding, found := keeper.GetServiceBinding(ctx, req.DefChainID, req.DefName, req.BindChainID, req.Provider)
 			if found {
 				for _, coin := range binding.Deposit {
 					taxAmount := sdk.NewDecFromInt(coin.Amount).Mul(slashFraction).TruncateInt()
-					slashCoins = append(slashCoins, sdk.NewCoin(coin.Denom, taxAmount))
+					slashCoins.Add(sdk.NewCoins(sdk.NewCoin(coin.Denom, taxAmount)))
 				}
 			}
-
-			slashCoins = slashCoins.Sort()
 
 			err := keeper.Slash(ctx, binding, slashCoins)
 			if err != nil {

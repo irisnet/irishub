@@ -5,7 +5,7 @@ import (
 	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	
+
 	"github.com/irisnet/irishub/modules/service/internal/types"
 )
 
@@ -275,7 +275,7 @@ func (k Keeper) getMinDeposit(ctx sdk.Context, prices []sdk.Coin) (sdk.Coins, sd
 		}
 
 		minInt := price.Amount.Mul(minDepositMultiple)
-		minDeposit = minDeposit.Add(sdk.Coins{sdk.NewCoin(price.Denom, minInt)})
+		minDeposit = minDeposit.Add(sdk.NewCoins(sdk.NewCoin(price.Denom, minInt)))
 	}
 
 	return minDeposit, nil

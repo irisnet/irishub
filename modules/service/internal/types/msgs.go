@@ -775,7 +775,7 @@ func (msg MsgSvcWithdrawTax) GetSigners() []sdk.AccAddress {
 //______________________________________________________________________
 
 func validServiceName(name string) bool {
-	return !reSvcName.MatchString(name)
+	return reSvcName.MatchString(name)
 }
 
 func (msg MsgSvcDef) EnsureLength() sdk.Error {
