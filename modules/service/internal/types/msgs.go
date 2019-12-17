@@ -115,14 +115,14 @@ func validateMethods(methods []string) (bool, sdk.Error) {
 
 // MsgSvcBinding - struct for bind a service
 type MsgSvcBind struct {
-	DefName     string         `json:"def_name"`
-	DefChainID  string         `json:"def_chain_id"`
-	BindChainID string         `json:"bind_chain_id"`
-	Provider    sdk.AccAddress `json:"provider"`
-	BindingType BindingType    `json:"binding_type"`
-	Deposit     sdk.Coins      `json:"deposit"`
-	Prices      []sdk.Coin     `json:"price"`
-	Level       Level          `json:"level"`
+	DefName     string         `json:"def_name" yaml:"def_name"`
+	DefChainID  string         `json:"def_chain_id" yaml:"def_chain_id"`
+	BindChainID string         `json:"bind_chain_id" yaml:"bind_chain_id"`
+	Provider    sdk.AccAddress `json:"provider" yaml:"provider"`
+	BindingType BindingType    `json:"binding_type" yaml:"binding_type"`
+	Deposit     sdk.Coins      `json:"deposit" yaml:"deposit"`
+	Prices      []sdk.Coin     `json:"price" yaml:"price"`
+	Level       Level          `json:"level" yaml:"level"`
 }
 
 func NewMsgSvcBind(defChainID, defName, bindChainID string, provider sdk.AccAddress, bindingType BindingType, deposit sdk.Coins, prices []sdk.Coin, level Level) MsgSvcBind {
@@ -207,14 +207,14 @@ func (msg MsgSvcBind) GetSigners() []sdk.AccAddress {
 
 // MsgSvcBindingUpdate - struct for update a service binding
 type MsgSvcBindingUpdate struct {
-	DefName     string         `json:"def_name"`
-	DefChainID  string         `json:"def_chain_id"`
-	BindChainID string         `json:"bind_chain_id"`
-	Provider    sdk.AccAddress `json:"provider"`
-	BindingType BindingType    `json:"binding_type"`
-	Deposit     sdk.Coins      `json:"deposit"`
-	Prices      []sdk.Coin     `json:"price"`
-	Level       Level          `json:"level"`
+	DefName     string         `json:"def_name" yaml:"def_name"`
+	DefChainID  string         `json:"def_chain_id" yaml:"def_chain_id"`
+	BindChainID string         `json:"bind_chain_id" yaml:"bind_chain_id"`
+	Provider    sdk.AccAddress `json:"provider" yaml:"provider"`
+	BindingType BindingType    `json:"binding_type" yaml:"binding_type"`
+	Deposit     sdk.Coins      `json:"deposit" yaml:"deposit"`
+	Prices      []sdk.Coin     `json:"price" yaml:"price"`
+	Level       Level          `json:"level" yaml:"level"`
 }
 
 func NewMsgSvcBindingUpdate(defChainID, defName, bindChainID string, provider sdk.AccAddress, bindingType BindingType, deposit sdk.Coins, prices []sdk.Coin, level Level) MsgSvcBindingUpdate {
@@ -298,10 +298,10 @@ func (msg MsgSvcBindingUpdate) GetSigners() []sdk.AccAddress {
 
 // MsgSvcDisable - struct for disable a service binding
 type MsgSvcDisable struct {
-	DefName     string         `json:"def_name"`
-	DefChainID  string         `json:"def_chain_id"`
-	BindChainID string         `json:"bind_chain_id"`
-	Provider    sdk.AccAddress `json:"provider"`
+	DefName     string         `json:"def_name" yaml:"def_name"`
+	DefChainID  string         `json:"def_chain_id" yaml:"def_chain_id"`
+	BindChainID string         `json:"bind_chain_id" yaml:"bind_chain_id"`
+	Provider    sdk.AccAddress `json:"provider" yaml:"provider"`
 }
 
 func NewMsgSvcDisable(defChainID, defName, bindChainID string, provider sdk.AccAddress) MsgSvcDisable {
@@ -364,11 +364,11 @@ func (msg MsgSvcDisable) GetSigners() []sdk.AccAddress {
 
 // MsgSvcEnable - struct for enable a service binding
 type MsgSvcEnable struct {
-	DefName     string         `json:"def_name"`
-	DefChainID  string         `json:"def_chain_id"`
-	BindChainID string         `json:"bind_chain_id"`
-	Provider    sdk.AccAddress `json:"provider"`
-	Deposit     sdk.Coins      `json:"deposit"`
+	DefName     string         `json:"def_name" yaml:"def_name"`
+	DefChainID  string         `json:"def_chain_id" yaml:"def_chain_id"`
+	BindChainID string         `json:"bind_chain_id" yaml:"bind_chain_id"`
+	Provider    sdk.AccAddress `json:"provider" yaml:"provider"`
+	Deposit     sdk.Coins      `json:"deposit" yaml:"deposit"`
 }
 
 func NewMsgSvcEnable(defChainID, defName, bindChainID string, provider sdk.AccAddress, deposit sdk.Coins) MsgSvcEnable {
@@ -436,10 +436,10 @@ func (msg MsgSvcEnable) GetSigners() []sdk.AccAddress {
 
 // MsgSvcRefundDeposit - struct for refund deposit from a service binding
 type MsgSvcRefundDeposit struct {
-	DefName     string         `json:"def_name"`
-	DefChainID  string         `json:"def_chain_id"`
-	BindChainID string         `json:"bind_chain_id"`
-	Provider    sdk.AccAddress `json:"provider"`
+	DefName     string         `json:"def_name" yaml:"def_name"`
+	DefChainID  string         `json:"def_chain_id" yaml:"def_chain_id"`
+	BindChainID string         `json:"bind_chain_id" yaml:"bind_chain_id"`
+	Provider    sdk.AccAddress `json:"provider" yaml:"provider"`
 }
 
 func NewMsgSvcRefundDeposit(defChainID, defName, bindChainID string, provider sdk.AccAddress) MsgSvcRefundDeposit {
@@ -502,16 +502,16 @@ func (msg MsgSvcRefundDeposit) GetSigners() []sdk.AccAddress {
 
 // MsgSvcRequest - struct for call a service
 type MsgSvcRequest struct {
-	DefChainID  string         `json:"def_chain_id"`
-	DefName     string         `json:"def_name"`
-	BindChainID string         `json:"bind_chain_id"`
-	ReqChainID  string         `json:"req_chain_id"`
-	MethodID    int16          `json:"method_id"`
-	Provider    sdk.AccAddress `json:"provider"`
-	Consumer    sdk.AccAddress `json:"consumer"`
-	Input       []byte         `json:"input"`
-	ServiceFee  sdk.Coins      `json:"service_fee"`
-	Profiling   bool           `json:"profiling"`
+	DefChainID  string         `json:"def_chain_id" yaml:"def_chain_id"`
+	DefName     string         `json:"def_name" yaml:"def_name"`
+	BindChainID string         `json:"bind_chain_id" yaml:"bind_chain_id"`
+	ReqChainID  string         `json:"req_chain_id" yaml:"req_chain_id"`
+	MethodID    int16          `json:"method_id" yaml:"method_id"`
+	Provider    sdk.AccAddress `json:"provider" yaml:"provider"`
+	Consumer    sdk.AccAddress `json:"consumer" yaml:"consumer"`
+	Input       []byte         `json:"input" yaml:"input"`
+	ServiceFee  sdk.Coins      `json:"service_fee" yaml:"service_fee"`
+	Profiling   bool           `json:"profiling" yaml:"profiling"`
 }
 
 func NewMsgSvcRequest(defChainID, defName, bindChainID, reqChainID string, consumer, provider sdk.AccAddress, methodID int16, input []byte, serviceFee sdk.Coins, profiling bool) MsgSvcRequest {
@@ -599,11 +599,11 @@ func (msg MsgSvcRequest) GetSigners() []sdk.AccAddress {
 
 // MsgSvcResponse - struct for respond a service call
 type MsgSvcResponse struct {
-	ReqChainID string         `json:"req_chain_id"`
-	RequestID  string         `json:"request_id"`
-	Provider   sdk.AccAddress `json:"provider"`
-	Output     []byte         `json:"output"`
-	ErrorMsg   []byte         `json:"error_msg"`
+	ReqChainID string         `json:"req_chain_id" yaml:"req_chain_id"`
+	RequestID  string         `json:"request_id" yaml:"request_id"`
+	Provider   sdk.AccAddress `json:"provider" yaml:"provider"`
+	Output     []byte         `json:"output" yaml:"output"`
+	ErrorMsg   []byte         `json:"error_msg" yaml:"error_msg"`
 }
 
 func NewMsgSvcResponse(reqChainID string, requestId string, provider sdk.AccAddress, output, errorMsg []byte) MsgSvcResponse {
@@ -665,7 +665,7 @@ func (msg MsgSvcResponse) GetSigners() []sdk.AccAddress {
 
 // MsgSvcRefundFees - struct for refund fees
 type MsgSvcRefundFees struct {
-	Consumer sdk.AccAddress `json:"consumer"`
+	Consumer sdk.AccAddress `json:"consumer" yaml:"consumer"`
 }
 
 func NewMsgSvcRefundFees(consumer sdk.AccAddress) MsgSvcRefundFees {
@@ -698,7 +698,7 @@ func (msg MsgSvcRefundFees) GetSigners() []sdk.AccAddress {
 
 // MsgSvcWithdrawFees - struct for withdraw fees
 type MsgSvcWithdrawFees struct {
-	Provider sdk.AccAddress `json:"provider"`
+	Provider sdk.AccAddress `json:"provider" yaml:"provider"`
 }
 
 func NewMsgSvcWithdrawFees(provider sdk.AccAddress) MsgSvcWithdrawFees {
@@ -731,9 +731,9 @@ func (msg MsgSvcWithdrawFees) GetSigners() []sdk.AccAddress {
 
 // MsgSvcWithdrawTax - struct for withdraw tax
 type MsgSvcWithdrawTax struct {
-	Trustee     sdk.AccAddress `json:"trustee"`
-	DestAddress sdk.AccAddress `json:"dest_address"`
-	Amount      sdk.Coins      `json:"amount"`
+	Trustee     sdk.AccAddress `json:"trustee" yaml:"trustee"`
+	DestAddress sdk.AccAddress `json:"dest_address" yaml:"dest_address"`
+	Amount      sdk.Coins      `json:"amount" yaml:"amount"`
 }
 
 func NewMsgSvcWithdrawTax(trustee, destAddress sdk.AccAddress, amount sdk.Coins) MsgSvcWithdrawTax {

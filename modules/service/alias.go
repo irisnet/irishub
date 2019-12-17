@@ -63,6 +63,16 @@ const (
 	Multicast        = types.Multicast
 	Global           = types.Global
 	Local            = types.Local
+
+	EventTypeRequestSvc     = types.EventTypeRequestSvc
+	EventTypeRespondSvc     = types.EventTypeRespondSvc
+	EventTypeSvcCallTimeout = types.EventTypeSvcCallTimeout
+	AttributeKeyRequestID   = types.AttributeKeyRequestID
+	AttributeKeyProvider    = types.AttributeKeyProvider
+	AttributeKeySlashCoins  = types.AttributeKeySlashCoins
+	AttributeKeyConsumer    = types.AttributeKeyConsumer
+	AttributeKeyServiceFee  = types.AttributeKeyServiceFee
+	AttributeValueCategory  = types.AttributeValueCategory
 )
 
 // exported variables and functions

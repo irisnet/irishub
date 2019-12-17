@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
 	"github.com/irisnet/irishub/modules/service/internal/types"
 )
 
@@ -139,21 +140,20 @@ func handleMsgSvcRequest(ctx sdk.Context, k Keeper, msg MsgSvcRequest) sdk.Resul
 		"provider", req.Provider.String(), "consumer", req.Consumer.String(), "method_id", req.MethodID,
 		"service_fee", req.ServiceFee, "request_id", req.RequestID())
 
-	ctx.EventManager().EmitEvent(
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, req.Consumer.String()),
-		),
-	)
-
-	ctx.EventManager().EmitEvent(
-		sdk.NewEvent(
-			types.EventTypeRequestSvc,
-			sdk.NewAttribute(types.AttributeKeyRequestID, req.RequestID()),
-			sdk.NewAttribute(types.AttributeKeyProvider, req.Provider.String()),
-			sdk.NewAttribute(types.AttributeKeyServiceFee, req.ServiceFee.String()),
-		),
+	ctx.EventManager().EmitEvents(
+		sdk.Events{
+			sdk.NewEvent(
+				sdk.EventTypeMessage,
+				sdk.NewAttribute(sdk.AttributeKeyModule, AttributeValueCategory),
+				sdk.NewAttribute(sdk.AttributeKeySender, req.Consumer.String()),
+			),
+			sdk.NewEvent(
+				EventTypeRequestSvc,
+				sdk.NewAttribute(AttributeKeyRequestID, req.RequestID()),
+				sdk.NewAttribute(AttributeKeyProvider, req.Provider.String()),
+				sdk.NewAttribute(AttributeKeyServiceFee, req.ServiceFee.String()),
+			),
+		},
 	)
 
 	return sdk.Result{Events: ctx.EventManager().Events()}
@@ -168,20 +168,19 @@ func handleMsgSvcResponse(ctx sdk.Context, k Keeper, msg MsgSvcResponse) sdk.Res
 	ctx.Logger().Debug("Service response", "request_id", msg.RequestID,
 		"provider", resp.Provider.String(), "consumer", resp.Consumer.String())
 
-	ctx.EventManager().EmitEvent(
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, resp.Provider.String()),
-		),
-	)
-
-	ctx.EventManager().EmitEvent(
-		sdk.NewEvent(
-			types.EventTypeRespondSvc,
-			sdk.NewAttribute(types.AttributeKeyRequestID, msg.RequestID),
-			sdk.NewAttribute(types.AttributeKeyConsumer, resp.Consumer.String()),
-		),
+	ctx.EventManager().EmitEvents(
+		sdk.Events{
+			sdk.NewEvent(
+				sdk.EventTypeMessage,
+				sdk.NewAttribute(sdk.AttributeKeyModule, AttributeValueCategory),
+				sdk.NewAttribute(sdk.AttributeKeySender, resp.Provider.String()),
+			),
+			sdk.NewEvent(
+				types.EventTypeRespondSvc,
+				sdk.NewAttribute(AttributeKeyRequestID, msg.RequestID),
+				sdk.NewAttribute(AttributeKeyConsumer, resp.Consumer.String()),
+			),
+		},
 	)
 
 	return sdk.Result{Events: ctx.EventManager().Events()}

@@ -2,7 +2,7 @@ package types
 
 // GenesisState - all service state that must be provided at genesis
 type GenesisState struct {
-	Params Params `json:"params"` // service params
+	Params Params `json:"params" yaml:"params"` // service params
 }
 
 // NewGenesisState constructs a GenesisState

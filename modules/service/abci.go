@@ -2,7 +2,6 @@ package service
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/irisnet/irishub/modules/service/internal/types"
 )
 
 // EndBlocker handles block ending logic
@@ -49,10 +48,10 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) {
 
 		ctx.EventManager().EmitEvent(
 			sdk.NewEvent(
-				types.EventTypeSvcCallTimeout,
-				sdk.NewAttribute(types.AttributeKeyRequestID, req.RequestID()),
-				sdk.NewAttribute(types.AttributeKeyProvider, req.Provider.String()),
-				sdk.NewAttribute(types.AttributeKeySlashCoins, slashCoins.String()),
+				EventTypeSvcCallTimeout,
+				sdk.NewAttribute(AttributeKeyRequestID, req.RequestID()),
+				sdk.NewAttribute(AttributeKeyProvider, req.Provider.String()),
+				sdk.NewAttribute(AttributeKeySlashCoins, slashCoins.String()),
 			),
 		)
 

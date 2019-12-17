@@ -51,13 +51,13 @@ var _ params.ParamSet = (*Params)(nil)
 
 // Params defines the high level settings for service
 type Params struct {
-	MaxRequestTimeout    int64         `json:"max_request_timeout"`
-	MinDepositMultiple   int64         `json:"min_deposit_multiple"`
-	ServiceFeeTax        sdk.Dec       `json:"service_fee_tax"`
-	SlashFraction        sdk.Dec       `json:"slash_fraction"`
-	ComplaintRetrospect  time.Duration `json:"complaint_retrospect"`
-	ArbitrationTimeLimit time.Duration `json:"arbitration_time_limit"`
-	TxSizeLimit          uint64        `json:"tx_size_limit"`
+	MaxRequestTimeout    int64         `json:"max_request_timeout" yaml:"max_request_timeout"`
+	MinDepositMultiple   int64         `json:"min_deposit_multiple" yaml:"min_deposit_multiple"`
+	ServiceFeeTax        sdk.Dec       `json:"service_fee_tax" yaml:"service_fee_tax"`
+	SlashFraction        sdk.Dec       `json:"slash_fraction" yaml:"slash_fraction"`
+	ComplaintRetrospect  time.Duration `json:"complaint_retrospect" yaml:"complaint_retrospect"`
+	ArbitrationTimeLimit time.Duration `json:"arbitration_time_limit" yaml:"arbitration_time_limit"`
+	TxSizeLimit          uint64        `json:"tx_size_limit" yaml:"tx_size_limit"`
 }
 
 // NewParams creates a new Params instance

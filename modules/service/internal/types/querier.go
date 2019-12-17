@@ -19,8 +19,8 @@ type QueryDefinitionParams struct {
 }
 
 type DefinitionOutput struct {
-	Definition SvcDef           `json:"definition"`
-	Methods    []MethodProperty `json:"methods"`
+	Definition SvcDef           `json:"definition" yaml:"definition`
+	Methods    []MethodProperty `json:"methods" yaml:"methods"`
 }
 
 type QueryBindingParams struct {
@@ -52,6 +52,6 @@ type QueryFeesParams struct {
 }
 
 type FeesOutput struct {
-	ReturnedFee sdk.Coins `json:"returned_fee"`
-	IncomingFee sdk.Coins `json:"incoming_fee"`
+	ReturnedFee sdk.Coins `json:"returned_fee" yaml:"returned_fee"`
+	IncomingFee sdk.Coins `json:"incoming_fee" yaml:"incoming_fee"`
 }
