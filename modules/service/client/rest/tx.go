@@ -12,7 +12,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/rest"
 	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
 
-	"github.com/irisnet/irishub/modules/service"
+	"github.com/irisnet/irishub/modules/service/internal/types"
 )
 
 func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router) {
@@ -46,7 +46,7 @@ func definitionPostHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		msg := service.NewMsgSvcDef(req.ServiceName, req.BaseReq.ChainID, req.ServiceDescription, req.Tags, author, req.AuthorDescription, req.IdlContent)
+		msg := types.NewMsgSvcDef(req.ServiceName, req.BaseReq.ChainID, req.ServiceDescription, req.Tags, author, req.AuthorDescription, req.IdlContent)
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -74,7 +74,7 @@ func bindingAddHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		bindingType, err := service.BindingTypeFromString(req.BindingType)
+		bindingType, err := types.BindingTypeFromString(req.BindingType)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -97,7 +97,7 @@ func bindingAddHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			prices = append(prices, price)
 		}
 
-		msg := service.NewMsgSvcBind(req.DefChainId, req.ServiceName, req.BaseReq.ChainID, provider, bindingType, deposit, prices, req.Level)
+		msg := types.NewMsgSvcBind(req.DefChainId, req.ServiceName, req.BaseReq.ChainID, provider, bindingType, deposit, prices, req.Level)
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -130,9 +130,9 @@ func bindingUpdateHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		var bindingType service.BindingType
+		var bindingType types.BindingType
 		if req.BindingType != "" {
-			bindingType, err = service.BindingTypeFromString(req.BindingType)
+			bindingType, err = types.BindingTypeFromString(req.BindingType)
 			if err != nil {
 				rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 				return
@@ -159,7 +159,7 @@ func bindingUpdateHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			prices = append(prices, price)
 		}
 
-		msg := service.NewMsgSvcBindingUpdate(DefChainID, serviceName, req.BaseReq.ChainID, provider, bindingType, deposit, prices, req.Level)
+		msg := types.NewMsgSvcBindingUpdate(DefChainID, serviceName, req.BaseReq.ChainID, provider, bindingType, deposit, prices, req.Level)
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -192,7 +192,7 @@ func bindingDisableHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		msg := service.NewMsgSvcDisable(DefChainID, serviceName, req.BaseReq.ChainID, provider)
+		msg := types.NewMsgSvcDisable(DefChainID, serviceName, req.BaseReq.ChainID, provider)
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -231,7 +231,7 @@ func bindingEnableHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		msg := service.NewMsgSvcEnable(DefChainID, serviceName, req.BaseReq.ChainID, provider, deposit)
+		msg := types.NewMsgSvcEnable(DefChainID, serviceName, req.BaseReq.ChainID, provider, deposit)
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -264,7 +264,7 @@ func bindingRefundHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		msg := service.NewMsgSvcRefundDeposit(DefChainID, serviceName, req.BaseReq.ChainID, provider)
+		msg := types.NewMsgSvcRefundDeposit(DefChainID, serviceName, req.BaseReq.ChainID, provider)
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -312,7 +312,7 @@ func requestAddHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 				return
 			}
 
-			msg := service.NewMsgSvcRequest(request.DefChainId, request.ServiceName, request.BindChainId, req.BaseReq.ChainID, consumer, provider, request.MethodId, input, serviceFee, request.Profiling)
+			msg := types.NewMsgSvcRequest(request.DefChainId, request.ServiceName, request.BindChainId, req.BaseReq.ChainID, consumer, provider, request.MethodId, input, serviceFee, request.Profiling)
 			if err := msg.ValidateBasic(); err != nil {
 				rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 				return
@@ -355,7 +355,7 @@ func responseAddHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		msg := service.NewMsgSvcResponse(req.ReqChainId, req.RequestId, provider, output, errMsg)
+		msg := types.NewMsgSvcResponse(req.ReqChainId, req.RequestId, provider, output, errMsg)
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -386,7 +386,7 @@ func FeesRefundHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		msg := service.NewMsgSvcRefundFees(consumer)
+		msg := types.NewMsgSvcRefundFees(consumer)
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -417,7 +417,7 @@ func FeesWithdrawHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		msg := service.NewMsgSvcWithdrawFees(provider)
+		msg := types.NewMsgSvcWithdrawFees(provider)
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return

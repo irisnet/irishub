@@ -12,7 +12,7 @@ import (
 type SvcDef struct {
 	Name              string         `json:"name" yaml:"name"`
 	ChainId           string         `json:"chain_id" yaml:"chain_id"`
-	Description       string         `json:"description" yaml:"chain_id"`
+	Description       string         `json:"description" yaml:"description"`
 	Tags              []string       `json:"tags" yaml:"tags"`
 	Author            sdk.AccAddress `json:"author" yaml:"author"`
 	AuthorDescription string         `json:"author_description" yaml:"author_description"`

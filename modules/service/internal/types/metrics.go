@@ -9,7 +9,7 @@ import (
 	cfg "github.com/tendermint/tendermint/config"
 )
 
-const MetricsSubsystem = ModuleName
+const MetricsSubsystem = "module_" + ModuleName
 
 type Metrics struct {
 	ActiveRequests metrics.Gauge
