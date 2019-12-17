@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/stretchr/testify/require"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/irisnet/irishub/config"
+	"github.com/stretchr/testify/require"
 )
 
 var (
@@ -14,6 +14,12 @@ var (
 	testAddr      = sdk.AccAddress([]byte("testAddr"))
 	blockInterval = uint64(10)
 )
+
+func init() {
+	sdk.GetConfig().SetBech32PrefixForAccount(config.GetConfig().GetBech32AccountAddrPrefix(), config.GetConfig().GetBech32AccountPubPrefix())
+	sdk.GetConfig().SetBech32PrefixForValidator(config.GetConfig().GetBech32ValidatorAddrPrefix(), config.GetConfig().GetBech32ValidatorPubPrefix())
+	sdk.GetConfig().SetBech32PrefixForConsensusNode(config.GetConfig().GetBech32ConsensusAddrPrefix(), config.GetConfig().GetBech32ConsensusPubPrefix())
+}
 
 func TestNewMsgRequestRand(t *testing.T) {
 	msg := NewMsgRequestRand(testAddr, blockInterval)
@@ -54,7 +60,7 @@ func TestMsgRequestRandGetSignBytes(t *testing.T) {
 	var msg = NewMsgRequestRand(testAddr, blockInterval)
 	res := msg.GetSignBytes()
 
-	expected := "{\"type\":\"irishub/rand/MsgRequestRand\",\"value\":{\"block-interval\":\"10\",\"consumer\":\"faa1w3jhxazpv3j8yxhn3j0\"}}"
+	expected := `{"type":"irishub/rand/MsgRequestRand","value":{"block_interval":"10","consumer":"faa1w3jhxazpv3j8yxhn3j0"}}`
 	require.Equal(t, expected, string(res))
 }
 

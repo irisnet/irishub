@@ -1,6 +1,7 @@
 package keeper_test
 
 import (
+	"encoding/json"
 	"math/big"
 	"testing"
 
@@ -45,12 +46,14 @@ func (suite *KeeperTestSuite) SetupTest() {
 }
 
 func (suite *KeeperTestSuite) TestSetRand() {
-	rand := types.NewRand(types.SHA256(testTxBytes), testHeight, big.NewRat(testRandNumerator, testRandDenomiator))
+	rand := types.NewRand(types.SHA256(testTxBytes), testHeight, big.NewRat(testRandNumerator, testRandDenomiator).FloatString(types.RandPrec))
 	suite.keeper.SetRand(suite.ctx, testReqID, rand)
 
 	storedRand, err := suite.keeper.GetRand(suite.ctx, testReqID)
 	suite.NoError(err)
-	suite.Equal(rand, storedRand)
+	randJson, _ := json.Marshal(rand)
+	storedRandJson, _ := json.Marshal(storedRand)
+	suite.Equal(string(randJson), string(storedRandJson))
 }
 
 func (suite *KeeperTestSuite) TestRequestRand() {
@@ -66,7 +69,7 @@ func (suite *KeeperTestSuite) TestRequestRand() {
 
 	for ; iterator.Valid(); iterator.Next() {
 		var request types.Request
-		suite.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), request)
+		suite.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &request)
 
 		suite.Equal(expectedRequest, request)
 	}

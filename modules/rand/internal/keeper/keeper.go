@@ -2,15 +2,14 @@ package keeper
 
 import (
 	"bytes"
+	"encoding/binary"
 	"encoding/hex"
 	"fmt"
-	"strconv"
-
 	"github.com/tendermint/tendermint/libs/log"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	
+
 	"github.com/irisnet/irishub/modules/rand/internal/types"
 )
 
@@ -136,7 +135,7 @@ func (k Keeper) IterateRandRequestQueue(ctx sdk.Context, op func(h int64, r type
 
 	for ; iterator.Valid(); iterator.Next() {
 		keyParts := bytes.Split(iterator.Key(), types.KeyDelimiter)
-		height, _ := strconv.ParseInt(string(keyParts[1]), 10, 64)
+		height := int64(binary.BigEndian.Uint64(keyParts[1]))
 
 		var request types.Request
 		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &request)

@@ -23,31 +23,8 @@ func NewRequest(height int64, consumer sdk.AccAddress, txHash []byte) Request {
 	}
 }
 
-// String implements fmt.Stringer
-func (r Request) String() string {
-	return fmt.Sprintf(`Request:
-  Height:            %d
-  Consumer:          %s
-  TxHash:            %s`,
-		r.Height, r.Consumer.String(), hex.EncodeToString(r.TxHash))
-}
-
 // Requests is a set of requests
 type Requests []Request
-
-// String implements fmt.Stringer
-func (rs Requests) String() string {
-	if len(rs) == 0 {
-		return "[]"
-	}
-
-	var str string
-	for _, r := range rs {
-		str += fmt.Sprintf("Request:\n  Height: %d, Consumer: %s, TxHash: %s", r.Height, r.Consumer.String(), hex.EncodeToString(r.TxHash))
-	}
-
-	return str
-}
 
 // GenerateRequestID generate a request id
 func GenerateRequestID(r Request) []byte {

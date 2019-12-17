@@ -28,7 +28,7 @@ func TestDecodeStore(t *testing.T) {
 
 	request := types.NewRequest(50, sdk.AccAddress([]byte("consumer")), []byte("txHash"))
 	reqID := types.GenerateRequestID(request)
-	rand := types.NewRand([]byte("requestTxHash"), 100, big.NewRat(10, 1000))
+	rand := types.NewRand([]byte("requestTxHash"), 100, big.NewRat(10, 1000).FloatString(types.RandPrec))
 
 	kvPairs := cmn.KVPairs{
 		cmn.KVPair{Key: types.KeyRand(reqID), Value: cdc.MustMarshalBinaryLengthPrefixed(rand)},

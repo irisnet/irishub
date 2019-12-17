@@ -52,7 +52,7 @@ func GetCmdQueryRand(queryRoute string, cdc *codec.Codec) *cobra.Command {
 			readableRand := clienttypes.ReadableRand{
 				RequestTxHash: hex.EncodeToString(rawRand.RequestTxHash),
 				Height:        rawRand.Height,
-				Value:         rawRand.Value.FloatString(types.RandPrec),
+				Value:         rawRand.Value,
 			}
 
 			return cliCtx.PrintOutput(readableRand)

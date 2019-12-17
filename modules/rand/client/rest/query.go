@@ -9,7 +9,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/types/rest"
-	
+
 	clienttypes "github.com/irisnet/irishub/modules/rand/client/types"
 	"github.com/irisnet/irishub/modules/rand/internal/types"
 )
@@ -62,7 +62,7 @@ func queryRandHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 		readableRand := clienttypes.ReadableRand{
 			RequestTxHash: hex.EncodeToString(rawRand.RequestTxHash),
 			Height:        rawRand.Height,
-			Value:         rawRand.Value.FloatString(types.RandPrec),
+			Value:         rawRand.Value,
 		}
 
 		cliCtx = cliCtx.WithHeight(height)

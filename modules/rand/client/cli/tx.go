@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"bufio"
 	"strconv"
 
 	"github.com/spf13/cobra"
@@ -21,10 +20,10 @@ func GetCmdRequestRand(cdc *codec.Codec) *cobra.Command {
 		Use:     "request-rand",
 		Short:   "Request a random number with an optional block interval",
 		Example: "iriscli tx rand request-rand [block-interval]",
+		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			inBuf := bufio.NewReader(cmd.InOrStdin())
-			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
-			cliCtx := context.NewCLIContextWithInput(inBuf).WithCodec(cdc)
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
 
 			var blockInterval uint64
 			var err error
@@ -36,10 +35,7 @@ func GetCmdRequestRand(cdc *codec.Codec) *cobra.Command {
 				}
 			}
 
-			consumer, err := cliCtx.GetFromAddress()
-			if err != nil {
-				return err
-			}
+			consumer := cliCtx.GetFromAddress()
 
 			msg := types.NewMsgRequestRand(consumer, blockInterval)
 			if err := msg.ValidateBasic(); err != nil {

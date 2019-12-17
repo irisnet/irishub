@@ -10,7 +10,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	
+
 	"github.com/irisnet/irishub/modules/rand"
 	"github.com/irisnet/irishub/simapp"
 )
@@ -47,10 +47,12 @@ func (suite *GenesisTestSuite) TestExportGenesis() {
 	suite.ctx = suite.ctx.WithBlockHeight(testHeight).WithTxBytes(testTxBytes)
 
 	// request rands
-	suite.keeper.RequestRand(suite.ctx, testConsumer1, testBlockInterval1)
-	suite.keeper.RequestRand(suite.ctx, testConsumer2, testBlockInterval2)
+	_, err := suite.keeper.RequestRand(suite.ctx, testConsumer1, testBlockInterval1)
+	suite.NoError(err)
+	_, err = suite.keeper.RequestRand(suite.ctx, testConsumer2, testBlockInterval2)
+	suite.NoError(err)
 
-	// preceed to the new block
+	// precede to the new block
 	suite.ctx = suite.ctx.WithBlockHeight(testNewHeight)
 
 	// get the pending requests from queue
@@ -66,7 +68,7 @@ func (suite *GenesisTestSuite) TestExportGenesis() {
 	exportedRequests := genesis.PendingRandRequests
 	suite.Equal(2, len(exportedRequests))
 
-	// assert that exported requests are consistant with requests in queue
+	// assert that exported requests are consistent with requests in queue
 	for height, requests := range exportedRequests {
 		h, _ := strconv.ParseInt(height, 10, 64)
 		storedHeight := h + testNewHeight - 1
