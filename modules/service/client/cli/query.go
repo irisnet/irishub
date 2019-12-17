@@ -37,7 +37,13 @@ func GetCmdQuerySvcDef(queryRoute string, cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			return cliCtx.PrintOutput(res)
+			var svcDefOutput types.DefinitionOutput
+			err = cdc.UnmarshalJSON(res, &svcDefOutput)
+			if err != nil {
+				return err
+			}
+
+			return cliCtx.PrintOutput(svcDefOutput)
 		},
 	}
 
@@ -76,7 +82,13 @@ func GetCmdQuerySvcBind(queryRoute string, cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			return cliCtx.PrintOutput(res)
+			var binding types.SvcBinding
+                        err = cdc.UnmarshalJSON(res, &binding)
+                        if err != nil {
+                                return err
+                        }
+
+                        return cliCtx.PrintOutput(binding)
 		},
 	}
 
@@ -108,7 +120,13 @@ func GetCmdQuerySvcBinds(queryRoute string, cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			return cliCtx.PrintOutput(res)
+			var bindings []types.SvcBinding
+                        err = cdc.UnmarshalJSON(res, &bindings)
+                        if err != nil {
+                                return err
+                        }
+
+                        return cliCtx.PrintOutput(bindings)
 		},
 	}
 
@@ -147,7 +165,13 @@ func GetCmdQuerySvcRequests(queryRoute string, cdc *codec.Codec) *cobra.Command 
 				return err
 			}
 
-			return cliCtx.PrintOutput(res)
+			var requests []types.SvcRequest
+                        err = cdc.UnmarshalJSON(res, &requests)
+                        if err != nil {
+                                return err
+                        }
+
+                        return cliCtx.PrintOutput(requests)
 		},
 	}
 
@@ -179,7 +203,13 @@ func GetCmdQuerySvcResponse(queryRoute string, cdc *codec.Codec) *cobra.Command 
 				return err
 			}
 
-			return cliCtx.PrintOutput(res)
+			var response types.SvcResponse
+                        err = cdc.UnmarshalJSON(res, &response)
+                        if err != nil {
+                                return err
+                        }
+
+                        return cliCtx.PrintOutput(response)
 		},
 	}
 
@@ -215,7 +245,13 @@ func GetCmdQuerySvcFees(queryRoute string, cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			return cliCtx.PrintOutput(res)
+			var fees types.FeesOutput
+                        err = cdc.UnmarshalJSON(res, &fees)
+                        if err != nil {
+                                return err
+                        }
+
+                        return cliCtx.PrintOutput(fees)
 		},
 	}
 

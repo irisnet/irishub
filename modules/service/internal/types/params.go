@@ -14,10 +14,10 @@ import (
 var (
 	DefaultMaxRequestTimeout    = int64(100)
 	DefaultMinDepositMultiple   = int64(1000)
-	DefaultServiceFeeTax        = sdk.NewDecWithPrec(1, 2)           // 1%
-	DefaultSlashFraction        = sdk.NewDecWithPrec(1, 3)           // 0.1%
-	DefaultComplaintRetrospect  = time.Duration(15 * 24 * time.Hour) // 15 days
-	DefaultArbitrationTimeLimit = time.Duration(5 * 24 * time.Hour)  // 5 days
+	DefaultServiceFeeTax        = sdk.NewDecWithPrec(1, 2) // 1%
+	DefaultSlashFraction        = sdk.NewDecWithPrec(1, 3) // 0.1%
+	DefaultComplaintRetrospect  = 15 * 24 * time.Hour      // 15 days
+	DefaultArbitrationTimeLimit = 5 * 24 * time.Hour       // 5 days
 	DefaultTxSizeLimit          = uint64(4000)
 )
 
@@ -28,10 +28,10 @@ var (
 	MaxDepositMultiple      = int64(5000)
 	MaxServiceFeeTax        = sdk.NewDecWithPrec(2, 1)
 	MaxSlashFraction        = sdk.NewDecWithPrec(1, 2)
-	MinComplaintRetrospect  = time.Duration(15 * 24 * time.Hour)
-	MaxComplaintRetrospect  = time.Duration(30 * 24 * time.Hour)
-	MinArbitrationTimeLimit = time.Duration(5 * 24 * time.Hour)
-	MaxArbitrationTimeLimit = time.Duration(10 * 24 * time.Hour)
+	MinComplaintRetrospect  = 15 * 24 * time.Hour
+	MaxComplaintRetrospect  = 30 * 24 * time.Hour
+	MinArbitrationTimeLimit = 5 * 24 * time.Hour
+	MaxArbitrationTimeLimit = 10 * 24 * time.Hour
 	MinTxSizeLimit          = uint64(2000)
 	MaxTxSizeLimit          = uint64(6000)
 )
@@ -62,7 +62,7 @@ type Params struct {
 
 // NewParams creates a new Params instance
 func NewParams(maxRequestTimeout, minDepositMultiple int64, serviceFeeTax, slashFraction sdk.Dec,
-	complaintRetrospect, arbitrationTimeLimit time.Duration, txSizeLimit uint64) Params {
+complaintRetrospect, arbitrationTimeLimit time.Duration, txSizeLimit uint64) Params {
 
 	return Params{
 		MaxRequestTimeout:    maxRequestTimeout,

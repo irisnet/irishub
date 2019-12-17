@@ -19,7 +19,7 @@ type QueryDefinitionParams struct {
 }
 
 type DefinitionOutput struct {
-	Definition SvcDef           `json:"definition" yaml:"definition`
+	Definition SvcDef           `json:"definition" yaml:"definition"`
 	Methods    []MethodProperty `json:"methods" yaml:"methods"`
 }
 
