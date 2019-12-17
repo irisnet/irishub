@@ -5,18 +5,18 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/types/rest"
-	
-	"github.com/irisnet/irishub/modules/service"
+
+	"github.com/irisnet/irishub/modules/service/internal/types"
 )
 
 // Rest variable names
 // nolint
 const (
-	RestDefChainId  = "def-chain-id"
+	RestDefChainID  = "def-chain-id"
 	RestServiceName = "service-name"
-	RestBindChainId = "bind-chain-id"
-	RestReqChainId  = "req-chain-id"
-	RestReqId       = "request-id"
+	RestBindChainID = "bind-chain-id"
+	RestReqChainID  = "req-chain-id"
+	RestReqID       = "request-id"
 	RestProvider    = "provider"
 	RestConsumer    = "consumer"
 	RestAddress     = "address"
@@ -45,7 +45,7 @@ type ServiceBindingReq struct {
 	BindingType string        `json:"binding_type" yaml:"binding_type"`
 	Deposit     string        `json:"deposit" yaml:"deposit"`
 	Prices      []string      `json:"prices" yaml:"prices"`
-	Level       service.Level `json:"level" yaml:"level"`
+	Level       types.Level `json:"level" yaml:"level"`
 	Provider    string        `json:"provider" yaml:"provider"`
 }
 
@@ -54,7 +54,7 @@ type ServiceBindingUpdateReq struct {
 	BindingType string        `json:"binding_type" yaml:"binding_type"`
 	Deposit     string        `json:"deposit" yaml:"deposit"`
 	Prices      []string      `json:"prices" yaml:"prices"`
-	Level       service.Level `json:"level" yaml:"level"`
+	Level       types.Level `json:"level" yaml:"level"`
 }
 
 type ServiceBindingEnableReq struct {

@@ -5,21 +5,23 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/gorilla/mux"
+
 	"github.com/cosmos/cosmos-sdk/client/context"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/rest"
 	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
-	"github.com/gorilla/mux"
+
 	"github.com/irisnet/irishub/modules/service"
 )
 
 func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router) {
 	r.HandleFunc("/service/definitions", definitionPostHandlerFn(cliCtx)).Methods("POST")
 	r.HandleFunc("/service/bindings", bindingAddHandlerFn(cliCtx)).Methods("POST")
-	r.HandleFunc(fmt.Sprintf("/service/bindings/{%s}/{%s}/{%s}", RestDefChainId, RestServiceName, RestProvider), bindingUpdateHandlerFn(cliCtx)).Methods("PUT")
-	r.HandleFunc(fmt.Sprintf("/service/bindings/{%s}/{%s}/{%s}/disable", RestDefChainId, RestServiceName, RestProvider), bindingDisableHandlerFn(cliCtx)).Methods("PUT")
-	r.HandleFunc(fmt.Sprintf("/service/bindings/{%s}/{%s}/{%s}/enable", RestDefChainId, RestServiceName, RestProvider), bindingEnableHandlerFn(cliCtx)).Methods("PUT")
-	r.HandleFunc(fmt.Sprintf("/service/bindings/{%s}/{%s}/{%s}/deposit/refund", RestDefChainId, RestServiceName, RestProvider), bindingRefundHandlerFn(cliCtx)).Methods("PUT")
+	r.HandleFunc(fmt.Sprintf("/service/bindings/{%s}/{%s}/{%s}", RestDefChainID, RestServiceName, RestProvider), bindingUpdateHandlerFn(cliCtx)).Methods("PUT")
+	r.HandleFunc(fmt.Sprintf("/service/bindings/{%s}/{%s}/{%s}/disable", RestDefChainID, RestServiceName, RestProvider), bindingDisableHandlerFn(cliCtx)).Methods("PUT")
+	r.HandleFunc(fmt.Sprintf("/service/bindings/{%s}/{%s}/{%s}/enable", RestDefChainID, RestServiceName, RestProvider), bindingEnableHandlerFn(cliCtx)).Methods("PUT")
+	r.HandleFunc(fmt.Sprintf("/service/bindings/{%s}/{%s}/{%s}/deposit/refund", RestDefChainID, RestServiceName, RestProvider), bindingRefundHandlerFn(cliCtx)).Methods("PUT")
 	r.HandleFunc(fmt.Sprintf("/service/requests"), requestAddHandlerFn(cliCtx)).Methods("POST")
 	r.HandleFunc(fmt.Sprintf("/service/responses"), responseAddHandlerFn(cliCtx)).Methods("POST")
 	r.HandleFunc(fmt.Sprintf("/service/fees/{%s}/refund", RestConsumer), FeesRefundHandlerFn(cliCtx)).Methods("POST")
@@ -108,7 +110,7 @@ func bindingAddHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 func bindingUpdateHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		DefChainId := vars[RestDefChainId]
+		DefChainID := vars[RestDefChainID]
 		serviceName := vars[RestServiceName]
 		providerStr := vars[RestProvider]
 
@@ -157,7 +159,7 @@ func bindingUpdateHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			prices = append(prices, price)
 		}
 
-		msg := service.NewMsgSvcBindingUpdate(DefChainId, serviceName, req.BaseReq.ChainID, provider, bindingType, deposit, prices, req.Level)
+		msg := service.NewMsgSvcBindingUpdate(DefChainID, serviceName, req.BaseReq.ChainID, provider, bindingType, deposit, prices, req.Level)
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -170,7 +172,7 @@ func bindingUpdateHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 func bindingDisableHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		DefChainId := vars[RestDefChainId]
+		DefChainID := vars[RestDefChainID]
 		serviceName := vars[RestServiceName]
 		providerStr := vars[RestProvider]
 
@@ -190,7 +192,7 @@ func bindingDisableHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		msg := service.NewMsgSvcDisable(DefChainId, serviceName, req.BaseReq.ChainID, provider)
+		msg := service.NewMsgSvcDisable(DefChainID, serviceName, req.BaseReq.ChainID, provider)
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -203,7 +205,7 @@ func bindingDisableHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 func bindingEnableHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		DefChainId := vars[RestDefChainId]
+		DefChainID := vars[RestDefChainID]
 		serviceName := vars[RestServiceName]
 		providerStr := vars[RestProvider]
 
@@ -229,7 +231,7 @@ func bindingEnableHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		msg := service.NewMsgSvcEnable(DefChainId, serviceName, req.BaseReq.ChainID, provider, deposit)
+		msg := service.NewMsgSvcEnable(DefChainID, serviceName, req.BaseReq.ChainID, provider, deposit)
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -242,7 +244,7 @@ func bindingEnableHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 func bindingRefundHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		DefChainId := vars[RestDefChainId]
+		DefChainID := vars[RestDefChainID]
 		serviceName := vars[RestServiceName]
 		providerStr := vars[RestProvider]
 
@@ -262,7 +264,7 @@ func bindingRefundHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		msg := service.NewMsgSvcRefundDeposit(DefChainId, serviceName, req.BaseReq.ChainID, provider)
+		msg := service.NewMsgSvcRefundDeposit(DefChainID, serviceName, req.BaseReq.ChainID, provider)
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return

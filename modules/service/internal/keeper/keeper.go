@@ -3,12 +3,14 @@ package keeper
 import (
 	"fmt"
 
+	"github.com/tendermint/tendermint/libs/log"
+
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/params"
 	"github.com/cosmos/cosmos-sdk/x/supply/exported"
+
 	"github.com/irisnet/irishub/modules/service/internal/types"
-	"github.com/tendermint/tendermint/libs/log"
 )
 
 type Keeper struct {

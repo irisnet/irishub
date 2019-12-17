@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"bufio"
 	"encoding/hex"
 	"fmt"
 	"strings"
@@ -29,9 +28,8 @@ func GetCmdSvcDef(cdc *codec.Codec) *cobra.Command {
 			"--service-name=<service name> --service-description=<service description> --author-description=<author description> " +
 			"--tags=tag1,tag2 --idl-content=<interface description content> --file=test.proto",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			inBuf := bufio.NewReader(cmd.InOrStdin())
-			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
-			cliCtx := context.NewCLIContextWithInput(inBuf).WithCodec(cdc)
+			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(auth.DefaultTxEncoder(cdc))
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
 			name := viper.GetString(FlagServiceName)
 			description := viper.GetString(FlagServiceDescription)
@@ -55,11 +53,7 @@ func GetCmdSvcDef(cdc *codec.Codec) *cobra.Command {
 			fmt.Printf("idl condent: \n%s\n", content)
 
 			chainID := viper.GetString(client.FlagChainID)
-
-			fromAddr, err := cliCtx.GetFromAddress()
-			if err != nil {
-				return err
-			}
+			fromAddr := cliCtx.GetFromAddress()
 
 			msg := types.NewMsgSvcDef(name, chainID, description, tags, fromAddr, authorDescription, content)
 			if err := msg.ValidateBasic(); err != nil {
@@ -84,14 +78,10 @@ func GetCmdSvcBind(cdc *codec.Codec) *cobra.Command {
 			"--service-name=<service name> --def-chain-id=<chain-id> --bind-type=Local " +
 			"--deposit=1iris --prices=1iris,2iris --avg-rsp-time=10000 --usable-time=100",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			inBuf := bufio.NewReader(cmd.InOrStdin())
-			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
-			cliCtx := context.NewCLIContextWithInput(inBuf).WithCodec(cdc)
+			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(auth.DefaultTxEncoder(cdc))
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			fromAddr, err := cliCtx.GetFromAddress()
-			if err != nil {
-				return err
-			}
+			fromAddr := cliCtx.GetFromAddress()
 
 			chainID := viper.GetString(client.FlagChainID)
 			name := viper.GetString(FlagServiceName)
@@ -107,14 +97,14 @@ func GetCmdSvcBind(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			deposit, err := cliCtx.ParseCoins(initialDeposit)
+			deposit, err := sdk.ParseCoins(initialDeposit)
 			if err != nil {
 				return err
 			}
 
 			var prices []sdk.Coin
 			for _, ip := range initialPrices {
-				price, err := cliCtx.ParseCoin(ip)
+				price, err := sdk.ParseCoin(ip)
 				if err != nil {
 					return err
 				}
@@ -152,14 +142,10 @@ func GetCmdSvcBindUpdate(cdc *codec.Codec) *cobra.Command {
 			"--service-name=<service name> --def-chain-id=<chain-id> --bind-type=Local " +
 			"--deposit=1iris --prices=1iris,2iris --avg-rsp-time=10000 --usable-time=100",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			inBuf := bufio.NewReader(cmd.InOrStdin())
-			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
-			cliCtx := context.NewCLIContextWithInput(inBuf).WithCodec(cdc)
+			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(auth.DefaultTxEncoder(cdc))
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			fromAddr, err := cliCtx.GetFromAddress()
-			if err != nil {
-				return err
-			}
+			fromAddr := cliCtx.GetFromAddress()
 
 			chainID := viper.GetString(client.FlagChainID)
 			name := viper.GetString(FlagServiceName)
@@ -169,6 +155,8 @@ func GetCmdSvcBindUpdate(cdc *codec.Codec) *cobra.Command {
 			avgRspTime := viper.GetInt64(FlagAvgRspTime)
 			usableTime := viper.GetInt64(FlagUsableTime)
 			bindingTypeStr := viper.GetString(FlagBindType)
+
+			var err error
 
 			var bindingType types.BindingType
 			if bindingTypeStr != "" {
@@ -180,7 +168,7 @@ func GetCmdSvcBindUpdate(cdc *codec.Codec) *cobra.Command {
 
 			var deposit sdk.Coins
 			if initialDeposit != "" {
-				deposit, err = cliCtx.ParseCoins(initialDeposit)
+				deposit, err = sdk.ParseCoins(initialDeposit)
 				if err != nil {
 					return err
 				}
@@ -188,7 +176,7 @@ func GetCmdSvcBindUpdate(cdc *codec.Codec) *cobra.Command {
 
 			var prices []sdk.Coin
 			for _, ip := range initialPrices {
-				price, err := cliCtx.ParseCoin(ip)
+				price, err := sdk.ParseCoin(ip)
 				if err != nil {
 					return err
 				}
@@ -221,14 +209,10 @@ func GetCmdSvcDisable(cdc *codec.Codec) *cobra.Command {
 		Example: "iriscli tx service disable --chain-id=<chain-id> --from=<key-name> --fee=0.3iris " +
 			"--service-name=<service name> --def-chain-id=<chain-id>",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			inBuf := bufio.NewReader(cmd.InOrStdin())
-			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
-			cliCtx := context.NewCLIContextWithInput(inBuf).WithCodec(cdc)
+			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(auth.DefaultTxEncoder(cdc))
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			fromAddr, err := cliCtx.GetFromAddress()
-			if err != nil {
-				return err
-			}
+			fromAddr := cliCtx.GetFromAddress()
 
 			chainID := viper.GetString(client.FlagChainID)
 			name := viper.GetString(FlagServiceName)
@@ -257,21 +241,17 @@ func GetCmdSvcEnable(cdc *codec.Codec) *cobra.Command {
 		Example: "iriscli tx service enable --chain-id=<chain-id> --from=<key-name> --fee=0.3iris " +
 			"--service-name=<service name> --def-chain-id=<chain-id> --deposit=1iris",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			inBuf := bufio.NewReader(cmd.InOrStdin())
-			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
-			cliCtx := context.NewCLIContextWithInput(inBuf).WithCodec(cdc)
+			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(auth.DefaultTxEncoder(cdc))
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			fromAddr, err := cliCtx.GetFromAddress()
-			if err != nil {
-				return err
-			}
+			fromAddr := cliCtx.GetFromAddress()
 
 			chainID := viper.GetString(client.FlagChainID)
 			name := viper.GetString(FlagServiceName)
 			defChainID := viper.GetString(FlagDefChainID)
 
 			initialDeposit := viper.GetString(FlagDeposit)
-			deposit, err := cliCtx.ParseCoins(initialDeposit)
+			deposit, err := sdk.ParseCoins(initialDeposit)
 			if err != nil {
 				return err
 			}
@@ -300,14 +280,10 @@ func GetCmdSvcRefundDeposit(cdc *codec.Codec) *cobra.Command {
 		Example: "iriscli tx service refund-deposit --chain-id=<chain-id> --from=<key-name> --fee=0.3iris " +
 			"--service-name=<service name> --def-chain-id=<chain-id>",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			inBuf := bufio.NewReader(cmd.InOrStdin())
-			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
-			cliCtx := context.NewCLIContextWithInput(inBuf).WithCodec(cdc)
+			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(auth.DefaultTxEncoder(cdc))
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			fromAddr, err := cliCtx.GetFromAddress()
-			if err != nil {
-				return err
-			}
+			fromAddr := cliCtx.GetFromAddress()
 
 			chainID := viper.GetString(client.FlagChainID)
 			name := viper.GetString(FlagServiceName)
@@ -336,14 +312,10 @@ func GetCmdSvcCall(cdc *codec.Codec) *cobra.Command {
 		Example: "iriscli tx service call --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --def-chain-id=<bind-chain-id> " +
 			"--service-name=<service name> --method-id=<method-id> --bind-chain-id=<chain-id> --provider=<provider> --service-fee=1iris --request-data=<req>",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			inBuf := bufio.NewReader(cmd.InOrStdin())
-			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
-			cliCtx := context.NewCLIContextWithInput(inBuf).WithCodec(cdc)
+			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(auth.DefaultTxEncoder(cdc))
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			fromAddr, err := cliCtx.GetFromAddress()
-			if err != nil {
-				return err
-			}
+			fromAddr := cliCtx.GetFromAddress()
 
 			chainID := viper.GetString(client.FlagChainID)
 			defChainID := viper.GetString(FlagDefChainID)
@@ -358,7 +330,7 @@ func GetCmdSvcCall(cdc *codec.Codec) *cobra.Command {
 			}
 
 			serviceFeeStr := viper.GetString(FlagServiceFee)
-			serviceFee, err := cliCtx.ParseCoins(serviceFeeStr)
+			serviceFee, err := sdk.ParseCoins(serviceFeeStr)
 			if err != nil {
 				return err
 			}
@@ -399,14 +371,10 @@ func GetCmdSvcRespond(cdc *codec.Codec) *cobra.Command {
 		Example: "iriscli service respond --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --request-chain-id=<call-chain-id> " +
 			"--request-id=<request-id> --response-data=<resp>",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			inBuf := bufio.NewReader(cmd.InOrStdin())
-			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
-			cliCtx := context.NewCLIContextWithInput(inBuf).WithCodec(cdc)
+			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(auth.DefaultTxEncoder(cdc))
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			fromAddr, err := cliCtx.GetFromAddress()
-			if err != nil {
-				return err
-			}
+			fromAddr := cliCtx.GetFromAddress()
 
 			reqChainID := viper.GetString(FlagReqChainID)
 
@@ -446,14 +414,10 @@ func GetCmdSvcRefundFees(cdc *codec.Codec) *cobra.Command {
 		Short:   "Refund all fees from service call timeout",
 		Example: "iriscli tx service refund-fees --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --dest-address=<account address> --withdraw-amount 1iris",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			inBuf := bufio.NewReader(cmd.InOrStdin())
-			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
-			cliCtx := context.NewCLIContextWithInput(inBuf).WithCodec(cdc)
+			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(auth.DefaultTxEncoder(cdc))
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			fromAddr, err := cliCtx.GetFromAddress()
-			if err != nil {
-				return err
-			}
+			fromAddr := cliCtx.GetFromAddress()
 
 			msg := types.NewMsgSvcRefundFees(fromAddr)
 			if err := msg.ValidateBasic(); err != nil {
@@ -473,14 +437,10 @@ func GetCmdSvcWithdrawFees(cdc *codec.Codec) *cobra.Command {
 		Short:   "withdraw all fees from service call reward",
 		Example: "iriscli tx service withdraw-fees --chain-id=<chain-id> --from=<key-name> --fee=0.3iris",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			inBuf := bufio.NewReader(cmd.InOrStdin())
-			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
-			cliCtx := context.NewCLIContextWithInput(inBuf).WithCodec(cdc)
+			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(auth.DefaultTxEncoder(cdc))
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			fromAddr, err := cliCtx.GetFromAddress()
-			if err != nil {
-				return err
-			}
+			fromAddr := cliCtx.GetFromAddress()
 
 			msg := types.NewMsgSvcWithdrawFees(fromAddr)
 			if err := msg.ValidateBasic(); err != nil {
@@ -500,14 +460,10 @@ func GetCmdSvcWithdrawTax(cdc *codec.Codec) *cobra.Command {
 		Short:   "withdraw service fee tax to an account",
 		Example: "iriscli tx service withdraw-tax --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --dest-address=<account address> --withdraw-amount=1iris",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			inBuf := bufio.NewReader(cmd.InOrStdin())
-			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
-			cliCtx := context.NewCLIContextWithInput(inBuf).WithCodec(cdc)
+			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(auth.DefaultTxEncoder(cdc))
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			fromAddr, err := cliCtx.GetFromAddress()
-			if err != nil {
-				return err
-			}
+			fromAddr := cliCtx.GetFromAddress()
 
 			destAddressStr := viper.GetString(FlagDestAddress)
 			destAddress, err := sdk.AccAddressFromBech32(destAddressStr)
@@ -516,7 +472,7 @@ func GetCmdSvcWithdrawTax(cdc *codec.Codec) *cobra.Command {
 			}
 
 			withdrawAmountStr := viper.GetString(FlagWithdrawAmount)
-			withdrawAmount, err := cliCtx.ParseCoins(withdrawAmountStr)
+			withdrawAmount, err := sdk.ParseCoins(withdrawAmountStr)
 			if err != nil {
 				return err
 			}

@@ -9,23 +9,23 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/context"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/rest"
-	
+
 	"github.com/irisnet/irishub/modules/service/internal/types"
 )
 
 func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router) {
-	r.HandleFunc(fmt.Sprintf("/service/definitions/{%s}/{%s}", RestDefChainId, RestServiceName), queryDefinitionHandlerFn(cliCtx)).Methods("GET")
-	r.HandleFunc(fmt.Sprintf("/service/bindings/{%s}/{%s}/{%s}/{%s}", RestDefChainId, RestServiceName, RestBindChainId, RestProvider), queryBindingHandlerFn(cliCtx)).Methods("GET")
-	r.HandleFunc(fmt.Sprintf("/service/bindings/{%s}/{%s}", RestDefChainId, RestServiceName), queryBindingsHandlerFn(cliCtx)).Methods("GET")
-	r.HandleFunc(fmt.Sprintf("/service/requests/{%s}/{%s}/{%s}/{%s}", RestDefChainId, RestServiceName, RestBindChainId, RestProvider), queryRequestsHandlerFn(cliCtx)).Methods("GET")
-	r.HandleFunc(fmt.Sprintf("/service/responses/{%s}/{%s}", RestReqChainId, RestReqId), queryResponseHandlerFn(cliCtx)).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/service/definitions/{%s}/{%s}", RestDefChainID, RestServiceName), queryDefinitionHandlerFn(cliCtx)).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/service/bindings/{%s}/{%s}/{%s}/{%s}", RestDefChainID, RestServiceName, RestBindChainID, RestProvider), queryBindingHandlerFn(cliCtx)).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/service/bindings/{%s}/{%s}", RestDefChainID, RestServiceName), queryBindingsHandlerFn(cliCtx)).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/service/requests/{%s}/{%s}/{%s}/{%s}", RestDefChainID, RestServiceName, RestBindChainID, RestProvider), queryRequestsHandlerFn(cliCtx)).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/service/responses/{%s}/{%s}", RestReqChainID, RestReqID), queryResponseHandlerFn(cliCtx)).Methods("GET")
 	r.HandleFunc(fmt.Sprintf("/service/fees/{%s}", RestAddress), queryFeesHandlerFn(cliCtx)).Methods("GET")
 }
 
 func queryDefinitionHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		defChainId := vars[RestDefChainId]
+		defChainID := vars[RestDefChainID]
 		serviceName := vars[RestServiceName]
 
 		cliCtx, ok := rest.ParseQueryHeightOrReturnBadRequest(w, cliCtx, r)
@@ -33,8 +33,8 @@ func queryDefinitionHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		params := service.QueryServiceParams{
-			DefChainID:  defChainId,
+		params := types.QueryDefinitionParams{
+			DefChainID:  defChainID,
 			ServiceName: serviceName,
 		}
 
@@ -44,7 +44,7 @@ func queryDefinitionHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		route := fmt.Sprintf("custom/%s/%s", service.QuerierRoute, service.QueryDefinition)
+		route := fmt.Sprintf("custom/%s/%s", types.QuerierRoute, types.QueryDefinition)
 		res, height, err := cliCtx.QueryWithData(route, bz)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
@@ -59,9 +59,9 @@ func queryDefinitionHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 func queryBindingHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		defChainId := vars[RestDefChainId]
+		defChainID := vars[RestDefChainID]
 		serviceName := vars[RestServiceName]
-		bindChainId := vars[RestBindChainId]
+		bindChainID := vars[RestBindChainID]
 		providerStr := vars[RestProvider]
 
 		provider, err := sdk.AccAddressFromBech32(providerStr)
@@ -75,10 +75,10 @@ func queryBindingHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		params := service.QueryBindingParams{
-			DefChainID:  defChainId,
+		params := types.QueryBindingParams{
+			DefChainID:  defChainID,
 			ServiceName: serviceName,
-			BindChainId: bindChainId,
+			BindChainId: bindChainID,
 			Provider:    provider,
 		}
 
@@ -88,7 +88,7 @@ func queryBindingHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		route := fmt.Sprintf("custom/%s/%s", service.QuerierRoute, service.QueryBinding)
+		route := fmt.Sprintf("custom/%s/%s", types.QuerierRoute, types.QueryBinding)
 		res, height, err := cliCtx.QueryWithData(route, bz)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
@@ -103,7 +103,7 @@ func queryBindingHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 func queryBindingsHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		defChainId := vars[RestDefChainId]
+		defChainID := vars[RestDefChainID]
 		serviceName := vars[RestServiceName]
 
 		cliCtx, ok := rest.ParseQueryHeightOrReturnBadRequest(w, cliCtx, r)
@@ -111,8 +111,8 @@ func queryBindingsHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		params := service.QueryServiceParams{
-			DefChainID:  defChainId,
+		params := types.QueryBindingsParams{
+			DefChainID:  defChainID,
 			ServiceName: serviceName,
 		}
 
@@ -122,7 +122,7 @@ func queryBindingsHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		route := fmt.Sprintf("custom/%s/%s", service.QuerierRoute, service.QueryBindings)
+		route := fmt.Sprintf("custom/%s/%s", types.QuerierRoute, types.QueryBindings)
 		res, height, err := cliCtx.QueryWithData(route, bz)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
@@ -137,9 +137,9 @@ func queryBindingsHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 func queryRequestsHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		defChainId := vars[RestDefChainId]
+		defChainID := vars[RestDefChainID]
 		serviceName := vars[RestServiceName]
-		bindChainId := vars[RestBindChainId]
+		bindChainID := vars[RestBindChainID]
 		providerStr := vars[RestProvider]
 
 		provider, err := sdk.AccAddressFromBech32(providerStr)
@@ -153,10 +153,10 @@ func queryRequestsHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		params := service.QueryBindingParams{
-			DefChainID:  defChainId,
+		params := types.QueryBindingParams{
+			DefChainID:  defChainID,
 			ServiceName: serviceName,
-			BindChainId: bindChainId,
+			BindChainId: bindChainID,
 			Provider:    provider,
 		}
 
@@ -166,7 +166,7 @@ func queryRequestsHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		route := fmt.Sprintf("custom/%s/%s", service.QuerierRoute, service.QueryRequests)
+		route := fmt.Sprintf("custom/%s/%s", types.QuerierRoute, types.QueryRequests)
 		res, height, err := cliCtx.QueryWithData(route, bz)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
@@ -181,17 +181,17 @@ func queryRequestsHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 func queryResponseHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		reqChainId := vars[RestReqChainId]
-		reqId := vars[RestReqId]
+		reqChainID := vars[RestReqChainID]
+		reqID := vars[RestReqID]
 
 		cliCtx, ok := rest.ParseQueryHeightOrReturnBadRequest(w, cliCtx, r)
 		if !ok {
 			return
 		}
 
-		params := service.QueryResponseParams{
-			ReqChainId: reqChainId,
-			RequestId:  reqId,
+		params := types.QueryResponseParams{
+			ReqChainId: reqChainID,
+			RequestId:  reqID,
 		}
 
 		bz, err := cliCtx.Codec.MarshalJSON(params)
@@ -200,7 +200,7 @@ func queryResponseHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		route := fmt.Sprintf("custom/%s/%s", service.QuerierRoute, service.QueryResponse)
+		route := fmt.Sprintf("custom/%s/%s", types.QuerierRoute, types.QueryResponse)
 		res, height, err := cliCtx.QueryWithData(route, bz)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
@@ -228,7 +228,7 @@ func queryFeesHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		params := service.QueryFeesParams{
+		params := types.QueryFeesParams{
 			Address: address,
 		}
 
@@ -238,7 +238,7 @@ func queryFeesHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		route := fmt.Sprintf("custom/%s/%s", service.QuerierRoute, service.QueryFees)
+		route := fmt.Sprintf("custom/%s/%s", types.QuerierRoute, types.QueryFees)
 		res, height, err := cliCtx.QueryWithData(route, bz)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
