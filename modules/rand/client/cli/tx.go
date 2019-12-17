@@ -20,7 +20,6 @@ func GetCmdRequestRand(cdc *codec.Codec) *cobra.Command {
 		Use:     "request-rand",
 		Short:   "Request a random number with an optional block interval",
 		Example: "iriscli tx rand request-rand [block-interval]",
-		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
