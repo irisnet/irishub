@@ -49,6 +49,12 @@ func TestMsgCreateHTLCRoute(t *testing.T) {
 	require.Equal(t, "htlc", msg.Route())
 }
 
+func TestMsgCreateHTLCType(t *testing.T) {
+	// build a MsgCreateHTLC
+	msg := NewMsgCreateHTLC(senderAddr, toAddr, receiverOnOtherChain, amount, hashLock, timestamp, timeLock)
+	require.Equal(t, "create_htlc", msg.Type())
+}
+
 func TestMsgCreateHTLCValidation(t *testing.T) {
 	emptyAddr := sdk.AccAddress{}
 	errReceiverOnOtherChain := string(make([]byte, 129))
@@ -123,6 +129,11 @@ func TestMsgClaimHTLCRoute(t *testing.T) {
 	require.Equal(t, "htlc", msg.Route())
 }
 
+func TestMsgClaimHTLCType(t *testing.T) {
+	msg := NewMsgClaimHTLC(senderAddr, hashLock, secret)
+	require.Equal(t, "claim_htlc", msg.Type())
+}
+
 func TestMsgClaimHTLCValidation(t *testing.T) {
 	emptyAddr := sdk.AccAddress{}
 	errSecret1 := HTLCSecret("xx")
@@ -183,6 +194,11 @@ func TestNewMsgRefundHTLC(t *testing.T) {
 func TestMsgRefundHTLCRoute(t *testing.T) {
 	msg := NewMsgRefundHTLC(senderAddr, hashLock)
 	require.Equal(t, "htlc", msg.Route())
+}
+
+func TestMsgRefundHTLCType(t *testing.T) {
+	msg := NewMsgRefundHTLC(senderAddr, hashLock)
+	require.Equal(t, "refund_htlc", msg.Type())
 }
 
 func TestMsgRefundHTLCValidation(t *testing.T) {

@@ -51,10 +51,3 @@ func DefaultGenesisState() GenesisState {
 		PendingHTLCs: map[string]HTLC{},
 	}
 }
-
-// DefaultGenesisStateForTest gets the default genesis state for test
-func DefaultGenesisStateForTest() GenesisState {
-	return GenesisState{
-		PendingHTLCs: map[string]HTLC{},
-	}
-}

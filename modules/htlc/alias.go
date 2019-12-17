@@ -16,6 +16,7 @@ const (
 type (
 	Keeper        = keeper.Keeper
 	HTLC          = types.HTLC
+	HTLCState     = types.HTLCState
 	HTLCSecret    = types.HTLCSecret
 	HTLCHashLock  = types.HTLCHashLock
 	GenesisState  = types.GenesisState
