@@ -269,8 +269,8 @@ func (suite *KeeperTestSuite) TestRefundHTLC() {
 	_, err = suite.app.HTLCKeeper.RefundHTLC(suite.ctx, hashLock)
 	suite.Nil(err)
 
-	htlc, _ = suite.app.HTLCKeeper.GetHTLC(suite.ctx, hashLock)
-	suite.Equal(types.REFUNDED, htlc.State)
+	_, err = suite.app.HTLCKeeper.GetHTLC(suite.ctx, hashLock)
+	suite.NotNil(err)
 
 	htlcAcc = suite.app.SupplyKeeper.GetModuleAccount(suite.ctx, types.ModuleName)
 

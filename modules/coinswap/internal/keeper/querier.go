@@ -2,9 +2,12 @@ package keeper
 
 import (
 	"fmt"
-	"github.com/irisnet/irishub/app/v2/coinswap/internal/types"
-	sdk "github.com/irisnet/irishub/types"
+
 	abci "github.com/tendermint/tendermint/abci/types"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	"github.com/irisnet/irishub/modules/coinswap/internal/types"
 )
 
 // NewQuerier creates a querier for coinswap REST endpoints
@@ -24,31 +27,35 @@ func NewQuerier(k Keeper) sdk.Querier {
 // upon success or an error if the query fails.
 func queryLiquidity(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sdk.Error) {
 	var params types.QueryLiquidityParams
+	standardDenom := k.GetParams(ctx).StandardDenom
 	err := k.cdc.UnmarshalJSON(req.Data, &params)
 	if err != nil {
 		return nil, sdk.ErrUnknownRequest(sdk.AppendMsgToErr("incorrectly formatted request data", err.Error()))
 	}
 
-	uniDenom, err := types.GetUniDenom(params.Id)
+	if err := types.CheckUniDenom(params.ID); err != nil {
+		return nil, sdk.ErrUnknownRequest(err.Error())
+	}
+
+	uniDenom := params.ID
+
+	tokenDenom, err := types.GetCoinDenomFromUniDenom(uniDenom)
 	if err != nil {
 		return nil, sdk.ErrUnknownRequest(err.Error())
 	}
 
-	tokenDenom, err := types.GetCoinMinDenomFromUniDenom(uniDenom)
-	if err != nil {
-		return nil, sdk.ErrUnknownRequest(err.Error())
-	}
+	reservePool := k.GetReservePool(ctx, params.ID)
+	// all liquidity vouchers in module account
+	liquidities := k.sk.GetSupply(ctx).GetTotal()
 
-	reservePool := k.GetReservePool(ctx, params.Id)
-
-	iris := sdk.NewCoin(sdk.IrisAtto, reservePool.AmountOf(sdk.IrisAtto))
+	standard := sdk.NewCoin(standardDenom, reservePool.AmountOf(standardDenom))
 	token := sdk.NewCoin(tokenDenom, reservePool.AmountOf(tokenDenom))
-	liquidity := sdk.NewCoin(uniDenom, reservePool.AmountOf(uniDenom))
+	liquidity := sdk.NewCoin(uniDenom, liquidities.AmountOf(uniDenom))
 
 	swapParams := k.GetParams(ctx)
-	fee := swapParams.Fee.DecimalString(types.MaxFeePrecision)
+	fee := swapParams.Fee.String()
 	res := types.QueryLiquidityResponse{
-		Iris:      iris,
+		Standard:  standard,
 		Token:     token,
 		Liquidity: liquidity,
 		Fee:       fee,

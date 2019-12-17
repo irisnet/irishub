@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	sdk "github.com/irisnet/irishub/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 func TestValidateParams(t *testing.T) {
@@ -14,16 +14,18 @@ func TestValidateParams(t *testing.T) {
 	err := ValidateParams(defaultParams)
 	require.Nil(t, err)
 
+	require.Panics(t, func() { sdk.NewDecWithPrec(1, 19) }, "should panic")
+	require.Panics(t, func() { sdk.NewDecWithPrec(1, -1) }, "should panic")
+
 	// all cases should return an error
 	invalidTests := []struct {
 		name   string
 		params Params
 		result bool
 	}{
-		{"fee == 0 ", NewParams(sdk.ZeroRat()), false},
-		{"fee < 1", NewParams(sdk.NewRat(1000, 100)), false},
-		{"fee numerator < 0", NewParams(sdk.NewRat(-1, 10)), false},
-		{"fee denominator < 0", NewParams(sdk.NewRat(1, -10)), false},
+		{"fee == 0 ", NewParams(sdk.ZeroDec(), StandardDenom), false},
+		{"fee < 1", NewParams(sdk.NewDecWithPrec(1000, 2), StandardDenom), false},
+		{"fee numerator < 0", NewParams(sdk.NewDecWithPrec(-1, 1), StandardDenom), false},
 	}
 
 	for _, tc := range invalidTests {

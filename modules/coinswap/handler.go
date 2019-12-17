@@ -4,22 +4,21 @@ import (
 	"fmt"
 	"time"
 
-	sdk "github.com/irisnet/irishub/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 // NewHandler returns a handler for "coinswap" type messages.
 func NewHandler(k Keeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
+		ctx = ctx.WithEventManager(sdk.NewEventManager())
+
 		switch msg := msg.(type) {
 		case MsgSwapOrder:
-			return HandleMsgSwapOrder(ctx, msg, k)
-
+			return HandleMsgSwapOrder(ctx, k, msg)
 		case MsgAddLiquidity:
-			return HandleMsgAddLiquidity(ctx, msg, k)
-
+			return HandleMsgAddLiquidity(ctx, k, msg)
 		case MsgRemoveLiquidity:
-			return HandleMsgRemoveLiquidity(ctx, msg, k)
-
+			return HandleMsgRemoveLiquidity(ctx, k, msg)
 		default:
 			errMsg := fmt.Sprintf("unrecognized coinswap message type: %T", msg)
 			return sdk.ErrUnknownRequest(errMsg).Result()
@@ -28,50 +27,77 @@ func NewHandler(k Keeper) sdk.Handler {
 }
 
 // Handle MsgSwapOrder.
-func HandleMsgSwapOrder(ctx sdk.Context, msg MsgSwapOrder, k Keeper) sdk.Result {
+func HandleMsgSwapOrder(ctx sdk.Context, k Keeper, msg MsgSwapOrder) sdk.Result {
 	// check that deadline has not passed
 	if ctx.BlockHeader().Time.After(time.Unix(msg.Deadline, 0)) {
 		return ErrInvalidDeadline("deadline has passed for MsgSwapOrder").Result()
 	}
-	tags, err := k.HandleSwap(ctx, msg)
+
+	err := k.Swap(ctx, msg)
 	if err != nil {
 		return err.Result()
 	}
 
-	return sdk.Result{Tags: tags}
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, AttributeValueCategory),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.Input.Address.String()),
+		),
+	)
+
+	return sdk.Result{
+		Events: ctx.EventManager().Events(),
+	}
 }
 
 // Handle MsgAddLiquidity. If the reserve pool does not exist, it will be
 // created. The first liquidity provider sets the exchange rate.
-func HandleMsgAddLiquidity(ctx sdk.Context, msg MsgAddLiquidity, k Keeper) sdk.Result {
+func HandleMsgAddLiquidity(ctx sdk.Context, k Keeper, msg MsgAddLiquidity) sdk.Result {
 	// check that deadline has not passed
 	if ctx.BlockHeader().Time.After(time.Unix(msg.Deadline, 0)) {
 		return ErrInvalidDeadline("deadline has passed for MsgAddLiquidity").Result()
 	}
 
-	tags, err := k.HandleAddLiquidity(ctx, msg)
+	err := k.AddLiquidity(ctx, msg)
 	if err != nil {
 		return err.Result()
 	}
 
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, AttributeValueCategory),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.Sender.String()),
+		),
+	)
+
 	return sdk.Result{
-		Tags: tags,
+		Events: ctx.EventManager().Events(),
 	}
 }
 
 // HandleMsgRemoveLiquidity handler for MsgRemoveLiquidity
-func HandleMsgRemoveLiquidity(ctx sdk.Context, msg MsgRemoveLiquidity, k Keeper) sdk.Result {
+func HandleMsgRemoveLiquidity(ctx sdk.Context, k Keeper, msg MsgRemoveLiquidity) sdk.Result {
 	// check that deadline has not passed
 	if ctx.BlockHeader().Time.After(time.Unix(msg.Deadline, 0)) {
 		return ErrInvalidDeadline("deadline has passed for MsgRemoveLiquidity").Result()
 	}
 
-	tags, err := k.HandleRemoveLiquidity(ctx, msg)
+	err := k.RemoveLiquidity(ctx, msg)
 	if err != nil {
 		return err.Result()
 	}
 
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, AttributeValueCategory),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.Sender.String()),
+		),
+	)
+
 	return sdk.Result{
-		Tags: tags,
+		Events: ctx.EventManager().Events(),
 	}
 }

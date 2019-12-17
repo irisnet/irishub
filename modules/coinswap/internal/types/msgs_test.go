@@ -2,10 +2,35 @@ package types
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 
-	sdk "github.com/irisnet/irishub/types"
+	"github.com/tendermint/tendermint/crypto/ed25519"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
+)
+
+// nolint: deadcode unused
+var (
+	amt = sdk.NewInt(100)
+
+	senderPk    = ed25519.GenPrivKey().PubKey()
+	recipientPk = ed25519.GenPrivKey().PubKey()
+	sender      = sdk.AccAddress(senderPk.Address())
+	recipient   = sdk.AccAddress(recipientPk.Address())
+
+	denom0   = "atom"
+	denom1   = "btc"
+	unidenom = FormatUniABSPrefix + "btc"
+
+	input             = sdk.NewCoin(denom0, sdk.NewInt(1000))
+	output            = sdk.NewCoin(denom1, sdk.NewInt(500))
+	withdrawLiquidity = sdk.NewCoin(unidenom, sdk.NewInt(500))
+	deadline          = time.Now().Unix()
+
+	emptyAddr sdk.AccAddress
+	emptyTime int64
 )
 
 // test ValidateBasic for MsgSwapOrder
@@ -130,7 +155,7 @@ func TestMsgRemoveLiquidity(t *testing.T) {
 		{"no withdraw coin", NewMsgRemoveLiquidity(amt, sdk.Coin{}, sdk.OneInt(), deadline, sender), false},
 		{"zero withdraw coin", NewMsgRemoveLiquidity(amt, sdk.NewCoin(unidenom, sdk.ZeroInt()), sdk.OneInt(), deadline, sender), false},
 		{"invalid minimum token amount", NewMsgRemoveLiquidity(sdk.NewInt(-100), withdrawLiquidity, sdk.OneInt(), deadline, sender), false},
-		{"invalid minimum iris amount", NewMsgRemoveLiquidity(amt, withdrawLiquidity, sdk.NewInt(-100), deadline, sender), false},
+		{"invalid minimum standard token amount", NewMsgRemoveLiquidity(amt, withdrawLiquidity, sdk.NewInt(-100), deadline, sender), false},
 		{"deadline not initialized", NewMsgRemoveLiquidity(amt, withdrawLiquidity, sdk.OneInt(), emptyTime, sender), false},
 		{"empty sender", NewMsgRemoveLiquidity(amt, withdrawLiquidity, sdk.OneInt(), deadline, emptyAddr), false},
 		{"valid MsgRemoveLiquidity", NewMsgRemoveLiquidity(amt, withdrawLiquidity, sdk.OneInt(), deadline, sender), true},

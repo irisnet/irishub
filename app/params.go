@@ -21,4 +21,5 @@ const (
 	OpWeightMsgUndelegate                  = "op_weight_msg_undelegate"
 	OpWeightMsgBeginRedelegate             = "op_weight_msg_begin_redelegate"
 	OpWeightMsgUnjail                      = "op_weight_msg_unjail"
+	OpWeightMsgRequestRand                 = "op_weight_msg_request_rand"
 )

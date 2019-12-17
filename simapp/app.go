@@ -30,9 +30,11 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/supply"
 
 	"github.com/irisnet/irishub/modules/asset"
+	"github.com/irisnet/irishub/modules/coinswap"
 	"github.com/irisnet/irishub/modules/guardian"
 	"github.com/irisnet/irishub/modules/htlc"
 	"github.com/irisnet/irishub/modules/mint"
+	"github.com/irisnet/irishub/modules/rand"
 	"github.com/irisnet/irishub/modules/service"
 )
 
@@ -63,6 +65,8 @@ var (
 		evidence.AppModuleBasic{},
 		guardian.AppModuleBasic{},
 		htlc.AppModuleBasic{},
+		coinswap.AppModuleBasic{},
+		rand.AppModuleBasic{},
 		service.AppModuleBasic{},
 	)
 
@@ -76,6 +80,7 @@ var (
 		gov.ModuleName:            {supply.Burner},
 		asset.ModuleName:          {supply.Minter, supply.Burner},
 		htlc.ModuleName:           nil,
+		coinswap.ModuleName:       {supply.Minter, supply.Burner},
 		service.DepositAccName:    {supply.Burner},
 		service.RequestAccName:    nil,
 		service.TaxAccName:        nil,
@@ -123,6 +128,8 @@ type SimApp struct {
 	AssetKeeper    asset.Keeper
 	GuardianKeeper guardian.Keeper
 	HTLCKeeper     htlc.Keeper
+	CoinswapKeeper coinswap.Keeper
+	RandKeeper     rand.Keeper
 	ServiceKeeper  service.Keeper
 
 	// the module manager
@@ -147,7 +154,8 @@ func NewSimApp(
 	keys := sdk.NewKVStoreKeys(
 		bam.MainStoreKey, auth.StoreKey, staking.StoreKey, supply.StoreKey, mint.StoreKey,
 		distr.StoreKey, slashing.StoreKey, gov.StoreKey, params.StoreKey, evidence.StoreKey,
-		asset.StoreKey, guardian.StoreKey, htlc.StoreKey, service.StoreKey,
+		asset.StoreKey, guardian.StoreKey, htlc.StoreKey, coinswap.StoreKey, rand.ModuleName,
+		service.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(params.TStoreKey)
 
@@ -172,6 +180,7 @@ func NewSimApp(
 	app.subspaces[crisis.ModuleName] = app.ParamsKeeper.Subspace(crisis.DefaultParamspace)
 	app.subspaces[evidence.ModuleName] = app.ParamsKeeper.Subspace(evidence.DefaultParamspace)
 	app.subspaces[asset.ModuleName] = app.ParamsKeeper.Subspace(asset.DefaultParamspace)
+	app.subspaces[coinswap.ModuleName] = app.ParamsKeeper.Subspace(coinswap.DefaultParamspace)
 	app.subspaces[service.ModuleName] = app.ParamsKeeper.Subspace(service.DefaultParamspace)
 
 	// add keepers
@@ -200,7 +209,9 @@ func NewSimApp(
 		app.subspaces[crisis.ModuleName], invCheckPeriod, app.SupplyKeeper, auth.FeeCollectorName,
 	)
 	app.HTLCKeeper = htlc.NewKeeper(app.cdc, keys[htlc.StoreKey], app.SupplyKeeper, htlc.DefaultCodespace)
-
+	app.CoinswapKeeper = coinswap.NewKeeper(
+		app.cdc, keys[coinswap.StoreKey], app.BankKeeper, app.AccountKeeper, app.SupplyKeeper, app.subspaces[coinswap.ModuleName],
+	)
 	// create evidence keeper with router
 	evidenceKeeper := evidence.NewKeeper(
 		app.cdc, keys[evidence.StoreKey], app.subspaces[evidence.ModuleName], evidence.DefaultCodespace,
@@ -235,6 +246,8 @@ func NewSimApp(
 		app.cdc, keys[asset.StoreKey], app.subspaces[asset.ModuleName], asset.DefaultCodespace,
 		app.SupplyKeeper, auth.FeeCollectorName)
 
+	app.RandKeeper = rand.NewKeeper(app.cdc, keys[rand.StoreKey], rand.DefaultCodespace)
+
 	app.ServiceKeeper = service.NewKeeper(
 		app.cdc, keys[service.StoreKey], app.SupplyKeeper, app.GuardianKeeper,
 		service.DefaultCodespace, app.subspaces[service.ModuleName], nil,
@@ -257,6 +270,8 @@ func NewSimApp(
 		asset.NewAppModule(app.AssetKeeper),
 		guardian.NewAppModule(app.GuardianKeeper),
 		htlc.NewAppModule(app.HTLCKeeper),
+		coinswap.NewAppModule(app.CoinswapKeeper),
+		rand.NewAppModule(app.RandKeeper),
 		service.NewAppModule(app.ServiceKeeper),
 	)
 
@@ -268,6 +283,7 @@ func NewSimApp(
 		distr.ModuleName,
 		slashing.ModuleName,
 		htlc.ModuleName,
+		rand.ModuleName,
 	)
 	app.mm.SetOrderEndBlockers(
 		crisis.ModuleName,
@@ -282,7 +298,8 @@ func NewSimApp(
 		auth.ModuleName, distr.ModuleName, staking.ModuleName, bank.ModuleName,
 		slashing.ModuleName, gov.ModuleName, mint.ModuleName, supply.ModuleName,
 		crisis.ModuleName, genutil.ModuleName, evidence.ModuleName,
-		asset.ModuleName, guardian.ModuleName, htlc.ModuleName, service.ModuleName,
+		asset.ModuleName, guardian.ModuleName, htlc.ModuleName,
+		coinswap.ModuleName, rand.ModuleName, service.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -303,6 +320,8 @@ func NewSimApp(
 		slashing.NewAppModule(app.SlashingKeeper, app.StakingKeeper),
 		asset.NewAppModule(app.AssetKeeper),
 		htlc.NewAppModule(app.HTLCKeeper),
+		coinswap.NewAppModule(app.CoinswapKeeper),
+		rand.NewAppModule(app.RandKeeper),
 		service.NewAppModule(app.ServiceKeeper),
 	)
 

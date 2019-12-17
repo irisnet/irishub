@@ -34,6 +34,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/supply"
 
 	"github.com/irisnet/irishub/modules/mint"
+	randmodule "github.com/irisnet/irishub/modules/rand"
+	randsim "github.com/irisnet/irishub/modules/rand/simulation"
 )
 
 func init() {
@@ -231,6 +233,17 @@ func testAndRunTxs(app *IrisApp, config simulation.Config) []simulation.Weighted
 				return v
 			}(nil),
 			slashingsim.SimulateMsgUnjail(app.accountKeeper, app.slashingKeeper, app.stakingKeeper),
+		},
+		{
+			func(_ *rand.Rand) int {
+				var v int
+				ap.GetOrGenerate(app.cdc, OpWeightMsgRequestRand, &v, nil,
+					func(_ *rand.Rand) {
+						v = 20
+					})
+				return v
+			}(nil),
+			randsim.SimulateMsgRequestRand(app.accountKeeper, app.randKeeper),
 		},
 	}
 }
@@ -450,6 +463,7 @@ func TestAppImportExport(t *testing.T) {
 		{app.keys[supply.StoreKey], newApp.keys[supply.StoreKey], [][]byte{}},
 		{app.keys[params.StoreKey], newApp.keys[params.StoreKey], [][]byte{}},
 		{app.keys[gov.StoreKey], newApp.keys[gov.StoreKey], [][]byte{}},
+		{app.keys[randmodule.StoreKey], newApp.keys[randmodule.StoreKey], [][]byte{}},
 	}
 
 	for _, storeKeysPrefix := range storeKeysPrefixes {

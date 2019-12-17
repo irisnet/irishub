@@ -104,7 +104,6 @@ const (
 	OPEN      HTLCState = 0x00 // claimable
 	COMPLETED HTLCState = 0x01 // claimed
 	EXPIRED   HTLCState = 0x02 // expired
-	REFUNDED  HTLCState = 0x03 // refunded
 )
 
 var (
@@ -112,13 +111,11 @@ var (
 		OPEN:      "open",
 		COMPLETED: "completed",
 		EXPIRED:   "expired",
-		REFUNDED:  "refunded",
 	}
 	StringToHTLCStateMap = map[string]HTLCState{
 		"open":      OPEN,
 		"completed": COMPLETED,
 		"expired":   EXPIRED,
-		"refunded":  REFUNDED,
 	}
 )
 

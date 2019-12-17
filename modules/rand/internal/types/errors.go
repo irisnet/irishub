@@ -2,12 +2,12 @@
 package types
 
 import (
-	sdk "github.com/irisnet/irishub/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 // Rand errors reserve 100 ~ 199.
 const (
-	DefaultCodespace sdk.CodespaceType = "rand"
+	DefaultCodespace sdk.CodespaceType = ModuleName
 
 	CodeInvalidConsumer sdk.CodeType = 100
 	CodeInvalidReqID    sdk.CodeType = 101

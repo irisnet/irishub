@@ -38,7 +38,6 @@ var (
 	DefaultCodespace = types.DefaultCodespace
 	OPEN             = types.OPEN
 	EXPIRED          = types.EXPIRED
-	REFUNDED         = types.REFUNDED
 
 	// variable aliases
 	ModuleCdc = types.ModuleCdc

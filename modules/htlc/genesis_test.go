@@ -100,6 +100,6 @@ func (suite *KeeperTestSuite) TestExportHTLCGenesis() {
 	suite.Nil(htlc.ValidateGenesis(exportedGenesis))
 
 	// assert the expired HTLCs(htlc1) have been refunded
-	tmpHTLC, _ := suite.app.HTLCKeeper.GetHTLC(suite.ctx, hashLocks[0])
-	suite.Equal(htlc.REFUNDED, tmpHTLC.State)
+	_, err = suite.app.HTLCKeeper.GetHTLC(suite.ctx, hashLocks[0])
+	suite.NotNil(err)
 }
