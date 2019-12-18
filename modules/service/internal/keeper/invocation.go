@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	
+
 	"github.com/irisnet/irishub/modules/service/internal/types"
 )
 
@@ -73,8 +73,6 @@ func (k Keeper) AddRequest(
 	k.SetRequest(ctx, req)
 	k.AddActiveRequest(ctx, req)
 	k.AddRequestExpiration(ctx, req)
-
-	k.metrics.ActiveRequests.Add(1)
 
 	return req, nil
 }

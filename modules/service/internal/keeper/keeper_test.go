@@ -1,6 +1,7 @@
 package keeper_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/suite"
@@ -21,21 +22,21 @@ var (
 	testServiceTags = []string{"tag1", "tag2"}
 	testAuthor      = sdk.AccAddress([]byte("test-author"))
 	testAuthorDesc  = "test-author-desc"
-	testIDLContent  = ""
+	testIDLContent  = idlContent
 
 	testBindingType = types.Global
 	testLevel       = types.Level{AvgRspTime: 10000, UsableTime: 9999}
 	testProvider    = sdk.AccAddress([]byte("test-provider"))
-	testDeposit, _  = sdk.ParseCoins("100iris-atto")
-	testPrices      = []sdk.Coin{sdk.NewCoin("iris-atto", sdk.NewInt(50))}
+	testPrices      = []sdk.Coin{sdk.NewCoin("iris", sdk.NewInt(1))}
+	testDeposit, _  = sdk.ParseCoins("10000iris") // testPrices * 1000
 
 	testConsumer       = sdk.AccAddress([]byte("test-consumer"))
-	testMethodID       = int16(0)
-	testServiceFees, _ = sdk.ParseCoins("50iris-atto")
+	testMethodID       = int16(1)
+	testServiceFees, _ = sdk.ParseCoins("50iris")
 	testInput          = []byte{}
 
-	testProviderCoins, _ = sdk.ParseCoins("200iris-atto")
-	testConsumerCoins, _ = sdk.ParseCoins("50iris-atto")
+	testProviderCoins, _ = sdk.ParseCoins("50000iris")
+	testConsumerCoins, _ = sdk.ParseCoins("10000iris")
 )
 
 type KeeperTestSuite struct {
@@ -144,24 +145,52 @@ func (suite *KeeperTestSuite) TestServiceRequest() {
 		testProvider, testMethodID, testInput, testServiceFees, false,
 	)
 
+	binding, found := suite.app.ServiceKeeper.GetServiceBinding(suite.ctx, testChainID, testServiceName, testChainID, testProvider)
+	suite.True(found)
+
 	_, err := suite.app.ServiceKeeper.AddRequest(
 		suite.ctx, testChainID, testServiceName, testChainID, testChainID,
 		testConsumer, testProvider, testMethodID, testInput, testServiceFees, false,
 	)
 	suite.NoError(err)
 
+	serviceFees := sdk.NewCoins(binding.Prices[testMethodID-1])
 	consumerCoins := suite.app.BankKeeper.GetCoins(suite.ctx, testConsumer)
-	suite.Equal(consumerCoins.Sub(testServiceFees), consumerCoins)
+	suite.Equal(testConsumerCoins.Sub(serviceFees), consumerCoins)
 
 	requestMaccAddr := suite.app.SupplyKeeper.GetModuleAddress(types.RequestAccName)
 	requestMaccCoins := suite.app.BankKeeper.GetCoins(suite.ctx, requestMaccAddr)
-	suite.Equal(testServiceFees, requestMaccCoins)
+	suite.Equal(serviceFees, requestMaccCoins)
 
-	activeReq, found := suite.app.ServiceKeeper.GetActiveRequest(suite.ctx, svcReq.ExpirationHeight, svcReq.RequestHeight, svcReq.RequestIntraTxCounter)
+	requestHeight := suite.ctx.BlockHeight()
+	expirationHeight := requestHeight + types.DefaultMaxRequestTimeout
+
+	activeReq, found := suite.app.ServiceKeeper.GetActiveRequest(suite.ctx, expirationHeight, requestHeight, svcReq.RequestIntraTxCounter)
 	suite.True(found)
-	suite.Equal(svcReq.RequestID(), activeReq.RequestID())
+	suite.Equal(fmt.Sprintf("%d-%d-%d", expirationHeight, requestHeight, 0), activeReq.RequestID())
 }
 
 func TestKeeperTestSuite(t *testing.T) {
 	suite.Run(t, new(KeeperTestSuite))
 }
+
+const idlContent = `
+	syntax = "proto3";
+
+	// The greeting service definition.
+	service Greeter {
+		//@Attribute description:sayHello
+		//@Attribute output_privacy:NoPrivacy
+		//@Attribute output_cached:NoCached
+		rpc SayHello (HelloRequest) returns (HelloReply) {}
+	}
+
+	// The request message containing the user's name.
+	message HelloRequest {
+		string name = 1;
+	}
+
+	// The response message containing the greetings
+	message HelloReply {
+		string message = 1;
+	}`

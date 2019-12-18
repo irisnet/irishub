@@ -62,7 +62,7 @@ type Params struct {
 
 // NewParams creates a new Params instance
 func NewParams(maxRequestTimeout, minDepositMultiple int64, serviceFeeTax, slashFraction sdk.Dec,
-complaintRetrospect, arbitrationTimeLimit time.Duration, txSizeLimit uint64) Params {
+	complaintRetrospect, arbitrationTimeLimit time.Duration, txSizeLimit uint64) Params {
 
 	return Params{
 		MaxRequestTimeout:    maxRequestTimeout,
@@ -183,7 +183,7 @@ func validateMaxRequestTimeout(v int64) error {
 
 func validateMinDepositMultiple(v int64) error {
 	if v < MinDepositMultiple || v > MaxDepositMultiple {
-		return fmt.Errorf("MinDepositMultiple [%d] should be between [%s, %s]", v, MinDepositMultiple, MaxDepositMultiple)
+		return fmt.Errorf("MinDepositMultiple [%d] should be between [%d, %d]", v, MinDepositMultiple, MaxDepositMultiple)
 	}
 
 	return nil

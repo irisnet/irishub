@@ -126,7 +126,7 @@ func (k Keeper) UpdateServiceBinding(
 	}
 
 	// Send coins from provider's account to the deposit module account
-	err = k.sk.SendCoinsFromAccountToModule(ctx, svcBinding.Provider, types.DepositAccName, newBinding.Deposit)
+	err = k.sk.SendCoinsFromAccountToModule(ctx, provider, types.DepositAccName, newBinding.Deposit)
 	if err != nil {
 		return svcBinding, err
 	}
