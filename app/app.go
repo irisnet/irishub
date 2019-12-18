@@ -287,10 +287,10 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 	// properly initialized with tokens from genesis accounts.
 	app.mm.SetOrderInitGenesis(
 		distr.ModuleName, staking.ModuleName, auth.ModuleName, bank.ModuleName,
-		slashing.ModuleName, gov.ModuleName, mint.ModuleName, supply.ModuleName,
-		crisis.ModuleName, genutil.ModuleName, evidence.ModuleName,
+		slashing.ModuleName, gov.ModuleName, mint.ModuleName,
 		asset.ModuleName, guardian.ModuleName, htlc.ModuleName,
 		coinswap.ModuleName, rand.ModuleName, service.ModuleName,
+		supply.ModuleName, crisis.ModuleName, genutil.ModuleName, evidence.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.crisisKeeper)
