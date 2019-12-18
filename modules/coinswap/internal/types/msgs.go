@@ -15,6 +15,11 @@ var (
 const (
 	FormatUniABSPrefix = "uni:"
 	FormatUniDenom     = "uni:%s"
+
+	// MsgType
+	MsgTypeAddLiquidity    = "add_liquidity"
+	MsgTypeRemoveLiquidity = "remove_liquidity"
+	MsgTypeSwapOrder       = "swap_order"
 )
 
 /* --------------------------------------------------------------------------- */
@@ -45,7 +50,10 @@ type MsgSwapOrder struct {
 
 // NewMsgSwapOrder creates a new MsgSwapOrder object.
 func NewMsgSwapOrder(
-	input Input, output Output, deadline int64, isBuyOrder bool,
+	input Input,
+	output Output,
+	deadline int64,
+	isBuyOrder bool,
 ) MsgSwapOrder {
 	return MsgSwapOrder{
 		Input:      input,
@@ -112,8 +120,11 @@ type MsgAddLiquidity struct {
 
 // NewMsgAddLiquidity creates a new MsgAddLiquidity object.
 func NewMsgAddLiquidity(
-	maxToken sdk.Coin, exactStandardAmt, minLiquidity sdk.Int,
-	deadline int64, sender sdk.AccAddress,
+	maxToken sdk.Coin,
+	exactStandardAmt sdk.Int,
+	minLiquidity sdk.Int,
+	deadline int64,
+	sender sdk.AccAddress,
 ) MsgAddLiquidity {
 	return MsgAddLiquidity{
 		MaxToken:         maxToken,
@@ -181,8 +192,11 @@ type MsgRemoveLiquidity struct {
 
 // NewMsgRemoveLiquidity creates a new MsgRemoveLiquidity object
 func NewMsgRemoveLiquidity(
-	minToken sdk.Int, withdrawLiquidity sdk.Coin, minStandardAmt sdk.Int,
-	deadline int64, sender sdk.AccAddress,
+	minToken sdk.Int,
+	withdrawLiquidity sdk.Coin,
+	minStandardAmt sdk.Int,
+	deadline int64,
+	sender sdk.AccAddress,
 ) MsgRemoveLiquidity {
 
 	return MsgRemoveLiquidity{

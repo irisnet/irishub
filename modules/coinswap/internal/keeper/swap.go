@@ -14,7 +14,7 @@ func (k Keeper) swapCoins(ctx sdk.Context, sender, recipient sdk.AccAddress, coi
 		return err
 	}
 
-	poolAddr := GetReservePoolAddr(uniDenom)
+	poolAddr := types.GetReservePoolAddr(uniDenom)
 	err = k.bk.SendCoins(ctx, sender, poolAddr, sdk.NewCoins(coinSold))
 	if err != nil {
 		return err

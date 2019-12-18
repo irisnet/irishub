@@ -41,9 +41,8 @@ type KeeperTestSuite struct {
 }
 
 func initVars(suite *KeeperTestSuite) {
-	addrSender = sdk.AccAddress("addrSender")
-	addrTo = sdk.AccAddress("addrTo")
-
+	addrSender = sdk.AccAddress([]byte("__addrSender________"))
+	addrTo = sdk.AccAddress([]byte("__addrTo____________"))
 	_ = suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, addrSender)
 	_ = suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, addrTo)
 	_ = suite.app.BankKeeper.SetCoins(suite.ctx, addrSender, sdk.NewCoins(sdk.NewInt64Coin(sdk.DefaultBondDenom, 100000)))
@@ -57,7 +56,7 @@ func initVars(suite *KeeperTestSuite) {
 	secret2 = types.HTLCSecret("___00000000000000000000000000___")
 	timestamp = uint64(1580000000)
 	timestampNil = uint64(0)
-	hashLock = types.HTLCHashLock(types.SHA256(append(secret1, sdk.Uint64ToBigEndian(timestamp)...)))
+	hashLock = types.GetHashLock(secret1, timestamp)
 	timeLock = uint64(50)
 	expireHeight = timeLock + uint64(suite.ctx.BlockHeight())
 	stateOpen = types.OPEN

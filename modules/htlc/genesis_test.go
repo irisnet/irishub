@@ -34,7 +34,7 @@ var (
 	htlc2 htlc.HTLC
 )
 
-type KeeperTestSuite struct {
+type TestSuite struct {
 	suite.Suite
 
 	cdc *codec.Codec
@@ -42,7 +42,7 @@ type KeeperTestSuite struct {
 	app *simapp.SimApp
 }
 
-func (suite *KeeperTestSuite) SetupTest() {
+func (suite *TestSuite) SetupTest() {
 	app := simapp.Setup(false)
 
 	suite.cdc = app.Codec()
@@ -52,7 +52,7 @@ func (suite *KeeperTestSuite) SetupTest() {
 	initVars(suite)
 }
 
-func initVars(suite *KeeperTestSuite) {
+func initVars(suite *TestSuite) {
 	senderAddrs = []sdk.AccAddress{sdk.AccAddress([]byte("sender1")), sdk.AccAddress([]byte("sender2"))}
 	receiverAddrs = []sdk.AccAddress{sdk.AccAddress([]byte("receiver1")), sdk.AccAddress([]byte("receiver2"))}
 
@@ -80,10 +80,10 @@ func initVars(suite *KeeperTestSuite) {
 }
 
 func TestKeeperTestSuite(t *testing.T) {
-	suite.Run(t, new(KeeperTestSuite))
+	suite.Run(t, new(TestSuite))
 }
 
-func (suite *KeeperTestSuite) TestInitGenesis() {
+func (suite *TestSuite) TestInitGenesis() {
 	GenesisState := htlc.GenesisState{
 		PendingHTLCs: map[string]htlc.HTLC{
 			hashLocks[0].String(): htlc1,
@@ -94,7 +94,7 @@ func (suite *KeeperTestSuite) TestInitGenesis() {
 	htlc.ValidateGenesis(GenesisState)
 }
 
-func (suite *KeeperTestSuite) TestExportGenesis() {
+func (suite *TestSuite) TestExportGenesis() {
 	// create HTLCs
 	err := suite.app.HTLCKeeper.CreateHTLC(suite.ctx, htlc1, hashLocks[0])
 	suite.Nil(err)

@@ -1,10 +1,18 @@
 package htlc_test
 
 import (
+	"testing"
+
+	"github.com/stretchr/testify/suite"
+
 	"github.com/irisnet/irishub/modules/htlc"
 )
 
-func (suite *KeeperTestSuite) TestBeginBlocker() {
+func TestABCISuite(t *testing.T) {
+	suite.Run(t, new(TestSuite))
+}
+
+func (suite *TestSuite) TestBeginBlocker() {
 	// create HTLCs
 	err := suite.app.HTLCKeeper.CreateHTLC(suite.ctx, htlc1, hashLocks[0])
 	suite.Nil(err)

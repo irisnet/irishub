@@ -16,7 +16,6 @@ func NewQuerier(k Keeper) sdk.Querier {
 		switch path[0] {
 		case types.QueryLiquidity:
 			return queryLiquidity(ctx, req, k)
-
 		default:
 			return nil, sdk.ErrUnknownRequest(fmt.Sprintf("%s is not a valid query request path", req.Path))
 		}
