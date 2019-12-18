@@ -1,31 +1,49 @@
 package rand
 
 import (
-	sdk "github.com/irisnet/irishub/types"
+	"encoding/hex"
+	"fmt"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-// NewHandler handles all "rand" messages
+// NewHandler handles all rand msgs
 func NewHandler(k Keeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
+		ctx = ctx.WithEventManager(sdk.NewEventManager())
+
 		switch msg := msg.(type) {
 		case MsgRequestRand:
 			return handleMsgRequestRand(ctx, k, msg)
-		default:
-			return sdk.ErrTxDecode("invalid message parsed in rand module").Result()
-		}
 
-		return sdk.ErrTxDecode("invalid message parsed in rand module").Result()
+		default:
+			errMsg := fmt.Sprintf("unrecognized rand message type: %T", msg)
+			return sdk.ErrUnknownRequest(errMsg).Result()
+		}
 	}
 }
 
 // handleMsgRequestRand handles MsgRequestRand
 func handleMsgRequestRand(ctx sdk.Context, k Keeper, msg MsgRequestRand) sdk.Result {
-	tags, err := k.RequestRand(ctx, msg.Consumer, msg.BlockInterval)
+	request, err := k.RequestRand(ctx, msg.Consumer, msg.BlockInterval)
 	if err != nil {
 		return err.Result()
 	}
 
-	return sdk.Result{
-		Tags: tags,
-	}
+	ctx.EventManager().EmitEvents(
+		sdk.Events{
+			sdk.NewEvent(
+				sdk.EventTypeMessage,
+				sdk.NewAttribute(sdk.AttributeKeyModule, AttributeValueCategory),
+				sdk.NewAttribute(sdk.AttributeKeySender, msg.Consumer.String()),
+			),
+			sdk.NewEvent(
+				EventTypeRequestRand,
+				sdk.NewAttribute(AttributeKeyRequestID, hex.EncodeToString(GenerateRequestID(request))),
+				sdk.NewAttribute(AttributeKeyGenHeight, fmt.Sprintf("%d", request.Height+int64(msg.BlockInterval))),
+			),
+		},
+	)
+
+	return sdk.Result{Events: ctx.EventManager().Events()}
 }

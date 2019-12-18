@@ -34,6 +34,7 @@ import (
 	"github.com/irisnet/irishub/modules/guardian"
 	"github.com/irisnet/irishub/modules/htlc"
 	"github.com/irisnet/irishub/modules/mint"
+	"github.com/irisnet/irishub/modules/rand"
 )
 
 const appName = "SimApp"
@@ -64,6 +65,7 @@ var (
 		guardian.AppModuleBasic{},
 		htlc.AppModuleBasic{},
 		coinswap.AppModuleBasic{},
+		rand.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -122,6 +124,7 @@ type SimApp struct {
 	GuardianKeeper guardian.Keeper
 	HTLCKeeper     htlc.Keeper
 	CoinswapKeeper coinswap.Keeper
+	RandKeeper     rand.Keeper
 
 	// the module manager
 	mm *module.Manager
@@ -145,7 +148,7 @@ func NewSimApp(
 	keys := sdk.NewKVStoreKeys(
 		bam.MainStoreKey, auth.StoreKey, staking.StoreKey, supply.StoreKey, mint.StoreKey,
 		distr.StoreKey, slashing.StoreKey, gov.StoreKey, params.StoreKey, evidence.StoreKey,
-		asset.StoreKey, guardian.StoreKey, htlc.StoreKey, coinswap.StoreKey,
+		asset.StoreKey, guardian.StoreKey, htlc.StoreKey, coinswap.StoreKey, rand.ModuleName,
 	)
 	tkeys := sdk.NewTransientStoreKeys(params.TStoreKey)
 
@@ -235,6 +238,8 @@ func NewSimApp(
 		app.cdc, keys[asset.StoreKey], app.subspaces[asset.ModuleName], asset.DefaultCodespace,
 		app.SupplyKeeper, auth.FeeCollectorName)
 
+	app.RandKeeper = rand.NewKeeper(app.cdc, keys[rand.StoreKey], rand.DefaultCodespace)
+
 	// NOTE: Any module instantiated in the module manager that is later modified
 	// must be passed by reference here.
 	app.mm = module.NewManager(
@@ -253,6 +258,7 @@ func NewSimApp(
 		guardian.NewAppModule(app.GuardianKeeper),
 		htlc.NewAppModule(app.HTLCKeeper),
 		coinswap.NewAppModule(app.CoinswapKeeper),
+		rand.NewAppModule(app.RandKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -263,6 +269,7 @@ func NewSimApp(
 		distr.ModuleName,
 		slashing.ModuleName,
 		htlc.ModuleName,
+		rand.ModuleName,
 	)
 	app.mm.SetOrderEndBlockers(
 		crisis.ModuleName,
@@ -277,7 +284,7 @@ func NewSimApp(
 		slashing.ModuleName, gov.ModuleName, mint.ModuleName, supply.ModuleName,
 		crisis.ModuleName, genutil.ModuleName, evidence.ModuleName,
 		asset.ModuleName, guardian.ModuleName, htlc.ModuleName,
-		coinswap.ModuleName,
+		coinswap.ModuleName, rand.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -299,6 +306,7 @@ func NewSimApp(
 		asset.NewAppModule(app.AssetKeeper),
 		htlc.NewAppModule(app.HTLCKeeper),
 		coinswap.NewAppModule(app.CoinswapKeeper),
+		rand.NewAppModule(app.RandKeeper),
 	)
 
 	app.sm.RegisterStoreDecoders()
