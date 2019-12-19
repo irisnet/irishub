@@ -1,21 +1,22 @@
-package service
+package types
 
 import (
 	"github.com/go-kit/kit/metrics"
 	"github.com/go-kit/kit/metrics/discard"
 	"github.com/go-kit/kit/metrics/prometheus"
-	promutil "github.com/irisnet/irishub/tools/prometheus"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
+
 	cfg "github.com/tendermint/tendermint/config"
 )
 
-const MetricsSubsystem = "module_service"
+const MetricsSubsystem = "module_" + ModuleName
 
 type Metrics struct {
 	ActiveRequests metrics.Gauge
 }
 
-// PrometheusMetrics returns Metrics build using Prometheus client library.
+// TODO
+// PrometheusMetrics returns Metrics built by the Prometheus client library.
 func PrometheusMetrics(config *cfg.InstrumentationConfig) *Metrics {
 	if !config.Prometheus {
 		return NopMetrics()
@@ -28,7 +29,9 @@ func PrometheusMetrics(config *cfg.InstrumentationConfig) *Metrics {
 		Help:      "active requests count",
 	}, []string{})
 
-	promutil.RegisterMetrics(activeRequestsVec)
+	if err := stdprometheus.Register(activeRequestsVec); err != nil {
+		return NopMetrics()
+	}
 
 	return &Metrics{
 		ActiveRequests: prometheus.NewGauge(activeRequestsVec),

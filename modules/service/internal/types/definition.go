@@ -1,29 +1,30 @@
-package service
+package types
 
 import (
 	"encoding/json"
 	"fmt"
 
-	sdk "github.com/irisnet/irishub/types"
 	"github.com/pkg/errors"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 type SvcDef struct {
-	Name              string         `json:"name"`
-	ChainId           string         `json:"chain_id"`
-	Description       string         `json:"description"`
-	Tags              []string       `json:"tags"`
-	Author            sdk.AccAddress `json:"author"`
-	AuthorDescription string         `json:"author_description"`
-	IDLContent        string         `json:"idl_content"`
+	Name              string         `json:"name" yaml:"name"`
+	ChainId           string         `json:"chain_id" yaml:"chain_id"`
+	Description       string         `json:"description" yaml:"description"`
+	Tags              []string       `json:"tags" yaml:"tags"`
+	Author            sdk.AccAddress `json:"author" yaml:"author"`
+	AuthorDescription string         `json:"author_description" yaml:"author_description"`
+	IDLContent        string         `json:"idl_content" yaml:"idl_content"`
 }
 
 type MethodProperty struct {
-	ID            int16             `json:"id"`
-	Name          string            `json:"name"`
-	Description   string            `json:"description"`
-	OutputPrivacy OutputPrivacyEnum `json:"output_privacy"`
-	OutputCached  OutputCachedEnum  `json:"output_cached"`
+	ID            int16             `json:"id" yaml:"id"`
+	Name          string            `json:"name" yaml:"name"`
+	Description   string            `json:"description" yaml:"description"`
+	OutputPrivacy OutputPrivacyEnum `json:"output_privacy" yaml:"output_privacy"`
+	OutputCached  OutputCachedEnum  `json:"output_cached" yaml:"output_cached"`
 }
 
 func NewSvcDef(name, chainId, description string, tags []string, author sdk.AccAddress, authorDescription, idlContent string) SvcDef {
