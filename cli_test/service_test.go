@@ -232,6 +232,9 @@ func TestIrisCLIService(t *testing.T) {
 	require.True(t, success)
 
 	tests.WaitForNextNBlocksTM(1, f.Port)
+
+	// Cleanup testing directories
+	f.Cleanup()
 }
 
 // TxServiceDefine is iriscli tx service define

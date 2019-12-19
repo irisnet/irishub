@@ -57,195 +57,177 @@ func testAndRunTxs(app *IrisApp, config simulation.Config) []simulation.Weighted
 	}
 
 	// nolint: govet
-	return []simulation.WeightedOperation{
-		{
-			func(_ *rand.Rand) int {
-				var v int
-				ap.GetOrGenerate(app.cdc, OpWeightMsgSend, &v, nil,
-					func(_ *rand.Rand) {
-						v = 100
-					})
-				return v
-			}(nil),
-			banksim.SimulateMsgSend(app.accountKeeper, app.bankKeeper),
-		},
-		{
-			func(_ *rand.Rand) int {
-				var v int
-				ap.GetOrGenerate(app.cdc, OpWeightMsgMultiSend, &v, nil,
-					func(_ *rand.Rand) {
-						v = 40
-					})
-				return v
-			}(nil),
-			banksim.SimulateMsgMultiSend(app.accountKeeper, app.bankKeeper),
-		},
-		{
-			func(_ *rand.Rand) int {
-				var v int
-				ap.GetOrGenerate(app.cdc, OpWeightMsgSetWithdrawAddress, &v, nil,
-					func(_ *rand.Rand) {
-						v = 50
-					})
-				return v
-			}(nil),
-			distrsim.SimulateMsgSetWithdrawAddress(app.accountKeeper, app.distrKeeper),
-		},
-		{
-			func(_ *rand.Rand) int {
-				var v int
-				ap.GetOrGenerate(app.cdc, OpWeightMsgWithdrawDelegationReward, &v, nil,
-					func(_ *rand.Rand) {
-						v = 50
-					})
-				return v
-			}(nil),
-			distrsim.SimulateMsgWithdrawDelegatorReward(app.accountKeeper, app.distrKeeper, app.stakingKeeper),
-		},
-		{
-			func(_ *rand.Rand) int {
-				var v int
-				ap.GetOrGenerate(app.cdc, OpWeightMsgWithdrawValidatorCommission, &v, nil,
-					func(_ *rand.Rand) {
-						v = 50
-					})
-				return v
-			}(nil),
-			distrsim.SimulateMsgWithdrawValidatorCommission(app.accountKeeper, app.distrKeeper, app.stakingKeeper),
-		},
-		{
-			func(_ *rand.Rand) int {
-				var v int
-				ap.GetOrGenerate(app.cdc, OpWeightSubmitTextProposal, &v, nil,
-					func(_ *rand.Rand) {
-						v = 20
-					})
-				return v
-			}(nil),
-			govsim.SimulateSubmitProposal(app.accountKeeper, app.govKeeper, govsim.SimulateTextProposalContent),
-		},
-		{
-			func(_ *rand.Rand) int {
-				var v int
-				ap.GetOrGenerate(app.cdc, OpWeightSubmitCommunitySpendProposal, &v, nil,
-					func(_ *rand.Rand) {
-						v = 20
-					})
-				return v
-			}(nil),
-			govsim.SimulateSubmitProposal(app.accountKeeper, app.govKeeper, distrsim.SimulateCommunityPoolSpendProposalContent(app.distrKeeper)),
-		},
-		{
-			func(_ *rand.Rand) int {
-				var v int
-				ap.GetOrGenerate(app.cdc, OpWeightSubmitParamChangeProposal, &v, nil,
-					func(_ *rand.Rand) {
-						v = 20
-					})
-				return v
-			}(nil),
-			govsim.SimulateSubmitProposal(app.accountKeeper, app.govKeeper, paramsim.SimulateParamChangeProposalContent(paramChanges)),
-		},
-		{
-			func(_ *rand.Rand) int {
-				var v int
-				ap.GetOrGenerate(app.cdc, OpWeightMsgDeposit, &v, nil,
-					func(_ *rand.Rand) {
-						v = 100
-					})
-				return v
-			}(nil),
-			govsim.SimulateMsgDeposit(app.accountKeeper, app.govKeeper),
-		},
-		{
-			func(_ *rand.Rand) int {
-				var v int
-				ap.GetOrGenerate(app.cdc, OpWeightMsgVote, &v, nil,
-					func(_ *rand.Rand) {
-						v = 100
-					})
-				return v
-			}(nil),
-			govsim.SimulateMsgVote(app.accountKeeper, app.govKeeper),
-		},
-		{
-			func(_ *rand.Rand) int {
-				var v int
-				ap.GetOrGenerate(app.cdc, OpWeightMsgCreateValidator, &v, nil,
-					func(_ *rand.Rand) {
-						v = 100
-					})
-				return v
-			}(nil),
-			stakingsim.SimulateMsgCreateValidator(app.accountKeeper, app.stakingKeeper),
-		},
-		{
-			func(_ *rand.Rand) int {
-				var v int
-				ap.GetOrGenerate(app.cdc, OpWeightMsgEditValidator, &v, nil,
-					func(_ *rand.Rand) {
-						v = 20
-					})
-				return v
-			}(nil),
-			stakingsim.SimulateMsgEditValidator(app.accountKeeper, app.stakingKeeper),
-		},
-		{
-			func(_ *rand.Rand) int {
-				var v int
-				ap.GetOrGenerate(app.cdc, OpWeightMsgDelegate, &v, nil,
-					func(_ *rand.Rand) {
-						v = 100
-					})
-				return v
-			}(nil),
-			stakingsim.SimulateMsgDelegate(app.accountKeeper, app.stakingKeeper),
-		},
-		{
-			func(_ *rand.Rand) int {
-				var v int
-				ap.GetOrGenerate(app.cdc, OpWeightMsgUndelegate, &v, nil,
-					func(_ *rand.Rand) {
-						v = 100
-					})
-				return v
-			}(nil),
-			stakingsim.SimulateMsgUndelegate(app.accountKeeper, app.stakingKeeper),
-		},
-		{
-			func(_ *rand.Rand) int {
-				var v int
-				ap.GetOrGenerate(app.cdc, OpWeightMsgBeginRedelegate, &v, nil,
-					func(_ *rand.Rand) {
-						v = 100
-					})
-				return v
-			}(nil),
-			stakingsim.SimulateMsgBeginRedelegate(app.accountKeeper, app.stakingKeeper),
-		},
-		{
-			func(_ *rand.Rand) int {
-				var v int
-				ap.GetOrGenerate(app.cdc, OpWeightMsgUnjail, &v, nil,
-					func(_ *rand.Rand) {
-						v = 100
-					})
-				return v
-			}(nil),
-			slashingsim.SimulateMsgUnjail(app.accountKeeper, app.slashingKeeper, app.stakingKeeper),
-		},
-		{
-			func(_ *rand.Rand) int {
-				var v int
-				ap.GetOrGenerate(app.cdc, OpWeightMsgRequestRand, &v, nil,
-					func(_ *rand.Rand) {
-						v = 20
-					})
-				return v
-			}(nil),
-			randsim.SimulateMsgRequestRand(app.accountKeeper, app.randKeeper),
-		},
-	}
+	return []simulation.WeightedOperation{{
+		Weight: func(_ *rand.Rand) int {
+			var v int
+			ap.GetOrGenerate(app.cdc, OpWeightMsgSend, &v, nil,
+				func(_ *rand.Rand) {
+					v = 100
+				})
+			return v
+		}(nil),
+		Op: banksim.SimulateMsgSend(app.accountKeeper, app.bankKeeper),
+	}, {
+		Weight: func(_ *rand.Rand) int {
+			var v int
+			ap.GetOrGenerate(app.cdc, OpWeightMsgMultiSend, &v, nil,
+				func(_ *rand.Rand) {
+					v = 40
+				})
+			return v
+		}(nil),
+		Op: banksim.SimulateMsgMultiSend(app.accountKeeper, app.bankKeeper),
+	}, {
+		Weight: func(_ *rand.Rand) int {
+			var v int
+			ap.GetOrGenerate(app.cdc, OpWeightMsgSetWithdrawAddress, &v, nil,
+				func(_ *rand.Rand) {
+					v = 50
+				})
+			return v
+		}(nil),
+		Op: distrsim.SimulateMsgSetWithdrawAddress(app.accountKeeper, app.distrKeeper),
+	}, {
+		Weight: func(_ *rand.Rand) int {
+			var v int
+			ap.GetOrGenerate(app.cdc, OpWeightMsgWithdrawDelegationReward, &v, nil,
+				func(_ *rand.Rand) {
+					v = 50
+				})
+			return v
+		}(nil),
+		Op: distrsim.SimulateMsgWithdrawDelegatorReward(app.accountKeeper, app.distrKeeper, app.stakingKeeper),
+	}, {
+		Weight: func(_ *rand.Rand) int {
+			var v int
+			ap.GetOrGenerate(app.cdc, OpWeightMsgWithdrawValidatorCommission, &v, nil,
+				func(_ *rand.Rand) {
+					v = 50
+				})
+			return v
+		}(nil),
+		Op: distrsim.SimulateMsgWithdrawValidatorCommission(app.accountKeeper, app.distrKeeper, app.stakingKeeper),
+	}, {
+		Weight: func(_ *rand.Rand) int {
+			var v int
+			ap.GetOrGenerate(app.cdc, OpWeightSubmitTextProposal, &v, nil,
+				func(_ *rand.Rand) {
+					v = 20
+				})
+			return v
+		}(nil),
+		Op: govsim.SimulateSubmitProposal(app.accountKeeper, app.govKeeper, govsim.SimulateTextProposalContent),
+	}, {
+		Weight: func(_ *rand.Rand) int {
+			var v int
+			ap.GetOrGenerate(app.cdc, OpWeightSubmitCommunitySpendProposal, &v, nil,
+				func(_ *rand.Rand) {
+					v = 20
+				})
+			return v
+		}(nil),
+		Op: govsim.SimulateSubmitProposal(app.accountKeeper, app.govKeeper, distrsim.SimulateCommunityPoolSpendProposalContent(app.distrKeeper)),
+	}, {
+		Weight: func(_ *rand.Rand) int {
+			var v int
+			ap.GetOrGenerate(app.cdc, OpWeightSubmitParamChangeProposal, &v, nil,
+				func(_ *rand.Rand) {
+					v = 20
+				})
+			return v
+		}(nil),
+		Op: govsim.SimulateSubmitProposal(app.accountKeeper, app.govKeeper, paramsim.SimulateParamChangeProposalContent(paramChanges)),
+	}, {
+		Weight: func(_ *rand.Rand) int {
+			var v int
+			ap.GetOrGenerate(app.cdc, OpWeightMsgDeposit, &v, nil,
+				func(_ *rand.Rand) {
+					v = 100
+				})
+			return v
+		}(nil),
+		Op: govsim.SimulateMsgDeposit(app.accountKeeper, app.govKeeper),
+	}, {
+		Weight: func(_ *rand.Rand) int {
+			var v int
+			ap.GetOrGenerate(app.cdc, OpWeightMsgVote, &v, nil,
+				func(_ *rand.Rand) {
+					v = 100
+				})
+			return v
+		}(nil),
+		Op: govsim.SimulateMsgVote(app.accountKeeper, app.govKeeper),
+	}, {
+		Weight: func(_ *rand.Rand) int {
+			var v int
+			ap.GetOrGenerate(app.cdc, OpWeightMsgCreateValidator, &v, nil,
+				func(_ *rand.Rand) {
+					v = 100
+				})
+			return v
+		}(nil),
+		Op: stakingsim.SimulateMsgCreateValidator(app.accountKeeper, app.stakingKeeper),
+	}, {
+		Weight: func(_ *rand.Rand) int {
+			var v int
+			ap.GetOrGenerate(app.cdc, OpWeightMsgEditValidator, &v, nil,
+				func(_ *rand.Rand) {
+					v = 20
+				})
+			return v
+		}(nil),
+		Op: stakingsim.SimulateMsgEditValidator(app.accountKeeper, app.stakingKeeper),
+	}, {
+		Weight: func(_ *rand.Rand) int {
+			var v int
+			ap.GetOrGenerate(app.cdc, OpWeightMsgDelegate, &v, nil,
+				func(_ *rand.Rand) {
+					v = 100
+				})
+			return v
+		}(nil),
+		Op: stakingsim.SimulateMsgDelegate(app.accountKeeper, app.stakingKeeper),
+	}, {
+		Weight: func(_ *rand.Rand) int {
+			var v int
+			ap.GetOrGenerate(app.cdc, OpWeightMsgUndelegate, &v, nil,
+				func(_ *rand.Rand) {
+					v = 100
+				})
+			return v
+		}(nil),
+		Op: stakingsim.SimulateMsgUndelegate(app.accountKeeper, app.stakingKeeper),
+	}, {
+		Weight: func(_ *rand.Rand) int {
+			var v int
+			ap.GetOrGenerate(app.cdc, OpWeightMsgBeginRedelegate, &v, nil,
+				func(_ *rand.Rand) {
+					v = 100
+				})
+			return v
+		}(nil),
+		Op: stakingsim.SimulateMsgBeginRedelegate(app.accountKeeper, app.stakingKeeper),
+	}, {
+		Weight: func(_ *rand.Rand) int {
+			var v int
+			ap.GetOrGenerate(app.cdc, OpWeightMsgUnjail, &v, nil,
+				func(_ *rand.Rand) {
+					v = 100
+				})
+			return v
+		}(nil),
+		Op: slashingsim.SimulateMsgUnjail(app.accountKeeper, app.slashingKeeper, app.stakingKeeper),
+	}, {
+		Weight: func(_ *rand.Rand) int {
+			var v int
+			ap.GetOrGenerate(app.cdc, OpWeightMsgRequestRand, &v, nil,
+				func(_ *rand.Rand) {
+					v = 20
+				})
+			return v
+		}(nil),
+		Op: randsim.SimulateMsgRequestRand(app.accountKeeper, app.randKeeper),
+	}}
 }
 
 // fauxMerkleModeOpt returns a BaseApp option to use a dbStoreAdapter instead of
@@ -634,7 +616,7 @@ func BenchmarkInvariants(b *testing.B) {
 
 	defer func() {
 		db.Close()
-		os.RemoveAll(dir)
+		_ = os.RemoveAll(dir)
 	}()
 
 	gapp := NewIrisApp(logger, db, nil, true, simapp.FlagPeriodValue, interBlockCacheOpt())

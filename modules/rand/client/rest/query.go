@@ -10,12 +10,11 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/types/rest"
 
-	clienttypes "github.com/irisnet/irishub/modules/rand/client/types"
 	"github.com/irisnet/irishub/modules/rand/internal/types"
 )
 
 func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router) {
-	r.HandleFunc(fmt.Sprintf("/rand/rands/{%s}", RestRequestID), queryRandHandlerFn(cliCtx)).Methods("GET")
+	r.HandleFunc("/rand/rands/{request-id}", queryRandHandlerFn(cliCtx)).Methods("GET")
 	r.HandleFunc("/rand/queue", queryQueueHandlerFn(cliCtx)).Methods("GET")
 }
 
@@ -53,13 +52,12 @@ func queryRandHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		var rawRand types.Rand
-		err = cliCtx.Codec.UnmarshalJSON(res, &rawRand)
-		if err != nil {
+		if err = cliCtx.Codec.UnmarshalJSON(res, &rawRand); err != nil {
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
 
-		readableRand := clienttypes.ReadableRand{
+		readableRand := types.ReadableRand{
 			RequestTxHash: hex.EncodeToString(rawRand.RequestTxHash),
 			Height:        rawRand.Height,
 			Value:         rawRand.Value,

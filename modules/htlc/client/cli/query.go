@@ -22,13 +22,11 @@ func GetQueryCmd(cdc *codec.Codec) *cobra.Command {
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
 	}
-
 	mintingQueryCmd.AddCommand(
 		client.GetCommands(
 			GetCmdQueryHTLC(cdc),
 		)...,
 	)
-
 	return mintingQueryCmd
 }
 
@@ -63,8 +61,7 @@ func GetCmdQueryHTLC(cdc *codec.Codec) *cobra.Command {
 			}
 
 			var htlc types.HTLC
-			err = cdc.UnmarshalJSON(res, &htlc)
-			if err != nil {
+			if err = cdc.UnmarshalJSON(res, &htlc); err != nil {
 				return err
 			}
 

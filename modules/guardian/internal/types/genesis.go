@@ -18,8 +18,3 @@ func DefaultGenesisState() GenesisState {
 	guardian := Guardian{Description: "genesis", AccountType: Genesis}
 	return NewGenesisState([]Guardian{guardian}, []Guardian{guardian})
 }
-
-// get raw genesis raw message for testing
-func DefaultGenesisStateForTest() GenesisState {
-	return DefaultGenesisState()
-}

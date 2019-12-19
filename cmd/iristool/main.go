@@ -10,11 +10,13 @@ import (
 	"strconv"
 	"strings"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/spf13/cobra"
+
 	"github.com/tendermint/tendermint/crypto"
 	"github.com/tendermint/tendermint/crypto/ed25519"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/x/auth"
 
 	iris "github.com/irisnet/irishub/app"
 )
@@ -220,8 +222,7 @@ func runTxCmd(cmd *cobra.Command, args []string) error {
 	var tx = auth.StdTx{}
 	cdc := iris.MakeCodec()
 
-	err = cdc.UnmarshalBinaryLengthPrefixed(txBytes, &tx)
-	if err != nil {
+	if err := cdc.UnmarshalBinaryLengthPrefixed(txBytes, &tx); err != nil {
 		return err
 	}
 
@@ -231,8 +232,7 @@ func runTxCmd(cmd *cobra.Command, args []string) error {
 	}
 
 	buf := bytes.NewBuffer([]byte{})
-	err = json.Indent(buf, bz, "", "  ")
-	if err != nil {
+	if err := json.Indent(buf, bz, "", "  "); err != nil {
 		return err
 	}
 
@@ -241,8 +241,7 @@ func runTxCmd(cmd *cobra.Command, args []string) error {
 }
 
 func main() {
-	err := rootCmd.Execute()
-	if err != nil {
+	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
 	}
 	os.Exit(0)

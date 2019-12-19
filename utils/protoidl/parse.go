@@ -13,8 +13,7 @@ const maxElements = 200
 func ValidateProto(content string) (bool, error) {
 	reader := strings.NewReader(content)
 	parser := proto.NewParser(reader)
-	_, err := parser.Parse()
-	if err != nil {
+	if _, err := parser.Parse(); err != nil {
 		return false, err
 	}
 	return true, nil

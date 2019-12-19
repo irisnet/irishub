@@ -155,6 +155,9 @@ func TestIrisCLIHTLC(t *testing.T) {
 
 	htlcAcc = f.QueryAccount(htlcAddr, flags)
 	require.Equal(t, "0", htlcAcc.GetCoins().AmountOf(sdk.DefaultBondDenom).String())
+
+	// Cleanup testing directories
+	f.Cleanup()
 }
 
 func executeGetHTLC(t *testing.T, cmdStr string) htlc.HTLC {

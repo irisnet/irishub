@@ -7,18 +7,20 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/cosmos/cosmos-sdk/baseapp"
-	"github.com/cosmos/cosmos-sdk/server"
-	"github.com/cosmos/cosmos-sdk/store"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	cpm "github.com/otiai10/copy"
 	"github.com/spf13/cobra"
+
 	abci "github.com/tendermint/tendermint/abci/types"
 	cmn "github.com/tendermint/tendermint/libs/common"
 	"github.com/tendermint/tendermint/proxy"
 	tmsm "github.com/tendermint/tendermint/state"
 	tmstore "github.com/tendermint/tendermint/store"
 	tm "github.com/tendermint/tendermint/types"
+
+	"github.com/cosmos/cosmos-sdk/baseapp"
+	"github.com/cosmos/cosmos-sdk/server"
+	"github.com/cosmos/cosmos-sdk/store"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/irisnet/irishub/app"
 )
@@ -35,7 +37,6 @@ func replayCmd() *cobra.Command {
 }
 
 func replayTxs(rootDir string) error {
-
 	if false {
 		// Copy the rootDir to a new directory, to preserve the old one.
 		fmt.Fprintln(os.Stderr, "Copying rootdir over")
@@ -109,8 +110,7 @@ func replayTxs(rootDir string) error {
 
 	cc := proxy.NewLocalClientCreator(gapp)
 	proxyApp := proxy.NewAppConns(cc)
-	err = proxyApp.Start()
-	if err != nil {
+	if err := proxyApp.Start(); err != nil {
 		return err
 	}
 	defer func() {

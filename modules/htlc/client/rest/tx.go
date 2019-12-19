@@ -43,10 +43,15 @@ func createHTLCHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 
 		// create the NewMsgCreateHTLC message
 		msg := types.NewMsgCreateHTLC(
-			req.Sender, req.To, req.ReceiverOnOtherChain, req.Amount,
-			hashLock, req.Timestamp, req.TimeLock)
-		err = msg.ValidateBasic()
-		if err != nil {
+			req.Sender,
+			req.To,
+			req.ReceiverOnOtherChain,
+			req.Amount,
+			hashLock,
+			req.Timestamp,
+			req.TimeLock,
+		)
+		if err = msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
@@ -82,10 +87,8 @@ func claimHTLCHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
-		msg := types.NewMsgClaimHTLC(
-			req.Sender, hashLock, secret)
-		err = msg.ValidateBasic()
-		if err != nil {
+		msg := types.NewMsgClaimHTLC(req.Sender, hashLock, secret)
+		if err = msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
@@ -116,10 +119,8 @@ func refundHTLCHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		// create the NewMsgRefundHTLC message
-		msg := types.NewMsgRefundHTLC(
-			req.Sender, hashLock)
-		err = msg.ValidateBasic()
-		if err != nil {
+		msg := types.NewMsgRefundHTLC(req.Sender, hashLock)
+		if err = msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}

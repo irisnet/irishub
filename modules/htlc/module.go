@@ -47,8 +47,7 @@ func (AppModuleBasic) DefaultGenesis() json.RawMessage {
 // ValidateGenesis performs genesis state validation for the HTLC module.
 func (AppModuleBasic) ValidateGenesis(bz json.RawMessage) error {
 	var data GenesisState
-	err := ModuleCdc.UnmarshalJSON(bz, &data)
-	if err != nil {
+	if err := ModuleCdc.UnmarshalJSON(bz, &data); err != nil {
 		return err
 	}
 	return ValidateGenesis(data)
@@ -95,7 +94,6 @@ func (AppModuleSimulation) RandomizedParams(r *rand.Rand) []sim.ParamChange {
 type AppModule struct {
 	AppModuleBasic
 	AppModuleSimulation
-
 	keeper Keeper
 }
 

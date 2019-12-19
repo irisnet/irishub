@@ -33,8 +33,7 @@ func HandleMsgSwapOrder(ctx sdk.Context, k Keeper, msg MsgSwapOrder) sdk.Result 
 		return ErrInvalidDeadline("deadline has passed for MsgSwapOrder").Result()
 	}
 
-	err := k.Swap(ctx, msg)
-	if err != nil {
+	if err := k.Swap(ctx, msg); err != nil {
 		return err.Result()
 	}
 
@@ -59,8 +58,7 @@ func HandleMsgAddLiquidity(ctx sdk.Context, k Keeper, msg MsgAddLiquidity) sdk.R
 		return ErrInvalidDeadline("deadline has passed for MsgAddLiquidity").Result()
 	}
 
-	err := k.AddLiquidity(ctx, msg)
-	if err != nil {
+	if err := k.AddLiquidity(ctx, msg); err != nil {
 		return err.Result()
 	}
 
@@ -84,8 +82,7 @@ func HandleMsgRemoveLiquidity(ctx sdk.Context, k Keeper, msg MsgRemoveLiquidity)
 		return ErrInvalidDeadline("deadline has passed for MsgRemoveLiquidity").Result()
 	}
 
-	err := k.RemoveLiquidity(ctx, msg)
-	if err != nil {
+	if err := k.RemoveLiquidity(ctx, msg); err != nil {
 		return err.Result()
 	}
 

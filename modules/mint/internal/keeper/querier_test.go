@@ -2,6 +2,7 @@ package keeper_test
 
 import (
 	"github.com/stretchr/testify/require"
+
 	abci "github.com/tendermint/tendermint/abci/types"
 
 	"github.com/irisnet/irishub/modules/mint/internal/keeper"

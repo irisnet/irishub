@@ -2,8 +2,6 @@ package mint
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-
-	"github.com/irisnet/irishub/modules/mint/internal/types"
 )
 
 // Called every block, process inflation on the first block of every hour
@@ -44,10 +42,10 @@ func BeginBlocker(ctx sdk.Context, k Keeper) {
 
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
-			types.EventTypeMint,
-			sdk.NewAttribute(types.AttributeKeyLastInflationTime, lastInflationTime.String()),
-			sdk.NewAttribute(types.AttributeKeyInflationTime, blockTime.String()),
-			sdk.NewAttribute(types.AttributeKeyMintCoin, mintedCoin.Amount.String()),
+			EventTypeMint,
+			sdk.NewAttribute(AttributeKeyLastInflationTime, lastInflationTime.String()),
+			sdk.NewAttribute(AttributeKeyInflationTime, blockTime.String()),
+			sdk.NewAttribute(AttributeKeyMintCoin, mintedCoin.Amount.String()),
 		),
 	)
 }

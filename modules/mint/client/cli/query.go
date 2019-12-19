@@ -21,18 +21,15 @@ func GetQueryCmd(cdc *codec.Codec) *cobra.Command {
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
 	}
-
 	mintingQueryCmd.AddCommand(
 		client.GetCommands(
 			GetCmdQueryParams(cdc),
 		)...,
 	)
-
 	return mintingQueryCmd
 }
 
-// GetCmdQueryParams implements a command to return the current minting
-// parameters.
+// GetCmdQueryParams implements a command to return the current minting parameters.
 func GetCmdQueryParams(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "params",

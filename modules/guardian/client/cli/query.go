@@ -3,15 +3,17 @@ package cli
 import (
 	"fmt"
 
+	"github.com/spf13/cobra"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/spf13/cobra"
 
 	"github.com/irisnet/irishub/modules/guardian/internal/types"
 )
 
-func GetQueryCmd(queryRoute string, cdc *codec.Codec) *cobra.Command {
+// GetQueryCmd returns the cli query commands for the Guardian module.
+func GetQueryCmd(cdc *codec.Codec) *cobra.Command {
 	txCmd := &cobra.Command{
 		Use:                        types.ModuleName,
 		Short:                      "Querying commands for the guardian module",
@@ -20,12 +22,14 @@ func GetQueryCmd(queryRoute string, cdc *codec.Codec) *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 	txCmd.AddCommand(client.GetCommands(
-		GetCmdQueryProfilers(queryRoute, cdc),
-		GetCmdQueryTrustees(queryRoute, cdc))...)
+		GetCmdQueryProfilers(cdc),
+		GetCmdQueryTrustees(cdc),
+	)...)
 	return txCmd
 }
 
-func GetCmdQueryProfilers(queryRoute string, cdc *codec.Codec) *cobra.Command {
+// GetCmdQueryProfilers implements the query profilers command.
+func GetCmdQueryProfilers(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "profilers",
 		Short:   "Query for all profilers",
@@ -33,15 +37,13 @@ func GetCmdQueryProfilers(queryRoute string, cdc *codec.Codec) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", queryRoute, types.QueryProfilers), nil)
-
+			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", types.QuerierRoute, types.QueryProfilers), nil)
 			if err != nil {
 				return err
 			}
 
 			var profilers types.Profilers
-			err = cdc.UnmarshalJSON(res, &profilers)
-			if err != nil {
+			if err = cdc.UnmarshalJSON(res, &profilers); err != nil {
 				return err
 			}
 
@@ -51,7 +53,8 @@ func GetCmdQueryProfilers(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-func GetCmdQueryTrustees(queryRoute string, cdc *codec.Codec) *cobra.Command {
+// GetCmdQueryTrustees implements the query trustees command.
+func GetCmdQueryTrustees(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "trustees",
 		Short:   "Query for all trustees",
@@ -59,15 +62,13 @@ func GetCmdQueryTrustees(queryRoute string, cdc *codec.Codec) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", queryRoute, types.QueryTrustees), nil)
-
+			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", types.QuerierRoute, types.QueryTrustees), nil)
 			if err != nil {
 				return err
 			}
 
 			var trustees types.Trustees
-			err = cdc.UnmarshalJSON(res, &trustees)
-			if err != nil {
+			if err = cdc.UnmarshalJSON(res, &trustees); err != nil {
 				return err
 			}
 

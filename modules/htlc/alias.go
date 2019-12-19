@@ -61,6 +61,7 @@ var (
 	ErrInvalidSecret           = types.ErrInvalidSecret
 	ErrStateIsNotOpen          = types.ErrStateIsNotOpen
 	ErrStateIsNotExpired       = types.ErrStateIsNotExpired
+	DefaultGenesisState        = types.DefaultGenesisState
 	ValidateGenesis            = types.ValidateGenesis
 	NewHTLC                    = types.NewHTLC
 	HTLCStateFromString        = types.HTLCStateFromString

@@ -31,8 +31,7 @@ func requestRandHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 
 		// create the MsgRequestRand message
 		msg := types.NewMsgRequestRand(req.Consumer, req.BlockInterval)
-		err := msg.ValidateBasic()
-		if err != nil {
+		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}

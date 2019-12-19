@@ -17,6 +17,5 @@ var (
 func init() {
 	FsAddGuardian.String(FlagAddress, "", "bech32 encoded account address")
 	FsAddGuardian.String(FlagDescription, "", "description of account")
-
 	FsDeleteGuardian.String(FlagAddress, "", "bech32 encoded account address")
 }

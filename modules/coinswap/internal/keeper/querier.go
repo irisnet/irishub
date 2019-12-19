@@ -16,7 +16,6 @@ func NewQuerier(k Keeper) sdk.Querier {
 		switch path[0] {
 		case types.QueryLiquidity:
 			return queryLiquidity(ctx, req, k)
-
 		default:
 			return nil, sdk.ErrUnknownRequest(fmt.Sprintf("%s is not a valid query request path", req.Path))
 		}
@@ -28,8 +27,7 @@ func NewQuerier(k Keeper) sdk.Querier {
 func queryLiquidity(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sdk.Error) {
 	var params types.QueryLiquidityParams
 	standardDenom := k.GetParams(ctx).StandardDenom
-	err := k.cdc.UnmarshalJSON(req.Data, &params)
-	if err != nil {
+	if err := k.cdc.UnmarshalJSON(req.Data, &params); err != nil {
 		return nil, sdk.ErrUnknownRequest(sdk.AppendMsgToErr("incorrectly formatted request data", err.Error()))
 	}
 
@@ -61,8 +59,8 @@ func queryLiquidity(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, s
 		Fee:       fee,
 	}
 
-	bz, err := k.cdc.MarshalJSONIndent(res, "", " ")
-	if err != nil {
+	bz, errRes := k.cdc.MarshalJSONIndent(res, "", " ")
+	if errRes != nil {
 		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", err.Error()))
 	}
 	return bz, nil

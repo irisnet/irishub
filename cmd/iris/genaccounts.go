@@ -4,6 +4,11 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+
+	"github.com/tendermint/tendermint/libs/cli"
+
 	"github.com/cosmos/cosmos-sdk/client/keys"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/server"
@@ -12,9 +17,6 @@ import (
 	authexported "github.com/cosmos/cosmos-sdk/x/auth/exported"
 	"github.com/cosmos/cosmos-sdk/x/auth/vesting"
 	"github.com/cosmos/cosmos-sdk/x/genutil"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
-	"github.com/tendermint/tendermint/libs/cli"
 )
 
 const (

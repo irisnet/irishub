@@ -11,13 +11,13 @@ import (
 func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
 	for height, requests := range data.PendingRandRequests {
 		for _, request := range requests {
-			h, err := strconv.ParseUint(height, 10, 64)
+			h, err := strconv.ParseInt(height, 10, 64)
 			if err != nil {
 				continue
 			}
 
 			reqID := GenerateRequestID(request)
-			k.EnqueueRandRequest(ctx, int64(h), reqID, request)
+			k.EnqueueRandRequest(ctx, h, reqID, request)
 		}
 	}
 }
@@ -29,7 +29,6 @@ func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 	k.IterateRandRequestQueue(ctx, func(height int64, request Request) bool {
 		leftHeight := fmt.Sprintf("%d", height-ctx.BlockHeight()+1)
 		pendingRequests[leftHeight] = append(pendingRequests[leftHeight], request)
-
 		return false
 	})
 

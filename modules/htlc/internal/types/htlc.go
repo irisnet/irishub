@@ -156,11 +156,9 @@ func (state HTLCState) MarshalYAML() (interface{}, error) {
 
 func (state *HTLCState) UnmarshalYAML(data []byte) error {
 	var s string
-	err := json.Unmarshal(data, &s)
-	if err != nil {
+	if err := json.Unmarshal(data, &s); err != nil {
 		return err
 	}
-
 	bz, err := HTLCStateFromString(s)
 	if err != nil {
 		return err
@@ -177,11 +175,9 @@ func (state HTLCState) MarshalJSON() ([]byte, error) {
 // Unmarshals from JSON
 func (state *HTLCState) UnmarshalJSON(data []byte) error {
 	var s string
-	err := json.Unmarshal(data, &s)
-	if err != nil {
+	if err := json.Unmarshal(data, &s); err != nil {
 		return nil
 	}
-
 	bz, err := HTLCStateFromString(s)
 	if err != nil {
 		return err
@@ -210,11 +206,9 @@ func (secret HTLCSecret) MarshalYAML() (interface{}, error) {
 
 func (secret *HTLCSecret) UnmarshalYAML(data []byte) error {
 	var s string
-	err := json.Unmarshal(data, &s)
-	if err != nil {
+	if err := json.Unmarshal(data, &s); err != nil {
 		return nil
 	}
-
 	bz, err := hex.DecodeString(s)
 	if err != nil {
 		return err
@@ -229,16 +223,13 @@ func (secret HTLCSecret) MarshalJSON() ([]byte, error) {
 
 func (secret *HTLCSecret) UnmarshalJSON(data []byte) error {
 	var s string
-	err := json.Unmarshal(data, &s)
-	if err != nil {
+	if err := json.Unmarshal(data, &s); err != nil {
 		return err
 	}
-
 	bz, err := hex.DecodeString(s)
 	if err != nil {
 		return err
 	}
-
 	*secret = bz
 	return nil
 }
@@ -263,11 +254,9 @@ func (hashLock HTLCHashLock) MarshalYAML() (interface{}, error) {
 
 func (hashLock *HTLCHashLock) UnmarshalYAML(data []byte) error {
 	var s string
-	err := json.Unmarshal(data, &s)
-	if err != nil {
+	if err := json.Unmarshal(data, &s); err != nil {
 		return nil
 	}
-
 	bz, err := hex.DecodeString(s)
 	if err != nil {
 		return err
@@ -282,16 +271,13 @@ func (hashLock HTLCHashLock) MarshalJSON() ([]byte, error) {
 
 func (hashLock *HTLCHashLock) UnmarshalJSON(data []byte) error {
 	var s string
-	err := json.Unmarshal(data, &s)
-	if err != nil {
+	if err := json.Unmarshal(data, &s); err != nil {
 		return err
 	}
-
 	bz, err := hex.DecodeString(s)
 	if err != nil {
 		return err
 	}
-
 	*hashLock = bz
 	return nil
 }

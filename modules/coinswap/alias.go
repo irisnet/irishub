@@ -10,6 +10,7 @@ import (
 	"github.com/irisnet/irishub/modules/coinswap/internal/types"
 )
 
+// exported constants
 const (
 	DefaultCodespace                 = types.DefaultCodespace
 	CodeReservePoolNotExists         = types.CodeReservePoolNotExists
@@ -32,9 +33,9 @@ const (
 	RouterKey                        = types.RouterKey
 	StoreKey                         = types.StoreKey
 	QuerierRoute                     = types.QuerierRoute
-	MsgTypeAddLiquidity              = types.MsgTypeAddLiquidity
-	MsgTypeRemoveLiquidity           = types.MsgTypeRemoveLiquidity
-	MsgTypeSwapOrder                 = types.MsgTypeSwapOrder
+	MsgTypeAddLiquidity              = types.TypeMsgAddLiquidity
+	MsgTypeRemoveLiquidity           = types.TypeMsgRemoveLiquidity
+	MsgTypeSwapOrder                 = types.TypeMsgSwapOrder
 	FormatUniABSPrefix               = types.FormatUniABSPrefix
 	FormatUniDenom                   = types.FormatUniDenom
 	DefaultParamspace                = types.DefaultParamspace
@@ -45,10 +46,10 @@ const (
 var (
 	// functions aliases
 	NewKeeper                = keeper.NewKeeper
-	GetReservePoolAddr       = keeper.GetReservePoolAddr
 	NewQuerier               = keeper.NewQuerier
 	GetInputPrice            = keeper.GetInputPrice
 	GetOutputPrice           = keeper.GetOutputPrice
+	GetReservePoolAddr       = types.GetReservePoolAddr
 	RegisterCodec            = types.RegisterCodec
 	ErrReservePoolNotExists  = types.ErrReservePoolNotExists
 	ErrEqualDenom            = types.ErrEqualDenom
@@ -60,6 +61,9 @@ var (
 	NewMsgSwapOrder          = types.NewMsgSwapOrder
 	NewMsgAddLiquidity       = types.NewMsgAddLiquidity
 	NewMsgRemoveLiquidity    = types.NewMsgRemoveLiquidity
+	DefaultGenesisState      = types.DefaultGenesisState
+	NewGenesisState          = types.NewGenesisState
+	ValidateGenesis          = types.ValidateGenesis
 	NewParams                = types.NewParams
 	ParamKeyTable            = types.ParamKeyTable
 	DefaultParams            = types.DefaultParams
@@ -88,4 +92,5 @@ type (
 	Params                 = types.Params
 	QueryLiquidityParams   = types.QueryLiquidityParams
 	QueryLiquidityResponse = types.QueryLiquidityResponse
+	GenesisState           = types.GenesisState
 )

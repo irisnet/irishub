@@ -9,5 +9,5 @@ const (
 	AttributeKeyGenHeight = "generate_height"
 	AttributeKeyRand      = "rand"
 
-	AttributeValueCategory = "rand"
+	AttributeValueCategory = ModuleName
 )

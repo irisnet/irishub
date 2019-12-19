@@ -40,16 +40,13 @@ func ParamKeyTable() params.KeyTable {
 
 // KeyValuePairs  Implements params.KeyValuePairs
 func (p *Params) ParamSetPairs() params.ParamSetPairs {
-	return params.ParamSetPairs{
-		{
-			Key:   KeyFee,
-			Value: &p.Fee,
-		},
-		{
-			Key:   KeyStandardDenom,
-			Value: &p.StandardDenom,
-		},
-	}
+	return params.ParamSetPairs{{
+		Key:   KeyFee,
+		Value: &p.Fee,
+	}, {
+		Key:   KeyStandardDenom,
+		Value: &p.StandardDenom,
+	}}
 }
 
 // DefaultParams returns the default coinswap module parameters

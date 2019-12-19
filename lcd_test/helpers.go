@@ -129,8 +129,7 @@ func InitializeLCD(nValidators int, initAddrs []sdk.AccAddress, minting bool, po
 
 func defaultGenesis(config *tmcfg.Config, nValidators int, initAddrs []sdk.AccAddress, minting bool) (
 	genDoc *tmtypes.GenesisDoc, valConsPubKeys []crypto.PubKey, valOperAddrs []sdk.ValAddress, privVal *pvm.FilePV, err error) {
-	privVal = pvm.LoadOrGenFilePV(config.PrivValidatorKeyFile(),
-		config.PrivValidatorStateFile())
+	privVal = pvm.LoadOrGenFilePV(config.PrivValidatorKeyFile(), config.PrivValidatorStateFile())
 	privVal.Reset()
 
 	if nValidators < 1 {
@@ -306,8 +305,7 @@ func startTM(
 		return nil, err
 	}
 
-	err = node.Start()
-	if err != nil {
+	if err = node.Start(); err != nil {
 		return nil, err
 	}
 

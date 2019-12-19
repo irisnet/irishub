@@ -38,8 +38,7 @@ func (k Keeper) DeleteProfiler(ctx sdk.Context, address sdk.AccAddress) {
 
 func (k Keeper) GetProfiler(ctx sdk.Context, addr sdk.AccAddress) (guardian types.Guardian, found bool) {
 	store := ctx.KVStore(k.storeKey)
-	bz := store.Get(types.GetProfilerKey(addr))
-	if bz != nil {
+	if bz := store.Get(types.GetProfilerKey(addr)); bz != nil {
 		k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &guardian)
 		return guardian, true
 	}
@@ -66,8 +65,7 @@ func (k Keeper) DeleteTrustee(ctx sdk.Context, address sdk.AccAddress) {
 
 func (k Keeper) GetTrustee(ctx sdk.Context, addr sdk.AccAddress) (guardian types.Guardian, found bool) {
 	store := ctx.KVStore(k.storeKey)
-	bz := store.Get(types.GetTrusteeKey(addr))
-	if bz != nil {
+	if bz := store.Get(types.GetTrusteeKey(addr)); bz != nil {
 		k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &guardian)
 		return guardian, true
 	}

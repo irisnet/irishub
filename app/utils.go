@@ -22,7 +22,6 @@ func ExportStateToJSON(app *IrisApp, path string) error {
 	if err != nil {
 		return err
 	}
-
 	return ioutil.WriteFile(path, []byte(appState), 0644)
 }
 
@@ -32,7 +31,6 @@ func ExportStateToJSON(app *IrisApp, path string) error {
 func NewIrisAppUNSAFE(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bool,
 	invCheckPeriod uint, baseAppOptions ...func(*baseapp.BaseApp),
 ) (gapp *IrisApp, keyMain, keyStaking *sdk.KVStoreKey, stakingKeeper staking.Keeper) {
-
 	gapp = NewIrisApp(logger, db, traceStore, loadLatest, invCheckPeriod, baseAppOptions...)
 	return gapp, gapp.keys[bam.MainStoreKey], gapp.keys[staking.StoreKey], gapp.stakingKeeper
 }

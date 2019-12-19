@@ -21,17 +21,11 @@ func DefaultGenesisState() GenesisState {
 	}
 }
 
-//
 // ValidateGenesis validates the provided staking genesis state to ensure the
 // expected invariants holds. (i.e. params in correct bounds, no duplicate validators)
 func ValidateGenesis(data GenesisState) error {
-	err := validateParams(data.Params)
-	if err != nil {
+	if err := validateParams(data.Params); err != nil {
 		return err
 	}
-	err = validateMinter(data.Minter)
-	if err != nil {
-		return err
-	}
-	return nil
+	return ValidateMinter(data.Minter)
 }

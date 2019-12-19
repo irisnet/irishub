@@ -15,6 +15,23 @@ import (
 	"github.com/irisnet/irishub/simapp"
 )
 
+var (
+	addrSender           sdk.AccAddress
+	addrTo               sdk.AccAddress
+	receiverOnOtherChain string
+	amount               sdk.Coins
+	secret1              types.HTLCSecret
+	secret2              types.HTLCSecret
+	timestamp            uint64
+	timestampNil         uint64
+	hashLock             types.HTLCHashLock
+	timeLock             uint64
+	expireHeight         uint64
+	stateOpen            types.HTLCState
+	stateExpired         types.HTLCState
+	initSecret           types.HTLCSecret
+)
+
 type KeeperTestSuite struct {
 	suite.Suite
 
@@ -23,12 +40,38 @@ type KeeperTestSuite struct {
 	app *simapp.SimApp
 }
 
+func initVars(suite *KeeperTestSuite) {
+	addrSender = sdk.AccAddress([]byte("__addrSender________"))
+	addrTo = sdk.AccAddress([]byte("__addrTo____________"))
+	_ = suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, addrSender)
+	_ = suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, addrTo)
+	_ = suite.app.BankKeeper.SetCoins(suite.ctx, addrSender, sdk.NewCoins(sdk.NewInt64Coin(sdk.DefaultBondDenom, 100000)))
+	_ = suite.app.BankKeeper.SetCoins(suite.ctx, addrTo, sdk.NewCoins(sdk.NewInt64Coin(sdk.DefaultBondDenom, 50000)))
+	suite.True(suite.app.BankKeeper.GetCoins(suite.ctx, addrSender).IsEqual(sdk.NewCoins(sdk.NewInt64Coin(sdk.DefaultBondDenom, 100000))))
+	suite.True(suite.app.BankKeeper.GetCoins(suite.ctx, addrTo).IsEqual(sdk.NewCoins(sdk.NewInt64Coin(sdk.DefaultBondDenom, 50000))))
+
+	receiverOnOtherChain = "receiverOnOtherChain"
+	amount = sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(10)))
+	secret1 = types.HTLCSecret("___abcdefghijklmnopqrstuvwxyz___")
+	secret2 = types.HTLCSecret("___00000000000000000000000000___")
+	timestamp = uint64(1580000000)
+	timestampNil = uint64(0)
+	hashLock = types.GetHashLock(secret1, timestamp)
+	timeLock = uint64(50)
+	expireHeight = timeLock + uint64(suite.ctx.BlockHeight())
+	stateOpen = types.OPEN
+	stateExpired = types.EXPIRED
+	initSecret = types.HTLCSecret(nil)
+}
+
 func (suite *KeeperTestSuite) SetupTest() {
 	app := simapp.Setup(false)
 
 	suite.cdc = app.Codec()
 	suite.ctx = app.BaseApp.NewContext(false, abci.Header{})
 	suite.app = app
+
+	initVars(suite)
 }
 
 func TestKeeperTestSuite(t *testing.T) {
@@ -36,24 +79,6 @@ func TestKeeperTestSuite(t *testing.T) {
 }
 
 func (suite *KeeperTestSuite) TestCreateHTLC() {
-	addrSender := sdk.AccAddress("addrSender")
-	addrTo := sdk.AccAddress("addrTo")
-
-	_ = suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, addrSender)
-	_ = suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, addrTo)
-	_ = suite.app.BankKeeper.SetCoins(suite.ctx, addrSender, sdk.NewCoins(sdk.NewInt64Coin(sdk.DefaultBondDenom, 100000)))
-	suite.True(suite.app.BankKeeper.GetCoins(suite.ctx, addrSender).IsEqual(sdk.NewCoins(sdk.NewInt64Coin(sdk.DefaultBondDenom, 100000))))
-
-	receiverOnOtherChain := "receiverOnOtherChain"
-	amount := sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(10)))
-	secret := types.HTLCSecret("___abcdefghijklmnopqrstuvwxyz___")
-	timestamp := uint64(1580000000)
-	hashLock := types.HTLCHashLock(types.SHA256(append(secret, sdk.Uint64ToBigEndian(timestamp)...)))
-	timeLock := uint64(50)
-	expireHeight := timeLock + uint64(suite.ctx.BlockHeight())
-	state := types.OPEN
-	initSecret := make(types.HTLCSecret, 0)
-
 	_, err := suite.app.HTLCKeeper.GetHTLC(suite.ctx, hashLock)
 	suite.NotNil(err)
 
@@ -65,7 +90,7 @@ func (suite *KeeperTestSuite) TestCreateHTLC() {
 		initSecret,
 		timestamp,
 		expireHeight,
-		state,
+		stateOpen,
 	)
 
 	originSenderAccAmt := suite.app.AccountKeeper.GetAccount(suite.ctx, addrSender).GetCoins()
@@ -95,33 +120,13 @@ func (suite *KeeperTestSuite) TestCreateHTLC() {
 	suite.Equal(types.HTLCSecret(nil), htlc.Secret)
 	suite.Equal(timestamp, htlc.Timestamp)
 	suite.Equal(expireHeight, htlc.ExpireHeight)
-	suite.Equal(state, htlc.State)
+	suite.Equal(stateOpen, htlc.State)
 
 	store := suite.ctx.KVStore(suite.app.GetKey(types.StoreKey))
 	suite.True(store.Has(keeper.KeyHTLCExpireQueue(htlc.ExpireHeight, hashLock)))
 }
 
 func (suite *KeeperTestSuite) TestClaimHTLC() {
-	addrSender := sdk.AccAddress("addrSender")
-	addrTo := sdk.AccAddress("addrTo")
-
-	_ = suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, addrSender)
-	_ = suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, addrTo)
-	_ = suite.app.BankKeeper.SetCoins(suite.ctx, addrSender, sdk.NewCoins(sdk.NewInt64Coin(sdk.DefaultBondDenom, 100000)))
-	_ = suite.app.BankKeeper.SetCoins(suite.ctx, addrTo, sdk.NewCoins(sdk.NewInt64Coin(sdk.DefaultBondDenom, 50000)))
-	suite.True(suite.app.BankKeeper.GetCoins(suite.ctx, addrSender).IsEqual(sdk.NewCoins(sdk.NewInt64Coin(sdk.DefaultBondDenom, 100000))))
-
-	receiverOnOtherChain := "receiverOnOtherChain"
-	amount := sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(10)))
-	secret1 := types.HTLCSecret("___abcdefghijklmnopqrstuvwxyz___")
-	secret2 := types.HTLCSecret("___00000000000000000000000000___")
-	timestamp := uint64(1580000000)
-	timestampNil := uint64(0)
-	timeLock := uint64(50)
-	expireHeight := timeLock + uint64(suite.ctx.BlockHeight())
-	state := types.OPEN
-	initSecret := make(types.HTLCSecret, 0)
-
 	testData := []struct {
 		expectPass           bool
 		senderAddr           []byte
@@ -137,11 +142,11 @@ func (suite *KeeperTestSuite) TestClaimHTLC() {
 		initSecret           types.HTLCSecret
 	}{
 		// timestamp > 0
-		{true, addrSender, addrTo, receiverOnOtherChain, amount, secret1, timestamp, types.GetHashLock(secret1, timestamp), timeLock, expireHeight, state, initSecret},
+		{true, addrSender, addrTo, receiverOnOtherChain, amount, secret1, timestamp, types.GetHashLock(secret1, timestamp), timeLock, expireHeight, stateOpen, initSecret},
 		// timestamp = 0
-		{true, addrSender, addrTo, receiverOnOtherChain, amount, secret1, timestampNil, types.GetHashLock(secret1, timestampNil), timeLock, expireHeight, state, initSecret},
+		{true, addrSender, addrTo, receiverOnOtherChain, amount, secret1, timestampNil, types.GetHashLock(secret1, timestampNil), timeLock, expireHeight, stateOpen, initSecret},
 		// invalid secret
-		{false, addrSender, addrTo, receiverOnOtherChain, amount, secret1, timestampNil, types.GetHashLock(secret2, timestampNil), timeLock, expireHeight, state, initSecret},
+		{false, addrSender, addrTo, receiverOnOtherChain, amount, secret1, timestampNil, types.GetHashLock(secret2, timestampNil), timeLock, expireHeight, stateOpen, initSecret},
 	}
 
 	for i, td := range testData {
@@ -225,24 +230,6 @@ func (suite *KeeperTestSuite) TestClaimHTLC() {
 }
 
 func (suite *KeeperTestSuite) TestRefundHTLC() {
-	addrSender := sdk.AccAddress("addrSender")
-	addrTo := sdk.AccAddress("addrTo")
-
-	_ = suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, addrSender)
-	_ = suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, addrTo)
-	_ = suite.app.BankKeeper.SetCoins(suite.ctx, addrSender, sdk.NewCoins(sdk.NewInt64Coin(sdk.DefaultBondDenom, 100000)))
-	suite.True(suite.app.BankKeeper.GetCoins(suite.ctx, addrSender).IsEqual(sdk.NewCoins(sdk.NewInt64Coin(sdk.DefaultBondDenom, 100000))))
-
-	receiverOnOtherChain := "receiverOnOtherChain"
-	amount := sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(10)))
-	secret := types.HTLCSecret("___abcdefghijklmnopqrstuvwxyz___")
-	timestamp := uint64(1580000000)
-	hashLock := types.HTLCHashLock(types.SHA256(append(secret, sdk.Uint64ToBigEndian(timestamp)...)))
-	timeLock := uint64(50)
-	expireHeight := timeLock + uint64(suite.ctx.BlockHeight())
-	state := types.EXPIRED
-	initSecret := make(types.HTLCSecret, 0)
-
 	htlc := types.NewHTLC(
 		addrSender,
 		addrTo,
@@ -251,7 +238,7 @@ func (suite *KeeperTestSuite) TestRefundHTLC() {
 		initSecret,
 		timestamp,
 		expireHeight,
-		state,
+		stateExpired,
 	)
 
 	err := suite.app.HTLCKeeper.CreateHTLC(suite.ctx, htlc, hashLock)
@@ -279,4 +266,53 @@ func (suite *KeeperTestSuite) TestRefundHTLC() {
 
 	suite.True(originHTLCAmount.Sub(amount).IsEqual(claimedHTLCAmount))
 	suite.True(originSenderAmount.Add(amount).IsEqual(claimedSenderAmount))
+}
+
+func (suite *KeeperTestSuite) TestIterateHTLCs() {
+	htlc := types.NewHTLC(
+		addrSender,
+		addrTo,
+		receiverOnOtherChain,
+		amount,
+		initSecret,
+		timestamp,
+		expireHeight,
+		stateOpen,
+	)
+	err := suite.app.HTLCKeeper.CreateHTLC(suite.ctx, htlc, hashLock)
+	suite.Nil(err)
+
+	find := false
+	suite.app.HTLCKeeper.IterateHTLCs(suite.ctx, func(hlock types.HTLCHashLock, h types.HTLC) (stop bool) {
+		suite.Equal(hlock, hashLock)
+		find = true
+		return false
+	})
+
+	suite.True(find)
+}
+
+func (suite *KeeperTestSuite) TestIterateHTLCExpireQueueByHeight() {
+	htlc := types.NewHTLC(
+		addrSender,
+		addrTo,
+		receiverOnOtherChain,
+		amount,
+		initSecret,
+		timestamp,
+		expireHeight,
+		stateOpen,
+	)
+	err := suite.app.HTLCKeeper.CreateHTLC(suite.ctx, htlc, hashLock)
+	suite.Nil(err)
+
+	iterator := suite.app.HTLCKeeper.IterateHTLCExpireQueueByHeight(suite.ctx, expireHeight)
+	defer iterator.Close()
+
+	var htlcTmp types.HTLC
+	for ; iterator.Valid(); iterator.Next() {
+		suite.app.HTLCKeeper.GetCdc().MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &hashLock)
+		htlcTmp, _ = suite.app.HTLCKeeper.GetHTLC(suite.ctx, hashLock)
+	}
+	suite.Equal(htlcTmp, htlc)
 }

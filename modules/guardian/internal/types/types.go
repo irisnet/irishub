@@ -5,8 +5,9 @@ import (
 	"fmt"
 	"strings"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/pkg/errors"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 type Guardian struct {
@@ -87,11 +88,7 @@ func AccountTypeFromString(str string) (AccountType, error) {
 
 // is defined AccountType?
 func validAccountType(bt AccountType) bool {
-	if bt == Genesis ||
-		bt == Ordinary {
-		return true
-	}
-	return false
+	return bt == Genesis || bt == Ordinary
 }
 
 // For Printf / Sprintf, returns bech32 when using %s
@@ -124,11 +121,9 @@ func (bt AccountType) MarshalJSON() ([]byte, error) {
 // Unmarshals from JSON assuming Bech32 encoding
 func (bt *AccountType) UnmarshalJSON(data []byte) error {
 	var s string
-	err := json.Unmarshal(data, &s)
-	if err != nil {
+	if err := json.Unmarshal(data, &s); err != nil {
 		return nil
 	}
-
 	bz2, err := AccountTypeFromString(s)
 	if err != nil {
 		return err
