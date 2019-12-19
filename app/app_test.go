@@ -8,15 +8,15 @@ import (
 
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/log"
-	dnm "github.com/tendermint/tm-db"
+	dbm "github.com/tendermint/tm-db"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 
 	"github.com/irisnet/irishub/simapp"
 )
 
-func TestIrisdExport(t *testing.T) {
-	db := dnm.NewMemDB()
+func TestIrisExport(t *testing.T) {
+	db := dbm.NewMemDB()
 	gapp := NewIrisApp(log.NewTMLogger(log.NewSyncWriter(os.Stdout)), db, nil, true, 0)
 	_ = setGenesis(gapp)
 
@@ -28,7 +28,7 @@ func TestIrisdExport(t *testing.T) {
 
 // ensure that black listed addresses are properly set in bank keeper
 func TestBlackListedAddrs(t *testing.T) {
-	db := dnm.NewMemDB()
+	db := dbm.NewMemDB()
 	gapp := NewIrisApp(log.NewTMLogger(log.NewSyncWriter(os.Stdout)), db, nil, true, 0)
 
 	for acc := range maccPerms {
