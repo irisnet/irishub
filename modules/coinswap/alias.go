@@ -5,6 +5,7 @@ import (
 	"github.com/irisnet/irishub/modules/coinswap/internal/types"
 )
 
+// exported constants
 const (
 	ModuleName        = types.ModuleName
 	StoreKey          = types.StoreKey
@@ -24,6 +25,7 @@ const (
 	AttributeValueTokenPair  = types.AttributeValueTokenPair
 )
 
+// exported types
 type (
 	Keeper               = keeper.Keeper
 	MsgSwapOrder         = types.MsgSwapOrder
@@ -33,18 +35,21 @@ type (
 	QueryLiquidityParams = types.QueryLiquidityParams
 	Input                = types.Input
 	Output               = types.Output
-)
-
-var (
-	NewKeeper          = keeper.NewKeeper
-	NewQuerier         = keeper.NewQuerier
-	RegisterCodec      = types.RegisterCodec
-	ErrInvalidDeadline = types.ErrInvalidDeadline
-	ValidateParams     = types.ValidateParams
-	DefaultParams      = types.DefaultParams
+	GenesisState         = types.GenesisState
 )
 
 // exported variables and functions
 var (
+	// functions aliases
 	ModuleCdc = types.ModuleCdc
+
+	// variable aliases
+	NewKeeper           = keeper.NewKeeper
+	NewQuerier          = keeper.NewQuerier
+	RegisterCodec       = types.RegisterCodec
+	ErrInvalidDeadline  = types.ErrInvalidDeadline
+	DefaultParams       = types.DefaultParams
+	NewGenesisState     = types.NewGenesisState
+	DefaultGenesisState = types.DefaultGenesisState
+	ValidateGenesis     = types.ValidateGenesis
 )

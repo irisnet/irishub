@@ -5,14 +5,33 @@ import (
 	"github.com/irisnet/irishub/modules/mint/internal/types"
 )
 
+// exported constants
+
 const (
 	ModuleName        = types.ModuleName
 	DefaultParamspace = types.DefaultParamspace
 	StoreKey          = types.StoreKey
 	QuerierRoute      = types.QuerierRoute
+
+	EventTypeMint                 = types.EventTypeMint
+	AttributeKeyLastInflationTime = types.AttributeKeyLastInflationTime
+	AttributeKeyInflationTime     = types.AttributeKeyInflationTime
+	AttributeKeyMintCoin          = types.AttributeKeyMintCoin
 )
 
+// exported types
+type (
+	Keeper       = keeper.Keeper
+	GenesisState = types.GenesisState
+	Minter       = types.Minter
+	Params       = types.Params
+)
+
+// exported variables and functions
 var (
+	// variable aliases
+	ModuleCdc = types.ModuleCdc
+
 	// functions aliases
 	NewKeeper           = keeper.NewKeeper
 	NewQuerier          = keeper.NewQuerier
@@ -22,14 +41,4 @@ var (
 	RegisterCodec       = types.RegisterCodec
 	DefaultParams       = types.DefaultParams
 	DefaultMinter       = types.DefaultMinter
-
-	// variable aliases
-	ModuleCdc = types.ModuleCdc
-)
-
-type (
-	Keeper       = keeper.Keeper
-	GenesisState = types.GenesisState
-	Minter       = types.Minter
-	Params       = types.Params
 )

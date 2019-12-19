@@ -5,8 +5,6 @@ import (
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-
-	"github.com/irisnet/irishub/modules/htlc/internal/types"
 )
 
 // BeginBlocker handles block beginning logic
@@ -33,8 +31,8 @@ func BeginBlocker(ctx sdk.Context, k Keeper) {
 
 		ctx.EventManager().EmitEvent(
 			sdk.NewEvent(
-				types.EventTypeExpiredHTLC,
-				sdk.NewAttribute(types.AttributeValueHashLock, hex.EncodeToString(hashLock)),
+				EventTypeExpiredHTLC,
+				sdk.NewAttribute(AttributeValueHashLock, hex.EncodeToString(hashLock)),
 			),
 		)
 

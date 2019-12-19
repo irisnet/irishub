@@ -27,8 +27,7 @@ func NewQuerier(k Keeper) sdk.Querier {
 
 func queryRand(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
 	var params types.QueryRandParams
-	err := keeper.cdc.UnmarshalJSON(req.Data, &params)
-	if err != nil {
+	if err := keeper.cdc.UnmarshalJSON(req.Data, &params); err != nil {
 		return nil, sdk.ErrInternal(fmt.Sprintf("failed to parse params: %s", err))
 	}
 
@@ -52,8 +51,7 @@ func queryRand(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, s
 
 func queryRandRequestQueue(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
 	var params types.QueryRandRequestQueueParams
-	err := keeper.cdc.UnmarshalJSON(req.Data, &params)
-	if err != nil {
+	if err := keeper.cdc.UnmarshalJSON(req.Data, &params); err != nil {
 		return nil, sdk.ErrInternal(fmt.Sprintf("failed to parse params: %s", err))
 	}
 

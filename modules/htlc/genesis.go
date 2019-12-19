@@ -5,8 +5,6 @@ import (
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-
-	"github.com/irisnet/irishub/modules/htlc/internal/types"
 )
 
 // InitGenesis stores genesis data
@@ -26,14 +24,13 @@ func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
 func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 	pendingHTLCs := make(map[string]HTLC)
 
-	k.IterateHTLCs(ctx, func(hlock types.HTLCHashLock, h HTLC) (stop bool) {
+	k.IterateHTLCs(ctx, func(hlock HTLCHashLock, h HTLC) (stop bool) {
 		if h.State == OPEN {
 			h.ExpireHeight = h.ExpireHeight - uint64(ctx.BlockHeight()) + 1
 			pendingHTLCs[hex.EncodeToString(hlock)] = h
 		}
 		if h.State == EXPIRED {
-			_, err := k.RefundHTLC(ctx, hlock)
-			if err != nil {
+			if _, err := k.RefundHTLC(ctx, hlock); err != nil {
 				panic(fmt.Errorf("failed to export HTLC genesis state: %s", hex.EncodeToString(hlock)))
 			}
 		}
@@ -42,12 +39,5 @@ func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 
 	return GenesisState{
 		PendingHTLCs: pendingHTLCs,
-	}
-}
-
-// DefaultGenesisState gets the default genesis state
-func DefaultGenesisState() GenesisState {
-	return GenesisState{
-		PendingHTLCs: map[string]HTLC{},
 	}
 }

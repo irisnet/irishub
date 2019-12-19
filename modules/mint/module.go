@@ -4,17 +4,20 @@ import (
 	"encoding/json"
 	"math/rand"
 
+	"github.com/gorilla/mux"
+	"github.com/spf13/cobra"
+
+	abci "github.com/tendermint/tendermint/abci/types"
+
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	sim "github.com/cosmos/cosmos-sdk/x/simulation"
-	"github.com/gorilla/mux"
+
 	"github.com/irisnet/irishub/modules/mint/client/cli"
 	"github.com/irisnet/irishub/modules/mint/client/rest"
 	"github.com/irisnet/irishub/modules/mint/simulation"
-	"github.com/spf13/cobra"
-	abci "github.com/tendermint/tendermint/abci/types"
 )
 
 var (
@@ -25,8 +28,6 @@ var (
 
 // AppModuleBasic defines the basic application module used by the mint module.
 type AppModuleBasic struct{}
-
-var _ module.AppModuleBasic = AppModuleBasic{}
 
 // Name returns the mint module's name.
 func (AppModuleBasic) Name() string {
@@ -47,8 +48,7 @@ func (AppModuleBasic) DefaultGenesis() json.RawMessage {
 // ValidateGenesis performs genesis state validation for the mint module.
 func (AppModuleBasic) ValidateGenesis(bz json.RawMessage) error {
 	var data GenesisState
-	err := ModuleCdc.UnmarshalJSON(bz, &data)
-	if err != nil {
+	if err := ModuleCdc.UnmarshalJSON(bz, &data); err != nil {
 		return err
 	}
 	return ValidateGenesis(data)
@@ -65,7 +65,6 @@ func (AppModuleBasic) GetTxCmd(_ *codec.Codec) *cobra.Command { return nil }
 // GetQueryCmd returns the root query command for the mint module.
 func (AppModuleBasic) GetQueryCmd(cdc *codec.Codec) *cobra.Command {
 	return cli.GetQueryCmd(cdc)
-
 }
 
 //____________________________________________________________________________
@@ -94,7 +93,6 @@ func (AppModuleSimulation) RandomizedParams(r *rand.Rand) []sim.ParamChange {
 type AppModule struct {
 	AppModuleBasic
 	AppModuleSimulation
-
 	keeper Keeper
 }
 

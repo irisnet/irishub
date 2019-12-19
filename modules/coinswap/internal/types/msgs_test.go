@@ -76,7 +76,7 @@ func TestMsgSwapOrderType(t *testing.T) {
 		deadline,
 		true,
 	)
-	require.Equal(t, MsgTypeSwapOrder, msg.Type())
+	require.Equal(t, TypeMsgSwapOrder, msg.Type())
 }
 
 func TestMsgSwapOrderGetSignBytes(t *testing.T) {
@@ -233,7 +233,7 @@ func TestMsgAddLiquidityRoute(t *testing.T) {
 
 func TestMsgAddLiquidityType(t *testing.T) {
 	msg := NewMsgAddLiquidity(input, amt, sdk.OneInt(), deadline, sender)
-	require.Equal(t, MsgTypeAddLiquidity, msg.Type())
+	require.Equal(t, TypeMsgAddLiquidity, msg.Type())
 }
 
 func TestMsgAddLiquidityGetSignBytes(t *testing.T) {
@@ -297,7 +297,7 @@ func TestMsgRemoveLiquidityRoute(t *testing.T) {
 
 func TestMsgRemoveLiquidityType(t *testing.T) {
 	msg := NewMsgRemoveLiquidity(amt, withdrawLiquidity, sdk.OneInt(), deadline, sender)
-	require.Equal(t, MsgTypeRemoveLiquidity, msg.Type())
+	require.Equal(t, TypeMsgRemoveLiquidity, msg.Type())
 }
 
 func TestMsgRemoveLiquidityGetSignBytes(t *testing.T) {

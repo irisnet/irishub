@@ -10,6 +10,7 @@ import (
 	"github.com/irisnet/irishub/modules/guardian/internal/types"
 )
 
+// exported constants
 const (
 	ModuleName       = types.ModuleName
 	DefaultCodespace = types.DefaultCodespace
@@ -21,11 +22,10 @@ const (
 	QueryProfilers   = types.QueryProfilers
 	QueryTrustees    = types.QueryTrustees
 
-	EventTypeAddProfiler    = types.EventTypeAddProfiler
-	EventTypeAddTrustee     = types.EventTypeAddTrustee
-	EventTypeDeleteProfiler = types.EventTypeDeleteProfiler
-	EventTypeDeleteTrustee  = types.EventTypeDeleteTrustee
-
+	EventTypeAddProfiler        = types.EventTypeAddProfiler
+	EventTypeAddTrustee         = types.EventTypeAddTrustee
+	EventTypeDeleteProfiler     = types.EventTypeDeleteProfiler
+	EventTypeDeleteTrustee      = types.EventTypeDeleteTrustee
 	AttributeValueCategory      = types.AttributeValueCategory
 	AttributeKeyProfilerAddress = types.AttributeKeyProfilerAddress
 	AttributeKeyTrusteeAddress  = types.AttributeKeyTrusteeAddress
@@ -33,28 +33,7 @@ const (
 	AttributeKeyDeletedBy       = types.AttributeKeyDeletedBy
 )
 
-var (
-	// functions aliases
-	NewKeeper           = keeper.NewKeeper
-	NewQuerier          = keeper.NewQuerier
-	NewGenesisState     = types.NewGenesisState
-	DefaultGenesisState = types.DefaultGenesisState
-	NewGuardian         = types.NewGuardian
-	RegisterCodec       = types.RegisterCodec
-
-	// variable aliases
-	ModuleCdc = types.ModuleCdc
-
-	// errors aliases
-	ErrInvalidOperator       = types.ErrInvalidOperator
-	ErrProfilerExists        = types.ErrProfilerExists
-	ErrProfilerNotExists     = types.ErrProfilerNotExists
-	ErrTrusteeExists         = types.ErrTrusteeExists
-	ErrTrusteeNotExists      = types.ErrTrusteeNotExists
-	ErrDeleteGenesisProfiler = types.ErrDeleteGenesisProfiler
-	ErrDeleteGenesisTrustee  = types.ErrDeleteGenesisTrustee
-)
-
+// exported types
 type (
 	Keeper            = keeper.Keeper
 	GenesisState      = types.GenesisState
@@ -65,4 +44,27 @@ type (
 	MsgAddTrustee     = types.MsgAddTrustee
 	MsgDeleteProfiler = types.MsgDeleteProfiler
 	MsgDeleteTrustee  = types.MsgDeleteTrustee
+)
+
+// exported variables and functions
+var (
+	// variable aliases
+	ModuleCdc = types.ModuleCdc
+
+	// functions aliases
+	NewKeeper           = keeper.NewKeeper
+	NewQuerier          = keeper.NewQuerier
+	NewGenesisState     = types.NewGenesisState
+	DefaultGenesisState = types.DefaultGenesisState
+	NewGuardian         = types.NewGuardian
+	RegisterCodec       = types.RegisterCodec
+
+	// errors aliases
+	ErrInvalidOperator       = types.ErrInvalidOperator
+	ErrProfilerExists        = types.ErrProfilerExists
+	ErrProfilerNotExists     = types.ErrProfilerNotExists
+	ErrTrusteeExists         = types.ErrTrusteeExists
+	ErrTrusteeNotExists      = types.ErrTrusteeNotExists
+	ErrDeleteGenesisProfiler = types.ErrDeleteGenesisProfiler
+	ErrDeleteGenesisTrustee  = types.ErrDeleteGenesisTrustee
 )

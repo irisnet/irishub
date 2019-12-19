@@ -38,8 +38,7 @@ func SimulateMsgRequestRand(ak types.AccountKeeper, k keeper.Keeper) simulation.
 			simAccount.PrivKey,
 		)
 
-		res := app.Deliver(tx)
-		if !res.IsOK() {
+		if res := app.Deliver(tx); !res.IsOK() {
 			return simulation.NoOpMsg(types.ModuleName), nil, errors.New(res.Log)
 		}
 

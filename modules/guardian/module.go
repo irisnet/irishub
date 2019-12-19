@@ -6,12 +6,14 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/spf13/cobra"
 
+	abci "github.com/tendermint/tendermint/abci/types"
+
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
+
 	"github.com/irisnet/irishub/modules/guardian/client/cli"
-	abci "github.com/tendermint/tendermint/abci/types"
 )
 
 var (
@@ -21,8 +23,6 @@ var (
 
 // AppModuleBasic defines the basic application module used by the guardian module.
 type AppModuleBasic struct{}
-
-var _ module.AppModuleBasic = AppModuleBasic{}
 
 // Name returns the guardian module's name.
 func (AppModuleBasic) Name() string {
@@ -42,11 +42,7 @@ func (AppModuleBasic) DefaultGenesis() json.RawMessage {
 // ValidateGenesis performs genesis state validation for the guardian module.
 func (AppModuleBasic) ValidateGenesis(bz json.RawMessage) error {
 	var data GenesisState
-	err := ModuleCdc.UnmarshalJSON(bz, &data)
-	if err != nil {
-		return err
-	}
-	return nil
+	return ModuleCdc.UnmarshalJSON(bz, &data)
 }
 
 // RegisterRESTRoutes registers the REST routes for the guardian module.
@@ -59,7 +55,7 @@ func (AppModuleBasic) GetTxCmd(cdc *codec.Codec) *cobra.Command {
 
 // GetQueryCmd returns the root query command for the guardian module.
 func (AppModuleBasic) GetQueryCmd(cdc *codec.Codec) *cobra.Command {
-	return cli.GetQueryCmd(StoreKey, cdc)
+	return cli.GetQueryCmd(cdc)
 }
 
 //____________________________________________________________________________

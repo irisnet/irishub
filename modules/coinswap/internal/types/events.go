@@ -6,7 +6,8 @@ const (
 	EventTypeAddLiquidity    = "add_liquidity"
 	EventTypeRemoveLiquidity = "remove_liquidity"
 
-	AttributeValueCategory   = ModuleName
+	AttributeValueCategory = ModuleName
+
 	AttributeValueAmount     = "amount"
 	AttributeValueSender     = "sender"
 	AttributeValueRecipient  = "recipient"

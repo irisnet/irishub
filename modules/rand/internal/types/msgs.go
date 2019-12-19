@@ -39,7 +39,6 @@ func (msg MsgRequestRand) ValidateBasic() sdk.Error {
 	if len(msg.Consumer) == 0 {
 		return ErrInvalidConsumer(DefaultCodespace, "the consumer address must be specified")
 	}
-
 	return nil
 }
 
@@ -49,7 +48,6 @@ func (msg MsgRequestRand) GetSignBytes() []byte {
 	if err != nil {
 		panic(err)
 	}
-
 	return sdk.MustSortJSON(b)
 }
 

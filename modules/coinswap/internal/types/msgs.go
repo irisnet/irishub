@@ -17,9 +17,9 @@ const (
 	FormatUniDenom     = "uni:%s"
 
 	// MsgType
-	MsgTypeAddLiquidity    = "add_liquidity"
-	MsgTypeRemoveLiquidity = "remove_liquidity"
-	MsgTypeSwapOrder       = "swap_order"
+	TypeMsgAddLiquidity    = "add_liquidity"
+	TypeMsgRemoveLiquidity = "remove_liquidity"
+	TypeMsgSwapOrder       = "swap_order"
 )
 
 /* --------------------------------------------------------------------------- */
@@ -67,7 +67,7 @@ func NewMsgSwapOrder(
 func (msg MsgSwapOrder) Route() string { return RouterKey }
 
 // Type Implements Msg.
-func (msg MsgSwapOrder) Type() string { return MsgTypeSwapOrder }
+func (msg MsgSwapOrder) Type() string { return TypeMsgSwapOrder }
 
 // ValidateBasic Implements Msg.
 func (msg MsgSwapOrder) ValidateBasic() sdk.Error {
@@ -139,7 +139,7 @@ func NewMsgAddLiquidity(
 func (msg MsgAddLiquidity) Route() string { return RouterKey }
 
 // Type Implements Msg.
-func (msg MsgAddLiquidity) Type() string { return MsgTypeAddLiquidity }
+func (msg MsgAddLiquidity) Type() string { return TypeMsgAddLiquidity }
 
 // ValidateBasic Implements Msg.
 func (msg MsgAddLiquidity) ValidateBasic() sdk.Error {
@@ -212,7 +212,7 @@ func NewMsgRemoveLiquidity(
 func (msg MsgRemoveLiquidity) Route() string { return RouterKey }
 
 // Type Implements Msg.
-func (msg MsgRemoveLiquidity) Type() string { return MsgTypeRemoveLiquidity }
+func (msg MsgRemoveLiquidity) Type() string { return TypeMsgRemoveLiquidity }
 
 // ValidateBasic Implements Msg.
 func (msg MsgRemoveLiquidity) ValidateBasic() sdk.Error {

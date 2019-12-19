@@ -85,8 +85,7 @@ func addLiquidityHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		msg := types.NewMsgAddLiquidity(sdk.NewCoin(tokenDenom, maxToken), exactStandardAmt, minLiquidity, deadline.Unix(), senderAddress)
-		err = msg.ValidateBasic()
-		if err != nil {
+		if err = msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
@@ -153,8 +152,7 @@ func removeLiquidityHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		msg := types.NewMsgRemoveLiquidity(minToken, sdk.NewCoin(uniDenom, liquidityAmt), minStandard, deadline.Unix(), senderAddress)
-		err := msg.ValidateBasic()
-		if err != nil {
+		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
@@ -207,8 +205,7 @@ func swapOrderHandlerFn(cliCtx context.CLIContext, isBuyOrder bool) http.Handler
 		deadline := status.SyncInfo.LatestBlockTime.Add(duration)
 
 		msg := types.NewMsgSwapOrder(input, output, deadline.Unix(), isBuyOrder)
-		err = msg.ValidateBasic()
-		if err != nil {
+		if err = msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}

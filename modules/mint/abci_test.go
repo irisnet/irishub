@@ -3,14 +3,16 @@ package mint_test
 import (
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
+	abci "github.com/tendermint/tendermint/abci/types"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/distribution"
 	"github.com/cosmos/cosmos-sdk/x/supply"
+
 	"github.com/irisnet/irishub/modules/mint"
-	"github.com/irisnet/irishub/modules/mint/internal/types"
 	"github.com/irisnet/irishub/simapp"
-	"github.com/stretchr/testify/require"
-	abci "github.com/tendermint/tendermint/abci/types"
 )
 
 func TestBeginBlocker(t *testing.T) {
@@ -30,11 +32,11 @@ func createTestApp(isCheckTx bool) (*simapp.SimApp, sdk.Context) {
 	app := simapp.Setup(isCheckTx)
 
 	ctx := app.BaseApp.NewContext(isCheckTx, abci.Header{Height: 2})
-	app.MintKeeper.SetParamSet(ctx, types.Params{
+	app.MintKeeper.SetParamSet(ctx, mint.Params{
 		Inflation: sdk.NewDecWithPrec(4, 2),
-		MintDenom: "iris",
+		MintDenom: sdk.DefaultBondDenom,
 	})
-	app.MintKeeper.SetMinter(ctx, types.DefaultMinter())
+	app.MintKeeper.SetMinter(ctx, mint.DefaultMinter())
 	app.SupplyKeeper.SetSupply(ctx, supply.Supply{})
 	app.DistrKeeper.SetFeePool(ctx, distribution.InitialFeePool())
 	return app, ctx

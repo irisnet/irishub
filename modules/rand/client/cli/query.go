@@ -7,15 +7,32 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
 
-	clienttypes "github.com/irisnet/irishub/modules/rand/client/types"
 	"github.com/irisnet/irishub/modules/rand/internal/types"
 )
 
+// GetQueryCmd returns the cli query commands for this module
+func GetQueryCmd(cdc *codec.Codec) *cobra.Command {
+	// Group rand queries under a subcommand
+	randQueryCmd := &cobra.Command{
+		Use:                        types.ModuleName,
+		Short:                      "Querying commands for the rand module",
+		DisableFlagParsing:         true,
+		SuggestionsMinimumDistance: 2,
+		RunE:                       client.ValidateCmd,
+	}
+	randQueryCmd.AddCommand(client.GetCommands(
+		GetCmdQueryRand(cdc),
+		GetCmdQueryRandRequestQueue(cdc),
+	)...)
+	return randQueryCmd
+}
+
 // GetCmdQueryRand implements the query rand command.
-func GetCmdQueryRand(queryRoute string, cdc *codec.Codec) *cobra.Command {
+func GetCmdQueryRand(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "rand",
 		Short:   "Query a random number by the request id",
@@ -37,19 +54,18 @@ func GetCmdQueryRand(queryRoute string, cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			route := fmt.Sprintf("custom/%s/%s", queryRoute, types.QueryRand)
+			route := fmt.Sprintf("custom/%s/%s", types.QuerierRoute, types.QueryRand)
 			res, _, err := cliCtx.QueryWithData(route, bz)
 			if err != nil {
 				return err
 			}
 
 			var rawRand types.Rand
-			err = cdc.UnmarshalJSON(res, &rawRand)
-			if err != nil {
+			if err = cdc.UnmarshalJSON(res, &rawRand); err != nil {
 				return err
 			}
 
-			readableRand := clienttypes.ReadableRand{
+			readableRand := types.ReadableRand{
 				RequestTxHash: hex.EncodeToString(rawRand.RequestTxHash),
 				Height:        rawRand.Height,
 				Value:         rawRand.Value,
@@ -63,7 +79,7 @@ func GetCmdQueryRand(queryRoute string, cdc *codec.Codec) *cobra.Command {
 }
 
 // GetCmdQueryRandRequestQueue implements the query queue command.
-func GetCmdQueryRandRequestQueue(queryRoute string, cdc *codec.Codec) *cobra.Command {
+func GetCmdQueryRandRequestQueue(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "query-queue",
 		Short:   "Query the random number request queue with an optional height",
@@ -75,8 +91,7 @@ func GetCmdQueryRandRequestQueue(queryRoute string, cdc *codec.Codec) *cobra.Com
 			var err error
 
 			if len(args) > 0 {
-				height, err = strconv.ParseInt(args[0], 10, 64)
-				if err != nil {
+				if height, err = strconv.ParseInt(args[0], 10, 64); err != nil {
 					return err
 				}
 			}
@@ -94,15 +109,14 @@ func GetCmdQueryRandRequestQueue(queryRoute string, cdc *codec.Codec) *cobra.Com
 				return err
 			}
 
-			route := fmt.Sprintf("custom/%s/%s", queryRoute, types.QueryRandRequestQueue)
+			route := fmt.Sprintf("custom/%s/%s", types.QuerierRoute, types.QueryRandRequestQueue)
 			res, _, err := cliCtx.QueryWithData(route, bz)
 			if err != nil {
 				return err
 			}
 
 			var requests types.Requests
-			err = cdc.UnmarshalJSON(res, &requests)
-			if err != nil {
+			if err = cdc.UnmarshalJSON(res, &requests); err != nil {
 				return err
 			}
 

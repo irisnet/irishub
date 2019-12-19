@@ -35,12 +35,19 @@ type GenesisTestSuite struct {
 }
 
 func (suite *GenesisTestSuite) SetupTest() {
-	isCheckTx := false
-	app := simapp.Setup(isCheckTx)
+	app := simapp.Setup(false)
 
 	suite.cdc = app.Codec()
-	suite.ctx = app.BaseApp.NewContext(isCheckTx, abci.Header{})
+	suite.ctx = app.BaseApp.NewContext(false, abci.Header{})
 	suite.keeper = &app.RandKeeper
+}
+
+func TestGenesisSuite(t *testing.T) {
+	suite.Run(t, new(GenesisTestSuite))
+}
+
+func (suite *GenesisTestSuite) TestInitGenesis() {
+	// TODO
 }
 
 func (suite *GenesisTestSuite) TestExportGenesis() {
@@ -72,11 +79,6 @@ func (suite *GenesisTestSuite) TestExportGenesis() {
 	for height, requests := range exportedRequests {
 		h, _ := strconv.ParseInt(height, 10, 64)
 		storedHeight := h + testNewHeight - 1
-
 		suite.Equal(storedRequests[storedHeight], requests)
 	}
-}
-
-func TestGenesisTestSuite(t *testing.T) {
-	suite.Run(t, new(GenesisTestSuite))
 }

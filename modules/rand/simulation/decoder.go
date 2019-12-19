@@ -19,13 +19,11 @@ func DecodeStore(cdc *codec.Codec, kvA, kvB cmn.KVPair) string {
 		cdc.MustUnmarshalBinaryLengthPrefixed(kvA.Value, &randA)
 		cdc.MustUnmarshalBinaryLengthPrefixed(kvB.Value, &randB)
 		return fmt.Sprintf("randA: %v\nrandB: %v", randA, randB)
-
 	case bytes.Equal(kvA.Key[:1], types.PrefixRandRequestQueue):
 		var requestA, requestB types.Request
 		cdc.MustUnmarshalBinaryLengthPrefixed(kvA.Value, &requestA)
 		cdc.MustUnmarshalBinaryLengthPrefixed(kvB.Value, &requestB)
 		return fmt.Sprintf("requestA: %v\nrequestB: %v", requestA, requestB)
-
 	default:
 		panic(fmt.Sprintf("invalid rand key prefix %X", kvA.Key[:1]))
 	}

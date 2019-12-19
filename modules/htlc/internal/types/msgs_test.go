@@ -253,7 +253,6 @@ func TestMsgRefundHTLCValidation(t *testing.T) {
 		t.Run(string(i), func(t *testing.T) {
 			msg := NewMsgRefundHTLC(td.sender, td.hashLock)
 			err := msg.ValidateBasic()
-
 			if td.expectPass {
 				require.Nil(t, msg.ValidateBasic(), "%d: %+v", i, err)
 			} else {

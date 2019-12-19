@@ -35,12 +35,12 @@ func DefaultMinter() Minter {
 	)
 }
 
-func validateMinter(minter Minter) error {
-	if minter.LastUpdate.Before(time.Unix(0, 0)) {
-		return fmt.Errorf("minter last update time(%s) should not be a time before January 1, 1970 UTC", minter.LastUpdate.String())
+func ValidateMinter(m Minter) error {
+	if m.LastUpdate.Before(time.Unix(0, 0)) {
+		return fmt.Errorf("minter last update time(%s) should not be a time before January 1, 1970 UTC", m.LastUpdate.String())
 	}
-	if !minter.InflationBase.GT(sdk.ZeroInt()) {
-		return fmt.Errorf("minter inflation basement (%s) should be positive", minter.InflationBase.String())
+	if !m.InflationBase.GT(sdk.ZeroInt()) {
+		return fmt.Errorf("minter inflation basement (%s) should be positive", m.InflationBase.String())
 	}
 	return nil
 }

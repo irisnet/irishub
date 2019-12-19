@@ -52,6 +52,10 @@ func (suite *TestSuite) SetupTest() {
 	initVars(suite)
 }
 
+func TestGenesisSuite(t *testing.T) {
+	suite.Run(t, new(TestSuite))
+}
+
 func initVars(suite *TestSuite) {
 	senderAddrs = []sdk.AccAddress{sdk.AccAddress([]byte("sender1")), sdk.AccAddress([]byte("sender2"))}
 	receiverAddrs = []sdk.AccAddress{sdk.AccAddress([]byte("receiver1")), sdk.AccAddress([]byte("receiver2"))}
@@ -79,10 +83,6 @@ func initVars(suite *TestSuite) {
 	htlc2 = htlc.NewHTLC(senderAddrs[1], receiverAddrs[1], receiverOnOtherChain, amount, initSecret, timestamps[1], expireHeights[1], state)
 }
 
-func TestKeeperTestSuite(t *testing.T) {
-	suite.Run(t, new(TestSuite))
-}
-
 func (suite *TestSuite) TestInitGenesis() {
 	GenesisState := htlc.GenesisState{
 		PendingHTLCs: map[string]htlc.HTLC{
@@ -91,7 +91,8 @@ func (suite *TestSuite) TestInitGenesis() {
 		},
 	}
 	htlc.InitGenesis(suite.ctx, suite.app.HTLCKeeper, GenesisState)
-	htlc.ValidateGenesis(GenesisState)
+	err := htlc.ValidateGenesis(GenesisState)
+	suite.Nil(err)
 }
 
 func (suite *TestSuite) TestExportGenesis() {

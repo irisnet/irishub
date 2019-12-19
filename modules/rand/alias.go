@@ -5,28 +5,14 @@ import (
 	"github.com/irisnet/irishub/modules/rand/internal/types"
 )
 
-// exported types
-type (
-	MsgRequestRand = types.MsgRequestRand
-	Rand           = types.Rand
-	Request        = types.Request
-	Requests       = types.Requests
-
-	GenesisState = types.GenesisState
-
-	QueryRandParams             = types.QueryRandParams
-	QueryRandRequestQueueParams = types.QueryRandRequestQueueParams
-
-	Keeper = keeper.Keeper
-)
-
 // exported constants
 const (
-	ModuleName       = types.ModuleName
-	StoreKey         = types.StoreKey
-	QuerierRoute     = types.QuerierRoute
-	RouterKey        = types.RouterKey
-	DefaultCodespace = types.DefaultCodespace
+	ModuleName            = types.ModuleName
+	StoreKey              = types.StoreKey
+	QuerierRoute          = types.QuerierRoute
+	RouterKey             = types.RouterKey
+	DefaultCodespace      = types.DefaultCodespace
+	RandPrec              = types.RandPrec
 
 	EventTypeGenerateRand  = types.EventTypeGenerateRand
 	EventTypeRequestRand   = types.EventTypeRequestRand
@@ -36,26 +22,31 @@ const (
 	AttributeValueCategory = types.AttributeValueCategory
 )
 
+// exported types
+type (
+	Keeper                      = keeper.Keeper
+	MsgRequestRand              = types.MsgRequestRand
+	Rand                        = types.Rand
+	Request                     = types.Request
+	Requests                    = types.Requests
+	GenesisState                = types.GenesisState
+	QueryRandParams             = types.QueryRandParams
+	QueryRandRequestQueueParams = types.QueryRandRequestQueueParams
+)
+
 // exported variables and functions
 var (
-	ModuleCdc     = types.ModuleCdc
-	RegisterCodec = types.RegisterCodec
+	// variable aliases
+	ModuleCdc = types.ModuleCdc
 
-	NewMsgRequestRand    = types.NewMsgRequestRand
-	NewRand              = types.NewRand
-	NewRequest           = types.NewRequest
-	MakePRNG             = types.MakePRNG
-	GenerateRequestID    = types.GenerateRequestID
-	CheckReqID           = types.CheckReqID
-	DefaultBlockInterval = types.DefaultBlockInterval
-	RandPrec             = types.RandPrec
-
-	QueryRand             = types.QueryRand
-	QueryRandRequestQueue = types.QueryRandRequestQueue
-
+	// functions aliases
+	RegisterCodec       = types.RegisterCodec
+	NewRand             = types.NewRand
+	NewRequest          = types.NewRequest
+	MakePRNG            = types.MakePRNG
+	GenerateRequestID   = types.GenerateRequestID
 	DefaultGenesisState = types.DefaultGenesisState
 	ValidateGenesis     = types.ValidateGenesis
-
-	NewKeeper  = keeper.NewKeeper
-	NewQuerier = keeper.NewQuerier
+	NewKeeper           = keeper.NewKeeper
+	NewQuerier          = keeper.NewQuerier
 )

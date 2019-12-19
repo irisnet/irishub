@@ -28,13 +28,11 @@ func GetTxCmd(cdc *codec.Codec) *cobra.Command {
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
 	}
-
 	stakingTxCmd.AddCommand(client.PostCommands(
 		GetCmdCreateHTLC(cdc),
 		GetCmdClaimHTLC(cdc),
 		GetCmdRefundHTLC(cdc),
 	)...)
-
 	return stakingTxCmd
 }
 
@@ -86,14 +84,11 @@ func GetCmdCreateHTLC(cdc *codec.Codec) *cobra.Command {
 					if len(secretStr) != 2*types.SecretLength {
 						return fmt.Errorf("length of the secret str must be %d", 2*types.SecretLength)
 					}
-
-					secret, err = hex.DecodeString(secretStr)
-					if err != nil {
+					if secret, err = hex.DecodeString(secretStr); err != nil {
 						return err
 					}
 				} else {
-					_, err := rand.Read(secret)
-					if err != nil {
+					if _, err := rand.Read(secret); err != nil {
 						return err
 					}
 				}
@@ -102,8 +97,14 @@ func GetCmdCreateHTLC(cdc *codec.Codec) *cobra.Command {
 			}
 
 			msg := types.NewMsgCreateHTLC(
-				sender, toAddr, receiverOnOtherChain, amount,
-				hashLock, uint64(timestamp), uint64(timeLock))
+				sender,
+				toAddr,
+				receiverOnOtherChain,
+				amount,
+				hashLock,
+				uint64(timestamp),
+				uint64(timeLock),
+			)
 
 			if err := msg.ValidateBasic(); err != nil {
 				return err
@@ -152,7 +153,6 @@ func GetCmdClaimHTLC(cdc *codec.Codec) *cobra.Command {
 			}
 
 			msg := types.NewMsgClaimHTLC(sender, hashLock, secret)
-
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -187,7 +187,6 @@ func GetCmdRefundHTLC(cdc *codec.Codec) *cobra.Command {
 			}
 
 			msg := types.NewMsgRefundHTLC(sender, hashLock)
-
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}

@@ -4,13 +4,11 @@ import (
 	"encoding/hex"
 	"fmt"
 
-	abci "github.com/tendermint/tendermint/abci/types"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 // BeginBlocker handles block beginning logic for rand
-func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, k Keeper) {
+func BeginBlocker(ctx sdk.Context, k Keeper) {
 	logger := k.Logger(ctx)
 
 	currentTimestamp := ctx.BlockHeader().Time.Unix()

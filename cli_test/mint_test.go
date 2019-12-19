@@ -2,12 +2,15 @@ package clitest
 
 import (
 	"fmt"
+	"testing"
+
+	"github.com/stretchr/testify/require"
+
 	"github.com/cosmos/cosmos-sdk/tests"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/modules/mint"
-	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func TestMintGetParams(t *testing.T) {

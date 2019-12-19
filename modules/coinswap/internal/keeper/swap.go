@@ -15,17 +15,15 @@ func (k Keeper) swapCoins(ctx sdk.Context, sender, recipient sdk.AccAddress, coi
 	}
 
 	poolAddr := types.GetReservePoolAddr(uniDenom)
-	err = k.bk.SendCoins(ctx, sender, poolAddr, sdk.NewCoins(coinSold))
-	if err != nil {
+	if err = k.bk.SendCoins(ctx, sender, poolAddr, sdk.NewCoins(coinSold)); err != nil {
 		return err
 	}
 
 	if recipient.Empty() {
 		recipient = sender
 	}
-	err = k.bk.SendCoins(ctx, poolAddr, recipient, sdk.NewCoins(coinBought))
 
-	return err
+	return k.bk.SendCoins(ctx, poolAddr, recipient, sdk.NewCoins(coinBought))
 }
 
 /**
@@ -77,8 +75,7 @@ func (k Keeper) TradeExactInputForOutput(ctx sdk.Context, input types.Input, out
 		return sdk.ZeroInt(), types.ErrConstraintNotMet(fmt.Sprintf("insufficient amount of %s, user expected: %s, actual: %s", output.Coin.Denom, output.Coin.Amount.String(), boughtTokenAmt.String()))
 	}
 	boughtToken := sdk.NewCoin(output.Coin.Denom, boughtTokenAmt)
-	err = k.swapCoins(ctx, input.Address, output.Address, input.Coin, boughtToken)
-	if err != nil {
+	if err = k.swapCoins(ctx, input.Address, output.Address, input.Coin, boughtToken); err != nil {
 		return sdk.ZeroInt(), err
 	}
 	return boughtTokenAmt, nil
@@ -99,8 +96,7 @@ func (k Keeper) doubleTradeExactInputForOutput(ctx sdk.Context, input types.Inpu
 		return sdk.ZeroInt(), err
 	}
 	standardCoin := sdk.NewCoin(standardDenom, standardAmount)
-	err = k.swapCoins(ctx, input.Address, output.Address, input.Coin, standardCoin)
-	if err != nil {
+	if err = k.swapCoins(ctx, input.Address, output.Address, input.Coin, standardCoin); err != nil {
 		return sdk.ZeroInt(), err
 	}
 
@@ -115,8 +111,7 @@ func (k Keeper) doubleTradeExactInputForOutput(ctx sdk.Context, input types.Inpu
 		return sdk.ZeroInt(), types.ErrConstraintNotMet(fmt.Sprintf("insufficient amount of %s, user expected: %s, actual: %s", output.Coin.Denom, output.Coin.Amount.String(), boughtAmt.String()))
 	}
 
-	err = k.swapCoins(ctx, input.Address, output.Address, standardCoin, boughtToken)
-	if err != nil {
+	if err = k.swapCoins(ctx, input.Address, output.Address, standardCoin, boughtToken); err != nil {
 		return sdk.ZeroInt(), err
 	}
 	return boughtAmt, nil
@@ -174,8 +169,7 @@ func (k Keeper) TradeInputForExactOutput(ctx sdk.Context, input types.Input, out
 		return sdk.ZeroInt(), types.ErrConstraintNotMet(fmt.Sprintf("insufficient amount of %s, user expected: %s, actual: %s", input.Coin.Denom, input.Coin.Amount.String(), soldTokenAmt.String()))
 	}
 	soldToken := sdk.NewCoin(input.Coin.Denom, soldTokenAmt)
-	err = k.swapCoins(ctx, input.Address, output.Address, soldToken, output.Coin)
-	if err != nil {
+	if err = k.swapCoins(ctx, input.Address, output.Address, soldToken, output.Coin); err != nil {
 		return sdk.ZeroInt(), err
 	}
 	return soldTokenAmt, nil
@@ -209,12 +203,10 @@ func (k Keeper) doubleTradeInputForExactOutput(ctx sdk.Context, input types.Inpu
 		return sdk.ZeroInt(), types.ErrConstraintNotMet(fmt.Sprintf("insufficient amount of %s, user expected: %s, actual: %s", input.Coin.Denom, input.Coin.Amount.String(), soldTokenAmt.String()))
 	}
 
-	err = k.swapCoins(ctx, input.Address, output.Address, soldTokenCoin, soldStandardCoin)
-	if err != nil {
+	if err = k.swapCoins(ctx, input.Address, output.Address, soldTokenCoin, soldStandardCoin); err != nil {
 		return sdk.ZeroInt(), err
 	}
-	err = k.swapCoins(ctx, input.Address, output.Address, soldStandardCoin, output.Coin)
-	if err != nil {
+	if err = k.swapCoins(ctx, input.Address, output.Address, soldStandardCoin, output.Coin); err != nil {
 		return sdk.ZeroInt(), err
 	}
 	return soldTokenAmt, nil
