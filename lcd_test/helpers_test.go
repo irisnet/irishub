@@ -9,6 +9,11 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/spf13/viper"
+	"github.com/stretchr/testify/require"
+
+	ctypes "github.com/tendermint/tendermint/rpc/core/types"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	clientkeys "github.com/cosmos/cosmos-sdk/client/keys"
 	"github.com/cosmos/cosmos-sdk/client/rpc"
@@ -31,26 +36,18 @@ import (
 	slashingrest "github.com/cosmos/cosmos-sdk/x/slashing/client/rest"
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	stakingrest "github.com/cosmos/cosmos-sdk/x/staking/client/rest"
-
-	"github.com/spf13/viper"
-	"github.com/stretchr/testify/require"
-	ctypes "github.com/tendermint/tendermint/rpc/core/types"
 )
 
 // Request makes a test LCD test request. It returns a response object and a
 // stringified response body.
 func Request(t *testing.T, port, method, path string, payload []byte) (*http.Response, string) {
-	var (
-		err error
-		res *http.Response
-	)
 	url := fmt.Sprintf("http://localhost:%v%v", port, path)
 	fmt.Printf("REQUEST %s %s\n", method, url)
 
 	req, err := http.NewRequest(method, url, bytes.NewBuffer(payload))
 	require.Nil(t, err)
 
-	res, err = http.DefaultClient.Do(req)
+	res, err := http.DefaultClient.Do(req)
 	require.Nil(t, err)
 
 	output, err := ioutil.ReadAll(res.Body)
@@ -889,7 +886,6 @@ func doDeposit(
 	t *testing.T, port, seed, name, pwd string, proposerAddr sdk.AccAddress,
 	proposalID uint64, amount sdk.Int, fees sdk.Coins,
 ) sdk.TxResponse {
-
 	acc := getAccount(t, port, proposerAddr)
 	accnum := acc.GetAccountNumber()
 	sequence := acc.GetSequence()

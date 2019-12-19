@@ -361,11 +361,7 @@ func TestValidatorsQuery(t *testing.T) {
 	require.Equal(t, 1, len(validators), fmt.Sprintf("%+v", validators))
 
 	// make sure all the validators were found (order unknown because sorted by operator addr)
-	foundVal := false
-
-	if validators[0].ConsPubKey == valPubKeys[0] {
-		foundVal = true
-	}
+	foundVal := validators[0].ConsPubKey == valPubKeys[0]
 
 	require.True(t, foundVal, "pk %v, operator %v", operAddrs[0], validators[0].OperatorAddress)
 }

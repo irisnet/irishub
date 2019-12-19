@@ -5,6 +5,12 @@ import (
 	"os"
 	"path"
 
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+
+	"github.com/tendermint/go-amino"
+	"github.com/tendermint/tendermint/libs/cli"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/keys"
 	"github.com/cosmos/cosmos-sdk/client/lcd"
@@ -16,10 +22,6 @@ import (
 	authrest "github.com/cosmos/cosmos-sdk/x/auth/client/rest"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	bankcmd "github.com/cosmos/cosmos-sdk/x/bank/client/cli"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
-	"github.com/tendermint/go-amino"
-	"github.com/tendermint/tendermint/libs/cli"
 
 	"github.com/irisnet/irishub/app"
 	iconfig "github.com/irisnet/irishub/config"
@@ -73,8 +75,7 @@ func main() {
 	// Add flags and prefix all env exposed with GA
 	executor := cli.PrepareMainCmd(rootCmd, "GA", app.DefaultCLIHome)
 
-	err := executor.Execute()
-	if err != nil {
+	if err := executor.Execute(); err != nil {
 		fmt.Printf("Failed executing CLI command: %s, exiting...\n", err)
 		os.Exit(1)
 	}

@@ -4,6 +4,15 @@ import (
 	"encoding/json"
 	"io"
 
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+
+	abci "github.com/tendermint/tendermint/abci/types"
+	"github.com/tendermint/tendermint/libs/cli"
+	"github.com/tendermint/tendermint/libs/log"
+	tmtypes "github.com/tendermint/tendermint/types"
+	dbm "github.com/tendermint/tm-db"
+
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/server"
@@ -12,13 +21,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
 	"github.com/cosmos/cosmos-sdk/x/staking"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
-	abci "github.com/tendermint/tendermint/abci/types"
-	"github.com/tendermint/tendermint/libs/cli"
-	"github.com/tendermint/tendermint/libs/log"
-	tmtypes "github.com/tendermint/tendermint/types"
-	dbm "github.com/tendermint/tm-db"
 
 	"github.com/irisnet/irishub/app"
 	iconfig "github.com/irisnet/irishub/config"
@@ -67,8 +69,7 @@ func main() {
 	executor := cli.PrepareBaseCmd(rootCmd, "GA", app.DefaultNodeHome)
 	rootCmd.PersistentFlags().UintVar(&invCheckPeriod, flagInvCheckPeriod,
 		0, "Assert registered invariants every N blocks")
-	err := executor.Execute()
-	if err != nil {
+	if err := executor.Execute(); err != nil {
 		panic(err)
 	}
 }
@@ -96,8 +97,7 @@ func exportAppStateAndTMValidators(
 
 	if height != -1 {
 		gapp := app.NewIrisApp(logger, db, traceStore, false, uint(1))
-		err := gapp.LoadHeight(height)
-		if err != nil {
+		if err := gapp.LoadHeight(height); err != nil {
 			return nil, nil, err
 		}
 		return gapp.ExportAppStateAndValidators(forZeroHeight, jailWhiteList)

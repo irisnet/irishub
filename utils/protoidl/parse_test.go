@@ -61,11 +61,11 @@ func TestGetMethods(t *testing.T) {
 		methods, err := GetMethods(tc.content)
 		if !tc.expectPass {
 			assert.Error(t, err)
-			return
+		} else {
+			assert.NoError(t, err)
+			require.Len(t, methods, tc.methodNumber)
+			require.Equal(t, methods[0].Name, "SayHello")
+			require.Equal(t, methods[0].Attributes, map[string]string{"description": "sayHello", "output_cached": "NoCached", "output_privacy": "NoPrivacy"})
 		}
-		assert.NoError(t, err)
-		require.Len(t, methods, tc.methodNumber)
-		require.Equal(t, methods[0].Name, "SayHello")
-		require.Equal(t, methods[0].Attributes, map[string]string{"description": "sayHello", "output_cached": "NoCached", "output_privacy": "NoPrivacy"})
 	}
 }

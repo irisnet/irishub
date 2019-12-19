@@ -13,7 +13,7 @@ func BeginBlocker(ctx sdk.Context, k Keeper) {
 
 	currentTimestamp := ctx.BlockHeader().Time.Unix()
 	preBlockHeight := ctx.BlockHeight() - 1
-	preBlockHash := []byte(ctx.BlockHeader().LastBlockId.Hash)
+	preBlockHash := ctx.BlockHeader().LastBlockId.Hash
 
 	// get pending random number requests for lastBlockHeight
 	iterator := k.IterateRandRequestQueueByHeight(ctx, preBlockHeight)

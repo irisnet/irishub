@@ -248,11 +248,10 @@ func InitTestnet(cmd *cobra.Command, config *tmconfig.Config, cdc *codec.Codec,
 		return err
 	}
 
-	err := collectGenFiles(
+	if err := collectGenFiles(
 		cdc, config, chainID, monikers, nodeIDs, valPubKeys, numValidators,
 		outputDir, nodeDirPrefix, nodeDaemonHome, genAccIterator,
-	)
-	if err != nil {
+	); err != nil {
 		return err
 	}
 
@@ -385,15 +384,9 @@ func writeFile(name string, dir string, contents []byte) error {
 	writePath := filepath.Join(dir)
 	file := filepath.Join(writePath, name)
 
-	err := cmn.EnsureDir(writePath, 0700)
-	if err != nil {
+	if err := cmn.EnsureDir(writePath, 0700); err != nil {
 		return err
 	}
 
-	err = cmn.WriteFile(file, contents, 0600)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return cmn.WriteFile(file, contents, 0600)
 }

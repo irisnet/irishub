@@ -93,8 +93,7 @@ func AddTestAddrs(app *SimApp, ctx sdk.Context, accNum int, accAmt sdk.Int) []sd
 
 	// fill all the addresses with some coins, set the loose pool tokens simultaneously
 	for _, addr := range testAddrs {
-		_, err := app.BankKeeper.AddCoins(ctx, addr, initCoins)
-		if err != nil {
+		if _, err := app.BankKeeper.AddCoins(ctx, addr, initCoins); err != nil {
 			panic(err)
 		}
 	}
