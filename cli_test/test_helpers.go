@@ -815,11 +815,11 @@ func AddGuardianAddr(cdc *codec.Codec, genDoc *tmtypes.GenesisDoc) {
 	cdc.MustUnmarshalJSON(guardianDataBz, &guardianGenState)
 
 	var guardianAddr = authGenState.Accounts[0].GetAddress()
-	for i, _ := range guardianGenState.Profilers {
+	for i := range guardianGenState.Profilers {
 		guardianGenState.Profilers[i].Address = guardianAddr
 		guardianGenState.Profilers[i].AddedBy = guardianAddr
 	}
-	for i, _ := range guardianGenState.Trustees {
+	for i := range guardianGenState.Trustees {
 		guardianGenState.Trustees[i].Address = guardianAddr
 		guardianGenState.Trustees[i].AddedBy = guardianAddr
 	}

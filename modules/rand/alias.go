@@ -7,12 +7,12 @@ import (
 
 // exported constants
 const (
-	ModuleName            = types.ModuleName
-	StoreKey              = types.StoreKey
-	QuerierRoute          = types.QuerierRoute
-	RouterKey             = types.RouterKey
-	DefaultCodespace      = types.DefaultCodespace
-	RandPrec              = types.RandPrec
+	ModuleName       = types.ModuleName
+	StoreKey         = types.StoreKey
+	QuerierRoute     = types.QuerierRoute
+	RouterKey        = types.RouterKey
+	DefaultCodespace = types.DefaultCodespace
+	RandPrec         = types.RandPrec
 
 	EventTypeGenerateRand  = types.EventTypeGenerateRand
 	EventTypeRequestRand   = types.EventTypeRequestRand
