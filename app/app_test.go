@@ -11,7 +11,8 @@ import (
 	dnm "github.com/tendermint/tm-db"
 
 	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/cosmos/cosmos-sdk/simapp"
+
+	"github.com/irisnet/irishub/simapp"
 )
 
 func TestIrisdExport(t *testing.T) {

@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
 	iristypes "github.com/irisnet/irishub/types"
 )
 

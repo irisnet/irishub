@@ -1,30 +1,31 @@
-package service
+package types
 
 import (
 	"encoding/json"
 	"fmt"
-
-	sdk "github.com/irisnet/irishub/types"
-	"github.com/pkg/errors"
 	"time"
+
+	"github.com/pkg/errors"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 type SvcBinding struct {
-	DefName     string         `json:"def_name"`
-	DefChainID  string         `json:"def_chain_id"`
-	BindChainID string         `json:"bind_chain_id"`
-	Provider    sdk.AccAddress `json:"provider"`
-	BindingType BindingType    `json:"binding_type"`
-	Deposit     sdk.Coins      `json:"deposit"`
-	Prices      []sdk.Coin     `json:"price"`
-	Level       Level          `json:"level"`
-	Available   bool           `json:"available"`
-	DisableTime time.Time      `json:"disable_time"`
+	DefName     string         `json:"def_name" yaml:"def_name"`
+	DefChainID  string         `json:"def_chain_id" yaml:"def_chain_id"`
+	BindChainID string         `json:"bind_chain_id" yaml:"bind_chain_id"`
+	Provider    sdk.AccAddress `json:"provider" yaml:"provider"`
+	BindingType BindingType    `json:"binding_type" yaml:"binding_type"`
+	Deposit     sdk.Coins      `json:"deposit" yaml:"deposit"`
+	Prices      []sdk.Coin     `json:"price" yaml:"price"`
+	Level       Level          `json:"level" yaml:"level"`
+	Available   bool           `json:"available" yaml:"available"`
+	DisableTime time.Time      `json:"disable_time" yaml:"disable_time"`
 }
 
 type Level struct {
-	AvgRspTime int64 `json:"avg_rsp_time"`
-	UsableTime int64 `json:"usable_time"`
+	AvgRspTime int64 `json:"avg_rsp_time" yaml:"avg_rsp_time"`
+	UsableTime int64 `json:"usable_time" yaml:"usable_time"`
 }
 
 // NewSvcBinding returns a new SvcBinding with the provided values.

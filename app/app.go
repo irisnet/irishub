@@ -35,6 +35,7 @@ import (
 	"github.com/irisnet/irishub/modules/htlc"
 	"github.com/irisnet/irishub/modules/mint"
 	"github.com/irisnet/irishub/modules/rand"
+	"github.com/irisnet/irishub/modules/service"
 )
 
 const appName = "IrisApp"
@@ -66,6 +67,7 @@ var (
 		htlc.AppModuleBasic{},
 		coinswap.AppModuleBasic{},
 		rand.AppModuleBasic{},
+		service.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -79,6 +81,9 @@ var (
 		asset.ModuleName:          {supply.Minter, supply.Burner},
 		htlc.ModuleName:           nil,
 		coinswap.ModuleName:       {supply.Minter, supply.Burner},
+		service.DepositAccName:    {supply.Burner},
+		service.RequestAccName:    nil,
+		service.TaxAccName:        nil,
 	}
 )
 
@@ -124,6 +129,7 @@ type IrisApp struct {
 	htlcKeeper     htlc.Keeper
 	coinswapKeeper coinswap.Keeper
 	randKeeper     rand.Keeper
+	serviceKeeper  service.Keeper
 
 	// the module manager
 	mm *module.Manager
@@ -146,7 +152,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 		bam.MainStoreKey, auth.StoreKey, staking.StoreKey, supply.StoreKey,
 		mint.StoreKey, distr.StoreKey, slashing.StoreKey, gov.StoreKey,
 		params.StoreKey, evidence.StoreKey, asset.StoreKey, guardian.StoreKey,
-		htlc.StoreKey, coinswap.StoreKey, rand.StoreKey,
+		htlc.StoreKey, coinswap.StoreKey, rand.StoreKey, service.StoreKey,
 	)
 	tKeys := sdk.NewTransientStoreKeys(staking.TStoreKey, params.TStoreKey)
 
@@ -171,6 +177,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 	evidenceSubspace := app.paramsKeeper.Subspace(evidence.DefaultParamspace)
 	assetSubspace := app.paramsKeeper.Subspace(asset.DefaultParamspace)
 	coinswapSubspace := app.paramsKeeper.Subspace(coinswap.DefaultParamspace)
+	serviceSubspace := app.paramsKeeper.Subspace(service.DefaultParamspace)
 
 	// add keepers
 	app.accountKeeper = auth.NewAccountKeeper(app.cdc, keys[auth.StoreKey], authSubspace, auth.ProtoBaseAccount)
@@ -231,6 +238,11 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 
 	app.randKeeper = rand.NewKeeper(app.cdc, keys[rand.StoreKey], rand.DefaultCodespace)
 
+	app.serviceKeeper = service.NewKeeper(
+		app.cdc, keys[service.StoreKey], app.supplyKeeper, app.guardianKeeper,
+		service.DefaultCodespace, serviceSubspace,
+	)
+
 	// NOTE: Any module instantiated in the module manager that is later modified
 	// must be passed by reference here.
 	app.mm = module.NewManager(
@@ -250,6 +262,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 		htlc.NewAppModule(app.htlcKeeper),
 		coinswap.NewAppModule(app.coinswapKeeper),
 		rand.NewAppModule(app.randKeeper),
+		service.NewAppModule(app.serviceKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -267,16 +280,17 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 		crisis.ModuleName,
 		gov.ModuleName,
 		staking.ModuleName,
+		service.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
 	// properly initialized with tokens from genesis accounts.
 	app.mm.SetOrderInitGenesis(
 		distr.ModuleName, staking.ModuleName, auth.ModuleName, bank.ModuleName,
-		slashing.ModuleName, gov.ModuleName, mint.ModuleName, supply.ModuleName,
-		crisis.ModuleName, genutil.ModuleName, evidence.ModuleName,
+		slashing.ModuleName, gov.ModuleName, mint.ModuleName,
 		asset.ModuleName, guardian.ModuleName, htlc.ModuleName,
-		coinswap.ModuleName, rand.ModuleName,
+		coinswap.ModuleName, rand.ModuleName, service.ModuleName,
+		supply.ModuleName, crisis.ModuleName, genutil.ModuleName, evidence.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.crisisKeeper)
@@ -299,6 +313,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 		htlc.NewAppModule(app.htlcKeeper),
 		coinswap.NewAppModule(app.coinswapKeeper),
 		rand.NewAppModule(app.randKeeper),
+		service.NewAppModule(app.serviceKeeper),
 	)
 
 	app.sm.RegisterStoreDecoders()
