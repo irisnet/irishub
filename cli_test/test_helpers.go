@@ -32,7 +32,6 @@ import (
 	"github.com/irisnet/irishub/app"
 	iconfig "github.com/irisnet/irishub/config"
 	"github.com/irisnet/irishub/modules/guardian"
-	"github.com/irisnet/irishub/modules/service"
 )
 
 const (
@@ -45,8 +44,6 @@ const (
 	keyBaz       = "baz"
 	keyVesting   = "vesting"
 	keyFooBarBaz = "foobarbaz"
-
-	serviceDenom = service.ServiceDenom
 )
 
 var (
@@ -56,7 +53,6 @@ var (
 		sdk.NewCoin(fee2Denom, sdk.TokensFromConsensusPower(2000000)),
 		sdk.NewCoin(feeDenom, sdk.TokensFromConsensusPower(2000000)),
 		sdk.NewCoin(fooDenom, sdk.TokensFromConsensusPower(2000)),
-		sdk.NewCoin(serviceDenom, sdk.TokensFromConsensusPower(2000)),
 		sdk.NewCoin(denom, sdk.TokensFromConsensusPower(300).Add(mintPerBlock)), // add coins from inflation
 	)
 
@@ -64,7 +60,6 @@ var (
 		sdk.NewCoin(fee2Denom, sdk.TokensFromConsensusPower(1000000)),
 		sdk.NewCoin(feeDenom, sdk.TokensFromConsensusPower(1000000)),
 		sdk.NewCoin(fooDenom, sdk.TokensFromConsensusPower(1000)),
-		sdk.NewCoin(serviceDenom, sdk.TokensFromConsensusPower(1000)),
 		sdk.NewCoin(denom, sdk.TokensFromConsensusPower(150)),
 	)
 

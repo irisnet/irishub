@@ -4,21 +4,43 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/tests"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/stretchr/testify/require"
-
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/modules/service"
+	"github.com/stretchr/testify/require"
+	tmtypes "github.com/tendermint/tendermint/types"
 )
 
 func TestIrisCLIService(t *testing.T) {
 	t.Parallel()
-
 	f := InitFixtures(t)
+
+	cdc := app.MakeCodec()
+
+	serviceFeeTax := sdk.NewDecWithPrec(1, 1) // 10%
+	maxRequestTimeout := int64(2)
+
+	// Update service params for test
+	genesisState := f.GenesisState()
+	var serviceData service.GenesisState
+	err := cdc.UnmarshalJSON(genesisState[service.ModuleName], &serviceData)
+	require.NoError(t, err)
+	serviceData.Params.ServiceFeeTax = serviceFeeTax
+	serviceData.Params.MaxRequestTimeout = maxRequestTimeout
+	serviceDataBz, err := cdc.MarshalJSON(serviceData)
+	require.NoError(t, err)
+	genesisState[service.ModuleName] = serviceDataBz
+
+	genFile := filepath.Join(f.IrisdHome, "config", "genesis.json")
+	genDoc, err := tmtypes.GenesisDocFromFile(genFile)
+	require.NoError(t, err)
+	genDoc.AppState, err = cdc.MarshalJSON(genesisState)
+	require.NoError(t, genDoc.SaveAs(genFile))
 
 	proc := f.GDStart()
 	defer proc.Stop(false)
@@ -27,41 +49,48 @@ func TestIrisCLIService(t *testing.T) {
 	tests.WaitForNextNBlocksTM(2, f.Port)
 
 	fooAddr := f.KeyAddress(keyFoo)
+	barAddr := f.KeyAddress(keyBar)
+
+	sendTokens := sdk.TokensFromConsensusPower(10)
+	f.TxSend(keyFoo, barAddr, sdk.NewCoin(denom, sendTokens), "-y")
+	tests.WaitForNextNBlocksTM(1, f.Port)
 
 	fooAcc := f.QueryAccount(fooAddr)
 	fooCoinAmt := fooAcc.Coins.AmountOf(sdk.DefaultBondDenom).String()
-	require.Equal(t, "50000000", fooCoinAmt)
+	require.Equal(t, "40000000", fooCoinAmt)
+
+	barAcc := f.QueryAccount(barAddr)
+	barCoinAmt := barAcc.Coins.AmountOf(sdk.DefaultBondDenom).String()
+	require.Equal(t, "10000000", barCoinAmt)
 
 	// testing variables
-
 	chainID := f.ChainID
 	serviceName := "test-service"
 	serviceDesc := "test-description"
 	serviceAuthorDesc := "test-author-description"
 	serviceTags := "tags1,tags2"
-	serviceIDLContent := "0x"
+	serviceIDLContent := idlContent
 	serviceFileName := f.IriscliHome + string(os.PathSeparator) + "test.proto"
+	serviceDenom := sdk.DefaultBondDenom
 
-	serviceDeposit := fmt.Sprintf("50000%s", service.ServiceDenom)
-	// servicePrices := fmt.Sprintf("50%s", service.ServiceDenom)
-	servicePrices :=  ""
+	serviceDeposit := fmt.Sprintf("50000%s", serviceDenom)
+	servicePrices := fmt.Sprintf("50%s", serviceDenom)
 	bindingType := "Local"
 	avgRspTime := int64(10000)
 	usableTime := int64(9999)
 
-	// reqMethodID := int16(0)
-	// reqServiceFees := fmt.Sprintf("50%s", service.ServiceDenom)
-	// reqInput := "0x"
-	// respOutput := "0x"
+	reqMethodID := int16(1)
+	reqServiceFees := fmt.Sprintf("50%s", serviceDenom)
+	reqInput := "AB"
+	respOutput := "CD"
 
 	author := fooAddr.String()
-        // consumer := fooAddr.String()
 	provider := fooAddr.String()
+	consumer := barAddr.String()
 
-	// TODO
-	// guardianAddr := ""
-	// taxWithdrawAddr := ""
-	// taxWithdrawAmt := fmt.Sprintf("0.5%s", service.ServiceDenom)
+	guardianAddr := fooAddr
+	taxWithdrawAddr := barAddr
+	taxWithdrawAmt := fmt.Sprintf("5%s", serviceDenom)
 
 	// define service
 
@@ -71,18 +100,17 @@ func TestIrisCLIService(t *testing.T) {
 	success, _, _ := f.TxServiceDefine(serviceName, serviceDesc, serviceTags, serviceAuthorDesc, serviceIDLContent, serviceFileName, author, "-y")
 	require.True(t, success)
 
-	tests.WaitForNextNBlocksTM(2, f.Port)
+	tests.WaitForNextNBlocksTM(1, f.Port)
 
 	svcDefOutput := f.QueryServiceDefinition(chainID, serviceName)
 	require.Equal(t, serviceName, svcDefOutput.Definition.Name)
 	require.Equal(t, chainID, svcDefOutput.Definition.ChainId)
 
 	// bind service
-
 	success, _, _ = f.TxServiceBind(chainID, serviceName, bindingType, serviceDeposit, servicePrices, avgRspTime, usableTime, provider, "-y")
 	require.True(t, success)
 
-	tests.WaitForNextNBlocksTM(2, f.Port)
+	tests.WaitForNextNBlocksTM(1, f.Port)
 
 	binding := f.QueryServiceBinding(chainID, serviceName, chainID, provider)
 	require.Equal(t, serviceName, binding.DefName)
@@ -98,7 +126,7 @@ func TestIrisCLIService(t *testing.T) {
 	success, _, _ = f.TxServiceDisable(chainID, serviceName, provider, "-y")
 	require.True(t, success)
 
-	tests.WaitForNextNBlocksTM(2, f.Port)
+	tests.WaitForNextNBlocksTM(1, f.Port)
 
 	binding = f.QueryServiceBinding(chainID, serviceName, chainID, provider)
 	require.Equal(t, false, binding.Available)
@@ -107,68 +135,102 @@ func TestIrisCLIService(t *testing.T) {
 	success, _, _ = f.TxServiceRefundDeposit(chainID, serviceName, provider, "-y")
 	require.True(t, success)
 
-	tests.WaitForNextNBlocksTM(2, f.Port)
+	tests.WaitForNextNBlocksTM(1, f.Port)
 
 	binding = f.QueryServiceBinding(chainID, serviceName, chainID, provider)
 	require.Equal(t, serviceDeposit, binding.Deposit.String())
 
-	// TODO
+	// enable service binding
+	success, _, _ = f.TxServiceEnable(chainID, serviceName, serviceDeposit, provider, "-y")
+	require.True(t, success)
+
+	tests.WaitForNextNBlocksTM(1, f.Port)
+
+	binding = f.QueryServiceBinding(chainID, serviceName, chainID, provider)
+	require.Equal(t, true, binding.Available)
 
 	// service call
-	// success, _, _ = f.TxServiceCall(chainID, serviceName, chainID, provider, reqMethodID, reqInput, reqServiceFees, consumer, "-y")
-	// require.True(t, success)
+	success, _, _ = f.TxServiceCall(chainID, serviceName, chainID, provider, reqMethodID, reqInput, reqServiceFees, consumer, "-y")
+	require.True(t, success)
 
-	// tests.WaitForNextNBlocksTM(2, f.Port)
+	tests.WaitForNextNBlocksTM(1, f.Port)
 
-	// TODO
-	// reqID := ""
+	// QueryTxs
+	searchResult := f.QueryTxs(1, 50, "message.action:call_service", fmt.Sprintf("message.sender:%s", consumer))
+	require.Len(t, searchResult.Txs, 1)
 
-	// requests := f.QueryServiceRequests(chainID, serviceName, chainID, consumer)
-	// require.Equal(t, 1, len(requests))
-	// require.Equal(t, reqID, requests[0].RequestID())
-	// require.Equal(t, consumer, requests[0].Consumer)
-	// require.Equal(t, provider, requests[0].Provider)
+	events := searchResult.Txs[0].Events
+	var reqID string
+	for _, e := range events {
+		for _, attribute := range e.Attributes {
+			if attribute.Key == service.AttributeKeyRequestID {
+				reqID = attribute.Value
+				break
+			}
+		}
+	}
+	require.NotEmpty(t, reqID)
+	requests := f.QueryServiceRequests(chainID, serviceName, chainID, provider)
+	require.Equal(t, 1, len(requests))
+	require.Equal(t, reqID, requests[0].RequestID())
+	require.Equal(t, consumer, requests[0].Consumer.String())
+	require.Equal(t, provider, requests[0].Provider.String())
 
 	// respond service request
-	// success, _, _ = f.TxServiceRespond(chainID, reqID, respOutput, provider, "-y")
-	// require.True(t, success)
+	success, _, _ = f.TxServiceRespond(chainID, reqID, respOutput, provider, "-y")
+	require.True(t, success)
 
-	// tests.WaitForNextNBlocksTM(2, f.Port)
+	tests.WaitForNextNBlocksTM(1, f.Port)
 
 	// query fees
-	// fees := f.QueryServiceFees(provider)
-	// require.Nil(t, fees.ReturnedFee)
-	// require.Equal(t, "", fees.IncomingFee)
+	fees := f.QueryServiceFees(provider)
+	require.Nil(t, fees.ReturnedFee)
+	require.Equal(t, "45stake", fees.IncomingFee.String()) // servicePrices * (1-serviceFeeTax)
 
-	// fees = f.QueryServiceFees(consumer)
-	// require.Nil(t, fees.IncomingFee)
-	// require.Equal(t, "", fees.ReturnedFee)
-
-	// refund fees
-	// success, _, _ = f.TxServiceRefundFees(consumer, "-y")
-	// require.True(t, success)
-
-	// tests.WaitForNextNBlocksTM(2, f.Port)
-
-	// fees = f.QueryServiceFees(consumer)
-	// require.Nil(t, fees.IncomingFee)
-	// require.Equal(t, "", fees.ReturnedFee)
+	fees = f.QueryServiceFees(consumer)
+	require.Nil(t, fees.IncomingFee)
+	require.Nil(t, fees.ReturnedFee)
 
 	// withdraw fees
-	// success, _, _ = f.TxServiceWithdrawFees(provider, "-y")
-	// require.True(t, success)
+	success, _, _ = f.TxServiceWithdrawFees(provider, "-y")
+	require.True(t, success)
 
-	// tests.WaitForNextNBlocksTM(2, f.Port)
+	tests.WaitForNextNBlocksTM(1, f.Port)
 
-	// fees = f.QueryServiceFees(provider)
-	// require.Nil(t, fees.ReturnedFee)
-	// require.Equal(t, "", fees.IncomingFee)
+	fees = f.QueryServiceFees(provider)
+	require.Nil(t, fees.ReturnedFee)
+	require.Nil(t, fees.IncomingFee)
+
+	// service call but does not respond
+	success, _, _ = f.TxServiceCall(chainID, serviceName, chainID, provider, reqMethodID, reqInput, reqServiceFees, consumer, "-y")
+	require.True(t, success)
+
+	tests.WaitForNextNBlocksTM(maxRequestTimeout+1, f.Port)
+
+	// query fees
+	fees = f.QueryServiceFees(provider)
+	require.Nil(t, fees.IncomingFee)
+	require.Nil(t, fees.ReturnedFee)
+
+	fees = f.QueryServiceFees(consumer)
+	require.Equal(t, servicePrices, fees.ReturnedFee.String())
+	require.Nil(t, fees.IncomingFee)
+
+	// refund fees
+	success, _, _ = f.TxServiceRefundFees(consumer, "-y")
+	require.True(t, success)
+
+	tests.WaitForNextNBlocksTM(1, f.Port)
+
+	fees = f.QueryServiceFees(consumer)
+	require.Nil(t, fees.IncomingFee)
+	require.Nil(t, fees.ReturnedFee)
 
 	// withdraw tax
-	// success, _, _ = f.TxServiceWithdrawTax(taxWithdrawAddr, taxWithdrawAmt, guardianAddr, "-y")
-	// require.True(t, success)
+	success, _, _ = f.TxServiceWithdrawTax(taxWithdrawAmt, taxWithdrawAddr, guardianAddr, "-y")
+	require.True(t, success)
 
-	// tests.WaitForNextNBlocksTM(2, f.Port)
+	tests.WaitForNextNBlocksTM(1, f.Port)
 }
 
 // TxServiceDefine is iriscli tx service define
@@ -201,9 +263,15 @@ func (f *Fixtures) TxServiceDisable(defChainID, serviceName, from string, flags 
 	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), client.DefaultKeyPass)
 }
 
+// TxServiceEnable is iriscli tx service enable
+func (f *Fixtures) TxServiceEnable(defChainID, serviceName, deposit, from string, flags ...string) (bool, string, string) {
+	cmd := fmt.Sprintf("%s tx service enable --def-chain-id %s --service-name %s --deposit %s --from=%s %v", f.IriscliBinary, defChainID, serviceName, deposit, from, f.Flags())
+	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), client.DefaultKeyPass)
+}
+
 // TxServiceCall is iriscli tx service call
 func (f *Fixtures) TxServiceCall(defChainID, serviceName, bindChainID, provider string, methodID int16, requestData, serviceFees, from string, flags ...string) (bool, string, string) {
-	cmd := fmt.Sprintf("%s tx service call --def-chain-id %s --service-name %s --bind-chain-id %s --provider %s --method-id %d --request-data %s --service-fees %s --from=%s %v", f.IriscliBinary, defChainID, serviceName, bindChainID, provider, methodID, requestData, serviceFees, from, f.Flags())
+	cmd := fmt.Sprintf("%s tx service call --def-chain-id %s --service-name %s --bind-chain-id %s --provider %s --method-id %d --request-data %s --service-fee %s --from=%s %v", f.IriscliBinary, defChainID, serviceName, bindChainID, provider, methodID, requestData, serviceFees, from, f.Flags())
 	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), client.DefaultKeyPass)
 }
 
@@ -226,7 +294,7 @@ func (f *Fixtures) TxServiceWithdrawFees(from string, flags ...string) (bool, st
 }
 
 // TxServiceWithdrawTax is iriscli tx service withdraw-tax
-func (f *Fixtures) TxServiceWithdrawTax(destAddr string, withdrawAmt string, from string, flags ...string) (bool, string, string) {
+func (f *Fixtures) TxServiceWithdrawTax(withdrawAmt string, destAddr, from sdk.AccAddress, flags ...string) (bool, string, string) {
 	cmd := fmt.Sprintf("%s tx service withdraw-tax --dest-address %s --withdraw-amount %s --from=%s %v", f.IriscliBinary, destAddr, withdrawAmt, from, f.Flags())
 	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), client.DefaultKeyPass)
 }
@@ -290,3 +358,24 @@ func (f *Fixtures) QueryServiceFees(address string) service.FeesOutput {
 	require.NoError(f.T, err)
 	return fees
 }
+
+const idlContent = `
+	syntax = "proto3";
+
+	// The greeting service definition.
+	service Greeter {
+		//@Attribute description:sayHello
+		//@Attribute output_privacy:NoPrivacy
+		//@Attribute output_cached:NoCached
+		rpc SayHello (HelloRequest) returns (HelloReply) {}
+	}
+
+	// The request message containing the user's name.
+	message HelloRequest {
+		string name = 1;
+	}
+
+	// The response message containing the greetings
+	message HelloReply {
+		string message = 1;
+	}`

@@ -55,8 +55,6 @@ const (
 	RequestAccName = types.RequestAccName
 	TaxAccName     = types.TaxAccName
 
-	ServiceDenom = types.ServiceDenom
-
 	NoPrivacy        = types.NoPrivacy
 	PubKeyEncryption = types.PubKeyEncryption
 	Unicast          = types.Unicast

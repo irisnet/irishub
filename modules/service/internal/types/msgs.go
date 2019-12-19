@@ -829,5 +829,5 @@ func validServiceCoins(coins sdk.Coins) bool {
 		return false
 	}
 
-	return coins[0].Denom == ServiceDenom && coins[0].IsPositive()
+	return coins[0].IsPositive()
 }

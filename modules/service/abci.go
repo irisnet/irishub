@@ -41,7 +41,6 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) {
 		keeper.AddReturnFee(ctx, req.Consumer, req.ServiceFee)
 
 		keeper.DeleteActiveRequest(ctx, req)
-		keeper.GetMetrics().ActiveRequests.Add(-1)
 		keeper.DeleteRequestExpiration(ctx, req)
 
 		ctx.EventManager().EmitEvent(

@@ -23,7 +23,7 @@ var (
 
 // no lint
 var (
-	MinRequestTimeout       = int64(20)
+	MinRequestTimeout       = int64(2)
 	MinDepositMultiple      = int64(500)
 	MaxDepositMultiple      = int64(5000)
 	MaxServiceFeeTax        = sdk.NewDecWithPrec(2, 1)

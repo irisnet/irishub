@@ -240,7 +240,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 
 	app.serviceKeeper = service.NewKeeper(
 		app.cdc, keys[service.StoreKey], app.supplyKeeper, app.guardianKeeper,
-		service.DefaultCodespace, serviceSubspace, nil,
+		service.DefaultCodespace, serviceSubspace,
 	)
 
 	// NOTE: Any module instantiated in the module manager that is later modified

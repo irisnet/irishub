@@ -23,11 +23,9 @@ type Keeper struct {
 	codespace sdk.CodespaceType
 	// params subspace
 	paramSpace params.Subspace
-	// metrics
-	metrics *types.Metrics
 }
 
-func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, sk types.SupplyKeeper, gk types.GuardianKeeper, codespace sdk.CodespaceType, paramSpace params.Subspace, metrics *types.Metrics) Keeper {
+func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, sk types.SupplyKeeper, gk types.GuardianKeeper, codespace sdk.CodespaceType, paramSpace params.Subspace) Keeper {
 	// ensure service module accounts are set
 	if addr := sk.GetModuleAddress(types.DepositAccName); addr == nil {
 		panic(fmt.Sprintf("%s module account has not been set", types.DepositAccName))
@@ -48,7 +46,6 @@ func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, sk types.SupplyKeeper, gk typ
 		gk:         gk,
 		codespace:  codespace,
 		paramSpace: paramSpace.WithKeyTable(ParamKeyTable()),
-		metrics:    metrics,
 	}
 
 	return keeper
@@ -67,11 +64,6 @@ func (k Keeper) Codespace() sdk.CodespaceType {
 // GetCdc returns the cdc
 func (k Keeper) GetCdc() *codec.Codec {
 	return k.cdc
-}
-
-// GetMetrics returns the metrics
-func (k Keeper) GetMetrics() *types.Metrics {
-	return k.metrics
 }
 
 // GetServiceDepositAccount returns the service depost ModuleAccount

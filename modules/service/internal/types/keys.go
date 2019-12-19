@@ -30,9 +30,6 @@ const (
 
 	// TaxAccName is the root string for the service tax account address
 	TaxAccName = "service_tax_account"
-
-	// ServiceDenom is the valid denom for service
-	ServiceDenom = "iris-atto"
 )
 
 var (

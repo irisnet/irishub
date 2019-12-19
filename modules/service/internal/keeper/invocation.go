@@ -168,7 +168,7 @@ func (k Keeper) AddResponse(
 		return resp, types.ErrNotMatchingReqChainID(k.codespace, reqChainID)
 	}
 
-	err = k.AddIncomingFee(ctx, resp.Provider, req.ServiceFee)
+	err = k.AddIncomingFee(ctx, provider, req.ServiceFee)
 	if err != nil {
 		return resp, err
 	}
@@ -295,10 +295,8 @@ func (k Keeper) AddIncomingFee(ctx sdk.Context, address sdk.AccAddress, coins sd
 	taxCoins := sdk.Coins{}
 	for _, coin := range coins {
 		taxAmount := sdk.NewDecFromInt(coin.Amount).Mul(feeTax).TruncateInt()
-		taxCoins = append(taxCoins, sdk.NewCoin(coin.Denom, taxAmount))
+		taxCoins = taxCoins.Add(sdk.NewCoins(sdk.NewCoin(coin.Denom, taxAmount)))
 	}
-
-	taxCoins = taxCoins.Sort()
 
 	err := k.sk.SendCoinsFromModuleToModule(ctx, types.RequestAccName, types.TaxAccName, taxCoins)
 	if err != nil {
@@ -311,11 +309,7 @@ func (k Keeper) AddIncomingFee(ctx sdk.Context, address sdk.AccAddress, coins sd
 		return sdk.ErrInsufficientFunds(errMsg)
 	}
 
-	fee, found := k.GetIncomingFee(ctx, address)
-	if !found {
-		k.SetIncomingFee(ctx, address, coins)
-	}
-
+	fee, _ := k.GetIncomingFee(ctx, address)
 	k.SetIncomingFee(ctx, address, fee.Coins.Add(incomingFee))
 	return nil
 }

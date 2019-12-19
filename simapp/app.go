@@ -251,7 +251,7 @@ func NewSimApp(
 
 	app.ServiceKeeper = service.NewKeeper(
 		app.cdc, keys[service.StoreKey], app.SupplyKeeper, app.GuardianKeeper,
-		service.DefaultCodespace, app.subspaces[service.ModuleName], nil,
+		service.DefaultCodespace, app.subspaces[service.ModuleName],
 	)
 
 	// NOTE: Any module instantiated in the module manager that is later modified
