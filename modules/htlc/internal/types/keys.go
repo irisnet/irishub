@@ -5,9 +5,12 @@ const (
 	// module name
 	ModuleName = "htlc"
 
-	// StoreKey is the default store key for mint
+	// RouterKey is the message route for the htlc module.
+	RouterKey = ModuleName
+
+	// StoreKey is the default store key for the htlc module.
 	StoreKey = ModuleName
 
-	// QuerierRoute is the querier route for the minting store.
+	// QuerierRoute is the querier route for the htlc module.
 	QuerierRoute = StoreKey
 )
