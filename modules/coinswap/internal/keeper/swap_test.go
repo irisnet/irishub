@@ -134,7 +134,7 @@ func (suite *KeeperTestSuite) TestKeeperSwap() {
 	// second swap
 	err = suite.app.CoinswapKeeper.Swap(suite.ctx, msg1)
 	suite.Nil(err)
-	moduleAccountBalances =suite.app.SupplyKeeper.GetSupply(suite.ctx).GetTotal()
+	moduleAccountBalances = suite.app.SupplyKeeper.GetSupply(suite.ctx).GetTotal()
 	reservePoolBalances = suite.app.AccountKeeper.GetAccount(suite.ctx, reservePoolAddr).GetCoins()
 	suite.Equal(fmt.Sprintf("800%s,1252%s", denomBTC, denomStandard), reservePoolBalances.String())
 	suite.Equal("1000", moduleAccountBalances.AmountOf(unidenomBTC).String())

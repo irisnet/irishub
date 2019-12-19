@@ -6,11 +6,12 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/distribution"
 	"github.com/cosmos/cosmos-sdk/x/supply"
+	"github.com/stretchr/testify/require"
+	abci "github.com/tendermint/tendermint/abci/types"
+
 	"github.com/irisnet/irishub/modules/mint"
 	"github.com/irisnet/irishub/modules/mint/internal/types"
 	"github.com/irisnet/irishub/simapp"
-	"github.com/stretchr/testify/require"
-	abci "github.com/tendermint/tendermint/abci/types"
 )
 
 func TestBeginBlocker(t *testing.T) {

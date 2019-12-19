@@ -4,7 +4,7 @@ package types
 const (
 	// module name
 	ModuleName = "htlc"
-	
+
 	// StoreKey is the default store key for mint
 	StoreKey = ModuleName
 

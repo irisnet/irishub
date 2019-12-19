@@ -31,7 +31,6 @@ func GetQueryCmd(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	return serviceQueryCmd
 }
 
-
 // GetTxCmd returns the transaction commands for this module
 func GetTxCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
 	serviceTxCmd := &cobra.Command{

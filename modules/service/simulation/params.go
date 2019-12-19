@@ -7,7 +7,7 @@ import (
 	"math/rand"
 
 	"github.com/cosmos/cosmos-sdk/x/simulation"
-	
+
 	"github.com/irisnet/irishub/modules/service/internal/types"
 )
 

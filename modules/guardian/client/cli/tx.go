@@ -9,9 +9,10 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
-	"github.com/irisnet/irishub/modules/guardian/internal/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+
+	"github.com/irisnet/irishub/modules/guardian/internal/types"
 )
 
 // GetTxCmd returns the transaction commands for this module

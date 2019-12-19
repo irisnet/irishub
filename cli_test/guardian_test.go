@@ -6,9 +6,10 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/tests"
+	"github.com/stretchr/testify/require"
+
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/modules/guardian"
-	"github.com/stretchr/testify/require"
 )
 
 func TestIrisCLIAddProfiler(t *testing.T) {

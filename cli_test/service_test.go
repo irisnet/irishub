@@ -10,10 +10,11 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/tests"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/irisnet/irishub/app"
-	"github.com/irisnet/irishub/modules/service"
 	"github.com/stretchr/testify/require"
 	tmtypes "github.com/tendermint/tendermint/types"
+
+	"github.com/irisnet/irishub/app"
+	"github.com/irisnet/irishub/modules/service"
 )
 
 func TestIrisCLIService(t *testing.T) {

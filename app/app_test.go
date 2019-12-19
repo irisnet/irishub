@@ -5,11 +5,12 @@ import (
 	"testing"
 
 	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/irisnet/irishub/simapp"
 	"github.com/stretchr/testify/require"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/log"
 	db "github.com/tendermint/tm-db"
+
+	"github.com/irisnet/irishub/simapp"
 )
 
 func TestIrisExport(t *testing.T) {

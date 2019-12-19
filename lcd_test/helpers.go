@@ -45,9 +45,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/genutil"
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	"github.com/cosmos/cosmos-sdk/x/supply"
-	"github.com/irisnet/irishub/modules/mint"
 
 	"github.com/irisnet/irishub/app"
+	"github.com/irisnet/irishub/modules/mint"
 )
 
 // TODO: Make InitializeTestLCD safe to call in multiple tests at the same time

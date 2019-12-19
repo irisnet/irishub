@@ -39,22 +39,22 @@ type ServiceDefinitionReq struct {
 }
 
 type ServiceBindingReq struct {
-	BaseReq     rest.BaseReq  `json:"base_req" yaml:"base_req"` // base req
-	ServiceName string        `json:"service_name" yaml:"service_name"`
-	DefChainId  string        `json:"def_chain_id" yaml:"def_chain_id"`
-	BindingType string        `json:"binding_type" yaml:"binding_type"`
-	Deposit     string        `json:"deposit" yaml:"deposit"`
-	Prices      []string      `json:"prices" yaml:"prices"`
-	Level       types.Level `json:"level" yaml:"level"`
-	Provider    string        `json:"provider" yaml:"provider"`
+	BaseReq     rest.BaseReq `json:"base_req" yaml:"base_req"` // base req
+	ServiceName string       `json:"service_name" yaml:"service_name"`
+	DefChainId  string       `json:"def_chain_id" yaml:"def_chain_id"`
+	BindingType string       `json:"binding_type" yaml:"binding_type"`
+	Deposit     string       `json:"deposit" yaml:"deposit"`
+	Prices      []string     `json:"prices" yaml:"prices"`
+	Level       types.Level  `json:"level" yaml:"level"`
+	Provider    string       `json:"provider" yaml:"provider"`
 }
 
 type ServiceBindingUpdateReq struct {
-	BaseReq     rest.BaseReq  `json:"base_req" yaml:"base_req"` // base req
-	BindingType string        `json:"binding_type" yaml:"binding_type"`
-	Deposit     string        `json:"deposit" yaml:"deposit"`
-	Prices      []string      `json:"prices" yaml:"prices"`
-	Level       types.Level `json:"level" yaml:"level"`
+	BaseReq     rest.BaseReq `json:"base_req" yaml:"base_req"` // base req
+	BindingType string       `json:"binding_type" yaml:"binding_type"`
+	Deposit     string       `json:"deposit" yaml:"deposit"`
+	Prices      []string     `json:"prices" yaml:"prices"`
+	Level       types.Level  `json:"level" yaml:"level"`
 }
 
 type ServiceBindingEnableReq struct {

@@ -6,8 +6,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/irisnet/irishub/modules/guardian/internal/types"
 	"github.com/spf13/cobra"
+
+	"github.com/irisnet/irishub/modules/guardian/internal/types"
 )
 
 func GetQueryCmd(queryRoute string, cdc *codec.Codec) *cobra.Command {

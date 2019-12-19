@@ -6,11 +6,12 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/supply"
-	"github.com/irisnet/irishub/modules/mint/internal/types"
-	"github.com/irisnet/irishub/simapp"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 	abci "github.com/tendermint/tendermint/abci/types"
+
+	"github.com/irisnet/irishub/modules/mint/internal/types"
+	"github.com/irisnet/irishub/simapp"
 )
 
 type KeeperTestSuite struct {
