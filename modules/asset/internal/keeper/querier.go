@@ -3,9 +3,10 @@ package keeper
 import (
 	"fmt"
 
+	abci "github.com/tendermint/tendermint/abci/types"
+
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	abci "github.com/tendermint/tendermint/abci/types"
 
 	"github.com/irisnet/irishub/modules/asset/internal/types"
 	iristypes "github.com/irisnet/irishub/types"
@@ -30,8 +31,7 @@ func NewQuerier(k Keeper) sdk.Querier {
 
 func queryToken(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
 	var params types.QueryTokenParams
-	err := keeper.cdc.UnmarshalJSON(req.Data, &params)
-	if err != nil {
+	if err := keeper.cdc.UnmarshalJSON(req.Data, &params); err != nil {
 		return nil, iristypes.ParseParamsErr(err)
 	}
 
@@ -41,17 +41,17 @@ func queryToken(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, 
 	}
 
 	bz, err := codec.MarshalJSONIndent(keeper.cdc, token)
-
 	if err != nil {
 		return nil, iristypes.MarshalResultErr(err)
 	}
+
 	return bz, nil
 }
 
 func queryTokens(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
 	var params types.QueryTokensParams
-	err := keeper.cdc.UnmarshalJSON(req.Data, &params)
-	if err != nil {
+	var err error
+	if err = keeper.cdc.UnmarshalJSON(req.Data, &params); err != nil {
 		return nil, iristypes.ParseParamsErr(err)
 	}
 
@@ -75,10 +75,9 @@ func queryTokens(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte,
 
 	if len(params.Source) > 0 || len(params.Gateway) > 0 {
 		nonSymbolTokenId, err = types.GetTokenID(source, "")
-	}
-
-	if err != nil {
-		return nil, iristypes.ParseParamsErr(err)
+		if err != nil {
+			return nil, iristypes.ParseParamsErr(err)
+		}
 	}
 
 	var tokens types.Tokens
@@ -134,8 +133,7 @@ func queryFees(ctx sdk.Context, path []string, req abci.RequestQuery, keeper Kee
 
 func queryTokenFees(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
 	var params types.QueryTokenFeesParams
-	err := keeper.cdc.UnmarshalJSON(req.Data, &params)
-	if err != nil {
+	if err := keeper.cdc.UnmarshalJSON(req.Data, &params); err != nil {
 		return nil, iristypes.ParseParamsErr(err)
 	}
 

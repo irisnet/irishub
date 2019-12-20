@@ -32,7 +32,9 @@ var (
 	reSvcName = regexp.MustCompile(`^[a-zA-Z0-9_-]+$`) // the service name only accepts alphanumeric characters, _ and -
 )
 
-var _, _, _, _, _, _, _, _, _, _, _ sdk.Msg = MsgSvcDef{}, MsgSvcBind{}, MsgSvcBindingUpdate{}, MsgSvcDisable{}, MsgSvcEnable{}, MsgSvcRefundDeposit{}, MsgSvcRequest{}, MsgSvcResponse{}, MsgSvcRefundFees{}, MsgSvcWithdrawFees{}, MsgSvcWithdrawTax{}
+var _, _, _, _, _, _, _, _, _, _, _ sdk.Msg = MsgSvcDef{}, MsgSvcBind{}, MsgSvcBindingUpdate{},
+	MsgSvcDisable{}, MsgSvcEnable{}, MsgSvcRefundDeposit{}, MsgSvcRequest{}, MsgSvcResponse{},
+	MsgSvcRefundFees{}, MsgSvcWithdrawFees{}, MsgSvcWithdrawTax{}
 
 //______________________________________________________________________
 
@@ -42,17 +44,15 @@ type MsgSvcDef struct {
 }
 
 func NewMsgSvcDef(name, chainId, description string, tags []string, author sdk.AccAddress, authorDescription, idlContent string) MsgSvcDef {
-	return MsgSvcDef{
-		SvcDef{
-			Name:              name,
-			ChainId:           chainId,
-			Description:       description,
-			Tags:              tags,
-			Author:            author,
-			AuthorDescription: authorDescription,
-			IDLContent:        idlContent,
-		},
-	}
+	return MsgSvcDef{SvcDef{
+		Name:              name,
+		ChainId:           chainId,
+		Description:       description,
+		Tags:              tags,
+		Author:            author,
+		AuthorDescription: authorDescription,
+		IDLContent:        idlContent,
+	}}
 }
 
 func (msg MsgSvcDef) Route() string { return RouterKey }
@@ -73,32 +73,25 @@ func (msg MsgSvcDef) ValidateBasic() sdk.Error {
 	if len(msg.ChainId) == 0 {
 		return ErrInvalidChainId(DefaultCodespace)
 	}
-
 	if !validServiceName(msg.Name) {
 		return ErrInvalidServiceName(DefaultCodespace, msg.Name)
 	}
-
 	if len(msg.Author) == 0 {
 		return ErrInvalidAuthor(DefaultCodespace)
 	}
-
 	if len(msg.IDLContent) == 0 {
 		return ErrInvalidIDL(DefaultCodespace, "content is empty")
 	}
-
 	if err := msg.EnsureLength(); err != nil {
 		return err
 	}
-
 	methods, err := ParseMethods(msg.IDLContent)
 	if err != nil {
 		return ErrInvalidIDL(DefaultCodespace, err.Error())
 	}
-
 	if valid, err := validateMethods(methods); !valid {
 		return err
 	}
-
 	return nil
 }
 
@@ -153,49 +146,38 @@ func (msg MsgSvcBind) ValidateBasic() sdk.Error {
 	if len(msg.DefChainID) == 0 {
 		return ErrInvalidDefChainId(DefaultCodespace)
 	}
-
 	if len(msg.BindChainID) == 0 {
 		return ErrInvalidChainId(DefaultCodespace)
 	}
-
 	if err := ensureChainIdLength(msg.DefChainID, "def_chain_id"); err != nil {
 		return err
 	}
-
 	if err := ensureChainIdLength(msg.BindChainID, "bind_chain_id"); err != nil {
 		return err
 	}
-
 	if !validServiceName(msg.DefName) {
 		return ErrInvalidServiceName(DefaultCodespace, msg.DefName)
 	}
-
 	if err := ensureNameLength(msg.DefName); err != nil {
 		return err
 	}
-
 	if !validBindingType(msg.BindingType) {
 		return ErrInvalidBindingType(DefaultCodespace, msg.BindingType)
 	}
-
 	if len(msg.Provider) == 0 {
 		return sdk.ErrInvalidAddress(msg.Provider.String())
 	}
-
 	if !validServiceCoins(msg.Deposit) {
 		return sdk.ErrInvalidCoins(fmt.Sprintf("invalid service deposit [%s]", msg.Deposit))
 	}
-
 	for _, price := range msg.Prices {
 		if !validServiceCoins(sdk.Coins{price}) {
 			return sdk.ErrInvalidCoins(fmt.Sprintf("invalid service price [%s]", price))
 		}
 	}
-
 	if !validLevel(msg.Level) {
 		return ErrInvalidLevel(DefaultCodespace, msg.Level)
 	}
-
 	return nil
 }
 
@@ -244,49 +226,38 @@ func (msg MsgSvcBindingUpdate) ValidateBasic() sdk.Error {
 	if len(msg.DefChainID) == 0 {
 		return ErrInvalidDefChainId(DefaultCodespace)
 	}
-
 	if len(msg.BindChainID) == 0 {
 		return ErrInvalidChainId(DefaultCodespace)
 	}
-
 	if err := ensureChainIdLength(msg.DefChainID, "def_chain_id"); err != nil {
 		return err
 	}
-
 	if err := ensureChainIdLength(msg.BindChainID, "bind_chain_id"); err != nil {
 		return err
 	}
-
 	if !validServiceName(msg.DefName) {
 		return ErrInvalidServiceName(DefaultCodespace, msg.DefName)
 	}
-
 	if err := ensureNameLength(msg.DefName); err != nil {
 		return err
 	}
-
 	if len(msg.Provider) == 0 {
 		return sdk.ErrInvalidAddress(msg.Provider.String())
 	}
-
 	if msg.BindingType != 0x00 && !validBindingType(msg.BindingType) {
 		return ErrInvalidBindingType(DefaultCodespace, msg.BindingType)
 	}
-
 	if !validServiceCoins(msg.Deposit) {
 		return sdk.ErrInvalidCoins(fmt.Sprintf("invalid service deposit [%s]", msg.Deposit))
 	}
-
 	for _, price := range msg.Prices {
 		if !validServiceCoins(sdk.Coins{price}) {
 			return sdk.ErrInvalidCoins(fmt.Sprintf("invalid service price [%s]", price))
 		}
 	}
-
 	if !validUpdateLevel(msg.Level) {
 		return ErrInvalidLevel(DefaultCodespace, msg.Level)
 	}
-
 	return nil
 }
 
@@ -328,31 +299,24 @@ func (msg MsgSvcDisable) ValidateBasic() sdk.Error {
 	if len(msg.DefChainID) == 0 {
 		return ErrInvalidDefChainId(DefaultCodespace)
 	}
-
 	if len(msg.BindChainID) == 0 {
 		return ErrInvalidChainId(DefaultCodespace)
 	}
-
 	if err := ensureChainIdLength(msg.DefChainID, "def_chain_id"); err != nil {
 		return err
 	}
-
 	if err := ensureChainIdLength(msg.BindChainID, "bind_chain_id"); err != nil {
 		return err
 	}
-
 	if !validServiceName(msg.DefName) {
 		return ErrInvalidServiceName(DefaultCodespace, msg.DefName)
 	}
-
 	if err := ensureNameLength(msg.DefName); err != nil {
 		return err
 	}
-
 	if len(msg.Provider) == 0 {
 		return sdk.ErrInvalidAddress(msg.Provider.String())
 	}
-
 	return nil
 }
 
@@ -396,35 +360,27 @@ func (msg MsgSvcEnable) ValidateBasic() sdk.Error {
 	if len(msg.DefChainID) == 0 {
 		return ErrInvalidDefChainId(DefaultCodespace)
 	}
-
 	if len(msg.BindChainID) == 0 {
 		return ErrInvalidChainId(DefaultCodespace)
 	}
-
 	if err := ensureChainIdLength(msg.DefChainID, "def_chain_id"); err != nil {
 		return err
 	}
-
 	if err := ensureChainIdLength(msg.BindChainID, "bind_chain_id"); err != nil {
 		return err
 	}
-
 	if !validServiceName(msg.DefName) {
 		return ErrInvalidServiceName(DefaultCodespace, msg.DefName)
 	}
-
 	if err := ensureNameLength(msg.DefName); err != nil {
 		return err
 	}
-
 	if !validServiceCoins(msg.Deposit) {
 		return sdk.ErrInvalidCoins(fmt.Sprintf("invalid service deposit [%s]", msg.Deposit))
 	}
-
 	if len(msg.Provider) == 0 {
 		return sdk.ErrInvalidAddress(msg.Provider.String())
 	}
-
 	return nil
 }
 
@@ -466,31 +422,24 @@ func (msg MsgSvcRefundDeposit) ValidateBasic() sdk.Error {
 	if len(msg.DefChainID) == 0 {
 		return ErrInvalidDefChainId(DefaultCodespace)
 	}
-
 	if len(msg.BindChainID) == 0 {
 		return ErrInvalidChainId(DefaultCodespace)
 	}
-
 	if err := ensureChainIdLength(msg.DefChainID, "def_chain_id"); err != nil {
 		return err
 	}
-
 	if err := ensureChainIdLength(msg.BindChainID, "bind_chain_id"); err != nil {
 		return err
 	}
-
 	if !validServiceName(msg.DefName) {
 		return ErrInvalidServiceName(DefaultCodespace, msg.DefName)
 	}
-
 	if err := ensureNameLength(msg.DefName); err != nil {
 		return err
 	}
-
 	if len(msg.Provider) == 0 {
 		return sdk.ErrInvalidAddress(msg.Provider.String())
 	}
-
 	return nil
 }
 
@@ -547,47 +496,36 @@ func (msg MsgSvcRequest) ValidateBasic() sdk.Error {
 	if len(msg.DefChainID) == 0 {
 		return ErrInvalidDefChainId(DefaultCodespace)
 	}
-
 	if len(msg.BindChainID) == 0 {
 		return ErrInvalidBindChainId(DefaultCodespace)
 	}
-
 	if len(msg.ReqChainID) == 0 {
 		return ErrInvalidChainId(DefaultCodespace)
 	}
-
 	if err := ensureChainIdLength(msg.DefChainID, "def_chain_id"); err != nil {
 		return err
 	}
-
 	if err := ensureChainIdLength(msg.BindChainID, "bind_chain_id"); err != nil {
 		return err
 	}
-
 	if err := ensureChainIdLength(msg.ReqChainID, "req_chain_id"); err != nil {
 		return err
 	}
-
 	if !validServiceName(msg.DefName) {
 		return ErrInvalidServiceName(DefaultCodespace, msg.DefName)
 	}
-
 	if err := ensureNameLength(msg.DefName); err != nil {
 		return err
 	}
-
 	if len(msg.Provider) == 0 {
 		return sdk.ErrInvalidAddress(msg.Provider.String())
 	}
-
 	if len(msg.Consumer) == 0 {
 		return sdk.ErrInvalidAddress(msg.Consumer.String())
 	}
-
 	if !validServiceCoins(msg.ServiceFee) {
 		return sdk.ErrInvalidCoins(fmt.Sprintf("invalid service fee [%s]", msg.ServiceFee))
 	}
-
 	return nil
 }
 
@@ -623,16 +561,13 @@ func (msg MsgSvcResponse) GetSignBytes() []byte {
 	if len(msg.Output) == 0 {
 		msg.Output = nil
 	}
-
 	if len(msg.ErrorMsg) == 0 {
 		msg.ErrorMsg = nil
 	}
-
 	b, err := ModuleCdc.MarshalJSON(msg)
 	if err != nil {
 		panic(err)
 	}
-
 	return sdk.MustSortJSON(b)
 }
 
@@ -640,20 +575,15 @@ func (msg MsgSvcResponse) ValidateBasic() sdk.Error {
 	if len(msg.ReqChainID) == 0 {
 		return ErrInvalidReqChainId(DefaultCodespace)
 	}
-
 	if err := ensureChainIdLength(msg.ReqChainID, "req_chain_id"); err != nil {
 		return err
 	}
-
 	if len(msg.Provider) == 0 {
 		return sdk.ErrInvalidAddress(msg.Provider.String())
 	}
-
-	_, _, _, err := ConvertRequestID(msg.RequestID)
-	if err != nil {
+	if _, _, _, err := ConvertRequestID(msg.RequestID); err != nil {
 		return ErrInvalidReqId(DefaultCodespace, msg.RequestID)
 	}
-
 	return nil
 }
 
@@ -669,9 +599,7 @@ type MsgSvcRefundFees struct {
 }
 
 func NewMsgSvcRefundFees(consumer sdk.AccAddress) MsgSvcRefundFees {
-	return MsgSvcRefundFees{
-		Consumer: consumer,
-	}
+	return MsgSvcRefundFees{Consumer: consumer}
 }
 
 func (msg MsgSvcRefundFees) Route() string { return RouterKey }
@@ -686,7 +614,6 @@ func (msg MsgSvcRefundFees) ValidateBasic() sdk.Error {
 	if len(msg.Consumer) == 0 {
 		return sdk.ErrInvalidAddress(msg.Consumer.String())
 	}
-
 	return nil
 }
 
@@ -702,9 +629,7 @@ type MsgSvcWithdrawFees struct {
 }
 
 func NewMsgSvcWithdrawFees(provider sdk.AccAddress) MsgSvcWithdrawFees {
-	return MsgSvcWithdrawFees{
-		Provider: provider,
-	}
+	return MsgSvcWithdrawFees{Provider: provider}
 }
 
 func (msg MsgSvcWithdrawFees) Route() string { return RouterKey }
@@ -719,7 +644,6 @@ func (msg MsgSvcWithdrawFees) ValidateBasic() sdk.Error {
 	if len(msg.Provider) == 0 {
 		return sdk.ErrInvalidAddress(msg.Provider.String())
 	}
-
 	return nil
 }
 
@@ -756,15 +680,12 @@ func (msg MsgSvcWithdrawTax) ValidateBasic() sdk.Error {
 	if len(msg.Trustee) == 0 {
 		return sdk.ErrInvalidAddress(msg.Trustee.String())
 	}
-
 	if len(msg.DestAddress) == 0 {
 		return sdk.ErrInvalidAddress(msg.DestAddress.String())
 	}
-
 	if !validServiceCoins(msg.Amount) {
 		return sdk.ErrInvalidCoins(fmt.Sprintf("invalid service withdrawal amount [%s]", msg.Amount))
 	}
-
 	return nil
 }
 
@@ -782,15 +703,12 @@ func (msg MsgSvcDef) EnsureLength() sdk.Error {
 	if err := ensureNameLength(msg.Name); err != nil {
 		return err
 	}
-
 	if err := ensureChainIdLength(msg.ChainId, "chain_id"); err != nil {
 		return err
 	}
-
 	if len(msg.Description) > MaxDescriptionLength {
 		return ErrInvalidLength(DefaultCodespace, fmt.Sprintf("length of the description must not be greater than %d", MaxDescriptionLength))
 	}
-
 	if len(msg.Tags) > MaxTagCount {
 		return ErrInvalidLength(DefaultCodespace, fmt.Sprintf("the tag count must not be greater than %d", MaxTagCount))
 	} else {
@@ -800,11 +718,9 @@ func (msg MsgSvcDef) EnsureLength() sdk.Error {
 			}
 		}
 	}
-
 	if len(msg.AuthorDescription) > MaxDescriptionLength {
 		return ErrInvalidLength(DefaultCodespace, fmt.Sprintf("length of the author description must not be greater than %d", MaxDescriptionLength))
 	}
-
 	return nil
 }
 
@@ -812,7 +728,6 @@ func ensureNameLength(name string) sdk.Error {
 	if len(name) > MaxNameLength {
 		return ErrInvalidLength(DefaultCodespace, fmt.Sprintf("length of the name must not be greater than %d", MaxNameLength))
 	}
-
 	return nil
 }
 
@@ -820,7 +735,6 @@ func ensureChainIdLength(chainId, fieldNm string) sdk.Error {
 	if len(chainId) > MaxChainIDLength {
 		return ErrInvalidLength(DefaultCodespace, fmt.Sprintf("length of the %s must not be greater than %d", fieldNm, MaxChainIDLength))
 	}
-
 	return nil
 }
 
@@ -828,6 +742,5 @@ func validServiceCoins(coins sdk.Coins) bool {
 	if coins == nil || len(coins) != 1 {
 		return false
 	}
-
 	return coins[0].IsPositive()
 }

@@ -42,17 +42,17 @@ var _, _, _, _ sdk.Msg = &MsgIssueToken{}, &MsgEditToken{}, &MsgMintToken{}, &Ms
 
 // MsgIssueToken for issuing token
 type MsgIssueToken struct {
-	Family          AssetFamily    `json:"family"`
-	Source          AssetSource    `json:"source"`
-	Symbol          string         `json:"symbol"`
-	CanonicalSymbol string         `json:"canonical_symbol"`
-	Name            string         `json:"name"`
-	Decimal         uint8          `json:"decimal"`
-	MinUnitAlias    string         `json:"min_unit_alias"`
-	InitialSupply   uint64         `json:"initial_supply"`
-	MaxSupply       uint64         `json:"max_supply"`
-	Mintable        bool           `json:"mintable"`
-	Owner           sdk.AccAddress `json:"owner"`
+	Family          AssetFamily    `json:"family" yaml:"family"`
+	Source          AssetSource    `json:"source" yaml:"source"`
+	Symbol          string         `json:"symbol" yaml:"symbol"`
+	CanonicalSymbol string         `json:"canonical_symbol" yaml:"canonical_symbol"`
+	Name            string         `json:"name" yaml:"name"`
+	Decimal         uint8          `json:"decimal" yaml:"decimal"`
+	MinUnitAlias    string         `json:"min_unit_alias" yaml:"min_unit_alias"`
+	InitialSupply   uint64         `json:"initial_supply" yaml:"initial_supply"`
+	MaxSupply       uint64         `json:"max_supply" yaml:"max_supply"`
+	Mintable        bool           `json:"mintable" yaml:"mintable"`
+	Owner           sdk.AccAddress `json:"owner" yaml:"owner"`
 }
 
 // NewMsgIssueToken - construct token issue msg
@@ -171,9 +171,9 @@ func (msg MsgIssueToken) GetSigners() []sdk.AccAddress {
 
 // MsgTransferTokenOwner for transferring the token owner
 type MsgTransferTokenOwner struct {
-	SrcOwner sdk.AccAddress `json:"src_owner"` // the current owner address of the token
-	DstOwner sdk.AccAddress `json:"dst_owner"` // the new owner
-	TokenID  string         `json:"token_id"`
+	SrcOwner sdk.AccAddress `json:"src_owner" yaml:"src_owner"` // the current owner address of the token
+	DstOwner sdk.AccAddress `json:"dst_owner" yaml:"dst_owner"` // the new owner
+	TokenID  string         `json:"token_id" yaml:"token_id"`
 }
 
 // NewMsgTransferTokenOwner - construct token transfer msg
@@ -232,13 +232,13 @@ func (msg MsgTransferTokenOwner) Type() string { return "transfer_token_owner" }
 
 // MsgEditToken for editing a specified token
 type MsgEditToken struct {
-	TokenID         string         `json:"token_id"`         //  id of token
-	Owner           sdk.AccAddress `json:"owner"`            //  owner of token
-	CanonicalSymbol string         `json:"canonical_symbol"` //  canonical_symbol of token
-	MinUnitAlias    string         `json:"min_unit_alias"`   //  min_unit_alias of token
-	MaxSupply       uint64         `json:"max_supply"`
-	Mintable        Bool           `json:"mintable"` //  mintable of token
-	Name            string         `json:"name"`
+	TokenID         string         `json:"token_id" yaml:"token_id"`                 //  id of token
+	Owner           sdk.AccAddress `json:"owner" yaml:"owner"`                       //  owner of token
+	CanonicalSymbol string         `json:"canonical_symbol" yaml:"canonical_symbol"` //  canonical_symbol of token
+	MinUnitAlias    string         `json:"min_unit_alias" yaml:"min_unit_alias"`     //  min_unit_alias of token
+	MaxSupply       uint64         `json:"max_supply" yaml:"max_supply"`
+	Mintable        Bool           `json:"mintable" yaml:"mintable"` //  mintable of token
+	Name            string         `json:"name" yaml:"name"`
 }
 
 // NewMsgEditToken creates a MsgEditToken
@@ -317,10 +317,10 @@ func (msg MsgEditToken) GetSigners() []sdk.AccAddress {
 
 // MsgMintToken for mint the token to a specified address
 type MsgMintToken struct {
-	TokenID string         `json:"token_id"` // the unique id of the token
-	Owner   sdk.AccAddress `json:"owner"`    // the current owner address of the token
-	To      sdk.AccAddress `json:"to"`       // address of mint token to
-	Amount  uint64         `json:"amount"`   // amount of mint token
+	TokenID string         `json:"token_id" yaml:"token_id"` // the unique id of the token
+	Owner   sdk.AccAddress `json:"owner" yaml:"owner"`       // the current owner address of the token
+	To      sdk.AccAddress `json:"to" yaml:"to"`             // address of mint token to
+	Amount  uint64         `json:"amount" yaml:"amount"`     // amount of mint token
 }
 
 // NewMsgMintToken creates a MsgMintToken

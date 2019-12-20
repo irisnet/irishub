@@ -4,6 +4,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 )
 
+// ModuleCdc defines the module codec
+var ModuleCdc *codec.Codec
+
 // Register concrete types on codec codec
 func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(MsgSvcDef{}, "irishub/service/MsgSvcDef", nil)
@@ -17,7 +20,6 @@ func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(MsgSvcRefundFees{}, "irishub/service/MsgSvcRefundFees", nil)
 	cdc.RegisterConcrete(MsgSvcWithdrawFees{}, "irishub/service/MsgSvcWithdrawFees", nil)
 	cdc.RegisterConcrete(MsgSvcWithdrawTax{}, "irishub/service/MsgSvcWithdrawTax", nil)
-
 	cdc.RegisterConcrete(SvcDef{}, "irishub/service/SvcDef", nil)
 	cdc.RegisterConcrete(MethodProperty{}, "irishub/service/MethodProperty", nil)
 	cdc.RegisterConcrete(SvcBinding{}, "irishub/service/SvcBinding", nil)
@@ -25,12 +27,8 @@ func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(SvcResponse{}, "irishub/service/SvcResponse", nil)
 	cdc.RegisterConcrete(IncomingFee{}, "irishub/service/IncomingFee", nil)
 	cdc.RegisterConcrete(ReturnedFee{}, "irishub/service/ReturnedFee", nil)
-
 	cdc.RegisterConcrete(&Params{}, "irishub/service/Params", nil)
 }
-
-// ModuleCdc defines the module codec
-var ModuleCdc *codec.Codec
 
 func init() {
 	ModuleCdc = codec.New()

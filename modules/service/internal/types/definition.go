@@ -74,11 +74,7 @@ func MessagingTypeFromString(str string) (MessagingType, error) {
 
 // is defined messagingType?
 func validMessagingType(mt MessagingType) bool {
-	if mt == Multicast ||
-		mt == Unicast {
-		return true
-	}
-	return false
+	return mt == Multicast || mt == Unicast
 }
 
 // For Printf / Sprintf, returns bech32 when using %s
@@ -111,11 +107,9 @@ func (mt MessagingType) MarshalJSON() ([]byte, error) {
 // Unmarshals from JSON assuming Bech32 encoding
 func (mt *MessagingType) UnmarshalJSON(data []byte) error {
 	var s string
-	err := json.Unmarshal(data, &s)
-	if err != nil {
+	if err := json.Unmarshal(data, &s); err != nil {
 		return nil
 	}
-
 	bz2, err := MessagingTypeFromString(s)
 	if err != nil {
 		return err
@@ -138,11 +132,7 @@ func OutputCachedEnumFromString(str string) (OutputCachedEnum, error) {
 
 // is defined OutputCachedEnum?
 func validOutputCachedEnum(oe OutputCachedEnum) bool {
-	if oe == OffChainCached ||
-		oe == NoCached {
-		return true
-	}
-	return false
+	return oe == OffChainCached || oe == NoCached
 }
 
 // For Printf / Sprintf, returns bech32 when using %s
@@ -175,11 +165,9 @@ func (oe OutputCachedEnum) MarshalJSON() ([]byte, error) {
 // Unmarshals from JSON assuming Bech32 encoding
 func (oe *OutputCachedEnum) UnmarshalJSON(data []byte) error {
 	var s string
-	err := json.Unmarshal(data, &s)
-	if err != nil {
+	if err := json.Unmarshal(data, &s); err != nil {
 		return nil
 	}
-
 	bz2, err := OutputCachedEnumFromString(s)
 	if err != nil {
 		return err
@@ -202,11 +190,7 @@ func OutputPrivacyEnumFromString(str string) (OutputPrivacyEnum, error) {
 
 // is defined OutputPrivacyEnum?
 func validOutputPrivacyEnum(oe OutputPrivacyEnum) bool {
-	if oe == NoPrivacy ||
-		oe == PubKeyEncryption {
-		return true
-	}
-	return false
+	return oe == NoPrivacy || oe == PubKeyEncryption
 }
 
 // For Printf / Sprintf, returns bech32 when using %s
@@ -239,11 +223,9 @@ func (oe OutputPrivacyEnum) MarshalJSON() ([]byte, error) {
 // Unmarshals from JSON assuming Bech32 encoding
 func (oe *OutputPrivacyEnum) UnmarshalJSON(data []byte) error {
 	var s string
-	err := json.Unmarshal(data, &s)
-	if err != nil {
+	if err := json.Unmarshal(data, &s); err != nil {
 		return nil
 	}
-
 	bz2, err := OutputPrivacyEnumFromString(s)
 	if err != nil {
 		return err

@@ -11,9 +11,7 @@ import (
 
 func TestNextInflation(t *testing.T) {
 	minter := NewMinter(time.Now(), sdk.NewIntWithDecimal(100, 18))
-	tests := []struct {
-		params Params
-	}{
+	tests := []struct{ params Params }{
 		{Params{Inflation: sdk.NewDecWithPrec(20, 2), MintDenom: sdk.DefaultBondDenom}},
 		{Params{Inflation: sdk.NewDecWithPrec(10, 2), MintDenom: sdk.DefaultBondDenom}},
 		{Params{Inflation: sdk.NewDecWithPrec(5, 2), MintDenom: sdk.DefaultBondDenom}},

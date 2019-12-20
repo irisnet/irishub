@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
@@ -15,8 +16,8 @@ import (
 )
 
 func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router) {
-	r.HandleFunc("/coinswap/liquidities/{id}/deposit", addLiquidityHandlerFn(cliCtx)).Methods("POST")
-	r.HandleFunc("/coinswap/liquidities/{id}/withdraw", removeLiquidityHandlerFn(cliCtx)).Methods("POST")
+	r.HandleFunc(fmt.Sprintf("/coinswap/liquidities/{%s}/deposit", RestPoolID), addLiquidityHandlerFn(cliCtx)).Methods("POST")
+	r.HandleFunc(fmt.Sprintf("/coinswap/liquidities/{%s}/withdraw", RestPoolID), removeLiquidityHandlerFn(cliCtx)).Methods("POST")
 	r.HandleFunc("/coinswap/liquidities/buy", swapOrderHandlerFn(cliCtx, true)).Methods("POST")
 	r.HandleFunc("/coinswap/liquidities/sell", swapOrderHandlerFn(cliCtx, false)).Methods("POST")
 }
@@ -24,7 +25,7 @@ func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router) {
 func addLiquidityHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		uniDenom := vars["id"]
+		uniDenom := vars[RestPoolID]
 
 		if err := types.CheckUniDenom(uniDenom); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -97,7 +98,7 @@ func addLiquidityHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 func removeLiquidityHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		uniDenom := vars["id"]
+		uniDenom := vars[RestPoolID]
 
 		if err := types.CheckUniDenom(uniDenom); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -151,7 +152,9 @@ func removeLiquidityHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgRemoveLiquidity(minToken, sdk.NewCoin(uniDenom, liquidityAmt), minStandard, deadline.Unix(), senderAddress)
+		msg := types.NewMsgRemoveLiquidity(
+			minToken, sdk.NewCoin(uniDenom, liquidityAmt), minStandard, deadline.Unix(), senderAddress,
+		)
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return

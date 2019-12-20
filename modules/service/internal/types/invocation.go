@@ -11,8 +11,8 @@ import (
 
 type SvcRequest struct {
 	DefChainID            string         `json:"def_chain_id" yaml:"def_chain_id"`
-	DefName               string         `json:"def_name" yaml:"def_name" `
-	BindChainID           string         `json:"bind_chain_id" yaml:"bind_chain_id`
+	DefName               string         `json:"def_name" yaml:"def_name"`
+	BindChainID           string         `json:"bind_chain_id" yaml:"bind_chain_id"`
 	ReqChainID            string         `json:"req_chain_id" yaml:"req_chain_id"`
 	MethodID              int16          `json:"method_id" yaml:"method_id"`
 	Provider              sdk.AccAddress `json:"provider" yaml:"provider"`

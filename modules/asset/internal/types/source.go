@@ -70,11 +70,9 @@ func (source AssetSource) MarshalJSON() ([]byte, error) {
 // Unmarshals from JSON assuming Bech32 encoding
 func (source *AssetSource) UnmarshalJSON(data []byte) error {
 	var s string
-	err := json.Unmarshal(data, &s)
-	if err != nil {
+	if err := json.Unmarshal(data, &s); err != nil {
 		return nil
 	}
-
 	bz2, err := AssetSourceFromString(s)
 	if err != nil {
 		return err

@@ -7,24 +7,15 @@ type GenesisState struct {
 
 // NewGenesisState constructs a GenesisState
 func NewGenesisState(params Params) GenesisState {
-	return GenesisState{
-		Params: params,
-	}
+	return GenesisState{Params: params}
 }
 
 // DefaultGenesisState returns the default genesis state
 func DefaultGenesisState() GenesisState {
-	return GenesisState{
-		Params: DefaultParams(),
-	}
+	return GenesisState{Params: DefaultParams()}
 }
 
 // ValidateGenesis validates the provided service genesis state
 func ValidateGenesis(data GenesisState) error {
-	err := data.Params.Validate()
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return data.Params.Validate()
 }

@@ -12,5 +12,5 @@ const (
 	AttributeKeyServiceFee = "service_fee"
 	AttributeKeySlashCoins = "service_slash_coins"
 
-	AttributeValueCategory = "service"
+	AttributeValueCategory = ModuleName
 )

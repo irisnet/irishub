@@ -26,20 +26,22 @@ func MethodToMethodProperty(index int, method protoidl.Method) (methodProperty M
 	// set default value
 	opp := NoPrivacy
 	opc := NoCached
+	var e error
 
-	var err1 error
 	if _, ok := method.Attributes[outputPrivacy]; ok {
-		opp, err1 = OutputPrivacyEnumFromString(method.Attributes[outputPrivacy])
-		if err1 != nil {
-			return methodProperty, ErrInvalidOutputPrivacyEnum(DefaultCodespace, method.Attributes[outputPrivacy])
+		if opp, e = OutputPrivacyEnumFromString(method.Attributes[outputPrivacy]); e != nil {
+			err = ErrInvalidOutputPrivacyEnum(DefaultCodespace, method.Attributes[outputPrivacy])
+			return
 		}
 	}
+
 	if _, ok := method.Attributes[outputCached]; ok {
-		opc, err1 = OutputCachedEnumFromString(method.Attributes[outputCached])
-		if err1 != nil {
-			return methodProperty, ErrInvalidOutputCachedEnum(DefaultCodespace, method.Attributes[outputCached])
+		if opc, e = OutputCachedEnumFromString(method.Attributes[outputCached]); e != nil {
+			err = ErrInvalidOutputCachedEnum(DefaultCodespace, method.Attributes[outputCached])
+			return
 		}
 	}
+
 	methodProperty = MethodProperty{
 		ID:            int16(index),
 		Name:          method.Name,
@@ -47,5 +49,6 @@ func MethodToMethodProperty(index int, method protoidl.Method) (methodProperty M
 		OutputPrivacy: opp,
 		OutputCached:  opc,
 	}
+
 	return
 }

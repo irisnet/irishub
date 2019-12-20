@@ -99,6 +99,8 @@ var (
 	IsValidAssetFamily             = types.IsValidAssetFamily
 	ParseBool                      = types.ParseBool
 	NewGenesisState                = types.NewGenesisState
+	ValidateGenesis                = types.ValidateGenesis
+	DefaultGenesisState            = types.DefaultGenesisState
 	NewMsgIssueToken               = types.NewMsgIssueToken
 	ValidateMsgIssueToken          = types.ValidateMsgIssueToken
 	NewMsgTransferTokenOwner       = types.NewMsgTransferTokenOwner

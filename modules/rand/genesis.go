@@ -9,15 +9,13 @@ import (
 
 // InitGenesis stores genesis data
 func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
+	if err := ValidateGenesis(data); err != nil {
+		panic(fmt.Errorf("failed to initialize rand genesis state: %s", err.Error()))
+	}
 	for height, requests := range data.PendingRandRequests {
 		for _, request := range requests {
-			h, err := strconv.ParseInt(height, 10, 64)
-			if err != nil {
-				continue
-			}
-
-			reqID := GenerateRequestID(request)
-			k.EnqueueRandRequest(ctx, h, reqID, request)
+			h, _ := strconv.ParseInt(height, 10, 64)
+			k.EnqueueRandRequest(ctx, h, GenerateRequestID(request), request)
 		}
 	}
 }
@@ -32,7 +30,5 @@ func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 		return false
 	})
 
-	return GenesisState{
-		PendingRandRequests: pendingRequests,
-	}
+	return GenesisState{PendingRandRequests: pendingRequests}
 }

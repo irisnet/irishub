@@ -17,8 +17,7 @@ func (k Keeper) AddServiceDefinition(
 	authorDescription,
 	idlContent string,
 ) sdk.Error {
-	_, found := k.GetServiceDefinition(ctx, chainId, name)
-	if found {
+	if _, found := k.GetServiceDefinition(ctx, chainId, name); found {
 		return types.ErrSvcDefExists(k.codespace, chainId, name)
 	}
 

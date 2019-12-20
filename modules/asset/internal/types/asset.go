@@ -159,7 +159,10 @@ func (tokens Tokens) Validate() sdk.Error {
 		exp := sdk.NewIntWithDecimal(1, int(token.Decimal))
 		initialSupply := uint64(token.InitialSupply.Quo(exp).Int64())
 		maxSupply := uint64(token.MaxSupply.Quo(exp).Int64())
-		msg := NewMsgIssueToken(token.Family, token.GetSource(), token.Symbol, token.CanonicalSymbol, token.Name, token.Decimal, token.MinUnitAlias, initialSupply, maxSupply, token.Mintable, token.Owner)
+		msg := NewMsgIssueToken(
+			token.Family, token.GetSource(), token.Symbol, token.CanonicalSymbol, token.Name,
+			token.Decimal, token.MinUnitAlias, initialSupply, maxSupply, token.Mintable, token.Owner,
+		)
 		if err := ValidateMsgIssueToken(&msg); err != nil {
 			return err
 		}

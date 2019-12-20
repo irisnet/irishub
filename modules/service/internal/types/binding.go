@@ -68,21 +68,12 @@ func SvcBindingEqual(bindingA, bindingB SvcBinding) bool {
 
 // is valid level?
 func validLevel(lv Level) bool {
-	if lv.AvgRspTime > 0 && lv.UsableTime > 0 && lv.UsableTime <= 10000 {
-		return true
-	}
-	return false
+	return lv.AvgRspTime > 0 && lv.UsableTime > 0 && lv.UsableTime <= 10000
 }
 
 // is valid update level?
 func validUpdateLevel(lv Level) bool {
-	if lv.AvgRspTime < 0 {
-		return false
-	}
-	if lv.UsableTime < 0 || lv.UsableTime > 10000 {
-		return false
-	}
-	return true
+	return lv.AvgRspTime >= 0 && lv.UsableTime >= 0 && lv.UsableTime <= 10000
 }
 
 func (svcBind SvcBinding) isValid() bool {
@@ -110,11 +101,7 @@ func BindingTypeFromString(str string) (BindingType, error) {
 
 // is defined BindingType?
 func validBindingType(bt BindingType) bool {
-	if bt == Local ||
-		bt == Global {
-		return true
-	}
-	return false
+	return bt == Local || bt == Global
 }
 
 // For Printf / Sprintf, returns bech32 when using %s
@@ -147,11 +134,9 @@ func (bt BindingType) MarshalJSON() ([]byte, error) {
 // Unmarshals from JSON assuming Bech32 encoding
 func (bt *BindingType) UnmarshalJSON(data []byte) error {
 	var s string
-	err := json.Unmarshal(data, &s)
-	if err != nil {
+	if err := json.Unmarshal(data, &s); err != nil {
 		return nil
 	}
-
 	bz2, err := BindingTypeFromString(s)
 	if err != nil {
 		return err

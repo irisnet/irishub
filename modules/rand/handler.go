@@ -15,7 +15,6 @@ func NewHandler(k Keeper) sdk.Handler {
 		switch msg := msg.(type) {
 		case MsgRequestRand:
 			return handleMsgRequestRand(ctx, k, msg)
-
 		default:
 			errMsg := fmt.Sprintf("unrecognized rand message type: %T", msg)
 			return sdk.ErrUnknownRequest(errMsg).Result()

@@ -131,10 +131,10 @@ func GetIncomingFeeKey(address sdk.AccAddress) []byte {
 
 func getStringsKey(ss []string) (result []byte) {
 	for _, s := range ss {
-		result = append(append(
-			result,
-			[]byte(s)...),
-			emptyByte...)
+		result = append(
+			append(result, []byte(s)...),
+			emptyByte...,
+		)
 	}
 	if len(result) > 0 {
 		return result[0 : len(result)-1]

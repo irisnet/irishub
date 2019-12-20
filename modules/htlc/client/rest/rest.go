@@ -8,6 +8,12 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/rest"
 )
 
+// Rest variable names
+// nolint
+const (
+	RestHashLock = "hash-lock"
+)
+
 // RegisterRoutes registers HTLC-related REST handlers to a router
 func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router) {
 	registerQueryRoutes(cliCtx, r)

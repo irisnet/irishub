@@ -2,6 +2,7 @@ package rest
 
 import (
 	"encoding/hex"
+	"fmt"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -15,14 +16,12 @@ import (
 )
 
 func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router) {
-	// create an HTLC
 	r.HandleFunc("/htlc/htlcs", createHTLCHandlerFn(cliCtx)).Methods("POST")
-	// claim an HTLC
-	r.HandleFunc("/htlc/htlcs/{hash-lock}/claim", claimHTLCHandlerFn(cliCtx)).Methods("POST")
-	// refund an HTLC
-	r.HandleFunc("/htlc/htlcs/{hash-lock}/refund", refundHTLCHandlerFn(cliCtx)).Methods("POST")
+	r.HandleFunc(fmt.Sprintf("/htlc/htlcs/{%s}/claim", RestHashLock), claimHTLCHandlerFn(cliCtx)).Methods("POST")
+	r.HandleFunc(fmt.Sprintf("/htlc/htlcs/{%s}/refund", RestHashLock), refundHTLCHandlerFn(cliCtx)).Methods("POST")
 }
 
+// create an HTLC
 func createHTLCHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req CreateHTLCReq
@@ -60,11 +59,12 @@ func createHTLCHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	}
 }
 
+// claim an HTLC
 func claimHTLCHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 
-		hashLockStr := vars["hash-lock"]
+		hashLockStr := vars[RestHashLock]
 		hashLock, err := hex.DecodeString(hashLockStr)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -97,11 +97,12 @@ func claimHTLCHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	}
 }
 
+// refund an HTLC
 func refundHTLCHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 
-		hashLockStr := vars["hash-lock"]
+		hashLockStr := vars[RestHashLock]
 		hashLock, err := hex.DecodeString(hashLockStr)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())

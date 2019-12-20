@@ -18,18 +18,20 @@ func InitGenesis(ctx sdk.Context, keeper Keeper, data GenesisState) {
 func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 	profilersIterator := k.ProfilersIterator(ctx)
 	defer profilersIterator.Close()
+
 	var profilers []Guardian
+	var profiler Guardian
 	for ; profilersIterator.Valid(); profilersIterator.Next() {
-		var profiler Guardian
 		ModuleCdc.MustUnmarshalBinaryLengthPrefixed(profilersIterator.Value(), &profiler)
 		profilers = append(profilers, profiler)
 	}
 
 	trusteesIterator := k.TrusteesIterator(ctx)
 	defer trusteesIterator.Close()
+
 	var trustees []Guardian
+	var trustee Guardian
 	for ; trusteesIterator.Valid(); trusteesIterator.Next() {
-		var trustee Guardian
 		ModuleCdc.MustUnmarshalBinaryLengthPrefixed(trusteesIterator.Value(), &trustee)
 		trustees = append(trustees, trustee)
 	}

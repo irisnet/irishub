@@ -66,27 +66,21 @@ func (msg MsgCreateHTLC) ValidateBasic() sdk.Error {
 	if len(msg.Sender) == 0 {
 		return ErrInvalidAddress(DefaultCodespace, "the sender address must be specified")
 	}
-
 	if len(msg.To) == 0 {
 		return ErrInvalidAddress(DefaultCodespace, "the receiver address must be specified")
 	}
-
 	if len(msg.ReceiverOnOtherChain) > MaxLengthForAddressOnOtherChain {
 		return ErrInvalidAddress(DefaultCodespace, fmt.Sprintf("the length of the receiver on other chain must be between [0,%d]", MaxLengthForAddressOnOtherChain))
 	}
-
 	if !msg.Amount.IsValid() || !msg.Amount.IsAllPositive() {
 		return ErrInvalidAmount(DefaultCodespace, "the transferred amount must be valid")
 	}
-
 	if len(msg.HashLock) != HashLockLength {
 		return ErrInvalidHashLock(DefaultCodespace, fmt.Sprintf("the hash lock must be %d bytes long", HashLockLength))
 	}
-
 	if msg.TimeLock < MinTimeLock || msg.TimeLock > MaxTimeLock {
 		return ErrInvalidTimeLock(DefaultCodespace, fmt.Sprintf("the time lock must be between [%d,%d]", MinTimeLock, MaxTimeLock))
 	}
-
 	return nil
 }
 
@@ -96,7 +90,6 @@ func (msg MsgCreateHTLC) GetSignBytes() []byte {
 	if err != nil {
 		panic(err)
 	}
-
 	return sdk.MustSortJSON(b)
 }
 
@@ -138,15 +131,12 @@ func (msg MsgClaimHTLC) ValidateBasic() sdk.Error {
 	if len(msg.Sender) == 0 {
 		return ErrInvalidAddress(DefaultCodespace, "the sender address must be specified")
 	}
-
 	if len(msg.HashLock) != HashLockLength {
 		return ErrInvalidHashLock(DefaultCodespace, fmt.Sprintf("the hash lock must be %d bytes long", HashLockLength))
 	}
-
 	if len(msg.Secret) != SecretLength {
 		return ErrInvalidSecret(DefaultCodespace, fmt.Sprintf("the secret must be %d bytes long", SecretLength))
 	}
-
 	return nil
 }
 
@@ -156,7 +146,6 @@ func (msg MsgClaimHTLC) GetSignBytes() []byte {
 	if err != nil {
 		panic(err)
 	}
-
 	return sdk.MustSortJSON(b)
 }
 
@@ -195,11 +184,9 @@ func (msg MsgRefundHTLC) ValidateBasic() sdk.Error {
 	if len(msg.Sender) == 0 {
 		return ErrInvalidAddress(DefaultCodespace, "the sender address must be specified")
 	}
-
 	if len(msg.HashLock) != HashLockLength {
 		return ErrInvalidHashLock(DefaultCodespace, fmt.Sprintf("the hash lock must be %d bytes long", HashLockLength))
 	}
-
 	return nil
 }
 
@@ -209,7 +196,6 @@ func (msg MsgRefundHTLC) GetSignBytes() []byte {
 	if err != nil {
 		panic(err)
 	}
-
 	return sdk.MustSortJSON(b)
 }
 

@@ -14,7 +14,7 @@ import (
 )
 
 func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router) {
-	r.HandleFunc("/rand/rands/{request-id}", queryRandHandlerFn(cliCtx)).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/rand/rands/{%s}", RestRequestID), queryRandHandlerFn(cliCtx)).Methods("GET")
 	r.HandleFunc("/rand/queue", queryQueueHandlerFn(cliCtx)).Methods("GET")
 }
 
@@ -23,7 +23,7 @@ func queryRandHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 
-		reqID := vars["request-id"]
+		reqID := vars[RestRequestID]
 		if err := types.CheckReqID(reqID); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return

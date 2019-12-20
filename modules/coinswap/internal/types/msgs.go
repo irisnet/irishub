@@ -198,7 +198,6 @@ func NewMsgRemoveLiquidity(
 	deadline int64,
 	sender sdk.AccAddress,
 ) MsgRemoveLiquidity {
-
 	return MsgRemoveLiquidity{
 		MinToken:          minToken,
 		WithdrawLiquidity: withdrawLiquidity,

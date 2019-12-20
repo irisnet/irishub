@@ -6,8 +6,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/cosmos/cosmos-sdk/codec"
 	cmn "github.com/tendermint/tendermint/libs/common"
+
+	"github.com/cosmos/cosmos-sdk/codec"
 
 	"github.com/irisnet/irishub/modules/asset/internal/keeper"
 	"github.com/irisnet/irishub/modules/asset/internal/types"

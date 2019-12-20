@@ -3,12 +3,13 @@ package cli
 import (
 	"fmt"
 
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/version"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 
 	"github.com/irisnet/irishub/modules/asset/internal/types"
 )
@@ -56,8 +57,7 @@ func GetCmdQueryToken(queryRoute string, cdc *codec.Codec) *cobra.Command {
 			}
 
 			var token types.FungibleToken
-			err = cdc.UnmarshalJSON(res, &token)
-			if err != nil {
+			if err = cdc.UnmarshalJSON(res, &token); err != nil {
 				return err
 			}
 
@@ -93,8 +93,7 @@ func GetCmdQueryTokens(queryRoute string, cdc *codec.Codec) *cobra.Command {
 			}
 
 			var tokens types.Tokens
-			err = cdc.UnmarshalJSON(res, &tokens)
-			if err != nil {
+			if err = cdc.UnmarshalJSON(res, &tokens); err != nil {
 				return err
 			}
 

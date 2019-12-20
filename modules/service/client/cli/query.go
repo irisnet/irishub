@@ -5,12 +5,35 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/irisnet/irishub/modules/service/internal/types"
 )
+
+func GetQueryCmd(queryRoute string, cdc *codec.Codec) *cobra.Command {
+	// Group service queries under a subcommand
+	serviceQueryCmd := &cobra.Command{
+		Use:                        types.ModuleName,
+		Short:                      "Querying commands for the service module",
+		DisableFlagParsing:         true,
+		SuggestionsMinimumDistance: 2,
+		RunE:                       client.ValidateCmd,
+	}
+
+	serviceQueryCmd.AddCommand(client.GetCommands(
+		GetCmdQuerySvcDef(queryRoute, cdc),
+		GetCmdQuerySvcBind(queryRoute, cdc),
+		GetCmdQuerySvcBinds(queryRoute, cdc),
+		GetCmdQuerySvcRequests(queryRoute, cdc),
+		GetCmdQuerySvcResponse(queryRoute, cdc),
+		GetCmdQuerySvcFees(queryRoute, cdc),
+	)...)
+
+	return serviceQueryCmd
+}
 
 func GetCmdQuerySvcDef(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
@@ -38,8 +61,7 @@ func GetCmdQuerySvcDef(queryRoute string, cdc *codec.Codec) *cobra.Command {
 			}
 
 			var svcDefOutput types.DefinitionOutput
-			err = cdc.UnmarshalJSON(res, &svcDefOutput)
-			if err != nil {
+			if err = cdc.UnmarshalJSON(res, &svcDefOutput); err != nil {
 				return err
 			}
 
@@ -83,8 +105,7 @@ func GetCmdQuerySvcBind(queryRoute string, cdc *codec.Codec) *cobra.Command {
 			}
 
 			var binding types.SvcBinding
-			err = cdc.UnmarshalJSON(res, &binding)
-			if err != nil {
+			if err := cdc.UnmarshalJSON(res, &binding); err != nil {
 				return err
 			}
 
@@ -121,8 +142,7 @@ func GetCmdQuerySvcBinds(queryRoute string, cdc *codec.Codec) *cobra.Command {
 			}
 
 			var bindings []types.SvcBinding
-			err = cdc.UnmarshalJSON(res, &bindings)
-			if err != nil {
+			if err := cdc.UnmarshalJSON(res, &bindings); err != nil {
 				return err
 			}
 
@@ -166,8 +186,7 @@ func GetCmdQuerySvcRequests(queryRoute string, cdc *codec.Codec) *cobra.Command 
 			}
 
 			var requests []types.SvcRequest
-			err = cdc.UnmarshalJSON(res, &requests)
-			if err != nil {
+			if err := cdc.UnmarshalJSON(res, &requests); err != nil {
 				return err
 			}
 
@@ -204,8 +223,7 @@ func GetCmdQuerySvcResponse(queryRoute string, cdc *codec.Codec) *cobra.Command 
 			}
 
 			var response types.SvcResponse
-			err = cdc.UnmarshalJSON(res, &response)
-			if err != nil {
+			if err := cdc.UnmarshalJSON(res, &response); err != nil {
 				return err
 			}
 
@@ -246,8 +264,7 @@ func GetCmdQuerySvcFees(queryRoute string, cdc *codec.Codec) *cobra.Command {
 			}
 
 			var fees types.FeesOutput
-			err = cdc.UnmarshalJSON(res, &fees)
-			if err != nil {
+			if err := cdc.UnmarshalJSON(res, &fees); err != nil {
 				return err
 			}
 

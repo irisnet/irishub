@@ -54,3 +54,9 @@ func (p *Params) ParamSetPairs() params.ParamSetPairs {
 		{Key: KeyAssetFeeDenom, Value: &p.AssetFeeDenom},
 	}
 }
+
+// ValidateParams validates a set of params
+func (p Params) Validate() error {
+	// TODO should validate Params
+	return nil
+}

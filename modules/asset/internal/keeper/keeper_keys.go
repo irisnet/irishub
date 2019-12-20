@@ -23,6 +23,5 @@ func KeyTokens(owner sdk.AccAddress, tokenId string) []byte {
 	if owner.Empty() {
 		return []byte(fmt.Sprintf("tokens:%s", tokenId))
 	}
-
 	return []byte(fmt.Sprintf("ownerTokens:%s:%s", owner, tokenId))
 }

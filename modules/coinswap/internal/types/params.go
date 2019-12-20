@@ -59,7 +59,7 @@ func DefaultParams() Params {
 }
 
 // ValidateParams validates a set of params
-func ValidateParams(p Params) error {
+func (p Params) Validate() error {
 	if !p.Fee.GT(sdk.ZeroDec()) || !p.Fee.LT(sdk.OneDec()) {
 		return fmt.Errorf("fee must be positive and less than 1: %s", p.Fee.String())
 	}

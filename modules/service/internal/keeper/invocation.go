@@ -30,8 +30,7 @@ func (k Keeper) AddRequest(
 		return req, types.ErrSvcBindingNotAvailable(k.codespace)
 	}
 
-	_, found = k.GetMethod(ctx, defChainID, defName, methodID)
-	if !found {
+	if _, found = k.GetMethod(ctx, defChainID, defName, methodID); !found {
 		return req, types.ErrMethodNotExists(k.codespace, methodID)
 	}
 
@@ -53,8 +52,10 @@ func (k Keeper) AddRequest(
 		serviceFee = nil
 	}
 
-	req = types.NewSvcRequest(defChainID, defName, bindChainID, reqChainID,
-		consumer, provider, methodID, input, serviceFee, profiling)
+	req = types.NewSvcRequest(
+		defChainID, defName, bindChainID, reqChainID, consumer,
+		provider, methodID, input, serviceFee, profiling,
+	)
 
 	counter := k.GetIntraTxCounter(ctx)
 	k.SetIntraTxCounter(ctx, counter+1)
@@ -65,8 +66,9 @@ func (k Keeper) AddRequest(
 	params := k.GetParams(ctx)
 	req.ExpirationHeight = req.RequestHeight + params.MaxRequestTimeout
 
-	err = k.sk.SendCoinsFromAccountToModule(ctx, req.Consumer, types.RequestAccName, req.ServiceFee)
-	if err != nil {
+	if err = k.sk.SendCoinsFromAccountToModule(
+		ctx, req.Consumer, types.RequestAccName, req.ServiceFee,
+	); err != nil {
 		return req, err
 	}
 
@@ -168,8 +170,7 @@ func (k Keeper) AddResponse(
 		return resp, types.ErrNotMatchingReqChainID(k.codespace, reqChainID)
 	}
 
-	err = k.AddIncomingFee(ctx, provider, req.ServiceFee)
-	if err != nil {
+	if err = k.AddIncomingFee(ctx, provider, req.ServiceFee); err != nil {
 		return resp, err
 	}
 
@@ -220,8 +221,7 @@ func (k Keeper) Slash(ctx sdk.Context, binding types.SvcBinding, slashCoins sdk.
 		binding.DisableTime = ctx.BlockHeader().Time
 	}
 
-	err = k.sk.BurnCoins(ctx, types.DepositAccName, slashCoins)
-	if err != nil {
+	if err = k.sk.BurnCoins(ctx, types.DepositAccName, slashCoins); err != nil {
 		return err
 	}
 
@@ -276,8 +276,7 @@ func (k Keeper) RefundFee(ctx sdk.Context, address sdk.AccAddress) sdk.Error {
 		return types.ErrReturnFeeNotExists(k.codespace, address)
 	}
 
-	err := k.sk.SendCoinsFromModuleToAccount(ctx, types.RequestAccName, address, fee.Coins)
-	if err != nil {
+	if err := k.sk.SendCoinsFromModuleToAccount(ctx, types.RequestAccName, address, fee.Coins); err != nil {
 		return err
 	}
 
@@ -298,8 +297,7 @@ func (k Keeper) AddIncomingFee(ctx sdk.Context, address sdk.AccAddress, coins sd
 		taxCoins = taxCoins.Add(sdk.NewCoins(sdk.NewCoin(coin.Denom, taxAmount)))
 	}
 
-	err := k.sk.SendCoinsFromModuleToModule(ctx, types.RequestAccName, types.TaxAccName, taxCoins)
-	if err != nil {
+	if err := k.sk.SendCoinsFromModuleToModule(ctx, types.RequestAccName, types.TaxAccName, taxCoins); err != nil {
 		return err
 	}
 
@@ -347,8 +345,7 @@ func (k Keeper) WithdrawFee(ctx sdk.Context, address sdk.AccAddress) sdk.Error {
 		return types.ErrWithdrawFeeNotExists(k.codespace, address)
 	}
 
-	err := k.sk.SendCoinsFromModuleToAccount(ctx, types.RequestAccName, address, fee.Coins)
-	if err != nil {
+	if err := k.sk.SendCoinsFromModuleToAccount(ctx, types.RequestAccName, address, fee.Coins); err != nil {
 		return err
 	}
 
@@ -359,13 +356,10 @@ func (k Keeper) WithdrawFee(ctx sdk.Context, address sdk.AccAddress) sdk.Error {
 }
 
 func (k Keeper) WithdrawTax(ctx sdk.Context, trustee sdk.AccAddress, destAddress sdk.AccAddress, amt sdk.Coins) sdk.Error {
-	_, found := k.gk.GetTrustee(ctx, trustee)
-	if !found {
+	if _, found := k.gk.GetTrustee(ctx, trustee); !found {
 		return types.ErrNotTrustee(k.codespace, trustee)
 	}
-
-	err := k.sk.SendCoinsFromModuleToAccount(ctx, types.TaxAccName, destAddress, amt)
-	return err
+	return k.sk.SendCoinsFromModuleToAccount(ctx, types.TaxAccName, destAddress, amt)
 }
 
 // AllReturnedFeesIterator returns an iterator for all the returned fees
@@ -389,8 +383,9 @@ func (k Keeper) RefundReturnedFees(ctx sdk.Context) sdk.Error {
 		var returnedFee types.ReturnedFee
 		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &returnedFee)
 
-		err := k.sk.SendCoinsFromModuleToAccount(ctx, types.RequestAccName, returnedFee.Address, returnedFee.Coins)
-		if err != nil {
+		if err := k.sk.SendCoinsFromModuleToAccount(
+			ctx, types.RequestAccName, returnedFee.Address, returnedFee.Coins,
+		); err != nil {
 			return err
 		}
 	}
@@ -407,8 +402,9 @@ func (k Keeper) RefundIncomingFees(ctx sdk.Context) sdk.Error {
 		var incomingFee types.IncomingFee
 		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &incomingFee)
 
-		err := k.sk.SendCoinsFromModuleToAccount(ctx, types.RequestAccName, incomingFee.Address, incomingFee.Coins)
-		if err != nil {
+		if err := k.sk.SendCoinsFromModuleToAccount(
+			ctx, types.RequestAccName, incomingFee.Address, incomingFee.Coins,
+		); err != nil {
 			return err
 		}
 	}
@@ -425,8 +421,9 @@ func (k Keeper) RefundServiceFees(ctx sdk.Context) sdk.Error {
 		var request types.SvcRequest
 		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &request)
 
-		err := k.sk.SendCoinsFromModuleToAccount(ctx, types.RequestAccName, request.Consumer, request.ServiceFee)
-		if err != nil {
+		if err := k.sk.SendCoinsFromModuleToAccount(
+			ctx, types.RequestAccName, request.Consumer, request.ServiceFee,
+		); err != nil {
 			return err
 		}
 	}

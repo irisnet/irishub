@@ -55,6 +55,8 @@ var (
 	ErrInvalidDescription    = types.ErrInvalidDescription
 	NewGenesisState          = types.NewGenesisState
 	DefaultGenesisState      = types.DefaultGenesisState
+	ProfilerKey              = types.ProfilerKey
+	TrusteeKey               = types.TrusteeKey
 	GetProfilerKey           = types.GetProfilerKey
 	GetTrusteeKey            = types.GetTrusteeKey
 	GetProfilersSubspaceKey  = types.GetProfilersSubspaceKey

@@ -53,7 +53,7 @@ func DefaultParams() Params {
 	}
 }
 
-func validateParams(p Params) error {
+func (p Params) Validate() error {
 	if p.Inflation.GT(sdk.NewDecWithPrec(2, 1)) || p.Inflation.LT(sdk.ZeroDec()) {
 		return sdk.NewError(params.DefaultCodespace, CodeInvalidMintInflation, fmt.Sprintf("Mint Inflation [%s] should be between [0, 0.2] ", p.Inflation.String()))
 	}

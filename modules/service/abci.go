@@ -32,8 +32,7 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) {
 				}
 			}
 
-			err := keeper.Slash(ctx, binding, slashCoins)
-			if err != nil {
+			if err := keeper.Slash(ctx, binding, slashCoins); err != nil {
 				panic(err)
 			}
 		}

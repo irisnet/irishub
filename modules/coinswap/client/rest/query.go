@@ -14,14 +14,14 @@ import (
 
 func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router) {
 	// Query liquidity
-	r.HandleFunc("/coinswap/liquidities/{id}", queryLiquidityHandlerFn(cliCtx)).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/coinswap/liquidities/{%s}", RestPoolID), queryLiquidityHandlerFn(cliCtx)).Methods("GET")
 }
 
 // queryLiquidityHandlerFn performs liquidity information query
 func queryLiquidityHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		id := vars["id"]
+		id := vars[RestPoolID]
 		params := types.QueryLiquidityParams{
 			ID: id,
 		}

@@ -15,6 +15,9 @@ func NewGenesisState(profilers, trustees []Guardian) GenesisState {
 
 // get raw genesis raw message for testing
 func DefaultGenesisState() GenesisState {
-	guardian := Guardian{Description: "genesis", AccountType: Genesis}
+	guardian := Guardian{
+		Description: "genesis",
+		AccountType: Genesis,
+	}
 	return NewGenesisState([]Guardian{guardian}, []Guardian{guardian})
 }

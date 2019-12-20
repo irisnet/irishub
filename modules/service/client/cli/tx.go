@@ -20,6 +20,33 @@ import (
 	"github.com/irisnet/irishub/modules/service/internal/types"
 )
 
+// GetTxCmd returns the transaction commands for this module
+func GetTxCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
+	serviceTxCmd := &cobra.Command{
+		Use:                        types.ModuleName,
+		Short:                      "Service transaction subcommands",
+		DisableFlagParsing:         true,
+		SuggestionsMinimumDistance: 2,
+		RunE:                       client.ValidateCmd,
+	}
+
+	serviceTxCmd.AddCommand(client.PostCommands(
+		GetCmdSvcDef(cdc),
+		GetCmdSvcBind(cdc),
+		GetCmdSvcBindUpdate(cdc),
+		GetCmdSvcDisable(cdc),
+		GetCmdSvcEnable(cdc),
+		GetCmdSvcRefundDeposit(cdc),
+		GetCmdSvcCall(cdc),
+		GetCmdSvcRespond(cdc),
+		GetCmdSvcRefundFees(cdc),
+		GetCmdSvcWithdrawFees(cdc),
+		GetCmdSvcWithdrawTax(cdc),
+	)...)
+
+	return serviceTxCmd
+}
+
 func GetCmdSvcDef(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "define",
@@ -111,7 +138,10 @@ func GetCmdSvcBind(cdc *codec.Codec) *cobra.Command {
 				prices = append(prices, price)
 			}
 
-			level := types.Level{AvgRspTime: avgRspTime, UsableTime: usableTime}
+			level := types.Level{
+				AvgRspTime: avgRspTime,
+				UsableTime: usableTime,
+			}
 
 			msg := types.NewMsgSvcBind(defChainID, name, chainID, fromAddr, bindingType, deposit, prices, level)
 			if err := msg.ValidateBasic(); err != nil {

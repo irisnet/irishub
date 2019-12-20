@@ -17,40 +17,40 @@ const (
 
 // QueryTokenParams is the query parameters for 'custom/asset/tokens/{id}'
 type QueryTokenParams struct {
-	TokenID string `json:"token_id"`
+	TokenID string `json:"token_id" yaml:"token_id"`
 }
 
 // QueryTokensParams is the query parameters for 'custom/asset/tokens'
 type QueryTokensParams struct {
-	Source  string `json:"source"`
-	Gateway string `json:"gateway"`
-	Owner   string `json:"owner"`
+	Source  string `json:"source" yaml:"source"`
+	Gateway string `json:"gateway" yaml:"gateway"`
+	Owner   string `json:"owner" yaml:"owner"`
 }
 
 // QueryGatewayParams is the query parameters for 'custom/asset/gateway'
 type QueryGatewayParams struct {
-	Moniker string `json:"moniker"`
+	Moniker string `json:"moniker" yaml:"moniker"`
 }
 
 // QueryGatewaysParams is the query parameters for 'custom/asset/gateways'
 type QueryGatewaysParams struct {
-	Owner sdk.AccAddress `json:"owner"`
+	Owner sdk.AccAddress `json:"owner" yaml:"owner"`
 }
 
 // QueryGatewayFeeParams is the query parameters for 'custom/asset/fees/gateways'
 type QueryGatewayFeeParams struct {
-	Moniker string `json:"moniker"`
+	Moniker string `json:"moniker" yaml:"moniker"`
 }
 
 // QueryTokenFeesParams is the query parameters for 'custom/asset/fees/tokens'
 type QueryTokenFeesParams struct {
-	ID string `json:"id"`
+	ID string `json:"id" yaml:"id"`
 }
 
 // GatewayFeeOutput is for the gateway fee query output
 type GatewayFeeOutput struct {
-	Exist bool     `json:"exist"` // indicate if the gateway has existed
-	Fee   sdk.Coin `json:"fee"`   // creation fee
+	Exist bool     `json:"exist" yaml:"exist"` // indicate if the gateway has existed
+	Fee   sdk.Coin `json:"fee" yaml:"fee"`     // creation fee
 }
 
 // TokenFeesOutput is for the token fees query output

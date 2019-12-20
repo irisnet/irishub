@@ -1,7 +1,7 @@
 package types
 
 const (
-	EventTypeMint = ModuleName
+	EventTypeMint = "mint"
 
 	AttributeKeyLastInflationTime = "last_inflation_time"
 	AttributeKeyInflationTime     = "inflation_time"

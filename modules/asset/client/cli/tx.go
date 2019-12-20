@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -11,8 +14,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/version"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 
 	"github.com/irisnet/irishub/modules/asset/internal/types"
 	iristypes "github.com/irisnet/irishub/types"
@@ -27,12 +28,14 @@ func GetTxCmd(queryRoute string, cdc *codec.Codec) *cobra.Command {
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
 	}
+
 	txCmd.AddCommand(client.PostCommands(
 		GetCmdIssueToken(queryRoute, cdc),
 		GetCmdTransferTokenOwner(cdc),
 		GetCmdEditToken(cdc),
 		GetCmdMintToken(queryRoute, cdc),
 	)...)
+
 	return txCmd
 }
 
@@ -134,9 +137,8 @@ func GetCmdEditToken(cdc *codec.Codec) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			var msg sdk.Msg
-			msg = types.NewMsgEditToken(name,
-				canonicalSymbol, minUnitAlias, tokenId, maxSupply, mintable, owner)
+
+			msg := types.NewMsgEditToken(name, canonicalSymbol, minUnitAlias, tokenId, maxSupply, mintable, owner)
 
 			if err := msg.ValidateBasic(); err != nil {
 				return err
@@ -174,8 +176,7 @@ func GetCmdMintToken(queryRoute string, cdc *codec.Codec) *cobra.Command {
 				}
 			}
 
-			var msg sdk.Msg
-			msg = types.NewMsgMintToken(
+			msg := types.NewMsgMintToken(
 				args[0], owner, to, amount,
 			)
 
@@ -223,8 +224,7 @@ func GetCmdTransferTokenOwner(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			var msg sdk.Msg
-			msg = types.NewMsgTransferTokenOwner(owner, to, args[0])
+			msg := types.NewMsgTransferTokenOwner(owner, to, args[0])
 
 			if err := msg.ValidateBasic(); err != nil {
 				return err

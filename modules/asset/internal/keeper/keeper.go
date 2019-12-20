@@ -60,14 +60,14 @@ func (k Keeper) IssueToken(ctx sdk.Context, token types.FungibleToken) sdk.Error
 	if owner != nil {
 		// mint coins
 		mintCoins := sdk.NewCoins(initialSupply)
-		err := k.supplyKeeper.MintCoins(ctx, types.ModuleName, mintCoins)
-		if err != nil {
+		if err := k.supplyKeeper.MintCoins(ctx, types.ModuleName, mintCoins); err != nil {
 			return err
 		}
 
 		// sent coins to owner's account
-		err = k.supplyKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, owner, mintCoins)
-		if err != nil {
+		if err = k.supplyKeeper.SendCoinsFromModuleToAccount(
+			ctx, types.ModuleName, owner, mintCoins,
+		); err != nil {
 			return err
 		}
 	}
@@ -92,22 +92,19 @@ func (k Keeper) AddToken(ctx sdk.Context, token types.FungibleToken) (types.Fung
 		token.CanonicalSymbol = ""
 	}
 
-	err = k.setToken(ctx, token)
-	if err != nil {
+	if err = k.setToken(ctx, token); err != nil {
 		return token, nil, err
 	}
 
 	// Set token to be prefixed with owner and source
 	if token.GetSource() == types.NATIVE {
-		err = k.setTokens(ctx, owner, token)
-		if err != nil {
+		if err = k.setTokens(ctx, owner, token); err != nil {
 			return token, nil, err
 		}
 	}
 
 	// Set token to be prefixed with source
-	err = k.setTokens(ctx, sdk.AccAddress{}, token)
-	if err != nil {
+	if err = k.setTokens(ctx, sdk.AccAddress{}, token); err != nil {
 		return token, nil, err
 	}
 
@@ -184,11 +181,9 @@ func (k Keeper) EditToken(ctx sdk.Context, msg types.MsgEditToken) sdk.Error {
 	if maxSupply.GT(sdk.ZeroInt()) && (maxSupply.LT(hasIssuedAmt) || maxSupply.GT(token.MaxSupply)) {
 		return types.ErrInvalidAssetMaxSupply(k.codespace, fmt.Sprintf("max supply must not be less than %s and greater than %s", hasIssuedAmt.String(), token.MaxSupply.String()))
 	}
-
 	if msg.Name != types.DoNotModify {
 		token.Name = msg.Name
 	}
-
 	if msg.CanonicalSymbol != types.DoNotModify && token.Source != types.NATIVE {
 		token.CanonicalSymbol = msg.CanonicalSymbol
 	}
@@ -202,11 +197,7 @@ func (k Keeper) EditToken(ctx sdk.Context, msg types.MsgEditToken) sdk.Error {
 		token.Mintable = msg.Mintable.ToBool()
 	}
 
-	if err := k.setToken(ctx, token); err != nil {
-		return err
-	}
-
-	return nil
+	return k.setToken(ctx, token)
 }
 
 // IterateTokens iterates through all existing tokens
@@ -269,10 +260,7 @@ func (k Keeper) TransferTokenOwner(ctx sdk.Context, msg types.MsgTransferTokenOw
 	}
 
 	// reset all index for query-token
-	if err := k.resetStoreKeyForQueryToken(ctx, msg, token); err != nil {
-		return err
-	}
-	return nil
+	return k.resetStoreKeyForQueryToken(ctx, msg, token)
 }
 
 // reset all index by DstOwner of token for query-token command
@@ -333,18 +321,12 @@ func (k Keeper) MintToken(ctx sdk.Context, msg types.MsgMintToken) sdk.Error {
 	}
 
 	// mint coins
-	err := k.supplyKeeper.MintCoins(ctx, types.ModuleName, mintCoins)
-	if err != nil {
+	if err := k.supplyKeeper.MintCoins(ctx, types.ModuleName, mintCoins); err != nil {
 		return err
 	}
 
 	// sent coins to owner's account
-	err = k.supplyKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, mintAcc, mintCoins)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return k.supplyKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, mintAcc, mintCoins)
 }
 
 // AssetTokenSupply asset tokens from the total supply
