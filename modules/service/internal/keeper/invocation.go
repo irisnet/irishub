@@ -225,8 +225,7 @@ func (k Keeper) Slash(ctx sdk.Context, binding types.SvcBinding, slashCoins sdk.
 		return err
 	}
 
-	ctx.Logger().Info("Slash service provider", "provider", binding.Provider.String(), "slash_amount", slashCoins.String())
-
+	k.Logger(ctx).Info("Slash service provider", "provider", binding.Provider.String(), "slash_amount", slashCoins.String())
 	k.SetServiceBinding(ctx, binding)
 
 	return nil
@@ -280,7 +279,7 @@ func (k Keeper) RefundFee(ctx sdk.Context, address sdk.AccAddress) sdk.Error {
 		return err
 	}
 
-	ctx.Logger().Info("Refund fees", "address", address.String(), "amount", fee.Coins.String())
+	k.Logger(ctx).Info("Refund fees", "address", address.String(), "amount", fee.Coins.String())
 	k.DeleteReturnFee(ctx, address)
 
 	return nil
@@ -349,7 +348,7 @@ func (k Keeper) WithdrawFee(ctx sdk.Context, address sdk.AccAddress) sdk.Error {
 		return err
 	}
 
-	ctx.Logger().Info("Withdraw fees", "address", address.String(), "amount", fee.Coins.String())
+	k.Logger(ctx).Info("Withdraw fees", "address", address.String(), "amount", fee.Coins.String())
 	k.DeleteIncomingFee(ctx, address)
 
 	return nil

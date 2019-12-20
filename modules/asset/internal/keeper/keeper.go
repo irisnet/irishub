@@ -3,6 +3,8 @@ package keeper
 import (
 	"fmt"
 
+	"github.com/tendermint/tendermint/libs/log"
+
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/params"
@@ -41,6 +43,11 @@ func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, paramSpace params.Subspace,
 		supplyKeeper:     supplyKeeper,
 		feeCollectorName: feeCollectorName,
 	}
+}
+
+// Logger returns a module-specific logger.
+func (k Keeper) Logger(ctx sdk.Context) log.Logger {
+	return ctx.Logger().With("module", fmt.Sprintf("%s", types.ModuleName))
 }
 
 // Codespace returns the codespace
@@ -220,19 +227,19 @@ func (k Keeper) IterateTokens(ctx sdk.Context, op func(token types.FungibleToken
 // TODO: delete
 // Init
 func (k Keeper) Init(ctx sdk.Context) {
-	ctx = ctx.WithLogger(ctx.Logger().With("handler", "Init").With("module", "iris/asset"))
+	logger := k.Logger(ctx)
 
 	//Initialize external tokens BTC and ETH
 	maxSupply := sdk.NewIntWithDecimal(int64(types.MaximumAssetMaxSupply), 8)
 	btc := types.NewFungibleToken(types.EXTERNAL, "BTC", "Bitcoin", 8, "BTC", "satoshi", sdk.ZeroInt(), maxSupply, true, nil)
 	if err := k.IssueToken(ctx, btc); err != nil {
-		ctx.Logger().Error(fmt.Sprintf("initialize external tokens BTC failed:%s", err.Error()))
+		logger.Error(fmt.Sprintf("initialize external tokens BTC failed:%s", err.Error()))
 	}
 
 	maxSupply = sdk.NewIntWithDecimal(int64(types.MaximumAssetMaxSupply), 18)
 	eth := types.NewFungibleToken(types.EXTERNAL, "ETH", "Ethereum", 18, "ETH", "wei", sdk.ZeroInt(), maxSupply, true, nil)
 	if err := k.IssueToken(ctx, eth); err != nil {
-		ctx.Logger().Error(fmt.Sprintf("initialize external tokens ETH failed:%s", err.Error()))
+		logger.Error(fmt.Sprintf("initialize external tokens ETH failed:%s", err.Error()))
 	}
 }
 

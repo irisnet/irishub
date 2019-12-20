@@ -9,8 +9,6 @@ import (
 
 // BeginBlocker handles block beginning logic
 func BeginBlocker(ctx sdk.Context, k Keeper) {
-	ctx = ctx.WithLogger(ctx.Logger().With("handler", "beginBlock").With("module", "iris/htlc"))
-
 	currentBlockHeight := uint64(ctx.BlockHeight())
 	iterator := k.IterateHTLCExpireQueueByHeight(ctx, currentBlockHeight)
 	defer iterator.Close()
@@ -36,7 +34,7 @@ func BeginBlocker(ctx sdk.Context, k Keeper) {
 			),
 		)
 
-		ctx.Logger().Info(fmt.Sprintf("HTLC [%s] is expired", hex.EncodeToString(hashLock)))
+		k.Logger(ctx).Info(fmt.Sprintf("HTLC [%s] is expired", hex.EncodeToString(hashLock)))
 	}
 
 	return

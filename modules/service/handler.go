@@ -49,7 +49,7 @@ func handleMsgSvcDef(ctx sdk.Context, k Keeper, msg MsgSvcDef) sdk.Result {
 		return err.Result()
 	}
 
-	ctx.Logger().Info("Create service definition", "name", msg.Name, "author", msg.Author.String())
+	k.Logger(ctx).Info("Create service definition", "name", msg.Name, "author", msg.Author.String())
 
 	return sdk.Result{}
 }
@@ -62,7 +62,7 @@ func handleMsgSvcBind(ctx sdk.Context, k Keeper, msg MsgSvcBind) sdk.Result {
 		return err.Result()
 	}
 
-	ctx.Logger().Info("Add service binding", "def_name", msg.DefName, "def_chain_id", msg.DefChainID,
+	k.Logger(ctx).Info("Add service binding", "def_name", msg.DefName, "def_chain_id", msg.DefChainID,
 		"provider", msg.Provider.String(), "binding_type", msg.BindingType.String())
 
 	return sdk.Result{}
@@ -75,7 +75,7 @@ func handleMsgSvcBindUpdate(ctx sdk.Context, k Keeper, msg MsgSvcBindingUpdate) 
 		return err.Result()
 	}
 
-	ctx.Logger().Info("Update service binding", "def_name", msg.DefName, "def_chain_id", msg.DefChainID,
+	k.Logger(ctx).Info("Update service binding", "def_name", msg.DefName, "def_chain_id", msg.DefChainID,
 		"provider", msg.Provider.String(), "binding_type", svcBinding.BindingType.String())
 
 	return sdk.Result{}
@@ -88,7 +88,7 @@ func handleMsgSvcDisable(ctx sdk.Context, k Keeper, msg MsgSvcDisable) sdk.Resul
 		return err.Result()
 	}
 
-	ctx.Logger().Info("Disable service binding", "def_name", msg.DefName, "def_chain_id", msg.DefChainID,
+	k.Logger(ctx).Info("Disable service binding", "def_name", msg.DefName, "def_chain_id", msg.DefChainID,
 		"provider", msg.Provider.String())
 
 	return sdk.Result{}
@@ -101,7 +101,7 @@ func handleMsgSvcEnable(ctx sdk.Context, k Keeper, msg MsgSvcEnable) sdk.Result 
 		return err.Result()
 	}
 
-	ctx.Logger().Info("Enable service binding", "def_name", msg.DefName, "def_chain_id", msg.DefChainID,
+	k.Logger(ctx).Info("Enable service binding", "def_name", msg.DefName, "def_chain_id", msg.DefChainID,
 		"provider", msg.Provider.String())
 
 	return sdk.Result{}
@@ -114,7 +114,7 @@ func handleMsgSvcRefundDeposit(ctx sdk.Context, k Keeper, msg MsgSvcRefundDeposi
 		return err.Result()
 	}
 
-	ctx.Logger().Info("Refund deposit", "def_name", msg.DefName, "def_chain_id", msg.DefChainID,
+	k.Logger(ctx).Info("Refund deposit", "def_name", msg.DefName, "def_chain_id", msg.DefChainID,
 		"provider", msg.Provider.String())
 
 	return sdk.Result{}
@@ -127,7 +127,7 @@ func handleMsgSvcRequest(ctx sdk.Context, k Keeper, msg MsgSvcRequest) sdk.Resul
 		return err.Result()
 	}
 
-	ctx.Logger().Debug("Service request", "def_name", req.DefName, "def_chain_id", req.DefChainID,
+	k.Logger(ctx).Debug("Service request", "def_name", req.DefName, "def_chain_id", req.DefChainID,
 		"provider", req.Provider.String(), "consumer", req.Consumer.String(), "method_id", req.MethodID,
 		"service_fee", req.ServiceFee, "request_id", req.RequestID())
 
@@ -156,7 +156,7 @@ func handleMsgSvcResponse(ctx sdk.Context, k Keeper, msg MsgSvcResponse) sdk.Res
 		return err.Result()
 	}
 
-	ctx.Logger().Debug("Service response", "request_id", msg.RequestID,
+	k.Logger(ctx).Debug("Service response", "request_id", msg.RequestID,
 		"provider", resp.Provider.String(), "consumer", resp.Consumer.String())
 
 	ctx.EventManager().EmitEvents(

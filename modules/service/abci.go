@@ -5,26 +5,24 @@ import (
 )
 
 // EndBlocker handles block ending logic
-func EndBlocker(ctx sdk.Context, keeper Keeper) {
-	logger := keeper.Logger(ctx)
-
+func EndBlocker(ctx sdk.Context, k Keeper) {
 	// Reset the intra-transaction counter.
-	keeper.SetIntraTxCounter(ctx, 0)
+	k.SetIntraTxCounter(ctx, 0)
 
-	params := keeper.GetParams(ctx)
+	params := k.GetParams(ctx)
 	slashFraction := params.SlashFraction
 
-	activeIterator := keeper.ActiveRequestQueueIterator(ctx, ctx.BlockHeight())
+	activeIterator := k.ActiveRequestQueueIterator(ctx, ctx.BlockHeight())
 	defer activeIterator.Close()
 
 	for ; activeIterator.Valid(); activeIterator.Next() {
 		var req SvcRequest
-		keeper.GetCdc().MustUnmarshalBinaryLengthPrefixed(activeIterator.Value(), &req)
+		k.GetCdc().MustUnmarshalBinaryLengthPrefixed(activeIterator.Value(), &req)
 
 		// if not Profiling mode,should slash provider
 		slashCoins := sdk.NewCoins()
 		if !req.Profiling {
-			binding, found := keeper.GetServiceBinding(ctx, req.DefChainID, req.DefName, req.BindChainID, req.Provider)
+			binding, found := k.GetServiceBinding(ctx, req.DefChainID, req.DefName, req.BindChainID, req.Provider)
 			if found {
 				for _, coin := range binding.Deposit {
 					taxAmount := sdk.NewDecFromInt(coin.Amount).Mul(slashFraction).TruncateInt()
@@ -32,15 +30,15 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) {
 				}
 			}
 
-			if err := keeper.Slash(ctx, binding, slashCoins); err != nil {
+			if err := k.Slash(ctx, binding, slashCoins); err != nil {
 				panic(err)
 			}
 		}
 
-		keeper.AddReturnFee(ctx, req.Consumer, req.ServiceFee)
+		k.AddReturnFee(ctx, req.Consumer, req.ServiceFee)
 
-		keeper.DeleteActiveRequest(ctx, req)
-		keeper.DeleteRequestExpiration(ctx, req)
+		k.DeleteActiveRequest(ctx, req)
+		k.DeleteRequestExpiration(ctx, req)
 
 		ctx.EventManager().EmitEvent(
 			sdk.NewEvent(
@@ -51,7 +49,7 @@ func EndBlocker(ctx sdk.Context, keeper Keeper) {
 			),
 		)
 
-		logger.Info("Remove timeout request", "request_id", req.RequestID(), "consumer", req.Consumer.String())
+		k.Logger(ctx).Info("Remove timeout request", "request_id", req.RequestID(), "consumer", req.Consumer.String())
 	}
 
 	return
