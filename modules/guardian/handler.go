@@ -1,6 +1,8 @@
 package guardian
 
 import (
+	"fmt"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -19,7 +21,8 @@ func NewHandler(k Keeper) sdk.Handler {
 		case MsgDeleteTrustee:
 			return handleMsgDeleteTrustee(ctx, k, msg)
 		default:
-			return sdk.ErrTxDecode("invalid message parse in guardian module").Result()
+			errMsg := fmt.Sprintf("unrecognized guardian message type: %T", msg)
+			return sdk.ErrUnknownRequest(errMsg).Result()
 		}
 	}
 }

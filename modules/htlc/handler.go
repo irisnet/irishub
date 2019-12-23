@@ -2,6 +2,7 @@ package htlc
 
 import (
 	"encoding/hex"
+	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -19,7 +20,8 @@ func NewHandler(k Keeper) sdk.Handler {
 		case MsgRefundHTLC:
 			return handleMsgRefundHTLC(ctx, k, msg)
 		default:
-			return sdk.ErrTxDecode("invalid message parsed in HTLC module").Result()
+			errMsg := fmt.Sprintf("unrecognized HTLC message type: %T", msg)
+			return sdk.ErrUnknownRequest(errMsg).Result()
 		}
 	}
 }

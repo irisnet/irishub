@@ -21,7 +21,8 @@ func NewHandler(k Keeper) sdk.Handler {
 		case MsgTransferTokenOwner:
 			return handleMsgTransferTokenOwner(ctx, k, msg)
 		default:
-			return sdk.ErrTxDecode("invalid message parse in asset module").Result()
+			errMsg := fmt.Sprintf("unrecognized asset message type: %T", msg)
+			return sdk.ErrUnknownRequest(errMsg).Result()
 		}
 	}
 }
