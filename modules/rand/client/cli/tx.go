@@ -15,7 +15,7 @@ import (
 	"github.com/irisnet/irishub/modules/rand/internal/types"
 )
 
-// GetTxCmd returns the transaction commands for this module
+// GetTxCmd returns the transaction commands for the rand module.
 func GetTxCmd(cdc *codec.Codec) *cobra.Command {
 	randTxCmd := &cobra.Command{
 		Use:                        types.ModuleName,
@@ -30,7 +30,7 @@ func GetTxCmd(cdc *codec.Codec) *cobra.Command {
 	return randTxCmd
 }
 
-// GetCmdRequestRand implements the request-rand command
+// GetCmdRequestRand implements the request-rand command.
 func GetCmdRequestRand(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "request-rand",

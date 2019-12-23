@@ -14,9 +14,11 @@ import (
 )
 
 func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router) {
+	// request rands
 	r.HandleFunc("/rand/rands", requestRandHandlerFn(cliCtx)).Methods("POST")
 }
 
+// HTTP request handler to request rand.
 func requestRandHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req RequestRandReq

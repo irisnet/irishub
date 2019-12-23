@@ -13,11 +13,11 @@ import (
 )
 
 func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router) {
-	// Query liquidity
+	// query liquidity
 	r.HandleFunc(fmt.Sprintf("/coinswap/liquidities/{%s}", RestPoolID), queryLiquidityHandlerFn(cliCtx)).Methods("GET")
 }
 
-// queryLiquidityHandlerFn performs liquidity information query
+// HTTP request handler to query liquidity information.
 func queryLiquidityHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)

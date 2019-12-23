@@ -16,12 +16,15 @@ import (
 )
 
 func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router) {
+	// create an HTLC
 	r.HandleFunc("/htlc/htlcs", createHTLCHandlerFn(cliCtx)).Methods("POST")
+	// claim an HTLC
 	r.HandleFunc(fmt.Sprintf("/htlc/htlcs/{%s}/claim", RestHashLock), claimHTLCHandlerFn(cliCtx)).Methods("POST")
+	// refund an HTLC
 	r.HandleFunc(fmt.Sprintf("/htlc/htlcs/{%s}/refund", RestHashLock), refundHTLCHandlerFn(cliCtx)).Methods("POST")
 }
 
-// create an HTLC
+// HTTP request handler to create HTLC.
 func createHTLCHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req CreateHTLCReq
@@ -59,7 +62,7 @@ func createHTLCHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	}
 }
 
-// claim an HTLC
+// HTTP request handler to claim HTLC.
 func claimHTLCHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
@@ -97,7 +100,7 @@ func claimHTLCHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	}
 }
 
-// refund an HTLC
+// HTTP request handler to refund HTLC.
 func refundHTLCHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)

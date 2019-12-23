@@ -14,7 +14,7 @@ import (
 	"github.com/irisnet/irishub/modules/asset/internal/types"
 )
 
-// GetQueryCmd returns the query commands for this module
+// GetQueryCmd returns the query commands for the asset module.
 func GetQueryCmd(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	queryCmd := &cobra.Command{
 		Use:                types.ModuleName,

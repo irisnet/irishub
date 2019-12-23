@@ -12,7 +12,7 @@ import (
 	"github.com/irisnet/irishub/modules/guardian/internal/types"
 )
 
-// GetQueryCmd returns the cli query commands for the Guardian module.
+// GetQueryCmd returns the cli query commands for the guardian module.
 func GetQueryCmd(cdc *codec.Codec) *cobra.Command {
 	txCmd := &cobra.Command{
 		Use:                        types.ModuleName,

@@ -15,13 +15,17 @@ import (
 )
 
 func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router) {
+	// issue a token
 	r.HandleFunc("/asset/tokens", issueTokenHandlerFn(cliCtx)).Methods("POST")
+	// edit a token
 	r.HandleFunc(fmt.Sprintf("/asset/tokens/{%s}", RestTokenID), editTokenHandlerFn(cliCtx)).Methods("PUT")
+	// transfer owner
 	r.HandleFunc(fmt.Sprintf("/asset/tokens/{%s}/transfer-owner", RestTokenID), transferOwnerHandlerFn(cliCtx)).Methods("POST")
+	// mint token
 	r.HandleFunc(fmt.Sprintf("/asset/tokens/{%s}/mint", RestTokenID), mintTokenHandlerFn(cliCtx)).Methods("POST")
 }
 
-// issue a token
+// HTTP request handler to issue token.
 func issueTokenHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req IssueTokenReq
@@ -48,7 +52,7 @@ func issueTokenHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	}
 }
 
-// edit a token
+// HTTP request handler to edit token.
 func editTokenHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
@@ -83,7 +87,7 @@ func editTokenHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	}
 }
 
-// transfer owner
+// HTTP request handler to transfer owner.
 func transferOwnerHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
@@ -109,7 +113,7 @@ func transferOwnerHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	}
 }
 
-// mint token
+// HTTP request handler to mint token.
 func mintTokenHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)

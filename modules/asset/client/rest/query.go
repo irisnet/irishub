@@ -11,28 +11,32 @@ import (
 )
 
 func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router, queryRoute string) {
+	// get token by id
 	r.HandleFunc(fmt.Sprintf("/asset/tokens/{%s}", RestTokenID), queryTokenHandlerFn(cliCtx, queryRoute)).Methods("GET")
+	// search tokens
 	r.HandleFunc("/asset/tokens", queryTokensHandlerFn(cliCtx, queryRoute)).Methods("GET")
+	// get token fees
 	r.HandleFunc(fmt.Sprintf("/asset/fees/tokens/{%s}", RestTokenID), tokenFeesHandlerFn(cliCtx, queryRoute)).Methods("GET")
+	// get the current asset parameter values
 	r.HandleFunc("/asset/parameters", paramsHandlerFn(cliCtx, queryRoute)).Methods("GET")
 }
 
-// queryTokenHandlerFn performs token information query
+// HTTP request handler to query token information.
 func queryTokenHandlerFn(cliCtx context.CLIContext, queryRoute string) http.HandlerFunc {
 	return queryToken(cliCtx, queryRoute)
 }
 
-// queryTokenHandlerFn performs token information query
+// HTTP request handler to query token information.
 func queryTokensHandlerFn(cliCtx context.CLIContext, queryRoute string) http.HandlerFunc {
 	return queryTokens(cliCtx, queryRoute)
 }
 
-// tokenFeesHandlerFn is the HTTP request handler to query token fees
+// HTTP request handler to query token fees.
 func tokenFeesHandlerFn(cliCtx context.CLIContext, queryRoute string) http.HandlerFunc {
 	return queryTokenFees(cliCtx, queryRoute)
 }
 
-// HTTP request handler to query the staking params values
+// HTTP request handler to query the staking params values.
 func paramsHandlerFn(cliCtx context.CLIContext, queryRoute string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		cliCtx, ok := rest.ParseQueryHeightOrReturnBadRequest(w, cliCtx, r)

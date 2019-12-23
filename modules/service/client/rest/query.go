@@ -14,14 +14,21 @@ import (
 )
 
 func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router) {
+	// query definition
 	r.HandleFunc(fmt.Sprintf("/service/definitions/{%s}/{%s}", RestDefChainID, RestServiceName), queryDefinitionHandlerFn(cliCtx)).Methods("GET")
+	// query binding
 	r.HandleFunc(fmt.Sprintf("/service/bindings/{%s}/{%s}/{%s}/{%s}", RestDefChainID, RestServiceName, RestBindChainID, RestProvider), queryBindingHandlerFn(cliCtx)).Methods("GET")
+	// query bindings
 	r.HandleFunc(fmt.Sprintf("/service/bindings/{%s}/{%s}", RestDefChainID, RestServiceName), queryBindingsHandlerFn(cliCtx)).Methods("GET")
+	// query requests
 	r.HandleFunc(fmt.Sprintf("/service/requests/{%s}/{%s}/{%s}/{%s}", RestDefChainID, RestServiceName, RestBindChainID, RestProvider), queryRequestsHandlerFn(cliCtx)).Methods("GET")
+	// query response
 	r.HandleFunc(fmt.Sprintf("/service/responses/{%s}/{%s}", RestReqChainID, RestReqID), queryResponseHandlerFn(cliCtx)).Methods("GET")
+	// query fees
 	r.HandleFunc(fmt.Sprintf("/service/fees/{%s}", RestAddress), queryFeesHandlerFn(cliCtx)).Methods("GET")
 }
 
+// HTTP request handler to query definition.
 func queryDefinitionHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
@@ -56,6 +63,7 @@ func queryDefinitionHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	}
 }
 
+// HTTP request handler to query binding.
 func queryBindingHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
@@ -100,6 +108,7 @@ func queryBindingHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	}
 }
 
+// HTTP request handler to query bindings.
 func queryBindingsHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
@@ -134,6 +143,7 @@ func queryBindingsHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	}
 }
 
+// HTTP request handler to query requests.
 func queryRequestsHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
@@ -178,6 +188,7 @@ func queryRequestsHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	}
 }
 
+// HTTP request handler to query response.
 func queryResponseHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
@@ -212,6 +223,7 @@ func queryResponseHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	}
 }
 
+// HTTP request handler to query fees.
 func queryFeesHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)

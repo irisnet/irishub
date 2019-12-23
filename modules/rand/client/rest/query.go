@@ -14,11 +14,13 @@ import (
 )
 
 func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router) {
+	// query rand by the request id
 	r.HandleFunc(fmt.Sprintf("/rand/rands/{%s}", RestRequestID), queryRandHandlerFn(cliCtx)).Methods("GET")
+	// query rand request queue by an optional heigth
 	r.HandleFunc("/rand/queue", queryQueueHandlerFn(cliCtx)).Methods("GET")
 }
 
-// queryRandHandlerFn performs rand query by the request id
+// HTTP request handler to query rand by the request id.
 func queryRandHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
@@ -69,7 +71,7 @@ func queryRandHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	}
 }
 
-// queryQueueHandlerFn performs rand request queue query by an optional heigth
+// HTTP request handler to query request queue by an optional heigth.
 func queryQueueHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		genHeightStr := r.FormValue("gen-height")

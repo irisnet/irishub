@@ -14,10 +14,11 @@ import (
 )
 
 func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router) {
+	// get the HTLC by the hash lock
 	r.HandleFunc(fmt.Sprintf("/htlc/htlcs/{%s}", RestHashLock), queryHTLCHandlerFn(cliCtx)).Methods("GET")
 }
 
-// get the HTLC by the hash lock
+// HTTP request handler to get the HTLC by the hash lock.
 func queryHTLCHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)

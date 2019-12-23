@@ -13,9 +13,11 @@ import (
 )
 
 func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router) {
+	// get the current mint parameter values
 	r.HandleFunc("/mint/parameters", queryParamsHandlerFn(cliCtx)).Methods("GET")
 }
 
+// HTTP request handler to get the current mint parameter values
 func queryParamsHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		route := fmt.Sprintf("custom/%s/%s", types.QuerierRoute, types.QueryParameters)

@@ -19,7 +19,7 @@ import (
 	"github.com/irisnet/irishub/modules/htlc/internal/types"
 )
 
-// GetTxCmd returns the transaction commands for this module
+// GetTxCmd returns the transaction commands for the HTLC module.
 func GetTxCmd(cdc *codec.Codec) *cobra.Command {
 	stakingTxCmd := &cobra.Command{
 		Use:                        types.ModuleName,
@@ -36,7 +36,7 @@ func GetTxCmd(cdc *codec.Codec) *cobra.Command {
 	return stakingTxCmd
 }
 
-// GetCmdCreateHTLC implements the create HTLC command
+// GetCmdCreateHTLC implements the create HTLC command.
 func GetCmdCreateHTLC(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create",
@@ -128,7 +128,7 @@ func GetCmdCreateHTLC(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-// GetCmdClaimHTLC implements the claim HTLC command
+// GetCmdClaimHTLC implements the claim HTLC command.
 func GetCmdClaimHTLC(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "claim",
@@ -167,7 +167,7 @@ func GetCmdClaimHTLC(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-// GetCmdRefundHTLC implements the refund HTLC command
+// GetCmdRefundHTLC implements the refund HTLC command.
 func GetCmdRefundHTLC(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "refund",

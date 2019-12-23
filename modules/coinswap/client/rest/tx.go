@@ -16,12 +16,17 @@ import (
 )
 
 func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router) {
+	// add liquidity
 	r.HandleFunc(fmt.Sprintf("/coinswap/liquidities/{%s}/deposit", RestPoolID), addLiquidityHandlerFn(cliCtx)).Methods("POST")
+	// remove liquidity
 	r.HandleFunc(fmt.Sprintf("/coinswap/liquidities/{%s}/withdraw", RestPoolID), removeLiquidityHandlerFn(cliCtx)).Methods("POST")
+	// post a buy order
 	r.HandleFunc("/coinswap/liquidities/buy", swapOrderHandlerFn(cliCtx, true)).Methods("POST")
+	// post a sell order
 	r.HandleFunc("/coinswap/liquidities/sell", swapOrderHandlerFn(cliCtx, false)).Methods("POST")
 }
 
+// HTTP request handler to add liquidity.
 func addLiquidityHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
@@ -95,6 +100,7 @@ func addLiquidityHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	}
 }
 
+// HTTP request handler to remove liquidity.
 func removeLiquidityHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
@@ -164,6 +170,7 @@ func removeLiquidityHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	}
 }
 
+// HTTP request handler to post order.
 func swapOrderHandlerFn(cliCtx context.CLIContext, isBuyOrder bool) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req SwapOrderReq

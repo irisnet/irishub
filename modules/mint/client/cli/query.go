@@ -12,7 +12,7 @@ import (
 	"github.com/irisnet/irishub/modules/mint/internal/types"
 )
 
-// GetQueryCmd returns the cli query commands for the minting module.
+// GetQueryCmd returns the cli query commands for the mint module.
 func GetQueryCmd(cdc *codec.Codec) *cobra.Command {
 	mintingQueryCmd := &cobra.Command{
 		Use:                        types.ModuleName,

@@ -19,7 +19,7 @@ import (
 	iristypes "github.com/irisnet/irishub/types"
 )
 
-// GetTxCmd returns the transaction commands for this module
+// GetTxCmd returns the transaction commands for the asset module.
 func GetTxCmd(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	txCmd := &cobra.Command{
 		Use:                        types.ModuleName,
@@ -39,7 +39,7 @@ func GetTxCmd(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	return txCmd
 }
 
-// GetCmdIssueToken implements the issue token command
+// GetCmdIssueToken implements the issue token command.
 func GetCmdIssueToken(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "issue-token",
@@ -113,7 +113,7 @@ func GetCmdIssueToken(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-// GetCmdEditToken implements the edit token command
+// GetCmdEditToken implements the edit token command.
 func GetCmdEditToken(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "edit-token",
@@ -152,7 +152,7 @@ func GetCmdEditToken(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-// GetCmdMintToken implements the mint token command
+// GetCmdMintToken implements the mint token command.
 func GetCmdMintToken(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "mint-token [token-id]",
@@ -206,7 +206,7 @@ func GetCmdMintToken(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-// GetCmdTransferTokenOwner implements the transfer token owner command
+// GetCmdTransferTokenOwner implements the transfer token owner command.
 func GetCmdTransferTokenOwner(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "transfer-token-owner [token-id]",

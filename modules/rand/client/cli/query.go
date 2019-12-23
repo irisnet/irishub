@@ -14,7 +14,7 @@ import (
 	"github.com/irisnet/irishub/modules/rand/internal/types"
 )
 
-// GetQueryCmd returns the cli query commands for this module
+// GetQueryCmd returns the cli query commands for the rand module.
 func GetQueryCmd(cdc *codec.Codec) *cobra.Command {
 	// Group rand queries under a subcommand
 	randQueryCmd := &cobra.Command{

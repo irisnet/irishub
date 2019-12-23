@@ -13,8 +13,8 @@ import (
 	"github.com/irisnet/irishub/modules/service/internal/types"
 )
 
+// GetQueryCmd returns the cli query commands for the rand module.
 func GetQueryCmd(queryRoute string, cdc *codec.Codec) *cobra.Command {
-	// Group service queries under a subcommand
 	serviceQueryCmd := &cobra.Command{
 		Use:                        types.ModuleName,
 		Short:                      "Querying commands for the service module",
@@ -35,6 +35,7 @@ func GetQueryCmd(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	return serviceQueryCmd
 }
 
+// GetCmdQuerySvcDef implements the query service definition command.
 func GetCmdQuerySvcDef(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "definition",
@@ -72,6 +73,7 @@ func GetCmdQuerySvcDef(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
+// GetCmdQuerySvcBind implements the query service binding command.
 func GetCmdQuerySvcBind(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "binding",
@@ -116,6 +118,7 @@ func GetCmdQuerySvcBind(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
+// GetCmdQuerySvcBinds implements the query service bindings command.
 func GetCmdQuerySvcBinds(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "bindings",
@@ -153,6 +156,7 @@ func GetCmdQuerySvcBinds(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
+// GetCmdQuerySvcRequests implements the query service requests command.
 func GetCmdQuerySvcRequests(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "requests",
@@ -197,6 +201,7 @@ func GetCmdQuerySvcRequests(queryRoute string, cdc *codec.Codec) *cobra.Command 
 	return cmd
 }
 
+// GetCmdQuerySvcResponse implements the query service response command.
 func GetCmdQuerySvcResponse(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "response",
@@ -234,6 +239,7 @@ func GetCmdQuerySvcResponse(queryRoute string, cdc *codec.Codec) *cobra.Command 
 	return cmd
 }
 
+// GetCmdQuerySvcFees implements the query returned and incoming fee command.
 func GetCmdQuerySvcFees(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "fees",
