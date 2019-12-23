@@ -1,3 +1,4 @@
+// nolint
 package cli
 
 import (
@@ -9,6 +10,7 @@ const (
 	FlagDescription = "description"
 )
 
+// common flagsets to add to various functions
 var (
 	FsAddGuardian    = flag.NewFlagSet("", flag.ContinueOnError)
 	FsDeleteGuardian = flag.NewFlagSet("", flag.ContinueOnError)

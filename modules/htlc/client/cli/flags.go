@@ -1,3 +1,4 @@
+// nolint
 package cli
 
 import (
@@ -14,6 +15,7 @@ const (
 	FlagTo                   = "to"
 )
 
+// common flagsets to add to various functions
 var (
 	FsCreateHTLC = flag.NewFlagSet("", flag.ContinueOnError)
 	FsClaimHTLC  = flag.NewFlagSet("", flag.ContinueOnError)

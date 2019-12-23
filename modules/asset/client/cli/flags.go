@@ -1,3 +1,4 @@
+// nolint
 package cli
 
 import (
@@ -22,6 +23,7 @@ const (
 	FlagAmount          = "amount"
 )
 
+// common flagsets to add to various functions
 var (
 	FsEditToken          = flag.NewFlagSet("", flag.ContinueOnError)
 	FsTokenIssue         = flag.NewFlagSet("", flag.ContinueOnError)
@@ -41,18 +43,14 @@ func init() {
 	FsTokenIssue.Uint64(FlagInitialSupply, 0, "the initial supply token of token")
 	FsTokenIssue.Uint64(FlagMaxSupply, types.MaximumAssetMaxSupply, "the max supply of the token")
 	FsTokenIssue.Bool(FlagMintable, false, "whether the token can be minted, default false")
-
 	FsTokensQuery.String(FlagSource, "", "the asset source, valid values can be native, external and gateway")
 	FsTokensQuery.String(FlagOwner, "", "the owner address to be queried")
-
 	FsEditToken.String(FlagName, "[do-not-modify]", "the token name, e.g. IRIS Network")
 	FsEditToken.String(FlagCanonicalSymbol, "[do-not-modify]", "the source symbol of a gateway or external token")
 	FsEditToken.String(FlagMinUnitAlias, "[do-not-modify]", "the token symbol minimum alias")
 	FsEditToken.Uint64(FlagMaxSupply, 0, "the max supply of token")
 	FsEditToken.String(FlagMintable, "", "whether the token can be minted, default false")
-
 	FsTransferTokenOwner.String(FlagTo, "", "the new owner")
-
 	FsMintToken.String(FlagTo, "", "address of mint token to")
 	FsMintToken.Uint64(FlagAmount, 0, "amount of mint token")
 }
