@@ -216,7 +216,7 @@ func (msg MsgTransferTokenOwner) ValidateBasic() sdk.Error {
 		return ErrInvalidToAddress(DefaultCodespace, fmt.Sprintf("the new owner must not be same as the original owner"))
 	}
 
-	// check the tokenId
+	// check the tokenID
 	if err := CheckTokenID(msg.TokenID); err != nil {
 		return err
 	}

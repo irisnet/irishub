@@ -89,7 +89,7 @@ func GetCmdQuerySvcBind(queryRoute string, cdc *codec.Codec) *cobra.Command {
 			params := types.QueryBindingParams{
 				DefChainID:  args[0],
 				ServiceName: args[1],
-				BindChainId: args[2],
+				BindChainID: args[2],
 				Provider:    provider,
 			}
 
@@ -170,7 +170,7 @@ func GetCmdQuerySvcRequests(queryRoute string, cdc *codec.Codec) *cobra.Command 
 			params := types.QueryBindingParams{
 				DefChainID:  args[0],
 				ServiceName: args[1],
-				BindChainId: args[2],
+				BindChainID: args[2],
 				Provider:    provider,
 			}
 
@@ -207,8 +207,8 @@ func GetCmdQuerySvcResponse(queryRoute string, cdc *codec.Codec) *cobra.Command 
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
 			params := types.QueryResponseParams{
-				ReqChainId: args[0],
-				RequestId:  args[1],
+				ReqChainID: args[0],
+				RequestID:  args[1],
 			}
 
 			bz, err := cdc.MarshalJSON(params)

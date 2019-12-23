@@ -10,7 +10,7 @@ const (
 	FlagServiceDescription = "service-description"
 	FlagTags               = "tags"
 	FlagAuthorDescription  = "author-description"
-	FlagIdlContent         = "idl-content"
+	FlagIDLContent         = "idl-content"
 	FlagFile               = "file"
 	FlagProvider           = "provider"
 	FlagBindChainID        = "bind-chain-id"
@@ -47,7 +47,7 @@ func init() {
 	FsServiceDefinitionCreate.String(FlagServiceDescription, "", "service description")
 	FsServiceDefinitionCreate.StringSlice(FlagTags, []string{}, "service tags")
 	FsServiceDefinitionCreate.String(FlagAuthorDescription, "", "service author description")
-	FsServiceDefinitionCreate.String(FlagIdlContent, "", "content of service interface description language")
+	FsServiceDefinitionCreate.String(FlagIDLContent, "", "content of service interface description language")
 	FsServiceDefinitionCreate.String(FlagFile, "", "path of file which contains service interface description language")
 
 	FsServiceDefinition.String(FlagDefChainID, "", "the ID of the blockchain defined of the service")

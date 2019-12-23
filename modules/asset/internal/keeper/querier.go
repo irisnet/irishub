@@ -57,7 +57,7 @@ func queryTokens(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte,
 
 	source := types.NATIVE
 	owner := sdk.AccAddress{}
-	nonSymbolTokenId := ""
+	nonSymbolTokenID := ""
 
 	if len(params.Source) > 0 { // if source is specified
 		source, err = types.AssetSourceFromString(params.Source)
@@ -74,7 +74,7 @@ func queryTokens(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte,
 	}
 
 	if len(params.Source) > 0 || len(params.Gateway) > 0 {
-		nonSymbolTokenId, err = types.GetTokenID(source, "")
+		nonSymbolTokenID, err = types.GetTokenID(source, "")
 		if err != nil {
 			return nil, iristypes.ParseParamsErr(err)
 		}
@@ -97,12 +97,12 @@ func queryTokens(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte,
 	//}
 
 	// Query from db
-	iter := keeper.GetTokens(ctx, owner, nonSymbolTokenId)
+	iter := keeper.GetTokens(ctx, owner, nonSymbolTokenID)
 	defer iter.Close()
 	for ; iter.Valid(); iter.Next() {
-		var tokenId string
-		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(iter.Value(), &tokenId)
-		token, found := keeper.GetToken(ctx, tokenId)
+		var tokenID string
+		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(iter.Value(), &tokenID)
+		token, found := keeper.GetToken(ctx, tokenID)
 		if !found {
 			continue
 		}

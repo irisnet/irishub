@@ -69,7 +69,7 @@ func queryBinding(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte
 		return nil, sdk.ErrInternal(fmt.Sprintf("failed to parse params: %s", err))
 	}
 
-	svcBinding, found := keeper.GetServiceBinding(ctx, params.DefChainID, params.ServiceName, params.BindChainId, params.Provider)
+	svcBinding, found := keeper.GetServiceBinding(ctx, params.DefChainID, params.ServiceName, params.BindChainID, params.Provider)
 	if !found {
 		return nil, types.ErrSvcBindingNotExists(types.DefaultCodespace)
 	}
@@ -112,7 +112,7 @@ func queryRequests(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byt
 		return nil, sdk.ErrInternal(fmt.Sprintf("failed to parse params: %s", err))
 	}
 
-	iterator := keeper.ActiveBindRequestsIterator(ctx, params.DefChainID, params.ServiceName, params.BindChainId, params.Provider)
+	iterator := keeper.ActiveBindRequestsIterator(ctx, params.DefChainID, params.ServiceName, params.BindChainID, params.Provider)
 	defer iterator.Close()
 
 	var requests []types.SvcRequest
@@ -136,14 +136,14 @@ func queryResponse(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byt
 		return nil, sdk.ErrInternal(fmt.Sprintf("failed to parse params: %s", err))
 	}
 
-	eHeight, rHeight, counter, err := types.ConvertRequestID(params.RequestId)
+	eHeight, rHeight, counter, err := types.ConvertRequestID(params.RequestID)
 	if err != nil {
 		return nil, sdk.ErrUnknownRequest(err.Error())
 	}
 
-	response, found := keeper.GetResponse(ctx, params.ReqChainId, eHeight, rHeight, counter)
+	response, found := keeper.GetResponse(ctx, params.ReqChainID, eHeight, rHeight, counter)
 	if !found {
-		return nil, types.ErrNoResponseFound(types.DefaultCodespace, params.RequestId)
+		return nil, types.ErrNoResponseFound(types.DefaultCodespace, params.RequestID)
 	}
 
 	bz, err := codec.MarshalJSONIndent(keeper.cdc, response)

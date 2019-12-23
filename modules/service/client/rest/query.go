@@ -78,7 +78,7 @@ func queryBindingHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 		params := types.QueryBindingParams{
 			DefChainID:  defChainID,
 			ServiceName: serviceName,
-			BindChainId: bindChainID,
+			BindChainID: bindChainID,
 			Provider:    provider,
 		}
 
@@ -156,7 +156,7 @@ func queryRequestsHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 		params := types.QueryBindingParams{
 			DefChainID:  defChainID,
 			ServiceName: serviceName,
-			BindChainId: bindChainID,
+			BindChainID: bindChainID,
 			Provider:    provider,
 		}
 
@@ -190,8 +190,8 @@ func queryResponseHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		params := types.QueryResponseParams{
-			ReqChainId: reqChainID,
-			RequestId:  reqID,
+			ReqChainID: reqChainID,
+			RequestID:  reqID,
 		}
 
 		bz, err := cliCtx.Codec.MarshalJSON(params)

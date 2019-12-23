@@ -43,7 +43,7 @@ func NewHandler(k Keeper) sdk.Handler {
 
 func handleMsgSvcDef(ctx sdk.Context, k Keeper, msg MsgSvcDef) sdk.Result {
 	if err := k.AddServiceDefinition(
-		ctx, msg.Name, msg.ChainId, msg.Description, msg.Tags,
+		ctx, msg.Name, msg.ChainID, msg.Description, msg.Tags,
 		msg.Author, msg.AuthorDescription, msg.IDLContent,
 	); err != nil {
 		return err.Result()

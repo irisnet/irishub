@@ -63,7 +63,7 @@ func GetCmdSvcDef(cdc *codec.Codec) *cobra.Command {
 			authorDescription := viper.GetString(FlagAuthorDescription)
 			tags := viper.GetStringSlice(FlagTags)
 
-			content := viper.GetString(FlagIdlContent)
+			content := viper.GetString(FlagIDLContent)
 			if len(content) > 0 {
 				content = strings.Replace(content, `\n`, "\n", -1)
 			}

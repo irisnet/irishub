@@ -26,7 +26,7 @@ type DefinitionOutput struct {
 type QueryBindingParams struct {
 	DefChainID  string
 	ServiceName string
-	BindChainId string
+	BindChainID string
 	Provider    sdk.AccAddress
 }
 
@@ -38,13 +38,13 @@ type QueryBindingsParams struct {
 type QueryRequestsParams struct {
 	DefChainID  string
 	ServiceName string
-	BindChainId string
+	BindChainID string
 	Provider    sdk.AccAddress
 }
 
 type QueryResponseParams struct {
-	ReqChainId string
-	RequestId  string
+	ReqChainID string
+	RequestID  string
 }
 
 type QueryFeesParams struct {

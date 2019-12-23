@@ -170,7 +170,7 @@ func (tokens Tokens) Validate() sdk.Error {
 	return nil
 }
 
-// GetTokenID returns tokenId by source and symbol
+// GetTokenID returns tokenID by source and symbol
 func GetTokenID(source AssetSource, symbol string) (string, sdk.Error) {
 	switch source {
 	case NATIVE:

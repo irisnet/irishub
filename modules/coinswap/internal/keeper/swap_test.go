@@ -18,7 +18,7 @@ func TestSwapSuite(t *testing.T) {
 	suite.Run(t, new(TestSuite))
 }
 
-func (suite *TestSuite) TestGetUniId() {
+func (suite *TestSuite) TestGetUniID() {
 	cases := []struct {
 		name         string
 		denom1       string

@@ -11,7 +11,7 @@ import (
 
 type SvcDef struct {
 	Name              string         `json:"name" yaml:"name"`
-	ChainId           string         `json:"chain_id" yaml:"chain_id"`
+	ChainID           string         `json:"chain_id" yaml:"chain_id"`
 	Description       string         `json:"description" yaml:"description"`
 	Tags              []string       `json:"tags" yaml:"tags"`
 	Author            sdk.AccAddress `json:"author" yaml:"author"`
@@ -27,10 +27,10 @@ type MethodProperty struct {
 	OutputCached  OutputCachedEnum  `json:"output_cached" yaml:"output_cached"`
 }
 
-func NewSvcDef(name, chainId, description string, tags []string, author sdk.AccAddress, authorDescription, idlContent string) SvcDef {
+func NewSvcDef(name, chainID, description string, tags []string, author sdk.AccAddress, authorDescription, idlContent string) SvcDef {
 	return SvcDef{
 		Name:              name,
-		ChainId:           chainId,
+		ChainID:           chainID,
 		Description:       description,
 		Tags:              tags,
 		Author:            author,
@@ -81,9 +81,9 @@ func validMessagingType(mt MessagingType) bool {
 func (mt MessagingType) Format(s fmt.State, verb rune) {
 	switch verb {
 	case 's':
-		s.Write([]byte(fmt.Sprintf("%s", mt.String())))
+		_, _ = s.Write([]byte(fmt.Sprintf("%s", mt.String())))
 	default:
-		s.Write([]byte(fmt.Sprintf("%v", byte(mt))))
+		_, _ = s.Write([]byte(fmt.Sprintf("%v", byte(mt))))
 	}
 }
 
@@ -139,9 +139,9 @@ func validOutputCachedEnum(oe OutputCachedEnum) bool {
 func (oe OutputCachedEnum) Format(s fmt.State, verb rune) {
 	switch verb {
 	case 's':
-		s.Write([]byte(fmt.Sprintf("%s", oe.String())))
+		_, _ = s.Write([]byte(fmt.Sprintf("%s", oe.String())))
 	default:
-		s.Write([]byte(fmt.Sprintf("%v", byte(oe))))
+		_, _ = s.Write([]byte(fmt.Sprintf("%v", byte(oe))))
 	}
 }
 
@@ -197,9 +197,9 @@ func validOutputPrivacyEnum(oe OutputPrivacyEnum) bool {
 func (oe OutputPrivacyEnum) Format(s fmt.State, verb rune) {
 	switch verb {
 	case 's':
-		s.Write([]byte(fmt.Sprintf("%s", oe.String())))
+		_, _ = s.Write([]byte(fmt.Sprintf("%s", oe.String())))
 	default:
-		s.Write([]byte(fmt.Sprintf("%v", byte(oe))))
+		_, _ = s.Write([]byte(fmt.Sprintf("%v", byte(oe))))
 	}
 }
 

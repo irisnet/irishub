@@ -43,10 +43,10 @@ type MsgSvcDef struct {
 	SvcDef
 }
 
-func NewMsgSvcDef(name, chainId, description string, tags []string, author sdk.AccAddress, authorDescription, idlContent string) MsgSvcDef {
+func NewMsgSvcDef(name, chainID, description string, tags []string, author sdk.AccAddress, authorDescription, idlContent string) MsgSvcDef {
 	return MsgSvcDef{SvcDef{
 		Name:              name,
-		ChainId:           chainId,
+		ChainID:           chainID,
 		Description:       description,
 		Tags:              tags,
 		Author:            author,
@@ -70,8 +70,8 @@ func (msg MsgSvcDef) GetSignBytes() []byte {
 }
 
 func (msg MsgSvcDef) ValidateBasic() sdk.Error {
-	if len(msg.ChainId) == 0 {
-		return ErrInvalidChainId(DefaultCodespace)
+	if len(msg.ChainID) == 0 {
+		return ErrInvalidChainID(DefaultCodespace)
 	}
 	if !validServiceName(msg.Name) {
 		return ErrInvalidServiceName(DefaultCodespace, msg.Name)
@@ -144,15 +144,15 @@ func (msg MsgSvcBind) GetSignBytes() []byte {
 
 func (msg MsgSvcBind) ValidateBasic() sdk.Error {
 	if len(msg.DefChainID) == 0 {
-		return ErrInvalidDefChainId(DefaultCodespace)
+		return ErrInvalidDefChainID(DefaultCodespace)
 	}
 	if len(msg.BindChainID) == 0 {
-		return ErrInvalidChainId(DefaultCodespace)
+		return ErrInvalidChainID(DefaultCodespace)
 	}
-	if err := ensureChainIdLength(msg.DefChainID, "def_chain_id"); err != nil {
+	if err := ensureChainIDLength(msg.DefChainID, "def_chain_id"); err != nil {
 		return err
 	}
-	if err := ensureChainIdLength(msg.BindChainID, "bind_chain_id"); err != nil {
+	if err := ensureChainIDLength(msg.BindChainID, "bind_chain_id"); err != nil {
 		return err
 	}
 	if !validServiceName(msg.DefName) {
@@ -224,15 +224,15 @@ func (msg MsgSvcBindingUpdate) GetSignBytes() []byte {
 
 func (msg MsgSvcBindingUpdate) ValidateBasic() sdk.Error {
 	if len(msg.DefChainID) == 0 {
-		return ErrInvalidDefChainId(DefaultCodespace)
+		return ErrInvalidDefChainID(DefaultCodespace)
 	}
 	if len(msg.BindChainID) == 0 {
-		return ErrInvalidChainId(DefaultCodespace)
+		return ErrInvalidChainID(DefaultCodespace)
 	}
-	if err := ensureChainIdLength(msg.DefChainID, "def_chain_id"); err != nil {
+	if err := ensureChainIDLength(msg.DefChainID, "def_chain_id"); err != nil {
 		return err
 	}
-	if err := ensureChainIdLength(msg.BindChainID, "bind_chain_id"); err != nil {
+	if err := ensureChainIDLength(msg.BindChainID, "bind_chain_id"); err != nil {
 		return err
 	}
 	if !validServiceName(msg.DefName) {
@@ -297,15 +297,15 @@ func (msg MsgSvcDisable) GetSignBytes() []byte {
 
 func (msg MsgSvcDisable) ValidateBasic() sdk.Error {
 	if len(msg.DefChainID) == 0 {
-		return ErrInvalidDefChainId(DefaultCodespace)
+		return ErrInvalidDefChainID(DefaultCodespace)
 	}
 	if len(msg.BindChainID) == 0 {
-		return ErrInvalidChainId(DefaultCodespace)
+		return ErrInvalidChainID(DefaultCodespace)
 	}
-	if err := ensureChainIdLength(msg.DefChainID, "def_chain_id"); err != nil {
+	if err := ensureChainIDLength(msg.DefChainID, "def_chain_id"); err != nil {
 		return err
 	}
-	if err := ensureChainIdLength(msg.BindChainID, "bind_chain_id"); err != nil {
+	if err := ensureChainIDLength(msg.BindChainID, "bind_chain_id"); err != nil {
 		return err
 	}
 	if !validServiceName(msg.DefName) {
@@ -358,15 +358,15 @@ func (msg MsgSvcEnable) GetSignBytes() []byte {
 
 func (msg MsgSvcEnable) ValidateBasic() sdk.Error {
 	if len(msg.DefChainID) == 0 {
-		return ErrInvalidDefChainId(DefaultCodespace)
+		return ErrInvalidDefChainID(DefaultCodespace)
 	}
 	if len(msg.BindChainID) == 0 {
-		return ErrInvalidChainId(DefaultCodespace)
+		return ErrInvalidChainID(DefaultCodespace)
 	}
-	if err := ensureChainIdLength(msg.DefChainID, "def_chain_id"); err != nil {
+	if err := ensureChainIDLength(msg.DefChainID, "def_chain_id"); err != nil {
 		return err
 	}
-	if err := ensureChainIdLength(msg.BindChainID, "bind_chain_id"); err != nil {
+	if err := ensureChainIDLength(msg.BindChainID, "bind_chain_id"); err != nil {
 		return err
 	}
 	if !validServiceName(msg.DefName) {
@@ -420,15 +420,15 @@ func (msg MsgSvcRefundDeposit) GetSignBytes() []byte {
 
 func (msg MsgSvcRefundDeposit) ValidateBasic() sdk.Error {
 	if len(msg.DefChainID) == 0 {
-		return ErrInvalidDefChainId(DefaultCodespace)
+		return ErrInvalidDefChainID(DefaultCodespace)
 	}
 	if len(msg.BindChainID) == 0 {
-		return ErrInvalidChainId(DefaultCodespace)
+		return ErrInvalidChainID(DefaultCodespace)
 	}
-	if err := ensureChainIdLength(msg.DefChainID, "def_chain_id"); err != nil {
+	if err := ensureChainIDLength(msg.DefChainID, "def_chain_id"); err != nil {
 		return err
 	}
-	if err := ensureChainIdLength(msg.BindChainID, "bind_chain_id"); err != nil {
+	if err := ensureChainIDLength(msg.BindChainID, "bind_chain_id"); err != nil {
 		return err
 	}
 	if !validServiceName(msg.DefName) {
@@ -494,21 +494,21 @@ func (msg MsgSvcRequest) GetSignBytes() []byte {
 
 func (msg MsgSvcRequest) ValidateBasic() sdk.Error {
 	if len(msg.DefChainID) == 0 {
-		return ErrInvalidDefChainId(DefaultCodespace)
+		return ErrInvalidDefChainID(DefaultCodespace)
 	}
 	if len(msg.BindChainID) == 0 {
-		return ErrInvalidBindChainId(DefaultCodespace)
+		return ErrInvalidBindChainID(DefaultCodespace)
 	}
 	if len(msg.ReqChainID) == 0 {
-		return ErrInvalidChainId(DefaultCodespace)
+		return ErrInvalidChainID(DefaultCodespace)
 	}
-	if err := ensureChainIdLength(msg.DefChainID, "def_chain_id"); err != nil {
+	if err := ensureChainIDLength(msg.DefChainID, "def_chain_id"); err != nil {
 		return err
 	}
-	if err := ensureChainIdLength(msg.BindChainID, "bind_chain_id"); err != nil {
+	if err := ensureChainIDLength(msg.BindChainID, "bind_chain_id"); err != nil {
 		return err
 	}
-	if err := ensureChainIdLength(msg.ReqChainID, "req_chain_id"); err != nil {
+	if err := ensureChainIDLength(msg.ReqChainID, "req_chain_id"); err != nil {
 		return err
 	}
 	if !validServiceName(msg.DefName) {
@@ -544,10 +544,10 @@ type MsgSvcResponse struct {
 	ErrorMsg   []byte         `json:"error_msg" yaml:"error_msg"`
 }
 
-func NewMsgSvcResponse(reqChainID string, requestId string, provider sdk.AccAddress, output, errorMsg []byte) MsgSvcResponse {
+func NewMsgSvcResponse(reqChainID string, requestID string, provider sdk.AccAddress, output, errorMsg []byte) MsgSvcResponse {
 	return MsgSvcResponse{
 		ReqChainID: reqChainID,
-		RequestID:  requestId,
+		RequestID:  requestID,
 		Provider:   provider,
 		Output:     output,
 		ErrorMsg:   errorMsg,
@@ -573,16 +573,16 @@ func (msg MsgSvcResponse) GetSignBytes() []byte {
 
 func (msg MsgSvcResponse) ValidateBasic() sdk.Error {
 	if len(msg.ReqChainID) == 0 {
-		return ErrInvalidReqChainId(DefaultCodespace)
+		return ErrInvalidReqChainID(DefaultCodespace)
 	}
-	if err := ensureChainIdLength(msg.ReqChainID, "req_chain_id"); err != nil {
+	if err := ensureChainIDLength(msg.ReqChainID, "req_chain_id"); err != nil {
 		return err
 	}
 	if len(msg.Provider) == 0 {
 		return sdk.ErrInvalidAddress(msg.Provider.String())
 	}
 	if _, _, _, err := ConvertRequestID(msg.RequestID); err != nil {
-		return ErrInvalidReqId(DefaultCodespace, msg.RequestID)
+		return ErrInvalidReqID(DefaultCodespace, msg.RequestID)
 	}
 	return nil
 }
@@ -703,7 +703,7 @@ func (msg MsgSvcDef) EnsureLength() sdk.Error {
 	if err := ensureNameLength(msg.Name); err != nil {
 		return err
 	}
-	if err := ensureChainIdLength(msg.ChainId, "chain_id"); err != nil {
+	if err := ensureChainIDLength(msg.ChainID, "chain_id"); err != nil {
 		return err
 	}
 	if len(msg.Description) > MaxDescriptionLength {
@@ -731,8 +731,8 @@ func ensureNameLength(name string) sdk.Error {
 	return nil
 }
 
-func ensureChainIdLength(chainId, fieldNm string) sdk.Error {
-	if len(chainId) > MaxChainIDLength {
+func ensureChainIDLength(chainID, fieldNm string) sdk.Error {
+	if len(chainID) > MaxChainIDLength {
 		return ErrInvalidLength(DefaultCodespace, fmt.Sprintf("length of the %s must not be greater than %d", fieldNm, MaxChainIDLength))
 	}
 	return nil

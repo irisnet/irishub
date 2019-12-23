@@ -82,7 +82,7 @@ func TestMsgEditToken(t *testing.T) {
 func TestMsgEditTokenRoute(t *testing.T) {
 	canonicalSymbol := "btc"
 	minUnitAlias := "satoshi"
-	tokenId := "x.btc"
+	tokenID := "x.btc"
 	mintable := False
 	// build a MsgEditToken
 	msg := MsgEditToken{
@@ -90,7 +90,7 @@ func TestMsgEditTokenRoute(t *testing.T) {
 		MinUnitAlias:    minUnitAlias,
 		MaxSupply:       10000000,
 		Mintable:        mintable,
-		TokenID:         tokenId,
+		TokenID:         tokenID,
 	}
 
 	require.Equal(t, "asset", msg.Route())
@@ -117,14 +117,14 @@ func TestMsgEditTokenGetSignBytes(t *testing.T) {
 func TestMsgMintTokenValidateBasic(t *testing.T) {
 	testData := []struct {
 		msg        string
-		tokeId     string
+		tokeID     string
 		owner      sdk.AccAddress
 		to         sdk.AccAddress
 		amount     uint64
 		expectPass bool
 	}{
-		{"empty tokeId", "", addr1, addr2, 1000, false},
-		{"wrong tokeId", "p.btc", addr1, addr2, 1000, false},
+		{"empty tokeID", "", addr1, addr2, 1000, false},
+		{"wrong tokeID", "p.btc", addr1, addr2, 1000, false},
 		{"empty owner", "btc", emptyAddr, addr2, 1000, false},
 		{"empty to", "btc", addr1, emptyAddr, 1000, true},
 		{"not empty to", "btc", addr1, addr2, 1000, true},
@@ -134,7 +134,7 @@ func TestMsgMintTokenValidateBasic(t *testing.T) {
 	}
 
 	for _, td := range testData {
-		msg := NewMsgMintToken(td.tokeId, td.owner, td.to, td.amount)
+		msg := NewMsgMintToken(td.tokeID, td.owner, td.to, td.amount)
 		if td.expectPass {
 			require.Nil(t, msg.ValidateBasic(), "test: %v", td.msg)
 		} else {
@@ -147,19 +147,19 @@ func TestMsgTransferTokenOwnerValidation(t *testing.T) {
 	testData := []struct {
 		name       string
 		srcOwner   sdk.AccAddress
-		tokenId    string
+		tokenID    string
 		dstOwner   sdk.AccAddress
 		expectPass bool
 	}{
 		{"empty srcOwner", emptyAddr, "btc", addr1, false},
-		{"empty tokenId", addr1, "", addr2, false},
+		{"empty tokenID", addr1, "", addr2, false},
 		{"empty dstOwner", addr1, "btc", emptyAddr, false},
-		{"invalid tokenId", addr1, "btc-min", addr2, false},
+		{"invalid tokenID", addr1, "btc-min", addr2, false},
 		{"basic good", addr1, "x.btc", addr2, true},
 	}
 
 	for _, td := range testData {
-		msg := NewMsgTransferTokenOwner(td.srcOwner, td.dstOwner, td.tokenId)
+		msg := NewMsgTransferTokenOwner(td.srcOwner, td.dstOwner, td.tokenID)
 		if td.expectPass {
 			require.Nil(t, msg.ValidateBasic(), "test: %v", td.name)
 		} else {

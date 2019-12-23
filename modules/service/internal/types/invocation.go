@@ -45,8 +45,8 @@ func (req SvcRequest) RequestID() string {
 	return fmt.Sprintf("%d-%d-%d", req.ExpirationHeight, req.RequestHeight, req.RequestIntraTxCounter)
 }
 
-func ConvertRequestID(requestId string) (eHeight int64, rHeight int64, counter int16, err error) {
-	ss := strings.Split(requestId, "-")
+func ConvertRequestID(requestID string) (eHeight int64, rHeight int64, counter int16, err error) {
+	ss := strings.Split(requestID, "-")
 	if len(ss) != 3 {
 		return eHeight, rHeight, counter, errors.New("invalid request id")
 	}

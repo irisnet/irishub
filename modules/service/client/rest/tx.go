@@ -46,7 +46,7 @@ func definitionPostHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgSvcDef(req.ServiceName, req.BaseReq.ChainID, req.ServiceDescription, req.Tags, author, req.AuthorDescription, req.IdlContent)
+		msg := types.NewMsgSvcDef(req.ServiceName, req.BaseReq.ChainID, req.ServiceDescription, req.Tags, author, req.AuthorDescription, req.IDLContent)
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -97,7 +97,7 @@ func bindingAddHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			prices = append(prices, price)
 		}
 
-		msg := types.NewMsgSvcBind(req.DefChainId, req.ServiceName, req.BaseReq.ChainID, provider, bindingType, deposit, prices, req.Level)
+		msg := types.NewMsgSvcBind(req.DefChainID, req.ServiceName, req.BaseReq.ChainID, provider, bindingType, deposit, prices, req.Level)
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -312,7 +312,7 @@ func requestAddHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 				return
 			}
 
-			msg := types.NewMsgSvcRequest(request.DefChainId, request.ServiceName, request.BindChainId, req.BaseReq.ChainID, consumer, provider, request.MethodId, input, serviceFee, request.Profiling)
+			msg := types.NewMsgSvcRequest(request.DefChainID, request.ServiceName, request.BindChainID, req.BaseReq.ChainID, consumer, provider, request.MethodID, input, serviceFee, request.Profiling)
 			if err := msg.ValidateBasic(); err != nil {
 				rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 				return
@@ -355,7 +355,7 @@ func responseAddHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgSvcResponse(req.ReqChainId, req.RequestId, provider, output, errMsg)
+		msg := types.NewMsgSvcResponse(req.ReqChainID, req.RequestID, provider, output, errMsg)
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return

@@ -82,13 +82,13 @@ func GetCmdIssueToken(queryRoute string, cdc *codec.Codec) *cobra.Command {
 			}
 
 			if !viper.GetBool(client.FlagGenerateOnly) {
-				tokenId, err := types.GetTokenID(msg.Source, msg.Symbol)
+				tokenID, err := types.GetTokenID(msg.Source, msg.Symbol)
 				if err != nil {
 					return fmt.Errorf("failed to query token issue fee: %s", err.Error())
 				}
 
 				// query fee
-				fee, err1 := queryTokenFees(cliCtx, queryRoute, tokenId)
+				fee, err1 := queryTokenFees(cliCtx, queryRoute, tokenID)
 				if err1 != nil {
 					return fmt.Errorf("failed to query token issue fee: %s", err1.Error())
 				}
@@ -128,7 +128,7 @@ func GetCmdEditToken(cdc *codec.Codec) *cobra.Command {
 
 			owner := cliCtx.GetFromAddress()
 
-			tokenId := args[0]
+			tokenID := args[0]
 			name := viper.GetString(FlagName)
 			canonicalSymbol := viper.GetString(FlagCanonicalSymbol)
 			minUnitAlias := viper.GetString(FlagMinUnitAlias)
@@ -138,7 +138,7 @@ func GetCmdEditToken(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgEditToken(name, canonicalSymbol, minUnitAlias, tokenId, maxSupply, mintable, owner)
+			msg := types.NewMsgEditToken(name, canonicalSymbol, minUnitAlias, tokenID, maxSupply, mintable, owner)
 
 			if err := msg.ValidateBasic(); err != nil {
 				return err
@@ -185,9 +185,9 @@ func GetCmdMintToken(queryRoute string, cdc *codec.Codec) *cobra.Command {
 			}
 
 			if !viper.GetBool(client.FlagGenerateOnly) {
-				tokenId, _ := iristypes.ConvertIdToTokenKeyId(args[0])
+				tokenID, _ := iristypes.ConvertIDToTokenKeyID(args[0])
 				// query fee
-				fee, err1 := queryTokenFees(cliCtx, queryRoute, tokenId)
+				fee, err1 := queryTokenFees(cliCtx, queryRoute, tokenID)
 				if err1 != nil {
 					return fmt.Errorf("failed to query token mint fee: %s", err1.Error())
 				}
