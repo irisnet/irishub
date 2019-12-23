@@ -61,7 +61,7 @@ func GetCmdQueryHTLC(cdc *codec.Codec) *cobra.Command {
 			}
 
 			var htlc types.HTLC
-			if err = cdc.UnmarshalJSON(res, &htlc); err != nil {
+			if err := cdc.UnmarshalJSON(res, &htlc); err != nil {
 				return err
 			}
 

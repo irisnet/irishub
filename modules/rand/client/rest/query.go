@@ -52,7 +52,7 @@ func queryRandHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		var rawRand types.Rand
-		if err = cliCtx.Codec.UnmarshalJSON(res, &rawRand); err != nil {
+		if err := cliCtx.Codec.UnmarshalJSON(res, &rawRand); err != nil {
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}

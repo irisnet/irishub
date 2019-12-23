@@ -66,7 +66,7 @@ func (k Keeper) AddRequest(
 	params := k.GetParams(ctx)
 	req.ExpirationHeight = req.RequestHeight + params.MaxRequestTimeout
 
-	if err = k.sk.SendCoinsFromAccountToModule(
+	if err := k.sk.SendCoinsFromAccountToModule(
 		ctx, req.Consumer, types.RequestAccName, req.ServiceFee,
 	); err != nil {
 		return req, err
@@ -170,7 +170,7 @@ func (k Keeper) AddResponse(
 		return resp, types.ErrNotMatchingReqChainID(k.codespace, reqChainID)
 	}
 
-	if err = k.AddIncomingFee(ctx, provider, req.ServiceFee); err != nil {
+	if err := k.AddIncomingFee(ctx, provider, req.ServiceFee); err != nil {
 		return resp, err
 	}
 
@@ -221,7 +221,7 @@ func (k Keeper) Slash(ctx sdk.Context, binding types.SvcBinding, slashCoins sdk.
 		binding.DisableTime = ctx.BlockHeader().Time
 	}
 
-	if err = k.sk.BurnCoins(ctx, types.DepositAccName, slashCoins); err != nil {
+	if err := k.sk.BurnCoins(ctx, types.DepositAccName, slashCoins); err != nil {
 		return err
 	}
 

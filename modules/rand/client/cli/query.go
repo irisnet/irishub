@@ -61,7 +61,7 @@ func GetCmdQueryRand(cdc *codec.Codec) *cobra.Command {
 			}
 
 			var rawRand types.Rand
-			if err = cdc.UnmarshalJSON(res, &rawRand); err != nil {
+			if err := cdc.UnmarshalJSON(res, &rawRand); err != nil {
 				return err
 			}
 
@@ -116,7 +116,7 @@ func GetCmdQueryRandRequestQueue(cdc *codec.Codec) *cobra.Command {
 			}
 
 			var requests types.Requests
-			if err = cdc.UnmarshalJSON(res, &requests); err != nil {
+			if err := cdc.UnmarshalJSON(res, &requests); err != nil {
 				return err
 			}
 

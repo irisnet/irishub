@@ -39,12 +39,12 @@ func (k Keeper) AddServiceBinding(
 
 	svcBinding := types.NewSvcBinding(ctx, defChainID, defName, bindChainID, provider, bindingType, deposit, prices, level, true)
 
-	if err = k.validateMethodPrices(ctx, svcBinding); err != nil {
+	if err := k.validateMethodPrices(ctx, svcBinding); err != nil {
 		return err
 	}
 
 	// Send coins from provider's account to the deposit module account
-	if err = k.sk.SendCoinsFromAccountToModule(
+	if err := k.sk.SendCoinsFromAccountToModule(
 		ctx, svcBinding.Provider, types.DepositAccName, svcBinding.Deposit,
 	); err != nil {
 		return err
@@ -106,7 +106,7 @@ func (k Keeper) UpdateServiceBinding(
 		deposit, prices, level, false)
 
 	if len(prices) > 0 {
-		if err = k.validateMethodPrices(ctx, newBinding); err != nil {
+		if err := k.validateMethodPrices(ctx, newBinding); err != nil {
 			return svcBinding, err
 		}
 		oldBinding.Prices = newBinding.Prices
@@ -122,7 +122,7 @@ func (k Keeper) UpdateServiceBinding(
 	}
 
 	// Send coins from provider's account to the deposit module account
-	if err = k.sk.SendCoinsFromAccountToModule(
+	if err := k.sk.SendCoinsFromAccountToModule(
 		ctx, provider, types.DepositAccName, newBinding.Deposit,
 	); err != nil {
 		return svcBinding, err
@@ -195,7 +195,7 @@ func (k Keeper) Enable(ctx sdk.Context, defChainID, defName, bindChainID string,
 	}
 
 	// Send coins from provider's account to the deposit module account
-	if err = k.sk.SendCoinsFromAccountToModule(
+	if err := k.sk.SendCoinsFromAccountToModule(
 		ctx, binding.Provider, types.DepositAccName, deposit,
 	); err != nil {
 		return err

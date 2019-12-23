@@ -72,7 +72,7 @@ func (k Keeper) IssueToken(ctx sdk.Context, token types.FungibleToken) sdk.Error
 		}
 
 		// sent coins to owner's account
-		if err = k.supplyKeeper.SendCoinsFromModuleToAccount(
+		if err := k.supplyKeeper.SendCoinsFromModuleToAccount(
 			ctx, types.ModuleName, owner, mintCoins,
 		); err != nil {
 			return err
@@ -99,19 +99,19 @@ func (k Keeper) AddToken(ctx sdk.Context, token types.FungibleToken) (types.Fung
 		token.CanonicalSymbol = ""
 	}
 
-	if err = k.setToken(ctx, token); err != nil {
+	if err := k.setToken(ctx, token); err != nil {
 		return token, nil, err
 	}
 
 	// Set token to be prefixed with owner and source
 	if token.GetSource() == types.NATIVE {
-		if err = k.setTokens(ctx, owner, token); err != nil {
+		if err := k.setTokens(ctx, owner, token); err != nil {
 			return token, nil, err
 		}
 	}
 
 	// Set token to be prefixed with source
-	if err = k.setTokens(ctx, sdk.AccAddress{}, token); err != nil {
+	if err := k.setTokens(ctx, sdk.AccAddress{}, token); err != nil {
 		return token, nil, err
 	}
 

@@ -43,7 +43,7 @@ func GetCmdQueryProfilers(cdc *codec.Codec) *cobra.Command {
 			}
 
 			var profilers types.Profilers
-			if err = cdc.UnmarshalJSON(res, &profilers); err != nil {
+			if err := cdc.UnmarshalJSON(res, &profilers); err != nil {
 				return err
 			}
 
@@ -68,7 +68,7 @@ func GetCmdQueryTrustees(cdc *codec.Codec) *cobra.Command {
 			}
 
 			var trustees types.Trustees
-			if err = cdc.UnmarshalJSON(res, &trustees); err != nil {
+			if err := cdc.UnmarshalJSON(res, &trustees); err != nil {
 				return err
 			}
 

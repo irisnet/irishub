@@ -57,7 +57,7 @@ func GetCmdQueryToken(queryRoute string, cdc *codec.Codec) *cobra.Command {
 			}
 
 			var token types.FungibleToken
-			if err = cdc.UnmarshalJSON(res, &token); err != nil {
+			if err := cdc.UnmarshalJSON(res, &token); err != nil {
 				return err
 			}
 
@@ -93,7 +93,7 @@ func GetCmdQueryTokens(queryRoute string, cdc *codec.Codec) *cobra.Command {
 			}
 
 			var tokens types.Tokens
-			if err = cdc.UnmarshalJSON(res, &tokens); err != nil {
+			if err := cdc.UnmarshalJSON(res, &tokens); err != nil {
 				return err
 			}
 

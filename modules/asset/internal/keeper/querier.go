@@ -51,7 +51,7 @@ func queryToken(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, 
 func queryTokens(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
 	var params types.QueryTokensParams
 	var err error
-	if err = keeper.cdc.UnmarshalJSON(req.Data, &params); err != nil {
+	if err := keeper.cdc.UnmarshalJSON(req.Data, &params); err != nil {
 		return nil, iristypes.ParseParamsErr(err)
 	}
 

@@ -61,7 +61,7 @@ func GetCmdQuerySvcDef(queryRoute string, cdc *codec.Codec) *cobra.Command {
 			}
 
 			var svcDefOutput types.DefinitionOutput
-			if err = cdc.UnmarshalJSON(res, &svcDefOutput); err != nil {
+			if err := cdc.UnmarshalJSON(res, &svcDefOutput); err != nil {
 				return err
 			}
 

@@ -110,8 +110,7 @@ func GetCmdCreateHTLC(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			err = utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
-			if err == nil && !flags.Changed(FlagHashLock) {
+			if err := utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg}); err == nil && !flags.Changed(FlagHashLock) {
 				fmt.Println("**Important** save this secret, hashLock in a safe place.")
 				fmt.Println("It is the only way to claim or refund the locked coins from an HTLC")
 				fmt.Println()
