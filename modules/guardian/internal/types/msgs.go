@@ -185,20 +185,20 @@ func (msg MsgDeleteTrustee) GetSigners() []sdk.AccAddress {
 
 //______________________________________________________________________
 
-// AddGuardian
+// AddGuardian defines the properties of add guardian message
 type AddGuardian struct {
-	Description string         `json:"description" yaml:"description"` //
+	Description string         `json:"description" yaml:"description"` // description of the guardian
 	Address     sdk.AccAddress `json:"address" yaml:"address"`         // address added
 	AddedBy     sdk.AccAddress `json:"added_by" yaml:"added_by"`       // address that initiated the tx
 }
 
-// DeleteGuardian
+// DeleteGuardian defines the properties of delete guardian message
 type DeleteGuardian struct {
 	Address   sdk.AccAddress `json:"address" yaml:"address"`       // address deleted
 	DeletedBy sdk.AccAddress `json:"deleted_by" yaml:"deleted_by"` // address that initiated the tx
 }
 
-// ValidateBasic
+// ValidateBasic validate the AddGuardian
 func (g AddGuardian) ValidateBasic() sdk.Error {
 	if len(g.Description) == 0 {
 		return ErrInvalidDescription(DefaultCodespace)
@@ -215,7 +215,7 @@ func (g AddGuardian) ValidateBasic() sdk.Error {
 	return nil
 }
 
-// ValidateBasic
+// ValidateBasic validate the DeleteGuardian
 func (g DeleteGuardian) ValidateBasic() sdk.Error {
 	if len(g.Address) == 0 {
 		return sdk.ErrInvalidAddress(g.Address.String())
@@ -226,7 +226,7 @@ func (g DeleteGuardian) ValidateBasic() sdk.Error {
 	return nil
 }
 
-// EnsureLength
+// EnsureLength validate the length of AddGuardian
 func (g AddGuardian) EnsureLength() sdk.Error {
 	if len(g.Description) > 70 {
 		return sdk.NewError(DefaultCodespace, CodeInvalidGuardian, "description", len(g.Description), 70)

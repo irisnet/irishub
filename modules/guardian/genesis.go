@@ -4,6 +4,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
+// InitGenesis stores genesis data
 func InitGenesis(ctx sdk.Context, keeper Keeper, data GenesisState) {
 	// Add profilers
 	for _, profiler := range data.Profilers {
@@ -15,6 +16,7 @@ func InitGenesis(ctx sdk.Context, keeper Keeper, data GenesisState) {
 	}
 }
 
+// ExportGenesis outputs genesis data
 func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 	profilersIterator := k.ProfilersIterator(ctx)
 	defer profilersIterator.Close()

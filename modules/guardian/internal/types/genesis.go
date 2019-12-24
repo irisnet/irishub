@@ -6,6 +6,7 @@ type GenesisState struct {
 	Trustees  []Guardian `json:"trustees"`
 }
 
+// NewGenesisState constructs a GenesisState
 func NewGenesisState(profilers, trustees []Guardian) GenesisState {
 	return GenesisState{
 		Profilers: profilers,
@@ -13,7 +14,7 @@ func NewGenesisState(profilers, trustees []Guardian) GenesisState {
 	}
 }
 
-// get raw genesis raw message for testing
+// DefaultGenesisState gets raw genesis raw message for testing
 func DefaultGenesisState() GenesisState {
 	guardian := Guardian{
 		Description: "genesis",

@@ -24,24 +24,26 @@ const (
 )
 
 var (
-	ProfilerKey = []byte{0x00}
-	TrusteeKey  = []byte{0x01}
+	ProfilerKey = []byte{0x00} // profiler key
+	TrusteeKey  = []byte{0x01} // trustee key
 )
 
+// GetProfilerKey returns profiler key bytes
 func GetProfilerKey(addr sdk.AccAddress) []byte {
 	return append(ProfilerKey, addr.Bytes()...)
 }
 
+// GetTrusteeKey returns trustee key bytes
 func GetTrusteeKey(addr sdk.AccAddress) []byte {
 	return append(TrusteeKey, addr.Bytes()...)
 }
 
-// Key for getting all profilers from the store
+// GetProfilersSubspaceKey returns the key for getting all profilers from the store
 func GetProfilersSubspaceKey() []byte {
 	return ProfilerKey
 }
 
-// Key for getting all profilers from the store
+// GetProfilersSubspaceKey returns the key for getting all profilers from the store
 func GetTrusteesSubspaceKey() []byte {
 	return TrusteeKey
 }

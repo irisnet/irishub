@@ -12,7 +12,7 @@ import (
 	"github.com/irisnet/irishub/modules/guardian/internal/types"
 )
 
-// Keeper
+// Keeper of the guardian store
 type Keeper struct {
 	storeKey sdk.StoreKey
 	cdc      *codec.Codec
@@ -21,7 +21,7 @@ type Keeper struct {
 	codespace sdk.CodespaceType
 }
 
-// NewKeeper
+// NewKeeper returns a guardian keeper
 func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, codespace sdk.CodespaceType) Keeper {
 	keeper := Keeper{
 		storeKey:  key,
@@ -43,13 +43,13 @@ func (k Keeper) AddProfiler(ctx sdk.Context, guardian types.Guardian) {
 	store.Set(types.GetProfilerKey(guardian.Address), bz)
 }
 
-// DeleteProfiler
+// DeleteProfiler delete the stored profiler
 func (k Keeper) DeleteProfiler(ctx sdk.Context, address sdk.AccAddress) {
 	store := ctx.KVStore(k.storeKey)
 	store.Delete(types.GetProfilerKey(address))
 }
 
-// GetProfiler
+// GetProfiler retrieves the profiler by specified address
 func (k Keeper) GetProfiler(ctx sdk.Context, addr sdk.AccAddress) (guardian exported.GuardianI, found bool) {
 	store := ctx.KVStore(k.storeKey)
 	if bz := store.Get(types.GetProfilerKey(addr)); bz != nil {
@@ -72,13 +72,13 @@ func (k Keeper) AddTrustee(ctx sdk.Context, guardian exported.GuardianI) {
 	store.Set(types.GetTrusteeKey(guardian.GetAddress()), bz)
 }
 
-// DeleteTrustee
+// DeleteTrustee delete the stored trustee
 func (k Keeper) DeleteTrustee(ctx sdk.Context, address sdk.AccAddress) {
 	store := ctx.KVStore(k.storeKey)
 	store.Delete(types.GetTrusteeKey(address))
 }
 
-// GetTrustee
+// GetTrustee retrieves the trustee by specified address
 func (k Keeper) GetTrustee(ctx sdk.Context, addr sdk.AccAddress) (guardian exported.GuardianI, found bool) {
 	store := ctx.KVStore(k.storeKey)
 	if bz := store.Get(types.GetTrusteeKey(addr)); bz != nil {

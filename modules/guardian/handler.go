@@ -27,7 +27,7 @@ func NewHandler(k Keeper) sdk.Handler {
 	}
 }
 
-// handleMsgAddProfiler
+// handleMsgAddProfiler handles MsgAddProfiler
 func handleMsgAddProfiler(ctx sdk.Context, k Keeper, msg MsgAddProfiler) sdk.Result {
 	if profiler, found := k.GetProfiler(ctx, msg.AddedBy); !found || profiler.GetAccountType() != Genesis {
 		return ErrInvalidOperator(DefaultCodespace, msg.AddedBy).Result()
@@ -54,7 +54,7 @@ func handleMsgAddProfiler(ctx sdk.Context, k Keeper, msg MsgAddProfiler) sdk.Res
 	return sdk.Result{Events: ctx.EventManager().Events()}
 }
 
-// handleMsgAddTrustee
+// handleMsgAddTrustee handles MsgAddTrustee
 func handleMsgAddTrustee(ctx sdk.Context, k Keeper, msg MsgAddTrustee) sdk.Result {
 	if trustee, found := k.GetTrustee(ctx, msg.AddedBy); !found || trustee.GetAccountType() != Genesis {
 		return ErrInvalidOperator(DefaultCodespace, msg.AddedBy).Result()
@@ -81,7 +81,7 @@ func handleMsgAddTrustee(ctx sdk.Context, k Keeper, msg MsgAddTrustee) sdk.Resul
 	return sdk.Result{Events: ctx.EventManager().Events()}
 }
 
-// handleMsgDeleteProfiler
+// handleMsgDeleteProfiler handles MsgDeleteProfiler
 func handleMsgDeleteProfiler(ctx sdk.Context, k Keeper, msg MsgDeleteProfiler) sdk.Result {
 	if profiler, found := k.GetProfiler(ctx, msg.DeletedBy); !found || profiler.GetAccountType() != Genesis {
 		return ErrInvalidOperator(DefaultCodespace, msg.DeletedBy).Result()
@@ -112,7 +112,7 @@ func handleMsgDeleteProfiler(ctx sdk.Context, k Keeper, msg MsgDeleteProfiler) s
 	return sdk.Result{Events: ctx.EventManager().Events()}
 }
 
-// handleMsgDeleteTrustee
+// handleMsgDeleteTrustee handles MsgDeleteTrustee
 func handleMsgDeleteTrustee(ctx sdk.Context, k Keeper, msg MsgDeleteTrustee) sdk.Result {
 	if trustee, found := k.GetTrustee(ctx, msg.DeletedBy); !found || trustee.GetAccountType() != Genesis {
 		return ErrInvalidOperator(DefaultCodespace, msg.DeletedBy).Result()
