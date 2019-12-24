@@ -39,7 +39,7 @@ func ParamKeyTable() params.KeyTable {
 	return params.NewKeyTable().RegisterParamSet(&Params{})
 }
 
-// KeyValuePairs  Implements params.KeyValuePairs
+// KeyValuePairs implements params.KeyValuePairs
 func (p *Params) ParamSetPairs() params.ParamSetPairs {
 	return params.ParamSetPairs{{
 		Key:   KeyFee,
@@ -59,7 +59,7 @@ func DefaultParams() Params {
 	}
 }
 
-// Validate validates a set of params
+// Validate returns err if Params is invalid
 func (p Params) Validate() error {
 	if !p.Fee.GT(sdk.ZeroDec()) || !p.Fee.LT(sdk.OneDec()) {
 		return fmt.Errorf("fee must be positive and less than 1: %s", p.Fee.String())

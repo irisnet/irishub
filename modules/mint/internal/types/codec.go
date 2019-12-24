@@ -4,10 +4,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 )
 
-// generic sealed codec to be used throughout this module
+// ModuleCdc defines the module codec
 var ModuleCdc *codec.Codec
 
-// Register concrete types on codec codec
+// RegisterCodec registers concrete types on the codec.
 func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(&Params{}, "irishub/mint/Params", nil)
 }

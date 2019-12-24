@@ -21,6 +21,7 @@ type Keeper struct {
 	feeCollectorName string
 }
 
+// NewKeeper returns a mint keeper
 func NewKeeper(cdc *codec.Codec, key sdk.StoreKey,
 	paramSpace params.Subspace, supplyKeeper types.SupplyKeeper, feeCollectorName string) Keeper {
 

@@ -1,5 +1,7 @@
+// nolint
 package types
 
+// mint module event types
 const (
 	EventTypeMint = "mint"
 

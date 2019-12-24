@@ -4,7 +4,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-// Called every block, process inflation on the first block of every hour
+// BeginBlocker handles block beginning logic for mint
 func BeginBlocker(ctx sdk.Context, k Keeper) {
 	logger := k.Logger(ctx)
 	// Get block BFT time and block height

@@ -6,6 +6,7 @@ type GenesisState struct {
 	Params Params `json:"params"` // inflation params
 }
 
+// NewGenesisState constructs a GenesisState
 func NewGenesisState(minter Minter, params Params) GenesisState {
 	return GenesisState{
 		Minter: minter,
@@ -13,7 +14,7 @@ func NewGenesisState(minter Minter, params Params) GenesisState {
 	}
 }
 
-// get raw genesis raw message for testing
+// DefaultGenesisState gets raw genesis raw message for testing
 func DefaultGenesisState() GenesisState {
 	return GenesisState{
 		Minter: DefaultMinter(),
