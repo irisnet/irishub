@@ -23,6 +23,7 @@ type Keeper struct {
 	codespace sdk.CodespaceType
 }
 
+// NewKeeper returns a new HTLC keeper
 func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, sk types.SupplyKeeper, codespace sdk.CodespaceType) Keeper {
 	// ensure htlc module account is set
 	if addr := sk.GetModuleAddress(types.ModuleName); addr == nil {

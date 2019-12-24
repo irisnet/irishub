@@ -7,7 +7,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-// BeginBlocker handles block beginning logic
+// BeginBlocker handles block beginning logic for HTLC
 func BeginBlocker(ctx sdk.Context, k Keeper) {
 	currentBlockHeight := uint64(ctx.BlockHeight())
 	iterator := k.IterateHTLCExpireQueueByHeight(ctx, currentBlockHeight)

@@ -55,6 +55,7 @@ func (h HTLC) GetHashLock() []byte {
 	return nil
 }
 
+// Validate returns is the HTLC invalid
 func (h HTLC) Validate(hashLock HTLCHashLock) error {
 	if len(hashLock) != HashLockLength {
 		return fmt.Errorf("the hash lock must be %d bytes long", HashLockLength)
@@ -99,11 +100,13 @@ const (
 )
 
 var (
+	// HTLCStateToStringMap is the map for HTLCState to state string
 	HTLCStateToStringMap = map[HTLCState]string{
 		OPEN:      "open",
 		COMPLETED: "completed",
 		EXPIRED:   "expired",
 	}
+	// StringToHTLCStateMap is the map for state string to HTLCState
 	StringToHTLCStateMap = map[string]HTLCState{
 		"open":      OPEN,
 		"completed": COMPLETED,
@@ -111,6 +114,7 @@ var (
 	}
 )
 
+// HTLCStateFromString convert string to HTLCState
 func HTLCStateFromString(str string) (HTLCState, error) {
 	if state, ok := StringToHTLCStateMap[strings.ToLower(str)]; ok {
 		return state, nil
@@ -118,6 +122,7 @@ func HTLCStateFromString(str string) (HTLCState, error) {
 	return HTLCState(0xff), fmt.Errorf("'%s' is not a valid HTLC state", str)
 }
 
+// Format formats HTLCState
 func (state HTLCState) Format(s fmt.State, verb rune) {
 	switch verb {
 	case 's':
@@ -127,6 +132,7 @@ func (state HTLCState) Format(s fmt.State, verb rune) {
 	}
 }
 
+// String convert HTLCState to format string
 func (state HTLCState) String() string {
 	return HTLCStateToStringMap[state]
 }
@@ -142,10 +148,12 @@ func (state *HTLCState) Unmarshal(data []byte) error {
 	return nil
 }
 
+// MarshalYAML implements the Marshaler of yaml
 func (state HTLCState) MarshalYAML() (interface{}, error) {
 	return state.String(), nil
 }
 
+// UnmarshalYAML implements the Unmarshaler of yaml
 func (state *HTLCState) UnmarshalYAML(data []byte) error {
 	var s string
 	if err := json.Unmarshal(data, &s); err != nil {
@@ -159,12 +167,12 @@ func (state *HTLCState) UnmarshalYAML(data []byte) error {
 	return nil
 }
 
-// Marshals to JSON using string
+// MarshalJSON marshals HTLCState to json
 func (state HTLCState) MarshalJSON() ([]byte, error) {
 	return json.Marshal(state.String())
 }
 
-// Unmarshals from JSON
+// UnmarshalJSON unmarshals json to HTLCState
 func (state *HTLCState) UnmarshalJSON(data []byte) error {
 	var s string
 	if err := json.Unmarshal(data, &s); err != nil {
@@ -178,24 +186,28 @@ func (state *HTLCState) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// HTLCSecret
+// String convert HTLCSecret to string
 func (secret HTLCSecret) String() string {
 	return hex.EncodeToString(secret)
 }
 
+// Marshal needed for protobuf compatibility
 func (secret HTLCSecret) Marshal() ([]byte, error) {
 	return secret, nil
 }
 
+// Unmarshal needed for protobuf compatibility
 func (secret *HTLCSecret) Unmarshal(data []byte) error {
 	*secret = data
 	return nil
 }
 
+// MarshalYAML implements the Marshaler of yaml
 func (secret HTLCSecret) MarshalYAML() (interface{}, error) {
 	return secret.String(), nil
 }
 
+// UnmarshalYAML implements the Unmarshaler of yaml
 func (secret *HTLCSecret) UnmarshalYAML(data []byte) error {
 	var s string
 	if err := json.Unmarshal(data, &s); err != nil {
@@ -209,10 +221,12 @@ func (secret *HTLCSecret) UnmarshalYAML(data []byte) error {
 	return nil
 }
 
+// MarshalJSON marshals HTLCSecret to json
 func (secret HTLCSecret) MarshalJSON() ([]byte, error) {
 	return json.Marshal(secret.String())
 }
 
+// UnmarshalJSON unmarshals json to HTLCSecret
 func (secret *HTLCSecret) UnmarshalJSON(data []byte) error {
 	var s string
 	if err := json.Unmarshal(data, &s); err != nil {
@@ -226,24 +240,28 @@ func (secret *HTLCSecret) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// HTLCHashLock
+// String convert HTLCHashLock to string
 func (hashLock HTLCHashLock) String() string {
 	return hex.EncodeToString(hashLock)
 }
 
+// Marshal needed for protobuf compatibility
 func (hashLock HTLCHashLock) Marshal() ([]byte, error) {
 	return hashLock, nil
 }
 
+// Unmarshal needed for protobuf compatibility
 func (hashLock *HTLCHashLock) Unmarshal(data []byte) error {
 	*hashLock = data
 	return nil
 }
 
+// MarshalYAML implements the Marshaler of yaml
 func (hashLock HTLCHashLock) MarshalYAML() (interface{}, error) {
 	return hashLock.String(), nil
 }
 
+// UnmarshalYAML implements the Unmarshaler of yaml
 func (hashLock *HTLCHashLock) UnmarshalYAML(data []byte) error {
 	var s string
 	if err := json.Unmarshal(data, &s); err != nil {
@@ -257,10 +275,12 @@ func (hashLock *HTLCHashLock) UnmarshalYAML(data []byte) error {
 	return nil
 }
 
+// MarshalJSON marshals HTLCHashLock to json
 func (hashLock HTLCHashLock) MarshalJSON() ([]byte, error) {
 	return json.Marshal(hashLock.String())
 }
 
+// UnmarshalJSON unmarshals json to HTLCHashLock
 func (hashLock *HTLCHashLock) UnmarshalJSON(data []byte) error {
 	var s string
 	if err := json.Unmarshal(data, &s); err != nil {

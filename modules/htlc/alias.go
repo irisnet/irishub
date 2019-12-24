@@ -52,6 +52,7 @@ const (
 var (
 	// functions aliases
 	RegisterCodec              = types.RegisterCodec
+	ErrHTLCNotExists           = types.ErrHTLCNotExists
 	ErrInvalidAddress          = types.ErrInvalidAddress
 	ErrInvalidAmount           = types.ErrInvalidAmount
 	ErrInvalidHashLock         = types.ErrInvalidHashLock

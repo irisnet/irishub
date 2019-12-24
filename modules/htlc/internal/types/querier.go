@@ -1,6 +1,7 @@
 package types
 
 const (
+	// QueryHTLC - HTLC query endpoint supported by the HTLC querier
 	QueryHTLC = "htlc"
 )
 
