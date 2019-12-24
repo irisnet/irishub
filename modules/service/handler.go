@@ -6,7 +6,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-// NewHandler creates an sdk.Handler for all the service type messages
+// NewHandler returns a handler for all the "service" type messages
 func NewHandler(k Keeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
 		ctx = ctx.WithEventManager(sdk.NewEventManager())
@@ -41,6 +41,7 @@ func NewHandler(k Keeper) sdk.Handler {
 	}
 }
 
+// handleMsgSvcDef handles MsgSvcDef
 func handleMsgSvcDef(ctx sdk.Context, k Keeper, msg MsgSvcDef) sdk.Result {
 	if err := k.AddServiceDefinition(
 		ctx, msg.Name, msg.ChainID, msg.Description, msg.Tags,
@@ -54,6 +55,7 @@ func handleMsgSvcDef(ctx sdk.Context, k Keeper, msg MsgSvcDef) sdk.Result {
 	return sdk.Result{}
 }
 
+// handleMsgSvcBind handles MsgSvcBind
 func handleMsgSvcBind(ctx sdk.Context, k Keeper, msg MsgSvcBind) sdk.Result {
 	if err := k.AddServiceBinding(
 		ctx, msg.DefChainID, msg.DefName, msg.BindChainID,
@@ -68,6 +70,7 @@ func handleMsgSvcBind(ctx sdk.Context, k Keeper, msg MsgSvcBind) sdk.Result {
 	return sdk.Result{}
 }
 
+// handleMsgSvcBindUpdate handles MsgSvcBindingUpdate
 func handleMsgSvcBindUpdate(ctx sdk.Context, k Keeper, msg MsgSvcBindingUpdate) sdk.Result {
 	svcBinding, err := k.UpdateServiceBinding(ctx, msg.DefChainID, msg.DefName, msg.BindChainID,
 		msg.Provider, msg.BindingType, msg.Deposit, msg.Prices, msg.Level)
@@ -81,6 +84,7 @@ func handleMsgSvcBindUpdate(ctx sdk.Context, k Keeper, msg MsgSvcBindingUpdate) 
 	return sdk.Result{}
 }
 
+// handleMsgSvcDisable handles MsgSvcDisable
 func handleMsgSvcDisable(ctx sdk.Context, k Keeper, msg MsgSvcDisable) sdk.Result {
 	if err := k.Disable(
 		ctx, msg.DefChainID, msg.DefName, msg.BindChainID, msg.Provider,
@@ -94,6 +98,7 @@ func handleMsgSvcDisable(ctx sdk.Context, k Keeper, msg MsgSvcDisable) sdk.Resul
 	return sdk.Result{}
 }
 
+// handleMsgSvcEnable handles MsgSvcEnable
 func handleMsgSvcEnable(ctx sdk.Context, k Keeper, msg MsgSvcEnable) sdk.Result {
 	if err := k.Enable(
 		ctx, msg.DefChainID, msg.DefName, msg.BindChainID, msg.Provider, msg.Deposit,
@@ -107,6 +112,7 @@ func handleMsgSvcEnable(ctx sdk.Context, k Keeper, msg MsgSvcEnable) sdk.Result 
 	return sdk.Result{}
 }
 
+// handleMsgSvcRefundDeposit handles MsgSvcRefundDeposit
 func handleMsgSvcRefundDeposit(ctx sdk.Context, k Keeper, msg MsgSvcRefundDeposit) sdk.Result {
 	if err := k.RefundDeposit(
 		ctx, msg.DefChainID, msg.DefName, msg.BindChainID, msg.Provider,
@@ -120,6 +126,7 @@ func handleMsgSvcRefundDeposit(ctx sdk.Context, k Keeper, msg MsgSvcRefundDeposi
 	return sdk.Result{}
 }
 
+// handleMsgSvcRequest handles MsgSvcRequest
 func handleMsgSvcRequest(ctx sdk.Context, k Keeper, msg MsgSvcRequest) sdk.Result {
 	req, err := k.AddRequest(ctx, msg.DefChainID, msg.DefName, msg.BindChainID, msg.ReqChainID,
 		msg.Consumer, msg.Provider, msg.MethodID, msg.Input, msg.ServiceFee, msg.Profiling)
@@ -150,6 +157,7 @@ func handleMsgSvcRequest(ctx sdk.Context, k Keeper, msg MsgSvcRequest) sdk.Resul
 	return sdk.Result{Events: ctx.EventManager().Events()}
 }
 
+// handleMsgSvcResponse handles MsgSvcResponse
 func handleMsgSvcResponse(ctx sdk.Context, k Keeper, msg MsgSvcResponse) sdk.Result {
 	resp, err := k.AddResponse(ctx, msg.ReqChainID, msg.RequestID, msg.Provider, msg.Output, msg.ErrorMsg)
 	if err != nil {
@@ -177,6 +185,7 @@ func handleMsgSvcResponse(ctx sdk.Context, k Keeper, msg MsgSvcResponse) sdk.Res
 	return sdk.Result{Events: ctx.EventManager().Events()}
 }
 
+// handleMsgSvcRefundFees handles MsgSvcRefundFees
 func handleMsgSvcRefundFees(ctx sdk.Context, k Keeper, msg MsgSvcRefundFees) sdk.Result {
 	if err := k.RefundFee(ctx, msg.Consumer); err != nil {
 		return err.Result()
@@ -184,6 +193,7 @@ func handleMsgSvcRefundFees(ctx sdk.Context, k Keeper, msg MsgSvcRefundFees) sdk
 	return sdk.Result{}
 }
 
+// handleMsgSvcWithdrawFees handles MsgSvcWithdrawFees
 func handleMsgSvcWithdrawFees(ctx sdk.Context, k Keeper, msg MsgSvcWithdrawFees) sdk.Result {
 	if err := k.WithdrawFee(ctx, msg.Provider); err != nil {
 		return err.Result()
@@ -191,6 +201,7 @@ func handleMsgSvcWithdrawFees(ctx sdk.Context, k Keeper, msg MsgSvcWithdrawFees)
 	return sdk.Result{}
 }
 
+// handleMsgSvcWithdrawTax handles MsgSvcWithdrawTax
 func handleMsgSvcWithdrawTax(ctx sdk.Context, k Keeper, msg MsgSvcWithdrawTax) sdk.Result {
 	if err := k.WithdrawTax(ctx, msg.Trustee, msg.DestAddress, msg.Amount); err != nil {
 		return err.Result()

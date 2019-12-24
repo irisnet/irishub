@@ -5,24 +5,27 @@ import (
 )
 
 const (
-	QueryDefinition = "definition"
-	QueryBinding    = "binding"
-	QueryBindings   = "bindings"
-	QueryRequests   = "requests"
-	QueryResponse   = "response"
-	QueryFees       = "fees"
+	QueryDefinition = "definition" // QueryDefinition
+	QueryBinding    = "binding"    // QueryBinding
+	QueryBindings   = "bindings"   // QueryBindings
+	QueryRequests   = "requests"   // QueryRequests
+	QueryResponse   = "response"   // QueryResponse
+	QueryFees       = "fees"       // QueryFees
 )
 
+// QueryDefinitionParams
 type QueryDefinitionParams struct {
 	DefChainID  string
 	ServiceName string
 }
 
+// DefinitionOutput
 type DefinitionOutput struct {
 	Definition SvcDef           `json:"definition" yaml:"definition"`
 	Methods    []MethodProperty `json:"methods" yaml:"methods"`
 }
 
+// QueryBindingParams
 type QueryBindingParams struct {
 	DefChainID  string
 	ServiceName string
@@ -30,11 +33,13 @@ type QueryBindingParams struct {
 	Provider    sdk.AccAddress
 }
 
+// QueryBindingsParams
 type QueryBindingsParams struct {
 	DefChainID  string
 	ServiceName string
 }
 
+// QueryRequestsParams
 type QueryRequestsParams struct {
 	DefChainID  string
 	ServiceName string
@@ -42,15 +47,18 @@ type QueryRequestsParams struct {
 	Provider    sdk.AccAddress
 }
 
+// QueryResponseParams
 type QueryResponseParams struct {
 	ReqChainID string
 	RequestID  string
 }
 
+// QueryFeesParams
 type QueryFeesParams struct {
 	Address sdk.AccAddress
 }
 
+// FeesOutput
 type FeesOutput struct {
 	ReturnedFee sdk.Coins `json:"returned_fee" yaml:"returned_fee"`
 	IncomingFee sdk.Coins `json:"incoming_fee" yaml:"incoming_fee"`

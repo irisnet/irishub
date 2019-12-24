@@ -11,6 +11,7 @@ import (
 	"github.com/irisnet/irishub/modules/service/internal/types"
 )
 
+// NewQuerier
 func NewQuerier(k Keeper) sdk.Querier {
 	return func(ctx sdk.Context, path []string, req abci.RequestQuery) ([]byte, sdk.Error) {
 		switch path[0] {

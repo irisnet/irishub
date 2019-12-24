@@ -9,6 +9,7 @@ import (
 	"github.com/irisnet/irishub/modules/service/internal/types"
 )
 
+// AddServiceBinding
 func (k Keeper) AddServiceBinding(
 	ctx sdk.Context,
 	defChainID,
@@ -56,6 +57,7 @@ func (k Keeper) AddServiceBinding(
 	return nil
 }
 
+// SetServiceBinding
 func (k Keeper) SetServiceBinding(ctx sdk.Context, svcBinding types.SvcBinding) {
 	store := ctx.KVStore(k.storeKey)
 
@@ -63,6 +65,7 @@ func (k Keeper) SetServiceBinding(ctx sdk.Context, svcBinding types.SvcBinding) 
 	store.Set(types.GetServiceBindingKey(svcBinding.DefChainID, svcBinding.DefName, svcBinding.BindChainID, svcBinding.Provider), bz)
 }
 
+// GetServiceBinding
 func (k Keeper) GetServiceBinding(ctx sdk.Context, defChainID, defName, bindChainID string, provider sdk.AccAddress) (svcBinding types.SvcBinding, found bool) {
 	store := ctx.KVStore(k.storeKey)
 
@@ -75,6 +78,7 @@ func (k Keeper) GetServiceBinding(ctx sdk.Context, defChainID, defName, bindChai
 	return svcBinding, true
 }
 
+// ServiceBindingsIterator
 func (k Keeper) ServiceBindingsIterator(ctx sdk.Context, defChainID, defName string) sdk.Iterator {
 	store := ctx.KVStore(k.storeKey)
 	return sdk.KVStorePrefixIterator(store, types.GetBindingsSubspaceKey(defChainID, defName))
@@ -86,6 +90,7 @@ func (k Keeper) AllServiceBindingsIterator(ctx sdk.Context) sdk.Iterator {
 	return sdk.KVStorePrefixIterator(store, types.BindingPropertyKey)
 }
 
+// UpdateServiceBinding
 func (k Keeper) UpdateServiceBinding(
 	ctx sdk.Context,
 	defChainID,
@@ -152,6 +157,7 @@ func (k Keeper) UpdateServiceBinding(
 	return oldBinding, nil
 }
 
+// Disable
 func (k Keeper) Disable(ctx sdk.Context, defChainID, defName, bindChainID string, provider sdk.AccAddress) sdk.Error {
 	binding, found := k.GetServiceBinding(ctx, defChainID, defName, bindChainID, provider)
 	if !found {
@@ -170,6 +176,7 @@ func (k Keeper) Disable(ctx sdk.Context, defChainID, defName, bindChainID string
 	return nil
 }
 
+// Enable
 func (k Keeper) Enable(ctx sdk.Context, defChainID, defName, bindChainID string, provider sdk.AccAddress, deposit sdk.Coins) sdk.Error {
 	binding, found := k.GetServiceBinding(ctx, defChainID, defName, bindChainID, provider)
 	if !found {
@@ -209,6 +216,7 @@ func (k Keeper) Enable(ctx sdk.Context, defChainID, defName, bindChainID string,
 	return nil
 }
 
+// RefundDeposit
 func (k Keeper) RefundDeposit(ctx sdk.Context, defChainID, defName, bindChainID string, provider sdk.AccAddress) sdk.Error {
 	binding, found := k.GetServiceBinding(ctx, defChainID, defName, bindChainID, provider)
 	if !found {

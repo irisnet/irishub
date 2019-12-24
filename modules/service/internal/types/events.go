@@ -1,6 +1,7 @@
+// nolint
 package types
 
-// Service module event types
+// service module event types
 const (
 	EventTypeRequestSvc     = "request_service"
 	EventTypeRespondSvc     = "respond_service"

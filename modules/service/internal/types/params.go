@@ -36,7 +36,8 @@ var (
 	MaxTxSizeLimit          = uint64(6000)
 )
 
-// nolint - Keys for parameter access
+// Keys for parameter access
+// nolint
 var (
 	KeyMaxRequestTimeout    = []byte("MaxRequestTimeout")
 	KeyMinDepositMultiple   = []byte("MinDepositMultiple")
@@ -75,7 +76,7 @@ func NewParams(maxRequestTimeout, minDepositMultiple int64, serviceFeeTax, slash
 	}
 }
 
-// Implements params.ParamSet
+// ParamSetPairs implements params.ParamSet
 func (p *Params) ParamSetPairs() params.ParamSetPairs {
 	return params.ParamSetPairs{
 		{Key: KeyMaxRequestTimeout, Value: &p.MaxRequestTimeout},

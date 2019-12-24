@@ -4,7 +4,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-// EndBlocker handles block ending logic
+// EndBlocker handles block ending logic for service
 func EndBlocker(ctx sdk.Context, k Keeper) {
 	// Reset the intra-transaction counter.
 	k.SetIntraTxCounter(ctx, 0)

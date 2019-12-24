@@ -12,6 +12,7 @@ const (
 	description   = "description"
 )
 
+// ParseMethods
 // TODO
 func ParseMethods(content string) (methods []string, err sdk.Error) {
 	return
@@ -22,6 +23,7 @@ func ParseMethods(content string) (methods []string, err sdk.Error) {
 //	return
 //}
 
+// MethodToMethodProperty
 func MethodToMethodProperty(index int, method protoidl.Method) (methodProperty MethodProperty, err sdk.Error) {
 	// set default value
 	opp := NoPrivacy

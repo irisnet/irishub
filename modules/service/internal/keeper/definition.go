@@ -7,6 +7,7 @@ import (
 	"github.com/irisnet/irishub/utils/protoidl"
 )
 
+// AddServiceDefinition
 func (k Keeper) AddServiceDefinition(
 	ctx sdk.Context,
 	name,
@@ -27,6 +28,7 @@ func (k Keeper) AddServiceDefinition(
 	return k.AddMethods(ctx, svcDef)
 }
 
+// SetServiceDefinition
 func (k Keeper) SetServiceDefinition(ctx sdk.Context, svcDef types.SvcDef) {
 	store := ctx.KVStore(k.storeKey)
 
@@ -34,7 +36,7 @@ func (k Keeper) SetServiceDefinition(ctx sdk.Context, svcDef types.SvcDef) {
 	store.Set(types.GetServiceDefinitionKey(svcDef.ChainID, svcDef.Name), bz)
 }
 
-// TODO
+// AddMethods
 func (k Keeper) AddMethods(ctx sdk.Context, svcDef types.SvcDef) sdk.Error {
 	methods, err := protoidl.GetMethods(svcDef.IDLContent)
 	if err != nil {
@@ -53,6 +55,7 @@ func (k Keeper) AddMethods(ctx sdk.Context, svcDef types.SvcDef) sdk.Error {
 	return nil
 }
 
+// SetMethod
 func (k Keeper) SetMethod(ctx sdk.Context, chainID, svcName string, method types.MethodProperty) {
 	store := ctx.KVStore(k.storeKey)
 
@@ -60,6 +63,7 @@ func (k Keeper) SetMethod(ctx sdk.Context, chainID, svcName string, method types
 	store.Set(types.GetMethodPropertyKey(chainID, svcName, method.ID), bz)
 }
 
+// GetServiceDefinition
 func (k Keeper) GetServiceDefinition(ctx sdk.Context, chainID, name string) (svcDef types.SvcDef, found bool) {
 	store := ctx.KVStore(k.storeKey)
 
@@ -72,7 +76,7 @@ func (k Keeper) GetServiceDefinition(ctx sdk.Context, chainID, name string) (svc
 	return svcDef, true
 }
 
-// Gets the method in a specific service and methodID
+// GetMethod gets the method in a specific service and methodID
 func (k Keeper) GetMethod(ctx sdk.Context, chainID, svcName string, id int16) (method types.MethodProperty, found bool) {
 	store := ctx.KVStore(k.storeKey)
 
@@ -85,7 +89,7 @@ func (k Keeper) GetMethod(ctx sdk.Context, chainID, svcName string, id int16) (m
 	return method, true
 }
 
-// Gets all the methods in a specific service
+// GetMethods gets all the methods in a specific service
 func (k Keeper) GetMethods(ctx sdk.Context, chainID, svcName string) sdk.Iterator {
 	store := ctx.KVStore(k.storeKey)
 	return sdk.KVStorePrefixIterator(store, types.GetMethodsSubspaceKey(chainID, svcName))

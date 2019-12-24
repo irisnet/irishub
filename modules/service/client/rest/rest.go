@@ -28,6 +28,7 @@ func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router) {
 	registerTxRoutes(cliCtx, r)
 }
 
+// ServiceDefinitionReq defines the properties of a service definition request's body
 type ServiceDefinitionReq struct {
 	BaseReq            rest.BaseReq `json:"base_req" yaml:"base_req"` // base req
 	ServiceName        string       `json:"service_name" yaml:"service_name"`
@@ -38,6 +39,7 @@ type ServiceDefinitionReq struct {
 	AuthorAddr         string       `json:"author_addr" yaml:"author_addr"`
 }
 
+// ServiceBindingReq defines the properties of a service binding request's body
 type ServiceBindingReq struct {
 	BaseReq     rest.BaseReq `json:"base_req" yaml:"base_req"` // base req
 	ServiceName string       `json:"service_name" yaml:"service_name"`
@@ -49,6 +51,7 @@ type ServiceBindingReq struct {
 	Provider    string       `json:"provider" yaml:"provider"`
 }
 
+// ServiceBindingUpdateReq defines the properties of a service binding update request's body
 type ServiceBindingUpdateReq struct {
 	BaseReq     rest.BaseReq `json:"base_req" yaml:"base_req"` // base req
 	BindingType string       `json:"binding_type" yaml:"binding_type"`
@@ -57,11 +60,13 @@ type ServiceBindingUpdateReq struct {
 	Level       types.Level  `json:"level" yaml:"level"`
 }
 
+// ServiceBindingEnableReq defines the properties of a service binding enable request's body
 type ServiceBindingEnableReq struct {
 	BaseReq rest.BaseReq `json:"base_req" yaml:"base_req"` // base req
 	Deposit string       `json:"deposit" yaml:"deposit"`
 }
 
+// ServiceRequest defines the properties of ServiceRequest
 type ServiceRequest struct {
 	ServiceName string `json:"service_name" yaml:"service_name"`
 	BindChainID string `json:"bind_chain_id" yaml:"bind_chain_id"`
@@ -74,11 +79,13 @@ type ServiceRequest struct {
 	Profiling   bool   `json:"profiling" yaml:"profiling"`
 }
 
+// ServiceRequestReq defines the properties of a service request's body
 type ServiceRequestReq struct {
 	BaseReq  rest.BaseReq     `json:"base_req" yaml:"base_req"` // base req
 	Requests []ServiceRequest `json:"requests" yaml:"requests"`
 }
 
+// ServiceResponseReq defines the properties of a service response request's body
 type ServiceResponseReq struct {
 	BaseReq    rest.BaseReq `json:"base_req" yaml:"base_req"` // base req
 	ReqChainID string       `json:"req_chain_id" yaml:"req_chain_id"`
@@ -88,6 +95,7 @@ type ServiceResponseReq struct {
 	ErrorMsg   string       `json:"error_msg" yaml:"error_msg"`
 }
 
+// BasicReq defines the properties of a basic request's body
 type BasicReq struct {
 	BaseReq rest.BaseReq `json:"base_req" yaml:"base_req"` // base req
 }
