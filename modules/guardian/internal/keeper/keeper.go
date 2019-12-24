@@ -8,9 +8,11 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
+	"github.com/irisnet/irishub/modules/guardian/exported"
 	"github.com/irisnet/irishub/modules/guardian/internal/types"
 )
 
+// Keeper
 type Keeper struct {
 	storeKey sdk.StoreKey
 	cdc      *codec.Codec
@@ -19,6 +21,7 @@ type Keeper struct {
 	codespace sdk.CodespaceType
 }
 
+// NewKeeper
 func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, codespace sdk.CodespaceType) Keeper {
 	keeper := Keeper{
 		storeKey:  key,
@@ -40,12 +43,14 @@ func (k Keeper) AddProfiler(ctx sdk.Context, guardian types.Guardian) {
 	store.Set(types.GetProfilerKey(guardian.Address), bz)
 }
 
+// DeleteProfiler
 func (k Keeper) DeleteProfiler(ctx sdk.Context, address sdk.AccAddress) {
 	store := ctx.KVStore(k.storeKey)
 	store.Delete(types.GetProfilerKey(address))
 }
 
-func (k Keeper) GetProfiler(ctx sdk.Context, addr sdk.AccAddress) (guardian types.Guardian, found bool) {
+// GetProfiler
+func (k Keeper) GetProfiler(ctx sdk.Context, addr sdk.AccAddress) (guardian exported.GuardianI, found bool) {
 	store := ctx.KVStore(k.storeKey)
 	if bz := store.Get(types.GetProfilerKey(addr)); bz != nil {
 		k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &guardian)
@@ -54,25 +59,27 @@ func (k Keeper) GetProfiler(ctx sdk.Context, addr sdk.AccAddress) (guardian type
 	return guardian, false
 }
 
-// Gets all profilers
+// ProfilersIterator gets all profilers
 func (k Keeper) ProfilersIterator(ctx sdk.Context) sdk.Iterator {
 	store := ctx.KVStore(k.storeKey)
 	return sdk.KVStorePrefixIterator(store, types.GetProfilersSubspaceKey())
 }
 
-// Add a trustee
-func (k Keeper) AddTrustee(ctx sdk.Context, guardian types.Guardian) {
+// AddTrustee add a trustee
+func (k Keeper) AddTrustee(ctx sdk.Context, guardian exported.GuardianI) {
 	store := ctx.KVStore(k.storeKey)
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(guardian)
-	store.Set(types.GetTrusteeKey(guardian.Address), bz)
+	store.Set(types.GetTrusteeKey(guardian.GetAddress()), bz)
 }
 
+// DeleteTrustee
 func (k Keeper) DeleteTrustee(ctx sdk.Context, address sdk.AccAddress) {
 	store := ctx.KVStore(k.storeKey)
 	store.Delete(types.GetTrusteeKey(address))
 }
 
-func (k Keeper) GetTrustee(ctx sdk.Context, addr sdk.AccAddress) (guardian types.Guardian, found bool) {
+// GetTrustee
+func (k Keeper) GetTrustee(ctx sdk.Context, addr sdk.AccAddress) (guardian exported.GuardianI, found bool) {
 	store := ctx.KVStore(k.storeKey)
 	if bz := store.Get(types.GetTrusteeKey(addr)); bz != nil {
 		k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &guardian)
@@ -81,7 +88,7 @@ func (k Keeper) GetTrustee(ctx sdk.Context, addr sdk.AccAddress) (guardian types
 	return guardian, false
 }
 
-// Gets all trustees
+// TrusteesIterator gets all trustees
 func (k Keeper) TrusteesIterator(ctx sdk.Context) sdk.Iterator {
 	store := ctx.KVStore(k.storeKey)
 	return sdk.KVStorePrefixIterator(store, types.GetTrusteesSubspaceKey())

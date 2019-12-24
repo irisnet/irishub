@@ -8,6 +8,8 @@ import (
 	"github.com/pkg/errors"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	"github.com/irisnet/irishub/modules/guardian/exported"
 )
 
 type Guardian struct {
@@ -65,6 +67,22 @@ func (g Guardian) Equal(guardian Guardian) bool {
 		g.AddedBy.Equals(guardian.AddedBy) &&
 		g.Description == guardian.Description &&
 		g.AccountType == guardian.AccountType
+}
+
+func (g Guardian) GetDescription() string {
+	return g.Description
+}
+
+func (g Guardian) GetAccountType() exported.AccountTypeI {
+	return g.AccountType
+}
+
+func (g Guardian) GetAddress() sdk.AccAddress {
+	return g.Address
+}
+
+func (g Guardian) GetAddedBy() sdk.AccAddress {
+	return g.AddedBy
 }
 
 type AccountType byte
