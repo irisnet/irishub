@@ -108,7 +108,6 @@ var (
 	MessagingTypeFromString              = types.MessagingTypeFromString
 	OutputCachedEnumFromString           = types.OutputCachedEnumFromString
 	OutputPrivacyEnumFromString          = types.OutputPrivacyEnumFromString
-	NewError                             = types.NewError
 	ErrSvcDefExists                      = types.ErrSvcDefExists
 	ErrSvcDefNotExists                   = types.ErrSvcDefNotExists
 	ErrInvalidIDL                        = types.ErrInvalidIDL
