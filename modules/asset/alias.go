@@ -50,8 +50,7 @@ const (
 	RouterKey                       = types.RouterKey
 	QuerierRoute                    = types.QuerierRoute
 	DefaultParamspace               = types.DefaultParamspace
-	MsgRoute                        = types.MsgRoute
-	MsgTypeIssueToken               = types.MsgTypeIssueToken
+	MsgTypeIssueToken               = types.TypeMsgIssueToken
 	DoNotModify                     = types.DoNotModify
 	QueryToken                      = types.QueryToken
 	QueryTokens                     = types.QueryTokens

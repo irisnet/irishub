@@ -8,18 +8,17 @@ import (
 )
 
 const (
-	// types for msgs
-	TypeMsgSvcDef           = "define_service"
-	TypeMsgSvcBind          = "bind_service"
-	TypeMsgSvcBindingUpdate = "update_service_binding"
-	TypeMsgSvcDisable       = "disable_service"
-	TypeMsgSvcEnable        = "enable_service"
-	TypeMsgSvcRefundDeposit = "refund_service_deposit"
-	TypeMsgSvcRequest       = "call_service"
-	TypeMsgSvcResponse      = "respond_service"
-	TypeMsgSvcRefundFees    = "refund_service_fees"
-	TypeMsgSvcWithdrawFees  = "withdraw_service_fees"
-	TypeMsgSvcWithdrawTax   = "withdraw_service_tax"
+	TypeMsgSvcDef           = "define_service"         // type for MsgSvcDef
+	TypeMsgSvcBind          = "bind_service"           // type for MsgSvcBind
+	TypeMsgSvcBindingUpdate = "update_service_binding" // type for MsgSvcBindingUpdate
+	TypeMsgSvcDisable       = "disable_service"        // type for MsgSvcDisable
+	TypeMsgSvcEnable        = "enable_service"         // type for MsgSvcEnable
+	TypeMsgSvcRefundDeposit = "refund_service_deposit" // type for MsgSvcRefundDeposit
+	TypeMsgSvcRequest       = "call_service"           // type for MsgSvcRequest
+	TypeMsgSvcResponse      = "respond_service"        // type for MsgSvcResponse
+	TypeMsgSvcRefundFees    = "refund_service_fees"    // type for MsgSvcRefundFees
+	TypeMsgSvcWithdrawFees  = "withdraw_service_fees"  // type for MsgSvcWithdrawFees
+	TypeMsgSvcWithdrawTax   = "withdraw_service_tax"   // type for MsgSvcWithdrawTax
 
 	MaxNameLength        = 70  // max length of the service name
 	MaxChainIDLength     = 50  // max length of the chain ID
@@ -28,13 +27,22 @@ const (
 	MaxTagLength         = 70  // max length of the tag
 )
 
-var (
-	reSvcName = regexp.MustCompile(`^[a-zA-Z0-9_-]+$`) // the service name only accepts alphanumeric characters, _ and -
-)
+// the service name only accepts alphanumeric characters, _ and -
+var reSvcName = regexp.MustCompile(`^[a-zA-Z0-9_-]+$`)
 
-var _, _, _, _, _, _, _, _, _, _, _ sdk.Msg = MsgSvcDef{}, MsgSvcBind{}, MsgSvcBindingUpdate{},
-	MsgSvcDisable{}, MsgSvcEnable{}, MsgSvcRefundDeposit{}, MsgSvcRequest{}, MsgSvcResponse{},
-	MsgSvcRefundFees{}, MsgSvcWithdrawFees{}, MsgSvcWithdrawTax{}
+var (
+	_ sdk.Msg = &MsgSvcDef{}
+	_ sdk.Msg = &MsgSvcBind{}
+	_ sdk.Msg = &MsgSvcBindingUpdate{}
+	_ sdk.Msg = &MsgSvcDisable{}
+	_ sdk.Msg = &MsgSvcEnable{}
+	_ sdk.Msg = &MsgSvcRefundDeposit{}
+	_ sdk.Msg = &MsgSvcRequest{}
+	_ sdk.Msg = &MsgSvcResponse{}
+	_ sdk.Msg = &MsgSvcRefundFees{}
+	_ sdk.Msg = &MsgSvcWithdrawFees{}
+	_ sdk.Msg = &MsgSvcWithdrawTax{}
+)
 
 //______________________________________________________________________
 
@@ -43,6 +51,7 @@ type MsgSvcDef struct {
 	SvcDef
 }
 
+// NewMsgSvcDef constructs a MsgSvcDef
 func NewMsgSvcDef(name, chainID, description string, tags []string, author sdk.AccAddress, authorDescription, idlContent string) MsgSvcDef {
 	return MsgSvcDef{SvcDef{
 		Name:              name,
@@ -55,9 +64,13 @@ func NewMsgSvcDef(name, chainID, description string, tags []string, author sdk.A
 	}}
 }
 
+// Route implements Msg.
 func (msg MsgSvcDef) Route() string { return RouterKey }
-func (msg MsgSvcDef) Type() string  { return TypeMsgSvcDef }
 
+// Type implements Msg.
+func (msg MsgSvcDef) Type() string { return TypeMsgSvcDef }
+
+// GetSignBytes implements Msg.
 func (msg MsgSvcDef) GetSignBytes() []byte {
 	if len(msg.Tags) == 0 {
 		msg.Tags = nil
@@ -69,6 +82,7 @@ func (msg MsgSvcDef) GetSignBytes() []byte {
 	return sdk.MustSortJSON(b)
 }
 
+// ValidateBasic implements Msg.
 func (msg MsgSvcDef) ValidateBasic() sdk.Error {
 	if len(msg.ChainID) == 0 {
 		return ErrInvalidChainID(DefaultCodespace)
@@ -95,6 +109,7 @@ func (msg MsgSvcDef) ValidateBasic() sdk.Error {
 	return nil
 }
 
+// GetSigners implements Msg.
 func (msg MsgSvcDef) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Author}
 }
@@ -108,16 +123,17 @@ func validateMethods(methods []string) (bool, sdk.Error) {
 
 // MsgSvcBinding - struct for bind a service
 type MsgSvcBind struct {
-	DefName     string         `json:"def_name" yaml:"def_name"`
-	DefChainID  string         `json:"def_chain_id" yaml:"def_chain_id"`
-	BindChainID string         `json:"bind_chain_id" yaml:"bind_chain_id"`
-	Provider    sdk.AccAddress `json:"provider" yaml:"provider"`
-	BindingType BindingType    `json:"binding_type" yaml:"binding_type"`
-	Deposit     sdk.Coins      `json:"deposit" yaml:"deposit"`
-	Prices      []sdk.Coin     `json:"price" yaml:"price"`
-	Level       Level          `json:"level" yaml:"level"`
+	DefName     string         `json:"def_name" yaml:"def_name"`           //
+	DefChainID  string         `json:"def_chain_id" yaml:"def_chain_id"`   //
+	BindChainID string         `json:"bind_chain_id" yaml:"bind_chain_id"` //
+	Provider    sdk.AccAddress `json:"provider" yaml:"provider"`           //
+	BindingType BindingType    `json:"binding_type" yaml:"binding_type"`   //
+	Deposit     sdk.Coins      `json:"deposit" yaml:"deposit"`             //
+	Prices      []sdk.Coin     `json:"price" yaml:"price"`                 //
+	Level       Level          `json:"level" yaml:"level"`                 //
 }
 
+// NewMsgSvcBind constructs a MsgSvcBind
 func NewMsgSvcBind(defChainID, defName, bindChainID string, provider sdk.AccAddress, bindingType BindingType, deposit sdk.Coins, prices []sdk.Coin, level Level) MsgSvcBind {
 	return MsgSvcBind{
 		DefChainID:  defChainID,
@@ -131,9 +147,13 @@ func NewMsgSvcBind(defChainID, defName, bindChainID string, provider sdk.AccAddr
 	}
 }
 
+// Route implements Msg.
 func (msg MsgSvcBind) Route() string { return RouterKey }
-func (msg MsgSvcBind) Type() string  { return TypeMsgSvcBind }
 
+// Type implements Msg.
+func (msg MsgSvcBind) Type() string { return TypeMsgSvcBind }
+
+// GetSignBytes implements Msg.
 func (msg MsgSvcBind) GetSignBytes() []byte {
 	b, err := ModuleCdc.MarshalJSON(msg)
 	if err != nil {
@@ -142,6 +162,7 @@ func (msg MsgSvcBind) GetSignBytes() []byte {
 	return sdk.MustSortJSON(b)
 }
 
+// ValidateBasic implements Msg.
 func (msg MsgSvcBind) ValidateBasic() sdk.Error {
 	if len(msg.DefChainID) == 0 {
 		return ErrInvalidDefChainID(DefaultCodespace)
@@ -181,6 +202,7 @@ func (msg MsgSvcBind) ValidateBasic() sdk.Error {
 	return nil
 }
 
+// GetSigners implements Msg.
 func (msg MsgSvcBind) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Provider}
 }
@@ -189,16 +211,17 @@ func (msg MsgSvcBind) GetSigners() []sdk.AccAddress {
 
 // MsgSvcBindingUpdate - struct for update a service binding
 type MsgSvcBindingUpdate struct {
-	DefName     string         `json:"def_name" yaml:"def_name"`
-	DefChainID  string         `json:"def_chain_id" yaml:"def_chain_id"`
-	BindChainID string         `json:"bind_chain_id" yaml:"bind_chain_id"`
-	Provider    sdk.AccAddress `json:"provider" yaml:"provider"`
-	BindingType BindingType    `json:"binding_type" yaml:"binding_type"`
-	Deposit     sdk.Coins      `json:"deposit" yaml:"deposit"`
-	Prices      []sdk.Coin     `json:"price" yaml:"price"`
-	Level       Level          `json:"level" yaml:"level"`
+	DefName     string         `json:"def_name" yaml:"def_name"`           //
+	DefChainID  string         `json:"def_chain_id" yaml:"def_chain_id"`   //
+	BindChainID string         `json:"bind_chain_id" yaml:"bind_chain_id"` //
+	Provider    sdk.AccAddress `json:"provider" yaml:"provider"`           //
+	BindingType BindingType    `json:"binding_type" yaml:"binding_type"`   //
+	Deposit     sdk.Coins      `json:"deposit" yaml:"deposit"`             //
+	Prices      []sdk.Coin     `json:"price" yaml:"price"`                 //
+	Level       Level          `json:"level" yaml:"level"`                 //
 }
 
+// NewMsgSvcBindingUpdate constructs a MsgSvcBindingUpdate
 func NewMsgSvcBindingUpdate(defChainID, defName, bindChainID string, provider sdk.AccAddress, bindingType BindingType, deposit sdk.Coins, prices []sdk.Coin, level Level) MsgSvcBindingUpdate {
 	return MsgSvcBindingUpdate{
 		DefChainID:  defChainID,
@@ -211,9 +234,14 @@ func NewMsgSvcBindingUpdate(defChainID, defName, bindChainID string, provider sd
 		Level:       level,
 	}
 }
-func (msg MsgSvcBindingUpdate) Route() string { return RouterKey }
-func (msg MsgSvcBindingUpdate) Type() string  { return TypeMsgSvcBindingUpdate }
 
+// Route implements Msg.
+func (msg MsgSvcBindingUpdate) Route() string { return RouterKey }
+
+// Type implements Msg.
+func (msg MsgSvcBindingUpdate) Type() string { return TypeMsgSvcBindingUpdate }
+
+// GetSignBytes implements Msg.
 func (msg MsgSvcBindingUpdate) GetSignBytes() []byte {
 	b, err := ModuleCdc.MarshalJSON(msg)
 	if err != nil {
@@ -222,6 +250,7 @@ func (msg MsgSvcBindingUpdate) GetSignBytes() []byte {
 	return sdk.MustSortJSON(b)
 }
 
+// ValidateBasic implements Msg.
 func (msg MsgSvcBindingUpdate) ValidateBasic() sdk.Error {
 	if len(msg.DefChainID) == 0 {
 		return ErrInvalidDefChainID(DefaultCodespace)
@@ -261,6 +290,7 @@ func (msg MsgSvcBindingUpdate) ValidateBasic() sdk.Error {
 	return nil
 }
 
+// GetSigners implements Msg.
 func (msg MsgSvcBindingUpdate) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Provider}
 }
@@ -269,12 +299,13 @@ func (msg MsgSvcBindingUpdate) GetSigners() []sdk.AccAddress {
 
 // MsgSvcDisable - struct for disable a service binding
 type MsgSvcDisable struct {
-	DefName     string         `json:"def_name" yaml:"def_name"`
-	DefChainID  string         `json:"def_chain_id" yaml:"def_chain_id"`
-	BindChainID string         `json:"bind_chain_id" yaml:"bind_chain_id"`
-	Provider    sdk.AccAddress `json:"provider" yaml:"provider"`
+	DefName     string         `json:"def_name" yaml:"def_name"`           //
+	DefChainID  string         `json:"def_chain_id" yaml:"def_chain_id"`   //
+	BindChainID string         `json:"bind_chain_id" yaml:"bind_chain_id"` //
+	Provider    sdk.AccAddress `json:"provider" yaml:"provider"`           //
 }
 
+// NewMsgSvcDisable constructs a MsgSvcDisable
 func NewMsgSvcDisable(defChainID, defName, bindChainID string, provider sdk.AccAddress) MsgSvcDisable {
 	return MsgSvcDisable{
 		DefChainID:  defChainID,
@@ -284,9 +315,13 @@ func NewMsgSvcDisable(defChainID, defName, bindChainID string, provider sdk.AccA
 	}
 }
 
+// Route implements Msg.
 func (msg MsgSvcDisable) Route() string { return RouterKey }
-func (msg MsgSvcDisable) Type() string  { return TypeMsgSvcDisable }
 
+// Type implements Msg.
+func (msg MsgSvcDisable) Type() string { return TypeMsgSvcDisable }
+
+// GetSignBytes implements Msg.
 func (msg MsgSvcDisable) GetSignBytes() []byte {
 	b, err := ModuleCdc.MarshalJSON(msg)
 	if err != nil {
@@ -295,6 +330,7 @@ func (msg MsgSvcDisable) GetSignBytes() []byte {
 	return sdk.MustSortJSON(b)
 }
 
+// ValidateBasic implements Msg.
 func (msg MsgSvcDisable) ValidateBasic() sdk.Error {
 	if len(msg.DefChainID) == 0 {
 		return ErrInvalidDefChainID(DefaultCodespace)
@@ -320,6 +356,7 @@ func (msg MsgSvcDisable) ValidateBasic() sdk.Error {
 	return nil
 }
 
+// GetSigners implements Msg.
 func (msg MsgSvcDisable) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Provider}
 }
@@ -328,13 +365,14 @@ func (msg MsgSvcDisable) GetSigners() []sdk.AccAddress {
 
 // MsgSvcEnable - struct for enable a service binding
 type MsgSvcEnable struct {
-	DefName     string         `json:"def_name" yaml:"def_name"`
-	DefChainID  string         `json:"def_chain_id" yaml:"def_chain_id"`
-	BindChainID string         `json:"bind_chain_id" yaml:"bind_chain_id"`
-	Provider    sdk.AccAddress `json:"provider" yaml:"provider"`
-	Deposit     sdk.Coins      `json:"deposit" yaml:"deposit"`
+	DefName     string         `json:"def_name" yaml:"def_name"`           //
+	DefChainID  string         `json:"def_chain_id" yaml:"def_chain_id"`   //
+	BindChainID string         `json:"bind_chain_id" yaml:"bind_chain_id"` //
+	Provider    sdk.AccAddress `json:"provider" yaml:"provider"`           //
+	Deposit     sdk.Coins      `json:"deposit" yaml:"deposit"`             //
 }
 
+// NewMsgSvcEnable constructs a MsgSvcEnable
 func NewMsgSvcEnable(defChainID, defName, bindChainID string, provider sdk.AccAddress, deposit sdk.Coins) MsgSvcEnable {
 	return MsgSvcEnable{
 		DefChainID:  defChainID,
@@ -345,9 +383,13 @@ func NewMsgSvcEnable(defChainID, defName, bindChainID string, provider sdk.AccAd
 	}
 }
 
+// Route implements Msg.
 func (msg MsgSvcEnable) Route() string { return RouterKey }
-func (msg MsgSvcEnable) Type() string  { return TypeMsgSvcEnable }
 
+// Type implements Msg.
+func (msg MsgSvcEnable) Type() string { return TypeMsgSvcEnable }
+
+// GetSignBytes implements Msg.
 func (msg MsgSvcEnable) GetSignBytes() []byte {
 	b, err := ModuleCdc.MarshalJSON(msg)
 	if err != nil {
@@ -356,6 +398,7 @@ func (msg MsgSvcEnable) GetSignBytes() []byte {
 	return sdk.MustSortJSON(b)
 }
 
+// ValidateBasic implements Msg.
 func (msg MsgSvcEnable) ValidateBasic() sdk.Error {
 	if len(msg.DefChainID) == 0 {
 		return ErrInvalidDefChainID(DefaultCodespace)
@@ -384,6 +427,7 @@ func (msg MsgSvcEnable) ValidateBasic() sdk.Error {
 	return nil
 }
 
+// GetSigners implements Msg.
 func (msg MsgSvcEnable) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Provider}
 }
@@ -392,12 +436,13 @@ func (msg MsgSvcEnable) GetSigners() []sdk.AccAddress {
 
 // MsgSvcRefundDeposit - struct for refund deposit from a service binding
 type MsgSvcRefundDeposit struct {
-	DefName     string         `json:"def_name" yaml:"def_name"`
-	DefChainID  string         `json:"def_chain_id" yaml:"def_chain_id"`
-	BindChainID string         `json:"bind_chain_id" yaml:"bind_chain_id"`
-	Provider    sdk.AccAddress `json:"provider" yaml:"provider"`
+	DefName     string         `json:"def_name" yaml:"def_name"`           //
+	DefChainID  string         `json:"def_chain_id" yaml:"def_chain_id"`   //
+	BindChainID string         `json:"bind_chain_id" yaml:"bind_chain_id"` //
+	Provider    sdk.AccAddress `json:"provider" yaml:"provider"`           //
 }
 
+// NewMsgSvcRefundDeposit constructs a MsgSvcRefundDeposit
 func NewMsgSvcRefundDeposit(defChainID, defName, bindChainID string, provider sdk.AccAddress) MsgSvcRefundDeposit {
 	return MsgSvcRefundDeposit{
 		DefChainID:  defChainID,
@@ -407,9 +452,13 @@ func NewMsgSvcRefundDeposit(defChainID, defName, bindChainID string, provider sd
 	}
 }
 
+// Route implements Msg.
 func (msg MsgSvcRefundDeposit) Route() string { return RouterKey }
-func (msg MsgSvcRefundDeposit) Type() string  { return TypeMsgSvcRefundDeposit }
 
+// Type implements Msg.
+func (msg MsgSvcRefundDeposit) Type() string { return TypeMsgSvcRefundDeposit }
+
+// GetSignBytes implements Msg.
 func (msg MsgSvcRefundDeposit) GetSignBytes() []byte {
 	b, err := ModuleCdc.MarshalJSON(msg)
 	if err != nil {
@@ -418,6 +467,7 @@ func (msg MsgSvcRefundDeposit) GetSignBytes() []byte {
 	return sdk.MustSortJSON(b)
 }
 
+// ValidateBasic implements Msg.
 func (msg MsgSvcRefundDeposit) ValidateBasic() sdk.Error {
 	if len(msg.DefChainID) == 0 {
 		return ErrInvalidDefChainID(DefaultCodespace)
@@ -443,6 +493,7 @@ func (msg MsgSvcRefundDeposit) ValidateBasic() sdk.Error {
 	return nil
 }
 
+// GetSigners implements Msg.
 func (msg MsgSvcRefundDeposit) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Provider}
 }
@@ -451,18 +502,19 @@ func (msg MsgSvcRefundDeposit) GetSigners() []sdk.AccAddress {
 
 // MsgSvcRequest - struct for call a service
 type MsgSvcRequest struct {
-	DefChainID  string         `json:"def_chain_id" yaml:"def_chain_id"`
-	DefName     string         `json:"def_name" yaml:"def_name"`
-	BindChainID string         `json:"bind_chain_id" yaml:"bind_chain_id"`
-	ReqChainID  string         `json:"req_chain_id" yaml:"req_chain_id"`
-	MethodID    int16          `json:"method_id" yaml:"method_id"`
-	Provider    sdk.AccAddress `json:"provider" yaml:"provider"`
-	Consumer    sdk.AccAddress `json:"consumer" yaml:"consumer"`
-	Input       []byte         `json:"input" yaml:"input"`
-	ServiceFee  sdk.Coins      `json:"service_fee" yaml:"service_fee"`
-	Profiling   bool           `json:"profiling" yaml:"profiling"`
+	DefChainID  string         `json:"def_chain_id" yaml:"def_chain_id"`   //
+	DefName     string         `json:"def_name" yaml:"def_name"`           //
+	BindChainID string         `json:"bind_chain_id" yaml:"bind_chain_id"` //
+	ReqChainID  string         `json:"req_chain_id" yaml:"req_chain_id"`   //
+	MethodID    int16          `json:"method_id" yaml:"method_id"`         //
+	Provider    sdk.AccAddress `json:"provider" yaml:"provider"`           //
+	Consumer    sdk.AccAddress `json:"consumer" yaml:"consumer"`           //
+	Input       []byte         `json:"input" yaml:"input"`                 //
+	ServiceFee  sdk.Coins      `json:"service_fee" yaml:"service_fee"`     //
+	Profiling   bool           `json:"profiling" yaml:"profiling"`         //
 }
 
+// NewMsgSvcRequest constructs a MsgSvcRequest
 func NewMsgSvcRequest(defChainID, defName, bindChainID, reqChainID string, consumer, provider sdk.AccAddress, methodID int16, input []byte, serviceFee sdk.Coins, profiling bool) MsgSvcRequest {
 	return MsgSvcRequest{
 		DefChainID:  defChainID,
@@ -478,9 +530,13 @@ func NewMsgSvcRequest(defChainID, defName, bindChainID, reqChainID string, consu
 	}
 }
 
+// Route implements Msg.
 func (msg MsgSvcRequest) Route() string { return RouterKey }
-func (msg MsgSvcRequest) Type() string  { return TypeMsgSvcRequest }
 
+// Type implements Msg.
+func (msg MsgSvcRequest) Type() string { return TypeMsgSvcRequest }
+
+// GetSignBytes implements Msg.
 func (msg MsgSvcRequest) GetSignBytes() []byte {
 	if len(msg.Input) == 0 {
 		msg.Input = nil
@@ -492,6 +548,7 @@ func (msg MsgSvcRequest) GetSignBytes() []byte {
 	return sdk.MustSortJSON(b)
 }
 
+// ValidateBasic implements Msg.
 func (msg MsgSvcRequest) ValidateBasic() sdk.Error {
 	if len(msg.DefChainID) == 0 {
 		return ErrInvalidDefChainID(DefaultCodespace)
@@ -529,6 +586,7 @@ func (msg MsgSvcRequest) ValidateBasic() sdk.Error {
 	return nil
 }
 
+// GetSigners implements Msg.
 func (msg MsgSvcRequest) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Consumer}
 }
@@ -537,13 +595,14 @@ func (msg MsgSvcRequest) GetSigners() []sdk.AccAddress {
 
 // MsgSvcResponse - struct for respond a service call
 type MsgSvcResponse struct {
-	ReqChainID string         `json:"req_chain_id" yaml:"req_chain_id"`
-	RequestID  string         `json:"request_id" yaml:"request_id"`
-	Provider   sdk.AccAddress `json:"provider" yaml:"provider"`
-	Output     []byte         `json:"output" yaml:"output"`
-	ErrorMsg   []byte         `json:"error_msg" yaml:"error_msg"`
+	ReqChainID string         `json:"req_chain_id" yaml:"req_chain_id"` //
+	RequestID  string         `json:"request_id" yaml:"request_id"`     //
+	Provider   sdk.AccAddress `json:"provider" yaml:"provider"`         //
+	Output     []byte         `json:"output" yaml:"output"`             //
+	ErrorMsg   []byte         `json:"error_msg" yaml:"error_msg"`       //
 }
 
+// NewMsgSvcResponse constructs a MsgSvcResponse
 func NewMsgSvcResponse(reqChainID string, requestID string, provider sdk.AccAddress, output, errorMsg []byte) MsgSvcResponse {
 	return MsgSvcResponse{
 		ReqChainID: reqChainID,
@@ -554,9 +613,13 @@ func NewMsgSvcResponse(reqChainID string, requestID string, provider sdk.AccAddr
 	}
 }
 
+// Route implements Msg.
 func (msg MsgSvcResponse) Route() string { return RouterKey }
-func (msg MsgSvcResponse) Type() string  { return TypeMsgSvcResponse }
 
+// Type implements Msg.
+func (msg MsgSvcResponse) Type() string { return TypeMsgSvcResponse }
+
+// GetSignBytes implements Msg.
 func (msg MsgSvcResponse) GetSignBytes() []byte {
 	if len(msg.Output) == 0 {
 		msg.Output = nil
@@ -571,6 +634,7 @@ func (msg MsgSvcResponse) GetSignBytes() []byte {
 	return sdk.MustSortJSON(b)
 }
 
+// ValidateBasic implements Msg.
 func (msg MsgSvcResponse) ValidateBasic() sdk.Error {
 	if len(msg.ReqChainID) == 0 {
 		return ErrInvalidReqChainID(DefaultCodespace)
@@ -587,6 +651,7 @@ func (msg MsgSvcResponse) ValidateBasic() sdk.Error {
 	return nil
 }
 
+// GetSigners implements Msg.
 func (msg MsgSvcResponse) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Provider}
 }
@@ -595,21 +660,27 @@ func (msg MsgSvcResponse) GetSigners() []sdk.AccAddress {
 
 // MsgSvcRefundFees - struct for refund fees
 type MsgSvcRefundFees struct {
-	Consumer sdk.AccAddress `json:"consumer" yaml:"consumer"`
+	Consumer sdk.AccAddress `json:"consumer" yaml:"consumer"` //
 }
 
+// NewMsgSvcRefundFees constructs a MsgSvcRefundFees
 func NewMsgSvcRefundFees(consumer sdk.AccAddress) MsgSvcRefundFees {
 	return MsgSvcRefundFees{Consumer: consumer}
 }
 
+// Route implements Msg.
 func (msg MsgSvcRefundFees) Route() string { return RouterKey }
-func (msg MsgSvcRefundFees) Type() string  { return TypeMsgSvcRefundFees }
 
+// Type implements Msg.
+func (msg MsgSvcRefundFees) Type() string { return TypeMsgSvcRefundFees }
+
+// GetSignBytes implements Msg.
 func (msg MsgSvcRefundFees) GetSignBytes() []byte {
 	b := ModuleCdc.MustMarshalJSON(msg)
 	return sdk.MustSortJSON(b)
 }
 
+// ValidateBasic implements Msg.
 func (msg MsgSvcRefundFees) ValidateBasic() sdk.Error {
 	if len(msg.Consumer) == 0 {
 		return sdk.ErrInvalidAddress(msg.Consumer.String())
@@ -617,6 +688,7 @@ func (msg MsgSvcRefundFees) ValidateBasic() sdk.Error {
 	return nil
 }
 
+// GetSigners implements Msg.
 func (msg MsgSvcRefundFees) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Consumer}
 }
@@ -625,21 +697,27 @@ func (msg MsgSvcRefundFees) GetSigners() []sdk.AccAddress {
 
 // MsgSvcWithdrawFees - struct for withdraw fees
 type MsgSvcWithdrawFees struct {
-	Provider sdk.AccAddress `json:"provider" yaml:"provider"`
+	Provider sdk.AccAddress `json:"provider" yaml:"provider"` //
 }
 
+// NewMsgSvcWithdrawFees constructs a MsgSvcWithdrawFees
 func NewMsgSvcWithdrawFees(provider sdk.AccAddress) MsgSvcWithdrawFees {
 	return MsgSvcWithdrawFees{Provider: provider}
 }
 
+// Route implements Msg.
 func (msg MsgSvcWithdrawFees) Route() string { return RouterKey }
-func (msg MsgSvcWithdrawFees) Type() string  { return TypeMsgSvcWithdrawFees }
 
+// Type implements Msg.
+func (msg MsgSvcWithdrawFees) Type() string { return TypeMsgSvcWithdrawFees }
+
+// GetSignBytes implements Msg.
 func (msg MsgSvcWithdrawFees) GetSignBytes() []byte {
 	b := ModuleCdc.MustMarshalJSON(msg)
 	return sdk.MustSortJSON(b)
 }
 
+// ValidateBasic implements Msg.
 func (msg MsgSvcWithdrawFees) ValidateBasic() sdk.Error {
 	if len(msg.Provider) == 0 {
 		return sdk.ErrInvalidAddress(msg.Provider.String())
@@ -647,6 +725,7 @@ func (msg MsgSvcWithdrawFees) ValidateBasic() sdk.Error {
 	return nil
 }
 
+// GetSigners implements Msg.
 func (msg MsgSvcWithdrawFees) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Provider}
 }
@@ -655,11 +734,12 @@ func (msg MsgSvcWithdrawFees) GetSigners() []sdk.AccAddress {
 
 // MsgSvcWithdrawTax - struct for withdraw tax
 type MsgSvcWithdrawTax struct {
-	Trustee     sdk.AccAddress `json:"trustee" yaml:"trustee"`
-	DestAddress sdk.AccAddress `json:"dest_address" yaml:"dest_address"`
-	Amount      sdk.Coins      `json:"amount" yaml:"amount"`
+	Trustee     sdk.AccAddress `json:"trustee" yaml:"trustee"`           //
+	DestAddress sdk.AccAddress `json:"dest_address" yaml:"dest_address"` //
+	Amount      sdk.Coins      `json:"amount" yaml:"amount"`             //
 }
 
+// NewMsgSvcWithdrawTax constructs a MsgSvcWithdrawTax
 func NewMsgSvcWithdrawTax(trustee, destAddress sdk.AccAddress, amount sdk.Coins) MsgSvcWithdrawTax {
 	return MsgSvcWithdrawTax{
 		Trustee:     trustee,
@@ -668,14 +748,19 @@ func NewMsgSvcWithdrawTax(trustee, destAddress sdk.AccAddress, amount sdk.Coins)
 	}
 }
 
+// Route implements Msg.
 func (msg MsgSvcWithdrawTax) Route() string { return RouterKey }
-func (msg MsgSvcWithdrawTax) Type() string  { return TypeMsgSvcWithdrawTax }
 
+// Type implements Msg.
+func (msg MsgSvcWithdrawTax) Type() string { return TypeMsgSvcWithdrawTax }
+
+// GetSignBytes implements Msg.
 func (msg MsgSvcWithdrawTax) GetSignBytes() []byte {
 	b := ModuleCdc.MustMarshalJSON(msg)
 	return sdk.MustSortJSON(b)
 }
 
+// ValidateBasic implements Msg.
 func (msg MsgSvcWithdrawTax) ValidateBasic() sdk.Error {
 	if len(msg.Trustee) == 0 {
 		return sdk.ErrInvalidAddress(msg.Trustee.String())
@@ -689,6 +774,7 @@ func (msg MsgSvcWithdrawTax) ValidateBasic() sdk.Error {
 	return nil
 }
 
+// GetSigners implements Msg.
 func (msg MsgSvcWithdrawTax) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Trustee}
 }
@@ -699,6 +785,7 @@ func validServiceName(name string) bool {
 	return reSvcName.MatchString(name)
 }
 
+// EnsureLength
 func (msg MsgSvcDef) EnsureLength() sdk.Error {
 	if err := ensureNameLength(msg.Name); err != nil {
 		return err
