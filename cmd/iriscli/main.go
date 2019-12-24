@@ -23,6 +23,8 @@ import (
 
 	"github.com/irisnet/irishub/app"
 	iconfig "github.com/irisnet/irishub/config"
+	// unnamed import of statik for swagger UI support
+	_ "github.com/irisnet/irishub/lite/statik"
 )
 
 func main() {
