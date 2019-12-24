@@ -7,7 +7,7 @@ import (
 // ModuleCdc defines the module codec
 var ModuleCdc *codec.Codec
 
-// Register concrete types on codec
+// RegisterCodec registers concrete types on the codec.
 func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(MsgRequestRand{}, "irishub/rand/MsgRequestRand", nil)
 	cdc.RegisterConcrete(&Rand{}, "irishub/rand/Rand", nil)

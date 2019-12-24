@@ -1,6 +1,7 @@
+// nolint
 package types
 
-// Rand module event types
+// rand module event types
 const (
 	EventTypeRequestRand  = "request_rand"
 	EventTypeGenerateRand = "generate_rand"
