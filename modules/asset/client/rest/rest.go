@@ -22,6 +22,7 @@ func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router, queryRoute string)
 	registerTxRoutes(cliCtx, r)
 }
 
+// IssueTokenReq defines the properties of a issue token request's body
 type IssueTokenReq struct {
 	BaseTx          rest.BaseReq      `json:"base_tx" yaml:"base_tx"`
 	Owner           sdk.AccAddress    `json:"owner" yaml:"owner"` //  Owner of the token
@@ -37,6 +38,7 @@ type IssueTokenReq struct {
 	Mintable        bool              `json:"mintable" yaml:"mintable"`
 }
 
+// EditTokenReq defines the properties of a edit token request's body
 type EditTokenReq struct {
 	BaseTx          rest.BaseReq   `json:"base_tx" yaml:"base_tx"`
 	Owner           sdk.AccAddress `json:"owner" yaml:"owner"`                       //  owner of asset
@@ -47,12 +49,14 @@ type EditTokenReq struct {
 	Name            string         `json:"name" yaml:"name"`
 }
 
+// TransferTokenOwnerReq defines the properties of a transfer token owner request's body
 type TransferTokenOwnerReq struct {
 	BaseTx   rest.BaseReq   `json:"base_tx" yaml:"base_tx"`
 	SrcOwner sdk.AccAddress `json:"src_owner" yaml:"src_owner"` // the current owner address of the token
 	DstOwner sdk.AccAddress `json:"dst_owner" yaml:"dst_owner"` // the new owner
 }
 
+// MintTokenReq defines the properties of a mint token request's body
 type MintTokenReq struct {
 	BaseTx rest.BaseReq   `json:"base_tx" yaml:"base_tx"`
 	Owner  sdk.AccAddress `json:"owner" yaml:"owner"`   // the current owner address of the token

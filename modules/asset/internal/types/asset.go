@@ -9,6 +9,7 @@ import (
 	iristypes "github.com/irisnet/irishub/types"
 )
 
+// BaseToken
 type BaseToken struct {
 	ID              string         `json:"id" yaml:"id"`
 	Family          AssetFamily    `json:"family" yaml:"family"`
@@ -24,6 +25,7 @@ type BaseToken struct {
 	Owner           sdk.AccAddress `json:"owner" yaml:"owner"`
 }
 
+// NewBaseToken - construct fungible token
 func NewBaseToken(family AssetFamily, source AssetSource, symbol string, name string,
 	decimal uint8, canonicalSymbol string, minUnitAlias string, initialSupply sdk.Int, maxSupply sdk.Int,
 	mintable bool, owner sdk.AccAddress,

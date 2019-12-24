@@ -4,10 +4,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 )
 
-// ModuleCdc
+// ModuleCdc defines the module codec
 var ModuleCdc *codec.Codec
 
-// Register concrete types on codec
+// RegisterCodec registers concrete types on the codec.
 func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(MsgIssueToken{}, "irishub/asset/MsgIssueToken", nil)
 	cdc.RegisterConcrete(MsgEditToken{}, "irishub/asset/MsgEditToken", nil)

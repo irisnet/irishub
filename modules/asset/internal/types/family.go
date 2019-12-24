@@ -9,6 +9,7 @@ import (
 	"github.com/pkg/errors"
 )
 
+// AssetFamily
 type AssetFamily byte
 
 const (
@@ -19,14 +20,15 @@ const (
 var (
 	AssetFamilyToStringMap = map[AssetFamily]string{
 		FUNGIBLE: "fungible",
-		//NON_FUNGIBLE: "non-fungible",
+		// NON_FUNGIBLE: "non-fungible",
 	}
 	StringToAssetFamilyMap = map[string]AssetFamily{
 		"fungible": FUNGIBLE,
-		//"non-fungible": NON_FUNGIBLE,
+		// "non-fungible": NON_FUNGIBLE,
 	}
 )
 
+// AssetFamilyFromString
 func AssetFamilyFromString(str string) (AssetFamily, error) {
 	if family, ok := StringToAssetFamilyMap[strings.ToLower(str)]; ok {
 		return family, nil
@@ -34,11 +36,13 @@ func AssetFamilyFromString(str string) (AssetFamily, error) {
 	return AssetFamily(0xff), errors.Errorf("'%s' is not a valid asset family", str)
 }
 
+// IsValidAssetFamily
 func IsValidAssetFamily(family AssetFamily) bool {
 	_, ok := AssetFamilyToStringMap[family]
 	return ok
 }
 
+// Format
 func (family AssetFamily) Format(s fmt.State, verb rune) {
 	switch verb {
 	case 's':
@@ -48,6 +52,7 @@ func (family AssetFamily) Format(s fmt.State, verb rune) {
 	}
 }
 
+// String
 func (family AssetFamily) String() string {
 	return AssetFamilyToStringMap[family]
 }
@@ -90,6 +95,7 @@ const (
 	Nil   Bool = ""
 )
 
+// ToBool
 func (b Bool) ToBool() bool {
 	v := string(b)
 	if len(v) == 0 {
@@ -99,6 +105,7 @@ func (b Bool) ToBool() bool {
 	return result
 }
 
+// ToBool
 func (b Bool) String() string {
 	return string(b)
 }
@@ -128,6 +135,8 @@ func (b *Bool) UnmarshalJSON(data []byte) error {
 	*b = Bool(s)
 	return nil
 }
+
+// ParseBool
 func ParseBool(v string) (Bool, error) {
 	if len(v) == 0 {
 		return Nil, nil

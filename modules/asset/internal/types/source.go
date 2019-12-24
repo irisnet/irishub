@@ -8,24 +8,28 @@ import (
 	"github.com/pkg/errors"
 )
 
+// AssetSource
 type AssetSource byte
 
 const (
-	NATIVE   AssetSource = 0x00
-	EXTERNAL AssetSource = 0x01
+	NATIVE   AssetSource = 0x00 //
+	EXTERNAL AssetSource = 0x01 //
 )
 
 var (
+	// AssetSourceToStringMap
 	AssetSourceToStringMap = map[AssetSource]string{
 		NATIVE:   "native",
 		EXTERNAL: "external",
 	}
+	// StringToAssetSourceMap
 	StringToAssetSourceMap = map[string]AssetSource{
 		"native":   NATIVE,
 		"external": EXTERNAL,
 	}
 )
 
+// AssetSourceFromString
 func AssetSourceFromString(str string) (AssetSource, error) {
 	if source, ok := StringToAssetSourceMap[strings.ToLower(str)]; ok {
 		return source, nil
@@ -33,11 +37,13 @@ func AssetSourceFromString(str string) (AssetSource, error) {
 	return AssetSource(0xff), errors.Errorf("'%s' is not a valid token source", str)
 }
 
+// IsValidAssetSource
 func IsValidAssetSource(source AssetSource) bool {
 	_, ok := AssetSourceToStringMap[source]
 	return ok
 }
 
+// Format
 func (source AssetSource) Format(s fmt.State, verb rune) {
 	switch verb {
 	case 's':
@@ -47,6 +53,7 @@ func (source AssetSource) Format(s fmt.State, verb rune) {
 	}
 }
 
+// String
 func (source AssetSource) String() string {
 	return AssetSourceToStringMap[source]
 }

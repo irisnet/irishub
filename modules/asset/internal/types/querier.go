@@ -17,34 +17,34 @@ const (
 
 // QueryTokenParams is the query parameters for 'custom/asset/tokens/{id}'
 type QueryTokenParams struct {
-	TokenID string `json:"token_id" yaml:"token_id"`
+	TokenID string `json:"token_id" yaml:"token_id"` //
 }
 
 // QueryTokensParams is the query parameters for 'custom/asset/tokens'
 type QueryTokensParams struct {
-	Source  string `json:"source" yaml:"source"`
-	Gateway string `json:"gateway" yaml:"gateway"`
-	Owner   string `json:"owner" yaml:"owner"`
+	Source  string `json:"source" yaml:"source"`   //
+	Gateway string `json:"gateway" yaml:"gateway"` //
+	Owner   string `json:"owner" yaml:"owner"`     //
 }
 
 // QueryGatewayParams is the query parameters for 'custom/asset/gateway'
 type QueryGatewayParams struct {
-	Moniker string `json:"moniker" yaml:"moniker"`
+	Moniker string `json:"moniker" yaml:"moniker"` //
 }
 
 // QueryGatewaysParams is the query parameters for 'custom/asset/gateways'
 type QueryGatewaysParams struct {
-	Owner sdk.AccAddress `json:"owner" yaml:"owner"`
+	Owner sdk.AccAddress `json:"owner" yaml:"owner"` //
 }
 
 // QueryGatewayFeeParams is the query parameters for 'custom/asset/fees/gateways'
 type QueryGatewayFeeParams struct {
-	Moniker string `json:"moniker" yaml:"moniker"`
+	Moniker string `json:"moniker" yaml:"moniker"` //
 }
 
 // QueryTokenFeesParams is the query parameters for 'custom/asset/fees/tokens'
 type QueryTokenFeesParams struct {
-	ID string `json:"id" yaml:"id"`
+	ID string `json:"id" yaml:"id"` //
 }
 
 // GatewayFeeOutput is for the gateway fee query output
