@@ -48,6 +48,7 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 	return ctx.Logger().With("module", fmt.Sprintf("%s", types.ModuleName))
 }
 
+// Swap execute swap order in specified pool
 func (k Keeper) Swap(ctx sdk.Context, msg types.MsgSwapOrder) sdk.Error {
 	var amount sdk.Int
 	var err sdk.Error
@@ -82,6 +83,7 @@ func (k Keeper) Swap(ctx sdk.Context, msg types.MsgSwapOrder) sdk.Error {
 	return nil
 }
 
+// AddLiquidity add liquidity to specified pool
 func (k Keeper) AddLiquidity(ctx sdk.Context, msg types.MsgAddLiquidity) sdk.Error {
 	standardDenom := k.GetParams(ctx).StandardDenom
 	uniDenom, err := types.GetUniDenomFromDenom(msg.MaxToken.Denom)
@@ -147,6 +149,7 @@ func (k Keeper) addLiquidity(ctx sdk.Context, sender sdk.AccAddress, standardCoi
 	return nil
 }
 
+// RemoveLiquidity remove liquidity from specified pool
 func (k Keeper) RemoveLiquidity(ctx sdk.Context, msg types.MsgRemoveLiquidity) sdk.Error {
 	standardDenom := k.GetParams(ctx).StandardDenom
 	uniDenom := msg.WithdrawLiquidity.Denom

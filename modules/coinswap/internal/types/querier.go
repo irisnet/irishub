@@ -16,8 +16,8 @@ type QueryLiquidityParams struct {
 
 // QueryLiquidityResponse is the query response for 'custom/swap/liquidity'
 type QueryLiquidityResponse struct {
-	Standard  sdk.Coin `json:"standard" yaml:"standard"`
-	Token     sdk.Coin `json:"token" yaml:"token"`
-	Liquidity sdk.Coin `json:"liquidity" yaml:"liquidity"`
-	Fee       string   `json:"fee" yaml:"fee"`
+	Standard  sdk.Coin `json:"standard" yaml:"standard"`   // standard token
+	Token     sdk.Coin `json:"token" yaml:"token"`         // the other token in swap pool
+	Liquidity sdk.Coin `json:"liquidity" yaml:"liquidity"` // liquidity of swap pool
+	Fee       string   `json:"fee" yaml:"fee"`             // fee of swap pool
 }

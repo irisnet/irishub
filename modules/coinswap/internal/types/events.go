@@ -1,3 +1,4 @@
+// nolint
 package types
 
 // coinswap module event types
