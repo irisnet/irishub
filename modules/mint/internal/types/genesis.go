@@ -6,6 +6,7 @@ type GenesisState struct {
 	Params Params `json:"params"` // inflation params
 }
 
+// NewGenesisState constructs a GenesisState
 func NewGenesisState(minter Minter, params Params) GenesisState {
 	return GenesisState{
 		Minter: minter,
@@ -13,7 +14,7 @@ func NewGenesisState(minter Minter, params Params) GenesisState {
 	}
 }
 
-// get raw genesis raw message for testing
+// DefaultGenesisState gets raw genesis raw message for testing
 func DefaultGenesisState() GenesisState {
 	return GenesisState{
 		Minter: DefaultMinter(),
@@ -24,7 +25,7 @@ func DefaultGenesisState() GenesisState {
 // ValidateGenesis validates the provided staking genesis state to ensure the
 // expected invariants holds. (i.e. params in correct bounds, no duplicate validators)
 func ValidateGenesis(data GenesisState) error {
-	if err := validateParams(data.Params); err != nil {
+	if err := data.Params.Validate(); err != nil {
 		return err
 	}
 	return ValidateMinter(data.Minter)

@@ -20,7 +20,6 @@ const (
 func TokenIssueFeeHandler(ctx sdk.Context, k Keeper, owner sdk.AccAddress, symbol string) sdk.Error {
 	// get the required issuance fee
 	fee := GetTokenIssueFee(ctx, k, symbol)
-
 	return feeHandler(ctx, k, owner, fee)
 }
 
@@ -28,7 +27,6 @@ func TokenIssueFeeHandler(ctx sdk.Context, k Keeper, owner sdk.AccAddress, symbo
 func TokenMintFeeHandler(ctx sdk.Context, k Keeper, owner sdk.AccAddress, symbol string) sdk.Error {
 	// get the required minting fee
 	fee := GetTokenMintFee(ctx, k, symbol)
-
 	return feeHandler(ctx, k, owner, fee)
 }
 
@@ -41,7 +39,9 @@ func feeHandler(ctx sdk.Context, k Keeper, feeAcc sdk.AccAddress, fee sdk.Coin) 
 	burnedCoins := sdk.NewCoins(fee.Sub(communityTaxCoin))
 
 	// send all fees to module account
-	if err := k.supplyKeeper.SendCoinsFromAccountToModule(ctx, feeAcc, types.ModuleName, sdk.NewCoins(fee)); err != nil {
+	if err := k.supplyKeeper.SendCoinsFromAccountToModule(
+		ctx, feeAcc, types.ModuleName, sdk.NewCoins(fee),
+	); err != nil {
 		return err
 	}
 
@@ -51,10 +51,7 @@ func feeHandler(ctx sdk.Context, k Keeper, feeAcc sdk.AccAddress, fee sdk.Coin) 
 	}
 
 	// burn burnedCoin
-	if err := k.supplyKeeper.BurnCoins(ctx, types.ModuleName, burnedCoins); err != nil {
-		return err
-	}
-	return nil
+	return k.supplyKeeper.BurnCoins(ctx, types.ModuleName, burnedCoins)
 }
 
 // getTokenIssueFee returns the token issurance fee

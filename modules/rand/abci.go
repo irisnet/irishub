@@ -9,8 +9,6 @@ import (
 
 // BeginBlocker handles block beginning logic for rand
 func BeginBlocker(ctx sdk.Context, k Keeper) {
-	logger := k.Logger(ctx)
-
 	currentTimestamp := ctx.BlockHeader().Time.Unix()
 	preBlockHeight := ctx.BlockHeight() - 1
 	preBlockHash := ctx.BlockHeader().LastBlockId.Hash
@@ -45,6 +43,6 @@ func BeginBlocker(ctx sdk.Context, k Keeper) {
 		handledRandReqNum++
 	}
 
-	logger.Info(fmt.Sprintf("%d rand requests are handled", handledRandReqNum))
+	k.Logger(ctx).Info(fmt.Sprintf("%d rand requests are handled", handledRandReqNum))
 	return
 }

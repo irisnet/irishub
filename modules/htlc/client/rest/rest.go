@@ -8,13 +8,19 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/rest"
 )
 
+// Rest variable names
+// nolint
+const (
+	RestHashLock = "hash-lock"
+)
+
 // RegisterRoutes registers HTLC-related REST handlers to a router
 func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router) {
 	registerQueryRoutes(cliCtx, r)
 	registerTxRoutes(cliCtx, r)
 }
 
-// CreateHTLCReq defines the properties of a create HTLC request's body.
+// CreateHTLCReq defines the properties of a create HTLC request's body
 type CreateHTLCReq struct {
 	BaseTx               rest.BaseReq   `json:"base_tx" yaml:"base_tx"`
 	Sender               sdk.AccAddress `json:"sender" yaml:"sender"`
@@ -26,14 +32,14 @@ type CreateHTLCReq struct {
 	Timestamp            uint64         `json:"timestamp" yaml:"timestamp"`
 }
 
-// ClaimHTLCReq defines the properties of a claim HTLC request's body.
+// ClaimHTLCReq defines the properties of a claim HTLC request's body
 type ClaimHTLCReq struct {
 	BaseTx rest.BaseReq   `json:"base_tx" yaml:"base_tx"`
 	Sender sdk.AccAddress `json:"sender" yaml:"sender"`
 	Secret string         `json:"secret" yaml:"secret"`
 }
 
-// RefundHTLCReq defines the properties of a refund HTLC request's body.
+// RefundHTLCReq defines the properties of a refund HTLC request's body
 type RefundHTLCReq struct {
 	BaseTx rest.BaseReq   `json:"base_tx" yaml:"base_tx"`
 	Sender sdk.AccAddress `json:"sender" yaml:"sender"`

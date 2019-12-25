@@ -5,6 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -12,6 +13,29 @@ import (
 	"github.com/irisnet/irishub/modules/service/internal/types"
 )
 
+// GetQueryCmd returns the cli query commands for the rand module.
+func GetQueryCmd(queryRoute string, cdc *codec.Codec) *cobra.Command {
+	serviceQueryCmd := &cobra.Command{
+		Use:                        types.ModuleName,
+		Short:                      "Querying commands for the service module",
+		DisableFlagParsing:         true,
+		SuggestionsMinimumDistance: 2,
+		RunE:                       client.ValidateCmd,
+	}
+
+	serviceQueryCmd.AddCommand(client.GetCommands(
+		GetCmdQuerySvcDef(queryRoute, cdc),
+		GetCmdQuerySvcBind(queryRoute, cdc),
+		GetCmdQuerySvcBinds(queryRoute, cdc),
+		GetCmdQuerySvcRequests(queryRoute, cdc),
+		GetCmdQuerySvcResponse(queryRoute, cdc),
+		GetCmdQuerySvcFees(queryRoute, cdc),
+	)...)
+
+	return serviceQueryCmd
+}
+
+// GetCmdQuerySvcDef implements the query service definition command.
 func GetCmdQuerySvcDef(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "definition",
@@ -38,8 +62,7 @@ func GetCmdQuerySvcDef(queryRoute string, cdc *codec.Codec) *cobra.Command {
 			}
 
 			var svcDefOutput types.DefinitionOutput
-			err = cdc.UnmarshalJSON(res, &svcDefOutput)
-			if err != nil {
+			if err := cdc.UnmarshalJSON(res, &svcDefOutput); err != nil {
 				return err
 			}
 
@@ -50,6 +73,7 @@ func GetCmdQuerySvcDef(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
+// GetCmdQuerySvcBind implements the query service binding command.
 func GetCmdQuerySvcBind(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "binding",
@@ -67,7 +91,7 @@ func GetCmdQuerySvcBind(queryRoute string, cdc *codec.Codec) *cobra.Command {
 			params := types.QueryBindingParams{
 				DefChainID:  args[0],
 				ServiceName: args[1],
-				BindChainId: args[2],
+				BindChainID: args[2],
 				Provider:    provider,
 			}
 
@@ -83,8 +107,7 @@ func GetCmdQuerySvcBind(queryRoute string, cdc *codec.Codec) *cobra.Command {
 			}
 
 			var binding types.SvcBinding
-			err = cdc.UnmarshalJSON(res, &binding)
-			if err != nil {
+			if err := cdc.UnmarshalJSON(res, &binding); err != nil {
 				return err
 			}
 
@@ -95,6 +118,7 @@ func GetCmdQuerySvcBind(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
+// GetCmdQuerySvcBinds implements the query service bindings command.
 func GetCmdQuerySvcBinds(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "bindings",
@@ -121,8 +145,7 @@ func GetCmdQuerySvcBinds(queryRoute string, cdc *codec.Codec) *cobra.Command {
 			}
 
 			var bindings []types.SvcBinding
-			err = cdc.UnmarshalJSON(res, &bindings)
-			if err != nil {
+			if err := cdc.UnmarshalJSON(res, &bindings); err != nil {
 				return err
 			}
 
@@ -133,6 +156,7 @@ func GetCmdQuerySvcBinds(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
+// GetCmdQuerySvcRequests implements the query service requests command.
 func GetCmdQuerySvcRequests(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "requests",
@@ -150,7 +174,7 @@ func GetCmdQuerySvcRequests(queryRoute string, cdc *codec.Codec) *cobra.Command 
 			params := types.QueryBindingParams{
 				DefChainID:  args[0],
 				ServiceName: args[1],
-				BindChainId: args[2],
+				BindChainID: args[2],
 				Provider:    provider,
 			}
 
@@ -166,8 +190,7 @@ func GetCmdQuerySvcRequests(queryRoute string, cdc *codec.Codec) *cobra.Command 
 			}
 
 			var requests []types.SvcRequest
-			err = cdc.UnmarshalJSON(res, &requests)
-			if err != nil {
+			if err := cdc.UnmarshalJSON(res, &requests); err != nil {
 				return err
 			}
 
@@ -178,6 +201,7 @@ func GetCmdQuerySvcRequests(queryRoute string, cdc *codec.Codec) *cobra.Command 
 	return cmd
 }
 
+// GetCmdQuerySvcResponse implements the query service response command.
 func GetCmdQuerySvcResponse(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "response",
@@ -188,8 +212,8 @@ func GetCmdQuerySvcResponse(queryRoute string, cdc *codec.Codec) *cobra.Command 
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
 			params := types.QueryResponseParams{
-				ReqChainId: args[0],
-				RequestId:  args[1],
+				ReqChainID: args[0],
+				RequestID:  args[1],
 			}
 
 			bz, err := cdc.MarshalJSON(params)
@@ -204,8 +228,7 @@ func GetCmdQuerySvcResponse(queryRoute string, cdc *codec.Codec) *cobra.Command 
 			}
 
 			var response types.SvcResponse
-			err = cdc.UnmarshalJSON(res, &response)
-			if err != nil {
+			if err := cdc.UnmarshalJSON(res, &response); err != nil {
 				return err
 			}
 
@@ -216,6 +239,7 @@ func GetCmdQuerySvcResponse(queryRoute string, cdc *codec.Codec) *cobra.Command 
 	return cmd
 }
 
+// GetCmdQuerySvcFees implements the query returned and incoming fee command.
 func GetCmdQuerySvcFees(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "fees",
@@ -246,8 +270,7 @@ func GetCmdQuerySvcFees(queryRoute string, cdc *codec.Codec) *cobra.Command {
 			}
 
 			var fees types.FeesOutput
-			err = cdc.UnmarshalJSON(res, &fees)
-			if err != nil {
+			if err := cdc.UnmarshalJSON(res, &fees); err != nil {
 				return err
 			}
 

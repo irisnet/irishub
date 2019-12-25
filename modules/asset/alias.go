@@ -50,8 +50,7 @@ const (
 	RouterKey                       = types.RouterKey
 	QuerierRoute                    = types.QuerierRoute
 	DefaultParamspace               = types.DefaultParamspace
-	MsgRoute                        = types.MsgRoute
-	MsgTypeIssueToken               = types.MsgTypeIssueToken
+	MsgTypeIssueToken               = types.TypeMsgIssueToken
 	DoNotModify                     = types.DoNotModify
 	QueryToken                      = types.QueryToken
 	QueryTokens                     = types.QueryTokens
@@ -99,6 +98,8 @@ var (
 	IsValidAssetFamily             = types.IsValidAssetFamily
 	ParseBool                      = types.ParseBool
 	NewGenesisState                = types.NewGenesisState
+	ValidateGenesis                = types.ValidateGenesis
+	DefaultGenesisState            = types.DefaultGenesisState
 	NewMsgIssueToken               = types.NewMsgIssueToken
 	ValidateMsgIssueToken          = types.ValidateMsgIssueToken
 	NewMsgTransferTokenOwner       = types.NewMsgTransferTokenOwner

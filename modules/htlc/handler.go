@@ -2,11 +2,12 @@ package htlc
 
 import (
 	"encoding/hex"
+	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-// NewHandler handles all htlc messages
+// NewHandler returns a handler for all htlc messages
 func NewHandler(k Keeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
 		ctx = ctx.WithEventManager(sdk.NewEventManager())
@@ -19,7 +20,8 @@ func NewHandler(k Keeper) sdk.Handler {
 		case MsgRefundHTLC:
 			return handleMsgRefundHTLC(ctx, k, msg)
 		default:
-			return sdk.ErrTxDecode("invalid message parsed in HTLC module").Result()
+			errMsg := fmt.Sprintf("unrecognized HTLC message type: %T", msg)
+			return sdk.ErrUnknownRequest(errMsg).Result()
 		}
 	}
 }
@@ -70,7 +72,7 @@ func handleMsgCreateHTLC(ctx sdk.Context, k Keeper, msg MsgCreateHTLC) sdk.Resul
 
 // handleMsgClaimHTLC handles MsgClaimHTLC
 func handleMsgClaimHTLC(ctx sdk.Context, k Keeper, msg MsgClaimHTLC) sdk.Result {
-	toStr, err := k.ClaimHTLC(ctx, msg.HashLock, msg.Secret)
+	senderStr, toStr, err := k.ClaimHTLC(ctx, msg.HashLock, msg.Secret)
 	if err != nil {
 		return err.Result()
 	}
@@ -84,7 +86,7 @@ func handleMsgClaimHTLC(ctx sdk.Context, k Keeper, msg MsgClaimHTLC) sdk.Result 
 			),
 			sdk.NewEvent(
 				EventTypeClaimHTLC,
-				sdk.NewAttribute(AttributeValueSender, msg.Sender.String()),
+				sdk.NewAttribute(AttributeValueSender, senderStr),
 				sdk.NewAttribute(AttributeValueReceiver, toStr),
 				sdk.NewAttribute(AttributeValueHashLock, hex.EncodeToString(msg.HashLock)),
 				sdk.NewAttribute(AttributeValueSecret, hex.EncodeToString(msg.Secret)),

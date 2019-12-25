@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/gorilla/mux"
+
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/types/rest"
-	"github.com/gorilla/mux"
 
 	"github.com/irisnet/irishub/modules/asset/internal/types"
 )
@@ -16,7 +17,7 @@ func queryToken(cliCtx context.CLIContext, queryRoute string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 
-		tokenID := vars["id"]
+		tokenID := vars[RestTokenID]
 		params := types.QueryTokenParams{
 			TokenID: tokenID,
 		}
@@ -28,7 +29,8 @@ func queryToken(cliCtx context.CLIContext, queryRoute string) http.HandlerFunc {
 		}
 
 		res, height, err := cliCtx.QueryWithData(
-			fmt.Sprintf("custom/%s/%s", queryRoute, types.QueryToken), bz)
+			fmt.Sprintf("custom/%s/%s", queryRoute, types.QueryToken), bz,
+		)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
@@ -57,7 +59,8 @@ func queryTokens(cliCtx context.CLIContext, queryRoute string) http.HandlerFunc 
 		}
 
 		res, height, err := cliCtx.QueryWithData(
-			fmt.Sprintf("custom/%s/%s", queryRoute, types.QueryTokens), bz)
+			fmt.Sprintf("custom/%s/%s", queryRoute, types.QueryTokens), bz,
+		)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
@@ -73,7 +76,7 @@ func queryTokenFees(cliCtx context.CLIContext, queryRoute string) http.HandlerFu
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 
-		id := vars["id"]
+		id := vars[RestTokenID]
 		if err := types.CheckTokenID(id); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -90,7 +93,8 @@ func queryTokenFees(cliCtx context.CLIContext, queryRoute string) http.HandlerFu
 		}
 
 		res, height, err := cliCtx.QueryWithData(
-			fmt.Sprintf("custom/%s/%s/tokens", queryRoute, types.QueryFees), bz)
+			fmt.Sprintf("custom/%s/%s/tokens", queryRoute, types.QueryFees), bz,
+		)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return

@@ -12,6 +12,7 @@ import (
 	"github.com/irisnet/irishub/modules/rand/internal/types"
 )
 
+// NewQuerier creates a new rand Querier instance
 func NewQuerier(k Keeper) sdk.Querier {
 	return func(ctx sdk.Context, path []string, req abci.RequestQuery) ([]byte, sdk.Error) {
 		switch path[0] {

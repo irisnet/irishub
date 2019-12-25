@@ -7,9 +7,7 @@ type GenesisState struct {
 
 // NewGenesisState is the constructor function for GenesisState
 func NewGenesisState(params Params) GenesisState {
-	return GenesisState{
-		Params: params,
-	}
+	return GenesisState{Params: params}
 }
 
 // DefaultGenesisState creates a default GenesisState object
@@ -19,5 +17,5 @@ func DefaultGenesisState() GenesisState {
 
 // ValidateGenesis - placeholder function
 func ValidateGenesis(data GenesisState) error {
-	return ValidateParams(data.Params)
+	return data.Params.Validate()
 }

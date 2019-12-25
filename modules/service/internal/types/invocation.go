@@ -9,10 +9,11 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
+// SvcRequest
 type SvcRequest struct {
 	DefChainID            string         `json:"def_chain_id" yaml:"def_chain_id"`
-	DefName               string         `json:"def_name" yaml:"def_name" `
-	BindChainID           string         `json:"bind_chain_id" yaml:"bind_chain_id`
+	DefName               string         `json:"def_name" yaml:"def_name"`
+	BindChainID           string         `json:"bind_chain_id" yaml:"bind_chain_id"`
 	ReqChainID            string         `json:"req_chain_id" yaml:"req_chain_id"`
 	MethodID              int16          `json:"method_id" yaml:"method_id"`
 	Provider              sdk.AccAddress `json:"provider" yaml:"provider"`
@@ -25,6 +26,7 @@ type SvcRequest struct {
 	ExpirationHeight      int64          `json:"expiration_height" yaml:"expiration_height"`               // block height of the service request has expired
 }
 
+// NewSvcRequest
 func NewSvcRequest(defChainID, defName, bindChainID, reqChainID string, consumer, provider sdk.AccAddress, methodID int16, input []byte, serviceFee sdk.Coins, profiling bool) SvcRequest {
 	return SvcRequest{
 		DefChainID:  defChainID,
@@ -45,8 +47,9 @@ func (req SvcRequest) RequestID() string {
 	return fmt.Sprintf("%d-%d-%d", req.ExpirationHeight, req.RequestHeight, req.RequestIntraTxCounter)
 }
 
-func ConvertRequestID(requestId string) (eHeight int64, rHeight int64, counter int16, err error) {
-	ss := strings.Split(requestId, "-")
+// ConvertRequestID
+func ConvertRequestID(requestID string) (eHeight int64, rHeight int64, counter int16, err error) {
+	ss := strings.Split(requestID, "-")
 	if len(ss) != 3 {
 		return eHeight, rHeight, counter, errors.New("invalid request id")
 	}
@@ -65,6 +68,7 @@ func ConvertRequestID(requestId string) (eHeight int64, rHeight int64, counter i
 	return eHeight, rHeight, int16(counterInt), err
 }
 
+// SvcResponse
 type SvcResponse struct {
 	ReqChainID            string         `json:"req_chain_id" yaml:"req_chain_id"`
 	RequestHeight         int64          `json:"request_height" yaml:"request_height"`
@@ -76,6 +80,7 @@ type SvcResponse struct {
 	ErrorMsg              []byte         `json:"error_msg" yaml:"error_msg"`
 }
 
+// NewSvcResponse
 func NewSvcResponse(reqChainID string, eheight int64, rheight int64, counter int16, provider, consumer sdk.AccAddress, out []byte, errorMsg []byte) SvcResponse {
 	return SvcResponse{
 		ReqChainID:            reqChainID,
@@ -89,12 +94,13 @@ func NewSvcResponse(reqChainID string, eheight int64, rheight int64, counter int
 	}
 }
 
-// return fee of a consumer
+// ReturnedFee defines the return fee of a consumer
 type ReturnedFee struct {
 	Address sdk.AccAddress `json:"address" yaml:"address"`
 	Coins   sdk.Coins      `json:"coins" yaml:"coins"`
 }
 
+// NewReturnedFee
 func NewReturnedFee(address sdk.AccAddress, coins sdk.Coins) ReturnedFee {
 	return ReturnedFee{
 		Address: address,
@@ -102,12 +108,13 @@ func NewReturnedFee(address sdk.AccAddress, coins sdk.Coins) ReturnedFee {
 	}
 }
 
-// incoming fee of a consumer
+// IncomingFee defines the incoming fee of a consumer
 type IncomingFee struct {
 	Address sdk.AccAddress `json:"address" yaml:"address"`
 	Coins   sdk.Coins      `json:"coins" yaml:"coins"`
 }
 
+// NewIncomingFee
 func NewIncomingFee(address sdk.AccAddress, coins sdk.Coins) IncomingFee {
 	return IncomingFee{
 		Address: address,

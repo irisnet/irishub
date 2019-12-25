@@ -33,6 +33,10 @@ const (
 	ModuleName                  = types.ModuleName
 	StoreKey                    = types.StoreKey
 	RouterKey                   = types.RouterKey
+	TypeMsgAddProfiler          = types.TypeMsgAddProfiler
+	TypeMsgDeleteProfiler       = types.TypeMsgDeleteProfiler
+	TypeMsgAddTrustee           = types.TypeMsgAddTrustee
+	TypeMsgDeleteTrustee        = types.TypeMsgDeleteTrustee
 	QuerierRoute                = types.QuerierRoute
 	QueryProfilers              = types.QueryProfilers
 	QueryTrustees               = types.QueryTrustees
@@ -55,6 +59,8 @@ var (
 	ErrInvalidDescription    = types.ErrInvalidDescription
 	NewGenesisState          = types.NewGenesisState
 	DefaultGenesisState      = types.DefaultGenesisState
+	ProfilerKey              = types.ProfilerKey
+	TrusteeKey               = types.TrusteeKey
 	GetProfilerKey           = types.GetProfilerKey
 	GetTrusteeKey            = types.GetTrusteeKey
 	GetProfilersSubspaceKey  = types.GetProfilersSubspaceKey

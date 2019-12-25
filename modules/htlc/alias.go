@@ -38,7 +38,6 @@ const (
 	RouterKey                          = types.RouterKey
 	StoreKey                           = types.StoreKey
 	QuerierRoute                       = types.QuerierRoute
-	MsgRoute                           = types.MsgRoute
 	TypeMsgCreateHTLC                  = types.TypeMsgCreateHTLC
 	TypeMsgClaimHTLC                   = types.TypeMsgClaimHTLC
 	TypeMsgRefundHTLC                  = types.TypeMsgRefundHTLC
@@ -53,6 +52,7 @@ const (
 var (
 	// functions aliases
 	RegisterCodec              = types.RegisterCodec
+	ErrHTLCNotExists           = types.ErrHTLCNotExists
 	ErrInvalidAddress          = types.ErrInvalidAddress
 	ErrInvalidAmount           = types.ErrInvalidAmount
 	ErrInvalidHashLock         = types.ErrInvalidHashLock

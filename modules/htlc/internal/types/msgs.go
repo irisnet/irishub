@@ -7,7 +7,6 @@ import (
 )
 
 const (
-	MsgRoute          = "htlc"        // MsgRoute identifies transaction types
 	TypeMsgCreateHTLC = "create_htlc" // type for MsgCreateHTLC
 	TypeMsgClaimHTLC  = "claim_htlc"  // type for MsgClaimHTLC
 	TypeMsgRefundHTLC = "refund_htlc" // type for MsgRefundHTLC
@@ -19,9 +18,11 @@ const (
 	MaxTimeLock                     = 25480 // maximal time span for HTLC
 )
 
-var _ sdk.Msg = &MsgCreateHTLC{}
-var _ sdk.Msg = &MsgClaimHTLC{}
-var _ sdk.Msg = &MsgRefundHTLC{}
+var (
+	_ sdk.Msg = &MsgCreateHTLC{}
+	_ sdk.Msg = &MsgClaimHTLC{}
+	_ sdk.Msg = &MsgRefundHTLC{}
+)
 
 // MsgCreateHTLC represents a msg for creating an HTLC
 type MsgCreateHTLC struct {
@@ -55,52 +56,45 @@ func NewMsgCreateHTLC(
 	}
 }
 
-// Implements Msg.
-func (msg MsgCreateHTLC) Route() string { return MsgRoute }
+// Route implements Msg.
+func (msg MsgCreateHTLC) Route() string { return RouterKey }
 
-// Implements Msg.
+// Type implements Msg.
 func (msg MsgCreateHTLC) Type() string { return TypeMsgCreateHTLC }
 
-// Implements Msg.
+// ValidateBasic implements Msg.
 func (msg MsgCreateHTLC) ValidateBasic() sdk.Error {
 	if len(msg.Sender) == 0 {
 		return ErrInvalidAddress(DefaultCodespace, "the sender address must be specified")
 	}
-
 	if len(msg.To) == 0 {
 		return ErrInvalidAddress(DefaultCodespace, "the receiver address must be specified")
 	}
-
 	if len(msg.ReceiverOnOtherChain) > MaxLengthForAddressOnOtherChain {
 		return ErrInvalidAddress(DefaultCodespace, fmt.Sprintf("the length of the receiver on other chain must be between [0,%d]", MaxLengthForAddressOnOtherChain))
 	}
-
 	if !msg.Amount.IsValid() || !msg.Amount.IsAllPositive() {
 		return ErrInvalidAmount(DefaultCodespace, "the transferred amount must be valid")
 	}
-
 	if len(msg.HashLock) != HashLockLength {
 		return ErrInvalidHashLock(DefaultCodespace, fmt.Sprintf("the hash lock must be %d bytes long", HashLockLength))
 	}
-
 	if msg.TimeLock < MinTimeLock || msg.TimeLock > MaxTimeLock {
 		return ErrInvalidTimeLock(DefaultCodespace, fmt.Sprintf("the time lock must be between [%d,%d]", MinTimeLock, MaxTimeLock))
 	}
-
 	return nil
 }
 
-// Implements Msg.
+// GetSignBytes implements Msg.
 func (msg MsgCreateHTLC) GetSignBytes() []byte {
 	b, err := ModuleCdc.MarshalJSON(msg)
 	if err != nil {
 		panic(err)
 	}
-
 	return sdk.MustSortJSON(b)
 }
 
-// Implements Msg.
+// GetSigners implements Msg.
 func (msg MsgCreateHTLC) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Sender}
 }
@@ -127,40 +121,36 @@ func NewMsgClaimHTLC(
 	}
 }
 
-// Implements Msg.
-func (msg MsgClaimHTLC) Route() string { return MsgRoute }
+// Route implements Msg.
+func (msg MsgClaimHTLC) Route() string { return RouterKey }
 
-// Implements Msg.
+// Type implements Msg.
 func (msg MsgClaimHTLC) Type() string { return TypeMsgClaimHTLC }
 
-// Implements Msg.
+// ValidateBasic implements Msg.
 func (msg MsgClaimHTLC) ValidateBasic() sdk.Error {
 	if len(msg.Sender) == 0 {
 		return ErrInvalidAddress(DefaultCodespace, "the sender address must be specified")
 	}
-
 	if len(msg.HashLock) != HashLockLength {
 		return ErrInvalidHashLock(DefaultCodespace, fmt.Sprintf("the hash lock must be %d bytes long", HashLockLength))
 	}
-
 	if len(msg.Secret) != SecretLength {
 		return ErrInvalidSecret(DefaultCodespace, fmt.Sprintf("the secret must be %d bytes long", SecretLength))
 	}
-
 	return nil
 }
 
-// Implements Msg.
+// GetSignBytes implements Msg.
 func (msg MsgClaimHTLC) GetSignBytes() []byte {
 	b, err := ModuleCdc.MarshalJSON(msg)
 	if err != nil {
 		panic(err)
 	}
-
 	return sdk.MustSortJSON(b)
 }
 
-// Implements Msg.
+// GetSigners implements Msg.
 func (msg MsgClaimHTLC) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Sender}
 }
@@ -184,36 +174,33 @@ func NewMsgRefundHTLC(
 	}
 }
 
-// Implements Msg.
-func (msg MsgRefundHTLC) Route() string { return MsgRoute }
+// Route implements Msg.
+func (msg MsgRefundHTLC) Route() string { return RouterKey }
 
-// Implements Msg.
+// Type implements Msg.
 func (msg MsgRefundHTLC) Type() string { return TypeMsgRefundHTLC }
 
-// Implements Msg.
+// ValidateBasic implements Msg.
 func (msg MsgRefundHTLC) ValidateBasic() sdk.Error {
 	if len(msg.Sender) == 0 {
 		return ErrInvalidAddress(DefaultCodespace, "the sender address must be specified")
 	}
-
 	if len(msg.HashLock) != HashLockLength {
 		return ErrInvalidHashLock(DefaultCodespace, fmt.Sprintf("the hash lock must be %d bytes long", HashLockLength))
 	}
-
 	return nil
 }
 
-// Implements Msg.
+// GetSignBytes implements Msg.
 func (msg MsgRefundHTLC) GetSignBytes() []byte {
 	b, err := ModuleCdc.MarshalJSON(msg)
 	if err != nil {
 		panic(err)
 	}
-
 	return sdk.MustSortJSON(b)
 }
 
-// Implements Msg.
+// GetSigners implements Msg.
 func (msg MsgRefundHTLC) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Sender}
 }

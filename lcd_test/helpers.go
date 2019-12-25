@@ -305,7 +305,7 @@ func startTM(
 		return nil, err
 	}
 
-	if err = node.Start(); err != nil {
+	if err := node.Start(); err != nil {
 		return nil, err
 	}
 

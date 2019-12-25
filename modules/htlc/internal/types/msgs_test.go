@@ -49,7 +49,7 @@ func TestNewMsgCreateHTLC(t *testing.T) {
 func TestMsgCreateHTLCRoute(t *testing.T) {
 	// build a MsgCreateHTLC
 	msg := NewMsgCreateHTLC(senderAddr, toAddr, receiverOnOtherChain, amount, hashLock, timestamp, timeLock)
-	require.Equal(t, MsgRoute, msg.Route())
+	require.Equal(t, RouterKey, msg.Route())
 }
 
 func TestMsgCreateHTLCType(t *testing.T) {
@@ -135,7 +135,7 @@ func TestNewMsgClaimHTLC(t *testing.T) {
 
 func TestMsgClaimHTLCRoute(t *testing.T) {
 	msg := NewMsgClaimHTLC(senderAddr, hashLock, secret)
-	require.Equal(t, MsgRoute, msg.Route())
+	require.Equal(t, RouterKey, msg.Route())
 }
 
 func TestMsgClaimHTLCType(t *testing.T) {
@@ -208,7 +208,7 @@ func TestNewMsgRefundHTLC(t *testing.T) {
 
 func TestMsgRefundHTLCRoute(t *testing.T) {
 	msg := NewMsgRefundHTLC(senderAddr, hashLock)
-	require.Equal(t, MsgRoute, msg.Route())
+	require.Equal(t, RouterKey, msg.Route())
 }
 
 func TestMsgRefundHTLCType(t *testing.T) {

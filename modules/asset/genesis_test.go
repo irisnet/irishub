@@ -3,9 +3,11 @@ package asset_test
 import (
 	"testing"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
+
 	abci "github.com/tendermint/tendermint/abci/types"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/irisnet/irishub/modules/asset"
 	"github.com/irisnet/irishub/simapp"

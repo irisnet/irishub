@@ -24,15 +24,12 @@ func GetUniDenomFromDenoms(denom1, denom2 string) (string, sdk.Error) {
 	if denom1 == denom2 {
 		return "", ErrEqualDenom("denomnations for forming uni id are equal")
 	}
-
 	if denom1 != StandardDenom && denom2 != StandardDenom {
 		return "", ErrIllegalDenom(fmt.Sprintf("illegal denomnations for forming uni id, must have one native denom: %s", StandardDenom))
 	}
-
 	if denom1 == StandardDenom {
 		return fmt.Sprintf(FormatUniDenom, denom2), nil
 	}
-
 	return fmt.Sprintf(FormatUniDenom, denom1), nil
 }
 

@@ -9,12 +9,11 @@ import (
 
 // InitGenesis stores genesis data
 func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
+	if err := ValidateGenesis(data); err != nil {
+		panic(fmt.Errorf("failed to initialize HTLC genesis state: %s", err.Error()))
+	}
 	for hashLockHex, htlc := range data.PendingHTLCs {
-		hashLock, err := hex.DecodeString(hashLockHex)
-		if err != nil {
-			panic(fmt.Errorf("failed to initialize HTLC genesis state: %s", err.Error()))
-		}
-
+		hashLock, _ := hex.DecodeString(hashLockHex)
 		k.SetHTLC(ctx, htlc, hashLock)
 		k.AddHTLCToExpireQueue(ctx, htlc.ExpireHeight, hashLock)
 	}
@@ -37,7 +36,5 @@ func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 		return false
 	})
 
-	return GenesisState{
-		PendingHTLCs: pendingHTLCs,
-	}
+	return GenesisState{PendingHTLCs: pendingHTLCs}
 }

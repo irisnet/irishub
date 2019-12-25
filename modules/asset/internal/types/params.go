@@ -9,10 +9,10 @@ var _ params.ParamSet = (*Params)(nil)
 
 // Parameter store keys
 var (
-	KeyAssetTaxRate      = []byte("AssetTaxRate")
-	KeyIssueTokenBaseFee = []byte("IssueTokenBaseFee")
-	KeyMintTokenFeeRatio = []byte("MintTokenFeeRatio")
-	KeyAssetFeeDenom     = []byte("AssetFeeDenom")
+	KeyAssetTaxRate      = []byte("AssetTaxRate")      //
+	KeyIssueTokenBaseFee = []byte("IssueTokenBaseFee") //
+	KeyMintTokenFeeRatio = []byte("MintTokenFeeRatio") //
+	KeyAssetFeeDenom     = []byte("AssetFeeDenom")     //
 )
 
 // asset parameters
@@ -24,6 +24,7 @@ type Params struct {
 	AssetFeeDenom     string  `json:"asset_fee_denom" yaml:"asset_fee_denom"`           // e.g., iris
 }
 
+// NewParams asset params constructor
 func NewParams(assetTaxRate sdk.Dec, issueTokenBaseFee sdk.Int,
 	mintTokenFeeRatio sdk.Dec, assetFeeDenom string,
 ) Params {
@@ -35,7 +36,7 @@ func NewParams(assetTaxRate sdk.Dec, issueTokenBaseFee sdk.Int,
 	}
 }
 
-// default asset module params
+// DefaultParams returns default asset module params
 func DefaultParams() Params {
 	return Params{
 		AssetTaxRate:      sdk.NewDecWithPrec(4, 1), // 0.4 (40%)
@@ -45,7 +46,7 @@ func DefaultParams() Params {
 	}
 }
 
-// Implements params.ParamSet
+// ParamSetPairs Implements params.ParamSet
 func (p *Params) ParamSetPairs() params.ParamSetPairs {
 	return params.ParamSetPairs{
 		{Key: KeyAssetTaxRate, Value: &p.AssetTaxRate},
@@ -53,4 +54,10 @@ func (p *Params) ParamSetPairs() params.ParamSetPairs {
 		{Key: KeyMintTokenFeeRatio, Value: &p.MintTokenFeeRatio},
 		{Key: KeyAssetFeeDenom, Value: &p.AssetFeeDenom},
 	}
+}
+
+// Validate validates a set of params
+func (p Params) Validate() error {
+	// TODO should validate Params
+	return nil
 }

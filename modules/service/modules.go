@@ -29,8 +29,6 @@ var (
 // AppModuleBasic defines the basic application module used by the service module.
 type AppModuleBasic struct{}
 
-var _ module.AppModuleBasic = AppModuleBasic{}
-
 // Name returns the service module's name.
 func (AppModuleBasic) Name() string {
 	return ModuleName
@@ -50,11 +48,9 @@ func (AppModuleBasic) DefaultGenesis() json.RawMessage {
 // ValidateGenesis performs genesis state validation for the service module.
 func (AppModuleBasic) ValidateGenesis(bz json.RawMessage) error {
 	var data GenesisState
-	err := ModuleCdc.UnmarshalJSON(bz, &data)
-	if err != nil {
+	if err := ModuleCdc.UnmarshalJSON(bz, &data); err != nil {
 		return err
 	}
-
 	return ValidateGenesis(data)
 }
 
@@ -99,13 +95,11 @@ func (AppModuleSimulation) RandomizedParams(r *rand.Rand) []sim.ParamChange {
 type AppModule struct {
 	AppModuleBasic
 	AppModuleSimulation
-
 	keeper Keeper
 }
 
 // NewAppModule creates a new AppModule object
 func NewAppModule(keeper Keeper) AppModule {
-
 	return AppModule{
 		AppModuleBasic:      AppModuleBasic{},
 		AppModuleSimulation: AppModuleSimulation{},
@@ -146,9 +140,7 @@ func (am AppModule) NewQuerierHandler() sdk.Querier {
 func (am AppModule) InitGenesis(ctx sdk.Context, data json.RawMessage) []abci.ValidatorUpdate {
 	var genesisState GenesisState
 	ModuleCdc.MustUnmarshalJSON(data, &genesisState)
-
 	InitGenesis(ctx, am.keeper, genesisState)
-
 	return []abci.ValidatorUpdate{}
 }
 

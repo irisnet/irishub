@@ -16,18 +16,29 @@ import (
 )
 
 func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router) {
+	// create service definition
 	r.HandleFunc("/service/definitions", definitionPostHandlerFn(cliCtx)).Methods("POST")
+	// create service bind
 	r.HandleFunc("/service/bindings", bindingAddHandlerFn(cliCtx)).Methods("POST")
+	// update service bind
 	r.HandleFunc(fmt.Sprintf("/service/bindings/{%s}/{%s}/{%s}", RestDefChainID, RestServiceName, RestProvider), bindingUpdateHandlerFn(cliCtx)).Methods("PUT")
+	// disable service binding
 	r.HandleFunc(fmt.Sprintf("/service/bindings/{%s}/{%s}/{%s}/disable", RestDefChainID, RestServiceName, RestProvider), bindingDisableHandlerFn(cliCtx)).Methods("PUT")
+	// enable service binding
 	r.HandleFunc(fmt.Sprintf("/service/bindings/{%s}/{%s}/{%s}/enable", RestDefChainID, RestServiceName, RestProvider), bindingEnableHandlerFn(cliCtx)).Methods("PUT")
+	// refund all deposit from a service binding
 	r.HandleFunc(fmt.Sprintf("/service/bindings/{%s}/{%s}/{%s}/deposit/refund", RestDefChainID, RestServiceName, RestProvider), bindingRefundHandlerFn(cliCtx)).Methods("PUT")
+	// call a service method
 	r.HandleFunc(fmt.Sprintf("/service/requests"), requestAddHandlerFn(cliCtx)).Methods("POST")
+	// respond a service method invocation
 	r.HandleFunc(fmt.Sprintf("/service/responses"), responseAddHandlerFn(cliCtx)).Methods("POST")
-	r.HandleFunc(fmt.Sprintf("/service/fees/{%s}/refund", RestConsumer), FeesRefundHandlerFn(cliCtx)).Methods("POST")
-	r.HandleFunc(fmt.Sprintf("/service/fees/{%s}/withdraw", RestProvider), FeesWithdrawHandlerFn(cliCtx)).Methods("POST")
+	// refund all fees from service call timeout
+	r.HandleFunc(fmt.Sprintf("/service/fees/{%s}/refund", RestConsumer), feesRefundHandlerFn(cliCtx)).Methods("POST")
+	// withdraw all fees from service call reward
+	r.HandleFunc(fmt.Sprintf("/service/fees/{%s}/withdraw", RestProvider), feesWithdrawHandlerFn(cliCtx)).Methods("POST")
 }
 
+// HTTP request handler to create service definition.
 func definitionPostHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req ServiceDefinitionReq
@@ -46,7 +57,7 @@ func definitionPostHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgSvcDef(req.ServiceName, req.BaseReq.ChainID, req.ServiceDescription, req.Tags, author, req.AuthorDescription, req.IdlContent)
+		msg := types.NewMsgSvcDef(req.ServiceName, req.BaseReq.ChainID, req.ServiceDescription, req.Tags, author, req.AuthorDescription, req.IDLContent)
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -56,6 +67,7 @@ func definitionPostHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	}
 }
 
+// HTTP request handler to create service bind.
 func bindingAddHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req ServiceBindingReq
@@ -97,7 +109,7 @@ func bindingAddHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			prices = append(prices, price)
 		}
 
-		msg := types.NewMsgSvcBind(req.DefChainId, req.ServiceName, req.BaseReq.ChainID, provider, bindingType, deposit, prices, req.Level)
+		msg := types.NewMsgSvcBind(req.DefChainID, req.ServiceName, req.BaseReq.ChainID, provider, bindingType, deposit, prices, req.Level)
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -107,6 +119,7 @@ func bindingAddHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	}
 }
 
+// HTTP request handler to update service bind.
 func bindingUpdateHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
@@ -169,6 +182,7 @@ func bindingUpdateHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	}
 }
 
+// HTTP request handler to disable service binding.
 func bindingDisableHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
@@ -202,6 +216,7 @@ func bindingDisableHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	}
 }
 
+// HTTP request handler to enable service binding.
 func bindingEnableHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
@@ -241,6 +256,7 @@ func bindingEnableHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	}
 }
 
+// HTTP request handler to refund all deposit.
 func bindingRefundHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
@@ -274,6 +290,7 @@ func bindingRefundHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	}
 }
 
+// HTTP request handler to call service method.
 func requestAddHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req ServiceRequestReq
@@ -312,7 +329,7 @@ func requestAddHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 				return
 			}
 
-			msg := types.NewMsgSvcRequest(request.DefChainId, request.ServiceName, request.BindChainId, req.BaseReq.ChainID, consumer, provider, request.MethodId, input, serviceFee, request.Profiling)
+			msg := types.NewMsgSvcRequest(request.DefChainID, request.ServiceName, request.BindChainID, req.BaseReq.ChainID, consumer, provider, request.MethodID, input, serviceFee, request.Profiling)
 			if err := msg.ValidateBasic(); err != nil {
 				rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 				return
@@ -325,6 +342,7 @@ func requestAddHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	}
 }
 
+// HTTP request handler to respond service method invocation.
 func responseAddHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req ServiceResponseReq
@@ -355,7 +373,7 @@ func responseAddHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgSvcResponse(req.ReqChainId, req.RequestId, provider, output, errMsg)
+		msg := types.NewMsgSvcResponse(req.ReqChainID, req.RequestID, provider, output, errMsg)
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -365,7 +383,8 @@ func responseAddHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	}
 }
 
-func FeesRefundHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
+// HTTP request handler to refund all fees.
+func feesRefundHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		consumerStr := vars[RestConsumer]
@@ -396,7 +415,8 @@ func FeesRefundHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	}
 }
 
-func FeesWithdrawHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
+// HTTP request handler to withdraw all fees.
+func feesWithdrawHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		providerStr := vars[RestProvider]

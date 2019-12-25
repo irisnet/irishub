@@ -13,6 +13,7 @@ import (
 	"github.com/irisnet/irishub/modules/service/internal/types"
 )
 
+// Keeper
 type Keeper struct {
 	storeKey sdk.StoreKey
 	cdc      *codec.Codec
@@ -25,6 +26,7 @@ type Keeper struct {
 	paramSpace params.Subspace
 }
 
+// NewKeeper
 func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, sk types.SupplyKeeper, gk types.GuardianKeeper, codespace sdk.CodespaceType, paramSpace params.Subspace) Keeper {
 	// ensure service module accounts are set
 	if addr := sk.GetModuleAddress(types.DepositAccName); addr == nil {
@@ -56,7 +58,7 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 	return ctx.Logger().With("module", fmt.Sprintf("%s", types.ModuleName))
 }
 
-// return the codespace
+// Codespace return the codespace
 func (k Keeper) Codespace() sdk.CodespaceType {
 	return k.codespace
 }

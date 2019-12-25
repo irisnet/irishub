@@ -4,11 +4,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-var (
-	profilerKey = []byte{0x00}
-	trusteeKey  = []byte{0x01}
-)
-
 // nolint
 const (
 	// module name
@@ -28,20 +23,27 @@ const (
 	QueryTrustees  = "trustees"
 )
 
+var (
+	ProfilerKey = []byte{0x00} // profiler key
+	TrusteeKey  = []byte{0x01} // trustee key
+)
+
+// GetProfilerKey returns profiler key bytes
 func GetProfilerKey(addr sdk.AccAddress) []byte {
-	return append(profilerKey, addr.Bytes()...)
+	return append(ProfilerKey, addr.Bytes()...)
 }
 
+// GetTrusteeKey returns trustee key bytes
 func GetTrusteeKey(addr sdk.AccAddress) []byte {
-	return append(trusteeKey, addr.Bytes()...)
+	return append(TrusteeKey, addr.Bytes()...)
 }
 
-// Key for getting all profilers from the store
+// GetProfilersSubspaceKey returns the key for getting all profilers from the store
 func GetProfilersSubspaceKey() []byte {
-	return profilerKey
+	return ProfilerKey
 }
 
-// Key for getting all profilers from the store
+// GetProfilersSubspaceKey returns the key for getting all profilers from the store
 func GetTrusteesSubspaceKey() []byte {
-	return trusteeKey
+	return TrusteeKey
 }

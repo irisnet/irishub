@@ -1,6 +1,7 @@
 // nolint
 package types
 
+// asset module event types
 const (
 	EventTypeIssueToken         = "issue_token"
 	EventTypeEditToken          = "edit_token"

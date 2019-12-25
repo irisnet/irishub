@@ -52,56 +52,64 @@ var (
 	ServiceSlashFractionKey = []byte{0x13}
 )
 
-func GetServiceDefinitionKey(chainId, name string) []byte {
-	return append(ServiceDefinitionKey, getStringsKey([]string{chainId, name})...)
+// GetServiceDefinitionKey
+func GetServiceDefinitionKey(chainID, name string) []byte {
+	return append(ServiceDefinitionKey, getStringsKey([]string{chainID, name})...)
 }
 
+// GetMethodPropertyKey
 // id can not be zero
-func GetMethodPropertyKey(chainId, serviceName string, id int16) []byte {
-	return append(MethodPropertyKey, getStringsKey([]string{chainId, serviceName, string(id)})...)
+func GetMethodPropertyKey(chainID, serviceName string, id int16) []byte {
+	return append(MethodPropertyKey, getStringsKey([]string{chainID, serviceName, string(id)})...)
 }
 
-// Key for getting all methods on a service from the store
-func GetMethodsSubspaceKey(chainId, serviceName string) []byte {
-	return append(append(MethodPropertyKey, getStringsKey([]string{chainId, serviceName})...), emptyByte...)
+// GetMethodsSubspaceKey returns the key for getting all methods on a service from the store
+func GetMethodsSubspaceKey(chainID, serviceName string) []byte {
+	return append(append(MethodPropertyKey, getStringsKey([]string{chainID, serviceName})...), emptyByte...)
 }
 
-func GetServiceBindingKey(defChainId, name, bindChainId string, provider sdk.AccAddress) []byte {
-	return append(BindingPropertyKey, getStringsKey([]string{defChainId, name, bindChainId, provider.String()})...)
+// GetServiceBindingKey
+func GetServiceBindingKey(defChainID, name, bindChainID string, provider sdk.AccAddress) []byte {
+	return append(BindingPropertyKey, getStringsKey([]string{defChainID, name, bindChainID, provider.String()})...)
 }
 
-// Key for getting all methods on a service from the store
-func GetBindingsSubspaceKey(chainId, serviceName string) []byte {
-	return append(append(BindingPropertyKey, getStringsKey([]string{chainId, serviceName})...), emptyByte...)
+// GetBindingsSubspaceKey returns the key for getting all methods on a service from the store
+func GetBindingsSubspaceKey(chainID, serviceName string) []byte {
+	return append(append(BindingPropertyKey, getStringsKey([]string{chainID, serviceName})...), emptyByte...)
 }
 
-func GetRequestKey(defChainId, serviceName, bindChainId string, provider sdk.AccAddress, height int64, counter int16) []byte {
-	return append(RequestKey, getStringsKey([]string{defChainId, serviceName,
-		bindChainId, provider.String(), string(height), string(counter)})...)
+// GetRequestKey
+func GetRequestKey(defChainID, serviceName, bindChainID string, provider sdk.AccAddress, height int64, counter int16) []byte {
+	return append(RequestKey, getStringsKey([]string{defChainID, serviceName,
+		bindChainID, provider.String(), string(height), string(counter)})...)
 }
 
-func GetActiveRequestKey(defChainId, serviceName, bindChainId string, provider sdk.AccAddress, height int64, counter int16) []byte {
-	return append(ActiveRequestKey, getStringsKey([]string{defChainId, serviceName,
-		bindChainId, provider.String(), string(height), string(counter)})...)
+// GetActiveRequestKey
+func GetActiveRequestKey(defChainID, serviceName, bindChainID string, provider sdk.AccAddress, height int64, counter int16) []byte {
+	return append(ActiveRequestKey, getStringsKey([]string{defChainID, serviceName,
+		bindChainID, provider.String(), string(height), string(counter)})...)
 }
 
-func GetSubActiveRequestKey(defChainId, serviceName, bindChainId string, provider sdk.AccAddress) []byte {
+// GetSubActiveRequestKey
+func GetSubActiveRequestKey(defChainID, serviceName, bindChainID string, provider sdk.AccAddress) []byte {
 	return append(append(
-		ActiveRequestKey, getStringsKey([]string{defChainId, serviceName,
-			bindChainId, provider.String()})...),
+		ActiveRequestKey, getStringsKey([]string{defChainID, serviceName,
+			bindChainID, provider.String()})...),
 		emptyByte...)
 }
 
-func GetResponseKey(reqChainId string, eHeight, rHeight int64, counter int16) []byte {
-	return append(ResponseKey, getStringsKey([]string{reqChainId,
+// GetResponseKey
+func GetResponseKey(reqChainID string, eHeight, rHeight int64, counter int16) []byte {
+	return append(ResponseKey, getStringsKey([]string{reqChainID,
 		string(eHeight), string(rHeight), string(counter)})...)
 }
 
-// get the expiration index of a request
+// GetRequestsByExpirationIndexKeyByReq gets the expiration index of a request
 func GetRequestsByExpirationIndexKeyByReq(req SvcRequest) []byte {
 	return GetRequestsByExpirationIndexKey(req.ExpirationHeight, req.RequestHeight, req.RequestIntraTxCounter)
 }
 
+// GetRequestsByExpirationIndexKey
 func GetRequestsByExpirationIndexKey(eHeight, rHeight int64, counter int16) []byte {
 	// key is of format prefix(1) || expirationHeight(8) || requestHeight(8) || counterBytes(2)
 	key := make([]byte, 1+8+8+2)
@@ -112,7 +120,7 @@ func GetRequestsByExpirationIndexKey(eHeight, rHeight int64, counter int16) []by
 	return key
 }
 
-// get the expiration prefix for all request of a block height
+// GetRequestsByExpirationPrefix gets the expiration prefix for all request of a block height
 func GetRequestsByExpirationPrefix(height int64) []byte {
 	// key is of format prefix || expirationHeight
 	key := make([]byte, 1+8)
@@ -121,20 +129,22 @@ func GetRequestsByExpirationPrefix(height int64) []byte {
 	return key
 }
 
+// GetReturnedFeeKey
 func GetReturnedFeeKey(address sdk.AccAddress) []byte {
 	return append(ReturnedFeeKey, address.Bytes()...)
 }
 
+// GetIncomingFeeKey
 func GetIncomingFeeKey(address sdk.AccAddress) []byte {
 	return append(IncomingFeeKey, address.Bytes()...)
 }
 
 func getStringsKey(ss []string) (result []byte) {
 	for _, s := range ss {
-		result = append(append(
-			result,
-			[]byte(s)...),
-			emptyByte...)
+		result = append(
+			append(result, []byte(s)...),
+			emptyByte...,
+		)
 	}
 	if len(result) > 0 {
 		return result[0 : len(result)-1]

@@ -9,6 +9,7 @@ import (
 	iristypes "github.com/irisnet/irishub/types"
 )
 
+// BaseToken
 type BaseToken struct {
 	ID              string         `json:"id" yaml:"id"`
 	Family          AssetFamily    `json:"family" yaml:"family"`
@@ -24,6 +25,7 @@ type BaseToken struct {
 	Owner           sdk.AccAddress `json:"owner" yaml:"owner"`
 }
 
+// NewBaseToken - construct fungible token
 func NewBaseToken(family AssetFamily, source AssetSource, symbol string, name string,
 	decimal uint8, canonicalSymbol string, minUnitAlias string, initialSupply sdk.Int, maxSupply sdk.Int,
 	mintable bool, owner sdk.AccAddress,
@@ -159,7 +161,10 @@ func (tokens Tokens) Validate() sdk.Error {
 		exp := sdk.NewIntWithDecimal(1, int(token.Decimal))
 		initialSupply := uint64(token.InitialSupply.Quo(exp).Int64())
 		maxSupply := uint64(token.MaxSupply.Quo(exp).Int64())
-		msg := NewMsgIssueToken(token.Family, token.GetSource(), token.Symbol, token.CanonicalSymbol, token.Name, token.Decimal, token.MinUnitAlias, initialSupply, maxSupply, token.Mintable, token.Owner)
+		msg := NewMsgIssueToken(
+			token.Family, token.GetSource(), token.Symbol, token.CanonicalSymbol, token.Name,
+			token.Decimal, token.MinUnitAlias, initialSupply, maxSupply, token.Mintable, token.Owner,
+		)
 		if err := ValidateMsgIssueToken(&msg); err != nil {
 			return err
 		}
@@ -167,7 +172,7 @@ func (tokens Tokens) Validate() sdk.Error {
 	return nil
 }
 
-// GetTokenID returns tokenId by source and symbol
+// GetTokenID returns tokenID by source and symbol
 func GetTokenID(source AssetSource, symbol string) (string, sdk.Error) {
 	switch source {
 	case NATIVE:

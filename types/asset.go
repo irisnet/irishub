@@ -13,27 +13,27 @@ var (
 	reDnm   = regexp.MustCompile(`[A-Za-z0-9\.\-]{3,21}`)
 )
 
-// ConvertIdToTokenKeyId return the store key suffix of a token
-func ConvertIdToTokenKeyId(tokenId string) (key string, err error) {
-	if !reToken.MatchString(tokenId) {
+// ConvertIDToTokenKeyID return the store key suffix of a token
+func ConvertIDToTokenKeyID(tokenID string) (key string, err error) {
+	if !reToken.MatchString(tokenID) {
 		return "", fmt.Errorf("token id convert error: invalid denom")
 	}
 
-	if strings.Contains(tokenId, ".") {
-		return strings.ToLower(tokenId), nil
+	if strings.Contains(tokenID, ".") {
+		return strings.ToLower(tokenID), nil
 	} else {
-		return strings.ToLower(fmt.Sprintf("i.%s", tokenId)), nil
+		return strings.ToLower(fmt.Sprintf("i.%s", tokenID)), nil
 	}
 }
 
-// ConvertDenomToTokenKeyId return the store key suffix of a token
-func ConvertDenomToTokenKeyId(denom string) (key string, err error) {
-	tokenId, err := ConvertDenomToTokenId(denom)
+// ConvertDenomToTokenKeyID return the store key suffix of a token
+func ConvertDenomToTokenKeyID(denom string) (key string, err error) {
+	tokenID, err := ConvertDenomToTokenID(denom)
 	if err != nil {
 		return "", err
 	}
 
-	key, err = ConvertIdToTokenKeyId(tokenId)
+	key, err = ConvertIDToTokenKeyID(tokenID)
 	if err != nil {
 		return "", err
 	}
@@ -41,12 +41,12 @@ func ConvertDenomToTokenKeyId(denom string) (key string, err error) {
 	return key, nil
 }
 
-// ConvertDenomToTokenId return the token id of the given denom
-func ConvertDenomToTokenId(denom string) (tokenId string, err error) {
+// ConvertDenomToTokenID return the token id of the given denom
+func ConvertDenomToTokenID(denom string) (tokenID string, err error) {
 	if !reDnm.MatchString(denom) {
 		return "", fmt.Errorf("token id convert error: invalid denom")
 	}
 
-	tokenId = strings.ToLower(strings.Split(denom, "-")[0])
-	return tokenId, nil
+	tokenID = strings.ToLower(strings.Split(denom, "-")[0])
+	return tokenID, nil
 }

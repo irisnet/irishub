@@ -112,7 +112,7 @@ func (ct CoinType) Convert(srcCoinStr string, destDenom string) (destCoinStr str
 
 func (ct CoinType) ConvertToMinDenomCoin(srcCoinStr string) (coin sdk.Coin, err error) {
 	destCoinStr, err := ct.Convert(srcCoinStr, ct.MinUnit.Denom)
-	if err == nil {
+	if err != nil {
 		return coin, errors.New("convert error")
 	}
 	return sdk.ParseCoin(destCoinStr)

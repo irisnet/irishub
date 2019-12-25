@@ -3,6 +3,8 @@ package keeper
 import (
 	"fmt"
 
+	"github.com/tendermint/tendermint/libs/log"
+
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/params"
@@ -43,6 +45,11 @@ func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, paramSpace params.Subspace,
 	}
 }
 
+// Logger returns a module-specific logger.
+func (k Keeper) Logger(ctx sdk.Context) log.Logger {
+	return ctx.Logger().With("module", fmt.Sprintf("%s", types.ModuleName))
+}
+
 // Codespace returns the codespace
 func (k Keeper) Codespace() sdk.CodespaceType {
 	return k.codespace
@@ -60,14 +67,14 @@ func (k Keeper) IssueToken(ctx sdk.Context, token types.FungibleToken) sdk.Error
 	if owner != nil {
 		// mint coins
 		mintCoins := sdk.NewCoins(initialSupply)
-		err := k.supplyKeeper.MintCoins(ctx, types.ModuleName, mintCoins)
-		if err != nil {
+		if err := k.supplyKeeper.MintCoins(ctx, types.ModuleName, mintCoins); err != nil {
 			return err
 		}
 
 		// sent coins to owner's account
-		err = k.supplyKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, owner, mintCoins)
-		if err != nil {
+		if err := k.supplyKeeper.SendCoinsFromModuleToAccount(
+			ctx, types.ModuleName, owner, mintCoins,
+		); err != nil {
 			return err
 		}
 	}
@@ -78,11 +85,11 @@ func (k Keeper) IssueToken(ctx sdk.Context, token types.FungibleToken) sdk.Error
 // AddToken adds a new token to keystore
 func (k Keeper) AddToken(ctx sdk.Context, token types.FungibleToken) (types.FungibleToken, sdk.AccAddress, sdk.Error) {
 	token.Sanitize()
-	tokenId, err := types.GetTokenID(token.GetSource(), token.GetSymbol())
+	tokenID, err := types.GetTokenID(token.GetSource(), token.GetSymbol())
 	if err != nil {
 		return token, nil, err
 	}
-	if k.HasToken(ctx, tokenId) {
+	if k.HasToken(ctx, tokenID) {
 		return token, nil, types.ErrAssetAlreadyExists(k.codespace, fmt.Sprintf("token already exists: %s", token.GetUniqueID()))
 	}
 
@@ -92,22 +99,19 @@ func (k Keeper) AddToken(ctx sdk.Context, token types.FungibleToken) (types.Fung
 		token.CanonicalSymbol = ""
 	}
 
-	err = k.setToken(ctx, token)
-	if err != nil {
+	if err := k.setToken(ctx, token); err != nil {
 		return token, nil, err
 	}
 
 	// Set token to be prefixed with owner and source
 	if token.GetSource() == types.NATIVE {
-		err = k.setTokens(ctx, owner, token)
-		if err != nil {
+		if err := k.setTokens(ctx, owner, token); err != nil {
 			return token, nil, err
 		}
 	}
 
 	// Set token to be prefixed with source
-	err = k.setTokens(ctx, sdk.AccAddress{}, token)
-	if err != nil {
+	if err := k.setTokens(ctx, sdk.AccAddress{}, token); err != nil {
 		return token, nil, err
 	}
 
@@ -115,9 +119,9 @@ func (k Keeper) AddToken(ctx sdk.Context, token types.FungibleToken) (types.Fung
 }
 
 // HasToken checks if the token exists
-func (k Keeper) HasToken(ctx sdk.Context, tokenId string) bool {
+func (k Keeper) HasToken(ctx sdk.Context, tokenID string) bool {
 	store := ctx.KVStore(k.storeKey)
-	return store.Has(KeyToken(tokenId))
+	return store.Has(KeyToken(tokenID))
 }
 
 // save token
@@ -125,26 +129,26 @@ func (k Keeper) setToken(ctx sdk.Context, token types.FungibleToken) sdk.Error {
 	store := ctx.KVStore(k.storeKey)
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(token)
 
-	tokenId, err := types.GetTokenID(token.GetSource(), token.GetSymbol())
+	tokenID, err := types.GetTokenID(token.GetSource(), token.GetSymbol())
 	if err != nil {
 		return err
 	}
 
-	store.Set(KeyToken(tokenId), bz)
+	store.Set(KeyToken(tokenID), bz)
 	return nil
 }
 
 // save tokens' owner
 func (k Keeper) setTokens(ctx sdk.Context, owner sdk.AccAddress, token types.FungibleToken) sdk.Error {
 	store := ctx.KVStore(k.storeKey)
-	tokenId, err := types.GetTokenID(token.GetSource(), token.GetSymbol())
+	tokenID, err := types.GetTokenID(token.GetSource(), token.GetSymbol())
 	if err != nil {
 		return err
 	}
 
-	bz := k.cdc.MustMarshalBinaryLengthPrefixed(tokenId)
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(tokenID)
 
-	store.Set(KeyTokens(owner, tokenId), bz)
+	store.Set(KeyTokens(owner, tokenID), bz)
 	return nil
 }
 
@@ -161,9 +165,9 @@ func (k Keeper) GetToken(ctx sdk.Context, tokenID string) (token types.FungibleT
 }
 
 // GetTokens returns tokens by specified owner
-func (k Keeper) GetTokens(ctx sdk.Context, owner sdk.AccAddress, nonSymbolTokenId string) sdk.Iterator {
+func (k Keeper) GetTokens(ctx sdk.Context, owner sdk.AccAddress, nonSymbolTokenID string) sdk.Iterator {
 	store := ctx.KVStore(k.storeKey)
-	return sdk.KVStorePrefixIterator(store, KeyTokens(owner, nonSymbolTokenId))
+	return sdk.KVStorePrefixIterator(store, KeyTokens(owner, nonSymbolTokenID))
 }
 
 // EditToken edits the specified token
@@ -184,11 +188,9 @@ func (k Keeper) EditToken(ctx sdk.Context, msg types.MsgEditToken) sdk.Error {
 	if maxSupply.GT(sdk.ZeroInt()) && (maxSupply.LT(hasIssuedAmt) || maxSupply.GT(token.MaxSupply)) {
 		return types.ErrInvalidAssetMaxSupply(k.codespace, fmt.Sprintf("max supply must not be less than %s and greater than %s", hasIssuedAmt.String(), token.MaxSupply.String()))
 	}
-
 	if msg.Name != types.DoNotModify {
 		token.Name = msg.Name
 	}
-
 	if msg.CanonicalSymbol != types.DoNotModify && token.Source != types.NATIVE {
 		token.CanonicalSymbol = msg.CanonicalSymbol
 	}
@@ -202,11 +204,7 @@ func (k Keeper) EditToken(ctx sdk.Context, msg types.MsgEditToken) sdk.Error {
 		token.Mintable = msg.Mintable.ToBool()
 	}
 
-	if err := k.setToken(ctx, token); err != nil {
-		return err
-	}
-
-	return nil
+	return k.setToken(ctx, token)
 }
 
 // IterateTokens iterates through all existing tokens
@@ -229,19 +227,19 @@ func (k Keeper) IterateTokens(ctx sdk.Context, op func(token types.FungibleToken
 // TODO: delete
 // Init
 func (k Keeper) Init(ctx sdk.Context) {
-	ctx = ctx.WithLogger(ctx.Logger().With("handler", "Init").With("module", "iris/asset"))
+	logger := k.Logger(ctx)
 
 	//Initialize external tokens BTC and ETH
 	maxSupply := sdk.NewIntWithDecimal(int64(types.MaximumAssetMaxSupply), 8)
 	btc := types.NewFungibleToken(types.EXTERNAL, "BTC", "Bitcoin", 8, "BTC", "satoshi", sdk.ZeroInt(), maxSupply, true, nil)
 	if err := k.IssueToken(ctx, btc); err != nil {
-		ctx.Logger().Error(fmt.Sprintf("initialize external tokens BTC failed:%s", err.Error()))
+		logger.Error(fmt.Sprintf("initialize external tokens BTC failed:%s", err.Error()))
 	}
 
 	maxSupply = sdk.NewIntWithDecimal(int64(types.MaximumAssetMaxSupply), 18)
 	eth := types.NewFungibleToken(types.EXTERNAL, "ETH", "Ethereum", 18, "ETH", "wei", sdk.ZeroInt(), maxSupply, true, nil)
 	if err := k.IssueToken(ctx, eth); err != nil {
-		ctx.Logger().Error(fmt.Sprintf("initialize external tokens ETH failed:%s", err.Error()))
+		logger.Error(fmt.Sprintf("initialize external tokens ETH failed:%s", err.Error()))
 	}
 }
 
@@ -269,22 +267,19 @@ func (k Keeper) TransferTokenOwner(ctx sdk.Context, msg types.MsgTransferTokenOw
 	}
 
 	// reset all index for query-token
-	if err := k.resetStoreKeyForQueryToken(ctx, msg, token); err != nil {
-		return err
-	}
-	return nil
+	return k.resetStoreKeyForQueryToken(ctx, msg, token)
 }
 
 // reset all index by DstOwner of token for query-token command
 func (k Keeper) resetStoreKeyForQueryToken(ctx sdk.Context, msg types.MsgTransferTokenOwner, token types.FungibleToken) sdk.Error {
 	store := ctx.KVStore(k.storeKey)
 
-	tokenId, err := types.GetTokenID(token.GetSource(), token.GetSymbol())
+	tokenID, err := types.GetTokenID(token.GetSource(), token.GetSymbol())
 	if err != nil {
 		return err
 	}
 	// delete the old key
-	store.Delete(KeyTokens(msg.SrcOwner, tokenId))
+	store.Delete(KeyTokens(msg.SrcOwner, tokenID))
 
 	// add the new key
 	return k.setTokens(ctx, msg.DstOwner, token)
@@ -333,18 +328,12 @@ func (k Keeper) MintToken(ctx sdk.Context, msg types.MsgMintToken) sdk.Error {
 	}
 
 	// mint coins
-	err := k.supplyKeeper.MintCoins(ctx, types.ModuleName, mintCoins)
-	if err != nil {
+	if err := k.supplyKeeper.MintCoins(ctx, types.ModuleName, mintCoins); err != nil {
 		return err
 	}
 
 	// sent coins to owner's account
-	err = k.supplyKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, mintAcc, mintCoins)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return k.supplyKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, mintAcc, mintCoins)
 }
 
 // AssetTokenSupply asset tokens from the total supply

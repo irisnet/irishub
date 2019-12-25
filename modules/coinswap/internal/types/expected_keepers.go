@@ -16,10 +16,12 @@ type SupplyKeeper interface {
 	GetSupply(ctx sdk.Context) (supply supplyexported.SupplyI)
 }
 
+// BankKeeper defines the expected bank keeper
 type BankKeeper interface {
 	SendCoins(ctx sdk.Context, fromAddr sdk.AccAddress, toAddr sdk.AccAddress, amt sdk.Coins) sdk.Error
 }
 
+// AccountKeeper defines the expected account keeper
 type AccountKeeper interface {
 	GetAccount(ctx sdk.Context, addr sdk.AccAddress) authexported.Account
 }

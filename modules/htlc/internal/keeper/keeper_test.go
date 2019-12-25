@@ -174,7 +174,7 @@ func (suite *KeeperTestSuite) TestClaimHTLC() {
 			originHTLCAmount := htlcAcc.GetCoins()
 			originReceiverAmount := suite.app.AccountKeeper.GetAccount(suite.ctx, addrTo).GetCoins()
 
-			_, err = suite.app.HTLCKeeper.ClaimHTLC(suite.ctx, td.hashLock, td.secret)
+			_, _, err = suite.app.HTLCKeeper.ClaimHTLC(suite.ctx, td.hashLock, td.secret)
 			suite.Nil(err, "TestData: %d", i)
 
 			htlc, _ = suite.app.HTLCKeeper.GetHTLC(suite.ctx, td.hashLock)
@@ -214,7 +214,7 @@ func (suite *KeeperTestSuite) TestClaimHTLC() {
 			originHTLCAmount := suite.app.AccountKeeper.GetAccount(suite.ctx, htlcAddr).GetCoins()
 			originReceiverAmount := suite.app.AccountKeeper.GetAccount(suite.ctx, addrTo).GetCoins()
 
-			_, err = suite.app.HTLCKeeper.ClaimHTLC(suite.ctx, td.hashLock, td.secret)
+			_, _, err = suite.app.HTLCKeeper.ClaimHTLC(suite.ctx, td.hashLock, td.secret)
 			suite.NotNil(err, "TestData: %d", i)
 
 			htlc, _ = suite.app.HTLCKeeper.GetHTLC(suite.ctx, td.hashLock)

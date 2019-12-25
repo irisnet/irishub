@@ -11,7 +11,7 @@ import (
 func TestValidateParams(t *testing.T) {
 	// check that valid case work
 	defaultParams := DefaultParams()
-	err := ValidateParams(defaultParams)
+	err := defaultParams.Validate()
 	require.Nil(t, err)
 
 	require.Panics(t, func() { sdk.NewDecWithPrec(1, 19) }, "should panic")
@@ -32,7 +32,7 @@ func TestValidateParams(t *testing.T) {
 
 	for _, tc := range invalidTests {
 		t.Run(tc.name, func(t *testing.T) {
-			if err := ValidateParams(tc.params); err != nil {
+			if err := tc.params.Validate(); err != nil {
 				require.False(t, tc.result)
 			} else {
 				require.True(t, tc.result)

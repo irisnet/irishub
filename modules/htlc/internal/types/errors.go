@@ -9,15 +9,21 @@ import (
 const (
 	DefaultCodespace sdk.CodespaceType = "htlc"
 
-	CodeInvalidAddress        sdk.CodeType = 100
-	CodeInvalidAmount         sdk.CodeType = 101
-	CodeInvalidHashLock       sdk.CodeType = 102
-	CodeHashLockAlreadyExists sdk.CodeType = 103
-	CodeInvalidTimeLock       sdk.CodeType = 104
-	CodeInvalidSecret         sdk.CodeType = 105
-	CodeStateIsNotOpen        sdk.CodeType = 106
-	CodeStateIsNotExpired     sdk.CodeType = 107
+	CodeHTLCNotExists         sdk.CodeType = 100
+	CodeInvalidAddress        sdk.CodeType = 101
+	CodeInvalidAmount         sdk.CodeType = 102
+	CodeInvalidHashLock       sdk.CodeType = 103
+	CodeHashLockAlreadyExists sdk.CodeType = 104
+	CodeInvalidTimeLock       sdk.CodeType = 105
+	CodeInvalidSecret         sdk.CodeType = 106
+	CodeStateIsNotOpen        sdk.CodeType = 107
+	CodeStateIsNotExpired     sdk.CodeType = 108
 )
+
+// ErrHTLCNotExists error for HTLC not exists
+func ErrHTLCNotExists(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeHTLCNotExists, msg)
+}
 
 // ErrInvalidAddress error for invalid address
 func ErrInvalidAddress(codespace sdk.CodespaceType, msg string) sdk.Error {

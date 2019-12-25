@@ -9,13 +9,14 @@ import (
 	cfg "github.com/tendermint/tendermint/config"
 )
 
+// MetricsSubsystem
 const MetricsSubsystem = "module_" + ModuleName
 
+// Metrics
 type Metrics struct {
 	ActiveRequests metrics.Gauge
 }
 
-// TODO
 // PrometheusMetrics returns Metrics built by the Prometheus client library.
 func PrometheusMetrics(config *cfg.InstrumentationConfig) *Metrics {
 	if !config.Prometheus {
@@ -38,6 +39,7 @@ func PrometheusMetrics(config *cfg.InstrumentationConfig) *Metrics {
 	}
 }
 
+// NopMetrics
 func NopMetrics() *Metrics {
 	return &Metrics{
 		ActiveRequests: discard.NewGauge(),

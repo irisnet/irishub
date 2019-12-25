@@ -3,14 +3,15 @@ package keeper
 import (
 	"fmt"
 
-	"github.com/cosmos/cosmos-sdk/codec"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 
+	"github.com/cosmos/cosmos-sdk/codec"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+
 	"github.com/irisnet/irishub/modules/asset/internal/types"
-	iristypes "github.com/irisnet/irishub/types"
 )
 
+// NewQuerier creates a new asset Querier instance
 func NewQuerier(k Keeper) sdk.Querier {
 	return func(ctx sdk.Context, path []string, req abci.RequestQuery) ([]byte, sdk.Error) {
 		switch path[0] {
@@ -30,9 +31,8 @@ func NewQuerier(k Keeper) sdk.Querier {
 
 func queryToken(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
 	var params types.QueryTokenParams
-	err := keeper.cdc.UnmarshalJSON(req.Data, &params)
-	if err != nil {
-		return nil, iristypes.ParseParamsErr(err)
+	if err := keeper.cdc.UnmarshalJSON(req.Data, &params); err != nil {
+		return nil, sdk.ErrUnknownRequest(fmt.Sprintf("failed to parse params: %s", err))
 	}
 
 	token, found := keeper.GetToken(ctx, params.TokenID)
@@ -41,44 +41,43 @@ func queryToken(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, 
 	}
 
 	bz, err := codec.MarshalJSONIndent(keeper.cdc, token)
-
 	if err != nil {
-		return nil, iristypes.MarshalResultErr(err)
+		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", err.Error()))
 	}
+
 	return bz, nil
 }
 
 func queryTokens(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
 	var params types.QueryTokensParams
-	err := keeper.cdc.UnmarshalJSON(req.Data, &params)
-	if err != nil {
-		return nil, iristypes.ParseParamsErr(err)
+	var err error
+	if err := keeper.cdc.UnmarshalJSON(req.Data, &params); err != nil {
+		return nil, sdk.ErrUnknownRequest(fmt.Sprintf("failed to parse params: %s", err))
 	}
 
 	source := types.NATIVE
 	owner := sdk.AccAddress{}
-	nonSymbolTokenId := ""
+	nonSymbolTokenID := ""
 
 	if len(params.Source) > 0 { // if source is specified
 		source, err = types.AssetSourceFromString(params.Source)
 		if err != nil {
-			return nil, iristypes.ParseParamsErr(err)
+			return nil, sdk.ErrUnknownRequest(fmt.Sprintf("failed to parse params: %s", err))
 		}
 	}
 
 	if len(params.Owner) > 0 && source == types.NATIVE { // ignore owner if source != NATIVE
 		owner, err = sdk.AccAddressFromBech32(params.Owner)
 		if err != nil {
-			return nil, iristypes.ParseParamsErr(err)
+			return nil, sdk.ErrUnknownRequest(fmt.Sprintf("failed to parse params: %s", err))
 		}
 	}
 
 	if len(params.Source) > 0 || len(params.Gateway) > 0 {
-		nonSymbolTokenId, err = types.GetTokenID(source, "")
-	}
-
-	if err != nil {
-		return nil, iristypes.ParseParamsErr(err)
+		nonSymbolTokenID, err = types.GetTokenID(source, "")
+		if err != nil {
+			return nil, sdk.ErrUnknownRequest(fmt.Sprintf("failed to parse params: %s", err))
+		}
 	}
 
 	var tokens types.Tokens
@@ -87,23 +86,23 @@ func queryTokens(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte,
 	//if source == types.NATIVE && owner.Empty() {
 	//	initSupply, err := sdk.IrisCoinType.ConvertToMinDenomCoin(sdk.NewCoin(sdk.Iris, sdk.InitialIssue).String())
 	//	if err != nil {
-	//		return nil, iristypes.MarshalResultErr(err)
+	//		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", err.Error()))
 	//	}
 	//	maxSupply, err := sdk.IrisCoinType.ConvertToMinDenomCoin(sdk.NewCoin(sdk.Iris, sdk.NewInt(int64(types.MaximumAssetMaxSupply))).String())
 	//	if err != nil {
-	//		return nil, iristypes.MarshalResultErr(err)
+	//		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", err.Error()))
 	//	}
 	//	token := types.NewFungibleToken(types.NATIVE, "", sdk.Iris, sdk.IrisCoinType.Desc, sdk.AttoScale, "", sdk.IrisAtto, initSupply.Amount, maxSupply.Amount, true, sdk.AccAddress{})
 	//	tokens = append(tokens, token)
 	//}
 
 	// Query from db
-	iter := keeper.GetTokens(ctx, owner, nonSymbolTokenId)
+	iter := keeper.GetTokens(ctx, owner, nonSymbolTokenID)
 	defer iter.Close()
 	for ; iter.Valid(); iter.Next() {
-		var tokenId string
-		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(iter.Value(), &tokenId)
-		token, found := keeper.GetToken(ctx, tokenId)
+		var tokenID string
+		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(iter.Value(), &tokenID)
+		token, found := keeper.GetToken(ctx, tokenID)
 		if !found {
 			continue
 		}
@@ -118,7 +117,7 @@ func queryTokens(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte,
 	bz, err := codec.MarshalJSONIndent(keeper.cdc, tokens)
 
 	if err != nil {
-		return nil, iristypes.MarshalResultErr(err)
+		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", err.Error()))
 	}
 	return bz, nil
 }
@@ -134,9 +133,8 @@ func queryFees(ctx sdk.Context, path []string, req abci.RequestQuery, keeper Kee
 
 func queryTokenFees(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
 	var params types.QueryTokenFeesParams
-	err := keeper.cdc.UnmarshalJSON(req.Data, &params)
-	if err != nil {
-		return nil, iristypes.ParseParamsErr(err)
+	if err := keeper.cdc.UnmarshalJSON(req.Data, &params); err != nil {
+		return nil, sdk.ErrUnknownRequest(fmt.Sprintf("failed to parse params: %s", err))
 	}
 
 	id := params.ID
@@ -166,7 +164,7 @@ func queryTokenFees(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]by
 
 	bz, err := codec.MarshalJSONIndent(keeper.cdc, fees)
 	if err != nil {
-		return nil, iristypes.MarshalResultErr(err)
+		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", err.Error()))
 	}
 
 	return bz, nil

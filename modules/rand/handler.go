@@ -7,7 +7,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-// NewHandler handles all rand msgs
+// NewHandler returns a handler for all rand msgs
 func NewHandler(k Keeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
 		ctx = ctx.WithEventManager(sdk.NewEventManager())
@@ -15,7 +15,6 @@ func NewHandler(k Keeper) sdk.Handler {
 		switch msg := msg.(type) {
 		case MsgRequestRand:
 			return handleMsgRequestRand(ctx, k, msg)
-
 		default:
 			errMsg := fmt.Sprintf("unrecognized rand message type: %T", msg)
 			return sdk.ErrUnknownRequest(errMsg).Result()

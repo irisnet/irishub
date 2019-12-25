@@ -16,7 +16,7 @@ import (
 	"github.com/irisnet/irishub/modules/guardian/internal/types"
 )
 
-// GetTxCmd returns the transaction commands for this module
+// GetTxCmd returns the transaction commands for the guardian module.
 func GetTxCmd(cdc *codec.Codec) *cobra.Command {
 	txCmd := &cobra.Command{
 		Use:                        types.ModuleName,
@@ -34,7 +34,7 @@ func GetTxCmd(cdc *codec.Codec) *cobra.Command {
 	return txCmd
 }
 
-// GetCmdCreateProfiler implements the create profiler command
+// GetCmdCreateProfiler implements the create profiler command.
 func GetCmdCreateProfiler(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "add-profiler",
@@ -69,7 +69,7 @@ func GetCmdCreateProfiler(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-// GetCmdDeleteProfiler implements the delete profiler command
+// GetCmdDeleteProfiler implements the delete profiler command.
 func GetCmdDeleteProfiler(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "delete-profiler",
@@ -97,7 +97,7 @@ func GetCmdDeleteProfiler(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-// GetCmdCreateTrustee implements the create trustee command
+// GetCmdCreateTrustee implements the create trustee command.
 func GetCmdCreateTrustee(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "add-trustee",
@@ -128,7 +128,7 @@ func GetCmdCreateTrustee(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-// GetCmdDeleteTrustee implements the delete trustee command
+// GetCmdDeleteTrustee implements the delete trustee command.
 func GetCmdDeleteTrustee(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "delete-trustee",

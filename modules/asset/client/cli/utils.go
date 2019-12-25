@@ -27,8 +27,7 @@ func queryTokenFees(cliCtx context.CLIContext, queryRoute string, tokenID string
 	}
 
 	var out types.TokenFeesOutput
-	err = cliCtx.Codec.UnmarshalJSON(res, &out)
-	if err != nil {
+	if err := cliCtx.Codec.UnmarshalJSON(res, &out); err != nil {
 		return types.TokenFeesOutput{}, err
 	}
 

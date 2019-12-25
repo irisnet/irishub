@@ -1,21 +1,20 @@
 package asset
 
 import (
+	"fmt"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 // InitGenesis - store genesis parameters and tokens
 func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
 	if err := ValidateGenesis(data); err != nil {
-		panic(err.Error())
+		panic(fmt.Errorf("failed to initialize asset genesis state: %s", err.Error()))
 	}
-
 	k.SetParamSet(ctx, data.Params)
-
 	//init tokens
 	for _, token := range data.Tokens {
-		_, _, err := k.AddToken(ctx, token)
-		if err != nil {
+		if _, _, err := k.AddToken(ctx, token); err != nil {
 			panic(err.Error())
 		}
 	}
@@ -33,20 +32,4 @@ func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 		Params: k.GetParamSet(ctx),
 		Tokens: tokens,
 	}
-}
-
-// DefaultGenesisState return the default asset genesis state
-func DefaultGenesisState() GenesisState {
-	return NewGenesisState(DefaultParams(), []FungibleToken{})
-}
-
-// ValidateGenesis validates the provided asset genesis state to ensure the
-// expected invariants holds.
-func ValidateGenesis(data GenesisState) error {
-	// validate tokens
-	if err := data.Tokens.Validate(); err != nil {
-		return err
-	}
-
-	return nil
 }
