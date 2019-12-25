@@ -8,5 +8,4 @@ docs/.vuepress/dist/
 node_modules/
 package.json
 yarn.lock
-lite/
 dependency-graph.png

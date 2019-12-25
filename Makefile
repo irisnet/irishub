@@ -5,6 +5,7 @@ PACKAGES_UNITTEST=$(shell go list ./... | grep -v '/simulation' | grep -v '/cli_
 VERSION := $(shell echo $(shell git describe --tags) | sed 's/^v//')
 COMMIT := $(shell git log -1 --format='%H')
 LEDGER_ENABLED ?= true
+BINDIR ?= $(GOPATH)/bin
 SDK_PACK := $(shell go list -m github.com/cosmos/cosmos-sdk | sed  's/ /\@/g')
 NetworkType := $(shell if [ -z ${NetworkType} ]; then echo "mainnet"; else echo ${NetworkType}; fi)
 
@@ -97,6 +98,15 @@ endif
 install: go.sum
 	go install $(BUILD_FLAGS) ./cmd/iris
 	go install $(BUILD_FLAGS) ./cmd/iriscli
+
+update-swagger-docs: statik
+	$(BINDIR)/statik -src=lite/swagger-ui -dest=lite -f -m
+	@if [ -n "$(git status --porcelain)" ]; then \
+        echo "\033[91mSwagger docs are out of sync!!!\033[0m";\
+        exit 1;\
+    else \
+    	echo "\033[92mSwagger docs are in sync\033[0m";\
+    fi
 
 install-tool: go.sum
 	go install -mod=readonly $(BUILD_FLAGS) ./cmd/iristool
