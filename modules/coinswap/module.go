@@ -46,8 +46,7 @@ func (AppModuleBasic) DefaultGenesis() json.RawMessage {
 // ValidateGenesis performs genesis state validation for the coinswap module.
 func (AppModuleBasic) ValidateGenesis(bz json.RawMessage) error {
 	var data GenesisState
-	err := ModuleCdc.UnmarshalJSON(bz, &data)
-	if err != nil {
+	if err := ModuleCdc.UnmarshalJSON(bz, &data); err != nil {
 		return err
 	}
 	return ValidateGenesis(data)
@@ -59,14 +58,10 @@ func (AppModuleBasic) RegisterRESTRoutes(ctx context.CLIContext, rtr *mux.Router
 }
 
 // GetTxCmd returns no root tx command for the coinswap module.
-func (AppModuleBasic) GetTxCmd(cdc *codec.Codec) *cobra.Command {
-	return nil
-}
+func (AppModuleBasic) GetTxCmd(cdc *codec.Codec) *cobra.Command { return nil }
 
 // GetQueryCmd returns the root query command for the coinswap module.
-func (AppModuleBasic) GetQueryCmd(cdc *codec.Codec) *cobra.Command {
-	return nil
-}
+func (AppModuleBasic) GetQueryCmd(cdc *codec.Codec) *cobra.Command { return nil }
 
 //____________________________________________________________________________
 

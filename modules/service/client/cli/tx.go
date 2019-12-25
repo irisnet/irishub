@@ -20,6 +20,34 @@ import (
 	"github.com/irisnet/irishub/modules/service/internal/types"
 )
 
+// GetTxCmd returns the transaction commands for the service module.
+func GetTxCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
+	serviceTxCmd := &cobra.Command{
+		Use:                        types.ModuleName,
+		Short:                      "Service transaction subcommands",
+		DisableFlagParsing:         true,
+		SuggestionsMinimumDistance: 2,
+		RunE:                       client.ValidateCmd,
+	}
+
+	serviceTxCmd.AddCommand(client.PostCommands(
+		GetCmdSvcDef(cdc),
+		GetCmdSvcBind(cdc),
+		GetCmdSvcBindUpdate(cdc),
+		GetCmdSvcDisable(cdc),
+		GetCmdSvcEnable(cdc),
+		GetCmdSvcRefundDeposit(cdc),
+		GetCmdSvcCall(cdc),
+		GetCmdSvcRespond(cdc),
+		GetCmdSvcRefundFees(cdc),
+		GetCmdSvcWithdrawFees(cdc),
+		GetCmdSvcWithdrawTax(cdc),
+	)...)
+
+	return serviceTxCmd
+}
+
+// GetCmdSvcDef implements the create service definition command.
 func GetCmdSvcDef(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "define",
@@ -36,7 +64,7 @@ func GetCmdSvcDef(cdc *codec.Codec) *cobra.Command {
 			authorDescription := viper.GetString(FlagAuthorDescription)
 			tags := viper.GetStringSlice(FlagTags)
 
-			content := viper.GetString(FlagIdlContent)
+			content := viper.GetString(FlagIDLContent)
 			if len(content) > 0 {
 				content = strings.Replace(content, `\n`, "\n", -1)
 			}
@@ -70,6 +98,7 @@ func GetCmdSvcDef(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
+// GetCmdSvcBind implements the create service bind command.
 func GetCmdSvcBind(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "bind",
@@ -111,7 +140,10 @@ func GetCmdSvcBind(cdc *codec.Codec) *cobra.Command {
 				prices = append(prices, price)
 			}
 
-			level := types.Level{AvgRspTime: avgRspTime, UsableTime: usableTime}
+			level := types.Level{
+				AvgRspTime: avgRspTime,
+				UsableTime: usableTime,
+			}
 
 			msg := types.NewMsgSvcBind(defChainID, name, chainID, fromAddr, bindingType, deposit, prices, level)
 			if err := msg.ValidateBasic(); err != nil {
@@ -134,6 +166,7 @@ func GetCmdSvcBind(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
+// GetCmdSvcBindUpdate implements the update service bind command.
 func GetCmdSvcBindUpdate(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "update-binding",
@@ -202,6 +235,7 @@ func GetCmdSvcBindUpdate(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
+// GetCmdSvcDisable implements the disable service binding command.
 func GetCmdSvcDisable(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "disable",
@@ -234,6 +268,7 @@ func GetCmdSvcDisable(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
+// GetCmdSvcEnable implements the enable service binding command.
 func GetCmdSvcEnable(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "enable",
@@ -273,6 +308,7 @@ func GetCmdSvcEnable(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
+// GetCmdSvcRefundDeposit implements the refund all deposit command.
 func GetCmdSvcRefundDeposit(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "refund-deposit",
@@ -305,6 +341,7 @@ func GetCmdSvcRefundDeposit(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
+// GetCmdSvcCall implements the call service method command.
 func GetCmdSvcCall(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "call",
@@ -364,6 +401,7 @@ func GetCmdSvcCall(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
+// GetCmdSvcRespond implements the respond service method invocation command.
 func GetCmdSvcRespond(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "respond",
@@ -408,6 +446,7 @@ func GetCmdSvcRespond(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
+// GetCmdSvcRefundFees implements the refund all fees command.
 func GetCmdSvcRefundFees(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "refund-fees",
@@ -431,10 +470,11 @@ func GetCmdSvcRefundFees(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
+// GetCmdSvcWithdrawFees implements the withdraw all fees command.
 func GetCmdSvcWithdrawFees(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "withdraw-fees",
-		Short:   "withdraw all fees from service call reward",
+		Short:   "Withdraw all fees from service call reward",
 		Example: "iriscli tx service withdraw-fees --chain-id=<chain-id> --from=<key-name> --fee=0.3iris",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(auth.DefaultTxEncoder(cdc))
@@ -454,10 +494,11 @@ func GetCmdSvcWithdrawFees(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
+// GetCmdSvcWithdrawTax implements the withdraw service fee tax command.
 func GetCmdSvcWithdrawTax(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "withdraw-tax",
-		Short:   "withdraw service fee tax to an account",
+		Short:   "Withdraw service fee tax to an account",
 		Example: "iriscli tx service withdraw-tax --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --dest-address=<account address> --withdraw-amount=1iris",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(auth.DefaultTxEncoder(cdc))

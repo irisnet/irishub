@@ -15,7 +15,26 @@ import (
 	"github.com/irisnet/irishub/simapp"
 )
 
-type KeeperTestSuite struct {
+var (
+	senderAddrs   []sdk.AccAddress
+	receiverAddrs []sdk.AccAddress
+
+	receiverOnOtherChain string
+	amount               sdk.Coins
+	secret               []byte
+	timestamps           []uint64
+	hashLocks            []htlc.HTLCHashLock
+	timeLocks            []uint64
+	expireHeights        []uint64
+	state                htlc.HTLCState
+	initSecret           htlc.HTLCSecret
+
+	// construct HTLCs
+	htlc1 htlc.HTLC
+	htlc2 htlc.HTLC
+)
+
+type TestSuite struct {
 	suite.Suite
 
 	cdc *codec.Codec
@@ -23,22 +42,23 @@ type KeeperTestSuite struct {
 	app *simapp.SimApp
 }
 
-func (suite *KeeperTestSuite) SetupTest() {
+func (suite *TestSuite) SetupTest() {
 	app := simapp.Setup(false)
 
 	suite.cdc = app.Codec()
 	suite.ctx = app.BaseApp.NewContext(false, abci.Header{})
 	suite.app = app
+
+	initVars(suite)
 }
 
-func TestKeeperTestSuite(t *testing.T) {
-	suite.Run(t, new(KeeperTestSuite))
+func TestGenesisSuite(t *testing.T) {
+	suite.Run(t, new(TestSuite))
 }
 
-func (suite *KeeperTestSuite) TestExportHTLCGenesis() {
-	// define variables
-	senderAddrs := []sdk.AccAddress{sdk.AccAddress([]byte("sender1")), sdk.AccAddress([]byte("sender2"))}
-	receiverAddrs := []sdk.AccAddress{sdk.AccAddress([]byte("receiver1")), sdk.AccAddress([]byte("receiver2"))}
+func initVars(suite *TestSuite) {
+	senderAddrs = []sdk.AccAddress{sdk.AccAddress([]byte("sender1")), sdk.AccAddress([]byte("sender2"))}
+	receiverAddrs = []sdk.AccAddress{sdk.AccAddress([]byte("receiver1")), sdk.AccAddress([]byte("receiver2"))}
 
 	_ = suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, senderAddrs[0])
 	_ = suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, senderAddrs[1])
@@ -48,20 +68,34 @@ func (suite *KeeperTestSuite) TestExportHTLCGenesis() {
 	_ = suite.app.BankKeeper.SetCoins(suite.ctx, senderAddrs[0], sdk.NewCoins(sdk.NewInt64Coin(sdk.DefaultBondDenom, 100000)))
 	_ = suite.app.BankKeeper.SetCoins(suite.ctx, senderAddrs[1], sdk.NewCoins(sdk.NewInt64Coin(sdk.DefaultBondDenom, 100000)))
 
-	receiverOnOtherChain := "receiverOnOtherChain"
-	amount := sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(1000)))
-	secret := []byte("___abcdefghijklmnopqrstuvwxyz___")
-	timestamps := []uint64{uint64(1580000000), 0}
-	hashLocks := []htlc.HTLCHashLock{htlc.GetHashLock(secret, timestamps[0]), htlc.GetHashLock(secret, timestamps[1])}
-	timeLocks := []uint64{50, 100}
-	expireHeights := []uint64{timeLocks[0] + uint64(suite.ctx.BlockHeight()), timeLocks[1] + uint64(suite.ctx.BlockHeight())}
-	state := htlc.OPEN
-	initSecret := htlc.HTLCSecret{}
+	receiverOnOtherChain = "receiverOnOtherChain"
+	amount = sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(1000)))
+	secret = []byte("___abcdefghijklmnopqrstuvwxyz___")
+	timestamps = []uint64{uint64(1580000000), 0}
+	hashLocks = []htlc.HTLCHashLock{htlc.GetHashLock(secret, timestamps[0]), htlc.GetHashLock(secret, timestamps[1])}
+	timeLocks = []uint64{50, 100}
+	expireHeights = []uint64{timeLocks[0] + uint64(suite.ctx.BlockHeight()), timeLocks[1] + uint64(suite.ctx.BlockHeight())}
+	state = htlc.OPEN
+	initSecret = htlc.HTLCSecret{}
 
 	// construct HTLCs
-	htlc1 := htlc.NewHTLC(senderAddrs[0], receiverAddrs[0], receiverOnOtherChain, amount, initSecret, timestamps[0], expireHeights[0], state)
-	htlc2 := htlc.NewHTLC(senderAddrs[1], receiverAddrs[1], receiverOnOtherChain, amount, initSecret, timestamps[1], expireHeights[1], state)
+	htlc1 = htlc.NewHTLC(senderAddrs[0], receiverAddrs[0], receiverOnOtherChain, amount, initSecret, timestamps[0], expireHeights[0], state)
+	htlc2 = htlc.NewHTLC(senderAddrs[1], receiverAddrs[1], receiverOnOtherChain, amount, initSecret, timestamps[1], expireHeights[1], state)
+}
 
+func (suite *TestSuite) TestInitGenesis() {
+	GenesisState := htlc.GenesisState{
+		PendingHTLCs: map[string]htlc.HTLC{
+			hashLocks[0].String(): htlc1,
+			hashLocks[1].String(): htlc2,
+		},
+	}
+	htlc.InitGenesis(suite.ctx, suite.app.HTLCKeeper, GenesisState)
+	err := htlc.ValidateGenesis(GenesisState)
+	suite.Nil(err)
+}
+
+func (suite *TestSuite) TestExportGenesis() {
 	// create HTLCs
 	err := suite.app.HTLCKeeper.CreateHTLC(suite.ctx, htlc1, hashLocks[0])
 	suite.Nil(err)

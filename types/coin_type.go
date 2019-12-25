@@ -87,36 +87,35 @@ func (ct CoinType) Convert(srcCoinStr string, destDenom string) (destCoinStr str
 	if err != nil {
 		return destCoinStr, err
 	}
-	var destUnit Unit
-	if destUnit, err = ct.GetUnit(destDenom); err != nil {
+
+	destUnit, err := ct.GetUnit(destDenom)
+	if err != nil {
 		return destCoinStr, errors.New("destination unit (%s) not defined" + destDenom)
 	}
 
-	if srcUnit, err := ct.GetUnit(coin.Denom); err == nil {
-		if srcUnit.Denom == destDenom {
-			return srcCoinStr, nil
-		}
-		// dest amount = src amount * (10^(dest scale) / 10^(src scale))
-		ratScale := sdk.NewDecFromInt(destUnit.GetScaleFactor())
-		srcScale := sdk.NewDecFromInt(srcUnit.GetScaleFactor())
-		amount := sdk.NewDecFromInt(coin.Amount) // convert src amount to dest unit
-
-		if err != nil {
-			return destCoinStr, err
-		}
-		amt := amount.Mul(ratScale).Quo(srcScale).String()
-		destCoinStr = fmt.Sprintf("%s%s", amt, destUnit.Denom)
-		return destCoinStr, nil
+	srcUnit, err := ct.GetUnit(coin.Denom)
+	if err != nil {
+		return destCoinStr, errors.New("source unit (%s) not defined" + coin.Denom)
 	}
-	return destCoinStr, errors.New("source unit (%s) not defined" + coin.Denom)
+	if srcUnit.Denom == destDenom {
+		return srcCoinStr, nil
+	}
+	// dest amount = src amount * (10^(dest scale) / 10^(src scale))
+	ratScale := sdk.NewDecFromInt(destUnit.GetScaleFactor())
+	srcScale := sdk.NewDecFromInt(srcUnit.GetScaleFactor())
+	amount := sdk.NewDecFromInt(coin.Amount) // convert src amount to dest unit
+
+	amt := amount.Mul(ratScale).Quo(srcScale).String()
+	destCoinStr = fmt.Sprintf("%s%s", amt, destUnit.Denom)
+	return destCoinStr, nil
 }
 
 func (ct CoinType) ConvertToMinDenomCoin(srcCoinStr string) (coin sdk.Coin, err error) {
-	if destCoinStr, err := ct.Convert(srcCoinStr, ct.MinUnit.Denom); err == nil {
-		coin, err = sdk.ParseCoin(destCoinStr)
-		return coin, err
+	destCoinStr, err := ct.Convert(srcCoinStr, ct.MinUnit.Denom)
+	if err != nil {
+		return coin, errors.New("convert error")
 	}
-	return coin, errors.New("convert error")
+	return sdk.ParseCoin(destCoinStr)
 }
 
 func (ct CoinType) GetUnit(denom string) (u Unit, err error) {
@@ -165,8 +164,7 @@ func NewIrisCoinType() CoinType {
 func GetCoinNameByDenom(denom string) (coinName string, err error) {
 	denom = strings.ToLower(denom)
 	if strings.HasPrefix(denom, Iris+"-") {
-		_, err := IrisCoinType.GetUnit(denom)
-		if err != nil {
+		if _, err := IrisCoinType.GetUnit(denom); err != nil {
 			return "", fmt.Errorf("invalid denom for getting coin name: %s", denom)
 		}
 		return Iris, nil

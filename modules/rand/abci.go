@@ -4,18 +4,14 @@ import (
 	"encoding/hex"
 	"fmt"
 
-	abci "github.com/tendermint/tendermint/abci/types"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 // BeginBlocker handles block beginning logic for rand
-func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, k Keeper) {
-	logger := k.Logger(ctx)
-
+func BeginBlocker(ctx sdk.Context, k Keeper) {
 	currentTimestamp := ctx.BlockHeader().Time.Unix()
 	preBlockHeight := ctx.BlockHeight() - 1
-	preBlockHash := []byte(ctx.BlockHeader().LastBlockId.Hash)
+	preBlockHash := ctx.BlockHeader().LastBlockId.Hash
 
 	// get pending random number requests for lastBlockHeight
 	iterator := k.IterateRandRequestQueueByHeight(ctx, preBlockHeight)
@@ -47,6 +43,6 @@ func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, k Keeper) {
 		handledRandReqNum++
 	}
 
-	logger.Info(fmt.Sprintf("%d rand requests are handled", handledRandReqNum))
+	k.Logger(ctx).Info(fmt.Sprintf("%d rand requests are handled", handledRandReqNum))
 	return
 }

@@ -2,13 +2,12 @@ package htlc
 
 import (
 	"encoding/hex"
+	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-
-	"github.com/irisnet/irishub/modules/htlc/internal/types"
 )
 
-// NewHandler handles all htlc messages
+// NewHandler returns a handler for all htlc messages
 func NewHandler(k Keeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
 		ctx = ctx.WithEventManager(sdk.NewEventManager())
@@ -21,7 +20,8 @@ func NewHandler(k Keeper) sdk.Handler {
 		case MsgRefundHTLC:
 			return handleMsgRefundHTLC(ctx, k, msg)
 		default:
-			return sdk.ErrTxDecode("invalid message parsed in HTLC module").Result()
+			errMsg := fmt.Sprintf("unrecognized HTLC message type: %T", msg)
+			return sdk.ErrUnknownRequest(errMsg).Result()
 		}
 	}
 }
@@ -43,8 +43,7 @@ func handleMsgCreateHTLC(ctx sdk.Context, k Keeper, msg MsgCreateHTLC) sdk.Resul
 		state,
 	)
 
-	err := k.CreateHTLC(ctx, htlc, msg.HashLock)
-	if err != nil {
+	if err := k.CreateHTLC(ctx, htlc, msg.HashLock); err != nil {
 		return err.Result()
 	}
 
@@ -52,16 +51,16 @@ func handleMsgCreateHTLC(ctx sdk.Context, k Keeper, msg MsgCreateHTLC) sdk.Resul
 		sdk.Events{
 			sdk.NewEvent(
 				sdk.EventTypeMessage,
-				sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+				sdk.NewAttribute(sdk.AttributeKeyModule, AttributeValueCategory),
 				sdk.NewAttribute(sdk.AttributeKeySender, msg.Sender.String()),
 			),
 			sdk.NewEvent(
-				types.EventTypeCreateHTLC,
-				sdk.NewAttribute(types.AttributeValueSender, htlc.Sender.String()),
-				sdk.NewAttribute(types.AttributeValueReceiver, htlc.To.String()),
-				sdk.NewAttribute(types.AttributeValueReceiverOnOtherChain, htlc.ReceiverOnOtherChain),
-				sdk.NewAttribute(types.AttributeValueAmount, htlc.Amount.String()),
-				sdk.NewAttribute(types.AttributeValueHashLock, hex.EncodeToString(msg.HashLock)),
+				EventTypeCreateHTLC,
+				sdk.NewAttribute(AttributeValueSender, htlc.Sender.String()),
+				sdk.NewAttribute(AttributeValueReceiver, htlc.To.String()),
+				sdk.NewAttribute(AttributeValueReceiverOnOtherChain, htlc.ReceiverOnOtherChain),
+				sdk.NewAttribute(AttributeValueAmount, htlc.Amount.String()),
+				sdk.NewAttribute(AttributeValueHashLock, hex.EncodeToString(msg.HashLock)),
 			),
 		},
 	)
@@ -73,7 +72,7 @@ func handleMsgCreateHTLC(ctx sdk.Context, k Keeper, msg MsgCreateHTLC) sdk.Resul
 
 // handleMsgClaimHTLC handles MsgClaimHTLC
 func handleMsgClaimHTLC(ctx sdk.Context, k Keeper, msg MsgClaimHTLC) sdk.Result {
-	toStr, err := k.ClaimHTLC(ctx, msg.HashLock, msg.Secret)
+	senderStr, toStr, err := k.ClaimHTLC(ctx, msg.HashLock, msg.Secret)
 	if err != nil {
 		return err.Result()
 	}
@@ -82,15 +81,15 @@ func handleMsgClaimHTLC(ctx sdk.Context, k Keeper, msg MsgClaimHTLC) sdk.Result 
 		sdk.Events{
 			sdk.NewEvent(
 				sdk.EventTypeMessage,
-				sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+				sdk.NewAttribute(sdk.AttributeKeyModule, AttributeValueCategory),
 				sdk.NewAttribute(sdk.AttributeKeySender, msg.Sender.String()),
 			),
 			sdk.NewEvent(
-				types.EventTypeClaimHTLC,
-				sdk.NewAttribute(types.AttributeValueSender, msg.Sender.String()),
-				sdk.NewAttribute(types.AttributeValueReceiver, toStr),
-				sdk.NewAttribute(types.AttributeValueHashLock, hex.EncodeToString(msg.HashLock)),
-				sdk.NewAttribute(types.AttributeValueSecret, hex.EncodeToString(msg.Secret)),
+				EventTypeClaimHTLC,
+				sdk.NewAttribute(AttributeValueSender, senderStr),
+				sdk.NewAttribute(AttributeValueReceiver, toStr),
+				sdk.NewAttribute(AttributeValueHashLock, hex.EncodeToString(msg.HashLock)),
+				sdk.NewAttribute(AttributeValueSecret, hex.EncodeToString(msg.Secret)),
 			),
 		},
 	)
@@ -111,13 +110,13 @@ func handleMsgRefundHTLC(ctx sdk.Context, k Keeper, msg MsgRefundHTLC) sdk.Resul
 		sdk.Events{
 			sdk.NewEvent(
 				sdk.EventTypeMessage,
-				sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+				sdk.NewAttribute(sdk.AttributeKeyModule, AttributeValueCategory),
 				sdk.NewAttribute(sdk.AttributeKeySender, msg.Sender.String()),
 			),
 			sdk.NewEvent(
-				types.EventTypeRefundHTLC,
-				sdk.NewAttribute(types.AttributeValueSender, sender),
-				sdk.NewAttribute(types.AttributeValueHashLock, hex.EncodeToString(msg.HashLock)),
+				EventTypeRefundHTLC,
+				sdk.NewAttribute(AttributeValueSender, sender),
+				sdk.NewAttribute(AttributeValueHashLock, hex.EncodeToString(msg.HashLock)),
 			),
 		},
 	)

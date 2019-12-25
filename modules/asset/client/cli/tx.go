@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -11,14 +14,12 @@ import (
 	"github.com/cosmos/cosmos-sdk/version"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 
 	"github.com/irisnet/irishub/modules/asset/internal/types"
 	iristypes "github.com/irisnet/irishub/types"
 )
 
-// GetTxCmd returns the transaction commands for this module
+// GetTxCmd returns the transaction commands for the asset module.
 func GetTxCmd(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	txCmd := &cobra.Command{
 		Use:                        types.ModuleName,
@@ -27,16 +28,18 @@ func GetTxCmd(queryRoute string, cdc *codec.Codec) *cobra.Command {
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
 	}
+
 	txCmd.AddCommand(client.PostCommands(
 		GetCmdIssueToken(queryRoute, cdc),
 		GetCmdTransferTokenOwner(cdc),
 		GetCmdEditToken(cdc),
 		GetCmdMintToken(queryRoute, cdc),
 	)...)
+
 	return txCmd
 }
 
-// GetCmdIssueToken implements the issue token command
+// GetCmdIssueToken implements the issue token command.
 func GetCmdIssueToken(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "issue-token",
@@ -79,13 +82,13 @@ func GetCmdIssueToken(queryRoute string, cdc *codec.Codec) *cobra.Command {
 			}
 
 			if !viper.GetBool(client.FlagGenerateOnly) {
-				tokenId, err := types.GetTokenID(msg.Source, msg.Symbol)
+				tokenID, err := types.GetTokenID(msg.Source, msg.Symbol)
 				if err != nil {
 					return fmt.Errorf("failed to query token issue fee: %s", err.Error())
 				}
 
 				// query fee
-				fee, err1 := queryTokenFees(cliCtx, queryRoute, tokenId)
+				fee, err1 := queryTokenFees(cliCtx, queryRoute, tokenID)
 				if err1 != nil {
 					return fmt.Errorf("failed to query token issue fee: %s", err1.Error())
 				}
@@ -110,7 +113,7 @@ func GetCmdIssueToken(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-// GetCmdEditToken implements the edit token command
+// GetCmdEditToken implements the edit token command.
 func GetCmdEditToken(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "edit-token",
@@ -125,7 +128,7 @@ func GetCmdEditToken(cdc *codec.Codec) *cobra.Command {
 
 			owner := cliCtx.GetFromAddress()
 
-			tokenId := args[0]
+			tokenID := args[0]
 			name := viper.GetString(FlagName)
 			canonicalSymbol := viper.GetString(FlagCanonicalSymbol)
 			minUnitAlias := viper.GetString(FlagMinUnitAlias)
@@ -134,9 +137,8 @@ func GetCmdEditToken(cdc *codec.Codec) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			var msg sdk.Msg
-			msg = types.NewMsgEditToken(name,
-				canonicalSymbol, minUnitAlias, tokenId, maxSupply, mintable, owner)
+
+			msg := types.NewMsgEditToken(name, canonicalSymbol, minUnitAlias, tokenID, maxSupply, mintable, owner)
 
 			if err := msg.ValidateBasic(); err != nil {
 				return err
@@ -150,7 +152,7 @@ func GetCmdEditToken(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-// GetCmdMintToken implements the mint token command
+// GetCmdMintToken implements the mint token command.
 func GetCmdMintToken(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "mint-token [token-id]",
@@ -174,8 +176,7 @@ func GetCmdMintToken(queryRoute string, cdc *codec.Codec) *cobra.Command {
 				}
 			}
 
-			var msg sdk.Msg
-			msg = types.NewMsgMintToken(
+			msg := types.NewMsgMintToken(
 				args[0], owner, to, amount,
 			)
 
@@ -184,9 +185,9 @@ func GetCmdMintToken(queryRoute string, cdc *codec.Codec) *cobra.Command {
 			}
 
 			if !viper.GetBool(client.FlagGenerateOnly) {
-				tokenId, _ := iristypes.ConvertIdToTokenKeyId(args[0])
+				tokenID, _ := iristypes.ConvertIDToTokenKeyID(args[0])
 				// query fee
-				fee, err1 := queryTokenFees(cliCtx, queryRoute, tokenId)
+				fee, err1 := queryTokenFees(cliCtx, queryRoute, tokenID)
 				if err1 != nil {
 					return fmt.Errorf("failed to query token mint fee: %s", err1.Error())
 				}
@@ -205,7 +206,7 @@ func GetCmdMintToken(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-// GetCmdTransferTokenOwner implements the transfer token owner command
+// GetCmdTransferTokenOwner implements the transfer token owner command.
 func GetCmdTransferTokenOwner(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "transfer-token-owner [token-id]",
@@ -223,8 +224,7 @@ func GetCmdTransferTokenOwner(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			var msg sdk.Msg
-			msg = types.NewMsgTransferTokenOwner(owner, to, args[0])
+			msg := types.NewMsgTransferTokenOwner(owner, to, args[0])
 
 			if err := msg.ValidateBasic(); err != nil {
 				return err

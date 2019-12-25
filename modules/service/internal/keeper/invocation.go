@@ -8,6 +8,7 @@ import (
 	"github.com/irisnet/irishub/modules/service/internal/types"
 )
 
+// AddRequest
 func (k Keeper) AddRequest(
 	ctx sdk.Context,
 	defChainID,
@@ -30,8 +31,7 @@ func (k Keeper) AddRequest(
 		return req, types.ErrSvcBindingNotAvailable(k.codespace)
 	}
 
-	_, found = k.GetMethod(ctx, defChainID, defName, methodID)
-	if !found {
+	if _, found = k.GetMethod(ctx, defChainID, defName, methodID); !found {
 		return req, types.ErrMethodNotExists(k.codespace, methodID)
 	}
 
@@ -53,8 +53,10 @@ func (k Keeper) AddRequest(
 		serviceFee = nil
 	}
 
-	req = types.NewSvcRequest(defChainID, defName, bindChainID, reqChainID,
-		consumer, provider, methodID, input, serviceFee, profiling)
+	req = types.NewSvcRequest(
+		defChainID, defName, bindChainID, reqChainID, consumer,
+		provider, methodID, input, serviceFee, profiling,
+	)
 
 	counter := k.GetIntraTxCounter(ctx)
 	k.SetIntraTxCounter(ctx, counter+1)
@@ -65,8 +67,9 @@ func (k Keeper) AddRequest(
 	params := k.GetParams(ctx)
 	req.ExpirationHeight = req.RequestHeight + params.MaxRequestTimeout
 
-	err = k.sk.SendCoinsFromAccountToModule(ctx, req.Consumer, types.RequestAccName, req.ServiceFee)
-	if err != nil {
+	if err := k.sk.SendCoinsFromAccountToModule(
+		ctx, req.Consumer, types.RequestAccName, req.ServiceFee,
+	); err != nil {
 		return req, err
 	}
 
@@ -77,6 +80,7 @@ func (k Keeper) AddRequest(
 	return req, nil
 }
 
+// SetRequest
 func (k Keeper) SetRequest(ctx sdk.Context, req types.SvcRequest) {
 	store := ctx.KVStore(k.storeKey)
 
@@ -85,6 +89,7 @@ func (k Keeper) SetRequest(ctx sdk.Context, req types.SvcRequest) {
 		req.Provider, req.RequestHeight, req.RequestIntraTxCounter), bz)
 }
 
+// AddActiveRequest
 func (k Keeper) AddActiveRequest(ctx sdk.Context, req types.SvcRequest) {
 	store := ctx.KVStore(k.storeKey)
 
@@ -93,12 +98,14 @@ func (k Keeper) AddActiveRequest(ctx sdk.Context, req types.SvcRequest) {
 		req.Provider, req.RequestHeight, req.RequestIntraTxCounter), bz)
 }
 
+// DeleteActiveRequest
 func (k Keeper) DeleteActiveRequest(ctx sdk.Context, req types.SvcRequest) {
 	store := ctx.KVStore(k.storeKey)
 	store.Delete(types.GetActiveRequestKey(req.DefChainID, req.DefName, req.BindChainID, req.Provider,
 		req.RequestHeight, req.RequestIntraTxCounter))
 }
 
+// AddRequestExpiration
 func (k Keeper) AddRequestExpiration(ctx sdk.Context, req types.SvcRequest) {
 	store := ctx.KVStore(k.storeKey)
 
@@ -106,11 +113,13 @@ func (k Keeper) AddRequestExpiration(ctx sdk.Context, req types.SvcRequest) {
 	store.Set(types.GetRequestsByExpirationIndexKeyByReq(req), bz)
 }
 
+// DeleteRequestExpiration
 func (k Keeper) DeleteRequestExpiration(ctx sdk.Context, req types.SvcRequest) {
 	store := ctx.KVStore(k.storeKey)
 	store.Delete(types.GetRequestsByExpirationIndexKeyByReq(req))
 }
 
+// GetActiveRequest
 func (k Keeper) GetActiveRequest(ctx sdk.Context, expHeight, reqHeight int64, counter int16) (req types.SvcRequest, found bool) {
 	store := ctx.KVStore(k.storeKey)
 
@@ -123,13 +132,13 @@ func (k Keeper) GetActiveRequest(ctx sdk.Context, expHeight, reqHeight int64, co
 	return req, true
 }
 
-// Returns an iterator for all the request in the Active Queue of specified service binding
+// ActiveBindRequestsIterator returns an iterator for all the request in the Active Queue of specified service binding
 func (k Keeper) ActiveBindRequestsIterator(ctx sdk.Context, defChainID, defName, bindChainID string, provider sdk.AccAddress) sdk.Iterator {
 	store := ctx.KVStore(k.storeKey)
 	return sdk.KVStorePrefixIterator(store, types.GetSubActiveRequestKey(defChainID, defName, bindChainID, provider))
 }
 
-// Returns an iterator for all the request in the Active Queue that expire by block height
+// ActiveRequestQueueIterator returns an iterator for all the request in the Active Queue that expire by block height
 func (k Keeper) ActiveRequestQueueIterator(ctx sdk.Context, height int64) sdk.Iterator {
 	store := ctx.KVStore(k.storeKey)
 	return sdk.KVStorePrefixIterator(store, types.GetRequestsByExpirationPrefix(height))
@@ -141,6 +150,7 @@ func (k Keeper) ActiveAllRequestQueueIterator(ctx sdk.Context) sdk.Iterator {
 	return sdk.KVStorePrefixIterator(store, types.ActiveRequestKey)
 }
 
+// AddResponse
 func (k Keeper) AddResponse(
 	ctx sdk.Context,
 	reqChainID string,
@@ -168,8 +178,7 @@ func (k Keeper) AddResponse(
 		return resp, types.ErrNotMatchingReqChainID(k.codespace, reqChainID)
 	}
 
-	err = k.AddIncomingFee(ctx, provider, req.ServiceFee)
-	if err != nil {
+	if err := k.AddIncomingFee(ctx, provider, req.ServiceFee); err != nil {
 		return resp, err
 	}
 
@@ -183,6 +192,7 @@ func (k Keeper) AddResponse(
 	return resp, nil
 }
 
+// SetResponse
 func (k Keeper) SetResponse(ctx sdk.Context, resp types.SvcResponse) {
 	store := ctx.KVStore(k.storeKey)
 
@@ -190,6 +200,7 @@ func (k Keeper) SetResponse(ctx sdk.Context, resp types.SvcResponse) {
 	store.Set(types.GetResponseKey(resp.ReqChainID, resp.ExpirationHeight, resp.RequestHeight, resp.RequestIntraTxCounter), bz)
 }
 
+// GetResponse
 func (k Keeper) GetResponse(ctx sdk.Context, reqChainID string, eHeight, rHeight int64, counter int16) (resp types.SvcResponse, found bool) {
 	store := ctx.KVStore(k.storeKey)
 
@@ -202,6 +213,7 @@ func (k Keeper) GetResponse(ctx sdk.Context, reqChainID string, eHeight, rHeight
 	return resp, true
 }
 
+// Slash
 func (k Keeper) Slash(ctx sdk.Context, binding types.SvcBinding, slashCoins sdk.Coins) sdk.Error {
 	deposit, hasNeg := binding.Deposit.SafeSub(slashCoins)
 	if hasNeg {
@@ -220,19 +232,17 @@ func (k Keeper) Slash(ctx sdk.Context, binding types.SvcBinding, slashCoins sdk.
 		binding.DisableTime = ctx.BlockHeader().Time
 	}
 
-	err = k.sk.BurnCoins(ctx, types.DepositAccName, slashCoins)
-	if err != nil {
+	if err := k.sk.BurnCoins(ctx, types.DepositAccName, slashCoins); err != nil {
 		return err
 	}
 
-	ctx.Logger().Info("Slash service provider", "provider", binding.Provider.String(), "slash_amount", slashCoins.String())
-
+	k.Logger(ctx).Info("Slash service provider", "provider", binding.Provider.String(), "slash_amount", slashCoins.String())
 	k.SetServiceBinding(ctx, binding)
 
 	return nil
 }
 
-// Add return fee for a particular consumer, if it is not existed will create a new
+// AddReturnFee add return fee for a particular consumer, if it is not existed will create a new
 func (k Keeper) AddReturnFee(ctx sdk.Context, address sdk.AccAddress, coins sdk.Coins) {
 	fee, found := k.GetReturnFee(ctx, address)
 	if !found {
@@ -276,12 +286,11 @@ func (k Keeper) RefundFee(ctx sdk.Context, address sdk.AccAddress) sdk.Error {
 		return types.ErrReturnFeeNotExists(k.codespace, address)
 	}
 
-	err := k.sk.SendCoinsFromModuleToAccount(ctx, types.RequestAccName, address, fee.Coins)
-	if err != nil {
+	if err := k.sk.SendCoinsFromModuleToAccount(ctx, types.RequestAccName, address, fee.Coins); err != nil {
 		return err
 	}
 
-	ctx.Logger().Info("Refund fees", "address", address.String(), "amount", fee.Coins.String())
+	k.Logger(ctx).Info("Refund fees", "address", address.String(), "amount", fee.Coins.String())
 	k.DeleteReturnFee(ctx, address)
 
 	return nil
@@ -298,8 +307,7 @@ func (k Keeper) AddIncomingFee(ctx sdk.Context, address sdk.AccAddress, coins sd
 		taxCoins = taxCoins.Add(sdk.NewCoins(sdk.NewCoin(coin.Denom, taxAmount)))
 	}
 
-	err := k.sk.SendCoinsFromModuleToModule(ctx, types.RequestAccName, types.TaxAccName, taxCoins)
-	if err != nil {
+	if err := k.sk.SendCoinsFromModuleToModule(ctx, types.RequestAccName, types.TaxAccName, taxCoins); err != nil {
 		return err
 	}
 
@@ -347,25 +355,21 @@ func (k Keeper) WithdrawFee(ctx sdk.Context, address sdk.AccAddress) sdk.Error {
 		return types.ErrWithdrawFeeNotExists(k.codespace, address)
 	}
 
-	err := k.sk.SendCoinsFromModuleToAccount(ctx, types.RequestAccName, address, fee.Coins)
-	if err != nil {
+	if err := k.sk.SendCoinsFromModuleToAccount(ctx, types.RequestAccName, address, fee.Coins); err != nil {
 		return err
 	}
 
-	ctx.Logger().Info("Withdraw fees", "address", address.String(), "amount", fee.Coins.String())
+	k.Logger(ctx).Info("Withdraw fees", "address", address.String(), "amount", fee.Coins.String())
 	k.DeleteIncomingFee(ctx, address)
 
 	return nil
 }
 
 func (k Keeper) WithdrawTax(ctx sdk.Context, trustee sdk.AccAddress, destAddress sdk.AccAddress, amt sdk.Coins) sdk.Error {
-	_, found := k.gk.GetTrustee(ctx, trustee)
-	if !found {
+	if _, found := k.gk.GetTrustee(ctx, trustee); !found {
 		return types.ErrNotTrustee(k.codespace, trustee)
 	}
-
-	err := k.sk.SendCoinsFromModuleToAccount(ctx, types.TaxAccName, destAddress, amt)
-	return err
+	return k.sk.SendCoinsFromModuleToAccount(ctx, types.TaxAccName, destAddress, amt)
 }
 
 // AllReturnedFeesIterator returns an iterator for all the returned fees
@@ -389,8 +393,9 @@ func (k Keeper) RefundReturnedFees(ctx sdk.Context) sdk.Error {
 		var returnedFee types.ReturnedFee
 		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &returnedFee)
 
-		err := k.sk.SendCoinsFromModuleToAccount(ctx, types.RequestAccName, returnedFee.Address, returnedFee.Coins)
-		if err != nil {
+		if err := k.sk.SendCoinsFromModuleToAccount(
+			ctx, types.RequestAccName, returnedFee.Address, returnedFee.Coins,
+		); err != nil {
 			return err
 		}
 	}
@@ -407,8 +412,9 @@ func (k Keeper) RefundIncomingFees(ctx sdk.Context) sdk.Error {
 		var incomingFee types.IncomingFee
 		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &incomingFee)
 
-		err := k.sk.SendCoinsFromModuleToAccount(ctx, types.RequestAccName, incomingFee.Address, incomingFee.Coins)
-		if err != nil {
+		if err := k.sk.SendCoinsFromModuleToAccount(
+			ctx, types.RequestAccName, incomingFee.Address, incomingFee.Coins,
+		); err != nil {
 			return err
 		}
 	}
@@ -425,8 +431,9 @@ func (k Keeper) RefundServiceFees(ctx sdk.Context) sdk.Error {
 		var request types.SvcRequest
 		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &request)
 
-		err := k.sk.SendCoinsFromModuleToAccount(ctx, types.RequestAccName, request.Consumer, request.ServiceFee)
-		if err != nil {
+		if err := k.sk.SendCoinsFromModuleToAccount(
+			ctx, types.RequestAccName, request.Consumer, request.ServiceFee,
+		); err != nil {
 			return err
 		}
 	}
@@ -434,7 +441,7 @@ func (k Keeper) RefundServiceFees(ctx sdk.Context) sdk.Error {
 	return nil
 }
 
-// get the current in-block request operation counter
+// GetIntraTxCounter get the current in-block request operation counter
 func (k Keeper) GetIntraTxCounter(ctx sdk.Context) int16 {
 	store := ctx.KVStore(k.storeKey)
 
@@ -449,7 +456,7 @@ func (k Keeper) GetIntraTxCounter(ctx sdk.Context) int16 {
 	return counter
 }
 
-// set the current in-block request counter
+// SetIntraTxCounter set the current in-block request counter
 func (k Keeper) SetIntraTxCounter(ctx sdk.Context, counter int16) {
 	store := ctx.KVStore(k.storeKey)
 

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/tendermint/tendermint/crypto"
+	"github.com/tendermint/tendermint/libs/log"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -43,6 +43,12 @@ func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, bk types.BankKeeper, ak types
 	}
 }
 
+// Logger returns a module-specific logger.
+func (k Keeper) Logger(ctx sdk.Context) log.Logger {
+	return ctx.Logger().With("module", fmt.Sprintf("%s", types.ModuleName))
+}
+
+// Swap execute swap order in specified pool
 func (k Keeper) Swap(ctx sdk.Context, msg types.MsgSwapOrder) sdk.Error {
 	var amount sdk.Int
 	var err sdk.Error
@@ -70,13 +76,14 @@ func (k Keeper) Swap(ctx sdk.Context, msg types.MsgSwapOrder) sdk.Error {
 			sdk.NewAttribute(types.AttributeValueSender, msg.Input.Address.String()),
 			sdk.NewAttribute(types.AttributeValueRecipient, msg.Output.Address.String()),
 			sdk.NewAttribute(types.AttributeValueIsBuyOrder, strconv.FormatBool(msg.IsBuyOrder)),
-			sdk.NewAttribute(types.AttributeValueTokenPair, getTokenPairByDenom(msg.Input.Coin.Denom, msg.Output.Coin.Denom)),
+			sdk.NewAttribute(types.AttributeValueTokenPair, types.GetTokenPairByDenom(msg.Input.Coin.Denom, msg.Output.Coin.Denom)),
 		),
 	)
 
 	return nil
 }
 
+// AddLiquidity add liquidity to specified pool
 func (k Keeper) AddLiquidity(ctx sdk.Context, msg types.MsgAddLiquidity) sdk.Error {
 	standardDenom := k.GetParams(ctx).StandardDenom
 	uniDenom, err := types.GetUniDenomFromDenom(msg.MaxToken.Denom)
@@ -115,7 +122,7 @@ func (k Keeper) AddLiquidity(ctx sdk.Context, msg types.MsgAddLiquidity) sdk.Err
 		sdk.NewEvent(
 			types.EventTypeAddLiquidity,
 			sdk.NewAttribute(types.AttributeValueSender, msg.Sender.String()),
-			sdk.NewAttribute(types.AttributeValueTokenPair, getTokenPairByDenom(msg.MaxToken.Denom, standardDenom)),
+			sdk.NewAttribute(types.AttributeValueTokenPair, types.GetTokenPairByDenom(msg.MaxToken.Denom, standardDenom)),
 		),
 	)
 
@@ -124,7 +131,7 @@ func (k Keeper) AddLiquidity(ctx sdk.Context, msg types.MsgAddLiquidity) sdk.Err
 
 func (k Keeper) addLiquidity(ctx sdk.Context, sender sdk.AccAddress, standardCoin, token sdk.Coin, uniDenom string, mintLiquidityAmt sdk.Int) sdk.Error {
 	depositedTokens := sdk.NewCoins(standardCoin, token)
-	poolAddr := GetReservePoolAddr(uniDenom)
+	poolAddr := types.GetReservePoolAddr(uniDenom)
 	// transfer deposited token into coinswaps Account
 	if err := k.bk.SendCoins(ctx, sender, poolAddr, depositedTokens); err != nil {
 		return err
@@ -142,6 +149,7 @@ func (k Keeper) addLiquidity(ctx sdk.Context, sender sdk.AccAddress, standardCoi
 	return nil
 }
 
+// RemoveLiquidity remove liquidity from specified pool
 func (k Keeper) RemoveLiquidity(ctx sdk.Context, msg types.MsgRemoveLiquidity) sdk.Error {
 	standardDenom := k.GetParams(ctx).StandardDenom
 	uniDenom := msg.WithdrawLiquidity.Denom
@@ -185,13 +193,13 @@ func (k Keeper) RemoveLiquidity(ctx sdk.Context, msg types.MsgRemoveLiquidity) s
 	if tokenWithdrawCoin.Amount.LT(msg.MinToken) {
 		return types.ErrConstraintNotMet(fmt.Sprintf("token amount not met, user expected: no less than %s, actual: %s", sdk.NewCoin(minTokenDenom, msg.MinToken).String(), tokenWithdrawCoin.String()))
 	}
-	poolAddr := GetReservePoolAddr(uniDenom)
+	poolAddr := types.GetReservePoolAddr(uniDenom)
 
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
 			types.EventTypeRemoveLiquidity,
 			sdk.NewAttribute(types.AttributeValueSender, msg.Sender.String()),
-			sdk.NewAttribute(types.AttributeValueTokenPair, getTokenPairByDenom(minTokenDenom, standardDenom)),
+			sdk.NewAttribute(types.AttributeValueTokenPair, types.GetTokenPairByDenom(minTokenDenom, standardDenom)),
 		),
 	)
 
@@ -220,7 +228,7 @@ func (k Keeper) removeLiquidity(ctx sdk.Context, poolAddr, sender sdk.AccAddress
 // GetReservePool returns the total balance of an reserve pool at the
 // provided denomination.
 func (k Keeper) GetReservePool(ctx sdk.Context, uniDenom string) (coins sdk.Coins) {
-	swapPoolAccAddr := GetReservePoolAddr(uniDenom)
+	swapPoolAccAddr := types.GetReservePoolAddr(uniDenom)
 	acc := k.ak.GetAccount(ctx, swapPoolAccAddr)
 	if acc == nil {
 		return nil
@@ -238,17 +246,4 @@ func (k Keeper) GetParams(ctx sdk.Context) types.Params {
 // SetParams sets the parameters for the coinswap module.
 func (k Keeper) SetParams(ctx sdk.Context, params types.Params) {
 	k.paramSpace.SetParamSet(ctx, &params)
-}
-
-func (k Keeper) Init(ctx sdk.Context) {
-	paramSet := types.DefaultParams()
-	k.paramSpace.SetParamSet(ctx, &paramSet)
-}
-
-func GetReservePoolAddr(uniDenom string) sdk.AccAddress {
-	return sdk.AccAddress(crypto.AddressHash([]byte(uniDenom)))
-}
-
-func getTokenPairByDenom(inputDenom, outputDenom string) string {
-	return fmt.Sprintf("%s-%s", outputDenom, inputDenom)
 }

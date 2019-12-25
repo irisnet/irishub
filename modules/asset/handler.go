@@ -4,11 +4,9 @@ import (
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-
-	"github.com/irisnet/irishub/modules/asset/internal/types"
 )
 
-// handle all "asset" type messages.
+// NewHandler returns a handler for all "asset" type messages.
 func NewHandler(k Keeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
 		ctx = ctx.WithEventManager(sdk.NewEventManager())
@@ -23,10 +21,9 @@ func NewHandler(k Keeper) sdk.Handler {
 		case MsgTransferTokenOwner:
 			return handleMsgTransferTokenOwner(ctx, k, msg)
 		default:
-			return sdk.ErrTxDecode("invalid message parse in asset module").Result()
+			errMsg := fmt.Sprintf("unrecognized asset message type: %T", msg)
+			return sdk.ErrUnknownRequest(errMsg).Result()
 		}
-
-		return sdk.ErrTxDecode("invalid message parse in asset module").Result()
 	}
 }
 
@@ -35,10 +32,11 @@ func handleIssueToken(ctx sdk.Context, k Keeper, msg MsgIssueToken) sdk.Result {
 	var token FungibleToken
 	switch msg.Family {
 	case FUNGIBLE:
-		decimal := int(msg.Decimal)
-		token = NewFungibleToken(msg.Source, msg.Symbol, msg.Name, msg.Decimal, msg.CanonicalSymbol,
-			msg.MinUnitAlias, sdk.NewIntWithDecimal(int64(msg.InitialSupply), decimal),
-			sdk.NewIntWithDecimal(int64(msg.MaxSupply), decimal), msg.Mintable, msg.Owner)
+		token = NewFungibleToken(
+			msg.Source, msg.Symbol, msg.Name, msg.Decimal, msg.CanonicalSymbol,
+			msg.MinUnitAlias, sdk.NewIntWithDecimal(int64(msg.InitialSupply), int(msg.Decimal)),
+			sdk.NewIntWithDecimal(int64(msg.MaxSupply), int(msg.Decimal)), msg.Mintable, msg.Owner,
+		)
 	default:
 		return ErrInvalidAssetFamily(DefaultCodespace, fmt.Sprintf("invalid asset family type %s", msg.Family)).Result()
 	}
@@ -54,23 +52,22 @@ func handleIssueToken(ctx sdk.Context, k Keeper, msg MsgIssueToken) sdk.Result {
 		break
 	}
 
-	err := k.IssueToken(ctx, token)
-	if err != nil {
+	if err := k.IssueToken(ctx, token); err != nil {
 		return err.Result()
 	}
 
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+			sdk.NewAttribute(sdk.AttributeKeyModule, AttributeValueCategory),
 			sdk.NewAttribute(sdk.AttributeKeySender, msg.Owner.String()),
 		),
 		sdk.NewEvent(
-			types.EventTypeIssueToken,
-			sdk.NewAttribute(types.AttributeKeyTokenID, token.GetUniqueID()),
-			sdk.NewAttribute(types.AttributeKeyTokenDenom, token.GetDenom()),
-			sdk.NewAttribute(types.AttributeKeyTokenSource, token.GetSource().String()),
-			sdk.NewAttribute(types.AttributeKeyTokenOwner, token.GetOwner().String()),
+			EventTypeIssueToken,
+			sdk.NewAttribute(AttributeKeyTokenID, token.GetUniqueID()),
+			sdk.NewAttribute(AttributeKeyTokenDenom, token.GetDenom()),
+			sdk.NewAttribute(AttributeKeyTokenSource, token.GetSource().String()),
+			sdk.NewAttribute(AttributeKeyTokenOwner, token.GetOwner().String()),
 		),
 	})
 
@@ -81,20 +78,19 @@ func handleIssueToken(ctx sdk.Context, k Keeper, msg MsgIssueToken) sdk.Result {
 
 // handleMsgEditToken handles MsgEditToken
 func handleMsgEditToken(ctx sdk.Context, k Keeper, msg MsgEditToken) sdk.Result {
-	err := k.EditToken(ctx, msg)
-	if err != nil {
+	if err := k.EditToken(ctx, msg); err != nil {
 		return err.Result()
 	}
 
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+			sdk.NewAttribute(sdk.AttributeKeyModule, AttributeValueCategory),
 			sdk.NewAttribute(sdk.AttributeKeySender, msg.Owner.String()),
 		),
 		sdk.NewEvent(
-			types.EventTypeEditToken,
-			sdk.NewAttribute(types.AttributeKeyTokenID, msg.TokenID),
+			EventTypeEditToken,
+			sdk.NewAttribute(AttributeKeyTokenID, msg.TokenID),
 		),
 	})
 
@@ -105,20 +101,19 @@ func handleMsgEditToken(ctx sdk.Context, k Keeper, msg MsgEditToken) sdk.Result 
 
 // handleMsgTransferTokenOwner handles MsgTransferTokenOwner
 func handleMsgTransferTokenOwner(ctx sdk.Context, k Keeper, msg MsgTransferTokenOwner) sdk.Result {
-	err := k.TransferTokenOwner(ctx, msg)
-	if err != nil {
+	if err := k.TransferTokenOwner(ctx, msg); err != nil {
 		return err.Result()
 	}
 
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+			sdk.NewAttribute(sdk.AttributeKeyModule, AttributeValueCategory),
 			sdk.NewAttribute(sdk.AttributeKeySender, msg.SrcOwner.String()),
 		),
 		sdk.NewEvent(
-			types.EventTypeTransferTokenOwner,
-			sdk.NewAttribute(types.AttributeKeyTokenID, msg.TokenID),
+			EventTypeTransferTokenOwner,
+			sdk.NewAttribute(AttributeKeyTokenID, msg.TokenID),
 		),
 	})
 
@@ -129,20 +124,19 @@ func handleMsgTransferTokenOwner(ctx sdk.Context, k Keeper, msg MsgTransferToken
 
 // handleMsgMintToken handles MsgMintToken
 func handleMsgMintToken(ctx sdk.Context, k Keeper, msg MsgMintToken) sdk.Result {
-	err := k.MintToken(ctx, msg)
-	if err != nil {
+	if err := k.MintToken(ctx, msg); err != nil {
 		return err.Result()
 	}
 
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+			sdk.NewAttribute(sdk.AttributeKeyModule, AttributeValueCategory),
 			sdk.NewAttribute(sdk.AttributeKeySender, msg.Owner.String()),
 		),
 		sdk.NewEvent(
-			types.EventTypeMintToken,
-			sdk.NewAttribute(types.AttributeKeyTokenID, msg.TokenID),
+			EventTypeMintToken,
+			sdk.NewAttribute(AttributeKeyTokenID, msg.TokenID),
 			sdk.NewAttribute(sdk.AttributeKeyAmount, string(msg.Amount)),
 		),
 	})

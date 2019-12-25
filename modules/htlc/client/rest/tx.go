@@ -2,6 +2,7 @@ package rest
 
 import (
 	"encoding/hex"
+	"fmt"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -18,11 +19,12 @@ func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router) {
 	// create an HTLC
 	r.HandleFunc("/htlc/htlcs", createHTLCHandlerFn(cliCtx)).Methods("POST")
 	// claim an HTLC
-	r.HandleFunc("/htlc/htlcs/{hash-lock}/claim", claimHTLCHandlerFn(cliCtx)).Methods("POST")
+	r.HandleFunc(fmt.Sprintf("/htlc/htlcs/{%s}/claim", RestHashLock), claimHTLCHandlerFn(cliCtx)).Methods("POST")
 	// refund an HTLC
-	r.HandleFunc("/htlc/htlcs/{hash-lock}/refund", refundHTLCHandlerFn(cliCtx)).Methods("POST")
+	r.HandleFunc(fmt.Sprintf("/htlc/htlcs/{%s}/refund", RestHashLock), refundHTLCHandlerFn(cliCtx)).Methods("POST")
 }
 
+// HTTP request handler to create HTLC.
 func createHTLCHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req CreateHTLCReq
@@ -43,10 +45,15 @@ func createHTLCHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 
 		// create the NewMsgCreateHTLC message
 		msg := types.NewMsgCreateHTLC(
-			req.Sender, req.To, req.ReceiverOnOtherChain, req.Amount,
-			hashLock, req.Timestamp, req.TimeLock)
-		err = msg.ValidateBasic()
-		if err != nil {
+			req.Sender,
+			req.To,
+			req.ReceiverOnOtherChain,
+			req.Amount,
+			hashLock,
+			req.Timestamp,
+			req.TimeLock,
+		)
+		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
@@ -55,11 +62,12 @@ func createHTLCHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	}
 }
 
+// HTTP request handler to claim HTLC.
 func claimHTLCHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 
-		hashLockStr := vars["hash-lock"]
+		hashLockStr := vars[RestHashLock]
 		hashLock, err := hex.DecodeString(hashLockStr)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -82,10 +90,8 @@ func claimHTLCHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
-		msg := types.NewMsgClaimHTLC(
-			req.Sender, hashLock, secret)
-		err = msg.ValidateBasic()
-		if err != nil {
+		msg := types.NewMsgClaimHTLC(req.Sender, hashLock, secret)
+		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
@@ -94,11 +100,12 @@ func claimHTLCHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	}
 }
 
+// HTTP request handler to refund HTLC.
 func refundHTLCHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 
-		hashLockStr := vars["hash-lock"]
+		hashLockStr := vars[RestHashLock]
 		hashLock, err := hex.DecodeString(hashLockStr)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -116,10 +123,8 @@ func refundHTLCHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		// create the NewMsgRefundHTLC message
-		msg := types.NewMsgRefundHTLC(
-			req.Sender, hashLock)
-		err = msg.ValidateBasic()
-		if err != nil {
+		msg := types.NewMsgRefundHTLC(req.Sender, hashLock)
+		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}

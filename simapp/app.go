@@ -339,8 +339,7 @@ func NewSimApp(
 	app.SetEndBlocker(app.EndBlocker)
 
 	if loadLatest {
-		err := app.LoadLatestVersion(app.keys[bam.MainStoreKey])
-		if err != nil {
+		if err := app.LoadLatestVersion(app.keys[bam.MainStoreKey]); err != nil {
 			cmn.Exit(err.Error())
 		}
 	}

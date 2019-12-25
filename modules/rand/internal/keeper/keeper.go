@@ -14,6 +14,7 @@ import (
 	"github.com/irisnet/irishub/modules/rand/internal/types"
 )
 
+// Keeper defines the rand module Keeper
 type Keeper struct {
 	storeKey sdk.StoreKey
 	cdc      *codec.Codec
@@ -22,6 +23,7 @@ type Keeper struct {
 	codespace sdk.CodespaceType
 }
 
+// NewKeeper returns a new rand keeper
 func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, codespace sdk.CodespaceType) Keeper {
 	return Keeper{
 		storeKey:  key,

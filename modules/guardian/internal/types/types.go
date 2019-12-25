@@ -5,19 +5,25 @@ import (
 	"fmt"
 	"strings"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/pkg/errors"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	"github.com/irisnet/irishub/modules/guardian/exported"
 )
 
+// Guardian represents a Guardian
 type Guardian struct {
-	Description string         `json:"description" yaml:"description"`
-	AccountType AccountType    `json:"type"  yaml:"account_type"`
-	Address     sdk.AccAddress `json:"address" yaml:"address"`    // this guardian's address
-	AddedBy     sdk.AccAddress `json:"added_by"  yaml:"added_by"` // address that initiated the AddGuardian tx
+	Description string         `json:"description" yaml:"description"` // description of guardian
+	AccountType AccountType    `json:"type"  yaml:"account_type"`      // account type of guardian
+	Address     sdk.AccAddress `json:"address" yaml:"address"`         // address of guardian
+	AddedBy     sdk.AccAddress `json:"added_by"  yaml:"added_by"`      // address that initiated the AddGuardian tx
 }
 
+// Profilers is a collection of Guardian
 type Profilers []Guardian
 
+// String implements string
 func (ps Profilers) String() (out string) {
 	if len(ps) == 0 {
 		return "[]"
@@ -33,6 +39,7 @@ func (ps Profilers) String() (out string) {
 	return strings.TrimSpace(out)
 }
 
+// Trustees is a collection of Guardian
 type Trustees []Guardian
 
 func (ts Trustees) String() (out string) {
@@ -50,6 +57,7 @@ func (ts Trustees) String() (out string) {
 	return strings.TrimSpace(out)
 }
 
+// NewGuardian constructs a Guardian
 func NewGuardian(description string, accountType AccountType, address, addedBy sdk.AccAddress) Guardian {
 	return Guardian{
 		Description: description,
@@ -59,6 +67,7 @@ func NewGuardian(description string, accountType AccountType, address, addedBy s
 	}
 }
 
+// Equal returns if the guardian is equal to specified guardian
 func (g Guardian) Equal(guardian Guardian) bool {
 	return g.Address.Equals(guardian.Address) &&
 		g.AddedBy.Equals(guardian.AddedBy) &&
@@ -66,14 +75,35 @@ func (g Guardian) Equal(guardian Guardian) bool {
 		g.AccountType == guardian.AccountType
 }
 
+// GetDescription returns Description of the guardian
+func (g Guardian) GetDescription() string {
+	return g.Description
+}
+
+// GetAccountType returns AccountType of the guardian
+func (g Guardian) GetAccountType() exported.AccountTypeI {
+	return g.AccountType
+}
+
+// GetAddress returns Address of the guardian
+func (g Guardian) GetAddress() sdk.AccAddress {
+	return g.Address
+}
+
+// GetAddedBy returns AddedBy of the guardian
+func (g Guardian) GetAddedBy() sdk.AccAddress {
+	return g.AddedBy
+}
+
+// AccountType represents the type of account
 type AccountType byte
 
 const (
-	Genesis  AccountType = 0x01
-	Ordinary AccountType = 0x02
+	Genesis  AccountType = 0x01 // account type of genesis
+	Ordinary AccountType = 0x02 // account type of ordinary
 )
 
-// String to AccountType byte, Returns ff if invalid.
+// AccountTypeFromString converts string to AccountType byte, Returns ff if invalid.
 func AccountTypeFromString(str string) (AccountType, error) {
 	switch str {
 	case "Genesis":
@@ -87,24 +117,20 @@ func AccountTypeFromString(str string) (AccountType, error) {
 
 // is defined AccountType?
 func validAccountType(bt AccountType) bool {
-	if bt == Genesis ||
-		bt == Ordinary {
-		return true
-	}
-	return false
+	return bt == Genesis || bt == Ordinary
 }
 
-// For Printf / Sprintf, returns bech32 when using %s
+// Format for Printf / Sprintf, returns bech32 when using %s
 func (bt AccountType) Format(s fmt.State, verb rune) {
 	switch verb {
 	case 's':
-		s.Write([]byte(fmt.Sprintf("%s", bt.String())))
+		_, _ = s.Write([]byte(fmt.Sprintf("%s", bt.String())))
 	default:
-		s.Write([]byte(fmt.Sprintf("%v", byte(bt))))
+		_, _ = s.Write([]byte(fmt.Sprintf("%v", byte(bt))))
 	}
 }
 
-// Turns BindingType byte to String
+// String converts BindingType byte to String
 func (bt AccountType) String() string {
 	switch bt {
 	case Genesis:
@@ -116,19 +142,17 @@ func (bt AccountType) String() string {
 	}
 }
 
-// Marshals to JSON using string
+// MarshalJSON marshals AccountType to JSON using string
 func (bt AccountType) MarshalJSON() ([]byte, error) {
 	return json.Marshal(bt.String())
 }
 
-// Unmarshals from JSON assuming Bech32 encoding
+// UnmarshalJSON unmarshals AccountType from JSON assuming Bech32 encoding
 func (bt *AccountType) UnmarshalJSON(data []byte) error {
 	var s string
-	err := json.Unmarshal(data, &s)
-	if err != nil {
+	if err := json.Unmarshal(data, &s); err != nil {
 		return nil
 	}
-
 	bz2, err := AccountTypeFromString(s)
 	if err != nil {
 		return err

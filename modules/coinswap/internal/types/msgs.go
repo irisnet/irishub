@@ -7,14 +7,18 @@ import (
 )
 
 var (
-	_ sdk.Msg = MsgSwapOrder{}
-	_ sdk.Msg = MsgAddLiquidity{}
-	_ sdk.Msg = MsgRemoveLiquidity{}
+	_ sdk.Msg = &MsgSwapOrder{}
+	_ sdk.Msg = &MsgAddLiquidity{}
+	_ sdk.Msg = &MsgRemoveLiquidity{}
 )
 
 const (
-	FormatUniABSPrefix = "uni:"
-	FormatUniDenom     = "uni:%s"
+	FormatUniABSPrefix = "uni:"   // format uni ABS Prefix
+	FormatUniDenom     = "uni:%s" // format uni denom
+
+	TypeMsgAddLiquidity    = "add_liquidity"    // type for MsgAddLiquidity
+	TypeMsgRemoveLiquidity = "remove_liquidity" // type for MsgRemoveLiquidity
+	TypeMsgSwapOrder       = "swap_order"       // type for MsgSwapOrder
 )
 
 /* --------------------------------------------------------------------------- */
@@ -26,16 +30,20 @@ const (
 // An exact coin has the senders desired buy or sell amount.
 // A calculated coin has the desired denomination and bounded amount
 // the sender is willing to buy or sell in this order.
+
+// Input defines the properties of order's input
 type Input struct {
-	Address sdk.AccAddress `json:"address" yaml:"address"`
-	Coin    sdk.Coin       `json:"coin" yaml:"coin"`
+	Address sdk.AccAddress `json:"address" yaml:"address"` // address of input
+	Coin    sdk.Coin       `json:"coin" yaml:"coin"`       // coins of input
 }
 
+// Output defines the properties of order's output
 type Output struct {
-	Address sdk.AccAddress `json:"address" yaml:"address"`
-	Coin    sdk.Coin       `json:"coin" yaml:"coin"`
+	Address sdk.AccAddress `json:"address" yaml:"address"` // address of output
+	Coin    sdk.Coin       `json:"coin" yaml:"coin"`       // coins of output
 }
 
+// MsgSwapOrder represents a msg for swap order
 type MsgSwapOrder struct {
 	Input      Input  `json:"input" yaml:"input"`               // the amount the sender is trading
 	Output     Output `json:"output" yaml:"output"`             // the amount the sender is receiving
@@ -45,7 +53,10 @@ type MsgSwapOrder struct {
 
 // NewMsgSwapOrder creates a new MsgSwapOrder object.
 func NewMsgSwapOrder(
-	input Input, output Output, deadline int64, isBuyOrder bool,
+	input Input,
+	output Output,
+	deadline int64,
+	isBuyOrder bool,
 ) MsgSwapOrder {
 	return MsgSwapOrder{
 		Input:      input,
@@ -55,13 +66,13 @@ func NewMsgSwapOrder(
 	}
 }
 
-// Route Implements Msg.
+// Route implements Msg.
 func (msg MsgSwapOrder) Route() string { return RouterKey }
 
-// Type Implements Msg.
-func (msg MsgSwapOrder) Type() string { return MsgTypeSwapOrder }
+// Type implements Msg.
+func (msg MsgSwapOrder) Type() string { return TypeMsgSwapOrder }
 
-// ValidateBasic Implements Msg.
+// ValidateBasic implements Msg.
 func (msg MsgSwapOrder) ValidateBasic() sdk.Error {
 	if !(msg.Input.Coin.IsValid() && msg.Input.Coin.IsPositive()) {
 		return sdk.ErrInvalidCoins("input coin is invalid: " + msg.Input.Coin.String())
@@ -87,12 +98,12 @@ func (msg MsgSwapOrder) ValidateBasic() sdk.Error {
 	return nil
 }
 
-// GetSignBytes Implements Msg.
+// GetSignBytes implements Msg.
 func (msg MsgSwapOrder) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
-// GetSigners Implements Msg.
+// GetSigners implements Msg.
 func (msg MsgSwapOrder) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Input.Address}
 }
@@ -106,14 +117,17 @@ type MsgAddLiquidity struct {
 	MaxToken         sdk.Coin       `json:"max_token" yaml:"max_token"`                   // coin to be deposited as liquidity with an upper bound for its amount
 	ExactStandardAmt sdk.Int        `json:"exact_standard_amt" yaml:"exact_standard_amt"` // exact amount of native asset being add to the liquidity pool
 	MinLiquidity     sdk.Int        `json:"min_liquidity" yaml:"min_liquidity"`           // lower bound UNI sender is willing to accept for deposited coins
-	Deadline         int64          `json:"deadline" yaml:"deadline"`
-	Sender           sdk.AccAddress `json:"sender" yaml:"sender"`
+	Deadline         int64          `json:"deadline" yaml:"deadline"`                     // deadline of tx
+	Sender           sdk.AccAddress `json:"sender" yaml:"sender"`                         // msg sender
 }
 
 // NewMsgAddLiquidity creates a new MsgAddLiquidity object.
 func NewMsgAddLiquidity(
-	maxToken sdk.Coin, exactStandardAmt, minLiquidity sdk.Int,
-	deadline int64, sender sdk.AccAddress,
+	maxToken sdk.Coin,
+	exactStandardAmt sdk.Int,
+	minLiquidity sdk.Int,
+	deadline int64,
+	sender sdk.AccAddress,
 ) MsgAddLiquidity {
 	return MsgAddLiquidity{
 		MaxToken:         maxToken,
@@ -124,13 +138,13 @@ func NewMsgAddLiquidity(
 	}
 }
 
-// Route Implements Msg.
+// Route implements Msg.
 func (msg MsgAddLiquidity) Route() string { return RouterKey }
 
-// Type Implements Msg.
-func (msg MsgAddLiquidity) Type() string { return MsgTypeAddLiquidity }
+// Type implements Msg.
+func (msg MsgAddLiquidity) Type() string { return TypeMsgAddLiquidity }
 
-// ValidateBasic Implements Msg.
+// ValidateBasic implements Msg.
 func (msg MsgAddLiquidity) ValidateBasic() sdk.Error {
 	if !(msg.MaxToken.IsValid() && msg.MaxToken.IsPositive()) {
 		return sdk.ErrInvalidCoins("max token is invalid: " + msg.MaxToken.String())
@@ -156,12 +170,12 @@ func (msg MsgAddLiquidity) ValidateBasic() sdk.Error {
 	return nil
 }
 
-// GetSignBytes Implements Msg.
+// GetSignBytes implements Msg.
 func (msg MsgAddLiquidity) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
-// GetSigners Implements Msg.
+// GetSigners implements Msg.
 func (msg MsgAddLiquidity) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Sender}
 }
@@ -175,16 +189,18 @@ type MsgRemoveLiquidity struct {
 	MinToken          sdk.Int        `json:"min_token" yaml:"min_token"`                   // coin to be withdrawn with a lower bound for its amount
 	WithdrawLiquidity sdk.Coin       `json:"withdraw_liquidity" yaml:"withdraw_liquidity"` // amount of UNI to be burned to withdraw liquidity from a reserve pool
 	MinStandardAmt    sdk.Int        `json:"min_standard_amt" yaml:"min_standard_amt"`     // minimum amount of the native asset the sender is willing to accept
-	Deadline          int64          `json:"deadline" yaml:"deadline"`
-	Sender            sdk.AccAddress `json:"sender" yaml:"sender"`
+	Deadline          int64          `json:"deadline" yaml:"deadline"`                     // deadline of tx
+	Sender            sdk.AccAddress `json:"sender" yaml:"sender"`                         // msg sender
 }
 
 // NewMsgRemoveLiquidity creates a new MsgRemoveLiquidity object
 func NewMsgRemoveLiquidity(
-	minToken sdk.Int, withdrawLiquidity sdk.Coin, minStandardAmt sdk.Int,
-	deadline int64, sender sdk.AccAddress,
+	minToken sdk.Int,
+	withdrawLiquidity sdk.Coin,
+	minStandardAmt sdk.Int,
+	deadline int64,
+	sender sdk.AccAddress,
 ) MsgRemoveLiquidity {
-
 	return MsgRemoveLiquidity{
 		MinToken:          minToken,
 		WithdrawLiquidity: withdrawLiquidity,
@@ -194,13 +210,13 @@ func NewMsgRemoveLiquidity(
 	}
 }
 
-// Route Implements Msg.
+// Route implements Msg.
 func (msg MsgRemoveLiquidity) Route() string { return RouterKey }
 
-// Type Implements Msg.
-func (msg MsgRemoveLiquidity) Type() string { return MsgTypeRemoveLiquidity }
+// Type implements Msg.
+func (msg MsgRemoveLiquidity) Type() string { return TypeMsgRemoveLiquidity }
 
-// ValidateBasic Implements Msg.
+// ValidateBasic implements Msg.
 func (msg MsgRemoveLiquidity) ValidateBasic() sdk.Error {
 	if msg.MinToken.IsNegative() {
 		return sdk.ErrInvalidCoins("minimum token amount can not be negative")
@@ -223,12 +239,12 @@ func (msg MsgRemoveLiquidity) ValidateBasic() sdk.Error {
 	return nil
 }
 
-// GetSignBytes Implements Msg.
+// GetSignBytes implements Msg.
 func (msg MsgRemoveLiquidity) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
-// GetSigners Implements Msg.
+// GetSigners implements Msg.
 func (msg MsgRemoveLiquidity) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Sender}
 }

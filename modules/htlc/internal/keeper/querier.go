@@ -25,8 +25,7 @@ func NewQuerier(k Keeper) sdk.Querier {
 
 func queryHTLC(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
 	var params types.QueryHTLCParams
-	err := keeper.cdc.UnmarshalJSON(req.Data, &params)
-	if err != nil {
+	if err := keeper.cdc.UnmarshalJSON(req.Data, &params); err != nil {
 		return nil, sdk.ErrUnknownRequest(sdk.AppendMsgToErr("incorrectly formatted request data", err.Error()))
 	}
 
@@ -34,14 +33,14 @@ func queryHTLC(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, s
 		return nil, types.ErrInvalidHashLock(types.DefaultCodespace, fmt.Sprintf("the hash lock must be %d bytes long", types.HashLockLength))
 	}
 
-	htlc, err2 := keeper.GetHTLC(ctx, params.HashLock)
-	if err2 != nil {
-		return nil, err2
+	htlc, err := keeper.GetHTLC(ctx, params.HashLock)
+	if err != nil {
+		return nil, err
 	}
 
-	bz, err := codec.MarshalJSONIndent(keeper.cdc, htlc)
-	if err != nil {
-		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", err.Error()))
+	bz, errRes := codec.MarshalJSONIndent(keeper.cdc, htlc)
+	if errRes != nil {
+		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", errRes.Error()))
 	}
 
 	return bz, nil

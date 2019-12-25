@@ -7,35 +7,36 @@ import (
 	"github.com/irisnet/irishub/utils/protoidl"
 )
 
+// AddServiceDefinition
 func (k Keeper) AddServiceDefinition(
 	ctx sdk.Context,
 	name,
-	chainId,
+	chainID,
 	description string,
 	tags []string,
 	author sdk.AccAddress,
 	authorDescription,
 	idlContent string,
 ) sdk.Error {
-	_, found := k.GetServiceDefinition(ctx, chainId, name)
-	if found {
-		return types.ErrSvcDefExists(k.codespace, chainId, name)
+	if _, found := k.GetServiceDefinition(ctx, chainID, name); found {
+		return types.ErrSvcDefExists(k.codespace, chainID, name)
 	}
 
-	svcDef := types.NewSvcDef(name, chainId, description, tags, author, authorDescription, idlContent)
+	svcDef := types.NewSvcDef(name, chainID, description, tags, author, authorDescription, idlContent)
 	k.SetServiceDefinition(ctx, svcDef)
 
 	return k.AddMethods(ctx, svcDef)
 }
 
+// SetServiceDefinition
 func (k Keeper) SetServiceDefinition(ctx sdk.Context, svcDef types.SvcDef) {
 	store := ctx.KVStore(k.storeKey)
 
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(svcDef)
-	store.Set(types.GetServiceDefinitionKey(svcDef.ChainId, svcDef.Name), bz)
+	store.Set(types.GetServiceDefinitionKey(svcDef.ChainID, svcDef.Name), bz)
 }
 
-// TODO
+// AddMethods
 func (k Keeper) AddMethods(ctx sdk.Context, svcDef types.SvcDef) sdk.Error {
 	methods, err := protoidl.GetMethods(svcDef.IDLContent)
 	if err != nil {
@@ -48,23 +49,25 @@ func (k Keeper) AddMethods(ctx sdk.Context, svcDef types.SvcDef) sdk.Error {
 			return err
 		}
 
-		k.SetMethod(ctx, svcDef.ChainId, svcDef.Name, methodProperty)
+		k.SetMethod(ctx, svcDef.ChainID, svcDef.Name, methodProperty)
 	}
 
 	return nil
 }
 
-func (k Keeper) SetMethod(ctx sdk.Context, chainId, svcName string, method types.MethodProperty) {
+// SetMethod
+func (k Keeper) SetMethod(ctx sdk.Context, chainID, svcName string, method types.MethodProperty) {
 	store := ctx.KVStore(k.storeKey)
 
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(method)
-	store.Set(types.GetMethodPropertyKey(chainId, svcName, method.ID), bz)
+	store.Set(types.GetMethodPropertyKey(chainID, svcName, method.ID), bz)
 }
 
-func (k Keeper) GetServiceDefinition(ctx sdk.Context, chainId, name string) (svcDef types.SvcDef, found bool) {
+// GetServiceDefinition
+func (k Keeper) GetServiceDefinition(ctx sdk.Context, chainID, name string) (svcDef types.SvcDef, found bool) {
 	store := ctx.KVStore(k.storeKey)
 
-	bz := store.Get(types.GetServiceDefinitionKey(chainId, name))
+	bz := store.Get(types.GetServiceDefinitionKey(chainID, name))
 	if bz == nil {
 		return svcDef, false
 	}
@@ -73,11 +76,11 @@ func (k Keeper) GetServiceDefinition(ctx sdk.Context, chainId, name string) (svc
 	return svcDef, true
 }
 
-// Gets the method in a specific service and methodID
-func (k Keeper) GetMethod(ctx sdk.Context, chainId, svcName string, id int16) (method types.MethodProperty, found bool) {
+// GetMethod gets the method in a specific service and methodID
+func (k Keeper) GetMethod(ctx sdk.Context, chainID, svcName string, id int16) (method types.MethodProperty, found bool) {
 	store := ctx.KVStore(k.storeKey)
 
-	bz := store.Get(types.GetMethodPropertyKey(chainId, svcName, id))
+	bz := store.Get(types.GetMethodPropertyKey(chainID, svcName, id))
 	if bz == nil {
 		return method, false
 	}
@@ -86,8 +89,8 @@ func (k Keeper) GetMethod(ctx sdk.Context, chainId, svcName string, id int16) (m
 	return method, true
 }
 
-// Gets all the methods in a specific service
-func (k Keeper) GetMethods(ctx sdk.Context, chainId, svcName string) sdk.Iterator {
+// GetMethods gets all the methods in a specific service
+func (k Keeper) GetMethods(ctx sdk.Context, chainID, svcName string) sdk.Iterator {
 	store := ctx.KVStore(k.storeKey)
-	return sdk.KVStorePrefixIterator(store, types.GetMethodsSubspaceKey(chainId, svcName))
+	return sdk.KVStorePrefixIterator(store, types.GetMethodsSubspaceKey(chainID, svcName))
 }

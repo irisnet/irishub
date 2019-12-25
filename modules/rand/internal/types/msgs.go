@@ -5,11 +5,9 @@ import (
 )
 
 const (
-	// TypeMsgRequestRand represents the type of MsgRequestRand
-	TypeMsgRequestRand = "request_rand"
+	TypeMsgRequestRand = "request_rand" // type for MsgRequestRand
 
-	// DefaultBlockInterval is the default block interval
-	DefaultBlockInterval = uint64(10)
+	DefaultBlockInterval = uint64(10) // DefaultBlockInterval is the default block interval
 )
 
 var _ sdk.Msg = &MsgRequestRand{}
@@ -28,32 +26,30 @@ func NewMsgRequestRand(consumer sdk.AccAddress, blockInterval uint64) MsgRequest
 	}
 }
 
-// Route implements Msg
+// Route implements Msg.
 func (msg MsgRequestRand) Route() string { return RouterKey }
 
-// Type implements Msg
+// Type implements Msg.
 func (msg MsgRequestRand) Type() string { return TypeMsgRequestRand }
 
-// ValidateBasic implements Msg
+// ValidateBasic implements Msg.
 func (msg MsgRequestRand) ValidateBasic() sdk.Error {
 	if len(msg.Consumer) == 0 {
 		return ErrInvalidConsumer(DefaultCodespace, "the consumer address must be specified")
 	}
-
 	return nil
 }
 
-// GetSignBytes implements Msg
+// GetSignBytes implements Msg.
 func (msg MsgRequestRand) GetSignBytes() []byte {
 	b, err := ModuleCdc.MarshalJSON(msg)
 	if err != nil {
 		panic(err)
 	}
-
 	return sdk.MustSortJSON(b)
 }
 
-// GetSigners implements Msg
+// GetSigners implements Msg.
 func (msg MsgRequestRand) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Consumer}
 }

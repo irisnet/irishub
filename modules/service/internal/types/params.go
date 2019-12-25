@@ -36,7 +36,8 @@ var (
 	MaxTxSizeLimit          = uint64(6000)
 )
 
-// nolint - Keys for parameter access
+// Keys for parameter access
+// nolint
 var (
 	KeyMaxRequestTimeout    = []byte("MaxRequestTimeout")
 	KeyMinDepositMultiple   = []byte("MinDepositMultiple")
@@ -75,7 +76,7 @@ func NewParams(maxRequestTimeout, minDepositMultiple int64, serviceFeeTax, slash
 	}
 }
 
-// Implements params.ParamSet
+// ParamSetPairs implements params.ParamSet
 func (p *Params) ParamSetPairs() params.ParamSetPairs {
 	return params.ParamSetPairs{
 		{Key: KeyMaxRequestTimeout, Value: &p.MaxRequestTimeout},
@@ -129,26 +130,17 @@ func MustUnmarshalParams(cdc *codec.Codec, value []byte) Params {
 	if err != nil {
 		panic(err)
 	}
-
 	return params
 }
 
 // UnmarshalParams unmarshals the current service params value from store key
 func UnmarshalParams(cdc *codec.Codec, value []byte) (params Params, err error) {
 	err = cdc.UnmarshalBinaryLengthPrefixed(value, &params)
-	if err != nil {
-		return
-	}
-
 	return
 }
 
 // Validate validates a set of params
 func (p Params) Validate() error {
-	return validateParams(p)
-}
-
-func validateParams(p Params) error {
 	if err := validateMaxRequestTimeout(p.MaxRequestTimeout); err != nil {
 		return err
 	}
@@ -167,17 +159,13 @@ func validateParams(p Params) error {
 	if err := validateArbitrationTimeLimit(p.ArbitrationTimeLimit); err != nil {
 		return err
 	}
-	if err := validateTxSizeLimit(p.TxSizeLimit); err != nil {
-		return err
-	}
-	return nil
+	return validateTxSizeLimit(p.TxSizeLimit)
 }
 
 func validateMaxRequestTimeout(v int64) error {
 	if v < MinRequestTimeout {
 		return fmt.Errorf("MaxRequestTimeout [%d] should be greater than or equal to %d", v, MinRequestTimeout)
 	}
-
 	return nil
 }
 
@@ -185,7 +173,6 @@ func validateMinDepositMultiple(v int64) error {
 	if v < MinDepositMultiple || v > MaxDepositMultiple {
 		return fmt.Errorf("MinDepositMultiple [%d] should be between [%d, %d]", v, MinDepositMultiple, MaxDepositMultiple)
 	}
-
 	return nil
 }
 
@@ -200,7 +187,6 @@ func validateServiceFeeTax(v sdk.Dec) error {
 	if v.LTE(sdk.ZeroDec()) || v.GT(MaxServiceFeeTax) {
 		return fmt.Errorf("ServiceFeeTax [%s] should be between (0, %s]", v, MaxServiceFeeTax)
 	}
-
 	return nil
 }
 
@@ -208,7 +194,6 @@ func validateComplaintRetrospect(v time.Duration) error {
 	if v < MinComplaintRetrospect || v > MaxComplaintRetrospect {
 		return fmt.Errorf("ComplaintRetrospect [%s] should be between [%s, %s]", v, MinComplaintRetrospect, MaxComplaintRetrospect)
 	}
-
 	return nil
 }
 
@@ -216,7 +201,6 @@ func validateArbitrationTimeLimit(v time.Duration) error {
 	if v < MinArbitrationTimeLimit || v > MaxArbitrationTimeLimit {
 		return fmt.Errorf("ArbitrationTimeLimit [%s] should be between [%s, %s]", v, MinArbitrationTimeLimit, MaxArbitrationTimeLimit)
 	}
-
 	return nil
 }
 
@@ -224,6 +208,5 @@ func validateTxSizeLimit(v uint64) error {
 	if v < MinTxSizeLimit || v > MaxTxSizeLimit {
 		return fmt.Errorf("TxSizeLimit [%d] should be between [%d, %d]", v, MinTxSizeLimit, MaxTxSizeLimit)
 	}
-
 	return nil
 }

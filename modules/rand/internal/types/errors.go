@@ -14,17 +14,17 @@ const (
 	CodeInvalidHeight   sdk.CodeType = 102
 )
 
-//----------------------------------------
-// Rand error constructors
-
+// ErrInvalidConsumer error for invalid consumer
 func ErrInvalidConsumer(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidConsumer, msg)
 }
 
+// ErrInvalidReqID error for invalid request id
 func ErrInvalidReqID(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidReqID, msg)
 }
 
+// ErrInvalidHeight error for invalid height
 func ErrInvalidHeight(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidHeight, msg)
 }

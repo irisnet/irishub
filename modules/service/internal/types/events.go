@@ -1,6 +1,7 @@
+// nolint
 package types
 
-// Service module event types
+// service module event types
 const (
 	EventTypeRequestSvc     = "request_service"
 	EventTypeRespondSvc     = "respond_service"
@@ -12,5 +13,5 @@ const (
 	AttributeKeyServiceFee = "service_fee"
 	AttributeKeySlashCoins = "service_slash_coins"
 
-	AttributeValueCategory = "service"
+	AttributeValueCategory = ModuleName
 )

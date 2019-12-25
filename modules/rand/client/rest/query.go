@@ -10,21 +10,22 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/types/rest"
 
-	clienttypes "github.com/irisnet/irishub/modules/rand/client/types"
 	"github.com/irisnet/irishub/modules/rand/internal/types"
 )
 
 func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router) {
+	// query rand by the request id
 	r.HandleFunc(fmt.Sprintf("/rand/rands/{%s}", RestRequestID), queryRandHandlerFn(cliCtx)).Methods("GET")
+	// query rand request queue by an optional heigth
 	r.HandleFunc("/rand/queue", queryQueueHandlerFn(cliCtx)).Methods("GET")
 }
 
-// queryRandHandlerFn performs rand query by the request id
+// HTTP request handler to query rand by the request id.
 func queryRandHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 
-		reqID := vars["request-id"]
+		reqID := vars[RestRequestID]
 		if err := types.CheckReqID(reqID); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -53,13 +54,12 @@ func queryRandHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		var rawRand types.Rand
-		err = cliCtx.Codec.UnmarshalJSON(res, &rawRand)
-		if err != nil {
+		if err := cliCtx.Codec.UnmarshalJSON(res, &rawRand); err != nil {
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
 
-		readableRand := clienttypes.ReadableRand{
+		readableRand := types.ReadableRand{
 			RequestTxHash: hex.EncodeToString(rawRand.RequestTxHash),
 			Height:        rawRand.Height,
 			Value:         rawRand.Value,
@@ -71,7 +71,7 @@ func queryRandHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	}
 }
 
-// queryQueueHandlerFn performs rand request queue query by an optional heigth
+// HTTP request handler to query request queue by an optional heigth.
 func queryQueueHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		genHeightStr := r.FormValue("gen-height")

@@ -5,6 +5,8 @@ import (
 	"encoding/hex"
 	"fmt"
 
+	"github.com/tendermint/tendermint/libs/log"
+
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -21,6 +23,7 @@ type Keeper struct {
 	codespace sdk.CodespaceType
 }
 
+// NewKeeper returns a new HTLC keeper
 func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, sk types.SupplyKeeper, codespace sdk.CodespaceType) Keeper {
 	// ensure htlc module account is set
 	if addr := sk.GetModuleAddress(types.ModuleName); addr == nil {
@@ -33,6 +36,11 @@ func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, sk types.SupplyKeeper, codesp
 		sk:        sk,
 		codespace: codespace,
 	}
+}
+
+// Logger returns a module-specific logger.
+func (k Keeper) Logger(ctx sdk.Context) log.Logger {
+	return ctx.Logger().With("module", fmt.Sprintf("%s", types.ModuleName))
 }
 
 // Codespace returns the codespace
@@ -67,26 +75,26 @@ func (k Keeper) CreateHTLC(ctx sdk.Context, htlc types.HTLC, hashLock types.HTLC
 }
 
 // ClaimHTLC claim an HTLC
-func (k Keeper) ClaimHTLC(ctx sdk.Context, hashLock types.HTLCHashLock, secret types.HTLCSecret) (string, sdk.Error) {
+func (k Keeper) ClaimHTLC(ctx sdk.Context, hashLock types.HTLCHashLock, secret types.HTLCSecret) (string, string, sdk.Error) {
 	// get the HTLC
 	htlc, err := k.GetHTLC(ctx, hashLock)
 	if err != nil {
-		return "", err
+		return "", "", types.ErrHTLCNotExists(k.codespace, fmt.Sprintf("the HTLC is not exists"))
 	}
 
 	// check if the HTLC is open
 	if htlc.State != types.OPEN {
-		return "", types.ErrStateIsNotOpen(k.codespace, fmt.Sprintf("the HTLC is not open"))
+		return "", "", types.ErrStateIsNotOpen(k.codespace, fmt.Sprintf("the HTLC is not open"))
 	}
 
 	// check if the secret matches with the hash lock
 	if !bytes.Equal(types.GetHashLock(secret, htlc.Timestamp), hashLock) {
-		return "", types.ErrInvalidSecret(k.codespace, fmt.Sprintf("invalid secret: %s", hex.EncodeToString(secret)))
+		return "", "", types.ErrInvalidSecret(k.codespace, fmt.Sprintf("invalid secret: %s", hex.EncodeToString(secret)))
 	}
 
 	// do the claim
 	if err := k.sk.SendCoinsFromModuleToAccount(ctx, types.ModuleName, htlc.To, htlc.Amount); err != nil {
-		return "", err
+		return "", "", err
 	}
 
 	// update the secret and state in HTLC
@@ -97,7 +105,7 @@ func (k Keeper) ClaimHTLC(ctx sdk.Context, hashLock types.HTLCHashLock, secret t
 	// delete from the expiration queue
 	k.DeleteHTLCFromExpireQueue(ctx, htlc.ExpireHeight, hashLock)
 
-	return htlc.To.String(), nil
+	return htlc.Sender.String(), htlc.To.String(), nil
 }
 
 // RefundHTLC refund an HTLC

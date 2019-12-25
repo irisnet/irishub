@@ -9,6 +9,11 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/spf13/viper"
+	"github.com/stretchr/testify/require"
+
+	ctypes "github.com/tendermint/tendermint/rpc/core/types"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	clientkeys "github.com/cosmos/cosmos-sdk/client/keys"
 	"github.com/cosmos/cosmos-sdk/client/rpc"
@@ -31,26 +36,18 @@ import (
 	slashingrest "github.com/cosmos/cosmos-sdk/x/slashing/client/rest"
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	stakingrest "github.com/cosmos/cosmos-sdk/x/staking/client/rest"
-
-	"github.com/spf13/viper"
-	"github.com/stretchr/testify/require"
-	ctypes "github.com/tendermint/tendermint/rpc/core/types"
 )
 
 // Request makes a test LCD test request. It returns a response object and a
 // stringified response body.
 func Request(t *testing.T, port, method, path string, payload []byte) (*http.Response, string) {
-	var (
-		err error
-		res *http.Response
-	)
 	url := fmt.Sprintf("http://localhost:%v%v", port, path)
 	fmt.Printf("REQUEST %s %s\n", method, url)
 
 	req, err := http.NewRequest(method, url, bytes.NewBuffer(payload))
 	require.Nil(t, err)
 
-	res, err = http.DefaultClient.Do(req)
+	res, err := http.DefaultClient.Do(req)
 	require.Nil(t, err)
 
 	output, err := ioutil.ReadAll(res.Body)
@@ -884,12 +881,11 @@ func getProposalsFilterStatus(t *testing.T, port string, status gov.ProposalStat
 	return proposals
 }
 
-// POST /gov/proposals/{proposalId}/deposits Deposit tokens to a proposal
+// POST /gov/proposals/{proposal-id}/deposits Deposit tokens to a proposal
 func doDeposit(
 	t *testing.T, port, seed, name, pwd string, proposerAddr sdk.AccAddress,
 	proposalID uint64, amount sdk.Int, fees sdk.Coins,
 ) sdk.TxResponse {
-
 	acc := getAccount(t, port, proposerAddr)
 	accnum := acc.GetAccountNumber()
 	sequence := acc.GetSequence()
@@ -919,7 +915,7 @@ func doDeposit(
 	return txResp
 }
 
-// GET /gov/proposals/{proposalId}/deposits Query deposits
+// GET /gov/proposals/{proposal-id}/deposits Query deposits
 func getDeposits(t *testing.T, port string, proposalID uint64) []gov.Deposit {
 	res, body := Request(t, port, "GET", fmt.Sprintf("/gov/proposals/%d/deposits", proposalID), nil)
 	require.Equal(t, http.StatusOK, res.StatusCode, body)
@@ -929,7 +925,7 @@ func getDeposits(t *testing.T, port string, proposalID uint64) []gov.Deposit {
 	return deposits
 }
 
-// GET /gov/proposals/{proposalId}/tally Get a proposal's tally result at the current time
+// GET /gov/proposals/{proposal-id}/tally Get a proposal's tally result at the current time
 func getTally(t *testing.T, port string, proposalID uint64) gov.TallyResult {
 	res, body := Request(t, port, "GET", fmt.Sprintf("/gov/proposals/%d/tally", proposalID), nil)
 	require.Equal(t, http.StatusOK, res.StatusCode, body)
@@ -941,7 +937,7 @@ func getTally(t *testing.T, port string, proposalID uint64) gov.TallyResult {
 	return tally
 }
 
-// POST /gov/proposals/{proposalId}/votes Vote a proposal
+// POST /gov/proposals/{proposal-id}/votes Vote a proposal
 func doVote(
 	t *testing.T, port, seed, name, pwd string, proposerAddr sdk.AccAddress,
 	proposalID uint64, option string, fees sdk.Coins,
@@ -977,7 +973,7 @@ func doVote(
 	return txResp
 }
 
-// GET /gov/proposals/{proposalId}/votes Query voters
+// GET /gov/proposals/{proposal-id}/votes Query voters
 func getVotes(t *testing.T, port string, proposalID uint64) []gov.Vote {
 	res, body := Request(t, port, "GET", fmt.Sprintf("/gov/proposals/%d/votes", proposalID), nil)
 	require.Equal(t, http.StatusOK, res.StatusCode, body)
@@ -987,7 +983,7 @@ func getVotes(t *testing.T, port string, proposalID uint64) []gov.Vote {
 	return votes
 }
 
-// GET /gov/proposals/{proposalId} Query a proposal
+// GET /gov/proposals/{proposal-id} Query a proposal
 func getProposal(t *testing.T, port string, proposalID uint64) gov.Proposal {
 	res, body := Request(t, port, "GET", fmt.Sprintf("/gov/proposals/%d", proposalID), nil)
 	require.Equal(t, http.StatusOK, res.StatusCode, body)
@@ -999,7 +995,7 @@ func getProposal(t *testing.T, port string, proposalID uint64) gov.Proposal {
 	return proposal
 }
 
-// GET /gov/proposals/{proposalId}/deposits/{depositor} Query deposit
+// GET /gov/proposals/{proposal-id}/deposits/{depositor} Query deposit
 func getDeposit(t *testing.T, port string, proposalID uint64, depositorAddr sdk.AccAddress) gov.Deposit {
 	res, body := Request(t, port, "GET", fmt.Sprintf("/gov/proposals/%d/deposits/%s", proposalID, depositorAddr), nil)
 	require.Equal(t, http.StatusOK, res.StatusCode, body)
@@ -1011,7 +1007,7 @@ func getDeposit(t *testing.T, port string, proposalID uint64, depositorAddr sdk.
 	return deposit
 }
 
-// GET /gov/proposals/{proposalId}/votes/{voter} Query vote
+// GET /gov/proposals/{proposal-id}/votes/{voter} Query vote
 func getVote(t *testing.T, port string, proposalID uint64, voterAddr sdk.AccAddress) gov.Vote {
 	res, body := Request(t, port, "GET", fmt.Sprintf("/gov/proposals/%d/votes/%s", proposalID, voterAddr), nil)
 	require.Equal(t, http.StatusOK, res.StatusCode, body)
@@ -1023,7 +1019,7 @@ func getVote(t *testing.T, port string, proposalID uint64, voterAddr sdk.AccAddr
 	return vote
 }
 
-// GET /gov/proposals/{proposalId}/proposer
+// GET /gov/proposals/{proposal-id}/proposer
 func getProposer(t *testing.T, port string, proposalID uint64) gcutils.Proposer {
 	res, body := Request(t, port, "GET", fmt.Sprintf("/gov/proposals/%d/proposer", proposalID), nil)
 	require.Equal(t, http.StatusOK, res.StatusCode, body)

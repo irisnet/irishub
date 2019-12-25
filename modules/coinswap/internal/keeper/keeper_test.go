@@ -7,11 +7,11 @@ import (
 
 	"github.com/stretchr/testify/suite"
 
-	"github.com/cosmos/cosmos-sdk/codec"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 
-	"github.com/irisnet/irishub/modules/coinswap/internal/keeper"
+	"github.com/cosmos/cosmos-sdk/codec"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+
 	"github.com/irisnet/irishub/modules/coinswap/internal/types"
 	"github.com/irisnet/irishub/simapp"
 )
@@ -24,8 +24,13 @@ const (
 	unidenomETH   = types.FormatUniABSPrefix + "eth"
 )
 
+var (
+	addrSender1 sdk.AccAddress
+	addrSender2 sdk.AccAddress
+)
+
 // test that the params can be properly set and retrieved
-type KeeperTestSuite struct {
+type TestSuite struct {
 	suite.Suite
 
 	cdc *codec.Codec
@@ -33,7 +38,7 @@ type KeeperTestSuite struct {
 	app *simapp.SimApp
 }
 
-func (suite *KeeperTestSuite) SetupTest() {
+func (suite *TestSuite) SetupTest() {
 	app := simapp.Setup(false)
 
 	suite.cdc = app.Codec()
@@ -42,10 +47,10 @@ func (suite *KeeperTestSuite) SetupTest() {
 }
 
 func TestKeeperTestSuite(t *testing.T) {
-	suite.Run(t, new(KeeperTestSuite))
+	suite.Run(t, new(TestSuite))
 }
 
-func (suite *KeeperTestSuite) TestParams() {
+func (suite *TestSuite) TestParams() {
 	cases := []struct {
 		params types.Params
 	}{
@@ -60,57 +65,114 @@ func (suite *KeeperTestSuite) TestParams() {
 	}
 }
 
-func (suite *KeeperTestSuite) TestKeeper_UpdateLiquidity() {
-	amountInit, _ := sdk.NewIntFromString("10000000000000000000")
+func initVars(suite *TestSuite) {
+	amountInitStandard, _ := sdk.NewIntFromString("30000000000000000000")
+	amountInitBTC, _ := sdk.NewIntFromString("3000000000")
 
-	addrSender := sdk.AccAddress([]byte("addrSender"))
-	_ = suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, addrSender)
+	addrSender1 = sdk.AccAddress([]byte("addrSender1"))
+	addrSender2 = sdk.AccAddress([]byte("addrSender2"))
+	_ = suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, addrSender1)
+	_ = suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, addrSender2)
 	_ = suite.app.BankKeeper.SetCoins(
 		suite.ctx,
-		addrSender,
+		addrSender1,
 		sdk.NewCoins(
-			sdk.NewCoin(denomStandard, amountInit),
-			sdk.NewCoin(denomBTC, amountInit),
+			sdk.NewCoin(denomStandard, amountInitStandard),
+			sdk.NewCoin(denomBTC, amountInitBTC),
 		),
 	)
+	_ = suite.app.BankKeeper.SetCoins(
+		suite.ctx,
+		addrSender2,
+		sdk.NewCoins(
+			sdk.NewCoin(denomStandard, amountInitStandard),
+			sdk.NewCoin(denomBTC, amountInitBTC),
+		),
+	)
+}
 
+func (suite *TestSuite) TestLiquidity() {
+	initVars(suite)
+
+	// test add liquidity (poor not exist)
 	uniDenom, _ := types.GetUniDenomFromDenoms(denomBTC, denomStandard)
 	suite.Equal(uniDenom, unidenomBTC)
-	poolAddr := keeper.GetReservePoolAddr(uniDenom)
-
-	btcAmt, _ := sdk.NewIntFromString("1")
-	depositCoin := sdk.NewCoin(denomBTC, btcAmt)
-
+	poolAddr := types.GetReservePoolAddr(uniDenom)
+	btcAmt, _ := sdk.NewIntFromString("100")
 	standardAmt, _ := sdk.NewIntFromString("10000000000000000000")
+	depositCoin := sdk.NewCoin(denomBTC, btcAmt)
 	minReward := sdk.NewInt(1)
 	deadline := time.Now().Add(1 * time.Minute)
-	msg := types.NewMsgAddLiquidity(depositCoin, standardAmt, minReward, deadline.Unix(), addrSender)
 
+	msg := types.NewMsgAddLiquidity(depositCoin, standardAmt, minReward, deadline.Unix(), addrSender1)
 	err := suite.app.CoinswapKeeper.AddLiquidity(suite.ctx, msg)
 	suite.Nil(err)
 
-	reservePoolBalances := suite.app.AccountKeeper.GetAccount(suite.ctx, poolAddr).GetCoins()
 	moduleAccountBalances := suite.app.SupplyKeeper.GetSupply(suite.ctx).GetTotal()
-	suite.Equal(fmt.Sprintf("1%s,10000000000000000000%s", denomBTC, denomStandard), reservePoolBalances.String())
+	reservePoolBalances := suite.app.AccountKeeper.GetAccount(suite.ctx, poolAddr).GetCoins()
+	sender1Blances := suite.app.AccountKeeper.GetAccount(suite.ctx, addrSender1).GetCoins()
 	suite.Equal("10000000000000000000", moduleAccountBalances.AmountOf(unidenomBTC).String())
+	suite.Equal(fmt.Sprintf("100%s,10000000000000000000%s", denomBTC, denomStandard), reservePoolBalances.String())
+	suite.Equal(fmt.Sprintf("2999999900%s,20000000000000000000%s,10000000000000000000%s", denomBTC, denomStandard, unidenomBTC), sender1Blances.String())
 
-	senderBlances := suite.app.AccountKeeper.GetAccount(suite.ctx, addrSender).GetCoins()
-	suite.Equal(fmt.Sprintf("9999999999999999999%s,10000000000000000000%s", denomBTC, unidenomBTC), senderBlances.String())
+	// test add liquidity (poor exist)
+	uniDenom, _ = types.GetUniDenomFromDenoms(denomBTC, denomStandard)
+	suite.Equal(uniDenom, unidenomBTC)
+	poolAddr = types.GetReservePoolAddr(uniDenom)
+	btcAmt, _ = sdk.NewIntFromString("201")
+	standardAmt, _ = sdk.NewIntFromString("20000000000000000000")
+	depositCoin = sdk.NewCoin(denomBTC, btcAmt)
+	minReward = sdk.NewInt(1)
+	deadline = time.Now().Add(1 * time.Minute)
 
+	msg = types.NewMsgAddLiquidity(depositCoin, standardAmt, minReward, deadline.Unix(), addrSender2)
+	err = suite.app.CoinswapKeeper.AddLiquidity(suite.ctx, msg)
+	suite.Nil(err)
+
+	moduleAccountBalances = suite.app.SupplyKeeper.GetSupply(suite.ctx).GetTotal()
+	reservePoolBalances = suite.app.AccountKeeper.GetAccount(suite.ctx, poolAddr).GetCoins()
+	sender2Blances := suite.app.AccountKeeper.GetAccount(suite.ctx, addrSender2).GetCoins()
+	suite.Equal("30000000000000000000", moduleAccountBalances.AmountOf(unidenomBTC).String())
+	suite.Equal(fmt.Sprintf("301%s,30000000000000000000%s", denomBTC, denomStandard), reservePoolBalances.String())
+	suite.Equal(fmt.Sprintf("2999999799%s,10000000000000000000%s,20000000000000000000%s", denomBTC, denomStandard, unidenomBTC), sender2Blances.String())
+
+	// Test remove liquidity (remove part)
 	withdraw, _ := sdk.NewIntFromString("10000000000000000000")
 	msgRemove := types.NewMsgRemoveLiquidity(
 		sdk.NewInt(1),
 		sdk.NewCoin(unidenomBTC, withdraw),
 		sdk.NewInt(1),
 		suite.ctx.BlockHeader().Time.Unix(),
-		addrSender,
+		addrSender1,
 	)
 
 	err = suite.app.CoinswapKeeper.RemoveLiquidity(suite.ctx, msgRemove)
 	suite.Nil(err)
 
-	poolAccout := suite.app.AccountKeeper.GetAccount(suite.ctx, poolAddr)
-	acc := suite.app.AccountKeeper.GetAccount(suite.ctx, addrSender)
-	suite.Equal("", poolAccout.GetCoins().String())
-	suite.Equal(fmt.Sprintf("10000000000000000000%s,10000000000000000000%s", denomBTC, denomStandard), acc.GetCoins().String())
+	moduleAccountBalances = suite.app.SupplyKeeper.GetSupply(suite.ctx).GetTotal()
+	reservePoolBalances = suite.app.AccountKeeper.GetAccount(suite.ctx, poolAddr).GetCoins()
+	sender1Blances = suite.app.AccountKeeper.GetAccount(suite.ctx, addrSender1).GetCoins()
+	suite.Equal("20000000000000000000", moduleAccountBalances.AmountOf(unidenomBTC).String())
+	suite.Equal(fmt.Sprintf("3000000000%s,30000000000000000000%s", denomBTC, denomStandard), sender1Blances.String())
+	suite.Equal(fmt.Sprintf("201%s,20000000000000000000%s", denomBTC, denomStandard), reservePoolBalances.String())
+
+	// Test remove liquidity (remove all)
+	withdraw, _ = sdk.NewIntFromString("20000000000000000000")
+	msgRemove = types.NewMsgRemoveLiquidity(
+		sdk.NewInt(1),
+		sdk.NewCoin(unidenomBTC, withdraw),
+		sdk.NewInt(1),
+		suite.ctx.BlockHeader().Time.Unix(),
+		addrSender2,
+	)
+
+	err = suite.app.CoinswapKeeper.RemoveLiquidity(suite.ctx, msgRemove)
+	suite.Nil(err)
+
+	moduleAccountBalances = suite.app.SupplyKeeper.GetSupply(suite.ctx).GetTotal()
+	reservePoolBalances = suite.app.AccountKeeper.GetAccount(suite.ctx, poolAddr).GetCoins()
+	sender1Blances = suite.app.AccountKeeper.GetAccount(suite.ctx, addrSender1).GetCoins()
+	suite.Equal("0", moduleAccountBalances.AmountOf(unidenomBTC).String())
+	suite.Equal(fmt.Sprintf("3000000000%s,30000000000000000000%s", denomBTC, denomStandard), sender1Blances.String())
+	suite.Equal("", reservePoolBalances.String())
 }

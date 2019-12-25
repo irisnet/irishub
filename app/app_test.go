@@ -4,19 +4,21 @@ import (
 	"os"
 	"testing"
 
-	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/stretchr/testify/require"
+
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/log"
-	db "github.com/tendermint/tm-db"
+	dbm "github.com/tendermint/tm-db"
+
+	"github.com/cosmos/cosmos-sdk/codec"
 
 	"github.com/irisnet/irishub/simapp"
 )
 
 func TestIrisExport(t *testing.T) {
-	db := db.NewMemDB()
+	db := dbm.NewMemDB()
 	gapp := NewIrisApp(log.NewTMLogger(log.NewSyncWriter(os.Stdout)), db, nil, true, 0)
-	setGenesis(gapp)
+	_ = setGenesis(gapp)
 
 	// Making a new app object with the db, so that initchain hasn't been called
 	newGapp := NewIrisApp(log.NewTMLogger(log.NewSyncWriter(os.Stdout)), db, nil, true, 0)
@@ -26,7 +28,7 @@ func TestIrisExport(t *testing.T) {
 
 // ensure that black listed addresses are properly set in bank keeper
 func TestBlackListedAddrs(t *testing.T) {
-	db := db.NewMemDB()
+	db := dbm.NewMemDB()
 	gapp := NewIrisApp(log.NewTMLogger(log.NewSyncWriter(os.Stdout)), db, nil, true, 0)
 
 	for acc := range maccPerms {

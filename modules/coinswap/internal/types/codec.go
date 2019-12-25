@@ -4,7 +4,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 )
 
-// module codec
+// ModuleCdc defines the module codec
 var ModuleCdc *codec.Codec
 
 // RegisterCodec registers concrete types on the codec.

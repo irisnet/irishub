@@ -95,7 +95,7 @@ func TestIrisCLIService(t *testing.T) {
 
 	// define service
 
-	ioutil.WriteFile(serviceFileName, []byte(serviceIDLContent), 0644)
+	_ = ioutil.WriteFile(serviceFileName, []byte(serviceIDLContent), 0644)
 	defer tests.ExecuteT(t, fmt.Sprintf("rm -f %s", serviceFileName), "")
 
 	success, _, _ := f.TxServiceDefine(serviceName, serviceDesc, serviceTags, serviceAuthorDesc, serviceIDLContent, serviceFileName, author, "-y")
@@ -105,7 +105,7 @@ func TestIrisCLIService(t *testing.T) {
 
 	svcDefOutput := f.QueryServiceDefinition(chainID, serviceName)
 	require.Equal(t, serviceName, svcDefOutput.Definition.Name)
-	require.Equal(t, chainID, svcDefOutput.Definition.ChainId)
+	require.Equal(t, chainID, svcDefOutput.Definition.ChainID)
 
 	// bind service
 	success, _, _ = f.TxServiceBind(chainID, serviceName, bindingType, serviceDeposit, servicePrices, avgRspTime, usableTime, provider, "-y")
@@ -232,6 +232,9 @@ func TestIrisCLIService(t *testing.T) {
 	require.True(t, success)
 
 	tests.WaitForNextNBlocksTM(1, f.Port)
+
+	// Cleanup testing directories
+	f.Cleanup()
 }
 
 // TxServiceDefine is iriscli tx service define

@@ -1,10 +1,22 @@
 package exported
 
 import (
-	"github.com/irisnet/irishub/modules/guardian/internal/types"
+	"fmt"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-// exported types
-type (
-	Guardian = types.Guardian
-)
+// AccountTypeI expected account type functions
+type AccountTypeI interface {
+	Format(s fmt.State, verb rune)
+	String() string
+	MarshalJSON() ([]byte, error)
+}
+
+// GuardianI expected guardian functions
+type GuardianI interface {
+	GetDescription() string
+	GetAccountType() AccountTypeI
+	GetAddress() sdk.AccAddress
+	GetAddedBy() sdk.AccAddress
+}

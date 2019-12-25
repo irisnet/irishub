@@ -70,7 +70,6 @@ func (suite *KeeperTestSuite) TestRequestRand() {
 	for ; iterator.Valid(); iterator.Next() {
 		var request types.Request
 		suite.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &request)
-
 		suite.Equal(expectedRequest, request)
 	}
 }

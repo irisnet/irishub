@@ -19,7 +19,7 @@ import (
 	"github.com/irisnet/irishub/modules/htlc/internal/types"
 )
 
-// GetTxCmd returns the transaction commands for this module
+// GetTxCmd returns the transaction commands for the HTLC module.
 func GetTxCmd(cdc *codec.Codec) *cobra.Command {
 	stakingTxCmd := &cobra.Command{
 		Use:                        types.ModuleName,
@@ -28,17 +28,15 @@ func GetTxCmd(cdc *codec.Codec) *cobra.Command {
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
 	}
-
 	stakingTxCmd.AddCommand(client.PostCommands(
 		GetCmdCreateHTLC(cdc),
 		GetCmdClaimHTLC(cdc),
 		GetCmdRefundHTLC(cdc),
 	)...)
-
 	return stakingTxCmd
 }
 
-// GetCmdCreateHTLC implements the create HTLC command
+// GetCmdCreateHTLC implements the create HTLC command.
 func GetCmdCreateHTLC(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create",
@@ -86,14 +84,11 @@ func GetCmdCreateHTLC(cdc *codec.Codec) *cobra.Command {
 					if len(secretStr) != 2*types.SecretLength {
 						return fmt.Errorf("length of the secret str must be %d", 2*types.SecretLength)
 					}
-
-					secret, err = hex.DecodeString(secretStr)
-					if err != nil {
+					if secret, err = hex.DecodeString(secretStr); err != nil {
 						return err
 					}
 				} else {
-					_, err := rand.Read(secret)
-					if err != nil {
+					if _, err := rand.Read(secret); err != nil {
 						return err
 					}
 				}
@@ -102,15 +97,20 @@ func GetCmdCreateHTLC(cdc *codec.Codec) *cobra.Command {
 			}
 
 			msg := types.NewMsgCreateHTLC(
-				sender, toAddr, receiverOnOtherChain, amount,
-				hashLock, uint64(timestamp), uint64(timeLock))
+				sender,
+				toAddr,
+				receiverOnOtherChain,
+				amount,
+				hashLock,
+				uint64(timestamp),
+				uint64(timeLock),
+			)
 
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
 
-			err = utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
-			if err == nil && !flags.Changed(FlagHashLock) {
+			if err := utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg}); err == nil && !flags.Changed(FlagHashLock) {
 				fmt.Println("**Important** save this secret, hashLock in a safe place.")
 				fmt.Println("It is the only way to claim or refund the locked coins from an HTLC")
 				fmt.Println()
@@ -128,7 +128,7 @@ func GetCmdCreateHTLC(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-// GetCmdClaimHTLC implements the claim HTLC command
+// GetCmdClaimHTLC implements the claim HTLC command.
 func GetCmdClaimHTLC(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "claim",
@@ -152,7 +152,6 @@ func GetCmdClaimHTLC(cdc *codec.Codec) *cobra.Command {
 			}
 
 			msg := types.NewMsgClaimHTLC(sender, hashLock, secret)
-
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -168,7 +167,7 @@ func GetCmdClaimHTLC(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-// GetCmdRefundHTLC implements the refund HTLC command
+// GetCmdRefundHTLC implements the refund HTLC command.
 func GetCmdRefundHTLC(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "refund",
@@ -187,7 +186,6 @@ func GetCmdRefundHTLC(cdc *codec.Codec) *cobra.Command {
 			}
 
 			msg := types.NewMsgRefundHTLC(sender, hashLock)
-
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}

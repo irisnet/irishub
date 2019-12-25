@@ -4,7 +4,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	supplyexported "github.com/cosmos/cosmos-sdk/x/supply/exported"
 
-	guardianexported "github.com/irisnet/irishub/modules/guardian/exported"
+	"github.com/irisnet/irishub/modules/guardian/exported"
 )
 
 // BankKeeper defines the expected bank keeper (noalias)
@@ -14,8 +14,8 @@ type BankKeeper interface {
 
 // GuardianKeeper defines the expected guardian keeper (noalias)
 type GuardianKeeper interface {
-	GetProfiler(ctx sdk.Context, addr sdk.AccAddress) (guardian guardianexported.Guardian, found bool)
-	GetTrustee(ctx sdk.Context, addr sdk.AccAddress) (guardian guardianexported.Guardian, found bool)
+	GetProfiler(ctx sdk.Context, addr sdk.AccAddress) (guardian exported.GuardianI, found bool)
+	GetTrustee(ctx sdk.Context, addr sdk.AccAddress) (guardian exported.GuardianI, found bool)
 }
 
 // SupplyKeeper defines the expected supply Keeper (noalias)

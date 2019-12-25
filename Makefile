@@ -70,7 +70,7 @@ BUILD_FLAGS := -tags "$(build_tags)" -ldflags '$(ldflags)'
 
 # The below include contains the tools target.
 
-all: tools install lint check
+all: tools install lint
 
 # The below include contains the tools.
 include contrib/devtools/Makefile
@@ -128,7 +128,7 @@ distclean: clean
 
 
 test: test-unit test-build
-test-all: check test-race test-cover
+test-all: test-race test-cover
 
 test-unit:
 	@VERSION=$(VERSION) go test -ldflags='$(denomflags)' -mod=readonly -tags='ledger test_ledger_mock' ${PACKAGES_UNITTEST}

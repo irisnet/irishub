@@ -4,13 +4,14 @@ import (
 	"encoding/hex"
 	"testing"
 
-	"github.com/cosmos/cosmos-sdk/codec"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
+
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/crypto"
 	"github.com/tendermint/tendermint/crypto/ed25519"
+
+	"github.com/cosmos/cosmos-sdk/codec"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/irisnet/irishub/modules/guardian"
 	"github.com/irisnet/irishub/simapp"
@@ -53,9 +54,11 @@ func (suite *KeeperTestSuite) TestAddProfiler() {
 	profiler := guardian.NewGuardian("test", guardian.Genesis, addrs[0], addrs[1])
 
 	suite.keeper.AddProfiler(suite.ctx, profiler)
-	AddedProfiler, found := suite.keeper.GetProfiler(suite.ctx, addrs[0])
-	require.True(suite.T(), found)
-	require.True(suite.T(), profiler.Equal(AddedProfiler))
+	addedProfilerI, found := suite.keeper.GetProfiler(suite.ctx, addrs[0])
+	suite.True(found)
+	addedProfiler, ok := addedProfilerI.(guardian.Guardian)
+	suite.True(ok)
+	suite.True(profiler.Equal(addedProfiler))
 
 	profilersIterator := suite.keeper.ProfilersIterator(suite.ctx)
 	defer profilersIterator.Close()
@@ -65,30 +68,34 @@ func (suite *KeeperTestSuite) TestAddProfiler() {
 		suite.cdc.MustUnmarshalBinaryLengthPrefixed(profilersIterator.Value(), &profiler)
 		profilers = append(profilers, profiler)
 	}
-	require.Equal(suite.T(), 2, len(profilers))
-	require.Contains(suite.T(), profilers, profiler)
+	suite.Equal(2, len(profilers))
+	suite.Contains(profilers, profiler)
 }
 
 func (suite *KeeperTestSuite) TestDeleteProfiler() {
 	profiler := guardian.NewGuardian("test", guardian.Genesis, addrs[0], addrs[1])
 
 	suite.keeper.AddProfiler(suite.ctx, profiler)
-	AddedProfiler, found := suite.keeper.GetProfiler(suite.ctx, addrs[0])
-	require.True(suite.T(), found)
-	require.True(suite.T(), profiler.Equal(AddedProfiler))
+	addedProfilerI, found := suite.keeper.GetProfiler(suite.ctx, addrs[0])
+	suite.True(found)
+	addedProfiler, ok := addedProfilerI.(guardian.Guardian)
+	suite.True(ok)
+	suite.True(profiler.Equal(addedProfiler))
 
 	suite.keeper.DeleteProfiler(suite.ctx, profiler.Address)
 
 	_, found = suite.keeper.GetProfiler(suite.ctx, addrs[0])
-	require.False(suite.T(), found)
+	suite.False(found)
 }
 
 func (suite *KeeperTestSuite) TestAddTrustee() {
 	trustee := guardian.NewGuardian("test", guardian.Genesis, addrs[0], addrs[1])
 	suite.keeper.AddTrustee(suite.ctx, trustee)
-	AddedTrustee, found := suite.keeper.GetTrustee(suite.ctx, addrs[0])
-	require.True(suite.T(), found)
-	require.True(suite.T(), trustee.Equal(AddedTrustee))
+	addedTrusteeI, found := suite.keeper.GetTrustee(suite.ctx, addrs[0])
+	suite.True(found)
+	addedTrustee, ok := addedTrusteeI.(guardian.Guardian)
+	suite.True(ok)
+	suite.True(trustee.Equal(addedTrustee))
 
 	trusteesIterator := suite.keeper.TrusteesIterator(suite.ctx)
 	defer trusteesIterator.Close()
@@ -98,20 +105,22 @@ func (suite *KeeperTestSuite) TestAddTrustee() {
 		suite.cdc.MustUnmarshalBinaryLengthPrefixed(trusteesIterator.Value(), &trustee)
 		trustees = append(trustees, trustee)
 	}
-	require.Equal(suite.T(), 2, len(trustees))
-	require.Contains(suite.T(), trustees, trustee)
+	suite.Equal(2, len(trustees))
+	suite.Contains(trustees, trustee)
 }
 
 func (suite *KeeperTestSuite) TestDeleteTrustee() {
 	trustee := guardian.NewGuardian("test", guardian.Genesis, addrs[0], addrs[1])
 	suite.keeper.AddTrustee(suite.ctx, trustee)
-	AddedTrustee, found := suite.keeper.GetTrustee(suite.ctx, addrs[0])
-	require.True(suite.T(), found)
-	require.True(suite.T(), trustee.Equal(AddedTrustee))
+	addedTrusteeI, found := suite.keeper.GetTrustee(suite.ctx, addrs[0])
+	suite.True(found)
+	addedTrustee, ok := addedTrusteeI.(guardian.Guardian)
+	suite.True(ok)
+	suite.True(trustee.Equal(addedTrustee))
 
 	suite.keeper.DeleteTrustee(suite.ctx, trustee.Address)
 	_, found = suite.keeper.GetProfiler(suite.ctx, trustee.Address)
-	require.False(suite.T(), found)
+	suite.False(found)
 
 }
 
@@ -122,12 +131,12 @@ func (suite *KeeperTestSuite) TestQueryProfilers() {
 	var profilers []guardian.Guardian
 	querier := guardian.NewQuerier(suite.keeper)
 	res, sdkErr := querier(suite.ctx, []string{guardian.QueryProfilers}, abci.RequestQuery{})
-	require.NoError(suite.T(), sdkErr)
+	suite.NoError(sdkErr)
 
 	err := suite.cdc.UnmarshalJSON(res, &profilers)
-	require.NoError(suite.T(), err)
-	require.Len(suite.T(), profilers, 2)
-	require.Contains(suite.T(), profilers, profiler)
+	suite.NoError(err)
+	suite.Len(profilers, 2)
+	suite.Contains(profilers, profiler)
 }
 
 func (suite *KeeperTestSuite) TestQueryTrustees() {
@@ -137,12 +146,12 @@ func (suite *KeeperTestSuite) TestQueryTrustees() {
 	var trustees []guardian.Guardian
 	querier := guardian.NewQuerier(suite.keeper)
 	res, sdkErr := querier(suite.ctx, []string{guardian.QueryTrustees}, abci.RequestQuery{})
-	require.NoError(suite.T(), sdkErr)
+	suite.NoError(sdkErr)
 
 	err := suite.cdc.UnmarshalJSON(res, &trustees)
-	require.NoError(suite.T(), err)
-	require.Len(suite.T(), trustees, 2)
-	require.Contains(suite.T(), trustees, trustee)
+	suite.NoError(err)
+	suite.Len(trustees, 2)
+	suite.Contains(trustees, trustee)
 }
 
 func newPubKey(pk string) (res crypto.PubKey) {

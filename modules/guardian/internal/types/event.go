@@ -1,5 +1,7 @@
+// nolint
 package types
 
+// guardian module event types
 const (
 	EventTypeAddProfiler    = "add_profiler"
 	EventTypeAddTrustee     = "add_trustee"

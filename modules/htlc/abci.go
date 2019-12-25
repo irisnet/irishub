@@ -5,14 +5,10 @@ import (
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-
-	"github.com/irisnet/irishub/modules/htlc/internal/types"
 )
 
-// BeginBlocker handles block beginning logic
+// BeginBlocker handles block beginning logic for HTLC
 func BeginBlocker(ctx sdk.Context, k Keeper) {
-	ctx = ctx.WithLogger(ctx.Logger().With("handler", "beginBlock").With("module", "iris/htlc"))
-
 	currentBlockHeight := uint64(ctx.BlockHeight())
 	iterator := k.IterateHTLCExpireQueueByHeight(ctx, currentBlockHeight)
 	defer iterator.Close()
@@ -33,12 +29,12 @@ func BeginBlocker(ctx sdk.Context, k Keeper) {
 
 		ctx.EventManager().EmitEvent(
 			sdk.NewEvent(
-				types.EventTypeExpiredHTLC,
-				sdk.NewAttribute(types.AttributeValueHashLock, hex.EncodeToString(hashLock)),
+				EventTypeExpiredHTLC,
+				sdk.NewAttribute(AttributeValueHashLock, hex.EncodeToString(hashLock)),
 			),
 		)
 
-		ctx.Logger().Info(fmt.Sprintf("HTLC [%s] is expired", hex.EncodeToString(hashLock)))
+		k.Logger(ctx).Info(fmt.Sprintf("HTLC [%s] is expired", hex.EncodeToString(hashLock)))
 	}
 
 	return
