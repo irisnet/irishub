@@ -1,6 +1,7 @@
 package app
 
 import (
+	token "github.com/irisnet/irishub/modules/asset/01-token"
 	"io"
 	"os"
 
@@ -78,7 +79,7 @@ var (
 		staking.BondedPoolName:    {supply.Burner, supply.Staking},
 		staking.NotBondedPoolName: {supply.Burner, supply.Staking},
 		gov.ModuleName:            {supply.Burner},
-		asset.ModuleName:          {supply.Minter, supply.Burner},
+		token.SubModuleName:       {supply.Minter, supply.Burner},
 		htlc.ModuleName:           nil,
 		coinswap.ModuleName:       {supply.Minter, supply.Burner},
 		service.DepositAccName:    {supply.Burner},
