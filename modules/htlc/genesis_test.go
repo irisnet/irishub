@@ -92,7 +92,7 @@ func (suite *KeeperTestSuite) TestExportHTLCGenesis() {
 		newExpireHeight := htlcInStore.ExpireHeight - uint64(newBlockHeight) + 1
 		suite.Equal(newExpireHeight, tmpHTLC.ExpireHeight)
 
-		// assert the exported HTLC is consistant with the HTLC in store except for the expiration height
+		// assert the exported HTLC is consistent with the HTLC in store except for the expiration height
 		htlcInStore.ExpireHeight = newExpireHeight
 		suite.Equal(htlcInStore, tmpHTLC)
 	}

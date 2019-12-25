@@ -5,9 +5,10 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	abci "github.com/tendermint/tendermint/abci/types"
+
 	"github.com/irisnet/irishub/modules/asset/internal/types"
 	iristypes "github.com/irisnet/irishub/types"
-	abci "github.com/tendermint/tendermint/abci/types"
 )
 
 func NewQuerier(k Keeper) sdk.Querier {

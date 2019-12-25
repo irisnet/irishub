@@ -1,45 +1,38 @@
 package service
 
 import (
-	"github.com/irisnet/irishub/app/v1/auth"
-	"github.com/irisnet/irishub/app/v1/service/tags"
-	"github.com/irisnet/irishub/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func EndBlocker(ctx types.Context, keeper Keeper) (resTags types.Tags) {
-	ctx = ctx.WithLogger(ctx.Logger().With("handler", "endBlock").With("module", "iris/service"))
-	logger := ctx.Logger()
+// EndBlocker handles block ending logic
+func EndBlocker(ctx sdk.Context, keeper Keeper) {
+	logger := keeper.Logger(ctx)
+
 	// Reset the intra-transaction counter.
 	keeper.SetIntraTxCounter(ctx, 0)
 
-	resTags = types.NewTags()
-	params := keeper.GetParamSet(ctx)
+	params := keeper.GetParams(ctx)
 	slashFraction := params.SlashFraction
 
 	activeIterator := keeper.ActiveRequestQueueIterator(ctx, ctx.BlockHeight())
 	defer activeIterator.Close()
+
 	for ; activeIterator.Valid(); activeIterator.Next() {
 		var req SvcRequest
-		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(activeIterator.Value(), &req)
+		keeper.GetCdc().MustUnmarshalBinaryLengthPrefixed(activeIterator.Value(), &req)
 
 		// if not Profiling mode,should slash provider
-		slashCoins := types.Coins{}
+		slashCoins := sdk.NewCoins()
 		if !req.Profiling {
 			binding, found := keeper.GetServiceBinding(ctx, req.DefChainID, req.DefName, req.BindChainID, req.Provider)
 			if found {
 				for _, coin := range binding.Deposit {
-					taxAmount := types.NewDecFromInt(coin.Amount).Mul(slashFraction).TruncateInt()
-					slashCoins = append(slashCoins, types.NewCoin(coin.Denom, taxAmount))
+					taxAmount := sdk.NewDecFromInt(coin.Amount).Mul(slashFraction).TruncateInt()
+					slashCoins.Add(sdk.NewCoins(sdk.NewCoin(coin.Denom, taxAmount)))
 				}
 			}
 
-			slashCoins = slashCoins.Sort()
-
-			_, err := keeper.ck.BurnCoins(ctx, auth.ServiceDepositCoinsAccAddr, slashCoins)
-			if err != nil {
-				panic(err)
-			}
-			err = keeper.Slash(ctx, binding, slashCoins)
+			err := keeper.Slash(ctx, binding, slashCoins)
 			if err != nil {
 				panic(err)
 			}
@@ -48,15 +41,19 @@ func EndBlocker(ctx types.Context, keeper Keeper) (resTags types.Tags) {
 		keeper.AddReturnFee(ctx, req.Consumer, req.ServiceFee)
 
 		keeper.DeleteActiveRequest(ctx, req)
-		keeper.metrics.ActiveRequests.Add(-1)
 		keeper.DeleteRequestExpiration(ctx, req)
 
-		resTags = resTags.AppendTag(tags.Action, tags.ActionSvcCallTimeOut)
-		resTags = resTags.AppendTag(tags.RequestID, []byte(req.RequestID()))
-		resTags = resTags.AppendTag(tags.Provider, []byte(req.Provider))
-		resTags = resTags.AppendTag(tags.SlashCoins, []byte(slashCoins.String()))
+		ctx.EventManager().EmitEvent(
+			sdk.NewEvent(
+				EventTypeSvcCallTimeout,
+				sdk.NewAttribute(AttributeKeyRequestID, req.RequestID()),
+				sdk.NewAttribute(AttributeKeyProvider, req.Provider.String()),
+				sdk.NewAttribute(AttributeKeySlashCoins, slashCoins.String()),
+			),
+		)
+
 		logger.Info("Remove timeout request", "request_id", req.RequestID(), "consumer", req.Consumer.String())
 	}
 
-	return resTags
+	return
 }

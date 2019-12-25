@@ -4,10 +4,11 @@ import (
 	"testing"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/irisnet/irishub/modules/asset"
-	"github.com/irisnet/irishub/simapp"
 	"github.com/stretchr/testify/require"
 	abci "github.com/tendermint/tendermint/abci/types"
+
+	"github.com/irisnet/irishub/modules/asset"
+	"github.com/irisnet/irishub/simapp"
 )
 
 func TestExportGatewayGenesis(t *testing.T) {

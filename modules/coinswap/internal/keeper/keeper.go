@@ -46,7 +46,7 @@ func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, bk types.BankKeeper, ak types
 func (k Keeper) Swap(ctx sdk.Context, msg types.MsgSwapOrder) sdk.Error {
 	var amount sdk.Int
 	var err sdk.Error
-	
+
 	standardDenom := k.GetParams(ctx).StandardDenom
 	isDoubleSwap := (msg.Input.Coin.Denom != standardDenom) && (msg.Output.Coin.Denom != standardDenom)
 

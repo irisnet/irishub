@@ -3,8 +3,9 @@ package keeper
 import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/irisnet/irishub/modules/guardian/internal/types"
 	abci "github.com/tendermint/tendermint/abci/types"
+
+	"github.com/irisnet/irishub/modules/guardian/internal/types"
 )
 
 func NewQuerier(k Keeper) sdk.Querier {

@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/cosmos/cosmos-sdk/client/context"
+
 	"github.com/irisnet/irishub/modules/asset/internal/types"
 )
 

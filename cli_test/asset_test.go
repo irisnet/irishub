@@ -9,10 +9,11 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/tests"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/irisnet/irishub/app"
-	"github.com/irisnet/irishub/modules/asset"
 	"github.com/stretchr/testify/require"
 	tmtypes "github.com/tendermint/tendermint/types"
+
+	"github.com/irisnet/irishub/app"
+	"github.com/irisnet/irishub/modules/asset"
 )
 
 func TestIrisCLIIssueToken(t *testing.T) {

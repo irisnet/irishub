@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
 	"github.com/irisnet/irishub/modules/asset/internal/types"
 )
 

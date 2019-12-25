@@ -123,10 +123,10 @@ func (k Keeper) doubleTradeExactInputForOutput(ctx sdk.Context, input types.Inpu
 }
 
 /**
-Calculate the amount of the token to be payed based on the exact amount of the token to be bought
+Calculate the amount of the token to be paid based on the exact amount of the token to be bought
 @param exactBoughtCoin
 @param soldTokenDenom
-@return: actual amount of the token to be payed
+@return: actual amount of the token to be paid
 */
 func (k Keeper) calculateWithExactOutput(ctx sdk.Context, exactBoughtCoin sdk.Coin, soldTokenDenom string) (sdk.Int, sdk.Error) {
 	uniDenom, err := types.GetUniDenomFromDenoms(exactBoughtCoin.Denom, soldTokenDenom)
@@ -157,11 +157,11 @@ func (k Keeper) calculateWithExactOutput(ctx sdk.Context, exactBoughtCoin sdk.Co
 
 /**
 Buy exact amount of a token by specifying the max amount of another token, one of them must be standard token
-@param input : max amount of the token to be payed
+@param input : max amount of the token to be paid
 @param output : exact amount of the token to be bought
 @param sender : address of the sender
 @param receipt : address of the receiver
-@return : actual amount of the token to be payed
+@return : actual amount of the token to be paid
 */
 func (k Keeper) TradeInputForExactOutput(ctx sdk.Context, input types.Input, output types.Output) (sdk.Int, sdk.Error) {
 	soldTokenAmt, err := k.calculateWithExactOutput(ctx, output.Coin, input.Coin.Denom)
@@ -183,11 +183,11 @@ func (k Keeper) TradeInputForExactOutput(ctx sdk.Context, input types.Input, out
 
 /**
 Buy exact amount of a token by specifying the max amount of another token, non of them are standard token
-@param input : max amount of the token to be payed
+@param input : max amount of the token to be paid
 @param output : exact amount of the token to be bought
 @param sender : address of the sender
 @param receipt : address of the receiver
-@return : actual amount of the token to be payed
+@return : actual amount of the token to be paid
 */
 func (k Keeper) doubleTradeInputForExactOutput(ctx sdk.Context, input types.Input, output types.Output) (sdk.Int, sdk.Error) {
 	standardDenom := k.GetParams(ctx).StandardDenom

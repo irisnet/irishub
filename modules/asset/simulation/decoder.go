@@ -7,9 +7,10 @@ import (
 	"strings"
 
 	"github.com/cosmos/cosmos-sdk/codec"
+	cmn "github.com/tendermint/tendermint/libs/common"
+
 	"github.com/irisnet/irishub/modules/asset/internal/keeper"
 	"github.com/irisnet/irishub/modules/asset/internal/types"
-	cmn "github.com/tendermint/tendermint/libs/common"
 )
 
 // DecodeStore unmarshals the KVPair's Value to the corresponding gov type

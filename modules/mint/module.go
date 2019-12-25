@@ -10,11 +10,12 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	sim "github.com/cosmos/cosmos-sdk/x/simulation"
 	"github.com/gorilla/mux"
+	"github.com/spf13/cobra"
+	abci "github.com/tendermint/tendermint/abci/types"
+
 	"github.com/irisnet/irishub/modules/mint/client/cli"
 	"github.com/irisnet/irishub/modules/mint/client/rest"
 	"github.com/irisnet/irishub/modules/mint/simulation"
-	"github.com/spf13/cobra"
-	abci "github.com/tendermint/tendermint/abci/types"
 )
 
 var (
