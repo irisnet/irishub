@@ -40,6 +40,20 @@ type KeeperTestSuite struct {
 	app *simapp.SimApp
 }
 
+func (suite *KeeperTestSuite) SetupTest() {
+	app := simapp.Setup(false)
+
+	suite.cdc = app.Codec()
+	suite.ctx = app.BaseApp.NewContext(false, abci.Header{})
+	suite.app = app
+
+	initVars(suite)
+}
+
+func TestKeeperTestSuite(t *testing.T) {
+	suite.Run(t, new(KeeperTestSuite))
+}
+
 func initVars(suite *KeeperTestSuite) {
 	addrSender = sdk.AccAddress([]byte("__addrSender________"))
 	addrTo = sdk.AccAddress([]byte("__addrTo____________"))
@@ -62,20 +76,6 @@ func initVars(suite *KeeperTestSuite) {
 	stateOpen = types.OPEN
 	stateExpired = types.EXPIRED
 	initSecret = types.HTLCSecret(nil)
-}
-
-func (suite *KeeperTestSuite) SetupTest() {
-	app := simapp.Setup(false)
-
-	suite.cdc = app.Codec()
-	suite.ctx = app.BaseApp.NewContext(false, abci.Header{})
-	suite.app = app
-
-	initVars(suite)
-}
-
-func TestKeeperTestSuite(t *testing.T) {
-	suite.Run(t, new(KeeperTestSuite))
 }
 
 func (suite *KeeperTestSuite) TestCreateHTLC() {

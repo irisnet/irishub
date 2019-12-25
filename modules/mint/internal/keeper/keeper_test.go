@@ -25,11 +25,12 @@ type KeeperTestSuite struct {
 
 func (suite *KeeperTestSuite) SetupTest() {
 	app := simapp.Setup(false)
-	ctx := app.BaseApp.NewContext(false, abci.Header{})
-	app.MintKeeper.SetParamSet(ctx, types.DefaultParams())
-	app.MintKeeper.SetMinter(ctx, types.DefaultMinter())
+
+	suite.ctx = app.BaseApp.NewContext(false, abci.Header{})
 	suite.app = app
-	suite.ctx = ctx
+
+	app.MintKeeper.SetParamSet(suite.ctx, types.DefaultParams())
+	app.MintKeeper.SetMinter(suite.ctx, types.DefaultMinter())
 }
 
 func TestKeeperTestSuite(t *testing.T) {

@@ -2,7 +2,6 @@ package rand_test
 
 import (
 	"strconv"
-	"testing"
 
 	"github.com/stretchr/testify/suite"
 
@@ -31,7 +30,7 @@ type GenesisTestSuite struct {
 
 	cdc    *codec.Codec
 	ctx    sdk.Context
-	keeper *rand.Keeper
+	keeper rand.Keeper
 }
 
 func (suite *GenesisTestSuite) SetupTest() {
@@ -39,15 +38,7 @@ func (suite *GenesisTestSuite) SetupTest() {
 
 	suite.cdc = app.Codec()
 	suite.ctx = app.BaseApp.NewContext(false, abci.Header{})
-	suite.keeper = &app.RandKeeper
-}
-
-func TestGenesisSuite(t *testing.T) {
-	suite.Run(t, new(GenesisTestSuite))
-}
-
-func (suite *GenesisTestSuite) TestInitGenesis() {
-	// TODO
+	suite.keeper = app.RandKeeper
 }
 
 func (suite *GenesisTestSuite) TestExportGenesis() {
@@ -71,7 +62,7 @@ func (suite *GenesisTestSuite) TestExportGenesis() {
 	suite.Equal(2, len(storedRequests))
 
 	// export genesis
-	genesis := rand.ExportGenesis(suite.ctx, *suite.keeper)
+	genesis := rand.ExportGenesis(suite.ctx, suite.keeper)
 	exportedRequests := genesis.PendingRandRequests
 	suite.Equal(2, len(exportedRequests))
 

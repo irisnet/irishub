@@ -12,8 +12,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irishub/modules/rand/internal/keeper"
-	"github.com/irisnet/irishub/modules/rand/internal/types"
+	"github.com/irisnet/irishub/modules/rand"
 	"github.com/irisnet/irishub/simapp"
 )
 
@@ -33,20 +32,19 @@ type KeeperTestSuite struct {
 
 	cdc    *codec.Codec
 	ctx    sdk.Context
-	keeper *keeper.Keeper
+	keeper rand.Keeper
 }
 
 func (suite *KeeperTestSuite) SetupTest() {
-	isCheckTx := false
-	app := simapp.Setup(isCheckTx)
+	app := simapp.Setup(false)
 
 	suite.cdc = app.Codec()
-	suite.ctx = app.BaseApp.NewContext(isCheckTx, abci.Header{})
-	suite.keeper = &app.RandKeeper
+	suite.ctx = app.BaseApp.NewContext(false, abci.Header{})
+	suite.keeper = app.RandKeeper
 }
 
 func (suite *KeeperTestSuite) TestSetRand() {
-	rand := types.NewRand(types.SHA256(testTxBytes), testHeight, big.NewRat(testRandNumerator, testRandDenomiator).FloatString(types.RandPrec))
+	rand := rand.NewRand(rand.SHA256(testTxBytes), testHeight, big.NewRat(testRandNumerator, testRandDenomiator).FloatString(rand.RandPrec))
 	suite.keeper.SetRand(suite.ctx, testReqID, rand)
 
 	storedRand, err := suite.keeper.GetRand(suite.ctx, testReqID)
@@ -62,13 +60,13 @@ func (suite *KeeperTestSuite) TestRequestRand() {
 	_, err := suite.keeper.RequestRand(suite.ctx, testConsumer, testBlockInterval)
 	suite.NoError(err)
 
-	expectedRequest := types.NewRequest(testHeight, testConsumer, types.SHA256(testTxBytes))
+	expectedRequest := rand.NewRequest(testHeight, testConsumer, rand.SHA256(testTxBytes))
 
 	iterator := suite.keeper.IterateRandRequestQueueByHeight(suite.ctx, testHeight+int64(testBlockInterval))
 	defer iterator.Close()
 
 	for ; iterator.Valid(); iterator.Next() {
-		var request types.Request
+		var request rand.Request
 		suite.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &request)
 		suite.Equal(expectedRequest, request)
 	}

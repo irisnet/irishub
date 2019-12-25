@@ -7,7 +7,7 @@ import (
 
 	abci "github.com/tendermint/tendermint/abci/types"
 
-	"github.com/irisnet/irishub/modules/rand/internal/keeper"
+	"github.com/irisnet/irishub/modules/guardian/internal/keeper"
 )
 
 func TestQuerierSuite(t *testing.T) {
@@ -26,8 +26,8 @@ func (suite *KeeperTestSuite) TestNewQuerier() {
 
 	// init xxx
 
-	// test queryRand
+	// test queryProfilers
 
-	// test queryRandRequestQueue
+	// test queryProfilers
 
 }

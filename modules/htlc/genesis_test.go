@@ -83,18 +83,6 @@ func initVars(suite *TestSuite) {
 	htlc2 = htlc.NewHTLC(senderAddrs[1], receiverAddrs[1], receiverOnOtherChain, amount, initSecret, timestamps[1], expireHeights[1], state)
 }
 
-func (suite *TestSuite) TestInitGenesis() {
-	GenesisState := htlc.GenesisState{
-		PendingHTLCs: map[string]htlc.HTLC{
-			hashLocks[0].String(): htlc1,
-			hashLocks[1].String(): htlc2,
-		},
-	}
-	htlc.InitGenesis(suite.ctx, suite.app.HTLCKeeper, GenesisState)
-	err := htlc.ValidateGenesis(GenesisState)
-	suite.Nil(err)
-}
-
 func (suite *TestSuite) TestExportGenesis() {
 	// create HTLCs
 	err := suite.app.HTLCKeeper.CreateHTLC(suite.ctx, htlc1, hashLocks[0])
@@ -131,7 +119,8 @@ func (suite *TestSuite) TestExportGenesis() {
 		suite.Equal(htlcInStore, tmpHTLC)
 	}
 
-	suite.Nil(htlc.ValidateGenesis(exportedGenesis))
+	e := htlc.ValidateGenesis(exportedGenesis)
+	suite.Nil(e)
 
 	// assert the expired HTLCs(htlc1) have been refunded
 	_, err = suite.app.HTLCKeeper.GetHTLC(suite.ctx, hashLocks[0])
