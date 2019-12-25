@@ -12,7 +12,7 @@ import (
 func TestNewMsgTransferNFT(t *testing.T) {
 	newMsgTransferNFT := NewMsgTransferNFT(address, address2,
 		fmt.Sprintf("     %s     ", denom),
-		fmt.Sprintf("     %s     ", id))
+		fmt.Sprintf("     %s     ", id), tokenURI)
 	require.Equal(t, newMsgTransferNFT.Sender, address)
 	require.Equal(t, newMsgTransferNFT.Recipient, address2)
 	require.Equal(t, newMsgTransferNFT.Denom, denom)
@@ -20,37 +20,37 @@ func TestNewMsgTransferNFT(t *testing.T) {
 }
 
 func TestMsgTransferNFTValidateBasicMethod(t *testing.T) {
-	newMsgTransferNFT := NewMsgTransferNFT(address, address2, "", id)
+	newMsgTransferNFT := NewMsgTransferNFT(address, address2, "", id, tokenURI)
 	err := newMsgTransferNFT.ValidateBasic()
 	require.Error(t, err)
 
-	newMsgTransferNFT = NewMsgTransferNFT(address, address2, denom, "")
+	newMsgTransferNFT = NewMsgTransferNFT(address, address2, denom, "", tokenURI)
 	err = newMsgTransferNFT.ValidateBasic()
 	require.Error(t, err)
 
-	newMsgTransferNFT = NewMsgTransferNFT(nil, address2, denom, "")
+	newMsgTransferNFT = NewMsgTransferNFT(nil, address2, denom, "", tokenURI)
 	err = newMsgTransferNFT.ValidateBasic()
 	require.Error(t, err)
 
-	newMsgTransferNFT = NewMsgTransferNFT(address, nil, denom, "")
+	newMsgTransferNFT = NewMsgTransferNFT(address, nil, denom, "", tokenURI)
 	err = newMsgTransferNFT.ValidateBasic()
 	require.Error(t, err)
 
-	newMsgTransferNFT = NewMsgTransferNFT(address, address2, denom, id)
+	newMsgTransferNFT = NewMsgTransferNFT(address, address2, denom, id, tokenURI)
 	err = newMsgTransferNFT.ValidateBasic()
 	require.NoError(t, err)
 }
 
 func TestMsgTransferNFTGetSignBytesMethod(t *testing.T) {
-	newMsgTransferNFT := NewMsgTransferNFT(address, address2, denom, id)
+	newMsgTransferNFT := NewMsgTransferNFT(address, address2, denom, id, tokenURI)
 	sortedBytes := newMsgTransferNFT.GetSignBytes()
-	require.Equal(t, string(sortedBytes), fmt.Sprintf(`{"type":"cosmos-sdk/MsgTransferNFT","value":{"Denom":"%s","ID":"%s","Recipient":"%s","Sender":"%s"}}`,
-		denom, id, address2, address,
+	require.Equal(t, string(sortedBytes), fmt.Sprintf(`{"type":"cosmos-sdk/MsgTransferNFT","value":{"Denom":"%s","ID":"%s","Recipient":"%s","Sender":"%s","TokenURI":"%s"}}`,
+		denom, id, address2, address, tokenURI,
 	))
 }
 
 func TestMsgTransferNFTGetSignersMethod(t *testing.T) {
-	newMsgTransferNFT := NewMsgTransferNFT(address, address2, denom, id)
+	newMsgTransferNFT := NewMsgTransferNFT(address, address2, denom, id, tokenURI)
 	signers := newMsgTransferNFT.GetSigners()
 	require.Equal(t, 1, len(signers))
 	require.Equal(t, address.String(), signers[0].String())

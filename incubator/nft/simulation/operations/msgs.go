@@ -30,6 +30,7 @@ func SimulateMsgTransferNFT(k keeper.Keeper) simulation.Operation {
 			simulation.RandomAcc(r, accs).Address, // recipient
 			denom,
 			nftID,
+			"",
 		)
 
 		if msg.ValidateBasic() != nil {

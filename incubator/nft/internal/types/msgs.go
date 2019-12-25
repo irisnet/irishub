@@ -6,6 +6,9 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
+// constant used to indicate that some field should not be updated
+const DoNotModify = "[do-not-modify]"
+
 /* --------------------------------------------------------------------------- */
 // MsgTransferNFT
 /* --------------------------------------------------------------------------- */
@@ -14,17 +17,19 @@ import (
 type MsgTransferNFT struct {
 	Sender    sdk.AccAddress
 	Recipient sdk.AccAddress
+	TokenURI  string
 	Denom     string
 	ID        string
 }
 
 // NewMsgTransferNFT is a constructor function for MsgSetName
-func NewMsgTransferNFT(sender, recipient sdk.AccAddress, denom, id string) MsgTransferNFT {
+func NewMsgTransferNFT(sender, recipient sdk.AccAddress, denom, id, tokenURI string) MsgTransferNFT {
 	return MsgTransferNFT{
 		Sender:    sender,
 		Recipient: recipient,
 		Denom:     strings.TrimSpace(denom),
 		ID:        strings.TrimSpace(id),
+		TokenURI:  strings.TrimSpace(tokenURI),
 	}
 }
 

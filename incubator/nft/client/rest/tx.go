@@ -46,6 +46,7 @@ type transferNFTReq struct {
 	Denom     string       `json:"denom"`
 	ID        string       `json:"id"`
 	Recipient string       `json:"recipient"`
+	TokenURI  string       `json:"tokenURI"`
 }
 
 func transferNFTHandler(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
@@ -65,7 +66,7 @@ func transferNFTHandler(cdc *codec.Codec, cliCtx context.CLIContext) http.Handle
 			return
 		}
 		// create the message
-		msg := types.NewMsgTransferNFT(cliCtx.GetFromAddress(), recipient, req.Denom, req.ID)
+		msg := types.NewMsgTransferNFT(cliCtx.GetFromAddress(), recipient, req.Denom, req.ID, req.TokenURI)
 
 		utils.WriteGenerateStdTxResponse(w, cliCtx, baseReq, []sdk.Msg{msg})
 	}

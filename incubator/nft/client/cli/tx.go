@@ -43,7 +43,7 @@ func GetTxCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
 
 // GetCmdTransferNFT is the CLI command for sending a TransferNFT transaction
 func GetCmdTransferNFT(cdc *codec.Codec) *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "transfer [sender] [recipient] [denom] [tokenID]",
 		Short: "transfer a NFT to a recipient",
 		Long: strings.TrimSpace(
@@ -76,11 +76,14 @@ crypto-kitties d04b98f48e8f8bcc15c6ae5ac050801cd6dcfd428fb5f9e65c4e16e7807340fa 
 
 			denom := args[2]
 			tokenID := args[3]
+			tokenURI := viper.GetString(flagTokenURI)
 
-			msg := types.NewMsgTransferNFT(sender, recipient, denom, tokenID)
+			msg := types.NewMsgTransferNFT(sender, recipient, denom, tokenID, tokenURI)
 			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
 		},
 	}
+	cmd.Flags().String(flagTokenURI, "[do-not-modify]", "Extra properties available for querying")
+	return cmd
 }
 
 // GetCmdEditNFTMetadata is the CLI command for sending an EditMetadata transaction
