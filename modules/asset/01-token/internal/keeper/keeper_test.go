@@ -25,7 +25,7 @@ const (
 var (
 	denom    = types.DefaultToken.MinUnit
 	owner    = sdk.AccAddress([]byte("tokenTest"))
-	initAmt  = types.DefaultToken.InitialSupply
+	initAmt  = sdk.NewIntWithDecimal(types.DefaultToken.InitialSupply.Int64(), int(types.DefaultToken.Scale))
 	initCoin = sdk.Coins{sdk.NewCoin(denom, initAmt)}
 )
 
