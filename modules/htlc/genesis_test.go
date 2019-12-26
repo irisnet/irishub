@@ -57,8 +57,8 @@ func TestGenesisSuite(t *testing.T) {
 }
 
 func initVars(suite *TestSuite) {
-	senderAddrs = []sdk.AccAddress{sdk.AccAddress([]byte("sender1")), sdk.AccAddress([]byte("sender2"))}
-	receiverAddrs = []sdk.AccAddress{sdk.AccAddress([]byte("receiver1")), sdk.AccAddress([]byte("receiver2"))}
+	senderAddrs = []sdk.AccAddress{sdk.AccAddress("sender1"), sdk.AccAddress("sender2")}
+	receiverAddrs = []sdk.AccAddress{sdk.AccAddress("receiver1"), sdk.AccAddress("receiver2")}
 
 	_ = suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, senderAddrs[0])
 	_ = suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, senderAddrs[1])
@@ -86,9 +86,9 @@ func initVars(suite *TestSuite) {
 func (suite *TestSuite) TestExportGenesis() {
 	// create HTLCs
 	err := suite.app.HTLCKeeper.CreateHTLC(suite.ctx, htlc1, hashLocks[0])
-	suite.Nil(err)
+	suite.NoError(err)
 	err = suite.app.HTLCKeeper.CreateHTLC(suite.ctx, htlc2, hashLocks[1])
-	suite.Nil(err)
+	suite.NoError(err)
 
 	newBlockHeight := int64(50)
 	suite.ctx = suite.ctx.WithBlockHeight(newBlockHeight)
@@ -104,11 +104,11 @@ func (suite *TestSuite) TestExportGenesis() {
 		suite.True(tmpHTLC.State == htlc.OPEN)
 
 		hashLock, err := hex.DecodeString(hashLockHex)
-		suite.Nil(err)
+		suite.NoError(err)
 
 		// assert the HTLC with the given hash lock exists
 		htlcInStore, err := suite.app.HTLCKeeper.GetHTLC(suite.ctx, hashLock)
-		suite.Nil(err)
+		suite.NoError(err)
 
 		// assert the expiration height is new
 		newExpireHeight := htlcInStore.ExpireHeight - uint64(newBlockHeight) + 1
@@ -120,9 +120,9 @@ func (suite *TestSuite) TestExportGenesis() {
 	}
 
 	e := htlc.ValidateGenesis(exportedGenesis)
-	suite.Nil(e)
+	suite.NoError(e)
 
 	// assert the expired HTLCs(htlc1) have been refunded
 	_, err = suite.app.HTLCKeeper.GetHTLC(suite.ctx, hashLocks[0])
-	suite.NotNil(err)
+	suite.Error(err)
 }

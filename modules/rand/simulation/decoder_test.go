@@ -26,7 +26,7 @@ func makeTestCodec() (cdc *codec.Codec) {
 func TestDecodeStore(t *testing.T) {
 	cdc := makeTestCodec()
 
-	request := types.NewRequest(50, sdk.AccAddress([]byte("consumer")), []byte("txHash"))
+	request := types.NewRequest(50, sdk.AccAddress("consumer"), []byte("txHash"))
 	reqID := types.GenerateRequestID(request)
 	rand := types.NewRand([]byte("requestTxHash"), 100, big.NewRat(10, 1000).FloatString(types.RandPrec))
 

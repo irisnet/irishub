@@ -117,7 +117,7 @@ func TestCoinSend(t *testing.T) {
 	// test failure with too little gas
 	res, body, _ = doTransferWithGas(t, port, seed, name1, memo, pw, addr, "100", 0, false, true, fees)
 	require.Equal(t, http.StatusOK, res.StatusCode, body)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	// test failure with negative gas
 	res, body, _ = doTransferWithGas(t, port, seed, name1, memo, pw, addr, "-200", 0, false, false, fees)
@@ -142,7 +142,7 @@ func TestCoinSend(t *testing.T) {
 	require.Equal(t, http.StatusOK, res.StatusCode, body)
 
 	var gasEstResp rest.GasEstimateResponse
-	require.Nil(t, cdc.UnmarshalJSON([]byte(body), &gasEstResp))
+	require.NoError(t, cdc.UnmarshalJSON([]byte(body), &gasEstResp))
 	require.NotZero(t, gasEstResp.GasEstimate)
 
 	acc = getAccount(t, port, addr)
@@ -154,7 +154,7 @@ func TestCoinSend(t *testing.T) {
 	require.Equal(t, http.StatusOK, res.StatusCode, body)
 
 	err = cdc.UnmarshalJSON([]byte(body), &resultTx)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	tests.WaitForHeight(resultTx.Height+1, port)
 	require.Equal(t, uint32(0), resultTx.Code)
@@ -205,7 +205,7 @@ func TestCoinMultiSendGenerateOnly(t *testing.T) {
 	require.Equal(t, http.StatusOK, res.StatusCode, body)
 
 	var stdTx auth.StdTx
-	require.Nil(t, cdc.UnmarshalJSON([]byte(body), &stdTx))
+	require.NoError(t, cdc.UnmarshalJSON([]byte(body), &stdTx))
 	require.Equal(t, len(stdTx.Msgs), 1)
 	require.Equal(t, stdTx.GetMsgs()[0].Route(), bank.RouterKey)
 	require.Equal(t, stdTx.GetMsgs()[0].GetSigners(), []sdk.AccAddress{addr})
@@ -233,7 +233,7 @@ func TestCoinSendGenerateSignAndBroadcast(t *testing.T) {
 	require.Equal(t, http.StatusOK, res.StatusCode, body)
 
 	var gasEstResp rest.GasEstimateResponse
-	require.Nil(t, cdc.UnmarshalJSON([]byte(body), &gasEstResp))
+	require.NoError(t, cdc.UnmarshalJSON([]byte(body), &gasEstResp))
 	require.NotZero(t, gasEstResp.GasEstimate)
 
 	// generate tx
@@ -242,7 +242,7 @@ func TestCoinSendGenerateSignAndBroadcast(t *testing.T) {
 	require.Equal(t, http.StatusOK, res.StatusCode, body)
 
 	var tx auth.StdTx
-	require.Nil(t, cdc.UnmarshalJSON([]byte(body), &tx))
+	require.NoError(t, cdc.UnmarshalJSON([]byte(body), &tx))
 	require.Equal(t, len(tx.Msgs), 1)
 	require.Equal(t, tx.Msgs[0].Route(), bank.RouterKey)
 	require.Equal(t, tx.Msgs[0].GetSigners(), []sdk.AccAddress{addr})
@@ -255,7 +255,7 @@ func TestCoinSendGenerateSignAndBroadcast(t *testing.T) {
 
 	// check if tx was committed
 	var txResp sdk.TxResponse
-	require.Nil(t, cdc.UnmarshalJSON([]byte(body), &txResp))
+	require.NoError(t, cdc.UnmarshalJSON([]byte(body), &txResp))
 	require.Equal(t, uint32(0), txResp.Code)
 	require.Equal(t, gasEstimate, txResp.GasWanted)
 }
@@ -271,7 +271,7 @@ func TestEncodeTx(t *testing.T) {
 
 	res, body, _ := doTransferWithGas(t, port, seed, name1, memo, "", addr, "2", 1, false, false, fees)
 	var tx auth.StdTx
-	require.Nil(t, cdc.UnmarshalJSON([]byte(body), &tx))
+	require.NoError(t, cdc.UnmarshalJSON([]byte(body), &tx))
 
 	encodedJSON, _ := cdc.MarshalJSON(tx)
 	res, body = Request(t, port, "POST", "/txs/encode", encodedJSON)
@@ -283,15 +283,15 @@ func TestEncodeTx(t *testing.T) {
 		Tx string `json:"tx"`
 	}{}
 
-	require.Nil(t, cdc.UnmarshalJSON([]byte(body), &encodeResp))
+	require.NoError(t, cdc.UnmarshalJSON([]byte(body), &encodeResp))
 
 	// verify that the base64 decodes
 	decodedBytes, err := base64.StdEncoding.DecodeString(encodeResp.Tx)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	// check that the transaction decodes as expected
 	var decodedTx auth.StdTx
-	require.Nil(t, cdc.UnmarshalBinaryLengthPrefixed(decodedBytes, &decodedTx))
+	require.NoError(t, cdc.UnmarshalBinaryLengthPrefixed(decodedBytes, &decodedTx))
 	require.Equal(t, memo, decodedTx.Memo)
 }
 

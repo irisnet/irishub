@@ -18,12 +18,12 @@ var (
 
 	amt = sdk.NewInt(100)
 
-	denom0   = "atom"
-	denom1   = "btc"
-	unidenom = FormatUniABSPrefix + "btc"
+	denomETH = "eth"
+	denomBTC = "btc"
+	unidenom = FormatUniABSPrefix + denomBTC
 
-	input             = sdk.NewCoin(denom0, sdk.NewInt(1000))
-	output            = sdk.NewCoin(denom1, sdk.NewInt(500))
+	input             = sdk.NewCoin(denomETH, sdk.NewInt(1000))
+	output            = sdk.NewCoin(denomBTC, sdk.NewInt(500))
 	withdrawLiquidity = sdk.NewCoin(unidenom, sdk.NewInt(500))
 	deadline          = int64(1580000000)
 
@@ -87,7 +87,7 @@ func TestMsgSwapOrderGetSignBytes(t *testing.T) {
 		true,
 	)
 	res := msg.GetSignBytes()
-	expected := `{"type":"irishub/coinswap/MsgSwapOrder","value":{"deadline":"1580000000","input":{"address":"faa128nh833v43sggcj65nk7khjka9dwngpl6j29hj","coin":{"amount":"1000","denom":"atom"}},"is_buy_order":true,"output":{"address":"faa128nh833v43sggcj65nk7khjka9dwngpl6j29hj","coin":{"amount":"500","denom":"btc"}}}}`
+	expected := `{"type":"irishub/coinswap/MsgSwapOrder","value":{"deadline":"1580000000","input":{"address":"faa128nh833v43sggcj65nk7khjka9dwngpl6j29hj","coin":{"amount":"1000","denom":"eth"}},"is_buy_order":true,"output":{"address":"faa128nh833v43sggcj65nk7khjka9dwngpl6j29hj","coin":{"amount":"500","denom":"btc"}}}}`
 	require.Equal(t, expected, string(res))
 }
 
@@ -123,7 +123,7 @@ func TestMsgSwapOrderValidation(t *testing.T) {
 			"zero input coin",
 			false,
 			NewMsgSwapOrder(
-				Input{Address: sender, Coin: sdk.NewCoin(denom0, sdk.ZeroInt())},
+				Input{Address: sender, Coin: sdk.NewCoin(denomETH, sdk.ZeroInt())},
 				Output{Address: recipient, Coin: output},
 				deadline,
 				true,
@@ -142,14 +142,14 @@ func TestMsgSwapOrderValidation(t *testing.T) {
 			false,
 			NewMsgSwapOrder(
 				Input{Address: sender, Coin: input},
-				Output{Address: recipient, Coin: sdk.NewCoin(denom1, sdk.ZeroInt())},
+				Output{Address: recipient, Coin: sdk.NewCoin(denomBTC, sdk.ZeroInt())},
 				deadline,
 				true,
 			),
 		}, {
 			"swap and coin denomination are equal", false, NewMsgSwapOrder(Input{
 				Address: sender, Coin: input},
-				Output{Address: recipient, Coin: sdk.NewCoin(denom0, amt)},
+				Output{Address: recipient, Coin: sdk.NewCoin(denomETH, amt)},
 				deadline,
 				true,
 			),
@@ -205,9 +205,9 @@ func TestMsgSwapOrderValidation(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			err := tc.msg.ValidateBasic()
 			if tc.expectPass {
-				require.Nil(t, err)
+				require.NoError(t, err, tc.name)
 			} else {
-				require.NotNil(t, err)
+				require.Error(t, err, tc.name)
 			}
 		})
 	}
@@ -239,7 +239,7 @@ func TestMsgAddLiquidityType(t *testing.T) {
 func TestMsgAddLiquidityGetSignBytes(t *testing.T) {
 	msg := NewMsgAddLiquidity(input, amt, sdk.OneInt(), deadline, sender)
 	res := msg.GetSignBytes()
-	expected := `{"type":"irishub/coinswap/MsgAddLiquidity","value":{"deadline":"1580000000","exact_standard_amt":"100","max_token":{"amount":"1000","denom":"atom"},"min_liquidity":"1","sender":"faa128nh833v43sggcj65nk7khjka9dwngpl6j29hj"}}`
+	expected := `{"type":"irishub/coinswap/MsgAddLiquidity","value":{"deadline":"1580000000","exact_standard_amt":"100","max_token":{"amount":"1000","denom":"eth"},"min_liquidity":"1","sender":"faa128nh833v43sggcj65nk7khjka9dwngpl6j29hj"}}`
 	require.Equal(t, expected, string(res))
 }
 
@@ -258,7 +258,7 @@ func TestMsgAddLiquidityValidation(t *testing.T) {
 		expectPass bool
 	}{
 		{"no deposit coin", NewMsgAddLiquidity(sdk.Coin{}, amt, sdk.OneInt(), deadline, sender), false},
-		{"zero deposit coin", NewMsgAddLiquidity(sdk.NewCoin(denom1, sdk.ZeroInt()), amt, sdk.OneInt(), deadline, sender), false},
+		{"zero deposit coin", NewMsgAddLiquidity(sdk.NewCoin(denomBTC, sdk.ZeroInt()), amt, sdk.OneInt(), deadline, sender), false},
 		{"invalid withdraw amount", NewMsgAddLiquidity(input, sdk.ZeroInt(), sdk.OneInt(), deadline, sender), false},
 		{"deadline not initialized", NewMsgAddLiquidity(input, amt, sdk.OneInt(), emptyTime, sender), false},
 		{"empty sender", NewMsgAddLiquidity(input, amt, sdk.OneInt(), deadline, emptyAddr), false},
@@ -269,9 +269,9 @@ func TestMsgAddLiquidityValidation(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			err := tc.msg.ValidateBasic()
 			if tc.expectPass {
-				require.Nil(t, err)
+				require.NoError(t, err, tc.name)
 			} else {
-				require.NotNil(t, err)
+				require.Error(t, err, tc.name)
 			}
 		})
 	}
@@ -334,9 +334,9 @@ func TestMsgRemoveLiquidityValidation(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			err := tc.msg.ValidateBasic()
 			if tc.expectPass {
-				require.Nil(t, err)
+				require.NoError(t, err, tc.name)
 			} else {
-				require.NotNil(t, err)
+				require.Error(t, err, tc.name)
 			}
 		})
 	}

@@ -12,7 +12,7 @@ func TestValidateParams(t *testing.T) {
 	// check that valid case work
 	defaultParams := DefaultParams()
 	err := defaultParams.Validate()
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	require.Panics(t, func() { sdk.NewDecWithPrec(1, 19) }, "should panic")
 	require.Panics(t, func() { sdk.NewDecWithPrec(1, -1) }, "should panic")

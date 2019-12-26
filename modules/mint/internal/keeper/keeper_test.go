@@ -9,6 +9,7 @@ import (
 
 	abci "github.com/tendermint/tendermint/abci/types"
 
+	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/supply"
 
@@ -19,6 +20,7 @@ import (
 type KeeperTestSuite struct {
 	suite.Suite
 
+	cdc *codec.Codec
 	ctx sdk.Context
 	app *simapp.SimApp
 }
@@ -26,6 +28,7 @@ type KeeperTestSuite struct {
 func (suite *KeeperTestSuite) SetupTest() {
 	app := simapp.Setup(false)
 
+	suite.cdc = app.Codec()
 	suite.ctx = app.BaseApp.NewContext(false, abci.Header{})
 	suite.app = app
 

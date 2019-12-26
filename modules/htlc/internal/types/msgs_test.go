@@ -114,9 +114,9 @@ func TestMsgCreateHTLCValidation(t *testing.T) {
 			msg := NewMsgCreateHTLC(td.sender, td.to, td.receiverOnOtherChain, td.amount, td.hashLock, td.timestamp, td.timeLock)
 			err := msg.ValidateBasic()
 			if td.expectPass {
-				require.Nil(t, err, "%d: %+v", i, err)
+				require.NoError(t, err, "%d: %+v", i, err)
 			} else {
-				require.NotNil(t, err, "%d: %+v", i, err)
+				require.Error(t, err, "%d: %+v", i, err)
 			}
 		})
 	}
@@ -188,9 +188,9 @@ func TestMsgClaimHTLCValidation(t *testing.T) {
 			err := msg.ValidateBasic()
 
 			if td.expectPass {
-				require.Nil(t, msg.ValidateBasic(), "%d: %+v", i, err)
+				require.NoError(t, msg.ValidateBasic(), "%d: %+v", i, err)
 			} else {
-				require.NotNil(t, msg.ValidateBasic(), "%d", i)
+				require.Error(t, msg.ValidateBasic(), "%d", i)
 			}
 		})
 	}
@@ -254,9 +254,9 @@ func TestMsgRefundHTLCValidation(t *testing.T) {
 			msg := NewMsgRefundHTLC(td.sender, td.hashLock)
 			err := msg.ValidateBasic()
 			if td.expectPass {
-				require.Nil(t, msg.ValidateBasic(), "%d: %+v", i, err)
+				require.NoError(t, msg.ValidateBasic(), "%d: %+v", i, err)
 			} else {
-				require.NotNil(t, msg.ValidateBasic(), "%d", i)
+				require.Error(t, msg.ValidateBasic(), "%d", i)
 			}
 		})
 	}

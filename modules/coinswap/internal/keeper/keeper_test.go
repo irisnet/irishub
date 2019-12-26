@@ -20,8 +20,8 @@ const (
 	denomStandard = types.StandardDenom
 	denomBTC      = "btc"
 	denomETH      = "eth"
-	unidenomBTC   = types.FormatUniABSPrefix + "btc"
-	unidenomETH   = types.FormatUniABSPrefix + "eth"
+	unidenomBTC   = types.FormatUniABSPrefix + denomBTC
+	unidenomETH   = types.FormatUniABSPrefix + denomETH
 )
 
 var (
@@ -69,8 +69,8 @@ func initVars(suite *TestSuite) {
 	amountInitStandard, _ := sdk.NewIntFromString("30000000000000000000")
 	amountInitBTC, _ := sdk.NewIntFromString("3000000000")
 
-	addrSender1 = sdk.AccAddress([]byte("addrSender1"))
-	addrSender2 = sdk.AccAddress([]byte("addrSender2"))
+	addrSender1 = sdk.AccAddress("addrSender1")
+	addrSender2 = sdk.AccAddress("addrSender2")
 	_ = suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, addrSender1)
 	_ = suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, addrSender2)
 	_ = suite.app.BankKeeper.SetCoins(
@@ -106,7 +106,7 @@ func (suite *TestSuite) TestLiquidity() {
 
 	msg := types.NewMsgAddLiquidity(depositCoin, standardAmt, minReward, deadline.Unix(), addrSender1)
 	err := suite.app.CoinswapKeeper.AddLiquidity(suite.ctx, msg)
-	suite.Nil(err)
+	suite.NoError(err)
 
 	moduleAccountBalances := suite.app.SupplyKeeper.GetSupply(suite.ctx).GetTotal()
 	reservePoolBalances := suite.app.AccountKeeper.GetAccount(suite.ctx, poolAddr).GetCoins()
@@ -127,7 +127,7 @@ func (suite *TestSuite) TestLiquidity() {
 
 	msg = types.NewMsgAddLiquidity(depositCoin, standardAmt, minReward, deadline.Unix(), addrSender2)
 	err = suite.app.CoinswapKeeper.AddLiquidity(suite.ctx, msg)
-	suite.Nil(err)
+	suite.NoError(err)
 
 	moduleAccountBalances = suite.app.SupplyKeeper.GetSupply(suite.ctx).GetTotal()
 	reservePoolBalances = suite.app.AccountKeeper.GetAccount(suite.ctx, poolAddr).GetCoins()
@@ -147,7 +147,7 @@ func (suite *TestSuite) TestLiquidity() {
 	)
 
 	err = suite.app.CoinswapKeeper.RemoveLiquidity(suite.ctx, msgRemove)
-	suite.Nil(err)
+	suite.NoError(err)
 
 	moduleAccountBalances = suite.app.SupplyKeeper.GetSupply(suite.ctx).GetTotal()
 	reservePoolBalances = suite.app.AccountKeeper.GetAccount(suite.ctx, poolAddr).GetCoins()
@@ -167,7 +167,7 @@ func (suite *TestSuite) TestLiquidity() {
 	)
 
 	err = suite.app.CoinswapKeeper.RemoveLiquidity(suite.ctx, msgRemove)
-	suite.Nil(err)
+	suite.NoError(err)
 
 	moduleAccountBalances = suite.app.SupplyKeeper.GetSupply(suite.ctx).GetTotal()
 	reservePoolBalances = suite.app.AccountKeeper.GetAccount(suite.ctx, poolAddr).GetCoins()

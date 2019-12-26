@@ -17,9 +17,9 @@ import (
 type TestSuite struct {
 	suite.Suite
 
-	cdc *codec.Codec
-	ctx sdk.Context
-	app *simapp.SimApp
+	cdc    *codec.Codec
+	ctx    sdk.Context
+	keeper guardian.Keeper
 }
 
 func (suite *TestSuite) SetupTest() {
@@ -27,7 +27,7 @@ func (suite *TestSuite) SetupTest() {
 
 	suite.cdc = app.Codec()
 	suite.ctx = app.BaseApp.NewContext(false, abci.Header{})
-	suite.app = app
+	suite.keeper = app.GuardianKeeper
 }
 
 func TestGenesisSuite(t *testing.T) {
@@ -35,7 +35,7 @@ func TestGenesisSuite(t *testing.T) {
 }
 
 func (suite *TestSuite) TestExportGenesis() {
-	exportedGenesis := guardian.ExportGenesis(suite.ctx, suite.app.GuardianKeeper)
+	exportedGenesis := guardian.ExportGenesis(suite.ctx, suite.keeper)
 	defaultGenesis := guardian.DefaultGenesisState()
 	suite.Equal(exportedGenesis, defaultGenesis)
 }

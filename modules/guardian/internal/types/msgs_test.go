@@ -53,7 +53,7 @@ func TestMsgAddProfilerType(t *testing.T) {
 func TestMsgAddProfilerGetSignBytes(t *testing.T) {
 	msg := NewMsgAddProfiler(description, testAddr, sender)
 	res := msg.GetSignBytes()
-	expected := `{"type":"irishub/guardian/MsgAddProfiler","value":{"AddGuardian":{"added_by":"faa128nh833v43sggcj65nk7khjka9dwngpl6j29hj","address":"faa1mrehjkgeg75nz2gk7lr7dnxvvtg4497jxss8hq","description":"description"}}}`
+	expected := `{"type":"irishub/guardian/MsgAddProfiler","value":{"add_guardian":{"added_by":"faa128nh833v43sggcj65nk7khjka9dwngpl6j29hj","address":"faa1mrehjkgeg75nz2gk7lr7dnxvvtg4497jxss8hq","description":"description"}}}`
 	require.Equal(t, expected, string(res))
 }
 
@@ -81,9 +81,9 @@ func TestMsgAddProfilerValidation(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			err := tc.msg.ValidateBasic()
 			if tc.expectPass {
-				require.Nil(t, err)
+				require.NoError(t, err)
 			} else {
-				require.NotNil(t, err)
+				require.Error(t, err)
 			}
 		})
 	}
@@ -112,7 +112,7 @@ func TestMsgDeleteProfilerType(t *testing.T) {
 func TestMsgDeleteProfilerGetSignBytes(t *testing.T) {
 	msg := NewMsgDeleteProfiler(testAddr, sender)
 	res := msg.GetSignBytes()
-	expected := `{"type":"irishub/guardian/MsgDeleteProfiler","value":{"DeleteGuardian":{"address":"faa1mrehjkgeg75nz2gk7lr7dnxvvtg4497jxss8hq","deleted_by":"faa128nh833v43sggcj65nk7khjka9dwngpl6j29hj"}}}`
+	expected := `{"type":"irishub/guardian/MsgDeleteProfiler","value":{"delete_guardian":{"address":"faa1mrehjkgeg75nz2gk7lr7dnxvvtg4497jxss8hq","deleted_by":"faa128nh833v43sggcj65nk7khjka9dwngpl6j29hj"}}}`
 	require.Equal(t, expected, string(res))
 }
 
@@ -139,9 +139,9 @@ func TestMsgDeleteProfilerValidation(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			err := tc.msg.ValidateBasic()
 			if tc.expectPass {
-				require.Nil(t, err)
+				require.NoError(t, err)
 			} else {
-				require.NotNil(t, err)
+				require.Error(t, err)
 			}
 		})
 	}
@@ -170,7 +170,7 @@ func TestMsgAddTrusteeType(t *testing.T) {
 func TestMsgAddTrusteeGetSignBytes(t *testing.T) {
 	msg := NewMsgAddTrustee(description, testAddr, sender)
 	res := msg.GetSignBytes()
-	expected := `{"type":"irishub/guardian/MsgAddTrustee","value":{"AddGuardian":{"added_by":"faa128nh833v43sggcj65nk7khjka9dwngpl6j29hj","address":"faa1mrehjkgeg75nz2gk7lr7dnxvvtg4497jxss8hq","description":"description"}}}`
+	expected := `{"type":"irishub/guardian/MsgAddTrustee","value":{"add_guardian":{"added_by":"faa128nh833v43sggcj65nk7khjka9dwngpl6j29hj","address":"faa1mrehjkgeg75nz2gk7lr7dnxvvtg4497jxss8hq","description":"description"}}}`
 	require.Equal(t, expected, string(res))
 }
 
@@ -198,9 +198,9 @@ func TestMsgAddTrusteeValidation(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			err := tc.msg.ValidateBasic()
 			if tc.expectPass {
-				require.Nil(t, err)
+				require.NoError(t, err)
 			} else {
-				require.NotNil(t, err)
+				require.Error(t, err)
 			}
 		})
 	}
@@ -229,7 +229,7 @@ func TestMsgDeleteTrusteeType(t *testing.T) {
 func TestMsgDeleteTrusteeGetSignBytes(t *testing.T) {
 	msg := NewMsgDeleteTrustee(testAddr, sender)
 	res := msg.GetSignBytes()
-	expected := `{"type":"irishub/guardian/MsgDeleteTrustee","value":{"DeleteGuardian":{"address":"faa1mrehjkgeg75nz2gk7lr7dnxvvtg4497jxss8hq","deleted_by":"faa128nh833v43sggcj65nk7khjka9dwngpl6j29hj"}}}`
+	expected := `{"type":"irishub/guardian/MsgDeleteTrustee","value":{"delete_guardian":{"address":"faa1mrehjkgeg75nz2gk7lr7dnxvvtg4497jxss8hq","deleted_by":"faa128nh833v43sggcj65nk7khjka9dwngpl6j29hj"}}}`
 	require.Equal(t, expected, string(res))
 }
 
@@ -256,9 +256,9 @@ func TestMsgDeleteTrusteeValidation(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			err := tc.msg.ValidateBasic()
 			if tc.expectPass {
-				require.Nil(t, err)
+				require.NoError(t, err)
 			} else {
-				require.NotNil(t, err)
+				require.Error(t, err)
 			}
 		})
 	}

@@ -55,8 +55,8 @@ func TestKeeperTestSuite(t *testing.T) {
 }
 
 func initVars(suite *KeeperTestSuite) {
-	addrSender = sdk.AccAddress([]byte("__addrSender________"))
-	addrTo = sdk.AccAddress([]byte("__addrTo____________"))
+	addrSender = sdk.AccAddress("__addrSender________")
+	addrTo = sdk.AccAddress("__addrTo____________")
 	_ = suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, addrSender)
 	_ = suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, addrTo)
 	_ = suite.app.BankKeeper.SetCoins(suite.ctx, addrSender, sdk.NewCoins(sdk.NewInt64Coin(sdk.DefaultBondDenom, 100000)))
@@ -80,7 +80,7 @@ func initVars(suite *KeeperTestSuite) {
 
 func (suite *KeeperTestSuite) TestCreateHTLC() {
 	_, err := suite.app.HTLCKeeper.GetHTLC(suite.ctx, hashLock)
-	suite.NotNil(err)
+	suite.Error(err)
 
 	htlc := types.NewHTLC(
 		addrSender,
@@ -99,7 +99,7 @@ func (suite *KeeperTestSuite) TestCreateHTLC() {
 	suite.Nil(suite.app.AccountKeeper.GetAccount(suite.ctx, htlcAddr))
 
 	err = suite.app.HTLCKeeper.CreateHTLC(suite.ctx, htlc, hashLock)
-	suite.Nil(err)
+	suite.NoError(err)
 
 	htlcAcc := suite.app.SupplyKeeper.GetModuleAccount(suite.ctx, types.ModuleName)
 	suite.NotNil(htlcAcc)
@@ -111,7 +111,7 @@ func (suite *KeeperTestSuite) TestCreateHTLC() {
 	suite.True(originSenderAccAmt.Sub(amount).IsEqual(finalSenderAccAmt))
 
 	htlc, err = suite.app.HTLCKeeper.GetHTLC(suite.ctx, hashLock)
-	suite.Nil(err)
+	suite.NoError(err)
 
 	suite.Equal(addrSender, htlc.Sender)
 	suite.Equal(addrTo, htlc.To)
@@ -163,10 +163,10 @@ func (suite *KeeperTestSuite) TestClaimHTLC() {
 			)
 
 			err := suite.app.HTLCKeeper.CreateHTLC(suite.ctx, htlc, td.hashLock)
-			suite.Nil(err, "TestData: %d", i)
+			suite.NoError(err, "TestData: %d", i)
 
 			htlc, err = suite.app.HTLCKeeper.GetHTLC(suite.ctx, td.hashLock)
-			suite.Nil(err, "TestData: %d", i)
+			suite.NoError(err, "TestData: %d", i)
 			suite.Equal(types.OPEN, htlc.State, "TestData: %d", i)
 
 			htlcAcc := suite.app.SupplyKeeper.GetModuleAccount(suite.ctx, types.ModuleName)
@@ -175,7 +175,7 @@ func (suite *KeeperTestSuite) TestClaimHTLC() {
 			originReceiverAmount := suite.app.AccountKeeper.GetAccount(suite.ctx, addrTo).GetCoins()
 
 			_, _, err = suite.app.HTLCKeeper.ClaimHTLC(suite.ctx, td.hashLock, td.secret)
-			suite.Nil(err, "TestData: %d", i)
+			suite.NoError(err, "TestData: %d", i)
 
 			htlc, _ = suite.app.HTLCKeeper.GetHTLC(suite.ctx, td.hashLock)
 			suite.Equal(types.COMPLETED, htlc.State, "TestData: %d", i)
@@ -203,10 +203,10 @@ func (suite *KeeperTestSuite) TestClaimHTLC() {
 			)
 
 			err := suite.app.HTLCKeeper.CreateHTLC(suite.ctx, htlc, td.hashLock)
-			suite.Nil(err, "TestData: %d", i)
+			suite.NoError(err, "TestData: %d", i)
 
 			htlc, err = suite.app.HTLCKeeper.GetHTLC(suite.ctx, td.hashLock)
-			suite.Nil(err, "TestData: %d", i)
+			suite.NoError(err, "TestData: %d", i)
 			suite.Equal(types.OPEN, htlc.State, "TestData: %d", i)
 
 			htlcAddr := suite.app.SupplyKeeper.GetModuleAddress(types.ModuleName)
@@ -215,7 +215,7 @@ func (suite *KeeperTestSuite) TestClaimHTLC() {
 			originReceiverAmount := suite.app.AccountKeeper.GetAccount(suite.ctx, addrTo).GetCoins()
 
 			_, _, err = suite.app.HTLCKeeper.ClaimHTLC(suite.ctx, td.hashLock, td.secret)
-			suite.NotNil(err, "TestData: %d", i)
+			suite.Error(err, "TestData: %d", i)
 
 			htlc, _ = suite.app.HTLCKeeper.GetHTLC(suite.ctx, td.hashLock)
 			suite.Equal(types.OPEN, htlc.State, "TestData: %d", i)
@@ -242,10 +242,10 @@ func (suite *KeeperTestSuite) TestRefundHTLC() {
 	)
 
 	err := suite.app.HTLCKeeper.CreateHTLC(suite.ctx, htlc, hashLock)
-	suite.Nil(err)
+	suite.NoError(err)
 
 	htlc, err = suite.app.HTLCKeeper.GetHTLC(suite.ctx, hashLock)
-	suite.Nil(err)
+	suite.NoError(err)
 	suite.Equal(types.EXPIRED, htlc.State)
 
 	htlcAcc := suite.app.SupplyKeeper.GetModuleAccount(suite.ctx, types.ModuleName)
@@ -254,10 +254,10 @@ func (suite *KeeperTestSuite) TestRefundHTLC() {
 	originSenderAmount := suite.app.AccountKeeper.GetAccount(suite.ctx, addrSender).GetCoins()
 
 	_, err = suite.app.HTLCKeeper.RefundHTLC(suite.ctx, hashLock)
-	suite.Nil(err)
+	suite.NoError(err)
 
 	_, err = suite.app.HTLCKeeper.GetHTLC(suite.ctx, hashLock)
-	suite.NotNil(err)
+	suite.Error(err)
 
 	htlcAcc = suite.app.SupplyKeeper.GetModuleAccount(suite.ctx, types.ModuleName)
 
@@ -280,7 +280,7 @@ func (suite *KeeperTestSuite) TestIterateHTLCs() {
 		stateOpen,
 	)
 	err := suite.app.HTLCKeeper.CreateHTLC(suite.ctx, htlc, hashLock)
-	suite.Nil(err)
+	suite.NoError(err)
 
 	find := false
 	suite.app.HTLCKeeper.IterateHTLCs(suite.ctx, func(hlock types.HTLCHashLock, h types.HTLC) (stop bool) {
@@ -304,7 +304,7 @@ func (suite *KeeperTestSuite) TestIterateHTLCExpireQueueByHeight() {
 		stateOpen,
 	)
 	err := suite.app.HTLCKeeper.CreateHTLC(suite.ctx, htlc, hashLock)
-	suite.Nil(err)
+	suite.NoError(err)
 
 	iterator := suite.app.HTLCKeeper.IterateHTLCExpireQueueByHeight(suite.ctx, expireHeight)
 	defer iterator.Close()

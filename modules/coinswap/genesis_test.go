@@ -37,7 +37,7 @@ func TestGenesisSuite(t *testing.T) {
 func (suite *TestSuite) TestExportGenesis() {
 	exportedGenesis := coinswap.ExportGenesis(suite.ctx, suite.app.CoinswapKeeper)
 	err := coinswap.ValidateGenesis(exportedGenesis)
-	suite.Nil(err)
+	suite.NoError(err)
 	defaultGenesis := coinswap.DefaultGenesisState()
 	suite.Equal(exportedGenesis, defaultGenesis)
 }

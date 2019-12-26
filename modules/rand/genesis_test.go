@@ -2,6 +2,7 @@ package rand_test
 
 import (
 	"strconv"
+	"testing"
 
 	"github.com/stretchr/testify/suite"
 
@@ -21,8 +22,8 @@ var (
 	testNewHeight      = testHeight + 50
 	testBlockInterval1 = uint64(100)
 	testBlockInterval2 = uint64(200)
-	testConsumer1      = sdk.AccAddress([]byte("test-consumer1"))
-	testConsumer2      = sdk.AccAddress([]byte("test-consumer2"))
+	testConsumer1      = sdk.AccAddress("test-consumer1")
+	testConsumer2      = sdk.AccAddress("test-consumer2")
 )
 
 type GenesisTestSuite struct {
@@ -39,6 +40,10 @@ func (suite *GenesisTestSuite) SetupTest() {
 	suite.cdc = app.Codec()
 	suite.ctx = app.BaseApp.NewContext(false, abci.Header{})
 	suite.keeper = app.RandKeeper
+}
+
+func TestQuerierSuite(t *testing.T) {
+	suite.Run(t, new(GenesisTestSuite))
 }
 
 func (suite *GenesisTestSuite) TestExportGenesis() {

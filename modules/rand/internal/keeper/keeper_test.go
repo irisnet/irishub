@@ -18,11 +18,11 @@ import (
 
 // define testing variables
 var (
-	testTxBytes        = []byte("test-tx")
+	testTxBytes        = []byte("test_tx")
 	testHeight         = int64(10000)
 	testBlockInterval  = uint64(100)
-	testConsumer       = sdk.AccAddress([]byte("test-consumer"))
-	testReqID          = []byte("test-req-id")
+	testConsumer       = sdk.AccAddress("_______test_consumer")
+	testReqID          = []byte("test_req_id")
 	testRandNumerator  = int64(3)
 	testRandDenomiator = int64(4)
 )
@@ -43,6 +43,10 @@ func (suite *KeeperTestSuite) SetupTest() {
 	suite.keeper = app.RandKeeper
 }
 
+func TestKeeperTestSuite(t *testing.T) {
+	suite.Run(t, new(KeeperTestSuite))
+}
+
 func (suite *KeeperTestSuite) TestSetRand() {
 	rand := rand.NewRand(rand.SHA256(testTxBytes), testHeight, big.NewRat(testRandNumerator, testRandDenomiator).FloatString(rand.RandPrec))
 	suite.keeper.SetRand(suite.ctx, testReqID, rand)
@@ -57,10 +61,11 @@ func (suite *KeeperTestSuite) TestSetRand() {
 func (suite *KeeperTestSuite) TestRequestRand() {
 	suite.ctx = suite.ctx.WithBlockHeight(testHeight).WithTxBytes(testTxBytes)
 
-	_, err := suite.keeper.RequestRand(suite.ctx, testConsumer, testBlockInterval)
+	request, err := suite.keeper.RequestRand(suite.ctx, testConsumer, testBlockInterval)
 	suite.NoError(err)
 
 	expectedRequest := rand.NewRequest(testHeight, testConsumer, rand.SHA256(testTxBytes))
+	suite.Equal(request, expectedRequest)
 
 	iterator := suite.keeper.IterateRandRequestQueueByHeight(suite.ctx, testHeight+int64(testBlockInterval))
 	defer iterator.Close()
@@ -70,8 +75,4 @@ func (suite *KeeperTestSuite) TestRequestRand() {
 		suite.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &request)
 		suite.Equal(expectedRequest, request)
 	}
-}
-
-func TestKeeperTestSuite(t *testing.T) {
-	suite.Run(t, new(KeeperTestSuite))
 }

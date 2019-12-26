@@ -8,6 +8,7 @@ import (
 	abci "github.com/tendermint/tendermint/abci/types"
 
 	"github.com/irisnet/irishub/modules/guardian/internal/keeper"
+	"github.com/irisnet/irishub/modules/guardian/internal/types"
 )
 
 func TestQuerierSuite(t *testing.T) {
@@ -24,10 +25,29 @@ func (suite *KeeperTestSuite) TestNewQuerier() {
 	suite.Error(err)
 	suite.Nil(res)
 
-	// init xxx
-
 	// test queryProfilers
 
-	// test queryProfilers
+	res, err = querier(suite.ctx, []string{types.QueryProfilers}, abci.RequestQuery{})
+	suite.NoError(err)
+	var guardianProfilers []types.Guardian
+	e := suite.cdc.UnmarshalJSON(res, &guardianProfilers)
+	suite.NoError(e)
 
+	for i, val := range guardianProfilers {
+		equal := val.Equal(types.DefaultGenesisState().Profilers[i])
+		suite.True(equal)
+	}
+
+	// test queryTrustees
+
+	res, err = querier(suite.ctx, []string{types.QueryTrustees}, abci.RequestQuery{})
+	suite.NoError(err)
+	var guardianTrustees []types.Guardian
+	e = suite.cdc.UnmarshalJSON(res, &guardianTrustees)
+	suite.NoError(e)
+
+	for i, val := range guardianTrustees {
+		equal := val.Equal(types.DefaultGenesisState().Trustees[i])
+		suite.True(equal)
+	}
 }
