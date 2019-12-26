@@ -72,7 +72,7 @@ func HandleMsgTransferToken(ctx sdk.Context, k Keeper, msg MsgTransferToken) sdk
 			sdk.NewAttribute(sdk.AttributeKeySender, msg.SrcOwner.String()),
 		),
 		sdk.NewEvent(
-			EventTypeTransferTokenOwner,
+			EventTypeTransferToken,
 			sdk.NewAttribute(AttributeKeyTokenSymbol, msg.Symbol),
 		),
 	})
@@ -119,7 +119,7 @@ func HandleMsgBurnToken(ctx sdk.Context, k Keeper, msg MsgBurnToken) sdk.Result 
 			sdk.NewAttribute(sdk.AttributeKeySender, msg.Sender.String()),
 		),
 		sdk.NewEvent(
-			EventTypeMintToken,
+			EventTypeBurnToken,
 			sdk.NewAttribute(sdk.AttributeKeyAmount, msg.Amount.String()),
 		),
 	})

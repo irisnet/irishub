@@ -7,6 +7,7 @@ const (
 	EventTypeEditToken     = "edit_token"
 	EventTypeTransferToken = "transfer_token"
 	EventTypeMintToken     = "mint_token"
+	EventTypeBurnToken     = "burn_token"
 
 	AttributeKeyTokenID     = "token_id"
 	AttributeKeyTokenDenom  = "token_denom"

@@ -7,17 +7,17 @@ import (
 
 // GenesisState - all asset state that must be provided at genesis
 type GenesisState struct {
-	TokenGenesisState token.GenesisState
+	TokenState token.GenesisState `json:"token_state" yaml:"token_state"` // token state
 }
 
 //NewGenesisState creates a new genesis state.
 func NewGenesisState(tGenesisState token.GenesisState) GenesisState {
-	return GenesisState{TokenGenesisState: tGenesisState}
+	return GenesisState{TokenState: tGenesisState}
 }
 
 // InitGenesis - store genesis parameters and tokens
 func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
-	token.InitGenesis(ctx, k.TokenKeeper, data.TokenGenesisState)
+	token.InitGenesis(ctx, k.TokenKeeper, data.TokenState)
 }
 
 // ExportGenesis - output genesis
@@ -25,7 +25,7 @@ func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 	// export token genesisState
 	tokenGenesisState := token.ExportGenesis(ctx, k.TokenKeeper)
 	return GenesisState{
-		TokenGenesisState: tokenGenesisState,
+		TokenState: tokenGenesisState,
 	}
 
 }
@@ -39,7 +39,7 @@ func DefaultGenesisState() GenesisState {
 // expected invariants holds.
 func ValidateGenesis(data GenesisState) error {
 	// validate tokens
-	if err := token.ValidateGenesis(data.TokenGenesisState); err != nil {
+	if err := token.ValidateGenesis(data.TokenState); err != nil {
 		return err
 	}
 

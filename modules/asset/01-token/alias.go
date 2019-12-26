@@ -30,8 +30,9 @@ const (
 	CodeAssetNotMintable         = types.CodeTokenNotMintable
 	EventTypeIssueToken          = types.EventTypeIssueToken
 	EventTypeEditToken           = types.EventTypeEditToken
-	EventTypeTransferTokenOwner  = types.EventTypeTransferToken
+	EventTypeTransferToken       = types.EventTypeTransferToken
 	EventTypeMintToken           = types.EventTypeMintToken
+	EventTypeBurnToken           = types.EventTypeBurnToken
 	AttributeKeyTokenID          = types.AttributeKeyTokenID
 	AttributeKeyTokenDenom       = types.AttributeKeyTokenDenom
 	AttributeKeyTokenSymbol      = types.AttributeKeyTokenSymbol
@@ -93,6 +94,7 @@ var (
 	NewMsgMintToken              = types.NewMsgMintToken
 	NewParams                    = types.NewParams
 	DefaultParams                = types.DefaultParams
+	DefaultTokens                = types.DefaultTokens
 
 	// variable aliases
 	ModuleCdc                    = types.ModuleCdc
