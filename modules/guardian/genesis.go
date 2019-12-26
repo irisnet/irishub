@@ -37,5 +37,6 @@ func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 		ModuleCdc.MustUnmarshalBinaryLengthPrefixed(trusteesIterator.Value(), &trustee)
 		trustees = append(trustees, trustee)
 	}
+
 	return NewGenesisState(profilers, trustees)
 }
