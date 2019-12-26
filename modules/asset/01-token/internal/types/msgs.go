@@ -331,7 +331,7 @@ func (msg MsgBurnToken) ValidateBasic() sdk.Error {
 		return ErrInvalidAddress(DefaultCodespace, fmt.Sprintf("the sender of the token must be specified"))
 	}
 
-	if !msg.Amount.IsValid() {
+	if msg.Amount.Empty() || !msg.Amount.IsValid() {
 		return ErrInvalidAssetMaxSupply(DefaultCodespace, fmt.Sprintf("invalid token amount %v", msg.Amount))
 	}
 

@@ -36,10 +36,8 @@ func NewParams(assetTaxRate sdk.Dec, issueTokenBaseFee sdk.Coin,
 // DefaultParams returns default asset module params
 func DefaultParams() Params {
 	return Params{
-		AssetTaxRate: sdk.NewDecWithPrec(4, 1), // 0.4 (40%)
-		//TODO
-		//IssueTokenBaseFee: sdk.NewCoin(types.IrisAtto, sdk.NewIntWithDecimal(60000, 18)),
-		IssueTokenBaseFee: sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewIntWithDecimal(1000, 0)),
+		AssetTaxRate:      sdk.NewDecWithPrec(4, 1), // 0.4 (40%)
+		IssueTokenBaseFee: sdk.NewCoin(DefaultToken.MinUnit, sdk.NewIntWithDecimal(60000, int(DefaultToken.Scale))),
 		MintTokenFeeRatio: sdk.NewDecWithPrec(1, 1), // 0.1 (10%)
 	}
 }

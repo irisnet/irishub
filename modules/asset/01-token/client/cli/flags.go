@@ -33,7 +33,7 @@ func init() {
 	FsTokenIssue.String(FlagSymbol, "", "the token symbol. Once created, it cannot be modified")
 	FsTokenIssue.String(FlagName, "", "the token name, e.g. IRIS Network")
 	FsTokenIssue.Uint8(FlagScale, 0, "the token decimal. The maximum value is 18")
-	FsTokenIssue.String(FlagMinUnit, "", "the token symbol minimum alias")
+	FsTokenIssue.String(FlagMinUnit, "", "the token symbol minimum uint")
 	FsTokenIssue.Uint64(FlagInitialSupply, 0, "the initial supply token of token")
 	FsTokenIssue.Uint64(FlagMaxSupply, types.MaximumAssetMaxSupply, "the max supply of the token")
 	FsTokenIssue.Bool(FlagMintable, false, "whether the token can be minted, default false")

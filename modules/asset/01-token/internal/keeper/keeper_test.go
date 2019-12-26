@@ -20,13 +20,13 @@ import (
 
 const (
 	isCheck = false
-	denom   = sdk.DefaultBondDenom
 )
 
 var (
-	owner      = sdk.AccAddress([]byte("tokenTest"))
-	initAmt, _ = sdk.NewIntFromString("1000000000000000000000000000")
-	initCoin   = sdk.Coins{sdk.NewCoin(denom, initAmt)}
+	denom    = types.DefaultToken.MinUnit
+	owner    = sdk.AccAddress([]byte("tokenTest"))
+	initAmt  = types.DefaultToken.InitialSupply
+	initCoin = sdk.Coins{sdk.NewCoin(denom, initAmt)}
 )
 
 type KeeperSuite struct {

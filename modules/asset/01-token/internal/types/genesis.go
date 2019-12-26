@@ -5,6 +5,15 @@ import (
 	"github.com/irisnet/irishub/types"
 )
 
+var DefaultToken = FungibleToken{BaseToken{
+	Symbol:        types.Iris,
+	Name:          "IRIS Network",
+	Scale:         18,
+	MinUnit:       types.IrisAtto,
+	InitialSupply: sdk.NewIntWithDecimal(20, 9),
+	Mintable:      true,
+}}
+
 // GenesisState - all asset state that must be provided at genesis
 type GenesisState struct {
 	Params Params `json:"params" yaml:"params"` // asset params
@@ -36,13 +45,6 @@ func ValidateGenesis(data GenesisState) error {
 
 func DefaultTokens() Tokens {
 	return Tokens{
-		{BaseToken{
-			Symbol:        types.Iris,
-			Name:          "IRIS Network",
-			Scale:         18,
-			MinUnit:       types.IrisAtto,
-			InitialSupply: sdk.NewIntWithDecimal(20, 9),
-			Mintable:      true,
-		}},
+		DefaultToken,
 	}
 }

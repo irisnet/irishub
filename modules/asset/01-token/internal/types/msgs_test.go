@@ -144,3 +144,25 @@ func TestMsgTransferTokenValidation(t *testing.T) {
 		}
 	}
 }
+
+func TestMsgBurnToken(t *testing.T) {
+	testData := []struct {
+		name       string
+		sender     sdk.AccAddress
+		amount     sdk.Coins
+		expectPass bool
+	}{
+		{"empty sender", emptyAddr, sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(1000))), false},
+		{"empty amount", addr1, sdk.Coins{}, false},
+		{"basic good", addr1, sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(1000))), true},
+	}
+
+	for _, td := range testData {
+		msg := NewMsgBurnToken(td.sender, td.amount)
+		if td.expectPass {
+			require.Nil(t, msg.ValidateBasic(), "test: %v", td.name)
+		} else {
+			require.NotNil(t, msg.ValidateBasic(), "test: %v", td.name)
+		}
+	}
+}
