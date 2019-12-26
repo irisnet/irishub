@@ -105,7 +105,7 @@ func (k Keeper) EditToken(ctx sdk.Context, msg types.MsgEditToken) sdk.Error {
 	}
 
 	if maxSupply.GT(sdk.ZeroInt()) {
-		token.MaxSupply = maxSupply
+		token.MaxSupply = sdk.NewInt(int64(msg.MaxSupply))
 	}
 
 	if msg.Mintable != types.Nil {

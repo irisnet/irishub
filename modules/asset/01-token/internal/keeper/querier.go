@@ -80,7 +80,7 @@ func queryToken(ctx sdk.Context, keeper Keeper, symbol string) ([]byte, sdk.Erro
 		return nil, sdk.ErrUnknownRequest(fmt.Sprintf("token %s does not exist", symbol))
 	}
 
-	bz, err := codec.MarshalJSONIndent(keeper.cdc, token)
+	bz, err := codec.MarshalJSONIndent(keeper.cdc, types.Tokens{token})
 	if err != nil {
 		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", err.Error()))
 	}

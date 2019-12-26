@@ -19,9 +19,10 @@ const (
 	CodeInvalidAssetInitSupply sdk.CodeType = 107
 	CodeInvalidAssetMaxSupply  sdk.CodeType = 108
 	CodeInvalidAssetScale      sdk.CodeType = 109
-	CodeAssetAlreadyExists     sdk.CodeType = 110
-	CodeAssetNotExists         sdk.CodeType = 111
-	CodeAssetNotMintable       sdk.CodeType = 112
+	CodeTokenAlreadyExists     sdk.CodeType = 110
+	CodeTokenNotExists         sdk.CodeType = 111
+	CodeTokenNotMintable       sdk.CodeType = 112
+	CodeInvalidMintAmount      sdk.CodeType = 113
 )
 
 //----------------------------------------
@@ -64,17 +65,17 @@ func ErrInvalidAssetScale(codespace sdk.CodespaceType, msg string) sdk.Error {
 
 // ErrAssetAlreadyExists error for invalid asset already exists
 func ErrAssetAlreadyExists(codespace sdk.CodespaceType, msg string) sdk.Error {
-	return sdk.NewError(codespace, CodeAssetAlreadyExists, msg)
+	return sdk.NewError(codespace, CodeTokenAlreadyExists, msg)
 }
 
 // ErrAssetNotExists error for asset not exists
 func ErrAssetNotExists(codespace sdk.CodespaceType, msg string) sdk.Error {
-	return sdk.NewError(codespace, CodeAssetNotExists, msg)
+	return sdk.NewError(codespace, CodeTokenNotExists, msg)
 }
 
 // ErrAssetNotMintable error for asset not mintable
 func ErrAssetNotMintable(codespace sdk.CodespaceType, msg string) sdk.Error {
-	return sdk.NewError(codespace, CodeAssetNotMintable, msg)
+	return sdk.NewError(codespace, CodeTokenNotMintable, msg)
 }
 
 // ErrInvalidOwner error for invalid owner
@@ -90,4 +91,9 @@ func ErrInvalidAddress(codespace sdk.CodespaceType, msg string) sdk.Error {
 // ErrInvalidToAddress error for invalid to address
 func ErrInvalidToAddress(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidToAddress, msg)
+}
+
+// ErrInvalidMintAmount error for invalid to amount
+func ErrInvalidMintAmount(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidMintAmount, msg)
 }

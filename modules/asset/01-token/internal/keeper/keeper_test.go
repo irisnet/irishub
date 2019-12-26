@@ -18,7 +18,18 @@ import (
 	"github.com/irisnet/irishub/simapp"
 )
 
-type KeeperTestSuite struct {
+const (
+	isCheck = false
+	denom   = sdk.DefaultBondDenom
+)
+
+var (
+	owner      = sdk.AccAddress([]byte("tokenTest"))
+	initAmt, _ = sdk.NewIntFromString("1000000000000000000000000000")
+	initCoin   = sdk.Coins{sdk.NewCoin(denom, initAmt)}
+)
+
+type KeeperSuite struct {
 	suite.Suite
 
 	cdc    *codec.Codec
@@ -28,34 +39,38 @@ type KeeperTestSuite struct {
 	bk     bank.Keeper
 }
 
-func (suite *KeeperTestSuite) SetupTest() {
-	isCheckTx := false
-	app := simapp.Setup(isCheckTx)
+func (suite *KeeperSuite) SetupTest() {
+
+	app := simapp.Setup(isCheck)
 
 	suite.cdc = app.Codec()
-	suite.ctx = app.BaseApp.NewContext(isCheckTx, abci.Header{})
+	suite.ctx = app.BaseApp.NewContext(isCheck, abci.Header{})
 	suite.keeper = app.AssetKeeper.TokenKeeper
 	suite.bk = app.BankKeeper
 	suite.sk = app.SupplyKeeper
 
 	// set params
 	suite.keeper.SetParamSet(suite.ctx, types.DefaultParams())
+
+	// init tokens to addr
+	err := suite.sk.MintCoins(suite.ctx, types.SubModuleName, initCoin)
+	suite.NoError(err)
+	err = suite.sk.SendCoinsFromModuleToAccount(suite.ctx, types.SubModuleName, owner, initCoin)
+	suite.NoError(err)
 }
 
-func TestKeeperTestSuite(t *testing.T) {
-	suite.Run(t, new(KeeperTestSuite))
+func TestKeeperSuite(t *testing.T) {
+	suite.Run(t, new(KeeperSuite))
 }
 
-func (suite *KeeperTestSuite) TestKeeper_IssueToken() {
-	addr := sdk.AccAddress([]byte("addr"))
-
-	ft := types.NewFungibleToken(types.NATIVE, "btc", "btc", 1, "", "satoshi", sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), true, addr)
+func (suite *KeeperSuite) TestIssueToken() {
+	ft := types.NewFungibleToken("btc", "Bitcoin network", 18, "satoshi", sdk.NewIntWithDecimal(21, 6), sdk.NewIntWithDecimal(21, 6), false, owner)
 	err := suite.keeper.IssueToken(suite.ctx, ft)
 	suite.NoError(err)
 
-	suite.True(suite.keeper.HasToken(suite.ctx, "btc"))
+	suite.True(suite.keeper.HasToken(suite.ctx, ft))
 
-	token, found := suite.keeper.GetToken(suite.ctx, "btc")
+	token, found := suite.keeper.GetToken(suite.ctx, ft.Symbol)
 	suite.True(found)
 
 	suite.Equal(ft.GetMinUnit(), token.GetMinUnit())
@@ -66,17 +81,16 @@ func (suite *KeeperTestSuite) TestKeeper_IssueToken() {
 	suite.Equal(ftJson, tokenJson)
 }
 
-func (suite *KeeperTestSuite) TestKeeper_EditToken() {
-	addr := sdk.AccAddress([]byte("addr"))
+func (suite *KeeperSuite) TestEditToken() {
 
-	ft := types.NewFungibleToken(types.NATIVE, "btc", "btc", 1, "", "satoshi", sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(21000000, 0), true, addr)
+	ft := types.NewFungibleToken("btc", "Bitcoin network", 18, "satoshi", sdk.NewIntWithDecimal(21, 6), sdk.NewIntWithDecimal(21, 6), false, owner)
 
 	err := suite.keeper.IssueToken(suite.ctx, ft)
 	suite.NoError(err)
 
-	suite.True(suite.keeper.HasToken(suite.ctx, "i.btc"))
+	suite.True(suite.keeper.HasToken(suite.ctx, ft))
 
-	token, found := suite.keeper.GetToken(suite.ctx, "i.btc")
+	token, found := suite.keeper.GetToken(suite.ctx, ft.Symbol)
 	suite.True(found)
 
 	suite.Equal(ft.GetMinUnit(), token.GetMinUnit())
@@ -87,27 +101,28 @@ func (suite *KeeperTestSuite) TestKeeper_EditToken() {
 	suite.Equal(ftJson, tokenJson)
 
 	mintable := types.False
-	msgEditToken := types.NewMsgEditToken("BTC Token", "btc", "btc", "btc", 0, mintable, addr)
+	msgEditToken := types.NewMsgEditToken("BTC Token", "btc", 22000000, mintable, owner)
 	err = suite.keeper.EditToken(suite.ctx, msgEditToken)
 	suite.NoError(err)
+
+	token2, found := suite.keeper.GetToken(suite.ctx, msgEditToken.Symbol)
+	suite.True(found)
+
+	expToken := types.NewFungibleToken("btc", "BTC Token", 18, "satoshi", sdk.NewIntWithDecimal(21, 6), sdk.NewIntWithDecimal(22, 6), false, owner)
+
+	expJson, _ := json.Marshal(expToken)
+	actJson, _ := json.Marshal(token2)
+	suite.Equal(expJson, actJson)
+
 }
 
-func (suite *KeeperTestSuite) TestMintTokenKeeper() {
-	addr := sdk.AccAddress([]byte("addr"))
+func (suite *KeeperSuite) TestMintToken() {
 
-	// mint tokens to addr
-	mintAmount, _ := sdk.NewIntFromString("1000000000000000000000000000")
-	mintCoin := sdk.Coins{sdk.NewCoin(sdk.DefaultBondDenom, mintAmount)}
-	err := suite.sk.MintCoins(suite.ctx, types.SubModuleName, mintCoin)
-	suite.NoError(err)
-	err = suite.sk.SendCoinsFromModuleToAccount(suite.ctx, types.SubModuleName, addr, mintCoin)
+	ft := types.NewFungibleToken("btc", "Bitcoin network", 0, "satoshi", sdk.NewIntWithDecimal(1000, 0), sdk.NewIntWithDecimal(3000, 0), true, owner)
+	err := suite.keeper.IssueToken(suite.ctx, ft)
 	suite.NoError(err)
 
-	ft := types.NewFungibleToken(types.NATIVE, "btc", "btc", 0, "", "satoshi", sdk.NewIntWithDecimal(1000, 0), sdk.NewIntWithDecimal(10000, 0), true, addr)
-	err = suite.keeper.IssueToken(suite.ctx, ft)
-	suite.NoError(err)
-
-	suite.True(suite.keeper.HasToken(suite.ctx, "btc"))
+	suite.True(suite.keeper.HasToken(suite.ctx, ft))
 
 	token, found := suite.keeper.GetToken(suite.ctx, "btc")
 	suite.True(found)
@@ -119,26 +134,29 @@ func (suite *KeeperTestSuite) TestMintTokenKeeper() {
 	assetJson, _ := json.Marshal(token)
 	suite.Equal(msgJson, assetJson)
 
-	msgMintToken := types.NewMsgMintToken("btc", addr, nil, 1000)
+	balance := suite.bk.GetCoins(suite.ctx, owner)
+	amt := balance.AmountOf(ft.MinUnit)
+	suite.Equal("1000", amt.String())
+
+	msgMintToken := types.NewMsgMintToken(ft.Symbol, owner, nil, 1000)
 	err = suite.keeper.MintToken(suite.ctx, msgMintToken)
 	suite.NoError(err)
 
-	balance := suite.bk.GetCoins(suite.ctx, addr)
-	amt := balance.AmountOf("btc-min")
+	balance = suite.bk.GetCoins(suite.ctx, owner)
+	amt = balance.AmountOf(ft.MinUnit)
 	suite.Equal("2000", amt.String())
 }
 
-func (suite *KeeperTestSuite) TestTransferOwnerKeeper() {
-	srcOwner := sdk.AccAddress([]byte("TokenSrcOwner"))
+func (suite *KeeperSuite) TestTransferToken() {
 
-	ft := types.NewFungibleToken(types.NATIVE, "btc", "btc", 1, "", "satoshi", sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(21000000, 0), true, srcOwner)
+	ft := types.NewFungibleToken("btc", "Bitcoin network", 18, "satoshi", sdk.NewIntWithDecimal(21, 6), sdk.NewIntWithDecimal(21, 6), false, owner)
 
 	err := suite.keeper.IssueToken(suite.ctx, ft)
 	suite.NoError(err)
 
-	suite.True(suite.keeper.HasToken(suite.ctx, "i.btc"))
+	suite.True(suite.keeper.HasToken(suite.ctx, ft))
 
-	token, found := suite.keeper.GetToken(suite.ctx, "i.btc")
+	token, found := suite.keeper.GetToken(suite.ctx, ft.Symbol)
 	suite.True(found)
 
 	suite.Equal(ft.GetMinUnit(), token.GetMinUnit())
@@ -150,14 +168,27 @@ func (suite *KeeperTestSuite) TestTransferOwnerKeeper() {
 
 	dstOwner := sdk.AccAddress([]byte("TokenDstOwner"))
 	msg := types.MsgTransferToken{
-		SrcOwner: srcOwner,
+		SrcOwner: ft.Owner,
 		DstOwner: dstOwner,
-		TokenID:  "btc",
+		Symbol:   ft.Symbol,
 	}
 	err = suite.keeper.TransferToken(suite.ctx, msg)
 	suite.NoError(err)
 
-	token, found = suite.keeper.GetToken(suite.ctx, "i.btc")
+	token, found = suite.keeper.GetToken(suite.ctx, ft.Symbol)
 	suite.True(found)
 	suite.Equal(dstOwner, token.Owner)
+}
+
+func (suite *KeeperSuite) TestBurnToken() {
+	burnCoin := sdk.NewCoins(sdk.NewCoin(denom, sdk.NewInt(1000)))
+	err := suite.keeper.BurnToken(suite.ctx, types.MsgBurnToken{
+		Sender: owner,
+		Amount: burnCoin,
+	})
+	suite.NoError(err)
+
+	balance := suite.bk.GetCoins(suite.ctx, owner)
+
+	suite.Equal(balance, initCoin.Sub(burnCoin))
 }

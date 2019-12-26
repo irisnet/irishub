@@ -284,6 +284,10 @@ func (msg MsgMintToken) ValidateBasic() sdk.Error {
 		return err
 	}
 
+	if msg.Amount <= 0 {
+		return ErrInvalidMintAmount(DefaultCodespace, fmt.Sprintf("the amount of the token must be great than zero"))
+	}
+
 	return ValidateMaxSupply(msg.Amount)
 }
 
@@ -327,7 +331,7 @@ func (msg MsgBurnToken) ValidateBasic() sdk.Error {
 		return ErrInvalidAddress(DefaultCodespace, fmt.Sprintf("the sender of the token must be specified"))
 	}
 
-	if msg.Amount.IsValid() {
+	if !msg.Amount.IsValid() {
 		return ErrInvalidAssetMaxSupply(DefaultCodespace, fmt.Sprintf("invalid token amount %v", msg.Amount))
 	}
 

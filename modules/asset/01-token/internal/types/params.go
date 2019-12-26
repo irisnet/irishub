@@ -3,8 +3,6 @@ package types
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/params"
-
-	"github.com/irisnet/irishub/types"
 )
 
 var _ params.ParamSet = (*Params)(nil)
@@ -38,8 +36,10 @@ func NewParams(assetTaxRate sdk.Dec, issueTokenBaseFee sdk.Coin,
 // DefaultParams returns default asset module params
 func DefaultParams() Params {
 	return Params{
-		AssetTaxRate:      sdk.NewDecWithPrec(4, 1), // 0.4 (40%)
-		IssueTokenBaseFee: sdk.NewCoin(types.IrisAtto, sdk.NewIntWithDecimal(60000, 18)),
+		AssetTaxRate: sdk.NewDecWithPrec(4, 1), // 0.4 (40%)
+		//TODO
+		//IssueTokenBaseFee: sdk.NewCoin(types.IrisAtto, sdk.NewIntWithDecimal(60000, 18)),
+		IssueTokenBaseFee: sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewIntWithDecimal(1000, 0)),
 		MintTokenFeeRatio: sdk.NewDecWithPrec(1, 1), // 0.1 (10%)
 	}
 }

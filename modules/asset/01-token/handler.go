@@ -2,6 +2,7 @@ package token
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"strconv"
 )
 
 // HandleIssueToken handles MsgIssueToken
@@ -96,7 +97,7 @@ func HandleMsgMintToken(ctx sdk.Context, k Keeper, msg MsgMintToken) sdk.Result 
 		sdk.NewEvent(
 			EventTypeMintToken,
 			sdk.NewAttribute(AttributeKeyTokenSymbol, msg.Symbol),
-			sdk.NewAttribute(sdk.AttributeKeyAmount, string(msg.Amount)),
+			sdk.NewAttribute(sdk.AttributeKeyAmount, strconv.FormatUint(msg.Amount, 10)),
 		),
 	})
 

@@ -23,7 +23,6 @@ func GetQueryCmd(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	}
 
 	queryCmd.AddCommand(client.GetCommands(
-		//GetCmdQueryToken(queryRoute, cdc),
 		GetCmdQueryTokens(queryRoute, cdc),
 		GetCmdQueryFee(queryRoute, cdc),
 		GetCmdQueryParams(queryRoute, cdc),
@@ -32,47 +31,12 @@ func GetQueryCmd(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	return queryCmd
 }
 
-// GetCmdQueryToken implements the query token command.
-//func GetCmdQueryToken(queryRoute string, cdc *codec.Codec) *cobra.Command {
-//	cmd := &cobra.Command{
-//		Use:     "token [symbol]",
-//		Short:   "Query details of a token",
-//		Example: fmt.Sprintf("%s query asset token [token-id]", version.ClientName),
-//		Args:    cobra.ExactArgs(1),
-//		RunE: func(cmd *cobra.Command, args []string) error {
-//			cliCtx := context.NewCLIContext().WithCodec(cdc)
-//
-//			params := types.QueryTokenParams{
-//				TokenID: args[0],
-//			}
-//
-//			bz, err := cdc.MarshalJSON(params)
-//			if err != nil {
-//				return err
-//			}
-//
-//			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", queryRoute, types.QueryToken), bz)
-//			if err != nil {
-//				return err
-//			}
-//
-//			var token types.FungibleToken
-//			if err := cdc.UnmarshalJSON(res, &token); err != nil {
-//				return err
-//			}
-//
-//			return cliCtx.PrintOutput(token)
-//		},
-//	}
-//	return cmd
-//}
-
 // GetCmdQueryTokens implements the query tokens command.
 func GetCmdQueryTokens(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "tokens",
 		Short:   "Query details of a group of tokens",
-		Example: fmt.Sprintf("%s asset token tokens --owner=[address]", version.ClientName),
+		Example: fmt.Sprintf("%s asset token tokens --symbol=[symbol] \n%s asset token tokens --owner=[address]", version.ClientName, version.ClientName),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 

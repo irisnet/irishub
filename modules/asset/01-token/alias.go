@@ -25,9 +25,9 @@ const (
 	CodeInvalidAssetInitSupply   = types.CodeInvalidAssetInitSupply
 	CodeInvalidAssetMaxSupply    = types.CodeInvalidAssetMaxSupply
 	CodeInvalidAssetDecimal      = types.CodeInvalidAssetScale
-	CodeAssetAlreadyExists       = types.CodeAssetAlreadyExists
-	CodeAssetNotExists           = types.CodeAssetNotExists
-	CodeAssetNotMintable         = types.CodeAssetNotMintable
+	CodeAssetAlreadyExists       = types.CodeTokenAlreadyExists
+	CodeAssetNotExists           = types.CodeTokenNotExists
+	CodeAssetNotMintable         = types.CodeTokenNotMintable
 	EventTypeIssueToken          = types.EventTypeIssueToken
 	EventTypeEditToken           = types.EventTypeEditToken
 	EventTypeTransferTokenOwner  = types.EventTypeTransferToken
