@@ -13,14 +13,14 @@ import (
 )
 
 var (
-	MaximumAssetMaxSupply   = uint64(1000000000000) // maximal limitation for asset max supply，1000 billion
-	MaximumAssetInitSupply  = uint64(100000000000)  // maximal limitation for asset initial supply，100 billion
-	MaximumAssetDecimal     = uint8(18)             // maximal limitation for asset decimal
-	MinimumAssetSymbolSize  = 3                     // minimal limitation for the length of the asset's symbol
-	MaximumAssetSymbolSize  = 8                     // maximal limitation for the length of the asset's symbol
-	MinimumAssetMinUnitSize = 3                     // minimal limitation for the length of the asset's min_unit
-	MaximumAssetMinUnitSize = 10                    // maximal limitation for the length of the asset's min_unit
-	MaximumAssetNameSize    = 32                    // maximal limitation for the length of the asset's name
+	MaximumAssetMaxSupply   = uint64(1000000000000) // maximal limitation for token max supply，1000 billion
+	MaximumAssetInitSupply  = uint64(100000000000)  // maximal limitation for token initial supply，100 billion
+	MaximumAssetDecimal     = uint8(18)             // maximal limitation for token decimal
+	MinimumAssetSymbolSize  = 3                     // minimal limitation for the length of the token's symbol
+	MaximumAssetSymbolSize  = 8                     // maximal limitation for the length of the token's symbol
+	MinimumAssetMinUnitSize = 3                     // minimal limitation for the length of the token's min_unit
+	MaximumAssetMinUnitSize = 10                    // maximal limitation for the length of the token's min_unit
+	MaximumAssetNameSize    = 32                    // maximal limitation for the length of the token's name
 
 	IsAlphaNumeric     = regexp.MustCompile(`^[a-zA-Z0-9]+$`).MatchString   // only accepts alphanumeric characters
 	IsAlphaNumericDash = regexp.MustCompile(`^[a-zA-Z0-9_-]+$`).MatchString // only accepts alphanumeric characters, _ and -
