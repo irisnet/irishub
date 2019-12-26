@@ -10,14 +10,13 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/codec"
 
-	"github.com/irisnet/irishub/modules/asset/01-token/internal/keeper"
 	"github.com/irisnet/irishub/modules/asset/01-token/internal/types"
 )
 
 // DecodeStore unmarshals the KVPair's Value to the corresponding gov type
 func DecodeStore(cdc *codec.Codec, kvA, kvB cmn.KVPair) string {
 	switch {
-	case strings.HasPrefix(string(kvA.Key), string(keeper.PrefixToken)):
+	case strings.HasPrefix(string(kvA.Key), string(types.KeyTokenPrefix())):
 		var tokenA, tokenB types.Tokens
 		cdc.MustUnmarshalBinaryLengthPrefixed(kvA.Value, &tokenA)
 		cdc.MustUnmarshalBinaryLengthPrefixed(kvB.Value, &tokenB)

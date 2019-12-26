@@ -17,8 +17,10 @@ func NewHandler(k Keeper) sdk.Handler {
 			return token.HandleMsgEditToken(ctx, k.TokenKeeper, msg)
 		case token.MsgMintToken:
 			return token.HandleMsgMintToken(ctx, k.TokenKeeper, msg)
-		case token.MsgTransferTokenOwner:
-			return token.HandleMsgTransferTokenOwner(ctx, k.TokenKeeper, msg)
+		case token.MsgTransferToken:
+			return token.HandleMsgTransferToken(ctx, k.TokenKeeper, msg)
+		case token.MsgBurnToken:
+			return token.HandleMsgBurnToken(ctx, k.TokenKeeper, msg)
 		//TODO NFT，IBC-Token
 		default:
 			return sdk.ErrTxDecode("invalid message parse in asset module").Result()

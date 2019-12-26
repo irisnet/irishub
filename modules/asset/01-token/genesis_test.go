@@ -29,7 +29,7 @@ func TestExportGatewayGenesis(t *testing.T) {
 
 	// query all token
 	var tokens token.Tokens
-	keeper.IterateTokens(ctx, func(token token.FungibleToken) (stop bool) {
+	keeper.GetAllTokens(ctx, func(token token.FungibleToken) (stop bool) {
 		tokens = append(tokens, token)
 		return false
 	})

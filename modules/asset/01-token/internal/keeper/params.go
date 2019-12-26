@@ -31,7 +31,7 @@ func (k Keeper) AssetTaxRate(ctx sdk.Context) (res sdk.Dec) {
 }
 
 // IssueTokenBaseFee returns parameter issueTokenBaseFee
-func (k Keeper) IssueTokenBaseFee(ctx sdk.Context) (res sdk.Int) {
+func (k Keeper) IssueTokenBaseFee(ctx sdk.Context) (res sdk.Coin) {
 	k.paramSpace.Get(ctx, types.KeyIssueTokenBaseFee, &res)
 	return
 }
@@ -39,11 +39,5 @@ func (k Keeper) IssueTokenBaseFee(ctx sdk.Context) (res sdk.Int) {
 // MintTokenFeeRatio returns parameter mintTokenFeeRatio
 func (k Keeper) MintTokenFeeRatio(ctx sdk.Context) (res sdk.Dec) {
 	k.paramSpace.Get(ctx, types.KeyMintTokenFeeRatio, &res)
-	return
-}
-
-// AssetFeeDenom returns parameter assetFeeDenom
-func (k Keeper) AssetFeeDenom(ctx sdk.Context) (res string) {
-	k.paramSpace.Get(ctx, types.KeyAssetFeeDenom, &res)
 	return
 }

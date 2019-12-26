@@ -61,8 +61,8 @@ func issueTokenHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 
 		// create the NewMsgIssueToken message
 		msg := types.NewMsgIssueToken(
-			req.Family, req.Source, req.Symbol, req.CanonicalSymbol, req.Name, req.Decimal,
-			req.MinUnitAlias, req.InitialSupply, req.MaxSupply, req.Mintable, req.Owner,
+			req.Symbol, req.Name, req.Scale,
+			req.MinUnit, req.InitialSupply, req.MaxSupply, req.Mintable, req.Owner,
 		)
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -77,7 +77,7 @@ func issueTokenHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 func editTokenHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		tokenID := vars[RestParamSymbol]
+		symbol := vars[RestParamSymbol]
 
 		var req EditTokenReq
 		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
@@ -97,7 +97,7 @@ func editTokenHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 
 		// create the MsgEditToken message
 		msg := types.NewMsgEditToken(
-			req.Name, req.CanonicalSymbol, req.MinUnitAlias, tokenID, req.MaxSupply, mintable, req.Owner,
+			req.Name, symbol, req.MaxSupply, mintable, req.Owner,
 		)
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -112,8 +112,8 @@ func editTokenHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 func transferTokenHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		tokenID := vars[RestParamSymbol]
-		var req TransferTokenOwnerReq
+		symbol := vars[RestParamSymbol]
+		var req TransferTokenReq
 		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
 			return
 		}
@@ -123,8 +123,8 @@ func transferTokenHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		// create the MsgTransferTokenOwner message
-		msg := types.NewMsgTransferTokenOwner(req.SrcOwner, req.DstOwner, tokenID)
+		// create the MsgTransferToken message
+		msg := types.NewMsgTransferToken(req.SrcOwner, req.DstOwner, symbol)
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -138,7 +138,7 @@ func transferTokenHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 func mintTokenHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		tokenID := vars[RestParamSymbol]
+		symbol := vars[RestParamSymbol]
 		var req MintTokenReq
 		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
 			return
@@ -150,7 +150,7 @@ func mintTokenHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		// create the MsgMintToken message
-		msg := types.NewMsgMintToken(tokenID, req.Owner, req.To, req.Amount)
+		msg := types.NewMsgMintToken(symbol, req.Owner, req.Recipient, req.Amount)
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return

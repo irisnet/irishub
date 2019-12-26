@@ -27,15 +27,20 @@ const (
 
 // KVStore key prefixes for Asset
 const (
+	//for token submodule
 	KeyTokenPrefix int = iota + 1
 	KeyTokenSymbolPrefix
 	KeyTokenMinUnitPrefix
 
+	//for NFT submodule
 	KeyNFTCollectionPrefix
 	KeyNFTIDCollectionPrefix
+
+	//for IBC-Token submodule
+	KeyIBCTokenCanonicalSymbol
 )
 
 // KeyPrefixBytes return the key prefix bytes from a URL string format
-func KeyPrefixBytes(prefix int) []byte {
-	return []byte(fmt.Sprintf("%d/", prefix))
+func KeyPrefixBytes(submodule string, prefix int) []byte {
+	return []byte(fmt.Sprintf("%s/%d", submodule, prefix))
 }

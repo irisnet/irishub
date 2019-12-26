@@ -58,7 +58,7 @@ func (suite *KeeperTestSuite) TestKeeper_IssueToken() {
 	token, found := suite.keeper.GetToken(suite.ctx, "btc")
 	suite.True(found)
 
-	suite.Equal(ft.GetDenom(), token.GetDenom())
+	suite.Equal(ft.GetMinUnit(), token.GetMinUnit())
 	suite.Equal(ft.Owner, ft.Owner)
 
 	ftJson, _ := json.Marshal(ft)
@@ -79,7 +79,7 @@ func (suite *KeeperTestSuite) TestKeeper_EditToken() {
 	token, found := suite.keeper.GetToken(suite.ctx, "i.btc")
 	suite.True(found)
 
-	suite.Equal(ft.GetDenom(), token.GetDenom())
+	suite.Equal(ft.GetMinUnit(), token.GetMinUnit())
 	suite.Equal(ft.Owner, token.Owner)
 
 	ftJson, _ := json.Marshal(ft)
@@ -112,7 +112,7 @@ func (suite *KeeperTestSuite) TestMintTokenKeeper() {
 	token, found := suite.keeper.GetToken(suite.ctx, "btc")
 	suite.True(found)
 
-	suite.Equal(ft.GetDenom(), token.GetDenom())
+	suite.Equal(ft.GetMinUnit(), token.GetMinUnit())
 	suite.Equal(ft.Owner, ft.Owner)
 
 	msgJson, _ := json.Marshal(ft)
@@ -141,7 +141,7 @@ func (suite *KeeperTestSuite) TestTransferOwnerKeeper() {
 	token, found := suite.keeper.GetToken(suite.ctx, "i.btc")
 	suite.True(found)
 
-	suite.Equal(ft.GetDenom(), token.GetDenom())
+	suite.Equal(ft.GetMinUnit(), token.GetMinUnit())
 	suite.Equal(ft.Owner, token.Owner)
 
 	msgJson, _ := json.Marshal(ft)
@@ -149,12 +149,12 @@ func (suite *KeeperTestSuite) TestTransferOwnerKeeper() {
 	suite.Equal(msgJson, assetJson)
 
 	dstOwner := sdk.AccAddress([]byte("TokenDstOwner"))
-	msg := types.MsgTransferTokenOwner{
+	msg := types.MsgTransferToken{
 		SrcOwner: srcOwner,
 		DstOwner: dstOwner,
 		TokenID:  "btc",
 	}
-	err = suite.keeper.TransferTokenOwner(suite.ctx, msg)
+	err = suite.keeper.TransferToken(suite.ctx, msg)
 	suite.NoError(err)
 
 	token, found = suite.keeper.GetToken(suite.ctx, "i.btc")

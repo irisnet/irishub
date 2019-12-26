@@ -9,9 +9,9 @@ import (
 )
 
 // queryTokenFees retrieves the fees of token issuance and minting for the specified id
-func queryTokenFees(cliCtx context.CLIContext, queryRoute string, tokenID string) (types.TokenFeesOutput, error) {
+func queryTokenFees(cliCtx context.CLIContext, queryRoute string, symbol string) (types.TokenFeesOutput, error) {
 	params := types.QueryTokenFeesParams{
-		ID: tokenID,
+		Symbol: symbol,
 	}
 
 	bz, err := cliCtx.Codec.MarshalJSON(params)

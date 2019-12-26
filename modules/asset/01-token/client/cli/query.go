@@ -108,18 +108,18 @@ func GetCmdQueryFee(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "fee [symbol]",
 		Short:   "Query the token related fees",
-		Example: fmt.Sprintf("%s query asset fee [token-id]", version.ClientName),
+		Example: fmt.Sprintf("%s query asset token fee [symbol]", version.ClientName),
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
 			// query token fees
-			tokenID := args[0]
-			if err := types.CheckTokenID(tokenID); err != nil {
+			symbol := args[0]
+			if err := types.ValidateSymbol(symbol); err != nil {
 				return err
 			}
 
-			fees, err := queryTokenFees(cliCtx, queryRoute, tokenID)
+			fees, err := queryTokenFees(cliCtx, queryRoute, symbol)
 			if err != nil {
 				return err
 			}
@@ -135,7 +135,7 @@ func GetCmdQueryParams(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "params",
 		Short:   "Query the current token parameters information",
-		Example: fmt.Sprintf("%s query asset params", version.ClientName),
+		Example: fmt.Sprintf("%s query asset token params", version.ClientName),
 		Args:    cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)

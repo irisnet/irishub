@@ -17,9 +17,9 @@ func queryToken(cliCtx context.CLIContext, queryRoute string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 
-		tokenID := vars[RestParamSymbol]
+		symbol := vars[RestParamSymbol]
 		params := types.QueryTokenParams{
-			TokenID: tokenID,
+			Symbol: symbol,
 		}
 
 		bz, err := cliCtx.Codec.MarshalJSON(params)
@@ -44,11 +44,11 @@ func queryToken(cliCtx context.CLIContext, queryRoute string) http.HandlerFunc {
 // queryTokens queries the token list from the specified endpoint
 func queryTokens(cliCtx context.CLIContext, queryRoute string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		source := r.FormValue("source")
-		owner := r.FormValue("owner")
+		symbol := r.FormValue(RestParamSymbol)
+		owner := r.FormValue(RestParamOwner)
 
 		params := types.QueryTokensParams{
-			Symbol: source,
+			Symbol: symbol,
 			Owner:  owner,
 		}
 
@@ -76,14 +76,14 @@ func queryTokenFees(cliCtx context.CLIContext, queryRoute string) http.HandlerFu
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 
-		id := vars[RestParamSymbol]
-		if err := types.CheckTokenID(id); err != nil {
+		symbol := vars[RestParamSymbol]
+		if err := types.ValidateSymbol(symbol); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
 		params := types.QueryTokenFeesParams{
-			ID: id,
+			Symbol: symbol,
 		}
 
 		bz, err := cliCtx.Codec.MarshalJSON(params)

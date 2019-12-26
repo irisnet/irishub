@@ -16,92 +16,24 @@ func QuerierToken(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte
 	if err := keeper.cdc.UnmarshalJSON(req.Data, &params); err != nil {
 		return nil, sdk.ErrUnknownRequest(fmt.Sprintf("failed to parse params: %s", err))
 	}
-
-	token, found := keeper.GetToken(ctx, params.TokenID)
-	if !found {
-		return nil, sdk.ErrUnknownRequest(fmt.Sprintf("token %s does not exist", params.TokenID))
-	}
-
-	bz, err := codec.MarshalJSONIndent(keeper.cdc, token)
-	if err != nil {
-		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", err.Error()))
-	}
-
-	return bz, nil
+	return queryToken(ctx, keeper, params.Symbol)
 }
 
 func QuerierTokens(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
 	var params types.QueryTokensParams
-	var err error
 	if err := keeper.cdc.UnmarshalJSON(req.Data, &params); err != nil {
 		return nil, sdk.ErrUnknownRequest(fmt.Sprintf("failed to parse params: %s", err))
 	}
 
-	source := types.NATIVE
-	owner := sdk.AccAddress{}
-	nonSymbolTokenID := ""
-
-	if len(params.Symbol) > 0 { // if source is specified
-		source, err = types.AssetSourceFromString(params.Symbol)
-		if err != nil {
-			return nil, sdk.ErrUnknownRequest(fmt.Sprintf("failed to parse params: %s", err))
-		}
+	if len(params.Symbol) > 0 {
+		return queryToken(ctx, keeper, params.Symbol)
 	}
 
-	if len(params.Owner) > 0 && source == types.NATIVE { // ignore owner if source != NATIVE
-		owner, err = sdk.AccAddressFromBech32(params.Owner)
-		if err != nil {
-			return nil, sdk.ErrUnknownRequest(fmt.Sprintf("failed to parse params: %s", err))
-		}
+	if len(params.Owner) > 0 {
+		return queryTokensByOwner(ctx, keeper, params.Owner)
 	}
 
-	//if len(params.Symbol) > 0 || len(params.Gateway) > 0 {
-	//	nonSymbolTokenID, err = types.GetTokenID(source, "")
-	//	if err != nil {
-	//		return nil, sdk.ErrUnknownRequest(fmt.Sprintf("failed to parse params: %s", err))
-	//	}
-	//}
-
-	var tokens types.Tokens
-
-	// Add iris to the list
-	//if source == types.NATIVE && owner.Empty() {
-	//	initSupply, err := sdk.IrisCoinType.ConvertToMinDenomCoin(sdk.NewCoin(sdk.Iris, sdk.InitialIssue).String())
-	//	if err != nil {
-	//		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", err.Error()))
-	//	}
-	//	maxSupply, err := sdk.IrisCoinType.ConvertToMinDenomCoin(sdk.NewCoin(sdk.Iris, sdk.NewInt(int64(types.MaximumAssetMaxSupply))).String())
-	//	if err != nil {
-	//		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", err.Error()))
-	//	}
-	//	token := types.NewFungibleToken(types.NATIVE, "", sdk.Iris, sdk.IrisCoinType.Desc, sdk.AttoScale, "", sdk.IrisAtto, initSupply.Amount, maxSupply.Amount, true, sdk.AccAddress{})
-	//	tokens = append(tokens, token)
-	//}
-
-	// Query from db
-	iter := keeper.GetTokens(ctx, owner, nonSymbolTokenID)
-	defer iter.Close()
-	for ; iter.Valid(); iter.Next() {
-		var tokenID string
-		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(iter.Value(), &tokenID)
-		token, found := keeper.GetToken(ctx, tokenID)
-		if !found {
-			continue
-		}
-
-		tokens = append(tokens, token)
-	}
-
-	if len(tokens) == 0 {
-		tokens = make([]types.FungibleToken, 0)
-	}
-
-	bz, err := codec.MarshalJSONIndent(keeper.cdc, tokens)
-
-	if err != nil {
-		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", err.Error()))
-	}
-	return bz, nil
+	return queryAllTokens(ctx, keeper)
 }
 
 func QuerierFees(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
@@ -114,27 +46,11 @@ func queryTokenFees(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]by
 		return nil, sdk.ErrUnknownRequest(fmt.Sprintf("failed to parse params: %s", err))
 	}
 
-	id := params.ID
-	if err := types.CheckTokenID(id); err != nil {
-		return nil, err
-	}
-
-	prefix, symbol := types.GetTokenIDParts(id)
-
-	var (
-		issueFee sdk.Coin
-		mintFee  sdk.Coin
-	)
-
-	if prefix == "x" {
-		return nil, sdk.ErrUnknownRequest("unsupported token source: external")
-	} else if prefix == "" || prefix == "i" {
-		issueFee = GetTokenIssueFee(ctx, keeper, symbol)
-		mintFee = GetTokenMintFee(ctx, keeper, symbol)
-	}
+	issueFee := GetTokenIssueFee(ctx, keeper, params.Symbol)
+	mintFee := GetTokenMintFee(ctx, keeper, params.Symbol)
 
 	fees := types.TokenFeesOutput{
-		Exist:    keeper.HasToken(ctx, id),
+		Exist:    keeper.HasTokenSymbol(ctx, params.Symbol),
 		IssueFee: issueFee,
 		MintFee:  mintFee,
 	}
@@ -156,4 +72,55 @@ func QuerierParameters(ctx sdk.Context, keeper Keeper) ([]byte, sdk.Error) {
 	}
 
 	return res, nil
+}
+
+func queryToken(ctx sdk.Context, keeper Keeper, symbol string) ([]byte, sdk.Error) {
+	token, found := keeper.GetToken(ctx, symbol)
+	if !found {
+		return nil, sdk.ErrUnknownRequest(fmt.Sprintf("token %s does not exist", symbol))
+	}
+
+	bz, err := codec.MarshalJSONIndent(keeper.cdc, token)
+	if err != nil {
+		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", err.Error()))
+	}
+
+	return bz, nil
+}
+
+func queryAllTokens(ctx sdk.Context, keeper Keeper) ([]byte, sdk.Error) {
+	tokens := keeper.GetAllTokens(ctx)
+	bz, err := codec.MarshalJSONIndent(keeper.cdc, tokens)
+	if err != nil {
+		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", err.Error()))
+	}
+	return bz, nil
+}
+
+func queryTokensByOwner(ctx sdk.Context, keeper Keeper, ownerStr string) ([]byte, sdk.Error) {
+	owner, err := sdk.AccAddressFromBech32(ownerStr)
+	if err != nil {
+		return nil, sdk.ErrUnknownRequest(fmt.Sprintf("failed to parse params: %s", err))
+	}
+	// Query from db
+	iter := keeper.GetTokens(ctx, owner, "")
+	defer iter.Close()
+
+	var tokens types.Tokens
+	for ; iter.Valid(); iter.Next() {
+		var symbol string
+		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(iter.Value(), &symbol)
+		token, found := keeper.GetToken(ctx, symbol)
+		if !found {
+			continue
+		}
+
+		tokens = append(tokens, token)
+	}
+
+	bz, err := codec.MarshalJSONIndent(keeper.cdc, tokens)
+	if err != nil {
+		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", err.Error()))
+	}
+	return bz, nil
 }

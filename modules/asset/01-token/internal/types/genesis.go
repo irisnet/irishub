@@ -1,5 +1,10 @@
 package types
 
+import (
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/irisnet/irishub/types"
+)
+
 // GenesisState - all asset state that must be provided at genesis
 type GenesisState struct {
 	Params Params `json:"params" yaml:"params"` // asset params
@@ -16,14 +21,28 @@ func NewGenesisState(params Params, tokens Tokens) GenesisState {
 
 // DefaultGenesisState return the default asset genesis state
 func DefaultGenesisState() GenesisState {
-	return NewGenesisState(DefaultParams(), []FungibleToken{})
+	return NewGenesisState(DefaultParams(), DefaultTokens())
 }
 
 // ValidateGenesis validates the provided asset genesis state to ensure the
 // expected invariants holds.
 func ValidateGenesis(data GenesisState) error {
-	if err := data.Params.Validate(); err != nil {
-		return err
+	//if err := data.Params.Validate(); err != nil {
+	//	return err
+	//}
+	//return data.Tokens.Validate()
+	return data.Params.Validate()
+}
+
+func DefaultTokens() Tokens {
+	return Tokens{
+		{BaseToken{
+			Symbol:        types.Iris,
+			Name:          "IRIS Network",
+			Scale:         18,
+			MinUnit:       types.IrisAtto,
+			InitialSupply: sdk.NewIntWithDecimal(20, 9),
+			Mintable:      true,
+		}},
 	}
-	return data.Tokens.Validate()
 }

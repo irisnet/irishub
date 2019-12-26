@@ -16,15 +16,15 @@ const (
 	FeeFactorExp  = 4
 )
 
-// TokenIssueFeeHandler performs fee handling for issuing token
-func TokenIssueFeeHandler(ctx sdk.Context, k Keeper, owner sdk.AccAddress, symbol string) sdk.Error {
+// IssueTokenFeeHandler performs fee handling for issuing token
+func IssueTokenFeeHandler(ctx sdk.Context, k Keeper, owner sdk.AccAddress, symbol string) sdk.Error {
 	// get the required issuance fee
 	fee := GetTokenIssueFee(ctx, k, symbol)
 	return feeHandler(ctx, k, owner, fee)
 }
 
-// TokenMintFeeHandler performs fee handling for minting token
-func TokenMintFeeHandler(ctx sdk.Context, k Keeper, owner sdk.AccAddress, symbol string) sdk.Error {
+// MintTokenFeeHandler performs fee handling for minting token
+func MintTokenFeeHandler(ctx sdk.Context, k Keeper, owner sdk.AccAddress, symbol string) sdk.Error {
 	// get the required minting fee
 	fee := GetTokenMintFee(ctx, k, symbol)
 	return feeHandler(ctx, k, owner, fee)
@@ -46,7 +46,7 @@ func feeHandler(ctx sdk.Context, k Keeper, feeAcc sdk.AccAddress, fee sdk.Coin) 
 	}
 
 	// send community tax to collectedFees
-	if err := k.AddCollectedFees(ctx, sdk.NewCoins(communityTaxCoin)); err != nil {
+	if err := k.addCollectedFees(ctx, sdk.NewCoins(communityTaxCoin)); err != nil {
 		return err
 	}
 
@@ -57,9 +57,10 @@ func feeHandler(ctx sdk.Context, k Keeper, feeAcc sdk.AccAddress, fee sdk.Coin) 
 // getTokenIssueFee returns the token issurance fee
 func GetTokenIssueFee(ctx sdk.Context, k Keeper, symbol string) sdk.Coin {
 	// compute the fee
-	fee := calcFeeByBase(symbol, k.IssueTokenBaseFee(ctx))
+	issueTokenBaseFee := k.IssueTokenBaseFee(ctx)
+	fee := calcFeeByBase(symbol, issueTokenBaseFee.Amount)
 
-	return sdk.NewCoin(k.AssetFeeDenom(ctx), convertFeeToInt(fee))
+	return sdk.NewCoin(issueTokenBaseFee.Denom, convertFeeToInt(fee))
 }
 
 // getTokenMintFee returns the token mint fee
@@ -68,7 +69,7 @@ func GetTokenMintFee(ctx sdk.Context, k Keeper, symbol string) sdk.Coin {
 	issueFee := GetTokenIssueFee(ctx, k, symbol)
 	mintFee := sdk.NewDecFromInt(issueFee.Amount).Mul(k.MintTokenFeeRatio(ctx))
 
-	return sdk.NewCoin(k.AssetFeeDenom(ctx), convertFeeToInt(mintFee))
+	return sdk.NewCoin(issueFee.Denom, convertFeeToInt(mintFee))
 }
 
 // calcFeeByBase computes the actual fee according to the given base fee
