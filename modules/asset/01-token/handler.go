@@ -1,8 +1,9 @@
 package token
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"strconv"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 // HandleIssueToken handles MsgIssueToken
@@ -106,7 +107,7 @@ func HandleMsgMintToken(ctx sdk.Context, k Keeper, msg MsgMintToken) sdk.Result 
 	}
 }
 
-// HandleMsgBurnToken handles MsgMintToken
+// HandleMsgBurnToken handles MsgBurnToken
 func HandleMsgBurnToken(ctx sdk.Context, k Keeper, msg MsgBurnToken) sdk.Result {
 	if err := k.BurnToken(ctx, msg); err != nil {
 		return err.Result()

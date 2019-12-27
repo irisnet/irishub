@@ -37,10 +37,6 @@ func QuerierTokens(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byt
 }
 
 func QuerierFees(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
-	return queryTokenFees(ctx, req, keeper)
-}
-
-func queryTokenFees(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
 	var params types.QueryTokenFeesParams
 	if err := keeper.cdc.UnmarshalJSON(req.Data, &params); err != nil {
 		return nil, sdk.ErrUnknownRequest(fmt.Sprintf("failed to parse params: %s", err))

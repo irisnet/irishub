@@ -63,5 +63,5 @@ type MintTokenReq struct {
 type BurnTokenReq struct {
 	BaseTx rest.BaseReq   `json:"base_tx"`
 	Sender sdk.AccAddress `json:"sender"` // the current sender address of the token
-	Amount sdk.Coins      `json:"amount"` // amount of mint token
+	Amount sdk.Coins      `json:"amount"` // amount of burn token
 }

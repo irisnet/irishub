@@ -49,7 +49,7 @@ func (suite GenesisSuite) TestExportGenesis() {
 
 	suite.Equal(len(tokens), len(defaultGenesis.Tokens)+1)
 
-	// export gateways
+	// export genesis
 	genesisState := token.ExportGenesis(suite.ctx, suite.keeper)
 
 	for _, t := range genesisState.Tokens {

@@ -6,19 +6,19 @@ import (
 	"io"
 	"io/ioutil"
 
-	"github.com/cosmos/cosmos-sdk/x/auth/ante"
-	"github.com/cosmos/cosmos-sdk/x/auth/keeper"
-	"github.com/cosmos/cosmos-sdk/x/auth/types"
-	"github.com/irisnet/irishub/modules/asset"
-	token "github.com/irisnet/irishub/modules/asset/01-token"
-
 	"github.com/tendermint/tendermint/libs/log"
 	dbm "github.com/tendermint/tm-db"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	bam "github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/x/auth/ante"
+	"github.com/cosmos/cosmos-sdk/x/auth/keeper"
+	"github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/cosmos/cosmos-sdk/x/staking"
+
+	"github.com/irisnet/irishub/modules/asset"
+	token "github.com/irisnet/irishub/modules/asset/01-token"
 )
 
 // ExportStateToJSON util function to export the app state to JSON

@@ -25,13 +25,13 @@ func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router, queryRoute st
 
 	// Get token fees
 	r.HandleFunc(
-		fmt.Sprintf("/asset/fees/tokens/{%s}", RestParamSymbol),
+		fmt.Sprintf("/asset/tokens/{%s}/fees", RestParamSymbol),
 		tokenFeesHandlerFn(cliCtx, queryRoute),
 	).Methods("GET")
 
 	// Get the current asset parameter values
 	r.HandleFunc(
-		"/asset/parameters",
+		"/asset/tokens/parameters",
 		paramsHandlerFn(cliCtx, queryRoute),
 	).Methods("GET")
 }

@@ -9,36 +9,13 @@ import (
 )
 
 const (
-	//1 iris = 10^3 iris-milli
-	Milli      = "milli"
-	MilliScale = 3
-
-	//1 iris = 10^6 iris-micro
-	Micro      = "micro"
-	MicroScale = 6
-
-	//1 iris = 10^9 iris-nano
-	Nano      = "nano"
-	NanoScale = 9
-
-	//1 iris = 10^12 iris-pico
-	Pico      = "pico"
-	PicoScale = 12
-
-	//1 iris = 10^15 iris-femto
-	Femto      = "femto"
-	FemtoScale = 15
-
 	//1 iris = 10^18 iris-atto
 	Atto      = "atto"
 	AttoScale = 18
-
-	MinDenomSuffix = "-min"
 )
 
 var (
-	IrisCoinType    = NewIrisCoinType()
-	AttoScaleFactor = IrisCoinType.MinUnit.GetScaleFactor()
+	IrisCoinType = NewIrisCoinType()
 )
 
 type Unit struct {
@@ -146,12 +123,7 @@ func NewIrisCoinType() CoinType {
 	units := make(Units, 7)
 
 	units[0] = NewUnit(Iris, 0)
-	units[1] = NewUnit(fmt.Sprintf("%s-%s", Iris, Milli), MilliScale)
-	units[2] = NewUnit(fmt.Sprintf("%s-%s", Iris, Micro), MicroScale)
-	units[3] = NewUnit(fmt.Sprintf("%s-%s", Iris, Nano), NanoScale)
-	units[4] = NewUnit(fmt.Sprintf("%s-%s", Iris, Pico), PicoScale)
-	units[5] = NewUnit(fmt.Sprintf("%s-%s", Iris, Femto), FemtoScale)
-	units[6] = NewUnit(fmt.Sprintf("%s-%s", Iris, Atto), AttoScale)
+	units[1] = NewUnit(fmt.Sprintf("%s-%s", Iris, Atto), AttoScale)
 
 	return CoinType{
 		Name:    Iris,
@@ -159,32 +131,4 @@ func NewIrisCoinType() CoinType {
 		MinUnit: units[6],
 		Desc:    "IRIS Network",
 	}
-}
-
-func GetCoinNameByDenom(denom string) (coinName string, err error) {
-	denom = strings.ToLower(denom)
-	if strings.HasPrefix(denom, Iris+"-") {
-		if _, err := IrisCoinType.GetUnit(denom); err != nil {
-			return "", fmt.Errorf("invalid denom for getting coin name: %s", denom)
-		}
-		return Iris, nil
-	}
-	if !IsCoinMinDenomValid(denom) {
-		return "", fmt.Errorf("invalid denom for getting coin name: %s", denom)
-	}
-	coinName = strings.TrimSuffix(denom, MinDenomSuffix)
-	if coinName == "" {
-		return coinName, fmt.Errorf("coin name is empty")
-	}
-	return coinName, nil
-}
-
-func GetCoinMinDenom(coinName string) (denom string, err error) {
-	coinName = strings.ToLower(strings.TrimSpace(coinName))
-
-	if coinName == Iris {
-		return IrisAtto, nil
-	}
-
-	return fmt.Sprintf("%s%s", coinName, MinDenomSuffix), nil
 }

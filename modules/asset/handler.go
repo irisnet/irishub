@@ -5,7 +5,7 @@ import (
 	token "github.com/irisnet/irishub/modules/asset/01-token"
 )
 
-// handle all "asset" type messages.
+// NewHandler returns a handler for all "asset" type messages
 func NewHandler(k Keeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
 		ctx = ctx.WithEventManager(sdk.NewEventManager())

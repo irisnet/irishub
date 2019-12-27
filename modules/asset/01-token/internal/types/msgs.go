@@ -65,7 +65,7 @@ func ValidateMsgIssueToken(msg *MsgIssueToken) sdk.Error {
 
 	if msg.MaxSupply == 0 {
 		if msg.Mintable {
-			msg.MaxSupply = MaximumAssetMaxSupply
+			msg.MaxSupply = MaximumTokenMaxSupply
 		} else {
 			msg.MaxSupply = msg.InitialSupply
 		}

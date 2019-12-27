@@ -94,18 +94,19 @@ func (k Keeper) EditToken(ctx sdk.Context, msg types.MsgEditToken) sdk.Error {
 		return types.ErrInvalidOwner(k.codespace, fmt.Sprintf("the address %d is not the owner of the token %s", msg.Owner, msg.Symbol))
 	}
 
-	hasIssuedAmt := k.AssetTokenSupply(ctx, token.GetMinUnit())
-
-	maxSupply := sdk.NewIntWithDecimal(int64(msg.MaxSupply), int(token.Scale))
-	if maxSupply.GT(sdk.ZeroInt()) && maxSupply.LT(hasIssuedAmt) {
-		return types.ErrInvalidAssetMaxSupply(k.codespace, fmt.Sprintf("max supply must not be less than %s", hasIssuedAmt.String()))
+	// check the maxSupply
+	if msg.MaxSupply > 0 {
+		hasIssuedAmt := k.getTokenSupply(ctx, token.GetMinUnit())
+		maxSupply := int64(msg.MaxSupply)
+		maxSupplyInt := sdk.NewIntWithDecimal(maxSupply, int(token.Scale))
+		if maxSupplyInt.LT(hasIssuedAmt) {
+			return types.ErrInvalidAssetMaxSupply(k.codespace, fmt.Sprintf("max supply must not be less than %s", hasIssuedAmt.String()))
+		}
+		token.MaxSupply = sdk.NewInt(maxSupply)
 	}
+
 	if msg.Name != types.DoNotModify {
 		token.Name = msg.Name
-	}
-
-	if maxSupply.GT(sdk.ZeroInt()) {
-		token.MaxSupply = sdk.NewInt(int64(msg.MaxSupply))
 	}
 
 	if msg.Mintable != types.Nil {
@@ -134,8 +135,8 @@ func (k Keeper) TransferToken(ctx sdk.Context, msg types.MsgTransferToken) sdk.E
 	// update token information
 	k.setToken(ctx, token)
 
-	// reset all index for query-token
-	k.resetStoreKeyForQueryToken(ctx, msg.SrcOwner, token)
+	// reset all store key for token
+	k.resetTokenKey(ctx, msg.SrcOwner, token)
 
 	return nil
 }
@@ -155,7 +156,7 @@ func (k Keeper) MintToken(ctx sdk.Context, msg types.MsgMintToken) sdk.Error {
 		return types.ErrAssetNotMintable(k.codespace, fmt.Sprintf("the token %s is set to be non-mintable", msg.Symbol))
 	}
 
-	hasIssuedAmt := k.AssetTokenSupply(ctx, token.GetMinUnit())
+	hasIssuedAmt := k.getTokenSupply(ctx, token.GetMinUnit())
 	mintAmt := sdk.NewIntWithDecimal(int64(msg.Amount), int(token.Scale))
 	maxSupply := sdk.NewIntWithDecimal(token.MaxSupply.Int64(), int(token.Scale))
 	if mintAmt.Add(hasIssuedAmt).GT(maxSupply) {
@@ -263,8 +264,8 @@ func (k Keeper) GetAllTokens(ctx sdk.Context) (tokens types.Tokens) {
 	return
 }
 
-// AssetTokenSupply asset tokens from the total supply
-func (k Keeper) AssetTokenSupply(ctx sdk.Context, denom string) sdk.Int {
+// getTokenSupply query issued tokens supply from the total supply
+func (k Keeper) getTokenSupply(ctx sdk.Context, denom string) sdk.Int {
 	return k.supplyKeeper.GetSupply(ctx).GetTotal().AmountOf(denom)
 }
 
@@ -275,7 +276,7 @@ func (k Keeper) addCollectedFees(ctx sdk.Context, fees sdk.Coins) sdk.Error {
 }
 
 // reset all index by DstOwner of token for query-token command
-func (k Keeper) resetStoreKeyForQueryToken(ctx sdk.Context, srcOwner sdk.AccAddress, token types.FungibleToken) {
+func (k Keeper) resetTokenKey(ctx sdk.Context, srcOwner sdk.AccAddress, token types.FungibleToken) {
 	store := ctx.KVStore(k.storeKey)
 
 	// delete the old key

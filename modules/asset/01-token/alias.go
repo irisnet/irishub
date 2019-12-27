@@ -98,14 +98,14 @@ var (
 
 	// variable aliases
 	ModuleCdc                    = types.ModuleCdc
-	MaximumAssetMaxSupply        = types.MaximumAssetMaxSupply
-	MaximumAssetInitSupply       = types.MaximumAssetInitSupply
-	MaximumAssetDecimal          = types.MaximumAssetDecimal
-	MinimumAssetSymbolSize       = types.MinimumAssetSymbolSize
-	MaximumAssetSymbolSize       = types.MaximumAssetSymbolSize
-	MinimumAssetMinUnitAliasSize = types.MinimumAssetMinUnitSize
-	MaximumAssetMinUnitAliasSize = types.MaximumAssetMinUnitSize
-	MaximumAssetNameSize         = types.MaximumAssetNameSize
+	MaximumAssetMaxSupply        = types.MaximumTokenMaxSupply
+	MaximumAssetInitSupply       = types.MaximumTokenInitSupply
+	MaximumAssetDecimal          = types.MaximumTokenDecimal
+	MinimumAssetSymbolSize       = types.MinimumTokenSymbolSize
+	MaximumAssetSymbolSize       = types.MaximumTokenSymbolSize
+	MinimumAssetMinUnitAliasSize = types.MinimumTokenMinUnitSize
+	MaximumAssetMinUnitAliasSize = types.MaximumTokenMinUnitSize
+	MaximumAssetNameSize         = types.MaximumTokenNameSize
 	IsAlphaNumeric               = types.IsAlphaNumeric
 	IsAlphaNumericDash           = types.IsAlphaNumericDash
 	IsBeginWithAlpha             = types.IsBeginWithAlpha

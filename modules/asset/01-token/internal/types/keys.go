@@ -47,7 +47,7 @@ func KeyTokens(owner sdk.AccAddress, symbol string) []byte {
 	)
 }
 
-// KeyTokens returns the key of the specified owner . Intended for querying all tokens of an owner
+// KeyMinUnit returns the key of the specified minUnit
 func KeyMinUnit(minUnit string) []byte {
 	return append(
 		KeyPath(types.KeyTokenMinUnitPrefix),
