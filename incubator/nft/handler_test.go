@@ -38,7 +38,7 @@ func TestTransferNFTMsg(t *testing.T) {
 	nft := types.NewBaseNFT(id, address, "TokenURI")
 
 	// Define MsgTransferNft
-	transferNftMsg := types.NewMsgTransferNFT(address, address2, denom, id)
+	transferNftMsg := types.NewMsgTransferNFT(address, address2, denom, id, tokenURI)
 
 	// handle should fail trying to transfer NFT that doesn't exist
 	res := h(ctx, transferNftMsg)
@@ -80,7 +80,7 @@ func TestTransferNFTMsg(t *testing.T) {
 	require.NoError(t, err)
 	require.True(t, nftAfterwards.GetOwner().Equals(address2))
 
-	transferNftMsg = types.NewMsgTransferNFT(address2, address3, denom, id)
+	transferNftMsg = types.NewMsgTransferNFT(address2, address3, denom, id, tokenURI)
 
 	// handle should succeed when nft exists and is transferred by owner
 	res = h(ctx, transferNftMsg)
@@ -92,7 +92,7 @@ func TestTransferNFTMsg(t *testing.T) {
 	require.Nil(t, err)
 	require.True(t, CheckInvariants(app.NFTKeeper, ctx))
 
-	transferNftMsg = types.NewMsgTransferNFT(address2, address3, denom2, id)
+	transferNftMsg = types.NewMsgTransferNFT(address2, address3, denom2, id, tokenURI)
 
 	// handle should succeed when nft exists and is transferred by owner
 	res = h(ctx, transferNftMsg)
