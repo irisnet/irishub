@@ -1,6 +1,6 @@
 # iriscli htlc
 
-[HTLC模块](../features/htlc)提供了与其他链进行原子交换的相关功能。
+[HTLC模块](../features/htlc.md)提供了与其他链进行原子交换的相关功能。
 
 在HTLC生命周期中有下面的几种状态：
    - open: HTLC是可申领的
