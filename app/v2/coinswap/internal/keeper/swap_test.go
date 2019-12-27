@@ -1,7 +1,6 @@
 package keeper
 
 import (
-	"bytes"
 	"fmt"
 	"github.com/irisnet/irishub/app/v2/coinswap/internal/types"
 	sdk "github.com/irisnet/irishub/types"
@@ -192,12 +191,6 @@ func TestTradeInputForExactOutput(t *testing.T) {
 	initSupplyOutput := poolBalances.AmountOf(outputCoin.Denom)
 	maxCnt := int(initSupplyOutput.Div(outputCoin.Amount).Int64())
 
-	fmt.Println("===============================================================")
-	fmt.Println(fmt.Sprintf("init pool state:[%s]", poolBalances.String()))
-	fmt.Println(fmt.Sprintf("init sender state:[%s]", senderBlances.String()))
-	fmt.Println(fmt.Sprintf("sender buy [%s%s] every times", outputCoin.Amount, outputCoin.Denom))
-	fmt.Println("===============================================================")
-
 	for i := 1; i < 100; i++ {
 		amt, err := keeper.tradeInputForExactOutput(ctx, input, output)
 		if i == maxCnt {
@@ -216,7 +209,6 @@ func TestTradeInputForExactOutput(t *testing.T) {
 
 		poolBalances = pb
 		senderBlances = sb
-		showMsg(i, pb, sb, input.Coin.Denom, output.Coin.Denom)
 	}
 }
 
@@ -233,12 +225,6 @@ func TestTradeExactInputForOutput(t *testing.T) {
 		Coin: outputCoin,
 	}
 
-	fmt.Println("===============================================================")
-	fmt.Println(fmt.Sprintf("init pool state:[%s]", poolBalances.String()))
-	fmt.Println(fmt.Sprintf("init sender state:[%s]", senderBlances.String()))
-	fmt.Println(fmt.Sprintf("sender sold [%s%s] every times", inputCoin.Amount, inputCoin.Denom))
-	fmt.Println("===============================================================")
-
 	for i := 1; i < 1000; i++ {
 		amt, err := keeper.tradeExactInputForOutput(ctx, input, output)
 		ifNil(t, err)
@@ -253,7 +239,6 @@ func TestTradeExactInputForOutput(t *testing.T) {
 
 		poolBalances = pb
 		senderBlances = sb
-		showMsg(i, pb, sb, input.Coin.Denom, output.Coin.Denom)
 	}
 }
 
@@ -270,22 +255,4 @@ func ifNil(t *testing.T, err sdk.Error) {
 		msg = err.Error()
 	}
 	require.Nil(t, err, msg)
-}
-
-func showMsg(index int, pb, sb sdk.Coins, intputDenom, outputDenom string) {
-	var msg bytes.Buffer
-	pool := fmt.Sprintf("[%dth] swap,pool:[%s]", index, pb.String())
-	msg.WriteString(pool)
-	msg.WriteString(" ")
-
-	sender := fmt.Sprintf("sender:[%s]", sb.String())
-	msg.WriteString(sender)
-	msg.WriteString(" ")
-
-	iAmt := sdk.NewDecFromInt(pb.AmountOf(intputDenom))
-	oAmt := sdk.NewDecFromInt(pb.AmountOf(outputDenom))
-	rate := fmt.Sprintf("rate:[1 %s = %s %s]", outputDenom, iAmt.Quo(oAmt).String(), intputDenom)
-	msg.WriteString(rate)
-
-	fmt.Println(msg.String())
 }

@@ -3,6 +3,7 @@ package keeper
 import (
 	"github.com/stretchr/testify/require"
 	"testing"
+	"time"
 
 	"github.com/irisnet/irishub/app/v2/coinswap/internal/types"
 	sdk "github.com/irisnet/irishub/types"
@@ -27,51 +28,40 @@ func TestParams(t *testing.T) {
 	}
 }
 
-//func TestKeeper_UpdateLiquidity(t *testing.T) {
-//	ctx, keeper, accs := createTestInput(t, sdk.NewInt(1000), 1)
-//
-//	liquidityName := "swap:btc:iris-atto"
-//	poolAddr := getReservePoolAddr(liquidityName)
-//
-//	// init liquidity
-//	msgAdd := types.NewMsgAddLiquidity(sdk.Coin{Denom: "btc", Amount: sdk.NewInt(1)},
-//		sdk.NewInt(10), sdk.NewInt(10), ctx.BlockHeader().Time,
-//		accs[0].GetAddress())
-//
-//	require.Nil(t, keeper.HandleAddLiquidity(ctx, msgAdd))
-//
-//	poolAccout := keeper.ak.GetAccount(ctx, poolAddr)
-//	acc := keeper.ak.GetAccount(ctx, accs[0].GetAddress())
-//	require.Equal(t, "1btc,10iris-atto,10swap:btc:iris-atto", poolAccout.GetCoins().String())
-//	require.Equal(t, "999btc,990iris-atto,10swap:btc:iris-atto", acc.GetCoins().String())
-//
-//	msgAdd1 := types.NewMsgAddLiquidity(sdk.Coin{Denom: "btc", Amount: sdk.NewInt(1)},
-//		sdk.NewInt(3), sdk.NewInt(3), ctx.BlockHeader().Time,
-//		accs[0].GetAddress())
-//	require.Nil(t, keeper.HandleAddLiquidity(ctx, msgAdd1))
-//
-//	poolAccout = keeper.ak.GetAccount(ctx, poolAddr)
-//	acc = keeper.ak.GetAccount(ctx, accs[0].GetAddress())
-//	require.Equal(t, "2btc,13iris-atto,13swap:btc:iris-atto", poolAccout.GetCoins().String())
-//	require.Equal(t, "998btc,987iris-atto,13swap:btc:iris-atto", acc.GetCoins().String())
-//
-//	require.Equal(t, "100btc,10iris-atto,10swap:btc:iris-atto", poolAccout.GetCoins().String())
-//	require.Equal(t, "900btc,990iris-atto,10swap:btc:iris-atto", acc.GetCoins().String())
-//
-//	require.Nil(t, keeper.HandleAddLiquidity(ctx, msgAdd))
-//
-//	poolAccout = keeper.ak.GetAccount(ctx, poolAddr)
-//	acc = keeper.ak.GetAccount(ctx, accs[0].GetAddress())
-//	require.Equal(t, "200btc,20iris-atto,20swap:btc:iris-atto", poolAccout.GetCoins().String())
-//	require.Equal(t, "800btc,980iris-atto,20swap:btc:iris-atto", acc.GetCoins().String())
-//
-//	msgRemove := types.NewMsgRemoveLiquidity(sdk.Coin{Denom: "btc", Amount: sdk.NewInt(1)},
-//		sdk.NewInt(3), sdk.NewInt(3), ctx.BlockHeader().Time,
-//		accs[0].GetAddress())
-//	require.Nil(t, keeper.HandleRemoveLiquidity(ctx, msgRemove))
-//
-//	poolAccout = keeper.ak.GetAccount(ctx, poolAddr)
-//	acc = keeper.ak.GetAccount(ctx, accs[0].GetAddress())
-//	require.Equal(t, "2btc,10iris-atto,10swap:btc:iris-atto", poolAccout.GetCoins().String())
-//	require.Equal(t, "998btc,990iris-atto,10swap:btc:iris-atto", acc.GetCoins().String())
-//}
+func TestKeeper_UpdateLiquidity(t *testing.T) {
+	total, _ := sdk.NewIntFromString("10000000000000000000")
+	ctx, keeper, accs := createTestInput(t, total, 1)
+	sender := accs[0].GetAddress()
+	denom1 := "btc-min"
+	denom2 := sdk.IrisAtto
+	uniId, _ := types.GetUniId(denom1, denom2)
+	poolAddr := getReservePoolAddr(uniId)
+
+	btcAmt, _ := sdk.NewIntFromString("1")
+	depositCoin := sdk.NewCoin("btc-min", btcAmt)
+
+	irisAmt, _ := sdk.NewIntFromString("10000000000000000000")
+	minReward := sdk.NewInt(1)
+	deadline := time.Now().Add(1 * time.Minute)
+	msg := types.NewMsgAddLiquidity(depositCoin, irisAmt, minReward, deadline.Unix(), sender)
+	_, err := keeper.HandleAddLiquidity(ctx, msg)
+	//assert
+	require.Nil(t, err)
+	reservePoolBalances := keeper.ak.GetAccount(ctx, poolAddr).GetCoins()
+	require.Equal(t, "1btc-min,10000000000000000000iris-atto,10000000000000000000uni:btc-min", reservePoolBalances.String())
+	senderBlances := keeper.ak.GetAccount(ctx, sender).GetCoins()
+	require.Equal(t, "9999999999999999999btc-min,10000000000000000000uni:btc-min", senderBlances.String())
+
+	withdraw, _ := sdk.NewIntFromString("10000000000000000000")
+	msgRemove := types.NewMsgRemoveLiquidity(sdk.NewInt(1), sdk.NewCoin("uni:btc-min", withdraw),
+		sdk.NewInt(1), ctx.BlockHeader().Time.Unix(),
+		sender)
+
+	_, err = keeper.HandleRemoveLiquidity(ctx, msgRemove)
+	require.Nil(t, err)
+
+	poolAccout := keeper.ak.GetAccount(ctx, poolAddr)
+	acc := keeper.ak.GetAccount(ctx, sender)
+	require.Equal(t, "", poolAccout.GetCoins().String())
+	require.Equal(t, "10000000000000000000btc-min,10000000000000000000iris-atto", acc.GetCoins().String())
+}
