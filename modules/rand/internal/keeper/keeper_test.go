@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/suite"
 
 	abci "github.com/tendermint/tendermint/abci/types"
+	"github.com/tendermint/tendermint/crypto"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -21,7 +22,7 @@ var (
 	testTxBytes        = []byte("test_tx")
 	testHeight         = int64(10000)
 	testBlockInterval  = uint64(100)
-	testConsumer       = sdk.AccAddress("_______test_consumer")
+	testConsumer, _    = sdk.AccAddressFromHex(crypto.AddressHash([]byte("test_consumer")).String())
 	testReqID          = []byte("test_req_id")
 	testRandNumerator  = int64(3)
 	testRandDenomiator = int64(4)

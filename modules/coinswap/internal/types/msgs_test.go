@@ -6,6 +6,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/tendermint/tendermint/crypto"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/irisnet/irishub/config"
@@ -13,8 +15,8 @@ import (
 
 // nolint: deadcode unused
 var (
-	sender    sdk.AccAddress
-	recipient sdk.AccAddress
+	sender, _    = sdk.AccAddressFromHex(crypto.AddressHash([]byte("sender")).String())
+	recipient, _ = sdk.AccAddressFromHex(crypto.AddressHash([]byte("recipient")).String())
 
 	amt = sdk.NewInt(100)
 
@@ -35,9 +37,6 @@ func init() {
 	sdk.GetConfig().SetBech32PrefixForAccount(config.GetConfig().GetBech32AccountAddrPrefix(), config.GetConfig().GetBech32AccountPubPrefix())
 	sdk.GetConfig().SetBech32PrefixForValidator(config.GetConfig().GetBech32ValidatorAddrPrefix(), config.GetConfig().GetBech32ValidatorPubPrefix())
 	sdk.GetConfig().SetBech32PrefixForConsensusNode(config.GetConfig().GetBech32ConsensusAddrPrefix(), config.GetConfig().GetBech32ConsensusPubPrefix())
-
-	sender, _ = sdk.AccAddressFromBech32("faa128nh833v43sggcj65nk7khjka9dwngpl6j29hj")
-	recipient, _ = sdk.AccAddressFromBech32("faa1mrehjkgeg75nz2gk7lr7dnxvvtg4497jxss8hq")
 }
 
 // ----------------------------------------------
@@ -87,7 +86,7 @@ func TestMsgSwapOrderGetSignBytes(t *testing.T) {
 		true,
 	)
 	res := msg.GetSignBytes()
-	expected := `{"type":"irishub/coinswap/MsgSwapOrder","value":{"deadline":"1580000000","input":{"address":"faa128nh833v43sggcj65nk7khjka9dwngpl6j29hj","coin":{"amount":"1000","denom":"eth"}},"is_buy_order":true,"output":{"address":"faa128nh833v43sggcj65nk7khjka9dwngpl6j29hj","coin":{"amount":"500","denom":"btc"}}}}`
+	expected := `{"type":"irishub/coinswap/MsgSwapOrder","value":{"deadline":"1580000000","input":{"address":"faa1pgm8hyk0pvphmlvfjc8wsvk4daluz5tgkwnkl5","coin":{"amount":"1000","denom":"eth"}},"is_buy_order":true,"output":{"address":"faa1pgm8hyk0pvphmlvfjc8wsvk4daluz5tgkwnkl5","coin":{"amount":"500","denom":"btc"}}}}`
 	require.Equal(t, expected, string(res))
 }
 
@@ -99,7 +98,7 @@ func TestMsgSwapOrderGetSigners(t *testing.T) {
 		true,
 	)
 	res := msg.GetSigners()
-	expected := "[51E773C62CAC6084625AA4EDEB5E56E95AE9A03F]"
+	expected := "[0A367B92CF0B037DFD89960EE832D56F7FC15168]"
 	require.Equal(t, expected, fmt.Sprintf("%v", res))
 }
 
@@ -239,14 +238,14 @@ func TestMsgAddLiquidityType(t *testing.T) {
 func TestMsgAddLiquidityGetSignBytes(t *testing.T) {
 	msg := NewMsgAddLiquidity(input, amt, sdk.OneInt(), deadline, sender)
 	res := msg.GetSignBytes()
-	expected := `{"type":"irishub/coinswap/MsgAddLiquidity","value":{"deadline":"1580000000","exact_standard_amt":"100","max_token":{"amount":"1000","denom":"eth"},"min_liquidity":"1","sender":"faa128nh833v43sggcj65nk7khjka9dwngpl6j29hj"}}`
+	expected := `{"type":"irishub/coinswap/MsgAddLiquidity","value":{"deadline":"1580000000","exact_standard_amt":"100","max_token":{"amount":"1000","denom":"eth"},"min_liquidity":"1","sender":"faa1pgm8hyk0pvphmlvfjc8wsvk4daluz5tgkwnkl5"}}`
 	require.Equal(t, expected, string(res))
 }
 
 func TestMsgAddLiquidityGetSigners(t *testing.T) {
 	msg := NewMsgAddLiquidity(input, amt, sdk.OneInt(), deadline, sender)
 	res := msg.GetSigners()
-	expected := "[51E773C62CAC6084625AA4EDEB5E56E95AE9A03F]"
+	expected := "[0A367B92CF0B037DFD89960EE832D56F7FC15168]"
 	require.Equal(t, expected, fmt.Sprintf("%v", res))
 }
 
@@ -303,14 +302,14 @@ func TestMsgRemoveLiquidityType(t *testing.T) {
 func TestMsgRemoveLiquidityGetSignBytes(t *testing.T) {
 	msg := NewMsgRemoveLiquidity(amt, withdrawLiquidity, sdk.OneInt(), deadline, sender)
 	res := msg.GetSignBytes()
-	expected := `{"type":"irishub/coinswap/MsgRemoveLiquidity","value":{"deadline":"1580000000","min_standard_amt":"1","min_token":"100","sender":"faa128nh833v43sggcj65nk7khjka9dwngpl6j29hj","withdraw_liquidity":{"amount":"500","denom":"uni:btc"}}}`
+	expected := `{"type":"irishub/coinswap/MsgRemoveLiquidity","value":{"deadline":"1580000000","min_standard_amt":"1","min_token":"100","sender":"faa1pgm8hyk0pvphmlvfjc8wsvk4daluz5tgkwnkl5","withdraw_liquidity":{"amount":"500","denom":"uni:btc"}}}`
 	require.Equal(t, expected, string(res))
 }
 
 func TestMsgRemoveLiquidityGetSigners(t *testing.T) {
 	msg := NewMsgRemoveLiquidity(amt, withdrawLiquidity, sdk.OneInt(), deadline, sender)
 	res := msg.GetSigners()
-	expected := "[51E773C62CAC6084625AA4EDEB5E56E95AE9A03F]"
+	expected := "[0A367B92CF0B037DFD89960EE832D56F7FC15168]"
 	require.Equal(t, expected, fmt.Sprintf("%v", res))
 }
 

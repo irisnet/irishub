@@ -6,6 +6,7 @@ import (
 	"github.com/stretchr/testify/suite"
 
 	abci "github.com/tendermint/tendermint/abci/types"
+	"github.com/tendermint/tendermint/crypto"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -55,8 +56,8 @@ func TestKeeperTestSuite(t *testing.T) {
 }
 
 func initVars(suite *KeeperTestSuite) {
-	addrSender = sdk.AccAddress("__addrSender________")
-	addrTo = sdk.AccAddress("__addrTo____________")
+	addrSender, _ = sdk.AccAddressFromHex(crypto.AddressHash([]byte("sender")).String())
+	addrTo, _ = sdk.AccAddressFromHex(crypto.AddressHash([]byte("to")).String())
 	_ = suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, addrSender)
 	_ = suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, addrTo)
 	_ = suite.app.BankKeeper.SetCoins(suite.ctx, addrSender, sdk.NewCoins(sdk.NewInt64Coin(sdk.DefaultBondDenom, 100000)))

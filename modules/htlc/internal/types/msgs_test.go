@@ -6,14 +6,16 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/tendermint/tendermint/crypto"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/irisnet/irishub/config"
 )
 
 var (
-	senderAddr           sdk.AccAddress
-	toAddr               sdk.AccAddress
+	senderAddr, _        = sdk.AccAddressFromHex(crypto.AddressHash([]byte("sender")).String())
+	toAddr, _            = sdk.AccAddressFromHex(crypto.AddressHash([]byte("to")).String())
 	receiverOnOtherChain = "receiverOnOtherChain"
 	amount               = sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(10)))
 	secret               = HTLCSecret("___abcdefghijklmnopqrstuvwxyz___")
@@ -26,9 +28,6 @@ func init() {
 	sdk.GetConfig().SetBech32PrefixForAccount(config.GetConfig().GetBech32AccountAddrPrefix(), config.GetConfig().GetBech32AccountPubPrefix())
 	sdk.GetConfig().SetBech32PrefixForValidator(config.GetConfig().GetBech32ValidatorAddrPrefix(), config.GetConfig().GetBech32ValidatorPubPrefix())
 	sdk.GetConfig().SetBech32PrefixForConsensusNode(config.GetConfig().GetBech32ConsensusAddrPrefix(), config.GetConfig().GetBech32ConsensusPubPrefix())
-
-	senderAddr, _ = sdk.AccAddressFromBech32("faa128nh833v43sggcj65nk7khjka9dwngpl6j29hj")
-	toAddr, _ = sdk.AccAddressFromBech32("faa1mrehjkgeg75nz2gk7lr7dnxvvtg4497jxss8hq")
 }
 
 // ----------------------------------------------
@@ -61,14 +60,14 @@ func TestMsgCreateHTLCType(t *testing.T) {
 func TestMsgCreateHTLCGetSignBytes(t *testing.T) {
 	msg := NewMsgCreateHTLC(senderAddr, toAddr, receiverOnOtherChain, amount, hashLock, timestamp, timeLock)
 	res := msg.GetSignBytes()
-	expected := `{"type":"irishub/htlc/MsgCreateHTLC","value":{"amount":[{"amount":"10","denom":"stake"}],"hash_lock":"e8d4133e1a82c74e2746e78c19385706ea7958a0ca441a08dacfa10c48ce2561","receiver_on_other_chain":"receiverOnOtherChain","sender":"faa128nh833v43sggcj65nk7khjka9dwngpl6j29hj","time_lock":"50","timestamp":"1580000000","to":"faa1mrehjkgeg75nz2gk7lr7dnxvvtg4497jxss8hq"}}`
+	expected := `{"type":"irishub/htlc/MsgCreateHTLC","value":{"amount":[{"amount":"10","denom":"stake"}],"hash_lock":"e8d4133e1a82c74e2746e78c19385706ea7958a0ca441a08dacfa10c48ce2561","receiver_on_other_chain":"receiverOnOtherChain","sender":"faa1pgm8hyk0pvphmlvfjc8wsvk4daluz5tgkwnkl5","time_lock":"50","timestamp":"1580000000","to":"faa1vcl2r0llu5pc70cv7enlznzz2lhl2tthnqea0f"}}`
 	require.Equal(t, expected, string(res))
 }
 
 func TestMsgCreateHTLCGetSigners(t *testing.T) {
 	msg := NewMsgCreateHTLC(senderAddr, toAddr, receiverOnOtherChain, amount, hashLock, timestamp, timeLock)
 	res := msg.GetSigners()
-	expected := "[51E773C62CAC6084625AA4EDEB5E56E95AE9A03F]"
+	expected := "[0A367B92CF0B037DFD89960EE832D56F7FC15168]"
 	require.Equal(t, expected, fmt.Sprintf("%v", res))
 }
 
@@ -146,14 +145,14 @@ func TestMsgClaimHTLCType(t *testing.T) {
 func TestMsgClaimHTLCGetSignBytes(t *testing.T) {
 	msg := NewMsgClaimHTLC(senderAddr, hashLock, secret)
 	res := msg.GetSignBytes()
-	expected := `{"type":"irishub/htlc/MsgClaimHTLC","value":{"hash_lock":"e8d4133e1a82c74e2746e78c19385706ea7958a0ca441a08dacfa10c48ce2561","secret":"5f5f5f6162636465666768696a6b6c6d6e6f707172737475767778797a5f5f5f","sender":"faa128nh833v43sggcj65nk7khjka9dwngpl6j29hj"}}`
+	expected := `{"type":"irishub/htlc/MsgClaimHTLC","value":{"hash_lock":"e8d4133e1a82c74e2746e78c19385706ea7958a0ca441a08dacfa10c48ce2561","secret":"5f5f5f6162636465666768696a6b6c6d6e6f707172737475767778797a5f5f5f","sender":"faa1pgm8hyk0pvphmlvfjc8wsvk4daluz5tgkwnkl5"}}`
 	require.Equal(t, expected, string(res))
 }
 
 func TestMsgClaimHTLCGetSigners(t *testing.T) {
 	msg := NewMsgClaimHTLC(senderAddr, hashLock, secret)
 	res := msg.GetSigners()
-	expected := "[51E773C62CAC6084625AA4EDEB5E56E95AE9A03F]"
+	expected := "[0A367B92CF0B037DFD89960EE832D56F7FC15168]"
 	require.Equal(t, expected, fmt.Sprintf("%v", res))
 }
 
@@ -219,14 +218,14 @@ func TestMsgRefundHTLCType(t *testing.T) {
 func TestMsgRefundHTLCGetSignBytes(t *testing.T) {
 	msg := NewMsgRefundHTLC(senderAddr, hashLock)
 	res := msg.GetSignBytes()
-	expected := `{"type":"irishub/htlc/MsgRefundHTLC","value":{"hash_lock":"e8d4133e1a82c74e2746e78c19385706ea7958a0ca441a08dacfa10c48ce2561","sender":"faa128nh833v43sggcj65nk7khjka9dwngpl6j29hj"}}`
+	expected := `{"type":"irishub/htlc/MsgRefundHTLC","value":{"hash_lock":"e8d4133e1a82c74e2746e78c19385706ea7958a0ca441a08dacfa10c48ce2561","sender":"faa1pgm8hyk0pvphmlvfjc8wsvk4daluz5tgkwnkl5"}}`
 	require.Equal(t, expected, string(res))
 }
 
 func TestMsgRefundHTLCGetSigners(t *testing.T) {
 	msg := NewMsgRefundHTLC(senderAddr, hashLock)
 	res := msg.GetSigners()
-	expected := "[51E773C62CAC6084625AA4EDEB5E56E95AE9A03F]"
+	expected := "[0A367B92CF0B037DFD89960EE832D56F7FC15168]"
 	require.Equal(t, expected, fmt.Sprintf("%v", res))
 }
 
