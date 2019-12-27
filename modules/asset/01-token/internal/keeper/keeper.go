@@ -249,6 +249,18 @@ func (k Keeper) GetToken(ctx sdk.Context, symbol string) (token types.FungibleTo
 	return token, true
 }
 
+// GetTokenByMintUint returns token by specified mintUint
+func (k Keeper) GetTokenByMintUint(ctx sdk.Context, mintUint string) (types.FungibleToken, bool) {
+	store := ctx.KVStore(k.storeKey)
+	var symbol string
+	bz := store.Get(types.KeyMinUnit(mintUint))
+	if bz == nil {
+		return types.FungibleToken{}, false
+	}
+	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &symbol)
+	return k.GetToken(ctx, symbol)
+}
+
 // GetTokens returns tokens by specified owner
 func (k Keeper) GetTokens(ctx sdk.Context, owner sdk.AccAddress, symbol string) sdk.Iterator {
 	store := ctx.KVStore(k.storeKey)

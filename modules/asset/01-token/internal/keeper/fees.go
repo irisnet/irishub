@@ -2,6 +2,7 @@
 package keeper
 
 import (
+	"fmt"
 	"math"
 	"strconv"
 
@@ -58,26 +59,31 @@ func feeHandler(ctx sdk.Context, k Keeper, feeAcc sdk.AccAddress, fee sdk.Coin) 
 func GetTokenIssueFee(ctx sdk.Context, k Keeper, symbol string) sdk.Coin {
 	// compute the fee
 	issueTokenBaseFee := k.IssueTokenBaseFee(ctx)
+	token, found := k.GetTokenByMintUint(ctx, issueTokenBaseFee.Denom)
+	if !found {
+		panic(fmt.Sprintf("token [%s] not found", issueTokenBaseFee.Denom))
+	}
 	fee := calcFeeByBase(symbol, issueTokenBaseFee.Amount)
-
-	return sdk.NewCoin(issueTokenBaseFee.Denom, convertFeeToInt(fee))
+	return sdk.NewCoin(issueTokenBaseFee.Denom, convertFeeToInt(fee, token.Scale))
 }
 
 // getTokenMintFee returns the token mint fee
 func GetTokenMintFee(ctx sdk.Context, k Keeper, symbol string) sdk.Coin {
 	// compute the issurance fee and mint fee
 	issueFee := GetTokenIssueFee(ctx, k, symbol)
+	token, found := k.GetTokenByMintUint(ctx, issueFee.Denom)
+	if !found {
+		panic(fmt.Sprintf("token [%s] not found", issueFee.Denom))
+	}
 	mintFee := sdk.NewDecFromInt(issueFee.Amount).Mul(k.MintTokenFeeRatio(ctx))
 
-	return sdk.NewCoin(issueFee.Denom, convertFeeToInt(mintFee))
+	return sdk.NewCoin(issueFee.Denom, convertFeeToInt(mintFee, token.Scale))
 }
 
 // calcFeeByBase computes the actual fee according to the given base fee
 func calcFeeByBase(name string, baseFee sdk.Int) sdk.Dec {
 	feeFactor := calcFeeFactor(name)
-	actualFee := sdk.NewDecFromInt(baseFee).Quo(feeFactor)
-
-	return actualFee
+	return sdk.NewDecFromInt(baseFee).Quo(feeFactor)
 }
 
 // calcFeeFactor computes the fee factor of the given name(common for gateway and asset)
@@ -102,12 +108,12 @@ func calcFeeFactor(name string) sdk.Dec {
 
 // convertFeeToInt converts the given fee to Int.
 // if greater than 1, rounds it; returns 1 otherwise
-func convertFeeToInt(fee sdk.Dec) sdk.Int {
-	feeNativeToken := fee.TruncateInt()
-
+func convertFeeToInt(fee sdk.Dec, scale uint8) sdk.Int {
+	scaleFactor := sdk.NewIntWithDecimal(1, int(scale))
+	feeNativeToken := fee.Quo(scaleFactor.ToDec()).TruncateInt()
 	if feeNativeToken.GT(sdk.NewInt(1)) {
-		return feeNativeToken
+		return feeNativeToken.Mul(scaleFactor)
 	} else {
-		return sdk.NewInt(1)
+		return scaleFactor
 	}
 }

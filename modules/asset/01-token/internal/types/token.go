@@ -100,14 +100,11 @@ func (ft FungibleToken) GetInitSupply() sdk.Int {
 
 // GetCoinType returns CoinType
 func (ft FungibleToken) GetCoinType() iristypes.CoinType {
-	units := make(iristypes.Units, 2)
-	units[0] = iristypes.NewUnit(ft.Symbol, 0)
-	units[1] = iristypes.NewUnit(ft.GetMinUnit(), ft.Scale)
 	return iristypes.CoinType{
-		Name:    ft.Name,
-		MinUnit: units[1],
-		Units:   units,
-		Desc:    ft.Name,
+		Name:     ft.Name,
+		MinUnit:  iristypes.NewUnit(ft.Symbol, 0),
+		MainUnit: iristypes.NewUnit(ft.GetMinUnit(), ft.Scale),
+		Desc:     ft.Name,
 	}
 }
 
