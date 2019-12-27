@@ -1,6 +1,6 @@
 # iriscli htlc
 
-HTLC allows you to manage local Hash Time Locked Contracts (HTLCs) for atomic swaps with other chains.
+[HTLC module](../features/htlc.md) allows you to manage local Hash Time Locked Contracts (HTLCs) for atomic swaps with other chains.
 
 There are the following states involved in the lifecycle of an HTLC:
    - open: indicates the HTLC is claimable
