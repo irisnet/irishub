@@ -39,9 +39,5 @@ func DefaultGenesisState() GenesisState {
 // expected invariants holds.
 func ValidateGenesis(data GenesisState) error {
 	// validate tokens
-	if err := token.ValidateGenesis(data.TokenState); err != nil {
-		return err
-	}
-
-	return nil
+	return token.ValidateGenesis(data.TokenState)
 }

@@ -11,7 +11,7 @@ type Keeper struct {
 	TokenKeeper token.Keeper
 }
 
-// NewKeeper creates a new ibc Keeper
+// NewKeeper creates a new asset Keeper
 func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, paramSpace params.Subspace,
 	codespace sdk.CodespaceType, supplyKeeper token.SupplyKeeper, feeCollectorName string,
 ) Keeper {

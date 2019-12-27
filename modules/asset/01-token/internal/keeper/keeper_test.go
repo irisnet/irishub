@@ -139,7 +139,7 @@ func (suite *KeeperSuite) TestMintToken() {
 	suite.Equal("1000", amt.String())
 
 	msgMintToken := types.NewMsgMintToken(ft.Symbol, owner, nil, 1000)
-	err = suite.keeper.MintToken(suite.ctx, msgMintToken)
+	_, err = suite.keeper.MintToken(suite.ctx, msgMintToken)
 	suite.NoError(err)
 
 	balance = suite.bk.GetCoins(suite.ctx, owner)

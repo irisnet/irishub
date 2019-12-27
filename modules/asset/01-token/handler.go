@@ -1,8 +1,6 @@
 package token
 
 import (
-	"strconv"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -85,7 +83,8 @@ func HandleMsgTransferToken(ctx sdk.Context, k Keeper, msg MsgTransferToken) sdk
 
 // handleMsgMintToken handles MsgMintToken
 func HandleMsgMintToken(ctx sdk.Context, k Keeper, msg MsgMintToken) sdk.Result {
-	if err := k.MintToken(ctx, msg); err != nil {
+	mintCoin, err := k.MintToken(ctx, msg)
+	if err != nil {
 		return err.Result()
 	}
 
@@ -98,7 +97,7 @@ func HandleMsgMintToken(ctx sdk.Context, k Keeper, msg MsgMintToken) sdk.Result 
 		sdk.NewEvent(
 			EventTypeMintToken,
 			sdk.NewAttribute(AttributeKeyTokenSymbol, msg.Symbol),
-			sdk.NewAttribute(sdk.AttributeKeyAmount, strconv.FormatUint(msg.Amount, 10)),
+			sdk.NewAttribute(sdk.AttributeKeyAmount, mintCoin.String()),
 		),
 	})
 

@@ -67,7 +67,7 @@ var (
 	QuerierTokens                = keeper.QuerierTokens
 	QuerierFees                  = keeper.QuerierFees
 	QuerierParameters            = keeper.QuerierParameters
-	NewBaseToken                 = types.NewBaseToken
+	NewBaseToken                 = types.NewFungibleToken
 	NewFungibleToken             = types.NewFungibleToken
 	RegisterCodec                = types.RegisterCodec
 	ErrNilAssetOwner             = types.ErrNilAssetOwner
@@ -118,7 +118,6 @@ var (
 
 type (
 	Keeper               = keeper.Keeper
-	BaseToken            = types.BaseToken
 	FungibleToken        = types.FungibleToken
 	Tokens               = types.Tokens
 	Bool                 = types.Bool

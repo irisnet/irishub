@@ -5,14 +5,14 @@ import (
 	"github.com/irisnet/irishub/types"
 )
 
-var DefaultToken = FungibleToken{BaseToken{
+var DefaultToken = FungibleToken{
 	Symbol:        types.Iris,
 	Name:          "IRIS Network",
 	Scale:         18,
 	MinUnit:       types.IrisAtto,
 	InitialSupply: sdk.NewIntWithDecimal(20, 9),
 	Mintable:      true,
-}}
+}
 
 // GenesisState - all asset state that must be provided at genesis
 type GenesisState struct {
@@ -36,10 +36,14 @@ func DefaultGenesisState() GenesisState {
 // ValidateGenesis validates the provided asset genesis state to ensure the
 // expected invariants holds.
 func ValidateGenesis(data GenesisState) error {
-	//if err := data.Params.Validate(); err != nil {
-	//	return err
-	//}
-	//return data.Tokens.Validate()
+	for _, token := range data.Tokens {
+		if err := ValidateName(token.Name); err != nil {
+			return err
+		}
+		if err := ValidateScale(token.Scale); err != nil {
+			return err
+		}
+	}
 	return data.Params.Validate()
 }
 

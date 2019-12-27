@@ -1,7 +1,6 @@
 package app
 
 import (
-	token "github.com/irisnet/irishub/modules/asset/01-token"
 	"io"
 	"os"
 
@@ -31,6 +30,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/supply"
 
 	"github.com/irisnet/irishub/modules/asset"
+	token "github.com/irisnet/irishub/modules/asset/01-token"
 	"github.com/irisnet/irishub/modules/coinswap"
 	"github.com/irisnet/irishub/modules/guardian"
 	"github.com/irisnet/irishub/modules/htlc"

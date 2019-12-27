@@ -18,7 +18,7 @@ var (
 // issuance fee = IssueTokenBaseFee / (ln(len(symbol))/ln3)^4
 type Params struct {
 	AssetTaxRate      sdk.Dec  `json:"asset_tax_rate" yaml:"asset_tax_rate"`             // e.g., 40%
-	IssueTokenBaseFee sdk.Coin `json:"issue_token_base_fee" yaml:"issue_token_base_fee"` // e.g., 300000*10^18
+	IssueTokenBaseFee sdk.Coin `json:"issue_token_base_fee" yaml:"issue_token_base_fee"` // e.g., 60000*10^18iris-atto
 	MintTokenFeeRatio sdk.Dec  `json:"mint_token_fee_ratio" yaml:"mint_token_fee_ratio"` // e.g., 10%
 }
 

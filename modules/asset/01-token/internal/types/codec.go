@@ -9,14 +9,13 @@ var ModuleCdc *codec.Codec
 
 // RegisterCodec registers concrete types on the codec.
 func RegisterCodec(cdc *codec.Codec) {
-	cdc.RegisterConcrete(MsgIssueToken{}, "irishub/asset/MsgIssueToken", nil)
-	cdc.RegisterConcrete(MsgEditToken{}, "irishub/asset/MsgEditToken", nil)
-	cdc.RegisterConcrete(MsgMintToken{}, "irishub/asset/MsgMintToken", nil)
-	cdc.RegisterConcrete(MsgTransferToken{}, "irishub/asset/MsgTransferToken", nil)
-	cdc.RegisterConcrete(MsgBurnToken{}, "irishub/asset/MsgBurnToken", nil)
-	cdc.RegisterConcrete(BaseToken{}, "irishub/asset/BaseToken", nil)
-	cdc.RegisterConcrete(FungibleToken{}, "irishub/asset/FungibleToken", nil)
-	cdc.RegisterConcrete(&Params{}, "irishub/asset/Params", nil)
+	cdc.RegisterConcrete(MsgIssueToken{}, "irishub/asset/token/MsgIssueToken", nil)
+	cdc.RegisterConcrete(MsgEditToken{}, "irishub/asset/token/MsgEditToken", nil)
+	cdc.RegisterConcrete(MsgMintToken{}, "irishub/asset/token/MsgMintToken", nil)
+	cdc.RegisterConcrete(MsgTransferToken{}, "irishub/asset/token/MsgTransferToken", nil)
+	cdc.RegisterConcrete(MsgBurnToken{}, "irishub/asset/token/MsgBurnToken", nil)
+	cdc.RegisterConcrete(FungibleToken{}, "irishub/asset/token/FungibleToken", nil)
+	cdc.RegisterConcrete(&Params{}, "irishub/asset/token/Params", nil)
 }
 
 func init() {

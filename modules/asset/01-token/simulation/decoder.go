@@ -23,6 +23,6 @@ func DecodeStore(cdc *codec.Codec, kvA, kvB cmn.KVPair) string {
 		return fmt.Sprintf("%v\n%v", tokenA, tokenB)
 
 	default:
-		panic(fmt.Sprintf("invalid asset key %X", kvA.Key))
+		panic(fmt.Sprintf("invalid token key %X", kvA.Key))
 	}
 }

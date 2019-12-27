@@ -27,8 +27,8 @@ var (
 	IsBeginWithAlpha   = regexp.MustCompile(`^[a-zA-Z].*`).MatchString      // only accepts alpha characters
 )
 
-// BaseToken
-type BaseToken struct {
+// FungibleToken
+type FungibleToken struct {
 	Symbol        string         `json:"symbol" yaml:"symbol"`
 	Name          string         `json:"name" yaml:"name"`
 	Scale         uint8          `json:"scale" yaml:"scale"`
@@ -39,11 +39,11 @@ type BaseToken struct {
 	Owner         sdk.AccAddress `json:"owner" yaml:"owner"`
 }
 
-// NewBaseToken - construct fungible token
-func NewBaseToken(symbol string, name string,
+// NewFungibleToken - construct fungible token
+func NewFungibleToken(symbol string, name string,
 	scale uint8, minUnit string, initialSupply sdk.Int, maxSupply sdk.Int,
 	mintable bool, owner sdk.AccAddress,
-) BaseToken {
+) FungibleToken {
 	symbol = strings.ToLower(strings.TrimSpace(symbol))
 	minUnit = strings.ToLower(strings.TrimSpace(minUnit))
 	name = strings.TrimSpace(name)
@@ -56,7 +56,7 @@ func NewBaseToken(symbol string, name string,
 		}
 	}
 
-	return BaseToken{
+	return FungibleToken{
 		Symbol:        symbol,
 		Name:          name,
 		Scale:         scale,
@@ -66,21 +66,6 @@ func NewBaseToken(symbol string, name string,
 		Mintable:      mintable,
 		Owner:         owner,
 	}
-}
-
-// FungibleToken
-type FungibleToken struct {
-	BaseToken `json:"base_token" yaml:"base_token"`
-}
-
-// NewFungibleToken - construct fungible token
-func NewFungibleToken(symbol string, name string, scale uint8, minUnit string, initialSupply sdk.Int, maxSupply sdk.Int,
-	mintable bool, owner sdk.AccAddress,
-) FungibleToken {
-	token := FungibleToken{
-		BaseToken: NewBaseToken(symbol, name, scale, minUnit, initialSupply, maxSupply, mintable, owner),
-	}
-	return token
 }
 
 // GetScale returns scale

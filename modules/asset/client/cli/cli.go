@@ -10,7 +10,7 @@ import (
 	"github.com/irisnet/irishub/modules/asset/types"
 )
 
-// GetTxCmd returns the transaction commands for this module
+// GetTxCmd returns the transaction commands for asset module
 func GetTxCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
 	txCmd := &cobra.Command{
 		Use:                        types.ModuleName,
@@ -25,7 +25,7 @@ func GetTxCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
 	return txCmd
 }
 
-// GetQueryCmd returns the query commands for this module
+// GetQueryCmd returns the query commands for asset module
 func GetQueryCmd(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	queryCmd := &cobra.Command{
 		Use:                types.ModuleName,

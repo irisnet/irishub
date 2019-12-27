@@ -86,11 +86,7 @@ func ValidateMsgIssueToken(msg *MsgIssueToken) sdk.Error {
 	if err := ValidateSupply(msg.InitialSupply, msg.MaxSupply); err != nil {
 		return err
 	}
-
-	if err := ValidateScale(msg.Scale); err != nil {
-		return err
-	}
-	return nil
+	return ValidateScale(msg.Scale)
 }
 
 // ValidateBasic implements Msg.
@@ -158,12 +154,8 @@ func (msg MsgTransferToken) ValidateBasic() sdk.Error {
 		return ErrInvalidToAddress(DefaultCodespace, fmt.Sprintf("the new owner must not be same as the original owner"))
 	}
 
-	// check the Symbol
-	if err := ValidateSymbol(msg.Symbol); err != nil {
-		return err
-	}
-
-	return nil
+	//check the Symbol
+	return ValidateSymbol(msg.Symbol)
 }
 
 // Route implements Msg.
@@ -214,11 +206,7 @@ func (msg MsgEditToken) ValidateBasic() sdk.Error {
 		return err
 	}
 
-	if err := ValidateSymbol(msg.Symbol); err != nil {
-		return err
-	}
-
-	return nil
+	return ValidateSymbol(msg.Symbol)
 }
 
 // GetSignBytes implements Msg.

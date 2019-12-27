@@ -9,7 +9,7 @@ import (
 	token "github.com/irisnet/irishub/modules/asset/01-token"
 )
 
-// NewQuerier creates a querier for the IBC module
+// NewQuerier creates a querier for the asset module
 func NewQuerier(k Keeper) sdk.Querier {
 	return func(ctx sdk.Context, path []string, req abci.RequestQuery) ([]byte, sdk.Error) {
 		var (

@@ -13,6 +13,7 @@ func init() {
 	ModuleCdc.Seal()
 }
 
+// RegisterCodec registers concrete types on the codec.
 func RegisterCodec(cdc *codec.Codec) {
 	token.RegisterCodec(cdc)
 }

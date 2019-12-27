@@ -142,18 +142,18 @@ func (k Keeper) TransferToken(ctx sdk.Context, msg types.MsgTransferToken) sdk.E
 }
 
 // MintToken handles MsgMintToken
-func (k Keeper) MintToken(ctx sdk.Context, msg types.MsgMintToken) sdk.Error {
+func (k Keeper) MintToken(ctx sdk.Context, msg types.MsgMintToken) (sdk.Coins, sdk.Error) {
 	token, exist := k.GetToken(ctx, msg.Symbol)
 	if !exist {
-		return types.ErrAssetNotExists(k.codespace, fmt.Sprintf("token %s does not exist", msg.Symbol))
+		return nil, types.ErrAssetNotExists(k.codespace, fmt.Sprintf("token %s does not exist", msg.Symbol))
 	}
 
 	if !msg.Owner.Equals(token.Owner) {
-		return types.ErrInvalidOwner(k.codespace, fmt.Sprintf("the address %s is not the owner of the token %s", msg.Owner.String(), msg.Symbol))
+		return nil, types.ErrInvalidOwner(k.codespace, fmt.Sprintf("the address %s is not the owner of the token %s", msg.Owner.String(), msg.Symbol))
 	}
 
 	if !token.Mintable {
-		return types.ErrAssetNotMintable(k.codespace, fmt.Sprintf("the token %s is set to be non-mintable", msg.Symbol))
+		return nil, types.ErrAssetNotMintable(k.codespace, fmt.Sprintf("the token %s has been set to be non-mintable", msg.Symbol))
 	}
 
 	hasIssuedAmt := k.getTokenSupply(ctx, token.GetMinUnit())
@@ -162,11 +162,11 @@ func (k Keeper) MintToken(ctx sdk.Context, msg types.MsgMintToken) sdk.Error {
 	if mintAmt.Add(hasIssuedAmt).GT(maxSupply) {
 		exp := sdk.NewIntWithDecimal(1, int(token.Scale))
 		canAmt := token.MaxSupply.Sub(hasIssuedAmt).Quo(exp)
-		return types.ErrInvalidAssetMaxSupply(k.codespace, fmt.Sprintf("The amount of mint tokens plus the total amount of issues has exceeded the maximum issue total,only accepts amount (0, %s]", canAmt.String()))
+		return nil, types.ErrInvalidAssetMaxSupply(k.codespace, fmt.Sprintf("The amount that the minting tokens plus the total issued amount has exceeded the maximum supply, only accepts amount (0, %s]", canAmt.String()))
 	}
 
 	if err := MintTokenFeeHandler(ctx, k, msg.Owner, token.Symbol); err != nil {
-		return err
+		return nil, err
 	}
 
 	mintCoins := sdk.NewCoins(sdk.NewCoin(token.GetMinUnit(), mintAmt))
@@ -178,11 +178,14 @@ func (k Keeper) MintToken(ctx sdk.Context, msg types.MsgMintToken) sdk.Error {
 
 	// mint coins
 	if err := k.supplyKeeper.MintCoins(ctx, types.SubModuleName, mintCoins); err != nil {
-		return err
+		return nil, err
 	}
 
 	// sent coins to owner's account
-	return k.supplyKeeper.SendCoinsFromModuleToAccount(ctx, types.SubModuleName, mintAcc, mintCoins)
+	if err := k.supplyKeeper.SendCoinsFromModuleToAccount(ctx, types.SubModuleName, mintAcc, mintCoins); err != nil {
+		return nil, err
+	}
+	return mintCoins, nil
 }
 
 // BurnToken handles MsgBurnToken
@@ -216,7 +219,10 @@ func (k Keeper) HasToken(ctx sdk.Context, token types.FungibleToken) (bool, stri
 	if exited := k.HasTokenSymbol(ctx, token.Symbol); exited {
 		return exited, fmt.Sprintf("token symbol already exists: %s", token.GetSymbol())
 	}
-	return k.HasTokenMinUnit(ctx, token.MinUnit), fmt.Sprintf("token minUnit already exists: %s", token.GetMinUnit())
+	if exited := k.HasTokenMinUnit(ctx, token.Symbol); exited {
+		return exited, fmt.Sprintf("token minUnit already exists: %s", token.GetMinUnit())
+	}
+	return false, ""
 }
 
 // HasTokenSymbol checks if the token symbol exists
@@ -249,7 +255,7 @@ func (k Keeper) GetTokens(ctx sdk.Context, owner sdk.AccAddress, symbol string) 
 	return sdk.KVStorePrefixIterator(store, types.KeyTokens(owner, symbol))
 }
 
-// GetAllTokens return  all existing tokens
+// GetAllTokens return all existing tokens
 func (k Keeper) GetAllTokens(ctx sdk.Context) (tokens types.Tokens) {
 	store := ctx.KVStore(k.storeKey)
 
