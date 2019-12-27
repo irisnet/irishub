@@ -2,41 +2,20 @@ package clitest
 
 import (
 	"fmt"
-	"path/filepath"
 	"strings"
 	"testing"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/tests"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/stretchr/testify/require"
-	tmtypes "github.com/tendermint/tendermint/types"
-
 	"github.com/irisnet/irishub/app"
-	"github.com/irisnet/irishub/modules/asset"
 	token "github.com/irisnet/irishub/modules/asset/01-token"
+	"github.com/stretchr/testify/require"
 )
 
 func TestIrisCLIIssueToken(t *testing.T) {
 	t.Parallel()
 	f := InitFixtures(t)
-	cdc := app.MakeCodec()
-
-	// Update asset params for test
-	genesisState := f.GenesisState()
-	var assetData asset.GenesisState
-	err := cdc.UnmarshalJSON(genesisState[asset.ModuleName], &assetData)
-	require.NoError(t, err)
-	assetData.TokenState.Params.IssueTokenBaseFee = sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(30))
-	assetDataBz, err := cdc.MarshalJSON(assetData)
-	require.NoError(t, err)
-	genesisState[asset.ModuleName] = assetDataBz
-
-	genFile := filepath.Join(f.IrisdHome, "config", "genesis.json")
-	genDoc, err := tmtypes.GenesisDocFromFile(genFile)
-	require.NoError(t, err)
-	genDoc.AppState, err = cdc.MarshalJSON(genesisState)
-	require.NoError(t, genDoc.SaveAs(genFile))
 
 	// start iris server
 	proc := f.GDStart()
@@ -49,8 +28,10 @@ func TestIrisCLIIssueToken(t *testing.T) {
 	startTokens := sdk.TokensFromConsensusPower(50)
 	require.Equal(t, startTokens, fooAcc.GetCoins().AmountOf(sdk.DefaultBondDenom))
 
+	initTokenNum := len(token.DefaultTokens()) + 1
+
 	tokensQuery := f.QueryAssetTokens()
-	require.Len(t, tokensQuery, len(token.DefaultTokens()))
+	require.Len(t, tokensQuery, initTokenNum)
 
 	symbol := "abcdefgf"
 	name := "Bitcoin"
@@ -74,7 +55,7 @@ func TestIrisCLIIssueToken(t *testing.T) {
 
 	// Ensure token is directly queryable
 	tokensQuery = f.QueryAssetTokens()
-	require.Equal(t, len(token.DefaultTokens())+1, len(tokensQuery))
+	require.Equal(t, initTokenNum+1, len(tokensQuery))
 
 	token := f.QueryAssetToken(symbol)
 	require.Equal(t, name, token.Name)

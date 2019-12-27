@@ -13,30 +13,30 @@ import (
 )
 
 var (
-	MaximumTokenMaxSupply   = uint64(1000000000000) // maximal limitation for token max supply，1000 billion
-	MaximumTokenInitSupply  = uint64(100000000000)  // maximal limitation for token initial supply，100 billion
-	MaximumTokenDecimal     = uint8(18)             // maximal limitation for token decimal
-	MinimumTokenSymbolSize  = 3                     // minimal limitation for the length of the token's symbol
-	MaximumTokenSymbolSize  = 8                     // maximal limitation for the length of the token's symbol
-	MinimumTokenMinUnitSize = 3                     // minimal limitation for the length of the token's min_unit
-	MaximumTokenMinUnitSize = 10                    // maximal limitation for the length of the token's min_unit
-	MaximumTokenNameSize    = 32                    // maximal limitation for the length of the token's name
+	MaximumTokenMaxSupply   = uint64(1000000000000) // Maximal limitation for token max supply，1000 billion
+	MaximumTokenInitSupply  = uint64(100000000000)  // Maximal limitation for token initial supply，100 billion
+	MaximumTokenDecimal     = uint8(18)             // Maximal limitation for token decimal
+	MinimumTokenSymbolSize  = 3                     // Minimal limitation for the length of the token's symbol
+	MaximumTokenSymbolSize  = 8                     // Maximal limitation for the length of the token's symbol
+	MinimumTokenMinUnitSize = 3                     // Minimal limitation for the length of the token's min_unit
+	MaximumTokenMinUnitSize = 10                    // Maximal limitation for the length of the token's min_unit
+	MaximumTokenNameSize    = 32                    // Maximal limitation for the length of the token's name
 
-	IsAlphaNumeric     = regexp.MustCompile(`^[a-zA-Z0-9]+$`).MatchString   // only accepts alphanumeric characters
-	IsAlphaNumericDash = regexp.MustCompile(`^[a-zA-Z0-9_-]+$`).MatchString // only accepts alphanumeric characters, _ and -
-	IsBeginWithAlpha   = regexp.MustCompile(`^[a-zA-Z].*`).MatchString      // only accepts alpha characters
+	IsAlphaNumeric     = regexp.MustCompile(`^[a-zA-Z0-9]+$`).MatchString   // Only accepts alphanumeric characters
+	IsAlphaNumericDash = regexp.MustCompile(`^[a-zA-Z0-9_-]+$`).MatchString // Only accepts alphanumeric characters, _ and -
+	IsBeginWithAlpha   = regexp.MustCompile(`^[a-zA-Z].*`).MatchString      // Only accepts alpha characters
 )
 
 // FungibleToken
 type FungibleToken struct {
-	Symbol        string         `json:"symbol" yaml:"symbol"`
-	Name          string         `json:"name" yaml:"name"`
-	Scale         uint8          `json:"scale" yaml:"scale"`
-	MinUnit       string         `json:"min_unit" yaml:"min_unit"`
-	InitialSupply sdk.Int        `json:"initial_supply" yaml:"initial_supply"`
-	MaxSupply     sdk.Int        `json:"max_supply" yaml:"max_supply"`
-	Mintable      bool           `json:"mintable" yaml:"mintable"`
-	Owner         sdk.AccAddress `json:"owner" yaml:"owner"`
+	Symbol        string         `json:"symbol" yaml:"symbol"`                 // Globally unique asset identifier
+	Name          string         `json:"name" yaml:"name"`                     // The name of the token, for example: Irisnet Network
+	Scale         uint8          `json:"scale" yaml:"scale"`                   // Maximum number of decimals supported by this token
+	MinUnit       string         `json:"min_unit" yaml:"min_unit"`             // The smallest unit name of the token
+	InitialSupply sdk.Int        `json:"initial_supply" yaml:"initial_supply"` // Initial Token Issuance
+	MaxSupply     sdk.Int        `json:"max_supply" yaml:"max_supply"`         // Maximum Token Issuance
+	Mintable      bool           `json:"mintable" yaml:"mintable"`             // Is it possible to issue additional shares after the token is issued?
+	Owner         sdk.AccAddress `json:"owner" yaml:"owner"`                   // The actual controller of the token
 }
 
 // NewFungibleToken - construct fungible token
@@ -135,6 +135,7 @@ func (tokens Tokens) Validate() sdk.Error {
 	return nil
 }
 
+// ValidateName - check the validity of the name
 func ValidateName(name string) sdk.Error {
 	nameLen := len(name)
 	if nameLen == 0 || nameLen > MaximumTokenNameSize {
@@ -143,6 +144,7 @@ func ValidateName(name string) sdk.Error {
 	return nil
 }
 
+// ValidateSymbol - check the validity of the symbol
 func ValidateSymbol(symbol string) sdk.Error {
 	symbolLen := len(symbol)
 	if symbolLen < MinimumTokenSymbolSize || symbolLen > MaximumTokenSymbolSize ||
@@ -156,6 +158,7 @@ func ValidateSymbol(symbol string) sdk.Error {
 	return nil
 }
 
+// ValidateScale - check the validity of the scale
 func ValidateScale(scale uint8) sdk.Error {
 	if scale > MaximumTokenDecimal {
 		return ErrInvalidAssetScale(DefaultCodespace, fmt.Sprintf("invalid token decimal %d, only accepts value [0, %d]", scale, MaximumTokenDecimal))
@@ -163,13 +166,14 @@ func ValidateScale(scale uint8) sdk.Error {
 	return nil
 }
 
+// ValidateMinUnit - check the validity of the minUnit
 func ValidateMinUnit(minUnit string) sdk.Error {
 	minUnitsLen := len(minUnit)
 	if minUnitsLen < MinimumTokenMinUnitSize ||
 		minUnitsLen > MaximumTokenMinUnitSize ||
-		!IsAlphaNumeric(minUnit) ||
+		!IsAlphaNumericDash(minUnit) ||
 		!IsBeginWithAlpha(minUnit) {
-		return ErrInvalidAssetMinUnit(DefaultCodespace, fmt.Sprintf("invalid token min_unit_alias %s, only accepts alphanumeric characters, and begin with an english letter, length [%d, %d]", minUnit, MinimumTokenMinUnitSize, MaximumTokenMinUnitSize))
+		return ErrInvalidAssetMinUnit(DefaultCodespace, fmt.Sprintf("invalid token min_unit %s, only accepts alphanumeric characters, and begin with an english letter, length [%d, %d]", minUnit, MinimumTokenMinUnitSize, MaximumTokenMinUnitSize))
 	}
 	if strings.Contains(strings.ToLower(minUnit), iristypes.Iris) {
 		return ErrInvalidAssetSymbol(DefaultCodespace, fmt.Sprintf("invalid token minUnit %s, can not contain native token minUnit %s", minUnit, iristypes.Iris))
@@ -177,6 +181,7 @@ func ValidateMinUnit(minUnit string) sdk.Error {
 	return nil
 }
 
+// ValidateSupply - check the validity of the initialSupply,maxSupply
 func ValidateSupply(initialSupply, maxSupply uint64) sdk.Error {
 	if initialSupply > MaximumTokenInitSupply {
 		return ErrInvalidAssetInitSupply(DefaultCodespace, fmt.Sprintf("invalid token initial supply %d, only accepts value [0, %d]", initialSupply, MaximumTokenInitSupply))
@@ -188,6 +193,7 @@ func ValidateSupply(initialSupply, maxSupply uint64) sdk.Error {
 	return nil
 }
 
+// ValidateMaxSupply - check the validity of the maxSupply
 func ValidateMaxSupply(maxSupply uint64) sdk.Error {
 	if maxSupply > MaximumTokenMaxSupply {
 		return ErrInvalidAssetMaxSupply(DefaultCodespace, fmt.Sprintf("invalid token max supply %d, only accepts value (0, %d]", maxSupply, MaximumTokenMaxSupply))

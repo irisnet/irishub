@@ -3,6 +3,7 @@ package clitest
 import (
 	"encoding/json"
 	"fmt"
+
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -31,6 +32,8 @@ import (
 
 	"github.com/irisnet/irishub/app"
 	iconfig "github.com/irisnet/irishub/config"
+	"github.com/irisnet/irishub/modules/asset"
+	token "github.com/irisnet/irishub/modules/asset/01-token"
 	"github.com/irisnet/irishub/modules/guardian"
 )
 
@@ -184,7 +187,7 @@ func InitFixtures(t *testing.T) (f *Fixtures) {
 
 	f.GenTx(keyFoo)
 	f.CollectGenTxs()
-	f.DoPreProcess(AddGuardianAddr)
+	f.DoPreProcess(AddGuardianAddr, ModifyAssetParam)
 	return
 }
 
@@ -825,5 +828,34 @@ func AddGuardianAddr(cdc *codec.Codec, genDoc *tmtypes.GenesisDoc) {
 	}
 	appState[guardian.ModuleName] = cdc.MustMarshalJSON(guardianGenState)
 
+	genDoc.AppState = cdc.MustMarshalJSON(appState)
+}
+
+func ModifyAssetParam(cdc *codec.Codec, genDoc *tmtypes.GenesisDoc) {
+	var appState simapp.GenesisState
+	cdc.MustUnmarshalJSON(genDoc.AppState, &appState)
+
+	assetDataBz := appState[asset.ModuleName]
+	var assetGenState asset.GenesisState
+	cdc.MustUnmarshalJSON(assetDataBz, &assetGenState)
+
+	stakeToken := token.FungibleToken{
+		Symbol:   sdk.DefaultBondDenom,
+		Name:     "IRIS Network",
+		Scale:    0,
+		MinUnit:  sdk.DefaultBondDenom,
+		Mintable: true,
+	}
+
+	tokenState := assetGenState.TokenState
+	tokenState.Params.IssueTokenBaseFee = sdk.NewCoin(stakeToken.MinUnit, sdk.NewInt(30))
+
+	tokens := tokenState.Tokens
+	tokens = append(tokens, stakeToken)
+	tokenState.Tokens = tokens
+
+	assetGenState.TokenState = tokenState
+
+	appState[asset.ModuleName] = cdc.MustMarshalJSON(assetGenState)
 	genDoc.AppState = cdc.MustMarshalJSON(appState)
 }

@@ -7,6 +7,7 @@ import (
 	token "github.com/irisnet/irishub/modules/asset/01-token"
 )
 
+// Keeper defines the module Keeper
 type Keeper struct {
 	TokenKeeper token.Keeper
 }

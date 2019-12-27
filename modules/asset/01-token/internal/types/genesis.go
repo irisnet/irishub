@@ -1,10 +1,12 @@
 package types
 
 import (
+	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/irisnet/irishub/types"
 )
 
+// DefaultToken return the definition of iris token
 var DefaultToken = FungibleToken{
 	Symbol:        types.Iris,
 	Name:          "IRIS Network",
@@ -42,6 +44,20 @@ func ValidateGenesis(data GenesisState) error {
 		}
 		if err := ValidateScale(token.Scale); err != nil {
 			return err
+		}
+
+		symbolLen := len(token.Symbol)
+		if symbolLen < MinimumTokenSymbolSize || symbolLen > MaximumTokenSymbolSize ||
+			!IsBeginWithAlpha(token.Symbol) || !IsAlphaNumeric(token.Symbol) {
+			return ErrInvalidAssetSymbol(DefaultCodespace, fmt.Sprintf("invalid token symbol %s, only accepts alphanumeric characters, and begin with an english letter, length [%d, %d]", token.Symbol, MinimumTokenSymbolSize, MaximumTokenSymbolSize))
+		}
+
+		minUnitsLen := len(token.MinUnit)
+		if minUnitsLen < MinimumTokenMinUnitSize ||
+			minUnitsLen > MaximumTokenMinUnitSize ||
+			!IsAlphaNumericDash(token.MinUnit) ||
+			!IsBeginWithAlpha(token.MinUnit) {
+			return ErrInvalidAssetMinUnit(DefaultCodespace, fmt.Sprintf("invalid token min_unit %s, only accepts alphanumeric characters, and begin with an english letter, length [%d, %d]", token.MinUnit, MinimumTokenMinUnitSize, MaximumTokenMinUnitSize))
 		}
 	}
 	return data.Params.Validate()

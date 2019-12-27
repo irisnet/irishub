@@ -11,6 +11,7 @@ import (
 	"github.com/irisnet/irishub/modules/asset/01-token/internal/types"
 )
 
+// QuerierToken return the definition of token by symbol
 func QuerierToken(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
 	var params types.QueryTokenParams
 	if err := keeper.cdc.UnmarshalJSON(req.Data, &params); err != nil {
@@ -19,6 +20,7 @@ func QuerierToken(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte
 	return queryToken(ctx, keeper, params.Symbol)
 }
 
+// QuerierTokens return the token list by symbol or owner
 func QuerierTokens(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
 	var params types.QueryTokensParams
 	if err := keeper.cdc.UnmarshalJSON(req.Data, &params); err != nil {
@@ -36,6 +38,7 @@ func QuerierTokens(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byt
 	return queryAllTokens(ctx, keeper)
 }
 
+// QuerierFees return the fee of issue or mint by symbol
 func QuerierFees(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
 	var params types.QueryTokenFeesParams
 	if err := keeper.cdc.UnmarshalJSON(req.Data, &params); err != nil {
@@ -59,6 +62,7 @@ func QuerierFees(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte,
 	return bz, nil
 }
 
+// QuerierParameters return the system param of the token module
 func QuerierParameters(ctx sdk.Context, keeper Keeper) ([]byte, sdk.Error) {
 	params := keeper.GetParamSet(ctx)
 

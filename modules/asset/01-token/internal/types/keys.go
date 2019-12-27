@@ -23,18 +23,19 @@ const (
 	DefaultParamspace = SubModuleName
 )
 
-func KeyPath(prefix int) []byte {
+func keyPath(prefix int) []byte {
 	return types.KeyPrefixBytes(SubModuleName, prefix)
 }
 
+// KeyTokenPrefix return the base prefix of the token module
 func KeyTokenPrefix() []byte {
-	return KeyPath(types.KeyTokenPrefix)
+	return keyPath(types.KeyTokenPrefix)
 }
 
 // KeyToken returns the key of the specified token
 func KeyToken(symbol string) []byte {
 	return append(
-		KeyPath(types.KeyTokenPrefix),
+		keyPath(types.KeyTokenPrefix),
 		[]byte(symbol)...,
 	)
 }
@@ -42,7 +43,7 @@ func KeyToken(symbol string) []byte {
 // KeyTokens returns the key of the specified owner . Intended for querying all tokens of an owner
 func KeyTokens(owner sdk.AccAddress, symbol string) []byte {
 	return append(
-		KeyPath(types.KeyTokenSymbolPrefix),
+		keyPath(types.KeyTokenSymbolPrefix),
 		[]byte(fmt.Sprintf("%s/%s", owner, symbol))...,
 	)
 }
@@ -50,7 +51,7 @@ func KeyTokens(owner sdk.AccAddress, symbol string) []byte {
 // KeyMinUnit returns the key of the specified minUnit
 func KeyMinUnit(minUnit string) []byte {
 	return append(
-		KeyPath(types.KeyTokenMinUnitPrefix),
+		keyPath(types.KeyTokenMinUnitPrefix),
 		[]byte(minUnit)...,
 	)
 }

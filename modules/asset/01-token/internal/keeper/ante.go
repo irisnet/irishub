@@ -7,7 +7,6 @@ import (
 	"github.com/irisnet/irishub/modules/asset/01-token/internal/types"
 )
 
-// ValidateTokenFeeDecorator is responsible for withholding fees on transactions issued in msg and additional tokens.
 type ValidateTokenFeeDecorator struct {
 	tk Keeper
 	ak types.AccountKeeper
@@ -20,6 +19,7 @@ func NewValidateTokenFeeDecorator(tk Keeper, ak types.AccountKeeper) ValidateTok
 	}
 }
 
+// AnteHandle is responsible for withholding fees on transactions issued in msg and additional tokens.
 func (dtf ValidateTokenFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (newCtx sdk.Context, err error) {
 	feeMap := make(map[string]sdk.Coin)
 	for _, msg := range tx.GetMsgs() {
