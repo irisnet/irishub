@@ -2,18 +2,22 @@ package types
 
 import (
 	"fmt"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/irisnet/irishub/types"
 )
 
 // DefaultToken return the definition of iris token
-var DefaultToken = FungibleToken{
-	Symbol:        types.Iris,
-	Name:          "IRIS Network",
-	Scale:         18,
-	MinUnit:       types.IrisAtto,
-	InitialSupply: sdk.NewIntWithDecimal(20, 9),
-	Mintable:      true,
+
+func IrisToken() FungibleToken {
+	return FungibleToken{
+		Symbol:        types.Iris,
+		Name:          "IRIS Network",
+		Scale:         18,
+		MinUnit:       types.IrisAtto,
+		InitialSupply: sdk.NewIntWithDecimal(20, 9),
+		Mintable:      true,
+	}
 }
 
 // GenesisState - all asset state that must be provided at genesis
@@ -65,6 +69,6 @@ func ValidateGenesis(data GenesisState) error {
 
 func DefaultTokens() Tokens {
 	return Tokens{
-		DefaultToken,
+		IrisToken(),
 	}
 }

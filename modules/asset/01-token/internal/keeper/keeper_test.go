@@ -23,9 +23,9 @@ const (
 )
 
 var (
-	denom    = types.DefaultToken.MinUnit
+	denom    = types.IrisToken().MinUnit
 	owner    = sdk.AccAddress([]byte("tokenTest"))
-	initAmt  = sdk.NewIntWithDecimal(types.DefaultToken.InitialSupply.Int64(), int(types.DefaultToken.Scale))
+	initAmt  = sdk.NewIntWithDecimal(types.IrisToken().InitialSupply.Int64(), int(types.IrisToken().Scale))
 	initCoin = sdk.Coins{sdk.NewCoin(denom, initAmt)}
 )
 

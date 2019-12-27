@@ -37,7 +37,7 @@ func NewParams(assetTaxRate sdk.Dec, issueTokenBaseFee sdk.Coin,
 func DefaultParams() Params {
 	return Params{
 		AssetTaxRate:      sdk.NewDecWithPrec(4, 1), // 0.4 (40%)
-		IssueTokenBaseFee: sdk.NewCoin(DefaultToken.MinUnit, sdk.NewIntWithDecimal(60000, int(DefaultToken.Scale))),
+		IssueTokenBaseFee: sdk.NewCoin(IrisToken().MinUnit, sdk.NewIntWithDecimal(60000, int(IrisToken().Scale))),
 		MintTokenFeeRatio: sdk.NewDecWithPrec(1, 1), // 0.1 (10%)
 	}
 }
