@@ -6,5 +6,5 @@ const (
 
 // QueryHTLCParams is the query parameters for 'custom/htlc/htlc'
 type QueryHTLCParams struct {
-	HashLock HTLCHashLock
+	HashLock HTLCHashLock `json:"hash_lock" yaml:"hash_lock"` // hash lock of an HTLC
 }

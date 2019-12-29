@@ -330,7 +330,7 @@ func TestIrisCLIGasAuto(t *testing.T) {
 	cdc := app.MakeCodec()
 	sendResp := sdk.TxResponse{}
 	err := cdc.UnmarshalJSON([]byte(stdout), &sendResp)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	require.True(t, sendResp.GasWanted >= sendResp.GasUsed)
 	tests.WaitForNextNBlocksTM(1, f.Port)
 
@@ -1020,11 +1020,11 @@ func TestIrisCLIEncode(t *testing.T) {
 
 	// Decode the base64
 	decodedBytes, err := base64.StdEncoding.DecodeString(trimmedBase64)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	// Check that the transaction decodes as epxceted
 	var decodedTx auth.StdTx
-	require.Nil(t, cdc.UnmarshalBinaryLengthPrefixed(decodedBytes, &decodedTx))
+	require.NoError(t, cdc.UnmarshalBinaryLengthPrefixed(decodedBytes, &decodedTx))
 	require.Equal(t, "deadbeef", decodedTx.Memo)
 }
 

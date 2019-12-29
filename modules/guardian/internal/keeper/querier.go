@@ -11,7 +11,7 @@ import (
 
 // NewQuerier creates a querier for guardian REST endpoints
 func NewQuerier(k Keeper) sdk.Querier {
-	return func(ctx sdk.Context, path []string, req abci.RequestQuery) ([]byte, sdk.Error) {
+	return func(ctx sdk.Context, path []string, _ abci.RequestQuery) ([]byte, sdk.Error) {
 		switch path[0] {
 		case types.QueryProfilers:
 			return queryProfilers(ctx, k)

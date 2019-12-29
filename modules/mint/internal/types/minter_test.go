@@ -26,7 +26,7 @@ func TestNextInflation(t *testing.T) {
 
 func TestDefaultMinter(t *testing.T) {
 	err := ValidateMinter(DefaultMinter())
-	require.Nil(t, err)
+	require.NoError(t, err)
 }
 
 func TestMinterValidate(t *testing.T) {
@@ -43,9 +43,9 @@ func TestMinterValidate(t *testing.T) {
 		minter := NewMinter(tc.LastUpdate, tc.InflationBase)
 		err := ValidateMinter(minter)
 		if tc.expectPass {
-			require.Nil(t, err, "%d: %+v", i, err)
+			require.NoError(t, err, "%d: %+v", i, err)
 		} else {
-			require.NotNil(t, err, "%d: %+v", i, err)
+			require.Error(t, err, "%d: %+v", i, err)
 		}
 	}
 }

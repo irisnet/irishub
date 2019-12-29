@@ -42,6 +42,7 @@ func (ps Profilers) String() (out string) {
 // Trustees is a collection of Guardian
 type Trustees []Guardian
 
+// String implements string
 func (ts Trustees) String() (out string) {
 	if len(ts) == 0 {
 		return "[]"

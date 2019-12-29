@@ -9,6 +9,7 @@ import (
 
 	abci "github.com/tendermint/tendermint/abci/types"
 
+	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/supply"
 
@@ -19,17 +20,20 @@ import (
 type KeeperTestSuite struct {
 	suite.Suite
 
+	cdc *codec.Codec
 	ctx sdk.Context
 	app *simapp.SimApp
 }
 
 func (suite *KeeperTestSuite) SetupTest() {
 	app := simapp.Setup(false)
-	ctx := app.BaseApp.NewContext(false, abci.Header{})
-	app.MintKeeper.SetParamSet(ctx, types.DefaultParams())
-	app.MintKeeper.SetMinter(ctx, types.DefaultMinter())
+
+	suite.cdc = app.Codec()
+	suite.ctx = app.BaseApp.NewContext(false, abci.Header{})
 	suite.app = app
-	suite.ctx = ctx
+
+	app.MintKeeper.SetParamSet(suite.ctx, types.DefaultParams())
+	app.MintKeeper.SetMinter(suite.ctx, types.DefaultMinter())
 }
 
 func TestKeeperTestSuite(t *testing.T) {

@@ -22,8 +22,8 @@ var (
 	testNewHeight      = testHeight + 50
 	testBlockInterval1 = uint64(100)
 	testBlockInterval2 = uint64(200)
-	testConsumer1      = sdk.AccAddress([]byte("test-consumer1"))
-	testConsumer2      = sdk.AccAddress([]byte("test-consumer2"))
+	testConsumer1      = sdk.AccAddress("test-consumer1")
+	testConsumer2      = sdk.AccAddress("test-consumer2")
 )
 
 type GenesisTestSuite struct {
@@ -31,7 +31,7 @@ type GenesisTestSuite struct {
 
 	cdc    *codec.Codec
 	ctx    sdk.Context
-	keeper *rand.Keeper
+	keeper rand.Keeper
 }
 
 func (suite *GenesisTestSuite) SetupTest() {
@@ -39,15 +39,11 @@ func (suite *GenesisTestSuite) SetupTest() {
 
 	suite.cdc = app.Codec()
 	suite.ctx = app.BaseApp.NewContext(false, abci.Header{})
-	suite.keeper = &app.RandKeeper
+	suite.keeper = app.RandKeeper
 }
 
-func TestGenesisSuite(t *testing.T) {
+func TestQuerierSuite(t *testing.T) {
 	suite.Run(t, new(GenesisTestSuite))
-}
-
-func (suite *GenesisTestSuite) TestInitGenesis() {
-	// TODO
 }
 
 func (suite *GenesisTestSuite) TestExportGenesis() {
@@ -71,7 +67,7 @@ func (suite *GenesisTestSuite) TestExportGenesis() {
 	suite.Equal(2, len(storedRequests))
 
 	// export genesis
-	genesis := rand.ExportGenesis(suite.ctx, *suite.keeper)
+	genesis := rand.ExportGenesis(suite.ctx, suite.keeper)
 	exportedRequests := genesis.PendingRandRequests
 	suite.Equal(2, len(exportedRequests))
 

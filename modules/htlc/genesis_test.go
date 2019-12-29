@@ -57,8 +57,8 @@ func TestGenesisSuite(t *testing.T) {
 }
 
 func initVars(suite *TestSuite) {
-	senderAddrs = []sdk.AccAddress{sdk.AccAddress([]byte("sender1")), sdk.AccAddress([]byte("sender2"))}
-	receiverAddrs = []sdk.AccAddress{sdk.AccAddress([]byte("receiver1")), sdk.AccAddress([]byte("receiver2"))}
+	senderAddrs = []sdk.AccAddress{sdk.AccAddress("sender1"), sdk.AccAddress("sender2")}
+	receiverAddrs = []sdk.AccAddress{sdk.AccAddress("receiver1"), sdk.AccAddress("receiver2")}
 
 	_ = suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, senderAddrs[0])
 	_ = suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, senderAddrs[1])
@@ -83,24 +83,12 @@ func initVars(suite *TestSuite) {
 	htlc2 = htlc.NewHTLC(senderAddrs[1], receiverAddrs[1], receiverOnOtherChain, amount, initSecret, timestamps[1], expireHeights[1], state)
 }
 
-func (suite *TestSuite) TestInitGenesis() {
-	GenesisState := htlc.GenesisState{
-		PendingHTLCs: map[string]htlc.HTLC{
-			hashLocks[0].String(): htlc1,
-			hashLocks[1].String(): htlc2,
-		},
-	}
-	htlc.InitGenesis(suite.ctx, suite.app.HTLCKeeper, GenesisState)
-	err := htlc.ValidateGenesis(GenesisState)
-	suite.Nil(err)
-}
-
 func (suite *TestSuite) TestExportGenesis() {
 	// create HTLCs
 	err := suite.app.HTLCKeeper.CreateHTLC(suite.ctx, htlc1, hashLocks[0])
-	suite.Nil(err)
+	suite.NoError(err)
 	err = suite.app.HTLCKeeper.CreateHTLC(suite.ctx, htlc2, hashLocks[1])
-	suite.Nil(err)
+	suite.NoError(err)
 
 	newBlockHeight := int64(50)
 	suite.ctx = suite.ctx.WithBlockHeight(newBlockHeight)
@@ -116,11 +104,11 @@ func (suite *TestSuite) TestExportGenesis() {
 		suite.True(tmpHTLC.State == htlc.OPEN)
 
 		hashLock, err := hex.DecodeString(hashLockHex)
-		suite.Nil(err)
+		suite.NoError(err)
 
 		// assert the HTLC with the given hash lock exists
 		htlcInStore, err := suite.app.HTLCKeeper.GetHTLC(suite.ctx, hashLock)
-		suite.Nil(err)
+		suite.NoError(err)
 
 		// assert the expiration height is new
 		newExpireHeight := htlcInStore.ExpireHeight - uint64(newBlockHeight) + 1
@@ -131,9 +119,10 @@ func (suite *TestSuite) TestExportGenesis() {
 		suite.Equal(htlcInStore, tmpHTLC)
 	}
 
-	suite.Nil(htlc.ValidateGenesis(exportedGenesis))
+	e := htlc.ValidateGenesis(exportedGenesis)
+	suite.NoError(e)
 
 	// assert the expired HTLCs(htlc1) have been refunded
 	_, err = suite.app.HTLCKeeper.GetHTLC(suite.ctx, hashLocks[0])
-	suite.NotNil(err)
+	suite.Error(err)
 }

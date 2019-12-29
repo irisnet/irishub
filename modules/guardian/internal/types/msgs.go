@@ -20,7 +20,7 @@ var (
 
 // MsgAddProfiler - struct for add a profiler
 type MsgAddProfiler struct {
-	AddGuardian
+	AddGuardian `json:"add_guardian" yaml:"add_guardian"` // the guardian will be added
 }
 
 // NewMsgAddProfiler constructs a MsgAddProfiler
@@ -62,7 +62,7 @@ func (msg MsgAddProfiler) GetSigners() []sdk.AccAddress {
 //______________________________________________________________________
 // MsgDeleteProfiler - struct for delete a profiler
 type MsgDeleteProfiler struct {
-	DeleteGuardian
+	DeleteGuardian `json:"delete_guardian" yaml:"delete_guardian"` // the guardian will be deleted
 }
 
 // NewMsgDeleteProfiler constructs a MsgDeleteProfiler
@@ -103,7 +103,7 @@ func (msg MsgDeleteProfiler) GetSigners() []sdk.AccAddress {
 //______________________________________________________________________
 // MsgAddTrustee - struct for add a trustee
 type MsgAddTrustee struct {
-	AddGuardian
+	AddGuardian `json:"add_guardian" yaml:"add_guardian"` // the guardian will be added
 }
 
 // NewMsgAddTrustee constructs a MsgAddTrustee
@@ -145,7 +145,7 @@ func (msg MsgAddTrustee) GetSigners() []sdk.AccAddress {
 //______________________________________________________________________
 // MsgDeleteTrustee - struct for delete a trustee
 type MsgDeleteTrustee struct {
-	DeleteGuardian
+	DeleteGuardian `json:"delete_guardian" yaml:"delete_guardian"` // the guardian will be deleted
 }
 
 // NewMsgDeleteTrustee constructs a MsgDeleteTrustee

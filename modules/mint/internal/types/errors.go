@@ -1,9 +1,12 @@
 package types
 
-import sdk "github.com/cosmos/cosmos-sdk/types"
+import (
+	sdk "github.com/cosmos/cosmos-sdk/types"
+)
 
+// Rand errors reserve 100 ~ 199.
+// nolint
 const (
-	//mint
 	CodeInvalidMintInflation sdk.CodeType = 400
 	CodeInvalidMintDenom     sdk.CodeType = 401
 )

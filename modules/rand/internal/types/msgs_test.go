@@ -13,7 +13,7 @@ import (
 
 var (
 	emptyAddr     sdk.AccAddress
-	testAddr      = sdk.AccAddress([]byte("testAddr"))
+	testAddr      = sdk.AccAddress("testAddr")
 	blockInterval = uint64(10)
 )
 
@@ -51,9 +51,9 @@ func TestMsgRequestRandValidation(t *testing.T) {
 	for _, td := range testData {
 		msg := NewMsgRequestRand(td.consumer, td.blockInterval)
 		if td.expectPass {
-			require.Nil(t, msg.ValidateBasic(), "test: %v", td.name)
+			require.NoError(t, msg.ValidateBasic(), "test: %v", td.name)
 		} else {
-			require.NotNil(t, msg.ValidateBasic(), "test: %v", td.name)
+			require.Error(t, msg.ValidateBasic(), "test: %v", td.name)
 		}
 	}
 }
