@@ -94,7 +94,7 @@ func TestMsgCreateHTLCValidation(t *testing.T) {
 		{true, senderAddr, toAddr, receiverOnOtherChain, amount, hashLock, timestamp, timeLock},
 		// len(msg.Sender) == 0
 		{false, emptyAddr, toAddr, receiverOnOtherChain, amount, hashLock, timestamp, timeLock},
-		// len(msg.To) == 0
+		// len(msg.Recipient) == 0
 		{false, senderAddr, emptyAddr, receiverOnOtherChain, amount, hashLock, timestamp, timeLock},
 		// len(msg.ToOnOtherChain) > MaxLengthForAddressOnOtherChain
 		{false, senderAddr, toAddr, errReceiverOnOtherChain, amount, hashLock, timestamp, timeLock},

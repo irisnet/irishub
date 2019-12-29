@@ -3,7 +3,6 @@ package types
 import (
 	"fmt"
 	"regexp"
-	"strings"
 )
 
 const (
@@ -20,10 +19,3 @@ var (
 	reDenomCompiled = regexp.MustCompile(fmt.Sprintf(`^%s$`, reDenom))
 	reCoinCompiled  = regexp.MustCompile(fmt.Sprintf(`^(%s)%s(%s)$`, reAmount, reSpace, reDenom))
 )
-
-func IsCoinMinDenomValid(denom string) bool {
-	if denom != IrisAtto && (!strings.HasSuffix(denom, MinDenomSuffix) || strings.HasPrefix(denom, Iris+"-")) {
-		return false
-	}
-	return reDenomCompiled.MatchString(denom)
-}
