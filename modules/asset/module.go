@@ -21,9 +21,10 @@ import (
 )
 
 var (
-	_ module.AppModule           = AppModule{}
-	_ module.AppModuleBasic      = AppModuleBasic{}
-	_ module.AppModuleSimulation = AppModuleSimulation{}
+	_ module.AppModule      = AppModule{}
+	_ module.AppModuleBasic = AppModuleBasic{}
+	// TODO
+	//_ module.AppModuleSimulation = AppModuleSimulation{}
 )
 
 // AppModuleBasic app module basics object

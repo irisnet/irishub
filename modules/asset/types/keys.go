@@ -2,8 +2,6 @@ package types
 
 import (
 	"fmt"
-
-	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 const (
@@ -18,8 +16,6 @@ const (
 
 	// RouterKey is the msg router key for the Asset module
 	RouterKey string = ModuleName
-
-	DefaultCodespace sdk.CodespaceType = ModuleName
 
 	// DefaultParamspace default name for parameter store
 	DefaultParamspace = ModuleName

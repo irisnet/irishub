@@ -5,28 +5,28 @@ import (
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 // NewHandler returns a handler for all rand msgs
 func NewHandler(k Keeper) sdk.Handler {
-	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
+	return func(ctx sdk.Context, msg sdk.Msg) (*sdk.Result, error) {
 		ctx = ctx.WithEventManager(sdk.NewEventManager())
 
 		switch msg := msg.(type) {
 		case MsgRequestRand:
 			return handleMsgRequestRand(ctx, k, msg)
 		default:
-			errMsg := fmt.Sprintf("unrecognized rand message type: %T", msg)
-			return sdk.ErrUnknownRequest(errMsg).Result()
+			return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unrecognized %s message type: %T", ModuleName, msg)
 		}
 	}
 }
 
 // handleMsgRequestRand handles MsgRequestRand
-func handleMsgRequestRand(ctx sdk.Context, k Keeper, msg MsgRequestRand) sdk.Result {
+func handleMsgRequestRand(ctx sdk.Context, k Keeper, msg MsgRequestRand) (*sdk.Result, error) {
 	request, err := k.RequestRand(ctx, msg.Consumer, msg.BlockInterval)
 	if err != nil {
-		return err.Result()
+		return nil, err
 	}
 
 	ctx.EventManager().EmitEvents(
@@ -44,5 +44,5 @@ func handleMsgRequestRand(ctx sdk.Context, k Keeper, msg MsgRequestRand) sdk.Res
 		},
 	)
 
-	return sdk.Result{Events: ctx.EventManager().Events()}
+	return &sdk.Result{Events: ctx.EventManager().Events()}, nil
 }

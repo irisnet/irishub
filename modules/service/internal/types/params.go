@@ -79,13 +79,13 @@ func NewParams(maxRequestTimeout, minDepositMultiple int64, serviceFeeTax, slash
 // ParamSetPairs implements params.ParamSet
 func (p *Params) ParamSetPairs() params.ParamSetPairs {
 	return params.ParamSetPairs{
-		{Key: KeyMaxRequestTimeout, Value: &p.MaxRequestTimeout},
-		{Key: KeyMinDepositMultiple, Value: &p.MinDepositMultiple},
-		{Key: KeyServiceFeeTax, Value: &p.ServiceFeeTax},
-		{Key: KeySlashFraction, Value: &p.SlashFraction},
-		{Key: KeyComplaintRetrospect, Value: &p.ComplaintRetrospect},
-		{Key: KeyArbitrationTimeLimit, Value: &p.ArbitrationTimeLimit},
-		{Key: KeyTxSizeLimit, Value: &p.TxSizeLimit},
+		params.NewParamSetPair(KeyMaxRequestTimeout, &p.MaxRequestTimeout, validateMaxRequestTimeout),
+		params.NewParamSetPair(KeyMinDepositMultiple, &p.MinDepositMultiple, validateMinDepositMultiple),
+		params.NewParamSetPair(KeyServiceFeeTax, &p.ServiceFeeTax, validateServiceFeeTax),
+		params.NewParamSetPair(KeySlashFraction, &p.SlashFraction, validateSlashFraction),
+		params.NewParamSetPair(KeyComplaintRetrospect, &p.ComplaintRetrospect, validateComplaintRetrospect),
+		params.NewParamSetPair(KeyArbitrationTimeLimit, &p.ArbitrationTimeLimit, validateArbitrationTimeLimit),
+		params.NewParamSetPair(KeyTxSizeLimit, &p.TxSizeLimit, validateTxSizeLimit),
 	}
 }
 
@@ -162,49 +162,84 @@ func (p Params) Validate() error {
 	return validateTxSizeLimit(p.TxSizeLimit)
 }
 
-func validateMaxRequestTimeout(v int64) error {
+func validateMaxRequestTimeout(i interface{}) error {
+	v, ok := i.(int64)
+	if !ok {
+		return fmt.Errorf("invalid parameter type: %T", i)
+	}
+
 	if v < MinRequestTimeout {
 		return fmt.Errorf("MaxRequestTimeout [%d] should be greater than or equal to %d", v, MinRequestTimeout)
 	}
 	return nil
 }
 
-func validateMinDepositMultiple(v int64) error {
+func validateMinDepositMultiple(i interface{}) error {
+	v, ok := i.(int64)
+	if !ok {
+		return fmt.Errorf("invalid parameter type: %T", i)
+	}
+
 	if v < MinDepositMultiple || v > MaxDepositMultiple {
 		return fmt.Errorf("MinDepositMultiple [%d] should be between [%d, %d]", v, MinDepositMultiple, MaxDepositMultiple)
 	}
 	return nil
 }
 
-func validateSlashFraction(v sdk.Dec) error {
+func validateSlashFraction(i interface{}) error {
+	v, ok := i.(sdk.Dec)
+	if !ok {
+		return fmt.Errorf("invalid parameter type: %T", i)
+	}
+
 	if v.LTE(sdk.ZeroDec()) || v.GT(MaxSlashFraction) {
 		return fmt.Errorf("SlashFraction [%s] should be between (0, %s]", v, MaxSlashFraction)
 	}
 	return nil
 }
 
-func validateServiceFeeTax(v sdk.Dec) error {
+func validateServiceFeeTax(i interface{}) error {
+	v, ok := i.(sdk.Dec)
+	if !ok {
+		return fmt.Errorf("invalid parameter type: %T", i)
+	}
+
 	if v.LTE(sdk.ZeroDec()) || v.GT(MaxServiceFeeTax) {
 		return fmt.Errorf("ServiceFeeTax [%s] should be between (0, %s]", v, MaxServiceFeeTax)
 	}
 	return nil
 }
 
-func validateComplaintRetrospect(v time.Duration) error {
+func validateComplaintRetrospect(i interface{}) error {
+	v, ok := i.(time.Duration)
+	if !ok {
+		return fmt.Errorf("invalid parameter type: %T", i)
+	}
+
 	if v < MinComplaintRetrospect || v > MaxComplaintRetrospect {
 		return fmt.Errorf("ComplaintRetrospect [%s] should be between [%s, %s]", v, MinComplaintRetrospect, MaxComplaintRetrospect)
 	}
 	return nil
 }
 
-func validateArbitrationTimeLimit(v time.Duration) error {
+func validateArbitrationTimeLimit(i interface{}) error {
+	v, ok := i.(time.Duration)
+	if !ok {
+		return fmt.Errorf("invalid parameter type: %T", i)
+	}
+
 	if v < MinArbitrationTimeLimit || v > MaxArbitrationTimeLimit {
 		return fmt.Errorf("ArbitrationTimeLimit [%s] should be between [%s, %s]", v, MinArbitrationTimeLimit, MaxArbitrationTimeLimit)
 	}
 	return nil
 }
 
-func validateTxSizeLimit(v uint64) error {
+func validateTxSizeLimit(i interface{}) error {
+	v, ok := i.(uint64)
+	if !ok {
+		return fmt.Errorf("invalid parameter type: %T", i)
+	}
+
 	if v < MinTxSizeLimit || v > MaxTxSizeLimit {
 		return fmt.Errorf("TxSizeLimit [%d] should be between [%d, %d]", v, MinTxSizeLimit, MaxTxSizeLimit)
 	}

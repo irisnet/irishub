@@ -1,6 +1,8 @@
 package types
 
 import (
+	"fmt"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/params"
 )
@@ -45,14 +47,59 @@ func DefaultParams() Params {
 // ParamSetPairs Implements params.ParamSet
 func (p *Params) ParamSetPairs() params.ParamSetPairs {
 	return params.ParamSetPairs{
-		{Key: KeyAssetTaxRate, Value: &p.AssetTaxRate},
-		{Key: KeyIssueTokenBaseFee, Value: &p.IssueTokenBaseFee},
-		{Key: KeyMintTokenFeeRatio, Value: &p.MintTokenFeeRatio},
+		params.NewParamSetPair(KeyAssetTaxRate, &p.AssetTaxRate, validateAssetTaxRate),
+		params.NewParamSetPair(KeyIssueTokenBaseFee, &p.IssueTokenBaseFee, validateIssueTokenBaseFee),
+		params.NewParamSetPair(KeyMintTokenFeeRatio, &p.MintTokenFeeRatio, validateMintTokenFeeRatio),
 	}
 }
 
 // Validate validates a set of params
 func (p Params) Validate() error {
 	// TODO should validate Params
+	return nil
+}
+
+func validateAssetTaxRate(i interface{}) error {
+	v, ok := i.(sdk.Dec)
+	if !ok {
+		return fmt.Errorf("invalid parameter type: %T", i)
+	}
+
+	if v.IsNegative() {
+		return fmt.Errorf("inflation rate change cannot be negative: %s", v)
+	}
+	if v.GT(sdk.OneDec()) {
+		return fmt.Errorf("inflation rate change too large: %s", v)
+	}
+
+	return nil
+}
+
+func validateIssueTokenBaseFee(i interface{}) error {
+	_, ok := i.(sdk.Coin)
+	if !ok {
+		return fmt.Errorf("invalid parameter type: %T", i)
+	}
+
+	//if v.IsValid() {
+	//	return fmt.Errorf("issue token base fee change cannot be invalid: %s", v.String())
+	//}
+
+	return nil
+}
+
+func validateMintTokenFeeRatio(i interface{}) error {
+	v, ok := i.(sdk.Dec)
+	if !ok {
+		return fmt.Errorf("invalid parameter type: %T", i)
+	}
+
+	if v.IsNegative() {
+		return fmt.Errorf("mint token fee ratio change cannot be negative: %s", v)
+	}
+	if v.GT(sdk.OneDec()) {
+		return fmt.Errorf("mint token fee ratio change too large: %s", v)
+	}
+
 	return nil
 }

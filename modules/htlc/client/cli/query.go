@@ -8,6 +8,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/context"
+	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/codec"
 
 	"github.com/irisnet/irishub/modules/htlc/internal/types"
@@ -23,7 +24,7 @@ func GetQueryCmd(cdc *codec.Codec) *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 	mintingQueryCmd.AddCommand(
-		client.GetCommands(
+		flags.GetCommands(
 			GetCmdQueryHTLC(cdc),
 		)...,
 	)

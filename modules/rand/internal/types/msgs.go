@@ -2,6 +2,7 @@ package types
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 const (
@@ -33,9 +34,9 @@ func (msg MsgRequestRand) Route() string { return RouterKey }
 func (msg MsgRequestRand) Type() string { return TypeMsgRequestRand }
 
 // ValidateBasic implements Msg.
-func (msg MsgRequestRand) ValidateBasic() sdk.Error {
+func (msg MsgRequestRand) ValidateBasic() error {
 	if len(msg.Consumer) == 0 {
-		return ErrInvalidConsumer(DefaultCodespace, "the consumer address must be specified")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "the consumer address must be specified")
 	}
 	return nil
 }

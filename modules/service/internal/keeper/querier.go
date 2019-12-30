@@ -1,19 +1,18 @@
 package keeper
 
 import (
-	"fmt"
-
 	abci "github.com/tendermint/tendermint/abci/types"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 	"github.com/irisnet/irishub/modules/service/internal/types"
 )
 
 // NewQuerier
 func NewQuerier(k Keeper) sdk.Querier {
-	return func(ctx sdk.Context, path []string, req abci.RequestQuery) ([]byte, sdk.Error) {
+	return func(ctx sdk.Context, path []string, req abci.RequestQuery) ([]byte, error) {
 		switch path[0] {
 		case types.QueryDefinition:
 			return queryDefinition(ctx, req, k)
@@ -28,20 +27,20 @@ func NewQuerier(k Keeper) sdk.Querier {
 		case types.QueryFees:
 			return queryFees(ctx, req, k)
 		default:
-			return nil, sdk.ErrUnknownRequest("unknown service query endpoint")
+			return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unknown query path: %s", path[0])
 		}
 	}
 }
 
-func queryDefinition(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
+func queryDefinition(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, error) {
 	var params types.QueryDefinitionParams
 	if err := keeper.cdc.UnmarshalJSON(req.Data, &params); err != nil {
-		return nil, sdk.ErrInternal(fmt.Sprintf("failed to parse params: %s", err))
+		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, err.Error())
 	}
 
 	svcDef, found := keeper.GetServiceDefinition(ctx, params.DefChainID, params.ServiceName)
 	if !found {
-		return nil, types.ErrSvcDefNotExists(types.DefaultCodespace, params.DefChainID, params.ServiceName)
+		return nil, types.ErrUnknownSvcDef
 	}
 
 	iterator := keeper.GetMethods(ctx, params.DefChainID, params.ServiceName)
@@ -58,35 +57,35 @@ func queryDefinition(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]b
 
 	bz, err := codec.MarshalJSONIndent(keeper.cdc, definitionOutput)
 	if err != nil {
-		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", err.Error()))
+		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
 	}
 
 	return bz, nil
 }
 
-func queryBinding(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
+func queryBinding(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, error) {
 	var params types.QueryBindingParams
 	if err := keeper.cdc.UnmarshalJSON(req.Data, &params); err != nil {
-		return nil, sdk.ErrInternal(fmt.Sprintf("failed to parse params: %s", err))
+		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, err.Error())
 	}
 
 	svcBinding, found := keeper.GetServiceBinding(ctx, params.DefChainID, params.ServiceName, params.BindChainID, params.Provider)
 	if !found {
-		return nil, types.ErrSvcBindingNotExists(types.DefaultCodespace)
+		return nil, types.ErrUnknownSvcBinding
 	}
 
 	bz, err := codec.MarshalJSONIndent(keeper.cdc, svcBinding)
 	if err != nil {
-		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", err.Error()))
+		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
 	}
 
 	return bz, nil
 }
 
-func queryBindings(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
+func queryBindings(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, error) {
 	var params types.QueryBindingsParams
 	if err := keeper.cdc.UnmarshalJSON(req.Data, &params); err != nil {
-		return nil, sdk.ErrInternal(fmt.Sprintf("failed to parse params: %s", err))
+		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, err.Error())
 	}
 
 	iterator := keeper.ServiceBindingsIterator(ctx, params.DefChainID, params.ServiceName)
@@ -101,16 +100,16 @@ func queryBindings(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byt
 
 	bz, err := codec.MarshalJSONIndent(keeper.cdc, bindings)
 	if err != nil {
-		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", err.Error()))
+		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
 	}
 
 	return bz, nil
 }
 
-func queryRequests(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
+func queryRequests(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, error) {
 	var params types.QueryRequestsParams
 	if err := keeper.cdc.UnmarshalJSON(req.Data, &params); err != nil {
-		return nil, sdk.ErrInternal(fmt.Sprintf("failed to parse params: %s", err))
+		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, err.Error())
 	}
 
 	iterator := keeper.ActiveBindRequestsIterator(ctx, params.DefChainID, params.ServiceName, params.BindChainID, params.Provider)
@@ -125,40 +124,40 @@ func queryRequests(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byt
 
 	bz, err := codec.MarshalJSONIndent(keeper.cdc, requests)
 	if err != nil {
-		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", err.Error()))
+		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
 	}
 
 	return bz, nil
 }
 
-func queryResponse(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
+func queryResponse(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, error) {
 	var params types.QueryResponseParams
 	if err := keeper.cdc.UnmarshalJSON(req.Data, &params); err != nil {
-		return nil, sdk.ErrInternal(fmt.Sprintf("failed to parse params: %s", err))
+		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, err.Error())
 	}
 
 	eHeight, rHeight, counter, err := types.ConvertRequestID(params.RequestID)
 	if err != nil {
-		return nil, sdk.ErrUnknownRequest(err.Error())
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid request id: %s", params.RequestID)
 	}
 
 	response, found := keeper.GetResponse(ctx, params.ReqChainID, eHeight, rHeight, counter)
 	if !found {
-		return nil, types.ErrNoResponseFound(types.DefaultCodespace, params.RequestID)
+		return nil, types.ErrUnknownResponse
 	}
 
 	bz, err := codec.MarshalJSONIndent(keeper.cdc, response)
 	if err != nil {
-		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", err.Error()))
+		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
 	}
 
 	return bz, nil
 }
 
-func queryFees(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
+func queryFees(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, error) {
 	var params types.QueryFeesParams
 	if err := keeper.cdc.UnmarshalJSON(req.Data, &params); err != nil {
-		return nil, sdk.ErrInternal(fmt.Sprintf("failed to parse params: %s", err))
+		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, err.Error())
 	}
 
 	var feesOutput types.FeesOutput
@@ -173,7 +172,7 @@ func queryFees(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, s
 
 	bz, err := codec.MarshalJSONIndent(keeper.cdc, feesOutput)
 	if err != nil {
-		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", err.Error()))
+		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, err.Error())
 	}
 
 	return bz, nil

@@ -18,21 +18,21 @@ const (
 )
 
 // IssueTokenFeeHandler performs fee handling for issuing token
-func IssueTokenFeeHandler(ctx sdk.Context, k Keeper, owner sdk.AccAddress, symbol string) sdk.Error {
+func IssueTokenFeeHandler(ctx sdk.Context, k Keeper, owner sdk.AccAddress, symbol string) error {
 	// get the required issuance fee
 	fee := GetTokenIssueFee(ctx, k, symbol)
 	return feeHandler(ctx, k, owner, fee)
 }
 
 // MintTokenFeeHandler performs fee handling for minting token
-func MintTokenFeeHandler(ctx sdk.Context, k Keeper, owner sdk.AccAddress, symbol string) sdk.Error {
+func MintTokenFeeHandler(ctx sdk.Context, k Keeper, owner sdk.AccAddress, symbol string) error {
 	// get the required minting fee
 	fee := GetTokenMintFee(ctx, k, symbol)
 	return feeHandler(ctx, k, owner, fee)
 }
 
 // feeHandler handles the fee of asset
-func feeHandler(ctx sdk.Context, k Keeper, feeAcc sdk.AccAddress, fee sdk.Coin) sdk.Error {
+func feeHandler(ctx sdk.Context, k Keeper, feeAcc sdk.AccAddress, fee sdk.Coin) error {
 	assetTaxRate := k.AssetTaxRate(ctx)
 
 	// compute community tax and burned coin

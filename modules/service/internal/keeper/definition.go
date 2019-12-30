@@ -2,6 +2,7 @@ package keeper
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 	"github.com/irisnet/irishub/modules/service/internal/types"
 	"github.com/irisnet/irishub/utils/protoidl"
@@ -17,9 +18,9 @@ func (k Keeper) AddServiceDefinition(
 	author sdk.AccAddress,
 	authorDescription,
 	idlContent string,
-) sdk.Error {
+) error {
 	if _, found := k.GetServiceDefinition(ctx, chainID, name); found {
-		return types.ErrSvcDefExists(k.codespace, chainID, name)
+		return sdkerrors.Wrapf(types.ErrUnknownSvcDef, "chain-id: %s, name: %s", chainID, name)
 	}
 
 	svcDef := types.NewSvcDef(name, chainID, description, tags, author, authorDescription, idlContent)
@@ -37,7 +38,7 @@ func (k Keeper) SetServiceDefinition(ctx sdk.Context, svcDef types.SvcDef) {
 }
 
 // AddMethods
-func (k Keeper) AddMethods(ctx sdk.Context, svcDef types.SvcDef) sdk.Error {
+func (k Keeper) AddMethods(ctx sdk.Context, svcDef types.SvcDef) error {
 	methods, err := protoidl.GetMethods(svcDef.IDLContent)
 	if err != nil {
 		panic(err)

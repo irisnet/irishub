@@ -16,17 +16,13 @@ import (
 type Keeper struct {
 	storeKey sdk.StoreKey
 	cdc      *codec.Codec
-
-	// codespace
-	codespace sdk.CodespaceType
 }
 
 // NewKeeper returns a guardian keeper
-func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, codespace sdk.CodespaceType) Keeper {
+func NewKeeper(cdc *codec.Codec, key sdk.StoreKey) Keeper {
 	keeper := Keeper{
-		storeKey:  key,
-		cdc:       cdc,
-		codespace: codespace,
+		storeKey: key,
+		cdc:      cdc,
 	}
 	return keeper
 }

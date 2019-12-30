@@ -11,30 +11,22 @@ import (
 
 // NewQuerier creates a querier for the asset module
 func NewQuerier(k Keeper) sdk.Querier {
-	return func(ctx sdk.Context, path []string, req abci.RequestQuery) ([]byte, sdk.Error) {
-		var (
-			res []byte
-			err error
-		)
-
+	return func(ctx sdk.Context, path []string, req abci.RequestQuery) ([]byte, error) {
 		switch path[0] {
 		case token.SubModuleName:
 			switch path[1] {
 			case token.QueryToken:
-				res, err = token.QuerierToken(ctx, req, k.TokenKeeper)
+				return token.QuerierToken(ctx, req, k.TokenKeeper)
 			case token.QueryTokens:
-				res, err = token.QuerierTokens(ctx, req, k.TokenKeeper)
+				return token.QuerierTokens(ctx, req, k.TokenKeeper)
 			case token.QueryFees:
-				res, err = token.QuerierFees(ctx, req, k.TokenKeeper)
+				return token.QuerierFees(ctx, req, k.TokenKeeper)
 			case token.QueryParameters:
-				res, err = token.QuerierParameters(ctx, k.TokenKeeper)
+				return token.QuerierParameters(ctx, k.TokenKeeper)
 			default:
-				err = sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unknown Asset %s query endpoint", token.SubModuleName)
+				return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unknown sub query path: %s", path[1])
 			}
-		default:
-			err = sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unknown Asset query endpoint")
 		}
-
-		return res, sdk.ConvertError(err)
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unknown query path: %s", path[0])
 	}
 }

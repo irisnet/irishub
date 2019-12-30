@@ -2,6 +2,7 @@ package asset
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
 	token "github.com/irisnet/irishub/modules/asset/01-token"
 )
 

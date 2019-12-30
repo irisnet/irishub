@@ -2,14 +2,14 @@ package htlc
 
 import (
 	"encoding/hex"
-	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 // NewHandler returns a handler for all htlc messages
 func NewHandler(k Keeper) sdk.Handler {
-	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
+	return func(ctx sdk.Context, msg sdk.Msg) (*sdk.Result, error) {
 		ctx = ctx.WithEventManager(sdk.NewEventManager())
 
 		switch msg := msg.(type) {
@@ -20,14 +20,13 @@ func NewHandler(k Keeper) sdk.Handler {
 		case MsgRefundHTLC:
 			return handleMsgRefundHTLC(ctx, k, msg)
 		default:
-			errMsg := fmt.Sprintf("unrecognized HTLC message type: %T", msg)
-			return sdk.ErrUnknownRequest(errMsg).Result()
+			return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unrecognized %s message type: %T", ModuleName, msg)
 		}
 	}
 }
 
 // handleMsgCreateHTLC handles MsgCreateHTLC
-func handleMsgCreateHTLC(ctx sdk.Context, k Keeper, msg MsgCreateHTLC) sdk.Result {
+func handleMsgCreateHTLC(ctx sdk.Context, k Keeper, msg MsgCreateHTLC) (*sdk.Result, error) {
 	secret := HTLCSecret{}
 	expireHeight := msg.TimeLock + uint64(ctx.BlockHeight())
 	state := OPEN
@@ -44,7 +43,7 @@ func handleMsgCreateHTLC(ctx sdk.Context, k Keeper, msg MsgCreateHTLC) sdk.Resul
 	)
 
 	if err := k.CreateHTLC(ctx, htlc, msg.HashLock); err != nil {
-		return err.Result()
+		return nil, err
 	}
 
 	ctx.EventManager().EmitEvents(
@@ -65,16 +64,16 @@ func handleMsgCreateHTLC(ctx sdk.Context, k Keeper, msg MsgCreateHTLC) sdk.Resul
 		},
 	)
 
-	return sdk.Result{
+	return &sdk.Result{
 		Events: ctx.EventManager().Events(),
-	}
+	}, nil
 }
 
 // handleMsgClaimHTLC handles MsgClaimHTLC
-func handleMsgClaimHTLC(ctx sdk.Context, k Keeper, msg MsgClaimHTLC) sdk.Result {
+func handleMsgClaimHTLC(ctx sdk.Context, k Keeper, msg MsgClaimHTLC) (*sdk.Result, error) {
 	senderStr, toStr, err := k.ClaimHTLC(ctx, msg.HashLock, msg.Secret)
 	if err != nil {
-		return err.Result()
+		return nil, err
 	}
 
 	ctx.EventManager().EmitEvents(
@@ -94,16 +93,16 @@ func handleMsgClaimHTLC(ctx sdk.Context, k Keeper, msg MsgClaimHTLC) sdk.Result 
 		},
 	)
 
-	return sdk.Result{
+	return &sdk.Result{
 		Events: ctx.EventManager().Events(),
-	}
+	}, nil
 }
 
 // handleMsgRefundHTLC handles MsgRefundHTLC
-func handleMsgRefundHTLC(ctx sdk.Context, k Keeper, msg MsgRefundHTLC) sdk.Result {
+func handleMsgRefundHTLC(ctx sdk.Context, k Keeper, msg MsgRefundHTLC) (*sdk.Result, error) {
 	sender, err := k.RefundHTLC(ctx, msg.HashLock)
 	if err != nil {
-		return err.Result()
+		return nil, err
 	}
 
 	ctx.EventManager().EmitEvents(
@@ -121,7 +120,7 @@ func handleMsgRefundHTLC(ctx sdk.Context, k Keeper, msg MsgRefundHTLC) sdk.Resul
 		},
 	)
 
-	return sdk.Result{
+	return &sdk.Result{
 		Events: ctx.EventManager().Events(),
-	}
+	}, nil
 }

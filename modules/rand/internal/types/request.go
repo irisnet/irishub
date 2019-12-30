@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 // Request represents a request for a random number
@@ -37,13 +38,13 @@ func GenerateRequestID(r Request) []byte {
 }
 
 // CheckReqID checks if the given request id is valid
-func CheckReqID(reqID string) sdk.Error {
+func CheckReqID(reqID string) error {
 	if len(reqID) != 64 {
-		return ErrInvalidReqID(DefaultCodespace, fmt.Sprintf("invalid request id: %s", reqID))
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, fmt.Sprintf("invalid request id: %s", reqID))
 	}
 
 	if _, err := hex.DecodeString(reqID); err != nil {
-		return ErrInvalidReqID(DefaultCodespace, fmt.Sprintf("invalid request id: %s", reqID))
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, fmt.Sprintf("invalid request id: %s", reqID))
 	}
 
 	return nil

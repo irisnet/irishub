@@ -1,9 +1,9 @@
 package keeper
 
 import (
-	"fmt"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+
 	"github.com/irisnet/irishub/modules/asset/01-token/internal/types"
 )
 
@@ -45,7 +45,8 @@ func (dtf ValidateTokenFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simu
 		owner, _ := sdk.AccAddressFromBech32(addr)
 		account := dtf.ak.GetAccount(ctx, owner)
 		if account.GetCoins().IsAllLT(sdk.NewCoins(fee)) {
-			return ctx, sdk.ErrInsufficientCoins(fmt.Sprintf("account [%s] insufficient coins for asset fee: %s needed", addr, fee.String()))
+			return ctx, sdkerrors.Wrapf(
+				sdkerrors.ErrInsufficientFunds, "insufficient coins for asset fee; %s < %s", account.GetCoins().String(), fee.String())
 		}
 	}
 	return next(ctx, tx, simulate)

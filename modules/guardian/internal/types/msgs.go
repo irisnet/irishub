@@ -2,6 +2,7 @@ package types
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 const (
@@ -50,7 +51,7 @@ func (msg MsgAddProfiler) GetSignBytes() []byte {
 }
 
 // ValidateBasic implements Msg.
-func (msg MsgAddProfiler) ValidateBasic() sdk.Error {
+func (msg MsgAddProfiler) ValidateBasic() error {
 	return msg.AddGuardian.ValidateBasic()
 }
 
@@ -91,7 +92,7 @@ func (msg MsgDeleteProfiler) GetSignBytes() []byte {
 }
 
 // RoValidateBasicute implements Msg.
-func (msg MsgDeleteProfiler) ValidateBasic() sdk.Error {
+func (msg MsgDeleteProfiler) ValidateBasic() error {
 	return msg.DeleteGuardian.ValidateBasic()
 }
 
@@ -133,7 +134,7 @@ func (msg MsgAddTrustee) GetSignBytes() []byte {
 }
 
 // ValidateBasic implements Msg.
-func (msg MsgAddTrustee) ValidateBasic() sdk.Error {
+func (msg MsgAddTrustee) ValidateBasic() error {
 	return msg.AddGuardian.ValidateBasic()
 }
 
@@ -174,7 +175,7 @@ func (msg MsgDeleteTrustee) GetSignBytes() []byte {
 }
 
 // ValidateBasic implements Msg.
-func (msg MsgDeleteTrustee) ValidateBasic() sdk.Error {
+func (msg MsgDeleteTrustee) ValidateBasic() error {
 	return msg.DeleteGuardian.ValidateBasic()
 }
 
@@ -199,15 +200,15 @@ type DeleteGuardian struct {
 }
 
 // ValidateBasic validate the AddGuardian
-func (g AddGuardian) ValidateBasic() sdk.Error {
+func (g AddGuardian) ValidateBasic() error {
 	if len(g.Description) == 0 {
-		return ErrInvalidDescription(DefaultCodespace)
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "description missing")
 	}
 	if len(g.Address) == 0 {
-		return sdk.ErrInvalidAddress(g.Address.String())
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "added address missing")
 	}
 	if len(g.AddedBy) == 0 {
-		return sdk.ErrInvalidAddress(g.AddedBy.String())
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "operator address missing")
 	}
 	if err := g.EnsureLength(); err != nil {
 		return err
@@ -216,20 +217,20 @@ func (g AddGuardian) ValidateBasic() sdk.Error {
 }
 
 // ValidateBasic validate the DeleteGuardian
-func (g DeleteGuardian) ValidateBasic() sdk.Error {
+func (g DeleteGuardian) ValidateBasic() error {
 	if len(g.Address) == 0 {
-		return sdk.ErrInvalidAddress(g.Address.String())
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "deleted address missing")
 	}
 	if len(g.DeletedBy) == 0 {
-		return sdk.ErrInvalidAddress(g.DeletedBy.String())
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "operator address missing")
 	}
 	return nil
 }
 
 // EnsureLength validate the length of AddGuardian
-func (g AddGuardian) EnsureLength() sdk.Error {
+func (g AddGuardian) EnsureLength() error {
 	if len(g.Description) > 70 {
-		return sdk.NewError(DefaultCodespace, CodeInvalidGuardian, "description", len(g.Description), 70)
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid website length; got: %d, max: %d", len(g.Description), 70)
 	}
 	return nil
 }

@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"bufio"
 	"fmt"
 	"strings"
 
@@ -9,10 +10,11 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/context"
+	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/version"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth"
+	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
 
 	"github.com/irisnet/irishub/modules/asset/01-token/internal/types"
@@ -28,7 +30,7 @@ func GetTxCmd(queryRoute string, cdc *codec.Codec) *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 
-	txCmd.AddCommand(client.PostCommands(
+	txCmd.AddCommand(flags.PostCommands(
 		GetCmdIssueToken(queryRoute, cdc),
 		GetCmdEditToken(cdc),
 		GetCmdMintToken(queryRoute, cdc),
@@ -48,8 +50,9 @@ func GetCmdIssueToken(queryRoute string, cdc *codec.Codec) *cobra.Command {
 			" --scale=<token-scale> --min-unit=<token-min-unit> --initial-supply=<initial-supply> --from=<key-name>"+
 			" --chain-id=<chain-id> --fees=0.6iris", version.ClientName),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			inBuf := bufio.NewReader(cmd.InOrStdin())
+			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
-			txBldr := authtypes.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
 
 			owner := cliCtx.GetFromAddress()
 
@@ -68,7 +71,7 @@ func GetCmdIssueToken(queryRoute string, cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			if !viper.GetBool(client.FlagGenerateOnly) {
+			if !viper.GetBool(flags.FlagGenerateOnly) {
 				// query fee
 				fee, err1 := queryTokenFees(cliCtx, queryRoute, msg.Symbol)
 				if err1 != nil {
@@ -104,8 +107,9 @@ func GetCmdEditToken(cdc *codec.Codec) *cobra.Command {
 			" --chain-id=<chain-id> --fees=0.6iris", version.ClientName),
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			inBuf := bufio.NewReader(cmd.InOrStdin())
+			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
-			txBldr := authtypes.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
 
 			owner := cliCtx.GetFromAddress()
 			symbol := args[0]
@@ -139,8 +143,9 @@ func GetCmdMintToken(queryRoute string, cdc *codec.Codec) *cobra.Command {
 			" --chain-id=<chain-id> --fees=0.6iris", version.ClientName),
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			inBuf := bufio.NewReader(cmd.InOrStdin())
+			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
-			txBldr := authtypes.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
 
 			var (
 				to  sdk.AccAddress
@@ -163,7 +168,7 @@ func GetCmdMintToken(queryRoute string, cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			if !viper.GetBool(client.FlagGenerateOnly) {
+			if !viper.GetBool(flags.FlagGenerateOnly) {
 				// query fee
 				var fee types.TokenFeesOutput
 				if fee, err = queryTokenFees(cliCtx, queryRoute, msg.Symbol); err != nil {
@@ -193,8 +198,9 @@ func GetCmdTransferToken(cdc *codec.Codec) *cobra.Command {
 			" --chain-id=<chain-id> --fees=0.6iris", version.ClientName),
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			inBuf := bufio.NewReader(cmd.InOrStdin())
+			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
-			txBldr := authtypes.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
 
 			owner := cliCtx.GetFromAddress()
 
@@ -227,8 +233,9 @@ func GetCmdBurnToken(cdc *codec.Codec) *cobra.Command {
 			" --chain-id=<chain-id> --fees=0.6iris", version.ClientName),
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			inBuf := bufio.NewReader(cmd.InOrStdin())
+			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
-			txBldr := authtypes.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
 
 			// parse coins trying to be burn
 			coins, err := sdk.ParseCoins(args[0])
