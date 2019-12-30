@@ -26,9 +26,8 @@ func TestIrisCLIAddProfiler(t *testing.T) {
 
 	description := "test"
 
-	success, _, stderr := f.TxAddProfiler(fooAddr.String(), barAddr.String(), description, "-y")
+	success, _, _ := f.TxAddProfiler(fooAddr.String(), barAddr.String(), description, "-y")
 	require.True(f.T, success)
-	require.Empty(f.T, stderr)
 
 	tests.WaitForNextNBlocksTM(1, f.Port)
 	// Ensure transaction tags can be queried
@@ -41,9 +40,8 @@ func TestIrisCLIAddProfiler(t *testing.T) {
 	require.NotEmpty(f.T, res)
 	require.Contains(f.T, res, expGuardian)
 
-	success, _, stderr = f.TxDeleteProfiler(fooAddr.String(), barAddr.String(), "-y")
+	success, _, _ = f.TxDeleteProfiler(fooAddr.String(), barAddr.String(), "-y")
 	require.True(f.T, success)
-	require.Empty(f.T, stderr)
 
 	tests.WaitForNextNBlocksTM(1, f.Port)
 	// Ensure transaction tags can be queried
@@ -71,9 +69,8 @@ func TestIrisCLIAddTrustee(t *testing.T) {
 
 	description := "test"
 
-	success, _, stderr := f.TxAddTrustee(fooAddr.String(), barAddr.String(), description, "-y")
+	success, _, _ := f.TxAddTrustee(fooAddr.String(), barAddr.String(), description, "-y")
 	require.True(f.T, success)
-	require.Empty(f.T, stderr)
 
 	expGuardian := guardian.NewGuardian(description, guardian.Ordinary, barAddr, fooAddr)
 
@@ -86,9 +83,8 @@ func TestIrisCLIAddTrustee(t *testing.T) {
 	require.NotEmpty(f.T, res)
 	require.Contains(f.T, res, expGuardian)
 
-	success, _, stderr = f.TxDeleteTrustee(fooAddr.String(), barAddr.String(), "-y")
+	success, _, _ = f.TxDeleteTrustee(fooAddr.String(), barAddr.String(), "-y")
 	require.True(f.T, success)
-	require.Empty(f.T, stderr)
 
 	tests.WaitForNextNBlocksTM(1, f.Port)
 	// Ensure transaction tags can be queried
@@ -108,25 +104,25 @@ func TestIrisCLIAddTrustee(t *testing.T) {
 
 // TxAddProfiler is iriscli tx guardian add-profiler
 func (f *Fixtures) TxAddProfiler(from, address, description string, flags ...string) (bool, string, string) {
-	cmd := fmt.Sprintf("%s tx guardian add-profiler %v --from=%s --address=%s --description=%s", f.IriscliBinary, f.Flags(), from, address, description)
+	cmd := fmt.Sprintf("%s tx guardian add-profiler %v --keyring-backend=test --from=%s --address=%s --description=%s", f.IriscliBinary, f.Flags(), from, address, description)
 	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), keys.DefaultKeyPass)
 }
 
 // TxAddTrustee is iriscli tx guardian add-trustee
 func (f *Fixtures) TxAddTrustee(from, address, description string, flags ...string) (bool, string, string) {
-	cmd := fmt.Sprintf("%s tx guardian add-trustee %v --from=%s --address=%s --description=%s", f.IriscliBinary, f.Flags(), from, address, description)
+	cmd := fmt.Sprintf("%s tx guardian add-trustee %v --keyring-backend=test --from=%s --address=%s --description=%s", f.IriscliBinary, f.Flags(), from, address, description)
 	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), keys.DefaultKeyPass)
 }
 
 // TxDeleteProfiler is iriscli tx guardian delete-profiler
 func (f *Fixtures) TxDeleteProfiler(from, address string, flags ...string) (bool, string, string) {
-	cmd := fmt.Sprintf("%s tx guardian delete-profiler %v --from=%s --address=%s", f.IriscliBinary, f.Flags(), from, address)
+	cmd := fmt.Sprintf("%s tx guardian delete-profiler %v --keyring-backend=test --from=%s --address=%s", f.IriscliBinary, f.Flags(), from, address)
 	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), keys.DefaultKeyPass)
 }
 
 // TxDeleteTrustee is iriscli tx guardian delete-trustee
 func (f *Fixtures) TxDeleteTrustee(from, address string, flags ...string) (bool, string, string) {
-	cmd := fmt.Sprintf("%s tx guardian  delete-trustee %v --from=%s --address=%s", f.IriscliBinary, f.Flags(), from, address)
+	cmd := fmt.Sprintf("%s tx guardian delete-trustee %v --keyring-backend=test --from=%s --address=%s", f.IriscliBinary, f.Flags(), from, address)
 	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), keys.DefaultKeyPass)
 }
 

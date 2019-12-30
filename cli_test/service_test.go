@@ -39,7 +39,7 @@ func TestIrisCLIService(t *testing.T) {
 	require.NoError(t, err)
 	genesisState[service.ModuleName] = serviceDataBz
 
-	genFile := filepath.Join(f.IrisdHome, "config", "genesis.json")
+	genFile := filepath.Join(f.IrisHome, "config", "genesis.json")
 	genDoc, err := tmtypes.GenesisDocFromFile(genFile)
 	require.NoError(t, err)
 	genDoc.AppState, err = cdc.MarshalJSON(genesisState)
@@ -241,67 +241,67 @@ func TestIrisCLIService(t *testing.T) {
 
 // TxServiceDefine is iriscli tx service define
 func (f *Fixtures) TxServiceDefine(serviceName, serviceDesc, tags, serviceAuthorDesc, serviceIDLContent, serviceFileName, from string, flags ...string) (bool, string, string) {
-	cmd := fmt.Sprintf("%s tx service define --service-name %s --service-description %s --tags %s --author-description %s --idl-content %s --file %s --from=%s %v", f.IriscliBinary, serviceName, serviceDesc, tags, serviceAuthorDesc, serviceIDLContent, serviceFileName, from, f.Flags())
+	cmd := fmt.Sprintf("%s tx service define --keyring-backend=test --service-name %s --service-description %s --tags %s --author-description %s --idl-content %s --file %s --from=%s %v", f.IriscliBinary, serviceName, serviceDesc, tags, serviceAuthorDesc, serviceIDLContent, serviceFileName, from, f.Flags())
 	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), keys.DefaultKeyPass)
 }
 
 // TxServiceBind is iriscli tx service bind
 func (f *Fixtures) TxServiceBind(defChainID, serviceName, bindType, deposit, prices string, avgRspTime int64, usableTime int64, from string, flags ...string) (bool, string, string) {
-	cmd := fmt.Sprintf("%s tx service bind --def-chain-id %s --service-name %s --bind-type %s --deposit %s --prices %s --avg-rsp-time %d --usable-time %d --from=%s %v", f.IriscliBinary, defChainID, serviceName, bindType, deposit, prices, avgRspTime, usableTime, from, f.Flags())
+	cmd := fmt.Sprintf("%s tx service bind --keyring-backend=test --def-chain-id %s --service-name %s --bind-type %s --deposit %s --prices %s --avg-rsp-time %d --usable-time %d --from=%s %v", f.IriscliBinary, defChainID, serviceName, bindType, deposit, prices, avgRspTime, usableTime, from, f.Flags())
 	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), keys.DefaultKeyPass)
 }
 
 // TxServiceRefundDeposit is iriscli tx service refund-deposit
 func (f *Fixtures) TxServiceRefundDeposit(defChainID, serviceName, from string, flags ...string) (bool, string, string) {
-	cmd := fmt.Sprintf("%s tx service refund-deposit --def-chain-id %s --service-name %s --from=%s %v", f.IriscliBinary, defChainID, serviceName, from, f.Flags())
+	cmd := fmt.Sprintf("%s tx service refund-deposit --keyring-backend=test --def-chain-id %s --service-name %s --from=%s %v", f.IriscliBinary, defChainID, serviceName, from, f.Flags())
 	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), keys.DefaultKeyPass)
 }
 
 // TxServiceUpdateBinding is iriscli tx service update-binding
 func (f *Fixtures) TxServiceUpdateBinding(defChainID, serviceName, bindType, deposit, prices string, avgRspTime int64, usableTime int64, from string, flags ...string) (bool, string, string) {
-	cmd := fmt.Sprintf("%s tx service update-binding --def-chain-id %s --service-name %s --bind-type %s --deposit %s --prices %s --avg-rsp-time %d --usable-time %d --from=%s %v", f.IriscliBinary, defChainID, serviceName, bindType, deposit, prices, avgRspTime, usableTime, from, f.Flags())
+	cmd := fmt.Sprintf("%s tx service update-binding --keyring-backend=test --def-chain-id %s --service-name %s --bind-type %s --deposit %s --prices %s --avg-rsp-time %d --usable-time %d --from=%s %v", f.IriscliBinary, defChainID, serviceName, bindType, deposit, prices, avgRspTime, usableTime, from, f.Flags())
 	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), keys.DefaultKeyPass)
 }
 
 // TxServiceDisable is iriscli tx service disable
 func (f *Fixtures) TxServiceDisable(defChainID, serviceName, from string, flags ...string) (bool, string, string) {
-	cmd := fmt.Sprintf("%s tx service disable --def-chain-id %s --service-name %s --from=%s %v", f.IriscliBinary, defChainID, serviceName, from, f.Flags())
+	cmd := fmt.Sprintf("%s tx service disable --keyring-backend=test --def-chain-id %s --service-name %s --from=%s %v", f.IriscliBinary, defChainID, serviceName, from, f.Flags())
 	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), keys.DefaultKeyPass)
 }
 
 // TxServiceEnable is iriscli tx service enable
 func (f *Fixtures) TxServiceEnable(defChainID, serviceName, deposit, from string, flags ...string) (bool, string, string) {
-	cmd := fmt.Sprintf("%s tx service enable --def-chain-id %s --service-name %s --deposit %s --from=%s %v", f.IriscliBinary, defChainID, serviceName, deposit, from, f.Flags())
+	cmd := fmt.Sprintf("%s tx service enable --keyring-backend=test --def-chain-id %s --service-name %s --deposit %s --from=%s %v", f.IriscliBinary, defChainID, serviceName, deposit, from, f.Flags())
 	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), keys.DefaultKeyPass)
 }
 
 // TxServiceCall is iriscli tx service call
 func (f *Fixtures) TxServiceCall(defChainID, serviceName, bindChainID, provider string, methodID int16, requestData, serviceFees, from string, flags ...string) (bool, string, string) {
-	cmd := fmt.Sprintf("%s tx service call --def-chain-id %s --service-name %s --bind-chain-id %s --provider %s --method-id %d --request-data %s --service-fee %s --from=%s %v", f.IriscliBinary, defChainID, serviceName, bindChainID, provider, methodID, requestData, serviceFees, from, f.Flags())
+	cmd := fmt.Sprintf("%s tx service call --keyring-backend=test --def-chain-id %s --service-name %s --bind-chain-id %s --provider %s --method-id %d --request-data %s --service-fee %s --from=%s %v", f.IriscliBinary, defChainID, serviceName, bindChainID, provider, methodID, requestData, serviceFees, from, f.Flags())
 	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), keys.DefaultKeyPass)
 }
 
 // TxServiceRespond is iriscli tx service respond
 func (f *Fixtures) TxServiceRespond(reqChainID, requestID, responseData, from string, flags ...string) (bool, string, string) {
-	cmd := fmt.Sprintf("%s tx service respond --request-chain-id %s --request-id %s --response-data %s --from=%s %v", f.IriscliBinary, reqChainID, requestID, responseData, from, f.Flags())
+	cmd := fmt.Sprintf("%s tx service respond --keyring-backend=test --request-chain-id %s --request-id %s --response-data %s --from=%s %v", f.IriscliBinary, reqChainID, requestID, responseData, from, f.Flags())
 	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), keys.DefaultKeyPass)
 }
 
 // TxServiceRefundFees is iriscli tx service refund-fees
 func (f *Fixtures) TxServiceRefundFees(from string, flags ...string) (bool, string, string) {
-	cmd := fmt.Sprintf("%s tx service refund-fees --from=%s %v", f.IriscliBinary, from, f.Flags())
+	cmd := fmt.Sprintf("%s tx service refund-fees --keyring-backend=test --from=%s %v", f.IriscliBinary, from, f.Flags())
 	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), keys.DefaultKeyPass)
 }
 
 // TxServiceWithdrawFees is iriscli tx service withdraw-fees
 func (f *Fixtures) TxServiceWithdrawFees(from string, flags ...string) (bool, string, string) {
-	cmd := fmt.Sprintf("%s tx service withdraw-fees --from=%s %v", f.IriscliBinary, from, f.Flags())
+	cmd := fmt.Sprintf("%s tx service withdraw-fees --keyring-backend=test --from=%s %v", f.IriscliBinary, from, f.Flags())
 	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), keys.DefaultKeyPass)
 }
 
 // TxServiceWithdrawTax is iriscli tx service withdraw-tax
 func (f *Fixtures) TxServiceWithdrawTax(withdrawAmt string, destAddr, from sdk.AccAddress, flags ...string) (bool, string, string) {
-	cmd := fmt.Sprintf("%s tx service withdraw-tax --dest-address %s --withdraw-amount %s --from=%s %v", f.IriscliBinary, destAddr, withdrawAmt, from, f.Flags())
+	cmd := fmt.Sprintf("%s tx service withdraw-tax --keyring-backend=test --dest-address %s --withdraw-amount %s --from=%s %v", f.IriscliBinary, destAddr, withdrawAmt, from, f.Flags())
 	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), keys.DefaultKeyPass)
 }
 

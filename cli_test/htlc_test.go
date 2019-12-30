@@ -48,7 +48,7 @@ func TestIrisCLIHTLC(t *testing.T) {
 	stateExpired := "expired"
 
 	// create an htlc
-	spStr := fmt.Sprintf("%s tx htlc create %v", f.IriscliBinary, flags)
+	spStr := fmt.Sprintf("%s tx htlc create %v --keyring-backend=test", f.IriscliBinary, flags)
 	spStr += fmt.Sprintf(" --from=%s", "foo")
 	spStr += fmt.Sprintf(" --to=%s", barAddr)
 	spStr += fmt.Sprintf(" --receiver-on-other-chain=%s", receiverOnOtherChain)
@@ -78,7 +78,7 @@ func TestIrisCLIHTLC(t *testing.T) {
 	require.Equal(t, "1000", htlcCoin)
 
 	// claim an htlc
-	spStr = fmt.Sprintf("%s tx htlc claim %v", f.IriscliBinary, flags)
+	spStr = fmt.Sprintf("%s tx htlc claim %v --keyring-backend=test", f.IriscliBinary, flags)
 	spStr += fmt.Sprintf(" --from=%s", "foo")
 	spStr += fmt.Sprintf(" --hash-lock=%s", hashLock)
 	spStr += fmt.Sprintf(" --secret=%s", secretHex)
@@ -104,7 +104,7 @@ func TestIrisCLIHTLC(t *testing.T) {
 	timeLock = uint64(50)
 
 	// create an htlc
-	spStr = fmt.Sprintf("%s tx htlc create %v", f.IriscliBinary, flags)
+	spStr = fmt.Sprintf("%s tx htlc create %v --keyring-backend=test", f.IriscliBinary, flags)
 	spStr += fmt.Sprintf(" --from=%s", "foo")
 	spStr += fmt.Sprintf(" --to=%s", barAddr)
 	spStr += fmt.Sprintf(" --receiver-on-other-chain=%s", receiverOnOtherChain)
@@ -132,7 +132,7 @@ func TestIrisCLIHTLC(t *testing.T) {
 	require.Equal(t, "1000", htlcCoin)
 
 	// refund an htlc and expect failure
-	spStr = fmt.Sprintf("%s tx htlc refund %v", f.IriscliBinary, flags)
+	spStr = fmt.Sprintf("%s tx htlc refund %v --keyring-backend=test", f.IriscliBinary, flags)
 	spStr += fmt.Sprintf(" --from=%s", "foo")
 	spStr += fmt.Sprintf(" --hash-lock=%s", hashLock)
 	spStr += fmt.Sprintf(" --fees=%s", "3000"+sdk.DefaultBondDenom)
