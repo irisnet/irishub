@@ -785,9 +785,9 @@ func queryTags(tags []string) (out string) {
 // Write the given string to a new temporary file
 func WriteToNewTempFile(t *testing.T, s string) *os.File {
 	fp, err := ioutil.TempFile(os.TempDir(), "cosmos_cli_test_")
-	require.Nil(t, err)
+	require.NoError(t, err)
 	_, err = fp.WriteString(s)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	return fp
 }
 
@@ -800,7 +800,7 @@ func marshalStdTx(t *testing.T, stdTx auth.StdTx) []byte {
 
 func unmarshalStdTx(t *testing.T, s string) (stdTx auth.StdTx) {
 	cdc := app.MakeCodec()
-	require.Nil(t, cdc.UnmarshalJSON([]byte(s), &stdTx))
+	require.NoError(t, cdc.UnmarshalJSON([]byte(s), &stdTx))
 	return
 }
 

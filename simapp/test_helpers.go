@@ -127,7 +127,7 @@ func SignCheckDeliver(
 	)
 
 	txBytes, err := cdc.MarshalBinaryLengthPrefixed(tx)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	// Must simulate now as CheckTx doesn't run Msgs anymore
 	res := app.Simulate(txBytes, tx)

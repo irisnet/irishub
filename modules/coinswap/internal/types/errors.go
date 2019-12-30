@@ -1,4 +1,3 @@
-// Package types nolint
 package types
 
 import (
@@ -6,6 +5,7 @@ import (
 )
 
 // coinswap errors reserve 100 ~ 199.
+// nolint
 const (
 	DefaultCodespace sdk.CodespaceType = ModuleName
 

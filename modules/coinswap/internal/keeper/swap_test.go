@@ -37,7 +37,7 @@ func (suite *TestSuite) TestGetUniID() {
 		if tc.expectPass {
 			suite.Equal(tc.expectResult, uniDenom)
 		} else {
-			suite.NotNil(err)
+			suite.Error(err)
 		}
 	}
 }
@@ -113,7 +113,7 @@ func (suite *TestSuite) TestSwap() {
 
 	// first swap buy order
 	err := suite.app.CoinswapKeeper.Swap(suite.ctx, msg)
-	assertNilErr(suite, err)
+	suite.NoError(err)
 	reservePoolBalances := suite.app.AccountKeeper.GetAccount(suite.ctx, reservePoolAddr).GetCoins()
 	senderBlances := suite.app.AccountKeeper.GetAccount(suite.ctx, sender).GetCoins()
 	suite.Equal(fmt.Sprintf("900%s,1112%s", denomBTC, denomStandard), reservePoolBalances.String())
@@ -121,7 +121,7 @@ func (suite *TestSuite) TestSwap() {
 
 	// second swap buy order
 	err = suite.app.CoinswapKeeper.Swap(suite.ctx, msg)
-	assertNilErr(suite, err)
+	suite.NoError(err)
 	reservePoolBalances = suite.app.AccountKeeper.GetAccount(suite.ctx, reservePoolAddr).GetCoins()
 	senderBlances = suite.app.AccountKeeper.GetAccount(suite.ctx, sender).GetCoins()
 	suite.Equal(fmt.Sprintf("800%s,1252%s", denomBTC, denomStandard), reservePoolBalances.String())
@@ -137,7 +137,7 @@ func (suite *TestSuite) TestSwap() {
 
 	// first swap sell order
 	err = suite.app.CoinswapKeeper.Swap(suite.ctx, msg)
-	assertNilErr(suite, err)
+	suite.NoError(err)
 	reservePoolBalances = suite.app.AccountKeeper.GetAccount(suite.ctx, reservePoolAddr).GetCoins()
 	senderBlances = suite.app.AccountKeeper.GetAccount(suite.ctx, sender).GetCoins()
 	suite.Equal(fmt.Sprintf("446%s,2252%s", denomBTC, denomStandard), reservePoolBalances.String())
@@ -145,7 +145,7 @@ func (suite *TestSuite) TestSwap() {
 
 	// second swap sell order
 	err = suite.app.CoinswapKeeper.Swap(suite.ctx, msg)
-	assertNilErr(suite, err)
+	suite.NoError(err)
 	reservePoolBalances = suite.app.AccountKeeper.GetAccount(suite.ctx, reservePoolAddr).GetCoins()
 	senderBlances = suite.app.AccountKeeper.GetAccount(suite.ctx, sender).GetCoins()
 	suite.Equal(fmt.Sprintf("310%s,3252%s", denomBTC, denomStandard), reservePoolBalances.String())
@@ -166,7 +166,7 @@ func (suite *TestSuite) TestDoubleSwap() {
 
 	// first swap buy order
 	err := suite.app.CoinswapKeeper.Swap(suite.ctx, msg)
-	assertNilErr(suite, err)
+	suite.NoError(err)
 	reservePoolBTCBalances := suite.app.AccountKeeper.GetAccount(suite.ctx, reservePoolAddrBTC).GetCoins()
 	reservePoolETHBalances := suite.app.AccountKeeper.GetAccount(suite.ctx, reservePoolAddrETH).GetCoins()
 	sender1Blances := suite.app.AccountKeeper.GetAccount(suite.ctx, sender1).GetCoins()
@@ -176,7 +176,7 @@ func (suite *TestSuite) TestDoubleSwap() {
 
 	// second swap buy order
 	err = suite.app.CoinswapKeeper.Swap(suite.ctx, msg)
-	assertNilErr(suite, err)
+	suite.NoError(err)
 	reservePoolBTCBalances = suite.app.AccountKeeper.GetAccount(suite.ctx, reservePoolAddrBTC).GetCoins()
 	reservePoolETHBalances = suite.app.AccountKeeper.GetAccount(suite.ctx, reservePoolAddrETH).GetCoins()
 	sender1Blances = suite.app.AccountKeeper.GetAccount(suite.ctx, sender1).GetCoins()
@@ -194,7 +194,7 @@ func (suite *TestSuite) TestDoubleSwap() {
 
 	// first swap sell order
 	err = suite.app.CoinswapKeeper.Swap(suite.ctx, msg)
-	assertNilErr(suite, err)
+	suite.NoError(err)
 	reservePoolBTCBalances = suite.app.AccountKeeper.GetAccount(suite.ctx, reservePoolAddrBTC).GetCoins()
 	reservePoolETHBalances = suite.app.AccountKeeper.GetAccount(suite.ctx, reservePoolAddrETH).GetCoins()
 	sender2Blances := suite.app.AccountKeeper.GetAccount(suite.ctx, sender2).GetCoins()
@@ -204,7 +204,7 @@ func (suite *TestSuite) TestDoubleSwap() {
 
 	// second swap sell order
 	err = suite.app.CoinswapKeeper.Swap(suite.ctx, msg)
-	assertNilErr(suite, err)
+	suite.NoError(err)
 	reservePoolBTCBalances = suite.app.AccountKeeper.GetAccount(suite.ctx, reservePoolAddrBTC).GetCoins()
 	reservePoolETHBalances = suite.app.AccountKeeper.GetAccount(suite.ctx, reservePoolAddrETH).GetCoins()
 	sender2Blances = suite.app.AccountKeeper.GetAccount(suite.ctx, sender2).GetCoins()
@@ -215,7 +215,7 @@ func (suite *TestSuite) TestDoubleSwap() {
 
 func createReservePool(suite *TestSuite, denom string) (sdk.AccAddress, sdk.AccAddress) {
 	amountInit, _ := sdk.NewIntFromString("100000000")
-	addrSender := sdk.AccAddress([]byte(getRandomString(20)))
+	addrSender := sdk.AccAddress(getRandomString(20))
 	_ = suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, addrSender)
 	_ = suite.app.BankKeeper.SetCoins(
 		suite.ctx,
@@ -227,7 +227,7 @@ func createReservePool(suite *TestSuite, denom string) (sdk.AccAddress, sdk.AccA
 	)
 
 	uniDenom, err := types.GetUniDenomFromDenoms(denom, denomStandard)
-	suite.Nil(err)
+	suite.NoError(err)
 	reservePoolAddr := types.GetReservePoolAddr(uniDenom)
 
 	btcAmt, _ := sdk.NewIntFromString("1000")
@@ -238,7 +238,7 @@ func createReservePool(suite *TestSuite, denom string) (sdk.AccAddress, sdk.AccA
 	deadline := time.Now().Add(1 * time.Minute)
 	msg := types.NewMsgAddLiquidity(depositCoin, standardAmt, minReward, deadline.Unix(), addrSender)
 	err = suite.app.CoinswapKeeper.AddLiquidity(suite.ctx, msg)
-	suite.Nil(err)
+	suite.NoError(err)
 
 	moduleAccountBalances := suite.app.SupplyKeeper.GetSupply(suite.ctx).GetTotal()
 	reservePoolBalances := suite.app.AccountKeeper.GetAccount(suite.ctx, reservePoolAddr).GetCoins()
@@ -271,10 +271,10 @@ func (suite *TestSuite) TestTradeInputForExactOutput() {
 	for i := 1; i < 100; i++ {
 		amt, err := suite.app.CoinswapKeeper.TradeInputForExactOutput(suite.ctx, input, output)
 		if i == maxCnt {
-			suite.NotNil(err)
+			suite.Error(err)
 			break
 		}
-		assertNilErr(suite, err)
+		suite.NoError(err)
 
 		bought := sdk.NewCoins(outputCoin)
 		sold := sdk.NewCoins(sdk.NewCoin(denomStandard, amt))
@@ -307,7 +307,7 @@ func (suite *TestSuite) TestTradeExactInputForOutput() {
 
 	for i := 1; i < 1000; i++ {
 		amt, err := suite.app.CoinswapKeeper.TradeExactInputForOutput(suite.ctx, input, output)
-		assertNilErr(suite, err)
+		suite.NoError(err)
 
 		sold := sdk.NewCoins(inputCoin)
 		bought := sdk.NewCoins(sdk.NewCoin(denomBTC, amt))
@@ -327,12 +327,6 @@ func assertResult(suite *TestSuite, reservePoolAddr, sender sdk.AccAddress, expe
 	senderBlances := suite.app.AccountKeeper.GetAccount(suite.ctx, sender).GetCoins()
 	suite.Equal(expectPoolBalance.String(), reservePoolBalances.String())
 	suite.Equal(expectSenderBalance.String(), senderBlances.String())
-}
-
-func assertNilErr(suite *TestSuite, err sdk.Error) {
-	if err != nil {
-		suite.Nil(err, err.Error())
-	}
 }
 
 func getRandomString(l int) string {

@@ -43,17 +43,17 @@ func (suite *TestSuite) TestNewQuerier() {
 	// test queryLiquidity
 
 	bz, errRes := suite.cdc.MarshalJSON(types.QueryLiquidityParams{ID: unidenomBTC})
-	suite.Nil(errRes)
+	suite.NoError(errRes)
 
 	req.Path = fmt.Sprintf("custom/%s/%s", types.QuerierRoute, types.QueryLiquidity)
 	req.Data = bz
 
 	res, err = querier(suite.ctx, []string{types.QueryLiquidity}, req)
-	suite.Nil(err)
+	suite.NoError(err)
 
 	var redelRes types.QueryLiquidityResponse
 	errRes = suite.cdc.UnmarshalJSON(res, &redelRes)
-	suite.Nil(errRes)
+	suite.NoError(errRes)
 	standard := sdk.NewCoin(denomStandard, standardAmt)
 	token := sdk.NewCoin(denomBTC, btcAmt)
 	liquidity := sdk.NewCoin(unidenomBTC, standardAmt)

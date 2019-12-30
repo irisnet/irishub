@@ -7,6 +7,7 @@ import (
 )
 
 // Asset errors reserve 100 ~ 199.
+// nolint
 const (
 	DefaultCodespace sdk.CodespaceType = "guardian"
 

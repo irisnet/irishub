@@ -1,7 +1,9 @@
 package keeper_test
 
 import (
-	"github.com/stretchr/testify/require"
+	"testing"
+
+	"github.com/stretchr/testify/suite"
 
 	abci "github.com/tendermint/tendermint/abci/types"
 
@@ -9,28 +11,22 @@ import (
 	"github.com/irisnet/irishub/modules/mint/internal/types"
 )
 
-func (suite *KeeperTestSuite) TestNewQuerier() {
-	querier := keeper.NewQuerier(suite.app.MintKeeper)
-
-	query := abci.RequestQuery{
-		Path: "",
-		Data: []byte{},
-	}
-
-	_, err := querier(suite.ctx, []string{types.QueryParameters}, query)
-	require.NoError(suite.T(), err)
+func TestQuerierSuite(t *testing.T) {
+	suite.Run(t, new(KeeperTestSuite))
 }
 
-func (suite *KeeperTestSuite) TestQueryParams() {
+func (suite *KeeperTestSuite) TestNewQuerier() {
 	querier := keeper.NewQuerier(suite.app.MintKeeper)
+	res, err := querier(suite.ctx, []string{"other"}, abci.RequestQuery{})
+	suite.Error(err)
+	suite.Nil(res)
 
+	// test queryParams
+
+	res, err = querier(suite.ctx, []string{types.QueryParameters}, abci.RequestQuery{})
+	suite.NoError(err)
 	var params types.Params
-
-	res, sdkErr := querier(suite.ctx, []string{types.QueryParameters}, abci.RequestQuery{})
-	require.NoError(suite.T(), sdkErr)
-
-	err := suite.app.Codec().UnmarshalJSON(res, &params)
-	require.NoError(suite.T(), err)
-
-	require.Equal(suite.T(), suite.app.MintKeeper.GetParamSet(suite.ctx), params)
+	e := suite.cdc.UnmarshalJSON(res, &params)
+	suite.NoError(e)
+	suite.Equal(suite.app.MintKeeper.GetParamSet(suite.ctx), params)
 }
