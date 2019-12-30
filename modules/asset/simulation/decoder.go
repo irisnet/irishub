@@ -4,6 +4,7 @@ package simulation
 
 import (
 	"fmt"
+
 	"github.com/cosmos/cosmos-sdk/codec"
 	cmn "github.com/tendermint/tendermint/libs/common"
 )

@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"bufio"
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
@@ -11,6 +12,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/context"
+	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
@@ -28,7 +30,7 @@ func GetTxCmd(cdc *codec.Codec) *cobra.Command {
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
 	}
-	stakingTxCmd.AddCommand(client.PostCommands(
+	stakingTxCmd.AddCommand(flags.PostCommands(
 		GetCmdCreateHTLC(cdc),
 		GetCmdClaimHTLC(cdc),
 		GetCmdRefundHTLC(cdc),
@@ -46,7 +48,8 @@ func GetCmdCreateHTLC(cdc *codec.Codec) *cobra.Command {
 			" --secret=<secret> --timestamp=<timestamp> --time-lock=<time-lock>",
 		PreRunE: preCheckCmd,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(auth.DefaultTxEncoder(cdc))
+			inBuf := bufio.NewReader(cmd.InOrStdin())
+			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
 			sender := cliCtx.GetFromAddress()
@@ -135,7 +138,8 @@ func GetCmdClaimHTLC(cdc *codec.Codec) *cobra.Command {
 		Short:   "Claim an opened HTLC",
 		Example: "iriscli tx htlc claim --chain-id=<chain-id> --from=<key-name> --fees=0.3iris --hash-lock=<hash-lock> --secret=<secret>",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(auth.DefaultTxEncoder(cdc))
+			inBuf := bufio.NewReader(cmd.InOrStdin())
+			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
 			sender := cliCtx.GetFromAddress()
@@ -174,11 +178,11 @@ func GetCmdRefundHTLC(cdc *codec.Codec) *cobra.Command {
 		Short:   "Refund from an expired HTLC",
 		Example: "iriscli tx htlc refund --chain-id=<chain-id> --from=<key-name> --fees=0.3iris --hash-lock=<hash-lock>",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(auth.DefaultTxEncoder(cdc))
+			inBuf := bufio.NewReader(cmd.InOrStdin())
+			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
 			sender := cliCtx.GetFromAddress()
-
 			hashLockStr := viper.GetString(FlagHashLock)
 			hashLock, err := hex.DecodeString(hashLockStr)
 			if err != nil {

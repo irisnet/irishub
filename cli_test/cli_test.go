@@ -12,14 +12,13 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/require"
 
 	"github.com/tendermint/tendermint/crypto/ed25519"
 	tmtypes "github.com/tendermint/tendermint/types"
 
-	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/tests"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
@@ -870,7 +869,7 @@ func TestIrisCLISendGenerateSignAndBroadcast(t *testing.T) {
 	require.True(t, success)
 	require.Empty(t, stderr)
 	msg := unmarshalStdTx(t, stdout)
-	require.Equal(t, msg.Fee.Gas, uint64(client.DefaultGasLimit))
+	require.Equal(t, msg.Fee.Gas, uint64(flags.DefaultGasLimit))
 	require.Equal(t, len(msg.Msgs), 1)
 	require.Equal(t, 0, len(msg.GetSignatures()))
 
@@ -1288,7 +1287,6 @@ func TestSlashingGetParams(t *testing.T) {
 	defer proc.Stop(false)
 
 	params := f.QuerySlashingParams()
-	require.Equal(t, time.Duration(120000000000), params.MaxEvidenceAge)
 	require.Equal(t, int64(100), params.SignedBlocksWindow)
 	require.Equal(t, sdk.NewDecWithPrec(5, 1), params.MinSignedPerWindow)
 

@@ -5,7 +5,7 @@ import (
 )
 
 // HandleIssueToken handles MsgIssueToken
-func HandleIssueToken(ctx sdk.Context, k Keeper, msg MsgIssueToken) sdk.Result {
+func HandleIssueToken(ctx sdk.Context, k Keeper, msg MsgIssueToken) (*sdk.Result, error) {
 	token := NewFungibleToken(
 		msg.Symbol, msg.Name, msg.Scale,
 		msg.MinUnit, sdk.NewInt(int64(msg.InitialSupply)),
@@ -13,7 +13,7 @@ func HandleIssueToken(ctx sdk.Context, k Keeper, msg MsgIssueToken) sdk.Result {
 	)
 
 	if err := k.IssueToken(ctx, token); err != nil {
-		return err.Result()
+		return nil, err
 	}
 
 	ctx.EventManager().EmitEvents(sdk.Events{
@@ -30,15 +30,15 @@ func HandleIssueToken(ctx sdk.Context, k Keeper, msg MsgIssueToken) sdk.Result {
 		),
 	})
 
-	return sdk.Result{
+	return &sdk.Result{
 		Events: ctx.EventManager().Events(),
-	}
+	}, nil
 }
 
 // HandleMsgEditToken handles MsgEditToken
-func HandleMsgEditToken(ctx sdk.Context, k Keeper, msg MsgEditToken) sdk.Result {
+func HandleMsgEditToken(ctx sdk.Context, k Keeper, msg MsgEditToken) (*sdk.Result, error) {
 	if err := k.EditToken(ctx, msg); err != nil {
-		return err.Result()
+		return nil, err
 	}
 
 	ctx.EventManager().EmitEvents(sdk.Events{
@@ -53,15 +53,15 @@ func HandleMsgEditToken(ctx sdk.Context, k Keeper, msg MsgEditToken) sdk.Result 
 		),
 	})
 
-	return sdk.Result{
+	return &sdk.Result{
 		Events: ctx.EventManager().Events(),
-	}
+	}, nil
 }
 
 // HandleMsgTransferToken handles MsgTransferToken
-func HandleMsgTransferToken(ctx sdk.Context, k Keeper, msg MsgTransferToken) sdk.Result {
+func HandleMsgTransferToken(ctx sdk.Context, k Keeper, msg MsgTransferToken) (*sdk.Result, error) {
 	if err := k.TransferToken(ctx, msg); err != nil {
-		return err.Result()
+		return nil, err
 	}
 
 	ctx.EventManager().EmitEvents(sdk.Events{
@@ -76,16 +76,16 @@ func HandleMsgTransferToken(ctx sdk.Context, k Keeper, msg MsgTransferToken) sdk
 		),
 	})
 
-	return sdk.Result{
+	return &sdk.Result{
 		Events: ctx.EventManager().Events(),
-	}
+	}, nil
 }
 
 // handleMsgMintToken handles MsgMintToken
-func HandleMsgMintToken(ctx sdk.Context, k Keeper, msg MsgMintToken) sdk.Result {
+func HandleMsgMintToken(ctx sdk.Context, k Keeper, msg MsgMintToken) (*sdk.Result, error) {
 	mintCoin, err := k.MintToken(ctx, msg)
 	if err != nil {
-		return err.Result()
+		return nil, err
 	}
 
 	ctx.EventManager().EmitEvents(sdk.Events{
@@ -101,15 +101,15 @@ func HandleMsgMintToken(ctx sdk.Context, k Keeper, msg MsgMintToken) sdk.Result 
 		),
 	})
 
-	return sdk.Result{
+	return &sdk.Result{
 		Events: ctx.EventManager().Events(),
-	}
+	}, nil
 }
 
 // HandleMsgBurnToken handles MsgBurnToken
-func HandleMsgBurnToken(ctx sdk.Context, k Keeper, msg MsgBurnToken) sdk.Result {
+func HandleMsgBurnToken(ctx sdk.Context, k Keeper, msg MsgBurnToken) (*sdk.Result, error) {
 	if err := k.BurnToken(ctx, msg); err != nil {
-		return err.Result()
+		return nil, err
 	}
 
 	ctx.EventManager().EmitEvents(sdk.Events{
@@ -124,7 +124,7 @@ func HandleMsgBurnToken(ctx sdk.Context, k Keeper, msg MsgBurnToken) sdk.Result 
 		),
 	})
 
-	return sdk.Result{
+	return &sdk.Result{
 		Events: ctx.EventManager().Events(),
-	}
+	}, nil
 }

@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/keys"
 	"github.com/cosmos/cosmos-sdk/tests"
 
 	"github.com/irisnet/irishub/app"
@@ -109,25 +109,25 @@ func TestIrisCLIAddTrustee(t *testing.T) {
 // TxAddProfiler is iriscli tx guardian add-profiler
 func (f *Fixtures) TxAddProfiler(from, address, description string, flags ...string) (bool, string, string) {
 	cmd := fmt.Sprintf("%s tx guardian add-profiler %v --from=%s --address=%s --description=%s", f.IriscliBinary, f.Flags(), from, address, description)
-	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), client.DefaultKeyPass)
+	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), keys.DefaultKeyPass)
 }
 
 // TxAddTrustee is iriscli tx guardian add-trustee
 func (f *Fixtures) TxAddTrustee(from, address, description string, flags ...string) (bool, string, string) {
 	cmd := fmt.Sprintf("%s tx guardian add-trustee %v --from=%s --address=%s --description=%s", f.IriscliBinary, f.Flags(), from, address, description)
-	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), client.DefaultKeyPass)
+	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), keys.DefaultKeyPass)
 }
 
 // TxDeleteProfiler is iriscli tx guardian delete-profiler
 func (f *Fixtures) TxDeleteProfiler(from, address string, flags ...string) (bool, string, string) {
 	cmd := fmt.Sprintf("%s tx guardian delete-profiler %v --from=%s --address=%s", f.IriscliBinary, f.Flags(), from, address)
-	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), client.DefaultKeyPass)
+	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), keys.DefaultKeyPass)
 }
 
 // TxDeleteTrustee is iriscli tx guardian delete-trustee
 func (f *Fixtures) TxDeleteTrustee(from, address string, flags ...string) (bool, string, string) {
 	cmd := fmt.Sprintf("%s tx guardian  delete-trustee %v --from=%s --address=%s", f.IriscliBinary, f.Flags(), from, address)
-	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), client.DefaultKeyPass)
+	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), keys.DefaultKeyPass)
 }
 
 // QueryProfiler is iriscli query guardian profilers

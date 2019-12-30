@@ -1,12 +1,14 @@
 package cli
 
 import (
+	"bufio"
 	"strconv"
 
 	"github.com/spf13/cobra"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/context"
+	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
@@ -24,7 +26,7 @@ func GetTxCmd(cdc *codec.Codec) *cobra.Command {
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
 	}
-	randTxCmd.AddCommand(client.PostCommands(
+	randTxCmd.AddCommand(flags.PostCommands(
 		GetCmdRequestRand(cdc),
 	)...)
 	return randTxCmd
@@ -37,8 +39,9 @@ func GetCmdRequestRand(cdc *codec.Codec) *cobra.Command {
 		Short:   "Request a random number with an optional block interval",
 		Example: "iriscli tx rand request-rand [block-interval]",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			inBuf := bufio.NewReader(cmd.InOrStdin())
+			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
-			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
 
 			var blockInterval uint64
 			var err error

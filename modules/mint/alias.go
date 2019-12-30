@@ -11,8 +11,6 @@ import (
 )
 
 const (
-	CodeInvalidMintInflation      = types.CodeInvalidMintInflation
-	CodeInvalidMintDenom          = types.CodeInvalidMintDenom
 	EventTypeMint                 = types.EventTypeMint
 	AttributeKeyLastInflationTime = types.AttributeKeyLastInflationTime
 	AttributeKeyInflationTime     = types.AttributeKeyInflationTime

@@ -11,10 +11,6 @@ import (
 )
 
 const (
-	DefaultCodespace       = types.DefaultCodespace
-	CodeInvalidConsumer    = types.CodeInvalidConsumer
-	CodeInvalidReqID       = types.CodeInvalidReqID
-	CodeInvalidHeight      = types.CodeInvalidHeight
 	EventTypeRequestRand   = types.EventTypeRequestRand
 	EventTypeGenerateRand  = types.EventTypeGenerateRand
 	AttributeKeyRequestID  = types.AttributeKeyRequestID
@@ -37,9 +33,6 @@ var (
 	NewKeeper                   = keeper.NewKeeper
 	NewQuerier                  = keeper.NewQuerier
 	RegisterCodec               = types.RegisterCodec
-	ErrInvalidConsumer          = types.ErrInvalidConsumer
-	ErrInvalidReqID             = types.ErrInvalidReqID
-	ErrInvalidHeight            = types.ErrInvalidHeight
 	NewGenesisState             = types.NewGenesisState
 	DefaultGenesisState         = types.DefaultGenesisState
 	ValidateGenesis             = types.ValidateGenesis
@@ -50,7 +43,6 @@ var (
 	NewRand                     = types.NewRand
 	NewRequest                  = types.NewRequest
 	GenerateRequestID           = types.GenerateRequestID
-	CheckReqID                  = types.CheckReqID
 	MakePRNG                    = types.MakePRNG
 	SHA256                      = types.SHA256
 

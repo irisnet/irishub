@@ -242,56 +242,6 @@ func interBlockCacheOpt() func(*baseapp.BaseApp) {
 	return baseapp.SetInterBlockCache(store.NewCommitKVStoreCacheManager())
 }
 
-// Profile with:
-// /usr/local/go/bin/go test -benchmem -run=^$ github.com/cosmos/cosmos-sdk/IrisApp -bench ^BenchmarkFullAppSimulation$ -Commit=true -cpuprofile cpu.out
-func BenchmarkFullAppSimulation(b *testing.B) {
-	logger := log.NewNopLogger()
-	config := simapp.NewConfigFromFlags()
-
-	var db dbm.DB
-	dir, _ := ioutil.TempDir("", "goleveldb-app-sim")
-	db, _ = sdk.NewLevelDB("Simulation", dir)
-	defer func() {
-		db.Close()
-		_ = os.RemoveAll(dir)
-	}()
-
-	gapp := NewIrisApp(logger, db, nil, true, simapp.FlagPeriodValue, interBlockCacheOpt())
-
-	// Run randomized simulation
-	// TODO: parameterize numbers, save for a later PR
-	_, simParams, simErr := simulation.SimulateFromSeed(
-		b, os.Stdout, gapp.BaseApp, simapp.AppStateFn(gapp.Codec(), gapp.sm),
-		testAndRunTxs(gapp, config), gapp.ModuleAccountAddrs(), config,
-	)
-
-	// export state and params before the simulation error is checked
-	if config.ExportStatePath != "" {
-		if err := ExportStateToJSON(gapp, config.ExportStatePath); err != nil {
-			fmt.Println(err)
-			b.Fail()
-		}
-	}
-
-	if config.ExportParamsPath != "" {
-		if err := simapp.ExportParamsToJSON(simParams, config.ExportParamsPath); err != nil {
-			fmt.Println(err)
-			b.Fail()
-		}
-	}
-
-	if simErr != nil {
-		fmt.Println(simErr)
-		b.FailNow()
-	}
-
-	if config.Commit {
-		fmt.Println("\nGoLevelDB Stats")
-		fmt.Println(db.Stats()["leveldb.stats"])
-		fmt.Println("GoLevelDB cached block size", db.Stats()["leveldb.cachedblock"])
-	}
-}
-
 func TestFullAppSimulation(t *testing.T) {
 	if !simapp.FlagEnabledValue {
 		t.Skip("skipping application simulation")
@@ -315,23 +265,23 @@ func TestFullAppSimulation(t *testing.T) {
 		_ = os.RemoveAll(dir)
 	}()
 
-	gapp := NewIrisApp(logger, db, nil, true, simapp.FlagPeriodValue, fauxMerkleModeOpt)
-	require.Equal(t, "IrisApp", gapp.Name())
+	app := NewIrisApp(logger, db, nil, true, simapp.FlagPeriodValue, fauxMerkleModeOpt)
+	require.Equal(t, "IrisApp", app.Name())
 
 	// Run randomized simulation
 	_, simParams, simErr := simulation.SimulateFromSeed(
-		t, os.Stdout, gapp.BaseApp, simapp.AppStateFn(gapp.Codec(), gapp.sm),
-		testAndRunTxs(gapp, config), gapp.ModuleAccountAddrs(), config,
+		t, os.Stdout, app.BaseApp, simapp.AppStateFn(app.Codec(), app.sm),
+		testAndRunTxs(app, config), app.ModuleAccountAddrs(), config,
 	)
 
 	// export state and params before the simulation error is checked
 	if config.ExportStatePath != "" {
-		err := ExportStateToJSON(gapp, config.ExportStatePath)
+		err := ExportStateToJSON(app, config.ExportStatePath)
 		require.NoError(t, err)
 	}
 
 	if config.ExportParamsPath != "" {
-		err := simapp.ExportParamsToJSON(simParams, config.ExportParamsPath)
+		err := simapp.CheckExportSimulation(app, config, simParams)
 		require.NoError(t, err)
 	}
 
@@ -379,16 +329,8 @@ func TestAppImportExport(t *testing.T) {
 	)
 
 	// export state and simParams before the simulation error is checked
-	if config.ExportStatePath != "" {
-		err := ExportStateToJSON(app, config.ExportStatePath)
-		require.NoError(t, err)
-	}
-
-	if config.ExportParamsPath != "" {
-		err := simapp.ExportParamsToJSON(simParams, config.ExportParamsPath)
-		require.NoError(t, err)
-	}
-
+	err := simapp.CheckExportSimulation(app, config, simParams)
+	require.NoError(t, err)
 	require.NoError(t, simErr)
 
 	if config.Commit {
@@ -486,27 +428,19 @@ func TestAppSimulationAfterImport(t *testing.T) {
 		_ = os.RemoveAll(dir)
 	}()
 
-	gapp := NewIrisApp(logger, db, nil, true, simapp.FlagPeriodValue, fauxMerkleModeOpt)
-	require.Equal(t, "IrisApp", gapp.Name())
+	app := NewIrisApp(logger, db, nil, true, simapp.FlagPeriodValue, fauxMerkleModeOpt)
+	require.Equal(t, "IrisApp", app.Name())
 
 	// Run randomized simulation
 	// Run randomized simulation
 	stopEarly, simParams, simErr := simulation.SimulateFromSeed(
-		t, os.Stdout, gapp.BaseApp, simapp.AppStateFn(gapp.Codec(), gapp.sm),
-		testAndRunTxs(gapp, config), gapp.ModuleAccountAddrs(), config,
+		t, os.Stdout, app.BaseApp, simapp.AppStateFn(app.Codec(), app.sm),
+		testAndRunTxs(app, config), app.ModuleAccountAddrs(), config,
 	)
 
 	// export state and params before the simulation error is checked
-	if config.ExportStatePath != "" {
-		err := ExportStateToJSON(gapp, config.ExportStatePath)
-		require.NoError(t, err)
-	}
-
-	if config.ExportParamsPath != "" {
-		err := simapp.ExportParamsToJSON(simParams, config.ExportParamsPath)
-		require.NoError(t, err)
-	}
-
+	err := simapp.CheckExportSimulation(app, config, simParams)
+	require.NoError(t, err)
 	require.NoError(t, simErr)
 
 	if config.Commit {
@@ -525,7 +459,7 @@ func TestAppSimulationAfterImport(t *testing.T) {
 
 	fmt.Printf("Exporting genesis...\n")
 
-	appState, _, err := gapp.ExportAppStateAndValidators(true, []string{})
+	appState, _, err := app.ExportAppStateAndValidators(true, []string{})
 	if err != nil {
 		panic(err)
 	}
@@ -549,7 +483,7 @@ func TestAppSimulationAfterImport(t *testing.T) {
 
 	// Run randomized simulation on imported app
 	_, _, err = simulation.SimulateFromSeed(
-		t, os.Stdout, newApp.BaseApp, simapp.AppStateFn(gapp.Codec(), gapp.sm),
+		t, os.Stdout, newApp.BaseApp, simapp.AppStateFn(app.Codec(), app.sm),
 		testAndRunTxs(newApp, config), newApp.ModuleAccountAddrs(), config,
 	)
 
@@ -602,63 +536,5 @@ func TestAppStateDeterminism(t *testing.T) {
 				)
 			}
 		}
-	}
-}
-
-func BenchmarkInvariants(b *testing.B) {
-	logger := log.NewNopLogger()
-
-	config := simapp.NewConfigFromFlags()
-	config.AllInvariants = false
-
-	dir, _ := ioutil.TempDir("", "goleveldb-app-invariant-bench")
-	db, _ := sdk.NewLevelDB("simulation", dir)
-
-	defer func() {
-		db.Close()
-		_ = os.RemoveAll(dir)
-	}()
-
-	gapp := NewIrisApp(logger, db, nil, true, simapp.FlagPeriodValue, interBlockCacheOpt())
-
-	// 2. Run parameterized simulation (w/o invariants)
-	_, simParams, simErr := simulation.SimulateFromSeed(
-		b, ioutil.Discard, gapp.BaseApp, simapp.AppStateFn(gapp.Codec(), gapp.sm),
-		testAndRunTxs(gapp, config), gapp.ModuleAccountAddrs(), config,
-	)
-
-	// export state and params before the simulation error is checked
-	if config.ExportStatePath != "" {
-		if err := ExportStateToJSON(gapp, config.ExportStatePath); err != nil {
-			fmt.Println(err)
-			b.Fail()
-		}
-	}
-
-	if config.ExportParamsPath != "" {
-		if err := simapp.ExportParamsToJSON(simParams, config.ExportParamsPath); err != nil {
-			fmt.Println(err)
-			b.Fail()
-		}
-	}
-
-	if simErr != nil {
-		fmt.Println(simErr)
-		b.FailNow()
-	}
-
-	ctx := gapp.NewContext(true, abci.Header{Height: gapp.LastBlockHeight() + 1})
-
-	// 3. Benchmark each invariant separately
-	//
-	// NOTE: We use the crisis keeper as it has all the invariants registered with
-	// their respective metadata which makes it useful for testing/benchmarking.
-	for _, cr := range gapp.crisisKeeper.Routes() {
-		b.Run(fmt.Sprintf("%s/%s", cr.ModuleName, cr.Route), func(b *testing.B) {
-			if res, stop := cr.Invar(ctx); stop {
-				fmt.Printf("broken invariant at block %d of %d\n%s", ctx.BlockHeight()-1, config.NumBlocks, res)
-				b.FailNow()
-			}
-		})
 	}
 }

@@ -2,39 +2,39 @@ package keeper
 
 import (
 	"encoding/hex"
-	"fmt"
 
 	abci "github.com/tendermint/tendermint/abci/types"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 	"github.com/irisnet/irishub/modules/rand/internal/types"
 )
 
 // NewQuerier creates a new rand Querier instance
 func NewQuerier(k Keeper) sdk.Querier {
-	return func(ctx sdk.Context, path []string, req abci.RequestQuery) ([]byte, sdk.Error) {
+	return func(ctx sdk.Context, path []string, req abci.RequestQuery) ([]byte, error) {
 		switch path[0] {
 		case types.QueryRand:
 			return queryRand(ctx, req, k)
 		case types.QueryRandRequestQueue:
 			return queryRandRequestQueue(ctx, req, k)
 		default:
-			return nil, sdk.ErrUnknownRequest("unknown rand query endpoint")
+			return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unknown sub query path: %s", path[0])
 		}
 	}
 }
 
-func queryRand(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
+func queryRand(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, error) {
 	var params types.QueryRandParams
 	if err := keeper.cdc.UnmarshalJSON(req.Data, &params); err != nil {
-		return nil, sdk.ErrInternal(fmt.Sprintf("failed to parse params: %s", err))
+		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, err.Error())
 	}
 
 	reqID, err := hex.DecodeString(params.ReqID)
 	if err != nil {
-		return nil, types.ErrInvalidReqID(types.DefaultCodespace, fmt.Sprintf("invalid request id: %s", err))
+		return nil, sdkerrors.Wrap(types.ErrInvalidReqID, params.ReqID)
 	}
 
 	rand, err2 := keeper.GetRand(ctx, reqID)
@@ -44,20 +44,20 @@ func queryRand(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, s
 
 	bz, err := codec.MarshalJSONIndent(keeper.cdc, rand)
 	if err != nil {
-		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", err.Error()))
+		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
 	}
 
 	return bz, nil
 }
 
-func queryRandRequestQueue(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
+func queryRandRequestQueue(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, error) {
 	var params types.QueryRandRequestQueueParams
 	if err := keeper.cdc.UnmarshalJSON(req.Data, &params); err != nil {
-		return nil, sdk.ErrInternal(fmt.Sprintf("failed to parse params: %s", err))
+		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, err.Error())
 	}
 
 	if params.Height < 0 {
-		return nil, types.ErrInvalidHeight(types.DefaultCodespace, fmt.Sprintf("the height must not be less than 0: %d", params.Height))
+		return nil, sdkerrors.Wrap(types.ErrInvalidHeight, string(params.Height))
 	}
 
 	var requests []types.Request
@@ -72,7 +72,7 @@ func queryRandRequestQueue(ctx sdk.Context, req abci.RequestQuery, keeper Keeper
 
 	bz, err := codec.MarshalJSONIndent(keeper.cdc, requests)
 	if err != nil {
-		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", err.Error()))
+		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
 	}
 
 	return bz, nil

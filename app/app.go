@@ -102,6 +102,9 @@ func MakeCodec() *codec.Codec {
 	return cdc.Seal()
 }
 
+// Verify app interface at compile time
+var _ simapp.App = (*IrisApp)(nil)
+
 // IrisApp extended ABCI application
 type IrisApp struct {
 	*bam.BaseApp
@@ -166,7 +169,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 	}
 
 	// init params keeper and subspaces
-	app.paramsKeeper = params.NewKeeper(app.cdc, keys[params.StoreKey], tKeys[params.TStoreKey], params.DefaultCodespace)
+	app.paramsKeeper = params.NewKeeper(app.cdc, keys[params.StoreKey], tKeys[params.TStoreKey])
 	authSubspace := app.paramsKeeper.Subspace(auth.DefaultParamspace)
 	bankSubspace := app.paramsKeeper.Subspace(bank.DefaultParamspace)
 	stakingSubspace := app.paramsKeeper.Subspace(staking.DefaultParamspace)
@@ -182,31 +185,29 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 
 	// add keepers
 	app.accountKeeper = auth.NewAccountKeeper(app.cdc, keys[auth.StoreKey], authSubspace, auth.ProtoBaseAccount)
-	app.bankKeeper = bank.NewBaseKeeper(app.accountKeeper, bankSubspace, bank.DefaultCodespace, app.ModuleAccountAddrs())
+	app.bankKeeper = bank.NewBaseKeeper(app.accountKeeper, bankSubspace, app.ModuleAccountAddrs())
 	app.supplyKeeper = supply.NewKeeper(app.cdc, keys[supply.StoreKey], app.accountKeeper, app.bankKeeper, maccPerms)
 	stakingKeeper := staking.NewKeeper(
-		app.cdc, keys[staking.StoreKey], app.supplyKeeper, stakingSubspace, staking.DefaultCodespace,
+		app.cdc, keys[staking.StoreKey], app.supplyKeeper, stakingSubspace,
 	)
 	app.mintKeeper = mint.NewKeeper(app.cdc, keys[mint.StoreKey], mintSubspace, app.supplyKeeper, auth.FeeCollectorName)
 	app.distrKeeper = distr.NewKeeper(app.cdc, keys[distr.StoreKey], distrSubspace, &stakingKeeper,
-		app.supplyKeeper, distr.DefaultCodespace, auth.FeeCollectorName, app.ModuleAccountAddrs())
+		app.supplyKeeper, auth.FeeCollectorName, app.ModuleAccountAddrs())
 	app.slashingKeeper = slashing.NewKeeper(
-		app.cdc, keys[slashing.StoreKey], &stakingKeeper, slashingSubspace, slashing.DefaultCodespace,
+		app.cdc, keys[slashing.StoreKey], &stakingKeeper, slashingSubspace,
 	)
 	app.crisisKeeper = crisis.NewKeeper(crisisSubspace, invCheckPeriod, app.supplyKeeper, auth.FeeCollectorName)
 
 	// create evidence keeper with evidence router
 	app.evidenceKeeper = evidence.NewKeeper(
-		app.cdc, keys[evidence.StoreKey], evidenceSubspace, evidence.DefaultCodespace,
+		app.cdc, keys[evidence.StoreKey], evidenceSubspace, stakingKeeper, app.slashingKeeper,
 	)
 	evidenceRouter := evidence.NewRouter()
 	// TODO: Register evidence routes.
 	app.evidenceKeeper.SetRouter(evidenceRouter)
 
 	// create guardian keeper with guardian router
-	app.guardianKeeper = guardian.NewKeeper(
-		app.cdc, keys[guardian.StoreKey], guardian.DefaultCodespace,
-	)
+	app.guardianKeeper = guardian.NewKeeper(app.cdc, keys[guardian.StoreKey])
 
 	// register the proposal types
 	govRouter := gov.NewRouter()
@@ -215,7 +216,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 		AddRoute(distr.RouterKey, distr.NewCommunityPoolSpendProposalHandler(app.distrKeeper))
 	app.govKeeper = gov.NewKeeper(
 		app.cdc, keys[gov.StoreKey], govSubspace,
-		app.supplyKeeper, &stakingKeeper, gov.DefaultCodespace, govRouter,
+		app.supplyKeeper, &stakingKeeper, govRouter,
 	)
 
 	// register the staking hooks
@@ -225,23 +226,20 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 	)
 
 	app.assetKeeper = asset.NewKeeper(
-		app.cdc, keys[asset.StoreKey], assetSubspace, asset.DefaultCodespace,
+		app.cdc, keys[asset.StoreKey], assetSubspace,
 		app.supplyKeeper, auth.FeeCollectorName,
 	)
 
-	app.htlcKeeper = htlc.NewKeeper(
-		app.cdc, keys[htlc.StoreKey], app.supplyKeeper, htlc.DefaultCodespace,
-	)
+	app.htlcKeeper = htlc.NewKeeper(app.cdc, keys[htlc.StoreKey], app.supplyKeeper)
 
 	app.coinswapKeeper = coinswap.NewKeeper(
 		app.cdc, keys[coinswap.StoreKey], app.bankKeeper, app.accountKeeper, app.supplyKeeper, coinswapSubspace,
 	)
 
-	app.randKeeper = rand.NewKeeper(app.cdc, keys[rand.StoreKey], rand.DefaultCodespace)
+	app.randKeeper = rand.NewKeeper(app.cdc, keys[rand.StoreKey])
 
 	app.serviceKeeper = service.NewKeeper(
-		app.cdc, keys[service.StoreKey], app.supplyKeeper, app.guardianKeeper,
-		service.DefaultCodespace, serviceSubspace,
+		app.cdc, keys[service.StoreKey], app.supplyKeeper, app.guardianKeeper, serviceSubspace,
 	)
 
 	// NOTE: Any module instantiated in the module manager that is later modified
@@ -252,10 +250,10 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 		bank.NewAppModule(app.bankKeeper, app.accountKeeper),
 		crisis.NewAppModule(&app.crisisKeeper),
 		supply.NewAppModule(app.supplyKeeper, app.accountKeeper),
-		distr.NewAppModule(app.distrKeeper, app.supplyKeeper),
-		gov.NewAppModule(app.govKeeper, app.supplyKeeper),
+		distr.NewAppModule(app.distrKeeper, app.accountKeeper, app.supplyKeeper, app.stakingKeeper),
+		gov.NewAppModule(app.govKeeper, app.accountKeeper, app.supplyKeeper),
 		mint.NewAppModule(app.mintKeeper),
-		slashing.NewAppModule(app.slashingKeeper, app.stakingKeeper),
+		slashing.NewAppModule(app.slashingKeeper, app.accountKeeper, app.stakingKeeper),
 		staking.NewAppModule(app.stakingKeeper, app.accountKeeper, app.supplyKeeper),
 		evidence.NewAppModule(*app.evidenceKeeper),
 		asset.NewAppModule(app.assetKeeper),
@@ -301,23 +299,24 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 	//
 	// NOTE: This is not required for apps that don't use the simulator for fuzz testing
 	// transactions.
-	app.sm = module.NewSimulationManager(
-		auth.NewAppModule(app.accountKeeper),
-		bank.NewAppModule(app.bankKeeper, app.accountKeeper),
-		supply.NewAppModule(app.supplyKeeper, app.accountKeeper),
-		gov.NewAppModule(app.govKeeper, app.supplyKeeper),
-		mint.NewAppModule(app.mintKeeper),
-		distr.NewAppModule(app.distrKeeper, app.supplyKeeper),
-		staking.NewAppModule(app.stakingKeeper, app.accountKeeper, app.supplyKeeper),
-		slashing.NewAppModule(app.slashingKeeper, app.stakingKeeper),
-		asset.NewAppModule(app.assetKeeper),
-		htlc.NewAppModule(app.htlcKeeper),
-		coinswap.NewAppModule(app.coinswapKeeper),
-		rand.NewAppModule(app.randKeeper),
-		service.NewAppModule(app.serviceKeeper),
-	)
+	// TODO
+	//app.sm = module.NewSimulationManager(
+	//	auth.NewAppModule(app.accountKeeper),
+	//	bank.NewAppModule(app.bankKeeper, app.accountKeeper),
+	//	supply.NewAppModule(app.supplyKeeper, app.accountKeeper),
+	//	gov.NewAppModule(app.govKeeper, app.supplyKeeper),
+	//	mint.NewAppModule(app.mintKeeper),
+	//	distr.NewAppModule(app.distrKeeper, app.supplyKeeper),
+	//	staking.NewAppModule(app.stakingKeeper, app.accountKeeper, app.supplyKeeper),
+	//	slashing.NewAppModule(app.slashingKeeper, app.stakingKeeper),
+	//	asset.NewAppModule(app.assetKeeper),
+	//	htlc.NewAppModule(app.htlcKeeper),
+	//	coinswap.NewAppModule(app.coinswapKeeper),
+	//	rand.NewAppModule(app.randKeeper),
+	//	service.NewAppModule(app.serviceKeeper),
+	//)
 
-	app.sm.RegisterStoreDecoders()
+	//app.sm.RegisterStoreDecoders()
 
 	// initialize stores
 	app.MountKVStores(keys)
@@ -375,6 +374,11 @@ func (app *IrisApp) ModuleAccountAddrs() map[string]bool {
 // Codec returns the application's sealed codec.
 func (app *IrisApp) Codec() *codec.Codec {
 	return app.cdc
+}
+
+// SimulationManager implements the SimulationApp interface
+func (app *IrisApp) SimulationManager() *module.SimulationManager {
+	return app.sm
 }
 
 // GetMaccPerms returns a mapping of the application's module account permissions.

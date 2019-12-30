@@ -1,12 +1,11 @@
 package types
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-// Rand errors reserve 100 ~ 199.
-// nolint
-const (
-	CodeInvalidMintInflation sdk.CodeType = 400
-	CodeInvalidMintDenom     sdk.CodeType = 401
+// mint module sentinel errors
+var (
+	ErrInvalidMintInflation = sdkerrors.Register(ModuleName, 1, "invalid mint inflation")
+	ErrInvalidMintDenom     = sdkerrors.Register(ModuleName, 2, "invalid mint denom")
 )

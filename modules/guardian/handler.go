@@ -1,14 +1,13 @@
 package guardian
 
 import (
-	"fmt"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 // NewHandler returns a handler for all "guardian" type messages.
 func NewHandler(k Keeper) sdk.Handler {
-	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
+	return func(ctx sdk.Context, msg sdk.Msg) (*sdk.Result, error) {
 		ctx = ctx.WithEventManager(sdk.NewEventManager())
 
 		switch msg := msg.(type) {
@@ -21,19 +20,18 @@ func NewHandler(k Keeper) sdk.Handler {
 		case MsgDeleteTrustee:
 			return handleMsgDeleteTrustee(ctx, k, msg)
 		default:
-			errMsg := fmt.Sprintf("unrecognized guardian message type: %T", msg)
-			return sdk.ErrUnknownRequest(errMsg).Result()
+			return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unrecognized %s message type: %T", ModuleName, msg)
 		}
 	}
 }
 
 // handleMsgAddProfiler handles MsgAddProfiler
-func handleMsgAddProfiler(ctx sdk.Context, k Keeper, msg MsgAddProfiler) sdk.Result {
+func handleMsgAddProfiler(ctx sdk.Context, k Keeper, msg MsgAddProfiler) (*sdk.Result, error) {
 	if profiler, found := k.GetProfiler(ctx, msg.AddedBy); !found || profiler.GetAccountType() != Genesis {
-		return ErrInvalidOperator(DefaultCodespace, msg.AddedBy).Result()
+		return nil, sdkerrors.Wrap(ErrUnknownOperator, msg.AddedBy.String())
 	}
 	if _, found := k.GetProfiler(ctx, msg.Address); found {
-		return ErrProfilerExists(DefaultCodespace, msg.Address).Result()
+		return nil, sdkerrors.Wrap(ErrUnknownProfiler, msg.Address.String())
 	}
 	profiler := NewGuardian(msg.Description, Ordinary, msg.Address, msg.AddedBy)
 	k.AddProfiler(ctx, profiler)
@@ -51,16 +49,16 @@ func handleMsgAddProfiler(ctx sdk.Context, k Keeper, msg MsgAddProfiler) sdk.Res
 		),
 	})
 
-	return sdk.Result{Events: ctx.EventManager().Events()}
+	return &sdk.Result{Events: ctx.EventManager().Events()}, nil
 }
 
 // handleMsgAddTrustee handles MsgAddTrustee
-func handleMsgAddTrustee(ctx sdk.Context, k Keeper, msg MsgAddTrustee) sdk.Result {
+func handleMsgAddTrustee(ctx sdk.Context, k Keeper, msg MsgAddTrustee) (*sdk.Result, error) {
 	if trustee, found := k.GetTrustee(ctx, msg.AddedBy); !found || trustee.GetAccountType() != Genesis {
-		return ErrInvalidOperator(DefaultCodespace, msg.AddedBy).Result()
+		return nil, sdkerrors.Wrap(ErrUnknownOperator, msg.AddedBy.String())
 	}
 	if _, found := k.GetTrustee(ctx, msg.Address); found {
-		return ErrTrusteeExists(DefaultCodespace, msg.Address).Result()
+		return nil, sdkerrors.Wrap(ErrUnknownTrustee, msg.Address.String())
 	}
 	trustee := NewGuardian(msg.Description, Ordinary, msg.Address, msg.AddedBy)
 	k.AddTrustee(ctx, trustee)
@@ -78,20 +76,20 @@ func handleMsgAddTrustee(ctx sdk.Context, k Keeper, msg MsgAddTrustee) sdk.Resul
 		),
 	})
 
-	return sdk.Result{Events: ctx.EventManager().Events()}
+	return &sdk.Result{Events: ctx.EventManager().Events()}, nil
 }
 
 // handleMsgDeleteProfiler handles MsgDeleteProfiler
-func handleMsgDeleteProfiler(ctx sdk.Context, k Keeper, msg MsgDeleteProfiler) sdk.Result {
+func handleMsgDeleteProfiler(ctx sdk.Context, k Keeper, msg MsgDeleteProfiler) (*sdk.Result, error) {
 	if profiler, found := k.GetProfiler(ctx, msg.DeletedBy); !found || profiler.GetAccountType() != Genesis {
-		return ErrInvalidOperator(DefaultCodespace, msg.DeletedBy).Result()
+		return nil, sdkerrors.Wrap(ErrUnknownOperator, msg.DeletedBy.String())
 	}
 	profiler, found := k.GetProfiler(ctx, msg.Address)
 	if !found {
-		return ErrProfilerNotExists(DefaultCodespace, msg.Address).Result()
+		return nil, sdkerrors.Wrap(ErrUnknownProfiler, msg.Address.String())
 	}
 	if profiler.GetAccountType() == Genesis {
-		return ErrDeleteGenesisProfiler(DefaultCodespace, msg.Address).Result()
+		return nil, sdkerrors.Wrap(ErrDeleteGenesisProfiler, msg.Address.String())
 	}
 
 	k.DeleteProfiler(ctx, msg.Address)
@@ -109,20 +107,20 @@ func handleMsgDeleteProfiler(ctx sdk.Context, k Keeper, msg MsgDeleteProfiler) s
 		),
 	})
 
-	return sdk.Result{Events: ctx.EventManager().Events()}
+	return &sdk.Result{Events: ctx.EventManager().Events()}, nil
 }
 
 // handleMsgDeleteTrustee handles MsgDeleteTrustee
-func handleMsgDeleteTrustee(ctx sdk.Context, k Keeper, msg MsgDeleteTrustee) sdk.Result {
+func handleMsgDeleteTrustee(ctx sdk.Context, k Keeper, msg MsgDeleteTrustee) (*sdk.Result, error) {
 	if trustee, found := k.GetTrustee(ctx, msg.DeletedBy); !found || trustee.GetAccountType() != Genesis {
-		return ErrInvalidOperator(DefaultCodespace, msg.DeletedBy).Result()
+		return nil, sdkerrors.Wrap(ErrUnknownOperator, msg.DeletedBy.String())
 	}
 	trustee, found := k.GetTrustee(ctx, msg.Address)
 	if !found {
-		return ErrTrusteeNotExists(DefaultCodespace, msg.Address).Result()
+		return nil, sdkerrors.Wrap(ErrUnknownTrustee, msg.Address.String())
 	}
 	if trustee.GetAccountType() == Genesis {
-		return ErrDeleteGenesisTrustee(DefaultCodespace, msg.Address).Result()
+		return nil, sdkerrors.Wrap(ErrDeleteGenesisTrustee, msg.Address.String())
 	}
 
 	k.DeleteTrustee(ctx, msg.Address)
@@ -140,5 +138,5 @@ func handleMsgDeleteTrustee(ctx sdk.Context, k Keeper, msg MsgDeleteTrustee) sdk
 		),
 	})
 
-	return sdk.Result{Events: ctx.EventManager().Events()}
+	return &sdk.Result{Events: ctx.EventManager().Events()}, nil
 }

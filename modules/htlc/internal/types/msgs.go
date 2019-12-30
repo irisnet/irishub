@@ -1,9 +1,8 @@
 package types
 
 import (
-	"fmt"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 const (
@@ -63,24 +62,24 @@ func (msg MsgCreateHTLC) Route() string { return RouterKey }
 func (msg MsgCreateHTLC) Type() string { return TypeMsgCreateHTLC }
 
 // ValidateBasic implements Msg.
-func (msg MsgCreateHTLC) ValidateBasic() sdk.Error {
+func (msg MsgCreateHTLC) ValidateBasic() error {
 	if len(msg.Sender) == 0 {
-		return ErrInvalidAddress(DefaultCodespace, "the sender address must be specified")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "sender address missing")
 	}
 	if len(msg.To) == 0 {
-		return ErrInvalidAddress(DefaultCodespace, "the receiver address must be specified")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "to address missing")
 	}
 	if len(msg.ReceiverOnOtherChain) > MaxLengthForAddressOnOtherChain {
-		return ErrInvalidAddress(DefaultCodespace, fmt.Sprintf("the length of the receiver on other chain must be between [0,%d]", MaxLengthForAddressOnOtherChain))
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid length of the receiver on other chain; got: %d, max: %d", len(msg.ReceiverOnOtherChain), MaxLengthForAddressOnOtherChain)
 	}
 	if !msg.Amount.IsValid() || !msg.Amount.IsAllPositive() {
-		return ErrInvalidAmount(DefaultCodespace, "the transferred amount must be valid")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, msg.Amount.String())
 	}
 	if len(msg.HashLock) != HashLockLength {
-		return ErrInvalidHashLock(DefaultCodespace, fmt.Sprintf("the hash lock must be %d bytes long", HashLockLength))
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid hash lock length; got: %d, must: %d", msg.HashLock, HashLockLength)
 	}
 	if msg.TimeLock < MinTimeLock || msg.TimeLock > MaxTimeLock {
-		return ErrInvalidTimeLock(DefaultCodespace, fmt.Sprintf("the time lock must be between [%d,%d]", MinTimeLock, MaxTimeLock))
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "the time lock must be between [%d,%d]", MinTimeLock, MaxTimeLock)
 	}
 	return nil
 }
@@ -128,15 +127,15 @@ func (msg MsgClaimHTLC) Route() string { return RouterKey }
 func (msg MsgClaimHTLC) Type() string { return TypeMsgClaimHTLC }
 
 // ValidateBasic implements Msg.
-func (msg MsgClaimHTLC) ValidateBasic() sdk.Error {
+func (msg MsgClaimHTLC) ValidateBasic() error {
 	if len(msg.Sender) == 0 {
-		return ErrInvalidAddress(DefaultCodespace, "the sender address must be specified")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "sender address missing")
 	}
 	if len(msg.HashLock) != HashLockLength {
-		return ErrInvalidHashLock(DefaultCodespace, fmt.Sprintf("the hash lock must be %d bytes long", HashLockLength))
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid hash lock length; got: %d, must: %d", msg.HashLock, HashLockLength)
 	}
 	if len(msg.Secret) != SecretLength {
-		return ErrInvalidSecret(DefaultCodespace, fmt.Sprintf("the secret must be %d bytes long", SecretLength))
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid secret length; got: %d, must: %d", msg.HashLock, SecretLength)
 	}
 	return nil
 }
@@ -181,12 +180,12 @@ func (msg MsgRefundHTLC) Route() string { return RouterKey }
 func (msg MsgRefundHTLC) Type() string { return TypeMsgRefundHTLC }
 
 // ValidateBasic implements Msg.
-func (msg MsgRefundHTLC) ValidateBasic() sdk.Error {
+func (msg MsgRefundHTLC) ValidateBasic() error {
 	if len(msg.Sender) == 0 {
-		return ErrInvalidAddress(DefaultCodespace, "the sender address must be specified")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "sender address missing")
 	}
 	if len(msg.HashLock) != HashLockLength {
-		return ErrInvalidHashLock(DefaultCodespace, fmt.Sprintf("the hash lock must be %d bytes long", HashLockLength))
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid hash lock length; got: %d, must: %d", msg.HashLock, HashLockLength)
 	}
 	return nil
 }

@@ -10,6 +10,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 	"github.com/irisnet/irishub/modules/rand/internal/types"
 )
@@ -18,17 +19,13 @@ import (
 type Keeper struct {
 	storeKey sdk.StoreKey
 	cdc      *codec.Codec
-
-	// codespace
-	codespace sdk.CodespaceType
 }
 
 // NewKeeper returns a new rand keeper
-func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, codespace sdk.CodespaceType) Keeper {
+func NewKeeper(cdc *codec.Codec, key sdk.StoreKey) Keeper {
 	return Keeper{
-		storeKey:  key,
-		cdc:       cdc,
-		codespace: codespace,
+		storeKey: key,
+		cdc:      cdc,
 	}
 }
 
@@ -37,18 +34,13 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 	return ctx.Logger().With("module", fmt.Sprintf("%s", types.ModuleName))
 }
 
-// Codespace returns the codespace
-func (k Keeper) Codespace() sdk.CodespaceType {
-	return k.codespace
-}
-
 // GetCdc returns the cdc
 func (k Keeper) GetCdc() *codec.Codec {
 	return k.cdc
 }
 
 // RequestRand requests a random number
-func (k Keeper) RequestRand(ctx sdk.Context, consumer sdk.AccAddress, blockInterval uint64) (types.Request, sdk.Error) {
+func (k Keeper) RequestRand(ctx sdk.Context, consumer sdk.AccAddress, blockInterval uint64) (types.Request, error) {
 	currentHeight := ctx.BlockHeight()
 	destHeight := currentHeight + int64(blockInterval)
 
@@ -92,12 +84,12 @@ func (k Keeper) DequeueRandRequest(ctx sdk.Context, height int64, reqID []byte) 
 }
 
 // GetRand retrieves the random number by the specified request id
-func (k Keeper) GetRand(ctx sdk.Context, reqID []byte) (types.Rand, sdk.Error) {
+func (k Keeper) GetRand(ctx sdk.Context, reqID []byte) (types.Rand, error) {
 	store := ctx.KVStore(k.storeKey)
 
 	bz := store.Get(types.KeyRand(reqID))
 	if bz == nil {
-		return types.Rand{}, types.ErrInvalidReqID(k.codespace, fmt.Sprintf("request id does not exist: %s", hex.EncodeToString(reqID)))
+		return types.Rand{}, sdkerrors.Wrap(types.ErrInvalidReqID, fmt.Sprintf("request id does not exist: %s", hex.EncodeToString(reqID)))
 	}
 
 	var rand types.Rand

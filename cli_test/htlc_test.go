@@ -7,7 +7,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/keys"
 	"github.com/cosmos/cosmos-sdk/tests"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/supply"
@@ -59,7 +59,7 @@ func TestIrisCLIHTLC(t *testing.T) {
 	spStr += fmt.Sprintf(" --fees=%s", "3000"+sdk.DefaultBondDenom)
 	spStr += " -y"
 
-	require.True(t, executeWrite(t, spStr, client.DefaultKeyPass))
+	require.True(t, executeWrite(t, spStr, keys.DefaultKeyPass))
 	tests.WaitForNextNBlocksTM(2, f.Port)
 
 	tmpHTLC := executeGetHTLC(t, fmt.Sprintf("%s query htlc htlc %s --output=json %v", f.IriscliBinary, strings.ToLower(strings.TrimSpace(hashLock)), flags))
@@ -85,7 +85,7 @@ func TestIrisCLIHTLC(t *testing.T) {
 	spStr += fmt.Sprintf(" --fees=%s", "3000"+sdk.DefaultBondDenom)
 	spStr += " -y"
 
-	require.True(t, executeWrite(t, spStr, client.DefaultKeyPass))
+	require.True(t, executeWrite(t, spStr, keys.DefaultKeyPass))
 	tests.WaitForNextNBlocksTM(2, f.Port)
 
 	tmpHTLC = executeGetHTLC(t, fmt.Sprintf("%s query htlc htlc %s --output=json %v", f.IriscliBinary, strings.ToLower(strings.TrimSpace(hashLock)), flags))
@@ -115,7 +115,7 @@ func TestIrisCLIHTLC(t *testing.T) {
 	spStr += fmt.Sprintf(" --fees=%s", "3000"+sdk.DefaultBondDenom)
 	spStr += " -y"
 
-	require.True(t, executeWrite(t, spStr, client.DefaultKeyPass))
+	require.True(t, executeWrite(t, spStr, keys.DefaultKeyPass))
 	tests.WaitForNextNBlocksTM(2, f.Port)
 
 	tmpHTLC = executeGetHTLC(t, fmt.Sprintf("%s query htlc htlc %s --output=json %v", f.IriscliBinary, strings.ToLower(strings.TrimSpace(hashLock)), flags))
@@ -138,7 +138,7 @@ func TestIrisCLIHTLC(t *testing.T) {
 	spStr += fmt.Sprintf(" --fees=%s", "3000"+sdk.DefaultBondDenom)
 	spStr += " -y"
 
-	require.True(t, executeWrite(t, spStr, client.DefaultKeyPass))
+	require.True(t, executeWrite(t, spStr, keys.DefaultKeyPass))
 	tests.WaitForNextNBlocksTM(2, f.Port)
 
 	tmpHTLC = executeGetHTLC(t, fmt.Sprintf("%s query htlc htlc %s --output=json %v", f.IriscliBinary, strings.ToLower(strings.TrimSpace(hashLock)), flags))
@@ -150,7 +150,7 @@ func TestIrisCLIHTLC(t *testing.T) {
 	tmpHTLC = executeGetHTLC(t, fmt.Sprintf("%s query htlc htlc %s --output=json %v", f.IriscliBinary, strings.ToLower(strings.TrimSpace(hashLock)), flags))
 	require.Equal(t, stateExpired, tmpHTLC.State.String())
 
-	require.True(t, executeWrite(t, spStr, client.DefaultKeyPass))
+	require.True(t, executeWrite(t, spStr, keys.DefaultKeyPass))
 	tests.WaitForNextNBlocksTM(2, f.Port)
 
 	htlcAcc = f.QueryAccount(htlcAddr, flags)

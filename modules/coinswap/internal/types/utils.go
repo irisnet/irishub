@@ -7,6 +7,7 @@ import (
 	"github.com/tendermint/tendermint/crypto"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 // GetReservePoolAddr returns the poor address for the provided provided liquidity denomination.
@@ -20,12 +21,12 @@ func GetTokenPairByDenom(inputDenom, outputDenom string) string {
 }
 
 // GetUniDenomFromDenoms returns the uni denom for the provided denominations.
-func GetUniDenomFromDenoms(denom1, denom2 string) (string, sdk.Error) {
+func GetUniDenomFromDenoms(denom1, denom2 string) (string, error) {
 	if denom1 == denom2 {
-		return "", ErrEqualDenom("denomnations for forming uni id are equal")
+		return "", ErrEqualDenom
 	}
 	if denom1 != StandardDenom && denom2 != StandardDenom {
-		return "", ErrIllegalDenom(fmt.Sprintf("illegal denomnations for forming uni id, must have one native denom: %s", StandardDenom))
+		return "", sdkerrors.Wrap(ErrNotContainStandardDenom, fmt.Sprintf("standard denom: %s,denom1: %s,denom2: %s", StandardDenom, denom1, denom2))
 	}
 	if denom1 == StandardDenom {
 		return fmt.Sprintf(FormatUniDenom, denom2), nil
@@ -34,15 +35,15 @@ func GetUniDenomFromDenoms(denom1, denom2 string) (string, sdk.Error) {
 }
 
 // GetUniDenomFromDenom returns the uni denom for the provided denomination.
-func GetUniDenomFromDenom(denom string) (string, sdk.Error) {
+func GetUniDenomFromDenom(denom string) (string, error) {
 	if denom == StandardDenom {
-		return "", ErrIllegalDenom("illegal denomnation for forming uni denom, must not be NativeDenom")
+		return "", ErrMustStandardDenom
 	}
 	return fmt.Sprintf(FormatUniDenom, denom), nil
 }
 
 // GetCoinDenomFromUniDenom returns the token denom by uni denom
-func GetCoinDenomFromUniDenom(uniDenom string) (string, sdk.Error) {
+func GetCoinDenomFromUniDenom(uniDenom string) (string, error) {
 	if err := CheckUniDenom(uniDenom); err != nil {
 		return "", err
 	}
@@ -50,9 +51,9 @@ func GetCoinDenomFromUniDenom(uniDenom string) (string, sdk.Error) {
 }
 
 // CheckUniDenom returns nil if the uni denom is valid
-func CheckUniDenom(uniDenom string) sdk.Error {
+func CheckUniDenom(uniDenom string) error {
 	if !strings.HasPrefix(uniDenom, FormatUniABSPrefix) {
-		return ErrIllegalDenom(fmt.Sprintf("illegal liquidity denomnation: %s", uniDenom))
+		return sdkerrors.Wrap(ErrInvalidDenom, uniDenom)
 	}
 	return nil
 }

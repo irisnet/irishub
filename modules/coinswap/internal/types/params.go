@@ -1,7 +1,9 @@
 package types
 
 import (
+	"errors"
 	"fmt"
+	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/params"
@@ -41,13 +43,11 @@ func ParamKeyTable() params.KeyTable {
 
 // KeyValuePairs implements params.KeyValuePairs
 func (p *Params) ParamSetPairs() params.ParamSetPairs {
-	return params.ParamSetPairs{{
-		Key:   KeyFee,
-		Value: &p.Fee,
-	}, {
-		Key:   KeyStandardDenom,
-		Value: &p.StandardDenom,
-	}}
+
+	return params.ParamSetPairs{
+		params.NewParamSetPair(KeyFee, &p.Fee, validateFee),
+		params.NewParamSetPair(KeyStandardDenom, &p.StandardDenom, validateStandardDenom),
+	}
 }
 
 // DefaultParams returns the default coinswap module parameters
@@ -67,5 +67,34 @@ func (p Params) Validate() error {
 	if p.StandardDenom == "" {
 		return fmt.Errorf("coinswap parameter standard denom can't be an empty string")
 	}
+	return nil
+}
+
+func validateFee(i interface{}) error {
+	v, ok := i.(sdk.Dec)
+	if !ok {
+		return fmt.Errorf("invalid parameter type: %T", i)
+	}
+
+	if !v.GT(sdk.ZeroDec()) || !v.LT(sdk.OneDec()) {
+		return fmt.Errorf("fee must be positive and less than 1: %s", v.String())
+	}
+
+	return nil
+}
+
+func validateStandardDenom(i interface{}) error {
+	v, ok := i.(string)
+	if !ok {
+		return fmt.Errorf("invalid parameter type: %T", i)
+	}
+
+	if strings.TrimSpace(v) == "" {
+		return errors.New("standard denom cannot be blank")
+	}
+	if err := sdk.ValidateDenom(v); err != nil {
+		return err
+	}
+
 	return nil
 }

@@ -9,6 +9,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+
 	iristypes "github.com/irisnet/irishub/types"
 )
 
@@ -119,7 +121,7 @@ func (ft *FungibleToken) Sanitize() {
 type Tokens []FungibleToken
 
 // Validate - validate Tokens
-func (tokens Tokens) Validate() sdk.Error {
+func (tokens Tokens) Validate() error {
 	for _, token := range tokens {
 		exp := sdk.NewIntWithDecimal(1, int(token.Scale))
 		initialSupply := uint64(token.InitialSupply.Quo(exp).Int64())
@@ -136,68 +138,67 @@ func (tokens Tokens) Validate() sdk.Error {
 }
 
 // ValidateName - check the validity of the name
-func ValidateName(name string) sdk.Error {
+func ValidateName(name string) error {
 	nameLen := len(name)
 	if nameLen == 0 || nameLen > MaximumTokenNameSize {
-		return ErrInvalidAssetName(DefaultCodespace, fmt.Sprintf("invalid token name %s, only accepts length (0, %d]", name, MaximumTokenNameSize))
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, fmt.Sprintf("invalid token name %s, only accepts length (0, %d]", name, MaximumTokenNameSize))
 	}
 	return nil
 }
 
 // ValidateSymbol - check the validity of the symbol
-func ValidateSymbol(symbol string) sdk.Error {
+func ValidateSymbol(symbol string) error {
 	symbolLen := len(symbol)
 	if symbolLen < MinimumTokenSymbolSize || symbolLen > MaximumTokenSymbolSize ||
 		!IsBeginWithAlpha(symbol) || !IsAlphaNumeric(symbol) {
-		return ErrInvalidAssetSymbol(DefaultCodespace, fmt.Sprintf("invalid token symbol %s, only accepts alphanumeric characters, and begin with an english letter, length [%d, %d]", symbol, MinimumTokenSymbolSize, MaximumTokenSymbolSize))
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, fmt.Sprintf("invalid token symbol %s, only accepts alphanumeric characters, and begin with an english letter, length [%d, %d]", symbol, MinimumTokenSymbolSize, MaximumTokenSymbolSize))
 	}
 
 	if strings.Contains(strings.ToLower(symbol), iristypes.Iris) {
-		return ErrInvalidAssetSymbol(DefaultCodespace, fmt.Sprintf("invalid token symbol %s, can not contain native token symbol %s", symbol, iristypes.Iris))
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, fmt.Sprintf("invalid token symbol %s, can not contain native token symbol %s", symbol, iristypes.Iris))
 	}
 	return nil
 }
 
 // ValidateScale - check the validity of the scale
-func ValidateScale(scale uint8) sdk.Error {
+func ValidateScale(scale uint8) error {
 	if scale > MaximumTokenDecimal {
-		return ErrInvalidAssetScale(DefaultCodespace, fmt.Sprintf("invalid token decimal %d, only accepts value [0, %d]", scale, MaximumTokenDecimal))
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, fmt.Sprintf("invalid token decimal %d, only accepts value [0, %d]", scale, MaximumTokenDecimal))
 	}
 	return nil
 }
 
 // ValidateMinUnit - check the validity of the minUnit
-func ValidateMinUnit(minUnit string) sdk.Error {
+func ValidateMinUnit(minUnit string) error {
 	minUnitsLen := len(minUnit)
 	if minUnitsLen < MinimumTokenMinUnitSize ||
 		minUnitsLen > MaximumTokenMinUnitSize ||
 		!IsAlphaNumericDash(minUnit) ||
 		!IsBeginWithAlpha(minUnit) {
-		return ErrInvalidAssetMinUnit(DefaultCodespace, fmt.Sprintf("invalid token min_unit %s, only accepts alphanumeric characters, and begin with an english letter, length [%d, %d]", minUnit, MinimumTokenMinUnitSize, MaximumTokenMinUnitSize))
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, fmt.Sprintf("invalid token min_unit %s, only accepts alphanumeric characters, and begin with an english letter, length [%d, %d]", minUnit, MinimumTokenMinUnitSize, MaximumTokenMinUnitSize))
 	}
 	if strings.Contains(strings.ToLower(minUnit), iristypes.Iris) {
-		return ErrInvalidAssetSymbol(DefaultCodespace, fmt.Sprintf("invalid token minUnit %s, can not contain native token minUnit %s", minUnit, iristypes.Iris))
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, fmt.Sprintf("invalid token minUnit %s, can not contain native token minUnit %s", minUnit, iristypes.Iris))
 	}
 	return nil
 }
 
 // ValidateSupply - check the validity of the initialSupply,maxSupply
-func ValidateSupply(initialSupply, maxSupply uint64) sdk.Error {
+func ValidateSupply(initialSupply, maxSupply uint64) error {
 	if initialSupply > MaximumTokenInitSupply {
-		return ErrInvalidAssetInitSupply(DefaultCodespace, fmt.Sprintf("invalid token initial supply %d, only accepts value [0, %d]", initialSupply, MaximumTokenInitSupply))
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, fmt.Sprintf("invalid token initial supply %d, only accepts value [0, %d]", initialSupply, MaximumTokenInitSupply))
 	}
 
 	if maxSupply < initialSupply || maxSupply > MaximumTokenMaxSupply {
-		return ErrInvalidAssetMaxSupply(DefaultCodespace, fmt.Sprintf("invalid token max supply %d, only accepts value [%d, %d]", maxSupply, initialSupply, MaximumTokenMaxSupply))
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, fmt.Sprintf("invalid token max supply %d, only accepts value [%d, %d]", maxSupply, initialSupply, MaximumTokenMaxSupply))
 	}
 	return nil
 }
 
 // ValidateMaxSupply - check the validity of the maxSupply
-func ValidateMaxSupply(maxSupply uint64) sdk.Error {
+func ValidateMaxSupply(maxSupply uint64) error {
 	if maxSupply > MaximumTokenMaxSupply {
-		return ErrInvalidAssetMaxSupply(DefaultCodespace, fmt.Sprintf("invalid token max supply %d, only accepts value (0, %d]", maxSupply, MaximumTokenMaxSupply))
-
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, fmt.Sprintf("invalid token max supply %d, only accepts value (0, %d]", maxSupply, MaximumTokenMaxSupply))
 	}
 	return nil
 }
