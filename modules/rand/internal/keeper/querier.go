@@ -21,7 +21,7 @@ func NewQuerier(k Keeper) sdk.Querier {
 		case types.QueryRandRequestQueue:
 			return queryRandRequestQueue(ctx, req, k)
 		default:
-			return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unknown sub query path: %s", path[0])
+			return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unknown query path: %s", path[0])
 		}
 	}
 }

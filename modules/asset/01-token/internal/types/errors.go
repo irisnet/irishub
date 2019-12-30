@@ -5,7 +5,7 @@ import (
 )
 
 // TODO: use ModuleName + SubModuleName
-// rand module sentinel errors
+// asset/token module sentinel errors
 var (
 	ErrUnknownToken          = sdkerrors.Register(SubModuleName, 1, "unknown token")
 	ErrInvalidAssetMaxSupply = sdkerrors.Register(SubModuleName, 2, "invalid token max supply")

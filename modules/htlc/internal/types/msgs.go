@@ -76,7 +76,7 @@ func (msg MsgCreateHTLC) ValidateBasic() error {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, msg.Amount.String())
 	}
 	if len(msg.HashLock) != HashLockLength {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid hash lock length; got: %d, must: %d", msg.HashLock, HashLockLength)
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid hash lock length; got: %d, must: %d", len(msg.HashLock), HashLockLength)
 	}
 	if msg.TimeLock < MinTimeLock || msg.TimeLock > MaxTimeLock {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "the time lock must be between [%d,%d]", MinTimeLock, MaxTimeLock)
@@ -132,10 +132,10 @@ func (msg MsgClaimHTLC) ValidateBasic() error {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "sender address missing")
 	}
 	if len(msg.HashLock) != HashLockLength {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid hash lock length; got: %d, must: %d", msg.HashLock, HashLockLength)
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid hash lock length; got: %d, must: %d", len(msg.HashLock), HashLockLength)
 	}
 	if len(msg.Secret) != SecretLength {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid secret length; got: %d, must: %d", msg.HashLock, SecretLength)
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid secret length; got: %d, must: %d", len(msg.Secret), SecretLength)
 	}
 	return nil
 }
@@ -185,7 +185,7 @@ func (msg MsgRefundHTLC) ValidateBasic() error {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "sender address missing")
 	}
 	if len(msg.HashLock) != HashLockLength {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid hash lock length; got: %d, must: %d", msg.HashLock, HashLockLength)
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid hash lock length; got: %d, must: %d", len(msg.HashLock), HashLockLength)
 	}
 	return nil
 }

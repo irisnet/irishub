@@ -19,7 +19,7 @@ func NewQuerier(k Keeper) sdk.Querier {
 		case types.QueryTrustees:
 			return queryTrustees(ctx, k)
 		default:
-			return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unknown sub query path: %s", path[0])
+			return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unknown query path: %s", path[0])
 		}
 	}
 }
