@@ -5,6 +5,8 @@ import (
 	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+
 	asset "github.com/irisnet/irishub/modules/asset/types"
 )
 
@@ -58,7 +60,7 @@ func (msg MsgIssueToken) Route() string { return asset.RouterKey }
 func (msg MsgIssueToken) Type() string { return TypeMsgIssueToken }
 
 // ValidateMsgIssueToken - validate msg
-func ValidateMsgIssueToken(msg *MsgIssueToken) sdk.Error {
+func ValidateMsgIssueToken(msg *MsgIssueToken) error {
 	msg.Symbol = strings.ToLower(strings.TrimSpace(msg.Symbol))
 	msg.MinUnit = strings.ToLower(strings.TrimSpace(msg.MinUnit))
 	msg.Name = strings.TrimSpace(msg.Name)
@@ -90,7 +92,7 @@ func ValidateMsgIssueToken(msg *MsgIssueToken) sdk.Error {
 }
 
 // ValidateBasic implements Msg.
-func (msg MsgIssueToken) ValidateBasic() sdk.Error {
+func (msg MsgIssueToken) ValidateBasic() error {
 	return ValidateMsgIssueToken(&msg)
 }
 
@@ -138,20 +140,20 @@ func (msg MsgTransferToken) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.SrcOwner}
 }
 
-func (msg MsgTransferToken) ValidateBasic() sdk.Error {
+func (msg MsgTransferToken) ValidateBasic() error {
 	// check the SrcOwner
 	if len(msg.SrcOwner) == 0 {
-		return ErrInvalidAddress(DefaultCodespace, fmt.Sprintf("the owner of the token must be specified"))
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "the owner of the token missing")
 	}
 
 	// check if the `DstOwner` is empty
 	if len(msg.DstOwner) == 0 {
-		return ErrInvalidAddress(DefaultCodespace, fmt.Sprintf("the new owner of the token must be specified"))
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "the new owner of the token missing")
 	}
 
 	// check if the `DstOwner` is same as the original owner
 	if msg.SrcOwner.Equals(msg.DstOwner) {
-		return ErrInvalidToAddress(DefaultCodespace, fmt.Sprintf("the new owner must not be same as the original owner"))
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "the new owner must not be same as the original owner")
 	}
 
 	//check the Symbol
@@ -191,10 +193,10 @@ func (msg MsgEditToken) Route() string { return asset.RouterKey }
 func (msg MsgEditToken) Type() string { return "edit_token" }
 
 // ValidateBasic implements Msg.
-func (msg MsgEditToken) ValidateBasic() sdk.Error {
+func (msg MsgEditToken) ValidateBasic() error {
 	//check owner
 	if msg.Owner.Empty() {
-		return ErrNilAssetOwner(DefaultCodespace, "the owner of the asset must be specified")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "the owner of the token missing")
 	}
 
 	//check max_supply for fast failed
@@ -262,10 +264,10 @@ func (msg MsgMintToken) GetSigners() []sdk.AccAddress {
 }
 
 // ValidateBasic implements Msg.
-func (msg MsgMintToken) ValidateBasic() sdk.Error {
+func (msg MsgMintToken) ValidateBasic() error {
 	// check the owner
 	if len(msg.Owner) == 0 {
-		return ErrInvalidAddress(DefaultCodespace, fmt.Sprintf("the owner of the token must be specified"))
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "the owner of the token missing")
 	}
 
 	if err := ValidateSymbol(msg.Symbol); err != nil {
@@ -273,7 +275,7 @@ func (msg MsgMintToken) ValidateBasic() sdk.Error {
 	}
 
 	if msg.Amount <= 0 {
-		return ErrInvalidMintAmount(DefaultCodespace, fmt.Sprintf("the amount of the token must be great than zero"))
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, fmt.Sprintf("the amount of the token must be great than zero: %d", msg.Amount))
 	}
 
 	return ValidateMaxSupply(msg.Amount)
@@ -313,14 +315,14 @@ func (msg MsgBurnToken) GetSigners() []sdk.AccAddress {
 }
 
 // ValidateBasic implements Msg
-func (msg MsgBurnToken) ValidateBasic() sdk.Error {
+func (msg MsgBurnToken) ValidateBasic() error {
 	// check the Sender
 	if len(msg.Sender) == 0 {
-		return ErrInvalidAddress(DefaultCodespace, fmt.Sprintf("the sender of the token must be specified"))
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "the sender of the token missing")
 	}
 
 	if msg.Amount.Empty() || !msg.Amount.IsValid() {
-		return ErrInvalidAssetMaxSupply(DefaultCodespace, fmt.Sprintf("invalid token amount %v", msg.Amount))
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, msg.Amount.String())
 	}
 
 	return nil

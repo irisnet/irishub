@@ -7,6 +7,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/context"
+	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/codec"
 
 	"github.com/irisnet/irishub/modules/guardian/internal/types"
@@ -21,7 +22,7 @@ func GetQueryCmd(cdc *codec.Codec) *cobra.Command {
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
 	}
-	txCmd.AddCommand(client.GetCommands(
+	txCmd.AddCommand(flags.GetCommands(
 		GetCmdQueryProfilers(cdc),
 		GetCmdQueryTrustees(cdc),
 	)...)

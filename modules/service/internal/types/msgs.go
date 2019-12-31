@@ -1,10 +1,10 @@
 package types
 
 import (
-	"fmt"
 	"regexp"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 const (
@@ -83,25 +83,25 @@ func (msg MsgSvcDef) GetSignBytes() []byte {
 }
 
 // ValidateBasic implements Msg.
-func (msg MsgSvcDef) ValidateBasic() sdk.Error {
+func (msg MsgSvcDef) ValidateBasic() error {
 	if len(msg.ChainID) == 0 {
-		return ErrInvalidChainID(DefaultCodespace)
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "chain-id missing")
 	}
 	if !validServiceName(msg.Name) {
-		return ErrInvalidServiceName(DefaultCodespace, msg.Name)
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "invalid service name")
 	}
 	if len(msg.Author) == 0 {
-		return ErrInvalidAuthor(DefaultCodespace)
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "author missing")
 	}
 	if len(msg.IDLContent) == 0 {
-		return ErrInvalidIDL(DefaultCodespace, "content is empty")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "IDL content missing")
 	}
 	if err := msg.EnsureLength(); err != nil {
 		return err
 	}
 	methods, err := ParseMethods(msg.IDLContent)
 	if err != nil {
-		return ErrInvalidIDL(DefaultCodespace, err.Error())
+		return sdkerrors.Wrap(ErrInvalidIDL, err.Error())
 	}
 	if valid, err := validateMethods(methods); !valid {
 		return err
@@ -115,7 +115,7 @@ func (msg MsgSvcDef) GetSigners() []sdk.AccAddress {
 }
 
 // TODO
-func validateMethods(methods []string) (bool, sdk.Error) {
+func validateMethods(methods []string) (bool, error) {
 	return true, nil
 }
 
@@ -163,12 +163,12 @@ func (msg MsgSvcBind) GetSignBytes() []byte {
 }
 
 // ValidateBasic implements Msg.
-func (msg MsgSvcBind) ValidateBasic() sdk.Error {
+func (msg MsgSvcBind) ValidateBasic() error {
 	if len(msg.DefChainID) == 0 {
-		return ErrInvalidDefChainID(DefaultCodespace)
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "define chain-id missing")
 	}
 	if len(msg.BindChainID) == 0 {
-		return ErrInvalidChainID(DefaultCodespace)
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "bind chain-id missing")
 	}
 	if err := ensureChainIDLength(msg.DefChainID, "def_chain_id"); err != nil {
 		return err
@@ -177,27 +177,27 @@ func (msg MsgSvcBind) ValidateBasic() sdk.Error {
 		return err
 	}
 	if !validServiceName(msg.DefName) {
-		return ErrInvalidServiceName(DefaultCodespace, msg.DefName)
+		return sdkerrors.Wrap(ErrInvalidServiceName, msg.DefName)
 	}
 	if err := ensureNameLength(msg.DefName); err != nil {
 		return err
 	}
 	if !validBindingType(msg.BindingType) {
-		return ErrInvalidBindingType(DefaultCodespace, msg.BindingType)
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid binding type: %s", msg.BindingType)
 	}
 	if len(msg.Provider) == 0 {
-		return sdk.ErrInvalidAddress(msg.Provider.String())
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "provider missing")
 	}
 	if !validServiceCoins(msg.Deposit) {
-		return sdk.ErrInvalidCoins(fmt.Sprintf("invalid service deposit [%s]", msg.Deposit))
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "invalid service deposit: %s", msg.Deposit.String())
 	}
 	for _, price := range msg.Prices {
 		if !validServiceCoins(sdk.Coins{price}) {
-			return sdk.ErrInvalidCoins(fmt.Sprintf("invalid service price [%s]", price))
+			return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "invalid service price: %s", price.String())
 		}
 	}
 	if !validLevel(msg.Level) {
-		return ErrInvalidLevel(DefaultCodespace, msg.Level)
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid level; AvgRspTime: %d, UsableTime: %d", msg.Level.AvgRspTime, msg.Level.UsableTime)
 	}
 	return nil
 }
@@ -251,12 +251,12 @@ func (msg MsgSvcBindingUpdate) GetSignBytes() []byte {
 }
 
 // ValidateBasic implements Msg.
-func (msg MsgSvcBindingUpdate) ValidateBasic() sdk.Error {
+func (msg MsgSvcBindingUpdate) ValidateBasic() error {
 	if len(msg.DefChainID) == 0 {
-		return ErrInvalidDefChainID(DefaultCodespace)
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "define chain-id missing")
 	}
 	if len(msg.BindChainID) == 0 {
-		return ErrInvalidChainID(DefaultCodespace)
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "bind chain-id missing")
 	}
 	if err := ensureChainIDLength(msg.DefChainID, "def_chain_id"); err != nil {
 		return err
@@ -265,27 +265,27 @@ func (msg MsgSvcBindingUpdate) ValidateBasic() sdk.Error {
 		return err
 	}
 	if !validServiceName(msg.DefName) {
-		return ErrInvalidServiceName(DefaultCodespace, msg.DefName)
+		return sdkerrors.Wrap(ErrInvalidServiceName, msg.DefName)
 	}
 	if err := ensureNameLength(msg.DefName); err != nil {
 		return err
 	}
 	if len(msg.Provider) == 0 {
-		return sdk.ErrInvalidAddress(msg.Provider.String())
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "provider missing")
 	}
 	if msg.BindingType != 0x00 && !validBindingType(msg.BindingType) {
-		return ErrInvalidBindingType(DefaultCodespace, msg.BindingType)
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid binding type: %s", msg.BindingType.String())
 	}
 	if !validServiceCoins(msg.Deposit) {
-		return sdk.ErrInvalidCoins(fmt.Sprintf("invalid service deposit [%s]", msg.Deposit))
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "invalid service deposit: %s", msg.Deposit.String())
 	}
 	for _, price := range msg.Prices {
 		if !validServiceCoins(sdk.Coins{price}) {
-			return sdk.ErrInvalidCoins(fmt.Sprintf("invalid service price [%s]", price))
+			return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "invalid service price: %s", price.String())
 		}
 	}
 	if !validUpdateLevel(msg.Level) {
-		return ErrInvalidLevel(DefaultCodespace, msg.Level)
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid level; AvgRspTime: %d, UsableTime: %d", msg.Level.AvgRspTime, msg.Level.UsableTime)
 	}
 	return nil
 }
@@ -331,12 +331,12 @@ func (msg MsgSvcDisable) GetSignBytes() []byte {
 }
 
 // ValidateBasic implements Msg.
-func (msg MsgSvcDisable) ValidateBasic() sdk.Error {
+func (msg MsgSvcDisable) ValidateBasic() error {
 	if len(msg.DefChainID) == 0 {
-		return ErrInvalidDefChainID(DefaultCodespace)
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "define chain-id missing")
 	}
 	if len(msg.BindChainID) == 0 {
-		return ErrInvalidChainID(DefaultCodespace)
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "bind chain-id missing")
 	}
 	if err := ensureChainIDLength(msg.DefChainID, "def_chain_id"); err != nil {
 		return err
@@ -345,13 +345,13 @@ func (msg MsgSvcDisable) ValidateBasic() sdk.Error {
 		return err
 	}
 	if !validServiceName(msg.DefName) {
-		return ErrInvalidServiceName(DefaultCodespace, msg.DefName)
+		return sdkerrors.Wrap(ErrInvalidServiceName, msg.DefName)
 	}
 	if err := ensureNameLength(msg.DefName); err != nil {
 		return err
 	}
 	if len(msg.Provider) == 0 {
-		return sdk.ErrInvalidAddress(msg.Provider.String())
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "provider missing")
 	}
 	return nil
 }
@@ -399,12 +399,12 @@ func (msg MsgSvcEnable) GetSignBytes() []byte {
 }
 
 // ValidateBasic implements Msg.
-func (msg MsgSvcEnable) ValidateBasic() sdk.Error {
+func (msg MsgSvcEnable) ValidateBasic() error {
 	if len(msg.DefChainID) == 0 {
-		return ErrInvalidDefChainID(DefaultCodespace)
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "define chain-id missing")
 	}
 	if len(msg.BindChainID) == 0 {
-		return ErrInvalidChainID(DefaultCodespace)
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "bind chain-id missing")
 	}
 	if err := ensureChainIDLength(msg.DefChainID, "def_chain_id"); err != nil {
 		return err
@@ -413,16 +413,16 @@ func (msg MsgSvcEnable) ValidateBasic() sdk.Error {
 		return err
 	}
 	if !validServiceName(msg.DefName) {
-		return ErrInvalidServiceName(DefaultCodespace, msg.DefName)
+		return sdkerrors.Wrap(ErrInvalidServiceName, msg.DefName)
 	}
 	if err := ensureNameLength(msg.DefName); err != nil {
 		return err
 	}
 	if !validServiceCoins(msg.Deposit) {
-		return sdk.ErrInvalidCoins(fmt.Sprintf("invalid service deposit [%s]", msg.Deposit))
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "invalid service deposit: %s", msg.Deposit.String())
 	}
 	if len(msg.Provider) == 0 {
-		return sdk.ErrInvalidAddress(msg.Provider.String())
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "provider missing")
 	}
 	return nil
 }
@@ -468,12 +468,12 @@ func (msg MsgSvcRefundDeposit) GetSignBytes() []byte {
 }
 
 // ValidateBasic implements Msg.
-func (msg MsgSvcRefundDeposit) ValidateBasic() sdk.Error {
+func (msg MsgSvcRefundDeposit) ValidateBasic() error {
 	if len(msg.DefChainID) == 0 {
-		return ErrInvalidDefChainID(DefaultCodespace)
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "define chain-id missing")
 	}
 	if len(msg.BindChainID) == 0 {
-		return ErrInvalidChainID(DefaultCodespace)
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "bind chain-id missing")
 	}
 	if err := ensureChainIDLength(msg.DefChainID, "def_chain_id"); err != nil {
 		return err
@@ -482,13 +482,13 @@ func (msg MsgSvcRefundDeposit) ValidateBasic() sdk.Error {
 		return err
 	}
 	if !validServiceName(msg.DefName) {
-		return ErrInvalidServiceName(DefaultCodespace, msg.DefName)
+		return sdkerrors.Wrap(ErrInvalidServiceName, msg.DefName)
 	}
 	if err := ensureNameLength(msg.DefName); err != nil {
 		return err
 	}
 	if len(msg.Provider) == 0 {
-		return sdk.ErrInvalidAddress(msg.Provider.String())
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "provider missing")
 	}
 	return nil
 }
@@ -549,15 +549,15 @@ func (msg MsgSvcRequest) GetSignBytes() []byte {
 }
 
 // ValidateBasic implements Msg.
-func (msg MsgSvcRequest) ValidateBasic() sdk.Error {
+func (msg MsgSvcRequest) ValidateBasic() error {
 	if len(msg.DefChainID) == 0 {
-		return ErrInvalidDefChainID(DefaultCodespace)
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "define chain-id missing")
 	}
 	if len(msg.BindChainID) == 0 {
-		return ErrInvalidBindChainID(DefaultCodespace)
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "bind chain-id missing")
 	}
 	if len(msg.ReqChainID) == 0 {
-		return ErrInvalidChainID(DefaultCodespace)
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "request chain-id missing")
 	}
 	if err := ensureChainIDLength(msg.DefChainID, "def_chain_id"); err != nil {
 		return err
@@ -569,19 +569,19 @@ func (msg MsgSvcRequest) ValidateBasic() sdk.Error {
 		return err
 	}
 	if !validServiceName(msg.DefName) {
-		return ErrInvalidServiceName(DefaultCodespace, msg.DefName)
+		return sdkerrors.Wrap(ErrInvalidServiceName, msg.DefName)
 	}
 	if err := ensureNameLength(msg.DefName); err != nil {
 		return err
 	}
 	if len(msg.Provider) == 0 {
-		return sdk.ErrInvalidAddress(msg.Provider.String())
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "provider missing")
 	}
 	if len(msg.Consumer) == 0 {
-		return sdk.ErrInvalidAddress(msg.Consumer.String())
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "consumer missing")
 	}
 	if !validServiceCoins(msg.ServiceFee) {
-		return sdk.ErrInvalidCoins(fmt.Sprintf("invalid service fee [%s]", msg.ServiceFee))
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "invalid service fee: %s", msg.ServiceFee.String())
 	}
 	return nil
 }
@@ -635,18 +635,18 @@ func (msg MsgSvcResponse) GetSignBytes() []byte {
 }
 
 // ValidateBasic implements Msg.
-func (msg MsgSvcResponse) ValidateBasic() sdk.Error {
+func (msg MsgSvcResponse) ValidateBasic() error {
 	if len(msg.ReqChainID) == 0 {
-		return ErrInvalidReqChainID(DefaultCodespace)
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "request chain-id missing")
 	}
 	if err := ensureChainIDLength(msg.ReqChainID, "req_chain_id"); err != nil {
 		return err
 	}
 	if len(msg.Provider) == 0 {
-		return sdk.ErrInvalidAddress(msg.Provider.String())
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "provider missing")
 	}
 	if _, _, _, err := ConvertRequestID(msg.RequestID); err != nil {
-		return ErrInvalidReqID(DefaultCodespace, msg.RequestID)
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid request id: %s", msg.RequestID)
 	}
 	return nil
 }
@@ -681,9 +681,9 @@ func (msg MsgSvcRefundFees) GetSignBytes() []byte {
 }
 
 // ValidateBasic implements Msg.
-func (msg MsgSvcRefundFees) ValidateBasic() sdk.Error {
+func (msg MsgSvcRefundFees) ValidateBasic() error {
 	if len(msg.Consumer) == 0 {
-		return sdk.ErrInvalidAddress(msg.Consumer.String())
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "consumer address missing")
 	}
 	return nil
 }
@@ -718,9 +718,9 @@ func (msg MsgSvcWithdrawFees) GetSignBytes() []byte {
 }
 
 // ValidateBasic implements Msg.
-func (msg MsgSvcWithdrawFees) ValidateBasic() sdk.Error {
+func (msg MsgSvcWithdrawFees) ValidateBasic() error {
 	if len(msg.Provider) == 0 {
-		return sdk.ErrInvalidAddress(msg.Provider.String())
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "provider address missing")
 	}
 	return nil
 }
@@ -761,15 +761,15 @@ func (msg MsgSvcWithdrawTax) GetSignBytes() []byte {
 }
 
 // ValidateBasic implements Msg.
-func (msg MsgSvcWithdrawTax) ValidateBasic() sdk.Error {
+func (msg MsgSvcWithdrawTax) ValidateBasic() error {
 	if len(msg.Trustee) == 0 {
-		return sdk.ErrInvalidAddress(msg.Trustee.String())
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "trustee address missing")
 	}
 	if len(msg.DestAddress) == 0 {
-		return sdk.ErrInvalidAddress(msg.DestAddress.String())
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "destination address missing")
 	}
 	if !validServiceCoins(msg.Amount) {
-		return sdk.ErrInvalidCoins(fmt.Sprintf("invalid service withdrawal amount [%s]", msg.Amount))
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, msg.Amount.String())
 	}
 	return nil
 }
@@ -786,7 +786,7 @@ func validServiceName(name string) bool {
 }
 
 // EnsureLength
-func (msg MsgSvcDef) EnsureLength() sdk.Error {
+func (msg MsgSvcDef) EnsureLength() error {
 	if err := ensureNameLength(msg.Name); err != nil {
 		return err
 	}
@@ -794,33 +794,33 @@ func (msg MsgSvcDef) EnsureLength() sdk.Error {
 		return err
 	}
 	if len(msg.Description) > MaxDescriptionLength {
-		return ErrInvalidLength(DefaultCodespace, fmt.Sprintf("length of the description must not be greater than %d", MaxDescriptionLength))
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid description length; got: %d, max: %d", len(msg.Description), MaxDescriptionLength)
 	}
 	if len(msg.Tags) > MaxTagCount {
-		return ErrInvalidLength(DefaultCodespace, fmt.Sprintf("the tag count must not be greater than %d", MaxTagCount))
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid tags count; got: %d, max: %d", len(msg.Tags), MaxTagCount)
 	} else {
 		for i, tag := range msg.Tags {
 			if len(tag) > MaxTagLength {
-				return ErrInvalidLength(DefaultCodespace, fmt.Sprintf("length of the tag %d must not be greater than %d", i, MaxTagLength))
+				return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid tag[%d] length; got: %d, max: %d", i, len(tag), MaxTagLength)
 			}
 		}
 	}
 	if len(msg.AuthorDescription) > MaxDescriptionLength {
-		return ErrInvalidLength(DefaultCodespace, fmt.Sprintf("length of the author description must not be greater than %d", MaxDescriptionLength))
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid author description length; got: %d, max: %d", len(msg.AuthorDescription), MaxDescriptionLength)
 	}
 	return nil
 }
 
-func ensureNameLength(name string) sdk.Error {
+func ensureNameLength(name string) error {
 	if len(name) > MaxNameLength {
-		return ErrInvalidLength(DefaultCodespace, fmt.Sprintf("length of the name must not be greater than %d", MaxNameLength))
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid service name length; got: %d, max: %d", len(name), MaxNameLength)
 	}
 	return nil
 }
 
-func ensureChainIDLength(chainID, fieldNm string) sdk.Error {
+func ensureChainIDLength(chainID, fieldNm string) error {
 	if len(chainID) > MaxChainIDLength {
-		return ErrInvalidLength(DefaultCodespace, fmt.Sprintf("length of the %s must not be greater than %d", fieldNm, MaxChainIDLength))
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid %s length; got: %d, max: %d", fieldNm, len(chainID), MaxChainIDLength)
 	}
 	return nil
 }

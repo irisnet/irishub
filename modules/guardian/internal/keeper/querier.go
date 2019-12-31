@@ -5,25 +5,26 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 	"github.com/irisnet/irishub/modules/guardian/internal/types"
 )
 
 // NewQuerier creates a querier for guardian REST endpoints
 func NewQuerier(k Keeper) sdk.Querier {
-	return func(ctx sdk.Context, path []string, _ abci.RequestQuery) ([]byte, sdk.Error) {
+	return func(ctx sdk.Context, path []string, _ abci.RequestQuery) ([]byte, error) {
 		switch path[0] {
 		case types.QueryProfilers:
 			return queryProfilers(ctx, k)
 		case types.QueryTrustees:
 			return queryTrustees(ctx, k)
 		default:
-			return nil, sdk.ErrUnknownRequest("unknown guardian query endpoint")
+			return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unknown query path: %s", path[0])
 		}
 	}
 }
 
-func queryProfilers(ctx sdk.Context, k Keeper) ([]byte, sdk.Error) {
+func queryProfilers(ctx sdk.Context, k Keeper) ([]byte, error) {
 	profilersIterator := k.ProfilersIterator(ctx)
 	defer profilersIterator.Close()
 	var profilers []types.Guardian
@@ -35,12 +36,12 @@ func queryProfilers(ctx sdk.Context, k Keeper) ([]byte, sdk.Error) {
 
 	bz, err := codec.MarshalJSONIndent(k.cdc, profilers)
 	if err != nil {
-		return nil, sdk.ConvertError(err)
+		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
 	}
 	return bz, nil
 }
 
-func queryTrustees(ctx sdk.Context, k Keeper) ([]byte, sdk.Error) {
+func queryTrustees(ctx sdk.Context, k Keeper) ([]byte, error) {
 	trusteesIterator := k.TrusteesIterator(ctx)
 	defer trusteesIterator.Close()
 	var trustees []types.Guardian
@@ -52,7 +53,7 @@ func queryTrustees(ctx sdk.Context, k Keeper) ([]byte, sdk.Error) {
 
 	bz, err := codec.MarshalJSONIndent(k.cdc, trustees)
 	if err != nil {
-		return nil, sdk.ConvertError(err)
+		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
 	}
 	return bz, nil
 }

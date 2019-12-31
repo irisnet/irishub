@@ -3,7 +3,6 @@ package clitest
 import (
 	"encoding/json"
 	"fmt"
-
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -15,7 +14,6 @@ import (
 
 	tmtypes "github.com/tendermint/tendermint/types"
 
-	"github.com/cosmos/cosmos-sdk/client"
 	clientkeys "github.com/cosmos/cosmos-sdk/client/keys"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/crypto/keys"
@@ -52,6 +50,7 @@ const (
 var (
 	mintPerBlock, _ = sdk.NewIntFromString("12675235125611580094")
 
+	// nolint:varcheck,deadcode,unused
 	totalCoins = sdk.NewCoins(
 		sdk.NewCoin(fee2Denom, sdk.TokensFromConsensusPower(2000000)),
 		sdk.NewCoin(feeDenom, sdk.TokensFromConsensusPower(2000000)),
@@ -88,12 +87,12 @@ func init() {
 type Fixtures struct {
 	BuildDir      string
 	RootDir       string
-	IrisdBinary   string
+	IrisBinary    string
 	IriscliBinary string
 	ChainID       string
 	RPCAddr       string
 	Port          string
-	IrisdHome     string
+	IrisHome      string
 	IriscliHome   string
 	P2PAddr       string
 	T             *testing.T
@@ -120,9 +119,9 @@ func NewFixtures(t *testing.T) *Fixtures {
 		T:             t,
 		BuildDir:      buildDir,
 		RootDir:       tmpDir,
-		IrisdBinary:   filepath.Join(buildDir, "iris"),
+		IrisBinary:    filepath.Join(buildDir, "iris"),
 		IriscliBinary: filepath.Join(buildDir, "iriscli"),
-		IrisdHome:     filepath.Join(tmpDir, ".iris"),
+		IrisHome:      filepath.Join(tmpDir, ".iris"),
 		IriscliHome:   filepath.Join(tmpDir, ".iriscli"),
 		RPCAddr:       servAddr,
 		P2PAddr:       p2pAddr,
@@ -132,7 +131,7 @@ func NewFixtures(t *testing.T) *Fixtures {
 
 // GenesisFile returns the path of the genesis file
 func (f Fixtures) GenesisFile() string {
-	return filepath.Join(f.IrisdHome, "config", "genesis.json")
+	return filepath.Join(f.IrisHome, "config", "genesis.json")
 }
 
 // GenesisFile returns the application's genesis state
@@ -153,6 +152,8 @@ func InitFixtures(t *testing.T) (f *Fixtures) {
 
 	// reset test state
 	f.UnsafeResetAll()
+
+	f.CLIConfig("keyring-backend", "test")
 
 	// ensure keystore has foo and bar keys
 	f.KeysDelete(keyFoo)
@@ -226,17 +227,17 @@ func (f *Fixtures) Flags() string {
 
 // UnsafeResetAll is iris unsafe-reset-all
 func (f *Fixtures) UnsafeResetAll(flags ...string) {
-	cmd := fmt.Sprintf("%s --home=%s unsafe-reset-all", f.IrisdBinary, f.IrisdHome)
+	cmd := fmt.Sprintf("%s --home=%s unsafe-reset-all", f.IrisBinary, f.IrisHome)
 	executeWrite(f.T, addFlags(cmd, flags))
-	err := os.RemoveAll(filepath.Join(f.IrisdHome, "config", "gentx"))
+	err := os.RemoveAll(filepath.Join(f.IrisHome, "config", "gentx"))
 	require.NoError(f.T, err)
 }
 
 // GDInit is iris init
 // NOTE: GDInit sets the ChainID for the Fixtures instance
 func (f *Fixtures) GDInit(moniker string, flags ...string) {
-	cmd := fmt.Sprintf("%s init -o --home=%s %s", f.IrisdBinary, f.IrisdHome, moniker)
-	_, stderr := tests.ExecuteT(f.T, addFlags(cmd, flags), client.DefaultKeyPass)
+	cmd := fmt.Sprintf("%s init -o --home=%s %s", f.IrisBinary, f.IrisHome, moniker)
+	_, stderr := tests.ExecuteT(f.T, addFlags(cmd, flags), clientkeys.DefaultKeyPass)
 
 	var chainID string
 	var initRes map[string]json.RawMessage
@@ -252,25 +253,25 @@ func (f *Fixtures) GDInit(moniker string, flags ...string) {
 
 // AddGenesisAccount is iris add-genesis-account
 func (f *Fixtures) AddGenesisAccount(address sdk.AccAddress, coins sdk.Coins, flags ...string) {
-	cmd := fmt.Sprintf("%s add-genesis-account %s %s --home=%s", f.IrisdBinary, address, coins, f.IrisdHome)
+	cmd := fmt.Sprintf("%s add-genesis-account %s %s --home=%s --keyring-backend=test", f.IrisBinary, address, coins, f.IrisHome)
 	executeWriteCheckErr(f.T, addFlags(cmd, flags))
 }
 
 // GenTx is iris gentx
 func (f *Fixtures) GenTx(name string, flags ...string) {
-	cmd := fmt.Sprintf("%s gentx --name=%s --home=%s --home-client=%s", f.IrisdBinary, name, f.IrisdHome, f.IriscliHome)
-	executeWriteCheckErr(f.T, addFlags(cmd, flags), client.DefaultKeyPass)
+	cmd := fmt.Sprintf("%s gentx --name=%s --home=%s --home-client=%s --keyring-backend=test", f.IrisBinary, name, f.IrisHome, f.IriscliHome)
+	executeWriteCheckErr(f.T, addFlags(cmd, flags))
 }
 
 // CollectGenTxs is iris collect-gentxs
 func (f *Fixtures) CollectGenTxs(flags ...string) {
-	cmd := fmt.Sprintf("%s collect-gentxs --home=%s", f.IrisdBinary, f.IrisdHome)
-	executeWriteCheckErr(f.T, addFlags(cmd, flags), client.DefaultKeyPass)
+	cmd := fmt.Sprintf("%s collect-gentxs --home=%s", f.IrisBinary, f.IrisHome)
+	executeWriteCheckErr(f.T, addFlags(cmd, flags))
 }
 
 // GDStart runs iris start with the appropriate flags and returns a process
 func (f *Fixtures) GDStart(flags ...string) *tests.Process {
-	cmd := fmt.Sprintf("%s start --home=%s --rpc.laddr=%v --p2p.laddr=%v", f.IrisdBinary, f.IrisdHome, f.RPCAddr, f.P2PAddr)
+	cmd := fmt.Sprintf("%s start --home=%s --rpc.laddr=%v --p2p.laddr=%v", f.IrisBinary, f.IrisHome, f.RPCAddr, f.P2PAddr)
 	proc := tests.GoExecuteTWithStdout(f.T, addFlags(cmd, flags))
 	tests.WaitForTMStart(f.Port)
 	tests.WaitForNextNBlocksTM(1, f.Port)
@@ -279,7 +280,7 @@ func (f *Fixtures) GDStart(flags ...string) *tests.Process {
 
 // GDTendermint returns the results of iris tendermint [query]
 func (f *Fixtures) GDTendermint(query string) string {
-	cmd := fmt.Sprintf("%s tendermint %s --home=%s", f.IrisdBinary, query, f.IrisdHome)
+	cmd := fmt.Sprintf("%s tendermint %s --home=%s", f.IrisBinary, query, f.IrisHome)
 	success, stdout, stderr := executeWriteRetStdStreams(f.T, cmd)
 	require.Empty(f.T, stderr)
 	require.True(f.T, success)
@@ -288,7 +289,7 @@ func (f *Fixtures) GDTendermint(query string) string {
 
 // ValidateGenesis runs iris validate-genesis
 func (f *Fixtures) ValidateGenesis() {
-	cmd := fmt.Sprintf("%s validate-genesis --home=%s", f.IrisdBinary, f.IrisdHome)
+	cmd := fmt.Sprintf("%s validate-genesis --home=%s", f.IrisBinary, f.IrisHome)
 	executeWriteCheckErr(f.T, cmd)
 }
 
@@ -297,31 +298,36 @@ func (f *Fixtures) ValidateGenesis() {
 
 // KeysDelete is iriscli keys delete
 func (f *Fixtures) KeysDelete(name string, flags ...string) {
-	cmd := fmt.Sprintf("%s keys delete --home=%s %s", f.IriscliBinary, f.IriscliHome, name)
+	cmd := fmt.Sprintf("%s keys delete --keyring-backend=test --home=%s %s", f.IriscliBinary,
+		f.IriscliHome, name)
 	executeWrite(f.T, addFlags(cmd, append(append(flags, "-y"), "-f")))
 }
 
 // KeysAdd is iriscli keys add
 func (f *Fixtures) KeysAdd(name string, flags ...string) {
-	cmd := fmt.Sprintf("%s keys add --home=%s %s", f.IriscliBinary, f.IriscliHome, name)
-	executeWriteCheckErr(f.T, addFlags(cmd, flags), client.DefaultKeyPass)
+	cmd := fmt.Sprintf("%s keys add --keyring-backend=test --home=%s %s", f.IriscliBinary,
+		f.IriscliHome, name)
+	executeWriteCheckErr(f.T, addFlags(cmd, flags))
 }
 
 // KeysAddRecover prepares iriscli keys add --recover
 func (f *Fixtures) KeysAddRecover(name, mnemonic string, flags ...string) (exitSuccess bool, stdout, stderr string) {
-	cmd := fmt.Sprintf("%s keys add --home=%s --recover %s", f.IriscliBinary, f.IriscliHome, name)
-	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), client.DefaultKeyPass, mnemonic)
+	cmd := fmt.Sprintf("%s keys add --keyring-backend=test --home=%s --recover %s",
+		f.IriscliBinary, f.IriscliHome, name)
+	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), mnemonic)
 }
 
 // KeysAddRecoverHDPath prepares iriscli keys add --recover --account --index
 func (f *Fixtures) KeysAddRecoverHDPath(name, mnemonic string, account uint32, index uint32, flags ...string) {
-	cmd := fmt.Sprintf("%s keys add --home=%s --recover %s --account %d --index %d", f.IriscliBinary, f.IriscliHome, name, account, index)
-	executeWriteCheckErr(f.T, addFlags(cmd, flags), client.DefaultKeyPass, mnemonic)
+	cmd := fmt.Sprintf("%s keys add --keyring-backend=test --home=%s --recover %s --account %d"+
+		" --index %d", f.IriscliBinary, f.IriscliHome, name, account, index)
+	executeWriteCheckErr(f.T, addFlags(cmd, flags), mnemonic)
 }
 
 // KeysShow is iriscli keys show
 func (f *Fixtures) KeysShow(name string, flags ...string) keys.KeyOutput {
-	cmd := fmt.Sprintf("%s keys show --home=%s %s", f.IriscliBinary, f.IriscliHome, name)
+	cmd := fmt.Sprintf("%s keys show --keyring-backend=test --home=%s %s", f.IriscliBinary,
+		f.IriscliHome, name)
 	out, _ := tests.ExecuteT(f.T, addFlags(cmd, flags), "")
 	var ko keys.KeyOutput
 	err := clientkeys.UnmarshalJSON([]byte(out), &ko)
@@ -351,33 +357,35 @@ func (f *Fixtures) CLIConfig(key, value string, flags ...string) {
 
 // TxSend is iriscli tx send
 func (f *Fixtures) TxSend(from string, to sdk.AccAddress, amount sdk.Coin, flags ...string) (bool, string, string) {
-	cmd := fmt.Sprintf("%s tx send %s %s %s %v", f.IriscliBinary, from, to, amount, f.Flags())
-	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), client.DefaultKeyPass)
+	cmd := fmt.Sprintf("%s tx send --keyring-backend=test %s %s %s %v", f.IriscliBinary, from,
+		to, amount, f.Flags())
+	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), clientkeys.DefaultKeyPass)
 }
 
 // TxSign is iriscli tx sign
 func (f *Fixtures) TxSign(signer, fileName string, flags ...string) (bool, string, string) {
-	cmd := fmt.Sprintf("%s tx sign %v --from=%s %v", f.IriscliBinary, f.Flags(), signer, fileName)
-	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), client.DefaultKeyPass)
+	cmd := fmt.Sprintf("%s tx sign %v --keyring-backend=test --from=%s %v", f.IriscliBinary,
+		f.Flags(), signer, fileName)
+	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), clientkeys.DefaultKeyPass)
 }
 
 // TxBroadcast is iriscli tx broadcast
 func (f *Fixtures) TxBroadcast(fileName string, flags ...string) (bool, string, string) {
 	cmd := fmt.Sprintf("%s tx broadcast %v %v", f.IriscliBinary, f.Flags(), fileName)
-	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), client.DefaultKeyPass)
+	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), clientkeys.DefaultKeyPass)
 }
 
 // TxEncode is iriscli tx encode
 func (f *Fixtures) TxEncode(fileName string, flags ...string) (bool, string, string) {
 	cmd := fmt.Sprintf("%s tx encode %v %v", f.IriscliBinary, f.Flags(), fileName)
-	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), client.DefaultKeyPass)
+	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), clientkeys.DefaultKeyPass)
 }
 
 // TxMultisign is iriscli tx multisign
 func (f *Fixtures) TxMultisign(fileName, name string, signaturesFiles []string,
 	flags ...string) (bool, string, string) {
 
-	cmd := fmt.Sprintf("%s tx multisign %v %s %s %s", f.IriscliBinary, f.Flags(),
+	cmd := fmt.Sprintf("%s tx multisign --keyring-backend=test %v %s %s %s", f.IriscliBinary, f.Flags(),
 		fileName, name, strings.Join(signaturesFiles, " "),
 	)
 	return executeWriteRetStdStreams(f.T, cmd)
@@ -388,17 +396,19 @@ func (f *Fixtures) TxMultisign(fileName, name string, signaturesFiles []string,
 
 // TxStakingCreateValidator is iriscli tx staking create-validator
 func (f *Fixtures) TxStakingCreateValidator(from, consPubKey string, amount sdk.Coin, flags ...string) (bool, string, string) {
-	cmd := fmt.Sprintf("%s tx staking create-validator %v --from=%s --pubkey=%s", f.IriscliBinary, f.Flags(), from, consPubKey)
+	cmd := fmt.Sprintf("%s tx staking create-validator %v --keyring-backend=test --from=%s"+
+		" --pubkey=%s", f.IriscliBinary, f.Flags(), from, consPubKey)
 	cmd += fmt.Sprintf(" --amount=%v --moniker=%v --commission-rate=%v", amount, from, "0.05")
 	cmd += fmt.Sprintf(" --commission-max-rate=%v --commission-max-change-rate=%v", "0.20", "0.10")
 	cmd += fmt.Sprintf(" --min-self-delegation=%v", "1")
-	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), client.DefaultKeyPass)
+	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), clientkeys.DefaultKeyPass)
 }
 
 // TxStakingUnbond is iriscli tx staking unbond
 func (f *Fixtures) TxStakingUnbond(from, shares string, validator sdk.ValAddress, flags ...string) bool {
-	cmd := fmt.Sprintf("%s tx staking unbond %s %v --from=%s %v", f.IriscliBinary, validator, shares, from, f.Flags())
-	return executeWrite(f.T, addFlags(cmd, flags), client.DefaultKeyPass)
+	cmd := fmt.Sprintf("%s tx staking unbond --keyring-backend=test %s %v --from=%s %v",
+		f.IriscliBinary, validator, shares, from, f.Flags())
+	return executeWrite(f.T, addFlags(cmd, flags), clientkeys.DefaultKeyPass)
 }
 
 //___________________________________________________________________________________
@@ -406,21 +416,24 @@ func (f *Fixtures) TxStakingUnbond(from, shares string, validator sdk.ValAddress
 
 // TxGovSubmitProposal is iriscli tx gov submit-proposal
 func (f *Fixtures) TxGovSubmitProposal(from, typ, title, description string, deposit sdk.Coin, flags ...string) (bool, string, string) {
-	cmd := fmt.Sprintf("%s tx gov submit-proposal %v --from=%s --type=%s", f.IriscliBinary, f.Flags(), from, typ)
+	cmd := fmt.Sprintf("%s tx gov submit-proposal %v --keyring-backend=test --from=%s --type=%s",
+		f.IriscliBinary, f.Flags(), from, typ)
 	cmd += fmt.Sprintf(" --title=%s --description=%s --deposit=%s", title, description, deposit)
-	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), client.DefaultKeyPass)
+	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), clientkeys.DefaultKeyPass)
 }
 
 // TxGovDeposit is iriscli tx gov deposit
 func (f *Fixtures) TxGovDeposit(proposalID int, from string, amount sdk.Coin, flags ...string) (bool, string, string) {
-	cmd := fmt.Sprintf("%s tx gov deposit %d %s --from=%s %v", f.IriscliBinary, proposalID, amount, from, f.Flags())
-	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), client.DefaultKeyPass)
+	cmd := fmt.Sprintf("%s tx gov deposit %d %s --keyring-backend=test --from=%s %v",
+		f.IriscliBinary, proposalID, amount, from, f.Flags())
+	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), clientkeys.DefaultKeyPass)
 }
 
 // TxGovVote is iriscli tx gov vote
 func (f *Fixtures) TxGovVote(proposalID int, option gov.VoteOption, from string, flags ...string) (bool, string, string) {
-	cmd := fmt.Sprintf("%s tx gov vote %d %s --from=%s %v", f.IriscliBinary, proposalID, option, from, f.Flags())
-	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), client.DefaultKeyPass)
+	cmd := fmt.Sprintf("%s tx gov vote %d %s --keyring-backend=test --from=%s %v",
+		f.IriscliBinary, proposalID, option, from, f.Flags())
+	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), clientkeys.DefaultKeyPass)
 }
 
 // TxGovSubmitParamChangeProposal executes a CLI parameter change proposal
@@ -430,11 +443,11 @@ func (f *Fixtures) TxGovSubmitParamChangeProposal(
 ) (bool, string, string) {
 
 	cmd := fmt.Sprintf(
-		"%s tx gov submit-proposal param-change %s --from=%s %v",
+		"%s tx gov submit-proposal param-change %s --keyring-backend=test --from=%s %v",
 		f.IriscliBinary, proposalPath, from, f.Flags(),
 	)
 
-	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), client.DefaultKeyPass)
+	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), clientkeys.DefaultKeyPass)
 }
 
 // TxGovSubmitCommunityPoolSpendProposal executes a CLI community pool spend proposal
@@ -444,11 +457,11 @@ func (f *Fixtures) TxGovSubmitCommunityPoolSpendProposal(
 ) (bool, string, string) {
 
 	cmd := fmt.Sprintf(
-		"%s tx gov submit-proposal community-pool-spend %s --from=%s %v",
+		"%s tx gov submit-proposal community-pool-spend %s --keyring-backend=test --from=%s %v",
 		f.IriscliBinary, proposalPath, from, f.Flags(),
 	)
 
-	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), client.DefaultKeyPass)
+	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), clientkeys.DefaultKeyPass)
 }
 
 //___________________________________________________________________________________
@@ -785,12 +798,13 @@ func queryTags(tags []string) (out string) {
 // Write the given string to a new temporary file
 func WriteToNewTempFile(t *testing.T, s string) *os.File {
 	fp, err := ioutil.TempFile(os.TempDir(), "cosmos_cli_test_")
-	require.NoError(t, err)
+	require.Nil(t, err)
 	_, err = fp.WriteString(s)
-	require.NoError(t, err)
+	require.Nil(t, err)
 	return fp
 }
 
+//nolint:deadcode,unused
 func marshalStdTx(t *testing.T, stdTx auth.StdTx) []byte {
 	cdc := app.MakeCodec()
 	bz, err := cdc.MarshalBinaryBare(stdTx)
@@ -798,9 +812,10 @@ func marshalStdTx(t *testing.T, stdTx auth.StdTx) []byte {
 	return bz
 }
 
+//nolint:deadcode,unused
 func unmarshalStdTx(t *testing.T, s string) (stdTx auth.StdTx) {
 	cdc := app.MakeCodec()
-	require.NoError(t, cdc.UnmarshalJSON([]byte(s), &stdTx))
+	require.Nil(t, cdc.UnmarshalJSON([]byte(s), &stdTx))
 	return
 }
 

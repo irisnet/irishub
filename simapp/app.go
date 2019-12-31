@@ -1,7 +1,6 @@
 package simapp
 
 import (
-	token "github.com/irisnet/irishub/modules/asset/01-token"
 	"io"
 	"os"
 
@@ -31,6 +30,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/supply"
 
 	"github.com/irisnet/irishub/modules/asset"
+	token "github.com/irisnet/irishub/modules/asset/01-token"
 	"github.com/irisnet/irishub/modules/coinswap"
 	"github.com/irisnet/irishub/modules/guardian"
 	"github.com/irisnet/irishub/modules/htlc"
@@ -171,7 +171,7 @@ func NewSimApp(
 	}
 
 	// init params keeper and subspaces
-	app.ParamsKeeper = params.NewKeeper(app.cdc, keys[params.StoreKey], tkeys[params.TStoreKey], params.DefaultCodespace)
+	app.ParamsKeeper = params.NewKeeper(app.cdc, keys[params.StoreKey], tkeys[params.TStoreKey])
 	app.subspaces[auth.ModuleName] = app.ParamsKeeper.Subspace(auth.DefaultParamspace)
 	app.subspaces[bank.ModuleName] = app.ParamsKeeper.Subspace(bank.DefaultParamspace)
 	app.subspaces[staking.ModuleName] = app.ParamsKeeper.Subspace(staking.DefaultParamspace)
@@ -190,38 +190,40 @@ func NewSimApp(
 		app.cdc, keys[auth.StoreKey], app.subspaces[auth.ModuleName], auth.ProtoBaseAccount,
 	)
 	app.BankKeeper = bank.NewBaseKeeper(
-		app.AccountKeeper, app.subspaces[bank.ModuleName], bank.DefaultCodespace,
-		app.ModuleAccountAddrs(),
+		app.AccountKeeper, app.subspaces[bank.ModuleName], app.ModuleAccountAddrs(),
 	)
 	app.SupplyKeeper = supply.NewKeeper(
 		app.cdc, keys[supply.StoreKey], app.AccountKeeper, app.BankKeeper, maccPerms,
 	)
 	stakingKeeper := staking.NewKeeper(
 		app.cdc, keys[staking.StoreKey], app.SupplyKeeper, app.subspaces[staking.ModuleName],
-		staking.DefaultCodespace)
-	app.MintKeeper = mint.NewKeeper(app.cdc, keys[mint.StoreKey], app.subspaces[mint.ModuleName], app.SupplyKeeper, auth.FeeCollectorName)
+	)
+	app.MintKeeper = mint.NewKeeper(
+		app.cdc, keys[mint.StoreKey], app.subspaces[mint.ModuleName],
+		app.SupplyKeeper, auth.FeeCollectorName,
+	)
 	app.DistrKeeper = distr.NewKeeper(
 		app.cdc, keys[distr.StoreKey], app.subspaces[distr.ModuleName], &stakingKeeper,
-		app.SupplyKeeper, distr.DefaultCodespace, auth.FeeCollectorName, app.ModuleAccountAddrs(),
+		app.SupplyKeeper, auth.FeeCollectorName, app.ModuleAccountAddrs(),
 	)
 	app.SlashingKeeper = slashing.NewKeeper(
-		app.cdc, keys[slashing.StoreKey], &stakingKeeper, app.subspaces[slashing.ModuleName], slashing.DefaultCodespace,
+		app.cdc, keys[slashing.StoreKey], &stakingKeeper,
+		app.subspaces[slashing.ModuleName],
 	)
 	app.CrisisKeeper = crisis.NewKeeper(
 		app.subspaces[crisis.ModuleName], invCheckPeriod, app.SupplyKeeper, auth.FeeCollectorName,
 	)
-	app.HTLCKeeper = htlc.NewKeeper(app.cdc, keys[htlc.StoreKey], app.SupplyKeeper, htlc.DefaultCodespace)
+	app.HTLCKeeper = htlc.NewKeeper(app.cdc, keys[htlc.StoreKey], app.SupplyKeeper)
 	app.CoinswapKeeper = coinswap.NewKeeper(
 		app.cdc, keys[coinswap.StoreKey], app.BankKeeper, app.AccountKeeper, app.SupplyKeeper, app.subspaces[coinswap.ModuleName],
 	)
 	// create evidence keeper with router
 	evidenceKeeper := evidence.NewKeeper(
-		app.cdc, keys[evidence.StoreKey], app.subspaces[evidence.ModuleName], evidence.DefaultCodespace,
+		app.cdc, keys[evidence.StoreKey], app.subspaces[evidence.ModuleName],
+		stakingKeeper, app.SlashingKeeper,
 	)
 
-	app.GuardianKeeper = guardian.NewKeeper(
-		app.cdc, keys[guardian.StoreKey], guardian.DefaultCodespace,
-	)
+	app.GuardianKeeper = guardian.NewKeeper(app.cdc, keys[guardian.StoreKey])
 
 	evidenceRouter := evidence.NewRouter()
 	// TODO: Register evidence routes.
@@ -235,7 +237,7 @@ func NewSimApp(
 		AddRoute(distr.RouterKey, distr.NewCommunityPoolSpendProposalHandler(app.DistrKeeper))
 	app.GovKeeper = gov.NewKeeper(
 		app.cdc, keys[gov.StoreKey], app.subspaces[gov.ModuleName], app.SupplyKeeper,
-		&stakingKeeper, gov.DefaultCodespace, govRouter,
+		&stakingKeeper, govRouter,
 	)
 
 	// register the staking hooks
@@ -245,14 +247,14 @@ func NewSimApp(
 	)
 
 	app.AssetKeeper = asset.NewKeeper(
-		app.cdc, keys[asset.StoreKey], app.subspaces[asset.ModuleName], asset.DefaultCodespace,
+		app.cdc, keys[asset.StoreKey], app.subspaces[asset.ModuleName],
 		app.SupplyKeeper, auth.FeeCollectorName)
 
-	app.RandKeeper = rand.NewKeeper(app.cdc, keys[rand.StoreKey], rand.DefaultCodespace)
+	app.RandKeeper = rand.NewKeeper(app.cdc, keys[rand.StoreKey])
 
 	app.ServiceKeeper = service.NewKeeper(
 		app.cdc, keys[service.StoreKey], app.SupplyKeeper, app.GuardianKeeper,
-		service.DefaultCodespace, app.subspaces[service.ModuleName],
+		app.subspaces[service.ModuleName],
 	)
 
 	// NOTE: Any module instantiated in the module manager that is later modified
@@ -263,10 +265,10 @@ func NewSimApp(
 		bank.NewAppModule(app.BankKeeper, app.AccountKeeper),
 		crisis.NewAppModule(&app.CrisisKeeper),
 		supply.NewAppModule(app.SupplyKeeper, app.AccountKeeper),
-		gov.NewAppModule(app.GovKeeper, app.SupplyKeeper),
+		gov.NewAppModule(app.GovKeeper, app.AccountKeeper, app.SupplyKeeper),
 		mint.NewAppModule(app.MintKeeper),
-		distr.NewAppModule(app.DistrKeeper, app.SupplyKeeper),
-		slashing.NewAppModule(app.SlashingKeeper, app.StakingKeeper),
+		distr.NewAppModule(app.DistrKeeper, app.AccountKeeper, app.SupplyKeeper, app.StakingKeeper),
+		slashing.NewAppModule(app.SlashingKeeper, app.AccountKeeper, app.StakingKeeper),
 		staking.NewAppModule(app.StakingKeeper, app.AccountKeeper, app.SupplyKeeper),
 		evidence.NewAppModule(app.EvidenceKeeper),
 		asset.NewAppModule(app.AssetKeeper),
@@ -311,23 +313,24 @@ func NewSimApp(
 	//
 	// NOTE: this is not required apps that don't use the simulator for fuzz testing
 	// transactions
-	app.sm = module.NewSimulationManager(
-		auth.NewAppModule(app.AccountKeeper),
-		bank.NewAppModule(app.BankKeeper, app.AccountKeeper),
-		supply.NewAppModule(app.SupplyKeeper, app.AccountKeeper),
-		gov.NewAppModule(app.GovKeeper, app.SupplyKeeper),
-		mint.NewAppModule(app.MintKeeper),
-		distr.NewAppModule(app.DistrKeeper, app.SupplyKeeper),
-		staking.NewAppModule(app.StakingKeeper, app.AccountKeeper, app.SupplyKeeper),
-		slashing.NewAppModule(app.SlashingKeeper, app.StakingKeeper),
-		asset.NewAppModule(app.AssetKeeper),
-		htlc.NewAppModule(app.HTLCKeeper),
-		coinswap.NewAppModule(app.CoinswapKeeper),
-		rand.NewAppModule(app.RandKeeper),
-		service.NewAppModule(app.ServiceKeeper),
-	)
+	// TODO:
+	//app.sm = module.NewSimulationManager(
+	//	auth.NewAppModule(app.AccountKeeper),
+	//	bank.NewAppModule(app.BankKeeper, app.AccountKeeper),
+	//	supply.NewAppModule(app.SupplyKeeper, app.AccountKeeper),
+	//	gov.NewAppModule(app.GovKeeper, app.SupplyKeeper),
+	//	mint.NewAppModule(app.MintKeeper),
+	//	distr.NewAppModule(app.DistrKeeper, app.SupplyKeeper),
+	//	staking.NewAppModule(app.StakingKeeper, app.AccountKeeper, app.SupplyKeeper),
+	//	slashing.NewAppModule(app.SlashingKeeper, app.StakingKeeper),
+	//	asset.NewAppModule(app.AssetKeeper),
+	//	htlc.NewAppModule(app.HTLCKeeper),
+	//	coinswap.NewAppModule(app.CoinswapKeeper),
+	//	rand.NewAppModule(app.RandKeeper),
+	//	service.NewAppModule(app.ServiceKeeper),
+	//)
 
-	app.sm.RegisterStoreDecoders()
+	//app.sm.RegisterStoreDecoders()
 
 	// initialize stores
 	app.MountKVStores(keys)

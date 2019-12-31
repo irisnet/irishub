@@ -5,11 +5,12 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/stretchr/testify/suite"
+	abci "github.com/tendermint/tendermint/abci/types"
+
 	"github.com/irisnet/irishub/modules/asset"
 	token "github.com/irisnet/irishub/modules/asset/01-token"
 	"github.com/irisnet/irishub/simapp"
-	"github.com/stretchr/testify/suite"
-	abci "github.com/tendermint/tendermint/abci/types"
 )
 
 var DefaultToken = token.FungibleToken{

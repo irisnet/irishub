@@ -1,9 +1,11 @@
 package types
 
 import (
+	"fmt"
 	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 var (
@@ -73,27 +75,27 @@ func (msg MsgSwapOrder) Route() string { return RouterKey }
 func (msg MsgSwapOrder) Type() string { return TypeMsgSwapOrder }
 
 // ValidateBasic implements Msg.
-func (msg MsgSwapOrder) ValidateBasic() sdk.Error {
+func (msg MsgSwapOrder) ValidateBasic() error {
 	if !(msg.Input.Coin.IsValid() && msg.Input.Coin.IsPositive()) {
-		return sdk.ErrInvalidCoins("input coin is invalid: " + msg.Input.Coin.String())
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, fmt.Sprintf("input coin is invalid: %s", msg.Input.Coin.String()))
 	}
 	if strings.HasPrefix(msg.Input.Coin.Denom, FormatUniABSPrefix) {
-		return sdk.ErrInvalidCoins("unsupported input coin type: " + msg.Input.Coin.String())
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, fmt.Sprintf("unsupported input coin type: %s", msg.Input.Coin.String()))
 	}
 	if !(msg.Output.Coin.IsValid() && msg.Output.Coin.IsPositive()) {
-		return sdk.ErrInvalidCoins("output coin is invalid: " + msg.Output.Coin.String())
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, fmt.Sprintf("output coin is invalid: %s", msg.Output.Coin.String()))
 	}
 	if strings.HasPrefix(msg.Output.Coin.Denom, FormatUniABSPrefix) {
-		return sdk.ErrInvalidCoins("unsupported output coin type: " + msg.Output.Coin.String())
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, fmt.Sprintf("unsupported output coin type: %s", msg.Output.Coin.String()))
 	}
 	if msg.Input.Coin.Denom == msg.Output.Coin.Denom {
-		return ErrEqualDenom("")
+		return ErrEqualDenom
 	}
 	if msg.Deadline <= 0 {
-		return ErrInvalidDeadline("deadline for MsgSwapOrder not initialized")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, fmt.Sprintf("deadline %d must be greater than 0", msg.Deadline))
 	}
 	if msg.Input.Address.Empty() {
-		return sdk.ErrInvalidAddress("invalid input address")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "input address missing")
 	}
 	return nil
 }
@@ -145,27 +147,27 @@ func (msg MsgAddLiquidity) Route() string { return RouterKey }
 func (msg MsgAddLiquidity) Type() string { return TypeMsgAddLiquidity }
 
 // ValidateBasic implements Msg.
-func (msg MsgAddLiquidity) ValidateBasic() sdk.Error {
+func (msg MsgAddLiquidity) ValidateBasic() error {
 	if !(msg.MaxToken.IsValid() && msg.MaxToken.IsPositive()) {
-		return sdk.ErrInvalidCoins("max token is invalid: " + msg.MaxToken.String())
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, fmt.Sprintf("max token is invalid: %s", msg.MaxToken.String()))
 	}
 	if msg.MaxToken.Denom == StandardDenom {
-		return sdk.ErrInvalidCoins("max token must not be native token")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, fmt.Sprintf("max token must not be standard token: %s", StandardDenom))
 	}
 	if strings.HasPrefix(msg.MaxToken.Denom, FormatUniABSPrefix) {
-		return sdk.ErrInvalidCoins("max token must be non-liquidity token")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "max token must be non-liquidity token")
 	}
 	if !msg.ExactStandardAmt.IsPositive() {
-		return ErrNotPositive("standard token amount must be positive")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "standard token amount must be positive")
 	}
 	if msg.MinLiquidity.IsNegative() {
-		return ErrNotPositive("minimum liquidity can not be negative")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "minimum liquidity can not be negative")
 	}
 	if msg.Deadline <= 0 {
-		return ErrInvalidDeadline("deadline for MsgAddLiquidity not initialized")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, fmt.Sprintf("deadline %d must be greater than 0", msg.Deadline))
 	}
 	if msg.Sender.Empty() {
-		return sdk.ErrInvalidAddress("invalid sender address")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "sender address missing")
 	}
 	return nil
 }
@@ -217,24 +219,24 @@ func (msg MsgRemoveLiquidity) Route() string { return RouterKey }
 func (msg MsgRemoveLiquidity) Type() string { return TypeMsgRemoveLiquidity }
 
 // ValidateBasic implements Msg.
-func (msg MsgRemoveLiquidity) ValidateBasic() sdk.Error {
+func (msg MsgRemoveLiquidity) ValidateBasic() error {
 	if msg.MinToken.IsNegative() {
-		return sdk.ErrInvalidCoins("minimum token amount can not be negative")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, "minimum token amount can not be negative")
 	}
 	if !msg.WithdrawLiquidity.IsValid() || !msg.WithdrawLiquidity.IsPositive() {
-		return ErrNotPositive("withdraw liquidity is not valid: " + msg.WithdrawLiquidity.String())
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, fmt.Sprintf("withdraw liquidity %s is not valid", msg.WithdrawLiquidity.String()))
 	}
 	if err := CheckUniDenom(msg.WithdrawLiquidity.Denom); err != nil {
 		return err
 	}
 	if msg.MinStandardAmt.IsNegative() {
-		return ErrNotPositive("minimum standard token amount can not be negative")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, fmt.Sprintf("minimum standard token amount %s can not be negative", msg.MinStandardAmt.String()))
 	}
 	if msg.Deadline <= 0 {
-		return ErrInvalidDeadline("deadline for MsgRemoveLiquidity not initialized")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, fmt.Sprintf("deadline %d must be greater than 0", msg.Deadline))
 	}
 	if msg.Sender.Empty() {
-		return sdk.ErrInvalidAddress("invalid sender address")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "sender address missing")
 	}
 	return nil
 }

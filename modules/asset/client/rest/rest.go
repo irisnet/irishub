@@ -3,6 +3,7 @@ package rest
 import (
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/gorilla/mux"
+
 	token "github.com/irisnet/irishub/modules/asset/01-token"
 )
 

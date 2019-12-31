@@ -4,6 +4,7 @@ package simulation
 
 import (
 	"github.com/cosmos/cosmos-sdk/types/module"
+
 	token "github.com/irisnet/irishub/modules/asset/01-token"
 )
 

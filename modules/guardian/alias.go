@@ -11,16 +11,6 @@ import (
 )
 
 const (
-	DefaultCodespace            = types.DefaultCodespace
-	CodeInvalidOperator         = types.CodeInvalidOperator
-	CodeProfilerExists          = types.CodeProfilerExists
-	CodeProfilerNotExists       = types.CodeProfilerNotExists
-	CodeTrusteeExists           = types.CodeTrusteeExists
-	CodeTrusteeNotExists        = types.CodeTrusteeNotExists
-	CodeInvalidDescription      = types.CodeInvalidDescription
-	CodeDeleteGenesisProfiler   = types.CodeDeleteGenesisProfiler
-	CodeDeleteGenesisTrustee    = types.CodeDeleteGenesisTrustee
-	CodeInvalidGuardian         = types.CodeInvalidGuardian
 	EventTypeAddProfiler        = types.EventTypeAddProfiler
 	EventTypeAddTrustee         = types.EventTypeAddTrustee
 	EventTypeDeleteProfiler     = types.EventTypeDeleteProfiler
@@ -49,14 +39,11 @@ var (
 	NewKeeper                = keeper.NewKeeper
 	NewQuerier               = keeper.NewQuerier
 	RegisterCodec            = types.RegisterCodec
-	ErrInvalidOperator       = types.ErrInvalidOperator
-	ErrProfilerNotExists     = types.ErrProfilerNotExists
+	ErrUnknownOperator       = types.ErrUnknownOperator
+	ErrUnknownProfiler       = types.ErrUnknownProfiler
+	ErrUnknownTrustee        = types.ErrUnknownTrustee
 	ErrDeleteGenesisProfiler = types.ErrDeleteGenesisProfiler
-	ErrProfilerExists        = types.ErrProfilerExists
-	ErrTrusteeExists         = types.ErrTrusteeExists
-	ErrTrusteeNotExists      = types.ErrTrusteeNotExists
 	ErrDeleteGenesisTrustee  = types.ErrDeleteGenesisTrustee
-	ErrInvalidDescription    = types.ErrInvalidDescription
 	NewGenesisState          = types.NewGenesisState
 	DefaultGenesisState      = types.DefaultGenesisState
 	ProfilerKey              = types.ProfilerKey

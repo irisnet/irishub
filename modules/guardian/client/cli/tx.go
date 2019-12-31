@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"bufio"
 	"fmt"
 
 	"github.com/spf13/cobra"
@@ -8,6 +9,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/context"
+	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
@@ -25,7 +27,7 @@ func GetTxCmd(cdc *codec.Codec) *cobra.Command {
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
 	}
-	txCmd.AddCommand(client.PostCommands(
+	txCmd.AddCommand(flags.PostCommands(
 		GetCmdCreateProfiler(cdc),
 		GetCmdDeleteProfiler(cdc),
 		GetCmdCreateTrustee(cdc),
@@ -42,8 +44,9 @@ func GetCmdCreateProfiler(cdc *codec.Codec) *cobra.Command {
 		Example: "iriscli tx guardian add-profiler --chain-id=<chain-id> --from=<key-name> --fees=0.3iris " +
 			"--address=<added address> --description=<name>",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			inBuf := bufio.NewReader(cmd.InOrStdin())
+			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
-			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
 
 			fromAddr := cliCtx.GetFromAddress()
 
@@ -56,16 +59,13 @@ func GetCmdCreateProfiler(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 			description := viper.GetString(FlagDescription)
-			if len(description) == 0 {
-				return fmt.Errorf("must use --description flag")
-			}
 			msg := types.NewMsgAddProfiler(description, pAddr, fromAddr)
 			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
 		},
 	}
 	cmd.Flags().AddFlagSet(FsAddGuardian)
-	cmd.MarkFlagRequired(FlagAddress)
-	cmd.MarkFlagRequired(FlagDescription)
+	_ = cmd.MarkFlagRequired(FlagAddress)
+	_ = cmd.MarkFlagRequired(FlagDescription)
 	return cmd
 }
 
@@ -77,13 +77,12 @@ func GetCmdDeleteProfiler(cdc *codec.Codec) *cobra.Command {
 		Example: "iriscli tx guardian delete-profiler --chain-id=<chain-id> --from=<key-name> --fees=0.3iris " +
 			"--address=<deleted address>",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			inBuf := bufio.NewReader(cmd.InOrStdin())
+			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
-			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
+
 			fromAddr := cliCtx.GetFromAddress()
 			paStr := viper.GetString(FlagAddress)
-			if len(paStr) == 0 {
-				return fmt.Errorf("must use --address flag")
-			}
 			pAddr, err := sdk.AccAddressFromBech32(paStr)
 			if err != nil {
 				return err
@@ -93,7 +92,7 @@ func GetCmdDeleteProfiler(cdc *codec.Codec) *cobra.Command {
 		},
 	}
 	cmd.Flags().AddFlagSet(FsDeleteGuardian)
-	cmd.MarkFlagRequired(FlagAddress)
+	_ = cmd.MarkFlagRequired(FlagAddress)
 	return cmd
 }
 
@@ -105,8 +104,10 @@ func GetCmdCreateTrustee(cdc *codec.Codec) *cobra.Command {
 		Example: "iriscli tx guardian add-trustee --chain-id=<chain-id> --from=<key-name> --fees=0.3iris " +
 			"--address=<added address> --description=<name>",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			inBuf := bufio.NewReader(cmd.InOrStdin())
+			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
-			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
+
 			fromAddr := cliCtx.GetFromAddress()
 			taStr := viper.GetString(FlagAddress)
 			if len(taStr) == 0 {
@@ -117,14 +118,12 @@ func GetCmdCreateTrustee(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 			description := viper.GetString(FlagDescription)
-			if len(description) == 0 {
-				return fmt.Errorf("must use --description flag")
-			}
 			msg := types.NewMsgAddTrustee(description, tAddr, fromAddr)
 			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
 		},
 	}
 	cmd.Flags().AddFlagSet(FsAddGuardian)
+	_ = cmd.MarkFlagRequired(FlagDescription)
 	return cmd
 }
 
@@ -136,13 +135,12 @@ func GetCmdDeleteTrustee(cdc *codec.Codec) *cobra.Command {
 		Example: "iriscli tx guardian delete-trustee --chain-id=<chain-id> --from=<key-name> --fees=0.3iris " +
 			"--address=<deleted address>",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			inBuf := bufio.NewReader(cmd.InOrStdin())
+			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
-			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
+
 			fromAddr := cliCtx.GetFromAddress()
 			taStr := viper.GetString(FlagAddress)
-			if len(taStr) == 0 {
-				return fmt.Errorf("must use --address flag")
-			}
 			tAddr, err := sdk.AccAddressFromBech32(taStr)
 			if err != nil {
 				return err
@@ -152,5 +150,6 @@ func GetCmdDeleteTrustee(cdc *codec.Codec) *cobra.Command {
 		},
 	}
 	cmd.Flags().AddFlagSet(FsDeleteGuardian)
+	_ = cmd.MarkFlagRequired(FlagAddress)
 	return cmd
 }

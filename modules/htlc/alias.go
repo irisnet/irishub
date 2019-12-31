@@ -11,15 +11,6 @@ import (
 )
 
 const (
-	DefaultCodespace                   = types.DefaultCodespace
-	CodeInvalidAddress                 = types.CodeInvalidAddress
-	CodeInvalidAmount                  = types.CodeInvalidAmount
-	CodeInvalidHashLock                = types.CodeInvalidHashLock
-	CodeHashLockAlreadyExists          = types.CodeHashLockAlreadyExists
-	CodeInvalidTimeLock                = types.CodeInvalidTimeLock
-	CodeInvalidSecret                  = types.CodeInvalidSecret
-	CodeStateIsNotOpen                 = types.CodeStateIsNotOpen
-	CodeStateIsNotExpired              = types.CodeStateIsNotExpired
 	EventTypeCreateHTLC                = types.EventTypeCreateHTLC
 	EventTypeClaimHTLC                 = types.EventTypeClaimHTLC
 	EventTypeRefundHTLC                = types.EventTypeRefundHTLC
@@ -52,13 +43,10 @@ const (
 var (
 	// functions aliases
 	RegisterCodec              = types.RegisterCodec
-	ErrHTLCNotExists           = types.ErrHTLCNotExists
-	ErrInvalidAddress          = types.ErrInvalidAddress
-	ErrInvalidAmount           = types.ErrInvalidAmount
+	ErrUnknownHTLC             = types.ErrUnknownHTLC
 	ErrInvalidHashLock         = types.ErrInvalidHashLock
-	ErrHashLockAlreadyExists   = types.ErrHashLockAlreadyExists
-	ErrInvalidTimeLock         = types.ErrInvalidTimeLock
 	ErrInvalidSecret           = types.ErrInvalidSecret
+	ErrHashLockAlreadyExists   = types.ErrHashLockAlreadyExists
 	ErrStateIsNotOpen          = types.ErrStateIsNotOpen
 	ErrStateIsNotExpired       = types.ErrStateIsNotExpired
 	DefaultGenesisState        = types.DefaultGenesisState

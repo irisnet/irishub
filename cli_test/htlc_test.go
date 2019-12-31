@@ -7,7 +7,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/keys"
 	"github.com/cosmos/cosmos-sdk/tests"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/supply"
@@ -48,7 +48,7 @@ func TestIrisCLIHTLC(t *testing.T) {
 	stateExpired := "expired"
 
 	// create an htlc
-	spStr := fmt.Sprintf("%s tx htlc create %v", f.IriscliBinary, flags)
+	spStr := fmt.Sprintf("%s tx htlc create %v --keyring-backend=test", f.IriscliBinary, flags)
 	spStr += fmt.Sprintf(" --from=%s", "foo")
 	spStr += fmt.Sprintf(" --to=%s", barAddr)
 	spStr += fmt.Sprintf(" --receiver-on-other-chain=%s", receiverOnOtherChain)
@@ -59,7 +59,7 @@ func TestIrisCLIHTLC(t *testing.T) {
 	spStr += fmt.Sprintf(" --fees=%s", "3000"+sdk.DefaultBondDenom)
 	spStr += " -y"
 
-	require.True(t, executeWrite(t, spStr, client.DefaultKeyPass))
+	require.True(t, executeWrite(t, spStr, keys.DefaultKeyPass))
 	tests.WaitForNextNBlocksTM(2, f.Port)
 
 	tmpHTLC := executeGetHTLC(t, fmt.Sprintf("%s query htlc htlc %s --output=json %v", f.IriscliBinary, strings.ToLower(strings.TrimSpace(hashLock)), flags))
@@ -78,14 +78,14 @@ func TestIrisCLIHTLC(t *testing.T) {
 	require.Equal(t, "1000", htlcCoin)
 
 	// claim an htlc
-	spStr = fmt.Sprintf("%s tx htlc claim %v", f.IriscliBinary, flags)
+	spStr = fmt.Sprintf("%s tx htlc claim %v --keyring-backend=test", f.IriscliBinary, flags)
 	spStr += fmt.Sprintf(" --from=%s", "foo")
 	spStr += fmt.Sprintf(" --hash-lock=%s", hashLock)
 	spStr += fmt.Sprintf(" --secret=%s", secretHex)
 	spStr += fmt.Sprintf(" --fees=%s", "3000"+sdk.DefaultBondDenom)
 	spStr += " -y"
 
-	require.True(t, executeWrite(t, spStr, client.DefaultKeyPass))
+	require.True(t, executeWrite(t, spStr, keys.DefaultKeyPass))
 	tests.WaitForNextNBlocksTM(2, f.Port)
 
 	tmpHTLC = executeGetHTLC(t, fmt.Sprintf("%s query htlc htlc %s --output=json %v", f.IriscliBinary, strings.ToLower(strings.TrimSpace(hashLock)), flags))
@@ -104,7 +104,7 @@ func TestIrisCLIHTLC(t *testing.T) {
 	timeLock = uint64(50)
 
 	// create an htlc
-	spStr = fmt.Sprintf("%s tx htlc create %v", f.IriscliBinary, flags)
+	spStr = fmt.Sprintf("%s tx htlc create %v --keyring-backend=test", f.IriscliBinary, flags)
 	spStr += fmt.Sprintf(" --from=%s", "foo")
 	spStr += fmt.Sprintf(" --to=%s", barAddr)
 	spStr += fmt.Sprintf(" --receiver-on-other-chain=%s", receiverOnOtherChain)
@@ -115,7 +115,7 @@ func TestIrisCLIHTLC(t *testing.T) {
 	spStr += fmt.Sprintf(" --fees=%s", "3000"+sdk.DefaultBondDenom)
 	spStr += " -y"
 
-	require.True(t, executeWrite(t, spStr, client.DefaultKeyPass))
+	require.True(t, executeWrite(t, spStr, keys.DefaultKeyPass))
 	tests.WaitForNextNBlocksTM(2, f.Port)
 
 	tmpHTLC = executeGetHTLC(t, fmt.Sprintf("%s query htlc htlc %s --output=json %v", f.IriscliBinary, strings.ToLower(strings.TrimSpace(hashLock)), flags))
@@ -132,13 +132,13 @@ func TestIrisCLIHTLC(t *testing.T) {
 	require.Equal(t, "1000", htlcCoin)
 
 	// refund an htlc and expect failure
-	spStr = fmt.Sprintf("%s tx htlc refund %v", f.IriscliBinary, flags)
+	spStr = fmt.Sprintf("%s tx htlc refund %v --keyring-backend=test", f.IriscliBinary, flags)
 	spStr += fmt.Sprintf(" --from=%s", "foo")
 	spStr += fmt.Sprintf(" --hash-lock=%s", hashLock)
 	spStr += fmt.Sprintf(" --fees=%s", "3000"+sdk.DefaultBondDenom)
 	spStr += " -y"
 
-	require.True(t, executeWrite(t, spStr, client.DefaultKeyPass))
+	require.True(t, executeWrite(t, spStr, keys.DefaultKeyPass))
 	tests.WaitForNextNBlocksTM(2, f.Port)
 
 	tmpHTLC = executeGetHTLC(t, fmt.Sprintf("%s query htlc htlc %s --output=json %v", f.IriscliBinary, strings.ToLower(strings.TrimSpace(hashLock)), flags))
@@ -150,7 +150,7 @@ func TestIrisCLIHTLC(t *testing.T) {
 	tmpHTLC = executeGetHTLC(t, fmt.Sprintf("%s query htlc htlc %s --output=json %v", f.IriscliBinary, strings.ToLower(strings.TrimSpace(hashLock)), flags))
 	require.Equal(t, stateExpired, tmpHTLC.State.String())
 
-	require.True(t, executeWrite(t, spStr, client.DefaultKeyPass))
+	require.True(t, executeWrite(t, spStr, keys.DefaultKeyPass))
 	tests.WaitForNextNBlocksTM(2, f.Port)
 
 	htlcAcc = f.QueryAccount(htlcAddr, flags)

@@ -99,7 +99,7 @@ paths:
                         example: 0
                   network:
                     type: string
-                    example: gaia-2
+                    example: irishub
                   channels:
                     type: string
                   listen_addr:

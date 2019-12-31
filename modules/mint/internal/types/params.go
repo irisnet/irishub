@@ -1,9 +1,12 @@
 package types
 
 import (
+	"errors"
 	"fmt"
+	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/params"
 )
 
@@ -36,8 +39,8 @@ type Params struct {
 // ParamSetPairs implements params.ParamSet
 func (p *Params) ParamSetPairs() params.ParamSetPairs {
 	return params.ParamSetPairs{
-		{Key: KeyInflation, Value: &p.Inflation},
-		{Key: KeyMintDenom, Value: &p.MintDenom},
+		params.NewParamSetPair(KeyInflation, &p.Inflation, validateInflation),
+		params.NewParamSetPair(KeyMintDenom, &p.MintDenom, validateMintDenom),
 	}
 }
 
@@ -57,10 +60,39 @@ func DefaultParams() Params {
 // Validate returns err if the Params is invalid
 func (p Params) Validate() error {
 	if p.Inflation.GT(sdk.NewDecWithPrec(2, 1)) || p.Inflation.LT(sdk.ZeroDec()) {
-		return sdk.NewError(params.DefaultCodespace, CodeInvalidMintInflation, fmt.Sprintf("Mint Inflation [%s] should be between [0, 0.2] ", p.Inflation.String()))
+		return sdkerrors.Wrapf(ErrInvalidMintInflation, "Mint inflation [%s] should be between [0, 0.2] ", p.Inflation.String())
 	}
 	if len(p.MintDenom) == 0 {
-		return sdk.NewError(params.DefaultCodespace, CodeInvalidMintDenom, fmt.Sprintf("Mint MintDenom [%s] should not be empty", p.MintDenom))
+		return sdkerrors.Wrapf(ErrInvalidMintDenom, "Mint denom [%s] should not be empty", p.MintDenom)
 	}
+	return nil
+}
+
+func validateInflation(i interface{}) error {
+	v, ok := i.(sdk.Dec)
+	if !ok {
+		return fmt.Errorf("invalid parameter type: %T", i)
+	}
+
+	if v.GT(sdk.NewDecWithPrec(2, 1)) || v.LT(sdk.ZeroDec()) {
+		return fmt.Errorf("Mint inflation [%s] should be between [0, 0.2] ", v.String())
+	}
+
+	return nil
+}
+
+func validateMintDenom(i interface{}) error {
+	v, ok := i.(string)
+	if !ok {
+		return fmt.Errorf("invalid parameter type: %T", i)
+	}
+
+	if strings.TrimSpace(v) == "" {
+		return errors.New("mint denom cannot be blank")
+	}
+	if err := sdk.ValidateDenom(v); err != nil {
+		return err
+	}
+
 	return nil
 }

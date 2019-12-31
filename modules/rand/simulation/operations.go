@@ -32,13 +32,14 @@ func SimulateMsgRequestRand(ak types.AccountKeeper, k keeper.Keeper) simulation.
 		tx := helpers.GenTx(
 			[]sdk.Msg{msg},
 			fees,
+			helpers.DefaultGenTxGas,
 			chainID,
 			[]uint64{account.GetAccountNumber()},
 			[]uint64{account.GetSequence()},
 			simAccount.PrivKey,
 		)
 
-		if res := app.Deliver(tx); !res.IsOK() {
+		if _, res, err := app.Deliver(tx); err != nil {
 			return simulation.NoOpMsg(types.ModuleName), nil, errors.New(res.Log)
 		}
 

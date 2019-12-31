@@ -27,7 +27,7 @@ func GenInflation(r *rand.Rand) sdk.Dec {
 // RandomizedGenState generates a random GenesisState for mint
 func RandomizedGenState(simState *module.SimulationState) {
 	// minter
-	var inflation sdk.Dec
+	var inflation = sdk.ZeroDec()
 	simState.AppParams.GetOrGenerate(
 		simState.Cdc, Inflation, &inflation, simState.Rand,
 		func(r *rand.Rand) { inflation = GenInflation(r) },

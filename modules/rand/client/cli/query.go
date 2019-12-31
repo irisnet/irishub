@@ -9,6 +9,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/context"
+	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/codec"
 
 	"github.com/irisnet/irishub/modules/rand/internal/types"
@@ -24,7 +25,7 @@ func GetQueryCmd(cdc *codec.Codec) *cobra.Command {
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
 	}
-	randQueryCmd.AddCommand(client.GetCommands(
+	randQueryCmd.AddCommand(flags.GetCommands(
 		GetCmdQueryRand(cdc),
 		GetCmdQueryRandRequestQueue(cdc),
 	)...)

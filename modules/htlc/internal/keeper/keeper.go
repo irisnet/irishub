@@ -9,6 +9,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 	"github.com/irisnet/irishub/modules/htlc/internal/types"
 )
@@ -18,23 +19,19 @@ type Keeper struct {
 	storeKey sdk.StoreKey
 	cdc      *codec.Codec
 	sk       types.SupplyKeeper
-
-	// codespace
-	codespace sdk.CodespaceType
 }
 
 // NewKeeper returns a new HTLC keeper
-func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, sk types.SupplyKeeper, codespace sdk.CodespaceType) Keeper {
+func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, sk types.SupplyKeeper) Keeper {
 	// ensure htlc module account is set
 	if addr := sk.GetModuleAddress(types.ModuleName); addr == nil {
 		panic(fmt.Sprintf("%s module account has not been set", types.ModuleName))
 	}
 
 	return Keeper{
-		storeKey:  key,
-		cdc:       cdc,
-		sk:        sk,
-		codespace: codespace,
+		storeKey: key,
+		cdc:      cdc,
+		sk:       sk,
 	}
 }
 
@@ -43,21 +40,16 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 	return ctx.Logger().With("module", fmt.Sprintf("%s", types.ModuleName))
 }
 
-// Codespace returns the codespace
-func (k Keeper) Codespace() sdk.CodespaceType {
-	return k.codespace
-}
-
 // GetCdc returns the cdc
 func (k Keeper) GetCdc() *codec.Codec {
 	return k.cdc
 }
 
 // CreateHTLC creates an HTLC
-func (k Keeper) CreateHTLC(ctx sdk.Context, htlc types.HTLC, hashLock types.HTLCHashLock) sdk.Error {
+func (k Keeper) CreateHTLC(ctx sdk.Context, htlc types.HTLC, hashLock types.HTLCHashLock) error {
 	// check if the hash lock already exists
 	if k.HasHashLock(ctx, hashLock) {
-		return types.ErrHashLockAlreadyExists(types.DefaultCodespace, fmt.Sprintf("the hash lock already exists: %s", hex.EncodeToString(hashLock)))
+		return sdkerrors.Wrap(types.ErrHashLockAlreadyExists, hex.EncodeToString(hashLock))
 	}
 
 	// transfer the specified tokens to HTLC module address
@@ -75,21 +67,21 @@ func (k Keeper) CreateHTLC(ctx sdk.Context, htlc types.HTLC, hashLock types.HTLC
 }
 
 // ClaimHTLC claim an HTLC
-func (k Keeper) ClaimHTLC(ctx sdk.Context, hashLock types.HTLCHashLock, secret types.HTLCSecret) (string, string, sdk.Error) {
+func (k Keeper) ClaimHTLC(ctx sdk.Context, hashLock types.HTLCHashLock, secret types.HTLCSecret) (string, string, error) {
 	// get the HTLC
 	htlc, err := k.GetHTLC(ctx, hashLock)
 	if err != nil {
-		return "", "", types.ErrHTLCNotExists(k.codespace, fmt.Sprintf("the HTLC is not exists"))
+		return "", "", types.ErrUnknownHTLC
 	}
 
 	// check if the HTLC is open
 	if htlc.State != types.OPEN {
-		return "", "", types.ErrStateIsNotOpen(k.codespace, fmt.Sprintf("the HTLC is not open"))
+		return "", "", types.ErrStateIsNotOpen
 	}
 
 	// check if the secret matches with the hash lock
 	if !bytes.Equal(types.GetHashLock(secret, htlc.Timestamp), hashLock) {
-		return "", "", types.ErrInvalidSecret(k.codespace, fmt.Sprintf("invalid secret: %s", hex.EncodeToString(secret)))
+		return "", "", sdkerrors.Wrap(types.ErrInvalidSecret, hex.EncodeToString(secret))
 	}
 
 	// do the claim
@@ -109,7 +101,7 @@ func (k Keeper) ClaimHTLC(ctx sdk.Context, hashLock types.HTLCHashLock, secret t
 }
 
 // RefundHTLC refund an HTLC
-func (k Keeper) RefundHTLC(ctx sdk.Context, hashLock types.HTLCHashLock) (string, sdk.Error) {
+func (k Keeper) RefundHTLC(ctx sdk.Context, hashLock types.HTLCHashLock) (string, error) {
 	// get the HTLC
 	htlc, err := k.GetHTLC(ctx, hashLock)
 	if err != nil {
@@ -118,7 +110,7 @@ func (k Keeper) RefundHTLC(ctx sdk.Context, hashLock types.HTLCHashLock) (string
 
 	// check if the HTLC is expired
 	if htlc.State != types.EXPIRED {
-		return "", types.ErrStateIsNotOpen(k.codespace, fmt.Sprintf("the htlc is not expired"))
+		return "", types.ErrStateIsNotExpired
 	}
 
 	// do the refund
@@ -152,12 +144,12 @@ func (k Keeper) DeleteHTLC(ctx sdk.Context, hashLock types.HTLCHashLock) {
 }
 
 // GetHTLC retrieves the HTLC by the specified hash lock
-func (k Keeper) GetHTLC(ctx sdk.Context, hashLock types.HTLCHashLock) (types.HTLC, sdk.Error) {
+func (k Keeper) GetHTLC(ctx sdk.Context, hashLock types.HTLCHashLock) (types.HTLC, error) {
 	store := ctx.KVStore(k.storeKey)
 
 	bz := store.Get(KeyHTLC(hashLock))
 	if bz == nil {
-		return types.HTLC{}, types.ErrInvalidHashLock(k.codespace, fmt.Sprintf("invalid hash lock: %s", hex.EncodeToString(hashLock)))
+		return types.HTLC{}, sdkerrors.Wrap(types.ErrInvalidHashLock, hex.EncodeToString(hashLock))
 	}
 
 	var htlc types.HTLC

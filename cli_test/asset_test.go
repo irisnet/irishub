@@ -5,12 +5,14 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/stretchr/testify/require"
+
+	"github.com/cosmos/cosmos-sdk/client/keys"
 	"github.com/cosmos/cosmos-sdk/tests"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
 	"github.com/irisnet/irishub/app"
 	token "github.com/irisnet/irishub/modules/asset/01-token"
-	"github.com/stretchr/testify/require"
 )
 
 func TestIrisCLIIssueToken(t *testing.T) {
@@ -191,37 +193,37 @@ func (f *Fixtures) QueryAssetToken(symbol string, flags ...string) token.Fungibl
 // TxAssetIssueToken is iriscli tx asset token issue
 func (f *Fixtures) TxAssetIssueToken(from, symbol, name, minUnit string,
 	initialSupply int64, scale int, flags ...string) (bool, string, string) {
-	cmd := fmt.Sprintf("%s tx asset token issue %v --from=%s", f.IriscliBinary, f.Flags(), from)
+	cmd := fmt.Sprintf("%s tx asset token issue %v --keyring-backend=test --from=%s", f.IriscliBinary, f.Flags(), from)
 	cmd += fmt.Sprintf(" --symbol=%s --name=%s --scale=%d --min-unit=%s --initial-supply=%d ",
 		symbol, name, scale, minUnit, initialSupply)
-	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), client.DefaultKeyPass)
+	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), keys.DefaultKeyPass)
 }
 
 // TxAssetEditToken is iriscli tx asset token edit
 func (f *Fixtures) TxAssetEditToken(from, symbol, name string, maxSupply int64,
 	mintable bool, flags ...string) (bool, string, string) {
-	cmd := fmt.Sprintf("%s tx asset token edit %s %v --from=%s", f.IriscliBinary, symbol, f.Flags(), from)
+	cmd := fmt.Sprintf("%s tx asset token edit %s %v --keyring-backend=test --from=%s", f.IriscliBinary, symbol, f.Flags(), from)
 	cmd += fmt.Sprintf(" --name=%s --max-supply=%d --mintable=%v",
 		name, maxSupply, mintable)
-	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), client.DefaultKeyPass)
+	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), keys.DefaultKeyPass)
 }
 
 // TxAssetMintToken is iriscli tx asset token mint
 func (f *Fixtures) TxAssetMintToken(from, symbol string, amount int64, to sdk.AccAddress, flags ...string) (bool, string, string) {
-	cmd := fmt.Sprintf("%s tx asset token mint %v --from=%s", f.IriscliBinary, f.Flags(), from)
+	cmd := fmt.Sprintf("%s tx asset token mint %v --keyring-backend=test --from=%s", f.IriscliBinary, f.Flags(), from)
 	cmd += fmt.Sprintf(" %s --recipient=%s --amount=%d", symbol, to, amount)
-	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), client.DefaultKeyPass)
+	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), keys.DefaultKeyPass)
 }
 
 // TxAssetTransferToken is iriscli tx asset token transfer
 func (f *Fixtures) TxAssetTransferToken(from, symbol string, to sdk.AccAddress, flags ...string) (bool, string, string) {
-	cmd := fmt.Sprintf("%s tx asset token transfer %v --from=%s", f.IriscliBinary, f.Flags(), from)
+	cmd := fmt.Sprintf("%s tx asset token transfer %v --keyring-backend=test --from=%s", f.IriscliBinary, f.Flags(), from)
 	cmd += fmt.Sprintf(" %s --recipient=%s", symbol, to)
-	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), client.DefaultKeyPass)
+	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), keys.DefaultKeyPass)
 }
 
 // TxAssetTransferToken is iriscli tx asset token transfer
 func (f *Fixtures) TxAssetBurnToken(from, amount string, flags ...string) (bool, string, string) {
-	cmd := fmt.Sprintf("%s tx asset token burn %s %v --from=%s", f.IriscliBinary, amount, f.Flags(), from)
-	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), client.DefaultKeyPass)
+	cmd := fmt.Sprintf("%s tx asset token burn %s %v --keyring-backend=test --from=%s", f.IriscliBinary, amount, f.Flags(), from)
+	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), keys.DefaultKeyPass)
 }

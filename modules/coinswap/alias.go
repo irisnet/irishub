@@ -12,35 +12,27 @@ import (
 
 // exported constants
 const (
-	DefaultCodespace                 = types.DefaultCodespace
-	CodeReservePoolNotExists         = types.CodeReservePoolNotExists
-	CodeEqualDenom                   = types.CodeEqualDenom
-	CodeInvalidDeadline              = types.CodeInvalidDeadline
-	CodeNotPositive                  = types.CodeNotPositive
-	CodeConstraintNotMet             = types.CodeConstraintNotMet
-	CodeIllegalDenom                 = types.CodeIllegalDenom
-	CodeReservePoolInsufficientFunds = types.CodeReservePoolInsufficientFunds
-	EventTypeSwap                    = types.EventTypeSwap
-	EventTypeAddLiquidity            = types.EventTypeAddLiquidity
-	EventTypeRemoveLiquidity         = types.EventTypeRemoveLiquidity
-	AttributeValueCategory           = types.AttributeValueCategory
-	AttributeValueAmount             = types.AttributeValueAmount
-	AttributeValueSender             = types.AttributeValueSender
-	AttributeValueRecipient          = types.AttributeValueRecipient
-	AttributeValueIsBuyOrder         = types.AttributeValueIsBuyOrder
-	AttributeValueTokenPair          = types.AttributeValueTokenPair
-	ModuleName                       = types.ModuleName
-	RouterKey                        = types.RouterKey
-	StoreKey                         = types.StoreKey
-	QuerierRoute                     = types.QuerierRoute
-	MsgTypeAddLiquidity              = types.TypeMsgAddLiquidity
-	MsgTypeRemoveLiquidity           = types.TypeMsgRemoveLiquidity
-	MsgTypeSwapOrder                 = types.TypeMsgSwapOrder
-	FormatUniABSPrefix               = types.FormatUniABSPrefix
-	FormatUniDenom                   = types.FormatUniDenom
-	DefaultParamspace                = types.DefaultParamspace
-	StandardDenom                    = types.StandardDenom
-	QueryLiquidity                   = types.QueryLiquidity
+	EventTypeSwap            = types.EventTypeSwap
+	EventTypeAddLiquidity    = types.EventTypeAddLiquidity
+	EventTypeRemoveLiquidity = types.EventTypeRemoveLiquidity
+	AttributeValueCategory   = types.AttributeValueCategory
+	AttributeValueAmount     = types.AttributeValueAmount
+	AttributeValueSender     = types.AttributeValueSender
+	AttributeValueRecipient  = types.AttributeValueRecipient
+	AttributeValueIsBuyOrder = types.AttributeValueIsBuyOrder
+	AttributeValueTokenPair  = types.AttributeValueTokenPair
+	ModuleName               = types.ModuleName
+	RouterKey                = types.RouterKey
+	StoreKey                 = types.StoreKey
+	QuerierRoute             = types.QuerierRoute
+	MsgTypeAddLiquidity      = types.TypeMsgAddLiquidity
+	MsgTypeRemoveLiquidity   = types.TypeMsgRemoveLiquidity
+	MsgTypeSwapOrder         = types.TypeMsgSwapOrder
+	FormatUniABSPrefix       = types.FormatUniABSPrefix
+	FormatUniDenom           = types.FormatUniDenom
+	DefaultParamspace        = types.DefaultParamspace
+	StandardDenom            = types.StandardDenom
+	QueryLiquidity           = types.QueryLiquidity
 )
 
 var (
@@ -52,10 +44,7 @@ var (
 	GetReservePoolAddr       = types.GetReservePoolAddr
 	RegisterCodec            = types.RegisterCodec
 	ErrReservePoolNotExists  = types.ErrReservePoolNotExists
-	ErrEqualDenom            = types.ErrEqualDenom
-	ErrIllegalDenom          = types.ErrIllegalDenom
 	ErrInvalidDeadline       = types.ErrInvalidDeadline
-	ErrNotPositive           = types.ErrNotPositive
 	ErrConstraintNotMet      = types.ErrConstraintNotMet
 	ErrInsufficientFunds     = types.ErrInsufficientFunds
 	NewMsgSwapOrder          = types.NewMsgSwapOrder
