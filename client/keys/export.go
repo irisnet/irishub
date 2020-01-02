@@ -66,8 +66,14 @@ func runExportCmd(cmd *cobra.Command, args []string) error {
 	var jsonString []byte
 	if viper.GetBool(flags.FlagIndentResponse) {
 		jsonString, err = json.MarshalIndent(encryptedKeyJSON, "", "  ")
+		if err != nil {
+			return err
+		}
 	} else {
 		jsonString, err = json.Marshal(encryptedKeyJSON)
+		if err != nil {
+			return err
+		}
 	}
 
 	if viper.GetString(flagOutfile) == "" {

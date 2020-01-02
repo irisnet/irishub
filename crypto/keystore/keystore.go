@@ -67,7 +67,7 @@ func decryptKey(keyProtected *EncryptedKeyJSON, auth string) ([]byte, error) {
 	bufferValue := make([]byte, len(cipherText)+16)
 	copy(bufferValue[0:16], derivedKey[16:32])
 	copy(bufferValue[16:], cipherText[:])
-	calculatedMAC := sha256.Sum256([]byte((bufferValue)))
+	calculatedMAC := sha256.Sum256(bufferValue)
 	if !bytes.Equal(calculatedMAC[:], mac) {
 		return nil, ErrDecrypt
 	}
