@@ -47,17 +47,12 @@ func runExportCmd(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	decryptPassword, err := input.GetPassword("Enter passphrase to decrypt your key:", buf)
-	if err != nil {
-		return err
-	}
-
 	encryptPassword, err := input.GetPassword("Enter passphrase to encrypt the exported key:", buf)
 	if err != nil {
 		return err
 	}
 
-	privKey, err := kb.ExportPrivateKeyObject(args[0], decryptPassword)
+	privKey, err := kb.ExportPrivateKeyObject(args[0], "")
 	if err != nil {
 		return err
 	}
