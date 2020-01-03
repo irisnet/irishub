@@ -2,14 +2,15 @@ package cli
 
 import (
 	"bufio"
+	"bytes"
 	"encoding/hex"
+	"encoding/json"
+	"errors"
 	"fmt"
-	"strings"
+	"io/ioutil"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-
-	cmn "github.com/tendermint/tendermint/libs/common"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/context"
@@ -22,7 +23,7 @@ import (
 	"github.com/irisnet/irishub/modules/service/internal/types"
 )
 
-// GetTxCmd returns the transaction commands for the service module.
+// GetTxCmd returns the transaction commands for this module.
 func GetTxCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
 	serviceTxCmd := &cobra.Command{
 		Use:                        types.ModuleName,
@@ -33,7 +34,7 @@ func GetTxCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
 	}
 
 	serviceTxCmd.AddCommand(flags.PostCommands(
-		GetCmdSvcDef(cdc),
+		GetCmdDefineService(cdc),
 		GetCmdSvcBind(cdc),
 		GetCmdSvcBindUpdate(cdc),
 		GetCmdSvcDisable(cdc),
@@ -49,44 +50,47 @@ func GetTxCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
 	return serviceTxCmd
 }
 
-// GetCmdSvcDef implements the create service definition command.
-func GetCmdSvcDef(cdc *codec.Codec) *cobra.Command {
+// GetCmdDefineService implements defining a service command.
+func GetCmdDefineService(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "define",
-		Short: "Create a new service definition",
+		Short: "Define a new service",
 		Example: "iriscli tx service define --chain-id=<chain-id> --from=<key-name> --fee=0.3iris " +
-			"--service-name=<service name> --service-description=<service description> --author-description=<author description> " +
-			"--tags=tag1,tag2 --idl-content=<interface description content> --file=test.proto",
+			"--name=<service name> --description=<service description> --author-description=<author description> " +
+			"--tags=tag1,tag2 --schema=<schema content or path/to/schema.json>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			inBuf := bufio.NewReader(cmd.InOrStdin())
 			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			name := viper.GetString(FlagServiceName)
-			description := viper.GetString(FlagServiceDescription)
+			author := cliCtx.GetFromAddress()
+			name := viper.GetString(FlagName)
+			description := viper.GetString(FlagDescription)
 			authorDescription := viper.GetString(FlagAuthorDescription)
 			tags := viper.GetStringSlice(FlagTags)
+			schema := viper.GetString(FlagSchema)
 
-			content := viper.GetString(FlagIDLContent)
-			if len(content) > 0 {
-				content = strings.Replace(content, `\n`, "\n", -1)
-			}
-
-			filePath := viper.GetString(FlagFile)
-			if len(filePath) > 0 {
-				contentBytes, err := cmn.ReadFile(filePath)
+			if !json.Valid([]byte(schema)) {
+				schemaContent, err := ioutil.ReadFile(schema)
 				if err != nil {
-					return err
+					return errors.New("neither JSON input nor path to .json file were provided")
 				}
-				content = string(contentBytes)
+
+				if !json.Valid(schemaContent) {
+					return errors.New(".json file content is invalid JSON")
+				}
+
+				schema = string(schemaContent)
 			}
 
-			fmt.Printf("idl condent: \n%s\n", content)
+			buf := bytes.NewBuffer([]byte{})
+			if err := json.Compact(buf, []byte(schema)); err != nil {
+				return errors.New("failed to compact the schema")
+			}
 
-			chainID := viper.GetString(flags.FlagChainID)
-			fromAddr := cliCtx.GetFromAddress()
+			fmt.Printf("schema content: \n%s\n", buf.String())
 
-			msg := types.NewMsgSvcDef(name, chainID, description, tags, fromAddr, authorDescription, content)
+			msg := types.NewMsgDefineService(name, description, tags, author, authorDescription, schema)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -95,8 +99,9 @@ func GetCmdSvcDef(cdc *codec.Codec) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().AddFlagSet(FsServiceDefinitionCreate)
-	cmd.MarkFlagRequired(FlagServiceName)
+	cmd.Flags().AddFlagSet(FsServiceDefine)
+	cmd.MarkFlagRequired(FlagName)
+	cmd.MarkFlagRequired(FlagSchema)
 
 	return cmd
 }

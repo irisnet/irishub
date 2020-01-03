@@ -6,51 +6,50 @@ import (
 )
 
 const (
-	FlagDefChainID         = "def-chain-id"
-	FlagServiceName        = "service-name"
-	FlagServiceDescription = "service-description"
-	FlagTags               = "tags"
-	FlagAuthorDescription  = "author-description"
-	FlagIDLContent         = "idl-content"
-	FlagFile               = "file"
-	FlagProvider           = "provider"
-	FlagBindChainID        = "bind-chain-id"
-	FlagBindType           = "bind-type"
-	FlagDeposit            = "deposit"
-	FlagPrices             = "prices"
-	FlagAvgRspTime         = "avg-rsp-time"
-	FlagUsableTime         = "usable-time"
-	FlagMethodID           = "method-id"
-	FlagServiceFee         = "service-fee"
-	FlagReqData            = "request-data"
-	FlagRespData           = "response-data"
-	FlagErrMsg             = "error-msg"
-	FlagProfiling          = "profiling"
-	FlagReqChainID         = "request-chain-id"
-	FlagReqID              = "request-id"
-	FlagDestAddress        = "dest-address"
-	FlagWithdrawAmount     = "withdraw-amount"
+	FlagDefChainID        = "def-chain-id"
+	FlagName              = "name"
+	FlagDescription       = "description"
+	FlagTags              = "tags"
+	FlagAuthorDescription = "author-description"
+	FlagSchema            = "schema"
+	FlagServiceName       = "service-name"
+	FlagProvider          = "provider"
+	FlagBindChainID       = "bind-chain-id"
+	FlagBindType          = "bind-type"
+	FlagDeposit           = "deposit"
+	FlagPrices            = "prices"
+	FlagAvgRspTime        = "avg-rsp-time"
+	FlagUsableTime        = "usable-time"
+	FlagMethodID          = "method-id"
+	FlagServiceFee        = "service-fee"
+	FlagReqData           = "request-data"
+	FlagRespData          = "response-data"
+	FlagErrMsg            = "error-msg"
+	FlagProfiling         = "profiling"
+	FlagReqChainID        = "request-chain-id"
+	FlagReqID             = "request-id"
+	FlagDestAddress       = "dest-address"
+	FlagWithdrawAmount    = "withdraw-amount"
 )
 
 // common flagsets to add to various functions
 var (
-	FsServiceDefinitionCreate = flag.NewFlagSet("", flag.ContinueOnError)
-	FsServiceBindingCreate    = flag.NewFlagSet("", flag.ContinueOnError)
-	FsServiceBindingUpdate    = flag.NewFlagSet("", flag.ContinueOnError)
-	FsServiceDefinition       = flag.NewFlagSet("", flag.ContinueOnError)
-	FsServiceBinding          = flag.NewFlagSet("", flag.ContinueOnError)
-	FsServiceRequest          = flag.NewFlagSet("", flag.ContinueOnError)
-	FsServiceResponse         = flag.NewFlagSet("", flag.ContinueOnError)
-	FsServiceWithdrawTax      = flag.NewFlagSet("", flag.ContinueOnError)
+	FsServiceDefine        = flag.NewFlagSet("", flag.ContinueOnError)
+	FsServiceBindingCreate = flag.NewFlagSet("", flag.ContinueOnError)
+	FsServiceBindingUpdate = flag.NewFlagSet("", flag.ContinueOnError)
+	FsServiceDefinition    = flag.NewFlagSet("", flag.ContinueOnError)
+	FsServiceBinding       = flag.NewFlagSet("", flag.ContinueOnError)
+	FsServiceRequest       = flag.NewFlagSet("", flag.ContinueOnError)
+	FsServiceResponse      = flag.NewFlagSet("", flag.ContinueOnError)
+	FsServiceWithdrawTax   = flag.NewFlagSet("", flag.ContinueOnError)
 )
 
 func init() {
-	FsServiceDefinitionCreate.String(FlagServiceName, "", "service name")
-	FsServiceDefinitionCreate.String(FlagServiceDescription, "", "service description")
-	FsServiceDefinitionCreate.StringSlice(FlagTags, []string{}, "service tags")
-	FsServiceDefinitionCreate.String(FlagAuthorDescription, "", "service author description")
-	FsServiceDefinitionCreate.String(FlagIDLContent, "", "content of service interface description language")
-	FsServiceDefinitionCreate.String(FlagFile, "", "path of file which contains service interface description language")
+	FsServiceDefine.String(FlagName, "", "service name")
+	FsServiceDefine.String(FlagDescription, "", "service description")
+	FsServiceDefine.StringSlice(FlagTags, []string{}, "service tags")
+	FsServiceDefine.String(FlagAuthorDescription, "", "service author description")
+	FsServiceDefine.String(FlagSchema, "", "interface schema content or path")
 	FsServiceDefinition.String(FlagDefChainID, "", "the ID of the blockchain defined of the service")
 	FsServiceDefinition.String(FlagServiceName, "", "service name")
 	FsServiceBindingCreate.String(FlagBindType, "", "type of binding, valid values can be Local and Global")
