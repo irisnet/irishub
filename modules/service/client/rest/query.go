@@ -32,7 +32,6 @@ func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router) {
 func queryDefinitionHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		defChainID := vars[RestDefChainID]
 		serviceName := vars[RestServiceName]
 
 		cliCtx, ok := rest.ParseQueryHeightOrReturnBadRequest(w, cliCtx, r)
@@ -41,7 +40,6 @@ func queryDefinitionHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		params := types.QueryDefinitionParams{
-			DefChainID:  defChainID,
 			ServiceName: serviceName,
 		}
 

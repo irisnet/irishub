@@ -16,8 +16,8 @@ import (
 )
 
 func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router) {
-	// create service definition
-	r.HandleFunc("/service/definitions", definitionPostHandlerFn(cliCtx)).Methods("POST")
+	// define service
+	r.HandleFunc("/service/definitions", defineServiceHandlerFn(cliCtx)).Methods("POST")
 	// create service bind
 	r.HandleFunc("/service/bindings", bindingAddHandlerFn(cliCtx)).Methods("POST")
 	// update service bind
@@ -39,9 +39,9 @@ func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router) {
 }
 
 // HTTP request handler to create service definition.
-func definitionPostHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
+func defineServiceHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req ServiceDefinitionReq
+		var req DefineServiceReq
 		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
 			return
 		}
@@ -51,13 +51,13 @@ func definitionPostHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		author, err := sdk.AccAddressFromBech32(req.AuthorAddr)
+		author, err := sdk.AccAddressFromBech32(req.Author)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		msg := types.NewMsgSvcDef(req.ServiceName, req.BaseReq.ChainID, req.ServiceDescription, req.Tags, author, req.AuthorDescription, req.IDLContent)
+		msg := types.NewMsgDefineService(req.ServiceName, req.ServiceDescription, req.Tags, author, req.AuthorDescription, req.Schema)
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
