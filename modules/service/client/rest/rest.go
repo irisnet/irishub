@@ -30,13 +30,13 @@ func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router) {
 
 // DefineServiceReq defines the properties of a service definition request's body
 type DefineServiceReq struct {
-	BaseReq            rest.BaseReq `json:"base_req" yaml:"base_req"`
-	ServiceName        string       `json:"service_name" yaml:"service_name"`               // Name of the service
-	ServiceDescription string       `json:"service_description" yaml:"service_description"` // Description of the service
-	Tags               []string     `json:"tags" yaml:"tags"`                               // Tags of the service
-	Author             string       `json:"author" yaml:"author"`                           // Author of the service
-	AuthorDescription  string       `json:"author_description" yaml:"author_description"`   // Description of the author of the service
-	Schema             string       `json:"schema" yaml:"schema"`                           // Interface JSON Schema of the service
+	BaseReq           rest.BaseReq `json:"base_req" yaml:"base_req"`
+	Name              string       `json:"name" yaml:"name"`                             // Name of the service
+	Description       string       `json:"description" yaml:"description"`               // Description of the service
+	Tags              []string     `json:"tags" yaml:"tags"`                             // Tags of the service
+	Author            string       `json:"author" yaml:"author"`                         // Author of the service
+	AuthorDescription string       `json:"author_description" yaml:"author_description"` // Description of the author of the service
+	Schema            string       `json:"schema" yaml:"schema"`                         // Interface JSON Schema of the service
 }
 
 // ServiceBindingReq defines the properties of a service binding request's body

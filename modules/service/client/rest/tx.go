@@ -38,7 +38,7 @@ func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router) {
 	r.HandleFunc(fmt.Sprintf("/service/fees/{%s}/withdraw", RestProvider), feesWithdrawHandlerFn(cliCtx)).Methods("POST")
 }
 
-// HTTP request handler to create service definition.
+// HTTP request handler to define service.
 func defineServiceHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req DefineServiceReq
@@ -57,7 +57,7 @@ func defineServiceHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgDefineService(req.ServiceName, req.ServiceDescription, req.Tags, author, req.AuthorDescription, req.Schema)
+		msg := types.NewMsgDefineService(req.Name, req.Description, req.Tags, author, req.AuthorDescription, req.Schema)
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
