@@ -32,10 +32,6 @@ func (k Keeper) AddRequest(
 		return req, types.ErrUnavailable
 	}
 
-	if _, found = k.GetMethod(ctx, defChainID, defName, methodID); !found {
-		return req, sdkerrors.Wrapf(types.ErrUnknownMethod, "%d", methodID)
-	}
-
 	if profiling {
 		if _, found := k.gk.GetProfiler(ctx, consumer); !found {
 			return req, sdkerrors.Wrap(types.ErrUnknownMethod, consumer.String())

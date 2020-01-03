@@ -38,7 +38,6 @@ var (
 
 	// Keys for store prefixes
 	ServiceDefinitionKey         = []byte{0x01}
-	MethodPropertyKey            = []byte{0x02}
 	BindingPropertyKey           = []byte{0x03}
 	RequestKey                   = []byte{0x05}
 	ResponseKey                  = []byte{0x06}
@@ -52,20 +51,9 @@ var (
 	ServiceSlashFractionKey = []byte{0x13}
 )
 
-// GetServiceDefinitionKey
-func GetServiceDefinitionKey(chainID, name string) []byte {
-	return append(ServiceDefinitionKey, getStringsKey([]string{chainID, name})...)
-}
-
-// GetMethodPropertyKey
-// id can not be zero
-func GetMethodPropertyKey(chainID, serviceName string, id int16) []byte {
-	return append(MethodPropertyKey, getStringsKey([]string{chainID, serviceName, string(id)})...)
-}
-
-// GetMethodsSubspaceKey returns the key for getting all methods on a service from the store
-func GetMethodsSubspaceKey(chainID, serviceName string) []byte {
-	return append(append(MethodPropertyKey, getStringsKey([]string{chainID, serviceName})...), emptyByte...)
+// GetServiceDefinitionKey returns a key for the service definition with the specified name
+func GetServiceDefinitionKey(name string) []byte {
+	return append(ServiceDefinitionKey, []byte(name)...)
 }
 
 // GetServiceBindingKey
