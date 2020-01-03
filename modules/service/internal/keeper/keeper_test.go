@@ -22,7 +22,7 @@ var (
 	testServiceTags = []string{"tag1", "tag2"}
 	testAuthor      = sdk.AccAddress([]byte("test-author"))
 	testAuthorDesc  = "test-author-desc"
-	testIDLContent  = idlContent
+	testSchema      = schema
 
 	testBindingType = types.Global
 	testLevel       = types.Level{AvgRspTime: 10000, UsableTime: 9999}
@@ -60,13 +60,12 @@ func (suite *KeeperTestSuite) SetupTest() {
 }
 
 func (suite *KeeperTestSuite) setServiceDefinition() {
-	svc := types.NewSvcDef(
-		testServiceName, testChainID, testServiceDesc,
-		testServiceTags, testAuthor, testAuthorDesc, testIDLContent,
+	svcDef := types.NewServiceDefinition(
+		testServiceName, testServiceDesc,
+		testServiceTags, testAuthor, testAuthorDesc, testSchema,
 	)
 
-	suite.app.ServiceKeeper.SetServiceDefinition(suite.ctx, svc)
-	suite.app.ServiceKeeper.AddMethods(suite.ctx, svc)
+	suite.app.ServiceKeeper.SetServiceDefinition(suite.ctx, svcDef)
 }
 
 func (suite *KeeperTestSuite) setServiceBinding() {
@@ -79,19 +78,19 @@ func (suite *KeeperTestSuite) setServiceBinding() {
 }
 func (suite *KeeperTestSuite) TestServiceDefinition() {
 	err := suite.app.ServiceKeeper.AddServiceDefinition(
-		suite.ctx, testServiceName, testChainID, testServiceDesc,
-		testServiceTags, testAuthor, testAuthorDesc, testIDLContent,
+		suite.ctx, testServiceName, testServiceDesc,
+		testServiceTags, testAuthor, testAuthorDesc, testSchema,
 	)
 	suite.NoError(err)
 
-	svc, found := suite.app.ServiceKeeper.GetServiceDefinition(suite.ctx, testChainID, testServiceName)
+	svcDef, found := suite.app.ServiceKeeper.GetServiceDefinition(suite.ctx, testServiceName)
 	suite.True(found)
 
-	expectedSvc := types.NewSvcDef(
-		testServiceName, testChainID, testServiceDesc,
-		testServiceTags, testAuthor, testAuthorDesc, testIDLContent,
+	expectedSvcDef := types.NewServiceDefinition(
+		testServiceName, testServiceDesc,
+		testServiceTags, testAuthor, testAuthorDesc, testSchema,
 	)
-	suite.Equal(expectedSvc, svc)
+	suite.Equal(expectedSvcDef, svcDef)
 }
 
 func (suite *KeeperTestSuite) TestServiceBinding() {
@@ -174,23 +173,4 @@ func TestKeeperTestSuite(t *testing.T) {
 	suite.Run(t, new(KeeperTestSuite))
 }
 
-const idlContent = `
-	syntax = "proto3";
-
-	// The greeting service definition.
-	service Greeter {
-		//@Attribute description:sayHello
-		//@Attribute output_privacy:NoPrivacy
-		//@Attribute output_cached:NoCached
-		rpc SayHello (HelloRequest) returns (HelloReply) {}
-	}
-
-	// The request message containing the user's name.
-	message HelloRequest {
-		string name = 1;
-	}
-
-	// The response message containing the greetings
-	message HelloReply {
-		string message = 1;
-	}`
+const schema = ""
