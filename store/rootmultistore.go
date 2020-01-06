@@ -221,6 +221,11 @@ func (rs *rootMultiStore) Commit(KVStoreList []*sdk.KVStoreKey) CommitID {
 	return commitID
 }
 
+// Implements Committer/CommitStore.
+func (rs *rootMultiStore) CommitWithVersion(KVStoreList []*sdk.KVStoreKey, _ int64) CommitID {
+	return rs.Commit(KVStoreList)
+}
+
 // Implements CacheWrapper/Store/CommitStore.
 func (rs *rootMultiStore) CacheWrap() CacheWrap {
 	return rs.CacheMultiStore().(CacheWrap)
@@ -526,7 +531,7 @@ func commitStores(version int64, storeMap map[StoreKey]CommitStore, KVStoreList 
 		for _, key := range KVStoreList {
 			if store, ok := storeMap[key]; ok {
 				// Commit
-				commitID := store.Commit([]*sdk.KVStoreKey{})
+				commitID := store.CommitWithVersion([]*sdk.KVStoreKey{}, version)
 				if store.GetStoreType() == sdk.StoreTypeTransient {
 					continue
 				}
