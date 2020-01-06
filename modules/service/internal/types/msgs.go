@@ -55,7 +55,7 @@ type MsgDefineService struct {
 	Schemas           string         `json:"schemas" yaml:"schemas"`
 }
 
-// NewMsgDefineService constructs a new MsgDefineService
+// NewMsgDefineService constructs a new MsgDefineService instance
 func NewMsgDefineService(name, description string, tags []string, author sdk.AccAddress, authorDescription, schemas string) MsgDefineService {
 	return MsgDefineService{
 		Name:              name,
@@ -94,7 +94,7 @@ func (msg MsgDefineService) ValidateBasic() error {
 	}
 
 	if !validServiceName(msg.Name) {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "invalid service name")
+		return sdkerrors.Wrap(ErrInvalidServiceName, "invalid service name, only alphanumeric charactors, _ and - accepted")
 	}
 
 	if err := ensureServiceDefLength(msg); err != nil {
@@ -730,7 +730,7 @@ func (msg MsgSvcWithdrawTax) GetSigners() []sdk.AccAddress {
 // ValidateServiceName validates the service name
 func ValidateServiceName(name string) error {
 	if !validServiceName(name) {
-		return sdkerrors.Wrap(ErrInvalidServiceName, "invalid service name")
+		return sdkerrors.Wrap(ErrInvalidServiceName, "invalid service name, only alphanumeric charactors, _ and - accepted")
 	}
 
 	if err := ensureServiceNameLength(name); err != nil {
@@ -741,7 +741,7 @@ func ValidateServiceName(name string) error {
 }
 
 func validServiceName(name string) bool {
-	return !reServiceName.MatchString(name)
+	return reServiceName.MatchString(name)
 }
 
 func ensureServiceNameLength(name string) error {
