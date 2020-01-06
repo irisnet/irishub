@@ -11,7 +11,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
 
-	"github.com/irisnet/irishub/modules/coinswap/internal/types"
+	"github.com/irisnet/irishub/modules/guardian/internal/types"
 )
 
 // Simulation parameter constants
@@ -32,9 +32,19 @@ func RandomizedGenState(simState *module.SimulationState) {
 		func(r *rand.Rand) { serviceFee = GenServicefee(r) },
 	)
 
-	params := types.NewParams(serviceFee, sdk.DefaultBondDenom)
-	swapGenesis := types.NewGenesisState(params)
+	var (
+		profilers types.Profilers
+		trustees  types.Trustees
+	)
 
-	fmt.Printf("Selected randomly generated cionswap parameters:\n%s\n", codec.MustMarshalJSONIndent(simState.Cdc, swapGenesis))
+	profilers = make([]types.Guardian, simState.NumBonded)
+	trustees = make([]types.Guardian, simState.NumBonded)
+	for i := 0; i < int(simState.NumBonded); i++ {
+		profilers = append(profilers, types.NewGuardian("", types.Genesis, simState.Accounts[i].Address, simState.Accounts[i].Address))
+		trustees = append(trustees, types.NewGuardian("", types.Genesis, simState.Accounts[i].Address, simState.Accounts[i].Address))
+	}
+	swapGenesis := types.NewGenesisState(profilers, trustees)
+
+	fmt.Printf("Selected randomly generated guardian parameters:\n%s\n", codec.MustMarshalJSONIndent(simState.Cdc, swapGenesis))
 	simState.GenState[types.ModuleName] = simState.Cdc.MustMarshalJSON(swapGenesis)
 }

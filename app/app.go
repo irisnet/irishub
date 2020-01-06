@@ -258,9 +258,9 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 		evidence.NewAppModule(*app.evidenceKeeper),
 		asset.NewAppModule(app.assetKeeper),
 		guardian.NewAppModule(app.guardianKeeper),
-		htlc.NewAppModule(app.htlcKeeper),
-		coinswap.NewAppModule(app.coinswapKeeper),
-		rand.NewAppModule(app.randKeeper),
+		htlc.NewAppModule(app.accountKeeper, app.htlcKeeper),
+		coinswap.NewAppModule(app.accountKeeper, app.coinswapKeeper),
+		rand.NewAppModule(app.accountKeeper, app.randKeeper),
 		service.NewAppModule(app.serviceKeeper),
 	)
 
@@ -299,24 +299,23 @@ func NewIrisApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 	//
 	// NOTE: This is not required for apps that don't use the simulator for fuzz testing
 	// transactions.
-	// TODO
-	//app.sm = module.NewSimulationManager(
-	//	auth.NewAppModule(app.accountKeeper),
-	//	bank.NewAppModule(app.bankKeeper, app.accountKeeper),
-	//	supply.NewAppModule(app.supplyKeeper, app.accountKeeper),
-	//	gov.NewAppModule(app.govKeeper, app.supplyKeeper),
-	//	mint.NewAppModule(app.mintKeeper),
-	//	distr.NewAppModule(app.distrKeeper, app.supplyKeeper),
-	//	staking.NewAppModule(app.stakingKeeper, app.accountKeeper, app.supplyKeeper),
-	//	slashing.NewAppModule(app.slashingKeeper, app.stakingKeeper),
-	//	asset.NewAppModule(app.assetKeeper),
-	//	htlc.NewAppModule(app.htlcKeeper),
-	//	coinswap.NewAppModule(app.coinswapKeeper),
-	//	rand.NewAppModule(app.randKeeper),
-	//	service.NewAppModule(app.serviceKeeper),
-	//)
+	app.sm = module.NewSimulationManager(
+		auth.NewAppModule(app.accountKeeper),
+		bank.NewAppModule(app.bankKeeper, app.accountKeeper),
+		supply.NewAppModule(app.supplyKeeper, app.accountKeeper),
+		gov.NewAppModule(app.govKeeper, app.accountKeeper, app.supplyKeeper),
+		mint.NewAppModule(app.mintKeeper),
+		distr.NewAppModule(app.distrKeeper, app.accountKeeper, app.supplyKeeper, app.stakingKeeper),
+		staking.NewAppModule(app.stakingKeeper, app.accountKeeper, app.supplyKeeper),
+		slashing.NewAppModule(app.slashingKeeper, app.accountKeeper, app.stakingKeeper),
+		//asset.NewAppModule(app.assetKeeper),
+		htlc.NewAppModule(app.accountKeeper, app.htlcKeeper),
+		coinswap.NewAppModule(app.accountKeeper, app.coinswapKeeper),
+		rand.NewAppModule(app.accountKeeper, app.randKeeper),
+		//service.NewAppModule(app.serviceKeeper),
+	)
 
-	//app.sm.RegisterStoreDecoders()
+	app.sm.RegisterStoreDecoders()
 
 	// initialize stores
 	app.MountKVStores(keys)

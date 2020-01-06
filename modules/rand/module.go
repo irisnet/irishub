@@ -17,14 +17,14 @@ import (
 
 	"github.com/irisnet/irishub/modules/rand/client/cli"
 	"github.com/irisnet/irishub/modules/rand/client/rest"
+	"github.com/irisnet/irishub/modules/rand/internal/types"
 	"github.com/irisnet/irishub/modules/rand/simulation"
 )
 
 var (
-	_ module.AppModule      = AppModule{}
-	_ module.AppModuleBasic = AppModuleBasic{}
-	// TODO
-	//_ module.AppModuleSimulation = AppModuleSimulation{}
+	_ module.AppModule           = AppModule{}
+	_ module.AppModuleBasic      = AppModuleBasic{}
+	_ module.AppModuleSimulation = AppModule{}
 )
 
 // AppModuleBasic defines the basic application module used by the rand module.
@@ -95,14 +95,17 @@ func (AppModuleSimulation) RandomizedParams(r *rand.Rand) []sim.ParamChange {
 type AppModule struct {
 	AppModuleBasic
 	AppModuleSimulation
-	keeper Keeper
+
+	accountKeeper types.AccountKeeper
+	keeper        Keeper
 }
 
 // NewAppModule creates a new AppModule object
-func NewAppModule(keeper Keeper) AppModule {
+func NewAppModule(accountKeeper types.AccountKeeper, keeper Keeper) AppModule {
 	return AppModule{
 		AppModuleBasic:      AppModuleBasic{},
 		AppModuleSimulation: AppModuleSimulation{},
+		accountKeeper:       accountKeeper,
 		keeper:              keeper,
 	}
 }
@@ -157,4 +160,33 @@ func (am AppModule) BeginBlock(ctx sdk.Context, _ abci.RequestBeginBlock) {
 // EndBlock returns the end blocker for the rand module. It returns no validator updates.
 func (am AppModule) EndBlock(ctx sdk.Context, _ abci.RequestEndBlock) []abci.ValidatorUpdate {
 	return []abci.ValidatorUpdate{}
+}
+
+//____________________________________________________________________________
+
+// AppModuleSimulation functions
+
+// GenerateGenesisState creates a randomized GenState of the bank module.
+func (AppModule) GenerateGenesisState(simState *module.SimulationState) {
+	simulation.RandomizedGenState(simState)
+}
+
+// ProposalContents doesn't return any content functions for governance proposals.
+func (AppModule) ProposalContents(_ module.SimulationState) []sim.WeightedProposalContent {
+	return nil
+}
+
+// RandomizedParams creates randomized bank param changes for the simulator.
+func (AppModule) RandomizedParams(r *rand.Rand) []sim.ParamChange {
+	return simulation.ParamChanges(r)
+}
+
+// RegisterStoreDecoder performs a no-op.
+func (AppModule) RegisterStoreDecoder(_ sdk.StoreDecoderRegistry) {}
+
+// WeightedOperations returns the all the gov module operations with their respective weights.
+func (am AppModule) WeightedOperations(simState module.SimulationState) []sim.WeightedOperation {
+	return simulation.WeightedOperations(
+		simState.AppParams, simState.Cdc, am.accountKeeper, am.keeper,
+	)
 }

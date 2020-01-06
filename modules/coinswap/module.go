@@ -16,14 +16,14 @@ import (
 	sim "github.com/cosmos/cosmos-sdk/x/simulation"
 
 	"github.com/irisnet/irishub/modules/coinswap/client/rest"
+	"github.com/irisnet/irishub/modules/coinswap/internal/types"
 	"github.com/irisnet/irishub/modules/coinswap/simulation"
 )
 
 var (
-	_ module.AppModule      = AppModule{}
-	_ module.AppModuleBasic = AppModuleBasic{}
-	// TODO
-	//_ module.AppModuleSimulation = AppModuleSimulation{}
+	_ module.AppModule           = AppModule{}
+	_ module.AppModuleBasic      = AppModuleBasic{}
+	_ module.AppModuleSimulation = AppModule{}
 )
 
 // AppModuleBasic defines the basic application module used by the coinswap module.
@@ -66,39 +66,20 @@ func (AppModuleBasic) GetQueryCmd(cdc *codec.Codec) *cobra.Command { return nil 
 
 //____________________________________________________________________________
 
-// AppModuleSimulation defines the module simulation functions used by the coinswap module.
-type AppModuleSimulation struct{}
-
-// RegisterStoreDecoder registers a decoder for coinswap module's types.
-func (AppModuleSimulation) RegisterStoreDecoder(sdr sdk.StoreDecoderRegistry) {
-	sdr[StoreKey] = simulation.DecodeStore
-}
-
-// GenerateGenesisState creates a randomized GenState of the coinswap module.
-func (AppModuleSimulation) GenerateGenesisState(simState *module.SimulationState) {
-	simulation.RandomizedGenState(simState)
-}
-
-// RandomizedParams creates randomized coinswap param changes for the simulator.
-func (AppModuleSimulation) RandomizedParams(r *rand.Rand) []sim.ParamChange {
-	return simulation.ParamChanges(r)
-}
-
-//____________________________________________________________________________
-
 // AppModule implements an application module for the coinswap module.
 type AppModule struct {
 	AppModuleBasic
-	AppModuleSimulation
-	keeper Keeper
+
+	accountKeeper types.AccountKeeper
+	keeper        Keeper
 }
 
 // NewAppModule creates a new AppModule object
-func NewAppModule(keeper Keeper) AppModule {
+func NewAppModule(accountKeeper types.AccountKeeper, keeper Keeper) AppModule {
 	return AppModule{
-		AppModuleBasic:      AppModuleBasic{},
-		AppModuleSimulation: AppModuleSimulation{},
-		keeper:              keeper,
+		AppModuleBasic: AppModuleBasic{},
+		accountKeeper:  accountKeeper,
+		keeper:         keeper,
 	}
 }
 
@@ -151,4 +132,33 @@ func (am AppModule) BeginBlock(ctx sdk.Context, _ abci.RequestBeginBlock) {}
 // EndBlock returns the end blocker for the coinswap module. It returns no validator updates.
 func (AppModule) EndBlock(_ sdk.Context, _ abci.RequestEndBlock) []abci.ValidatorUpdate {
 	return []abci.ValidatorUpdate{}
+}
+
+//____________________________________________________________________________
+
+// AppModuleSimulation functions
+
+// GenerateGenesisState creates a randomized GenState of the bank module.
+func (AppModule) GenerateGenesisState(simState *module.SimulationState) {
+	simulation.RandomizedGenState(simState)
+}
+
+// ProposalContents doesn't return any content functions for governance proposals.
+func (AppModule) ProposalContents(_ module.SimulationState) []sim.WeightedProposalContent {
+	return nil
+}
+
+// RandomizedParams creates randomized bank param changes for the simulator.
+func (AppModule) RandomizedParams(r *rand.Rand) []sim.ParamChange {
+	return simulation.ParamChanges(r)
+}
+
+// RegisterStoreDecoder performs a no-op.
+func (AppModule) RegisterStoreDecoder(_ sdk.StoreDecoderRegistry) {}
+
+// WeightedOperations returns the all the gov module operations with their respective weights.
+func (am AppModule) WeightedOperations(simState module.SimulationState) []sim.WeightedOperation {
+	return simulation.WeightedOperations(
+		simState.AppParams, simState.Cdc, am.accountKeeper, am.keeper,
+	)
 }

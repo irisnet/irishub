@@ -15,7 +15,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/cosmos/cosmos-sdk/x/auth"
-	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 	"github.com/cosmos/cosmos-sdk/x/auth/vesting"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	"github.com/cosmos/cosmos-sdk/x/crisis"
@@ -273,9 +272,9 @@ func NewSimApp(
 		evidence.NewAppModule(app.EvidenceKeeper),
 		asset.NewAppModule(app.AssetKeeper),
 		guardian.NewAppModule(app.GuardianKeeper),
-		htlc.NewAppModule(app.HTLCKeeper),
-		coinswap.NewAppModule(app.CoinswapKeeper),
-		rand.NewAppModule(app.RandKeeper),
+		htlc.NewAppModule(app.AccountKeeper, app.HTLCKeeper),
+		coinswap.NewAppModule(app.AccountKeeper, app.CoinswapKeeper),
+		rand.NewAppModule(app.AccountKeeper, app.RandKeeper),
 		service.NewAppModule(app.ServiceKeeper),
 	)
 
@@ -314,23 +313,23 @@ func NewSimApp(
 	// NOTE: this is not required apps that don't use the simulator for fuzz testing
 	// transactions
 	// TODO:
-	//app.sm = module.NewSimulationManager(
-	//	auth.NewAppModule(app.AccountKeeper),
-	//	bank.NewAppModule(app.BankKeeper, app.AccountKeeper),
-	//	supply.NewAppModule(app.SupplyKeeper, app.AccountKeeper),
-	//	gov.NewAppModule(app.GovKeeper, app.SupplyKeeper),
-	//	mint.NewAppModule(app.MintKeeper),
-	//	distr.NewAppModule(app.DistrKeeper, app.SupplyKeeper),
-	//	staking.NewAppModule(app.StakingKeeper, app.AccountKeeper, app.SupplyKeeper),
-	//	slashing.NewAppModule(app.SlashingKeeper, app.StakingKeeper),
-	//	asset.NewAppModule(app.AssetKeeper),
-	//	htlc.NewAppModule(app.HTLCKeeper),
-	//	coinswap.NewAppModule(app.CoinswapKeeper),
-	//	rand.NewAppModule(app.RandKeeper),
-	//	service.NewAppModule(app.ServiceKeeper),
-	//)
+	app.sm = module.NewSimulationManager(
+		auth.NewAppModule(app.AccountKeeper),
+		bank.NewAppModule(app.BankKeeper, app.AccountKeeper),
+		supply.NewAppModule(app.SupplyKeeper, app.AccountKeeper),
+		gov.NewAppModule(app.GovKeeper, app.AccountKeeper, app.SupplyKeeper),
+		mint.NewAppModule(app.MintKeeper),
+		distr.NewAppModule(app.DistrKeeper, app.AccountKeeper, app.SupplyKeeper, app.StakingKeeper),
+		staking.NewAppModule(app.StakingKeeper, app.AccountKeeper, app.SupplyKeeper),
+		slashing.NewAppModule(app.SlashingKeeper, app.AccountKeeper, app.StakingKeeper),
+		//asset.NewAppModule(app.AssetKeeper),
+		htlc.NewAppModule(app.AccountKeeper, app.HTLCKeeper),
+		coinswap.NewAppModule(app.AccountKeeper, app.CoinswapKeeper),
+		rand.NewAppModule(app.AccountKeeper, app.RandKeeper),
+		//service.NewAppModule(app.ServiceKeeper),
+	)
 
-	//app.sm.RegisterStoreDecoders()
+	app.sm.RegisterStoreDecoders()
 
 	// initialize stores
 	app.MountKVStores(keys)
@@ -339,7 +338,7 @@ func NewSimApp(
 	// initialize BaseApp
 	app.SetInitChainer(app.InitChainer)
 	app.SetBeginBlocker(app.BeginBlocker)
-	app.SetAnteHandler(ante.NewAnteHandler(app.AccountKeeper, app.SupplyKeeper, auth.DefaultSigVerificationGasConsumer))
+	app.SetAnteHandler(NewAnteHandler(app.AccountKeeper, app.SupplyKeeper, app.AssetKeeper, auth.DefaultSigVerificationGasConsumer))
 	app.SetEndBlocker(app.EndBlocker)
 
 	if loadLatest {
