@@ -30,6 +30,11 @@ func queryHTLCHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
+		cliCtx, ok := rest.ParseQueryHeightOrReturnBadRequest(w, cliCtx, r)
+		if !ok {
+			return
+		}
+
 		params := types.QueryHTLCParams{
 			HashLock: hashLock,
 		}
