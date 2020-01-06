@@ -36,7 +36,7 @@ type DefineServiceReq struct {
 	Tags              []string     `json:"tags" yaml:"tags"`                             // Tags of the service
 	Author            string       `json:"author" yaml:"author"`                         // Author of the service
 	AuthorDescription string       `json:"author_description" yaml:"author_description"` // Description of the author of the service
-	Schema            string       `json:"schema" yaml:"schema"`                         // Interface JSON Schema of the service
+	Schemas           string       `json:"schemas" yaml:"schemas"`                       // Interface JSON Schemas of the service
 }
 
 // ServiceBindingReq defines the properties of a service binding request's body

@@ -15,7 +15,7 @@ import (
 
 func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router) {
 	// query definition
-	r.HandleFunc(fmt.Sprintf("/service/definitions/{%s}/{%s}", RestDefChainID, RestServiceName), queryDefinitionHandlerFn(cliCtx)).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/service/definitions/{%s}", RestServiceName), queryDefinitionHandlerFn(cliCtx)).Methods("GET")
 	// query binding
 	r.HandleFunc(fmt.Sprintf("/service/bindings/{%s}/{%s}/{%s}/{%s}", RestDefChainID, RestServiceName, RestBindChainID, RestProvider), queryBindingHandlerFn(cliCtx)).Methods("GET")
 	// query bindings
