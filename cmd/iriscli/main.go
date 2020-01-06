@@ -57,8 +57,13 @@ func main() {
 
 	// Add --chain-id to persistent flags and mark it required
 	rootCmd.PersistentFlags().String(flags.FlagChainID, "", "Chain ID of tendermint node")
-	rootCmd.PersistentPreRunE = func(_ *cobra.Command, _ []string) error {
+	rootCmd.PersistentPreRunE = func(cmd *cobra.Command, args []string) error {
+		handleRequestPreRun(cdc, cmd, args)
+		handleResponsePreRun(cdc, cmd)
 		return initConfig(rootCmd)
+	}
+	rootCmd.PersistentPostRun = func(cmd *cobra.Command, args []string) {
+		handleResponsePostRun(cdc, cmd)
 	}
 
 	// Construct Root Command
@@ -91,7 +96,6 @@ func queryCmd(cdc *amino.Codec) *cobra.Command {
 		Aliases: []string{"q"},
 		Short:   "Querying subcommands",
 	}
-
 	queryCmd.AddCommand(
 		authcmd.GetAccountCmd(cdc),
 		flags.LineBreak,
