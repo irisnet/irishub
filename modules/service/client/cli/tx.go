@@ -57,7 +57,7 @@ func GetCmdDefineService(cdc *codec.Codec) *cobra.Command {
 		Short: "Define a new service",
 		Example: "iriscli tx service define --chain-id=<chain-id> --from=<key-name> --fee=0.3iris " +
 			"--name=<service name> --description=<service description> --author-description=<author description> " +
-			"--tags=tag1,tag2 --schema=<schema content or path/to/schema.json>",
+			"--tags=tag1,tag2 --schemas=<schemas content or path/to/schemas.json>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			inBuf := bufio.NewReader(cmd.InOrStdin())
 			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
@@ -68,29 +68,29 @@ func GetCmdDefineService(cdc *codec.Codec) *cobra.Command {
 			description := viper.GetString(FlagDescription)
 			authorDescription := viper.GetString(FlagAuthorDescription)
 			tags := viper.GetStringSlice(FlagTags)
-			schema := viper.GetString(FlagSchema)
+			schemas := viper.GetString(FlagSchemas)
 
-			if !json.Valid([]byte(schema)) {
-				schemaContent, err := ioutil.ReadFile(schema)
+			if !json.Valid([]byte(schemas)) {
+				schemasContent, err := ioutil.ReadFile(schemas)
 				if err != nil {
 					return errors.New("neither JSON input nor path to .json file were provided")
 				}
 
-				if !json.Valid(schemaContent) {
+				if !json.Valid(schemasContent) {
 					return errors.New(".json file content is invalid JSON")
 				}
 
-				schema = string(schemaContent)
+				schemas = string(schemasContent)
 			}
 
 			buf := bytes.NewBuffer([]byte{})
-			if err := json.Compact(buf, []byte(schema)); err != nil {
+			if err := json.Compact(buf, []byte(schemas)); err != nil {
 				return errors.New("failed to compact the schema")
 			}
 
-			fmt.Printf("schema content: \n%s\n", buf.String())
+			fmt.Printf("schemas content: \n%s\n", buf.String())
 
-			msg := types.NewMsgDefineService(name, description, tags, author, authorDescription, schema)
+			msg := types.NewMsgDefineService(name, description, tags, author, authorDescription, schemas)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -101,7 +101,7 @@ func GetCmdDefineService(cdc *codec.Codec) *cobra.Command {
 
 	cmd.Flags().AddFlagSet(FsServiceDefine)
 	cmd.MarkFlagRequired(FlagName)
-	cmd.MarkFlagRequired(FlagSchema)
+	cmd.MarkFlagRequired(FlagSchemas)
 
 	return cmd
 }

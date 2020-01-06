@@ -11,7 +11,7 @@ const (
 	FlagDescription       = "description"
 	FlagTags              = "tags"
 	FlagAuthorDescription = "author-description"
-	FlagSchema            = "schema"
+	FlagSchemas           = "schemas"
 	FlagServiceName       = "service-name"
 	FlagProvider          = "provider"
 	FlagBindChainID       = "bind-chain-id"
@@ -49,7 +49,7 @@ func init() {
 	FsServiceDefine.String(FlagDescription, "", "service description")
 	FsServiceDefine.StringSlice(FlagTags, []string{}, "service tags")
 	FsServiceDefine.String(FlagAuthorDescription, "", "service author description")
-	FsServiceDefine.String(FlagSchema, "", "interface schema content or path")
+	FsServiceDefine.String(FlagSchemas, "", "interface schemas content or path")
 	FsServiceDefinition.String(FlagDefChainID, "", "the ID of the blockchain defined of the service")
 	FsServiceDefinition.String(FlagServiceName, "", "service name")
 	FsServiceBindingCreate.String(FlagBindType, "", "type of binding, valid values can be Local and Global")
