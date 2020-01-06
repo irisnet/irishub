@@ -17,7 +17,8 @@ const (
 
 // QueryTokenParams is the query parameters for 'custom/asset/tokens/{symbol}'
 type QueryTokenParams struct {
-	Symbol string `json:"symbol" yaml:"symbol"` //
+	Symbol  string `json:"symbol" yaml:"symbol"`     //
+	MinUnit string `json:"min_unit" yaml:"min_unit"` //
 }
 
 // QueryTokensParams is the query parameters for 'custom/asset/tokens'

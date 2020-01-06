@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"errors"
 	abci "github.com/tendermint/tendermint/abci/types"
 
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -16,7 +17,13 @@ func QuerierToken(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte
 	if err := keeper.cdc.UnmarshalJSON(req.Data, &params); err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, err.Error())
 	}
-	return queryToken(ctx, keeper, params.Symbol)
+	if len(params.Symbol) != 0 {
+		return queryToken(ctx, keeper, params.Symbol)
+	}
+	if len(params.MinUnit) != 0 {
+		return queryTokenByMinUnit(ctx, keeper, params.MinUnit)
+	}
+	return []byte{}, errors.New("symbol and minUnit cannot be empty at the same time")
 }
 
 // QuerierTokens return the token list by symbol or owner
@@ -77,6 +84,20 @@ func queryToken(ctx sdk.Context, keeper Keeper, symbol string) ([]byte, error) {
 	token, found := keeper.GetToken(ctx, symbol)
 	if !found {
 		return nil, sdkerrors.Wrapf(types.ErrUnknownToken, "%s", symbol)
+	}
+
+	bz, err := codec.MarshalJSONIndent(keeper.cdc, types.Tokens{token})
+	if err != nil {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
+	}
+
+	return bz, nil
+}
+
+func queryTokenByMinUnit(ctx sdk.Context, keeper Keeper, minUnit string) ([]byte, error) {
+	token, found := keeper.GetTokenByMintUint(ctx, minUnit)
+	if !found {
+		return nil, sdkerrors.Wrapf(types.ErrUnknownToken, "%s", minUnit)
 	}
 
 	bz, err := codec.MarshalJSONIndent(keeper.cdc, types.Tokens{token})

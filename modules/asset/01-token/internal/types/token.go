@@ -100,21 +100,49 @@ func (ft FungibleToken) GetInitSupply() sdk.Int {
 	return ft.InitialSupply
 }
 
-// GetCoinType returns CoinType
-func (ft FungibleToken) GetCoinType() iristypes.CoinType {
-	return iristypes.CoinType{
-		Name:     ft.Name,
-		MinUnit:  iristypes.NewUnit(ft.Symbol, 0),
-		MainUnit: iristypes.NewUnit(ft.GetMinUnit(), ft.Scale),
-		Desc:     ft.Name,
-	}
-}
-
 // Sanitize - sanitize strings type
 func (ft *FungibleToken) Sanitize() {
 	ft.Symbol = strings.ToLower(strings.TrimSpace(ft.Symbol))
 	ft.MinUnit = strings.ToLower(strings.TrimSpace(ft.MinUnit))
 	ft.Name = strings.TrimSpace(ft.Name)
+}
+
+//ConvertToMainCoin return the main denom coin from args
+func (ft FungibleToken) ConvertToMainCoin(coin sdk.Coin) (sdk.Coin, error) {
+	if coin.Denom != ft.Symbol && coin.Denom != ft.MinUnit {
+		return coin, fmt.Errorf("token unit (%s) not defined", coin.Denom)
+	}
+
+	if coin.Denom == ft.Symbol || coin.Amount.IsZero() {
+		return coin, nil
+	}
+
+	// dest amount = src amount * (10^(dest scale) / 10^(src scale))
+	dstScale := sdk.NewDecFromInt(sdk.NewIntWithDecimal(1, 0))
+	srcScale := sdk.NewDecFromInt(sdk.NewIntWithDecimal(1, int(ft.Scale)))
+	amount := sdk.NewDecFromInt(coin.Amount)
+
+	amt := amount.Mul(dstScale).Quo(srcScale)
+	return sdk.NewCoin(ft.Symbol, amt.TruncateInt()), nil
+}
+
+//ConvertToMinCoin return the min denom coin from args
+func (ft FungibleToken) ConvertToMinCoin(coin sdk.Coin) (newCoins sdk.Coin, err error) {
+	if coin.Denom != ft.Symbol && coin.Denom != ft.MinUnit {
+		return coin, fmt.Errorf("token unit (%s) not defined", coin.Denom)
+	}
+
+	if coin.Denom == ft.MinUnit || coin.Amount.IsZero() {
+		return coin, nil
+	}
+
+	// dest amount = src amount * (10^(dest scale) / 10^(src scale))
+	srcScale := sdk.NewDecFromInt(sdk.NewIntWithDecimal(1, 0))
+	dstScale := sdk.NewDecFromInt(sdk.NewIntWithDecimal(1, int(ft.Scale)))
+	amount := sdk.NewDecFromInt(coin.Amount)
+
+	amt := amount.Mul(dstScale).Quo(srcScale)
+	return sdk.NewCoin(ft.MinUnit, amt.RoundInt()), nil
 }
 
 // Tokens - construct FungibleToken array
