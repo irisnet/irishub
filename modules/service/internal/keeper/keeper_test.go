@@ -22,7 +22,7 @@ var (
 	testServiceTags = []string{"tag1", "tag2"}
 	testAuthor      = sdk.AccAddress([]byte("test-author"))
 	testAuthorDesc  = "test-author-desc"
-	testSchemas     = schemas
+	testSchemas     = `{"input":{"type":"object"},"output":{"type":"object"},"error":{"type":"object"}}`
 
 	testBindingType = types.Global
 	testLevel       = types.Level{AvgRspTime: 10000, UsableTime: 9999}
@@ -172,5 +172,3 @@ func (suite *KeeperTestSuite) TestServiceRequest() {
 func TestKeeperTestSuite(t *testing.T) {
 	suite.Run(t, new(KeeperTestSuite))
 }
-
-const schemas = ""
