@@ -21,7 +21,7 @@ const (
 
 // GenInflation randomized Inflation
 func GenInflation(r *rand.Rand) sdk.Dec {
-	return sdk.NewDecWithPrec(int64(r.Intn(99)), 2)
+	return sdk.NewDecWithPrec(int64(r.Intn(20)), 2)
 }
 
 // RandomizedGenState generates a random GenesisState for mint

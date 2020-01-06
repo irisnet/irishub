@@ -193,3 +193,6 @@ testnet-stop:
 testnet-clean:
 	docker-compose down
 	sudo rm -rf build/*
+
+# include simulations
+include sims.mk
