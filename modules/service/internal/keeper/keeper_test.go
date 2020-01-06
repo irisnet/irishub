@@ -22,7 +22,7 @@ var (
 	testServiceTags = []string{"tag1", "tag2"}
 	testAuthor      = sdk.AccAddress([]byte("test-author"))
 	testAuthorDesc  = "test-author-desc"
-	testSchema      = schema
+	testSchemas     = schemas
 
 	testBindingType = types.Global
 	testLevel       = types.Level{AvgRspTime: 10000, UsableTime: 9999}
@@ -62,7 +62,7 @@ func (suite *KeeperTestSuite) SetupTest() {
 func (suite *KeeperTestSuite) setServiceDefinition() {
 	svcDef := types.NewServiceDefinition(
 		testServiceName, testServiceDesc,
-		testServiceTags, testAuthor, testAuthorDesc, testSchema,
+		testServiceTags, testAuthor, testAuthorDesc, testSchemas,
 	)
 
 	suite.app.ServiceKeeper.SetServiceDefinition(suite.ctx, svcDef)
@@ -79,7 +79,7 @@ func (suite *KeeperTestSuite) setServiceBinding() {
 func (suite *KeeperTestSuite) TestServiceDefinition() {
 	err := suite.app.ServiceKeeper.AddServiceDefinition(
 		suite.ctx, testServiceName, testServiceDesc,
-		testServiceTags, testAuthor, testAuthorDesc, testSchema,
+		testServiceTags, testAuthor, testAuthorDesc, testSchemas,
 	)
 	suite.NoError(err)
 
@@ -88,7 +88,7 @@ func (suite *KeeperTestSuite) TestServiceDefinition() {
 
 	expectedSvcDef := types.NewServiceDefinition(
 		testServiceName, testServiceDesc,
-		testServiceTags, testAuthor, testAuthorDesc, testSchema,
+		testServiceTags, testAuthor, testAuthorDesc, testSchemas,
 	)
 	suite.Equal(expectedSvcDef, svcDef)
 }
@@ -173,4 +173,4 @@ func TestKeeperTestSuite(t *testing.T) {
 	suite.Run(t, new(KeeperTestSuite))
 }
 
-const schema = ""
+const schemas = ""

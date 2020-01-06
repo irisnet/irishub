@@ -15,13 +15,13 @@ func (k Keeper) AddServiceDefinition(
 	tags []string,
 	author sdk.AccAddress,
 	authorDescription,
-	schema string,
+	schemas string,
 ) error {
 	if _, found := k.GetServiceDefinition(ctx, name); found {
 		return sdkerrors.Wrapf(types.ErrUnknownSvcDef, "name: %s", name)
 	}
 
-	svcDef := types.NewServiceDefinition(name, description, tags, author, authorDescription, schema)
+	svcDef := types.NewServiceDefinition(name, description, tags, author, authorDescription, schemas)
 	k.SetServiceDefinition(ctx, svcDef)
 
 	return nil

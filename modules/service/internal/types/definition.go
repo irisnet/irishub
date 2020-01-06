@@ -11,17 +11,17 @@ type ServiceDefinition struct {
 	Tags              []string       `json:"tags" yaml:"tags"`
 	Author            sdk.AccAddress `json:"author" yaml:"author"`
 	AuthorDescription string         `json:"author_description" yaml:"author_description"`
-	Schema            string         `json:"schema" yaml:"schema"`
+	Schemas           string         `json:"schemas" yaml:"schemas"`
 }
 
 // NewServiceDefinition constructs a new ServiceDefinition
-func NewServiceDefinition(name, description string, tags []string, author sdk.AccAddress, authorDescription, schema string) ServiceDefinition {
+func NewServiceDefinition(name, description string, tags []string, author sdk.AccAddress, authorDescription, schemas string) ServiceDefinition {
 	return ServiceDefinition{
 		Name:              name,
 		Description:       description,
 		Tags:              tags,
 		Author:            author,
 		AuthorDescription: authorDescription,
-		Schema:            schema,
+		Schemas:           schemas,
 	}
 }

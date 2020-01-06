@@ -52,18 +52,18 @@ type MsgDefineService struct {
 	Tags              []string       `json:"tags" yaml:"tags"`
 	Author            sdk.AccAddress `json:"author" yaml:"author"`
 	AuthorDescription string         `json:"author_description" yaml:"author_description"`
-	Schema            string         `json:"schema" yaml:"schema"`
+	Schemas           string         `json:"schemas" yaml:"schemas"`
 }
 
-// NewMsgDefineService constructs a new MsgServiceDef
-func NewMsgDefineService(name, description string, tags []string, author sdk.AccAddress, authorDescription, schema string) MsgDefineService {
+// NewMsgDefineService constructs a new MsgDefineService
+func NewMsgDefineService(name, description string, tags []string, author sdk.AccAddress, authorDescription, schemas string) MsgDefineService {
 	return MsgDefineService{
 		Name:              name,
 		Description:       description,
 		Tags:              tags,
 		Author:            author,
 		AuthorDescription: authorDescription,
-		Schema:            schema,
+		Schemas:           schemas,
 	}
 }
 
@@ -101,11 +101,11 @@ func (msg MsgDefineService) ValidateBasic() error {
 		return err
 	}
 
-	if len(msg.Schema) == 0 {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "schema missing")
+	if len(msg.Schemas) == 0 {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "schemas missing")
 	}
 
-	return ValidateServiceSchema(msg.Schema)
+	return ValidateServiceSchemas(msg.Schemas)
 }
 
 // GetSigners implements Msg
@@ -730,7 +730,7 @@ func (msg MsgSvcWithdrawTax) GetSigners() []sdk.AccAddress {
 // ValidateServiceName validates the service name
 func ValidateServiceName(name string) error {
 	if !validServiceName(name) {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "invalid service name")
+		return sdkerrors.Wrap(ErrInvalidServiceName, "invalid service name")
 	}
 
 	if err := ensureServiceNameLength(name); err != nil {
@@ -746,7 +746,7 @@ func validServiceName(name string) bool {
 
 func ensureServiceNameLength(name string) error {
 	if len(name) > MaxNameLength {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid service name length; got: %d, max: %d", len(name), MaxNameLength)
+		return sdkerrors.Wrapf(ErrInvalidServiceName, "invalid service name length; got: %d, max: %d", len(name), MaxNameLength)
 	}
 
 	return nil
