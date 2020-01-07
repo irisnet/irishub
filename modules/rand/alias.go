@@ -60,6 +60,7 @@ type (
 	QueryRandParams             = types.QueryRandParams
 	QueryRandRequestQueueParams = types.QueryRandRequestQueueParams
 	Rand                        = types.Rand
+	ReadableRand                = types.ReadableRand
 	Request                     = types.Request
 	Requests                    = types.Requests
 	RNG                         = types.RNG

@@ -192,7 +192,7 @@ func createHTLC(
 	require.Equal(t, http.StatusOK, res.StatusCode, body)
 
 	// sign and broadcast
-	resp, body := signAndBroadcastGenTx(t, port, "sender", body, acc, 0, false, kb)
+	resp, body := signAndBroadcastGenTx(t, port, name, body, acc, 0, false, kb)
 	require.Equal(t, http.StatusOK, resp.StatusCode, body)
 
 	var txResp sdk.TxResponse
@@ -233,7 +233,7 @@ func claimHTLC(
 	require.Equal(t, http.StatusOK, res.StatusCode, body)
 
 	// sign and broadcast
-	resp, body := signAndBroadcastGenTx(t, port, "sender", body, acc, 0, false, kb)
+	resp, body := signAndBroadcastGenTx(t, port, name, body, acc, 0, false, kb)
 	require.Equal(t, http.StatusOK, resp.StatusCode, body)
 
 	var txResp sdk.TxResponse
@@ -272,7 +272,7 @@ func refundHTLC(
 	require.Equal(t, http.StatusOK, res.StatusCode, body)
 
 	// sign and broadcast
-	resp, body := signAndBroadcastGenTx(t, port, "sender", body, acc, 0, false, kb)
+	resp, body := signAndBroadcastGenTx(t, port, name, body, acc, 0, false, kb)
 	require.Equal(t, http.StatusOK, resp.StatusCode, body)
 
 	var txResp sdk.TxResponse

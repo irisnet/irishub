@@ -13,9 +13,10 @@ import (
 )
 
 func TestMint(t *testing.T) {
+	name := "sender"
 	kb, err := keys.NewKeyringFromDir(InitClientHome(""), nil)
 	require.NoError(t, err)
-	addr, _, err := CreateAddr(name1, kb)
+	addr, _, err := CreateAddr(name, kb)
 	require.NoError(t, err)
 
 	cleanup, _, _, port, err := InitializeLCD(1, []sdk.AccAddress{addr}, true)
@@ -28,6 +29,7 @@ func TestMint(t *testing.T) {
 	require.NoError(t, err)
 }
 
+// GET /mint/parameters
 func queryParams(t *testing.T, port string) mint.Params {
 	res, body := Request(t, port, "GET", "/mint/parameters", nil)
 	require.Equal(t, http.StatusOK, res.StatusCode, body)
