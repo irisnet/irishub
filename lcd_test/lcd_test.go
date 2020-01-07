@@ -50,7 +50,7 @@ func TestMain(m *testing.M) {
 }
 
 func TestNodeStatus(t *testing.T) {
-	cleanup, _, _, port, err := InitializeLCD(1, []sdk.AccAddress{}, true)
+	cleanup, _, _, port, err := InitializeLCD(1, []sdk.AccAddress{}, true, []string{})
 	require.NoError(t, err)
 	defer cleanup()
 	getNodeInfo(t, port)
@@ -58,7 +58,7 @@ func TestNodeStatus(t *testing.T) {
 }
 
 func TestBlock(t *testing.T) {
-	cleanup, _, _, port, err := InitializeLCD(1, []sdk.AccAddress{}, true)
+	cleanup, _, _, port, err := InitializeLCD(1, []sdk.AccAddress{}, true, []string{})
 	require.NoError(t, err)
 	defer cleanup()
 	getBlock(t, port, -1, false)
@@ -67,7 +67,7 @@ func TestBlock(t *testing.T) {
 }
 
 func TestValidators(t *testing.T) {
-	cleanup, _, _, port, err := InitializeLCD(1, []sdk.AccAddress{}, true)
+	cleanup, _, _, port, err := InitializeLCD(1, []sdk.AccAddress{}, true, []string{})
 	require.NoError(t, err)
 	defer cleanup()
 	resultVals := getValidatorSets(t, port, -1, false)
@@ -82,7 +82,7 @@ func TestCoinSend(t *testing.T) {
 	require.NoError(t, err)
 	addr, _, err := CreateAddr(name1, kb)
 	require.NoError(t, err)
-	cleanup, _, _, port, err := InitializeLCD(1, []sdk.AccAddress{addr}, true)
+	cleanup, _, _, port, err := InitializeLCD(1, []sdk.AccAddress{addr}, true, []string{})
 	require.NoError(t, err)
 	defer cleanup()
 
@@ -172,7 +172,7 @@ func TestCoinSendAccAuto(t *testing.T) {
 	require.NoError(t, err)
 	addr, _, err := CreateAddr(name1, kb)
 	require.NoError(t, err)
-	cleanup, _, _, port, err := InitializeLCD(1, []sdk.AccAddress{addr}, true)
+	cleanup, _, _, port, err := InitializeLCD(1, []sdk.AccAddress{addr}, true, []string{})
 	require.NoError(t, err)
 	defer cleanup()
 
@@ -199,7 +199,7 @@ func TestCoinMultiSendGenerateOnly(t *testing.T) {
 	require.NoError(t, err)
 	addr, _, err := CreateAddr(name1, kb)
 	require.NoError(t, err)
-	cleanup, _, _, port, err := InitializeLCD(1, []sdk.AccAddress{addr}, true)
+	cleanup, _, _, port, err := InitializeLCD(1, []sdk.AccAddress{addr}, true, []string{})
 	require.NoError(t, err)
 	defer cleanup()
 
@@ -224,7 +224,7 @@ func TestCoinSendGenerateSignAndBroadcast(t *testing.T) {
 	require.NoError(t, err)
 	addr, _, err := CreateAddr(name1, kb)
 	require.NoError(t, err)
-	cleanup, _, _, port, err := InitializeLCD(1, []sdk.AccAddress{addr}, true)
+	cleanup, _, _, port, err := InitializeLCD(1, []sdk.AccAddress{addr}, true, []string{})
 	require.NoError(t, err)
 	defer cleanup()
 	acc := getAccount(t, port, addr)
@@ -266,7 +266,7 @@ func TestEncodeTx(t *testing.T) {
 	require.NoError(t, err)
 	addr, _, err := CreateAddr(name1, kb)
 	require.NoError(t, err)
-	cleanup, _, _, port, err := InitializeLCD(1, []sdk.AccAddress{addr}, true)
+	cleanup, _, _, port, err := InitializeLCD(1, []sdk.AccAddress{addr}, true, []string{})
 	require.NoError(t, err)
 	defer cleanup()
 
@@ -302,7 +302,7 @@ func TestTxs(t *testing.T) {
 	require.NoError(t, err)
 	addr, _, err := CreateAddr(name1, kb)
 	require.NoError(t, err)
-	cleanup, _, _, port, err := InitializeLCD(1, []sdk.AccAddress{addr}, true)
+	cleanup, _, _, port, err := InitializeLCD(1, []sdk.AccAddress{addr}, true, []string{})
 	require.NoError(t, err)
 	defer cleanup()
 
@@ -352,7 +352,7 @@ func TestTxs(t *testing.T) {
 }
 
 func TestValidatorsQuery(t *testing.T) {
-	cleanup, valPubKeys, operAddrs, port, err := InitializeLCD(1, []sdk.AccAddress{}, true)
+	cleanup, valPubKeys, operAddrs, port, err := InitializeLCD(1, []sdk.AccAddress{}, true, []string{})
 	require.NoError(t, err)
 	defer cleanup()
 
@@ -373,7 +373,7 @@ func TestValidatorsQuery(t *testing.T) {
 }
 
 func TestValidatorQuery(t *testing.T) {
-	cleanup, valPubKeys, operAddrs, port, err := InitializeLCD(1, []sdk.AccAddress{}, true)
+	cleanup, valPubKeys, operAddrs, port, err := InitializeLCD(1, []sdk.AccAddress{}, true, []string{})
 	require.NoError(t, err)
 	defer cleanup()
 	require.Equal(t, 1, len(valPubKeys))
@@ -389,7 +389,7 @@ func TestBonding(t *testing.T) {
 	addr, _, err := CreateAddr(name1, kb)
 	require.NoError(t, err)
 
-	cleanup, valPubKeys, operAddrs, port, err := InitializeLCD(2, []sdk.AccAddress{addr}, false)
+	cleanup, valPubKeys, operAddrs, port, err := InitializeLCD(2, []sdk.AccAddress{addr}, false, []string{})
 	require.NoError(t, err)
 	tests.WaitForHeight(1, port)
 	defer cleanup()
@@ -553,7 +553,7 @@ func TestSubmitProposal(t *testing.T) {
 	require.NoError(t, err)
 	addr, _, err := CreateAddr(name1, kb)
 	require.NoError(t, err)
-	cleanup, _, _, port, err := InitializeLCD(1, []sdk.AccAddress{addr}, true)
+	cleanup, _, _, port, err := InitializeLCD(1, []sdk.AccAddress{addr}, true, []string{})
 	require.NoError(t, err)
 	defer cleanup()
 
@@ -591,7 +591,7 @@ func TestSubmitCommunityPoolSpendProposal(t *testing.T) {
 	require.NoError(t, err)
 	addr, _, err := CreateAddr(name1, kb)
 	require.NoError(t, err)
-	cleanup, _, _, port, err := InitializeLCD(1, []sdk.AccAddress{addr}, true)
+	cleanup, _, _, port, err := InitializeLCD(1, []sdk.AccAddress{addr}, true, []string{})
 	require.NoError(t, err)
 	defer cleanup()
 
@@ -629,7 +629,7 @@ func TestSubmitParamChangeProposal(t *testing.T) {
 	require.NoError(t, err)
 	addr, _, err := CreateAddr(name1, kb)
 	require.NoError(t, err)
-	cleanup, _, _, port, err := InitializeLCD(1, []sdk.AccAddress{addr}, true)
+	cleanup, _, _, port, err := InitializeLCD(1, []sdk.AccAddress{addr}, true, []string{})
 	require.NoError(t, err)
 	defer cleanup()
 
@@ -667,7 +667,7 @@ func TestDeposit(t *testing.T) {
 	require.NoError(t, err)
 	addr, _, err := CreateAddr(name1, kb)
 	require.NoError(t, err)
-	cleanup, _, _, port, err := InitializeLCD(1, []sdk.AccAddress{addr}, true)
+	cleanup, _, _, port, err := InitializeLCD(1, []sdk.AccAddress{addr}, true, []string{})
 	require.NoError(t, err)
 	defer cleanup()
 
@@ -727,7 +727,7 @@ func TestVote(t *testing.T) {
 	require.NoError(t, err)
 	addr, _, err := CreateAddr(name1, kb)
 	require.NoError(t, err)
-	cleanup, _, operAddrs, port, err := InitializeLCD(1, []sdk.AccAddress{addr}, true)
+	cleanup, _, operAddrs, port, err := InitializeLCD(1, []sdk.AccAddress{addr}, true, []string{})
 	require.NoError(t, err)
 	defer cleanup()
 
@@ -815,7 +815,7 @@ func TestUnjail(t *testing.T) {
 	require.NoError(t, err)
 	addr, _, err := CreateAddr(name1, kb)
 	require.NoError(t, err)
-	cleanup, valPubKeys, _, port, err := InitializeLCD(1, []sdk.AccAddress{addr}, true)
+	cleanup, valPubKeys, _, port, err := InitializeLCD(1, []sdk.AccAddress{addr}, true, []string{})
 	require.NoError(t, err)
 	defer cleanup()
 
@@ -838,7 +838,7 @@ func TestProposalsQuery(t *testing.T) {
 	addrs, _, names, errors := CreateAddrs(kb, 2)
 	require.Empty(t, errors)
 
-	cleanup, _, _, port, err := InitializeLCD(1, []sdk.AccAddress{addrs[0], addrs[1]}, true)
+	cleanup, _, _, port, err := InitializeLCD(1, []sdk.AccAddress{addrs[0], addrs[1]}, true, []string{})
 	require.NoError(t, err)
 	defer cleanup()
 
@@ -965,7 +965,7 @@ func TestProposalsQuery(t *testing.T) {
 }
 
 func TestSlashingGetParams(t *testing.T) {
-	cleanup, _, _, port, err := InitializeLCD(1, []sdk.AccAddress{}, true)
+	cleanup, _, _, port, err := InitializeLCD(1, []sdk.AccAddress{}, true, []string{})
 	require.NoError(t, err)
 	defer cleanup()
 
@@ -978,7 +978,7 @@ func TestSlashingGetParams(t *testing.T) {
 }
 
 func TestDistributionGetParams(t *testing.T) {
-	cleanup, _, _, port, err := InitializeLCD(1, []sdk.AccAddress{}, true)
+	cleanup, _, _, port, err := InitializeLCD(1, []sdk.AccAddress{}, true, []string{})
 	require.NoError(t, err)
 	defer cleanup()
 
@@ -992,7 +992,7 @@ func TestDistributionFlow(t *testing.T) {
 	require.NoError(t, err)
 	addr, _, err := CreateAddr(name1, kb)
 	require.NoError(t, err)
-	cleanup, _, valAddrs, port, err := InitializeLCD(1, []sdk.AccAddress{addr}, true)
+	cleanup, _, valAddrs, port, err := InitializeLCD(1, []sdk.AccAddress{addr}, true, []string{})
 	require.NoError(t, err)
 	defer cleanup()
 
@@ -1070,7 +1070,7 @@ func TestAccountBalanceQuery(t *testing.T) {
 	require.NoError(t, err)
 	addr, _, err := CreateAddr(name1, kb)
 	require.NoError(t, err)
-	cleanup, _, _, port, err := InitializeLCD(1, []sdk.AccAddress{addr}, true)
+	cleanup, _, _, port, err := InitializeLCD(1, []sdk.AccAddress{addr}, true, []string{})
 	require.NoError(t, err)
 	defer cleanup()
 

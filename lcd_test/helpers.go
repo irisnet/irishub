@@ -57,9 +57,19 @@ import (
 // their respective sockets where nValidators is the total number of validators
 // and initAddrs are the accounts to initialize with some stake tokens. It
 // returns a cleanup function, a set of validator public keys, and a port.
-func InitializeLCD(nValidators int, initAddrs []sdk.AccAddress, minting bool, portExt ...string) (
-	cleanup func(), valConsPubKeys []crypto.PubKey, valOperAddrs []sdk.ValAddress, port string, err error) {
-
+func InitializeLCD(
+	nValidators int,
+	initAddrs []sdk.AccAddress,
+	minting bool,
+	assets []string,
+	portExt ...string,
+) (
+	cleanup func(),
+	valConsPubKeys []crypto.PubKey,
+	valOperAddrs []sdk.ValAddress,
+	port string,
+	err error,
+) {
 	config, err := GetConfig()
 	if err != nil {
 		return
@@ -75,16 +85,14 @@ func InitializeLCD(nValidators int, initAddrs []sdk.AccAddress, minting bool, po
 	iapp := app.NewIrisApp(logger, db, nil, true, 0, baseapp.SetPruning(store.PruneNothing))
 	cdc = app.MakeCodec()
 
-	genDoc, valConsPubKeys, valOperAddrs, privVal, err := defaultGenesis(config, nValidators, initAddrs, minting)
+	genDoc, valConsPubKeys, valOperAddrs, privVal, err := defaultGenesis(config, nValidators, initAddrs, minting, assets)
 	if err != nil {
 		return
 	}
 
 	var listenAddr string
-
 	if len(portExt) == 0 {
-		listenAddr, port, err = server.FreeTCPAddr()
-		if err != nil {
+		if listenAddr, port, err = server.FreeTCPAddr(); err != nil {
 			return
 		}
 	} else {
@@ -114,14 +122,12 @@ func InitializeLCD(nValidators int, initAddrs []sdk.AccAddress, minting bool, po
 
 	cleanup = func() {
 		logger.Debug("cleaning up LCD initialization")
-		err = node.Stop()
-		if err != nil {
+		if err = node.Stop(); err != nil {
 			logger.Error(err.Error())
 		}
 
 		node.Wait()
-		err = lcdInstance.Close()
-		if err != nil {
+		if err = lcdInstance.Close(); err != nil {
 			logger.Error(err.Error())
 		}
 	}
@@ -129,10 +135,20 @@ func InitializeLCD(nValidators int, initAddrs []sdk.AccAddress, minting bool, po
 	return cleanup, valConsPubKeys, valOperAddrs, port, err
 }
 
-func defaultGenesis(config *tmcfg.Config, nValidators int, initAddrs []sdk.AccAddress, minting bool) (
-	genDoc *tmtypes.GenesisDoc, valConsPubKeys []crypto.PubKey, valOperAddrs []sdk.ValAddress, privVal *pvm.FilePV, err error) {
-	privVal = pvm.LoadOrGenFilePV(config.PrivValidatorKeyFile(),
-		config.PrivValidatorStateFile())
+func defaultGenesis(
+	config *tmcfg.Config,
+	nValidators int,
+	initAddrs []sdk.AccAddress,
+	minting bool,
+	assets []string,
+) (
+	genDoc *tmtypes.GenesisDoc,
+	valConsPubKeys []crypto.PubKey,
+	valOperAddrs []sdk.ValAddress,
+	privVal *pvm.FilePV,
+	err error,
+) {
+	privVal = pvm.LoadOrGenFilePV(config.PrivValidatorKeyFile(), config.PrivValidatorStateFile())
 	privVal.Reset()
 
 	if nValidators < 1 {
@@ -146,8 +162,7 @@ func defaultGenesis(config *tmcfg.Config, nValidators int, initAddrs []sdk.AccAd
 		return
 	}
 	genDoc.Validators = nil
-	err = genDoc.SaveAs(genesisFile)
-	if err != nil {
+	if err = genDoc.SaveAs(genesisFile); err != nil {
 		return
 	}
 
@@ -192,7 +207,12 @@ func defaultGenesis(config *tmcfg.Config, nValidators int, initAddrs []sdk.AccAd
 			return
 		}
 
-		transaction := auth.NewStdTx([]sdk.Msg{msg}, auth.StdFee{}, []auth.StdSignature{{Signature: sig, PubKey: operPrivKey.PubKey()}}, "")
+		transaction := auth.NewStdTx(
+			[]sdk.Msg{msg},
+			auth.StdFee{},
+			[]auth.StdSignature{{Signature: sig, PubKey: operPrivKey.PubKey()}},
+			"",
+		)
 		genTxs = append(genTxs, transaction)
 		valConsPubKeys = append(valConsPubKeys, pubKey)
 		valOperAddrs = append(valOperAddrs, sdk.ValAddress(operAddr))
@@ -202,6 +222,11 @@ func defaultGenesis(config *tmcfg.Config, nValidators int, initAddrs []sdk.AccAd
 		totalSupply = totalSupply.Add(accTokens)
 
 		account.Coins = sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, accTokens))
+
+		for _, denom := range assets {
+			account.Coins = append(account.Coins, sdk.NewCoin(denom, accTokens))
+		}
+
 		genAccounts = append(genAccounts, &account)
 	}
 
@@ -221,8 +246,12 @@ func defaultGenesis(config *tmcfg.Config, nValidators int, initAddrs []sdk.AccAd
 		accAuth := auth.NewBaseAccountWithAddress(addr)
 		accTokens := sdk.TokensFromConsensusPower(100)
 		accAuth.Coins = sdk.Coins{sdk.NewCoin(sdk.DefaultBondDenom, accTokens)}
-		totalSupply = totalSupply.Add(accTokens)
 
+		for _, denom := range assets {
+			accAuth.Coins = append(accAuth.Coins, sdk.NewCoin(denom, accTokens))
+		}
+
+		totalSupply = totalSupply.Add(accTokens)
 		genAccounts = append(genAccounts, &accAuth)
 	}
 
@@ -253,7 +282,14 @@ func defaultGenesis(config *tmcfg.Config, nValidators int, initAddrs []sdk.AccAd
 	var supplyData supply.GenesisState
 	cdc.MustUnmarshalJSON(supplyDataBz, &supplyData)
 
-	supplyData.Supply = sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, totalSupply.Add(commPoolAmt)))
+	supplyData.Supply = sdk.NewCoins(
+		sdk.NewCoin(sdk.DefaultBondDenom, totalSupply.Add(commPoolAmt)),
+	)
+
+	for _, denom := range assets {
+		supplyData.Supply = append(supplyData.Supply, sdk.NewCoin(denom, totalSupply))
+	}
+
 	supplyDataBz = cdc.MustMarshalJSON(supplyData)
 	genesisState[supply.ModuleName] = supplyDataBz
 
@@ -304,16 +340,23 @@ func defaultGenesis(config *tmcfg.Config, nValidators int, initAddrs []sdk.AccAd
 //
 // TODO: Clean up the WAL dir or enable it to be not persistent!
 func startTM(
-	tmcfg *tmcfg.Config, logger log.Logger, genDoc *tmtypes.GenesisDoc,
-	privVal tmtypes.PrivValidator, app *app.IrisApp,
+	tmcfg *tmcfg.Config,
+	logger log.Logger,
+	genDoc *tmtypes.GenesisDoc,
+	privVal tmtypes.PrivValidator,
+	app *app.IrisApp,
 ) (*nm.Node, error) {
-
-	genDocProvider := func() (*tmtypes.GenesisDoc, error) { return genDoc, nil }
-	dbProvider := func(*nm.DBContext) (dbm.DB, error) { return dbm.NewMemDB(), nil }
+	genDocProvider := func() (*tmtypes.GenesisDoc, error) {
+		return genDoc, nil
+	}
+	dbProvider := func(*nm.DBContext) (dbm.DB, error) {
+		return dbm.NewMemDB(), nil
+	}
 	nodeKey, err := p2p.LoadOrGenNodeKey(tmcfg.NodeKeyFile())
 	if err != nil {
 		return nil, err
 	}
+
 	node, err := nm.NewNode(
 		tmcfg,
 		privVal,
@@ -328,8 +371,7 @@ func startTM(
 		return nil, err
 	}
 
-	err = node.Start()
-	if err != nil {
+	if err = node.Start(); err != nil {
 		return nil, err
 	}
 
@@ -367,33 +409,33 @@ func init() {
 // CreateAddr adds an address to the key store and returns an address and seed.
 // It also requires that the key could be created.
 func CreateAddr(name string, kb crkeys.Keybase) (sdk.AccAddress, string, error) {
-	var (
-		err  error
-		info crkeys.Info
-		seed string
-	)
-	info, seed, err = kb.CreateMnemonic(name, crkeys.English, keys.DefaultKeyPass, crkeys.Secp256k1)
+	info, seed, err := kb.CreateMnemonic(name, crkeys.English, keys.DefaultKeyPass, crkeys.Secp256k1)
 	return sdk.AccAddress(info.GetPubKey().Address()), seed, err
 }
 
 // CreateAddr adds multiple address to the key store and returns the addresses and associated seeds in lexographical order by address.
 // It also requires that the keys could be created.
-func CreateAddrs(kb crkeys.Keybase, numAddrs int) (addrs []sdk.AccAddress, seeds, names []string, errs []error) {
-	var (
-		err  error
-		info crkeys.Info
-		seed string
-	)
-
+func CreateAddrs(
+	kb crkeys.Keybase,
+	numAddrs int,
+) (
+	addrs []sdk.AccAddress,
+	seeds []string,
+	names []string,
+	errs []error,
+) {
 	addrSeeds := AddrSeedSlice{}
 
 	for i := 0; i < numAddrs; i++ {
 		name := fmt.Sprintf("test%d", i)
-		info, seed, err = kb.CreateMnemonic(name, crkeys.English, keys.DefaultKeyPass, crkeys.Secp256k1)
+		info, seed, err := kb.CreateMnemonic(name, crkeys.English, keys.DefaultKeyPass, crkeys.Secp256k1)
 		if err != nil {
 			errs = append(errs, err)
 		}
-		addrSeeds = append(addrSeeds, AddrSeed{Address: sdk.AccAddress(info.GetPubKey().Address()), Seed: seed, Name: name})
+		addrSeeds = append(
+			addrSeeds,
+			AddrSeed{Address: sdk.AccAddress(info.GetPubKey().Address()), Seed: seed, Name: name},
+		)
 	}
 	if len(errs) > 0 {
 		return
@@ -445,8 +487,7 @@ func (b AddrSeedSlice) Swap(i, j int) {
 func InitClientHome(dir string) string {
 	var err error
 	if dir == "" {
-		dir, err = ioutil.TempDir("", "lcd_test")
-		if err != nil {
+		if dir, err = ioutil.TempDir("", "lcd_test"); err != nil {
 			panic(err)
 		}
 	}

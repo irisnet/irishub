@@ -25,18 +25,17 @@ import (
 
 func TestRand(t *testing.T) {
 	name := "sender"
-	// requestID := "ca0b3bae1cc4bffbccc9c085d2311c6bf9c53b57d603808136a2a3a4a585fe17"
 	blockInterval := uint64(50)
 	kb, err := keys.NewKeyringFromDir(InitClientHome(""), nil)
 	require.NoError(t, err)
 	addr, _, err := CreateAddr(name, kb)
 	require.NoError(t, err)
 
-	cleanup, _, _, port, err := InitializeLCD(1, []sdk.AccAddress{addr}, true)
+	cleanup, _, _, port, err := InitializeLCD(1, []sdk.AccAddress{addr}, true, []string{})
 	require.NoError(t, err)
 	defer cleanup()
 
-	// request Rand
+	// request rand
 	resultTx := requestRand(t, port, name, kb, addr, blockInterval)
 	requestID := resultTx.Events[1].Attributes[0].Value
 	generateHeight, err := strconv.ParseInt(resultTx.Events[1].Attributes[1].Value, 10, 64)
@@ -48,7 +47,7 @@ func TestRand(t *testing.T) {
 	requests := queryQueue(t, port, generateHeight)
 	require.Equal(t, strings.ToLower(txHash), hex.EncodeToString(requests[0].TxHash))
 	require.Equal(t, resultTx.Height, requests[0].Height)
-	tests.WaitForHeight(resultTx.Height+51, port)
+	tests.WaitForHeight(resultTx.Height+55, port)
 
 	// query rand
 	readableRand := queryRand(t, port, requestID)

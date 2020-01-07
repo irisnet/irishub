@@ -19,7 +19,7 @@ func TestMint(t *testing.T) {
 	addr, _, err := CreateAddr(name, kb)
 	require.NoError(t, err)
 
-	cleanup, _, _, port, err := InitializeLCD(1, []sdk.AccAddress{addr}, true)
+	cleanup, _, _, port, err := InitializeLCD(1, []sdk.AccAddress{addr}, true, []string{})
 	require.NoError(t, err)
 	defer cleanup()
 

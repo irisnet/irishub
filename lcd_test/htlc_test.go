@@ -35,16 +35,13 @@ func TestHTLC(t *testing.T) {
 	addrTo, _, err := CreateAddr("to", kb)
 	require.NoError(t, err)
 
-	cleanup, _, _, port, err := InitializeLCD(2, []sdk.AccAddress{addrSender, addrTo}, true)
+	cleanup, _, _, port, err := InitializeLCD(1, []sdk.AccAddress{addrSender, addrTo}, true, []string{})
 	require.NoError(t, err)
 	defer cleanup()
 
 	// create HTLC
 	resultTx := createHTLC(
-		t,
-		port,
-		name,
-		kb,
+		t, port, name, kb,
 		addrSender,
 		addrTo,
 		receiverOnOtherChain,
@@ -85,10 +82,7 @@ func TestHTLC(t *testing.T) {
 
 	// refund HTLC
 	resultTx = refundHTLC(
-		t,
-		port,
-		name,
-		kb,
+		t, port, name, kb,
 		addrSender,
 		hashLock.String(),
 	)
@@ -100,10 +94,7 @@ func TestHTLC(t *testing.T) {
 
 	// create HTLC
 	resultTx = createHTLC(
-		t,
-		port,
-		name,
-		kb,
+		t, port, name, kb,
 		addrSender,
 		addrTo,
 		receiverOnOtherChain,
@@ -126,10 +117,7 @@ func TestHTLC(t *testing.T) {
 
 	// claim HTLC
 	resultTx = claimHTLC(
-		t,
-		port,
-		name,
-		kb,
+		t, port, name, kb,
 		addrSender,
 		hashLock.String(),
 		secret.String(),
