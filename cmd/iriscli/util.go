@@ -7,6 +7,8 @@ import (
 	"os"
 	"strings"
 
+	"github.com/spf13/viper"
+
 	"github.com/olebedev/config"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -160,6 +162,9 @@ func handleRequestPreRun(cdc *codec.Codec, cmd *cobra.Command, args []string) {
 	cmdNm := cmd.Name()
 	//handle flag
 	cmd.Flags().Visit(func(flag *pflag.Flag) {
+		if flag.Changed {
+			viper.SetDefault(flag.Name, flag.Value)
+		}
 		parseFlags(cdc, flag, cmdNm)
 	})
 
@@ -188,8 +193,9 @@ func handleResponsePostRun(cdc *codec.Codec, cmd *cobra.Command) {
 }
 
 func isOutputYAML(cdc *codec.Codec, cmd *cobra.Command) bool {
-	output, err := cmd.Flags().GetString(cli.OutputFlag)
-	if err == nil && output == formatJson {
+	output1, err := cmd.Flags().GetString(cli.OutputFlag)
+	output2 := viper.GetString(cli.OutputFlag)
+	if output2 == formatJson || (err == nil && output1 == formatJson) {
 		return false
 	}
 	cmdPath := cmd.CommandPath()
@@ -203,7 +209,7 @@ func parseFlags(cdc *codec.Codec, flag *pflag.Flag, cmdNm string) {
 	if cmdCfg.hasFromFlag(cmdNm, flag.Name) {
 		srcCoinStr := flag.Value.String()
 		if res, err := convertCoins(cdc, srcCoinStr); err == nil {
-			_ = flag.Value.Set(res.String())
+			_ = flag.Value.Set(res)
 		}
 	}
 }
@@ -211,7 +217,7 @@ func parseFlags(cdc *codec.Codec, flag *pflag.Flag, cmdNm string) {
 func parseArgs(cdc *codec.Codec, cmd string, args []string) {
 	if field, ok := cmdCfg.getFromArgs(cmd); ok && len(args) > 0 {
 		if res, err := convertCoins(cdc, args[field.index]); err == nil {
-			args[field.index] = res.String()
+			args[field.index] = res
 		}
 	}
 }
@@ -268,22 +274,24 @@ func handleMap(cdc *codec.Codec, cfg *config.Config, path string) {
 	_ = cfg.Set(path, dstCoin)
 }
 
-func convertCoins(cdc *codec.Codec, coinsStr string) (coins sdk.Coins, err error) {
-	cs, err := sdk.ParseCoins(coinsStr)
+func convertCoins(cdc *codec.Codec, coinsStr string) (dstCoinsStr string, err error) {
+	cs, err := parseCoins(coinsStr)
 	if err != nil {
-		return
+		return coinsStr, err
 	}
+	dstCoins := sdk.Coins{}
 	for _, coin := range cs {
 		if c, err := convertToMinCoin(cdc, coin); err == nil {
-			coins = append(coins, c)
+			dstCoins = append(dstCoins, c)
 			continue
 		}
-		coins = append(coins, coin)
+		c, _ := coin.TruncateDecimal()
+		dstCoins = append(dstCoins, c)
 	}
-	return
+	return dstCoins.String(), nil
 }
 
-func convertToMinCoin(cdc *codec.Codec, srcCoin sdk.Coin) (coin sdk.Coin, err error) {
+func convertToMinCoin(cdc *codec.Codec, srcCoin sdk.DecCoin) (coin sdk.Coin, err error) {
 	params := token.QueryTokenParams{
 		Symbol: srcCoin.Denom,
 	}
@@ -292,14 +300,10 @@ func convertToMinCoin(cdc *codec.Codec, srcCoin sdk.Coin) (coin sdk.Coin, err er
 	if err != nil {
 		return coin, err
 	}
-
-	if ft.Symbol == ft.MinUnit {
-		return srcCoin, err
-	}
-	return ft.ConvertToMinCoin(srcCoin)
+	return ft.ToMinCoin(srcCoin)
 }
 
-func convertToMainCoin(cdc *codec.Codec, srcCoin sdk.Coin) (coin sdk.Coin, err error) {
+func convertToMainCoin(cdc *codec.Codec, srcCoin sdk.Coin) (coin sdk.DecCoin, err error) {
 	params := token.QueryTokenParams{
 		MinUnit: srcCoin.Denom,
 	}
@@ -308,11 +312,7 @@ func convertToMainCoin(cdc *codec.Codec, srcCoin sdk.Coin) (coin sdk.Coin, err e
 	if err != nil {
 		return coin, err
 	}
-
-	if ft.Symbol == ft.MinUnit {
-		return srcCoin, err
-	}
-	return ft.ConvertToMainCoin(srcCoin)
+	return ft.ToMainCoin(srcCoin)
 }
 
 func queryToken(cdc *codec.Codec, params token.QueryTokenParams) (ft token.FungibleToken, err error) {
@@ -336,4 +336,14 @@ func queryToken(cdc *codec.Codec, params token.QueryTokenParams) (ft token.Fungi
 		return
 	}
 	return fts[0], nil
+}
+
+func parseCoins(srcCoinsStr string) (sdk.DecCoins, error) {
+	if cs, err := sdk.ParseDecCoins(srcCoinsStr); err == nil {
+		return cs, nil
+	}
+	if cs, err := sdk.ParseCoins(srcCoinsStr); err == nil {
+		return sdk.NewDecCoins(cs), nil
+	}
+	return sdk.DecCoins{}, fmt.Errorf("parsed decimal coins are invalid: %s", srcCoinsStr)
 }

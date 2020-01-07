@@ -107,14 +107,14 @@ func (ft *FungibleToken) Sanitize() {
 	ft.Name = strings.TrimSpace(ft.Name)
 }
 
-//ConvertToMainCoin return the main denom coin from args
-func (ft FungibleToken) ConvertToMainCoin(coin sdk.Coin) (sdk.Coin, error) {
+//ToMainCoin return the main denom coin from args
+func (ft FungibleToken) ToMainCoin(coin sdk.Coin) (newCoins sdk.DecCoin, err error) {
 	if coin.Denom != ft.Symbol && coin.Denom != ft.MinUnit {
-		return coin, fmt.Errorf("token unit (%s) not defined", coin.Denom)
+		return newCoins, fmt.Errorf("token unit (%s) not defined", coin.Denom)
 	}
 
-	if coin.Denom == ft.Symbol || coin.Amount.IsZero() {
-		return coin, nil
+	if coin.Amount.IsZero() {
+		return
 	}
 
 	// dest amount = src amount * (10^(dest scale) / 10^(src scale))
@@ -123,26 +123,25 @@ func (ft FungibleToken) ConvertToMainCoin(coin sdk.Coin) (sdk.Coin, error) {
 	amount := sdk.NewDecFromInt(coin.Amount)
 
 	amt := amount.Mul(dstScale).Quo(srcScale)
-	return sdk.NewCoin(ft.Symbol, amt.TruncateInt()), nil
+	return sdk.NewDecCoinFromDec(ft.Symbol, amt), nil
 }
 
-//ConvertToMinCoin return the min denom coin from args
-func (ft FungibleToken) ConvertToMinCoin(coin sdk.Coin) (newCoins sdk.Coin, err error) {
+//ToMinCoin return the min denom coin from args
+func (ft FungibleToken) ToMinCoin(coin sdk.DecCoin) (newCoins sdk.Coin, err error) {
 	if coin.Denom != ft.Symbol && coin.Denom != ft.MinUnit {
-		return coin, fmt.Errorf("token unit (%s) not defined", coin.Denom)
+		return newCoins, fmt.Errorf("token unit (%s) not defined", coin.Denom)
 	}
 
-	if coin.Denom == ft.MinUnit || coin.Amount.IsZero() {
-		return coin, nil
+	if coin.Amount.IsZero() {
+		return
 	}
 
 	// dest amount = src amount * (10^(dest scale) / 10^(src scale))
 	srcScale := sdk.NewDecFromInt(sdk.NewIntWithDecimal(1, 0))
 	dstScale := sdk.NewDecFromInt(sdk.NewIntWithDecimal(1, int(ft.Scale)))
-	amount := sdk.NewDecFromInt(coin.Amount)
 
-	amt := amount.Mul(dstScale).Quo(srcScale)
-	return sdk.NewCoin(ft.MinUnit, amt.RoundInt()), nil
+	amt := coin.Amount.Mul(dstScale).Quo(srcScale)
+	return sdk.NewCoin(ft.MinUnit, amt.TruncateInt()), nil
 }
 
 // Tokens - construct FungibleToken array
