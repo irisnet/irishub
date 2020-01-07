@@ -1,7 +1,6 @@
 package keeper
 
 import (
-	"errors"
 	abci "github.com/tendermint/tendermint/abci/types"
 
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -23,7 +22,7 @@ func QuerierToken(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte
 	if len(params.MinUnit) != 0 {
 		return queryTokenByMinUnit(ctx, keeper, params.MinUnit)
 	}
-	return []byte{}, errors.New("symbol and minUnit cannot be empty at the same time")
+	return []byte{}, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "symbol and minUnit cannot be empty at the same time")
 }
 
 // QuerierTokens return the token list by symbol or owner

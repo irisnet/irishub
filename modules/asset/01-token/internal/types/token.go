@@ -110,7 +110,7 @@ func (ft *FungibleToken) Sanitize() {
 //ToMainCoin return the main denom coin from args
 func (ft FungibleToken) ToMainCoin(coin sdk.Coin) (newCoins sdk.DecCoin, err error) {
 	if coin.Denom != ft.Symbol && coin.Denom != ft.MinUnit {
-		return newCoins, fmt.Errorf("token unit (%s) not defined", coin.Denom)
+		return newCoins, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, fmt.Sprintf("token unit (%s) not defined", coin.Denom))
 	}
 
 	if coin.Amount.IsZero() {
@@ -129,7 +129,7 @@ func (ft FungibleToken) ToMainCoin(coin sdk.Coin) (newCoins sdk.DecCoin, err err
 //ToMinCoin return the min denom coin from args
 func (ft FungibleToken) ToMinCoin(coin sdk.DecCoin) (newCoins sdk.Coin, err error) {
 	if coin.Denom != ft.Symbol && coin.Denom != ft.MinUnit {
-		return newCoins, fmt.Errorf("token unit (%s) not defined", coin.Denom)
+		return newCoins, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, fmt.Sprintf("token unit (%s) not defined", coin.Denom))
 	}
 
 	if coin.Amount.IsZero() {
