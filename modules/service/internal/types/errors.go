@@ -26,4 +26,7 @@ var (
 	ErrUnknownReturnFee      = sdkerrors.Register(ModuleName, 21, "no service refund fees")
 	ErrUnknownWithdrawFee    = sdkerrors.Register(ModuleName, 22, "no service withdraw fees")
 	ErrUnknownResponse       = sdkerrors.Register(ModuleName, 23, "unknown response")
+	ErrInvalidRequestInput   = sdkerrors.Register(ModuleName, 24, "invalid request input")
+	ErrInvalidResponseOutput = sdkerrors.Register(ModuleName, 25, "invalid response output")
+	ErrInvalidResponseErr    = sdkerrors.Register(ModuleName, 26, "invalid response err")
 )

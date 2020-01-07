@@ -44,45 +44,36 @@ func ValidateBindingPricing(pricing string) error {
 }
 
 // ValidateRequestInput validates the request input against the input schema.
-// assume that the schemas is valid.
+// ensure that the schemas is valid and input is a valid JSON
 func ValidateRequestInput(schemas string, input string) error {
 	inputSchemaBz := parseInputSchema(schemas)
-	inputSchemaLoader := gojsonschema.NewBytesLoader(inputSchemaBz)
 
-	inputLoader := gojsonschema.NewStringLoader(input)
-
-	if _, err := gojsonschema.Validate(inputSchemaLoader, inputLoader); err != nil {
-		return err
+	if !validateDocument(inputSchemaBz, input) {
+		return sdkerrors.Wrap(ErrInvalidRequestInput, "invalid request input")
 	}
 
 	return nil
 }
 
 // ValidateResponseOutput validates the response output against the output schema.
-// assume that the schemas is valid.
+// ensure that the schemas is valid and output is a valid JSON
 func ValidateResponseOutput(schemas string, output string) error {
 	outputSchemaBz := parseOutputSchema(schemas)
-	outputSchemaLoader := gojsonschema.NewBytesLoader(outputSchemaBz)
 
-	outputLoader := gojsonschema.NewStringLoader(output)
-
-	if _, err := gojsonschema.Validate(outputSchemaLoader, outputLoader); err != nil {
-		return err
+	if !validateDocument(outputSchemaBz, output) {
+		return sdkerrors.Wrap(ErrInvalidResponseOutput, "invalid response output")
 	}
 
 	return nil
 }
 
 // ValidateResponseError validates the response err against the error schema.
-// assume that the schemas is valid.
-func ValidateResponseError(schemas string, err string) error {
+// ensure that the schemas is valid and errResp is a valid JSON
+func ValidateResponseError(schemas string, errResp string) error {
 	errSchemaBz := parseErrorSchema(schemas)
-	errSchemaLoader := gojsonschema.NewBytesLoader(errSchemaBz)
 
-	errLoader := gojsonschema.NewStringLoader(err)
-
-	if _, err := gojsonschema.Validate(errSchemaLoader, errLoader); err != nil {
-		return err
+	if !validateDocument(errSchemaBz, errResp) {
+		return sdkerrors.Wrap(ErrInvalidResponseErr, "invalid response err")
 	}
 
 	return nil
@@ -130,8 +121,8 @@ func validateErrorSchema(errSchema map[string]interface{}) error {
 	return nil
 }
 
-// parseInputSchema parses the input schema from the given schemas
-// assume that the schemas is valid. Panic if invalid
+// parseInputSchema parses the input schema from the given schemas.
+// ensure that the schemas is valid. Panic if invalid
 func parseInputSchema(schemas string) []byte {
 	var svcSchemas ServiceSchemas
 	if err := json.Unmarshal([]byte(schemas), &svcSchemas); err != nil {
@@ -146,8 +137,8 @@ func parseInputSchema(schemas string) []byte {
 	return inputSchemaBz
 }
 
-// parseOutputSchema parses the output schema from the given schemas
-// assume that the schemas is valid. Panic if invalid
+// parseOutputSchema parses the output schema from the given schemas.
+// ensure that the schemas is valid. Panic if invalid
 func parseOutputSchema(schemas string) []byte {
 	var svcSchemas ServiceSchemas
 	if err := json.Unmarshal([]byte(schemas), &svcSchemas); err != nil {
@@ -162,8 +153,8 @@ func parseOutputSchema(schemas string) []byte {
 	return outputSchemaBz
 }
 
-// parseErrorSchema parses the error schema from the given schemas
-// assume that the schemas is valid. Panic if invalid
+// parseErrorSchema parses the error schema from the given schemas.
+// ensure that the schemas is valid. Panic if invalid
 func parseErrorSchema(schemas string) []byte {
 	var svcSchemas ServiceSchemas
 	if err := json.Unmarshal([]byte(schemas), &svcSchemas); err != nil {
@@ -176,4 +167,18 @@ func parseErrorSchema(schemas string) []byte {
 	}
 
 	return errSchemaBz
+}
+
+// validateDocument wraps the gojsonschema validation.
+// ensure that the document is a valid JSON. Panic if invalid
+func validateDocument(schema []byte, document string) bool {
+	schemaLoader := gojsonschema.NewBytesLoader(schema)
+	docLoader := gojsonschema.NewStringLoader(document)
+
+	res, err := gojsonschema.Validate(schemaLoader, docLoader)
+	if err != nil {
+		panic(err)
+	}
+
+	return res.Valid()
 }
