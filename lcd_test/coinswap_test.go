@@ -152,7 +152,7 @@ func addLiquidity(
 	t *testing.T, port string, name string, kb crkeys.Keybase,
 	addrSender sdk.AccAddress, poolID string, maxToken string,
 	exactStandardAmt string, minLiquidity string, deadline string,
-) sdk.TxResponse {
+) (txResp sdk.TxResponse) {
 	acc := getAccount(t, port, addrSender)
 	accnum := acc.GetAccountNumber()
 	sequence := acc.GetSequence()
@@ -181,11 +181,10 @@ func addLiquidity(
 	resp, body := signAndBroadcastGenTx(t, port, name, body, acc, 0, false, kb)
 	require.Equal(t, http.StatusOK, resp.StatusCode, body)
 
-	var txResp sdk.TxResponse
 	err = cdc.UnmarshalJSON([]byte(body), &txResp)
 	require.NoError(t, err)
 
-	return txResp
+	return
 }
 
 // POST /coinswap/liquidities/{pool-id}/withdraw
@@ -193,7 +192,7 @@ func removeLiquidity(
 	t *testing.T, port string, name string, kb crkeys.Keybase,
 	addrSender sdk.AccAddress, poolID string, minToken string,
 	withdrawLiquidity string, minStandardAmt string, deadline string,
-) sdk.TxResponse {
+) (txResp sdk.TxResponse) {
 	acc := getAccount(t, port, addrSender)
 	accnum := acc.GetAccountNumber()
 	sequence := acc.GetSequence()
@@ -222,11 +221,10 @@ func removeLiquidity(
 	resp, body := signAndBroadcastGenTx(t, port, name, body, acc, 0, false, kb)
 	require.Equal(t, http.StatusOK, resp.StatusCode, body)
 
-	var txResp sdk.TxResponse
 	err = cdc.UnmarshalJSON([]byte(body), &txResp)
 	require.NoError(t, err)
 
-	return txResp
+	return
 }
 
 // POST /coinswap/liquidities/buy
@@ -234,7 +232,7 @@ func buyOrder(
 	t *testing.T, port string, name string, kb crkeys.Keybase,
 	addrSender sdk.AccAddress, inputCoin sdk.Coin, outputCoin sdk.Coin,
 	deadline string,
-) sdk.TxResponse {
+) (txResp sdk.TxResponse) {
 	acc := getAccount(t, port, addrSender)
 	accnum := acc.GetAccountNumber()
 	sequence := acc.GetSequence()
@@ -260,11 +258,10 @@ func buyOrder(
 	resp, body := signAndBroadcastGenTx(t, port, name, body, acc, 0, false, kb)
 	require.Equal(t, http.StatusOK, resp.StatusCode, body)
 
-	var txResp sdk.TxResponse
 	err = cdc.UnmarshalJSON([]byte(body), &txResp)
 	require.NoError(t, err)
 
-	return txResp
+	return
 }
 
 // POST /coinswap/liquidities/sell
@@ -272,7 +269,7 @@ func sellOrder(
 	t *testing.T, port string, name string, kb crkeys.Keybase,
 	addrSender sdk.AccAddress, inputCoin sdk.Coin, outputCoin sdk.Coin,
 	deadline string,
-) sdk.TxResponse {
+) (txResp sdk.TxResponse) {
 	acc := getAccount(t, port, addrSender)
 	accnum := acc.GetAccountNumber()
 	sequence := acc.GetSequence()
@@ -298,24 +295,22 @@ func sellOrder(
 	resp, body := signAndBroadcastGenTx(t, port, name, body, acc, 0, false, kb)
 	require.Equal(t, http.StatusOK, resp.StatusCode, body)
 
-	var txResp sdk.TxResponse
 	err = cdc.UnmarshalJSON([]byte(body), &txResp)
 	require.NoError(t, err)
 
-	return txResp
+	return
 }
 
 // GET /coinswap/liquidities/{pool-id}
-func queryLiquidity(t *testing.T, port string, poolID string) coinswap.QueryLiquidityResponse {
+func queryLiquidity(t *testing.T, port string, poolID string) (response coinswap.QueryLiquidityResponse) {
 	res, body := Request(t, port, "GET", fmt.Sprintf("/coinswap/liquidities/%s", poolID), nil)
 	require.Equal(t, http.StatusOK, res.StatusCode, body)
 
 	var resp rest.ResponseWithHeight
 	require.NoError(t, cdc.UnmarshalJSON([]byte(body), &resp))
 
-	var liquidityResponse coinswap.QueryLiquidityResponse
-	err := cdc.UnmarshalJSON(resp.Result, &liquidityResponse)
+	err := cdc.UnmarshalJSON(resp.Result, &response)
 	require.NoError(t, err)
 
-	return liquidityResponse
+	return
 }

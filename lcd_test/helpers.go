@@ -345,7 +345,10 @@ func startTM(
 	genDoc *tmtypes.GenesisDoc,
 	privVal tmtypes.PrivValidator,
 	app *app.IrisApp,
-) (*nm.Node, error) {
+) (
+	*nm.Node,
+	error,
+) {
 	genDocProvider := func() (*tmtypes.GenesisDoc, error) {
 		return genDoc, nil
 	}

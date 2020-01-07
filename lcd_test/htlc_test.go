@@ -153,7 +153,7 @@ func createHTLC(
 	hashLock string,
 	timeLock uint64,
 	timestamp uint64,
-) sdk.TxResponse {
+) (txResp sdk.TxResponse) {
 	acc := getAccount(t, port, addrSender)
 	accnum := acc.GetAccountNumber()
 	sequence := acc.GetSequence()
@@ -183,11 +183,10 @@ func createHTLC(
 	resp, body := signAndBroadcastGenTx(t, port, name, body, acc, 0, false, kb)
 	require.Equal(t, http.StatusOK, resp.StatusCode, body)
 
-	var txResp sdk.TxResponse
 	err = cdc.UnmarshalJSON([]byte(body), &txResp)
 	require.NoError(t, err)
 
-	return txResp
+	return
 }
 
 // POST /htlc/htlcs/{hash-lock}/claim
@@ -199,7 +198,7 @@ func claimHTLC(
 	addrSender sdk.AccAddress,
 	hashLock string,
 	secret string,
-) sdk.TxResponse {
+) (txResp sdk.TxResponse) {
 	acc := getAccount(t, port, addrSender)
 	accnum := acc.GetAccountNumber()
 	sequence := acc.GetSequence()
@@ -224,11 +223,10 @@ func claimHTLC(
 	resp, body := signAndBroadcastGenTx(t, port, name, body, acc, 0, false, kb)
 	require.Equal(t, http.StatusOK, resp.StatusCode, body)
 
-	var txResp sdk.TxResponse
 	err = cdc.UnmarshalJSON([]byte(body), &txResp)
 	require.NoError(t, err)
 
-	return txResp
+	return
 }
 
 // POST /htlc/htlcs/{hash-lock}/refund
@@ -239,7 +237,7 @@ func refundHTLC(
 	kb crkeys.Keybase,
 	addrSender sdk.AccAddress,
 	hashLock string,
-) sdk.TxResponse {
+) (txResp sdk.TxResponse) {
 	acc := getAccount(t, port, addrSender)
 	accnum := acc.GetAccountNumber()
 	sequence := acc.GetSequence()
@@ -263,24 +261,22 @@ func refundHTLC(
 	resp, body := signAndBroadcastGenTx(t, port, name, body, acc, 0, false, kb)
 	require.Equal(t, http.StatusOK, resp.StatusCode, body)
 
-	var txResp sdk.TxResponse
 	err = cdc.UnmarshalJSON([]byte(body), &txResp)
 	require.NoError(t, err)
 
-	return txResp
+	return
 }
 
 // GET /htlc/htlcs/{hash-lock}
-func queryHTLC(t *testing.T, port string, hashLock string) htlc.HTLC {
+func queryHTLC(t *testing.T, port string, hashLock string) (resHTLC htlc.HTLC) {
 	res, body := Request(t, port, "GET", fmt.Sprintf("/htlc/htlcs/%s", hashLock), nil)
 	require.Equal(t, http.StatusOK, res.StatusCode, body)
 
 	var resp rest.ResponseWithHeight
 	require.NoError(t, cdc.UnmarshalJSON([]byte(body), &resp))
 
-	var resHTLC htlc.HTLC
 	err := cdc.UnmarshalJSON(resp.Result, &resHTLC)
 	require.NoError(t, err)
 
-	return resHTLC
+	return
 }

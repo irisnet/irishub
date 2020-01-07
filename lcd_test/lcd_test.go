@@ -1087,5 +1087,4 @@ func TestAccountBalanceQuery(t *testing.T) {
 	res, body = Request(t, port, "GET", fmt.Sprintf("/bank/balances/%s", someFakeAddr), nil)
 	require.Equal(t, http.StatusOK, res.StatusCode, body)
 	require.Contains(t, body, "[]")
-
 }

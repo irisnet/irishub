@@ -30,12 +30,9 @@ func TestMint(t *testing.T) {
 }
 
 // GET /mint/parameters
-func queryParams(t *testing.T, port string) mint.Params {
+func queryParams(t *testing.T, port string) (params mint.Params) {
 	res, body := Request(t, port, "GET", "/mint/parameters", nil)
 	require.Equal(t, http.StatusOK, res.StatusCode, body)
-
-	var params mint.Params
 	require.NoError(t, cdc.UnmarshalJSON(extractResultFromResponse(t, []byte(body)), &params))
-
-	return params
+	return
 }

@@ -58,7 +58,7 @@ func TestRand(t *testing.T) {
 func requestRand(
 	t *testing.T, port string, name string, kb crkeys.Keybase,
 	addrSender sdk.AccAddress, blockInterval uint64,
-) sdk.TxResponse {
+) (txResp sdk.TxResponse) {
 	acc := getAccount(t, port, addrSender)
 	accnum := acc.GetAccountNumber()
 	sequence := acc.GetSequence()
@@ -83,39 +83,36 @@ func requestRand(
 	resp, body := signAndBroadcastGenTx(t, port, name, body, acc, 0, false, kb)
 	require.Equal(t, http.StatusOK, resp.StatusCode, body)
 
-	var txResp sdk.TxResponse
 	err = cdc.UnmarshalJSON([]byte(body), &txResp)
 	require.NoError(t, err)
 
-	return txResp
+	return
 }
 
 // GET /rand/rands/{request-id}
-func queryRand(t *testing.T, port string, requestID string) rand.ReadableRand {
+func queryRand(t *testing.T, port string, requestID string) (readableRand rand.ReadableRand) {
 	res, body := Request(t, port, "GET", fmt.Sprintf("/rand/rands/%s", requestID), nil)
 	require.Equal(t, http.StatusOK, res.StatusCode, body)
 
 	var resp rest.ResponseWithHeight
 	require.NoError(t, cdc.UnmarshalJSON([]byte(body), &resp))
 
-	var readableRand rand.ReadableRand
 	err := cdc.UnmarshalJSON(resp.Result, &readableRand)
 	require.NoError(t, err)
 
-	return readableRand
+	return
 }
 
 // GET /rand/queue
-func queryQueue(t *testing.T, port string, height int64) []rand.Request {
+func queryQueue(t *testing.T, port string, height int64) (requests []rand.Request) {
 	res, body := Request(t, port, "GET", fmt.Sprintf("/rand/queue?gen-height=%d", height), nil)
 	require.Equal(t, http.StatusOK, res.StatusCode, body)
 
 	var resp rest.ResponseWithHeight
 	require.NoError(t, cdc.UnmarshalJSON([]byte(body), &resp))
 
-	var requests []rand.Request
 	err := cdc.UnmarshalJSON(resp.Result, &requests)
 	require.NoError(t, err)
 
-	return requests
+	return
 }
