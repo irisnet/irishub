@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -22,8 +23,6 @@ import (
 
 const (
 	formatJson      = "json"
-	propDenom       = "denom"
-	propAmount      = "amount"
 	tokenQueryRoute = "asset/token"
 
 	cmdScopeGlobal = "global"
@@ -165,7 +164,7 @@ func handleRequestPreRun(cdc *codec.Codec, cmd *cobra.Command, args []string) {
 	})
 
 	//handle field
-	parseArgs(cdc, cmd.Name(), args[:])
+	parseArgs(cdc, cmdNm, args[:])
 }
 
 func handleResponsePreRun(cdc *codec.Codec, cmd *cobra.Command) {
@@ -185,8 +184,7 @@ func handleResponsePostRun(cdc *codec.Codec, cmd *cobra.Command) {
 	}
 	out, _ := ioutil.ReadAll(r)
 	os.Stdout = rescueStdout
-	cmdNm := cmd.Name()
-	fmt.Println(parseYAML(cdc, cmdNm, out))
+	fmt.Println(parseYAML(cdc, cmd.Name(), out))
 }
 
 func isOutputYAML(cdc *codec.Codec, cmd *cobra.Command) bool {
@@ -246,27 +244,7 @@ func handleList(cdc *codec.Codec, cfg *config.Config, path string) {
 		return
 	}
 	for i, _ := range list {
-		denomPath := fmt.Sprintf("%s.%d.%s", path, i, propDenom)
-		amountPath := fmt.Sprintf("%s.%d.%s", path, i, propAmount)
-		denom, err := cfg.String(denomPath)
-		if err != nil {
-			continue
-		}
-		amount, err := cfg.String(amountPath)
-		if err != nil {
-			continue
-		}
-		amtInt, ok := sdk.NewIntFromString(amount)
-		if !ok {
-			continue
-		}
-		srcCoin := sdk.NewCoin(denom, amtInt)
-		dstCoin, err := convertToMainCoin(cdc, srcCoin)
-		if err != nil {
-			continue
-		}
-		_ = cfg.Set(denomPath, dstCoin.Denom)
-		_ = cfg.Set(amountPath, dstCoin.Amount)
+		handleMap(cdc, cfg, fmt.Sprintf("%s.%d", path, i))
 	}
 }
 
@@ -275,27 +253,19 @@ func handleMap(cdc *codec.Codec, cfg *config.Config, path string) {
 	if err != nil {
 		return
 	}
-	denomPath := fmt.Sprintf("%s.%s", path, propDenom)
-	amountPath := fmt.Sprintf("%s.%s", path, propAmount)
-	denom, ok := cMap[propDenom].(string)
-	if !ok {
+	bz, err := json.Marshal(cMap)
+	if err != nil {
 		return
 	}
-	amount, ok := cMap[propAmount].(string)
-	if !ok {
+	var srcCoin sdk.Coin
+	if err := json.Unmarshal(bz, &srcCoin); err != nil {
 		return
 	}
-	amtInt, ok := sdk.NewIntFromString(amount)
-	if !ok {
-		return
-	}
-	srcCoin := sdk.NewCoin(denom, amtInt)
 	dstCoin, err := convertToMainCoin(cdc, srcCoin)
 	if err != nil {
 		return
 	}
-	_ = cfg.Set(denomPath, dstCoin.Denom)
-	_ = cfg.Set(amountPath, dstCoin.Amount)
+	_ = cfg.Set(path, dstCoin)
 }
 
 func convertCoins(cdc *codec.Codec, coinsStr string) (coins sdk.Coins, err error) {
@@ -314,43 +284,42 @@ func convertCoins(cdc *codec.Codec, coinsStr string) (coins sdk.Coins, err error
 }
 
 func convertToMinCoin(cdc *codec.Codec, srcCoin sdk.Coin) (coin sdk.Coin, err error) {
-	cliCtx := context.NewCLIContext().WithCodec(cdc)
 	params := token.QueryTokenParams{
 		Symbol: srcCoin.Denom,
 	}
 
-	bz, err := cliCtx.Codec.MarshalJSON(params)
+	ft, err := queryToken(cdc, params)
 	if err != nil {
-		return
+		return coin, err
 	}
 
-	res, _, err := cliCtx.QueryWithData(
-		fmt.Sprintf("custom/%s/%s", tokenQueryRoute, token.QueryToken), bz,
-	)
-
-	if err != nil {
-		return
+	if ft.Symbol == ft.MinUnit {
+		return srcCoin, err
 	}
-
-	var fts token.Tokens
-	cliCtx.Codec.MustUnmarshalJSON(res, &fts)
-
-	if fts[0].Symbol == fts[0].MinUnit {
-		return
-	}
-
-	return fts[0].ConvertToMinCoin(srcCoin)
+	return ft.ConvertToMinCoin(srcCoin)
 }
 
 func convertToMainCoin(cdc *codec.Codec, srcCoin sdk.Coin) (coin sdk.Coin, err error) {
-	cliCtx := context.NewCLIContext().WithCodec(cdc)
 	params := token.QueryTokenParams{
 		MinUnit: srcCoin.Denom,
 	}
 
+	ft, err := queryToken(cdc, params)
+	if err != nil {
+		return coin, err
+	}
+
+	if ft.Symbol == ft.MinUnit {
+		return srcCoin, err
+	}
+	return ft.ConvertToMainCoin(srcCoin)
+}
+
+func queryToken(cdc *codec.Codec, params token.QueryTokenParams) (ft token.FungibleToken, err error) {
+	cliCtx := context.NewCLIContext().WithCodec(cdc)
 	bz, err := cliCtx.Codec.MarshalJSON(params)
 	if err != nil {
-		return
+		return ft, err
 	}
 
 	res, _, err := cliCtx.QueryWithData(
@@ -358,15 +327,13 @@ func convertToMainCoin(cdc *codec.Codec, srcCoin sdk.Coin) (coin sdk.Coin, err e
 	)
 
 	if err != nil {
-		return
+		return ft, err
 	}
 
 	var fts token.Tokens
 	cliCtx.Codec.MustUnmarshalJSON(res, &fts)
-
-	if fts[0].Symbol == fts[0].MinUnit {
+	if len(fts) == 0 {
 		return
 	}
-
-	return fts[0].ConvertToMainCoin(srcCoin)
+	return fts[0], nil
 }
