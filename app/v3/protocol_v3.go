@@ -5,27 +5,28 @@ import (
 	"sort"
 	"strings"
 
+	abci "github.com/tendermint/tendermint/abci/types"
+	cfg "github.com/tendermint/tendermint/config"
+	"github.com/tendermint/tendermint/libs/log"
+
 	"github.com/irisnet/irishub/app/protocol"
-	"github.com/irisnet/irishub/app/v1/asset"
 	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/app/v1/bank"
 	distr "github.com/irisnet/irishub/app/v1/distribution"
-	"github.com/irisnet/irishub/app/v1/gov"
 	"github.com/irisnet/irishub/app/v1/mint"
 	"github.com/irisnet/irishub/app/v1/params"
 	"github.com/irisnet/irishub/app/v1/rand"
-	"github.com/irisnet/irishub/app/v1/service"
 	"github.com/irisnet/irishub/app/v1/slashing"
 	"github.com/irisnet/irishub/app/v1/stake"
 	"github.com/irisnet/irishub/app/v1/upgrade"
 	"github.com/irisnet/irishub/app/v2/coinswap"
 	"github.com/irisnet/irishub/app/v2/htlc"
+	"github.com/irisnet/irishub/app/v3/asset"
+	"github.com/irisnet/irishub/app/v3/gov"
+	"github.com/irisnet/irishub/app/v3/service"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/guardian"
 	sdk "github.com/irisnet/irishub/types"
-	abci "github.com/tendermint/tendermint/abci/types"
-	cfg "github.com/tendermint/tendermint/config"
-	"github.com/tendermint/tendermint/libs/log"
 )
 
 var _ protocol.Protocol = (*ProtocolV3)(nil)
@@ -102,7 +103,6 @@ func (p *ProtocolV3) Load() {
 
 // Init initializes the configuration of this Protocol
 func (p *ProtocolV3) Init(ctx sdk.Context) {
-	//TODO
 }
 
 // GetCodec get codec
@@ -112,7 +112,8 @@ func (p *ProtocolV3) GetCodec() *codec.Codec {
 
 // InitMetrics init prometheus metrics
 func (p *ProtocolV3) InitMetrics(store sdk.MultiStore) {
-	//TODO
+	p.StakeKeeper.InitMetrics(store.GetKVStore(protocol.KeyStake))
+	p.serviceKeeper.InitMetrics(store.GetKVStore(protocol.KeyService))
 }
 
 func (p *ProtocolV3) configCodec() {

@@ -3,9 +3,10 @@ package app
 import (
 	"fmt"
 
+	dbm "github.com/tendermint/tm-db"
+
 	"github.com/irisnet/irishub/store"
 	sdk "github.com/irisnet/irishub/types"
-	dbm "github.com/tendermint/tm-db"
 )
 
 // File for storing in-package BaseApp optional functions,

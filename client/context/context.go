@@ -3,25 +3,27 @@ package context
 import (
 	"bytes"
 	"fmt"
-	"github.com/irisnet/irishub/app/v2/coinswap"
 	"io"
 	"os"
 	"strings"
 
-	"github.com/irisnet/irishub/app/protocol"
-	"github.com/irisnet/irishub/app/v1/asset"
-	"github.com/irisnet/irishub/app/v1/auth"
-	"github.com/irisnet/irishub/client"
-	"github.com/irisnet/irishub/client/keys"
-	"github.com/irisnet/irishub/codec"
-	cskeys "github.com/irisnet/irishub/crypto/keys"
-	sdk "github.com/irisnet/irishub/types"
 	"github.com/spf13/viper"
+
 	"github.com/tendermint/tendermint/libs/cli"
 	"github.com/tendermint/tendermint/libs/log"
 	tmlite "github.com/tendermint/tendermint/lite"
 	tmliteProxy "github.com/tendermint/tendermint/lite/proxy"
 	rpcclient "github.com/tendermint/tendermint/rpc/client"
+
+	"github.com/irisnet/irishub/app/protocol"
+	"github.com/irisnet/irishub/app/v1/auth"
+	"github.com/irisnet/irishub/app/v2/coinswap"
+	"github.com/irisnet/irishub/app/v3/asset"
+	"github.com/irisnet/irishub/client"
+	"github.com/irisnet/irishub/client/keys"
+	"github.com/irisnet/irishub/codec"
+	cskeys "github.com/irisnet/irishub/crypto/keys"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 // CLIContext implements a typical CLI context created in SDK modules for

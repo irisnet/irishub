@@ -3,23 +3,24 @@ package v3
 import (
 	"encoding/json"
 
+	tmtypes "github.com/tendermint/tendermint/types"
+
 	"github.com/irisnet/irishub/app/protocol"
-	"github.com/irisnet/irishub/app/v1/asset"
 	"github.com/irisnet/irishub/app/v1/auth"
 	distr "github.com/irisnet/irishub/app/v1/distribution"
-	"github.com/irisnet/irishub/app/v1/gov"
 	"github.com/irisnet/irishub/app/v1/mint"
 	"github.com/irisnet/irishub/app/v1/rand"
-	"github.com/irisnet/irishub/app/v1/service"
 	"github.com/irisnet/irishub/app/v1/slashing"
 	"github.com/irisnet/irishub/app/v1/stake"
 	"github.com/irisnet/irishub/app/v1/upgrade"
 	"github.com/irisnet/irishub/app/v2/coinswap"
 	"github.com/irisnet/irishub/app/v2/htlc"
+	"github.com/irisnet/irishub/app/v3/asset"
+	"github.com/irisnet/irishub/app/v3/gov"
+	"github.com/irisnet/irishub/app/v3/service"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/guardian"
 	sdk "github.com/irisnet/irishub/types"
-	tmtypes "github.com/tendermint/tendermint/types"
 )
 
 // export the state of iris for a genesis file

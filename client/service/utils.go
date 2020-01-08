@@ -1,7 +1,7 @@
 package service
 
 import (
-	"github.com/irisnet/irishub/app/v1/service"
+	"github.com/irisnet/irishub/app/v3/service"
 	sdk "github.com/irisnet/irishub/types"
 )
 

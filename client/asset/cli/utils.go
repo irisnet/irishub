@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/irisnet/irishub/app/protocol"
-	"github.com/irisnet/irishub/app/v1/asset"
+	"github.com/irisnet/irishub/app/v3/asset"
 	"github.com/irisnet/irishub/client/context"
 )
 

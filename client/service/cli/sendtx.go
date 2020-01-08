@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/irisnet/irishub/app/v1/service"
+	"github.com/irisnet/irishub/app/v3/service"
 	"github.com/irisnet/irishub/client"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"

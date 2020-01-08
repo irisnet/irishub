@@ -1,7 +1,7 @@
 package cli
 
 import (
-	"github.com/irisnet/irishub/app/v1/asset"
+	"github.com/irisnet/irishub/app/v3/asset"
 	flag "github.com/spf13/pflag"
 )
 
