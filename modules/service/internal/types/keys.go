@@ -38,17 +38,17 @@ var (
 
 	// Keys for store prefixes
 	ServiceDefinitionKey         = []byte{0x01}
-	BindingPropertyKey           = []byte{0x03}
-	RequestKey                   = []byte{0x05}
-	ResponseKey                  = []byte{0x06}
-	RequestsByExpirationIndexKey = []byte{0x07}
-	IntraTxCounterKey            = []byte{0x08} // key for intra-block tx index
-	ActiveRequestKey             = []byte{0x09} // key for active request
-	ReturnedFeeKey               = []byte{0x10}
-	IncomingFeeKey               = []byte{0x11}
+	BindingPropertyKey           = []byte{0x02}
+	RequestKey                   = []byte{0x03}
+	ResponseKey                  = []byte{0x04}
+	RequestsByExpirationIndexKey = []byte{0x05}
+	IntraTxCounterKey            = []byte{0x06} // key for intra-block tx index
+	ActiveRequestKey             = []byte{0x07} // key for active request
+	ReturnedFeeKey               = []byte{0x08}
+	IncomingFeeKey               = []byte{0x09}
 
-	ServiceFeeTaxKey        = []byte{0x12}
-	ServiceSlashFractionKey = []byte{0x13}
+	ServiceFeeTaxKey        = []byte{0x10}
+	ServiceSlashFractionKey = []byte{0x11}
 )
 
 // GetServiceDefinitionKey returns a key for the service definition with the specified name

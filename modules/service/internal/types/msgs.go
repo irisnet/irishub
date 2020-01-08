@@ -94,7 +94,7 @@ func (msg MsgDefineService) ValidateBasic() error {
 	}
 
 	if !validServiceName(msg.Name) {
-		return sdkerrors.Wrap(ErrInvalidServiceName, "invalid service name, only alphanumeric characters, _ and - accepted")
+		return sdkerrors.Wrap(ErrInvalidServiceName, msg.Name)
 	}
 
 	if err := ensureServiceDefLength(msg); err != nil {
@@ -730,7 +730,7 @@ func (msg MsgSvcWithdrawTax) GetSigners() []sdk.AccAddress {
 // ValidateServiceName validates the service name
 func ValidateServiceName(name string) error {
 	if !validServiceName(name) {
-		return sdkerrors.Wrap(ErrInvalidServiceName, "invalid service name, only alphanumeric characters, _ and - accepted")
+		return sdkerrors.Wrap(ErrInvalidServiceName, name)
 	}
 
 	if err := ensureServiceNameLength(name); err != nil {
