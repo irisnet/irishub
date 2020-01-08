@@ -312,7 +312,7 @@ func convertToMainCoin(cdc *codec.Codec, srcCoin sdk.Coin) (coin sdk.DecCoin, er
 	if err != nil {
 		return coin, err
 	}
-	return ft.ToMainCoin(srcCoin)
+	return ft.FromMinCoin(srcCoin)
 }
 
 func queryToken(cdc *codec.Codec, params token.QueryTokenParams) (ft token.FungibleToken, err error) {

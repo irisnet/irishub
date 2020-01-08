@@ -59,7 +59,7 @@ func feeHandler(ctx sdk.Context, k Keeper, feeAcc sdk.AccAddress, fee sdk.Coin) 
 func GetTokenIssueFee(ctx sdk.Context, k Keeper, symbol string) sdk.Coin {
 	// compute the fee
 	issueTokenBaseFee := k.IssueTokenBaseFee(ctx)
-	token, found := k.GetTokenByMintUint(ctx, issueTokenBaseFee.Denom)
+	token, found := k.GetTokenByMinUint(ctx, issueTokenBaseFee.Denom)
 	if !found {
 		panic(fmt.Sprintf("token [%s] not found", issueTokenBaseFee.Denom))
 	}
@@ -71,7 +71,7 @@ func GetTokenIssueFee(ctx sdk.Context, k Keeper, symbol string) sdk.Coin {
 func GetTokenMintFee(ctx sdk.Context, k Keeper, symbol string) sdk.Coin {
 	// compute the issurance fee and mint fee
 	issueFee := GetTokenIssueFee(ctx, k, symbol)
-	token, found := k.GetTokenByMintUint(ctx, issueFee.Denom)
+	token, found := k.GetTokenByMinUint(ctx, issueFee.Denom)
 	if !found {
 		panic(fmt.Sprintf("token [%s] not found", issueFee.Denom))
 	}

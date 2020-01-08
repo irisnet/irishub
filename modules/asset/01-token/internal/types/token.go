@@ -107,8 +107,8 @@ func (ft *FungibleToken) Sanitize() {
 	ft.Name = strings.TrimSpace(ft.Name)
 }
 
-//ToMainCoin return the main denom coin from args
-func (ft FungibleToken) ToMainCoin(coin sdk.Coin) (newCoins sdk.DecCoin, err error) {
+//FromMinCoin return the main denom coin from args
+func (ft FungibleToken) FromMinCoin(coin sdk.Coin) (newCoins sdk.DecCoin, err error) {
 	if coin.Denom != ft.Symbol && coin.Denom != ft.MinUnit {
 		return newCoins, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, fmt.Sprintf("token unit (%s) not defined", coin.Denom))
 	}

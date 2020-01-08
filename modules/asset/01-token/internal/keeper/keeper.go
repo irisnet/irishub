@@ -243,11 +243,11 @@ func (k Keeper) GetToken(ctx sdk.Context, symbol string) (token types.FungibleTo
 	return token, true
 }
 
-// GetTokenByMintUint returns token by specified mintUint
-func (k Keeper) GetTokenByMintUint(ctx sdk.Context, mintUint string) (types.FungibleToken, bool) {
+// GetTokenByMinUint returns token by specified minUint
+func (k Keeper) GetTokenByMinUint(ctx sdk.Context, minUint string) (types.FungibleToken, bool) {
 	store := ctx.KVStore(k.storeKey)
 	var symbol string
-	bz := store.Get(types.KeyMinUnit(mintUint))
+	bz := store.Get(types.KeyMinUnit(minUint))
 	if bz == nil {
 		return types.FungibleToken{}, false
 	}

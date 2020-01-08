@@ -94,7 +94,7 @@ func queryToken(ctx sdk.Context, keeper Keeper, symbol string) ([]byte, error) {
 }
 
 func queryTokenByMinUnit(ctx sdk.Context, keeper Keeper, minUnit string) ([]byte, error) {
-	token, found := keeper.GetTokenByMintUint(ctx, minUnit)
+	token, found := keeper.GetTokenByMinUint(ctx, minUnit)
 	if !found {
 		return nil, sdkerrors.Wrapf(types.ErrUnknownToken, "%s", minUnit)
 	}
