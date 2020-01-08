@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	v3 "github.com/irisnet/irishub/app/v3"
 	"io"
 	"os"
 	"strings"
@@ -79,6 +80,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, config *cfg.InstrumentationConfig,
 	engine.Add(v0.NewProtocolV0(0, logger, protocolKeeper, app.checkInvariant, app.trackCoinFlow, &appPrometheusConfig))
 	engine.Add(v1.NewProtocolV1(1, logger, protocolKeeper, app.checkInvariant, app.trackCoinFlow, &appPrometheusConfig))
 	engine.Add(v2.NewProtocolV2(2, logger, protocolKeeper, app.checkInvariant, app.trackCoinFlow, &appPrometheusConfig))
+	engine.Add(v3.NewProtocolV3(3, logger, protocolKeeper, app.checkInvariant, app.trackCoinFlow, &appPrometheusConfig))
 	// engine.Add(v1.NewProtocolV1(1, ...))
 	// engine.Add(v2.NewProtocolV1(2, ...))
 
@@ -93,7 +95,7 @@ func NewIrisApp(logger log.Logger, db dbm.DB, config *cfg.InstrumentationConfig,
 
 // MakeLatestCodec loads the lastest verson codec
 func MakeLatestCodec() *codec.Codec {
-	var cdc = v2.MakeCodec() // replace with latest protocol version
+	var cdc = v3.MakeCodec() // replace with latest protocol version
 	return cdc
 }
 
