@@ -12,7 +12,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/server"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/version"
+	"github.com/cosmos/cosmos-sdk/x/auth"
+	"github.com/cosmos/cosmos-sdk/x/auth/exported"
 	"github.com/cosmos/cosmos-sdk/x/genutil"
+	"github.com/irisnet/irishub/migrate/v0_16"
 )
 
 const (
@@ -42,13 +45,12 @@ $ %s migrate /path/to/genesis.json --chain-id=cosmoshub-3 --genesis-time=2019-04
 				return errors.Wrapf(err, "failed to read genesis document from file %s", importGenesis)
 			}
 
-			var initialState genutil.AppMap
+			var initialState v0_16.GenesisFileState
 			if err := cdc.UnmarshalJSON(genDoc.AppState, &initialState); err != nil {
 				return errors.Wrap(err, "failed to JSON unmarshal initial genesis state")
 			}
 
-			//newGenState := Migrate(initialState)
-			newGenState := initialState
+			newGenState := Migrate(cdc, initialState)
 
 			genDoc.AppState, err = cdc.MarshalJSON(newGenState)
 			if err != nil {
@@ -93,80 +95,28 @@ $ %s migrate /path/to/genesis.json --chain-id=cosmoshub-3 --genesis-time=2019-04
 	return cmd
 }
 
-func Migrate(appState genutil.AppMap) genutil.AppMap {
-	//v034Codec := codec.New()
-	//codec.RegisterCrypto(v034Codec)
-	//v034gov.RegisterCodec(v034Codec)
-	//
-	//v036Codec := codec.New()
-	//codec.RegisterCrypto(v036Codec)
-	//v036gov.RegisterCodec(v036Codec)
-	//
-	//// migrate genesis accounts state
-	//if appState[v034genAccounts.ModuleName] != nil {
-	//	var genAccs v034genAccounts.GenesisState
-	//	v034Codec.MustUnmarshalJSON(appState[v034genAccounts.ModuleName], &genAccs)
-	//
-	//	var authGenState v034auth.GenesisState
-	//	v034Codec.MustUnmarshalJSON(appState[v034auth.ModuleName], &authGenState)
-	//
-	//	var govGenState v034gov.GenesisState
-	//	v034Codec.MustUnmarshalJSON(appState[v034gov.ModuleName], &govGenState)
-	//
-	//	var distrGenState v034distr.GenesisState
-	//	v034Codec.MustUnmarshalJSON(appState[v034distr.ModuleName], &distrGenState)
-	//
-	//	var stakingGenState v034staking.GenesisState
-	//	v034Codec.MustUnmarshalJSON(appState[v034staking.ModuleName], &stakingGenState)
-	//
-	//	delete(appState, v034genAccounts.ModuleName) // delete old key in case the name changed
-	//	appState[v036genAccounts.ModuleName] = v036Codec.MustMarshalJSON(
-	//		v036genAccounts.Migrate(
-	//			genAccs, authGenState.CollectedFees, distrGenState.FeePool.CommunityPool, govGenState.Deposits,
-	//			stakingGenState.Validators, stakingGenState.UnbondingDelegations, distrGenState.OutstandingRewards,
-	//			stakingGenState.Params.BondDenom, v036distr.ModuleName, v036gov.ModuleName,
-	//		),
-	//	)
-	//}
-	//
-	//// migrate auth state
-	//if appState[v034auth.ModuleName] != nil {
-	//	var authGenState v034auth.GenesisState
-	//	v034Codec.MustUnmarshalJSON(appState[v034auth.ModuleName], &authGenState)
-	//
-	//	delete(appState, v034auth.ModuleName) // delete old key in case the name changed
-	//	appState[v036auth.ModuleName] = v036Codec.MustMarshalJSON(v036auth.Migrate(authGenState))
-	//}
-	//
-	//// migrate gov state
-	//if appState[v034gov.ModuleName] != nil {
-	//	var govGenState v034gov.GenesisState
-	//	v034Codec.MustUnmarshalJSON(appState[v034gov.ModuleName], &govGenState)
-	//
-	//	delete(appState, v034gov.ModuleName) // delete old key in case the name changed
-	//	appState[v036gov.ModuleName] = v036Codec.MustMarshalJSON(v036gov.Migrate(govGenState))
-	//}
-	//
-	//// migrate distribution state
-	//if appState[v034distr.ModuleName] != nil {
-	//	var slashingGenState v034distr.GenesisState
-	//	v034Codec.MustUnmarshalJSON(appState[v034distr.ModuleName], &slashingGenState)
-	//
-	//	delete(appState, v034distr.ModuleName) // delete old key in case the name changed
-	//	appState[v036distr.ModuleName] = v036Codec.MustMarshalJSON(v036distr.Migrate(slashingGenState))
-	//}
-	//
-	//// migrate staking state
-	//if appState[v034staking.ModuleName] != nil {
-	//	var stakingGenState v034staking.GenesisState
-	//	v034Codec.MustUnmarshalJSON(appState[v034staking.ModuleName], &stakingGenState)
-	//
-	//	delete(appState, v034staking.ModuleName) // delete old key in case the name changed
-	//	appState[v036staking.ModuleName] = v036Codec.MustMarshalJSON(v036staking.Migrate(stakingGenState))
-	//}
-	//
-	//// migrate supply state
-	//appState[v036supply.ModuleName] = v036Codec.MustMarshalJSON(v036supply.EmptyGenesisState())
-	//
-	//return appState
+func Migrate(cdc *codec.Codec, initialState v0_16.GenesisFileState) (appState genutil.AppMap) {
+	v016Codec := codec.New()
+	codec.RegisterCrypto(v016Codec)
+
+	// migrate auth state
+	authParams := auth.DefaultParams()
+	var accounts exported.GenesisAccounts
+	for _, acc := range initialState.Accounts {
+		var coins sdk.Coins
+		for _, c := range acc.Coins {
+			coin, err := sdk.ParseCoin(c)
+			if err != nil {
+				panic(err)
+			}
+			coins = append(coins, coin)
+		}
+		baseAccount := auth.NewBaseAccount(acc.Address, coins.Sort(), nil, acc.AccountNumber, acc.Sequence)
+
+		accounts = append(accounts, baseAccount)
+	}
+	authState := auth.NewGenesisState(authParams, accounts)
+	appState[auth.ModuleName] = cdc.MustMarshalJSON(authState)
+
+	return appState
 }
