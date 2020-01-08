@@ -44,23 +44,27 @@ func ValidateBindingPricing(pricing string) error {
 }
 
 // ValidateRequestInput validates the request input against the input schema.
-// ensure that the schemas is valid and input is a valid JSON
 func ValidateRequestInput(schemas string, input string) error {
-	inputSchemaBz := parseInputSchema(schemas)
+	inputSchemaBz, err := parseInputSchema(schemas)
+	if err != nil {
+		return err
+	}
 
-	if !validateDocument(inputSchemaBz, input) {
+	if !validDocument(inputSchemaBz, input) {
 		return sdkerrors.Wrap(ErrInvalidRequestInput, "invalid request input")
 	}
 
 	return nil
 }
 
-// ValidateResponseOutput validates the response output against the output schema.
-// ensure that the schemas is valid and output is a valid JSON
+// ValidateResponseOutput validates the response output against the output schema
 func ValidateResponseOutput(schemas string, output string) error {
-	outputSchemaBz := parseOutputSchema(schemas)
+	outputSchemaBz, err := parseOutputSchema(schemas)
+	if err != nil {
+		return err
+	}
 
-	if !validateDocument(outputSchemaBz, output) {
+	if !validDocument(outputSchemaBz, output) {
 		return sdkerrors.Wrap(ErrInvalidResponseOutput, "invalid response output")
 	}
 
@@ -68,11 +72,13 @@ func ValidateResponseOutput(schemas string, output string) error {
 }
 
 // ValidateResponseError validates the response err against the error schema.
-// ensure that the schemas is valid and errResp is a valid JSON
 func ValidateResponseError(schemas string, errResp string) error {
-	errSchemaBz := parseErrorSchema(schemas)
+	errSchemaBz, err := parseErrorSchema(schemas)
+	if err != nil {
+		return err
+	}
 
-	if !validateDocument(errSchemaBz, errResp) {
+	if !validDocument(errSchemaBz, errResp) {
 		return sdkerrors.Wrap(ErrInvalidResponseErr, "invalid response err")
 	}
 
@@ -121,63 +127,59 @@ func validateErrorSchema(errSchema map[string]interface{}) error {
 	return nil
 }
 
-// parseInputSchema parses the input schema from the given schemas.
-// ensure that the schemas is valid. Panic if invalid
-func parseInputSchema(schemas string) []byte {
+// parseInputSchema parses the input schema from the given schemas
+func parseInputSchema(schemas string) ([]byte, error) {
 	var svcSchemas ServiceSchemas
 	if err := json.Unmarshal([]byte(schemas), &svcSchemas); err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	inputSchemaBz, err := json.Marshal(svcSchemas.Input)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
-	return inputSchemaBz
+	return inputSchemaBz, nil
 }
 
-// parseOutputSchema parses the output schema from the given schemas.
-// ensure that the schemas is valid. Panic if invalid
-func parseOutputSchema(schemas string) []byte {
+// parseOutputSchema parses the output schema from the given schemas
+func parseOutputSchema(schemas string) ([]byte, error) {
 	var svcSchemas ServiceSchemas
 	if err := json.Unmarshal([]byte(schemas), &svcSchemas); err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	outputSchemaBz, err := json.Marshal(svcSchemas.Output)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
-	return outputSchemaBz
+	return outputSchemaBz, nil
 }
 
-// parseErrorSchema parses the error schema from the given schemas.
-// ensure that the schemas is valid. Panic if invalid
-func parseErrorSchema(schemas string) []byte {
+// parseErrorSchema parses the error schema from the given schemas
+func parseErrorSchema(schemas string) ([]byte, error) {
 	var svcSchemas ServiceSchemas
 	if err := json.Unmarshal([]byte(schemas), &svcSchemas); err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	errSchemaBz, err := json.Marshal(svcSchemas.Error)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
-	return errSchemaBz
+	return errSchemaBz, nil
 }
 
-// validateDocument wraps the gojsonschema validation.
-// ensure that the document is a valid JSON. Panic if invalid
-func validateDocument(schema []byte, document string) bool {
+// validDocument wraps the gojsonschema validation
+func validDocument(schema []byte, document string) bool {
 	schemaLoader := gojsonschema.NewBytesLoader(schema)
 	docLoader := gojsonschema.NewStringLoader(document)
 
 	res, err := gojsonschema.Validate(schemaLoader, docLoader)
 	if err != nil {
-		panic(err)
+		return false
 	}
 
 	return res.Valid()
