@@ -171,14 +171,15 @@ type MsgSubmitCommunityTaxUsageProposal struct {
 	Usage       UsageType      `json:"usage"`
 	DestAddress sdk.AccAddress `json:"dest_address"`
 	Percent     sdk.Dec        `json:"percent"`
+	Amount      sdk.Coins      `json:"amount"`
 }
 
-func NewMsgSubmitCommunityTaxUsageProposal(msgSubmitProposal MsgSubmitProposal, usage UsageType, destAddress sdk.AccAddress, percent sdk.Dec) MsgSubmitCommunityTaxUsageProposal {
+func NewMsgSubmitCommunityTaxUsageProposal(msgSubmitProposal MsgSubmitProposal, usage UsageType, destAddress sdk.AccAddress, amount sdk.Coins) MsgSubmitCommunityTaxUsageProposal {
 	return MsgSubmitCommunityTaxUsageProposal{
 		MsgSubmitProposal: msgSubmitProposal,
 		Usage:             usage,
 		DestAddress:       destAddress,
-		Percent:           percent,
+		Amount:            amount,
 	}
 }
 
@@ -193,8 +194,8 @@ func (msg MsgSubmitCommunityTaxUsageProposal) ValidateBasic() sdk.Error {
 	if msg.Usage != UsageTypeBurn && len(msg.DestAddress) == 0 {
 		return sdk.ErrInvalidAddress(msg.DestAddress.String())
 	}
-	if msg.Percent.IsNil() || msg.Percent.LTE(sdk.NewDec(0)) || msg.Percent.GT(sdk.NewDec(1)) {
-		return ErrInvalidPercent(DefaultCodespace, msg.Percent)
+	if !msg.Amount.IsValid() {
+		return sdk.ErrInvalidCoins(fmt.Sprintf("invalid coins to burn [%s]", msg.Amount))
 	}
 	return nil
 }

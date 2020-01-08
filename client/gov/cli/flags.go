@@ -18,7 +18,7 @@ const (
 	flagPath         = "path"
 	flagUsage        = "usage"
 	flagDestAddress  = "dest-address"
-	flagPercent      = "percent"
+	flagAmount       = "amount"
 	flagVersion      = "version"
 	flagSoftware     = "software"
 	flagSwitchHeight = "switch-height"

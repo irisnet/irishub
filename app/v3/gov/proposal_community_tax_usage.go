@@ -3,7 +3,7 @@ package gov
 import (
 	"encoding/json"
 	"fmt"
-
+	"github.com/irisnet/irishub/app/v1/auth"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/pkg/errors"
 )
@@ -104,6 +104,7 @@ type TaxUsage struct {
 	Usage       UsageType      `json:"usage"`
 	DestAddress sdk.AccAddress `json:"dest_address"`
 	Percent     sdk.Dec        `json:"percent"`
+	Amount      sdk.Coins      `json:"amount"`
 }
 
 type CommunityTaxUsageProposal struct {
@@ -141,6 +142,39 @@ func (tp *CommunityTaxUsageProposal) Execute(ctx sdk.Context, gk Keeper) sdk.Err
 	if tp.TaxUsage.Usage == UsageTypeBurn {
 		burn = true
 	}
-	gk.dk.AllocateFeeTax(ctx, tp.TaxUsage.DestAddress, tp.TaxUsage.Percent, burn)
+	gk.dk.AllocateFeeTax(ctx, tp.TaxUsage.DestAddress, tp.TaxUsage.Amount, burn)
 	return nil
+}
+
+// Allocate fee tax from the community fee pool, burn or send to trustee account
+func (keeper Keeper) AllocateFeeTax(ctx sdk.Context, destAddr sdk.AccAddress, amount sdk.Coins, burn bool) {
+	logger := ctx.Logger()
+	taxCoins := keeper.ck.GetCoins(ctx, auth.CommunityTaxCoinsAccAddr)
+	taxLeftCoins, hasNeg := taxCoins.SafeSub(amount)
+	if hasNeg {
+		logger.Info(fmt.Sprintf("account balance [%s] is not enough to cover fee [%s]", taxCoins, amount))
+		return
+	}
+
+	logger.Info("Spend community tax fund", "total_community_tax_fund", taxCoins.String(), "left_community_tax_fund", taxLeftCoins.String())
+	if burn {
+		logger.Info("Burn community tax", "burn_amount", amount.String())
+		_, err := keeper.ck.BurnCoins(ctx, auth.CommunityTaxCoinsAccAddr, amount)
+		if err != nil {
+			panic(err)
+		}
+		if !amount.IsZero() {
+			ctx.CoinFlowTags().AppendCoinFlowTag(ctx, auth.CommunityTaxCoinsAccAddr.String(), "", amount.String(), sdk.BurnFlow, "")
+		}
+	} else {
+		logger.Info("Grant community tax to account", "grant_amount", amount.String(), "grant_address", destAddr.String())
+		if !amount.IsZero() {
+			ctx.CoinFlowTags().AppendCoinFlowTag(ctx, "", destAddr.String(), amount.String(), sdk.CommunityTaxUseFlow, "")
+		}
+		_, err := keeper.ck.SendCoins(ctx, auth.CommunityTaxCoinsAccAddr, destAddr, amount)
+		if err != nil {
+			panic(err)
+		}
+	}
+
 }

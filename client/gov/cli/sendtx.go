@@ -77,12 +77,12 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 						return err
 					}
 				}
-				percentStr := viper.GetString(flagPercent)
-				percent, err := sdk.NewDecFromStr(percentStr)
+				amountStr := viper.GetString(flagAmount)
+				amount, err := sdk.ParseCoins(amountStr)
 				if err != nil {
 					return err
 				}
-				taxMsg := gov.NewMsgSubmitCommunityTaxUsageProposal(msg, usage, destAddr, percent)
+				taxMsg := gov.NewMsgSubmitCommunityTaxUsageProposal(msg, usage, destAddr, amount)
 				return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{taxMsg})
 			}
 
@@ -131,7 +131,7 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 	cmd.Flags().String(flagDeposit, "", "deposit of proposal(at least 30% of MinDeposit)")
 	cmd.Flags().String(flagParam, "", "parameter of proposal,eg. key=value")
 	cmd.Flags().String(flagUsage, "", "the transaction fee tax usage type, valid values can be Burn, Distribute and Grant")
-	cmd.Flags().String(flagPercent, "", "percent of transaction fee tax pool to use, integer or decimal >0 and <=1")
+	cmd.Flags().String(flagAmount, "", "amount of transaction fee tax pool to use")
 	cmd.Flags().String(flagDestAddress, "", "the destination trustee address")
 
 	cmd.Flags().String(flagVersion, "0", "the version of the new protocol")
