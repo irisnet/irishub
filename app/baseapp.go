@@ -9,6 +9,14 @@ import (
 	"strings"
 
 	"github.com/gogo/protobuf/proto"
+	"github.com/pkg/errors"
+
+	abci "github.com/tendermint/tendermint/abci/types"
+	"github.com/tendermint/tendermint/crypto/tmhash"
+	"github.com/tendermint/tendermint/libs/log"
+	tmstate "github.com/tendermint/tendermint/state"
+	dbm "github.com/tendermint/tm-db"
+
 	"github.com/irisnet/irishub/app/protocol"
 	v0 "github.com/irisnet/irishub/app/v0"
 	"github.com/irisnet/irishub/codec"
@@ -16,12 +24,6 @@ import (
 	"github.com/irisnet/irishub/store"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/version"
-	"github.com/pkg/errors"
-	abci "github.com/tendermint/tendermint/abci/types"
-	"github.com/tendermint/tendermint/crypto/tmhash"
-	"github.com/tendermint/tendermint/libs/log"
-	tmstate "github.com/tendermint/tendermint/state"
-	dbm "github.com/tendermint/tm-db"
 )
 
 // Key to store the consensus params in the main store.

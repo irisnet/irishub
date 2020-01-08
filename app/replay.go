@@ -3,14 +3,16 @@ package app
 import (
 	"fmt"
 
-	"github.com/irisnet/irishub/server"
 	"github.com/spf13/viper"
+
 	bc "github.com/tendermint/tendermint/blockchain"
 	tmcli "github.com/tendermint/tendermint/libs/cli"
 	"github.com/tendermint/tendermint/libs/log"
 	"github.com/tendermint/tendermint/node"
 	sm "github.com/tendermint/tendermint/state"
 	dbm "github.com/tendermint/tm-db"
+
+	"github.com/irisnet/irishub/server"
 )
 
 func Replay(logger log.Logger) int64 {

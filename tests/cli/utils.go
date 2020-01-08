@@ -10,16 +10,21 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/irisnet/irishub/app/v1/bank"
-	v2 "github.com/irisnet/irishub/app/v2"
-	"github.com/irisnet/irishub/app/v2/htlc"
+	"github.com/stretchr/testify/require"
+
+	"github.com/tendermint/tendermint/crypto"
+	cmn "github.com/tendermint/tendermint/libs/common"
+	"github.com/tendermint/tendermint/types"
 
 	"github.com/irisnet/irishub/app"
-	"github.com/irisnet/irishub/app/v1/asset"
 	"github.com/irisnet/irishub/app/v1/auth"
-	"github.com/irisnet/irishub/app/v1/gov"
-	"github.com/irisnet/irishub/app/v1/service"
+	"github.com/irisnet/irishub/app/v1/bank"
 	"github.com/irisnet/irishub/app/v1/upgrade"
+	"github.com/irisnet/irishub/app/v2/htlc"
+	"github.com/irisnet/irishub/app/v3"
+	"github.com/irisnet/irishub/app/v3/asset"
+	"github.com/irisnet/irishub/app/v3/gov"
+	"github.com/irisnet/irishub/app/v3/service"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/keys"
 	servicecli "github.com/irisnet/irishub/client/service"
@@ -29,10 +34,6 @@ import (
 	"github.com/irisnet/irishub/server"
 	"github.com/irisnet/irishub/tests"
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/stretchr/testify/require"
-	"github.com/tendermint/tendermint/crypto"
-	cmn "github.com/tendermint/tendermint/libs/common"
-	"github.com/tendermint/tendermint/types"
 )
 
 //___________________________________________________________________________________
@@ -66,7 +67,7 @@ func getAmountFromCoinStr(coinStr string) float64 {
 	return num
 }
 
-func modifyGenesisState(genesisState v2.GenesisFileState) v2.GenesisFileState {
+func modifyGenesisState(genesisState v3.GenesisFileState) v3.GenesisFileState {
 	genesisState.GovData = gov.DefaultGenesisStateForCliTest()
 	genesisState.UpgradeData = upgrade.DefaultGenesisStateForTest()
 	genesisState.ServiceData = service.DefaultGenesisStateForTest()
@@ -118,11 +119,11 @@ func initializeFixtures(t *testing.T) (chainID, servAddr, port, irisHome, iriscl
 	chainID = executeInit(t, fmt.Sprintf("iris init -o --moniker=foo --home=%s", irisHome))
 	genFile := filepath.Join(irisHome, "config", "genesis.json")
 	genDoc := readGenesisFile(t, genFile)
-	var appState v2.GenesisFileState
+	var appState v3.GenesisFileState
 	cdc := app.MakeLatestCodec()
 	err := cdc.UnmarshalJSON(genDoc.AppState, &appState)
 	require.NoError(t, err)
-	appState.Accounts = []v2.GenesisFileAccount{v2.NewDefaultGenesisFileAccount(fooAddr)}
+	appState.Accounts = []v3.GenesisFileAccount{v3.NewDefaultGenesisFileAccount(fooAddr)}
 	appState = modifyGenesisState(appState)
 	appStateJSON, err := codec.Cdc.MarshalJSON(appState)
 	require.NoError(t, err)

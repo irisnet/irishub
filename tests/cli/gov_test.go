@@ -2,11 +2,13 @@ package cli
 
 import (
 	"fmt"
-	"github.com/irisnet/irishub/app/v1/gov"
+	"testing"
+
+	"github.com/stretchr/testify/require"
+
+	"github.com/irisnet/irishub/app/v3/gov"
 	"github.com/irisnet/irishub/tests"
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func TestIrisCLISubmitProposal(t *testing.T) {

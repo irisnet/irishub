@@ -4,10 +4,10 @@ import (
 	"fmt"
 
 	"github.com/irisnet/irishub/app/protocol"
-	"github.com/irisnet/irishub/app/v1/asset"
 	"github.com/irisnet/irishub/app/v1/auth"
 	bankv1 "github.com/irisnet/irishub/app/v1/bank"
 	"github.com/irisnet/irishub/app/v1/stake"
+	"github.com/irisnet/irishub/app/v3/asset"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
