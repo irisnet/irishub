@@ -10,7 +10,7 @@ import (
 	"github.com/irisnet/irishub/modules/service/internal/types"
 )
 
-// NewQuerier
+// NewQuerier creates a querier for the service module
 func NewQuerier(k Keeper) sdk.Querier {
 	return func(ctx sdk.Context, path []string, req abci.RequestQuery) ([]byte, error) {
 		switch path[0] {
@@ -38,24 +38,12 @@ func queryDefinition(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]b
 		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, err.Error())
 	}
 
-	svcDef, found := keeper.GetServiceDefinition(ctx, params.DefChainID, params.ServiceName)
+	svcDef, found := keeper.GetServiceDefinition(ctx, params.ServiceName)
 	if !found {
 		return nil, types.ErrUnknownSvcDef
 	}
 
-	iterator := keeper.GetMethods(ctx, params.DefChainID, params.ServiceName)
-	defer iterator.Close()
-
-	var methods []types.MethodProperty
-	for ; iterator.Valid(); iterator.Next() {
-		var method types.MethodProperty
-		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &method)
-		methods = append(methods, method)
-	}
-
-	definitionOutput := types.DefinitionOutput{Definition: svcDef, Methods: methods}
-
-	bz, err := codec.MarshalJSONIndent(keeper.cdc, definitionOutput)
+	bz, err := codec.MarshalJSONIndent(keeper.cdc, svcDef)
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
 	}

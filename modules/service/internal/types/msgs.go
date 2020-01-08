@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	TypeMsgSvcDef           = "define_service"         // type for MsgSvcDef
+	TypeMsgDefineService    = "define_service"         // type for MsgDefineService
 	TypeMsgSvcBind          = "bind_service"           // type for MsgSvcBind
 	TypeMsgSvcBindingUpdate = "update_service_binding" // type for MsgSvcBindingUpdate
 	TypeMsgSvcDisable       = "disable_service"        // type for MsgSvcDisable
@@ -21,17 +21,16 @@ const (
 	TypeMsgSvcWithdrawTax   = "withdraw_service_tax"   // type for MsgSvcWithdrawTax
 
 	MaxNameLength        = 70  // max length of the service name
-	MaxChainIDLength     = 50  // max length of the chain ID
 	MaxDescriptionLength = 280 // max length of the service and author description
-	MaxTagCount          = 10  // max total number of the tags
+	MaxTagsNum           = 10  // max total number of the tags
 	MaxTagLength         = 70  // max length of the tag
 )
 
 // the service name only accepts alphanumeric characters, _ and -
-var reSvcName = regexp.MustCompile(`^[a-zA-Z0-9_-]+$`)
+var reServiceName = regexp.MustCompile(`^[a-zA-Z0-9_-]+$`)
 
 var (
-	_ sdk.Msg = &MsgSvcDef{}
+	_ sdk.Msg = &MsgDefineService{}
 	_ sdk.Msg = &MsgSvcBind{}
 	_ sdk.Msg = &MsgSvcBindingUpdate{}
 	_ sdk.Msg = &MsgSvcDisable{}
@@ -46,77 +45,72 @@ var (
 
 //______________________________________________________________________
 
-// MsgSvcDef - struct for define a service
-type MsgSvcDef struct {
-	SvcDef
+// MsgDefineService represents a msg for service definition
+type MsgDefineService struct {
+	Name              string         `json:"name" yaml:"name"`
+	Description       string         `json:"description" yaml:"description"`
+	Tags              []string       `json:"tags" yaml:"tags"`
+	Author            sdk.AccAddress `json:"author" yaml:"author"`
+	AuthorDescription string         `json:"author_description" yaml:"author_description"`
+	Schemas           string         `json:"schemas" yaml:"schemas"`
 }
 
-// NewMsgSvcDef constructs a MsgSvcDef
-func NewMsgSvcDef(name, chainID, description string, tags []string, author sdk.AccAddress, authorDescription, idlContent string) MsgSvcDef {
-	return MsgSvcDef{SvcDef{
+// NewMsgDefineService constructs a new MsgDefineService instance
+func NewMsgDefineService(name, description string, tags []string, author sdk.AccAddress, authorDescription, schemas string) MsgDefineService {
+	return MsgDefineService{
 		Name:              name,
-		ChainID:           chainID,
 		Description:       description,
 		Tags:              tags,
 		Author:            author,
 		AuthorDescription: authorDescription,
-		IDLContent:        idlContent,
-	}}
+		Schemas:           schemas,
+	}
 }
 
-// Route implements Msg.
-func (msg MsgSvcDef) Route() string { return RouterKey }
+// Route implements Msg
+func (msg MsgDefineService) Route() string { return RouterKey }
 
-// Type implements Msg.
-func (msg MsgSvcDef) Type() string { return TypeMsgSvcDef }
+// Type implements Msg
+func (msg MsgDefineService) Type() string { return TypeMsgDefineService }
 
-// GetSignBytes implements Msg.
-func (msg MsgSvcDef) GetSignBytes() []byte {
+// GetSignBytes implements Msg
+func (msg MsgDefineService) GetSignBytes() []byte {
 	if len(msg.Tags) == 0 {
 		msg.Tags = nil
 	}
+
 	b, err := ModuleCdc.MarshalJSON(msg)
 	if err != nil {
 		panic(err)
 	}
+
 	return sdk.MustSortJSON(b)
 }
 
-// ValidateBasic implements Msg.
-func (msg MsgSvcDef) ValidateBasic() error {
-	if len(msg.ChainID) == 0 {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "chain-id missing")
-	}
-	if !validServiceName(msg.Name) {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "invalid service name")
-	}
+// ValidateBasic implements Msg
+func (msg MsgDefineService) ValidateBasic() error {
 	if len(msg.Author) == 0 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "author missing")
 	}
-	if len(msg.IDLContent) == 0 {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "IDL content missing")
+
+	if !validServiceName(msg.Name) {
+		return sdkerrors.Wrap(ErrInvalidServiceName, msg.Name)
 	}
-	if err := msg.EnsureLength(); err != nil {
+
+	if err := ensureServiceDefLength(msg); err != nil {
 		return err
 	}
-	methods, err := ParseMethods(msg.IDLContent)
-	if err != nil {
-		return sdkerrors.Wrap(ErrInvalidIDL, err.Error())
+
+	if len(msg.Schemas) == 0 {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "schemas missing")
 	}
-	if valid, err := validateMethods(methods); !valid {
-		return err
-	}
-	return nil
+
+	return ValidateServiceSchemas(msg.Schemas)
 }
 
-// GetSigners implements Msg.
-func (msg MsgSvcDef) GetSigners() []sdk.AccAddress {
+// GetSigners implements Msg
+func (msg MsgDefineService) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Author}
-}
-
-// TODO
-func validateMethods(methods []string) (bool, error) {
-	return true, nil
 }
 
 //______________________________________________________________________
@@ -170,18 +164,11 @@ func (msg MsgSvcBind) ValidateBasic() error {
 	if len(msg.BindChainID) == 0 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "bind chain-id missing")
 	}
-	if err := ensureChainIDLength(msg.DefChainID, "def_chain_id"); err != nil {
+
+	if err := ValidateServiceName(msg.DefName); err != nil {
 		return err
 	}
-	if err := ensureChainIDLength(msg.BindChainID, "bind_chain_id"); err != nil {
-		return err
-	}
-	if !validServiceName(msg.DefName) {
-		return sdkerrors.Wrap(ErrInvalidServiceName, msg.DefName)
-	}
-	if err := ensureNameLength(msg.DefName); err != nil {
-		return err
-	}
+
 	if !validBindingType(msg.BindingType) {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid binding type: %s", msg.BindingType)
 	}
@@ -258,18 +245,11 @@ func (msg MsgSvcBindingUpdate) ValidateBasic() error {
 	if len(msg.BindChainID) == 0 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "bind chain-id missing")
 	}
-	if err := ensureChainIDLength(msg.DefChainID, "def_chain_id"); err != nil {
+
+	if err := ValidateServiceName(msg.DefName); err != nil {
 		return err
 	}
-	if err := ensureChainIDLength(msg.BindChainID, "bind_chain_id"); err != nil {
-		return err
-	}
-	if !validServiceName(msg.DefName) {
-		return sdkerrors.Wrap(ErrInvalidServiceName, msg.DefName)
-	}
-	if err := ensureNameLength(msg.DefName); err != nil {
-		return err
-	}
+
 	if len(msg.Provider) == 0 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "provider missing")
 	}
@@ -338,18 +318,11 @@ func (msg MsgSvcDisable) ValidateBasic() error {
 	if len(msg.BindChainID) == 0 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "bind chain-id missing")
 	}
-	if err := ensureChainIDLength(msg.DefChainID, "def_chain_id"); err != nil {
+
+	if err := ValidateServiceName(msg.DefName); err != nil {
 		return err
 	}
-	if err := ensureChainIDLength(msg.BindChainID, "bind_chain_id"); err != nil {
-		return err
-	}
-	if !validServiceName(msg.DefName) {
-		return sdkerrors.Wrap(ErrInvalidServiceName, msg.DefName)
-	}
-	if err := ensureNameLength(msg.DefName); err != nil {
-		return err
-	}
+
 	if len(msg.Provider) == 0 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "provider missing")
 	}
@@ -406,18 +379,11 @@ func (msg MsgSvcEnable) ValidateBasic() error {
 	if len(msg.BindChainID) == 0 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "bind chain-id missing")
 	}
-	if err := ensureChainIDLength(msg.DefChainID, "def_chain_id"); err != nil {
+
+	if err := ValidateServiceName(msg.DefName); err != nil {
 		return err
 	}
-	if err := ensureChainIDLength(msg.BindChainID, "bind_chain_id"); err != nil {
-		return err
-	}
-	if !validServiceName(msg.DefName) {
-		return sdkerrors.Wrap(ErrInvalidServiceName, msg.DefName)
-	}
-	if err := ensureNameLength(msg.DefName); err != nil {
-		return err
-	}
+
 	if !validServiceCoins(msg.Deposit) {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "invalid service deposit: %s", msg.Deposit.String())
 	}
@@ -475,18 +441,11 @@ func (msg MsgSvcRefundDeposit) ValidateBasic() error {
 	if len(msg.BindChainID) == 0 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "bind chain-id missing")
 	}
-	if err := ensureChainIDLength(msg.DefChainID, "def_chain_id"); err != nil {
+
+	if err := ValidateServiceName(msg.DefName); err != nil {
 		return err
 	}
-	if err := ensureChainIDLength(msg.BindChainID, "bind_chain_id"); err != nil {
-		return err
-	}
-	if !validServiceName(msg.DefName) {
-		return sdkerrors.Wrap(ErrInvalidServiceName, msg.DefName)
-	}
-	if err := ensureNameLength(msg.DefName); err != nil {
-		return err
-	}
+
 	if len(msg.Provider) == 0 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "provider missing")
 	}
@@ -559,21 +518,11 @@ func (msg MsgSvcRequest) ValidateBasic() error {
 	if len(msg.ReqChainID) == 0 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "request chain-id missing")
 	}
-	if err := ensureChainIDLength(msg.DefChainID, "def_chain_id"); err != nil {
+
+	if err := ValidateServiceName(msg.DefName); err != nil {
 		return err
 	}
-	if err := ensureChainIDLength(msg.BindChainID, "bind_chain_id"); err != nil {
-		return err
-	}
-	if err := ensureChainIDLength(msg.ReqChainID, "req_chain_id"); err != nil {
-		return err
-	}
-	if !validServiceName(msg.DefName) {
-		return sdkerrors.Wrap(ErrInvalidServiceName, msg.DefName)
-	}
-	if err := ensureNameLength(msg.DefName); err != nil {
-		return err
-	}
+
 	if len(msg.Provider) == 0 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "provider missing")
 	}
@@ -638,9 +587,6 @@ func (msg MsgSvcResponse) GetSignBytes() []byte {
 func (msg MsgSvcResponse) ValidateBasic() error {
 	if len(msg.ReqChainID) == 0 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "request chain-id missing")
-	}
-	if err := ensureChainIDLength(msg.ReqChainID, "req_chain_id"); err != nil {
-		return err
 	}
 	if len(msg.Provider) == 0 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "provider missing")
@@ -781,47 +727,54 @@ func (msg MsgSvcWithdrawTax) GetSigners() []sdk.AccAddress {
 
 //______________________________________________________________________
 
-func validServiceName(name string) bool {
-	return reSvcName.MatchString(name)
+// ValidateServiceName validates the service name
+func ValidateServiceName(name string) error {
+	if !validServiceName(name) {
+		return sdkerrors.Wrap(ErrInvalidServiceName, name)
+	}
+
+	if err := ensureServiceNameLength(name); err != nil {
+		return err
+	}
+
+	return nil
 }
 
-// EnsureLength
-func (msg MsgSvcDef) EnsureLength() error {
-	if err := ensureNameLength(msg.Name); err != nil {
+func validServiceName(name string) bool {
+	return reServiceName.MatchString(name)
+}
+
+func ensureServiceNameLength(name string) error {
+	if len(name) > MaxNameLength {
+		return sdkerrors.Wrapf(ErrInvalidServiceName, "invalid service name length; got: %d, max: %d", len(name), MaxNameLength)
+	}
+
+	return nil
+}
+
+func ensureServiceDefLength(msg MsgDefineService) error {
+	if err := ensureServiceNameLength(msg.Name); err != nil {
 		return err
 	}
-	if err := ensureChainIDLength(msg.ChainID, "chain_id"); err != nil {
-		return err
-	}
+
 	if len(msg.Description) > MaxDescriptionLength {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid description length; got: %d, max: %d", len(msg.Description), MaxDescriptionLength)
 	}
-	if len(msg.Tags) > MaxTagCount {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid tags count; got: %d, max: %d", len(msg.Tags), MaxTagCount)
-	} else {
-		for i, tag := range msg.Tags {
-			if len(tag) > MaxTagLength {
-				return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid tag[%d] length; got: %d, max: %d", i, len(tag), MaxTagLength)
-			}
+
+	if len(msg.Tags) > MaxTagsNum {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid tags count; got: %d, max: %d", len(msg.Tags), MaxTagsNum)
+	}
+
+	for i, tag := range msg.Tags {
+		if len(tag) > MaxTagLength {
+			return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid tag[%d] length; got: %d, max: %d", i, len(tag), MaxTagLength)
 		}
 	}
+
 	if len(msg.AuthorDescription) > MaxDescriptionLength {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid author description length; got: %d, max: %d", len(msg.AuthorDescription), MaxDescriptionLength)
 	}
-	return nil
-}
 
-func ensureNameLength(name string) error {
-	if len(name) > MaxNameLength {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid service name length; got: %d, max: %d", len(name), MaxNameLength)
-	}
-	return nil
-}
-
-func ensureChainIDLength(chainID, fieldNm string) error {
-	if len(chainID) > MaxChainIDLength {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid %s length; got: %d, max: %d", fieldNm, len(chainID), MaxChainIDLength)
-	}
 	return nil
 }
 

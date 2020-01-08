@@ -2,8 +2,6 @@ package clitest
 
 import (
 	"fmt"
-	"io/ioutil"
-	"os"
 	"path/filepath"
 	"testing"
 
@@ -72,8 +70,7 @@ func TestIrisCLIService(t *testing.T) {
 	serviceDesc := "test-description"
 	serviceAuthorDesc := "test-author-description"
 	serviceTags := "tags1,tags2"
-	serviceIDLContent := idlContent
-	serviceFileName := f.IriscliHome + string(os.PathSeparator) + "test.proto"
+	serviceSchemas := `{"input":{"type":"object"},"output":{"type":"object"},"error":{"type":"object"}}`
 	serviceDenom := sdk.DefaultBondDenom
 
 	serviceDeposit := fmt.Sprintf("50000%s", serviceDenom)
@@ -96,18 +93,13 @@ func TestIrisCLIService(t *testing.T) {
 	taxWithdrawAmt := fmt.Sprintf("5%s", serviceDenom)
 
 	// define service
-
-	_ = ioutil.WriteFile(serviceFileName, []byte(serviceIDLContent), 0644)
-	defer tests.ExecuteT(t, fmt.Sprintf("rm -f %s", serviceFileName), "")
-
-	success, _, _ := f.TxServiceDefine(serviceName, serviceDesc, serviceTags, serviceAuthorDesc, serviceIDLContent, serviceFileName, author, "-y")
+	success, _, _ := f.TxServiceDefine(serviceName, serviceDesc, serviceTags, serviceAuthorDesc, serviceSchemas, author, "-y")
 	require.True(t, success)
 
 	tests.WaitForNextNBlocksTM(1, f.Port)
 
-	svcDefOutput := f.QueryServiceDefinition(chainID, serviceName)
-	require.Equal(t, serviceName, svcDefOutput.Definition.Name)
-	require.Equal(t, chainID, svcDefOutput.Definition.ChainID)
+	svcDef := f.QueryServiceDefinition(serviceName)
+	require.Equal(t, serviceName, svcDef.Name)
 
 	// bind service
 	success, _, _ = f.TxServiceBind(chainID, serviceName, bindingType, serviceDeposit, servicePrices, avgRspTime, usableTime, provider, "-y")
@@ -240,8 +232,8 @@ func TestIrisCLIService(t *testing.T) {
 }
 
 // TxServiceDefine is iriscli tx service define
-func (f *Fixtures) TxServiceDefine(serviceName, serviceDesc, tags, serviceAuthorDesc, serviceIDLContent, serviceFileName, from string, flags ...string) (bool, string, string) {
-	cmd := fmt.Sprintf("%s tx service define --keyring-backend=test --service-name %s --service-description %s --tags %s --author-description %s --idl-content %s --file %s --from=%s %v", f.IriscliBinary, serviceName, serviceDesc, tags, serviceAuthorDesc, serviceIDLContent, serviceFileName, from, f.Flags())
+func (f *Fixtures) TxServiceDefine(serviceName, serviceDesc, tags, serviceAuthorDesc, serviceSchemas, from string, flags ...string) (bool, string, string) {
+	cmd := fmt.Sprintf("%s tx service define --keyring-backend=test --name %s --description %s --tags %s --author-description %s --schemas %s --from=%s %v", f.IriscliBinary, serviceName, serviceDesc, tags, serviceAuthorDesc, serviceSchemas, from, f.Flags())
 	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), keys.DefaultKeyPass)
 }
 
@@ -306,15 +298,15 @@ func (f *Fixtures) TxServiceWithdrawTax(withdrawAmt string, destAddr, from sdk.A
 }
 
 // QueryServiceDefinition is iriscli query service definition
-func (f *Fixtures) QueryServiceDefinition(defChainID, serviceName string) service.DefinitionOutput {
-	cmd := fmt.Sprintf("%s query service definition %s %s %v", f.IriscliBinary, defChainID, serviceName, f.Flags())
+func (f *Fixtures) QueryServiceDefinition(serviceName string) service.ServiceDefinition {
+	cmd := fmt.Sprintf("%s query service definition %s %v", f.IriscliBinary, serviceName, f.Flags())
 	res, errStr := tests.ExecuteT(f.T, cmd, "")
 	require.Empty(f.T, errStr)
 	cdc := app.MakeCodec()
-	var svcDefOutput service.DefinitionOutput
-	err := cdc.UnmarshalJSON([]byte(res), &svcDefOutput)
+	var svcDef service.ServiceDefinition
+	err := cdc.UnmarshalJSON([]byte(res), &svcDef)
 	require.NoError(f.T, err)
-	return svcDefOutput
+	return svcDef
 }
 
 // QueryServiceBinding is iriscli query service binding
@@ -364,24 +356,3 @@ func (f *Fixtures) QueryServiceFees(address string) service.FeesOutput {
 	require.NoError(f.T, err)
 	return fees
 }
-
-const idlContent = `
-	syntax = "proto3";
-
-	// The greeting service definition.
-	service Greeter {
-		//@Attribute description:sayHello
-		//@Attribute output_privacy:NoPrivacy
-		//@Attribute output_cached:NoCached
-		rpc SayHello (HelloRequest) returns (HelloReply) {}
-	}
-
-	// The request message containing the user's name.
-	message HelloRequest {
-		string name = 1;
-	}
-
-	// The response message containing the greetings
-	message HelloReply {
-		string message = 1;
-	}`

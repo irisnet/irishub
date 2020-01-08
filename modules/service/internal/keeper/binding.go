@@ -21,7 +21,7 @@ func (k Keeper) AddServiceBinding(
 	prices []sdk.Coin,
 	level types.Level,
 ) error {
-	if _, found := k.GetServiceDefinition(ctx, defChainID, defName); !found {
+	if _, found := k.GetServiceDefinition(ctx, defName); !found {
 		return sdkerrors.Wrapf(types.ErrUnknownSvcDef, "define chain-id: %s, name: %s", defChainID, defName)
 	}
 
@@ -39,10 +39,6 @@ func (k Keeper) AddServiceBinding(
 	}
 
 	svcBinding := types.NewSvcBinding(ctx, defChainID, defName, bindChainID, provider, bindingType, deposit, prices, level, true)
-
-	if err := k.validateMethodPrices(ctx, svcBinding); err != nil {
-		return err
-	}
 
 	// Send coins from provider's account to the deposit module account
 	if err := k.sk.SendCoinsFromAccountToModule(
@@ -110,12 +106,8 @@ func (k Keeper) UpdateServiceBinding(
 	newBinding := types.NewSvcBinding(ctx, defChainID, defName, bindChainID, provider, bindingType,
 		deposit, prices, level, false)
 
-	if len(prices) > 0 {
-		if err := k.validateMethodPrices(ctx, newBinding); err != nil {
-			return svcBinding, err
-		}
-		oldBinding.Prices = newBinding.Prices
-	}
+	// TODO
+	oldBinding.Prices = newBinding.Prices
 
 	if newBinding.BindingType != 0x00 {
 		oldBinding.BindingType = newBinding.BindingType
@@ -288,22 +280,4 @@ func (k Keeper) getMinDeposit(ctx sdk.Context, prices []sdk.Coin) (sdk.Coins, er
 	}
 
 	return minDeposit, nil
-}
-
-func (k Keeper) validateMethodPrices(ctx sdk.Context, svcBinding types.SvcBinding) error {
-	iterator := k.GetMethods(ctx, svcBinding.DefChainID, svcBinding.DefName)
-	defer iterator.Close()
-
-	var methods []types.MethodProperty
-	for ; iterator.Valid(); iterator.Next() {
-		var method types.MethodProperty
-		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &method)
-		methods = append(methods, method)
-	}
-
-	if len(methods) != len(svcBinding.Prices) {
-		return sdkerrors.Wrapf(types.ErrInvalidPriceCount, "prices count: %d, methods count: %d", len(svcBinding.Prices), len(methods))
-	}
-
-	return nil
 }

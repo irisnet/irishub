@@ -9,7 +9,7 @@ var ModuleCdc *codec.Codec
 
 // RegisterCodec registers concrete types on the codec.
 func RegisterCodec(cdc *codec.Codec) {
-	cdc.RegisterConcrete(MsgSvcDef{}, "irishub/service/MsgSvcDef", nil)
+	cdc.RegisterConcrete(MsgDefineService{}, "irishub/service/MsgDefineService", nil)
 	cdc.RegisterConcrete(MsgSvcBind{}, "irishub/service/MsgSvcBinding", nil)
 	cdc.RegisterConcrete(MsgSvcBindingUpdate{}, "irishub/service/MsgSvcBindingUpdate", nil)
 	cdc.RegisterConcrete(MsgSvcDisable{}, "irishub/service/MsgSvcDisable", nil)
@@ -20,8 +20,7 @@ func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(MsgSvcRefundFees{}, "irishub/service/MsgSvcRefundFees", nil)
 	cdc.RegisterConcrete(MsgSvcWithdrawFees{}, "irishub/service/MsgSvcWithdrawFees", nil)
 	cdc.RegisterConcrete(MsgSvcWithdrawTax{}, "irishub/service/MsgSvcWithdrawTax", nil)
-	cdc.RegisterConcrete(SvcDef{}, "irishub/service/SvcDef", nil)
-	cdc.RegisterConcrete(MethodProperty{}, "irishub/service/MethodProperty", nil)
+	cdc.RegisterConcrete(ServiceDefinition{}, "irishub/service/ServiceDefinition", nil)
 	cdc.RegisterConcrete(SvcBinding{}, "irishub/service/SvcBinding", nil)
 	cdc.RegisterConcrete(SvcRequest{}, "irishub/service/SvcRequest", nil)
 	cdc.RegisterConcrete(SvcResponse{}, "irishub/service/SvcResponse", nil)

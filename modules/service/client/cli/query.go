@@ -14,7 +14,7 @@ import (
 	"github.com/irisnet/irishub/modules/service/internal/types"
 )
 
-// GetQueryCmd returns the cli query commands for the rand module.
+// GetQueryCmd returns the cli query commands for the module.
 func GetQueryCmd(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	serviceQueryCmd := &cobra.Command{
 		Use:                        types.ModuleName,
@@ -25,7 +25,7 @@ func GetQueryCmd(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	}
 
 	serviceQueryCmd.AddCommand(flags.GetCommands(
-		GetCmdQuerySvcDef(queryRoute, cdc),
+		GetCmdQueryServiceDefinition(queryRoute, cdc),
 		GetCmdQuerySvcBind(queryRoute, cdc),
 		GetCmdQuerySvcBinds(queryRoute, cdc),
 		GetCmdQuerySvcRequests(queryRoute, cdc),
@@ -36,19 +36,18 @@ func GetQueryCmd(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	return serviceQueryCmd
 }
 
-// GetCmdQuerySvcDef implements the query service definition command.
-func GetCmdQuerySvcDef(queryRoute string, cdc *codec.Codec) *cobra.Command {
+// GetCmdQueryServiceDefinition implements the query service definition command.
+func GetCmdQueryServiceDefinition(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "definition",
 		Short:   "Query service definition",
-		Example: "iriscli query service definition <def-chain-id> <service name>",
-		Args:    cobra.ExactArgs(2),
+		Example: "iriscli query service definition <service name>",
+		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
 			params := types.QueryDefinitionParams{
-				DefChainID:  args[0],
-				ServiceName: args[1],
+				ServiceName: args[0],
 			}
 
 			bz, err := cdc.MarshalJSON(params)
@@ -62,12 +61,12 @@ func GetCmdQuerySvcDef(queryRoute string, cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			var svcDefOutput types.DefinitionOutput
-			if err := cdc.UnmarshalJSON(res, &svcDefOutput); err != nil {
+			var svcDef types.ServiceDefinition
+			if err := cdc.UnmarshalJSON(res, &svcDef); err != nil {
 				return err
 			}
 
-			return cliCtx.PrintOutput(svcDefOutput)
+			return cliCtx.PrintOutput(svcDef)
 		},
 	}
 
