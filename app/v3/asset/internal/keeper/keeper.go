@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"fmt"
+
 	"github.com/irisnet/irishub/app/v1/params"
 	"github.com/irisnet/irishub/app/v3/asset/internal/types"
 	"github.com/irisnet/irishub/codec"
@@ -29,7 +30,7 @@ func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, bk types.BankKeeper, codespac
 	}
 }
 
-// return the codespace
+// Codespace return the codespace
 func (k Keeper) Codespace() sdk.CodespaceType {
 	return k.codespace
 }
@@ -37,6 +38,11 @@ func (k Keeper) Codespace() sdk.CodespaceType {
 // IssueToken issue a new token
 func (k Keeper) IssueToken(ctx sdk.Context, token types.FungibleToken) (sdk.Tags, sdk.Error) {
 	if err := k.AddToken(ctx, token); err != nil {
+		return nil, err
+	}
+
+	// handle fee for token
+	if err := k.deductIssueTokenFee(ctx, token.Owner, token.Symbol); err != nil {
 		return nil, err
 	}
 
@@ -59,66 +65,6 @@ func (k Keeper) IssueToken(ctx sdk.Context, token types.FungibleToken) (sdk.Tags
 	)
 
 	return createTags, nil
-}
-
-// save a new token to keystore
-func (k Keeper) AddToken(ctx sdk.Context, token types.FungibleToken) sdk.Error {
-	if k.HasToken(ctx, types.GetTokenID(token.GetSymbol())) {
-		return types.ErrAssetAlreadyExists(k.codespace, fmt.Sprintf("token already exists: %s", token.GetUniqueID()))
-	}
-
-	//
-	if err := k.SetToken(ctx, token); err != nil {
-		return err
-	}
-
-	// Set token to be prefixed with owner and source
-	if err := k.SetTokens(ctx, token.GetOwner(), token); err != nil {
-		return err
-	}
-
-	// Set token to be prefixed with source
-	if err := k.SetTokens(ctx, sdk.AccAddress{}, token); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (k Keeper) HasToken(ctx sdk.Context, tokenId string) bool {
-	store := ctx.KVStore(k.storeKey)
-	return store.Has(KeyToken(tokenId))
-}
-
-func (k Keeper) SetToken(ctx sdk.Context, token types.FungibleToken) sdk.Error {
-	store := ctx.KVStore(k.storeKey)
-	bz := k.cdc.MustMarshalBinaryLengthPrefixed(token)
-
-	tokenId := types.GetTokenID(token.GetSymbol())
-	store.Set(KeyToken(tokenId), bz)
-	return nil
-}
-
-func (k Keeper) SetTokens(ctx sdk.Context, owner sdk.AccAddress, token types.FungibleToken) sdk.Error {
-	store := ctx.KVStore(k.storeKey)
-
-	tokenId := types.GetTokenID(token.GetSymbol())
-
-	bz := k.cdc.MustMarshalBinaryLengthPrefixed(tokenId)
-
-	store.Set(KeyTokens(owner, tokenId), bz)
-	return nil
-}
-
-func (k Keeper) getToken(ctx sdk.Context, tokenId string) (token types.FungibleToken, err sdk.Error) {
-	store := ctx.KVStore(k.storeKey)
-	bz := store.Get(KeyToken(tokenId))
-	if bz == nil {
-		return token, types.ErrAssetNotExists(k.codespace, fmt.Sprintf("token %s does not exist", tokenId))
-	}
-
-	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &token)
-	return token, nil
 }
 
 // EditToken edits the specified token
@@ -154,7 +100,7 @@ func (k Keeper) EditToken(ctx sdk.Context, msg types.MsgEditToken) (sdk.Tags, sd
 		token.Mintable = msg.Mintable.ToBool()
 	}
 
-	if err := k.SetToken(ctx, token); err != nil {
+	if err := k.setToken(ctx, token); err != nil {
 		return nil, err
 	}
 
@@ -163,43 +109,6 @@ func (k Keeper) EditToken(ctx sdk.Context, msg types.MsgEditToken) (sdk.Tags, sd
 	)
 
 	return editTags, nil
-}
-
-// IterateTokens iterates through all existing tokens
-func (k Keeper) IterateTokens(ctx sdk.Context, op func(token types.FungibleToken) (stop bool)) {
-	store := ctx.KVStore(k.storeKey)
-
-	iterator := sdk.KVStorePrefixIterator(store, PrefixToken)
-	defer iterator.Close()
-
-	for ; iterator.Valid(); iterator.Next() {
-		var token types.FungibleToken
-		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &token)
-
-		if stop := op(token); stop {
-			break
-		}
-	}
-}
-
-// IterateTokens iterates through owner
-func (k Keeper) IterateTokensWithOwner(ctx sdk.Context, owner sdk.AccAddress, op func(token types.FungibleToken) (stop bool)) {
-	store := ctx.KVStore(k.storeKey)
-
-	iterator := sdk.KVStorePrefixIterator(store, KeyTokens(owner, ""))
-	defer iterator.Close()
-
-	for ; iterator.Valid(); iterator.Next() {
-		var tokenId string
-		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &tokenId)
-		token, err := k.getToken(ctx, tokenId)
-		if err != nil {
-			continue
-		}
-		if stop := op(token); stop {
-			break
-		}
-	}
 }
 
 // TransferTokenOwner transfers the owner of the specified token to a new one
@@ -216,7 +125,7 @@ func (k Keeper) TransferTokenOwner(ctx sdk.Context, msg types.MsgTransferTokenOw
 
 	token.Owner = msg.DstOwner
 	// update token information
-	if err := k.SetToken(ctx, token); err != nil {
+	if err := k.setToken(ctx, token); err != nil {
 		return nil, err
 	}
 
@@ -231,18 +140,7 @@ func (k Keeper) TransferTokenOwner(ctx sdk.Context, msg types.MsgTransferTokenOw
 	return tags, nil
 }
 
-// reset all index by DstOwner of token for query-token command
-func (k Keeper) resetStoreKeyForQueryToken(ctx sdk.Context, msg types.MsgTransferTokenOwner, token types.FungibleToken) sdk.Error {
-	store := ctx.KVStore(k.storeKey)
-
-	tokenId := types.GetTokenID(token.GetSymbol())
-	// delete the old key
-	store.Delete(KeyTokens(msg.SrcOwner, tokenId))
-
-	// add the new key
-	return k.SetTokens(ctx, msg.DstOwner, token)
-}
-
+// MintToken mint specified amount token to a specified owner
 func (k Keeper) MintToken(ctx sdk.Context, msg types.MsgMintToken) (sdk.Tags, sdk.Error) {
 	token, err := k.getToken(ctx, msg.TokenId)
 	if err != nil {
@@ -275,6 +173,10 @@ func (k Keeper) MintToken(ctx sdk.Context, msg types.MsgMintToken) (sdk.Tags, sd
 		return nil, types.ErrInvalidAssetMaxSupply(k.codespace, fmt.Sprintf("The amount of mint tokens plus the total amount of issues has exceeded the maximum issue total,only accepts amount (0, %s]", canAmt.String()))
 	}
 
+	if err := k.deductMintTokenFeeFee(ctx, msg.Owner, token.Symbol); err != nil {
+		return nil, err
+	}
+
 	mintCoin := sdk.NewCoin(expDenom, mintAmt)
 	//add TotalSupply
 	if err := k.bk.IncreaseTotalSupply(ctx, mintCoin); err != nil {
@@ -295,14 +197,123 @@ func (k Keeper) MintToken(ctx sdk.Context, msg types.MsgMintToken) (sdk.Tags, sd
 	return tags, nil
 }
 
-// get asset params from the global param store
+// IterateTokens iterates through all existing tokens
+func (k Keeper) IterateTokens(ctx sdk.Context, op func(token types.FungibleToken) (stop bool)) {
+	store := ctx.KVStore(k.storeKey)
+
+	iterator := sdk.KVStorePrefixIterator(store, PrefixToken)
+	defer iterator.Close()
+
+	for ; iterator.Valid(); iterator.Next() {
+		var token types.FungibleToken
+		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &token)
+
+		if stop := op(token); stop {
+			break
+		}
+	}
+}
+
+// AddToken save a new token
+func (k Keeper) AddToken(ctx sdk.Context, token types.FungibleToken) sdk.Error {
+	if k.HasToken(ctx, types.GetTokenID(token.GetSymbol())) {
+		return types.ErrAssetAlreadyExists(k.codespace, fmt.Sprintf("token already exists: %s", token.GetUniqueID()))
+	}
+
+	//
+	if err := k.setToken(ctx, token); err != nil {
+		return err
+	}
+
+	// Set token to be prefixed with owner and source
+	if err := k.setTokens(ctx, token.GetOwner(), token); err != nil {
+		return err
+	}
+
+	// Set token to be prefixed with source
+	if err := k.setTokens(ctx, sdk.AccAddress{}, token); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// HasToken asset a token exited
+func (k Keeper) HasToken(ctx sdk.Context, tokenId string) bool {
+	store := ctx.KVStore(k.storeKey)
+	return store.Has(KeyToken(tokenId))
+}
+
+// GetParamSet return asset params from the global param store
 func (k Keeper) GetParamSet(ctx sdk.Context) types.Params {
 	var p types.Params
 	k.paramSpace.GetParamSet(ctx, &p)
 	return p
 }
 
-// set asset params from the global param store
+// SetParamSet set asset params from the global param store
 func (k Keeper) SetParamSet(ctx sdk.Context, params types.Params) {
 	k.paramSpace.SetParamSet(ctx, &params)
+}
+
+func (k Keeper) iterateTokensWithOwner(ctx sdk.Context, owner sdk.AccAddress, op func(token types.FungibleToken) (stop bool)) {
+	store := ctx.KVStore(k.storeKey)
+
+	iterator := sdk.KVStorePrefixIterator(store, KeyTokens(owner, ""))
+	defer iterator.Close()
+
+	for ; iterator.Valid(); iterator.Next() {
+		var tokenId string
+		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &tokenId)
+		token, err := k.getToken(ctx, tokenId)
+		if err != nil {
+			continue
+		}
+		if stop := op(token); stop {
+			break
+		}
+	}
+}
+
+func (k Keeper) setTokens(ctx sdk.Context, owner sdk.AccAddress, token types.FungibleToken) sdk.Error {
+	store := ctx.KVStore(k.storeKey)
+
+	tokenId := types.GetTokenID(token.GetSymbol())
+
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(tokenId)
+
+	store.Set(KeyTokens(owner, tokenId), bz)
+	return nil
+}
+
+func (k Keeper) setToken(ctx sdk.Context, token types.FungibleToken) sdk.Error {
+	store := ctx.KVStore(k.storeKey)
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(token)
+
+	tokenId := types.GetTokenID(token.GetSymbol())
+	store.Set(KeyToken(tokenId), bz)
+	return nil
+}
+
+// reset all index by DstOwner of token for query-token command
+func (k Keeper) resetStoreKeyForQueryToken(ctx sdk.Context, msg types.MsgTransferTokenOwner, token types.FungibleToken) sdk.Error {
+	store := ctx.KVStore(k.storeKey)
+
+	tokenId := types.GetTokenID(token.GetSymbol())
+	// delete the old key
+	store.Delete(KeyTokens(msg.SrcOwner, tokenId))
+
+	// add the new key
+	return k.setTokens(ctx, msg.DstOwner, token)
+}
+
+func (k Keeper) getToken(ctx sdk.Context, tokenId string) (token types.FungibleToken, err sdk.Error) {
+	store := ctx.KVStore(k.storeKey)
+	bz := store.Get(KeyToken(tokenId))
+	if bz == nil {
+		return token, types.ErrAssetNotExists(k.codespace, fmt.Sprintf("token %s does not exist", tokenId))
+	}
+
+	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &token)
+	return token, nil
 }

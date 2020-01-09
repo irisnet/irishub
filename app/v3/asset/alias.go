@@ -52,12 +52,10 @@ var (
 	DefaultParamsForTest     = types.DefaultParamsForTest
 	ValidateParams           = types.ValidateParams
 
-	QueryToken           = types.QueryToken
-	QueryTokens          = types.QueryTokens
-	QueryFees            = types.QueryFees
-	NewKeeper            = keeper.NewKeeper
-	TokenIssueFeeHandler = keeper.TokenIssueFeeHandler
-	TokenMintFeeHandler  = keeper.TokenMintFeeHandler
-	NewQuerier           = keeper.NewQuerier
-	NewAnteHandler       = keeper.NewAnteHandler
+	QueryToken     = types.QueryToken
+	QueryTokens    = types.QueryTokens
+	QueryFees      = types.QueryFees
+	NewKeeper      = keeper.NewKeeper
+	NewQuerier     = keeper.NewQuerier
+	NewAnteHandler = keeper.NewAnteHandler
 )

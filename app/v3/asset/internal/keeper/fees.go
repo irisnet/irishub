@@ -15,20 +15,43 @@ const (
 	FeeFactorExp  = 4
 )
 
-// TokenIssueFeeHandler performs fee handling for issuing token
-func TokenIssueFeeHandler(ctx sdk.Context, k Keeper, owner sdk.AccAddress, symbol string) sdk.Error {
+// deductIssueTokenFee performs fee handling for issuing token
+func (k Keeper) deductIssueTokenFee(ctx sdk.Context, owner sdk.AccAddress, symbol string) sdk.Error {
 	// get the required issuance fee
-	fee := GetTokenIssueFee(ctx, k, symbol)
-
+	fee := k.getTokenIssueFee(ctx, symbol)
 	return feeHandler(ctx, k, owner, fee)
 }
 
-// TokenMintFeeHandler performs fee handling for minting token
-func TokenMintFeeHandler(ctx sdk.Context, k Keeper, owner sdk.AccAddress, symbol string) sdk.Error {
+// deductMintTokenFeeFee performs fee handling for minting token
+func (k Keeper) deductMintTokenFeeFee(ctx sdk.Context, owner sdk.AccAddress, symbol string) sdk.Error {
 	// get the required minting fee
-	fee := GetTokenMintFee(ctx, k, symbol)
-
+	fee := k.getTokenMintFee(ctx, symbol)
 	return feeHandler(ctx, k, owner, fee)
+}
+
+// GetTokenIssueFee returns the token issurance fee
+func (k Keeper) getTokenIssueFee(ctx sdk.Context, symbol string) sdk.Coin {
+	// get params
+	params := k.GetParamSet(ctx)
+	issueTokenBaseFee := params.IssueTokenBaseFee
+
+	// compute the fee
+	fee := calcFeeByBase(symbol, issueTokenBaseFee.Amount)
+
+	return sdk.NewCoin(sdk.IrisAtto, convertFeeToInt(fee))
+}
+
+// getTokenMintFee returns the token mint fee
+func (k Keeper) getTokenMintFee(ctx sdk.Context, symbol string) sdk.Coin {
+	// get params
+	params := k.GetParamSet(ctx)
+	mintTokenFeeRatio := params.MintTokenFeeRatio
+
+	// compute the issurance fee and mint fee
+	issueFee := k.getTokenIssueFee(ctx, symbol)
+	mintFee := sdk.NewDecFromInt(issueFee.Amount).Mul(mintTokenFeeRatio)
+
+	return sdk.NewCoin(sdk.IrisAtto, convertFeeToInt(mintFee))
 }
 
 // feeHandler handles the fee of gateway or asset
@@ -53,31 +76,6 @@ func feeHandler(ctx sdk.Context, k Keeper, feeAcc sdk.AccAddress, fee sdk.Coin) 
 	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, feeAcc.String(), auth.BurnedCoinsAccAddr.String(), burnedCoin.String(), sdk.BurnFlow, "")
 
 	return nil
-}
-
-// getTokenIssueFee returns the token issurance fee
-func GetTokenIssueFee(ctx sdk.Context, k Keeper, symbol string) sdk.Coin {
-	// get params
-	params := k.GetParamSet(ctx)
-	issueTokenBaseFee := params.IssueTokenBaseFee
-
-	// compute the fee
-	fee := calcFeeByBase(symbol, issueTokenBaseFee.Amount)
-
-	return sdk.NewCoin(sdk.IrisAtto, convertFeeToInt(fee))
-}
-
-// getTokenMintFee returns the token mint fee
-func GetTokenMintFee(ctx sdk.Context, k Keeper, symbol string) sdk.Coin {
-	// get params
-	params := k.GetParamSet(ctx)
-	mintTokenFeeRatio := params.MintTokenFeeRatio
-
-	// compute the issurance fee and mint fee
-	issueFee := GetTokenIssueFee(ctx, k, symbol)
-	mintFee := sdk.NewDecFromInt(issueFee.Amount).Mul(mintTokenFeeRatio)
-
-	return sdk.NewCoin(sdk.IrisAtto, convertFeeToInt(mintFee))
 }
 
 // calcFeeByBase computes the actual fee according to the given base fee

@@ -170,7 +170,7 @@ func TestTransferOwnerKeeper(t *testing.T) {
 	tokenSrc.Owner = dstOwner
 	assert.Equal(t, tokenSrc, token1)
 
-	keeper.IterateTokensWithOwner(ctx, dstOwner, func(token types.FungibleToken) (stop bool) {
+	keeper.iterateTokensWithOwner(ctx, dstOwner, func(token types.FungibleToken) (stop bool) {
 		assert.Equal(t, token, tokenSrc)
 		return false
 	})

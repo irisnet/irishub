@@ -37,8 +37,8 @@ func TestAssetAnteHandler(t *testing.T) {
 	acc2 := ak.NewAccountWithAddress(ctx, addr2)
 
 	// get asset fees
-	nativeTokenIssueFee := GetTokenIssueFee(ctx, keeper, "sym")
-	nativeTokenMintFee := GetTokenMintFee(ctx, keeper, "sym")
+	nativeTokenIssueFee := keeper.getTokenIssueFee(ctx, "sym")
+	nativeTokenMintFee := keeper.getTokenMintFee(ctx, "sym")
 
 	// construct msgs
 	msgIssueNativeToken := types.MsgIssueToken{Source: types.AssetSource(0x00), Symbol: "sym"}

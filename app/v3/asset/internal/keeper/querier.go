@@ -74,8 +74,8 @@ func queryFees(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, s
 	}
 
 	symbol := params.Symbol
-	issueFee := GetTokenIssueFee(ctx, keeper, symbol)
-	mintFee := GetTokenMintFee(ctx, keeper, symbol)
+	issueFee := keeper.getTokenIssueFee(ctx, symbol)
+	mintFee := keeper.getTokenMintFee(ctx, symbol)
 
 	tokenID := types.GetTokenID(symbol)
 	fees := types.TokenFeesOutput{
@@ -117,7 +117,7 @@ func queryTokens(ctx sdk.Context, keeper Keeper, owner string) (tokens types.Tok
 	if er != nil {
 		return nil, sdk.ParseParamsErr(er)
 	}
-	keeper.IterateTokensWithOwner(ctx, ownerAcc, func(token types.FungibleToken) (stop bool) {
+	keeper.iterateTokensWithOwner(ctx, ownerAcc, func(token types.FungibleToken) (stop bool) {
 		tokens = append(tokens, types.NewTokenOutputFrom(token))
 		return false
 	})

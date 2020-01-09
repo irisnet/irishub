@@ -40,12 +40,12 @@ func NewAnteHandler(k Keeper) sdk.AnteHandler {
 
 			switch msg := msg.(type) {
 			case types.MsgIssueToken:
-				msgFee = GetTokenIssueFee(ctx, k, msg.Symbol)
+				msgFee = k.getTokenIssueFee(ctx, msg.Symbol)
 				break
 
 			case types.MsgMintToken:
 				_, symbol := types.GetTokenIDParts(msg.TokenId)
-				msgFee = GetTokenMintFee(ctx, k, symbol)
+				msgFee = k.getTokenMintFee(ctx, symbol)
 				break
 
 			default:
