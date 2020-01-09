@@ -198,5 +198,5 @@ irislcd start --node=tcp://localhost:26657 --chain-id=<chain-id> --laddr=tcp://0
 
 ### 查询版本
 
-1. `GET /version`: 获取IRISHUB的版本
-2. `GET /node-version`: 查询全节点版本
+1. `GET /version`: 查询IRISLCD的版本
+2. `GET /node-version`: 查询IRISLCD所连接全节点的版本
