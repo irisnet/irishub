@@ -1,7 +1,6 @@
 package keeper
 
 import (
-	"encoding/json"
 	"testing"
 
 	"github.com/irisnet/irishub/tests"
@@ -17,7 +16,7 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 )
 
-func TestKeeper_IssueToken(t *testing.T) {
+func TestKeeperIssueToken(t *testing.T) {
 	ms, accountKey, assetKey, paramskey, paramsTkey := tests.SetupMultiStore()
 
 	cdc := codec.New()
@@ -33,25 +32,18 @@ func TestKeeper_IssueToken(t *testing.T) {
 
 	acc := ak.NewAccountWithAddress(ctx, addr)
 
-	ft := types.NewFungibleToken(types.NATIVE, "", "btc", "btc", 1, "", "satoshi", sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), true, acc.GetAddress())
+	ft := types.NewFungibleToken("btc", "btc", 1, sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), true, acc.GetAddress())
 	_, err := keeper.IssueToken(ctx, ft)
 	assert.NoError(t, err)
 
-	assert.True(t, keeper.HasToken(ctx, "btc"))
+	assert.True(t, keeper.HasToken(ctx, types.GetTokenID(ft.Symbol)))
 
-	token, found := keeper.getToken(ctx, "btc")
-	assert.True(t, found)
-
-	assert.Equal(t, ft.GetDenom(), token.GetDenom())
-	assert.Equal(t, ft.Owner, ft.Owner)
-
-	msgJson, _ := json.Marshal(ft)
-	assetJson, _ := json.Marshal(token)
-	assert.Equal(t, msgJson, assetJson)
+	token, err := keeper.getToken(ctx, types.GetTokenID(ft.Symbol))
+	assert.NoError(t, err)
+	assert.Equal(t, ft, token)
 }
 
-//TODO:finish the test
-func TestKeeper_EditToken(t *testing.T) {
+func TestKeeperEditToken(t *testing.T) {
 	ms, accountKey, assetKey, paramskey, paramsTkey := tests.SetupMultiStore()
 
 	cdc := codec.New()
@@ -67,31 +59,32 @@ func TestKeeper_EditToken(t *testing.T) {
 
 	acc := ak.NewAccountWithAddress(ctx, addr)
 
-	ft := types.NewFungibleToken(types.NATIVE, "", "btc", "btc", 1, "", "satoshi", sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(21000000, 0), true, acc.GetAddress())
+	ft := types.NewFungibleToken("btc", "btc", 1, sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(21000000, 0), true, acc.GetAddress())
 
 	_, err := keeper.IssueToken(ctx, ft)
 	assert.NoError(t, err)
 
-	assert.True(t, keeper.HasToken(ctx, "i.btc"))
+	assert.True(t, keeper.HasToken(ctx, types.GetTokenID(ft.Symbol)))
 
-	token, found := keeper.getToken(ctx, "i.btc")
-	assert.True(t, found)
-
-	assert.Equal(t, ft.GetDenom(), token.GetDenom())
-	assert.Equal(t, ft.Owner, token.Owner)
-
-	msgJson, _ := json.Marshal(ft)
-	assetJson, _ := json.Marshal(token)
-	assert.Equal(t, msgJson, assetJson)
+	token, err := keeper.getToken(ctx, types.GetTokenID(ft.Symbol))
+	assert.NoError(t, err)
+	assert.Equal(t, ft, token)
 
 	//TODO:finish the edit token
 	mintable := types.False
-	msgEditToken := types.NewMsgEditToken("BTC Token", "btc", "btc", "btc", 0, mintable, acc.GetAddress())
+	msgEditToken := types.NewMsgEditToken("BTC Token", "btc", 0, mintable, acc.GetAddress())
 	_, err = keeper.EditToken(ctx, msgEditToken)
 	assert.NoError(t, err)
+
+	token, err = keeper.getToken(ctx, types.GetTokenID(ft.Symbol))
+	assert.NoError(t, err)
+	ft.Name = msgEditToken.Name
+	ft.Mintable = false
+
+	assert.Equal(t, token, ft)
 }
 
-func TestMintTokenKeeper(t *testing.T) {
+func TestMintToken(t *testing.T) {
 	ms, accountKey, assetKey, paramskey, paramsTkey := tests.SetupMultiStore()
 
 	cdc := codec.New()
@@ -103,38 +96,33 @@ func TestMintTokenKeeper(t *testing.T) {
 	ak := auth.NewAccountKeeper(cdc, accountKey, auth.ProtoBaseAccount)
 	bk := bank.NewBaseKeeper(cdc, ak)
 	keeper := NewKeeper(cdc, assetKey, bk, types.DefaultCodespace, pk.Subspace(types.DefaultParamSpace))
-	//keeper.Init(ctx)
+	keeper.SetParamSet(ctx, types.DefaultParams())
 
 	addr := sdk.AccAddress([]byte("addr1"))
 
 	acc := ak.NewAccountWithAddress(ctx, addr)
 	amtCoin, _ := sdk.NewIntFromString("1000000000000000000000000000")
 	coin := sdk.Coins{sdk.NewCoin("iris-atto", amtCoin)}
-	bk.AddCoins(ctx, addr, coin)
+	_, _, err := bk.AddCoins(ctx, addr, coin)
+	assert.NoError(t, err)
 	ak.IncreaseTotalLoosenToken(ctx, coin)
 
-	ft := types.NewFungibleToken(types.NATIVE, "", "btc", "btc", 0, "", "satoshi", sdk.NewIntWithDecimal(1000, 0), sdk.NewIntWithDecimal(10000, 0), true, acc.GetAddress())
-	_, err := keeper.IssueToken(ctx, ft)
+	ft := types.NewFungibleToken("btc", "btc", 0, sdk.NewIntWithDecimal(1000, 0), sdk.NewIntWithDecimal(10000, 0), true, acc.GetAddress())
+	_, err = keeper.IssueToken(ctx, ft)
 	assert.NoError(t, err)
 
-	assert.True(t, keeper.HasToken(ctx, "btc"))
+	assert.True(t, keeper.HasToken(ctx, types.GetTokenID(ft.Symbol)))
 
-	token, found := keeper.getToken(ctx, "btc")
-	assert.True(t, found)
+	token, err := keeper.getToken(ctx, types.GetTokenID(ft.Symbol))
+	assert.NoError(t, err)
+	assert.Equal(t, ft, token)
 
-	assert.Equal(t, ft.GetDenom(), token.GetDenom())
-	assert.Equal(t, ft.Owner, ft.Owner)
-
-	msgJson, _ := json.Marshal(ft)
-	assetJson, _ := json.Marshal(token)
-	assert.Equal(t, msgJson, assetJson)
-
-	msgMintToken := types.NewMsgMintToken("btc", acc.GetAddress(), nil, 1000)
+	msgMintToken := types.NewMsgMintToken(types.GetTokenID(ft.Symbol), acc.GetAddress(), nil, 1000)
 	_, err = keeper.MintToken(ctx, msgMintToken)
 	assert.NoError(t, err)
 
 	balance := bk.GetCoins(ctx, acc.GetAddress())
-	amt := balance.AmountOf("btc-min")
+	amt := balance.AmountOf(ft.GetDenom())
 	assert.Equal(t, "2000", amt.String())
 }
 
@@ -155,22 +143,17 @@ func TestTransferOwnerKeeper(t *testing.T) {
 
 	acc := ak.NewAccountWithAddress(ctx, srcOwner)
 
-	ft := types.NewFungibleToken(types.NATIVE, "", "btc", "btc", 1, "", "satoshi", sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(21000000, 0), true, acc.GetAddress())
+	ft := types.NewFungibleToken("btc", "btc", 1, sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(21000000, 0), true, acc.GetAddress())
 
 	_, err := keeper.IssueToken(ctx, ft)
 	assert.NoError(t, err)
 
-	assert.True(t, keeper.HasToken(ctx, "i.btc"))
+	assert.True(t, keeper.HasToken(ctx, types.GetTokenID(ft.Symbol)))
 
-	token, found := keeper.getToken(ctx, "i.btc")
-	assert.True(t, found)
+	tokenSrc, err := keeper.getToken(ctx, types.GetTokenID(ft.Symbol))
+	assert.NoError(t, err)
 
-	assert.Equal(t, ft.GetDenom(), token.GetDenom())
-	assert.Equal(t, ft.Owner, token.Owner)
-
-	msgJson, _ := json.Marshal(ft)
-	assetJson, _ := json.Marshal(token)
-	assert.Equal(t, msgJson, assetJson)
+	assert.Equal(t, ft, tokenSrc)
 
 	dstOwner := sdk.AccAddress([]byte("TokenDstOwner"))
 	msg := types.MsgTransferTokenOwner{
@@ -181,7 +164,14 @@ func TestTransferOwnerKeeper(t *testing.T) {
 	_, err = keeper.TransferTokenOwner(ctx, msg)
 	assert.NoError(t, err)
 
-	token, found = keeper.getToken(ctx, "i.btc")
-	assert.True(t, found)
-	assert.Equal(t, dstOwner, token.Owner)
+	token1, err := keeper.getToken(ctx, types.GetTokenID(ft.Symbol))
+	assert.NoError(t, err)
+
+	tokenSrc.Owner = dstOwner
+	assert.Equal(t, tokenSrc, token1)
+
+	keeper.IterateTokensWithOwner(ctx, dstOwner, func(token types.FungibleToken) (stop bool) {
+		assert.Equal(t, token, tokenSrc)
+		return false
+	})
 }
