@@ -122,7 +122,8 @@ func (tp *CommunityTaxUsageProposal) Validate(ctx sdk.Context, k Keeper, verify 
 		return err
 	}
 
-	if tp.TaxUsage.Usage != UsageTypeBurn {
+	// only check trustee address for grant usage
+	if tp.TaxUsage.Usage == UsageTypeGrant {
 		_, found := k.guardianKeeper.GetTrustee(ctx, tp.TaxUsage.DestAddress)
 		if !found {
 			return ErrNotTrustee(k.codespace, tp.TaxUsage.DestAddress)
