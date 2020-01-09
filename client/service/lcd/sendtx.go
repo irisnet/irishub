@@ -28,25 +28,25 @@ func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec
 
 	// Update a service binding
 	r.HandleFunc(
-		fmt.Sprintf("/service/bindings/{%s}/{%s}/{%s}", DefChainId, ServiceName, Provider),
+		fmt.Sprintf("/service/bindings/{%s}/{%s}/{%s}", DefChainID, ServiceName, Provider),
 		bindingUpdateHandlerFn(cdc, cliCtx),
 	).Methods("PUT")
 
 	// disable a service binding
 	r.HandleFunc(
-		fmt.Sprintf("/service/bindings/{%s}/{%s}/{%s}/disable", DefChainId, ServiceName, Provider),
+		fmt.Sprintf("/service/bindings/{%s}/{%s}/{%s}/disable", DefChainID, ServiceName, Provider),
 		bindingDisableHandlerFn(cdc, cliCtx),
 	).Methods("PUT")
 
 	// enable a service binding
 	r.HandleFunc(
-		fmt.Sprintf("/service/bindings/{%s}/{%s}/{%s}/enable", DefChainId, ServiceName, Provider),
+		fmt.Sprintf("/service/bindings/{%s}/{%s}/{%s}/enable", DefChainID, ServiceName, Provider),
 		bindingEnableHandlerFn(cdc, cliCtx),
 	).Methods("PUT")
 
 	// refund deposit from a service binding
 	r.HandleFunc(
-		fmt.Sprintf("/service/bindings/{%s}/{%s}/{%s}/deposit/refund", DefChainId, ServiceName, Provider),
+		fmt.Sprintf("/service/bindings/{%s}/{%s}/{%s}/deposit/refund", DefChainID, ServiceName, Provider),
 		bindingRefundHandlerFn(cdc, cliCtx),
 	).Methods("PUT")
 
@@ -148,7 +148,7 @@ func bindingAddHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handl
 			prices = append(prices, price)
 		}
 
-		msg := service.NewMsgSvcBind(req.DefChainId, req.ServiceName, baseReq.ChainID, providerAddr, bindingType, deposit, prices, req.Level)
+		msg := service.NewMsgSvcBind(req.DefChainID, req.ServiceName, baseReq.ChainID, providerAddr, bindingType, deposit, prices, req.Level)
 		err = msg.ValidateBasic()
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -164,7 +164,7 @@ func bindingAddHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handl
 func bindingUpdateHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		DefChainId := vars[DefChainId]
+		DefChainId := vars[DefChainID]
 		serviceName := vars[ServiceName]
 		bechProviderAddr := vars[Provider]
 
@@ -229,7 +229,7 @@ func bindingUpdateHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Ha
 func bindingDisableHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		DefChainId := vars[DefChainId]
+		DefChainId := vars[DefChainID]
 		serviceName := vars[ServiceName]
 		bechProviderAddr := vars[Provider]
 
@@ -266,7 +266,7 @@ func bindingDisableHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.H
 func bindingEnableHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		DefChainId := vars[DefChainId]
+		DefChainId := vars[DefChainID]
 		serviceName := vars[ServiceName]
 		bechProviderAddr := vars[Provider]
 
@@ -309,7 +309,7 @@ func bindingEnableHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Ha
 func bindingRefundHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		DefChainId := vars[DefChainId]
+		DefChainId := vars[DefChainID]
 		serviceName := vars[ServiceName]
 		bechProviderAddr := vars[Provider]
 
@@ -386,7 +386,7 @@ func requestAddHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handl
 				return
 			}
 
-			msg := service.NewMsgSvcRequest(request.DefChainId, request.ServiceName, request.BindChainId, baseReq.ChainID, consumer, provider, request.MethodId, input, serviceFee, request.Profiling)
+			msg := service.NewMsgSvcRequest(request.DefChainID, request.ServiceName, request.BindChainID, baseReq.ChainID, consumer, provider, request.MethodID, input, serviceFee, request.Profiling)
 			err = msg.ValidateBasic()
 			if err != nil {
 				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -435,7 +435,7 @@ func responseAddHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Hand
 			return
 		}
 
-		msg := service.NewMsgSvcResponse(req.ReqChainId, req.RequestId, provider, output, errMsg)
+		msg := service.NewMsgSvcResponse(req.ReqChainID, req.RequestID, provider, output, errMsg)
 		err = msg.ValidateBasic()
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -531,7 +531,7 @@ type definition struct {
 type binding struct {
 	BaseTx      utils.BaseTx  `json:"base_tx"` // basic tx info
 	ServiceName string        `json:"service_name"`
-	DefChainId  string        `json:"def_chain_id"`
+	DefChainID  string        `json:"def_chain_id"`
 	BindingType string        `json:"binding_type"`
 	Deposit     string        `json:"deposit"`
 	Prices      []string      `json:"prices"`
@@ -554,9 +554,9 @@ type bindingEnable struct {
 
 type serviceRequest struct {
 	ServiceName string `json:"service_name"`
-	BindChainId string `json:"bind_chain_id"`
-	DefChainId  string `json:"def_chain_id"`
-	MethodId    int16  `json:"method_id"`
+	BindChainID string `json:"bind_chain_id"`
+	DefChainID  string `json:"def_chain_id"`
+	MethodID    int16  `json:"method_id"`
 	Provider    string `json:"provider"`
 	Consumer    string `json:"consumer"`
 	ServiceFee  string `json:"service_fee"`
@@ -571,8 +571,8 @@ type serviceRequestWithBasic struct {
 
 type serviceResponse struct {
 	BaseTx     utils.BaseTx `json:"base_tx"` // basic tx info
-	ReqChainId string       `json:"req_chain_id"`
-	RequestId  string       `json:"request_id"`
+	ReqChainID string       `json:"req_chain_id"`
+	RequestID  string       `json:"request_id"`
 	Data       string       `json:"data"`
 	Provider   string       `json:"provider"`
 	ErrorMsg   string       `json:"error_msg"`
