@@ -8,11 +8,9 @@ import (
 )
 
 const (
-	QueryToken    = "token"
-	QueryTokens   = "tokens"
-	QueryGateway  = "gateway"
-	QueryGateways = "gateways"
-	QueryFees     = "fees"
+	QueryToken  = "token"
+	QueryTokens = "tokens"
+	QueryFees   = "fees"
 )
 
 // QueryTokenParams is the query parameters for 'custom/asset/tokens/{id}'
@@ -22,59 +20,75 @@ type QueryTokenParams struct {
 
 // QueryTokensParams is the query parameters for 'custom/asset/tokens'
 type QueryTokensParams struct {
-	Source  string
-	Gateway string
+	TokenID string
 	Owner   string
-}
-
-// QueryGatewayParams is the query parameters for 'custom/asset/gateway'
-type QueryGatewayParams struct {
-	Moniker string
-}
-
-// QueryGatewaysParams is the query parameters for 'custom/asset/gateways'
-type QueryGatewaysParams struct {
-	Owner sdk.AccAddress
-}
-
-// QueryGatewayFeeParams is the query parameters for 'custom/asset/fees/gateways'
-type QueryGatewayFeeParams struct {
-	Moniker string
 }
 
 // QueryTokenFeesParams is the query parameters for 'custom/asset/fees/tokens'
 type QueryTokenFeesParams struct {
-	ID string
+	Symbol string
 }
 
-// GatewayFeeOutput is for the gateway fee query output
-type GatewayFeeOutput struct {
-	Exist bool     `json:"exist"` // indicate if the gateway has existed
-	Fee   sdk.Coin `json:"fee"`   // creation fee
+type TokenOutput struct {
+	Id            string         `json:"id"`
+	Family        AssetFamily    `json:"family"`
+	Source        AssetSource    `json:"source"`
+	Symbol        string         `json:"symbol"`
+	Name          string         `json:"name"`
+	Decimal       uint8          `json:"decimal"`
+	InitialSupply sdk.Int        `json:"initial_supply"`
+	MaxSupply     sdk.Int        `json:"max_supply"`
+	Mintable      bool           `json:"mintable"`
+	Owner         sdk.AccAddress `json:"owner"`
 }
 
 // String implements stringer
-func (gfo GatewayFeeOutput) String() string {
-	var out strings.Builder
-	if gfo.Exist {
-		out.WriteString("The gateway moniker has existed\n")
-	}
-
-	out.WriteString(fmt.Sprintf("Fee: %s", gfo.Fee.String()))
-
-	return out.String()
+func (top TokenOutput) String() string {
+	token := NewFungibleTokenFrom(top)
+	return token.String()
 }
 
-// HumanString implements human
-func (gfo GatewayFeeOutput) HumanString(converter sdk.CoinsConverter) string {
-	var out strings.Builder
-	if gfo.Exist {
-		out.WriteString("The gateway moniker has existed\n")
+func NewTokenOutputFrom(token FungibleToken) TokenOutput {
+	return TokenOutput{
+		Id:            token.Id,
+		Family:        token.Family,
+		Source:        token.Source,
+		Symbol:        token.Symbol,
+		Name:          token.Name,
+		Decimal:       token.Decimal,
+		InitialSupply: token.InitialSupply,
+		MaxSupply:     token.MaxSupply,
+		Mintable:      token.Mintable,
+		Owner:         token.Owner,
 	}
+}
 
-	out.WriteString(fmt.Sprintf("Fee: %s", converter.ToMainUnit(sdk.Coins{gfo.Fee})))
+func NewFungibleTokenFrom(token TokenOutput) FungibleToken {
+	return FungibleToken{BaseToken{
+		Id:            token.Id,
+		Family:        token.Family,
+		Source:        token.Source,
+		Symbol:        token.Symbol,
+		Name:          token.Name,
+		Decimal:       token.Decimal,
+		InitialSupply: token.InitialSupply,
+		MaxSupply:     token.MaxSupply,
+		Mintable:      token.Mintable,
+		Owner:         token.Owner,
+	}}
+}
 
-	return out.String()
+type TokensOutput []TokenOutput
+
+func (tsop TokensOutput) String() string {
+	var tokens Tokens
+	for _, t := range tsop {
+		tokens = append(tokens, NewFungibleTokenFrom(t))
+	}
+	if len(tokens) == 0 {
+		return ""
+	}
+	return tokens.String()
 }
 
 // TokenFeesOutput is for the token fees query output

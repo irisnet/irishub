@@ -24,11 +24,8 @@ type BaseToken struct {
 	Owner           types.AccAddress `json:"owner"`
 }
 
-func NewBaseToken(family AssetFamily, source AssetSource, gateway string, symbol string, name string, decimal uint8, canonicalSymbol string, minUnitAlias string, initialSupply types.Int, maxSupply types.Int, mintable bool, owner types.AccAddress) BaseToken {
-	gateway = strings.ToLower(strings.TrimSpace(gateway))
+func NewBaseToken(family AssetFamily, source AssetSource, symbol string, name string, decimal uint8, initialSupply types.Int, maxSupply types.Int, mintable bool, owner types.AccAddress) BaseToken {
 	symbol = strings.ToLower(strings.TrimSpace(symbol))
-	canonicalSymbol = strings.ToLower(strings.TrimSpace(canonicalSymbol))
-	minUnitAlias = strings.ToLower(strings.TrimSpace(minUnitAlias))
 	name = strings.TrimSpace(name)
 
 	if maxSupply.IsZero() {
@@ -40,18 +37,15 @@ func NewBaseToken(family AssetFamily, source AssetSource, gateway string, symbol
 	}
 
 	return BaseToken{
-		Family:          family,
-		Source:          source,
-		Gateway:         gateway,
-		Symbol:          symbol,
-		Name:            name,
-		Decimal:         decimal,
-		CanonicalSymbol: canonicalSymbol,
-		MinUnitAlias:    minUnitAlias,
-		InitialSupply:   initialSupply,
-		MaxSupply:       maxSupply,
-		Mintable:        mintable,
-		Owner:           owner,
+		Family:        family,
+		Source:        source,
+		Symbol:        symbol,
+		Name:          name,
+		Decimal:       decimal,
+		InitialSupply: initialSupply,
+		MaxSupply:     maxSupply,
+		Mintable:      mintable,
+		Owner:         owner,
 	}
 }
 
@@ -60,13 +54,12 @@ type FungibleToken struct {
 	BaseToken `json:"base_token"`
 }
 
-func NewFungibleToken(source AssetSource, gateway string, symbol string, name string, decimal uint8, canonicalSymbol string, minUnitAlias string, initialSupply types.Int, maxSupply types.Int, mintable bool, owner types.AccAddress) FungibleToken {
+func NewFungibleToken(symbol, name string, decimal uint8, initialSupply, maxSupply types.Int, mintable bool, owner types.AccAddress) FungibleToken {
 	token := FungibleToken{
 		BaseToken: NewBaseToken(
-			FUNGIBLE, source, gateway, symbol, name, decimal, canonicalSymbol, minUnitAlias, initialSupply, maxSupply, mintable, owner,
+			FUNGIBLE, NATIVE, symbol, name, decimal, initialSupply, maxSupply, mintable, owner,
 		),
 	}
-
 	token.Id = token.GetUniqueID()
 	return token
 }
@@ -96,16 +89,7 @@ func (ft FungibleToken) GetGateway() string {
 }
 
 func (ft FungibleToken) GetUniqueID() string {
-	switch ft.Source {
-	case NATIVE:
-		return strings.ToLower(ft.Symbol)
-	case EXTERNAL:
-		return strings.ToLower(fmt.Sprintf("x.%s", ft.Symbol))
-	case GATEWAY:
-		return strings.ToLower(fmt.Sprintf("%s.%s", ft.Gateway, ft.Symbol))
-	default:
-		return ""
-	}
+	return strings.ToLower(ft.Symbol)
 }
 
 func (ft FungibleToken) GetDenom() string {
@@ -144,27 +128,15 @@ func (ft FungibleToken) String() string {
 	return fmt.Sprintf(`FungibleToken %s:
   Family:            %s
   Source:            %s
-  Gateway:           %s
   Name:              %s
   Symbol:            %s
-  CanonicalSymbol:   %s
-  MinUnitAlias:      %s
   Decimal:           %d
   Initial Supply:    %s
   Max Supply:        %s
   Mintable:          %v
   Owner:             %s`,
-		ft.GetUniqueID(), ft.Family, ft.Source, ft.Gateway, ft.Name, ft.Symbol, ft.CanonicalSymbol, ft.MinUnitAlias,
+		ft.GetUniqueID(), ft.Family, ft.Source, ft.Name, ft.Symbol,
 		ft.Decimal, initSupply, maxSupply, ft.Mintable, owner)
-}
-
-func (ft FungibleToken) Sanitize() FungibleToken {
-	ft.Gateway = strings.ToLower(strings.TrimSpace(ft.Gateway))
-	ft.Symbol = strings.ToLower(strings.TrimSpace(ft.Symbol))
-	ft.CanonicalSymbol = strings.ToLower(strings.TrimSpace(ft.CanonicalSymbol))
-	ft.MinUnitAlias = strings.ToLower(strings.TrimSpace(ft.MinUnitAlias))
-	ft.Name = strings.TrimSpace(ft.Name)
-	return ft
 }
 
 type Tokens []FungibleToken
@@ -200,33 +172,21 @@ func (tokens Tokens) Validate() sdk.Error {
 
 // -----------------------------
 
-func GetTokenID(source AssetSource, symbol string, gateway string) (string, types.Error) {
-	switch source {
-	case NATIVE:
-		return strings.ToLower(fmt.Sprintf("i.%s", symbol)), nil
-	case EXTERNAL:
-		return strings.ToLower(fmt.Sprintf("x.%s", symbol)), nil
-	case GATEWAY:
-		return strings.ToLower(fmt.Sprintf("%s.%s", gateway, symbol)), nil
-	default:
-		return "", ErrInvalidAssetSource(DefaultCodespace, fmt.Sprintf("invalid asset source type %s", source))
-	}
+func GetTokenID(symbol string) string {
+	return strings.ToLower(fmt.Sprintf("i.%s", symbol))
 }
 
 // CheckTokenID checks if the given token id is valid
 func CheckTokenID(id string) sdk.Error {
 	prefix, symbol := GetTokenIDParts(id)
 
-	// check gateway moniker
-	if prefix != "" && prefix != "i" && prefix != "x" {
-		if err := ValidateMoniker(prefix); err != nil {
-			return err
-		}
-	}
-
 	// check symbol
 	if len(symbol) < MinimumAssetSymbolSize || len(symbol) > MaximumAssetSymbolSize || !IsBeginWithAlpha(symbol) || !IsAlphaNumeric(symbol) || strings.Contains(symbol, sdk.Iris) {
 		return ErrInvalidAssetSymbol(DefaultCodespace, fmt.Sprintf("invalid asset symbol: %s", symbol))
+	}
+	// check prefix
+	if prefix != "i" {
+		return ErrInvalidTokenID(DefaultCodespace, fmt.Sprintf("invalid token-id: %s", id))
 	}
 
 	return nil
@@ -235,14 +195,7 @@ func CheckTokenID(id string) sdk.Error {
 // GetTokenIDParts returns the source prefix and symbol
 func GetTokenIDParts(id string) (prefix string, symbol string) {
 	parts := strings.Split(strings.ToLower(id), ".")
-
-	if len(parts) > 1 {
-		// external or gateway asset
-		prefix = parts[0]
-		symbol = strings.Join(parts[1:], ".")
-	} else {
-		symbol = parts[0]
-	}
-
+	prefix = parts[0]
+	symbol = strings.Join(parts[1:], ".")
 	return
 }

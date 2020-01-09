@@ -1,7 +1,6 @@
 package gov
 
 import (
-	"github.com/irisnet/irishub/app/v3/asset/exported"
 	sdk "github.com/irisnet/irishub/types"
 )
 
@@ -86,27 +85,6 @@ func createCommunityTaxUsageInfo() pTypeInfo {
 						taxMsg.Usage,
 						taxMsg.DestAddress,
 						taxMsg.Percent},
-				}
-				return proposal
-			})
-		},
-	}
-}
-
-func createTokenAdditionInfo() pTypeInfo {
-	return pTypeInfo{
-		ProposalTypeTokenAddition,
-		ProposalLevelImportant,
-		func(content Content) Proposal {
-			return buildProposal(content, func(p BasicProposal, content Content) Proposal {
-				addTokenMsg := content.(MsgSubmitTokenAdditionProposal)
-				decimal := int(addTokenMsg.Decimal)
-				maxSupply := sdk.NewIntWithDecimal(int64(exported.MaximumAssetMaxSupply), decimal)
-
-				fToken := exported.NewFungibleToken(exported.EXTERNAL, "", addTokenMsg.Symbol, addTokenMsg.Name, addTokenMsg.Decimal, addTokenMsg.CanonicalSymbol, addTokenMsg.MinUnitAlias, sdk.ZeroInt(), maxSupply, true, nil)
-				proposal := &TokenAdditionProposal{
-					p,
-					fToken,
 				}
 				return proposal
 			})

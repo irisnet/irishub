@@ -39,28 +39,13 @@ func NewAnteHandler(k Keeper) sdk.AnteHandler {
 			var msgFee sdk.Coin
 
 			switch msg := msg.(type) {
-			case types.MsgCreateGateway:
-				msgFee = GetGatewayCreateFee(ctx, k, msg.Moniker)
-				break
-
 			case types.MsgIssueToken:
-				if msg.Source == types.NATIVE {
-					msgFee = GetTokenIssueFee(ctx, k, msg.Symbol)
-				} else if msg.Source == types.GATEWAY {
-					msgFee = GetGatewayTokenIssueFee(ctx, k, msg.Symbol)
-				}
-
+				msgFee = GetTokenIssueFee(ctx, k, msg.Symbol)
 				break
 
 			case types.MsgMintToken:
-				prefix, symbol := types.GetTokenIDParts(msg.TokenId)
-
-				if prefix == "" || prefix == "i" {
-					msgFee = GetTokenMintFee(ctx, k, symbol)
-				} else if prefix != "x" {
-					msgFee = GetGatewayTokenMintFee(ctx, k, symbol)
-				}
-
+				_, symbol := types.GetTokenIDParts(msg.TokenId)
+				msgFee = GetTokenMintFee(ctx, k, symbol)
 				break
 
 			default:

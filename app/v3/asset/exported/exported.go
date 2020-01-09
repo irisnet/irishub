@@ -9,7 +9,6 @@ type FungibleToken = types.FungibleToken
 var (
 	MaximumAssetMaxSupply = types.MaximumAssetMaxSupply
 	NewFungibleToken      = types.NewFungibleToken
-	EXTERNAL              = types.EXTERNAL
 	FUNGIBLE              = types.FUNGIBLE
 	NewMsgIssueToken      = types.NewMsgIssueToken
 	ValidateMsgIssueToken = types.ValidateMsgIssueToken

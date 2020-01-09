@@ -1,7 +1,12 @@
 package lcd
 
 import (
+	"fmt"
 	"net/http"
+
+	"github.com/irisnet/irishub/app/protocol"
+	"github.com/irisnet/irishub/app/v3/asset"
+	"github.com/irisnet/irishub/client/utils"
 
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client/context"
@@ -11,7 +16,7 @@ import (
 func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec) {
 	// Get token by id
 	r.HandleFunc(
-		"/asset/tokens/{id}",
+		"/asset/tokens/{token-id}",
 		queryTokenHandlerFn(cliCtx, cdc),
 	).Methods("GET")
 	// Search tokens
@@ -19,57 +24,94 @@ func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Co
 		"/asset/tokens",
 		queryTokensHandlerFn(cliCtx, cdc),
 	).Methods("GET")
-	// Get the gateway from a moniker
-	r.HandleFunc(
-		"/asset/gateways/{moniker}",
-		monikerGatewayHandlerFn(cliCtx, cdc),
-	).Methods("GET")
-
-	// Get all gateways with an optional owner
-	r.HandleFunc(
-		"/asset/gateways",
-		gatewaysHandlerFn(cliCtx, cdc),
-	).Methods("GET")
-
-	// Get gateway creation fee
-	r.HandleFunc(
-		"/asset/fees/gateways/{moniker}",
-		gatewayFeeHandlerFn(cliCtx, cdc),
-	).Methods("GET")
 
 	// Get token fees
 	r.HandleFunc(
-		"/asset/fees/tokens/{id}",
+		"/asset/tokens/{symbol}/fee",
 		tokenFeesHandlerFn(cliCtx, cdc),
 	).Methods("GET")
 }
 
 // queryTokenHandlerFn performs token information query
 func queryTokenHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
-	return queryToken(cliCtx, cdc, "custom/asset/tokens/{id}")
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+
+		tokenId := vars["token-id"]
+
+		params := asset.QueryTokenParams{
+			TokenId: tokenId,
+		}
+
+		bz, err := cliCtx.Codec.MarshalJSON(params)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		res, err := cliCtx.QueryWithData(
+			fmt.Sprintf("custom/%s/%s", protocol.AssetRoute, asset.QueryToken), bz)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		utils.PostProcessResponse(w, cliCtx.Codec, res, cliCtx.Indent)
+	}
 }
 
 // queryTokenHandlerFn performs token information query
 func queryTokensHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
-	return queryTokens(cliCtx, cdc, "custom/asset/tokens")
-}
+	return func(w http.ResponseWriter, r *http.Request) {
+		owner := r.FormValue("owner")
 
-// monikerGatewayHandlerFn is the HTTP request handler to query a gateway of the given moniker
-func monikerGatewayHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
-	return queryGateway(cliCtx, cdc, "custom/asset/gateway")
-}
+		// TODO: pagination support
 
-// gatewaysHandlerFn is the HTTP request handler to query a set of gateways
-func gatewaysHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
-	return queryGateways(cliCtx, cdc, "custom/asset/gateways")
-}
+		params := asset.QueryTokensParams{
+			Owner: owner,
+		}
 
-// gatewayFeeHandlerFn is the HTTP request handler to query gateway creation fee
-func gatewayFeeHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
-	return queryGatewayFee(cliCtx, cdc, "custom/asset/fees/gateways")
+		bz, err := cliCtx.Codec.MarshalJSON(params)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		res, err := cliCtx.QueryWithData(
+			fmt.Sprintf("custom/%s/%s", protocol.AssetRoute, asset.QueryTokens), bz)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		utils.PostProcessResponse(w, cliCtx.Codec, res, cliCtx.Indent)
+	}
 }
 
 // tokenFeesHandlerFn is the HTTP request handler to query token fees
 func tokenFeesHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
-	return queryTokenFees(cliCtx, cdc, "custom/asset/fees/tokens")
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+
+		symbol := vars["symbol"]
+
+		params := asset.QueryTokenFeesParams{
+			Symbol: symbol,
+		}
+
+		bz, err := cliCtx.Codec.MarshalJSON(params)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		res, err := cliCtx.QueryWithData(
+			fmt.Sprintf("custom/%s/%s/tokens", protocol.AssetRoute, asset.QueryFees), bz)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		utils.PostProcessResponse(w, cliCtx.Codec, res, cliCtx.Indent)
+	}
 }
