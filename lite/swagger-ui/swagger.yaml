@@ -4,7 +4,7 @@ info:
   description: >-
     A REST interface for state queries, transaction generation and
     broadcast.
-  version: "0.16.0"
+  version: "0.16.1"
   title: IRISLCD Swagger-UI
   termsOfService: 'https://www.irisnet.org'
   contact:
@@ -2825,7 +2825,7 @@ paths:
           description: Internal Server Error
   '/coinswap/liquidities/{id}':
     get:
-      summary: Query liquidity by token id
+      summary: Query liquidity by id
       tags:
         - CoinSwap
       parameters:
