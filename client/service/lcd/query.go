@@ -17,31 +17,31 @@ func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Co
 
 	// get a single definition info
 	r.HandleFunc(
-		fmt.Sprintf("/service/definitions/{%s}/{%s}", DefChainId, ServiceName),
+		fmt.Sprintf("/service/definitions/{%s}/{%s}", DefChainID, ServiceName),
 		definitionGetHandlerFn(cliCtx, cdc),
 	).Methods("GET")
 
 	// get a single binding info
 	r.HandleFunc(
-		fmt.Sprintf("/service/bindings/{%s}/{%s}/{%s}/{%s}", DefChainId, ServiceName, BindChainId, Provider),
+		fmt.Sprintf("/service/bindings/{%s}/{%s}/{%s}/{%s}", DefChainID, ServiceName, BindChainID, Provider),
 		bindingHandlerFn(cliCtx, cdc),
 	).Methods("GET")
 
 	// get all bindings of a definition
 	r.HandleFunc(
-		fmt.Sprintf("/service/bindings/{%s}/{%s}", DefChainId, ServiceName),
+		fmt.Sprintf("/service/bindings/{%s}/{%s}", DefChainID, ServiceName),
 		bindingsHandlerFn(cliCtx, cdc),
 	).Methods("GET")
 
 	// get all active requests of a binding
 	r.HandleFunc(
-		fmt.Sprintf("/service/requests/{%s}/{%s}/{%s}/{%s}", DefChainId, ServiceName, BindChainId, Provider),
+		fmt.Sprintf("/service/requests/{%s}/{%s}/{%s}/{%s}", DefChainID, ServiceName, BindChainID, Provider),
 		requestsHandlerFn(cliCtx, cdc),
 	).Methods("GET")
 
 	// get a single response
 	r.HandleFunc(
-		fmt.Sprintf("/service/responses/{%s}/{%s}", ReqChainId, ReqId),
+		fmt.Sprintf("/service/responses/{%s}/{%s}", ReqChainID, ReqID),
 		responseGetHandlerFn(cliCtx, cdc),
 	).Methods("GET")
 
@@ -55,7 +55,7 @@ func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Co
 func definitionGetHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		defChainId := vars[DefChainId]
+		defChainId := vars[DefChainID]
 		serviceName := vars[ServiceName]
 
 		params := service.QueryServiceParams{
@@ -83,9 +83,9 @@ func definitionGetHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.Ha
 func bindingHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		defChainId := vars[DefChainId]
+		defChainID := vars[DefChainID]
 		serviceName := vars[ServiceName]
-		bindChainId := vars[BindChainId]
+		bindChainID := vars[BindChainID]
 		bechProviderAddr := vars[Provider]
 
 		provider, err := sdk.AccAddressFromBech32(bechProviderAddr)
@@ -95,9 +95,9 @@ func bindingHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerF
 		}
 
 		params := service.QueryBindingParams{
-			DefChainID:  defChainId,
+			DefChainID:  defChainID,
 			ServiceName: serviceName,
-			BindChainId: bindChainId,
+			BindChainID: bindChainID,
 			Provider:    provider,
 		}
 
@@ -120,7 +120,7 @@ func bindingHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerF
 func bindingsHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		defChainId := vars[DefChainId]
+		defChainId := vars[DefChainID]
 		serviceName := vars[ServiceName]
 
 		params := service.QueryServiceParams{
@@ -148,9 +148,9 @@ func bindingsHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.Handler
 func requestsHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		defChainId := vars[DefChainId]
+		defChainID := vars[DefChainID]
 		serviceName := vars[ServiceName]
-		bindChainId := vars[BindChainId]
+		bindChainID := vars[BindChainID]
 		bechProviderAddr := vars[Provider]
 
 		provider, err := sdk.AccAddressFromBech32(bechProviderAddr)
@@ -160,9 +160,9 @@ func requestsHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.Handler
 		}
 
 		params := service.QueryBindingParams{
-			DefChainID:  defChainId,
+			DefChainID:  defChainID,
 			ServiceName: serviceName,
-			BindChainId: bindChainId,
+			BindChainID: bindChainID,
 			Provider:    provider,
 		}
 
@@ -186,12 +186,12 @@ func requestsHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.Handler
 func responseGetHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		reqChainId := vars[ReqChainId]
-		reqId := vars[ReqId]
+		reqChainID := vars[ReqChainID]
+		reqID := vars[ReqID]
 
 		params := service.QueryResponseParams{
-			ReqChainId: reqChainId,
-			RequestId:  reqId,
+			ReqChainID: reqChainID,
+			RequestID:  reqID,
 		}
 
 		bz, err := cdc.MarshalJSON(params)

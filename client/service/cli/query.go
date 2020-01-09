@@ -74,7 +74,7 @@ func GetCmdQuerySvcBind(cdc *codec.Codec) *cobra.Command {
 			params := service.QueryBindingParams{
 				DefChainID:  defChainId,
 				ServiceName: name,
-				BindChainId: bindChainId,
+				BindChainID: bindChainId,
 				Provider:    provider,
 			}
 
@@ -112,10 +112,10 @@ func GetCmdQuerySvcBinds(cdc *codec.Codec) *cobra.Command {
 				WithAccountDecoder(utils.GetAccountDecoder(cdc))
 
 			name := viper.GetString(FlagServiceName)
-			defChainId := viper.GetString(FlagDefChainID)
+			defChainID := viper.GetString(FlagDefChainID)
 
 			params := service.QueryServiceParams{
-				DefChainID:  defChainId,
+				DefChainID:  defChainID,
 				ServiceName: name,
 			}
 
@@ -151,8 +151,8 @@ func GetCmdQuerySvcRequests(cdc *codec.Codec) *cobra.Command {
 				WithAccountDecoder(utils.GetAccountDecoder(cdc))
 
 			name := viper.GetString(FlagServiceName)
-			defChainId := viper.GetString(FlagDefChainID)
-			bindChainId := viper.GetString(FlagBindChainID)
+			defChainID := viper.GetString(FlagDefChainID)
+			bindChainID := viper.GetString(FlagBindChainID)
 			providerStr := viper.GetString(FlagProvider)
 
 			provider, err := sdk.AccAddressFromBech32(providerStr)
@@ -161,9 +161,9 @@ func GetCmdQuerySvcRequests(cdc *codec.Codec) *cobra.Command {
 			}
 
 			params := service.QueryBindingParams{
-				DefChainID:  defChainId,
+				DefChainID:  defChainID,
 				ServiceName: name,
-				BindChainId: bindChainId,
+				BindChainID: bindChainID,
 				Provider:    provider,
 			}
 
@@ -200,12 +200,12 @@ func GetCmdQuerySvcResponse(cdc *codec.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
 				WithAccountDecoder(utils.GetAccountDecoder(cdc))
 
-			reqChainId := viper.GetString(FlagReqChainId)
-			reqId := viper.GetString(FlagReqId)
+			reqChainID := viper.GetString(FlagReqChainId)
+			reqID := viper.GetString(FlagReqId)
 
 			params := service.QueryResponseParams{
-				ReqChainId: reqChainId,
-				RequestId:  reqId,
+				ReqChainID: reqChainID,
+				RequestID:  reqID,
 			}
 
 			bz, err := cdc.MarshalJSON(params)

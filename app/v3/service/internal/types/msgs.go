@@ -1,4 +1,4 @@
-package service
+package types
 
 import (
 	"fmt"
@@ -29,7 +29,7 @@ func NewMsgSvcDef(name, chainId, description string, tags []string, author sdk.A
 	return MsgSvcDef{
 		SvcDef{
 			Name:              name,
-			ChainId:           chainId,
+			ChainID:           chainId,
 			Description:       description,
 			Tags:              tags,
 			Author:            author,
@@ -54,7 +54,7 @@ func (msg MsgSvcDef) GetSignBytes() []byte {
 }
 
 func (msg MsgSvcDef) ValidateBasic() sdk.Error {
-	if len(msg.ChainId) == 0 {
+	if len(msg.ChainID) == 0 {
 		return ErrInvalidChainId(DefaultCodespace)
 	}
 	if !validServiceName(msg.Name) {
@@ -104,7 +104,7 @@ func validateMethods(methods []protoidl.Method) (bool, sdk.Error) {
 	return true, nil
 }
 
-func methodToMethodProperty(index int, method protoidl.Method) (methodProperty MethodProperty, err sdk.Error) {
+func MethodToMethodProperty(index int, method protoidl.Method) (methodProperty MethodProperty, err sdk.Error) {
 	// set default value
 	opp := NoPrivacy
 	opc := NoCached
@@ -744,7 +744,7 @@ func (msg MsgSvcDef) EnsureLength() sdk.Error {
 		return err
 	}
 
-	if err := ensureChainIdLength(msg.ChainId, "chain_id"); err != nil {
+	if err := ensureChainIdLength(msg.ChainID, "chain_id"); err != nil {
 		return err
 	}
 
