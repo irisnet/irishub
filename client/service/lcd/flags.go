@@ -1,10 +1,10 @@
 package lcd
 
 const (
-	DefChainId  = "defChainId"
-	BindChainId = "bindChainId"
-	ReqChainId  = "reqChainId"
-	ReqId       = "reqId"
+	DefChainID  = "defChainID"
+	BindChainID = "bindChainID"
+	ReqChainID  = "reqChainID"
+	ReqID       = "reqID"
 	ServiceName = "serviceName"
 	Provider    = "provider"
 	Consumer    = "consumer"

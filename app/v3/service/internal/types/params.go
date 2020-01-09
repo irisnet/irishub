@@ -1,4 +1,4 @@
-package service
+package types
 
 import (
 	"fmt"
@@ -227,22 +227,6 @@ func validateParams(p Params) error {
 	}
 	return nil
 }
-
-//______________________________________________________________________
-
-// get service params from the global param store
-func (k Keeper) GetParamSet(ctx sdk.Context) Params {
-	var params Params
-	k.paramSpace.GetParamSet(ctx, &params)
-	return params
-}
-
-// set service params from the global param store
-func (k Keeper) SetParamSet(ctx sdk.Context, params Params) {
-	k.paramSpace.SetParamSet(ctx, &params)
-}
-
-//______________________________________________________________________
 
 func validateMaxRequestTimeout(v int64) sdk.Error {
 	if sdk.NetworkType == sdk.Mainnet {

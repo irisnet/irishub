@@ -1,12 +1,14 @@
-package service
+package types
 
 import (
 	"github.com/go-kit/kit/metrics"
 	"github.com/go-kit/kit/metrics/discard"
 	"github.com/go-kit/kit/metrics/prometheus"
-	promutil "github.com/irisnet/irishub/tools/prometheus"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
+	
 	cfg "github.com/tendermint/tendermint/config"
+
+	promutil "github.com/irisnet/irishub/tools/prometheus"
 )
 
 const MetricsSubsystem = "module_service"

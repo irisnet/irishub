@@ -1,4 +1,4 @@
-package service
+package types
 
 import (
 	"encoding/json"
@@ -10,7 +10,7 @@ import (
 
 type SvcDef struct {
 	Name              string         `json:"name"`
-	ChainId           string         `json:"chain_id"`
+	ChainID           string         `json:"chain_id"`
 	Description       string         `json:"description"`
 	Tags              []string       `json:"tags"`
 	Author            sdk.AccAddress `json:"author"`
@@ -29,7 +29,7 @@ type MethodProperty struct {
 func NewSvcDef(name, chainId, description string, tags []string, author sdk.AccAddress, authorDescription, idlContent string) SvcDef {
 	return SvcDef{
 		Name:              name,
-		ChainId:           chainId,
+		ChainID:           chainId,
 		Description:       description,
 		Tags:              tags,
 		Author:            author,

@@ -1,9 +1,10 @@
-package service
+package keeper
 
 import (
 	"encoding/binary"
 
 	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/app/v3/service/internal/types"
 )
 
 var (
@@ -72,7 +73,7 @@ func GetResponseKey(reqChainId string, eHeight, rHeight int64, counter int16) []
 }
 
 // get the expiration index of a request
-func GetRequestsByExpirationIndexKeyByReq(req SvcRequest) []byte {
+func GetRequestsByExpirationIndexKeyByReq(req types.SvcRequest) []byte {
 	return GetRequestsByExpirationIndexKey(req.ExpirationHeight, req.RequestHeight, req.RequestIntraTxCounter)
 }
 
