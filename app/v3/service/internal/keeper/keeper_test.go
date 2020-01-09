@@ -21,14 +21,18 @@ func TestKeeper_Service_Definition_Binding(t *testing.T) {
 	tags := []string{"test", "tutorial"}
 	authorDescription := "unit test author"
 
-	keeper.AddServiceDefinition(ctx, serviceName, chainID, serviceDescription, tags, author, authorDescription, idlContent)
-	serviceDef, _ := keeper.GetServiceDefinition(ctx, chainID, serviceName)
+	err := keeper.AddServiceDefinition(ctx, serviceName, chainID, serviceDescription, tags, author, authorDescription, idlContent)
+	require.NoError(t, err)
 
+	serviceDef, found := keeper.GetServiceDefinition(ctx, chainID, serviceName)
+
+	require.True(t, found)
 	require.Equal(t, idlContent, serviceDef.IDLContent)
 	require.Equal(t, serviceName, serviceDef.Name)
 
 	// test methods
-	keeper.AddMethods(ctx, serviceDef)
+	err = keeper.AddMethods(ctx, serviceDef)
+	require.NoError(t, err)
 
 	iterator := keeper.GetMethods(ctx, chainID, serviceName)
 	defer iterator.Close()
@@ -54,7 +58,7 @@ func TestKeeper_Service_Definition_Binding(t *testing.T) {
 	bindingType := types.Global
 	level := types.Level{AvgRspTime: 10000, UsableTime: 9999}
 
-	err := keeper.AddServiceBinding(ctx, chainID, serviceName, chainID, provider, bindingType, sdk.NewCoins(deposit), []sdk.Coin{price}, level)
+	err = keeper.AddServiceBinding(ctx, chainID, serviceName, chainID, provider, bindingType, sdk.NewCoins(deposit), []sdk.Coin{price}, level)
 	require.NoError(t, err)
 
 	svcBinding, found := keeper.GetServiceBinding(ctx, chainID, serviceName, chainID, provider)
@@ -85,14 +89,15 @@ func TestKeeper_Service_Call(t *testing.T) {
 	tags := []string{"test", "tutorial"}
 	authorDescription := "unit test author"
 
-	keeper.AddServiceDefinition(ctx, serviceName, chainID, serviceDescription, tags, author, authorDescription, idlContent)
+	err := keeper.AddServiceDefinition(ctx, serviceName, chainID, serviceDescription, tags, author, authorDescription, idlContent)
+	require.NoError(t, err)
 
 	deposit, _ := sdk.IrisCoinType.ConvertToMinDenomCoin("1000iris")
 	price, _ := sdk.IrisCoinType.ConvertToMinDenomCoin("1iris")
 	bindingType := types.Global
 	level := types.Level{AvgRspTime: 10000, UsableTime: 9999}
 
-	err := keeper.AddServiceBinding(ctx, chainID, serviceName, chainID, provider, bindingType, sdk.NewCoins(deposit), []sdk.Coin{price}, level)
+	err = keeper.AddServiceBinding(ctx, chainID, serviceName, chainID, provider, bindingType, sdk.NewCoins(deposit), []sdk.Coin{price}, level)
 	require.NoError(t, err)
 
 	// service request
