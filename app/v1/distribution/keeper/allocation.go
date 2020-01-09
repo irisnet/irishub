@@ -2,9 +2,9 @@ package keeper
 
 import (
 	"fmt"
-	"github.com/irisnet/irishub/app/v1/auth"
 	"strconv"
 
+	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/app/v1/distribution/types"
 	sdk "github.com/irisnet/irishub/types"
 )
@@ -95,7 +95,7 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, percentVotes sdk.Dec, proposer s
 }
 
 // Allocate fee tax from the community fee pool, burn or send to trustee account
-func (k Keeper) AllocateFeeTax(ctx sdk.Context, destAddr sdk.AccAddress, amount sdk.Coins, burn bool) {
+func (k Keeper) AllocateFeeTax(ctx sdk.Context, destAddr sdk.AccAddress, percent sdk.Dec, burn bool) {
 	logger := ctx.Logger()
 	//feePool := k.GetFeePool(ctx)
 	//communityPool := feePool.CommunityPool
@@ -103,35 +103,35 @@ func (k Keeper) AllocateFeeTax(ctx sdk.Context, destAddr sdk.AccAddress, amount 
 
 	//feePool.CommunityPool = communityPool.Sub(types.NewDecCoins(allocateCoins))
 	taxCoins := k.bankKeeper.GetCoins(ctx, auth.CommunityTaxCoinsAccAddr)
-	taxLeftCoins, hasNeg := taxCoins.SafeSub(amount)
-	if hasNeg {
-		logger.Info(fmt.Sprintf("account balance [%s] is not enough to cover fee [%s]", taxCoins, amount))
-		return
-	}
+	taxDecCoins := types.NewDecCoins(taxCoins)
+	allocatedDecCoins := taxDecCoins.MulDec(percent)
+	allocatedCoins, _ := allocatedDecCoins.TruncateDecimal()
+	taxLeftDecCoins := taxDecCoins.Minus(allocatedDecCoins)
 
-	taxLeftDec := sdk.NewDecFromInt(taxLeftCoins.AmountOf(sdk.IrisAtto))
+	taxLeftDec := taxLeftDecCoins.AmountOf(sdk.IrisAtto)
 	taxLeftFloat, err := strconv.ParseFloat(taxLeftDec.QuoInt(sdk.AttoScaleFactor).String(), 64)
+	//communityTaxAmount, err := strconv.ParseFloat(feePool.CommunityPool.AmountOf(sdk.IrisAtto).QuoInt(sdk.AttoScaleFactor).String(), 64)
 	if err == nil {
 		k.metrics.CommunityTax.Set(taxLeftFloat)
 	}
 
 	//k.SetFeePool(ctx, feePool)
-	logger.Info("Spend community tax fund", "total_community_tax_fund", taxCoins.String(), "left_community_tax_fund", taxLeftCoins.String())
+	logger.Info("Spend community tax fund", "total_community_tax_fund", taxCoins.String(), "left_community_tax_fund", taxLeftDecCoins.String())
 	if burn {
-		logger.Info("Burn community tax", "burn_amount", amount.String())
-		_, err := k.bankKeeper.BurnCoins(ctx, auth.CommunityTaxCoinsAccAddr, amount)
+		logger.Info("Burn community tax", "burn_amount", allocatedCoins.String())
+		_, err := k.bankKeeper.BurnCoins(ctx, auth.CommunityTaxCoinsAccAddr, allocatedCoins)
 		if err != nil {
 			panic(err)
 		}
-		if !amount.IsZero() {
-			ctx.CoinFlowTags().AppendCoinFlowTag(ctx, auth.CommunityTaxCoinsAccAddr.String(), "", amount.String(), sdk.BurnFlow, "")
+		if !allocatedCoins.IsZero() {
+			ctx.CoinFlowTags().AppendCoinFlowTag(ctx, auth.CommunityTaxCoinsAccAddr.String(), "", allocatedCoins.String(), sdk.BurnFlow, "")
 		}
 	} else {
-		logger.Info("Grant community tax to account", "grant_amount", amount.String(), "grant_address", destAddr.String())
-		if !amount.IsZero() {
-			ctx.CoinFlowTags().AppendCoinFlowTag(ctx, "", destAddr.String(), amount.String(), sdk.CommunityTaxUseFlow, "")
+		logger.Info("Grant community tax to account", "grant_amount", allocatedCoins.String(), "grant_address", destAddr.String())
+		if !allocatedCoins.IsZero() {
+			ctx.CoinFlowTags().AppendCoinFlowTag(ctx, "", destAddr.String(), allocatedCoins.String(), sdk.CommunityTaxUseFlow, "")
 		}
-		_, err := k.bankKeeper.SendCoins(ctx, auth.CommunityTaxCoinsAccAddr, destAddr, amount)
+		_, err := k.bankKeeper.SendCoins(ctx, auth.CommunityTaxCoinsAccAddr, destAddr, allocatedCoins)
 		if err != nil {
 			panic(err)
 		}

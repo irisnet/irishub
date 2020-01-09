@@ -45,6 +45,7 @@ type commTax struct {
 	Usage       gov.UsageType  `json:"usage"`
 	DestAddress sdk.AccAddress `json:"dest_address"`
 	Percent     sdk.Dec        `json:"percent"`
+	Amount      sdk.Coins      `json:"amount"`
 }
 
 type depositReq struct {
@@ -104,7 +105,7 @@ func postProposalHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Han
 			msgs[0] = gov.NewMsgSubmitSoftwareUpgradeProposal(msg, req.Upgrade.Version, req.Upgrade.Software, req.Upgrade.SwitchHeight, req.Upgrade.Threshold)
 			break
 		case gov.ProposalTypeCommunityTaxUsage:
-			msgs[0] = gov.NewMsgSubmitCommunityTaxUsageProposal(msg, req.CommTax.Usage, req.CommTax.DestAddress, req.CommTax.Percent)
+			msgs[0] = gov.NewMsgSubmitCommunityTaxUsageProposal(msg, req.CommTax.Usage, req.CommTax.DestAddress, req.CommTax.Amount)
 			break
 		case gov.ProposalTypeTokenAddition:
 			msgs[0] = gov.NewMsgSubmitTokenAdditionProposal(msg, req.Token.Symbol, req.Token.CanonicalSymbol, req.Token.Name, req.Token.MinUnitAlias, req.Token.Decimal)

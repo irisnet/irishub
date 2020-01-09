@@ -142,7 +142,7 @@ func (tp *CommunityTaxUsageProposal) Execute(ctx sdk.Context, gk Keeper) sdk.Err
 	if tp.TaxUsage.Usage == UsageTypeBurn {
 		burn = true
 	}
-	gk.dk.AllocateFeeTax(ctx, tp.TaxUsage.DestAddress, tp.TaxUsage.Amount, burn)
+	gk.AllocateFeeTax(ctx, tp.TaxUsage.DestAddress, tp.TaxUsage.Amount, burn)
 	return nil
 }
 
