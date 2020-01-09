@@ -1,14 +1,16 @@
-package service
+package types
 
 import (
 	"encoding/json"
 	"fmt"
 	"time"
 
-	sdk "github.com/irisnet/irishub/types"
 	"github.com/pkg/errors"
+
+	sdk "github.com/irisnet/irishub/types"
 )
 
+// SvcBinding
 type SvcBinding struct {
 	DefName     string         `json:"def_name"`
 	DefChainID  string         `json:"def_chain_id"`
@@ -22,6 +24,7 @@ type SvcBinding struct {
 	DisableTime time.Time      `json:"disable_time"`
 }
 
+// Level
 type Level struct {
 	AvgRspTime int64 `json:"avg_rsp_time"`
 	UsableTime int64 `json:"usable_time"`
@@ -43,6 +46,7 @@ func NewSvcBinding(ctx sdk.Context, defChainID, defName, bindChainID string, pro
 	}
 }
 
+// SvcBindingEqual
 func SvcBindingEqual(bindingA, bindingB SvcBinding) bool {
 	if bindingA.DefChainID == bindingB.DefChainID &&
 		bindingA.DefName == bindingB.DefName &&
@@ -67,35 +71,27 @@ func SvcBindingEqual(bindingA, bindingB SvcBinding) bool {
 
 // is valid level?
 func validLevel(lv Level) bool {
-	if lv.AvgRspTime > 0 && lv.UsableTime > 0 && lv.UsableTime <= 10000 {
-		return true
-	}
-	return false
+	return lv.AvgRspTime > 0 && lv.UsableTime > 0 && lv.UsableTime <= 10000
 }
 
 // is valid update level?
 func validUpdateLevel(lv Level) bool {
-	if lv.AvgRspTime < 0 {
-		return false
-	}
-	if lv.UsableTime < 0 || lv.UsableTime > 10000 {
-		return false
-	}
-	return true
+	return lv.AvgRspTime >= 0 && lv.UsableTime >= 0 && lv.UsableTime <= 10000
 }
 
 func (svcBind SvcBinding) isValid() bool {
 	return svcBind.Available
 }
 
+// BindingType
 type BindingType byte
 
 const (
-	Global BindingType = 0x01
-	Local  BindingType = 0x02
+	Global BindingType = 0x01 // global type
+	Local  BindingType = 0x02 // local type
 )
 
-// String to BindingType byte, Returns ff if invalid.
+// BindingTypeFromString converts string to BindingType byte, returns ff if invalid.
 func BindingTypeFromString(str string) (BindingType, error) {
 	switch str {
 	case "Local":
@@ -109,14 +105,10 @@ func BindingTypeFromString(str string) (BindingType, error) {
 
 // is defined BindingType?
 func validBindingType(bt BindingType) bool {
-	if bt == Local ||
-		bt == Global {
-		return true
-	}
-	return false
+	return bt == Local || bt == Global
 }
 
-// For Printf / Sprintf, returns bech32 when using %s
+// Format for Printf / Sprintf, returns bech32 when using %s
 func (bt BindingType) Format(s fmt.State, verb rune) {
 	switch verb {
 	case 's':
@@ -126,7 +118,7 @@ func (bt BindingType) Format(s fmt.State, verb rune) {
 	}
 }
 
-// Turns BindingType byte to String
+// String converts BindingType byte to string
 func (bt BindingType) String() string {
 	switch bt {
 	case Local:
@@ -138,19 +130,17 @@ func (bt BindingType) String() string {
 	}
 }
 
-// Marshals to JSON using string
+// MarshalJSON marshals BindingType to JSON using string
 func (bt BindingType) MarshalJSON() ([]byte, error) {
 	return json.Marshal(bt.String())
 }
 
-// Unmarshals from JSON assuming Bech32 encoding
+// UnmarshalJSON unmarshals BindingType from JSON assuming Bech32 encoding
 func (bt *BindingType) UnmarshalJSON(data []byte) error {
 	var s string
-	err := json.Unmarshal(data, &s)
-	if err != nil {
+	if err := json.Unmarshal(data, &s); err != nil {
 		return nil
 	}
-
 	bz2, err := BindingTypeFromString(s)
 	if err != nil {
 		return err
