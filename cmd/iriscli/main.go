@@ -207,7 +207,7 @@ func main() {
 	}
 	serviceCmd.AddCommand(
 		client.GetCommands(
-			servicecmd.GetCmdQuerySvcDef(cdc),
+			servicecmd.GetCmdQueryServiceDefinition(cdc),
 			servicecmd.GetCmdQuerySvcBind(cdc),
 			servicecmd.GetCmdQuerySvcBinds(cdc),
 			servicecmd.GetCmdQuerySvcRequests(cdc),
@@ -215,7 +215,7 @@ func main() {
 			servicecmd.GetCmdQuerySvcFees(cdc),
 		)...)
 	serviceCmd.AddCommand(client.PostCommands(
-		servicecmd.GetCmdSvcDef(cdc),
+		servicecmd.GetCmdDefineService(cdc),
 		servicecmd.GetCmdSvcBind(cdc),
 		servicecmd.GetCmdSvcBindUpdate(cdc),
 		servicecmd.GetCmdSvcDisable(cdc),
