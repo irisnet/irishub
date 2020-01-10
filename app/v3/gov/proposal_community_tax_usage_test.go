@@ -109,7 +109,7 @@ func TestCommunityTaxUsageProposal_Execute(t *testing.T) {
 	require.Equal(t, "5iris-atto", remainingTax.String())
 	require.Equal(t, sdk.Coins{}.String(), k.ck.GetCoins(ctx, distributeAddr).String())
 
-	// distribute 5iris-atto to trustee address(not trustee address)
+	// distribute 5iris-atto to trustee address
 	distributeAddr = accs[0].GetAddress()
 	genesisAmount := k.ck.GetCoins(ctx, distributeAddr)
 	distributeAmount = sdk.NewCoins(sdk.NewInt64Coin(sdk.IrisAtto, 5))
