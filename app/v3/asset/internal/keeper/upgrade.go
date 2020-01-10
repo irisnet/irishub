@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/irisnet/irishub/app/v3/asset/internal/types"
 	"github.com/irisnet/irishub/codec"
@@ -26,21 +27,18 @@ type Gateway struct {
 	Website  string         `json:"website"`  //  the external website of the gateway
 }
 
-// Deprecated
-// KeyGateway returns the key of the specified moniker
-func KeyGateway(moniker string) []byte {
+// keyGateway returns the key of the specified moniker
+func keyGateway(moniker string) []byte {
 	return []byte(fmt.Sprintf("gateways:%s", moniker))
 }
 
-// Deprecated
-// KeyOwnerGateway returns the key of the specifed owner and moniker. Intended for querying all gateways of an owner
-func KeyOwnerGateway(owner sdk.AccAddress, moniker string) []byte {
+// keyOwnerGateway returns the key of the specifed owner and moniker. Intended for querying all gateways of an owner
+func keyOwnerGateway(owner sdk.AccAddress, moniker string) []byte {
 	return []byte(fmt.Sprintf("ownerGateways:%d:%s", owner, moniker))
 }
 
-// Deprecated
-// KeyGatewaysSubspace returns the key prefix for iterating on all gateways of an owner
-func KeyGatewaysSubspace(owner sdk.AccAddress) []byte {
+// keyGatewaysSubspace returns the key prefix for iterating on all gateways of an owner
+func keyGatewaysSubspace(owner sdk.AccAddress) []byte {
 	return []byte(fmt.Sprintf("ownerGateways:%d:", owner))
 }
 
@@ -49,17 +47,17 @@ func (k Keeper) Init(ctx sdk.Context) {
 	store := ctx.KVStore(k.storeKey)
 
 	// delete gateway
-	k.IterateGateways(ctx, func(gateway Gateway) (stop bool) {
-		store.Delete(KeyGateway(gateway.Moniker))
-		store.Delete(KeyOwnerGateway(gateway.Owner, gateway.Moniker))
-		store.Delete(KeyGatewaysSubspace(gateway.Owner))
+	k.iterateGateways(ctx, func(gateway Gateway) (stop bool) {
+		store.Delete(keyGateway(gateway.Moniker))
+		store.Delete(keyOwnerGateway(gateway.Owner, gateway.Moniker))
+		store.Delete(keyGatewaysSubspace(gateway.Owner))
 		return false
 	})
 
 	// delete Gateway/External token
 	k.IterateTokens(ctx, func(token types.FungibleToken) (stop bool) {
-		if token.Family == 0x01 || token.Family == 0x02 {
-			tokenID := token.GetSymbol()
+		if token.Source == 0x01 || token.Source == 0x02 {
+			tokenID := getTokenID(token.Source, token.GetSymbol(), token.Gateway)
 			store.Delete(KeyTokens(token.Owner, tokenID))
 			store.Delete(KeyTokens(sdk.AccAddress{}, tokenID))
 			store.Delete(KeyToken(tokenID))
@@ -73,7 +71,7 @@ func (k Keeper) Init(ctx sdk.Context) {
 }
 
 // Deprecated
-func (k Keeper) IterateGateways(ctx sdk.Context, op func(gateway Gateway) (stop bool)) {
+func (k Keeper) iterateGateways(ctx sdk.Context, op func(gateway Gateway) (stop bool)) {
 	store := ctx.KVStore(k.storeKey)
 
 	iterator := sdk.KVStorePrefixIterator(store, prefixGateway)
@@ -89,4 +87,17 @@ func (k Keeper) IterateGateways(ctx sdk.Context, op func(gateway Gateway) (stop 
 			break
 		}
 	}
+}
+
+// Deprecated
+func getTokenID(source types.AssetSource, symbol string, gateway string) string {
+	switch source {
+	case 0x00:
+		return strings.ToLower(fmt.Sprintf("i.%s", symbol))
+	case 0x01:
+		return strings.ToLower(fmt.Sprintf("x.%s", symbol))
+	case 0x02:
+		return strings.ToLower(fmt.Sprintf("%s.%s", gateway, symbol))
+	}
+	return ""
 }

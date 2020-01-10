@@ -77,6 +77,7 @@ func TestAssetAnteHandler(t *testing.T) {
 
 	//multiple msg, success
 	_, _, err = keeper.bk.AddCoins(ctx, addr2, sdk.Coins{nativeTokenIssueFee})
+	require.NoError(t, err)
 	tx = auth.StdTx{Msgs: []sdk.Msg{msgIssueToken, msgIssueToken2, msgMintToken}}
 	_, res, abort = NewAnteHandler(keeper)(ctx, tx, false)
 	require.Equal(t, false, abort)
