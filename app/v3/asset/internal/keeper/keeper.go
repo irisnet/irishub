@@ -41,11 +41,6 @@ func (k Keeper) IssueToken(ctx sdk.Context, token types.FungibleToken) (sdk.Tags
 		return nil, err
 	}
 
-	// handle fee for token
-	if err := k.deductIssueTokenFee(ctx, token.Owner, token.Symbol); err != nil {
-		return nil, err
-	}
-
 	initialSupply := sdk.NewCoin(token.GetDenom(), token.GetInitSupply())
 	// Add coins into owner's account
 	if _, _, err := k.bk.AddCoins(ctx, token.Owner, sdk.Coins{initialSupply}); err != nil {
@@ -171,10 +166,6 @@ func (k Keeper) MintToken(ctx sdk.Context, msg types.MsgMintToken) (sdk.Tags, sd
 		exp := sdk.NewIntWithDecimal(1, int(token.Decimal))
 		canAmt := token.MaxSupply.Sub(hasIssuedAmt.Amount).Div(exp)
 		return nil, types.ErrInvalidAssetMaxSupply(k.codespace, fmt.Sprintf("The amount of mint tokens plus the total amount of issues has exceeded the maximum issue total,only accepts amount (0, %s]", canAmt.String()))
-	}
-
-	if err := k.deductMintTokenFeeFee(ctx, msg.Owner, token.Symbol); err != nil {
-		return nil, err
 	}
 
 	mintCoin := sdk.NewCoin(expDenom, mintAmt)

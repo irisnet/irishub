@@ -6,6 +6,8 @@ import sdk "github.com/irisnet/irishub/types"
 type BankKeeper interface {
 	AddCoins(ctx sdk.Context, addr sdk.AccAddress, amt sdk.Coins) (sdk.Coins, sdk.Tags, sdk.Error)
 
+	GetCoins(ctx sdk.Context, addr sdk.AccAddress) sdk.Coins
+
 	SetTotalSupply(ctx sdk.Context, totalSupply sdk.Coin)
 
 	GetTotalSupply(ctx sdk.Context, denom string) (coin sdk.Coin, found bool)

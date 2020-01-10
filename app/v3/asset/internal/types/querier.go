@@ -44,8 +44,23 @@ type TokenOutput struct {
 
 // String implements stringer
 func (top TokenOutput) String() string {
-	token := NewFungibleTokenFrom(top)
+	token := top.ToFungibleToken()
 	return token.String()
+}
+
+func (top TokenOutput) ToFungibleToken() FungibleToken {
+	return FungibleToken{BaseToken{
+		Id:            top.Id,
+		Family:        top.Family,
+		Source:        top.Source,
+		Symbol:        top.Symbol,
+		Name:          top.Name,
+		Decimal:       top.Decimal,
+		InitialSupply: top.InitialSupply,
+		MaxSupply:     top.MaxSupply,
+		Mintable:      top.Mintable,
+		Owner:         top.Owner,
+	}}
 }
 
 func NewTokenOutputFrom(token FungibleToken) TokenOutput {
@@ -63,27 +78,12 @@ func NewTokenOutputFrom(token FungibleToken) TokenOutput {
 	}
 }
 
-func NewFungibleTokenFrom(token TokenOutput) FungibleToken {
-	return FungibleToken{BaseToken{
-		Id:            token.Id,
-		Family:        token.Family,
-		Source:        token.Source,
-		Symbol:        token.Symbol,
-		Name:          token.Name,
-		Decimal:       token.Decimal,
-		InitialSupply: token.InitialSupply,
-		MaxSupply:     token.MaxSupply,
-		Mintable:      token.Mintable,
-		Owner:         token.Owner,
-	}}
-}
-
 type TokensOutput []TokenOutput
 
 func (tsop TokensOutput) String() string {
 	var tokens Tokens
 	for _, t := range tsop {
-		tokens = append(tokens, NewFungibleTokenFrom(t))
+		tokens = append(tokens, t.ToFungibleToken())
 	}
 	if len(tokens) == 0 {
 		return ""

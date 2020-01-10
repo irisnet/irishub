@@ -28,8 +28,8 @@ const (
 	CodeAssetNotExists              sdk.CodeType = 115
 	CodeAssetNotMintable            sdk.CodeType = 116
 
-	CodeInsufficientCoins       sdk.CodeType = 130
-	CodeSignersMissingInContext sdk.CodeType = 131
+	CodeInsufficientCoins       sdk.CodeType = 117
+	CodeSignersMissingInContext sdk.CodeType = 118
 )
 
 //----------------------------------------

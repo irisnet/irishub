@@ -26,28 +26,21 @@ func getCmdQueryTokens(cdc *codec.Codec) *cobra.Command {
 				TokenID: viper.GetString(FlagTokenID),
 			}
 
-			bz, err := cdc.MarshalJSON(params)
-			if err != nil {
-				return err
-			}
-
+			bz := cdc.MustMarshalJSON(params)
 			res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.AssetRoute, asset.QueryTokens), bz)
 			if err != nil {
 				return err
 			}
 
 			var tokens asset.TokensOutput
-			err = cdc.UnmarshalJSON(res, &tokens)
-			if err != nil {
+			if err := cdc.UnmarshalJSON(res, &tokens); err != nil {
 				return err
 			}
-
 			return cliCtx.PrintOutput(tokens)
 		},
 	}
 
 	cmd.Flags().AddFlagSet(FsTokensQuery)
-
 	return cmd
 }
 

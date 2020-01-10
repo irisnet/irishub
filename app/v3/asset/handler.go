@@ -24,6 +24,10 @@ func NewHandler(k Keeper) sdk.Handler {
 
 // handleIssueToken handles MsgIssueToken
 func handleIssueToken(ctx sdk.Context, k Keeper, msg MsgIssueToken) sdk.Result {
+	// handle fee for token
+	if err := k.DeductIssueTokenFee(ctx, msg.Owner, msg.Symbol); err != nil {
+		return err.Result()
+	}
 	decimal := int(msg.Decimal)
 	token := NewFungibleToken(msg.Symbol, msg.Name, msg.Decimal,
 		sdk.NewIntWithDecimal(int64(msg.InitialSupply), decimal),
@@ -63,6 +67,11 @@ func handleMsgTransferTokenOwner(ctx sdk.Context, k Keeper, msg MsgTransferToken
 
 // handleMsgMintToken handles MsgMintToken
 func handleMsgMintToken(ctx sdk.Context, k Keeper, msg MsgMintToken) sdk.Result {
+	_, symbol := GetTokenIDParts(msg.TokenId)
+	if err := k.DeductMintTokenFeeFee(ctx, msg.Owner, symbol); err != nil {
+		return err.Result()
+	}
+
 	tags, err := k.MintToken(ctx, msg)
 	if err != nil {
 		return err.Result()

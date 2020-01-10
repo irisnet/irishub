@@ -10,7 +10,7 @@ import (
 
 var (
 	cdc           = codec.New()
-	PrefixGateway = []byte("gateways:") // prefix for the gateway store
+	prefixGateway = []byte("gateways:") // prefix for the gateway store
 )
 
 func init() {
@@ -45,7 +45,7 @@ func KeyGatewaysSubspace(owner sdk.AccAddress) []byte {
 }
 
 //Init Initialize module parameters during network upgrade
-func (k Keeper) Init(ctx sdk.Context) error {
+func (k Keeper) Init(ctx sdk.Context) {
 	store := ctx.KVStore(k.storeKey)
 
 	// delete gateway
@@ -70,19 +70,20 @@ func (k Keeper) Init(ctx sdk.Context) error {
 	//reset params
 	param := k.GetParamSet(ctx)
 	k.SetParamSet(ctx, param)
-	return nil
 }
 
 // Deprecated
 func (k Keeper) IterateGateways(ctx sdk.Context, op func(gateway Gateway) (stop bool)) {
 	store := ctx.KVStore(k.storeKey)
 
-	iterator := sdk.KVStorePrefixIterator(store, PrefixGateway)
+	iterator := sdk.KVStorePrefixIterator(store, prefixGateway)
 	defer iterator.Close()
 
 	for ; iterator.Valid(); iterator.Next() {
 		var gateway Gateway
-		cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &gateway)
+		if err := cdc.UnmarshalBinaryLengthPrefixed(iterator.Value(), &gateway); err != nil {
+			continue
+		}
 
 		if stop := op(gateway); stop {
 			break

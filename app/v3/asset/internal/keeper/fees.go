@@ -15,15 +15,15 @@ const (
 	FeeFactorExp  = 4
 )
 
-// deductIssueTokenFee performs fee handling for issuing token
-func (k Keeper) deductIssueTokenFee(ctx sdk.Context, owner sdk.AccAddress, symbol string) sdk.Error {
+// DeductIssueTokenFee performs fee handling for issuing token
+func (k Keeper) DeductIssueTokenFee(ctx sdk.Context, owner sdk.AccAddress, symbol string) sdk.Error {
 	// get the required issuance fee
 	fee := k.getTokenIssueFee(ctx, symbol)
 	return feeHandler(ctx, k, owner, fee)
 }
 
-// deductMintTokenFeeFee performs fee handling for minting token
-func (k Keeper) deductMintTokenFeeFee(ctx sdk.Context, owner sdk.AccAddress, symbol string) sdk.Error {
+// DeductMintTokenFeeFee performs fee handling for minting token
+func (k Keeper) DeductMintTokenFeeFee(ctx sdk.Context, owner sdk.AccAddress, symbol string) sdk.Error {
 	// get the required minting fee
 	fee := k.getTokenMintFee(ctx, symbol)
 	return feeHandler(ctx, k, owner, fee)

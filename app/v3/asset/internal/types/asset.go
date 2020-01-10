@@ -115,9 +115,7 @@ func (ft FungibleToken) GetCoinType() types.CoinType {
 
 // String implements fmt.Stringer
 func (ft FungibleToken) String() string {
-
 	ct := ft.GetCoinType()
-
 	initSupply, _ := ct.Convert(types.NewCoin(ft.GetDenom(), ft.InitialSupply).String(), ft.GetUniqueID())
 	maxSupply, _ := ct.Convert(types.NewCoin(ft.GetDenom(), ft.MaxSupply).String(), ft.GetUniqueID())
 	owner := ""

@@ -16,7 +16,7 @@ import (
 func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec) {
 	// Get token by id
 	r.HandleFunc(
-		"/asset/tokens/{token-id}",
+		fmt.Sprintf("/asset/tokens/{%s}", RestParamTokenID),
 		queryTokenHandlerFn(cliCtx, cdc),
 	).Methods("GET")
 	// Search tokens
@@ -27,7 +27,7 @@ func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Co
 
 	// Get token fees
 	r.HandleFunc(
-		"/asset/tokens/{symbol}/fee",
+		fmt.Sprintf("/asset/tokens/{%s}/fee", RestParamSymbol),
 		tokenFeesHandlerFn(cliCtx, cdc),
 	).Methods("GET")
 }
@@ -36,11 +36,8 @@ func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Co
 func queryTokenHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-
-		tokenId := vars["token-id"]
-
 		params := asset.QueryTokenParams{
-			TokenId: tokenId,
+			TokenId: vars[RestParamTokenID],
 		}
 
 		bz, err := cliCtx.Codec.MarshalJSON(params)
@@ -63,12 +60,8 @@ func queryTokenHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.Handl
 // queryTokenHandlerFn performs token information query
 func queryTokensHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		owner := r.FormValue("owner")
-
-		// TODO: pagination support
-
 		params := asset.QueryTokensParams{
-			Owner: owner,
+			Owner: r.FormValue(RestParamOwner),
 		}
 
 		bz, err := cliCtx.Codec.MarshalJSON(params)
@@ -92,11 +85,8 @@ func queryTokensHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.Hand
 func tokenFeesHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-
-		symbol := vars["symbol"]
-
 		params := asset.QueryTokenFeesParams{
-			Symbol: symbol,
+			Symbol: vars[RestParamSymbol],
 		}
 
 		bz, err := cliCtx.Codec.MarshalJSON(params)

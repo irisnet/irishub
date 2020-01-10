@@ -43,7 +43,7 @@ func getCmdIssueToken(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "issue",
 		Short:   "Issue a new token",
-		Example: `iriscli asset token issue --symbol="kitty" --name="Kitty Token" --initial-supply=100000000000 --max-supply=1000000000000 --from=<key-name> --chain-id=<chain-id> --fee=0.6iris`,
+		Example: `iriscli asset token issue --name="Kitty Token" --symbol="kitty"  --initial-supply=100000000000 --max-supply=1000000000000 --mintable=true --from=<key-name> --chain-id=<chain-id> --fee=0.6iris`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
@@ -156,7 +156,7 @@ func getCmdMintToken(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "mint",
 		Short:   "The asset owner and operator can directly mint tokens to a specified address",
-		Example: `iriscli asset token mint [token-id] --amount="" --to="" --from=<key-name> --chain-id=irishub --fee=0.3iris`,
+		Example: `iriscli asset token mint [token-id] --amount=<amount> --to=<to> --from=<key-name> --chain-id=irishub --fee=0.3iris`,
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
@@ -230,7 +230,7 @@ func getCmdTransferTokenOwner(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "transfer",
 		Short:   "Transfer the owner of a token to a new owner",
-		Example: `iriscli asset token transfer [token-id] --to="" --from=<key-name> --chain-id=irishub --fee=0.3iris`,
+		Example: `iriscli asset token transfer [token-id] --to=<to> --from=<key-name> --chain-id=irishub --fee=0.3iris`,
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().

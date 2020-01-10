@@ -12,12 +12,10 @@ const (
 	FlagInitialSupply = "initial-supply"
 	FlagMaxSupply     = "max-supply"
 	FlagMintable      = "mintable"
-
-	FlagOwner   = "owner"
-	FlagTokenID = "token-id"
-	FlagTo      = "to"
-
-	FlagAmount = "amount"
+	FlagOwner         = "owner"
+	FlagTokenID       = "token-id"
+	FlagTo            = "to"
+	FlagAmount        = "amount"
 )
 
 var (

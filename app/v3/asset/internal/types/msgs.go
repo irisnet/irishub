@@ -18,18 +18,15 @@ const (
 )
 
 var (
-	MaximumAssetMaxSupply        = uint64(1000000000000) // maximal limitation for asset max supply，1000 billion
-	MaximumAssetInitSupply       = uint64(100000000000)  // maximal limitation for asset initial supply，100 billion
-	MaximumAssetDecimal          = uint8(18)             // maximal limitation for asset decimal
-	MinimumAssetSymbolSize       = 3                     // minimal limitation for the length of the asset's symbol / canonical_symbol
-	MaximumAssetSymbolSize       = 8                     // maximal limitation for the length of the asset's symbol / canonical_symbol
-	MinimumAssetMinUnitAliasSize = 3                     // minimal limitation for the length of the asset's min_unit_alias
-	MaximumAssetMinUnitAliasSize = 10                    // maximal limitation for the length of the asset's min_unit_alias
-	MaximumAssetNameSize         = 32                    // maximal limitation for the length of the asset's name
+	MaximumAssetMaxSupply  = uint64(1000000000000) // maximal limitation for asset max supply，1000 billion
+	MaximumAssetInitSupply = uint64(100000000000)  // maximal limitation for asset initial supply，100 billion
+	MaximumAssetDecimal    = uint8(18)             // maximal limitation for asset decimal
+	MinimumAssetSymbolSize = 3                     // minimal limitation for the length of the asset's symbol / canonical_symbol
+	MaximumAssetSymbolSize = 8                     // maximal limitation for the length of the asset's symbol / canonical_symbol
+	MaximumAssetNameSize   = 32                    // maximal limitation for the length of the asset's name
 
-	IsAlphaNumeric     = regexp.MustCompile(`^[a-zA-Z0-9]+$`).MatchString   // only accepts alphanumeric characters
-	IsAlphaNumericDash = regexp.MustCompile(`^[a-zA-Z0-9_-]+$`).MatchString // only accepts alphanumeric characters, _ and -
-	IsBeginWithAlpha   = regexp.MustCompile(`^[a-zA-Z].*`).MatchString
+	IsAlphaNumeric   = regexp.MustCompile(`^[a-zA-Z0-9]+$`).MatchString // only accepts alphanumeric characters
+	IsBeginWithAlpha = regexp.MustCompile(`^[a-zA-Z].*`).MatchString
 )
 
 var _, _, _, _ sdk.Msg = &MsgIssueToken{}, &MsgEditToken{}, &MsgMintToken{}, &MsgTransferTokenOwner{}
@@ -74,7 +71,6 @@ func (msg MsgIssueToken) Type() string  { return MsgTypeIssueToken }
 
 func ValidateMsgIssueToken(msg *MsgIssueToken) sdk.Error {
 	msg.Symbol = strings.ToLower(strings.TrimSpace(msg.Symbol))
-	msg.MinUnitAlias = strings.ToLower(strings.TrimSpace(msg.MinUnitAlias))
 	msg.Name = strings.TrimSpace(msg.Name)
 
 	if msg.MaxSupply == 0 {
@@ -106,11 +102,6 @@ func ValidateMsgIssueToken(msg *MsgIssueToken) sdk.Error {
 
 	if strings.Contains(strings.ToLower(msg.Symbol), sdk.Iris) {
 		return ErrInvalidAssetSymbol(DefaultCodespace, fmt.Sprintf("invalid token symbol %s, can not contain native token symbol %s", msg.Symbol, sdk.Iris))
-	}
-
-	minUnitAliasLen := len(msg.MinUnitAlias)
-	if minUnitAliasLen > 0 && (minUnitAliasLen < MinimumAssetMinUnitAliasSize || minUnitAliasLen > MaximumAssetMinUnitAliasSize || !IsAlphaNumeric(msg.MinUnitAlias) || !IsBeginWithAlpha(msg.MinUnitAlias)) {
-		return ErrInvalidAssetMinUnitAlias(DefaultCodespace, fmt.Sprintf("invalid token min_unit_alias %s, only accepts alphanumeric characters, and begin with an english letter, length [%d, %d]", msg.MinUnitAlias, MinimumAssetMinUnitAliasSize, MaximumAssetMinUnitAliasSize))
 	}
 
 	if msg.InitialSupply > MaximumAssetInitSupply {

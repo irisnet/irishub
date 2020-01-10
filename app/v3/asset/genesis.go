@@ -53,8 +53,7 @@ func DefaultGenesisStateForTest() GenesisState {
 // ValidateGenesis validates the provided asset genesis state to ensure the
 // expected invariants holds.
 func ValidateGenesis(data GenesisState) error {
-	err := ValidateParams(data.Params)
-	if err != nil {
+	if err := ValidateParams(data.Params); err != nil {
 		return err
 	}
 

@@ -14,13 +14,9 @@ func queryTokenFees(cliCtx context.CLIContext, symbol string) (asset.TokenFeesOu
 		Symbol: symbol,
 	}
 
-	bz, err := cliCtx.Codec.MarshalJSON(params)
-	if err != nil {
-		return asset.TokenFeesOutput{}, err
-	}
+	bz := cliCtx.Codec.MustMarshalJSON(params)
 
 	path := fmt.Sprintf("custom/%s/fees/tokens", protocol.AssetRoute)
-
 	res, err := cliCtx.QueryWithData(path, bz)
 	if err != nil {
 		return asset.TokenFeesOutput{}, err
@@ -28,9 +24,5 @@ func queryTokenFees(cliCtx context.CLIContext, symbol string) (asset.TokenFeesOu
 
 	var out asset.TokenFeesOutput
 	err = cliCtx.Codec.UnmarshalJSON(res, &out)
-	if err != nil {
-		return asset.TokenFeesOutput{}, err
-	}
-
-	return out, nil
+	return out, err
 }

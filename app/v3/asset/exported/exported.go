@@ -8,7 +8,6 @@ type FungibleToken = types.FungibleToken
 
 var (
 	MaximumAssetMaxSupply = types.MaximumAssetMaxSupply
-	NewFungibleToken      = types.NewFungibleToken
 	FUNGIBLE              = types.FUNGIBLE
 	NewMsgIssueToken      = types.NewMsgIssueToken
 	ValidateMsgIssueToken = types.ValidateMsgIssueToken
