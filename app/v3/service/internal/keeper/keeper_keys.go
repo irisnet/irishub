@@ -3,8 +3,8 @@ package keeper
 import (
 	"encoding/binary"
 
-	sdk "github.com/irisnet/irishub/types"
 	"github.com/irisnet/irishub/app/v3/service/internal/types"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 var (
@@ -13,32 +13,22 @@ var (
 
 	// Keys for store prefixes
 	serviceDefinitionKey         = []byte{0x01}
-	methodPropertyKey            = []byte{0x02}
-	bindingPropertyKey           = []byte{0x03}
-	requestKey                   = []byte{0x05}
-	responseKey                  = []byte{0x06}
-	requestsByExpirationIndexKey = []byte{0x07}
-	intraTxCounterKey            = []byte{0x08} // key for intra-block tx index
-	activeRequestKey             = []byte{0x09} // key for active request
-	returnedFeeKey               = []byte{0x10}
-	incomingFeeKey               = []byte{0x11}
+	bindingPropertyKey           = []byte{0x02}
+	requestKey                   = []byte{0x03}
+	responseKey                  = []byte{0x04}
+	requestsByExpirationIndexKey = []byte{0x05}
+	intraTxCounterKey            = []byte{0x06} // key for intra-block tx index
+	activeRequestKey             = []byte{0x07} // key for active request
+	returnedFeeKey               = []byte{0x08}
+	incomingFeeKey               = []byte{0x09}
 
-	serviceFeeTaxKey        = []byte{0x12}
-	serviceSlashFractionKey = []byte{0x13}
+	serviceFeeTaxKey        = []byte{0x10}
+	serviceSlashFractionKey = []byte{0x11}
 )
 
-func GetServiceDefinitionKey(chainId, name string) []byte {
-	return append(serviceDefinitionKey, getStringsKey([]string{chainId, name})...)
-}
-
-// id can not be zero
-func GetMethodPropertyKey(chainId, serviceName string, id int16) []byte {
-	return append(methodPropertyKey, getStringsKey([]string{chainId, serviceName, string(id)})...)
-}
-
-// Key for getting all methods on a service from the store
-func GetMethodsSubspaceKey(chainId, serviceName string) []byte {
-	return append(append(methodPropertyKey, getStringsKey([]string{chainId, serviceName})...), emptyByte...)
+// GetServiceDefinitionKey returns a key for the service definition with the specified name
+func GetServiceDefinitionKey(name string) []byte {
+	return append(serviceDefinitionKey, []byte(name)...)
 }
 
 func GetServiceBindingKey(defChainId, name, bindChainId string, provider sdk.AccAddress) []byte {
