@@ -95,7 +95,7 @@ iriscli gov query-proposal --proposal-id=<proposal-id>
 
 ### Proposals on community funds usage
 
-There are three usages, `Burn`, `Distribute` and `Grant`. `Burn` means burning tokens from community funds. `Distribute` and `Grant` will transfer tokens to a destination address(`Distribute` destination address must be the `trustee` address) from community funds.
+There are three usages, `Burn`, `Distribute` and `Grant`. `Burn` means burning tokens from community funds. `Grant` will transfer tokens from community funds to the destination address. `Distribute` will transfer tokens from community funds to the destination `trustee` address, and then will be assigned to other addresses by the `trustee` account.
 
 ```bash
 # Submit Burn usage proposal

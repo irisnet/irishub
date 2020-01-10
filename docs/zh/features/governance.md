@@ -96,7 +96,7 @@ iriscli gov query-proposal --proposal-id=<proposal-id>
 
 ### 社区基金使用提议
 
-有三种使用方式: `Burn`，`Distribute` and `Grant`。 `Burn`表示从社区基金中销毁代币。`Distribute` and `Grant` 将从社区基金中向目标地址（`Distribute`目标地址必须是`trustee`地址）转移代币，然后受托人将这些代币分发或赠给其他账户。
+有三种使用方式: `Burn`，`Distribute`和`Grant`。`Burn`表示从社区基金中销毁代币，`Grant`将从社区基金中向目标地址授予一定数量的token，`Distribute`将从社区基金中向目标`trustee`地址划转一定数量的token，再由`trustee`账户分发给其他账户。
 
 ```bash
 # 提交 Burn 提议
