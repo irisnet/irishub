@@ -21,7 +21,7 @@ import (
 	"github.com/irisnet/irishub/app/v1/bank"
 	"github.com/irisnet/irishub/app/v1/upgrade"
 	"github.com/irisnet/irishub/app/v2/htlc"
-	"github.com/irisnet/irishub/app/v3"
+	v3 "github.com/irisnet/irishub/app/v3"
 	"github.com/irisnet/irishub/app/v3/asset"
 	"github.com/irisnet/irishub/app/v3/gov"
 	"github.com/irisnet/irishub/app/v3/service"
@@ -304,13 +304,13 @@ func executeGetVotes(t *testing.T, cmdStr string) []gov.Vote {
 	return votes
 }
 
-func executeGetServiceDefinition(t *testing.T, cmdStr string) servicecli.DefOutput {
+func executeGetServiceDefinition(t *testing.T, cmdStr string) service.ServiceDefinition {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
-	var serviceDef servicecli.DefOutput
+	var svcDef service.ServiceDefinition
 	cdc := app.MakeLatestCodec()
-	err := cdc.UnmarshalJSON([]byte(out), &serviceDef)
+	err := cdc.UnmarshalJSON([]byte(out), &svcDef)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
-	return serviceDef
+	return svcDef
 }
 
 func executeGetServiceBinding(t *testing.T, cmdStr string) service.SvcBinding {

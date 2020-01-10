@@ -2,16 +2,15 @@ package cli
 
 import (
 	"fmt"
-	"io/ioutil"
-	"os"
 	"testing"
+
+	"regexp"
+	"strings"
 
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/tests"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/stretchr/testify/require"
-	"regexp"
-	"strings"
 )
 
 func TestIrisCLIService(t *testing.T) {
@@ -30,27 +29,24 @@ func TestIrisCLIService(t *testing.T) {
 	fooAddr, _ := executeGetAddrPK(t, fmt.Sprintf("iriscli keys show foo --output=json --home=%s", iriscliHome))
 	barAddr, _ := executeGetAddrPK(t, fmt.Sprintf("iriscli keys show bar --output=json --home=%s", iriscliHome))
 
-	serviceName := "testService"
-
-	serviceQuery, _ := tests.ExecuteT(t, fmt.Sprintf("iriscli service definition --service-name=%s --def-chain-id=%s %v", serviceName, chainID, flags), "")
-	require.Equal(t, "", serviceQuery)
-
 	fooAcc := executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", fooAddr, flags))
 	fooCoin := convertToIrisBaseAccount(t, fooAcc)
-	num := getAmountFromCoinStr(fooCoin)
 	require.Equal(t, "50iris", fooCoin)
 
-	// service define
-	fileName := iriscliHome + string(os.PathSeparator) + "test.proto"
-	defer tests.ExecuteT(t, fmt.Sprintf("rm -f %s", fileName), "")
-	ioutil.WriteFile(fileName, []byte(idlContent), 0644)
+	// define service
+	serviceName := "testService"
+	serviceSchemas := `{"input":{"type":"object"},"output":{"type":"object"},"error":{"type":"object"}}`
+
+	svcDefOutput, _ := tests.ExecuteT(t, fmt.Sprintf("iriscli service definition %s %v", serviceName, flags), "")
+	require.Equal(t, "", svcDefOutput)
+
 	sdStr := fmt.Sprintf("iriscli service define %v", flags)
 	sdStr += fmt.Sprintf(" --from=%s", "foo")
-	sdStr += fmt.Sprintf(" --service-name=%s", serviceName)
-	sdStr += fmt.Sprintf(" --service-description=%s", "test")
+	sdStr += fmt.Sprintf(" --name=%s", serviceName)
+	sdStr += fmt.Sprintf(" --description=%s", "test")
 	sdStr += fmt.Sprintf(" --tags=%s", "tag1,tag2")
 	sdStr += fmt.Sprintf(" --author-description=%s", "foo")
-	sdStr += fmt.Sprintf(" --file=%s", fileName)
+	sdStr += fmt.Sprintf(" --schemas=%s", serviceSchemas)
 	sdStr += fmt.Sprintf(" --fee=%s", "0.4iris")
 
 	executeWrite(t, sdStr, sdk.DefaultKeyPass)
@@ -58,22 +54,17 @@ func TestIrisCLIService(t *testing.T) {
 
 	fooAcc = executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", fooAddr, flags))
 	fooCoin = convertToIrisBaseAccount(t, fooAcc)
-	num = getAmountFromCoinStr(fooCoin)
+	fooAmt := getAmountFromCoinStr(fooCoin)
 
-	if !(num > 49 && num < 50) {
-		t.Error("Test Failed: (49, 50) expected, received: {}", num)
+	if !(fooAmt > 49 && fooAmt < 50) {
+		t.Error("Test Failed: (49, 50) expected, received: {}", fooAmt)
 	}
 
-	serviceDef := executeGetServiceDefinition(t, fmt.Sprintf("iriscli service definition --service-name=%s --def-chain-id=%s %v", serviceName, chainID, flags))
-	require.Equal(t, serviceName, serviceDef.Definition.Name)
+	svcDef := executeGetServiceDefinition(t, fmt.Sprintf("iriscli service definition %s %v", serviceName, flags))
+	require.Equal(t, serviceName, svcDef.Name)
+	require.Equal(t, serviceSchemas, svcDef.Schemas)
 
-	// method test
-	require.Equal(t, "SayHello", serviceDef.Methods[0].Name)
-	require.Equal(t, "sayHello", serviceDef.Methods[0].Description)
-	require.Equal(t, "NoCached", serviceDef.Methods[0].OutputCached.String())
-	require.Equal(t, "NoPrivacy", serviceDef.Methods[0].OutputPrivacy.String())
-
-	// binding test
+	// bind service
 	sdStr = fmt.Sprintf("iriscli service bind %v", flags)
 	sdStr += fmt.Sprintf(" --service-name=%s", serviceName)
 	sdStr += fmt.Sprintf(" --def-chain-id=%s", chainID)
@@ -92,31 +83,33 @@ func TestIrisCLIService(t *testing.T) {
 
 	fooAcc = executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", fooAddr, flags))
 	fooCoin = convertToIrisBaseAccount(t, fooAcc)
-	num = getAmountFromCoinStr(fooCoin)
+	fooAmt = getAmountFromCoinStr(fooCoin)
 
-	if !(num > 39 && num < 40) {
-		t.Error("Test Failed: (39, 40) expected, received: {}", num)
+	if !(fooAmt > 39 && fooAmt < 40) {
+		t.Error("Test Failed: (39, 40) expected, received: {}", fooAmt)
 	}
 
 	executeWrite(t, fmt.Sprintf("iriscli bank send --to=%s --from=%s --amount=20iris --fee=0.3iris %v", barAddr.String(), "foo", flags), sdk.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
+
 	executeWrite(t, sdStrBar, sdk.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
+
 	barAcc := executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", barAddr, flags))
 	barCoin := convertToIrisBaseAccount(t, barAcc)
-	barNum := getAmountFromCoinStr(barCoin)
+	barAmt := getAmountFromCoinStr(barCoin)
 
-	if !(barNum > 9 && barNum < 10) {
-		t.Error("Test Failed: (9, 10) expected, received: {}", barNum)
+	if !(barAmt > 9 && barAmt < 10) {
+		t.Error("Test Failed: (9, 10) expected, received: {}", barAmt)
 	}
 
-	serviceBinding := executeGetServiceBinding(t, fmt.Sprintf("iriscli service binding --service-name=%s --def-chain-id=%s --bind-chain-id=%s --provider=%s %v", serviceName, chainID, chainID, fooAddr.String(), flags))
-	require.NotNil(t, serviceBinding)
+	svcBinding := executeGetServiceBinding(t, fmt.Sprintf("iriscli service binding --service-name=%s --def-chain-id=%s --bind-chain-id=%s --provider=%s %v", serviceName, chainID, chainID, fooAddr.String(), flags))
+	require.NotNil(t, svcBinding)
 
-	serviceBindings := executeGetServiceBindings(t, fmt.Sprintf("iriscli service bindings --service-name=%s --def-chain-id=%s %v", serviceName, chainID, flags))
-	require.Equal(t, 2, len(serviceBindings))
+	svcBindings := executeGetServiceBindings(t, fmt.Sprintf("iriscli service bindings --service-name=%s --def-chain-id=%s %v", serviceName, chainID, flags))
+	require.Equal(t, 2, len(svcBindings))
 
-	// binding update test
+	// update binding
 	ubStr := fmt.Sprintf("iriscli service update-binding %v", flags)
 	ubStr += fmt.Sprintf(" --service-name=%s", serviceName)
 	ubStr += fmt.Sprintf(" --def-chain-id=%s", chainID)
@@ -127,37 +120,43 @@ func TestIrisCLIService(t *testing.T) {
 	ubStr += fmt.Sprintf(" --usable-time=%d", 99)
 	ubStr += fmt.Sprintf(" --fee=%s", "0.4iris")
 	ubStr += fmt.Sprintf(" --from=%s", "bar")
+
 	executeWrite(t, ubStr, sdk.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
+
 	barAcc = executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", barAddr, flags))
 	barCoin = convertToIrisBaseAccount(t, barAcc)
-	barNum = getAmountFromCoinStr(barCoin)
+	barAmt = getAmountFromCoinStr(barCoin)
 
-	if !(barNum > 8 && barNum < 9) {
-		t.Error("Test Failed: (8, 9) expected, received: {}", barNum)
+	if !(barAmt > 8 && barAmt < 9) {
+		t.Error("Test Failed: (8, 9) expected, received: {}", barAmt)
 	}
-	serviceBindings = executeGetServiceBindings(t, fmt.Sprintf("iriscli service bindings --service-name=%s --def-chain-id=%s %v", serviceName, chainID, flags))
+
+	svcBindings = executeGetServiceBindings(t, fmt.Sprintf("iriscli service bindings --service-name=%s --def-chain-id=%s %v", serviceName, chainID, flags))
+
 	var totalDeposit sdk.Coins
-	for _, bind := range serviceBindings {
+	for _, bind := range svcBindings {
 		totalDeposit = totalDeposit.Add(bind.Deposit)
 	}
 	require.Equal(t, "21000000000000000000iris-atto", totalDeposit.String())
 
 	// disable binding
 	executeWrite(t, fmt.Sprintf("iriscli service disable --def-chain-id=%s --service-name=%s --from=%s --fee=0.3iris %v", chainID, serviceName, "bar", flags), sdk.DefaultKeyPass)
-
-	// refund-deposit test
 	tests.WaitForNextNBlocksTM(12, port)
+
+	// refund deposit
 	executeWrite(t, fmt.Sprintf("iriscli service refund-deposit --service-name=%s --def-chain-id=%s --from=%s --fee=0.3iris %v", serviceName, chainID, "bar", flags), sdk.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
+
 	barAcc = executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", barAddr, flags))
 	barCoin = convertToIrisBaseAccount(t, barAcc)
-	barNum = getAmountFromCoinStr(barCoin)
-	if !(barNum > 18 && barNum < 20) {
-		t.Error("Test Failed: (18, 20) expected, received: {}", barNum)
+	barAmt = getAmountFromCoinStr(barCoin)
+
+	if !(barAmt > 18 && barAmt < 20) {
+		t.Error("Test Failed: (18, 20) expected, received: {}", barAmt)
 	}
 
-	// call test
+	// call service
 	caStr := fmt.Sprintf("iriscli service call %v", flags)
 	caStr += fmt.Sprintf(" --def-chain-id=%s", chainID)
 	caStr += fmt.Sprintf(" --service-name=%s", serviceName)
@@ -169,24 +168,28 @@ func TestIrisCLIService(t *testing.T) {
 	caStr += fmt.Sprintf(" --fee=%s", "0.4iris")
 	caStr += fmt.Sprintf(" --from=%s", "bar")
 	caStr += " --commit"
+
 	_, outString, _ := executeWriteRetStdStreams(t, caStr, sdk.DefaultKeyPass)
+
 	var digitsRegexp = regexp.MustCompile(`\"key\": \"request-id\",\n       \"value\": \".*\"`)
 	requestTag := string(digitsRegexp.Find([]byte(outString)))
 	requestId := strings.TrimSpace(strings.Split(requestTag, ":")[2])
 	requestId = requestId[1 : len(requestId)-1]
+
 	tests.WaitForNextNBlocksTM(2, port)
 
-	serviceRequests := executeGetServiceRequests(t, fmt.Sprintf("iriscli service requests --def-chain-id=%s --service-name=%s --bind-chain-id=%s --provider=%s %v", chainID, serviceName, chainID, fooAddr.String(), flags))
-	require.Equal(t, 1, len(serviceRequests))
+	svcRequests := executeGetServiceRequests(t, fmt.Sprintf("iriscli service requests --def-chain-id=%s --service-name=%s --bind-chain-id=%s --provider=%s %v", chainID, serviceName, chainID, fooAddr.String(), flags))
+	require.Equal(t, 1, len(svcRequests))
 
 	barAcc = executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", barAddr, flags))
 	barCoin = convertToIrisBaseAccount(t, barAcc)
-	barNum = getAmountFromCoinStr(barCoin)
-	if !(barNum > 17 && barNum < 19) {
-		t.Error("Test Failed: (17, 19) expected, received: {}", barNum)
+	barAmt = getAmountFromCoinStr(barCoin)
+
+	if !(barAmt > 17 && barAmt < 19) {
+		t.Error("Test Failed: (17, 19) expected, received: {}", barAmt)
 	}
 
-	// respond test
+	// respond service
 	reStr := fmt.Sprintf("iriscli service respond %v", flags)
 	reStr += fmt.Sprintf(" --request-chain-id=%s", chainID)
 	reStr += fmt.Sprintf(" --request-id=%s", requestId)
@@ -197,47 +200,53 @@ func TestIrisCLIService(t *testing.T) {
 	executeWrite(t, reStr, sdk.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(7, port)
 
-	// fees test
-	fooFess := executeGetServiceFees(t, fmt.Sprintf("iriscli service fees %s %v", fooAddr.String(), flags))
-	barFess := executeGetServiceFees(t, fmt.Sprintf("iriscli service fees %s %v", barAddr.String(), flags))
+	// fees
+	fooFees := executeGetServiceFees(t, fmt.Sprintf("iriscli service fees %s %v", fooAddr.String(), flags))
+	barFees := executeGetServiceFees(t, fmt.Sprintf("iriscli service fees %s %v", barAddr.String(), flags))
 
-	require.Equal(t, "990000000000000000iris-atto", fooFess.IncomingFee.String())
-	require.Nil(t, fooFess.ReturnedFee)
-	require.Nil(t, barFess.ReturnedFee)
-	require.Nil(t, barFess.IncomingFee)
+	require.Equal(t, "990000000000000000iris-atto", fooFees.IncomingFee.String())
+	require.Nil(t, fooFees.ReturnedFee)
+	require.Nil(t, barFees.ReturnedFee)
+	require.Nil(t, barFees.IncomingFee)
 
 	executeWrite(t, caStr, sdk.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(7, port)
 
-	fooFess = executeGetServiceFees(t, fmt.Sprintf("iriscli service fees %s %v", fooAddr.String(), flags))
-	barFess = executeGetServiceFees(t, fmt.Sprintf("iriscli service fees %s %v", barAddr.String(), flags))
-	require.Equal(t, "990000000000000000iris-atto", fooFess.IncomingFee.String())
-	require.Nil(t, fooFess.ReturnedFee)
-	require.Equal(t, "1000000000000000000iris-atto", barFess.ReturnedFee.String())
-	require.Nil(t, barFess.IncomingFee)
-	serviceBinding = executeGetServiceBinding(t, fmt.Sprintf("iriscli service binding --service-name=%s --def-chain-id=%s --bind-chain-id=%s --provider=%s %v", serviceName, chainID, chainID, fooAddr.String(), flags))
-	require.NotNil(t, serviceBinding)
-	require.Equal(t, "9990000000000000000iris-atto", serviceBinding.Deposit.String())
-	require.Equal(t, false, serviceBinding.Available)
+	fooFees = executeGetServiceFees(t, fmt.Sprintf("iriscli service fees %s %v", fooAddr.String(), flags))
+	barFees = executeGetServiceFees(t, fmt.Sprintf("iriscli service fees %s %v", barAddr.String(), flags))
+
+	require.Equal(t, "990000000000000000iris-atto", fooFees.IncomingFee.String())
+	require.Nil(t, fooFees.ReturnedFee)
+	require.Equal(t, "1000000000000000000iris-atto", barFees.ReturnedFee.String())
+	require.Nil(t, barFees.IncomingFee)
+
+	svcBinding = executeGetServiceBinding(t, fmt.Sprintf("iriscli service binding --service-name=%s --def-chain-id=%s --bind-chain-id=%s --provider=%s %v", serviceName, chainID, chainID, fooAddr.String(), flags))
+	require.NotNil(t, svcBinding)
+	require.Equal(t, "10000000000000000000iris-atto", svcBinding.Deposit.String())
+	require.Equal(t, true, svcBinding.Available)
 
 	// refund fees
 	executeWrite(t, fmt.Sprintf("iriscli service refund-fees %v --fee=%s --from=%s", flags, "0.4iris", "bar"), sdk.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
+
 	barAcc = executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", barAddr, flags))
 	barCoin = convertToIrisBaseAccount(t, barAcc)
-	barNum = getAmountFromCoinStr(barCoin)
-	if !(barNum > 17 && barNum < 19) {
-		t.Error("Test Failed: (17, 19) expected, received: {}", barNum)
+	barAmt = getAmountFromCoinStr(barCoin)
+
+	if !(barAmt > 17 && barAmt < 19) {
+		t.Error("Test Failed: (17, 19) expected, received: {}", barAmt)
 	}
 
 	// withdraw fees
 	executeWrite(t, fmt.Sprintf("iriscli service withdraw-fees %v --fee=%s --from=%s", flags, "0.4iris", "foo"), sdk.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
+
 	fooAcc = executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", fooAddr, flags))
 	fooCoin = convertToIrisBaseAccount(t, fooAcc)
-	fooNum := getAmountFromCoinStr(fooCoin)
-	if !(fooNum > 19 && fooNum < 21) {
-		t.Error("Test Failed: (19, 21) expected, received: {}", fooNum)
+	fooAmt = getAmountFromCoinStr(fooCoin)
+
+	if !(fooAmt > 19 && fooAmt < 21) {
+		t.Error("Test Failed: (19, 21) expected, received: {}", fooAmt)
 	}
 
 	// withdraw tax
@@ -251,32 +260,13 @@ func TestIrisCLIService(t *testing.T) {
 
 	executeWrite(t, wtStr, sdk.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
+
 	barAcc1 := executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", barAddr, flags))
 
 	cliCtx := context.NewCLIContext()
 	oldAmount, _ := cliCtx.ParseCoin(barAcc.Coins[0].String())
 	newAmount, _ := cliCtx.ParseCoin(barAcc1.Coins[0].String())
+
 	tax, _ := sdk.NewIntFromString("1000000000000000")
 	require.Equal(t, oldAmount.Amount.Add(tax).String(), newAmount.Amount.String())
 }
-
-const idlContent = `
-	syntax = "proto3";
-
-	// The greeting service definition.
-	service Greeter {
-		//@Attribute description:sayHello
-		//@Attribute output_privacy:NoPrivacy
-		//@Attribute output_cached:NoCached
-		rpc SayHello (HelloRequest) returns (HelloReply) {}
-	}
-
-	// The request message containing the user's name.
-	message HelloRequest {
-		string name = 1;
-	}
-
-	// The response message containing the greetings
-	message HelloReply {
-		string message = 1;
-	}`
