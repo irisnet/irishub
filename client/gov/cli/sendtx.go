@@ -111,16 +111,6 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 				return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 			}
 
-			if proposalType == gov.ProposalTypeTokenAddition {
-				symbol := viper.GetString(flagTokenSymbol)
-				canonicalSymbol := viper.GetString(flagTokenCanonicalSymbol)
-				name := viper.GetString(flagTokenName)
-				decimal := uint8(viper.GetInt(flagTokenDecimal))
-				alias := viper.GetString(flagTokenMinUnitAlias)
-
-				msg := gov.NewMsgSubmitTokenAdditionProposal(msg, symbol, canonicalSymbol, name, alias, decimal)
-				return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
-			}
 			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 		},
 	}
@@ -138,13 +128,6 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 	cmd.Flags().String(flagSoftware, " ", "the software of the new protocol")
 	cmd.Flags().String(flagSwitchHeight, "0", "the switchheight of the new protocol")
 	cmd.Flags().String(flagThreshold, "0.8", "the upgrade signal threshold of the software upgrade")
-
-	//for TokenAdditionProposal
-	cmd.Flags().String(flagTokenSymbol, "", "the asset symbol. Once created, it cannot be modified")
-	cmd.Flags().String(flagTokenCanonicalSymbol, "", "the source symbol of a external asset")
-	cmd.Flags().String(flagTokenName, "", "the asset name")
-	cmd.Flags().Uint8(flagTokenDecimal, 0, "the asset decimal. The maximum value is 18")
-	cmd.Flags().String(flagTokenMinUnitAlias, "", "the asset symbol minimum alias")
 
 	cmd.MarkFlagRequired(flagTitle)
 	cmd.MarkFlagRequired(flagDescription)

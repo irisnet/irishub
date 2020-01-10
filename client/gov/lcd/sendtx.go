@@ -22,16 +22,7 @@ type postProposalReq struct {
 	InitialDeposit string         `json:"initial_deposit"` // Coins to add to the proposal's deposit
 	Param          gov.Param      `json:"param"`
 	CommTax        commTax        `json:"comm_tax"`
-	Token          token          `json:"token"`
 	Upgrade        upgrade        `json:"upgrade"`
-}
-
-type token struct {
-	Symbol          string `json:"symbol"`
-	CanonicalSymbol string `json:"canonical_symbol"`
-	Name            string `json:"name"`
-	Decimal         uint8  `json:"decimal"`
-	MinUnitAlias    string `json:"min_unit_alias"`
 }
 
 type upgrade struct {
@@ -106,9 +97,6 @@ func postProposalHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Han
 			break
 		case gov.ProposalTypeCommunityTaxUsage:
 			msgs[0] = gov.NewMsgSubmitCommunityTaxUsageProposal(msg, req.CommTax.Usage, req.CommTax.DestAddress, req.CommTax.Amount)
-			break
-		case gov.ProposalTypeTokenAddition:
-			msgs[0] = gov.NewMsgSubmitTokenAdditionProposal(msg, req.Token.Symbol, req.Token.CanonicalSymbol, req.Token.Name, req.Token.MinUnitAlias, req.Token.Decimal)
 			break
 		default:
 			utils.WriteErrorResponse(w, http.StatusBadRequest, "not a valid proposal type")

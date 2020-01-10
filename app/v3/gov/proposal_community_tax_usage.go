@@ -122,8 +122,13 @@ func (tp *CommunityTaxUsageProposal) Validate(ctx sdk.Context, k Keeper, verify 
 		return err
 	}
 
-	// only check trustee address for grant usage
-	if tp.TaxUsage.Usage == UsageTypeGrant {
+	taxCoins := k.ck.GetCoins(ctx, auth.CommunityTaxCoinsAccAddr)
+	if !taxCoins.IsAllGTE(tp.TaxUsage.Amount) {
+		return ErrNotEnoughCommunityTax(k.codespace, taxCoins, tp.TaxUsage.Amount)
+	}
+
+	// only check trustee address for distribute usage
+	if tp.TaxUsage.Usage == UsageTypeDistribute {
 		_, found := k.guardianKeeper.GetTrustee(ctx, tp.TaxUsage.DestAddress)
 		if !found {
 			return ErrNotTrustee(k.codespace, tp.TaxUsage.DestAddress)
@@ -153,7 +158,7 @@ func (keeper Keeper) AllocateFeeTax(ctx sdk.Context, destAddr sdk.AccAddress, am
 	taxCoins := keeper.ck.GetCoins(ctx, auth.CommunityTaxCoinsAccAddr)
 	taxLeftCoins, hasNeg := taxCoins.SafeSub(amount)
 	if hasNeg {
-		logger.Info(fmt.Sprintf("account balance [%s] is not enough to cover fee [%s]", taxCoins, amount))
+		logger.Info(fmt.Sprintf("community tax account [%s] is not enough to cover usage amount [%s]", taxCoins, amount))
 		return
 	}
 
