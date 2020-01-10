@@ -15,10 +15,10 @@ import (
 
 type postProposalReq struct {
 	BaseTx         utils.BaseTx   `json:"base_tx"`
-	Title          string         `json:"title"`           //  Title of the proposal
-	Description    string         `json:"description"`     //  Description of the proposal
-	ProposalType   string         `json:"proposal_type"`   //  Type of proposal. Initial set {PlainTextProposal, SoftwareUpgradeProposal}
-	Proposer       sdk.AccAddress `json:"proposer"`        //  Address of the proposer
+	Title          string         `json:"title"`           // Title of the proposal
+	Description    string         `json:"description"`     // Description of the proposal
+	ProposalType   string         `json:"proposal_type"`   // Type of proposal. Initial set {PlainTextProposal, SoftwareUpgradeProposal}
+	Proposer       sdk.AccAddress `json:"proposer"`        // Address of the proposer
 	InitialDeposit string         `json:"initial_deposit"` // Coins to add to the proposal's deposit
 	Param          gov.Param      `json:"param"`
 	CommTax        commTax        `json:"comm_tax"`
@@ -35,7 +35,6 @@ type upgrade struct {
 type commTax struct {
 	Usage       gov.UsageType  `json:"usage"`
 	DestAddress sdk.AccAddress `json:"dest_address"`
-	Percent     sdk.Dec        `json:"percent"`
 	Amount      sdk.Coins      `json:"amount"`
 }
 
