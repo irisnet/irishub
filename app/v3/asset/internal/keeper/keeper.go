@@ -86,8 +86,8 @@ func (k Keeper) EditToken(ctx sdk.Context, msg types.MsgEditToken) (sdk.Tags, sd
 
 	if msg.MaxSupply > 0 {
 		maxSupply := sdk.NewIntWithDecimal(int64(msg.MaxSupply), int(token.Decimal))
-		if maxSupply.LT(hasIssuedAmt.Amount) || maxSupply.GT(token.MaxSupply) {
-			return nil, types.ErrInvalidAssetMaxSupply(k.codespace, fmt.Sprintf("max supply must not be less than %s and greater than %s", hasIssuedAmt.Amount.String(), token.MaxSupply.String()))
+		if maxSupply.LT(hasIssuedAmt.Amount) {
+			return nil, types.ErrInvalidAssetMaxSupply(k.codespace, fmt.Sprintf("max supply must not be less than %s", hasIssuedAmt.Amount.String()))
 		}
 		token.MaxSupply = maxSupply
 	}

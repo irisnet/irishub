@@ -173,7 +173,7 @@ func (tokens Tokens) Validate() sdk.Error {
 // -----------------------------
 
 func GetTokenID(symbol string) string {
-	return strings.ToLower(fmt.Sprintf("i.%s", symbol))
+	return strings.ToLower(fmt.Sprintf("i.%s", strings.TrimSpace(symbol)))
 }
 
 // CheckTokenID checks if the given token id is valid
