@@ -3,12 +3,10 @@ package gov
 import (
 	"fmt"
 
-	"github.com/irisnet/irishub/app/v3/asset/exported"
-
 	sdk "github.com/irisnet/irishub/types"
 )
 
-// name to idetify transaction types
+// name to identify transaction types
 const MsgRoute = "gov"
 
 var _, _, _, _ sdk.Msg = MsgSubmitProposal{}, MsgSubmitCommunityTaxUsageProposal{}, MsgDeposit{}, MsgVote{}
@@ -170,7 +168,6 @@ type MsgSubmitCommunityTaxUsageProposal struct {
 	MsgSubmitProposal
 	Usage       UsageType      `json:"usage"`
 	DestAddress sdk.AccAddress `json:"dest_address"`
-	Percent     sdk.Dec        `json:"percent"`
 	Amount      sdk.Coins      `json:"amount"`
 }
 
@@ -195,7 +192,7 @@ func (msg MsgSubmitCommunityTaxUsageProposal) ValidateBasic() sdk.Error {
 		return sdk.ErrInvalidAddress(msg.DestAddress.String())
 	}
 	if !msg.Amount.IsValid() {
-		return sdk.ErrInvalidCoins(fmt.Sprintf("invalid coins to burn [%s]", msg.Amount))
+		return sdk.ErrInvalidCoins(fmt.Sprintf("invalid coins %s", msg.Amount))
 	}
 	return nil
 }
@@ -333,41 +330,4 @@ func (msg MsgSubmitProposal) EnsureLength() sdk.Error {
 	}
 
 	return nil
-}
-
-type MsgSubmitTokenAdditionProposal struct {
-	MsgSubmitProposal
-	Symbol          string `json:"symbol"`
-	CanonicalSymbol string `json:"canonical_symbol"`
-	Name            string `json:"name"`
-	Decimal         uint8  `json:"decimal"`
-	MinUnitAlias    string `json:"min_unit_alias"`
-}
-
-func NewMsgSubmitTokenAdditionProposal(msgSubmitProposal MsgSubmitProposal, symbol, canonicalSymbol, name, minUnitAlias string, decimal uint8) MsgSubmitTokenAdditionProposal {
-	return MsgSubmitTokenAdditionProposal{
-		MsgSubmitProposal: msgSubmitProposal,
-		Symbol:            symbol,
-		CanonicalSymbol:   canonicalSymbol,
-		Name:              name,
-		Decimal:           decimal,
-		MinUnitAlias:      minUnitAlias,
-	}
-}
-
-func (msg MsgSubmitTokenAdditionProposal) ValidateBasic() sdk.Error {
-	err := msg.MsgSubmitProposal.ValidateBasic()
-	if err != nil {
-		return err
-	}
-
-	issueToken := exported.NewMsgIssueToken(exported.FUNGIBLE, exported.EXTERNAL, "", msg.Symbol, msg.CanonicalSymbol, msg.Name, msg.Decimal, msg.MinUnitAlias, 0, exported.MaximumAssetMaxSupply, true, nil)
-	return exported.ValidateMsgIssueToken(&issueToken)
-}
-func (msg MsgSubmitTokenAdditionProposal) GetSignBytes() []byte {
-	b, err := msgCdc.MarshalJSON(msg)
-	if err != nil {
-		panic(err)
-	}
-	return sdk.MustSortJSON(b)
 }

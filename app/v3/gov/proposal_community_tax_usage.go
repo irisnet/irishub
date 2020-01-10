@@ -175,7 +175,7 @@ func (keeper Keeper) AllocateFeeTax(ctx sdk.Context, destAddr sdk.AccAddress, am
 	} else {
 		logger.Info("Grant community tax to account", "grant_amount", amount.String(), "grant_address", destAddr.String())
 		if !amount.IsZero() {
-			ctx.CoinFlowTags().AppendCoinFlowTag(ctx, "", destAddr.String(), amount.String(), sdk.CommunityTaxUseFlow, "")
+			ctx.CoinFlowTags().AppendCoinFlowTag(ctx, auth.CommunityTaxCoinsAccAddr.String(), destAddr.String(), amount.String(), sdk.CommunityTaxUseFlow, "")
 		}
 		_, err := keeper.ck.SendCoins(ctx, auth.CommunityTaxCoinsAccAddr, destAddr, amount)
 		if err != nil {

@@ -78,7 +78,7 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 					}
 				}
 				amountStr := viper.GetString(flagAmount)
-				amount, err := sdk.ParseCoins(amountStr)
+				amount, err := cliCtx.ParseCoins(amountStr)
 				if err != nil {
 					return err
 				}
@@ -117,7 +117,7 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 
 	cmd.Flags().String(flagTitle, "", "title of proposal")
 	cmd.Flags().String(flagDescription, "", "description of proposal")
-	cmd.Flags().String(flagProposalType, "", "proposalType of proposal,eg:PlainText/Parameter/SoftwareUpgrade/SystemHalt/CommunityTaxUsage/TokenAddition")
+	cmd.Flags().String(flagProposalType, "", "proposalType of proposal,eg:PlainText/Parameter/SoftwareUpgrade/SystemHalt/CommunityTaxUsage")
 	cmd.Flags().String(flagDeposit, "", "deposit of proposal(at least 30% of MinDeposit)")
 	cmd.Flags().String(flagParam, "", "parameter of proposal,eg. key=value")
 	cmd.Flags().String(flagUsage, "", "the transaction fee tax usage type, valid values can be Burn, Distribute and Grant")
