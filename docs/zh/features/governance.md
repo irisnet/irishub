@@ -15,9 +15,9 @@
 
 不同级别对应的具体 Proposal：
 
-- Critical：`SoftwareUpgrade`, `SystemHalt`
-- Important：`Parameter`,`TokenAddition`
-- Normal：`CommunityTaxUsage`,`PlainText`
+- Critical：`SoftwareUpgrade`，`SystemHalt`
+- Important：`Parameter`，`CommunityTaxUsage`
+- Normal：`PlainText`
 
 `SoftwareUpgrade Proposal` 和 `SystemHalt Proposal` 只能由profiler发起。
 
@@ -96,7 +96,7 @@ iriscli gov query-proposal --proposal-id=<proposal-id>
 
 ### 社区基金使用提议
 
-有三种使用方式: `Burn`，`Distribute` and `Grant`。 `Burn`表示从社区基金中销毁代币。`Distribute` and `Grant` 将从社区基金中向目标受托人账户转移代币，然后受托人将这些代币分发或赠给其他账户。
+有三种使用方式: `Burn`，`Distribute` and `Grant`。 `Burn`表示从社区基金中销毁代币。`Distribute` and `Grant` 将从社区基金中向目标地址（`Distribute`目标地址必须是`trustee`地址）转移代币，然后受托人将这些代币分发或赠给其他账户。
 
 ```bash
 # 提交 Burn 提议
