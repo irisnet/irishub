@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	testChainID     = "test-chain"
+	testChainID = "test-chain"
 
 	testServiceName = "test-service"
 	testServiceDesc = "test-service-desc"

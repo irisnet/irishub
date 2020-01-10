@@ -225,8 +225,8 @@ func GetCmdQuerySvcResponse(cdc *codec.Codec) *cobra.Command {
 	}
 	cmd.Flags().String(FlagReqChainID, "", "the ID of the blockchain that the service invocation initiated")
 	cmd.Flags().String(FlagReqID, "", "the ID of the service invocation")
-	cmd.MarkFlagRequired(FlagReqChainID)
-	cmd.MarkFlagRequired(FlagReqID)
+	_ = cmd.MarkFlagRequired(FlagReqChainID)
+	_ = cmd.MarkFlagRequired(FlagReqID)
 	return cmd
 }
 

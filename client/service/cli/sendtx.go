@@ -76,8 +76,8 @@ func GetCmdDefineService(cdc *codec.Codec) *cobra.Command {
 	}
 
 	cmd.Flags().AddFlagSet(FsServiceDefine)
-	cmd.MarkFlagRequired(FlagName)
-	cmd.MarkFlagRequired(FlagSchemas)
+	_ = cmd.MarkFlagRequired(FlagName)
+	_ = cmd.MarkFlagRequired(FlagSchemas)
 
 	return cmd
 }
@@ -414,8 +414,8 @@ func GetCmdSvcRespond(cdc *codec.Codec) *cobra.Command {
 		},
 	}
 	cmd.Flags().AddFlagSet(FsServiceResponse)
-	cmd.MarkFlagRequired(FlagReqChainID)
-	cmd.MarkFlagRequired(FlagReqID)
+	_ = cmd.MarkFlagRequired(FlagReqChainID)
+	_ = cmd.MarkFlagRequired(FlagReqID)
 	return cmd
 }
 
