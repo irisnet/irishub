@@ -21,9 +21,6 @@ var (
 	activeRequestKey             = []byte{0x07} // key for active request
 	returnedFeeKey               = []byte{0x08}
 	incomingFeeKey               = []byte{0x09}
-
-	serviceFeeTaxKey        = []byte{0x10}
-	serviceSlashFractionKey = []byte{0x11}
 )
 
 // GetServiceDefinitionKey returns a key for the service definition with the specified name

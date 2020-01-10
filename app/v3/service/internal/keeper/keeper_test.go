@@ -11,10 +11,10 @@ import (
 
 var (
 	testChainID     = "test-chain"
+
 	testServiceName = "test-service"
 	testServiceDesc = "test-service-desc"
 	testServiceTags = []string{"tag1", "tag2"}
-	testAuthor      = sdk.AccAddress([]byte("test-author"))
 	testAuthorDesc  = "test-author-desc"
 	testSchemas     = `{"input":{"type":"object"},"output":{"type":"object"},"error":{"type":"object"}}`
 
