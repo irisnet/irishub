@@ -266,7 +266,7 @@ func (k Keeper) getMinDeposit(ctx sdk.Context, prices []sdk.Coin) (sdk.Coins, sd
 	var minDeposit sdk.Coins
 	for _, price := range prices {
 		if price.Amount.BigInt().BitLen()+minDepositMultiple.BigInt().BitLen()-1 > 255 {
-			return minDeposit, sdk.NewError(types.DefaultCodespace, types.CodeIntOverflow, fmt.Sprintf("Int Overflow"))
+			return minDeposit, sdk.NewError(k.codespace, types.CodeIntOverflow, fmt.Sprintf("Int Overflow"))
 		}
 		minInt := price.Amount.Mul(minDepositMultiple)
 		minDeposit = minDeposit.Add(sdk.NewCoins(sdk.NewCoin(price.Denom, minInt)))
