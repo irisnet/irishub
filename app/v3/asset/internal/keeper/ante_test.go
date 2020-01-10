@@ -36,6 +36,9 @@ func TestAssetAnteHandler(t *testing.T) {
 	acc1 := ak.NewAccountWithAddress(ctx, addr1)
 	acc2 := ak.NewAccountWithAddress(ctx, addr2)
 
+	//set params
+	keeper.SetParamSet(ctx, types.DefaultParams())
+
 	// get asset fees
 	nativeTokenIssueFee := keeper.getTokenIssueFee(ctx, "sym")
 	nativeTokenMintFee := keeper.getTokenMintFee(ctx, "sym")
@@ -47,7 +50,7 @@ func TestAssetAnteHandler(t *testing.T) {
 	msgNonAsset2 := sdk.NewTestMsg(addr2)
 
 	// construct test txs
-	tx1 := auth.StdTx{Msgs: []sdk.Msg{msgIssueNativeToken, msgMintNativeToken}}
+	tx1 := auth.StdTx{Msgs: []sdk.Msg{msgMintNativeToken}}
 	tx2 := auth.StdTx{Msgs: []sdk.Msg{msgIssueNativeToken, msgNonAsset1, msgMintNativeToken}}
 	tx3 := auth.StdTx{Msgs: []sdk.Msg{msgNonAsset2, msgIssueNativeToken, msgMintNativeToken}}
 
