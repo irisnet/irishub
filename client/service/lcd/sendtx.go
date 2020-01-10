@@ -14,10 +14,10 @@ import (
 )
 
 func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec) {
-	// Add a new service definition
+	// define a service
 	r.HandleFunc(
 		"/service/definitions",
-		definitionPostHandlerFn(cdc, cliCtx),
+		defineServiceHandlerFn(cdc, cliCtx),
 	).Methods("POST")
 
 	// Add a new service binding
@@ -75,9 +75,74 @@ func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec
 	).Methods("POST")
 }
 
-func definitionPostHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+type defineServiceReq struct {
+	BaseTx            utils.BaseTx `json:"base_tx"` // basic tx info
+	Name              string       `json:"name"`
+	Description       string       `json:"description"`
+	Tags              []string     `json:"tags"`
+	Author            string       `json:"author"`
+	AuthorDescription string       `json:"author_description"`
+	Schemas           string       `json:"schemas"`
+}
+
+type binding struct {
+	BaseTx      utils.BaseTx  `json:"base_tx"` // basic tx info
+	ServiceName string        `json:"service_name"`
+	DefChainID  string        `json:"def_chain_id"`
+	BindingType string        `json:"binding_type"`
+	Deposit     string        `json:"deposit"`
+	Prices      []string      `json:"prices"`
+	Level       service.Level `json:"level"`
+	Provider    string        `json:"provider"`
+}
+
+type bindingUpdate struct {
+	BaseTx      utils.BaseTx  `json:"base_tx"` // basic tx info
+	BindingType string        `json:"binding_type"`
+	Deposit     string        `json:"deposit"`
+	Prices      []string      `json:"prices"`
+	Level       service.Level `json:"level"`
+}
+
+type bindingEnable struct {
+	BaseTx  utils.BaseTx `json:"base_tx"` // basic tx info
+	Deposit string       `json:"deposit"`
+}
+
+type serviceRequest struct {
+	ServiceName string `json:"service_name"`
+	BindChainID string `json:"bind_chain_id"`
+	DefChainID  string `json:"def_chain_id"`
+	MethodID    int16  `json:"method_id"`
+	Provider    string `json:"provider"`
+	Consumer    string `json:"consumer"`
+	ServiceFee  string `json:"service_fee"`
+	Data        string `json:"data"`
+	Profiling   bool   `json:"profiling"`
+}
+
+type serviceRequestWithBasic struct {
+	BaseTx   utils.BaseTx     `json:"base_tx"` // basic tx info
+	Requests []serviceRequest `json:"requests"`
+}
+
+type serviceResponse struct {
+	BaseTx     utils.BaseTx `json:"base_tx"` // basic tx info
+	ReqChainID string       `json:"req_chain_id"`
+	RequestID  string       `json:"request_id"`
+	Data       string       `json:"data"`
+	Provider   string       `json:"provider"`
+	ErrorMsg   string       `json:"error_msg"`
+}
+
+type basicReq struct {
+	BaseTx utils.BaseTx `json:"base_tx"` // basic tx info
+}
+
+// HTTP request handler to define service.
+func defineServiceHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req definition
+		var req defineServiceReq
 		err := utils.ReadPostBody(w, r, cdc, &req)
 		if err != nil {
 			return
@@ -88,15 +153,14 @@ func definitionPostHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.H
 			return
 		}
 
-		authorAddr, err := sdk.AccAddressFromBech32(req.AuthorAddr)
+		author, err := sdk.AccAddressFromBech32(req.Author)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		msg := service.NewMsgSvcDef(req.ServiceName, baseReq.ChainID, req.ServiceDescription, req.Tags, authorAddr, req.AuthorDescription, req.IdlContent)
-		err = msg.ValidateBasic()
-		if err != nil {
+		msg := service.NewMsgDefineService(req.Name, req.Description, req.Tags, author, req.AuthorDescription, req.Schemas)
+		if err := msg.ValidateBasic(); err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
@@ -516,68 +580,4 @@ func FeesWithdrawHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Han
 
 		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
 	}
-}
-
-type definition struct {
-	BaseTx             utils.BaseTx `json:"base_tx"` // basic tx info
-	ServiceName        string       `json:"service_name"`
-	ServiceDescription string       `json:"service_description"`
-	AuthorDescription  string       `json:"author_description"`
-	Tags               []string     `json:"tags"`
-	IdlContent         string       `json:"idl_content"`
-	AuthorAddr         string       `json:"author_addr"`
-}
-
-type binding struct {
-	BaseTx      utils.BaseTx  `json:"base_tx"` // basic tx info
-	ServiceName string        `json:"service_name"`
-	DefChainID  string        `json:"def_chain_id"`
-	BindingType string        `json:"binding_type"`
-	Deposit     string        `json:"deposit"`
-	Prices      []string      `json:"prices"`
-	Level       service.Level `json:"level"`
-	Provider    string        `json:"provider"`
-}
-
-type bindingUpdate struct {
-	BaseTx      utils.BaseTx  `json:"base_tx"` // basic tx info
-	BindingType string        `json:"binding_type"`
-	Deposit     string        `json:"deposit"`
-	Prices      []string      `json:"prices"`
-	Level       service.Level `json:"level"`
-}
-
-type bindingEnable struct {
-	BaseTx  utils.BaseTx `json:"base_tx"` // basic tx info
-	Deposit string       `json:"deposit"`
-}
-
-type serviceRequest struct {
-	ServiceName string `json:"service_name"`
-	BindChainID string `json:"bind_chain_id"`
-	DefChainID  string `json:"def_chain_id"`
-	MethodID    int16  `json:"method_id"`
-	Provider    string `json:"provider"`
-	Consumer    string `json:"consumer"`
-	ServiceFee  string `json:"service_fee"`
-	Data        string `json:"data"`
-	Profiling   bool   `json:"profiling"`
-}
-
-type serviceRequestWithBasic struct {
-	BaseTx   utils.BaseTx     `json:"base_tx"` // basic tx info
-	Requests []serviceRequest `json:"requests"`
-}
-
-type serviceResponse struct {
-	BaseTx     utils.BaseTx `json:"base_tx"` // basic tx info
-	ReqChainID string       `json:"req_chain_id"`
-	RequestID  string       `json:"request_id"`
-	Data       string       `json:"data"`
-	Provider   string       `json:"provider"`
-	ErrorMsg   string       `json:"error_msg"`
-}
-
-type basicReq struct {
-	BaseTx utils.BaseTx `json:"base_tx"` // basic tx info
 }
