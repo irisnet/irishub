@@ -19,8 +19,8 @@ type GenesisState struct {
 
 // Last validator power, needed for validator set update logic
 type LastValidatorPower struct {
-	Address sdk.ValAddress
-	Power   sdk.Int
+	Address sdk.ValAddress `json:"address"`
+	Power   sdk.Int        `json:"power"`
 }
 
 func NewGenesisState(bondedPool BondedPool, params Params, validators []Validator, bonds []Delegation) GenesisState {

@@ -9,7 +9,7 @@ const protocolV1 = version.ProtocolVersion
 
 // GenesisState - all upgrade state that must be provided at genesis
 type GenesisState struct {
-	GenesisVersion VersionInfo `json:genesis_version`
+	GenesisVersion VersionInfo `json:"genesis_version"`
 }
 
 // InitGenesis - build the genesis version For first Version

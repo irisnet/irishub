@@ -26,8 +26,8 @@ type ProtocolDefinition struct {
 }
 
 type UpgradeConfig struct {
-	ProposalID uint64
-	Protocol   ProtocolDefinition
+	ProposalID uint64             `json:"proposal_id"`
+	Protocol   ProtocolDefinition `json:"proposal"`
 }
 
 func (uc UpgradeConfig) String() string {
