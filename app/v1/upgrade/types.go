@@ -5,7 +5,7 @@ import (
 )
 
 type VersionInfo struct {
-	UpgradeInfo sdk.UpgradeConfig `json:"genesis_version"`
+	UpgradeInfo sdk.UpgradeConfig `json:"upgrade_info"`
 	Success     bool              `json:"success"`
 }
 
