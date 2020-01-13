@@ -31,10 +31,6 @@ func (k Keeper) AddRequest(
 		return req, types.ErrSvcBindingNotAvailable(k.codespace)
 	}
 
-	if _, found = k.GetMethod(ctx, defChainID, defName, methodID); !found {
-		return req, types.ErrMethodNotExists(k.codespace, methodID)
-	}
-
 	if profiling {
 		if _, found := k.gk.GetProfiler(ctx, consumer); !found {
 			return req, types.ErrNotProfiler(k.codespace, consumer)
