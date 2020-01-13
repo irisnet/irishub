@@ -174,13 +174,28 @@ func GetTokenID(symbol string) string {
 	return strings.ToLower(fmt.Sprintf("i.%s", strings.TrimSpace(symbol)))
 }
 
+//CheckSymbol
+func CheckSymbol(symbol string) sdk.Error {
+	if strings.Contains(symbol, sdk.Iris) {
+		return ErrInvalidAssetSymbol(DefaultCodespace, fmt.Sprintf("symbol can not contains : %s", sdk.Iris))
+	}
+	// check symbol
+	if len(symbol) < MinimumAssetSymbolLen || len(symbol) > MaximumAssetSymbolLen {
+		return ErrInvalidAssetSymbol(DefaultCodespace, fmt.Sprintf("invalid asset symbol: %s", symbol))
+	}
+	if !IsBeginWithAlpha(symbol) || !IsAlphaNumeric(symbol) {
+		return ErrInvalidAssetSymbol(DefaultCodespace, fmt.Sprintf("invalid asset symbol: %s", symbol))
+	}
+	return nil
+}
+
 // CheckTokenID checks if the given token id is valid
 func CheckTokenID(id string) sdk.Error {
 	prefix, symbol := GetTokenIDParts(id)
 
 	// check symbol
-	if len(symbol) < MinimumAssetSymbolSize || len(symbol) > MaximumAssetSymbolSize || !IsBeginWithAlpha(symbol) || !IsAlphaNumeric(symbol) || strings.Contains(symbol, sdk.Iris) {
-		return ErrInvalidAssetSymbol(DefaultCodespace, fmt.Sprintf("invalid asset symbol: %s", symbol))
+	if err := CheckSymbol(symbol); err != nil {
+		return err
 	}
 	// check prefix
 	if prefix != "i" {

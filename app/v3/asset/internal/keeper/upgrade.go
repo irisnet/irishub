@@ -5,53 +5,25 @@ import (
 	"strings"
 
 	"github.com/irisnet/irishub/app/v3/asset/internal/types"
-	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
 )
 
 var (
-	cdc           = codec.New()
-	prefixGateway = []byte("gateways:") // prefix for the gateway store
+	prefixGateway      = []byte("gateways:")
+	prefixOwnerGateway = []byte("ownerGateways:")
 )
-
-func init() {
-	cdc.RegisterConcrete(&Gateway{}, "irishub/asset/Gateway", nil)
-}
-
-// Deprecated
-type Gateway struct {
-	Owner    sdk.AccAddress `json:"owner"`    //  the owner address of the gateway
-	Moniker  string         `json:"moniker"`  //  the globally unique name of the gateway
-	Identity string         `json:"identity"` //  the identity of the gateway
-	Details  string         `json:"details"`  //  the description of the gateway
-	Website  string         `json:"website"`  //  the external website of the gateway
-}
-
-// keyGateway returns the key of the specified moniker
-func keyGateway(moniker string) []byte {
-	return []byte(fmt.Sprintf("gateways:%s", moniker))
-}
-
-// keyOwnerGateway returns the key of the specifed owner and moniker. Intended for querying all gateways of an owner
-func keyOwnerGateway(owner sdk.AccAddress, moniker string) []byte {
-	return []byte(fmt.Sprintf("ownerGateways:%d:%s", owner, moniker))
-}
-
-// keyGatewaysSubspace returns the key prefix for iterating on all gateways of an owner
-func keyGatewaysSubspace(owner sdk.AccAddress) []byte {
-	return []byte(fmt.Sprintf("ownerGateways:%d:", owner))
-}
 
 //Init Initialize module parameters during network upgrade
 func (k Keeper) Init(ctx sdk.Context) {
 	store := ctx.KVStore(k.storeKey)
-
 	// delete gateway
-	k.iterateGateways(ctx, func(gateway Gateway) (stop bool) {
-		store.Delete(keyGateway(gateway.Moniker))
-		store.Delete(keyOwnerGateway(gateway.Owner, gateway.Moniker))
-		store.Delete(keyGatewaysSubspace(gateway.Owner))
-		return false
+	k.deleteGateways(ctx, prefixGateway, func(key []byte) {
+		store.Delete(key)
+	})
+
+	// delete gateway owner
+	k.deleteGateways(ctx, prefixOwnerGateway, func(key []byte) {
+		store.Delete(key)
 	})
 
 	// delete Gateway/External token
@@ -70,22 +42,14 @@ func (k Keeper) Init(ctx sdk.Context) {
 	k.SetParamSet(ctx, param)
 }
 
-// Deprecated
-func (k Keeper) iterateGateways(ctx sdk.Context, op func(gateway Gateway) (stop bool)) {
+func (k Keeper) deleteGateways(ctx sdk.Context, prefix []byte, op func(key []byte)) {
 	store := ctx.KVStore(k.storeKey)
 
-	iterator := sdk.KVStorePrefixIterator(store, prefixGateway)
+	iterator := sdk.KVStorePrefixIterator(store, prefix)
 	defer iterator.Close()
 
 	for ; iterator.Valid(); iterator.Next() {
-		var gateway Gateway
-		if err := cdc.UnmarshalBinaryLengthPrefixed(iterator.Value(), &gateway); err != nil {
-			continue
-		}
-
-		if stop := op(gateway); stop {
-			break
-		}
+		op(iterator.Key())
 	}
 }
 

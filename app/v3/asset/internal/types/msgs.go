@@ -21,9 +21,9 @@ var (
 	MaximumAssetMaxSupply  = uint64(1000000000000) // maximal limitation for asset max supply，1000 billion
 	MaximumAssetInitSupply = uint64(100000000000)  // maximal limitation for asset initial supply，100 billion
 	MaximumAssetDecimal    = uint8(18)             // maximal limitation for asset decimal
-	MinimumAssetSymbolSize = 3                     // minimal limitation for the length of the asset's symbol / canonical_symbol
-	MaximumAssetSymbolSize = 8                     // maximal limitation for the length of the asset's symbol / canonical_symbol
-	MaximumAssetNameSize   = 32                    // maximal limitation for the length of the asset's name
+	MinimumAssetSymbolLen  = 3                     // minimal limitation for the length of the asset's symbol / canonical_symbol
+	MaximumAssetSymbolLen  = 8                     // maximal limitation for the length of the asset's symbol / canonical_symbol
+	MaximumAssetNameLen    = 32                    // maximal limitation for the length of the asset's name
 
 	IsAlphaNumeric   = regexp.MustCompile(`^[a-zA-Z0-9]+$`).MatchString // only accepts alphanumeric characters
 	IsBeginWithAlpha = regexp.MustCompile(`^[a-zA-Z].*`).MatchString
@@ -91,13 +91,13 @@ func ValidateMsgIssueToken(msg *MsgIssueToken) sdk.Error {
 	}
 
 	nameLen := len(msg.Name)
-	if nameLen == 0 || nameLen > MaximumAssetNameSize {
-		return ErrInvalidAssetName(DefaultCodespace, fmt.Sprintf("invalid token name %s, only accepts length (0, %d]", msg.Name, MaximumAssetNameSize))
+	if nameLen == 0 || nameLen > MaximumAssetNameLen {
+		return ErrInvalidAssetName(DefaultCodespace, fmt.Sprintf("invalid token name %s, only accepts length (0, %d]", msg.Name, MaximumAssetNameLen))
 	}
 
 	symbolLen := len(msg.Symbol)
-	if symbolLen < MinimumAssetSymbolSize || symbolLen > MaximumAssetSymbolSize || !IsBeginWithAlpha(msg.Symbol) || !IsAlphaNumeric(msg.Symbol) {
-		return ErrInvalidAssetSymbol(DefaultCodespace, fmt.Sprintf("invalid token symbol %s, only accepts alphanumeric characters, and begin with an english letter, length [%d, %d]", msg.Symbol, MinimumAssetSymbolSize, MaximumAssetSymbolSize))
+	if symbolLen < MinimumAssetSymbolLen || symbolLen > MaximumAssetSymbolLen || !IsBeginWithAlpha(msg.Symbol) || !IsAlphaNumeric(msg.Symbol) {
+		return ErrInvalidAssetSymbol(DefaultCodespace, fmt.Sprintf("invalid token symbol %s, only accepts alphanumeric characters, and begin with an english letter, length [%d, %d]", msg.Symbol, MinimumAssetSymbolLen, MaximumAssetSymbolLen))
 	}
 
 	if strings.Contains(strings.ToLower(msg.Symbol), sdk.Iris) {
@@ -235,8 +235,8 @@ func (msg MsgEditToken) ValidateBasic() sdk.Error {
 	}
 
 	nameLen := len(msg.Name)
-	if DoNotModify != msg.Name && nameLen > MaximumAssetNameSize {
-		return ErrInvalidAssetName(DefaultCodespace, fmt.Sprintf("invalid token name %s, only accepts length (0, %d]", msg.Name, MaximumAssetNameSize))
+	if DoNotModify != msg.Name && nameLen > MaximumAssetNameLen {
+		return ErrInvalidAssetName(DefaultCodespace, fmt.Sprintf("invalid token name %s, only accepts length (0, %d]", msg.Name, MaximumAssetNameLen))
 	}
 
 	//check max_supply for fast failed

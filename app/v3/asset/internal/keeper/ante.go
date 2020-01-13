@@ -18,6 +18,7 @@ func NewAnteHandler(k Keeper) sdk.AnteHandler {
 		newCtx = sdk.Context{}
 		// total fee
 		feeMap := make(map[string]sdk.Coins)
+		var senders []string
 		for _, msg := range tx.GetMsgs() {
 			// only check consecutive msgs which are routed to asset from the beginning
 			if msg.Route() != types.MsgRoute {
@@ -26,6 +27,7 @@ func NewAnteHandler(k Keeper) sdk.AnteHandler {
 			sender := msg.GetSigners()[0].String()
 			if _, ok := feeMap[sender]; !ok {
 				feeMap[sender] = sdk.Coins{}
+				senders = append(senders, sender)
 			}
 
 			var fee sdk.Coin
@@ -41,11 +43,11 @@ func NewAnteHandler(k Keeper) sdk.AnteHandler {
 			feeMap[sender] = feeMap[sender].Add(sdk.NewCoins(fee))
 		}
 
-		for addr, fee := range feeMap {
+		for _, addr := range senders {
 			owner, _ := sdk.AccAddressFromBech32(addr)
 			balance := k.bk.GetCoins(ctx, owner)
-			if balance.IsAllLT(fee) {
-				return newCtx, types.ErrInsufficientCoins(types.DefaultCodespace, fmt.Sprintf("insufficient coins for asset fee: %s needed", fee.MainUnitString())).Result(), true
+			if balance.IsAllLT(feeMap[addr]) {
+				return newCtx, types.ErrInsufficientCoins(types.DefaultCodespace, fmt.Sprintf("insufficient coins for asset fee: %s needed", feeMap[addr].MainUnitString())).Result(), true
 			}
 		}
 		// continue

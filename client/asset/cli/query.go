@@ -49,16 +49,17 @@ func getCmdQueryFee(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "fee",
 		Short:   "Query the asset related fees",
-		Example: "iriscli asset token fee --symbol=<symbol>",
+		Args:    cobra.ExactArgs(1),
+		Example: "iriscli asset token fee [symbol]",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			// query token fees
-			tokenID := viper.GetString(FlagSymbol)
-			if err := asset.CheckTokenID(tokenID); err != nil {
+			symbol := args[0]
+			if err := asset.CheckSymbol(symbol); err != nil {
 				return err
 			}
 
-			fees, err := queryTokenFees(cliCtx, tokenID)
+			fees, err := queryTokenFees(cliCtx, symbol)
 			if err != nil {
 				return err
 			}
@@ -66,9 +67,6 @@ func getCmdQueryFee(cdc *codec.Codec) *cobra.Command {
 			return cliCtx.PrintOutput(fees)
 		},
 	}
-
-	cmd.Flags().AddFlagSet(FsFeeQuery)
-
 	return cmd
 }
 
