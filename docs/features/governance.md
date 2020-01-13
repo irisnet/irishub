@@ -7,7 +7,6 @@
 3. On-chain governance proposals on software upgrade
 4. On-chain governance proposals on software halt
 5. On-chain governance proposals on tax usage
-6. On-chain governance proposals on token addition
 
 ## Interactive process
 
@@ -16,8 +15,8 @@
 Specific Proposal for different levels:
 
 - Critical：`SoftwareUpgrade`, `SystemHalt`
-- Important：`Parameter`,`TokenAddition`
-- Normal：`CommunityTaxUsage`,`PlainText`
+- Important：`Parameter`, `CommunityTaxUsage`
+- Normal：`PlainText`
 
 `SoftwareUpgrade Proposal` and `SystemHalt Proposal` can only be submitted by the profiler.
 
@@ -96,7 +95,7 @@ iriscli gov query-proposal --proposal-id=<proposal-id>
 
 ### Proposals on community funds usage
 
-There are three usages, `Burn`, `Distribute` and `Grant`. `Burn` means burning tokens from community funds. `Distribute` and `Grant` will transfer tokens to the destination trustee's account from community funds.
+There are three usages, `Burn`, `Distribute` and `Grant`. `Burn` means burning tokens from community funds. `Grant` will transfer tokens from community funds to the destination address. `Distribute` will transfer tokens from community funds to the destination `trustee` address, and then will be assigned to other addresses by the `trustee` account.
 
 ```bash
 # Submit Burn usage proposal

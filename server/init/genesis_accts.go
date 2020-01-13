@@ -2,7 +2,7 @@ package init
 
 import (
 	"fmt"
-	v2 "github.com/irisnet/irishub/app/v2"
+	v3 "github.com/irisnet/irishub/app/v3"
 	"os"
 
 	"github.com/irisnet/irishub/app"
@@ -50,13 +50,13 @@ func AddGenesisAccountCmd(ctx *server.Context, cdc *codec.Codec) *cobra.Command 
 			if err != nil {
 				return err
 			}
-			var genesisState v2.GenesisFileState
+			var genesisState v3.GenesisFileState
 			if err = cdc.UnmarshalJSON(genDoc.AppState, &genesisState); err != nil {
 				return err
 			}
 			acc := auth.NewBaseAccountWithAddress(addr)
 			acc.Coins = coins
-			genesisState.Accounts = append(genesisState.Accounts, v2.NewGenesisFileAccount(&acc))
+			genesisState.Accounts = append(genesisState.Accounts, v3.NewGenesisFileAccount(&acc))
 			appStateJSON, err := cdc.MarshalJSON(genesisState)
 			if err != nil {
 				return err

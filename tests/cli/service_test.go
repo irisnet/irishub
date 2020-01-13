@@ -2,15 +2,15 @@ package cli
 
 import (
 	"fmt"
-	"testing"
-
 	"regexp"
 	"strings"
+	"testing"
+
+	"github.com/stretchr/testify/require"
 
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/tests"
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/stretchr/testify/require"
 )
 
 func TestIrisCLIService(t *testing.T) {

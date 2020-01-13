@@ -18,17 +18,9 @@ const (
 	flagPath         = "path"
 	flagUsage        = "usage"
 	flagDestAddress  = "dest-address"
-	flagPercent      = "percent"
+	flagAmount       = "amount"
 	flagVersion      = "version"
 	flagSoftware     = "software"
 	flagSwitchHeight = "switch-height"
 	flagThreshold    = "threshold"
-
-	//for addTokenProposal
-	flagTokenSymbol          = "token-symbol"
-	flagTokenCanonicalSymbol = "token-canonical-symbol"
-	flagTokenName            = "token-name"
-	flagTokenDecimal         = "token-decimal"
-	flagTokenMinUnitAlias    = "token-min-unit-alias"
-	flagTokenInitialSupply   = "token-initial-supply"
 )

@@ -103,6 +103,7 @@ func (p *ProtocolV3) Load() {
 
 // Init initializes the configuration of this Protocol
 func (p *ProtocolV3) Init(ctx sdk.Context) {
+	p.assetKeeper.Init(ctx)
 }
 
 // GetCodec get codec
@@ -278,7 +279,6 @@ func (p *ProtocolV3) configKeepers() {
 		&stakeKeeper,
 		gov.DefaultCodespace,
 		gov.PrometheusMetrics(p.config),
-		p.assetKeeper,
 	)
 
 	p.randKeeper = rand.NewKeeper(p.cdc, protocol.KeyRand, rand.DefaultCodespace)
