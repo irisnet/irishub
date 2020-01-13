@@ -1,6 +1,5 @@
 package cli
 
-//
 //import (
 //	"fmt"
 //	"io/ioutil"

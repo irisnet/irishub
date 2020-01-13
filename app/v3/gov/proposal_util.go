@@ -82,9 +82,10 @@ func createCommunityTaxUsageInfo() pTypeInfo {
 				proposal := &CommunityTaxUsageProposal{
 					p,
 					TaxUsage{
-						taxMsg.Usage,
-						taxMsg.DestAddress,
-						taxMsg.Percent},
+						Usage:       taxMsg.Usage,
+						DestAddress: taxMsg.DestAddress,
+						Amount:      taxMsg.Amount,
+					},
 				}
 				return proposal
 			})

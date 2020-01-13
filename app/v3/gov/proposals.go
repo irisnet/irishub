@@ -216,7 +216,6 @@ const (
 	ProposalTypeSystemHalt        ProposalKind = 0x03
 	ProposalTypeCommunityTaxUsage ProposalKind = 0x04
 	ProposalTypePlainText         ProposalKind = 0x05
-	ProposalTypeTokenAddition     ProposalKind = 0x06
 )
 
 var pTypeMap = map[string]pTypeInfo{

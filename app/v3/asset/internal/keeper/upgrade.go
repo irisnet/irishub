@@ -15,14 +15,19 @@ var (
 
 //Init Initialize module parameters during network upgrade
 func (k Keeper) Init(ctx sdk.Context) {
+	logger := k.Logger(ctx)
+
+	logger.Info("begin execute upgrade method", "method", "Init")
 	store := ctx.KVStore(k.storeKey)
 	// delete gateway
 	k.deleteGateways(ctx, prefixGateway, func(key []byte) {
+		logger.Info("delete gateway info", "key", string(key))
 		store.Delete(key)
 	})
 
 	// delete gateway owner
 	k.deleteGateways(ctx, prefixOwnerGateway, func(key []byte) {
+		logger.Info("delete gateway owner", "key", string(key))
 		store.Delete(key)
 	})
 
@@ -30,6 +35,7 @@ func (k Keeper) Init(ctx sdk.Context) {
 	k.IterateTokens(ctx, func(token types.FungibleToken) (stop bool) {
 		if token.Source == 0x01 || token.Source == 0x02 {
 			tokenID := getTokenID(token.Source, token.GetSymbol(), token.Gateway)
+			logger.Info("delete token", "tokenID", tokenID)
 			store.Delete(KeyTokens(token.Owner, tokenID))
 			store.Delete(KeyTokens(sdk.AccAddress{}, tokenID))
 			store.Delete(KeyToken(tokenID))
@@ -40,6 +46,7 @@ func (k Keeper) Init(ctx sdk.Context) {
 	//reset params
 	param := k.GetParamSet(ctx)
 	k.SetParamSet(ctx, param)
+	logger.Info("end execute upgrade method", "method", "Init")
 }
 
 func (k Keeper) deleteGateways(ctx sdk.Context, prefix []byte, op func(key []byte)) {

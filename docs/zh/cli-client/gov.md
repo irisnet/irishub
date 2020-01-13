@@ -184,7 +184,7 @@ iriscli gov submit-proposal <flags>
 | --description            | string | 是       |       | 提案的描述信息                                                                                 |
 | --param                  | string |          |       | 提案修改的参数，例如`mint/Inflation=0.050`                                                     |
 | --title                  | string | 是       |       | 提案的标题                                                                                     |
-| --type                   | string | 是       |       | 提案的类型（PlainText/Parameter/SoftwareUpgrade/SoftwareHalt/CommunityTaxUsage/TokenAddition） |
+| --type                   | string | 是       |       | 提案的类型（PlainText/Parameter/SoftwareUpgrade/SoftwareHalt/CommunityTaxUsage） |
 | --version                | uint   |          | 0     | 升级的版本                                                                                     |
 | --software               | string |          |       | 新软件的地址                                                                                   |
 | --switch-height          | uint   |          | 0     | 软件升级过程中，切换的区块高度                                                                 |
@@ -218,17 +218,6 @@ iriscli gov submit-proposal --chain-id=irishub --title=<proposal-title> --descri
 
 ```bash
 iriscli gov submit-proposal --chain-id=irishub --title=<proposal-title> --description=<proposal-description> --from=<key-name> --fee=0.3iris --deposit=2000iris --type=SoftwareUpgrade --software=https://github.com/irisnet/irishub/tree/v0.15.1 --version=2 --switch-height=8000 --threshold=0.8
-```
-
-### 提交通证添加提案
-
-**所需参数：**
-
-- 必选: `--token-symbol`, `--token-canonical-symbol`, `--token-name`
-- 可选: `--token-decimal`, `--token-min-unit-alias`
-
-```bash
-iriscli gov submit-proposal --chain-id=irishub --title=<proposal-title> --description=<proposal-description> --from=<key-name> --fee=1iris --deposit=2000iris --type=TokenAddition --token-symbol=btc --token-canonical-symbol=btc --token-name=Bitcoin --token-decimal=18 --token-min-unit-alias=satoshi
 ```
 
 ## iriscli gov deposit

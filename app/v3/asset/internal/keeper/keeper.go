@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"fmt"
+	"github.com/tendermint/tendermint/libs/log"
 
 	"github.com/irisnet/irishub/app/v1/params"
 	"github.com/irisnet/irishub/app/v3/asset/internal/types"
@@ -30,9 +31,9 @@ func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, bk types.BankKeeper, codespac
 	}
 }
 
-// Codespace return the codespace
-func (k Keeper) Codespace() sdk.CodespaceType {
-	return k.codespace
+// Logger returns a module-specific logger.
+func (k Keeper) Logger(ctx sdk.Context) log.Logger {
+	return ctx.Logger().With("module", fmt.Sprintf("%s", types.MsgRoute))
 }
 
 // IssueToken issue a new token
