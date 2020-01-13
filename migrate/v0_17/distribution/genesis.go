@@ -26,13 +26,11 @@ type FeePool struct {
 }
 
 type ValidatorDistInfo struct {
-	OperatorAddr sdk.ValAddress `json:"operator_addr"`
-
-	FeePoolWithdrawalHeight int64 `json:"fee_pool_withdrawal_height"` // last height this validator withdrew from the global pool
-
-	DelAccum      TotalAccum   `json:"del_accum"`      // total accumulation factor held by delegators
-	DelPool       sdk.DecCoins `json:"del_pool"`       // rewards owed to delegators, commission has already been charged (includes proposer reward)
-	ValCommission sdk.DecCoins `json:"val_commission"` // commission collected by this validator (pending withdrawal)
+	OperatorAddr            sdk.ValAddress `json:"operator_addr"`
+	FeePoolWithdrawalHeight int64          `json:"fee_pool_withdrawal_height"` // last height this validator withdrew from the global pool
+	DelAccum                TotalAccum     `json:"del_accum"`                  // total accumulation factor held by delegators
+	DelPool                 sdk.DecCoins   `json:"del_pool"`                   // rewards owed to delegators, commission has already been charged (includes proposer reward)
+	ValCommission           sdk.DecCoins   `json:"val_commission"`             // commission collected by this validator (pending withdrawal)
 }
 
 type TotalAccum struct {

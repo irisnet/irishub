@@ -29,26 +29,22 @@ type Params struct {
 }
 
 type LastValidatorPower struct {
-	Address sdk.ValAddress
-	Power   sdk.Int
+	Address sdk.ValAddress `json:"address"`
+	Power   sdk.Int        `json:"power"`
 }
 
 type Validator struct {
-	OperatorAddr sdk.ValAddress `json:"operator_address"` // address of the validator's operator; bech encoded in JSON
-	ConsPubKey   crypto.PubKey  `json:"consensus_pubkey"` // the consensus public key of the validator; bech encoded in JSON
-	Jailed       bool           `json:"jailed"`           // has the validator been jailed from bonded status?
-
-	Status          sdk.BondStatus `json:"status"`           // validator status (bonded/unbonding/unbonded)
-	Tokens          sdk.Dec        `json:"tokens"`           // delegated tokens (incl. self-delegation)
-	DelegatorShares sdk.Dec        `json:"delegator_shares"` // total shares issued to a validator's delegators
-
-	Description Description `json:"description"` // description terms for the validator
-	BondHeight  int64       `json:"bond_height"` // earliest height as a bonded validator
-
-	UnbondingHeight  int64     `json:"unbonding_height"` // if unbonding, height at which this validator has begun unbonding
-	UnbondingMinTime time.Time `json:"unbonding_time"`   // if unbonding, min time for the validator to complete unbonding
-
-	Commission Commission `json:"commission"` // commission parameters
+	OperatorAddr     sdk.ValAddress `json:"operator_address"` // address of the validator's operator; bech encoded in JSON
+	ConsPubKey       crypto.PubKey  `json:"consensus_pubkey"` // the consensus public key of the validator; bech encoded in JSON
+	Jailed           bool           `json:"jailed"`           // has the validator been jailed from bonded status?
+	Status           sdk.BondStatus `json:"status"`           // validator status (bonded/unbonding/unbonded)
+	Tokens           sdk.Dec        `json:"tokens"`           // delegated tokens (incl. self-delegation)
+	DelegatorShares  sdk.Dec        `json:"delegator_shares"` // total shares issued to a validator's delegators
+	Description      Description    `json:"description"`      // description terms for the validator
+	BondHeight       int64          `json:"bond_height"`      // earliest height as a bonded validator
+	UnbondingHeight  int64          `json:"unbonding_height"` // if unbonding, height at which this validator has begun unbonding
+	UnbondingMinTime time.Time      `json:"unbonding_time"`   // if unbonding, min time for the validator to complete unbonding
+	Commission       Commission     `json:"commission"`       // commission parameters
 }
 
 type Description struct {

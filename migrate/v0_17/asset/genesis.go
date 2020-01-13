@@ -15,11 +15,9 @@ type GenesisState struct {
 }
 
 type Params struct {
-	AssetTaxRate         sdk.Dec  `json:"asset_tax_rate"`          // e.g., 40%
-	IssueTokenBaseFee    sdk.Coin `json:"issue_token_base_fee"`    // e.g., 300000*10^18iris-atto
-	MintTokenFeeRatio    sdk.Dec  `json:"mint_token_fee_ratio"`    // e.g., 10%
-	CreateGatewayBaseFee sdk.Coin `json:"create_gateway_base_fee"` // e.g., 600000*10^18iris-atto
-	GatewayAssetFeeRatio sdk.Dec  `json:"gateway_asset_fee_ratio"` // e.g., 10%
+	AssetTaxRate      sdk.Dec  `json:"asset_tax_rate"`       // e.g., 40%
+	IssueTokenBaseFee sdk.Coin `json:"issue_token_base_fee"` // e.g., 300000*10^18iris-atto
+	MintTokenFeeRatio sdk.Dec  `json:"mint_token_fee_ratio"` // e.g., 10%
 }
 
 type Tokens []FungibleToken

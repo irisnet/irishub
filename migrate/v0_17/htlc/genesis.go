@@ -9,7 +9,7 @@ import (
 )
 
 type GenesisState struct {
-	PendingHTLCs map[string]HTLC // claimable HTLCs
+	PendingHTLCs map[string]HTLC `json:"pending_htlcs"` // claimable HTLCs
 }
 
 type HTLC struct {
@@ -57,7 +57,7 @@ func HTLCStateFromString(str string) (HTLCState, error) {
 func (state HTLCState) Format(s fmt.State, verb rune) {
 	switch verb {
 	case 's':
-		s.Write([]byte(fmt.Sprintf("%s", state.String())))
+		s.Write([]byte(state.String()))
 	default:
 		s.Write([]byte(fmt.Sprintf("%v", byte(state))))
 	}

@@ -15,7 +15,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/auth/exported"
 	"github.com/cosmos/cosmos-sdk/x/genutil"
-	"github.com/irisnet/irishub/migrate/v0_16"
+	"github.com/irisnet/irishub/migrate/v0_17"
 )
 
 const (
