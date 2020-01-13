@@ -2,10 +2,10 @@ package cli
 
 import (
 	"fmt"
-	"github.com/irisnet/irishub/app/v3/asset"
 	"strings"
 	"testing"
 
+	"github.com/irisnet/irishub/app/v3/asset"
 	"github.com/irisnet/irishub/tests"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/stretchr/testify/require"
