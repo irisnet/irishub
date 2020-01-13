@@ -32,13 +32,14 @@ func TestKeeperIssueToken(t *testing.T) {
 
 	acc := ak.NewAccountWithAddress(ctx, addr)
 
-	ft := types.NewFungibleToken("btc", "btc", 1, sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), true, acc.GetAddress())
-	_, err := keeper.IssueToken(ctx, ft)
+	msg := types.NewMsgIssueToken("btc", "satoshi", "Bitcoin Network", 18, 21000000, 21000000, false, acc.GetAddress())
+	_, err := keeper.IssueToken(ctx, msg)
 	assert.NoError(t, err)
 
-	assert.True(t, keeper.HasToken(ctx, types.GetTokenID(ft.Symbol)))
+	assert.True(t, keeper.HasToken(ctx, types.GetTokenID(msg.Symbol)))
 
-	token, err := keeper.getToken(ctx, types.GetTokenID(ft.Symbol))
+	token, err := keeper.getToken(ctx, types.GetTokenID(msg.Symbol))
+	ft := types.NewFungibleToken(msg.Symbol, msg.Name, msg.MinUnitAlias, msg.Decimal, sdk.NewIntWithDecimal(int64(msg.InitialSupply), int(msg.Decimal)), sdk.NewIntWithDecimal(int64(msg.MaxSupply), int(msg.Decimal)), msg.Mintable, msg.Owner)
 	assert.NoError(t, err)
 	assert.Equal(t, ft, token)
 }
@@ -59,14 +60,15 @@ func TestKeeperEditToken(t *testing.T) {
 
 	acc := ak.NewAccountWithAddress(ctx, addr)
 
-	ft := types.NewFungibleToken("btc", "btc", 1, sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(21000000, 0), true, acc.GetAddress())
+	msg := types.NewMsgIssueToken("btc", "satoshi", "Bitcoin Network", 18, 21000000, 21000000, false, acc.GetAddress())
 
-	_, err := keeper.IssueToken(ctx, ft)
+	_, err := keeper.IssueToken(ctx, msg)
 	assert.NoError(t, err)
 
-	assert.True(t, keeper.HasToken(ctx, types.GetTokenID(ft.Symbol)))
+	assert.True(t, keeper.HasToken(ctx, types.GetTokenID(msg.Symbol)))
 
-	token, err := keeper.getToken(ctx, types.GetTokenID(ft.Symbol))
+	token, err := keeper.getToken(ctx, types.GetTokenID(msg.Symbol))
+	ft := types.NewFungibleToken(msg.Symbol, msg.Name, msg.MinUnitAlias, msg.Decimal, sdk.NewIntWithDecimal(int64(msg.InitialSupply), int(msg.Decimal)), sdk.NewIntWithDecimal(int64(msg.MaxSupply), int(msg.Decimal)), msg.Mintable, msg.Owner)
 	assert.NoError(t, err)
 	assert.Equal(t, ft, token)
 
@@ -107,13 +109,14 @@ func TestMintToken(t *testing.T) {
 	assert.NoError(t, err)
 	ak.IncreaseTotalLoosenToken(ctx, coin)
 
-	ft := types.NewFungibleToken("btc", "btc", 0, sdk.NewIntWithDecimal(1000, 0), sdk.NewIntWithDecimal(10000, 0), true, acc.GetAddress())
-	_, err = keeper.IssueToken(ctx, ft)
+	msg := types.NewMsgIssueToken("btc", "satoshi", "Bitcoin Network", 0, 1000, 2100, true, acc.GetAddress())
+	_, err = keeper.IssueToken(ctx, msg)
 	assert.NoError(t, err)
 
-	assert.True(t, keeper.HasToken(ctx, types.GetTokenID(ft.Symbol)))
+	assert.True(t, keeper.HasToken(ctx, types.GetTokenID(msg.Symbol)))
 
-	token, err := keeper.getToken(ctx, types.GetTokenID(ft.Symbol))
+	token, err := keeper.getToken(ctx, types.GetTokenID(msg.Symbol))
+	ft := types.NewFungibleToken(msg.Symbol, msg.Name, msg.MinUnitAlias, msg.Decimal, sdk.NewIntWithDecimal(int64(msg.InitialSupply), int(msg.Decimal)), sdk.NewIntWithDecimal(int64(msg.MaxSupply), int(msg.Decimal)), msg.Mintable, msg.Owner)
 	assert.NoError(t, err)
 	assert.Equal(t, ft, token)
 
@@ -143,14 +146,14 @@ func TestTransferOwnerKeeper(t *testing.T) {
 
 	acc := ak.NewAccountWithAddress(ctx, srcOwner)
 
-	ft := types.NewFungibleToken("btc", "btc", 1, sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(21000000, 0), true, acc.GetAddress())
-
-	_, err := keeper.IssueToken(ctx, ft)
+	issueMsg := types.NewMsgIssueToken("btc", "satoshi", "Bitcoin Network", 18, 21000000, 21000000, false, acc.GetAddress())
+	_, err := keeper.IssueToken(ctx, issueMsg)
 	assert.NoError(t, err)
 
-	assert.True(t, keeper.HasToken(ctx, types.GetTokenID(ft.Symbol)))
+	assert.True(t, keeper.HasToken(ctx, types.GetTokenID(issueMsg.Symbol)))
 
-	tokenSrc, err := keeper.getToken(ctx, types.GetTokenID(ft.Symbol))
+	tokenSrc, err := keeper.getToken(ctx, types.GetTokenID(issueMsg.Symbol))
+	ft := types.NewFungibleToken(issueMsg.Symbol, issueMsg.Name, issueMsg.MinUnitAlias, issueMsg.Decimal, sdk.NewIntWithDecimal(int64(issueMsg.InitialSupply), int(issueMsg.Decimal)), sdk.NewIntWithDecimal(int64(issueMsg.MaxSupply), int(issueMsg.Decimal)), issueMsg.Mintable, issueMsg.Owner)
 	assert.NoError(t, err)
 
 	assert.Equal(t, ft, tokenSrc)

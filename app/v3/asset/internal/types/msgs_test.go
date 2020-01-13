@@ -22,20 +22,19 @@ func TestMsgIssueAsset(t *testing.T) {
 		MsgIssueToken
 		expectPass bool
 	}{
-		{"native basic good", NewMsgIssueToken(FUNGIBLE, NATIVE, "a", "btc", "btc", "btc", 18, "satoshi", 1, 1, true, addr), true},
-		{"native family error", NewMsgIssueToken(0x02, NATIVE, "b", "btc", "btc", "btc", 1, "satoshi", 1, 1, true, addr), false},
-		{"native symbol empty", NewMsgIssueToken(FUNGIBLE, NATIVE, "d", "", "btc", "btc", 1, "g", 1, 1, true, addr), false},
-		{"native symbol error", NewMsgIssueToken(FUNGIBLE, NATIVE, "e", "ab,c", "btc", "btc", 1, "satoshi", 1, 1, true, addr), false},
-		{"native symbol first letter is num", NewMsgIssueToken(FUNGIBLE, NATIVE, "e", "4iris", "btc", "btc", 1, "satoshi", 1, 1, true, addr), false},
-		{"native symbol too long", NewMsgIssueToken(FUNGIBLE, NATIVE, "e", "aaaaaaaaa", "btc", "btc", 1, "satoshi", 1, 1, true, addr), false},
-		{"native symbol too short", NewMsgIssueToken(FUNGIBLE, NATIVE, "e", "a", "btc", "btc", 1, "satoshi", 1, 1, true, addr), false},
-		{"native name empty", NewMsgIssueToken(FUNGIBLE, NATIVE, "h", "btc", "btc", "", 1, "btc", 1, 1, true, addr), false},
-		{"native name blank", NewMsgIssueToken(FUNGIBLE, NATIVE, "h", "btc", "btc", "  ", 1, "btc", 1, 1, true, addr), false},
-		{"native name too long", NewMsgIssueToken(FUNGIBLE, NATIVE, "i", "btc", "btc", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 1, "satoshi", 1, 1, true, addr), false},
-		{"native initial supply is zero", NewMsgIssueToken(FUNGIBLE, NATIVE, "j", "btc", "btc", "btc", 1, "satoshi", 0, 1, true, addr), true},
-		{"native max supply is zero", NewMsgIssueToken(FUNGIBLE, NATIVE, "k", "btc", "btc", "btc", 1, "satoshi", 1, 0, true, addr), true},
-		{"native init supply bigger than max supply", NewMsgIssueToken(FUNGIBLE, NATIVE, "l", "btc", "btc", "btc", 1, "satoshi", 2, 1, true, addr), false},
-		{"native decimal error", NewMsgIssueToken(FUNGIBLE, NATIVE, "m", "btc", "btc", "btc", 19, "satoshi", 1, 1, true, addr), false},
+		{"basic good", NewMsgIssueToken("btc", "satoshi", "Bitcoin Network", 18, 1, 1, true, addr), true},
+		{"symbol empty", NewMsgIssueToken("", "satoshi", "Bitcoin Network", 18, 1, 1, true, addr), false},
+		{"symbol error", NewMsgIssueToken("b&tc", "satoshi", "Bitcoin Network", 18, 1, 1, true, addr), false},
+		{"symbol first letter is num", NewMsgIssueToken("4btc", "satoshi", "Bitcoin Network", 18, 1, 1, true, addr), false},
+		{"symbol too long", NewMsgIssueToken("btc1111111111", "satoshi", "Bitcoin Network", 18, 1, 1, true, addr), false},
+		{"symbol too short", NewMsgIssueToken("ht", "satoshi", "Bitcoin Network", 18, 1, 1, true, addr), false},
+		{"name empty", NewMsgIssueToken("btc", "satoshi", "", 18, 1, 1, true, addr), false},
+		{"name blank", NewMsgIssueToken("btc", "satoshi", " ", 18, 1, 1, true, addr), false},
+		{"name too long", NewMsgIssueToken("btc", "satoshi", "Bitcoin Network aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 18, 1, 1, true, addr), false},
+		{"initial supply is zero", NewMsgIssueToken("btc", "satoshi", "Bitcoin Network", 18, 0, 1, true, addr), true},
+		{"max supply is zero", NewMsgIssueToken("btc", "satoshi", "Bitcoin Network", 18, 1, 0, true, addr), true},
+		{"init supply bigger than max supply", NewMsgIssueToken("btc", "satoshi", "Bitcoin Network", 18, 2, 1, true, addr), false},
+		{"decimal error", NewMsgIssueToken("btc", "satoshi", "Bitcoin Network", 30, 1, 1, true, addr), false},
 	}
 
 	for _, tc := range tests {

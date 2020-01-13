@@ -30,7 +30,7 @@ func TestExportGenesis(t *testing.T) {
 	// add token
 	addr := sdk.AccAddress([]byte("addr1"))
 	acc := ak.NewAccountWithAddress(ctx, addr)
-	ft := NewFungibleToken("bch", "bch", 1, sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), true, acc.GetAddress())
+	ft := NewFungibleToken("bch", "Bitcoin Network", "satoshi", 1, sdk.NewIntWithDecimal(1, 0), sdk.NewIntWithDecimal(1, 0), true, acc.GetAddress())
 
 	genesis := GenesisState{
 		Params: DefaultParams(),
