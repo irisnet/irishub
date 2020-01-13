@@ -89,7 +89,7 @@ func ValidateResponseError(schemas string, errResp string) sdk.Error {
 func validateInputSchema(inputSchema map[string]interface{}) sdk.Error {
 	inputSchemaBz, err := json.Marshal(inputSchema)
 	if err != nil {
-		return ErrInvalidSchemas(DefaultCodespace, fmt.Sprintf("invalid input schema: %s", err))
+		return ErrInvalidSchemas(DefaultCodespace, fmt.Sprintf("failed to marshal the input schema: %s", err))
 	}
 
 	_, err = gojsonschema.NewSchema(gojsonschema.NewBytesLoader(inputSchemaBz))
@@ -103,7 +103,7 @@ func validateInputSchema(inputSchema map[string]interface{}) sdk.Error {
 func validateOutputSchema(outputSchema map[string]interface{}) sdk.Error {
 	outputSchemaBz, err := json.Marshal(outputSchema)
 	if err != nil {
-		return ErrInvalidSchemas(DefaultCodespace, fmt.Sprintf("invalid output schema: %s", err))
+		return ErrInvalidSchemas(DefaultCodespace, fmt.Sprintf("failed to marshal the output schema: %s", err))
 	}
 
 	_, err = gojsonschema.NewSchema(gojsonschema.NewBytesLoader(outputSchemaBz))
@@ -117,7 +117,7 @@ func validateOutputSchema(outputSchema map[string]interface{}) sdk.Error {
 func validateErrorSchema(errSchema map[string]interface{}) sdk.Error {
 	errSchemaBz, err := json.Marshal(errSchema)
 	if err != nil {
-		return ErrInvalidSchemas(DefaultCodespace, fmt.Sprintf("invalid error schema: %s", err))
+		return ErrInvalidSchemas(DefaultCodespace, fmt.Sprintf("failed to marshal the err schema: %s", err))
 	}
 
 	_, err = gojsonschema.NewSchema(gojsonschema.NewBytesLoader(errSchemaBz))
