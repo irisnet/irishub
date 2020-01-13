@@ -2354,27 +2354,12 @@ paths:
                   $ref: '#/components/schemas/BaseTx'
                 owner:
                   $ref: '#/components/schemas/Address'
-                family:
-                  type: string
-                  example: 'fungible'
-                source:
-                  type: string
-                  example: 'native'
-                gateway:
-                  type: string
-                  example: ''
                 name:
                   type: string
                   example: 'Hello Kitty'
                 symbol:
                   type: string
                   example: 'cat'
-                canonical_symbol:
-                  type: string
-                  example: ''
-                min_unit_alias:
-                  type: string
-                  example: 'kitty'
                 initial_supply:
                   type: string
                   example: '1000000000'
@@ -2401,20 +2386,8 @@ paths:
         - Asset
       parameters:
         - in: query
-          name: source
-          description: 'the source of the destination token, options: native, external, gateway'
-          required: false
-          schema:
-            type: string
-        - in: query
           name: owner
           description: 'the owner address of the destination token, optional when source is native, ignored when source is not native'
-          required: false
-          schema:
-            type: string
-        - in: query
-          name: gateway
-          description: 'the gateway moniker of the destination token, optional when source is gateway'
           required: false
           schema:
             type: string
@@ -2429,14 +2402,14 @@ paths:
           description: Invalid token id
         '500':
           description: Internal Server Error
-  '/asset/tokens/{id}':
+  '/asset/tokens/{token-id}':
     get:
       summary: Query token by unique id
       tags:
         - Asset
       parameters:
         - in: path
-          name: id
+          name: token-id
           description: the unique id of the token
           required: true
           schema:
@@ -2456,7 +2429,7 @@ paths:
       summary: Edit token information
       parameters:
         - in: path
-          name: id
+          name: token-id
           description: unique id of token
           required: true
           schema:
@@ -2480,12 +2453,6 @@ paths:
                   $ref: '#/components/schemas/BaseTx'
                 owner:
                   $ref: '#/components/schemas/Address'
-                canonical_symbol:
-                  type: string
-                  example: 'btc'
-                min_unit_alias:
-                  type: string
-                  example: 'satoshi'
                 max_supply:
                   type: int
                   example: '21000000'
@@ -2495,12 +2462,12 @@ paths:
                 name:
                   type: string
                   example: 'BTC Token'
-  '/asset/tokens/{id}/mint':
+  '/asset/tokens/{token-id}/mint':
     post:
       summary: The asset owner and operator can directly mint tokens to a specified address
       parameters:
         - in: path
-          name: id
+          name: token-id
           description: unique id of token
           required: true
           schema:
@@ -2529,12 +2496,12 @@ paths:
                 amount:
                   type: int
                   example: '21000000'
-  '/asset/tokens/{id}/transfer-owner':
+  '/asset/tokens/{token-id}/transfer':
     post:
       summary: Transfer token to a new owner
       parameters:
         - in: path
-          name: id
+          name: token-id
           description: unique id of token
           required: true
           schema:
@@ -2560,180 +2527,15 @@ paths:
                   $ref: '#/components/schemas/Address'
                 dst_owner:
                   $ref: '#/components/schemas/Address'
-  '/asset/gateways/{moniker}':
+  '/asset/tokens/{symbol}/fee':
     get:
-      summary: Query the gateway with the specified moniker
+      summary: Query the fees for the issuance and minting of the token with the given symbol
       tags:
         - Asset
       parameters:
         - in: path
-          name: moniker
-          description: the unique name of the destination gateway
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Gateway'
-        '400':
-          description: Invalid moniker
-        '500':
-          description: Internal Server Error
-    put:
-      summary: Edit an existing gateway
-      tags:
-        - Asset
-      parameters:
-        - in: path
-          name: moniker
-          description: the unique name of the destination gateway
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Unsigned tx was succesfully generated
-        '400':
-          description: Invalid parameters
-        '500':
-          description: Internal Server Error
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                base_tx:
-                  $ref: '#/components/schemas/BaseTx'
-                owner:
-                  $ref: '#/components/schemas/Address'
-                identity:
-                  type: string
-                details:
-                  type: string
-                website:
-                  type: string
-  '/asset/gateways':
-    get:
-      summary: Get all the gateways with an optional owner
-      tags:
-        - Asset
-      parameters:
-        - in: query
-          name: owner
-          description: the owner address to be queried
-          required: false
-          schema:
-            type: string
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Gateway'
-        '400':
-          description: Invalid owner address if the owner is given
-        '500':
-          description: Internal Server Error
-    post:
-      summary: Create a gateway
-      tags:
-        - Asset
-      responses:
-        '200':
-          description: Unsigned tx was succesfully generated
-        '400':
-          description: Invalid parameters
-        '500':
-          description: Internal Server Error
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                base_tx:
-                  $ref: '#/components/schemas/BaseTx'
-                owner:
-                  $ref: '#/components/schemas/Address'
-                moniker:
-                  type: string
-                identity:
-                  type: string
-                details:
-                  type: string
-                website:
-                  type: string
-  '/asset/gateways/{moniker}/transfer':
-    post:
-      summary: Transfer the owner of a gateway
-      tags:
-        - Asset
-      parameters:
-        - in: path
-          name: moniker
-          description: the unique name of the destination gateway
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Unsigned tx was succesfully generated
-        '400':
-          description: Invalid parameters
-        '500':
-          description: Internal Server Error
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                base_tx:
-                  $ref: '#/components/schemas/BaseTx'
-                owner:
-                  $ref: '#/components/schemas/Address'
-                to:
-                  $ref: '#/components/schemas/Address'
-  '/asset/fees/gateways/{moniker}':
-    get:
-      summary: Query the fee for the creation of the gateway with the given moniker
-      tags:
-        - Asset
-      parameters:
-        - in: path
-          name: moniker
-          description: the unique name of a gateway
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GatewayFeeOutput'
-        '400':
-          description: Invalid moniker
-        '500':
-          description: Internal Server Error
-  '/asset/fees/tokens/{id}':
-    get:
-      summary: Query the fees for the issuance and minting of the token with the given id
-      tags:
-        - Asset
-      parameters:
-        - in: path
-          name: id
-          description: the token id
+          name: symbol
+          description: the token symbol
           required: true
           schema:
             type: string
@@ -3695,11 +3497,11 @@ components:
     Token:
       type: object
       properties:
+        id:
+          type: string
         family:
           type: string
         source:
-          type: string
-        gateway:
           type: string
         symbol:
           type: string
@@ -3707,10 +3509,6 @@ components:
           type: string
         decimal:
           type: integer
-        canonical_symbol:
-          type: string
-        min_unit_alias:
-          type: string
         initial_supply:
           type: string
         max_supply:
@@ -3719,19 +3517,6 @@ components:
           type: boolean
         owner:
           $ref: '#/components/schemas/Address'
-    Gateway:
-      type: object
-      properties:
-        owner:
-          $ref: '#/components/schemas/Address'
-        moniker:
-          type: string
-        identity:
-          type: string
-        details:
-          type: string
-        website:
-          type: string
     GatewayFeeOutput:
       type: object
       properties:
