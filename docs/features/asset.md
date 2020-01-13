@@ -14,11 +14,6 @@ IRISHub allows individuals and companies to create and issue their own tokens fo
 All you need to do in order to create a new `native asset` is to execute a one-line command, defining your preferred parameters for your coin, such as supply, symbol, description etc. From that point on, you can issue some of your coins to whomever you want just like sending iris.
 As the owner of that asset, you don’t need to take care of any technical details of blockchain technology, such as distributed consensus algorithms, blockchain development or integration. You don’t even need to run any mining equipment or servers, at all.
 
-#### External Assets
-
-Instead of creating a `native asset` where the full control over supply is under the issuer, we can also create an `external asset` which already exists on another blockchain and let the market deal with demand and supply.
-The only way to create an `external asset` is by submitting an `TokenAddition` proposal via Governance, except that the top 20 CMC tokens are pre-configured in the system for users' convenience.
-
 ### Gateways
 
 A gateway is a trusted party that facilitates moving value into and out of the IRIS Network. Gateways are basically equivalent to the standard exchange model where you depend on the solvency of the exchange to be able to redeem your coins. Generally gateways issue [native assets](#native-assets) prefixed with their symbol, like GDEX, OPEN, and so on. These assets are backed 100% by the real BTC or ETH or any other coin that people deposit in the gateways.

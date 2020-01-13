@@ -2,9 +2,9 @@ package keeper
 
 import (
 	"fmt"
-	"github.com/irisnet/irishub/app/v1/auth"
 	"strconv"
 
+	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/app/v1/distribution/types"
 	sdk "github.com/irisnet/irishub/types"
 )

@@ -40,6 +40,7 @@ const (
 	CodeInvalidUpgradeParams         sdk.CodeType = 28
 	CodeEmptyParam                   sdk.CodeType = 29
 	CodeInvalidParamNum              sdk.CodeType = 30
+	CodeNotEnoughCommunityTax        sdk.CodeType = 31
 )
 
 //----------------------------------------
@@ -161,4 +162,8 @@ func ErrInvalidUpgradeThreshold(codespace sdk.CodespaceType, Threshold sdk.Dec) 
 
 func ErrNotEnoughInitialDeposit(codespace sdk.CodespaceType, initialDeposit sdk.Coins, minDeposit sdk.Coins) sdk.Error {
 	return sdk.NewError(codespace, CodeNotEnoughInitialDeposit, fmt.Sprintf("Initial Deposit [%s] is less than minInitialDeposit [%s]", initialDeposit.String(), minDeposit.String()))
+}
+
+func ErrNotEnoughCommunityTax(codespace sdk.CodespaceType, taxCoins sdk.Coins, amount sdk.Coins) sdk.Error {
+	return sdk.NewError(codespace, CodeNotEnoughCommunityTax, fmt.Sprintf("community tax account [%s] is not enough to cover usage amount [%s]", taxCoins, amount))
 }

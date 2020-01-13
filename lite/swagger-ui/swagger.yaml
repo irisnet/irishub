@@ -1202,13 +1202,11 @@ paths:
                   $ref: '#/components/schemas/Param'
                 comm_tax:
                   $ref: '#/components/schemas/CommTax'
-                token:
-                  $ref: '#/components/schemas/TokenAddition'
                 upgrade:
                   $ref: '#/components/schemas/Upgrade'
         description: >-
           valid value of `"proposal_type"` can be `"PlainText"`, `"Parameter"`,
-          `"SoftwareUpgrade"`, `"SystemHalt"`,`"CommunityTaxUsage"`,`"TokenAddition"`
+          `"SoftwareUpgrade"`, `"SystemHalt"`,`"CommunityTaxUsage"`
         required: true
     get:
       summary: Query proposals
@@ -3809,9 +3807,10 @@ components:
         dest_address:
           type: string
           example: 'faa1ezzh0humhy3329xg4avhcjtay985nll0zswc5j'
-        percent:
-          type: string
-          example: '0.8'
+        amount:
+          type: array
+          items:
+            $ref: '#/components/schemas/Coin'
     TokenAddition:
       type: object
       properties:

@@ -278,7 +278,6 @@ func (p *ProtocolV3) configKeepers() {
 		&stakeKeeper,
 		gov.DefaultCodespace,
 		gov.PrometheusMetrics(p.config),
-		p.assetKeeper,
 	)
 
 	p.randKeeper = rand.NewKeeper(p.cdc, protocol.KeyRand, rand.DefaultCodespace)
