@@ -11,8 +11,8 @@ import (
 func NewHandler(k Keeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
 		switch msg := msg.(type) {
-		case MsgSvcDef:
-			return handleMsgSvcDef(ctx, k, msg)
+		case MsgDefineService:
+			return handleMsgDefineService(ctx, k, msg)
 		case MsgSvcBind:
 			return handleMsgSvcBind(ctx, k, msg)
 		case MsgSvcBindingUpdate:
@@ -40,16 +40,14 @@ func NewHandler(k Keeper) sdk.Handler {
 	}
 }
 
-// handleMsgSvcDef handles MsgSvcDef
-func handleMsgSvcDef(ctx sdk.Context, k Keeper, msg MsgSvcDef) sdk.Result {
+// handleMsgDefineService handles MsgDefineService
+func handleMsgDefineService(ctx sdk.Context, k Keeper, msg MsgDefineService) sdk.Result {
 	if err := k.AddServiceDefinition(
-		ctx, msg.Name, msg.ChainID, msg.Description, msg.Tags,
-		msg.Author, msg.AuthorDescription, msg.IDLContent,
+		ctx, msg.Name, msg.Description, msg.Tags,
+		msg.Author, msg.AuthorDescription, msg.Schemas,
 	); err != nil {
 		return err.Result()
 	}
-
-	ctx.Logger().Info("Create service definition", "name", msg.Name, "author", msg.Author.String())
 
 	return sdk.Result{}
 }

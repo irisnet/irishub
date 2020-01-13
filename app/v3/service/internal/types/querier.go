@@ -13,16 +13,9 @@ const (
 	QueryFees       = "fees"       // QueryFees
 )
 
-// QueryServiceParams
-type QueryServiceParams struct {
-	DefChainID  string
+// QueryDefinitionParams defines the params to query a service definition
+type QueryDefinitionParams struct {
 	ServiceName string
-}
-
-// DefinitionOutput
-type DefinitionOutput struct {
-	Definition SvcDef           `json:"definition"`
-	Methods    []MethodProperty `json:"methods"`
 }
 
 // QueryBindingParams

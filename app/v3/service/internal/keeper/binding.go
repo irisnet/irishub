@@ -21,8 +21,8 @@ func (k Keeper) AddServiceBinding(
 	prices []sdk.Coin,
 	level types.Level,
 ) sdk.Error {
-	if _, found := k.GetServiceDefinition(ctx, defChainID, defName); !found {
-		return types.ErrSvcDefNotExists(k.codespace, defChainID, defName)
+	if _, found := k.GetServiceDefinition(ctx, defName); !found {
+		return types.ErrUnknownServiceDefinition(k.codespace, defName)
 	}
 
 	if _, found := k.GetServiceBinding(ctx, defChainID, defName, bindChainID, provider); found {
@@ -39,10 +39,6 @@ func (k Keeper) AddServiceBinding(
 	}
 
 	svcBinding := types.NewSvcBinding(ctx, defChainID, defName, bindChainID, provider, bindingType, deposit, prices, level, true)
-
-	if err := k.validateMethodPrices(ctx, svcBinding); err != nil {
-		return err
-	}
 
 	// Send coins from the provider's account to DepositedCoinsAccAddr
 	_, err = k.bk.SendCoins(ctx, svcBinding.Provider, auth.ServiceDepositCoinsAccAddr, svcBinding.Deposit)
@@ -110,9 +106,6 @@ func (k Keeper) UpdateServiceBinding(
 		deposit, prices, level, false)
 
 	if len(prices) > 0 {
-		if err := k.validateMethodPrices(ctx, newBinding); err != nil {
-			return svcBinding, err
-		}
 		oldBinding.Prices = newBinding.Prices
 	}
 
@@ -270,34 +263,13 @@ func (k Keeper) getMinDeposit(ctx sdk.Context, prices []sdk.Coin) (sdk.Coins, sd
 	params := k.GetParamSet(ctx)
 	// min deposit must >= sum(method price) * minDepositMultiple
 	minDepositMultiple := sdk.NewInt(params.MinDepositMultiple)
-
 	var minDeposit sdk.Coins
 	for _, price := range prices {
 		if price.Amount.BigInt().BitLen()+minDepositMultiple.BigInt().BitLen()-1 > 255 {
 			return minDeposit, sdk.NewError(k.codespace, types.CodeIntOverflow, fmt.Sprintf("Int Overflow"))
 		}
-
 		minInt := price.Amount.Mul(minDepositMultiple)
 		minDeposit = minDeposit.Add(sdk.NewCoins(sdk.NewCoin(price.Denom, minInt)))
 	}
-
 	return minDeposit, nil
-}
-
-func (k Keeper) validateMethodPrices(ctx sdk.Context, svcBinding types.SvcBinding) sdk.Error {
-	iterator := k.GetMethods(ctx, svcBinding.DefChainID, svcBinding.DefName)
-	defer iterator.Close()
-
-	var methods []types.MethodProperty
-	for ; iterator.Valid(); iterator.Next() {
-		var method types.MethodProperty
-		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &method)
-		methods = append(methods, method)
-	}
-
-	if len(methods) != len(svcBinding.Prices) {
-		return types.ErrInvalidPriceCount(k.Codespace(), len(svcBinding.Prices), len(methods))
-	}
-
-	return nil
 }
