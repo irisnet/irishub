@@ -1,9 +1,6 @@
 package asset
 
 import (
-	"fmt"
-	"strings"
-
 	sdk "github.com/irisnet/irishub/types"
 )
 
@@ -13,14 +10,8 @@ func NewHandler(k Keeper) sdk.Handler {
 		switch msg := msg.(type) {
 		case MsgIssueToken:
 			return handleIssueToken(ctx, k, msg)
-		case MsgCreateGateway:
-			return handleMsgCreateGateway(ctx, k, msg)
-		case MsgEditGateway:
-			return handleMsgEditGateway(ctx, k, msg)
 		case MsgEditToken:
 			return handleMsgEditToken(ctx, k, msg)
-		case MsgTransferGatewayOwner:
-			return handleMsgTransferGatewayOwner(ctx, k, msg)
 		case MsgMintToken:
 			return handleMsgMintToken(ctx, k, msg)
 		case MsgTransferTokenOwner:
@@ -28,75 +19,20 @@ func NewHandler(k Keeper) sdk.Handler {
 		default:
 			return sdk.ErrTxDecode("invalid message parse in asset module").Result()
 		}
-
-		return sdk.ErrTxDecode("invalid message parse in asset module").Result()
 	}
 }
 
 // handleIssueToken handles MsgIssueToken
 func handleIssueToken(ctx sdk.Context, k Keeper, msg MsgIssueToken) sdk.Result {
-	var token FungibleToken
-	switch msg.Family {
-	case FUNGIBLE:
-		decimal := int(msg.Decimal)
-		token = NewFungibleToken(msg.Source, msg.Gateway, msg.Symbol, msg.Name, msg.Decimal, msg.CanonicalSymbol, msg.MinUnitAlias, sdk.NewIntWithDecimal(int64(msg.InitialSupply), decimal), sdk.NewIntWithDecimal(int64(msg.MaxSupply), decimal), msg.Mintable, msg.Owner)
-	default:
-		return ErrInvalidAssetFamily(DefaultCodespace, fmt.Sprintf("invalid asset family type %s", msg.Family)).Result()
+	// handle fee for token
+	if err := k.DeductIssueTokenFee(ctx, msg.Owner, msg.Symbol); err != nil {
+		return err.Result()
 	}
-
-	switch msg.Source {
-	case NATIVE:
-		// handle fee for native token
-		if err := TokenIssueFeeHandler(ctx, k, msg.Owner, msg.Symbol); err != nil {
-			return err.Result()
-		}
-		break
-	case GATEWAY:
-		// handle fee for gateway token
-		if err := GatewayTokenIssueFeeHandler(ctx, k, msg.Owner, msg.Symbol); err != nil {
-			return err.Result()
-		}
-		break
-	default:
-		break
-	}
-
+	decimal := int(msg.Decimal)
+	token := NewFungibleToken(msg.Symbol, msg.Name, msg.Decimal,
+		sdk.NewIntWithDecimal(int64(msg.InitialSupply), decimal),
+		sdk.NewIntWithDecimal(int64(msg.MaxSupply), decimal), msg.Mintable, msg.Owner)
 	tags, err := k.IssueToken(ctx, token)
-	if err != nil {
-		return err.Result()
-	}
-
-	return sdk.Result{
-		Tags: tags,
-	}
-}
-
-// handleMsgCreateGateway handles MsgCreateGateway
-func handleMsgCreateGateway(ctx sdk.Context, k Keeper, msg MsgCreateGateway) sdk.Result {
-	// handle fee
-	if err := GatewayCreateFeeHandler(ctx, k, msg.Owner, msg.Moniker); err != nil {
-		return err.Result()
-	}
-
-	// convert moniker to lowercase
-	msg.Moniker = strings.ToLower(msg.Moniker)
-
-	tags, err := k.CreateGateway(ctx, msg)
-	if err != nil {
-		return err.Result()
-	}
-
-	return sdk.Result{
-		Tags: tags,
-	}
-}
-
-// handleMsgEditGateway handles MsgEditGateway
-func handleMsgEditGateway(ctx sdk.Context, k Keeper, msg MsgEditGateway) sdk.Result {
-	// convert moniker to lowercase
-	msg.Moniker = strings.ToLower(msg.Moniker)
-
-	tags, err := k.EditGateway(ctx, msg)
 	if err != nil {
 		return err.Result()
 	}
@@ -117,21 +53,6 @@ func handleMsgEditToken(ctx sdk.Context, k Keeper, msg MsgEditToken) sdk.Result 
 	}
 }
 
-// handleMsgTransferGatewayOwner handles MsgTransferGatewayOwner
-func handleMsgTransferGatewayOwner(ctx sdk.Context, k Keeper, msg MsgTransferGatewayOwner) sdk.Result {
-	// convert moniker to lowercase
-	msg.Moniker = strings.ToLower(msg.Moniker)
-
-	tags, err := k.TransferGatewayOwner(ctx, msg)
-	if err != nil {
-		return err.Result()
-	}
-
-	return sdk.Result{
-		Tags: tags,
-	}
-}
-
 // handleMsgTransferTokenOwner handles MsgTransferTokenOwner
 func handleMsgTransferTokenOwner(ctx sdk.Context, k Keeper, msg MsgTransferTokenOwner) sdk.Result {
 	tags, err := k.TransferTokenOwner(ctx, msg)
@@ -146,6 +67,11 @@ func handleMsgTransferTokenOwner(ctx sdk.Context, k Keeper, msg MsgTransferToken
 
 // handleMsgMintToken handles MsgMintToken
 func handleMsgMintToken(ctx sdk.Context, k Keeper, msg MsgMintToken) sdk.Result {
+	_, symbol := GetTokenIDParts(msg.TokenId)
+	if err := k.DeductMintTokenFeeFee(ctx, msg.Owner, symbol); err != nil {
+		return err.Result()
+	}
+
 	tags, err := k.MintToken(ctx, msg)
 	if err != nil {
 		return err.Result()

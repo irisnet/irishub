@@ -1,6 +1,7 @@
 package lcd
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -12,24 +13,6 @@ import (
 )
 
 func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec) {
-	// create a gateway
-	r.HandleFunc(
-		"/asset/gateways",
-		createGatewayHandlerFn(cdc, cliCtx),
-	).Methods("POST")
-
-	// edit a gateway
-	r.HandleFunc(
-		"/asset/gateways/{moniker}",
-		editGatewayHandlerFn(cdc, cliCtx),
-	).Methods("PUT")
-
-	// transfer the ownership of a gateway
-	r.HandleFunc(
-		"/asset/gateways/{moniker}/transfer",
-		transferGatewayOwnerHandlerFn(cdc, cliCtx),
-	).Methods("POST")
-
 	// issue a token
 	r.HandleFunc(
 		"/asset/tokens",
@@ -38,70 +21,40 @@ func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec
 
 	// edit a token
 	r.HandleFunc(
-		"/asset/tokens/{token-id}",
+		fmt.Sprintf("/asset/tokens/{%s}", RestParamTokenID),
 		editTokenHandlerFn(cdc, cliCtx),
 	).Methods("PUT")
 
 	// transfer owner
 	r.HandleFunc(
-		"/asset/tokens/{token-id}/transfer-owner",
+		fmt.Sprintf("/asset/tokens/{%s}/transfer", RestParamTokenID),
 		transferOwnerHandlerFn(cdc, cliCtx),
 	).Methods("POST")
 
 	// mint token
 	r.HandleFunc(
-		"/asset/tokens/{token-id}/mint",
+		fmt.Sprintf("/asset/tokens/{%s}/mint", RestParamTokenID),
 		mintTokenHandlerFn(cdc, cliCtx),
 	).Methods("POST")
 }
 
 type issueTokenReq struct {
-	BaseTx          utils.BaseTx      `json:"base_tx"`
-	Owner           sdk.AccAddress    `json:"owner"` //  Owner of the token
-	Family          asset.AssetFamily `json:"family"`
-	Source          asset.AssetSource `json:"source"`
-	Gateway         string            `json:"gateway"`
-	Symbol          string            `json:"symbol"`
-	CanonicalSymbol string            `json:"canonical_symbol"`
-	Name            string            `json:"name"`
-	Decimal         uint8             `json:"decimal"`
-	MinUnitAlias    string            `json:"min_unit_alias"`
-	InitialSupply   uint64            `json:"initial_supply"`
-	MaxSupply       uint64            `json:"max_supply"`
-	Mintable        bool              `json:"mintable"`
-}
-
-type createGatewayReq struct {
-	BaseTx   utils.BaseTx   `json:"base_tx"`
-	Owner    sdk.AccAddress `json:"owner"`    //  Owner of the gateway
-	Moniker  string         `json:"moniker"`  //  Name of the gateway
-	Identity string         `json:"identity"` //  Identity of the gateway
-	Details  string         `json:"details"`  //  Description of the gateway
-	Website  string         `json:"website"`  //  Website of the gateway
-}
-
-type editGatewayReq struct {
-	BaseTx   utils.BaseTx   `json:"base_tx"`
-	Owner    sdk.AccAddress `json:"owner"`    //  Owner of the gateway
-	Identity string         `json:"identity"` //  Identity of the gateway
-	Details  string         `json:"details"`  //  Description of the gateway
-	Website  string         `json:"website"`  //  Website of the gateway
-}
-
-type transferGatewayOwnerReq struct {
-	BaseTx utils.BaseTx   `json:"base_tx"`
-	Owner  sdk.AccAddress `json:"owner"` // Current Owner of the gateway
-	To     sdk.AccAddress `json:"to"`    // New owner of the gateway
+	BaseTx        utils.BaseTx   `json:"base_tx"`
+	Owner         sdk.AccAddress `json:"owner"` //  Owner of the token
+	Symbol        string         `json:"symbol"`
+	Name          string         `json:"name"`
+	Scale         uint8          `json:"scale"`
+	InitialSupply uint64         `json:"initial_supply"`
+	MaxSupply     uint64         `json:"max_supply"`
+	Mintable      bool           `json:"mintable"`
 }
 
 type editTokenReq struct {
-	BaseTx          utils.BaseTx   `json:"base_tx"`
-	Owner           sdk.AccAddress `json:"owner"`            //  owner of asset
-	CanonicalSymbol string         `json:"canonical_symbol"` //  canonical_symbol of asset
-	MinUnitAlias    string         `json:"min_unit_alias"`   //  min_unit_alias of asset
-	MaxSupply       uint64         `json:"max_supply"`
-	Mintable        string         `json:"mintable"` //  mintable of asset
-	Name            string         `json:"name"`
+	BaseTx    utils.BaseTx   `json:"base_tx"`
+	Owner     sdk.AccAddress `json:"owner"` //  owner of asset
+	MaxSupply uint64         `json:"max_supply"`
+	Mintable  string         `json:"mintable"` //  mintable of asset
+	Name      string         `json:"name"`
 }
 
 type transferTokenOwnerReq struct {
@@ -117,98 +70,10 @@ type mintTokenReq struct {
 	Amount uint64         `json:"amount"` // amount of mint token
 }
 
-func createGatewayHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		var req createGatewayReq
-		err := utils.ReadPostBody(w, r, cdc, &req)
-		if err != nil {
-			return
-		}
-
-		baseReq := req.BaseTx.Sanitize()
-		if !baseReq.ValidateBasic(w) {
-			return
-		}
-
-		// create the MsgCreateGateway message
-		msg := asset.NewMsgCreateGateway(req.Owner, req.Moniker, req.Identity, req.Details, req.Website)
-		err = msg.ValidateBasic()
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
-		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
-
-		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
-	}
-}
-
-func editGatewayHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		vars := mux.Vars(r)
-		moniker := vars["moniker"]
-
-		var req editGatewayReq
-		err := utils.ReadPostBody(w, r, cdc, &req)
-		if err != nil {
-			return
-		}
-
-		baseReq := req.BaseTx.Sanitize()
-		if !baseReq.ValidateBasic(w) {
-			return
-		}
-
-		// create the MsgEditGateway message
-		msg := asset.NewMsgEditGateway(req.Owner, moniker, req.Identity, req.Details, req.Website)
-		err = msg.ValidateBasic()
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
-		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
-
-		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
-	}
-}
-
-func transferGatewayOwnerHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		vars := mux.Vars(r)
-		moniker := vars["moniker"]
-
-		var req transferGatewayOwnerReq
-		err := utils.ReadPostBody(w, r, cdc, &req)
-		if err != nil {
-			return
-		}
-
-		baseReq := req.BaseTx.Sanitize()
-		if !baseReq.ValidateBasic(w) {
-			return
-		}
-
-		// create the MsgTransferGatewayOwner message
-		msg := asset.NewMsgTransferGatewayOwner(req.Owner, moniker, req.To)
-		err = msg.ValidateBasic()
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
-		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
-
-		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
-	}
-}
-
 func issueTokenHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req issueTokenReq
-		err := utils.ReadPostBody(w, r, cdc, &req)
-		if err != nil {
+		if err := utils.ReadPostBody(w, r, cdc, &req); err != nil {
 			return
 		}
 
@@ -218,9 +83,16 @@ func issueTokenHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handl
 		}
 
 		// create the MsgEditGateway message
-		msg := asset.NewMsgIssueToken(req.Family, req.Source, req.Gateway, req.Symbol, req.CanonicalSymbol, req.Name, req.Decimal, req.MinUnitAlias, req.InitialSupply, req.MaxSupply, req.Mintable, req.Owner)
-		err = msg.ValidateBasic()
-		if err != nil {
+		msg := asset.MsgIssueToken{
+			Symbol:        req.Symbol,
+			Name:          req.Name,
+			Decimal:       req.Scale,
+			InitialSupply: req.InitialSupply,
+			MaxSupply:     req.MaxSupply,
+			Mintable:      req.Mintable,
+			Owner:         req.Owner,
+		}
+		if err := msg.ValidateBasic(); err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
@@ -234,11 +106,10 @@ func issueTokenHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handl
 func editTokenHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		tokenId := vars["token-id"]
+		tokenId := vars[RestParamTokenID]
 
 		var req editTokenReq
-		err := utils.ReadPostBody(w, r, cdc, &req)
-		if err != nil {
+		if err := utils.ReadPostBody(w, r, cdc, &req); err != nil {
 			return
 		}
 
@@ -253,9 +124,8 @@ func editTokenHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handle
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
-		msg := asset.NewMsgEditToken(req.Name, req.CanonicalSymbol, req.MinUnitAlias, tokenId, req.MaxSupply, mintable, req.Owner)
-		err = msg.ValidateBasic()
-		if err != nil {
+		msg := asset.NewMsgEditToken(req.Name, tokenId, req.MaxSupply, mintable, req.Owner)
+		if err := msg.ValidateBasic(); err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
@@ -269,10 +139,9 @@ func editTokenHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handle
 func transferOwnerHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		tokenId := vars["token-id"]
+		tokenId := vars[RestParamTokenID]
 		var req transferTokenOwnerReq
-		err := utils.ReadPostBody(w, r, cdc, &req)
-		if err != nil {
+		if err := utils.ReadPostBody(w, r, cdc, &req); err != nil {
 			return
 		}
 
@@ -283,8 +152,7 @@ func transferOwnerHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Ha
 
 		// create the MsgTransferTokenOwner message
 		msg := asset.NewMsgTransferTokenOwner(req.SrcOwner, req.DstOwner, tokenId)
-		err = msg.ValidateBasic()
-		if err != nil {
+		if err := msg.ValidateBasic(); err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
@@ -298,10 +166,9 @@ func transferOwnerHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Ha
 func mintTokenHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		tokenId := vars["token-id"]
+		tokenId := vars[RestParamTokenID]
 		var req mintTokenReq
-		err := utils.ReadPostBody(w, r, cdc, &req)
-		if err != nil {
+		if err := utils.ReadPostBody(w, r, cdc, &req); err != nil {
 			return
 		}
 
@@ -312,8 +179,7 @@ func mintTokenHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handle
 
 		// create the MsgMintToken message
 		msg := asset.NewMsgMintToken(tokenId, req.Owner, req.To, req.Amount)
-		err = msg.ValidateBasic()
-		if err != nil {
+		if err := msg.ValidateBasic(); err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}

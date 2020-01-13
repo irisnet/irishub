@@ -16,22 +16,34 @@ import (
 	"github.com/spf13/viper"
 )
 
-func preSignCmd(cmd *cobra.Command, _ []string) {
-	// Conditionally mark the account and sequence numbers required as no RPC
-	// query will be done.
-	if viper.GetString(FlagSource) == "gateway" {
-		cmd.MarkFlagRequired(FlagGateway)
+func GetTokenCmd(cdc *codec.Codec) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:                        "token",
+		Short:                      "token transaction subcommands",
+		DisableFlagParsing:         true,
+		SuggestionsMinimumDistance: 2,
 	}
+	cmd.AddCommand(client.PostCommands(
+		getCmdIssueToken(cdc),
+		getCmdEditAsset(cdc),
+		getCmdMintToken(cdc),
+		getCmdTransferTokenOwner(cdc),
+	)...)
+
+	cmd.AddCommand(client.GetCommands(
+		getCmdQueryTokens(cdc),
+		getCmdQueryFee(cdc),
+	)...)
+
+	return cmd
 }
 
-// GetCmdIssueToken implements the issue asset command
-func GetCmdIssueToken(cdc *codec.Codec) *cobra.Command {
+// getCmdIssueToken implements the issue asset command
+func getCmdIssueToken(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "issue-token",
-		Short: "Issue a new token",
-		Example: "iriscli asset issue-token --family=<family> --source=<source> --gateway=<gateway-moniker> --decimal=<decimal>" +
-			" --symbol=<symbol> --name=<token-name> --initial-supply=<initial-supply> --from=<key-name> --chain-id=<chain-id> --fee=0.6iris",
-		PreRun: preSignCmd,
+		Use:     "issue",
+		Short:   "Issue a new token",
+		Example: `iriscli asset token issue --name="Kitty Token" --symbol="kitty"  --initial-supply=100000000000 --max-supply=1000000000000 --mintable=true --from=<key-name> --chain-id=<chain-id> --fee=0.6iris`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
@@ -45,29 +57,14 @@ func GetCmdIssueToken(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			family, ok := asset.StringToAssetFamilyMap[strings.ToLower(viper.GetString(FlagFamily))]
-			if !ok {
-				return fmt.Errorf("invalid token family type %s", viper.GetString(FlagFamily))
-			}
-
-			source, ok := asset.StringToAssetSourceMap[strings.ToLower(viper.GetString(FlagSource))]
-			if !ok || source == asset.EXTERNAL {
-				return fmt.Errorf("invalid token source type %s", viper.GetString(FlagSource))
-			}
-
 			msg := asset.MsgIssueToken{
-				Family:          family,
-				Source:          source,
-				Gateway:         viper.GetString(FlagGateway),
-				Symbol:          viper.GetString(FlagSymbol),
-				CanonicalSymbol: viper.GetString(FlagCanonicalSymbol),
-				Name:            viper.GetString(FlagName),
-				Decimal:         uint8(viper.GetInt(FlagDecimal)),
-				MinUnitAlias:    viper.GetString(FlagMinUnitAlias),
-				InitialSupply:   uint64(viper.GetInt(FlagInitialSupply)),
-				MaxSupply:       uint64(viper.GetInt(FlagMaxSupply)),
-				Mintable:        viper.GetBool(FlagMintable),
-				Owner:           owner,
+				Symbol:        viper.GetString(FlagSymbol),
+				Name:          viper.GetString(FlagName),
+				Decimal:       uint8(viper.GetInt(FlagDecimal)),
+				InitialSupply: uint64(viper.GetInt(FlagInitialSupply)),
+				MaxSupply:     uint64(viper.GetInt(FlagMaxSupply)),
+				Mintable:      viper.GetBool(FlagMintable),
+				Owner:         owner,
 			}
 
 			if err := msg.ValidateBasic(); err != nil {
@@ -77,10 +74,7 @@ func GetCmdIssueToken(cdc *codec.Codec) *cobra.Command {
 			var prompt = "The token issue transaction will consume extra fee"
 
 			if !viper.GetBool(client.FlagGenerateOnly) {
-				tokenId, err := asset.GetTokenID(msg.Source, msg.Symbol, msg.Gateway)
-				if err != nil {
-					return fmt.Errorf("failed to query token issue fee: %s", err.Error())
-				}
+				tokenId := asset.GetTokenID(msg.Symbol)
 
 				// query fee
 				fee, err1 := queryTokenFees(cliCtx, tokenId)
@@ -109,135 +103,19 @@ func GetCmdIssueToken(cdc *codec.Codec) *cobra.Command {
 	}
 
 	cmd.Flags().AddFlagSet(FsTokenIssue)
-	cmd.MarkFlagRequired(FlagFamily)
-	cmd.MarkFlagRequired(FlagSource)
-	cmd.MarkFlagRequired(FlagSymbol)
-	cmd.MarkFlagRequired(FlagName)
-	cmd.MarkFlagRequired(FlagInitialSupply)
-	cmd.MarkFlagRequired(FlagDecimal)
-
+	_ = cmd.MarkFlagRequired(FlagSymbol)
+	_ = cmd.MarkFlagRequired(FlagName)
+	_ = cmd.MarkFlagRequired(FlagInitialSupply)
+	_ = cmd.MarkFlagRequired(FlagDecimal)
 	return cmd
 }
 
-// GetCmdCreateGateway implements the create gateway command
-func GetCmdCreateGateway(cdc *codec.Codec) *cobra.Command {
+// getCmdEditGateway implements the edit asset command
+func getCmdEditAsset(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "create-gateway",
-		Short: "Create a gateway",
-		Example: "iriscli asset create-gateway --moniker=<moniker> --identity=<identity> --details=<details> " +
-			"--website=<website>",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().
-				WithCodec(cdc).
-				WithLogger(os.Stdout).
-				WithAccountDecoder(utils.GetAccountDecoder(cdc))
-			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).
-				WithCliCtx(cliCtx)
-
-			owner, err := cliCtx.GetFromAddress()
-			if err != nil {
-				return err
-			}
-
-			moniker := viper.GetString(FlagMoniker)
-			identity := viper.GetString(FlagIdentity)
-			details := viper.GetString(FlagDetails)
-			website := viper.GetString(FlagWebsite)
-
-			var msg sdk.Msg
-			msg = asset.NewMsgCreateGateway(
-				owner, moniker, identity, details, website,
-			)
-
-			if err := msg.ValidateBasic(); err != nil {
-				return err
-			}
-
-			var prompt = "The gateway creation transaction will consume extra fee"
-
-			if !viper.GetBool(client.FlagGenerateOnly) {
-				// query fee
-				creationFee, err := queryGatewayFee(cliCtx, moniker)
-				if err != nil {
-					return fmt.Errorf("failed to query gateway creation fee: %s", err.Error())
-				}
-
-				// append creation fee to prompt
-				creationFeeMainUnit := sdk.Coins{creationFee.Fee}.MainUnitString()
-				prompt += fmt.Sprintf(": %s", creationFeeMainUnit)
-			}
-
-			// a confirmation is needed
-			prompt += "\nAre you sure to proceed?"
-			confirmed, err := client.GetConfirmation(prompt, bufio.NewReader(os.Stdin))
-			if err != nil {
-				return err
-			}
-
-			if !confirmed {
-				return fmt.Errorf("The operation aborted")
-			}
-
-			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
-		},
-	}
-
-	cmd.Flags().AddFlagSet(FsGatewayCreate)
-	cmd.MarkFlagRequired(FlagMoniker)
-
-	return cmd
-}
-
-// GetCmdEditGateway implements the edit gateway command
-func GetCmdEditGateway(cdc *codec.Codec) *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "edit-gateway",
-		Short: "Edit a gateway",
-		Example: "iriscli asset edit-gateway --moniker=<moniker> --identity=<identity> --details=<details> " +
-			"--website=<website>",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().
-				WithCodec(cdc).
-				WithLogger(os.Stdout).
-				WithAccountDecoder(utils.GetAccountDecoder(cdc))
-			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).
-				WithCliCtx(cliCtx)
-
-			owner, err := cliCtx.GetFromAddress()
-			if err != nil {
-				return err
-			}
-
-			moniker := viper.GetString(FlagMoniker)
-			identity := viper.GetString(FlagIdentity)
-			details := viper.GetString(FlagDetails)
-			website := viper.GetString(FlagWebsite)
-
-			var msg sdk.Msg
-			msg = asset.NewMsgEditGateway(
-				owner, moniker, identity, details, website,
-			)
-
-			if err := msg.ValidateBasic(); err != nil {
-				return err
-			}
-
-			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
-		},
-	}
-
-	cmd.Flags().AddFlagSet(FsGatewayEdit)
-	cmd.MarkFlagRequired(FlagMoniker)
-
-	return cmd
-}
-
-// GetCmdEditGateway implements the edit asset command
-func GetCmdEditAsset(cdc *codec.Codec) *cobra.Command {
-	cmd := &cobra.Command{
-		Use:     "edit-token",
+		Use:     "edit",
 		Short:   "Edit a existed token",
-		Example: "iriscli asset edit-token <token-id> --name=<name> --canonical-symbol=<canonical-symbol> --min-unit-alias=<min-alias> --max-supply=<max-supply> --mintable=<mintable> --from=<your account name> --chain-id=<chain-id> --fee=0.6iris",
+		Example: `iriscli asset token edit <token-id> --name="Cat Token" --max-supply=100000000000 --mintable=true --from=<your account name> --chain-id=<chain-id> --fee=0.6iris`,
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
@@ -254,16 +132,13 @@ func GetCmdEditAsset(cdc *codec.Codec) *cobra.Command {
 
 			tokenId := args[0]
 			name := viper.GetString(FlagName)
-			canonicalSymbol := viper.GetString(FlagCanonicalSymbol)
-			minUnitAlias := viper.GetString(FlagMinUnitAlias)
 			maxSupply := uint64(viper.GetInt(FlagMaxSupply))
 			mintable, err := asset.ParseBool(viper.GetString(FlagMintable))
 			if err != nil {
 				return err
 			}
 			var msg sdk.Msg
-			msg = asset.NewMsgEditToken(name,
-				canonicalSymbol, minUnitAlias, tokenId, maxSupply, mintable, owner)
+			msg = asset.NewMsgEditToken(name, tokenId, maxSupply, mintable, owner)
 
 			if err := msg.ValidateBasic(); err != nil {
 				return err
@@ -277,56 +152,11 @@ func GetCmdEditAsset(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-// GetCmdTransferGatewayOwner implements the transfer gateway owner command
-func GetCmdTransferGatewayOwner(cdc *codec.Codec) *cobra.Command {
+func getCmdMintToken(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "transfer-gateway-owner",
-		Short: "Transfer the owner of a gateway",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().
-				WithCodec(cdc).
-				WithLogger(os.Stdout).
-				WithAccountDecoder(utils.GetAccountDecoder(cdc))
-			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).
-				WithCliCtx(cliCtx)
-
-			owner, err := cliCtx.GetFromAddress()
-			if err != nil {
-				return err
-			}
-
-			moniker := viper.GetString(FlagMoniker)
-
-			to, err := sdk.AccAddressFromBech32(viper.GetString(FlagTo))
-			if err != nil {
-				return err
-			}
-
-			var msg sdk.Msg
-			msg = asset.NewMsgTransferGatewayOwner(
-				owner, moniker, to,
-			)
-
-			if err := msg.ValidateBasic(); err != nil {
-				return err
-			}
-
-			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
-		},
-	}
-
-	cmd.Flags().AddFlagSet(FsGatewayOwnerTransfer)
-	cmd.MarkFlagRequired(FlagMoniker)
-	cmd.MarkFlagRequired(FlagTo)
-
-	return cmd
-}
-
-func GetCmdMintToken(cdc *codec.Codec) *cobra.Command {
-	cmd := &cobra.Command{
-		Use:     "mint-token",
+		Use:     "mint",
 		Short:   "The asset owner and operator can directly mint tokens to a specified address",
-		Example: "iriscli asset mint-token <token-id> [flags]",
+		Example: `iriscli asset token mint [token-id] --amount=<amount> --to=<to> --from=<key-name> --chain-id=irishub --fee=0.3iris`,
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
@@ -391,16 +221,16 @@ func GetCmdMintToken(cdc *codec.Codec) *cobra.Command {
 	}
 
 	cmd.Flags().AddFlagSet(FsMintToken)
-	cmd.MarkFlagRequired(FlagAmount)
+	_ = cmd.MarkFlagRequired(FlagAmount)
 	return cmd
 }
 
-// GetCmdTransferTokenOwner implements the transfer token owner command
-func GetCmdTransferTokenOwner(cdc *codec.Codec) *cobra.Command {
+// getCmdTransferTokenOwner implements the transfer token owner command
+func getCmdTransferTokenOwner(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "transfer-token-owner",
+		Use:     "transfer",
 		Short:   "Transfer the owner of a token to a new owner",
-		Example: "iriscli asset transfer-token-owner <token-id> --to=<new owner>",
+		Example: `iriscli asset token transfer [token-id] --to=<to> --from=<key-name> --chain-id=irishub --fee=0.3iris`,
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
@@ -431,7 +261,6 @@ func GetCmdTransferTokenOwner(cdc *codec.Codec) *cobra.Command {
 		},
 	}
 	cmd.Flags().AddFlagSet(FsTransferTokenOwner)
-	cmd.MarkFlagRequired(FlagTo)
-
+	_ = cmd.MarkFlagRequired(FlagTo)
 	return cmd
 }

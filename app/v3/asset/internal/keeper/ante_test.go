@@ -30,71 +30,56 @@ func TestAssetAnteHandler(t *testing.T) {
 	bk := bank.NewBaseKeeper(cdc, ak)
 	keeper := NewKeeper(cdc, assetKey, bk, types.DefaultCodespace, paramsKeeper.Subspace(types.DefaultParamSpace))
 
-	// init params
-	keeper.Init(ctx)
+	//set params
+	keeper.SetParamSet(ctx, types.DefaultParams())
 
 	// set test accounts
 	addr1 := sdk.AccAddress([]byte("addr1"))
 	addr2 := sdk.AccAddress([]byte("addr2"))
-	acc1 := ak.NewAccountWithAddress(ctx, addr1)
-	acc2 := ak.NewAccountWithAddress(ctx, addr2)
 
 	// get asset fees
-	gatewayCreateFee := GetGatewayCreateFee(ctx, keeper, "mon")
-	nativeTokenIssueFee := GetTokenIssueFee(ctx, keeper, "sym")
-	gatewayTokenIssueFee := GetGatewayTokenIssueFee(ctx, keeper, "sym")
-	nativeTokenMintFee := GetTokenMintFee(ctx, keeper, "sym")
+	nativeTokenIssueFee := keeper.getTokenIssueFee(ctx, "sym")
+	nativeTokenMintFee := keeper.getTokenMintFee(ctx, "sym")
 
-	// construct msgs
-	msgCreateGateway := types.NewMsgCreateGateway(addr1, "mon", "i", "d", "w")
-	msgIssueNativeToken := types.MsgIssueToken{Source: types.AssetSource(0x00), Symbol: "sym"}
-	msgIssueGatewayToken := types.MsgIssueToken{Source: types.AssetSource(0x02), Symbol: "sym"}
-	msgMintNativeToken := types.MsgMintToken{TokenId: "i.sym"}
-	msgNonAsset1 := sdk.NewTestMsg(addr1)
-	msgNonAsset2 := sdk.NewTestMsg(addr2)
+	//msg
+	msgIssueToken := types.MsgIssueToken{Source: types.AssetSource(0x00), Symbol: "sym", Owner: addr1}
+	msgIssueToken2 := types.MsgIssueToken{Source: types.AssetSource(0x00), Symbol: "sym", Owner: addr2}
+	msgMintToken := types.MsgMintToken{TokenId: "i.sym", Owner: addr1}
 
-	// construct test txs
-	tx1 := auth.StdTx{Msgs: []sdk.Msg{msgCreateGateway, msgIssueNativeToken, msgIssueGatewayToken, msgMintNativeToken}}
-	tx2 := auth.StdTx{Msgs: []sdk.Msg{msgCreateGateway, msgIssueNativeToken, msgNonAsset1, msgIssueGatewayToken, msgMintNativeToken}}
-	tx3 := auth.StdTx{Msgs: []sdk.Msg{msgNonAsset2, msgCreateGateway, msgIssueNativeToken, msgIssueGatewayToken, msgMintNativeToken}}
+	//init account balance
+	_, _, err := keeper.bk.AddCoins(ctx, addr1, sdk.Coins{nativeTokenIssueFee})
+	require.NoError(t, err)
 
-	// set signers and construct an ante handler
-	newCtx := auth.WithSigners(ctx, []auth.Account{acc1, acc2})
-	anteHandler := NewAnteHandler(keeper)
-
-	// assert that the ante handler will return with `abort` set to true
-	acc1.SetCoins(sdk.Coins{gatewayCreateFee.Add(nativeTokenIssueFee)})
-	_, res, abort := anteHandler(newCtx, tx1, false)
-	require.Equal(t, true, abort)
-	require.Equal(t, false, res.IsOK())
-
-	// assert that the ante handler will return with `abort` set to true
-	acc1.SetCoins(acc1.GetCoins().Add(sdk.Coins{gatewayTokenIssueFee}))
-	_, res, abort = anteHandler(newCtx, tx1, false)
-	require.Equal(t, true, abort)
-	require.Equal(t, false, res.IsOK())
-
-	// assert that the ante handler will return with `abort` set to false
-	acc1.SetCoins(acc1.GetCoins().Add(sdk.Coins{nativeTokenMintFee}))
-	_, res, abort = anteHandler(newCtx, tx1, false)
+	//single msg
+	tx := auth.StdTx{Msgs: []sdk.Msg{msgIssueToken}}
+	_, res, abort := NewAnteHandler(keeper)(ctx, tx, false)
 	require.Equal(t, false, abort)
 	require.Equal(t, true, res.IsOK())
 
-	// assert that the ante handler will return with `abort` set to false
-	acc1.SetCoins(sdk.Coins{gatewayCreateFee.Add(nativeTokenIssueFee)})
-	_, res, abort = anteHandler(newCtx, tx2, false)
-	require.Equal(t, false, abort)
-	require.Equal(t, true, res.IsOK())
-
-	// assert that the ante handler will return with `abort` set to false
-	acc1.SetCoins(sdk.Coins{})
-	_, res, abort = anteHandler(newCtx, tx3, false)
-	require.Equal(t, false, abort)
-	require.Equal(t, true, res.IsOK())
-
-	// assert that the ante handler will return with `abort` set to true
-	newCtx = auth.WithSigners(ctx, []auth.Account{})
-	_, res, abort = anteHandler(newCtx, tx3, false)
+	//multiple msg, but insufficient coins
+	tx = auth.StdTx{Msgs: []sdk.Msg{msgIssueToken, msgMintToken}}
+	_, res, abort = NewAnteHandler(keeper)(ctx, tx, false)
 	require.Equal(t, true, abort)
 	require.Equal(t, false, res.IsOK())
+
+	//multiple msg, success
+	_, _, err = keeper.bk.AddCoins(ctx, addr1, sdk.Coins{nativeTokenMintFee})
+	require.NoError(t, err)
+	_, res, abort = NewAnteHandler(keeper)(ctx, tx, false)
+	require.Equal(t, false, abort)
+	require.Equal(t, true, res.IsOK())
+
+	//multiple msg, but insufficient coins
+	tx = auth.StdTx{Msgs: []sdk.Msg{msgIssueToken, msgIssueToken2, msgMintToken}}
+	_, res, abort = NewAnteHandler(keeper)(ctx, tx, false)
+	require.Equal(t, true, abort)
+	require.Equal(t, false, res.IsOK())
+
+	//multiple msg, success
+	_, _, err = keeper.bk.AddCoins(ctx, addr2, sdk.Coins{nativeTokenIssueFee})
+	require.NoError(t, err)
+	tx = auth.StdTx{Msgs: []sdk.Msg{msgIssueToken, msgIssueToken2, msgMintToken}}
+	_, res, abort = NewAnteHandler(keeper)(ctx, tx, false)
+	require.Equal(t, false, abort)
+	require.Equal(t, true, res.IsOK())
 }

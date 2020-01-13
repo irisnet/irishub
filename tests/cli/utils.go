@@ -367,31 +367,13 @@ func executeGetServiceFees(t *testing.T, cmdStr string) servicecli.FeesOutput {
 	return feesOutput
 }
 
-func executeGetToken(t *testing.T, cmdStr string) asset.FungibleToken {
+func executeGetToken(t *testing.T, cmdStr string) asset.TokenOutput {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
-	var token asset.FungibleToken
+	var token asset.TokensOutput
 	cdc := app.MakeLatestCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &token)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
-	return token
-}
-
-func executeGetGateway(t *testing.T, cmdStr string) asset.Gateway {
-	out, _ := tests.ExecuteT(t, cmdStr, "")
-	var gateway asset.Gateway
-	cdc := app.MakeLatestCodec()
-	err := cdc.UnmarshalJSON([]byte(out), &gateway)
-	require.NoError(t, err, "out %v\n, err %v", out, err)
-	return gateway
-}
-
-func executeGetGateways(t *testing.T, cmdStr string) []asset.Gateway {
-	out, _ := tests.ExecuteT(t, cmdStr, "")
-	var gateways []asset.Gateway
-	cdc := app.MakeLatestCodec()
-	err := cdc.UnmarshalJSON([]byte(out), &gateways)
-	require.NoError(t, err, "out %v\n, err %v", out, err)
-	return gateways
+	return token[0]
 }
 
 func executeWriteCheckErr(t *testing.T, cmdStr string, writes ...string) {
