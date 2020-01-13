@@ -15,14 +15,7 @@ const (
 
 // QueryDefinitionParams
 type QueryDefinitionParams struct {
-	DefChainID  string
 	ServiceName string
-}
-
-// DefinitionOutput
-type DefinitionOutput struct {
-	Definition SvcDef           `json:"definition" yaml:"definition"`
-	Methods    []MethodProperty `json:"methods" yaml:"methods"`
 }
 
 // QueryBindingParams

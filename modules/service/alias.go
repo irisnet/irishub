@@ -13,12 +13,6 @@ import (
 const (
 	Global                  = types.Global
 	Local                   = types.Local
-	NoPrivacy               = types.NoPrivacy
-	PubKeyEncryption        = types.PubKeyEncryption
-	OffChainCached          = types.OffChainCached
-	NoCached                = types.NoCached
-	Unicast                 = types.Unicast
-	Multicast               = types.Multicast
 	EventTypeRequestSvc     = types.EventTypeRequestSvc
 	EventTypeRespondSvc     = types.EventTypeRespondSvc
 	EventTypeSvcCallTimeout = types.EventTypeSvcCallTimeout
@@ -37,7 +31,7 @@ const (
 	RequestAccName          = types.RequestAccName
 	TaxAccName              = types.TaxAccName
 	MetricsSubsystem        = types.MetricsSubsystem
-	TypeMsgSvcDef           = types.TypeMsgSvcDef
+	TypeMsgDefineService    = types.TypeMsgDefineService
 	TypeMsgSvcBind          = types.TypeMsgSvcBind
 	TypeMsgSvcBindingUpdate = types.TypeMsgSvcBindingUpdate
 	TypeMsgSvcDisable       = types.TypeMsgSvcDisable
@@ -49,9 +43,8 @@ const (
 	TypeMsgSvcWithdrawFees  = types.TypeMsgSvcWithdrawFees
 	TypeMsgSvcWithdrawTax   = types.TypeMsgSvcWithdrawTax
 	MaxNameLength           = types.MaxNameLength
-	MaxChainIDLength        = types.MaxChainIDLength
 	MaxDescriptionLength    = types.MaxDescriptionLength
-	MaxTagCount             = types.MaxTagCount
+	MaxTagsNum              = types.MaxTagsNum
 	MaxTagLength            = types.MaxTagLength
 	QueryDefinition         = types.QueryDefinition
 	QueryBinding            = types.QueryBinding
@@ -70,18 +63,12 @@ var (
 	SvcBindingEqual                      = types.SvcBindingEqual
 	BindingTypeFromString                = types.BindingTypeFromString
 	RegisterCodec                        = types.RegisterCodec
-	NewSvcDef                            = types.NewSvcDef
-	MessagingTypeFromString              = types.MessagingTypeFromString
-	OutputCachedEnumFromString           = types.OutputCachedEnumFromString
-	OutputPrivacyEnumFromString          = types.OutputPrivacyEnumFromString
+	NewServiceDefinition                 = types.NewServiceDefinition
 	ErrUnknownSvcDef                     = types.ErrUnknownSvcDef
 	ErrUnknownSvcBinding                 = types.ErrUnknownSvcBinding
-	ErrInvalidIDL                        = types.ErrInvalidIDL
-	ErrInvalidOutputPrivacyEnum          = types.ErrInvalidOutputPrivacyEnum
-	ErrInvalidOutputCachedEnum           = types.ErrInvalidOutputCachedEnum
+	ErrInvalidSchemas                    = types.ErrInvalidSchemas
 	ErrInvalidServiceName                = types.ErrInvalidServiceName
 	ErrSvcBindingExists                  = types.ErrSvcBindingExists
-	ErrInvalidPriceCount                 = types.ErrInvalidPriceCount
 	ErrRefundDeposit                     = types.ErrRefundDeposit
 	ErrDisable                           = types.ErrUnavailable
 	ErrEnable                            = types.ErrAvailable
@@ -104,8 +91,6 @@ var (
 	NewReturnedFee                       = types.NewReturnedFee
 	NewIncomingFee                       = types.NewIncomingFee
 	GetServiceDefinitionKey              = types.GetServiceDefinitionKey
-	GetMethodPropertyKey                 = types.GetMethodPropertyKey
-	GetMethodsSubspaceKey                = types.GetMethodsSubspaceKey
 	GetServiceBindingKey                 = types.GetServiceBindingKey
 	GetBindingsSubspaceKey               = types.GetBindingsSubspaceKey
 	GetRequestKey                        = types.GetRequestKey
@@ -119,7 +104,7 @@ var (
 	GetIncomingFeeKey                    = types.GetIncomingFeeKey
 	PrometheusMetrics                    = types.PrometheusMetrics
 	NopMetrics                           = types.NopMetrics
-	NewMsgSvcDef                         = types.NewMsgSvcDef
+	NewMsgDefineService                  = types.NewMsgDefineService
 	NewMsgSvcBind                        = types.NewMsgSvcBind
 	NewMsgSvcBindingUpdate               = types.NewMsgSvcBindingUpdate
 	NewMsgSvcDisable                     = types.NewMsgSvcDisable
@@ -134,13 +119,10 @@ var (
 	DefaultParams                        = types.DefaultParams
 	MustUnmarshalParams                  = types.MustUnmarshalParams
 	UnmarshalParams                      = types.UnmarshalParams
-	ParseMethods                         = types.ParseMethods
-	MethodToMethodProperty               = types.MethodToMethodProperty
 
 	// variable aliases
 	ModuleCdc                    = types.ModuleCdc
 	ServiceDefinitionKey         = types.ServiceDefinitionKey
-	MethodPropertyKey            = types.MethodPropertyKey
 	BindingPropertyKey           = types.BindingPropertyKey
 	RequestKey                   = types.RequestKey
 	ResponseKey                  = types.ResponseKey
@@ -183,18 +165,14 @@ type (
 	SvcBinding            = types.SvcBinding
 	Level                 = types.Level
 	BindingType           = types.BindingType
-	SvcDef                = types.SvcDef
-	MethodProperty        = types.MethodProperty
-	OutputPrivacyEnum     = types.OutputPrivacyEnum
-	OutputCachedEnum      = types.OutputCachedEnum
-	MessagingType         = types.MessagingType
+	ServiceDefinition     = types.ServiceDefinition
 	GenesisState          = types.GenesisState
 	SvcRequest            = types.SvcRequest
 	SvcResponse           = types.SvcResponse
 	ReturnedFee           = types.ReturnedFee
 	IncomingFee           = types.IncomingFee
 	Metrics               = types.Metrics
-	MsgSvcDef             = types.MsgSvcDef
+	MsgDefineService      = types.MsgDefineService
 	MsgSvcBind            = types.MsgSvcBind
 	MsgSvcBindingUpdate   = types.MsgSvcBindingUpdate
 	MsgSvcDisable         = types.MsgSvcDisable
@@ -207,7 +185,6 @@ type (
 	MsgSvcWithdrawTax     = types.MsgSvcWithdrawTax
 	Params                = types.Params
 	QueryDefinitionParams = types.QueryDefinitionParams
-	DefinitionOutput      = types.DefinitionOutput
 	QueryBindingParams    = types.QueryBindingParams
 	QueryBindingsParams   = types.QueryBindingsParams
 	QueryRequestsParams   = types.QueryRequestsParams

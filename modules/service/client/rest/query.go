@@ -15,7 +15,7 @@ import (
 
 func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router) {
 	// query definition
-	r.HandleFunc(fmt.Sprintf("/service/definitions/{%s}/{%s}", RestDefChainID, RestServiceName), queryDefinitionHandlerFn(cliCtx)).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/service/definitions/{%s}", RestServiceName), queryDefinitionHandlerFn(cliCtx)).Methods("GET")
 	// query binding
 	r.HandleFunc(fmt.Sprintf("/service/bindings/{%s}/{%s}/{%s}/{%s}", RestDefChainID, RestServiceName, RestBindChainID, RestProvider), queryBindingHandlerFn(cliCtx)).Methods("GET")
 	// query bindings
@@ -32,7 +32,6 @@ func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router) {
 func queryDefinitionHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		defChainID := vars[RestDefChainID]
 		serviceName := vars[RestServiceName]
 
 		cliCtx, ok := rest.ParseQueryHeightOrReturnBadRequest(w, cliCtx, r)
@@ -41,7 +40,6 @@ func queryDefinitionHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		params := types.QueryDefinitionParams{
-			DefChainID:  defChainID,
 			ServiceName: serviceName,
 		}
 
