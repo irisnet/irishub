@@ -43,7 +43,7 @@ func getCmdIssueToken(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "issue",
 		Short:   "Issue a new token",
-		Example: `iriscli asset token issue --name="Kitty Token" --symbol="kitty"  --initial-supply=100000000000 --max-supply=1000000000000 --mintable=true --from=<key-name> --chain-id=<chain-id> --fee=0.6iris`,
+		Example: `iriscli asset token issue --name="Kitty Token" --symbol="kitty" --min-unit="kitty" --scale=0 --initial-supply=100000000000 --max-supply=1000000000000 --mintable=true --from=<key-name> --chain-id=<chain-id> --fee=0.6iris`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
@@ -60,7 +60,8 @@ func getCmdIssueToken(cdc *codec.Codec) *cobra.Command {
 			msg := asset.MsgIssueToken{
 				Symbol:        viper.GetString(FlagSymbol),
 				Name:          viper.GetString(FlagName),
-				Decimal:       uint8(viper.GetInt(FlagDecimal)),
+				MinUnitAlias:  viper.GetString(FlagMinUnit),
+				Decimal:       uint8(viper.GetInt(FlagScale)),
 				InitialSupply: uint64(viper.GetInt(FlagInitialSupply)),
 				MaxSupply:     uint64(viper.GetInt(FlagMaxSupply)),
 				Mintable:      viper.GetBool(FlagMintable),
@@ -106,7 +107,7 @@ func getCmdIssueToken(cdc *codec.Codec) *cobra.Command {
 	_ = cmd.MarkFlagRequired(FlagSymbol)
 	_ = cmd.MarkFlagRequired(FlagName)
 	_ = cmd.MarkFlagRequired(FlagInitialSupply)
-	_ = cmd.MarkFlagRequired(FlagDecimal)
+	_ = cmd.MarkFlagRequired(FlagScale)
 	return cmd
 }
 

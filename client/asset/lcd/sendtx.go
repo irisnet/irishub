@@ -44,6 +44,7 @@ type issueTokenReq struct {
 	Symbol        string         `json:"symbol"`
 	Name          string         `json:"name"`
 	Scale         uint8          `json:"scale"`
+	MinUnit       string         `json:"min_unit"`
 	InitialSupply uint64         `json:"initial_supply"`
 	MaxSupply     uint64         `json:"max_supply"`
 	Mintable      bool           `json:"mintable"`
@@ -87,6 +88,7 @@ func issueTokenHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handl
 			Symbol:        req.Symbol,
 			Name:          req.Name,
 			Decimal:       req.Scale,
+			MinUnitAlias:  req.MinUnit,
 			InitialSupply: req.InitialSupply,
 			MaxSupply:     req.MaxSupply,
 			Mintable:      req.Mintable,
