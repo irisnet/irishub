@@ -141,16 +141,13 @@ irislcd start --node=tcp://localhost:26657 --chain-id=<chain-id> --laddr=tcp://0
 
 ### Asset模块的APIs
 
-1. `GET /asset/gateways/{moniker}`: 查询指定名字所对应的网关信息
-2. `GET /asset/gateways`: 查询所有网关信息，提供一个可选的owner参数
-3. `GET /asset/fees/gateways/{moniker}`: 查询指定网关的创建费用
-4. `GET /asset/fees/tokens/{id}`: 查询指定通证的发行和增发费用
-5. `POST /asset/gateways`: 创建一个网关
-6. `PUT /asset/gateways/{moniker}`: 编辑一个存在的网关
-7. `POST /asset/gateways/{moniker}/transfer`: 转让指定网关的所有权
-8. `PUT /asset/tokens/{token-id}`: 编辑一个已经存在的通证
-9. `POST /asset/tokens/{token-id}/mint`: 通证所有者和操作者可以直接将铸造该通证到指定地址
-10. `POST /asset/tokens/{token-id}/transfer-owner`: 将通证的所有者转移到新所有者
+1. `POST /asset/tokens`: 发行一种通证
+2. `PUT /asset/tokens/{token-id}`: 编辑一个已存在的通证
+3. `POST /asset/tokens/{token-id}/mint`: 资产所有者和操作员可以直接将通证铸造到指定地址
+4. `POST /asset/tokens/{token-id}/transfer`: 转让通证的所有权
+5. `GET /asset/tokens`: 通过`owner`查询通证列表
+6. `GET /asset/tokens/{token-id}`: 通过`token-id`查询指定通证信息
+7. `GET /asset/tokens/{symbol}/fee`: 查询发行和铸造指定通证的费用
 
 ### Coinswap模块的APIs
 
