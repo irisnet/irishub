@@ -17,8 +17,8 @@ import (
 
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/app/v1/auth"
-	"github.com/irisnet/irishub/app/v2/coinswap"
 	"github.com/irisnet/irishub/app/v3/asset"
+	"github.com/irisnet/irishub/app/v3/coinswap"
 	"github.com/irisnet/irishub/client"
 	"github.com/irisnet/irishub/client/keys"
 	"github.com/irisnet/irishub/codec"
