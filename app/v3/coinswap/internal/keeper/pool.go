@@ -27,7 +27,7 @@ func (k Keeper) GetPool(ctx sdk.Context, uniID string) (pool Pool, existed bool)
 }
 
 // GetPool returns all pools.
-func (k Keeper) GetPools(ctx sdk.Context) (pools []Pool, existed bool) {
+func (k Keeper) GetPools(ctx sdk.Context) (pools []Pool) {
 	store := ctx.KVStore(k.storeKey)
 	iterator := sdk.KVStorePrefixIterator(store, []byte(KeyPool))
 	defer iterator.Close()
