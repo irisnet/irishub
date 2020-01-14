@@ -15,7 +15,7 @@
 Specific Proposal for different levels:
 
 - Critical：`SoftwareUpgrade`, `SystemHalt`
-- Important：`Parameter`, `CommunityTaxUsage`
+- Important：`Parameter`, `CommunityTaxUsage`, `TokenAddition`
 - Normal：`PlainText`
 
 `SoftwareUpgrade Proposal` and `SystemHalt Proposal` can only be submitted by the profiler.
