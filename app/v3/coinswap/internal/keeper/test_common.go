@@ -34,7 +34,7 @@ func makeTestCodec() *codec.Codec {
 	return cdc
 }
 
-func createTestInput(t *testing.T, amt sdk.Int, nAccs int64) (sdk.Context, Keeper, []auth.Account) {
+func createTestInput(t *testing.T, amt sdk.Int, nAccs int64) (sdk.Context, Keeper, auth.AccountKeeper, []auth.Account) {
 	keyAcc := protocol.KeyAccount
 	keyParams := protocol.KeyParams
 	tkeyParams := protocol.TkeyParams
@@ -63,10 +63,10 @@ func createTestInput(t *testing.T, amt sdk.Int, nAccs int64) (sdk.Context, Keepe
 	initialCoins = initialCoins.Sort()
 	accs := createTestAccs(ctx, int(nAccs), initialCoins, &ak)
 
-	keeper := NewKeeper(cdc, keyCoinswap, bk, ak, pk.Subspace(types.DefaultParamSpace))
+	keeper := NewKeeper(cdc, keyCoinswap, bk, pk.Subspace(types.DefaultParamSpace))
 	keeper.SetParams(ctx, types.DefaultParams())
 
-	return ctx, keeper, accs
+	return ctx, keeper, ak, accs
 }
 
 func createTestAccs(ctx sdk.Context, numAccs int, initialCoins sdk.Coins, ak *auth.AccountKeeper) (accs []auth.Account) {

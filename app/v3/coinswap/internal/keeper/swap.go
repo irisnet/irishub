@@ -8,27 +8,25 @@ import (
 )
 
 func (k Keeper) swapCoins(ctx sdk.Context, sender, recipient sdk.AccAddress, coinSold, coinBought sdk.Coin) sdk.Error {
-	uniId, err := types.GetUniId(coinSold.Denom, coinBought.Denom)
+	uniID, err := types.GetUniID(coinSold.Denom, coinBought.Denom)
 	if err != nil {
 		return err
 	}
 
-	poolAddr := getReservePoolAddr(uniId)
-	_, err = k.bk.SendCoins(ctx, sender, poolAddr, sdk.NewCoins(coinSold))
-	if err != nil {
+	if err := k.SendCoinsFromAccountToPool(ctx, sender, uniID, sdk.NewCoins(coinSold)); err != nil {
 		return err
 	}
-
-	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, sender.String(), poolAddr.String(), coinSold.String(), sdk.CoinSwapInputFlow, "")
+	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, sender.String(), uniID, coinSold.String(), sdk.CoinSwapInputFlow, "")
 
 	if recipient.Empty() {
 		recipient = sender
 	}
-	_, err = k.bk.SendCoins(ctx, poolAddr, recipient, sdk.NewCoins(coinBought))
 
-	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, poolAddr.String(), recipient.String(), coinBought.String(), sdk.CoinSwapOutputFlow, "")
-
-	return err
+	if err := k.SendCoinsFromPoolToAccount(ctx, recipient, uniID, sdk.NewCoins(coinBought)); err != nil {
+		return err
+	}
+	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, uniID, recipient.String(), coinBought.String(), sdk.CoinSwapOutputFlow, "")
+	return nil
 }
 
 /**
@@ -38,12 +36,12 @@ Calculate the amount of another token to be received based on the exact amount o
 @return : token amount that will to be received
 */
 func (k Keeper) calculateWithExactInput(ctx sdk.Context, exactSoldCoin sdk.Coin, boughtTokenDenom string) (sdk.Int, sdk.Error) {
-	uniId, err := types.GetUniId(exactSoldCoin.Denom, boughtTokenDenom)
+	uniId, err := types.GetUniID(exactSoldCoin.Denom, boughtTokenDenom)
 	if err != nil {
 		return sdk.ZeroInt(), err
 	}
-	reservePool := k.GetReservePool(ctx, uniId)
-	if reservePool == nil {
+	reservePool, existed := k.GetPool(ctx, uniId)
+	if !existed {
 		return sdk.ZeroInt(), types.ErrReservePoolNotExists(fmt.Sprintf("reserve pool for %s not found", uniId))
 	}
 	inputReserve := reservePool.AmountOf(exactSoldCoin.Denom)
@@ -131,13 +129,13 @@ Calculate the amount of the token to be payed based on the exact amount of the t
 @return: actual amount of the token to be payed
 */
 func (k Keeper) calculateWithExactOutput(ctx sdk.Context, exactBoughtCoin sdk.Coin, soldTokenDenom string) (sdk.Int, sdk.Error) {
-	uniId, err := types.GetUniId(exactBoughtCoin.Denom, soldTokenDenom)
+	uniID, err := types.GetUniID(exactBoughtCoin.Denom, soldTokenDenom)
 	if err != nil {
 		return sdk.ZeroInt(), types.ErrReservePoolNotExists(fmt.Sprintf("reserve pool not found: %s", err.Error()))
 	}
-	reservePool := k.GetReservePool(ctx, uniId)
-	if reservePool == nil {
-		return sdk.ZeroInt(), types.ErrReservePoolNotExists(fmt.Sprintf("reserve pool for %s not found", uniId))
+	reservePool, existed := k.GetPool(ctx, uniID)
+	if !existed {
+		return sdk.ZeroInt(), types.ErrReservePoolNotExists(fmt.Sprintf("reserve pool for %s not found", uniID))
 	}
 	outputReserve := reservePool.AmountOf(exactBoughtCoin.Denom)
 	inputReserve := reservePool.AmountOf(soldTokenDenom)

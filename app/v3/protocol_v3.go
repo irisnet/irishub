@@ -282,7 +282,7 @@ func (p *ProtocolV3) configKeepers() {
 	)
 
 	p.randKeeper = rand.NewKeeper(p.cdc, protocol.KeyRand, rand.DefaultCodespace)
-	p.coinswapKeeper = coinswap.NewKeeper(p.cdc, protocol.KeySwap, p.bankKeeper, p.accountMapper, p.paramsKeeper.Subspace(coinswap.DefaultParamSpace))
+	p.coinswapKeeper = coinswap.NewKeeper(p.cdc, protocol.KeySwap, p.bankKeeper, p.paramsKeeper.Subspace(coinswap.DefaultParamSpace))
 	p.htlcKeeper = htlc.NewKeeper(p.cdc, protocol.KeyHtlc, p.bankKeeper, htlc.DefaultCodespace)
 }
 

@@ -8,7 +8,6 @@ import (
 	"github.com/irisnet/irishub/app/v3/coinswap/internal/types"
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/tendermint/tendermint/crypto"
 )
 
 // Keeper of the coinswap store
@@ -16,7 +15,6 @@ type Keeper struct {
 	cdc        *codec.Codec
 	storeKey   sdk.StoreKey
 	bk         types.BankKeeper
-	ak         types.AuthKeeper
 	paramSpace params.Subspace
 }
 
@@ -24,11 +22,10 @@ type Keeper struct {
 // - creating new ModuleAccounts for each trading pair
 // - burning minting liquidity coins
 // - sending to and from ModuleAccounts
-func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, bk types.BankKeeper, ak types.AuthKeeper, paramSpace params.Subspace) Keeper {
+func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, bk types.BankKeeper, paramSpace params.Subspace) Keeper {
 	return Keeper{
 		storeKey:   key,
 		bk:         bk,
-		ak:         ak,
 		cdc:        cdc,
 		paramSpace: paramSpace.WithTypeTable(types.ParamTypeTable()),
 	}
@@ -66,19 +63,24 @@ func (k Keeper) HandleSwap(ctx sdk.Context, msg types.MsgSwapOrder) (sdk.Tags, s
 
 func (k Keeper) HandleAddLiquidity(ctx sdk.Context, msg types.MsgAddLiquidity) (sdk.Tags, sdk.Error) {
 	tags := sdk.EmptyTags()
-	uniId, err := types.GetUniId(sdk.IrisAtto, msg.MaxToken.Denom)
+	uniID, err := types.GetUniID(sdk.IrisAtto, msg.MaxToken.Denom)
 	if err != nil {
 		return tags, err
 	}
-	uniDenom, err := types.GetUniDenom(uniId)
+	uniDenom, err := types.GetUniDenom(uniID)
 	if err != nil {
 		return tags, err
 	}
 
-	reservePool := k.GetReservePool(ctx, uniId)
-	irisReserveAmt := reservePool.AmountOf(sdk.IrisAtto)
-	tokenReserveAmt := reservePool.AmountOf(msg.MaxToken.Denom)
-	liquidity := reservePool.AmountOf(uniDenom)
+	pool, existed := k.GetPool(ctx, uniID)
+	if !existed {
+		_ = k.setPool(ctx, Pool{
+			Name: uniID,
+		})
+	}
+	irisReserveAmt := pool.AmountOf(sdk.IrisAtto)
+	tokenReserveAmt := pool.AmountOf(msg.MaxToken.Denom)
+	liquidity := pool.AmountOf(uniDenom)
 
 	var mintLiquidityAmt sdk.Int
 	var depositToken sdk.Coin
@@ -106,40 +108,22 @@ func (k Keeper) HandleAddLiquidity(ctx sdk.Context, msg types.MsgAddLiquidity) (
 		types.TagSender, []byte(msg.Sender.String()),
 		types.TagTokenPair, []byte(getTokenPairByDenom(msg.MaxToken.Denom, sdk.IrisAtto)),
 	)
-	return tags, k.addLiquidity(ctx, msg.Sender, irisCoin, depositToken, uniId, mintLiquidityAmt)
+	return tags, k.addLiquidity(ctx, msg.Sender, irisCoin, depositToken, uniID, mintLiquidityAmt)
 }
 
-func (k Keeper) addLiquidity(ctx sdk.Context, sender sdk.AccAddress, irisCoin, token sdk.Coin, uniId string, mintLiquidityAmt sdk.Int) sdk.Error {
+func (k Keeper) addLiquidity(ctx sdk.Context, sender sdk.AccAddress, irisCoin, token sdk.Coin, uniID string, mintLiquidityAmt sdk.Int) sdk.Error {
 	depositedTokens := sdk.NewCoins(irisCoin, token)
-	poolAddr := getReservePoolAddr(uniId)
 	// transfer deposited token into coinswaps Account
-	_, err := k.bk.SendCoins(ctx, sender, poolAddr, depositedTokens)
-	if err != nil {
+	if err := k.SendCoinsFromAccountToPool(ctx, sender, uniID, depositedTokens); err != nil {
 		return err
 	}
-
-	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, sender.String(), poolAddr.String(), depositedTokens.String(), sdk.CoinSwapAddLiquidityFlow, "")
-
-	uniDenom, err := types.GetUniDenom(uniId)
-	if err != nil {
-		return err
-	}
-	// mint liquidity vouchers for reserve Pool
-	mintToken := sdk.NewCoins(sdk.NewCoin(uniDenom, mintLiquidityAmt))
-	k.bk.AddCoins(ctx, poolAddr, mintToken)
-	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, "", poolAddr.String(), mintToken.String(), sdk.MintTokenFlow, "")
-
-	// mint liquidity vouchers for sender
-	k.bk.AddCoins(ctx, sender, mintToken)
-	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, "", sender.String(), mintToken.String(), sdk.MintTokenFlow, "")
-
-	return nil
+	return k.MintCoins(ctx, sender, uniID, mintLiquidityAmt)
 }
 
 func (k Keeper) HandleRemoveLiquidity(ctx sdk.Context, msg types.MsgRemoveLiquidity) (sdk.Tags, sdk.Error) {
 	tags := sdk.EmptyTags()
 	uniDenom := msg.WithdrawLiquidity.Denom
-	uniId, err1 := sdk.GetCoinNameByDenom(uniDenom)
+	uniID, err1 := sdk.GetCoinNameByDenom(uniDenom)
 	if err1 != nil {
 		return tags, types.ErrIllegalDenom(err1.Error())
 	}
@@ -149,9 +133,9 @@ func (k Keeper) HandleRemoveLiquidity(ctx sdk.Context, msg types.MsgRemoveLiquid
 	}
 
 	// check if reserve pool exists
-	reservePool := k.GetReservePool(ctx, uniId)
-	if reservePool == nil {
-		return tags, types.ErrReservePoolNotExists("")
+	reservePool, existed := k.GetPool(ctx, uniID)
+	if !existed {
+		return tags, types.ErrReservePoolNotExists(fmt.Sprintf("reserve pool for %s not found", uniID))
 	}
 
 	irisReserveAmt := reservePool.AmountOf(sdk.IrisAtto)
@@ -182,48 +166,21 @@ func (k Keeper) HandleRemoveLiquidity(ctx sdk.Context, msg types.MsgRemoveLiquid
 	if tokenWithdrawCoin.Amount.LT(msg.MinToken) {
 		return tags, types.ErrConstraintNotMet(fmt.Sprintf("token amount not met, user expected: no less than %s, actual: %s", sdk.NewCoin(minTokenDenom, msg.MinToken).String(), tokenWithdrawCoin.String()))
 	}
-	poolAddr := getReservePoolAddr(uniId)
 	tags = sdk.NewTags(
 		types.TagSender, []byte(msg.Sender.String()),
 		types.TagTokenPair, []byte(getTokenPairByDenom(minTokenDenom, sdk.IrisAtto)),
 	)
-	return tags, k.removeLiquidity(ctx, poolAddr, msg.Sender, deductUniCoin, irisWithdrawCoin, tokenWithdrawCoin)
+	return tags, k.removeLiquidity(ctx, uniID, msg.Sender, deductUniCoin, irisWithdrawCoin, tokenWithdrawCoin)
 }
 
-func (k Keeper) removeLiquidity(ctx sdk.Context, poolAddr, sender sdk.AccAddress, deductUniCoin, irisWithdrawCoin, tokenWithdrawCoin sdk.Coin) sdk.Error {
-	// burn liquidity from reserve Pool
-	deltaCoins := sdk.NewCoins(deductUniCoin)
-	_, _, err := k.bk.SubtractCoins(ctx, poolAddr, deltaCoins)
-	if err != nil {
+func (k Keeper) removeLiquidity(ctx sdk.Context, uniID string, sender sdk.AccAddress, burnUniCoin, irisWithdrawCoin, tokenWithdrawCoin sdk.Coin) sdk.Error {
+	// burn liquidity from reserve pool and account
+	if err := k.BurnCoins(ctx, sender, uniID, burnUniCoin); err != nil {
 		return err
 	}
-	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, poolAddr.String(), "", deltaCoins.String(), sdk.BurnFlow, "")
-
-	// burn liquidity from account
-	_, _, err = k.bk.SubtractCoins(ctx, sender, deltaCoins)
-	if err != nil {
-		return err
-	}
-	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, sender.String(), "", deltaCoins.String(), sdk.BurnFlow, "")
-
 	// transfer withdrawn liquidity from coinswaps special account to sender's account
 	coins := sdk.NewCoins(irisWithdrawCoin, tokenWithdrawCoin)
-	_, err = k.bk.SendCoins(ctx, poolAddr, sender, coins)
-	if err == nil {
-		ctx.CoinFlowTags().AppendCoinFlowTag(ctx, poolAddr.String(), sender.String(), coins.String(), sdk.CoinSwapRemoveLiquidityFlow, "")
-	}
-	return err
-}
-
-// GetReservePool returns the total balance of an reserve pool at the
-// provided denomination.
-func (k Keeper) GetReservePool(ctx sdk.Context, uniId string) (coins sdk.Coins) {
-	swapPoolAccAddr := getReservePoolAddr(uniId)
-	acc := k.ak.GetAccount(ctx, swapPoolAccAddr)
-	if acc == nil {
-		return nil
-	}
-	return acc.GetCoins()
+	return k.SendCoinsFromPoolToAccount(ctx, sender, uniID, coins)
 }
 
 // GetParams gets the parameters for the coinswap module.
@@ -241,10 +198,6 @@ func (k Keeper) SetParams(ctx sdk.Context, params types.Params) {
 func (k Keeper) Init(ctx sdk.Context) {
 	paramSet := types.DefaultParams()
 	k.paramSpace.SetParamSet(ctx, &paramSet)
-}
-
-func getReservePoolAddr(uniDenom string) sdk.AccAddress {
-	return sdk.AccAddress(crypto.AddressHash([]byte(uniDenom)))
 }
 
 func getTokenPairByDenom(inputDenom, outputDenom string) string {

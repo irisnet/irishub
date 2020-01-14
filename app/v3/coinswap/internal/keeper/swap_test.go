@@ -5,6 +5,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/irisnet/irishub/app/v1/auth"
+
 	"github.com/irisnet/irishub/app/v3/coinswap/internal/types"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/stretchr/testify/require"
@@ -31,7 +33,7 @@ func TestGetUniId(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			uniId, err := types.GetUniId(tc.denom1, tc.denom2)
+			uniId, err := types.GetUniID(tc.denom1, tc.denom2)
 			if tc.expectPass {
 				require.Equal(t, tc.expectResult, uniId)
 			} else {
@@ -111,7 +113,7 @@ func TestGetOutputPrice(t *testing.T) {
 }
 
 func TestKeeperSwap(t *testing.T) {
-	ctx, keeper, sender, reservePoolAddr, err, reservePoolBalances, senderBlances := createReservePool(t)
+	ctx, keeper, ak, sender, uniID, err, _, senderBlances := createReservePool(t)
 
 	outputCoin := sdk.NewCoin("btc-min", sdk.NewInt(100))
 	inputCoin := sdk.NewCoin(sdk.IrisAtto, sdk.NewInt(1000))
@@ -131,33 +133,35 @@ func TestKeeperSwap(t *testing.T) {
 	// first swap
 	_, err = keeper.HandleSwap(ctx, msg1)
 	require.Nil(t, err)
-	reservePoolBalances = keeper.ak.GetAccount(ctx, reservePoolAddr).GetCoins()
-	require.Equal(t, "900btc-min,1112iris-atto,1000uni:btc-min", reservePoolBalances.String())
-	senderBlances = keeper.ak.GetAccount(ctx, sender).GetCoins()
+	pool, existed := keeper.GetPool(ctx, uniID)
+	require.True(t, existed)
+	require.Equal(t, "900btc-min,1112iris-atto,1000uni:btc-min", pool.Coins.String())
+	senderBlances = ak.GetAccount(ctx, sender).GetCoins()
 	require.Equal(t, "99999100btc-min,99998888iris-atto,1000uni:btc-min", senderBlances.String())
 
 	// second swap
 	_, err = keeper.HandleSwap(ctx, msg1)
 	require.Nil(t, err)
-	reservePoolBalances = keeper.ak.GetAccount(ctx, reservePoolAddr).GetCoins()
-	require.Equal(t, "800btc-min,1252iris-atto,1000uni:btc-min", reservePoolBalances.String())
-	senderBlances = keeper.ak.GetAccount(ctx, sender).GetCoins()
+	pool, existed = keeper.GetPool(ctx, uniID)
+	require.True(t, existed)
+	require.Equal(t, "800btc-min,1252iris-atto,1000uni:btc-min", pool.Coins.String())
+	senderBlances = ak.GetAccount(ctx, sender).GetCoins()
 	require.Equal(t, "99999200btc-min,99998748iris-atto,1000uni:btc-min", senderBlances.String())
 
 	// third swap
 	_, err = keeper.HandleSwap(ctx, msg1)
 	require.Nil(t, err)
-	reservePoolBalances = keeper.ak.GetAccount(ctx, reservePoolAddr).GetCoins()
-	require.Equal(t, "700btc-min,1432iris-atto,1000uni:btc-min", reservePoolBalances.String())
+	pool, existed = keeper.GetPool(ctx, uniID)
+	require.True(t, existed)
+	require.Equal(t, "700btc-min,1432iris-atto,1000uni:btc-min", pool.Coins.String())
 }
 
-func createReservePool(t *testing.T) (sdk.Context, Keeper, sdk.AccAddress, sdk.AccAddress, sdk.Error, sdk.Coins, sdk.Coins) {
-	ctx, keeper, accs := createTestInput(t, sdk.NewInt(100000000), 1)
+func createReservePool(t *testing.T) (sdk.Context, Keeper, auth.AccountKeeper, sdk.AccAddress, string, sdk.Error, sdk.Coins, sdk.Coins) {
+	ctx, keeper, ak, accs := createTestInput(t, sdk.NewInt(100000000), 1)
 	sender := accs[0].GetAddress()
 	denom1 := "btc-min"
 	denom2 := sdk.IrisAtto
-	uniId, _ := types.GetUniId(denom1, denom2)
-	reservePoolAddr := getReservePoolAddr(uniId)
+	uniID, _ := types.GetUniID(denom1, denom2)
 
 	btcAmt, _ := sdk.NewIntFromString("1000")
 	depositCoin := sdk.NewCoin("btc-min", btcAmt)
@@ -169,15 +173,17 @@ func createReservePool(t *testing.T) (sdk.Context, Keeper, sdk.AccAddress, sdk.A
 	_, err := keeper.HandleAddLiquidity(ctx, msg)
 	//assert
 	require.Nil(t, err)
-	reservePoolBalances := keeper.ak.GetAccount(ctx, reservePoolAddr).GetCoins()
-	require.Equal(t, "1000btc-min,1000iris-atto,1000uni:btc-min", reservePoolBalances.String())
-	senderBlances := keeper.ak.GetAccount(ctx, sender).GetCoins()
-	require.Equal(t, "99999000btc-min,99999000iris-atto,1000uni:btc-min", senderBlances.String())
-	return ctx, keeper, sender, reservePoolAddr, err, reservePoolBalances, senderBlances
+	pool, existed := keeper.GetPool(ctx, uniID)
+	senderBalances := ak.GetAccount(ctx, sender).GetCoins()
+	require.Equal(t, "99999000btc-min,99999000iris-atto,1000uni:btc-min", senderBalances.String())
+	require.True(t, existed)
+	require.Equal(t, "1000btc-min,1000iris-atto,1000uni:btc-min", pool.Coins.String())
+	require.Equal(t, "99999000btc-min,99999000iris-atto,1000uni:btc-min", senderBalances.String())
+	return ctx, keeper, ak, sender, uniID, err, pool.Coins, senderBalances
 }
 
 func TestTradeInputForExactOutput(t *testing.T) {
-	ctx, keeper, sender, poolAddr, _, poolBalances, senderBlances := createReservePool(t)
+	ctx, keeper, ak, sender, uniID, _, _, senderBlances := createReservePool(t)
 
 	outputCoin := sdk.NewCoin("btc-min", sdk.NewInt(100))
 	inputCoin := sdk.NewCoin(sdk.IrisAtto, sdk.NewInt(100000))
@@ -189,7 +195,10 @@ func TestTradeInputForExactOutput(t *testing.T) {
 		Coin: outputCoin,
 	}
 
-	initSupplyOutput := poolBalances.AmountOf(outputCoin.Denom)
+	pool, existed := keeper.GetPool(ctx, uniID)
+	require.True(t, existed)
+
+	initSupplyOutput := pool.AmountOf(outputCoin.Denom)
 	maxCnt := int(initSupplyOutput.Div(outputCoin.Amount).Int64())
 
 	for i := 1; i < 100; i++ {
@@ -203,18 +212,18 @@ func TestTradeInputForExactOutput(t *testing.T) {
 		bought := sdk.NewCoins(outputCoin)
 		sold := sdk.NewCoins(sdk.NewCoin(sdk.IrisAtto, amt))
 
-		pb := poolBalances.Add(sold).Sub(bought)
+		pb := pool.Add(sold).Sub(bought)
 		sb := senderBlances.Add(bought).Sub(sold)
 
-		assertResult(t, keeper, ctx, poolAddr, sender, pb, sb)
+		assertResult(t, keeper, ak, ctx, uniID, sender, pb, sb)
 
-		poolBalances = pb
+		pool.Coins = pb
 		senderBlances = sb
 	}
 }
 
 func TestTradeExactInputForOutput(t *testing.T) {
-	ctx, keeper, sender, poolAddr, _, poolBalances, senderBlances := createReservePool(t)
+	ctx, keeper, ak, sender, uniID, _, _, senderBlances := createReservePool(t)
 
 	outputCoin := sdk.NewCoin("btc-min", sdk.NewInt(0))
 	inputCoin := sdk.NewCoin(sdk.IrisAtto, sdk.NewInt(100))
@@ -226,6 +235,9 @@ func TestTradeExactInputForOutput(t *testing.T) {
 		Coin: outputCoin,
 	}
 
+	pool, existed := keeper.GetPool(ctx, uniID)
+	require.True(t, existed)
+
 	for i := 1; i < 1000; i++ {
 		amt, err := keeper.tradeExactInputForOutput(ctx, input, output)
 		ifNil(t, err)
@@ -233,21 +245,22 @@ func TestTradeExactInputForOutput(t *testing.T) {
 		sold := sdk.NewCoins(inputCoin)
 		bought := sdk.NewCoins(sdk.NewCoin("btc-min", amt))
 
-		pb := poolBalances.Add(sold).Sub(bought)
+		pb := pool.Add(sold).Sub(bought)
 		sb := senderBlances.Add(bought).Sub(sold)
 
-		assertResult(t, keeper, ctx, poolAddr, sender, pb, sb)
+		assertResult(t, keeper, ak, ctx, uniID, sender, pb, sb)
 
-		poolBalances = pb
+		pool.Coins = pb
 		senderBlances = sb
 	}
 }
 
-func assertResult(t *testing.T, keeper Keeper, ctx sdk.Context, reservePoolAddr, sender sdk.AccAddress, expectPoolBalance, expectSenderBalance sdk.Coins) {
-	reservePoolBalances := keeper.ak.GetAccount(ctx, reservePoolAddr).GetCoins()
-	require.Equal(t, expectPoolBalance.String(), reservePoolBalances.String())
-	senderBlances := keeper.ak.GetAccount(ctx, sender).GetCoins()
-	require.Equal(t, expectSenderBalance.String(), senderBlances.String())
+func assertResult(t *testing.T, keeper Keeper, ak auth.AccountKeeper, ctx sdk.Context, uniID string, sender sdk.AccAddress, expectPoolBalance, expectSenderBalance sdk.Coins) {
+	pool, existed := keeper.GetPool(ctx, uniID)
+	require.True(t, existed)
+	require.Equal(t, expectPoolBalance.String(), pool.Coins.String())
+	senderBalances := ak.GetAccount(ctx, sender).GetCoins()
+	require.Equal(t, expectSenderBalance.String(), senderBalances.String())
 }
 
 func ifNil(t *testing.T, err sdk.Error) {

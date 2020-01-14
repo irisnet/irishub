@@ -12,7 +12,7 @@ import (
 )
 
 func TestNewQuerier(t *testing.T) {
-	ctx, keeper, _ := createTestInput(t, sdk.NewInt(100), 2)
+	ctx, keeper, _, _ := createTestInput(t, sdk.NewInt(100), 2)
 
 	req := abci.RequestQuery{
 		Path: "",

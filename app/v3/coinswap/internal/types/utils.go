@@ -7,10 +7,10 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 )
 
-// GetUniId returns the unique uni id for the provided denominations.
+// GetUniID returns the unique uni id for the provided denominations.
 // The uni id is in the format of 'u-coin-name' which the denomination
 // is not iris-atto.
-func GetUniId(denom1, denom2 string) (string, sdk.Error) {
+func GetUniID(denom1, denom2 string) (string, sdk.Error) {
 	if denom1 == denom2 {
 		return "", ErrEqualDenom("denomnations for forming uni id are equal")
 	}
@@ -40,16 +40,16 @@ func GetCoinMinDenomFromUniDenom(uniDenom string) (string, sdk.Error) {
 }
 
 // GetUniCoinType returns the uni coin type
-func GetUniCoinType(uniId string) (sdk.CoinType, sdk.Error) {
-	uniDenom, err := GetUniDenom(uniId)
+func GetUniCoinType(uniID string) (sdk.CoinType, sdk.Error) {
+	uniDenom, err := GetUniDenom(uniID)
 	if err != nil {
 		return sdk.CoinType{}, err
 	}
 	units := make(sdk.Units, 2)
-	units[0] = sdk.NewUnit(uniId, 0)
+	units[0] = sdk.NewUnit(uniID, 0)
 	units[1] = sdk.NewUnit(uniDenom, sdk.AttoScale) // the uni denom has the same decimal with iris-atto
 	return sdk.CoinType{
-		Name:    uniId,
+		Name:    uniID,
 		MinUnit: units[1],
 		Units:   units,
 	}, nil
@@ -63,23 +63,23 @@ func CheckUniDenom(uniDenom string) sdk.Error {
 	return nil
 }
 
-// CheckUniId returns nil if the uni id is valid
-func CheckUniId(uniId string) sdk.Error {
-	if !sdk.IsCoinNameValid(uniId) || !strings.HasPrefix(uniId, FormatUniABSPrefix) {
-		return ErrIllegalUniId(fmt.Sprintf("illegal liquidity id: %s", uniId))
+// CheckUniID returns nil if the uni id is valid
+func CheckUniID(uniID string) sdk.Error {
+	if !sdk.IsCoinNameValid(uniID) || !strings.HasPrefix(uniID, FormatUniABSPrefix) {
+		return ErrIllegalUniId(fmt.Sprintf("illegal liquidity id: %s", uniID))
 	}
 	return nil
 }
 
 // GetUniDenom returns uni denom if the uni id is valid
-func GetUniDenom(uniId string) (string, sdk.Error) {
-	if err := CheckUniId(uniId); err != nil {
+func GetUniDenom(uniID string) (string, sdk.Error) {
+	if err := CheckUniID(uniID); err != nil {
 		return "", err
 	}
 
-	uniDenom, err := sdk.GetCoinMinDenom(uniId)
+	uniDenom, err := sdk.GetCoinMinDenom(uniID)
 	if err != nil {
-		return "", ErrIllegalUniId(fmt.Sprintf("illegal liquidity id: %s", uniId))
+		return "", ErrIllegalUniId(fmt.Sprintf("illegal liquidity id: %s", uniID))
 	}
 	return uniDenom, nil
 }
