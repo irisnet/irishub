@@ -3,8 +3,10 @@ package stake
 import (
 	"time"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/tendermint/tendermint/crypto"
+	
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	
 )
 
 type GenesisState struct {

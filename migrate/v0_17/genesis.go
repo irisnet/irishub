@@ -1,4 +1,4 @@
-package v0_16
+package v0_17
 
 import (
 	"encoding/json"
@@ -21,39 +21,39 @@ import (
 )
 
 type GenesisState struct {
-	Accounts     []GenesisAccount      `json:"accounts"`
-	AuthData     auth.GenesisState     `json:"auth"`
-	StakeData    stake.GenesisState    `json:"stake"`
-	MintData     mint.GenesisState     `json:"mint"`
-	DistrData    distr.GenesisState    `json:"distr"`
-	GovData      gov.GenesisState      `json:"gov"`
-	UpgradeData  upgrade.GenesisState  `json:"upgrade"`
-	SlashingData slashing.GenesisState `json:"slashing"`
-	ServiceData  service.GenesisState  `json:"service"`
-	GuardianData guardian.GenesisState `json:"guardian"`
-	AssetData    asset.GenesisState    `json:"asset"`
-	RandData     rand.GenesisState     `json:"rand"`
-	SwapData     coinswap.GenesisState `json:"swap"`
-	HtlcData     htlc.GenesisState     `json:"htlc"`
-	GenTxs       []json.RawMessage     `json:"gentxs"`
+	Accounts     []GenesisAccount          `json:"accounts"`
+	AuthData     auth.GenesisState         `json:"auth"`
+	StakeData    stake.GenesisState        `json:"stake"`
+	MintData     mint.GenesisState         `json:"mint"`
+	DistrData    distribution.GenesisState `json:"distr"`
+	GovData      gov.GenesisState          `json:"gov"`
+	UpgradeData  upgrade.GenesisState      `json:"upgrade"`
+	SlashingData slashing.GenesisState     `json:"slashing"`
+	ServiceData  service.GenesisState      `json:"service"`
+	GuardianData guardian.GenesisState     `json:"guardian"`
+	AssetData    asset.GenesisState        `json:"asset"`
+	RandData     rand.GenesisState         `json:"rand"`
+	SwapData     coinswap.GenesisState     `json:"swap"`
+	HtlcData     htlc.GenesisState         `json:"htlc"`
+	GenTxs       []json.RawMessage         `json:"gentxs"`
 }
 
 type GenesisFileState struct {
-	Accounts     []GenesisFileAccount  `json:"accounts"`
-	AuthData     auth.GenesisState     `json:"auth"`
-	StakeData    stake.GenesisState    `json:"stake"`
-	MintData     mint.GenesisState     `json:"mint"`
-	DistrData    distr.GenesisState    `json:"distr"`
-	GovData      gov.GenesisState      `json:"gov"`
-	UpgradeData  upgrade.GenesisState  `json:"upgrade"`
-	SlashingData slashing.GenesisState `json:"slashing"`
-	ServiceData  service.GenesisState  `json:"service"`
-	GuardianData guardian.GenesisState `json:"guardian"`
-	AssetData    asset.GenesisState    `json:"asset"`
-	RandData     rand.GenesisState     `json:"rand"`
-	SwapData     coinswap.GenesisState `json:"swap"`
-	HtlcData     htlc.GenesisState     `json:"htlc"`
-	GenTxs       []json.RawMessage     `json:"gentxs"`
+	Accounts     []GenesisFileAccount      `json:"accounts"`
+	AuthData     auth.GenesisState         `json:"auth"`
+	StakeData    stake.GenesisState        `json:"stake"`
+	MintData     mint.GenesisState         `json:"mint"`
+	DistrData    distribution.GenesisState `json:"distr"`
+	GovData      gov.GenesisState          `json:"gov"`
+	UpgradeData  upgrade.GenesisState      `json:"upgrade"`
+	SlashingData slashing.GenesisState     `json:"slashing"`
+	ServiceData  service.GenesisState      `json:"service"`
+	GuardianData guardian.GenesisState     `json:"guardian"`
+	AssetData    asset.GenesisState        `json:"asset"`
+	RandData     rand.GenesisState         `json:"rand"`
+	SwapData     coinswap.GenesisState     `json:"swap"`
+	HtlcData     htlc.GenesisState         `json:"htlc"`
+	GenTxs       []json.RawMessage         `json:"gentxs"`
 }
 
 type GenesisFileAccount struct {

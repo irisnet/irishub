@@ -6,6 +6,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+
 	"github.com/tendermint/tendermint/types"
 
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -15,7 +16,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/auth/exported"
 	"github.com/cosmos/cosmos-sdk/x/genutil"
-	"github.com/irisnet/irishub/migrate/v0_17"
+
+	v0_17 "github.com/irisnet/irishub/migrate/v0_17"
 )
 
 const (
@@ -45,7 +47,7 @@ $ %s migrate /path/to/genesis.json --chain-id=cosmoshub-3 --genesis-time=2019-04
 				return errors.Wrapf(err, "failed to read genesis document from file %s", importGenesis)
 			}
 
-			var initialState v0_16.GenesisFileState
+			var initialState v0_17.GenesisFileState
 			if err := cdc.UnmarshalJSON(genDoc.AppState, &initialState); err != nil {
 				return errors.Wrap(err, "failed to JSON unmarshal initial genesis state")
 			}
@@ -95,7 +97,7 @@ $ %s migrate /path/to/genesis.json --chain-id=cosmoshub-3 --genesis-time=2019-04
 	return cmd
 }
 
-func Migrate(cdc *codec.Codec, initialState v0_16.GenesisFileState) (appState genutil.AppMap) {
+func Migrate(cdc *codec.Codec, initialState v0_17.GenesisFileState) (appState genutil.AppMap) {
 	v016Codec := codec.New()
 	codec.RegisterCrypto(v016Codec)
 
