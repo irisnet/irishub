@@ -195,11 +195,6 @@ func (k Keeper) SetParams(ctx sdk.Context, params types.Params) {
 	k.paramSpace.SetParamSet(ctx, &params)
 }
 
-func (k Keeper) Init(ctx sdk.Context) {
-	paramSet := types.DefaultParams()
-	k.paramSpace.SetParamSet(ctx, &paramSet)
-}
-
 func getTokenPairByDenom(inputDenom, outputDenom string) string {
 	inputToken, err := sdk.GetCoinNameByDenom(inputDenom)
 	if err != nil {

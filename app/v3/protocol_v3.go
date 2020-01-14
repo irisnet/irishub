@@ -104,6 +104,7 @@ func (p *ProtocolV3) Load() {
 // Init initializes the configuration of this Protocol
 func (p *ProtocolV3) Init(ctx sdk.Context) {
 	p.assetKeeper.Init(ctx)
+	p.coinswapKeeper.Init(ctx)
 }
 
 // GetCodec get codec
