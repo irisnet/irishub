@@ -16,8 +16,8 @@
 不同级别对应的具体 Proposal：
 
 - Critical：`SoftwareUpgrade`, `SystemHalt`
-- Important：`Parameter`,`TokenAddition`
-- Normal：`CommunityTaxUsage`,`PlainText`
+- Important：`Parameter`, `CommunityTaxUsage`, `TokenAddition`
+- Normal：`PlainText`
 
 `SoftwareUpgrade Proposal` 和 `SystemHalt Proposal` 只能由profiler发起。
 
