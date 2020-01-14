@@ -64,7 +64,7 @@ func handleMsgTransferTokenOwner(ctx sdk.Context, k Keeper, msg MsgTransferToken
 // handleMsgMintToken handles MsgMintToken
 func handleMsgMintToken(ctx sdk.Context, k Keeper, msg MsgMintToken) sdk.Result {
 	_, symbol := GetTokenIDParts(msg.TokenId)
-	if err := k.DeductMintTokenFeeFee(ctx, msg.Owner, symbol); err != nil {
+	if err := k.DeductMintTokenFee(ctx, msg.Owner, symbol); err != nil {
 		return err.Result()
 	}
 
