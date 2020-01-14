@@ -14,37 +14,27 @@ const (
 	CodeInvalidLength            sdk.CodeType = 102
 	CodeUnknownServiceDefinition sdk.CodeType = 103
 	CodeServiceDefinitionExists  sdk.CodeType = 104
-	CodeInvalidChainId           sdk.CodeType = 105
 
-	CodeSvcBindingExists     sdk.CodeType = 106
-	CodeSvcBindingNotExists  sdk.CodeType = 107
-	CodeInvalidDefChainId    sdk.CodeType = 108
-	CodeInvalidBindingType   sdk.CodeType = 109
-	CodeInvalidLevel         sdk.CodeType = 110
-	CodeInvalidPriceCount    sdk.CodeType = 111
-	CodeInvalidRefundDeposit sdk.CodeType = 112
-	CodeLtMinProviderDeposit sdk.CodeType = 113
-	CodeInvalidDisable       sdk.CodeType = 114
-	CodeInvalidEnable        sdk.CodeType = 115
+	CodeInvalidDeposit            sdk.CodeType = 108
+	CodeInvalidPricing            sdk.CodeType = 108
+	CodeServiceBindingExists      sdk.CodeType = 106
+	CodeUnknownServiceBinding     sdk.CodeType = 107
+	CodeServiceBindingUnavailable sdk.CodeType = 110
+	CodeServiceBindingAvailable   sdk.CodeType = 111
+	CodeIncorrectRefundTime       sdk.CodeType = 108
 
-	CodeMethodNotExists        sdk.CodeType = 116
-	CodeRequestNotActive       sdk.CodeType = 117
-	CodeReturnFeeNotExists     sdk.CodeType = 118
-	CodeWithdrawFeeNotExists   sdk.CodeType = 119
-	CodeLtServiceFee           sdk.CodeType = 120
-	CodeInvalidReqId           sdk.CodeType = 121
-	CodeSvcBindingNotAvailable sdk.CodeType = 122
-	CodeNotMatchingProvider    sdk.CodeType = 123
-	CodeInvalidReqChainId      sdk.CodeType = 124
-	CodeInvalidBindChainId     sdk.CodeType = 125
-	CodeNotMatchingReqChainID  sdk.CodeType = 126
+	CodeRequestNotActive     sdk.CodeType = 117
+	CodeReturnFeeNotExists   sdk.CodeType = 118
+	CodeWithdrawFeeNotExists sdk.CodeType = 119
+	CodeLtServiceFee         sdk.CodeType = 120
+	CodeInvalidReqId         sdk.CodeType = 121
+	CodeNotMatchingProvider  sdk.CodeType = 123
 
 	CodeInvalidRequestInput   sdk.CodeType = 127
 	CodeInvalidResponseOutput sdk.CodeType = 128
 	CodeInvalidResponseErr    sdk.CodeType = 129
 
-	CodeIntOverflow    sdk.CodeType = 130
-	CodeInvalidInput   sdk.CodeType = 131
+	CodeInvalidInput   sdk.CodeType = 130
 	CodeInvalidAddress sdk.CodeType = 132
 )
 
@@ -56,6 +46,10 @@ func ErrInvalidSchemas(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidSchemas, msg)
 }
 
+func ErrInvalidLength(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidLength, msg)
+}
+
 func ErrServiceDefinitionExists(codespace sdk.CodespaceType, serviceName string) sdk.Error {
 	return sdk.NewError(codespace, CodeServiceDefinitionExists, fmt.Sprintf("service name %s already exists", serviceName))
 }
@@ -64,56 +58,32 @@ func ErrUnknownServiceDefinition(codespace sdk.CodespaceType, serviceName string
 	return sdk.NewError(codespace, CodeUnknownServiceDefinition, fmt.Sprintf("service name %s does not exist", serviceName))
 }
 
-func ErrInvalidLength(codespace sdk.CodespaceType, msg string) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidLength, msg)
+func ErrInvalidDeposit(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidDeposit, msg)
 }
 
-func ErrInvalidChainId(codespace sdk.CodespaceType) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidChainId, fmt.Sprintf("chainId is empty"))
+func ErrInvalidPricing(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidPricing, msg)
 }
 
-func ErrInvalidDefChainId(codespace sdk.CodespaceType) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidDefChainId, fmt.Sprintf("defined chain id is empty"))
+func ErrServiceBindingExists(codespace sdk.CodespaceType) sdk.Error {
+	return sdk.NewError(codespace, CodeServiceBindingExists, fmt.Sprintf("service binding already exists"))
 }
 
-func ErrSvcBindingExists(codespace sdk.CodespaceType) sdk.Error {
-	return sdk.NewError(codespace, CodeSvcBindingExists, fmt.Sprintf("service binding already exists"))
+func ErrUnknownServiceBinding(codespace sdk.CodespaceType) sdk.Error {
+	return sdk.NewError(codespace, CodeUnknownServiceBinding, fmt.Sprintf("service binding does not exist"))
 }
 
-func ErrSvcBindingNotExists(codespace sdk.CodespaceType) sdk.Error {
-	return sdk.NewError(codespace, CodeSvcBindingNotExists, fmt.Sprintf("service binding is not existed"))
+func ErrServiceBindingUnavailable(codespace sdk.CodespaceType) sdk.Error {
+	return sdk.NewError(codespace, CodeServiceBindingUnavailable, fmt.Sprintf("service binding is unavailable"))
 }
 
-func ErrInvalidBindingType(codespace sdk.CodespaceType, bindingType BindingType) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidBindingType, fmt.Sprintf("invalid binding type %s", bindingType))
+func ErrServiceBindingAvailable(codespace sdk.CodespaceType) sdk.Error {
+	return sdk.NewError(codespace, CodeServiceBindingAvailable, fmt.Sprintf("service binding is available"))
 }
 
-func ErrInvalidLevel(codespace sdk.CodespaceType, level Level) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidLevel, fmt.Sprintf("invalid level %v, avg_rsp_time and usable_time must be positive integer and usable_time limit to 10000", level))
-}
-
-func ErrInvalidPriceCount(codespace sdk.CodespaceType, priceCount int, methodCount int) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidPriceCount, fmt.Sprintf("invalid prices count %d, but methods count is %d", priceCount, methodCount))
-}
-
-func ErrRefundDeposit(codespace sdk.CodespaceType, msg string) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidRefundDeposit, fmt.Sprintf("can't refund deposit, %s", msg))
-}
-
-func ErrDisable(codespace sdk.CodespaceType, msg string) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidDisable, fmt.Sprintf("can't disable, %s", msg))
-}
-
-func ErrEnable(codespace sdk.CodespaceType, msg string) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidEnable, fmt.Sprintf("can't enable, %s", msg))
-}
-
-func ErrLtMinProviderDeposit(codespace sdk.CodespaceType, coins sdk.Coins) sdk.Error {
-	return sdk.NewError(codespace, CodeLtMinProviderDeposit, fmt.Sprintf("deposit amount must be equal or greater than %s", coins.String()))
-}
-
-func ErrMethodNotExists(codespace sdk.CodespaceType, methodID int16) sdk.Error {
-	return sdk.NewError(codespace, CodeMethodNotExists, fmt.Sprintf("service method [%d] is not existed", methodID))
+func ErrIncorrectRefundTime(codespace sdk.CodespaceType, refundableTime string) sdk.Error {
+	return sdk.NewError(codespace, CodeIncorrectRefundTime, fmt.Sprintf("can not refund before %s", refundableTime))
 }
 
 func ErrRequestNotActive(codespace sdk.CodespaceType, requestID string) sdk.Error {
@@ -136,24 +106,8 @@ func ErrInvalidReqId(codespace sdk.CodespaceType, reqId string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidReqId, fmt.Sprintf("invalid request id [%s]", reqId))
 }
 
-func ErrSvcBindingNotAvailable(codespace sdk.CodespaceType) sdk.Error {
-	return sdk.NewError(codespace, CodeSvcBindingNotAvailable, fmt.Sprintf("service binding is unavailable"))
-}
-
 func ErrNotMatchingProvider(codespace sdk.CodespaceType, provider sdk.AccAddress) sdk.Error {
 	return sdk.NewError(codespace, CodeNotMatchingProvider, fmt.Sprintf("[%s] is not a matching Provider", provider.String()))
-}
-
-func ErrInvalidReqChainId(codespace sdk.CodespaceType) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidReqChainId, fmt.Sprintf("request chain id is empty"))
-}
-
-func ErrInvalidBindChainId(codespace sdk.CodespaceType) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidBindChainId, fmt.Sprintf("bind chain id is empty"))
-}
-
-func ErrNotMatchingReqChainID(codespace sdk.CodespaceType, reqChainID string) sdk.Error {
-	return sdk.NewError(codespace, CodeNotMatchingReqChainID, fmt.Sprintf("[%s] is not a matching reqChainID", reqChainID))
 }
 
 func ErrNotTrustee(codespace sdk.CodespaceType, trustee sdk.AccAddress) sdk.Error {
@@ -168,10 +122,6 @@ func ErrNoResponseFound(codespace sdk.CodespaceType, requestID string) sdk.Error
 	return sdk.NewError(codespace, CodeInvalidInput, fmt.Sprintf("response is not existed for request %s", requestID))
 }
 
-func ErrInvalidAddress(codespace sdk.CodespaceType, msg string) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidAddress, msg)
-}
-
 func ErrInvalidRequestInput(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidRequestInput, msg)
 }
@@ -182,4 +132,8 @@ func ErrInvalidResponseOutput(codespace sdk.CodespaceType, msg string) sdk.Error
 
 func ErrInvalidResponseErr(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidResponseErr, msg)
+}
+
+func ErrInvalidAddress(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidAddress, msg)
 }
