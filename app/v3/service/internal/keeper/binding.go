@@ -9,224 +9,190 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 )
 
-// AddServiceBinding
+// AddServiceBinding creates a new service binding
 func (k Keeper) AddServiceBinding(
 	ctx sdk.Context,
-	defChainID,
-	defName,
-	bindChainID string,
+	serviceName string,
 	provider sdk.AccAddress,
-	bindingType types.BindingType,
 	deposit sdk.Coins,
-	prices []sdk.Coin,
-	level types.Level,
+	pricing string,
+	withdrawAddr sdk.AccAddress,
 ) sdk.Error {
-	if _, found := k.GetServiceDefinition(ctx, defName); !found {
-		return types.ErrUnknownServiceDefinition(k.codespace, defName)
+	if _, found := k.GetServiceDefinition(ctx, serviceName); !found {
+		return types.ErrUnknownServiceDefinition(k.codespace, serviceName)
 	}
 
-	if _, found := k.GetServiceBinding(ctx, defChainID, defName, bindChainID, provider); found {
-		return types.ErrSvcBindingExists(k.codespace)
+	if _, found := k.GetServiceBinding(ctx, serviceName, provider); found {
+		return types.ErrServiceBindingExists(k.codespace)
 	}
 
-	minDeposit, err := k.getMinDeposit(ctx, prices)
-	if err != nil {
-		return err
-	}
-
+	minDeposit := k.getMinDeposit(ctx, pricing)
 	if !deposit.IsAllGTE(minDeposit) {
-		return types.ErrLtMinProviderDeposit(k.codespace, minDeposit)
+		return types.ErrInvalidDeposit(k.codespace, fmt.Sprintf("insufficient deposit: minimal deposit %s, %s got", minDeposit, deposit))
 	}
 
-	svcBinding := types.NewSvcBinding(ctx, defChainID, defName, bindChainID, provider, bindingType, deposit, prices, level, true)
-
-	// Send coins from the provider's account to DepositedCoinsAccAddr
-	_, err = k.bk.SendCoins(ctx, svcBinding.Provider, auth.ServiceDepositCoinsAccAddr, svcBinding.Deposit)
+	// Send coins from the provider's account to ServiceDepositCoinsAccAddr
+	_, err := k.bk.SendCoins(ctx, provider, auth.ServiceDepositCoinsAccAddr, deposit)
 	if err != nil {
 		return err
 	}
 
-	svcBinding.DisableTime = time.Time{}
+	if len(withdrawAddr) == 0 {
+		withdrawAddr = provider
+	}
+
+	available := true
+	disabledTime := time.Time{}
+
+	svcBinding := types.NewServiceBinding(serviceName, provider, deposit, pricing, withdrawAddr, available, disabledTime)
 	k.SetServiceBinding(ctx, svcBinding)
 
 	return nil
 }
 
-// SetServiceBinding
-func (k Keeper) SetServiceBinding(ctx sdk.Context, svcBinding types.SvcBinding) {
-	store := ctx.KVStore(k.storeKey)
-
-	bz := k.cdc.MustMarshalBinaryLengthPrefixed(svcBinding)
-	store.Set(GetServiceBindingKey(svcBinding.DefChainID, svcBinding.DefName, svcBinding.BindChainID, svcBinding.Provider), bz)
-}
-
-// GetServiceBinding
-func (k Keeper) GetServiceBinding(ctx sdk.Context, defChainID, defName, bindChainID string, provider sdk.AccAddress) (svcBinding types.SvcBinding, found bool) {
-	store := ctx.KVStore(k.storeKey)
-
-	bz := store.Get(GetServiceBindingKey(defChainID, defName, bindChainID, provider))
-	if bz == nil {
-		return svcBinding, false
-	}
-
-	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &svcBinding)
-	return svcBinding, true
-}
-
-// ServiceBindingsIterator
-func (k Keeper) ServiceBindingsIterator(ctx sdk.Context, defChainID, defName string) sdk.Iterator {
-	store := ctx.KVStore(k.storeKey)
-	return sdk.KVStorePrefixIterator(store, GetBindingsSubspaceKey(defChainID, defName))
-}
-
-// AllServiceBindingsIterator returns an iterator for all the binding services
-func (k Keeper) AllServiceBindingsIterator(ctx sdk.Context) sdk.Iterator {
-	store := ctx.KVStore(k.storeKey)
-	return sdk.KVStorePrefixIterator(store, bindingPropertyKey)
-}
-
-// UpdateServiceBinding
+// UpdateServiceBinding updates the specified service binding
 func (k Keeper) UpdateServiceBinding(
 	ctx sdk.Context,
-	defChainID,
-	defName,
-	bindChainID string,
+	serviceName string,
 	provider sdk.AccAddress,
-	bindingType types.BindingType,
 	deposit sdk.Coins,
-	prices []sdk.Coin,
-	level types.Level,
-) (svcBinding types.SvcBinding, err sdk.Error) {
-	oldBinding, found := k.GetServiceBinding(ctx, defChainID, defName, bindChainID, provider)
+	pricing string,
+) sdk.Error {
+	binding, found := k.GetServiceBinding(ctx, serviceName, provider)
 	if !found {
-		return svcBinding, types.ErrSvcBindingNotExists(k.codespace)
+		return types.ErrUnknownServiceBinding(k.codespace)
 	}
 
-	newBinding := types.NewSvcBinding(ctx, defChainID, defName, bindChainID, provider, bindingType,
-		deposit, prices, level, false)
+	updated := false
 
-	if len(prices) > 0 {
-		oldBinding.Prices = newBinding.Prices
+	// update the pricing
+	if len(pricing) != 0 {
+		binding.Pricing = pricing
+		updated = true
 	}
 
-	if newBinding.BindingType != 0x00 {
-		oldBinding.BindingType = newBinding.BindingType
+	// add the deposit
+	if len(deposit) != 0 {
+		binding.Deposit = binding.Deposit.Add(deposit)
+		updated = true
 	}
 
-	// Add coins to svcBinding deposit
-	if !newBinding.Deposit.IsAnyNegative() {
-		oldBinding.Deposit = oldBinding.Deposit.Add(newBinding.Deposit)
+	// only check deposit when updated and the binding is available
+	if updated && binding.Available {
+		minDeposit := k.getMinDeposit(ctx, binding.Pricing)
+		if !binding.Deposit.IsAllGTE(minDeposit) {
+			return types.ErrInvalidDeposit(k.codespace, fmt.Sprintf("insufficient deposit: minimal deposit %s, %s got", minDeposit, binding.Deposit))
+		}
 	}
 
-	// Send coins from the provider's account to ServiceDepositCoinsAccAddr
-	_, err = k.bk.SendCoins(ctx, provider, auth.ServiceDepositCoinsAccAddr, newBinding.Deposit)
-	if err != nil {
-		return svcBinding, err
-	}
-
-	if newBinding.Level.UsableTime != 0 {
-		oldBinding.Level.UsableTime = newBinding.Level.UsableTime
-	}
-	if newBinding.Level.AvgRspTime != 0 {
-		oldBinding.Level.AvgRspTime = newBinding.Level.AvgRspTime
-	}
-
-	// only check deposit if binding is available
-	if oldBinding.Available {
-		minDeposit, err := k.getMinDeposit(ctx, oldBinding.Prices)
+	if len(deposit) != 0 {
+		// Send coins from the provider's account to ServiceDepositCoinsAccAddr
+		_, err := k.bk.SendCoins(ctx, provider, auth.ServiceDepositCoinsAccAddr, deposit)
 		if err != nil {
-			return svcBinding, err
-		}
-
-		if !oldBinding.Deposit.IsAllGTE(minDeposit) {
-			return svcBinding, types.ErrLtMinProviderDeposit(k.codespace, minDeposit.Sub(oldBinding.Deposit).Add(newBinding.Deposit))
+			return err
 		}
 	}
 
-	k.SetServiceBinding(ctx, oldBinding)
+	k.SetServiceBinding(ctx, binding)
 
-	return oldBinding, nil
+	return nil
 }
 
-// Disable
-func (k Keeper) Disable(ctx sdk.Context, defChainID, defName, bindChainID string, provider sdk.AccAddress) sdk.Error {
-	binding, found := k.GetServiceBinding(ctx, defChainID, defName, bindChainID, provider)
+// SetWithdrawAddress sets a new withdrawal address for the specified service binding
+func (k Keeper) SetWithdrawAddress(
+	ctx sdk.Context,
+	serviceName string,
+	provider,
+	withdrawAddr sdk.AccAddress,
+) sdk.Error {
+	binding, found := k.GetServiceBinding(ctx, serviceName, provider)
 	if !found {
-		return types.ErrSvcBindingNotExists(k.codespace)
+		return types.ErrUnknownServiceBinding(k.codespace)
+	}
+
+	binding.WithdrawAddress = withdrawAddr
+	k.SetServiceBinding(ctx, binding)
+
+	return nil
+}
+
+// DisableService disables the specified service binding
+func (k Keeper) DisableService(ctx sdk.Context, serviceName string, provider sdk.AccAddress) sdk.Error {
+	binding, found := k.GetServiceBinding(ctx, serviceName, provider)
+	if !found {
+		return types.ErrUnknownServiceBinding(k.codespace)
 	}
 
 	if !binding.Available {
-		return types.ErrDisable(k.Codespace(), "service binding is unavailable")
+		return types.ErrServiceBindingUnavailable(k.codespace)
 	}
 
 	binding.Available = false
-	binding.DisableTime = ctx.BlockHeader().Time
+	binding.DisabledTime = ctx.BlockHeader().Time
 
 	k.SetServiceBinding(ctx, binding)
 
 	return nil
 }
 
-// Enable
-func (k Keeper) Enable(ctx sdk.Context, defChainID, defName, bindChainID string, provider sdk.AccAddress, deposit sdk.Coins) sdk.Error {
-	binding, found := k.GetServiceBinding(ctx, defChainID, defName, bindChainID, provider)
+// EnableService enables the specified service binding
+func (k Keeper) EnableService(ctx sdk.Context, serviceName string, provider sdk.AccAddress, deposit sdk.Coins) sdk.Error {
+	binding, found := k.GetServiceBinding(ctx, serviceName, provider)
 	if !found {
-		return types.ErrSvcBindingNotExists(k.codespace)
+		return types.ErrUnknownServiceBinding(k.codespace)
 	}
 
 	if binding.Available {
-		return types.ErrEnable(k.Codespace(), "service binding is available")
+		return types.ErrServiceBindingAvailable(k.codespace)
 	}
 
-	// Add coins to svcBinding deposit
-	if !deposit.IsAnyNegative() {
+	// add the deposit
+	if len(deposit) != 0 {
 		binding.Deposit = binding.Deposit.Add(deposit)
 	}
 
-	minDeposit, err := k.getMinDeposit(ctx, binding.Prices)
-	if err != nil {
-		return err
-	}
-
+	minDeposit := k.getMinDeposit(ctx, binding.Pricing)
 	if !binding.Deposit.IsAllGTE(minDeposit) {
-		return types.ErrLtMinProviderDeposit(k.codespace, minDeposit.Sub(binding.Deposit).Add(deposit))
+		return types.ErrInvalidDeposit(k.codespace, fmt.Sprintf("insufficient deposit: minimal deposit %s, %s got", minDeposit, binding.Deposit))
 	}
 
-	// Send coins from the provider's account to ServiceDepositCoinsAccAddr
-	_, err = k.bk.SendCoins(ctx, binding.Provider, auth.ServiceDepositCoinsAccAddr, deposit)
-	if err != nil {
-		return err
+	if deposit != nil {
+		// Send coins from the provider's account to ServiceDepositCoinsAccAddr
+		_, err := k.bk.SendCoins(ctx, binding.Provider, auth.ServiceDepositCoinsAccAddr, deposit)
+		if err != nil {
+			return err
+		}
 	}
 
 	binding.Available = true
-	binding.DisableTime = time.Time{}
+	binding.DisabledTime = time.Time{}
 
 	k.SetServiceBinding(ctx, binding)
 
 	return nil
 }
 
-// RefundDeposit
-func (k Keeper) RefundDeposit(ctx sdk.Context, defChainID, defName, bindChainID string, provider sdk.AccAddress) sdk.Error {
-	binding, found := k.GetServiceBinding(ctx, defChainID, defName, bindChainID, provider)
+// RefundDeposit refunds the deposit from the specified service binding
+func (k Keeper) RefundDeposit(ctx sdk.Context, serviceName string, provider sdk.AccAddress) sdk.Error {
+	binding, found := k.GetServiceBinding(ctx, serviceName, provider)
 	if !found {
-		return types.ErrSvcBindingNotExists(k.Codespace())
+		return types.ErrUnknownServiceBinding(k.codespace)
 	}
 
 	if binding.Available {
-		return types.ErrRefundDeposit(k.Codespace(), "can't refund from a available service binding")
+		return types.ErrServiceBindingAvailable(k.codespace)
 	}
 
 	if binding.Deposit.IsZero() {
-		return types.ErrRefundDeposit(k.Codespace(), "service binding deposit is zero")
+		return types.ErrInvalidDeposit(k.codespace, "the deposit of the service binding is zero")
 	}
 
-	blockTime := ctx.BlockHeader().Time
 	params := k.GetParamSet(ctx)
+	refundableTime := binding.DisabledTime.Add(params.ArbitrationTimeLimit).Add(params.ComplaintRetrospect)
 
-	refundTime := binding.DisableTime.Add(params.ArbitrationTimeLimit).Add(params.ComplaintRetrospect)
-	if blockTime.Before(refundTime) {
-		return types.ErrRefundDeposit(k.Codespace(), fmt.Sprintf("can not refund deposit before %s", refundTime.Format("2006-01-02 15:04:05")))
+	currentTime := ctx.BlockHeader().Time
+	if currentTime.Before(refundableTime) {
+		return types.ErrIncorrectRefundTime(k.codespace, refundableTime.Format("2006-01-02 15:04:05"))
 	}
 
 	// Send coins from ServiceDepositCoinsAccAddr to the provider's account
@@ -247,7 +213,7 @@ func (k Keeper) RefundDeposits(ctx sdk.Context) sdk.Error {
 	defer iterator.Close()
 
 	for ; iterator.Valid(); iterator.Next() {
-		var binding types.SvcBinding
+		var binding types.ServiceBinding
 		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &binding)
 
 		_, err := k.bk.SendCoins(ctx, auth.ServiceDepositCoinsAccAddr, binding.Provider, binding.Deposit)
@@ -259,17 +225,47 @@ func (k Keeper) RefundDeposits(ctx sdk.Context) sdk.Error {
 	return nil
 }
 
-func (k Keeper) getMinDeposit(ctx sdk.Context, prices []sdk.Coin) (sdk.Coins, sdk.Error) {
-	params := k.GetParamSet(ctx)
-	// min deposit must >= sum(method price) * minDepositMultiple
-	minDepositMultiple := sdk.NewInt(params.MinDepositMultiple)
-	var minDeposit sdk.Coins
-	for _, price := range prices {
-		if price.Amount.BigInt().BitLen()+minDepositMultiple.BigInt().BitLen()-1 > 255 {
-			return minDeposit, sdk.NewError(k.codespace, types.CodeIntOverflow, fmt.Sprintf("Int Overflow"))
-		}
-		minInt := price.Amount.Mul(minDepositMultiple)
-		minDeposit = minDeposit.Add(sdk.NewCoins(sdk.NewCoin(price.Denom, minInt)))
+// SetServiceBinding sets the service binding
+func (k Keeper) SetServiceBinding(ctx sdk.Context, svcBinding types.ServiceBinding) {
+	store := ctx.KVStore(k.storeKey)
+
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(svcBinding)
+	store.Set(GetServiceBindingKey(svcBinding.ServiceName, svcBinding.Provider), bz)
+}
+
+// GetServiceBinding retrieves the specified service binding
+func (k Keeper) GetServiceBinding(ctx sdk.Context, serviceName string, provider sdk.AccAddress) (svcBinding types.ServiceBinding, found bool) {
+	store := ctx.KVStore(k.storeKey)
+
+	bz := store.Get(GetServiceBindingKey(serviceName, provider))
+	if bz == nil {
+		return svcBinding, false
 	}
-	return minDeposit, nil
+
+	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &svcBinding)
+	return svcBinding, true
+}
+
+// ServiceBindingsIterator returns an iterator for all bindings of the specified service
+func (k Keeper) ServiceBindingsIterator(ctx sdk.Context, serviceName string) sdk.Iterator {
+	store := ctx.KVStore(k.storeKey)
+	return sdk.KVStorePrefixIterator(store, GetBindingsSubspace(serviceName))
+}
+
+// AllServiceBindingsIterator returns an iterator for all bindings
+func (k Keeper) AllServiceBindingsIterator(ctx sdk.Context) sdk.Iterator {
+	store := ctx.KVStore(k.storeKey)
+	return sdk.KVStorePrefixIterator(store, serviceBindingKey)
+}
+
+func (k Keeper) getMinDeposit(ctx sdk.Context, pricing string) sdk.Coins {
+	params := k.GetParamSet(ctx)
+	minDepositMultiple := sdk.NewInt(params.MinDepositMultiple)
+
+	// TODO
+	price := sdk.Coin{}
+
+	// minimal deposit = price * minDepositMultiple
+	minDeposit := sdk.NewCoins(sdk.NewCoin(price.Denom, price.Amount.Mul(minDepositMultiple)))
+	return minDeposit
 }

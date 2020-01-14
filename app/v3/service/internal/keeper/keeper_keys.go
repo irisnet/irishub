@@ -13,7 +13,7 @@ var (
 
 	// Keys for store prefixes
 	serviceDefinitionKey         = []byte{0x01}
-	bindingPropertyKey           = []byte{0x02}
+	serviceBindingKey            = []byte{0x02}
 	requestKey                   = []byte{0x03}
 	responseKey                  = []byte{0x04}
 	requestsByExpirationIndexKey = []byte{0x05}
@@ -28,13 +28,14 @@ func GetServiceDefinitionKey(name string) []byte {
 	return append(serviceDefinitionKey, []byte(name)...)
 }
 
-func GetServiceBindingKey(defChainId, name, bindChainId string, provider sdk.AccAddress) []byte {
-	return append(bindingPropertyKey, getStringsKey([]string{defChainId, name, bindChainId, provider.String()})...)
+// GetServiceBindingKey returns the key for the service binding with the specified name and provider
+func GetServiceBindingKey(serviceName string, provider sdk.AccAddress) []byte {
+	return append(serviceBindingKey, getStringsKey([]string{serviceName, provider.String()})...)
 }
 
-// Key for getting all methods on a service from the store
-func GetBindingsSubspaceKey(chainId, serviceName string) []byte {
-	return append(append(bindingPropertyKey, getStringsKey([]string{chainId, serviceName})...), emptyByte...)
+// GetBindingsSubspace returns the key for retrieving all bindings of the specified service
+func GetBindingsSubspace(serviceName string) []byte {
+	return append(append(serviceBindingKey, []byte(serviceName)...), emptyByte...)
 }
 
 func GetRequestKey(defChainId, serviceName, bindChainId string, provider sdk.AccAddress, height int64, counter int16) []byte {

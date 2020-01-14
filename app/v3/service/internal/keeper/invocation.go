@@ -22,13 +22,13 @@ func (k Keeper) AddRequest(
 	serviceFee sdk.Coins,
 	profiling bool,
 ) (req types.SvcRequest, err sdk.Error) {
-	binding, found := k.GetServiceBinding(ctx, defChainID, defName, bindChainID, provider)
+	binding, found := k.GetServiceBinding(ctx, defName, provider)
 	if !found {
-		return req, types.ErrSvcBindingNotExists(k.codespace)
+		return req, types.ErrUnknownServiceBinding(k.codespace)
 	}
 
 	if !binding.Available {
-		return req, types.ErrSvcBindingNotAvailable(k.codespace)
+		return req, types.ErrServiceBindingUnavailable(k.codespace)
 	}
 
 	if profiling {
@@ -37,17 +37,7 @@ func (k Keeper) AddRequest(
 		}
 	}
 
-	//Method id start at 1
-	if len(binding.Prices) >= int(methodID) && !serviceFee.IsAllGTE(sdk.Coins{binding.Prices[methodID-1]}) {
-		return req, types.ErrLtServiceFee(k.codespace, sdk.Coins{binding.Prices[methodID-1]})
-	}
-
-	// request service fee is equal to service binding service fee if not profiling
-	if len(binding.Prices) >= int(methodID) && !profiling {
-		serviceFee = sdk.Coins{binding.Prices[methodID-1]}
-	} else {
-		serviceFee = nil
-	}
+	// TODO: service fee logic
 
 	req = types.NewSvcRequest(
 		defChainID, defName, bindChainID, reqChainID, consumer,
@@ -168,10 +158,6 @@ func (k Keeper) AddResponse(
 		return resp, types.ErrNotMatchingProvider(k.codespace, provider)
 	}
 
-	if reqChainID != req.ReqChainID {
-		return resp, types.ErrNotMatchingReqChainID(k.codespace, reqChainID)
-	}
-
 	if err := k.AddIncomingFee(ctx, provider, req.ServiceFee); err != nil {
 		return resp, err
 	}
@@ -208,7 +194,7 @@ func (k Keeper) GetResponse(ctx sdk.Context, reqChainID string, eHeight, rHeight
 }
 
 // Slash
-func (k Keeper) Slash(ctx sdk.Context, binding types.SvcBinding, slashCoins sdk.Coins) sdk.Error {
+func (k Keeper) Slash(ctx sdk.Context, binding types.ServiceBinding, slashCoins sdk.Coins) sdk.Error {
 	deposit, hasNeg := binding.Deposit.SafeSub(slashCoins)
 	if hasNeg {
 		errMsg := fmt.Sprintf("%s is less than %s", binding.Deposit, slashCoins)
@@ -216,17 +202,14 @@ func (k Keeper) Slash(ctx sdk.Context, binding types.SvcBinding, slashCoins sdk.
 	}
 
 	binding.Deposit = deposit
-	minDeposit, err := k.getMinDeposit(ctx, binding.Prices)
-	if err != nil {
-		return err
-	}
+	minDeposit := k.getMinDeposit(ctx, binding.Pricing)
 
 	if !binding.Deposit.IsAllGTE(minDeposit) {
 		binding.Available = false
-		binding.DisableTime = ctx.BlockHeader().Time
+		binding.DisabledTime = ctx.BlockHeader().Time
 	}
 
-	_, err = k.bk.BurnCoins(ctx, auth.ServiceDepositCoinsAccAddr, slashCoins)
+	_, err := k.bk.BurnCoins(ctx, auth.ServiceDepositCoinsAccAddr, slashCoins)
 	if err != nil {
 		return err
 	}
