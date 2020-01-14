@@ -52,29 +52,23 @@ func GetCmdQueryServiceDefinition(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-func GetCmdQuerySvcBind(cdc *codec.Codec) *cobra.Command {
+// GetCmdQueryServiceBinding implements the query service binding command
+func GetCmdQueryServiceBinding(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "binding",
 		Short:   "Query service binding",
-		Example: "iriscli service binding --def-chain-id=<chain-id> --service-name=<service name> --bind-chain-id=<chain-id> --provider=<provider>",
+		Example: "iriscli service binding <service name> <provider>",
+		Args:    cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
-				WithAccountDecoder(utils.GetAccountDecoder(cdc))
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			name := viper.GetString(FlagServiceName)
-			defChainId := viper.GetString(FlagDefChainID)
-			bindChainId := viper.GetString(FlagBindChainID)
-			providerStr := viper.GetString(FlagProvider)
-
-			provider, err := sdk.AccAddressFromBech32(providerStr)
+			provider, err := sdk.AccAddressFromBech32(args[1])
 			if err != nil {
 				return err
 			}
 
 			params := service.QueryBindingParams{
-				DefChainID:  defChainId,
-				ServiceName: name,
-				BindChainID: bindChainId,
+				ServiceName: args[0],
 				Provider:    provider,
 			}
 
@@ -89,34 +83,30 @@ func GetCmdQuerySvcBind(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			fmt.Println(string(res))
-			return nil
+			var svcBinding service.ServiceBinding
+			if err := cdc.UnmarshalJSON(res, &svcBinding); err != nil {
+				return err
+			}
+
+			return cliCtx.PrintOutput(svcBinding)
 		},
 	}
-	cmd.Flags().AddFlagSet(FsServiceDefinition)
-	cmd.Flags().AddFlagSet(FsServiceBinding)
-	cmd.MarkFlagRequired(FlagDefChainID)
-	cmd.MarkFlagRequired(FlagServiceName)
-	cmd.MarkFlagRequired(FlagBindChainID)
-	cmd.MarkFlagRequired(FlagProvider)
+
 	return cmd
 }
 
-func GetCmdQuerySvcBinds(cdc *codec.Codec) *cobra.Command {
+// GetCmdQueryServiceBindings implements the query service bindings command
+func GetCmdQueryServiceBindings(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "bindings",
 		Short:   "Query service bindings",
-		Example: "iriscli service bindings --def-chain-id=<chain-id> --service-name=<service name>",
+		Example: "iriscli service bindings <service name>",
+		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
-				WithAccountDecoder(utils.GetAccountDecoder(cdc))
-
-			name := viper.GetString(FlagServiceName)
-			defChainID := viper.GetString(FlagDefChainID)
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
 			params := service.QueryBindingsParams{
-				DefChainID:  defChainID,
-				ServiceName: name,
+				ServiceName: args[0],
 			}
 
 			bz, err := cdc.MarshalJSON(params)
@@ -130,13 +120,15 @@ func GetCmdQuerySvcBinds(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			fmt.Println(string(res))
-			return nil
+			var bindings service.ServiceBindings
+			if err := cdc.UnmarshalJSON(res, bindings); err != nil {
+				return err
+			}
+
+			return cliCtx.PrintOutput(bindings)
 		},
 	}
-	cmd.Flags().AddFlagSet(FsServiceDefinition)
-	cmd.MarkFlagRequired(FlagDefChainID)
-	cmd.MarkFlagRequired(FlagServiceName)
+
 	return cmd
 }
 
@@ -160,7 +152,7 @@ func GetCmdQuerySvcRequests(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			params := service.QueryBindingParams{
+			params := service.QueryRequestsParams{
 				DefChainID:  defChainID,
 				ServiceName: name,
 				BindChainID: bindChainID,
@@ -182,8 +174,6 @@ func GetCmdQuerySvcRequests(cdc *codec.Codec) *cobra.Command {
 			return nil
 		},
 	}
-	cmd.Flags().AddFlagSet(FsServiceDefinition)
-	cmd.Flags().AddFlagSet(FsServiceBinding)
 	cmd.MarkFlagRequired(FlagDefChainID)
 	cmd.MarkFlagRequired(FlagServiceName)
 	cmd.MarkFlagRequired(FlagBindChainID)

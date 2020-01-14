@@ -208,19 +208,20 @@ func main() {
 	serviceCmd.AddCommand(
 		client.GetCommands(
 			servicecmd.GetCmdQueryServiceDefinition(cdc),
-			servicecmd.GetCmdQuerySvcBind(cdc),
-			servicecmd.GetCmdQuerySvcBinds(cdc),
+			servicecmd.GetCmdQueryServiceBinding(cdc),
+			servicecmd.GetCmdQueryServiceBindings(cdc),
 			servicecmd.GetCmdQuerySvcRequests(cdc),
 			servicecmd.GetCmdQuerySvcResponse(cdc),
 			servicecmd.GetCmdQuerySvcFees(cdc),
 		)...)
 	serviceCmd.AddCommand(client.PostCommands(
 		servicecmd.GetCmdDefineService(cdc),
-		servicecmd.GetCmdSvcBind(cdc),
-		servicecmd.GetCmdSvcBindUpdate(cdc),
-		servicecmd.GetCmdSvcDisable(cdc),
-		servicecmd.GetCmdSvcEnable(cdc),
-		servicecmd.GetCmdSvcRefundDeposit(cdc),
+		servicecmd.GetCmdBindService(cdc),
+		servicecmd.GetCmdUpdateServiceBinding(cdc),
+		servicecmd.GetCmdSetWithdrawAddr(cdc),
+		servicecmd.GetCmdDisableService(cdc),
+		servicecmd.GetCmdEnableService(cdc),
+		servicecmd.GetCmdRefundServiceDeposit(cdc),
 		servicecmd.GetCmdSvcCall(cdc),
 		servicecmd.GetCmdSvcRespond(cdc),
 		servicecmd.GetCmdSvcRefundFees(cdc),
