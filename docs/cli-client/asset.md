@@ -29,13 +29,14 @@ iriscli asset token issue <flags>
 | --symbol         | string  | Yes      |               | The symbol of the token, length between 3 and 8, alphanumeric characters, case insensitive                                     |
 | --initial-supply | uint64  | Yes      |               | The initial supply of this token. The amount before boosting should not exceed 100 billion.                                    |
 | --max-supply     | uint64  |          | 1000000000000 | The hard cap of this token, total supply can not exceed max supply. The amount before boosting should not exceed 1000 billion. |
-| --decimal        | uint8   | Yes      |               | A token can have a maximum of 18 digits of decimal                                                                             |
+| --min-unit       | string  |          |               | The alias of minimum uint                                                                                                      |
+| --scale          | uint8   | Yes      |               | A token can have a maximum of 18 digits of decimal                                                                             |
 | --mintable       | boolean |          | false         | Whether this token could be minted(increased) after the initial issuing                                                        |
 
 ### Issue a token
 
 ```bash
-iriscli asset token issue --symbol="kitty" --name="Kitty Token" --initial-supply=100000000000 --max-supply=1000000000000 --decimal=0 --mintable=true --fee=1iris --from=<key-name> --commit
+iriscli asset token issue --symbol="kitty" --name="Kitty Token" --initial-supply=100000000000 --max-supply=1000000000000 --scale=0 --mintable=true --fee=1iris --from=<key-name> --commit
 ```
 
 ### Send tokens

@@ -29,13 +29,14 @@ iriscli asset token issue <flags>
 | --symbol         | string  | 是   |               | 通证的符号，长度在3到8之间，字母数字字符，不区分大小写       |
 | --initial-supply | uint64  | 是   |               | 此通证的初始供应。 增发前的数量不应超过1000亿。              |
 | --max-supply     | uint64  |      | 1000000000000 | 通证上限，总供应不能超过最大供应。 增发前的金额不应超过1万亿 |
-| --decimal        | uint8   | 是   |               | 通证最多可以有18位小数                                       |
+| --scale          | uint8   | 是   |               | 通证最多可以有18位小数                                       |
+| --min-unit       | string  |      |               | 最小单位别名                                                 |
 | --mintable       | boolean |      | false         | 首次发行后是否可以增发此通证                                 |
 
 ### 发行通证
 
 ```bash
-iriscli asset token issue --symbol="kitty" --name="Kitty Token" --initial-supply=100000000000 --max-supply=1000000000000 --decimal=0 --mintable=true --fee=1iris --from=<key-name> --commit
+iriscli asset token issue --symbol="kitty" --name="Kitty Token" --initial-supply=100000000000 --max-supply=1000000000000 --scale=0 --mintable=true --fee=1iris --from=<key-name> --commit
 ```
 
 ### 发送通证
