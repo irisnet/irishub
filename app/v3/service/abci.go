@@ -26,7 +26,7 @@ func EndBlocker(ctx sdk.Context, k Keeper) (resTags sdk.Tags) {
 		// if not Profiling mode,should slash provider
 		slashCoins := sdk.NewCoins()
 		if !req.Profiling {
-			binding, found := k.GetServiceBinding(ctx, req.DefChainID, req.DefName, req.BindChainID, req.Provider)
+			binding, found := k.GetServiceBinding(ctx, req.DefName, req.Provider)
 			if found {
 				for _, coin := range binding.Deposit {
 					taxAmount := sdk.NewDecFromInt(coin.Amount).Mul(slashFraction).TruncateInt()
