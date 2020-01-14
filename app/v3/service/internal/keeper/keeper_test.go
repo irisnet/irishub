@@ -9,101 +9,83 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 )
 
-func TestKeeper_Service_Definition_Binding(t *testing.T) {
+var (
+	testChainID = "test-chain"
+
+	testServiceName = "test-service"
+	testServiceDesc = "test-service-desc"
+	testServiceTags = []string{"tag1", "tag2"}
+	testAuthorDesc  = "test-author-desc"
+	testSchemas     = `{"input":{"type":"object"},"output":{"type":"object"},"error":{"type":"object"}}`
+
+	testBindingType     = types.Global
+	testLevel           = types.Level{AvgRspTime: 10000, UsableTime: 9999}
+	testDeposit, _      = sdk.IrisCoinType.ConvertToMinDenomCoin("1000iris")
+	testPrices          = []sdk.Coin{sdk.NewCoin(sdk.IrisAtto, sdk.NewIntWithDecimal(1, 18))}
+	testAddedDeposit, _ = sdk.IrisCoinType.ConvertToMinDenomCoin("1000iris")
+
+	testMethodID       = int16(1)
+	testServiceFees, _ = sdk.IrisCoinType.ConvertToMinDenomCoin("1iris")
+	testInput          = []byte{}
+)
+
+func TestKeeper_Define_Service(t *testing.T) {
+	ctx, keeper, accs := createTestInput(t, sdk.NewIntWithDecimal(1, 18), 1)
+
+	author := accs[0].GetAddress()
+
+	err := keeper.AddServiceDefinition(ctx, testServiceName, testServiceDesc, testServiceTags, author, testAuthorDesc, testSchemas)
+	require.NoError(t, err)
+
+	svcDef, found := keeper.GetServiceDefinition(ctx, testServiceName)
+	require.True(t, found)
+
+	require.Equal(t, testServiceName, svcDef.Name)
+	require.Equal(t, testServiceTags, svcDef.Tags)
+	require.Equal(t, author, svcDef.Author)
+	require.Equal(t, testSchemas, svcDef.Schemas)
+}
+
+func TestKeeper_Bind_Service(t *testing.T) {
 	ctx, keeper, accs := createTestInput(t, sdk.NewIntWithDecimal(2000, 18), 2)
 
 	author := accs[0].GetAddress()
 	provider := accs[1].GetAddress()
 
-	serviceName := "myService"
-	chainID := "testnet"
-	serviceDescription := "the service for unit test"
-	tags := []string{"test", "tutorial"}
-	authorDescription := "unit test author"
+	_ = keeper.AddServiceDefinition(ctx, testServiceName, testServiceDesc, testServiceTags, author, testAuthorDesc, testSchemas)
 
-	err := keeper.AddServiceDefinition(ctx, serviceName, chainID, serviceDescription, tags, author, authorDescription, idlContent)
+	err := keeper.AddServiceBinding(ctx, testChainID, testServiceName, testChainID, provider, testBindingType, sdk.NewCoins(testDeposit), testPrices, testLevel)
 	require.NoError(t, err)
 
-	serviceDef, found := keeper.GetServiceDefinition(ctx, chainID, serviceName)
-
+	svcBinding, found := keeper.GetServiceBinding(ctx, testChainID, testServiceName, testChainID, provider)
 	require.True(t, found)
-	require.Equal(t, idlContent, serviceDef.IDLContent)
-	require.Equal(t, serviceName, serviceDef.Name)
 
-	// test methods
-	err = keeper.AddMethods(ctx, serviceDef)
-	require.NoError(t, err)
-
-	iterator := keeper.GetMethods(ctx, chainID, serviceName)
-	defer iterator.Close()
-
-	require.True(t, iterator.Valid())
-	for ; ; iterator.Next() {
-		var method types.MethodProperty
-		if !iterator.Valid() {
-			break
-		}
-
-		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &method)
-
-		require.Equal(t, "SayHello", method.Name)
-		require.Equal(t, "sayHello", method.Description)
-		require.Equal(t, "NoPrivacy", method.OutputPrivacy.String())
-		require.Equal(t, "NoCached", method.OutputCached.String())
-	}
-
-	// test binding
-	deposit, _ := sdk.IrisCoinType.ConvertToMinDenomCoin("1000iris")
-	price, _ := sdk.IrisCoinType.ConvertToMinDenomCoin("1iris")
-	bindingType := types.Global
-	level := types.Level{AvgRspTime: 10000, UsableTime: 9999}
-
-	err = keeper.AddServiceBinding(ctx, chainID, serviceName, chainID, provider, bindingType, sdk.NewCoins(deposit), []sdk.Coin{price}, level)
-	require.NoError(t, err)
-
-	svcBinding, found := keeper.GetServiceBinding(ctx, chainID, serviceName, chainID, provider)
-	require.True(t, found)
-	require.Equal(t, sdk.NewCoins(deposit), svcBinding.Deposit)
-	require.Equal(t, bindingType, svcBinding.BindingType)
+	require.Equal(t, testServiceName, svcBinding.DefName)
+	require.Equal(t, testBindingType, svcBinding.BindingType)
+	require.Equal(t, sdk.NewCoins(testDeposit), svcBinding.Deposit)
+	require.Equal(t, testPrices, svcBinding.Prices)
 
 	// test binding update
-	addedDeposit, _ := sdk.IrisCoinType.ConvertToMinDenomCoin("100iris")
-	_, err = keeper.UpdateServiceBinding(ctx, chainID, serviceName, chainID, provider, bindingType, sdk.NewCoins(addedDeposit), []sdk.Coin{price}, level)
+	_, err = keeper.UpdateServiceBinding(ctx, testChainID, testServiceName, testChainID, provider, testBindingType, sdk.NewCoins(testAddedDeposit), testPrices, testLevel)
 	require.NoError(t, err)
 
 	updatedSvcBinding, found := keeper.GetServiceBinding(ctx, svcBinding.DefChainID, svcBinding.DefName, svcBinding.BindChainID, svcBinding.Provider)
 	require.True(t, found)
-	require.True(t, updatedSvcBinding.Deposit.IsEqual(svcBinding.Deposit.Add(sdk.NewCoins(addedDeposit))))
+
+	require.True(t, updatedSvcBinding.Deposit.IsEqual(svcBinding.Deposit.Add(sdk.NewCoins(testAddedDeposit))))
 }
 
-func TestKeeper_Service_Call(t *testing.T) {
-	ctx, keeper, accs := createTestInput(t, sdk.NewIntWithDecimal(2000, 18), 2)
+func TestKeeper_Call_Service(t *testing.T) {
+	ctx, keeper, accs := createTestInput(t, sdk.NewIntWithDecimal(2000, 18), 3)
 
 	author := accs[0].GetAddress()
 	provider := accs[1].GetAddress()
-	consumer := author
+	consumer := accs[2].GetAddress()
 
-	serviceName := "myService"
-	chainID := "testnet"
-	serviceDescription := "the service for unit test"
-	tags := []string{"test", "tutorial"}
-	authorDescription := "unit test author"
+	_ = keeper.AddServiceDefinition(ctx, testServiceName, testServiceDesc, testServiceTags, author, testAuthorDesc, testSchemas)
+	_ = keeper.AddServiceBinding(ctx, testChainID, testServiceName, testChainID, provider, testBindingType, sdk.NewCoins(testDeposit), testPrices, testLevel)
 
-	err := keeper.AddServiceDefinition(ctx, serviceName, chainID, serviceDescription, tags, author, authorDescription, idlContent)
-	require.NoError(t, err)
-
-	deposit, _ := sdk.IrisCoinType.ConvertToMinDenomCoin("1000iris")
-	price, _ := sdk.IrisCoinType.ConvertToMinDenomCoin("1iris")
-	bindingType := types.Global
-	level := types.Level{AvgRspTime: 10000, UsableTime: 9999}
-
-	err = keeper.AddServiceBinding(ctx, chainID, serviceName, chainID, provider, bindingType, sdk.NewCoins(deposit), []sdk.Coin{price}, level)
-	require.NoError(t, err)
-
-	// service request
-	input := []byte("1234")
-
-	svcRequest, err := keeper.AddRequest(ctx, chainID, serviceName, chainID, chainID, consumer, provider, 1, input, sdk.NewCoins(price), false)
+	svcRequest, err := keeper.AddRequest(ctx, testChainID, testServiceName, testChainID, testChainID, consumer, provider, testMethodID, testInput, sdk.NewCoins(testServiceFees), false)
 	require.NoError(t, err)
 
 	storedSvcRequest, found := keeper.GetActiveRequest(ctx, svcRequest.ExpirationHeight, svcRequest.RequestHeight, svcRequest.RequestIntraTxCounter)
@@ -114,34 +96,10 @@ func TestKeeper_Service_Call(t *testing.T) {
 	defer iterator.Close()
 
 	require.True(t, iterator.Valid())
-	for ; ; iterator.Next() {
+	for ; iterator.Valid(); iterator.Next() {
 		var req types.SvcRequest
-		if !iterator.Valid() {
-			break
-		}
-
 		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &req)
+
 		require.Equal(t, svcRequest.RequestID(), req.RequestID())
 	}
 }
-
-const idlContent = `
-	syntax = "proto3";
-
-	// The greeting service definition.
-	service Greeter {
-		//@Attribute description:sayHello
-		//@Attribute output_privacy:NoPrivacy
-		//@Attribute output_cached:NoCached
-		rpc SayHello (HelloRequest) returns (HelloReply) {}
-	}
-
-	// The request message containing the user's name.
-	message HelloRequest {
-		string name = 1;
-	}
-
-	// The response message containing the greetings
-	message HelloReply {
-		string message = 1;
-	}`

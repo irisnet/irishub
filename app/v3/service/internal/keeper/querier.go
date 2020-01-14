@@ -8,6 +8,7 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 )
 
+// NewQuerier creates a querier for the service module
 func NewQuerier(k Keeper) sdk.Querier {
 	return func(ctx sdk.Context, path []string, req abci.RequestQuery) ([]byte, sdk.Error) {
 		switch path[0] {
@@ -30,30 +31,17 @@ func NewQuerier(k Keeper) sdk.Querier {
 }
 
 func queryDefinition(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sdk.Error) {
-	var params types.QueryServiceParams
-	err := k.cdc.UnmarshalJSON(req.Data, &params)
-	if err != nil {
+	var params types.QueryDefinitionParams
+	if err := k.cdc.UnmarshalJSON(req.Data, &params); err != nil {
 		return nil, sdk.ParseParamsErr(err)
 	}
 
-	svcDef, found := k.GetServiceDefinition(ctx, params.DefChainID, params.ServiceName)
+	svcDef, found := k.GetServiceDefinition(ctx, params.ServiceName)
 	if !found {
-		return nil, types.ErrSvcDefNotExists(types.DefaultCodespace, params.DefChainID, params.ServiceName)
+		return nil, types.ErrUnknownServiceDefinition(types.DefaultCodespace, params.ServiceName)
 	}
 
-	iterator := k.GetMethods(ctx, params.DefChainID, params.ServiceName)
-	defer iterator.Close()
-
-	var methods []types.MethodProperty
-	for ; iterator.Valid(); iterator.Next() {
-		var method types.MethodProperty
-		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &method)
-		methods = append(methods, method)
-	}
-
-	definitionOutput := types.DefinitionOutput{Definition: svcDef, Methods: methods}
-
-	bz, err := codec.MarshalJSONIndent(k.cdc, definitionOutput)
+	bz, err := codec.MarshalJSONIndent(k.cdc, svcDef)
 	if err != nil {
 		return nil, sdk.MarshalResultErr(err)
 	}
@@ -82,7 +70,7 @@ func queryBinding(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sdk
 }
 
 func queryBindings(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sdk.Error) {
-	var params types.QueryServiceParams
+	var params types.QueryBindingsParams
 	err := k.cdc.UnmarshalJSON(req.Data, &params)
 	if err != nil {
 		return nil, sdk.ParseParamsErr(err)

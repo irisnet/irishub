@@ -15,44 +15,43 @@ const (
 	FeeFactorExp  = 4
 )
 
-// GatewayCreateFeeHandler performs fee handling for creating a gateway
-func GatewayCreateFeeHandler(ctx sdk.Context, k Keeper, owner sdk.AccAddress, moniker string) sdk.Error {
-	// get the required creation fee
-	fee := GetGatewayCreateFee(ctx, k, moniker)
-
-	return feeHandler(ctx, k, owner, fee)
-}
-
-// TokenIssueFeeHandler performs fee handling for issuing token
-func TokenIssueFeeHandler(ctx sdk.Context, k Keeper, owner sdk.AccAddress, symbol string) sdk.Error {
+// DeductIssueTokenFee performs fee handling for issuing token
+func (k Keeper) DeductIssueTokenFee(ctx sdk.Context, owner sdk.AccAddress, symbol string) sdk.Error {
 	// get the required issuance fee
-	fee := GetTokenIssueFee(ctx, k, symbol)
-
+	fee := k.getTokenIssueFee(ctx, symbol)
 	return feeHandler(ctx, k, owner, fee)
 }
 
-// TokenMintFeeHandler performs fee handling for minting token
-func TokenMintFeeHandler(ctx sdk.Context, k Keeper, owner sdk.AccAddress, symbol string) sdk.Error {
+// DeductMintTokenFeeFee performs fee handling for minting token
+func (k Keeper) DeductMintTokenFeeFee(ctx sdk.Context, owner sdk.AccAddress, symbol string) sdk.Error {
 	// get the required minting fee
-	fee := GetTokenMintFee(ctx, k, symbol)
-
+	fee := k.getTokenMintFee(ctx, symbol)
 	return feeHandler(ctx, k, owner, fee)
 }
 
-// GatewayTokenIssueFeeHandler performs fee handling for issuing gateway token
-func GatewayTokenIssueFeeHandler(ctx sdk.Context, k Keeper, owner sdk.AccAddress, symbol string) sdk.Error {
-	// get the required issuance fee
-	fee := GetGatewayTokenIssueFee(ctx, k, symbol)
+// GetTokenIssueFee returns the token issurance fee
+func (k Keeper) getTokenIssueFee(ctx sdk.Context, symbol string) sdk.Coin {
+	// get params
+	params := k.GetParamSet(ctx)
+	issueTokenBaseFee := params.IssueTokenBaseFee
 
-	return feeHandler(ctx, k, owner, fee)
+	// compute the fee
+	fee := calcFeeByBase(symbol, issueTokenBaseFee.Amount)
+
+	return sdk.NewCoin(sdk.IrisAtto, convertFeeToInt(fee))
 }
 
-// GatewayTokenMintFeeHandler performs fee handling for minting gateway token
-func GatewayTokenMintFeeHandler(ctx sdk.Context, k Keeper, owner sdk.AccAddress, symbol string) sdk.Error {
-	// get the required minting fee
-	fee := GetGatewayTokenMintFee(ctx, k, symbol)
+// getTokenMintFee returns the token mint fee
+func (k Keeper) getTokenMintFee(ctx sdk.Context, symbol string) sdk.Coin {
+	// get params
+	params := k.GetParamSet(ctx)
+	mintTokenFeeRatio := params.MintTokenFeeRatio
 
-	return feeHandler(ctx, k, owner, fee)
+	// compute the issurance fee and mint fee
+	issueFee := k.getTokenIssueFee(ctx, symbol)
+	mintFee := sdk.NewDecFromInt(issueFee.Amount).Mul(mintTokenFeeRatio)
+
+	return sdk.NewCoin(sdk.IrisAtto, convertFeeToInt(mintFee))
 }
 
 // feeHandler handles the fee of gateway or asset
@@ -77,69 +76,6 @@ func feeHandler(ctx sdk.Context, k Keeper, feeAcc sdk.AccAddress, fee sdk.Coin) 
 	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, feeAcc.String(), auth.BurnedCoinsAccAddr.String(), burnedCoin.String(), sdk.BurnFlow, "")
 
 	return nil
-}
-
-// GetGatewayCreateFee returns the gateway creation fee
-func GetGatewayCreateFee(ctx sdk.Context, k Keeper, moniker string) sdk.Coin {
-	// get params
-	params := k.GetParamSet(ctx)
-	gatewayBaseFee := params.CreateGatewayBaseFee
-
-	// compute the fee
-	fee := calcFeeByBase(moniker, gatewayBaseFee.Amount)
-
-	return sdk.NewCoin(sdk.IrisAtto, convertFeeToInt(fee))
-}
-
-// getTokenIssueFee returns the token issurance fee
-func GetTokenIssueFee(ctx sdk.Context, k Keeper, symbol string) sdk.Coin {
-	// get params
-	params := k.GetParamSet(ctx)
-	issueTokenBaseFee := params.IssueTokenBaseFee
-
-	// compute the fee
-	fee := calcFeeByBase(symbol, issueTokenBaseFee.Amount)
-
-	return sdk.NewCoin(sdk.IrisAtto, convertFeeToInt(fee))
-}
-
-// getTokenMintFee returns the token mint fee
-func GetTokenMintFee(ctx sdk.Context, k Keeper, symbol string) sdk.Coin {
-	// get params
-	params := k.GetParamSet(ctx)
-	mintTokenFeeRatio := params.MintTokenFeeRatio
-
-	// compute the issurance fee and mint fee
-	issueFee := GetTokenIssueFee(ctx, k, symbol)
-	mintFee := sdk.NewDecFromInt(issueFee.Amount).Mul(mintTokenFeeRatio)
-
-	return sdk.NewCoin(sdk.IrisAtto, convertFeeToInt(mintFee))
-}
-
-// getGatewayTokenIssueFee returns the gateway token issurance fee
-func GetGatewayTokenIssueFee(ctx sdk.Context, k Keeper, symbol string) sdk.Coin {
-	// get params
-	params := k.GetParamSet(ctx)
-	gatewayAssetFeeRatio := params.GatewayAssetFeeRatio
-
-	// compute the native token issurance fee and gateway token issurance fee
-	nativeTokenIssueFee := GetTokenIssueFee(ctx, k, symbol)
-	gatewayTokenIssueFee := sdk.NewDecFromInt(nativeTokenIssueFee.Amount).Mul(gatewayAssetFeeRatio)
-
-	return sdk.NewCoin(sdk.IrisAtto, convertFeeToInt(gatewayTokenIssueFee))
-}
-
-// getGatewayTokenMintFee returns the gateway token mint fee
-func GetGatewayTokenMintFee(ctx sdk.Context, k Keeper, symbol string) sdk.Coin {
-	// get params
-	params := k.GetParamSet(ctx)
-	gatewayAssetFeeRatio := params.GatewayAssetFeeRatio
-
-	// compute the native token mint fee and gateway token mint fee
-	nativeTokenMintFee := GetTokenMintFee(ctx, k, symbol)
-	gatewayTokenMintFee := sdk.NewDecFromInt(nativeTokenMintFee.Amount).Mul(gatewayAssetFeeRatio)
-
-	return sdk.NewCoin(sdk.IrisAtto, convertFeeToInt(gatewayTokenMintFee))
 }
 
 // calcFeeByBase computes the actual fee according to the given base fee

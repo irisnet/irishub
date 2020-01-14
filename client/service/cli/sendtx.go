@@ -1,10 +1,15 @@
 package cli
 
 import (
+	"bytes"
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"os"
-	"strings"
+
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 
 	"github.com/irisnet/irishub/app/v3/service"
 	"github.com/irisnet/irishub/client"
@@ -12,59 +17,68 @@ import (
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
-	cmn "github.com/tendermint/tendermint/libs/common"
 )
 
-func GetCmdSvcDef(cdc *codec.Codec) *cobra.Command {
+// GetCmdDefineService implements defining a service command
+func GetCmdDefineService(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "define",
-		Short: "Create a new service definition",
+		Short: "Define a new service",
 		Example: "iriscli service define --chain-id=<chain-id> --from=<key-name> --fee=0.3iris " +
-			"--service-name=<service name> --service-description=<service description> --author-description=<author description> " +
-			"--tags=tag1,tag2 --idl-content=<interface description content> --file=test.proto",
+			"--name=<service name> --description=<service description> --author-description=<author description> " +
+			"--tags=tag1,tag2 --schemas=<schemas content or path/to/schemas.json>",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
+			cliCtx := context.NewCLIContext().
+				WithCodec(cdc).
+				WithLogger(os.Stdout).
 				WithAccountDecoder(utils.GetAccountDecoder(cdc))
 			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).
 				WithCliCtx(cliCtx)
 
-			name := viper.GetString(FlagServiceName)
-			description := viper.GetString(FlagServiceDescription)
+			author, err := cliCtx.GetFromAddress()
+			if err != nil {
+				return err
+			}
+
+			name := viper.GetString(FlagName)
+			description := viper.GetString(FlagDescription)
 			authorDescription := viper.GetString(FlagAuthorDescription)
 			tags := viper.GetStringSlice(FlagTags)
-			content := viper.GetString(FlagIdlContent)
-			if len(content) > 0 {
-				content = strings.Replace(content, `\n`, "\n", -1)
-			}
-			filePath := viper.GetString(FlagFile)
-			if len(filePath) > 0 {
-				contentBytes, err := cmn.ReadFile(filePath)
+			schemas := viper.GetString(FlagSchemas)
+
+			if !json.Valid([]byte(schemas)) {
+				schemasContent, err := ioutil.ReadFile(schemas)
 				if err != nil {
-					return err
+					return fmt.Errorf("neither JSON input nor path to .json file were provided")
 				}
-				content = string(contentBytes)
-			}
-			fmt.Printf("idl condent: \n%s\n", content)
-			chainId := viper.GetString(client.FlagChainID)
 
-			fromAddr, err := cliCtx.GetFromAddress()
-			if err != nil {
+				if !json.Valid(schemasContent) {
+					return fmt.Errorf(".json file content is invalid JSON")
+				}
+
+				schemas = string(schemasContent)
+			}
+
+			buf := bytes.NewBuffer([]byte{})
+			if err := json.Compact(buf, []byte(schemas)); err != nil {
+				return fmt.Errorf("failed to compact the schema")
+			}
+
+			fmt.Printf("schemas content: \n%s\n", buf.String())
+
+			msg := service.NewMsgDefineService(name, description, tags, author, authorDescription, schemas)
+			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
 
-			if err != nil {
-				return err
-			}
-
-			msg := service.NewMsgSvcDef(name, chainId, description, tags, fromAddr, authorDescription, content)
-			cliCtx.PrintResponse = true
 			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 		},
 	}
-	cmd.Flags().AddFlagSet(FsServiceDefinitionCreate)
-	cmd.MarkFlagRequired(FlagServiceName)
+
+	cmd.Flags().AddFlagSet(FsServiceDefine)
+	_ = cmd.MarkFlagRequired(FlagName)
+	_ = cmd.MarkFlagRequired(FlagSchemas)
+
 	return cmd
 }
 
@@ -85,10 +99,10 @@ func GetCmdSvcBind(cdc *codec.Codec) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			chainId := viper.GetString(client.FlagChainID)
+			chainID := viper.GetString(client.FlagChainID)
 
 			name := viper.GetString(FlagServiceName)
-			defChainId := viper.GetString(FlagDefChainID)
+			defChainID := viper.GetString(FlagDefChainID)
 			initialDeposit := viper.GetString(FlagDeposit)
 			initialPrices := viper.GetStringSlice(FlagPrices)
 			avgRspTime := viper.GetInt64(FlagAvgRspTime)
@@ -115,7 +129,7 @@ func GetCmdSvcBind(cdc *codec.Codec) *cobra.Command {
 			}
 
 			level := service.Level{AvgRspTime: avgRspTime, UsableTime: usableTime}
-			msg := service.NewMsgSvcBind(defChainId, name, chainId, fromAddr, bindingType, deposit, prices, level)
+			msg := service.NewMsgSvcBind(defChainID, name, chainID, fromAddr, bindingType, deposit, prices, level)
 			cliCtx.PrintResponse = true
 			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 		},
@@ -149,9 +163,9 @@ func GetCmdSvcBindUpdate(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			chainId := viper.GetString(client.FlagChainID)
+			chainID := viper.GetString(client.FlagChainID)
 			name := viper.GetString(FlagServiceName)
-			defChainId := viper.GetString(FlagDefChainID)
+			defChainID := viper.GetString(FlagDefChainID)
 			initialDeposit := viper.GetString(FlagDeposit)
 			initialPrices := viper.GetStringSlice(FlagPrices)
 			avgRspTime := viper.GetInt64(FlagAvgRspTime)
@@ -184,7 +198,7 @@ func GetCmdSvcBindUpdate(cdc *codec.Codec) *cobra.Command {
 			}
 
 			level := service.Level{AvgRspTime: avgRspTime, UsableTime: usableTime}
-			msg := service.NewMsgSvcBindingUpdate(defChainId, name, chainId, fromAddr, bindingType, deposit, prices, level)
+			msg := service.NewMsgSvcBindingUpdate(defChainID, name, chainID, fromAddr, bindingType, deposit, prices, level)
 			cliCtx.PrintResponse = true
 			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 		},
@@ -213,12 +227,12 @@ func GetCmdSvcDisable(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			chainId := viper.GetString(client.FlagChainID)
+			chainID := viper.GetString(client.FlagChainID)
 
 			name := viper.GetString(FlagServiceName)
-			defChainId := viper.GetString(FlagDefChainID)
+			defChainID := viper.GetString(FlagDefChainID)
 
-			msg := service.NewMsgSvcDisable(defChainId, name, chainId, fromAddr)
+			msg := service.NewMsgSvcDisable(defChainID, name, chainID, fromAddr)
 			cliCtx.PrintResponse = true
 			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 		},
@@ -246,10 +260,10 @@ func GetCmdSvcEnable(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			chainId := viper.GetString(client.FlagChainID)
+			chainID := viper.GetString(client.FlagChainID)
 
 			name := viper.GetString(FlagServiceName)
-			defChainId := viper.GetString(FlagDefChainID)
+			defChainID := viper.GetString(FlagDefChainID)
 
 			initialDeposit := viper.GetString(FlagDeposit)
 			deposit, err := cliCtx.ParseCoins(initialDeposit)
@@ -257,7 +271,7 @@ func GetCmdSvcEnable(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			msg := service.NewMsgSvcEnable(defChainId, name, chainId, fromAddr, deposit)
+			msg := service.NewMsgSvcEnable(defChainID, name, chainID, fromAddr, deposit)
 			cliCtx.PrintResponse = true
 			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 		},
@@ -286,12 +300,12 @@ func GetCmdSvcRefundDeposit(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			chainId := viper.GetString(client.FlagChainID)
+			chainID := viper.GetString(client.FlagChainID)
 
 			name := viper.GetString(FlagServiceName)
 			defChainId := viper.GetString(FlagDefChainID)
 
-			msg := service.NewMsgSvcRefundDeposit(defChainId, name, chainId, fromAddr)
+			msg := service.NewMsgSvcRefundDeposit(defChainId, name, chainID, fromAddr)
 			cliCtx.PrintResponse = true
 			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 		},
@@ -319,12 +333,12 @@ func GetCmdSvcCall(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			chainId := viper.GetString(client.FlagChainID)
+			chainID := viper.GetString(client.FlagChainID)
 
-			defChainId := viper.GetString(FlagDefChainID)
+			defChainID := viper.GetString(FlagDefChainID)
 			name := viper.GetString(FlagServiceName)
-			bindChainId := viper.GetString(FlagBindChainID)
-			methodId := int16(viper.GetInt(FlagMethodID))
+			bindChainID := viper.GetString(FlagBindChainID)
+			methodID := int16(viper.GetInt(FlagMethodID))
 
 			providerStr := viper.GetString(FlagProvider)
 			provider, err := sdk.AccAddressFromBech32(providerStr)
@@ -346,7 +360,7 @@ func GetCmdSvcCall(cdc *codec.Codec) *cobra.Command {
 
 			profiling := viper.GetBool(FlagProfiling)
 
-			msg := service.NewMsgSvcRequest(defChainId, name, bindChainId, chainId, fromAddr, provider, methodId, input, serviceFee, profiling)
+			msg := service.NewMsgSvcRequest(defChainID, name, bindChainID, chainID, fromAddr, provider, methodID, input, serviceFee, profiling)
 			cliCtx.PrintResponse = true
 			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 		},
@@ -379,7 +393,7 @@ func GetCmdSvcRespond(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			reqChainId := viper.GetString(FlagReqChainId)
+			reqChainID := viper.GetString(FlagReqChainID)
 			outputString := viper.GetString(FlagRespData)
 			output, err := hex.DecodeString(outputString)
 			if err != nil {
@@ -392,16 +406,16 @@ func GetCmdSvcRespond(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			reqId := viper.GetString(FlagReqId)
+			reqID := viper.GetString(FlagReqID)
 
-			msg := service.NewMsgSvcResponse(reqChainId, reqId, fromAddr, output, errMsg)
+			msg := service.NewMsgSvcResponse(reqChainID, reqID, fromAddr, output, errMsg)
 			cliCtx.PrintResponse = true
 			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 		},
 	}
 	cmd.Flags().AddFlagSet(FsServiceResponse)
-	cmd.MarkFlagRequired(FlagReqChainId)
-	cmd.MarkFlagRequired(FlagReqId)
+	_ = cmd.MarkFlagRequired(FlagReqChainID)
+	_ = cmd.MarkFlagRequired(FlagReqID)
 	return cmd
 }
 

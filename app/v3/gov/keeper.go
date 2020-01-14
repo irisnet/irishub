@@ -56,8 +56,6 @@ type Keeper struct {
 	codespace sdk.CodespaceType
 
 	metrics *Metrics
-
-	ak AssetKeeper
 }
 
 // NewProtocolKeeper returns a governance keeper. It handles:
@@ -65,7 +63,7 @@ type Keeper struct {
 // - depositing funds into proposals, and activating upon sufficient funds being deposited
 // - users voting on proposals, with weight proportional to stake in the system
 // - and tallying the result of the vote.
-func NewKeeper(key sdk.StoreKey, cdc *codec.Codec, paramSpace params.Subspace, paramsKeeper params.Keeper, protocolKeeper sdk.ProtocolKeeper, ck bank.Keeper, dk distribution.Keeper, guardianKeeper guardian.Keeper, ds sdk.DelegationSet, codespace sdk.CodespaceType, metrics *Metrics, ak AssetKeeper) Keeper {
+func NewKeeper(key sdk.StoreKey, cdc *codec.Codec, paramSpace params.Subspace, paramsKeeper params.Keeper, protocolKeeper sdk.ProtocolKeeper, ck bank.Keeper, dk distribution.Keeper, guardianKeeper guardian.Keeper, ds sdk.DelegationSet, codespace sdk.CodespaceType, metrics *Metrics) Keeper {
 	return Keeper{
 		key,
 		cdc,
@@ -79,7 +77,6 @@ func NewKeeper(key sdk.StoreKey, cdc *codec.Codec, paramSpace params.Subspace, p
 		ds,
 		codespace,
 		metrics,
-		ak,
 	}
 }
 
@@ -149,9 +146,6 @@ func (keeper Keeper) SubmitProposal(ctx sdk.Context, msg sdk.Msg) (sdk.Tags, sdk
 	case ProposalTypeCommunityTaxUsage:
 		msg := msg.(MsgSubmitCommunityTaxUsageProposal)
 		resTags = resTags.AppendTag(tags.DestAddress, []byte(msg.DestAddress.String()))
-	case ProposalTypeTokenAddition:
-		tokenId := proposal.(*TokenAdditionProposal).FToken.GetUniqueID()
-		resTags = resTags.AppendTag(tags.TokenId, []byte(tokenId))
 	}
 	return resTags, nil
 }

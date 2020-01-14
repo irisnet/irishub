@@ -13,17 +13,14 @@ type AssetFamily byte
 
 const (
 	FUNGIBLE AssetFamily = 0x00
-	//NON_FUNGIBLE AssetFamily = 0x01
 )
 
 var (
 	AssetFamilyToStringMap = map[AssetFamily]string{
 		FUNGIBLE: "fungible",
-		//NON_FUNGIBLE: "non-fungible",
 	}
 	StringToAssetFamilyMap = map[string]AssetFamily{
 		"fungible": FUNGIBLE,
-		//"non-fungible": NON_FUNGIBLE,
 	}
 )
 
@@ -32,11 +29,6 @@ func AssetFamilyFromString(str string) (AssetFamily, error) {
 		return family, nil
 	}
 	return AssetFamily(0xff), errors.Errorf("'%s' is not a valid asset family", str)
-}
-
-func IsValidAssetFamily(family AssetFamily) bool {
-	_, ok := AssetFamilyToStringMap[family]
-	return ok
 }
 
 func (family AssetFamily) Format(s fmt.State, verb rune) {

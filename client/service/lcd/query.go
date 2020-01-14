@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/app/v3/service"
 	"github.com/irisnet/irishub/client/context"
@@ -14,11 +15,10 @@ import (
 )
 
 func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec) {
-
-	// get a single definition info
+	// query a definition
 	r.HandleFunc(
-		fmt.Sprintf("/service/definitions/{%s}/{%s}", DefChainID, ServiceName),
-		definitionGetHandlerFn(cliCtx, cdc),
+		fmt.Sprintf("/service/definitions/{%s}", ServiceName),
+		queryDefinitionHandlerFn(cliCtx, cdc),
 	).Methods("GET")
 
 	// get a single binding info
@@ -52,18 +52,16 @@ func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Co
 	).Methods("GET")
 }
 
-func definitionGetHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
+func queryDefinitionHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		defChainId := vars[DefChainID]
 		serviceName := vars[ServiceName]
 
-		params := service.QueryServiceParams{
-			DefChainID:  defChainId,
+		params := service.QueryDefinitionParams{
 			ServiceName: serviceName,
 		}
 
-		bz, err := cdc.MarshalJSON(params)
+		bz, err := cliCtx.Codec.MarshalJSON(params)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -76,7 +74,7 @@ func definitionGetHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.Ha
 			return
 		}
 
-		utils.PostProcessResponse(w, cdc, res, cliCtx.Indent)
+		utils.PostProcessResponse(w, cliCtx.Codec, res, cliCtx.Indent)
 	}
 }
 
@@ -120,11 +118,11 @@ func bindingHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerF
 func bindingsHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		defChainId := vars[DefChainID]
+		defChainID := vars[DefChainID]
 		serviceName := vars[ServiceName]
 
-		params := service.QueryServiceParams{
-			DefChainID:  defChainId,
+		params := service.QueryBindingsParams{
+			DefChainID:  defChainID,
 			ServiceName: serviceName,
 		}
 

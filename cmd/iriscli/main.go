@@ -207,7 +207,7 @@ func main() {
 	}
 	serviceCmd.AddCommand(
 		client.GetCommands(
-			servicecmd.GetCmdQuerySvcDef(cdc),
+			servicecmd.GetCmdQueryServiceDefinition(cdc),
 			servicecmd.GetCmdQuerySvcBind(cdc),
 			servicecmd.GetCmdQuerySvcBinds(cdc),
 			servicecmd.GetCmdQuerySvcRequests(cdc),
@@ -215,7 +215,7 @@ func main() {
 			servicecmd.GetCmdQuerySvcFees(cdc),
 		)...)
 	serviceCmd.AddCommand(client.PostCommands(
-		servicecmd.GetCmdSvcDef(cdc),
+		servicecmd.GetCmdDefineService(cdc),
 		servicecmd.GetCmdSvcBind(cdc),
 		servicecmd.GetCmdSvcBindUpdate(cdc),
 		servicecmd.GetCmdSvcDisable(cdc),
@@ -259,27 +259,7 @@ func main() {
 		Use:   "asset",
 		Short: "Asset subcommands",
 	}
-
-	assetCmd.AddCommand(
-		client.PostCommands(
-			assetcmd.GetCmdCreateGateway(cdc),
-			assetcmd.GetCmdEditGateway(cdc),
-			assetcmd.GetCmdTransferGatewayOwner(cdc),
-			assetcmd.GetCmdIssueToken(cdc),
-			assetcmd.GetCmdTransferTokenOwner(cdc),
-			assetcmd.GetCmdEditAsset(cdc),
-			assetcmd.GetCmdMintToken(cdc),
-		)...)
-
-	assetCmd.AddCommand(
-		client.GetCommands(
-			assetcmd.GetCmdQueryToken(cdc),
-			assetcmd.GetCmdQueryTokens(cdc),
-			assetcmd.GetCmdQueryGateway(cdc),
-			assetcmd.GetCmdQueryGateways(cdc),
-			assetcmd.GetCmdQueryFee(cdc),
-		)...)
-
+	assetCmd.AddCommand(assetcmd.GetTokenCmd(cdc))
 	rootCmd.AddCommand(
 		assetCmd,
 	)
