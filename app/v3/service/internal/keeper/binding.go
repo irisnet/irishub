@@ -65,27 +65,27 @@ func (k Keeper) UpdateServiceBinding(
 
 	updated := false
 
+	// add the deposit
+	if !deposit.Empty() {
+		binding.Deposit = binding.Deposit.Add(deposit)
+		updated = true
+	}
+
 	// update the pricing
 	if len(pricing) != 0 {
 		binding.Pricing = pricing
 		updated = true
 	}
 
-	// add the deposit
-	if len(deposit) != 0 {
-		binding.Deposit = binding.Deposit.Add(deposit)
-		updated = true
-	}
-
-	// only check deposit when updated and the binding is available
-	if updated && binding.Available {
+	// only check deposit when the binding is available and updated
+	if binding.Available && updated {
 		minDeposit := k.getMinDeposit(ctx, binding.Pricing)
 		if !binding.Deposit.IsAllGTE(minDeposit) {
 			return types.ErrInvalidDeposit(k.codespace, fmt.Sprintf("insufficient deposit: minimal deposit %s, %s got", minDeposit, binding.Deposit))
 		}
 	}
 
-	if len(deposit) != 0 {
+	if !deposit.Empty() {
 		// Send coins from the provider's account to ServiceDepositCoinsAccAddr
 		_, err := k.bk.SendCoins(ctx, provider, auth.ServiceDepositCoinsAccAddr, deposit)
 		if err != nil {
@@ -147,7 +147,7 @@ func (k Keeper) EnableService(ctx sdk.Context, serviceName string, provider sdk.
 	}
 
 	// add the deposit
-	if len(deposit) != 0 {
+	if !deposit.Empty() {
 		binding.Deposit = binding.Deposit.Add(deposit)
 	}
 
@@ -156,9 +156,9 @@ func (k Keeper) EnableService(ctx sdk.Context, serviceName string, provider sdk.
 		return types.ErrInvalidDeposit(k.codespace, fmt.Sprintf("insufficient deposit: minimal deposit %s, %s got", minDeposit, binding.Deposit))
 	}
 
-	if deposit != nil {
+	if !deposit.Empty() {
 		// Send coins from the provider's account to ServiceDepositCoinsAccAddr
-		_, err := k.bk.SendCoins(ctx, binding.Provider, auth.ServiceDepositCoinsAccAddr, deposit)
+		_, err := k.bk.SendCoins(ctx, provider, auth.ServiceDepositCoinsAccAddr, deposit)
 		if err != nil {
 			return err
 		}
@@ -258,12 +258,14 @@ func (k Keeper) AllServiceBindingsIterator(ctx sdk.Context) sdk.Iterator {
 	return sdk.KVStorePrefixIterator(store, serviceBindingKey)
 }
 
+// getMinDeposit gets the minimal deposit required for the service binding.
+// Note: ensure that the pricing is valid
 func (k Keeper) getMinDeposit(ctx sdk.Context, pricing string) sdk.Coins {
 	params := k.GetParamSet(ctx)
 	minDepositMultiple := sdk.NewInt(params.MinDepositMultiple)
 
-	// TODO
-	price := sdk.Coin{}
+	p, _ := types.ParsePricing(pricing)
+	price := p.Price[0]
 
 	// minimal deposit = price * minDepositMultiple
 	minDeposit := sdk.NewCoins(sdk.NewCoin(price.Denom, price.Amount.Mul(minDepositMultiple)))
