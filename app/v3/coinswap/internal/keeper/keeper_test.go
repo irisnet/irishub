@@ -12,7 +12,7 @@ import (
 
 // test that the params can be properly set and retrieved
 func TestParams(t *testing.T) {
-	ctx, keeper, _, _ := createTestInput(t, sdk.NewInt(0), 0)
+	app := createTestApp(nil, 0)
 
 	cases := []struct {
 		params types.Params
@@ -22,19 +22,21 @@ func TestParams(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		keeper.SetParams(ctx, tc.params)
+		app.csk.SetParams(app.ctx, tc.params)
 
-		feeParam := keeper.GetParams(ctx)
+		feeParam := app.csk.GetParams(app.ctx)
 		require.Equal(t, tc.params.Fee, feeParam.Fee)
 	}
 }
 
-func TestKeeper_UpdateLiquidity(t *testing.T) {
+func TestAddAndRemoveLiquidity(t *testing.T) {
 	total, _ := sdk.NewIntFromString("10000000000000000000")
-	ctx, keeper, ak, accs := createTestInput(t, total, 1)
-	sender := accs[0].GetAddress()
 	denom1 := "btc-min"
 	denom2 := sdk.IrisAtto
+
+	initCoins := sdk.NewCoins(sdk.NewCoin(denom1, total), sdk.NewCoin(denom2, total))
+	app := createTestApp(initCoins, 1)
+	sender := app.accounts[0].GetAddress()
 
 	uniID, _ := types.GetUniID(denom1, denom2)
 
@@ -45,26 +47,26 @@ func TestKeeper_UpdateLiquidity(t *testing.T) {
 	minReward := sdk.NewInt(1)
 	deadline := time.Now().Add(1 * time.Minute)
 	msg := types.NewMsgAddLiquidity(depositCoin, irisAmt, minReward, deadline.Unix(), sender)
-	_, err := keeper.HandleAddLiquidity(ctx, msg)
+	_, err := app.csk.HandleAddLiquidity(app.ctx, msg)
 	//assert
 	require.Nil(t, err)
-	pool, existed := keeper.GetPool(ctx, uniID)
+	pool, existed := app.csk.GetPool(app.ctx, uniID)
 	require.True(t, existed)
 	require.Equal(t, "1btc-min,10000000000000000000iris-atto,10000000000000000000uni:btc-min", pool.Balance().String())
-	senderBalances := ak.GetAccount(ctx, sender).GetCoins()
+	senderBalances := app.ak.GetAccount(app.ctx, sender).GetCoins()
 	require.Equal(t, "9999999999999999999btc-min,10000000000000000000uni:btc-min", senderBalances.String())
 
 	withdraw, _ := sdk.NewIntFromString("10000000000000000000")
 	msgRemove := types.NewMsgRemoveLiquidity(sdk.NewInt(1), sdk.NewCoin("uni:btc-min", withdraw),
-		sdk.NewInt(1), ctx.BlockHeader().Time.Unix(),
+		sdk.NewInt(1), app.ctx.BlockHeader().Time.Unix(),
 		sender)
 
-	_, err = keeper.HandleRemoveLiquidity(ctx, msgRemove)
+	_, err = app.csk.HandleRemoveLiquidity(app.ctx, msgRemove)
 	require.Nil(t, err)
 
-	pools := keeper.GetPools(ctx)
+	pools := app.csk.GetPools(app.ctx)
 	require.Len(t, pools, 1)
-	acc := ak.GetAccount(ctx, sender)
+	acc := app.ak.GetAccount(app.ctx, sender)
 	require.True(t, existed)
 	require.Equal(t, "", pools[0].Balance().String())
 	require.Equal(t, "10000000000000000000btc-min,10000000000000000000iris-atto", acc.GetCoins().String())

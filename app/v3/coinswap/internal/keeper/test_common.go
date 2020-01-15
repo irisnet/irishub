@@ -1,17 +1,7 @@
 package keeper
 
 import (
-	"testing"
-
 	"github.com/irisnet/irishub/app/protocol"
-
-	abci "github.com/tendermint/tendermint/abci/types"
-	"github.com/tendermint/tendermint/crypto/secp256k1"
-	"github.com/tendermint/tendermint/libs/log"
-	dbm "github.com/tendermint/tm-db"
-
-	"github.com/stretchr/testify/require"
-
 	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/app/v1/bank"
 	"github.com/irisnet/irishub/app/v1/params"
@@ -19,6 +9,10 @@ import (
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/store"
 	sdk "github.com/irisnet/irishub/types"
+	abci "github.com/tendermint/tendermint/abci/types"
+	"github.com/tendermint/tendermint/crypto/secp256k1"
+	"github.com/tendermint/tendermint/libs/log"
+	dbm "github.com/tendermint/tm-db"
 )
 
 // create a codec used only for testing
@@ -34,7 +28,14 @@ func makeTestCodec() *codec.Codec {
 	return cdc
 }
 
-func createTestInput(t *testing.T, amt sdk.Int, nAccs int64) (sdk.Context, Keeper, auth.AccountKeeper, []auth.Account) {
+type TestApp struct {
+	ctx      sdk.Context
+	csk      Keeper
+	ak       auth.AccountKeeper
+	accounts []auth.Account
+}
+
+func createTestApp(initCoins sdk.Coins, nAccount int64) TestApp {
 	keyAcc := protocol.KeyAccount
 	keyParams := protocol.KeyParams
 	tkeyParams := protocol.TkeyParams
@@ -46,8 +47,7 @@ func createTestInput(t *testing.T, amt sdk.Int, nAccs int64) (sdk.Context, Keepe
 	ms.MountStoreWithDB(keyParams, sdk.StoreTypeIAVL, db)
 	ms.MountStoreWithDB(tkeyParams, sdk.StoreTypeTransient, db)
 	ms.MountStoreWithDB(keyCoinswap, sdk.StoreTypeIAVL, db)
-	err := ms.LoadLatestVersion()
-	require.Nil(t, err)
+	_ = ms.LoadLatestVersion()
 
 	cdc := makeTestCodec()
 	ctx := sdk.NewContext(ms, abci.Header{ChainID: "coinswap-chain"}, false, log.NewNopLogger())
@@ -56,17 +56,18 @@ func createTestInput(t *testing.T, amt sdk.Int, nAccs int64) (sdk.Context, Keepe
 	ak := auth.NewAccountKeeper(cdc, keyAcc, auth.ProtoBaseAccount)
 	bk := bank.NewBaseKeeper(cdc, ak)
 
-	initialCoins := sdk.Coins{
-		sdk.NewCoin(sdk.IrisAtto, amt),
-		sdk.NewCoin("btc-min", amt),
-	}
-	initialCoins = initialCoins.Sort()
-	accs := createTestAccs(ctx, int(nAccs), initialCoins, &ak)
+	initCoins = initCoins.Sort()
+	accounts := createTestAccs(ctx, int(nAccount), initCoins, &ak)
 
 	keeper := NewKeeper(cdc, keyCoinswap, bk, pk.Subspace(types.DefaultParamSpace))
 	keeper.SetParams(ctx, types.DefaultParams())
 
-	return ctx, keeper, ak, accs
+	return TestApp{
+		ctx:      ctx,
+		csk:      keeper,
+		ak:       ak,
+		accounts: accounts,
+	}
 }
 
 func createTestAccs(ctx sdk.Context, numAccs int, initialCoins sdk.Coins, ak *auth.AccountKeeper) (accs []auth.Account) {
