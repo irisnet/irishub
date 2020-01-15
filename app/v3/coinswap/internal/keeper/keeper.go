@@ -74,9 +74,7 @@ func (k Keeper) HandleAddLiquidity(ctx sdk.Context, msg types.MsgAddLiquidity) (
 
 	pool, existed := k.GetPool(ctx, uniID)
 	if !existed {
-		_ = k.setPool(ctx, Pool{
-			Name: uniID,
-		})
+		_ = k.SetPool(ctx, NewPool(uniID, nil))
 	}
 	irisReserveAmt := pool.AmountOf(sdk.IrisAtto)
 	tokenReserveAmt := pool.AmountOf(msg.MaxToken.Denom)
