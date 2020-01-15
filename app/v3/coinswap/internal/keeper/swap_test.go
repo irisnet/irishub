@@ -135,7 +135,7 @@ func TestKeeperSwap(t *testing.T) {
 	require.Nil(t, err)
 	pool, existed := keeper.GetPool(ctx, uniID)
 	require.True(t, existed)
-	require.Equal(t, "900btc-min,1112iris-atto,1000uni:btc-min", pool.Coins.String())
+	require.Equal(t, "900btc-min,1112iris-atto,1000uni:btc-min", pool.Balance().String())
 	senderBlances = ak.GetAccount(ctx, sender).GetCoins()
 	require.Equal(t, "99999100btc-min,99998888iris-atto,1000uni:btc-min", senderBlances.String())
 
@@ -144,7 +144,7 @@ func TestKeeperSwap(t *testing.T) {
 	require.Nil(t, err)
 	pool, existed = keeper.GetPool(ctx, uniID)
 	require.True(t, existed)
-	require.Equal(t, "800btc-min,1252iris-atto,1000uni:btc-min", pool.Coins.String())
+	require.Equal(t, "800btc-min,1252iris-atto,1000uni:btc-min", pool.Balance().String())
 	senderBlances = ak.GetAccount(ctx, sender).GetCoins()
 	require.Equal(t, "99999200btc-min,99998748iris-atto,1000uni:btc-min", senderBlances.String())
 
@@ -153,7 +153,7 @@ func TestKeeperSwap(t *testing.T) {
 	require.Nil(t, err)
 	pool, existed = keeper.GetPool(ctx, uniID)
 	require.True(t, existed)
-	require.Equal(t, "700btc-min,1432iris-atto,1000uni:btc-min", pool.Coins.String())
+	require.Equal(t, "700btc-min,1432iris-atto,1000uni:btc-min", pool.Balance().String())
 }
 
 func createReservePool(t *testing.T) (sdk.Context, Keeper, auth.AccountKeeper, sdk.AccAddress, string, sdk.Error, sdk.Coins, sdk.Coins) {
@@ -177,9 +177,9 @@ func createReservePool(t *testing.T) (sdk.Context, Keeper, auth.AccountKeeper, s
 	senderBalances := ak.GetAccount(ctx, sender).GetCoins()
 	require.Equal(t, "99999000btc-min,99999000iris-atto,1000uni:btc-min", senderBalances.String())
 	require.True(t, existed)
-	require.Equal(t, "1000btc-min,1000iris-atto,1000uni:btc-min", pool.Coins.String())
+	require.Equal(t, "1000btc-min,1000iris-atto,1000uni:btc-min", pool.Balance().String())
 	require.Equal(t, "99999000btc-min,99999000iris-atto,1000uni:btc-min", senderBalances.String())
-	return ctx, keeper, ak, sender, uniID, err, pool.Coins, senderBalances
+	return ctx, keeper, ak, sender, uniID, err, pool.Balance(), senderBalances
 }
 
 func TestTradeInputForExactOutput(t *testing.T) {
@@ -198,7 +198,7 @@ func TestTradeInputForExactOutput(t *testing.T) {
 	pool, existed := keeper.GetPool(ctx, uniID)
 	require.True(t, existed)
 
-	initSupplyOutput := pool.AmountOf(outputCoin.Denom)
+	initSupplyOutput := pool.BalanceOf(outputCoin.Denom)
 	maxCnt := int(initSupplyOutput.Div(outputCoin.Amount).Int64())
 
 	for i := 1; i < 100; i++ {
@@ -212,12 +212,11 @@ func TestTradeInputForExactOutput(t *testing.T) {
 		bought := sdk.NewCoins(outputCoin)
 		sold := sdk.NewCoins(sdk.NewCoin(sdk.IrisAtto, amt))
 
-		pb := pool.Add(sold).Sub(bought)
+		pool.Add(sold).Sub(bought)
 		sb := senderBlances.Add(bought).Sub(sold)
 
-		assertResult(t, keeper, ak, ctx, uniID, sender, pb, sb)
+		assertResult(t, keeper, ak, ctx, uniID, sender, pool.Balance(), sb)
 
-		pool.Coins = pb
 		senderBlances = sb
 	}
 }
@@ -245,12 +244,10 @@ func TestTradeExactInputForOutput(t *testing.T) {
 		sold := sdk.NewCoins(inputCoin)
 		bought := sdk.NewCoins(sdk.NewCoin("btc-min", amt))
 
-		pb := pool.Add(sold).Sub(bought)
+		pool.Add(sold).Sub(bought)
 		sb := senderBlances.Add(bought).Sub(sold)
 
-		assertResult(t, keeper, ak, ctx, uniID, sender, pb, sb)
-
-		pool.Coins = pb
+		assertResult(t, keeper, ak, ctx, uniID, sender, pool.Balance(), sb)
 		senderBlances = sb
 	}
 }
@@ -258,7 +255,7 @@ func TestTradeExactInputForOutput(t *testing.T) {
 func assertResult(t *testing.T, keeper Keeper, ak auth.AccountKeeper, ctx sdk.Context, uniID string, sender sdk.AccAddress, expectPoolBalance, expectSenderBalance sdk.Coins) {
 	pool, existed := keeper.GetPool(ctx, uniID)
 	require.True(t, existed)
-	require.Equal(t, expectPoolBalance.String(), pool.Coins.String())
+	require.Equal(t, expectPoolBalance.String(), pool.Balance().String())
 	senderBalances := ak.GetAccount(ctx, sender).GetCoins()
 	require.Equal(t, expectSenderBalance.String(), senderBalances.String())
 }

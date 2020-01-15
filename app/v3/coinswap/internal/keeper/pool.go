@@ -9,21 +9,9 @@ import (
 
 const KeyPool = "pool"
 
-type Pool struct {
-	sdk.Coins
-	Name string
-}
-
-func NewPool(name string, coins sdk.Coins) Pool {
-	return Pool{
-		Coins: coins,
-		Name:  name,
-	}
-}
-
 // GetPool returns the total balance of an reserve pool at the
 // provided denomination.
-func (k Keeper) GetPool(ctx sdk.Context, uniID string) (pool Pool, existed bool) {
+func (k Keeper) GetPool(ctx sdk.Context, uniID string) (pool types.Pool, existed bool) {
 	store := ctx.KVStore(k.storeKey)
 	bz := store.Get(keyPool(uniID))
 
@@ -34,13 +22,13 @@ func (k Keeper) GetPool(ctx sdk.Context, uniID string) (pool Pool, existed bool)
 }
 
 // GetPool returns all pools.
-func (k Keeper) GetPools(ctx sdk.Context) (pools []Pool) {
+func (k Keeper) GetPools(ctx sdk.Context) (pools []types.Pool) {
 	store := ctx.KVStore(k.storeKey)
 	iterator := sdk.KVStorePrefixIterator(store, []byte(KeyPool))
 	defer iterator.Close()
 
 	for ; iterator.Valid(); iterator.Next() {
-		var pool Pool
+		var pool types.Pool
 		if err := k.cdc.UnmarshalBinaryLengthPrefixed(iterator.Value(), &pool); err == nil {
 			pools = append(pools, pool)
 		}
@@ -49,7 +37,7 @@ func (k Keeper) GetPools(ctx sdk.Context) (pools []Pool) {
 }
 
 // SetPool is responsible for storing the poll to database
-func (k Keeper) SetPool(ctx sdk.Context, pool Pool) sdk.Error {
+func (k Keeper) SetPool(ctx sdk.Context, pool types.Pool) sdk.Error {
 	store := ctx.KVStore(k.storeKey)
 	bz, err := k.cdc.MarshalBinaryLengthPrefixed(pool)
 	if err != nil {
@@ -68,7 +56,7 @@ func (k Keeper) SendCoinsFromAccountToPool(ctx sdk.Context, from sdk.AccAddress,
 	if !existed {
 		return types.ErrReservePoolNotExists(fmt.Sprintf("reserve pool for %s not found", uniID))
 	}
-	pool.Coins = pool.Add(amount)
+	pool.Add(amount)
 	return k.SetPool(ctx, pool)
 }
 
@@ -81,7 +69,7 @@ func (k Keeper) SendCoinsFromPoolToAccount(ctx sdk.Context, receiver sdk.AccAddr
 	if !existed {
 		return types.ErrReservePoolNotExists(fmt.Sprintf("reserve pool for %s not found", uniID))
 	}
-	pool.Coins = pool.Coins.Sub(amount)
+	pool.Sub(amount)
 	return k.SetPool(ctx, pool)
 }
 
@@ -98,7 +86,7 @@ func (k Keeper) MintCoins(ctx sdk.Context, receiver sdk.AccAddress, uniID string
 	}
 	// mint liquidity vouchers for reserve Pool
 	mintCoins := sdk.NewCoins(sdk.NewCoin(uniDenom, mintAmount))
-	pool.Coins = pool.Coins.Add(mintCoins)
+	pool.Add(mintCoins)
 	if err := k.SetPool(ctx, pool); err != nil {
 		return err
 	}
@@ -119,7 +107,7 @@ func (k Keeper) BurnCoins(ctx sdk.Context, from sdk.AccAddress, uniID string, bu
 	}
 	// burn liquidity from pool
 	burnCoins := sdk.NewCoins(burnCoin)
-	pool.Coins = pool.Coins.Sub(burnCoins)
+	pool.Sub(burnCoins)
 	if err := k.SetPool(ctx, pool); err != nil {
 		return err
 	}

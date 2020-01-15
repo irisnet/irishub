@@ -45,9 +45,9 @@ func queryLiquidity(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, s
 		return nil, types.ErrReservePoolNotExists(fmt.Sprintf("reserve pool for %s not found", params.Id))
 	}
 
-	iris := sdk.NewCoin(sdk.IrisAtto, pool.AmountOf(sdk.IrisAtto))
-	token := sdk.NewCoin(tokenDenom, pool.AmountOf(tokenDenom))
-	liquidity := sdk.NewCoin(uniDenom, pool.AmountOf(uniDenom))
+	iris := sdk.NewCoin(sdk.IrisAtto, pool.BalanceOf(sdk.IrisAtto))
+	token := sdk.NewCoin(tokenDenom, pool.BalanceOf(tokenDenom))
+	liquidity := sdk.NewCoin(uniDenom, pool.BalanceOf(uniDenom))
 
 	swapParams := k.GetParams(ctx)
 	fee := swapParams.Fee.DecimalString(types.MaxFeePrecision)

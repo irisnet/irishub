@@ -48,9 +48,9 @@ func TestKeeper_UpdateLiquidity(t *testing.T) {
 	_, err := keeper.HandleAddLiquidity(ctx, msg)
 	//assert
 	require.Nil(t, err)
-	reservePoolBalances, existed := keeper.GetPool(ctx, uniID)
+	pool, existed := keeper.GetPool(ctx, uniID)
 	require.True(t, existed)
-	require.Equal(t, "1btc-min,10000000000000000000iris-atto,10000000000000000000uni:btc-min", reservePoolBalances.String())
+	require.Equal(t, "1btc-min,10000000000000000000iris-atto,10000000000000000000uni:btc-min", pool.Balance().String())
 	senderBalances := ak.GetAccount(ctx, sender).GetCoins()
 	require.Equal(t, "9999999999999999999btc-min,10000000000000000000uni:btc-min", senderBalances.String())
 
@@ -62,9 +62,10 @@ func TestKeeper_UpdateLiquidity(t *testing.T) {
 	_, err = keeper.HandleRemoveLiquidity(ctx, msgRemove)
 	require.Nil(t, err)
 
-	reservePoolBalances, existed = keeper.GetPool(ctx, uniID)
+	pools := keeper.GetPools(ctx)
+	require.Len(t, pools, 1)
 	acc := ak.GetAccount(ctx, sender)
 	require.True(t, existed)
-	require.Equal(t, "", reservePoolBalances.String())
+	require.Equal(t, "", pools[0].Balance().String())
 	require.Equal(t, "10000000000000000000btc-min,10000000000000000000iris-atto", acc.GetCoins().String())
 }

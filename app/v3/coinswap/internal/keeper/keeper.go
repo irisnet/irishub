@@ -74,11 +74,11 @@ func (k Keeper) HandleAddLiquidity(ctx sdk.Context, msg types.MsgAddLiquidity) (
 
 	pool, existed := k.GetPool(ctx, uniID)
 	if !existed {
-		_ = k.SetPool(ctx, NewPool(uniID, nil))
+		_ = k.SetPool(ctx, types.NewPool(uniID, nil))
 	}
-	irisReserveAmt := pool.AmountOf(sdk.IrisAtto)
-	tokenReserveAmt := pool.AmountOf(msg.MaxToken.Denom)
-	liquidity := pool.AmountOf(uniDenom)
+	irisReserveAmt := pool.BalanceOf(sdk.IrisAtto)
+	tokenReserveAmt := pool.BalanceOf(msg.MaxToken.Denom)
+	liquidity := pool.BalanceOf(uniDenom)
 
 	var mintLiquidityAmt sdk.Int
 	var depositToken sdk.Coin
@@ -131,14 +131,14 @@ func (k Keeper) HandleRemoveLiquidity(ctx sdk.Context, msg types.MsgRemoveLiquid
 	}
 
 	// check if reserve pool exists
-	reservePool, existed := k.GetPool(ctx, uniID)
+	pool, existed := k.GetPool(ctx, uniID)
 	if !existed {
 		return tags, types.ErrReservePoolNotExists(fmt.Sprintf("reserve pool for %s not found", uniID))
 	}
 
-	irisReserveAmt := reservePool.AmountOf(sdk.IrisAtto)
-	tokenReserveAmt := reservePool.AmountOf(minTokenDenom)
-	liquidityReserve := reservePool.AmountOf(uniDenom)
+	irisReserveAmt := pool.BalanceOf(sdk.IrisAtto)
+	tokenReserveAmt := pool.BalanceOf(minTokenDenom)
+	liquidityReserve := pool.BalanceOf(uniDenom)
 	if irisReserveAmt.LT(msg.MinIrisAmt) {
 		return tags, types.ErrInsufficientFunds(fmt.Sprintf("insufficient %s funds, user expected: %s, actual: %s", sdk.IrisAtto, msg.MinIrisAmt.String(), irisReserveAmt.String()))
 	}

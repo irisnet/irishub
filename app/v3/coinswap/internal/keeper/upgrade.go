@@ -16,7 +16,7 @@ func (k Keeper) Init(ctx sdk.Context, assetKeeper types.AssetKeeper, accountKeep
 			coins := k.getAbandonedPool(ctx, accountKeeper, uniID)
 			irisToken := sdk.NewCoin(sdk.IrisAtto, coins.AmountOf(sdk.IrisAtto))
 			otherToken := sdk.NewCoin(denom, coins.AmountOf(denom))
-			_ = k.SetPool(ctx, NewPool(uniID, sdk.NewCoins(irisToken, otherToken)))
+			_ = k.SetPool(ctx, types.NewPool(uniID, sdk.NewCoins(irisToken, otherToken)))
 		}
 	}
 }
