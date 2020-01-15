@@ -3,6 +3,13 @@ package keeper
 import (
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
+	abci "github.com/tendermint/tendermint/abci/types"
+	"github.com/tendermint/tendermint/crypto/secp256k1"
+	"github.com/tendermint/tendermint/libs/log"
+	dbm "github.com/tendermint/tm-db"
+
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/app/v1/bank"
@@ -10,11 +17,6 @@ import (
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/store"
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/stretchr/testify/require"
-	abci "github.com/tendermint/tendermint/abci/types"
-	"github.com/tendermint/tendermint/crypto/secp256k1"
-	"github.com/tendermint/tendermint/libs/log"
-	dbm "github.com/tendermint/tm-db"
 )
 
 // create a codec used only for testing
@@ -51,9 +53,7 @@ func createTestInput(t *testing.T, amt sdk.Int, nAccs int64) (sdk.Context, Keepe
 	ak := auth.NewAccountKeeper(cdc, keyAcc, auth.ProtoBaseAccount)
 	bk := bank.NewBaseKeeper(cdc, ak)
 
-	initialCoins := sdk.Coins{
-		sdk.NewCoin(sdk.IrisAtto, amt),
-	}
+	initialCoins := sdk.Coins{sdk.NewCoin(sdk.IrisAtto, amt)}
 	initialCoins = initialCoins.Sort()
 	accs := createTestAccs(ctx, int(nAccs), initialCoins, &ak)
 	keeper := NewKeeper(cdc, htlcKey, bk, types.DefaultCodespace)

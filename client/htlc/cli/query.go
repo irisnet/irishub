@@ -4,11 +4,13 @@ import (
 	"encoding/hex"
 	"fmt"
 
+	"github.com/spf13/cobra"
+
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/app/v2/htlc"
 	"github.com/irisnet/irishub/client/context"
+	"github.com/irisnet/irishub/client/htlc/types"
 	"github.com/irisnet/irishub/codec"
-	"github.com/spf13/cobra"
 )
 
 // GetCmdQueryHTLC implements the query HTLC command.
@@ -41,12 +43,13 @@ func GetCmdQueryHTLC(cdc *codec.Codec) *cobra.Command {
 			}
 
 			var htlc htlc.HTLC
-			err = cdc.UnmarshalJSON(res, &htlc)
-			if err != nil {
+			if err = cdc.UnmarshalJSON(res, &htlc); err != nil {
 				return err
 			}
 
-			return cliCtx.PrintOutput(htlc)
+			oh := types.NewOutputHTLC(htlc)
+
+			return cliCtx.PrintOutput(oh)
 		},
 	}
 

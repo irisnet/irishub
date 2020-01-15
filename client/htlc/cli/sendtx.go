@@ -7,14 +7,15 @@ import (
 	"os"
 	"strings"
 
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+
 	"github.com/irisnet/irishub/app/v2/htlc"
 	"github.com/irisnet/irishub/client/asset/cli"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 // GetCmdCreateHTLC implements the create HTLC command
@@ -61,8 +62,7 @@ func GetCmdCreateHTLC(cdc *codec.Codec) *cobra.Command {
 			flags := cmd.Flags()
 			if flags.Changed(FlagHashLock) {
 				hashLockStr := strings.TrimSpace(viper.GetString(FlagHashLock))
-				hashLock, err = hex.DecodeString(hashLockStr)
-				if err != nil {
+				if hashLock, err = hex.DecodeString(hashLockStr); err != nil {
 					return err
 				}
 			} else {
@@ -72,13 +72,11 @@ func GetCmdCreateHTLC(cdc *codec.Codec) *cobra.Command {
 						return fmt.Errorf("the secret must be %d bytes long", htlc.SecretLength)
 					}
 
-					secret, err = hex.DecodeString(secretStr)
-					if err != nil {
+					if secret, err = hex.DecodeString(secretStr); err != nil {
 						return err
 					}
 				} else {
-					_, err := rand.Read(secret)
-					if err != nil {
+					if _, err := rand.Read(secret); err != nil {
 						return err
 					}
 				}
@@ -88,19 +86,20 @@ func GetCmdCreateHTLC(cdc *codec.Codec) *cobra.Command {
 
 			msg := htlc.NewMsgCreateHTLC(
 				sender, toAddr, receiverOnOtherChain, amount,
-				hashLock, uint64(timestamp), uint64(timeLock))
+				hashLock, uint64(timestamp), uint64(timeLock),
+			)
 
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
 
-			err = utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
-			if err == nil && !flags.Changed(FlagHashLock) {
+			if err = utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg}); err == nil && !flags.Changed(FlagHashLock) {
 				fmt.Println("**Important** save this secret, hashLock in a safe place.")
 				fmt.Println("It is the only way to claim or refund the locked coins from an HTLC")
 				fmt.Println()
 				fmt.Printf("Secret:      %s\nHashLock:    %s\n",
-					hex.EncodeToString(secret), hex.EncodeToString(hashLock))
+					hex.EncodeToString(secret), hex.EncodeToString(hashLock),
+				)
 			}
 			return err
 		},

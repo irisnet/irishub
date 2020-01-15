@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+
 	"github.com/irisnet/irishub/app/v2/htlc"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
@@ -14,22 +15,11 @@ import (
 
 func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec) {
 	// create an HTLC
-	r.HandleFunc(
-		"/htlc/htlcs",
-		createHTLCHandlerFn(cdc, cliCtx),
-	).Methods("POST")
-
+	r.HandleFunc("/htlc/htlcs", createHTLCHandlerFn(cdc, cliCtx)).Methods("POST")
 	// claim an HTLC
-	r.HandleFunc(
-		"/htlc/htlcs/{hash-lock}/claim",
-		claimHTLCHandlerFn(cdc, cliCtx),
-	).Methods("POST")
-
+	r.HandleFunc("/htlc/htlcs/{hash-lock}/claim", claimHTLCHandlerFn(cdc, cliCtx)).Methods("POST")
 	// refund an HTLC
-	r.HandleFunc(
-		"/htlc/htlcs/{hash-lock}/refund",
-		refundHTLCHandlerFn(cdc, cliCtx),
-	).Methods("POST")
+	r.HandleFunc("/htlc/htlcs/{hash-lock}/refund", refundHTLCHandlerFn(cdc, cliCtx)).Methods("POST")
 }
 
 type createHTLCReq struct {
@@ -46,8 +36,7 @@ type createHTLCReq struct {
 func createHTLCHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req createHTLCReq
-		err := utils.ReadPostBody(w, r, cdc, &req)
-		if err != nil {
+		if err := utils.ReadPostBody(w, r, cdc, &req); err != nil {
 			return
 		}
 
@@ -66,8 +55,7 @@ func createHTLCHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handl
 		msg := htlc.NewMsgCreateHTLC(
 			req.Sender, req.To, req.ReceiverOnOtherChain, req.Amount,
 			hashLock, req.Timestamp, req.TimeLock)
-		err = msg.ValidateBasic()
-		if err != nil {
+		if err = msg.ValidateBasic(); err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
@@ -96,8 +84,7 @@ func claimHTLCHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handle
 		}
 
 		var req claimHTLCReq
-		err = utils.ReadPostBody(w, r, cdc, &req)
-		if err != nil {
+		if err = utils.ReadPostBody(w, r, cdc, &req); err != nil {
 			return
 		}
 
@@ -112,10 +99,8 @@ func claimHTLCHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handle
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
-		msg := htlc.NewMsgClaimHTLC(
-			req.Sender, hashLock, secret)
-		err = msg.ValidateBasic()
-		if err != nil {
+		msg := htlc.NewMsgClaimHTLC(req.Sender, hashLock, secret)
+		if err = msg.ValidateBasic(); err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
@@ -143,8 +128,7 @@ func refundHTLCHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handl
 		}
 
 		var req RefundHTLCReq
-		err = utils.ReadPostBody(w, r, cdc, &req)
-		if err != nil {
+		if err = utils.ReadPostBody(w, r, cdc, &req); err != nil {
 			return
 		}
 
@@ -154,10 +138,8 @@ func refundHTLCHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handl
 		}
 
 		// create the NewMsgRefundHTLC message
-		msg := htlc.NewMsgRefundHTLC(
-			req.Sender, hashLock)
-		err = msg.ValidateBasic()
-		if err != nil {
+		msg := htlc.NewMsgRefundHTLC(req.Sender, hashLock)
+		if err = msg.ValidateBasic(); err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}

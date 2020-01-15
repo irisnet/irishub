@@ -1,14 +1,16 @@
 package cli
 
 import (
+	"encoding/hex"
 	"fmt"
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/tests"
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/stretchr/testify/require"
 )
 
 func TestIrisCLIHTLC(t *testing.T) {
@@ -64,7 +66,7 @@ func TestIrisCLIHTLC(t *testing.T) {
 	require.Equal(t, barAddr, htlc.To)
 	require.Equal(t, receiverOnOtherChain, htlc.ReceiverOnOtherChain)
 	require.Equal(t, amount, htlc.Amount.String())
-	require.Equal(t, initSecret, htlc.Secret)
+	require.Equal(t, hex.EncodeToString(initSecret), htlc.Secret)
 	require.Equal(t, timestamp, htlc.Timestamp)
 	require.Equal(t, stateOpen, htlc.State.String())
 
@@ -117,7 +119,7 @@ func TestIrisCLIHTLC(t *testing.T) {
 	require.Equal(t, barAddr, htlc.To)
 	require.Equal(t, receiverOnOtherChain, htlc.ReceiverOnOtherChain)
 	require.Equal(t, amount, htlc.Amount.String())
-	require.Equal(t, initSecret, htlc.Secret)
+	require.Equal(t, hex.EncodeToString(initSecret), htlc.Secret)
 	require.Equal(t, timestamp, htlc.Timestamp)
 	require.Equal(t, stateOpen, htlc.State.String())
 
