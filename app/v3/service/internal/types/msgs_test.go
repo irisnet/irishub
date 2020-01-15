@@ -23,7 +23,7 @@ var (
 
 	testProvider     = sdk.AccAddress([]byte("test-provider"))
 	testDeposit      = sdk.NewCoins(testCoin1)
-	testPricing      = `{"price":"100iris-atto"}`
+	testPricing      = `{"price":[{"denom":"iris-atto","amount":"1000000"}]}`
 	testWithdrawAddr = sdk.AccAddress([]byte("test-withdrawal-address"))
 	testAddedDeposit = sdk.NewCoins(testCoin2)
 )
@@ -46,6 +46,7 @@ func TestMsgDefineServiceType(t *testing.T) {
 func TestMsgDefineServiceValidation(t *testing.T) {
 	emptyAddress := sdk.AccAddress{}
 
+	invalidName := "invalid/service/name"
 	invalidLongName := strings.Repeat("s", MaxNameLength+1)
 	invalidLongDesc := strings.Repeat("d", MaxDescriptionLength+1)
 	invalidMoreTags := strings.Split("t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11", ",")
@@ -59,7 +60,7 @@ func TestMsgDefineServiceValidation(t *testing.T) {
 	testMsgs := []MsgDefineService{
 		NewMsgDefineService(testServiceName, testServiceDesc, testServiceTags, testAuthor, testAuthorDesc, testSchemas),            // valid msg
 		NewMsgDefineService(testServiceName, testServiceDesc, testServiceTags, emptyAddress, testAuthorDesc, testSchemas),          // missing author address
-		NewMsgDefineService("service/name", testServiceDesc, testServiceTags, testAuthor, testAuthorDesc, testSchemas),             // service name contains illegal characters
+		NewMsgDefineService(invalidName, testServiceDesc, testServiceTags, testAuthor, testAuthorDesc, testSchemas),                // service name contains illegal characters
 		NewMsgDefineService(invalidLongName, testServiceDesc, testServiceTags, testAuthor, testAuthorDesc, testSchemas),            // too long service name
 		NewMsgDefineService(testServiceName, invalidLongDesc, testServiceTags, testAuthor, testAuthorDesc, testSchemas),            // too long service description
 		NewMsgDefineService(testServiceName, testServiceDesc, invalidMoreTags, testAuthor, testAuthorDesc, testSchemas),            // too many tags
@@ -139,9 +140,9 @@ func TestMsgBindServiceValidation(t *testing.T) {
 	invalidName := "invalid/service/name"
 	invalidLongName := strings.Repeat("s", MaxNameLength+1)
 	invalidDeposit := sdk.Coins{}
-	invalidDenomDeposit := sdk.NewCoins(sdk.NewCoin("iris", sdk.NewInt(1000)))
-	invalidPricing := `{"price":"100iris-atto","other":"notallowedfield"}`
-	invalidDenomPricing := `{"price":"100iris"}`
+	invalidDenomDeposit := sdk.NewCoins(sdk.NewCoin("eth-min", sdk.NewInt(1000)))
+	invalidPricing := `{"price":[{"denom":"iris-atto","amount":"1000000"}],"other":"notallowedfield"}`
+	invalidDenomPricing := `{"price":[{"denom":"iris","amount":"1000000"}]}`
 
 	testMsgs := []MsgBindService{
 		NewMsgBindService(testServiceName, testProvider, testDeposit, testPricing, testWithdrawAddr),         // valid msg
@@ -222,9 +223,9 @@ func TestMsgUpdateServiceBindingValidation(t *testing.T) {
 
 	invalidName := "invalid/service/name"
 	invalidLongName := strings.Repeat("s", MaxNameLength+1)
-	invalidDenomDeposit := sdk.NewCoins(sdk.NewCoin("iris", sdk.NewInt(1000)))
-	invalidPricing := `{"price":"100iris-atto","other":"notallowedfield"}`
-	invalidDenomPricing := `{"price":"100iris"}`
+	invalidDenomDeposit := sdk.NewCoins(sdk.NewCoin("eth-min", sdk.NewInt(1000)))
+	invalidPricing := `{"price":[{"denom":"iris-atto","amount":"1000000"}],"other":"notallowedfield"}`
+	invalidDenomPricing := `{"price":[{"denom":"iris","amount":"1000000"}]}`
 
 	testMsgs := []MsgUpdateServiceBinding{
 		NewMsgUpdateServiceBinding(testServiceName, testProvider, testAddedDeposit, testPricing),         // valid msg
@@ -441,7 +442,7 @@ func TestMsgEnableServiceValidation(t *testing.T) {
 
 	invalidName := "invalid/service/name"
 	invalidLongName := strings.Repeat("s", MaxNameLength+1)
-	invalidDenomDeposit := sdk.NewCoins(sdk.NewCoin("iris", sdk.NewInt(1000)))
+	invalidDenomDeposit := sdk.NewCoins(sdk.NewCoin("eth-min", sdk.NewInt(1000)))
 
 	testMsgs := []MsgEnableService{
 		NewMsgEnableService(testServiceName, testProvider, testAddedDeposit),    // valid msg
