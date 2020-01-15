@@ -1,6 +1,7 @@
 package types
 
 import (
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -69,4 +70,34 @@ func (bindings ServiceBindings) String() string {
 	}
 
 	return str
+}
+
+// Pricing represents the pricing of a service binding
+type Pricing struct {
+	Price              sdk.Coins           `json:"price"`                // base price
+	PromotionsByTime   []PromotionByTime   `json:"promotions_by_time"`   // promotions by time
+	PromotionsByVolume []PromotionByVolume `json:"promotions_by_volume"` // promotions by volume
+}
+
+// PromotionByTime defines the promotion activity by time
+type PromotionByTime struct {
+	StartTime time.Time `json:"start_time"` // starting time of the promotion
+	EndTime   time.Time `json:"end_time"`   // ending time of the promotion
+	Discount  float32   `json:"discount"`   // discount during the promotion
+}
+
+// PromotionByVolume defines the promotion activity by volume
+type PromotionByVolume struct {
+	Volume   uint64  `json:"volume"`   // minimal volume for the promotion
+	Discount float32 `json:"discount"` // discount for the promotion
+}
+
+// ParsePricing parses the given pricing string
+func ParsePricing(pricing string) (Pricing, sdk.Error) {
+	var p Pricing
+	if err := json.Unmarshal([]byte(pricing), &p); err != nil {
+		return p, ErrInvalidPricing(DefaultCodespace, fmt.Sprintf("failed to unmarshal the pricing: %s", err))
+	}
+
+	return p, nil
 }

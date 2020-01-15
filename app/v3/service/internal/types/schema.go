@@ -38,9 +38,12 @@ func ValidateServiceSchemas(schemas string) sdk.Error {
 	return nil
 }
 
-// ValidateBindingPricing checks if the given pricing is valid
+// ValidateBindingPricing validates the given pricing against the Pricing JSON Schema
 func ValidateBindingPricing(pricing string) sdk.Error {
-	// TODO
+	if !validDocument([]byte(PricingSchema), pricing) {
+		return ErrInvalidPricing(DefaultCodespace, "invalid pricing")
+	}
+
 	return nil
 }
 
@@ -195,3 +198,100 @@ func validDocument(schema []byte, document string) bool {
 
 	return res.Valid()
 }
+
+// PricingSchema is the Pricing JSON Schema
+const PricingSchema = `
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "Irishub Service Pricing",
+    "description": "The Irishub Service Pricing specification",
+    "type": "object",
+
+    "definitions": {
+		"coin": {
+			"type": "object",
+			"description": "price coin",
+
+			"properties": {
+				"denom": {
+					"type": "string",
+					"description": "the denomination of the coin"
+				},
+				"amount": {
+					"type": "string",
+					"description": "the amount of the coin"
+				}
+			},
+
+			"required": ["denom", "amount"]
+		},
+        "promotion_by_time": {
+            "type": "object",
+            "description": "promotion activity by time",
+
+            "properties": {
+                "start_time": {
+                    "type": "number",
+                    "description": "starting time of the promotion"
+				},
+                "end_time": {
+                    "type": "number",
+                    "description": "ending time of the promotion"
+				},
+				"discount": {
+                    "type": "number",
+                    "description": "discount during the promotion"
+				}
+			},
+
+			"required": ["start_time", "end_time", "discount"]
+		},
+		"promotion_by_volume": {
+            "type": "object",
+            "description": "promotion activity by volume",
+
+            "properties": {
+                "volume": {
+                    "type": "number",
+                    "description": "minimal volume for the promotion"
+				},
+				"discount": {
+                    "type": "number",
+                    "description": "discount for the promotion"
+				}
+			},
+
+			"required": ["volume", "discount"]
+        }
+    },
+
+    "properties": {
+        "price": {
+            "type": "array",
+			"description": "normal service price",
+
+			"item": {
+				"$ref": "#/definitions/coin"
+			}
+        },
+        "promotions_by_time": {
+            "type": "array",
+            "description": "promotion activities by time",
+
+            "item": {
+                "$ref": "#/definitions/promotion_by_time"
+            }
+		},
+		"promotions_by_volume": {
+            "type": "array",
+            "description": "promotion activities by volume",
+
+            "item": {
+                "$ref": "#/definitions/promotion_by_volume"
+            }
+		}
+    },
+
+    "required": ["price"]
+}
+`
