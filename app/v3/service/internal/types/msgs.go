@@ -165,11 +165,15 @@ func (msg MsgBindService) ValidateBasic() sdk.Error {
 		return err
 	}
 
-	if !validServiceCoins(msg.Deposit) {
-		return ErrInvalidDeposit(DefaultCodespace, fmt.Sprintf("invalid service deposit: %s", msg.Deposit))
+	if !validDepositCoins(msg.Deposit) {
+		return ErrInvalidDeposit(DefaultCodespace, fmt.Sprintf("invalid deposit: %s", msg.Deposit))
 	}
 
-	return ValidateBindingPricing(msg.Pricing)
+	if len(msg.Pricing) == 0 {
+		return ErrInvalidPricing(DefaultCodespace, "pricing missing")
+	}
+
+	return validatePricing(msg.Pricing)
 }
 
 // GetSigners implements Msg.
@@ -223,12 +227,12 @@ func (msg MsgUpdateServiceBinding) ValidateBasic() sdk.Error {
 		return err
 	}
 
-	if len(msg.Deposit) == 0 && !validServiceCoins(msg.Deposit) {
-		return ErrInvalidDeposit(DefaultCodespace, fmt.Sprintf("invalid service deposit: %s", msg.Deposit))
+	if !msg.Deposit.Empty() && !validDepositCoins(msg.Deposit) {
+		return ErrInvalidDeposit(DefaultCodespace, fmt.Sprintf("invalid deposit: %s", msg.Deposit))
 	}
 
 	if len(msg.Pricing) != 0 {
-		return ValidateBindingPricing(msg.Pricing)
+		return validatePricing(msg.Pricing)
 	}
 
 	return nil
@@ -385,8 +389,8 @@ func (msg MsgEnableService) ValidateBasic() sdk.Error {
 		return err
 	}
 
-	if len(msg.Deposit) == 0 && !validServiceCoins(msg.Deposit) {
-		return ErrInvalidDeposit(DefaultCodespace, fmt.Sprintf("invalid service deposit: %s", msg.Deposit))
+	if !msg.Deposit.Empty() && !validDepositCoins(msg.Deposit) {
+		return ErrInvalidDeposit(DefaultCodespace, fmt.Sprintf("invalid deposit: %s", msg.Deposit))
 	}
 
 	return nil
@@ -750,10 +754,31 @@ func ensureServiceDefLength(msg MsgDefineService) sdk.Error {
 	return nil
 }
 
-func validServiceCoins(coins sdk.Coins) bool {
-	if coins == nil || len(coins) != 1 {
+func validatePricing(pricing string) sdk.Error {
+	p, err := ParsePricing(pricing)
+	if err != nil {
+		return err
+	}
+
+	if !validPricingCoins(p.Price) {
+		return ErrInvalidPricing(DefaultCodespace, fmt.Sprintf("invalid pricing coins: %s", p.Price))
+	}
+
+	return ValidateBindingPricing(pricing)
+}
+
+func validDepositCoins(coins sdk.Coins) bool {
+	if len(coins) != 1 {
 		return false
 	}
 
-	return coins[0].IsPositive()
+	return coins[0].IsPositive() && coins[0].Denom == sdk.IrisAtto
+}
+
+func validPricingCoins(coins sdk.Coins) bool {
+	if len(coins) != 1 {
+		return false
+	}
+
+	return coins[0].IsPositive() && coins[0].Denom == sdk.IrisAtto
 }
