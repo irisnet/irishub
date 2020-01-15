@@ -24,9 +24,10 @@ type BaseToken struct {
 	Owner           types.AccAddress `json:"owner"`
 }
 
-func NewBaseToken(family AssetFamily, source AssetSource, symbol string, name string, decimal uint8, initialSupply types.Int, maxSupply types.Int, mintable bool, owner types.AccAddress) BaseToken {
+func NewBaseToken(symbol, name, minUnit string, decimal uint8, initialSupply types.Int, maxSupply types.Int, mintable bool, owner types.AccAddress) BaseToken {
 	symbol = strings.ToLower(strings.TrimSpace(symbol))
 	name = strings.TrimSpace(name)
+	minUnit = strings.ToLower(strings.TrimSpace(minUnit))
 
 	if maxSupply.IsZero() {
 		if mintable {
@@ -37,11 +38,12 @@ func NewBaseToken(family AssetFamily, source AssetSource, symbol string, name st
 	}
 
 	return BaseToken{
-		Family:        family,
-		Source:        source,
+		Family:        FUNGIBLE,
+		Source:        NATIVE,
 		Symbol:        symbol,
 		Name:          name,
 		Decimal:       decimal,
+		MinUnitAlias:  minUnit,
 		InitialSupply: initialSupply,
 		MaxSupply:     maxSupply,
 		Mintable:      mintable,
@@ -54,11 +56,9 @@ type FungibleToken struct {
 	BaseToken `json:"base_token"`
 }
 
-func NewFungibleToken(symbol, name string, decimal uint8, initialSupply, maxSupply types.Int, mintable bool, owner types.AccAddress) FungibleToken {
+func NewFungibleToken(symbol, name, minUnit string, decimal uint8, initialSupply, maxSupply types.Int, mintable bool, owner types.AccAddress) FungibleToken {
 	token := FungibleToken{
-		BaseToken: NewBaseToken(
-			FUNGIBLE, NATIVE, symbol, name, decimal, initialSupply, maxSupply, mintable, owner,
-		),
+		BaseToken: NewBaseToken(symbol, name, minUnit, decimal, initialSupply, maxSupply, mintable, owner),
 	}
 	token.Id = token.GetUniqueID()
 	return token
@@ -124,17 +124,16 @@ func (ft FungibleToken) String() string {
 	}
 
 	return fmt.Sprintf(`FungibleToken %s:
-  Family:            %s
-  Source:            %s
   Name:              %s
   Symbol:            %s
-  Decimal:           %d
+  Scale:             %d
+  MinUnit:           %s
   Initial Supply:    %s
   Max Supply:        %s
   Mintable:          %v
   Owner:             %s`,
-		ft.GetUniqueID(), ft.Family, ft.Source, ft.Name, ft.Symbol,
-		ft.Decimal, initSupply, maxSupply, ft.Mintable, owner)
+		ft.GetUniqueID(), ft.Name, ft.Symbol,
+		ft.Decimal, ft.MinUnitAlias, initSupply, maxSupply, ft.Mintable, owner)
 }
 
 type Tokens []FungibleToken
@@ -160,7 +159,7 @@ func (tokens Tokens) Validate() sdk.Error {
 		exp := sdk.NewIntWithDecimal(1, int(token.Decimal))
 		initialSupply := uint64(token.InitialSupply.Div(exp).Int64())
 		maxSupply := uint64(token.MaxSupply.Div(exp).Int64())
-		msg := NewMsgIssueToken(token.Family, token.GetSource(), token.Gateway, token.Symbol, token.CanonicalSymbol, token.Name, token.Decimal, token.MinUnitAlias, initialSupply, maxSupply, token.Mintable, token.Owner)
+		msg := NewMsgIssueToken(token.Symbol, token.MinUnitAlias, token.Name, token.Decimal, initialSupply, maxSupply, token.Mintable, token.Owner)
 		if err := ValidateMsgIssueToken(&msg); err != nil {
 			return err
 		}
@@ -176,7 +175,7 @@ func GetTokenID(symbol string) string {
 
 //CheckSymbol
 func CheckSymbol(symbol string) sdk.Error {
-	if strings.Contains(symbol, sdk.Iris) {
+	if strings.Contains(strings.ToLower(symbol), sdk.Iris) {
 		return ErrInvalidAssetSymbol(DefaultCodespace, fmt.Sprintf("symbol can not contains : %s", sdk.Iris))
 	}
 	// check symbol

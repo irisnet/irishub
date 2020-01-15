@@ -31,11 +31,10 @@ type QueryTokenFeesParams struct {
 
 type TokenOutput struct {
 	Id            string         `json:"id"`
-	Family        AssetFamily    `json:"family"`
-	Source        AssetSource    `json:"source"`
 	Symbol        string         `json:"symbol"`
 	Name          string         `json:"name"`
-	Decimal       uint8          `json:"decimal"`
+	Scale         uint8          `json:"scale"`
+	MinUnit       string         `json:"min_unit"`
 	InitialSupply sdk.Int        `json:"initial_supply"`
 	MaxSupply     sdk.Int        `json:"max_supply"`
 	Mintable      bool           `json:"mintable"`
@@ -51,11 +50,10 @@ func (top TokenOutput) String() string {
 func (top TokenOutput) ToFungibleToken() FungibleToken {
 	return FungibleToken{BaseToken{
 		Id:            top.Id,
-		Family:        top.Family,
-		Source:        top.Source,
 		Symbol:        top.Symbol,
 		Name:          top.Name,
-		Decimal:       top.Decimal,
+		Decimal:       top.Scale,
+		MinUnitAlias:  top.MinUnit,
 		InitialSupply: top.InitialSupply,
 		MaxSupply:     top.MaxSupply,
 		Mintable:      top.Mintable,
@@ -66,11 +64,10 @@ func (top TokenOutput) ToFungibleToken() FungibleToken {
 func NewTokenOutputFrom(token FungibleToken) TokenOutput {
 	return TokenOutput{
 		Id:            token.Id,
-		Family:        token.Family,
-		Source:        token.Source,
 		Symbol:        token.Symbol,
 		Name:          token.Name,
-		Decimal:       token.Decimal,
+		Scale:         token.Decimal,
+		MinUnit:       token.MinUnitAlias,
 		InitialSupply: token.InitialSupply,
 		MaxSupply:     token.MaxSupply,
 		Mintable:      token.Mintable,

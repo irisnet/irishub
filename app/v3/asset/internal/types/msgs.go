@@ -24,6 +24,8 @@ var (
 	MinimumAssetSymbolLen  = 3                     // minimal limitation for the length of the asset's symbol / canonical_symbol
 	MaximumAssetSymbolLen  = 8                     // maximal limitation for the length of the asset's symbol / canonical_symbol
 	MaximumAssetNameLen    = 32                    // maximal limitation for the length of the asset's name
+	MinimumAssetMinUnitLen = 3                     // minimal limitation for the length of the asset's min_unit
+	MaximumAssetMinUnitLen = 10                    // maximal limitation for the length of the asset's min_unit
 
 	IsAlphaNumeric   = regexp.MustCompile(`^[a-zA-Z0-9]+$`).MatchString // only accepts alphanumeric characters
 	IsBeginWithAlpha = regexp.MustCompile(`^[a-zA-Z].*`).MatchString
@@ -48,20 +50,16 @@ type MsgIssueToken struct {
 }
 
 // NewMsgIssueToken - construct asset issue msg.
-func NewMsgIssueToken(family AssetFamily, source AssetSource, gateway string, symbol string, canonicalSymbol string, name string, decimal uint8, alias string, initialSupply uint64, maxSupply uint64, mintable bool, owner sdk.AccAddress) MsgIssueToken {
+func NewMsgIssueToken(symbol string, minUnit string, name string, scale uint8, initialSupply, maxSupply uint64, mintable bool, owner sdk.AccAddress) MsgIssueToken {
 	return MsgIssueToken{
-		Family:          family,
-		Source:          source,
-		Gateway:         gateway,
-		Symbol:          symbol,
-		CanonicalSymbol: canonicalSymbol,
-		Name:            name,
-		Decimal:         decimal,
-		MinUnitAlias:    alias,
-		InitialSupply:   initialSupply,
-		MaxSupply:       maxSupply,
-		Mintable:        mintable,
-		Owner:           owner,
+		Symbol:        symbol,
+		Name:          name,
+		Decimal:       scale,
+		MinUnitAlias:  minUnit,
+		InitialSupply: initialSupply,
+		MaxSupply:     maxSupply,
+		Mintable:      mintable,
+		Owner:         owner,
 	}
 }
 
@@ -95,13 +93,13 @@ func ValidateMsgIssueToken(msg *MsgIssueToken) sdk.Error {
 		return ErrInvalidAssetName(DefaultCodespace, fmt.Sprintf("invalid token name %s, only accepts length (0, %d]", msg.Name, MaximumAssetNameLen))
 	}
 
-	symbolLen := len(msg.Symbol)
-	if symbolLen < MinimumAssetSymbolLen || symbolLen > MaximumAssetSymbolLen || !IsBeginWithAlpha(msg.Symbol) || !IsAlphaNumeric(msg.Symbol) {
-		return ErrInvalidAssetSymbol(DefaultCodespace, fmt.Sprintf("invalid token symbol %s, only accepts alphanumeric characters, and begin with an english letter, length [%d, %d]", msg.Symbol, MinimumAssetSymbolLen, MaximumAssetSymbolLen))
+	if err := CheckSymbol(msg.Symbol); err != nil {
+		return err
 	}
 
-	if strings.Contains(strings.ToLower(msg.Symbol), sdk.Iris) {
-		return ErrInvalidAssetSymbol(DefaultCodespace, fmt.Sprintf("invalid token symbol %s, can not contain native token symbol %s", msg.Symbol, sdk.Iris))
+	minUnitAliasLen := len(msg.MinUnitAlias)
+	if minUnitAliasLen > 0 && (minUnitAliasLen < MinimumAssetMinUnitLen || minUnitAliasLen > MaximumAssetMinUnitLen || !IsAlphaNumeric(msg.MinUnitAlias) || !IsBeginWithAlpha(msg.MinUnitAlias)) {
+		return ErrInvalidAssetMinUnitAlias(DefaultCodespace, fmt.Sprintf("invalid token min_unit_alias %s, only accepts alphanumeric characters, and begin with an english letter, length [%d, %d]", msg.MinUnitAlias, MinimumAssetMinUnitLen, MaximumAssetMinUnitLen))
 	}
 
 	if msg.InitialSupply > MaximumAssetInitSupply {

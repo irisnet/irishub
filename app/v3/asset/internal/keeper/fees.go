@@ -22,8 +22,8 @@ func (k Keeper) DeductIssueTokenFee(ctx sdk.Context, owner sdk.AccAddress, symbo
 	return feeHandler(ctx, k, owner, fee)
 }
 
-// DeductMintTokenFeeFee performs fee handling for minting token
-func (k Keeper) DeductMintTokenFeeFee(ctx sdk.Context, owner sdk.AccAddress, symbol string) sdk.Error {
+// DeductMintTokenFee performs fee handling for minting token
+func (k Keeper) DeductMintTokenFee(ctx sdk.Context, owner sdk.AccAddress, symbol string) sdk.Error {
 	// get the required minting fee
 	fee := k.getTokenMintFee(ctx, symbol)
 	return feeHandler(ctx, k, owner, fee)
