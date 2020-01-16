@@ -6,6 +6,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/app/v3/service/internal/types"
 	sdk "github.com/irisnet/irishub/types"
 )
@@ -23,7 +24,7 @@ var (
 	testSchemas     = `{"input":{"type":"object"},"output":{"type":"object"},"error":{"type":"object"}}`
 
 	testDeposit      = sdk.NewCoins(testCoin1)
-	testPricing      = `{"price":{"denom":"iris-atto","amount":"1000000000"}}`
+	testPricing      = `{"price":[{"denom":"iris-atto","amount":"1000000000"}]}`
 	testWithdrawAddr = sdk.AccAddress{}
 	testAddedDeposit = sdk.NewCoins(testCoin2)
 
@@ -124,7 +125,7 @@ func TestKeeper_Disable_Service(t *testing.T) {
 	require.True(t, found)
 
 	require.False(t, svcBinding.Available)
-	require.Equal(t, currentTime, svcBinding.DisabledTime)
+	require.Equal(t, currentTime.Unix(), svcBinding.DisabledTime.Unix())
 }
 
 func TestKeeper_Enable_Service(t *testing.T) {
@@ -151,17 +152,20 @@ func TestKeeper_Refund_Deposit(t *testing.T) {
 	disabledTime := time.Now()
 	setServiceBinding(ctx, keeper, provider, false, disabledTime)
 
+	_, err := keeper.bk.SendCoins(ctx, provider, auth.ServiceDepositCoinsAccAddr, testDeposit)
+	require.NoError(t, err)
+
 	params := keeper.GetParamSet(ctx)
 	blockTime := disabledTime.Add(params.ArbitrationTimeLimit).Add(params.ComplaintRetrospect)
 	ctx = ctx.WithBlockTime(blockTime)
 
-	err := keeper.RefundDeposit(ctx, testServiceName, provider)
+	err = keeper.RefundDeposit(ctx, testServiceName, provider)
 	require.NoError(t, err)
 
 	svcBinding, found := keeper.GetServiceBinding(ctx, testServiceName, provider)
 	require.True(t, found)
 
-	require.Equal(t, sdk.Coins{}, svcBinding.Deposit)
+	require.Equal(t, sdk.Coins(nil), svcBinding.Deposit)
 }
 
 func TestKeeper_Call_Service(t *testing.T) {
