@@ -412,7 +412,7 @@ func refundServiceDepositHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) 
 			return
 		}
 
-		var req basicReq
+		var req refundServiceDepositReq
 		err = utils.ReadPostBody(w, r, cdc, &req)
 		if err != nil {
 			return
