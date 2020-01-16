@@ -215,15 +215,24 @@ const PricingSchema = `
 			"properties": {
 				"denom": {
 					"type": "string",
-					"description": "the denomination of the coin"
+					"description": "the denomination of the coin",
+					"minLength": 1
 				},
 				"amount": {
 					"type": "string",
-					"description": "the amount of the coin"
+					"description": "the amount of the coin",
+					"pattern": "^[1-9]\d+$"
 				}
 			},
-
+			
+			"additionalProperties": false,
 			"required": ["denom", "amount"]
+		},
+		"discount": {
+			"type": "number",
+			"description": "promotion discount",
+			"exclusiveMinimum": 0, 
+			"exclusiveMaximum": 1
 		},
         "promotion_by_time": {
             "type": "object",
@@ -231,19 +240,21 @@ const PricingSchema = `
 
             "properties": {
                 "start_time": {
-                    "type": "number",
-                    "description": "starting time of the promotion"
+                    "type": "integer",
+					"description": "starting time of the promotion",
+					"exclusiveMinimum": 0,
 				},
                 "end_time": {
-                    "type": "number",
-                    "description": "ending time of the promotion"
+                    "type": "integer",
+					"description": "ending time of the promotion",
+					"exclusiveMinimum": 0,
 				},
 				"discount": {
-                    "type": "number",
-                    "description": "discount during the promotion"
+                    "$ref": "#/definitions/discount"
 				}
 			},
-
+			
+			"additionalProperties": false,
 			"required": ["start_time", "end_time", "discount"]
 		},
 		"promotion_by_volume": {
@@ -252,15 +263,16 @@ const PricingSchema = `
 
             "properties": {
                 "volume": {
-                    "type": "number",
-                    "description": "minimal volume for the promotion"
+                    "type": "integer",
+					"description": "minimal volume for the promotion",
+					"minimum": 1
 				},
 				"discount": {
-                    "type": "number",
-                    "description": "discount for the promotion"
+                    "$ref": "#/definitions/discount"
 				}
 			},
-
+			
+			"additionalProperties": false,
 			"required": ["volume", "discount"]
         }
     },
@@ -291,7 +303,8 @@ const PricingSchema = `
             }
 		}
     },
-
+	
+	"additionalProperties": false,
     "required": ["price"]
 }
 `

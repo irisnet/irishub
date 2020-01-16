@@ -189,7 +189,7 @@ func TestMsgBindServiceGetSignBytes(t *testing.T) {
 	msg := NewMsgBindService(testServiceName, testProvider, testDeposit, testPricing, testWithdrawAddr)
 	res := msg.GetSignBytes()
 
-	expected := `{"type":"irishub/service/MsgBindService","value":{"deposit":[{"amount":"1000000000000000000000","denom":"iris-atto"}],"pricing":"{\"price\":\"100iris-atto\"}","provider":"faa1w3jhxapdwpex7anfv3jhynrxe9z","service_name":"test-service","withdraw_address":"faa1w3jhxapdwa5hg6rywfshwctv94skgerjv4ehxdueap6"}}`
+	expected := `{"type":"irishub/service/MsgBindService","value":{"deposit":[{"amount":"1000000000000000000000","denom":"iris-atto"}],"pricing":"{\"price\":[{\"denom\":\"iris-atto\",\"amount\":\"1000000\"}]}","provider":"faa1w3jhxapdwpex7anfv3jhynrxe9z","service_name":"test-service","withdraw_address":"faa1w3jhxapdwa5hg6rywfshwctv94skgerjv4ehxdueap6"}}`
 	require.Equal(t, expected, string(res))
 }
 

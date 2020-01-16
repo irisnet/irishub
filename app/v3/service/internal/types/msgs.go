@@ -165,7 +165,7 @@ func (msg MsgBindService) ValidateBasic() sdk.Error {
 		return err
 	}
 
-	if !validDepositCoins(msg.Deposit) {
+	if !validServiceCoins(msg.Deposit) {
 		return ErrInvalidDeposit(DefaultCodespace, fmt.Sprintf("invalid deposit: %s", msg.Deposit))
 	}
 
@@ -227,7 +227,7 @@ func (msg MsgUpdateServiceBinding) ValidateBasic() sdk.Error {
 		return err
 	}
 
-	if !msg.Deposit.Empty() && !validDepositCoins(msg.Deposit) {
+	if !msg.Deposit.Empty() && !validServiceCoins(msg.Deposit) {
 		return ErrInvalidDeposit(DefaultCodespace, fmt.Sprintf("invalid deposit: %s", msg.Deposit))
 	}
 
@@ -389,7 +389,7 @@ func (msg MsgEnableService) ValidateBasic() sdk.Error {
 		return err
 	}
 
-	if !msg.Deposit.Empty() && !validDepositCoins(msg.Deposit) {
+	if !msg.Deposit.Empty() && !validServiceCoins(msg.Deposit) {
 		return ErrInvalidDeposit(DefaultCodespace, fmt.Sprintf("invalid deposit: %s", msg.Deposit))
 	}
 
@@ -755,30 +755,22 @@ func ensureServiceDefLength(msg MsgDefineService) sdk.Error {
 }
 
 func validatePricing(pricing string) sdk.Error {
+	if err := ValidateBindingPricing(pricing); err != nil {
+		return err
+	}
+
 	p, err := ParsePricing(pricing)
 	if err != nil {
 		return err
 	}
 
-	if !validPricingCoins(p.Price) {
+	if !validServiceCoins(p.Price) {
 		return ErrInvalidPricing(DefaultCodespace, fmt.Sprintf("invalid pricing coins: %s", p.Price))
 	}
 
-	return ValidateBindingPricing(pricing)
+	return nil
 }
 
-func validDepositCoins(coins sdk.Coins) bool {
-	if len(coins) != 1 {
-		return false
-	}
-
-	return coins[0].IsPositive() && coins[0].Denom == sdk.IrisAtto
-}
-
-func validPricingCoins(coins sdk.Coins) bool {
-	if len(coins) != 1 {
-		return false
-	}
-
-	return coins[0].IsPositive() && coins[0].Denom == sdk.IrisAtto
+func validServiceCoins(coins sdk.Coins) bool {
+	return coins.IsValidIrisAtto()
 }
