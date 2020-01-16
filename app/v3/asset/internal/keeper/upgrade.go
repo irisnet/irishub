@@ -20,13 +20,13 @@ func (k Keeper) Init(ctx sdk.Context) {
 	logger.Info("Begin execute upgrade method")
 	store := ctx.KVStore(k.storeKey)
 	// delete gateway
-	k.deleteGateways(ctx, prefixGateway, func(key []byte) {
+	k.iterateGateways(ctx, prefixGateway, func(key []byte) {
 		logger.Info("Delete gateway information", "key", string(key))
 		store.Delete(key)
 	})
 
 	// delete gateway owner
-	k.deleteGateways(ctx, prefixOwnerGateway, func(key []byte) {
+	k.iterateGateways(ctx, prefixOwnerGateway, func(key []byte) {
 		logger.Info("Delete gateway owner", "key", string(key))
 		store.Delete(key)
 	})
@@ -49,7 +49,7 @@ func (k Keeper) Init(ctx sdk.Context) {
 	logger.Info("End execute upgrade method")
 }
 
-func (k Keeper) deleteGateways(ctx sdk.Context, prefix []byte, op func(key []byte)) {
+func (k Keeper) iterateGateways(ctx sdk.Context, prefix []byte, op func(key []byte)) {
 	store := ctx.KVStore(k.storeKey)
 
 	iterator := sdk.KVStorePrefixIterator(store, prefix)

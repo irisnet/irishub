@@ -39,7 +39,12 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 }
 
 // IssueToken issue a new token
-func (k Keeper) IssueToken(ctx sdk.Context, token types.FungibleToken) (sdk.Tags, sdk.Error) {
+func (k Keeper) IssueToken(ctx sdk.Context, msg types.MsgIssueToken) (sdk.Tags, sdk.Error) {
+	scale := int(msg.Decimal)
+	token := types.NewFungibleToken(msg.Symbol, msg.Name, msg.MinUnitAlias, msg.Decimal,
+		sdk.NewIntWithDecimal(int64(msg.InitialSupply), scale),
+		sdk.NewIntWithDecimal(int64(msg.MaxSupply), scale), msg.Mintable, msg.Owner)
+
 	if err := k.AddToken(ctx, token); err != nil {
 		return nil, err
 	}

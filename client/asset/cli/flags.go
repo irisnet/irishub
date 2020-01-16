@@ -8,7 +8,8 @@ import (
 const (
 	FlagSymbol        = "symbol"
 	FlagName          = "name"
-	FlagDecimal       = "decimal"
+	FlagScale         = "scale"
+	FlagMinUnit       = "min-unit"
 	FlagInitialSupply = "initial-supply"
 	FlagMaxSupply     = "max-supply"
 	FlagMintable      = "mintable"
@@ -30,7 +31,8 @@ var (
 func init() {
 	FsTokenIssue.String(FlagSymbol, "", "the token symbol. Once created, it cannot be modified")
 	FsTokenIssue.String(FlagName, "", "the token name, e.g. IRIS Network")
-	FsTokenIssue.Uint8(FlagDecimal, 0, "the token decimal. The maximum value is 18")
+	FsTokenIssue.String(FlagMinUnit, "", "the minimum unit name of token, e.g. wei")
+	FsTokenIssue.Uint8(FlagScale, 0, "the token decimal. The maximum value is 18")
 	FsTokenIssue.Uint64(FlagInitialSupply, 0, "the initial supply token of token")
 	FsTokenIssue.Uint64(FlagMaxSupply, asset.MaximumAssetMaxSupply, "the max supply of the token")
 	FsTokenIssue.Bool(FlagMintable, false, "whether the token can be minted, default false")

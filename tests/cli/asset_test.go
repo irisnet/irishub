@@ -35,6 +35,7 @@ func TestIrisCLIToken(t *testing.T) {
 
 	symbol := "btc"
 	name := "Bitcoin"
+	minUnit := "satoshi"
 	initialSupply := 10000000000
 	maxSupply := 20000000000
 	decimal := 18
@@ -47,9 +48,10 @@ func TestIrisCLIToken(t *testing.T) {
 	issueCmd += fmt.Sprintf(" --from=%s", "foo")
 	issueCmd += fmt.Sprintf(" --symbol=%s", symbol)
 	issueCmd += fmt.Sprintf(" --name=%s", name)
+	issueCmd += fmt.Sprintf(" --min-unit=%s", minUnit)
 	issueCmd += fmt.Sprintf(" --initial-supply=%d", initialSupply)
 	issueCmd += fmt.Sprintf(" --max-supply=%d", maxSupply)
-	issueCmd += fmt.Sprintf(" --decimal=%d", decimal)
+	issueCmd += fmt.Sprintf(" --scale=%d", decimal)
 	issueCmd += fmt.Sprintf(" --mintable=%v", mintable)
 	issueCmd += fmt.Sprintf(" --fee=%s", "0.4iris")
 
@@ -68,10 +70,11 @@ func TestIrisCLIToken(t *testing.T) {
 	query := fmt.Sprintf("--token-id=%s ", tokenID)
 	token := executeGetToken(t, fmt.Sprintf("iriscli asset token tokens %s %v", query, flags))
 	require.Equal(t, strings.ToLower(strings.TrimSpace(symbol)), token.Symbol)
+	require.Equal(t, strings.ToLower(strings.TrimSpace(minUnit)), token.MinUnit)
 	require.Equal(t, strings.TrimSpace(name), token.Name)
 	require.Equal(t, sdk.NewIntWithDecimal(int64(initialSupply), decimal), token.InitialSupply)
 	require.Equal(t, sdk.NewIntWithDecimal(int64(maxSupply), decimal), token.MaxSupply)
-	require.Equal(t, uint8(decimal), token.Decimal)
+	require.Equal(t, uint8(decimal), token.Scale)
 	require.Equal(t, mintable, token.Mintable)
 
 	// edit a token
