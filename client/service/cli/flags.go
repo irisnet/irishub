@@ -51,7 +51,7 @@ func init() {
 
 	FsServiceBind.String(FlagServiceName, "", "service name")
 	FsServiceBind.String(FlagDeposit, "", "deposit of the binding")
-	FsServiceBind.String(FlagPricing, "", "pricing of the binding, which is a Pricing JSON Schema instance")
+	FsServiceBind.String(FlagPricing, "", "pricing content or path")
 	FsServiceBind.String(FlagWithdrawAddr, "", "withdrawal address of the binding")
 
 	FsServiceUpdateBinding.String(FlagDeposit, "", "added deposit for the binding")

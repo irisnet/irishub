@@ -64,7 +64,8 @@ func GetCmdDefineService(cdc *codec.Codec) *cobra.Command {
 				return fmt.Errorf("failed to compact the schema")
 			}
 
-			fmt.Printf("schemas content: \n%s\n", buf.String())
+			schemas = buf.String()
+			fmt.Printf("schemas content: \n%s\n", schemas)
 
 			msg := service.NewMsgDefineService(name, description, tags, author, authorDescription, schemas)
 			if err := msg.ValidateBasic(); err != nil {
@@ -103,7 +104,6 @@ func GetCmdBindService(cdc *codec.Codec) *cobra.Command {
 			}
 
 			serviceName := viper.GetString(FlagServiceName)
-			pricing := viper.GetString(FlagPricing)
 
 			depositStr := viper.GetString(FlagDeposit)
 			deposit, err := cliCtx.ParseCoins(depositStr)
@@ -120,6 +120,28 @@ func GetCmdBindService(cdc *codec.Codec) *cobra.Command {
 					return err
 				}
 			}
+
+			pricing := viper.GetString(FlagPricing)
+
+			if !json.Valid([]byte(pricing)) {
+				pricingContent, err := ioutil.ReadFile(pricing)
+				if err != nil {
+					return fmt.Errorf("neither JSON input nor path to .json file were provided")
+				}
+
+				if !json.Valid(pricingContent) {
+					return fmt.Errorf(".json file content is invalid JSON")
+				}
+
+				pricing = string(pricingContent)
+			}
+
+			buf := bytes.NewBuffer([]byte{})
+			if err := json.Compact(buf, []byte(pricing)); err != nil {
+				return fmt.Errorf("failed to compact the pricing")
+			}
+
+			pricing = buf.String()
 
 			msg := service.NewMsgBindService(serviceName, provider, deposit, pricing, withdrawAddr)
 			if err := msg.ValidateBasic(); err != nil {
