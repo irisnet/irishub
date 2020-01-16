@@ -9,7 +9,7 @@ import (
 )
 
 type GenesisState struct {
-	PendingHTLCs map[string]HTLC `json:"pending_htlcs"` // claimable HTLCs
+	PendingHTLCs map[string]HTLC // claimable HTLCs
 }
 
 type HTLC struct {

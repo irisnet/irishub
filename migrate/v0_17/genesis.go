@@ -5,19 +5,19 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
+	"github.com/irisnet/irishub/migrate/v0_17/asset"
 	"github.com/irisnet/irishub/migrate/v0_17/auth"
+	"github.com/irisnet/irishub/migrate/v0_17/coinswap"
 	"github.com/irisnet/irishub/migrate/v0_17/distribution"
 	"github.com/irisnet/irishub/migrate/v0_17/gov"
 	"github.com/irisnet/irishub/migrate/v0_17/guardian"
+	"github.com/irisnet/irishub/migrate/v0_17/htlc"
 	"github.com/irisnet/irishub/migrate/v0_17/mint"
+	"github.com/irisnet/irishub/migrate/v0_17/rand"
 	"github.com/irisnet/irishub/migrate/v0_17/service"
 	"github.com/irisnet/irishub/migrate/v0_17/slashing"
 	"github.com/irisnet/irishub/migrate/v0_17/stake"
 	"github.com/irisnet/irishub/migrate/v0_17/upgrade"
-	"github.com/irisnet/irishub/modules/asset"
-	"github.com/irisnet/irishub/modules/coinswap"
-	"github.com/irisnet/irishub/modules/htlc"
-	"github.com/irisnet/irishub/modules/rand"
 )
 
 type GenesisState struct {
@@ -83,6 +83,7 @@ func convertToGenesisState(genesisFileState GenesisFileState) GenesisState {
 		}
 		genesisAccounts = append(genesisAccounts, acc)
 	}
+
 	return GenesisState{
 		Accounts:     genesisAccounts,
 		AuthData:     genesisFileState.AuthData,

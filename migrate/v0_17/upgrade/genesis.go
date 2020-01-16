@@ -3,17 +3,17 @@ package upgrade
 import sdk "github.com/cosmos/cosmos-sdk/types"
 
 type GenesisState struct {
-	GenesisVersion VersionInfo `json:"genesis_version"`
+	GenesisVersion VersionInfo
 }
 
 type VersionInfo struct {
-	UpgradeInfo UpgradeConfig `json:"upgrade_info"`
-	Success     bool          `json:"success"`
+	UpgradeInfo UpgradeConfig
+	Success     bool
 }
 
 type UpgradeConfig struct {
-	ProposalID uint64             `json:"proposal_id"`
-	Protocol   ProtocolDefinition `json:"proposal"`
+	ProposalID uint64
+	Protocol   ProtocolDefinition
 }
 
 type ProtocolDefinition struct {

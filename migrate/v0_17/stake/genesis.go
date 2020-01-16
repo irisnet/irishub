@@ -4,9 +4,8 @@ import (
 	"time"
 
 	"github.com/tendermint/tendermint/crypto"
-	
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	
 )
 
 type GenesisState struct {
@@ -31,8 +30,8 @@ type Params struct {
 }
 
 type LastValidatorPower struct {
-	Address sdk.ValAddress `json:"address"`
-	Power   sdk.Int        `json:"power"`
+	Address sdk.ValAddress
+	Power   sdk.Int
 }
 
 type Validator struct {
