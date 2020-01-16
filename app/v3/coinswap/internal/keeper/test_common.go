@@ -61,6 +61,7 @@ func createTestApp(initCoins sdk.Coins, nAccount int64) TestApp {
 
 	keeper := NewKeeper(cdc, keyCoinswap, bk, pk.Subspace(types.DefaultParamSpace))
 	keeper.SetParams(ctx, types.DefaultParams())
+	keeper.bk.IncreaseLoosenToken(ctx, initCoins)
 
 	return TestApp{
 		ctx:      ctx,
