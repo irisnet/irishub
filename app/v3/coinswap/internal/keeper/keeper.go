@@ -173,7 +173,7 @@ func (k Keeper) HandleRemoveLiquidity(ctx sdk.Context, msg types.MsgRemoveLiquid
 
 func (k Keeper) removeLiquidity(ctx sdk.Context, uniID string, sender sdk.AccAddress, burnUniCoin, irisWithdrawCoin, tokenWithdrawCoin sdk.Coin) sdk.Error {
 	// burn liquidity from reserve pool and account
-	if err := k.BurnCoins(ctx, sender, uniID, burnUniCoin); err != nil {
+	if err := k.BurnCoins(ctx, sender, uniID, burnUniCoin.Amount); err != nil {
 		return err
 	}
 	// transfer withdrawn liquidity from coinswaps special account to sender's account

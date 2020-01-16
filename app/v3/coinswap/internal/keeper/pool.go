@@ -57,6 +57,9 @@ func (k Keeper) SendCoinsFromAccountToPool(ctx sdk.Context, from sdk.AccAddress,
 		return types.ErrReservePoolNotExists(fmt.Sprintf("reserve pool for %s not found", uniID))
 	}
 	pool.Add(amount)
+	if amt := amount.AmountOf(sdk.IrisAtto); amt.GT(sdk.ZeroInt()) {
+		k.bk.DecreaseLoosenToken(ctx, amount)
+	}
 	return k.SetPool(ctx, pool)
 }
 
@@ -70,6 +73,9 @@ func (k Keeper) SendCoinsFromPoolToAccount(ctx sdk.Context, receiver sdk.AccAddr
 		return types.ErrReservePoolNotExists(fmt.Sprintf("reserve pool for %s not found", uniID))
 	}
 	pool.Sub(amount)
+	if amt := amount.AmountOf(sdk.IrisAtto); amt.GT(sdk.ZeroInt()) {
+		k.bk.IncreaseLoosenToken(ctx, amount)
+	}
 	return k.SetPool(ctx, pool)
 }
 
@@ -100,13 +106,18 @@ func (k Keeper) MintCoins(ctx sdk.Context, receiver sdk.AccAddress, uniID string
 }
 
 //BurnCoins is responsible for burning some coins from the account/pool
-func (k Keeper) BurnCoins(ctx sdk.Context, from sdk.AccAddress, uniID string, burnCoin sdk.Coin) sdk.Error {
+func (k Keeper) BurnCoins(ctx sdk.Context, from sdk.AccAddress, uniID string, burnAmount sdk.Int) sdk.Error {
 	pool, existed := k.GetPool(ctx, uniID)
 	if !existed {
 		return types.ErrReservePoolNotExists(fmt.Sprintf("reserve pool for %s not found", uniID))
 	}
+
+	uniDenom, err := types.GetUniDenom(uniID)
+	if err != nil {
+		return err
+	}
 	// burn liquidity from pool
-	burnCoins := sdk.NewCoins(burnCoin)
+	burnCoins := sdk.NewCoins(sdk.NewCoin(uniDenom, burnAmount))
 	pool.Sub(burnCoins)
 	if err := k.SetPool(ctx, pool); err != nil {
 		return err
