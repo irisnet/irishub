@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/tendermint/tendermint/libs/log"
+
 	"github.com/irisnet/irishub/app/v1/params"
 	"github.com/irisnet/irishub/app/v3/coinswap/internal/types"
 	"github.com/irisnet/irishub/codec"
@@ -29,6 +31,11 @@ func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, bk types.BankKeeper, paramSpa
 		cdc:        cdc,
 		paramSpace: paramSpace.WithTypeTable(types.ParamTypeTable()),
 	}
+}
+
+// Logger returns a module-specific logger.
+func (k Keeper) Logger(ctx sdk.Context) log.Logger {
+	return ctx.Logger().With("module", fmt.Sprintf("%s/%s", "iris", types.RouterKey))
 }
 
 func (k Keeper) HandleSwap(ctx sdk.Context, msg types.MsgSwapOrder) (sdk.Tags, sdk.Error) {

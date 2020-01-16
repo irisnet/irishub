@@ -9,21 +9,34 @@ import (
 )
 
 func (k Keeper) Init(ctx sdk.Context, assetKeeper types.AssetKeeper, accountKeeper types.AccountKeeper) {
+	logger := k.Logger(ctx).With("handler", "Init")
 	tokens := assetKeeper.GetAllTokens(ctx)
+	logger.Info("Begin execute upgrade method")
 	for _, token := range tokens {
 		denom := token.GetDenom()
 		uniID, err := types.GetUniID(sdk.IrisAtto, denom)
 		if err == nil {
 			poolAcc := k.getAccount(ctx, accountKeeper, uniID)
 			balance := poolAcc.GetCoins()
+
 			irisToken := sdk.NewCoin(sdk.IrisAtto, balance.AmountOf(sdk.IrisAtto))
 			otherToken := sdk.NewCoin(denom, balance.AmountOf(denom))
-			coins := sdk.NewCoins(irisToken, otherToken)
+
+			uniDenom, _ := types.GetUniDenom(uniID)
+			uniToken := sdk.NewCoin(uniDenom, balance.AmountOf(uniDenom))
+
+			coins := sdk.NewCoins(irisToken, otherToken, uniToken)
 			//create pool for uniID
+			logger.Info("Create liquidity pool", "poolName", uniID)
 			_ = k.SetPool(ctx, types.NewPool(uniID, nil))
 			_ = k.SendCoinsFromAccountToPool(ctx, poolAcc.GetAddress(), uniID, coins)
+			logger.Info("Transfer coin to liquidity pool",
+				"from", poolAcc.GetAddress().String(),
+				"amount", coins.String(),
+				"poolName", uniID)
 		}
 	}
+	logger.Info("End execute upgrade method")
 }
 
 //Except for the upgrade process from v2 to v3, please do not use this code
