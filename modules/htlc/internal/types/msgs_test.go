@@ -14,8 +14,8 @@ import (
 )
 
 var (
-	senderAddr, _        = sdk.AccAddressFromHex(crypto.AddressHash([]byte("sender")).String())
-	toAddr, _            = sdk.AccAddressFromHex(crypto.AddressHash([]byte("to")).String())
+	senderAddr, _        = sdk.AccAddressFromHex(crypto.AddressHash(sdk.AccAddress("sender")).String())
+	toAddr, _            = sdk.AccAddressFromHex(crypto.AddressHash(sdk.AccAddress("to")).String())
 	receiverOnOtherChain = "receiverOnOtherChain"
 	amount               = sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(10)))
 	secret               = HTLCSecret("___abcdefghijklmnopqrstuvwxyz___")

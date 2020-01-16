@@ -45,7 +45,7 @@ func NewHTLC(
 }
 
 // GetHashLock calculates the hash lock
-func (h HTLC) GetHashLock() []byte {
+func (h HTLC) GetHashLock() HTLCHashLock {
 	if h.State == COMPLETED {
 		if h.Timestamp > 0 {
 			return SHA256(append(h.Secret, sdk.Uint64ToBigEndian(h.Timestamp)...))

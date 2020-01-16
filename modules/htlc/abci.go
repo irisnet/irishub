@@ -1,7 +1,6 @@
 package htlc
 
 import (
-	"encoding/hex"
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -15,7 +14,7 @@ func BeginBlocker(ctx sdk.Context, k Keeper) {
 
 	for ; iterator.Valid(); iterator.Next() {
 		// get the hash lock
-		var hashLock []byte
+		var hashLock HTLCHashLock
 		k.GetCdc().MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &hashLock)
 
 		htlc, _ := k.GetHTLC(ctx, hashLock)
@@ -30,11 +29,11 @@ func BeginBlocker(ctx sdk.Context, k Keeper) {
 		ctx.EventManager().EmitEvent(
 			sdk.NewEvent(
 				EventTypeExpiredHTLC,
-				sdk.NewAttribute(AttributeValueHashLock, hex.EncodeToString(hashLock)),
+				sdk.NewAttribute(AttributeValueHashLock, hashLock.String()),
 			),
 		)
 
-		k.Logger(ctx).Info(fmt.Sprintf("HTLC [%s] is expired", hex.EncodeToString(hashLock)))
+		k.Logger(ctx).Info(fmt.Sprintf("HTLC [%s] is expired", hashLock.String()))
 	}
 
 	return

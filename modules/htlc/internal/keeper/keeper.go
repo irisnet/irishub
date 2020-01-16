@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"bytes"
-	"encoding/hex"
 	"fmt"
 
 	"github.com/tendermint/tendermint/libs/log"
@@ -49,7 +48,7 @@ func (k Keeper) GetCdc() *codec.Codec {
 func (k Keeper) CreateHTLC(ctx sdk.Context, htlc types.HTLC, hashLock types.HTLCHashLock) error {
 	// check if the hash lock already exists
 	if k.HasHashLock(ctx, hashLock) {
-		return sdkerrors.Wrap(types.ErrHashLockAlreadyExists, hex.EncodeToString(hashLock))
+		return sdkerrors.Wrap(types.ErrHashLockAlreadyExists, hashLock.String())
 	}
 
 	// transfer the specified tokens to HTLC module address
@@ -81,7 +80,7 @@ func (k Keeper) ClaimHTLC(ctx sdk.Context, hashLock types.HTLCHashLock, secret t
 
 	// check if the secret matches with the hash lock
 	if !bytes.Equal(types.GetHashLock(secret, htlc.Timestamp), hashLock) {
-		return "", "", sdkerrors.Wrap(types.ErrInvalidSecret, hex.EncodeToString(secret))
+		return "", "", sdkerrors.Wrap(types.ErrInvalidSecret, secret.String())
 	}
 
 	// do the claim
@@ -149,7 +148,7 @@ func (k Keeper) GetHTLC(ctx sdk.Context, hashLock types.HTLCHashLock) (types.HTL
 
 	bz := store.Get(KeyHTLC(hashLock))
 	if bz == nil {
-		return types.HTLC{}, sdkerrors.Wrap(types.ErrInvalidHashLock, hex.EncodeToString(hashLock))
+		return types.HTLC{}, sdkerrors.Wrap(types.ErrInvalidHashLock, hashLock.String())
 	}
 
 	var htlc types.HTLC

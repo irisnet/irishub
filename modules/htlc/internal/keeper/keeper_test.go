@@ -56,8 +56,8 @@ func TestKeeperTestSuite(t *testing.T) {
 }
 
 func initVars(suite *KeeperTestSuite) {
-	addrSender, _ = sdk.AccAddressFromHex(crypto.AddressHash([]byte("sender")).String())
-	addrTo, _ = sdk.AccAddressFromHex(crypto.AddressHash([]byte("to")).String())
+	addrSender, _ = sdk.AccAddressFromHex(crypto.AddressHash(sdk.AccAddress("sender")).String())
+	addrTo, _ = sdk.AccAddressFromHex(crypto.AddressHash(sdk.AccAddress("to")).String())
 	_ = suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, addrSender)
 	_ = suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, addrTo)
 	_ = suite.app.BankKeeper.SetCoins(suite.ctx, addrSender, sdk.NewCoins(sdk.NewInt64Coin(sdk.DefaultBondDenom, 100000)))
@@ -118,7 +118,7 @@ func (suite *KeeperTestSuite) TestCreateHTLC() {
 	suite.Equal(addrTo, htlc.To)
 	suite.Equal(receiverOnOtherChain, htlc.ReceiverOnOtherChain)
 	suite.Equal(amount, htlc.Amount)
-	suite.Equal(types.HTLCSecret(nil), htlc.Secret)
+	suite.Equal(initSecret, htlc.Secret)
 	suite.Equal(timestamp, htlc.Timestamp)
 	suite.Equal(expireHeight, htlc.ExpireHeight)
 	suite.Equal(stateOpen, htlc.State)
@@ -130,8 +130,8 @@ func (suite *KeeperTestSuite) TestCreateHTLC() {
 func (suite *KeeperTestSuite) TestClaimHTLC() {
 	testData := []struct {
 		expectPass           bool
-		senderAddr           []byte
-		toAddr               []byte
+		senderAddr           sdk.AccAddress
+		toAddr               sdk.AccAddress
 		receiverOnOtherChain string
 		amount               sdk.Coins
 		secret               types.HTLCSecret

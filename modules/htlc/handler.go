@@ -1,8 +1,6 @@
 package htlc
 
 import (
-	"encoding/hex"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
@@ -59,7 +57,7 @@ func handleMsgCreateHTLC(ctx sdk.Context, k Keeper, msg MsgCreateHTLC) (*sdk.Res
 				sdk.NewAttribute(AttributeValueReceiver, htlc.To.String()),
 				sdk.NewAttribute(AttributeValueReceiverOnOtherChain, htlc.ReceiverOnOtherChain),
 				sdk.NewAttribute(AttributeValueAmount, htlc.Amount.String()),
-				sdk.NewAttribute(AttributeValueHashLock, hex.EncodeToString(msg.HashLock)),
+				sdk.NewAttribute(AttributeValueHashLock, msg.HashLock.String()),
 			),
 		},
 	)
@@ -87,8 +85,8 @@ func handleMsgClaimHTLC(ctx sdk.Context, k Keeper, msg MsgClaimHTLC) (*sdk.Resul
 				EventTypeClaimHTLC,
 				sdk.NewAttribute(AttributeValueSender, senderStr),
 				sdk.NewAttribute(AttributeValueReceiver, toStr),
-				sdk.NewAttribute(AttributeValueHashLock, hex.EncodeToString(msg.HashLock)),
-				sdk.NewAttribute(AttributeValueSecret, hex.EncodeToString(msg.Secret)),
+				sdk.NewAttribute(AttributeValueHashLock, msg.HashLock.String()),
+				sdk.NewAttribute(AttributeValueSecret, msg.Secret.String()),
 			),
 		},
 	)
@@ -115,7 +113,7 @@ func handleMsgRefundHTLC(ctx sdk.Context, k Keeper, msg MsgRefundHTLC) (*sdk.Res
 			sdk.NewEvent(
 				EventTypeRefundHTLC,
 				sdk.NewAttribute(AttributeValueSender, sender),
-				sdk.NewAttribute(AttributeValueHashLock, hex.EncodeToString(msg.HashLock)),
+				sdk.NewAttribute(AttributeValueHashLock, msg.HashLock.String()),
 			),
 		},
 	)

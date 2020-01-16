@@ -49,6 +49,7 @@ var (
 	ErrHashLockAlreadyExists   = types.ErrHashLockAlreadyExists
 	ErrStateIsNotOpen          = types.ErrStateIsNotOpen
 	ErrStateIsNotExpired       = types.ErrStateIsNotExpired
+	NewGenesisState            = types.NewGenesisState
 	DefaultGenesisState        = types.DefaultGenesisState
 	ValidateGenesis            = types.ValidateGenesis
 	NewHTLC                    = types.NewHTLC

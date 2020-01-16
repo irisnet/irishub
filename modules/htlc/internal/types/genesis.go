@@ -9,6 +9,11 @@ type GenesisState struct {
 	PendingHTLCs map[string]HTLC `json:"pending_htlcs" yaml:"pending_htlcs"` // claimable HTLCs
 }
 
+// NewGenesisState is the constructor function for GenesisState
+func NewGenesisState(pendingHTLCs map[string]HTLC) GenesisState {
+	return GenesisState{PendingHTLCs: pendingHTLCs}
+}
+
 // DefaultGenesisState gets the default genesis state
 func DefaultGenesisState() GenesisState {
 	return GenesisState{

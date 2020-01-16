@@ -21,7 +21,7 @@ var (
 
 	receiverOnOtherChain string
 	amount               sdk.Coins
-	secret               []byte
+	secret               htlc.HTLCSecret
 	timestamps           []uint64
 	hashLocks            []htlc.HTLCHashLock
 	timeLocks            []uint64
@@ -70,7 +70,7 @@ func initVars(suite *TestSuite) {
 
 	receiverOnOtherChain = "receiverOnOtherChain"
 	amount = sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(1000)))
-	secret = []byte("___abcdefghijklmnopqrstuvwxyz___")
+	secret = htlc.HTLCSecret("___abcdefghijklmnopqrstuvwxyz___")
 	timestamps = []uint64{uint64(1580000000), 0}
 	hashLocks = []htlc.HTLCHashLock{htlc.GetHashLock(secret, timestamps[0]), htlc.GetHashLock(secret, timestamps[1])}
 	timeLocks = []uint64{50, 100}
