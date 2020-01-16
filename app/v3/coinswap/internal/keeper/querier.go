@@ -42,7 +42,7 @@ func queryLiquidity(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, s
 
 	pool, existed := k.GetPool(ctx, params.Id)
 	if !existed {
-		return nil, types.ErrReservePoolNotExists(fmt.Sprintf("reserve pool for %s not found", params.Id))
+		return nil, types.ErrReservePoolNotExists(fmt.Sprintf("liquidity pool for %s not found", params.Id))
 	}
 
 	iris := sdk.NewCoin(sdk.IrisAtto, pool.BalanceOf(sdk.IrisAtto))

@@ -42,7 +42,7 @@ func (k Keeper) calculateWithExactInput(ctx sdk.Context, exactSoldCoin sdk.Coin,
 	}
 	pool, existed := k.GetPool(ctx, uniId)
 	if !existed {
-		return sdk.ZeroInt(), types.ErrReservePoolNotExists(fmt.Sprintf("reserve pool for %s not found", uniId))
+		return sdk.ZeroInt(), types.ErrReservePoolNotExists(fmt.Sprintf("liquidity pool for %s not found", uniId))
 	}
 	inputReserve := pool.BalanceOf(exactSoldCoin.Denom)
 	outputReserve := pool.BalanceOf(boughtTokenDenom)
@@ -131,11 +131,11 @@ Calculate the amount of the token to be payed based on the exact amount of the t
 func (k Keeper) calculateWithExactOutput(ctx sdk.Context, exactBoughtCoin sdk.Coin, soldTokenDenom string) (sdk.Int, sdk.Error) {
 	uniID, err := types.GetUniID(exactBoughtCoin.Denom, soldTokenDenom)
 	if err != nil {
-		return sdk.ZeroInt(), types.ErrReservePoolNotExists(fmt.Sprintf("reserve pool not found: %s", err.Error()))
+		return sdk.ZeroInt(), types.ErrReservePoolNotExists(fmt.Sprintf("liquidity pool not found: %s", err.Error()))
 	}
 	pool, existed := k.GetPool(ctx, uniID)
 	if !existed {
-		return sdk.ZeroInt(), types.ErrReservePoolNotExists(fmt.Sprintf("reserve pool for %s not found", uniID))
+		return sdk.ZeroInt(), types.ErrReservePoolNotExists(fmt.Sprintf("liquidity pool for %s not found", uniID))
 	}
 	outputReserve := pool.BalanceOf(exactBoughtCoin.Denom)
 	inputReserve := pool.BalanceOf(soldTokenDenom)

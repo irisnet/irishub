@@ -116,15 +116,6 @@ func (k Keeper) HandleAddLiquidity(ctx sdk.Context, msg types.MsgAddLiquidity) (
 	return tags, k.addLiquidity(ctx, msg.Sender, irisCoin, depositToken, uniID, mintLiquidityAmt)
 }
 
-func (k Keeper) addLiquidity(ctx sdk.Context, sender sdk.AccAddress, irisCoin, token sdk.Coin, uniID string, mintLiquidityAmt sdk.Int) sdk.Error {
-	depositedTokens := sdk.NewCoins(irisCoin, token)
-	// transfer deposited token into coinswaps Account
-	if err := k.SendCoinsFromAccountToPool(ctx, sender, uniID, depositedTokens); err != nil {
-		return err
-	}
-	return k.MintCoins(ctx, sender, uniID, mintLiquidityAmt)
-}
-
 func (k Keeper) HandleRemoveLiquidity(ctx sdk.Context, msg types.MsgRemoveLiquidity) (sdk.Tags, sdk.Error) {
 	tags := sdk.EmptyTags()
 	uniDenom := msg.WithdrawLiquidity.Denom
@@ -140,7 +131,7 @@ func (k Keeper) HandleRemoveLiquidity(ctx sdk.Context, msg types.MsgRemoveLiquid
 	// check if reserve pool exists
 	pool, existed := k.GetPool(ctx, uniID)
 	if !existed {
-		return tags, types.ErrReservePoolNotExists(fmt.Sprintf("reserve pool for %s not found", uniID))
+		return tags, types.ErrReservePoolNotExists(fmt.Sprintf("liquidity pool for %s not found", uniID))
 	}
 
 	irisReserveAmt := pool.BalanceOf(sdk.IrisAtto)
@@ -178,16 +169,6 @@ func (k Keeper) HandleRemoveLiquidity(ctx sdk.Context, msg types.MsgRemoveLiquid
 	return tags, k.removeLiquidity(ctx, uniID, msg.Sender, deductUniCoin, irisWithdrawCoin, tokenWithdrawCoin)
 }
 
-func (k Keeper) removeLiquidity(ctx sdk.Context, uniID string, sender sdk.AccAddress, burnUniCoin, irisWithdrawCoin, tokenWithdrawCoin sdk.Coin) sdk.Error {
-	// burn liquidity from reserve pool and account
-	if err := k.BurnCoins(ctx, sender, uniID, burnUniCoin.Amount); err != nil {
-		return err
-	}
-	// transfer withdrawn liquidity from coinswaps special account to sender's account
-	coins := sdk.NewCoins(irisWithdrawCoin, tokenWithdrawCoin)
-	return k.SendCoinsFromPoolToAccount(ctx, sender, uniID, coins)
-}
-
 // GetParams gets the parameters for the coinswap module.
 func (k Keeper) GetParams(ctx sdk.Context) types.Params {
 	var swapParams types.Params
@@ -198,6 +179,26 @@ func (k Keeper) GetParams(ctx sdk.Context) types.Params {
 // SetParams sets the parameters for the coinswap module.
 func (k Keeper) SetParams(ctx sdk.Context, params types.Params) {
 	k.paramSpace.SetParamSet(ctx, &params)
+}
+
+func (k Keeper) addLiquidity(ctx sdk.Context, sender sdk.AccAddress, irisCoin, token sdk.Coin, uniID string, mintLiquidityAmt sdk.Int) sdk.Error {
+	// mint liquidity to pool and sender
+	if err := k.MintLiquidity(ctx, sender, uniID, mintLiquidityAmt); err != nil {
+		return err
+	}
+	coins := sdk.NewCoins(irisCoin, token)
+	// transfer deposited token into liquidity pool
+	return k.SendCoinsFromAccountToPool(ctx, sender, uniID, coins)
+}
+
+func (k Keeper) removeLiquidity(ctx sdk.Context, uniID string, sender sdk.AccAddress, burnUniCoin, irisWithdrawCoin, tokenWithdrawCoin sdk.Coin) sdk.Error {
+	// burn liquidity from pool and sender
+	if err := k.BurnLiquidity(ctx, sender, uniID, burnUniCoin.Amount); err != nil {
+		return err
+	}
+	// transfer withdrawn liquidity from pool to sender's account
+	coins := sdk.NewCoins(irisWithdrawCoin, tokenWithdrawCoin)
+	return k.SendCoinsFromPoolToAccount(ctx, sender, uniID, coins)
 }
 
 func getTokenPairByDenom(inputDenom, outputDenom string) string {
