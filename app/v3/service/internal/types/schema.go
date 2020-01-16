@@ -221,7 +221,7 @@ const PricingSchema = `
 				"amount": {
 					"type": "string",
 					"description": "the amount of the coin",
-					"pattern": "^[1-9]\d+$"
+					"pattern": "^[1-9]\\d+$"
 				}
 			},
 			
@@ -231,8 +231,10 @@ const PricingSchema = `
 		"discount": {
 			"type": "number",
 			"description": "promotion discount",
-			"exclusiveMinimum": 0, 
-			"exclusiveMaximum": 1
+			"minimum": 0,
+			"exclusiveMinimum": true,
+			"maximum": 1,
+			"exclusiveMaximum": true
 		},
         "promotion_by_time": {
             "type": "object",
@@ -242,12 +244,14 @@ const PricingSchema = `
                 "start_time": {
                     "type": "integer",
 					"description": "starting time of the promotion",
-					"exclusiveMinimum": 0,
+					"minimum": 0,
+					"exclusiveMinimum": true
 				},
                 "end_time": {
                     "type": "integer",
 					"description": "ending time of the promotion",
-					"exclusiveMinimum": 0,
+					"minimum": 0,
+					"exclusiveMinimum": true
 				},
 				"discount": {
                     "$ref": "#/definitions/discount"
