@@ -14,14 +14,14 @@ func (k Keeper) Init(ctx sdk.Context, assetKeeper types.AssetKeeper, accountKeep
 		denom := token.GetDenom()
 		uniID, err := types.GetUniID(sdk.IrisAtto, denom)
 		if err == nil {
-			account := k.getAccount(ctx, accountKeeper, uniID)
-			balance := account.GetCoins()
+			poolAcc := k.getAccount(ctx, accountKeeper, uniID)
+			balance := poolAcc.GetCoins()
 			irisToken := sdk.NewCoin(sdk.IrisAtto, balance.AmountOf(sdk.IrisAtto))
 			otherToken := sdk.NewCoin(denom, balance.AmountOf(denom))
 			coins := sdk.NewCoins(irisToken, otherToken)
-			if _, _, err := k.bk.SubtractCoins(ctx, account.GetAddress(), coins); err == nil {
-				_ = k.SetPool(ctx, types.NewPool(uniID, coins))
-			}
+			//create pool for uniID
+			_ = k.SetPool(ctx, types.NewPool(uniID, nil))
+			_ = k.SendCoinsFromAccountToPool(ctx, poolAcc.GetAddress(), uniID, coins)
 		}
 	}
 }
