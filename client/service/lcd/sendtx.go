@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+
 	"github.com/irisnet/irishub/app/v3/service"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
@@ -20,35 +21,41 @@ func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec
 		defineServiceHandlerFn(cdc, cliCtx),
 	).Methods("POST")
 
-	// Add a new service binding
+	// bind a service
 	r.HandleFunc(
 		"/service/bindings",
-		bindingAddHandlerFn(cdc, cliCtx),
+		bindServiceHandlerFn(cdc, cliCtx),
 	).Methods("POST")
 
-	// Update a service binding
+	// update a service binding
 	r.HandleFunc(
-		fmt.Sprintf("/service/bindings/{%s}/{%s}/{%s}", DefChainID, ServiceName, Provider),
-		bindingUpdateHandlerFn(cdc, cliCtx),
+		fmt.Sprintf("/service/bindings/{%s}/{%s}", ServiceName, Provider),
+		updateServiceBindingHandlerFn(cdc, cliCtx),
 	).Methods("PUT")
+
+	// set a new withdrawal address for a service binding
+	r.HandleFunc(
+		fmt.Sprintf("/service/bindings/{%s}/{%s}/withdraw-address", ServiceName, Provider),
+		setWithdrawAddrHandlerFn(cdc, cliCtx),
+	).Methods("POST")
 
 	// disable a service binding
 	r.HandleFunc(
-		fmt.Sprintf("/service/bindings/{%s}/{%s}/{%s}/disable", DefChainID, ServiceName, Provider),
-		bindingDisableHandlerFn(cdc, cliCtx),
-	).Methods("PUT")
+		fmt.Sprintf("/service/bindings/{%s}/{%s}/disable", ServiceName, Provider),
+		disableServiceHandlerFn(cdc, cliCtx),
+	).Methods("POST")
 
 	// enable a service binding
 	r.HandleFunc(
-		fmt.Sprintf("/service/bindings/{%s}/{%s}/{%s}/enable", DefChainID, ServiceName, Provider),
-		bindingEnableHandlerFn(cdc, cliCtx),
-	).Methods("PUT")
+		fmt.Sprintf("/service/bindings/{%s}/{%s}/enable", ServiceName, Provider),
+		enableServiceHandlerFn(cdc, cliCtx),
+	).Methods("POST")
 
 	// refund deposit from a service binding
 	r.HandleFunc(
-		fmt.Sprintf("/service/bindings/{%s}/{%s}/{%s}/deposit/refund", DefChainID, ServiceName, Provider),
-		bindingRefundHandlerFn(cdc, cliCtx),
-	).Methods("PUT")
+		fmt.Sprintf("/service/bindings/{%s}/{%s}/refund-deposit", ServiceName, Provider),
+		refundServiceDepositHandlerFn(cdc, cliCtx),
+	).Methods("POST")
 
 	// Add a request for a service binding
 	r.HandleFunc(
@@ -85,28 +92,37 @@ type defineServiceReq struct {
 	Schemas           string       `json:"schemas"`
 }
 
-type binding struct {
-	BaseTx      utils.BaseTx  `json:"base_tx"` // basic tx info
-	ServiceName string        `json:"service_name"`
-	DefChainID  string        `json:"def_chain_id"`
-	BindingType string        `json:"binding_type"`
-	Deposit     string        `json:"deposit"`
-	Prices      []string      `json:"prices"`
-	Level       service.Level `json:"level"`
-	Provider    string        `json:"provider"`
+type bindServiceReq struct {
+	BaseTx          utils.BaseTx `json:"base_tx"` // basic tx info
+	ServiceName     string       `json:"service_name"`
+	Provider        string       `json:"provider"`
+	Deposit         string       `json:"deposit"`
+	Pricing         string       `json:"pricing"`
+	WithdrawAddress string       `json:"withdraw_address"`
 }
 
-type bindingUpdate struct {
-	BaseTx      utils.BaseTx  `json:"base_tx"` // basic tx info
-	BindingType string        `json:"binding_type"`
-	Deposit     string        `json:"deposit"`
-	Prices      []string      `json:"prices"`
-	Level       service.Level `json:"level"`
-}
-
-type bindingEnable struct {
+type updateServiceBindingReq struct {
 	BaseTx  utils.BaseTx `json:"base_tx"` // basic tx info
 	Deposit string       `json:"deposit"`
+	Pricing string       `json:"pricing"`
+}
+
+type setWithdrawAddrReq struct {
+	BaseTx          utils.BaseTx `json:"base_tx"` // basic tx info
+	WithdrawAddress string       `json:"withdraw_address"`
+}
+
+type disableServiceReq struct {
+	BaseTx utils.BaseTx `json:"base_tx"` // basic tx info`
+}
+
+type enableServiceReq struct {
+	BaseTx  utils.BaseTx `json:"base_tx"` // basic tx info
+	Deposit string       `json:"deposit"`
+}
+
+type refundServiceDepositReq struct {
+	BaseTx utils.BaseTx `json:"base_tx"` // basic tx info`
 }
 
 type serviceRequest struct {
@@ -139,7 +155,7 @@ type basicReq struct {
 	BaseTx utils.BaseTx `json:"base_tx"` // basic tx info
 }
 
-// HTTP request handler to define service.
+// HTTP request handler to define a service.
 func defineServiceHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req defineServiceReq
@@ -171,9 +187,10 @@ func defineServiceHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Ha
 	}
 }
 
-func bindingAddHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+// HTTP request handler to bind a service.
+func bindServiceHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req binding
+		var req bindServiceReq
 		err := utils.ReadPostBody(w, r, cdc, &req)
 		if err != nil {
 			return
@@ -184,13 +201,7 @@ func bindingAddHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handl
 			return
 		}
 
-		providerAddr, err := sdk.AccAddressFromBech32(req.Provider)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
-		bindingType, err := service.BindingTypeFromString(req.BindingType)
+		provider, err := sdk.AccAddressFromBech32(req.Provider)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -202,19 +213,14 @@ func bindingAddHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handl
 			return
 		}
 
-		var prices []sdk.Coin
-		for _, ip := range req.Prices {
-			price, err := cliCtx.ParseCoin(ip)
-			if err != nil {
-				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-				return
-			}
-			prices = append(prices, price)
+		withdrawAddr, err := sdk.AccAddressFromBech32(req.WithdrawAddress)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
 		}
 
-		msg := service.NewMsgSvcBind(req.DefChainID, req.ServiceName, baseReq.ChainID, providerAddr, bindingType, deposit, prices, req.Level)
-		err = msg.ValidateBasic()
-		if err != nil {
+		msg := service.NewMsgBindService(req.ServiceName, provider, deposit, req.Pricing, withdrawAddr)
+		if err := msg.ValidateBasic(); err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
@@ -225,20 +231,20 @@ func bindingAddHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handl
 	}
 }
 
-func bindingUpdateHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+// HTTP request handler to update a service binding.
+func updateServiceBindingHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		DefChainId := vars[DefChainID]
 		serviceName := vars[ServiceName]
-		bechProviderAddr := vars[Provider]
+		providerStr := vars[Provider]
 
-		providerAddr, err := sdk.AccAddressFromBech32(bechProviderAddr)
+		provider, err := sdk.AccAddressFromBech32(providerStr)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		var req bindingUpdate
+		var req updateServiceBindingReq
 		err = utils.ReadPostBody(w, r, cdc, &req)
 		if err != nil {
 			return
@@ -247,15 +253,6 @@ func bindingUpdateHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Ha
 		baseReq := req.BaseTx.Sanitize()
 		if !baseReq.ValidateBasic(w) {
 			return
-		}
-
-		var bindingType service.BindingType
-		if req.BindingType != "" {
-			bindingType, err = service.BindingTypeFromString(req.BindingType)
-			if err != nil {
-				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-				return
-			}
 		}
 
 		var deposit sdk.Coins
@@ -267,19 +264,131 @@ func bindingUpdateHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Ha
 			}
 		}
 
-		var prices []sdk.Coin
-		for _, ip := range req.Prices {
-			price, err := cliCtx.ParseCoin(ip)
+		msg := service.NewMsgUpdateServiceBinding(serviceName, provider, deposit, req.Pricing)
+		if err := msg.ValidateBasic(); err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
+
+		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
+	}
+}
+
+// HTTP request handler to set a new withdrawal address for a service binding.
+func setWithdrawAddrHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		serviceName := vars[ServiceName]
+		providerStr := vars[Provider]
+
+		provider, err := sdk.AccAddressFromBech32(providerStr)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		var req setWithdrawAddrReq
+		err = utils.ReadPostBody(w, r, cdc, &req)
+		if err != nil {
+			return
+		}
+
+		baseReq := req.BaseTx.Sanitize()
+		if !baseReq.ValidateBasic(w) {
+			return
+		}
+
+		withdrawAddr, err := sdk.AccAddressFromBech32(req.WithdrawAddress)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		msg := service.NewMsgSetWithdrawAddress(serviceName, provider, withdrawAddr)
+		if err := msg.ValidateBasic(); err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
+
+		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
+	}
+}
+
+// HTTP request handler to disable a service.
+func disableServiceHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		serviceName := vars[ServiceName]
+		providerStr := vars[Provider]
+
+		provider, err := sdk.AccAddressFromBech32(providerStr)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		var req disableServiceReq
+		err = utils.ReadPostBody(w, r, cdc, &req)
+		if err != nil {
+			return
+		}
+
+		baseReq := req.BaseTx.Sanitize()
+		if !baseReq.ValidateBasic(w) {
+			return
+		}
+
+		msg := service.NewMsgDisableService(serviceName, provider)
+		if err := msg.ValidateBasic(); err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
+
+		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
+	}
+}
+
+// HTTP request handler to enable a service.
+func enableServiceHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		serviceName := vars[ServiceName]
+		providerStr := vars[Provider]
+
+		provider, err := sdk.AccAddressFromBech32(providerStr)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		var req enableServiceReq
+		err = utils.ReadPostBody(w, r, cdc, &req)
+		if err != nil {
+			return
+		}
+
+		baseReq := req.BaseTx.Sanitize()
+		if !baseReq.ValidateBasic(w) {
+			return
+		}
+
+		var deposit sdk.Coins
+		if len(req.Deposit) != 0 {
+			deposit, err = cliCtx.ParseCoins(req.Deposit)
 			if err != nil {
 				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 				return
 			}
-			prices = append(prices, price)
 		}
 
-		msg := service.NewMsgSvcBindingUpdate(DefChainId, serviceName, baseReq.ChainID, providerAddr, bindingType, deposit, prices, req.Level)
-		err = msg.ValidateBasic()
-		if err != nil {
+		msg := service.NewMsgEnableService(serviceName, provider, deposit)
+		if err := msg.ValidateBasic(); err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
@@ -290,14 +399,14 @@ func bindingUpdateHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Ha
 	}
 }
 
-func bindingDisableHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+// HTTP request handler to refund deposit from a service binding
+func refundServiceDepositHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		DefChainId := vars[DefChainID]
 		serviceName := vars[ServiceName]
-		bechProviderAddr := vars[Provider]
+		providerStr := vars[Provider]
 
-		providerAddr, err := sdk.AccAddressFromBech32(bechProviderAddr)
+		provider, err := sdk.AccAddressFromBech32(providerStr)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -314,89 +423,8 @@ func bindingDisableHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.H
 			return
 		}
 
-		msg := service.NewMsgSvcDisable(DefChainId, serviceName, baseReq.ChainID, providerAddr)
-		err = msg.ValidateBasic()
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
-		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
-
-		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
-	}
-}
-
-func bindingEnableHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		vars := mux.Vars(r)
-		DefChainId := vars[DefChainID]
-		serviceName := vars[ServiceName]
-		bechProviderAddr := vars[Provider]
-
-		providerAddr, err := sdk.AccAddressFromBech32(bechProviderAddr)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
-		var req bindingEnable
-		err = utils.ReadPostBody(w, r, cdc, &req)
-		if err != nil {
-			return
-		}
-
-		baseReq := req.BaseTx.Sanitize()
-		if !baseReq.ValidateBasic(w) {
-			return
-		}
-
-		deposit, err := cliCtx.ParseCoins(req.Deposit)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
-		msg := service.NewMsgSvcEnable(DefChainId, serviceName, baseReq.ChainID, providerAddr, deposit)
-		err = msg.ValidateBasic()
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
-		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
-
-		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
-	}
-}
-
-func bindingRefundHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		vars := mux.Vars(r)
-		DefChainId := vars[DefChainID]
-		serviceName := vars[ServiceName]
-		bechProviderAddr := vars[Provider]
-
-		providerAddr, err := sdk.AccAddressFromBech32(bechProviderAddr)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
-		var req basicReq
-		err = utils.ReadPostBody(w, r, cdc, &req)
-		if err != nil {
-			return
-		}
-
-		baseReq := req.BaseTx.Sanitize()
-		if !baseReq.ValidateBasic(w) {
-			return
-		}
-
-		msg := service.NewMsgSvcRefundDeposit(DefChainId, serviceName, baseReq.ChainID, providerAddr)
-		err = msg.ValidateBasic()
-		if err != nil {
+		msg := service.NewMsgRefundServiceDeposit(serviceName, provider)
+		if err = msg.ValidateBasic(); err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
