@@ -34,12 +34,12 @@ var reServiceName = regexp.MustCompile(`^[a-zA-Z0-9_-]+$`)
 
 var (
 	_ sdk.Msg = MsgDefineService{}
-	_ sdk.Msg = &MsgBindService{}
-	_ sdk.Msg = &MsgUpdateServiceBinding{}
-	_ sdk.Msg = &MsgSetWithdrawAddress{}
-	_ sdk.Msg = &MsgDisableService{}
-	_ sdk.Msg = &MsgEnableService{}
-	_ sdk.Msg = &MsgRefundServiceDeposit{}
+	_ sdk.Msg = MsgBindService{}
+	_ sdk.Msg = MsgUpdateServiceBinding{}
+	_ sdk.Msg = MsgSetWithdrawAddress{}
+	_ sdk.Msg = MsgDisableService{}
+	_ sdk.Msg = MsgEnableService{}
+	_ sdk.Msg = MsgRefundServiceDeposit{}
 	_ sdk.Msg = &MsgSvcRequest{}
 	_ sdk.Msg = &MsgSvcResponse{}
 	_ sdk.Msg = &MsgSvcRefundFees{}

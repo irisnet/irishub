@@ -45,7 +45,7 @@ func (binding ServiceBinding) String() string {
 	disabledTimeStr := ""
 
 	if !binding.DisabledTime.IsZero() {
-		disabledTimeStr = binding.DisabledTime.Format("1970-01-01 00:00:00")
+		disabledTimeStr = fmt.Sprintf("%v", binding.DisabledTime)
 	}
 
 	return fmt.Sprintf(`ServiceBinding:

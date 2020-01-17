@@ -192,7 +192,7 @@ func (k Keeper) RefundDeposit(ctx sdk.Context, serviceName string, provider sdk.
 
 	currentTime := ctx.BlockHeader().Time
 	if currentTime.Before(refundableTime) {
-		return types.ErrIncorrectRefundTime(k.codespace, refundableTime.Format("2006-01-02 15:04:05"))
+		return types.ErrIncorrectRefundTime(k.codespace, fmt.Sprintf("%v", refundableTime))
 	}
 
 	// Send coins from ServiceDepositCoinsAccAddr to the provider's account
@@ -265,9 +265,9 @@ func (k Keeper) getMinDeposit(ctx sdk.Context, pricing string) sdk.Coins {
 	minDepositMultiple := sdk.NewInt(params.MinDepositMultiple)
 
 	p, _ := types.ParsePricing(pricing)
-	price := p.Price[0]
+	price := p.Price.AmountOf(sdk.IrisAtto)
 
 	// minimal deposit = price * minDepositMultiple
-	minDeposit := sdk.NewCoins(sdk.NewCoin(price.Denom, price.Amount.Mul(minDepositMultiple)))
+	minDeposit := sdk.NewCoins(sdk.NewCoin(sdk.IrisAtto, price.Mul(minDepositMultiple)))
 	return minDeposit
 }

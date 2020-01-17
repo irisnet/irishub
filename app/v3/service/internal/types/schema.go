@@ -302,8 +302,7 @@ const PricingSchema = `
 		"description": "promotions by time",
 		"type": "array",
 		"items": {
-		  "$ref": "#/definitions/promotion_by_time",
-		  "type": "string"
+		  "$ref": "#/definitions/promotion_by_time"
 		},
 		"uniqueItems": true
 	  },
