@@ -571,7 +571,7 @@ func (msg MsgSvcResponse) ValidateBasic() sdk.Error {
 
 	_, _, _, err := ConvertRequestID(msg.RequestID)
 	if err != nil {
-		return ErrInvalidReqId(DefaultCodespace, msg.RequestID)
+		return ErrInvalidReqID(DefaultCodespace, msg.RequestID)
 	}
 
 	return nil

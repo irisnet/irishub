@@ -15,27 +15,27 @@ const (
 	CodeUnknownServiceDefinition sdk.CodeType = 103
 	CodeServiceDefinitionExists  sdk.CodeType = 104
 
-	CodeInvalidDeposit            sdk.CodeType = 108
-	CodeInvalidPricing            sdk.CodeType = 108
-	CodeServiceBindingExists      sdk.CodeType = 106
-	CodeUnknownServiceBinding     sdk.CodeType = 107
-	CodeServiceBindingUnavailable sdk.CodeType = 110
-	CodeServiceBindingAvailable   sdk.CodeType = 111
-	CodeIncorrectRefundTime       sdk.CodeType = 108
+	CodeInvalidDeposit            sdk.CodeType = 105
+	CodeInvalidPricing            sdk.CodeType = 106
+	CodeServiceBindingExists      sdk.CodeType = 107
+	CodeUnknownServiceBinding     sdk.CodeType = 108
+	CodeServiceBindingUnavailable sdk.CodeType = 109
+	CodeServiceBindingAvailable   sdk.CodeType = 110
+	CodeIncorrectRefundTime       sdk.CodeType = 111
 
-	CodeRequestNotActive     sdk.CodeType = 117
-	CodeReturnFeeNotExists   sdk.CodeType = 118
-	CodeWithdrawFeeNotExists sdk.CodeType = 119
-	CodeLtServiceFee         sdk.CodeType = 120
-	CodeInvalidReqId         sdk.CodeType = 121
-	CodeNotMatchingProvider  sdk.CodeType = 123
+	CodeRequestNotActive     sdk.CodeType = 112
+	CodeReturnFeeNotExists   sdk.CodeType = 113
+	CodeWithdrawFeeNotExists sdk.CodeType = 114
+	CodeLtServiceFee         sdk.CodeType = 115
+	CodeInvalidReqID         sdk.CodeType = 116
+	CodeNotMatchingProvider  sdk.CodeType = 117
 
-	CodeInvalidRequestInput   sdk.CodeType = 127
-	CodeInvalidResponseOutput sdk.CodeType = 128
-	CodeInvalidResponseErr    sdk.CodeType = 129
+	CodeInvalidRequestInput   sdk.CodeType = 118
+	CodeInvalidResponseOutput sdk.CodeType = 119
+	CodeInvalidResponseErr    sdk.CodeType = 120
 
-	CodeInvalidInput   sdk.CodeType = 130
-	CodeInvalidAddress sdk.CodeType = 132
+	CodeInvalidInput   sdk.CodeType = 121
+	CodeInvalidAddress sdk.CodeType = 122
 )
 
 func ErrInvalidServiceName(codespace sdk.CodespaceType, serviceName string) sdk.Error {
@@ -102,8 +102,8 @@ func ErrLtServiceFee(codespace sdk.CodespaceType, coins sdk.Coins) sdk.Error {
 	return sdk.NewError(codespace, CodeLtServiceFee, fmt.Sprintf("service fee amount must be equal or greater than %s", coins.String()))
 }
 
-func ErrInvalidReqId(codespace sdk.CodespaceType, reqId string) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidReqId, fmt.Sprintf("invalid request id [%s]", reqId))
+func ErrInvalidReqID(codespace sdk.CodespaceType, reqId string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidReqID, fmt.Sprintf("invalid request id [%s]", reqId))
 }
 
 func ErrNotMatchingProvider(codespace sdk.CodespaceType, provider sdk.AccAddress) sdk.Error {
