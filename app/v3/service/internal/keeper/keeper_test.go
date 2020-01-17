@@ -80,7 +80,7 @@ func TestKeeper_Bind_Service(t *testing.T) {
 	require.Equal(t, testPricing, svcBinding.Pricing)
 	require.Equal(t, provider, svcBinding.WithdrawAddress)
 	require.True(t, svcBinding.Available)
-	require.Equal(t, time.Time{}, svcBinding.DisabledTime)
+	require.True(t, svcBinding.DisabledTime.IsZero())
 
 	// update binding
 	err = keeper.UpdateServiceBinding(ctx, svcBinding.ServiceName, svcBinding.Provider, testAddedDeposit, testPricing)
@@ -115,7 +115,7 @@ func TestKeeper_Disable_Service(t *testing.T) {
 	provider := accs[0].GetAddress()
 	setServiceBinding(ctx, keeper, provider, true, time.Time{})
 
-	currentTime := time.Now()
+	currentTime := time.Now().UTC()
 	ctx = ctx.WithBlockTime(currentTime)
 
 	err := keeper.DisableService(ctx, testServiceName, provider)
@@ -125,14 +125,16 @@ func TestKeeper_Disable_Service(t *testing.T) {
 	require.True(t, found)
 
 	require.False(t, svcBinding.Available)
-	require.Equal(t, currentTime.Unix(), svcBinding.DisabledTime.Unix())
+	require.Equal(t, currentTime, svcBinding.DisabledTime)
 }
 
 func TestKeeper_Enable_Service(t *testing.T) {
 	ctx, keeper, accs := createTestInput(t, sdk.NewIntWithDecimal(2000, 18), 1)
 
 	provider := accs[0].GetAddress()
-	setServiceBinding(ctx, keeper, provider, false, time.Now())
+
+	disabledTime := time.Now().UTC()
+	setServiceBinding(ctx, keeper, provider, false, disabledTime)
 
 	err := keeper.EnableService(ctx, testServiceName, provider, nil)
 	require.NoError(t, err)
@@ -141,7 +143,7 @@ func TestKeeper_Enable_Service(t *testing.T) {
 	require.True(t, found)
 
 	require.True(t, svcBinding.Available)
-	require.Equal(t, time.Time{}, svcBinding.DisabledTime)
+	require.True(t, svcBinding.DisabledTime.IsZero())
 }
 
 func TestKeeper_Refund_Deposit(t *testing.T) {
@@ -149,7 +151,7 @@ func TestKeeper_Refund_Deposit(t *testing.T) {
 
 	provider := accs[0].GetAddress()
 
-	disabledTime := time.Now()
+	disabledTime := time.Now().UTC()
 	setServiceBinding(ctx, keeper, provider, false, disabledTime)
 
 	_, err := keeper.bk.SendCoins(ctx, provider, auth.ServiceDepositCoinsAccAddr, testDeposit)

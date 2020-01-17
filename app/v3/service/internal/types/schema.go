@@ -2,6 +2,7 @@ package types
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 
 	"github.com/xeipuuv/gojsonschema"
@@ -198,7 +199,7 @@ func validateDocument(schema []byte, document string) error {
 
 	if !res.Valid() {
 		for _, e := range res.Errors() {
-			return fmt.Errorf(e.String()) // only return the first error
+			return errors.New(e.String()) // only return the first error
 		}
 	}
 
