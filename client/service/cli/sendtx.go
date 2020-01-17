@@ -180,15 +180,38 @@ func GetCmdUpdateServiceBinding(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			depositStr := viper.GetString(FlagDeposit)
-			pricing := viper.GetString(FlagPricing)
-
 			var deposit sdk.Coins
+			depositStr := viper.GetString(FlagDeposit)
+
 			if len(depositStr) != 0 {
 				deposit, err = cliCtx.ParseCoins(depositStr)
 				if err != nil {
 					return err
 				}
+			}
+
+			pricing := viper.GetString(FlagPricing)
+
+			if len(pricing) != 0 {
+				if !json.Valid([]byte(pricing)) {
+					pricingContent, err := ioutil.ReadFile(pricing)
+					if err != nil {
+						return fmt.Errorf("neither JSON input nor path to .json file were provided")
+					}
+
+					if !json.Valid(pricingContent) {
+						return fmt.Errorf(".json file content is invalid JSON")
+					}
+
+					pricing = string(pricingContent)
+				}
+
+				buf := bytes.NewBuffer([]byte{})
+				if err := json.Compact(buf, []byte(pricing)); err != nil {
+					return fmt.Errorf("failed to compact the pricing")
+				}
+
+				pricing = buf.String()
 			}
 
 			msg := service.NewMsgUpdateServiceBinding(args[0], provider, deposit, pricing)
