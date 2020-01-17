@@ -32,12 +32,12 @@ var (
 	ErrNotPositive      = types.ErrNotPositive
 	ErrConstraintNotMet = types.ErrConstraintNotMet
 
-	GetUniId                    = types.GetUniId
+	GetUniId                    = types.GetUniID
 	GetCoinMinDenomFromUniDenom = types.GetCoinMinDenomFromUniDenom
 	GetUniDenom                 = types.GetUniDenom
 	GetUniCoinType              = types.GetUniCoinType
 	CheckUniDenom               = types.CheckUniDenom
-	CheckUniId                  = types.CheckUniId
+	CheckUniId                  = types.CheckUniID
 )
 
 const (

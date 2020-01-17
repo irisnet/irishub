@@ -2,9 +2,11 @@ package keeper
 
 import (
 	"fmt"
+
 	"github.com/tendermint/tendermint/libs/log"
 
 	"github.com/irisnet/irishub/app/v1/params"
+	"github.com/irisnet/irishub/app/v3/asset/exported"
 	"github.com/irisnet/irishub/app/v3/asset/internal/types"
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
@@ -209,6 +211,15 @@ func (k Keeper) IterateTokens(ctx sdk.Context, op func(token types.FungibleToken
 			break
 		}
 	}
+}
+
+// IterateTokens return all existing tokens
+func (k Keeper) GetAllTokens(ctx sdk.Context) (tokens []exported.Token) {
+	k.IterateTokens(ctx, func(token types.FungibleToken) (stop bool) {
+		tokens = append(tokens, token)
+		return false
+	})
+	return
 }
 
 // AddToken save a new token

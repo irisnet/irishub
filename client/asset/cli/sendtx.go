@@ -75,10 +75,8 @@ func getCmdIssueToken(cdc *codec.Codec) *cobra.Command {
 			var prompt = "The token issue transaction will consume extra fee"
 
 			if !viper.GetBool(client.FlagGenerateOnly) {
-				tokenId := asset.GetTokenID(msg.Symbol)
-
 				// query fee
-				fee, err1 := queryTokenFees(cliCtx, tokenId)
+				fee, err1 := queryTokenFees(cliCtx, msg.Symbol)
 				if err1 != nil {
 					return fmt.Errorf("failed to query token issue fee: %s", err1.Error())
 				}
