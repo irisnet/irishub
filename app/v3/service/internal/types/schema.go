@@ -249,15 +249,13 @@ const PricingSchema = `
 		"properties": {
 		  "start_time": {
 			"description": "starting time of the promotion",
-			"type": "integer",
-			"minimum": 0,
-			"exclusiveMinimum": true
+			"type": "string",
+			"format": "date-time"
 		  },
 		  "end_time": {
 			"description": "ending time of the promotion",
-			"type": "integer",
-			"minimum": 0,
-			"exclusiveMinimum": true
+			"type": "string",
+			"format": "date-time"
 		  },
 		  "discount": {
 			"$ref": "#/definitions/discount"

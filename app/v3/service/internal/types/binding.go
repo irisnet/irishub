@@ -88,9 +88,9 @@ type Pricing struct {
 
 // PromotionByTime defines the promotion activity by time
 type PromotionByTime struct {
-	StartTime int64   `json:"start_time"` // starting time of the promotion
-	EndTime   int64   `json:"end_time"`   // ending time of the promotion
-	Discount  float32 `json:"discount"`   // discount during the promotion
+	StartTime time.Time `json:"start_time"` // starting time of the promotion
+	EndTime   time.Time `json:"end_time"`   // ending time of the promotion
+	Discount  float32   `json:"discount"`   // discount during the promotion
 }
 
 // PromotionByVolume defines the promotion activity by volume
