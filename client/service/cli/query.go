@@ -121,7 +121,7 @@ func GetCmdQueryServiceBindings(cdc *codec.Codec) *cobra.Command {
 			}
 
 			var bindings service.ServiceBindings
-			if err := cdc.UnmarshalJSON(res, bindings); err != nil {
+			if err := cdc.UnmarshalJSON(res, &bindings); err != nil {
 				return err
 			}
 
