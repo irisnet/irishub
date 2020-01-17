@@ -42,6 +42,12 @@ func NewServiceBinding(
 
 // String implements fmt.Stringer
 func (binding ServiceBinding) String() string {
+	disabledTimeStr := ""
+
+	if !binding.DisabledTime.IsZero() {
+		disabledTimeStr = binding.DisabledTime.Format("1970-01-01 00:00:00")
+	}
+
 	return fmt.Sprintf(`ServiceBinding:
 		ServiceName:             %s
 		Provider:                %s
@@ -50,9 +56,10 @@ func (binding ServiceBinding) String() string {
 		WithdrawAddress:         %s
 		Available:               %v,
 		DisabledTime:            %s`,
-		binding.ServiceName, binding.Provider, binding.Deposit,
-		binding.Pricing, binding.WithdrawAddress, binding.Available,
-		binding.DisabledTime)
+		binding.ServiceName, binding.Provider, binding.Deposit.MainUnitString(),
+		binding.Pricing, binding.WithdrawAddress,
+		binding.Available, disabledTimeStr,
+	)
 }
 
 // ServiceBindings is a set of service bindings

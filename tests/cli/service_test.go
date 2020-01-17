@@ -160,7 +160,7 @@ func TestIrisCLIService(t *testing.T) {
 
 	svcBinding = executeGetServiceBinding(t, fmt.Sprintf("iriscli service binding %s %s %v", serviceName, barAddr.String(), flags))
 	require.False(t, svcBinding.Available)
-	require.NotEqual(t, "", svcBinding.DisabledTime.String())
+	require.False(t, svcBinding.DisabledTime.IsZero())
 
 	// refund deposit
 	tests.WaitForNextNBlocksTM(10, port)
@@ -185,7 +185,7 @@ func TestIrisCLIService(t *testing.T) {
 
 	svcBinding = executeGetServiceBinding(t, fmt.Sprintf("iriscli service binding %s %s %v", serviceName, barAddr.String(), flags))
 	require.True(t, svcBinding.Available)
-	require.Equal(t, "", svcBinding.DisabledTime.String())
+	require.True(t, svcBinding.DisabledTime.IsZero())
 	require.Equal(t, "10iris", svcBinding.Deposit.MainUnitString())
 
 	// call service
