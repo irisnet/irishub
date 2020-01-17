@@ -104,6 +104,7 @@ func (p *ProtocolV3) Load() {
 // Init initializes the configuration of this Protocol
 func (p *ProtocolV3) Init(ctx sdk.Context) {
 	p.assetKeeper.Init(ctx)
+	p.coinswapKeeper.Init(ctx, p.assetKeeper, p.accountMapper)
 }
 
 // GetCodec get codec
@@ -282,7 +283,7 @@ func (p *ProtocolV3) configKeepers() {
 	)
 
 	p.randKeeper = rand.NewKeeper(p.cdc, protocol.KeyRand, rand.DefaultCodespace)
-	p.coinswapKeeper = coinswap.NewKeeper(p.cdc, protocol.KeySwap, p.bankKeeper, p.accountMapper, p.paramsKeeper.Subspace(coinswap.DefaultParamSpace))
+	p.coinswapKeeper = coinswap.NewKeeper(p.cdc, protocol.KeySwap, p.bankKeeper, p.paramsKeeper.Subspace(coinswap.DefaultParamSpace))
 	p.htlcKeeper = htlc.NewKeeper(p.cdc, protocol.KeyHtlc, p.bankKeeper, htlc.DefaultCodespace)
 }
 
