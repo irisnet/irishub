@@ -35,7 +35,7 @@ func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, bk types.BankKeeper, paramSpa
 
 // Logger returns a module-specific logger.
 func (k Keeper) Logger(ctx sdk.Context) log.Logger {
-	return ctx.Logger().With("module", fmt.Sprintf("%s/%s", "iris", types.RouterKey))
+	return ctx.Logger().With("module", fmt.Sprintf("%s/%s", "iris", types.ModuleName))
 }
 
 func (k Keeper) HandleSwap(ctx sdk.Context, msg types.MsgSwapOrder) (sdk.Tags, sdk.Error) {

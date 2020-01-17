@@ -16,14 +16,21 @@ func (k Keeper) Init(ctx sdk.Context, assetKeeper types.AssetKeeper, accountKeep
 		denom := token.GetDenom()
 		uniID, err := types.GetUniID(sdk.IrisAtto, denom)
 		if err == nil {
-			poolAcc := k.getAccount(ctx, accountKeeper, uniID)
+			poolAcc, existed := k.getAccount(ctx, accountKeeper, uniID)
+			if !existed {
+				continue
+			}
 			balance := poolAcc.GetCoins()
+			uniDenom, _ := types.GetUniDenom(uniID)
+
+			liquidity := balance.AmountOf(uniDenom)
+			if liquidity.LTE(sdk.ZeroInt()) {
+				continue
+			}
 
 			irisToken := sdk.NewCoin(sdk.IrisAtto, balance.AmountOf(sdk.IrisAtto))
 			otherToken := sdk.NewCoin(denom, balance.AmountOf(denom))
-
-			uniDenom, _ := types.GetUniDenom(uniID)
-			uniToken := sdk.NewCoin(uniDenom, balance.AmountOf(uniDenom))
+			uniToken := sdk.NewCoin(uniDenom, liquidity)
 
 			coins := sdk.NewCoins(irisToken, otherToken, uniToken)
 			//create pool for uniID
@@ -40,7 +47,11 @@ func (k Keeper) Init(ctx sdk.Context, assetKeeper types.AssetKeeper, accountKeep
 }
 
 //Except for the upgrade process from v2 to v3, please do not use this code
-func (k Keeper) getAccount(ctx sdk.Context, accountKeeper types.AccountKeeper, uniId string) auth.Account {
+func (k Keeper) getAccount(ctx sdk.Context, accountKeeper types.AccountKeeper, uniId string) (account auth.Account, existed bool) {
 	swapPoolAccAddr := sdk.AccAddress(crypto.AddressHash([]byte(uniId)))
-	return accountKeeper.GetAccount(ctx, swapPoolAccAddr)
+	account = accountKeeper.GetAccount(ctx, swapPoolAccAddr)
+	if account == nil {
+		return account, false
+	}
+	return account, true
 }
