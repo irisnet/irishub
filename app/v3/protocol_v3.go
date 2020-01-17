@@ -19,9 +19,9 @@ import (
 	"github.com/irisnet/irishub/app/v1/slashing"
 	"github.com/irisnet/irishub/app/v1/stake"
 	"github.com/irisnet/irishub/app/v1/upgrade"
-	"github.com/irisnet/irishub/app/v2/coinswap"
 	"github.com/irisnet/irishub/app/v2/htlc"
 	"github.com/irisnet/irishub/app/v3/asset"
+	"github.com/irisnet/irishub/app/v3/coinswap"
 	"github.com/irisnet/irishub/app/v3/gov"
 	"github.com/irisnet/irishub/app/v3/service"
 	"github.com/irisnet/irishub/codec"
@@ -103,6 +103,8 @@ func (p *ProtocolV3) Load() {
 
 // Init initializes the configuration of this Protocol
 func (p *ProtocolV3) Init(ctx sdk.Context) {
+	p.assetKeeper.Init(ctx)
+	p.coinswapKeeper.Init(ctx, p.assetKeeper, p.accountMapper)
 }
 
 // GetCodec get codec
@@ -278,11 +280,10 @@ func (p *ProtocolV3) configKeepers() {
 		&stakeKeeper,
 		gov.DefaultCodespace,
 		gov.PrometheusMetrics(p.config),
-		p.assetKeeper,
 	)
 
 	p.randKeeper = rand.NewKeeper(p.cdc, protocol.KeyRand, rand.DefaultCodespace)
-	p.coinswapKeeper = coinswap.NewKeeper(p.cdc, protocol.KeySwap, p.bankKeeper, p.accountMapper, p.paramsKeeper.Subspace(coinswap.DefaultParamSpace))
+	p.coinswapKeeper = coinswap.NewKeeper(p.cdc, protocol.KeySwap, p.bankKeeper, p.paramsKeeper.Subspace(coinswap.DefaultParamSpace))
 	p.htlcKeeper = htlc.NewKeeper(p.cdc, protocol.KeyHtlc, p.bankKeeper, htlc.DefaultCodespace)
 }
 

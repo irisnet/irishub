@@ -3,19 +3,20 @@
 [HTLC模块](../features/htlc.md)提供了与其他链进行原子交换的相关功能。
 
 在HTLC生命周期中有下面的几种状态：
-   - open: HTLC是可申领的
-   - completed: HTLC已经被申领
-   - expired: HTLC过期并且可退还
-   - refunded: HTLC已退还
+
+- open: HTLC是可申领的
+- completed: HTLC已经被申领
+- expired: HTLC过期并且可退还
+- refunded: HTLC已退还
 
 ## Available Commands
 
-| Name                                   | Description                                          |
-| -------------------------------------- | ---------------------------------------------------- |
-| [create](#iriscli-htlc-create)         | 创建HTLC                                            |
+| Name                                   | Description                                      |
+| -------------------------------------- | ------------------------------------------------ |
+| [create](#iriscli-htlc-create)         | 创建HTLC                                         |
 | [claim](#iriscli-htlc-claim)           | 将一个OPEN状态的HTLC中锁定的资金发放到收款人地址 |
-| [refund](#iriscli-htlc-refund)         | 从过期的HTLC中取回退款                             |
-| [query-htlc](#iriscli-htlc-query-htlc) | 查询一个HTLC的详细信息                             |
+| [refund](#iriscli-htlc-refund)         | 从过期的HTLC中取回退款                           |
+| [query-htlc](#iriscli-htlc-query-htlc) | 查询一个HTLC的详细信息                           |
 
 ## iriscli htlc create
 
@@ -27,15 +28,15 @@ iriscli htlc create --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --to=<
 
 **标识：**
 
-| 名称, 速记                | 类型     | 必须 | 默认 | 描述                                              |
-| ------------------------- | -------- | ---- | ---- | ------------------------------------------------- |
-| --to                      | string   | 是   |      | Bech32编码的收款人地址                                        |
-| --receiver-on-other-chain | bytesHex |      |      | 另一条链上的HTLC认领接收地址                          |
-| --amount                  | string   | 是   |      | 要发送的金额                                      |
-| --secret                  | bytesHex |      |      | 用于生成Hash Lock的secret，缺省将随机生成    |
+| 名称, 速记                | 类型     | 必须 | 默认 | 描述                                                               |
+| ------------------------- | -------- | ---- | ---- | ------------------------------------------------------------------ |
+| --to                      | string   | 是   |      | Bech32编码的收款人地址                                             |
+| --receiver-on-other-chain | bytesHex |      |      | 另一条链上的HTLC认领接收地址                                       |
+| --amount                  | string   | 是   |      | 要发送的金额                                                       |
+| --secret                  | bytesHex |      |      | 用于生成Hash Lock的secret，缺省将随机生成                          |
 | --hash-lock               | bytesHex |      |      | 由secret和时间戳（如果提供）生成的sha256哈希，缺省将使用secret生成 |
-| --time-lock               | string   | 是   |      | 资金锁定的区块数                                  |
-| --timestamp               | uint     |      |      | 参与生成hash lock的10位时间戳（可选）           |
+| --time-lock               | string   | 是   |      | 资金锁定的区块数                                                   |
+| --timestamp               | uint     |      |      | 参与生成hash lock的10位时间戳（可选）                              |
 
 ### 创建HTLC
 
@@ -63,8 +64,8 @@ iriscli htlc claim --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --hash-
 
 **标识：**
 
-| 名称, 速记  | 类型     | 必须 | 默认 | 描述                              |
-| ----------- | -------- | ---- | ---- | --------------------------------- |
+| 名称, 速记  | 类型     | 必须 | 默认 | 描述                           |
+| ----------- | -------- | ---- | ---- | ------------------------------ |
 | --hash-lock | bytesHex | 是   |      | T要发送锁定资金HTLC的Hash Lock |
 | --secret    | bytesHex | 是   |      | 用于生成hash lock的secret      |
 
@@ -90,8 +91,8 @@ iriscli htlc refund --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --hash
 
 **标识：**
 
-| 名称, 速记  | 类型     | 必须 | 默认 | 描述                       |
-| ----------- | -------- | ---- | ---- | -------------------------- |
+| 名称, 速记  | 类型     | 必须 | 默认 | 描述                    |
+| ----------- | -------- | ---- | ---- | ----------------------- |
 | --hash-lock | bytesHex | 是   |      | 要退款的HTLC的Hash Lock |
 
 ### 从过期的 HTLC 中取回退款

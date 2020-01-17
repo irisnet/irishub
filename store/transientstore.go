@@ -24,6 +24,12 @@ func (ts *transientStore) Commit([]*sdk.KVStoreKey) (id CommitID) {
 	return
 }
 
+// Commit cleans up transientStore.
+func (ts *transientStore) CommitWithVersion([]*sdk.KVStoreKey, int64) (id CommitID) {
+	ts.dbStoreAdapter = dbStoreAdapter{dbm.NewMemDB()}
+	return
+}
+
 // Implements CommitStore
 func (ts *transientStore) SetPruning(pruning PruningStrategy) {
 }

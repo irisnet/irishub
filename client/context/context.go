@@ -17,8 +17,8 @@ import (
 
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/app/v1/auth"
-	"github.com/irisnet/irishub/app/v2/coinswap"
 	"github.com/irisnet/irishub/app/v3/asset"
+	"github.com/irisnet/irishub/app/v3/coinswap"
 	"github.com/irisnet/irishub/client"
 	"github.com/irisnet/irishub/client/keys"
 	"github.com/irisnet/irishub/codec"
@@ -268,13 +268,13 @@ func (cliCtx CLIContext) GetCoinType(coinName string) (sdk.CoinType, error) {
 			return sdk.CoinType{}, fmt.Errorf("unsupported coin type \"%s\"", coinName)
 		}
 
-		var token asset.FungibleToken
+		var token asset.TokenOutput
 		err = cliCtx.Codec.UnmarshalJSON(res, &token)
 		if err != nil {
 			return sdk.CoinType{}, err
 		}
 
-		coinType = token.GetCoinType()
+		coinType = token.ToFungibleToken().GetCoinType()
 	}
 
 	return coinType, nil

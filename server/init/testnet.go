@@ -3,7 +3,7 @@ package init
 import (
 	"encoding/json"
 	"fmt"
-	v2 "github.com/irisnet/irishub/app/v2"
+	v3 "github.com/irisnet/irishub/app/v3"
 	"net"
 	"os"
 	"path/filepath"
@@ -97,7 +97,7 @@ func initTestnet(config *cfg.Config, cdc *codec.Codec) error {
 	valPubKeys := make([]crypto.PubKey, numValidators)
 
 	var (
-		accs     []v2.GenesisFileAccount
+		accs     []v3.GenesisFileAccount
 		genFiles []string
 	)
 
@@ -180,7 +180,7 @@ func initTestnet(config *cfg.Config, cdc *codec.Codec) error {
 			return err
 		}
 
-		accs = append(accs, v2.GenesisFileAccount{
+		accs = append(accs, v3.GenesisFileAccount{
 			Address: addr,
 			Coins:   []string{sdk.FreeToken4Acc.String()},
 		})
@@ -235,11 +235,11 @@ func initTestnet(config *cfg.Config, cdc *codec.Codec) error {
 }
 
 func initGenFiles(
-	cdc *codec.Codec, chainID string, accs []v2.GenesisFileAccount,
+	cdc *codec.Codec, chainID string, accs []v3.GenesisFileAccount,
 	genFiles []string, numValidators int,
 ) error {
 
-	appGenState := v2.NewDefaultGenesisFileState()
+	appGenState := v3.NewDefaultGenesisFileState()
 	appGenState.Accounts = accs
 
 	// genesis add a profiler

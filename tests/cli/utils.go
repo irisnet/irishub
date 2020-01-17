@@ -20,12 +20,12 @@ import (
 	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/app/v1/bank"
 	"github.com/irisnet/irishub/app/v1/upgrade"
-	"github.com/irisnet/irishub/app/v2/htlc"
 	v3 "github.com/irisnet/irishub/app/v3"
 	"github.com/irisnet/irishub/app/v3/asset"
 	"github.com/irisnet/irishub/app/v3/gov"
 	"github.com/irisnet/irishub/app/v3/service"
 	"github.com/irisnet/irishub/client/context"
+	htlctypes "github.com/irisnet/irishub/client/htlc/types"
 	"github.com/irisnet/irishub/client/keys"
 	servicecli "github.com/irisnet/irishub/client/service"
 	"github.com/irisnet/irishub/client/stake"
@@ -367,42 +367,24 @@ func executeGetServiceFees(t *testing.T, cmdStr string) servicecli.FeesOutput {
 	return feesOutput
 }
 
-func executeGetToken(t *testing.T, cmdStr string) asset.FungibleToken {
+func executeGetToken(t *testing.T, cmdStr string) asset.TokenOutput {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
-	var token asset.FungibleToken
+	var token asset.TokensOutput
 	cdc := app.MakeLatestCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &token)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
-	return token
-}
-
-func executeGetGateway(t *testing.T, cmdStr string) asset.Gateway {
-	out, _ := tests.ExecuteT(t, cmdStr, "")
-	var gateway asset.Gateway
-	cdc := app.MakeLatestCodec()
-	err := cdc.UnmarshalJSON([]byte(out), &gateway)
-	require.NoError(t, err, "out %v\n, err %v", out, err)
-	return gateway
-}
-
-func executeGetGateways(t *testing.T, cmdStr string) []asset.Gateway {
-	out, _ := tests.ExecuteT(t, cmdStr, "")
-	var gateways []asset.Gateway
-	cdc := app.MakeLatestCodec()
-	err := cdc.UnmarshalJSON([]byte(out), &gateways)
-	require.NoError(t, err, "out %v\n, err %v", out, err)
-	return gateways
+	return token[0]
 }
 
 func executeWriteCheckErr(t *testing.T, cmdStr string, writes ...string) {
 	require.True(t, executeWrite(t, cmdStr, writes...))
 }
 
-func executeGetHtlc(t *testing.T, cmdStr string) htlc.HTLC {
+func executeGetHtlc(t *testing.T, cmdStr string) htlctypes.OutputHTLC {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
-	var htlc htlc.HTLC
+	var h htlctypes.OutputHTLC
 	cdc := app.MakeLatestCodec()
-	err := cdc.UnmarshalJSON([]byte(out), &htlc)
+	err := cdc.UnmarshalJSON([]byte(out), &h)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
-	return htlc
+	return h
 }

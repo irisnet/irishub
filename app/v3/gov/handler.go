@@ -13,7 +13,6 @@ func NewHandler(keeper Keeper) sdk.Handler {
 		switch msg := msg.(type) {
 		case MsgSubmitProposal,
 			MsgSubmitSoftwareUpgradeProposal,
-			MsgSubmitTokenAdditionProposal,
 			MsgSubmitCommunityTaxUsageProposal:
 			return handleMsgSubmitProposal(ctx, keeper, msg)
 		case MsgDeposit:

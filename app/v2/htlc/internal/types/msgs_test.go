@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"testing"
 
-	sdk "github.com/irisnet/irishub/types"
 	"github.com/stretchr/testify/require"
+
+	sdk "github.com/irisnet/irishub/types"
 )
 
 var (

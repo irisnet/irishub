@@ -260,27 +260,7 @@ func main() {
 		Use:   "asset",
 		Short: "Asset subcommands",
 	}
-
-	assetCmd.AddCommand(
-		client.PostCommands(
-			assetcmd.GetCmdCreateGateway(cdc),
-			assetcmd.GetCmdEditGateway(cdc),
-			assetcmd.GetCmdTransferGatewayOwner(cdc),
-			assetcmd.GetCmdIssueToken(cdc),
-			assetcmd.GetCmdTransferTokenOwner(cdc),
-			assetcmd.GetCmdEditAsset(cdc),
-			assetcmd.GetCmdMintToken(cdc),
-		)...)
-
-	assetCmd.AddCommand(
-		client.GetCommands(
-			assetcmd.GetCmdQueryToken(cdc),
-			assetcmd.GetCmdQueryTokens(cdc),
-			assetcmd.GetCmdQueryGateway(cdc),
-			assetcmd.GetCmdQueryGateways(cdc),
-			assetcmd.GetCmdQueryFee(cdc),
-		)...)
-
+	assetCmd.AddCommand(assetcmd.GetTokenCmd(cdc))
 	rootCmd.AddCommand(
 		assetCmd,
 	)

@@ -9,34 +9,27 @@ import (
 const (
 	DefaultCodespace sdk.CodespaceType = "asset"
 
-	CodeInvalidMoniker       sdk.CodeType = 100
-	CodeInvalidIdentity      sdk.CodeType = 101
-	CodeInvalidDetails       sdk.CodeType = 102
-	CodeInvalidWebsite       sdk.CodeType = 103
-	CodeUnknownGateway       sdk.CodeType = 104
-	CodeGatewayAlreadyExists sdk.CodeType = 105
-	CodeInvalidOwner         sdk.CodeType = 106
-	CodeNoUpdatesProvided    sdk.CodeType = 107
-	CodeInvalidAddress       sdk.CodeType = 108
-	CodeInvalidToAddress     sdk.CodeType = 109
+	CodeInvalidMoniker   sdk.CodeType = 100
+	CodeInvalidOwner     sdk.CodeType = 101
+	CodeInvalidAddress   sdk.CodeType = 102
+	CodeInvalidToAddress sdk.CodeType = 103
 
-	CodeNilAssetOwner                 sdk.CodeType = 110
-	CodeInvalidAssetFamily            sdk.CodeType = 111
-	CodeInvalidAssetSource            sdk.CodeType = 112
-	CodeInvalidAssetName              sdk.CodeType = 113
-	CodeInvalidAssetSymbol            sdk.CodeType = 114
-	CodeInvalidAssetCanonicalSymbol   sdk.CodeType = 115
-	CodeInvalidAssetMinUnitAlias      sdk.CodeType = 116
-	CodeInvalidAssetInitSupply        sdk.CodeType = 117
-	CodeInvalidAssetMaxSupply         sdk.CodeType = 118
-	CodeInvalidAssetDecimal           sdk.CodeType = 119
-	CodeAssetAlreadyExists            sdk.CodeType = 120
-	CodeUnauthorizedIssueGatewayAsset sdk.CodeType = 121
-	CodeAssetNotExists                sdk.CodeType = 122
-	CodeAssetNotMintable              sdk.CodeType = 123
+	CodeNilAssetOwner               sdk.CodeType = 104
+	CodeInvalidAssetFamily          sdk.CodeType = 105
+	CodeInvalidTokenID              sdk.CodeType = 106
+	CodeInvalidAssetName            sdk.CodeType = 107
+	CodeInvalidAssetSymbol          sdk.CodeType = 108
+	CodeInvalidAssetCanonicalSymbol sdk.CodeType = 109
+	CodeInvalidAssetMinUnitAlias    sdk.CodeType = 110
+	CodeInvalidAssetInitSupply      sdk.CodeType = 111
+	CodeInvalidAssetMaxSupply       sdk.CodeType = 112
+	CodeInvalidAssetDecimal         sdk.CodeType = 113
+	CodeAssetAlreadyExists          sdk.CodeType = 114
+	CodeAssetNotExists              sdk.CodeType = 115
+	CodeAssetNotMintable            sdk.CodeType = 116
 
-	CodeInsufficientCoins       sdk.CodeType = 130
-	CodeSignersMissingInContext sdk.CodeType = 131
+	CodeInsufficientCoins       sdk.CodeType = 117
+	CodeSignersMissingInContext sdk.CodeType = 118
 )
 
 //----------------------------------------
@@ -50,8 +43,8 @@ func ErrInvalidAssetFamily(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidAssetFamily, msg)
 }
 
-func ErrInvalidAssetSource(codespace sdk.CodespaceType, msg string) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidAssetSource, msg)
+func ErrInvalidTokenID(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidTokenID, msg)
 }
 
 func ErrInvalidAssetName(codespace sdk.CodespaceType, msg string) sdk.Error {
@@ -100,32 +93,8 @@ func ErrInvalidMoniker(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidMoniker, msg)
 }
 
-func ErrInvalidIdentity(codespace sdk.CodespaceType, msg string) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidIdentity, msg)
-}
-
-func ErrInvalidDetails(codespace sdk.CodespaceType, msg string) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidDetails, msg)
-}
-
-func ErrInvalidWebsite(codespace sdk.CodespaceType, msg string) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidWebsite, msg)
-}
-
-func ErrUnkwownGateway(codespace sdk.CodespaceType, msg string) sdk.Error {
-	return sdk.NewError(codespace, CodeUnknownGateway, msg)
-}
-
-func ErrGatewayAlreadyExists(codespace sdk.CodespaceType, msg string) sdk.Error {
-	return sdk.NewError(codespace, CodeGatewayAlreadyExists, msg)
-}
-
 func ErrInvalidOwner(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidOwner, msg)
-}
-
-func ErrNoUpdatesProvided(codespace sdk.CodespaceType, msg string) sdk.Error {
-	return sdk.NewError(codespace, CodeNoUpdatesProvided, msg)
 }
 
 func ErrInvalidAddress(codespace sdk.CodespaceType, msg string) sdk.Error {
@@ -134,10 +103,6 @@ func ErrInvalidAddress(codespace sdk.CodespaceType, msg string) sdk.Error {
 
 func ErrInvalidToAddress(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidToAddress, msg)
-}
-
-func ErrUnauthorizedIssueGatewayAsset(codespace sdk.CodespaceType, msg string) sdk.Error {
-	return sdk.NewError(codespace, CodeUnauthorizedIssueGatewayAsset, msg)
 }
 
 //----------------------------------------
