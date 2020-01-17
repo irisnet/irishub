@@ -4,15 +4,17 @@ import (
 	"encoding/hex"
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
+	abci "github.com/tendermint/tendermint/abci/types"
+	"github.com/tendermint/tendermint/libs/log"
+	dbm "github.com/tendermint/tm-db"
+
 	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/app/v1/bank"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/store"
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/stretchr/testify/require"
-	abci "github.com/tendermint/tendermint/abci/types"
-	"github.com/tendermint/tendermint/libs/log"
-	dbm "github.com/tendermint/tm-db"
 )
 
 func setupMultiStore() (sdk.MultiStore, *sdk.KVStoreKey, *sdk.KVStoreKey) {
@@ -23,7 +25,7 @@ func setupMultiStore() (sdk.MultiStore, *sdk.KVStoreKey, *sdk.KVStoreKey) {
 	ms := store.NewCommitMultiStore(db)
 	ms.MountStoreWithDB(accountKey, sdk.StoreTypeIAVL, db)
 	ms.MountStoreWithDB(htlcKey, sdk.StoreTypeIAVL, db)
-	ms.LoadLatestVersion()
+	_ = ms.LoadLatestVersion()
 
 	return ms, accountKey, htlcKey
 }
@@ -45,8 +47,8 @@ func TestExportHTLCGenesis(t *testing.T) {
 	ctx = ctx.WithBlockHeight(currentBlockHeight)
 
 	// define variables
-	senderAddrs := []sdk.AccAddress{sdk.AccAddress([]byte("sender1")), sdk.AccAddress([]byte("sender2"))}
-	receiverAddrs := []sdk.AccAddress{sdk.AccAddress([]byte("receiver1")), sdk.AccAddress([]byte("receiver2"))}
+	senderAddrs := []sdk.AccAddress{sdk.AccAddress("sender1"), sdk.AccAddress("sender2")}
+	receiverAddrs := []sdk.AccAddress{sdk.AccAddress("receiver1"), sdk.AccAddress("receiver2")}
 	receiverOnOtherChain := "receiverOnOtherChain"
 	amount := sdk.NewCoins(sdk.NewCoin(sdk.IrisAtto, sdk.NewInt(0)))
 	secret := []byte("___abcdefghijklmnopqrstuvwxyz___")
@@ -62,8 +64,10 @@ func TestExportHTLCGenesis(t *testing.T) {
 	htlc2 := NewHTLC(senderAddrs[1], receiverAddrs[1], receiverOnOtherChain, amount, initSecret, timestamps[1], expireHeights[1], state)
 
 	// create HTLCs
-	keeper.CreateHTLC(ctx, htlc1, hashLocks[0])
-	keeper.CreateHTLC(ctx, htlc2, hashLocks[1])
+	_, err := keeper.CreateHTLC(ctx, htlc1, hashLocks[0])
+	require.Nil(t, err)
+	_, err = keeper.CreateHTLC(ctx, htlc2, hashLocks[1])
+	require.Nil(t, err)
 
 	// preceed to the new block
 	newBlockHeight := int64(150)
@@ -80,6 +84,7 @@ func TestExportHTLCGenesis(t *testing.T) {
 		require.True(t, htlc.State == OPEN)
 
 		hashLock, err := hex.DecodeString(hashLockHex)
+		require.Nil(t, err)
 
 		// assert the HTLC with the given hash lock exists
 		htlcInStore, err := keeper.GetHTLC(ctx, hashLock)

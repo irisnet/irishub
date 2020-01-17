@@ -3,10 +3,11 @@ package keeper
 import (
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/app/v2/htlc/internal/types"
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/stretchr/testify/require"
 )
 
 func TestKeeper_CreateHTLC(t *testing.T) {

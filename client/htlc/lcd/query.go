@@ -6,19 +6,18 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/app/v2/htlc"
 	"github.com/irisnet/irishub/client/context"
+	"github.com/irisnet/irishub/client/htlc/types"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/codec"
 )
 
 func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec) {
 	// Get the HTLC by the hash lock
-	r.HandleFunc(
-		"/htlc/htlcs/{hash-lock}",
-		queryHTLCHandlerFn(cliCtx, cdc),
-	).Methods("GET")
+	r.HandleFunc("/htlc/htlcs/{hash-lock}", queryHTLCHandlerFn(cliCtx, cdc)).Methods("GET")
 }
 
 func queryHTLCHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
@@ -48,6 +47,13 @@ func queryHTLCHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.Handle
 			return
 		}
 
-		utils.PostProcessResponse(w, cliCtx.Codec, res, cliCtx.Indent)
+		var htlc htlc.HTLC
+		if err = cdc.UnmarshalJSON(res, &htlc); err != nil {
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+		}
+
+		oh := types.NewOutputHTLC(htlc)
+
+		utils.PostProcessResponse(w, cliCtx.Codec, oh, cliCtx.Indent)
 	}
 }

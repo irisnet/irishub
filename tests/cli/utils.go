@@ -20,12 +20,12 @@ import (
 	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/app/v1/bank"
 	"github.com/irisnet/irishub/app/v1/upgrade"
-	"github.com/irisnet/irishub/app/v2/htlc"
 	v3 "github.com/irisnet/irishub/app/v3"
 	"github.com/irisnet/irishub/app/v3/asset"
 	"github.com/irisnet/irishub/app/v3/gov"
 	"github.com/irisnet/irishub/app/v3/service"
 	"github.com/irisnet/irishub/client/context"
+	htlctypes "github.com/irisnet/irishub/client/htlc/types"
 	"github.com/irisnet/irishub/client/keys"
 	servicecli "github.com/irisnet/irishub/client/service"
 	"github.com/irisnet/irishub/client/stake"
@@ -380,11 +380,11 @@ func executeWriteCheckErr(t *testing.T, cmdStr string, writes ...string) {
 	require.True(t, executeWrite(t, cmdStr, writes...))
 }
 
-func executeGetHtlc(t *testing.T, cmdStr string) htlc.HTLC {
+func executeGetHtlc(t *testing.T, cmdStr string) htlctypes.OutputHTLC {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
-	var htlc htlc.HTLC
+	var h htlctypes.OutputHTLC
 	cdc := app.MakeLatestCodec()
-	err := cdc.UnmarshalJSON([]byte(out), &htlc)
+	err := cdc.UnmarshalJSON([]byte(out), &h)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
-	return htlc
+	return h
 }
