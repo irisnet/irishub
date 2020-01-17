@@ -154,17 +154,16 @@ func migrateAuth(initialState v0_17.GenesisFileState) auth.GenesisState {
 
 	for _, p := range initialState.SwapData.Pools {
 		if !p.Coins.IsZero() {
-			var uniToken sdk.Coin
 			for _, c := range p.Coins {
 				if _, err := coinswap.GetCoinDenomFromUniDenom(c.Denom); err != nil {
-					uniToken = c
+					poolAddress := coinswap.GetReservePoolAddr(c.Denom)
+					poolAccount := auth.NewBaseAccountWithAddress(poolAddress)
+					if err := poolAccount.SetCoins(p.Coins.Sort()); err == nil {
+						accounts = append(accounts, &poolAccount)
+					}
+					break
 				}
 			}
-
-			poolAddress := coinswap.GetReservePoolAddr(uniToken.Denom)
-			poolAccount := auth.NewBaseAccountWithAddress(poolAddress)
-			poolAccount.SetCoins(p.Coins.Sort())
-			accounts = append(accounts, &poolAccount)
 		}
 	}
 
