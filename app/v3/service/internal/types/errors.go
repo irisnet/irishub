@@ -63,11 +63,11 @@ func ErrInvalidDeposit(codespace sdk.CodespaceType, msg string) sdk.Error {
 }
 
 func ErrInvalidPricing(codespace sdk.CodespaceType, msg string) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidPricing, msg)
+	return sdk.NewError(codespace, CodeInvalidPricing, fmt.Sprintf("invalid pricing: %s", msg))
 }
 
 func ErrServiceBindingExists(codespace sdk.CodespaceType) sdk.Error {
-	return sdk.NewError(codespace, CodeServiceBindingExists, fmt.Sprintf("service binding already exists"))
+	return sdk.NewError(codespace, CodeServiceBindingExists, "service binding already exists")
 }
 
 func ErrUnknownServiceBinding(codespace sdk.CodespaceType) sdk.Error {
@@ -75,11 +75,11 @@ func ErrUnknownServiceBinding(codespace sdk.CodespaceType) sdk.Error {
 }
 
 func ErrServiceBindingUnavailable(codespace sdk.CodespaceType) sdk.Error {
-	return sdk.NewError(codespace, CodeServiceBindingUnavailable, fmt.Sprintf("service binding is unavailable"))
+	return sdk.NewError(codespace, CodeServiceBindingUnavailable, "service binding is unavailable")
 }
 
 func ErrServiceBindingAvailable(codespace sdk.CodespaceType) sdk.Error {
-	return sdk.NewError(codespace, CodeServiceBindingAvailable, fmt.Sprintf("service binding is available"))
+	return sdk.NewError(codespace, CodeServiceBindingAvailable, "service binding is available")
 }
 
 func ErrIncorrectRefundTime(codespace sdk.CodespaceType, refundableTime string) sdk.Error {
@@ -123,15 +123,15 @@ func ErrNoResponseFound(codespace sdk.CodespaceType, requestID string) sdk.Error
 }
 
 func ErrInvalidRequestInput(codespace sdk.CodespaceType, msg string) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidRequestInput, msg)
+	return sdk.NewError(codespace, CodeInvalidRequestInput, fmt.Sprintf("invalid request input: %s", msg))
 }
 
 func ErrInvalidResponseOutput(codespace sdk.CodespaceType, msg string) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidResponseOutput, msg)
+	return sdk.NewError(codespace, CodeInvalidResponseOutput, fmt.Sprintf("invalid response output: %s", msg))
 }
 
 func ErrInvalidResponseErr(codespace sdk.CodespaceType, msg string) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidResponseErr, msg)
+	return sdk.NewError(codespace, CodeInvalidResponseErr, fmt.Sprintf("invalid response err: %s", msg))
 }
 
 func ErrInvalidAddress(codespace sdk.CodespaceType, msg string) sdk.Error {
