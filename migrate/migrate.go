@@ -113,25 +113,31 @@ func Migrate(cdc *codec.Codec, initialState v0_17.GenesisFileState) (appState ge
 	v016Codec := codec.New()
 	codec.RegisterCrypto(v016Codec)
 
+	// ------------------------------------------------------------
+	// sdk modules
+	// ------------------------------------------------------------
 	appState[auth.ModuleName] = cdc.MustMarshalJSON(migrateAuth(initialState))
-	appState[distribution.ModuleName] = cdc.MustMarshalJSON(migrateDistribution(initialState))
-	// appState[gov.ModuleName] = cdc.MustMarshalJSON(migrateGov(initialState))
-	appState[slashing.ModuleName] = cdc.MustMarshalJSON(migrateSlashing(initialState))
 	appState[staking.ModuleName] = cdc.MustMarshalJSON(migrateStaking(initialState))
+	appState[slashing.ModuleName] = cdc.MustMarshalJSON(migrateSlashing(initialState))
+	// appState[distribution.ModuleName] = cdc.MustMarshalJSON(migrateDistribution(initialState))
+	// appState[gov.ModuleName] = cdc.MustMarshalJSON(migrateGov(initialState))
 
+	// ------------------------------------------------------------
+	// irishub modules
+	// ------------------------------------------------------------
+	appState[mint.ModuleName] = cdc.MustMarshalJSON(migrateMint(initialState))
 	appState[rand.ModuleName] = cdc.MustMarshalJSON(migrateRand(initialState))
 	appState[htlc.ModuleName] = cdc.MustMarshalJSON(migrateHTLC(initialState))
-	appState[mint.ModuleName] = cdc.MustMarshalJSON(migrateMint(initialState))
+	appState[asset.ModuleName] = cdc.MustMarshalJSON(migrateAsset(initialState))
+	appState[coinswap.ModuleName] = cdc.MustMarshalJSON(migrateCoinswap(initialState))
 	// appState[guardian.ModuleName] = cdc.MustMarshalJSON(migrateGuardian(initialState))
-	// appState[coinswap.ModuleName] = cdc.MustMarshalJSON(migrateCoinswap(initialState))
-	// appState[asset.ModuleName] = cdc.MustMarshalJSON(migrateAsset(initialState))
 	// appState[service.ModuleName] = cdc.MustMarshalJSON(migrateService(initialState))
 
 	return appState
 }
 
 func migrateAuth(initialState v0_17.GenesisFileState) auth.GenesisState {
-	authParams := auth.DefaultParams()
+	params := auth.DefaultParams()
 	var accounts exported.GenesisAccounts
 	for _, acc := range initialState.Accounts {
 		var coins sdk.Coins
@@ -145,115 +151,36 @@ func migrateAuth(initialState v0_17.GenesisFileState) auth.GenesisState {
 		baseAccount := auth.NewBaseAccount(acc.Address, coins.Sort(), nil, acc.AccountNumber, acc.Sequence)
 		accounts = append(accounts, baseAccount)
 	}
+
+	for _, p := range initialState.SwapData.Pools {
+		if !p.Coins.IsZero() {
+			var uniToken sdk.Coin
+			for _, c := range p.Coins {
+				if _, err := coinswap.GetCoinDenomFromUniDenom(c.Denom); err != nil {
+					uniToken = c
+				}
+			}
+
+			poolAddress := coinswap.GetReservePoolAddr(uniToken.Denom)
+			poolAccount := auth.NewBaseAccountWithAddress(poolAddress)
+			poolAccount.SetCoins(p.Coins.Sort())
+			accounts = append(accounts, &poolAccount)
+		}
+	}
+
 	return auth.GenesisState{
-		Params:   authParams,
+		Params:   params,
 		Accounts: accounts,
 	}
 }
 
-func migrateDistribution(initialState v0_17.GenesisFileState) distribution.GenesisState {
-	var feePool distribution.FeePool
-	var communityTax sdk.Dec
-	var baseProposerReward sdk.Dec
-	var bonusProposerReward sdk.Dec
-	var withdrawAddrEnabled bool
-	var delegatorWithdrawInfos []distribution.DelegatorWithdrawInfo
-	var previousProposer sdk.ConsAddress
-	var outstandingRewards []distribution.ValidatorOutstandingRewardsRecord
-	var validatorAccumulatedCommissions []distribution.ValidatorAccumulatedCommissionRecord
-	var validatorHistoricalRewards []distribution.ValidatorHistoricalRewardsRecord
-	var validatorCurrentRewards []distribution.ValidatorCurrentRewardsRecord
-	var delegatorStartingInfos []distribution.DelegatorStartingInfoRecord
-	var validatorSlashEvents []distribution.ValidatorSlashEventRecord
-	// TODO
-
-	return distribution.GenesisState{
-		FeePool:                         feePool,
-		CommunityTax:                    communityTax,
-		BaseProposerReward:              baseProposerReward,
-		BonusProposerReward:             bonusProposerReward,
-		WithdrawAddrEnabled:             withdrawAddrEnabled,
-		DelegatorWithdrawInfos:          delegatorWithdrawInfos,
-		PreviousProposer:                previousProposer,
-		OutstandingRewards:              outstandingRewards,
-		ValidatorAccumulatedCommissions: validatorAccumulatedCommissions,
-		ValidatorHistoricalRewards:      validatorHistoricalRewards,
-		ValidatorCurrentRewards:         validatorCurrentRewards,
-		DelegatorStartingInfos:          delegatorStartingInfos,
-		ValidatorSlashEvents:            validatorSlashEvents,
-	}
-}
-
-func migrateGov(initialState v0_17.GenesisFileState) gov.GenesisState {
-	var startingProposalID uint64
-	var deposits gov.Deposits
-	var votes gov.Votes
-	var proposals gov.Proposals
-	var depositParams gov.DepositParams
-	var votingParams gov.VotingParams
-	var tallyParams gov.TallyParams
-	// TODO
-
-	return gov.GenesisState{
-		StartingProposalID: startingProposalID,
-		Deposits:           deposits,
-		Votes:              votes,
-		Proposals:          proposals,
-		DepositParams:      depositParams,
-		VotingParams:       votingParams,
-		TallyParams:        tallyParams,
-	}
-}
-
-func migrateSlashing(initialState v0_17.GenesisFileState) slashing.GenesisState {
-	slashingParams := slashing.Params{
-		SignedBlocksWindow:      initialState.SlashingData.Params.SignedBlocksWindow,
-		MinSignedPerWindow:      initialState.SlashingData.Params.MinSignedPerWindow,
-		DowntimeJailDuration:    initialState.SlashingData.Params.DowntimeJailDuration,
-		SlashFractionDoubleSign: initialState.SlashingData.Params.SlashFractionDoubleSign,
-		SlashFractionDowntime:   initialState.SlashingData.Params.SlashFractionDowntime,
-	}
-	var signingInfos map[string]slashing.ValidatorSigningInfo
-	for ba, vs := range initialState.SlashingData.SigningInfos {
-		signingInfos[ba] = slashing.ValidatorSigningInfo{
-			// Address: , // TODO
-			StartHeight: vs.StartHeight,
-			IndexOffset: vs.IndexOffset,
-			JailedUntil: vs.JailedUntil,
-			// Tombstoned: , // TODO
-			MissedBlocksCounter: vs.MissedBlocksCounter,
-		}
-
-	}
-	var mMissedBlocks map[string][]slashing.MissedBlock
-	for ba, mbs := range initialState.SlashingData.MissedBlocks {
-		var missedBlocks []slashing.MissedBlock
-		for _, mb := range mbs {
-			missedBlocks = append(
-				missedBlocks,
-				slashing.MissedBlock{
-					Index:  mb.Index,
-					Missed: mb.Missed,
-				},
-			)
-		}
-		mMissedBlocks[ba] = missedBlocks
-	}
-
-	return slashing.GenesisState{
-		Params:       slashingParams,
-		SigningInfos: signingInfos,
-		MissedBlocks: mMissedBlocks,
-	}
-}
-
 func migrateStaking(initialState v0_17.GenesisFileState) staking.GenesisState {
-	stakingParams := staking.Params{
+	params := staking.Params{
 		UnbondingTime:     initialState.StakeData.Params.UnbondingTime,
 		MaxValidators:     initialState.StakeData.Params.MaxValidators,
-		MaxEntries:        staking.DefaultParams().MaxEntries,        // TODO
-		HistoricalEntries: staking.DefaultParams().HistoricalEntries, // TODO
-		BondDenom:         staking.DefaultParams().BondDenom,         // TODO
+		MaxEntries:        staking.DefaultParams().MaxEntries,
+		HistoricalEntries: staking.DefaultParams().HistoricalEntries,
+		BondDenom:         sdk.DefaultBondDenom,
 	}
 	lastTotalPower := initialState.StakeData.LastTotalPower
 	var lastValidatorPowers []staking.LastValidatorPower
@@ -262,7 +189,7 @@ func migrateStaking(initialState v0_17.GenesisFileState) staking.GenesisState {
 			lastValidatorPowers,
 			staking.LastValidatorPower{
 				Address: lvp.Address,
-				Power:   lvp.Power.Int64(), // TODO
+				Power:   lvp.Power.Quo(sdk.NewInt(sdk.Precision)).Int64(), // TODO
 			},
 		)
 	}
@@ -275,13 +202,13 @@ func migrateStaking(initialState v0_17.GenesisFileState) staking.GenesisState {
 				ConsPubKey:      v.ConsPubKey,
 				Jailed:          v.Jailed,
 				Status:          v.Status,
-				Tokens:          v.Tokens.TruncateInt(), // TODO
+				Tokens:          sdk.NewIntFromBigInt(v.Tokens.Int), // TODO
 				DelegatorShares: v.DelegatorShares,
 				Description: staking.Description{
 					Moniker:         v.Description.Moniker,
 					Identity:        v.Description.Identity,
 					Website:         v.Description.Website,
-					SecurityContact: "", // TODO
+					SecurityContact: "",
 					Details:         v.Description.Details,
 				},
 				UnbondingHeight:         v.UnbondingHeight,
@@ -294,7 +221,7 @@ func migrateStaking(initialState v0_17.GenesisFileState) staking.GenesisState {
 					},
 					UpdateTime: v.Commission.UpdateTime,
 				},
-				MinSelfDelegation: sdk.OneInt(), // TODO
+				MinSelfDelegation: sdk.ZeroInt(), // TODO
 			},
 		)
 	}
@@ -316,7 +243,14 @@ func migrateStaking(initialState v0_17.GenesisFileState) staking.GenesisState {
 			staking.UnbondingDelegation{
 				DelegatorAddress: b.DelegatorAddr,
 				ValidatorAddress: b.ValidatorAddr,
-				Entries:          []staking.UnbondingDelegationEntry{}, // TODO
+				Entries: []staking.UnbondingDelegationEntry{
+					staking.UnbondingDelegationEntry{
+						CreationHeight: b.CreationHeight,
+						CompletionTime: b.MinTime,
+						InitialBalance: b.InitialBalance.Amount,
+						Balance:        b.Balance.Amount,
+					},
+				},
 			},
 		)
 	}
@@ -328,14 +262,21 @@ func migrateStaking(initialState v0_17.GenesisFileState) staking.GenesisState {
 				DelegatorAddress:    r.DelegatorAddr,
 				ValidatorSrcAddress: r.ValidatorSrcAddr,
 				ValidatorDstAddress: r.ValidatorDstAddr,
-				Entries:             []staking.RedelegationEntry{}, // TODO
+				Entries: []staking.RedelegationEntry{
+					staking.RedelegationEntry{
+						CreationHeight: r.CreationHeight,
+						CompletionTime: r.MinTime,
+						InitialBalance: r.InitialBalance.Amount,
+						SharesDst:      r.SharesDst,
+					},
+				},
 			},
 		)
 	}
 	exported := initialState.StakeData.Exported
 
 	return staking.GenesisState{
-		Params:               stakingParams,
+		Params:               params,
 		LastTotalPower:       lastTotalPower,
 		LastValidatorPowers:  lastValidatorPowers,
 		Validators:           validators,
@@ -343,6 +284,119 @@ func migrateStaking(initialState v0_17.GenesisFileState) staking.GenesisState {
 		UnbondingDelegations: unbondingDelegations,
 		Redelegations:        redelegations,
 		Exported:             exported,
+	}
+}
+
+func migrateSlashing(initialState v0_17.GenesisFileState) slashing.GenesisState {
+	params := slashing.Params{
+		SignedBlocksWindow:      initialState.SlashingData.Params.SignedBlocksWindow,
+		MinSignedPerWindow:      initialState.SlashingData.Params.MinSignedPerWindow,
+		DowntimeJailDuration:    initialState.SlashingData.Params.DowntimeJailDuration,
+		SlashFractionDoubleSign: initialState.SlashingData.Params.SlashFractionDoubleSign,
+		SlashFractionDowntime:   initialState.SlashingData.Params.SlashFractionDowntime,
+	}
+	var signingInfos map[string]slashing.ValidatorSigningInfo
+	for ba, vs := range initialState.SlashingData.SigningInfos {
+		acc, _ := sdk.ConsAddressFromBech32(ba)
+		signingInfos[ba] = slashing.ValidatorSigningInfo{
+			Address:             acc,
+			StartHeight:         vs.StartHeight,
+			IndexOffset:         vs.IndexOffset,
+			JailedUntil:         vs.JailedUntil,
+			Tombstoned:          false, // TODO
+			MissedBlocksCounter: vs.MissedBlocksCounter,
+		}
+
+	}
+	var mMissedBlocks map[string][]slashing.MissedBlock
+	for ba, mbs := range initialState.SlashingData.MissedBlocks {
+		var missedBlocks []slashing.MissedBlock
+		for _, mb := range mbs {
+			missedBlocks = append(
+				missedBlocks,
+				slashing.MissedBlock{
+					Index:  mb.Index,
+					Missed: mb.Missed,
+				},
+			)
+		}
+		mMissedBlocks[ba] = missedBlocks
+	}
+
+	return slashing.GenesisState{
+		Params:       params,
+		SigningInfos: signingInfos,
+		MissedBlocks: mMissedBlocks,
+	}
+}
+
+// TODO
+func migrateDistribution(initialState v0_17.GenesisFileState) distribution.GenesisState {
+	var feePool distribution.FeePool
+	var communityTax sdk.Dec
+	var baseProposerReward sdk.Dec
+	var bonusProposerReward sdk.Dec
+	var withdrawAddrEnabled bool
+	var delegatorWithdrawInfos []distribution.DelegatorWithdrawInfo
+	var previousProposer sdk.ConsAddress
+	var outstandingRewards []distribution.ValidatorOutstandingRewardsRecord
+	var validatorAccumulatedCommissions []distribution.ValidatorAccumulatedCommissionRecord
+	var validatorHistoricalRewards []distribution.ValidatorHistoricalRewardsRecord
+	var validatorCurrentRewards []distribution.ValidatorCurrentRewardsRecord
+	var delegatorStartingInfos []distribution.DelegatorStartingInfoRecord
+	var validatorSlashEvents []distribution.ValidatorSlashEventRecord
+
+	return distribution.GenesisState{
+		FeePool:                         feePool,
+		CommunityTax:                    communityTax,
+		BaseProposerReward:              baseProposerReward,
+		BonusProposerReward:             bonusProposerReward,
+		WithdrawAddrEnabled:             withdrawAddrEnabled,
+		DelegatorWithdrawInfos:          delegatorWithdrawInfos,
+		PreviousProposer:                previousProposer,
+		OutstandingRewards:              outstandingRewards,
+		ValidatorAccumulatedCommissions: validatorAccumulatedCommissions,
+		ValidatorHistoricalRewards:      validatorHistoricalRewards,
+		ValidatorCurrentRewards:         validatorCurrentRewards,
+		DelegatorStartingInfos:          delegatorStartingInfos,
+		ValidatorSlashEvents:            validatorSlashEvents,
+	}
+}
+
+// TODO
+func migrateGov(initialState v0_17.GenesisFileState) gov.GenesisState {
+	var startingProposalID uint64
+	var deposits gov.Deposits
+	var votes gov.Votes
+	var proposals gov.Proposals
+	var depositParams gov.DepositParams
+	var votingParams gov.VotingParams
+	var tallyParams gov.TallyParams
+
+	return gov.GenesisState{
+		StartingProposalID: startingProposalID,
+		Deposits:           deposits,
+		Votes:              votes,
+		Proposals:          proposals,
+		DepositParams:      depositParams,
+		VotingParams:       votingParams,
+		TallyParams:        tallyParams,
+	}
+}
+
+func migrateMint(initialState v0_17.GenesisFileState) mint.GenesisState {
+	minter := mint.Minter{
+		LastUpdate:    initialState.MintData.Minter.LastUpdate,
+		InflationBase: initialState.MintData.Minter.InflationBase,
+	}
+	params := mint.Params{
+		Inflation: initialState.MintData.Params.Inflation,
+		MintDenom: sdk.DefaultBondDenom,
+	}
+
+	return mint.GenesisState{
+		Minter: minter,
+		Params: params,
 	}
 }
 
@@ -388,26 +442,53 @@ func migrateHTLC(initialState v0_17.GenesisFileState) htlc.GenesisState {
 	}
 }
 
-func migrateMint(initialState v0_17.GenesisFileState) mint.GenesisState {
-	minter := mint.Minter{
-		LastUpdate:    initialState.MintData.Minter.LastUpdate,
-		InflationBase: initialState.MintData.Minter.InflationBase,
+func migrateAsset(initialState v0_17.GenesisFileState) asset.GenesisState {
+	var tokens []token.FungibleToken
+	for _, t := range initialState.AssetData.Tokens {
+		tokens = append(
+			tokens,
+			token.FungibleToken{
+				Symbol:        t.BaseToken.Symbol,
+				Name:          t.BaseToken.Name,
+				Scale:         t.BaseToken.Decimal,
+				MinUnit:       t.BaseToken.MinUnitAlias,
+				InitialSupply: t.BaseToken.InitialSupply,
+				MaxSupply:     t.BaseToken.MaxSupply,
+				Mintable:      t.BaseToken.Mintable,
+				Owner:         t.BaseToken.Owner,
+			},
+		)
 	}
-	mintParams := mint.Params{
-		Inflation: initialState.MintData.Params.Inflation,
-		MintDenom: mint.DefaultParams().MintDenom, // TODO
+	tokenState := token.GenesisState{
+		Params: token.Params{
+			AssetTaxRate:      initialState.AssetData.Params.AssetTaxRate,
+			IssueTokenBaseFee: initialState.AssetData.Params.IssueTokenBaseFee,
+			MintTokenFeeRatio: initialState.AssetData.Params.MintTokenFeeRatio,
+		},
+		Tokens: tokens,
 	}
 
-	return mint.GenesisState{
-		Minter: minter,
-		Params: mintParams,
+	return asset.GenesisState{
+		TokenState: tokenState,
 	}
 }
 
+func migrateCoinswap(initialState v0_17.GenesisFileState) coinswap.GenesisState {
+	fee, _ := sdk.NewDecFromStr(initialState.SwapData.Params.Fee.FloatString(sdk.Precision))
+	params := coinswap.Params{
+		Fee:           fee,
+		StandardDenom: sdk.DefaultBondDenom,
+	}
+
+	return coinswap.GenesisState{
+		Params: params,
+	}
+}
+
+// TODO
 func migrateGuardian(initialState v0_17.GenesisFileState) guardian.GenesisState {
 	var profilers guardian.Profilers
 	var trustees guardian.Trustees
-	// TODO
 
 	return guardian.GenesisState{
 		Profilers: profilers,
@@ -415,29 +496,11 @@ func migrateGuardian(initialState v0_17.GenesisFileState) guardian.GenesisState 
 	}
 }
 
-func migrateCoinswap(initialState v0_17.GenesisFileState) coinswap.GenesisState {
-	var coinswapParams coinswap.Params
-	// TODO
-
-	return coinswap.GenesisState{
-		Params: coinswapParams,
-	}
-}
-
-func migrateAsset(initialState v0_17.GenesisFileState) asset.GenesisState {
-	var tokenState token.GenesisState
-	// TODO
-
-	return asset.GenesisState{
-		TokenState: tokenState,
-	}
-}
-
+// TODO
 func migrateService(initialState v0_17.GenesisFileState) service.GenesisState {
-	var serviceParams service.Params
-	// TODO
+	var params service.Params
 
 	return service.GenesisState{
-		Params: serviceParams,
+		Params: params,
 	}
 }
