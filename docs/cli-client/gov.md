@@ -192,7 +192,7 @@ iriscli gov submit-proposal <flags>
 | --description            | string | Yes      |         | Description of the proposal                                                                                    |
 | --param                  | string |          |         | On-chain Parameter to be changed, eg. mint/Inflation=0.050                                                     |
 | --title                  | string | Yes      |         | Title of the proposal                                                                                          |
-| --type                   | string | Yes      |         | ProposalType of the proposal(PlainText/Parameter/SoftwareUpgrade/SoftwareHalt/CommunityTaxUsage/TokenAddition) |
+| --type                   | string | Yes      |         | ProposalType of the proposal(PlainText/Parameter/SoftwareUpgrade/SoftwareHalt/CommunityTaxUsage) |
 | --version                | uint   |          | 0       | The version of the new protocol                                                                                |
 | --software               | string |          |         | The software of the new protocol                                                                               |
 | --switch-height          | uint   |          | 0       | The switch height of the new protocol                                                                          |
@@ -227,18 +227,6 @@ iriscli gov submit-proposal --chain-id=irishub --title=<proposal-title> --descri
 
 ```bash
 iriscli gov submit-proposal --chain-id=irishub --title=<proposal-title> --description=<proposal-description> --from=<key-name> --fee=0.3iris --deposit=2000iris --type=SoftwareUpgrade --software=https://github.com/irisnet/irishub/tree/v0.15.1 --version=2 --switch-height=8000 --threshold=0.8
-
-```
-
-### Submit a Token Addition Proposal
-
-**Unique Params:**
-
-- Required: `--token-symbol`, `--token-canonical-symbol`, `--token-name`
-- Optional: `--token-decimal`, `--token-min-unit-alias`
-
-```bash
-iriscli gov submit-proposal --chain-id=irishub --title=<proposal-title> --description=<proposal-description> --from=<key-name> --fee=1iris --deposit=2000iris --type=TokenAddition --token-symbol=btc --token-canonical-symbol=btc --token-name=Bitcoin --token-decimal=18 --token-min-unit-alias=satoshi
 
 ```
 

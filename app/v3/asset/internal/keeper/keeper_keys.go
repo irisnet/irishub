@@ -7,8 +7,7 @@ import (
 )
 
 var (
-	PrefixGateway = []byte("gateways:") // prefix for the gateway store
-	PrefixToken   = []byte("token:")    // prefix for the token store
+	PrefixToken = []byte("token:") // prefix for the token store
 )
 
 // KeyToken returns the key of the specified token source and id
@@ -24,19 +23,4 @@ func KeyTokens(owner sdk.AccAddress, tokenId string) []byte {
 	}
 
 	return []byte(fmt.Sprintf("ownerTokens:%s:%s", owner, tokenId))
-}
-
-// KeyGateway returns the key of the specified moniker
-func KeyGateway(moniker string) []byte {
-	return []byte(fmt.Sprintf("gateways:%s", moniker))
-}
-
-// KeyOwnerGateway returns the key of the specifed owner and moniker. Intended for querying all gateways of an owner
-func KeyOwnerGateway(owner sdk.AccAddress, moniker string) []byte {
-	return []byte(fmt.Sprintf("ownerGateways:%d:%s", owner, moniker))
-}
-
-// KeyGatewaysSubspace returns the key prefix for iterating on all gateways of an owner
-func KeyGatewaysSubspace(owner sdk.AccAddress) []byte {
-	return []byte(fmt.Sprintf("ownerGateways:%d:", owner))
 }

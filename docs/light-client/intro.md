@@ -28,7 +28,7 @@ The `start` subcommand has the following flags:
 
 | Flag       | Type   | Default                 | Required | Description                                                     |
 | ---------- | ------ | ----------------------- | -------- | --------------------------------------------------------------- |
-| chain-id   | string |                         | Yes     | Chain ID of Tendermint node                                     |
+| chain-id   | string |                         | Yes      | Chain ID of Tendermint node                                     |
 | home       | string | "$HOME/.irislcd"        |          | Directory for config and data, such as key and checkpoint       |
 | node       | string | "tcp://localhost:26657" |          | Full node to connect to                                         |
 | laddr      | string | "tcp://localhost:1317"  |          | Address for server to listen on                                 |
@@ -141,16 +141,13 @@ This api supports the following special parameters. By default, their values are
 
 ### Asset module APIs
 
-1. `GET /asset/gateways/{moniker}`: Query the gateway of a given moniker
-2. `GET /asset/gateways`: Query all the gateways with an optional owner
-3. `GET /asset/fees/gateways/{moniker}`: Query the creation fee of a given gateway
-4. `GET /asset/fees/tokens/{id}`: Query the fees for issuing and minting the specified token
-5. `POST /asset/gateways`: Create a gateway
-6. `PUT /asset/gateways/{moniker}`: Edit an existing gateway
-7. `POST /asset/gateways/{moniker}/transfer`: Transfer the ownership of the given gateway
-8. `PUT /asset/tokens/{token-id}`: Edit an existing token
-9. `POST /asset/tokens/{token-id}/mint`: The asset owner and operator can directly mint tokens to a specified address
-10. `POST /asset/tokens/{token-id}/transfer-owner`: transfer the owner of a token to a new owner
+1. `POST /asset/tokens`: Issue a token
+2. `PUT /asset/tokens/{token-id}`: Edit an existing token
+3. `POST /asset/tokens/{token-id}/mint`: The asset owner and operator can directly mint tokens to a specified address
+4. `POST /asset/tokens/{token-id}/transfer`: transfer the owner of a token to a new owner
+5. `GET /asset/tokens`: Query tokens by condition
+6. `GET /asset/tokens/{token-id}`: Query token by unique id
+7. `GET /asset/tokens/{symbol}/fee`: Query the fees for issuing and minting the specified token
 
 ### Coinswap module APIs
 

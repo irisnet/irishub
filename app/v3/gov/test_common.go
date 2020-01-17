@@ -1,148 +1,108 @@
 package gov
 
 import (
-	"bytes"
-	"log"
-	"sort"
 	"testing"
 
-	"github.com/irisnet/irishub/app/protocol"
-	"github.com/irisnet/irishub/app/v3/asset"
 	"github.com/stretchr/testify/require"
 
 	abci "github.com/tendermint/tendermint/abci/types"
-	"github.com/tendermint/tendermint/crypto"
+	"github.com/tendermint/tendermint/crypto/secp256k1"
+	"github.com/tendermint/tendermint/libs/log"
+	dbm "github.com/tendermint/tm-db"
 
-	"fmt"
-
+	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/app/v1/bank"
 	"github.com/irisnet/irishub/app/v1/distribution"
 	"github.com/irisnet/irishub/app/v1/params"
 	"github.com/irisnet/irishub/app/v1/stake"
+	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/guardian"
-	"github.com/irisnet/irishub/server/mock"
+	"github.com/irisnet/irishub/store"
 	sdk "github.com/irisnet/irishub/types"
 )
 
-// initialize the mock application for this module
-func getMockApp(t *testing.T, numGenAccs int) (*mock.App, Keeper, stake.Keeper, []sdk.AccAddress, []crypto.PubKey, []crypto.PrivKey) {
-	mapp := mock.NewApp()
+// create a codec used only for testing
+func makeTestCodec() *codec.Codec {
+	var cdc = codec.New()
 
-	stake.RegisterCodec(mapp.Cdc)
-	RegisterCodec(mapp.Cdc)
+	bank.RegisterCodec(cdc)
+	auth.RegisterCodec(cdc)
+	guardian.RegisterCodec(cdc)
+	RegisterCodec(cdc)
+	sdk.RegisterCodec(cdc)
+	codec.RegisterCrypto(cdc)
 
-	keyGov := sdk.NewKVStoreKey("gov")
-	keyDistr := sdk.NewKVStoreKey("distr")
-
-	paramsKeeper := params.NewKeeper(
-		mapp.Cdc,
-		sdk.NewKVStoreKey("params"),
-		sdk.NewTransientStoreKey("transient_params"),
-	)
-	feeKeeper := auth.NewFeeKeeper(
-		mapp.Cdc,
-		sdk.NewKVStoreKey("fee"),
-		paramsKeeper.Subspace(auth.DefaultParamSpace),
-	)
-
-	ck := bank.NewBaseKeeper(mapp.Cdc, mapp.AccountKeeper)
-	sk := stake.NewKeeper(
-		mapp.Cdc,
-		mapp.KeyStake, mapp.TkeyStake,
-		mapp.BankKeeper, mapp.ParamsKeeper.Subspace(stake.DefaultParamspace),
-		stake.DefaultCodespace,
-		stake.NopMetrics())
-	dk := distribution.NewKeeper(mapp.Cdc, keyDistr, paramsKeeper.Subspace(distribution.DefaultParamspace), ck, sk, feeKeeper, DefaultCodespace, distribution.NopMetrics())
-	guardianKeeper := guardian.NewKeeper(mapp.Cdc, sdk.NewKVStoreKey("guardian"), guardian.DefaultCodespace)
-	ak := asset.NewKeeper(mapp.Cdc, protocol.KeyAsset, ck, asset.DefaultCodespace, paramsKeeper.Subspace(asset.DefaultParamSpace))
-
-	gk := NewKeeper(keyGov, mapp.Cdc, paramsKeeper.Subspace(DefaultParamSpace), paramsKeeper, sdk.NewProtocolKeeper(sdk.NewKVStoreKey("main")), ck, dk, guardianKeeper, sk, DefaultCodespace, NopMetrics(), ak)
-
-	mapp.Router().AddRoute("gov", []*sdk.KVStoreKey{keyGov}, NewHandler(gk))
-
-	mapp.SetEndBlocker(getEndBlocker(gk))
-	mapp.SetInitChainer(getInitChainer(mapp, gk, sk))
-
-	require.NoError(t, mapp.CompleteSetup(keyGov))
-
-	coin, _ := sdk.IrisCoinType.ConvertToMinDenomCoin(fmt.Sprintf("%d%s", 1042, sdk.Iris))
-	genAccs, addrs, pubKeys, privKeys := mock.CreateGenAccounts(numGenAccs, sdk.Coins{coin})
-
-	mock.SetGenesis(mapp, genAccs)
-
-	return mapp, gk, sk, addrs, pubKeys, privKeys
+	return cdc
 }
 
-// gov and stake endblocker
-func getEndBlocker(keeper Keeper) sdk.EndBlocker {
-	return func(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
-		tags := EndBlocker(ctx, keeper)
-		return abci.ResponseEndBlock{
-			Tags: tags,
-		}
+func createTestInput(t *testing.T, amt sdk.Int, nAccs int64) (sdk.Context, Keeper, []auth.Account) {
+	keyAcc := protocol.KeyAccount
+	keyParams := protocol.KeyParams
+	tkeyParams := protocol.TkeyParams
+	keyGuardian := protocol.KeyGuardian
+	keyStake := protocol.KeyStake
+	tkeyStake := protocol.TkeyStake
+	keyDistr := protocol.KeyDistr
+	keyFee := protocol.KeyFee
+	keyGov := sdk.NewKVStoreKey("govKey")
+
+	db := dbm.NewMemDB()
+	ms := store.NewCommitMultiStore(db)
+	ms.MountStoreWithDB(keyAcc, sdk.StoreTypeIAVL, db)
+	ms.MountStoreWithDB(keyParams, sdk.StoreTypeIAVL, db)
+	ms.MountStoreWithDB(tkeyParams, sdk.StoreTypeTransient, db)
+	ms.MountStoreWithDB(keyStake, sdk.StoreTypeIAVL, db)
+	ms.MountStoreWithDB(tkeyStake, sdk.StoreTypeTransient, db)
+	ms.MountStoreWithDB(keyGuardian, sdk.StoreTypeIAVL, db)
+	ms.MountStoreWithDB(keyDistr, sdk.StoreTypeIAVL, db)
+	ms.MountStoreWithDB(keyFee, sdk.StoreTypeIAVL, db)
+	ms.MountStoreWithDB(keyGov, sdk.StoreTypeIAVL, db)
+	err := ms.LoadLatestVersion()
+	require.Nil(t, err)
+
+	cdc := makeTestCodec()
+	ctx := sdk.NewContext(ms, abci.Header{ChainID: "service-chain"}, false, log.NewNopLogger())
+
+	pk := params.NewKeeper(cdc, keyParams, tkeyParams)
+	ak := auth.NewAccountKeeper(cdc, keyAcc, auth.ProtoBaseAccount)
+	bk := bank.NewBaseKeeper(cdc, ak)
+	gk := guardian.NewKeeper(cdc, keyGuardian, guardian.DefaultCodespace)
+
+	feeKeeper := auth.NewFeeKeeper(cdc, keyFee, pk.Subspace(auth.DefaultParamSpace))
+
+	sk := stake.NewKeeper(cdc, keyStake, tkeyStake, bk,
+		pk.Subspace(stake.DefaultParamspace), stake.DefaultCodespace, stake.NopMetrics())
+	dk := distribution.NewKeeper(cdc, keyDistr, pk.Subspace(distribution.DefaultParamspace),
+		bk, sk, feeKeeper, DefaultCodespace, distribution.NopMetrics())
+
+	initialCoins := sdk.Coins{
+		sdk.NewCoin(sdk.IrisAtto, amt),
 	}
+	initialCoins = initialCoins.Sort()
+	accs := createTestAccs(ctx, int(nAccs), initialCoins, &ak)
+
+	keeper := NewKeeper(keyGov, cdc, pk.Subspace(DefaultParamSpace),
+		pk, sdk.NewProtocolKeeper(sdk.NewKVStoreKey("main")),
+		bk, dk, gk, sk, DefaultCodespace, NopMetrics())
+
+	keeper.SetParamSet(ctx, DefaultParams())
+
+	return ctx, keeper, accs
 }
 
-// gov and stake initchainer
-func getInitChainer(mapp *mock.App, keeper Keeper, stakeKeeper stake.Keeper) sdk.InitChainer {
-	return func(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
-		mapp.InitChainer(ctx, req)
-
-		stakeGenesis := stake.DefaultGenesisState()
-
-		validators, err := stake.InitGenesis(ctx, stakeKeeper, stakeGenesis)
-		if err != nil {
-			panic(err)
-		}
-		InitGenesis(ctx, keeper, GenesisState{
-			Params: DefaultParams(),
-		})
-		return abci.ResponseInitChain{
-			Validators: validators,
-		}
+func createTestAccs(ctx sdk.Context, numAccs int, initialCoins sdk.Coins, ak *auth.AccountKeeper) (accs []auth.Account) {
+	for i := 0; i < numAccs; i++ {
+		privKey := secp256k1.GenPrivKey()
+		pubKey := privKey.PubKey()
+		addr := sdk.AccAddress(pubKey.Address())
+		acc := auth.NewBaseAccountWithAddress(addr)
+		acc.Coins = initialCoins
+		acc.PubKey = pubKey
+		acc.AccountNumber = uint64(i)
+		ak.SetAccount(ctx, &acc)
+		accs = append(accs, &acc)
 	}
-}
 
-// Sorts Addresses
-func SortAddresses(addrs []sdk.AccAddress) {
-	var byteAddrs [][]byte
-	for _, addr := range addrs {
-		byteAddrs = append(byteAddrs, addr.Bytes())
-	}
-	SortByteArrays(byteAddrs)
-	for i, byteAddr := range byteAddrs {
-		addrs[i] = byteAddr
-	}
-}
-
-// implement `Interface` in sort package.
-type sortByteArrays [][]byte
-
-func (b sortByteArrays) Len() int {
-	return len(b)
-}
-
-func (b sortByteArrays) Less(i, j int) bool {
-	// bytes package already implements Comparable for []byte.
-	switch bytes.Compare(b[i], b[j]) {
-	case -1:
-		return true
-	case 0, 1:
-		return false
-	default:
-		log.Panic("not fail-able with `bytes.Comparable` bounded [-1, 1].")
-		return false
-	}
-}
-
-func (b sortByteArrays) Swap(i, j int) {
-	b[j], b[i] = b[i], b[j]
-}
-
-// Public
-func SortByteArrays(src [][]byte) [][]byte {
-	sorted := sortByteArrays(src)
-	sort.Sort(sorted)
-	return sorted
+	return
 }

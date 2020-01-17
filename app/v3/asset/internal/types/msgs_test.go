@@ -1,7 +1,6 @@
 package types
 
 import (
-	"fmt"
 	"testing"
 
 	sdk "github.com/irisnet/irishub/types"
@@ -23,31 +22,19 @@ func TestMsgIssueAsset(t *testing.T) {
 		MsgIssueToken
 		expectPass bool
 	}{
-		{"native basic good", NewMsgIssueToken(FUNGIBLE, NATIVE, "a", "btc", "btc", "btc", 18, "satoshi", 1, 1, true, addr), true},
-		{"native family error", NewMsgIssueToken(0x02, NATIVE, "b", "btc", "btc", "btc", 1, "satoshi", 1, 1, true, addr), false},
-		{"native source error", NewMsgIssueToken(FUNGIBLE, 0x03, "c", "btc", "btc", "btc", 1, "satoshi", 1, 1, true, addr), false},
-		{"native symbol empty", NewMsgIssueToken(FUNGIBLE, NATIVE, "d", "", "btc", "btc", 1, "g", 1, 1, true, addr), false},
-		{"native symbol error", NewMsgIssueToken(FUNGIBLE, NATIVE, "e", "ab,c", "btc", "btc", 1, "satoshi", 1, 1, true, addr), false},
-		{"native symbol first letter is num", NewMsgIssueToken(FUNGIBLE, NATIVE, "e", "4iris", "btc", "btc", 1, "satoshi", 1, 1, true, addr), false},
-		{"native symbol too long", NewMsgIssueToken(FUNGIBLE, NATIVE, "e", "aaaaaaaaa", "btc", "btc", 1, "satoshi", 1, 1, true, addr), false},
-		{"native symbol too short", NewMsgIssueToken(FUNGIBLE, NATIVE, "e", "a", "btc", "btc", 1, "satoshi", 1, 1, true, addr), false},
-		{"native canonical_symbol ignored", NewMsgIssueToken(FUNGIBLE, NATIVE, "a", "btc", "c", "btc", 18, "satoshi", 1, 1, true, addr), true},
-		{"native min_unit_alias error", NewMsgIssueToken(FUNGIBLE, NATIVE, "g", "btc", "btc", "btc", 1, "a1,3d", 1, 1, true, addr), false},
-		{"native min_unit_alias too long", NewMsgIssueToken(FUNGIBLE, NATIVE, "g", "btc", "btc", "btc", 1, "aaaaaaaaaaaaa", 1, 1, true, addr), false},
-		{"native min_unit_alias too short", NewMsgIssueToken(FUNGIBLE, NATIVE, "g", "btc", "btc", "btc", 1, "a", 1, 1, true, addr), false},
-		{"native min_unit_alias  first letter is num", NewMsgIssueToken(FUNGIBLE, NATIVE, "g", "btc", "btc", "btc", 1, "1a", 1, 1, true, addr), false},
-		{"native name empty", NewMsgIssueToken(FUNGIBLE, NATIVE, "h", "btc", "btc", "", 1, "btc", 1, 1, true, addr), false},
-		{"native name blank", NewMsgIssueToken(FUNGIBLE, NATIVE, "h", "btc", "btc", "  ", 1, "btc", 1, 1, true, addr), false},
-		{"native name too long", NewMsgIssueToken(FUNGIBLE, NATIVE, "i", "btc", "btc", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 1, "satoshi", 1, 1, true, addr), false},
-		{"native initial supply is zero", NewMsgIssueToken(FUNGIBLE, NATIVE, "j", "btc", "btc", "btc", 1, "satoshi", 0, 1, true, addr), true},
-		{"native max supply is zero", NewMsgIssueToken(FUNGIBLE, NATIVE, "k", "btc", "btc", "btc", 1, "satoshi", 1, 0, true, addr), true},
-		{"native init supply bigger than max supply", NewMsgIssueToken(FUNGIBLE, NATIVE, "l", "btc", "btc", "btc", 1, "satoshi", 2, 1, true, addr), false},
-		{"native decimal error", NewMsgIssueToken(FUNGIBLE, NATIVE, "m", "btc", "btc", "btc", 19, "satoshi", 1, 1, true, addr), false},
-
-		{"gateway basic good", NewMsgIssueToken(FUNGIBLE, GATEWAY, "abc", "btc", "btc", "btc", 18, "satoshi", 1, 1, true, addr), true},
-		{"gateway canonical_symbol error", NewMsgIssueToken(FUNGIBLE, GATEWAY, "a", "btc", "a1,d", "btc", 18, "satoshi", 1, 1, true, addr), false},
-		{"gateway canonical_symbol too long", NewMsgIssueToken(FUNGIBLE, GATEWAY, "a", "btc", "abcdefghijklmn", "btc", 18, "satoshi", 1, 1, true, addr), false},
-		{"gateway canonical_symbol too short", NewMsgIssueToken(FUNGIBLE, GATEWAY, "a", "btc", "a", "btc", 18, "satoshi", 1, 1, true, addr), false},
+		{"basic good", NewMsgIssueToken("btc", "satoshi", "Bitcoin Network", 18, 1, 1, true, addr), true},
+		{"symbol empty", NewMsgIssueToken("", "satoshi", "Bitcoin Network", 18, 1, 1, true, addr), false},
+		{"symbol error", NewMsgIssueToken("b&tc", "satoshi", "Bitcoin Network", 18, 1, 1, true, addr), false},
+		{"symbol first letter is num", NewMsgIssueToken("4btc", "satoshi", "Bitcoin Network", 18, 1, 1, true, addr), false},
+		{"symbol too long", NewMsgIssueToken("btc1111111111", "satoshi", "Bitcoin Network", 18, 1, 1, true, addr), false},
+		{"symbol too short", NewMsgIssueToken("ht", "satoshi", "Bitcoin Network", 18, 1, 1, true, addr), false},
+		{"name empty", NewMsgIssueToken("btc", "satoshi", "", 18, 1, 1, true, addr), false},
+		{"name blank", NewMsgIssueToken("btc", "satoshi", " ", 18, 1, 1, true, addr), false},
+		{"name too long", NewMsgIssueToken("btc", "satoshi", "Bitcoin Network aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 18, 1, 1, true, addr), false},
+		{"initial supply is zero", NewMsgIssueToken("btc", "satoshi", "Bitcoin Network", 18, 0, 1, true, addr), true},
+		{"max supply is zero", NewMsgIssueToken("btc", "satoshi", "Bitcoin Network", 18, 1, 0, true, addr), true},
+		{"init supply bigger than max supply", NewMsgIssueToken("btc", "satoshi", "Bitcoin Network", 18, 2, 1, true, addr), false},
+		{"decimal error", NewMsgIssueToken("btc", "satoshi", "Bitcoin Network", 30, 1, 1, true, addr), false},
 	}
 
 	for _, tc := range tests {
@@ -59,175 +46,6 @@ func TestMsgIssueAsset(t *testing.T) {
 	}
 }
 
-func TestNewMsgCreateGateway(t *testing.T) {}
-
-func TestMsgCreateGatewayRoute(t *testing.T) {
-	owner := sdk.AccAddress([]byte("owner"))
-	moniker := "moniker"
-	identity := "identity"
-	details := "details"
-	website := "website"
-
-	// build a MsgCreateGateway
-	msg := MsgCreateGateway{
-		Owner:    owner,
-		Moniker:  moniker,
-		Identity: identity,
-		Details:  details,
-		Website:  website,
-	}
-
-	require.Equal(t, "asset", msg.Route())
-}
-
-func TestMsgCreateGatewayValidation(t *testing.T) {
-	testData := []struct {
-		name                                string
-		owner                               sdk.AccAddress
-		moniker, identity, details, website string
-		expectPass                          bool
-	}{
-		{"empty owner", emptyAddr, "mon", "i", "d", "w", false},
-		{"empty moniker", addr1, "", "i", "d", "w", false},
-		{"too short moniker", addr1, "mo", "i", "d", "w", false},
-		{"too long moniker", addr1, "monikermo", "i", "d", "w", false},
-		{"moniker contains illegal characters", addr2, "moni-", "i", "d", "w", false},
-		{"moniker begins with an illegal character", addr2, "3moni", "i", "d", "w", false},
-		{"valid msg", addr2, "moniker", "i", "d", "w", true},
-	}
-
-	for _, td := range testData {
-		msg := NewMsgCreateGateway(td.owner, td.moniker, td.identity, td.details, td.website)
-		if td.expectPass {
-			require.Nil(t, msg.ValidateBasic(), "test: %v", td.name)
-		} else {
-			require.NotNil(t, msg.ValidateBasic(), "test: %v", td.name)
-		}
-	}
-}
-
-func TestMsgCreateGatewayGetSignBytes(t *testing.T) {
-	var msg = MsgCreateGateway{
-		Owner:    sdk.AccAddress([]byte("owner")),
-		Moniker:  "moniker",
-		Identity: "identity",
-		Details:  "details",
-		Website:  "website",
-	}
-
-	res := msg.GetSignBytes()
-
-	expected := "{\"type\":\"irishub/asset/MsgCreateGateway\",\"value\":{\"details\":\"details\",\"identity\":\"identity\",\"moniker\":\"moniker\",\"owner\":\"faa1damkuetjqqah8w\",\"website\":\"website\"}}"
-	require.Equal(t, expected, string(res))
-}
-
-func TestMsgCreateGatewayGetSigners(t *testing.T) {
-	var msg = MsgCreateGateway{
-		Owner:    sdk.AccAddress([]byte("owner")),
-		Moniker:  "moniker",
-		Identity: "identity",
-		Details:  "details",
-		Website:  "website",
-	}
-
-	res := msg.GetSigners()
-
-	expected := "[6F776E6572]"
-	require.Equal(t, expected, fmt.Sprintf("%v", res))
-}
-
-func TestNewMsgEditGateway(t *testing.T) {}
-
-func TestMsgEditGatewayRoute(t *testing.T) {
-	owner := sdk.AccAddress([]byte("owner"))
-	moniker := "mon"
-	identity := "i"
-	details := "d"
-	website := "w"
-
-	// build a MsgEditGateway
-	msg := MsgEditGateway{
-		Owner:    owner,
-		Moniker:  moniker,
-		Identity: identity,
-		Details:  details,
-		Website:  website,
-	}
-
-	require.Equal(t, "asset", msg.Route())
-}
-
-func TestMsgEditGatewayValidation(t *testing.T) {
-	identity := "i"
-	details := "d"
-	website := "w"
-
-	testData := []struct {
-		name                                string
-		owner                               sdk.AccAddress
-		moniker, identity, details, website string
-		expectPass                          bool
-	}{
-		{"empty owner", emptyAddr, "mon", identity, details, website, false},
-		{"empty moniker", addr1, "", identity, details, website, false},
-		{"too short moniker", addr1, "mo", identity, details, website, false},
-		{"too long moniker", addr1, "monikermo", identity, details, website, false},
-		{"moniker contains illegal characters", addr2, "moni_", identity, details, website, false},
-		{"moniker begins with an illegal character", addr2, "3moni", "i", "d", "w", false},
-		{"identity not updated", addr2, "mon", DoNotModify, details, website, true},
-		{"details not updated", addr2, "mon", identity, DoNotModify, website, true},
-		{"website not updated", addr2, "mon", identity, details, DoNotModify, true},
-		{"no updated fields", addr2, "mon", DoNotModify, DoNotModify, DoNotModify, false},
-	}
-
-	for _, td := range testData {
-		msg := NewMsgEditGateway(td.owner, td.moniker, td.identity, td.details, td.website)
-		if td.expectPass {
-			require.Nil(t, msg.ValidateBasic(), "test: %v", td.name)
-		} else {
-			require.NotNil(t, msg.ValidateBasic(), "test: %v", td.name)
-		}
-	}
-}
-
-func TestMsgEditGatewayGetSignBytes(t *testing.T) {
-	identity := "i"
-	details := "d"
-	website := "w"
-
-	var msg = MsgEditGateway{
-		Owner:    sdk.AccAddress([]byte("owner")),
-		Moniker:  "mon",
-		Identity: identity,
-		Details:  details,
-		Website:  website,
-	}
-
-	res := msg.GetSignBytes()
-
-	expected := `{"type":"irishub/asset/MsgEditGateway","value":{"details":"d","identity":"i","moniker":"mon","owner":"faa1damkuetjqqah8w","website":"w"}}`
-	require.Equal(t, expected, string(res))
-}
-
-func TestMsgEditGatewayGetSigners(t *testing.T) {
-	identity := "i"
-	details := "d"
-	website := "w"
-
-	var msg = MsgEditGateway{
-		Owner:    sdk.AccAddress([]byte("owner")),
-		Moniker:  "mon",
-		Identity: identity,
-		Details:  details,
-		Website:  website,
-	}
-
-	res := msg.GetSigners()
-
-	expected := "[6F776E6572]"
-	require.Equal(t, expected, fmt.Sprintf("%v", res))
-}
-
 // test ValidateBasic for MsgIssueToken
 func TestMsgEditToken(t *testing.T) {
 	owner := sdk.AccAddress([]byte("owner"))
@@ -237,12 +55,10 @@ func TestMsgEditToken(t *testing.T) {
 		MsgEditToken
 		expectPass bool
 	}{
-		{"native basic good", NewMsgEditToken("BTC Token", "btc", "satoshi", "x.btc", 10000, mintable, owner), true},
-		{"wrong canonical_symbol", NewMsgEditToken("BTC Token", "HT", "satoshi", "x.btc", 10000, mintable, owner), false},
-		{"wrong min_unit_alias", NewMsgEditToken("BTC Token", "btc", "btc-min", "x.ht", 10000, mintable, owner), false},
-		{"wrong token_id", NewMsgEditToken("BTC Token", "HTC", "HT", "i.ht", 10000, mintable, owner), false},
-		{"wrong max_supply", NewMsgEditToken("BTC Token", "btc", "satoshi", "x.btc", 10000000000000, mintable, owner), false},
-		{"loss owner", NewMsgEditToken("BTC Token", "btc", "satoshi", "x.btc", 10000, mintable, nil), false},
+		{"native basic good", NewMsgEditToken("BTC Token", "i.btc", 10000, mintable, owner), true},
+		{"wrong token_id", NewMsgEditToken("BTC Token", "HTC", 10000, mintable, owner), false},
+		{"wrong max_supply", NewMsgEditToken("BTC Token", "i.btc", 10000000000000, mintable, owner), false},
+		{"loss owner", NewMsgEditToken("BTC Token", "i.btc", 10000, mintable, nil), false},
 	}
 
 	for _, tc := range tests {
@@ -289,81 +105,6 @@ func TestMsgEditTokenGetSignBytes(t *testing.T) {
 	require.Equal(t, expected, string(res))
 }
 
-func TestNewMsgTransferGatewayOwner(t *testing.T) {
-	owner := sdk.AccAddress([]byte("owner"))
-	moniker := "mon"
-	newOwner := sdk.AccAddress([]byte("newOwner"))
-
-	msg := NewMsgTransferGatewayOwner(owner, moniker, newOwner)
-
-	require.Equal(t, owner, msg.Owner)
-	require.Equal(t, moniker, msg.Moniker)
-	require.Equal(t, newOwner, msg.To)
-}
-
-func TestMsgTransferGatewayOwnerRoute(t *testing.T) {
-	owner := sdk.AccAddress([]byte("owner"))
-	moniker := "mon"
-	newOwner := sdk.AccAddress([]byte("newOwner"))
-
-	msg := NewMsgTransferGatewayOwner(owner, moniker, newOwner)
-	require.Equal(t, "asset", msg.Route())
-}
-
-func TestMsgTransferGatewayOwnerValidation(t *testing.T) {
-	testData := []struct {
-		name       string
-		owner      sdk.AccAddress
-		moniker    string
-		to         sdk.AccAddress
-		expectPass bool
-	}{
-		{"empty owner", emptyAddr, "mon", addr1, false},
-		{"empty moniker", addr1, "", addr2, false},
-		{"too short moniker", addr1, "mo", addr2, false},
-		{"too long moniker", addr1, "monikermo", addr2, false},
-		{"moniker contains illegal characters", addr1, "moni$", addr2, false},
-		{"moniker begins with an illegal character", addr1, "3moni", addr2, false},
-		{"empty to address", addr1, "mon", emptyAddr, false},
-		{"the to address is same as the owner", addr1, "mon", addr1, false},
-		{"basic good", addr1, "mon", addr2, true},
-	}
-
-	for _, td := range testData {
-		msg := NewMsgTransferGatewayOwner(td.owner, td.moniker, td.to)
-		if td.expectPass {
-			require.Nil(t, msg.ValidateBasic(), "test: %v", td.name)
-		} else {
-			require.NotNil(t, msg.ValidateBasic(), "test: %v", td.name)
-		}
-	}
-}
-
-func TestMsgTransferGatewayOwnerGetSignBytes(t *testing.T) {
-	owner := sdk.AccAddress([]byte("owner"))
-	moniker := "mon"
-	newOwner := sdk.AccAddress([]byte("newOwner"))
-
-	msg := NewMsgTransferGatewayOwner(owner, moniker, newOwner)
-	res := msg.GetSignBytes()
-
-	expected := `{"type":"irishub/asset/MsgTransferGatewayOwner","value":{"moniker":"mon","owner":"faa1damkuetjqqah8w","to":"faa1dejhwnmhdejhyxslsx8"}}`
-	require.Equal(t, expected, string(res))
-}
-
-func TestMsgTransferGatewayOwnerGetSigners(t *testing.T) {
-	owner := sdk.AccAddress([]byte("owner"))
-	moniker := "mon"
-	newOwner := sdk.AccAddress([]byte("newOwner"))
-
-	msg := NewMsgTransferGatewayOwner(owner, moniker, newOwner)
-
-	res := msg.GetSigners()
-
-	expected := "[6F776E6572]"
-	require.Equal(t, expected, fmt.Sprintf("%v", res))
-}
-
 func TestMsgMintTokenValidateBasic(t *testing.T) {
 	testData := []struct {
 		msg        string
@@ -375,12 +116,12 @@ func TestMsgMintTokenValidateBasic(t *testing.T) {
 	}{
 		{"empty tokeId", "", addr1, addr2, 1000, false},
 		{"wrong tokeId", "p.btc", addr1, addr2, 1000, false},
-		{"empty owner", "btc", emptyAddr, addr2, 1000, false},
-		{"empty to", "btc", addr1, emptyAddr, 1000, true},
-		{"not empty to", "btc", addr1, addr2, 1000, true},
-		{"invalid amount", "btc", addr1, addr2, 0, false},
-		{"exceed max supply", "btc", addr1, addr2, 100000000000000, false},
-		{"basic good", "btc", addr1, addr2, 1000, true},
+		{"empty owner", "i.btc", emptyAddr, addr2, 1000, false},
+		{"empty to", "i.btc", addr1, emptyAddr, 1000, true},
+		{"not empty to", "i.btc", addr1, addr2, 1000, true},
+		{"invalid amount", "i.btc", addr1, addr2, 0, false},
+		{"exceed max supply", "i.btc", addr1, addr2, 100000000000000, false},
+		{"basic good", "i.btc", addr1, addr2, 1000, true},
 	}
 
 	for _, td := range testData {
@@ -403,9 +144,9 @@ func TestMsgTransferTokenOwnerValidation(t *testing.T) {
 	}{
 		{"empty srcOwner", emptyAddr, "btc", addr1, false},
 		{"empty tokenId", addr1, "", addr2, false},
-		{"empty dstOwner", addr1, "btc", emptyAddr, false},
+		{"empty dstOwner", addr1, "i.btc", emptyAddr, false},
 		{"invalid tokenId", addr1, "btc-min", addr2, false},
-		{"basic good", addr1, "x.btc", addr2, true},
+		{"basic good", addr1, "i.btc", addr2, true},
 	}
 
 	for _, td := range testData {
@@ -416,15 +157,4 @@ func TestMsgTransferTokenOwnerValidation(t *testing.T) {
 			require.NotNil(t, msg.ValidateBasic(), "test: %v", td.name)
 		}
 	}
-}
-
-func TestMsgTransferTokenOwnerGetSignBytes(t *testing.T) {
-	owner := sdk.AccAddress([]byte("srcOwner"))
-	tokenId := "btc"
-	newOwner := sdk.AccAddress([]byte("dstOwner"))
-
-	msg := NewMsgTransferGatewayOwner(owner, tokenId, newOwner)
-	res := msg.GetSignBytes()
-	expected := `{"type":"irishub/asset/MsgTransferGatewayOwner","value":{"moniker":"btc","owner":"faa1wdexxnmhdejhywzqzta","to":"faa1v3ehgnmhdejhysljv64"}}`
-	require.Equal(t, expected, string(res))
 }

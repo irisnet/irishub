@@ -67,7 +67,7 @@ func main() {
 		tendermintCmd,
 		server.ResetCmd(ctx, cdc, resetAppState),
 		server.ExportCmd(ctx, cdc, exportAppStateAndTMValidators),
-		server.SnapshotCmd(cdc),
+		server.SnapshotCmd(ctx, cdc, resetAppState),
 		client.LineBreak,
 	)
 

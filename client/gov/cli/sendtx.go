@@ -77,12 +77,12 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 						return err
 					}
 				}
-				percentStr := viper.GetString(flagPercent)
-				percent, err := sdk.NewDecFromStr(percentStr)
+				amountStr := viper.GetString(flagAmount)
+				amount, err := cliCtx.ParseCoins(amountStr)
 				if err != nil {
 					return err
 				}
-				taxMsg := gov.NewMsgSubmitCommunityTaxUsageProposal(msg, usage, destAddr, percent)
+				taxMsg := gov.NewMsgSubmitCommunityTaxUsageProposal(msg, usage, destAddr, amount)
 				return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{taxMsg})
 			}
 
@@ -111,40 +111,23 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 				return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 			}
 
-			if proposalType == gov.ProposalTypeTokenAddition {
-				symbol := viper.GetString(flagTokenSymbol)
-				canonicalSymbol := viper.GetString(flagTokenCanonicalSymbol)
-				name := viper.GetString(flagTokenName)
-				decimal := uint8(viper.GetInt(flagTokenDecimal))
-				alias := viper.GetString(flagTokenMinUnitAlias)
-
-				msg := gov.NewMsgSubmitTokenAdditionProposal(msg, symbol, canonicalSymbol, name, alias, decimal)
-				return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
-			}
 			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 		},
 	}
 
 	cmd.Flags().String(flagTitle, "", "title of proposal")
 	cmd.Flags().String(flagDescription, "", "description of proposal")
-	cmd.Flags().String(flagProposalType, "", "proposalType of proposal,eg:PlainText/Parameter/SoftwareUpgrade/SystemHalt/CommunityTaxUsage/TokenAddition")
+	cmd.Flags().String(flagProposalType, "", "proposalType of proposal,eg:PlainText/Parameter/SoftwareUpgrade/SystemHalt/CommunityTaxUsage")
 	cmd.Flags().String(flagDeposit, "", "deposit of proposal(at least 30% of MinDeposit)")
 	cmd.Flags().String(flagParam, "", "parameter of proposal,eg. key=value")
 	cmd.Flags().String(flagUsage, "", "the transaction fee tax usage type, valid values can be Burn, Distribute and Grant")
-	cmd.Flags().String(flagPercent, "", "percent of transaction fee tax pool to use, integer or decimal >0 and <=1")
+	cmd.Flags().String(flagAmount, "", "amount of transaction fee tax pool to use")
 	cmd.Flags().String(flagDestAddress, "", "the destination trustee address")
 
 	cmd.Flags().String(flagVersion, "0", "the version of the new protocol")
 	cmd.Flags().String(flagSoftware, " ", "the software of the new protocol")
 	cmd.Flags().String(flagSwitchHeight, "0", "the switchheight of the new protocol")
 	cmd.Flags().String(flagThreshold, "0.8", "the upgrade signal threshold of the software upgrade")
-
-	//for TokenAdditionProposal
-	cmd.Flags().String(flagTokenSymbol, "", "the asset symbol. Once created, it cannot be modified")
-	cmd.Flags().String(flagTokenCanonicalSymbol, "", "the source symbol of a external asset")
-	cmd.Flags().String(flagTokenName, "", "the asset name")
-	cmd.Flags().Uint8(flagTokenDecimal, 0, "the asset decimal. The maximum value is 18")
-	cmd.Flags().String(flagTokenMinUnitAlias, "", "the asset symbol minimum alias")
 
 	cmd.MarkFlagRequired(flagTitle)
 	cmd.MarkFlagRequired(flagDescription)

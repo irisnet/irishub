@@ -50,10 +50,8 @@ func (h HTLC) GetHashLock() []byte {
 		if h.Timestamp > 0 {
 			return sdk.SHA256(append(h.Secret, sdk.Uint64ToBigEndian(h.Timestamp)...))
 		}
-
 		return sdk.SHA256(h.Secret)
 	}
-
 	return nil
 }
 
@@ -136,7 +134,7 @@ func HTLCStateFromString(str string) (HTLCState, error) {
 func (state HTLCState) Format(s fmt.State, verb rune) {
 	switch verb {
 	case 's':
-		s.Write([]byte(fmt.Sprintf("%s", state.String())))
+		s.Write([]byte(state.String()))
 	default:
 		s.Write([]byte(fmt.Sprintf("%v", byte(state))))
 	}
@@ -165,8 +163,7 @@ func (state HTLCState) MarshalJSON() ([]byte, error) {
 // Unmarshals from JSON
 func (state *HTLCState) UnmarshalJSON(data []byte) error {
 	var s string
-	err := json.Unmarshal(data, &s)
-	if err != nil {
+	if err := json.Unmarshal(data, &s); err != nil {
 		return nil
 	}
 
