@@ -104,7 +104,7 @@ func queryDelegationDistInfo(ctx sdk.Context, _ []string, req abci.RequestQuery,
 	ddi := k.GetDelegationDistInfo(ctx, params.DelegatorAddress, params.ValidatorAddress)
 	res, errRes := codec.MarshalJSONIndent(k.cdc, ddi)
 	if errRes != nil {
-		return nil, sdk.MarshalResultErr(err)
+		return nil, sdk.MarshalResultErr(errRes)
 	}
 	return res, nil
 }
@@ -129,7 +129,7 @@ func queryAllDelegationDistInfo(ctx sdk.Context, _ []string, req abci.RequestQue
 	k.IterateDelegatorDistInfos(ctx, params.DelegatorAddress, ddiIter)
 	res, errRes := codec.MarshalJSONIndent(k.cdc, distInfos)
 	if errRes != nil {
-		return nil, sdk.MarshalResultErr(err)
+		return nil, sdk.MarshalResultErr(errRes)
 	}
 	return res, nil
 }
@@ -161,7 +161,7 @@ func queryValidatorDistInfo(ctx sdk.Context, _ []string, req abci.RequestQuery, 
 	vdi := k.GetValidatorDistInfo(ctx, params.ValidatorAddress)
 	res, errRes := codec.MarshalJSONIndent(k.cdc, vdi)
 	if errRes != nil {
-		return nil, sdk.MarshalResultErr(err)
+		return nil, sdk.MarshalResultErr(errRes)
 	}
 	return res, nil
 }
@@ -257,7 +257,7 @@ func queryRewards(ctx sdk.Context, _ []string, req abci.RequestQuery, k Keeper) 
 	rewards.Total = rewardTruncate
 	res, errRes := codec.MarshalJSONIndent(k.cdc, rewards)
 	if errRes != nil {
-		return nil, sdk.MarshalResultErr(err)
+		return nil, sdk.MarshalResultErr(errRes)
 	}
 	return res, nil
 }
