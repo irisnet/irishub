@@ -8,7 +8,6 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/tests"
 	sdk "github.com/irisnet/irishub/types"
 )
@@ -109,7 +108,7 @@ func TestIrisCLIService(t *testing.T) {
 	svcBinding := executeGetServiceBinding(t, fmt.Sprintf("iriscli service binding %s %s %v", serviceName, fooAddr.String(), flags))
 	require.Equal(t, serviceName, svcBinding.ServiceName)
 	require.Equal(t, fooAddr, svcBinding.Provider)
-	require.Equal(t, deposit, svcBinding.Deposit)
+	require.Equal(t, deposit, svcBinding.Deposit.MainUnitString())
 	require.Equal(t, pricing, svcBinding.Pricing)
 	require.Equal(t, fooAddr, svcBinding.WithdrawAddress)
 	require.True(t, svcBinding.Available)
@@ -186,7 +185,7 @@ func TestIrisCLIService(t *testing.T) {
 	svcBinding = executeGetServiceBinding(t, fmt.Sprintf("iriscli service binding %s %s %v", serviceName, barAddr.String(), flags))
 	require.True(t, svcBinding.Available)
 	require.True(t, svcBinding.DisabledTime.IsZero())
-	require.Equal(t, "10iris", svcBinding.Deposit.MainUnitString())
+	require.Equal(t, deposit, svcBinding.Deposit.MainUnitString())
 
 	// call service
 	caStr := fmt.Sprintf("iriscli service call %v", flags)
@@ -217,8 +216,8 @@ func TestIrisCLIService(t *testing.T) {
 	barCoin = convertToIrisBaseAccount(t, barAcc)
 	barAmt = getAmountFromCoinStr(barCoin)
 
-	if !(barAmt > 17 && barAmt < 19) {
-		t.Error("Test Failed: (17, 19) expected, received: {}", barAmt)
+	if !(barAmt > 7 && barAmt < 8) {
+		t.Error("Test Failed: (7, 8) expected, received: {}", barAmt)
 	}
 
 	// respond service
@@ -236,7 +235,7 @@ func TestIrisCLIService(t *testing.T) {
 	fooFees := executeGetServiceFees(t, fmt.Sprintf("iriscli service fees %s %v", fooAddr.String(), flags))
 	barFees := executeGetServiceFees(t, fmt.Sprintf("iriscli service fees %s %v", barAddr.String(), flags))
 
-	require.Equal(t, "990000000000000000iris-atto", fooFees.IncomingFee.String())
+	require.Equal(t, "1.98iris", fooFees.IncomingFee.MainUnitString())
 	require.Nil(t, fooFees.ReturnedFee)
 	require.Nil(t, barFees.ReturnedFee)
 	require.Nil(t, barFees.IncomingFee)
@@ -247,14 +246,14 @@ func TestIrisCLIService(t *testing.T) {
 	fooFees = executeGetServiceFees(t, fmt.Sprintf("iriscli service fees %s %v", fooAddr.String(), flags))
 	barFees = executeGetServiceFees(t, fmt.Sprintf("iriscli service fees %s %v", barAddr.String(), flags))
 
-	require.Equal(t, "990000000000000000iris-atto", fooFees.IncomingFee.String())
+	require.Equal(t, "1.98iris", fooFees.IncomingFee.MainUnitString())
 	require.Nil(t, fooFees.ReturnedFee)
-	require.Equal(t, "1000000000000000000iris-atto", barFees.ReturnedFee.String())
+	require.Equal(t, "2iris", barFees.ReturnedFee.MainUnitString())
 	require.Nil(t, barFees.IncomingFee)
 
-	svcBinding = executeGetServiceBinding(t, fmt.Sprintf("iriscli service binding --service-name=%s --def-chain-id=%s --bind-chain-id=%s --provider=%s %v", serviceName, chainID, chainID, fooAddr.String(), flags))
+	svcBinding = executeGetServiceBinding(t, fmt.Sprintf("iriscli service binding %s %s %v", serviceName, fooAddr.String(), flags))
 	require.NotNil(t, svcBinding)
-	require.Equal(t, "10000000000000000000iris-atto", svcBinding.Deposit.String())
+	require.Equal(t, "10iris", svcBinding.Deposit.MainUnitString())
 	require.Equal(t, true, svcBinding.Available)
 
 	// refund fees
@@ -265,8 +264,8 @@ func TestIrisCLIService(t *testing.T) {
 	barCoin = convertToIrisBaseAccount(t, barAcc)
 	barAmt = getAmountFromCoinStr(barCoin)
 
-	if !(barAmt > 17 && barAmt < 19) {
-		t.Error("Test Failed: (17, 19) expected, received: {}", barAmt)
+	if !(barAmt > 7 && barAmt < 8) {
+		t.Error("Test Failed: (7, 8) expected, received: {}", barAmt)
 	}
 
 	// withdraw fees
@@ -277,8 +276,8 @@ func TestIrisCLIService(t *testing.T) {
 	fooCoin = convertToIrisBaseAccount(t, fooAcc)
 	fooAmt = getAmountFromCoinStr(fooCoin)
 
-	if !(fooAmt > 19 && fooAmt < 21) {
-		t.Error("Test Failed: (19, 21) expected, received: {}", fooAmt)
+	if !(fooAmt > 21 && fooAmt < 22) {
+		t.Error("Test Failed: (21, 22) expected, received: {}", fooAmt)
 	}
 
 	// withdraw tax
@@ -293,12 +292,11 @@ func TestIrisCLIService(t *testing.T) {
 	executeWrite(t, wtStr, sdk.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
 
-	barAcc1 := executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", barAddr, flags))
+	newBarAcc := executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", barAddr, flags))
 
-	cliCtx := context.NewCLIContext()
-	oldAmount, _ := cliCtx.ParseCoin(barAcc.Coins[0].String())
-	newAmount, _ := cliCtx.ParseCoin(barAcc1.Coins[0].String())
+	oldBarAmt := barAcc.Coins.AmountOf(sdk.IrisAtto)
+	newBarAmt := newBarAcc.Coins.AmountOf(sdk.IrisAtto)
 
-	tax, _ := sdk.NewIntFromString("1000000000000000")
-	require.Equal(t, oldAmount.Amount.Add(tax).String(), newAmount.Amount.String())
+	tax := sdk.NewIntWithDecimal(1, 15)
+	require.Equal(t, oldBarAmt.Add(tax), newBarAmt)
 }

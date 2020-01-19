@@ -65,6 +65,10 @@ func init() {
 	FsServiceRequest.String(FlagServiceFee, "", "fee to pay for a service invocation")
 	FsServiceRequest.BytesHex(FlagReqData, nil, "hex encoded request data of a service invocation")
 	FsServiceRequest.Bool(FlagProfiling, false, "service invocation profiling model, default false")
+	FsServiceRequest.String(FlagDefChainID, "", "ID of the chain where the service definition lies")
+	FsServiceRequest.String(FlagBindChainID, "", "ID of the chain where the service binding lies")
+	FsServiceRequest.String(FlagProvider, "", "the provider address")
+	FsServiceRequest.String(FlagServiceName, "", "service name")
 
 	FsServiceResponse.BytesHex(FlagRespData, nil, "hex encoded response data of a service invocation")
 	FsServiceResponse.BytesHex(FlagErrMsg, nil, "hex encoded response error msg of a service invocation")
