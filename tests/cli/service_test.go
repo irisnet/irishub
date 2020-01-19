@@ -174,8 +174,8 @@ func TestIrisCLIService(t *testing.T) {
 	barCoin = convertToIrisBaseAccount(t, barAcc)
 	barAmt = getAmountFromCoinStr(barCoin)
 
-	if !(barAmt > 18 && barAmt < 20) {
-		t.Error("Test Failed: (18, 20) expected, received: {}", barAmt)
+	if !(barAmt > 19 && barAmt < 20) {
+		t.Error("Test Failed: (19, 20) expected, received: {}", barAmt)
 	}
 
 	// enable binding
