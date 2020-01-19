@@ -94,7 +94,7 @@ func TestIrisCLIBankTokenStatsById(t *testing.T) {
 	fooCoin := convertToIrisBaseAccount(t, fooAcc)
 	require.Equal(t, "50iris", fooCoin)
 
-	executeWrite(t, fmt.Sprintf("iriscli asset token issue %v --symbol=kitty --name=eeee --initial-supply=1000 --decimal=0 --from=foo --fee=0.6iris", flags), sdk.DefaultKeyPass)
+	executeWrite(t, fmt.Sprintf("iriscli asset token issue %v --symbol=kitty --name=eeee --initial-supply=1000 --scale=0 --from=foo --fee=0.6iris", flags), sdk.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
 
 	executeWrite(t, fmt.Sprintf("iriscli bank burn --from=foo --amount=10kitty %v --fee=0.6iris", flags), sdk.DefaultKeyPass)
