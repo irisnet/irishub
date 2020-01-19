@@ -2,6 +2,7 @@ package types
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 
 	"github.com/xeipuuv/gojsonschema"
@@ -38,9 +39,12 @@ func ValidateServiceSchemas(schemas string) sdk.Error {
 	return nil
 }
 
-// ValidateBindingPricing checks if the given pricing is valid
+// ValidateBindingPricing validates the given pricing against the Pricing JSON Schema
 func ValidateBindingPricing(pricing string) sdk.Error {
-	// TODO
+	if err := validateDocument([]byte(PricingSchema), pricing); err != nil {
+		return ErrInvalidPricing(DefaultCodespace, err.Error())
+	}
+
 	return nil
 }
 
@@ -51,8 +55,8 @@ func ValidateRequestInput(schemas string, input string) sdk.Error {
 		return err
 	}
 
-	if !validDocument(inputSchemaBz, input) {
-		return ErrInvalidRequestInput(DefaultCodespace, "invalid request input")
+	if err := validateDocument(inputSchemaBz, input); err != nil {
+		return ErrInvalidRequestInput(DefaultCodespace, err.Error())
 	}
 
 	return nil
@@ -65,8 +69,8 @@ func ValidateResponseOutput(schemas string, output string) sdk.Error {
 		return err
 	}
 
-	if !validDocument(outputSchemaBz, output) {
-		return ErrInvalidResponseOutput(DefaultCodespace, "invalid response output")
+	if err := validateDocument(outputSchemaBz, output); err != nil {
+		return ErrInvalidResponseOutput(DefaultCodespace, err.Error())
 	}
 
 	return nil
@@ -79,8 +83,8 @@ func ValidateResponseError(schemas string, errResp string) sdk.Error {
 		return err
 	}
 
-	if !validDocument(errSchemaBz, errResp) {
-		return ErrInvalidResponseErr(DefaultCodespace, "invalid response err")
+	if err := validateDocument(errSchemaBz, errResp); err != nil {
+		return ErrInvalidResponseErr(DefaultCodespace, err.Error())
 	}
 
 	return nil
@@ -183,15 +187,136 @@ func parseErrorSchema(schemas string) ([]byte, sdk.Error) {
 	return errSchemaBz, nil
 }
 
-// validDocument wraps the gojsonschema validation
-func validDocument(schema []byte, document string) bool {
+// validateDocument wraps the gojsonschema validation
+func validateDocument(schema []byte, document string) error {
 	schemaLoader := gojsonschema.NewBytesLoader(schema)
 	docLoader := gojsonschema.NewStringLoader(document)
 
 	res, err := gojsonschema.Validate(schemaLoader, docLoader)
 	if err != nil {
-		return false
+		return err
 	}
 
-	return res.Valid()
+	if !res.Valid() {
+		for _, e := range res.Errors() {
+			return errors.New(e.String()) // only return the first error
+		}
+	}
+
+	return nil
 }
+
+// PricingSchema is the Pricing JSON Schema
+const PricingSchema = `
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"title": "Irishub Service Pricing",
+	"description": "The Irishub Service Pricing specification",
+	"type": "object",
+	"definitions": {
+	  "coin": {
+		"description": "price coin",
+		"type": "object",
+		"properties": {
+		  "denom": {
+			"description": "the denomination of the coin",
+			"type": "string",
+			"pattern": "^([a-z][0-9a-z]{2}[:])?(([a-z][a-z0-9]{2,7}|x)\\.)?([a-z][a-z0-9]{2,7})(-[a-z]{3,5})?$"
+		  },
+		  "amount": {
+			"description": "the amount of the coin",
+			"type": "string",
+			"pattern": "^[0-9]+(\\.[0-9]+)?$"
+		  }
+		},
+		"additionalProperties": false,
+		"required": [
+		  "denom",
+		  "amount"
+		]
+	  },
+	  "discount": {
+		"description": "promotion discount",
+		"type": "number",
+		"minimum": 0,
+		"exclusiveMinimum": true,
+		"maximum": 1,
+		"exclusiveMaximum": true
+	  },
+	  "promotion_by_time": {
+		"description": "promotion by time",
+		"type": "object",
+		"properties": {
+		  "start_time": {
+			"description": "starting time of the promotion",
+			"type": "string",
+			"format": "date-time"
+		  },
+		  "end_time": {
+			"description": "ending time of the promotion",
+			"type": "string",
+			"format": "date-time"
+		  },
+		  "discount": {
+			"$ref": "#/definitions/discount"
+		  }
+		},
+		"additionalProperties": false,
+		"required": [
+		  "start_time",
+		  "end_time",
+		  "discount"
+		]
+	  },
+	  "promotion_by_volume": {
+		"description": "promotion by volume",
+		"type": "object",
+		"properties": {
+		  "volume": {
+			"description": "minimal volume for the promotion",
+			"type": "integer",
+			"minimum": 1
+		  },
+		  "discount": {
+			"$ref": "#/definitions/discount"
+		  }
+		},
+		"additionalProperties": false,
+		"required": [
+		  "volume",
+		  "discount"
+		]
+	  }
+	},
+	"properties": {
+	  "price": {
+		"description": "base price",
+		"type": "array",
+		"items": {
+		  "$ref": "#/definitions/coin"
+		},
+		"uniqueItems": true
+	  },
+	  "promotions_by_time": {
+		"description": "promotions by time",
+		"type": "array",
+		"items": {
+		  "$ref": "#/definitions/promotion_by_time"
+		},
+		"uniqueItems": true
+	  },
+	  "promotions_by_volume": {
+		"description": "promotions by volume",
+		"type": "array",
+		"items": {
+		  "$ref": "#/definitions/promotion_by_volume"
+		},
+		"uniqueItems": true
+	  }
+	},
+	"additionalProperties": false,
+	"required": [
+	  "price"
+	]
+  }
+`

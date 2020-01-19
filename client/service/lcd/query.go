@@ -15,22 +15,22 @@ import (
 )
 
 func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec) {
-	// query a definition
+	// query a service definition
 	r.HandleFunc(
 		fmt.Sprintf("/service/definitions/{%s}", ServiceName),
 		queryDefinitionHandlerFn(cliCtx, cdc),
 	).Methods("GET")
 
-	// get a single binding info
+	// query a service binding
 	r.HandleFunc(
-		fmt.Sprintf("/service/bindings/{%s}/{%s}/{%s}/{%s}", DefChainID, ServiceName, BindChainID, Provider),
-		bindingHandlerFn(cliCtx, cdc),
+		fmt.Sprintf("/service/bindings/{%s}/{%s}", ServiceName, Provider),
+		queryBindingHandlerFn(cliCtx, cdc),
 	).Methods("GET")
 
-	// get all bindings of a definition
+	// query all bindings of a service definition
 	r.HandleFunc(
-		fmt.Sprintf("/service/bindings/{%s}/{%s}", DefChainID, ServiceName),
-		bindingsHandlerFn(cliCtx, cdc),
+		fmt.Sprintf("/service/bindings/{%s}", ServiceName),
+		queryBindingsHandlerFn(cliCtx, cdc),
 	).Methods("GET")
 
 	// get all active requests of a binding
@@ -78,28 +78,24 @@ func queryDefinitionHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.
 	}
 }
 
-func bindingHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
+func queryBindingHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		defChainID := vars[DefChainID]
 		serviceName := vars[ServiceName]
-		bindChainID := vars[BindChainID]
-		bechProviderAddr := vars[Provider]
+		providerStr := vars[Provider]
 
-		provider, err := sdk.AccAddressFromBech32(bechProviderAddr)
+		provider, err := sdk.AccAddressFromBech32(providerStr)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
 		params := service.QueryBindingParams{
-			DefChainID:  defChainID,
 			ServiceName: serviceName,
-			BindChainID: bindChainID,
 			Provider:    provider,
 		}
 
-		bz, err := cdc.MarshalJSON(params)
+		bz, err := cliCtx.Codec.MarshalJSON(params)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -111,22 +107,21 @@ func bindingHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerF
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
-		utils.PostProcessResponse(w, cdc, res, cliCtx.Indent)
+
+		utils.PostProcessResponse(w, cliCtx.Codec, res, cliCtx.Indent)
 	}
 }
 
-func bindingsHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
+func queryBindingsHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		defChainID := vars[DefChainID]
 		serviceName := vars[ServiceName]
 
 		params := service.QueryBindingsParams{
-			DefChainID:  defChainID,
 			ServiceName: serviceName,
 		}
 
-		bz, err := cdc.MarshalJSON(params)
+		bz, err := cliCtx.Codec.MarshalJSON(params)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -139,7 +134,7 @@ func bindingsHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.Handler
 			return
 		}
 
-		utils.PostProcessResponse(w, cdc, res, cliCtx.Indent)
+		utils.PostProcessResponse(w, cliCtx.Codec, res, cliCtx.Indent)
 	}
 }
 
@@ -157,7 +152,7 @@ func requestsHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.Handler
 			return
 		}
 
-		params := service.QueryBindingParams{
+		params := service.QueryRequestsParams{
 			DefChainID:  defChainID,
 			ServiceName: serviceName,
 			BindChainID: bindChainID,

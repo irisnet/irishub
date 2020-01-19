@@ -13,16 +13,18 @@ func NewHandler(k Keeper) sdk.Handler {
 		switch msg := msg.(type) {
 		case MsgDefineService:
 			return handleMsgDefineService(ctx, k, msg)
-		case MsgSvcBind:
-			return handleMsgSvcBind(ctx, k, msg)
-		case MsgSvcBindingUpdate:
-			return handleMsgSvcBindUpdate(ctx, k, msg)
-		case MsgSvcDisable:
-			return handleMsgSvcDisable(ctx, k, msg)
-		case MsgSvcEnable:
-			return handleMsgSvcEnable(ctx, k, msg)
-		case MsgSvcRefundDeposit:
-			return handleMsgSvcRefundDeposit(ctx, k, msg)
+		case MsgBindService:
+			return handleMsgBindService(ctx, k, msg)
+		case MsgUpdateServiceBinding:
+			return handleMsgUpdateServiceBinding(ctx, k, msg)
+		case MsgSetWithdrawAddress:
+			return handleMsgSetWithdrawAddress(ctx, k, msg)
+		case MsgDisableService:
+			return handleMsgDisableService(ctx, k, msg)
+		case MsgEnableService:
+			return handleMsgEnableService(ctx, k, msg)
+		case MsgRefundServiceDeposit:
+			return handleMsgRefundServiceDeposit(ctx, k, msg)
 		case MsgSvcRequest:
 			return handleMsgSvcRequest(ctx, k, msg)
 		case MsgSvcResponse:
@@ -52,73 +54,64 @@ func handleMsgDefineService(ctx sdk.Context, k Keeper, msg MsgDefineService) sdk
 	return sdk.Result{}
 }
 
-// handleMsgSvcBind handles MsgSvcBind
-func handleMsgSvcBind(ctx sdk.Context, k Keeper, msg MsgSvcBind) sdk.Result {
+// handleMsgBindService handles MsgBindService
+func handleMsgBindService(ctx sdk.Context, k Keeper, msg MsgBindService) sdk.Result {
 	if err := k.AddServiceBinding(
-		ctx, msg.DefChainID, msg.DefName, msg.BindChainID,
-		msg.Provider, msg.BindingType, msg.Deposit, msg.Prices, msg.Level,
+		ctx, msg.ServiceName, msg.Provider, msg.Deposit,
+		msg.Pricing, msg.WithdrawAddress,
 	); err != nil {
 		return err.Result()
 	}
 
-	ctx.Logger().Info("Add service binding", "def_name", msg.DefName, "def_chain_id", msg.DefChainID,
-		"provider", msg.Provider.String(), "binding_type", msg.BindingType.String())
-
 	return sdk.Result{}
 }
 
-// handleMsgSvcBindUpdate handles MsgSvcBindingUpdate
-func handleMsgSvcBindUpdate(ctx sdk.Context, k Keeper, msg MsgSvcBindingUpdate) sdk.Result {
-	svcBinding, err := k.UpdateServiceBinding(ctx, msg.DefChainID, msg.DefName, msg.BindChainID,
-		msg.Provider, msg.BindingType, msg.Deposit, msg.Prices, msg.Level)
-	if err != nil {
-		return err.Result()
-	}
-
-	ctx.Logger().Info("Update service binding", "def_name", msg.DefName, "def_chain_id", msg.DefChainID,
-		"provider", msg.Provider.String(), "binding_type", svcBinding.BindingType.String())
-
-	return sdk.Result{}
-}
-
-// handleMsgSvcDisable handles MsgSvcDisable
-func handleMsgSvcDisable(ctx sdk.Context, k Keeper, msg MsgSvcDisable) sdk.Result {
-	if err := k.Disable(
-		ctx, msg.DefChainID, msg.DefName, msg.BindChainID, msg.Provider,
+// handleMsgUpdateServiceBinding handles MsgUpdateServiceBinding
+func handleMsgUpdateServiceBinding(ctx sdk.Context, k Keeper, msg MsgUpdateServiceBinding) sdk.Result {
+	if err := k.UpdateServiceBinding(
+		ctx, msg.ServiceName, msg.Provider,
+		msg.Deposit, msg.Pricing,
 	); err != nil {
 		return err.Result()
 	}
 
-	ctx.Logger().Info("Disable service binding", "def_name", msg.DefName, "def_chain_id", msg.DefChainID,
-		"provider", msg.Provider.String())
-
 	return sdk.Result{}
 }
 
-// handleMsgSvcEnable handles MsgSvcEnable
-func handleMsgSvcEnable(ctx sdk.Context, k Keeper, msg MsgSvcEnable) sdk.Result {
-	if err := k.Enable(
-		ctx, msg.DefChainID, msg.DefName, msg.BindChainID, msg.Provider, msg.Deposit,
+// handleMsgSetWithdrawAddress handles MsgSetWithdrawAddress
+func handleMsgSetWithdrawAddress(ctx sdk.Context, k Keeper, msg MsgSetWithdrawAddress) sdk.Result {
+	if err := k.SetWithdrawAddress(
+		ctx, msg.ServiceName, msg.Provider, msg.WithdrawAddress,
 	); err != nil {
 		return err.Result()
 	}
 
-	ctx.Logger().Info("Enable service binding", "def_name", msg.DefName, "def_chain_id", msg.DefChainID,
-		"provider", msg.Provider.String())
+	return sdk.Result{}
+}
+
+// handleMsgDisableService handles MsgDisableService
+func handleMsgDisableService(ctx sdk.Context, k Keeper, msg MsgDisableService) sdk.Result {
+	if err := k.DisableService(ctx, msg.ServiceName, msg.Provider); err != nil {
+		return err.Result()
+	}
 
 	return sdk.Result{}
 }
 
-// handleMsgSvcRefundDeposit handles MsgSvcRefundDeposit
-func handleMsgSvcRefundDeposit(ctx sdk.Context, k Keeper, msg MsgSvcRefundDeposit) sdk.Result {
-	if err := k.RefundDeposit(
-		ctx, msg.DefChainID, msg.DefName, msg.BindChainID, msg.Provider,
-	); err != nil {
+// handleMsgEnableService handles MsgEnableService
+func handleMsgEnableService(ctx sdk.Context, k Keeper, msg MsgEnableService) sdk.Result {
+	if err := k.EnableService(ctx, msg.ServiceName, msg.Provider, msg.Deposit); err != nil {
 		return err.Result()
 	}
 
-	ctx.Logger().Info("Refund deposit", "def_name", msg.DefName, "def_chain_id", msg.DefChainID,
-		"provider", msg.Provider.String())
+	return sdk.Result{}
+}
+
+// handleMsgRefundServiceDeposit handles MsgRefundServiceDeposit
+func handleMsgRefundServiceDeposit(ctx sdk.Context, k Keeper, msg MsgRefundServiceDeposit) sdk.Result {
+	if err := k.RefundDeposit(ctx, msg.ServiceName, msg.Provider); err != nil {
+		return err.Result()
+	}
 
 	return sdk.Result{}
 }

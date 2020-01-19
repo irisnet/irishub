@@ -18,17 +18,14 @@ type QueryDefinitionParams struct {
 	ServiceName string
 }
 
-// QueryBindingParams
+// QueryBindingParams defines the params to query a service binding
 type QueryBindingParams struct {
-	DefChainID  string
 	ServiceName string
-	BindChainID string
 	Provider    sdk.AccAddress
 }
 
-// QueryBindingsParams
+// QueryBindingsParams defines the params to query all service bindings of a service
 type QueryBindingsParams struct {
-	DefChainID  string
 	ServiceName string
 }
 

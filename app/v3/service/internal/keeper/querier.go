@@ -56,9 +56,9 @@ func queryBinding(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sdk
 		return nil, sdk.ParseParamsErr(err)
 	}
 
-	svcBinding, found := k.GetServiceBinding(ctx, params.DefChainID, params.ServiceName, params.BindChainID, params.Provider)
+	svcBinding, found := k.GetServiceBinding(ctx, params.ServiceName, params.Provider)
 	if !found {
-		return nil, types.ErrSvcBindingNotExists(types.DefaultCodespace)
+		return nil, types.ErrUnknownServiceBinding(types.DefaultCodespace)
 	}
 
 	bz, err := codec.MarshalJSONIndent(k.cdc, svcBinding)
@@ -76,13 +76,14 @@ func queryBindings(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sd
 		return nil, sdk.ParseParamsErr(err)
 	}
 
-	iterator := k.ServiceBindingsIterator(ctx, params.DefChainID, params.ServiceName)
+	iterator := k.ServiceBindingsIterator(ctx, params.ServiceName)
 	defer iterator.Close()
 
-	var bindings []types.SvcBinding
+	var bindings []types.ServiceBinding
 	for ; iterator.Valid(); iterator.Next() {
-		var binding types.SvcBinding
+		var binding types.ServiceBinding
 		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &binding)
+
 		bindings = append(bindings, binding)
 	}
 
@@ -95,7 +96,7 @@ func queryBindings(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sd
 }
 
 func queryRequests(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sdk.Error) {
-	var params types.QueryBindingParams
+	var params types.QueryRequestsParams
 	err := k.cdc.UnmarshalJSON(req.Data, &params)
 	if err != nil {
 		return nil, sdk.ParseParamsErr(err)

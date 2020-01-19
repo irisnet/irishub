@@ -313,22 +313,22 @@ func executeGetServiceDefinition(t *testing.T, cmdStr string) service.ServiceDef
 	return svcDef
 }
 
-func executeGetServiceBinding(t *testing.T, cmdStr string) service.SvcBinding {
+func executeGetServiceBinding(t *testing.T, cmdStr string) service.ServiceBinding {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
-	var serviceBinding service.SvcBinding
+	var svcBinding service.ServiceBinding
 	cdc := app.MakeLatestCodec()
-	err := cdc.UnmarshalJSON([]byte(out), &serviceBinding)
+	err := cdc.UnmarshalJSON([]byte(out), &svcBinding)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
-	return serviceBinding
+	return svcBinding
 }
 
-func executeGetServiceBindings(t *testing.T, cmdStr string) []service.SvcBinding {
+func executeGetServiceBindings(t *testing.T, cmdStr string) []service.ServiceBinding {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
-	var serviceBindings []service.SvcBinding
+	var svcBindings []service.ServiceBinding
 	cdc := app.MakeLatestCodec()
-	err := cdc.UnmarshalJSON([]byte(out), &serviceBindings)
+	err := cdc.UnmarshalJSON([]byte(out), &svcBindings)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
-	return serviceBindings
+	return svcBindings
 }
 
 func executeGetProfilers(t *testing.T, cmdStr string) []guardian.Guardian {

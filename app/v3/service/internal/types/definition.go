@@ -38,5 +38,6 @@ func (svcDef ServiceDefinition) String() string {
 		AuthorDescription:     %s
 		Schemas:               %s`,
 		svcDef.Name, svcDef.Description, svcDef.Tags,
-		svcDef.Author, svcDef.AuthorDescription, svcDef.Schemas)
+		svcDef.Author, svcDef.AuthorDescription, svcDef.Schemas,
+	)
 }
