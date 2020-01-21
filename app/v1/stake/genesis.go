@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/irisnet/irishub/app/v1/stake/types"
-	sdk "github.com/irisnet/irishub/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 	tmtypes "github.com/tendermint/tendermint/types"
+
+	"github.com/irisnet/irishub/app/v1/stake/types"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 // InitGenesis sets the pool and parameters for the provided keeper.  For each
@@ -111,7 +112,10 @@ func ExportGenesis(ctx sdk.Context, keeper Keeper) types.GenesisState {
 
 	var lastValidatorPowers []types.LastValidatorPower
 	keeper.IterateLastValidatorPowers(ctx, func(addr sdk.ValAddress, power sdk.Int) (stop bool) {
-		lastValidatorPowers = append(lastValidatorPowers, types.LastValidatorPower{addr, power})
+		lastValidatorPowers = append(
+			lastValidatorPowers,
+			types.LastValidatorPower{Address: addr, Power: power},
+		)
 		return false
 	})
 
@@ -124,7 +128,7 @@ func ExportGenesis(ctx sdk.Context, keeper Keeper) types.GenesisState {
 		Bonds:                bonds,
 		UnbondingDelegations: unbondingDelegations,
 		Redelegations:        redelegations,
-		Exported:             true,
+		Exported:             false,
 	}
 }
 
@@ -146,12 +150,10 @@ func WriteValidators(ctx sdk.Context, keeper Keeper) (vals []tmtypes.GenesisVali
 // ValidateGenesis validates the provided staking genesis state to ensure the
 // expected invariants holds. (i.e. params in correct bounds, no duplicate validators)
 func ValidateGenesis(data types.GenesisState) error {
-	err := validateGenesisStateValidators(data.Validators)
-	if err != nil {
+	if err := validateGenesisStateValidators(data.Validators); err != nil {
 		return err
 	}
-	err = types.ValidateParams(data.Params)
-	if err != nil {
+	if err := types.ValidateParams(data.Params); err != nil {
 		return err
 	}
 

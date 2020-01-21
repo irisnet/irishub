@@ -8,7 +8,11 @@ const StartingProposalID = 1
 
 // GenesisState - all gov state that must be provided at genesis
 type GenesisState struct {
-	Params GovParams `json:"params"` // inflation params
+	Params         GovParams `json:"params"` // inflation params
+	NextProposalID uint64    `json:"next_proposal_id"`
+	Deposits       Deposits  `json:"deposits"`
+	Votes          Votes     `json:"votes"`
+	Proposals      Proposals `json:"proposals"`
 }
 
 func NewGenesisState(systemHaltPeriod int64, params GovParams) GenesisState {
@@ -26,14 +30,12 @@ func DefaultGenesisState() GenesisState {
 
 // InitGenesis - store genesis parameters
 func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
-	err := ValidateGenesis(data)
-	if err != nil {
+	if err := ValidateGenesis(data); err != nil {
 		// TODO: Handle this with #870
 		panic(err)
 	}
 
-	err = k.setInitialProposalID(ctx, StartingProposalID)
-	if err != nil {
+	if err := k.setInitialProposalID(ctx, StartingProposalID); err != nil {
 		// TODO: Handle this with #870
 		panic(err)
 	}
@@ -44,15 +46,44 @@ func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
 
 // ExportGenesis - output genesis parameters
 func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
+	proposals := k.GetProposals(ctx)
+
+	var deposits Deposits
+	var votes Votes
+	for _, proposal := range proposals {
+		depositsIterator := k.GetDeposits(ctx, proposal.GetProposalID())
+		defer depositsIterator.Close()
+		for ; depositsIterator.Valid(); depositsIterator.Next() {
+			deposit := Deposit{}
+			k.cdc.MustUnmarshalBinaryLengthPrefixed(depositsIterator.Value(), deposit)
+			deposits = append(deposits, deposit)
+		}
+
+		vitesIterator := k.GetVotes(ctx, proposal.GetProposalID())
+		defer vitesIterator.Close()
+		for ; vitesIterator.Valid(); vitesIterator.Next() {
+			vote := Vote{}
+			k.cdc.MustUnmarshalBinaryLengthPrefixed(vitesIterator.Value(), vote)
+			votes = append(votes, vote)
+		}
+	}
+
+	nextProposalID, err := k.peekCurrentProposalID(ctx)
+	if err != nil {
+		panic(err)
+	}
 
 	return GenesisState{
-		Params: k.GetParamSet(ctx),
+		Params:         k.GetParamSet(ctx),
+		NextProposalID: nextProposalID,
+		Deposits:       deposits,
+		Votes:          votes,
+		Proposals:      proposals,
 	}
 }
 
 func ValidateGenesis(data GenesisState) error {
-	err := validateParams(data.Params)
-	if err != nil {
+	if err := validateParams(data.Params); err != nil {
 		return err
 	}
 	return nil
@@ -60,7 +91,6 @@ func ValidateGenesis(data GenesisState) error {
 
 // get raw genesis raw message for testing
 func DefaultGenesisStateForCliTest() GenesisState {
-
 	return GenesisState{
 		Params: DefaultParamsForTest(),
 	}

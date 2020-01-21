@@ -2,21 +2,18 @@ package gov
 
 import (
 	"encoding/json"
+	"strconv"
 	"time"
 
 	"github.com/irisnet/irishub/app/v1/auth"
-	"github.com/irisnet/irishub/app/v3/gov/tags"
-
 	"github.com/irisnet/irishub/app/v1/bank"
 	"github.com/irisnet/irishub/app/v1/distribution"
-	stakeTypes "github.com/irisnet/irishub/app/v1/stake/types"
+	"github.com/irisnet/irishub/app/v1/params"
+	staketypes "github.com/irisnet/irishub/app/v1/stake/types"
+	"github.com/irisnet/irishub/app/v3/gov/tags"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/guardian"
 	sdk "github.com/irisnet/irishub/types"
-
-	"strconv"
-
-	"github.com/irisnet/irishub/app/v1/params"
 )
 
 // nolint
@@ -34,16 +31,13 @@ type Keeper struct {
 	cdc *codec.Codec
 
 	// The reference to the Param ProtocolKeeper to get and set Global Params
-	paramSpace   params.Subspace
-	paramsKeeper params.Keeper
-
+	paramSpace     params.Subspace
+	paramsKeeper   params.Keeper
 	protocolKeeper sdk.ProtocolKeeper
 
 	// The reference to the CoinKeeper to modify balances
-	ck bank.Keeper
-
-	dk distribution.Keeper
-
+	ck             bank.Keeper
+	dk             distribution.Keeper
 	guardianKeeper guardian.Keeper
 
 	// The ValidatorSet to get information about validators
@@ -63,7 +57,12 @@ type Keeper struct {
 // - depositing funds into proposals, and activating upon sufficient funds being deposited
 // - users voting on proposals, with weight proportional to stake in the system
 // - and tallying the result of the vote.
-func NewKeeper(key sdk.StoreKey, cdc *codec.Codec, paramSpace params.Subspace, paramsKeeper params.Keeper, protocolKeeper sdk.ProtocolKeeper, ck bank.Keeper, dk distribution.Keeper, guardianKeeper guardian.Keeper, ds sdk.DelegationSet, codespace sdk.CodespaceType, metrics *Metrics) Keeper {
+func NewKeeper(
+	key sdk.StoreKey, cdc *codec.Codec, paramSpace params.Subspace,
+	paramsKeeper params.Keeper, protocolKeeper sdk.ProtocolKeeper,
+	ck bank.Keeper, dk distribution.Keeper, guardianKeeper guardian.Keeper,
+	ds sdk.DelegationSet, codespace sdk.CodespaceType, metrics *Metrics,
+) Keeper {
 	return Keeper{
 		key,
 		cdc,
@@ -181,8 +180,25 @@ func (keeper Keeper) DeleteProposal(ctx sdk.Context, proposalID uint64) {
 	store.Delete(KeyProposal(proposalID))
 }
 
+// GetProposals returns all the proposals from store
+func (keeper Keeper) GetProposals(ctx sdk.Context) (propsals Proposals) {
+	maxProposalID, err := keeper.peekCurrentProposalID(ctx)
+	if err != nil {
+		return
+	}
+
+	for proposalID := uint64(1); proposalID < maxProposalID; proposalID++ {
+		propsals = append(propsals, keeper.GetProposal(ctx, proposalID))
+	}
+
+	return
+}
+
 // Get Proposal from store by ProposalID
-func (keeper Keeper) GetProposalsFiltered(ctx sdk.Context, voterAddr sdk.AccAddress, depositorAddr sdk.AccAddress, status ProposalStatus, numLatest uint64) []Proposal {
+func (keeper Keeper) GetProposalsFiltered(
+	ctx sdk.Context, voterAddr sdk.AccAddress, depositorAddr sdk.AccAddress,
+	status ProposalStatus, numLatest uint64,
+) []Proposal {
 
 	maxProposalID, err := keeper.peekCurrentProposalID(ctx)
 	if err != nil {
@@ -287,7 +303,10 @@ func (keeper Keeper) activateVotingPeriod(ctx sdk.Context, proposal Proposal) {
 // Votes
 
 // Adds a vote on a specific proposal
-func (keeper Keeper) AddVote(ctx sdk.Context, proposalID uint64, voterAddr sdk.AccAddress, option VoteOption) sdk.Error {
+func (keeper Keeper) AddVote(
+	ctx sdk.Context, proposalID uint64,
+	voterAddr sdk.AccAddress, option VoteOption,
+) sdk.Error {
 	proposal := keeper.GetProposal(ctx, proposalID)
 	if proposal == nil {
 		return ErrUnknownProposal(keeper.codespace, proposalID)
@@ -299,10 +318,12 @@ func (keeper Keeper) AddVote(ctx sdk.Context, proposalID uint64, voterAddr sdk.A
 	validator := keeper.vs.Validator(ctx, sdk.ValAddress(voterAddr))
 	if validator == nil {
 		isDelegator := false
-		keeper.ds.IterateDelegations(ctx, voterAddr, func(index int64, delegation sdk.Delegation) (stop bool) {
-			isDelegator = true
-			return isDelegator
-		})
+		keeper.ds.IterateDelegations(ctx, voterAddr,
+			func(index int64, delegation sdk.Delegation) (stop bool) {
+				isDelegator = true
+				return isDelegator
+			},
+		)
 		if !isDelegator {
 			return ErrOnlyValidatorOrDelegatorVote(keeper.codespace, voterAddr)
 		}
@@ -352,11 +373,6 @@ func (keeper Keeper) GetVotes(ctx sdk.Context, proposalID uint64) sdk.Iterator {
 	return sdk.KVStorePrefixIterator(store, KeyVotesSubspace(proposalID))
 }
 
-func (keeper Keeper) deleteVote(ctx sdk.Context, proposalID uint64, voterAddr sdk.AccAddress) {
-	store := ctx.KVStore(keeper.storeKey)
-	store.Delete(KeyVote(proposalID, voterAddr))
-}
-
 // =====================================================
 // Deposits
 
@@ -380,7 +396,10 @@ func (keeper Keeper) setDeposit(ctx sdk.Context, proposalID uint64, depositorAdd
 
 // Adds or updates a deposit of a specific depositor on a specific proposal
 // Activates voting period when appropriate
-func (keeper Keeper) AddDeposit(ctx sdk.Context, proposalID uint64, depositorAddr sdk.AccAddress, depositAmount sdk.Coins) (sdk.Error, bool) {
+func (keeper Keeper) AddDeposit(
+	ctx sdk.Context, proposalID uint64, depositorAddr sdk.AccAddress,
+	depositAmount sdk.Coins,
+) (sdk.Error, bool) {
 	// Checks to see if proposal exists
 	proposal := keeper.GetProposal(ctx, proposalID)
 	if proposal == nil {
@@ -393,9 +412,11 @@ func (keeper Keeper) AddDeposit(ctx sdk.Context, proposalID uint64, depositorAdd
 	}
 
 	// Send coins from depositor's account to DepositedCoinsAccAddr account
-	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, depositorAddr.String(), auth.GovDepositCoinsAccAddr.String(), depositAmount.String(), sdk.GovDepositFlow, "")
-	_, err := keeper.ck.SendCoins(ctx, depositorAddr, auth.GovDepositCoinsAccAddr, depositAmount)
-	if err != nil {
+	ctx.CoinFlowTags().AppendCoinFlowTag(
+		ctx, depositorAddr.String(), auth.GovDepositCoinsAccAddr.String(),
+		depositAmount.String(), sdk.GovDepositFlow, "",
+	)
+	if _, err := keeper.ck.SendCoins(ctx, depositorAddr, auth.GovDepositCoinsAccAddr, depositAmount); err != nil {
 		return err, false
 	}
 
@@ -446,27 +467,34 @@ func (keeper Keeper) RefundDeposits(ctx sdk.Context, proposalID uint64) {
 	}
 
 	proposal := keeper.GetProposal(ctx, proposalID)
-	BurnAmountDec := sdk.NewDecFromInt(keeper.GetDepositProcedure(ctx, proposal.GetProposalLevel()).MinDeposit.AmountOf(stakeTypes.StakeDenom)).Mul(BurnRate)
-	DepositSumInt := depositSum.AmountOf(stakeTypes.StakeDenom)
+	BurnAmountDec := sdk.NewDecFromInt(
+		keeper.GetDepositProcedure(ctx, proposal.GetProposalLevel()).
+			MinDeposit.AmountOf(staketypes.StakeDenom),
+	).Mul(BurnRate)
+	DepositSumInt := depositSum.AmountOf(staketypes.StakeDenom)
 	rate := BurnAmountDec.Quo(sdk.NewDecFromInt(DepositSumInt))
 	RefundSumInt := sdk.NewInt(0)
 	for _, deposit := range deposits {
-		AmountDec := sdk.NewDecFromInt(deposit.Amount.AmountOf(stakeTypes.StakeDenom))
+		AmountDec := sdk.NewDecFromInt(deposit.Amount.AmountOf(staketypes.StakeDenom))
 		RefundAmountInt := AmountDec.Sub(AmountDec.Mul(rate)).RoundInt()
 		RefundSumInt = RefundSumInt.Add(RefundAmountInt)
-		deposit.Amount = sdk.Coins{sdk.NewCoin(stakeTypes.StakeDenom, RefundAmountInt)}
+		deposit.Amount = sdk.Coins{sdk.NewCoin(staketypes.StakeDenom, RefundAmountInt)}
 
-		ctx.CoinFlowTags().AppendCoinFlowTag(ctx, auth.GovDepositCoinsAccAddr.String(), deposit.Depositor.String(), deposit.Amount.String(), sdk.GovDepositRefundFlow, "")
-		_, err := keeper.ck.SendCoins(ctx, auth.GovDepositCoinsAccAddr, deposit.Depositor, deposit.Amount)
-		if err != nil {
+		ctx.CoinFlowTags().AppendCoinFlowTag(
+			ctx, auth.GovDepositCoinsAccAddr.String(), deposit.Depositor.String(),
+			deposit.Amount.String(), sdk.GovDepositRefundFlow, "",
+		)
+		if _, err := keeper.ck.SendCoins(ctx, auth.GovDepositCoinsAccAddr, deposit.Depositor, deposit.Amount); err != nil {
 			panic(err)
 		}
 	}
 
-	burnCoin := sdk.NewCoin(stakeTypes.StakeDenom, DepositSumInt.Sub(RefundSumInt))
-	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, auth.GovDepositCoinsAccAddr.String(), "", burnCoin.String(), sdk.GovDepositBurnFlow, "")
-	_, err := keeper.ck.BurnCoins(ctx, auth.GovDepositCoinsAccAddr, sdk.Coins{burnCoin})
-	if err != nil {
+	burnCoin := sdk.NewCoin(staketypes.StakeDenom, DepositSumInt.Sub(RefundSumInt))
+	ctx.CoinFlowTags().AppendCoinFlowTag(
+		ctx, auth.GovDepositCoinsAccAddr.String(), "",
+		burnCoin.String(), sdk.GovDepositBurnFlow, "",
+	)
+	if _, err := keeper.ck.BurnCoins(ctx, auth.GovDepositCoinsAccAddr, sdk.Coins{burnCoin}); err != nil {
 		panic(err)
 	}
 
@@ -482,9 +510,11 @@ func (keeper Keeper) DeleteDeposits(ctx sdk.Context, proposalID uint64) {
 		deposit := &Deposit{}
 		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(depositsIterator.Value(), deposit)
 
-		ctx.CoinFlowTags().AppendCoinFlowTag(ctx, auth.GovDepositCoinsAccAddr.String(), "", deposit.Amount.String(), sdk.GovDepositBurnFlow, "")
-		_, err := keeper.ck.BurnCoins(ctx, auth.GovDepositCoinsAccAddr, deposit.Amount)
-		if err != nil {
+		ctx.CoinFlowTags().AppendCoinFlowTag(
+			ctx, auth.GovDepositCoinsAccAddr.String(), "",
+			deposit.Amount.String(), sdk.GovDepositBurnFlow, "",
+		)
+		if _, err := keeper.ck.BurnCoins(ctx, auth.GovDepositCoinsAccAddr, deposit.Amount); err != nil {
 			panic(err)
 		}
 
@@ -639,7 +669,6 @@ func (keeper Keeper) SubNormalProposalNum(ctx sdk.Context) {
 }
 
 func (keeper Keeper) SetValidatorSet(ctx sdk.Context, proposalID uint64) {
-
 	valAddrs := []sdk.ValAddress{}
 	keeper.vs.IterateBondedValidatorsByPower(ctx, func(index int64, validator sdk.Validator) (stop bool) {
 		valAddrs = append(valAddrs, validator.GetOperator())
@@ -685,8 +714,8 @@ func (keeper Keeper) SetParamSet(ctx sdk.Context, params GovParams) {
 
 func (keeper Keeper) getMinInitialDeposit(ctx sdk.Context, proposalLevel ProposalLevel) sdk.Coins {
 	minDeposit := keeper.GetDepositProcedure(ctx, proposalLevel).MinDeposit
-	minDepositInt := sdk.NewDecFromInt(minDeposit.AmountOf(stakeTypes.StakeDenom)).Mul(MinDepositRate).RoundInt()
-	return sdk.Coins{sdk.NewCoin(stakeTypes.StakeDenom, minDepositInt)}
+	minDepositInt := sdk.NewDecFromInt(minDeposit.AmountOf(staketypes.StakeDenom)).Mul(MinDepositRate).RoundInt()
+	return sdk.Coins{sdk.NewCoin(staketypes.StakeDenom, minDepositInt)}
 }
 
 // Returns the current Deposit Procedure from the global param store
@@ -808,10 +837,12 @@ func (keeper Keeper) SubProposalNum(ctx sdk.Context, p ProposalLevel) {
 }
 
 func (keeper Keeper) HasReachedTheMaxProposalNum(ctx sdk.Context, p ProposalLevel) (uint64, bool) {
-	ctx.Logger().Debug("Proposals Distribution",
+	ctx.Logger().Debug(
+		"Proposals Distribution",
 		"CriticalProposalNum", keeper.GetCriticalProposalNum(ctx),
 		"ImportantProposalNum", keeper.GetImportantProposalNum(ctx),
-		"NormalProposalNum", keeper.GetNormalProposalNum(ctx))
+		"NormalProposalNum", keeper.GetNormalProposalNum(ctx),
+	)
 
 	maxNum := keeper.GetMaxNumByProposalLevel(ctx, p)
 	switch p {
