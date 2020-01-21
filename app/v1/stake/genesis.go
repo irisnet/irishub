@@ -128,7 +128,7 @@ func ExportGenesis(ctx sdk.Context, keeper Keeper) types.GenesisState {
 		Bonds:                bonds,
 		UnbondingDelegations: unbondingDelegations,
 		Redelegations:        redelegations,
-		Exported:             false,
+		Exported:             true,
 	}
 }
 

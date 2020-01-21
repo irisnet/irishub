@@ -54,7 +54,7 @@ func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 		depositsIterator := k.GetDeposits(ctx, proposal.GetProposalID())
 		defer depositsIterator.Close()
 		for ; depositsIterator.Valid(); depositsIterator.Next() {
-			deposit := Deposit{}
+			var deposit Deposit
 			k.cdc.MustUnmarshalBinaryLengthPrefixed(depositsIterator.Value(), deposit)
 			deposits = append(deposits, deposit)
 		}
@@ -62,7 +62,7 @@ func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 		vitesIterator := k.GetVotes(ctx, proposal.GetProposalID())
 		defer vitesIterator.Close()
 		for ; vitesIterator.Valid(); vitesIterator.Next() {
-			vote := Vote{}
+			var vote Vote
 			k.cdc.MustUnmarshalBinaryLengthPrefixed(vitesIterator.Value(), vote)
 			votes = append(votes, vote)
 		}
