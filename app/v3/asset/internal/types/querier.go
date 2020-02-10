@@ -82,9 +82,6 @@ func (tsop TokensOutput) String() string {
 	for _, t := range tsop {
 		tokens = append(tokens, t.ToFungibleToken())
 	}
-	if len(tokens) == 0 {
-		return ""
-	}
 	return tokens.String()
 }
 
