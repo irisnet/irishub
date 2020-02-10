@@ -174,6 +174,10 @@ func GetCmdQuerySvcRequests(cdc *codec.Codec) *cobra.Command {
 			return nil
 		},
 	}
+	cmd.Flags().String(FlagDefChainID, "", "ID of the chain where the service definition lies")
+	cmd.Flags().String(FlagBindChainID, "", "ID of the chain where the service binding lies")
+	cmd.Flags().String(FlagProvider, "", "the provider address")
+	cmd.Flags().String(FlagServiceName, "", "service name")
 	cmd.MarkFlagRequired(FlagDefChainID)
 	cmd.MarkFlagRequired(FlagServiceName)
 	cmd.MarkFlagRequired(FlagBindChainID)
