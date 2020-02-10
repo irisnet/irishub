@@ -30,7 +30,7 @@ const (
 )
 
 // the service name only accepts alphanumeric characters, _ and -
-var reServiceName = regexp.MustCompile(`^[a-zA-Z][a-zA-Z0-9_-]+$`)
+var reServiceName = regexp.MustCompile(`^[a-zA-Z][a-zA-Z0-9_-]*$`)
 
 var (
 	_ sdk.Msg = MsgDefineService{}
