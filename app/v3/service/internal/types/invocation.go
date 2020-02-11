@@ -204,3 +204,13 @@ func GenerateRequestContextID(blockHeight int64, intraCounter int16) []byte {
 
 	return sdk.SHA256(bz)
 }
+
+// GenerateRequestID generates a unique request ID from the given params
+func GenerateRequestID(requestContextID []byte, requestContextBatchCounter uint64, batchRequestIndex int16) []byte {
+	bz := make([]byte, 10)
+
+	binary.BigEndian.PutUint64(bz, requestContextBatchCounter)
+	binary.BigEndian.PutUint16(bz[8:], uint16(batchRequestIndex))
+
+	return append(requestContextID, bz...)
+}
