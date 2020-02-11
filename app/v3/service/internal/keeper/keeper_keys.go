@@ -14,16 +14,19 @@ var (
 	// Keys for store prefixes
 	serviceDefinitionKey         = []byte{0x01}
 	serviceBindingKey            = []byte{0x02}
-	requestKey                   = []byte{0x03}
-	responseKey                  = []byte{0x04}
+	requestContextKey            = []byte{0x03}
+	expiredRequestBatchKey       = []byte{0x04}
+	newRequestBatchKey           = []byte{0x05}
+	requestKey                   = []byte{0x06}
+	responseKey                  = []byte{0x07}
 	requestsByExpirationIndexKey = []byte{0x05}
-	intraTxCounterKey            = []byte{0x06} // key for intra-block tx index
-	activeRequestKey             = []byte{0x07} // key for active request
+	intraCounterKey              = []byte{0x06}
+	activeRequestKey             = []byte{0x07}
 	returnedFeeKey               = []byte{0x08}
 	incomingFeeKey               = []byte{0x09}
 )
 
-// GetServiceDefinitionKey returns a key for the service definition with the specified name
+// GetServiceDefinitionKey returns the key for the service definition with the specified name
 func GetServiceDefinitionKey(name string) []byte {
 	return append(serviceDefinitionKey, []byte(name)...)
 }
@@ -38,14 +41,32 @@ func GetBindingsSubspace(serviceName string) []byte {
 	return append(append(serviceBindingKey, []byte(serviceName)...), emptyByte...)
 }
 
-func GetRequestKey(defChainId, serviceName, bindChainId string, provider sdk.AccAddress, height int64, counter int16) []byte {
-	return append(requestKey, getStringsKey([]string{defChainId, serviceName,
-		bindChainId, provider.String(), string(height), string(counter)})...)
+// GetRequestContextKey returns the key for the request context with the specified ID
+func GetRequestContextKey(requestContextID []byte) []byte {
+	return append(requestContextKey, requestContextID...)
 }
 
-func GetActiveRequestKey(defChainId, serviceName, bindChainId string, provider sdk.AccAddress, height int64, counter int16) []byte {
-	return append(activeRequestKey, getStringsKey([]string{defChainId, serviceName,
-		bindChainId, provider.String(), string(height), string(counter)})...)
+// GetExpiredRequestBatchKey returns the key for the request batch expiration of the specified request context
+func GetExpiredRequestBatchKey(requestContextID []byte, batchExpirationHeight int64) []byte {
+	reqBatchExpiration := append(append(sdk.Uint64ToBigEndian(uint64(batchExpirationHeight)), emptyByte...), requestContextID...)
+	return append(expiredRequestBatchKey, reqBatchExpiration...)
+}
+
+// GetNewRequestBatchKey returns the key for the new batch request of the specified request context in the given height
+func GetNewRequestBatchKey(requestContextID []byte, batchRequestHeight int64) []byte {
+	newBatchRequest := append(append(sdk.Uint64ToBigEndian(uint64(batchRequestHeight)), emptyByte...), requestContextID...)
+	return append(expiredRequestBatchKey, newBatchRequest...)
+}
+
+// GetRequestKey returns the key for the request with the specified request ID
+func GetRequestKey(requestID []byte) []byte {
+	return append(requestKey, requestID...)
+}
+
+// GetActiveRequestKey returns the key for the active request with the specified request ID in the given height
+func GetActiveRequestKey(serviceName string, provider sdk.AccAddress, expirationHeight int64, requestID []byte) []byte {
+	activeRequest := append(append(append(getStringsKey([]string{serviceName, provider.String()}), emptyByte...), sdk.Uint64ToBigEndian(uint64(expirationHeight))...), requestID...)
+	return append(activeRequestKey, activeRequest...)
 }
 
 func GetSubActiveRequestKey(defChainId, serviceName, bindChainId string, provider sdk.AccAddress) []byte {
