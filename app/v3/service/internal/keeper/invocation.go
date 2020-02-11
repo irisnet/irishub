@@ -8,90 +8,110 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 )
 
-// AddRequest
-func (k Keeper) AddRequest(
+// InitializeRequest initializes the specified service request
+func (k Keeper) InitializeRequest(
 	ctx sdk.Context,
-	defChainID,
-	defName,
-	bindChainID,
-	reqChainID string,
-	consumer,
-	provider sdk.AccAddress,
-	methodID int16,
-	input []byte,
-	serviceFee sdk.Coins,
-	profiling bool,
-) (req types.SvcRequest, err sdk.Error) {
-	binding, found := k.GetServiceBinding(ctx, defName, provider)
+	serviceName string,
+	providers []sdk.AccAddress,
+	consumer sdk.AccAddress,
+	input string,
+	maxServiceFee sdk.Coins,
+	timeout int64,
+	profiling,
+	repeated bool,
+	repeatedFrequency uint64,
+	repeatedTotal int64,
+) sdk.Error {
+	svcDef, found := k.GetServiceDefinition(ctx, serviceName)
 	if !found {
-		return req, types.ErrUnknownServiceBinding(k.codespace)
+		return types.ErrUnknownServiceDefinition(k.codespace, serviceName)
 	}
 
-	if !binding.Available {
-		return req, types.ErrServiceBindingUnavailable(k.codespace)
+	if err := types.ValidateRequestInput(svcDef.Schemas, input); err != nil {
+		return err
+	}
+
+	params := k.GetParamSet(ctx)
+	if timeout > params.MaxRequestTimeout {
+		types.ErrInvalidRequest(k.codespace, fmt.Sprintf("timeout must not be greater than %d: %d", params.MaxRequestTimeout, timeout))
+	}
+
+	if timeout == 0 {
+		timeout = params.MaxRequestTimeout
 	}
 
 	if profiling {
 		if _, found := k.gk.GetProfiler(ctx, consumer); !found {
-			return req, types.ErrNotProfiler(k.codespace, consumer)
+			return types.ErrInvalidGuardian(k.codespace, fmt.Sprintf("invalid profiler: %s", consumer))
 		}
 	}
 
-	// TODO: service fee logic
+	if repeated {
+		if repeatedFrequency == 0 {
+			repeatedFrequency = uint64(timeout)
+		}
 
-	req = types.NewSvcRequest(
-		defChainID, defName, bindChainID, reqChainID, consumer,
-		provider, methodID, input, serviceFee, profiling,
-	)
-
-	counter := k.GetIntraTxCounter(ctx)
-	k.SetIntraTxCounter(ctx, counter+1)
-
-	req.RequestIntraTxCounter = counter
-	req.RequestHeight = ctx.BlockHeight()
-
-	params := k.GetParamSet(ctx)
-	req.ExpirationHeight = req.RequestHeight + params.MaxRequestTimeout
-
-	_, err = k.bk.SendCoins(ctx, req.Consumer, auth.ServiceRequestCoinsAccAddr, req.ServiceFee)
-	if err != nil {
-		return req, err
+		if repeatedFrequency < uint64(timeout) {
+			types.ErrInvalidRequest(k.codespace, fmt.Sprintf("repeated frequency [%d] must not be less than timeout [%d]", repeatedFrequency, timeout))
+		}
+	} else {
+		repeatedFrequency = 0
+		repeatedTotal = 0
 	}
 
-	k.SetRequest(ctx, req)
-	k.AddActiveRequest(ctx, req)
-	k.AddRequestExpiration(ctx, req)
+	batchCounter := uint64(0)
+	state := types.RequestContextState(0x00)
+	respThreshold := uint16(0)
+	respHandler := ""
 
-	return req, nil
+	requestContext := types.NewRequestContext(
+		serviceName, providers, consumer, input, maxServiceFee,
+		profiling, timeout, repeated, repeatedFrequency, repeatedTotal,
+		batchCounter, state, respThreshold, respHandler,
+	)
+	requestContextID := types.GenerateRequestContextID(ctx.BlockHeight(), k.GetIntraTxCounter(ctx))
+
+	k.SetRequestContext(ctx, requestContextID, requestContext)
+
+	return nil
 }
 
-// SetRequest
-func (k Keeper) SetRequest(ctx sdk.Context, req types.SvcRequest) {
+// SetRequestContext sets the specified request context
+func (k Keeper) SetRequestContext(ctx sdk.Context, requestContextID []byte, requestContext types.RequestContext) {
+	store := ctx.KVStore(k.storeKey)
+
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(requestContext)
+	store.Set(GetRequestContextKey(requestContextID), bz)
+}
+
+// SetRequest sets the specified compact request
+func (k Keeper) SetRequest(ctx sdk.Context, req types.CompactRequest) {
 	store := ctx.KVStore(k.storeKey)
 
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(req)
-	store.Set(GetRequestKey(req.DefChainID, req.DefName, req.BindChainID,
-		req.Provider, req.RequestHeight, req.RequestIntraTxCounter), bz)
+	store.Set(GetRequestKey(types.GenerateRequestID(req.RequestContextID, req.RequestContextBatchCounter, req.Provider)), bz)
 }
 
-// AddActiveRequest
-func (k Keeper) AddActiveRequest(ctx sdk.Context, req types.SvcRequest) {
+// AddActiveRequest adds the specified active request
+func (k Keeper) AddActiveRequest(ctx sdk.Context, req types.Request) {
 	store := ctx.KVStore(k.storeKey)
 
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(req)
-	store.Set(GetActiveRequestKey(req.DefChainID, req.DefName, req.BindChainID,
-		req.Provider, req.RequestHeight, req.RequestIntraTxCounter), bz)
+
+	requestID := types.GenerateRequestID(req.RequestContextID, req.RequestContextBatchCounter, req.Provider)
+	store.Set(GetActiveRequestKey(req.ServiceName, req.Provider, req.ExpirationHeight, requestID), bz)
 }
 
-// DeleteActiveRequest
-func (k Keeper) DeleteActiveRequest(ctx sdk.Context, req types.SvcRequest) {
+// DeleteActiveRequest deletes the specified active request
+func (k Keeper) DeleteActiveRequest(ctx sdk.Context, req types.Request) {
 	store := ctx.KVStore(k.storeKey)
-	store.Delete(GetActiveRequestKey(req.DefChainID, req.DefName, req.BindChainID, req.Provider,
-		req.RequestHeight, req.RequestIntraTxCounter))
+
+	requestID := types.GenerateRequestID(req.RequestContextID, req.RequestContextBatchCounter, req.Provider)
+	store.Delete(GetActiveRequestKey(req.ServiceName, req.Provider, req.ExpirationHeight, requestID))
 }
 
 // AddRequestExpiration
-func (k Keeper) AddRequestExpiration(ctx sdk.Context, req types.SvcRequest) {
+func (k Keeper) AddRequestExpiration(ctx sdk.Context, req types.CompactRequest) {
 	store := ctx.KVStore(k.storeKey)
 
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(req)
@@ -99,7 +119,7 @@ func (k Keeper) AddRequestExpiration(ctx sdk.Context, req types.SvcRequest) {
 }
 
 // DeleteRequestExpiration
-func (k Keeper) DeleteRequestExpiration(ctx sdk.Context, req types.SvcRequest) {
+func (k Keeper) DeleteRequestExpiration(ctx sdk.Context, req types.CompactRequest) {
 	store := ctx.KVStore(k.storeKey)
 	store.Delete(GetRequestsByExpirationIndexKeyByReq(req))
 }
@@ -142,7 +162,7 @@ func (k Keeper) AddResponse(
 	provider sdk.AccAddress,
 	output,
 	errorMsg []byte,
-) (resp types.SvcResponse, err sdk.Error) {
+) (resp types.Response, err sdk.Error) {
 	expHeight, reqHeight, counter, _ := types.ConvertRequestID(requestID)
 
 	req, found := k.GetActiveRequest(ctx, expHeight, reqHeight, counter)
@@ -173,7 +193,7 @@ func (k Keeper) AddResponse(
 }
 
 // SetResponse
-func (k Keeper) SetResponse(ctx sdk.Context, resp types.SvcResponse) {
+func (k Keeper) SetResponse(ctx sdk.Context, resp types.Response) {
 	store := ctx.KVStore(k.storeKey)
 
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(resp)
@@ -450,3 +470,5 @@ func (k Keeper) SetIntraTxCounter(ctx sdk.Context, counter int16) {
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(counter)
 	store.Set(intraTxCounterKey, bz)
 }
+
+func (k Keeper) generateRequestContextID(ctx sdk.Context)
