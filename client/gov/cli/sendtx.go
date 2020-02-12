@@ -79,6 +79,9 @@ func GetCmdSubmitProposal(cdc *codec.Codec) *cobra.Command {
 				}
 				amountStr := viper.GetString(flagAmount)
 				amount, err := cliCtx.ParseCoins(amountStr)
+				if amount != nil && amount.Empty() {
+					amount = nil
+				}
 				if err != nil {
 					return err
 				}

@@ -191,6 +191,11 @@ func (msg MsgSubmitCommunityTaxUsageProposal) ValidateBasic() sdk.Error {
 	if msg.Usage != UsageTypeBurn && len(msg.DestAddress) == 0 {
 		return sdk.ErrInvalidAddress(msg.DestAddress.String())
 	}
+
+	if msg.Usage != UsageTypeBurn && msg.Amount.Empty() {
+		return sdk.ErrInvalidCoins(fmt.Sprintf("empty %s coins", msg.Usage.String()))
+	}
+
 	if !msg.Amount.IsValid() {
 		return sdk.ErrInvalidCoins(fmt.Sprintf("invalid coins %s", msg.Amount))
 	}
