@@ -514,4 +514,22 @@ func (k Keeper) SetIntraTxCounter(ctx sdk.Context, counter int16) {
 	store.Set(intraTxCounterKey, bz)
 }
 
-func (k Keeper) generateRequestContextID(ctx sdk.Context)
+func (k Keeper) RegisterResponseHandler(ctx sdk.Context, respHandlerName string, respHandler types.ResponseHandler) error {
+
+}
+
+func (k Keeper) UpdateRequestContext(ctx sdk.Context, requestContextID []byte) {
+
+}
+
+func (k Keeper) StartContext(ctx sdk.Context, requestContextID []byte) {
+
+}
+
+func (k Keeper) PauseRequest(ctx sdk.Context, requestContextID []byte) {
+
+}
+
+func (k Keeper) KillRequest(ctx sdk.Context, requestContextID []byte) {
+
+}
