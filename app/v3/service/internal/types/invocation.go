@@ -15,8 +15,7 @@ type RequestContext struct {
 	Providers         []sdk.AccAddress    `json:"providers"`
 	Consumer          sdk.AccAddress      `json:"consumer"`
 	Input             string              `json:"input"`
-	MaxServiceFee     sdk.Coins           `json:"max_service_fee"`
-	Profiling         bool                `json:"profiling"`
+	ServiceFeeCap     sdk.Coins           `json:"service_fee_cap"`
 	Timeout           int64               `json:"timeout"`
 	Repeated          bool                `json:"repeated"`
 	RepeatedFrequency uint64              `json:"repeated_frequency"`
@@ -33,8 +32,7 @@ func NewRequestContext(
 	providers []sdk.AccAddress,
 	consumer sdk.AccAddress,
 	input string,
-	maxServiceFee sdk.Coins,
-	profiling bool,
+	serviceFeeCap sdk.Coins,
 	timeout int64,
 	repeated bool,
 	repeatedFrequency uint64,
@@ -49,8 +47,7 @@ func NewRequestContext(
 		Providers:         providers,
 		Consumer:          consumer,
 		Input:             input,
-		MaxServiceFee:     maxServiceFee,
-		Profiling:         profiling,
+		ServiceFeeCap:     serviceFeeCap,
 		Timeout:           timeout,
 		Repeated:          repeated,
 		RepeatedFrequency: repeatedFrequency,
@@ -174,6 +171,9 @@ func NewEarnedFees(address sdk.AccAddress, coins sdk.Coins) EarnedFees {
 
 // RequestContextState defines the state for the request context
 type RequestContextState byte
+
+// ResponseHandler defines the response handler interface
+type ResponseHandler func(requestContextID []byte, reponses []Response)
 
 func ConvertRequestID(requestId string) (eHeight int64, rHeight int64, counter int16, err error) {
 	ss := strings.Split(requestId, "-")

@@ -1,8 +1,8 @@
 package types
 
 import (
-	"fmt"
 	"encoding/json"
+	"fmt"
 	"regexp"
 
 	sdk "github.com/irisnet/irishub/types"
@@ -461,9 +461,8 @@ type MsgRequestService struct {
 	Providers         []sdk.AccAddress `json:"providers"`
 	Consumer          sdk.AccAddress   `json:"consumer"`
 	Input             string           `json:"input"`
-	MaxServiceFee     sdk.Coins        `json:"max_service_fee"`
+	ServiceFeeCap     sdk.Coins        `json:"service_fee_cap"`
 	Timeout           int64            `json:"timeout"`
-	Profiling         bool             `json:"profiling"`
 	Repeated          bool             `json:"repeated"`
 	RepeatedFrequency uint64           `json:"repeated_frequency"`
 	RepeatedTotal     int64            `json:"repeated_total"`
@@ -475,9 +474,8 @@ func NewMsgRequestService(
 	providers []sdk.AccAddress,
 	consumer sdk.AccAddress,
 	input string,
-	maxServiceFee sdk.Coins,
+	serviceFeeCap sdk.Coins,
 	timeout int64,
-	profiling,
 	repeated bool,
 	repeatedFrequency uint64,
 	repeatedTotal int64,
@@ -487,9 +485,8 @@ func NewMsgRequestService(
 		Providers:         providers,
 		Consumer:          consumer,
 		Input:             input,
-		MaxServiceFee:     maxServiceFee,
+		ServiceFeeCap:     serviceFeeCap,
 		Timeout:           timeout,
-		Profiling:         profiling,
 		Repeated:          repeated,
 		RepeatedFrequency: repeatedFrequency,
 		RepeatedTotal:     repeatedTotal,
@@ -522,11 +519,7 @@ func (msg MsgRequestService) ValidateBasic() sdk.Error {
 		return err
 	}
 
-	if !msg.Profiling && !validServiceCoins(msg.MaxServiceFee) {
-		return ErrInvalidServiceFee(DefaultCodespace, fmt.Sprintf("invalid service fee: %s", msg.MaxServiceFee))
-	}
-
-	return validateRequest(msg)
+	return ValidateRequest(msg)
 }
 
 // GetSigners implements Msg.
@@ -884,7 +877,11 @@ func validatePricing(pricing string) sdk.Error {
 	return nil
 }
 
-func validateRequest(msg MsgRequestService) sdk.Error {
+func ValidateRequest(msg MsgRequestService) sdk.Error {
+	if !validServiceCoins(msg.ServiceFeeCap) {
+		return ErrInvalidServiceFee(DefaultCodespace, fmt.Sprintf("invalid service fee: %s", msg.ServiceFeeCap))
+	}
+
 	if len(msg.Providers) == 0 {
 		return ErrInvalidRequest(DefaultCodespace, "providers missing")
 	}
