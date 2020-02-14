@@ -12,14 +12,16 @@ const (
 	CodeUnknownFeedName            sdk.CodeType = 100
 	CodeEmptyFeedName              sdk.CodeType = 101
 	CodeExistedFeedName            sdk.CodeType = 102
-	CodeUnauthorized               sdk.CodeType = 102
-	CodeEmptyServiceName           sdk.CodeType = 103
-	CodeInvalidLatestHistory       sdk.CodeType = 104
-	CodeEmptyProviders             sdk.CodeType = 105
-	CodeInvalidServiceFeeCap       sdk.CodeType = 106
-	CodeInvalidResponseThreshold   sdk.CodeType = 107
-	CodeInvalidAddress             sdk.CodeType = 108
-	CodeEmptyAggregateArgsJsonPath sdk.CodeType = 109
+	CodeUnauthorized               sdk.CodeType = 103
+	CodeEmptyServiceName           sdk.CodeType = 104
+	CodeInvalidLatestHistory       sdk.CodeType = 105
+	CodeEmptyProviders             sdk.CodeType = 106
+	CodeInvalidServiceFeeCap       sdk.CodeType = 107
+	CodeInvalidResponseThreshold   sdk.CodeType = 108
+	CodeInvalidAddress             sdk.CodeType = 109
+	CodeEmptyAggregateArgsJsonPath sdk.CodeType = 110
+	CodeUnknownRequestContextID    sdk.CodeType = 111
+	CodeNotRegisterMethod          sdk.CodeType = 112
 )
 
 func ErrUnknownFeedName(codespace sdk.CodespaceType, feedName string) sdk.Error {
@@ -64,4 +66,12 @@ func ErrInvalidAddress(codespace sdk.CodespaceType, msg string) sdk.Error {
 
 func ErrEmptyAggregateArgsJsonPath(codespace sdk.CodespaceType) sdk.Error {
 	return sdk.NewError(codespace, CodeEmptyAggregateArgsJsonPath, "aggregate args json path can not be empty")
+}
+
+func ErrUnknownRequestContextID(codespace sdk.CodespaceType, reqCtxID []byte) sdk.Error {
+	return sdk.NewError(codespace, CodeUnknownRequestContextID, "request context ID %s does not exist", string(reqCtxID))
+}
+
+func ErrNotRegisterMethod(codespace sdk.CodespaceType, methodName string) sdk.Error {
+	return sdk.NewError(codespace, CodeNotRegisterMethod, "method %s don't register", methodName)
 }
