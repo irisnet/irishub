@@ -80,27 +80,27 @@ func Avg(data []Value) Value {
 }
 
 func ConvertToFloat64(args Value) (float64, error) {
-	switch args.(type) {
+	switch args := args.(type) {
 	case string:
-		return strconv.ParseFloat(args.(string), 64)
+		return strconv.ParseFloat(args, 64)
 	case int:
-		return float64(args.(int)), nil
+		return float64(args), nil
 	case int16:
-		return float64(args.(int16)), nil
+		return float64(args), nil
 	case int32:
-		return float64(args.(int32)), nil
+		return float64(args), nil
 	case uint:
-		return float64(args.(uint)), nil
+		return float64(args), nil
 	case uint16:
-		return float64(args.(uint16)), nil
+		return float64(args), nil
 	case uint32:
-		return float64(args.(uint32)), nil
+		return float64(args), nil
 	case uint64:
-		return float64(args.(uint64)), nil
+		return float64(args), nil
 	case float32:
-		return float64(args.(float32)), nil
+		return float64(args), nil
 	case float64:
-		return args.(float64), nil
+		return args, nil
 	}
 	return 0.0, errors.New("invalid number")
 }

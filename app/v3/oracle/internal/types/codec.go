@@ -8,6 +8,8 @@ func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(MsgStartFeed{}, "irishub/oracle/MsgStartFeed", nil)
 	cdc.RegisterConcrete(MsgPauseFeed{}, "irishub/oracle/MsgPauseFeed", nil)
 	cdc.RegisterConcrete(MsgEditFeed{}, "irishub/oracle/MsgEditFeed", nil)
+
+	cdc.RegisterConcrete(Feed{}, "irishub/oracle/Feed", nil)
 }
 
 var msgCdc = codec.New()

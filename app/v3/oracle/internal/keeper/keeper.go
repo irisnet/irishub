@@ -1,12 +1,11 @@
 package keeper
 
 import (
-	"errors"
+	"github.com/tidwall/gjson"
 
 	"github.com/irisnet/irishub/app/v3/oracle/internal/types"
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/tidwall/gjson"
 )
 
 // Keeper
@@ -27,7 +26,7 @@ func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, codespace sdk.CodespaceType, 
 		sk:        sk,
 		codespace: codespace,
 	}
-
+	_ = sk.RegisterResponseHandler(types.ModuleName, keeper.HandleServiceResponse)
 	return keeper
 }
 
@@ -36,7 +35,15 @@ func (k Keeper) CreateFeed(ctx sdk.Context, msg types.MsgCreateFeed) sdk.Error {
 	if _, found := k.GetFeed(ctx, msg.FeedName); found {
 		return types.ErrExistedFeedName(types.DefaultCodespace, msg.FeedName)
 	}
-	requestContextID, err := k.sk.CreateRequestContext(ctx)
+	requestContextID, err := k.sk.CreateRequestContext(ctx,
+		msg.ServiceName,
+		msg.Providers,
+		msg.Owner,
+		msg.Input,
+		msg.ServiceFeeCap,
+		msg.Timeout,
+		true,
+		msg.RepeatedFrequency, msg.RepeatedTotal, types.Pause, msg.ResponseThreshold, types.ModuleName)
 	if err != nil {
 		return sdk.ErrInternal(err.Error())
 	}
@@ -58,7 +65,7 @@ func (k Keeper) StartFeed(ctx sdk.Context, msg types.MsgStartFeed) sdk.Error {
 	if !found {
 		return types.ErrUnknownFeedName(types.DefaultCodespace, msg.FeedName)
 	}
-	if msg.Owner.Equals(feed.Owner) {
+	if !msg.Owner.Equals(feed.Owner) {
 		return types.ErrUnauthorized(types.DefaultCodespace, msg.FeedName, msg.Owner)
 	}
 	//Can not start feed in "running" state
@@ -135,17 +142,17 @@ func (k Keeper) EditFeed(ctx sdk.Context, msg types.MsgEditFeed) sdk.Error {
 
 //HandleServiceResponse is responsible for processing the data returned from the service module,
 //processed by the aggregate function, and then saved
-func (k Keeper) HandleServiceResponse(ctx sdk.Context, requestContextID []byte, responseOutput []string) error {
+func (k Keeper) HandleServiceResponse(ctx sdk.Context, requestContextID []byte, responseOutput []string) {
 	if len(responseOutput) == 0 {
-		return errors.New("invalid response")
+		return
 	}
 	feed, found := k.GetFeedByReqCtxID(ctx, requestContextID)
 	if !found {
-		return types.ErrUnknownRequestContextID(types.DefaultCodespace, requestContextID)
+		return
 	}
 	aggregate, err := types.GetAggregateMethod(feed.AggregateMethod)
 	if err != nil {
-		return err
+		return
 	}
 
 	var data []types.Value
@@ -156,5 +163,4 @@ func (k Keeper) HandleServiceResponse(ctx sdk.Context, requestContextID []byte, 
 	value := aggregate(data)
 	//TODO
 	k.setFeedResult(ctx, feed.FeedName, 1, feed.LatestHistory, value)
-	return nil
 }

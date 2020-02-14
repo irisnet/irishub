@@ -7,7 +7,8 @@ import (
 )
 
 const (
-	MsgRoute = "oracle" // route for oracle msg
+	ModuleName = "oracle"
+	MsgRoute   = ModuleName // route for oracle msg
 
 	LatestHistory = 100
 
@@ -37,6 +38,7 @@ type MsgCreateFeed struct {
 	LatestHistory         uint64           `json:"latest_history"`
 	Providers             []sdk.AccAddress `json:"providers"`
 	Input                 string           `json:"input"`
+	Timeout               int64            `json:"timeout"`
 	ServiceFeeCap         sdk.Coins        `json:"service_fee_cap"`
 	RepeatedFrequency     uint64           `json:"repeated_frequency"`
 	RepeatedTotal         int64            `json:"repeated_total"`
