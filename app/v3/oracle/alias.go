@@ -11,6 +11,7 @@ type (
 
 	MsgCreateFeed = types.MsgCreateFeed
 	MsgStartFeed  = types.MsgStartFeed
-	MsgStopFeed   = types.MsgStopFeed
+	MsgPauseFeed  = types.MsgPauseFeed
+	MsgKillFeed   = types.MsgKillFeed
 	MsgEditFeed   = types.MsgEditFeed
 )

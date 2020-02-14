@@ -9,18 +9,20 @@ import (
 const (
 	MsgRoute = "oracle" // route for oracle msg
 
-	MaxHistory = 10
+	LatestHistory = 100
 
 	TypeMsgCreateFeed = "create_feed" // type for MsgCreateFeed
 	TypeMsgStartFeed  = "start_feed"  // type for MsgStartFeed
-	TypeMsgStopFeed   = "stop_feed"   // type for MsgStopFeed
+	TypeMsgPauseFeed  = "pause_feed"  // type for MsgPauseFeed
+	TypeMsgKillFeed   = "kill_feed"   // type for MsgKillFeed
 	TypeMsgEditFeed   = "edit_feed"   // type for MsgEditFeed
 )
 
 var (
 	_ sdk.Msg = MsgCreateFeed{}
 	_ sdk.Msg = MsgStartFeed{}
-	_ sdk.Msg = MsgStopFeed{}
+	_ sdk.Msg = MsgPauseFeed{}
+	_ sdk.Msg = MsgKillFeed{}
 	_ sdk.Msg = MsgEditFeed{}
 )
 
@@ -28,17 +30,18 @@ var (
 
 // MsgCreateFeed - struct for create a feed
 type MsgCreateFeed struct {
-	FeedKey       string           `json:"feed_key"`
-	ServiceName   string           `json:"service_name"`
-	ResHandler    string           `json:"res_handler"`
-	MaxHistory    uint64           `json:"max_history"`
-	Providers     []sdk.AccAddress `json:"providers"`
-	Input         string           `json:"input"`
-	MaxServiceFee sdk.Coins        `json:"max_service_fee"`
-	Frequency     uint64           `json:"frequency"`
-	MaxCount      int64            `json:"max_count"`
-	ResThreshold  uint16           `json:"res_threshold"`
-	Sender        sdk.AccAddress   `json:"sender"`
+	FeedName              string           `json:"feed_name"`
+	ServiceName           string           `json:"service_name"`
+	AggregateMethod       string           `json:"aggregate_method"`
+	AggregateArgsJsonPath string           `json:"aggregate_args_json_path"`
+	LatestHistory         uint64           `json:"latest_history"`
+	Providers             []sdk.AccAddress `json:"providers"`
+	Input                 string           `json:"input"`
+	ServiceFeeCap         sdk.Coins        `json:"service_fee_cap"`
+	RepeatedFrequency     uint64           `json:"repeated_frequency"`
+	RepeatedTotal         int64            `json:"repeated_total"`
+	ResponseThreshold     uint16           `json:"response_threshold"`
+	Owner                 sdk.AccAddress   `json:"owner"`
 }
 
 // Route implements Msg.
@@ -53,9 +56,9 @@ func (msg MsgCreateFeed) Type() string {
 
 // ValidateBasic implements Msg.
 func (msg MsgCreateFeed) ValidateBasic() sdk.Error {
-	feedKey := strings.TrimSpace(msg.FeedKey)
+	feedKey := strings.TrimSpace(msg.ServiceName)
 	if len(feedKey) == 0 {
-		return ErrEmptyFeedKey(DefaultCodespace)
+		return ErrEmptyFeedName(DefaultCodespace)
 	}
 
 	serviceName := strings.TrimSpace(msg.ServiceName)
@@ -63,24 +66,33 @@ func (msg MsgCreateFeed) ValidateBasic() sdk.Error {
 		return ErrEmptyServiceName(DefaultCodespace)
 	}
 
-	if err := validateMaxHistory(msg.MaxHistory); err != nil {
-		return err
+	if msg.LatestHistory < 1 || msg.LatestHistory > LatestHistory {
+		return ErrInvalidLatestHistory(DefaultCodespace)
 	}
 
 	if len(msg.Providers) == 0 {
 		return ErrEmptyProviders(DefaultCodespace)
 	}
 
+	aggregateArgsJsonPath := strings.TrimSpace(msg.AggregateArgsJsonPath)
+	if len(aggregateArgsJsonPath) == 0 {
+		return ErrEmptyAggregateArgsJsonPath(DefaultCodespace)
+	}
+
 	if len(msg.Input) > 0 {
 		//TODO
 	}
 
-	if !msg.MaxServiceFee.IsValidIrisAtto() {
-		return ErrInvalidMaxServiceFee(DefaultCodespace, msg.MaxServiceFee)
+	if !msg.ServiceFeeCap.IsValidIrisAtto() {
+		return ErrInvalidServiceFeeCap(DefaultCodespace, msg.ServiceFeeCap)
 	}
 
-	if len(msg.Sender) == 0 {
-		return ErrInvalidAddress(DefaultCodespace, "sender can not be empty")
+	if int(msg.ResponseThreshold) > len(msg.Providers) || msg.ResponseThreshold < 1 {
+		return ErrInvalidResponseThreshold(DefaultCodespace, len(msg.Providers))
+	}
+
+	if len(msg.Owner) == 0 {
+		return ErrInvalidAddress(DefaultCodespace, "owner can not be empty")
 	}
 	return nil
 }
@@ -96,15 +108,15 @@ func (msg MsgCreateFeed) GetSignBytes() []byte {
 
 // GetSigners implements Msg.
 func (msg MsgCreateFeed) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{msg.Sender}
+	return []sdk.AccAddress{msg.Owner}
 }
 
 //______________________________________________________________________
 
 // MsgStartFeed - struct for start a feed
 type MsgStartFeed struct {
-	FeedKey string         `json:"feed_key"`
-	Sender  sdk.AccAddress `json:"sender"`
+	FeedName string         `json:"feed_name"`
+	Owner    sdk.AccAddress `json:"owner"`
 }
 
 // Route implements Msg.
@@ -119,13 +131,13 @@ func (msg MsgStartFeed) Type() string {
 
 // ValidateBasic implements Msg.
 func (msg MsgStartFeed) ValidateBasic() sdk.Error {
-	feedKey := strings.TrimSpace(msg.FeedKey)
-	if len(feedKey) == 0 {
-		return ErrEmptyFeedKey(DefaultCodespace)
+	feedName := strings.TrimSpace(msg.FeedName)
+	if len(feedName) == 0 {
+		return ErrEmptyFeedName(DefaultCodespace)
 	}
 
-	if len(msg.Sender) == 0 {
-		return ErrInvalidAddress(DefaultCodespace, "sender can not be empty")
+	if len(msg.Owner) == 0 {
+		return ErrInvalidAddress(DefaultCodespace, "owner can not be empty")
 	}
 	return nil
 }
@@ -141,42 +153,42 @@ func (msg MsgStartFeed) GetSignBytes() []byte {
 
 // GetSigners implements Msg.
 func (msg MsgStartFeed) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{msg.Sender}
+	return []sdk.AccAddress{msg.Owner}
 }
 
 //______________________________________________________________________
 
-// MsgStopFeed - struct for stop a started feed
-type MsgStopFeed struct {
-	FeedKey string         `json:"feed_key"`
-	Sender  sdk.AccAddress `json:"sender"`
+// MsgPauseFeed - struct for stop a started feed
+type MsgPauseFeed struct {
+	FeedName string         `json:"feed_name"`
+	Owner    sdk.AccAddress `json:"sender"`
 }
 
 // Route implements Msg.
-func (msg MsgStopFeed) Route() string {
+func (msg MsgPauseFeed) Route() string {
 	return MsgRoute
 }
 
 // Type implements Msg.
-func (msg MsgStopFeed) Type() string {
-	return TypeMsgStopFeed
+func (msg MsgPauseFeed) Type() string {
+	return TypeMsgPauseFeed
 }
 
 // ValidateBasic implements Msg.
-func (msg MsgStopFeed) ValidateBasic() sdk.Error {
-	feedKey := strings.TrimSpace(msg.FeedKey)
+func (msg MsgPauseFeed) ValidateBasic() sdk.Error {
+	feedKey := strings.TrimSpace(msg.FeedName)
 	if len(feedKey) == 0 {
-		return ErrEmptyFeedKey(DefaultCodespace)
+		return ErrEmptyFeedName(DefaultCodespace)
 	}
 
-	if len(msg.Sender) == 0 {
+	if len(msg.Owner) == 0 {
 		return ErrInvalidAddress(DefaultCodespace, "sender can not be empty")
 	}
 	return nil
 }
 
 // GetSignBytes implements Msg.
-func (msg MsgStopFeed) GetSignBytes() []byte {
+func (msg MsgPauseFeed) GetSignBytes() []byte {
 	b, err := msgCdc.MarshalJSON(msg)
 	if err != nil {
 		panic(err)
@@ -185,23 +197,67 @@ func (msg MsgStopFeed) GetSignBytes() []byte {
 }
 
 // GetSigners implements Msg.
-func (msg MsgStopFeed) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{msg.Sender}
+func (msg MsgPauseFeed) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{msg.Owner}
+}
+
+//______________________________________________________________________
+
+// MsgKillFeed - struct for stop a started feed
+type MsgKillFeed struct {
+	FeedName string         `json:"feed_name"`
+	Owner    sdk.AccAddress `json:"sender"`
+}
+
+// Route implements Msg.
+func (msg MsgKillFeed) Route() string {
+	return MsgRoute
+}
+
+// Type implements Msg.
+func (msg MsgKillFeed) Type() string {
+	return TypeMsgKillFeed
+}
+
+// ValidateBasic implements Msg.
+func (msg MsgKillFeed) ValidateBasic() sdk.Error {
+	feedKey := strings.TrimSpace(msg.FeedName)
+	if len(feedKey) == 0 {
+		return ErrEmptyFeedName(DefaultCodespace)
+	}
+
+	if len(msg.Owner) == 0 {
+		return ErrInvalidAddress(DefaultCodespace, "sender can not be empty")
+	}
+	return nil
+}
+
+// GetSignBytes implements Msg.
+func (msg MsgKillFeed) GetSignBytes() []byte {
+	b, err := msgCdc.MarshalJSON(msg)
+	if err != nil {
+		panic(err)
+	}
+	return sdk.MustSortJSON(b)
+}
+
+// GetSigners implements Msg.
+func (msg MsgKillFeed) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{msg.Owner}
 }
 
 //______________________________________________________________________
 
 // MsgEditFeed - struct for edit a existed feed
 type MsgEditFeed struct {
-	FeedKey       string           `json:"feed_key"`
-	ResHandler    string           `json:"res_handler"`
-	MaxHistory    uint64           `json:"max_history"`
-	Providers     []sdk.AccAddress `json:"providers"`
-	MaxServiceFee sdk.Coins        `json:"max_service_fee"`
-	Frequency     uint64           `json:"frequency"`
-	MaxCount      int64            `json:"max_count"`
-	ResThreshold  uint16           `json:"res_threshold"`
-	Sender        sdk.AccAddress   `json:"sender"`
+	FeedName          string           `json:"feed_name"`
+	LatestHistory     uint64           `json:"latest_history"`
+	Providers         []sdk.AccAddress `json:"providers"`
+	ServiceFeeCap     sdk.Coins        `json:"service_fee_cap"`
+	RepeatedFrequency uint64           `json:"repeated_frequency"`
+	RepeatedTotal     int64            `json:"repeated_total"`
+	ResponseThreshold uint16           `json:"response_threshold"`
+	Owner             sdk.AccAddress   `json:"owner"`
 }
 
 // Route implements Msg.
@@ -216,17 +272,21 @@ func (msg MsgEditFeed) Type() string {
 
 // ValidateBasic implements Msg.
 func (msg MsgEditFeed) ValidateBasic() sdk.Error {
-	feedKey := strings.TrimSpace(msg.FeedKey)
-	if len(feedKey) == 0 {
-		return ErrEmptyFeedKey(DefaultCodespace)
+	feedName := strings.TrimSpace(msg.FeedName)
+	if len(feedName) == 0 {
+		return ErrEmptyFeedName(DefaultCodespace)
 	}
 
-	if len(msg.Sender) == 0 {
+	if len(msg.Owner) == 0 {
 		return ErrInvalidAddress(DefaultCodespace, "sender can not be empty")
 	}
 
-	if !msg.MaxServiceFee.IsValidIrisAtto() {
-		return ErrInvalidMaxServiceFee(DefaultCodespace, msg.MaxServiceFee)
+	if !msg.ServiceFeeCap.IsValidIrisAtto() {
+		return ErrInvalidServiceFeeCap(DefaultCodespace, msg.ServiceFeeCap)
+	}
+
+	if int(msg.ResponseThreshold) > len(msg.Providers) || msg.ResponseThreshold < 1 {
+		return ErrInvalidResponseThreshold(DefaultCodespace, len(msg.Providers))
 	}
 	return nil
 }
@@ -242,5 +302,5 @@ func (msg MsgEditFeed) GetSignBytes() []byte {
 
 // GetSigners implements Msg.
 func (msg MsgEditFeed) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{msg.Sender}
+	return []sdk.AccAddress{msg.Owner}
 }

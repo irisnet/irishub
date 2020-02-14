@@ -3,6 +3,7 @@ package oracle
 import (
 	"fmt"
 
+	"github.com/irisnet/irishub/app/v3/oracle/internal/types"
 	sdk "github.com/irisnet/irishub/types"
 )
 
@@ -14,8 +15,10 @@ func NewHandler(k Keeper) sdk.Handler {
 			return handleMsgCreateFeed(ctx, k, msg)
 		case MsgStartFeed:
 			return handleMsgStartFeed(ctx, k, msg)
-		case MsgStopFeed:
-			return handleMsgStopFeed(ctx, k, msg)
+		case MsgPauseFeed:
+			return handleMsgPauseFeed(ctx, k, msg)
+		case MsgKillFeed:
+			return handleMsgKillFeed(ctx, k, msg)
 		case MsgEditFeed:
 			return handleMsgEditFeed(ctx, k, msg)
 		default:
@@ -25,42 +28,72 @@ func NewHandler(k Keeper) sdk.Handler {
 	}
 }
 
+// handleMsgCreateFeed handles MsgCreateFeed
 func handleMsgCreateFeed(ctx sdk.Context, k Keeper, msg MsgCreateFeed) sdk.Result {
-	tags, err := k.CreateFeed(ctx, msg)
-	if err != nil {
+	if err := k.CreateFeed(ctx, msg); err != nil {
 		return err.Result()
 	}
 	return sdk.Result{
-		Tags: tags,
+		Tags: sdk.NewTags(
+			types.TagAction, []byte(types.TypeMsgCreateFeed),
+			types.TagFeedName, msg.FeedName,
+			types.TagOwner, msg.Owner,
+		),
 	}
 }
 
+// handleMsgStartFeed handles MsgStartFeed
 func handleMsgStartFeed(ctx sdk.Context, k Keeper, msg MsgStartFeed) sdk.Result {
-	tags, err := k.StartFeed(ctx, msg)
-	if err != nil {
+	if err := k.StartFeed(ctx, msg); err != nil {
 		return err.Result()
 	}
 	return sdk.Result{
-		Tags: tags,
+		Tags: sdk.NewTags(
+			types.TagAction, []byte(types.TypeMsgStartFeed),
+			types.TagFeedName, msg.FeedName,
+			types.TagOwner, msg.Owner,
+		),
 	}
 }
 
-func handleMsgStopFeed(ctx sdk.Context, k Keeper, msg MsgStopFeed) sdk.Result {
-	tags, err := k.StopFeed(ctx, msg)
-	if err != nil {
+// handleMsgPauseFeed handles MsgPauseFeed
+func handleMsgPauseFeed(ctx sdk.Context, k Keeper, msg MsgPauseFeed) sdk.Result {
+	if err := k.PauseFeed(ctx, msg); err != nil {
 		return err.Result()
 	}
 	return sdk.Result{
-		Tags: tags,
+		Tags: sdk.NewTags(
+			types.TagAction, []byte(types.TypeMsgPauseFeed),
+			types.TagFeedName, msg.FeedName,
+			types.TagOwner, msg.Owner,
+		),
 	}
 }
 
+// handleMsgKillFeed handles MsgKillFeed
+func handleMsgKillFeed(ctx sdk.Context, k Keeper, msg MsgKillFeed) sdk.Result {
+	if err := k.KillFeed(ctx, msg); err != nil {
+		return err.Result()
+	}
+	return sdk.Result{
+		Tags: sdk.NewTags(
+			types.TagAction, []byte(types.TypeMsgKillFeed),
+			types.TagFeedName, msg.FeedName,
+			types.TagOwner, msg.Owner,
+		),
+	}
+}
+
+// handleMsgEditFeed handles MsgEditFeed
 func handleMsgEditFeed(ctx sdk.Context, k Keeper, msg MsgEditFeed) sdk.Result {
-	tags, err := k.EditFeed(ctx, msg)
-	if err != nil {
+	if err := k.EditFeed(ctx, msg); err != nil {
 		return err.Result()
 	}
 	return sdk.Result{
-		Tags: tags,
+		Tags: sdk.NewTags(
+			types.TagAction, []byte(types.TypeMsgEditFeed),
+			types.TagFeedName, msg.FeedName,
+			types.TagOwner, msg.Owner,
+		),
 	}
 }
