@@ -8,6 +8,230 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 )
 
+// RegisterResponseCallback registers a module callback for response handling
+func (k Keeper) RegisterResponseCallback(ctx sdk.Context, moduleName string, respCallback types.ResponseCallback) sdk.Error {
+	if _, ok := k.respCallbacks[moduleName]; ok {
+		return types.ErrModuleNameRegistered(k.codespace, moduleName)
+	}
+
+	k.respCallbacks[moduleName] = respCallback
+
+	return nil
+}
+
+// CreateRequestContext creates a request context with the specified params
+func (k Keeper) CreateRequestContext(
+	ctx sdk.Context,
+	serviceName string,
+	providers []sdk.AccAddress,
+	consumer sdk.AccAddress,
+	input string,
+	serviceFeeCap sdk.Coins,
+	timeout int64,
+	repeated bool,
+	repeatedFrequency uint64,
+	repeatedTotal int64,
+	state types.RequestContextState,
+	respThreshold uint16,
+	respHandler string,
+) ([]byte, sdk.Error) {
+	svcDef, found := k.GetServiceDefinition(ctx, serviceName)
+	if !found {
+		return nil, types.ErrUnknownServiceDefinition(k.codespace, serviceName)
+	}
+
+	if err := types.ValidateRequestInput(svcDef.Schemas, input); err != nil {
+		return nil, err
+	}
+
+	params := k.GetParamSet(ctx)
+	if timeout > params.MaxRequestTimeout {
+		return nil, types.ErrInvalidRequest(k.codespace, fmt.Sprintf("timeout must not be greater than %d: %d", params.MaxRequestTimeout, timeout))
+	}
+
+	if timeout == 0 {
+		timeout = params.MaxRequestTimeout
+	}
+
+	if repeated {
+		if repeatedFrequency == 0 {
+			repeatedFrequency = uint64(timeout)
+		}
+
+		if repeatedFrequency < uint64(timeout) {
+			return nil, types.ErrInvalidRequest(k.codespace, fmt.Sprintf("repeated frequency [%d] must not be less than timeout [%d]", repeatedFrequency, timeout))
+		}
+	} else {
+		repeatedFrequency = 0
+		repeatedTotal = 0
+	}
+
+	batchCounter := uint64(0)
+
+	requestContext := types.NewRequestContext(
+		serviceName, providers, consumer, input, serviceFeeCap,
+		timeout, repeated, repeatedFrequency, repeatedTotal,
+		batchCounter, state, respThreshold, respHandler,
+	)
+
+	requestContextID := types.GenerateRequestContextID(ctx.BlockHeight(), k.GetIntraTxCounter(ctx))
+	k.SetRequestContext(ctx, requestContextID, requestContext)
+
+	return requestContextID, nil
+}
+
+// UpdateRequestContext updates the specified request context
+func (k Keeper) UpdateRequestContext(
+	ctx sdk.Context,
+	requestContextID []byte,
+	providers []sdk.AccAddress,
+	serviceFeeCap sdk.Coins,
+	repeatedFreq uint64,
+	repeatedTotal int64,
+) sdk.Error {
+	requestContext, found := k.GetRequestContext(ctx, requestContextID)
+	if !found {
+		return types.ErrInvalidRequestContextID(k.codespace, "invalid request context ID")
+	}
+
+	if !requestContext.Repeated {
+		return types.ErrRequestContextNonRepeated(k.codespace)
+	}
+
+	if len(providers) > 0 && requestContext.ResponseThreshold > 0 && len(providers) < int(requestContext.ResponseThreshold) {
+		return types.ErrInvalidProviders(k.codespace, "length of providers must not be less than the response threshold")
+	}
+
+	if repeatedFreq > 0 && repeatedFreq < uint64(requestContext.Timeout) {
+		return types.ErrInvalidRepeatedFreq(k.codespace, "repeated frequency must not be less than the timeout")
+	}
+
+	if repeatedTotal >= 1 && repeatedTotal <= int64(requestContext.BatchCounter) {
+		return types.ErrInvalidRepeatedTotal(k.codespace, "updated repeated total must be greater than the current batch counter")
+	}
+
+	if len(providers) > 0 {
+		requestContext.Providers = providers
+	}
+
+	if repeatedFreq > 0 {
+		requestContext.RepeatedFrequency = repeatedFreq
+	}
+
+	if repeatedTotal != 0 {
+		requestContext.RepeatedTotal = repeatedTotal
+	}
+
+	k.SetRequestContext(ctx, requestContextID, requestContext)
+
+	return nil
+}
+
+// PauseRequestContext suspends the specified request context
+func (k Keeper) PauseRequestContext(
+	ctx sdk.Context,
+	requestContextID []byte,
+) sdk.Error {
+	requestContext, found := k.GetRequestContext(ctx, requestContextID)
+	if !found {
+		return types.ErrInvalidRequestContextID(k.codespace, "invalid request context ID")
+	}
+
+	if !requestContext.Repeated {
+		return types.ErrRequestContextNonRepeated(k.codespace)
+	}
+
+	if requestContext.State != types.RequestContextState(0x00) {
+		return types.ErrRequestContextNotStarted(k.codespace)
+	}
+
+	requestContext.State = types.RequestContextState(0x01)
+	k.DeleteNewBatchRequest(ctx, requestContextID)
+
+	k.SetRequestContext(ctx, requestContextID, requestContext)
+
+	return nil
+}
+
+// StartRequestContext starts the specified request context
+func (k Keeper) StartRequestContext(
+	ctx sdk.Context,
+	requestContextID []byte,
+) sdk.Error {
+	requestContext, found := k.GetRequestContext(ctx, requestContextID)
+	if !found {
+		return types.ErrInvalidRequestContextID(k.codespace, "invalid request context ID")
+	}
+
+	if !requestContext.Repeated {
+		return types.ErrRequestContextNonRepeated(k.codespace)
+	}
+
+	if requestContext.State != types.RequestContextState(0x01) {
+		return types.ErrRequestContextNotPaused(k.codespace)
+	}
+
+	requestContext.State = types.RequestContextState(0x00)
+	k.AddNewBatchRequest(ctx, requestContextID)
+
+	k.SetRequestContext(ctx, requestContextID, requestContext)
+
+	return nil
+}
+
+// KillRequestContext terminates the specified request context
+func (k Keeper) KillRequestContext(
+	ctx sdk.Context,
+	requestContextID []byte,
+) sdk.Error {
+	requestContext, found := k.GetRequestContext(ctx, requestContextID)
+	if !found {
+		return types.ErrInvalidRequestContextID(k.codespace, "invalid request context ID")
+	}
+
+	if !requestContext.Repeated {
+		return types.ErrRequestContextNonRepeated(k.codespace)
+	}
+
+	requestContext.State = types.RequestContextState(0x01)
+	requestContext.RepeatedTotal = int64(requestContext.BatchCounter)
+
+	k.SetRequestContext(ctx, requestContextID, requestContext)
+
+	return nil
+}
+
+// SetRequestContext sets the specified request context
+func (k Keeper) SetRequestContext(ctx sdk.Context, requestContextID []byte, requestContext types.RequestContext) {
+	store := ctx.KVStore(k.storeKey)
+
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(requestContext)
+	store.Set(GetRequestContextKey(requestContextID), bz)
+}
+
+// GetRequestContext retrieves the specified request context
+func (k Keeper) GetRequestContext(ctx sdk.Context, requestContextID []byte) (requestContext types.RequestContext, found bool) {
+	store := ctx.KVStore(k.storeKey)
+
+	bz := store.Get(GetRequestContextKey(requestContextID))
+	if bz == nil {
+		return requestContext, false
+	}
+
+	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &requestContext)
+	return requestContext, true
+}
+
+// AddNewBatchRequest adds a new batch request of the specified request context
+func (k Keeper) AddNewBatchRequest(ctx sdk.Context, requestContextID []byte) {
+	// TODO
+}
+
+// DeleteNewBatchRequest deletes the new batch request of the specified request context
+func (k Keeper) DeleteNewBatchRequest(ctx sdk.Context, requestContextID []byte) {
+	// TODO
+}
+
 // AddRequest
 func (k Keeper) AddRequest(
 	ctx sdk.Context,

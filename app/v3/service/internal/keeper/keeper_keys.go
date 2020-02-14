@@ -21,6 +21,7 @@ var (
 	activeRequestKey             = []byte{0x07} // key for active request
 	returnedFeeKey               = []byte{0x08}
 	incomingFeeKey               = []byte{0x09}
+	requestContextKey            = []byte{0x10}
 )
 
 // GetServiceDefinitionKey returns a key for the service definition with the specified name
@@ -36,6 +37,11 @@ func GetServiceBindingKey(serviceName string, provider sdk.AccAddress) []byte {
 // GetBindingsSubspace returns the key for retrieving all bindings of the specified service
 func GetBindingsSubspace(serviceName string) []byte {
 	return append(append(serviceBindingKey, []byte(serviceName)...), emptyByte...)
+}
+
+// GetRequestContextKey returns the key for the request context with the specified ID
+func GetRequestContextKey(requestContextID []byte) []byte {
+	return append(requestContextKey, requestContextID...)
 }
 
 func GetRequestKey(defChainId, serviceName, bindChainId string, provider sdk.AccAddress, height int64, counter int16) []byte {
