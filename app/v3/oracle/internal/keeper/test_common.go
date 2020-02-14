@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 
@@ -55,7 +56,7 @@ func createTestInput(t *testing.T, amt sdk.Int, nAccs int64) (sdk.Context, Keepe
 	require.Nil(t, err)
 
 	cdc := makeTestCodec()
-	ctx := sdk.NewContext(ms, abci.Header{ChainID: "test-oracle"}, false, log.NewNopLogger())
+	ctx := sdk.NewContext(ms, abci.Header{ChainID: "test-oracle", Time: time.Now()}, false, log.NewNopLogger())
 
 	ak := auth.NewAccountKeeper(cdc, keyAcc, auth.ProtoBaseAccount)
 	initialCoins := sdk.Coins{
@@ -155,7 +156,17 @@ func (m MockServiceKeeper) UpdateRequestContext(ctx sdk.Context, requestContextI
 
 func (m MockServiceKeeper) StartRequestContext(ctx sdk.Context, requestContextID []byte) error {
 	reqCtx := m.cxtMap[string(requestContextID)]
-	m.callbackMap[reqCtx.ResponseHandler](ctx, requestContextID, responses)
+	for i := int64(1); i <= reqCtx.RepeatedTotal; i++ {
+		reqCtx.BatchCounter = uint64(i)
+		m.cxtMap[string(requestContextID)] = reqCtx
+		ctx = ctx.WithBlockHeader(abci.Header{
+			ChainID: ctx.BlockHeader().ChainID,
+			Height:  ctx.BlockHeight() + 1,
+			Time:    ctx.BlockTime().Add(2 * time.Minute),
+		})
+		callback := m.callbackMap[reqCtx.ResponseHandler]
+		callback(ctx, requestContextID, responses)
+	}
 	return nil
 }
 

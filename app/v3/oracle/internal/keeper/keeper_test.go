@@ -15,13 +15,13 @@ func TestCreateFeed(t *testing.T) {
 		ServiceName:           "GetRthPrice",
 		AggregateMethod:       "avg",
 		AggregateArgsJsonPath: "high",
-		LatestHistory:         1,
+		LatestHistory:         3,
 		Providers:             []sdk.AccAddress{acc[0].GetAddress()},
 		Input:                 "xxxx",
 		Timeout:               10,
 		ServiceFeeCap:         sdk.NewCoins(sdk.NewCoin(sdk.IrisAtto, sdk.NewInt(100))),
 		RepeatedFrequency:     1,
-		RepeatedTotal:         100,
+		RepeatedTotal:         10,
 		ResponseThreshold:     1,
 		Owner:                 acc[0].GetAddress(),
 	}
@@ -35,6 +35,6 @@ func TestCreateFeed(t *testing.T) {
 
 	result := keeper.GetFeedResults(ctx, msg.FeedName)
 	require.NoError(t, err)
-	require.Len(t, result, 1)
+	require.Len(t, result, int(msg.LatestHistory))
 	require.Equal(t, 250.0, result[0].Data)
 }

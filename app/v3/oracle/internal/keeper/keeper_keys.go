@@ -25,5 +25,5 @@ func GetFeedResultKey(feedName string, batchCounter uint64) []byte {
 }
 
 func GetFeedResultPrefixKey(feedName string) []byte {
-	return append(append(PrefixFeedResultKey, separator...), []byte(feedName)...)
+	return append(append(PrefixFeedResultKey, []byte(feedName)...), separator...)
 }

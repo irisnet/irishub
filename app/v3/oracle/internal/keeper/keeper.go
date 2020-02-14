@@ -146,10 +146,17 @@ func (k Keeper) HandleServiceResponse(ctx sdk.Context, requestContextID []byte, 
 	if len(responseOutput) == 0 {
 		return
 	}
+
 	feed, found := k.GetFeedByReqCtxID(ctx, requestContextID)
 	if !found {
 		return
 	}
+
+	reqCtx, existed := k.sk.GetRequestContext(ctx, requestContextID)
+	if !existed {
+		return
+	}
+
 	aggregate, err := types.GetAggregateMethod(feed.AggregateMethod)
 	if err != nil {
 		return
@@ -160,7 +167,6 @@ func (k Keeper) HandleServiceResponse(ctx sdk.Context, requestContextID []byte, 
 		result := gjson.Get(jsonStr, feed.AggregateArgsJsonPath)
 		data = append(data, result.Value())
 	}
-	value := aggregate(data)
-	//TODO
-	k.setFeedResult(ctx, feed.FeedName, 1, feed.LatestHistory, value)
+	result := aggregate(data)
+	k.setFeedResult(ctx, feed.FeedName, reqCtx.BatchCounter, feed.LatestHistory, result)
 }
