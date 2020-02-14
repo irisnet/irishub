@@ -23,19 +23,26 @@ const (
 	CodeServiceBindingAvailable   sdk.CodeType = 110
 	CodeIncorrectRefundTime       sdk.CodeType = 111
 
-	CodeInvalidRequest          sdk.CodeType = 112
-	CodeInvalidServiceFee       sdk.CodeType = 113
-	CodeInvalidResponse         sdk.CodeType = 114
-	CodeInvalidRequestID        sdk.CodeType = 115
-	CodeInvalidRequestContextID sdk.CodeType = 116
-	CodeNoEarnedFees            sdk.CodeType = 116
+	CodeInvalidRequest            sdk.CodeType = 112
+	CodeInvalidServiceFee         sdk.CodeType = 113
+	CodeInvalidResponse           sdk.CodeType = 114
+	CodeInvalidRequestID          sdk.CodeType = 115
+	CodeInvalidProviders          sdk.CodeType = 116
+	CodeInvalidRepeatedFreq       sdk.CodeType = 117
+	CodeInvalidRepeatedTotal      sdk.CodeType = 118
+	CodeInvalidRequestContextID   sdk.CodeType = 119
+	CodeRequestContextNonRepeated sdk.CodeType = 120
+	CodeRequestContextNotStarted  sdk.CodeType = 121
+	CodeRequestContextNotPaused   sdk.CodeType = 122
+	CodeModuleNameRegistered      sdk.CodeType = 123
+	CodeNoEarnedFees              sdk.CodeType = 124
 
-	CodeInvalidRequestInput   sdk.CodeType = 117
-	CodeInvalidResponseOutput sdk.CodeType = 118
-	CodeInvalidResponseErr    sdk.CodeType = 119
+	CodeInvalidRequestInput   sdk.CodeType = 125
+	CodeInvalidResponseOutput sdk.CodeType = 126
+	CodeInvalidResponseErr    sdk.CodeType = 127
 
-	CodeInvalidAddress  sdk.CodeType = 120
-	CodeInvalidGuardian sdk.CodeType = 121
+	CodeInvalidAddress  sdk.CodeType = 128
+	CodeInvalidGuardian sdk.CodeType = 129
 )
 
 func ErrInvalidServiceName(codespace sdk.CodespaceType, serviceName string) sdk.Error {
@@ -102,8 +109,36 @@ func ErrInvalidRequestID(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidResponse, fmt.Sprintf("invalid request ID: %s", msg))
 }
 
+func ErrInvalidProviders(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidProviders, fmt.Sprintf("invalid providers: %s", msg))
+}
+
+func ErrInvalidRepeatedFreq(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidRepeatedFreq, msg)
+}
+
+func ErrInvalidRepeatedTotal(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidRepeatedTotal, msg)
+}
+
 func ErrInvalidRequestContextID(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidRequestContextID, fmt.Sprintf("invalid request context ID: %s", msg))
+}
+
+func ErrRequestContextNonRepeated(codespace sdk.CodespaceType) sdk.Error {
+	return sdk.NewError(codespace, CodeRequestContextNonRepeated, "request context is non repeated")
+}
+
+func ErrRequestContextNotStarted(codespace sdk.CodespaceType) sdk.Error {
+	return sdk.NewError(codespace, CodeRequestContextNotStarted, "request context not started")
+}
+
+func ErrRequestContextNotPaused(codespace sdk.CodespaceType) sdk.Error {
+	return sdk.NewError(codespace, CodeRequestContextNotPaused, "request context not paused")
+}
+
+func ErrModuleNameRegistered(codespace sdk.CodespaceType, moduleName string) sdk.Error {
+	return sdk.NewError(codespace, CodeModuleNameRegistered, fmt.Sprintf("module % already registered", moduleName))
 }
 
 func ErrNoEarnedFees(codespace sdk.CodespaceType, provider sdk.AccAddress) sdk.Error {
