@@ -12,6 +12,7 @@ const (
 	CodeUnknownFeedName            sdk.CodeType = 100
 	CodeEmptyFeedName              sdk.CodeType = 101
 	CodeExistedFeedName            sdk.CodeType = 102
+	CodeUnauthorized               sdk.CodeType = 102
 	CodeEmptyServiceName           sdk.CodeType = 103
 	CodeInvalidLatestHistory       sdk.CodeType = 104
 	CodeEmptyProviders             sdk.CodeType = 105
@@ -31,6 +32,10 @@ func ErrEmptyFeedName(codespace sdk.CodespaceType) sdk.Error {
 
 func ErrExistedFeedName(codespace sdk.CodespaceType, feedName string) sdk.Error {
 	return sdk.NewError(codespace, CodeExistedFeedName, fmt.Sprintf("feed name %s already exists", feedName))
+}
+
+func ErrUnauthorized(codespace sdk.CodespaceType, feedName string, owner sdk.AccAddress) sdk.Error {
+	return sdk.NewError(codespace, CodeUnauthorized, fmt.Sprintf("feed %s does not belong to %s", feedName, owner.String()))
 }
 
 func ErrEmptyServiceName(codespace sdk.CodespaceType) sdk.Error {

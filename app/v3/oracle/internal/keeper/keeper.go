@@ -29,7 +29,7 @@ func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, codespace sdk.CodespaceType, 
 }
 
 func (k Keeper) CreateFeed(ctx sdk.Context, msg types.MsgCreateFeed) sdk.Error {
-	if k.hasFeed(ctx, msg.FeedName) {
+	if _, found := k.GetFeed(ctx, msg.FeedName); found {
 		return types.ErrExistedFeedName(types.DefaultCodespace, msg.FeedName)
 	}
 	requestContextID, err := k.sk.CreateRequestContext(ctx)
@@ -49,21 +49,82 @@ func (k Keeper) CreateFeed(ctx sdk.Context, msg types.MsgCreateFeed) sdk.Error {
 }
 
 func (k Keeper) StartFeed(ctx sdk.Context, msg types.MsgStartFeed) sdk.Error {
+	feed, found := k.GetFeed(ctx, msg.FeedName)
+	if !found {
+		return types.ErrUnknownFeedName(types.DefaultCodespace, msg.FeedName)
+	}
+	if msg.Owner.Equals(feed.Owner) {
+		return types.ErrUnauthorized(types.DefaultCodespace, msg.FeedName, msg.Owner)
+	}
+	//Can not start feed in "running" state
 	//TODO
+	k.sk.GetRequestContext(ctx, feed.RequestContextID)
+
+	//TODO params ?
+	if err := k.sk.StartRequestContext(ctx, feed.RequestContextID); err != nil {
+		return sdk.ErrInternal(err.Error())
+	}
 	return nil
 }
 
 func (k Keeper) PauseFeed(ctx sdk.Context, msg types.MsgPauseFeed) sdk.Error {
+	feed, found := k.GetFeed(ctx, msg.FeedName)
+	if !found {
+		return types.ErrUnknownFeedName(types.DefaultCodespace, msg.FeedName)
+	}
+	if msg.Owner.Equals(feed.Owner) {
+		return types.ErrUnauthorized(types.DefaultCodespace, msg.FeedName, msg.Owner)
+	}
+	//Can only pause feed in "running" state
 	//TODO
+	k.sk.GetRequestContext(ctx, feed.RequestContextID)
+
+	//TODO params ?
+	if err := k.sk.PauseRequestContext(ctx, feed.RequestContextID); err != nil {
+		return sdk.ErrInternal(err.Error())
+	}
 	return nil
 }
 
 func (k Keeper) KillFeed(ctx sdk.Context, msg types.MsgKillFeed) sdk.Error {
-	//TODO
+	feed, found := k.GetFeed(ctx, msg.FeedName)
+	if !found {
+		return types.ErrUnknownFeedName(types.DefaultCodespace, msg.FeedName)
+	}
+	if msg.Owner.Equals(feed.Owner) {
+		return types.ErrUnauthorized(types.DefaultCodespace, msg.FeedName, msg.Owner)
+	}
+	//TODO params ?
+	if err := k.sk.KillRequestContext(ctx, feed.RequestContextID); err != nil {
+		return sdk.ErrInternal(err.Error())
+	}
+	k.deleteFeed(ctx, feed)
 	return nil
 }
 
 func (k Keeper) EditFeed(ctx sdk.Context, msg types.MsgEditFeed) sdk.Error {
+	feed, found := k.GetFeed(ctx, msg.FeedName)
+	if !found {
+		return types.ErrUnknownFeedName(types.DefaultCodespace, msg.FeedName)
+	}
+	if msg.Owner.Equals(feed.Owner) {
+		return types.ErrUnauthorized(types.DefaultCodespace, msg.FeedName, msg.Owner)
+	}
+	if msg.LatestHistory > 1 {
+		if msg.LatestHistory < feed.LatestHistory {
+			count := int(feed.LatestHistory - msg.LatestHistory)
+			k.deleteOldestFeedResult(ctx, feed.FeedName, count)
+		}
+		feed.LatestHistory = msg.LatestHistory
+	}
 	//TODO
+	if err := k.sk.UpdateRequestContext(ctx, feed.RequestContextID); err != nil {
+		return sdk.ErrInternal(err.Error())
+	}
+	k.setFeed(ctx, feed)
+	return nil
+}
+
+func (k Keeper) HandleServiceResponse(ctx sdk.Context, requestContextID []byte, responseOutput []string) error {
 	return nil
 }

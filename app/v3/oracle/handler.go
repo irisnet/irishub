@@ -22,7 +22,7 @@ func NewHandler(k Keeper) sdk.Handler {
 		case MsgEditFeed:
 			return handleMsgEditFeed(ctx, k, msg)
 		default:
-			errMsg := fmt.Sprintf("unrecognized service message type: %T", msg)
+			errMsg := fmt.Sprintf("unrecognized oracle message type: %T", msg)
 			return sdk.ErrUnknownRequest(errMsg).Result()
 		}
 	}
