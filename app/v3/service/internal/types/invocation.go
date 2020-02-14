@@ -23,7 +23,7 @@ type RequestContext struct {
 	BatchCounter      uint64              `json:"batch_counter"`
 	State             RequestContextState `json:"state"`
 	ResponseThreshold uint16              `json:"response_threshold"`
-	ResponseHandler   string              `json:"response_handler"`
+	ModuleName        string              `json:"module_name"`
 }
 
 // NewRequestContext creates a new RequestContext instance
@@ -40,7 +40,7 @@ func NewRequestContext(
 	batchCounter uint64,
 	state RequestContextState,
 	responseThreshold uint16,
-	responseHandler string,
+	moduleName string,
 ) RequestContext {
 	return RequestContext{
 		ServiceName:       serviceName,
@@ -55,7 +55,7 @@ func NewRequestContext(
 		BatchCounter:      batchCounter,
 		State:             state,
 		ResponseThreshold: responseThreshold,
-		ResponseHandler:   responseHandler,
+		ModuleName:   moduleName,
 	}
 }
 
@@ -172,8 +172,8 @@ func NewEarnedFees(address sdk.AccAddress, coins sdk.Coins) EarnedFees {
 // RequestContextState defines the state for the request context
 type RequestContextState byte
 
-// ResponseHandler defines the response handler interface
-type ResponseHandler func(requestContextID []byte, reponses []Response)
+// ResponseCallback defines the response callback interface
+type ResponseCallback func(requestContextID []byte, reponses []string)
 
 func ConvertRequestID(requestId string) (eHeight int64, rHeight int64, counter int16, err error) {
 	ss := strings.Split(requestId, "-")
