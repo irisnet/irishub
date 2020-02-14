@@ -20,6 +20,8 @@ type Keeper struct {
 	paramSpace params.Subspace
 	// metrics
 	metrics *types.Metrics
+
+	respCallbacks map[string]types.ResponseCallback
 }
 
 // NewKeeper
@@ -33,6 +35,8 @@ func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, bk types.BankKeeper, gk types
 		paramSpace: paramSpace.WithTypeTable(types.ParamTypeTable()),
 		metrics:    metrics,
 	}
+
+	keeper.respCallbacks = make(map[string]types.ResponseCallback)
 
 	return keeper
 }
