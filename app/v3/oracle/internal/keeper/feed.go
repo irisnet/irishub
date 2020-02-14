@@ -1,27 +1,11 @@
 package keeper
 
 import (
-	"time"
-
+	"github.com/irisnet/irishub/app/v3/oracle/internal/types"
 	sdk "github.com/irisnet/irishub/types"
 )
 
-type Feed struct {
-	FeedName              string         `json:"feed_name"`
-	AggregateMethod       string         `json:"aggregate_method"`
-	AggregateArgsJsonPath string         `json:"aggregate_args_json_path"`
-	LatestHistory         uint64         `json:"latest_history"`
-	RequestContextID      []byte         `json:"request_context_id"`
-	Owner                 sdk.AccAddress `json:"owner"`
-}
-type Value interface{}
-type FeedResult struct {
-	Data      Value     `json:"data"`
-	Timestamp time.Time `json:"timestamp"`
-}
-type FeedResults []FeedResult
-
-func (k Keeper) GetFeed(ctx sdk.Context, feedName string) (feed Feed, found bool) {
+func (k Keeper) GetFeed(ctx sdk.Context, feedName string) (feed types.Feed, found bool) {
 	store := ctx.KVStore(k.storeKey)
 	bz := store.Get(GetFeedKey(feedName))
 	if bz == nil {
@@ -31,46 +15,41 @@ func (k Keeper) GetFeed(ctx sdk.Context, feedName string) (feed Feed, found bool
 	return feed, true
 }
 
-func (k Keeper) GetFeedByReqCtxID(ctx sdk.Context, requestContextID []byte) (feed Feed, found bool) {
+func (k Keeper) GetFeedByReqCtxID(ctx sdk.Context, requestContextID []byte) (feed types.Feed, found bool) {
 	store := ctx.KVStore(k.storeKey)
 	bz := store.Get(GetReqCtxIDKey(requestContextID))
 	feedName := string(bz)
 	return k.GetFeed(ctx, feedName)
 }
 
-func (k Keeper) GetFeedResults(ctx sdk.Context, feedName string) (result FeedResults) {
+func (k Keeper) GetFeedResults(ctx sdk.Context, feedName string) (result types.FeedResults) {
 	store := ctx.KVStore(k.storeKey)
 	iterator := sdk.KVStoreReversePrefixIterator(store, GetFeedResultPrefixKey(feedName))
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
-		var res FeedResult
+		var res types.FeedResult
 		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &res)
 		result = append(result, res)
 	}
 	return
 }
 
-func (k Keeper) setFeed(ctx sdk.Context, feed Feed) {
+func (k Keeper) setFeed(ctx sdk.Context, feed types.Feed) {
 	store := ctx.KVStore(k.storeKey)
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(feed)
 	store.Set(GetFeedKey(feed.FeedName), bz)
 }
 
-func (k Keeper) deleteFeed(ctx sdk.Context, feed Feed) {
+func (k Keeper) deleteFeed(ctx sdk.Context, feed types.Feed) {
 	store := ctx.KVStore(k.storeKey)
 	store.Delete(GetFeedKey(feed.FeedName))
 	store.Delete(GetReqCtxIDKey(feed.RequestContextID))
 	store.Delete(GetFeedResultPrefixKey(feed.FeedName))
 }
 
-func (k Keeper) setRequestContextID(ctx sdk.Context, requestContextID []byte, feedName string) {
+func (k Keeper) setFeedResult(ctx sdk.Context, feedName string, batchCounter uint64, latestHistory uint64, data types.Value) {
 	store := ctx.KVStore(k.storeKey)
-	store.Set(GetReqCtxIDKey(requestContextID), []byte(feedName))
-}
-
-func (k Keeper) setFeedResult(ctx sdk.Context, feedName string, batchCounter uint64, latestHistory uint64, data Value) {
-	store := ctx.KVStore(k.storeKey)
-	result := FeedResult{
+	result := types.FeedResult{
 		Data:      data,
 		Timestamp: ctx.BlockTime(),
 	}
@@ -82,11 +61,6 @@ func (k Keeper) setFeedResult(ctx sdk.Context, feedName string, batchCounter uin
 	store.Set(GetFeedResultKey(feedName, batchCounter), bz)
 }
 
-func (k Keeper) getFeedResultsIteratorDesc(ctx sdk.Context, feedName string) sdk.Iterator {
-	store := ctx.KVStore(k.storeKey)
-	return sdk.KVStoreReversePrefixIterator(store, GetFeedResultPrefixKey(feedName))
-}
-
 func (k Keeper) deleteOldestFeedResult(ctx sdk.Context, feedName string, delta int) {
 	store := ctx.KVStore(k.storeKey)
 	iterator := sdk.KVStorePrefixIterator(store, GetFeedResultPrefixKey(feedName))
@@ -95,9 +69,4 @@ func (k Keeper) deleteOldestFeedResult(ctx sdk.Context, feedName string, delta i
 		store.Delete(iterator.Key())
 		i++
 	}
-}
-
-func (k Keeper) getFeedResultsIterator(ctx sdk.Context, feedName string) sdk.Iterator {
-	store := ctx.KVStore(k.storeKey)
-	return sdk.KVStorePrefixIterator(store, GetFeedResultPrefixKey(feedName))
 }

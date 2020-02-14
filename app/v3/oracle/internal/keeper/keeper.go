@@ -40,7 +40,7 @@ func (k Keeper) CreateFeed(ctx sdk.Context, msg types.MsgCreateFeed) sdk.Error {
 	if err != nil {
 		return sdk.ErrInternal(err.Error())
 	}
-	feed := Feed{
+	feed := types.Feed{
 		FeedName:              msg.FeedName,
 		AggregateMethod:       msg.AggregateMethod,
 		AggregateArgsJsonPath: msg.AggregateArgsJsonPath,
@@ -148,7 +148,7 @@ func (k Keeper) HandleServiceResponse(ctx sdk.Context, requestContextID []byte, 
 		return err
 	}
 
-	var data []Value
+	var data []types.Value
 	for _, jsonStr := range responseOutput {
 		result := gjson.Get(jsonStr, feed.AggregateArgsJsonPath)
 		data = append(data, result.Value())

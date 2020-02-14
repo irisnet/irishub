@@ -28,6 +28,7 @@ require (
 	github.com/tendermint/tendermint v0.31.0
 	github.com/tendermint/tm-db v0.1.1
 	github.com/tendermint/tmlibs v0.9.0
+	github.com/tidwall/gjson v1.5.0
 	github.com/xeipuuv/gojsonschema v1.2.0
 	golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2
 )

@@ -3,7 +3,6 @@ package types
 import (
 	"errors"
 	"fmt"
-	"github.com/irisnet/irishub/app/v3/oracle/internal/keeper"
 	sdk "github.com/irisnet/irishub/types"
 	"math"
 	"strconv"
@@ -14,7 +13,7 @@ var (
 )
 
 type methodRouter map[string]Aggregate
-type Aggregate func(args []keeper.Value) keeper.Value
+type Aggregate func(args []Value) Value
 
 func init() {
 	router = make(methodRouter)
@@ -40,7 +39,7 @@ func RegisterAggregateMethod(methodNm string, fun Aggregate) error {
 	return nil
 }
 
-func Max(data []keeper.Value) keeper.Value {
+func Max(data []Value) Value {
 	var maxNumber = math.SmallestNonzeroFloat64
 	for _, d := range data {
 		f, err := ConvertToFloat64(d)
@@ -54,7 +53,7 @@ func Max(data []keeper.Value) keeper.Value {
 	return maxNumber
 }
 
-func Min(data []keeper.Value) keeper.Value {
+func Min(data []Value) Value {
 	var maxNumber = math.MaxFloat64
 	for _, d := range data {
 		f, err := ConvertToFloat64(d)
@@ -68,7 +67,7 @@ func Min(data []keeper.Value) keeper.Value {
 	return maxNumber
 }
 
-func Avg(data []keeper.Value) keeper.Value {
+func Avg(data []Value) Value {
 	var total = 0.0
 	for _, d := range data {
 		f, err := ConvertToFloat64(d)
@@ -80,7 +79,7 @@ func Avg(data []keeper.Value) keeper.Value {
 	return total / float64(len(data))
 }
 
-func ConvertToFloat64(args keeper.Value) (float64, error) {
+func ConvertToFloat64(args Value) (float64, error) {
 	switch args.(type) {
 	case string:
 		return strconv.ParseFloat(args.(string), 64)
