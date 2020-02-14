@@ -20,6 +20,9 @@ type Keeper struct {
 	paramSpace params.Subspace
 	// metrics
 	metrics *types.Metrics
+
+	// used to map the module name to response callback
+	respCallbacks map[string]types.ResponseCallback
 }
 
 // NewKeeper
