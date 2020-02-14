@@ -1,19 +1,19 @@
 package cli
 
 import (
+	"bufio"
 	"fmt"
 	"strings"
-
-	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/client/context"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
+	"github.com/cosmos/cosmos-sdk/client/context"
+	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/version"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth"
+	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
 
 	"github.com/irisnet/modules/incubator/nft/internal/types"
@@ -31,12 +31,12 @@ func GetTxCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
 		Short: "NFT transactions subcommands",
 	}
 
-	nftTxCmd.AddCommand(client.PostCommands(
+	nftTxCmd.AddCommand(
 		GetCmdTransferNFT(cdc),
 		GetCmdEditNFTMetadata(cdc),
 		GetCmdMintNFT(cdc),
 		GetCmdBurnNFT(cdc),
-	)...)
+	)
 
 	return nftTxCmd
 }
@@ -61,8 +61,9 @@ crypto-kitties d04b98f48e8f8bcc15c6ae5ac050801cd6dcfd428fb5f9e65c4e16e7807340fa 
 		),
 		Args: cobra.ExactArgs(4),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().WithCodec(cdc)
-			txBldr := authtypes.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
+			inBuf := bufio.NewReader(cmd.InOrStdin())
+			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
+			cliCtx := context.NewCLIContextWithInputAndFrom(inBuf, args[0]).WithCodec(cdc)
 
 			sender, err := sdk.AccAddressFromBech32(args[0])
 			if err != nil {
@@ -83,6 +84,9 @@ crypto-kitties d04b98f48e8f8bcc15c6ae5ac050801cd6dcfd428fb5f9e65c4e16e7807340fa 
 		},
 	}
 	cmd.Flags().String(flagTokenURI, "[do-not-modify]", "Extra properties available for querying")
+
+	cmd = flags.PostCommands(cmd)[0]
+
 	return cmd
 }
 
@@ -104,8 +108,9 @@ $ %s tx %s edit-metadata crypto-kitties d04b98f48e8f8bcc15c6ae5ac050801cd6dcfd42
 		),
 		Args: cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().WithCodec(cdc)
-			txBldr := authtypes.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
+			inBuf := bufio.NewReader(cmd.InOrStdin())
+			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
+			cliCtx := context.NewCLIContextWithInputAndFrom(inBuf, args[0]).WithCodec(cdc)
 
 			denom := args[0]
 			tokenID := args[1]
@@ -117,6 +122,9 @@ $ %s tx %s edit-metadata crypto-kitties d04b98f48e8f8bcc15c6ae5ac050801cd6dcfd42
 	}
 
 	cmd.Flags().String(flagTokenURI, "", "Extra properties available for querying")
+
+	cmd = flags.PostCommands(cmd)[0]
+
 	return cmd
 }
 
@@ -138,8 +146,9 @@ cosmos1gghjut3ccd8ay0zduzj64hwre2fxs9ld75ru9p --from mykey
 		),
 		Args: cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().WithCodec(cdc)
-			txBldr := authtypes.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
+			inBuf := bufio.NewReader(cmd.InOrStdin())
+			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
+			cliCtx := context.NewCLIContextWithInputAndFrom(inBuf, args[0]).WithCodec(cdc)
 
 			denom := args[0]
 			tokenID := args[1]
@@ -158,12 +167,14 @@ cosmos1gghjut3ccd8ay0zduzj64hwre2fxs9ld75ru9p --from mykey
 
 	cmd.Flags().String(flagTokenURI, "", "URI for supplemental off-chain metadata (should return a JSON object)")
 
+	cmd = flags.PostCommands(cmd)[0]
+
 	return cmd
 }
 
 // GetCmdBurnNFT is the CLI command for sending a BurnNFT transaction
 func GetCmdBurnNFT(cdc *codec.Codec) *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "burn [denom] [tokenID]",
 		Short: "burn an NFT",
 		Long: strings.TrimSpace(
@@ -179,8 +190,9 @@ $ %s tx %s burn crypto-kitties d04b98f48e8f8bcc15c6ae5ac050801cd6dcfd428fb5f9e65
 		),
 		Args: cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().WithCodec(cdc)
-			txBldr := authtypes.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
+			inBuf := bufio.NewReader(cmd.InOrStdin())
+			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
+			cliCtx := context.NewCLIContextWithInputAndFrom(inBuf, args[0]).WithCodec(cdc)
 
 			denom := args[0]
 			tokenID := args[1]
@@ -189,4 +201,7 @@ $ %s tx %s burn crypto-kitties d04b98f48e8f8bcc15c6ae5ac050801cd6dcfd428fb5f9e65
 			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
 		},
 	}
+
+	cmd = flags.PostCommands(cmd)[0]
+	return cmd
 }

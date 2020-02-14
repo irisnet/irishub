@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 // IDCollection defines a set of nft ids that belong to a specific
@@ -42,12 +43,10 @@ func (idCollection IDCollection) AddID(id string) IDCollection {
 }
 
 // DeleteID deletes an ID from an ID Collection
-func (idCollection IDCollection) DeleteID(id string) (IDCollection, sdk.Error) {
+func (idCollection IDCollection) DeleteID(id string) (IDCollection, error) {
 	index := idCollection.IDs.find(id)
 	if index == -1 {
-		return idCollection, ErrUnknownNFT(DefaultCodespace,
-			fmt.Sprintf("ID #%s doesn't exist on ID Collection %s", id, idCollection.Denom),
-		)
+		return idCollection, sdkerrors.Wrapf(ErrUnknownNFT, "ID #%s doesn't exist on ID Collection %s", id, idCollection.Denom)
 	}
 
 	idCollection.IDs = append(idCollection.IDs[:index], idCollection.IDs[index+1:]...)
@@ -129,13 +128,11 @@ func (owner Owner) GetIDCollection(denom string) (IDCollection, bool) {
 }
 
 // UpdateIDCollection updates the ID Collection of an owner
-func (owner Owner) UpdateIDCollection(idCollection IDCollection) (Owner, sdk.Error) {
+func (owner Owner) UpdateIDCollection(idCollection IDCollection) (Owner, error) {
 	denom := idCollection.Denom
 	index := owner.IDCollections.find(denom)
 	if index == -1 {
-		return owner, ErrUnknownCollection(DefaultCodespace,
-			fmt.Sprintf("ID Collection %s doesn't exist for owner %s", denom, owner.Address),
-		)
+		return owner, sdkerrors.Wrapf(ErrUnknownCollection, "ID Collection %s doesn't exist for owner %s", denom, owner.Address)
 	}
 
 	owner.IDCollections = append(append(owner.IDCollections[:index], idCollection), owner.IDCollections[index+1:]...)
@@ -144,12 +141,10 @@ func (owner Owner) UpdateIDCollection(idCollection IDCollection) (Owner, sdk.Err
 }
 
 // DeleteID deletes an ID from an owners ID Collection
-func (owner Owner) DeleteID(denom string, id string) (Owner, sdk.Error) {
+func (owner Owner) DeleteID(denom string, id string) (Owner, error) {
 	idCollection, found := owner.GetIDCollection(denom)
 	if !found {
-		return owner, ErrUnknownNFT(DefaultCodespace,
-			fmt.Sprintf("ID #%s doesn't exist in ID Collection %s", id, denom),
-		)
+		return owner, sdkerrors.Wrapf(ErrUnknownNFT, "ID #%s doesn't exist in ID Collection %s", id, denom)
 	}
 	idCollection, err := idCollection.DeleteID(id)
 	if err != nil {

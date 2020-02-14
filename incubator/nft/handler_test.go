@@ -25,9 +25,10 @@ const (
 func TestInvalidMsg(t *testing.T) {
 	app, ctx := createTestApp(false)
 	h := nft.GenericHandler(app.NFTKeeper)
-	res := h(ctx, sdk.NewTestMsg())
-	require.False(t, res.IsOK())
-	require.True(t, strings.Contains(res.Log, "unrecognized nft message type"))
+	res, err := h(ctx, sdk.NewTestMsg())
+	require.Error(t, err)
+	require.Nil(t, res)
+	require.True(t, strings.Contains(err.Error(), "unrecognized nft message type"))
 }
 
 func TestTransferNFTMsg(t *testing.T) {
@@ -41,17 +42,19 @@ func TestTransferNFTMsg(t *testing.T) {
 	transferNftMsg := types.NewMsgTransferNFT(address, address2, denom, id, tokenURI)
 
 	// handle should fail trying to transfer NFT that doesn't exist
-	res := h(ctx, transferNftMsg)
-	require.False(t, res.IsOK(), "%v", res)
+	res, err := h(ctx, transferNftMsg)
+	require.Error(t, err)
+	require.Nil(t, res)
 
 	// Create token (collection and owner)
-	err := app.NFTKeeper.MintNFT(ctx, denom, &nft)
+	err = app.NFTKeeper.MintNFT(ctx, denom, &nft)
 	require.Nil(t, err)
 	require.True(t, CheckInvariants(app.NFTKeeper, ctx))
 
 	// handle should succeed when nft exists and is transferred by owner
-	res = h(ctx, transferNftMsg)
-	require.True(t, res.IsOK(), "%v", res)
+	res, err = h(ctx, transferNftMsg)
+	require.NoError(t, err)
+	require.NotNil(t, res)
 	require.True(t, CheckInvariants(app.NFTKeeper, ctx))
 
 	// event events should be emitted correctly
@@ -83,8 +86,9 @@ func TestTransferNFTMsg(t *testing.T) {
 	transferNftMsg = types.NewMsgTransferNFT(address2, address3, denom, id, tokenURI)
 
 	// handle should succeed when nft exists and is transferred by owner
-	res = h(ctx, transferNftMsg)
-	require.True(t, res.IsOK(), "%v", res)
+	res, err = h(ctx, transferNftMsg)
+	require.NoError(t, err)
+	require.NotNil(t, res)
 	require.True(t, CheckInvariants(app.NFTKeeper, ctx))
 
 	// Create token (collection and owner)
@@ -95,8 +99,9 @@ func TestTransferNFTMsg(t *testing.T) {
 	transferNftMsg = types.NewMsgTransferNFT(address2, address3, denom2, id, tokenURI)
 
 	// handle should succeed when nft exists and is transferred by owner
-	res = h(ctx, transferNftMsg)
-	require.True(t, res.IsOK(), "%v", res)
+	res, err = h(ctx, transferNftMsg)
+	require.NoError(t, err)
+	require.NotNil(t, res)
 	require.True(t, CheckInvariants(app.NFTKeeper, ctx))
 }
 
@@ -114,14 +119,16 @@ func TestEditNFTMetadataMsg(t *testing.T) {
 	// Define MsgTransferNft
 	failingEditNFTMetadata := types.NewMsgEditNFTMetadata(address, id, denom2, tokenURI2)
 
-	res := h(ctx, failingEditNFTMetadata)
-	require.False(t, res.IsOK(), "%v", res)
+	res, err := h(ctx, failingEditNFTMetadata)
+	require.Error(t, err)
+	require.Nil(t, res)
 
 	// Define MsgTransferNft
 	editNFTMetadata := types.NewMsgEditNFTMetadata(address, id, denom, tokenURI2)
 
-	res = h(ctx, editNFTMetadata)
-	require.True(t, res.IsOK(), "%v", res)
+	res, err = h(ctx, editNFTMetadata)
+	require.NoError(t, err)
+	require.NotNil(t, res)
 
 	// event events should be emitted correctly
 	for _, event := range res.Events {
@@ -157,8 +164,9 @@ func TestMintNFTMsg(t *testing.T) {
 	mintNFT := types.NewMsgMintNFT(address, address, id, denom, tokenURI)
 
 	// minting a token should succeed
-	res := h(ctx, mintNFT)
-	require.True(t, res.IsOK(), "%v", res)
+	res, err := h(ctx, mintNFT)
+	require.NoError(t, err)
+	require.NotNil(t, res)
 
 	// event events should be emitted correctly
 	for _, event := range res.Events {
@@ -189,8 +197,9 @@ func TestMintNFTMsg(t *testing.T) {
 	require.Equal(t, tokenURI, nftAfterwards.GetTokenURI())
 
 	// minting the same token should fail
-	res = h(ctx, mintNFT)
-	require.False(t, res.IsOK(), "%v", res)
+	res, err = h(ctx, mintNFT)
+	require.Error(t, err)
+	require.Nil(t, res)
 
 	require.True(t, CheckInvariants(app.NFTKeeper, ctx))
 }
@@ -211,8 +220,9 @@ func TestBurnNFTMsg(t *testing.T) {
 
 	// burning a non-existent NFT should fail
 	failBurnNFT := types.NewMsgBurnNFT(address, id2, denom)
-	res := h(ctx, failBurnNFT)
-	require.False(t, res.IsOK(), "%s", res.Log)
+	res, err := h(ctx, failBurnNFT)
+	require.Error(t, err)
+	require.Nil(t, res)
 
 	// NFT should still exist
 	exists = app.NFTKeeper.IsNFT(ctx, denom, id)
@@ -221,8 +231,9 @@ func TestBurnNFTMsg(t *testing.T) {
 	// burning the NFt should succeed
 	burnNFT := types.NewMsgBurnNFT(address, id, denom)
 
-	res = h(ctx, burnNFT)
-	require.True(t, res.IsOK(), "%v", res)
+	res, err = h(ctx, burnNFT)
+	require.NoError(t, err)
+	require.NotNil(t, res)
 
 	// event events should be emitted correctly
 	for _, event := range res.Events {
