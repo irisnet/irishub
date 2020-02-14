@@ -181,5 +181,5 @@ func ErrRequestContextNotPaused(codespace sdk.CodespaceType) sdk.Error {
 }
 
 func ErrModuleNameRegistered(codespace sdk.CodespaceType, moduleName string) sdk.Error {
-	return sdk.NewError(codespace, CodeModuleNameRegistered, fmt.Sprintf("module % already registered", moduleName))
+	return sdk.NewError(codespace, CodeModuleNameRegistered, fmt.Sprintf("module %s already registered", moduleName))
 }
