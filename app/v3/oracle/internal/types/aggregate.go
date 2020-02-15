@@ -9,20 +9,20 @@ import (
 )
 
 var (
-	router methodRouter
+	router funcRouter
 )
 
-type methodRouter map[string]Aggregate
+type funcRouter map[string]Aggregate
 type Aggregate func(args []Value) Value
 
 func init() {
-	router = make(methodRouter)
-	_ = RegisterAggregateMethod("max", Max)
-	_ = RegisterAggregateMethod("min", Min)
-	_ = RegisterAggregateMethod("avg", Avg)
+	router = make(funcRouter)
+	_ = RegisterAggregateFunc("max", Max)
+	_ = RegisterAggregateFunc("min", Min)
+	_ = RegisterAggregateFunc("avg", Avg)
 }
 
-func GetAggregateMethod(methodNm string) (Aggregate, sdk.Error) {
+func GetAggregateFunc(methodNm string) (Aggregate, sdk.Error) {
 	fun, ok := router[methodNm]
 	if !ok {
 		return nil, ErrNotRegisterMethod(DefaultCodespace, methodNm)
@@ -30,7 +30,7 @@ func GetAggregateMethod(methodNm string) (Aggregate, sdk.Error) {
 	return fun, nil
 }
 
-func RegisterAggregateMethod(methodNm string, fun Aggregate) error {
+func RegisterAggregateFunc(methodNm string, fun Aggregate) error {
 	_, ok := router[methodNm]
 	if ok {
 		return errors.New(fmt.Sprintf("%s has existed", methodNm))

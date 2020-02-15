@@ -1,13 +1,17 @@
 package types
 
-import sdk "github.com/irisnet/irishub/types"
+import (
+	"github.com/irisnet/irishub/modules/guardian"
+	sdk "github.com/irisnet/irishub/types"
+)
 
 //expected Service keeper
 type ServiceKeeper interface {
-	RegisterResponseHandler(moduleName string,
-		callback func(ctx sdk.Context, requestContextID []byte, responseOutput []string)) error
+	RegisterResponseCallback(moduleName string,
+		respCallback ResponseCallback) sdk.Error
 
-	GetRequestContext(ctx sdk.Context, requestContextID []byte) (RequestContext, bool)
+	GetRequestContext(ctx sdk.Context,
+		requestContextID []byte) (RequestContext, bool)
 
 	CreateRequestContext(ctx sdk.Context,
 		serviceName string,
@@ -23,16 +27,27 @@ type ServiceKeeper interface {
 		respThreshold uint16,
 		respHandler string) ([]byte, sdk.Error)
 
-	UpdateRequestContext(ctx sdk.Context, requestContextID []byte) error
+	UpdateRequestContext(ctx sdk.Context,
+		requestContextID []byte,
+		providers []sdk.AccAddress,
+		serviceFeeCap sdk.Coins,
+		repeatedFreq uint64,
+		repeatedTotal int64) sdk.Error
 
-	StartRequestContext(ctx sdk.Context, requestContextID []byte) error
+	StartRequestContext(ctx sdk.Context,
+		requestContextID []byte) sdk.Error
 
-	PauseRequestContext(ctx sdk.Context, requestContextID []byte) error
+	PauseRequestContext(ctx sdk.Context,
+		requestContextID []byte) sdk.Error
+}
 
-	KillRequestContext(ctx sdk.Context, requestContextID []byte) error
+// GuardianKeeper defines the expected guardian keeper (noalias)
+type GuardianKeeper interface {
+	GetProfiler(ctx sdk.Context, addr sdk.AccAddress) (guardian guardian.Guardian, found bool)
 }
 
 type RequestContext = MockRequestContext
+type ResponseCallback func(ctx sdk.Context, requestContextID []byte, responses []string)
 
 const (
 	Running RequestContextState = "running"
@@ -52,7 +67,7 @@ type MockRequestContext struct {
 	BatchCounter      uint64              `json:"batch_counter"`
 	State             RequestContextState `json:"state"`
 	ResponseThreshold uint16              `json:"response_threshold"`
-	ResponseHandler   string              `json:"response_handler"`
+	ModuleName        string              `json:"module_name"`
 }
 
 type RequestContextState string

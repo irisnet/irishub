@@ -46,12 +46,14 @@ func makeTestCodec() *codec.Codec {
 
 func createTestInput(t *testing.T, amt sdk.Int, nAccs int64) (sdk.Context, Keeper, []auth.Account) {
 	keyAcc := protocol.KeyAccount
+	keyGuardian := protocol.KeyGuardian
 	keyOracle := sdk.NewKVStoreKey("oracle")
 
 	db := dbm.NewMemDB()
 	ms := store.NewCommitMultiStore(db)
 	ms.MountStoreWithDB(keyAcc, sdk.StoreTypeIAVL, db)
 	ms.MountStoreWithDB(keyOracle, sdk.StoreTypeIAVL, db)
+	ms.MountStoreWithDB(keyGuardian, sdk.StoreTypeIAVL, db)
 	err := ms.LoadLatestVersion()
 	require.Nil(t, err)
 
@@ -67,7 +69,16 @@ func createTestInput(t *testing.T, amt sdk.Int, nAccs int64) (sdk.Context, Keepe
 
 	mockServiceKeeper := NewMockServiceKeeper()
 
-	keeper := NewKeeper(cdc, keyOracle, types.DefaultCodespace, mockServiceKeeper)
+	gk := guardian.NewKeeper(cdc, keyGuardian, guardian.DefaultCodespace)
+	err = gk.AddProfiler(ctx, guardian.Guardian{
+		Description: "oracle test",
+		AccountType: guardian.Genesis,
+		Address:     accs[0].GetAddress(),
+		AddedBy:     nil,
+	})
+	require.Nil(t, err)
+
+	keeper := NewKeeper(cdc, keyOracle, types.DefaultCodespace, gk, mockServiceKeeper)
 
 	return ctx, keeper, accs
 }
@@ -88,25 +99,23 @@ func createTestAccs(ctx sdk.Context, numAccs int, initialCoins sdk.Coins, ak *au
 	return
 }
 
-type Callback func(ctx sdk.Context, requestContextID []byte, responseOutput []string)
-
 type MockServiceKeeper struct {
 	cxtMap      map[string]types.RequestContext
-	callbackMap map[string]Callback
+	callbackMap map[string]types.ResponseCallback
 }
 
 func NewMockServiceKeeper() MockServiceKeeper {
 	cxtMap := make(map[string]types.RequestContext)
-	callbackMap := make(map[string]Callback)
+	callbackMap := make(map[string]types.ResponseCallback)
 	return MockServiceKeeper{
 		cxtMap:      cxtMap,
 		callbackMap: callbackMap,
 	}
 }
 
-func (m MockServiceKeeper) RegisterResponseHandler(moduleName string,
-	callback func(ctx sdk.Context, requestContextID []byte, responseOutput []string)) error {
-	m.callbackMap[moduleName] = callback
+func (m MockServiceKeeper) RegisterResponseCallback(moduleName string,
+	respCallback types.ResponseCallback) sdk.Error {
+	m.callbackMap[moduleName] = respCallback
 	return nil
 }
 
@@ -144,36 +153,41 @@ func (m MockServiceKeeper) CreateRequestContext(ctx sdk.Context,
 		BatchCounter:      0,
 		State:             state,
 		ResponseThreshold: respThreshold,
-		ResponseHandler:   moduleName,
+		ModuleName:        moduleName,
 	}
 	m.cxtMap[reqCtxID] = reqCtx
 	return []byte(reqCtxID), nil
 }
 
-func (m MockServiceKeeper) UpdateRequestContext(ctx sdk.Context, requestContextID []byte) error {
+func (m MockServiceKeeper) UpdateRequestContext(ctx sdk.Context,
+	requestContextID []byte,
+	providers []sdk.AccAddress,
+	serviceFeeCap sdk.Coins,
+	repeatedFreq uint64,
+	repeatedTotal int64) sdk.Error {
 	return nil
 }
 
-func (m MockServiceKeeper) StartRequestContext(ctx sdk.Context, requestContextID []byte) error {
+func (m MockServiceKeeper) StartRequestContext(ctx sdk.Context, requestContextID []byte) sdk.Error {
 	reqCtx := m.cxtMap[string(requestContextID)]
-	for i := int64(1); i <= reqCtx.RepeatedTotal; i++ {
+	for i := int64(reqCtx.BatchCounter + 1); i <= reqCtx.RepeatedTotal; i++ {
 		reqCtx.BatchCounter = uint64(i)
+		reqCtx.State = types.Running
 		m.cxtMap[string(requestContextID)] = reqCtx
 		ctx = ctx.WithBlockHeader(abci.Header{
 			ChainID: ctx.BlockHeader().ChainID,
 			Height:  ctx.BlockHeight() + 1,
 			Time:    ctx.BlockTime().Add(2 * time.Minute),
 		})
-		callback := m.callbackMap[reqCtx.ResponseHandler]
+		callback := m.callbackMap[reqCtx.ModuleName]
 		callback(ctx, requestContextID, responses)
 	}
 	return nil
 }
 
-func (m MockServiceKeeper) PauseRequestContext(ctx sdk.Context, requestContextID []byte) error {
-	panic("implement me")
-}
-
-func (m MockServiceKeeper) KillRequestContext(ctx sdk.Context, requestContextID []byte) error {
-	panic("implement me")
+func (m MockServiceKeeper) PauseRequestContext(ctx sdk.Context, requestContextID []byte) sdk.Error {
+	reqCtx := m.cxtMap[string(requestContextID)]
+	reqCtx.State = types.Pause
+	m.cxtMap[string(requestContextID)] = reqCtx
+	return nil
 }

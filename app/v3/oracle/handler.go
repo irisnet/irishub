@@ -37,7 +37,7 @@ func handleMsgCreateFeed(ctx sdk.Context, k Keeper, msg MsgCreateFeed) sdk.Resul
 		Tags: sdk.NewTags(
 			types.TagAction, []byte(types.TypeMsgCreateFeed),
 			types.TagFeedName, msg.FeedName,
-			types.TagOwner, msg.Owner,
+			types.TagOwner, msg.Creator,
 		),
 	}
 }
@@ -51,7 +51,7 @@ func handleMsgStartFeed(ctx sdk.Context, k Keeper, msg MsgStartFeed) sdk.Result 
 		Tags: sdk.NewTags(
 			types.TagAction, []byte(types.TypeMsgStartFeed),
 			types.TagFeedName, msg.FeedName,
-			types.TagOwner, msg.Owner,
+			types.TagOwner, msg.Creator,
 		),
 	}
 }
@@ -65,7 +65,7 @@ func handleMsgPauseFeed(ctx sdk.Context, k Keeper, msg MsgPauseFeed) sdk.Result 
 		Tags: sdk.NewTags(
 			types.TagAction, []byte(types.TypeMsgPauseFeed),
 			types.TagFeedName, msg.FeedName,
-			types.TagOwner, msg.Owner,
+			types.TagOwner, msg.Creator,
 		),
 	}
 }
@@ -93,7 +93,7 @@ func handleMsgEditFeed(ctx sdk.Context, k Keeper, msg MsgEditFeed) sdk.Result {
 		Tags: sdk.NewTags(
 			types.TagAction, []byte(types.TypeMsgEditFeed),
 			types.TagFeedName, msg.FeedName,
-			types.TagOwner, msg.Owner,
+			types.TagOwner, msg.Creator,
 		),
 	}
 }

@@ -56,13 +56,6 @@ func (k Keeper) setFeed(ctx sdk.Context, feed types.Feed) {
 	store.Set(GetReqCtxIDKey(feed.RequestContextID), bz)
 }
 
-func (k Keeper) deleteFeed(ctx sdk.Context, feed types.Feed) {
-	store := ctx.KVStore(k.storeKey)
-	store.Delete(GetFeedKey(feed.FeedName))
-	store.Delete(GetReqCtxIDKey(feed.RequestContextID))
-	store.Delete(GetFeedResultPrefixKey(feed.FeedName))
-}
-
 func (k Keeper) setFeedResult(ctx sdk.Context, feedName string, batchCounter uint64, latestHistory uint64, data types.Value) {
 	store := ctx.KVStore(k.storeKey)
 	result := types.FeedResult{
