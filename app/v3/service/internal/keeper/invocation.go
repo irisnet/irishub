@@ -9,7 +9,7 @@ import (
 )
 
 // RegisterResponseCallback registers a module callback for response handling
-func (k Keeper) RegisterResponseCallback(ctx sdk.Context, moduleName string, respCallback types.ResponseCallback) sdk.Error {
+func (k Keeper) RegisterResponseCallback(moduleName string, respCallback types.ResponseCallback) sdk.Error {
 	if _, ok := k.respCallbacks[moduleName]; ok {
 		return types.ErrModuleNameRegistered(k.codespace, moduleName)
 	}

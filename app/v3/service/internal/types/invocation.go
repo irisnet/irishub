@@ -69,7 +69,7 @@ const (
 )
 
 // ResponseCallback defines the response callback interface
-type ResponseCallback func(requestContextID []byte, reponses []string)
+type ResponseCallback func(ctx sdk.Context, requestContextID []byte, reponses []string)
 
 // GenerateRequestContextID generates a unique ID for the request context from the specified params
 func GenerateRequestContextID(blockHeight int64, intraCounter int16) []byte {
