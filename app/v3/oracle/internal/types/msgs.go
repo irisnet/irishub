@@ -268,7 +268,7 @@ func validateFeedName(feedName string) sdk.Error {
 	if len(feedName) == 0 || len(feedName) > MaxNameLen {
 		return ErrInvalidFeedName(DefaultCodespace)
 	}
-	if regPlainText.MatchString(feedName) {
+	if !regPlainText.MatchString(feedName) {
 		return ErrInvalidFeedName(DefaultCodespace)
 	}
 	return nil
@@ -279,7 +279,7 @@ func validateServiceName(serviceName string) sdk.Error {
 	if len(serviceName) == 0 || len(serviceName) > MaxNameLen {
 		return ErrInvalidServiceName(DefaultCodespace)
 	}
-	if regPlainText.MatchString(serviceName) {
+	if !regPlainText.MatchString(serviceName) {
 		return ErrInvalidServiceName(DefaultCodespace)
 	}
 	return nil
