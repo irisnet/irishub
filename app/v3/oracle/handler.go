@@ -17,8 +17,6 @@ func NewHandler(k Keeper) sdk.Handler {
 			return handleMsgStartFeed(ctx, k, msg)
 		case MsgPauseFeed:
 			return handleMsgPauseFeed(ctx, k, msg)
-		case MsgKillFeed:
-			return handleMsgKillFeed(ctx, k, msg)
 		case MsgEditFeed:
 			return handleMsgEditFeed(ctx, k, msg)
 		default:
@@ -37,7 +35,7 @@ func handleMsgCreateFeed(ctx sdk.Context, k Keeper, msg MsgCreateFeed) sdk.Resul
 		Tags: sdk.NewTags(
 			types.TagAction, []byte(types.TypeMsgCreateFeed),
 			types.TagFeedName, msg.FeedName,
-			types.TagOwner, msg.Creator,
+			types.TagCreator, msg.Creator,
 		),
 	}
 }
@@ -51,7 +49,7 @@ func handleMsgStartFeed(ctx sdk.Context, k Keeper, msg MsgStartFeed) sdk.Result 
 		Tags: sdk.NewTags(
 			types.TagAction, []byte(types.TypeMsgStartFeed),
 			types.TagFeedName, msg.FeedName,
-			types.TagOwner, msg.Creator,
+			types.TagCreator, msg.Creator,
 		),
 	}
 }
@@ -65,21 +63,7 @@ func handleMsgPauseFeed(ctx sdk.Context, k Keeper, msg MsgPauseFeed) sdk.Result 
 		Tags: sdk.NewTags(
 			types.TagAction, []byte(types.TypeMsgPauseFeed),
 			types.TagFeedName, msg.FeedName,
-			types.TagOwner, msg.Creator,
-		),
-	}
-}
-
-// handleMsgKillFeed handles MsgKillFeed
-func handleMsgKillFeed(ctx sdk.Context, k Keeper, msg MsgKillFeed) sdk.Result {
-	if err := k.KillFeed(ctx, msg); err != nil {
-		return err.Result()
-	}
-	return sdk.Result{
-		Tags: sdk.NewTags(
-			types.TagAction, []byte(types.TypeMsgKillFeed),
-			types.TagFeedName, msg.FeedName,
-			types.TagOwner, msg.Owner,
+			types.TagCreator, msg.Creator,
 		),
 	}
 }
@@ -93,7 +77,7 @@ func handleMsgEditFeed(ctx sdk.Context, k Keeper, msg MsgEditFeed) sdk.Result {
 		Tags: sdk.NewTags(
 			types.TagAction, []byte(types.TypeMsgEditFeed),
 			types.TagFeedName, msg.FeedName,
-			types.TagOwner, msg.Creator,
+			types.TagCreator, msg.Creator,
 		),
 	}
 }
