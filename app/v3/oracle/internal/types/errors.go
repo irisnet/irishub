@@ -1,8 +1,6 @@
 package types
 
 import (
-	"fmt"
-
 	sdk "github.com/irisnet/irishub/types"
 )
 
@@ -10,41 +8,42 @@ const (
 	DefaultCodespace sdk.CodespaceType = "oracle"
 
 	CodeUnknownFeedName          sdk.CodeType = 100
-	CodeEmptyFeedName            sdk.CodeType = 101
+	CodeInvalidFeedName          sdk.CodeType = 101
 	CodeExistedFeedName          sdk.CodeType = 102
 	CodeUnauthorized             sdk.CodeType = 103
-	CodeEmptyServiceName         sdk.CodeType = 104
+	CodeInvalidServiceName       sdk.CodeType = 104
 	CodeInvalidLatestHistory     sdk.CodeType = 105
 	CodeEmptyProviders           sdk.CodeType = 106
 	CodeInvalidServiceFeeCap     sdk.CodeType = 107
 	CodeInvalidResponseThreshold sdk.CodeType = 108
 	CodeInvalidAddress           sdk.CodeType = 109
-	CodeEmptyAggregateFunc       sdk.CodeType = 110
-	CodeEmptyValueJsonPath       sdk.CodeType = 111
+	CodeInvalidAggregateFunc     sdk.CodeType = 110
+	CodeInvalidValueJsonPath     sdk.CodeType = 111
 	CodeUnknownRequestContextID  sdk.CodeType = 112
 	CodeNotRegisterMethod        sdk.CodeType = 113
 	CodeInvalidFeedState         sdk.CodeType = 114
 	CodeNotProfiler              sdk.CodeType = 115
+	CodeInvalidDescription       sdk.CodeType = 116
 )
 
 func ErrUnknownFeedName(codespace sdk.CodespaceType, feedName string) sdk.Error {
-	return sdk.NewError(codespace, CodeUnknownFeedName, fmt.Sprintf("feed name %s does not exist", feedName))
+	return sdk.NewError(codespace, CodeUnknownFeedName, "feed name %s does not exist", feedName)
 }
 
-func ErrEmptyFeedName(codespace sdk.CodespaceType) sdk.Error {
-	return sdk.NewError(codespace, CodeEmptyFeedName, "feed name can not be empty")
+func ErrInvalidFeedName(codespace sdk.CodespaceType) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidFeedName, "feed name length should be more than 0 and less than %d", MaxNameLen)
 }
 
 func ErrExistedFeedName(codespace sdk.CodespaceType, feedName string) sdk.Error {
-	return sdk.NewError(codespace, CodeExistedFeedName, fmt.Sprintf("feed name %s already exists", feedName))
+	return sdk.NewError(codespace, CodeExistedFeedName, "feed name %s already exists", feedName)
 }
 
 func ErrUnauthorized(codespace sdk.CodespaceType, feedName string, owner sdk.AccAddress) sdk.Error {
-	return sdk.NewError(codespace, CodeUnauthorized, fmt.Sprintf("feed %s does not belong to %s", feedName, owner.String()))
+	return sdk.NewError(codespace, CodeUnauthorized, "feed %s does not belong to %s", feedName, owner.String())
 }
 
-func ErrEmptyServiceName(codespace sdk.CodespaceType) sdk.Error {
-	return sdk.NewError(codespace, CodeEmptyServiceName, "service name can not be empty")
+func ErrInvalidServiceName(codespace sdk.CodespaceType) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidServiceName, "service name length should be more than 0 and less than %d", MaxNameLen)
 }
 
 func ErrEmptyProviders(codespace sdk.CodespaceType) sdk.Error {
@@ -52,27 +51,27 @@ func ErrEmptyProviders(codespace sdk.CodespaceType) sdk.Error {
 }
 
 func ErrInvalidLatestHistory(codespace sdk.CodespaceType) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidLatestHistory, fmt.Sprintf("latest history is invalid, should be between 1 and %d", LatestHistory))
+	return sdk.NewError(codespace, CodeInvalidLatestHistory, "latest history is invalid, should be between 1 and %d", LatestHistory)
 }
 
 func ErrInvalidServiceFeeCap(codespace sdk.CodespaceType, fees sdk.Coins) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidServiceFeeCap, fmt.Sprintf("service fee %s is invalid", fees.String()))
+	return sdk.NewError(codespace, CodeInvalidServiceFeeCap, "service fee %s is invalid", fees.String())
 }
 
 func ErrInvalidResponseThreshold(codespace sdk.CodespaceType, limit int) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidResponseThreshold, fmt.Sprintf("response threshold should be between 1 and %d", limit))
+	return sdk.NewError(codespace, CodeInvalidResponseThreshold, "response threshold should be between 1 and %d", limit)
 }
 
 func ErrInvalidAddress(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidAddress, msg)
 }
 
-func ErrEmptyEmptyAggregateFunc(codespace sdk.CodespaceType) sdk.Error {
-	return sdk.NewError(codespace, CodeEmptyAggregateFunc, "aggregate func can not be empty")
+func ErrInvalidAggregateFunc(codespace sdk.CodespaceType) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidAggregateFunc, "aggregate function name length should be more than 0 and less than %d", MaxNameLen)
 }
 
-func ErrEmptyValueJsonPath(codespace sdk.CodespaceType) sdk.Error {
-	return sdk.NewError(codespace, CodeEmptyValueJsonPath, "json path can not be empty")
+func ErrInvalidValueJsonPath(codespace sdk.CodespaceType) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidValueJsonPath, "json path length should be more than 0 and less than %d", MaxNameLen)
 }
 
 func ErrUnknownRequestContextID(codespace sdk.CodespaceType, reqCtxID []byte) sdk.Error {
@@ -88,5 +87,9 @@ func ErrInvalidFeedState(codespace sdk.CodespaceType, feedName string) sdk.Error
 }
 
 func ErrNotProfiler(codespace sdk.CodespaceType, profiler sdk.AccAddress) sdk.Error {
-	return sdk.NewError(codespace, CodeNotProfiler, fmt.Sprintf("[%s] is not a profiler address", profiler))
+	return sdk.NewError(codespace, CodeNotProfiler, "%s is not a profiler address", profiler)
+}
+
+func ErrInvalidDescription(codespace sdk.CodespaceType, descLen int) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidDescription, "description length should be no more than %d,actual length is %d", descLen)
 }

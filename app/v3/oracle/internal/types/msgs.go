@@ -1,6 +1,7 @@
 package types
 
 import (
+	"regexp"
 	"strings"
 
 	sdk "github.com/irisnet/irishub/types"
@@ -10,7 +11,9 @@ const (
 	ModuleName = "oracle"
 	MsgRoute   = ModuleName // route for oracle msg
 
-	LatestHistory = 100
+	LatestHistory     = 100
+	MaxNameLen        = 70 // max length of the feed/service name
+	MaxDescriptionLen = 200
 
 	TypeMsgCreateFeed = "create_feed" // type for MsgCreateFeed
 	TypeMsgStartFeed  = "start_feed"  // type for MsgStartFeed
@@ -23,6 +26,9 @@ var (
 	_ sdk.Msg = MsgStartFeed{}
 	_ sdk.Msg = MsgPauseFeed{}
 	_ sdk.Msg = MsgEditFeed{}
+
+	// the feed/service name only accepts alphanumeric characters, _ and -
+	regPlainText = regexp.MustCompile(`^[a-zA-Z][a-zA-Z0-9_-]*$`)
 )
 
 //______________________________________________________________________
@@ -57,18 +63,20 @@ func (msg MsgCreateFeed) Type() string {
 
 // ValidateBasic implements Msg.
 func (msg MsgCreateFeed) ValidateBasic() sdk.Error {
-	feedKey := strings.TrimSpace(msg.ServiceName)
-	if len(feedKey) == 0 {
-		return ErrEmptyFeedName(DefaultCodespace)
+	if err := validateFeedName(msg.FeedName); err != nil {
+		return err
 	}
 
-	serviceName := strings.TrimSpace(msg.ServiceName)
-	if len(serviceName) == 0 {
-		return ErrEmptyServiceName(DefaultCodespace)
+	if len(msg.Description) > MaxDescriptionLen {
+		return ErrInvalidDescription(DefaultCodespace, len(msg.Description))
 	}
 
-	if msg.LatestHistory < 1 || msg.LatestHistory > LatestHistory {
-		return ErrInvalidLatestHistory(DefaultCodespace)
+	if err := validateServiceName(msg.ServiceName); err != nil {
+		return err
+	}
+
+	if err := validateLatestHistory(msg.LatestHistory); err != nil {
+		return err
 	}
 
 	if len(msg.Providers) == 0 {
@@ -76,27 +84,26 @@ func (msg MsgCreateFeed) ValidateBasic() sdk.Error {
 	}
 
 	aggregateFunc := strings.TrimSpace(msg.AggregateFunc)
-	if len(aggregateFunc) == 0 {
-		return ErrEmptyEmptyAggregateFunc(DefaultCodespace)
+	if len(aggregateFunc) == 0 || len(aggregateFunc) > MaxNameLen {
+		return ErrInvalidAggregateFunc(DefaultCodespace)
+	}
+	if _, err := GetAggregateFunc(aggregateFunc); err != nil {
+		return err
 	}
 
 	valueJsonPath := strings.TrimSpace(msg.ValueJsonPath)
-	if len(valueJsonPath) == 0 {
-		return ErrEmptyValueJsonPath(DefaultCodespace)
+	if len(valueJsonPath) == 0 || len(valueJsonPath) > MaxNameLen {
+		return ErrInvalidValueJsonPath(DefaultCodespace)
 	}
 
 	if !msg.ServiceFeeCap.IsValidIrisAtto() {
 		return ErrInvalidServiceFeeCap(DefaultCodespace, msg.ServiceFeeCap)
 	}
 
-	if int(msg.ResponseThreshold) > len(msg.Providers) || msg.ResponseThreshold < 1 {
-		return ErrInvalidResponseThreshold(DefaultCodespace, len(msg.Providers))
-	}
-
 	if len(msg.Creator) == 0 {
 		return ErrInvalidAddress(DefaultCodespace, "fee creator can not be empty")
 	}
-	return nil
+	return validateResponseThreshold(msg.ResponseThreshold, len(msg.Providers))
 }
 
 // GetSignBytes implements Msg.
@@ -133,15 +140,10 @@ func (msg MsgStartFeed) Type() string {
 
 // ValidateBasic implements Msg.
 func (msg MsgStartFeed) ValidateBasic() sdk.Error {
-	feedName := strings.TrimSpace(msg.FeedName)
-	if len(feedName) == 0 {
-		return ErrEmptyFeedName(DefaultCodespace)
-	}
-
 	if len(msg.Creator) == 0 {
-		return ErrInvalidAddress(DefaultCodespace, "fee creator can not be empty")
+		return ErrInvalidAddress(DefaultCodespace, "creator can not be empty")
 	}
-	return nil
+	return validateFeedName(msg.FeedName)
 }
 
 // GetSignBytes implements Msg.
@@ -178,15 +180,10 @@ func (msg MsgPauseFeed) Type() string {
 
 // ValidateBasic implements Msg.
 func (msg MsgPauseFeed) ValidateBasic() sdk.Error {
-	feedKey := strings.TrimSpace(msg.FeedName)
-	if len(feedKey) == 0 {
-		return ErrEmptyFeedName(DefaultCodespace)
-	}
-
 	if len(msg.Creator) == 0 {
-		return ErrInvalidAddress(DefaultCodespace, "fee creator can not be empty")
+		return ErrInvalidAddress(DefaultCodespace, "creator can not be empty")
 	}
-	return nil
+	return validateFeedName(msg.FeedName)
 }
 
 // GetSignBytes implements Msg.
@@ -229,23 +226,27 @@ func (msg MsgEditFeed) Type() string {
 
 // ValidateBasic implements Msg.
 func (msg MsgEditFeed) ValidateBasic() sdk.Error {
-	feedName := strings.TrimSpace(msg.FeedName)
-	if len(feedName) == 0 {
-		return ErrEmptyFeedName(DefaultCodespace)
+	if err := validateFeedName(msg.FeedName); err != nil {
+		return err
+	}
+
+	if err := validateLatestHistory(msg.LatestHistory); err != nil {
+		return err
 	}
 
 	if len(msg.Creator) == 0 {
-		return ErrInvalidAddress(DefaultCodespace, "fee creator can not be empty")
+		return ErrInvalidAddress(DefaultCodespace, "creator can not be empty")
 	}
 
 	if !msg.ServiceFeeCap.IsValidIrisAtto() {
 		return ErrInvalidServiceFeeCap(DefaultCodespace, msg.ServiceFeeCap)
 	}
 
-	if int(msg.ResponseThreshold) > len(msg.Providers) || msg.ResponseThreshold < 1 {
-		return ErrInvalidResponseThreshold(DefaultCodespace, len(msg.Providers))
+	if len(msg.Providers) == 0 {
+		return ErrEmptyProviders(DefaultCodespace)
 	}
-	return nil
+
+	return validateResponseThreshold(msg.ResponseThreshold, len(msg.Providers))
 }
 
 // GetSignBytes implements Msg.
@@ -260,4 +261,40 @@ func (msg MsgEditFeed) GetSignBytes() []byte {
 // GetSigners implements Msg.
 func (msg MsgEditFeed) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Creator}
+}
+
+func validateFeedName(feedName string) sdk.Error {
+	feedName = strings.TrimSpace(feedName)
+	if len(feedName) == 0 || len(feedName) > MaxNameLen {
+		return ErrInvalidFeedName(DefaultCodespace)
+	}
+	if regPlainText.MatchString(feedName) {
+		return ErrInvalidFeedName(DefaultCodespace)
+	}
+	return nil
+}
+
+func validateServiceName(serviceName string) sdk.Error {
+	serviceName = strings.TrimSpace(serviceName)
+	if len(serviceName) == 0 || len(serviceName) > MaxNameLen {
+		return ErrInvalidServiceName(DefaultCodespace)
+	}
+	if regPlainText.MatchString(serviceName) {
+		return ErrInvalidServiceName(DefaultCodespace)
+	}
+	return nil
+}
+
+func validateLatestHistory(latestHistory uint64) sdk.Error {
+	if latestHistory < 1 || latestHistory > LatestHistory {
+		return ErrInvalidLatestHistory(DefaultCodespace)
+	}
+	return nil
+}
+
+func validateResponseThreshold(responseThreshold uint16, maxCnt int) sdk.Error {
+	if int(responseThreshold) > maxCnt || responseThreshold < 1 {
+		return ErrInvalidResponseThreshold(DefaultCodespace, maxCnt)
+	}
+	return nil
 }
