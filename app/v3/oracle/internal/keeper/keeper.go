@@ -56,7 +56,7 @@ func (k Keeper) CreateFeed(ctx sdk.Context, msg types.MsgCreateFeed) sdk.Error {
 		true,
 		msg.RepeatedFrequency, msg.RepeatedTotal, types.Pause, msg.ResponseThreshold, types.ModuleName)
 	if err != nil {
-		return sdk.ErrInternal(err.Error())
+		return err
 	}
 
 	k.setFeed(ctx, types.Feed{
@@ -136,7 +136,8 @@ func (k Keeper) EditFeed(ctx sdk.Context, msg types.MsgEditFeed) sdk.Error {
 	}
 
 	if msg.LatestHistory > 1 {
-		if msg.LatestHistory < feed.LatestHistory {
+		if msg.LatestHistory != feed.LatestHistory &&
+			msg.LatestHistory < feed.LatestHistory {
 			count := int(feed.LatestHistory - msg.LatestHistory)
 			k.deleteOldestFeedResult(ctx, feed.FeedName, count)
 		}
@@ -176,10 +177,10 @@ func (k Keeper) HandlerResponse(ctx sdk.Context, requestContextID []byte, respon
 		return
 	}
 
-	var data []types.Value
+	var data []types.ArgsType
 	for _, jsonStr := range responseOutput {
 		result := gjson.Get(jsonStr, feed.ValueJsonPath)
-		data = append(data, result.Value())
+		data = append(data, result)
 	}
 	result := aggregate(data)
 	k.setFeedResult(ctx, feed.FeedName, reqCtx.BatchCounter, feed.LatestHistory, result)

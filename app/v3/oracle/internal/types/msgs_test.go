@@ -99,7 +99,7 @@ func TestMsgCreateFeed_ValidateBasic(t *testing.T) {
 			ResponseThreshold: 1,
 			Creator:           addr1,
 		}, false},
-		{"wrong LatestHistory(=0)", MsgCreateFeed{
+		{"wrong MaxLatestHistory(=0)", MsgCreateFeed{
 			FeedName:          "feedEthPrice",
 			AggregateFunc:     "avg",
 			ValueJsonPath:     "data.price",
@@ -115,7 +115,7 @@ func TestMsgCreateFeed_ValidateBasic(t *testing.T) {
 			ResponseThreshold: 1,
 			Creator:           addr1,
 		}, false},
-		{"wrong LatestHistory(>100)", MsgCreateFeed{
+		{"wrong MaxLatestHistory(>100)", MsgCreateFeed{
 			FeedName:          "feedEthPrice",
 			AggregateFunc:     "avg",
 			ValueJsonPath:     "data.price",
@@ -356,7 +356,7 @@ func TestMsgEditFeed_ValidateBasic(t *testing.T) {
 			ResponseThreshold: 1,
 			Creator:           addr1,
 		}, false},
-		{"wrong LatestHistory(=0)", MsgEditFeed{
+		{"wrong MaxLatestHistory(=0)", MsgEditFeed{
 			FeedName:          "feedEthPrice",
 			LatestHistory:     0,
 			Providers:         []sdk.AccAddress{addr1, addr2},
@@ -366,7 +366,7 @@ func TestMsgEditFeed_ValidateBasic(t *testing.T) {
 			ResponseThreshold: 1,
 			Creator:           addr1,
 		}, false},
-		{"wrong LatestHistory(>100)", MsgEditFeed{
+		{"wrong MaxLatestHistory(>100)", MsgEditFeed{
 			FeedName:          "feedEthPrice",
 			LatestHistory:     101,
 			Providers:         []sdk.AccAddress{addr1, addr2},

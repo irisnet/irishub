@@ -11,7 +11,7 @@ const (
 	ModuleName = "oracle"
 	MsgRoute   = ModuleName // route for oracle msg
 
-	LatestHistory     = 100
+	MaxLatestHistory  = 100
 	MaxNameLen        = 70 // max length of the feed/service name
 	MaxDescriptionLen = 200
 
@@ -286,7 +286,7 @@ func validateServiceName(serviceName string) sdk.Error {
 }
 
 func validateLatestHistory(latestHistory uint64) sdk.Error {
-	if latestHistory < 1 || latestHistory > LatestHistory {
+	if latestHistory < 1 || latestHistory > MaxLatestHistory {
 		return ErrInvalidLatestHistory(DefaultCodespace)
 	}
 	return nil

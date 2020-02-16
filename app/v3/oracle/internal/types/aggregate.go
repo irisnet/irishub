@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	sdk "github.com/irisnet/irishub/types"
+	"github.com/tidwall/gjson"
 	"math"
 	"strconv"
 )
@@ -12,8 +13,9 @@ var (
 	router funcRouter
 )
 
+type ArgsType = gjson.Result
 type funcRouter map[string]Aggregate
-type Aggregate func(args []Value) Value
+type Aggregate func(args []ArgsType) string
 
 func init() {
 	router = make(funcRouter)
@@ -25,7 +27,7 @@ func init() {
 func GetAggregateFunc(methodNm string) (Aggregate, sdk.Error) {
 	fun, ok := router[methodNm]
 	if !ok {
-		return nil, ErrNotRegisterMethod(DefaultCodespace, methodNm)
+		return nil, ErrNotRegisterFunc(DefaultCodespace, methodNm)
 	}
 	return fun, nil
 }
@@ -39,68 +41,33 @@ func RegisterAggregateFunc(methodNm string, fun Aggregate) error {
 	return nil
 }
 
-func Max(data []Value) Value {
+func Max(data []ArgsType) string {
 	var maxNumber = math.SmallestNonzeroFloat64
 	for _, d := range data {
-		f, err := ConvertToFloat64(d)
-		if err != nil {
-			continue
-		}
+		f := d.Float()
 		if maxNumber < f {
 			maxNumber = f
 		}
 	}
-	return maxNumber
+	return strconv.FormatFloat(maxNumber, 'f', 8, 64)
 }
 
-func Min(data []Value) Value {
-	var maxNumber = math.MaxFloat64
+func Min(data []ArgsType) string {
+	var minNum = math.MaxFloat64
 	for _, d := range data {
-		f, err := ConvertToFloat64(d)
-		if err != nil {
-			continue
-		}
-		if maxNumber > f {
-			maxNumber = f
+		f := d.Float()
+		if minNum > d.Float() {
+			minNum = f
 		}
 	}
-	return maxNumber
+	return strconv.FormatFloat(minNum, 'f', 8, 64)
 }
 
-func Avg(data []Value) Value {
+func Avg(data []ArgsType) string {
 	var total = 0.0
 	for _, d := range data {
-		f, err := ConvertToFloat64(d)
-		if err != nil {
-			continue
-		}
+		f := d.Float()
 		total += f
 	}
-	return total / float64(len(data))
-}
-
-func ConvertToFloat64(args Value) (float64, error) {
-	switch args := args.(type) {
-	case string:
-		return strconv.ParseFloat(args, 64)
-	case int:
-		return float64(args), nil
-	case int16:
-		return float64(args), nil
-	case int32:
-		return float64(args), nil
-	case uint:
-		return float64(args), nil
-	case uint16:
-		return float64(args), nil
-	case uint32:
-		return float64(args), nil
-	case uint64:
-		return float64(args), nil
-	case float32:
-		return float64(args), nil
-	case float64:
-		return args, nil
-	}
-	return 0.0, errors.New("invalid number")
+	return strconv.FormatFloat(total/float64(len(data)), 'f', 8, 64)
 }

@@ -20,7 +20,7 @@ const (
 	CodeInvalidAggregateFunc     sdk.CodeType = 110
 	CodeInvalidValueJsonPath     sdk.CodeType = 111
 	CodeUnknownRequestContextID  sdk.CodeType = 112
-	CodeNotRegisterMethod        sdk.CodeType = 113
+	CodeNotRegisterFunc          sdk.CodeType = 113
 	CodeInvalidFeedState         sdk.CodeType = 114
 	CodeNotProfiler              sdk.CodeType = 115
 	CodeInvalidDescription       sdk.CodeType = 116
@@ -51,7 +51,7 @@ func ErrEmptyProviders(codespace sdk.CodespaceType) sdk.Error {
 }
 
 func ErrInvalidLatestHistory(codespace sdk.CodespaceType) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidLatestHistory, "latest history is invalid, should be between 1 and %d", LatestHistory)
+	return sdk.NewError(codespace, CodeInvalidLatestHistory, "latest history is invalid, should be between 1 and %d", MaxLatestHistory)
 }
 
 func ErrInvalidServiceFeeCap(codespace sdk.CodespaceType, fees sdk.Coins) sdk.Error {
@@ -78,8 +78,8 @@ func ErrUnknownRequestContextID(codespace sdk.CodespaceType, reqCtxID []byte) sd
 	return sdk.NewError(codespace, CodeUnknownRequestContextID, "request context ID %s does not exist", string(reqCtxID))
 }
 
-func ErrNotRegisterMethod(codespace sdk.CodespaceType, methodName string) sdk.Error {
-	return sdk.NewError(codespace, CodeNotRegisterMethod, "method %s don't register", methodName)
+func ErrNotRegisterFunc(codespace sdk.CodespaceType, methodName string) sdk.Error {
+	return sdk.NewError(codespace, CodeNotRegisterFunc, "method %s don't register", methodName)
 }
 
 func ErrInvalidFeedState(codespace sdk.CodespaceType, feedName string) sdk.Error {

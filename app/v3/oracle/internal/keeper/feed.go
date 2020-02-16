@@ -1,7 +1,6 @@
 package keeper
 
 import (
-	"encoding/json"
 	"github.com/irisnet/irishub/app/v3/oracle/internal/types"
 	sdk "github.com/irisnet/irishub/types"
 )
@@ -30,8 +29,7 @@ func (k Keeper) GetFeedResults(ctx sdk.Context, feedName string) (result types.F
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
 		var res types.FeedResult
-		_ = json.Unmarshal(iterator.Value(), &res)
-		//k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &res)
+		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &res)
 		result = append(result, res)
 	}
 	return
@@ -46,7 +44,7 @@ func (k Keeper) setFeed(ctx sdk.Context, feed types.Feed) {
 	store.Set(GetReqCtxIDKey(feed.RequestContextID), bz)
 }
 
-func (k Keeper) setFeedResult(ctx sdk.Context, feedName string, batchCounter uint64, latestHistory uint64, data types.Value) {
+func (k Keeper) setFeedResult(ctx sdk.Context, feedName string, batchCounter uint64, latestHistory uint64, data string) {
 	store := ctx.KVStore(k.storeKey)
 	result := types.FeedResult{
 		Data:      data,
@@ -55,8 +53,7 @@ func (k Keeper) setFeedResult(ctx sdk.Context, feedName string, batchCounter uin
 	counter := k.getFeedResultsCnt(ctx, feedName)
 	delta := counter - int(latestHistory)
 	k.deleteOldestFeedResult(ctx, feedName, delta+1)
-	bz, _ := json.Marshal(result)
-	//bz := k.cdc.MustMarshalBinaryLengthPrefixed(result)
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(result)
 	store.Set(GetFeedResultKey(feedName, batchCounter), bz)
 }
 
