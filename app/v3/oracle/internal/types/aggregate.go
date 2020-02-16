@@ -1,7 +1,6 @@
 package types
 
 import (
-	"errors"
 	"fmt"
 	sdk "github.com/irisnet/irishub/types"
 	"github.com/tidwall/gjson"
@@ -35,7 +34,7 @@ func GetAggregateFunc(methodNm string) (Aggregate, sdk.Error) {
 func RegisterAggregateFunc(methodNm string, fun Aggregate) error {
 	_, ok := router[methodNm]
 	if ok {
-		return errors.New(fmt.Sprintf("%s has existed", methodNm))
+		return fmt.Errorf("%s has existed", methodNm)
 	}
 	router[methodNm] = fun
 	return nil

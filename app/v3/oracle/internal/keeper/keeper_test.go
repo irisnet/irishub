@@ -50,7 +50,7 @@ func TestFeed(t *testing.T) {
 	result := keeper.GetFeedResults(ctx, msg.FeedName)
 	require.NoError(t, err)
 	require.Len(t, result, int(msg.LatestHistory))
-	require.Equal(t, "250", result[0].Data)
+	require.Equal(t, "250.00000000", result[0].Data)
 
 	//start again, will return error
 	err = keeper.StartFeed(ctx, types.MsgStartFeed{
@@ -109,5 +109,5 @@ func TestFeed(t *testing.T) {
 	result = keeper.GetFeedResults(ctx, msg.FeedName)
 	require.NoError(t, err)
 	require.Len(t, result, int(latestHistory))
-	require.Equal(t, "250", result[0].Data)
+	require.Equal(t, "250.00000000", result[0].Data)
 }
