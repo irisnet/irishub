@@ -1,11 +1,12 @@
 package keeper
 
 import (
-	"github.com/tidwall/gjson"
+	"strings"
 
 	"github.com/irisnet/irishub/app/v3/oracle/internal/types"
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
+	"github.com/tidwall/gjson"
 )
 
 // Keeper
@@ -65,8 +66,10 @@ func (k Keeper) CreateFeed(ctx sdk.Context, msg types.MsgCreateFeed) sdk.Error {
 		ValueJsonPath:    msg.ValueJsonPath,
 		LatestHistory:    msg.LatestHistory,
 		RequestContextID: requestContextID,
+		Description:      msg.Description,
 		Creator:          msg.Creator,
 	})
+	k.insertToPauseQueue(ctx, msg.FeedName)
 	return nil
 }
 
@@ -94,6 +97,8 @@ func (k Keeper) StartFeed(ctx sdk.Context, msg types.MsgStartFeed) sdk.Error {
 	if err := k.sk.StartRequestContext(ctx, feed.RequestContextID); err != nil {
 		return err
 	}
+
+	k.insertToRunningQueue(ctx, msg.FeedName)
 	return nil
 }
 
@@ -121,6 +126,8 @@ func (k Keeper) PauseFeed(ctx sdk.Context, msg types.MsgPauseFeed) sdk.Error {
 	if err := k.sk.PauseRequestContext(ctx, feed.RequestContextID); err != nil {
 		return err
 	}
+
+	k.insertToPauseQueue(ctx, msg.FeedName)
 	return nil
 }
 
@@ -135,6 +142,14 @@ func (k Keeper) EditFeed(ctx sdk.Context, msg types.MsgEditFeed) sdk.Error {
 		return types.ErrUnauthorized(types.DefaultCodespace, msg.FeedName, msg.Creator)
 	}
 
+	if err := k.sk.UpdateRequestContext(ctx, feed.RequestContextID,
+		msg.Providers,
+		msg.ServiceFeeCap,
+		msg.RepeatedFrequency,
+		msg.RepeatedTotal); err != nil {
+		return err
+	}
+
 	if msg.LatestHistory > 1 {
 		if msg.LatestHistory != feed.LatestHistory &&
 			msg.LatestHistory < feed.LatestHistory {
@@ -144,13 +159,11 @@ func (k Keeper) EditFeed(ctx sdk.Context, msg types.MsgEditFeed) sdk.Error {
 		feed.LatestHistory = msg.LatestHistory
 	}
 
-	if err := k.sk.UpdateRequestContext(ctx, feed.RequestContextID,
-		msg.Providers,
-		msg.ServiceFeeCap,
-		msg.RepeatedFrequency,
-		msg.RepeatedTotal); err != nil {
-		return err
+	desc := strings.TrimSpace(msg.Description)
+	if len(desc) > 0 {
+		feed.Description = desc
 	}
+
 	k.setFeed(ctx, feed)
 	return nil
 }

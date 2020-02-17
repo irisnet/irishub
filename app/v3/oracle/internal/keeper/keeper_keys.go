@@ -4,10 +4,12 @@ import "encoding/binary"
 
 var (
 	// Keys for store prefixes
-	separator           = []byte("/")
-	PrefixFeedKey       = []byte{0x01}
-	PrefixReqCtxIdKey   = []byte{0x02}
-	PrefixFeedResultKey = []byte{0x03}
+	separator                 = []byte("/")
+	PrefixFeedKey             = []byte{0x01}
+	PrefixReqCtxIdKey         = []byte{0x02}
+	PrefixFeedResultKey       = []byte{0x03}
+	PrefixFeedRunningStateKey = []byte{0x04}
+	PrefixFeedPauseStateKey   = []byte{0x05}
 )
 
 func GetFeedKey(feedName string) []byte {
@@ -26,4 +28,12 @@ func GetFeedResultKey(feedName string, batchCounter uint64) []byte {
 
 func GetFeedResultPrefixKey(feedName string) []byte {
 	return append(append(PrefixFeedResultKey, []byte(feedName)...), separator...)
+}
+
+func GetFeedRunningStateKey(feedName string) []byte {
+	return append(append(PrefixFeedRunningStateKey, separator...), []byte(feedName)...)
+}
+
+func GetFeedPauseStateKey(feedName string) []byte {
+	return append(append(PrefixFeedPauseStateKey, separator...), []byte(feedName)...)
 }

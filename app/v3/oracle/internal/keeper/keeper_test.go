@@ -26,10 +26,11 @@ func TestFeed(t *testing.T) {
 		Creator:           acc[0].GetAddress(),
 	}
 
-	//test CreateFeed
+	//================test CreateFeed start================
 	err := keeper.CreateFeed(ctx, msg)
 	require.NoError(t, err)
 
+	//check feed existed
 	feed, existed := keeper.GetFeed(ctx, msg.FeedName)
 	require.True(t, existed)
 	require.EqualValues(t, types.Feed{
@@ -41,16 +42,28 @@ func TestFeed(t *testing.T) {
 		Creator:          msg.Creator,
 	}, feed)
 
-	//test StartFeed
+	//check feed state
+	feeds := keeper.GetFeedByState(ctx, types.Pause)
+	require.Len(t, feeds, 1)
+	require.Equal(t, msg.FeedName, feeds[0].FeedName)
+	//================test CreateFeed end================
+
+	//================test StartFeed start================
 	err = keeper.StartFeed(ctx, types.MsgStartFeed{
 		FeedName: msg.FeedName,
 		Creator:  acc[0].GetAddress(),
 	})
 
+	//check feed result
 	result := keeper.GetFeedResults(ctx, msg.FeedName)
 	require.NoError(t, err)
 	require.Len(t, result, int(msg.LatestHistory))
 	require.Equal(t, "250.00000000", result[0].Data)
+
+	//check feed state
+	feeds = keeper.GetFeedByState(ctx, types.Running)
+	require.Len(t, feeds, 1)
+	require.Equal(t, msg.FeedName, feeds[0].FeedName)
 
 	//start again, will return error
 	err = keeper.StartFeed(ctx, types.MsgStartFeed{
@@ -58,8 +71,9 @@ func TestFeed(t *testing.T) {
 		Creator:  acc[0].GetAddress(),
 	})
 	require.Error(t, err)
+	//================test StartFeed end================
 
-	//edit feed
+	//================test EditFeed start================
 	latestHistory := uint64(3)
 	err = keeper.EditFeed(ctx, types.MsgEditFeed{
 		FeedName:          msg.FeedName,
@@ -72,6 +86,8 @@ func TestFeed(t *testing.T) {
 		Creator:           acc[0].GetAddress(),
 	})
 	require.NoError(t, err)
+
+	//check feed existed
 	feed, existed = keeper.GetFeed(ctx, msg.FeedName)
 	require.True(t, existed)
 	require.EqualValues(t, types.Feed{
@@ -82,7 +98,9 @@ func TestFeed(t *testing.T) {
 		RequestContextID: feed.RequestContextID,
 		Creator:          msg.Creator,
 	}, feed)
+	//================test EditFeed end================
 
+	//================test PauseFeed start================
 	err = keeper.PauseFeed(ctx, types.MsgPauseFeed{
 		FeedName: msg.FeedName,
 		Creator:  acc[0].GetAddress(),
@@ -106,8 +124,15 @@ func TestFeed(t *testing.T) {
 		Creator:  acc[0].GetAddress(),
 	})
 
+	//check feed result
 	result = keeper.GetFeedResults(ctx, msg.FeedName)
 	require.NoError(t, err)
 	require.Len(t, result, int(latestHistory))
 	require.Equal(t, "250.00000000", result[0].Data)
+
+	//check feed state
+	feeds = keeper.GetFeedByState(ctx, types.Running)
+	require.Len(t, feeds, 1)
+	require.Equal(t, msg.FeedName, feeds[0].FeedName)
+	//================test PauseFeed end================
 }

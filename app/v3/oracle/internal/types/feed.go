@@ -8,6 +8,7 @@ import (
 
 type Feed struct {
 	FeedName         string         `json:"feed_name"`
+	Description      string         `json:"description"`
 	AggregateFunc    string         `json:"aggregate_func"`
 	ValueJsonPath    string         `json:"value_json_path"`
 	LatestHistory    uint64         `json:"latest_history"`
@@ -19,3 +20,16 @@ type FeedResult struct {
 	Timestamp time.Time `json:"timestamp"`
 }
 type FeedResults []FeedResult
+
+type FeedContext struct {
+	Feed              Feed                `json:"feed"`
+	ServiceName       string              `json:"service_name"`
+	Providers         []sdk.AccAddress    `json:"providers"`
+	Input             string              `json:"input"`
+	Timeout           int64               `json:"timeout"`
+	ServiceFeeCap     sdk.Coins           `json:"service_fee_cap"`
+	RepeatedFrequency uint64              `json:"repeated_frequency"`
+	RepeatedTotal     int64               `json:"repeated_total"`
+	ResponseThreshold uint16              `json:"response_threshold"`
+	State             RequestContextState `json:"state"`
+}

@@ -67,8 +67,8 @@ func (msg MsgCreateFeed) ValidateBasic() sdk.Error {
 		return err
 	}
 
-	if len(msg.Description) > MaxDescriptionLen {
-		return ErrInvalidDescription(DefaultCodespace, len(msg.Description))
+	if err := validateDescription(msg.Description); err != nil {
+		return err
 	}
 
 	if err := validateServiceName(msg.ServiceName); err != nil {
@@ -205,6 +205,7 @@ func (msg MsgPauseFeed) GetSigners() []sdk.AccAddress {
 // MsgEditFeed - struct for edit a existed feed
 type MsgEditFeed struct {
 	FeedName          string           `json:"feed_name"`
+	Description       string           `json:"description"`
 	LatestHistory     uint64           `json:"latest_history"`
 	Providers         []sdk.AccAddress `json:"providers"`
 	ServiceFeeCap     sdk.Coins        `json:"service_fee_cap"`
@@ -227,6 +228,10 @@ func (msg MsgEditFeed) Type() string {
 // ValidateBasic implements Msg.
 func (msg MsgEditFeed) ValidateBasic() sdk.Error {
 	if err := validateFeedName(msg.FeedName); err != nil {
+		return err
+	}
+
+	if err := validateDescription(msg.Description); err != nil {
 		return err
 	}
 
@@ -270,6 +275,14 @@ func validateFeedName(feedName string) sdk.Error {
 	}
 	if !regPlainText.MatchString(feedName) {
 		return ErrInvalidFeedName(DefaultCodespace)
+	}
+	return nil
+}
+
+func validateDescription(desc string) sdk.Error {
+	desc = strings.TrimSpace(desc)
+	if len(desc) > MaxDescriptionLen {
+		return ErrInvalidDescription(DefaultCodespace, len(desc))
 	}
 	return nil
 }
