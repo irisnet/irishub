@@ -16,9 +16,9 @@ type (
 )
 
 const (
-	// RUNNING means the request context is running
+	// RUNNING indicates the request context is running
 	RUNNING = types.RUNNING
 
-	// PAUSED means the request context is paused
+	// PAUSED indicates the request context is paused
 	PAUSED = types.PAUSED
 )
