@@ -55,7 +55,7 @@ func NewRequestContext(
 		BatchCounter:      batchCounter,
 		State:             state,
 		ResponseThreshold: responseThreshold,
-		ModuleName:   moduleName,
+		ModuleName:        moduleName,
 	}
 }
 
@@ -173,7 +173,7 @@ func NewEarnedFees(address sdk.AccAddress, coins sdk.Coins) EarnedFees {
 type RequestContextState byte
 
 // ResponseCallback defines the response callback interface
-type ResponseCallback func(requestContextID []byte, reponses []string)
+type ResponseCallback func(ctx sdk.Context, requestContextID []byte, reponses []string)
 
 func ConvertRequestID(requestId string) (eHeight int64, rHeight int64, counter int16, err error) {
 	ss := strings.Split(requestId, "-")

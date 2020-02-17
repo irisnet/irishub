@@ -9,7 +9,7 @@ import (
 )
 
 // RegisterResponseCallback registers a module callback for response handling
-func (k Keeper) RegisterResponseCallback(ctx sdk.Context, moduleName string, respCallback types.ResponseCallback) sdk.Error {
+func (k Keeper) RegisterResponseCallback(moduleName string, respCallback types.ResponseCallback) sdk.Error {
 	if _, ok := k.respCallbacks[moduleName]; ok {
 		return types.ErrModuleNameRegistered(k.codespace, moduleName)
 	}
@@ -222,18 +222,44 @@ func (k Keeper) GetRequestContext(ctx sdk.Context, requestContextID []byte) (req
 	return requestContext, true
 }
 
-// AddRequest initiates a request from the specified request context
-func (k Keeper) AddRequest(
+// InitiateRequests creates requests for all providers from the specified request context
+func (k Keeper) InitiateRequests(
 	ctx sdk.Context,
 	requestContextID []byte,
-	provider sdk.AccAddress,
-) (request types.Request, err sdk.Error) {
+) sdk.Error {
 	requestContext, found := k.GetRequestContext(ctx, requestContextID)
 	if !found {
-		return request, types.ErrInvalidRequestContextID(k.codespace, "invalid request context ID")
+		return types.ErrInvalidRequestContextID(k.codespace, "invalid request context ID")
 	}
 
-	binding, found := k.GetServiceBinding(ctx, requestContext.ServiceName, provider)
+	if requestContext.State != types.RequestContextState(0x00) {
+		return types.ErrRequestContextNotStarted(k.codespace)
+	}
+
+	for providerIndex, provider := range requestContext.Providers {
+		request, err := k.buildRequest(ctx, requestContextID, requestContext.BatchCounter, requestContext.ServiceName, provider)
+		if err != nil {
+			return err
+		}
+
+		requestID := types.GenerateRequestID(requestContextID, requestContext.BatchCounter, int16(providerIndex))
+
+		k.SetRequest(ctx, requestID, request)
+		k.AddActiveRequest(ctx, requestContext.ServiceName, ctx.BlockHeight()+requestContext.Timeout, requestID, request)
+	}
+
+	return nil
+}
+
+// buildRequest builds a request for the given provider from the specified request context
+func (k Keeper) buildRequest(
+	ctx sdk.Context,
+	requestContextID []byte,
+	batchCounter uint64,
+	serviceName string,
+	provider sdk.AccAddress,
+) (request types.CompactRequest, err sdk.Error) {
+	_, found := k.GetServiceBinding(ctx, serviceName, provider)
 	if !found {
 		return request, types.ErrUnknownServiceBinding(k.codespace)
 	}
@@ -241,24 +267,15 @@ func (k Keeper) AddRequest(
 	// TODO: extract price from binding.Pricing
 	serviceFee := sdk.Coins{}
 
-	// TODO: get next counter
-	batchCounter := 0
-
-	compactRequest := types.NewCompactRequest(
-		requestContext.ServiceName,
-		provider,
-		requestContext.Consumer,
-		requestContext.Input,
-		serviceFee,
-		ctx.BlockHeight(),
+	request = types.NewCompactRequest(
 		requestContextID,
 		batchCounter,
+		provider,
+		serviceFee,
+		ctx.BlockHeight(),
 	)
 
-	requestID := types.GenerateRequestID(requestContextID, requestContext.BatchCounter, batchCounter)
-	k.SetRequest(ctx, requestID, compactRequest)
-
-	return req, nil
+	return request, nil
 }
 
 // SetRequest sets the specified compact request
@@ -270,49 +287,85 @@ func (k Keeper) SetRequest(ctx sdk.Context, requestID []byte, request types.Comp
 }
 
 // AddActiveRequest adds the specified active request
-func (k Keeper) AddActiveRequest(ctx sdk.Context, req types.Request) {
+func (k Keeper) AddActiveRequest(
+	ctx sdk.Context,
+	serviceName string,
+	expirationHeight int64,
+	requestID []byte,
+	request types.CompactRequest,
+) {
 	store := ctx.KVStore(k.storeKey)
 
-	bz := k.cdc.MustMarshalBinaryLengthPrefixed(req)
-
-	requestID := types.GenerateRequestID(req.RequestContextID, req.RequestContextBatchCounter, req.Provider)
-	store.Set(GetActiveRequestKey(req.ServiceName, req.Provider, req.ExpirationHeight, requestID), bz)
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(request)
+	store.Set(GetActiveRequestKey(serviceName, request.Provider, expirationHeight, requestID), bz)
 }
 
 // DeleteActiveRequest deletes the specified active request
-func (k Keeper) DeleteActiveRequest(ctx sdk.Context, req types.Request) {
+func (k Keeper) DeleteActiveRequest(
+	ctx sdk.Context,
+	serviceName string,
+	provider sdk.AccAddress,
+	expirationHeight int64,
+	requestID []byte,
+) {
 	store := ctx.KVStore(k.storeKey)
-
-	requestID := types.GenerateRequestID(req.RequestContextID, req.RequestContextBatchCounter, req.Provider)
-	store.Delete(GetActiveRequestKey(req.ServiceName, req.Provider, req.ExpirationHeight, requestID))
+	store.Delete(GetActiveRequestKey(serviceName, provider, expirationHeight, requestID))
 }
 
-// AddRequestExpiration
-func (k Keeper) AddRequestExpiration(ctx sdk.Context, req types.CompactRequest) {
+// AddRequestBatchExpiration adds a request batch to the expiration queue
+func (k Keeper) AddRequestBatchExpiration(ctx sdk.Context, requestContextID []byte, expirationHeight int64) {
 	store := ctx.KVStore(k.storeKey)
 
-	bz := k.cdc.MustMarshalBinaryLengthPrefixed(req)
-	store.Set(GetRequestsByExpirationIndexKeyByReq(req), bz)
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(requestContextID)
+	store.Set(GetExpiredRequestBatchKey(requestContextID, expirationHeight), bz)
 }
 
-// DeleteRequestExpiration
-func (k Keeper) DeleteRequestExpiration(ctx sdk.Context, req types.CompactRequest) {
+// DeleteRequestBatchExpiration deletes the request batch from the expiration queue
+func (k Keeper) DeleteRequestBatchExpiration(ctx sdk.Context, requestContextID []byte, expirationHeight int64) {
 	store := ctx.KVStore(k.storeKey)
-	store.Delete(GetRequestsByExpirationIndexKeyByReq(req))
+	store.Delete(GetExpiredRequestBatchKey(requestContextID, expirationHeight))
 }
 
-// AddNewBatchRequest adds a new batch request of the specified request context
-func (k Keeper) AddNewBatchRequest(ctx sdk.Context, requestContextID []byte) {
+// AddNewRequestBatch adds a request batch to the new request batch queue
+func (k Keeper) AddNewRequestBatch(ctx sdk.Context, requestContextID []byte, requestBatchHeight int64) {
+	store := ctx.KVStore(k.storeKey)
+
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(requestContextID)
+	store.Set(GetNewRequestBatchKey(requestContextID, requestBatchHeight), bz)
+}
+
+// DeleteNewRequestBatch deletes the request batch in the given height from the new request batch queue
+func (k Keeper) DeleteNewRequestBatch(ctx sdk.Context, requestContextID []byte, requestBatchHeight int64) {
+	store := ctx.KVStore(k.storeKey)
+	store.Delete(GetNewRequestBatchKey(requestContextID, requestBatchHeight))
+}
+
+//
+func (k Keeper) ExpiredRequestBatchIterator(ctx sdk.Context, expirationHeight int64) sdk.Iterator {
+	store := ctx.KVStore(k.storeKey)
+	return sdk.KVStorePrefixIterator(store, GetExpiredRequestBatchKey(expirationHeight))
+}
+
+//
+func (k Keeper) NewRequestBatchIterator(ctx sdk.Context, requestBatchHeight int64) sdk.Iterator {
+	store := ctx.KVStore(k.storeKey)
+	return sdk.KVStorePrefixIterator(store, GetNewRequestBatchKey(requestBatchHeight))
+}
+
+//
+func (k Keeper) FilterServiceProviders(ctx sdk.Context, requestContextID []byte) []sdk.AccAddress {
 	// TODO
+	return nil
 }
 
-// DeleteNewBatchRequest deletes the new batch request of the specified request context
-func (k Keeper) DeleteNewBatchRequest(ctx sdk.Context, requestContextID []byte) {
+//
+func (k Keeper) DeductServiceFees(ctx sdk.Context,sdk.AccAddress,serviceName string,providers sdk.AccAddress[]) sdk.Error {
 	// TODO
+	return nil
 }
 
 // GetActiveRequest
-func (k Keeper) GetActiveRequest(ctx sdk.Context, expHeight, reqHeight int64, counter int16) (req types.SvcRequest, found bool) {
+func (k Keeper) GetActiveRequest(ctx sdk.Context, service, reqHeight int64, counter int16) (req types.SvcRequest, found bool) {
 	store := ctx.KVStore(k.storeKey)
 
 	bz := store.Get(GetRequestsByExpirationIndexKey(expHeight, reqHeight, counter))
@@ -634,25 +687,27 @@ func (k Keeper) RefundServiceFees(ctx sdk.Context) sdk.Error {
 	return nil
 }
 
-// GetIntraTxCounter get the current in-block request operation counter
-func (k Keeper) GetIntraTxCounter(ctx sdk.Context) int16 {
-	store := ctx.KVStore(k.storeKey)
+// GetResponseCallback gets the registered module callback for response handling
+func (k Keeper) GetResponseCallback(moduleName string) (types.ResponseCallback, sdk.Error) {
+	respCallback, ok := k.respCallbacks[moduleName]
+	if !ok {
+		return nil, types.ErrModuleNameNotRegistered(k.Codespace(), moduleName)
+	}
 
-	b := store.Get(intraTxCounterKey)
-	if b == nil {
+	return respCallback, nil
+}
+
+// GetIntraTxCounter gets the current tx counter
+func (k Keeper) GetIntraTxCounter(ctx sdk.Context) int16 {
+	v := ctx.Value(GetIntraTxCounterKey())
+	if v == nil {
 		return 0
 	}
 
-	var counter int16
-	k.cdc.MustUnmarshalBinaryLengthPrefixed(b, &counter)
-
-	return counter
+	return v.(int16)
 }
 
-// SetIntraTxCounter set the current in-block request counter
+// SetIntraTxCounter sets the tx counter to the context
 func (k Keeper) SetIntraTxCounter(ctx sdk.Context, counter int16) {
-	store := ctx.KVStore(k.storeKey)
-
-	bz := k.cdc.MustMarshalBinaryLengthPrefixed(counter)
-	store.Set(intraTxCounterKey, bz)
+	ctx = ctx.WithValue(GetIntraTxCounterKey(), counter)
 }

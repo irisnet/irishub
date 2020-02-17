@@ -37,6 +37,8 @@ func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, bk types.BankKeeper, gk types
 		metrics:    metrics,
 	}
 
+	keeper.respCallbacks = make(map[string]types.ResponseCallback)
+
 	return keeper
 }
 

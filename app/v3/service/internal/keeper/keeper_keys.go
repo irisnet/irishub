@@ -21,6 +21,11 @@ var (
 	incomingFeeKey         = []byte{0x10}
 )
 
+const (
+	// tx counter key in the context
+	contextKeyIntraTxCounter = 0
+)
+
 // GetServiceDefinitionKey returns the key for the service definition with the specified name
 func GetServiceDefinitionKey(name string) []byte {
 	return append(serviceDefinitionKey, []byte(name)...)
@@ -80,6 +85,10 @@ func GetReturnedFeeKey(address sdk.AccAddress) []byte {
 
 func GetIncomingFeeKey(address sdk.AccAddress) []byte {
 	return append(incomingFeeKey, address.Bytes()...)
+}
+
+func GetIntraTxCounterKey() int {
+	return contextKeyIntraTxCounter
 }
 
 func getStringsKey(ss []string) (result []byte) {

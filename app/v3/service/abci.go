@@ -5,53 +5,112 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 )
 
+// BeginBlocker handles block beginning logic for service
+func BeginBlocker(ctx sdk.Context, k Keeper) {
+	// reset the tx counter
+	k.SetIntraTxCounter(ctx, 0)
+}
+
 // EndBlocker handles block ending logic for service
 func EndBlocker(ctx sdk.Context, k Keeper) (resTags sdk.Tags) {
 	ctx = ctx.WithLogger(ctx.Logger().With("handler", "endBlock").With("module", "iris/service"))
 	logger := ctx.Logger()
 
-	// Reset the intra-transaction counter.
-	k.SetIntraTxCounter(ctx, 0)
-
 	params := k.GetParamSet(ctx)
 	slashFraction := params.SlashFraction
 
-	activeIterator := k.ActiveRequestQueueIterator(ctx, ctx.BlockHeight())
-	defer activeIterator.Close()
+	expiredReqBatchIterator := k.ExpiredRequestBatchIterator(ctx, ctx.BlockHeight())
+	defer expiredReqBatchIterator.Close()
 
-	for ; activeIterator.Valid(); activeIterator.Next() {
-		var req SvcRequest
-		k.GetCdc().MustUnmarshalBinaryLengthPrefixed(activeIterator.Value(), &req)
+	for ; expiredReqBatchIterator.Valid(); expiredReqBatchIterator.Next() {
+		var reqContextID []byte
+		k.GetCdc().MustUnmarshalBinaryLengthPrefixed(expiredReqBatchIterator.Value(), &reqContextID)
 
-		// if not Profiling mode,should slash provider
-		slashCoins := sdk.NewCoins()
-		if !req.Profiling {
-			binding, found := k.GetServiceBinding(ctx, req.DefName, req.Provider)
-			if found {
-				for _, coin := range binding.Deposit {
-					taxAmount := sdk.NewDecFromInt(coin.Amount).Mul(slashFraction).TruncateInt()
-					slashCoins.Add(sdk.NewCoins(sdk.NewCoin(coin.Denom, taxAmount)))
+		reqContext,_ := k.GetRequestContext(ctx, reqContextID)
+		if reqContext.BatchState == 0x01 {
+			continue
+		}
+
+		reqIterator := k.RequestIterator(ctx, reqContextID, reqContext.BatchCounter)
+		defer reqIterator.Close()
+
+		respCount := 0
+		var respOutputs []string
+
+		for ; reqIterator.Valid(); reqIterator.Next() {
+			requestID := reqIterator.Key[2:]
+
+			var request CompactRequest
+			k.GetCdc().MustUnmarshalBinaryLengthPrefixed(reqIterator.Value(), &request)
+
+			resp, found := k.GetResponse(ctx, requestID)
+			if !found {
+				slashCoins := sdk.NewCoins()
+				if !request.Profiling {
+					binding, found := k.GetServiceBinding(ctx, request.ServiceName, request.Provider)
+					if found {
+						for _, coin := range binding.Deposit {
+							taxAmount := sdk.NewDecFromInt(coin.Amount).Mul(slashFraction).TruncateInt()
+							slashCoins.Add(sdk.NewCoins(sdk.NewCoin(coin.Denom, taxAmount)))
+						}
+
+						if err := k.Slash(ctx, binding, slashCoins); err != nil {
+							panic(err)
+						}
+					}
 				}
-			}
+			} else {
+				respOutputs = append(respOutputs, resp.Output)
 
-			if err := k.Slash(ctx, binding, slashCoins); err != nil {
-				panic(err)
+				k.DeleteActiveRequest(ctx, reqContext.ServiceName,request.Provider,ctx.BlockHeight(),requestID)
+				k.GetMetrics().ActiveRequests.Add(-1)
+
+				respCount++
 			}
 		}
 
-		k.AddReturnFee(ctx, req.Consumer, req.ServiceFee)
+		if reqContext.ModuleName != "" {
+			respCallback, _ := k.GetResponseCallback(reqContext.ModuleName)
 
-		k.DeleteActiveRequest(ctx, req)
-		k.GetMetrics().ActiveRequests.Add(-1)
-		k.DeleteRequestExpiration(ctx, req)
+			if respCount >= reqContext.ResponseThreshold {
+				respCallback(ctx, reqContextID, respOutputs)
+			} else {
+				respCallback(ctx, reqContextID, []string{})
+			}
+		}
 
-		resTags = resTags.AppendTag(types.TagAction, types.TagActionSvcCallTimeOut)
-		resTags = resTags.AppendTag(types.TagRequestID, []byte(req.RequestID()))
-		resTags = resTags.AppendTag(types.TagProvider, []byte(req.Provider))
-		resTags = resTags.AppendTag(types.TagSlashCoins, []byte(slashCoins.String()))
-
-		logger.Info("Remove timeout request", "request_id", req.RequestID(), "consumer", req.Consumer.String())
+		k.DeleteRequestBatchExpiration(ctx, reqContextID, ctx.BlockHeight())
+		k.AddNewRequestBatch(ctx, reqContextID, ctx.BlockHeight()-reqContext.Timeout+reqContext.RepeatedFrequency)
 	}
+
+	newReqBatchIterator := k.NewRequestBatchIterator(ctx, ctx.BlockHeight())
+	defer newReqBatchIterator.Close()
+
+	for ; newReqBatchIterator.Valid(); newReqBatchIterator.Next() {
+		var reqContextID []byte
+		k.GetCdc().MustUnmarshalBinaryLengthPrefixed(newReqBatchIterator.Value(), &reqContextID)
+
+		reqContext,_ := k.GetRequestContext(ctx, reqContextID)
+       
+		providers:=k.FilterServiceProviders(ctx,reqContextID)
+		if reqContext.ModuleName == "" || len(providers) >= reqContext.ResponseThreshold {
+			err:=k.DeductServiceFees(ctx,reqContext.Consumer,reqContext.ServiceName,providers)
+			if err != nil {
+				reqContext.State == types.RequestContextState(0x01)
+			}
+
+			reqContext.BatchCounter++
+			k.InitiateRequests(ctx,reqContextID,providers)
+		}
+
+		k.DeleteNewRequestBatch(ctx,reqContextID,ctx.BlockHeight())
+		
+		if reqContext.State ==  types.RequestContextState(0x00) {
+			if reqContext.Repeated && (reqContext.RepeatedTotal<0  || reqContext.BatchCounter < reqContext.RepeatedTotal) {
+				k.AddRequestBatchExpiration(ctx,reqContextID,ctx.BlockHeight()+Timeout)
+			}
+		}
+	}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          vb                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
 
 	return
 }
