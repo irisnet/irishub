@@ -64,7 +64,7 @@ func NewRequestContext(
 type RequestContextState byte
 
 const (
-	STARTED RequestContextState = 0x00 // started
+	RUNNING RequestContextState = 0x00 // running
 	PAUSED  RequestContextState = 0x01 // paused
 )
 
