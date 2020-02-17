@@ -104,6 +104,7 @@ func TestNewQuerier(t *testing.T) {
 		FeedName: msg.FeedName,
 		Creator:  acc[0].GetAddress(),
 	})
+	require.NoError(t, err)
 
 	//test QueryValue
 	params2 := types.QueryFeedValueParams{
