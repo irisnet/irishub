@@ -154,7 +154,7 @@ func (k Keeper) EditFeed(ctx sdk.Context, msg types.MsgEditFeed) sdk.Error {
 		if msg.LatestHistory != feed.LatestHistory &&
 			msg.LatestHistory < feed.LatestHistory {
 			count := int(feed.LatestHistory - msg.LatestHistory)
-			k.deleteOldestFeedResult(ctx, feed.FeedName, count)
+			k.deleteOldestFeedValue(ctx, feed.FeedName, count)
 		}
 		feed.LatestHistory = msg.LatestHistory
 	}
@@ -196,5 +196,5 @@ func (k Keeper) HandlerResponse(ctx sdk.Context, requestContextID []byte, respon
 		data = append(data, result)
 	}
 	result := aggregate(data)
-	k.setFeedResult(ctx, feed.FeedName, reqCtx.BatchCounter, feed.LatestHistory, result)
+	k.setFeedValue(ctx, feed.FeedName, reqCtx.BatchCounter, feed.LatestHistory, result)
 }

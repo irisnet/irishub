@@ -24,6 +24,7 @@ const (
 	CodeInvalidFeedState         sdk.CodeType = 114
 	CodeNotProfiler              sdk.CodeType = 115
 	CodeInvalidDescription       sdk.CodeType = 116
+	CodeInvalidTimeout           sdk.CodeType = 117
 )
 
 func ErrUnknownFeedName(codespace sdk.CodespaceType, feedName string) sdk.Error {
@@ -92,4 +93,8 @@ func ErrNotProfiler(codespace sdk.CodespaceType, profiler sdk.AccAddress) sdk.Er
 
 func ErrInvalidDescription(codespace sdk.CodespaceType, descLen int) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidDescription, "description length should be no more than %d,actual length is %d", descLen)
+}
+
+func ErrInvalidTimeout(codespace sdk.CodespaceType, timeout int64, frequency uint64) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidDescription, "timeout[%d] should be no more than frequency[%d]", timeout, frequency)
 }

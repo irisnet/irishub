@@ -38,7 +38,7 @@ func TestFeed(t *testing.T) {
 		AggregateFunc:    msg.AggregateFunc,
 		ValueJsonPath:    msg.ValueJsonPath,
 		LatestHistory:    msg.LatestHistory,
-		RequestContextID: feed.RequestContextID,
+		RequestContextID: mockReqCtxID,
 		Creator:          msg.Creator,
 	}, feed)
 
@@ -55,7 +55,7 @@ func TestFeed(t *testing.T) {
 	})
 
 	//check feed result
-	result := keeper.GetFeedResults(ctx, msg.FeedName)
+	result := keeper.GetFeedValues(ctx, msg.FeedName)
 	require.NoError(t, err)
 	require.Len(t, result, int(msg.LatestHistory))
 	require.Equal(t, "250.00000000", result[0].Data)
@@ -125,7 +125,7 @@ func TestFeed(t *testing.T) {
 	})
 
 	//check feed result
-	result = keeper.GetFeedResults(ctx, msg.FeedName)
+	result = keeper.GetFeedValues(ctx, msg.FeedName)
 	require.NoError(t, err)
 	require.Len(t, result, int(latestHistory))
 	require.Equal(t, "250.00000000", result[0].Data)

@@ -79,6 +79,10 @@ func (msg MsgCreateFeed) ValidateBasic() sdk.Error {
 		return err
 	}
 
+	if err := validateTimeout(msg.Timeout, msg.RepeatedFrequency); err != nil {
+		return err
+	}
+
 	if len(msg.Providers) == 0 {
 		return ErrEmptyProviders(DefaultCodespace)
 	}
@@ -208,6 +212,7 @@ type MsgEditFeed struct {
 	Description       string           `json:"description"`
 	LatestHistory     uint64           `json:"latest_history"`
 	Providers         []sdk.AccAddress `json:"providers"`
+	Timeout           int64            `json:"timeout"`
 	ServiceFeeCap     sdk.Coins        `json:"service_fee_cap"`
 	RepeatedFrequency uint64           `json:"repeated_frequency"`
 	RepeatedTotal     int64            `json:"repeated_total"`
@@ -249,6 +254,10 @@ func (msg MsgEditFeed) ValidateBasic() sdk.Error {
 
 	if len(msg.Providers) == 0 {
 		return ErrEmptyProviders(DefaultCodespace)
+	}
+
+	if err := validateTimeout(msg.Timeout, msg.RepeatedFrequency); err != nil {
+		return err
 	}
 
 	return validateResponseThreshold(msg.ResponseThreshold, len(msg.Providers))
@@ -308,6 +317,13 @@ func validateLatestHistory(latestHistory uint64) sdk.Error {
 func validateResponseThreshold(responseThreshold uint16, maxCnt int) sdk.Error {
 	if int(responseThreshold) > maxCnt || responseThreshold < 1 {
 		return ErrInvalidResponseThreshold(DefaultCodespace, maxCnt)
+	}
+	return nil
+}
+
+func validateTimeout(timeout int64, frequency uint64) sdk.Error {
+	if frequency < uint64(timeout) {
+		return ErrInvalidTimeout(DefaultCodespace, timeout, frequency)
 	}
 	return nil
 }

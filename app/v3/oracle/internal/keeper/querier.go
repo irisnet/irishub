@@ -16,8 +16,8 @@ func NewQuerier(k Keeper) sdk.Querier {
 			return queryFeed(ctx, req, k)
 		case types.QueryFeeds:
 			return queryFeeds(ctx, req, k)
-		case types.QueryFeedResult:
-			return queryFeedResult(ctx, req, k)
+		case types.QueryFeedValue:
+			return queryFeedValue(ctx, req, k)
 		default:
 			return nil, sdk.ErrUnknownRequest("unknown oracle query endpoint")
 		}
@@ -61,13 +61,13 @@ func queryFeeds(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sdk.E
 	return bz, nil
 }
 
-func queryFeedResult(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sdk.Error) {
-	var params types.QueryFeedsResult
+func queryFeedValue(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sdk.Error) {
+	var params types.QueryFeedValueParams
 	if err := k.cdc.UnmarshalJSON(req.Data, &params); err != nil {
 		return nil, sdk.ParseParamsErr(err)
 	}
 
-	result := k.GetFeedResults(ctx, params.FeedName)
+	result := k.GetFeedValues(ctx, params.FeedName)
 	bz, err := codec.MarshalJSONIndent(k.cdc, result)
 	if err != nil {
 		return nil, sdk.MarshalResultErr(err)

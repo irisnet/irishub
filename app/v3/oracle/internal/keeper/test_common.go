@@ -30,6 +30,8 @@ var (
 		`{"last":100,"high":300,"low":50}`,
 		`{"last":100,"high":400,"low":50}`,
 	}
+
+	mockReqCtxID = []byte("mockRequest")
 )
 
 // create a codec used only for testing
@@ -139,7 +141,6 @@ func (m MockServiceKeeper) CreateRequestContext(ctx sdk.Context,
 	respThreshold uint16,
 	moduleName string) ([]byte, sdk.Error) {
 
-	var reqCtxID = "mockRequest"
 	reqCtx := types.RequestContext{
 		ServiceName:       serviceName,
 		Providers:         providers,
@@ -155,8 +156,8 @@ func (m MockServiceKeeper) CreateRequestContext(ctx sdk.Context,
 		ResponseThreshold: respThreshold,
 		ModuleName:        moduleName,
 	}
-	m.cxtMap[reqCtxID] = reqCtx
-	return []byte(reqCtxID), nil
+	m.cxtMap[string(mockReqCtxID)] = reqCtx
+	return mockReqCtxID, nil
 }
 
 func (m MockServiceKeeper) UpdateRequestContext(ctx sdk.Context,

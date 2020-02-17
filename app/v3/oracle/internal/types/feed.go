@@ -15,11 +15,11 @@ type Feed struct {
 	RequestContextID []byte         `json:"request_context_id"`
 	Creator          sdk.AccAddress `json:"creator"`
 }
-type FeedResult struct {
+type FeedValue struct {
 	Data      string    `json:"data"`
 	Timestamp time.Time `json:"timestamp"`
 }
-type FeedResults []FeedResult
+type FeedValues []FeedValue
 
 type FeedContext struct {
 	Feed              Feed                `json:"feed"`

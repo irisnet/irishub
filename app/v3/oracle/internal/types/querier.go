@@ -1,9 +1,9 @@
 package types
 
 const (
-	QueryFeed       = "feed"       // QueryFeed
-	QueryFeeds      = "feeds"      // QueryFeeds
-	QueryFeedResult = "feedResult" // QueryFeedResult
+	QueryFeed      = "feed"      // QueryFeed
+	QueryFeeds     = "feeds"     // QueryFeeds
+	QueryFeedValue = "feedValue" // QueryFeedValue
 )
 
 // QueryFeedParams defines the params to query a feed definition
@@ -16,7 +16,7 @@ type QueryFeedsParams struct {
 	State string
 }
 
-// QueryFeedsResult defines the params to query a feed result
-type QueryFeedsResult struct {
+// QueryFeedValueParams defines the params to query a feed result
+type QueryFeedValueParams struct {
 	FeedName string
 }

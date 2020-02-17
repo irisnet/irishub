@@ -23,12 +23,12 @@ func (k Keeper) GetFeedByReqCtxID(ctx sdk.Context, requestContextID []byte) (fee
 	return k.GetFeed(ctx, feedName)
 }
 
-func (k Keeper) GetFeedResults(ctx sdk.Context, feedName string) (result types.FeedResults) {
+func (k Keeper) GetFeedValues(ctx sdk.Context, feedName string) (result types.FeedValues) {
 	store := ctx.KVStore(k.storeKey)
-	iterator := sdk.KVStoreReversePrefixIterator(store, GetFeedResultPrefixKey(feedName))
+	iterator := sdk.KVStoreReversePrefixIterator(store, GetFeedValuePrefixKey(feedName))
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
-		var res types.FeedResult
+		var res types.FeedValue
 		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &res)
 		result = append(result, res)
 	}
@@ -37,13 +37,7 @@ func (k Keeper) GetFeedResults(ctx sdk.Context, feedName string) (result types.F
 
 func (k Keeper) GetFeedByState(ctx sdk.Context, state types.RequestContextState) (feeds []types.Feed) {
 	store := ctx.KVStore(k.storeKey)
-	var prefix []byte
-	if state == types.Running {
-		prefix = PrefixFeedRunningStateKey
-	} else {
-		prefix = PrefixFeedPauseStateKey
-	}
-	iterator := sdk.KVStorePrefixIterator(store, prefix)
+	iterator := sdk.KVStorePrefixIterator(store, GetFeedStatePrefixKey(state))
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
 		var feedName string
@@ -66,36 +60,40 @@ func (k Keeper) setFeed(ctx sdk.Context, feed types.Feed) {
 
 func (k Keeper) insertToRunningQueue(ctx sdk.Context, feedName string) {
 	store := ctx.KVStore(k.storeKey)
-	store.Delete(GetFeedPauseStateKey(feedName))
+	store.Delete(GetFeedStateKey(feedName, types.Pause))
 
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(feedName)
-	store.Set(GetFeedRunningStateKey(feedName), bz)
+	store.Set(GetFeedStateKey(feedName, types.Running), bz)
 }
 
 func (k Keeper) insertToPauseQueue(ctx sdk.Context, feedName string) {
 	store := ctx.KVStore(k.storeKey)
-	store.Delete(GetFeedRunningStateKey(feedName))
+	store.Delete(GetFeedStateKey(feedName, types.Running))
 
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(feedName)
-	store.Set(GetFeedPauseStateKey(feedName), bz)
+	store.Set(GetFeedStateKey(feedName, types.Pause), bz)
 }
 
-func (k Keeper) setFeedResult(ctx sdk.Context, feedName string, batchCounter uint64, latestHistory uint64, data string) {
+func (k Keeper) setFeedValue(ctx sdk.Context,
+	feedName string,
+	batchCounter uint64,
+	latestHistory uint64,
+	data string) {
 	store := ctx.KVStore(k.storeKey)
-	result := types.FeedResult{
+	result := types.FeedValue{
 		Data:      data,
 		Timestamp: ctx.BlockTime(),
 	}
-	counter := k.getFeedResultsCnt(ctx, feedName)
+	counter := k.getFeedValuesCnt(ctx, feedName)
 	delta := counter - int(latestHistory)
-	k.deleteOldestFeedResult(ctx, feedName, delta+1)
+	k.deleteOldestFeedValue(ctx, feedName, delta+1)
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(result)
-	store.Set(GetFeedResultKey(feedName, batchCounter), bz)
+	store.Set(GetFeedValueKey(feedName, batchCounter), bz)
 }
 
-func (k Keeper) getFeedResultsCnt(ctx sdk.Context, feedName string) (i int) {
+func (k Keeper) getFeedValuesCnt(ctx sdk.Context, feedName string) (i int) {
 	store := ctx.KVStore(k.storeKey)
-	iterator := sdk.KVStoreReversePrefixIterator(store, GetFeedResultPrefixKey(feedName))
+	iterator := sdk.KVStoreReversePrefixIterator(store, GetFeedValuePrefixKey(feedName))
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
 		i++
@@ -103,9 +101,9 @@ func (k Keeper) getFeedResultsCnt(ctx sdk.Context, feedName string) (i int) {
 	return
 }
 
-func (k Keeper) deleteOldestFeedResult(ctx sdk.Context, feedName string, delta int) {
+func (k Keeper) deleteOldestFeedValue(ctx sdk.Context, feedName string, delta int) {
 	store := ctx.KVStore(k.storeKey)
-	iterator := sdk.KVStorePrefixIterator(store, GetFeedResultPrefixKey(feedName))
+	iterator := sdk.KVStorePrefixIterator(store, GetFeedValuePrefixKey(feedName))
 	defer iterator.Close()
 	for i := 1; iterator.Valid() && i <= delta; iterator.Next() {
 		store.Delete(iterator.Key())
