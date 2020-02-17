@@ -35,14 +35,15 @@ const (
 	CodeRequestContextNotStarted  sdk.CodeType = 121
 	CodeRequestContextNotPaused   sdk.CodeType = 122
 	CodeModuleNameRegistered      sdk.CodeType = 123
-	CodeNoEarnedFees              sdk.CodeType = 124
+	CodeModuleNameNotRegistered   sdk.CodeType = 124
+	CodeNoEarnedFees              sdk.CodeType = 125
 
-	CodeInvalidRequestInput   sdk.CodeType = 125
-	CodeInvalidResponseOutput sdk.CodeType = 126
-	CodeInvalidResponseErr    sdk.CodeType = 127
+	CodeInvalidRequestInput   sdk.CodeType = 126
+	CodeInvalidResponseOutput sdk.CodeType = 127
+	CodeInvalidResponseErr    sdk.CodeType = 128
 
-	CodeInvalidAddress  sdk.CodeType = 128
-	CodeInvalidGuardian sdk.CodeType = 129
+	CodeInvalidAddress  sdk.CodeType = 129
+	CodeInvalidGuardian sdk.CodeType = 130
 )
 
 func ErrInvalidServiceName(codespace sdk.CodespaceType, serviceName string) sdk.Error {
@@ -138,7 +139,11 @@ func ErrRequestContextNotPaused(codespace sdk.CodespaceType) sdk.Error {
 }
 
 func ErrModuleNameRegistered(codespace sdk.CodespaceType, moduleName string) sdk.Error {
-	return sdk.NewError(codespace, CodeModuleNameRegistered, fmt.Sprintf("module % already registered", moduleName))
+	return sdk.NewError(codespace, CodeModuleNameRegistered, fmt.Sprintf("module %s already registered", moduleName))
+}
+
+func ErrModuleNameNotRegistered(codespace sdk.CodespaceType, moduleName string) sdk.Error {
+	return sdk.NewError(codespace, CodeModuleNameNotRegistered, fmt.Sprintf("module %s not registered", moduleName))
 }
 
 func ErrNoEarnedFees(codespace sdk.CodespaceType, provider sdk.AccAddress) sdk.Error {

@@ -42,15 +42,16 @@ var (
 	NewMsgUpdateServiceBinding = types.NewMsgUpdateServiceBinding
 	NewMsgSetWithdrawAddress   = types.NewMsgSetWithdrawAddress
 	NewMsgDisableService       = types.NewMsgDisableService
-	NewMsgEnableService        = types.NewMsgEnableService
+	NewMsgEnableService        = types.NewMsgRequestService
+	NewMsgRespondService       = types.NewMsgEnableService
 	NewMsgRefundServiceDeposit = types.NewMsgRefundServiceDeposit
-	NewMsgRequestService       = types.NewMsgRequestService
-	NewMsgRespondService       = types.NewMsgRespondService
+	NewMsgRequestService       = types.NewMsgRespondService
 	NewMsgStopRepeated         = types.NewMsgStopRepeated
 	NewMsgUpdateRequestContext = types.NewMsgUpdateRequestContext
 	NewMsgWithdrawEarnedFees   = types.NewMsgWithdrawEarnedFees
 	NewMsgWithdrawTax          = types.NewMsgWithdrawTax
 	ConvertRequestID           = types.ConvertRequestID
+	GetBatchRequestIndexKey    = keeper.GetBatchRequestIndexKey
 )
 
 // nolint
