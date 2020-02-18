@@ -154,7 +154,7 @@ func (k Keeper) EditFeed(ctx sdk.Context, msg types.MsgEditFeed) sdk.Error {
 	if msg.LatestHistory > 1 {
 		cnt := k.getFeedValuesCnt(ctx, feed.FeedName)
 		if expectCnt := int(msg.LatestHistory); expectCnt < cnt {
-			k.deleteOldestFeedValue(ctx, feed.FeedName, expectCnt-cnt)
+			k.deleteOldestFeedValue(ctx, feed.FeedName, cnt-expectCnt)
 		}
 		feed.LatestHistory = msg.LatestHistory
 	}
