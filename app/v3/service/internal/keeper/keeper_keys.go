@@ -17,8 +17,7 @@ var (
 	requestKey             = []byte{0x06}
 	activeRequestKey       = []byte{0x07}
 	responseKey            = []byte{0x08}
-	returnedFeeKey         = []byte{0x09}
-	incomingFeeKey         = []byte{0x10}
+	earnedFeesKey          = []byte{0x09}
 )
 
 const (
@@ -79,12 +78,8 @@ func GetResponseKey(requestID []byte) []byte {
 	return append(responseKey, requestID...)
 }
 
-func GetReturnedFeeKey(address sdk.AccAddress) []byte {
-	return append(returnedFeeKey, address.Bytes()...)
-}
-
-func GetIncomingFeeKey(address sdk.AccAddress) []byte {
-	return append(incomingFeeKey, address.Bytes()...)
+func GetEarnedFeesKey(address sdk.AccAddress) []byte {
+	return append(earnedFeesKey, address.Bytes()...)
 }
 
 func GetIntraTxCounterKey() int {
@@ -93,13 +88,12 @@ func GetIntraTxCounterKey() int {
 
 func getStringsKey(ss []string) (result []byte) {
 	for _, s := range ss {
-		result = append(append(
-			result,
-			[]byte(s)...),
-			emptyByte...)
+		result = append(append(result, []byte(s)...), emptyByte...)
 	}
+
 	if len(result) > 0 {
 		return result[0 : len(result)-1]
 	}
+
 	return
 }

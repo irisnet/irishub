@@ -44,6 +44,7 @@ const (
 
 	CodeInvalidAddress  sdk.CodeType = 129
 	CodeInvalidGuardian sdk.CodeType = 130
+	CodeInvalidTrustee  sdk.CodeType = 131
 )
 
 func ErrInvalidServiceName(codespace sdk.CodespaceType, serviceName string) sdk.Error {
@@ -162,8 +163,12 @@ func ErrInvalidResponseErr(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidResponseErr, fmt.Sprintf("invalid response err: %s", msg))
 }
 
-func ErrInvalidGuardian(codespace sdk.CodespaceType, msg string) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidGuardian, msg)
+func ErrInvalidGuardian(codespace sdk.CodespaceType, address sdk.AccAddress) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidGuardian, fmt.Sprintf("invalid guardian: %s", address))
+}
+
+func ErrInvalidTrustee(codespace sdk.CodespaceType, address sdk.AccAddress) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidTrustee, fmt.Sprintf("invalid trustee: %s", address))
 }
 
 func ErrInvalidAddress(codespace sdk.CodespaceType, msg string) sdk.Error {
