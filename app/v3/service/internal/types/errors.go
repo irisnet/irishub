@@ -36,6 +36,16 @@ const (
 
 	CodeInvalidInput   sdk.CodeType = 121
 	CodeInvalidAddress sdk.CodeType = 122
+
+	CodeInvalidRequest            sdk.CodeType = 123
+	CodeInvalidProviders          sdk.CodeType = 124
+	CodeInvalidRepeatedFreq       sdk.CodeType = 125
+	CodeInvalidRepeatedTotal      sdk.CodeType = 126
+	CodeInvalidRequestContextID   sdk.CodeType = 127
+	CodeRequestContextNonRepeated sdk.CodeType = 128
+	CodeRequestContextNotStarted  sdk.CodeType = 129
+	CodeRequestContextNotPaused   sdk.CodeType = 130
+	CodeModuleNameRegistered      sdk.CodeType = 131
 )
 
 func ErrInvalidServiceName(codespace sdk.CodespaceType, serviceName string) sdk.Error {
@@ -136,4 +146,40 @@ func ErrInvalidResponseErr(codespace sdk.CodespaceType, msg string) sdk.Error {
 
 func ErrInvalidAddress(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidAddress, msg)
+}
+
+func ErrInvalidRequest(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidRequest, fmt.Sprintf("invalid request: %s", msg))
+}
+
+func ErrInvalidProviders(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidProviders, fmt.Sprintf("invalid providers: %s", msg))
+}
+
+func ErrInvalidRepeatedFreq(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidRepeatedFreq, msg)
+}
+
+func ErrInvalidRepeatedTotal(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidRepeatedTotal, msg)
+}
+
+func ErrInvalidRequestContextID(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidRequestContextID, fmt.Sprintf("invalid request context ID: %s", msg))
+}
+
+func ErrRequestContextNonRepeated(codespace sdk.CodespaceType) sdk.Error {
+	return sdk.NewError(codespace, CodeRequestContextNonRepeated, "request context is non repeated")
+}
+
+func ErrRequestContextNotStarted(codespace sdk.CodespaceType) sdk.Error {
+	return sdk.NewError(codespace, CodeRequestContextNotStarted, "request context not started")
+}
+
+func ErrRequestContextNotPaused(codespace sdk.CodespaceType) sdk.Error {
+	return sdk.NewError(codespace, CodeRequestContextNotPaused, "request context not paused")
+}
+
+func ErrModuleNameRegistered(codespace sdk.CodespaceType, moduleName string) sdk.Error {
+	return sdk.NewError(codespace, CodeModuleNameRegistered, fmt.Sprintf("module %s already registered", moduleName))
 }
