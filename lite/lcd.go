@@ -13,6 +13,7 @@ import (
 	distributionhandler "github.com/irisnet/irishub/client/distribution/lcd"
 	govhandler "github.com/irisnet/irishub/client/gov/lcd"
 	htlchandler "github.com/irisnet/irishub/client/htlc/lcd"
+	oraclehandler "github.com/irisnet/irishub/client/oracle/lcd"
 	paramshandler "github.com/irisnet/irishub/client/params/lcd"
 	randhandler "github.com/irisnet/irishub/client/rand/lcd"
 	servicehandler "github.com/irisnet/irishub/client/service/lcd"
@@ -109,6 +110,7 @@ func createHandler(cdc *codec.Codec) *mux.Router {
 	stakehandler.RegisterRoutes(cliCtx, r, cdc)
 	govhandler.RegisterRoutes(cliCtx, r, cdc)
 	servicehandler.RegisterRoutes(cliCtx, r, cdc)
+	oraclehandler.RegisterRoutes(cliCtx, r, cdc)
 	paramshandler.RegisterRoutes(cliCtx, r, cdc)
 	coinswaphandler.RegisterRoutes(cliCtx, r, cdc)
 	htlchandler.RegisterRoutes(cliCtx, r, cdc)

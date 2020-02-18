@@ -1,6 +1,8 @@
 package types
 
 import (
+	"bytes"
+	"fmt"
 	"time"
 
 	"github.com/irisnet/irishub/app/v3/service/exported"
@@ -17,11 +19,52 @@ type Feed struct {
 	RequestContextID []byte         `json:"request_context_id"`
 	Creator          sdk.AccAddress `json:"creator"`
 }
+
+// String implements fmt.Stringer
+func (f Feed) String() string {
+	return fmt.Sprintf(`Feed:
+		FeedName:                 %s
+		Description:              %s
+		AggregateFunc:            %s
+		ValueJsonPath:            %s
+		LatestHistory:            %d
+		RequestContextID:         %s
+		Creator:                  %s`,
+		f.FeedName,
+		f.Description,
+		f.AggregateFunc,
+		f.ValueJsonPath,
+		f.LatestHistory,
+		f.RequestContextID,
+		f.Creator.String(),
+	)
+}
+
 type FeedValue struct {
 	Data      string    `json:"data"`
 	Timestamp time.Time `json:"timestamp"`
 }
+
+// String implements fmt.Stringer
+func (f FeedValue) String() string {
+	return fmt.Sprintf(`FeedValue:
+		Data:                 %s
+		Timestamp:            %s`,
+		f.Data,
+		f.Timestamp.String(),
+	)
+}
+
 type FeedValues []FeedValue
+
+// String implements fmt.Stringer
+func (fv FeedValues) String() string {
+	var bf bytes.Buffer
+	for _, f := range fv {
+		bf.WriteString(f.String())
+	}
+	return bf.String()
+}
 
 type FeedContext struct {
 	Feed              Feed                         `json:"feed"`
@@ -34,4 +77,37 @@ type FeedContext struct {
 	RepeatedTotal     int64                        `json:"repeated_total"`
 	ResponseThreshold uint16                       `json:"response_threshold"`
 	State             exported.RequestContextState `json:"state"`
+}
+
+// String implements fmt.Stringer
+func (f FeedContext) String() string {
+	var bf bytes.Buffer
+	bf.WriteString("[")
+	for _, addr := range f.Providers {
+		bf.WriteString(addr.String())
+		bf.WriteString(",")
+	}
+	bf.WriteString("]")
+	return fmt.Sprintf(`FeedContext:
+		Feed:                         %s
+		ServiceName:                  %s
+		Providers:                    %s
+		Input:                        %s
+		Timeout:                      %d
+		ServiceFeeCap:                %s
+		RepeatedFrequency:            %d
+		RepeatedTotal:                %d
+		ResponseThreshold:            %d
+		State:                        %s`,
+		f.Feed.String(),
+		f.ServiceName,
+		bf.String(),
+		f.Input,
+		f.Timeout,
+		f.ServiceFeeCap,
+		f.RepeatedFrequency,
+		f.RepeatedTotal,
+		f.ResponseThreshold,
+		f.State,
+	)
 }
