@@ -45,6 +45,7 @@ type createFeedReq struct {
 	ValueJsonPath     string       `json:"value_json_path"`
 	LatestHistory     uint64       `json:"latest_history"`
 	Description       string       `json:"description"`
+	Creator           string       `json:"creator"`
 	ServiceName       string       `json:"service_name"`
 	Providers         []string     `json:"providers"`
 	Input             string       `json:"input"`
@@ -53,7 +54,6 @@ type createFeedReq struct {
 	RepeatedFrequency uint64       `json:"repeated_frequency"`
 	RepeatedTotal     int64        `json:"repeated_total"`
 	ResponseThreshold uint16       `json:"response_threshold"`
-	Creator           string       `json:"creator"`
 }
 
 type editFeedReq struct {
@@ -61,13 +61,13 @@ type editFeedReq struct {
 	FeedName          string       `json:"feed_name"`
 	Description       string       `json:"description"`
 	LatestHistory     uint64       `json:"latest_history"`
+	Creator           string       `json:"creator"`
 	Providers         []string     `json:"providers"`
 	Timeout           int64        `json:"timeout"`
 	ServiceFeeCap     string       `json:"service_fee_cap"`
 	RepeatedFrequency uint64       `json:"repeated_frequency"`
 	RepeatedTotal     int64        `json:"repeated_total"`
 	ResponseThreshold uint16       `json:"response_threshold"`
-	Creator           string       `json:"creator"`
 }
 
 type startFeedReq struct {
@@ -117,10 +117,9 @@ func createFeedHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handl
 
 		msg := oracle.MsgCreateFeed{
 			FeedName:          req.FeedName,
-			AggregateFunc:     req.AggregateFunc,
-			ValueJsonPath:     req.ValueJsonPath,
 			LatestHistory:     req.LatestHistory,
 			Description:       req.Description,
+			Creator:           creator,
 			ServiceName:       req.ServiceName,
 			Providers:         providers,
 			Input:             req.Input,
@@ -129,7 +128,8 @@ func createFeedHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handl
 			RepeatedFrequency: req.RepeatedFrequency,
 			RepeatedTotal:     req.RepeatedTotal,
 			ResponseThreshold: req.ResponseThreshold,
-			Creator:           creator,
+			AggregateFunc:     req.AggregateFunc,
+			ValueJsonPath:     req.ValueJsonPath,
 		}
 		if err := msg.ValidateBasic(); err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())

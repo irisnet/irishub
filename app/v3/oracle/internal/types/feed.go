@@ -98,7 +98,7 @@ func (f FeedContext) String() string {
 		RepeatedFrequency:            %d
 		RepeatedTotal:                %d
 		ResponseThreshold:            %d
-		State:                        %s`,
+		State:                        %d`,
 		f.Feed.String(),
 		f.ServiceName,
 		bf.String(),

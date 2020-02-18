@@ -36,10 +36,9 @@ var (
 // MsgCreateFeed - struct for create a feed
 type MsgCreateFeed struct {
 	FeedName          string           `json:"feed_name"`
-	AggregateFunc     string           `json:"aggregate_func"`
-	ValueJsonPath     string           `json:"value_json_path"`
 	LatestHistory     uint64           `json:"latest_history"`
 	Description       string           `json:"description"`
+	Creator           sdk.AccAddress   `json:"creator"`
 	ServiceName       string           `json:"service_name"`
 	Providers         []sdk.AccAddress `json:"providers"`
 	Input             string           `json:"input"`
@@ -47,8 +46,9 @@ type MsgCreateFeed struct {
 	ServiceFeeCap     sdk.Coins        `json:"service_fee_cap"`
 	RepeatedFrequency uint64           `json:"repeated_frequency"`
 	RepeatedTotal     int64            `json:"repeated_total"`
+	AggregateFunc     string           `json:"aggregate_func"`
+	ValueJsonPath     string           `json:"value_json_path"`
 	ResponseThreshold uint16           `json:"response_threshold"`
-	Creator           sdk.AccAddress   `json:"creator"`
 }
 
 // Route implements Msg.

@@ -24,7 +24,7 @@ func GetCmdCreateFeed(cdc *codec.Codec) *cobra.Command {
 			`--input={request-data} ` +
 			`--providers="faa1r3tyupskwlh07dmhjw70frxzaaaufta37y25yr,faa1ydahnhrhkjh9j9u0jn8p3s272l0ecqj40vra8h" ` +
 			`--service-fee-cap=1iris ` +
-			`--timeout=6 --repeated_frequency=5 --repeated_total=-1 --response_threshold=3 --aggregate-func="avg" --value-json-path="data.user.name"`,
+			`--timeout=6 --frequency=5 --total=-1 --threshold=3 --aggregate-func="avg" --value-json-path="data.user.name"`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
@@ -63,9 +63,9 @@ func GetCmdCreateFeed(cdc *codec.Codec) *cobra.Command {
 				Input:             viper.GetString(FlagInput),
 				Timeout:           viper.GetInt64(FlagTimeout),
 				ServiceFeeCap:     serviceFeeCap,
-				RepeatedFrequency: uint64(viper.GetInt64(FlagRepeatedFrequency)),
-				RepeatedTotal:     viper.GetInt64(FlagRepeatedTotal),
-				ResponseThreshold: uint16(viper.GetInt(FlagResponseThreshold)),
+				RepeatedFrequency: uint64(viper.GetInt64(FlagFrequency)),
+				RepeatedTotal:     viper.GetInt64(FlagTotal),
+				ResponseThreshold: uint16(viper.GetInt(FlagThreshold)),
 				Creator:           creator,
 			}
 			if err := msg.ValidateBasic(); err != nil {
@@ -163,7 +163,7 @@ func GetCmdEditFeed(cdc *codec.Codec) *cobra.Command {
 		Example: `oracle edit --chain-id="irishub-test" --from=<creator> --fee=0.3iris ` +
 			`--feed-name=<feed-name> --latest-history=10 ` +
 			`--providers="faa1r3tyupskwlh07dmhjw70frxzaaaufta37y25yr,faa1ydahnhrhkjh9j9u0jn8p3s272l0ecqj40vra8h"` +
-			`--service-fee-cap=1iris --timeout=6 --response_threshold=5 --repeated_total=-1 --response_threshold=3`,
+			`--service-fee-cap=1iris --timeout=6 --threshold=5 --total=-1 --threshold=3`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
@@ -197,9 +197,9 @@ func GetCmdEditFeed(cdc *codec.Codec) *cobra.Command {
 				Providers:         providers,
 				Timeout:           viper.GetInt64(FlagTimeout),
 				ServiceFeeCap:     serviceFeeCap,
-				RepeatedFrequency: uint64(viper.GetInt64(FlagRepeatedFrequency)),
-				RepeatedTotal:     viper.GetInt64(FlagRepeatedTotal),
-				ResponseThreshold: uint16(viper.GetInt(FlagResponseThreshold)),
+				RepeatedFrequency: uint64(viper.GetInt64(FlagFrequency)),
+				RepeatedTotal:     viper.GetInt64(FlagTotal),
+				ResponseThreshold: uint16(viper.GetInt(FlagThreshold)),
 				Creator:           creator,
 			}
 			if err := msg.ValidateBasic(); err != nil {
