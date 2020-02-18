@@ -1,18 +1,19 @@
 package types
 
 import (
-	"github.com/irisnet/irishub/app/v3/service/exported"
+	service "github.com/irisnet/irishub/app/v3/service/exported"
 	"github.com/irisnet/irishub/modules/guardian"
 	sdk "github.com/irisnet/irishub/types"
+	"strings"
 )
 
 //expected Service keeper
 type ServiceKeeper interface {
 	RegisterResponseCallback(moduleName string,
-		respCallback exported.ResponseCallback) sdk.Error
+		respCallback service.ResponseCallback) sdk.Error
 
 	GetRequestContext(ctx sdk.Context,
-		requestContextID []byte) (exported.RequestContext, bool)
+		requestContextID []byte) (service.RequestContext, bool)
 
 	CreateRequestContext(ctx sdk.Context,
 		serviceName string,
@@ -24,7 +25,7 @@ type ServiceKeeper interface {
 		repeated bool,
 		repeatedFrequency uint64,
 		repeatedTotal int64,
-		state exported.RequestContextState,
+		state service.RequestContextState,
 		respThreshold uint16,
 		respHandler string) ([]byte, sdk.Error)
 
@@ -45,4 +46,19 @@ type ServiceKeeper interface {
 // GuardianKeeper defines the expected guardian keeper (noalias)
 type GuardianKeeper interface {
 	GetProfiler(ctx sdk.Context, addr sdk.AccAddress) (guardian guardian.Guardian, found bool)
+}
+
+func StateFromString(state string) service.RequestContextState {
+	state = strings.ToLower(strings.TrimSpace(state))
+	if state == "running" {
+		return service.RUNNING
+	}
+	return service.PAUSED
+}
+
+func StateToString(state service.RequestContextState) string {
+	if state == service.RUNNING {
+		return "running"
+	}
+	return "paused"
 }

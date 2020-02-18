@@ -14,7 +14,7 @@ const (
 	FlagProviders     = "providers"
 	FlagInput         = "input"
 	FlagTimeout       = "timeout"
-	FlagServiceFeeCap = "service_fee_cap"
+	FlagServiceFeeCap = "service-fee-cap"
 	FlagFrequency     = "frequency"
 	FlagTotal         = "total"
 	FlagThreshold     = "threshold"
@@ -65,6 +65,5 @@ func init() {
 	FsEditFeed.Uint16(FlagThreshold, 0, "minimum number of responses needed for aggregation, range [1, count(providers)]")
 	FsEditFeed.String(FlagCreator, "", "address of the Feed creator")
 
-	FsQueryFeeds.String(FlagFeedState, "paused", "the state of the Feed,paused|running")
-	FsQueryFeedValue.String(FlagFeedName, "", "unique identifier of the Feed")
+	FsQueryFeeds.String(FlagFeedState, "", "the state of the Feed,paused|running")
 }

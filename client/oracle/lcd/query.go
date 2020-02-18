@@ -8,7 +8,6 @@ import (
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/app/v3/oracle"
 	"github.com/irisnet/irishub/client/context"
-	cli "github.com/irisnet/irishub/client/oracle"
 	oracleClient "github.com/irisnet/irishub/client/oracle"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/codec"
@@ -37,10 +36,8 @@ func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Co
 func queryFeedHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		feedName := vars[FeedName]
-
 		params := oracle.QueryFeedParams{
-			FeedName: feedName,
+			FeedName: vars[FeedName],
 		}
 
 		bz, err := cliCtx.Codec.MarshalJSON(params)
@@ -64,7 +61,7 @@ func queryFeedsHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.Handl
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		params := oracle.QueryFeedsParams{
-			State: cli.GetState(oracleClient.GetUrlParam(r.URL, FeedState)),
+			State: oracleClient.GetUrlParam(r.URL, FeedState),
 		}
 
 		bz, err := cliCtx.Codec.MarshalJSON(params)
@@ -86,9 +83,9 @@ func queryFeedsHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.Handl
 
 func queryFeedValuesHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
-		params := oracle.QueryFeedsParams{
-			State: cli.GetState(oracleClient.GetUrlParam(r.URL, FeedState)),
+		vars := mux.Vars(r)
+		params := oracle.QueryFeedValueParams{
+			FeedName: vars[FeedName],
 		}
 
 		bz, err := cliCtx.Codec.MarshalJSON(params)

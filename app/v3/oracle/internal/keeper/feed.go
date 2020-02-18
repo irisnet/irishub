@@ -16,6 +16,18 @@ func (k Keeper) GetFeed(ctx sdk.Context, feedName string) (feed types.Feed, foun
 	return feed, true
 }
 
+func (k Keeper) GetFeeds(ctx sdk.Context) (feeds []types.Feed) {
+	store := ctx.KVStore(k.storeKey)
+	iterator := sdk.KVStoreReversePrefixIterator(store, GetFeedPrefixKey())
+	defer iterator.Close()
+	for ; iterator.Valid(); iterator.Next() {
+		var res types.Feed
+		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &res)
+		feeds = append(feeds, res)
+	}
+	return
+}
+
 func (k Keeper) GetFeedByReqCtxID(ctx sdk.Context, requestContextID []byte) (feed types.Feed, found bool) {
 	store := ctx.KVStore(k.storeKey)
 	bz := store.Get(GetReqCtxIDKey(requestContextID))

@@ -23,13 +23,13 @@ type Feed struct {
 // String implements fmt.Stringer
 func (f Feed) String() string {
 	return fmt.Sprintf(`Feed:
-		FeedName:                 %s
-		Description:              %s
-		AggregateFunc:            %s
-		ValueJsonPath:            %s
-		LatestHistory:            %d
-		RequestContextID:         %s
-		Creator:                  %s`,
+	  FeedName:                 %s
+	  Description:              %s
+	  AggregateFunc:            %s
+	  ValueJsonPath:            %s
+	  LatestHistory:            %d
+	  RequestContextID:         %s
+	  Creator:                  %s`,
 		f.FeedName,
 		f.Description,
 		f.AggregateFunc,
@@ -47,7 +47,7 @@ type FeedValue struct {
 
 // String implements fmt.Stringer
 func (f FeedValue) String() string {
-	return fmt.Sprintf(`FeedValue:
+	return fmt.Sprintf(` FeedValue:
 		Data:                 %s
 		Timestamp:            %s`,
 		f.Data,
@@ -60,9 +60,13 @@ type FeedValues []FeedValue
 // String implements fmt.Stringer
 func (fv FeedValues) String() string {
 	var bf bytes.Buffer
+	bf.WriteString("[")
 	for _, f := range fv {
+		bf.WriteString("\n")
 		bf.WriteString(f.String())
+		bf.WriteString("\n")
 	}
+	bf.WriteString("]")
 	return bf.String()
 }
 
@@ -82,23 +86,21 @@ type FeedContext struct {
 // String implements fmt.Stringer
 func (f FeedContext) String() string {
 	var bf bytes.Buffer
-	bf.WriteString("[")
 	for _, addr := range f.Providers {
 		bf.WriteString(addr.String())
 		bf.WriteString(",")
 	}
-	bf.WriteString("]")
-	return fmt.Sprintf(`FeedContext:
-		Feed:                         %s
-		ServiceName:                  %s
-		Providers:                    %s
-		Input:                        %s
-		Timeout:                      %d
-		ServiceFeeCap:                %s
-		RepeatedFrequency:            %d
-		RepeatedTotal:                %d
-		ResponseThreshold:            %d
-		State:                        %d`,
+	return fmt.Sprintf(` FeedContext:
+	%s
+	ServiceName:                %s
+	Providers:                  %s
+	Input:                      %s
+	Timeout:                    %d
+	ServiceFeeCap:              %s
+	RepeatedFrequency:          %d
+	RepeatedTotal:              %d
+	ResponseThreshold:          %d
+	State:                      %s`,
 		f.Feed.String(),
 		f.ServiceName,
 		bf.String(),
@@ -108,6 +110,21 @@ func (f FeedContext) String() string {
 		f.RepeatedFrequency,
 		f.RepeatedTotal,
 		f.ResponseThreshold,
-		f.State,
+		StateToString(f.State),
 	)
+}
+
+type FeedsContext []FeedContext
+
+// String implements fmt.Stringer
+func (fc FeedsContext) String() string {
+	var bf bytes.Buffer
+	bf.WriteString("[")
+	for _, f := range fc {
+		bf.WriteString("\n")
+		bf.WriteString(f.String())
+		bf.WriteString("\n")
+	}
+	bf.WriteString("]")
+	return bf.String()
 }

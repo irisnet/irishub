@@ -6,7 +6,6 @@ import (
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/app/v3/oracle"
 	"github.com/irisnet/irishub/client/context"
-	cli "github.com/irisnet/irishub/client/oracle"
 	"github.com/irisnet/irishub/codec"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -59,7 +58,7 @@ func GetCmdQueryFeeds(cdc *codec.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
 			params := oracle.QueryFeedsParams{
-				State: cli.GetState(viper.GetString(FlagFeedState)),
+				State: viper.GetString(FlagFeedState),
 			}
 
 			bz, err := cdc.MarshalJSON(params)
@@ -73,7 +72,7 @@ func GetCmdQueryFeeds(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			var feedCtx oracle.FeedContext
+			var feedCtx oracle.FeedsContext
 			if err := cdc.UnmarshalJSON(res, &feedCtx); err != nil {
 				return err
 			}
@@ -82,7 +81,6 @@ func GetCmdQueryFeeds(cdc *codec.Codec) *cobra.Command {
 		},
 	}
 	cmd.Flags().AddFlagSet(FsQueryFeeds)
-	_ = cmd.MarkFlagRequired(FlagFeedState)
 	return cmd
 }
 
@@ -92,6 +90,7 @@ func GetCmdQueryFeedValue(cdc *codec.Codec) *cobra.Command {
 		Use:     "query-value",
 		Short:   "Query feed values",
 		Example: "iriscli oracle query-value",
+		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
@@ -118,7 +117,6 @@ func GetCmdQueryFeedValue(cdc *codec.Codec) *cobra.Command {
 			return cliCtx.PrintOutput(feedValue)
 		},
 	}
-	cmd.Flags().AddFlagSet(FsQueryFeeds)
-	_ = cmd.MarkFlagRequired(FlagFeedState)
+	cmd.Flags().AddFlagSet(FsQueryFeedValue)
 	return cmd
 }

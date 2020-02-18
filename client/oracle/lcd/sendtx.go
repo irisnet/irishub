@@ -109,7 +109,7 @@ func createFeedHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handl
 			providers = append(providers, provider)
 		}
 
-		serviceFeeCap, err := sdk.ParseCoins(req.ServiceFeeCap)
+		serviceFeeCap, err := cliCtx.ParseCoins(req.ServiceFeeCap)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -170,7 +170,7 @@ func editFeedHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handler
 			providers = append(providers, provider)
 		}
 
-		serviceFeeCap, err := sdk.ParseCoins(req.ServiceFeeCap)
+		serviceFeeCap, err := cliCtx.ParseCoins(req.ServiceFeeCap)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return

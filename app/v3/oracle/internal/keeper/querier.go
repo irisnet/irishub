@@ -2,6 +2,7 @@ package keeper
 
 import (
 	abci "github.com/tendermint/tendermint/abci/types"
+	"strings"
 
 	"github.com/irisnet/irishub/app/v3/oracle/internal/types"
 	"github.com/irisnet/irishub/codec"
@@ -48,12 +49,19 @@ func queryFeeds(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sdk.E
 	if err := k.cdc.UnmarshalJSON(req.Data, &params); err != nil {
 		return nil, sdk.ParseParamsErr(err)
 	}
-	var result []types.FeedContext
-	feeds := k.GetFeedByState(ctx, params.State)
+
+	var feeds []types.Feed
+	state := strings.TrimSpace(params.State)
+	if len(state) == 0 {
+		feeds = k.GetFeeds(ctx)
+	} else {
+		feeds = k.GetFeedByState(ctx, types.StateFromString(params.State))
+	}
+
+	var result types.FeedsContext
 	for _, feed := range feeds {
 		result = append(result, buildFeedContext(ctx, k, feed))
 	}
-
 	bz, err := codec.MarshalJSONIndent(k.cdc, result)
 	if err != nil {
 		return nil, sdk.MarshalResultErr(err)

@@ -17,9 +17,9 @@ func GetCmdCreateFeed(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create",
 		Short: "Define a new feed",
-		Example: `oracle create --chain-id="irishub-test" --from=<creator> --fee=0.3iris ` +
+		Example: `iriscli oracle create --chain-id="irishub-test" --from=<creator> --fee=0.3iris ` +
 			`--feed-name="test-feed" ` +
-			`--latest-history=10 "` +
+			`--latest-history=10 ` +
 			`--service-name="test-service" ` +
 			`--input={request-data} ` +
 			`--providers="faa1r3tyupskwlh07dmhjw70frxzaaaufta37y25yr,faa1ydahnhrhkjh9j9u0jn8p3s272l0ecqj40vra8h" ` +
@@ -47,7 +47,7 @@ func GetCmdCreateFeed(cdc *codec.Codec) *cobra.Command {
 				providers = append(providers, provider)
 			}
 
-			serviceFeeCap, err := sdk.ParseCoins(viper.GetString(FlagServiceFeeCap))
+			serviceFeeCap, err := cliCtx.ParseCoins(viper.GetString(FlagServiceFeeCap))
 			if err != nil {
 				return err
 			}
@@ -93,7 +93,7 @@ func GetCmdStartFeed(cdc *codec.Codec) *cobra.Command {
 		Use:     "start",
 		Short:   "start a new feed",
 		Args:    cobra.ExactArgs(1),
-		Example: `oracle start <feed-name> --chain-id="irishub-test" --from=<creator> --fee=0.3iris `,
+		Example: `iriscli oracle start <feed-name> --chain-id="irishub-test" --from=<creator> --fee=0.3iris `,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
@@ -127,7 +127,7 @@ func GetCmdPauseFeed(cdc *codec.Codec) *cobra.Command {
 		Use:     "pause",
 		Short:   "pause a running feed",
 		Args:    cobra.ExactArgs(1),
-		Example: `oracle pause <feed-name> --chain-id="irishub-test" --from=<creator> --fee=0.3iris `,
+		Example: `iriscli oracle pause <feed-name> --chain-id="irishub-test" --from=<creator> --fee=0.3iris `,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
@@ -160,7 +160,7 @@ func GetCmdEditFeed(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "edit",
 		Short: "edit a feed",
-		Example: `oracle edit --chain-id="irishub-test" --from=<creator> --fee=0.3iris ` +
+		Example: `iriscli oracle edit --chain-id="irishub-test" --from=<creator> --fee=0.3iris ` +
 			`--feed-name=<feed-name> --latest-history=10 ` +
 			`--providers="faa1r3tyupskwlh07dmhjw70frxzaaaufta37y25yr,faa1ydahnhrhkjh9j9u0jn8p3s272l0ecqj40vra8h"` +
 			`--service-fee-cap=1iris --timeout=6 --threshold=5 --total=-1 --threshold=3`,
@@ -185,7 +185,7 @@ func GetCmdEditFeed(cdc *codec.Codec) *cobra.Command {
 				providers = append(providers, provider)
 			}
 
-			serviceFeeCap, err := sdk.ParseCoins(viper.GetString(FlagServiceFeeCap))
+			serviceFeeCap, err := cliCtx.ParseCoins(viper.GetString(FlagServiceFeeCap))
 			if err != nil {
 				return err
 			}

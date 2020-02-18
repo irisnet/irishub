@@ -18,9 +18,10 @@ type (
 	QueryFeedsParams     = types.QueryFeedsParams
 	QueryFeedValueParams = types.QueryFeedValueParams
 
-	FeedContext = types.FeedContext
-	FeedValue   = types.FeedValue
-	FeedValues  = types.FeedValues
+	FeedContext  = types.FeedContext
+	FeedsContext = types.FeedsContext
+	FeedValue    = types.FeedValue
+	FeedValues   = types.FeedValues
 )
 
 const (
@@ -31,7 +32,9 @@ const (
 )
 
 var (
-	NewKeeper     = keeper.NewKeeper
-	NewQuerier    = keeper.NewQuerier
-	RegisterCodec = types.RegisterCodec
+	NewKeeper  = keeper.NewKeeper
+	NewQuerier = keeper.NewQuerier
+
+	RegisterCodec   = types.RegisterCodec
+	StateFromString = types.StateFromString
 )

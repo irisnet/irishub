@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	oraclecmd "github.com/irisnet/irishub/client/oracle/cli"
 	"os"
 	"path"
 
@@ -15,7 +16,6 @@ import (
 	guardiancmd "github.com/irisnet/irishub/client/guardian/cli"
 	htlccmd "github.com/irisnet/irishub/client/htlc/cli"
 	keyscmd "github.com/irisnet/irishub/client/keys/cli"
-	oraclecmd "github.com/irisnet/irishub/client/oracle/cli"
 	paramscmd "github.com/irisnet/irishub/client/params/cli"
 	randcmd "github.com/irisnet/irishub/client/rand/cli"
 	servicecmd "github.com/irisnet/irishub/client/service/cli"
@@ -201,27 +201,6 @@ func main() {
 		upgradeCmd,
 	)
 
-	//Add oracle commands
-	oracleCmd := &cobra.Command{
-		Use:   "oracle",
-		Short: "Oracle subcommands",
-	}
-	oracleCmd.AddCommand(
-		client.PostCommands(
-			oraclecmd.GetCmdCreateFeed(cdc),
-			oraclecmd.GetCmdStartFeed(cdc),
-			oraclecmd.GetCmdPauseFeed(cdc),
-			oraclecmd.GetCmdEditFeed(cdc),
-		)...,
-	)
-	oracleCmd.AddCommand(
-		client.GetCommands(
-			oraclecmd.GetCmdQueryFeed(cdc),
-			oraclecmd.GetCmdQueryFeeds(cdc),
-			oraclecmd.GetCmdQueryFeedValue(cdc),
-		)...,
-	)
-
 	//Add service commands
 	serviceCmd := &cobra.Command{
 		Use:   "service",
@@ -253,6 +232,30 @@ func main() {
 
 	rootCmd.AddCommand(
 		serviceCmd,
+	)
+
+	//Add oracle commands
+	oracleCmd := &cobra.Command{
+		Use:   "oracle",
+		Short: "Oracle subcommands",
+	}
+	oracleCmd.AddCommand(
+		client.PostCommands(
+			oraclecmd.GetCmdCreateFeed(cdc),
+			oraclecmd.GetCmdStartFeed(cdc),
+			oraclecmd.GetCmdPauseFeed(cdc),
+			oraclecmd.GetCmdEditFeed(cdc),
+		)...,
+	)
+	oracleCmd.AddCommand(
+		client.GetCommands(
+			oraclecmd.GetCmdQueryFeed(cdc),
+			oraclecmd.GetCmdQueryFeeds(cdc),
+			oraclecmd.GetCmdQueryFeedValue(cdc),
+		)...,
+	)
+	rootCmd.AddCommand(
+		oracleCmd,
 	)
 
 	//add guardian command
