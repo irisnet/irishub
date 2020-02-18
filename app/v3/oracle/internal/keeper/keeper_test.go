@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"github.com/irisnet/irishub/app/v3/service/exported"
 	"testing"
 
 	"github.com/irisnet/irishub/app/v3/oracle/internal/types"
@@ -43,7 +44,7 @@ func TestFeed(t *testing.T) {
 	}, feed)
 
 	//check feed state
-	feeds := keeper.GetFeedByState(ctx, types.Pause)
+	feeds := keeper.GetFeedByState(ctx, exported.PAUSED)
 	require.Len(t, feeds, 1)
 	require.Equal(t, msg.FeedName, feeds[0].FeedName)
 	//================test CreateFeed end================
@@ -61,7 +62,7 @@ func TestFeed(t *testing.T) {
 	require.Equal(t, "250.00000000", result[0].Data)
 
 	//check feed state
-	feeds = keeper.GetFeedByState(ctx, types.Running)
+	feeds = keeper.GetFeedByState(ctx, exported.RUNNING)
 	require.Len(t, feeds, 1)
 	require.Equal(t, msg.FeedName, feeds[0].FeedName)
 
@@ -109,7 +110,7 @@ func TestFeed(t *testing.T) {
 
 	reqCtx, existed := keeper.sk.GetRequestContext(ctx, feed.RequestContextID)
 	require.True(t, existed)
-	require.Equal(t, types.Pause, reqCtx.State)
+	require.Equal(t, exported.PAUSED, reqCtx.State)
 
 	//pause again, will return error
 	err = keeper.PauseFeed(ctx, types.MsgPauseFeed{
@@ -131,7 +132,7 @@ func TestFeed(t *testing.T) {
 	require.Equal(t, "250.00000000", result[0].Data)
 
 	//check feed state
-	feeds = keeper.GetFeedByState(ctx, types.Running)
+	feeds = keeper.GetFeedByState(ctx, exported.RUNNING)
 	require.Len(t, feeds, 1)
 	require.Equal(t, msg.FeedName, feeds[0].FeedName)
 	//================test PauseFeed end================

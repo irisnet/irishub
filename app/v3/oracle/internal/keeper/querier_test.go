@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"github.com/irisnet/irishub/app/v3/service/exported"
 	"testing"
 
 	"github.com/irisnet/irishub/app/v3/oracle/internal/types"
@@ -63,12 +64,12 @@ func TestNewQuerier(t *testing.T) {
 		RepeatedFrequency: msg.RepeatedFrequency,
 		RepeatedTotal:     msg.RepeatedTotal,
 		ResponseThreshold: msg.ResponseThreshold,
-		State:             types.Pause,
+		State:             exported.PAUSED,
 	}, feedCtx)
 
 	//test QueryFeeds
 	params1 := types.QueryFeedsParams{
-		State: "pause",
+		State: exported.PAUSED,
 	}
 	bz = keeper.cdc.MustMarshalJSON(params1)
 	res, err = query(ctx, []string{types.QueryFeeds}, abci.RequestQuery{
@@ -96,7 +97,7 @@ func TestNewQuerier(t *testing.T) {
 		RepeatedFrequency: msg.RepeatedFrequency,
 		RepeatedTotal:     msg.RepeatedTotal,
 		ResponseThreshold: msg.ResponseThreshold,
-		State:             types.Pause,
+		State:             exported.PAUSED,
 	}, feedsCtx[0])
 
 	//================test StartFeed start================

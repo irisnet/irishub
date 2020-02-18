@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"github.com/irisnet/irishub/app/v3/service/exported"
 	"testing"
 	"time"
 
@@ -102,13 +103,13 @@ func createTestAccs(ctx sdk.Context, numAccs int, initialCoins sdk.Coins, ak *au
 }
 
 type MockServiceKeeper struct {
-	cxtMap      map[string]types.RequestContext
-	callbackMap map[string]types.ResponseCallback
+	cxtMap      map[string]exported.RequestContext
+	callbackMap map[string]exported.ResponseCallback
 }
 
 func NewMockServiceKeeper() MockServiceKeeper {
-	cxtMap := make(map[string]types.RequestContext)
-	callbackMap := make(map[string]types.ResponseCallback)
+	cxtMap := make(map[string]exported.RequestContext)
+	callbackMap := make(map[string]exported.ResponseCallback)
 	return MockServiceKeeper{
 		cxtMap:      cxtMap,
 		callbackMap: callbackMap,
@@ -116,13 +117,13 @@ func NewMockServiceKeeper() MockServiceKeeper {
 }
 
 func (m MockServiceKeeper) RegisterResponseCallback(moduleName string,
-	respCallback types.ResponseCallback) sdk.Error {
+	respCallback exported.ResponseCallback) sdk.Error {
 	m.callbackMap[moduleName] = respCallback
 	return nil
 }
 
 func (m MockServiceKeeper) GetRequestContext(ctx sdk.Context,
-	requestContextID []byte) (types.RequestContext, bool) {
+	requestContextID []byte) (exported.RequestContext, bool) {
 	reqCtx, ok := m.cxtMap[string(requestContextID)]
 	return reqCtx, ok
 }
@@ -137,11 +138,11 @@ func (m MockServiceKeeper) CreateRequestContext(ctx sdk.Context,
 	repeated bool,
 	repeatedFrequency uint64,
 	repeatedTotal int64,
-	state types.RequestContextState,
+	state exported.RequestContextState,
 	respThreshold uint16,
 	moduleName string) ([]byte, sdk.Error) {
 
-	reqCtx := types.RequestContext{
+	reqCtx := exported.RequestContext{
 		ServiceName:       serviceName,
 		Providers:         providers,
 		Consumer:          consumer,
@@ -173,7 +174,7 @@ func (m MockServiceKeeper) StartRequestContext(ctx sdk.Context, requestContextID
 	reqCtx := m.cxtMap[string(requestContextID)]
 	for i := int64(reqCtx.BatchCounter + 1); i <= reqCtx.RepeatedTotal; i++ {
 		reqCtx.BatchCounter = uint64(i)
-		reqCtx.State = types.Running
+		reqCtx.State = exported.RUNNING
 		m.cxtMap[string(requestContextID)] = reqCtx
 		ctx = ctx.WithBlockHeader(abci.Header{
 			ChainID: ctx.BlockHeader().ChainID,
@@ -188,7 +189,7 @@ func (m MockServiceKeeper) StartRequestContext(ctx sdk.Context, requestContextID
 
 func (m MockServiceKeeper) PauseRequestContext(ctx sdk.Context, requestContextID []byte) sdk.Error {
 	reqCtx := m.cxtMap[string(requestContextID)]
-	reqCtx.State = types.Pause
+	reqCtx.State = exported.PAUSED
 	m.cxtMap[string(requestContextID)] = reqCtx
 	return nil
 }

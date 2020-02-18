@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"github.com/irisnet/irishub/app/v3/service/exported"
 	"strings"
 
 	"github.com/irisnet/irishub/app/v3/oracle/internal/types"
@@ -55,7 +56,7 @@ func (k Keeper) CreateFeed(ctx sdk.Context, msg types.MsgCreateFeed) sdk.Error {
 		msg.ServiceFeeCap,
 		msg.Timeout,
 		true,
-		msg.RepeatedFrequency, msg.RepeatedTotal, types.Pause, msg.ResponseThreshold, types.ModuleName)
+		msg.RepeatedFrequency, msg.RepeatedTotal, exported.PAUSED, msg.ResponseThreshold, types.ModuleName)
 	if err != nil {
 		return err
 	}
@@ -90,7 +91,7 @@ func (k Keeper) StartFeed(ctx sdk.Context, msg types.MsgStartFeed) sdk.Error {
 	}
 
 	//Can not start feed in "running" state
-	if reqCtx.State == types.Running {
+	if reqCtx.State == exported.RUNNING {
 		return types.ErrInvalidFeedState(types.DefaultCodespace, msg.FeedName)
 	}
 
@@ -119,7 +120,7 @@ func (k Keeper) PauseFeed(ctx sdk.Context, msg types.MsgPauseFeed) sdk.Error {
 	}
 
 	//Can only pause feed in "running" state
-	if reqCtx.State != types.Running {
+	if reqCtx.State != exported.RUNNING {
 		return types.ErrInvalidFeedState(types.DefaultCodespace, msg.FeedName)
 	}
 

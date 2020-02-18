@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"github.com/irisnet/irishub/app/v3/oracle/internal/types"
+	"github.com/irisnet/irishub/app/v3/service/exported"
 	sdk "github.com/irisnet/irishub/types"
 )
 
@@ -35,7 +36,7 @@ func (k Keeper) GetFeedValues(ctx sdk.Context, feedName string) (result types.Fe
 	return
 }
 
-func (k Keeper) GetFeedByState(ctx sdk.Context, state types.RequestContextState) (feeds []types.Feed) {
+func (k Keeper) GetFeedByState(ctx sdk.Context, state exported.RequestContextState) (feeds []types.Feed) {
 	store := ctx.KVStore(k.storeKey)
 	iterator := sdk.KVStorePrefixIterator(store, GetFeedStatePrefixKey(state))
 	defer iterator.Close()
@@ -60,18 +61,18 @@ func (k Keeper) setFeed(ctx sdk.Context, feed types.Feed) {
 
 func (k Keeper) insertToRunningQueue(ctx sdk.Context, feedName string) {
 	store := ctx.KVStore(k.storeKey)
-	store.Delete(GetFeedStateKey(feedName, types.Pause))
+	store.Delete(GetFeedStateKey(feedName, exported.PAUSED))
 
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(feedName)
-	store.Set(GetFeedStateKey(feedName, types.Running), bz)
+	store.Set(GetFeedStateKey(feedName, exported.RUNNING), bz)
 }
 
 func (k Keeper) insertToPauseQueue(ctx sdk.Context, feedName string) {
 	store := ctx.KVStore(k.storeKey)
-	store.Delete(GetFeedStateKey(feedName, types.Running))
+	store.Delete(GetFeedStateKey(feedName, exported.RUNNING))
 
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(feedName)
-	store.Set(GetFeedStateKey(feedName, types.Pause), bz)
+	store.Set(GetFeedStateKey(feedName, exported.PAUSED), bz)
 }
 
 func (k Keeper) setFeedValue(ctx sdk.Context,

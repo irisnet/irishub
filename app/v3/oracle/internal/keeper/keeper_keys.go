@@ -2,7 +2,7 @@ package keeper
 
 import (
 	"encoding/binary"
-	"github.com/irisnet/irishub/app/v3/oracle/internal/types"
+	"github.com/irisnet/irishub/app/v3/service/exported"
 )
 
 var (
@@ -33,12 +33,12 @@ func GetFeedValuePrefixKey(feedName string) []byte {
 	return append(append(PrefixFeedValueKey, []byte(feedName)...), separator...)
 }
 
-func GetFeedStateKey(feedName string, state types.RequestContextState) []byte {
+func GetFeedStateKey(feedName string, state exported.RequestContextState) []byte {
 	return append(append(GetFeedStatePrefixKey(state), separator...), []byte(feedName)...)
 }
 
-func GetFeedStatePrefixKey(state types.RequestContextState) []byte {
-	if state == types.Running {
+func GetFeedStatePrefixKey(state exported.RequestContextState) []byte {
+	if state == exported.RUNNING {
 		return PrefixFeedRunningStateKey
 	}
 	return PrefixFeedPauseStateKey

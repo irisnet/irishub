@@ -49,7 +49,7 @@ func queryFeeds(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sdk.E
 		return nil, sdk.ParseParamsErr(err)
 	}
 	var result []types.FeedContext
-	feeds := k.GetFeedByState(ctx, types.RequestContextState(params.State))
+	feeds := k.GetFeedByState(ctx, params.State)
 	for _, feed := range feeds {
 		result = append(result, buildFeedContext(ctx, k, feed))
 	}

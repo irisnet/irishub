@@ -1,5 +1,7 @@
 package types
 
+import "github.com/irisnet/irishub/app/v3/service/exported"
+
 const (
 	QueryFeed      = "feed"      // QueryFeed
 	QueryFeeds     = "feeds"     // QueryFeeds
@@ -13,7 +15,7 @@ type QueryFeedParams struct {
 
 // QueryFeedsParams defines the params to query a feed list by state
 type QueryFeedsParams struct {
-	State string
+	State exported.RequestContextState
 }
 
 // QueryFeedValueParams defines the params to query a feed result
