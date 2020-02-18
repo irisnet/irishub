@@ -574,7 +574,7 @@ func (msg MsgRespondService) ValidateBasic() sdk.Error {
 		return ErrInvalidAddress(DefaultCodespace, "provider missing")
 	}
 
-	_, _, _, err := ConvertRequestID(msg.RequestID)
+	_, err := ConvertRequestID(msg.RequestID)
 	if err != nil {
 		return ErrInvalidRequestID(DefaultCodespace, fmt.Sprintf("failed to parse %s", msg.RequestID))
 	}

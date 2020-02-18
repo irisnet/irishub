@@ -2,6 +2,7 @@ package types
 
 import (
 	"encoding/binary"
+	"encoding/hex"
 	"errors"
 	"strconv"
 	"strings"
@@ -175,24 +176,29 @@ type RequestContextState byte
 // ResponseCallback defines the response callback interface
 type ResponseCallback func(ctx sdk.Context, requestContextID []byte, reponses []string)
 
-func ConvertRequestID(requestId string) (eHeight int64, rHeight int64, counter int16, err error) {
-	ss := strings.Split(requestId, "-")
-	if len(ss) != 3 {
-		return eHeight, rHeight, counter, errors.New("invalid request id")
+// ConvertRequestID converts the given string to request ID
+func ConvertRequestID(requestID string) ([]byte, error) {
+	parts := strings.Split(requestID, "-")
+	if len(parts) != 3 {
+		return nil, errors.New("invalid request id")
 	}
-	eHeight, err = strconv.ParseInt(ss[0], 10, 64)
+
+	requestContextID, err := hex.DecodeString(parts[0])
 	if err != nil {
-		return eHeight, rHeight, counter, err
+		return nil, err
 	}
-	rHeight, err = strconv.ParseInt(ss[1], 10, 64)
+
+	batchCounter, err := strconv.ParseInt(parts[1], 10, 64)
 	if err != nil {
-		return eHeight, rHeight, counter, err
+		return nil, err
 	}
-	counterInt, err := strconv.Atoi(ss[2])
+
+	batchRequestIndex, err := strconv.Atoi(parts[2])
 	if err != nil {
-		return eHeight, rHeight, counter, err
+		return nil, err
 	}
-	return eHeight, rHeight, int16(counterInt), err
+
+	return GenerateRequestID(requestContextID, uint64(batchCounter), int16(batchRequestIndex)), nil
 }
 
 // GenerateRequestContextID generates a unique ID for the request context from the specified params
