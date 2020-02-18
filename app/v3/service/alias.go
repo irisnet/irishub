@@ -63,6 +63,7 @@ type (
 	ServiceBinding          = types.ServiceBinding
 	ServiceBindings         = types.ServiceBindings
 	Request                 = types.Request
+	CompactRequest          = types.CompactRequest
 	Response                = types.Response
 	ReturnedFee             = types.EarnedFees
 	Metrics                 = types.Metrics

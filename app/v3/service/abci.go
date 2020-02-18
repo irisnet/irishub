@@ -26,7 +26,7 @@ func EndBlocker(ctx sdk.Context, k Keeper) (resTags sdk.Tags) {
 		var reqContextID []byte
 		k.GetCdc().MustUnmarshalBinaryLengthPrefixed(expiredReqBatchIterator.Value(), &reqContextID)
 
-		reqContext,_ := k.GetRequestContext(ctx, reqContextID)
+		reqContext, _ := k.GetRequestContext(ctx, reqContextID)
 		if reqContext.BatchState == 0x01 {
 			continue
 		}
@@ -34,7 +34,7 @@ func EndBlocker(ctx sdk.Context, k Keeper) (resTags sdk.Tags) {
 		reqIterator := k.RequestIterator(ctx, reqContextID, reqContext.BatchCounter)
 		defer reqIterator.Close()
 
-		respCount := 0
+		respCount := uint16(0)
 		var respOutputs []string
 
 		for ; reqIterator.Valid(); reqIterator.Next() {
@@ -62,14 +62,14 @@ func EndBlocker(ctx sdk.Context, k Keeper) (resTags sdk.Tags) {
 			} else {
 				respOutputs = append(respOutputs, resp.Output)
 
-				k.DeleteActiveRequest(ctx, reqContext.ServiceName,request.Provider,ctx.BlockHeight(),requestID)
+				k.DeleteActiveRequest(ctx, reqContext.ServiceName, request.Provider, ctx.BlockHeight(), requestID)
 				k.GetMetrics().ActiveRequests.Add(-1)
 
 				respCount++
 			}
 		}
 
-		if reqContext.ModuleName != "" {
+		if len(reqContext.ModuleName) != 0 {
 			respCallback, _ := k.GetResponseCallback(reqContext.ModuleName)
 
 			if respCount >= reqContext.ResponseThreshold {
@@ -80,7 +80,7 @@ func EndBlocker(ctx sdk.Context, k Keeper) (resTags sdk.Tags) {
 		}
 
 		k.DeleteRequestBatchExpiration(ctx, reqContextID, ctx.BlockHeight())
-		k.AddNewRequestBatch(ctx, reqContextID, ctx.BlockHeight()-reqContext.Timeout+reqContext.RepeatedFrequency)
+		k.AddNewRequestBatch(ctx, reqContextID, ctx.BlockHeight()-reqContext.Timeout+int64(reqContext.RepeatedFrequency))
 	}
 
 	newReqBatchIterator := k.NewRequestBatchIterator(ctx, ctx.BlockHeight())
@@ -90,27 +90,29 @@ func EndBlocker(ctx sdk.Context, k Keeper) (resTags sdk.Tags) {
 		var reqContextID []byte
 		k.GetCdc().MustUnmarshalBinaryLengthPrefixed(newReqBatchIterator.Value(), &reqContextID)
 
-		reqContext,_ := k.GetRequestContext(ctx, reqContextID)
-       
-		providers:=k.FilterServiceProviders(ctx,reqContextID)
-		if reqContext.ModuleName == "" || len(providers) >= reqContext.ResponseThreshold {
-			err:=k.DeductServiceFees(ctx,reqContext.Consumer,reqContext.ServiceName,providers)
+		reqContext, _ := k.GetRequestContext(ctx, reqContextID)
+
+		providers, totalPrice := k.FilterServiceProviders(ctx, reqContext.ServiceName, reqContext.Providers, reqContext.ServiceFeeCap)
+		if len(reqContext.ModuleName) == 0 || len(providers) >= int(reqContext.ResponseThreshold) {
+			err := k.DeductServiceFees(ctx, reqContext.Consumer, totalPrice)
 			if err != nil {
-				reqContext.State == types.RequestContextState(0x01)
+				reqContext.State = types.RequestContextState(0x01)
 			}
 
 			reqContext.BatchCounter++
-			k.InitiateRequests(ctx,reqContextID,providers)
+			k.InitiateRequests(ctx, reqContextID, providers)
 		}
 
-		k.DeleteNewRequestBatch(ctx,reqContextID,ctx.BlockHeight())
-		
-		if reqContext.State ==  types.RequestContextState(0x00) {
-			if reqContext.Repeated && (reqContext.RepeatedTotal<0  || reqContext.BatchCounter < reqContext.RepeatedTotal) {
-				k.AddRequestBatchExpiration(ctx,reqContextID,ctx.BlockHeight()+Timeout)
+		k.DeleteNewRequestBatch(ctx, reqContextID, ctx.BlockHeight())
+
+		if reqContext.State == types.RequestContextState(0x00) {
+			if reqContext.Repeated && (reqContext.RepeatedTotal < 0 || int64(reqContext.BatchCounter) < reqContext.RepeatedTotal) {
+				k.AddRequestBatchExpiration(ctx, reqContextID, ctx.BlockHeight()+reqContext.Timeout)
 			}
 		}
-	}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          vb                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
+
+		k.SetRequestContext(ctx, reqContextID, reqContext)
+	}
 
 	return
 }
