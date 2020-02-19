@@ -11,23 +11,16 @@ import (
 )
 
 const (
-	QuerySupply           = keeper.QuerySupply
-	QueryOwner            = keeper.QueryOwner
-	QueryOwnerByDenom     = keeper.QueryOwnerByDenom
-	QueryCollection       = keeper.QueryCollection
-	QueryDenoms           = keeper.QueryDenoms
-	QueryNFT              = keeper.QueryNFT
-	DefaultCodespace      = types.DefaultCodespace
-	CodeInvalidCollection = types.CodeInvalidCollection
-	CodeUnknownCollection = types.CodeUnknownCollection
-	CodeInvalidNFT        = types.CodeInvalidNFT
-	CodeUnknownNFT        = types.CodeUnknownNFT
-	CodeNFTAlreadyExists  = types.CodeNFTAlreadyExists
-	CodeEmptyMetadata     = types.CodeEmptyMetadata
-	ModuleName            = types.ModuleName
-	StoreKey              = types.StoreKey
-	QuerierRoute          = types.QuerierRoute
-	RouterKey             = types.RouterKey
+	QuerySupply       = keeper.QuerySupply
+	QueryOwner        = keeper.QueryOwner
+	QueryOwnerByDenom = keeper.QueryOwnerByDenom
+	QueryCollection   = keeper.QueryCollection
+	QueryDenoms       = keeper.QueryDenoms
+	QueryNFT          = keeper.QueryNFT
+	ModuleName        = types.ModuleName
+	StoreKey          = types.StoreKey
+	QuerierRoute      = types.QuerierRoute
+	RouterKey         = types.RouterKey
 )
 
 var (
@@ -88,7 +81,6 @@ type (
 	Collection            = types.Collection
 	Collections           = types.Collections
 	CollectionJSON        = types.CollectionJSON
-	CodeType              = types.CodeType
 	GenesisState          = types.GenesisState
 	MsgTransferNFT        = types.MsgTransferNFT
 	MsgEditNFTMetadata    = types.MsgEditNFTMetadata

@@ -5,11 +5,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/cosmos/cosmos-sdk/client"
-
 	"github.com/spf13/cobra"
 
 	"github.com/cosmos/cosmos-sdk/client/context"
+	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/version"
@@ -25,20 +24,20 @@ func GetQueryCmd(queryRoute string, cdc *codec.Codec) *cobra.Command {
 		Short: "Querying commands for the NFT module",
 	}
 
-	nftQueryCmd.AddCommand(client.GetCommands(
+	nftQueryCmd.AddCommand(
 		GetCmdQueryCollectionSupply(queryRoute, cdc),
 		GetCmdQueryOwner(queryRoute, cdc),
 		GetCmdQueryCollection(queryRoute, cdc),
 		GetCmdQueryDenoms(queryRoute, cdc),
 		GetCmdQueryNFT(queryRoute, cdc),
-	)...)
+	)
 
 	return nftQueryCmd
 }
 
 // GetCmdQueryCollectionSupply queries the supply of a nft collection
 func GetCmdQueryCollectionSupply(queryRoute string, cdc *codec.Codec) *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "supply [denom]",
 		Short: "total supply of a collection of NFTs",
 		Long: strings.TrimSpace(
@@ -73,11 +72,13 @@ $ %s query %s supply crypto-kitties
 			return cliCtx.PrintOutput(out)
 		},
 	}
+
+	return flags.GetCommands(cmd)[0]
 }
 
 // GetCmdQueryOwner queries all the NFTs owned by an account
 func GetCmdQueryOwner(queryRoute string, cdc *codec.Codec) *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "owner [accountAddress] [denom]",
 		Short: "get the NFTs owned by an account address",
 		Long: strings.TrimSpace(
@@ -128,11 +129,13 @@ $ %s query %s owner cosmos1gghjut3ccd8ay0zduzj64hwre2fxs9ld75ru9p crypto-kitties
 			return cliCtx.PrintOutput(out)
 		},
 	}
+
+	return flags.GetCommands(cmd)[0]
 }
 
 // GetCmdQueryCollection queries all the NFTs from a collection
 func GetCmdQueryCollection(queryRoute string, cdc *codec.Codec) *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "collection [denom]",
 		Short: "get all the NFTs from a given collection",
 		Long: strings.TrimSpace(
@@ -168,11 +171,13 @@ $ %s query %s collection crypto-kitties
 			return cliCtx.PrintOutput(out)
 		},
 	}
+
+	return flags.GetCommands(cmd)[0]
 }
 
 // GetCmdQueryDenoms queries all denoms
 func GetCmdQueryDenoms(queryRoute string, cdc *codec.Codec) *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "denoms",
 		Short: "queries all denominations of all collections of NFTs",
 		Long: strings.TrimSpace(
@@ -202,11 +207,13 @@ func GetCmdQueryDenoms(queryRoute string, cdc *codec.Codec) *cobra.Command {
 			return cliCtx.PrintOutput(out)
 		},
 	}
+
+	return flags.GetCommands(cmd)[0]
 }
 
 // GetCmdQueryNFT queries a single NFTs from a collection
 func GetCmdQueryNFT(queryRoute string, cdc *codec.Codec) *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "token [denom] [ID]",
 		Short: "query a single NFT from a collection",
 		Long: strings.TrimSpace(
@@ -243,4 +250,6 @@ $ %s query %s token crypto-kitties d04b98f48e8f8bcc15c6ae5ac050801cd6dcfd428fb5f
 			return cliCtx.PrintOutput(out)
 		},
 	}
+
+	return flags.GetCommands(cmd)[0]
 }
