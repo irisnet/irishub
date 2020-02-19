@@ -20,7 +20,9 @@ const (
 	TypeMsgRefundServiceDeposit = "refund_service_deposit" // type for MsgRefundServiceDeposit
 	TypeMsgRequestService       = "request_service"        // type for MsgRequestService
 	TypeMsgRespondService       = "respond_service"        // type for MsgRespondService
-	TypeMsgStopRepeated         = "stop_repeated"          // type for MsgStopRepeated
+	TypeMsgPauseRequestContext  = "pause_request_context"  // type for MsgPauseRequestContext
+	TypeMsgStartRequestContext  = "start_request_context"  // type for MsgStartRequestContext
+	TypeMsgKillRequestContext   = "kill_request_context"   // type for MsgKillRequestContext
 	TypeMsgUpdateRequestContext = "update_request_context" // type for MsgUpdateRequestContext
 	TypeMsgWithdrawEarnedFees   = "withdraw_earned_fees"   // type for MsgWithdrawEarnedFees
 	TypeMsgWithdrawTax          = "withdraw_tax"           // type for MsgWithdrawTax
@@ -47,7 +49,9 @@ var (
 	_ sdk.Msg = MsgRefundServiceDeposit{}
 	_ sdk.Msg = MsgRequestService{}
 	_ sdk.Msg = MsgRespondService{}
-	_ sdk.Msg = MsgStopRepeated{}
+	_ sdk.Msg = MsgPauseRequestContext{}
+	_ sdk.Msg = MsgStartRequestContext{}
+	_ sdk.Msg = MsgKillRequestContext{}
 	_ sdk.Msg = MsgUpdateRequestContext{}
 	_ sdk.Msg = MsgWithdrawEarnedFees{}
 	_ sdk.Msg = MsgWithdrawTax{}
@@ -587,6 +591,16 @@ func (msg MsgRespondService) ValidateBasic() sdk.Error {
 		return ErrInvalidResponse(DefaultCodespace, "either output or error should be specified, but both were provided")
 	}
 
+	if len(msg.Output) > 0 {
+		if !json.Valid([]byte(msg.Output)) {
+			return ErrInvalidResponseOutput(DefaultCodespace, "output is not valid JSON")
+		}
+	} else {
+		if !json.Valid([]byte(msg.Error)) {
+			return ErrInvalidResponseErr(DefaultCodespace, "err is not valid JSON")
+		}
+	}
+
 	return nil
 }
 
@@ -597,28 +611,28 @@ func (msg MsgRespondService) GetSigners() []sdk.AccAddress {
 
 //______________________________________________________________________
 
-// MsgStopRepeated defines a message to stop a repeated request
-type MsgStopRepeated struct {
+// MsgPauseRequestContext defines a message to suspend a request context
+type MsgPauseRequestContext struct {
 	RequestContextID []byte         `json:"request_context_id"`
 	Consumer         sdk.AccAddress `json:"consumer"`
 }
 
-// NewMsgStopRepeated creates a new MsgStopRepeated instance
-func NewMsgStopRepeated(requestContextID []byte, consumer sdk.AccAddress) MsgStopRepeated {
-	return MsgStopRepeated{
+// NewMsgPauseRequestContext creates a new MsgPauseRequestContext instance
+func NewMsgPauseRequestContext(requestContextID []byte, consumer sdk.AccAddress) MsgPauseRequestContext {
+	return MsgPauseRequestContext{
 		RequestContextID: requestContextID,
 		Consumer:         consumer,
 	}
 }
 
 // Route implements Msg.
-func (msg MsgStopRepeated) Route() string { return MsgRoute }
+func (msg MsgPauseRequestContext) Route() string { return MsgRoute }
 
 // Type implements Msg.
-func (msg MsgStopRepeated) Type() string { return TypeMsgStopRepeated }
+func (msg MsgPauseRequestContext) Type() string { return TypeMsgPauseRequestContext }
 
 // GetSignBytes implements Msg.
-func (msg MsgStopRepeated) GetSignBytes() []byte {
+func (msg MsgPauseRequestContext) GetSignBytes() []byte {
 	b, err := msgCdc.MarshalJSON(msg)
 	if err != nil {
 		panic(err)
@@ -628,7 +642,7 @@ func (msg MsgStopRepeated) GetSignBytes() []byte {
 }
 
 // ValidateBasic implements Msg.
-func (msg MsgStopRepeated) ValidateBasic() sdk.Error {
+func (msg MsgPauseRequestContext) ValidateBasic() sdk.Error {
 	if len(msg.Consumer) == 0 {
 		return ErrInvalidAddress(DefaultCodespace, "consumer missing")
 	}
@@ -641,7 +655,107 @@ func (msg MsgStopRepeated) ValidateBasic() sdk.Error {
 }
 
 // GetSigners implements Msg.
-func (msg MsgStopRepeated) GetSigners() []sdk.AccAddress {
+func (msg MsgPauseRequestContext) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{msg.Consumer}
+}
+
+//______________________________________________________________________
+
+// MsgStartRequestContext defines a message to resume a request context
+type MsgStartRequestContext struct {
+	RequestContextID []byte         `json:"request_context_id"`
+	Consumer         sdk.AccAddress `json:"consumer"`
+}
+
+// NewMsgStartRequestContext creates a new MsgStartRequestContext instance
+func NewMsgStartRequestContext(requestContextID []byte, consumer sdk.AccAddress) MsgStartRequestContext {
+	return MsgStartRequestContext{
+		RequestContextID: requestContextID,
+		Consumer:         consumer,
+	}
+}
+
+// Route implements Msg.
+func (msg MsgStartRequestContext) Route() string { return MsgRoute }
+
+// Type implements Msg.
+func (msg MsgStartRequestContext) Type() string { return TypeMsgStartRequestContext }
+
+// GetSignBytes implements Msg.
+func (msg MsgStartRequestContext) GetSignBytes() []byte {
+	b, err := msgCdc.MarshalJSON(msg)
+	if err != nil {
+		panic(err)
+	}
+
+	return sdk.MustSortJSON(b)
+}
+
+// ValidateBasic implements Msg.
+func (msg MsgStartRequestContext) ValidateBasic() sdk.Error {
+	if len(msg.Consumer) == 0 {
+		return ErrInvalidAddress(DefaultCodespace, "consumer missing")
+	}
+
+	if len(msg.RequestContextID) != RequestContextIDLen {
+		return ErrInvalidAddress(DefaultCodespace, fmt.Sprintf("length of the request context ID must be %d in bytes", RequestContextIDLen))
+	}
+
+	return nil
+}
+
+// GetSigners implements Msg.
+func (msg MsgStartRequestContext) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{msg.Consumer}
+}
+
+//______________________________________________________________________
+
+// MsgKillRequestContext defines a message to terminate a request context
+type MsgKillRequestContext struct {
+	RequestContextID []byte         `json:"request_context_id"`
+	Consumer         sdk.AccAddress `json:"consumer"`
+}
+
+// NewMsgKillRequestContext creates a new MsgKillRequestContext instance
+func NewMsgKillRequestContext(requestContextID []byte, consumer sdk.AccAddress) MsgKillRequestContext {
+	return MsgKillRequestContext{
+		RequestContextID: requestContextID,
+		Consumer:         consumer,
+	}
+}
+
+// Route implements Msg.
+func (msg MsgKillRequestContext) Route() string { return MsgRoute }
+
+// Type implements Msg.
+func (msg MsgKillRequestContext) Type() string { return TypeMsgKillRequestContext }
+
+// GetSignBytes implements Msg.
+func (msg MsgKillRequestContext) GetSignBytes() []byte {
+	b, err := msgCdc.MarshalJSON(msg)
+	if err != nil {
+		panic(err)
+	}
+
+	return sdk.MustSortJSON(b)
+}
+
+// ValidateBasic implements Msg.
+func (msg MsgKillRequestContext) ValidateBasic() sdk.Error {
+	if len(msg.Consumer) == 0 {
+		return ErrInvalidAddress(DefaultCodespace, "consumer missing")
+	}
+
+	if len(msg.RequestContextID) != RequestContextIDLen {
+		return ErrInvalidAddress(DefaultCodespace, fmt.Sprintf("length of the request context ID must be %d in bytes", RequestContextIDLen))
+	}
+
+	return nil
+}
+
+// GetSigners implements Msg.
+func (msg MsgKillRequestContext) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Consumer}
 }
 

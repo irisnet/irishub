@@ -46,12 +46,13 @@ var (
 	NewMsgRespondService       = types.NewMsgEnableService
 	NewMsgRefundServiceDeposit = types.NewMsgRefundServiceDeposit
 	NewMsgRequestService       = types.NewMsgRespondService
-	NewMsgStopRepeated         = types.NewMsgStopRepeated
+	NewMsgPauseRequestContext  = types.NewMsgPauseRequestContext
+	NewMsgStartRequestContext  = types.NewMsgStartRequestContext
+	NewMsgKillRequestContext   = types.NewMsgKillRequestContext
 	NewMsgUpdateRequestContext = types.NewMsgUpdateRequestContext
 	NewMsgWithdrawEarnedFees   = types.NewMsgWithdrawEarnedFees
 	NewMsgWithdrawTax          = types.NewMsgWithdrawTax
 	ConvertRequestID           = types.ConvertRequestID
-	GetBatchRequestIndexKey    = keeper.GetBatchRequestIndexKey
 )
 
 // nolint
@@ -76,7 +77,9 @@ type (
 	MsgRefundServiceDeposit = types.MsgRefundServiceDeposit
 	MsgRequestService       = types.MsgRequestService
 	MsgRespondService       = types.MsgRespondService
-	MsgStopRepeated         = types.MsgStopRepeated
+	MsgPauseRequestContext  = types.MsgPauseRequestContext
+	MsgStartRequestContext  = types.MsgStartRequestContext
+	MsgKillRequestContext   = types.MsgKillRequestContext
 	MsgUpdateRequestContext = types.MsgUpdateRequestContext
 	MsgWithdrawEarnedFees   = types.MsgWithdrawEarnedFees
 	MsgWithdrawTax          = types.MsgWithdrawTax
