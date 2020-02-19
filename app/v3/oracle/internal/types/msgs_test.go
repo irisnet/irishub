@@ -376,16 +376,6 @@ func TestMsgEditFeed_ValidateBasic(t *testing.T) {
 			ResponseThreshold: 3,
 			Creator:           addr1,
 		}, false},
-		{"invalid ResponseThreshold", MsgEditFeed{
-			FeedName:          "feedEthPrice",
-			LatestHistory:     10,
-			Providers:         []sdk.AccAddress{addr1, addr2},
-			ServiceFeeCap:     sdk.NewCoins(sdk.NewCoin(sdk.IrisAtto, sdk.NewInt(100))),
-			RepeatedFrequency: 5,
-			RepeatedTotal:     100,
-			ResponseThreshold: 1,
-			Creator:           addr1,
-		}, false},
 		{"empty Creator", MsgEditFeed{
 			FeedName:          "feedEthPrice",
 			LatestHistory:     10,
