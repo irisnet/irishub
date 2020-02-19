@@ -28,6 +28,15 @@ var (
 	testWithdrawAddr = sdk.AccAddress{}
 	testAddedDeposit = sdk.NewCoins(testCoin2)
 
+	testInput         = `{"pair":"iris-usdt"}`
+	testServiceFeeCap = sdk.NewCoins(testCoin2)
+	testTimeout       = int64(100)
+	testRepeatedFreq  = uint64(120)
+	testRepeatedTotal = int64(100)
+
+	testOutput = `{"last":"100"}`
+	testErrMsg = `{"code":-1}`
+
 	testMethodID       = int16(1)
 	testServiceFees, _ = sdk.IrisCoinType.ConvertToMinDenomCoin("1iris")
 	testInput          = []byte{}
@@ -168,6 +177,34 @@ func TestKeeper_Refund_Deposit(t *testing.T) {
 	require.True(t, found)
 
 	require.Equal(t, sdk.Coins(nil), svcBinding.Deposit)
+}
+
+func TestKeeper_Request_Context(t *testing.T) {
+	ctx, keeper, accs := createTestInput(t, sdk.NewIntWithDecimal(2000, 18), 4)
+
+	author := accs[0].GetAddress()
+	consumer := accs[0].GetAddress()
+	providers := []sdk.AccAddress{accs[0].GetAddress(), accs[1].GetAddress()}
+
+	setServiceDefinition(ctx, keeper, author)
+
+	// create
+	requestContextID, err := keeper.CreateRequestContext(
+		ctx, testServiceName, providers, consumer, testInput,
+		testServiceFeeCap, testTimeout, true,
+		testRepeatedFreq, testRepeatedTotal,
+		types.RUNNING, "", "",
+	)
+	require.NoError(t, err)
+
+	requestContext, found := keeper.GetRequestContext(ctx, requestContextID)
+	require.True(t, found)
+
+	require.Equal(t, testServiceName, requestContext.ServiceName)
+	require.Equal(t, consumer, requestContext.Consumer)
+	require.Equal(t, true, requestContext.Repeated)
+	require.Equal(t, 0, requestContext.BatchCounter)
+	require.Equal(t, types.RUNNING, requestContext.State)
 }
 
 func TestKeeper_Call_Service(t *testing.T) {
