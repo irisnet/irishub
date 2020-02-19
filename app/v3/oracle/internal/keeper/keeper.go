@@ -26,6 +26,10 @@ func NewKeeper(cdc *codec.Codec, key sdk.StoreKey,
 	codespace sdk.CodespaceType,
 	gk types.GuardianKeeper,
 	sk types.ServiceKeeper) Keeper {
+
+	if sdk.Mock {
+		sk = NewMockServiceKeeper()
+	}
 	keeper := Keeper{
 		storeKey:  key,
 		cdc:       cdc,

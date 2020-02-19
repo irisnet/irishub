@@ -248,7 +248,7 @@ func (msg MsgEditFeed) ValidateBasic() sdk.Error {
 		return ErrInvalidAddress(DefaultCodespace, "creator can not be empty")
 	}
 
-	if !msg.ServiceFeeCap.IsValidIrisAtto() {
+	if !msg.ServiceFeeCap.Empty() && !msg.ServiceFeeCap.IsValidIrisAtto() {
 		return ErrInvalidServiceFeeCap(DefaultCodespace, msg.ServiceFeeCap)
 	}
 
