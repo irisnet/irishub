@@ -24,7 +24,6 @@ var (
 var (
 	NetworkType    = Testnet
 	InvariantLevel = InvariantPanic
-	Mock           = true
 )
 
 var (
