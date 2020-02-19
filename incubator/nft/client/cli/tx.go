@@ -63,7 +63,7 @@ crypto-kitties d04b98f48e8f8bcc15c6ae5ac050801cd6dcfd428fb5f9e65c4e16e7807340fa 
 		RunE: func(cmd *cobra.Command, args []string) error {
 			inBuf := bufio.NewReader(cmd.InOrStdin())
 			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
-			cliCtx := context.NewCLIContextWithInputAndFrom(inBuf, args[0]).WithCodec(cdc)
+			cliCtx := context.NewCLIContextWithInput(inBuf).WithCodec(cdc)
 
 			sender, err := sdk.AccAddressFromBech32(args[0])
 			if err != nil {
@@ -110,7 +110,7 @@ $ %s tx %s edit-metadata crypto-kitties d04b98f48e8f8bcc15c6ae5ac050801cd6dcfd42
 		RunE: func(cmd *cobra.Command, args []string) error {
 			inBuf := bufio.NewReader(cmd.InOrStdin())
 			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
-			cliCtx := context.NewCLIContextWithInputAndFrom(inBuf, args[0]).WithCodec(cdc)
+			cliCtx := context.NewCLIContextWithInput(inBuf).WithCodec(cdc)
 
 			denom := args[0]
 			tokenID := args[1]
@@ -148,7 +148,7 @@ cosmos1gghjut3ccd8ay0zduzj64hwre2fxs9ld75ru9p --from mykey
 		RunE: func(cmd *cobra.Command, args []string) error {
 			inBuf := bufio.NewReader(cmd.InOrStdin())
 			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
-			cliCtx := context.NewCLIContextWithInputAndFrom(inBuf, args[0]).WithCodec(cdc)
+			cliCtx := context.NewCLIContextWithInput(inBuf).WithCodec(cdc)
 
 			denom := args[0]
 			tokenID := args[1]
@@ -192,7 +192,7 @@ $ %s tx %s burn crypto-kitties d04b98f48e8f8bcc15c6ae5ac050801cd6dcfd428fb5f9e65
 		RunE: func(cmd *cobra.Command, args []string) error {
 			inBuf := bufio.NewReader(cmd.InOrStdin())
 			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
-			cliCtx := context.NewCLIContextWithInputAndFrom(inBuf, args[0]).WithCodec(cdc)
+			cliCtx := context.NewCLIContextWithInput(inBuf).WithCodec(cdc)
 
 			denom := args[0]
 			tokenID := args[1]
