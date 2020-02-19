@@ -363,7 +363,7 @@ func (k Keeper) IsRequestActive(
 	requestID []byte,
 ) bool {
 	store := ctx.KVStore(k.storeKey)
-	store.Has(GetActiveRequestKey(serviceName, provider, expirationHeight, requestID))
+	return store.Has(GetActiveRequestKey(serviceName, provider, expirationHeight, requestID))
 }
 
 // AddRequestBatchExpiration adds a request batch to the expiration queue
@@ -397,13 +397,13 @@ func (k Keeper) DeleteNewRequestBatch(ctx sdk.Context, requestContextID []byte, 
 // ExpiredRequestBatchIterator returns an iterator for the request batch expiration queue
 func (k Keeper) ExpiredRequestBatchIterator(ctx sdk.Context, expirationHeight int64) sdk.Iterator {
 	store := ctx.KVStore(k.storeKey)
-	return sdk.KVStorePrefixIterator(store, GetExpiredRequestBatchKey(expirationHeight))
+	return sdk.KVStorePrefixIterator(store, GetExpiredRequestBatchSubspace(expirationHeight))
 }
 
 // NewRequestBatchIterator returns an iterator for the new request batch queue
 func (k Keeper) NewRequestBatchIterator(ctx sdk.Context, requestBatchHeight int64) sdk.Iterator {
 	store := ctx.KVStore(k.storeKey)
-	return sdk.KVStorePrefixIterator(store, GetNewRequestBatchKey(requestBatchHeight))
+	return sdk.KVStorePrefixIterator(store, GetNewRequestBatchSubspace(requestBatchHeight))
 }
 
 // ActiveRequestsIterator returns an iterator for all the request in the Active Queue of specified service binding
@@ -567,7 +567,7 @@ func (k Keeper) AddEarnedFee(ctx sdk.Context, provider sdk.AccAddress, fee sdk.C
 
 	earnedFee, hasNeg := fee.SafeSub(taxCoins)
 	if hasNeg {
-		errMsg := fmt.Sprintf("%s is less than %s", coins, taxCoins)
+		errMsg := fmt.Sprintf("%s is less than %s", fee, taxCoins)
 		return sdk.ErrInsufficientFunds(errMsg)
 	}
 
@@ -688,14 +688,19 @@ func (k Keeper) GetResponseCallback(moduleName string) (types.ResponseCallback, 
 	return respCallback, nil
 }
 
-// GetIntraTxCounter gets the current tx counter
+// GetIntraTxCounter returns the current tx counter and increases it by 1
 func (k Keeper) GetIntraTxCounter(ctx sdk.Context) int16 {
+	var counter int16
+
 	v := ctx.Value(GetIntraTxCounterKey())
 	if v == nil {
-		return 0
+		counter = 0
+	} else {
+		counter = v.(int16)
 	}
 
-	return v.(int16)
+	k.SetIntraTxCounter(ctx, counter+1)
+	return counter
 }
 
 // SetIntraTxCounter sets the tx counter to the context
