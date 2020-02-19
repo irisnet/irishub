@@ -19,6 +19,8 @@ const (
 	TypeMsgStartFeed  = "start_feed"  // type for MsgStartFeed
 	TypeMsgPauseFeed  = "pause_feed"  // type for MsgPauseFeed
 	TypeMsgEditFeed   = "edit_feed"   // type for MsgEditFeed
+
+	DoNotModify = "do-not-modify"
 )
 
 var (
@@ -240,27 +242,31 @@ func (msg MsgEditFeed) ValidateBasic() sdk.Error {
 		return err
 	}
 
-	if err := validateLatestHistory(msg.LatestHistory); err != nil {
-		return err
+	if msg.LatestHistory != 0 {
+		if err := validateLatestHistory(msg.LatestHistory); err != nil {
+			return err
+		}
 	}
 
 	if len(msg.Creator) == 0 {
 		return ErrInvalidAddress(DefaultCodespace, "creator can not be empty")
 	}
 
-	if !msg.ServiceFeeCap.Empty() && !msg.ServiceFeeCap.IsValidIrisAtto() {
+	if msg.ServiceFeeCap != nil && !msg.ServiceFeeCap.IsValidIrisAtto() {
 		return ErrInvalidServiceFeeCap(DefaultCodespace, msg.ServiceFeeCap)
-	}
-
-	if len(msg.Providers) == 0 {
-		return ErrEmptyProviders(DefaultCodespace)
 	}
 
 	if err := validateTimeout(msg.Timeout, msg.RepeatedFrequency); err != nil {
 		return err
 	}
 
-	return validateResponseThreshold(msg.ResponseThreshold, len(msg.Providers))
+	if msg.ResponseThreshold != 0 {
+		if err := validateResponseThreshold(msg.ResponseThreshold, len(msg.Providers)); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 // GetSignBytes implements Msg.
@@ -315,7 +321,7 @@ func validateLatestHistory(latestHistory uint64) sdk.Error {
 }
 
 func validateResponseThreshold(responseThreshold uint16, maxCnt int) sdk.Error {
-	if int(responseThreshold) > maxCnt || responseThreshold < 1 {
+	if (maxCnt != 0 && int(responseThreshold) > maxCnt) || responseThreshold < 1 {
 		return ErrInvalidResponseThreshold(DefaultCodespace, maxCnt)
 	}
 	return nil
@@ -326,4 +332,12 @@ func validateTimeout(timeout int64, frequency uint64) sdk.Error {
 		return ErrInvalidTimeout(DefaultCodespace, timeout, frequency)
 	}
 	return nil
+}
+
+func IsModified(target string) bool {
+	target = strings.TrimSpace(target)
+	if target == DoNotModify {
+		return false
+	}
+	return true
 }

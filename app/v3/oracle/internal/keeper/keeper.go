@@ -27,6 +27,7 @@ func NewKeeper(cdc *codec.Codec, key sdk.StoreKey,
 	gk types.GuardianKeeper,
 	sk types.ServiceKeeper) Keeper {
 
+	//TODO
 	if sdk.Mock {
 		sk = NewMockServiceKeeper()
 	}
@@ -163,9 +164,8 @@ func (k Keeper) EditFeed(ctx sdk.Context, msg types.MsgEditFeed) sdk.Error {
 		feed.LatestHistory = msg.LatestHistory
 	}
 
-	desc := strings.TrimSpace(msg.Description)
-	if len(desc) > 0 {
-		feed.Description = desc
+	if types.IsModified(msg.Description) {
+		feed.Description = strings.TrimSpace(msg.Description)
 	}
 
 	k.setFeed(ctx, feed)
