@@ -44,7 +44,10 @@ func TestFeed(t *testing.T) {
 	}, feed)
 
 	//check feed state
-	feeds := keeper.GetFeedByState(ctx, exported.PAUSED)
+	var feeds []types.Feed
+	keeper.IteratorFeedsByState(ctx, exported.PAUSED, func(feed types.Feed) {
+		feeds = append(feeds, feed)
+	})
 	require.Len(t, feeds, 1)
 	require.Equal(t, msg.FeedName, feeds[0].FeedName)
 	//================test CreateFeed end================
@@ -62,9 +65,12 @@ func TestFeed(t *testing.T) {
 	require.Equal(t, "250.00000000", result[0].Data)
 
 	//check feed state
-	feeds = keeper.GetFeedByState(ctx, exported.RUNNING)
-	require.Len(t, feeds, 1)
-	require.Equal(t, msg.FeedName, feeds[0].FeedName)
+	var feeds1 []types.Feed
+	keeper.IteratorFeedsByState(ctx, exported.RUNNING, func(feed types.Feed) {
+		feeds1 = append(feeds1, feed)
+	})
+	require.Len(t, feeds1, 1)
+	require.Equal(t, msg.FeedName, feeds1[0].FeedName)
 
 	//start again, will return error
 	err = keeper.StartFeed(ctx, types.MsgStartFeed{
@@ -132,8 +138,11 @@ func TestFeed(t *testing.T) {
 	require.Equal(t, "250.00000000", result[0].Data)
 
 	//check feed state
-	feeds = keeper.GetFeedByState(ctx, exported.RUNNING)
-	require.Len(t, feeds, 1)
-	require.Equal(t, msg.FeedName, feeds[0].FeedName)
+	var feeds2 []types.Feed
+	keeper.IteratorFeedsByState(ctx, exported.RUNNING, func(feed types.Feed) {
+		feeds2 = append(feeds2, feed)
+	})
+	require.Len(t, feeds2, 1)
+	require.Equal(t, msg.FeedName, feeds2[0].FeedName)
 	//================test PauseFeed end================
 }

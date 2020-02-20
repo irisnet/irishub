@@ -50,18 +50,18 @@ func queryFeeds(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sdk.E
 		return nil, sdk.ParseParamsErr(err)
 	}
 
-	var feeds []types.Feed
 	state := strings.TrimSpace(params.State)
+	var result types.FeedsContext
 	if len(state) == 0 {
-		feeds = k.GetFeeds(ctx)
+		k.IteratorFeeds(ctx, func(feed types.Feed) {
+			result = append(result, buildFeedContext(ctx, k, feed))
+		})
 	} else {
-		feeds = k.GetFeedByState(ctx, types.StateFromString(params.State))
+		k.IteratorFeedsByState(ctx, types.StateFromString(params.State), func(feed types.Feed) {
+			result = append(result, buildFeedContext(ctx, k, feed))
+		})
 	}
 
-	var result types.FeedsContext
-	for _, feed := range feeds {
-		result = append(result, buildFeedContext(ctx, k, feed))
-	}
 	bz, err := codec.MarshalJSONIndent(k.cdc, result)
 	if err != nil {
 		return nil, sdk.MarshalResultErr(err)
