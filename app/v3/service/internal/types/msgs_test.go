@@ -997,14 +997,14 @@ func TestMsgKillRequestContextGetSigners(t *testing.T) {
 
 // TestMsgUpdateRequestContextRoute tests Route for MsgUpdateRequestContext
 func TestMsgUpdateRequestContextRoute(t *testing.T) {
-	msg := NewMsgUpdateRequestContext(testRequestContextID, nil, 0, 0, testConsumer)
+	msg := NewMsgUpdateRequestContext(testRequestContextID, nil, nil, 0, 0, testConsumer)
 
 	require.Equal(t, MsgRoute, msg.Route())
 }
 
 // TestMsgUpdateRequestContextType tests Type for MsgUpdateRequestContext
 func TestMsgUpdateRequestContextType(t *testing.T) {
-	msg := NewMsgUpdateRequestContext(testRequestContextID, nil, 0, 0, testConsumer)
+	msg := NewMsgUpdateRequestContext(testRequestContextID, nil, nil, 0, 0, testConsumer)
 
 	require.Equal(t, "update_request_context", msg.Type())
 }
@@ -1015,13 +1015,15 @@ func TestMsgUpdateRequestContextValidation(t *testing.T) {
 
 	invalidRequestContextID := []byte("invalid-request-context-id")
 	invalidRepeatedTotal := int64(-2)
+	invalidDenomCoins := sdk.NewCoins(sdk.NewCoin("eth-min", sdk.NewInt(1000)))
 
 	testMsgs := []MsgUpdateRequestContext{
-		NewMsgUpdateRequestContext(testRequestContextID, testProviders, testRepeatedFreq, testRepeatedTotal, testConsumer), // valid msg
-		NewMsgUpdateRequestContext(testRequestContextID, nil, 0, 0, testConsumer),                                          // allow all not to be updated
-		NewMsgUpdateRequestContext(testRequestContextID, nil, 0, 0, emptyAddress),                                          // missing consumer address
-		NewMsgUpdateRequestContext(invalidRequestContextID, nil, 0, 0, testConsumer),                                       // invalid request context ID
-		NewMsgUpdateRequestContext(testRequestContextID, nil, 0, invalidRepeatedTotal, testConsumer),                       // invalid repeated total               // too long service name
+		NewMsgUpdateRequestContext(testRequestContextID, testProviders, testServiceFeeCap, testRepeatedFreq, testRepeatedTotal, testConsumer), // valid msg
+		NewMsgUpdateRequestContext(testRequestContextID, nil, nil, 0, 0, testConsumer),                                                        // allow all not to be updated
+		NewMsgUpdateRequestContext(testRequestContextID, nil, nil, 0, 0, emptyAddress),                                                        // missing consumer address
+		NewMsgUpdateRequestContext(invalidRequestContextID, nil, nil, 0, 0, testConsumer),                                                     // invalid request context ID
+		NewMsgUpdateRequestContext(testRequestContextID, nil, nil, 0, invalidRepeatedTotal, testConsumer),                                     // invalid repeated total
+		NewMsgUpdateRequestContext(testRequestContextID, nil, invalidDenomCoins, 0, 0, testConsumer),                                          // invalid service fee denom
 	}
 
 	testCases := []struct {
@@ -1034,6 +1036,7 @@ func TestMsgUpdateRequestContextValidation(t *testing.T) {
 		{testMsgs[2], false, "missing consumer address"},
 		{testMsgs[3], false, "invalid request context ID"},
 		{testMsgs[4], false, "invalid repeated total"},
+		{testMsgs[5], false, "invalid service fee denom"},
 	}
 
 	for i, tc := range testCases {
@@ -1048,7 +1051,7 @@ func TestMsgUpdateRequestContextValidation(t *testing.T) {
 
 // TestMsgUpdateRequestContextGetSignBytes tests GetSignBytes for MsgUpdateRequestContext
 func TestMsgUpdateRequestContextGetSignBytes(t *testing.T) {
-	msg := NewMsgUpdateRequestContext(testRequestContextID, testProviders, testRepeatedFreq, testRepeatedTotal, testConsumer)
+	msg := NewMsgUpdateRequestContext(testRequestContextID, testProviders, testServiceFeeCap, testRepeatedFreq, testRepeatedTotal, testConsumer)
 	res := msg.GetSignBytes()
 
 	expected := `{"type":"irishub/service/MsgUpdateRequestContext","value":{"consumer":"faa1w3jhxapdvdhkuum4d4jhyl0qvse","providers":["faa1w3jhxapdwpex7anfv3jhynrxe9z"],"repeated_frequency":"120","repeated_total":"100","request_context_id":"PbD6mdywWLyGBButvWFNaDn4+iDhfPitO6FMPxv2E70="}}`
@@ -1057,7 +1060,7 @@ func TestMsgUpdateRequestContextGetSignBytes(t *testing.T) {
 
 // TestMsgUpdateRequestContextGetSigners tests GetSigners for MsgUpdateRequestContext
 func TestMsgUpdateRequestContextGetSigners(t *testing.T) {
-	msg := NewMsgUpdateRequestContext(testRequestContextID, []sdk.AccAddress{testProvider}, testRepeatedFreq, testRepeatedTotal, testConsumer)
+	msg := NewMsgUpdateRequestContext(testRequestContextID, testProviders, testServiceFeeCap, testRepeatedFreq, testRepeatedTotal, testConsumer)
 	res := msg.GetSigners()
 
 	expected := "[746573742D636F6E73756D6572]"

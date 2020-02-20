@@ -519,11 +519,10 @@ func (msg MsgRequestService) ValidateBasic() sdk.Error {
 		return ErrInvalidAddress(DefaultCodespace, "consumer missing")
 	}
 
-	if err := ValidateServiceName(msg.ServiceName); err != nil {
-		return err
-	}
-
-	return ValidateRequest(msg)
+	return ValidateRequest(
+		msg.ServiceName, msg.ServiceFeeCap, msg.Providers, msg.Input, msg.Timeout,
+		msg.Repeated, msg.RepeatedFrequency, msg.RepeatedTotal,
+	)
 }
 
 // GetSigners implements Msg.
@@ -648,7 +647,7 @@ func (msg MsgPauseRequestContext) ValidateBasic() sdk.Error {
 	}
 
 	if len(msg.RequestContextID) != RequestContextIDLen {
-		return ErrInvalidAddress(DefaultCodespace, fmt.Sprintf("length of the request context ID must be %d in bytes", RequestContextIDLen))
+		return ErrInvalidRequestContextID(DefaultCodespace, fmt.Sprintf("length of the request context ID must be %d in bytes", RequestContextIDLen))
 	}
 
 	return nil
@@ -698,7 +697,7 @@ func (msg MsgStartRequestContext) ValidateBasic() sdk.Error {
 	}
 
 	if len(msg.RequestContextID) != RequestContextIDLen {
-		return ErrInvalidAddress(DefaultCodespace, fmt.Sprintf("length of the request context ID must be %d in bytes", RequestContextIDLen))
+		return ErrInvalidRequestContextID(DefaultCodespace, fmt.Sprintf("length of the request context ID must be %d in bytes", RequestContextIDLen))
 	}
 
 	return nil
@@ -748,7 +747,7 @@ func (msg MsgKillRequestContext) ValidateBasic() sdk.Error {
 	}
 
 	if len(msg.RequestContextID) != RequestContextIDLen {
-		return ErrInvalidAddress(DefaultCodespace, fmt.Sprintf("length of the request context ID must be %d in bytes", RequestContextIDLen))
+		return ErrInvalidRequestContextID(DefaultCodespace, fmt.Sprintf("length of the request context ID must be %d in bytes", RequestContextIDLen))
 	}
 
 	return nil
@@ -765,6 +764,7 @@ func (msg MsgKillRequestContext) GetSigners() []sdk.AccAddress {
 type MsgUpdateRequestContext struct {
 	RequestContextID  []byte           `json:"request_context_id"`
 	Providers         []sdk.AccAddress `json:"providers"`
+	ServiceFeeCap     sdk.Coins        `json:"service_fee_cap"`
 	RepeatedFrequency uint64           `json:"repeated_frequency"`
 	RepeatedTotal     int64            `json:"repeated_total"`
 	Consumer          sdk.AccAddress   `json:"consumer"`
@@ -774,6 +774,7 @@ type MsgUpdateRequestContext struct {
 func NewMsgUpdateRequestContext(
 	requestContextID []byte,
 	providers []sdk.AccAddress,
+	serviceFeeCap sdk.Coins,
 	repeatedFrequency uint64,
 	repeatedTotal int64,
 	consumer sdk.AccAddress,
@@ -781,6 +782,7 @@ func NewMsgUpdateRequestContext(
 	return MsgUpdateRequestContext{
 		RequestContextID:  requestContextID,
 		Providers:         providers,
+		ServiceFeeCap:     serviceFeeCap,
 		RepeatedFrequency: repeatedFrequency,
 		RepeatedTotal:     repeatedTotal,
 		Consumer:          consumer,
@@ -813,11 +815,7 @@ func (msg MsgUpdateRequestContext) ValidateBasic() sdk.Error {
 		return ErrInvalidRequestContextID(DefaultCodespace, fmt.Sprintf("length of the request context ID must be %d in bytes", RequestContextIDLen))
 	}
 
-	if msg.RepeatedTotal < -1 {
-		return ErrInvalidRequest(DefaultCodespace, fmt.Sprintf("repeated total number must not be less than -1: %d", msg.RepeatedTotal))
-	}
-
-	return nil
+	return ValidateRequestContextUpdating(msg.ServiceFeeCap, msg.RepeatedTotal)
 }
 
 // GetSigners implements Msg.
@@ -991,39 +989,66 @@ func validatePricing(pricing string) sdk.Error {
 	return nil
 }
 
-func ValidateRequest(msg MsgRequestService) sdk.Error {
-	if !validServiceCoins(msg.ServiceFeeCap) {
-		return ErrInvalidServiceFee(DefaultCodespace, fmt.Sprintf("invalid service fee: %s", msg.ServiceFeeCap))
+// ValidateRequest validates the request params
+func ValidateRequest(
+	serviceName string,
+	serviceFeeCap sdk.Coins,
+	providers []sdk.AccAddress,
+	input string,
+	timeout int64,
+	repeated bool,
+	repeatedFrequency uint64,
+	repeatedTotal int64,
+) sdk.Error {
+	if err := ValidateServiceName(serviceName); err != nil {
+		return err
 	}
 
-	if len(msg.Providers) == 0 {
+	if !validServiceCoins(serviceFeeCap) {
+		return ErrInvalidServiceFee(DefaultCodespace, fmt.Sprintf("invalid service fee: %s", serviceFeeCap))
+	}
+
+	if len(providers) == 0 {
 		return ErrInvalidRequest(DefaultCodespace, "providers missing")
 	}
 
-	if len(msg.Providers) > MaxProvidersNum {
+	if len(providers) > MaxProvidersNum {
 		return ErrInvalidRequest(DefaultCodespace, fmt.Sprintf("total number of the providers must not be greater than %d", MaxProvidersNum))
 	}
 
-	if len(msg.Input) == 0 {
+	if len(input) == 0 {
 		return ErrInvalidRequestInput(DefaultCodespace, "input missing")
 	}
 
-	if !json.Valid([]byte(msg.Input)) {
+	if !json.Valid([]byte(input)) {
 		return ErrInvalidRequestInput(DefaultCodespace, "input is not valid JSON")
 	}
 
-	if msg.Timeout < 0 {
-		return ErrInvalidRequest(DefaultCodespace, fmt.Sprintf("timeout must not be less than 0: %d", msg.Timeout))
+	if timeout < 0 {
+		return ErrInvalidRequest(DefaultCodespace, fmt.Sprintf("timeout must not be less than 0: %d", timeout))
 	}
 
-	if msg.Repeated {
-		if msg.RepeatedFrequency > 0 && msg.Timeout > 0 && msg.RepeatedFrequency < uint64(msg.Timeout) {
-			return ErrInvalidRequest(DefaultCodespace, fmt.Sprintf("repeated frequency [%d] must not be less than timeout [%d]", msg.RepeatedFrequency, msg.Timeout))
+	if repeated {
+		if repeatedFrequency > 0 && timeout > 0 && repeatedFrequency < uint64(timeout) {
+			return ErrInvalidRequest(DefaultCodespace, fmt.Sprintf("repeated frequency [%d] must not be less than timeout [%d]", repeatedFrequency, timeout))
 		}
 
-		if msg.RepeatedTotal < -1 || msg.RepeatedTotal == 0 {
-			return ErrInvalidRequest(DefaultCodespace, fmt.Sprintf("repeated total number must be greater than 0 or equal to -1: %d", msg.RepeatedTotal))
+		if repeatedTotal < -1 || repeatedTotal == 0 {
+			return ErrInvalidRequest(DefaultCodespace, fmt.Sprintf("repeated total number must be greater than 0 or equal to -1: %d", repeatedTotal))
 		}
+	}
+
+	return nil
+}
+
+// ValidateRequestContextUpdating validates the request context updating operation
+func ValidateRequestContextUpdating(serviceFeeCap sdk.Coins, repeatedTotal int64) sdk.Error {
+	if !serviceFeeCap.Empty() && !validServiceCoins(serviceFeeCap) {
+		return ErrInvalidServiceFee(DefaultCodespace, fmt.Sprintf("invalid service fee: %s", serviceFeeCap))
+	}
+
+	if repeatedTotal < -1 {
+		return ErrInvalidRepeatedTotal(DefaultCodespace, fmt.Sprintf("repeated total number must not be less than -1: %d", repeatedTotal))
 	}
 
 	return nil
