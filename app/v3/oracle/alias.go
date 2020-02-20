@@ -14,6 +14,9 @@ type (
 	MsgPauseFeed  = types.MsgPauseFeed
 	MsgEditFeed   = types.MsgEditFeed
 
+	GenesisState = types.GenesisState
+	FeedEntry    = types.FeedEntry
+
 	QueryFeedParams      = types.QueryFeedParams
 	QueryFeedsParams     = types.QueryFeedsParams
 	QueryFeedValueParams = types.QueryFeedValueParams

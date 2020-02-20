@@ -456,6 +456,7 @@ func (p *ProtocolV3) InitChainer(ctx sdk.Context, DeliverTx sdk.DeliverTx, req a
 	rand.InitGenesis(ctx, p.randKeeper, genesisState.RandData)
 	coinswap.InitGenesis(ctx, p.coinswapKeeper, genesisState.SwapData)
 	htlc.InitGenesis(ctx, p.htlcKeeper, genesisState.HtlcData)
+	oracle.InitGenesis(ctx, p.oracleKeeper, genesisState.OracleData)
 
 	// load the address to pubkey map
 	err = IrisValidateGenesisState(genesisState)

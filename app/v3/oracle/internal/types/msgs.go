@@ -65,11 +65,11 @@ func (msg MsgCreateFeed) Type() string {
 
 // ValidateBasic implements Msg.
 func (msg MsgCreateFeed) ValidateBasic() sdk.Error {
-	if err := validateFeedName(msg.FeedName); err != nil {
+	if err := ValidateFeedName(msg.FeedName); err != nil {
 		return err
 	}
 
-	if err := validateDescription(msg.Description); err != nil {
+	if err := ValidateDescription(msg.Description); err != nil {
 		return err
 	}
 
@@ -77,7 +77,7 @@ func (msg MsgCreateFeed) ValidateBasic() sdk.Error {
 		return err
 	}
 
-	if err := validateLatestHistory(msg.LatestHistory); err != nil {
+	if err := ValidateLatestHistory(msg.LatestHistory); err != nil {
 		return err
 	}
 
@@ -89,25 +89,20 @@ func (msg MsgCreateFeed) ValidateBasic() sdk.Error {
 		return ErrEmptyProviders(DefaultCodespace)
 	}
 
-	aggregateFunc := strings.TrimSpace(msg.AggregateFunc)
-	if len(aggregateFunc) == 0 || len(aggregateFunc) > MaxNameLen {
-		return ErrInvalidAggregateFunc(DefaultCodespace)
-	}
-	if _, err := GetAggregateFunc(aggregateFunc); err != nil {
+	if err := ValidateAggregateFunc(msg.AggregateFunc); err != nil {
 		return err
 	}
 
-	valueJsonPath := strings.TrimSpace(msg.ValueJsonPath)
-	if len(valueJsonPath) == 0 || len(valueJsonPath) > MaxNameLen {
-		return ErrInvalidValueJsonPath(DefaultCodespace)
+	if err := ValidateValueJsonPath(msg.ValueJsonPath); err != nil {
+		return err
 	}
 
 	if !msg.ServiceFeeCap.IsValidIrisAtto() {
 		return ErrInvalidServiceFeeCap(DefaultCodespace, msg.ServiceFeeCap)
 	}
 
-	if len(msg.Creator) == 0 {
-		return ErrInvalidAddress(DefaultCodespace, "fee creator can not be empty")
+	if err := ValidateCreator(msg.Creator); err != nil {
+		return err
 	}
 	return validateResponseThreshold(msg.ResponseThreshold, len(msg.Providers))
 }
@@ -149,7 +144,7 @@ func (msg MsgStartFeed) ValidateBasic() sdk.Error {
 	if len(msg.Creator) == 0 {
 		return ErrInvalidAddress(DefaultCodespace, "creator can not be empty")
 	}
-	return validateFeedName(msg.FeedName)
+	return ValidateFeedName(msg.FeedName)
 }
 
 // GetSignBytes implements Msg.
@@ -186,10 +181,10 @@ func (msg MsgPauseFeed) Type() string {
 
 // ValidateBasic implements Msg.
 func (msg MsgPauseFeed) ValidateBasic() sdk.Error {
-	if len(msg.Creator) == 0 {
-		return ErrInvalidAddress(DefaultCodespace, "creator can not be empty")
+	if err := ValidateCreator(msg.Creator); err != nil {
+		return err
 	}
-	return validateFeedName(msg.FeedName)
+	return ValidateFeedName(msg.FeedName)
 }
 
 // GetSignBytes implements Msg.
@@ -234,22 +229,18 @@ func (msg MsgEditFeed) Type() string {
 
 // ValidateBasic implements Msg.
 func (msg MsgEditFeed) ValidateBasic() sdk.Error {
-	if err := validateFeedName(msg.FeedName); err != nil {
+	if err := ValidateFeedName(msg.FeedName); err != nil {
 		return err
 	}
 
-	if err := validateDescription(msg.Description); err != nil {
+	if err := ValidateDescription(msg.Description); err != nil {
 		return err
 	}
 
 	if msg.LatestHistory != 0 {
-		if err := validateLatestHistory(msg.LatestHistory); err != nil {
+		if err := ValidateLatestHistory(msg.LatestHistory); err != nil {
 			return err
 		}
-	}
-
-	if len(msg.Creator) == 0 {
-		return ErrInvalidAddress(DefaultCodespace, "creator can not be empty")
 	}
 
 	if msg.ServiceFeeCap != nil && !msg.ServiceFeeCap.IsValidIrisAtto() {
@@ -266,7 +257,7 @@ func (msg MsgEditFeed) ValidateBasic() sdk.Error {
 		}
 	}
 
-	return nil
+	return ValidateCreator(msg.Creator)
 }
 
 // GetSignBytes implements Msg.
@@ -283,7 +274,7 @@ func (msg MsgEditFeed) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Creator}
 }
 
-func validateFeedName(feedName string) sdk.Error {
+func ValidateFeedName(feedName string) sdk.Error {
 	feedName = strings.TrimSpace(feedName)
 	if len(feedName) == 0 || len(feedName) > MaxNameLen {
 		return ErrInvalidFeedName(DefaultCodespace)
@@ -294,10 +285,43 @@ func validateFeedName(feedName string) sdk.Error {
 	return nil
 }
 
-func validateDescription(desc string) sdk.Error {
+func ValidateDescription(desc string) sdk.Error {
 	desc = strings.TrimSpace(desc)
 	if len(desc) > MaxDescriptionLen {
 		return ErrInvalidDescription(DefaultCodespace, len(desc))
+	}
+	return nil
+}
+
+func ValidateAggregateFunc(aggregateFunc string) sdk.Error {
+	aggregateFunc = strings.TrimSpace(aggregateFunc)
+	if len(aggregateFunc) == 0 || len(aggregateFunc) > MaxNameLen {
+		return ErrInvalidAggregateFunc(DefaultCodespace)
+	}
+	if _, err := GetAggregateFunc(aggregateFunc); err != nil {
+		return err
+	}
+	return nil
+}
+
+func ValidateValueJsonPath(valueJsonPath string) sdk.Error {
+	valueJsonPath = strings.TrimSpace(valueJsonPath)
+	if len(valueJsonPath) == 0 || len(valueJsonPath) > MaxNameLen {
+		return ErrInvalidValueJsonPath(DefaultCodespace)
+	}
+	return nil
+}
+
+func ValidateLatestHistory(latestHistory uint64) sdk.Error {
+	if latestHistory < 1 || latestHistory > MaxLatestHistory {
+		return ErrInvalidLatestHistory(DefaultCodespace)
+	}
+	return nil
+}
+
+func ValidateCreator(creator sdk.AccAddress) sdk.Error {
+	if len(creator) == 0 {
+		return ErrInvalidAddress(DefaultCodespace, "fee creator can not be empty")
 	}
 	return nil
 }
@@ -309,13 +333,6 @@ func validateServiceName(serviceName string) sdk.Error {
 	}
 	if !regPlainText.MatchString(serviceName) {
 		return ErrInvalidServiceName(DefaultCodespace)
-	}
-	return nil
-}
-
-func validateLatestHistory(latestHistory uint64) sdk.Error {
-	if latestHistory < 1 || latestHistory > MaxLatestHistory {
-		return ErrInvalidLatestHistory(DefaultCodespace)
 	}
 	return nil
 }
@@ -336,8 +353,5 @@ func validateTimeout(timeout int64, frequency uint64) sdk.Error {
 
 func IsModified(target string) bool {
 	target = strings.TrimSpace(target)
-	if target == DoNotModify {
-		return false
-	}
-	return true
+	return !(target == DoNotModify)
 }
