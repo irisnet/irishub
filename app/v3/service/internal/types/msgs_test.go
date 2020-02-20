@@ -1054,7 +1054,7 @@ func TestMsgUpdateRequestContextGetSignBytes(t *testing.T) {
 	msg := NewMsgUpdateRequestContext(testRequestContextID, testProviders, testServiceFeeCap, testRepeatedFreq, testRepeatedTotal, testConsumer)
 	res := msg.GetSignBytes()
 
-	expected := `{"type":"irishub/service/MsgUpdateRequestContext","value":{"consumer":"faa1w3jhxapdvdhkuum4d4jhyl0qvse","providers":["faa1w3jhxapdwpex7anfv3jhynrxe9z"],"repeated_frequency":"120","repeated_total":"100","request_context_id":"PbD6mdywWLyGBButvWFNaDn4+iDhfPitO6FMPxv2E70="}}`
+	expected := `{"type":"irishub/service/MsgUpdateRequestContext","value":{"consumer":"faa1w3jhxapdvdhkuum4d4jhyl0qvse","providers":["faa1w3jhxapdwpex7anfv3jhynrxe9z"],"repeated_frequency":"120","repeated_total":"100","request_context_id":"PbD6mdywWLyGBButvWFNaDn4+iDhfPitO6FMPxv2E70=","service_fee_cap":[{"amount":"100000000000000000000","denom":"iris-atto"}]}}`
 	require.Equal(t, expected, string(res))
 }
 
