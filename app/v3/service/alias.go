@@ -17,6 +17,11 @@ const (
 	QueryRequests     = types.QueryRequests
 	QueryResponse     = types.QueryResponse
 	QueryFees         = types.QueryFees
+	RUNNING           = types.RUNNING
+	PAUSED            = types.PAUSED
+	COMPLETED         = types.COMPLETED
+	BATCHRUNNING      = types.BATCHRUNNING
+	BATCHCOMPLETED    = types.BATCHCOMPLETED
 )
 
 // nolint
@@ -89,5 +94,4 @@ type (
 	QueryRequestsParams     = types.QueryRequestsParams
 	QueryResponseParams     = types.QueryResponseParams
 	QueryFeesParams         = types.QueryFeesParams
-	FeesOutput              = types.FeesOutput
 )
