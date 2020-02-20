@@ -35,6 +35,9 @@ func HandleMsgTransferNFT(ctx sdk.Context, msg types.MsgTransferNFT, k keeper.Ke
 	if err != nil {
 		return nil, err
 	}
+	if !msg.Sender.Equals(nft.GetOwner()) {
+		return nil, sdkerrors.Wrap(types.ErrUnauthorized, msg.Sender.String())
+	}
 	// update NFT owner
 	nft.SetOwner(msg.Recipient)
 	if msg.TokenURI != types.DoNotModify {
@@ -68,6 +71,10 @@ func HandleMsgEditNFTMetadata(ctx sdk.Context, msg types.MsgEditNFTMetadata, k k
 	nft, err := k.GetNFT(ctx, msg.Denom, msg.ID)
 	if err != nil {
 		return nil, err
+	}
+
+	if !msg.Sender.Equals(nft.GetOwner()) {
+		return nil, sdkerrors.Wrap(types.ErrUnauthorized, msg.Sender.String())
 	}
 
 	// update NFT
@@ -122,12 +129,16 @@ func HandleMsgMintNFT(ctx sdk.Context, msg types.MsgMintNFT, k keeper.Keeper,
 // HandleMsgBurnNFT handles MsgBurnNFT
 func HandleMsgBurnNFT(ctx sdk.Context, msg types.MsgBurnNFT, k keeper.Keeper,
 ) (*sdk.Result, error) {
-	_, err := k.GetNFT(ctx, msg.Denom, msg.ID)
+	nft, err := k.GetNFT(ctx, msg.Denom, msg.ID)
 	if err != nil {
 		return nil, err
 	}
 
-	// remove  NFT
+	if !msg.Sender.Equals(nft.GetOwner()) {
+		return nil, sdkerrors.Wrap(types.ErrUnauthorized, msg.Sender.String())
+	}
+
+	// remove NFT
 	err = k.DeleteNFT(ctx, msg.Denom, msg.ID)
 	if err != nil {
 		return nil, err

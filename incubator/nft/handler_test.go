@@ -98,10 +98,10 @@ func TestTransferNFTMsg(t *testing.T) {
 
 	transferNftMsg = types.NewMsgTransferNFT(address2, address3, denom2, id, tokenURI)
 
-	// handle should succeed when nft exists and is transferred by owner
+	// handle should fail when nft exists and is not transferred by owner
 	res, err = h(ctx, transferNftMsg)
-	require.NoError(t, err)
-	require.NotNil(t, res)
+	require.Error(t, err)
+	require.Nil(t, res)
 	require.True(t, CheckInvariants(app.NFTKeeper, ctx))
 }
 

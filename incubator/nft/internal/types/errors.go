@@ -11,4 +11,5 @@ var (
 	ErrNFTAlreadyExists  = sdkerrors.Register(ModuleName, 4, "NFT already exists")
 	ErrUnknownNFT        = sdkerrors.Register(ModuleName, 5, "unknown NFT")
 	ErrEmptyMetadata     = sdkerrors.Register(ModuleName, 6, "NFT metadata can't be empty")
+	ErrUnauthorized      = sdkerrors.Register(ModuleName, 7, "unauthorized address")
 )
