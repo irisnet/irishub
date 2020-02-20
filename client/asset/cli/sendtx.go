@@ -129,7 +129,10 @@ func getCmdEditAsset(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			tokenId := args[0]
+			tokenId, err := sdk.ConvertIdToTokenKeyId(args[0])
+			if err != nil {
+				return err
+			}
 			name := viper.GetString(FlagName)
 			maxSupply := uint64(viper.GetInt(FlagMaxSupply))
 			mintable, err := asset.ParseBool(viper.GetString(FlagMintable))
@@ -180,9 +183,13 @@ func getCmdMintToken(cdc *codec.Codec) *cobra.Command {
 				}
 			}
 
+			tokenId, err := sdk.ConvertIdToTokenKeyId(args[0])
+			if err != nil {
+				return err
+			}
 			var msg sdk.Msg
 			msg = asset.NewMsgMintToken(
-				args[0], owner, to, amount,
+				tokenId, owner, to, amount,
 			)
 
 			if err := msg.ValidateBasic(); err != nil {
