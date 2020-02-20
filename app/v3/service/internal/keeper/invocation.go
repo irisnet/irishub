@@ -263,52 +263,44 @@ func (k Keeper) GetRequestContext(ctx sdk.Context, requestContextID []byte) (req
 }
 
 // InitiateRequests creates requests for the given providers from the specified request context
+// Note: make sure that request context is valid and running, and providers are valid
 func (k Keeper) InitiateRequests(
 	ctx sdk.Context,
 	requestContextID []byte,
 	providers []sdk.AccAddress,
-) sdk.Error {
-	requestContext, found := k.GetRequestContext(ctx, requestContextID)
-	if !found {
-		return types.ErrInvalidRequestContextID(k.codespace, "invalid request context ID")
-	}
-
-	if requestContext.State != types.RUNNING {
-		return types.ErrRequestContextNotStarted(k.codespace)
-	}
+) {
+	requestContext, _ := k.GetRequestContext(ctx, requestContextID)
 
 	for providerIndex, provider := range providers {
-		request, err := k.buildRequest(ctx, requestContextID, requestContext.BatchCounter, requestContext.ServiceName, provider)
-		if err != nil {
-			return err
-		}
+		request := k.buildRequest(ctx, requestContextID, requestContext.BatchCounter, requestContext.ServiceName, provider)
 
 		requestID := types.GenerateRequestID(requestContextID, requestContext.BatchCounter, int16(providerIndex))
-
 		k.SetCompactRequest(ctx, requestID, request)
-		k.AddActiveRequest(ctx, requestContext.ServiceName, ctx.BlockHeight()+requestContext.Timeout, requestID, request)
+
+		k.AddActiveRequest(ctx, requestContext.ServiceName, provider, ctx.BlockHeight()+requestContext.Timeout, requestID)
+		k.AddActiveRequestByID(ctx, requestID)
+
+		k.GetMetrics().ActiveRequests.Add(1)
 	}
 
+	requestContext.BatchState = types.BATCHRUNNING
 	requestContext.BatchRequestCount = uint16(len(providers))
-	k.SetRequestContext(ctx, requestContextID, requestContext)
 
-	return nil
+	k.SetRequestContext(ctx, requestContextID, requestContext)
 }
 
 // buildRequest builds a request for the given provider from the specified request context
+// Note: make that the binding exists
 func (k Keeper) buildRequest(
 	ctx sdk.Context,
 	requestContextID []byte,
 	batchCounter uint64,
 	serviceName string,
 	provider sdk.AccAddress,
-) (request types.CompactRequest, err sdk.Error) {
-	binding, found := k.GetServiceBinding(ctx, serviceName, provider)
-	if !found {
-		return request, types.ErrUnknownServiceBinding(k.codespace)
-	}
+) types.CompactRequest {
+	binding, _ := k.GetServiceBinding(ctx, serviceName, provider)
 
-	request = types.NewCompactRequest(
+	request := types.NewCompactRequest(
 		requestContextID,
 		batchCounter,
 		provider,
@@ -316,7 +308,7 @@ func (k Keeper) buildRequest(
 		ctx.BlockHeight(),
 	)
 
-	return request, nil
+	return request
 }
 
 // SetCompactRequest sets the specified compact request
@@ -372,14 +364,14 @@ func (k Keeper) GetRequest(ctx sdk.Context, requestID []byte) (request types.Req
 func (k Keeper) AddActiveRequest(
 	ctx sdk.Context,
 	serviceName string,
+	provider sdk.AccAddress,
 	expirationHeight int64,
 	requestID []byte,
-	request types.CompactRequest,
 ) {
 	store := ctx.KVStore(k.storeKey)
 
-	bz := k.cdc.MustMarshalBinaryLengthPrefixed(request)
-	store.Set(GetActiveRequestKey(serviceName, request.Provider, expirationHeight, requestID), bz)
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(requestID)
+	store.Set(GetActiveRequestKey(serviceName, provider, expirationHeight, requestID), bz)
 }
 
 // DeleteActiveRequest deletes the specified active request
@@ -394,16 +386,33 @@ func (k Keeper) DeleteActiveRequest(
 	store.Delete(GetActiveRequestKey(serviceName, provider, expirationHeight, requestID))
 }
 
+// AddActiveRequestByID adds the specified active request by request ID
+func (k Keeper) AddActiveRequestByID(
+	ctx sdk.Context,
+	requestID []byte,
+) {
+	store := ctx.KVStore(k.storeKey)
+
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(requestID)
+	store.Set(GetActiveRequestKeyByID(requestID), bz)
+}
+
+// DeleteActiveRequestByID deletes the specified active request by request ID
+func (k Keeper) DeleteActiveRequestByID(
+	ctx sdk.Context,
+	requestID []byte,
+) {
+	store := ctx.KVStore(k.storeKey)
+	store.Delete(GetActiveRequestKeyByID(requestID))
+}
+
 // IsRequestActive checks if the specified request is active
 func (k Keeper) IsRequestActive(
 	ctx sdk.Context,
-	serviceName string,
-	provider sdk.AccAddress,
-	expirationHeight int64,
 	requestID []byte,
 ) bool {
 	store := ctx.KVStore(k.storeKey)
-	return store.Has(GetActiveRequestKey(serviceName, provider, expirationHeight, requestID))
+	return store.Has(GetActiveRequestKeyByID(requestID))
 }
 
 // AddRequestBatchExpiration adds a request batch to the expiration queue
@@ -519,7 +528,7 @@ func (k Keeper) AddResponse(
 		return response, types.ErrInvalidResponse(k.codespace, "provider does not match")
 	}
 
-	if !k.IsRequestActive(ctx, request.ServiceName, provider, request.ExpirationHeight, reqID) {
+	if !k.IsRequestActive(ctx, reqID) {
 		return response, types.ErrInvalidResponse(k.codespace, "request is not active")
 	}
 
@@ -539,22 +548,27 @@ func (k Keeper) AddResponse(
 		return response, err
 	}
 
-	response = types.NewResponse(provider, request.Consumer, output, errMsg, request.RequestContextID, request.RequestContextBatchCounter)
+	requestContextID := request.RequestContextID
+
+	response = types.NewResponse(provider, request.Consumer, output, errMsg, requestContextID, request.RequestContextBatchCounter)
 	k.SetResponse(ctx, reqID, response)
 
 	k.DeleteActiveRequest(ctx, request.ServiceName, provider, request.ExpirationHeight, reqID)
+	k.DeleteActiveRequestByID(ctx, reqID)
 
-	requestContext, _ := k.GetRequestContext(ctx, response.RequestContextID)
-	requestContext.BatchResponseCount += 1
+	requestContext, _ := k.GetRequestContext(ctx, requestContextID)
+	requestContext.BatchResponseCount++
 
 	if requestContext.BatchResponseCount == requestContext.BatchRequestCount {
 		requestContext.BatchState = types.BATCHCOMPLETED
 
 		if len(requestContext.ModuleName) != 0 {
 			respCallback, _ := k.GetResponseCallback(requestContext.ModuleName)
-			respCallback(ctx, requestContextID)
+			respCallback(ctx, requestContextID, k.GetResponsesOutput(ctx, requestContextID, requestContext.BatchCounter))
 		}
 	}
+
+	k.SetRequestContext(ctx, requestContextID, requestContext)
 
 	return response, nil
 }
@@ -578,6 +592,30 @@ func (k Keeper) GetResponse(ctx sdk.Context, requestID []byte) (response types.R
 
 	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &response)
 	return response, true
+}
+
+// ResponsesIteratorByReqCtx returns an iterator for all responses of the specified request context and batch counter
+func (k Keeper) ResponsesIteratorByReqCtx(ctx sdk.Context, requestContextID []byte, batchCounter uint64) sdk.Iterator {
+	store := ctx.KVStore(k.storeKey)
+	return sdk.KVStorePrefixIterator(store, GetResponseSubspaceByReqCtx(requestContextID, batchCounter))
+}
+
+// GetResponsesOutput retrieves all response outputs of the specified request context and batch counter
+func (k Keeper) GetResponsesOutput(ctx sdk.Context, requestContextID []byte, batchCounter uint64) []string {
+	iterator := k.ResponsesIteratorByReqCtx(ctx, requestContextID, batchCounter)
+	defer iterator.Close()
+
+	var outputs []string
+	for ; iterator.Valid(); iterator.Next() {
+		var response types.Response
+		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &response)
+
+		if len(response.Output) > 0 {
+			outputs = append(outputs, response.Output)
+		}
+	}
+
+	return outputs
 }
 
 // Slash

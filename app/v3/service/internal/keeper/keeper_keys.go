@@ -99,6 +99,11 @@ func GetResponseKey(requestID []byte) []byte {
 	return append(responseKey, requestID...)
 }
 
+// GetResponseSubspaceByReqCtx returns the key for responses for the specified request context and batch counter
+func GetResponseSubspaceByReqCtx(requestContextID []byte, batchCounter uint64) []byte {
+	return append(append(responseKey, requestContextID...), sdk.Uint64ToBigEndian(batchCounter)...)
+}
+
 func GetEarnedFeesKey(address sdk.AccAddress) []byte {
 	return append(earnedFeesKey, address.Bytes()...)
 }
