@@ -57,11 +57,11 @@ func (k Keeper) GetMetrics() *types.Metrics {
 }
 
 // InitMetrics
-func (k Keeper) InitMetrics(store sdk.KVStore) {
-	activeIterator := k.ActiveAllRequestQueueIterator(store)
-	defer activeIterator.Close()
+func (k Keeper) InitMetrics(ctx sdk.Context) {
+	iterator := k.AllActiveRequestsIterator(ctx)
+	defer iterator.Close()
 
-	for ; activeIterator.Valid(); activeIterator.Next() {
+	for ; iterator.Valid(); iterator.Next() {
 		k.metrics.ActiveRequests.Add(1)
 	}
 }

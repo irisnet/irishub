@@ -32,9 +32,26 @@ func (k Keeper) CreateRequestContext(
 	repeatedFrequency uint64,
 	repeatedTotal int64,
 	state types.RequestContextState,
-	respThreshold uint16,
-	respHandler string,
+	responseThreshold uint16,
+	moduleName string,
 ) ([]byte, sdk.Error) {
+	if len(moduleName) != 0 {
+		if _, err := k.GetResponseCallback(moduleName); err != nil {
+			return nil, err
+		}
+
+		if err := types.ValidateRequest(
+			serviceName, serviceFeeCap, providers, input,
+			timeout, repeated, repeatedFrequency, repeatedTotal,
+		); err != nil {
+			return nil, err
+		}
+
+		if responseThreshold < 1 || int(responseThreshold) > len(providers) {
+			return nil, types.ErrInvalidRequest(k.codespace, fmt.Sprintf("response threshold must be between [1,%d]", len(providers)))
+		}
+	}
+
 	svcDef, found := k.GetServiceDefinition(ctx, serviceName)
 	if !found {
 		return nil, types.ErrUnknownServiceDefinition(k.codespace, serviceName)
@@ -46,7 +63,7 @@ func (k Keeper) CreateRequestContext(
 
 	params := k.GetParamSet(ctx)
 	if timeout > params.MaxRequestTimeout {
-		return nil, types.ErrInvalidRequest(k.codespace, fmt.Sprintf("timeout must not be greater than %d: %d", params.MaxRequestTimeout, timeout))
+		return nil, types.ErrInvalidRequest(k.codespace, fmt.Sprintf("timeout [%d] must not be greater than the max request timeout [%d]", timeout, params.MaxRequestTimeout))
 	}
 
 	if timeout == 0 {
@@ -66,16 +83,31 @@ func (k Keeper) CreateRequestContext(
 		repeatedTotal = 0
 	}
 
+	profiling := false
+
+	_, found = k.gk.GetProfiler(ctx, consumer)
+	if found {
+		profiling = true
+	}
+
 	batchCounter := uint64(0)
+	batchRequestCount := uint16(0)
+	batchResponseCount := uint16(0)
+	batchState := types.BATCHCOMPLETED
 
 	requestContext := types.NewRequestContext(
 		serviceName, providers, consumer, input, serviceFeeCap,
-		timeout, repeated, repeatedFrequency, repeatedTotal,
-		batchCounter, state, respThreshold, respHandler,
+		profiling, timeout, repeated, repeatedFrequency, repeatedTotal,
+		batchCounter, batchRequestCount, batchResponseCount, batchState,
+		state, responseThreshold, moduleName,
 	)
 
 	requestContextID := types.GenerateRequestContextID(ctx.BlockHeight(), k.GetIntraTxCounter(ctx))
 	k.SetRequestContext(ctx, requestContextID, requestContext)
+
+	if requestContext.State == types.RUNNING {
+		k.AddNewRequestBatch(ctx, requestContextID, ctx.BlockHeight())
+	}
 
 	return requestContextID, nil
 }
@@ -98,20 +130,30 @@ func (k Keeper) UpdateRequestContext(
 		return types.ErrRequestContextNonRepeated(k.codespace)
 	}
 
+	if len(requestContext.ModuleName) != 0 {
+		if err := types.ValidateRequestContextUpdating(serviceFeeCap, repeatedTotal); err != nil {
+			return err
+		}
+	}
+
 	if len(providers) > 0 && requestContext.ResponseThreshold > 0 && len(providers) < int(requestContext.ResponseThreshold) {
-		return types.ErrInvalidProviders(k.codespace, "length of providers must not be less than the response threshold")
+		return types.ErrInvalidProviders(k.codespace, fmt.Sprintf("length [%d] of providers must not be less than the response threshold [%d]", len(providers), requestContext.ResponseThreshold))
 	}
 
 	if repeatedFreq > 0 && repeatedFreq < uint64(requestContext.Timeout) {
-		return types.ErrInvalidRepeatedFreq(k.codespace, "repeated frequency must not be less than the timeout")
+		return types.ErrInvalidRepeatedFreq(k.codespace, fmt.Sprintf("repeated frequency [%d] must not be less than the timeout [%d]", repeatedFreq, requestContext.Timeout))
 	}
 
-	if repeatedTotal >= 1 && repeatedTotal <= int64(requestContext.BatchCounter) {
-		return types.ErrInvalidRepeatedTotal(k.codespace, "updated repeated total must be greater than the current batch counter")
+	if repeatedTotal >= 1 && repeatedTotal < int64(requestContext.BatchCounter) {
+		return types.ErrInvalidRepeatedTotal(k.codespace, fmt.Sprintf("updated repeated total [%d] must not be less than the current batch counter [%d]", repeatedTotal, requestContext.BatchCounter))
 	}
 
 	if len(providers) > 0 {
 		requestContext.Providers = providers
+	}
+
+	if !serviceFeeCap.Empty() {
+		requestContext.ServiceFeeCap = serviceFeeCap
 	}
 
 	if repeatedFreq > 0 {
@@ -141,13 +183,11 @@ func (k Keeper) PauseRequestContext(
 		return types.ErrRequestContextNonRepeated(k.codespace)
 	}
 
-	if requestContext.State != types.RequestContextState(0x00) {
+	if requestContext.State != types.RUNNING {
 		return types.ErrRequestContextNotStarted(k.codespace)
 	}
 
-	requestContext.State = types.RequestContextState(0x01)
-	k.DeleteNewBatchRequest(ctx, requestContextID)
-
+	requestContext.State = types.PAUSED
 	k.SetRequestContext(ctx, requestContextID, requestContext)
 
 	return nil
@@ -167,14 +207,16 @@ func (k Keeper) StartRequestContext(
 		return types.ErrRequestContextNonRepeated(k.codespace)
 	}
 
-	if requestContext.State != types.RequestContextState(0x01) {
+	if requestContext.State != types.PAUSED {
 		return types.ErrRequestContextNotPaused(k.codespace)
 	}
 
-	requestContext.State = types.RequestContextState(0x00)
-	k.AddNewBatchRequest(ctx, requestContextID)
-
+	requestContext.State = types.RUNNING
 	k.SetRequestContext(ctx, requestContextID, requestContext)
+
+	if requestContext.BatchState == types.BATCHCOMPLETED {
+		k.AddNewRequestBatch(ctx, requestContextID, ctx.BlockHeight())
+	}
 
 	return nil
 }
@@ -193,9 +235,7 @@ func (k Keeper) KillRequestContext(
 		return types.ErrRequestContextNonRepeated(k.codespace)
 	}
 
-	requestContext.State = types.RequestContextState(0x01)
-	requestContext.RepeatedTotal = int64(requestContext.BatchCounter)
-
+	requestContext.State = types.COMPLETED
 	k.SetRequestContext(ctx, requestContextID, requestContext)
 
 	return nil
@@ -233,7 +273,7 @@ func (k Keeper) InitiateRequests(
 		return types.ErrInvalidRequestContextID(k.codespace, "invalid request context ID")
 	}
 
-	if requestContext.State != types.RequestContextState(0x00) {
+	if requestContext.State != types.RUNNING {
 		return types.ErrRequestContextNotStarted(k.codespace)
 	}
 
@@ -249,6 +289,9 @@ func (k Keeper) InitiateRequests(
 		k.AddActiveRequest(ctx, requestContext.ServiceName, ctx.BlockHeight()+requestContext.Timeout, requestID, request)
 	}
 
+	requestContext.BatchRequestCount = uint16(len(providers))
+	k.SetRequestContext(ctx, requestContextID, requestContext)
+
 	return nil
 }
 
@@ -260,19 +303,16 @@ func (k Keeper) buildRequest(
 	serviceName string,
 	provider sdk.AccAddress,
 ) (request types.CompactRequest, err sdk.Error) {
-	_, found := k.GetServiceBinding(ctx, serviceName, provider)
+	binding, found := k.GetServiceBinding(ctx, serviceName, provider)
 	if !found {
 		return request, types.ErrUnknownServiceBinding(k.codespace)
 	}
-
-	// TODO: extract price from binding.Pricing
-	serviceFee := sdk.Coins{}
 
 	request = types.NewCompactRequest(
 		requestContextID,
 		batchCounter,
 		provider,
-		serviceFee,
+		k.GetBasePrice(ctx, binding),
 		ctx.BlockHeight(),
 	)
 
@@ -406,14 +446,25 @@ func (k Keeper) NewRequestBatchIterator(ctx sdk.Context, requestBatchHeight int6
 	return sdk.KVStorePrefixIterator(store, GetNewRequestBatchSubspace(requestBatchHeight))
 }
 
-// ActiveRequestsIterator returns an iterator for all the request in the Active Queue of specified service binding
+// ActiveRequestsIterator returns an iterator for all the active requests of the specified service binding
 func (k Keeper) ActiveRequestsIterator(ctx sdk.Context, serviceName string, provider sdk.AccAddress) sdk.Iterator {
 	store := ctx.KVStore(k.storeKey)
 	return sdk.KVStorePrefixIterator(store, GetActiveRequestSubspace(serviceName, provider))
 }
 
+// ActiveRequestsIterator returns an iterator for all the active requests of the specified service binding
+func (k Keeper) ActiveRequestsIteratorByReqCtx(ctx sdk.Context, requestContextID []byte, batchCounter uint64) sdk.Iterator {
+	store := ctx.KVStore(k.storeKey)
+	return sdk.KVStorePrefixIterator(store, GetActiveRequestSubspaceByReqCtx(requestContextID, batchCounter))
+}
+
+// AllActiveRequestsIterator returns an iterator for all the active requests
+func (k Keeper) AllActiveRequestsIterator(ctx sdk.Context) sdk.Iterator {
+	store := ctx.KVStore(k.storeKey)
+	return sdk.KVStorePrefixIterator(store, activeRequestKey)
+}
+
 // FilterServiceProviders gets the providers which satisfy the specified service fee requirement
-// Note: make sure that the binding exists for every provider
 func (k Keeper) FilterServiceProviders(
 	ctx sdk.Context,
 	serviceName string,
@@ -421,17 +472,22 @@ func (k Keeper) FilterServiceProviders(
 	serviceFeeCap sdk.Coins,
 ) ([]sdk.AccAddress, sdk.Coins) {
 	var newProviders []sdk.AccAddress
-	var totalPrice sdk.Coins
+	var totalPrices sdk.Coins
 
 	for _, provider := range providers {
-		binding, _ := k.GetServiceBinding(ctx, serviceName, provider)
-		if binding.Pricing <= serviceFeeCap {
-			newProviders = append(newProviders, provider)
-			totalPrice = totalPrice.Add(binding.Pricing)
+		binding, found := k.GetServiceBinding(ctx, serviceName, provider)
+
+		if found && binding.Available {
+			price := k.GetBasePrice(ctx, binding)
+
+			if price.IsAllLTE(serviceFeeCap) {
+				newProviders = append(newProviders, provider)
+				totalPrices = totalPrices.Add(price)
+			}
 		}
 	}
 
-	return newProviders, totalPrice
+	return newProviders, totalPrices
 }
 
 // DeductServiceFees deducts the given service fees from the specified consumer
@@ -488,6 +544,18 @@ func (k Keeper) AddResponse(
 
 	k.DeleteActiveRequest(ctx, request.ServiceName, provider, request.ExpirationHeight, reqID)
 
+	requestContext, _ := k.GetRequestContext(ctx, response.RequestContextID)
+	requestContext.BatchResponseCount += 1
+
+	if requestContext.BatchResponseCount == requestContext.BatchRequestCount {
+		requestContext.BatchState = types.BATCHCOMPLETED
+
+		if len(requestContext.ModuleName) != 0 {
+			respCallback, _ := k.GetResponseCallback(requestContext.ModuleName)
+			respCallback(ctx, requestContextID)
+		}
+	}
+
 	return response, nil
 }
 
@@ -533,7 +601,6 @@ func (k Keeper) Slash(ctx sdk.Context, binding types.ServiceBinding, slashCoins 
 		return err
 	}
 
-	ctx.Logger().Info("Slash service provider", "provider", binding.Provider.String(), "slash_amount", slashCoins.String())
 	k.SetServiceBinding(ctx, binding)
 
 	return nil
@@ -660,14 +727,14 @@ func (k Keeper) RefundEarnedFees(ctx sdk.Context) sdk.Error {
 
 // RefundServiceFees refunds the service fees of all the active requests
 func (k Keeper) RefundServiceFees(ctx sdk.Context) sdk.Error {
-	store := ctx.KVStore(k.storeKey)
-
-	iterator := k.ActiveAllRequestQueueIterator(store)
+	iterator := k.AllActiveRequestsIterator(ctx)
 	defer iterator.Close()
 
 	for ; iterator.Valid(); iterator.Next() {
-		var request types.CompactRequest
-		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &request)
+		var requestID []byte
+		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &requestID)
+
+		request, _ := k.GetRequest(ctx, requestID)
 
 		_, err := k.bk.SendCoins(ctx, auth.ServiceRequestCoinsAccAddr, request.Consumer, request.ServiceFee)
 		if err != nil {
