@@ -16,6 +16,7 @@ var (
 
 	testCoin1, _ = sdk.IrisCoinType.ConvertToMinDenomCoin("1000iris")
 	testCoin2, _ = sdk.IrisCoinType.ConvertToMinDenomCoin("100iris")
+	testCoin3, _ = sdk.IrisCoinType.ConvertToMinDenomCoin("1iris")
 
 	testServiceName = "test-service"
 	testServiceDesc = "test-service-desc"
@@ -24,18 +25,18 @@ var (
 	testSchemas     = `{"input":{"type":"object"},"output":{"type":"object"},"error":{"type":"object"}}`
 
 	testDeposit      = sdk.NewCoins(testCoin1)
-	testPricing      = `{"price":[{"denom":"iris-atto","amount":"1000000000"}]}`
+	testPricing      = `{"price":[{"denom":"iris-atto","amount":"1000000000000000000"}]}`
 	testWithdrawAddr = sdk.AccAddress{}
 	testAddedDeposit = sdk.NewCoins(testCoin2)
 
 	testInput         = `{"pair":"iris-usdt"}`
-	testOutput = `{"last":"100"}`
-	testServiceFee, _ = sdk.IrisCoinType.ConvertToMinDenomCoin("1iris")
-	testServiceFeeCap = sdk.NewCoins(testCoin2)
+	testOutput        = `{"last":"100"}`
+	testServiceFee    = sdk.NewCoins(testCoin3)
+	testServiceFeeCap = sdk.NewCoins(testCoin3)
 	testTimeout       = int64(100)
 	testRepeatedFreq  = uint64(120)
 	testRepeatedTotal = int64(100)
-	
+
 	callbacked = false
 )
 
@@ -50,35 +51,42 @@ func setServiceBinding(ctx sdk.Context, k Keeper, provider sdk.AccAddress, avail
 }
 
 func setRequestContext(
-	ctx sdk.Context, k Keeper, consumer sdk.AccAddress, 
-	providers []sdk.AccAddress, state types.RequestContextState, 
+	ctx sdk.Context, k Keeper, consumer sdk.AccAddress,
+	providers []sdk.AccAddress, state types.RequestContextState,
 	threshold uint16, moduleName string,
-) ([]byte,types.RequestContext) {
+) ([]byte, types.RequestContext) {
 	requestContext := types.NewRequestContext(
 		testServiceName, providers, consumer, testInput,
 		testServiceFeeCap, false, testTimeout, true, testRepeatedFreq,
-		testRepeatedTotal, 0, state, threshold, moduleName,
+		testRepeatedTotal, 0, 0, 0, types.BATCHCOMPLETED, state, threshold, moduleName,
 	)
 
 	requestContextID := types.GenerateRequestContextID(ctx.BlockHeight(), 0)
 	k.SetRequestContext(ctx, requestContextID, requestContext)
 
-	return requestContextID,requestContext
+	return requestContextID, requestContext
 }
 
 func setRequest(ctx sdk.Context, k Keeper, consumer sdk.AccAddress, provider sdk.AccAddress, requestContextID []byte) []byte {
-	requestContext, found := k.GetRequestContext(ctx, requestContextID)
-	require.True(t, found)
+	requestContext, _ := k.GetRequestContext(ctx, requestContextID)
+
+	k.DeductServiceFees(ctx, consumer, testServiceFee)
 
 	request := types.NewCompactRequest(
 		requestContextID, requestContext.BatchCounter, provider,
-		testServiceFees, ctx.BlockHeight(),
+		testServiceFee, ctx.BlockHeight(),
 	)
 
-	requestID := types.GenerateRequestID(requestContextID, request.RequestContextBatchCounter, 0)
+	requestContext.BatchRequestCount++
+
+	requestID := types.GenerateRequestID(requestContextID, request.RequestContextBatchCounter, int16(requestContext.BatchRequestCount))
 	k.SetCompactRequest(ctx, requestID, request)
 
+	requestContext.BatchState = types.BATCHRUNNING
+	k.SetRequestContext(ctx, requestContextID, requestContext)
+
 	k.AddActiveRequest(ctx, requestContext.ServiceName, provider, request.RequestHeight+requestContext.Timeout, requestID)
+	k.AddActiveRequestByID(ctx, requestID)
 
 	return requestID
 }
@@ -211,18 +219,18 @@ func TestKeeper_Refund_Deposit(t *testing.T) {
 }
 
 func TestKeeper_Register_Callback(t *testing.T) {
-	ctx, keeper, accs := createTestInput(t, sdk.NewIntWithDecimal(2000, 18), 1)
+	_, keeper, _ := createTestInput(t, sdk.NewIntWithDecimal(2000, 18), 1)
 
-	moduleName:="test-module"
-	
-	err:=keeper.RegisterResponseCallback(moduleName,callback)
-	require.NoError(t,err)
+	moduleName := "test-module"
 
-	_,found:=keeper.GetResponseCallback(moduleName)
-	require.True(t,found)
+	err := keeper.RegisterResponseCallback(moduleName, callback)
+	require.NoError(t, err)
 
-	err=keeper.RegisterResponseCallback(moduleName,callback)
-	require.NotNil(t,err,"module already registered") 
+	_, err = keeper.GetResponseCallback(moduleName)
+	require.NoError(t, err)
+
+	err = keeper.RegisterResponseCallback(moduleName, callback)
+	require.NotNil(t, err, "module already registered")
 }
 
 func TestKeeper_Request_Context(t *testing.T) {
@@ -234,14 +242,18 @@ func TestKeeper_Request_Context(t *testing.T) {
 
 	setServiceDefinition(ctx, keeper, author)
 
+	blockHeight := int64(1000)
+	ctx = ctx.WithBlockHeight(blockHeight)
+
 	// create
 	requestContextID, err := keeper.CreateRequestContext(
 		ctx, testServiceName, providers, consumer, testInput,
-		testServiceFeeCap, testTimeout, true,
-		testRepeatedFreq, testRepeatedTotal,
-		types.RUNNING, "", "",
+		testServiceFeeCap, testTimeout, true, testRepeatedFreq,
+		testRepeatedTotal, types.RUNNING, 0, "",
 	)
 	require.NoError(t, err)
+
+	require.True(t, keeper.HasNewRequestBatch(ctx, requestContextID, ctx.BlockHeight()))
 
 	requestContext, found := keeper.GetRequestContext(ctx, requestContextID)
 	require.True(t, found)
@@ -254,18 +266,18 @@ func TestKeeper_Request_Context(t *testing.T) {
 	require.True(t, requestContext.Repeated)
 	require.Equal(t, testRepeatedFreq, requestContext.RepeatedFrequency)
 	require.Equal(t, testRepeatedTotal, requestContext.RepeatedTotal)
-	require.Equal(t, 0, requestContext.BatchCounter)
+	require.Equal(t, uint64(0), requestContext.BatchCounter)
 	require.Equal(t, types.RUNNING, requestContext.State)
 
 	// update
-	newServiceFeeCap := sdk.NewCoins(testCoins1)
+	newServiceFeeCap := sdk.NewCoins(testCoin1)
 	newRepeatedFreq := testRepeatedFreq + 10
-	newRepeatedTotal := -1
+	newRepeatedTotal := int64(-1)
 
 	err = keeper.UpdateRequestContext(ctx, requestContextID, nil, newServiceFeeCap, newRepeatedFreq, newRepeatedTotal)
 	require.NoError(t, err)
 
-	requestContext, found := keeper.GetRequestContext(ctx, requestContextID)
+	requestContext, found = keeper.GetRequestContext(ctx, requestContextID)
 	require.True(t, found)
 
 	require.Equal(t, testServiceName, requestContext.ServiceName)
@@ -276,14 +288,14 @@ func TestKeeper_Request_Context(t *testing.T) {
 	require.True(t, requestContext.Repeated)
 	require.Equal(t, newRepeatedFreq, requestContext.RepeatedFrequency)
 	require.Equal(t, newRepeatedTotal, requestContext.RepeatedTotal)
-	require.Equal(t, 0, requestContext.BatchCounter)
+	require.Equal(t, uint64(0), requestContext.BatchCounter)
 	require.Equal(t, types.RUNNING, requestContext.State)
 
 	// pause
 	err = keeper.PauseRequestContext(ctx, requestContextID)
 	require.NoError(t, err)
 
-	requestContext, found := keeper.GetRequestContext(ctx, requestContextID)
+	requestContext, found = keeper.GetRequestContext(ctx, requestContextID)
 	require.True(t, found)
 
 	require.Equal(t, types.PAUSED, requestContext.State)
@@ -292,7 +304,7 @@ func TestKeeper_Request_Context(t *testing.T) {
 	err = keeper.StartRequestContext(ctx, requestContextID)
 	require.NoError(t, err)
 
-	requestContext, found := keeper.GetRequestContext(ctx, requestContextID)
+	requestContext, found = keeper.GetRequestContext(ctx, requestContextID)
 	require.True(t, found)
 
 	require.Equal(t, types.RUNNING, requestContext.State)
@@ -301,7 +313,7 @@ func TestKeeper_Request_Context(t *testing.T) {
 	err = keeper.KillRequestContext(ctx, requestContextID)
 	require.NoError(t, err)
 
-	requestContext, found := keeper.GetRequestContext(ctx, requestContextID)
+	requestContext, found = keeper.GetRequestContext(ctx, requestContextID)
 	require.True(t, found)
 
 	require.Equal(t, types.COMPLETED, requestContext.State)
@@ -322,22 +334,28 @@ func TestKeeper_Request_Service(t *testing.T) {
 		setServiceBinding(ctx, keeper, provider, true, time.Time{})
 	}
 
-	blockHeight := 1000
+	blockHeight := int64(1000)
 	ctx = ctx.WithBlockHeight(blockHeight)
 
-	requestContextID,requestContext := setRequestContext(ctx, keeper, consumer, providers, types.RUNNING, 0, "")
+	requestContextID, requestContext := setRequestContext(ctx, keeper, consumer, providers, types.RUNNING, 0, "")
 
 	newProviders, totalServiceFees := keeper.FilterServiceProviders(ctx, testServiceName, providers, testServiceFeeCap)
 	require.Equal(t, providers, newProviders)
-	require.Equal(t, testPricing, totalServiceFees)
+	require.Equal(t, "2iris", totalServiceFees.MainUnitString())
 
 	err := keeper.DeductServiceFees(ctx, consumer, totalServiceFees)
 	require.NoError(t, err)
 
-	err = keeper.InitiateRequests(ctx, requestContextID, newProviders)
-	require.NoError(t, err)
+	requestContext.BatchCounter++
+	keeper.SetRequestContext(ctx, requestContextID, requestContext)
 
-	iterator := k.ActiveRequestsIterator(ctx)
+	keeper.InitiateRequests(ctx, requestContextID, newProviders)
+
+	requestContext, _ = keeper.GetRequestContext(ctx, requestContextID)
+	require.Equal(t, len(newProviders), int(requestContext.BatchRequestCount))
+	require.Equal(t, types.BATCHRUNNING, requestContext.BatchState)
+
+	iterator := keeper.ActiveRequestsIteratorByReqCtx(ctx, requestContextID, requestContext.BatchCounter)
 	defer iterator.Close()
 
 	require.True(t, iterator.Valid())
@@ -348,10 +366,10 @@ func TestKeeper_Request_Service(t *testing.T) {
 		keeper.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &requestID)
 
 		request, found := keeper.GetRequest(ctx, requestID)
-		require.Ture(t, found)
+		require.True(t, found)
 
-		require.Equal(t, testServiceName, request.ServiceName)
-		require.Equal(t, consumer, request.Consumer)
+		require.Equal(t, requestContext.ServiceName, request.ServiceName)
+		require.Equal(t, requestContext.Consumer, request.Consumer)
 
 		requestProviders = append(requestProviders, request.Provider)
 
@@ -369,39 +387,42 @@ func TestKeeper_Respond_Service(t *testing.T) {
 
 	author := accs[0].GetAddress()
 	provider := accs[1].GetAddress()
-	consumer := accs[3].GetAddress()
+	consumer := accs[2].GetAddress()
 
 	setServiceDefinition(ctx, keeper, author)
 
-	blockHeight := 1000
+	blockHeight := int64(1000)
 	ctx = ctx.WithBlockHeight(blockHeight)
 
-	requestContextID,requestContext := setRequestContext(ctx, keeper, consumer, []sdk.AccAddress{provider}, types.RUNNING, 0, "")
+	requestContextID, requestContext := setRequestContext(ctx, keeper, consumer, []sdk.AccAddress{provider}, types.RUNNING, 0, "")
+
+	requestContext.BatchCounter++
+	keeper.SetRequestContext(ctx, requestContextID, requestContext)
 
 	requestID := setRequest(ctx, keeper, consumer, provider, requestContextID)
-	
+
 	requestIDStr, _ := types.RequestIDToString(requestID)
 
 	_, err := keeper.AddResponse(ctx, requestIDStr, provider, testOutput, "")
 	require.NoError(t, err)
 
-	response,found:=keeper.GetResponse(ctx,requestID)
+	requestContext, _ = keeper.GetRequestContext(ctx, requestContextID)
+	require.Equal(t, uint16(1), requestContext.BatchResponseCount)
+	require.Equal(t, types.BATCHCOMPLETED, requestContext.BatchState)
+
+	response, found := keeper.GetResponse(ctx, requestID)
 	require.True(t, found)
-	
-	require.Equal(t,provider,response.Provider)
-	require.Equal(t,consumer,response.Consumer)
-	require.Equal(t,requestContextID,response.RequestContextID)
-	require.Equal(t,requestContext.BatchCounter,response.RequestContextBatchCounter)
+
+	require.Equal(t, provider, response.Provider)
+	require.Equal(t, consumer, response.Consumer)
+	require.Equal(t, requestContextID, response.RequestContextID)
+	require.Equal(t, requestContext.BatchCounter, response.RequestContextBatchCounter)
 
 	earnedFees, found := keeper.GetEarnedFees(ctx, provider)
 	require.True(t, found)
+	require.True(t, !earnedFees.Coins.Empty())
 
-	require.True(t,!earnedFees.Coins.Empty())
-
-	for iterator := k.ActiveRequestsIterator(ctx)
-	defer iterator.Close()
-
-	require.False(t, iterator.Valid())
+	require.False(t, keeper.IsRequestActive(ctx, requestID))
 }
 
 func TestKeeper_Request_Service_From_Module(t *testing.T) {
@@ -415,16 +436,19 @@ func TestKeeper_Request_Service_From_Module(t *testing.T) {
 
 	setServiceDefinition(ctx, keeper, author)
 
-	moduleName:="oracle"
-	respThreshold:=2
+	moduleName := "oracle"
+	respThreshold := uint16(2)
 
-	err:=keeper.RegisterResponseCallback(moduleName,callback)
-	require.NoError(t,err)
+	err := keeper.RegisterResponseCallback(moduleName, callback)
+	require.NoError(t, err)
 
-	blockHeight := 1000
+	blockHeight := int64(1000)
 	ctx = ctx.WithBlockHeight(blockHeight)
 
-	requestContextID,requestContext := setRequestContext(ctx, keeper, consumer, providers, types.RUNNING, respThreshold, moduleName)
+	requestContextID, requestContext := setRequestContext(ctx, keeper, consumer, providers, types.RUNNING, respThreshold, moduleName)
+
+	requestContext.BatchCounter++
+	keeper.SetRequestContext(ctx, requestContextID, requestContext)
 
 	requestID1 := setRequest(ctx, keeper, consumer, provider1, requestContextID)
 	requestID2 := setRequest(ctx, keeper, consumer, provider2, requestContextID)
@@ -432,17 +456,27 @@ func TestKeeper_Request_Service_From_Module(t *testing.T) {
 	requestIDStr1, _ := types.RequestIDToString(requestID1)
 	requestIDStr2, _ := types.RequestIDToString(requestID2)
 
-	_, err := keeper.AddResponse(ctx, requestIDStr1, provider1, testOutput, "")
+	_, err = keeper.AddResponse(ctx, requestIDStr1, provider1, testOutput, "")
 	require.NoError(t, err)
 
-	require.False(t,callbacked)
+	requestContext, _ = keeper.GetRequestContext(ctx, requestContextID)
+	require.Equal(t, uint16(1), requestContext.BatchResponseCount)
+	require.Equal(t, types.BATCHRUNNING, requestContext.BatchState)
 
-	_, err := keeper.AddResponse(ctx, requestIDStr2, provider2, testOutput, "")
+	// callback has not occurred due to insufficient responses
+	require.False(t, callbacked)
+
+	_, err = keeper.AddResponse(ctx, requestIDStr2, provider2, testOutput, "")
 	require.NoError(t, err)
 
-	require.True(t,callbacked) // the response count reaches the threshold, so callback has occurred
+	requestContext, _ = keeper.GetRequestContext(ctx, requestContextID)
+	require.Equal(t, uint16(2), requestContext.BatchResponseCount)
+	require.Equal(t, types.BATCHCOMPLETED, requestContext.BatchState)
+
+	// callback has occurred because the response count reaches the threshold
+	require.True(t, callbacked)
 }
 
 func callback(ctx sdk.Context, requestContextID []byte, responses []string) {
-	callbacked = true	
+	callbacked = true
 }

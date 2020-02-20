@@ -443,6 +443,12 @@ func (k Keeper) DeleteNewRequestBatch(ctx sdk.Context, requestContextID []byte, 
 	store.Delete(GetNewRequestBatchKey(requestContextID, requestBatchHeight))
 }
 
+// HasNewRequestBatch checks if the new request batch from the specified request context exists in the given height
+func (k Keeper) HasNewRequestBatch(ctx sdk.Context, requestContextID []byte, requestBatchHeight int64) bool {
+	store := ctx.KVStore(k.storeKey)
+	return store.Has(GetNewRequestBatchKey(requestContextID, requestBatchHeight))
+}
+
 // ExpiredRequestBatchIterator returns an iterator for the request batch expiration queue
 func (k Keeper) ExpiredRequestBatchIterator(ctx sdk.Context, expirationHeight int64) sdk.Iterator {
 	store := ctx.KVStore(k.storeKey)
@@ -461,7 +467,7 @@ func (k Keeper) ActiveRequestsIterator(ctx sdk.Context, serviceName string, prov
 	return sdk.KVStorePrefixIterator(store, GetActiveRequestSubspace(serviceName, provider))
 }
 
-// ActiveRequestsIterator returns an iterator for all the active requests of the specified service binding
+// ActiveRequestsIteratorByReqCtx returns an iterator for all the active requests of the specified service binding
 func (k Keeper) ActiveRequestsIteratorByReqCtx(ctx sdk.Context, requestContextID []byte, batchCounter uint64) sdk.Iterator {
 	store := ctx.KVStore(k.storeKey)
 	return sdk.KVStorePrefixIterator(store, GetActiveRequestSubspaceByReqCtx(requestContextID, batchCounter))
