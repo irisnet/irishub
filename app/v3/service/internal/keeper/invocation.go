@@ -468,8 +468,7 @@ func (k Keeper) ActiveRequestsIteratorByReqCtx(ctx sdk.Context, requestContextID
 }
 
 // AllActiveRequestsIterator returns an iterator for all the active requests
-func (k Keeper) AllActiveRequestsIterator(ctx sdk.Context) sdk.Iterator {
-	store := ctx.KVStore(k.storeKey)
+func (k Keeper) AllActiveRequestsIterator(store sdk.KVStore) sdk.Iterator {
 	return sdk.KVStorePrefixIterator(store, activeRequestKey)
 }
 
@@ -765,7 +764,7 @@ func (k Keeper) RefundEarnedFees(ctx sdk.Context) sdk.Error {
 
 // RefundServiceFees refunds the service fees of all the active requests
 func (k Keeper) RefundServiceFees(ctx sdk.Context) sdk.Error {
-	iterator := k.AllActiveRequestsIterator(ctx)
+	iterator := k.AllActiveRequestsIterator(ctx.KVStore(k.storeKey))
 	defer iterator.Close()
 
 	for ; iterator.Valid(); iterator.Next() {
