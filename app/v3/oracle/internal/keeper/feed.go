@@ -32,7 +32,6 @@ func (k Keeper) IteratorFeeds(ctx sdk.Context, fn func(feed types.Feed)) {
 		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &res)
 		fn(res)
 	}
-	return
 }
 
 func (k Keeper) SetFeed(ctx sdk.Context, feed types.Feed) {
