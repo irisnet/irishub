@@ -16,8 +16,9 @@ var (
 	newRequestBatchKey     = []byte{0x05}
 	requestKey             = []byte{0x06}
 	activeRequestKey       = []byte{0x07}
-	responseKey            = []byte{0x08}
-	earnedFeesKey          = []byte{0x09}
+	activeRequestByIDKey   = []byte{0x08}
+	responseKey            = []byte{0x09}
+	earnedFeesKey          = []byte{0x10}
 )
 
 const (
@@ -81,6 +82,16 @@ func GetActiveRequestKey(serviceName string, provider sdk.AccAddress, expiration
 // GetActiveRequestSubspace returns the key for the active requests for the specified provider
 func GetActiveRequestSubspace(serviceName string, provider sdk.AccAddress) []byte {
 	return append(append(activeRequestKey, getStringsKey([]string{serviceName, provider.String()})...), emptyByte...)
+}
+
+// GetActiveRequestKeyByID returns the key for the active request with the specified request ID
+func GetActiveRequestKeyByID(requestID []byte) []byte {
+	return append(activeRequestByIDKey, requestID...)
+}
+
+// GetActiveRequestSubspaceByReqCtx returns the key for the active requests for the specified request context
+func GetActiveRequestSubspaceByReqCtx(requestContextID []byte, batchCounter uint64) []byte {
+	return append(append(activeRequestByIDKey, requestContextID...), sdk.Uint64ToBigEndian(batchCounter)...)
 }
 
 // GetResponseKey returns the key for the response for the given request ID
