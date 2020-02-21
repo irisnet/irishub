@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/app/v3/service"
@@ -132,30 +131,24 @@ func GetCmdQueryServiceBindings(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-func GetCmdQuerySvcRequests(cdc *codec.Codec) *cobra.Command {
+func GetCmdQueryServiceRequests(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "requests",
-		Short: "Query service requests",
-		Example: "iriscli service requests --def-chain-id=<service-def-chain-id> --service-name=test " +
-			"--bind-chain-id=<bind-chain-id> --provider=<provider>",
+		Use:     "requests",
+		Short:   "Query service requests",
+		Example: "iriscli service requests <service-name> <provider>",
+		Args:    cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
-				WithAccountDecoder(utils.GetAccountDecoder(cdc))
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			name := viper.GetString(FlagServiceName)
-			defChainID := viper.GetString(FlagDefChainID)
-			bindChainID := viper.GetString(FlagBindChainID)
-			providerStr := viper.GetString(FlagProvider)
+			serviceName := args[0]
 
-			provider, err := sdk.AccAddressFromBech32(providerStr)
+			provider, err := sdk.AccAddressFromBech32(args[1])
 			if err != nil {
 				return err
 			}
 
 			params := service.QueryRequestsParams{
-				DefChainID:  defChainID,
-				ServiceName: name,
-				BindChainID: bindChainID,
+				ServiceName: serviceName,
 				Provider:    provider,
 			}
 
@@ -170,36 +163,29 @@ func GetCmdQuerySvcRequests(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			fmt.Println(string(res))
-			return nil
+			var requests service.Requests
+			if err := cdc.UnmarshalJSON(res, &requests); err != nil {
+				return err
+			}
+
+			return cliCtx.PrintOutput(requests)
 		},
 	}
-	cmd.Flags().String(FlagDefChainID, "", "ID of the chain where the service definition lies")
-	cmd.Flags().String(FlagBindChainID, "", "ID of the chain where the service binding lies")
-	cmd.Flags().String(FlagProvider, "", "the provider address")
-	cmd.Flags().String(FlagServiceName, "", "service name")
-	cmd.MarkFlagRequired(FlagDefChainID)
-	cmd.MarkFlagRequired(FlagServiceName)
-	cmd.MarkFlagRequired(FlagBindChainID)
-	cmd.MarkFlagRequired(FlagProvider)
+
 	return cmd
 }
 
-func GetCmdQuerySvcResponse(cdc *codec.Codec) *cobra.Command {
+func GetCmdQueryServiceResponse(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "response",
 		Short:   "Query a service response",
-		Example: "iriscli service response --request-chain-id=<req-chain-id> --request-id=<request-id>",
+		Example: "iriscli service response <request-id>",
+		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
-				WithAccountDecoder(utils.GetAccountDecoder(cdc))
-
-			reqChainID := viper.GetString(FlagReqChainID)
-			reqID := viper.GetString(FlagReqID)
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
 			params := service.QueryResponseParams{
-				ReqChainID: reqChainID,
-				RequestID:  reqID,
+				RequestID: args[0],
 			}
 
 			bz, err := cdc.MarshalJSON(params)
@@ -213,14 +199,15 @@ func GetCmdQuerySvcResponse(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			fmt.Println(string(res))
-			return nil
+			var response service.Response
+			if err := cdc.UnmarshalJSON(res, &response); err != nil {
+				return err
+			}
+
+			return cliCtx.PrintOutput(response)
 		},
 	}
-	cmd.Flags().String(FlagReqChainID, "", "the ID of the blockchain that the service invocation initiated")
-	cmd.Flags().String(FlagReqID, "", "the ID of the service invocation")
-	_ = cmd.MarkFlagRequired(FlagReqChainID)
-	_ = cmd.MarkFlagRequired(FlagReqID)
+
 	return cmd
 }
 
