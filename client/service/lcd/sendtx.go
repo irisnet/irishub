@@ -1,7 +1,6 @@
 package lcd
 
 import (
-	"encoding/hex"
 	"fmt"
 	"net/http"
 
@@ -57,29 +56,29 @@ func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec
 		refundServiceDepositHandlerFn(cdc, cliCtx),
 	).Methods("POST")
 
-	// Add a request for a service binding
-	r.HandleFunc(
-		fmt.Sprintf("/service/requests"),
-		requestAddHandlerFn(cdc, cliCtx),
-	).Methods("POST")
+	// // Add a request for a service binding
+	// r.HandleFunc(
+	// 	fmt.Sprintf("/service/requests"),
+	// 	requestAddHandlerFn(cdc, cliCtx),
+	// ).Methods("POST")
 
-	// Add a response for a service request
-	r.HandleFunc(
-		fmt.Sprintf("/service/responses"),
-		responseAddHandlerFn(cdc, cliCtx),
-	).Methods("POST")
+	// // Add a response for a service request
+	// r.HandleFunc(
+	// 	fmt.Sprintf("/service/responses"),
+	// 	responseAddHandlerFn(cdc, cliCtx),
+	// ).Methods("POST")
 
-	// refund fees from return fees
-	r.HandleFunc(
-		fmt.Sprintf("/service/fees/{%s}/refund", Consumer),
-		FeesRefundHandlerFn(cdc, cliCtx),
-	).Methods("POST")
+	// // refund fees from return fees
+	// r.HandleFunc(
+	// 	fmt.Sprintf("/service/fees/{%s}/refund", Consumer),
+	// 	FeesRefundHandlerFn(cdc, cliCtx),
+	// ).Methods("POST")
 
-	// withdraw fees from incoming fees
-	r.HandleFunc(
-		fmt.Sprintf("/service/fees/{%s}/withdraw", Provider),
-		FeesWithdrawHandlerFn(cdc, cliCtx),
-	).Methods("POST")
+	// // withdraw fees from incoming fees
+	// r.HandleFunc(
+	// 	fmt.Sprintf("/service/fees/{%s}/withdraw", Provider),
+	// 	FeesWithdrawHandlerFn(cdc, cliCtx),
+	// ).Methods("POST")
 }
 
 type defineServiceReq struct {
@@ -435,177 +434,177 @@ func refundServiceDepositHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) 
 	}
 }
 
-func requestAddHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		var req serviceRequestWithBasic
-		err := utils.ReadPostBody(w, r, cdc, &req)
-		if err != nil {
-			return
-		}
+// func requestAddHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+// 	return func(w http.ResponseWriter, r *http.Request) {
+// 		var req serviceRequestWithBasic
+// 		err := utils.ReadPostBody(w, r, cdc, &req)
+// 		if err != nil {
+// 			return
+// 		}
 
-		baseReq := req.BaseTx.Sanitize()
-		if !baseReq.ValidateBasic(w) {
-			return
-		}
+// 		baseReq := req.BaseTx.Sanitize()
+// 		if !baseReq.ValidateBasic(w) {
+// 			return
+// 		}
 
-		var msgs []sdk.Msg
-		for _, request := range req.Requests {
-			consumerStr := request.Consumer
-			consumer, err := sdk.AccAddressFromBech32(consumerStr)
-			if err != nil {
-				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-				return
-			}
+// 		var msgs []sdk.Msg
+// 		for _, request := range req.Requests {
+// 			consumerStr := request.Consumer
+// 			consumer, err := sdk.AccAddressFromBech32(consumerStr)
+// 			if err != nil {
+// 				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+// 				return
+// 			}
 
-			providerStr := request.Provider
-			provider, err := sdk.AccAddressFromBech32(providerStr)
-			if err != nil {
-				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-				return
-			}
+// 			providerStr := request.Provider
+// 			provider, err := sdk.AccAddressFromBech32(providerStr)
+// 			if err != nil {
+// 				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+// 				return
+// 			}
 
-			inputString := request.Data
-			input, err := hex.DecodeString(inputString)
-			if err != nil {
-				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-				return
-			}
+// 			inputString := request.Data
+// 			input, err := hex.DecodeString(inputString)
+// 			if err != nil {
+// 				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+// 				return
+// 			}
 
-			serviceFeeStr := request.ServiceFee
-			serviceFee, err := cliCtx.ParseCoins(serviceFeeStr)
-			if err != nil {
-				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-				return
-			}
+// 			serviceFeeStr := request.ServiceFee
+// 			serviceFee, err := cliCtx.ParseCoins(serviceFeeStr)
+// 			if err != nil {
+// 				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+// 				return
+// 			}
 
-			msg := service.NewMsgSvcRequest(request.DefChainID, request.ServiceName, request.BindChainID, baseReq.ChainID, consumer, provider, request.MethodID, input, serviceFee, request.Profiling)
-			err = msg.ValidateBasic()
-			if err != nil {
-				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-				return
-			}
-			msgs = append(msgs, msg)
-		}
+// 			msg := service.NewMsgSvcRequest(request.DefChainID, request.ServiceName, request.BindChainID, baseReq.ChainID, consumer, provider, request.MethodID, input, serviceFee, request.Profiling)
+// 			err = msg.ValidateBasic()
+// 			if err != nil {
+// 				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+// 				return
+// 			}
+// 			msgs = append(msgs, msg)
+// 		}
 
-		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
+// 		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
 
-		utils.WriteGenerateStdTxResponse(w, txCtx, msgs)
-	}
-}
+// 		utils.WriteGenerateStdTxResponse(w, txCtx, msgs)
+// 	}
+// }
 
-func responseAddHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		var req serviceResponse
-		err := utils.ReadPostBody(w, r, cdc, &req)
-		if err != nil {
-			return
-		}
+// func responseAddHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+// 	return func(w http.ResponseWriter, r *http.Request) {
+// 		var req serviceResponse
+// 		err := utils.ReadPostBody(w, r, cdc, &req)
+// 		if err != nil {
+// 			return
+// 		}
 
-		baseReq := req.BaseTx.Sanitize()
-		if !baseReq.ValidateBasic(w) {
-			return
-		}
+// 		baseReq := req.BaseTx.Sanitize()
+// 		if !baseReq.ValidateBasic(w) {
+// 			return
+// 		}
 
-		providerStr := req.Provider
-		provider, err := sdk.AccAddressFromBech32(providerStr)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
+// 		providerStr := req.Provider
+// 		provider, err := sdk.AccAddressFromBech32(providerStr)
+// 		if err != nil {
+// 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+// 			return
+// 		}
 
-		outputString := req.Data
-		output, err := hex.DecodeString(outputString)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
+// 		outputString := req.Data
+// 		output, err := hex.DecodeString(outputString)
+// 		if err != nil {
+// 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+// 			return
+// 		}
 
-		errMsgString := req.ErrorMsg
-		errMsg, err := hex.DecodeString(errMsgString)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
+// 		errMsgString := req.ErrorMsg
+// 		errMsg, err := hex.DecodeString(errMsgString)
+// 		if err != nil {
+// 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+// 			return
+// 		}
 
-		msg := service.NewMsgSvcResponse(req.ReqChainID, req.RequestID, provider, output, errMsg)
-		err = msg.ValidateBasic()
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
+// 		msg := service.NewMsgSvcResponse(req.ReqChainID, req.RequestID, provider, output, errMsg)
+// 		err = msg.ValidateBasic()
+// 		if err != nil {
+// 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+// 			return
+// 		}
 
-		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
+// 		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
 
-		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
-	}
-}
+// 		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
+// 	}
+// }
 
-func FeesRefundHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		vars := mux.Vars(r)
-		bechConsumerAddr := vars[Consumer]
+// func FeesRefundHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+// 	return func(w http.ResponseWriter, r *http.Request) {
+// 		vars := mux.Vars(r)
+// 		bechConsumerAddr := vars[Consumer]
 
-		consumerAddr, err := sdk.AccAddressFromBech32(bechConsumerAddr)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
+// 		consumerAddr, err := sdk.AccAddressFromBech32(bechConsumerAddr)
+// 		if err != nil {
+// 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+// 			return
+// 		}
 
-		var req basicReq
-		err = utils.ReadPostBody(w, r, cdc, &req)
-		if err != nil {
-			return
-		}
+// 		var req basicReq
+// 		err = utils.ReadPostBody(w, r, cdc, &req)
+// 		if err != nil {
+// 			return
+// 		}
 
-		baseReq := req.BaseTx.Sanitize()
-		if !baseReq.ValidateBasic(w) {
-			return
-		}
+// 		baseReq := req.BaseTx.Sanitize()
+// 		if !baseReq.ValidateBasic(w) {
+// 			return
+// 		}
 
-		msg := service.NewMsgSvcRefundFees(consumerAddr)
-		err = msg.ValidateBasic()
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
+// 		msg := service.NewMsgSvcRefundFees(consumerAddr)
+// 		err = msg.ValidateBasic()
+// 		if err != nil {
+// 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+// 			return
+// 		}
 
-		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
+// 		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
 
-		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
-	}
-}
+// 		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
+// 	}
+// }
 
-func FeesWithdrawHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		vars := mux.Vars(r)
-		bechProviderAddr := vars[Provider]
+// func FeesWithdrawHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+// 	return func(w http.ResponseWriter, r *http.Request) {
+// 		vars := mux.Vars(r)
+// 		bechProviderAddr := vars[Provider]
 
-		providerAddr, err := sdk.AccAddressFromBech32(bechProviderAddr)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
+// 		providerAddr, err := sdk.AccAddressFromBech32(bechProviderAddr)
+// 		if err != nil {
+// 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+// 			return
+// 		}
 
-		var req basicReq
-		err = utils.ReadPostBody(w, r, cdc, &req)
-		if err != nil {
-			return
-		}
+// 		var req basicReq
+// 		err = utils.ReadPostBody(w, r, cdc, &req)
+// 		if err != nil {
+// 			return
+// 		}
 
-		baseReq := req.BaseTx.Sanitize()
-		if !baseReq.ValidateBasic(w) {
-			return
-		}
+// 		baseReq := req.BaseTx.Sanitize()
+// 		if !baseReq.ValidateBasic(w) {
+// 			return
+// 		}
 
-		msg := service.NewMsgSvcWithdrawFees(providerAddr)
-		err = msg.ValidateBasic()
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
+// 		msg := service.NewMsgSvcWithdrawFees(providerAddr)
+// 		err = msg.ValidateBasic()
+// 		if err != nil {
+// 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+// 			return
+// 		}
 
-		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
+// 		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
 
-		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
-	}
-}
+// 		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
+// 	}
+// }
