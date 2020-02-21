@@ -47,10 +47,10 @@ var (
 	NewMsgUpdateServiceBinding = types.NewMsgUpdateServiceBinding
 	NewMsgSetWithdrawAddress   = types.NewMsgSetWithdrawAddress
 	NewMsgDisableService       = types.NewMsgDisableService
-	NewMsgEnableService        = types.NewMsgRequestService
-	NewMsgRespondService       = types.NewMsgEnableService
+	NewMsgEnableService        = types.NewMsgEnableService
 	NewMsgRefundServiceDeposit = types.NewMsgRefundServiceDeposit
-	NewMsgRequestService       = types.NewMsgRespondService
+	NewMsgRequestService       = types.NewMsgRequestService
+	NewMsgRespondService       = types.NewMsgRespondService
 	NewMsgPauseRequestContext  = types.NewMsgPauseRequestContext
 	NewMsgStartRequestContext  = types.NewMsgStartRequestContext
 	NewMsgKillRequestContext   = types.NewMsgKillRequestContext
