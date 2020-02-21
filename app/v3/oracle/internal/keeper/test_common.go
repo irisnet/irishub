@@ -172,6 +172,7 @@ func (m MockServiceKeeper) UpdateRequestContext(ctx sdk.Context,
 
 func (m MockServiceKeeper) StartRequestContext(ctx sdk.Context, requestContextID []byte) sdk.Error {
 	reqCtx := m.cxtMap[string(requestContextID)]
+	callback := m.callbackMap[reqCtx.ModuleName]
 	for i := int64(reqCtx.BatchCounter + 1); i <= reqCtx.RepeatedTotal; i++ {
 		reqCtx.BatchCounter = uint64(i)
 		reqCtx.State = exported.RUNNING
@@ -181,7 +182,6 @@ func (m MockServiceKeeper) StartRequestContext(ctx sdk.Context, requestContextID
 			Height:  ctx.BlockHeight() + 1,
 			Time:    ctx.BlockTime().Add(2 * time.Minute),
 		})
-		callback := m.callbackMap[reqCtx.ModuleName]
 		callback(ctx, requestContextID, responses)
 	}
 	return nil

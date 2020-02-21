@@ -19,6 +19,10 @@ func GetFeedKey(feedName string) []byte {
 	return append(append(PrefixFeedKey, separator...), []byte(feedName)...)
 }
 
+func GetFeedPrefixKey() []byte {
+	return append(PrefixFeedKey, separator...)
+}
+
 func GetReqCtxIDKey(requestContextID []byte) []byte {
 	return append(append(PrefixReqCtxIdKey, separator...), requestContextID...)
 }

@@ -2,10 +2,11 @@ package keeper
 
 import (
 	"github.com/irisnet/irishub/app/v3/oracle/internal/types"
-	"github.com/irisnet/irishub/app/v3/service/exported"
+	service "github.com/irisnet/irishub/app/v3/service/exported"
 	sdk "github.com/irisnet/irishub/types"
 )
 
+//GetFeed return the feed by feedName
 func (k Keeper) GetFeed(ctx sdk.Context, feedName string) (feed types.Feed, found bool) {
 	store := ctx.KVStore(k.storeKey)
 	bz := store.Get(GetFeedKey(feedName))
@@ -16,6 +17,7 @@ func (k Keeper) GetFeed(ctx sdk.Context, feedName string) (feed types.Feed, foun
 	return feed, true
 }
 
+//GetFeedByReqCtxID return feed by requestContextID
 func (k Keeper) GetFeedByReqCtxID(ctx sdk.Context, requestContextID []byte) (feed types.Feed, found bool) {
 	store := ctx.KVStore(k.storeKey)
 	bz := store.Get(GetReqCtxIDKey(requestContextID))
@@ -24,6 +26,58 @@ func (k Keeper) GetFeedByReqCtxID(ctx sdk.Context, requestContextID []byte) (fee
 	return k.GetFeed(ctx, feedName)
 }
 
+//IteratorFeeds will foreach all feeds
+func (k Keeper) IteratorFeeds(ctx sdk.Context, fn func(feed types.Feed)) {
+	store := ctx.KVStore(k.storeKey)
+	iterator := sdk.KVStoreReversePrefixIterator(store, GetFeedPrefixKey())
+	defer iterator.Close()
+	for ; iterator.Valid(); iterator.Next() {
+		var res types.Feed
+		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &res)
+		fn(res)
+	}
+}
+
+//IteratorFeedsByState will foreach all feeds by state
+func (k Keeper) IteratorFeedsByState(ctx sdk.Context, state service.RequestContextState, fn func(feed types.Feed)) {
+	store := ctx.KVStore(k.storeKey)
+	iterator := sdk.KVStorePrefixIterator(store, GetFeedStatePrefixKey(state))
+	defer iterator.Close()
+	for ; iterator.Valid(); iterator.Next() {
+		var feedName string
+		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &feedName)
+		if feed, found := k.GetFeed(ctx, feedName); found {
+			fn(feed)
+		}
+	}
+	return
+}
+
+//SetFeed will save a feed to store
+func (k Keeper) SetFeed(ctx sdk.Context, feed types.Feed) {
+	store := ctx.KVStore(k.storeKey)
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(feed)
+	store.Set(GetFeedKey(feed.FeedName), bz)
+
+	bz = k.cdc.MustMarshalBinaryLengthPrefixed(feed.FeedName)
+	store.Set(GetReqCtxIDKey(feed.RequestContextID), bz)
+}
+
+//SetFeedValue will save a feed result to store
+func (k Keeper) SetFeedValue(ctx sdk.Context,
+	feedName string,
+	batchCounter uint64,
+	latestHistory uint64,
+	value types.FeedValue) {
+	store := ctx.KVStore(k.storeKey)
+	counter := k.getFeedValuesCnt(ctx, feedName)
+	delta := counter - int(latestHistory)
+	k.deleteOldestFeedValue(ctx, feedName, delta+1)
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(value)
+	store.Set(GetFeedValueKey(feedName, batchCounter), bz)
+}
+
+//GetFeedValues return all feed values by feedName
 func (k Keeper) GetFeedValues(ctx sdk.Context, feedName string) (result types.FeedValues) {
 	store := ctx.KVStore(k.storeKey)
 	iterator := sdk.KVStoreReversePrefixIterator(store, GetFeedValuePrefixKey(feedName))
@@ -36,60 +90,28 @@ func (k Keeper) GetFeedValues(ctx sdk.Context, feedName string) (result types.Fe
 	return
 }
 
-func (k Keeper) GetFeedByState(ctx sdk.Context, state exported.RequestContextState) (feeds []types.Feed) {
+//Enqueue will put feedName to a 'state' queue
+func (k Keeper) Enqueue(ctx sdk.Context, feedName string, state service.RequestContextState) {
 	store := ctx.KVStore(k.storeKey)
-	iterator := sdk.KVStorePrefixIterator(store, GetFeedStatePrefixKey(state))
-	defer iterator.Close()
-	for ; iterator.Valid(); iterator.Next() {
-		var feedName string
-		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &feedName)
-		if feed, found := k.GetFeed(ctx, feedName); found {
-			feeds = append(feeds, feed)
-		}
-	}
-	return
-}
-
-func (k Keeper) setFeed(ctx sdk.Context, feed types.Feed) {
-	store := ctx.KVStore(k.storeKey)
-	bz := k.cdc.MustMarshalBinaryLengthPrefixed(feed)
-	store.Set(GetFeedKey(feed.FeedName), bz)
-
-	bz = k.cdc.MustMarshalBinaryLengthPrefixed(feed.FeedName)
-	store.Set(GetReqCtxIDKey(feed.RequestContextID), bz)
-}
-
-func (k Keeper) insertToRunningQueue(ctx sdk.Context, feedName string) {
-	store := ctx.KVStore(k.storeKey)
-	store.Delete(GetFeedStateKey(feedName, exported.PAUSED))
-
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(feedName)
-	store.Set(GetFeedStateKey(feedName, exported.RUNNING), bz)
+	store.Set(GetFeedStateKey(feedName, state), bz)
 }
 
-func (k Keeper) insertToPauseQueue(ctx sdk.Context, feedName string) {
+//Dequeue will remove from the 'state' queue
+func (k Keeper) Dequeue(ctx sdk.Context, feedName string, state service.RequestContextState) {
 	store := ctx.KVStore(k.storeKey)
-	store.Delete(GetFeedStateKey(feedName, exported.RUNNING))
-
-	bz := k.cdc.MustMarshalBinaryLengthPrefixed(feedName)
-	store.Set(GetFeedStateKey(feedName, exported.PAUSED), bz)
+	store.Delete(GetFeedStateKey(feedName, state))
 }
 
-func (k Keeper) setFeedValue(ctx sdk.Context,
+//dequeueAndEnqueue will move feedName  from the 'dequeueState' queue to a 'enqueueState' queue
+func (k Keeper) dequeueAndEnqueue(ctx sdk.Context,
 	feedName string,
-	batchCounter uint64,
-	latestHistory uint64,
-	data string) {
+	dequeueState, enqueueState service.RequestContextState) {
 	store := ctx.KVStore(k.storeKey)
-	result := types.FeedValue{
-		Data:      data,
-		Timestamp: ctx.BlockTime(),
-	}
-	counter := k.getFeedValuesCnt(ctx, feedName)
-	delta := counter - int(latestHistory)
-	k.deleteOldestFeedValue(ctx, feedName, delta+1)
-	bz := k.cdc.MustMarshalBinaryLengthPrefixed(result)
-	store.Set(GetFeedValueKey(feedName, batchCounter), bz)
+	store.Delete(GetFeedStateKey(feedName, dequeueState))
+
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(feedName)
+	store.Set(GetFeedStateKey(feedName, enqueueState), bz)
 }
 
 func (k Keeper) getFeedValuesCnt(ctx sdk.Context, feedName string) (i int) {

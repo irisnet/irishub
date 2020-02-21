@@ -61,7 +61,7 @@ func (k Keeper) CreateFeed(ctx sdk.Context, msg types.MsgCreateFeed) sdk.Error {
 		return err
 	}
 
-	k.setFeed(ctx, types.Feed{
+	k.SetFeed(ctx, types.Feed{
 		FeedName:         msg.FeedName,
 		AggregateFunc:    msg.AggregateFunc,
 		ValueJsonPath:    msg.ValueJsonPath,
@@ -70,7 +70,7 @@ func (k Keeper) CreateFeed(ctx sdk.Context, msg types.MsgCreateFeed) sdk.Error {
 		Description:      msg.Description,
 		Creator:          msg.Creator,
 	})
-	k.insertToPauseQueue(ctx, msg.FeedName)
+	k.Enqueue(ctx, msg.FeedName, service.PAUSED)
 	return nil
 }
 
@@ -99,7 +99,7 @@ func (k Keeper) StartFeed(ctx sdk.Context, msg types.MsgStartFeed) sdk.Error {
 		return err
 	}
 
-	k.insertToRunningQueue(ctx, msg.FeedName)
+	k.dequeueAndEnqueue(ctx, msg.FeedName, service.PAUSED, service.RUNNING)
 	return nil
 }
 
@@ -128,7 +128,7 @@ func (k Keeper) PauseFeed(ctx sdk.Context, msg types.MsgPauseFeed) sdk.Error {
 		return err
 	}
 
-	k.insertToPauseQueue(ctx, msg.FeedName)
+	k.dequeueAndEnqueue(ctx, msg.FeedName, service.RUNNING, service.PAUSED)
 	return nil
 }
 
@@ -159,12 +159,11 @@ func (k Keeper) EditFeed(ctx sdk.Context, msg types.MsgEditFeed) sdk.Error {
 		feed.LatestHistory = msg.LatestHistory
 	}
 
-	desc := strings.TrimSpace(msg.Description)
-	if len(desc) > 0 {
-		feed.Description = desc
+	if types.IsModified(msg.Description) {
+		feed.Description = strings.TrimSpace(msg.Description)
 	}
 
-	k.setFeed(ctx, feed)
+	k.SetFeed(ctx, feed)
 	return nil
 }
 
@@ -195,6 +194,13 @@ func (k Keeper) HandlerResponse(ctx sdk.Context, requestContextID []byte, respon
 		result := gjson.Get(jsonStr, feed.ValueJsonPath)
 		data = append(data, result)
 	}
-	result := aggregate(data)
-	k.setFeedValue(ctx, feed.FeedName, reqCtx.BatchCounter, feed.LatestHistory, result)
+	value := types.FeedValue{
+		Data:      aggregate(data),
+		Timestamp: ctx.BlockTime(),
+	}
+	k.SetFeedValue(ctx, feed.FeedName, reqCtx.BatchCounter, feed.LatestHistory, value)
+}
+
+func (k Keeper) GetRequestContext(ctx sdk.Context, requestContextID []byte) (service.RequestContext, bool) {
+	return k.sk.GetRequestContext(ctx, requestContextID)
 }
