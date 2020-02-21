@@ -5,6 +5,8 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/irisnet/irishub/app/v3/oracle"
+
 	abci "github.com/tendermint/tendermint/abci/types"
 	cfg "github.com/tendermint/tendermint/config"
 	"github.com/tendermint/tendermint/libs/log"
@@ -51,6 +53,7 @@ type ProtocolV3 struct {
 	protocolKeeper sdk.ProtocolKeeper
 	govKeeper      gov.Keeper
 	paramsKeeper   params.Keeper
+	oracleKeeper   oracle.Keeper
 	serviceKeeper  service.Keeper
 	guardianKeeper guardian.Keeper
 	upgradeKeeper  upgrade.Keeper
@@ -133,6 +136,7 @@ func MakeCodec() *codec.Codec {
 	slashing.RegisterCodec(cdc)
 	gov.RegisterCodec(cdc)
 	upgrade.RegisterCodec(cdc)
+	oracle.RegisterCodec(cdc)
 	service.RegisterCodec(cdc)
 	guardian.RegisterCodec(cdc)
 	auth.RegisterCodec(cdc)
@@ -258,6 +262,14 @@ func (p *ProtocolV3) configKeepers() {
 		service.PrometheusMetrics(p.config),
 	)
 
+	p.oracleKeeper = oracle.NewKeeper(
+		p.cdc,
+		protocol.KeyOracle,
+		oracle.DefaultCodespace,
+		p.guardianKeeper,
+		p.serviceKeeper,
+	)
+
 	// register the staking hooks
 	// NOTE: StakeKeeper above are passed by reference,
 	// so that it can be modified like below:
@@ -296,6 +308,7 @@ func (p *ProtocolV3) configRouters() {
 		AddRoute(protocol.DistrRoute, distr.NewHandler(p.distrKeeper)).
 		AddRoute(protocol.GovRoute, gov.NewHandler(p.govKeeper)).
 		AddRoute(protocol.ServiceRoute, service.NewHandler(p.serviceKeeper)).
+		AddRoute(protocol.OracleRoute, oracle.NewHandler(p.oracleKeeper)).
 		AddRoute(protocol.GuardianRoute, guardian.NewHandler(p.guardianKeeper)).
 		AddRoute(protocol.AssetRoute, asset.NewHandler(p.assetKeeper)).
 		AddRoute(protocol.RandRoute, rand.NewHandler(p.randKeeper)).
@@ -309,6 +322,7 @@ func (p *ProtocolV3) configRouters() {
 		AddRoute(protocol.DistrRoute, distr.NewQuerier(p.distrKeeper)).
 		AddRoute(protocol.GuardianRoute, guardian.NewQuerier(p.guardianKeeper)).
 		AddRoute(protocol.ServiceRoute, service.NewQuerier(p.serviceKeeper)).
+		AddRoute(protocol.OracleRoute, oracle.NewQuerier(p.oracleKeeper)).
 		AddRoute(protocol.ParamsRoute, params.NewQuerier(p.paramsKeeper)).
 		AddRoute(protocol.AssetRoute, asset.NewQuerier(p.assetKeeper)).
 		AddRoute(protocol.RandRoute, rand.NewQuerier(p.randKeeper)).
@@ -341,6 +355,7 @@ func (p *ProtocolV3) GetKVStoreKeyList() []*sdk.KVStoreKey {
 		protocol.KeyParams,
 		protocol.KeyUpgrade,
 		protocol.KeyService,
+		protocol.KeyOracle,
 		protocol.KeyGuardian,
 		protocol.KeyAsset,
 		protocol.KeyRand,
@@ -441,6 +456,7 @@ func (p *ProtocolV3) InitChainer(ctx sdk.Context, DeliverTx sdk.DeliverTx, req a
 	rand.InitGenesis(ctx, p.randKeeper, genesisState.RandData)
 	coinswap.InitGenesis(ctx, p.coinswapKeeper, genesisState.SwapData)
 	htlc.InitGenesis(ctx, p.htlcKeeper, genesisState.HtlcData)
+	oracle.InitGenesis(ctx, p.oracleKeeper, genesisState.OracleData)
 
 	// load the address to pubkey map
 	err = IrisValidateGenesisState(genesisState)

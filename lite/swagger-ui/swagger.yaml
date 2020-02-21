@@ -33,6 +33,8 @@ tags:
     description: Rand module APIs
   - name: Service
     description: Service module APIs
+  - name: Oracle
+    description: Oracle module APIs
   - name: CoinSwap
     description: CoinSwap module APIs
   - name: HTLC
@@ -2339,6 +2341,218 @@ paths:
           description: Internal Server Error
       requestBody:
         $ref: '#/components/requestBodies/Unjailbody'
+
+  /oracle/feeds:
+    post:
+      summary: Define a new feed,the feed will be in "paused" state
+      description: Send transaction to define a feed
+      tags:
+        - Oracle
+      responses:
+        '200':
+          description: Unsigned tx was succesfully generated
+        '400':
+          description: Invalid service define body
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_tx:
+                  $ref: '#/components/schemas/BaseTx'
+                feed_name:
+                  type: string
+                aggregate_func:
+                  type: string
+                value_json_path:
+                  type: string
+                latest_history:
+                  type: integer
+                description:
+                  type: string
+                creator:
+                  $ref: '#/components/schemas/Address'
+                service_name:
+                  type: string
+                providers:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Address'
+                input:
+                  type: integer
+                timeout:
+                  type: integer
+                service_fee_cap:
+                  type: string
+                repeated_frequency:
+                  type: integer
+                repeated_total:
+                  type: integer
+                response_threshold:
+                  type: integer
+        required: true
+    get:
+      summary: Query some feeds  by state
+      tags:
+        - Oracle
+      parameters:
+        - in: query
+          name: state
+          description: 'the state of feed,such as running|paused'
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FeedContext'
+        '500':
+          description: Internal Server Error
+  /oracle/feeds/{feed-name}/start:
+    post:
+      summary: Start a Feed in "paused" state
+      description: Send transaction to start a feed
+      tags:
+        - Oracle
+      responses:
+        '200':
+          description: Unsigned tx was succesfully generated
+        '400':
+          description: Invalid service define body
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_tx:
+                  $ref: '#/components/schemas/BaseTx'
+                creator:
+                  $ref: '#/components/schemas/Address'
+        required: true
+  /oracle/feeds/{feed-name}/pause:
+    post:
+      summary: Pause a Feed in "running" state
+      description: Send transaction to start a feed
+      tags:
+        - Oracle
+      responses:
+        '200':
+          description: Unsigned tx was succesfully generated
+        '400':
+          description: Invalid service define body
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_tx:
+                  $ref: '#/components/schemas/BaseTx'
+                creator:
+                  $ref: '#/components/schemas/Address'
+        required: true
+  /oracle/feeds/{feed-name}:
+    put:
+      summary: Modify Feed information and update service invocation parameters by feed creator
+      description: Send transaction to define a feed
+      tags:
+        - Oracle
+      responses:
+        '200':
+          description: Unsigned tx was succesfully generated
+        '400':
+          description: Invalid service define body
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_tx:
+                  $ref: '#/components/schemas/BaseTx'
+                feed_name:
+                  type: string
+                latest_history:
+                  type: integer
+                description:
+                  type: string
+                creator:
+                  $ref: '#/components/schemas/Address'
+                providers:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Address'
+                timeout:
+                  type: integer
+                service_fee_cap:
+                  type: string
+                repeated_frequency:
+                  type: integer
+                repeated_total:
+                  type: integer
+                response_threshold:
+                  type: integer
+        required: true
+    get:
+      summary: Query a feed definition by name
+      tags:
+        - Oracle
+      parameters:
+        - in: path
+          name: feed-name
+          description: the name of the feed
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeedContext'
+        '400':
+          description: Invalid token id
+        '500':
+          description: Internal Server Error
+  /oracle/feeds/{feed-name}/values :
+    get:
+      summary: Query the value of a feed  by name
+      tags:
+        - Oracle
+      parameters:
+        - in: path
+          name: feed-name
+          description: 'the unique identifier of the Feed'
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FeedValue'
+        '500':
+          description: Internal Server Error
   '/asset/tokens':
     post:
       summary: Issue a token
@@ -3632,3 +3846,67 @@ components:
         threshold:
           type: string
           example: '0.8'
+    Feed:
+      type: object
+      properties:
+        feed_name:
+          type: string
+          example: feed-eth-price
+        description:
+          type: string
+          example: 'get the price of eth'
+        aggregate_func:
+          type: string
+          example: 'min'
+        value_json_path:
+          type: string
+          example: 'data.eth.price'
+        latest_history:
+          type: string
+          example: 10
+        request_context_id:
+          type: string
+          example: 'the request id of calling a service'
+        creator:
+          $ref: '#/components/schemas/Address'
+          example: 'faa1fpdpm5p5styjmqptlc522y6qgxw807uk9p9hce'
+    FeedContext:
+      type: object
+      properties:
+        feed:
+          $ref: '#/components/schemas/Feed'
+        service_name:
+          type: string
+          example: 'the name of service'
+        providers:
+          $ref: '#/components/schemas/Address'
+          example: ['faa1fpdpm5p5styjmqptlc522y6qgxw807uk9p9hce']
+        input:
+          type: string
+          example: 'the data of calling a service'
+        timeout:
+          type: integer
+          example: 10
+        service_fee_cap:
+          type: array
+          items:
+            $ref: '#/components/schemas/Coin'
+        repeated_frequency:
+          type: integer
+          example: 5
+        repeated_total:
+          type: integer
+          example: -1
+        response_threshold:
+          type: integer
+          example: 1
+        state:
+          type: byte
+          example: 0
+    FeedValue:
+      type: object
+      properties:
+        data:
+          type: string
+        timestamp:
+          type: string

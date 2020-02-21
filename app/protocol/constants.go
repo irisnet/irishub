@@ -24,6 +24,7 @@ const (
 	RandStore            = "rand"
 	SwapStore            = "coinswap"
 	HtlcStore            = "htlc"
+	OracleStore          = "oracle"
 
 	// all route for query and handler
 	BankRoute     = "bank"
@@ -40,6 +41,7 @@ const (
 	RandRoute     = RandStore
 	SwapRoute     = SwapStore
 	HtlcRoute     = HtlcStore
+	OracleRoute   = OracleStore
 )
 
 var (
@@ -56,6 +58,7 @@ var (
 	KeyParams   = sdk.NewKVStoreKey(ParamsStore)
 	TkeyParams  = sdk.NewTransientStoreKey(ParamsTransientStore)
 	KeyService  = sdk.NewKVStoreKey(ServiceStore)
+	KeyOracle   = sdk.NewKVStoreKey(OracleStore)
 	KeyGuardian = sdk.NewKVStoreKey(GuardianStore)
 	KeyUpgrade  = sdk.NewKVStoreKey(UpgradeStore)
 	KeyAsset    = sdk.NewKVStoreKey(AssetStore)
