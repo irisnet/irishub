@@ -96,5 +96,5 @@ func ErrInvalidDescription(codespace sdk.CodespaceType, descLen int) sdk.Error {
 }
 
 func ErrInvalidTimeout(codespace sdk.CodespaceType, timeout int64, frequency uint64) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidDescription, "timeout[%d] should be no more than frequency[%d]", timeout, frequency)
+	return sdk.NewError(codespace, CodeInvalidTimeout, "timeout[%d] should be no more than frequency[%d]", timeout, frequency)
 }

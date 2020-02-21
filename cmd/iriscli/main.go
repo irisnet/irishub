@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	oraclecmd "github.com/irisnet/irishub/client/oracle/cli"
 	"os"
 	"path"
 
@@ -231,6 +232,30 @@ func main() {
 
 	rootCmd.AddCommand(
 		serviceCmd,
+	)
+
+	//Add oracle commands
+	oracleCmd := &cobra.Command{
+		Use:   "oracle",
+		Short: "Oracle subcommands",
+	}
+	oracleCmd.AddCommand(
+		client.PostCommands(
+			oraclecmd.GetCmdCreateFeed(cdc),
+			oraclecmd.GetCmdStartFeed(cdc),
+			oraclecmd.GetCmdPauseFeed(cdc),
+			oraclecmd.GetCmdEditFeed(cdc),
+		)...,
+	)
+	oracleCmd.AddCommand(
+		client.GetCommands(
+			oraclecmd.GetCmdQueryFeed(cdc),
+			oraclecmd.GetCmdQueryFeeds(cdc),
+			oraclecmd.GetCmdQueryFeedValue(cdc),
+		)...,
+	)
+	rootCmd.AddCommand(
+		oracleCmd,
 	)
 
 	//add guardian command

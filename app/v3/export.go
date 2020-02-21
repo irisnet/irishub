@@ -3,6 +3,8 @@ package v3
 import (
 	"encoding/json"
 
+	"github.com/irisnet/irishub/app/v3/oracle"
+
 	tmtypes "github.com/tendermint/tendermint/types"
 
 	"github.com/irisnet/irishub/app/protocol"
@@ -74,6 +76,7 @@ func (p *ProtocolV3) ExportAppStateAndValidators(ctx sdk.Context, forZeroHeight 
 		rand.ExportGenesis(ctx, p.randKeeper),
 		coinswap.ExportGenesis(ctx, p.coinswapKeeper),
 		htlcGenesis,
+		oracle.ExportGenesis(ctx, p.oracleKeeper),
 	)
 	appState, err = codec.MarshalJSONIndent(p.cdc, genState)
 	if err != nil {

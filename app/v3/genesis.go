@@ -10,6 +10,8 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/irisnet/irishub/app/v3/oracle"
+
 	tmtypes "github.com/tendermint/tendermint/types"
 
 	"github.com/irisnet/irishub/app/v1/auth"
@@ -41,6 +43,7 @@ type GenesisState struct {
 	UpgradeData  upgrade.GenesisState  `json:"upgrade"`
 	SlashingData slashing.GenesisState `json:"slashing"`
 	ServiceData  service.GenesisState  `json:"service"`
+	OracleData   oracle.GenesisState   `json:"oracle"`
 	GuardianData guardian.GenesisState `json:"guardian"`
 	AssetData    asset.GenesisState    `json:"asset"`
 	RandData     rand.GenesisState     `json:"rand"`
@@ -367,6 +370,7 @@ type GenesisFileState struct {
 	UpgradeData  upgrade.GenesisState  `json:"upgrade"`
 	SlashingData slashing.GenesisState `json:"slashing"`
 	ServiceData  service.GenesisState  `json:"service"`
+	OracleData   oracle.GenesisState   `json:"oracle"`
 	GuardianData guardian.GenesisState `json:"guardian"`
 	AssetData    asset.GenesisState    `json:"asset"`
 	RandData     rand.GenesisState     `json:"rand"`
@@ -398,7 +402,7 @@ func NewGenesisFileAccount(acc *auth.BaseAccount) GenesisFileAccount {
 func NewGenesisFileState(accounts []GenesisFileAccount, authData auth.GenesisState, stakeData stake.GenesisState, mintData mint.GenesisState,
 	distrData distr.GenesisState, govData gov.GenesisState, upgradeData upgrade.GenesisState, serviceData service.GenesisState,
 	guardianData guardian.GenesisState, slashingData slashing.GenesisState, assetData asset.GenesisState, randData rand.GenesisState,
-	swapData coinswap.GenesisState, htlcData htlc.GenesisState) GenesisFileState {
+	swapData coinswap.GenesisState, htlcData htlc.GenesisState, oracleData oracle.GenesisState) GenesisFileState {
 
 	return GenesisFileState{
 		Accounts:     accounts,
@@ -409,6 +413,7 @@ func NewGenesisFileState(accounts []GenesisFileAccount, authData auth.GenesisSta
 		GovData:      govData,
 		UpgradeData:  upgradeData,
 		ServiceData:  serviceData,
+		OracleData:   oracleData,
 		GuardianData: guardianData,
 		SlashingData: slashingData,
 		AssetData:    assetData,
