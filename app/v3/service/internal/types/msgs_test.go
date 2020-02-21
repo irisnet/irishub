@@ -1,7 +1,6 @@
 package types
 
 import (
-	"encoding/hex"
 	"fmt"
 	"strings"
 	"testing"
@@ -42,7 +41,7 @@ var (
 	testTaxWithdrawalAmt = sdk.NewCoins(testCoin1)
 
 	testRequestContextID = sdk.SHA256([]byte("test-request-context-id"))
-	testRequestID        = hex.EncodeToString(testRequestContextID) + "-1-1"
+	testRequestID        = RequestIDToString(GenerateRequestID(testRequestContextID, 1, 1))
 )
 
 // TestMsgDefineServiceRoute tests Route for MsgDefineService
@@ -793,7 +792,7 @@ func TestMsgRespondServiceGetSignBytes(t *testing.T) {
 	msg := NewMsgRespondService(testRequestID, testProvider, testOutput, "")
 	res := msg.GetSignBytes()
 
-	expected := `{"type":"irishub/service/MsgRespondService","value":{"error":"","output":"{\"last\":\"100\"}","provider":"faa1w3jhxapdwpex7anfv3jhynrxe9z","request_id":"3db0fa99dcb058bc86041badbd614d6839f8fa20e17cf8ad3ba14c3f1bf613bd-1-1"}}`
+	expected := `{"type":"irishub/service/MsgRespondService","value":{"error":"","output":"{\"last\":\"100\"}","provider":"faa1w3jhxapdwpex7anfv3jhynrxe9z","request_id":"3db0fa99dcb058bc86041badbd614d6839f8fa20e17cf8ad3ba14c3f1bf613bd00000000000000010001"}}`
 	require.Equal(t, expected, string(res))
 }
 
