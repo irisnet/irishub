@@ -90,19 +90,28 @@ func (k Keeper) GetFeedValues(ctx sdk.Context, feedName string) (result types.Fe
 	return
 }
 
-//Enqueue will put feedName to a 'state' queue and remove from the other queue
+//Enqueue will put feedName to a 'state' queue
 func (k Keeper) Enqueue(ctx sdk.Context, feedName string, state service.RequestContextState) {
-	var dequeueState service.RequestContextState
-	if state == service.RUNNING {
-		dequeueState = service.PAUSED
-	} else {
-		dequeueState = service.RUNNING
-	}
+	store := ctx.KVStore(k.storeKey)
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(feedName)
+	store.Set(GetFeedStateKey(feedName, state), bz)
+}
+
+//Dequeue will remove from the 'state' queue
+func (k Keeper) Dequeue(ctx sdk.Context, feedName string, state service.RequestContextState) {
+	store := ctx.KVStore(k.storeKey)
+	store.Delete(GetFeedStateKey(feedName, state))
+}
+
+//dequeueAndEnqueue will move feedName  from the 'dequeueState' queue to a 'enqueueState' queue
+func (k Keeper) dequeueAndEnqueue(ctx sdk.Context,
+	feedName string,
+	dequeueState, enqueueState service.RequestContextState) {
 	store := ctx.KVStore(k.storeKey)
 	store.Delete(GetFeedStateKey(feedName, dequeueState))
 
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(feedName)
-	store.Set(GetFeedStateKey(feedName, state), bz)
+	store.Set(GetFeedStateKey(feedName, enqueueState), bz)
 }
 
 func (k Keeper) getFeedValuesCnt(ctx sdk.Context, feedName string) (i int) {

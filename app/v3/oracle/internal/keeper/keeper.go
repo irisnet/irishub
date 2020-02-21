@@ -99,7 +99,7 @@ func (k Keeper) StartFeed(ctx sdk.Context, msg types.MsgStartFeed) sdk.Error {
 		return err
 	}
 
-	k.Enqueue(ctx, msg.FeedName, service.RUNNING)
+	k.dequeueAndEnqueue(ctx, msg.FeedName, service.PAUSED, service.RUNNING)
 	return nil
 }
 
@@ -128,7 +128,7 @@ func (k Keeper) PauseFeed(ctx sdk.Context, msg types.MsgPauseFeed) sdk.Error {
 		return err
 	}
 
-	k.Enqueue(ctx, msg.FeedName, service.PAUSED)
+	k.dequeueAndEnqueue(ctx, msg.FeedName, service.RUNNING, service.PAUSED)
 	return nil
 }
 

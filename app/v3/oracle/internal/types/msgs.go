@@ -11,9 +11,11 @@ const (
 	ModuleName = "oracle"
 	MsgRoute   = ModuleName // route for oracle msg
 
-	MaxLatestHistory  = 100
-	MaxNameLen        = 70 // max length of the feed/service name
-	MaxDescriptionLen = 200
+	MaxLatestHistory    = 100
+	MaxNameLen          = 70
+	MaxAggregateFuncLen = 10
+	MaxValueJsonPath    = 70
+	MaxDescriptionLen   = 200
 
 	TypeMsgCreateFeed = "create_feed" // type for MsgCreateFeed
 	TypeMsgStartFeed  = "start_feed"  // type for MsgStartFeed
@@ -295,7 +297,7 @@ func ValidateDescription(desc string) sdk.Error {
 
 func ValidateAggregateFunc(aggregateFunc string) sdk.Error {
 	aggregateFunc = strings.TrimSpace(aggregateFunc)
-	if len(aggregateFunc) == 0 || len(aggregateFunc) > MaxNameLen {
+	if len(aggregateFunc) == 0 || len(aggregateFunc) > MaxAggregateFuncLen {
 		return ErrInvalidAggregateFunc(DefaultCodespace)
 	}
 	if _, err := GetAggregateFunc(aggregateFunc); err != nil {
@@ -306,7 +308,7 @@ func ValidateAggregateFunc(aggregateFunc string) sdk.Error {
 
 func ValidateValueJsonPath(valueJsonPath string) sdk.Error {
 	valueJsonPath = strings.TrimSpace(valueJsonPath)
-	if len(valueJsonPath) == 0 || len(valueJsonPath) > MaxNameLen {
+	if len(valueJsonPath) == 0 || len(valueJsonPath) > MaxValueJsonPath {
 		return ErrInvalidValueJsonPath(DefaultCodespace)
 	}
 	return nil
@@ -353,5 +355,5 @@ func validateTimeout(timeout int64, frequency uint64) sdk.Error {
 
 func IsModified(target string) bool {
 	target = strings.TrimSpace(target)
-	return !(target == DoNotModify)
+	return target != DoNotModify
 }

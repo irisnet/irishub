@@ -1,8 +1,9 @@
 package keeper
 
 import (
-	abci "github.com/tendermint/tendermint/abci/types"
 	"strings"
+
+	abci "github.com/tendermint/tendermint/abci/types"
 
 	"github.com/irisnet/irishub/app/v3/oracle/internal/types"
 	"github.com/irisnet/irishub/codec"

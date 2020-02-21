@@ -66,10 +66,10 @@ func ValidateGenesis(data GenesisState) error {
 	for _, entry := range data.Entries {
 		feed := entry.Feed
 		if err := types.ValidateFeedName(feed.FeedName); err != nil {
-			panic(err)
+			return err
 		}
 		if err := types.ValidateDescription(feed.Description); err != nil {
-			panic(err)
+			return err
 		}
 
 		if err := types.ValidateAggregateFunc(feed.AggregateFunc); err != nil {

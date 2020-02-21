@@ -1,10 +1,11 @@
 package types
 
 import (
+	"strings"
+
 	service "github.com/irisnet/irishub/app/v3/service/exported"
 	"github.com/irisnet/irishub/modules/guardian"
 	sdk "github.com/irisnet/irishub/types"
-	"strings"
 )
 
 //expected Service keeper
