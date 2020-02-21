@@ -23,7 +23,7 @@ var (
 
 const (
 	// tx counter key in the context
-	contextKeyIntraTxCounter = "intra_tx_counter"
+	contextKeyIntraTxCounter = "service_intra_tx_counter"
 )
 
 // GetServiceDefinitionKey returns the key for the service definition with the specified name
