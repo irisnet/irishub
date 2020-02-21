@@ -32,9 +32,26 @@ func (k Keeper) CreateRequestContext(
 	repeatedFrequency uint64,
 	repeatedTotal int64,
 	state types.RequestContextState,
-	respThreshold uint16,
-	respHandler string,
+	responseThreshold uint16,
+	moduleName string,
 ) ([]byte, sdk.Error) {
+	if len(moduleName) != 0 {
+		if _, err := k.GetResponseCallback(moduleName); err != nil {
+			return nil, err
+		}
+
+		if err := types.ValidateRequest(
+			serviceName, serviceFeeCap, providers, input,
+			timeout, repeated, repeatedFrequency, repeatedTotal,
+		); err != nil {
+			return nil, err
+		}
+
+		if responseThreshold < 1 || int(responseThreshold) > len(providers) {
+			return nil, types.ErrInvalidRequest(k.codespace, fmt.Sprintf("response threshold must be between [1,%d]", len(providers)))
+		}
+	}
+
 	svcDef, found := k.GetServiceDefinition(ctx, serviceName)
 	if !found {
 		return nil, types.ErrUnknownServiceDefinition(k.codespace, serviceName)
@@ -46,7 +63,7 @@ func (k Keeper) CreateRequestContext(
 
 	params := k.GetParamSet(ctx)
 	if timeout > params.MaxRequestTimeout {
-		return nil, types.ErrInvalidRequest(k.codespace, fmt.Sprintf("timeout must not be greater than %d: %d", params.MaxRequestTimeout, timeout))
+		return nil, types.ErrInvalidRequest(k.codespace, fmt.Sprintf("timeout [%d] must not be greater than the max request timeout [%d]", timeout, params.MaxRequestTimeout))
 	}
 
 	if timeout == 0 {
@@ -66,16 +83,31 @@ func (k Keeper) CreateRequestContext(
 		repeatedTotal = 0
 	}
 
+	profiling := false
+
+	_, found = k.gk.GetProfiler(ctx, consumer)
+	if found {
+		profiling = true
+	}
+
 	batchCounter := uint64(0)
+	batchRequestCount := uint16(0)
+	batchResponseCount := uint16(0)
+	batchState := types.BATCHCOMPLETED
 
 	requestContext := types.NewRequestContext(
 		serviceName, providers, consumer, input, serviceFeeCap,
-		timeout, repeated, repeatedFrequency, repeatedTotal,
-		batchCounter, state, respThreshold, respHandler,
+		profiling, timeout, repeated, repeatedFrequency, repeatedTotal,
+		batchCounter, batchRequestCount, batchResponseCount, batchState,
+		state, responseThreshold, moduleName,
 	)
 
 	requestContextID := types.GenerateRequestContextID(ctx.BlockHeight(), k.GetIntraTxCounter(ctx))
 	k.SetRequestContext(ctx, requestContextID, requestContext)
+
+	if requestContext.State == types.RUNNING {
+		k.AddNewRequestBatch(ctx, requestContextID, ctx.BlockHeight())
+	}
 
 	return requestContextID, nil
 }
@@ -91,27 +123,37 @@ func (k Keeper) UpdateRequestContext(
 ) sdk.Error {
 	requestContext, found := k.GetRequestContext(ctx, requestContextID)
 	if !found {
-		return types.ErrInvalidRequestContextID(k.codespace, "invalid request context ID")
+		return types.ErrUnknownRequestContext(k.codespace, requestContextID)
 	}
 
 	if !requestContext.Repeated {
 		return types.ErrRequestContextNonRepeated(k.codespace)
 	}
 
+	if len(requestContext.ModuleName) != 0 {
+		if err := types.ValidateRequestContextUpdating(serviceFeeCap, repeatedTotal); err != nil {
+			return err
+		}
+	}
+
 	if len(providers) > 0 && requestContext.ResponseThreshold > 0 && len(providers) < int(requestContext.ResponseThreshold) {
-		return types.ErrInvalidProviders(k.codespace, "length of providers must not be less than the response threshold")
+		return types.ErrInvalidProviders(k.codespace, fmt.Sprintf("length [%d] of providers must not be less than the response threshold [%d]", len(providers), requestContext.ResponseThreshold))
 	}
 
 	if repeatedFreq > 0 && repeatedFreq < uint64(requestContext.Timeout) {
-		return types.ErrInvalidRepeatedFreq(k.codespace, "repeated frequency must not be less than the timeout")
+		return types.ErrInvalidRepeatedFreq(k.codespace, fmt.Sprintf("repeated frequency [%d] must not be less than the timeout [%d]", repeatedFreq, requestContext.Timeout))
 	}
 
-	if repeatedTotal >= 1 && repeatedTotal <= int64(requestContext.BatchCounter) {
-		return types.ErrInvalidRepeatedTotal(k.codespace, "updated repeated total must be greater than the current batch counter")
+	if repeatedTotal >= 1 && repeatedTotal < int64(requestContext.BatchCounter) {
+		return types.ErrInvalidRepeatedTotal(k.codespace, fmt.Sprintf("updated repeated total [%d] must not be less than the current batch counter [%d]", repeatedTotal, requestContext.BatchCounter))
 	}
 
 	if len(providers) > 0 {
 		requestContext.Providers = providers
+	}
+
+	if !serviceFeeCap.Empty() {
+		requestContext.ServiceFeeCap = serviceFeeCap
 	}
 
 	if repeatedFreq > 0 {
@@ -134,20 +176,18 @@ func (k Keeper) PauseRequestContext(
 ) sdk.Error {
 	requestContext, found := k.GetRequestContext(ctx, requestContextID)
 	if !found {
-		return types.ErrInvalidRequestContextID(k.codespace, "invalid request context ID")
+		return types.ErrUnknownRequestContext(k.codespace, requestContextID)
 	}
 
 	if !requestContext.Repeated {
 		return types.ErrRequestContextNonRepeated(k.codespace)
 	}
 
-	if requestContext.State != types.RequestContextState(0x00) {
+	if requestContext.State != types.RUNNING {
 		return types.ErrRequestContextNotStarted(k.codespace)
 	}
 
-	requestContext.State = types.RequestContextState(0x01)
-	k.DeleteNewBatchRequest(ctx, requestContextID)
-
+	requestContext.State = types.PAUSED
 	k.SetRequestContext(ctx, requestContextID, requestContext)
 
 	return nil
@@ -160,21 +200,23 @@ func (k Keeper) StartRequestContext(
 ) sdk.Error {
 	requestContext, found := k.GetRequestContext(ctx, requestContextID)
 	if !found {
-		return types.ErrInvalidRequestContextID(k.codespace, "invalid request context ID")
+		return types.ErrUnknownRequestContext(k.codespace, requestContextID)
 	}
 
 	if !requestContext.Repeated {
 		return types.ErrRequestContextNonRepeated(k.codespace)
 	}
 
-	if requestContext.State != types.RequestContextState(0x01) {
+	if requestContext.State != types.PAUSED {
 		return types.ErrRequestContextNotPaused(k.codespace)
 	}
 
-	requestContext.State = types.RequestContextState(0x00)
-	k.AddNewBatchRequest(ctx, requestContextID)
-
+	requestContext.State = types.RUNNING
 	k.SetRequestContext(ctx, requestContextID, requestContext)
+
+	if requestContext.BatchState == types.BATCHCOMPLETED {
+		k.AddNewRequestBatch(ctx, requestContextID, ctx.BlockHeight())
+	}
 
 	return nil
 }
@@ -186,16 +228,14 @@ func (k Keeper) KillRequestContext(
 ) sdk.Error {
 	requestContext, found := k.GetRequestContext(ctx, requestContextID)
 	if !found {
-		return types.ErrInvalidRequestContextID(k.codespace, "invalid request context ID")
+		return types.ErrUnknownRequestContext(k.codespace, requestContextID)
 	}
 
 	if !requestContext.Repeated {
 		return types.ErrRequestContextNonRepeated(k.codespace)
 	}
 
-	requestContext.State = types.RequestContextState(0x01)
-	requestContext.RepeatedTotal = int64(requestContext.BatchCounter)
-
+	requestContext.State = types.COMPLETED
 	k.SetRequestContext(ctx, requestContextID, requestContext)
 
 	return nil
@@ -222,199 +262,365 @@ func (k Keeper) GetRequestContext(ctx sdk.Context, requestContextID []byte) (req
 	return requestContext, true
 }
 
-// AddNewBatchRequest adds a new batch request of the specified request context
-func (k Keeper) AddNewBatchRequest(ctx sdk.Context, requestContextID []byte) {
-	// TODO
-}
-
-// DeleteNewBatchRequest deletes the new batch request of the specified request context
-func (k Keeper) DeleteNewBatchRequest(ctx sdk.Context, requestContextID []byte) {
-	// TODO
-}
-
-// AddRequest
-func (k Keeper) AddRequest(
+// InitiateRequests creates requests for the given providers from the specified request context
+// Note: make sure that request context is valid and running, and providers are valid
+func (k Keeper) InitiateRequests(
 	ctx sdk.Context,
-	defChainID,
-	defName,
-	bindChainID,
-	reqChainID string,
-	consumer,
+	requestContextID []byte,
+	providers []sdk.AccAddress,
+) {
+	requestContext, _ := k.GetRequestContext(ctx, requestContextID)
+
+	for providerIndex, provider := range providers {
+		request := k.buildRequest(ctx, requestContextID, requestContext.BatchCounter, requestContext.ServiceName, provider)
+
+		requestID := types.GenerateRequestID(requestContextID, requestContext.BatchCounter, int16(providerIndex))
+		k.SetCompactRequest(ctx, requestID, request)
+
+		k.AddActiveRequest(ctx, requestContext.ServiceName, provider, ctx.BlockHeight()+requestContext.Timeout, requestID)
+		k.AddActiveRequestByID(ctx, requestID)
+
+		k.GetMetrics().ActiveRequests.Add(1)
+	}
+
+	requestContext.BatchState = types.BATCHRUNNING
+	requestContext.BatchRequestCount = uint16(len(providers))
+
+	k.SetRequestContext(ctx, requestContextID, requestContext)
+}
+
+// buildRequest builds a request for the given provider from the specified request context
+// Note: make that the binding exists
+func (k Keeper) buildRequest(
+	ctx sdk.Context,
+	requestContextID []byte,
+	batchCounter uint64,
+	serviceName string,
 	provider sdk.AccAddress,
-	methodID int16,
-	input []byte,
-	serviceFee sdk.Coins,
-	profiling bool,
-) (req types.SvcRequest, err sdk.Error) {
-	binding, found := k.GetServiceBinding(ctx, defName, provider)
-	if !found {
-		return req, types.ErrUnknownServiceBinding(k.codespace)
-	}
+) types.CompactRequest {
+	binding, _ := k.GetServiceBinding(ctx, serviceName, provider)
 
-	if !binding.Available {
-		return req, types.ErrServiceBindingUnavailable(k.codespace)
-	}
-
-	if profiling {
-		if _, found := k.gk.GetProfiler(ctx, consumer); !found {
-			return req, types.ErrNotProfiler(k.codespace, consumer)
-		}
-	}
-
-	// TODO: service fee logic
-
-	req = types.NewSvcRequest(
-		defChainID, defName, bindChainID, reqChainID, consumer,
-		provider, methodID, input, serviceFee, profiling,
+	request := types.NewCompactRequest(
+		requestContextID,
+		batchCounter,
+		provider,
+		k.GetBasePrice(ctx, binding),
+		ctx.BlockHeight(),
 	)
 
-	counter := k.GetIntraTxCounter(ctx)
-	k.SetIntraTxCounter(ctx, counter+1)
-
-	req.RequestIntraTxCounter = counter
-	req.RequestHeight = ctx.BlockHeight()
-
-	params := k.GetParamSet(ctx)
-	req.ExpirationHeight = req.RequestHeight + params.MaxRequestTimeout
-
-	_, err = k.bk.SendCoins(ctx, req.Consumer, auth.ServiceRequestCoinsAccAddr, req.ServiceFee)
-	if err != nil {
-		return req, err
-	}
-
-	k.SetRequest(ctx, req)
-	k.AddActiveRequest(ctx, req)
-	k.AddRequestExpiration(ctx, req)
-
-	return req, nil
+	return request
 }
 
-// SetRequest
-func (k Keeper) SetRequest(ctx sdk.Context, req types.SvcRequest) {
+// SetCompactRequest sets the specified compact request
+func (k Keeper) SetCompactRequest(ctx sdk.Context, requestID []byte, request types.CompactRequest) {
 	store := ctx.KVStore(k.storeKey)
 
-	bz := k.cdc.MustMarshalBinaryLengthPrefixed(req)
-	store.Set(GetRequestKey(req.DefChainID, req.DefName, req.BindChainID,
-		req.Provider, req.RequestHeight, req.RequestIntraTxCounter), bz)
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(request)
+	store.Set(GetRequestKey(requestID), bz)
 }
 
-// AddActiveRequest
-func (k Keeper) AddActiveRequest(ctx sdk.Context, req types.SvcRequest) {
+// GetCompactRequest retrieves the specified compact request
+func (k Keeper) GetCompactRequest(ctx sdk.Context, requestID []byte) (request types.CompactRequest, found bool) {
 	store := ctx.KVStore(k.storeKey)
 
-	bz := k.cdc.MustMarshalBinaryLengthPrefixed(req)
-	store.Set(GetActiveRequestKey(req.DefChainID, req.DefName, req.BindChainID,
-		req.Provider, req.RequestHeight, req.RequestIntraTxCounter), bz)
-}
-
-// DeleteActiveRequest
-func (k Keeper) DeleteActiveRequest(ctx sdk.Context, req types.SvcRequest) {
-	store := ctx.KVStore(k.storeKey)
-	store.Delete(GetActiveRequestKey(req.DefChainID, req.DefName, req.BindChainID, req.Provider,
-		req.RequestHeight, req.RequestIntraTxCounter))
-}
-
-// AddRequestExpiration
-func (k Keeper) AddRequestExpiration(ctx sdk.Context, req types.SvcRequest) {
-	store := ctx.KVStore(k.storeKey)
-
-	bz := k.cdc.MustMarshalBinaryLengthPrefixed(req)
-	store.Set(GetRequestsByExpirationIndexKeyByReq(req), bz)
-}
-
-// DeleteRequestExpiration
-func (k Keeper) DeleteRequestExpiration(ctx sdk.Context, req types.SvcRequest) {
-	store := ctx.KVStore(k.storeKey)
-	store.Delete(GetRequestsByExpirationIndexKeyByReq(req))
-}
-
-// GetActiveRequest
-func (k Keeper) GetActiveRequest(ctx sdk.Context, expHeight, reqHeight int64, counter int16) (req types.SvcRequest, found bool) {
-	store := ctx.KVStore(k.storeKey)
-
-	bz := store.Get(GetRequestsByExpirationIndexKey(expHeight, reqHeight, counter))
+	bz := store.Get(GetRequestKey(requestID))
 	if bz == nil {
-		return req, false
+		return request, false
 	}
 
-	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &req)
-	return req, true
+	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &request)
+	return request, true
 }
 
-// ActiveBindRequestsIterator returns an iterator for all the request in the Active Queue of specified service binding
-func (k Keeper) ActiveBindRequestsIterator(ctx sdk.Context, defChainID, defName, bindChainID string, provider sdk.AccAddress) sdk.Iterator {
+// GetRequest returns the specified request
+func (k Keeper) GetRequest(ctx sdk.Context, requestID []byte) (request types.Request, found bool) {
+	compactRequest, found := k.GetCompactRequest(ctx, requestID)
+	if !found {
+		return request, false
+	}
+
+	requestContext, found := k.GetRequestContext(ctx, compactRequest.RequestContextID)
+	if !found {
+		return request, false
+	}
+
+	request = types.NewRequest(
+		requestContext.ServiceName,
+		compactRequest.Provider,
+		requestContext.Consumer,
+		requestContext.Input,
+		compactRequest.ServiceFee,
+		requestContext.Profiling,
+		compactRequest.RequestHeight,
+		compactRequest.RequestHeight+requestContext.Timeout,
+		compactRequest.RequestContextID,
+		compactRequest.RequestContextBatchCounter,
+	)
+
+	return request, true
+}
+
+// AddActiveRequest adds the specified active request
+func (k Keeper) AddActiveRequest(
+	ctx sdk.Context,
+	serviceName string,
+	provider sdk.AccAddress,
+	expirationHeight int64,
+	requestID []byte,
+) {
 	store := ctx.KVStore(k.storeKey)
-	return sdk.KVStorePrefixIterator(store, GetSubActiveRequestKey(defChainID, defName, bindChainID, provider))
+
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(requestID)
+	store.Set(GetActiveRequestKey(serviceName, provider, expirationHeight, requestID), bz)
 }
 
-// ActiveRequestQueueIterator returns an iterator for all the request in the Active Queue that expire by block height
-func (k Keeper) ActiveRequestQueueIterator(ctx sdk.Context, height int64) sdk.Iterator {
+// DeleteActiveRequest deletes the specified active request
+func (k Keeper) DeleteActiveRequest(
+	ctx sdk.Context,
+	serviceName string,
+	provider sdk.AccAddress,
+	expirationHeight int64,
+	requestID []byte,
+) {
 	store := ctx.KVStore(k.storeKey)
-	return sdk.KVStorePrefixIterator(store, GetRequestsByExpirationPrefix(height))
+	store.Delete(GetActiveRequestKey(serviceName, provider, expirationHeight, requestID))
 }
 
-// ActiveAllRequestQueueIterator returns an iterator for all the requests in the active queue
-func (k Keeper) ActiveAllRequestQueueIterator(store sdk.KVStore) sdk.Iterator {
+// AddActiveRequestByID adds the specified active request by request ID
+func (k Keeper) AddActiveRequestByID(
+	ctx sdk.Context,
+	requestID []byte,
+) {
+	store := ctx.KVStore(k.storeKey)
+
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(requestID)
+	store.Set(GetActiveRequestKeyByID(requestID), bz)
+}
+
+// DeleteActiveRequestByID deletes the specified active request by request ID
+func (k Keeper) DeleteActiveRequestByID(
+	ctx sdk.Context,
+	requestID []byte,
+) {
+	store := ctx.KVStore(k.storeKey)
+	store.Delete(GetActiveRequestKeyByID(requestID))
+}
+
+// IsRequestActive checks if the specified request is active
+func (k Keeper) IsRequestActive(
+	ctx sdk.Context,
+	requestID []byte,
+) bool {
+	store := ctx.KVStore(k.storeKey)
+	return store.Has(GetActiveRequestKeyByID(requestID))
+}
+
+// AddRequestBatchExpiration adds a request batch to the expiration queue
+func (k Keeper) AddRequestBatchExpiration(ctx sdk.Context, requestContextID []byte, expirationHeight int64) {
+	store := ctx.KVStore(k.storeKey)
+
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(requestContextID)
+	store.Set(GetExpiredRequestBatchKey(requestContextID, expirationHeight), bz)
+}
+
+// DeleteRequestBatchExpiration deletes the request batch from the expiration queue
+func (k Keeper) DeleteRequestBatchExpiration(ctx sdk.Context, requestContextID []byte, expirationHeight int64) {
+	store := ctx.KVStore(k.storeKey)
+	store.Delete(GetExpiredRequestBatchKey(requestContextID, expirationHeight))
+}
+
+// AddNewRequestBatch adds a request batch to the new request batch queue
+func (k Keeper) AddNewRequestBatch(ctx sdk.Context, requestContextID []byte, requestBatchHeight int64) {
+	store := ctx.KVStore(k.storeKey)
+
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(requestContextID)
+	store.Set(GetNewRequestBatchKey(requestContextID, requestBatchHeight), bz)
+}
+
+// DeleteNewRequestBatch deletes the request batch in the given height from the new request batch queue
+func (k Keeper) DeleteNewRequestBatch(ctx sdk.Context, requestContextID []byte, requestBatchHeight int64) {
+	store := ctx.KVStore(k.storeKey)
+	store.Delete(GetNewRequestBatchKey(requestContextID, requestBatchHeight))
+}
+
+// HasNewRequestBatch checks if the new request batch from the specified request context exists in the given height
+func (k Keeper) HasNewRequestBatch(ctx sdk.Context, requestContextID []byte, requestBatchHeight int64) bool {
+	store := ctx.KVStore(k.storeKey)
+	return store.Has(GetNewRequestBatchKey(requestContextID, requestBatchHeight))
+}
+
+// ExpiredRequestBatchIterator returns an iterator for the request batch expiration queue
+func (k Keeper) ExpiredRequestBatchIterator(ctx sdk.Context, expirationHeight int64) sdk.Iterator {
+	store := ctx.KVStore(k.storeKey)
+	return sdk.KVStorePrefixIterator(store, GetExpiredRequestBatchSubspace(expirationHeight))
+}
+
+// NewRequestBatchIterator returns an iterator for the new request batch queue
+func (k Keeper) NewRequestBatchIterator(ctx sdk.Context, requestBatchHeight int64) sdk.Iterator {
+	store := ctx.KVStore(k.storeKey)
+	return sdk.KVStorePrefixIterator(store, GetNewRequestBatchSubspace(requestBatchHeight))
+}
+
+// ActiveRequestsIterator returns an iterator for all the active requests of the specified service binding
+func (k Keeper) ActiveRequestsIterator(ctx sdk.Context, serviceName string, provider sdk.AccAddress) sdk.Iterator {
+	store := ctx.KVStore(k.storeKey)
+	return sdk.KVStorePrefixIterator(store, GetActiveRequestSubspace(serviceName, provider))
+}
+
+// ActiveRequestsIteratorByReqCtx returns an iterator for all the active requests of the specified service binding
+func (k Keeper) ActiveRequestsIteratorByReqCtx(ctx sdk.Context, requestContextID []byte, batchCounter uint64) sdk.Iterator {
+	store := ctx.KVStore(k.storeKey)
+	return sdk.KVStorePrefixIterator(store, GetActiveRequestSubspaceByReqCtx(requestContextID, batchCounter))
+}
+
+// AllActiveRequestsIterator returns an iterator for all the active requests
+func (k Keeper) AllActiveRequestsIterator(store sdk.KVStore) sdk.Iterator {
 	return sdk.KVStorePrefixIterator(store, activeRequestKey)
 }
 
-// AddResponse
+// FilterServiceProviders gets the providers which satisfy the specified service fee requirement
+func (k Keeper) FilterServiceProviders(
+	ctx sdk.Context,
+	serviceName string,
+	providers []sdk.AccAddress,
+	serviceFeeCap sdk.Coins,
+) ([]sdk.AccAddress, sdk.Coins) {
+	var newProviders []sdk.AccAddress
+	var totalPrices sdk.Coins
+
+	for _, provider := range providers {
+		binding, found := k.GetServiceBinding(ctx, serviceName, provider)
+
+		if found && binding.Available {
+			price := k.GetBasePrice(ctx, binding)
+
+			if price.IsAllLTE(serviceFeeCap) {
+				newProviders = append(newProviders, provider)
+				totalPrices = totalPrices.Add(price)
+			}
+		}
+	}
+
+	return newProviders, totalPrices
+}
+
+// DeductServiceFees deducts the given service fees from the specified consumer
+func (k Keeper) DeductServiceFees(ctx sdk.Context, consumer sdk.AccAddress, serviceFees sdk.Coins) sdk.Error {
+	_, err := k.bk.SendCoins(ctx, consumer, auth.ServiceRequestCoinsAccAddr, serviceFees)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// AddResponse adds the response for the specified request ID
 func (k Keeper) AddResponse(
 	ctx sdk.Context,
-	reqChainID string,
 	requestID string,
 	provider sdk.AccAddress,
 	output,
-	errorMsg []byte,
-) (resp types.SvcResponse, err sdk.Error) {
-	expHeight, reqHeight, counter, _ := types.ConvertRequestID(requestID)
+	errMsg string,
+) (response types.Response, err sdk.Error) {
+	reqID, _ := types.ConvertRequestID(requestID)
 
-	req, found := k.GetActiveRequest(ctx, expHeight, reqHeight, counter)
+	request, found := k.GetRequest(ctx, reqID)
 	if !found {
-		req.ExpirationHeight = expHeight
-		req.RequestHeight = reqHeight
-		req.RequestIntraTxCounter = counter
-
-		return resp, types.ErrRequestNotActive(k.codespace, req.RequestID())
+		return response, types.ErrInvalidRequestID(k.codespace, requestID)
 	}
 
-	if !(provider.Equals(req.Provider)) {
-		return resp, types.ErrNotMatchingProvider(k.codespace, provider)
+	if !provider.Equals(request.Provider) {
+		return response, types.ErrInvalidResponse(k.codespace, "provider does not match")
 	}
 
-	if err := k.AddIncomingFee(ctx, provider, req.ServiceFee); err != nil {
-		return resp, err
+	if !k.IsRequestActive(ctx, reqID) {
+		return response, types.ErrInvalidResponse(k.codespace, "request is not active")
 	}
 
-	resp = types.NewSvcResponse(reqChainID, expHeight, reqHeight, counter, provider, req.Consumer, output, errorMsg)
-	k.SetResponse(ctx, resp)
+	svcDef, _ := k.GetServiceDefinition(ctx, request.ServiceName)
 
-	// delete request from active request list and expiration list
-	k.DeleteActiveRequest(ctx, req)
-	k.DeleteRequestExpiration(ctx, req)
+	if len(output) > 0 {
+		if err := types.ValidateResponseOutput(svcDef.Schemas, output); err != nil {
+			return response, err
+		}
+	} else {
+		if err := types.ValidateResponseError(svcDef.Schemas, errMsg); err != nil {
+			return response, err
+		}
+	}
 
-	return resp, nil
+	if err := k.AddEarnedFee(ctx, provider, request.ServiceFee); err != nil {
+		return response, err
+	}
+
+	requestContextID := request.RequestContextID
+
+	response = types.NewResponse(provider, request.Consumer, output, errMsg, requestContextID, request.RequestContextBatchCounter)
+	k.SetResponse(ctx, reqID, response)
+
+	k.DeleteActiveRequest(ctx, request.ServiceName, provider, request.ExpirationHeight, reqID)
+	k.DeleteActiveRequestByID(ctx, reqID)
+
+	requestContext, _ := k.GetRequestContext(ctx, requestContextID)
+	requestContext.BatchResponseCount++
+
+	if requestContext.BatchResponseCount == requestContext.BatchRequestCount {
+		requestContext.BatchState = types.BATCHCOMPLETED
+
+		if len(requestContext.ModuleName) != 0 {
+			respCallback, _ := k.GetResponseCallback(requestContext.ModuleName)
+			respCallback(ctx, requestContextID, k.GetResponsesOutput(ctx, requestContextID, requestContext.BatchCounter))
+		}
+	}
+
+	k.SetRequestContext(ctx, requestContextID, requestContext)
+
+	return response, nil
 }
 
-// SetResponse
-func (k Keeper) SetResponse(ctx sdk.Context, resp types.SvcResponse) {
+// SetResponse sets the specified response
+func (k Keeper) SetResponse(ctx sdk.Context, requestID []byte, response types.Response) {
 	store := ctx.KVStore(k.storeKey)
 
-	bz := k.cdc.MustMarshalBinaryLengthPrefixed(resp)
-	store.Set(GetResponseKey(resp.ReqChainID, resp.ExpirationHeight, resp.RequestHeight, resp.RequestIntraTxCounter), bz)
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(response)
+	store.Set(GetResponseKey(requestID), bz)
 }
 
-// GetResponse
-func (k Keeper) GetResponse(ctx sdk.Context, reqChainID string, eHeight, rHeight int64, counter int16) (resp types.SvcResponse, found bool) {
+// GetResponse returns a response with the speicified request ID
+func (k Keeper) GetResponse(ctx sdk.Context, requestID []byte) (response types.Response, found bool) {
 	store := ctx.KVStore(k.storeKey)
 
-	bz := store.Get(GetResponseKey(reqChainID, eHeight, rHeight, counter))
+	bz := store.Get(GetResponseKey(requestID))
 	if bz == nil {
-		return resp, false
+		return response, false
 	}
 
-	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &resp)
-	return resp, true
+	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &response)
+	return response, true
+}
+
+// ResponsesIteratorByReqCtx returns an iterator for all responses of the specified request context and batch counter
+func (k Keeper) ResponsesIteratorByReqCtx(ctx sdk.Context, requestContextID []byte, batchCounter uint64) sdk.Iterator {
+	store := ctx.KVStore(k.storeKey)
+	return sdk.KVStorePrefixIterator(store, GetResponseSubspaceByReqCtx(requestContextID, batchCounter))
+}
+
+// GetResponsesOutput retrieves all response outputs of the specified request context and batch counter
+func (k Keeper) GetResponsesOutput(ctx sdk.Context, requestContextID []byte, batchCounter uint64) []string {
+	iterator := k.ResponsesIteratorByReqCtx(ctx, requestContextID, batchCounter)
+	defer iterator.Close()
+
+	var outputs []string
+	for ; iterator.Valid(); iterator.Next() {
+		var response types.Response
+		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &response)
+
+		if len(response.Output) > 0 {
+			outputs = append(outputs, response.Output)
+		}
+	}
+
+	return outputs
 }
 
 // Slash
@@ -438,75 +644,29 @@ func (k Keeper) Slash(ctx sdk.Context, binding types.ServiceBinding, slashCoins 
 		return err
 	}
 
-	ctx.Logger().Info("Slash service provider", "provider", binding.Provider.String(), "slash_amount", slashCoins.String())
 	k.SetServiceBinding(ctx, binding)
 
 	return nil
 }
 
-// AddReturnFee add return fee for a particular consumer, if it is not existed will create a new
-func (k Keeper) AddReturnFee(ctx sdk.Context, address sdk.AccAddress, coins sdk.Coins) {
-	fee, found := k.GetReturnFee(ctx, address)
-	if !found {
-		k.SetReturnFee(ctx, address, coins)
-		return
-	}
-
-	k.SetReturnFee(ctx, address, fee.Coins.Add(coins))
-}
-
-func (k Keeper) SetReturnFee(ctx sdk.Context, address sdk.AccAddress, coins sdk.Coins) {
-	store := ctx.KVStore(k.storeKey)
-
-	fee := types.NewReturnedFee(address, coins)
-	bz := k.cdc.MustMarshalBinaryLengthPrefixed(fee)
-
-	store.Set(GetReturnedFeeKey(address), bz)
-}
-
-func (k Keeper) DeleteReturnFee(ctx sdk.Context, address sdk.AccAddress) {
-	store := ctx.KVStore(k.storeKey)
-	store.Delete(GetReturnedFeeKey(address))
-}
-
-func (k Keeper) GetReturnFee(ctx sdk.Context, address sdk.AccAddress) (fee types.ReturnedFee, found bool) {
-	store := ctx.KVStore(k.storeKey)
-
-	bz := store.Get(GetReturnedFeeKey(address))
-	if bz == nil {
-		return fee, false
-	}
-
-	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &fee)
-	return fee, true
-}
-
-// refund fees from a particular consumer, and delete it
-func (k Keeper) RefundFee(ctx sdk.Context, address sdk.AccAddress) sdk.Error {
-	fee, found := k.GetReturnFee(ctx, address)
-	if !found {
-		return types.ErrReturnFeeNotExists(k.codespace, address)
-	}
-
-	_, err := k.bk.SendCoins(ctx, auth.ServiceRequestCoinsAccAddr, address, fee.Coins)
+// RefundServiceFee refunds the service fee to the specified consumer
+func (k Keeper) RefundServiceFee(ctx sdk.Context, consumer sdk.AccAddress, serviceFee sdk.Coins) sdk.Error {
+	_, err := k.bk.SendCoins(ctx, auth.ServiceRequestCoinsAccAddr, consumer, serviceFee)
 	if err != nil {
 		return err
 	}
 
-	ctx.Logger().Info("Refund fees", "address", address.String(), "amount", fee.Coins.String())
-	k.DeleteReturnFee(ctx, address)
-
 	return nil
 }
 
-// Add incoming fee for a particular provider, if it is not existed will create a new
-func (k Keeper) AddIncomingFee(ctx sdk.Context, address sdk.AccAddress, coins sdk.Coins) sdk.Error {
+// AddEarnedFee adds the earned fee for the given provider
+func (k Keeper) AddEarnedFee(ctx sdk.Context, provider sdk.AccAddress, fee sdk.Coins) sdk.Error {
 	params := k.GetParamSet(ctx)
-	feeTax := params.ServiceFeeTax
+	taxRate := params.ServiceFeeTax
 
 	taxCoins := sdk.Coins{}
-	for _, coin := range coins {
-		taxAmount := sdk.NewDecFromInt(coin.Amount).Mul(feeTax).TruncateInt()
+	for _, coin := range fee {
+		taxAmount := sdk.NewDecFromInt(coin.Amount).Mul(taxRate).TruncateInt()
 		taxCoins = taxCoins.Add(sdk.NewCoins(sdk.NewCoin(coin.Denom, taxAmount)))
 	}
 
@@ -515,65 +675,65 @@ func (k Keeper) AddIncomingFee(ctx sdk.Context, address sdk.AccAddress, coins sd
 		return err
 	}
 
-	incomingFee, hasNeg := coins.SafeSub(taxCoins)
+	earnedFee, hasNeg := fee.SafeSub(taxCoins)
 	if hasNeg {
-		errMsg := fmt.Sprintf("%s is less than %s", coins, taxCoins)
+		errMsg := fmt.Sprintf("%s is less than %s", fee, taxCoins)
 		return sdk.ErrInsufficientFunds(errMsg)
 	}
 
-	fee, _ := k.GetIncomingFee(ctx, address)
-	k.SetIncomingFee(ctx, address, fee.Coins.Add(incomingFee))
+	fees, _ := k.GetEarnedFees(ctx, provider)
+	k.SetEarnedFees(ctx, provider, fees.Coins.Add(earnedFee))
 
 	return nil
 }
 
-func (k Keeper) SetIncomingFee(ctx sdk.Context, address sdk.AccAddress, coins sdk.Coins) {
+func (k Keeper) SetEarnedFees(ctx sdk.Context, provider sdk.AccAddress, fees sdk.Coins) {
 	store := ctx.KVStore(k.storeKey)
 
-	fee := types.NewIncomingFee(address, coins)
-	bz := k.cdc.MustMarshalBinaryLengthPrefixed(fee)
+	earnedFees := types.NewEarnedFees(provider, fees)
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(earnedFees)
 
-	store.Set(GetIncomingFeeKey(address), bz)
+	store.Set(GetEarnedFeesKey(provider), bz)
 }
 
-func (k Keeper) DeleteIncomingFee(ctx sdk.Context, address sdk.AccAddress) {
+func (k Keeper) DeleteEarnedFees(ctx sdk.Context, provider sdk.AccAddress) {
 	store := ctx.KVStore(k.storeKey)
-	store.Delete(GetIncomingFeeKey(address))
+	store.Delete(GetEarnedFeesKey(provider))
 }
 
-func (k Keeper) GetIncomingFee(ctx sdk.Context, address sdk.AccAddress) (fee types.IncomingFee, found bool) {
+func (k Keeper) GetEarnedFees(ctx sdk.Context, provider sdk.AccAddress) (fees types.EarnedFees, found bool) {
 	store := ctx.KVStore(k.storeKey)
 
-	bz := store.Get(GetIncomingFeeKey(address))
+	bz := store.Get(GetEarnedFeesKey(provider))
 	if bz == nil {
-		return fee, false
+		return fees, false
 	}
 
-	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &fee)
-	return fee, true
+	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &fees)
+	return fees, true
 }
 
-// withdraw fees from a particular provider, and delete it
-func (k Keeper) WithdrawFee(ctx sdk.Context, address sdk.AccAddress) sdk.Error {
-	fee, found := k.GetIncomingFee(ctx, address)
+// WithdrawEarnedFees withdraws the earned fees to the specified provider
+func (k Keeper) WithdrawEarnedFees(ctx sdk.Context, provider sdk.AccAddress) sdk.Error {
+	fees, found := k.GetEarnedFees(ctx, provider)
 	if !found {
-		return types.ErrWithdrawFeeNotExists(k.codespace, address)
+		return types.ErrNoEarnedFees(k.codespace, provider)
 	}
 
-	_, err := k.bk.SendCoins(ctx, auth.ServiceRequestCoinsAccAddr, address, fee.Coins)
+	_, err := k.bk.SendCoins(ctx, auth.ServiceRequestCoinsAccAddr, provider, fees.Coins)
 	if err != nil {
 		return err
 	}
 
-	ctx.Logger().Info("Withdraw fees", "address", address.String(), "amount", fee.Coins.String())
-	k.DeleteIncomingFee(ctx, address)
+	k.DeleteEarnedFees(ctx, provider)
 
 	return nil
 }
 
+// WithdrawTax withdraws the service tax to the speicified destination address by the trustee
 func (k Keeper) WithdrawTax(ctx sdk.Context, trustee sdk.AccAddress, destAddress sdk.AccAddress, amt sdk.Coins) sdk.Error {
 	if _, found := k.gk.GetTrustee(ctx, trustee); !found {
-		return types.ErrNotTrustee(k.codespace, trustee)
+		return types.ErrInvalidTrustee(k.codespace, trustee)
 	}
 
 	_, err := k.bk.SendCoins(ctx, auth.ServiceTaxCoinsAccAddr, destAddress, amt)
@@ -584,46 +744,22 @@ func (k Keeper) WithdrawTax(ctx sdk.Context, trustee sdk.AccAddress, destAddress
 	return nil
 }
 
-// AllReturnedFeesIterator returns an iterator for all the returned fees
-func (k Keeper) AllReturnedFeesIterator(ctx sdk.Context) sdk.Iterator {
+// AllEarnedFeesIterator returns an iterator for all the earned fees
+func (k Keeper) AllEarnedFeesIterator(ctx sdk.Context) sdk.Iterator {
 	store := ctx.KVStore(k.storeKey)
-	return sdk.KVStorePrefixIterator(store, returnedFeeKey)
+	return sdk.KVStorePrefixIterator(store, earnedFeesKey)
 }
 
-// AllIncomingFeesIterator returns an iterator for all the incoming fees
-func (k Keeper) AllIncomingFeesIterator(ctx sdk.Context) sdk.Iterator {
-	store := ctx.KVStore(k.storeKey)
-	return sdk.KVStorePrefixIterator(store, incomingFeeKey)
-}
-
-// RefundReturnedFees refunds all the returned fees
-func (k Keeper) RefundReturnedFees(ctx sdk.Context) sdk.Error {
-	iterator := k.AllReturnedFeesIterator(ctx)
+// RefundEarnedFees refunds all the incoming fees
+func (k Keeper) RefundEarnedFees(ctx sdk.Context) sdk.Error {
+	iterator := k.AllEarnedFeesIterator(ctx)
 	defer iterator.Close()
 
 	for ; iterator.Valid(); iterator.Next() {
-		var returnedFee types.ReturnedFee
-		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &returnedFee)
+		var earnedFees types.EarnedFees
+		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &earnedFees)
 
-		_, err := k.bk.SendCoins(ctx, auth.ServiceRequestCoinsAccAddr, returnedFee.Address, returnedFee.Coins)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// RefundIncomingFees refunds all the incoming fees
-func (k Keeper) RefundIncomingFees(ctx sdk.Context) sdk.Error {
-	iterator := k.AllIncomingFeesIterator(ctx)
-	defer iterator.Close()
-
-	for ; iterator.Valid(); iterator.Next() {
-		var incomingFee types.IncomingFee
-		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &incomingFee)
-
-		_, err := k.bk.SendCoins(ctx, auth.ServiceRequestCoinsAccAddr, incomingFee.Address, incomingFee.Coins)
+		_, err := k.bk.SendCoins(ctx, auth.ServiceRequestCoinsAccAddr, earnedFees.Address, earnedFees.Coins)
 		if err != nil {
 			return err
 		}
@@ -634,14 +770,14 @@ func (k Keeper) RefundIncomingFees(ctx sdk.Context) sdk.Error {
 
 // RefundServiceFees refunds the service fees of all the active requests
 func (k Keeper) RefundServiceFees(ctx sdk.Context) sdk.Error {
-	store := ctx.KVStore(k.storeKey)
-
-	iterator := k.ActiveAllRequestQueueIterator(store)
+	iterator := k.AllActiveRequestsIterator(ctx.KVStore(k.storeKey))
 	defer iterator.Close()
 
 	for ; iterator.Valid(); iterator.Next() {
-		var request types.SvcRequest
-		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &request)
+		var requestID []byte
+		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &requestID)
+
+		request, _ := k.GetRequest(ctx, requestID)
 
 		_, err := k.bk.SendCoins(ctx, auth.ServiceRequestCoinsAccAddr, request.Consumer, request.ServiceFee)
 		if err != nil {
@@ -652,25 +788,32 @@ func (k Keeper) RefundServiceFees(ctx sdk.Context) sdk.Error {
 	return nil
 }
 
-// GetIntraTxCounter get the current in-block request operation counter
-func (k Keeper) GetIntraTxCounter(ctx sdk.Context) int16 {
-	store := ctx.KVStore(k.storeKey)
-
-	b := store.Get(intraTxCounterKey)
-	if b == nil {
-		return 0
+// GetResponseCallback gets the registered module callback for response handling
+func (k Keeper) GetResponseCallback(moduleName string) (types.ResponseCallback, sdk.Error) {
+	respCallback, ok := k.respCallbacks[moduleName]
+	if !ok {
+		return nil, types.ErrModuleNameNotRegistered(k.Codespace(), moduleName)
 	}
 
-	var counter int16
-	k.cdc.MustUnmarshalBinaryLengthPrefixed(b, &counter)
+	return respCallback, nil
+}
 
+// GetIntraTxCounter returns the current tx counter and increases it by 1
+func (k Keeper) GetIntraTxCounter(ctx sdk.Context) int16 {
+	var counter int16
+
+	v := ctx.Value(GetIntraTxCounterKey())
+	if v == nil {
+		counter = 0
+	} else {
+		counter = v.(int16)
+	}
+
+	k.SetIntraTxCounter(ctx, counter+1)
 	return counter
 }
 
-// SetIntraTxCounter set the current in-block request counter
+// SetIntraTxCounter sets the tx counter to the context
 func (k Keeper) SetIntraTxCounter(ctx sdk.Context, counter int16) {
-	store := ctx.KVStore(k.storeKey)
-
-	bz := k.cdc.MustMarshalBinaryLengthPrefixed(counter)
-	store.Set(intraTxCounterKey, bz)
+	ctx = ctx.WithValue(GetIntraTxCounterKey(), counter)
 }

@@ -17,6 +17,11 @@ const (
 	QueryRequests     = types.QueryRequests
 	QueryResponse     = types.QueryResponse
 	QueryFees         = types.QueryFees
+	RUNNING           = types.RUNNING
+	PAUSED            = types.PAUSED
+	COMPLETED         = types.COMPLETED
+	BATCHRUNNING      = types.BATCHRUNNING
+	BATCHCOMPLETED    = types.BATCHCOMPLETED
 )
 
 // nolint
@@ -34,10 +39,9 @@ var (
 	PrometheusMetrics          = types.PrometheusMetrics
 	NewServiceDefinition       = types.NewServiceDefinition
 	NewServiceBinding          = types.NewServiceBinding
-	NewSvcRequest              = types.NewSvcRequest
-	NewSvcResponse             = types.NewSvcResponse
-	NewReturnedFee             = types.NewReturnedFee
-	NewIncomingFee             = types.NewIncomingFee
+	NewRequest                 = types.NewRequest
+	NewResponse                = types.NewResponse
+	NewEarnedFees              = types.NewEarnedFees
 	NewMsgDefineService        = types.NewMsgDefineService
 	NewMsgBindService          = types.NewMsgBindService
 	NewMsgUpdateServiceBinding = types.NewMsgUpdateServiceBinding
@@ -45,11 +49,14 @@ var (
 	NewMsgDisableService       = types.NewMsgDisableService
 	NewMsgEnableService        = types.NewMsgEnableService
 	NewMsgRefundServiceDeposit = types.NewMsgRefundServiceDeposit
-	NewMsgSvcRequest           = types.NewMsgSvcRequest
-	NewMsgSvcResponse          = types.NewMsgSvcResponse
-	NewMsgSvcRefundFees        = types.NewMsgSvcRefundFees
-	NewMsgSvcWithdrawFees      = types.NewMsgSvcWithdrawFees
-	NewMsgSvcWithdrawTax       = types.NewMsgSvcWithdrawTax
+	NewMsgRequestService       = types.NewMsgRequestService
+	NewMsgRespondService       = types.NewMsgRespondService
+	NewMsgPauseRequestContext  = types.NewMsgPauseRequestContext
+	NewMsgStartRequestContext  = types.NewMsgStartRequestContext
+	NewMsgKillRequestContext   = types.NewMsgKillRequestContext
+	NewMsgUpdateRequestContext = types.NewMsgUpdateRequestContext
+	NewMsgWithdrawEarnedFees   = types.NewMsgWithdrawEarnedFees
+	NewMsgWithdrawTax          = types.NewMsgWithdrawTax
 	ConvertRequestID           = types.ConvertRequestID
 )
 
@@ -61,10 +68,10 @@ type (
 	ServiceDefinition       = types.ServiceDefinition
 	ServiceBinding          = types.ServiceBinding
 	ServiceBindings         = types.ServiceBindings
-	SvcRequest              = types.SvcRequest
-	SvcResponse             = types.SvcResponse
-	ReturnedFee             = types.ReturnedFee
-	IncomingFee             = types.IncomingFee
+	Request                 = types.Request
+	CompactRequest          = types.CompactRequest
+	Response                = types.Response
+	ReturnedFee             = types.EarnedFees
 	Metrics                 = types.Metrics
 	MsgDefineService        = types.MsgDefineService
 	MsgBindService          = types.MsgBindService
@@ -73,16 +80,18 @@ type (
 	MsgDisableService       = types.MsgDisableService
 	MsgEnableService        = types.MsgEnableService
 	MsgRefundServiceDeposit = types.MsgRefundServiceDeposit
-	MsgSvcRequest           = types.MsgSvcRequest
-	MsgSvcResponse          = types.MsgSvcResponse
-	MsgSvcRefundFees        = types.MsgSvcRefundFees
-	MsgSvcWithdrawFees      = types.MsgSvcWithdrawFees
-	MsgSvcWithdrawTax       = types.MsgSvcWithdrawTax
+	MsgRequestService       = types.MsgRequestService
+	MsgRespondService       = types.MsgRespondService
+	MsgPauseRequestContext  = types.MsgPauseRequestContext
+	MsgStartRequestContext  = types.MsgStartRequestContext
+	MsgKillRequestContext   = types.MsgKillRequestContext
+	MsgUpdateRequestContext = types.MsgUpdateRequestContext
+	MsgWithdrawEarnedFees   = types.MsgWithdrawEarnedFees
+	MsgWithdrawTax          = types.MsgWithdrawTax
 	QueryDefinitionParams   = types.QueryDefinitionParams
 	QueryBindingParams      = types.QueryBindingParams
 	QueryBindingsParams     = types.QueryBindingsParams
 	QueryRequestsParams     = types.QueryRequestsParams
 	QueryResponseParams     = types.QueryResponseParams
 	QueryFeesParams         = types.QueryFeesParams
-	FeesOutput              = types.FeesOutput
 )

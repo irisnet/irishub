@@ -21,6 +21,7 @@ type Keeper struct {
 	// metrics
 	metrics *types.Metrics
 
+	// used to map the module name to response callback
 	respCallbacks map[string]types.ResponseCallback
 }
 
@@ -57,10 +58,10 @@ func (k Keeper) GetMetrics() *types.Metrics {
 
 // InitMetrics
 func (k Keeper) InitMetrics(store sdk.KVStore) {
-	activeIterator := k.ActiveAllRequestQueueIterator(store)
-	defer activeIterator.Close()
+	iterator := k.AllActiveRequestsIterator(store)
+	defer iterator.Close()
 
-	for ; activeIterator.Valid(); activeIterator.Next() {
+	for ; iterator.Valid(); iterator.Next() {
 		k.metrics.ActiveRequests.Add(1)
 	}
 }

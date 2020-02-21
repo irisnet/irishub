@@ -29,27 +29,18 @@ type QueryBindingsParams struct {
 	ServiceName string
 }
 
-// QueryRequestsParams
+// QueryRequestsParams defines the params to query all requests for a service binding
 type QueryRequestsParams struct {
-	DefChainID  string
 	ServiceName string
-	BindChainID string
 	Provider    sdk.AccAddress
 }
 
-// QueryResponseParams
+// QueryResponseParams defines the params to query the response for a request
 type QueryResponseParams struct {
-	ReqChainID string
-	RequestID  string
+	RequestID string
 }
 
-// QueryFeesParams
+// QueryFeesParams defines the params to query the earned fees for a provider
 type QueryFeesParams struct {
 	Address sdk.AccAddress
-}
-
-// FeesOutput
-type FeesOutput struct {
-	ReturnedFee sdk.Coins `json:"returned_fee"`
-	IncomingFee sdk.Coins `json:"incoming_fee"`
 }

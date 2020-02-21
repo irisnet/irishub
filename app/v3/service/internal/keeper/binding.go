@@ -258,7 +258,14 @@ func (k Keeper) AllServiceBindingsIterator(ctx sdk.Context) sdk.Iterator {
 	return sdk.KVStorePrefixIterator(store, serviceBindingKey)
 }
 
-// getMinDeposit gets the minimal deposit required for the service binding.
+// GetBasePrice gets the base price of the given service binding
+// Note: ensure that the binding is valid
+func (k Keeper) GetBasePrice(ctx sdk.Context, binding types.ServiceBinding) sdk.Coins {
+	pricing, _ := types.ParsePricing(binding.Pricing)
+	return pricing.Price
+}
+
+// getMinDeposit gets the minimal deposit required for the service binding
 // Note: ensure that the pricing is valid
 func (k Keeper) getMinDeposit(ctx sdk.Context, pricing string) sdk.Coins {
 	params := k.GetParamSet(ctx)

@@ -102,13 +102,15 @@ func queryRequests(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sd
 		return nil, sdk.ParseParamsErr(err)
 	}
 
-	iterator := k.ActiveBindRequestsIterator(ctx, params.DefChainID, params.ServiceName, params.BindChainID, params.Provider)
+	iterator := k.ActiveRequestsIterator(ctx, params.ServiceName, params.Provider)
 	defer iterator.Close()
 
-	var requests []types.SvcRequest
+	var requests []types.Request
 	for ; iterator.Valid(); iterator.Next() {
-		var request types.SvcRequest
-		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &request)
+		var requestID []byte
+		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &requestID)
+
+		request, _ := k.GetRequest(ctx, requestID)
 		requests = append(requests, request)
 	}
 
@@ -127,14 +129,14 @@ func queryResponse(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sd
 		return nil, sdk.ParseParamsErr(err)
 	}
 
-	eHeight, rHeight, counter, err := types.ConvertRequestID(params.RequestID)
+	requestID, err := types.ConvertRequestID(params.RequestID)
 	if err != nil {
-		return nil, sdk.ErrUnknownRequest(err.Error())
+		return nil, types.ErrInvalidRequestID(types.DefaultCodespace, params.RequestID)
 	}
 
-	response, found := k.GetResponse(ctx, params.ReqChainID, eHeight, rHeight, counter)
+	response, found := k.GetResponse(ctx, requestID)
 	if !found {
-		return nil, types.ErrNoResponseFound(types.DefaultCodespace, params.RequestID)
+		return nil, types.ErrInvalidRequestID(types.DefaultCodespace, params.RequestID)
 	}
 
 	bz, err := codec.MarshalJSONIndent(k.cdc, response)
@@ -152,17 +154,12 @@ func queryFees(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sdk.Er
 		return nil, sdk.ParseParamsErr(err)
 	}
 
-	var feesOutput types.FeesOutput
-
-	if returnFee, found := k.GetReturnFee(ctx, params.Address); found {
-		feesOutput.ReturnedFee = returnFee.Coins
+	fees, found := k.GetEarnedFees(ctx, params.Address)
+	if !found {
+		return nil, types.ErrNoEarnedFees(types.DefaultCodespace, params.Address)
 	}
 
-	if incomingFee, found := k.GetIncomingFee(ctx, params.Address); found {
-		feesOutput.IncomingFee = incomingFee.Coins
-	}
-
-	bz, err := codec.MarshalJSONIndent(k.cdc, feesOutput)
+	bz, err := codec.MarshalJSONIndent(k.cdc, fees)
 	if err != nil {
 		return nil, sdk.MarshalResultErr(err)
 	}

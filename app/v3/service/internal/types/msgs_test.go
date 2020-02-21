@@ -26,6 +26,22 @@ var (
 	testPricing      = `{"price":[{"denom":"iris-atto","amount":"1000000"}]}`
 	testWithdrawAddr = sdk.AccAddress([]byte("test-withdrawal-address"))
 	testAddedDeposit = sdk.NewCoins(testCoin2)
+
+	testConsumer      = sdk.AccAddress([]byte("test-consumer"))
+	testProviders     = []sdk.AccAddress{testProvider}
+	testInput         = `{"pair":"iris-usdt"}`
+	testServiceFeeCap = sdk.NewCoins(testCoin2)
+	testTimeout       = int64(100)
+	testRepeatedFreq  = uint64(120)
+	testRepeatedTotal = int64(100)
+
+	testOutput           = `{"last":"100"}`
+	testErrMsg           = `{"code":-1}`
+	testTrustee          = sdk.AccAddress([]byte("test-trustee"))
+	testTaxWithdrawalAmt = sdk.NewCoins(testCoin1)
+
+	testRequestContextID = sdk.SHA256([]byte("test-request-context-id"))
+	testRequestID        = RequestIDToString(GenerateRequestID(testRequestContextID, 1, 1))
 )
 
 // TestMsgDefineServiceRoute tests Route for MsgDefineService
@@ -558,5 +574,619 @@ func TestMsgRefundServiceDepositGetSigners(t *testing.T) {
 	res := msg.GetSigners()
 
 	expected := "[746573742D70726F7669646572]"
+	require.Equal(t, expected, fmt.Sprintf("%v", res))
+}
+
+// TestMsgRequestServiceRoute tests Route for MsgRequestService
+func TestMsgRequestServiceRoute(t *testing.T) {
+	msg := NewMsgRequestService(
+		testServiceName, testProviders, testConsumer,
+		testInput, testServiceFeeCap, testTimeout, true,
+		testRepeatedFreq, testRepeatedTotal,
+	)
+
+	require.Equal(t, MsgRoute, msg.Route())
+}
+
+// TestMsgRequestServiceType tests Type for MsgRequestService
+func TestMsgRequestServiceType(t *testing.T) {
+	msg := NewMsgRequestService(
+		testServiceName, testProviders, testConsumer,
+		testInput, testServiceFeeCap, testTimeout, true,
+		testRepeatedFreq, testRepeatedTotal,
+	)
+
+	require.Equal(t, "request_service", msg.Type())
+}
+
+// TestMsgRequestServiceValidation tests ValidateBasic for MsgRequestService
+func TestMsgRequestServiceValidation(t *testing.T) {
+	emptyAddress := sdk.AccAddress{}
+
+	invalidName := "invalid/service/name"
+	invalidLongName := strings.Repeat("s", MaxNameLength+1)
+	invalidDenomCoins := sdk.NewCoins(sdk.NewCoin("eth-min", sdk.NewInt(1000)))
+
+	invalidInput := "iris-usdt"
+	invalidTimeout := int64(-1)
+	lessRepeatedFreq := uint64(testTimeout) - 10
+	invalidRepeatedTotal1 := int64(-2)
+	invalidRepeatedTotal2 := int64(0)
+
+	testMsgs := []MsgRequestService{
+		NewMsgRequestService(
+			testServiceName, testProviders, testConsumer, testInput, testServiceFeeCap, testTimeout,
+			true, testRepeatedFreq, testRepeatedTotal,
+		), // valid msg
+		NewMsgRequestService(
+			testServiceName, testProviders, emptyAddress, testInput, testServiceFeeCap, testTimeout,
+			true, testRepeatedFreq, testRepeatedTotal,
+		), // missing consumer address
+		NewMsgRequestService(
+			invalidName, testProviders, testConsumer, testInput, testServiceFeeCap, testTimeout,
+			true, testRepeatedFreq, testRepeatedTotal,
+		), // service name contains illegal characters
+		NewMsgRequestService(
+			invalidLongName, testProviders, testConsumer, testInput, testServiceFeeCap, testTimeout,
+			true, testRepeatedFreq, testRepeatedTotal,
+		), // too long service name
+		NewMsgRequestService(
+			testServiceName, testProviders, testConsumer, testInput, invalidDenomCoins, testTimeout,
+			true, testRepeatedFreq, testRepeatedTotal,
+		), // invalid service fee denom
+		NewMsgRequestService(
+			testServiceName, nil, testConsumer, testInput, testServiceFeeCap, testTimeout,
+			true, testRepeatedFreq, testRepeatedTotal,
+		), // missing providers
+		NewMsgRequestService(
+			testServiceName, testProviders, testConsumer, "", testServiceFeeCap, testTimeout,
+			true, testRepeatedFreq, testRepeatedTotal,
+		), // missing input
+		NewMsgRequestService(
+			testServiceName, testProviders, testConsumer, invalidInput, testServiceFeeCap, testTimeout,
+			true, testRepeatedFreq, testRepeatedTotal,
+		), // invalid input
+		NewMsgRequestService(
+			testServiceName, testProviders, testConsumer, testInput, testServiceFeeCap, invalidTimeout,
+			true, testRepeatedFreq, testRepeatedTotal,
+		), // invalid timeout
+		NewMsgRequestService(
+			testServiceName, testProviders, testConsumer, testInput, testServiceFeeCap, testTimeout,
+			true, lessRepeatedFreq, testRepeatedTotal,
+		), // invalid repeated frequency
+		NewMsgRequestService(
+			testServiceName, testProviders, testConsumer, testInput, testServiceFeeCap, testTimeout,
+			true, testRepeatedFreq, invalidRepeatedTotal1,
+		), // repeated total can not be less than -1
+		NewMsgRequestService(
+			testServiceName, testProviders, testConsumer, testInput, testServiceFeeCap, testTimeout,
+			true, testRepeatedFreq, invalidRepeatedTotal2,
+		), // repeated total can not be zero
+		NewMsgRequestService(
+			testServiceName, testProviders, testConsumer, testInput, testServiceFeeCap, int64(0),
+			true, uint64(0), testRepeatedTotal,
+		), // both timeout and frequency can be zero
+		NewMsgRequestService(
+			testServiceName, testProviders, testConsumer, testInput, testServiceFeeCap, testTimeout,
+			false, lessRepeatedFreq, invalidRepeatedTotal1,
+		), // do not check the repeated frequency and total when not repeated
+	}
+
+	testCases := []struct {
+		msg     MsgRequestService
+		expPass bool
+		errMsg  string
+	}{
+		{testMsgs[0], true, ""},
+		{testMsgs[1], false, "missing consumer address"},
+		{testMsgs[2], false, "service name contains illegal characters"},
+		{testMsgs[3], false, "too long service name"},
+		{testMsgs[4], false, "invalid service fee denom"},
+		{testMsgs[5], false, "missing providers"},
+		{testMsgs[6], false, "missing input"},
+		{testMsgs[7], false, "invalid input"},
+		{testMsgs[8], false, "invalid timeout"},
+		{testMsgs[9], false, "invalid repeated frequency"},
+		{testMsgs[10], false, "repeated total can not be less than -1"},
+		{testMsgs[11], false, "repeated total can not be zero"},
+		{testMsgs[12], true, "both timeout and frequency can be zero"},
+		{testMsgs[13], true, "do not check the repeated frequency and total when not repeated"},
+	}
+
+	for i, tc := range testCases {
+		err := tc.msg.ValidateBasic()
+		if tc.expPass {
+			require.NoError(t, err, "Msg %d failed: %v", i, err)
+		} else {
+			require.Error(t, err, "Invalid Msg %d passed: %s", i, tc.errMsg)
+		}
+	}
+}
+
+// TestMsgRequestServiceGetSignBytes tests GetSignBytes for MsgRequestService
+func TestMsgRequestServiceGetSignBytes(t *testing.T) {
+	msg := NewMsgRequestService(
+		testServiceName, testProviders, testConsumer,
+		testInput, testServiceFeeCap, testTimeout, true,
+		testRepeatedFreq, testRepeatedTotal,
+	)
+	res := msg.GetSignBytes()
+
+	expected := `{"type":"irishub/service/MsgRequestService","value":{"consumer":"faa1w3jhxapdvdhkuum4d4jhyl0qvse","input":"{\"pair\":\"iris-usdt\"}","providers":["faa1w3jhxapdwpex7anfv3jhynrxe9z"],"repeated":true,"repeated_frequency":"120","repeated_total":"100","service_fee_cap":[{"amount":"100000000000000000000","denom":"iris-atto"}],"service_name":"test-service","timeout":"100"}}`
+	require.Equal(t, expected, string(res))
+}
+
+// TestMsgRequestServiceGetSigners tests GetSigners for MsgRequestService
+func TestMsgRequestServiceGetSigners(t *testing.T) {
+	msg := NewMsgRequestService(
+		testServiceName, testProviders, testConsumer,
+		testInput, testServiceFeeCap, testTimeout, true,
+		testRepeatedFreq, testRepeatedTotal,
+	)
+	res := msg.GetSigners()
+
+	expected := "[746573742D636F6E73756D6572]"
+	require.Equal(t, expected, fmt.Sprintf("%v", res))
+}
+
+// TestMsgRespondServiceRoute tests Route for MsgRespondService
+func TestMsgRespondServiceRoute(t *testing.T) {
+	msg := NewMsgRespondService(testRequestID, testProvider, testOutput, "")
+
+	require.Equal(t, MsgRoute, msg.Route())
+}
+
+// TestMsgRespondServiceType tests Type for MsgRespondService
+func TestMsgRespondServiceType(t *testing.T) {
+	msg := NewMsgRespondService(testRequestID, testProvider, testOutput, "")
+
+	require.Equal(t, "respond_service", msg.Type())
+}
+
+// TestMsgRespondServiceValidation tests ValidateBasic for MsgRespondService
+func TestMsgRespondServiceValidation(t *testing.T) {
+	emptyAddress := sdk.AccAddress{}
+
+	invalidRequestID := "invalidRequestID"
+	invalidOutput := "invalidOutput"
+	invalidErrMsg := "invalidErrMsg"
+
+	testMsgs := []MsgRespondService{
+		NewMsgRespondService(testRequestID, testProvider, testOutput, ""),         // valid msg
+		NewMsgRespondService(testRequestID, testProvider, "", testErrMsg),         // valid msg
+		NewMsgRespondService(testRequestID, emptyAddress, testOutput, ""),         // missing provider address
+		NewMsgRespondService(invalidRequestID, testProvider, testOutput, ""),      // invalid request ID
+		NewMsgRespondService(testRequestID, testProvider, "", ""),                 // neither output nor errMsg provided
+		NewMsgRespondService(testRequestID, testProvider, testOutput, testErrMsg), // both output and errMsg provided
+		NewMsgRespondService(testRequestID, testProvider, invalidOutput, ""),      // invalid output
+		NewMsgRespondService(testRequestID, testProvider, "", invalidErrMsg),      // invalid errMsg
+	}
+
+	testCases := []struct {
+		msg     MsgRespondService
+		expPass bool
+		errMsg  string
+	}{
+		{testMsgs[0], true, ""},
+		{testMsgs[1], true, ""},
+		{testMsgs[2], false, "missing provider address"},
+		{testMsgs[3], false, "invalid request ID"},
+		{testMsgs[4], false, "neither output nor errMsg provided"},
+		{testMsgs[5], false, "both output and errMsg provided"},
+		{testMsgs[6], false, "invalid output"},
+		{testMsgs[7], false, "invalid errMsg"},
+	}
+
+	for i, tc := range testCases {
+		err := tc.msg.ValidateBasic()
+		if tc.expPass {
+			require.NoError(t, err, "Msg %d failed: %v", i, err)
+		} else {
+			require.Error(t, err, "Invalid Msg %d passed: %s", i, tc.errMsg)
+		}
+	}
+}
+
+// TestMsgRespondServiceGetSignBytes tests GetSignBytes for MsgRespondService
+func TestMsgRespondServiceGetSignBytes(t *testing.T) {
+	msg := NewMsgRespondService(testRequestID, testProvider, testOutput, "")
+	res := msg.GetSignBytes()
+
+	expected := `{"type":"irishub/service/MsgRespondService","value":{"error":"","output":"{\"last\":\"100\"}","provider":"faa1w3jhxapdwpex7anfv3jhynrxe9z","request_id":"3db0fa99dcb058bc86041badbd614d6839f8fa20e17cf8ad3ba14c3f1bf613bd00000000000000010001"}}`
+	require.Equal(t, expected, string(res))
+}
+
+// TestMsgRespondServiceGetSigners tests GetSigners for MsgRespondService
+func TestMsgRespondServiceGetSigners(t *testing.T) {
+	msg := NewMsgRespondService(testRequestID, testProvider, testOutput, "")
+	res := msg.GetSigners()
+
+	expected := "[746573742D70726F7669646572]"
+	require.Equal(t, expected, fmt.Sprintf("%v", res))
+}
+
+// TestMsgPauseRequestContextRoute tests Route for MsgPauseRequestContext
+func TestMsgPauseRequestContextRoute(t *testing.T) {
+	msg := NewMsgPauseRequestContext(testRequestContextID, testConsumer)
+
+	require.Equal(t, MsgRoute, msg.Route())
+}
+
+// TestMsgPauseRequestContextType tests Type for MsgPauseRequestContext
+func TestMsgPauseRequestContextType(t *testing.T) {
+	msg := NewMsgPauseRequestContext(testRequestContextID, testConsumer)
+
+	require.Equal(t, "pause_request_context", msg.Type())
+}
+
+// TestMsgPauseRequestContextValidation tests ValidateBasic for MsgPauseRequestContext
+func TestMsgPauseRequestContextValidation(t *testing.T) {
+	emptyAddress := sdk.AccAddress{}
+	invalidRequestContextID := []byte("invalid-request-context-id")
+
+	testMsgs := []MsgPauseRequestContext{
+		NewMsgPauseRequestContext(testRequestContextID, testConsumer),    // valid msg
+		NewMsgPauseRequestContext(testRequestContextID, emptyAddress),    // missing consumer address
+		NewMsgPauseRequestContext(invalidRequestContextID, testConsumer), // invalid request context ID
+	}
+
+	testCases := []struct {
+		msg     MsgPauseRequestContext
+		expPass bool
+		errMsg  string
+	}{
+		{testMsgs[0], true, ""},
+		{testMsgs[1], false, "missing consumer address"},
+		{testMsgs[2], false, "invalid request context ID"},
+	}
+
+	for i, tc := range testCases {
+		err := tc.msg.ValidateBasic()
+		if tc.expPass {
+			require.NoError(t, err, "Msg %d failed: %v", i, err)
+		} else {
+			require.Error(t, err, "Invalid Msg %d passed: %s", i, tc.errMsg)
+		}
+	}
+}
+
+// TestMsgPauseRequestContextGetSignBytes tests GetSignBytes for MsgPauseRequestContext
+func TestMsgPauseRequestContextGetSignBytes(t *testing.T) {
+	msg := NewMsgPauseRequestContext(testRequestContextID, testConsumer)
+	res := msg.GetSignBytes()
+
+	expected := `{"type":"irishub/service/MsgPauseRequestContext","value":{"consumer":"faa1w3jhxapdvdhkuum4d4jhyl0qvse","request_context_id":"PbD6mdywWLyGBButvWFNaDn4+iDhfPitO6FMPxv2E70="}}`
+	require.Equal(t, expected, string(res))
+}
+
+// TestMsgPauseRequestContextGetSigners tests GetSigners for MsgPauseRequestContext
+func TestMsgPauseRequestContextGetSigners(t *testing.T) {
+	msg := NewMsgPauseRequestContext(testRequestContextID, testConsumer)
+	res := msg.GetSigners()
+
+	expected := "[746573742D636F6E73756D6572]"
+	require.Equal(t, expected, fmt.Sprintf("%v", res))
+}
+
+// TestMsgStartRequestContextRoute tests Route for MsgStartRequestContext
+func TestMsgStartRequestContextRoute(t *testing.T) {
+	msg := NewMsgStartRequestContext(testRequestContextID, testConsumer)
+
+	require.Equal(t, MsgRoute, msg.Route())
+}
+
+// TestMsgStartRequestContextType tests Type for MsgStartRequestContext
+func TestMsgStartRequestContextType(t *testing.T) {
+	msg := NewMsgStartRequestContext(testRequestContextID, testConsumer)
+
+	require.Equal(t, "start_request_context", msg.Type())
+}
+
+// TestMsgStartRequestContextValidation tests ValidateBasic for MsgStartRequestContext
+func TestMsgStartRequestContextValidation(t *testing.T) {
+	emptyAddress := sdk.AccAddress{}
+	invalidRequestContextID := []byte("invalid-request-context-id")
+
+	testMsgs := []MsgStartRequestContext{
+		NewMsgStartRequestContext(testRequestContextID, testConsumer),    // valid msg
+		NewMsgStartRequestContext(testRequestContextID, emptyAddress),    // missing consumer address
+		NewMsgStartRequestContext(invalidRequestContextID, testConsumer), // invalid request context ID
+	}
+
+	testCases := []struct {
+		msg     MsgStartRequestContext
+		expPass bool
+		errMsg  string
+	}{
+		{testMsgs[0], true, ""},
+		{testMsgs[1], false, "missing consumer address"},
+		{testMsgs[2], false, "invalid request context ID"},
+	}
+
+	for i, tc := range testCases {
+		err := tc.msg.ValidateBasic()
+		if tc.expPass {
+			require.NoError(t, err, "Msg %d failed: %v", i, err)
+		} else {
+			require.Error(t, err, "Invalid Msg %d passed: %s", i, tc.errMsg)
+		}
+	}
+}
+
+// TestMsgStartRequestContextGetSignBytes tests GetSignBytes for MsgStartRequestContext
+func TestMsgStartRequestContextGetSignBytes(t *testing.T) {
+	msg := NewMsgStartRequestContext(testRequestContextID, testConsumer)
+	res := msg.GetSignBytes()
+
+	expected := `{"type":"irishub/service/MsgStartRequestContext","value":{"consumer":"faa1w3jhxapdvdhkuum4d4jhyl0qvse","request_context_id":"PbD6mdywWLyGBButvWFNaDn4+iDhfPitO6FMPxv2E70="}}`
+	require.Equal(t, expected, string(res))
+}
+
+// TestMsgStartRequestContextGetSigners tests GetSigners for MsgStartRequestContext
+func TestMsgStartRequestContextGetSigners(t *testing.T) {
+	msg := NewMsgStartRequestContext(testRequestContextID, testConsumer)
+	res := msg.GetSigners()
+
+	expected := "[746573742D636F6E73756D6572]"
+	require.Equal(t, expected, fmt.Sprintf("%v", res))
+}
+
+// TestMsgKillRequestContextRoute tests Route for MsgKillRequestContext
+func TestMsgKillRequestContextRoute(t *testing.T) {
+	msg := NewMsgKillRequestContext(testRequestContextID, testConsumer)
+
+	require.Equal(t, MsgRoute, msg.Route())
+}
+
+// TestMsgKillRequestContextType tests Type for MsgKillRequestContext
+func TestMsgKillRequestContextType(t *testing.T) {
+	msg := NewMsgKillRequestContext(testRequestContextID, testConsumer)
+
+	require.Equal(t, "kill_request_context", msg.Type())
+}
+
+// TestMsgKillRequestContextValidation tests ValidateBasic for MsgKillRequestContext
+func TestMsgKillRequestContextValidation(t *testing.T) {
+	emptyAddress := sdk.AccAddress{}
+	invalidRequestContextID := []byte("invalid-request-context-id")
+
+	testMsgs := []MsgKillRequestContext{
+		NewMsgKillRequestContext(testRequestContextID, testConsumer),    // valid msg
+		NewMsgKillRequestContext(testRequestContextID, emptyAddress),    // missing consumer address
+		NewMsgKillRequestContext(invalidRequestContextID, testConsumer), // invalid request context ID
+	}
+
+	testCases := []struct {
+		msg     MsgKillRequestContext
+		expPass bool
+		errMsg  string
+	}{
+		{testMsgs[0], true, ""},
+		{testMsgs[1], false, "missing consumer address"},
+		{testMsgs[2], false, "invalid request context ID"},
+	}
+
+	for i, tc := range testCases {
+		err := tc.msg.ValidateBasic()
+		if tc.expPass {
+			require.NoError(t, err, "Msg %d failed: %v", i, err)
+		} else {
+			require.Error(t, err, "Invalid Msg %d passed: %s", i, tc.errMsg)
+		}
+	}
+}
+
+// TestMsgKillRequestContextGetSignBytes tests GetSignBytes for MsgKillRequestContext
+func TestMsgKillRequestContextGetSignBytes(t *testing.T) {
+	msg := NewMsgKillRequestContext(testRequestContextID, testConsumer)
+	res := msg.GetSignBytes()
+
+	expected := `{"type":"irishub/service/MsgKillRequestContext","value":{"consumer":"faa1w3jhxapdvdhkuum4d4jhyl0qvse","request_context_id":"PbD6mdywWLyGBButvWFNaDn4+iDhfPitO6FMPxv2E70="}}`
+	require.Equal(t, expected, string(res))
+}
+
+// TestMsgKillRequestContextGetSigners tests GetSigners for MsgKillRequestContext
+func TestMsgKillRequestContextGetSigners(t *testing.T) {
+	msg := NewMsgKillRequestContext(testRequestContextID, testConsumer)
+	res := msg.GetSigners()
+
+	expected := "[746573742D636F6E73756D6572]"
+	require.Equal(t, expected, fmt.Sprintf("%v", res))
+}
+
+// TestMsgUpdateRequestContextRoute tests Route for MsgUpdateRequestContext
+func TestMsgUpdateRequestContextRoute(t *testing.T) {
+	msg := NewMsgUpdateRequestContext(testRequestContextID, nil, nil, 0, 0, testConsumer)
+
+	require.Equal(t, MsgRoute, msg.Route())
+}
+
+// TestMsgUpdateRequestContextType tests Type for MsgUpdateRequestContext
+func TestMsgUpdateRequestContextType(t *testing.T) {
+	msg := NewMsgUpdateRequestContext(testRequestContextID, nil, nil, 0, 0, testConsumer)
+
+	require.Equal(t, "update_request_context", msg.Type())
+}
+
+// TestMsgUpdateRequestContextValidation tests ValidateBasic for MsgUpdateRequestContext
+func TestMsgUpdateRequestContextValidation(t *testing.T) {
+	emptyAddress := sdk.AccAddress{}
+
+	invalidRequestContextID := []byte("invalid-request-context-id")
+	invalidRepeatedTotal := int64(-2)
+	invalidDenomCoins := sdk.NewCoins(sdk.NewCoin("eth-min", sdk.NewInt(1000)))
+
+	testMsgs := []MsgUpdateRequestContext{
+		NewMsgUpdateRequestContext(testRequestContextID, testProviders, testServiceFeeCap, testRepeatedFreq, testRepeatedTotal, testConsumer), // valid msg
+		NewMsgUpdateRequestContext(testRequestContextID, nil, nil, 0, 0, testConsumer),                                                        // allow all not to be updated
+		NewMsgUpdateRequestContext(testRequestContextID, nil, nil, 0, 0, emptyAddress),                                                        // missing consumer address
+		NewMsgUpdateRequestContext(invalidRequestContextID, nil, nil, 0, 0, testConsumer),                                                     // invalid request context ID
+		NewMsgUpdateRequestContext(testRequestContextID, nil, nil, 0, invalidRepeatedTotal, testConsumer),                                     // invalid repeated total
+		NewMsgUpdateRequestContext(testRequestContextID, nil, invalidDenomCoins, 0, 0, testConsumer),                                          // invalid service fee denom
+	}
+
+	testCases := []struct {
+		msg     MsgUpdateRequestContext
+		expPass bool
+		errMsg  string
+	}{
+		{testMsgs[0], true, ""},
+		{testMsgs[1], true, ""},
+		{testMsgs[2], false, "missing consumer address"},
+		{testMsgs[3], false, "invalid request context ID"},
+		{testMsgs[4], false, "invalid repeated total"},
+		{testMsgs[5], false, "invalid service fee denom"},
+	}
+
+	for i, tc := range testCases {
+		err := tc.msg.ValidateBasic()
+		if tc.expPass {
+			require.NoError(t, err, "Msg %d failed: %v", i, err)
+		} else {
+			require.Error(t, err, "Invalid Msg %d passed: %s", i, tc.errMsg)
+		}
+	}
+}
+
+// TestMsgUpdateRequestContextGetSignBytes tests GetSignBytes for MsgUpdateRequestContext
+func TestMsgUpdateRequestContextGetSignBytes(t *testing.T) {
+	msg := NewMsgUpdateRequestContext(testRequestContextID, testProviders, testServiceFeeCap, testRepeatedFreq, testRepeatedTotal, testConsumer)
+	res := msg.GetSignBytes()
+
+	expected := `{"type":"irishub/service/MsgUpdateRequestContext","value":{"consumer":"faa1w3jhxapdvdhkuum4d4jhyl0qvse","providers":["faa1w3jhxapdwpex7anfv3jhynrxe9z"],"repeated_frequency":"120","repeated_total":"100","request_context_id":"PbD6mdywWLyGBButvWFNaDn4+iDhfPitO6FMPxv2E70=","service_fee_cap":[{"amount":"100000000000000000000","denom":"iris-atto"}]}}`
+	require.Equal(t, expected, string(res))
+}
+
+// TestMsgUpdateRequestContextGetSigners tests GetSigners for MsgUpdateRequestContext
+func TestMsgUpdateRequestContextGetSigners(t *testing.T) {
+	msg := NewMsgUpdateRequestContext(testRequestContextID, testProviders, testServiceFeeCap, testRepeatedFreq, testRepeatedTotal, testConsumer)
+	res := msg.GetSigners()
+
+	expected := "[746573742D636F6E73756D6572]"
+	require.Equal(t, expected, fmt.Sprintf("%v", res))
+}
+
+// TestMsgWithdrawEarnedFeesRoute tests Route for MsgWithdrawEarnedFees
+func TestMsgWithdrawEarnedFeesRoute(t *testing.T) {
+	msg := NewMsgWithdrawEarnedFees(testProvider)
+
+	require.Equal(t, MsgRoute, msg.Route())
+}
+
+// TestMsgWithdrawEarnedFeesType tests Type for MsgWithdrawEarnedFees
+func TestMsgWithdrawEarnedFeesType(t *testing.T) {
+	msg := NewMsgWithdrawEarnedFees(testProvider)
+
+	require.Equal(t, "withdraw_earned_fees", msg.Type())
+}
+
+// TestMsgWithdrawEarnedFeesValidation tests ValidateBasic for MsgWithdrawEarnedFees
+func TestMsgWithdrawEarnedFeesValidation(t *testing.T) {
+	emptyAddress := sdk.AccAddress{}
+
+	testMsgs := []MsgWithdrawEarnedFees{
+		NewMsgWithdrawEarnedFees(testProvider), // valid msg
+		NewMsgWithdrawEarnedFees(emptyAddress), // missing provider address
+	}
+
+	testCases := []struct {
+		msg     MsgWithdrawEarnedFees
+		expPass bool
+		errMsg  string
+	}{
+		{testMsgs[0], true, ""},
+		{testMsgs[1], false, "missing provider address"},
+	}
+
+	for i, tc := range testCases {
+		err := tc.msg.ValidateBasic()
+		if tc.expPass {
+			require.NoError(t, err, "Msg %d failed: %v", i, err)
+		} else {
+			require.Error(t, err, "Invalid Msg %d passed: %s", i, tc.errMsg)
+		}
+	}
+}
+
+// TestMsgWithdrawEarnedFeesGetSignBytes tests GetSignBytes for MsgWithdrawEarnedFees
+func TestMsgWithdrawEarnedFeesGetSignBytes(t *testing.T) {
+	msg := NewMsgWithdrawEarnedFees(testProvider)
+	res := msg.GetSignBytes()
+
+	expected := `{"type":"irishub/service/MsgWithdrawEarnedFees","value":{"provider":"faa1w3jhxapdwpex7anfv3jhynrxe9z"}}`
+	require.Equal(t, expected, string(res))
+}
+
+// TestMsgWithdrawEarnedFeesGetSigners tests GetSigners for MsgWithdrawEarnedFees
+func TestMsgWithdrawEarnedFeesGetSigners(t *testing.T) {
+	msg := NewMsgWithdrawEarnedFees(testProvider)
+	res := msg.GetSigners()
+
+	expected := "[746573742D70726F7669646572]"
+	require.Equal(t, expected, fmt.Sprintf("%v", res))
+}
+
+// TestMsgWithdrawTaxRoute tests Route for MsgWithdrawTax
+func TestMsgWithdrawTaxRoute(t *testing.T) {
+	msg := NewMsgWithdrawTax(testTrustee, testTrustee, testTaxWithdrawalAmt)
+
+	require.Equal(t, MsgRoute, msg.Route())
+}
+
+// TestMsgWithdrawTaxType tests Type for MsgWithdrawTax
+func TestMsgWithdrawTaxType(t *testing.T) {
+	msg := NewMsgWithdrawTax(testTrustee, testTrustee, testTaxWithdrawalAmt)
+
+	require.Equal(t, "withdraw_tax", msg.Type())
+}
+
+// TestMsgWithdrawTaxValidation tests ValidateBasic for MsgWithdrawTax
+func TestMsgWithdrawTaxValidation(t *testing.T) {
+	emptyAddress := sdk.AccAddress{}
+	invalidDenomCoins := sdk.NewCoins(sdk.NewCoin("eth-min", sdk.NewInt(1000)))
+
+	testMsgs := []MsgWithdrawTax{
+		NewMsgWithdrawTax(testTrustee, testTrustee, testTaxWithdrawalAmt),  // valid msg
+		NewMsgWithdrawTax(emptyAddress, testTrustee, testTaxWithdrawalAmt), // missing trustee address
+		NewMsgWithdrawTax(testTrustee, emptyAddress, testTaxWithdrawalAmt), // missing destination address
+		NewMsgWithdrawTax(testTrustee, testTrustee, invalidDenomCoins),     // invalid withdrawal denom
+	}
+
+	testCases := []struct {
+		msg     MsgWithdrawTax
+		expPass bool
+		errMsg  string
+	}{
+		{testMsgs[0], true, ""},
+		{testMsgs[1], false, "missing trustee address"},
+		{testMsgs[2], false, "missing destination address"},
+		{testMsgs[3], false, "invalid withdrawal denom"},
+	}
+
+	for i, tc := range testCases {
+		err := tc.msg.ValidateBasic()
+		if tc.expPass {
+			require.NoError(t, err, "Msg %d failed: %v", i, err)
+		} else {
+			require.Error(t, err, "Invalid Msg %d passed: %s", i, tc.errMsg)
+		}
+	}
+}
+
+// TestMsgWithdrawTaxGetSignBytes tests GetSignBytes for MsgWithdrawTax
+func TestMsgWithdrawTaxGetSignBytes(t *testing.T) {
+	msg := NewMsgWithdrawTax(testTrustee, testTrustee, testTaxWithdrawalAmt)
+	res := msg.GetSignBytes()
+
+	expected := `{"type":"irishub/service/MsgWithdrawTax","value":{"amount":[{"amount":"1000000000000000000000","denom":"iris-atto"}],"dest_address":"faa1w3jhxapdw3e82um5v4jscm70uh","trustee":"faa1w3jhxapdw3e82um5v4jscm70uh"}}`
+	require.Equal(t, expected, string(res))
+}
+
+// TestMsgWithdrawTaxGetSigners tests GetSigners for MsgWithdrawTax
+func TestMsgWithdrawTaxGetSigners(t *testing.T) {
+	msg := NewMsgWithdrawTax(testTrustee, testTrustee, testTaxWithdrawalAmt)
+	res := msg.GetSigners()
+
+	expected := "[746573742D74727573746565]"
 	require.Equal(t, expected, fmt.Sprintf("%v", res))
 }

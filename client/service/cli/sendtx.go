@@ -2,7 +2,6 @@ package cli
 
 import (
 	"bytes"
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -12,7 +11,6 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/irisnet/irishub/app/v3/service"
-	"github.com/irisnet/irishub/client"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/codec"
@@ -376,187 +374,187 @@ func GetCmdRefundServiceDeposit(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-func GetCmdSvcCall(cdc *codec.Codec) *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "call",
-		Short: "Call a service method",
-		Example: "iriscli service call --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --def-chain-id=<bind-chain-id> " +
-			"--service-name=<service name> --method-id=<method-id> --bind-chain-id=<chain-id> --provider=<provider> --service-fee=1iris --request-data=<req>",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
-				WithAccountDecoder(utils.GetAccountDecoder(cdc))
-			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).
-				WithCliCtx(cliCtx)
+// func GetCmdSvcCall(cdc *codec.Codec) *cobra.Command {
+// 	cmd := &cobra.Command{
+// 		Use:   "call",
+// 		Short: "Call a service method",
+// 		Example: "iriscli service call --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --def-chain-id=<bind-chain-id> " +
+// 			"--service-name=<service name> --method-id=<method-id> --bind-chain-id=<chain-id> --provider=<provider> --service-fee=1iris --request-data=<req>",
+// 		RunE: func(cmd *cobra.Command, args []string) error {
+// 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
+// 				WithAccountDecoder(utils.GetAccountDecoder(cdc))
+// 			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).
+// 				WithCliCtx(cliCtx)
 
-			fromAddr, err := cliCtx.GetFromAddress()
-			if err != nil {
-				return err
-			}
+// 			fromAddr, err := cliCtx.GetFromAddress()
+// 			if err != nil {
+// 				return err
+// 			}
 
-			chainID := viper.GetString(client.FlagChainID)
+// 			chainID := viper.GetString(client.FlagChainID)
 
-			defChainID := viper.GetString(FlagDefChainID)
-			name := viper.GetString(FlagServiceName)
-			bindChainID := viper.GetString(FlagBindChainID)
-			methodID := int16(viper.GetInt(FlagMethodID))
+// 			defChainID := viper.GetString(FlagDefChainID)
+// 			name := viper.GetString(FlagServiceName)
+// 			bindChainID := viper.GetString(FlagBindChainID)
+// 			methodID := int16(viper.GetInt(FlagMethodID))
 
-			providerStr := viper.GetString(FlagProvider)
-			provider, err := sdk.AccAddressFromBech32(providerStr)
-			if err != nil {
-				return err
-			}
+// 			providerStr := viper.GetString(FlagProvider)
+// 			provider, err := sdk.AccAddressFromBech32(providerStr)
+// 			if err != nil {
+// 				return err
+// 			}
 
-			serviceFeeStr := viper.GetString(FlagServiceFee)
-			serviceFee, err := cliCtx.ParseCoins(serviceFeeStr)
-			if err != nil {
-				return err
-			}
+// 			serviceFeeStr := viper.GetString(FlagServiceFee)
+// 			serviceFee, err := cliCtx.ParseCoins(serviceFeeStr)
+// 			if err != nil {
+// 				return err
+// 			}
 
-			inputString := viper.GetString(FlagReqData)
-			input, err := hex.DecodeString(inputString)
-			if err != nil {
-				return err
-			}
+// 			inputString := viper.GetString(FlagReqData)
+// 			input, err := hex.DecodeString(inputString)
+// 			if err != nil {
+// 				return err
+// 			}
 
-			profiling := viper.GetBool(FlagProfiling)
+// 			profiling := viper.GetBool(FlagProfiling)
 
-			msg := service.NewMsgSvcRequest(defChainID, name, bindChainID, chainID, fromAddr, provider, methodID, input, serviceFee, profiling)
-			cliCtx.PrintResponse = true
-			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
-		},
-	}
+// 			msg := service.NewMsgSvcRequest(defChainID, name, bindChainID, chainID, fromAddr, provider, methodID, input, serviceFee, profiling)
+// 			cliCtx.PrintResponse = true
+// 			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
+// 		},
+// 	}
 
-	cmd.Flags().AddFlagSet(FsServiceRequest)
-	cmd.MarkFlagRequired(FlagDefChainID)
-	cmd.MarkFlagRequired(FlagServiceName)
-	cmd.MarkFlagRequired(FlagBindChainID)
-	cmd.MarkFlagRequired(FlagProvider)
-	cmd.MarkFlagRequired(FlagMethodID)
-	return cmd
-}
+// 	cmd.Flags().AddFlagSet(FsServiceRequest)
+// 	cmd.MarkFlagRequired(FlagDefChainID)
+// 	cmd.MarkFlagRequired(FlagServiceName)
+// 	cmd.MarkFlagRequired(FlagBindChainID)
+// 	cmd.MarkFlagRequired(FlagProvider)
+// 	cmd.MarkFlagRequired(FlagMethodID)
+// 	return cmd
+// }
 
-func GetCmdSvcRespond(cdc *codec.Codec) *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "respond",
-		Short: "Respond a service method invocation",
-		Example: "iriscli service respond --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --request-chain-id=<call-chain-id> " +
-			"--request-id=<request-id> --response-data=<resp>",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
-				WithAccountDecoder(utils.GetAccountDecoder(cdc))
-			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).
-				WithCliCtx(cliCtx)
+// func GetCmdSvcRespond(cdc *codec.Codec) *cobra.Command {
+// 	cmd := &cobra.Command{
+// 		Use:   "respond",
+// 		Short: "Respond a service method invocation",
+// 		Example: "iriscli service respond --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --request-chain-id=<call-chain-id> " +
+// 			"--request-id=<request-id> --response-data=<resp>",
+// 		RunE: func(cmd *cobra.Command, args []string) error {
+// 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
+// 				WithAccountDecoder(utils.GetAccountDecoder(cdc))
+// 			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).
+// 				WithCliCtx(cliCtx)
 
-			fromAddr, err := cliCtx.GetFromAddress()
-			if err != nil {
-				return err
-			}
+// 			fromAddr, err := cliCtx.GetFromAddress()
+// 			if err != nil {
+// 				return err
+// 			}
 
-			reqChainID := viper.GetString(FlagReqChainID)
-			outputString := viper.GetString(FlagRespData)
-			output, err := hex.DecodeString(outputString)
-			if err != nil {
-				return err
-			}
+// 			reqChainID := viper.GetString(FlagReqChainID)
+// 			outputString := viper.GetString(FlagRespData)
+// 			output, err := hex.DecodeString(outputString)
+// 			if err != nil {
+// 				return err
+// 			}
 
-			errMsgString := viper.GetString(FlagErrMsg)
-			errMsg, err := hex.DecodeString(errMsgString)
-			if err != nil {
-				return err
-			}
+// 			errMsgString := viper.GetString(FlagErrMsg)
+// 			errMsg, err := hex.DecodeString(errMsgString)
+// 			if err != nil {
+// 				return err
+// 			}
 
-			reqID := viper.GetString(FlagReqID)
+// 			reqID := viper.GetString(FlagReqID)
 
-			msg := service.NewMsgSvcResponse(reqChainID, reqID, fromAddr, output, errMsg)
-			cliCtx.PrintResponse = true
-			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
-		},
-	}
-	cmd.Flags().AddFlagSet(FsServiceResponse)
-	_ = cmd.MarkFlagRequired(FlagReqChainID)
-	_ = cmd.MarkFlagRequired(FlagReqID)
-	return cmd
-}
+// 			msg := service.NewMsgSvcResponse(reqChainID, reqID, fromAddr, output, errMsg)
+// 			cliCtx.PrintResponse = true
+// 			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
+// 		},
+// 	}
+// 	cmd.Flags().AddFlagSet(FsServiceResponse)
+// 	_ = cmd.MarkFlagRequired(FlagReqChainID)
+// 	_ = cmd.MarkFlagRequired(FlagReqID)
+// 	return cmd
+// }
 
-func GetCmdSvcRefundFees(cdc *codec.Codec) *cobra.Command {
-	cmd := &cobra.Command{
-		Use:     "refund-fees",
-		Short:   "Refund all fees from service call timeout",
-		Example: "iriscli service refund-fees --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --dest-address=<account address> --withdraw-amount 1iris",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
-				WithAccountDecoder(utils.GetAccountDecoder(cdc))
-			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).
-				WithCliCtx(cliCtx)
+// func GetCmdSvcRefundFees(cdc *codec.Codec) *cobra.Command {
+// 	cmd := &cobra.Command{
+// 		Use:     "refund-fees",
+// 		Short:   "Refund all fees from service call timeout",
+// 		Example: "iriscli service refund-fees --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --dest-address=<account address> --withdraw-amount 1iris",
+// 		RunE: func(cmd *cobra.Command, args []string) error {
+// 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
+// 				WithAccountDecoder(utils.GetAccountDecoder(cdc))
+// 			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).
+// 				WithCliCtx(cliCtx)
 
-			fromAddr, err := cliCtx.GetFromAddress()
-			if err != nil {
-				return err
-			}
-			msg := service.NewMsgSvcRefundFees(fromAddr)
-			cliCtx.PrintResponse = true
-			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
-		},
-	}
-	return cmd
-}
+// 			fromAddr, err := cliCtx.GetFromAddress()
+// 			if err != nil {
+// 				return err
+// 			}
+// 			msg := service.NewMsgSvcRefundFees(fromAddr)
+// 			cliCtx.PrintResponse = true
+// 			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
+// 		},
+// 	}
+// 	return cmd
+// }
 
-func GetCmdSvcWithdrawFees(cdc *codec.Codec) *cobra.Command {
-	cmd := &cobra.Command{
-		Use:     "withdraw-fees",
-		Short:   "withdraw all fees from service call reward",
-		Example: "iriscli service withdraw-fees --chain-id=<chain-id> --from=<key-name> --fee=0.3iris",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
-				WithAccountDecoder(utils.GetAccountDecoder(cdc))
-			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).
-				WithCliCtx(cliCtx)
+// func GetCmdSvcWithdrawFees(cdc *codec.Codec) *cobra.Command {
+// 	cmd := &cobra.Command{
+// 		Use:     "withdraw-fees",
+// 		Short:   "withdraw all fees from service call reward",
+// 		Example: "iriscli service withdraw-fees --chain-id=<chain-id> --from=<key-name> --fee=0.3iris",
+// 		RunE: func(cmd *cobra.Command, args []string) error {
+// 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
+// 				WithAccountDecoder(utils.GetAccountDecoder(cdc))
+// 			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).
+// 				WithCliCtx(cliCtx)
 
-			fromAddr, err := cliCtx.GetFromAddress()
-			if err != nil {
-				return err
-			}
-			msg := service.NewMsgSvcWithdrawFees(fromAddr)
-			cliCtx.PrintResponse = true
-			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
-		},
-	}
-	return cmd
-}
+// 			fromAddr, err := cliCtx.GetFromAddress()
+// 			if err != nil {
+// 				return err
+// 			}
+// 			msg := service.NewMsgSvcWithdrawFees(fromAddr)
+// 			cliCtx.PrintResponse = true
+// 			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
+// 		},
+// 	}
+// 	return cmd
+// }
 
-func GetCmdSvcWithdrawTax(cdc *codec.Codec) *cobra.Command {
-	cmd := &cobra.Command{
-		Use:     "withdraw-tax",
-		Short:   "withdraw service fee tax to a account",
-		Example: "iriscli service withdraw-tax --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --dest-address=<account address> --withdraw-amount=1iris",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
-				WithAccountDecoder(utils.GetAccountDecoder(cdc))
-			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).
-				WithCliCtx(cliCtx)
+// func GetCmdSvcWithdrawTax(cdc *codec.Codec) *cobra.Command {
+// 	cmd := &cobra.Command{
+// 		Use:     "withdraw-tax",
+// 		Short:   "withdraw service fee tax to a account",
+// 		Example: "iriscli service withdraw-tax --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --dest-address=<account address> --withdraw-amount=1iris",
+// 		RunE: func(cmd *cobra.Command, args []string) error {
+// 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
+// 				WithAccountDecoder(utils.GetAccountDecoder(cdc))
+// 			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).
+// 				WithCliCtx(cliCtx)
 
-			fromAddr, err := cliCtx.GetFromAddress()
-			if err != nil {
-				return err
-			}
-			destAddressStr := viper.GetString(FlagDestAddress)
-			destAddress, err := sdk.AccAddressFromBech32(destAddressStr)
-			if err != nil {
-				return err
-			}
+// 			fromAddr, err := cliCtx.GetFromAddress()
+// 			if err != nil {
+// 				return err
+// 			}
+// 			destAddressStr := viper.GetString(FlagDestAddress)
+// 			destAddress, err := sdk.AccAddressFromBech32(destAddressStr)
+// 			if err != nil {
+// 				return err
+// 			}
 
-			withdrawAmountStr := viper.GetString(FlagWithdrawAmount)
-			withdrawAmount, err := cliCtx.ParseCoins(withdrawAmountStr)
-			if err != nil {
-				return err
-			}
-			msg := service.NewMsgSvcWithdrawTax(fromAddr, destAddress, withdrawAmount)
-			cliCtx.PrintResponse = true
-			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
-		},
-	}
-	cmd.Flags().AddFlagSet(FsServiceWithdrawTax)
-	cmd.MarkFlagRequired(FlagDestAddress)
-	cmd.MarkFlagRequired(FlagWithdrawAmount)
-	return cmd
-}
+// 			withdrawAmountStr := viper.GetString(FlagWithdrawAmount)
+// 			withdrawAmount, err := cliCtx.ParseCoins(withdrawAmountStr)
+// 			if err != nil {
+// 				return err
+// 			}
+// 			msg := service.NewMsgSvcWithdrawTax(fromAddr, destAddress, withdrawAmount)
+// 			cliCtx.PrintResponse = true
+// 			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
+// 		},
+// 	}
+// 	cmd.Flags().AddFlagSet(FsServiceWithdrawTax)
+// 	cmd.MarkFlagRequired(FlagDestAddress)
+// 	cmd.MarkFlagRequired(FlagWithdrawAmount)
+// 	return cmd
+// }

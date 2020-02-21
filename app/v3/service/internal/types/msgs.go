@@ -1,6 +1,7 @@
 package types
 
 import (
+	"encoding/json"
 	"fmt"
 	"regexp"
 
@@ -17,16 +18,22 @@ const (
 	TypeMsgDisableService       = "disable_service"        // type for MsgDisableService
 	TypeMsgEnableService        = "enable_service"         // type for MsgEnableService
 	TypeMsgRefundServiceDeposit = "refund_service_deposit" // type for MsgRefundServiceDeposit
-	TypeMsgSvcRequest           = "call_service"           // type for MsgSvcRequest
-	TypeMsgSvcResponse          = "respond_service"        // type for MsgSvcResponse
-	TypeMsgSvcRefundFees        = "refund_service_fees"    // type for MsgSvcRefundFees
-	TypeMsgSvcWithdrawFees      = "withdraw_service_fees"  // type for MsgSvcWithdrawFees
-	TypeMsgSvcWithdrawTax       = "withdraw_service_tax"   // type for MsgSvcWithdrawTax
+	TypeMsgRequestService       = "request_service"        // type for MsgRequestService
+	TypeMsgRespondService       = "respond_service"        // type for MsgRespondService
+	TypeMsgPauseRequestContext  = "pause_request_context"  // type for MsgPauseRequestContext
+	TypeMsgStartRequestContext  = "start_request_context"  // type for MsgStartRequestContext
+	TypeMsgKillRequestContext   = "kill_request_context"   // type for MsgKillRequestContext
+	TypeMsgUpdateRequestContext = "update_request_context" // type for MsgUpdateRequestContext
+	TypeMsgWithdrawEarnedFees   = "withdraw_earned_fees"   // type for MsgWithdrawEarnedFees
+	TypeMsgWithdrawTax          = "withdraw_tax"           // type for MsgWithdrawTax
 
 	MaxNameLength        = 70  // max length of the service name
 	MaxDescriptionLength = 280 // max length of the service and author description
 	MaxTagsNum           = 10  // max total number of the tags
 	MaxTagLength         = 70  // max length of the tag
+
+	MaxProvidersNum     = 10 // max total number of the providers to request
+	RequestContextIDLen = 32 // length of the request context ID in bytes
 )
 
 // the service name only accepts alphanumeric characters, _ and -
@@ -40,11 +47,14 @@ var (
 	_ sdk.Msg = MsgDisableService{}
 	_ sdk.Msg = MsgEnableService{}
 	_ sdk.Msg = MsgRefundServiceDeposit{}
-	_ sdk.Msg = &MsgSvcRequest{}
-	_ sdk.Msg = &MsgSvcResponse{}
-	_ sdk.Msg = &MsgSvcRefundFees{}
-	_ sdk.Msg = &MsgSvcWithdrawFees{}
-	_ sdk.Msg = &MsgSvcWithdrawTax{}
+	_ sdk.Msg = MsgRequestService{}
+	_ sdk.Msg = MsgRespondService{}
+	_ sdk.Msg = MsgPauseRequestContext{}
+	_ sdk.Msg = MsgStartRequestContext{}
+	_ sdk.Msg = MsgKillRequestContext{}
+	_ sdk.Msg = MsgUpdateRequestContext{}
+	_ sdk.Msg = MsgWithdrawEarnedFees{}
+	_ sdk.Msg = MsgWithdrawTax{}
 )
 
 //______________________________________________________________________
@@ -449,225 +459,426 @@ func (msg MsgRefundServiceDeposit) GetSigners() []sdk.AccAddress {
 
 //______________________________________________________________________
 
-// MsgSvcRequest - struct for call a service
-type MsgSvcRequest struct {
-	DefChainID  string         `json:"def_chain_id"`
-	DefName     string         `json:"def_name"`
-	BindChainID string         `json:"bind_chain_id"`
-	ReqChainID  string         `json:"req_chain_id"`
-	MethodID    int16          `json:"method_id"`
-	Provider    sdk.AccAddress `json:"provider"`
-	Consumer    sdk.AccAddress `json:"consumer"`
-	Input       []byte         `json:"input"`
-	ServiceFee  sdk.Coins      `json:"service_fee"`
-	Profiling   bool           `json:"profiling"`
+// MsgRequestService defines a message to request a service
+type MsgRequestService struct {
+	ServiceName       string           `json:"service_name"`
+	Providers         []sdk.AccAddress `json:"providers"`
+	Consumer          sdk.AccAddress   `json:"consumer"`
+	Input             string           `json:"input"`
+	ServiceFeeCap     sdk.Coins        `json:"service_fee_cap"`
+	Timeout           int64            `json:"timeout"`
+	Repeated          bool             `json:"repeated"`
+	RepeatedFrequency uint64           `json:"repeated_frequency"`
+	RepeatedTotal     int64            `json:"repeated_total"`
 }
 
-// NewMsgSvcRequest constructs a MsgSvcRequest
-func NewMsgSvcRequest(defChainID, defName, bindChainID, reqChainID string, consumer, provider sdk.AccAddress, methodID int16, input []byte, serviceFee sdk.Coins, profiling bool) MsgSvcRequest {
-	return MsgSvcRequest{
-		DefChainID:  defChainID,
-		DefName:     defName,
-		BindChainID: bindChainID,
-		ReqChainID:  reqChainID,
-		Consumer:    consumer,
-		Provider:    provider,
-		MethodID:    methodID,
-		Input:       input,
-		ServiceFee:  serviceFee,
-		Profiling:   profiling,
+// NewMsgRequestService creates a new MsgRequestService instance
+func NewMsgRequestService(
+	serviceName string,
+	providers []sdk.AccAddress,
+	consumer sdk.AccAddress,
+	input string,
+	serviceFeeCap sdk.Coins,
+	timeout int64,
+	repeated bool,
+	repeatedFrequency uint64,
+	repeatedTotal int64,
+) MsgRequestService {
+	return MsgRequestService{
+		ServiceName:       serviceName,
+		Providers:         providers,
+		Consumer:          consumer,
+		Input:             input,
+		ServiceFeeCap:     serviceFeeCap,
+		Timeout:           timeout,
+		Repeated:          repeated,
+		RepeatedFrequency: repeatedFrequency,
+		RepeatedTotal:     repeatedTotal,
 	}
 }
 
 // Route implements Msg.
-func (msg MsgSvcRequest) Route() string { return MsgRoute }
+func (msg MsgRequestService) Route() string { return MsgRoute }
 
 // Type implements Msg.
-func (msg MsgSvcRequest) Type() string { return TypeMsgSvcRequest }
+func (msg MsgRequestService) Type() string { return TypeMsgRequestService }
 
 // GetSignBytes implements Msg.
-func (msg MsgSvcRequest) GetSignBytes() []byte {
-	if len(msg.Input) == 0 {
-		msg.Input = nil
-	}
+func (msg MsgRequestService) GetSignBytes() []byte {
 	b, err := msgCdc.MarshalJSON(msg)
 	if err != nil {
 		panic(err)
 	}
+
 	return sdk.MustSortJSON(b)
 }
 
 // ValidateBasic implements Msg.
-func (msg MsgSvcRequest) ValidateBasic() sdk.Error {
-	if err := ValidateServiceName(msg.DefName); err != nil {
-		return err
-	}
-
-	if len(msg.Provider) == 0 {
-		return ErrInvalidAddress(DefaultCodespace, "provider missing")
-	}
+func (msg MsgRequestService) ValidateBasic() sdk.Error {
 	if len(msg.Consumer) == 0 {
 		return ErrInvalidAddress(DefaultCodespace, "consumer missing")
 	}
-	if !msg.ServiceFee.IsValidIrisAtto() {
-		return sdk.ErrInvalidCoins(fmt.Sprintf("invalid service fee [%s]", msg.ServiceFee))
-	}
-	return nil
+
+	return ValidateRequest(
+		msg.ServiceName, msg.ServiceFeeCap, msg.Providers, msg.Input, msg.Timeout,
+		msg.Repeated, msg.RepeatedFrequency, msg.RepeatedTotal,
+	)
 }
 
 // GetSigners implements Msg.
-func (msg MsgSvcRequest) GetSigners() []sdk.AccAddress {
+func (msg MsgRequestService) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Consumer}
 }
 
 //______________________________________________________________________
 
-// MsgSvcResponse - struct for respond a service call
-type MsgSvcResponse struct {
-	ReqChainID string         `json:"req_chain_id"`
-	RequestID  string         `json:"request_id"`
-	Provider   sdk.AccAddress `json:"provider"`
-	Output     []byte         `json:"output"`
-	ErrorMsg   []byte         `json:"error_msg"`
+// MsgRespondService defines a message to respond a service request
+type MsgRespondService struct {
+	RequestID string         `json:"request_id"`
+	Provider  sdk.AccAddress `json:"provider"`
+	Output    string         `json:"output"`
+	Error     string         `json:"error"`
 }
 
-// NewMsgSvcResponse constructs a MsgSvcResponse
-func NewMsgSvcResponse(reqChainID string, requestID string, provider sdk.AccAddress, output, errorMsg []byte) MsgSvcResponse {
-	return MsgSvcResponse{
-		ReqChainID: reqChainID,
-		RequestID:  requestID,
-		Provider:   provider,
-		Output:     output,
-		ErrorMsg:   errorMsg,
+// NewMsgRespondService creates a new MsgRespondService instance
+func NewMsgRespondService(
+	requestID string,
+	provider sdk.AccAddress,
+	output,
+	err string,
+) MsgRespondService {
+	return MsgRespondService{
+		RequestID: requestID,
+		Provider:  provider,
+		Output:    output,
+		Error:     err,
 	}
 }
 
 // Route implements Msg.
-func (msg MsgSvcResponse) Route() string { return MsgRoute }
+func (msg MsgRespondService) Route() string { return MsgRoute }
 
 // Type implements Msg.
-func (msg MsgSvcResponse) Type() string { return TypeMsgSvcResponse }
+func (msg MsgRespondService) Type() string { return TypeMsgRespondService }
 
 // GetSignBytes implements Msg.
-func (msg MsgSvcResponse) GetSignBytes() []byte {
-	if len(msg.Output) == 0 {
-		msg.Output = nil
-	}
-	if len(msg.ErrorMsg) == 0 {
-		msg.ErrorMsg = nil
-	}
+func (msg MsgRespondService) GetSignBytes() []byte {
 	b, err := msgCdc.MarshalJSON(msg)
 	if err != nil {
 		panic(err)
 	}
+
 	return sdk.MustSortJSON(b)
 }
 
 // ValidateBasic implements Msg.
-func (msg MsgSvcResponse) ValidateBasic() sdk.Error {
+func (msg MsgRespondService) ValidateBasic() sdk.Error {
 	if len(msg.Provider) == 0 {
 		return ErrInvalidAddress(DefaultCodespace, "provider missing")
 	}
 
-	_, _, _, err := ConvertRequestID(msg.RequestID)
+	_, err := ConvertRequestID(msg.RequestID)
 	if err != nil {
-		return ErrInvalidReqID(DefaultCodespace, msg.RequestID)
+		return ErrInvalidRequestID(DefaultCodespace, fmt.Sprintf("failed to parse %s", msg.RequestID))
+	}
+
+	if len(msg.Output) == 0 && len(msg.Error) == 0 {
+		return ErrInvalidResponse(DefaultCodespace, "either output or error should be specified, but neither was provided")
+	}
+
+	if len(msg.Output) > 0 && len(msg.Error) > 0 {
+		return ErrInvalidResponse(DefaultCodespace, "either output or error should be specified, but both were provided")
+	}
+
+	if len(msg.Output) > 0 {
+		if !json.Valid([]byte(msg.Output)) {
+			return ErrInvalidResponseOutput(DefaultCodespace, "output is not valid JSON")
+		}
+	} else {
+		if !json.Valid([]byte(msg.Error)) {
+			return ErrInvalidResponseErr(DefaultCodespace, "err is not valid JSON")
+		}
 	}
 
 	return nil
 }
 
 // GetSigners implements Msg.
-func (msg MsgSvcResponse) GetSigners() []sdk.AccAddress {
+func (msg MsgRespondService) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Provider}
 }
 
 //______________________________________________________________________
 
-// MsgSvcRefundFees - struct for refund fees
-type MsgSvcRefundFees struct {
-	Consumer sdk.AccAddress `json:"consumer"`
+// MsgPauseRequestContext defines a message to suspend a request context
+type MsgPauseRequestContext struct {
+	RequestContextID []byte         `json:"request_context_id"`
+	Consumer         sdk.AccAddress `json:"consumer"`
 }
 
-// NewMsgSvcRefundFees constructs a MsgSvcRefundFees
-func NewMsgSvcRefundFees(consumer sdk.AccAddress) MsgSvcRefundFees {
-	return MsgSvcRefundFees{Consumer: consumer}
+// NewMsgPauseRequestContext creates a new MsgPauseRequestContext instance
+func NewMsgPauseRequestContext(requestContextID []byte, consumer sdk.AccAddress) MsgPauseRequestContext {
+	return MsgPauseRequestContext{
+		RequestContextID: requestContextID,
+		Consumer:         consumer,
+	}
 }
 
 // Route implements Msg.
-func (msg MsgSvcRefundFees) Route() string { return MsgRoute }
+func (msg MsgPauseRequestContext) Route() string { return MsgRoute }
 
 // Type implements Msg.
-func (msg MsgSvcRefundFees) Type() string { return TypeMsgSvcRefundFees }
+func (msg MsgPauseRequestContext) Type() string { return TypeMsgPauseRequestContext }
 
 // GetSignBytes implements Msg.
-func (msg MsgSvcRefundFees) GetSignBytes() []byte {
-	b := msgCdc.MustMarshalJSON(msg)
+func (msg MsgPauseRequestContext) GetSignBytes() []byte {
+	b, err := msgCdc.MarshalJSON(msg)
+	if err != nil {
+		panic(err)
+	}
+
 	return sdk.MustSortJSON(b)
 }
 
 // ValidateBasic implements Msg.
-func (msg MsgSvcRefundFees) ValidateBasic() sdk.Error {
+func (msg MsgPauseRequestContext) ValidateBasic() sdk.Error {
 	if len(msg.Consumer) == 0 {
 		return ErrInvalidAddress(DefaultCodespace, "consumer missing")
 	}
+
+	if len(msg.RequestContextID) != RequestContextIDLen {
+		return ErrInvalidRequestContextID(DefaultCodespace, fmt.Sprintf("length of the request context ID must be %d in bytes", RequestContextIDLen))
+	}
+
 	return nil
 }
 
 // GetSigners implements Msg.
-func (msg MsgSvcRefundFees) GetSigners() []sdk.AccAddress {
+func (msg MsgPauseRequestContext) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Consumer}
 }
 
 //______________________________________________________________________
 
-// MsgSvcWithdrawFees - struct for withdraw fees
-type MsgSvcWithdrawFees struct {
+// MsgStartRequestContext defines a message to resume a request context
+type MsgStartRequestContext struct {
+	RequestContextID []byte         `json:"request_context_id"`
+	Consumer         sdk.AccAddress `json:"consumer"`
+}
+
+// NewMsgStartRequestContext creates a new MsgStartRequestContext instance
+func NewMsgStartRequestContext(requestContextID []byte, consumer sdk.AccAddress) MsgStartRequestContext {
+	return MsgStartRequestContext{
+		RequestContextID: requestContextID,
+		Consumer:         consumer,
+	}
+}
+
+// Route implements Msg.
+func (msg MsgStartRequestContext) Route() string { return MsgRoute }
+
+// Type implements Msg.
+func (msg MsgStartRequestContext) Type() string { return TypeMsgStartRequestContext }
+
+// GetSignBytes implements Msg.
+func (msg MsgStartRequestContext) GetSignBytes() []byte {
+	b, err := msgCdc.MarshalJSON(msg)
+	if err != nil {
+		panic(err)
+	}
+
+	return sdk.MustSortJSON(b)
+}
+
+// ValidateBasic implements Msg.
+func (msg MsgStartRequestContext) ValidateBasic() sdk.Error {
+	if len(msg.Consumer) == 0 {
+		return ErrInvalidAddress(DefaultCodespace, "consumer missing")
+	}
+
+	if len(msg.RequestContextID) != RequestContextIDLen {
+		return ErrInvalidRequestContextID(DefaultCodespace, fmt.Sprintf("length of the request context ID must be %d in bytes", RequestContextIDLen))
+	}
+
+	return nil
+}
+
+// GetSigners implements Msg.
+func (msg MsgStartRequestContext) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{msg.Consumer}
+}
+
+//______________________________________________________________________
+
+// MsgKillRequestContext defines a message to terminate a request context
+type MsgKillRequestContext struct {
+	RequestContextID []byte         `json:"request_context_id"`
+	Consumer         sdk.AccAddress `json:"consumer"`
+}
+
+// NewMsgKillRequestContext creates a new MsgKillRequestContext instance
+func NewMsgKillRequestContext(requestContextID []byte, consumer sdk.AccAddress) MsgKillRequestContext {
+	return MsgKillRequestContext{
+		RequestContextID: requestContextID,
+		Consumer:         consumer,
+	}
+}
+
+// Route implements Msg.
+func (msg MsgKillRequestContext) Route() string { return MsgRoute }
+
+// Type implements Msg.
+func (msg MsgKillRequestContext) Type() string { return TypeMsgKillRequestContext }
+
+// GetSignBytes implements Msg.
+func (msg MsgKillRequestContext) GetSignBytes() []byte {
+	b, err := msgCdc.MarshalJSON(msg)
+	if err != nil {
+		panic(err)
+	}
+
+	return sdk.MustSortJSON(b)
+}
+
+// ValidateBasic implements Msg.
+func (msg MsgKillRequestContext) ValidateBasic() sdk.Error {
+	if len(msg.Consumer) == 0 {
+		return ErrInvalidAddress(DefaultCodespace, "consumer missing")
+	}
+
+	if len(msg.RequestContextID) != RequestContextIDLen {
+		return ErrInvalidRequestContextID(DefaultCodespace, fmt.Sprintf("length of the request context ID must be %d in bytes", RequestContextIDLen))
+	}
+
+	return nil
+}
+
+// GetSigners implements Msg.
+func (msg MsgKillRequestContext) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{msg.Consumer}
+}
+
+//______________________________________________________________________
+
+// MsgUpdateRequestContext defines a message to update a request context
+type MsgUpdateRequestContext struct {
+	RequestContextID  []byte           `json:"request_context_id"`
+	Providers         []sdk.AccAddress `json:"providers"`
+	ServiceFeeCap     sdk.Coins        `json:"service_fee_cap"`
+	RepeatedFrequency uint64           `json:"repeated_frequency"`
+	RepeatedTotal     int64            `json:"repeated_total"`
+	Consumer          sdk.AccAddress   `json:"consumer"`
+}
+
+// NewMsgUpdateRequestContext creates a new MsgUpdateRequestContext instance
+func NewMsgUpdateRequestContext(
+	requestContextID []byte,
+	providers []sdk.AccAddress,
+	serviceFeeCap sdk.Coins,
+	repeatedFrequency uint64,
+	repeatedTotal int64,
+	consumer sdk.AccAddress,
+) MsgUpdateRequestContext {
+	return MsgUpdateRequestContext{
+		RequestContextID:  requestContextID,
+		Providers:         providers,
+		ServiceFeeCap:     serviceFeeCap,
+		RepeatedFrequency: repeatedFrequency,
+		RepeatedTotal:     repeatedTotal,
+		Consumer:          consumer,
+	}
+}
+
+// Route implements Msg.
+func (msg MsgUpdateRequestContext) Route() string { return MsgRoute }
+
+// Type implements Msg.
+func (msg MsgUpdateRequestContext) Type() string { return TypeMsgUpdateRequestContext }
+
+// GetSignBytes implements Msg.
+func (msg MsgUpdateRequestContext) GetSignBytes() []byte {
+	b, err := msgCdc.MarshalJSON(msg)
+	if err != nil {
+		panic(err)
+	}
+
+	return sdk.MustSortJSON(b)
+}
+
+// ValidateBasic implements Msg.
+func (msg MsgUpdateRequestContext) ValidateBasic() sdk.Error {
+	if len(msg.Consumer) == 0 {
+		return ErrInvalidAddress(DefaultCodespace, "consumer missing")
+	}
+
+	if len(msg.RequestContextID) != RequestContextIDLen {
+		return ErrInvalidRequestContextID(DefaultCodespace, fmt.Sprintf("length of the request context ID must be %d in bytes", RequestContextIDLen))
+	}
+
+	return ValidateRequestContextUpdating(msg.ServiceFeeCap, msg.RepeatedTotal)
+}
+
+// GetSigners implements Msg.
+func (msg MsgUpdateRequestContext) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{msg.Consumer}
+}
+
+//______________________________________________________________________
+
+// MsgWithdrawEarnedFees defines a message to withdraw the fees earned by the provider
+type MsgWithdrawEarnedFees struct {
 	Provider sdk.AccAddress `json:"provider"`
 }
 
-// NewMsgSvcWithdrawFees constructs a MsgSvcWithdrawFees
-func NewMsgSvcWithdrawFees(provider sdk.AccAddress) MsgSvcWithdrawFees {
-	return MsgSvcWithdrawFees{Provider: provider}
+// NewMsgWithdrawEarnedFees creates a new MsgWithdrawEarnedFees instance
+func NewMsgWithdrawEarnedFees(provider sdk.AccAddress) MsgWithdrawEarnedFees {
+	return MsgWithdrawEarnedFees{
+		Provider: provider,
+	}
 }
 
 // Route implements Msg.
-func (msg MsgSvcWithdrawFees) Route() string { return MsgRoute }
+func (msg MsgWithdrawEarnedFees) Route() string { return MsgRoute }
 
 // Type implements Msg.
-func (msg MsgSvcWithdrawFees) Type() string { return TypeMsgSvcWithdrawFees }
+func (msg MsgWithdrawEarnedFees) Type() string { return TypeMsgWithdrawEarnedFees }
 
 // GetSignBytes implements Msg.
-func (msg MsgSvcWithdrawFees) GetSignBytes() []byte {
-	b := msgCdc.MustMarshalJSON(msg)
+func (msg MsgWithdrawEarnedFees) GetSignBytes() []byte {
+	b, err := msgCdc.MarshalJSON(msg)
+	if err != nil {
+		panic(err)
+	}
+
 	return sdk.MustSortJSON(b)
 }
 
 // ValidateBasic implements Msg.
-func (msg MsgSvcWithdrawFees) ValidateBasic() sdk.Error {
+func (msg MsgWithdrawEarnedFees) ValidateBasic() sdk.Error {
 	if len(msg.Provider) == 0 {
 		return ErrInvalidAddress(DefaultCodespace, "provider missing")
 	}
+
 	return nil
 }
 
 // GetSigners implements Msg.
-func (msg MsgSvcWithdrawFees) GetSigners() []sdk.AccAddress {
+func (msg MsgWithdrawEarnedFees) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Provider}
 }
 
 //______________________________________________________________________
 
-// MsgSvcWithdrawTax - struct for withdraw tax
-type MsgSvcWithdrawTax struct {
+// MsgWithdrawTax defines a message to withdraw the service tax
+type MsgWithdrawTax struct {
 	Trustee     sdk.AccAddress `json:"trustee"`
 	DestAddress sdk.AccAddress `json:"dest_address"`
 	Amount      sdk.Coins      `json:"amount"`
 }
 
-// NewMsgSvcWithdrawTax constructs a MsgSvcWithdrawTax
-func NewMsgSvcWithdrawTax(trustee, destAddress sdk.AccAddress, amount sdk.Coins) MsgSvcWithdrawTax {
-	return MsgSvcWithdrawTax{
+// NewMsgWithdrawTax creates a new MsgWithdrawTax instance
+func NewMsgWithdrawTax(trustee, destAddress sdk.AccAddress, amount sdk.Coins) MsgWithdrawTax {
+	return MsgWithdrawTax{
 		Trustee:     trustee,
 		DestAddress: destAddress,
 		Amount:      amount,
@@ -675,33 +886,40 @@ func NewMsgSvcWithdrawTax(trustee, destAddress sdk.AccAddress, amount sdk.Coins)
 }
 
 // Route implements Msg.
-func (msg MsgSvcWithdrawTax) Route() string { return MsgRoute }
+func (msg MsgWithdrawTax) Route() string { return MsgRoute }
 
 // Type implements Msg.
-func (msg MsgSvcWithdrawTax) Type() string { return TypeMsgSvcWithdrawTax }
+func (msg MsgWithdrawTax) Type() string { return TypeMsgWithdrawTax }
 
 // GetSignBytes implements Msg.
-func (msg MsgSvcWithdrawTax) GetSignBytes() []byte {
-	b := msgCdc.MustMarshalJSON(msg)
+func (msg MsgWithdrawTax) GetSignBytes() []byte {
+	b, err := msgCdc.MarshalJSON(msg)
+	if err != nil {
+		panic(err)
+	}
+
 	return sdk.MustSortJSON(b)
 }
 
 // ValidateBasic implements Msg.
-func (msg MsgSvcWithdrawTax) ValidateBasic() sdk.Error {
+func (msg MsgWithdrawTax) ValidateBasic() sdk.Error {
 	if len(msg.Trustee) == 0 {
 		return ErrInvalidAddress(DefaultCodespace, "trustee missing")
 	}
+
 	if len(msg.DestAddress) == 0 {
 		return ErrInvalidAddress(DefaultCodespace, "destination address missing")
 	}
-	if !msg.Amount.IsValidIrisAtto() {
-		return sdk.ErrInvalidCoins(fmt.Sprintf("invalid withdraw amount [%s]", msg.Amount))
+
+	if !validServiceCoins(msg.Amount) {
+		return sdk.ErrInvalidCoins(fmt.Sprintf("invalid withdrawal amount: %s", msg.Amount))
 	}
+
 	return nil
 }
 
 // GetSigners implements Msg.
-func (msg MsgSvcWithdrawTax) GetSigners() []sdk.AccAddress {
+func (msg MsgWithdrawTax) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Trustee}
 }
 
@@ -766,6 +984,71 @@ func validatePricing(pricing string) sdk.Error {
 
 	if !validServiceCoins(p.Price) {
 		return ErrInvalidPricing(DefaultCodespace, fmt.Sprintf("invalid pricing coins: %s", p.Price))
+	}
+
+	return nil
+}
+
+// ValidateRequest validates the request params
+func ValidateRequest(
+	serviceName string,
+	serviceFeeCap sdk.Coins,
+	providers []sdk.AccAddress,
+	input string,
+	timeout int64,
+	repeated bool,
+	repeatedFrequency uint64,
+	repeatedTotal int64,
+) sdk.Error {
+	if err := ValidateServiceName(serviceName); err != nil {
+		return err
+	}
+
+	if !validServiceCoins(serviceFeeCap) {
+		return ErrInvalidServiceFee(DefaultCodespace, fmt.Sprintf("invalid service fee: %s", serviceFeeCap))
+	}
+
+	if len(providers) == 0 {
+		return ErrInvalidRequest(DefaultCodespace, "providers missing")
+	}
+
+	if len(providers) > MaxProvidersNum {
+		return ErrInvalidRequest(DefaultCodespace, fmt.Sprintf("total number of the providers must not be greater than %d", MaxProvidersNum))
+	}
+
+	if len(input) == 0 {
+		return ErrInvalidRequestInput(DefaultCodespace, "input missing")
+	}
+
+	if !json.Valid([]byte(input)) {
+		return ErrInvalidRequestInput(DefaultCodespace, "input is not valid JSON")
+	}
+
+	if timeout < 0 {
+		return ErrInvalidRequest(DefaultCodespace, fmt.Sprintf("timeout must not be less than 0: %d", timeout))
+	}
+
+	if repeated {
+		if repeatedFrequency > 0 && timeout > 0 && repeatedFrequency < uint64(timeout) {
+			return ErrInvalidRequest(DefaultCodespace, fmt.Sprintf("repeated frequency [%d] must not be less than timeout [%d]", repeatedFrequency, timeout))
+		}
+
+		if repeatedTotal < -1 || repeatedTotal == 0 {
+			return ErrInvalidRequest(DefaultCodespace, fmt.Sprintf("repeated total number must be greater than 0 or equal to -1: %d", repeatedTotal))
+		}
+	}
+
+	return nil
+}
+
+// ValidateRequestContextUpdating validates the request context updating operation
+func ValidateRequestContextUpdating(serviceFeeCap sdk.Coins, repeatedTotal int64) sdk.Error {
+	if !serviceFeeCap.Empty() && !validServiceCoins(serviceFeeCap) {
+		return ErrInvalidServiceFee(DefaultCodespace, fmt.Sprintf("invalid service fee: %s", serviceFeeCap))
+	}
+
+	if repeatedTotal < -1 {
+		return ErrInvalidRepeatedTotal(DefaultCodespace, fmt.Sprintf("repeated total number must not be less than -1: %d", repeatedTotal))
 	}
 
 	return nil
