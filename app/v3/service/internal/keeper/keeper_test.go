@@ -401,7 +401,7 @@ func TestKeeper_Respond_Service(t *testing.T) {
 
 	requestID := setRequest(ctx, keeper, consumer, provider, requestContextID)
 
-	requestIDStr, _ := types.RequestIDToString(requestID)
+	requestIDStr := types.RequestIDToString(requestID)
 
 	_, err := keeper.AddResponse(ctx, requestIDStr, provider, testOutput, "")
 	require.NoError(t, err)
@@ -453,8 +453,8 @@ func TestKeeper_Request_Service_From_Module(t *testing.T) {
 	requestID1 := setRequest(ctx, keeper, consumer, provider1, requestContextID)
 	requestID2 := setRequest(ctx, keeper, consumer, provider2, requestContextID)
 
-	requestIDStr1, _ := types.RequestIDToString(requestID1)
-	requestIDStr2, _ := types.RequestIDToString(requestID2)
+	requestIDStr1 := types.RequestIDToString(requestID1)
+	requestIDStr2 := types.RequestIDToString(requestID2)
 
 	_, err = keeper.AddResponse(ctx, requestIDStr1, provider1, testOutput, "")
 	require.NoError(t, err)

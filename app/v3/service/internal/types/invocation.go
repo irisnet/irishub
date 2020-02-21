@@ -4,9 +4,6 @@ import (
 	"encoding/binary"
 	"encoding/hex"
 	"errors"
-	"fmt"
-	"strconv"
-	"strings"
 
 	sdk "github.com/irisnet/irishub/types"
 )
@@ -203,49 +200,27 @@ const (
 // ResponseCallback defines the response callback interface
 type ResponseCallback func(ctx sdk.Context, requestContextID []byte, reponses []string)
 
+const (
+	requestIDLen = 42
+)
+
 // ConvertRequestID converts the given string to request ID
-func ConvertRequestID(requestID string) ([]byte, error) {
-	parts := strings.Split(requestID, "-")
-	if len(parts) != 3 {
+func ConvertRequestID(requestIDStr string) ([]byte, error) {
+	if len(requestIDStr) != 2*requestIDLen {
 		return nil, errors.New("invalid request id")
 	}
 
-	requestContextID, err := hex.DecodeString(parts[0])
+	requestID, err := hex.DecodeString(requestIDStr)
 	if err != nil {
-		return nil, err
+		return nil, errors.New("invalid request id")
 	}
 
-	batchCounter, err := strconv.ParseInt(parts[1], 10, 64)
-	if err != nil {
-		return nil, err
-	}
-
-	batchRequestIndex, err := strconv.Atoi(parts[2])
-	if err != nil {
-		return nil, err
-	}
-
-	return GenerateRequestID(requestContextID, uint64(batchCounter), int16(batchRequestIndex)), nil
+	return requestID, nil
 }
 
 // RequestIDToString returns the string representation of the given request ID
-// request ID layout: 32+8+2 bytes
-func RequestIDToString(requestID []byte) (string, error) {
-	if len(requestID) != 42 {
-		return "", errors.New("invalid request id")
-	}
-
-	requestContextID := requestID[0:32]
-	batchCounter := requestID[32:40]
-	batchRequestIndex := requestID[40:42]
-
-	return fmt.Sprintf(
-			"%s-%d-%d",
-			hex.EncodeToString(requestContextID),
-			binary.BigEndian.Uint64(batchCounter),
-			binary.BigEndian.Uint16(batchRequestIndex),
-		),
-		nil
+func RequestIDToString(requestID []byte) string {
+	return hex.EncodeToString(requestID)
 }
 
 // GenerateRequestContextID generates a unique ID for the request context from the specified params

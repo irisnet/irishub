@@ -123,7 +123,7 @@ func (k Keeper) UpdateRequestContext(
 ) sdk.Error {
 	requestContext, found := k.GetRequestContext(ctx, requestContextID)
 	if !found {
-		return types.ErrInvalidRequestContextID(k.codespace, "invalid request context ID")
+		return types.ErrUnknownRequestContext(k.codespace, requestContextID)
 	}
 
 	if !requestContext.Repeated {
@@ -176,7 +176,7 @@ func (k Keeper) PauseRequestContext(
 ) sdk.Error {
 	requestContext, found := k.GetRequestContext(ctx, requestContextID)
 	if !found {
-		return types.ErrInvalidRequestContextID(k.codespace, "invalid request context ID")
+		return types.ErrUnknownRequestContext(k.codespace, requestContextID)
 	}
 
 	if !requestContext.Repeated {
@@ -200,7 +200,7 @@ func (k Keeper) StartRequestContext(
 ) sdk.Error {
 	requestContext, found := k.GetRequestContext(ctx, requestContextID)
 	if !found {
-		return types.ErrInvalidRequestContextID(k.codespace, "invalid request context ID")
+		return types.ErrUnknownRequestContext(k.codespace, requestContextID)
 	}
 
 	if !requestContext.Repeated {
@@ -228,7 +228,7 @@ func (k Keeper) KillRequestContext(
 ) sdk.Error {
 	requestContext, found := k.GetRequestContext(ctx, requestContextID)
 	if !found {
-		return types.ErrInvalidRequestContextID(k.codespace, "invalid request context ID")
+		return types.ErrUnknownRequestContext(k.codespace, requestContextID)
 	}
 
 	if !requestContext.Repeated {

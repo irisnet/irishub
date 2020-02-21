@@ -1,6 +1,7 @@
 package types
 
 import (
+	"encoding/hex"
 	"fmt"
 
 	sdk "github.com/irisnet/irishub/types"
@@ -30,21 +31,22 @@ const (
 	CodeInvalidProviders          sdk.CodeType = 116
 	CodeInvalidRepeatedFreq       sdk.CodeType = 117
 	CodeInvalidRepeatedTotal      sdk.CodeType = 118
-	CodeInvalidRequestContextID   sdk.CodeType = 119
-	CodeRequestContextNonRepeated sdk.CodeType = 120
-	CodeRequestContextNotStarted  sdk.CodeType = 121
-	CodeRequestContextNotPaused   sdk.CodeType = 122
-	CodeModuleNameRegistered      sdk.CodeType = 123
-	CodeModuleNameNotRegistered   sdk.CodeType = 124
-	CodeNoEarnedFees              sdk.CodeType = 125
+	CodeUnknownRequestContext     sdk.CodeType = 119
+	CodeInvalidRequestContextID   sdk.CodeType = 120
+	CodeRequestContextNonRepeated sdk.CodeType = 121
+	CodeRequestContextNotStarted  sdk.CodeType = 122
+	CodeRequestContextNotPaused   sdk.CodeType = 123
+	CodeModuleNameRegistered      sdk.CodeType = 124
+	CodeModuleNameNotRegistered   sdk.CodeType = 125
+	CodeNoEarnedFees              sdk.CodeType = 126
 
-	CodeInvalidRequestInput   sdk.CodeType = 126
-	CodeInvalidResponseOutput sdk.CodeType = 127
-	CodeInvalidResponseErr    sdk.CodeType = 128
+	CodeInvalidRequestInput   sdk.CodeType = 127
+	CodeInvalidResponseOutput sdk.CodeType = 128
+	CodeInvalidResponseErr    sdk.CodeType = 129
 
-	CodeInvalidAddress  sdk.CodeType = 129
-	CodeInvalidGuardian sdk.CodeType = 130
-	CodeInvalidTrustee  sdk.CodeType = 131
+	CodeInvalidAddress  sdk.CodeType = 130
+	CodeInvalidGuardian sdk.CodeType = 131
+	CodeInvalidTrustee  sdk.CodeType = 132
 )
 
 func ErrInvalidServiceName(codespace sdk.CodespaceType, serviceName string) sdk.Error {
@@ -121,6 +123,10 @@ func ErrInvalidRepeatedFreq(codespace sdk.CodespaceType, msg string) sdk.Error {
 
 func ErrInvalidRepeatedTotal(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidRepeatedTotal, msg)
+}
+
+func ErrUnknownRequestContext(codespace sdk.CodespaceType, requestContextID []byte) sdk.Error {
+	return sdk.NewError(codespace, CodeUnknownRequestContext, fmt.Sprintf("unknown request context: %s", hex.EncodeToString(requestContextID)))
 }
 
 func ErrInvalidRequestContextID(codespace sdk.CodespaceType, msg string) sdk.Error {
