@@ -1,15 +1,15 @@
 package cli
 
 import (
+	"encoding/hex"
 	"fmt"
-	"os"
+	"strconv"
 
 	"github.com/spf13/cobra"
 
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/app/v3/service"
 	"github.com/irisnet/irishub/client/context"
-	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
 )
@@ -134,22 +134,46 @@ func GetCmdQueryServiceBindings(cdc *codec.Codec) *cobra.Command {
 func GetCmdQueryServiceRequests(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "requests",
-		Short:   "Query service requests",
-		Example: "iriscli service requests <service-name> <provider>",
+		Short:   "Query service requests by the service binding or request context ID",
+		Example: "iriscli service requests <service-name> <provider> | <request-context-id> <batch-counter>",
 		Args:    cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			serviceName := args[0]
+			queryByBinding := true
 
 			provider, err := sdk.AccAddressFromBech32(args[1])
 			if err != nil {
-				return err
+				queryByBinding = false
 			}
 
-			params := service.QueryRequestsParams{
-				ServiceName: serviceName,
-				Provider:    provider,
+			var params interface{}
+			var route string
+
+			if queryByBinding {
+				params = service.QueryRequestsParams{
+					ServiceName: args[0],
+					Provider:    provider,
+				}
+
+				route = fmt.Sprintf("custom/%s/%s", protocol.ServiceRoute, service.QueryRequests)
+			} else {
+				requestContextID, err := hex.DecodeString(args[0])
+				if err != nil {
+					return err
+				}
+
+				batchCounter, err := strconv.ParseUint(args[1], 10, 64)
+				if err != nil {
+					return err
+				}
+
+				params = service.QueryRequestsByReqCtxParams{
+					RequestContextID: requestContextID,
+					BatchCounter:     batchCounter,
+				}
+
+				route = fmt.Sprintf("custom/%s/%s", protocol.ServiceRoute, service.QueryRequestsByReqCtx)
 			}
 
 			bz, err := cdc.MarshalJSON(params)
@@ -157,7 +181,6 @@ func GetCmdQueryServiceRequests(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			route := fmt.Sprintf("custom/%s/%s", protocol.ServiceRoute, service.QueryRequests)
 			res, err := cliCtx.QueryWithData(route, bz)
 			if err != nil {
 				return err
@@ -178,7 +201,7 @@ func GetCmdQueryServiceRequests(cdc *codec.Codec) *cobra.Command {
 func GetCmdQueryServiceResponse(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "response",
-		Short:   "Query a service response",
+		Short:   "Query a response by the request ID",
 		Example: "iriscli service response <request-id>",
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -211,25 +234,110 @@ func GetCmdQueryServiceResponse(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-func GetCmdQuerySvcFees(cdc *codec.Codec) *cobra.Command {
+func GetCmdQueryServiceResponses(cdc *codec.Codec) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "response",
+		Short:   "Query responses by the request context ID and batch counter",
+		Example: "iriscli service responses <request-context-id> <batch-counter>",
+		Args:    cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+
+			requestContextID, err := hex.DecodeString(args[0])
+			if err != nil {
+				return err
+			}
+
+			batchCounter, err := strconv.ParseUint(args[1], 10, 64)
+			if err != nil {
+				return err
+			}
+
+			params := service.QueryResponsesParams{
+				RequestContextID: requestContextID,
+				BatchCounter:     batchCounter,
+			}
+
+			bz, err := cdc.MarshalJSON(params)
+			if err != nil {
+				return err
+			}
+
+			route := fmt.Sprintf("custom/%s/%s", protocol.ServiceRoute, service.QueryResponses)
+			res, err := cliCtx.QueryWithData(route, bz)
+			if err != nil {
+				return err
+			}
+
+			var responses service.Responses
+			if err := cdc.UnmarshalJSON(res, &responses); err != nil {
+				return err
+			}
+
+			return cliCtx.PrintOutput(responses)
+		},
+	}
+
+	return cmd
+}
+
+func GetCmdQueryRequestContext(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "fees",
-		Short:   "Query return and incoming fee of a particular address",
-		Example: "iriscli service fees <account address>",
+		Short:   "Query a request context",
+		Example: "iriscli service request-context <request-context-id>",
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
-				WithAccountDecoder(utils.GetAccountDecoder(cdc))
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			addrString := args[0]
+			requestContextID, err := hex.DecodeString(args[0])
+			if err != nil {
+				return err
+			}
 
-			addr, err := sdk.AccAddressFromBech32(addrString)
+			params := service.QueryRequestContextParams{
+				RequestContextID: requestContextID,
+			}
+
+			bz, err := cdc.MarshalJSON(params)
+			if err != nil {
+				return err
+			}
+
+			route := fmt.Sprintf("custom/%s/%s", protocol.ServiceRoute, service.QueryRequestContext)
+			res, err := cliCtx.QueryWithData(route, bz)
+			if err != nil {
+				return err
+			}
+
+			var requestContext service.RequestContext
+			if err := cdc.UnmarshalJSON(res, &requestContext); err != nil {
+				return err
+			}
+
+			return cliCtx.PrintOutput(requestContext)
+		},
+	}
+
+	return cmd
+}
+
+func GetCmdQueryEarnedFees(cdc *codec.Codec) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "fees",
+		Short:   "Query the earned fees",
+		Example: "iriscli service fees <address>",
+		Args:    cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+
+			provider, err := sdk.AccAddressFromBech32(args[0])
 			if err != nil {
 				return err
 			}
 
 			params := service.QueryFeesParams{
-				Address: addr,
+				Address: provider,
 			}
 
 			bz, err := cdc.MarshalJSON(params)
@@ -243,9 +351,14 @@ func GetCmdQuerySvcFees(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			fmt.Println(string(res))
-			return nil
+			var fees service.EarnedFees
+			if err := cdc.UnmarshalJSON(res, &fees); err != nil {
+				return err
+			}
+
+			return cliCtx.PrintOutput(fees)
 		},
 	}
+
 	return cmd
 }

@@ -71,7 +71,7 @@ type (
 	Request                 = types.Request
 	CompactRequest          = types.CompactRequest
 	Response                = types.Response
-	ReturnedFee             = types.EarnedFees
+	EarnedFees              = types.EarnedFees
 	Metrics                 = types.Metrics
 	MsgDefineService        = types.MsgDefineService
 	MsgBindService          = types.MsgBindService

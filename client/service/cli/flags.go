@@ -66,6 +66,7 @@ func init() {
 	FsServiceRequest.Uint64(FlagFrequency, 0, "request frequency when repeated, default to timeout")
 	FsServiceRequest.Int64(FlagTotal, 0, "request count when repeated, -1 means unlimited")
 
+	FsServiceRequest.StringSlice(FlagProviders, []string{}, "new providers to request, not updated if empty")
 	FsServiceUpdateRequestContext.String(FlagServiceFeeCap, "", "maximal fee to pay for a service request, empty means not updated")
 	FsServiceUpdateRequestContext.Uint64(FlagFrequency, 0, "new request frequency, not updated if set to 0")
 	FsServiceUpdateRequestContext.Int64(FlagTotal, 0, "new request count, not updated if set to 0")

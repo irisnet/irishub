@@ -380,7 +380,7 @@ func GetCmdRequestService(cdc *codec.Codec) *cobra.Command {
 		Use:   "call",
 		Short: "Call a service",
 		Example: "iriscli service call --chain-id=<chain-id> --from=<key name> --fee=0.3iris --service-name=<service name> " +
-			"--providers=<provider list> --service-fee-cap=1iris --data=<request data> --repeated --frequency=10 --total=100",
+			"--providers=<provider list> --service-fee-cap=1iris --data=<request data> -timeout=100 --repeated --frequency=150 --total=100",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
@@ -578,6 +578,68 @@ func GetCmdKillRequestContext(cdc *codec.Codec) *cobra.Command {
 			}
 
 			msg := service.NewMsgKillRequestContext(requestContextID, consumer)
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+
+			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
+		},
+	}
+
+	return cmd
+}
+
+func GetCmdUpdateRequestContext(cdc *codec.Codec) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "update",
+		Short: "Update a request context",
+		Example: "iriscli service update-request-context <request-context-id> --chain-id=<chain-id> --from=<key name> --fee=0.3iris " +
+			"--providers=<new providers> --service-fee-cap=<2iris> --frequency=200 --total=200",
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().
+				WithCodec(cdc).
+				WithLogger(os.Stdout).
+				WithAccountDecoder(utils.GetAccountDecoder(cdc))
+			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).
+				WithCliCtx(cliCtx)
+
+			consumer, err := cliCtx.GetFromAddress()
+			if err != nil {
+				return err
+			}
+
+			requestContextID, err := hex.DecodeString(args[0])
+			if err != nil {
+				return err
+			}
+
+			var providers []sdk.AccAddress
+			providerList := viper.GetStringSlice(FlagProviders)
+
+			for _, p := range providerList {
+				provider, err := sdk.AccAddressFromBech32(p)
+				if err != nil {
+					return err
+				}
+
+				providers = append(providers, provider)
+			}
+
+			var serviceFeeCap sdk.Coins
+
+			serviceFeeCapStr := viper.GetString(FlagServiceFeeCap)
+			if len(serviceFeeCapStr) != 0 {
+				serviceFeeCap, err := cliCtx.ParseCoins(serviceFeeCapStr)
+				if err != nil {
+					return err
+				}
+			}
+
+			frequency := uint64(viper.GetInt64(FlagFrequency))
+			total := viper.GetInt64(FlagTotal)
+
+			msg := service.NewMsgUpdateRequestContext(requestContextID, providers, serviceFeeCap, frequency, total, consumer)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
