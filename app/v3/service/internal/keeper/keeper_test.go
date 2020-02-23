@@ -14,7 +14,7 @@ import (
 var (
 	testChainID = "test-chain"
 
-	testCoin1, _ = sdk.IrisCoinType.ConvertToMinDenomCoin("1000iris")
+	testCoin1, _ = sdk.IrisCoinType.ConvertToMinDenomCoin("10000iris")
 	testCoin2, _ = sdk.IrisCoinType.ConvertToMinDenomCoin("100iris")
 	testCoin3, _ = sdk.IrisCoinType.ConvertToMinDenomCoin("1iris")
 
@@ -109,7 +109,7 @@ func TestKeeper_Define_Service(t *testing.T) {
 }
 
 func TestKeeper_Bind_Service(t *testing.T) {
-	ctx, keeper, accs := createTestInput(t, sdk.NewIntWithDecimal(2000, 18), 2)
+	ctx, keeper, accs := createTestInput(t, sdk.NewIntWithDecimal(20000, 18), 2)
 
 	author := accs[0].GetAddress()
 	provider := accs[1].GetAddress()
@@ -195,7 +195,7 @@ func TestKeeper_Enable_Service(t *testing.T) {
 }
 
 func TestKeeper_Refund_Deposit(t *testing.T) {
-	ctx, keeper, accs := createTestInput(t, sdk.NewIntWithDecimal(2000, 18), 1)
+	ctx, keeper, accs := createTestInput(t, sdk.NewIntWithDecimal(20000, 18), 1)
 
 	provider := accs[0].GetAddress()
 

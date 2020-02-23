@@ -273,7 +273,7 @@ func validateMinDepositMultiple(v int64) sdk.Error {
 
 func validateMinDeposit(v sdk.Coins) sdk.Error {
 	max := sdk.NewCoins(sdk.NewCoin(sdk.IrisAtto, sdk.NewIntWithDecimal(100000, 18)))
-	min := sdk.Coins{}
+	var min sdk.Coins
 
 	if sdk.NetworkType == sdk.Mainnet {
 		min = sdk.NewCoins(sdk.NewCoin(sdk.IrisAtto, sdk.NewIntWithDecimal(5000, 18)))
