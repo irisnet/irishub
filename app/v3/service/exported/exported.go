@@ -21,4 +21,7 @@ const (
 
 	// PAUSED indicates the request context is paused
 	PAUSED = types.PAUSED
+
+	// COMPLETED indicates the request context is completed
+	COMPLETED = types.COMPLETED
 )

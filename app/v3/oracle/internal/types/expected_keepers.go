@@ -34,6 +34,7 @@ type ServiceKeeper interface {
 		requestContextID []byte,
 		providers []sdk.AccAddress,
 		serviceFeeCap sdk.Coins,
+		timeout int64,
 		repeatedFreq uint64,
 		repeatedTotal int64) sdk.Error
 

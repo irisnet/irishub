@@ -146,6 +146,7 @@ func (k Keeper) EditFeed(ctx sdk.Context, msg types.MsgEditFeed) sdk.Error {
 	if err := k.sk.UpdateRequestContext(ctx, feed.RequestContextID,
 		msg.Providers,
 		msg.ServiceFeeCap,
+		0, // TODO: add Timeout to msg
 		msg.RepeatedFrequency,
 		msg.RepeatedTotal); err != nil {
 		return err
