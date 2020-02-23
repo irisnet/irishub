@@ -29,6 +29,7 @@ const (
 	CodeInvalidResponse           sdk.CodeType = 114
 	CodeInvalidRequestID          sdk.CodeType = 115
 	CodeInvalidProviders          sdk.CodeType = 116
+	CodeInvalidTimeout            sdk.CodeType = 117
 	CodeInvalidRepeatedFreq       sdk.CodeType = 117
 	CodeInvalidRepeatedTotal      sdk.CodeType = 118
 	CodeUnknownRequestContext     sdk.CodeType = 119
@@ -115,6 +116,10 @@ func ErrInvalidRequestID(codespace sdk.CodespaceType, msg string) sdk.Error {
 
 func ErrInvalidProviders(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidProviders, fmt.Sprintf("invalid providers: %s", msg))
+}
+
+func ErrInvalidTimeout(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidTimeout, msg)
 }
 
 func ErrInvalidRepeatedFreq(codespace sdk.CodespaceType, msg string) sdk.Error {

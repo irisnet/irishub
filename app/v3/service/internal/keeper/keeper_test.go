@@ -271,10 +271,11 @@ func TestKeeper_Request_Context(t *testing.T) {
 
 	// update
 	newServiceFeeCap := sdk.NewCoins(testCoin1)
+	newTimeout := testTimeout - 10
 	newRepeatedFreq := testRepeatedFreq + 10
 	newRepeatedTotal := int64(-1)
 
-	err = keeper.UpdateRequestContext(ctx, requestContextID, nil, newServiceFeeCap, newRepeatedFreq, newRepeatedTotal)
+	err = keeper.UpdateRequestContext(ctx, requestContextID, nil, newServiceFeeCap, newTimeout, newRepeatedFreq, newRepeatedTotal)
 	require.NoError(t, err)
 
 	requestContext, found = keeper.GetRequestContext(ctx, requestContextID)
@@ -284,7 +285,7 @@ func TestKeeper_Request_Context(t *testing.T) {
 	require.Equal(t, providers, requestContext.Providers)
 	require.Equal(t, consumer, requestContext.Consumer)
 	require.Equal(t, newServiceFeeCap, requestContext.ServiceFeeCap)
-	require.Equal(t, testTimeout, requestContext.Timeout)
+	require.Equal(t, newTimeout, requestContext.Timeout)
 	require.True(t, requestContext.Repeated)
 	require.Equal(t, newRepeatedFreq, requestContext.RepeatedFrequency)
 	require.Equal(t, newRepeatedTotal, requestContext.RepeatedTotal)

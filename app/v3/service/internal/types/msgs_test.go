@@ -609,7 +609,7 @@ func TestMsgRequestServiceValidation(t *testing.T) {
 
 	invalidInput := "iris-usdt"
 	invalidTimeout := int64(-1)
-	lessRepeatedFreq := uint64(testTimeout) - 10
+	invalidLessRepeatedFreq := uint64(testTimeout) - 10
 	invalidRepeatedTotal1 := int64(-2)
 	invalidRepeatedTotal2 := int64(0)
 
@@ -652,7 +652,7 @@ func TestMsgRequestServiceValidation(t *testing.T) {
 		), // invalid timeout
 		NewMsgRequestService(
 			testServiceName, testProviders, testConsumer, testInput, testServiceFeeCap, testTimeout,
-			true, lessRepeatedFreq, testRepeatedTotal,
+			true, invalidLessRepeatedFreq, testRepeatedTotal,
 		), // invalid repeated frequency
 		NewMsgRequestService(
 			testServiceName, testProviders, testConsumer, testInput, testServiceFeeCap, testTimeout,
@@ -668,7 +668,7 @@ func TestMsgRequestServiceValidation(t *testing.T) {
 		), // both timeout and frequency can be zero
 		NewMsgRequestService(
 			testServiceName, testProviders, testConsumer, testInput, testServiceFeeCap, testTimeout,
-			false, lessRepeatedFreq, invalidRepeatedTotal1,
+			false, invalidLessRepeatedFreq, invalidRepeatedTotal1,
 		), // do not check the repeated frequency and total when not repeated
 	}
 
@@ -996,14 +996,14 @@ func TestMsgKillRequestContextGetSigners(t *testing.T) {
 
 // TestMsgUpdateRequestContextRoute tests Route for MsgUpdateRequestContext
 func TestMsgUpdateRequestContextRoute(t *testing.T) {
-	msg := NewMsgUpdateRequestContext(testRequestContextID, nil, nil, 0, 0, testConsumer)
+	msg := NewMsgUpdateRequestContext(testRequestContextID, nil, nil, 0, 0, 0, testConsumer)
 
 	require.Equal(t, MsgRoute, msg.Route())
 }
 
 // TestMsgUpdateRequestContextType tests Type for MsgUpdateRequestContext
 func TestMsgUpdateRequestContextType(t *testing.T) {
-	msg := NewMsgUpdateRequestContext(testRequestContextID, nil, nil, 0, 0, testConsumer)
+	msg := NewMsgUpdateRequestContext(testRequestContextID, nil, nil, 0, 0, 0, testConsumer)
 
 	require.Equal(t, "update_request_context", msg.Type())
 }
@@ -1013,16 +1013,20 @@ func TestMsgUpdateRequestContextValidation(t *testing.T) {
 	emptyAddress := sdk.AccAddress{}
 
 	invalidRequestContextID := []byte("invalid-request-context-id")
+	invalidTimeout := int64(-1)
+	invalidLessRepeatedFreq := uint64(testTimeout) - 10
 	invalidRepeatedTotal := int64(-2)
 	invalidDenomCoins := sdk.NewCoins(sdk.NewCoin("eth-min", sdk.NewInt(1000)))
 
 	testMsgs := []MsgUpdateRequestContext{
-		NewMsgUpdateRequestContext(testRequestContextID, testProviders, testServiceFeeCap, testRepeatedFreq, testRepeatedTotal, testConsumer), // valid msg
-		NewMsgUpdateRequestContext(testRequestContextID, nil, nil, 0, 0, testConsumer),                                                        // allow all not to be updated
-		NewMsgUpdateRequestContext(testRequestContextID, nil, nil, 0, 0, emptyAddress),                                                        // missing consumer address
-		NewMsgUpdateRequestContext(invalidRequestContextID, nil, nil, 0, 0, testConsumer),                                                     // invalid request context ID
-		NewMsgUpdateRequestContext(testRequestContextID, nil, nil, 0, invalidRepeatedTotal, testConsumer),                                     // invalid repeated total
-		NewMsgUpdateRequestContext(testRequestContextID, nil, invalidDenomCoins, 0, 0, testConsumer),                                          // invalid service fee denom
+		NewMsgUpdateRequestContext(testRequestContextID, testProviders, testServiceFeeCap, testTimeout, testRepeatedFreq, testRepeatedTotal, testConsumer), // valid msg
+		NewMsgUpdateRequestContext(testRequestContextID, nil, nil, 0, 0, 0, testConsumer),                                                                  // allow all not to be updated
+		NewMsgUpdateRequestContext(testRequestContextID, nil, nil, 0, 0, 0, emptyAddress),                                                                  // missing consumer address
+		NewMsgUpdateRequestContext(invalidRequestContextID, nil, nil, 0, 0, 0, testConsumer),                                                               // invalid request context ID
+		NewMsgUpdateRequestContext(testRequestContextID, nil, nil, invalidTimeout, 0, 0, testConsumer),                                                     // invalid timeout
+		NewMsgUpdateRequestContext(invalidRequestContextID, nil, nil, testTimeout, invalidLessRepeatedFreq, 0, testConsumer),                               // invalid repeated frequency
+		NewMsgUpdateRequestContext(testRequestContextID, nil, nil, 0, 0, invalidRepeatedTotal, testConsumer),                                               // invalid repeated total
+		NewMsgUpdateRequestContext(testRequestContextID, nil, invalidDenomCoins, 0, 0, 0, testConsumer),                                                    // invalid service fee denom
 	}
 
 	testCases := []struct {
@@ -1034,8 +1038,10 @@ func TestMsgUpdateRequestContextValidation(t *testing.T) {
 		{testMsgs[1], true, ""},
 		{testMsgs[2], false, "missing consumer address"},
 		{testMsgs[3], false, "invalid request context ID"},
-		{testMsgs[4], false, "invalid repeated total"},
-		{testMsgs[5], false, "invalid service fee denom"},
+		{testMsgs[4], false, "invalid timeout"},
+		{testMsgs[5], false, "invalid repeated frequency"},
+		{testMsgs[6], false, "invalid repeated total"},
+		{testMsgs[7], false, "invalid service fee denom"},
 	}
 
 	for i, tc := range testCases {
@@ -1050,16 +1056,16 @@ func TestMsgUpdateRequestContextValidation(t *testing.T) {
 
 // TestMsgUpdateRequestContextGetSignBytes tests GetSignBytes for MsgUpdateRequestContext
 func TestMsgUpdateRequestContextGetSignBytes(t *testing.T) {
-	msg := NewMsgUpdateRequestContext(testRequestContextID, testProviders, testServiceFeeCap, testRepeatedFreq, testRepeatedTotal, testConsumer)
+	msg := NewMsgUpdateRequestContext(testRequestContextID, testProviders, testServiceFeeCap, testTimeout, testRepeatedFreq, testRepeatedTotal, testConsumer)
 	res := msg.GetSignBytes()
 
-	expected := `{"type":"irishub/service/MsgUpdateRequestContext","value":{"consumer":"faa1w3jhxapdvdhkuum4d4jhyl0qvse","providers":["faa1w3jhxapdwpex7anfv3jhynrxe9z"],"repeated_frequency":"120","repeated_total":"100","request_context_id":"PbD6mdywWLyGBButvWFNaDn4+iDhfPitO6FMPxv2E70=","service_fee_cap":[{"amount":"100000000000000000000","denom":"iris-atto"}]}}`
+	expected := `{"type":"irishub/service/MsgUpdateRequestContext","value":{"consumer":"faa1w3jhxapdvdhkuum4d4jhyl0qvse","providers":["faa1w3jhxapdwpex7anfv3jhynrxe9z"],"repeated_frequency":"120","repeated_total":"100","request_context_id":"PbD6mdywWLyGBButvWFNaDn4+iDhfPitO6FMPxv2E70=","service_fee_cap":[{"amount":"100000000000000000000","denom":"iris-atto"}],"timeout":"100"}}`
 	require.Equal(t, expected, string(res))
 }
 
 // TestMsgUpdateRequestContextGetSigners tests GetSigners for MsgUpdateRequestContext
 func TestMsgUpdateRequestContextGetSigners(t *testing.T) {
-	msg := NewMsgUpdateRequestContext(testRequestContextID, testProviders, testServiceFeeCap, testRepeatedFreq, testRepeatedTotal, testConsumer)
+	msg := NewMsgUpdateRequestContext(testRequestContextID, testProviders, testServiceFeeCap, testTimeout, testRepeatedFreq, testRepeatedTotal, testConsumer)
 	res := msg.GetSigners()
 
 	expected := "[746573742D636F6E73756D6572]"
