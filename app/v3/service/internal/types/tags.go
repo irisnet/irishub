@@ -1,17 +1,13 @@
 package types
 
-import (
-	sdk "github.com/irisnet/irishub/types"
-)
-
+// nolint
 var (
-	TagActionSvcCallTimeOut = []byte("service_call_expiration")
-
-	TagAction = sdk.TagAction
-
-	TagProvider   = "provider"
-	TagConsumer   = "consumer"
-	TagRequestID  = "request-id"
-	TagServiceFee = "service-fee"
-	TagSlashCoins = "service-slash-coins"
+	TagProvider         = "provider"
+	TagConsumer         = "consumer"
+	TagRequestContextID = "request-context-id"
+	TagRequestID        = "request-id"
+	TagServiceFee       = "service-fee"
+	TagRequestHeight    = "request-height"
+	TagExpirationHeight = "expiration-height"
+	TagSlashedCoins     = "slashed-coins"
 )

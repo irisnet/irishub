@@ -11,9 +11,8 @@ func BeginBlocker(ctx sdk.Context, k Keeper) {
 }
 
 // EndBlocker handles block ending logic for service
-func EndBlocker(ctx sdk.Context, k Keeper) (resTags sdk.Tags) {
+func EndBlocker(ctx sdk.Context, k Keeper) (tags sdk.Tags) {
 	ctx = ctx.WithLogger(ctx.Logger().With("handler", "endBlock").With("module", "iris/service"))
-	// logger := ctx.Logger()
 
 	params := k.GetParamSet(ctx)
 	slashFraction := params.SlashFraction
@@ -35,7 +34,7 @@ func EndBlocker(ctx sdk.Context, k Keeper) (resTags sdk.Tags) {
 			defer activeReqIterator.Close()
 
 			for ; activeReqIterator.Valid(); activeReqIterator.Next() {
-				requestID := activeReqIterator.Value()
+				var requestID []byte
 				k.GetCdc().MustUnmarshalBinaryLengthPrefixed(activeReqIterator.Value(), &requestID)
 
 				request, _ := k.GetRequest(ctx, requestID)
@@ -57,6 +56,13 @@ func EndBlocker(ctx sdk.Context, k Keeper) (resTags sdk.Tags) {
 						if err := k.RefundServiceFee(ctx, request.Consumer, request.ServiceFee); err != nil {
 							panic(err)
 						}
+
+						tags = tags.AppendTags(sdk.NewTags(
+							TagRequestID, []byte(RequestIDToString(requestID)),
+							TagProvider, []byte(request.Provider.String()),
+							TagConsumer, []byte(request.Consumer.String()),
+							TagSlashedCoins, []byte(slashedCoins.String()),
+						))
 					}
 				}
 
@@ -105,8 +111,10 @@ func EndBlocker(ctx sdk.Context, k Keeper) (resTags sdk.Tags) {
 				reqContext.BatchCounter++
 				k.SetRequestContext(ctx, reqContextID, reqContext)
 
-				k.InitiateRequests(ctx, reqContextID, providers)
+				requestTags := k.InitiateRequests(ctx, reqContextID, providers)
 				k.AddRequestBatchExpiration(ctx, reqContextID, ctx.BlockHeight()+reqContext.Timeout)
+
+				tags = tags.AppendTags(requestTags)
 			}
 		}
 
