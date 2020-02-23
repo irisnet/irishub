@@ -23,6 +23,7 @@ type ServiceKeeper interface {
 		input string,
 		serviceFeeCap sdk.Coins,
 		timeout int64,
+		superMode,
 		repeated bool,
 		repeatedFrequency uint64,
 		repeatedTotal int64,

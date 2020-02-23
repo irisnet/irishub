@@ -55,6 +55,7 @@ func (k Keeper) CreateFeed(ctx sdk.Context, msg types.MsgCreateFeed) sdk.Error {
 		msg.Input,
 		msg.ServiceFeeCap,
 		msg.Timeout,
+		false, // TODO: add SuperMode to msg
 		true,
 		msg.RepeatedFrequency, msg.RepeatedTotal, service.PAUSED, msg.ResponseThreshold, types.ModuleName)
 	if err != nil {
