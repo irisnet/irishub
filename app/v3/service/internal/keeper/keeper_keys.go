@@ -73,6 +73,11 @@ func GetRequestKey(requestID []byte) []byte {
 	return append(requestKey, requestID...)
 }
 
+// GetRequestSubspaceByReqCtx returns the key for the requests of the specified request context
+func GetRequestSubspaceByReqCtx(requestContextID []byte, batchCounter uint64) []byte {
+	return append(append(requestKey, requestContextID...), sdk.Uint64ToBigEndian(batchCounter)...)
+}
+
 // GetActiveRequestKey returns the key for the active request with the specified request ID in the given height
 func GetActiveRequestKey(serviceName string, provider sdk.AccAddress, expirationHeight int64, requestID []byte) []byte {
 	activeRequest := append(append(append(getStringsKey([]string{serviceName, provider.String()}), emptyByte...), sdk.Uint64ToBigEndian(uint64(expirationHeight))...), requestID...)

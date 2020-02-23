@@ -360,6 +360,12 @@ func (k Keeper) GetRequest(ctx sdk.Context, requestID []byte) (request types.Req
 	return request, true
 }
 
+// RequestsIteratorByReqCtx returns an iterator for all requests with the specified request context ID and batch counter
+func (k Keeper) RequestsIteratorByReqCtx(ctx sdk.Context, requestContextID []byte, batchCounter uint64) sdk.Iterator {
+	store := ctx.KVStore(k.storeKey)
+	return sdk.KVStorePrefixIterator(store, GetRequestSubspaceByReqCtx(requestContextID, batchCounter))
+}
+
 // AddActiveRequest adds the specified active request
 func (k Keeper) AddActiveRequest(
 	ctx sdk.Context,

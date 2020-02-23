@@ -22,6 +22,12 @@ func NewQuerier(k Keeper) sdk.Querier {
 			return queryRequests(ctx, req, k)
 		case types.QueryResponse:
 			return queryResponse(ctx, req, k)
+		case types.QueryRequestContext:
+			return queryRequestContext(ctx, req, k)
+		case types.QueryRequestsByReqCtx:
+			return queryRequestsByReqCtx(ctx, req, k)
+		case types.QueryResponses:
+			return queryResponses(ctx, req, k)
 		case types.QueryFees:
 			return queryFees(ctx, req, k)
 		default:
@@ -140,6 +146,80 @@ func queryResponse(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sd
 	}
 
 	bz, err := codec.MarshalJSONIndent(k.cdc, response)
+	if err != nil {
+		return nil, sdk.MarshalResultErr(err)
+	}
+
+	return bz, nil
+}
+
+func queryRequestContext(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sdk.Error) {
+	var params types.QueryRequestContextParams
+	err := k.cdc.UnmarshalJSON(req.Data, &params)
+	if err != nil {
+		return nil, sdk.ParseParamsErr(err)
+	}
+
+	requestContext, found := k.GetRequestContext(ctx, params.RequestContextID)
+	if !found {
+		return nil, types.ErrUnknownRequestContext(types.DefaultCodespace, params.RequestContextID)
+	}
+
+	bz, err := codec.MarshalJSONIndent(k.cdc, requestContext)
+	if err != nil {
+		return nil, sdk.MarshalResultErr(err)
+	}
+
+	return bz, nil
+}
+
+func queryRequestsByReqCtx(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sdk.Error) {
+	var params types.QueryRequestsByReqCtxParams
+	err := k.cdc.UnmarshalJSON(req.Data, &params)
+	if err != nil {
+		return nil, sdk.ParseParamsErr(err)
+	}
+
+	iterator:=k.RequestsIteratorByReqCtx(ctx,params.RequestContextID,params.BatchCounter)
+	defer iterator.Close()
+	
+	requests:=make([]types.Request,0)
+
+	for ;iterator.Valid();iterator.Next(); {
+		requestID:=iterator.Key()[1:]
+		request,_:=k.GetRequest(ctx,requestID)
+
+		requests=append(requests,request)
+	}
+
+	bz, err := codec.MarshalJSONIndent(k.cdc, requests)
+	if err != nil {
+		return nil, sdk.MarshalResultErr(err)
+	}
+
+	return bz, nil
+}
+
+func queryResponses(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sdk.Error) {
+	var params types.QueryResponsesParams
+	err := k.cdc.UnmarshalJSON(req.Data, &params)
+	if err != nil {
+		return nil, sdk.ParseParamsErr(err)
+	}
+
+	iterator:=k.ResponsesIteratorByReqCtx(ctx,params.RequestContextID,params.BatchCounter)
+	defer iterator.Close()
+	
+	responses:=make([]types.Response,0)
+
+	for ;iterator.Valid();iterator.Next(); {
+		var response types.Response
+		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(),&response)
+
+		responses=append(responses,response)
+	}
+
+	bz, err := codec.MarshalJSONIndent(k.cdc, responses)
 	if err != nil {
 		return nil, sdk.MarshalResultErr(err)
 	}
