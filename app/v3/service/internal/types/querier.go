@@ -5,12 +5,15 @@ import (
 )
 
 const (
-	QueryDefinition = "definition" // QueryDefinition
-	QueryBinding    = "binding"    // QueryBinding
-	QueryBindings   = "bindings"   // QueryBindings
-	QueryRequests   = "requests"   // QueryRequests
-	QueryResponse   = "response"   // QueryResponse
-	QueryFees       = "fees"       // QueryFees
+	QueryDefinition       = "definition"      // QueryDefinition
+	QueryBinding          = "binding"         // QueryBinding
+	QueryBindings         = "bindings"        // QueryBindings
+	QueryRequests         = "requests"        // QueryRequests
+	QueryResponse         = "response"        // QueryResponse
+	QueryRequestContext   = "context"         // QueryRequestContext
+	QueryRequestsByReqCtx = "requests_by_ctx" // QueryRequestsByReqCtx
+	QueryResponses        = "responses"       // QueryResponses
+	QueryFees             = "fees"            // QueryFees
 )
 
 // QueryDefinitionParams defines the params to query a service definition
@@ -38,6 +41,20 @@ type QueryRequestsParams struct {
 // QueryResponseParams defines the params to query the response for a request
 type QueryResponseParams struct {
 	RequestID string
+}
+
+type QueryRequestContextParams struct {
+	RequestContextID []byte
+}
+
+type QueryRequestsByReqCtxParams struct {
+	RequestContextID []byte
+	BatchCounter     uint64
+}
+
+type QueryResponsesParams struct {
+	RequestContextID []byte
+	BatchCounter     uint64
 }
 
 // QueryFeesParams defines the params to query the earned fees for a provider
