@@ -22,6 +22,7 @@ var (
 	// params store for service params
 	KeyMaxRequestTimeout    = []byte("MaxRequestTimeout")
 	KeyMinDepositMultiple   = []byte("MinDepositMultiple")
+	KeyMinDeposit           = []byte("MinDeposit")
 	KeyServiceFeeTax        = []byte("ServiceFeeTax")
 	KeySlashFraction        = []byte("SlashFraction")
 	KeyComplaintRetrospect  = []byte("ComplaintRetrospect")
@@ -38,6 +39,7 @@ func ParamTypeTable() params.TypeTable {
 type Params struct {
 	MaxRequestTimeout    int64         `json:"max_request_timeout"`
 	MinDepositMultiple   int64         `json:"min_deposit_multiple"`
+	MinDeposit           sdk.Coins     `json:"min_deposit"`
 	ServiceFeeTax        sdk.Dec       `json:"service_fee_tax"`
 	SlashFraction        sdk.Dec       `json:"slash_fraction"`
 	ComplaintRetrospect  time.Duration `json:"complaint_retrospect"`
@@ -49,12 +51,13 @@ func (p Params) String() string {
 	return fmt.Sprintf(`Service Params:
   service/MaxRequestTimeout:     %d
   service/MinDepositMultiple:    %d
+  service/MinDeposit:            %s
   service/ServiceFeeTax:         %s
   service/SlashFraction:         %s
   service/ComplaintRetrospect:   %s
   service/ArbitrationTimeLimit:  %s
   service/TxSizeLimit:           %d`,
-		p.MaxRequestTimeout, p.MinDepositMultiple, p.ServiceFeeTax.String(), p.SlashFraction.String(),
+		p.MaxRequestTimeout, p.MinDepositMultiple, p.MinDeposit.String(), p.ServiceFeeTax.String(), p.SlashFraction.String(),
 		p.ComplaintRetrospect, p.ArbitrationTimeLimit, p.TxSizeLimit)
 }
 
@@ -67,6 +70,7 @@ func (p *Params) KeyValuePairs() params.KeyValuePairs {
 	return params.KeyValuePairs{
 		{KeyMaxRequestTimeout, &p.MaxRequestTimeout},
 		{KeyMinDepositMultiple, &p.MinDepositMultiple},
+		{KeyMinDeposit, &p.MinDeposit},
 		{KeyServiceFeeTax, &p.ServiceFeeTax},
 		{KeySlashFraction, &p.SlashFraction},
 		{KeyComplaintRetrospect, &p.ComplaintRetrospect},
@@ -95,6 +99,15 @@ func (p *Params) Validate(key string, value string) (interface{}, sdk.Error) {
 			return nil, err
 		}
 		return minDepositMultiple, nil
+	case string(KeyMinDeposit):
+		minDeposit, err := sdk.ParseCoins(value)
+		if err != nil {
+			return nil, params.ErrInvalidString(value)
+		}
+		if err := validateMinDeposit(minDeposit); err != nil {
+			return nil, err
+		}
+		return minDeposit, nil
 	case string(KeyServiceFeeTax):
 		serviceFeeTax, err := sdk.NewDecFromStr(value)
 		if err != nil {
@@ -153,6 +166,9 @@ func (p *Params) StringFromBytes(cdc *codec.Codec, key string, bytes []byte) (st
 	case string(KeyMinDepositMultiple):
 		err := cdc.UnmarshalJSON(bytes, &p.MinDepositMultiple)
 		return strconv.FormatInt(p.MinDepositMultiple, 10), err
+	case string(KeyMinDeposit):
+		err := cdc.UnmarshalJSON(bytes, &p.MinDeposit)
+		return p.MinDeposit.String(), err
 	case string(KeyServiceFeeTax):
 		err := cdc.UnmarshalJSON(bytes, &p.ServiceFeeTax)
 		return p.ServiceFeeTax.String(), err
@@ -182,10 +198,11 @@ func DefaultParams() Params {
 	return Params{
 		MaxRequestTimeout:    100,
 		MinDepositMultiple:   1000,
-		ServiceFeeTax:        sdk.NewDecWithPrec(1, 2),    //1%
-		SlashFraction:        sdk.NewDecWithPrec(1, 3),    //0.1%
-		ComplaintRetrospect:  time.Duration(15 * sdk.Day), //15 days
-		ArbitrationTimeLimit: time.Duration(5 * sdk.Day),  //5 days
+		MinDeposit:           sdk.NewCoins(sdk.NewCoin(sdk.IrisAtto, sdk.NewIntWithDecimal(10000, 18))), // 10000iris
+		ServiceFeeTax:        sdk.NewDecWithPrec(1, 2),                                                  // 1%
+		SlashFraction:        sdk.NewDecWithPrec(1, 3),                                                  // 0.1%
+		ComplaintRetrospect:  time.Duration(15 * sdk.Day),                                               // 15 days
+		ArbitrationTimeLimit: time.Duration(5 * sdk.Day),                                                // 5 days
 		TxSizeLimit:          4000,
 	}
 }
@@ -195,10 +212,11 @@ func DefaultParamsForTest() Params {
 	return Params{
 		MaxRequestTimeout:    5,
 		MinDepositMultiple:   10,
-		ServiceFeeTax:        sdk.NewDecWithPrec(1, 2), //1%
-		SlashFraction:        sdk.NewDecWithPrec(1, 3), //0.1%
-		ComplaintRetrospect:  20 * time.Second,         //20 seconds
-		ArbitrationTimeLimit: 20 * time.Second,         //20 seconds
+		MinDeposit:           sdk.NewCoins(sdk.NewCoin(sdk.IrisAtto, sdk.NewIntWithDecimal(10, 18))), // 10iris
+		ServiceFeeTax:        sdk.NewDecWithPrec(1, 2),                                               // 1%
+		SlashFraction:        sdk.NewDecWithPrec(1, 3),                                               // 0.1%
+		ComplaintRetrospect:  20 * time.Second,                                                       // 20 seconds
+		ArbitrationTimeLimit: 20 * time.Second,                                                       // 20 seconds
 		TxSizeLimit:          4000,
 	}
 }
@@ -208,6 +226,9 @@ func validateParams(p Params) error {
 		return err
 	}
 	if err := validateMinDepositMultiple(p.MinDepositMultiple); err != nil {
+		return err
+	}
+	if err := validateMinDeposit(p.MinDeposit); err != nil {
 		return err
 	}
 	if err := validateSlashFraction(p.SlashFraction); err != nil {
@@ -247,6 +268,23 @@ func validateMinDepositMultiple(v int64) sdk.Error {
 	} else if v < 10 || v > 5000 {
 		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidMinDepositMultiple, fmt.Sprintf("Invalid MinDepositMultiple [%d] should be between [10, 5000]", v))
 	}
+	return nil
+}
+
+func validateMinDeposit(v sdk.Coins) sdk.Error {
+	max := sdk.NewCoins(sdk.NewCoin(sdk.IrisAtto, sdk.NewIntWithDecimal(100000, 18)))
+	min := sdk.Coins{}
+
+	if sdk.NetworkType == sdk.Mainnet {
+		min = sdk.NewCoins(sdk.NewCoin(sdk.IrisAtto, sdk.NewIntWithDecimal(5000, 18)))
+	} else {
+		min = sdk.NewCoins(sdk.NewCoin(sdk.IrisAtto, sdk.NewIntWithDecimal(10, 18)))
+	}
+
+	if v.IsAllLT(min) || v.IsAllGT(max) {
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidMinDeposit, fmt.Sprintf("Invalid MinDeposit [%s] should be between [%s, %s]", v, min, max))
+	}
+
 	return nil
 }
 

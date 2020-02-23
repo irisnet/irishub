@@ -70,7 +70,7 @@ func setRequestContext(
 func setRequest(ctx sdk.Context, k Keeper, consumer sdk.AccAddress, provider sdk.AccAddress, requestContextID []byte) []byte {
 	requestContext, _ := k.GetRequestContext(ctx, requestContextID)
 
-	k.DeductServiceFees(ctx, consumer, testServiceFee)
+	_ = k.DeductServiceFees(ctx, consumer, testServiceFee)
 
 	request := types.NewCompactRequest(
 		requestContextID, requestContext.BatchCounter, provider,
