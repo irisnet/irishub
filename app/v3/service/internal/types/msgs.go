@@ -467,6 +467,7 @@ type MsgRequestService struct {
 	Input             string           `json:"input"`
 	ServiceFeeCap     sdk.Coins        `json:"service_fee_cap"`
 	Timeout           int64            `json:"timeout"`
+	SuperMode         bool             `json:"super_mode"`
 	Repeated          bool             `json:"repeated"`
 	RepeatedFrequency uint64           `json:"repeated_frequency"`
 	RepeatedTotal     int64            `json:"repeated_total"`
@@ -480,6 +481,7 @@ func NewMsgRequestService(
 	input string,
 	serviceFeeCap sdk.Coins,
 	timeout int64,
+	superMode bool,
 	repeated bool,
 	repeatedFrequency uint64,
 	repeatedTotal int64,
@@ -491,6 +493,7 @@ func NewMsgRequestService(
 		Input:             input,
 		ServiceFeeCap:     serviceFeeCap,
 		Timeout:           timeout,
+		SuperMode:         superMode,
 		Repeated:          repeated,
 		RepeatedFrequency: repeatedFrequency,
 		RepeatedTotal:     repeatedTotal,

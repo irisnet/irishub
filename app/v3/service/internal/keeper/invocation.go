@@ -28,6 +28,7 @@ func (k Keeper) CreateRequestContext(
 	input string,
 	serviceFeeCap sdk.Coins,
 	timeout int64,
+	superMode bool,
 	repeated bool,
 	repeatedFrequency uint64,
 	repeatedTotal int64,
@@ -35,6 +36,13 @@ func (k Keeper) CreateRequestContext(
 	responseThreshold uint16,
 	moduleName string,
 ) ([]byte, sdk.Error) {
+	if superMode {
+		_, found := k.gk.GetProfiler(ctx, consumer)
+		if !found {
+			return nil, types.ErrInvalidProfiler(k.codespace, consumer)
+		}
+	}
+
 	if len(moduleName) != 0 {
 		if _, err := k.GetResponseCallback(moduleName); err != nil {
 			return nil, err
@@ -83,23 +91,16 @@ func (k Keeper) CreateRequestContext(
 		repeatedTotal = 0
 	}
 
-	profiling := false
-
-	_, found = k.gk.GetProfiler(ctx, consumer)
-	if found {
-		profiling = true
-	}
-
 	batchCounter := uint64(0)
 	batchRequestCount := uint16(0)
 	batchResponseCount := uint16(0)
 	batchState := types.BATCHCOMPLETED
 
 	requestContext := types.NewRequestContext(
-		serviceName, providers, consumer, input, serviceFeeCap,
-		profiling, timeout, repeated, repeatedFrequency, repeatedTotal,
-		batchCounter, batchRequestCount, batchResponseCount, batchState,
-		state, responseThreshold, moduleName,
+		serviceName, providers, consumer, input, serviceFeeCap, timeout,
+		superMode, repeated, repeatedFrequency, repeatedTotal, batchCounter,
+		batchRequestCount, batchResponseCount, batchState, state,
+		responseThreshold, moduleName,
 	)
 
 	requestContextID := types.GenerateRequestContextID(ctx.BlockHeight(), k.GetIntraTxCounter(ctx))
@@ -307,7 +308,10 @@ func (k Keeper) InitiateRequests(
 	requestContext, _ := k.GetRequestContext(ctx, requestContextID)
 
 	for providerIndex, provider := range providers {
-		request := k.buildRequest(ctx, requestContextID, requestContext.BatchCounter, requestContext.ServiceName, provider)
+		request := k.buildRequest(
+			ctx, requestContextID, requestContext.BatchCounter,
+			requestContext.ServiceName, provider, requestContext.SuperMode,
+		)
 
 		requestID := types.GenerateRequestID(requestContextID, requestContext.BatchCounter, int16(providerIndex))
 		k.SetCompactRequest(ctx, requestID, request)
@@ -343,14 +347,20 @@ func (k Keeper) buildRequest(
 	batchCounter uint64,
 	serviceName string,
 	provider sdk.AccAddress,
+	superMode bool,
 ) types.CompactRequest {
-	binding, _ := k.GetServiceBinding(ctx, serviceName, provider)
+	var serviceFee sdk.Coins
+
+	if !superMode {
+		binding, _ := k.GetServiceBinding(ctx, serviceName, provider)
+		serviceFee = k.GetBasePrice(ctx, binding)
+	}
 
 	request := types.NewCompactRequest(
 		requestContextID,
 		batchCounter,
 		provider,
-		k.GetBasePrice(ctx, binding),
+		serviceFee,
 		ctx.BlockHeight(),
 	)
 
@@ -396,7 +406,7 @@ func (k Keeper) GetRequest(ctx sdk.Context, requestID []byte) (request types.Req
 		requestContext.Consumer,
 		requestContext.Input,
 		compactRequest.ServiceFee,
-		requestContext.Profiling,
+		requestContext.SuperMode,
 		compactRequest.RequestHeight,
 		compactRequest.RequestHeight+requestContext.Timeout,
 		compactRequest.RequestContextID,

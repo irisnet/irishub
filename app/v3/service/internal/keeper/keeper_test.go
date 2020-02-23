@@ -57,7 +57,7 @@ func setRequestContext(
 ) ([]byte, types.RequestContext) {
 	requestContext := types.NewRequestContext(
 		testServiceName, providers, consumer, testInput,
-		testServiceFeeCap, false, testTimeout, true, testRepeatedFreq,
+		testServiceFeeCap, testTimeout, false, true, testRepeatedFreq,
 		testRepeatedTotal, 0, 0, 0, types.BATCHCOMPLETED, state, threshold, moduleName,
 	)
 
@@ -248,8 +248,8 @@ func TestKeeper_Request_Context(t *testing.T) {
 	// create
 	requestContextID, err := keeper.CreateRequestContext(
 		ctx, testServiceName, providers, consumer, testInput,
-		testServiceFeeCap, testTimeout, true, testRepeatedFreq,
-		testRepeatedTotal, types.RUNNING, 0, "",
+		testServiceFeeCap, testTimeout, false, true,
+		testRepeatedFreq, testRepeatedTotal, types.RUNNING, 0, "",
 	)
 	require.NoError(t, err)
 

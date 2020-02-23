@@ -39,7 +39,7 @@ func EndBlocker(ctx sdk.Context, k Keeper) (tags sdk.Tags) {
 
 				request, _ := k.GetRequest(ctx, requestID)
 
-				if !request.Profiling {
+				if !request.SuperMode {
 					binding, found := k.GetServiceBinding(ctx, request.ServiceName, request.Provider)
 					if found {
 						slashedCoins := sdk.NewCoins()
@@ -104,8 +104,10 @@ func EndBlocker(ctx sdk.Context, k Keeper) (tags sdk.Tags) {
 		if reqContext.State == RUNNING {
 			providers, totalPrices := k.FilterServiceProviders(ctx, reqContext.ServiceName, reqContext.Providers, reqContext.ServiceFeeCap)
 			if len(reqContext.ModuleName) == 0 || len(providers) >= int(reqContext.ResponseThreshold) {
-				if err := k.DeductServiceFees(ctx, reqContext.Consumer, totalPrices); err != nil {
-					reqContext.State = PAUSED
+				if !reqContext.SuperMode {
+					if err := k.DeductServiceFees(ctx, reqContext.Consumer, totalPrices); err != nil {
+						reqContext.State = PAUSED
+					}
 				}
 
 				reqContext.BatchCounter++

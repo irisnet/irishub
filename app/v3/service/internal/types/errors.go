@@ -30,24 +30,24 @@ const (
 	CodeInvalidRequestID          sdk.CodeType = 115
 	CodeInvalidProviders          sdk.CodeType = 116
 	CodeInvalidTimeout            sdk.CodeType = 117
-	CodeInvalidRepeatedFreq       sdk.CodeType = 117
-	CodeInvalidRepeatedTotal      sdk.CodeType = 118
-	CodeUnknownRequestContext     sdk.CodeType = 119
-	CodeInvalidRequestContextID   sdk.CodeType = 120
-	CodeRequestContextNonRepeated sdk.CodeType = 121
-	CodeRequestContextNotStarted  sdk.CodeType = 122
-	CodeRequestContextNotPaused   sdk.CodeType = 123
-	CodeModuleNameRegistered      sdk.CodeType = 124
-	CodeModuleNameNotRegistered   sdk.CodeType = 125
-	CodeNoEarnedFees              sdk.CodeType = 126
+	CodeInvalidRepeatedFreq       sdk.CodeType = 118
+	CodeInvalidRepeatedTotal      sdk.CodeType = 119
+	CodeUnknownRequestContext     sdk.CodeType = 120
+	CodeInvalidRequestContextID   sdk.CodeType = 121
+	CodeRequestContextNonRepeated sdk.CodeType = 122
+	CodeRequestContextNotStarted  sdk.CodeType = 123
+	CodeRequestContextNotPaused   sdk.CodeType = 124
+	CodeModuleNameRegistered      sdk.CodeType = 125
+	CodeModuleNameNotRegistered   sdk.CodeType = 126
+	CodeNoEarnedFees              sdk.CodeType = 127
 
-	CodeInvalidRequestInput   sdk.CodeType = 127
-	CodeInvalidResponseOutput sdk.CodeType = 128
-	CodeInvalidResponseErr    sdk.CodeType = 129
+	CodeInvalidRequestInput   sdk.CodeType = 128
+	CodeInvalidResponseOutput sdk.CodeType = 129
+	CodeInvalidResponseErr    sdk.CodeType = 130
 
-	CodeInvalidAddress  sdk.CodeType = 130
-	CodeInvalidGuardian sdk.CodeType = 131
-	CodeInvalidTrustee  sdk.CodeType = 132
+	CodeInvalidAddress  sdk.CodeType = 131
+	CodeInvalidProfiler sdk.CodeType = 132
+	CodeInvalidTrustee  sdk.CodeType = 133
 )
 
 func ErrInvalidServiceName(codespace sdk.CodespaceType, serviceName string) sdk.Error {
@@ -174,8 +174,8 @@ func ErrInvalidResponseErr(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidResponseErr, fmt.Sprintf("invalid response err: %s", msg))
 }
 
-func ErrInvalidGuardian(codespace sdk.CodespaceType, address sdk.AccAddress) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidGuardian, fmt.Sprintf("invalid guardian: %s", address))
+func ErrInvalidProfiler(codespace sdk.CodespaceType, address sdk.AccAddress) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidProfiler, fmt.Sprintf("invalid profiler: %s", address))
 }
 
 func ErrInvalidTrustee(codespace sdk.CodespaceType, address sdk.AccAddress) sdk.Error {
