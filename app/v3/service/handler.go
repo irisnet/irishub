@@ -25,18 +25,6 @@ func NewHandler(k Keeper) sdk.Handler {
 			return handleMsgEnableService(ctx, k, msg)
 		case MsgRefundServiceDeposit:
 			return handleMsgRefundServiceDeposit(ctx, k, msg)
-<<<<<<< HEAD
-		// case MsgSvcRequest:
-		// 	return handleMsgSvcRequest(ctx, k, msg)
-		// case MsgSvcResponse:
-		// 	return handleMsgSvcResponse(ctx, k, msg)
-		// case MsgSvcRefundFees:
-		// 	return handleMsgSvcRefundFees(ctx, k, msg)
-		// case MsgSvcWithdrawFees:
-		// 	return handleMsgSvcWithdrawFees(ctx, k, msg)
-		// case MsgSvcWithdrawTax:
-		// 	return handleMsgSvcWithdrawTax(ctx, k, msg)
-=======
 		case MsgRequestService:
 			return handleMsgRequestService(ctx, k, msg)
 		case MsgRespondService:
@@ -53,7 +41,6 @@ func NewHandler(k Keeper) sdk.Handler {
 			return handleMsgWithdrawEarnedFees(ctx, k, msg)
 		case MsgWithdrawTax:
 			return handleMsgWithdrawTax(ctx, k, msg)
->>>>>>> develop
 		default:
 			errMsg := fmt.Sprintf("unrecognized service message type: %T", msg)
 			return sdk.ErrUnknownRequest(errMsg).Result()
@@ -135,81 +122,6 @@ func handleMsgRefundServiceDeposit(ctx sdk.Context, k Keeper, msg MsgRefundServi
 	return sdk.Result{}
 }
 
-<<<<<<< HEAD
-// TODO
-
-// // handleMsgSvcRequest handles MsgSvcRequest
-// func handleMsgSvcRequest(ctx sdk.Context, k Keeper, msg MsgSvcRequest) sdk.Result {
-// 	request, err := k.AddRequest(ctx, msg.DefChainID, msg.DefName, msg.BindChainID, msg.ReqChainID,
-// 		msg.Consumer, msg.Provider, msg.MethodID, msg.Input, msg.ServiceFee, msg.Profiling)
-// 	if err != nil {
-// 		return err.Result()
-// 	}
-
-// 	ctx.Logger().Debug("Service request", "def_name", request.DefName, "def_chain_id", request.DefChainID,
-// 		"provider", request.Provider.String(), "consumer", request.Consumer.String(), "method_id", request.MethodID,
-// 		"service_fee", request.ServiceFee, "request_id", request.RequestID())
-
-// 	resTags := sdk.NewTags(
-// 		types.TagRequestID, []byte(request.RequestID()),
-// 		types.TagProvider, []byte(request.Provider.String()),
-// 		types.TagConsumer, []byte(request.Consumer.String()),
-// 		types.TagServiceFee, []byte(request.ServiceFee.String()),
-// 	)
-
-// 	return sdk.Result{
-// 		Tags: resTags,
-// 	}
-// }
-
-// // handleMsgSvcResponse handles MsgSvcResponse
-// func handleMsgSvcResponse(ctx sdk.Context, k Keeper, msg MsgSvcResponse) sdk.Result {
-// 	response, err := k.AddResponse(ctx, msg.ReqChainID, msg.RequestID, msg.Provider, msg.Output, msg.ErrorMsg)
-// 	if err != nil {
-// 		return err.Result()
-// 	}
-
-// 	ctx.Logger().Debug("Service response", "request_id", msg.RequestID,
-// 		"provider", response.Provider.String(), "consumer", response.Consumer.String())
-
-// 	resTags := sdk.NewTags(
-// 		types.TagRequestID, []byte(msg.RequestID),
-// 		types.TagConsumer, []byte(response.Consumer.String()),
-// 		types.TagProvider, []byte(response.Provider.String()),
-// 	)
-
-// 	return sdk.Result{
-// 		Tags: resTags,
-// 	}
-// }
-
-// // handleMsgSvcRefundFees handles MsgSvcRefundFees
-// func handleMsgSvcRefundFees(ctx sdk.Context, k Keeper, msg MsgSvcRefundFees) sdk.Result {
-// 	if err := k.RefundFee(ctx, msg.Consumer); err != nil {
-// 		return err.Result()
-// 	}
-
-// 	return sdk.Result{}
-// }
-
-// // handleMsgSvcWithdrawFees handles MsgSvcWithdrawFees
-// func handleMsgSvcWithdrawFees(ctx sdk.Context, k Keeper, msg MsgSvcWithdrawFees) sdk.Result {
-// 	if err := k.WithdrawFee(ctx, msg.Provider); err != nil {
-// 		return err.Result()
-// 	}
-
-// 	return sdk.Result{}
-// }
-
-// // handleMsgSvcWithdrawTax handles MsgSvcWithdrawTax
-// func handleMsgSvcWithdrawTax(ctx sdk.Context, k Keeper, msg MsgSvcWithdrawTax) sdk.Result {
-// 	if err := k.WithdrawTax(ctx, msg.Trustee, msg.DestAddress, msg.Amount); err != nil {
-// 		return err.Result()
-// 	}
-
-// 	return sdk.Result{}
-// }
-=======
 // handleMsgRequestService handles MsgRequestService
 func handleMsgRequestService(ctx sdk.Context, k Keeper, msg MsgRequestService) sdk.Result {
 	requestContextID, err := k.CreateRequestContext(
@@ -303,4 +215,3 @@ func handleMsgWithdrawTax(ctx sdk.Context, k Keeper, msg MsgWithdrawTax) sdk.Res
 
 	return sdk.Result{}
 }
->>>>>>> develop
