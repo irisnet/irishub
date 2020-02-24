@@ -1,6 +1,7 @@
 package service
 
 import (
+	"encoding/hex"
 	"fmt"
 
 	sdk "github.com/irisnet/irishub/types"
@@ -24,16 +25,22 @@ func NewHandler(k Keeper) sdk.Handler {
 			return handleMsgEnableService(ctx, k, msg)
 		case MsgRefundServiceDeposit:
 			return handleMsgRefundServiceDeposit(ctx, k, msg)
-		// case MsgSvcRequest:
-		// 	return handleMsgSvcRequest(ctx, k, msg)
-		// case MsgSvcResponse:
-		// 	return handleMsgSvcResponse(ctx, k, msg)
-		// case MsgSvcRefundFees:
-		// 	return handleMsgSvcRefundFees(ctx, k, msg)
-		// case MsgSvcWithdrawFees:
-		// 	return handleMsgSvcWithdrawFees(ctx, k, msg)
-		// case MsgSvcWithdrawTax:
-		// 	return handleMsgSvcWithdrawTax(ctx, k, msg)
+		case MsgRequestService:
+			return handleMsgRequestService(ctx, k, msg)
+		case MsgRespondService:
+			return handleMsgRespondService(ctx, k, msg)
+		case MsgPauseRequestContext:
+			return handleMsgPauseRequestContext(ctx, k, msg)
+		case MsgStartRequestContext:
+			return handleMsgStartRequestContext(ctx, k, msg)
+		case MsgKillRequestContext:
+			return handleMsgKillRequestContext(ctx, k, msg)
+		case MsgUpdateRequestContext:
+			return handleMsgUpdateRequestContext(ctx, k, msg)
+		case MsgWithdrawEarnedFees:
+			return handleMsgWithdrawEarnedFees(ctx, k, msg)
+		case MsgWithdrawTax:
+			return handleMsgWithdrawTax(ctx, k, msg)
 		default:
 			errMsg := fmt.Sprintf("unrecognized service message type: %T", msg)
 			return sdk.ErrUnknownRequest(errMsg).Result()
@@ -115,76 +122,96 @@ func handleMsgRefundServiceDeposit(ctx sdk.Context, k Keeper, msg MsgRefundServi
 	return sdk.Result{}
 }
 
-// TODO
+// handleMsgRequestService handles MsgRequestService
+func handleMsgRequestService(ctx sdk.Context, k Keeper, msg MsgRequestService) sdk.Result {
+	requestContextID, err := k.CreateRequestContext(
+		ctx, msg.ServiceName, msg.Providers, msg.Consumer, msg.Input, msg.ServiceFeeCap, msg.Timeout,
+		msg.SuperMode, msg.Repeated, msg.RepeatedFrequency, msg.RepeatedTotal, RUNNING, 0, "")
+	if err != nil {
+		return err.Result()
+	}
 
-// // handleMsgSvcRequest handles MsgSvcRequest
-// func handleMsgSvcRequest(ctx sdk.Context, k Keeper, msg MsgSvcRequest) sdk.Result {
-// 	request, err := k.AddRequest(ctx, msg.DefChainID, msg.DefName, msg.BindChainID, msg.ReqChainID,
-// 		msg.Consumer, msg.Provider, msg.MethodID, msg.Input, msg.ServiceFee, msg.Profiling)
-// 	if err != nil {
-// 		return err.Result()
-// 	}
+	tags := sdk.NewTags(
+		TagRequestContextID, []byte(hex.EncodeToString(requestContextID)),
+		TagConsumer, []byte(msg.Consumer.String()),
+	)
 
-// 	ctx.Logger().Debug("Service request", "def_name", request.DefName, "def_chain_id", request.DefChainID,
-// 		"provider", request.Provider.String(), "consumer", request.Consumer.String(), "method_id", request.MethodID,
-// 		"service_fee", request.ServiceFee, "request_id", request.RequestID())
+	return sdk.Result{
+		Tags: tags,
+	}
+}
 
-// 	resTags := sdk.NewTags(
-// 		types.TagRequestID, []byte(request.RequestID()),
-// 		types.TagProvider, []byte(request.Provider.String()),
-// 		types.TagConsumer, []byte(request.Consumer.String()),
-// 		types.TagServiceFee, []byte(request.ServiceFee.String()),
-// 	)
+// handleMsgRespondService handles MsgRespondService
+func handleMsgRespondService(ctx sdk.Context, k Keeper, msg MsgRespondService) sdk.Result {
+	response, err := k.AddResponse(ctx, msg.RequestID, msg.Provider, msg.Output, msg.Error)
+	if err != nil {
+		return err.Result()
+	}
 
-// 	return sdk.Result{
-// 		Tags: resTags,
-// 	}
-// }
+	tags := sdk.NewTags(
+		TagRequestID, []byte(msg.RequestID),
+		TagConsumer, []byte(response.Consumer.String()),
+		TagProvider, []byte(response.Provider.String()),
+	)
 
-// // handleMsgSvcResponse handles MsgSvcResponse
-// func handleMsgSvcResponse(ctx sdk.Context, k Keeper, msg MsgSvcResponse) sdk.Result {
-// 	response, err := k.AddResponse(ctx, msg.ReqChainID, msg.RequestID, msg.Provider, msg.Output, msg.ErrorMsg)
-// 	if err != nil {
-// 		return err.Result()
-// 	}
+	return sdk.Result{
+		Tags: tags,
+	}
+}
 
-// 	ctx.Logger().Debug("Service response", "request_id", msg.RequestID,
-// 		"provider", response.Provider.String(), "consumer", response.Consumer.String())
+// handleMsgPauseRequestContext handles MsgPauseRequestContext
+func handleMsgPauseRequestContext(ctx sdk.Context, k Keeper, msg MsgPauseRequestContext) sdk.Result {
+	if err := k.PauseRequestContext(ctx, msg.RequestContextID); err != nil {
+		return err.Result()
+	}
 
-// 	resTags := sdk.NewTags(
-// 		types.TagRequestID, []byte(msg.RequestID),
-// 		types.TagConsumer, []byte(response.Consumer.String()),
-// 		types.TagProvider, []byte(response.Provider.String()),
-// 	)
+	return sdk.Result{}
+}
 
-// 	return sdk.Result{
-// 		Tags: resTags,
-// 	}
-// }
+// handleMsgStartRequestContext handles MsgStartRequestContext
+func handleMsgStartRequestContext(ctx sdk.Context, k Keeper, msg MsgStartRequestContext) sdk.Result {
+	if err := k.StartRequestContext(ctx, msg.RequestContextID); err != nil {
+		return err.Result()
+	}
 
-// // handleMsgSvcRefundFees handles MsgSvcRefundFees
-// func handleMsgSvcRefundFees(ctx sdk.Context, k Keeper, msg MsgSvcRefundFees) sdk.Result {
-// 	if err := k.RefundFee(ctx, msg.Consumer); err != nil {
-// 		return err.Result()
-// 	}
+	return sdk.Result{}
+}
 
-// 	return sdk.Result{}
-// }
+// handleMsgKillRequestContext handles MsgKillRequestContext
+func handleMsgKillRequestContext(ctx sdk.Context, k Keeper, msg MsgKillRequestContext) sdk.Result {
+	if err := k.KillRequestContext(ctx, msg.RequestContextID); err != nil {
+		return err.Result()
+	}
 
-// // handleMsgSvcWithdrawFees handles MsgSvcWithdrawFees
-// func handleMsgSvcWithdrawFees(ctx sdk.Context, k Keeper, msg MsgSvcWithdrawFees) sdk.Result {
-// 	if err := k.WithdrawFee(ctx, msg.Provider); err != nil {
-// 		return err.Result()
-// 	}
+	return sdk.Result{}
+}
 
-// 	return sdk.Result{}
-// }
+// handleMsgUpdateRequestContext handles MsgUpdateRequestContext
+func handleMsgUpdateRequestContext(ctx sdk.Context, k Keeper, msg MsgUpdateRequestContext) sdk.Result {
+	if err := k.UpdateRequestContext(
+		ctx, msg.RequestContextID, msg.Providers, msg.ServiceFeeCap,
+		msg.Timeout, msg.RepeatedFrequency, msg.RepeatedTotal,
+	); err != nil {
+		return err.Result()
+	}
 
-// // handleMsgSvcWithdrawTax handles MsgSvcWithdrawTax
-// func handleMsgSvcWithdrawTax(ctx sdk.Context, k Keeper, msg MsgSvcWithdrawTax) sdk.Result {
-// 	if err := k.WithdrawTax(ctx, msg.Trustee, msg.DestAddress, msg.Amount); err != nil {
-// 		return err.Result()
-// 	}
+	return sdk.Result{}
+}
 
-// 	return sdk.Result{}
-// }
+// handleMsgWithdrawEarnedFees handles MsgWithdrawEarnedFees
+func handleMsgWithdrawEarnedFees(ctx sdk.Context, k Keeper, msg MsgWithdrawEarnedFees) sdk.Result {
+	if err := k.WithdrawEarnedFees(ctx, msg.Provider); err != nil {
+		return err.Result()
+	}
+
+	return sdk.Result{}
+}
+
+// handleMsgWithdrawTax handles MsgWithdrawTax
+func handleMsgWithdrawTax(ctx sdk.Context, k Keeper, msg MsgWithdrawTax) sdk.Result {
+	if err := k.WithdrawTax(ctx, msg.Trustee, msg.DestAddress, msg.Amount); err != nil {
+		return err.Result()
+	}
+
+	return sdk.Result{}
+}

@@ -27,6 +27,11 @@ const (
 // nolint
 var (
 	// variables and functions aliases
+	TagProvider                = types.TagProvider
+	TagConsumer                = types.TagConsumer
+	TagRequestContextID        = types.TagRequestContextID
+	TagRequestID               = types.TagRequestID
+	TagSlashedCoins            = types.TagSlashedCoins
 	KeyTxSizeLimit             = types.KeyTxSizeLimit
 	NewKeeper                  = keeper.NewKeeper
 	NewQuerier                 = keeper.NewQuerier
@@ -57,7 +62,10 @@ var (
 	NewMsgUpdateRequestContext = types.NewMsgUpdateRequestContext
 	NewMsgWithdrawEarnedFees   = types.NewMsgWithdrawEarnedFees
 	NewMsgWithdrawTax          = types.NewMsgWithdrawTax
+	GenerateRequestContextID   = types.GenerateRequestContextID
+	GenerateRequestID          = types.GenerateRequestID
 	ConvertRequestID           = types.ConvertRequestID
+	RequestIDToString          = types.RequestIDToString
 )
 
 // nolint
@@ -68,10 +76,11 @@ type (
 	ServiceDefinition       = types.ServiceDefinition
 	ServiceBinding          = types.ServiceBinding
 	ServiceBindings         = types.ServiceBindings
+	RequestContext          = types.RequestContext
 	Request                 = types.Request
 	CompactRequest          = types.CompactRequest
 	Response                = types.Response
-	ReturnedFee             = types.EarnedFees
+	EarnedFees              = types.EarnedFees
 	Metrics                 = types.Metrics
 	MsgDefineService        = types.MsgDefineService
 	MsgBindService          = types.MsgBindService

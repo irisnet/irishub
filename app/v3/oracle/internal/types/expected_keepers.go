@@ -23,6 +23,7 @@ type ServiceKeeper interface {
 		input string,
 		serviceFeeCap sdk.Coins,
 		timeout int64,
+		superMode,
 		repeated bool,
 		repeatedFrequency uint64,
 		repeatedTotal int64,
@@ -34,6 +35,7 @@ type ServiceKeeper interface {
 		requestContextID []byte,
 		providers []sdk.AccAddress,
 		serviceFeeCap sdk.Coins,
+		timeout int64,
 		repeatedFreq uint64,
 		repeatedTotal int64) sdk.Error
 

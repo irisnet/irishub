@@ -15,8 +15,8 @@ type RequestContext struct {
 	Consumer           sdk.AccAddress           `json:"consumer"`
 	Input              string                   `json:"input"`
 	ServiceFeeCap      sdk.Coins                `json:"service_fee_cap"`
-	Profiling          bool                     `json:"profiling"`
 	Timeout            int64                    `json:"timeout"`
+	SuperMode          bool                     `json:"super_mode"`
 	Repeated           bool                     `json:"repeated"`
 	RepeatedFrequency  uint64                   `json:"repeated_frequency"`
 	RepeatedTotal      int64                    `json:"repeated_total"`
@@ -36,8 +36,8 @@ func NewRequestContext(
 	consumer sdk.AccAddress,
 	input string,
 	serviceFeeCap sdk.Coins,
-	profiling bool,
 	timeout int64,
+	superMode bool,
 	repeated bool,
 	repeatedFrequency uint64,
 	repeatedTotal int64,
@@ -55,8 +55,8 @@ func NewRequestContext(
 		Consumer:           consumer,
 		Input:              input,
 		ServiceFeeCap:      serviceFeeCap,
-		Profiling:          profiling,
 		Timeout:            timeout,
+		SuperMode:          superMode,
 		Repeated:           repeated,
 		RepeatedFrequency:  repeatedFrequency,
 		RepeatedTotal:      repeatedTotal,
@@ -103,7 +103,7 @@ type Request struct {
 	Consumer                   sdk.AccAddress `json:"consumer"`
 	Input                      string         `json:"input"`
 	ServiceFee                 sdk.Coins      `json:"service_fee"`
-	Profiling                  bool           `json:"profiling"`
+	SuperMode                  bool           `json:"super_mode"`
 	RequestHeight              int64          `json:"request_height"`
 	ExpirationHeight           int64          `json:"expiration_height"`
 	RequestContextID           []byte         `json:"request_context_id"`
@@ -117,7 +117,7 @@ func NewRequest(
 	consumer sdk.AccAddress,
 	input string,
 	serviceFee sdk.Coins,
-	profiling bool,
+	superMode bool,
 	requestHeight int64,
 	expirationHeight int64,
 	requestContextID []byte,
@@ -129,7 +129,7 @@ func NewRequest(
 		Consumer:                   consumer,
 		Input:                      input,
 		ServiceFee:                 serviceFee,
-		Profiling:                  profiling,
+		SuperMode:                  superMode,
 		RequestHeight:              requestHeight,
 		ExpirationHeight:           expirationHeight,
 		RequestContextID:           requestContextID,

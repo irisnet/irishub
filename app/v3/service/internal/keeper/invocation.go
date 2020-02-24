@@ -28,6 +28,7 @@ func (k Keeper) CreateRequestContext(
 	input string,
 	serviceFeeCap sdk.Coins,
 	timeout int64,
+	superMode bool,
 	repeated bool,
 	repeatedFrequency uint64,
 	repeatedTotal int64,
@@ -35,6 +36,13 @@ func (k Keeper) CreateRequestContext(
 	responseThreshold uint16,
 	moduleName string,
 ) ([]byte, sdk.Error) {
+	if superMode {
+		_, found := k.gk.GetProfiler(ctx, consumer)
+		if !found {
+			return nil, types.ErrInvalidProfiler(k.codespace, consumer)
+		}
+	}
+
 	if len(moduleName) != 0 {
 		if _, err := k.GetResponseCallback(moduleName); err != nil {
 			return nil, err
@@ -83,23 +91,16 @@ func (k Keeper) CreateRequestContext(
 		repeatedTotal = 0
 	}
 
-	profiling := false
-
-	_, found = k.gk.GetProfiler(ctx, consumer)
-	if found {
-		profiling = true
-	}
-
 	batchCounter := uint64(0)
 	batchRequestCount := uint16(0)
 	batchResponseCount := uint16(0)
 	batchState := types.BATCHCOMPLETED
 
 	requestContext := types.NewRequestContext(
-		serviceName, providers, consumer, input, serviceFeeCap,
-		profiling, timeout, repeated, repeatedFrequency, repeatedTotal,
-		batchCounter, batchRequestCount, batchResponseCount, batchState,
-		state, responseThreshold, moduleName,
+		serviceName, providers, consumer, input, serviceFeeCap, timeout,
+		superMode, repeated, repeatedFrequency, repeatedTotal, batchCounter,
+		batchRequestCount, batchResponseCount, batchState, state,
+		responseThreshold, moduleName,
 	)
 
 	requestContextID := types.GenerateRequestContextID(ctx.BlockHeight(), k.GetIntraTxCounter(ctx))
@@ -118,6 +119,7 @@ func (k Keeper) UpdateRequestContext(
 	requestContextID []byte,
 	providers []sdk.AccAddress,
 	serviceFeeCap sdk.Coins,
+	timeout int64,
 	repeatedFreq uint64,
 	repeatedTotal int64,
 ) sdk.Error {
@@ -131,7 +133,7 @@ func (k Keeper) UpdateRequestContext(
 	}
 
 	if len(requestContext.ModuleName) != 0 {
-		if err := types.ValidateRequestContextUpdating(serviceFeeCap, repeatedTotal); err != nil {
+		if err := types.ValidateRequestContextUpdating(serviceFeeCap, timeout, repeatedFreq, repeatedTotal); err != nil {
 			return err
 		}
 	}
@@ -140,7 +142,15 @@ func (k Keeper) UpdateRequestContext(
 		return types.ErrInvalidProviders(k.codespace, fmt.Sprintf("length [%d] of providers must not be less than the response threshold [%d]", len(providers), requestContext.ResponseThreshold))
 	}
 
-	if repeatedFreq > 0 && repeatedFreq < uint64(requestContext.Timeout) {
+	if timeout == 0 {
+		timeout = requestContext.Timeout
+	}
+
+	if repeatedFreq == 0 {
+		repeatedFreq = requestContext.RepeatedFrequency
+	}
+
+	if repeatedFreq < uint64(timeout) {
 		return types.ErrInvalidRepeatedFreq(k.codespace, fmt.Sprintf("repeated frequency [%d] must not be less than the timeout [%d]", repeatedFreq, requestContext.Timeout))
 	}
 
@@ -154,6 +164,10 @@ func (k Keeper) UpdateRequestContext(
 
 	if !serviceFeeCap.Empty() {
 		requestContext.ServiceFeeCap = serviceFeeCap
+	}
+
+	if timeout > 0 {
+		requestContext.Timeout = timeout
 	}
 
 	if repeatedFreq > 0 {
@@ -262,17 +276,42 @@ func (k Keeper) GetRequestContext(ctx sdk.Context, requestContextID []byte) (req
 	return requestContext, true
 }
 
+// IterateRequestContexts iterates through all request contexts
+func (k Keeper) IterateRequestContexts(
+	ctx sdk.Context,
+	op func(requestContextID []byte, requestContext types.RequestContext) (stop bool),
+) {
+	store := ctx.KVStore(k.storeKey)
+
+	iterator := sdk.KVStorePrefixIterator(store, requestContextKey)
+	defer iterator.Close()
+
+	for ; iterator.Valid(); iterator.Next() {
+		requestContextID := iterator.Key()[1:]
+
+		var requestContext types.RequestContext
+		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &requestContext)
+
+		if stop := op(requestContextID, requestContext); stop {
+			break
+		}
+	}
+}
+
 // InitiateRequests creates requests for the given providers from the specified request context
 // Note: make sure that request context is valid and running, and providers are valid
 func (k Keeper) InitiateRequests(
 	ctx sdk.Context,
 	requestContextID []byte,
 	providers []sdk.AccAddress,
-) {
+) (tags sdk.Tags) {
 	requestContext, _ := k.GetRequestContext(ctx, requestContextID)
 
 	for providerIndex, provider := range providers {
-		request := k.buildRequest(ctx, requestContextID, requestContext.BatchCounter, requestContext.ServiceName, provider)
+		request := k.buildRequest(
+			ctx, requestContextID, requestContext.BatchCounter,
+			requestContext.ServiceName, provider, requestContext.SuperMode,
+		)
 
 		requestID := types.GenerateRequestID(requestContextID, requestContext.BatchCounter, int16(providerIndex))
 		k.SetCompactRequest(ctx, requestID, request)
@@ -281,12 +320,23 @@ func (k Keeper) InitiateRequests(
 		k.AddActiveRequestByID(ctx, requestID)
 
 		k.GetMetrics().ActiveRequests.Add(1)
+
+		tags = tags.AppendTags(sdk.NewTags(
+			types.TagRequestID, []byte(types.RequestIDToString(requestID)),
+			types.TagProvider, []byte(provider.String()),
+			types.TagConsumer, []byte(requestContext.Consumer.String()),
+			types.TagServiceFee, []byte(request.ServiceFee.String()),
+			types.TagRequestHeight, []byte(fmt.Sprintf("%d", request.RequestHeight)),
+			types.TagExpirationHeight, []byte(fmt.Sprintf("%d", request.RequestHeight+requestContext.Timeout)),
+		))
 	}
 
 	requestContext.BatchState = types.BATCHRUNNING
 	requestContext.BatchRequestCount = uint16(len(providers))
 
 	k.SetRequestContext(ctx, requestContextID, requestContext)
+
+	return
 }
 
 // buildRequest builds a request for the given provider from the specified request context
@@ -297,14 +347,20 @@ func (k Keeper) buildRequest(
 	batchCounter uint64,
 	serviceName string,
 	provider sdk.AccAddress,
+	superMode bool,
 ) types.CompactRequest {
-	binding, _ := k.GetServiceBinding(ctx, serviceName, provider)
+	var serviceFee sdk.Coins
+
+	if !superMode {
+		binding, _ := k.GetServiceBinding(ctx, serviceName, provider)
+		serviceFee = k.GetBasePrice(ctx, binding)
+	}
 
 	request := types.NewCompactRequest(
 		requestContextID,
 		batchCounter,
 		provider,
-		k.GetBasePrice(ctx, binding),
+		serviceFee,
 		ctx.BlockHeight(),
 	)
 
@@ -350,7 +406,7 @@ func (k Keeper) GetRequest(ctx sdk.Context, requestID []byte) (request types.Req
 		requestContext.Consumer,
 		requestContext.Input,
 		compactRequest.ServiceFee,
-		requestContext.Profiling,
+		requestContext.SuperMode,
 		compactRequest.RequestHeight,
 		compactRequest.RequestHeight+requestContext.Timeout,
 		compactRequest.RequestContextID,
@@ -358,6 +414,28 @@ func (k Keeper) GetRequest(ctx sdk.Context, requestID []byte) (request types.Req
 	)
 
 	return request, true
+}
+
+// IterateRequests iterates through all compact requests
+func (k Keeper) IterateRequests(
+	ctx sdk.Context,
+	op func(requestID []byte, request types.CompactRequest) (stop bool),
+) {
+	store := ctx.KVStore(k.storeKey)
+
+	iterator := sdk.KVStorePrefixIterator(store, requestKey)
+	defer iterator.Close()
+
+	for ; iterator.Valid(); iterator.Next() {
+		requestID := iterator.Key()[1:]
+
+		var request types.CompactRequest
+		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &request)
+
+		if stop := op(requestID, request); stop {
+			break
+		}
+	}
 }
 
 // AddActiveRequest adds the specified active request
@@ -597,6 +675,28 @@ func (k Keeper) GetResponse(ctx sdk.Context, requestID []byte) (response types.R
 
 	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &response)
 	return response, true
+}
+
+// IterateResponses iterates through all responses
+func (k Keeper) IterateResponses(
+	ctx sdk.Context,
+	op func(requestID []byte, response types.Response) (stop bool),
+) {
+	store := ctx.KVStore(k.storeKey)
+
+	iterator := sdk.KVStorePrefixIterator(store, responseKey)
+	defer iterator.Close()
+
+	for ; iterator.Valid(); iterator.Next() {
+		requestID := iterator.Key()[1:]
+
+		var response types.Response
+		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &response)
+
+		if stop := op(requestID, response); stop {
+			break
+		}
+	}
 }
 
 // ResponsesIteratorByReqCtx returns an iterator for all responses of the specified request context and batch counter
