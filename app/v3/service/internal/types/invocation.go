@@ -3,7 +3,10 @@ package types
 import (
 	"encoding/binary"
 	"encoding/hex"
+	"encoding/json"
 	"errors"
+	"fmt"
+	"strings"
 
 	sdk "github.com/irisnet/irishub/types"
 )
@@ -68,6 +71,80 @@ func NewRequestContext(
 		ResponseThreshold:  responseThreshold,
 		ModuleName:         moduleName,
 	}
+}
+
+// String implements Stringer
+func (rc RequestContext) String() string {
+	providers := ""
+
+	for _, p := range rc.Providers {
+		providers += p.String() + ","
+	}
+
+	if len(providers) > 0 {
+		providers = providers[0 : len(providers)-1]
+	}
+
+	return fmt.Sprintf(`RequestContext:
+	ServiceName:             %s
+	Providers:               %s
+	Consumer:                %s
+	Input:                   %s
+	ServiceFeeCap:           %s
+	Timeout:                 %d 
+	SuperMode:               %v
+	Repeated:                %v
+	RepeatedFrequency:       %d
+	RepeatedTotal:           %d
+	BatchCounter:            %d
+	BatchRequestCount:       %d
+	BatchResponseCount:      %d
+	BatchState:              %s
+	State:                   %s
+	ResponseThreshold:       %d
+	ModuleName:              %s`,
+		rc.ServiceName, providers, rc.Consumer, rc.Input, rc.ServiceFeeCap.String(),
+		rc.Timeout, rc.SuperMode, rc.Repeated, rc.RepeatedFrequency, rc.RepeatedTotal,
+		rc.BatchCounter, rc.BatchRequestCount, rc.BatchResponseCount, rc.BatchState, rc.State,
+		rc.ResponseThreshold, rc.ModuleName,
+	)
+}
+
+// HumanString implements human stringer
+func (rc RequestContext) HumanString(converter sdk.CoinsConverter) string {
+	providers := ""
+
+	for _, p := range rc.Providers {
+		providers += p.String() + ","
+	}
+
+	if len(providers) > 0 {
+		providers = providers[0 : len(providers)-1]
+	}
+
+	return fmt.Sprintf(`RequestContext:
+	ServiceName:             %s
+	Providers:               %s
+	Consumer:                %s
+	Input:                   %s
+	ServiceFeeCap:           %s
+	Timeout:                 %d 
+	SuperMode:               %v
+	Repeated:                %v
+	RepeatedFrequency:       %d
+	RepeatedTotal:           %d
+	BatchCounter:            %d
+	BatchRequestCount:       %d
+	BatchResponseCount:      %d
+	BatchState:              %s
+	State:                   %s
+	ResponseThreshold:       %d
+	ModuleName:              %s`,
+		rc.ServiceName, providers, rc.Consumer, rc.Input, converter.ToMainUnit(rc.ServiceFeeCap),
+		rc.Timeout, rc.SuperMode, rc.Repeated, rc.RepeatedFrequency, rc.RepeatedTotal,
+		rc.BatchCounter, rc.BatchRequestCount, rc.BatchResponseCount, rc.BatchState, rc.State,
+		rc.ResponseThreshold, rc.ModuleName,
+	)
 }
 
 // CompactRequest defines a compact request with a request context ID
@@ -137,6 +214,75 @@ func NewRequest(
 	}
 }
 
+// String implements Stringer
+func (r Request) String() string {
+	return fmt.Sprintf(`Request:
+	ServiceName:             %s
+	Provider:                %s
+	Consumer:                %s
+	Input:                   %s
+	ServiceFee:              %s
+	SuperMode:               %v 
+	RequestHeight:           %d
+	ExpirationHeight:        %d
+	RequestContextID:        %s
+	BatchCounter:            %d`,
+		r.ServiceName, r.Provider, r.Consumer, r.Input, r.ServiceFee.String(),
+		r.SuperMode, r.RequestHeight, r.ExpirationHeight,
+		hex.EncodeToString(r.RequestContextID), r.RequestContextBatchCounter,
+	)
+}
+
+// HumanString implements human stringer
+func (r Request) HumanString(converter sdk.CoinsConverter) string {
+	return fmt.Sprintf(`Request:
+	ServiceName:             %s
+	Provider:                %s
+	Consumer:                %s
+	Input:                   %s
+	ServiceFee:              %s
+	SuperMode:               %v 
+	RequestHeight:           %d
+	ExpirationHeight:        %d
+	RequestContextID:        %s
+	BatchCounter:            %d`,
+		r.ServiceName, r.Provider, r.Consumer, r.Input, converter.ToMainUnit(r.ServiceFee),
+		r.SuperMode, r.RequestHeight, r.ExpirationHeight,
+		hex.EncodeToString(r.RequestContextID), r.RequestContextBatchCounter,
+	)
+}
+
+// Requests represents a set of requests
+type Requests []Request
+
+// String implements Stringer
+func (rs Requests) String() string {
+	if len(rs) == 0 {
+		return "[]"
+	}
+
+	var str string
+	for _, r := range rs {
+		str += r.String() + "\n"
+	}
+
+	return str
+}
+
+// HumanString implements human stringer
+func (rs Requests) HumanString(converter sdk.CoinsConverter) string {
+	if len(rs) == 0 {
+		return "[]"
+	}
+
+	var str string
+	for _, r := range rs {
+		str += r.HumanString(converter) + "\n"
+	}
+
+	return str
+}
+
 // Response defines a response
 type Response struct {
 	Provider                   sdk.AccAddress `json:"provider"`
@@ -166,6 +312,38 @@ func NewResponse(
 	}
 }
 
+// String implements Stringer
+func (r Response) String() string {
+	return fmt.Sprintf(`Response:
+	Provider:                %s
+	Consumer:                %s
+	Output:                  %s
+	Error:                   %s
+	RequestContextID:        %s
+	BatchCounter:            %d`,
+		r.Provider, r.Consumer, r.Output, r.Error,
+		hex.EncodeToString(r.RequestContextID),
+		r.RequestContextBatchCounter,
+	)
+}
+
+// Responses represents a set of responses
+type Responses []Response
+
+// String implements Stringer
+func (rs Responses) String() string {
+	if len(rs) == 0 {
+		return "[]"
+	}
+
+	var str string
+	for _, r := range rs {
+		str += r.String() + "\n"
+	}
+
+	return str
+}
+
 // EarnedFees defines a struct for the fees earned by the provider
 type EarnedFees struct {
 	Address sdk.AccAddress `json:"address"`
@@ -180,6 +358,24 @@ func NewEarnedFees(address sdk.AccAddress, coins sdk.Coins) EarnedFees {
 	}
 }
 
+// String implements Stringer
+func (e EarnedFees) String() string {
+	return fmt.Sprintf(`EarnedFees:
+	Address:                 %s
+	Coins:                   %s`,
+		e.Address, e.Coins.String(),
+	)
+}
+
+// HumanString implements human stringer
+func (e EarnedFees) HumanString(converter sdk.CoinsConverter) string {
+	return fmt.Sprintf(`EarnedFees:
+	Address:                 %s
+	Coins:                   %s`,
+		e.Address, converter.ToMainUnit(e.Coins),
+	)
+}
+
 // RequestContextState defines the state for the request context
 type RequestContextState byte
 
@@ -189,6 +385,71 @@ const (
 	COMPLETED RequestContextState = 0x02 // completed
 )
 
+var (
+	RequestContextStateToStringMap = map[RequestContextState]string{
+		RUNNING:   "running",
+		PAUSED:    "paused",
+		COMPLETED: "completed",
+	}
+	StringToRequestContextStateMap = map[string]RequestContextState{
+		"running":   RUNNING,
+		"paused":    PAUSED,
+		"completed": COMPLETED,
+	}
+)
+
+func RequestContextStateFromString(str string) (RequestContextState, error) {
+	if state, ok := StringToRequestContextStateMap[strings.ToLower(str)]; ok {
+		return state, nil
+	}
+	return RequestContextState(0xff), fmt.Errorf("'%s' is not a valid request context state", str)
+}
+
+func (state RequestContextState) Format(s fmt.State, verb rune) {
+	switch verb {
+	case 's':
+		s.Write([]byte(state.String()))
+	default:
+		s.Write([]byte(fmt.Sprintf("%v", byte(state))))
+	}
+}
+
+func (state RequestContextState) String() string {
+	return RequestContextStateToStringMap[state]
+}
+
+// Marshal needed for protobuf compatibility
+func (state RequestContextState) Marshal() ([]byte, error) {
+	return []byte{byte(state)}, nil
+}
+
+// Unmarshal needed for protobuf compatibility
+func (state *RequestContextState) Unmarshal(data []byte) error {
+	*state = RequestContextState(data[0])
+	return nil
+}
+
+// Marshals to JSON using string
+func (state RequestContextState) MarshalJSON() ([]byte, error) {
+	return json.Marshal(state.String())
+}
+
+// Unmarshals from JSON
+func (state *RequestContextState) UnmarshalJSON(data []byte) error {
+	var s string
+	if err := json.Unmarshal(data, &s); err != nil {
+		return nil
+	}
+
+	bz, err := RequestContextStateFromString(s)
+	if err != nil {
+		return err
+	}
+
+	*state = bz
+	return nil
+}
+
 // RequestContextBatchState defines the current batch state for the request context
 type RequestContextBatchState byte
 
@@ -196,6 +457,69 @@ const (
 	BATCHRUNNING   RequestContextBatchState = 0x00 // running
 	BATCHCOMPLETED RequestContextBatchState = 0x01 // completed
 )
+
+var (
+	RequestContextBatchStateToStringMap = map[RequestContextBatchState]string{
+		BATCHRUNNING:   "running",
+		BATCHCOMPLETED: "completed",
+	}
+	StringToRequestContextBatchStateMap = map[string]RequestContextBatchState{
+		"running":   BATCHRUNNING,
+		"completed": BATCHCOMPLETED,
+	}
+)
+
+func RequestContextBatchStateFromString(str string) (RequestContextBatchState, error) {
+	if state, ok := StringToRequestContextBatchStateMap[strings.ToLower(str)]; ok {
+		return state, nil
+	}
+	return RequestContextBatchState(0xff), fmt.Errorf("'%s' is not a valid request context batch state", str)
+}
+
+func (state RequestContextBatchState) Format(s fmt.State, verb rune) {
+	switch verb {
+	case 's':
+		s.Write([]byte(state.String()))
+	default:
+		s.Write([]byte(fmt.Sprintf("%v", byte(state))))
+	}
+}
+
+func (state RequestContextBatchState) String() string {
+	return RequestContextBatchStateToStringMap[state]
+}
+
+// Marshal needed for protobuf compatibility
+func (state RequestContextBatchState) Marshal() ([]byte, error) {
+	return []byte{byte(state)}, nil
+}
+
+// Unmarshal needed for protobuf compatibility
+func (state *RequestContextBatchState) Unmarshal(data []byte) error {
+	*state = RequestContextBatchState(data[0])
+	return nil
+}
+
+// Marshals to JSON using string
+func (state RequestContextBatchState) MarshalJSON() ([]byte, error) {
+	return json.Marshal(state.String())
+}
+
+// Unmarshals from JSON
+func (state *RequestContextBatchState) UnmarshalJSON(data []byte) error {
+	var s string
+	if err := json.Unmarshal(data, &s); err != nil {
+		return nil
+	}
+
+	bz, err := RequestContextBatchStateFromString(s)
+	if err != nil {
+		return err
+	}
+
+	*state = bz
+	return nil
+}
 
 // ResponseCallback defines the response callback interface
 type ResponseCallback func(ctx sdk.Context, requestContextID []byte, reponses []string)

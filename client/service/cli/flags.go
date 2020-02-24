@@ -15,31 +15,28 @@ const (
 	FlagDeposit           = "deposit"
 	FlagPricing           = "pricing"
 	FlagWithdrawAddr      = "withdraw-addr"
-	FlagMethodID          = "method-id"
-	FlagServiceFee        = "service-fee"
-	FlagReqData           = "request-data"
-	FlagProfiling         = "profiling"
-	FlagProvider          = "provider"
-	FlagDefChainID        = "def-chain-id"
-	FlagBindChainID       = "bind-chain-id"
-	FlagReqChainID        = "request-chain-id"
-	FlagReqID             = "request-id"
-	FlagRespData          = "response-data"
-	FlagErrMsg            = "error-msg"
-	FlagDestAddress       = "dest-address"
-	FlagWithdrawAmount    = "withdraw-amount"
+	FlagProviders         = "providers"
+	FlagServiceFeeCap     = "service-fee-cap"
+	FlagTimeout           = "timeout"
+	FlagData              = "data"
+	FlagSuperMode         = "super-mode"
+	FlagRepeated          = "repeated"
+	FlagFrequency         = "frequency"
+	FlagTotal             = "total"
+	FlagRequestID         = "request-id"
+	FlagError             = "error"
 )
 
 // common flagsets to add to various functions
 var (
-	FsServiceDefine          = flag.NewFlagSet("", flag.ContinueOnError)
-	FsServiceBind            = flag.NewFlagSet("", flag.ContinueOnError)
-	FsServiceUpdateBinding   = flag.NewFlagSet("", flag.ContinueOnError)
-	FsServiceSetWithdrawAddr = flag.NewFlagSet("", flag.ContinueOnError)
-	FsServiceEnable          = flag.NewFlagSet("", flag.ContinueOnError)
-	FsServiceRequest         = flag.NewFlagSet("", flag.ContinueOnError)
-	FsServiceResponse        = flag.NewFlagSet("", flag.ContinueOnError)
-	FsServiceWithdrawTax     = flag.NewFlagSet("", flag.ContinueOnError)
+	FsServiceDefine               = flag.NewFlagSet("", flag.ContinueOnError)
+	FsServiceBind                 = flag.NewFlagSet("", flag.ContinueOnError)
+	FsServiceUpdateBinding        = flag.NewFlagSet("", flag.ContinueOnError)
+	FsServiceSetWithdrawAddr      = flag.NewFlagSet("", flag.ContinueOnError)
+	FsServiceEnable               = flag.NewFlagSet("", flag.ContinueOnError)
+	FsServiceRequest              = flag.NewFlagSet("", flag.ContinueOnError)
+	FsServiceRespond              = flag.NewFlagSet("", flag.ContinueOnError)
+	FsServiceUpdateRequestContext = flag.NewFlagSet("", flag.ContinueOnError)
 )
 
 func init() {
@@ -61,20 +58,23 @@ func init() {
 
 	FsServiceEnable.String(FlagDeposit, "", "added deposit for enabling the binding")
 
-	FsServiceRequest.Int16(FlagMethodID, 0, "the method id called")
-	FsServiceRequest.String(FlagServiceFee, "", "fee to pay for a service invocation")
-	FsServiceRequest.BytesHex(FlagReqData, nil, "hex encoded request data of a service invocation")
-	FsServiceRequest.Bool(FlagProfiling, false, "service invocation profiling model, default false")
-	FsServiceRequest.String(FlagDefChainID, "", "ID of the chain where the service definition lies")
-	FsServiceRequest.String(FlagBindChainID, "", "ID of the chain where the service binding lies")
-	FsServiceRequest.String(FlagProvider, "", "the provider address")
 	FsServiceRequest.String(FlagServiceName, "", "service name")
+	FsServiceRequest.StringSlice(FlagProviders, []string{}, "providers to request")
+	FsServiceRequest.String(FlagServiceFeeCap, "", "maximal fee to pay for a service request")
+	FsServiceRequest.String(FlagData, "", "input of the service request, which is an Input JSON schema instance")
+	FsServiceRequest.Uint64(FlagTimeout, 0, "request timeout, 0 means default timeout")
+	FsServiceRequest.Bool(FlagSuperMode, false, "indicate if the signer is a super user")
+	FsServiceRequest.Bool(FlagRepeated, false, "indicate if the request is repetitive")
+	FsServiceRequest.Uint64(FlagFrequency, 0, "request frequency when repeated, default to timeout")
+	FsServiceRequest.Int64(FlagTotal, 0, "request count when repeated, -1 means unlimited")
 
-	FsServiceResponse.BytesHex(FlagRespData, nil, "hex encoded response data of a service invocation")
-	FsServiceResponse.BytesHex(FlagErrMsg, nil, "hex encoded response error msg of a service invocation")
-	FsServiceResponse.String(FlagReqChainID, "", "the ID of the blockchain that the service invocation initiated")
-	FsServiceResponse.String(FlagReqID, "", "the ID of the service invocation")
+	FsServiceUpdateRequestContext.StringSlice(FlagProviders, []string{}, "new providers to request, not updated if empty")
+	FsServiceUpdateRequestContext.String(FlagServiceFeeCap, "", "maximal fee to pay for a service request, empty means not updated")
+	FsServiceUpdateRequestContext.Uint64(FlagTimeout, 0, "new request timeout, not updated if set to 0")
+	FsServiceUpdateRequestContext.Uint64(FlagFrequency, 0, "new request frequency, not updated if set to 0")
+	FsServiceUpdateRequestContext.Int64(FlagTotal, 0, "new request count, not updated if set to 0")
 
-	FsServiceWithdrawTax.String(FlagDestAddress, "", "bech32 encoded address of the destination account")
-	FsServiceWithdrawTax.String(FlagWithdrawAmount, "", "withdraw amount")
+	FsServiceRespond.String(FlagRequestID, "", "ID of the request to respond")
+	FsServiceRespond.String(FlagData, "", "output of the service response, which is an Output JSON schema instance")
+	FsServiceRespond.String(FlagError, "", "err msg of the service response, which is an Error JSON schema instance")
 }

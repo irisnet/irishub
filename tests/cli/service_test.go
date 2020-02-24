@@ -1,17 +1,6 @@
 package cli
 
-import (
-	"fmt"
-	"regexp"
-	"strings"
-	"testing"
-
-	"github.com/stretchr/testify/require"
-
-	"github.com/irisnet/irishub/tests"
-	sdk "github.com/irisnet/irishub/types"
-)
-
+/*
 func TestIrisCLIService(t *testing.T) {
 	t.Parallel()
 	chainID, servAddr, port, irisHome, iriscliHome, p2pAddr := initializeFixtures(t)
@@ -300,3 +289,4 @@ func TestIrisCLIService(t *testing.T) {
 	tax := sdk.NewIntWithDecimal(1, 15)
 	require.Equal(t, oldBarAmt.Add(tax), newBarAmt)
 }
+ */

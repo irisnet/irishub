@@ -212,9 +212,11 @@ func main() {
 			servicecmd.GetCmdQueryServiceDefinition(cdc),
 			servicecmd.GetCmdQueryServiceBinding(cdc),
 			servicecmd.GetCmdQueryServiceBindings(cdc),
-			// servicecmd.GetCmdQuerySvcRequests(cdc),
-			// servicecmd.GetCmdQuerySvcResponse(cdc),
-			// servicecmd.GetCmdQuerySvcFees(cdc),
+			servicecmd.GetCmdQueryServiceRequests(cdc),
+			servicecmd.GetCmdQueryServiceResponse(cdc),
+			servicecmd.GetCmdQueryRequestContext(cdc),
+			servicecmd.GetCmdQueryServiceResponses(cdc),
+			servicecmd.GetCmdQueryEarnedFees(cdc),
 		)...)
 	serviceCmd.AddCommand(client.PostCommands(
 		servicecmd.GetCmdDefineService(cdc),
@@ -224,11 +226,14 @@ func main() {
 		servicecmd.GetCmdDisableService(cdc),
 		servicecmd.GetCmdEnableService(cdc),
 		servicecmd.GetCmdRefundServiceDeposit(cdc),
-		// servicecmd.GetCmdSvcCall(cdc),
-		// servicecmd.GetCmdSvcRespond(cdc),
-		// servicecmd.GetCmdSvcRefundFees(cdc),
-		// servicecmd.GetCmdSvcWithdrawFees(cdc),
-		// servicecmd.GetCmdSvcWithdrawTax(cdc),
+		servicecmd.GetCmdRequestService(cdc),
+		servicecmd.GetCmdRespondService(cdc),
+		servicecmd.GetCmdPauseRequestContext(cdc),
+		servicecmd.GetCmdStartRequestContext(cdc),
+		servicecmd.GetCmdKillRequestContext(cdc),
+		servicecmd.GetCmdUpdateRequestContext(cdc),
+		servicecmd.GetCmdWithdrawEarnedFees(cdc),
+		servicecmd.GetCmdWithdrawTax(cdc),
 	)...)
 
 	rootCmd.AddCommand(

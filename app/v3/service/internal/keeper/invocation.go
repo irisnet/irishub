@@ -142,6 +142,11 @@ func (k Keeper) UpdateRequestContext(
 		return types.ErrInvalidProviders(k.codespace, fmt.Sprintf("length [%d] of providers must not be less than the response threshold [%d]", len(providers), requestContext.ResponseThreshold))
 	}
 
+	params := k.GetParamSet(ctx)
+	if timeout > params.MaxRequestTimeout {
+		return types.ErrInvalidTimeout(k.codespace, fmt.Sprintf("timeout [%d] must not be greater than the max request timeout [%d]", timeout, params.MaxRequestTimeout))
+	}
+
 	if timeout == 0 {
 		timeout = requestContext.Timeout
 	}
@@ -436,6 +441,12 @@ func (k Keeper) IterateRequests(
 			break
 		}
 	}
+}
+
+// RequestsIteratorByReqCtx returns an iterator for all requests of the specified request context ID and batch counter
+func (k Keeper) RequestsIteratorByReqCtx(ctx sdk.Context, requestContextID []byte, batchCounter uint64) sdk.Iterator {
+	store := ctx.KVStore(k.storeKey)
+	return sdk.KVStorePrefixIterator(store, GetRequestSubspaceByReqCtx(requestContextID, batchCounter))
 }
 
 // AddActiveRequest adds the specified active request

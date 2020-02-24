@@ -1,7 +1,9 @@
 package cli
 
 import (
+	"encoding/hex"
 	"fmt"
+	"strconv"
 
 	"github.com/spf13/cobra"
 
@@ -129,133 +131,234 @@ func GetCmdQueryServiceBindings(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-// func GetCmdQuerySvcRequests(cdc *codec.Codec) *cobra.Command {
-// 	cmd := &cobra.Command{
-// 		Use:   "requests",
-// 		Short: "Query service requests",
-// 		Example: "iriscli service requests --def-chain-id=<service-def-chain-id> --service-name=test " +
-// 			"--bind-chain-id=<bind-chain-id> --provider=<provider>",
-// 		RunE: func(cmd *cobra.Command, args []string) error {
-// 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
-// 				WithAccountDecoder(utils.GetAccountDecoder(cdc))
+func GetCmdQueryServiceRequests(cdc *codec.Codec) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "requests",
+		Short:   "Query service requests by the service binding or request context ID",
+		Example: "iriscli service requests <service-name> <provider> | <request-context-id> <batch-counter>",
+		Args:    cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-// 			name := viper.GetString(FlagServiceName)
-// 			defChainID := viper.GetString(FlagDefChainID)
-// 			bindChainID := viper.GetString(FlagBindChainID)
-// 			providerStr := viper.GetString(FlagProvider)
+			queryByBinding := true
 
-// 			provider, err := sdk.AccAddressFromBech32(providerStr)
-// 			if err != nil {
-// 				return err
-// 			}
+			provider, err := sdk.AccAddressFromBech32(args[1])
+			if err != nil {
+				queryByBinding = false
+			}
 
-// 			params := service.QueryRequestsParams{
-// 				DefChainID:  defChainID,
-// 				ServiceName: name,
-// 				BindChainID: bindChainID,
-// 				Provider:    provider,
-// 			}
+			var params interface{}
+			var route string
 
-// 			bz, err := cdc.MarshalJSON(params)
-// 			if err != nil {
-// 				return err
-// 			}
+			if queryByBinding {
+				params = service.QueryRequestsParams{
+					ServiceName: args[0],
+					Provider:    provider,
+				}
 
-// 			route := fmt.Sprintf("custom/%s/%s", protocol.ServiceRoute, service.QueryRequests)
-// 			res, err := cliCtx.QueryWithData(route, bz)
-// 			if err != nil {
-// 				return err
-// 			}
+				route = fmt.Sprintf("custom/%s/%s", protocol.ServiceRoute, service.QueryRequests)
+			} else {
+				requestContextID, err := hex.DecodeString(args[0])
+				if err != nil {
+					return err
+				}
 
-// 			fmt.Println(string(res))
-// 			return nil
-// 		},
-// 	}
-// 	cmd.Flags().String(FlagDefChainID, "", "ID of the chain where the service definition lies")
-// 	cmd.Flags().String(FlagBindChainID, "", "ID of the chain where the service binding lies")
-// 	cmd.Flags().String(FlagProvider, "", "the provider address")
-// 	cmd.Flags().String(FlagServiceName, "", "service name")
-// 	cmd.MarkFlagRequired(FlagDefChainID)
-// 	cmd.MarkFlagRequired(FlagServiceName)
-// 	cmd.MarkFlagRequired(FlagBindChainID)
-// 	cmd.MarkFlagRequired(FlagProvider)
-// 	return cmd
-// }
+				batchCounter, err := strconv.ParseUint(args[1], 10, 64)
+				if err != nil {
+					return err
+				}
 
-// func GetCmdQuerySvcResponse(cdc *codec.Codec) *cobra.Command {
-// 	cmd := &cobra.Command{
-// 		Use:     "response",
-// 		Short:   "Query a service response",
-// 		Example: "iriscli service response --request-chain-id=<req-chain-id> --request-id=<request-id>",
-// 		RunE: func(cmd *cobra.Command, args []string) error {
-// 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
-// 				WithAccountDecoder(utils.GetAccountDecoder(cdc))
+				params = service.QueryRequestsByReqCtxParams{
+					RequestContextID: requestContextID,
+					BatchCounter:     batchCounter,
+				}
 
-// 			reqChainID := viper.GetString(FlagReqChainID)
-// 			reqID := viper.GetString(FlagReqID)
+				route = fmt.Sprintf("custom/%s/%s", protocol.ServiceRoute, service.QueryRequestsByReqCtx)
+			}
 
-// 			params := service.QueryResponseParams{
-// 				ReqChainID: reqChainID,
-// 				RequestID:  reqID,
-// 			}
+			bz, err := cdc.MarshalJSON(params)
+			if err != nil {
+				return err
+			}
 
-// 			bz, err := cdc.MarshalJSON(params)
-// 			if err != nil {
-// 				return err
-// 			}
+			res, err := cliCtx.QueryWithData(route, bz)
+			if err != nil {
+				return err
+			}
 
-// 			route := fmt.Sprintf("custom/%s/%s", protocol.ServiceRoute, service.QueryResponse)
-// 			res, err := cliCtx.QueryWithData(route, bz)
-// 			if err != nil {
-// 				return err
-// 			}
+			var requests service.Requests
+			if err := cdc.UnmarshalJSON(res, &requests); err != nil {
+				return err
+			}
 
-// 			fmt.Println(string(res))
-// 			return nil
-// 		},
-// 	}
-// 	cmd.Flags().String(FlagReqChainID, "", "the ID of the blockchain that the service invocation initiated")
-// 	cmd.Flags().String(FlagReqID, "", "the ID of the service invocation")
-// 	_ = cmd.MarkFlagRequired(FlagReqChainID)
-// 	_ = cmd.MarkFlagRequired(FlagReqID)
-// 	return cmd
-// }
+			return cliCtx.PrintOutput(requests)
+		},
+	}
 
-// func GetCmdQuerySvcFees(cdc *codec.Codec) *cobra.Command {
-// 	cmd := &cobra.Command{
-// 		Use:     "fees",
-// 		Short:   "Query return and incoming fee of a particular address",
-// 		Example: "iriscli service fees <account address>",
-// 		Args:    cobra.ExactArgs(1),
-// 		RunE: func(cmd *cobra.Command, args []string) error {
-// 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithLogger(os.Stdout).
-// 				WithAccountDecoder(utils.GetAccountDecoder(cdc))
+	return cmd
+}
 
-// 			addrString := args[0]
+func GetCmdQueryServiceResponse(cdc *codec.Codec) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "response",
+		Short:   "Query a response by the request ID",
+		Example: "iriscli service response <request-id>",
+		Args:    cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-// 			addr, err := sdk.AccAddressFromBech32(addrString)
-// 			if err != nil {
-// 				return err
-// 			}
+			params := service.QueryResponseParams{
+				RequestID: args[0],
+			}
 
-// 			params := service.QueryFeesParams{
-// 				Address: addr,
-// 			}
+			bz, err := cdc.MarshalJSON(params)
+			if err != nil {
+				return err
+			}
 
-// 			bz, err := cdc.MarshalJSON(params)
-// 			if err != nil {
-// 				return err
-// 			}
+			route := fmt.Sprintf("custom/%s/%s", protocol.ServiceRoute, service.QueryResponse)
+			res, err := cliCtx.QueryWithData(route, bz)
+			if err != nil {
+				return err
+			}
 
-// 			route := fmt.Sprintf("custom/%s/%s", protocol.ServiceRoute, service.QueryFees)
-// 			res, err := cliCtx.QueryWithData(route, bz)
-// 			if err != nil {
-// 				return err
-// 			}
+			var response service.Response
+			if err := cdc.UnmarshalJSON(res, &response); err != nil {
+				return err
+			}
 
-// 			fmt.Println(string(res))
-// 			return nil
-// 		},
-// 	}
-// 	return cmd
-// }
+			return cliCtx.PrintOutput(response)
+		},
+	}
+
+	return cmd
+}
+
+func GetCmdQueryServiceResponses(cdc *codec.Codec) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "response",
+		Short:   "Query responses by the request context ID and batch counter",
+		Example: "iriscli service responses <request-context-id> <batch-counter>",
+		Args:    cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+
+			requestContextID, err := hex.DecodeString(args[0])
+			if err != nil {
+				return err
+			}
+
+			batchCounter, err := strconv.ParseUint(args[1], 10, 64)
+			if err != nil {
+				return err
+			}
+
+			params := service.QueryResponsesParams{
+				RequestContextID: requestContextID,
+				BatchCounter:     batchCounter,
+			}
+
+			bz, err := cdc.MarshalJSON(params)
+			if err != nil {
+				return err
+			}
+
+			route := fmt.Sprintf("custom/%s/%s", protocol.ServiceRoute, service.QueryResponses)
+			res, err := cliCtx.QueryWithData(route, bz)
+			if err != nil {
+				return err
+			}
+
+			var responses service.Responses
+			if err := cdc.UnmarshalJSON(res, &responses); err != nil {
+				return err
+			}
+
+			return cliCtx.PrintOutput(responses)
+		},
+	}
+
+	return cmd
+}
+
+func GetCmdQueryRequestContext(cdc *codec.Codec) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "fees",
+		Short:   "Query a request context",
+		Example: "iriscli service request-context <request-context-id>",
+		Args:    cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+
+			requestContextID, err := hex.DecodeString(args[0])
+			if err != nil {
+				return err
+			}
+
+			params := service.QueryRequestContextParams{
+				RequestContextID: requestContextID,
+			}
+
+			bz, err := cdc.MarshalJSON(params)
+			if err != nil {
+				return err
+			}
+
+			route := fmt.Sprintf("custom/%s/%s", protocol.ServiceRoute, service.QueryRequestContext)
+			res, err := cliCtx.QueryWithData(route, bz)
+			if err != nil {
+				return err
+			}
+
+			var requestContext service.RequestContext
+			if err := cdc.UnmarshalJSON(res, &requestContext); err != nil {
+				return err
+			}
+
+			return cliCtx.PrintOutput(requestContext)
+		},
+	}
+
+	return cmd
+}
+
+func GetCmdQueryEarnedFees(cdc *codec.Codec) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "fees",
+		Short:   "Query the earned fees",
+		Example: "iriscli service fees <address>",
+		Args:    cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+
+			provider, err := sdk.AccAddressFromBech32(args[0])
+			if err != nil {
+				return err
+			}
+
+			params := service.QueryFeesParams{
+				Address: provider,
+			}
+
+			bz, err := cdc.MarshalJSON(params)
+			if err != nil {
+				return err
+			}
+
+			route := fmt.Sprintf("custom/%s/%s", protocol.ServiceRoute, service.QueryFees)
+			res, err := cliCtx.QueryWithData(route, bz)
+			if err != nil {
+				return err
+			}
+
+			var fees service.EarnedFees
+			if err := cdc.UnmarshalJSON(res, &fees); err != nil {
+				return err
+			}
+
+			return cliCtx.PrintOutput(fees)
+		},
+	}
+
+	return cmd
+}
