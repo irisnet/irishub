@@ -55,7 +55,7 @@ func (k Keeper) CreateFeed(ctx sdk.Context, msg types.MsgCreateFeed) sdk.Error {
 		msg.Input,
 		msg.ServiceFeeCap,
 		msg.Timeout,
-		false, // TODO: add SuperMode to msg
+		false,
 		true,
 		msg.RepeatedFrequency, msg.RepeatedTotal, service.PAUSED, msg.ResponseThreshold, types.ModuleName)
 	if err != nil {
@@ -147,7 +147,7 @@ func (k Keeper) EditFeed(ctx sdk.Context, msg types.MsgEditFeed) sdk.Error {
 	if err := k.sk.UpdateRequestContext(ctx, feed.RequestContextID,
 		msg.Providers,
 		msg.ServiceFeeCap,
-		0, // TODO: add Timeout to msg
+		msg.Timeout,
 		msg.RepeatedFrequency,
 		msg.RepeatedTotal); err != nil {
 		return err
