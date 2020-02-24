@@ -598,7 +598,7 @@ func GetCmdUpdateRequestContext(cdc *codec.Codec) *cobra.Command {
 		Use:   "update",
 		Short: "Update a request context",
 		Example: "iriscli service update-request-context <request-context-id> --chain-id=<chain-id> --from=<key name> --fee=0.3iris " +
-			"--providers=<new providers> --service-fee-cap=<2iris> --timeout=0 --frequency=200 --total=200",
+			"--providers=<new providers> --service-fee-cap=2iris --timeout=0 --frequency=200 --total=200",
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().

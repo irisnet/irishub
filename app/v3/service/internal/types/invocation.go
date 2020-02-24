@@ -95,7 +95,7 @@ func (rc RequestContext) String() string {
 	SuperMode:               %v
 	Repeated:                %v
 	RepeatedFrequency:       %d
-    RepeatedTotal:           %d
+	RepeatedTotal:           %d
 	BatchCounter:            %d
 	BatchRequestCount:       %d
 	BatchResponseCount:      %d
@@ -132,7 +132,7 @@ func (rc RequestContext) HumanString(converter sdk.CoinsConverter) string {
 	SuperMode:               %v
 	Repeated:                %v
 	RepeatedFrequency:       %d
-    RepeatedTotal:           %d
+	RepeatedTotal:           %d
 	BatchCounter:            %d
 	BatchRequestCount:       %d
 	BatchResponseCount:      %d
