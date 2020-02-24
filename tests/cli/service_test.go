@@ -1,6 +1,17 @@
 package cli
 
-/*
+import (
+	"encoding/hex"
+	"fmt"
+	"regexp"
+	"strings"
+	"testing"
+
+	"github.com/irisnet/irishub/app/v3/service"
+	"github.com/irisnet/irishub/tests"
+	"github.com/stretchr/testify/require"
+)
+
 func TestIrisCLIService(t *testing.T) {
 	t.Parallel()
 	chainID, servAddr, port, irisHome, iriscliHome, p2pAddr := initializeFixtures(t)
@@ -27,9 +38,15 @@ func TestIrisCLIService(t *testing.T) {
 	serviceTags := []string{"tag1", "tag2"}
 	authorDesc := "author"
 	serviceSchemas := `{"input":{"type":"object"},"output":{"type":"object"},"error":{"type":"object"}}`
-	deposit := "10iris"
+	deposit := "10000iris"
 	pricing := `{"price":[{"denom":"iris-atto","amount":"100000000000000000"}]}` // 0.1iris
 	addedDeposit := "1iris"
+	serviceFeeCap:="10iris"
+	input:={"pair":"iris-usdt"}
+	timeout:=10
+	repeatedFreq:=20
+	repeatedTotal:=10
+	output:={"last":100}
 
 	// define service
 	svcDefOutput, _ := tests.ExecuteT(t, fmt.Sprintf("iriscli service definition %s %v", serviceName, flags), "")
@@ -177,29 +194,81 @@ func TestIrisCLIService(t *testing.T) {
 	require.Equal(t, deposit, svcBinding.Deposit.MainUnitString())
 
 	// call service
-	caStr := fmt.Sprintf("iriscli service call %v", flags)
-	caStr += fmt.Sprintf(" --def-chain-id=%s", chainID)
-	caStr += fmt.Sprintf(" --service-name=%s", serviceName)
-	caStr += fmt.Sprintf(" --bind-chain-id=%s", chainID)
-	caStr += fmt.Sprintf(" --method-id=%d", 1)
-	caStr += fmt.Sprintf(" --provider=%s", fooAddr.String())
-	caStr += fmt.Sprintf(" --request-data=%s", "1234")
-	caStr += fmt.Sprintf(" --service-fee=%s", "2iris")
-	caStr += fmt.Sprintf(" --fee=%s", "0.4iris")
-	caStr += fmt.Sprintf(" --from=%s", "bar")
-	caStr += " --commit"
+	cStr := fmt.Sprintf("iriscli service call %v", flags)
+	csStr += fmt.Sprintf(" --service-name=%s", serviceName)
+	csStr += fmt.Sprintf(" --providers=%s,%s",fooAddr.String(),barAddr.String())
+	csStr += fmt.Sprintf(" --service-fee-cap=%s", serviceFeeCap)
+	csStr += fmt.Sprintf(" --data=%s", input)
+	csStr += fmt.Sprintf(" --timeout=%d", timeout)
+	csStr += fmt.Sprintf(" --repeated=%v", true)
+	csStr += fmt.Sprintf(" --frequency=%d", repeatedFreq)
+	csStr += fmt.Sprintf(" --total=%d", repeatedTotal)
+	csStr += fmt.Sprintf(" --fee=%s", "0.4iris")
+	csStr += fmt.Sprintf(" --from=%s", "bar")
+	csStr += " --commit"
 
-	_, outString, _ := executeWriteRetStdStreams(t, caStr, sdk.DefaultKeyPass)
+	_, outString, _ := executeWriteRetStdStreams(t, csStr, sdk.DefaultKeyPass)
 
-	var digitsRegexp = regexp.MustCompile(`\"key\": \"request-id\",\n       \"value\": \".*\"`)
-	requestTag := string(digitsRegexp.Find([]byte(outString)))
-	requestId := strings.TrimSpace(strings.Split(requestTag, ":")[2])
-	requestId = requestId[1 : len(requestId)-1]
+	var regExp = regexp.MustCompile(`\"key\": \"request-context-id\",\n       \"value\": \"(.*)\"`)
+	requestContextID := string(regExp.Find([]byte(outString)))
 
 	tests.WaitForNextNBlocksTM(2, port)
+	
+	// query request context
+	requestContext := executeGetRequestContext(t, fmt.Sprintf("iriscli service request-context %s %v", requestContextID, flags))
+	
+	require.Equal(t, serviceName, requestContext.ServiceName)
+	require.Equal(t, []sdk.AccAddress{fooAddr,barAddr}, requestContext.Providers)
+	require.Equal(t, barAddr, requestContext.Consumer)
+	require.Equal(t, input, requestContext.Input)
+	require.Equal(t, serviceFeeCap, requestContext.ServiceFeeCap)
+	require.Equal(t, timeout, requestContext.Timeout)
+	require.Equal(t, false, requestContext.SuperMode)
+	require.Equal(t, true, requestContext.Repeated)
+	require.Equal(t, repeatedFreq, requestContext.RepeatedFrequency)
+	require.Equal(t, repeatedTotal, requestContext.RepeatedTotal)
+	require.Equal(t, uint64(1), requestContext.BatchCounter)
+	require.Equal(t, uint64(2), requestContext.BatchRequestCount)
+	require.Equal(t, uint64(0), requestContext.BatchResponseCount)
+	require.Equal(t, service.BATCHRUNNING, requestContext.BatchState)
+	require.Equal(t, service.RUNNING, requestContext.State)
+	require.Equal(t, uint16(0), requestContext.ResponseThreshold)
+	require.Equal(t, "" , requestContext.ModuleName)
 
-	svcRequests := executeGetServiceRequests(t, fmt.Sprintf("iriscli service requests --def-chain-id=%s --service-name=%s --bind-chain-id=%s --provider=%s %v", chainID, serviceName, chainID, fooAddr.String(), flags))
-	require.Equal(t, 1, len(svcRequests))
+	// query requests by binding (foo)
+	fooRequests := executeGetRequests(t, fmt.Sprintf("iriscli service requests %s %s %v", serviceName, fooAddr.String(),flags))
+	require.Equal(t,1,fooRequests)
+	
+	require.Equal(t, serviceName, fooRequests[0].ServiceName)
+	require.Equal(t, fooAddr, fooRequests[0].Provider)
+	require.Equal(t, barAddr, fooRequests[0].Consumer)
+	require.Equal(t, input, fooRequests[0].Input)
+	require.Equal(t, input, fooRequests[0].ServiceFee)
+	require.Equal(t, timeout, fooRequests[0].Timeout)
+	require.Equal(t, false, fooRequests[0].SuperMode)
+	require.Equal(t, requestContextID, hex.EncodeToString(fooRequests[0].RequestContextID))
+	require.Equal(t, uint64(1), fooRequests[0].RequestContextBatchCounter)
+
+	// query requests by binding (bar)
+	barRequests = executeGetRequests(t, fmt.Sprintf("iriscli service requests %s %s %v", serviceName, barAddr.String(),flags))
+	require.Equal(t,1,barRequests)
+	
+	require.Equal(t, serviceName, barRequests[0].ServiceName)
+	require.Equal(t, barAddr, barRequests[0].Provider)
+	require.Equal(t, barAddr, barRequests[0].Consumer)
+	require.Equal(t, input, barRequests[0].Input)
+	require.Equal(t, input, barRequests[0].ServiceFee)
+	require.Equal(t, timeout, barRequests[0].Timeout)
+	require.Equal(t, false, barRequests[0].SuperMode)
+	require.Equal(t, requestContextID, hex.EncodeToString(barRequests[0].RequestContextID))
+	require.Equal(t, uint64(1), barRequests[0].RequestContextBatchCounter)
+
+	// query requests by request context
+	requests = executeGetRequestsByReqCtx(t, fmt.Sprintf("iriscli service requests %s %d %v", requestContextID, 1,flags))
+	require.Equal(t,2,requests)
+	
+	require.Equal(t, fooRequests[0], requests[0])
+	require.Equal(t, barRequests[0], requests[1])
 
 	barAcc = executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", barAddr, flags))
 	barCoin = convertToIrisBaseAccount(t, barAcc)
@@ -209,16 +278,76 @@ func TestIrisCLIService(t *testing.T) {
 		t.Error("Test Failed: (7, 8) expected, received: {}", barAmt)
 	}
 
-	// respond service
-	reStr := fmt.Sprintf("iriscli service respond %v", flags)
-	reStr += fmt.Sprintf(" --request-chain-id=%s", chainID)
-	reStr += fmt.Sprintf(" --request-id=%s", requestId)
-	reStr += fmt.Sprintf(" --response-data=%s", "1234")
-	reStr += fmt.Sprintf(" --fee=%s", "0.4iris")
-	reStr += fmt.Sprintf(" --from=%s", "foo")
+	// respond service (foo)
 
-	executeWrite(t, reStr, sdk.DefaultKeyPass)
-	tests.WaitForNextNBlocksTM(7, port)
+	fooRequestID:=service.GenerateRequestID()
+
+	rsStr := fmt.Sprintf("iriscli service respond %v", flags)
+	rsStr += fmt.Sprintf(" --request-id=%s", fooRequestId)
+	rsStr += fmt.Sprintf(" --data=%s", output)
+	rsStr += fmt.Sprintf(" --fee=%s", "0.4iris")
+	rsStr += fmt.Sprintf(" --from=%s", "foo")
+
+	executeWrite(t, rsStr, sdk.DefaultKeyPass)
+	tests.WaitForNextNBlocksTM(2, port)
+
+	// query response (foo)
+	fooResponse = executeGetResponse(t, fmt.Sprintf("iriscli service response %s %v", fooRequestID,flags))
+	
+	require.Equal(t, fooAddr, fooResponse.Provider)
+	require.Equal(t, barAddr, fooResponse.Consumer)
+	require.Equal(t, output, fooResponse.Output)
+	require.Equal(t, "", fooResponse.Error)
+	require.Equal(t, requestContextID, hex.EncodeToString(fooResponse.RequestContextID))
+	require.Equal(t, uint64(1), fooResponse.RequestContextBatchCounter)
+
+	// query request context
+	requestContext = executeGetRequestContext(t, fmt.Sprintf("iriscli service request-context %s %v", requestContextID, flags))
+	
+	require.Equal(t, uint64(1), requestContext.BatchCounter)
+	require.Equal(t, uint64(2), requestContext.BatchRequestCount)
+	require.Equal(t, uint64(1), requestContext.BatchResponseCount)
+	require.Equal(t, service.BATCHRUNNING, requestContext.BatchState)
+	require.Equal(t, service.RUNNING, requestContext.State)
+	
+	// respond service (bar)
+
+	barRequestID:=service.GenerateRequestID()
+
+	rsStr = fmt.Sprintf("iriscli service respond %v", flags)
+	rsStr += fmt.Sprintf(" --request-id=%s", barRequestId)
+	rsStr += fmt.Sprintf(" --data=%s", output)
+	rsStr += fmt.Sprintf(" --fee=%s", "0.4iris")
+	rsStr += fmt.Sprintf(" --from=%s", "bar")
+
+	executeWrite(t, rsStr, sdk.DefaultKeyPass)
+	tests.WaitForNextNBlocksTM(2, port)
+
+	// query response (bar)
+	fooResponse = executeGetResponse(t, fmt.Sprintf("iriscli service response %s %v", barRequestID,flags))
+	
+	require.Equal(t, barAddr, fooResponse.Provider)
+	require.Equal(t, barAddr, fooResponse.Consumer)
+	require.Equal(t, output, fooResponse.Output)
+	require.Equal(t, "", fooResponse.Error)
+	require.Equal(t, requestContextID, hex.EncodeToString(fooResponse.RequestContextID))
+	require.Equal(t, uint64(1), fooResponse.RequestContextBatchCounter)
+
+	// query request context
+	requestContext = executeGetRequestContext(t, fmt.Sprintf("iriscli service request-context %s %v", requestContextID, flags))
+	
+	require.Equal(t, uint64(1), requestContext.BatchCounter)
+	require.Equal(t, uint64(2), requestContext.BatchRequestCount)
+	require.Equal(t, uint64(2), requestContext.BatchResponseCount)
+	require.Equal(t, service.BATCHCOMPLETED, requestContext.BatchState)
+	require.Equal(t, service.RUNNING, requestContext.State)
+
+	// query responses by request context
+	responses = executeGetResponses(t, fmt.Sprintf("iriscli service responses %s %d %v", requestContextID, 1,flags))
+	require.Equal(t,2,responses)
+	
+	require.Equal(t, fooResponse, responses[0])
+	require.Equal(t, barResponse, responses[1])
 
 	// fees
 	fooFees := executeGetServiceFees(t, fmt.Sprintf("iriscli service fees %s %v", fooAddr.String(), flags))
@@ -289,4 +418,3 @@ func TestIrisCLIService(t *testing.T) {
 	tax := sdk.NewIntWithDecimal(1, 15)
 	require.Equal(t, oldBarAmt.Add(tax), newBarAmt)
 }
- */
