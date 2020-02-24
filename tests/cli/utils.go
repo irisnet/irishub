@@ -349,9 +349,9 @@ func executeGetTrustees(t *testing.T, cmdStr string) []guardian.Guardian {
 	return trustees
 }
 
-func executeGetServiceRequests(t *testing.T, cmdStr string) []service.SvcRequest {
+func executeGetServiceRequests(t *testing.T, cmdStr string) []service.Request {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
-	var svcRequests []service.SvcRequest
+	var svcRequests []service.Request
 	cdc := app.MakeLatestCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &svcRequests)
 	require.NoError(t, err, "out %v\n, err %v", out, err)

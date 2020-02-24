@@ -467,6 +467,7 @@ type MsgRequestService struct {
 	Input             string           `json:"input"`
 	ServiceFeeCap     sdk.Coins        `json:"service_fee_cap"`
 	Timeout           int64            `json:"timeout"`
+	SuperMode         bool             `json:"super_mode"`
 	Repeated          bool             `json:"repeated"`
 	RepeatedFrequency uint64           `json:"repeated_frequency"`
 	RepeatedTotal     int64            `json:"repeated_total"`
@@ -480,6 +481,7 @@ func NewMsgRequestService(
 	input string,
 	serviceFeeCap sdk.Coins,
 	timeout int64,
+	superMode bool,
 	repeated bool,
 	repeatedFrequency uint64,
 	repeatedTotal int64,
@@ -491,6 +493,7 @@ func NewMsgRequestService(
 		Input:             input,
 		ServiceFeeCap:     serviceFeeCap,
 		Timeout:           timeout,
+		SuperMode:         superMode,
 		Repeated:          repeated,
 		RepeatedFrequency: repeatedFrequency,
 		RepeatedTotal:     repeatedTotal,
@@ -765,6 +768,7 @@ type MsgUpdateRequestContext struct {
 	RequestContextID  []byte           `json:"request_context_id"`
 	Providers         []sdk.AccAddress `json:"providers"`
 	ServiceFeeCap     sdk.Coins        `json:"service_fee_cap"`
+	Timeout           int64            `json:"timeout"`
 	RepeatedFrequency uint64           `json:"repeated_frequency"`
 	RepeatedTotal     int64            `json:"repeated_total"`
 	Consumer          sdk.AccAddress   `json:"consumer"`
@@ -775,6 +779,7 @@ func NewMsgUpdateRequestContext(
 	requestContextID []byte,
 	providers []sdk.AccAddress,
 	serviceFeeCap sdk.Coins,
+	timeout int64,
 	repeatedFrequency uint64,
 	repeatedTotal int64,
 	consumer sdk.AccAddress,
@@ -783,6 +788,7 @@ func NewMsgUpdateRequestContext(
 		RequestContextID:  requestContextID,
 		Providers:         providers,
 		ServiceFeeCap:     serviceFeeCap,
+		Timeout:           timeout,
 		RepeatedFrequency: repeatedFrequency,
 		RepeatedTotal:     repeatedTotal,
 		Consumer:          consumer,
@@ -815,7 +821,7 @@ func (msg MsgUpdateRequestContext) ValidateBasic() sdk.Error {
 		return ErrInvalidRequestContextID(DefaultCodespace, fmt.Sprintf("length of the request context ID must be %d in bytes", RequestContextIDLen))
 	}
 
-	return ValidateRequestContextUpdating(msg.ServiceFeeCap, msg.RepeatedTotal)
+	return ValidateRequestContextUpdating(msg.ServiceFeeCap, msg.Timeout, msg.RepeatedFrequency, msg.RepeatedTotal)
 }
 
 // GetSigners implements Msg.
@@ -1042,9 +1048,17 @@ func ValidateRequest(
 }
 
 // ValidateRequestContextUpdating validates the request context updating operation
-func ValidateRequestContextUpdating(serviceFeeCap sdk.Coins, repeatedTotal int64) sdk.Error {
+func ValidateRequestContextUpdating(serviceFeeCap sdk.Coins, timeout int64, repeatedFrequency uint64, repeatedTotal int64) sdk.Error {
 	if !serviceFeeCap.Empty() && !validServiceCoins(serviceFeeCap) {
 		return ErrInvalidServiceFee(DefaultCodespace, fmt.Sprintf("invalid service fee: %s", serviceFeeCap))
+	}
+
+	if timeout < 0 {
+		return ErrInvalidTimeout(DefaultCodespace, fmt.Sprintf("timeout must not be less than 0: %d", timeout))
+	}
+
+	if timeout != 0 && repeatedFrequency != 0 && repeatedFrequency < uint64(timeout) {
+		return ErrInvalidRepeatedFreq(DefaultCodespace, fmt.Sprintf("frequency [%d] must not be less than timeout [%d]", repeatedFrequency, timeout))
 	}
 
 	if repeatedTotal < -1 {

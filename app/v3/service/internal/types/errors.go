@@ -1,6 +1,7 @@
 package types
 
 import (
+	"encoding/hex"
 	"fmt"
 
 	sdk "github.com/irisnet/irishub/types"
@@ -28,23 +29,25 @@ const (
 	CodeInvalidResponse           sdk.CodeType = 114
 	CodeInvalidRequestID          sdk.CodeType = 115
 	CodeInvalidProviders          sdk.CodeType = 116
-	CodeInvalidRepeatedFreq       sdk.CodeType = 117
-	CodeInvalidRepeatedTotal      sdk.CodeType = 118
-	CodeInvalidRequestContextID   sdk.CodeType = 119
-	CodeRequestContextNonRepeated sdk.CodeType = 120
-	CodeRequestContextNotStarted  sdk.CodeType = 121
-	CodeRequestContextNotPaused   sdk.CodeType = 122
-	CodeModuleNameRegistered      sdk.CodeType = 123
-	CodeModuleNameNotRegistered   sdk.CodeType = 124
-	CodeNoEarnedFees              sdk.CodeType = 125
+	CodeInvalidTimeout            sdk.CodeType = 117
+	CodeInvalidRepeatedFreq       sdk.CodeType = 118
+	CodeInvalidRepeatedTotal      sdk.CodeType = 119
+	CodeUnknownRequestContext     sdk.CodeType = 120
+	CodeInvalidRequestContextID   sdk.CodeType = 121
+	CodeRequestContextNonRepeated sdk.CodeType = 122
+	CodeRequestContextNotStarted  sdk.CodeType = 123
+	CodeRequestContextNotPaused   sdk.CodeType = 124
+	CodeModuleNameRegistered      sdk.CodeType = 125
+	CodeModuleNameNotRegistered   sdk.CodeType = 126
+	CodeNoEarnedFees              sdk.CodeType = 127
 
-	CodeInvalidRequestInput   sdk.CodeType = 126
-	CodeInvalidResponseOutput sdk.CodeType = 127
-	CodeInvalidResponseErr    sdk.CodeType = 128
+	CodeInvalidRequestInput   sdk.CodeType = 128
+	CodeInvalidResponseOutput sdk.CodeType = 129
+	CodeInvalidResponseErr    sdk.CodeType = 130
 
-	CodeInvalidAddress  sdk.CodeType = 129
-	CodeInvalidGuardian sdk.CodeType = 130
-	CodeInvalidTrustee  sdk.CodeType = 131
+	CodeInvalidAddress  sdk.CodeType = 131
+	CodeInvalidProfiler sdk.CodeType = 132
+	CodeInvalidTrustee  sdk.CodeType = 133
 )
 
 func ErrInvalidServiceName(codespace sdk.CodespaceType, serviceName string) sdk.Error {
@@ -115,12 +118,20 @@ func ErrInvalidProviders(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidProviders, fmt.Sprintf("invalid providers: %s", msg))
 }
 
+func ErrInvalidTimeout(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidTimeout, msg)
+}
+
 func ErrInvalidRepeatedFreq(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidRepeatedFreq, msg)
 }
 
 func ErrInvalidRepeatedTotal(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidRepeatedTotal, msg)
+}
+
+func ErrUnknownRequestContext(codespace sdk.CodespaceType, requestContextID []byte) sdk.Error {
+	return sdk.NewError(codespace, CodeUnknownRequestContext, fmt.Sprintf("unknown request context: %s", hex.EncodeToString(requestContextID)))
 }
 
 func ErrInvalidRequestContextID(codespace sdk.CodespaceType, msg string) sdk.Error {
@@ -163,8 +174,8 @@ func ErrInvalidResponseErr(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidResponseErr, fmt.Sprintf("invalid response err: %s", msg))
 }
 
-func ErrInvalidGuardian(codespace sdk.CodespaceType, address sdk.AccAddress) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidGuardian, fmt.Sprintf("invalid guardian: %s", address))
+func ErrInvalidProfiler(codespace sdk.CodespaceType, address sdk.AccAddress) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidProfiler, fmt.Sprintf("invalid profiler: %s", address))
 }
 
 func ErrInvalidTrustee(codespace sdk.CodespaceType, address sdk.AccAddress) sdk.Error {

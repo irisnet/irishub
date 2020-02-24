@@ -2,7 +2,6 @@ package cli
 
 import (
 	"bytes"
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -427,8 +426,8 @@ func GetCmdRequestService(cdc *codec.Codec) *cobra.Command {
 			}
 
 			msg := service.NewMsgRequestService(
-				serviceName, providers, consumer, input, serviceFeeCap, timeout,
-				superMode, repeated, frequency, total,
+				serviceName, providers, consumer, input, serviceFeeCap,
+				timeout, superMode, repeated, frequency, total,
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
@@ -644,7 +643,10 @@ func GetCmdUpdateRequestContext(cdc *codec.Codec) *cobra.Command {
 			frequency := uint64(viper.GetInt64(FlagFrequency))
 			total := viper.GetInt64(FlagTotal)
 
-			msg := service.NewMsgUpdateRequestContext(requestContextID, providers, serviceFeeCap, timeout, frequency, total, consumer)
+			msg := service.NewMsgUpdateRequestContext(
+				requestContextID, providers, serviceFeeCap,
+				timeout, frequency, total, consumer,
+			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}

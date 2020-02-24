@@ -270,11 +270,16 @@ func (k Keeper) GetBasePrice(ctx sdk.Context, binding types.ServiceBinding) sdk.
 func (k Keeper) getMinDeposit(ctx sdk.Context, pricing string) sdk.Coins {
 	params := k.GetParamSet(ctx)
 	minDepositMultiple := sdk.NewInt(params.MinDepositMultiple)
+	minDepositParam := params.MinDeposit
 
 	p, _ := types.ParsePricing(pricing)
 	price := p.Price.AmountOf(sdk.IrisAtto)
 
-	// minimal deposit = price * minDepositMultiple
+	// minimal deposit = max(price * minDepositMultiple, minDepositParam)
 	minDeposit := sdk.NewCoins(sdk.NewCoin(sdk.IrisAtto, price.Mul(minDepositMultiple)))
+	if minDeposit.IsAllLT(minDepositParam) {
+		minDeposit = minDepositParam
+	}
+
 	return minDeposit
 }

@@ -180,16 +180,16 @@ func queryRequestsByReqCtx(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]
 		return nil, sdk.ParseParamsErr(err)
 	}
 
-	iterator:=k.RequestsIteratorByReqCtx(ctx,params.RequestContextID,params.BatchCounter)
+	iterator := k.RequestsIteratorByReqCtx(ctx, params.RequestContextID, params.BatchCounter)
 	defer iterator.Close()
-	
-	requests:=make([]types.Request,0)
 
-	for ;iterator.Valid();iterator.Next(); {
-		requestID:=iterator.Key()[1:]
-		request,_:=k.GetRequest(ctx,requestID)
+	requests := make([]types.Request, 0)
 
-		requests=append(requests,request)
+	for ; iterator.Valid(); iterator.Next() {
+		requestID := iterator.Key()[1:]
+		request, _ := k.GetRequest(ctx, requestID)
+
+		requests = append(requests, request)
 	}
 
 	bz, err := codec.MarshalJSONIndent(k.cdc, requests)
@@ -207,16 +207,16 @@ func queryResponses(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, s
 		return nil, sdk.ParseParamsErr(err)
 	}
 
-	iterator:=k.ResponsesIteratorByReqCtx(ctx,params.RequestContextID,params.BatchCounter)
+	iterator := k.ResponsesIteratorByReqCtx(ctx, params.RequestContextID, params.BatchCounter)
 	defer iterator.Close()
-	
-	responses:=make([]types.Response,0)
 
-	for ;iterator.Valid();iterator.Next(); {
+	responses := make([]types.Response, 0)
+
+	for ; iterator.Valid(); iterator.Next() {
 		var response types.Response
-		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(),&response)
+		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &response)
 
-		responses=append(responses,response)
+		responses = append(responses, response)
 	}
 
 	bz, err := codec.MarshalJSONIndent(k.cdc, responses)

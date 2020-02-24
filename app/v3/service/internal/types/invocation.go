@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"strconv"
 	"strings"
 
 	sdk "github.com/irisnet/irishub/types"
@@ -19,8 +18,8 @@ type RequestContext struct {
 	Consumer           sdk.AccAddress           `json:"consumer"`
 	Input              string                   `json:"input"`
 	ServiceFeeCap      sdk.Coins                `json:"service_fee_cap"`
-	Profiling          bool                     `json:"profiling"`
 	Timeout            int64                    `json:"timeout"`
+	SuperMode          bool                     `json:"super_mode"`
 	Repeated           bool                     `json:"repeated"`
 	RepeatedFrequency  uint64                   `json:"repeated_frequency"`
 	RepeatedTotal      int64                    `json:"repeated_total"`
@@ -40,8 +39,8 @@ func NewRequestContext(
 	consumer sdk.AccAddress,
 	input string,
 	serviceFeeCap sdk.Coins,
-	profiling bool,
 	timeout int64,
+	superMode bool,
 	repeated bool,
 	repeatedFrequency uint64,
 	repeatedTotal int64,
@@ -59,8 +58,8 @@ func NewRequestContext(
 		Consumer:           consumer,
 		Input:              input,
 		ServiceFeeCap:      serviceFeeCap,
-		Profiling:          profiling,
 		Timeout:            timeout,
+		SuperMode:          superMode,
 		Repeated:           repeated,
 		RepeatedFrequency:  repeatedFrequency,
 		RepeatedTotal:      repeatedTotal,
@@ -74,11 +73,48 @@ func NewRequestContext(
 	}
 }
 
+// String implements Stringer
+func (rc RequestContext) String() string {
+	providers := ""
+
+	for _, p := range rc.Providers {
+		providers += p.String() + ","
+	}
+
+	if len(providers) > 0 {
+		providers = providers[0 : len(providers)-1]
+	}
+
+	return fmt.Sprintf(`RequestContext:
+	ServiceName:             %s
+	Providers:               %s
+	Consumer:                %s
+	Input:                   %s
+	ServiceFeeCap:           %s
+	Timeout:                 %d 
+	SuperMode:               %v
+	Repeated:                %v
+	RepeatedFrequency:       %d
+    RepeatedTotal:           %d
+	BatchCounter:            %d
+	BatchRequestCount:       %d
+	BatchResponseCount:      %d
+	BatchState:              %s
+	State:                   %s
+	ResponseThreshold:       %d
+	ModuleName:              %s`,
+		rc.ServiceName, providers, rc.Consumer, rc.Input, rc.ServiceFeeCap.String(),
+		rc.Timeout, rc.SuperMode, rc.Repeated, rc.RepeatedFrequency, rc.RepeatedTotal,
+		rc.BatchCounter, rc.BatchRequestCount, rc.BatchResponseCount, rc.BatchState, rc.State,
+		rc.ResponseThreshold, rc.ModuleName,
+	)
+}
+
 // HumanString implements human stringer
 func (rc RequestContext) HumanString(converter sdk.CoinsConverter) string {
 	providers := ""
 
-	for i, p := range len(rc.Providers) {
+	for _, p := range rc.Providers {
 		providers += p.String() + ","
 	}
 
@@ -144,7 +180,7 @@ type Request struct {
 	Consumer                   sdk.AccAddress `json:"consumer"`
 	Input                      string         `json:"input"`
 	ServiceFee                 sdk.Coins      `json:"service_fee"`
-	Profiling                  bool           `json:"profiling"`
+	SuperMode                  bool           `json:"super_mode"`
 	RequestHeight              int64          `json:"request_height"`
 	ExpirationHeight           int64          `json:"expiration_height"`
 	RequestContextID           []byte         `json:"request_context_id"`
@@ -158,7 +194,7 @@ func NewRequest(
 	consumer sdk.AccAddress,
 	input string,
 	serviceFee sdk.Coins,
-	profiling bool,
+	superMode bool,
 	requestHeight int64,
 	expirationHeight int64,
 	requestContextID []byte,
@@ -170,12 +206,31 @@ func NewRequest(
 		Consumer:                   consumer,
 		Input:                      input,
 		ServiceFee:                 serviceFee,
-		Profiling:                  profiling,
+		SuperMode:                  superMode,
 		RequestHeight:              requestHeight,
 		ExpirationHeight:           expirationHeight,
 		RequestContextID:           requestContextID,
 		RequestContextBatchCounter: batchCounter,
 	}
+}
+
+// String implements Stringer
+func (r Request) String() string {
+	return fmt.Sprintf(`Request:
+	ServiceName:             %s
+	Provider:                %s
+	Consumer:                %s
+	Input:                   %s
+	ServiceFee:              %s
+	SuperMode:               %v 
+	RequestHeight:           %d
+	ExpirationHeight:        %d
+	RequestContextID:        %s
+	BatchCounter:            %d`,
+		r.ServiceName, r.Provider, r.Consumer, r.Input, r.ServiceFee.String(),
+		r.SuperMode, r.RequestHeight, r.ExpirationHeight,
+		hex.EncodeToString(r.RequestContextID), r.RequestContextBatchCounter,
+	)
 }
 
 // HumanString implements human stringer
@@ -191,14 +246,14 @@ func (r Request) HumanString(converter sdk.CoinsConverter) string {
 	ExpirationHeight:        %d
 	RequestContextID:        %s
 	BatchCounter:            %d`,
-		r.ServiceName, r.Provider, r.Consumer, rc.Input, converter.ToMainUnit(ServiceFee),
+		r.ServiceName, r.Provider, r.Consumer, r.Input, converter.ToMainUnit(r.ServiceFee),
 		r.SuperMode, r.RequestHeight, r.ExpirationHeight,
 		hex.EncodeToString(r.RequestContextID), r.RequestContextBatchCounter,
 	)
 }
 
 // Requests represents a set of requests
-var Requests []Request
+type Requests []Request
 
 // String implements Stringer
 func (rs Requests) String() string {
@@ -208,7 +263,21 @@ func (rs Requests) String() string {
 
 	var str string
 	for _, r := range rs {
-		str += r.HumanString() + "\n"
+		str += r.String() + "\n"
+	}
+
+	return str
+}
+
+// HumanString implements human stringer
+func (rs Requests) HumanString(converter sdk.CoinsConverter) string {
+	if len(rs) == 0 {
+		return "[]"
+	}
+
+	var str string
+	for _, r := range rs {
+		str += r.HumanString(converter) + "\n"
 	}
 
 	return str
@@ -259,7 +328,7 @@ func (r Response) String() string {
 }
 
 // Responses represents a set of responses
-var Responses []Response
+type Responses []Response
 
 // String implements Stringer
 func (rs Responses) String() string {
@@ -287,6 +356,15 @@ func NewEarnedFees(address sdk.AccAddress, coins sdk.Coins) EarnedFees {
 		Address: address,
 		Coins:   coins,
 	}
+}
+
+// String implements Stringer
+func (e EarnedFees) String() string {
+	return fmt.Sprintf(`EarnedFees:
+	Address:                 %s
+	Coins:                   %s`,
+		e.Address, e.Coins.String(),
+	)
 }
 
 // HumanString implements human stringer
@@ -382,14 +460,12 @@ const (
 
 var (
 	RequestContextBatchStateToStringMap = map[RequestContextBatchState]string{
-		RUNNING:   "running",
-		PAUSED:    "paused",
-		COMPLETED: "completed",
+		BATCHRUNNING:   "running",
+		BATCHCOMPLETED: "completed",
 	}
 	StringToRequestContextBatchStateMap = map[string]RequestContextBatchState{
-		"running":   RUNNING,
-		"paused":    PAUSED,
-		"completed": COMPLETED,
+		"running":   BATCHRUNNING,
+		"completed": BATCHCOMPLETED,
 	}
 )
 
@@ -448,49 +524,27 @@ func (state *RequestContextBatchState) UnmarshalJSON(data []byte) error {
 // ResponseCallback defines the response callback interface
 type ResponseCallback func(ctx sdk.Context, requestContextID []byte, reponses []string)
 
+const (
+	requestIDLen = 42
+)
+
 // ConvertRequestID converts the given string to request ID
-func ConvertRequestID(requestID string) ([]byte, error) {
-	parts := strings.Split(requestID, "-")
-	if len(parts) != 3 {
+func ConvertRequestID(requestIDStr string) ([]byte, error) {
+	if len(requestIDStr) != 2*requestIDLen {
 		return nil, errors.New("invalid request id")
 	}
 
-	requestContextID, err := hex.DecodeString(parts[0])
+	requestID, err := hex.DecodeString(requestIDStr)
 	if err != nil {
-		return nil, err
+		return nil, errors.New("invalid request id")
 	}
 
-	batchCounter, err := strconv.ParseInt(parts[1], 10, 64)
-	if err != nil {
-		return nil, err
-	}
-
-	batchRequestIndex, err := strconv.Atoi(parts[2])
-	if err != nil {
-		return nil, err
-	}
-
-	return GenerateRequestID(requestContextID, uint64(batchCounter), int16(batchRequestIndex)), nil
+	return requestID, nil
 }
 
 // RequestIDToString returns the string representation of the given request ID
-// request ID layout: 32+8+2 bytes
-func RequestIDToString(requestID []byte) (string, error) {
-	if len(requestID) != 42 {
-		return "", errors.New("invalid request id")
-	}
-
-	requestContextID := requestID[0:32]
-	batchCounter := requestID[32:40]
-	batchRequestIndex := requestID[40:42]
-
-	return fmt.Sprintf(
-			"%s-%d-%d",
-			hex.EncodeToString(requestContextID),
-			binary.BigEndian.Uint64(batchCounter),
-			binary.BigEndian.Uint16(batchRequestIndex),
-		),
-		nil
+func RequestIDToString(requestID []byte) string {
+	return hex.EncodeToString(requestID)
 }
 
 // GenerateRequestContextID generates a unique ID for the request context from the specified params

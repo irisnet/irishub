@@ -5,6 +5,8 @@ import (
 	"os"
 	"path"
 
+	oraclecmd "github.com/irisnet/irishub/client/oracle/cli"
+
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/client"
@@ -210,11 +212,17 @@ func main() {
 			servicecmd.GetCmdQueryServiceDefinition(cdc),
 			servicecmd.GetCmdQueryServiceBinding(cdc),
 			servicecmd.GetCmdQueryServiceBindings(cdc),
+<<<<<<< HEAD
 			servicecmd.GetCmdQueryServiceRequests(cdc),
 			servicecmd.GetCmdQueryServiceResponse(cdc),
 			servicecmd.GetCmdQueryRequestContext(cdc),
 			servicecmd.GetCmdQueryServiceResponses(cdc),
 			servicecmd.GetCmdQueryEarnedFees(cdc),
+=======
+			// servicecmd.GetCmdQuerySvcRequests(cdc),
+			// servicecmd.GetCmdQuerySvcResponse(cdc),
+			// servicecmd.GetCmdQuerySvcFees(cdc),
+>>>>>>> develop
 		)...)
 	serviceCmd.AddCommand(client.PostCommands(
 		servicecmd.GetCmdDefineService(cdc),
@@ -224,6 +232,7 @@ func main() {
 		servicecmd.GetCmdDisableService(cdc),
 		servicecmd.GetCmdEnableService(cdc),
 		servicecmd.GetCmdRefundServiceDeposit(cdc),
+<<<<<<< HEAD
 		servicecmd.GetCmdRequestService(cdc),
 		servicecmd.GetCmdRespondService(cdc),
 		servicecmd.GetCmdPauseRequestContext(cdc),
@@ -232,10 +241,41 @@ func main() {
 		servicecmd.GetCmdUpdateRequestContext(cdc),
 		servicecmd.GetCmdWithdrawEarnedFees(cdc),
 		servicecmd.GetCmdWithdrawTax(cdc),
+=======
+		// servicecmd.GetCmdSvcCall(cdc),
+		// servicecmd.GetCmdSvcRespond(cdc),
+		// servicecmd.GetCmdSvcRefundFees(cdc),
+		// servicecmd.GetCmdSvcWithdrawFees(cdc),
+		// servicecmd.GetCmdSvcWithdrawTax(cdc),
+>>>>>>> develop
 	)...)
 
 	rootCmd.AddCommand(
 		serviceCmd,
+	)
+
+	//Add oracle commands
+	oracleCmd := &cobra.Command{
+		Use:   "oracle",
+		Short: "Oracle subcommands",
+	}
+	oracleCmd.AddCommand(
+		client.PostCommands(
+			oraclecmd.GetCmdCreateFeed(cdc),
+			oraclecmd.GetCmdStartFeed(cdc),
+			oraclecmd.GetCmdPauseFeed(cdc),
+			oraclecmd.GetCmdEditFeed(cdc),
+		)...,
+	)
+	oracleCmd.AddCommand(
+		client.GetCommands(
+			oraclecmd.GetCmdQueryFeed(cdc),
+			oraclecmd.GetCmdQueryFeeds(cdc),
+			oraclecmd.GetCmdQueryFeedValue(cdc),
+		)...,
+	)
+	rootCmd.AddCommand(
+		oracleCmd,
 	)
 
 	//add guardian command

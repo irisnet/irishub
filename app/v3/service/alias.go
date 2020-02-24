@@ -7,26 +7,34 @@ import (
 
 // nolint
 const (
-	DefaultParamSpace = types.DefaultParamSpace
-	DefaultCodespace  = types.DefaultCodespace
-	MsgRoute          = types.MsgRoute
-	MetricsSubsystem  = types.MetricsSubsystem
-	QueryDefinition   = types.QueryDefinition
-	QueryBinding      = types.QueryBinding
-	QueryBindings     = types.QueryBindings
-	QueryRequests     = types.QueryRequests
-	QueryResponse     = types.QueryResponse
-	QueryFees         = types.QueryFees
-	RUNNING           = types.RUNNING
-	PAUSED            = types.PAUSED
-	COMPLETED         = types.COMPLETED
-	BATCHRUNNING      = types.BATCHRUNNING
-	BATCHCOMPLETED    = types.BATCHCOMPLETED
+	DefaultParamSpace     = types.DefaultParamSpace
+	DefaultCodespace      = types.DefaultCodespace
+	MsgRoute              = types.MsgRoute
+	MetricsSubsystem      = types.MetricsSubsystem
+	QueryDefinition       = types.QueryDefinition
+	QueryBinding          = types.QueryBinding
+	QueryBindings         = types.QueryBindings
+	QueryRequests         = types.QueryRequests
+	QueryResponse         = types.QueryResponse
+	QueryRequestContext   = types.QueryRequestContext
+	QueryRequestsByReqCtx = types.QueryRequestsByReqCtx
+	QueryResponses        = types.QueryResponses
+	QueryFees             = types.QueryFees
+	RUNNING               = types.RUNNING
+	PAUSED                = types.PAUSED
+	COMPLETED             = types.COMPLETED
+	BATCHRUNNING          = types.BATCHRUNNING
+	BATCHCOMPLETED        = types.BATCHCOMPLETED
 )
 
 // nolint
 var (
 	// variables and functions aliases
+	TagProvider                = types.TagProvider
+	TagConsumer                = types.TagConsumer
+	TagRequestContextID        = types.TagRequestContextID
+	TagRequestID               = types.TagRequestID
+	TagSlashedCoins            = types.TagSlashedCoins
 	KeyTxSizeLimit             = types.KeyTxSizeLimit
 	NewKeeper                  = keeper.NewKeeper
 	NewQuerier                 = keeper.NewQuerier
@@ -58,6 +66,7 @@ var (
 	NewMsgWithdrawEarnedFees   = types.NewMsgWithdrawEarnedFees
 	NewMsgWithdrawTax          = types.NewMsgWithdrawTax
 	ConvertRequestID           = types.ConvertRequestID
+	RequestIDToString          = types.RequestIDToString
 )
 
 // nolint
@@ -68,6 +77,7 @@ type (
 	ServiceDefinition           = types.ServiceDefinition
 	ServiceBinding              = types.ServiceBinding
 	ServiceBindings             = types.ServiceBindings
+	RequestContext              = types.RequestContext
 	Request                     = types.Request
 	Requests                    = types.Requests
 	CompactRequest              = types.CompactRequest

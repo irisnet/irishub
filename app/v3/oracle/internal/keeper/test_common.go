@@ -1,9 +1,10 @@
 package keeper
 
 import (
-	"github.com/irisnet/irishub/app/v3/service/exported"
 	"testing"
 	"time"
+
+	"github.com/irisnet/irishub/app/v3/service/exported"
 
 	"github.com/stretchr/testify/require"
 
@@ -135,6 +136,7 @@ func (m MockServiceKeeper) CreateRequestContext(ctx sdk.Context,
 	input string,
 	serviceFeeCap sdk.Coins,
 	timeout int64,
+	superMode,
 	repeated bool,
 	repeatedFrequency uint64,
 	repeatedTotal int64,
@@ -149,6 +151,7 @@ func (m MockServiceKeeper) CreateRequestContext(ctx sdk.Context,
 		Input:             input,
 		ServiceFeeCap:     serviceFeeCap,
 		Timeout:           timeout,
+		SuperMode:         superMode,
 		Repeated:          repeated,
 		RepeatedFrequency: repeatedFrequency,
 		RepeatedTotal:     repeatedTotal,
@@ -165,6 +168,7 @@ func (m MockServiceKeeper) UpdateRequestContext(ctx sdk.Context,
 	requestContextID []byte,
 	providers []sdk.AccAddress,
 	serviceFeeCap sdk.Coins,
+	timeout int64,
 	repeatedFreq uint64,
 	repeatedTotal int64) sdk.Error {
 	return nil
@@ -172,6 +176,7 @@ func (m MockServiceKeeper) UpdateRequestContext(ctx sdk.Context,
 
 func (m MockServiceKeeper) StartRequestContext(ctx sdk.Context, requestContextID []byte) sdk.Error {
 	reqCtx := m.cxtMap[string(requestContextID)]
+	callback := m.callbackMap[reqCtx.ModuleName]
 	for i := int64(reqCtx.BatchCounter + 1); i <= reqCtx.RepeatedTotal; i++ {
 		reqCtx.BatchCounter = uint64(i)
 		reqCtx.State = exported.RUNNING
@@ -181,7 +186,6 @@ func (m MockServiceKeeper) StartRequestContext(ctx sdk.Context, requestContextID
 			Height:  ctx.BlockHeight() + 1,
 			Time:    ctx.BlockTime().Add(2 * time.Minute),
 		})
-		callback := m.callbackMap[reqCtx.ModuleName]
 		callback(ctx, requestContextID, responses)
 	}
 	return nil

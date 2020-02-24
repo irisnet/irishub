@@ -69,7 +69,7 @@ func TestNewQuerier(t *testing.T) {
 
 	//test QueryFeeds
 	params1 := types.QueryFeedsParams{
-		State: exported.PAUSED,
+		State: "paused",
 	}
 	bz = keeper.cdc.MustMarshalJSON(params1)
 	res, err = query(ctx, []string{types.QueryFeeds}, abci.RequestQuery{

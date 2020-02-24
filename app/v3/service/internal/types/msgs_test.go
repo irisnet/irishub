@@ -1,7 +1,6 @@
 package types
 
 import (
-	"encoding/hex"
 	"fmt"
 	"strings"
 	"testing"
@@ -42,7 +41,7 @@ var (
 	testTaxWithdrawalAmt = sdk.NewCoins(testCoin1)
 
 	testRequestContextID = sdk.SHA256([]byte("test-request-context-id"))
-	testRequestID        = hex.EncodeToString(testRequestContextID) + "-1-1"
+	testRequestID        = RequestIDToString(GenerateRequestID(testRequestContextID, 1, 1))
 )
 
 // TestMsgDefineServiceRoute tests Route for MsgDefineService
@@ -582,8 +581,8 @@ func TestMsgRefundServiceDepositGetSigners(t *testing.T) {
 func TestMsgRequestServiceRoute(t *testing.T) {
 	msg := NewMsgRequestService(
 		testServiceName, testProviders, testConsumer,
-		testInput, testServiceFeeCap, testTimeout, true,
-		testRepeatedFreq, testRepeatedTotal,
+		testInput, testServiceFeeCap, testTimeout, false,
+		true, testRepeatedFreq, testRepeatedTotal,
 	)
 
 	require.Equal(t, MsgRoute, msg.Route())
@@ -593,8 +592,8 @@ func TestMsgRequestServiceRoute(t *testing.T) {
 func TestMsgRequestServiceType(t *testing.T) {
 	msg := NewMsgRequestService(
 		testServiceName, testProviders, testConsumer,
-		testInput, testServiceFeeCap, testTimeout, true,
-		testRepeatedFreq, testRepeatedTotal,
+		testInput, testServiceFeeCap, testTimeout, false,
+		true, testRepeatedFreq, testRepeatedTotal,
 	)
 
 	require.Equal(t, "request_service", msg.Type())
@@ -610,66 +609,66 @@ func TestMsgRequestServiceValidation(t *testing.T) {
 
 	invalidInput := "iris-usdt"
 	invalidTimeout := int64(-1)
-	lessRepeatedFreq := uint64(testTimeout) - 10
+	invalidLessRepeatedFreq := uint64(testTimeout) - 10
 	invalidRepeatedTotal1 := int64(-2)
 	invalidRepeatedTotal2 := int64(0)
 
 	testMsgs := []MsgRequestService{
 		NewMsgRequestService(
-			testServiceName, testProviders, testConsumer, testInput, testServiceFeeCap, testTimeout,
-			true, testRepeatedFreq, testRepeatedTotal,
+			testServiceName, testProviders, testConsumer, testInput, testServiceFeeCap,
+			testTimeout, false, true, testRepeatedFreq, testRepeatedTotal,
 		), // valid msg
 		NewMsgRequestService(
-			testServiceName, testProviders, emptyAddress, testInput, testServiceFeeCap, testTimeout,
-			true, testRepeatedFreq, testRepeatedTotal,
+			testServiceName, testProviders, emptyAddress, testInput, testServiceFeeCap,
+			testTimeout, false, true, testRepeatedFreq, testRepeatedTotal,
 		), // missing consumer address
 		NewMsgRequestService(
-			invalidName, testProviders, testConsumer, testInput, testServiceFeeCap, testTimeout,
-			true, testRepeatedFreq, testRepeatedTotal,
+			invalidName, testProviders, testConsumer, testInput, testServiceFeeCap,
+			testTimeout, false, true, testRepeatedFreq, testRepeatedTotal,
 		), // service name contains illegal characters
 		NewMsgRequestService(
-			invalidLongName, testProviders, testConsumer, testInput, testServiceFeeCap, testTimeout,
-			true, testRepeatedFreq, testRepeatedTotal,
+			invalidLongName, testProviders, testConsumer, testInput, testServiceFeeCap,
+			testTimeout, false, true, testRepeatedFreq, testRepeatedTotal,
 		), // too long service name
 		NewMsgRequestService(
-			testServiceName, testProviders, testConsumer, testInput, invalidDenomCoins, testTimeout,
-			true, testRepeatedFreq, testRepeatedTotal,
+			testServiceName, testProviders, testConsumer, testInput, invalidDenomCoins,
+			testTimeout, false, true, testRepeatedFreq, testRepeatedTotal,
 		), // invalid service fee denom
 		NewMsgRequestService(
-			testServiceName, nil, testConsumer, testInput, testServiceFeeCap, testTimeout,
-			true, testRepeatedFreq, testRepeatedTotal,
+			testServiceName, nil, testConsumer, testInput, testServiceFeeCap,
+			testTimeout, false, true, testRepeatedFreq, testRepeatedTotal,
 		), // missing providers
 		NewMsgRequestService(
-			testServiceName, testProviders, testConsumer, "", testServiceFeeCap, testTimeout,
-			true, testRepeatedFreq, testRepeatedTotal,
+			testServiceName, testProviders, testConsumer, "", testServiceFeeCap,
+			testTimeout, false, true, testRepeatedFreq, testRepeatedTotal,
 		), // missing input
 		NewMsgRequestService(
-			testServiceName, testProviders, testConsumer, invalidInput, testServiceFeeCap, testTimeout,
-			true, testRepeatedFreq, testRepeatedTotal,
+			testServiceName, testProviders, testConsumer, invalidInput, testServiceFeeCap,
+			testTimeout, false, true, testRepeatedFreq, testRepeatedTotal,
 		), // invalid input
 		NewMsgRequestService(
-			testServiceName, testProviders, testConsumer, testInput, testServiceFeeCap, invalidTimeout,
-			true, testRepeatedFreq, testRepeatedTotal,
+			testServiceName, testProviders, testConsumer, testInput, testServiceFeeCap,
+			invalidTimeout, false, true, testRepeatedFreq, testRepeatedTotal,
 		), // invalid timeout
 		NewMsgRequestService(
-			testServiceName, testProviders, testConsumer, testInput, testServiceFeeCap, testTimeout,
-			true, lessRepeatedFreq, testRepeatedTotal,
+			testServiceName, testProviders, testConsumer, testInput, testServiceFeeCap,
+			testTimeout, false, true, invalidLessRepeatedFreq, testRepeatedTotal,
 		), // invalid repeated frequency
 		NewMsgRequestService(
-			testServiceName, testProviders, testConsumer, testInput, testServiceFeeCap, testTimeout,
-			true, testRepeatedFreq, invalidRepeatedTotal1,
+			testServiceName, testProviders, testConsumer, testInput, testServiceFeeCap,
+			testTimeout, false, true, testRepeatedFreq, invalidRepeatedTotal1,
 		), // repeated total can not be less than -1
 		NewMsgRequestService(
-			testServiceName, testProviders, testConsumer, testInput, testServiceFeeCap, testTimeout,
-			true, testRepeatedFreq, invalidRepeatedTotal2,
+			testServiceName, testProviders, testConsumer, testInput, testServiceFeeCap,
+			testTimeout, false, true, testRepeatedFreq, invalidRepeatedTotal2,
 		), // repeated total can not be zero
 		NewMsgRequestService(
-			testServiceName, testProviders, testConsumer, testInput, testServiceFeeCap, int64(0),
-			true, uint64(0), testRepeatedTotal,
+			testServiceName, testProviders, testConsumer, testInput, testServiceFeeCap,
+			int64(0), false, true, uint64(0), testRepeatedTotal,
 		), // both timeout and frequency can be zero
 		NewMsgRequestService(
-			testServiceName, testProviders, testConsumer, testInput, testServiceFeeCap, testTimeout,
-			false, lessRepeatedFreq, invalidRepeatedTotal1,
+			testServiceName, testProviders, testConsumer, testInput, testServiceFeeCap,
+			testTimeout, false, false, invalidLessRepeatedFreq, invalidRepeatedTotal1,
 		), // do not check the repeated frequency and total when not repeated
 	}
 
@@ -708,12 +707,12 @@ func TestMsgRequestServiceValidation(t *testing.T) {
 func TestMsgRequestServiceGetSignBytes(t *testing.T) {
 	msg := NewMsgRequestService(
 		testServiceName, testProviders, testConsumer,
-		testInput, testServiceFeeCap, testTimeout, true,
-		testRepeatedFreq, testRepeatedTotal,
+		testInput, testServiceFeeCap, testTimeout, false,
+		true, testRepeatedFreq, testRepeatedTotal,
 	)
 	res := msg.GetSignBytes()
 
-	expected := `{"type":"irishub/service/MsgRequestService","value":{"consumer":"faa1w3jhxapdvdhkuum4d4jhyl0qvse","input":"{\"pair\":\"iris-usdt\"}","providers":["faa1w3jhxapdwpex7anfv3jhynrxe9z"],"repeated":true,"repeated_frequency":"120","repeated_total":"100","service_fee_cap":[{"amount":"100000000000000000000","denom":"iris-atto"}],"service_name":"test-service","timeout":"100"}}`
+	expected := `{"type":"irishub/service/MsgRequestService","value":{"consumer":"faa1w3jhxapdvdhkuum4d4jhyl0qvse","input":"{\"pair\":\"iris-usdt\"}","providers":["faa1w3jhxapdwpex7anfv3jhynrxe9z"],"repeated":true,"repeated_frequency":"120","repeated_total":"100","service_fee_cap":[{"amount":"100000000000000000000","denom":"iris-atto"}],"service_name":"test-service","super_mode":false,"timeout":"100"}}`
 	require.Equal(t, expected, string(res))
 }
 
@@ -721,8 +720,8 @@ func TestMsgRequestServiceGetSignBytes(t *testing.T) {
 func TestMsgRequestServiceGetSigners(t *testing.T) {
 	msg := NewMsgRequestService(
 		testServiceName, testProviders, testConsumer,
-		testInput, testServiceFeeCap, testTimeout, true,
-		testRepeatedFreq, testRepeatedTotal,
+		testInput, testServiceFeeCap, testTimeout,
+		false, true, testRepeatedFreq, testRepeatedTotal,
 	)
 	res := msg.GetSigners()
 
@@ -793,7 +792,7 @@ func TestMsgRespondServiceGetSignBytes(t *testing.T) {
 	msg := NewMsgRespondService(testRequestID, testProvider, testOutput, "")
 	res := msg.GetSignBytes()
 
-	expected := `{"type":"irishub/service/MsgRespondService","value":{"error":"","output":"{\"last\":\"100\"}","provider":"faa1w3jhxapdwpex7anfv3jhynrxe9z","request_id":"3db0fa99dcb058bc86041badbd614d6839f8fa20e17cf8ad3ba14c3f1bf613bd-1-1"}}`
+	expected := `{"type":"irishub/service/MsgRespondService","value":{"error":"","output":"{\"last\":\"100\"}","provider":"faa1w3jhxapdwpex7anfv3jhynrxe9z","request_id":"3db0fa99dcb058bc86041badbd614d6839f8fa20e17cf8ad3ba14c3f1bf613bd00000000000000010001"}}`
 	require.Equal(t, expected, string(res))
 }
 
@@ -997,14 +996,14 @@ func TestMsgKillRequestContextGetSigners(t *testing.T) {
 
 // TestMsgUpdateRequestContextRoute tests Route for MsgUpdateRequestContext
 func TestMsgUpdateRequestContextRoute(t *testing.T) {
-	msg := NewMsgUpdateRequestContext(testRequestContextID, nil, nil, 0, 0, testConsumer)
+	msg := NewMsgUpdateRequestContext(testRequestContextID, nil, nil, 0, 0, 0, testConsumer)
 
 	require.Equal(t, MsgRoute, msg.Route())
 }
 
 // TestMsgUpdateRequestContextType tests Type for MsgUpdateRequestContext
 func TestMsgUpdateRequestContextType(t *testing.T) {
-	msg := NewMsgUpdateRequestContext(testRequestContextID, nil, nil, 0, 0, testConsumer)
+	msg := NewMsgUpdateRequestContext(testRequestContextID, nil, nil, 0, 0, 0, testConsumer)
 
 	require.Equal(t, "update_request_context", msg.Type())
 }
@@ -1014,16 +1013,20 @@ func TestMsgUpdateRequestContextValidation(t *testing.T) {
 	emptyAddress := sdk.AccAddress{}
 
 	invalidRequestContextID := []byte("invalid-request-context-id")
+	invalidTimeout := int64(-1)
+	invalidLessRepeatedFreq := uint64(testTimeout) - 10
 	invalidRepeatedTotal := int64(-2)
 	invalidDenomCoins := sdk.NewCoins(sdk.NewCoin("eth-min", sdk.NewInt(1000)))
 
 	testMsgs := []MsgUpdateRequestContext{
-		NewMsgUpdateRequestContext(testRequestContextID, testProviders, testServiceFeeCap, testRepeatedFreq, testRepeatedTotal, testConsumer), // valid msg
-		NewMsgUpdateRequestContext(testRequestContextID, nil, nil, 0, 0, testConsumer),                                                        // allow all not to be updated
-		NewMsgUpdateRequestContext(testRequestContextID, nil, nil, 0, 0, emptyAddress),                                                        // missing consumer address
-		NewMsgUpdateRequestContext(invalidRequestContextID, nil, nil, 0, 0, testConsumer),                                                     // invalid request context ID
-		NewMsgUpdateRequestContext(testRequestContextID, nil, nil, 0, invalidRepeatedTotal, testConsumer),                                     // invalid repeated total
-		NewMsgUpdateRequestContext(testRequestContextID, nil, invalidDenomCoins, 0, 0, testConsumer),                                          // invalid service fee denom
+		NewMsgUpdateRequestContext(testRequestContextID, testProviders, testServiceFeeCap, testTimeout, testRepeatedFreq, testRepeatedTotal, testConsumer), // valid msg
+		NewMsgUpdateRequestContext(testRequestContextID, nil, nil, 0, 0, 0, testConsumer),                                                                  // allow all not to be updated
+		NewMsgUpdateRequestContext(testRequestContextID, nil, nil, 0, 0, 0, emptyAddress),                                                                  // missing consumer address
+		NewMsgUpdateRequestContext(invalidRequestContextID, nil, nil, 0, 0, 0, testConsumer),                                                               // invalid request context ID
+		NewMsgUpdateRequestContext(testRequestContextID, nil, nil, invalidTimeout, 0, 0, testConsumer),                                                     // invalid timeout
+		NewMsgUpdateRequestContext(invalidRequestContextID, nil, nil, testTimeout, invalidLessRepeatedFreq, 0, testConsumer),                               // invalid repeated frequency
+		NewMsgUpdateRequestContext(testRequestContextID, nil, nil, 0, 0, invalidRepeatedTotal, testConsumer),                                               // invalid repeated total
+		NewMsgUpdateRequestContext(testRequestContextID, nil, invalidDenomCoins, 0, 0, 0, testConsumer),                                                    // invalid service fee denom
 	}
 
 	testCases := []struct {
@@ -1035,8 +1038,10 @@ func TestMsgUpdateRequestContextValidation(t *testing.T) {
 		{testMsgs[1], true, ""},
 		{testMsgs[2], false, "missing consumer address"},
 		{testMsgs[3], false, "invalid request context ID"},
-		{testMsgs[4], false, "invalid repeated total"},
-		{testMsgs[5], false, "invalid service fee denom"},
+		{testMsgs[4], false, "invalid timeout"},
+		{testMsgs[5], false, "invalid repeated frequency"},
+		{testMsgs[6], false, "invalid repeated total"},
+		{testMsgs[7], false, "invalid service fee denom"},
 	}
 
 	for i, tc := range testCases {
@@ -1051,16 +1056,16 @@ func TestMsgUpdateRequestContextValidation(t *testing.T) {
 
 // TestMsgUpdateRequestContextGetSignBytes tests GetSignBytes for MsgUpdateRequestContext
 func TestMsgUpdateRequestContextGetSignBytes(t *testing.T) {
-	msg := NewMsgUpdateRequestContext(testRequestContextID, testProviders, testServiceFeeCap, testRepeatedFreq, testRepeatedTotal, testConsumer)
+	msg := NewMsgUpdateRequestContext(testRequestContextID, testProviders, testServiceFeeCap, testTimeout, testRepeatedFreq, testRepeatedTotal, testConsumer)
 	res := msg.GetSignBytes()
 
-	expected := `{"type":"irishub/service/MsgUpdateRequestContext","value":{"consumer":"faa1w3jhxapdvdhkuum4d4jhyl0qvse","providers":["faa1w3jhxapdwpex7anfv3jhynrxe9z"],"repeated_frequency":"120","repeated_total":"100","request_context_id":"PbD6mdywWLyGBButvWFNaDn4+iDhfPitO6FMPxv2E70=","service_fee_cap":[{"amount":"100000000000000000000","denom":"iris-atto"}]}}`
+	expected := `{"type":"irishub/service/MsgUpdateRequestContext","value":{"consumer":"faa1w3jhxapdvdhkuum4d4jhyl0qvse","providers":["faa1w3jhxapdwpex7anfv3jhynrxe9z"],"repeated_frequency":"120","repeated_total":"100","request_context_id":"PbD6mdywWLyGBButvWFNaDn4+iDhfPitO6FMPxv2E70=","service_fee_cap":[{"amount":"100000000000000000000","denom":"iris-atto"}],"timeout":"100"}}`
 	require.Equal(t, expected, string(res))
 }
 
 // TestMsgUpdateRequestContextGetSigners tests GetSigners for MsgUpdateRequestContext
 func TestMsgUpdateRequestContextGetSigners(t *testing.T) {
-	msg := NewMsgUpdateRequestContext(testRequestContextID, testProviders, testServiceFeeCap, testRepeatedFreq, testRepeatedTotal, testConsumer)
+	msg := NewMsgUpdateRequestContext(testRequestContextID, testProviders, testServiceFeeCap, testTimeout, testRepeatedFreq, testRepeatedTotal, testConsumer)
 	res := msg.GetSigners()
 
 	expected := "[746573742D636F6E73756D6572]"

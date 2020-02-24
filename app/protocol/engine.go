@@ -89,6 +89,7 @@ func (pe *ProtocolEngine) GetKVStoreKeys() []*sdk.KVStoreKey {
 		KeyParams,
 		KeyUpgrade,
 		KeyService,
+		KeyOracle,
 		KeyGuardian,
 		KeyAsset,
 		KeyRand,

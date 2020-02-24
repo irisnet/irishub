@@ -23,7 +23,7 @@ var (
 
 const (
 	// tx counter key in the context
-	contextKeyIntraTxCounter = 0
+	contextKeyIntraTxCounter = "service_intra_tx_counter"
 )
 
 // GetServiceDefinitionKey returns the key for the service definition with the specified name
@@ -48,24 +48,24 @@ func GetRequestContextKey(requestContextID []byte) []byte {
 
 // GetExpiredRequestBatchKey returns the key for the request batch expiration of the specified request context
 func GetExpiredRequestBatchKey(requestContextID []byte, batchExpirationHeight int64) []byte {
-	reqBatchExpiration := append(append(sdk.Uint64ToBigEndian(uint64(batchExpirationHeight)), emptyByte...), requestContextID...)
+	reqBatchExpiration := append(sdk.Uint64ToBigEndian(uint64(batchExpirationHeight)), requestContextID...)
 	return append(expiredRequestBatchKey, reqBatchExpiration...)
 }
 
 // GetNewRequestBatchKey returns the key for the new batch request of the specified request context in the given height
 func GetNewRequestBatchKey(requestContextID []byte, requestBatchHeight int64) []byte {
-	newBatchRequest := append(append(sdk.Uint64ToBigEndian(uint64(requestBatchHeight)), emptyByte...), requestContextID...)
+	newBatchRequest := append(sdk.Uint64ToBigEndian(uint64(requestBatchHeight)), requestContextID...)
 	return append(expiredRequestBatchKey, newBatchRequest...)
 }
 
 // GetExpiredRequestBatchSubspace returns the key for iterating through the expired request batch queue in the specified height
 func GetExpiredRequestBatchSubspace(batchExpirationHeight int64) []byte {
-	return append(append(expiredRequestBatchKey, sdk.Uint64ToBigEndian(uint64(batchExpirationHeight))...), emptyByte...)
+	return append(expiredRequestBatchKey, sdk.Uint64ToBigEndian(uint64(batchExpirationHeight))...)
 }
 
 // GetNewRequestBatchSubspace returns the key for iterating through the new request batch queue in the specified height
 func GetNewRequestBatchSubspace(requestBatchHeight int64) []byte {
-	return append(append(newRequestBatchKey, sdk.Uint64ToBigEndian(uint64(requestBatchHeight))...), emptyByte...)
+	return append(newRequestBatchKey, sdk.Uint64ToBigEndian(uint64(requestBatchHeight))...)
 }
 
 // GetRequestKey returns the key for the request with the specified request ID
@@ -113,7 +113,7 @@ func GetEarnedFeesKey(address sdk.AccAddress) []byte {
 	return append(earnedFeesKey, address.Bytes()...)
 }
 
-func GetIntraTxCounterKey() int {
+func GetIntraTxCounterKey() string {
 	return contextKeyIntraTxCounter
 }
 
