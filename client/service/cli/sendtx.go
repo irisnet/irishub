@@ -415,6 +415,7 @@ func GetCmdRequestService(cdc *codec.Codec) *cobra.Command {
 
 			input := viper.GetString(FlagData)
 			timeout := viper.GetInt64(FlagTimeout)
+			superMode := viper.GetBool(FlagSuperMode)
 			repeated := viper.GetBool(FlagRepeated)
 
 			frequency := uint64(0)
@@ -425,7 +426,10 @@ func GetCmdRequestService(cdc *codec.Codec) *cobra.Command {
 				total = viper.GetInt64(FlagTotal)
 			}
 
-			msg := service.NewMsgRequestService(serviceName, providers, consumer, input, serviceFeeCap, timeout, repeated, frequency, total)
+			msg := service.NewMsgRequestService(
+				serviceName, providers, consumer, input, serviceFeeCap, timeout,
+				superMode, repeated, frequency, total,
+			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -594,7 +598,7 @@ func GetCmdUpdateRequestContext(cdc *codec.Codec) *cobra.Command {
 		Use:   "update",
 		Short: "Update a request context",
 		Example: "iriscli service update-request-context <request-context-id> --chain-id=<chain-id> --from=<key name> --fee=0.3iris " +
-			"--providers=<new providers> --service-fee-cap=<2iris> --frequency=200 --total=200",
+			"--providers=<new providers> --service-fee-cap=<2iris> --timeout=0 --frequency=200 --total=200",
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
@@ -630,16 +634,17 @@ func GetCmdUpdateRequestContext(cdc *codec.Codec) *cobra.Command {
 
 			serviceFeeCapStr := viper.GetString(FlagServiceFeeCap)
 			if len(serviceFeeCapStr) != 0 {
-				serviceFeeCap, err := cliCtx.ParseCoins(serviceFeeCapStr)
+				serviceFeeCap, err = cliCtx.ParseCoins(serviceFeeCapStr)
 				if err != nil {
 					return err
 				}
 			}
 
+			timeout := viper.GetInt64(FlagTimeout)
 			frequency := uint64(viper.GetInt64(FlagFrequency))
 			total := viper.GetInt64(FlagTotal)
 
-			msg := service.NewMsgUpdateRequestContext(requestContextID, providers, serviceFeeCap, frequency, total, consumer)
+			msg := service.NewMsgUpdateRequestContext(requestContextID, providers, serviceFeeCap, timeout, frequency, total, consumer)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -647,6 +652,8 @@ func GetCmdUpdateRequestContext(cdc *codec.Codec) *cobra.Command {
 			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 		},
 	}
+
+	cmd.Flags().AddFlagSet(FsServiceUpdateRequestContext)
 
 	return cmd
 }
