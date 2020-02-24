@@ -27,7 +27,6 @@ import (
 	"github.com/irisnet/irishub/client/context"
 	htlctypes "github.com/irisnet/irishub/client/htlc/types"
 	"github.com/irisnet/irishub/client/keys"
-	servicecli "github.com/irisnet/irishub/client/service"
 	"github.com/irisnet/irishub/client/stake"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/guardian"
@@ -358,14 +357,14 @@ func executeGetServiceRequests(t *testing.T, cmdStr string) []service.Request {
 	return svcRequests
 }
 
-func executeGetServiceFees(t *testing.T, cmdStr string) servicecli.FeesOutput {
-	out, _ := tests.ExecuteT(t, cmdStr, "")
-	var feesOutput servicecli.FeesOutput
-	cdc := app.MakeLatestCodec()
-	err := cdc.UnmarshalJSON([]byte(out), &feesOutput)
-	require.NoError(t, err, "out %v\n, err %v", out, err)
-	return feesOutput
-}
+//func executeGetServiceFees(t *testing.T, cmdStr string) servicecli.FeesOutput {
+//	out, _ := tests.ExecuteT(t, cmdStr, "")
+//	var feesOutput servicecli.FeesOutput
+//	cdc := app.MakeLatestCodec()
+//	err := cdc.UnmarshalJSON([]byte(out), &feesOutput)
+//	require.NoError(t, err, "out %v\n, err %v", out, err)
+//	return feesOutput
+//}
 
 func executeGetToken(t *testing.T, cmdStr string) asset.TokenOutput {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
