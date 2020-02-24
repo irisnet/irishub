@@ -83,6 +83,12 @@ func EndBlocker(ctx sdk.Context, k Keeper) (tags sdk.Tags) {
 			reqContext.BatchState = BATCHCOMPLETED
 			k.SetRequestContext(ctx, reqContextID, reqContext)
 		}
+
+		k.DeleteRequestBatchExpiration(ctx, reqContextID, ctx.BlockHeight())
+
+		if reqContext.State == RUNNING && reqContext.Repeated && (reqContext.RepeatedTotal < 0 || int64(reqContext.BatchCounter) < reqContext.RepeatedTotal) {
+			k.AddNewRequestBatch(ctx, reqContextID, ctx.BlockHeight()-reqContext.Timeout+int64(reqContext.RepeatedFrequency))
+		}
 	}
 
 	// handle new request batch queue
