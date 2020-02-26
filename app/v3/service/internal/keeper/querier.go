@@ -18,6 +18,8 @@ func NewQuerier(k Keeper) sdk.Querier {
 			return queryBinding(ctx, req, k)
 		case types.QueryBindings:
 			return queryBindings(ctx, req, k)
+		case types.QueryRequest:
+			return queryRequest(ctx, req, k)
 		case types.QueryRequests:
 			return queryRequests(ctx, req, k)
 		case types.QueryResponse:
@@ -101,6 +103,31 @@ func queryBindings(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sd
 	return bz, nil
 }
 
+func queryRequest(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sdk.Error) {
+	var params types.QueryRequestParams
+	err := k.cdc.UnmarshalJSON(req.Data, &params)
+	if err != nil {
+		return nil, sdk.ParseParamsErr(err)
+	}
+
+	requestID, err := types.ConvertRequestID(params.RequestID)
+	if err != nil {
+		return nil, types.ErrInvalidRequestID(types.DefaultCodespace, params.RequestID)
+	}
+
+	request, found := k.GetRequest(ctx, requestID)
+	if !found {
+		return nil, types.ErrUnknownRequest(types.DefaultCodespace, requestID)
+	}
+
+	bz, err := codec.MarshalJSONIndent(k.cdc, request)
+	if err != nil {
+		return nil, sdk.MarshalResultErr(err)
+	}
+
+	return bz, nil
+}
+
 func queryRequests(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sdk.Error) {
 	var params types.QueryRequestsParams
 	err := k.cdc.UnmarshalJSON(req.Data, &params)
@@ -142,7 +169,7 @@ func queryResponse(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sd
 
 	response, found := k.GetResponse(ctx, requestID)
 	if !found {
-		return nil, types.ErrInvalidRequestID(types.DefaultCodespace, params.RequestID)
+		return nil, types.ErrUnknownResponse(types.DefaultCodespace, requestID)
 	}
 
 	bz, err := codec.MarshalJSONIndent(k.cdc, response)
