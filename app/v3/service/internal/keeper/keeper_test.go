@@ -404,7 +404,7 @@ func TestKeeper_Respond_Service(t *testing.T) {
 
 	requestIDStr := types.RequestIDToString(requestID)
 
-	_, err := keeper.AddResponse(ctx, requestIDStr, provider, testOutput, "")
+	_, _, err := keeper.AddResponse(ctx, requestIDStr, provider, testOutput, "")
 	require.NoError(t, err)
 
 	requestContext, _ = keeper.GetRequestContext(ctx, requestContextID)
@@ -457,7 +457,7 @@ func TestKeeper_Request_Service_From_Module(t *testing.T) {
 	requestIDStr1 := types.RequestIDToString(requestID1)
 	requestIDStr2 := types.RequestIDToString(requestID2)
 
-	_, err = keeper.AddResponse(ctx, requestIDStr1, provider1, testOutput, "")
+	_, _, err = keeper.AddResponse(ctx, requestIDStr1, provider1, testOutput, "")
 	require.NoError(t, err)
 
 	requestContext, _ = keeper.GetRequestContext(ctx, requestContextID)
@@ -467,7 +467,7 @@ func TestKeeper_Request_Service_From_Module(t *testing.T) {
 	// callback has not occurred due to insufficient responses
 	require.False(t, callbacked)
 
-	_, err = keeper.AddResponse(ctx, requestIDStr2, provider2, testOutput, "")
+	_, _, err = keeper.AddResponse(ctx, requestIDStr2, provider2, testOutput, "")
 	require.NoError(t, err)
 
 	requestContext, _ = keeper.GetRequestContext(ctx, requestContextID)

@@ -8,6 +8,7 @@ const (
 	QueryDefinition       = "definition"      // QueryDefinition
 	QueryBinding          = "binding"         // QueryBinding
 	QueryBindings         = "bindings"        // QueryBindings
+	QueryRequest          = "request"         // QueryRequest
 	QueryRequests         = "requests"        // QueryRequests
 	QueryResponse         = "response"        // QueryResponse
 	QueryRequestContext   = "context"         // QueryRequestContext
@@ -30,6 +31,11 @@ type QueryBindingParams struct {
 // QueryBindingsParams defines the params to query all service bindings of a service
 type QueryBindingsParams struct {
 	ServiceName string
+}
+
+// QueryRequestParams defines the params to query the request by ID
+type QueryRequestParams struct {
+	RequestID string
 }
 
 // QueryRequestsParams defines the params to query all requests for a service binding

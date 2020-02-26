@@ -32,22 +32,24 @@ const (
 	CodeInvalidTimeout            sdk.CodeType = 117
 	CodeInvalidRepeatedFreq       sdk.CodeType = 118
 	CodeInvalidRepeatedTotal      sdk.CodeType = 119
-	CodeUnknownRequestContext     sdk.CodeType = 120
-	CodeInvalidRequestContextID   sdk.CodeType = 121
-	CodeRequestContextNonRepeated sdk.CodeType = 122
-	CodeRequestContextNotStarted  sdk.CodeType = 123
-	CodeRequestContextNotPaused   sdk.CodeType = 124
-	CodeModuleNameRegistered      sdk.CodeType = 125
-	CodeModuleNameNotRegistered   sdk.CodeType = 126
-	CodeNoEarnedFees              sdk.CodeType = 127
+	CodeUnknownRequest            sdk.CodeType = 120
+	CodeUnknownResponse           sdk.CodeType = 121
+	CodeUnknownRequestContext     sdk.CodeType = 122
+	CodeInvalidRequestContextID   sdk.CodeType = 123
+	CodeRequestContextNonRepeated sdk.CodeType = 124
+	CodeRequestContextNotStarted  sdk.CodeType = 125
+	CodeRequestContextNotPaused   sdk.CodeType = 126
+	CodeModuleNameRegistered      sdk.CodeType = 127
+	CodeModuleNameNotRegistered   sdk.CodeType = 128
+	CodeNoEarnedFees              sdk.CodeType = 129
 
-	CodeInvalidRequestInput   sdk.CodeType = 128
-	CodeInvalidResponseOutput sdk.CodeType = 129
-	CodeInvalidResponseErr    sdk.CodeType = 130
+	CodeInvalidRequestInput   sdk.CodeType = 130
+	CodeInvalidResponseOutput sdk.CodeType = 131
+	CodeInvalidResponseErr    sdk.CodeType = 132
 
-	CodeInvalidAddress  sdk.CodeType = 131
-	CodeInvalidProfiler sdk.CodeType = 132
-	CodeInvalidTrustee  sdk.CodeType = 133
+	CodeInvalidAddress  sdk.CodeType = 133
+	CodeInvalidProfiler sdk.CodeType = 134
+	CodeInvalidTrustee  sdk.CodeType = 135
 )
 
 func ErrInvalidServiceName(codespace sdk.CodespaceType, serviceName string) sdk.Error {
@@ -128,6 +130,14 @@ func ErrInvalidRepeatedFreq(codespace sdk.CodespaceType, msg string) sdk.Error {
 
 func ErrInvalidRepeatedTotal(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidRepeatedTotal, msg)
+}
+
+func ErrUnknownRequest(codespace sdk.CodespaceType, requestID []byte) sdk.Error {
+	return sdk.NewError(codespace, CodeUnknownRequest, fmt.Sprintf("unknown request: %s", RequestIDToString(requestID)))
+}
+
+func ErrUnknownResponse(codespace sdk.CodespaceType, requestID []byte) sdk.Error {
+	return sdk.NewError(codespace, CodeUnknownResponse, fmt.Sprintf("unknown response: %s", RequestIDToString(requestID)))
 }
 
 func ErrUnknownRequestContext(codespace sdk.CodespaceType, requestContextID []byte) sdk.Error {
