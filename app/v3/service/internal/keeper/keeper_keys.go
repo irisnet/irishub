@@ -55,7 +55,7 @@ func GetExpiredRequestBatchKey(requestContextID []byte, batchExpirationHeight in
 // GetNewRequestBatchKey returns the key for the new batch request of the specified request context in the given height
 func GetNewRequestBatchKey(requestContextID []byte, requestBatchHeight int64) []byte {
 	newBatchRequest := append(sdk.Uint64ToBigEndian(uint64(requestBatchHeight)), requestContextID...)
-	return append(expiredRequestBatchKey, newBatchRequest...)
+	return append(newRequestBatchKey, newBatchRequest...)
 }
 
 // GetExpiredRequestBatchSubspace returns the key for iterating through the expired request batch queue in the specified height
