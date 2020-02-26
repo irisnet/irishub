@@ -357,6 +357,15 @@ func executeGetServiceRequests(t *testing.T, cmdStr string) []service.Request {
 	return requests
 }
 
+func executeGetServiceResponses(t *testing.T, cmdStr string) []service.Response {
+	out, _ := tests.ExecuteT(t, cmdStr, "")
+	var responses []service.Response
+	cdc := app.MakeLatestCodec()
+	err := cdc.UnmarshalJSON([]byte(out), &responses)
+	require.NoError(t, err, "out %v\n, err %v", out, err)
+	return responses
+}
+
 func executeGetServiceResponse(t *testing.T, cmdStr string) service.Response {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
 	var response service.Response
