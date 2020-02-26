@@ -350,21 +350,39 @@ func executeGetTrustees(t *testing.T, cmdStr string) []guardian.Guardian {
 
 func executeGetServiceRequests(t *testing.T, cmdStr string) []service.Request {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
-	var svcRequests []service.Request
+	var requests []service.Request
 	cdc := app.MakeLatestCodec()
-	err := cdc.UnmarshalJSON([]byte(out), &svcRequests)
+	err := cdc.UnmarshalJSON([]byte(out), &requests)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
-	return svcRequests
+	return requests
 }
 
-//func executeGetServiceFees(t *testing.T, cmdStr string) servicecli.FeesOutput {
-//	out, _ := tests.ExecuteT(t, cmdStr, "")
-//	var feesOutput servicecli.FeesOutput
-//	cdc := app.MakeLatestCodec()
-//	err := cdc.UnmarshalJSON([]byte(out), &feesOutput)
-//	require.NoError(t, err, "out %v\n, err %v", out, err)
-//	return feesOutput
-//}
+func executeGetServiceResponse(t *testing.T, cmdStr string) service.Response {
+	out, _ := tests.ExecuteT(t, cmdStr, "")
+	var response service.Response
+	cdc := app.MakeLatestCodec()
+	err := cdc.UnmarshalJSON([]byte(out), &response)
+	require.NoError(t, err, "out %v\n, err %v", out, err)
+	return response
+}
+
+func executeGetRequestContext(t *testing.T, cmdStr string) service.RequestContext {
+	out, _ := tests.ExecuteT(t, cmdStr, "")
+	var requestContext service.RequestContext
+	cdc := app.MakeLatestCodec()
+	err := cdc.UnmarshalJSON([]byte(out), &requestContext)
+	require.NoError(t, err, "out %v\n, err %v", out, err)
+	return requestContext
+}
+
+func executeGetServiceFees(t *testing.T, cmdStr string) service.EarnedFees {
+	out, _ := tests.ExecuteT(t, cmdStr, "")
+	var fees service.EarnedFees
+	cdc := app.MakeLatestCodec()
+	err := cdc.UnmarshalJSON([]byte(out), &fees)
+	require.NoError(t, err, "out %v\n, err %v", out, err)
+	return fees
+}
 
 func executeGetToken(t *testing.T, cmdStr string) asset.TokenOutput {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
