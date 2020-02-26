@@ -330,6 +330,7 @@ func (k Keeper) InitiateRequests(
 			types.TagRequestID, []byte(types.RequestIDToString(requestID)),
 			types.TagProvider, []byte(provider.String()),
 			types.TagConsumer, []byte(requestContext.Consumer.String()),
+			types.TagServiceName, []byte(requestContext.ServiceName),
 			types.TagServiceFee, []byte(request.ServiceFee.String()),
 			types.TagRequestHeight, []byte(fmt.Sprintf("%d", request.RequestHeight)),
 			types.TagExpirationHeight, []byte(fmt.Sprintf("%d", request.RequestHeight+requestContext.Timeout)),
@@ -610,36 +611,36 @@ func (k Keeper) AddResponse(
 	provider sdk.AccAddress,
 	output,
 	errMsg string,
-) (response types.Response, err sdk.Error) {
+) (request types.Request, response types.Response, err sdk.Error) {
 	reqID, _ := types.ConvertRequestID(requestID)
 
 	request, found := k.GetRequest(ctx, reqID)
 	if !found {
-		return response, types.ErrInvalidRequestID(k.codespace, requestID)
+		return request, response, types.ErrUnknownRequest(k.codespace, reqID)
 	}
 
 	if !provider.Equals(request.Provider) {
-		return response, types.ErrInvalidResponse(k.codespace, "provider does not match")
+		return request, response, types.ErrInvalidResponse(k.codespace, "provider does not match")
 	}
 
 	if !k.IsRequestActive(ctx, reqID) {
-		return response, types.ErrInvalidResponse(k.codespace, "request is not active")
+		return request, response, types.ErrInvalidResponse(k.codespace, "request is not active")
 	}
 
 	svcDef, _ := k.GetServiceDefinition(ctx, request.ServiceName)
 
 	if len(output) > 0 {
 		if err := types.ValidateResponseOutput(svcDef.Schemas, output); err != nil {
-			return response, err
+			return request, response, err
 		}
 	} else {
 		if err := types.ValidateResponseError(svcDef.Schemas, errMsg); err != nil {
-			return response, err
+			return request, response, err
 		}
 	}
 
 	if err := k.AddEarnedFee(ctx, provider, request.ServiceFee); err != nil {
-		return response, err
+		return request, response, err
 	}
 
 	requestContextID := request.RequestContextID
@@ -664,7 +665,7 @@ func (k Keeper) AddResponse(
 
 	k.SetRequestContext(ctx, requestContextID, requestContext)
 
-	return response, nil
+	return request, response, nil
 }
 
 // SetResponse sets the specified response
