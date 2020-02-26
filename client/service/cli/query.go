@@ -131,6 +131,42 @@ func GetCmdQueryServiceBindings(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
+func GetCmdQueryServiceRequest(cdc *codec.Codec) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "request",
+		Short:   "Query a request by the request ID",
+		Example: "iriscli service request <request-id>",
+		Args:    cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+
+			params := service.QueryRequestParams{
+				RequestID: args[0],
+			}
+
+			bz, err := cdc.MarshalJSON(params)
+			if err != nil {
+				return err
+			}
+
+			route := fmt.Sprintf("custom/%s/%s", protocol.ServiceRoute, service.QueryRequest)
+			res, err := cliCtx.QueryWithData(route, bz)
+			if err != nil {
+				return err
+			}
+
+			var request service.Request
+			if err := cdc.UnmarshalJSON(res, &request); err != nil {
+				return err
+			}
+
+			return cliCtx.PrintOutput(request)
+		},
+	}
+
+	return cmd
+}
+
 func GetCmdQueryServiceRequests(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "requests",
