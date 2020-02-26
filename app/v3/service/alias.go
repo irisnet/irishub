@@ -31,6 +31,7 @@ const (
 // nolint
 var (
 	// variables and functions aliases
+	TagServiceName             = types.TagServiceName
 	TagProvider                = types.TagProvider
 	TagConsumer                = types.TagConsumer
 	TagRequestContextID        = types.TagRequestContextID
