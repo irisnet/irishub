@@ -330,6 +330,7 @@ func (k Keeper) InitiateRequests(
 			types.TagRequestID, []byte(types.RequestIDToString(requestID)),
 			types.TagProvider, []byte(provider.String()),
 			types.TagConsumer, []byte(requestContext.Consumer.String()),
+			types.TagServiceName, []byte(requestContext.ServiceName),
 			types.TagServiceFee, []byte(request.ServiceFee.String()),
 			types.TagRequestHeight, []byte(fmt.Sprintf("%d", request.RequestHeight)),
 			types.TagExpirationHeight, []byte(fmt.Sprintf("%d", request.RequestHeight+requestContext.Timeout)),
@@ -615,7 +616,7 @@ func (k Keeper) AddResponse(
 
 	request, found := k.GetRequest(ctx, reqID)
 	if !found {
-		return response, types.ErrInvalidRequestID(k.codespace, requestID)
+		return response, types.ErrUnknownRequest(k.codespace, reqID)
 	}
 
 	if !provider.Equals(request.Provider) {
