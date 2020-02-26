@@ -14,6 +14,7 @@ const (
 	QueryDefinition       = types.QueryDefinition
 	QueryBinding          = types.QueryBinding
 	QueryBindings         = types.QueryBindings
+	QueryRequest          = types.QueryRequest
 	QueryRequests         = types.QueryRequests
 	QueryResponse         = types.QueryResponse
 	QueryRequestContext   = types.QueryRequestContext
@@ -103,6 +104,7 @@ type (
 	QueryDefinitionParams       = types.QueryDefinitionParams
 	QueryBindingParams          = types.QueryBindingParams
 	QueryBindingsParams         = types.QueryBindingsParams
+	QueryRequestParams          = types.QueryRequestParams
 	QueryRequestsParams         = types.QueryRequestsParams
 	QueryResponseParams         = types.QueryResponseParams
 	QueryRequestContextParams   = types.QueryRequestContextParams
