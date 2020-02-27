@@ -716,7 +716,7 @@ func GetCmdWithdrawTax(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			amount, err := sdk.ParseCoins(args[1])
+			amount, err := cliCtx.ParseCoins(args[1])
 			if err != nil {
 				return err
 			}
