@@ -58,10 +58,3 @@ func StateFromString(state string) service.RequestContextState {
 	}
 	return service.PAUSED
 }
-
-func StateToString(state service.RequestContextState) string {
-	if state == service.RUNNING {
-		return "running"
-	}
-	return "paused"
-}
