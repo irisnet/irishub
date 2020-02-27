@@ -314,7 +314,7 @@ func GetCmdQueryServiceResponse(cdc *codec.Codec) *cobra.Command {
 
 func GetCmdQueryServiceResponses(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "response",
+		Use:     "responses",
 		Short:   "Query responses by the request context ID and batch counter",
 		Example: "iriscli service responses <request-context-id> <batch-counter>",
 		Args:    cobra.ExactArgs(2),
