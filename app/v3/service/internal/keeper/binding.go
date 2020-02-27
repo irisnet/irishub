@@ -44,8 +44,10 @@ func (k Keeper) AddServiceBinding(
 	available := true
 	disabledTime := time.Time{}
 
-	svcBinding := types.NewServiceBinding(serviceName, provider, deposit, pricing, withdrawAddr, available, disabledTime)
+	svcBinding := types.NewServiceBinding(serviceName, provider, deposit, pricing, available, disabledTime)
 	k.SetServiceBinding(ctx, svcBinding)
+
+	k.SetWithdrawAddress(ctx, provider, withdrawAddr)
 
 	return nil
 }
@@ -93,24 +95,6 @@ func (k Keeper) UpdateServiceBinding(
 		}
 	}
 
-	k.SetServiceBinding(ctx, binding)
-
-	return nil
-}
-
-// SetWithdrawAddress sets a new withdrawal address for the specified service binding
-func (k Keeper) SetWithdrawAddress(
-	ctx sdk.Context,
-	serviceName string,
-	provider,
-	withdrawAddr sdk.AccAddress,
-) sdk.Error {
-	binding, found := k.GetServiceBinding(ctx, serviceName, provider)
-	if !found {
-		return types.ErrUnknownServiceBinding(k.codespace)
-	}
-
-	binding.WithdrawAddress = withdrawAddr
 	k.SetServiceBinding(ctx, binding)
 
 	return nil
@@ -244,6 +228,27 @@ func (k Keeper) GetServiceBinding(ctx sdk.Context, serviceName string, provider 
 
 	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &svcBinding)
 	return svcBinding, true
+}
+
+// SetWithdrawAddress sets the withdrawal address for the specified provider
+func (k Keeper) SetWithdrawAddress(ctx sdk.Context, provider sdk.AccAddress, withdrawAddr sdk.AccAddress) {
+	store := ctx.KVStore(k.storeKey)
+
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(withdrawAddr)
+	store.Set(GetWithdrawAddrKey(provider), bz)
+}
+
+// GetWithdrawAddress gets the withdrawal address of the specified provider
+func (k Keeper) GetWithdrawAddress(ctx sdk.Context, provider sdk.AccAddress) (withdrawAddr sdk.AccAddress, found bool) {
+	store := ctx.KVStore(k.storeKey)
+
+	bz := store.Get(GetWithdrawAddrKey(provider))
+	if bz == nil {
+		return withdrawAddr, false
+	}
+
+	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &withdrawAddr)
+	return withdrawAddr, true
 }
 
 // ServiceBindingsIterator returns an iterator for all bindings of the specified service

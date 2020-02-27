@@ -9,17 +9,17 @@ var (
 	emptyByte = []byte{0x00}
 
 	// Keys for store prefixes
-	serviceDefinitionKey    = []byte{0x01}
-	serviceBindingKey       = []byte{0x02}
-	providerWithdrawAddrKey = []byte{0x03}
-	requestContextKey       = []byte{0x04}
-	expiredRequestBatchKey  = []byte{0x05}
-	newRequestBatchKey      = []byte{0x06}
-	requestKey              = []byte{0x07}
-	activeRequestKey        = []byte{0x08}
-	activeRequestByIDKey    = []byte{0x09}
-	responseKey             = []byte{0x10}
-	earnedFeesKey           = []byte{0x11}
+	serviceDefinitionKey   = []byte{0x01}
+	serviceBindingKey      = []byte{0x02}
+	withdrawAddrKey        = []byte{0x03}
+	requestContextKey      = []byte{0x04}
+	expiredRequestBatchKey = []byte{0x05}
+	newRequestBatchKey     = []byte{0x06}
+	requestKey             = []byte{0x07}
+	activeRequestKey       = []byte{0x08}
+	activeRequestByIDKey   = []byte{0x09}
+	responseKey            = []byte{0x10}
+	earnedFeesKey          = []byte{0x11}
 )
 
 const (
@@ -37,9 +37,9 @@ func GetServiceBindingKey(serviceName string, provider sdk.AccAddress) []byte {
 	return append(serviceBindingKey, getStringsKey([]string{serviceName, provider.String()})...)
 }
 
-// GetProviderWithdrawAddrKey returns the key for the withdrawal address of the specified provider
-func GetProviderWithdrawAddrKey(provider sdk.AccAddress) []byte {
-	return append(providerWithdrawAddrKey, []byte(provider.String())...)
+// GetWithdrawAddrKey returns the key for the withdrawal address of the specified provider
+func GetWithdrawAddrKey(provider sdk.AccAddress) []byte {
+	return append(withdrawAddrKey, []byte(provider.String())...)
 }
 
 // GetBindingsSubspace returns the key for retrieving all bindings of the specified service
