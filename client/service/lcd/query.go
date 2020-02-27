@@ -35,6 +35,12 @@ func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Co
 		queryBindingsHandlerFn(cliCtx, cdc),
 	).Methods("GET")
 
+	// query the withdrawal address of a provider
+	r.HandleFunc(
+		fmt.Sprintf("/service/providers/{%s}/withdraw-address", Provider),
+		queryWithdrawAddrHandlerFn(cliCtx, cdc),
+	).Methods("GET")
+
 	// query a request by ID
 	r.HandleFunc(
 		fmt.Sprintf("/service/requests/{%s}", RequestID),
@@ -154,6 +160,38 @@ func queryBindingsHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.Ha
 		}
 
 		route := fmt.Sprintf("custom/%s/%s", protocol.ServiceRoute, service.QueryBindings)
+		res, err := cliCtx.QueryWithData(route, bz)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		utils.PostProcessResponse(w, cliCtx.Codec, res, cliCtx.Indent)
+	}
+}
+
+func queryWithdrawAddrHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		providerStr := vars[Provider]
+
+		provider, err := sdk.AccAddressFromBech32(providerStr)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		params := service.QueryWithdrawAddressParams{
+			Provider: provider,
+		}
+
+		bz, err := cliCtx.Codec.MarshalJSON(params)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		route := fmt.Sprintf("custom/%s/%s", protocol.ServiceRoute, service.QueryWithdrawAddress)
 		res, err := cliCtx.QueryWithData(route, bz)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())

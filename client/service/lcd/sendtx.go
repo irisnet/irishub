@@ -33,9 +33,9 @@ func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec
 		updateServiceBindingHandlerFn(cdc, cliCtx),
 	).Methods("PUT")
 
-	// set a new withdrawal address for a service binding
+	// set a new withdrawal address for a provider
 	r.HandleFunc(
-		fmt.Sprintf("/service/bindings/{%s}/{%s}/withdraw-address", ServiceName, Provider),
+		fmt.Sprintf("/service/providers/{%s}/withdraw-address", Provider),
 		setWithdrawAddrHandlerFn(cdc, cliCtx),
 	).Methods("POST")
 
@@ -315,11 +315,10 @@ func updateServiceBindingHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) 
 	}
 }
 
-// HTTP request handler to set a new withdrawal address for a service binding.
+// HTTP request handler to set a new withdrawal address for a provider.
 func setWithdrawAddrHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		serviceName := vars[ServiceName]
 		providerStr := vars[Provider]
 
 		provider, err := sdk.AccAddressFromBech32(providerStr)
@@ -345,7 +344,7 @@ func setWithdrawAddrHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.
 			return
 		}
 
-		msg := service.NewMsgSetWithdrawAddress(serviceName, provider, withdrawAddr)
+		msg := service.NewMsgSetWithdrawAddress(provider, withdrawAddr)
 		if err := msg.ValidateBasic(); err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
