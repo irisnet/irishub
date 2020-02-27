@@ -32,7 +32,6 @@ var (
 	FsServiceDefine               = flag.NewFlagSet("", flag.ContinueOnError)
 	FsServiceBind                 = flag.NewFlagSet("", flag.ContinueOnError)
 	FsServiceUpdateBinding        = flag.NewFlagSet("", flag.ContinueOnError)
-	FsServiceSetWithdrawAddr      = flag.NewFlagSet("", flag.ContinueOnError)
 	FsServiceEnable               = flag.NewFlagSet("", flag.ContinueOnError)
 	FsServiceRequest              = flag.NewFlagSet("", flag.ContinueOnError)
 	FsServiceRespond              = flag.NewFlagSet("", flag.ContinueOnError)
@@ -53,8 +52,6 @@ func init() {
 
 	FsServiceUpdateBinding.String(FlagDeposit, "", "added deposit for the binding")
 	FsServiceUpdateBinding.String(FlagPricing, "", "new pricing of the binding, which is a Pricing JSON Schema instance")
-
-	FsServiceSetWithdrawAddr.String(FlagWithdrawAddr, "", "withdrawal address of the binding")
 
 	FsServiceEnable.String(FlagDeposit, "", "added deposit for enabling the binding")
 

@@ -230,9 +230,9 @@ func GetCmdUpdateServiceBinding(cdc *codec.Codec) *cobra.Command {
 func GetCmdSetWithdrawAddr(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "set-withdraw-addr",
-		Short: "Set a new withdrawal address for a service binding",
-		Example: "iriscli service set-withdraw-addr <service name> --chain-id=<chain-id> --from=<key-name> " +
-			"--fee=0.3iris --withdraw-addr=<withdrawal address>",
+		Short: "Set a new withdrawal address for a provider",
+		Example: "iriscli service set-withdraw-addr <withdrawal address> --chain-id=<chain-id> " +
+			"--from=<key-name> --fee=0.3iris",
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
@@ -247,13 +247,12 @@ func GetCmdSetWithdrawAddr(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			withdrawAddrStr := viper.GetString(FlagWithdrawAddr)
-			withdrawAddr, err := sdk.AccAddressFromBech32(withdrawAddrStr)
+			withdrawAddr, err := sdk.AccAddressFromBech32(args[0])
 			if err != nil {
 				return err
 			}
 
-			msg := service.NewMsgSetWithdrawAddress(args[0], provider, withdrawAddr)
+			msg := service.NewMsgSetWithdrawAddress(provider, withdrawAddr)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -261,9 +260,6 @@ func GetCmdSetWithdrawAddr(cdc *codec.Codec) *cobra.Command {
 			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 		},
 	}
-
-	cmd.Flags().AddFlagSet(FsServiceSetWithdrawAddr)
-	_ = cmd.MarkFlagRequired(FlagWithdrawAddr)
 
 	return cmd
 }
