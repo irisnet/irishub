@@ -86,11 +86,7 @@ func handleMsgUpdateServiceBinding(ctx sdk.Context, k Keeper, msg MsgUpdateServi
 
 // handleMsgSetWithdrawAddress handles MsgSetWithdrawAddress
 func handleMsgSetWithdrawAddress(ctx sdk.Context, k Keeper, msg MsgSetWithdrawAddress) sdk.Result {
-	if err := k.SetWithdrawAddress(
-		ctx, msg.ServiceName, msg.Provider, msg.WithdrawAddress,
-	); err != nil {
-		return err.Result()
-	}
+	k.SetWithdrawAddress(ctx, msg.Provider, msg.WithdrawAddress)
 
 	return sdk.Result{}
 }
