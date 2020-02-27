@@ -319,7 +319,7 @@ func GetCmdQueryServiceResponses(cdc *codec.Codec) *cobra.Command {
 
 func GetCmdQueryRequestContext(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "fees",
+		Use:     "request-context",
 		Short:   "Query a request context",
 		Example: "iriscli service request-context <request-context-id>",
 		Args:    cobra.ExactArgs(1),
