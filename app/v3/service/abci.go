@@ -81,14 +81,19 @@ func EndBlocker(ctx sdk.Context, k Keeper) (tags sdk.Tags) {
 			}
 
 			reqContext.BatchState = BATCHCOMPLETED
-			k.SetRequestContext(ctx, reqContextID, reqContext)
 		}
 
 		k.DeleteRequestBatchExpiration(ctx, reqContextID, ctx.BlockHeight())
 
-		if reqContext.State == RUNNING && reqContext.Repeated && (reqContext.RepeatedTotal < 0 || int64(reqContext.BatchCounter) < reqContext.RepeatedTotal) {
-			k.AddNewRequestBatch(ctx, reqContextID, ctx.BlockHeight()-reqContext.Timeout+int64(reqContext.RepeatedFrequency))
+		if reqContext.State == RUNNING {
+			if reqContext.Repeated && (reqContext.RepeatedTotal < 0 || int64(reqContext.BatchCounter) < reqContext.RepeatedTotal) {
+				k.AddNewRequestBatch(ctx, reqContextID, ctx.BlockHeight()-reqContext.Timeout+int64(reqContext.RepeatedFrequency))
+			} else {
+				reqContext.State = COMPLETED
+			}
 		}
+
+		k.SetRequestContext(ctx, reqContextID, reqContext)
 	}
 
 	// handle new request batch queue
@@ -103,20 +108,24 @@ func EndBlocker(ctx sdk.Context, k Keeper) (tags sdk.Tags) {
 
 		if reqContext.State == RUNNING {
 			providers, totalPrices := k.FilterServiceProviders(ctx, reqContext.ServiceName, reqContext.Providers, reqContext.ServiceFeeCap)
+
 			if len(reqContext.ModuleName) == 0 || len(providers) >= int(reqContext.ResponseThreshold) {
 				if !reqContext.SuperMode {
 					if err := k.DeductServiceFees(ctx, reqContext.Consumer, totalPrices); err != nil {
 						reqContext.State = PAUSED
+						k.SetRequestContext(ctx, reqContextID, reqContext)
 					}
 				}
 
-				reqContext.BatchCounter++
-				k.SetRequestContext(ctx, reqContextID, reqContext)
+				if reqContext.State == RUNNING {
+					reqContext.BatchCounter++
+					k.SetRequestContext(ctx, reqContextID, reqContext)
 
-				requestTags := k.InitiateRequests(ctx, reqContextID, providers)
-				k.AddRequestBatchExpiration(ctx, reqContextID, ctx.BlockHeight()+reqContext.Timeout)
+					requestTags := k.InitiateRequests(ctx, reqContextID, providers)
+					k.AddRequestBatchExpiration(ctx, reqContextID, ctx.BlockHeight()+reqContext.Timeout)
 
-				tags = tags.AppendTags(requestTags)
+					tags = tags.AppendTags(requestTags)
+				}
 			}
 		}
 

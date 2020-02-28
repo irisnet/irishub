@@ -1589,17 +1589,17 @@ paths:
           description: Invalid address
         '500':
           description: Internal Server Error
-  /service/definitions:
+  '/service/definitions':
     post:
-      summary: Add a service definition
-      description: Send transaction to define a service
+      summary: Define a service
+      description: Define a service with JSON schemas
       tags:
         - Service
       responses:
         '200':
           description: Unsigned tx was succesfully generated
         '400':
-          description: Invalid service define body
+          description: Invalid parameters
         '500':
           description: Internal Server Error
       requestBody:
@@ -1610,99 +1610,55 @@ paths:
               properties:
                 base_tx:
                   $ref: '#/components/schemas/BaseTx'
-                service_name:
+                name:
                   type: string
-                service_description:
+                description:
                   type: string
                 tags:
                   type: array
                   items:
                     type: string
-                idl_content:
-                  type: string
-                author_addr:
+                author:
                   $ref: '#/components/schemas/Address'
                 author_description:
                   type: string
-        required: true
-  '/service/definitions/{defChainId}/{serviceName}':
-    parameters:
-      - in: path
-        name: defChainId
-        description: service defined chain id
-        required: true
-        schema:
-          type: string
-      - in: path
-        name: serviceName
-        description: service name
-        required: true
-        schema:
-          type: string
+                schemas:
+                  type: string
+                  example: '{"input":{"type":"object"},"output":{"type":"object"},"error":{"type":"object"}}'
+  '/service/definitions/{service-name}':
     get:
-      summary: Query service definition
-      description: Query a service definition
+      summary: Query a service definition by the service name
       tags:
         - Service
+      parameters:
+        - in: path
+          name: service-name
+          description: service name
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: OK
           content:
-            '*/*':
+            application/json:
               schema:
-                type: object
-                properties:
-                  definition:
-                    type: object
-                    properties:
-                      name:
-                        type: string
-                      chain_id:
-                        type: string
-                      description:
-                        type: string
-                      tags:
-                        type: array
-                        items:
-                          type: string
-                      author:
-                        type: string
-                      author_description:
-                        type: string
-                      idl_content:
-                        type: string
-                  methods:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        id:
-                          type: integer
-                        name:
-                          type: string
-                        description:
-                          type: string
-                        output_privacy:
-                          type: string
-                        output_cached:
-                          type: string
-        '204':
-          description: No service definition
+                $ref: '#/components/schemas/ServiceDefinition'
         '400':
-          description: Bad Request
+          description: Invalid parameters
         '500':
           description: Internal Server Error
-  /service/bindings:
+  '/service/bindings':
     post:
-      summary: Add a service binding
-      description: Send transaction to add a binding to a service definition
+      summary: Bind a service
+      description: Bind a service definition
       tags:
         - Service
       responses:
         '200':
           description: Unsigned tx was succesfully generated
         '400':
-          description: Invalid service bind body
+          description: Invalid parameters
         '500':
           description: Internal Server Error
       requestBody:
@@ -1713,199 +1669,88 @@ paths:
               properties:
                 base_tx:
                   $ref: '#/components/schemas/BaseTx'
-                def_chain_id:
-                  type: string
                 service_name:
                   type: string
-                binding_type:
-                  type: string
-                deposit:
-                  type: string
-                  example: 1iris
-                prices:
-                  type: array
-                  items:
-                    type: string
-                    example: 1iris
-                level:
-                  type: object
-                  properties:
-                    avg_rsp_time:
-                      type: string
-                    usable_time:
-                      type: string
                 provider:
                   $ref: '#/components/schemas/Address'
-        required: true
-  '/service/bindings/{defChainId}/{serviceName}/{bindChainId}/{provider}':
-    parameters:
-      - in: path
-        name: defChainId
-        description: service defined chain id
-        required: true
-        schema:
-          type: string
-      - in: path
-        name: serviceName
-        description: service name
-        required: true
-        schema:
-          type: string
-      - in: path
-        name: bindChainId
-        description: service bound chain id
-        required: true
-        schema:
-          type: string
-      - in: path
-        name: provider
-        description: service provider address
-        required: true
-        schema:
-          type: string
+                deposit:
+                  type: string
+                  example: 10000iris
+                pricing:
+                  type: string
+                  example: {"price":[{"denom":"iris-atto","amount":"1000000"}]}
+                withdraw_address:
+                  $ref: '#/components/schemas/Address'
+  '/service/bindings/{service-name}/{provider}':
     get:
-      summary: Query service binding
-      description: Query a service binding
+      summary: Query a service binding by the service name and provider
       tags:
         - Service
+      parameters:
+        - in: path
+          name: service-name
+          description: service name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: provider
+          description: provider
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: OK
           content:
-            '*/*':
+            application/json:
               schema:
-                type: object
-                properties:
-                  type:
-                    type: string
-                  value:
-                    type: object
-                    properties:
-                      def_name:
-                        type: string
-                      def_chain_id:
-                        type: string
-                      bind_chain_id:
-                        type: string
-                      provider:
-                        type: string
-                      binding_type:
-                        type: string
-                      deposit:
-                        type: string
-                        example: 1iris
-                      prices:
-                        type: array
-                        items:
-                          type: string
-                          example: 1iris
-                      level:
-                        type: object
-                        properties:
-                          avg_rsp_time:
-                            type: integer
-                          usable_time:
-                            type: integer
-                      available:
-                        type: boolean
-                      disable_time:
-                        type: string
-        '204':
-          description: No service binding
+                $ref: '#/components/schemas/ServiceBinding'
         '400':
-          description: Bad Request
+          description: Invalid parameters
         '500':
           description: Internal Server Error
-  '/service/bindings/{defChainId}/{serviceName}':
-    parameters:
-      - in: path
-        name: defChainId
-        description: service defined chain id
-        required: true
-        schema:
-          type: string
-      - in: path
-        name: serviceName
-        description: service name
-        required: true
-        schema:
-          type: string
+  '/service/bindings/{service-name}':
     get:
-      summary: Query service binding list
-      description: Query service binding list
+      summary: Query all bindings of a service definition
       tags:
         - Service
+      parameters:
+        - in: path
+          name: service-name
+          description: service name
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: OK
           content:
-            '*/*':
+            application/json:
               schema:
                 type: array
                 items:
-                  properties:
-                    type:
-                      type: string
-                    value:
-                      type: object
-                      properties:
-                        def_name:
-                          type: string
-                        def_chain_id:
-                          type: string
-                        bind_chain_id:
-                          type: string
-                        provider:
-                          type: string
-                        binding_type:
-                          type: string
-                        deposit:
-                          type: string
-                          example: 1iris
-                        prices:
-                          type: array
-                          items:
-                            type: string
-                            example: 1iris
-                        level:
-                          type: object
-                          properties:
-                            avg_rsp_time:
-                              type: integer
-                            usable_time:
-                              type: integer
-                        available:
-                          type: boolean
-                        disable_time:
-                          type: string
-        '204':
-          description: No service binding
+                  $ref: '#/components/schemas/ServiceBinding'
         '400':
-          description: Bad Request
+          description: Invalid parameters
         '500':
           description: Internal Server Error
-  '/service/bindings/{defChainId}/{serviceName}/{provider}':
+  '/service/bindings/{service-name}/{provider}':
     put:
       summary: Update a service binding
-      description: Send transaction to update a service binding
+      description: Update a service binding
       tags:
         - Service
       parameters:
         - in: path
-          name: defChainId
-          description: service defined chain id
-          required: true
-          schema:
-            type: string
-        - in: path
-          name: serviceName
+          name: service-name
           description: service name
           required: true
           schema:
             type: string
         - in: path
           name: provider
-          description: service provider address
+          description: provider
           required: true
           schema:
             type: string
@@ -1913,103 +1758,7 @@ paths:
         '200':
           description: Unsigned tx was succesfully generated
         '400':
-          description: Invalid service binding update body
-        '500':
-          description: Internal Server Error
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                base_tx:
-                  $ref: '#/components/schemas/BaseTx'
-                def_chain_id:
-                  type: string
-                service_name:
-                  type: string
-                binding_type:
-                  type: string
-                deposit:
-                  type: string
-                  example: 1iris
-                prices:
-                  type: array
-                  items:
-                    type: string
-                    example: 1iris
-                level:
-                  type: object
-                  properties:
-                    avg_rsp_time:
-                      type: integer
-                    usable_time:
-                      type: integer
-        required: true
-  '/service/bindings/{defChainId}/{serviceName}/{provider}/disable':
-    put:
-      summary: Disable service binding
-      description: Send transaction to diasble a service binding
-      tags:
-        - Service
-      parameters:
-        - in: path
-          name: defChainId
-          description: service defined chain id
-          required: true
-          schema:
-            type: string
-        - in: path
-          name: serviceName
-          description: service name
-          required: true
-          schema:
-            type: string
-        - in: path
-          name: provider
-          description: service provider address
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Unsigned tx was succesfully generated
-        '400':
-          description: Invalid service binding disable body
-        '500':
-          description: Internal Server Error
-      requestBody:
-        $ref: '#/components/requestBodies/Unjailbody'
-  '/service/bindings/{defChainId}/{serviceName}/{provider}/enable':
-    put:
-      summary: Enable service binding
-      description: Send transaction to enable a service binding
-      tags:
-        - Service
-      parameters:
-        - in: path
-          name: defChainId
-          description: service defined chain id
-          required: true
-          schema:
-            type: string
-        - in: path
-          name: serviceName
-          description: service name
-          required: true
-          schema:
-            type: string
-        - in: path
-          name: provider
-          description: service provider address
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Unsigned tx was succesfully generated
-        '400':
-          description: Invalid service binding enable body
+          description: Invalid parameters
         '500':
           description: Internal Server Error
       requestBody:
@@ -2023,29 +1772,96 @@ paths:
                 deposit:
                   type: string
                   example: 1iris
-        required: true
-  '/service/bindings/{defChainId}/{serviceName}/{provider}/deposit/refund':
-    put:
+                pricing:
+                  type: string
+                  example: '{"price":[{"denom":"iris-atto","amount":"10000000"}]}'
+  '/service/bindings/{service-name}/{provider}/disable':
+    post:
+      summary: Disable a service binding
+      description: Disable a service binding by the service name and provider
+      tags:
+        - Service
+      parameters:
+        - in: path
+          name: service-name
+          description: service name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: provider
+          description: provider
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Unsigned tx was succesfully generated
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_tx:
+                  $ref: '#/components/schemas/BaseTx'
+  '/service/bindings/{service-name}/{provider}/enable':
+    post:
+      summary: Enable a service binding
+      description: Enable a service binding by the service name and provider
+      tags:
+        - Service
+      parameters:
+        - in: path
+          name: service-name
+          description: service name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: provider
+          description: provider
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Unsigned tx was succesfully generated
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_tx:
+                  $ref: '#/components/schemas/BaseTx'
+                deposit:
+                  type: string
+                  example: '1iris'
+  '/service/bindings/{service-name}/{provider}/refund-deposit':
+    post:
       summary: Refund deposit from a service binding
-      description: Send transaction to refund deposit from a service binding
+      description: Refund deposit from a service binding
       tags:
         - Service
       parameters:
         - in: path
-          name: defChainId
-          description: service defined chain id
-          required: true
-          schema:
-            type: string
-        - in: path
-          name: serviceName
+          name: service-name
           description: service name
           required: true
           schema:
             type: string
         - in: path
           name: provider
-          description: service provider address
+          description: provider
           required: true
           schema:
             type: string
@@ -2053,22 +1869,28 @@ paths:
         '200':
           description: Unsigned tx was succesfully generated
         '400':
-          description: Invalid service binding deposit refund body
+          description: Invalid parameters
         '500':
           description: Internal Server Error
       requestBody:
-        $ref: '#/components/requestBodies/Unjailbody'
-  /service/requests:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_tx:
+                  $ref: '#/components/schemas/BaseTx'
+  '/service/requests':
     post:
       summary: Call service
-      description: Send transaction to call a method of service which a provider bound it
+      description: Call a service definition with the specified params
       tags:
         - Service
       responses:
         '200':
           description: Unsigned tx was succesfully generated
         '400':
-          description: Invalid service request body
+          description: Invalid parameters
         '500':
           description: Internal Server Error
       requestBody:
@@ -2079,114 +1901,78 @@ paths:
               properties:
                 base_tx:
                   $ref: '#/components/schemas/BaseTx'
-                requests:
-                  type: array
-                  items:
-                    properties:
-                      def_chain_id:
-                        type: string
-                      service_name:
-                        type: string
-                      bind_chain_id:
-                        type: string
-                      method_id:
-                        type: integer
-                      service_fee:
-                        type: string
-                        example: 1iris
-                      data:
-                        type: string
-                      provider:
-                        $ref: '#/components/schemas/Address'
-                      consumer:
-                        $ref: '#/components/schemas/Address'
-        required: true
-  '/service/requests/{defChainId}/{serviceName}/{bindChainId}/{provider}':
-    parameters:
-      - in: path
-        name: defChainId
-        description: service defined chain id
-        required: true
-        schema:
-          type: string
-      - in: path
-        name: serviceName
-        description: service name
-        required: true
-        schema:
-          type: string
-      - in: path
-        name: bindChainId
-        description: service bound chain id
-        required: true
-        schema:
-          type: string
-      - in: path
-        name: provider
-        description: service provider address
-        required: true
-        schema:
-          type: string
+                properties:
+                  service_name:
+                    type: string
+                  providers:
+                    type: array
+                    items: 
+                      $ref: '#/components/schemas/Address'
+                  consumer:
+                    $ref: '#/components/schemas/Address'
+                  input:
+                    type: string
+                    example: '{"id":1}'
+                  service_fee_cap:
+                    type: string
+                    example: 1iris
+                  timeout:
+                    type: interger
+                    example: 20
+                  super_mode:
+                    type: boolean
+                    example: false
+                  repeated:
+                    type: boolean
+                    example: true
+                  repeated_frequency:
+                    type: interger
+                    example: 50
+                  repeated_total:
+                    type: interger
+                    example: 100
+  '/service/requests/{service-name}/{provider}':
     get:
-      summary: Query service requests of a provider
-      description: Query service requests of a provider
+      summary: Query active requests of a provider
       tags:
         - Service
+      parameters:
+        - in: path
+          name: service-name
+          description: service name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: provider
+          description: provider
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: OK
           content:
-            '*/*':
+            application/json:
               schema:
                 type: array
                 items:
-                  type: object
-                  properties:
-                    def_chain_id:
-                      type: string
-                    def_name:
-                      type: string
-                    bind_chain_id:
-                      type: string
-                    req_chain_id:
-                      type: string
-                    method_id:
-                      type: integer
-                    provider:
-                      $ref: '#/components/schemas/Address'
-                    consumer:
-                      $ref: '#/components/schemas/Address'
-                    input:
-                      type: string
-                    service_fee:
-                      type: array
-                      items:
-                        $ref: '#/components/schemas/Coin'
-                    profiling:
-                      type: boolean
-                    request_height:
-                      type: number
-                    request_intra_tx_counter:
-                      type: number
-                    expiration_height:
-                      type: number
-        '204':
-          description: No service request
+                  $ref: '#/components/schemas/ServiceRequest'
         '400':
-          description: Bad Request
+          description: Invalid parameters
         '500':
           description: Internal Server Error
-  /service/responses:
+  '/service/responses':
     post:
-      summary: Respond service call
-      description: Send transaction to respond a service call
+      summary: Respond a service request
+      description: Respond a service request by the request ID
       tags:
         - Service
       responses:
         '200':
           description: Unsigned tx was succesfully generated
         '400':
-          description: Invalid service response body
+          description: Invalid parameters
         '500':
           description: Internal Server Error
       requestBody:
@@ -2197,116 +1983,48 @@ paths:
               properties:
                 base_tx:
                   $ref: '#/components/schemas/BaseTx'
-                req_chain_id:
-                  type: string
                 request_id:
-                  type: string
-                data:
                   type: string
                 provider:
                   $ref: '#/components/schemas/Address'
-                error_msg:
+                output:
                   type: string
-        required: true
-  '/service/responses/{reqChainId}/{reqId}':
-    parameters:
-      - in: path
-        name: reqChainId
-        description: service request chain id
-        required: true
-        schema:
-          type: string
-      - in: path
-        name: reqId
-        description: request id
-        required: true
-        schema:
-          type: string
+                  example: '{"userName":"irisnet"}'
+                error:
+                  type: string
+  '/service/responses/{request-id}':
     get:
-      summary: Query service response
-      description: Query service response
-      tags:
-        - Service
-      responses:
-        '200':
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: object
-                properties:
-                  type:
-                    type: string
-                  value:
-                    type: object
-                    properties:
-                      req_chain_id:
-                        type: string
-                      request_height:
-                        type: integer
-                      request_intra_tx_counter:
-                        type: integer
-                      expiration_height:
-                        type: integer
-                      provider:
-                        $ref: '#/components/schemas/Address'
-                      consumer:
-                        $ref: '#/components/schemas/Address'
-                      output:
-                        type: string
-                      error_msg:
-                        type: string
-        '204':
-          description: No service request
-        '400':
-          description: Bad Request
-        '500':
-          description: Internal Server Error
-  '/service/fees/{address}':
-    parameters:
-      - in: path
-        name: address
-        description: account address
-        required: true
-        schema:
-          type: string
-    get:
-      summary: Query service fees of an address
-      description: Query service fees of an address
-      tags:
-        - Service
-      responses:
-        '200':
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: object
-                properties:
-                  returned_fee:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Coin'
-                  incoming_fee:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Coin'
-        '204':
-          description: No service request
-        '400':
-          description: Bad Request
-        '500':
-          description: Internal Server Error
-  '/service/fees/{address}/refund':
-    post:
-      summary: Refund service return fee of consumer
-      description: Send transaction to refund service return fee of consumer
+      summary: Query a response by the request ID
       tags:
         - Service
       parameters:
         - in: path
-          name: address
-          description: address of consumer
+          name: request-id
+          description: request ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceResponse'
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
+  '/service/contexts/{request-context-id}/pause':
+    post:
+      summary: Pause a request context
+      description: Pause a running request context
+      tags:
+        - Service
+      parameters:
+        - in: path
+          name: request-context-id
+          description: request context ID
           required: true
           schema:
             type: string
@@ -2314,21 +2032,29 @@ paths:
         '200':
           description: Unsigned tx was succesfully generated
         '400':
-          description: Invalid service fees refund body
+          description: Invalid parameters
         '500':
           description: Internal Server Error
       requestBody:
-        $ref: '#/components/requestBodies/Unjailbody'
-  '/service/fees/{address}/withdraw':
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_tx:
+                  $ref: '#/components/schemas/BaseTx'
+                consumer:
+                  $ref: '#/components/schemas/Address'
+  '/service/contexts/{request-context-id}/start':
     post:
-      summary: Withdraw service incoming fee of provider
-      description: Send transaction to withdraw service incoming fee of provider
+      summary: Start a request context
+      description: Resume a paused request context
       tags:
         - Service
       parameters:
         - in: path
-          name: address
-          description: address of provider
+          name: request-context-id
+          description: request context ID
           required: true
           schema:
             type: string
@@ -2336,12 +2062,227 @@ paths:
         '200':
           description: Unsigned tx was succesfully generated
         '400':
-          description: Invalid service fees withdraw body
+          description: Invalid parameters
         '500':
           description: Internal Server Error
       requestBody:
-        $ref: '#/components/requestBodies/Unjailbody'
-
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_tx:
+                  $ref: '#/components/schemas/BaseTx'
+                consumer:
+                  $ref: '#/components/schemas/Address'
+  '/service/contexts/{request-context-id}/kill':
+    post:
+      summary: Terminate a request context
+      description: Terminate a request context
+      tags:
+        - Service
+      parameters:
+        - in: path
+          name: request-context-id
+          description: request context ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Unsigned tx was succesfully generated
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_tx:
+                  $ref: '#/components/schemas/BaseTx'
+                consumer:
+                  $ref: '#/components/schemas/Address'
+  '/service/contexts/{request-context-id}':
+    get:
+      summary: Query a request context
+      tags:
+        - Service
+      parameters:
+        - in: path
+          name: request-context-id
+          description: request context ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RequestContext'
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
+    put:
+      summary: Update a request context
+      description: Update a request context
+      tags:
+        - Service
+      parameters:
+        - in: path
+          name: request-context-id
+          description: request context ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Unsigned tx was succesfully generated
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_tx:
+                  $ref: '#/components/schemas/BaseTx'
+                providers:
+                  type: array
+                  items: 
+                    $ref: '#/components/schemas/Address'
+                service_fee_cap:
+                  type: string
+                  example: 1iris
+                timeout:
+                  type: interger
+                repeated_frequency:
+                  type: interger
+                repeated_total:
+                  type: interger
+                consumer:
+                  $ref: '#/components/schemas/Address'
+  '/service/requests/{request-context-id}/{batch-counter}':
+    get:
+      summary: Query requests by the request context ID and batch counter
+      tags:
+        - Service
+      parameters:
+        - in: path
+          name: request-context-id
+          description: request context ID
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: batch-counter
+          description: batch counter
+          required: true
+          schema:
+            type: interger
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ServiceRequest'
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
+  '/service/responses/{request-context-id}/{batch-counter}':
+    get:
+      summary: Query responses by the request context ID and batch counter
+      tags:
+        - Service
+      parameters:
+        - in: path
+          name: request-context-id
+          description: request context ID
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: batch-counter
+          description: batch counter
+          required: true
+          schema:
+            type: interger
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ServiceResponse'
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
+  '/service/fees/{provider}/withdraw':
+    post:
+      summary: Withdraw the earned fees
+      description: Withdraw the earned fees of a provider
+      tags:
+        - Service
+      parameters:
+        - in: path
+          name: provider
+          description: provider
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Unsigned tx was succesfully generated
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_tx:
+                  $ref: '#/components/schemas/BaseTx'
+  '/service/fees/{provider}':
+    get:
+      summary: Query the earned fees of a provider
+      tags:
+        - Service
+      parameters:
+        - in: path
+          name: provider
+          description: provider
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EarnedFees'
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
   /oracle/feeds:
     post:
       summary: Define a new feed,the feed will be in "paused" state
@@ -3910,3 +3851,133 @@ components:
           type: string
         timestamp:
           type: string
+    ServiceDefinition:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        author:
+          $ref: '#/components/schemas/Address'
+        author_description:
+          type: string
+        schemas:
+          type: string
+          example: '{"input":{"type":"object"},"output":{"type":"object"},"error":{"type":"object"}}'
+    ServiceBinding:
+      type: object
+      properties:
+        service_name:
+          type: string
+        provider:
+          $ref: '#/components/schemas/Address'
+        deposit:
+          type: array
+          items:
+            $ref: '#/components/schemas/Coin'
+        pricing:
+          type: string
+          example: {"price":[{"denom":"iris-atto","amount":"1000000"}]}
+        withdraw_address:
+          $ref: '#/components/schemas/Address'
+        available:
+          type: boolean
+        disabled_time:
+          type: string
+    ServiceRequest:
+      type: object
+      properties:
+        service_name:
+          type: string
+        provider:
+          $ref: '#/components/schemas/Address'
+        consumer:
+          $ref: '#/components/schemas/Address'
+        input:
+          type: string
+          example: '{"id":1}'
+        service_fee:
+          type: array
+          items:
+            $ref: '#/components/schemas/Coin'
+        super_mode:
+          type: boolean
+        request_height:
+          type: interger
+        expiration_height:
+          type: interger
+        request_context_id:
+          type: string
+        request_context_batch_counter:
+          type: interger
+    ServiceResponse:
+      type: object
+      properties:
+        provider:
+          $ref: '#/components/schemas/Address'
+        consumer:
+          $ref: '#/components/schemas/Address'
+        output:
+          type: string
+          example: '{"userName":"irisnet"}'
+        error:
+          type: string
+        request_context_id:
+          type: string
+        request_context_batch_counter:
+          type: interger
+    RequestContext:
+      type: object
+      properties:
+        service_name:
+          type: string
+        providers:
+          type: array
+          items: 
+            $ref: '#/components/schemas/Address'
+        consumer:
+          $ref: '#/components/schemas/Address'
+        input:
+          type: string
+        service_fee_cap:
+          type: array
+          items:
+            $ref: '#/components/schemas/Coin'
+        timeout:
+          type: interger
+        super_mode:
+          type: boolean
+        repeated:
+          type: boolean
+        repeated_frequency:
+          type: interger
+        repeated_total:
+          type: interger
+        batch_counter:
+          type:
+        batch_request_count:
+          type: interger
+        batch_response_count:
+          type: interger
+        batch_state:
+          type: string
+        state:
+          type: string
+        response_threshold:
+          type: interger
+        module_name:
+          type: string
+    EarnedFees:
+      type: object
+      properties:
+        address:
+          $ref: '#/components/schemas/Address'
+        coins:
+          type: array
+          items:
+            $ref: '#/components/schemas/Coin'

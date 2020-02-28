@@ -5,15 +5,17 @@ import (
 )
 
 const (
-	QueryDefinition       = "definition"      // QueryDefinition
-	QueryBinding          = "binding"         // QueryBinding
-	QueryBindings         = "bindings"        // QueryBindings
-	QueryRequests         = "requests"        // QueryRequests
-	QueryResponse         = "response"        // QueryResponse
-	QueryRequestContext   = "context"         // QueryRequestContext
-	QueryRequestsByReqCtx = "requests_by_ctx" // QueryRequestsByReqCtx
-	QueryResponses        = "responses"       // QueryResponses
-	QueryFees             = "fees"            // QueryFees
+	QueryDefinition       = "definition"       // QueryDefinition
+	QueryBinding          = "binding"          // QueryBinding
+	QueryBindings         = "bindings"         // QueryBindings
+	QueryWithdrawAddress  = "withdraw_address" // QueryWithdrawAddress
+	QueryRequest          = "request"          // QueryRequest
+	QueryRequests         = "requests"         // QueryRequests
+	QueryResponse         = "response"         // QueryResponse
+	QueryRequestContext   = "context"          // QueryRequestContext
+	QueryRequestsByReqCtx = "requests_by_ctx"  // QueryRequestsByReqCtx
+	QueryResponses        = "responses"        // QueryResponses
+	QueryFees             = "fees"             // QueryFees
 )
 
 // QueryDefinitionParams defines the params to query a service definition
@@ -30,6 +32,16 @@ type QueryBindingParams struct {
 // QueryBindingsParams defines the params to query all service bindings of a service
 type QueryBindingsParams struct {
 	ServiceName string
+}
+
+// QueryWithdrawAddressParams defines the params to query the withdrawal address of a provider
+type QueryWithdrawAddressParams struct {
+	Provider sdk.AccAddress
+}
+
+// QueryRequestParams defines the params to query the request by ID
+type QueryRequestParams struct {
+	RequestID string
 }
 
 // QueryRequestsParams defines the params to query all requests for a service binding

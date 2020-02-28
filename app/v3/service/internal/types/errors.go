@@ -20,34 +20,37 @@ const (
 	CodeInvalidPricing            sdk.CodeType = 106
 	CodeServiceBindingExists      sdk.CodeType = 107
 	CodeUnknownServiceBinding     sdk.CodeType = 108
-	CodeServiceBindingUnavailable sdk.CodeType = 109
-	CodeServiceBindingAvailable   sdk.CodeType = 110
-	CodeIncorrectRefundTime       sdk.CodeType = 111
+	CodeNoWithdrawAddr            sdk.CodeType = 109
+	CodeServiceBindingUnavailable sdk.CodeType = 110
+	CodeServiceBindingAvailable   sdk.CodeType = 111
+	CodeIncorrectRefundTime       sdk.CodeType = 112
 
-	CodeInvalidRequest            sdk.CodeType = 112
-	CodeInvalidServiceFee         sdk.CodeType = 113
-	CodeInvalidResponse           sdk.CodeType = 114
-	CodeInvalidRequestID          sdk.CodeType = 115
-	CodeInvalidProviders          sdk.CodeType = 116
-	CodeInvalidTimeout            sdk.CodeType = 117
-	CodeInvalidRepeatedFreq       sdk.CodeType = 118
-	CodeInvalidRepeatedTotal      sdk.CodeType = 119
-	CodeUnknownRequestContext     sdk.CodeType = 120
-	CodeInvalidRequestContextID   sdk.CodeType = 121
-	CodeRequestContextNonRepeated sdk.CodeType = 122
-	CodeRequestContextNotStarted  sdk.CodeType = 123
-	CodeRequestContextNotPaused   sdk.CodeType = 124
-	CodeModuleNameRegistered      sdk.CodeType = 125
-	CodeModuleNameNotRegistered   sdk.CodeType = 126
-	CodeNoEarnedFees              sdk.CodeType = 127
+	CodeInvalidRequest            sdk.CodeType = 113
+	CodeInvalidServiceFee         sdk.CodeType = 114
+	CodeInvalidResponse           sdk.CodeType = 115
+	CodeInvalidRequestID          sdk.CodeType = 116
+	CodeInvalidProviders          sdk.CodeType = 117
+	CodeInvalidTimeout            sdk.CodeType = 118
+	CodeInvalidRepeatedFreq       sdk.CodeType = 119
+	CodeInvalidRepeatedTotal      sdk.CodeType = 120
+	CodeUnknownRequest            sdk.CodeType = 121
+	CodeUnknownResponse           sdk.CodeType = 122
+	CodeUnknownRequestContext     sdk.CodeType = 123
+	CodeInvalidRequestContextID   sdk.CodeType = 124
+	CodeRequestContextNonRepeated sdk.CodeType = 125
+	CodeRequestContextNotStarted  sdk.CodeType = 126
+	CodeRequestContextNotPaused   sdk.CodeType = 127
+	CodeModuleNameRegistered      sdk.CodeType = 128
+	CodeModuleNameNotRegistered   sdk.CodeType = 129
+	CodeNoEarnedFees              sdk.CodeType = 130
 
-	CodeInvalidRequestInput   sdk.CodeType = 128
-	CodeInvalidResponseOutput sdk.CodeType = 129
-	CodeInvalidResponseErr    sdk.CodeType = 130
+	CodeInvalidRequestInput   sdk.CodeType = 131
+	CodeInvalidResponseOutput sdk.CodeType = 132
+	CodeInvalidResponseErr    sdk.CodeType = 133
 
-	CodeInvalidAddress  sdk.CodeType = 131
-	CodeInvalidProfiler sdk.CodeType = 132
-	CodeInvalidTrustee  sdk.CodeType = 133
+	CodeInvalidAddress  sdk.CodeType = 134
+	CodeInvalidProfiler sdk.CodeType = 135
+	CodeInvalidTrustee  sdk.CodeType = 136
 )
 
 func ErrInvalidServiceName(codespace sdk.CodespaceType, serviceName string) sdk.Error {
@@ -83,7 +86,11 @@ func ErrServiceBindingExists(codespace sdk.CodespaceType) sdk.Error {
 }
 
 func ErrUnknownServiceBinding(codespace sdk.CodespaceType) sdk.Error {
-	return sdk.NewError(codespace, CodeUnknownServiceBinding, fmt.Sprintf("service binding does not exist"))
+	return sdk.NewError(codespace, CodeUnknownServiceBinding, "service binding does not exist")
+}
+
+func ErrNoWithdrawAddr(codespace sdk.CodespaceType, provider sdk.AccAddress) sdk.Error {
+	return sdk.NewError(codespace, CodeNoWithdrawAddr, fmt.Sprintf("no withdraw address for %s", provider))
 }
 
 func ErrServiceBindingUnavailable(codespace sdk.CodespaceType) sdk.Error {
@@ -128,6 +135,14 @@ func ErrInvalidRepeatedFreq(codespace sdk.CodespaceType, msg string) sdk.Error {
 
 func ErrInvalidRepeatedTotal(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidRepeatedTotal, msg)
+}
+
+func ErrUnknownRequest(codespace sdk.CodespaceType, requestID []byte) sdk.Error {
+	return sdk.NewError(codespace, CodeUnknownRequest, fmt.Sprintf("unknown request: %s", RequestIDToString(requestID)))
+}
+
+func ErrUnknownResponse(codespace sdk.CodespaceType, requestID []byte) sdk.Error {
+	return sdk.NewError(codespace, CodeUnknownResponse, fmt.Sprintf("unknown response: %s", RequestIDToString(requestID)))
 }
 
 func ErrUnknownRequestContext(codespace sdk.CodespaceType, requestContextID []byte) sdk.Error {
