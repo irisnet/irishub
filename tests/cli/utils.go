@@ -330,6 +330,15 @@ func executeGetServiceBindings(t *testing.T, cmdStr string) []service.ServiceBin
 	return svcBindings
 }
 
+func executeGetWithdrawAddress(t *testing.T, cmdStr string) sdk.AccAddress {
+	out, _ := tests.ExecuteT(t, cmdStr, "")
+	var withdrawAddr sdk.AccAddress
+	cdc := app.MakeLatestCodec()
+	err := cdc.UnmarshalJSON([]byte(out), &withdrawAddr)
+	require.NoError(t, err, "out %v\n, err %v", out, err)
+	return withdrawAddr
+}
+
 func executeGetProfilers(t *testing.T, cmdStr string) []guardian.Guardian {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
 	var profilers []guardian.Guardian
