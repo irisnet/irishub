@@ -1679,8 +1679,6 @@ paths:
                 pricing:
                   type: string
                   example: {"price":[{"denom":"iris-atto","amount":"1000000"}]}
-                withdraw_address:
-                  $ref: '#/components/schemas/Address'
   '/service/bindings/{service-name}/{provider}':
     get:
       summary: Query a service binding by the service name and provider
@@ -1775,6 +1773,55 @@ paths:
                 pricing:
                   type: string
                   example: '{"price":[{"denom":"iris-atto","amount":"10000000"}]}'
+  '/service/providers/{provider}/withdraw-address':
+    get:
+      summary: Query the withdrawal address of a provider
+      tags:
+        - Service
+      parameters:
+        - in: path
+          name: provider
+          description: provider
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/components/schemas/Address'
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
+    post:
+      summary: Set a new withdrawal address for a provider
+      tags:
+        - Service
+      parameters:
+        - in: path
+          name: provider
+          description: provider
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Unsigned tx was succesfully generated
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_tx:
+                  $ref: '#/components/schemas/BaseTx'
+                withdraw_address:
+                  $ref: '#/components/schemas/Address'
   '/service/bindings/{service-name}/{provider}/disable':
     post:
       summary: Disable a service binding
@@ -1931,6 +1978,29 @@ paths:
                   repeated_total:
                     type: interger
                     example: 100
+  '/service/requests/{request-id}':
+    get:
+      summary: Query a request by the request ID
+      tags:
+        - Service
+      parameters:
+        - in: path
+          name: request-id
+          description: request ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceRequest'
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
   '/service/requests/{service-name}/{provider}':
     get:
       summary: Query active requests of a provider
@@ -3883,8 +3953,6 @@ components:
         pricing:
           type: string
           example: {"price":[{"denom":"iris-atto","amount":"1000000"}]}
-        withdraw_address:
-          $ref: '#/components/schemas/Address'
         available:
           type: boolean
         disabled_time:
@@ -3959,7 +4027,7 @@ components:
         repeated_total:
           type: interger
         batch_counter:
-          type:
+          type: interger
         batch_request_count:
           type: interger
         batch_response_count:
