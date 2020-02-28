@@ -18,6 +18,8 @@ func NewQuerier(k Keeper) sdk.Querier {
 			return queryBinding(ctx, req, k)
 		case types.QueryBindings:
 			return queryBindings(ctx, req, k)
+		case types.QueryWithdrawAddress:
+			return queryWithdrawAddress(ctx, req, k)
 		case types.QueryRequest:
 			return queryRequest(ctx, req, k)
 		case types.QueryRequests:
@@ -96,6 +98,23 @@ func queryBindings(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sd
 	}
 
 	bz, err := codec.MarshalJSONIndent(k.cdc, bindings)
+	if err != nil {
+		return nil, sdk.MarshalResultErr(err)
+	}
+
+	return bz, nil
+}
+
+func queryWithdrawAddress(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sdk.Error) {
+	var params types.QueryWithdrawAddressParams
+	err := k.cdc.UnmarshalJSON(req.Data, &params)
+	if err != nil {
+		return nil, sdk.ParseParamsErr(err)
+	}
+
+	withdrawAddr := k.GetWithdrawAddress(ctx, params.Provider)
+
+	bz, err := codec.MarshalJSONIndent(k.cdc, withdrawAddr)
 	if err != nil {
 		return nil, sdk.MarshalResultErr(err)
 	}

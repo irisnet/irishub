@@ -63,8 +63,8 @@ func handleMsgDefineService(ctx sdk.Context, k Keeper, msg MsgDefineService) sdk
 // handleMsgBindService handles MsgBindService
 func handleMsgBindService(ctx sdk.Context, k Keeper, msg MsgBindService) sdk.Result {
 	if err := k.AddServiceBinding(
-		ctx, msg.ServiceName, msg.Provider, msg.Deposit,
-		msg.Pricing, msg.WithdrawAddress,
+		ctx, msg.ServiceName, msg.Provider,
+		msg.Deposit, msg.Pricing,
 	); err != nil {
 		return err.Result()
 	}
@@ -86,11 +86,7 @@ func handleMsgUpdateServiceBinding(ctx sdk.Context, k Keeper, msg MsgUpdateServi
 
 // handleMsgSetWithdrawAddress handles MsgSetWithdrawAddress
 func handleMsgSetWithdrawAddress(ctx sdk.Context, k Keeper, msg MsgSetWithdrawAddress) sdk.Result {
-	if err := k.SetWithdrawAddress(
-		ctx, msg.ServiceName, msg.Provider, msg.WithdrawAddress,
-	); err != nil {
-		return err.Result()
-	}
+	k.SetWithdrawAddress(ctx, msg.Provider, msg.WithdrawAddress)
 
 	return sdk.Result{}
 }

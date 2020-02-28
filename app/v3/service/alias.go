@@ -14,6 +14,7 @@ const (
 	QueryDefinition       = types.QueryDefinition
 	QueryBinding          = types.QueryBinding
 	QueryBindings         = types.QueryBindings
+	QueryWithdrawAddress  = types.QueryWithdrawAddress
 	QueryRequest          = types.QueryRequest
 	QueryRequests         = types.QueryRequests
 	QueryResponse         = types.QueryResponse
@@ -105,6 +106,7 @@ type (
 	QueryDefinitionParams       = types.QueryDefinitionParams
 	QueryBindingParams          = types.QueryBindingParams
 	QueryBindingsParams         = types.QueryBindingsParams
+	QueryWithdrawAddressParams  = types.QueryWithdrawAddressParams
 	QueryRequestParams          = types.QueryRequestParams
 	QueryRequestsParams         = types.QueryRequestsParams
 	QueryResponseParams         = types.QueryResponseParams

@@ -137,14 +137,14 @@ func TestMsgDefineServiceGetSigners(t *testing.T) {
 
 // TestMsgBindServiceRoute tests Route for MsgBindService
 func TestMsgBindServiceRoute(t *testing.T) {
-	msg := NewMsgBindService(testServiceName, testProvider, testDeposit, testPricing, testWithdrawAddr)
+	msg := NewMsgBindService(testServiceName, testProvider, testDeposit, testPricing)
 
 	require.Equal(t, MsgRoute, msg.Route())
 }
 
 // TestMsgBindServiceType tests Type for MsgBindService
 func TestMsgBindServiceType(t *testing.T) {
-	msg := NewMsgBindService(testServiceName, testProvider, testDeposit, testPricing, testWithdrawAddr)
+	msg := NewMsgBindService(testServiceName, testProvider, testDeposit, testPricing)
 
 	require.Equal(t, "bind_service", msg.Type())
 }
@@ -161,16 +161,15 @@ func TestMsgBindServiceValidation(t *testing.T) {
 	invalidDenomPricing := `{"price":[{"denom":"iris","amount":"1000000"}]}`
 
 	testMsgs := []MsgBindService{
-		NewMsgBindService(testServiceName, testProvider, testDeposit, testPricing, testWithdrawAddr),         // valid msg
-		NewMsgBindService(testServiceName, testProvider, testDeposit, testPricing, emptyAddress),             // empty withdrawal address is allowed
-		NewMsgBindService(testServiceName, emptyAddress, testDeposit, testPricing, testWithdrawAddr),         // missing provider address
-		NewMsgBindService(invalidName, testProvider, testDeposit, testPricing, testWithdrawAddr),             // service name contains illegal characters
-		NewMsgBindService(invalidLongName, testProvider, testDeposit, testPricing, testWithdrawAddr),         // too long service name
-		NewMsgBindService(testServiceName, testProvider, invalidDeposit, testPricing, testWithdrawAddr),      // invalid deposit
-		NewMsgBindService(testServiceName, testProvider, invalidDenomDeposit, testPricing, testWithdrawAddr), // invalid deposit denom
-		NewMsgBindService(testServiceName, testProvider, testDeposit, "", testWithdrawAddr),                  // missing pricing
-		NewMsgBindService(testServiceName, testProvider, testDeposit, invalidPricing, testWithdrawAddr),      // invalid Pricing JSON Schema instance
-		NewMsgBindService(testServiceName, testProvider, testDeposit, invalidDenomPricing, testWithdrawAddr), // invalid pricing denom
+		NewMsgBindService(testServiceName, testProvider, testDeposit, testPricing),         // valid msg
+		NewMsgBindService(testServiceName, emptyAddress, testDeposit, testPricing),         // missing provider address
+		NewMsgBindService(invalidName, testProvider, testDeposit, testPricing),             // service name contains illegal characters
+		NewMsgBindService(invalidLongName, testProvider, testDeposit, testPricing),         // too long service name
+		NewMsgBindService(testServiceName, testProvider, invalidDeposit, testPricing),      // invalid deposit
+		NewMsgBindService(testServiceName, testProvider, invalidDenomDeposit, testPricing), // invalid deposit denom
+		NewMsgBindService(testServiceName, testProvider, testDeposit, ""),                  // missing pricing
+		NewMsgBindService(testServiceName, testProvider, testDeposit, invalidPricing),      // invalid Pricing JSON Schema instance
+		NewMsgBindService(testServiceName, testProvider, testDeposit, invalidDenomPricing), // invalid pricing denom
 	}
 
 	testCases := []struct {
@@ -179,15 +178,14 @@ func TestMsgBindServiceValidation(t *testing.T) {
 		errMsg  string
 	}{
 		{testMsgs[0], true, ""},
-		{testMsgs[1], true, ""},
-		{testMsgs[2], false, "missing provider address"},
-		{testMsgs[3], false, "service name contains illegal characters"},
-		{testMsgs[4], false, "too long service name"},
-		{testMsgs[5], false, "invalid deposit"},
-		{testMsgs[6], false, "invalid deposit denom"},
-		{testMsgs[7], false, "missing pricing"},
-		{testMsgs[8], false, "invalid Pricing JSON Schema instance"},
-		{testMsgs[9], false, "invalid pricing denom"},
+		{testMsgs[1], false, "missing provider address"},
+		{testMsgs[2], false, "service name contains illegal characters"},
+		{testMsgs[3], false, "too long service name"},
+		{testMsgs[4], false, "invalid deposit"},
+		{testMsgs[5], false, "invalid deposit denom"},
+		{testMsgs[6], false, "missing pricing"},
+		{testMsgs[7], false, "invalid Pricing JSON Schema instance"},
+		{testMsgs[8], false, "invalid pricing denom"},
 	}
 
 	for i, tc := range testCases {
@@ -202,16 +200,16 @@ func TestMsgBindServiceValidation(t *testing.T) {
 
 // TestMsgBindServiceGetSignBytes tests GetSignBytes for MsgBindService
 func TestMsgBindServiceGetSignBytes(t *testing.T) {
-	msg := NewMsgBindService(testServiceName, testProvider, testDeposit, testPricing, testWithdrawAddr)
+	msg := NewMsgBindService(testServiceName, testProvider, testDeposit, testPricing)
 	res := msg.GetSignBytes()
 
-	expected := `{"type":"irishub/service/MsgBindService","value":{"deposit":[{"amount":"1000000000000000000000","denom":"iris-atto"}],"pricing":"{\"price\":[{\"denom\":\"iris-atto\",\"amount\":\"1000000\"}]}","provider":"faa1w3jhxapdwpex7anfv3jhynrxe9z","service_name":"test-service","withdraw_address":"faa1w3jhxapdwa5hg6rywfshwctv94skgerjv4ehxdueap6"}}`
+	expected := `{"type":"irishub/service/MsgBindService","value":{"deposit":[{"amount":"1000000000000000000000","denom":"iris-atto"}],"pricing":"{\"price\":[{\"denom\":\"iris-atto\",\"amount\":\"1000000\"}]}","provider":"faa1w3jhxapdwpex7anfv3jhynrxe9z","service_name":"test-service"}}`
 	require.Equal(t, expected, string(res))
 }
 
 // TestMsgBindServiceGetSigners tests GetSigners for MsgBindService
 func TestMsgBindServiceGetSigners(t *testing.T) {
-	msg := NewMsgBindService(testServiceName, testProvider, testDeposit, testPricing, testWithdrawAddr)
+	msg := NewMsgBindService(testServiceName, testProvider, testDeposit, testPricing)
 	res := msg.GetSigners()
 
 	expected := "[746573742D70726F7669646572]"
@@ -303,14 +301,14 @@ func TestMsgUpdateServiceBindingGetSigners(t *testing.T) {
 
 // TestMsgSetWithdrawAddressRoute tests Route for MsgSetWithdrawAddress
 func TestMsgSetWithdrawAddressRoute(t *testing.T) {
-	msg := NewMsgSetWithdrawAddress(testServiceName, testProvider, testWithdrawAddr)
+	msg := NewMsgSetWithdrawAddress(testProvider, testWithdrawAddr)
 
 	require.Equal(t, MsgRoute, msg.Route())
 }
 
 // TestMsgSetWithdrawAddressType tests Type for MsgSetWithdrawAddress
 func TestMsgSetWithdrawAddressType(t *testing.T) {
-	msg := NewMsgSetWithdrawAddress(testServiceName, testProvider, testWithdrawAddr)
+	msg := NewMsgSetWithdrawAddress(testProvider, testWithdrawAddr)
 
 	require.Equal(t, "set_withdraw_address", msg.Type())
 }
@@ -319,15 +317,10 @@ func TestMsgSetWithdrawAddressType(t *testing.T) {
 func TestMsgSetWithdrawAddressValidation(t *testing.T) {
 	emptyAddress := sdk.AccAddress{}
 
-	invalidName := "invalid/service/name"
-	invalidLongName := strings.Repeat("s", MaxNameLength+1)
-
 	testMsgs := []MsgSetWithdrawAddress{
-		NewMsgSetWithdrawAddress(testServiceName, testProvider, testWithdrawAddr), // valid msg
-		NewMsgSetWithdrawAddress(testServiceName, emptyAddress, testWithdrawAddr), // missing provider address
-		NewMsgSetWithdrawAddress(invalidName, testProvider, testWithdrawAddr),     // service name contains illegal characters
-		NewMsgSetWithdrawAddress(invalidLongName, testProvider, testWithdrawAddr), // too long service name
-		NewMsgSetWithdrawAddress(testServiceName, testProvider, emptyAddress),     // missing withdrawal address
+		NewMsgSetWithdrawAddress(testProvider, testWithdrawAddr), // valid msg
+		NewMsgSetWithdrawAddress(emptyAddress, testWithdrawAddr), // missing provider address
+		NewMsgSetWithdrawAddress(testProvider, emptyAddress),     // missing withdrawal address
 	}
 
 	testCases := []struct {
@@ -337,9 +330,7 @@ func TestMsgSetWithdrawAddressValidation(t *testing.T) {
 	}{
 		{testMsgs[0], true, ""},
 		{testMsgs[1], false, "missing provider address"},
-		{testMsgs[2], false, "service name contains illegal characters"},
-		{testMsgs[3], false, "too long service name"},
-		{testMsgs[4], false, "missing withdrawal address"},
+		{testMsgs[2], false, "missing withdrawal address"},
 	}
 
 	for i, tc := range testCases {
@@ -354,16 +345,16 @@ func TestMsgSetWithdrawAddressValidation(t *testing.T) {
 
 // TestMsgSetWithdrawAddressGetSignBytes tests GetSignBytes for MsgSetWithdrawAddress
 func TestMsgSetWithdrawAddressGetSignBytes(t *testing.T) {
-	msg := NewMsgSetWithdrawAddress(testServiceName, testProvider, testWithdrawAddr)
+	msg := NewMsgSetWithdrawAddress(testProvider, testWithdrawAddr)
 	res := msg.GetSignBytes()
 
-	expected := `{"type":"irishub/service/MsgSetWithdrawAddress","value":{"provider":"faa1w3jhxapdwpex7anfv3jhynrxe9z","service_name":"test-service","withdraw_address":"faa1w3jhxapdwa5hg6rywfshwctv94skgerjv4ehxdueap6"}}`
+	expected := `{"type":"irishub/service/MsgSetWithdrawAddress","value":{"provider":"faa1w3jhxapdwpex7anfv3jhynrxe9z","withdraw_address":"faa1w3jhxapdwa5hg6rywfshwctv94skgerjv4ehxdueap6"}}`
 	require.Equal(t, expected, string(res))
 }
 
 // TestMsgSetWithdrawAddressGetSigners tests GetSigners for MsgSetWithdrawAddress
 func TestMsgSetWithdrawAddressGetSigners(t *testing.T) {
-	msg := NewMsgSetWithdrawAddress(testServiceName, testProvider, testWithdrawAddr)
+	msg := NewMsgSetWithdrawAddress(testProvider, testWithdrawAddr)
 	res := msg.GetSigners()
 
 	expected := "[746573742D70726F7669646572]"

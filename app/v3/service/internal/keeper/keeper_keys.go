@@ -11,14 +11,15 @@ var (
 	// Keys for store prefixes
 	serviceDefinitionKey   = []byte{0x01}
 	serviceBindingKey      = []byte{0x02}
-	requestContextKey      = []byte{0x03}
-	expiredRequestBatchKey = []byte{0x04}
-	newRequestBatchKey     = []byte{0x05}
-	requestKey             = []byte{0x06}
-	activeRequestKey       = []byte{0x07}
-	activeRequestByIDKey   = []byte{0x08}
-	responseKey            = []byte{0x09}
-	earnedFeesKey          = []byte{0x10}
+	withdrawAddrKey        = []byte{0x03}
+	requestContextKey      = []byte{0x04}
+	expiredRequestBatchKey = []byte{0x05}
+	newRequestBatchKey     = []byte{0x06}
+	requestKey             = []byte{0x07}
+	activeRequestKey       = []byte{0x08}
+	activeRequestByIDKey   = []byte{0x09}
+	responseKey            = []byte{0x10}
+	earnedFeesKey          = []byte{0x11}
 )
 
 const (
@@ -34,6 +35,11 @@ func GetServiceDefinitionKey(name string) []byte {
 // GetServiceBindingKey returns the key for the service binding with the specified name and provider
 func GetServiceBindingKey(serviceName string, provider sdk.AccAddress) []byte {
 	return append(serviceBindingKey, getStringsKey([]string{serviceName, provider.String()})...)
+}
+
+// GetWithdrawAddrKey returns the key for the withdrawal address of the specified provider
+func GetWithdrawAddrKey(provider sdk.AccAddress) []byte {
+	return append(withdrawAddrKey, provider.Bytes()...)
 }
 
 // GetBindingsSubspace returns the key for retrieving all bindings of the specified service

@@ -10,13 +10,12 @@ import (
 
 // ServiceBinding defines a struct for service binding
 type ServiceBinding struct {
-	ServiceName     string         `json:"service_name"`
-	Provider        sdk.AccAddress `json:"provider"`
-	Deposit         sdk.Coins      `json:"deposit"`
-	Pricing         string         `json:"pricing"`
-	WithdrawAddress sdk.AccAddress `json:"withdraw_address"`
-	Available       bool           `json:"available"`
-	DisabledTime    time.Time      `json:"disabled_time"`
+	ServiceName  string         `json:"service_name"`
+	Provider     sdk.AccAddress `json:"provider"`
+	Deposit      sdk.Coins      `json:"deposit"`
+	Pricing      string         `json:"pricing"`
+	Available    bool           `json:"available"`
+	DisabledTime time.Time      `json:"disabled_time"`
 }
 
 // NewServiceBinding creates a new ServiceBinding instance
@@ -25,18 +24,16 @@ func NewServiceBinding(
 	provider sdk.AccAddress,
 	deposit sdk.Coins,
 	pricing string,
-	withdrawAddr sdk.AccAddress,
 	available bool,
 	disabledTime time.Time,
 ) ServiceBinding {
 	return ServiceBinding{
-		ServiceName:     serviceName,
-		Provider:        provider,
-		Deposit:         deposit,
-		Pricing:         pricing,
-		WithdrawAddress: withdrawAddr,
-		Available:       available,
-		DisabledTime:    disabledTime,
+		ServiceName:  serviceName,
+		Provider:     provider,
+		Deposit:      deposit,
+		Pricing:      pricing,
+		Available:    available,
+		DisabledTime: disabledTime,
 	}
 }
 
@@ -53,12 +50,10 @@ func (binding ServiceBinding) String() string {
 		Provider:                %s
 		Deposit:                 %s
 		Pricing:                 %s
-		WithdrawAddress:         %s
 		Available:               %v,
 		DisabledTime:            %s`,
 		binding.ServiceName, binding.Provider, binding.Deposit.MainUnitString(),
-		binding.Pricing, binding.WithdrawAddress,
-		binding.Available, disabledTimeStr,
+		binding.Pricing, binding.Available, disabledTimeStr,
 	)
 }
 
