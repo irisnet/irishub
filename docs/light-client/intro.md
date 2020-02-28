@@ -183,6 +183,17 @@ This api supports the following special parameters. By default, their values are
 15. `POST /service/fees/{address}/refund`: Refund service return fee of consumer
 16. `POST /service/fees/{address}/withdraw`: Withdraw service incoming fee of provider
 
+### Oracle module APIs
+
+1. `POST /oracle/feeds`: Define a new Feed with the initial state of paused.
+2. `POST /oracle/feeds/<feed-name>/start`: Start a paused Feed created by the tx signer.
+3. `POST /oracle/feeds/<feed-name>/pause`: Pause a running Feed created by the tx signer.
+4. `PUT /oracle/feeds/<feed-name>`: Update a Feed definition created by the tx signer.
+5. `GET /oracle/feeds/<feed-name>`: Query Feed information by its name.
+6. `GET /oracle/feeds?status=running`: Query Feed list by Feed state.
+7. `GET /oracle/feeds/<feed-name>/values`: Query the result of the feed by its name, in descending order of timestamp.
+
+
 ### Rand module APIs
 
 1. `POST /rand/rands`: Request a randon number
