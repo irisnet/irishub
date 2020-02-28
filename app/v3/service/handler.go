@@ -63,8 +63,8 @@ func handleMsgDefineService(ctx sdk.Context, k Keeper, msg MsgDefineService) sdk
 // handleMsgBindService handles MsgBindService
 func handleMsgBindService(ctx sdk.Context, k Keeper, msg MsgBindService) sdk.Result {
 	if err := k.AddServiceBinding(
-		ctx, msg.ServiceName, msg.Provider, msg.Deposit,
-		msg.Pricing, msg.WithdrawAddress,
+		ctx, msg.ServiceName, msg.Provider,
+		msg.Deposit, msg.Pricing,
 	); err != nil {
 		return err.Result()
 	}
@@ -86,11 +86,7 @@ func handleMsgUpdateServiceBinding(ctx sdk.Context, k Keeper, msg MsgUpdateServi
 
 // handleMsgSetWithdrawAddress handles MsgSetWithdrawAddress
 func handleMsgSetWithdrawAddress(ctx sdk.Context, k Keeper, msg MsgSetWithdrawAddress) sdk.Result {
-	if err := k.SetWithdrawAddress(
-		ctx, msg.ServiceName, msg.Provider, msg.WithdrawAddress,
-	); err != nil {
-		return err.Result()
-	}
+	k.SetWithdrawAddress(ctx, msg.Provider, msg.WithdrawAddress)
 
 	return sdk.Result{}
 }
@@ -143,7 +139,7 @@ func handleMsgRequestService(ctx sdk.Context, k Keeper, msg MsgRequestService) s
 
 // handleMsgRespondService handles MsgRespondService
 func handleMsgRespondService(ctx sdk.Context, k Keeper, msg MsgRespondService) sdk.Result {
-	response, err := k.AddResponse(ctx, msg.RequestID, msg.Provider, msg.Output, msg.Error)
+	request, response, err := k.AddResponse(ctx, msg.RequestID, msg.Provider, msg.Output, msg.Error)
 	if err != nil {
 		return err.Result()
 	}
@@ -152,6 +148,7 @@ func handleMsgRespondService(ctx sdk.Context, k Keeper, msg MsgRespondService) s
 		TagRequestID, []byte(msg.RequestID),
 		TagConsumer, []byte(response.Consumer.String()),
 		TagProvider, []byte(response.Provider.String()),
+		TagServiceName, []byte(request.ServiceName),
 	)
 
 	return sdk.Result{

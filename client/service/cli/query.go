@@ -131,6 +131,84 @@ func GetCmdQueryServiceBindings(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
+// GetCmdQueryWithdrawAddr implements the query withdraw address command
+func GetCmdQueryWithdrawAddr(cdc *codec.Codec) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "withdraw-addr",
+		Short:   "Query the withdrawal address of a provider",
+		Example: "iriscli service withdraw-addr <provider>",
+		Args:    cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+
+			provider, err := sdk.AccAddressFromBech32(args[0])
+			if err != nil {
+				return err
+			}
+
+			params := service.QueryWithdrawAddressParams{
+				Provider: provider,
+			}
+
+			bz, err := cdc.MarshalJSON(params)
+			if err != nil {
+				return err
+			}
+
+			route := fmt.Sprintf("custom/%s/%s", protocol.ServiceRoute, service.QueryWithdrawAddress)
+			res, err := cliCtx.QueryWithData(route, bz)
+			if err != nil {
+				return err
+			}
+
+			var withdrawAddr sdk.AccAddress
+			if err := cdc.UnmarshalJSON(res, &withdrawAddr); err != nil {
+				return err
+			}
+
+			return cliCtx.PrintOutput(withdrawAddr)
+		},
+	}
+
+	return cmd
+}
+
+func GetCmdQueryServiceRequest(cdc *codec.Codec) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "request",
+		Short:   "Query a request by the request ID",
+		Example: "iriscli service request <request-id>",
+		Args:    cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+
+			params := service.QueryRequestParams{
+				RequestID: args[0],
+			}
+
+			bz, err := cdc.MarshalJSON(params)
+			if err != nil {
+				return err
+			}
+
+			route := fmt.Sprintf("custom/%s/%s", protocol.ServiceRoute, service.QueryRequest)
+			res, err := cliCtx.QueryWithData(route, bz)
+			if err != nil {
+				return err
+			}
+
+			var request service.Request
+			if err := cdc.UnmarshalJSON(res, &request); err != nil {
+				return err
+			}
+
+			return cliCtx.PrintOutput(request)
+		},
+	}
+
+	return cmd
+}
+
 func GetCmdQueryServiceRequests(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "requests",
@@ -236,7 +314,7 @@ func GetCmdQueryServiceResponse(cdc *codec.Codec) *cobra.Command {
 
 func GetCmdQueryServiceResponses(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "response",
+		Use:     "responses",
 		Short:   "Query responses by the request context ID and batch counter",
 		Example: "iriscli service responses <request-context-id> <batch-counter>",
 		Args:    cobra.ExactArgs(2),
