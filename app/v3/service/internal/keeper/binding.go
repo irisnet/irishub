@@ -16,7 +16,6 @@ func (k Keeper) AddServiceBinding(
 	provider sdk.AccAddress,
 	deposit sdk.Coins,
 	pricing string,
-	withdrawAddr sdk.AccAddress,
 ) sdk.Error {
 	if _, found := k.GetServiceDefinition(ctx, serviceName); !found {
 		return types.ErrUnknownServiceDefinition(k.codespace, serviceName)
@@ -37,14 +36,10 @@ func (k Keeper) AddServiceBinding(
 		return err
 	}
 
-	if len(withdrawAddr) == 0 {
-		withdrawAddr = provider
-	}
-
 	available := true
 	disabledTime := time.Time{}
 
-	svcBinding := types.NewServiceBinding(serviceName, provider, deposit, pricing, withdrawAddr, available, disabledTime)
+	svcBinding := types.NewServiceBinding(serviceName, provider, deposit, pricing, available, disabledTime)
 	k.SetServiceBinding(ctx, svcBinding)
 
 	return nil
@@ -93,24 +88,6 @@ func (k Keeper) UpdateServiceBinding(
 		}
 	}
 
-	k.SetServiceBinding(ctx, binding)
-
-	return nil
-}
-
-// SetWithdrawAddress sets a new withdrawal address for the specified service binding
-func (k Keeper) SetWithdrawAddress(
-	ctx sdk.Context,
-	serviceName string,
-	provider,
-	withdrawAddr sdk.AccAddress,
-) sdk.Error {
-	binding, found := k.GetServiceBinding(ctx, serviceName, provider)
-	if !found {
-		return types.ErrUnknownServiceBinding(k.codespace)
-	}
-
-	binding.WithdrawAddress = withdrawAddr
 	k.SetServiceBinding(ctx, binding)
 
 	return nil
@@ -244,6 +221,24 @@ func (k Keeper) GetServiceBinding(ctx sdk.Context, serviceName string, provider 
 
 	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &svcBinding)
 	return svcBinding, true
+}
+
+// SetWithdrawAddress sets the withdrawal address for the specified provider
+func (k Keeper) SetWithdrawAddress(ctx sdk.Context, provider, withdrawAddr sdk.AccAddress) {
+	store := ctx.KVStore(k.storeKey)
+	store.Set(GetWithdrawAddrKey(provider), withdrawAddr.Bytes())
+}
+
+// GetWithdrawAddress gets the withdrawal address of the specified provider
+func (k Keeper) GetWithdrawAddress(ctx sdk.Context, provider sdk.AccAddress) sdk.AccAddress {
+	store := ctx.KVStore(k.storeKey)
+
+	bz := store.Get(GetWithdrawAddrKey(provider))
+	if bz == nil {
+		return provider
+	}
+
+	return sdk.AccAddress(bz)
 }
 
 // ServiceBindingsIterator returns an iterator for all bindings of the specified service
