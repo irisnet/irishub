@@ -111,12 +111,11 @@ type defineServiceReq struct {
 }
 
 type bindServiceReq struct {
-	BaseTx          utils.BaseTx `json:"base_tx"` // basic tx info
-	ServiceName     string       `json:"service_name"`
-	Provider        string       `json:"provider"`
-	Deposit         string       `json:"deposit"`
-	Pricing         string       `json:"pricing"`
-	WithdrawAddress string       `json:"withdraw_address"`
+	BaseTx      utils.BaseTx `json:"base_tx"` // basic tx info
+	ServiceName string       `json:"service_name"`
+	Provider    string       `json:"provider"`
+	Deposit     string       `json:"deposit"`
+	Pricing     string       `json:"pricing"`
 }
 
 type updateServiceBindingReq struct {
@@ -252,13 +251,7 @@ func bindServiceHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Hand
 			return
 		}
 
-		withdrawAddr, err := sdk.AccAddressFromBech32(req.WithdrawAddress)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
-		msg := service.NewMsgBindService(req.ServiceName, provider, deposit, req.Pricing, withdrawAddr)
+		msg := service.NewMsgBindService(req.ServiceName, provider, deposit, req.Pricing)
 		if err := msg.ValidateBasic(); err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return

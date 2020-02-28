@@ -88,7 +88,7 @@ func GetCmdBindService(cdc *codec.Codec) *cobra.Command {
 		Use:   "bind",
 		Short: "Bind a service",
 		Example: "iriscli service bind --chain-id=<chain-id> --from=<key-name> --fee=0.3iris " +
-			"--service-name=<service name> --deposit=1iris --pricing=<service pricing> --withdraw-addr=<withdrawal address>",
+			"--service-name=<service name> --deposit=1iris --pricing=<service pricing>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
@@ -108,16 +108,6 @@ func GetCmdBindService(cdc *codec.Codec) *cobra.Command {
 			deposit, err := cliCtx.ParseCoins(depositStr)
 			if err != nil {
 				return err
-			}
-
-			var withdrawAddr sdk.AccAddress
-			withdrawAddrStr := viper.GetString(FlagWithdrawAddr)
-
-			if len(withdrawAddrStr) != 0 {
-				withdrawAddr, err = sdk.AccAddressFromBech32(withdrawAddrStr)
-				if err != nil {
-					return err
-				}
 			}
 
 			pricing := viper.GetString(FlagPricing)
@@ -142,7 +132,7 @@ func GetCmdBindService(cdc *codec.Codec) *cobra.Command {
 
 			pricing = buf.String()
 
-			msg := service.NewMsgBindService(serviceName, provider, deposit, pricing, withdrawAddr)
+			msg := service.NewMsgBindService(serviceName, provider, deposit, pricing)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}

@@ -131,21 +131,19 @@ func (msg MsgDefineService) GetSigners() []sdk.AccAddress {
 
 // MsgBindService defines a message to bind a service
 type MsgBindService struct {
-	ServiceName     string         `json:"service_name"`
-	Provider        sdk.AccAddress `json:"provider"`
-	Deposit         sdk.Coins      `json:"deposit"`
-	Pricing         string         `json:"pricing"`
-	WithdrawAddress sdk.AccAddress `json:"withdraw_address"`
+	ServiceName string         `json:"service_name"`
+	Provider    sdk.AccAddress `json:"provider"`
+	Deposit     sdk.Coins      `json:"deposit"`
+	Pricing     string         `json:"pricing"`
 }
 
 // NewMsgBindService creates a new MsgBindService instance
-func NewMsgBindService(serviceName string, provider sdk.AccAddress, deposit sdk.Coins, pricing string, withdrawAddr sdk.AccAddress) MsgBindService {
+func NewMsgBindService(serviceName string, provider sdk.AccAddress, deposit sdk.Coins, pricing string) MsgBindService {
 	return MsgBindService{
-		ServiceName:     serviceName,
-		Provider:        provider,
-		Deposit:         deposit,
-		Pricing:         pricing,
-		WithdrawAddress: withdrawAddr,
+		ServiceName: serviceName,
+		Provider:    provider,
+		Deposit:     deposit,
+		Pricing:     pricing,
 	}
 }
 

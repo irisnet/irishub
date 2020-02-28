@@ -16,7 +16,6 @@ func (k Keeper) AddServiceBinding(
 	provider sdk.AccAddress,
 	deposit sdk.Coins,
 	pricing string,
-	withdrawAddr sdk.AccAddress,
 ) sdk.Error {
 	if _, found := k.GetServiceDefinition(ctx, serviceName); !found {
 		return types.ErrUnknownServiceDefinition(k.codespace, serviceName)
@@ -42,10 +41,6 @@ func (k Keeper) AddServiceBinding(
 
 	svcBinding := types.NewServiceBinding(serviceName, provider, deposit, pricing, available, disabledTime)
 	k.SetServiceBinding(ctx, svcBinding)
-
-	if len(withdrawAddr) != 0 {
-		k.SetWithdrawAddress(ctx, provider, withdrawAddr)
-	}
 
 	return nil
 }

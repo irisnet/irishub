@@ -14,7 +14,6 @@ const (
 	FlagServiceName       = "service-name"
 	FlagDeposit           = "deposit"
 	FlagPricing           = "pricing"
-	FlagWithdrawAddr      = "withdraw-addr"
 	FlagProviders         = "providers"
 	FlagServiceFeeCap     = "service-fee-cap"
 	FlagTimeout           = "timeout"
@@ -48,7 +47,6 @@ func init() {
 	FsServiceBind.String(FlagServiceName, "", "service name")
 	FsServiceBind.String(FlagDeposit, "", "deposit of the binding")
 	FsServiceBind.String(FlagPricing, "", "pricing content or path")
-	FsServiceBind.String(FlagWithdrawAddr, "", "withdrawal address of the binding")
 
 	FsServiceUpdateBinding.String(FlagDeposit, "", "added deposit for the binding")
 	FsServiceUpdateBinding.String(FlagPricing, "", "new pricing of the binding, which is a Pricing JSON Schema instance")

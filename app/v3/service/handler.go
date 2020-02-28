@@ -63,8 +63,8 @@ func handleMsgDefineService(ctx sdk.Context, k Keeper, msg MsgDefineService) sdk
 // handleMsgBindService handles MsgBindService
 func handleMsgBindService(ctx sdk.Context, k Keeper, msg MsgBindService) sdk.Result {
 	if err := k.AddServiceBinding(
-		ctx, msg.ServiceName, msg.Provider, msg.Deposit,
-		msg.Pricing, msg.WithdrawAddress,
+		ctx, msg.ServiceName, msg.Provider,
+		msg.Deposit, msg.Pricing,
 	); err != nil {
 		return err.Result()
 	}

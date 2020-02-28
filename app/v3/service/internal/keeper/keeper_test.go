@@ -47,9 +47,7 @@ func setServiceDefinition(ctx sdk.Context, k Keeper, author sdk.AccAddress) {
 
 func setServiceBinding(ctx sdk.Context, k Keeper, provider sdk.AccAddress, available bool, disabledTime time.Time) {
 	svcBinding := types.NewServiceBinding(testServiceName, provider, testDeposit, testPricing, available, disabledTime)
-
 	k.SetServiceBinding(ctx, svcBinding)
-	k.SetWithdrawAddress(ctx, provider, testWithdrawAddr)
 }
 
 func setRequestContext(
@@ -118,7 +116,7 @@ func TestKeeper_Bind_Service(t *testing.T) {
 
 	setServiceDefinition(ctx, keeper, author)
 
-	err := keeper.AddServiceBinding(ctx, testServiceName, provider, testDeposit, testPricing, testWithdrawAddr)
+	err := keeper.AddServiceBinding(ctx, testServiceName, provider, testDeposit, testPricing)
 	require.NoError(t, err)
 
 	svcBinding, found := keeper.GetServiceBinding(ctx, testServiceName, provider)
@@ -130,9 +128,6 @@ func TestKeeper_Bind_Service(t *testing.T) {
 	require.Equal(t, testPricing, svcBinding.Pricing)
 	require.True(t, svcBinding.Available)
 	require.True(t, svcBinding.DisabledTime.IsZero())
-
-	withdrawAddr := keeper.GetWithdrawAddress(ctx, provider)
-	require.Equal(t, testWithdrawAddr, withdrawAddr)
 
 	// update binding
 	err = keeper.UpdateServiceBinding(ctx, svcBinding.ServiceName, svcBinding.Provider, testAddedDeposit, testPricing)
@@ -148,17 +143,16 @@ func TestKeeper_Set_Withdraw_Address(t *testing.T) {
 	ctx, keeper, accs := createTestInput(t, sdk.NewIntWithDecimal(2000, 18), 2)
 
 	provider := accs[0].GetAddress()
-	newWithdrawAddr := accs[1].GetAddress()
 
 	setServiceBinding(ctx, keeper, provider, true, time.Time{})
 
 	withdrawAddr := keeper.GetWithdrawAddress(ctx, provider)
-	require.Equal(t, testWithdrawAddr, withdrawAddr)
+	require.Equal(t, provider, withdrawAddr)
 
-	keeper.SetWithdrawAddress(ctx, provider, newWithdrawAddr)
+	keeper.SetWithdrawAddress(ctx, provider, testWithdrawAddr)
 
 	withdrawAddr = keeper.GetWithdrawAddress(ctx, provider)
-	require.Equal(t, newWithdrawAddr, withdrawAddr)
+	require.Equal(t, testWithdrawAddr, withdrawAddr)
 }
 
 func TestKeeper_Disable_Service(t *testing.T) {
