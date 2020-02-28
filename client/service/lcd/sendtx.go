@@ -493,7 +493,7 @@ func requestServiceHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.H
 			return
 		}
 
-		serviceFeeCap, err := sdk.ParseCoins(req.ServiceFeeCap)
+		serviceFeeCap, err := cliCtx.ParseCoins(req.ServiceFeeCap)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -707,7 +707,7 @@ func updateRequestContextHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) 
 		var serviceFeeCap sdk.Coins
 
 		if len(req.ServiceFeeCap) != 0 {
-			serviceFeeCap, err = sdk.ParseCoins(req.ServiceFeeCap)
+			serviceFeeCap, err = cliCtx.ParseCoins(req.ServiceFeeCap)
 			if err != nil {
 				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 				return
