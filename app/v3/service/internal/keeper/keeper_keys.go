@@ -39,7 +39,7 @@ func GetServiceBindingKey(serviceName string, provider sdk.AccAddress) []byte {
 
 // GetWithdrawAddrKey returns the key for the withdrawal address of the specified provider
 func GetWithdrawAddrKey(provider sdk.AccAddress) []byte {
-	return append(withdrawAddrKey, []byte(provider.String())...)
+	return append(withdrawAddrKey, provider.Bytes()...)
 }
 
 // GetBindingsSubspace returns the key for retrieving all bindings of the specified service
