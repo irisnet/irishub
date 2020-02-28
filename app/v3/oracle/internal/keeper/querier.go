@@ -58,7 +58,11 @@ func queryFeeds(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sdk.E
 			result = append(result, buildFeedContext(ctx, k, feed))
 		})
 	} else {
-		k.IteratorFeedsByState(ctx, types.StateFromString(params.State), func(feed types.Feed) {
+		state, err := types.RequestContextStateFromString(params.State)
+		if err != nil {
+			return nil, sdk.ParseParamsErr(err)
+		}
+		k.IteratorFeedsByState(ctx, state, func(feed types.Feed) {
 			result = append(result, buildFeedContext(ctx, k, feed))
 		})
 	}

@@ -1,8 +1,6 @@
 package types
 
 import (
-	"strings"
-
 	service "github.com/irisnet/irishub/app/v3/service/exported"
 	"github.com/irisnet/irishub/modules/guardian"
 	sdk "github.com/irisnet/irishub/types"
@@ -51,10 +49,6 @@ type GuardianKeeper interface {
 	GetProfiler(ctx sdk.Context, addr sdk.AccAddress) (guardian guardian.Guardian, found bool)
 }
 
-func StateFromString(state string) service.RequestContextState {
-	state = strings.ToLower(strings.TrimSpace(state))
-	if state == "running" {
-		return service.RUNNING
-	}
-	return service.PAUSED
-}
+var (
+	RequestContextStateFromString = service.RequestContextStateFromString
+)
