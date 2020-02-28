@@ -131,21 +131,19 @@ func (msg MsgDefineService) GetSigners() []sdk.AccAddress {
 
 // MsgBindService defines a message to bind a service
 type MsgBindService struct {
-	ServiceName     string         `json:"service_name"`
-	Provider        sdk.AccAddress `json:"provider"`
-	Deposit         sdk.Coins      `json:"deposit"`
-	Pricing         string         `json:"pricing"`
-	WithdrawAddress sdk.AccAddress `json:"withdraw_address"`
+	ServiceName string         `json:"service_name"`
+	Provider    sdk.AccAddress `json:"provider"`
+	Deposit     sdk.Coins      `json:"deposit"`
+	Pricing     string         `json:"pricing"`
 }
 
 // NewMsgBindService creates a new MsgBindService instance
-func NewMsgBindService(serviceName string, provider sdk.AccAddress, deposit sdk.Coins, pricing string, withdrawAddr sdk.AccAddress) MsgBindService {
+func NewMsgBindService(serviceName string, provider sdk.AccAddress, deposit sdk.Coins, pricing string) MsgBindService {
 	return MsgBindService{
-		ServiceName:     serviceName,
-		Provider:        provider,
-		Deposit:         deposit,
-		Pricing:         pricing,
-		WithdrawAddress: withdrawAddr,
+		ServiceName: serviceName,
+		Provider:    provider,
+		Deposit:     deposit,
+		Pricing:     pricing,
 	}
 }
 
@@ -255,17 +253,15 @@ func (msg MsgUpdateServiceBinding) GetSigners() []sdk.AccAddress {
 
 //______________________________________________________________________
 
-// MsgSetWithdrawAddress defines a message to set the withdrawal address for a service binding
+// MsgSetWithdrawAddress defines a message to set the withdrawal address for a provider
 type MsgSetWithdrawAddress struct {
-	ServiceName     string         `json:"service_name"`
 	Provider        sdk.AccAddress `json:"provider"`
 	WithdrawAddress sdk.AccAddress `json:"withdraw_address"`
 }
 
 // NewMsgSetWithdrawAddress creates a new MsgSetWithdrawAddress instance
-func NewMsgSetWithdrawAddress(serviceName string, provider sdk.AccAddress, withdrawAddr sdk.AccAddress) MsgSetWithdrawAddress {
+func NewMsgSetWithdrawAddress(provider sdk.AccAddress, withdrawAddr sdk.AccAddress) MsgSetWithdrawAddress {
 	return MsgSetWithdrawAddress{
-		ServiceName:     serviceName,
 		Provider:        provider,
 		WithdrawAddress: withdrawAddr,
 	}
@@ -291,10 +287,6 @@ func (msg MsgSetWithdrawAddress) GetSignBytes() []byte {
 func (msg MsgSetWithdrawAddress) ValidateBasic() sdk.Error {
 	if len(msg.Provider) == 0 {
 		return ErrInvalidAddress(DefaultCodespace, "provider missing")
-	}
-
-	if err := ValidateServiceName(msg.ServiceName); err != nil {
-		return err
 	}
 
 	if len(msg.WithdrawAddress) == 0 {

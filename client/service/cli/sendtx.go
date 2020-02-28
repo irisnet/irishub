@@ -88,7 +88,7 @@ func GetCmdBindService(cdc *codec.Codec) *cobra.Command {
 		Use:   "bind",
 		Short: "Bind a service",
 		Example: "iriscli service bind --chain-id=<chain-id> --from=<key-name> --fee=0.3iris " +
-			"--service-name=<service name> --deposit=1iris --pricing=<service pricing> --withdraw-addr=<withdrawal address>",
+			"--service-name=<service name> --deposit=1iris --pricing=<service pricing>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
@@ -108,16 +108,6 @@ func GetCmdBindService(cdc *codec.Codec) *cobra.Command {
 			deposit, err := cliCtx.ParseCoins(depositStr)
 			if err != nil {
 				return err
-			}
-
-			var withdrawAddr sdk.AccAddress
-			withdrawAddrStr := viper.GetString(FlagWithdrawAddr)
-
-			if len(withdrawAddrStr) != 0 {
-				withdrawAddr, err = sdk.AccAddressFromBech32(withdrawAddrStr)
-				if err != nil {
-					return err
-				}
 			}
 
 			pricing := viper.GetString(FlagPricing)
@@ -142,7 +132,7 @@ func GetCmdBindService(cdc *codec.Codec) *cobra.Command {
 
 			pricing = buf.String()
 
-			msg := service.NewMsgBindService(serviceName, provider, deposit, pricing, withdrawAddr)
+			msg := service.NewMsgBindService(serviceName, provider, deposit, pricing)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -230,9 +220,9 @@ func GetCmdUpdateServiceBinding(cdc *codec.Codec) *cobra.Command {
 func GetCmdSetWithdrawAddr(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "set-withdraw-addr",
-		Short: "Set a new withdrawal address for a service binding",
-		Example: "iriscli service set-withdraw-addr <service name> --chain-id=<chain-id> --from=<key-name> " +
-			"--fee=0.3iris --withdraw-addr=<withdrawal address>",
+		Short: "Set a new withdrawal address for a provider",
+		Example: "iriscli service set-withdraw-addr <withdrawal address> --chain-id=<chain-id> " +
+			"--from=<key-name> --fee=0.3iris",
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
@@ -247,13 +237,12 @@ func GetCmdSetWithdrawAddr(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			withdrawAddrStr := viper.GetString(FlagWithdrawAddr)
-			withdrawAddr, err := sdk.AccAddressFromBech32(withdrawAddrStr)
+			withdrawAddr, err := sdk.AccAddressFromBech32(args[0])
 			if err != nil {
 				return err
 			}
 
-			msg := service.NewMsgSetWithdrawAddress(args[0], provider, withdrawAddr)
+			msg := service.NewMsgSetWithdrawAddress(provider, withdrawAddr)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -261,9 +250,6 @@ func GetCmdSetWithdrawAddr(cdc *codec.Codec) *cobra.Command {
 			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 		},
 	}
-
-	cmd.Flags().AddFlagSet(FsServiceSetWithdrawAddr)
-	_ = cmd.MarkFlagRequired(FlagWithdrawAddr)
 
 	return cmd
 }
@@ -597,7 +583,7 @@ func GetCmdUpdateRequestContext(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "update",
 		Short: "Update a request context",
-		Example: "iriscli service update-request-context <request-context-id> --chain-id=<chain-id> --from=<key name> --fee=0.3iris " +
+		Example: "iriscli service update <request-context-id> --chain-id=<chain-id> --from=<key name> --fee=0.3iris " +
 			"--providers=<new providers> --service-fee-cap=2iris --timeout=0 --frequency=200 --total=200",
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {

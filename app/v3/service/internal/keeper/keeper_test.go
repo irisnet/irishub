@@ -26,7 +26,7 @@ var (
 
 	testDeposit      = sdk.NewCoins(testCoin1)
 	testPricing      = `{"price":[{"denom":"iris-atto","amount":"1000000000000000000"}]}`
-	testWithdrawAddr = sdk.AccAddress{}
+	testWithdrawAddr = sdk.AccAddress([]byte("test-withdrawal-address"))
 	testAddedDeposit = sdk.NewCoins(testCoin2)
 
 	testInput         = `{"pair":"iris-usdt"}`
@@ -46,7 +46,7 @@ func setServiceDefinition(ctx sdk.Context, k Keeper, author sdk.AccAddress) {
 }
 
 func setServiceBinding(ctx sdk.Context, k Keeper, provider sdk.AccAddress, available bool, disabledTime time.Time) {
-	svcBinding := types.NewServiceBinding(testServiceName, provider, testDeposit, testPricing, testWithdrawAddr, available, disabledTime)
+	svcBinding := types.NewServiceBinding(testServiceName, provider, testDeposit, testPricing, available, disabledTime)
 	k.SetServiceBinding(ctx, svcBinding)
 }
 
@@ -116,7 +116,7 @@ func TestKeeper_Bind_Service(t *testing.T) {
 
 	setServiceDefinition(ctx, keeper, author)
 
-	err := keeper.AddServiceBinding(ctx, testServiceName, provider, testDeposit, testPricing, testWithdrawAddr)
+	err := keeper.AddServiceBinding(ctx, testServiceName, provider, testDeposit, testPricing)
 	require.NoError(t, err)
 
 	svcBinding, found := keeper.GetServiceBinding(ctx, testServiceName, provider)
@@ -126,7 +126,6 @@ func TestKeeper_Bind_Service(t *testing.T) {
 	require.Equal(t, provider, svcBinding.Provider)
 	require.Equal(t, testDeposit, svcBinding.Deposit)
 	require.Equal(t, testPricing, svcBinding.Pricing)
-	require.Equal(t, provider, svcBinding.WithdrawAddress)
 	require.True(t, svcBinding.Available)
 	require.True(t, svcBinding.DisabledTime.IsZero())
 
@@ -144,17 +143,16 @@ func TestKeeper_Set_Withdraw_Address(t *testing.T) {
 	ctx, keeper, accs := createTestInput(t, sdk.NewIntWithDecimal(2000, 18), 2)
 
 	provider := accs[0].GetAddress()
-	withdrawAddr := accs[1].GetAddress()
 
 	setServiceBinding(ctx, keeper, provider, true, time.Time{})
 
-	err := keeper.SetWithdrawAddress(ctx, testServiceName, provider, withdrawAddr)
-	require.NoError(t, err)
+	withdrawAddr := keeper.GetWithdrawAddress(ctx, provider)
+	require.Equal(t, provider, withdrawAddr)
 
-	svcBinding, found := keeper.GetServiceBinding(ctx, testServiceName, provider)
-	require.True(t, found)
+	keeper.SetWithdrawAddress(ctx, provider, testWithdrawAddr)
 
-	require.Equal(t, withdrawAddr, svcBinding.WithdrawAddress)
+	withdrawAddr = keeper.GetWithdrawAddress(ctx, provider)
+	require.Equal(t, testWithdrawAddr, withdrawAddr)
 }
 
 func TestKeeper_Disable_Service(t *testing.T) {
