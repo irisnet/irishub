@@ -37,17 +37,15 @@ func (k Keeper) AddServiceBinding(
 		return err
 	}
 
-	if len(withdrawAddr) == 0 {
-		withdrawAddr = provider
-	}
-
 	available := true
 	disabledTime := time.Time{}
 
 	svcBinding := types.NewServiceBinding(serviceName, provider, deposit, pricing, available, disabledTime)
 	k.SetServiceBinding(ctx, svcBinding)
 
-	k.SetWithdrawAddress(ctx, provider, withdrawAddr)
+	if len(withdrawAddr) != 0 {
+		k.SetWithdrawAddress(ctx, provider, withdrawAddr)
+	}
 
 	return nil
 }
@@ -231,24 +229,21 @@ func (k Keeper) GetServiceBinding(ctx sdk.Context, serviceName string, provider 
 }
 
 // SetWithdrawAddress sets the withdrawal address for the specified provider
-func (k Keeper) SetWithdrawAddress(ctx sdk.Context, provider sdk.AccAddress, withdrawAddr sdk.AccAddress) {
+func (k Keeper) SetWithdrawAddress(ctx sdk.Context, provider, withdrawAddr sdk.AccAddress) {
 	store := ctx.KVStore(k.storeKey)
-
-	bz := k.cdc.MustMarshalBinaryLengthPrefixed(withdrawAddr)
-	store.Set(GetWithdrawAddrKey(provider), bz)
+	store.Set(GetWithdrawAddrKey(provider), withdrawAddr.Bytes())
 }
 
 // GetWithdrawAddress gets the withdrawal address of the specified provider
-func (k Keeper) GetWithdrawAddress(ctx sdk.Context, provider sdk.AccAddress) (withdrawAddr sdk.AccAddress, found bool) {
+func (k Keeper) GetWithdrawAddress(ctx sdk.Context, provider sdk.AccAddress) sdk.AccAddress {
 	store := ctx.KVStore(k.storeKey)
 
 	bz := store.Get(GetWithdrawAddrKey(provider))
 	if bz == nil {
-		return withdrawAddr, false
+		return provider
 	}
 
-	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &withdrawAddr)
-	return withdrawAddr, true
+	return sdk.AccAddress(bz)
 }
 
 // ServiceBindingsIterator returns an iterator for all bindings of the specified service

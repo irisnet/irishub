@@ -131,6 +131,9 @@ func TestKeeper_Bind_Service(t *testing.T) {
 	require.True(t, svcBinding.Available)
 	require.True(t, svcBinding.DisabledTime.IsZero())
 
+	withdrawAddr := keeper.GetWithdrawAddress(ctx, provider)
+	require.Equal(t, testWithdrawAddr, withdrawAddr)
+
 	// update binding
 	err = keeper.UpdateServiceBinding(ctx, svcBinding.ServiceName, svcBinding.Provider, testAddedDeposit, testPricing)
 	require.NoError(t, err)
@@ -149,16 +152,12 @@ func TestKeeper_Set_Withdraw_Address(t *testing.T) {
 
 	setServiceBinding(ctx, keeper, provider, true, time.Time{})
 
-	withdrawAddr, found := keeper.GetWithdrawAddress(ctx, provider)
-	require.True(t, found)
-
+	withdrawAddr := keeper.GetWithdrawAddress(ctx, provider)
 	require.Equal(t, testWithdrawAddr, withdrawAddr)
 
 	keeper.SetWithdrawAddress(ctx, provider, newWithdrawAddr)
 
-	withdrawAddr, found = keeper.GetWithdrawAddress(ctx, provider)
-	require.True(t, found)
-
+	withdrawAddr = keeper.GetWithdrawAddress(ctx, provider)
 	require.Equal(t, newWithdrawAddr, withdrawAddr)
 }
 

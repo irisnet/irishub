@@ -112,10 +112,7 @@ func queryWithdrawAddress(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]b
 		return nil, sdk.ParseParamsErr(err)
 	}
 
-	withdrawAddr, found := k.GetWithdrawAddress(ctx, params.Provider)
-	if !found {
-		return nil, types.ErrNoWithdrawAddr(types.DefaultCodespace, params.Provider)
-	}
+	withdrawAddr := k.GetWithdrawAddress(ctx, params.Provider)
 
 	bz, err := codec.MarshalJSONIndent(k.cdc, withdrawAddr)
 	if err != nil {

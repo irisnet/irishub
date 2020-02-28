@@ -832,7 +832,7 @@ func (k Keeper) WithdrawEarnedFees(ctx sdk.Context, provider sdk.AccAddress) sdk
 		return types.ErrNoEarnedFees(k.codespace, provider)
 	}
 
-	withdrawAddr, _ := k.GetWithdrawAddress(ctx, provider)
+	withdrawAddr := k.GetWithdrawAddress(ctx, provider)
 
 	_, err := k.bk.SendCoins(ctx, auth.ServiceRequestCoinsAccAddr, withdrawAddr, fees.Coins)
 	if err != nil {
