@@ -25,3 +25,7 @@ const (
 	// COMPLETED indicates the request context is completed
 	COMPLETED = types.COMPLETED
 )
+
+var (
+	RequestContextStateFromString = types.RequestContextStateFromString
+)

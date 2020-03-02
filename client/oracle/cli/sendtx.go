@@ -16,7 +16,7 @@ import (
 func GetCmdCreateFeed(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create",
-		Short: `define a new feed,the feed will be in "paused" state`,
+		Short: `Define a new feed,the feed will be in "paused" state`,
 		Example: `iriscli oracle create --chain-id="irishub-test" --from=node0 --fee=0.3iris  --commit ` +
 			`--feed-name="test-feed" ` +
 			`--latest-history=10 ` +
@@ -96,7 +96,7 @@ func GetCmdCreateFeed(cdc *codec.Codec) *cobra.Command {
 func GetCmdStartFeed(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "start",
-		Short:   `start a Feed in "paused" state`,
+		Short:   `Start a feed in "paused" state`,
 		Args:    cobra.ExactArgs(1),
 		Example: `iriscli oracle start <feed-name> --chain-id="irishub-test" --from=<creator> --fee=0.3iris --commit `,
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -130,7 +130,7 @@ func GetCmdStartFeed(cdc *codec.Codec) *cobra.Command {
 func GetCmdPauseFeed(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "pause",
-		Short:   `pause a Feed in "running" state`,
+		Short:   `Pause a feed in "running" state`,
 		Args:    cobra.ExactArgs(1),
 		Example: `iriscli oracle pause <feed-name> --chain-id="irishub-test" --from=<creator> --fee=0.3iris --commit  `,
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -164,9 +164,9 @@ func GetCmdPauseFeed(cdc *codec.Codec) *cobra.Command {
 func GetCmdEditFeed(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "edit",
-		Short: "modify Feed information and update service invocation parameters by Feed creator",
-		Example: `iriscli oracle edit --chain-id="irishub-test" --from=<creator> --fee=0.3iris --commit  ` +
-			`--feed-name=<feed-name> ` +
+		Short: "Modify the feed information and update service invocation parameters by feed creator",
+		Args:  cobra.ExactArgs(1),
+		Example: `iriscli oracle edit <feed-name> --chain-id="irishub-test" --from=<creator> --fee=0.3iris --commit  ` +
 			`--latest-history=10 ` +
 			`--providers="faa1r3tyupskwlh07dmhjw70frxzaaaufta37y25yr,faa1ydahnhrhkjh9j9u0jn8p3s272l0ecqj40vra8h"` +
 			`--service-fee-cap=1iris ` +
@@ -202,7 +202,7 @@ func GetCmdEditFeed(cdc *codec.Codec) *cobra.Command {
 			}
 
 			msg := oracle.MsgEditFeed{
-				FeedName:          viper.GetString(FlagFeedName),
+				FeedName:          args[0],
 				Description:       viper.GetString(FlagDescription),
 				LatestHistory:     uint64(viper.GetInt64(FlagLatestHistory)),
 				Providers:         providers,
@@ -221,6 +221,5 @@ func GetCmdEditFeed(cdc *codec.Codec) *cobra.Command {
 		},
 	}
 	cmd.Flags().AddFlagSet(FsEditFeed)
-	_ = cmd.MarkFlagRequired(FlagFeedName)
 	return cmd
 }
