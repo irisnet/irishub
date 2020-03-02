@@ -109,10 +109,9 @@ func TestIrisCLIOracle(t *testing.T) {
 	//edit feed
 	description = "feed-eth"
 	//TODO
-	efCmdStr := fmt.Sprintf("iriscli oracle edit %v", flags)
+	efCmdStr := fmt.Sprintf("iriscli oracle edit %s %v", feedName, flags)
 	efCmdStr += fmt.Sprintf(" --from=%s", "foo")
 	efCmdStr += fmt.Sprintf(" --fee=%s", "0.4iris")
-	efCmdStr += fmt.Sprintf(" --feed-name=%s", feedName)
 	efCmdStr += fmt.Sprintf(" --description=%s", description)
 	executeWrite(t, efCmdStr, sdk.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(1, port)
