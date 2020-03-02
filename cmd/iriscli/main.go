@@ -212,6 +212,7 @@ func main() {
 			servicecmd.GetCmdQueryServiceDefinition(cdc),
 			servicecmd.GetCmdQueryServiceBinding(cdc),
 			servicecmd.GetCmdQueryServiceBindings(cdc),
+			servicecmd.GetCmdQueryWithdrawAddr(cdc),
 			servicecmd.GetCmdQueryServiceRequest(cdc),
 			servicecmd.GetCmdQueryServiceRequests(cdc),
 			servicecmd.GetCmdQueryServiceResponse(cdc),
