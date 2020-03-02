@@ -6,26 +6,34 @@ Service module allows you to define, bind, invoke services on the IRIS Hub. [Rea
 
 | Name                                              | Description                                           |
 | ------------------------------------------------- | ----------------------------------------------------- |
-| [define](#iriscli-service-define)                 | Create a new service definition                       |
-| [definition](#iriscli-service-definition)         | Query service definition                              |
-| [bind](#iriscli-service-bind)                     | Create a new service binding                          |
-| [binding](#iriscli-service-binding)               | Query service binding                                 |
-| [bindings](#iriscli-service-bindings)             | Query service bindings                                |
+| [define](#iriscli-service-define)                 | Define a new service                      |
+| [definition](#iriscli-service-definition)         | Query a service definition                              |
+| [bind](#iriscli-service-bind)                     | Bind a service                     |
+| [binding](#iriscli-service-binding)               | Query a service binding                                 |
+| [bindings](#iriscli-service-bindings)             | Query all bindings of a service definition                              |
+| [set-withdraw-addr](#iriscli-service-set-withdraw-addr)             | Set a withdrawal address for a provider                              |
+| [withdraw-addr](#iriscli-service-withdraw-addr)             | Query the withdrawal address of a provider                              |
 | [update-binding](#iriscli-service-update-binding) | Update a service binding                              |
-| [disable](#iriscli-service-disable)               | Disable a available service binding                   |
+| [disable](#iriscli-service-disable)               | Disable an available service binding                   |
 | [enable](#iriscli-service-enable)                 | Enable an unavailable service binding                 |
 | [refund-deposit](#iriscli-service-refund-deposit) | Refund all deposit from a service binding             |
-| [call](#iriscli-service-call)                     | Call a service method                                 |
-| [requests](#iriscli-service-requests)             | Query service requests                                |
-| [respond](#iriscli-service-respond)               | Respond a service method invocation                   |
-| [response](#iriscli-service-response)             | Query a service response                              |
-| [fees](#iriscli-service-fees)                     | Query return and incoming fee of a particular address |
-| [refund-fees](#iriscli-service-refund-fees)       | Refund all fees from service return fees              |
-| [withdraw-fees](#iriscli-service-withdraw-fees)   | Withdraw all fees from service incoming fees          |
+| [call](#iriscli-service-call)                     | Call a service                                 |
+| [request](#iriscli-service-request)             | Query a request by the request ID                          |
+| [requests](#iriscli-service-requests)             | Query service requests by the service binding or request context ID                          |
+| [respond](#iriscli-service-respond)               | Respond to a service request                  |
+| [response](#iriscli-service-response)             | Query a response by the request ID                             |
+| [responses](#iriscli-service-responses)             | Query responses by the request context ID and batch counter                             |
+| [request-context](#iriscli-service-request-context)             | Query a request context                             |
+| [update](#iriscli-service-update)             | Update a request context                             |
+| [pause](#iriscli-service-pause)             | Pause a request context                             |
+| [start](#iriscli-service-start)             | Resume a paused request context                             |
+| [kill](#iriscli-service-kill)             | Terminate a request context                             |
+| [fees](#iriscli-service-fees)                     | Query the earned fees of a provider |
+| [withdraw-fees](#iriscli-service-withdraw-fees)   | Withdraw the earned fees of a provider          |
 
 ## iriscli service define
 
-Create a new service definition.
+Define a new service.
 
 ```bash
 iriscli service define <flags>
@@ -35,57 +43,45 @@ iriscli service define <flags>
 
 | Name, shorthand       | Default | Description                                                        | Required |
 | --------------------- | ------- | ------------------------------------------------------------------ | -------- |
-| --service-description |         | Service description                                                |          |
+| --name        |         | Service name                                                       | Yes      |
+| --description |         | Service description                                                |          |
 | --author-description  |         | Service author description                                         |          |
-| --service-name        |         | Service name                                                       | Yes      |
 | --tags                |         | Service tags                                                       |          |
-| --idl-content         |         | Content of service interface description language                  |          |
-| --file                |         | Path of file which contains service interface description language |          |
+| --schemas        |         | Service interface schemas content or path                  | Yes    |
 
 ### define a service
 
 ```bash
-iriscli service define --chain-id=<chain-id>  --from=<key-name> --fee=0.3iris --service-name=<service-name> --service-description=<service-description> --author-description=<author-description> --tags=tag1,tag2 --idl-content=<idl-content> --file=test.proto
+iriscli service define --chain-id=<chain-id> --from=<key-name> --fee=0.3iris 
+--name=<service name> --description=<service description> --author-description=<author description>
+--tags=tag1,tag2 --schemas=<schemas content or path/to/schemas.json>
 ```
 
-Idl-content can be replaced by file if the file item is not empty.  [Example of IDL content](#idl-content-example).
-
-### IDL content example
+### Schemas content example
 
 * idl-content example
 
     > syntax = \\"proto3\\";\n\npackage helloworld;\n\n// The greeting service definition.\nservice Greeter {\n    //@Attribute description: sayHello\n    //@Attribute output-privacy: NoPrivacy\n    //@Attribute output-cached: NoCached\n    rpc SayHello (HelloRequest) returns (HelloReply) {}\n}\n\n// The request message containing the user's name.\nmessage HelloRequest {\n    string name = 1;\n}\n\n// The response message containing the greetings\nmessage HelloReply {\n    string message = 1;\n}\n
 
-* IDL file example
-
-    [test.proto](https://github.com/irisnet/irishub/blob/master/docs/features/test.proto)
-
 ## iriscli service definition
 
-Query service definition.
+Query a service definition.
 
 ```bash
-iriscli service definition <flags>
+iriscli service definition <service name>
 ```
-
-**Flags:**
-
-| Name, shorthand | Default | Description                                     | Required |
-| --------------- | ------- | ----------------------------------------------- | -------- |
-| --def-chain-id  |         | The ID of the blockchain defined of the service | Yes      |
-| --service-name  |         | Service name                                    | Yes      |
 
 ### Query a service definition
 
-Query the detail info of the service definition which has the specified define chain id and service name.
+Query the detailed info of the service definition with the specified service name.
 
 ```bash
-iriscli service definition --def-chain-id=<service-define-chain-id> --service-name=<service-name>
+iriscli service definition <service name>
 ```
 
 ## iriscli service bind
 
-Create a new service binding.
+Bind a service.
 
 ```bash
 iriscli service bind <flags>
@@ -95,64 +91,50 @@ iriscli service bind <flags>
 
 | Name, shorthand | Default | Description                                                               | Required |
 | --------------- | ------- | ------------------------------------------------------------------------- | -------- |
-| --avg-rsp-time  |         | The average service response time in milliseconds                         | Yes      |
-| --bind-type     |         | Type of binding, valid values can be Local and Global                     | Yes      |
-| --def-chain-id  |         | The ID of the blockchain defined of the service                           | Yes      |
-| --deposit       |         | Deposit of binding                                                        | Yes      |
-| --prices        |         | Prices of binding, will contains all method                               |          |
 | --service-name  |         | Service name                                                              | Yes      |
-| --usable-time   |         | An integer represents the number of usable service invocations per 10,000 | Yes      |
+| --deposit       |         | Deposit of the binding                                                        | Yes      |
+| --pricing        |        | Pricing of the binding, which is an instance of the Irishub Service Pricing schema                           | Yes          |
 
-### Add a binding to an existing service definition
+### Bind an existing service definition
 
-In service binding, you need to define a `deposit`, the minimum mortgage amount of this `deposit` is `price` * `MinDepositMultiple` (defined by system parameters, can be modified through governance).
+The deposit needs to satisfy the minimum requirement, which is the maximal one between `price` * `MinDepositMultiple` and `MinDeposit`(`MinDepositMultiple` and `MinDeposit` are the system parameters, which can be modified through the governance).
+
+The pricing must contain a `price` property which represents the base price of the service binding.
 
 ```bash
-iriscli service bind --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --service-name=<service-name> --def-chain-id=<service-define-chain-id> --bind-type=Local --deposit=1000iris --prices=1iris --avg-rsp-time=10000 --usable-time=9999
+iriscli service bind --chain-id=<chain-id> --from=<key-name> --fee=0.3iris
+--service-name=<service name> --deposit=10000iris --pricing=<pricing>
 ```
+
+### Pricing example
+
 
 ## iriscli service binding
 
-Query service binding.
+Query a service binding.
 
 ```bash
-iriscli service binding <flags>
+iriscli service binding <service name> <provider>
 ```
-
-**Flags:**
-
-| Name, shorthand | Default | Description                                        | Required |
-| --------------- | ------- | -------------------------------------------------- | -------- |
-| --bind-chain-id |         | The ID of the blockchain bond of the service       | Yes      |
-| --def-chain-id  |         | The ID of the blockchain defined of the service    | Yes      |
-| --provider      |         | Bech32 encoded account created the service binding | Yes      |
-| --service-name  |         | Service name                                       | Yes      |
 
 ### Query a service binding
 
 ```bash
-iriscli service binding --def-chain-id=<service-define-chain-id> --service-name=<service-name> --bind-chain-id=<service-bind-chain-id> --provider=<provider-address>
+iriscli service binding <service name> <provider>
 ```
 
 ## iriscli service bindings
 
-Query service bindings.
+Query all bindings of a service definition.
 
 ```bash
-iriscli service bindings <flags>
+iriscli service bindings <service name>
 ```
-
-**Flags:**
-
-| Name, shorthand | Default | Description                                     | Required |
-| --------------- | ------- | ----------------------------------------------- | -------- |
-| --def-chain-id  |         | The ID of the blockchain defined of the service | Yes      |
-| --service-name  |         | Service name                                    | Yes      |
 
 ### Query service binding list
 
 ```bash
-iriscli service bindings --def-chain-id=<chain-id> --service-name=<service-name>
+iriscli service bindings <service name>
 ```
 
 ## iriscli service update-binding
@@ -164,67 +146,56 @@ iriscli service update-binding <flags>
 ```
 
 **Flags:**
+
 | Name, shorthand | Default | Description                                                               | Required |
 | --------------- | ------- | ------------------------------------------------------------------------- | -------- |
-| --avg-rsp-time  |         | The average service response time in milliseconds                         |          |
-| --bind-type     |         | Type of binding, valid values can be Local and Global                     |          |
-| --def-chain-id  |         | The ID of the blockchain defined of the service                           | Yes      |
-| --deposit       |         | Deposit of binding, will add to the current deposit balance               |          |
-| --prices        |         | Prices of binding, will contains all method                               |          |
 | --service-name  |         | Service name                                                              | Yes      |
-| --usable-time   |         | An integer represents the number of usable service invocations per 10,000 |          |
+| --deposit       |         | Deposit to be increased to the binding             |          |
+| --pricing        |         | New pricing of the binding, which is an instance of the Irishub Service Pricing schema        |
 
 ### Update an existing service binding
 
-The following example updates a service binding alone with 10iris additional deposit.
+The following example updates the service binding with the additional 10iris deposit
 
 ```bash
-iriscli service update-binding --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --service-name=<service-name> --def-chain-id=<service-define-chain-id> --bind-type=Local --deposit=10iris --prices=1iris --avg-rsp-time=10000 --usable-time=9999
+iriscli service update-binding --chain-id=<chain-id> --from=<key-name> --fee=0.3iris 
+--service-name=<service-name> --deposit=10iris
 ```
 
 ## iriscli service disable
 
-Disable an active service binding.
+Disable an available service binding.
 
 ```bash
-iriscli service disable <flags>
+iriscli service disable <service name>
 ```
 
-**Flags:**
-
-| Name, shorthand | Default | Description                                     | Required |
-| --------------- | ------- | ----------------------------------------------- | -------- |
-| --def-chain-id  |         | The ID of the blockchain defined of the service | Yes      |
-| --service-name  |         | Service name                                    | Yes      |
-
-### Disable an active service binding
+### Disable an available service binding
 
 ```bash
-iriscli service disable --chain-id=<chain-id>  --from=<key-name> --fee=0.3iris --def-chain-id=<service-define-chain-id> --service-name=<service>
+iriscli service disable <service name> --chain-id=<chain-id> --from=<key-name> --fee=0.3iris
 ```
 
 ## iriscli service enable
 
-Enable an inactive service binding.
+Enable an unavailable service binding.
 
 ```bash
-iriscli service enable <flags>
+iriscli service enable <service name> <flags>
 ```
 
 **Flags:**
 
 | Name, shorthand  | Default | Description                                                 | Required |
 | ---------------- | ------- | ----------------------------------------------------------- | -------- |
-| --def-chain-id   |         | The ID of the blockchain defined of the service             | Yes      |
-| --deposit string |         | Deposit of binding, will add to the current deposit balance |          |
-| --service-name   |         | Service name                                                | Yes      |
+| --deposit |         | Deposit to be increased to the binding |          |
 
-### Enable an inactive service binding
+### Enable an unavailable service binding
 
-The following example activates a service binding alone with 10iris additional deposit.
+The following example enables a service binding with the additional 10iris deposit.
 
 ```bash
-iriscli service enable --chain-id=<chain-id>  --from=<key-name> --fee=0.3iris --def-chain-id=<service-define-chain-id> --service-name=<service-name> --deposit=10iris
+iriscli service enable <service name> --chain-id=<chain-id>  --from=<key-name> --fee=0.3iris --deposit=10iris
 ```
 
 ## iriscli service refund-deposit
@@ -232,27 +203,20 @@ iriscli service enable --chain-id=<chain-id>  --from=<key-name> --fee=0.3iris --
 Refund all deposits from a service binding.
 
 ```bash
-iriscli service refund-deposit <flags>
+iriscli service refund-deposit <service name>
 ```
 
-**Flags:**
-
-| Name, shorthand | Default | Description                                     | Required |
-| --------------- | ------- | ----------------------------------------------- | -------- |
-| --def-chain-id  |         | The ID of the blockchain defined of the service | Yes      |
-| --service-name  |         | Service name                                    | Yes      |
-
-### Refund all deposits from an inactive service binding
+### Refund all deposits from an unavailable service binding
 
 Before refunding, you should [disable](#iriscli-service-disable) the service binding first.
 
 ```bash
-iriscli service refund-deposit --chain-id=<chain-id>  --from=<key-name> --fee=0.3iris --def-chain-id=<service-define-chain-id> --service-name=<service-name>
+iriscli service refund-deposit <service name> --chain-id=<chain-id>  --from=<key-name> --fee=0.3iris
 ```
 
 ## iriscli service call
 
-Invoke a service method.
+Call a service.
 
 ```bash
 iriscli service call <flags>
@@ -262,46 +226,45 @@ iriscli service call <flags>
 
 | Name, shorthand | Default | Description                                        | Required |
 | --------------- | ------- | -------------------------------------------------- | -------- |
-| --def-chain-id  |         | The ID of the blockchain defined of the service    | Yes      |
 | --service-name  |         | Service name                                       | Yes      |
-| --method-id     |         | The method id called                               | Yes      |
-| --bind-chain-id |         | The ID of the blockchain bond of the service       | Yes      |
-| --provider      |         | Bech32 encoded account created the service binding | Yes      |
-| --service-fee   |         | Fee to pay for a service invocation                |          |
-| --request-data  |         | Hex encoded request data of a service invocation   |          |
+| --providers     |         | Provider list                             | Yes      |
+| --service-fee-cap |         | The maximum service fee to pay for a single request        | Yes      |
+| --data      |         | Input data which is an instance of the Input JSON schema of the service definition | Yes      |
+| --timeout | | Block interval after which the request will expire | |
+| --repeated   |    false     | Indicate if the reqeust is repetitive                |          |
+| --frequency   |         | Request generation frequency if repeated              |          |
+| --total  |         | Repeated count if repeated    |          |
 
 ### Initiate a service invocation request
 
 ```bash
-iriscli service call --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --def-chain-id=<service-define-chain-id> --service-name=<service-name> --method-id=1 --bind-chain-id=<service-bind-chain-id> --provider=<provider-address> --service-fee=1iris --request-data=<request-data>
+iriscli service call --chain-id=<chain-id> --from=<key name> --fee=0.3iris --service-name=<service name>
+--providers=<provider list> --service-fee-cap=1iris --data=<request data> -timeout=100 --repeated --frequency=150 --total=100
 ```
 
 ## iriscli service requests
 
-Query service requests.
+Query service requests by the service binding or request context ID.
 
 ```bash
-iriscli service requests <flags>
+iriscli service requests [<service name> <provider>] | [<request-context-id> <batch-counter>]
 ```
 
-**Flags:**
-
-| Name, shorthand | Default | Description                                        | Required |
-| --------------- | ------- | -------------------------------------------------- | -------- |
-| --def-chain-id  |         | The ID of the blockchain defined of the service    | Yes      |
-| --service-name  |         | Service name                                       | Yes      |
-| --bind-chain-id |         | The ID of the blockchain bond of the service       | Yes      |
-| --provider      |         | Bech32 encoded account created the service binding | Yes      |
-
-### Query service request list
+### Query active requests of a service binding
 
 ```bash
-iriscli service requests --def-chain-id=<service-define-chain-id> --service-name=<service-name> --bind-chain-id=<service-bind-chain-id> --provider=<provider-address>
+iriscli service requests <service name> <provider>
+```
+
+### Query service requests by the request context ID and batch counter
+
+```bash
+iriscli service requests <request-context-id> <batch-counter>
 ```
 
 ## iriscli service respond
 
-Respond a service method invocation.
+Respond to a service request.
 
 ```bash
 iriscli service respond <flags>
@@ -311,18 +274,19 @@ iriscli service respond <flags>
 
 | Name, shorthand    | Default | Description                                                    | Required |
 | ------------------ | ------- | -------------------------------------------------------------- | -------- |
-| --request-chain-id |         | The ID of the blockchain that the service invocation initiated | Yes      |
-| --request-id       |         | The ID of the service invocation                               | Yes      |
-| --response-data    |         | Hex encoded response data of a service invocation              |          |
+| --request-id       |         | The request ID                             | Yes      |
+| --data    |         | Output data which is an instance of the Output JSON schema of the service definition             |          |
+| --error    |         | Error msg which is an instance of the Error JSON schema of the service definition              |          |
 
-### Respond to a service invocation
+### Respond to a service request
 
 ```bash
-iriscli service respond --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --request-chain-id=<request-chain-id> --request-id=<request-id> --response-data=<response-data>
+iriscli service respond --chain-id=<chain-id> --from=<key-name> --fee=0.3iris
+--request-id=<request-id> --data=<response output>
 ```
 
 :::tip
-You can figure out the `request-id` in the result of [service call](#iriscli-service-call)
+You can retrieve the `request-id` by querying the block result of [tendermint block](#iriscli-tendermint-block)
 :::
 
 ## iriscli service response
@@ -330,78 +294,137 @@ You can figure out the `request-id` in the result of [service call](#iriscli-ser
 Query a service response.
 
 ```bash
-iriscli service response <flags>
+iriscli service response <request-id>
 ```
-
-**Flags:**
-
-| Name, shorthand    | Default | Description                                                    | Required |
-| ------------------ | ------- | -------------------------------------------------------------- | -------- |
-| --request-chain-id |         | The ID of the blockchain that the service invocation initiated | Yes      |
-| --request-id       |         | The ID of the service invocation                               | Yes      |
 
 ### Query a service response
 
 ```bash
-iriscli service response --request-chain-id=<request-chain-id> --request-id=<request-id>
+iriscli service response <request-id>
 ```
 
 :::tip
-You can figure out the `request-id` in the result of [service call](#iriscli-service-call)
+You can retrieve the `request-id` by querying the block result of [tendermint block](#iriscli-tendermint-block)
 :::
+
+## iriscli service request-context
+
+Query a request context.
+
+```bash
+iriscli service request-context <request-context-id>
+```
+
+### Query a request context
+
+```bash
+iriscli service request-context <request-context-id>
+```
+
+:::tip
+You can retrieve the `request-context-id` in the result of [service call](#iriscli-service-call)
+:::
+
+## iriscli service responses
+
+Query responses by the request context ID and batch counter
+
+```bash
+iriscli service responses <request-context-id> <batch-counter>
+```
+
+### Query responses by the request context ID and batch counter
+
+```bash
+iriscli service responses <request-context-id> <batch-counter>
+```
+
+## iriscli service update
+
+Update a request context
+
+```bash
+iriscli service update <request-context-id> <flags>
+```
+
+**Flags:**
+
+| Name, shorthand | Default | Description                                        | Required |
+| --------------- | ------- | -------------------------------------------------- | -------- |
+| --providers     |         | New provider list, not updated if empty                            | Yes      |
+| --service-fee-cap |         | New maximum service fee to pay for a single request, not updated if not provided       |      |
+| --timeout | | New timeout, not updated if set to 0 | |
+| --frequency   |         | New request frequency, not updated if set to 0           |          |
+| --total  |         | New repeated count, not updated if set to 0    |          |
+
+### Update a request context
+
+```bash
+iriscli service update <request-context-id> --chain-id=<chain-id> --from=<key name> --fee=0.3iris
+--providers=<provider list> --service-fee-cap=1iris -timeout=0 --frequency=150 --total=100
+```
+
+## iriscli service pause
+
+Pause a running request context.
+
+```bash
+iriscli service pause <request-context-id>
+```
+
+### Pause a running request context
+
+```bash
+iriscli service pause <request-context-id>
+```
+
+## iriscli service start
+
+Resume a paused request context.
+
+```bash
+iriscli service start <request-context-id>
+```
+
+### Start a paused request context
+
+```bash
+iriscli service start <request-context-id>
+```
+
+## iriscli service kill
+
+Terminate a request context.
+
+```bash
+iriscli service kill <request-context-id>
+```
+
+### Kill a request context
+
+```bash
+iriscli service kill <request-context-id>
+```
 
 ## iriscli service fees
 
-Query return and incoming fee of a service provider address.
+Query the earned fees of a provider.
 
 ### Query service fees
 
 ```bash
-iriscli service fees <service-provider-address>
-```
-
-Example Output:
-
-```json
-{
-  "returned-fee": [
-    {
-      "denom": "iris-atto",
-      "amount": "10000000000000000"
-    }
-  ],
-  "incoming-fee": [
-    {
-      "denom": "iris-atto",
-      "amount": "10000000000000000"
-    }
-  ]
-}
-```
-
-## iriscli service refund-fees
-
-Refund all fees from service return fees.
-
-```bash
-iriscli service refund-fees <flags>
-```
-
-### Refund fees from service return fees
-
-```bash
-iriscli service refund-fees --chain-id=<chain-id> --from=<key-name> --fee=0.3iris
+iriscli service fees <provider>
 ```
 
 ## iriscli service withdraw-fees
 
-Withdraw service incoming fees.
+Withdraw the earned fees of a provider.
 
 ```bash
 iriscli service withdraw-fees <flags>
 ```
 
-### Withdraw service incoming fees
+### Withdraw the earned fees
 
 ```bash
 iriscli service withdraw-fees --chain-id=<chain-id> --from=<key-name> --fee=0.3iris

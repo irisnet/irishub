@@ -436,7 +436,7 @@ func GetCmdRequestService(cdc *codec.Codec) *cobra.Command {
 func GetCmdRespondService(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "respond",
-		Short: "Respond a service request",
+		Short: "Respond to a service request",
 		Example: "iriscli service respond --chain-id=<chain-id> --from=<key name> --fee=0.3iris " +
 			"--request-id=<request-id> --data=<response data>",
 		RunE: func(cmd *cobra.Command, args []string) error {
