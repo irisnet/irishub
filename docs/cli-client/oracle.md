@@ -79,7 +79,7 @@ iriscli oracle pause test-feed --chain-id="irishub-test" --from=node0 --fee=0.3i
 This command is used to edit an existed feed on IRIS Hub.
 
 ```bash
-iriscli oracle edit <flags>
+iriscli oracle edit <feed-name> <flags>
 ```
 
 **Flags:**
@@ -99,7 +99,7 @@ iriscli oracle edit <flags>
 ### Edit an existed feed
 
 ```bash
-iriscli oracle edit --chain-id="irishub-test" --from=node0 --fee=0.3iris --feed-name="test-feed" --latest-history=5 --commit
+iriscli oracle edit test-feed --chain-id="irishub-test" --from=node0 --fee=0.3iris --latest-history=5 --commit
 ```
 
 ## iriscli oracle query-feed

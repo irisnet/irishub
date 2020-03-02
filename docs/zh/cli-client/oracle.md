@@ -79,7 +79,7 @@ iriscli oracle pause test-feed --chain-id="irishub-test" --from=node0 --fee=0.3i
 该命令用于编辑一个已经存在的feed
 
 ```bash
-iriscli oracle edit <flags>
+iriscli oracle edit <feed-name> <flags>
 ```
 
 **Flags:**
@@ -101,7 +101,7 @@ iriscli oracle edit <flags>
 ### 编辑feed
 
 ```bash
-iriscli oracle edit --chain-id="irishub-test" --from=node0 --fee=0.3iris --feed-name="test-feed" --latest-history=5 --commit
+iriscli oracle edit test-feed --chain-id="irishub-test" --from=node0 --fee=0.3iris --feed-name="test-feed" --latest-history=5 --commit
 ```
 
 ## iriscli oracle query-feed

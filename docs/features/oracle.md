@@ -48,6 +48,6 @@ iriscli oracle pause test-feed --chain-id="irishub-test" --from=node0 --fee=0.3i
 You can use the edit command to edit an existing feed to change the data collection behavior of the feed.
 
 ```bash
-iriscli oracle edit --feed-name="test-feed" --latest-history=5 --providers="faa1r3tyupskwlh07dmhjw70frxzaaaufta37y25yr,faa1ydahnhrhkjh9j9u0jn8p3s272l0ecqj40vra8h" --service-fee-cap=1iris --timeout=6 --threshold=5 --total=-1 --threshold=3 --chain-id="irishub-test" --from=node0 --fee=0.3iris --commit
+iriscli oracle edit test-feed --latest-history=5 --providers="faa1r3tyupskwlh07dmhjw70frxzaaaufta37y25yr,faa1ydahnhrhkjh9j9u0jn8p3s272l0ecqj40vra8h" --service-fee-cap=1iris --timeout=6 --threshold=5 --total=-1 --threshold=3 --chain-id="irishub-test" --from=node0 --fee=0.3iris --commit
 ```
 Note that if the `latest-history` at the time of creation is greater than the currently modified value, the oracle module will delete the extra data.
