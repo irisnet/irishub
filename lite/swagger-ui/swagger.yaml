@@ -1675,12 +1675,10 @@ paths:
                   $ref: '#/components/schemas/Address'
                 deposit:
                   type: string
-                  example: 10000iris
+                  example: '10000iris'
                 pricing:
                   type: string
-                  example: {"price":[{"denom":"iris-atto","amount":"1000000"}]}
-                withdraw_address:
-                  $ref: '#/components/schemas/Address'
+                  example: {"price":[{"denom":"iris-atto","amount":"1000000000000000000"}]}
   '/service/bindings/{service-name}/{provider}':
     get:
       summary: Query a service binding by the service name and provider
@@ -1710,32 +1708,6 @@ paths:
           description: Invalid parameters
         '500':
           description: Internal Server Error
-  '/service/bindings/{service-name}':
-    get:
-      summary: Query all bindings of a service definition
-      tags:
-        - Service
-      parameters:
-        - in: path
-          name: service-name
-          description: service name
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ServiceBinding'
-        '400':
-          description: Invalid parameters
-        '500':
-          description: Internal Server Error
-  '/service/bindings/{service-name}/{provider}':
     put:
       summary: Update a service binding
       description: Update a service binding
@@ -1771,10 +1743,84 @@ paths:
                   $ref: '#/components/schemas/BaseTx'
                 deposit:
                   type: string
-                  example: 1iris
+                  example: '1iris'
                 pricing:
                   type: string
-                  example: '{"price":[{"denom":"iris-atto","amount":"10000000"}]}'
+                  example: '{"price":[{"denom":"iris-atto","amount":"1000000000000000000"}]}'
+  '/service/bindings/{service-name}':
+    get:
+      summary: Query all bindings of a service definition
+      tags:
+        - Service
+      parameters:
+        - in: path
+          name: service-name
+          description: service name
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ServiceBinding'
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
+  '/service/providers/{provider}/withdraw-address':
+    get:
+      summary: Query the withdrawal address of a provider
+      tags:
+        - Service
+      parameters:
+        - in: path
+          name: provider
+          description: provider
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/components/schemas/Address'
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
+    post:
+      summary: Set a new withdrawal address for a provider
+      tags:
+        - Service
+      parameters:
+        - in: path
+          name: provider
+          description: provider
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Unsigned tx was succesfully generated
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_tx:
+                  $ref: '#/components/schemas/BaseTx'
+                withdraw_address:
+                  $ref: '#/components/schemas/Address'
   '/service/bindings/{service-name}/{provider}/disable':
     post:
       summary: Disable a service binding
@@ -1915,7 +1961,7 @@ paths:
                     example: '{"id":1}'
                   service_fee_cap:
                     type: string
-                    example: 1iris
+                    example: '1iris'
                   timeout:
                     type: interger
                     example: 20
@@ -1931,9 +1977,32 @@ paths:
                   repeated_total:
                     type: interger
                     example: 100
+  '/service/requests/{request-id}':
+    get:
+      summary: Query a request by the request ID
+      tags:
+        - Service
+      parameters:
+        - in: path
+          name: request-id
+          description: request ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceRequest'
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
   '/service/requests/{service-name}/{provider}':
     get:
-      summary: Query active requests of a provider
+      summary: Query active requests of a service binding
       tags:
         - Service
       parameters:
@@ -1989,7 +2058,7 @@ paths:
                   $ref: '#/components/schemas/Address'
                 output:
                   type: string
-                  example: '{"userName":"irisnet"}'
+                  example: '{"name":"irisnet"}'
                 error:
                   type: string
   '/service/responses/{request-id}':
@@ -3883,8 +3952,6 @@ components:
         pricing:
           type: string
           example: {"price":[{"denom":"iris-atto","amount":"1000000"}]}
-        withdraw_address:
-          $ref: '#/components/schemas/Address'
         available:
           type: boolean
         disabled_time:
@@ -3959,7 +4026,7 @@ components:
         repeated_total:
           type: interger
         batch_counter:
-          type:
+          type: interger
         batch_request_count:
           type: interger
         batch_response_count:
