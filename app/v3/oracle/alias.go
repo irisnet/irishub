@@ -38,6 +38,6 @@ var (
 	NewKeeper  = keeper.NewKeeper
 	NewQuerier = keeper.NewQuerier
 
-	RegisterCodec   = types.RegisterCodec
-	StateFromString = types.StateFromString
+	RegisterCodec                 = types.RegisterCodec
+	RequestContextStateFromString = types.RequestContextStateFromString
 )
