@@ -2,6 +2,7 @@ package types
 
 import (
 	"bytes"
+	"encoding/hex"
 	"fmt"
 	"time"
 
@@ -35,7 +36,7 @@ func (f Feed) String() string {
 		f.AggregateFunc,
 		f.ValueJsonPath,
 		f.LatestHistory,
-		f.RequestContextID,
+		hex.EncodeToString(f.RequestContextID),
 		f.Creator.String(),
 	)
 }
@@ -110,7 +111,7 @@ func (f FeedContext) String() string {
 		f.RepeatedFrequency,
 		f.RepeatedTotal,
 		f.ResponseThreshold,
-		StateToString(f.State),
+		f.State.String(),
 	)
 }
 

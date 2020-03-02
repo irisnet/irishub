@@ -10,6 +10,7 @@ func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(MsgEditFeed{}, "irishub/oracle/MsgEditFeed", nil)
 
 	cdc.RegisterConcrete(Feed{}, "irishub/oracle/Feed", nil)
+	cdc.RegisterConcrete(FeedContext{}, "irishub/oracle/FeedContext", nil)
 }
 
 var msgCdc = codec.New()
