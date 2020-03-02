@@ -9,10 +9,10 @@ Oracle module allows you to manage the feed on IRIS Hub
 | [create](#iriscli-oracle-create)           | Create a new feed, the feed will be in "paused" state                                   |
 | [start](#iriscli-oracle-start)             | Start a Feed in "paused" state                                                         |
 | [pause](#iriscli-oracle-pause)             | Pause a Feed in "running" state                                                        |
-| [edit](#iriscli-oracle-edit)               | Modify the feed information and update service invocation parameters by feed's creator |
-| [query-feed](#iriscli-oracle-query-feed)   | Query feed definition by feed's name                                                   |
-| [query-feeds](#iriscli-oracle-query-feeds) | Query a group of definitions  by feed's state                                          |
-| [query-value](#iriscli-oracle-query-value) | Query the feed's value by feed's name                                                  |
+| [edit](#iriscli-oracle-edit)               | Feed creator modify the feed information and update service invocation parameters      |
+| [query-feed](#iriscli-oracle-query-feed)   | Query feed definition by feed name                                                   |
+| [query-feeds](#iriscli-oracle-query-feeds) | Query a group of definitions by feed state                                          |
+| [query-value](#iriscli-oracle-query-value) | Query the feed's value by feed name                                                |
 
 ## iriscli oracle create
 
@@ -76,7 +76,7 @@ iriscli oracle pause test-feed --chain-id="irishub-test" --from=node0 --fee=0.3i
 
 ## iriscli oracle edit
 
-This command is used to edit an existed feed on IRIS Hub.
+This command is used to edit an existing feed on IRIS Hub.
 
 ```bash
 iriscli oracle edit <feed-name> <flags>

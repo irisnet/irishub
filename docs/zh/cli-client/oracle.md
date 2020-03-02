@@ -9,7 +9,7 @@ Oracle模块负责管理你在IRIS Hub上创建的feed。
 | [create](#iriscli-oracle-create)           | 创建一个新的feed，初始状态为"paused" |
 | [start](#iriscli-oracle-start)             | 启动一个处于"paused"状态的feed       |
 | [pause](#iriscli-oracle-pause)             | 暂停一个处于"running"状态的feed      |
-| [edit](#iriscli-oracle-edit)               | feed的所有者编辑一个feed的相关信息   |
+| [edit](#iriscli-oracle-edit)               | feed的所有者编辑一个feed的相关信息并更新服务调用参数   |
 | [query-feed](#iriscli-oracle-query-feed)   | 通过名称查询一个feed信息             |
 | [query-feeds](#iriscli-oracle-query-feeds) | 查询一组feed信息                     |
 | [query-value](#iriscli-oracle-query-value) | 通过名称查询feed的执行结果           |
@@ -36,7 +36,7 @@ iriscli oracle create <flags>
 | --timeout         | int64    |      |      | 请求等待响应的最大区块数, 响应超过这个时间，请求将被忽略                          |
 | --frequency       | uint64   |      |      | 重复性请求的调用频率                                                              |
 | --total           | int64    |      | -1   | 重复性请求的调用总数；-1表示无限重复                                              |
-| --threshold       | uint16   |      | 1    | 期待的最小响应数，取值范围[1,服务提供者数量]                                      |
+| --threshold       | uint16   |      | 1    | 期待服务的最小响应数量，取值范围[1,服务提供者数量]                                      |
 | --aggregate-func  | string   | 是   |      | 对 Service 响应结果进行处理的 IRISHub 预定义方法，目前支持：avg/max/min/          |
 | --value-json-path | string   | 是   |      | Service响应结果中的字段名称或路径，用于从响应结果中获取调用 aggregate-func 的参数 |
 
