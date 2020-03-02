@@ -397,7 +397,11 @@ func TestIrisCLIService(t *testing.T) {
 	fooCoin = convertToIrisBaseAccount(t, fooAcc)
 	newFooAmt := getAmountFromCoinStr(fooCoin)
 
+<<<<<<< HEAD
 	require.Equal(t, oldFooAmt+earnedFeesAmt, newFooAmt)
+=======
+	require.True(t, newFooAmt-oldFooAmt == earnedFeesAmt)
+>>>>>>> cf0ddaa602c415610a4d8e31a69430a12bd9f1b3
 
 	// withdraw tax
 	barAcc = executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", barAddr, flags))
