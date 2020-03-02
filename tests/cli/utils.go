@@ -3,13 +3,14 @@ package cli
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/irisnet/irishub/app/v3/oracle"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
 	"testing"
+
+	"github.com/irisnet/irishub/app/v3/oracle"
 
 	"github.com/stretchr/testify/require"
 

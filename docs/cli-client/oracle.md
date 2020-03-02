@@ -6,7 +6,7 @@ Oracle module allows you to manage the feed on IRIS Hub
 
 | Name                                       | Description                                                                            |
 | ------------------------------------------ | -------------------------------------------------------------------------------------- |
-| [create](#iriscli-oracle-create)           | Define a new feed,the feed will be in "paused" state                                   |
+| [create](#iriscli-oracle-create)           | Create a new feed, the feed will be in "paused" state                                   |
 | [start](#iriscli-oracle-start)             | Start a Feed in "paused" state                                                         |
 | [pause](#iriscli-oracle-pause)             | Pause a Feed in "running" state                                                        |
 | [edit](#iriscli-oracle-edit)               | Modify the feed information and update service invocation parameters by feed's creator |
