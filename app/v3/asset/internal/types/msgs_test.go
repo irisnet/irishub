@@ -17,6 +17,7 @@ var (
 // test ValidateBasic for MsgIssueToken
 func TestMsgIssueAsset(t *testing.T) {
 	addr := sdk.AccAddress("test")
+
 	tests := []struct {
 		testCase string
 		MsgIssueToken
@@ -50,15 +51,16 @@ func TestMsgIssueAsset(t *testing.T) {
 func TestMsgEditToken(t *testing.T) {
 	owner := sdk.AccAddress([]byte("owner"))
 	mintable := False
+
 	tests := []struct {
 		testCase string
 		MsgEditToken
 		expectPass bool
 	}{
-		{"native basic good", NewMsgEditToken("BTC Token", "i.btc", 10000, mintable, owner), true},
-		{"wrong token_id", NewMsgEditToken("BTC Token", "HTC", 10000, mintable, owner), false},
-		{"wrong max_supply", NewMsgEditToken("BTC Token", "i.btc", 10000000000000, mintable, owner), false},
-		{"loss owner", NewMsgEditToken("BTC Token", "i.btc", 10000, mintable, nil), false},
+		{"native basic good", NewMsgEditToken("BTC Token", "btc", 10000, mintable, owner), true},
+		{"wrong symbol", NewMsgEditToken("BTC Token", "BT", 10000, mintable, owner), false},
+		{"wrong max_supply", NewMsgEditToken("BTC Token", "btc", 10000000000000, mintable, owner), false},
+		{"loss owner", NewMsgEditToken("BTC Token", "btc", 10000, mintable, nil), false},
 	}
 
 	for _, tc := range tests {
@@ -73,15 +75,16 @@ func TestMsgEditToken(t *testing.T) {
 func TestMsgEditTokenRoute(t *testing.T) {
 	canonicalSymbol := "btc"
 	minUnitAlias := "satoshi"
-	tokenId := "x.btc"
+	symbol := "btc"
 	mintable := False
+
 	// build a MsgEditToken
 	msg := MsgEditToken{
+		Symbol:          symbol,
 		CanonicalSymbol: canonicalSymbol,
 		MinUnitAlias:    minUnitAlias,
 		MaxSupply:       10000000,
 		Mintable:        mintable,
-		TokenId:         tokenId,
 	}
 
 	require.Equal(t, "asset", msg.Route())
@@ -89,10 +92,11 @@ func TestMsgEditTokenRoute(t *testing.T) {
 
 func TestMsgEditTokenGetSignBytes(t *testing.T) {
 	mintable := False
+
 	var msg = MsgEditToken{
 		Name:            "BTC TOKEN",
 		Owner:           sdk.AccAddress([]byte("owner")),
-		TokenId:         "x.btc",
+		Symbol:          "btc",
 		CanonicalSymbol: "btc",
 		MinUnitAlias:    "satoshi",
 		MaxSupply:       21000000,
@@ -108,24 +112,24 @@ func TestMsgEditTokenGetSignBytes(t *testing.T) {
 func TestMsgMintTokenValidateBasic(t *testing.T) {
 	testData := []struct {
 		msg        string
-		tokeId     string
+		symbol     string
 		owner      sdk.AccAddress
 		to         sdk.AccAddress
 		amount     uint64
 		expectPass bool
 	}{
-		{"empty tokeId", "", addr1, addr2, 1000, false},
-		{"wrong tokeId", "p.btc", addr1, addr2, 1000, false},
-		{"empty owner", "i.btc", emptyAddr, addr2, 1000, false},
-		{"empty to", "i.btc", addr1, emptyAddr, 1000, true},
-		{"not empty to", "i.btc", addr1, addr2, 1000, true},
-		{"invalid amount", "i.btc", addr1, addr2, 0, false},
-		{"exceed max supply", "i.btc", addr1, addr2, 100000000000000, false},
-		{"basic good", "i.btc", addr1, addr2, 1000, true},
+		{"empty symbol", "", addr1, addr2, 1000, false},
+		{"wrong symbol", "bt", addr1, addr2, 1000, false},
+		{"empty owner", "btc", emptyAddr, addr2, 1000, false},
+		{"empty to", "btc", addr1, emptyAddr, 1000, true},
+		{"not empty to", "btc", addr1, addr2, 1000, true},
+		{"invalid amount", "btc", addr1, addr2, 0, false},
+		{"exceed max supply", "btc", addr1, addr2, 100000000000000, false},
+		{"basic good", "btc", addr1, addr2, 1000, true},
 	}
 
 	for _, td := range testData {
-		msg := NewMsgMintToken(td.tokeId, td.owner, td.to, td.amount)
+		msg := NewMsgMintToken(td.symbol, td.owner, td.to, td.amount)
 		if td.expectPass {
 			require.Nil(t, msg.ValidateBasic(), "test: %v", td.msg)
 		} else {
@@ -138,19 +142,19 @@ func TestMsgTransferTokenOwnerValidation(t *testing.T) {
 	testData := []struct {
 		name       string
 		srcOwner   sdk.AccAddress
-		tokenId    string
+		symbol     string
 		dstOwner   sdk.AccAddress
 		expectPass bool
 	}{
 		{"empty srcOwner", emptyAddr, "btc", addr1, false},
-		{"empty tokenId", addr1, "", addr2, false},
-		{"empty dstOwner", addr1, "i.btc", emptyAddr, false},
-		{"invalid tokenId", addr1, "btc-min", addr2, false},
-		{"basic good", addr1, "i.btc", addr2, true},
+		{"empty symbol", addr1, "", addr2, false},
+		{"empty dstOwner", addr1, "btc", emptyAddr, false},
+		{"invalid symbol", addr1, "btc-min", addr2, false},
+		{"basic good", addr1, "btc", addr2, true},
 	}
 
 	for _, td := range testData {
-		msg := NewMsgTransferTokenOwner(td.srcOwner, td.dstOwner, td.tokenId)
+		msg := NewMsgTransferTokenOwner(td.srcOwner, td.dstOwner, td.symbol)
 		if td.expectPass {
 			require.Nil(t, msg.ValidateBasic(), "test: %v", td.name)
 		} else {
