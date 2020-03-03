@@ -1,6 +1,8 @@
 package keeper
 
 import (
+	"strings"
+
 	"github.com/irisnet/irishub/app/v3/asset/internal/types"
 
 	"github.com/irisnet/irishub/codec"
@@ -29,14 +31,17 @@ func querierToken(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte
 	if err != nil {
 		return nil, sdk.ParseParamsErr(err)
 	}
-	token, err := queryToken(ctx, keeper, params.TokenId)
+
+	token, err := queryToken(ctx, keeper, params.Symbol)
 	if err != nil {
 		return nil, sdk.MarshalResultErr(err)
 	}
+
 	bz, err := codec.MarshalJSONIndent(keeper.cdc, token)
 	if err != nil {
 		return nil, sdk.MarshalResultErr(err)
 	}
+
 	return bz, nil
 }
 
@@ -45,12 +50,15 @@ func querierTokens(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) (bz []
 	if err := keeper.cdc.UnmarshalJSON(req.Data, &params); err != nil {
 		return nil, sdk.ParseParamsErr(err)
 	}
+
 	var tokens []types.TokenOutput
-	if len(params.TokenID) > 0 {
-		token, err := queryToken(ctx, keeper, params.TokenID)
+
+	if len(params.Symbol) > 0 {
+		token, err := queryToken(ctx, keeper, strings.ToLower(params.Symbol))
 		if err != nil {
 			return nil, sdk.MarshalResultErr(err)
 		}
+
 		tokens = append(tokens, token)
 	} else {
 		tokens, err = queryTokens(ctx, keeper, params.Owner)
@@ -63,6 +71,7 @@ func querierTokens(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) (bz []
 	if er != nil {
 		return nil, sdk.MarshalResultErr(er)
 	}
+
 	return bz, nil
 }
 
@@ -73,13 +82,12 @@ func queryFees(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, s
 		return nil, sdk.ParseParamsErr(err)
 	}
 
-	symbol := params.Symbol
+	symbol := strings.ToLower(params.Symbol)
 	issueFee := keeper.getTokenIssueFee(ctx, symbol)
 	mintFee := keeper.getTokenMintFee(ctx, symbol)
 
-	tokenID := types.GetTokenID(symbol)
 	fees := types.TokenFeesOutput{
-		Exist:    keeper.HasToken(ctx, tokenID),
+		Exist:    keeper.HasToken(ctx, symbol),
 		IssueFee: issueFee,
 		MintFee:  mintFee,
 	}
@@ -92,23 +100,26 @@ func queryFees(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, s
 	return bz, nil
 }
 
-func queryToken(ctx sdk.Context, keeper Keeper, tokenID string) (types.TokenOutput, sdk.Error) {
-	if tokenID == sdk.Iris {
+func queryToken(ctx sdk.Context, keeper Keeper, symbol string) (types.TokenOutput, sdk.Error) {
+	if symbol == sdk.Iris {
 		return types.NewTokenOutputFrom(getIrisToken()), nil
 	}
-	token, err := keeper.getToken(ctx, tokenID)
+
+	token, err := keeper.getToken(ctx, symbol)
 	if err != nil {
 		return types.TokenOutput{}, err
 	}
+
 	return types.NewTokenOutputFrom(token), nil
 }
 
-func queryTokens(ctx sdk.Context, keeper Keeper, owner string) (tokens types.TokensOutput, error sdk.Error) {
+func queryTokens(ctx sdk.Context, keeper Keeper, owner string) (tokens types.TokensOutput, err sdk.Error) {
 	if len(owner) == 0 {
 		keeper.IterateTokens(ctx, func(token types.FungibleToken) (stop bool) {
 			tokens = append(tokens, types.NewTokenOutputFrom(token))
 			return false
 		})
+
 		tokens = append(tokens, types.NewTokenOutputFrom(getIrisToken()))
 		return
 	}
@@ -117,15 +128,18 @@ func queryTokens(ctx sdk.Context, keeper Keeper, owner string) (tokens types.Tok
 	if er != nil {
 		return nil, sdk.ParseParamsErr(er)
 	}
+
 	keeper.iterateTokensWithOwner(ctx, ownerAcc, func(token types.FungibleToken) (stop bool) {
 		tokens = append(tokens, types.NewTokenOutputFrom(token))
 		return false
 	})
+
 	return
 }
 
 func getIrisToken() types.FungibleToken {
 	initSupply, _ := sdk.IrisCoinType.ConvertToMinDenomCoin(sdk.NewCoin(sdk.Iris, sdk.InitialIssue).String())
 	maxSupply, _ := sdk.IrisCoinType.ConvertToMinDenomCoin(sdk.NewCoin(sdk.Iris, sdk.NewInt(int64(types.MaximumAssetMaxSupply))).String())
+
 	return types.NewFungibleToken(sdk.Iris, sdk.IrisCoinType.Desc, sdk.IrisAtto, sdk.AttoScale, initSupply.Amount, maxSupply.Amount, true, sdk.AccAddress{})
 }

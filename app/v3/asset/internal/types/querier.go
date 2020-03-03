@@ -13,15 +13,15 @@ const (
 	QueryFees   = "fees"
 )
 
-// QueryTokenParams is the query parameters for 'custom/asset/tokens/{id}'
+// QueryTokenParams is the query parameters for 'custom/asset/tokens/{symbol}'
 type QueryTokenParams struct {
-	TokenId string
+	Symbol string
 }
 
 // QueryTokensParams is the query parameters for 'custom/asset/tokens'
 type QueryTokensParams struct {
-	TokenID string
-	Owner   string
+	Symbol string
+	Owner  string
 }
 
 // QueryTokenFeesParams is the query parameters for 'custom/asset/fees/tokens'
@@ -30,7 +30,6 @@ type QueryTokenFeesParams struct {
 }
 
 type TokenOutput struct {
-	Id            string         `json:"id"`
 	Symbol        string         `json:"symbol"`
 	Name          string         `json:"name"`
 	Scale         uint8          `json:"scale"`
@@ -48,8 +47,7 @@ func (top TokenOutput) String() string {
 }
 
 func (top TokenOutput) ToFungibleToken() FungibleToken {
-	return FungibleToken{BaseToken{
-		Id:            top.Id,
+	return FungibleToken{
 		Symbol:        top.Symbol,
 		Name:          top.Name,
 		Decimal:       top.Scale,
@@ -58,12 +56,11 @@ func (top TokenOutput) ToFungibleToken() FungibleToken {
 		MaxSupply:     top.MaxSupply,
 		Mintable:      top.Mintable,
 		Owner:         top.Owner,
-	}}
+	}
 }
 
 func NewTokenOutputFrom(token FungibleToken) TokenOutput {
 	return TokenOutput{
-		Id:            token.Id,
 		Symbol:        token.Symbol,
 		Name:          token.Name,
 		Scale:         token.Decimal,
@@ -79,9 +76,11 @@ type TokensOutput []TokenOutput
 
 func (tsop TokensOutput) String() string {
 	var tokens Tokens
+
 	for _, t := range tsop {
 		tokens = append(tokens, t.ToFungibleToken())
 	}
+
 	return tokens.String()
 }
 
@@ -96,7 +95,7 @@ type TokenFeesOutput struct {
 func (tfo TokenFeesOutput) String() string {
 	var out strings.Builder
 	if tfo.Exist {
-		out.WriteString("The token id has existed\n")
+		out.WriteString("The symbol has existed\n")
 	}
 
 	out.WriteString(fmt.Sprintf(`Fees:
@@ -111,7 +110,7 @@ func (tfo TokenFeesOutput) String() string {
 func (tfo TokenFeesOutput) HumanString(converter sdk.CoinsConverter) string {
 	var out strings.Builder
 	if tfo.Exist {
-		out.WriteString("The token id has existed\n")
+		out.WriteString("The symbol has existed\n")
 	}
 
 	out.WriteString(fmt.Sprintf(`Fees:
