@@ -10,8 +10,12 @@ import (
 
 const (
 	// MsgRoute identifies transaction types
-	MsgRoute          = "asset"
-	MsgTypeIssueToken = "issue_token"
+	MsgRoute = "asset"
+
+	TypeMsgIssueToken         = "issue_token"
+	TypeMsgEditToken          = "edit_token"
+	TypeMsgMintToken          = "mint_token"
+	TypeMsgTransferTokenOwner = "transfer_token_owner"
 
 	// constant used to indicate that some field should not be updated
 	DoNotModify = "[do-not-modify]"
@@ -35,9 +39,6 @@ var _, _, _, _ sdk.Msg = &MsgIssueToken{}, &MsgEditToken{}, &MsgMintToken{}, &Ms
 
 // MsgIssueToken
 type MsgIssueToken struct {
-	Family          AssetFamily    `json:"family"`
-	Source          AssetSource    `json:"source"`
-	Gateway         string         `json:"gateway"`
 	Symbol          string         `json:"symbol"`
 	CanonicalSymbol string         `json:"canonical_symbol"`
 	Name            string         `json:"name"`
@@ -65,7 +66,7 @@ func NewMsgIssueToken(symbol string, minUnit string, name string, scale uint8, i
 
 // Implements Msg.
 func (msg MsgIssueToken) Route() string { return MsgRoute }
-func (msg MsgIssueToken) Type() string  { return MsgTypeIssueToken }
+func (msg MsgIssueToken) Type() string  { return TypeMsgIssueToken }
 
 func ValidateMsgIssueToken(msg *MsgIssueToken) sdk.Error {
 	msg.Symbol = strings.ToLower(strings.TrimSpace(msg.Symbol))
@@ -79,13 +80,8 @@ func ValidateMsgIssueToken(msg *MsgIssueToken) sdk.Error {
 		}
 	}
 
-	// require owner for native asset
 	if msg.Owner.Empty() {
 		return ErrNilAssetOwner(DefaultCodespace, "the owner of the asset must be specified")
-	}
-
-	if _, found := AssetFamilyToStringMap[msg.Family]; !found {
-		return ErrInvalidAssetFamily(DefaultCodespace, fmt.Sprintf("invalid asset family type %s", msg.Family))
 	}
 
 	nameLen := len(msg.Name)
@@ -113,6 +109,7 @@ func ValidateMsgIssueToken(msg *MsgIssueToken) sdk.Error {
 	if msg.Decimal > MaximumAssetDecimal {
 		return ErrInvalidAssetDecimal(DefaultCodespace, fmt.Sprintf("invalid token decimal %d, only accepts value [0, %d]", msg.Decimal, MaximumAssetDecimal))
 	}
+
 	return nil
 }
 
@@ -127,6 +124,7 @@ func (msg MsgIssueToken) GetSignBytes() []byte {
 	if err != nil {
 		panic(err)
 	}
+
 	return sdk.MustSortJSON(b)
 }
 
@@ -139,15 +137,16 @@ func (msg MsgIssueToken) GetSigners() []sdk.AccAddress {
 type MsgTransferTokenOwner struct {
 	SrcOwner sdk.AccAddress `json:"src_owner"` // the current owner address of the token
 	DstOwner sdk.AccAddress `json:"dst_owner"` // the new owner
-	TokenId  string         `json:"token_id"`
+	Symbol   string         `json:"symbol"`    // the token symbol
 }
 
-func NewMsgTransferTokenOwner(srcOwner, dstOwner sdk.AccAddress, tokenId string) MsgTransferTokenOwner {
-	tokenId = strings.TrimSpace(tokenId)
+func NewMsgTransferTokenOwner(srcOwner, dstOwner sdk.AccAddress, symbol string) MsgTransferTokenOwner {
+	symbol = strings.TrimSpace(symbol)
+
 	return MsgTransferTokenOwner{
 		SrcOwner: srcOwner,
 		DstOwner: dstOwner,
-		TokenId:  tokenId,
+		Symbol:   symbol,
 	}
 }
 
@@ -157,6 +156,7 @@ func (msg MsgTransferTokenOwner) GetSignBytes() []byte {
 	if err != nil {
 		panic(err)
 	}
+
 	return sdk.MustSortJSON(b)
 }
 
@@ -181,8 +181,8 @@ func (msg MsgTransferTokenOwner) ValidateBasic() sdk.Error {
 		return ErrInvalidToAddress(DefaultCodespace, fmt.Sprintf("the new owner must not be same as the original owner"))
 	}
 
-	// check the tokenId
-	if err := CheckTokenID(msg.TokenId); err != nil {
+	// check the symbol
+	if err := CheckSymbol(msg.Symbol); err != nil {
 		return err
 	}
 
@@ -193,11 +193,11 @@ func (msg MsgTransferTokenOwner) ValidateBasic() sdk.Error {
 func (msg MsgTransferTokenOwner) Route() string { return MsgRoute }
 
 // Type implements Msg
-func (msg MsgTransferTokenOwner) Type() string { return "transfer_token_owner" }
+func (msg MsgTransferTokenOwner) Type() string { return TypeMsgTransferTokenOwner }
 
 // MsgEditToken for editing a specified token
 type MsgEditToken struct {
-	TokenId         string         `json:"token_id"`         //  id of token
+	Symbol          string         `json:"symbol"`           //  symbol of token
 	Owner           sdk.AccAddress `json:"owner"`            //  owner of token
 	CanonicalSymbol string         `json:"canonical_symbol"` //  canonical_symbol of token
 	MinUnitAlias    string         `json:"min_unit_alias"`   //  min_unit_alias of token
@@ -207,11 +207,12 @@ type MsgEditToken struct {
 }
 
 // NewMsgEditToken creates a MsgEditToken
-func NewMsgEditToken(name, tokenId string, maxSupply uint64, mintable Bool, owner sdk.AccAddress) MsgEditToken {
+func NewMsgEditToken(name, symbol string, maxSupply uint64, mintable Bool, owner sdk.AccAddress) MsgEditToken {
 	name = strings.TrimSpace(name)
+
 	return MsgEditToken{
 		Name:      name,
-		TokenId:   tokenId,
+		Symbol:    symbol,
 		MaxSupply: maxSupply,
 		Mintable:  mintable,
 		Owner:     owner,
@@ -222,12 +223,11 @@ func NewMsgEditToken(name, tokenId string, maxSupply uint64, mintable Bool, owne
 func (msg MsgEditToken) Route() string { return MsgRoute }
 
 // Type implements Msg
-func (msg MsgEditToken) Type() string { return "edit_token" }
+func (msg MsgEditToken) Type() string { return TypeMsgEditToken }
 
 // ValidateBasic implements Msg
 func (msg MsgEditToken) ValidateBasic() sdk.Error {
-
-	//check owner
+	// check owner
 	if msg.Owner.Empty() {
 		return ErrNilAssetOwner(DefaultCodespace, "the owner of the asset must be specified")
 	}
@@ -237,13 +237,13 @@ func (msg MsgEditToken) ValidateBasic() sdk.Error {
 		return ErrInvalidAssetName(DefaultCodespace, fmt.Sprintf("invalid token name %s, only accepts length (0, %d]", msg.Name, MaximumAssetNameLen))
 	}
 
-	//check max_supply for fast failed
+	// check max_supply for fast failed
 	if msg.MaxSupply > MaximumAssetMaxSupply {
 		return ErrInvalidAssetMaxSupply(DefaultCodespace, fmt.Sprintf("invalid token max supply %d, must be less than %d", msg.MaxSupply, MaximumAssetMaxSupply))
 	}
 
-	//check token_id
-	if err := CheckTokenID(msg.TokenId); err != nil {
+	// check symbol
+	if err := CheckSymbol(msg.Symbol); err != nil {
 		return err
 	}
 
@@ -256,6 +256,7 @@ func (msg MsgEditToken) GetSignBytes() []byte {
 	if err != nil {
 		panic(err)
 	}
+
 	return sdk.MustSortJSON(b)
 }
 
@@ -264,22 +265,23 @@ func (msg MsgEditToken) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Owner}
 }
 
-// MsgMintToken for mint the token to a specified address
+// MsgMintToken for minting the token to a specified address
 type MsgMintToken struct {
-	TokenId string         `json:"token_id"` // the unique id of the token
-	Owner   sdk.AccAddress `json:"owner"`    // the current owner address of the token
-	To      sdk.AccAddress `json:"to"`       // address of mint token to
-	Amount  uint64         `json:"amount"`   // amount of mint token
+	Symbol string         `json:"symbol"` // the symbol of the token
+	Owner  sdk.AccAddress `json:"owner"`  // the current owner address of the token
+	To     sdk.AccAddress `json:"to"`     // address of minting token to
+	Amount uint64         `json:"amount"` // amount of minting token
 }
 
 // NewMsgMintToken creates a MsgMintToken
-func NewMsgMintToken(tokenId string, owner, to sdk.AccAddress, amount uint64) MsgMintToken {
-	tokenId = strings.TrimSpace(tokenId)
+func NewMsgMintToken(symbol string, owner, to sdk.AccAddress, amount uint64) MsgMintToken {
+	symbol = strings.TrimSpace(symbol)
+
 	return MsgMintToken{
-		TokenId: tokenId,
-		Owner:   owner,
-		To:      to,
-		Amount:  amount,
+		Symbol: symbol,
+		Owner:  owner,
+		To:     to,
+		Amount: amount,
 	}
 }
 
@@ -287,7 +289,7 @@ func NewMsgMintToken(tokenId string, owner, to sdk.AccAddress, amount uint64) Ms
 func (msg MsgMintToken) Route() string { return MsgRoute }
 
 // Type implements Msg
-func (msg MsgMintToken) Type() string { return "mint_token" }
+func (msg MsgMintToken) Type() string { return TypeMsgMintToken }
 
 // GetSignBytes implements Msg
 func (msg MsgMintToken) GetSignBytes() []byte {
@@ -314,5 +316,5 @@ func (msg MsgMintToken) ValidateBasic() sdk.Error {
 		return ErrInvalidAssetMaxSupply(DefaultCodespace, fmt.Sprintf("invalid token amount %d, only accepts value (0, %d]", msg.Amount, MaximumAssetMaxSupply))
 	}
 
-	return CheckTokenID(msg.TokenId)
+	return CheckSymbol(msg.Symbol)
 }
