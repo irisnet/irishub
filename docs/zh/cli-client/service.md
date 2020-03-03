@@ -20,16 +20,16 @@ Service模块允许在IRIS Hub中定义、绑定、调用服务。[了解更多i
 | [call](#iriscli-service-call)                     | 调用服务                  |
 | [request](#iriscli-service-request)             | 查询服务请求                          |
 | [requests](#iriscli-service-requests)             | 查询服务请求列表               |
-| [respond](#iriscli-service-respond)               | 响应一个服务请求                 |
+| [respond](#iriscli-service-respond)               | 响应服务请求                 |
 | [response](#iriscli-service-response)             | 查询服务响应                   |
 | [responses](#iriscli-service-responses)             | 查询服务响应列表                             |
 | [request-context](#iriscli-service-request-context)             | 查询请求上下文                             |
 | [update](#iriscli-service-update)             | 更新请求上下文                             |
-| [pause](#iriscli-service-pause)             | 暂停运行的请求上下文                             |
-| [start](#iriscli-service-start)             | 恢复暂停的请求上下文                             |
+| [pause](#iriscli-service-pause)             | 暂停一个正在进行的请求上下文                             |
+| [start](#iriscli-service-start)             | 启动一个暂停的请求上下文                             |
 | [kill](#iriscli-service-kill)             | 终止请求上下文                            |
-| [fees](#iriscli-service-fees)                     | 查询指定服务提供者的收益 |
-| [withdraw-fees](#iriscli-service-withdraw-fees)   | 提取指定服务提供者的收益     |
+| [fees](#iriscli-service-fees)                     | 查询服务提供者的收益 |
+| [withdraw-fees](#iriscli-service-withdraw-fees)   | 提取服务提供者的收益     |
 
 ## iriscli service define
 
@@ -47,9 +47,9 @@ iriscli service define <flags>
 | --description |      | 服务的描述                               |      |
 | --author-description  |      | 服务创建者的描述                         |      |
 | --tags                |      | 服务的标签列表                        |      |
-| --schemas         |      | 服务接口的schemas内容或路径           |      |
+| --schemas         |      | 服务接口的schemas内容或路径           | 是   |
 
-### define a service
+### 定义一个新的服务
 
 ```bash
 iriscli service define --chain-id=<chain-id> --from=<key-name> --fee=0.3iris 
@@ -59,6 +59,9 @@ iriscli service define --chain-id=<chain-id> --from=<key-name> --fee=0.3iris
 
 ### Schemas内容示例
 
+```json
+{"input":{"$schema":"http://json-schema.org/draft-04/schema#","title":"BioIdentify service input","description":"BioIdentify service input specification","type":"object","properties":{"id":{"description":"id","type":"string"},"name":{"description":"name","type":"string"},"data":{"description":"data","type":"string"}},"required":["id","data"]},"output":{"$schema":"http://json-schema.org/draft-04/schema#","title":"BioIdentify service output","description":"BioIdentify service output specification","type":"object","properties":{"data":{"description":"result data","type":"string"}},"required":["data"]},"error":{"$schema":"http://json-schema.org/draft-04/schema#","title":"BioIdentify service error","description":"BioIdentify service error specification","type":"object","properties":{"code":{"description":"error code","type":"interger"},"msg":{"description":"detailed error msg","type":"string"}},"required":["msg"]}}
+```
 
 ## iriscli service definition
 
@@ -74,7 +77,7 @@ iriscli service definition <service name>
 | -------------- | ---- | -------------------- | ---- |
 | --service-name |      | 服务名称             | 是   |
 
-### 查询服务定义
+### 查询一个服务定义
 
 查询指定服务定义的详细信息。
 
@@ -109,6 +112,17 @@ iriscli service bind --chain-id=<chain-id> --from=<key-name> --fee=0.3iris
 
 ### Pricing内容示例
 
+```json
+{
+    "price": [
+        {
+            "denom": "iris-atto",
+            "amount": "1000000000000000000"
+        }
+    ]
+}
+```
+
 ## iriscli service binding
 
 查询服务绑定。
@@ -117,7 +131,7 @@ iriscli service bind --chain-id=<chain-id> --from=<key-name> --fee=0.3iris
 iriscli service binding <service name> <provider>
 ```
 
-### 查询服务绑定
+### 查询一个服务绑定
 
 ```bash
 iriscli service binding <service name> <provider>
@@ -159,6 +173,34 @@ iriscli service update-binding <flags>
 ```bash
 iriscli service update-binding --chain-id=<chain-id> --from=<key-name> --fee=0.3iris 
 --service-name=<service-name> --deposit=10iris
+```
+
+## iriscli service set-withdraw-addr
+
+设置提取地址
+
+```bash
+iriscli service set-withdraw-addr <withdrawal address>
+```
+
+### 设置一个提取地址
+
+```bash
+iriscli service set-withdraw-addr <withdrawal address> --chain-id=<chain-id> --from=<key-name> --fee=0.3iris
+```
+
+## iriscli service withdraw-addr
+
+查询提取地址
+
+```bash
+iriscli service withdraw-addr <provider>
+```
+
+### 查询一个服务提供者的提取地址
+
+```bash
+iriscli service withdraw-addr <provider>
 ```
 
 ## iriscli service disable
@@ -215,7 +257,7 @@ iriscli service refund-deposit <service name> --chain-id=<chain-id> --from=<key-
 
 ## iriscli service call
 
-调用服务方法。
+调用服务。
 
 ```bash
 iriscli service call <flags>
@@ -225,46 +267,74 @@ iriscli service call <flags>
 
 | 名称，速记      | 默认 | 描述                           | 必须 |
 | --------------- | ---- | ------------------------------ | ---- |
-| --def-chain-id  |      | 定义该服务的区块链ID           | 是   |
-| --service-name  |      | 服务名称                       | 是   |
-| --method-id     |      | 调用的服务方法ID               | 是   |
-| --bind-chain-id |      | 绑定该服务的区块链ID           | 是   |
-| --provider      |      | bech32编码的服务提供商账户地址 | 是   |
-| --service-fee   |      | 服务调用支付的服务费           |      |
-| --request-data  |      | hex编码的服务调用请求数据      |      |
+| --name  |      | 服务名称                       | 是   |
+| --providers     |         | 服务提供者列表                             | 是      |
+| --service-fee-cap |         | 愿意为单个请求支付的最大服务费用        | 是     |
+| --data      |         | 请求的输入，是一个Input JSON schema实例 | 是      |
+| --timeout | | 请求超时, 0意味着取系统默认超时 | |
+| --super-mode| false | 签名者是否为超级用户 |
+| --repeated   |    false     | 请求是否为重复性的                |          |
+| --frequency   |         | 重复性请求的请求频率；默认为`timeout`值              |          |
+| --total  |         | 重复性请求的请求总数，-1表示无限制    |          |
 
 ### 发起一个服务调用请求
 
 ```bash
-iriscli service call --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --def-chain-id=<service-define-chain-id> --service-name=<service-name> --method-id=1 --bind-chain-id=<service-bind-chain-id> --provider=<provider-address> --service-fee=1iris --request-data=<request-data>
+iriscli service call --chain-id=<chain-id> --from=<key name> --fee=0.3iris --service-name=<service name>
+--providers=<provider list> --service-fee-cap=1iris --data=<request data> -timeout=100 --repeated --frequency=150 --total=100
 ```
+
+### 请求输入示例
+
+```json
+{
+    "id": "1",
+    "name": "irisnet",
+    "data": "facedata"
+}
+```
+
+## iriscli service request
+
+查询服务请求。
+
+```bash
+iriscli service request <request-id>
+```
+
+### 查询一个服务请求
+
+```bash
+iriscli service request <request-id>
+```
+
+:::tip
+你可以从[按高度获取区块信息](#iriscli-tendermint-block)的结果中获取`request-id`。
+:::
 
 ## iriscli service requests
 
 查询服务请求列表。
 
 ```bash
-iriscli service requests <flags>
+iriscli service requests [<service name> <provider>] | [<request-context-id> <batch-counter>]
 ```
 
-**标志：**
-
-| 名称，速记      | 默认 | 描述                           | 必须 |
-| --------------- | ---- | ------------------------------ | ---- |
-| --def-chain-id  |      | 定义该服务的区块链ID           | 是   |
-| --service-name  |      | 服务名称                       | 是   |
-| --bind-chain-id |      | 绑定该服务的区块链ID           | 是   |
-| --provider      |      | bech32编码的服务提供商账户地址 | 是   |
-
-### 查询服务请求列表
+### 查询服务绑定的活跃请求
 
 ```bash
-iriscli service requests --def-chain-id=<service-define-chain-id> --service-name=<service-name> --bind-chain-id=<service-bind-chain-id> --provider=<provider-address>
+iriscli service requests <service name> <provider>
+```
+
+### 根据请求上下文ID和批次计数器查询请求
+
+```bash
+iriscli service requests <request-context-id> <batch-counter>
 ```
 
 ## iriscli service respond
 
-响应服务调用。
+响应服务请求。
 
 ```bash
 iriscli service respond <flags>
@@ -274,97 +344,169 @@ iriscli service respond <flags>
 
 | 名称，速记         | 默认 | 描述                      | 必须 |
 | ------------------ | ---- | ------------------------- | ---- |
-| --request-chain-id |      | 发起该服务调用的区块链ID  | 是   |
-| --request-id       |      | 该服务调用的ID            | 是   |
-| --response-data    |      | hex编码的服务调用响应数据 |
+| --request-id       |      | 欲响应请求的ID            | 是   |
+| --data    |      | 响应的输出, 是一个Output JSON schema实例 | |
+| --error | | 响应的错误消息, 是一个Error JSON schema实例  | |
 
-### 响应一个服务调用
+### 响应一个服务请求
 
 ```bash
-iriscli service respond --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --request-chain-id=<request-chain-id> --request-id=<request-id> --response-data=<response-data>
+iriscli service respond --chain-id=<chain-id> --from=<key-name> --fee=0.3iris
+--request-id=<request-id> --data=<response output>
 ```
 
 :::tip
-你可以从[服务调用](#iriscli-service-call)的返回结果中得到`request-id`。
+你可以从[按高度获取区块信息](#iriscli-tendermint-block)的结果中获取`request-id`。
 :::
+
+### 响应输出示例
+
+```json
+{
+    "data": "userdata"
+}
+```
 
 ## iriscli service response
 
 查询服务响应。
 
 ```bash
-iriscli service response <flags>
+iriscli service response <request-id>
+```
+
+### 查询一个服务响应
+
+```bash
+iriscli service response <request-id>
+```
+
+:::tip
+你可以从[按高度获取区块信息](#iriscli-tendermint-block)的结果中获取`request-id`。
+:::
+
+## iriscli service responses
+
+根据指定的请求上下文ID以及批次计数器查询响应。
+
+```bash
+iriscli service responses <request-context-id> <batch-counter>
+```
+
+### 根据指定的请求上下文ID以及批次计数器查询响应
+
+```bash
+iriscli service responses <request-context-id> <batch-counter>
+```
+
+## iriscli service request-context
+
+查询请求上下文。
+
+```bash
+iriscli service request-context <request-context-id>
+```
+
+### 查询一个请求上下文
+
+```bash
+iriscli service request-context <request-context-id>
+```
+
+:::tip
+你可以从[调用服务](#iriscli-service-call)的结果中获取`request-context-id`
+:::
+
+## iriscli service update
+
+更新请求上下文。
+
+```bash
+iriscli service update <request-context-id> <flags>
 ```
 
 **标志：**
 
-| 名称，速记         | 默认 | 描述                     | 必须 |
-| ------------------ | ---- | ------------------------ | ---- |
-| --request-chain-id |      | 发起该服务调用的区块链ID | 是   |
-| --request-id       |      | 该服务调用的ID           | 是   |
+| 名称，速记         | 默认 | 描述                      | 必须 |
+| --------------- | ------- | -------------------------------------------------- | -------- |
+| --providers     |         | 服务提供者列表，为空则不更新                            | Yes      |
+| --service-fee-cap |         | 愿意为单个请求支付的最大服务费用, 为空则不更新       |      |
+| --timeout | | 请求超时, 为0则不更新 | |
+| --frequency   |         | 请求频率, 为0则不更新           |          |
+| --total  |         | 请求总数, 为0则不更新    |          |
 
-### 查询服务响应
+### 更新一个请求上下文
 
 ```bash
-iriscli service response --request-chain-id=<request-chain-id> --request-id=<request-id>
+iriscli service update <request-context-id> --chain-id=<chain-id> --from=<key name> --fee=0.3iris
+--providers=<provider list> --service-fee-cap=1iris -timeout=0 --frequency=150 --total=100
 ```
 
-:::tip
-你可以从[服务调用](#iriscli-service-call)的返回结果中得到`request-id`。
-:::
+## iriscli service pause
+
+暂停一个正在进行的请求上下文。
+
+```bash
+iriscli service pause <request-context-id>
+```
+
+### 暂停一个正在进行的请求上下文
+
+```bash
+iriscli service pause <request-context-id>
+```
+
+## iriscli service start
+
+启动一个暂停的请求上下文。
+
+```bash
+iriscli service start <request-context-id>
+```
+
+### 启动一个暂停的请求上下文
+
+```bash
+iriscli service start <request-context-id>
+```
+
+## iriscli service kill
+
+终止请求上下文。
+
+```bash
+iriscli service kill <request-context-id>
+```
+
+### 终止一个请求上下文
+
+```bash
+iriscli service kill <request-context-id>
+```
 
 ## iriscli service fees
 
-查询指定地址的服务费退款和收入。
-
-### 查询服务费
+查询服务提供者的收益。
 
 ```bash
-iriscli service fees <service-provider-address>
+iriscli service fees <provider>
 ```
 
-示例输出:
-
-```json
-{
-  "returned-fee": [
-    {
-      "denom": "iris-atto",
-      "amount": "10000000000000000"
-    }
-  ],
-  "incoming-fee": [
-    {
-      "denom": "iris-atto",
-      "amount": "10000000000000000"
-    }
-  ]
-}
-```
-
-## iriscli service refund-fees
-
-从服务费退款中退还所有费用。
+### 查询服务提供者的收益
 
 ```bash
-iriscli service refund-fees <flags>
-```
-
-### 从服务费退款中退还费用
-
-```bash
-iriscli service refund-fees --chain-id=<chain-id> --from=<key-name> --fee=0.3iris
+iriscli service fees <provider>
 ```
 
 ## iriscli service withdraw-fees
 
-从服务费收入中取回所有费用。
+提取服务提供者的收益。
 
 ```bash
 iriscli service withdraw-fees <flags>
 ```
 
-### 从服务费收入中取回费用
+### 提取服务提供者的收益
 
 ```bash
 iriscli service withdraw-fees --chain-id=<chain-id> --from=<key-name> --fee=0.3iris

@@ -25,8 +25,8 @@ Service module allows you to define, bind, invoke services on the IRIS Hub. [Rea
 | [responses](#iriscli-service-responses)             | Query responses by the request context ID and batch counter                             |
 | [request-context](#iriscli-service-request-context)             | Query a request context                             |
 | [update](#iriscli-service-update)             | Update a request context                             |
-| [pause](#iriscli-service-pause)             | Pause a request context                             |
-| [start](#iriscli-service-start)             | Resume a paused request context                             |
+| [pause](#iriscli-service-pause)             | Pause a running request context                             |
+| [start](#iriscli-service-start)             | Start a paused request context                             |
 | [kill](#iriscli-service-kill)             | Terminate a request context                             |
 | [fees](#iriscli-service-fees)                     | Query the earned fees of a provider |
 | [withdraw-fees](#iriscli-service-withdraw-fees)   | Withdraw the earned fees of a provider          |
@@ -59,6 +59,9 @@ iriscli service define --chain-id=<chain-id> --from=<key-name> --fee=0.3iris
 
 ### Schemas content example
 
+```json
+{"input":{"$schema":"http://json-schema.org/draft-04/schema#","title":"BioIdentify service input","description":"BioIdentify service input specification","type":"object","properties":{"id":{"description":"id","type":"string"},"name":{"description":"name","type":"string"},"data":{"description":"data","type":"string"}},"required":["id","data"]},"output":{"$schema":"http://json-schema.org/draft-04/schema#","title":"BioIdentify service output","description":"BioIdentify service output specification","type":"object","properties":{"data":{"description":"result data","type":"string"}},"required":["data"]},"error":{"$schema":"http://json-schema.org/draft-04/schema#","title":"BioIdentify service error","description":"BioIdentify service error specification","type":"object","properties":{"code":{"description":"error code","type":"interger"},"msg":{"description":"detailed error msg","type":"string"}},"required":["msg"]}}
+```
 
 ## iriscli service definition
 
@@ -94,9 +97,7 @@ iriscli service bind <flags>
 
 ### Bind an existing service definition
 
-The deposit needs to satisfy the minimum requirement, which is the maximal one between `price` * `MinDepositMultiple` and `MinDeposit`(`MinDepositMultiple` and `MinDeposit` are the system parameters, which can be modified through the governance).
-
-The pricing must contain a `price` property which represents the base price of the service binding.
+The deposit needs to satisfy the minimum deposit requirement, which is the maximal one between `price` * `MinDepositMultiple` and `MinDeposit`(`MinDepositMultiple` and `MinDeposit` are the system parameters, which can be modified through the governance).
 
 ```bash
 iriscli service bind --chain-id=<chain-id> --from=<key-name> --fee=0.3iris
@@ -105,6 +106,16 @@ iriscli service bind --chain-id=<chain-id> --from=<key-name> --fee=0.3iris
 
 ### Pricing content example
 
+```json
+{
+    "price": [
+        {
+            "denom": "iris-atto",
+            "amount": "1000000000000000000"
+        }
+    ]
+}
+```
 
 ## iriscli service binding
 
@@ -148,7 +159,7 @@ iriscli service update-binding <flags>
 | --------------- | ------- | ------------------------------------------------------------------------- | -------- |
 | --service-name  |         | Service name                                                              | Yes      |
 | --deposit       |         | Added deposit for the binding             |          |
-| --pricing        |         | New pricing of the binding, which is an instance of the Irishub Service Pricing schema        |
+| --pricing        |         | Pricing of the binding, which is an instance of the Irishub Service Pricing schema        |
 
 ### Update an existing service binding
 
@@ -253,7 +264,7 @@ iriscli service call <flags>
 | --------------- | ------- | -------------------------------------------------- | -------- |
 | --service-name  |         | Service name                                       | Yes      |
 | --providers     |         | Provider list to request                             | Yes      |
-| --service-fee-cap |         | maximum service fee to pay for a single request        | Yes      |
+| --service-fee-cap |         | Maximum service fee to pay for a single request        | Yes      |
 | --data      |         | Input of the service request, which is an Input JSON schema instance | Yes      |
 | --timeout | | Request timeout, 0 means default timeout | |
 | --super-mode| false | Indicate if the signer is a super user
@@ -266,6 +277,16 @@ iriscli service call <flags>
 ```bash
 iriscli service call --chain-id=<chain-id> --from=<key name> --fee=0.3iris --service-name=<service name>
 --providers=<provider list> --service-fee-cap=1iris --data=<request data> -timeout=100 --repeated --frequency=150 --total=100
+```
+
+### Input example
+
+```json
+{
+    "id": "1",
+    "name": "irisnet",
+    "data": "facedata"
+}
 ```
 
 ## iriscli service requests
@@ -312,8 +333,16 @@ iriscli service respond --chain-id=<chain-id> --from=<key-name> --fee=0.3iris
 ```
 
 :::tip
-You can retrieve the `request-id` by querying the block result of [tendermint block](#iriscli-tendermint-block)
+You can retrieve the `request-id` in the result of [tendermint block](#iriscli-tendermint-block)
 :::
+
+### Output example
+
+```json
+{
+    "data": "userdata"
+}
+```
 
 ## iriscli service response
 
@@ -330,8 +359,22 @@ iriscli service response <request-id>
 ```
 
 :::tip
-You can retrieve the `request-id` by querying the block result of [tendermint block](#iriscli-tendermint-block)
+You can retrieve the `request-id` in the result of [tendermint block](#iriscli-tendermint-block)
 :::
+
+## iriscli service responses
+
+Query responses by the request context ID and batch counter
+
+```bash
+iriscli service responses <request-context-id> <batch-counter>
+```
+
+### Query responses by the request context ID and batch counter
+
+```bash
+iriscli service responses <request-context-id> <batch-counter>
+```
 
 ## iriscli service request-context
 
@@ -351,20 +394,6 @@ iriscli service request-context <request-context-id>
 You can retrieve the `request-context-id` in the result of [service call](#iriscli-service-call)
 :::
 
-## iriscli service responses
-
-Query responses by the request context ID and batch counter
-
-```bash
-iriscli service responses <request-context-id> <batch-counter>
-```
-
-### Query responses by the request context ID and batch counter
-
-```bash
-iriscli service responses <request-context-id> <batch-counter>
-```
-
 ## iriscli service update
 
 Update a request context
@@ -377,11 +406,11 @@ iriscli service update <request-context-id> <flags>
 
 | Name, shorthand | Default | Description                                        | Required |
 | --------------- | ------- | -------------------------------------------------- | -------- |
-| --providers     |         | New providers to request, not updated if empty                            | Yes      |
-| --service-fee-cap |         | New maximum service fee to pay for a single request, empty means not updated       |      |
-| --timeout | | New request timeout, not updated if set to 0 | |
-| --frequency   |         | New request frequency, not updated if set to 0           |          |
-| --total  |         | New request count, not updated if set to 0    |          |
+| --providers     |         | Provider list to request, not updated if empty                            | Yes      |
+| --service-fee-cap |         | Maximum service fee to pay for a single request, not updated if empty       |      |
+| --timeout | | Request timeout, not updated if set to 0 | |
+| --frequency   |         | Request frequency, not updated if set to 0           |          |
+| --total  |         | Request count, not updated if set to 0    |          |
 
 ### Update a request context
 
@@ -406,7 +435,7 @@ iriscli service pause <request-context-id>
 
 ## iriscli service start
 
-Resume a paused request context.
+Start a paused request context.
 
 ```bash
 iriscli service start <request-context-id>
@@ -435,6 +464,10 @@ iriscli service kill <request-context-id>
 ## iriscli service fees
 
 Query the earned fees of a provider.
+
+```bash
+iriscli service fees <provider>
+```
 
 ### Query service fees
 

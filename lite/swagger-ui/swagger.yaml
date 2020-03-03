@@ -1794,7 +1794,7 @@ paths:
         '500':
           description: Internal Server Error
     post:
-      summary: Set a new withdrawal address for a provider
+      summary: Set a withdrawal address for a provider
       tags:
         - Service
       parameters:
