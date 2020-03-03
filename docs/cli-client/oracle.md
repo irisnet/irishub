@@ -28,17 +28,17 @@ iriscli oracle create <flags>
 | ----------------- | -------- | -------- | ------- | --------------------------------------------------------------------------------------------- |
 | --feed-name       | string   | Yes      |         | The unique identifier of the feed.                                                            |
 | --description     | string   |          |         | The description of the feed.                                                                  |
-| --latest-history  | uint64   | Yes      |         | The Number of latest history values to be saved for the Feed, range [1, 100].                 |
+| --latest-history  | uint64   | Yes      |         | The maximum Number of the latest history values to be saved for the Feed, range [1, 100].                 |
 | --service-name    | string   | Yes      |         | The name of the service to be invoked by the feed.                                            |
 | --input           | string   | Yes      |         | The input argument (JSON) used to invoke the service.                                         |
 | --providers       | []string | Yes      |         | The list of service provider addresses.                                                       |
 | --service-fee-cap | string   | Yes      |         | Only providers charging a fee lower than the cap will be invoked.                             |
-| --timeout         | int64    |          |         | The number of blocks to wait since a request is sent, beyond which responses will be ignored. |
-| --frequency       | uint64   |          |         | The frequency of sending repeated requests.                                                   |
+| --timeout         | int64    |          |         | The maximum number of blocks to wait for a response since a request is sent, beyond which the request will be ignored. |
+| --frequency       | uint64   |          |         | The invocation frequency of sending repeated requests.                                                   |
 | --total           | int64    |          | -1      | The total number of calls for repetitive requests,  -1 means unlimited.                       |
 | --threshold       | uint16   |          | 1       | The minimum number of responses needed for aggregation, range [1, Length(providers)].         |
 | --aggregate-func  | string   | Yes      |         | The name of predefined function for processing the service responses, e.g.avg、max、min etc.  |
-| --value-json-path | string   | Yes      |         | The son path used by aggregate function to retrieve the value property from responses.        |
+| --value-json-path | string   | Yes      |         | The field name or path of Service response result used to retrieve the value property of aggregate-func from response results.        |
 
 ### Create a new feed
 
@@ -88,11 +88,11 @@ iriscli oracle edit <feed-name> <flags>
 | ----------------- | -------- | -------- | ------- | --------------------------------------------------------------------------------------------- |
 | --feed-name       | string   | Yes      |         | The Unique identifier of the feed.                                                            |
 | --description     | string   |          |         | The description of the feed.                                                                  |
-| --latest-history  | uint64   | Yes      |         | The Number of latest history values to be saved for the Feed, range [1, 100].                 |
+| --latest-history  | uint64   | Yes      |         | The maximum Number of the latest history values to be saved for the Feed, range [1, 100].                |
 | --providers       | []string | Yes      |         | The list of service provider addresses.                                                       |
 | --service-fee-cap | string   | Yes      |         | Only providers charging a fee lower than the cap will be invoked.                             |
-| --timeout         | int64    |          |         | The number of blocks to wait since a request is sent, beyond which responses will be ignored. |
-| --frequency       | uint64   |          |         | The frequency of sending repeated requests.                                                   |
+| --timeout         | int64    |          |         | The maximum number of blocks to wait for a response since a request is sent, beyond which the request will be ignored. |
+| --frequency       | uint64   |          |         | The invocation frequency of sending repeated requests.                                                   |
 | --total           | int64    |          | -1      | The total number of calls for repetitive requests,  -1 means unlimited.                       |
 | --threshold       | uint16   |          | 1       | The minimum number of responses needed for aggregation, range [1, Length(providers)].         |
 

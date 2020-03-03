@@ -146,7 +146,7 @@ iriscli oracle query-feeds --state=running
 iriscli oracle query-value <feed name>
 ```
 
-### 查询feed的执行结果
+### 查询现存的feed的执行结果
 
 ```bash
 iriscli oracle query-value test-feed
