@@ -7,8 +7,8 @@ Oracle module allows you to manage the feed on IRIS Hub
 | Name                                       | Description                                                                            |
 | ------------------------------------------ | -------------------------------------------------------------------------------------- |
 | [create](#iriscli-oracle-create)           | Create a new feed, the feed will be in "paused" state                                   |
-| [start](#iriscli-oracle-start)             | Start a Feed in "paused" state                                                         |
-| [pause](#iriscli-oracle-pause)             | Pause a Feed in "running" state                                                        |
+| [start](#iriscli-oracle-start)             | Start a feed in "paused" state                                                         |
+| [pause](#iriscli-oracle-pause)             | Pause a feed in "running" state                                                        |
 | [edit](#iriscli-oracle-edit)               | Feed creator modify the feed information and update service invocation parameters      |
 | [query-feed](#iriscli-oracle-query-feed)   | Query feed definition by feed name                                                   |
 | [query-feeds](#iriscli-oracle-query-feeds) | Query a group of definitions by feed state                                          |
@@ -86,7 +86,7 @@ iriscli oracle edit <feed-name> <flags>
 
 | Name, shorthand   | Type     | Required | Default | Description                                                                                   |
 | ----------------- | -------- | -------- | ------- | --------------------------------------------------------------------------------------------- |
-| --feed-name       | string   | Yes      |         | The Unique identifier of the feed.                                                            |
+| --feed-name       | string   | Yes      |         | The unique identifier of the feed.                                                            |
 | --description     | string   |          |         | The description of the feed.                                                                  |
 | --latest-history  | uint64   | Yes      |         | The maximum Number of the latest history values to be saved for the Feed, range [1, 100].                |
 | --providers       | []string | Yes      |         | The list of service provider addresses.                                                       |
