@@ -54,8 +54,8 @@ func init() {
 	FsServiceEnable.String(FlagDeposit, "", "added deposit for enabling the binding")
 
 	FsServiceRequest.String(FlagServiceName, "", "service name")
-	FsServiceRequest.StringSlice(FlagProviders, []string{}, "providers to request")
-	FsServiceRequest.String(FlagServiceFeeCap, "", "maximal fee to pay for a service request")
+	FsServiceRequest.StringSlice(FlagProviders, []string{}, "provider list to request")
+	FsServiceRequest.String(FlagServiceFeeCap, "", "maximum service fee to pay for a single request")
 	FsServiceRequest.String(FlagData, "", "input of the service request, which is an Input JSON schema instance")
 	FsServiceRequest.Uint64(FlagTimeout, 0, "request timeout, 0 means default timeout")
 	FsServiceRequest.Bool(FlagSuperMode, false, "indicate if the signer is a super user")
@@ -69,7 +69,7 @@ func init() {
 	FsServiceUpdateRequestContext.Uint64(FlagFrequency, 0, "new request frequency, not updated if set to 0")
 	FsServiceUpdateRequestContext.Int64(FlagTotal, 0, "new request count, not updated if set to 0")
 
-	FsServiceRespond.String(FlagRequestID, "", "ID of the request to respond")
+	FsServiceRespond.String(FlagRequestID, "", "ID of the request to respond to")
 	FsServiceRespond.String(FlagData, "", "output of the service response, which is an Output JSON schema instance")
-	FsServiceRespond.String(FlagError, "", "err msg of the service response, which is an Error JSON schema instance")
+	FsServiceRespond.String(FlagError, "", "error msg of the service response, which is an Error JSON schema instance")
 }
