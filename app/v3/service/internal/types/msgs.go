@@ -30,6 +30,7 @@ const (
 	MaxNameLength        = 70  // max length of the service name
 	MaxDescriptionLength = 280 // max length of the service and author description
 	MaxTagsNum           = 10  // max total number of the tags
+	MinTagLength         = 1   // min length of the tag
 	MaxTagLength         = 70  // max length of the tag
 
 	MaxProvidersNum     = 10 // max total number of the providers to request
@@ -113,6 +114,10 @@ func (msg MsgDefineService) ValidateBasic() sdk.Error {
 
 	if err := ensureServiceDefLength(msg); err != nil {
 		return err
+	}
+
+	if sdk.CheckDuplicate(msg.Tags) {
+		return ErrDuplicateTags(DefaultCodespace)
 	}
 
 	if len(msg.Schemas) == 0 {
@@ -813,7 +818,7 @@ func (msg MsgUpdateRequestContext) ValidateBasic() sdk.Error {
 		return ErrInvalidRequestContextID(DefaultCodespace, fmt.Sprintf("length of the request context ID must be %d in bytes", RequestContextIDLen))
 	}
 
-	return ValidateRequestContextUpdating(msg.ServiceFeeCap, msg.Timeout, msg.RepeatedFrequency, msg.RepeatedTotal)
+	return ValidateRequestContextUpdating(msg.Providers, msg.ServiceFeeCap, msg.Timeout, msg.RepeatedFrequency, msg.RepeatedTotal)
 }
 
 // GetSigners implements Msg.
@@ -958,6 +963,10 @@ func ensureServiceDefLength(msg MsgDefineService) sdk.Error {
 	}
 
 	for i, tag := range msg.Tags {
+		if len(tag) < MinTagLength {
+			return ErrInvalidLength(DefaultCodespace, fmt.Sprintf("invalid tag[%d] length; got: %d, min: %d", i, len(tag), MinTagLength))
+		}
+
 		if len(tag) > MaxTagLength {
 			return ErrInvalidLength(DefaultCodespace, fmt.Sprintf("invalid tag[%d] length; got: %d, max: %d", i, len(tag), MaxTagLength))
 		}
@@ -1014,6 +1023,10 @@ func ValidateRequest(
 		return ErrInvalidRequest(DefaultCodespace, fmt.Sprintf("total number of the providers must not be greater than %d", MaxProvidersNum))
 	}
 
+	if sdk.CheckDuplicate(providers) {
+		return ErrInvalidRequest(DefaultCodespace, "there exists duplicate providers")
+	}
+
 	if len(input) == 0 {
 		return ErrInvalidRequestInput(DefaultCodespace, "input missing")
 	}
@@ -1022,12 +1035,12 @@ func ValidateRequest(
 		return ErrInvalidRequestInput(DefaultCodespace, "input is not valid JSON")
 	}
 
-	if timeout < 0 {
-		return ErrInvalidRequest(DefaultCodespace, fmt.Sprintf("timeout must not be less than 0: %d", timeout))
+	if timeout <= 0 {
+		return ErrInvalidRequest(DefaultCodespace, fmt.Sprintf("timeout must be greater than 0: %d", timeout))
 	}
 
 	if repeated {
-		if repeatedFrequency > 0 && timeout > 0 && repeatedFrequency < uint64(timeout) {
+		if repeatedFrequency > 0 && repeatedFrequency < uint64(timeout) {
 			return ErrInvalidRequest(DefaultCodespace, fmt.Sprintf("repeated frequency [%d] must not be less than timeout [%d]", repeatedFrequency, timeout))
 		}
 
@@ -1040,7 +1053,11 @@ func ValidateRequest(
 }
 
 // ValidateRequestContextUpdating validates the request context updating operation
-func ValidateRequestContextUpdating(serviceFeeCap sdk.Coins, timeout int64, repeatedFrequency uint64, repeatedTotal int64) sdk.Error {
+func ValidateRequestContextUpdating(providers []sdk.AccAddress, serviceFeeCap sdk.Coins, timeout int64, repeatedFrequency uint64, repeatedTotal int64) sdk.Error {
+	if sdk.CheckDuplicate(providers) {
+		return ErrInvalidProviders(DefaultCodespace, "there exists duplicate providers")
+	}
+
 	if !serviceFeeCap.Empty() && !validServiceCoins(serviceFeeCap) {
 		return ErrInvalidServiceFee(DefaultCodespace, fmt.Sprintf("invalid service fee: %s", serviceFeeCap))
 	}
