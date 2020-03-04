@@ -35,13 +35,16 @@ type ServiceKeeper interface {
 		serviceFeeCap sdk.Coins,
 		timeout int64,
 		repeatedFreq uint64,
-		repeatedTotal int64) sdk.Error
+		repeatedTotal int64,
+		consumer sdk.AccAddress) sdk.Error
 
 	StartRequestContext(ctx sdk.Context,
-		requestContextID []byte) sdk.Error
+		requestContextID []byte,
+		consumer sdk.AccAddress) sdk.Error
 
 	PauseRequestContext(ctx sdk.Context,
-		requestContextID []byte) sdk.Error
+		requestContextID []byte,
+		consumer sdk.AccAddress) sdk.Error
 }
 
 // GuardianKeeper defines the expected guardian keeper (noalias)

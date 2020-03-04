@@ -170,11 +170,12 @@ func (m MockServiceKeeper) UpdateRequestContext(ctx sdk.Context,
 	serviceFeeCap sdk.Coins,
 	timeout int64,
 	repeatedFreq uint64,
-	repeatedTotal int64) sdk.Error {
+	repeatedTotal int64,
+	consumer sdk.AccAddress) sdk.Error {
 	return nil
 }
 
-func (m MockServiceKeeper) StartRequestContext(ctx sdk.Context, requestContextID []byte) sdk.Error {
+func (m MockServiceKeeper) StartRequestContext(ctx sdk.Context, requestContextID []byte, consumer sdk.AccAddress) sdk.Error {
 	reqCtx := m.cxtMap[string(requestContextID)]
 	callback := m.callbackMap[reqCtx.ModuleName]
 	for i := int64(reqCtx.BatchCounter + 1); i <= reqCtx.RepeatedTotal; i++ {
@@ -191,7 +192,7 @@ func (m MockServiceKeeper) StartRequestContext(ctx sdk.Context, requestContextID
 	return nil
 }
 
-func (m MockServiceKeeper) PauseRequestContext(ctx sdk.Context, requestContextID []byte) sdk.Error {
+func (m MockServiceKeeper) PauseRequestContext(ctx sdk.Context, requestContextID []byte, consumer sdk.AccAddress) sdk.Error {
 	reqCtx := m.cxtMap[string(requestContextID)]
 	reqCtx.State = exported.PAUSED
 	m.cxtMap[string(requestContextID)] = reqCtx
