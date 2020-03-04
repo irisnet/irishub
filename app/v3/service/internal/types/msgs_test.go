@@ -666,8 +666,8 @@ func TestMsgRequestServiceValidation(t *testing.T) {
 		), // repeated total can not be zero
 		NewMsgRequestService(
 			testServiceName, testProviders, testConsumer, testInput, testServiceFeeCap,
-			int64(0), false, true, uint64(0), testRepeatedTotal,
-		), // both timeout and frequency can be zero
+			testTimeout, false, true, uint64(0), testRepeatedTotal,
+		), // frequency can be zero
 		NewMsgRequestService(
 			testServiceName, testProviders, testConsumer, testInput, testServiceFeeCap,
 			testTimeout, false, false, invalidLessRepeatedFreq, invalidRepeatedTotal1,
@@ -692,7 +692,7 @@ func TestMsgRequestServiceValidation(t *testing.T) {
 		{testMsgs[10], false, "invalid repeated frequency"},
 		{testMsgs[11], false, "repeated total can not be less than -1"},
 		{testMsgs[12], false, "repeated total can not be zero"},
-		{testMsgs[13], true, "both timeout and frequency can be zero"},
+		{testMsgs[13], true, "frequency can be zero"},
 		{testMsgs[14], true, "do not check the repeated frequency and total when not repeated"},
 	}
 

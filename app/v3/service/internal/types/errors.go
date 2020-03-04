@@ -26,14 +26,14 @@ const (
 	CodeServiceBindingAvailable   sdk.CodeType = 112
 	CodeIncorrectRefundTime       sdk.CodeType = 113
 
-	CodeInvalidServiceFee         sdk.CodeType = 115
-	CodeInvalidProviders          sdk.CodeType = 118
-	CodeInvalidTimeout            sdk.CodeType = 119
-	CodeInvalidRepeatedFreq       sdk.CodeType = 120
-	CodeInvalidRepeatedTotal      sdk.CodeType = 121
-	CodeInvalidThreshold          sdk.CodeType = 121
-	CodeInvalidResponse           sdk.CodeType = 116
-	CodeInvalidRequestID          sdk.CodeType = 117
+	CodeInvalidServiceFee         sdk.CodeType = 114
+	CodeInvalidProviders          sdk.CodeType = 115
+	CodeInvalidTimeout            sdk.CodeType = 116
+	CodeInvalidRepeatedFreq       sdk.CodeType = 117
+	CodeInvalidRepeatedTotal      sdk.CodeType = 118
+	CodeInvalidThreshold          sdk.CodeType = 119
+	CodeInvalidResponse           sdk.CodeType = 120
+	CodeInvalidRequestID          sdk.CodeType = 121
 	CodeUnknownRequest            sdk.CodeType = 122
 	CodeUnknownResponse           sdk.CodeType = 123
 	CodeUnknownRequestContext     sdk.CodeType = 124

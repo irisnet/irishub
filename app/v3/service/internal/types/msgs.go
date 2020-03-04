@@ -116,8 +116,8 @@ func (msg MsgDefineService) ValidateBasic() sdk.Error {
 		return err
 	}
 
-	if err := checkDuplicateTags(msg.Tags); err != nil {
-		return err
+	if sdk.HasDuplicate(msg.Tags) {
+		return ErrDuplicateTags(DefaultCodespace)
 	}
 
 	if len(msg.Schemas) == 0 {
@@ -1036,7 +1036,7 @@ func ValidateRequest(
 	}
 
 	if timeout <= 0 {
-		return ErrInvalidTimeout(DefaultCodespace, fmt.Sprintf("timeout must be greater than 0: %d", timeout))
+		return ErrInvalidTimeout(DefaultCodespace, fmt.Sprintf("timeout [%d] must be greater than 0", timeout))
 	}
 
 	if repeated {
@@ -1045,7 +1045,7 @@ func ValidateRequest(
 		}
 
 		if repeatedTotal < -1 || repeatedTotal == 0 {
-			return ErrInvalidRepeatedTotal(DefaultCodespace, fmt.Sprintf("repeated total number must be greater than 0 or equal to -1: %d", repeatedTotal))
+			return ErrInvalidRepeatedTotal(DefaultCodespace, fmt.Sprintf("repeated total number [%d] must be greater than 0 or equal to -1", repeatedTotal))
 		}
 	}
 
@@ -1083,25 +1083,11 @@ func ValidateRequestContextUpdating(
 	return nil
 }
 
-func checkDuplicateTags(tags []string) sdk.Error {
-	tagArr := make([]interface{}, len(tags))
-
-	for i, tag := range tagArr {
-		tagArr[i] = tag
-	}
-
-	if sdk.HasDuplicate(tagArr) {
-		return ErrDuplicateTags(DefaultCodespace)
-	}
-
-	return nil
-}
-
 func checkDuplicateProviders(providers []sdk.AccAddress) sdk.Error {
-	providerArr := make([]interface{}, len(providers))
+	providerArr := make([]string, len(providers))
 
-	for i, provider := range providerArr {
-		providerArr[i] = provider
+	for i, provider := range providers {
+		providerArr[i] = provider.String()
 	}
 
 	if sdk.HasDuplicate(providerArr) {
