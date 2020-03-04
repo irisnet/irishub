@@ -67,6 +67,8 @@ func TestMsgDefineServiceValidation(t *testing.T) {
 	invalidLongDesc := strings.Repeat("d", MaxDescriptionLength+1)
 	invalidMoreTags := strings.Split("t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11", ",")
 	invalidLongTags := []string{strings.Repeat("t", MaxTagLength+1)}
+	invalidEmptyTags := []string{"t1", ""}
+	invalidDuplicateTags := []string{"t1", "t1"}
 
 	invalidSchemas := `{"input":"nonobject","output":"nonobject","error":"nonobject"}`
 	invalidSchemasNoInput := `{"output":{"type":"object"},"error":{"type":"object"}}`
@@ -81,6 +83,8 @@ func TestMsgDefineServiceValidation(t *testing.T) {
 		NewMsgDefineService(testServiceName, invalidLongDesc, testServiceTags, testAuthor, testAuthorDesc, testSchemas),            // too long service description
 		NewMsgDefineService(testServiceName, testServiceDesc, invalidMoreTags, testAuthor, testAuthorDesc, testSchemas),            // too many tags
 		NewMsgDefineService(testServiceName, testServiceDesc, invalidLongTags, testAuthor, testAuthorDesc, testSchemas),            // too long tag
+		NewMsgDefineService(testServiceName, testServiceDesc, invalidEmptyTags, testAuthor, testAuthorDesc, testSchemas),           // empty tag
+		NewMsgDefineService(testServiceName, testServiceDesc, invalidDuplicateTags, testAuthor, testAuthorDesc, testSchemas),       // duplicate tags
 		NewMsgDefineService(testServiceName, testServiceDesc, testServiceTags, testAuthor, invalidLongDesc, testSchemas),           // too long author description
 		NewMsgDefineService(testServiceName, testServiceDesc, testServiceTags, testAuthor, testAuthorDesc, invalidSchemas),         // invalid schemas
 		NewMsgDefineService(testServiceName, testServiceDesc, testServiceTags, testAuthor, testAuthorDesc, invalidSchemasNoInput),  // missing input schema
@@ -100,11 +104,13 @@ func TestMsgDefineServiceValidation(t *testing.T) {
 		{testMsgs[4], false, "too long service description"},
 		{testMsgs[5], false, "too many tags"},
 		{testMsgs[6], false, "too long tag"},
-		{testMsgs[7], false, "too long author description"},
-		{testMsgs[8], false, "invalid schemas"},
-		{testMsgs[9], false, "missing input schema"},
-		{testMsgs[10], false, "missing output schema"},
-		{testMsgs[11], false, "missing error schema"},
+		{testMsgs[7], false, "empty tag"},
+		{testMsgs[8], false, "duplicate tags"},
+		{testMsgs[9], false, "too long author description"},
+		{testMsgs[10], false, "invalid schemas"},
+		{testMsgs[11], false, "missing input schema"},
+		{testMsgs[12], false, "missing output schema"},
+		{testMsgs[13], false, "missing error schema"},
 	}
 
 	for i, tc := range testCases {
@@ -598,8 +604,9 @@ func TestMsgRequestServiceValidation(t *testing.T) {
 	invalidLongName := strings.Repeat("s", MaxNameLength+1)
 	invalidDenomCoins := sdk.NewCoins(sdk.NewCoin("eth-min", sdk.NewInt(1000)))
 
+	invalidDuplicateProviders := []sdk.AccAddress{testProvider, testProvider}
 	invalidInput := "iris-usdt"
-	invalidTimeout := int64(-1)
+	invalidTimeout := int64(0)
 	invalidLessRepeatedFreq := uint64(testTimeout) - 10
 	invalidRepeatedTotal1 := int64(-2)
 	invalidRepeatedTotal2 := int64(0)
@@ -629,6 +636,10 @@ func TestMsgRequestServiceValidation(t *testing.T) {
 			testServiceName, nil, testConsumer, testInput, testServiceFeeCap,
 			testTimeout, false, true, testRepeatedFreq, testRepeatedTotal,
 		), // missing providers
+		NewMsgRequestService(
+			testServiceName, invalidDuplicateProviders, testConsumer, testInput, testServiceFeeCap,
+			testTimeout, false, true, testRepeatedFreq, testRepeatedTotal,
+		), // duplicate providers
 		NewMsgRequestService(
 			testServiceName, testProviders, testConsumer, "", testServiceFeeCap,
 			testTimeout, false, true, testRepeatedFreq, testRepeatedTotal,
@@ -674,14 +685,15 @@ func TestMsgRequestServiceValidation(t *testing.T) {
 		{testMsgs[3], false, "too long service name"},
 		{testMsgs[4], false, "invalid service fee denom"},
 		{testMsgs[5], false, "missing providers"},
-		{testMsgs[6], false, "missing input"},
-		{testMsgs[7], false, "invalid input"},
-		{testMsgs[8], false, "invalid timeout"},
-		{testMsgs[9], false, "invalid repeated frequency"},
-		{testMsgs[10], false, "repeated total can not be less than -1"},
-		{testMsgs[11], false, "repeated total can not be zero"},
-		{testMsgs[12], true, "both timeout and frequency can be zero"},
-		{testMsgs[13], true, "do not check the repeated frequency and total when not repeated"},
+		{testMsgs[6], false, "duplicate providers"},
+		{testMsgs[7], false, "missing input"},
+		{testMsgs[8], false, "invalid input"},
+		{testMsgs[9], false, "invalid timeout"},
+		{testMsgs[10], false, "invalid repeated frequency"},
+		{testMsgs[11], false, "repeated total can not be less than -1"},
+		{testMsgs[12], false, "repeated total can not be zero"},
+		{testMsgs[13], true, "both timeout and frequency can be zero"},
+		{testMsgs[14], true, "do not check the repeated frequency and total when not repeated"},
 	}
 
 	for i, tc := range testCases {
@@ -1004,6 +1016,7 @@ func TestMsgUpdateRequestContextValidation(t *testing.T) {
 	emptyAddress := sdk.AccAddress{}
 
 	invalidRequestContextID := []byte("invalid-request-context-id")
+	invalidDuplicateProviders := []sdk.AccAddress{testProvider, testProvider}
 	invalidTimeout := int64(-1)
 	invalidLessRepeatedFreq := uint64(testTimeout) - 10
 	invalidRepeatedTotal := int64(-2)
@@ -1014,6 +1027,7 @@ func TestMsgUpdateRequestContextValidation(t *testing.T) {
 		NewMsgUpdateRequestContext(testRequestContextID, nil, nil, 0, 0, 0, testConsumer),                                                                  // allow all not to be updated
 		NewMsgUpdateRequestContext(testRequestContextID, nil, nil, 0, 0, 0, emptyAddress),                                                                  // missing consumer address
 		NewMsgUpdateRequestContext(invalidRequestContextID, nil, nil, 0, 0, 0, testConsumer),                                                               // invalid request context ID
+		NewMsgUpdateRequestContext(testRequestContextID, invalidDuplicateProviders, nil, 0, 0, 0, testConsumer),                                            // duplicate providers
 		NewMsgUpdateRequestContext(testRequestContextID, nil, nil, invalidTimeout, 0, 0, testConsumer),                                                     // invalid timeout
 		NewMsgUpdateRequestContext(invalidRequestContextID, nil, nil, testTimeout, invalidLessRepeatedFreq, 0, testConsumer),                               // invalid repeated frequency
 		NewMsgUpdateRequestContext(testRequestContextID, nil, nil, 0, 0, invalidRepeatedTotal, testConsumer),                                               // invalid repeated total
@@ -1029,10 +1043,11 @@ func TestMsgUpdateRequestContextValidation(t *testing.T) {
 		{testMsgs[1], true, ""},
 		{testMsgs[2], false, "missing consumer address"},
 		{testMsgs[3], false, "invalid request context ID"},
-		{testMsgs[4], false, "invalid timeout"},
-		{testMsgs[5], false, "invalid repeated frequency"},
-		{testMsgs[6], false, "invalid repeated total"},
-		{testMsgs[7], false, "invalid service fee denom"},
+		{testMsgs[4], false, "duplicate providers"},
+		{testMsgs[5], false, "invalid timeout"},
+		{testMsgs[6], false, "invalid repeated frequency"},
+		{testMsgs[7], false, "invalid repeated total"},
+		{testMsgs[8], false, "invalid service fee denom"},
 	}
 
 	for i, tc := range testCases {
