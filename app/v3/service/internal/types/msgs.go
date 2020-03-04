@@ -116,8 +116,8 @@ func (msg MsgDefineService) ValidateBasic() sdk.Error {
 		return err
 	}
 
-	if sdk.CheckDuplicate(msg.Tags) {
-		return ErrDuplicateTags(DefaultCodespace)
+	if err := checkDuplicateTags(msg.Tags); err != nil {
+		return err
 	}
 
 	if len(msg.Schemas) == 0 {
@@ -1016,15 +1016,15 @@ func ValidateRequest(
 	}
 
 	if len(providers) == 0 {
-		return ErrInvalidRequest(DefaultCodespace, "providers missing")
+		return ErrInvalidProviders(DefaultCodespace, "providers missing")
 	}
 
 	if len(providers) > MaxProvidersNum {
-		return ErrInvalidRequest(DefaultCodespace, fmt.Sprintf("total number of the providers must not be greater than %d", MaxProvidersNum))
+		return ErrInvalidProviders(DefaultCodespace, fmt.Sprintf("total number of the providers must not be greater than %d", MaxProvidersNum))
 	}
 
-	if sdk.CheckDuplicate(providers) {
-		return ErrInvalidRequest(DefaultCodespace, "there exists duplicate providers")
+	if err := checkDuplicateProviders(providers); err != nil {
+		return err
 	}
 
 	if len(input) == 0 {
@@ -1036,16 +1036,16 @@ func ValidateRequest(
 	}
 
 	if timeout <= 0 {
-		return ErrInvalidRequest(DefaultCodespace, fmt.Sprintf("timeout must be greater than 0: %d", timeout))
+		return ErrInvalidTimeout(DefaultCodespace, fmt.Sprintf("timeout must be greater than 0: %d", timeout))
 	}
 
 	if repeated {
 		if repeatedFrequency > 0 && repeatedFrequency < uint64(timeout) {
-			return ErrInvalidRequest(DefaultCodespace, fmt.Sprintf("repeated frequency [%d] must not be less than timeout [%d]", repeatedFrequency, timeout))
+			return ErrInvalidRepeatedFreq(DefaultCodespace, fmt.Sprintf("repeated frequency [%d] must not be less than timeout [%d]", repeatedFrequency, timeout))
 		}
 
 		if repeatedTotal < -1 || repeatedTotal == 0 {
-			return ErrInvalidRequest(DefaultCodespace, fmt.Sprintf("repeated total number must be greater than 0 or equal to -1: %d", repeatedTotal))
+			return ErrInvalidRepeatedTotal(DefaultCodespace, fmt.Sprintf("repeated total number must be greater than 0 or equal to -1: %d", repeatedTotal))
 		}
 	}
 
@@ -1053,9 +1053,15 @@ func ValidateRequest(
 }
 
 // ValidateRequestContextUpdating validates the request context updating operation
-func ValidateRequestContextUpdating(providers []sdk.AccAddress, serviceFeeCap sdk.Coins, timeout int64, repeatedFrequency uint64, repeatedTotal int64) sdk.Error {
-	if sdk.CheckDuplicate(providers) {
-		return ErrInvalidProviders(DefaultCodespace, "there exists duplicate providers")
+func ValidateRequestContextUpdating(
+	providers []sdk.AccAddress,
+	serviceFeeCap sdk.Coins,
+	timeout int64,
+	repeatedFrequency uint64,
+	repeatedTotal int64,
+) sdk.Error {
+	if err := checkDuplicateProviders(providers); err != nil {
+		return err
 	}
 
 	if !serviceFeeCap.Empty() && !validServiceCoins(serviceFeeCap) {
@@ -1072,6 +1078,34 @@ func ValidateRequestContextUpdating(providers []sdk.AccAddress, serviceFeeCap sd
 
 	if repeatedTotal < -1 {
 		return ErrInvalidRepeatedTotal(DefaultCodespace, fmt.Sprintf("repeated total number must not be less than -1: %d", repeatedTotal))
+	}
+
+	return nil
+}
+
+func checkDuplicateTags(tags []string) sdk.Error {
+	tagArr := make([]interface{}, len(tags))
+
+	for i, tag := range tagArr {
+		tagArr[i] = tag
+	}
+
+	if sdk.HasDuplicate(tagArr) {
+		return ErrDuplicateTags(DefaultCodespace)
+	}
+
+	return nil
+}
+
+func checkDuplicateProviders(providers []sdk.AccAddress) sdk.Error {
+	providerArr := make([]interface{}, len(providers))
+
+	for i, provider := range providerArr {
+		providerArr[i] = provider
+	}
+
+	if sdk.HasDuplicate(providerArr) {
+		return ErrInvalidProviders(DefaultCodespace, "there exists duplicate providers")
 	}
 
 	return nil

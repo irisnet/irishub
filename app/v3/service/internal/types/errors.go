@@ -26,14 +26,14 @@ const (
 	CodeServiceBindingAvailable   sdk.CodeType = 112
 	CodeIncorrectRefundTime       sdk.CodeType = 113
 
-	CodeInvalidRequest            sdk.CodeType = 114
 	CodeInvalidServiceFee         sdk.CodeType = 115
-	CodeInvalidResponse           sdk.CodeType = 116
-	CodeInvalidRequestID          sdk.CodeType = 117
 	CodeInvalidProviders          sdk.CodeType = 118
 	CodeInvalidTimeout            sdk.CodeType = 119
 	CodeInvalidRepeatedFreq       sdk.CodeType = 120
 	CodeInvalidRepeatedTotal      sdk.CodeType = 121
+	CodeInvalidThreshold          sdk.CodeType = 121
+	CodeInvalidResponse           sdk.CodeType = 116
+	CodeInvalidRequestID          sdk.CodeType = 117
 	CodeUnknownRequest            sdk.CodeType = 122
 	CodeUnknownResponse           sdk.CodeType = 123
 	CodeUnknownRequestContext     sdk.CodeType = 124
@@ -111,10 +111,6 @@ func ErrIncorrectRefundTime(codespace sdk.CodespaceType, refundableTime string) 
 	return sdk.NewError(codespace, CodeIncorrectRefundTime, fmt.Sprintf("can not refund before %s", refundableTime))
 }
 
-func ErrInvalidRequest(codespace sdk.CodespaceType, msg string) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidRequest, fmt.Sprintf("invalid request: %s", msg))
-}
-
 func ErrInvalidServiceFee(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidServiceFee, msg)
 }
@@ -141,6 +137,10 @@ func ErrInvalidRepeatedFreq(codespace sdk.CodespaceType, msg string) sdk.Error {
 
 func ErrInvalidRepeatedTotal(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidRepeatedTotal, msg)
+}
+
+func ErrInvalidThreshold(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidThreshold, msg)
 }
 
 func ErrUnknownRequest(codespace sdk.CodespaceType, requestID []byte) sdk.Error {

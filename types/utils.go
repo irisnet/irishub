@@ -88,17 +88,18 @@ func SHA256(data []byte) []byte {
 	return sum[:]
 }
 
-// CheckDuplicate checks if the given array contains duplicate elements
-func CheckDuplicate(arr ...interface{}) bool {
+// HasDuplicate checks if the given array contains duplicate elements.
+// Return true if there exists duplicate elements, false otherwise
+func HasDuplicate(arr []interface{}) bool {
 	elementMap := make(map[interface{}]bool)
 
 	for _, elem := range arr {
 		if _, ok := elementMap[elem]; ok {
-			return false
+			return true
 		}
 
 		elementMap[elem] = true
 	}
 
-	return true
+	return false
 }

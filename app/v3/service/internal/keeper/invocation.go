@@ -56,7 +56,7 @@ func (k Keeper) CreateRequestContext(
 		}
 
 		if responseThreshold < 1 || int(responseThreshold) > len(providers) {
-			return nil, types.ErrInvalidRequest(k.codespace, fmt.Sprintf("response threshold must be between [1,%d]", len(providers)))
+			return nil, types.ErrInvalidThreshold(k.codespace, fmt.Sprintf("response threshold must be between [1,%d]", len(providers)))
 		}
 	}
 
@@ -71,7 +71,7 @@ func (k Keeper) CreateRequestContext(
 
 	params := k.GetParamSet(ctx)
 	if timeout > params.MaxRequestTimeout {
-		return nil, types.ErrInvalidRequest(k.codespace, fmt.Sprintf("timeout [%d] must not be greater than the max request timeout [%d]", timeout, params.MaxRequestTimeout))
+		return nil, types.ErrInvalidTimeout(k.codespace, fmt.Sprintf("timeout [%d] must not be greater than the max request timeout [%d]", timeout, params.MaxRequestTimeout))
 	}
 
 	if repeated {
