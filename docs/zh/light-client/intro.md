@@ -192,6 +192,16 @@ irislcd start --node=tcp://localhost:26657 --chain-id=<chain-id> --laddr=tcp://0
 24. `GET /service/fees/{provider}`: 查询服务提供者的收益
 25. `POST /service/fees/{provider}/withdraw`: 提取服务提供者的收益
 
+### Oracle模块的APIs
+
+1. `POST /oracle/feeds`: 创建一个初始状态为`paused`的Feed。
+2. `POST /oracle/feeds/<feed-name>/start`: 启动一个处于`paused`的Feed。
+3. `POST /oracle/feeds/<feed-name>/pause`: 暂停一个处于`running`的Feed。
+4. `PUT /oracle/feeds/<feed-name>`: 更新Feed的相关信息。
+5. `GET /oracle/feeds/<feed-name>`: 通过名称查询Feed的相关信息。
+6. `GET /oracle/feeds?state=<state>`: 通过状态查询符合条件的一组Feed。
+7. `GET /oracle/feeds/<feed-name>/values`: 查询Feed的执行结果，按照时间倒序排列
+
 ### Rand模块的APIs
 
 1. `POST /rand/rands`: 请求一个随机数

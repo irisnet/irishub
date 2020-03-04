@@ -10,6 +10,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/irisnet/irishub/app/v3/oracle"
+
 	"github.com/stretchr/testify/require"
 
 	"github.com/tendermint/tendermint/crypto"
@@ -400,6 +402,24 @@ func executeGetServiceFees(t *testing.T, cmdStr string) service.EarnedFees {
 	err := cdc.UnmarshalJSON([]byte(out), &fees)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
 	return fees
+}
+
+func executeGetFeed(t *testing.T, cmdStr string) oracle.FeedContext {
+	out, _ := tests.ExecuteT(t, cmdStr, "")
+	var feed oracle.FeedContext
+	cdc := app.MakeLatestCodec()
+	err := cdc.UnmarshalJSON([]byte(out), &feed)
+	require.NoError(t, err, "out %v\n, err %v", out, err)
+	return feed
+}
+
+func executeGetFeedValue(t *testing.T, cmdStr string) oracle.FeedValues {
+	out, _ := tests.ExecuteT(t, cmdStr, "")
+	var values oracle.FeedValues
+	cdc := app.MakeLatestCodec()
+	err := cdc.UnmarshalJSON([]byte(out), &values)
+	require.NoError(t, err, "out %v\n, err %v", out, err)
+	return values
 }
 
 func executeGetToken(t *testing.T, cmdStr string) asset.TokenOutput {
