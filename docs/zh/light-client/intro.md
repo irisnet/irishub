@@ -166,22 +166,31 @@ irislcd start --node=tcp://localhost:26657 --chain-id=<chain-id> --laddr=tcp://0
 
 ### Service模块的APIs
 
-1. `POST /service/definitions`: 添加服务定义
-2. `GET /service/definitions/{defChainId}/{serviceName}`: 查询服务定义
-3. `POST /service/bindings`: 添加服务绑定
-4. `GET /service/bindings/{defChainId}/{serviceName}/{bindChainId}/{provider}`: 查询服务绑定
-5. `GET /service/bindings/{defChainId}/{serviceName}`: 查询服务绑定列表
-6. `PUT /service/bindings/{defChainId}/{serviceName}/{provider}`: 更新服务绑定
-7. `PUT /service/bindings/{defChainId}/{serviceName}/{provider}/disable`: 使绑定失效
-8. `PUT /service/bindings/{defChainId}/{serviceName}/{provider}/enable`: 重新启用绑定
-9. `PUT /service/bindings/{defChainId}/{serviceName}/{provider}/deposit/refund`: 取回服务绑定的抵押
-10. `POST /service/requests`: 请求服务
-11. `GET /service/requests/{defChainId}/{serviceName}/{bindChainId}/{provider}`: 查询某服务提供者收到的服务请求
-12. `POST /service/responses`: 响应服务请求
-13. `GET /service/responses/{reqChainId}/{reqId}`: 查询服务响应
-14. `GET /service/fees/{address}`:  查询（某个地址的）服务费用
-15. `POST /service/fees/{address}/refund`: 消费者取回（未被响应的）服务费用
-16. `POST /service/fees/{address}/withdraw`: 服务提供者取回服务收益
+1. `POST /service/definitions`: 定义一个新的服务
+2. `GET /service/definitions/{service-name}`: 查询服务定义
+3. `POST /service/bindings`: 绑定一个服务
+4. `GET /service/bindings/{service-name}/{provider}`: 查询服务绑定
+5. `GET /service/bindings{service-name}`: 查询服务绑定列表
+6. `POST /service/providers/{provider}/withdraw-address`: 设置提取地址
+7. `GET /service/providers/{provider}/withdraw-address`: 查询提取地址
+8. `PUT /service/bindings/{service-name}/{provider}`: 更新一个存在的服务绑定
+9. `POST /service/bindings/{service-name}/{provider}/disable`: 禁用一个可用的服务绑定
+10. `POST /service/bindings/{service-name}/{provider}/enable`: 启用一个不可用的服务绑定
+11. `POST /service/bindings/{service-name}/{provider}/refund-deposit`: 取回一个服务绑定的所有押金
+12. `POST /service/requests`: 调用服务
+13. `GET /service/requests/{request-id}`: 查询服务请求
+14. `GET /service/requests/{service-name}/{provider}`: 查询一个服务绑定的活跃请求
+15. `GET /service/requests/{request-context-id}/{batch-counter}`: 根据请求上下文ID和批次计数器查询请求列表
+16. `POST /service/responses`: 响应服务请求
+17. `GET /service/responses/{request-id}`: 查询服务响应
+18. `GET /service/responses/{request-context-id}/{batch-counter}`: 根据请求上下文ID和批次计数器查询服务响应列表
+19. `GET /service/contexts/{request-context-id}`: 查询请求上下文
+20. `PUT /service/contexts/{request-context-id}`: 更新请求上下文
+21. `POST /service/contexts/{request-context-id}/pause`: 暂停一个正在进行的请求上下文
+22. `POST /service/contexts/{request-context-id}/start`: 启动一个暂停的请求上下文
+23. `POST /service/contexts/{request-context-id}/kill`: 终止请求上下文
+24. `GET /service/fees/{provider}`: 查询服务提供者的收益
+25. `POST /service/fees/{provider}/withdraw`: 提取服务提供者的收益
 
 ### Oracle模块的APIs
 
