@@ -46,10 +46,10 @@ func init() {
 
 	FsServiceBind.String(FlagServiceName, "", "service name")
 	FsServiceBind.String(FlagDeposit, "", "deposit of the binding")
-	FsServiceBind.String(FlagPricing, "", "pricing content or path")
+	FsServiceBind.String(FlagPricing, "", "pricing content or path, which is an instance of the Irishub Service Pricing schema")
 
 	FsServiceUpdateBinding.String(FlagDeposit, "", "added deposit for the binding")
-	FsServiceUpdateBinding.String(FlagPricing, "", "pricing of the binding, which is a Pricing JSON Schema instance")
+	FsServiceUpdateBinding.String(FlagPricing, "", "pricing content or path, which is an instance of the Irishub Service Pricing schema")
 
 	FsServiceEnable.String(FlagDeposit, "", "added deposit for enabling the binding")
 

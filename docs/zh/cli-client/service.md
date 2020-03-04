@@ -16,7 +16,7 @@ Service模块允许在IRIS Hub中定义、绑定、调用服务。[了解更多i
 | [update-binding](#iriscli-service-update-binding) | 更新一个存在的服务绑定         |
 | [disable](#iriscli-service-disable)               | 禁用一个可用的服务绑定         |
 | [enable](#iriscli-service-enable)                 | 启用一个不可用的服务绑定       |
-| [refund-deposit](#iriscli-service-refund-deposit) | 取回所有押金                   |
+| [refund-deposit](#iriscli-service-refund-deposit) | 取回一个服务绑定的所有押金                   |
 | [call](#iriscli-service-call)                     | 调用服务                  |
 | [request](#iriscli-service-request)             | 查询服务请求                          |
 | [requests](#iriscli-service-requests)             | 查询服务请求列表               |
@@ -164,7 +164,7 @@ iriscli service update-binding <flags>
 | -------------- | ---- | --------------------------------------------------- | ---- |
 | --service-name |      | 服务名称                                            | 是   |
 | --deposit      |      | 增加的押金                  |      |
-| --pricing      |      | 新的服务定价内容或路径，需符合Irishub Pricing JSON schema              |      |
+| --pricing      |      | 服务定价内容或路径，需符合Irishub Pricing JSON schema              |      |
 
 ### 更新一个存在的服务绑定
 

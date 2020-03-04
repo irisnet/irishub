@@ -13,13 +13,13 @@ Service module allows you to define, bind, invoke services on the IRIS Hub. [Rea
 | [bindings](#iriscli-service-bindings)             | Query all bindings of a service definition                              |
 | [set-withdraw-addr](#iriscli-service-set-withdraw-addr)             | Set a withdrawal address for a provider                              |
 | [withdraw-addr](#iriscli-service-withdraw-addr)             | Query the withdrawal address of a provider                              |
-| [update-binding](#iriscli-service-update-binding) | Update a service binding                              |
+| [update-binding](#iriscli-service-update-binding) | Update an existing service binding                              |
 | [disable](#iriscli-service-disable)               | Disable an available service binding                   |
 | [enable](#iriscli-service-enable)                 | Enable an unavailable service binding                 |
 | [refund-deposit](#iriscli-service-refund-deposit) | Refund all deposit from a service binding             |
 | [call](#iriscli-service-call)                     | Call a service                                 |
 | [request](#iriscli-service-request)             | Query a request by the request ID                          |
-| [requests](#iriscli-service-requests)             | Query service requests by the service binding or request context ID                          |
+| [requests](#iriscli-service-requests)             | Query requests by the service binding or request context                      |
 | [respond](#iriscli-service-respond)               | Respond to a service request                  |
 | [response](#iriscli-service-response)             | Query a response by the request ID                             |
 | [responses](#iriscli-service-responses)             | Query responses by the request context ID and batch counter                             |
@@ -159,7 +159,7 @@ iriscli service update-binding <flags>
 | --------------- | ------- | ------------------------------------------------------------------------- | -------- |
 | --service-name  |         | Service name                                                              | Yes      |
 | --deposit       |         | Added deposit for the binding             |          |
-| --pricing        |         | Pricing of the binding, which is an instance of the Irishub Service Pricing schema        |
+| --pricing        |         | Pricing context or path, which is an instance of the Irishub Service Pricing schema        |
 
 ### Update an existing service binding
 

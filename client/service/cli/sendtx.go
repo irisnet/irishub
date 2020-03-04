@@ -152,7 +152,7 @@ func GetCmdBindService(cdc *codec.Codec) *cobra.Command {
 func GetCmdUpdateServiceBinding(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "update-binding",
-		Short: "Update a service binding",
+		Short: "Update an existing service binding",
 		Example: "iriscli service update-binding <service name> --chain-id=<chain-id> --from=<key-name> " +
 			"--fee=0.3iris --deposit=1iris --pricing=<pricing content or path>",
 		Args: cobra.ExactArgs(1),
@@ -332,7 +332,7 @@ func GetCmdEnableService(cdc *codec.Codec) *cobra.Command {
 func GetCmdRefundServiceDeposit(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "refund-deposit",
-		Short: "Refund the deposit from a service binding",
+		Short: "Refund all deposit from a service binding",
 		Example: "iriscli service refund-deposit <service name> --chain-id=<chain-id> --from=<key-name> " +
 			"--fee=0.3iris",
 		Args: cobra.ExactArgs(1),
@@ -474,7 +474,7 @@ func GetCmdRespondService(cdc *codec.Codec) *cobra.Command {
 func GetCmdPauseRequestContext(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "pause",
-		Short:   "Pause a request context",
+		Short:   "Pause a running request context",
 		Example: "iriscli service pause <request-context-id> --chain-id=<chain-id> --from=<key name> --fee=0.3iris",
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -650,7 +650,7 @@ func GetCmdUpdateRequestContext(cdc *codec.Codec) *cobra.Command {
 func GetCmdWithdrawEarnedFees(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "withdraw-fees",
-		Short:   "Withdraw the earned fees",
+		Short:   "Withdraw the earned fees of a provider",
 		Example: "iriscli service withdraw-fees --chain-id=<chain-id> --from=<key name> --fee=0.3iris",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
@@ -680,7 +680,7 @@ func GetCmdWithdrawEarnedFees(cdc *codec.Codec) *cobra.Command {
 func GetCmdWithdrawTax(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "withdraw-tax",
-		Short: "Withdraw service tax",
+		Short: "Withdraw the service tax",
 		Example: "iriscli service withdraw-tax <destination address> <withdrawal amount> --chain-id=<chain-id> " +
 			"--from=<key name> --fee=0.3iris",
 		Args: cobra.ExactArgs(2),
