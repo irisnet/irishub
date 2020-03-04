@@ -74,17 +74,9 @@ func (k Keeper) CreateRequestContext(
 		return nil, types.ErrInvalidRequest(k.codespace, fmt.Sprintf("timeout [%d] must not be greater than the max request timeout [%d]", timeout, params.MaxRequestTimeout))
 	}
 
-	if timeout == 0 {
-		timeout = params.MaxRequestTimeout
-	}
-
 	if repeated {
 		if repeatedFrequency == 0 {
 			repeatedFrequency = uint64(timeout)
-		}
-
-		if repeatedFrequency < uint64(timeout) {
-			return nil, types.ErrInvalidRequest(k.codespace, fmt.Sprintf("repeated frequency [%d] must not be less than timeout [%d]", repeatedFrequency, timeout))
 		}
 	} else {
 		repeatedFrequency = 0
@@ -122,10 +114,15 @@ func (k Keeper) UpdateRequestContext(
 	timeout int64,
 	repeatedFreq uint64,
 	repeatedTotal int64,
+	consumer sdk.AccAddress,
 ) sdk.Error {
 	requestContext, found := k.GetRequestContext(ctx, requestContextID)
 	if !found {
 		return types.ErrUnknownRequestContext(k.codespace, requestContextID)
+	}
+
+	if !consumer.Equals(requestContext.Consumer) {
+		return types.ErrNotMatchingConsumer(k.codespace)
 	}
 
 	if !requestContext.Repeated {
@@ -133,7 +130,7 @@ func (k Keeper) UpdateRequestContext(
 	}
 
 	if len(requestContext.ModuleName) != 0 {
-		if err := types.ValidateRequestContextUpdating(serviceFeeCap, timeout, repeatedFreq, repeatedTotal); err != nil {
+		if err := types.ValidateRequestContextUpdating(providers, serviceFeeCap, timeout, repeatedFreq, repeatedTotal); err != nil {
 			return err
 		}
 	}
@@ -192,10 +189,15 @@ func (k Keeper) UpdateRequestContext(
 func (k Keeper) PauseRequestContext(
 	ctx sdk.Context,
 	requestContextID []byte,
+	consumer sdk.AccAddress,
 ) sdk.Error {
 	requestContext, found := k.GetRequestContext(ctx, requestContextID)
 	if !found {
 		return types.ErrUnknownRequestContext(k.codespace, requestContextID)
+	}
+
+	if !consumer.Equals(requestContext.Consumer) {
+		return types.ErrNotMatchingConsumer(k.codespace)
 	}
 
 	if !requestContext.Repeated {
@@ -216,10 +218,15 @@ func (k Keeper) PauseRequestContext(
 func (k Keeper) StartRequestContext(
 	ctx sdk.Context,
 	requestContextID []byte,
+	consumer sdk.AccAddress,
 ) sdk.Error {
 	requestContext, found := k.GetRequestContext(ctx, requestContextID)
 	if !found {
 		return types.ErrUnknownRequestContext(k.codespace, requestContextID)
+	}
+
+	if !consumer.Equals(requestContext.Consumer) {
+		return types.ErrNotMatchingConsumer(k.codespace)
 	}
 
 	if !requestContext.Repeated {
@@ -244,10 +251,15 @@ func (k Keeper) StartRequestContext(
 func (k Keeper) KillRequestContext(
 	ctx sdk.Context,
 	requestContextID []byte,
+	consumer sdk.AccAddress,
 ) sdk.Error {
 	requestContext, found := k.GetRequestContext(ctx, requestContextID)
 	if !found {
 		return types.ErrUnknownRequestContext(k.codespace, requestContextID)
+	}
+
+	if !consumer.Equals(requestContext.Consumer) {
+		return types.ErrNotMatchingConsumer(k.codespace)
 	}
 
 	if !requestContext.Repeated {

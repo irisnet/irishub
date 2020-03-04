@@ -13,44 +13,46 @@ const (
 	CodeInvalidServiceName       sdk.CodeType = 100
 	CodeInvalidSchemas           sdk.CodeType = 101
 	CodeInvalidLength            sdk.CodeType = 102
-	CodeUnknownServiceDefinition sdk.CodeType = 103
-	CodeServiceDefinitionExists  sdk.CodeType = 104
+	CodeDuplicateTags            sdk.CodeType = 103
+	CodeUnknownServiceDefinition sdk.CodeType = 104
+	CodeServiceDefinitionExists  sdk.CodeType = 105
 
-	CodeInvalidDeposit            sdk.CodeType = 105
-	CodeInvalidPricing            sdk.CodeType = 106
-	CodeServiceBindingExists      sdk.CodeType = 107
-	CodeUnknownServiceBinding     sdk.CodeType = 108
-	CodeNoWithdrawAddr            sdk.CodeType = 109
-	CodeServiceBindingUnavailable sdk.CodeType = 110
-	CodeServiceBindingAvailable   sdk.CodeType = 111
-	CodeIncorrectRefundTime       sdk.CodeType = 112
+	CodeInvalidDeposit            sdk.CodeType = 106
+	CodeInvalidPricing            sdk.CodeType = 107
+	CodeServiceBindingExists      sdk.CodeType = 108
+	CodeUnknownServiceBinding     sdk.CodeType = 109
+	CodeNoWithdrawAddr            sdk.CodeType = 110
+	CodeServiceBindingUnavailable sdk.CodeType = 111
+	CodeServiceBindingAvailable   sdk.CodeType = 112
+	CodeIncorrectRefundTime       sdk.CodeType = 113
 
-	CodeInvalidRequest            sdk.CodeType = 113
-	CodeInvalidServiceFee         sdk.CodeType = 114
-	CodeInvalidResponse           sdk.CodeType = 115
-	CodeInvalidRequestID          sdk.CodeType = 116
-	CodeInvalidProviders          sdk.CodeType = 117
-	CodeInvalidTimeout            sdk.CodeType = 118
-	CodeInvalidRepeatedFreq       sdk.CodeType = 119
-	CodeInvalidRepeatedTotal      sdk.CodeType = 120
-	CodeUnknownRequest            sdk.CodeType = 121
-	CodeUnknownResponse           sdk.CodeType = 122
-	CodeUnknownRequestContext     sdk.CodeType = 123
-	CodeInvalidRequestContextID   sdk.CodeType = 124
-	CodeRequestContextNonRepeated sdk.CodeType = 125
-	CodeRequestContextNotStarted  sdk.CodeType = 126
-	CodeRequestContextNotPaused   sdk.CodeType = 127
-	CodeModuleNameRegistered      sdk.CodeType = 128
-	CodeModuleNameNotRegistered   sdk.CodeType = 129
-	CodeNoEarnedFees              sdk.CodeType = 130
+	CodeInvalidRequest            sdk.CodeType = 114
+	CodeInvalidServiceFee         sdk.CodeType = 115
+	CodeInvalidResponse           sdk.CodeType = 116
+	CodeInvalidRequestID          sdk.CodeType = 117
+	CodeInvalidProviders          sdk.CodeType = 118
+	CodeInvalidTimeout            sdk.CodeType = 119
+	CodeInvalidRepeatedFreq       sdk.CodeType = 120
+	CodeInvalidRepeatedTotal      sdk.CodeType = 121
+	CodeUnknownRequest            sdk.CodeType = 122
+	CodeUnknownResponse           sdk.CodeType = 123
+	CodeUnknownRequestContext     sdk.CodeType = 124
+	CodeInvalidRequestContextID   sdk.CodeType = 125
+	CodeNotMatchingConsumer       sdk.CodeType = 126
+	CodeRequestContextNonRepeated sdk.CodeType = 127
+	CodeRequestContextNotStarted  sdk.CodeType = 128
+	CodeRequestContextNotPaused   sdk.CodeType = 129
+	CodeModuleNameRegistered      sdk.CodeType = 130
+	CodeModuleNameNotRegistered   sdk.CodeType = 131
+	CodeNoEarnedFees              sdk.CodeType = 132
 
-	CodeInvalidRequestInput   sdk.CodeType = 131
-	CodeInvalidResponseOutput sdk.CodeType = 132
-	CodeInvalidResponseErr    sdk.CodeType = 133
+	CodeInvalidRequestInput   sdk.CodeType = 133
+	CodeInvalidResponseOutput sdk.CodeType = 134
+	CodeInvalidResponseErr    sdk.CodeType = 135
 
-	CodeInvalidAddress  sdk.CodeType = 134
-	CodeInvalidProfiler sdk.CodeType = 135
-	CodeInvalidTrustee  sdk.CodeType = 136
+	CodeInvalidAddress  sdk.CodeType = 136
+	CodeInvalidProfiler sdk.CodeType = 137
+	CodeInvalidTrustee  sdk.CodeType = 138
 )
 
 func ErrInvalidServiceName(codespace sdk.CodespaceType, serviceName string) sdk.Error {
@@ -63,6 +65,10 @@ func ErrInvalidSchemas(codespace sdk.CodespaceType, msg string) sdk.Error {
 
 func ErrInvalidLength(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidLength, msg)
+}
+
+func ErrDuplicateTags(codespace sdk.CodespaceType) sdk.Error {
+	return sdk.NewError(codespace, CodeDuplicateTags, "there exists duplicate tags")
 }
 
 func ErrServiceDefinitionExists(codespace sdk.CodespaceType, serviceName string) sdk.Error {
@@ -151,6 +157,10 @@ func ErrUnknownRequestContext(codespace sdk.CodespaceType, requestContextID []by
 
 func ErrInvalidRequestContextID(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidRequestContextID, fmt.Sprintf("invalid request context ID: %s", msg))
+}
+
+func ErrNotMatchingConsumer(codespace sdk.CodespaceType) sdk.Error {
+	return sdk.NewError(codespace, CodeNotMatchingConsumer, "consumer does not match")
 }
 
 func ErrRequestContextNonRepeated(codespace sdk.CodespaceType) sdk.Error {
