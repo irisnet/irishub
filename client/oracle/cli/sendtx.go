@@ -16,7 +16,7 @@ import (
 func GetCmdCreateFeed(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create",
-		Short: `Define a new feed,the feed will be in "paused" state`,
+		Short: `create a new feed,the feed will be in "paused" state`,
 		Example: `iriscli oracle create --chain-id="irishub-test" --from=node0 --fee=0.3iris  --commit ` +
 			`--feed-name="test-feed" ` +
 			`--latest-history=10 ` +
