@@ -1627,7 +1627,7 @@ paths:
                   example: '{"input":{"type":"object"},"output":{"type":"object"},"error":{"type":"object"}}'
   '/service/definitions/{service-name}':
     get:
-      summary: Query a service definition by the service name
+      summary: Query a service definition
       tags:
         - Service
       parameters:
@@ -1651,7 +1651,7 @@ paths:
   '/service/bindings':
     post:
       summary: Bind a service
-      description: Bind a service definition
+      description: Bind a service
       tags:
         - Service
       responses:
@@ -1678,10 +1678,10 @@ paths:
                   example: '10000iris'
                 pricing:
                   type: string
-                  example: {"price":[{"denom":"iris-atto","amount":"1000000000000000000"}]}
+                  example: '{"price":[{"denom":"iris-atto","amount":"1000000000000000000"}]}'
   '/service/bindings/{service-name}/{provider}':
     get:
-      summary: Query a service binding by the service name and provider
+      summary: Query a service binding
       tags:
         - Service
       parameters:
@@ -1794,7 +1794,7 @@ paths:
         '500':
           description: Internal Server Error
     post:
-      summary: Set a new withdrawal address for a provider
+      summary: Set a withdrawal address for a provider
       tags:
         - Service
       parameters:
@@ -1823,8 +1823,8 @@ paths:
                   $ref: '#/components/schemas/Address'
   '/service/bindings/{service-name}/{provider}/disable':
     post:
-      summary: Disable a service binding
-      description: Disable a service binding by the service name and provider
+      summary: Disable an available service binding
+      description: Disable an available service binding by the service name and provider
       tags:
         - Service
       parameters:
@@ -1857,8 +1857,8 @@ paths:
                   $ref: '#/components/schemas/BaseTx'
   '/service/bindings/{service-name}/{provider}/enable':
     post:
-      summary: Enable a service binding
-      description: Enable a service binding by the service name and provider
+      summary: Enable an unavailable service binding
+      description: Enable an unavailable service binding by the service name and provider
       tags:
         - Service
       parameters:
@@ -1894,8 +1894,8 @@ paths:
                   example: '1iris'
   '/service/bindings/{service-name}/{provider}/refund-deposit':
     post:
-      summary: Refund deposit from a service binding
-      description: Refund deposit from a service binding
+      summary: Refund all deposit from a service binding
+      description: Refund all deposit from a service binding
       tags:
         - Service
       parameters:
@@ -1928,8 +1928,8 @@ paths:
                   $ref: '#/components/schemas/BaseTx'
   '/service/requests':
     post:
-      summary: Call service
-      description: Call a service definition with the specified params
+      summary: Call a service
+      description: Call a service with the specified params
       tags:
         - Service
       responses:
@@ -1963,7 +1963,7 @@ paths:
                     type: string
                     example: '1iris'
                   timeout:
-                    type: interger
+                    type: integer
                     example: 20
                   super_mode:
                     type: boolean
@@ -1972,10 +1972,10 @@ paths:
                     type: boolean
                     example: true
                   repeated_frequency:
-                    type: interger
+                    type: integer
                     example: 50
                   repeated_total:
-                    type: interger
+                    type: integer
                     example: 100
   '/service/requests/{request-id}':
     get:
@@ -2033,8 +2033,8 @@ paths:
           description: Internal Server Error
   '/service/responses':
     post:
-      summary: Respond a service request
-      description: Respond a service request by the request ID
+      summary: Respond to a service request
+      description: Respond to a service request by the request ID
       tags:
         - Service
       responses:
@@ -2086,7 +2086,7 @@ paths:
           description: Internal Server Error
   '/service/contexts/{request-context-id}/pause':
     post:
-      summary: Pause a request context
+      summary: Pause a running request context
       description: Pause a running request context
       tags:
         - Service
@@ -2116,8 +2116,8 @@ paths:
                   $ref: '#/components/schemas/Address'
   '/service/contexts/{request-context-id}/start':
     post:
-      summary: Start a request context
-      description: Resume a paused request context
+      summary: Start a paused request context
+      description: Start a paused request context
       tags:
         - Service
       parameters:
@@ -2230,13 +2230,16 @@ paths:
                     $ref: '#/components/schemas/Address'
                 service_fee_cap:
                   type: string
-                  example: 1iris
+                  example: '1iris'
                 timeout:
-                  type: interger
+                  type: integer
+                  example: 0
                 repeated_frequency:
-                  type: interger
+                  type: integer
+                  example: 0
                 repeated_total:
-                  type: interger
+                  type: integer
+                  example: 0
                 consumer:
                   $ref: '#/components/schemas/Address'
   '/service/requests/{request-context-id}/{batch-counter}':
@@ -2256,7 +2259,7 @@ paths:
           description: batch counter
           required: true
           schema:
-            type: interger
+            type: integer
       responses:
         '200':
           description: OK
@@ -2287,7 +2290,7 @@ paths:
           description: batch counter
           required: true
           schema:
-            type: interger
+            type: integer
       responses:
         '200':
           description: OK
@@ -2303,7 +2306,7 @@ paths:
           description: Internal Server Error
   '/service/fees/{provider}/withdraw':
     post:
-      summary: Withdraw the earned fees
+      summary: Withdraw the earned fees of a provider
       description: Withdraw the earned fees of a provider
       tags:
         - Service
@@ -3951,7 +3954,7 @@ components:
             $ref: '#/components/schemas/Coin'
         pricing:
           type: string
-          example: {"price":[{"denom":"iris-atto","amount":"1000000"}]}
+          example: '{"price":[{"denom":"iris-atto","amount":"1000000"}]}''
         available:
           type: boolean
         disabled_time:
@@ -3975,13 +3978,13 @@ components:
         super_mode:
           type: boolean
         request_height:
-          type: interger
+          type: integer
         expiration_height:
-          type: interger
+          type: integer
         request_context_id:
           type: string
         request_context_batch_counter:
-          type: interger
+          type: integer
     ServiceResponse:
       type: object
       properties:
@@ -3991,13 +3994,13 @@ components:
           $ref: '#/components/schemas/Address'
         output:
           type: string
-          example: '{"userName":"irisnet"}'
+          example: '{"name":"irisnet"}'
         error:
           type: string
         request_context_id:
           type: string
         request_context_batch_counter:
-          type: interger
+          type: integer
     RequestContext:
       type: object
       properties:
@@ -4016,27 +4019,27 @@ components:
           items:
             $ref: '#/components/schemas/Coin'
         timeout:
-          type: interger
+          type: integer
         super_mode:
           type: boolean
         repeated:
           type: boolean
         repeated_frequency:
-          type: interger
+          type: integer
         repeated_total:
-          type: interger
+          type: integer
         batch_counter:
-          type: interger
+          type: integer
         batch_request_count:
-          type: interger
+          type: integer
         batch_response_count:
-          type: interger
+          type: integer
         batch_state:
           type: string
         state:
           type: string
         response_threshold:
-          type: interger
+          type: integer
         module_name:
           type: string
     EarnedFees:
