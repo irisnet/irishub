@@ -77,10 +77,12 @@ func QueryCoinTypeRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) 
 func QueryTokenStatsRequestHandlerFn(cdc *codec.Codec, decoder auth.AccountDecoder, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		tokenId := vars["id"]
+		symbol := vars["symbol"]
+
 		params := asset.QueryTokenParams{
-			TokenId: tokenId,
+			Symbol: symbol,
 		}
+
 		bz, err := cdc.MarshalJSON(params)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -101,12 +103,13 @@ func QueryTokenStatsRequestHandlerFn(cdc *codec.Codec, decoder auth.AccountDecod
 		}
 
 		// query bonded tokens for iris
-		if tokenId == "" || tokenId == sdk.Iris {
+		if symbol == "" || symbol == sdk.Iris {
 			resPool, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.StakeRoute, stake.QueryPool), nil)
 			if err != nil {
 				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 				return
 			}
+
 			var poolStatus stake.PoolStatus
 			err = cdc.UnmarshalJSON(resPool, &poolStatus)
 			if err != nil {

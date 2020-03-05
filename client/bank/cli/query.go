@@ -79,13 +79,17 @@ func GetCmdQueryTokenStats(cdc *codec.Codec, decoder auth.AccountDecoder) *cobra
 		Example: "iriscli bank token-stats iris",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithAccountDecoder(decoder)
-			tokenId := ""
+
+			symbol := ""
+
 			if len(args) > 0 {
-				tokenId = args[0]
+				symbol = args[0]
 			}
+
 			params := asset.QueryTokenParams{
-				TokenId: tokenId,
+				Symbol: symbol,
 			}
+
 			bz, err := cdc.MarshalJSON(params)
 			if err != nil {
 				return err
@@ -103,11 +107,12 @@ func GetCmdQueryTokenStats(cdc *codec.Codec, decoder auth.AccountDecoder) *cobra
 			}
 
 			// query bonded tokens for iris
-			if tokenId == "" || tokenId == sdk.Iris {
+			if symbol == "" || symbol == sdk.Iris {
 				resPool, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.StakeRoute, stake.QueryPool), nil)
 				if err != nil {
 					return err
 				}
+
 				var poolStatus stake.PoolStatus
 				err = cdc.UnmarshalJSON(resPool, &poolStatus)
 				if err != nil {
