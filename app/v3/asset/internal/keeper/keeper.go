@@ -216,7 +216,7 @@ func (k Keeper) IterateTokens(ctx sdk.Context, op func(token types.FungibleToken
 	}
 }
 
-// IterateTokens returns all existing tokens
+// GetAllTokens returns all existing tokens
 func (k Keeper) GetAllTokens(ctx sdk.Context) (tokens []exported.Token) {
 	k.IterateTokens(ctx, func(token types.FungibleToken) (stop bool) {
 		tokens = append(tokens, token)

@@ -1,10 +1,6 @@
 package keeper
 
 import (
-	"fmt"
-	"strings"
-
-	"github.com/irisnet/irishub/app/v3/asset/internal/types"
 	sdk "github.com/irisnet/irishub/types"
 )
 
@@ -19,7 +15,8 @@ func (k Keeper) Init(ctx sdk.Context) {
 
 	logger.Info("Begin execute upgrade method")
 	store := ctx.KVStore(k.storeKey)
-	// delete gateway
+
+	// delete gateways
 	k.iterateGateways(ctx, prefixGateway, func(key []byte) {
 		logger.Info("Delete gateway information", "key", string(key))
 		store.Delete(key)
@@ -31,21 +28,16 @@ func (k Keeper) Init(ctx sdk.Context) {
 		store.Delete(key)
 	})
 
-	// delete Gateway/External token
-	k.IterateTokens(ctx, func(token types.FungibleToken) (stop bool) {
-		if token.Source == 0x01 || token.Source == 0x02 {
-			tokenID := getTokenID(token.Source, token.GetSymbol(), token.Gateway)
-			logger.Info("Delete token", "tokenID", tokenID)
-			store.Delete(KeyTokens(token.Owner, tokenID))
-			store.Delete(KeyTokens(sdk.AccAddress{}, tokenID))
-			store.Delete(KeyToken(tokenID))
-		}
-		return false
+	// delete all tokens
+	k.IterateTokensWithKeyOp(ctx, func(key []byte) {
+		logger.Info("Delete token")
+		store.Delete(key)
 	})
 
 	//reset params
 	param := k.GetParamSet(ctx)
 	k.SetParamSet(ctx, param)
+
 	logger.Info("End execute upgrade method")
 }
 
@@ -60,15 +52,14 @@ func (k Keeper) iterateGateways(ctx sdk.Context, prefix []byte, op func(key []by
 	}
 }
 
-// Deprecated
-func getTokenID(source types.AssetSource, symbol string, gateway string) string {
-	switch source {
-	case 0x00:
-		return strings.ToLower(fmt.Sprintf("i.%s", symbol))
-	case 0x01:
-		return strings.ToLower(fmt.Sprintf("x.%s", symbol))
-	case 0x02:
-		return strings.ToLower(fmt.Sprintf("%s.%s", gateway, symbol))
+// IterateTokensWithKeyOp iterates through all existing tokens with an operation on key
+func (k Keeper) IterateTokensWithKeyOp(ctx sdk.Context, op func(key []byte)) {
+	store := ctx.KVStore(k.storeKey)
+
+	iterator := sdk.KVStorePrefixIterator(store, PrefixToken)
+	defer iterator.Close()
+
+	for ; iterator.Valid(); iterator.Next() {
+		op(iterator.Key())
 	}
-	return ""
 }
