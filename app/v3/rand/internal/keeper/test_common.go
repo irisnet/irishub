@@ -6,6 +6,7 @@ import (
 	abci "github.com/tendermint/tendermint/abci/types"
 
 	"github.com/irisnet/irishub/app/v3/rand/internal/types"
+	"github.com/irisnet/irishub/app/v3/service"
 	"github.com/irisnet/irishub/app/v3/service/exported"
 	sdk "github.com/irisnet/irishub/types"
 )
@@ -117,4 +118,8 @@ func (m MockServiceKeeper) PauseRequestContext(ctx sdk.Context, requestContextID
 	reqCtx.State = exported.PAUSED
 	m.cxtMap[string(requestContextID)] = reqCtx
 	return nil
+}
+
+func (m MockServiceKeeper) GetParamSet(ctx sdk.Context) service.Params {
+	return service.DefaultParams()
 }

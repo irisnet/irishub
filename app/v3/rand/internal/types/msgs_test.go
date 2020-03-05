@@ -16,7 +16,7 @@ var (
 )
 
 func TestNewMsgRequestRand(t *testing.T) {
-	msg := NewMsgRequestRand(testAddr, blockInterval)
+	msg := NewMsgRequestRand(testAddr, blockInterval, false)
 
 	require.Equal(t, testAddr, msg.Consumer)
 	require.Equal(t, blockInterval, msg.BlockInterval)
@@ -24,7 +24,7 @@ func TestNewMsgRequestRand(t *testing.T) {
 
 func TestMsgRequestRandRoute(t *testing.T) {
 	// build a MsgRequestRand
-	msg := NewMsgRequestRand(testAddr, blockInterval)
+	msg := NewMsgRequestRand(testAddr, blockInterval, false)
 
 	require.Equal(t, "rand", msg.Route())
 }
@@ -34,14 +34,15 @@ func TestMsgRequestRandValidation(t *testing.T) {
 		name          string
 		consumer      sdk.AccAddress
 		blockInterval uint64
+		oracle        bool
 		expectPass    bool
 	}{
-		{"empty consumer", emptyAddr, blockInterval, false},
-		{"basic good", testAddr, blockInterval, true},
+		{"empty consumer", emptyAddr, blockInterval, false, false},
+		{"basic good", testAddr, blockInterval, false, true},
 	}
 
 	for _, td := range testData {
-		msg := NewMsgRequestRand(td.consumer, td.blockInterval)
+		msg := NewMsgRequestRand(td.consumer, td.blockInterval, td.oracle)
 		if td.expectPass {
 			require.Nil(t, msg.ValidateBasic(), "test: %v", td.name)
 		} else {
@@ -51,7 +52,7 @@ func TestMsgRequestRandValidation(t *testing.T) {
 }
 
 func TestMsgRequestRandGetSignBytes(t *testing.T) {
-	var msg = NewMsgRequestRand(testAddr, blockInterval)
+	var msg = NewMsgRequestRand(testAddr, blockInterval, false)
 	res := msg.GetSignBytes()
 
 	expected := "{\"type\":\"irishub/rand/MsgRequestRand\",\"value\":{\"block-interval\":\"10\",\"consumer\":\"faa1w3jhxazpv3j8yxhn3j0\"}}"
@@ -59,7 +60,7 @@ func TestMsgRequestRandGetSignBytes(t *testing.T) {
 }
 
 func TestMsgRequestRandGetSigners(t *testing.T) {
-	var msg = NewMsgRequestRand(testAddr, blockInterval)
+	var msg = NewMsgRequestRand(testAddr, blockInterval, false)
 	res := msg.GetSigners()
 
 	expected := "[7465737441646472]"

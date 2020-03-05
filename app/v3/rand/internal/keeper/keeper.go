@@ -12,8 +12,8 @@ import (
 )
 
 type Keeper struct {
-	storeKey sdk.StoreKey
-	cdc      *codec.Codec
+	storeKey  sdk.StoreKey
+	cdc       *codec.Codec
 	sk        types.ServiceKeeper
 	codespace sdk.CodespaceType
 }
@@ -25,8 +25,8 @@ func NewKeeper(
 	codespace sdk.CodespaceType,
 ) Keeper {
 	return Keeper{
-		storeKey: key,
-		cdc:      cdc,
+		storeKey:  key,
+		cdc:       cdc,
 		sk:        sk,
 		codespace: codespace,
 	}
@@ -43,7 +43,12 @@ func (k Keeper) GetCdc() *codec.Codec {
 }
 
 // RequestRand requests a random number
-func (k Keeper) RequestRand(ctx sdk.Context, consumer sdk.AccAddress, blockInterval uint64) (sdk.Tags, sdk.Error) {
+func (k Keeper) RequestRand(
+	ctx sdk.Context,
+	consumer sdk.AccAddress,
+	blockInterval uint64,
+	oracle bool,
+) (sdk.Tags, sdk.Error) {
 	currentHeight := ctx.BlockHeight()
 	destHeight := currentHeight + int64(blockInterval)
 
@@ -51,7 +56,7 @@ func (k Keeper) RequestRand(ctx sdk.Context, consumer sdk.AccAddress, blockInter
 	txHash := sdk.SHA256(ctx.TxBytes())
 
 	// build request
-	request := types.NewRequest(currentHeight, consumer, txHash)
+	request := types.NewRequest(currentHeight, consumer, txHash, oracle)
 
 	// generate the request id
 	reqID := types.GenerateRequestID(request)
@@ -147,4 +152,33 @@ func (k Keeper) IterateRandRequestQueue(ctx sdk.Context, op func(h int64, r type
 			break
 		}
 	}
+}
+
+// SetSeed stores the oracle seed
+func (k Keeper) SetSeed(ctx sdk.Context, reqID []byte, seed types.Seed) {
+	store := ctx.KVStore(k.storeKey)
+
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(seed)
+	store.Set(KeySeed(reqID), bz)
+}
+
+// GetSeed retrieves the oracle seed by the specified request id
+func (k Keeper) GetSeed(ctx sdk.Context, reqID []byte) (types.Seed, sdk.Error) {
+	store := ctx.KVStore(k.storeKey)
+
+	bz := store.Get(KeySeed(reqID))
+	if bz == nil {
+		return types.Seed{}, types.ErrInvalidReqID(k.codespace, fmt.Sprintf("invalid request id: %s", hex.EncodeToString(reqID)))
+	}
+
+	var seed types.Seed
+	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &seed)
+
+	return seed, nil
+}
+
+// DeleteSeed delete the stored oracle seed
+func (k Keeper) DeleteSeed(ctx sdk.Context, reqID []byte) {
+	store := ctx.KVStore(k.storeKey)
+	store.Delete(KeySeed(reqID))
 }

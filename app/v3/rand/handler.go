@@ -18,7 +18,7 @@ func NewHandler(k Keeper) sdk.Handler {
 
 // handleMsgRequestRand handles MsgRequestRand
 func handleMsgRequestRand(ctx sdk.Context, k Keeper, msg MsgRequestRand) sdk.Result {
-	tags, err := k.RequestRand(ctx, msg.Consumer, msg.BlockInterval)
+	tags, err := k.RequestRand(ctx, msg.Consumer, msg.BlockInterval, msg.Oracle)
 	if err != nil {
 		return err.Result()
 	}

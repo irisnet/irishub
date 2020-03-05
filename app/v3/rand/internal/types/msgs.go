@@ -17,14 +17,20 @@ var _ sdk.Msg = &MsgRequestRand{}
 // MsgRequestRand represents a msg for requesting a random number
 type MsgRequestRand struct {
 	Consumer      sdk.AccAddress `json:"consumer"`       // request address
-	BlockInterval uint64         `json:"block-interval"` // block interval after which the requested random number will be generated
+	BlockInterval uint64         `json:"block_interval"` // block interval after which the requested random number will be generated
+	Oracle        bool           `json:"oracle"`         // oracle method
 }
 
 // NewMsgRequestRand constructs a MsgRequestRand
-func NewMsgRequestRand(consumer sdk.AccAddress, blockInterval uint64) MsgRequestRand {
+func NewMsgRequestRand(
+	consumer sdk.AccAddress,
+	blockInterval uint64,
+	oracle bool,
+) MsgRequestRand {
 	return MsgRequestRand{
 		Consumer:      consumer,
 		BlockInterval: blockInterval,
+		Oracle:        oracle,
 	}
 }
 

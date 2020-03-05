@@ -1,7 +1,8 @@
 package types
 
 import (
-	service "github.com/irisnet/irishub/app/v3/service/exported"
+	"github.com/irisnet/irishub/app/v3/service"
+	"github.com/irisnet/irishub/app/v3/service/exported"
 	sdk "github.com/irisnet/irishub/types"
 )
 
@@ -9,16 +10,13 @@ import (
 type ServiceKeeper interface {
 	RegisterResponseCallback(
 		moduleName string,
-		respCallback service.ResponseCallback,
+		respCallback exported.ResponseCallback,
 	) sdk.Error
 
 	GetRequestContext(
 		ctx sdk.Context,
 		requestContextID []byte,
-	) (
-		service.RequestContext,
-		bool,
-	)
+	) (exported.RequestContext, bool)
 
 	CreateRequestContext(
 		ctx sdk.Context,
@@ -32,13 +30,10 @@ type ServiceKeeper interface {
 		repeated bool,
 		repeatedFrequency uint64,
 		repeatedTotal int64,
-		state service.RequestContextState,
+		state exported.RequestContextState,
 		respThreshold uint16,
 		respHandler string,
-	) (
-		[]byte,
-		sdk.Error,
-	)
+	) ([]byte, sdk.Error)
 
 	UpdateRequestContext(
 		ctx sdk.Context,
@@ -50,13 +45,9 @@ type ServiceKeeper interface {
 		repeatedTotal int64,
 	) sdk.Error
 
-	StartRequestContext(
-		ctx sdk.Context,
-		requestContextID []byte,
-	) sdk.Error
+	StartRequestContext(ctx sdk.Context, requestContextID []byte) sdk.Error
 
-	PauseRequestContext(
-		ctx sdk.Context,
-		requestContextID []byte,
-	) sdk.Error
+	PauseRequestContext(ctx sdk.Context, requestContextID []byte) sdk.Error
+
+	GetParamSet(ctx sdk.Context) service.Params
 }

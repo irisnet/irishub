@@ -58,11 +58,11 @@ func TestRequestRandKeeper(t *testing.T) {
 	require.True(t, len(requests) == 0)
 
 	// request a rand
-	_, err := keeper.RequestRand(ctx, consumer, blockInterval)
+	_, err := keeper.RequestRand(ctx, consumer, blockInterval, false)
 	require.Nil(t, err)
 
 	// get request id
-	reqID := types.GenerateRequestID(types.NewRequest(txHeight, consumer, sdk.SHA256(txBytes)))
+	reqID := types.GenerateRequestID(types.NewRequest(txHeight, consumer, sdk.SHA256(txBytes), false))
 
 	// get the pending request and assert the result is not nil
 	store := ctx.KVStore(randKey)
