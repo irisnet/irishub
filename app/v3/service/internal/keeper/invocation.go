@@ -613,6 +613,12 @@ func (k Keeper) FilterServiceProviders(
 // DeductServiceFees deducts the given service fees from the specified consumer
 func (k Keeper) DeductServiceFees(ctx sdk.Context, consumer sdk.AccAddress, serviceFees sdk.Coins) sdk.Error {
 	_, err := k.bk.SendCoins(ctx, consumer, auth.ServiceRequestCoinsAccAddr, serviceFees)
+
+	if !serviceFees.IsZero() {
+		ctx.CoinFlowTags().AppendCoinFlowTag(ctx, consumer.String(),
+			auth.ServiceDepositCoinsAccAddr.String(), serviceFees.String(), sdk.ServiceFeeDeductFlow, "")
+	}
+
 	if err != nil {
 		return err
 	}
@@ -768,6 +774,12 @@ func (k Keeper) Slash(ctx sdk.Context, binding types.ServiceBinding, slashCoins 
 	}
 
 	_, err := k.bk.BurnCoins(ctx, auth.ServiceDepositCoinsAccAddr, slashCoins)
+
+	if !slashCoins.IsZero() {
+		ctx.CoinFlowTags().AppendCoinFlowTag(ctx, auth.ServiceDepositCoinsAccAddr.String(),
+			"", slashCoins.String(), sdk.ServiceDepositBurnFlow, "")
+	}
+
 	if err != nil {
 		return err
 	}
@@ -780,6 +792,12 @@ func (k Keeper) Slash(ctx sdk.Context, binding types.ServiceBinding, slashCoins 
 // RefundServiceFee refunds the service fee to the specified consumer
 func (k Keeper) RefundServiceFee(ctx sdk.Context, consumer sdk.AccAddress, serviceFee sdk.Coins) sdk.Error {
 	_, err := k.bk.SendCoins(ctx, auth.ServiceRequestCoinsAccAddr, consumer, serviceFee)
+
+	if !serviceFee.IsZero() {
+		ctx.CoinFlowTags().AppendCoinFlowTag(ctx, auth.ServiceRequestCoinsAccAddr.String(),
+			consumer.String(), serviceFee.String(), sdk.ServiceFeeRefundFlow, "")
+	}
+
 	if err != nil {
 		return err
 	}
