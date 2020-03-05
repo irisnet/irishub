@@ -42,17 +42,18 @@ const (
 	CodeRequestContextNonRepeated sdk.CodeType = 127
 	CodeRequestContextNotStarted  sdk.CodeType = 128
 	CodeRequestContextNotPaused   sdk.CodeType = 129
-	CodeModuleNameRegistered      sdk.CodeType = 130
-	CodeModuleNameNotRegistered   sdk.CodeType = 131
-	CodeNoEarnedFees              sdk.CodeType = 132
+	CodeRequestContextCompleted   sdk.CodeType = 130
+	CodeModuleNameRegistered      sdk.CodeType = 131
+	CodeModuleNameNotRegistered   sdk.CodeType = 132
+	CodeNoEarnedFees              sdk.CodeType = 133
 
-	CodeInvalidRequestInput   sdk.CodeType = 133
-	CodeInvalidResponseOutput sdk.CodeType = 134
-	CodeInvalidResponseErr    sdk.CodeType = 135
+	CodeInvalidRequestInput   sdk.CodeType = 134
+	CodeInvalidResponseOutput sdk.CodeType = 135
+	CodeInvalidResponseErr    sdk.CodeType = 136
 
-	CodeInvalidAddress  sdk.CodeType = 136
-	CodeInvalidProfiler sdk.CodeType = 137
-	CodeInvalidTrustee  sdk.CodeType = 138
+	CodeInvalidAddress  sdk.CodeType = 137
+	CodeInvalidProfiler sdk.CodeType = 138
+	CodeInvalidTrustee  sdk.CodeType = 139
 )
 
 func ErrInvalidServiceName(codespace sdk.CodespaceType, serviceName string) sdk.Error {
@@ -173,6 +174,10 @@ func ErrRequestContextNotStarted(codespace sdk.CodespaceType) sdk.Error {
 
 func ErrRequestContextNotPaused(codespace sdk.CodespaceType) sdk.Error {
 	return sdk.NewError(codespace, CodeRequestContextNotPaused, "request context not paused")
+}
+
+func ErrRequestContextCompleted(codespace sdk.CodespaceType) sdk.Error {
+	return sdk.NewError(codespace, CodeRequestContextCompleted, "request context completed")
 }
 
 func ErrModuleNameRegistered(codespace sdk.CodespaceType, moduleName string) sdk.Error {

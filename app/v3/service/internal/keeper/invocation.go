@@ -129,6 +129,10 @@ func (k Keeper) UpdateRequestContext(
 		return types.ErrRequestContextNonRepeated(k.codespace)
 	}
 
+	if requestContext.State == types.COMPLETED {
+		return types.ErrRequestContextCompleted(k.codespace)
+	}
+
 	if len(requestContext.ModuleName) != 0 {
 		if err := types.ValidateRequestContextUpdating(providers, serviceFeeCap, timeout, repeatedFreq, repeatedTotal); err != nil {
 			return err
