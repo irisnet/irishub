@@ -366,7 +366,7 @@ func GetCmdRequestService(cdc *codec.Codec) *cobra.Command {
 		Use:   "call",
 		Short: "Call a service",
 		Example: "iriscli service call --chain-id=<chain-id> --from=<key name> --fee=0.3iris --service-name=<service name> " +
-			"--providers=<provider list> --service-fee-cap=1iris --data=<request data> -timeout=100 --repeated --frequency=150 --total=100",
+			"--providers=<provider list> --service-fee-cap=1iris --data=<input content or path> -timeout=100 --repeated --frequency=150 --total=100",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
@@ -400,6 +400,26 @@ func GetCmdRequestService(cdc *codec.Codec) *cobra.Command {
 			}
 
 			input := viper.GetString(FlagData)
+
+			if !json.Valid([]byte(input)) {
+				inputContent, err := ioutil.ReadFile(input)
+				if err != nil {
+					return fmt.Errorf("neither JSON input nor path to .json file were provided")
+				}
+
+				if !json.Valid(inputContent) {
+					return fmt.Errorf(".json file content is invalid JSON")
+				}
+
+				input = string(inputContent)
+			}
+
+			buf := bytes.NewBuffer([]byte{})
+			if err := json.Compact(buf, []byte(input)); err != nil {
+				return fmt.Errorf("failed to compact the input")
+			}
+
+			input = buf.String()
 			timeout := viper.GetInt64(FlagTimeout)
 			superMode := viper.GetBool(FlagSuperMode)
 			repeated := viper.GetBool(FlagRepeated)
@@ -438,7 +458,8 @@ func GetCmdRespondService(cdc *codec.Codec) *cobra.Command {
 		Use:   "respond",
 		Short: "Respond a service request",
 		Example: "iriscli service respond --chain-id=<chain-id> --from=<key name> --fee=0.3iris " +
-			"--request-id=<request-id> --data=<response data>",
+			"--request-id=<request-id> --data=<output content or path> --error=<err msg content or path>",
+		PreRunE: preCheckResponseCmd,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
@@ -455,6 +476,50 @@ func GetCmdRespondService(cdc *codec.Codec) *cobra.Command {
 			requestID := viper.GetString(FlagRequestID)
 			output := viper.GetString(FlagData)
 			errMsg := viper.GetString(FlagError)
+
+			if len(output) > 0 {
+				if !json.Valid([]byte(output)) {
+					outputContent, err := ioutil.ReadFile(output)
+					if err != nil {
+						return fmt.Errorf("neither JSON input nor path to .json file were provided")
+					}
+
+					if !json.Valid(outputContent) {
+						return fmt.Errorf(".json file content is invalid JSON")
+					}
+
+					output = string(outputContent)
+				}
+
+				buf := bytes.NewBuffer([]byte{})
+				if err := json.Compact(buf, []byte(output)); err != nil {
+					return fmt.Errorf("failed to compact the input")
+				}
+
+				output = buf.String()
+			}
+
+			if len(errMsg) > 0 {
+				if !json.Valid([]byte(errMsg)) {
+					errMsgContent, err := ioutil.ReadFile(errMsg)
+					if err != nil {
+						return fmt.Errorf("neither JSON input nor path to .json file were provided")
+					}
+
+					if !json.Valid(errMsgContent) {
+						return fmt.Errorf(".json file content is invalid JSON")
+					}
+
+					errMsg = string(errMsgContent)
+				}
+
+				buf := bytes.NewBuffer([]byte{})
+				if err := json.Compact(buf, []byte(errMsg)); err != nil {
+					return fmt.Errorf("failed to compact the input")
+				}
+
+				errMsg = buf.String()
+			}
 
 			msg := service.NewMsgRespondService(requestID, provider, output, errMsg)
 			if err := msg.ValidateBasic(); err != nil {
@@ -717,4 +782,14 @@ func GetCmdWithdrawTax(cdc *codec.Codec) *cobra.Command {
 	}
 
 	return cmd
+}
+
+func preCheckResponseCmd(cmd *cobra.Command, _ []string) error {
+	// make sure either the data or error is provided
+	flags := cmd.Flags()
+	if flags.Changed(FlagData) && flags.Changed(FlagError) {
+		return fmt.Errorf("only one flag is allowed among the data and error")
+	}
+
+	return nil
 }

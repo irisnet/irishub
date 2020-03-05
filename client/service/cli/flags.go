@@ -57,7 +57,7 @@ func init() {
 	FsServiceRequest.StringSlice(FlagProviders, []string{}, "providers to request")
 	FsServiceRequest.String(FlagServiceFeeCap, "", "maximal fee to pay for a service request")
 	FsServiceRequest.String(FlagData, "", "input of the service request, which is an Input JSON schema instance")
-	FsServiceRequest.Uint64(FlagTimeout, 0, "request timeout, 0 means default timeout")
+	FsServiceRequest.Uint64(FlagTimeout, 0, "request timeout")
 	FsServiceRequest.Bool(FlagSuperMode, false, "indicate if the signer is a super user")
 	FsServiceRequest.Bool(FlagRepeated, false, "indicate if the request is repetitive")
 	FsServiceRequest.Uint64(FlagFrequency, 0, "request frequency when repeated, default to timeout")
@@ -70,6 +70,6 @@ func init() {
 	FsServiceUpdateRequestContext.Int64(FlagTotal, 0, "new request count, not updated if set to 0")
 
 	FsServiceRespond.String(FlagRequestID, "", "ID of the request to respond")
-	FsServiceRespond.String(FlagData, "", "output of the service response, which is an Output JSON schema instance")
-	FsServiceRespond.String(FlagError, "", "err msg of the service response, which is an Error JSON schema instance")
+	FsServiceRespond.String(FlagData, "", "content or path of the output of the service response, which is an Output JSON schema instance")
+	FsServiceRespond.String(FlagError, "", "content or path of the err msg of the service response, which is an Error JSON schema instance")
 }

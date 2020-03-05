@@ -273,7 +273,7 @@ func TestKeeper_Request_Context(t *testing.T) {
 	newRepeatedFreq := testRepeatedFreq + 10
 	newRepeatedTotal := int64(-1)
 
-	err = keeper.UpdateRequestContext(ctx, requestContextID, nil, newServiceFeeCap, newTimeout, newRepeatedFreq, newRepeatedTotal)
+	err = keeper.UpdateRequestContext(ctx, requestContextID, nil, newServiceFeeCap, newTimeout, newRepeatedFreq, newRepeatedTotal, consumer)
 	require.NoError(t, err)
 
 	requestContext, found = keeper.GetRequestContext(ctx, requestContextID)
@@ -291,7 +291,7 @@ func TestKeeper_Request_Context(t *testing.T) {
 	require.Equal(t, types.RUNNING, requestContext.State)
 
 	// pause
-	err = keeper.PauseRequestContext(ctx, requestContextID)
+	err = keeper.PauseRequestContext(ctx, requestContextID, consumer)
 	require.NoError(t, err)
 
 	requestContext, found = keeper.GetRequestContext(ctx, requestContextID)
@@ -300,7 +300,7 @@ func TestKeeper_Request_Context(t *testing.T) {
 	require.Equal(t, types.PAUSED, requestContext.State)
 
 	// start
-	err = keeper.StartRequestContext(ctx, requestContextID)
+	err = keeper.StartRequestContext(ctx, requestContextID, consumer)
 	require.NoError(t, err)
 
 	requestContext, found = keeper.GetRequestContext(ctx, requestContextID)
@@ -309,7 +309,7 @@ func TestKeeper_Request_Context(t *testing.T) {
 	require.Equal(t, types.RUNNING, requestContext.State)
 
 	// kill
-	err = keeper.KillRequestContext(ctx, requestContextID)
+	err = keeper.KillRequestContext(ctx, requestContextID, consumer)
 	require.NoError(t, err)
 
 	requestContext, found = keeper.GetRequestContext(ctx, requestContextID)

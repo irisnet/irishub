@@ -96,7 +96,7 @@ func (k Keeper) StartFeed(ctx sdk.Context, msg types.MsgStartFeed) sdk.Error {
 		return types.ErrInvalidFeedState(types.DefaultCodespace, msg.FeedName)
 	}
 
-	if err := k.sk.StartRequestContext(ctx, feed.RequestContextID); err != nil {
+	if err := k.sk.StartRequestContext(ctx, feed.RequestContextID, feed.Creator); err != nil {
 		return err
 	}
 
@@ -125,7 +125,7 @@ func (k Keeper) PauseFeed(ctx sdk.Context, msg types.MsgPauseFeed) sdk.Error {
 		return types.ErrInvalidFeedState(types.DefaultCodespace, msg.FeedName)
 	}
 
-	if err := k.sk.PauseRequestContext(ctx, feed.RequestContextID); err != nil {
+	if err := k.sk.PauseRequestContext(ctx, feed.RequestContextID, feed.Creator); err != nil {
 		return err
 	}
 
@@ -149,7 +149,8 @@ func (k Keeper) EditFeed(ctx sdk.Context, msg types.MsgEditFeed) sdk.Error {
 		msg.ServiceFeeCap,
 		msg.Timeout,
 		msg.RepeatedFrequency,
-		msg.RepeatedTotal); err != nil {
+		msg.RepeatedTotal,
+		msg.Creator); err != nil {
 		return err
 	}
 

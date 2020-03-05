@@ -46,7 +46,7 @@ func EndBlocker(ctx sdk.Context, k Keeper) (tags sdk.Tags) {
 
 						for _, coin := range binding.Deposit {
 							taxAmount := sdk.NewDecFromInt(coin.Amount).Mul(slashFraction).TruncateInt()
-							slashedCoins.Add(sdk.NewCoins(sdk.NewCoin(coin.Denom, taxAmount)))
+							slashedCoins = slashedCoins.Add(sdk.NewCoins(sdk.NewCoin(coin.Denom, taxAmount)))
 						}
 
 						if err := k.Slash(ctx, binding, slashedCoins); err != nil {
