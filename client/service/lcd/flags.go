@@ -7,4 +7,6 @@ const (
 	RequestID        = "request-id"
 	RequestContextID = "request-context-id"
 	BatchCounter     = "batch-counter"
+	Arg1             = "arg1"
+	Arg2             = "arg2"
 )
