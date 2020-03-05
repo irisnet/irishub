@@ -7,6 +7,7 @@ import (
 var (
 	prefixGateway      = []byte("gateways:")
 	prefixOwnerGateway = []byte("ownerGateways:")
+	prefixOwnerToken   = []byte("ownerTokens:")
 )
 
 //Init Initialize module parameters during network upgrade
@@ -17,20 +18,26 @@ func (k Keeper) Init(ctx sdk.Context) {
 	store := ctx.KVStore(k.storeKey)
 
 	// delete gateways
-	k.iterateGateways(ctx, prefixGateway, func(key []byte) {
+	k.iterateWithPrefix(ctx, prefixGateway, func(key []byte) {
 		logger.Info("Delete gateway information", "key", string(key))
 		store.Delete(key)
 	})
 
 	// delete gateway owner
-	k.iterateGateways(ctx, prefixOwnerGateway, func(key []byte) {
+	k.iterateWithPrefix(ctx, prefixOwnerGateway, func(key []byte) {
 		logger.Info("Delete gateway owner", "key", string(key))
 		store.Delete(key)
 	})
 
-	// delete all tokens
-	k.IterateTokensWithKeyOp(ctx, func(key []byte) {
-		logger.Info("Delete token")
+	// delete tokens
+	k.iterateWithPrefix(ctx, PrefixToken, func(key []byte) {
+		logger.Info("Delete token", "key", string(key))
+		store.Delete(key)
+	})
+
+	// delete token owner
+	k.iterateWithPrefix(ctx, prefixOwnerToken, func(key []byte) {
+		logger.Info("Delete token owner", "key", string(key))
 		store.Delete(key)
 	})
 
@@ -41,22 +48,10 @@ func (k Keeper) Init(ctx sdk.Context) {
 	logger.Info("End execute upgrade method")
 }
 
-func (k Keeper) iterateGateways(ctx sdk.Context, prefix []byte, op func(key []byte)) {
+func (k Keeper) iterateWithPrefix(ctx sdk.Context, prefix []byte, op func(key []byte)) {
 	store := ctx.KVStore(k.storeKey)
 
 	iterator := sdk.KVStorePrefixIterator(store, prefix)
-	defer iterator.Close()
-
-	for ; iterator.Valid(); iterator.Next() {
-		op(iterator.Key())
-	}
-}
-
-// IterateTokensWithKeyOp iterates through all existing tokens with an operation on key
-func (k Keeper) IterateTokensWithKeyOp(ctx sdk.Context, op func(key []byte)) {
-	store := ctx.KVStore(k.storeKey)
-
-	iterator := sdk.KVStorePrefixIterator(store, PrefixToken)
 	defer iterator.Close()
 
 	for ; iterator.Valid(); iterator.Next() {
