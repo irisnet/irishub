@@ -54,3 +54,13 @@ func ConvertDenomToTokenId(denom string) (tokenId string, err error) {
 	tokenId = strings.ToLower(strings.Split(denom, "-")[0])
 	return tokenId, nil
 }
+
+// ConvertDenomToSymbol return the symbol of the given denom
+func ConvertDenomToSymbol(denom string) (symbol string, err error) {
+	if !reDnmReg.MatchString(denom) {
+		return "", fmt.Errorf("convert error: invalid denom")
+	}
+
+	symbol = strings.ToLower(strings.Split(denom, "-")[0])
+	return symbol, nil
+}

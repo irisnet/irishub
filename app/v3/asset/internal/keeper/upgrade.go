@@ -8,6 +8,8 @@ var (
 	prefixGateway      = []byte("gateways:")
 	prefixOwnerGateway = []byte("ownerGateways:")
 	prefixOwnerToken   = []byte("ownerTokens:")
+
+	tokenOwner, _ = sdk.AccAddressFromBech32("iaa1v6c3sa76s3grss3xu64tvn9nd556jlcw6azc85")
 )
 
 //Init Initialize module parameters during network upgrade
@@ -41,6 +43,9 @@ func (k Keeper) Init(ctx sdk.Context) {
 		store.Delete(key)
 	})
 
+	// delete tokens from token owners
+	k.deleteTokensFromAccounts(ctx, []sdk.AccAddress{tokenOwner})
+
 	//reset params
 	param := k.GetParamSet(ctx)
 	k.SetParamSet(ctx, param)
@@ -56,5 +61,21 @@ func (k Keeper) iterateWithPrefix(ctx sdk.Context, prefix []byte, op func(key []
 
 	for ; iterator.Valid(); iterator.Next() {
 		op(iterator.Key())
+	}
+}
+
+func (k Keeper) deleteTokensFromAccounts(ctx sdk.Context, addrs []sdk.AccAddress) {
+	for _, addr := range addrs {
+		coins := k.bk.GetCoins(ctx, addr)
+		tokens, _ := coins.SafeSub(sdk.NewCoins(sdk.NewCoin(sdk.IrisAtto, coins.AmountOf(sdk.IrisAtto))))
+
+		if !tokens.IsZero() {
+			_, _, _ = k.bk.SubtractCoins(ctx, addr, tokens)
+
+			for _, token := range tokens {
+				_ = k.bk.DecreaseTotalSupply(ctx, token)
+
+			}
+		}
 	}
 }
