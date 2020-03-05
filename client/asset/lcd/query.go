@@ -4,19 +4,19 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/gorilla/mux"
+
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/app/v3/asset"
-	"github.com/irisnet/irishub/client/utils"
-
-	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/client/context"
+	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/codec"
 )
 
 func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec) {
-	// Get token by id
+	// Get token by symbol
 	r.HandleFunc(
-		fmt.Sprintf("/asset/tokens/{%s}", RestParamTokenID),
+		fmt.Sprintf("/asset/tokens/{%s}", RestParamSymbol),
 		queryTokenHandlerFn(cliCtx, cdc),
 	).Methods("GET")
 	// Search tokens
@@ -37,7 +37,7 @@ func queryTokenHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.Handl
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		params := asset.QueryTokenParams{
-			TokenId: vars[RestParamTokenID],
+			Symbol: vars[RestParamSymbol],
 		}
 
 		bz, err := cliCtx.Codec.MarshalJSON(params)
