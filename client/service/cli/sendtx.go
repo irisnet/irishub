@@ -449,6 +449,7 @@ func GetCmdRequestService(cdc *codec.Codec) *cobra.Command {
 	_ = cmd.MarkFlagRequired(FlagProviders)
 	_ = cmd.MarkFlagRequired(FlagServiceFeeCap)
 	_ = cmd.MarkFlagRequired(FlagData)
+	_ = cmd.MarkFlagRequired(FlagTimeout)
 
 	return cmd
 }
