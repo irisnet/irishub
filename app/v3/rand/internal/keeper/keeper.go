@@ -14,15 +14,20 @@ import (
 type Keeper struct {
 	storeKey sdk.StoreKey
 	cdc      *codec.Codec
-
-	// codespace
+	sk        types.ServiceKeeper
 	codespace sdk.CodespaceType
 }
 
-func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, codespace sdk.CodespaceType) Keeper {
+func NewKeeper(
+	cdc *codec.Codec,
+	key sdk.StoreKey,
+	sk types.ServiceKeeper,
+	codespace sdk.CodespaceType,
+) Keeper {
 	return Keeper{
-		storeKey:  key,
-		cdc:       cdc,
+		storeKey: key,
+		cdc:      cdc,
+		sk:        sk,
 		codespace: codespace,
 	}
 }

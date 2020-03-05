@@ -3,14 +3,16 @@ package keeper
 import (
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
+	abci "github.com/tendermint/tendermint/abci/types"
+	"github.com/tendermint/tendermint/libs/log"
+	dbm "github.com/tendermint/tm-db"
+
 	"github.com/irisnet/irishub/app/v3/rand/internal/types"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/store"
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/stretchr/testify/require"
-	abci "github.com/tendermint/tendermint/abci/types"
-	"github.com/tendermint/tendermint/libs/log"
-	dbm "github.com/tendermint/tm-db"
 )
 
 func setupMultiStore() (sdk.MultiStore, *sdk.KVStoreKey) {
@@ -19,7 +21,7 @@ func setupMultiStore() (sdk.MultiStore, *sdk.KVStoreKey) {
 
 	ms := store.NewCommitMultiStore(db)
 	ms.MountStoreWithDB(randKey, sdk.StoreTypeIAVL, db)
-	ms.LoadLatestVersion()
+	_ = ms.LoadLatestVersion()
 
 	return ms, randKey
 }
@@ -30,7 +32,9 @@ func TestRequestRandKeeper(t *testing.T) {
 	cdc := codec.New()
 	types.RegisterCodec(cdc)
 
-	keeper := NewKeeper(cdc, randKey, types.DefaultCodespace)
+	mockServiceKeeper := NewMockServiceKeeper()
+
+	keeper := NewKeeper(cdc, randKey, mockServiceKeeper, types.DefaultCodespace)
 
 	// define variables
 	txBytes := []byte("testtx")

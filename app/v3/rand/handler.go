@@ -13,8 +13,6 @@ func NewHandler(k Keeper) sdk.Handler {
 		default:
 			return sdk.ErrTxDecode("invalid message parsed in rand module").Result()
 		}
-
-		return sdk.ErrTxDecode("invalid message parsed in rand module").Result()
 	}
 }
 

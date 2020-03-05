@@ -4,8 +4,9 @@ import (
 	"encoding/hex"
 	"fmt"
 
-	sdk "github.com/irisnet/irishub/types"
 	abci "github.com/tendermint/tendermint/abci/types"
+
+	sdk "github.com/irisnet/irishub/types"
 )
 
 // BeginBlocker handles block beginning logic for rand
