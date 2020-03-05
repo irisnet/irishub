@@ -30,7 +30,6 @@ const (
 	MaxNameLength        = 70  // max length of the service name
 	MaxDescriptionLength = 280 // max length of the service and author description
 	MaxTagsNum           = 10  // max total number of the tags
-	MinTagLength         = 1   // min length of the tag
 	MaxTagLength         = 70  // max length of the tag
 
 	MaxProvidersNum     = 10 // max total number of the providers to request
@@ -963,8 +962,8 @@ func ensureServiceDefLength(msg MsgDefineService) sdk.Error {
 	}
 
 	for i, tag := range msg.Tags {
-		if len(tag) < MinTagLength {
-			return ErrInvalidLength(DefaultCodespace, fmt.Sprintf("invalid tag[%d] length; got: %d, min: %d", i, len(tag), MinTagLength))
+		if len(tag) == 0 {
+			return ErrInvalidLength(DefaultCodespace, fmt.Sprintf("invalid tag[%d] length: tag must not be empty", i))
 		}
 
 		if len(tag) > MaxTagLength {
