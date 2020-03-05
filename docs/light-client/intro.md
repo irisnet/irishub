@@ -166,22 +166,42 @@ This api supports the following special parameters. By default, their values are
 
 ### Service module APIs
 
-1. `POST /service/definitions`: Add a service definition
-2. `GET /service/definitions/{defChainId}/{serviceName}`: Query service definition
-3. `POST /service/bindings`: Add a service binding
-4. `GET /service/bindings/{defChainId}/{serviceName}/{bindChainId}/{provider}`: Query service binding
-5. `GET /service/bindings/{defChainId}/{serviceName}`: Query service binding list
-6. `PUT /service/bindings/{defChainId}/{serviceName}/{provider}`: Update a service binding
-7. `PUT /service/bindings/{defChainId}/{serviceName}/{provider}/disable`: Disable service binding
-8. `PUT /service/bindings/{defChainId}/{serviceName}/{provider}/enable`: Enable service binding
-9. `PUT /service/bindings/{defChainId}/{serviceName}/{provider}/deposit/refund`: Refund deposit from a service binding
-10. `POST /service/requests`: Call service
-11. `GET /service/requests/{defChainId}/{serviceName}/{bindChainId}/{provider}`: Query service requests of a provider
-12. `POST /service/responses`: Respond service call
-13. `GET /service/responses/{reqChainId}/{reqId}`: Query service response
-14. `GET /service/fees/{address}`:  Query service fees of a address
-15. `POST /service/fees/{address}/refund`: Refund service return fee of consumer
-16. `POST /service/fees/{address}/withdraw`: Withdraw service incoming fee of provider
+1. `POST /service/definitions`: Define a new service
+2. `GET /service/definitions/{service-name}`: Query a service definition
+3. `POST /service/bindings`: Bind a service
+4. `GET /service/bindings/{service-name}/{provider}`: Query a service binding
+5. `GET /service/bindings{service-name}`: Query all bindings of a service definition
+6. `POST /service/providers/{provider}/withdraw-address`: Set a withdrawal address for the provider
+7. `GET /service/providers/{provider}/withdraw-address`: Query the withdrawal address of a provider
+8. `PUT /service/bindings/{service-name}/{provider}`: Update a service binding
+9. `POST /service/bindings/{service-name}/{provider}/disable`: Disable an available service binding
+10. `POST /service/bindings/{service-name}/{provider}/enable`: Enable an unavailable service binding
+11. `POST /service/bindings/{service-name}/{provider}/refund-deposit`: Refund all deposit from a service binding
+12. `POST /service/requests`: Call a service
+13. `GET /service/requests/{request-id}`: Query a request by the request ID
+14. `GET /service/requests/{service-name}/{provider}`: Query active requests of a service binding
+15. `GET /service/requests/{request-context-id}/{batch-counter}`: Query requests by the request context ID and batch counter
+16. `POST /service/responses`: Respond to a service request
+17. `GET /service/responses/{request-id}`: Query a response by the request ID
+18. `GET /service/responses/{request-context-id}/{batch-counter}`: Query responses by the request context ID and batch counter
+19. `GET /service/contexts/{request-context-id}`: Query a request context
+20. `PUT /service/contexts/{request-context-id}`: Update a request context
+21. `POST /service/contexts/{request-context-id}/pause`: Pause a running request context
+22. `POST /service/contexts/{request-context-id}/start`: Start a paused request context
+23. `POST /service/contexts/{request-context-id}/kill`: Terminate a request context
+24. `GET /service/fees/{provider}`: Query the earned fees of a provider
+25. `POST /service/fees/{provider}/withdraw`: Withdraw the earned fees of a provider
+
+### Oracle module APIs
+
+1. `POST /oracle/feeds`: Define a new Feed with the initial state of paused.
+2. `POST /oracle/feeds/<feed-name>/start`: Start a paused Feed created by the tx signer.
+3. `POST /oracle/feeds/<feed-name>/pause`: Pause a running Feed created by the tx signer.
+4. `PUT /oracle/feeds/<feed-name>`: Update a Feed definition created by the tx signer.
+5. `GET /oracle/feeds/<feed-name>`: Query Feed information by its name.
+6. `GET /oracle/feeds?state=<state>`: Query Feed list by Feed state.
+7. `GET /oracle/feeds/<feed-name>/values`: Query the result of the feed by its name, in descending order of timestamp.
+
 
 ### Rand module APIs
 
