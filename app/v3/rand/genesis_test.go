@@ -57,7 +57,7 @@ func TestExportRandGenesis(t *testing.T) {
 	})
 	require.Equal(t, 2, len(storedRequests))
 
-	// preceed to the new block
+	// precede to the new block
 	ctx = ctx.WithBlockHeight(newBlockHeight)
 
 	// export requests
@@ -65,7 +65,7 @@ func TestExportRandGenesis(t *testing.T) {
 	exportedRequests := exportedGenesis.PendingRandRequests
 	require.Equal(t, 2, len(exportedRequests))
 
-	// assert that exported requests are consistant with the requests in queue
+	// assert that exported requests are consistent with the requests in queue
 	for height, requests := range exportedRequests {
 		h, _ := strconv.ParseInt(height, 10, 64)
 		storedHeight := h + newBlockHeight - 1
