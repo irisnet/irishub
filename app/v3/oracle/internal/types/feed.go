@@ -2,13 +2,14 @@ package types
 
 import (
 	"bytes"
-	"encoding/hex"
 	"fmt"
 	"time"
 
-	service "github.com/irisnet/irishub/app/v3/service/exported"
+	cmn "github.com/tendermint/tendermint/libs/common"
 
 	sdk "github.com/irisnet/irishub/types"
+
+	service "github.com/irisnet/irishub/app/v3/service/exported"
 )
 
 type Feed struct {
@@ -17,7 +18,7 @@ type Feed struct {
 	AggregateFunc    string         `json:"aggregate_func"`
 	ValueJsonPath    string         `json:"value_json_path"`
 	LatestHistory    uint64         `json:"latest_history"`
-	RequestContextID []byte         `json:"request_context_id"`
+	RequestContextID cmn.HexBytes   `json:"request_context_id"`
 	Creator          sdk.AccAddress `json:"creator"`
 }
 
@@ -36,7 +37,7 @@ func (f Feed) String() string {
 		f.AggregateFunc,
 		f.ValueJsonPath,
 		f.LatestHistory,
-		hex.EncodeToString(f.RequestContextID),
+		f.RequestContextID.String(),
 		f.Creator.String(),
 	)
 }

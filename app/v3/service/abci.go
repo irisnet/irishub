@@ -2,6 +2,7 @@ package service
 
 import (
 	sdk "github.com/irisnet/irishub/types"
+	cmn "github.com/tendermint/tendermint/libs/common"
 )
 
 // BeginBlocker handles block beginning logic for service
@@ -34,7 +35,7 @@ func EndBlocker(ctx sdk.Context, k Keeper) (tags sdk.Tags) {
 			defer activeReqIterator.Close()
 
 			for ; activeReqIterator.Valid(); activeReqIterator.Next() {
-				var requestID []byte
+				var requestID cmn.HexBytes
 				k.GetCdc().MustUnmarshalBinaryLengthPrefixed(activeReqIterator.Value(), &requestID)
 
 				request, _ := k.GetRequest(ctx, requestID)
@@ -57,12 +58,12 @@ func EndBlocker(ctx sdk.Context, k Keeper) (tags sdk.Tags) {
 							panic(err)
 						}
 
-						tags = tags.AppendTags(sdk.NewTags(
-							TagRequestID, []byte(RequestIDToString(requestID)),
+						tags = sdk.NewTags(
+							TagRequestID, []byte(requestID.String()),
 							TagProvider, []byte(request.Provider.String()),
 							TagConsumer, []byte(request.Consumer.String()),
 							TagSlashedCoins, []byte(slashedCoins.String()),
-						))
+						)
 					}
 				}
 

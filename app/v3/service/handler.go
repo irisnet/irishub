@@ -1,7 +1,6 @@
 package service
 
 import (
-	"encoding/hex"
 	"fmt"
 
 	sdk "github.com/irisnet/irishub/types"
@@ -128,7 +127,7 @@ func handleMsgRequestService(ctx sdk.Context, k Keeper, msg MsgRequestService) s
 	}
 
 	tags := sdk.NewTags(
-		TagRequestContextID, []byte(hex.EncodeToString(requestContextID)),
+		TagRequestContextID, []byte(requestContextID.String()),
 		TagConsumer, []byte(msg.Consumer.String()),
 	)
 
