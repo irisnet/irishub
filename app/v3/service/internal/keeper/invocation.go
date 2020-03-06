@@ -930,20 +930,22 @@ func (k Keeper) GetResponseCallback(moduleName string) (types.ResponseCallback, 
 
 // GetIntraTxCounter returns the current tx counter and increases it by 1
 func (k Keeper) GetIntraTxCounter(ctx sdk.Context) int16 {
+	store := ctx.KVStore(k.storeKey)
 	var counter int16
 
-	v := ctx.Value(GetIntraTxCounterKey())
-	if v == nil {
-		counter = 0
-	} else {
-		counter = v.(int16)
+	bz := store.Get(GetIntraTxCounterKey())
+	if bz != nil {
+		k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &counter)
 	}
 
 	k.SetIntraTxCounter(ctx, counter+1)
 	return counter
 }
 
-// SetIntraTxCounter sets the tx counter to the context
+// SetIntraTxCounter sets the tx counter
 func (k Keeper) SetIntraTxCounter(ctx sdk.Context, counter int16) {
-	ctx = ctx.WithValue(GetIntraTxCounterKey(), counter)
+	store := ctx.KVStore(k.storeKey)
+
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(counter)
+	store.Set(GetIntraTxCounterKey(), bz)
 }

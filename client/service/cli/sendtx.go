@@ -48,11 +48,11 @@ func GetCmdDefineService(cdc *codec.Codec) *cobra.Command {
 			if !json.Valid([]byte(schemas)) {
 				schemasContent, err := ioutil.ReadFile(schemas)
 				if err != nil {
-					return fmt.Errorf("neither JSON input nor path to .json file were provided")
+					return fmt.Errorf("invalid schemas: neither JSON input nor path to .json file were provided")
 				}
 
 				if !json.Valid(schemasContent) {
-					return fmt.Errorf(".json file content is invalid JSON")
+					return fmt.Errorf("invalid schemas: .json file content is invalid JSON")
 				}
 
 				schemas = string(schemasContent)
@@ -60,7 +60,7 @@ func GetCmdDefineService(cdc *codec.Codec) *cobra.Command {
 
 			buf := bytes.NewBuffer([]byte{})
 			if err := json.Compact(buf, []byte(schemas)); err != nil {
-				return fmt.Errorf("failed to compact the schema")
+				return fmt.Errorf("failed to compact the schemas")
 			}
 
 			schemas = buf.String()
@@ -115,11 +115,11 @@ func GetCmdBindService(cdc *codec.Codec) *cobra.Command {
 			if !json.Valid([]byte(pricing)) {
 				pricingContent, err := ioutil.ReadFile(pricing)
 				if err != nil {
-					return fmt.Errorf("neither JSON input nor path to .json file were provided")
+					return fmt.Errorf("invalid pricing: neither JSON input nor path to .json file were provided")
 				}
 
 				if !json.Valid(pricingContent) {
-					return fmt.Errorf(".json file content is invalid JSON")
+					return fmt.Errorf("invalid pricing: .json file content is invalid JSON")
 				}
 
 				pricing = string(pricingContent)
@@ -185,11 +185,11 @@ func GetCmdUpdateServiceBinding(cdc *codec.Codec) *cobra.Command {
 				if !json.Valid([]byte(pricing)) {
 					pricingContent, err := ioutil.ReadFile(pricing)
 					if err != nil {
-						return fmt.Errorf("neither JSON input nor path to .json file were provided")
+						return fmt.Errorf("invalid pricing: neither JSON input nor path to .json file were provided")
 					}
 
 					if !json.Valid(pricingContent) {
-						return fmt.Errorf(".json file content is invalid JSON")
+						return fmt.Errorf("invalid pricing: .json file content is invalid JSON")
 					}
 
 					pricing = string(pricingContent)
@@ -404,11 +404,11 @@ func GetCmdRequestService(cdc *codec.Codec) *cobra.Command {
 			if !json.Valid([]byte(input)) {
 				inputContent, err := ioutil.ReadFile(input)
 				if err != nil {
-					return fmt.Errorf("neither JSON input nor path to .json file were provided")
+					return fmt.Errorf("invalid input data: neither JSON input nor path to .json file were provided")
 				}
 
 				if !json.Valid(inputContent) {
-					return fmt.Errorf(".json file content is invalid JSON")
+					return fmt.Errorf("invalid input data: .json file content is invalid JSON")
 				}
 
 				input = string(inputContent)
@@ -416,7 +416,7 @@ func GetCmdRequestService(cdc *codec.Codec) *cobra.Command {
 
 			buf := bytes.NewBuffer([]byte{})
 			if err := json.Compact(buf, []byte(input)); err != nil {
-				return fmt.Errorf("failed to compact the input")
+				return fmt.Errorf("failed to compact the input data")
 			}
 
 			input = buf.String()
@@ -449,6 +449,7 @@ func GetCmdRequestService(cdc *codec.Codec) *cobra.Command {
 	_ = cmd.MarkFlagRequired(FlagProviders)
 	_ = cmd.MarkFlagRequired(FlagServiceFeeCap)
 	_ = cmd.MarkFlagRequired(FlagData)
+	_ = cmd.MarkFlagRequired(FlagTimeout)
 
 	return cmd
 }
@@ -481,11 +482,11 @@ func GetCmdRespondService(cdc *codec.Codec) *cobra.Command {
 				if !json.Valid([]byte(output)) {
 					outputContent, err := ioutil.ReadFile(output)
 					if err != nil {
-						return fmt.Errorf("neither JSON input nor path to .json file were provided")
+						return fmt.Errorf("invalid output data: neither JSON input nor path to .json file were provided")
 					}
 
 					if !json.Valid(outputContent) {
-						return fmt.Errorf(".json file content is invalid JSON")
+						return fmt.Errorf("invalid output data: .json file content is invalid JSON")
 					}
 
 					output = string(outputContent)
@@ -493,7 +494,7 @@ func GetCmdRespondService(cdc *codec.Codec) *cobra.Command {
 
 				buf := bytes.NewBuffer([]byte{})
 				if err := json.Compact(buf, []byte(output)); err != nil {
-					return fmt.Errorf("failed to compact the input")
+					return fmt.Errorf("failed to compact the output data")
 				}
 
 				output = buf.String()
@@ -503,11 +504,11 @@ func GetCmdRespondService(cdc *codec.Codec) *cobra.Command {
 				if !json.Valid([]byte(errMsg)) {
 					errMsgContent, err := ioutil.ReadFile(errMsg)
 					if err != nil {
-						return fmt.Errorf("neither JSON input nor path to .json file were provided")
+						return fmt.Errorf("invalid err msg: neither JSON input nor path to .json file were provided")
 					}
 
 					if !json.Valid(errMsgContent) {
-						return fmt.Errorf(".json file content is invalid JSON")
+						return fmt.Errorf("invalid err msg: .json file content is invalid JSON")
 					}
 
 					errMsg = string(errMsgContent)
@@ -515,7 +516,7 @@ func GetCmdRespondService(cdc *codec.Codec) *cobra.Command {
 
 				buf := bytes.NewBuffer([]byte{})
 				if err := json.Compact(buf, []byte(errMsg)); err != nil {
-					return fmt.Errorf("failed to compact the input")
+					return fmt.Errorf("failed to compact the err msg")
 				}
 
 				errMsg = buf.String()
