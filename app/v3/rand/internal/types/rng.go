@@ -6,7 +6,8 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 )
 
-const RandPrec = 20 // the precision for generated random numbers
+const RandPrec = 20        // the precision for generated random numbers
+const SeedBytesLength = 32 //
 
 // RNG is a random number generator
 type RNG interface {

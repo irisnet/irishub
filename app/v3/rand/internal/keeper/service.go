@@ -85,7 +85,7 @@ func (k Keeper) HandlerResponse(ctx sdk.Context, requestContextID []byte, respon
 	result := gjson.Get(responseOutput[0], types.ValueJsonPath)
 
 	seed, err := hex.DecodeString(result.String())
-	if err != nil || len(seed) != 32 {
+	if err != nil || len(seed) != types.SeedBytesLength {
 		return
 	}
 

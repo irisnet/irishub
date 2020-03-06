@@ -13,6 +13,7 @@ var (
 	emptyAddr     sdk.AccAddress
 	testAddr      = sdk.AccAddress([]byte("testAddr"))
 	blockInterval = uint64(10)
+	oracle        = false
 )
 
 func TestNewMsgRequestRand(t *testing.T) {
@@ -55,7 +56,7 @@ func TestMsgRequestRandGetSignBytes(t *testing.T) {
 	var msg = NewMsgRequestRand(testAddr, blockInterval, false)
 	res := msg.GetSignBytes()
 
-	expected := "{\"type\":\"irishub/rand/MsgRequestRand\",\"value\":{\"block-interval\":\"10\",\"consumer\":\"faa1w3jhxazpv3j8yxhn3j0\"}}"
+	expected := "{\"type\":\"irishub/rand/MsgRequestRand\",\"value\":{\"block_interval\":\"10\",\"consumer\":\"faa1w3jhxazpv3j8yxhn3j0\",\"oracle\":false}}"
 	require.Equal(t, expected, string(res))
 }
 
