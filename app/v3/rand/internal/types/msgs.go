@@ -5,10 +5,10 @@ import (
 )
 
 const (
-	ModuleName = "rand"
-
 	// MsgRoute identifies transaction types
-	MsgRoute = "rand"
+	MsgRoute = ModuleName
+
+	MsgTypeRequestRand = "request_rand"
 
 	// DefaultBlockInterval is the default block interval
 	DefaultBlockInterval = uint64(10)
@@ -40,7 +40,7 @@ func NewMsgRequestRand(
 func (msg MsgRequestRand) Route() string { return MsgRoute }
 
 // Implements Msg.
-func (msg MsgRequestRand) Type() string { return "request_rand" }
+func (msg MsgRequestRand) Type() string { return MsgTypeRequestRand }
 
 // Implements Msg.
 func (msg MsgRequestRand) ValidateBasic() sdk.Error {

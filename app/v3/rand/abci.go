@@ -31,7 +31,7 @@ func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, k Keeper) (tags s
 			// get the request id
 			reqID := GenerateRequestID(request)
 
-			if err := k.RequestService(ctx, reqID); err != nil {
+			if err := k.RequestService(ctx, reqID, request.Consumer); err != nil {
 				// TODO: handle error
 				ctx.Logger().Info(fmt.Sprintf("request service error : %s", err.Error()))
 			} else {
