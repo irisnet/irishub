@@ -47,9 +47,9 @@ func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Co
 		queryRequestHandlerFn(cliCtx, cdc),
 	).Methods("GET")
 
-	// query all active requests of a service binding
+	// query requests by the service binding or request context ID
 	r.HandleFunc(
-		fmt.Sprintf("/service/requests/{%s}/{%s}", ServiceName, Provider),
+		fmt.Sprintf("/service/requests/{%s}/{%s}", Arg1, Arg2),
 		queryRequestsHandlerFn(cliCtx, cdc),
 	).Methods("GET")
 
@@ -63,12 +63,6 @@ func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Co
 	r.HandleFunc(
 		fmt.Sprintf("/service/contexts/{%s}", RequestContextID),
 		qeuryRequestContextHandlerFn(cliCtx, cdc),
-	).Methods("GET")
-
-	// query requests by the request context ID and batch counter
-	r.HandleFunc(
-		fmt.Sprintf("/service/requests/{%s}/{%s}", RequestContextID, BatchCounter),
-		queryRequestsByReqCtxHandlerFn(cliCtx, cdc),
 	).Methods("GET")
 
 	// query responses by the request context ID and batch counter
@@ -231,34 +225,60 @@ func queryRequestHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.Han
 func queryRequestsHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		serviceName := vars[ServiceName]
-		providerStr := vars[Provider]
+		arg1 := vars[Arg1]
+		arg2 := vars[Arg2]
 
-		provider, err := sdk.AccAddressFromBech32(providerStr)
+		queryByBinding := true
+
+		provider, err := sdk.AccAddressFromBech32(arg2)
+		if err != nil {
+			queryByBinding = false
+		}
+
+		var params interface{}
+		var route string
+
+		if queryByBinding {
+			params = service.QueryRequestsParams{
+				ServiceName: arg1,
+				Provider:    provider,
+			}
+
+			route = fmt.Sprintf("custom/%s/%s", protocol.ServiceRoute, service.QueryRequests)
+		} else {
+			requestContextID, err := hex.DecodeString(arg1)
+			if err != nil {
+				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+				return
+			}
+
+			batchCounter, err := strconv.ParseUint(arg2, 10, 64)
+			if err != nil {
+				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+				return
+			}
+
+			params = service.QueryRequestsByReqCtxParams{
+				RequestContextID: requestContextID,
+				BatchCounter:     batchCounter,
+			}
+
+			route = fmt.Sprintf("custom/%s/%s", protocol.ServiceRoute, service.QueryRequestsByReqCtx)
+		}
+
+		bz, err := cdc.MarshalJSON(params)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		params := service.QueryRequestsParams{
-			ServiceName: serviceName,
-			Provider:    provider,
-		}
-
-		bz, err := cliCtx.Codec.MarshalJSON(params)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
-		route := fmt.Sprintf("custom/%s/%s", protocol.ServiceRoute, service.QueryRequests)
 		res, err := cliCtx.QueryWithData(route, bz)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
 
-		utils.PostProcessResponse(w, cliCtx.Codec, res, cliCtx.Indent)
+		utils.PostProcessResponse(w, cdc, res, cliCtx.Indent)
 	}
 }
 
@@ -310,46 +330,6 @@ func qeuryRequestContextHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) h
 		}
 
 		route := fmt.Sprintf("custom/%s/%s", protocol.ServiceRoute, service.QueryRequestContext)
-		res, err := cliCtx.QueryWithData(route, bz)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-			return
-		}
-
-		utils.PostProcessResponse(w, cdc, res, cliCtx.Indent)
-	}
-}
-
-func queryRequestsByReqCtxHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		vars := mux.Vars(r)
-		requestContextIDStr := vars[RequestContextID]
-		batchCounterStr := vars[BatchCounter]
-
-		requestContextID, err := hex.DecodeString(requestContextIDStr)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
-		batchCounter, err := strconv.ParseUint(batchCounterStr, 10, 64)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
-		params := service.QueryRequestsByReqCtxParams{
-			RequestContextID: requestContextID,
-			BatchCounter:     batchCounter,
-		}
-
-		bz, err := cdc.MarshalJSON(params)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
-		route := fmt.Sprintf("custom/%s/%s", protocol.ServiceRoute, service.QueryRequestsByReqCtx)
 		res, err := cliCtx.QueryWithData(route, bz)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
