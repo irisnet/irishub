@@ -37,6 +37,7 @@ func (k Keeper) RequestService(ctx sdk.Context, reqID []byte, consumer sdk.AccAd
 
 	timeout := k.sk.GetParamSet(ctx).MaxRequestTimeout
 
+	// TODO
 	coins := sdk.NewCoins(sdk.NewCoin(sdk.Iris, sdk.NewInt(100)))
 
 	requestContextID, err := k.sk.CreateRequestContext(

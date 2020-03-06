@@ -7,26 +7,13 @@ import (
 
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/log"
-	dbm "github.com/tendermint/tm-db"
 
 	"github.com/irisnet/irishub/app/v3/rand/internal/types"
 	"github.com/irisnet/irishub/codec"
-	"github.com/irisnet/irishub/store"
 	sdk "github.com/irisnet/irishub/types"
 )
 
-func setupMultiStore() (sdk.MultiStore, *sdk.KVStoreKey) {
-	db := dbm.NewMemDB()
-	randKey := sdk.NewKVStoreKey("randkey")
-
-	ms := store.NewCommitMultiStore(db)
-	ms.MountStoreWithDB(randKey, sdk.StoreTypeIAVL, db)
-	_ = ms.LoadLatestVersion()
-
-	return ms, randKey
-}
-
-func TestRequestRandKeeper(t *testing.T) {
+func TestOracleRequestRandKeeper(t *testing.T) {
 	ms, randKey := setupMultiStore()
 
 	cdc := codec.New()
@@ -62,7 +49,7 @@ func TestRequestRandKeeper(t *testing.T) {
 	require.Nil(t, err)
 
 	// get request id
-	reqID := types.GenerateRequestID(types.NewRequest(txHeight, consumer, sdk.SHA256(txBytes), nil, false))
+	reqID := types.GenerateRequestID(types.NewRequest(txHeight, consumer, sdk.SHA256(txBytes), nil, true))
 
 	// get the pending request and assert the result is not nil
 	store := ctx.KVStore(randKey)
