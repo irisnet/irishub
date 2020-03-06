@@ -31,16 +31,20 @@ func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, k Keeper) (tags s
 			// get the request id
 			reqID := GenerateRequestID(request)
 
-			if err := k.RequestService(ctx, reqID, request.Consumer); err != nil {
-				// TODO: handle error
-				ctx.Logger().Info(fmt.Sprintf("request service error : %s", err.Error()))
-			} else {
-				k.EnqueueOracleTimeoutRandRequest(ctx, lastBlockHeight+k.GetMaxServiceRequestTimeout(ctx), reqID, request)
+			if requestContextID, err := k.RequestService(ctx, reqID, request.Consumer); err == nil {
+				request.ReqCtxID = requestContextID
+				k.EnqueueOracleTimeoutRandRequest(
+					ctx,
+					lastBlockHeight+k.GetMaxServiceRequestTimeout(ctx),
+					reqID,
+					request,
+				)
 				requestedOracleRandNum++
+			} else {
+				ctx.Logger().Info(fmt.Sprintf("request service error : %s", err.Error()))
 			}
 
 			k.DequeueRandRequest(ctx, lastBlockHeight, reqID)
-
 		} else {
 			// get the request id
 			reqID := GenerateRequestID(request)

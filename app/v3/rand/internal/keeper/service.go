@@ -1,48 +1,119 @@
 package keeper
 
 import (
+	"bytes"
+	"encoding/hex"
+	"fmt"
+	"math/rand"
+	"time"
+
+	"github.com/tidwall/gjson"
+
 	"github.com/irisnet/irishub/app/v3/rand/internal/types"
+	"github.com/irisnet/irishub/app/v3/service"
 	"github.com/irisnet/irishub/app/v3/service/exported"
 	sdk "github.com/irisnet/irishub/types"
 )
 
 // RequestService ...
-func (k Keeper) RequestService(ctx sdk.Context, reqID []byte, consumer sdk.AccAddress) sdk.Error {
+func (k Keeper) RequestService(ctx sdk.Context, reqID []byte, consumer sdk.AccAddress) ([]byte, sdk.Error) {
+	iterator := k.sk.ServiceBindingsIterator(ctx, types.ServiceName)
+	defer iterator.Close()
 
-	// TODO: rand provider
-	provider := []sdk.AccAddress{}
+	var bindings []service.ServiceBinding
+	for ; iterator.Valid(); iterator.Next() {
+		var binding service.ServiceBinding
+		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &binding)
+
+		bindings = append(bindings, binding)
+	}
+
+	if len(bindings) < 1 {
+		return nil, types.ErrInvalidServiceBindings(types.DefaultCodespace, fmt.Sprintf("no service bindings available"))
+	}
+
+	rand.Seed(time.Now().UnixNano())
+	provider := []sdk.AccAddress{bindings[rand.Intn(len(bindings))].Provider}
 
 	timeout := k.sk.GetParamSet(ctx).MaxRequestTimeout
 
+	coins := sdk.NewCoins(sdk.NewCoin(sdk.Iris, sdk.NewInt(100)))
+
 	requestContextID, err := k.sk.CreateRequestContext(
-		ctx,               //
-		types.ServiceName, //
-		provider,          //
-		consumer,          //
-		"{}",              // TODO  input 				string
-		sdk.Coins{},       // TODO  serviceFeeCap 		sdk.Coins
-		timeout,           //
-		false,             // TODO  superMode 			bool
-		false,             // TODO  repeated			bool
-		0,                 // TODO  repeatedFrequency 	uint64
-		0,                 // TODO  repeatedTotal 		int64
-		exported.RUNNING,  // TODO  state 				exported.RequestContextState
-		0,                 // TODO  respThreshold 		uint16
-		types.ModuleName,  // TODO  respHandler 		string
+		ctx,
+		types.ServiceName,
+		provider,
+		consumer,
+		"{}",
+		coins,
+		timeout,
+		false,
+		false,
+		0,
+		0,
+		exported.RUNNING,
+		0,
+		types.ModuleName,
 	)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return k.sk.StartRequestContext(ctx, requestContextID)
+	if err := k.sk.StartRequestContext(ctx, requestContextID); err != nil {
+		return nil, err
+	}
+
+	return requestContextID, nil
 }
 
 // HandlerResponse ...
 func (k Keeper) HandlerResponse(ctx sdk.Context, requestContextID []byte, responseOutput []string) {
+	if len(responseOutput) == 0 {
+		return
+	}
 
-	// TODO: Generate random
+	_, existed := k.sk.GetRequestContext(ctx, requestContextID)
+	if !existed {
+		return
+	}
 
-	// TODO: DequeueOracleTimeoutRandRequest
+	request, expiredHeight, found := k.GetRequestByReqCtxID(ctx, requestContextID)
+	if !found {
+		return
+	}
+
+	result := gjson.Get(responseOutput[0], types.ValueJsonPath)
+
+	seed, err := hex.DecodeString(result.String())
+	if err != nil || len(seed) != 32 {
+		return
+	}
+
+	currentTimestamp := ctx.BlockHeader().Time.Unix()
+	lastBlockHeight := ctx.BlockHeight() - 1
+	lastBlockHash := []byte(ctx.BlockHeader().LastBlockId.Hash)
+
+	// get the request id
+	reqID := types.GenerateRequestID(request)
+
+	// generate a random number
+	rand := types.MakePRNG(lastBlockHash, currentTimestamp, request.Consumer, seed, true).GetRand()
+	k.SetRand(ctx, reqID, types.NewRand(request.TxHash, lastBlockHeight, rand))
+
+	k.DequeueOracleTimeoutRandRequest(ctx, expiredHeight, reqID)
+}
+
+// GetRequestByReqCtxID ...
+func (k Keeper) GetRequestByReqCtxID(ctx sdk.Context, requestContextID []byte) (request types.Request, expiredHeight int64, found bool) {
+	k.IterateRandRequestOracleTimeoutQueue(ctx, func(h int64, r types.Request) (stop bool) {
+		if bytes.Equal(requestContextID, r.ReqCtxID) {
+			request = r
+			expiredHeight = h
+			found = true
+		}
+		return found
+	})
+	return
 }
 
 // GetRequestContext ...
