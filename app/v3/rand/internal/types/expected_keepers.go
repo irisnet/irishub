@@ -43,11 +43,20 @@ type ServiceKeeper interface {
 		timeout int64,
 		repeatedFreq uint64,
 		repeatedTotal int64,
+		consumer sdk.AccAddress,
 	) sdk.Error
 
-	StartRequestContext(ctx sdk.Context, requestContextID []byte) sdk.Error
+	StartRequestContext(
+		ctx sdk.Context,
+		requestContextID []byte,
+		consumer sdk.AccAddress,
+	) sdk.Error
 
-	PauseRequestContext(ctx sdk.Context, requestContextID []byte) sdk.Error
+	PauseRequestContext(
+		ctx sdk.Context,
+		requestContextID []byte,
+		consumer sdk.AccAddress,
+	) sdk.Error
 
 	ServiceBindingsIterator(ctx sdk.Context, serviceName string) sdk.Iterator
 

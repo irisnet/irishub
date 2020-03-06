@@ -59,7 +59,7 @@ func (k Keeper) RequestService(ctx sdk.Context, reqID []byte, consumer sdk.AccAd
 		return nil, err
 	}
 
-	if err := k.sk.StartRequestContext(ctx, requestContextID); err != nil {
+	if err := k.sk.StartRequestContext(ctx, requestContextID, consumer); err != nil {
 		return nil, err
 	}
 
