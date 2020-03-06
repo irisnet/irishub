@@ -13,7 +13,6 @@ var (
 	emptyAddr     sdk.AccAddress
 	testAddr      = sdk.AccAddress([]byte("testAddr"))
 	blockInterval = uint64(10)
-	oracle        = false
 )
 
 func TestNewMsgRequestRand(t *testing.T) {

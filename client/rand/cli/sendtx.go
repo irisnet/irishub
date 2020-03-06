@@ -3,13 +3,14 @@ package cli
 import (
 	"os"
 
-	"github.com/irisnet/irishub/app/v1/rand"
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+
+	"github.com/irisnet/irishub/app/v3/rand"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 // GetCmdRequestRand implements the request-rand command
@@ -17,7 +18,7 @@ func GetCmdRequestRand(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "request-rand",
 		Short:   "Request a random number",
-		Example: "iriscli rand request-rand --block-interval=10",
+		Example: "iriscli rand request-rand --block-interval=10 -oracle=true",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
@@ -34,6 +35,7 @@ func GetCmdRequestRand(cdc *codec.Codec) *cobra.Command {
 			msg := rand.MsgRequestRand{
 				Consumer:      consumer,
 				BlockInterval: uint64(viper.GetInt64(FlagBlockInterval)),
+				Oracle:        viper.GetBool(FlagOracle),
 			}
 
 			if err := msg.ValidateBasic(); err != nil {

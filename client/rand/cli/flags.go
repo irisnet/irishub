@@ -1,8 +1,9 @@
 package cli
 
 import (
-	"github.com/irisnet/irishub/app/v1/rand"
 	flag "github.com/spf13/pflag"
+
+	"github.com/irisnet/irishub/app/v3/rand"
 )
 
 const (
@@ -10,6 +11,7 @@ const (
 	FlagConsumer      = "consumer"
 	FlagBlockInterval = "block-interval"
 	FlagQueueHeight   = "queue-height"
+	FlagOracle        = "oracle"
 )
 
 var (
