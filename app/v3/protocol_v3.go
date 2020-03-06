@@ -385,8 +385,6 @@ func (p *ProtocolV3) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) a
 	// handle HTLC expiration queue
 	htlcTags := htlc.BeginBlocker(ctx, p.htlcKeeper)
 
-	service.BeginBlocker(ctx, p.serviceKeeper)
-
 	ctx.CoinFlowTags().TagWrite()
 
 	tags = tags.AppendTags(slashTags).AppendTags(randTags).AppendTags(htlcTags)

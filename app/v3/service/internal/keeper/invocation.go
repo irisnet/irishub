@@ -56,7 +56,7 @@ func (k Keeper) CreateRequestContext(
 		}
 
 		if responseThreshold < 1 || int(responseThreshold) > len(providers) {
-			return nil, types.ErrInvalidRequest(k.codespace, fmt.Sprintf("response threshold must be between [1,%d]", len(providers)))
+			return nil, types.ErrInvalidThreshold(k.codespace, fmt.Sprintf("response threshold must be between [1,%d]", len(providers)))
 		}
 	}
 
@@ -71,20 +71,12 @@ func (k Keeper) CreateRequestContext(
 
 	params := k.GetParamSet(ctx)
 	if timeout > params.MaxRequestTimeout {
-		return nil, types.ErrInvalidRequest(k.codespace, fmt.Sprintf("timeout [%d] must not be greater than the max request timeout [%d]", timeout, params.MaxRequestTimeout))
-	}
-
-	if timeout == 0 {
-		timeout = params.MaxRequestTimeout
+		return nil, types.ErrInvalidTimeout(k.codespace, fmt.Sprintf("timeout [%d] must not be greater than the max request timeout [%d]", timeout, params.MaxRequestTimeout))
 	}
 
 	if repeated {
 		if repeatedFrequency == 0 {
 			repeatedFrequency = uint64(timeout)
-		}
-
-		if repeatedFrequency < uint64(timeout) {
-			return nil, types.ErrInvalidRequest(k.codespace, fmt.Sprintf("repeated frequency [%d] must not be less than timeout [%d]", repeatedFrequency, timeout))
 		}
 	} else {
 		repeatedFrequency = 0
@@ -122,18 +114,27 @@ func (k Keeper) UpdateRequestContext(
 	timeout int64,
 	repeatedFreq uint64,
 	repeatedTotal int64,
+	consumer sdk.AccAddress,
 ) sdk.Error {
 	requestContext, found := k.GetRequestContext(ctx, requestContextID)
 	if !found {
 		return types.ErrUnknownRequestContext(k.codespace, requestContextID)
 	}
 
+	if !consumer.Equals(requestContext.Consumer) {
+		return types.ErrNotMatchingConsumer(k.codespace)
+	}
+
 	if !requestContext.Repeated {
 		return types.ErrRequestContextNonRepeated(k.codespace)
 	}
 
+	if requestContext.State == types.COMPLETED {
+		return types.ErrRequestContextCompleted(k.codespace)
+	}
+
 	if len(requestContext.ModuleName) != 0 {
-		if err := types.ValidateRequestContextUpdating(serviceFeeCap, timeout, repeatedFreq, repeatedTotal); err != nil {
+		if err := types.ValidateRequestContextUpdating(providers, serviceFeeCap, timeout, repeatedFreq, repeatedTotal); err != nil {
 			return err
 		}
 	}
@@ -192,10 +193,15 @@ func (k Keeper) UpdateRequestContext(
 func (k Keeper) PauseRequestContext(
 	ctx sdk.Context,
 	requestContextID []byte,
+	consumer sdk.AccAddress,
 ) sdk.Error {
 	requestContext, found := k.GetRequestContext(ctx, requestContextID)
 	if !found {
 		return types.ErrUnknownRequestContext(k.codespace, requestContextID)
+	}
+
+	if !consumer.Equals(requestContext.Consumer) {
+		return types.ErrNotMatchingConsumer(k.codespace)
 	}
 
 	if !requestContext.Repeated {
@@ -216,10 +222,15 @@ func (k Keeper) PauseRequestContext(
 func (k Keeper) StartRequestContext(
 	ctx sdk.Context,
 	requestContextID []byte,
+	consumer sdk.AccAddress,
 ) sdk.Error {
 	requestContext, found := k.GetRequestContext(ctx, requestContextID)
 	if !found {
 		return types.ErrUnknownRequestContext(k.codespace, requestContextID)
+	}
+
+	if !consumer.Equals(requestContext.Consumer) {
+		return types.ErrNotMatchingConsumer(k.codespace)
 	}
 
 	if !requestContext.Repeated {
@@ -244,10 +255,15 @@ func (k Keeper) StartRequestContext(
 func (k Keeper) KillRequestContext(
 	ctx sdk.Context,
 	requestContextID []byte,
+	consumer sdk.AccAddress,
 ) sdk.Error {
 	requestContext, found := k.GetRequestContext(ctx, requestContextID)
 	if !found {
 		return types.ErrUnknownRequestContext(k.codespace, requestContextID)
+	}
+
+	if !consumer.Equals(requestContext.Consumer) {
+		return types.ErrNotMatchingConsumer(k.codespace)
 	}
 
 	if !requestContext.Repeated {
@@ -914,20 +930,22 @@ func (k Keeper) GetResponseCallback(moduleName string) (types.ResponseCallback, 
 
 // GetIntraTxCounter returns the current tx counter and increases it by 1
 func (k Keeper) GetIntraTxCounter(ctx sdk.Context) int16 {
+	store := ctx.KVStore(k.storeKey)
 	var counter int16
 
-	v := ctx.Value(GetIntraTxCounterKey())
-	if v == nil {
-		counter = 0
-	} else {
-		counter = v.(int16)
+	bz := store.Get(GetIntraTxCounterKey())
+	if bz != nil {
+		k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &counter)
 	}
 
 	k.SetIntraTxCounter(ctx, counter+1)
 	return counter
 }
 
-// SetIntraTxCounter sets the tx counter to the context
+// SetIntraTxCounter sets the tx counter
 func (k Keeper) SetIntraTxCounter(ctx sdk.Context, counter int16) {
-	ctx = ctx.WithValue(GetIntraTxCounterKey(), counter)
+	store := ctx.KVStore(k.storeKey)
+
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(counter)
+	store.Set(GetIntraTxCounterKey(), bz)
 }

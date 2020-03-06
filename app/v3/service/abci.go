@@ -4,15 +4,11 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 )
 
-// BeginBlocker handles block beginning logic for service
-func BeginBlocker(ctx sdk.Context, k Keeper) {
-	// reset the tx counter
-	k.SetIntraTxCounter(ctx, 0)
-}
-
 // EndBlocker handles block ending logic for service
 func EndBlocker(ctx sdk.Context, k Keeper) (tags sdk.Tags) {
 	ctx = ctx.WithLogger(ctx.Logger().With("handler", "endBlock").With("module", "iris/service"))
+
+	k.SetIntraTxCounter(ctx, 0)
 
 	params := k.GetParamSet(ctx)
 	slashFraction := params.SlashFraction
@@ -46,7 +42,7 @@ func EndBlocker(ctx sdk.Context, k Keeper) (tags sdk.Tags) {
 
 						for _, coin := range binding.Deposit {
 							taxAmount := sdk.NewDecFromInt(coin.Amount).Mul(slashFraction).TruncateInt()
-							slashedCoins.Add(sdk.NewCoins(sdk.NewCoin(coin.Denom, taxAmount)))
+							slashedCoins = slashedCoins.Add(sdk.NewCoins(sdk.NewCoin(coin.Denom, taxAmount)))
 						}
 
 						if err := k.Slash(ctx, binding, slashedCoins); err != nil {
