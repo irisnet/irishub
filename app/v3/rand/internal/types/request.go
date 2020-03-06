@@ -3,16 +3,18 @@ package types
 import (
 	"encoding/hex"
 	"fmt"
+	"strconv"
 
 	sdk "github.com/irisnet/irishub/types"
 )
 
 // Request represents a request for a random number
 type Request struct {
-	Height   int64          `json:"height"`   // the height of the block in which the request tx is included
-	Consumer sdk.AccAddress `json:"consumer"` // the request address
-	TxHash   []byte         `json:"txhash"`   // the request tx hash
-	Oracle   bool           `json:"oracle"`   // oracle method
+	Height   int64          `json:"height"`     // the height of the block in which the request tx is included
+	Consumer sdk.AccAddress `json:"consumer"`   // the request address
+	TxHash   []byte         `json:"txhash"`     // the request tx hash
+	ReqCtxID []byte         `json:"req_ctx_id"` // request context id
+	Oracle   bool           `json:"oracle"`     // oracle method
 }
 
 // NewRequest constructs a request
@@ -20,12 +22,14 @@ func NewRequest(
 	height int64,
 	consumer sdk.AccAddress,
 	txHash []byte,
+	reqCtxID []byte,
 	oracle bool,
 ) Request {
 	return Request{
 		Height:   height,
 		Consumer: consumer,
 		TxHash:   txHash,
+		ReqCtxID: reqCtxID,
 		Oracle:   oracle,
 	}
 }
@@ -35,8 +39,15 @@ func (r Request) String() string {
 	return fmt.Sprintf(`Request:
   Height:            %d
   Consumer:          %s
-  TxHash:            %s`,
-		r.Height, r.Consumer.String(), hex.EncodeToString(r.TxHash))
+  TxHash:            %s
+  ReqCtxID:          %s
+  Oracle:            %s`,
+		r.Height,
+		r.Consumer.String(),
+		hex.EncodeToString(r.TxHash),
+		hex.EncodeToString(r.ReqCtxID),
+		strconv.FormatBool(r.Oracle),
+	)
 }
 
 // Requests is a set of requests
@@ -50,7 +61,10 @@ func (rs Requests) String() string {
 
 	var str string
 	for _, r := range rs {
-		str += fmt.Sprintf("Request:\n  Height: %d, Consumer: %s, TxHash: %s", r.Height, r.Consumer.String(), hex.EncodeToString(r.TxHash))
+		str += fmt.Sprintf(
+			"Request:\n  Height: %d, Consumer: %s, TxHash: %s",
+			r.Height, r.Consumer.String(), hex.EncodeToString(r.TxHash),
+		)
 	}
 
 	return str

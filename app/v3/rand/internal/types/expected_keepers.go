@@ -49,5 +49,7 @@ type ServiceKeeper interface {
 
 	PauseRequestContext(ctx sdk.Context, requestContextID []byte) sdk.Error
 
+	ServiceBindingsIterator(ctx sdk.Context, serviceName string) sdk.Iterator
+
 	GetParamSet(ctx sdk.Context) service.Params
 }

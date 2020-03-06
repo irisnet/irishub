@@ -5,6 +5,8 @@ import (
 )
 
 const (
+	ModuleName = "rand"
+
 	// MsgRoute identifies transaction types
 	MsgRoute = "rand"
 

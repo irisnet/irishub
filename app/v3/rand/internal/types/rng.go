@@ -18,14 +18,18 @@ type PRNG struct {
 	BlockHash      []byte         // hash of some block
 	BlockTimestamp int64          // timestamp of the next block
 	TxInitiator    sdk.AccAddress // address initiating the request tx
+	OracleSeed     []byte         // oracle seed
+	Oracle         bool           // oracle method
 }
 
 // MakePRNG constructs a PRNG
-func MakePRNG(blockHash []byte, blockTimestampt int64, txInitiator sdk.AccAddress) PRNG {
+func MakePRNG(blockHash []byte, blockTimestampt int64, txInitiator sdk.AccAddress, oracleSeed []byte, oracle bool) PRNG {
 	return PRNG{
 		BlockHash:      blockHash,
 		BlockTimestamp: blockTimestampt,
 		TxInitiator:    txInitiator,
+		OracleSeed:     oracleSeed,
+		Oracle:         oracle,
 	}
 }
 
@@ -37,6 +41,12 @@ func (p PRNG) GetRand() sdk.Rat {
 
 	seedSum := new(big.Int).Add(seedBT, seedBH)
 	seedSum = new(big.Int).Add(seedSum, seedTI)
+
+	if p.Oracle {
+		seedOS := new(big.Int).Div(new(big.Int).SetBytes(sdk.SHA256(p.OracleSeed)), seedBT)
+		seedSum = new(big.Int).Add(seedSum, seedOS)
+	}
+
 	seed := new(big.Int).SetBytes(sdk.SHA256(seedSum.Bytes()))
 
 	precision := new(big.Int).Exp(big.NewInt(10), big.NewInt(RandPrec), nil)

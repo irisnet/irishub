@@ -24,12 +24,14 @@ func NewKeeper(
 	sk types.ServiceKeeper,
 	codespace sdk.CodespaceType,
 ) Keeper {
-	return Keeper{
+	keeper := Keeper{
 		storeKey:  key,
 		cdc:       cdc,
 		sk:        sk,
 		codespace: codespace,
 	}
+	_ = sk.RegisterResponseCallback(types.ModuleName, keeper.HandlerResponse)
+	return keeper
 }
 
 // Codespace returns the codespace
@@ -56,7 +58,7 @@ func (k Keeper) RequestRand(
 	txHash := sdk.SHA256(ctx.TxBytes())
 
 	// build request
-	request := types.NewRequest(currentHeight, consumer, txHash, oracle)
+	request := types.NewRequest(currentHeight, consumer, txHash, nil, oracle)
 
 	// generate the request id
 	reqID := types.GenerateRequestID(request)
@@ -94,6 +96,22 @@ func (k Keeper) DequeueRandRequest(ctx sdk.Context, height int64, reqID []byte) 
 
 	// delete the key
 	store.Delete(KeyRandRequestQueue(height, reqID))
+}
+
+// EnqueueOracleRandRequest enqueue the oracle timeout random number request
+func (k Keeper) EnqueueOracleTimeoutRandRequest(ctx sdk.Context, height int64, reqID []byte, request types.Request) {
+	store := ctx.KVStore(k.storeKey)
+
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(request)
+	store.Set(KeyRandRequestOracleTimeoutQueue(height, reqID), bz)
+}
+
+// DequeueOracleRandRequest removes the oracle timeout random number request by the specified height and request id
+func (k Keeper) DequeueOracleTimeoutRandRequest(ctx sdk.Context, height int64, reqID []byte) {
+	store := ctx.KVStore(k.storeKey)
+
+	// delete the key
+	store.Delete(KeyRandRequestOracleTimeoutQueue(height, reqID))
 }
 
 // GetRand retrieves the random number by the specified request id
@@ -154,31 +172,28 @@ func (k Keeper) IterateRandRequestQueue(ctx sdk.Context, op func(h int64, r type
 	}
 }
 
-// SetSeed stores the oracle seed
-func (k Keeper) SetSeed(ctx sdk.Context, reqID []byte, seed types.Seed) {
+// IterateOracleRandRequestQueueByHeight iterates the random number request oracle timeout queue by the specified height
+func (k Keeper) IterateRandRequestOracleTimeoutQueueByHeight(ctx sdk.Context, height int64) sdk.Iterator {
 	store := ctx.KVStore(k.storeKey)
-
-	bz := k.cdc.MustMarshalBinaryLengthPrefixed(seed)
-	store.Set(KeySeed(reqID), bz)
+	return sdk.KVStorePrefixIterator(store, KeyRandRequestOracleTimeoutQueueSubspace(height))
 }
 
-// GetSeed retrieves the oracle seed by the specified request id
-func (k Keeper) GetSeed(ctx sdk.Context, reqID []byte) (types.Seed, sdk.Error) {
+// IterateOracleRandRequestQueue iterates through the random number request oracle timeout queue
+func (k Keeper) IterateRandRequestOracleTimeoutQueue(ctx sdk.Context, op func(h int64, r types.Request) (stop bool)) {
 	store := ctx.KVStore(k.storeKey)
 
-	bz := store.Get(KeySeed(reqID))
-	if bz == nil {
-		return types.Seed{}, types.ErrInvalidReqID(k.codespace, fmt.Sprintf("invalid request id: %s", hex.EncodeToString(reqID)))
+	iterator := sdk.KVStorePrefixIterator(store, PrefixRandRequestOracleTimeoutQueue)
+	defer iterator.Close()
+
+	for ; iterator.Valid(); iterator.Next() {
+		keyParts := bytes.Split(iterator.Key(), KeyDelimiter)
+		height, _ := strconv.ParseInt(string(keyParts[1]), 10, 64)
+
+		var request types.Request
+		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &request)
+
+		if stop := op(height, request); stop {
+			break
+		}
 	}
-
-	var seed types.Seed
-	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &seed)
-
-	return seed, nil
-}
-
-// DeleteSeed delete the stored oracle seed
-func (k Keeper) DeleteSeed(ctx sdk.Context, reqID []byte) {
-	store := ctx.KVStore(k.storeKey)
-	store.Delete(KeySeed(reqID))
 }

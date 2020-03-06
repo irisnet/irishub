@@ -11,7 +11,6 @@ type (
 	Rand                        = types.Rand
 	Request                     = types.Request
 	Requests                    = types.Requests
-	Params                      = types.Params
 	GenesisState                = types.GenesisState
 	QueryRandParams             = types.QueryRandParams
 	QueryRandRequestQueueParams = types.QueryRandRequestQueueParams
@@ -20,8 +19,8 @@ type (
 
 // exported consts
 const (
+	ServiceName           = types.ModuleName
 	DefaultCodespace      = types.DefaultCodespace
-	DefaultParamSpace     = types.DefaultParamSpace
 	DefaultBlockInterval  = types.DefaultBlockInterval
 	RandPrec              = types.RandPrec
 	QueryRand             = types.QueryRand
@@ -34,16 +33,13 @@ var (
 	TagRandHeight = types.TagRandHeight
 	TagRand       = types.TagRand
 
-	DefaultParams        = types.DefaultParams
-	DefaultParamsForTest = types.DefaultParamsForTest
-	ValidateParams       = types.ValidateParams
-	RegisterCodec        = types.RegisterCodec
-	NewMsgRequestRand    = types.NewMsgRequestRand
-	NewRand              = types.NewRand
-	NewRequest           = types.NewRequest
-	MakePRNG             = types.MakePRNG
-	GenerateRequestID    = types.GenerateRequestID
-	CheckReqID           = types.CheckReqID
-	NewKeeper            = keeper.NewKeeper
-	NewQuerier           = keeper.NewQuerier
+	RegisterCodec     = types.RegisterCodec
+	NewMsgRequestRand = types.NewMsgRequestRand
+	NewRand           = types.NewRand
+	NewRequest        = types.NewRequest
+	MakePRNG          = types.MakePRNG
+	GenerateRequestID = types.GenerateRequestID
+	CheckReqID        = types.CheckReqID
+	NewKeeper         = keeper.NewKeeper
+	NewQuerier        = keeper.NewQuerier
 )
