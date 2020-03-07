@@ -10,8 +10,8 @@ const (
 	FlagReqID         = "request-id"
 	FlagConsumer      = "consumer"
 	FlagBlockInterval = "block-interval"
-	FlagQueueHeight   = "queue-height"
 	FlagOracle        = "oracle"
+	FlagQueueHeight   = "queue-height"
 )
 
 var (
@@ -22,6 +22,7 @@ var (
 
 func init() {
 	FsRequestRand.Uint64(FlagBlockInterval, rand.DefaultBlockInterval, "the block interval")
+	FsRequestRand.Bool(FlagOracle, false, "woth oracle method")
 	FsQueryRand.String(FlagReqID, "", "the request id")
 	FsQueryQueue.Int64(FlagQueueHeight, 0, "optional height")
 }

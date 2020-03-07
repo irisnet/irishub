@@ -38,7 +38,7 @@ func (k Keeper) RequestService(ctx sdk.Context, reqID []byte, consumer sdk.AccAd
 	timeout := k.sk.GetParamSet(ctx).MaxRequestTimeout
 
 	// TODO
-	coins := sdk.NewCoins(sdk.NewCoin(sdk.Iris, sdk.NewInt(100)))
+	coins := sdk.NewCoins(sdk.NewCoin(sdk.IrisAtto, sdk.NewInt(1000000000000000000)))
 
 	requestContextID, err := k.sk.CreateRequestContext(
 		ctx,
@@ -53,14 +53,10 @@ func (k Keeper) RequestService(ctx sdk.Context, reqID []byte, consumer sdk.AccAd
 		0,
 		0,
 		exported.RUNNING,
-		0,
+		1,
 		types.ModuleName,
 	)
 	if err != nil {
-		return nil, err
-	}
-
-	if err := k.sk.StartRequestContext(ctx, requestContextID, consumer); err != nil {
 		return nil, err
 	}
 
