@@ -157,3 +157,8 @@ func CheckSymbol(symbol string) sdk.Error {
 
 	return nil
 }
+
+// TotalSupplyKeyHandler implements auth.TotalSupplyKeyHandler
+func TotalSupplyKeyHandler(denom string) (string, error) {
+	return strings.Split(denom, "-")[0], nil
+}

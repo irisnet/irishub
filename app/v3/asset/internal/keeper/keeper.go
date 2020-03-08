@@ -5,6 +5,7 @@ import (
 
 	"github.com/tendermint/tendermint/libs/log"
 
+	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/app/v1/params"
 	"github.com/irisnet/irishub/app/v3/asset/exported"
 	"github.com/irisnet/irishub/app/v3/asset/internal/types"
@@ -24,13 +25,17 @@ type Keeper struct {
 }
 
 func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, bk types.BankKeeper, codespace sdk.CodespaceType, paramSpace params.Subspace) Keeper {
-	return Keeper{
+	keeper := Keeper{
 		storeKey:   key,
 		cdc:        cdc,
 		bk:         bk,
 		codespace:  codespace,
 		paramSpace: paramSpace.WithTypeTable(types.ParamTypeTable()),
 	}
+
+	auth.RegisterTotalSupplyKeyHandler(types.TotalSupplyKeyHandler)
+
+	return keeper
 }
 
 // Logger returns a module-specific logger.
