@@ -9,10 +9,13 @@ var (
 	prefixOwnerGateway = []byte("ownerGateways:")
 	prefixOwnerToken   = []byte("ownerTokens:")
 
+	keyAccount        = sdk.NewKVStoreKey("acc")
+	prefixTotalSupply = []byte("totalSupply:")
+
 	tokenOwner, _ = sdk.AccAddressFromBech32("iaa1v6c3sa76s3grss3xu64tvn9nd556jlcw6azc85")
 )
 
-//Init Initialize module parameters during network upgrade
+//Init Initializes module parameters during network upgrade
 func (k Keeper) Init(ctx sdk.Context) {
 	logger := k.Logger(ctx).With("handler", "Init")
 
@@ -46,6 +49,9 @@ func (k Keeper) Init(ctx sdk.Context) {
 	// delete tokens from token owners
 	k.deleteTokensFromAccounts(ctx, []sdk.AccAddress{tokenOwner})
 
+	// delete total supplies
+	k.deleteTotalSupplies(ctx)
+
 	//reset params
 	param := k.GetParamSet(ctx)
 	k.SetParamSet(ctx, param)
@@ -71,11 +77,17 @@ func (k Keeper) deleteTokensFromAccounts(ctx sdk.Context, addrs []sdk.AccAddress
 
 		if !tokens.IsZero() {
 			_, _, _ = k.bk.SubtractCoins(ctx, addr, tokens)
-
-			for _, token := range tokens {
-				_ = k.bk.DecreaseTotalSupply(ctx, token)
-
-			}
 		}
+	}
+}
+
+func (k Keeper) deleteTotalSupplies(ctx sdk.Context) {
+	store := ctx.KVStore(keyAccount)
+
+	iterator := sdk.KVStorePrefixIterator(store, prefixTotalSupply)
+	defer iterator.Close()
+
+	for ; iterator.Valid(); iterator.Next() {
+		store.Delete(iterator.Key())
 	}
 }
