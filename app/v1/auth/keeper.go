@@ -29,6 +29,19 @@ var (
 	HTLCLockedCoinsAccAddr = sdk.AccAddress(crypto.AddressHash([]byte("HTLCLockedCoins"))) // HTLCLockedCoinsAccAddr store All HTLC locked coins
 )
 
+var (
+	// globle total supply key handler implement
+	totalSupplyKeyHandler TotalSupplyKeyHandler
+)
+
+// TotalSupplyKeyHandler defines an interface for total supply key handler
+type TotalSupplyKeyHandler func(denom string) (string, error)
+
+// RegisterTotalSupplyKeyHandler sets a total supply key handler
+func RegisterTotalSupplyKeyHandler(tsKeyHandler TotalSupplyKeyHandler) {
+	totalSupplyKeyHandler = tsKeyHandler
+}
+
 // This AccountKeeper encodes/decodes accounts using the
 // go-amino (binary) encoding/decoding library.
 type AccountKeeper struct {
@@ -53,7 +66,7 @@ func NewAccountKeeper(cdc *codec.Codec, key sdk.StoreKey, proto func() Account) 
 	}
 }
 
-// Implaements sdk.AccountKeeper.
+// Implements sdk.AccountKeeper.
 func (am AccountKeeper) NewAccountWithAddress(ctx sdk.Context, addr sdk.AccAddress) Account {
 	acc := am.proto()
 	err := acc.SetAddress(addr)
@@ -263,7 +276,7 @@ func (am AccountKeeper) DecreaseTotalLoosenToken(ctx sdk.Context, coins sdk.Coin
 
 // Turn a token id to key used to get it from the account store
 func TotalSupplyStoreKey(denom string) []byte {
-	keyId, _ := sdk.ConvertDenomToTokenKeyId(denom)
+	keyId, _ := totalSupplyKeyHandler(denom)
 	return append(totalSupplyKeyPrefix, keyId...)
 }
 
