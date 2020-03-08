@@ -3,6 +3,7 @@ package keeper
 import (
 	"fmt"
 
+	"github.com/irisnet/irishub/app/v1/asset/internal/types"
 	sdk "github.com/irisnet/irishub/types"
 )
 
@@ -13,7 +14,7 @@ var (
 
 // KeyToken returns the key of the specified token source and id
 func KeyToken(tokenId string) []byte {
-	keyId, _ := sdk.ConvertIdToTokenKeyId(tokenId)
+	keyId, _ := types.ConvertIdToTokenKeyId(tokenId)
 	return []byte(fmt.Sprintf("token:%s", keyId))
 }
 
