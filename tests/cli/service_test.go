@@ -246,7 +246,7 @@ func TestIrisCLIService(t *testing.T) {
 	require.Equal(t, input, fooRequests[0].Input)
 	require.Equal(t, price, fooRequests[0].ServiceFee.MainUnitString())
 	require.Equal(t, false, fooRequests[0].SuperMode)
-	require.Equal(t, requestContextID, hex.EncodeToString(fooRequests[0].RequestContextID))
+	require.Equal(t, requestContextID, fooRequests[0].RequestContextID.String())
 	require.Equal(t, uint64(1), fooRequests[0].RequestContextBatchCounter)
 
 	// query requests by binding (bar)
@@ -259,7 +259,7 @@ func TestIrisCLIService(t *testing.T) {
 	require.Equal(t, input, barRequests[0].Input)
 	require.Equal(t, price, barRequests[0].ServiceFee.MainUnitString())
 	require.Equal(t, false, barRequests[0].SuperMode)
-	require.Equal(t, requestContextID, hex.EncodeToString(barRequests[0].RequestContextID))
+	require.Equal(t, requestContextID, barRequests[0].RequestContextID.String())
 	require.Equal(t, uint64(1), barRequests[0].RequestContextBatchCounter)
 
 	// query requests by request context
@@ -289,7 +289,7 @@ func TestIrisCLIService(t *testing.T) {
 	require.Equal(t, barAddr, fooResponse.Consumer)
 	require.Equal(t, output, fooResponse.Output)
 	require.Equal(t, "", fooResponse.Error)
-	require.Equal(t, requestContextID, hex.EncodeToString(fooResponse.RequestContextID))
+	require.Equal(t, requestContextID, fooResponse.RequestContextID.String())
 	require.Equal(t, uint64(1), fooResponse.RequestContextBatchCounter)
 
 	// query request context
@@ -321,7 +321,7 @@ func TestIrisCLIService(t *testing.T) {
 	require.Equal(t, barAddr, barResponse.Consumer)
 	require.Equal(t, output, barResponse.Output)
 	require.Equal(t, "", barResponse.Error)
-	require.Equal(t, requestContextID, hex.EncodeToString(barResponse.RequestContextID))
+	require.Equal(t, requestContextID, barResponse.RequestContextID.String())
 	require.Equal(t, uint64(1), barResponse.RequestContextBatchCounter)
 
 	// query request context
