@@ -1,7 +1,6 @@
 package keeper
 
 import (
-	"bytes"
 	"encoding/hex"
 	"fmt"
 	"math/rand"
@@ -70,20 +69,33 @@ func (k Keeper) RequestService(ctx sdk.Context, reqID []byte, consumer sdk.AccAd
 func (k Keeper) HandlerResponse(ctx sdk.Context, requestContextID cmn.HexBytes, responseOutput []string, err error) {
 	if len(responseOutput) == 0 || err != nil {
 		ctx = ctx.WithLogger(ctx.Logger().With("handler", "HandlerResponse"))
-		ctx.Logger().Error("oracle feed failed",
-			"requestContextID", requestContextID.String(),
-			"err", err.Error(),
+		ctx.Logger().Error(
+			"respond service failed",
+			"requestContextID",
+			requestContextID.String(),
+			"err",
+			err.Error(),
 		)
+		k.DeleteOracleRandRequest(ctx, requestContextID)
 		return
 	}
 
 	_, existed := k.sk.GetRequestContext(ctx, requestContextID)
 	if !existed {
+		k.DeleteOracleRandRequest(ctx, requestContextID)
 		return
 	}
 
-	request, expiredHeight, found := k.GetRequestByReqCtxID(ctx, requestContextID)
-	if !found {
+	request, err := k.GetOracleRandRequest(ctx, requestContextID)
+	if err != nil {
+		ctx.Logger().Error(
+			"can not find request",
+			"requestContextID",
+			requestContextID.String(),
+			"err",
+			err.Error(),
+		)
+		k.DeleteOracleRandRequest(ctx, requestContextID)
 		return
 	}
 
@@ -91,6 +103,14 @@ func (k Keeper) HandlerResponse(ctx sdk.Context, requestContextID cmn.HexBytes, 
 
 	seed, err := hex.DecodeString(result.String())
 	if err != nil || len(seed) != types.SeedBytesLength {
+		ctx.Logger().Error(
+			"invalid seed",
+			"seed",
+			hex.EncodeToString(seed),
+			"err",
+			err.Error(),
+		)
+		k.DeleteOracleRandRequest(ctx, requestContextID)
 		return
 	}
 
@@ -105,20 +125,7 @@ func (k Keeper) HandlerResponse(ctx sdk.Context, requestContextID cmn.HexBytes, 
 	rand := types.MakePRNG(lastBlockHash, currentTimestamp, request.Consumer, seed, true).GetRand()
 	k.SetRand(ctx, reqID, types.NewRand(request.TxHash, lastBlockHeight, rand))
 
-	k.DequeueOracleTimeoutRandRequest(ctx, expiredHeight, reqID)
-}
-
-// GetRequestByReqCtxID ...
-func (k Keeper) GetRequestByReqCtxID(ctx sdk.Context, requestContextID []byte) (request types.Request, expiredHeight int64, found bool) {
-	k.IterateRandRequestOracleTimeoutQueue(ctx, func(h int64, r types.Request) (stop bool) {
-		if bytes.Equal(requestContextID, r.ReqCtxID) {
-			request = r
-			expiredHeight = h
-			found = true
-		}
-		return found
-	})
-	return
+	k.DeleteOracleRandRequest(ctx, requestContextID)
 }
 
 // GetRequestContext ...

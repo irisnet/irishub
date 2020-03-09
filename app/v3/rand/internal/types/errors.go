@@ -9,12 +9,13 @@ import (
 const (
 	DefaultCodespace sdk.CodespaceType = "rand"
 
-	CodeInvalidConsumer        sdk.CodeType = 100
-	CodeInvalidReqID           sdk.CodeType = 101
-	CodeInvalidHeight          sdk.CodeType = 102
-	CodeInvalidServiceBindings sdk.CodeType = 103
-	CodeInvalidServiceFee      sdk.CodeType = 104
-	CodeInsufficientBalance    sdk.CodeType = 105
+	CodeInvalidConsumer         sdk.CodeType = 100
+	CodeInvalidReqID            sdk.CodeType = 101
+	CodeInvalidHeight           sdk.CodeType = 102
+	CodeInvalidServiceBindings  sdk.CodeType = 103
+	CodeInvalidServiceFee       sdk.CodeType = 104
+	CodeInsufficientBalance     sdk.CodeType = 105
+	CodeInvalidRequestContextID sdk.CodeType = 106
 )
 
 //----------------------------------------
@@ -42,4 +43,8 @@ func ErrInvalidServiceFee(codespace sdk.CodespaceType, msg string) sdk.Error {
 
 func ErrInsufficientBalance(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInsufficientBalance, msg)
+}
+
+func ErrInvalidRequestContextID(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidRequestContextID, msg)
 }

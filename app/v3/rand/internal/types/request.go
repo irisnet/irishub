@@ -13,7 +13,6 @@ type Request struct {
 	Height        int64          `json:"height"`          // the height of the block in which the request tx is included
 	Consumer      sdk.AccAddress `json:"consumer"`        // the request address
 	TxHash        []byte         `json:"txhash"`          // the request tx hash
-	ReqCtxID      []byte         `json:"req_ctx_id"`      // request context id
 	Oracle        bool           `json:"oracle"`          // oracle method
 	ServiceFeeCap sdk.Coins      `json:"service_fee_cap"` // service fee cap
 }
@@ -23,7 +22,6 @@ func NewRequest(
 	height int64,
 	consumer sdk.AccAddress,
 	txHash []byte,
-	reqCtxID []byte,
 	oracle bool,
 	serviceFeeCap sdk.Coins,
 ) Request {
@@ -31,7 +29,6 @@ func NewRequest(
 		Height:        height,
 		Consumer:      consumer,
 		TxHash:        txHash,
-		ReqCtxID:      reqCtxID,
 		Oracle:        oracle,
 		ServiceFeeCap: serviceFeeCap,
 	}
@@ -43,13 +40,11 @@ func (r Request) String() string {
   Height:            %d
   Consumer:          %s
   TxHash:            %s
-  ReqCtxID:          %s
   Oracle:            %s
   ServiceFeeCap:     %s`,
 		r.Height,
 		r.Consumer.String(),
 		hex.EncodeToString(r.TxHash),
-		hex.EncodeToString(r.ReqCtxID),
 		strconv.FormatBool(r.Oracle),
 		r.ServiceFeeCap.String(),
 	)

@@ -32,13 +32,7 @@ func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, k Keeper) (tags s
 			reqID := GenerateRequestID(request)
 
 			if requestContextID, err := k.RequestService(ctx, reqID, request.Consumer, request.ServiceFeeCap); err == nil {
-				request.ReqCtxID = requestContextID
-				k.EnqueueOracleTimeoutRandRequest(
-					ctx,
-					lastBlockHeight+k.GetMaxServiceRequestTimeout(ctx),
-					reqID,
-					request,
-				)
+				k.SetOracleRandRequest(ctx, requestContextID, request)
 				requestedOracleRandNum++
 			} else {
 				ctx.Logger().Info(fmt.Sprintf("request service error : %s", err.Error()))
@@ -68,28 +62,6 @@ func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, k Keeper) (tags s
 
 	ctx.Logger().Info(fmt.Sprintf("%d normal rand requests are handled", handledNormalRandReqNum))
 	ctx.Logger().Info(fmt.Sprintf("%d oracle rand requests are pending", requestedOracleRandNum))
-
-	// ----------------------------------------------------------------------------------------
-
-	// get pending random number requests for lastBlockHeight
-	orqIterator := k.IterateRandRequestOracleTimeoutQueueByHeight(ctx, lastBlockHeight)
-	defer orqIterator.Close()
-
-	expiredOracleRandReqNum := 0
-	for ; orqIterator.Valid(); orqIterator.Next() {
-		var request Request
-		k.GetCdc().MustUnmarshalBinaryLengthPrefixed(orqIterator.Value(), &request)
-
-		// get the request id
-		reqID := GenerateRequestID(request)
-
-		// remove the request
-		k.DequeueOracleTimeoutRandRequest(ctx, lastBlockHeight, reqID)
-
-		expiredOracleRandReqNum++
-	}
-
-	ctx.Logger().Info(fmt.Sprintf("%d oracle rand requests are expired", expiredOracleRandReqNum))
 
 	return
 }

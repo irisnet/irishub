@@ -51,7 +51,7 @@ func TestOracleRequestRandKeeper(t *testing.T) {
 	require.Nil(t, err)
 
 	// get request id
-	reqID := types.GenerateRequestID(types.NewRequest(txHeight, consumer, sdk.SHA256(txBytes), nil, true, serviceFeeCap))
+	reqID := types.GenerateRequestID(types.NewRequest(txHeight, consumer, sdk.SHA256(txBytes), true, serviceFeeCap))
 
 	// get the pending request and assert the result is not nil
 	store := ctx.KVStore(randKey)

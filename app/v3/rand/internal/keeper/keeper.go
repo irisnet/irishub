@@ -62,7 +62,7 @@ func (k Keeper) RequestRand(
 	txHash := sdk.SHA256(ctx.TxBytes())
 
 	// build request
-	request := types.NewRequest(currentHeight, consumer, txHash, nil, oracle, serviceFeeCap)
+	request := types.NewRequest(currentHeight, consumer, txHash, oracle, serviceFeeCap)
 
 	// generate the request id
 	reqID := types.GenerateRequestID(request)
@@ -97,25 +97,33 @@ func (k Keeper) EnqueueRandRequest(ctx sdk.Context, height int64, reqID []byte, 
 // DequeueRandRequest removes the random number request by the specified height and request id
 func (k Keeper) DequeueRandRequest(ctx sdk.Context, height int64, reqID []byte) {
 	store := ctx.KVStore(k.storeKey)
-
-	// delete the key
 	store.Delete(KeyRandRequestQueue(height, reqID))
 }
 
-// EnqueueOracleRandRequest enqueue the oracle timeout random number request
-func (k Keeper) EnqueueOracleTimeoutRandRequest(ctx sdk.Context, height int64, reqID []byte, request types.Request) {
+func (k Keeper) SetOracleRandRequest(ctx sdk.Context, requestContextID []byte, request types.Request) {
 	store := ctx.KVStore(k.storeKey)
 
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(request)
-	store.Set(KeyRandRequestOracleTimeoutQueue(height, reqID), bz)
+	store.Set(KeyOracleRandRequest(requestContextID), bz)
 }
 
-// DequeueOracleRandRequest removes the oracle timeout random number request by the specified height and request id
-func (k Keeper) DequeueOracleTimeoutRandRequest(ctx sdk.Context, height int64, reqID []byte) {
+func (k Keeper) GetOracleRandRequest(ctx sdk.Context, requestContextID []byte) (types.Request, sdk.Error) {
 	store := ctx.KVStore(k.storeKey)
 
-	// delete the key
-	store.Delete(KeyRandRequestOracleTimeoutQueue(height, reqID))
+	bz := store.Get(KeyOracleRandRequest(requestContextID))
+	if bz == nil {
+		return types.Request{}, types.ErrInvalidRequestContextID(k.codespace, fmt.Sprintf("invalid request context id: %s", hex.EncodeToString(requestContextID)))
+	}
+
+	var request types.Request
+	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &request)
+
+	return request, nil
+}
+
+func (k Keeper) DeleteOracleRandRequest(ctx sdk.Context, requestContextID []byte) {
+	store := ctx.KVStore(k.storeKey)
+	store.Delete(KeyOracleRandRequest(requestContextID))
 }
 
 // GetRand retrieves the random number by the specified request id
@@ -161,32 +169,6 @@ func (k Keeper) IterateRandRequestQueue(ctx sdk.Context, op func(h int64, r type
 	store := ctx.KVStore(k.storeKey)
 
 	iterator := sdk.KVStorePrefixIterator(store, PrefixRandRequestQueue)
-	defer iterator.Close()
-
-	for ; iterator.Valid(); iterator.Next() {
-		keyParts := bytes.Split(iterator.Key(), KeyDelimiter)
-		height, _ := strconv.ParseInt(string(keyParts[1]), 10, 64)
-
-		var request types.Request
-		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &request)
-
-		if stop := op(height, request); stop {
-			break
-		}
-	}
-}
-
-// IterateOracleRandRequestQueueByHeight iterates the random number request oracle timeout queue by the specified height
-func (k Keeper) IterateRandRequestOracleTimeoutQueueByHeight(ctx sdk.Context, height int64) sdk.Iterator {
-	store := ctx.KVStore(k.storeKey)
-	return sdk.KVStorePrefixIterator(store, KeyRandRequestOracleTimeoutQueueSubspace(height))
-}
-
-// IterateOracleRandRequestQueue iterates through the random number request oracle timeout queue
-func (k Keeper) IterateRandRequestOracleTimeoutQueue(ctx sdk.Context, op func(h int64, r types.Request) (stop bool)) {
-	store := ctx.KVStore(k.storeKey)
-
-	iterator := sdk.KVStorePrefixIterator(store, PrefixRandRequestOracleTimeoutQueue)
 	defer iterator.Close()
 
 	for ; iterator.Valid(); iterator.Next() {
