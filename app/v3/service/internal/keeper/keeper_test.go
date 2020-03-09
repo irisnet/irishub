@@ -478,6 +478,6 @@ func TestKeeper_Request_Service_From_Module(t *testing.T) {
 	require.True(t, callbacked)
 }
 
-func callback(ctx sdk.Context, requestContextID cmn.HexBytes, responses []string) {
+func callback(ctx sdk.Context, requestContextID cmn.HexBytes, responses []string, err error) {
 	callbacked = true
 }
