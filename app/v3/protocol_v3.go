@@ -5,8 +5,6 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/irisnet/irishub/app/v3/oracle"
-
 	abci "github.com/tendermint/tendermint/abci/types"
 	cfg "github.com/tendermint/tendermint/config"
 	"github.com/tendermint/tendermint/libs/log"
@@ -24,6 +22,7 @@ import (
 	"github.com/irisnet/irishub/app/v3/asset"
 	"github.com/irisnet/irishub/app/v3/coinswap"
 	"github.com/irisnet/irishub/app/v3/gov"
+	"github.com/irisnet/irishub/app/v3/oracle"
 	"github.com/irisnet/irishub/app/v3/rand"
 	"github.com/irisnet/irishub/app/v3/service"
 	"github.com/irisnet/irishub/codec"

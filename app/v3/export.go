@@ -3,8 +3,6 @@ package v3
 import (
 	"encoding/json"
 
-	"github.com/irisnet/irishub/app/v3/oracle"
-
 	tmtypes "github.com/tendermint/tendermint/types"
 
 	"github.com/irisnet/irishub/app/protocol"
@@ -18,6 +16,7 @@ import (
 	"github.com/irisnet/irishub/app/v3/asset"
 	"github.com/irisnet/irishub/app/v3/coinswap"
 	"github.com/irisnet/irishub/app/v3/gov"
+	"github.com/irisnet/irishub/app/v3/oracle"
 	"github.com/irisnet/irishub/app/v3/rand"
 	"github.com/irisnet/irishub/app/v3/service"
 	"github.com/irisnet/irishub/codec"

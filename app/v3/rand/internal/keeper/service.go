@@ -16,7 +16,7 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 )
 
-// RequestService ...
+// RequestService request the service for oracle seed
 func (k Keeper) RequestService(ctx sdk.Context, reqID []byte, consumer sdk.AccAddress, serviceFeeCap sdk.Coins) ([]byte, sdk.Error) {
 	iterator := k.sk.ServiceBindingsIterator(ctx, types.ServiceName)
 	defer iterator.Close()
@@ -65,7 +65,7 @@ func (k Keeper) RequestService(ctx sdk.Context, reqID []byte, consumer sdk.AccAd
 	return requestContextID, nil
 }
 
-// HandlerResponse ...
+// HandlerResponse is responsible for processing the data returned from the service module
 func (k Keeper) HandlerResponse(ctx sdk.Context, requestContextID cmn.HexBytes, responseOutput []string, err error) {
 	if len(responseOutput) == 0 || err != nil {
 		ctx = ctx.WithLogger(ctx.Logger().With("handler", "HandlerResponse"))
@@ -128,12 +128,12 @@ func (k Keeper) HandlerResponse(ctx sdk.Context, requestContextID cmn.HexBytes, 
 	k.DeleteOracleRandRequest(ctx, requestContextID)
 }
 
-// GetRequestContext ...
+// GetRequestContext retrieves the request context by the specified request context id
 func (k Keeper) GetRequestContext(ctx sdk.Context, requestContextID []byte) (exported.RequestContext, bool) {
 	return k.sk.GetRequestContext(ctx, requestContextID)
 }
 
-// GetMaxServiceRequestTimeout ...
+// GetMaxServiceRequestTimeout returns MaxServiceRequestTimeout
 func (k Keeper) GetMaxServiceRequestTimeout(ctx sdk.Context) int64 {
 	return k.sk.GetParamSet(ctx).MaxRequestTimeout
 }

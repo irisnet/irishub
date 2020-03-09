@@ -33,7 +33,9 @@ func NewKeeper(
 		sk:        sk,
 		codespace: codespace,
 	}
-	_ = sk.RegisterResponseCallback(types.ModuleName, keeper.HandlerResponse)
+	if err := sk.RegisterResponseCallback(types.ModuleName, keeper.HandlerResponse); err != nil {
+		panic(err)
+	}
 	return keeper
 }
 
@@ -81,7 +83,6 @@ func (k Keeper) RequestRand(
 // SetRand stores the random number
 func (k Keeper) SetRand(ctx sdk.Context, reqID []byte, rand types.Rand) {
 	store := ctx.KVStore(k.storeKey)
-
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(rand)
 	store.Set(KeyRand(reqID), bz)
 }
@@ -89,7 +90,6 @@ func (k Keeper) SetRand(ctx sdk.Context, reqID []byte, rand types.Rand) {
 // EnqueueRandRequest enqueue the random number request
 func (k Keeper) EnqueueRandRequest(ctx sdk.Context, height int64, reqID []byte, request types.Request) {
 	store := ctx.KVStore(k.storeKey)
-
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(request)
 	store.Set(KeyRandRequestQueue(height, reqID), bz)
 }
@@ -100,13 +100,14 @@ func (k Keeper) DequeueRandRequest(ctx sdk.Context, height int64, reqID []byte) 
 	store.Delete(KeyRandRequestQueue(height, reqID))
 }
 
+// SetOracleRandRequest stores the oracle rand request
 func (k Keeper) SetOracleRandRequest(ctx sdk.Context, requestContextID []byte, request types.Request) {
 	store := ctx.KVStore(k.storeKey)
-
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(request)
 	store.Set(KeyOracleRandRequest(requestContextID), bz)
 }
 
+// GetOracleRandRequest retrieves the oracle rand request by the specified request id
 func (k Keeper) GetOracleRandRequest(ctx sdk.Context, requestContextID []byte) (types.Request, sdk.Error) {
 	store := ctx.KVStore(k.storeKey)
 
@@ -121,6 +122,7 @@ func (k Keeper) GetOracleRandRequest(ctx sdk.Context, requestContextID []byte) (
 	return request, nil
 }
 
+// DeleteOracleRandRequest delete an oracle rand request
 func (k Keeper) DeleteOracleRandRequest(ctx sdk.Context, requestContextID []byte) {
 	store := ctx.KVStore(k.storeKey)
 	store.Delete(KeyOracleRandRequest(requestContextID))
