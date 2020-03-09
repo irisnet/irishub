@@ -34,6 +34,11 @@ func (k Keeper) RequestService(ctx sdk.Context, reqID []byte, consumer sdk.AccAd
 		return nil, types.ErrInvalidServiceBindings(types.DefaultCodespace, fmt.Sprintf("no service bindings available"))
 	}
 
+	coins := k.bk.GetCoins(ctx, consumer)
+	if !coins.IsAllGTE(serviceFeeCap) {
+		return nil, types.ErrInsufficientBalance(types.DefaultCodespace, fmt.Sprintf("insufficient balance"))
+	}
+
 	rand.Seed(time.Now().UnixNano())
 	provider := []sdk.AccAddress{bindings[rand.Intn(len(bindings))].Provider}
 	timeout := k.sk.GetParamSet(ctx).MaxRequestTimeout

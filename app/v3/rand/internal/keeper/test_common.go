@@ -29,6 +29,17 @@ var (
 	mockReqCtxID = []byte("mockRequest")
 )
 
+type MockBankKeeper struct {
+}
+
+func NewMockBankKeeper() MockBankKeeper {
+	return MockBankKeeper{}
+}
+
+func (m MockBankKeeper) GetCoins(ctx sdk.Context, addr sdk.AccAddress) sdk.Coins {
+	return sdk.NewCoins()
+}
+
 type MockServiceKeeper struct {
 	storeKey    sdk.StoreKey
 	cdc         *codec.Codec

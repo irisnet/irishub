@@ -294,7 +294,7 @@ func (p *ProtocolV3) configKeepers() {
 		gov.PrometheusMetrics(p.config),
 	)
 
-	p.randKeeper = rand.NewKeeper(p.cdc, protocol.KeyRand, p.serviceKeeper, rand.DefaultCodespace)
+	p.randKeeper = rand.NewKeeper(p.cdc, protocol.KeyRand, p.bankKeeper, p.serviceKeeper, rand.DefaultCodespace)
 	p.coinswapKeeper = coinswap.NewKeeper(p.cdc, protocol.KeySwap, p.bankKeeper, p.paramsKeeper.Subspace(coinswap.DefaultParamSpace))
 	p.htlcKeeper = htlc.NewKeeper(p.cdc, protocol.KeyHtlc, p.bankKeeper, htlc.DefaultCodespace)
 }

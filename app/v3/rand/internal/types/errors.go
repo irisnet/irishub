@@ -14,6 +14,7 @@ const (
 	CodeInvalidHeight          sdk.CodeType = 102
 	CodeInvalidServiceBindings sdk.CodeType = 103
 	CodeInvalidServiceFee      sdk.CodeType = 104
+	CodeInsufficientBalance    sdk.CodeType = 105
 )
 
 //----------------------------------------
@@ -37,4 +38,8 @@ func ErrInvalidServiceBindings(codespace sdk.CodespaceType, msg string) sdk.Erro
 
 func ErrInvalidServiceFee(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidServiceFee, msg)
+}
+
+func ErrInsufficientBalance(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeInsufficientBalance, msg)
 }

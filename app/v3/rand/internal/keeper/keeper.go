@@ -14,6 +14,7 @@ import (
 type Keeper struct {
 	storeKey  sdk.StoreKey
 	cdc       *codec.Codec
+	bk        types.BankKeeper
 	sk        types.ServiceKeeper
 	codespace sdk.CodespaceType
 }
@@ -21,12 +22,14 @@ type Keeper struct {
 func NewKeeper(
 	cdc *codec.Codec,
 	key sdk.StoreKey,
+	bk types.BankKeeper,
 	sk types.ServiceKeeper,
 	codespace sdk.CodespaceType,
 ) Keeper {
 	keeper := Keeper{
 		storeKey:  key,
 		cdc:       cdc,
+		bk:        bk,
 		sk:        sk,
 		codespace: codespace,
 	}

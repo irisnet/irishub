@@ -20,8 +20,9 @@ func TestOracleRequestRandKeeper(t *testing.T) {
 	types.RegisterCodec(cdc)
 
 	mockServiceKeeper := NewMockServiceKeeper()
+	mockBankKeeper := NewMockBankKeeper()
 
-	keeper := NewKeeper(cdc, randKey, mockServiceKeeper, types.DefaultCodespace)
+	keeper := NewKeeper(cdc, randKey, mockBankKeeper, mockServiceKeeper, types.DefaultCodespace)
 
 	// define variables
 	txBytes := []byte("testtx")

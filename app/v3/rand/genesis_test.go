@@ -34,8 +34,9 @@ func TestExportRandGenesis(t *testing.T) {
 	RegisterCodec(cdc)
 
 	mockServiceKeeper := keeper.NewMockServiceKeeper()
+	mockBankKeeper := keeper.NewMockBankKeeper()
 
-	keeper := NewKeeper(cdc, randKey, mockServiceKeeper, DefaultCodespace)
+	keeper := NewKeeper(cdc, randKey, mockBankKeeper, mockServiceKeeper, DefaultCodespace)
 
 	// define variables
 	txBytes := []byte("testtx")

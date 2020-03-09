@@ -41,3 +41,8 @@ type ServiceKeeper interface {
 
 	GetParamSet(ctx sdk.Context) service.Params
 }
+
+//expected Bank keeper
+type BankKeeper interface {
+	GetCoins(ctx sdk.Context, addr sdk.AccAddress) sdk.Coins
+}
