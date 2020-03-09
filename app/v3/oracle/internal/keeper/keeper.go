@@ -176,7 +176,7 @@ func (k Keeper) EditFeed(ctx sdk.Context, msg types.MsgEditFeed) sdk.Error {
 //processed by the aggregate function, and then saved
 func (k Keeper) HandlerResponse(ctx sdk.Context, requestContextID cmn.HexBytes, responseOutput []string, err error) {
 	if len(responseOutput) == 0 || err != nil {
-		ctx = ctx.WithLogger(ctx.Logger().With("handler", "HandlerResponse").With("module", "iris/oracle"))
+		ctx = ctx.WithLogger(ctx.Logger().With("handler", "HandlerResponse"))
 		ctx.Logger().Error("oracle feed failed",
 			"requestContextID", requestContextID.String(),
 			"err", err.Error(),
