@@ -46,16 +46,16 @@ func init() {
 
 	FsServiceBind.String(FlagServiceName, "", "service name")
 	FsServiceBind.String(FlagDeposit, "", "deposit of the binding")
-	FsServiceBind.String(FlagPricing, "", "pricing content or path")
+	FsServiceBind.String(FlagPricing, "", "pricing content or path, which is an instance of the Irishub Service Pricing schema")
 
 	FsServiceUpdateBinding.String(FlagDeposit, "", "added deposit for the binding")
-	FsServiceUpdateBinding.String(FlagPricing, "", "new pricing of the binding, which is a Pricing JSON Schema instance")
+	FsServiceUpdateBinding.String(FlagPricing, "", "pricing content or path, which is an instance of the Irishub Service Pricing schema")
 
 	FsServiceEnable.String(FlagDeposit, "", "added deposit for enabling the binding")
 
 	FsServiceRequest.String(FlagServiceName, "", "service name")
-	FsServiceRequest.StringSlice(FlagProviders, []string{}, "providers to request")
-	FsServiceRequest.String(FlagServiceFeeCap, "", "maximal fee to pay for a service request")
+	FsServiceRequest.StringSlice(FlagProviders, []string{}, "provider list to request")
+	FsServiceRequest.String(FlagServiceFeeCap, "", "maximum service fee to pay for a single request")
 	FsServiceRequest.String(FlagData, "", "input of the service request, which is an Input JSON schema instance")
 	FsServiceRequest.Uint64(FlagTimeout, 0, "request timeout")
 	FsServiceRequest.Bool(FlagSuperMode, false, "indicate if the signer is a super user")
@@ -63,11 +63,11 @@ func init() {
 	FsServiceRequest.Uint64(FlagFrequency, 0, "request frequency when repeated, default to timeout")
 	FsServiceRequest.Int64(FlagTotal, 0, "request count when repeated, -1 means unlimited")
 
-	FsServiceUpdateRequestContext.StringSlice(FlagProviders, []string{}, "new providers to request, not updated if empty")
-	FsServiceUpdateRequestContext.String(FlagServiceFeeCap, "", "maximal fee to pay for a service request, empty means not updated")
-	FsServiceUpdateRequestContext.Uint64(FlagTimeout, 0, "new request timeout, not updated if set to 0")
-	FsServiceUpdateRequestContext.Uint64(FlagFrequency, 0, "new request frequency, not updated if set to 0")
-	FsServiceUpdateRequestContext.Int64(FlagTotal, 0, "new request count, not updated if set to 0")
+	FsServiceUpdateRequestContext.StringSlice(FlagProviders, []string{}, "provider list to request, not updated if empty")
+	FsServiceUpdateRequestContext.String(FlagServiceFeeCap, "", "maximum service fee to pay for a single request, not updated if empty")
+	FsServiceUpdateRequestContext.Uint64(FlagTimeout, 0, "request timeout, not updated if set to 0")
+	FsServiceUpdateRequestContext.Uint64(FlagFrequency, 0, "request frequency, not updated if set to 0")
+	FsServiceUpdateRequestContext.Int64(FlagTotal, 0, "request count, not updated if set to 0")
 
 	FsServiceRespond.String(FlagRequestID, "", "ID of the request to respond")
 	FsServiceRespond.String(FlagData, "", "content or path of the output of the service response, which is an Output JSON schema instance")
