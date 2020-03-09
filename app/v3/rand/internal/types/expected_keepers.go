@@ -35,29 +35,6 @@ type ServiceKeeper interface {
 		respHandler string,
 	) ([]byte, sdk.Error)
 
-	UpdateRequestContext(
-		ctx sdk.Context,
-		requestContextID []byte,
-		providers []sdk.AccAddress,
-		serviceFeeCap sdk.Coins,
-		timeout int64,
-		repeatedFreq uint64,
-		repeatedTotal int64,
-		consumer sdk.AccAddress,
-	) sdk.Error
-
-	StartRequestContext(
-		ctx sdk.Context,
-		requestContextID []byte,
-		consumer sdk.AccAddress,
-	) sdk.Error
-
-	PauseRequestContext(
-		ctx sdk.Context,
-		requestContextID []byte,
-		consumer sdk.AccAddress,
-	) sdk.Error
-
 	ServiceBindingsIterator(ctx sdk.Context, serviceName string) sdk.Iterator
 
 	GetParamSet(ctx sdk.Context) service.Params
