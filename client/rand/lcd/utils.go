@@ -7,8 +7,9 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
+
 	"github.com/irisnet/irishub/app/protocol"
-	"github.com/irisnet/irishub/app/v1/rand"
+	"github.com/irisnet/irishub/app/v3/rand"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/rand/types"
 	"github.com/irisnet/irishub/client/utils"
@@ -36,15 +37,16 @@ func queryRand(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string) htt
 		}
 
 		res, err := cliCtx.QueryWithData(
-			fmt.Sprintf("custom/%s/%s", protocol.RandRoute, rand.QueryRand), bz)
+			fmt.Sprintf("custom/%s/%s", protocol.RandRoute, rand.QueryRand),
+			bz,
+		)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
 
 		var rawRand rand.Rand
-		err = cdc.UnmarshalJSON(res, &rawRand)
-		if err != nil {
+		if err = cdc.UnmarshalJSON(res, &rawRand); err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
@@ -92,7 +94,9 @@ func queryQueue(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string) ht
 		}
 
 		res, err := cliCtx.QueryWithData(
-			fmt.Sprintf("custom/%s/%s", protocol.RandRoute, rand.QueryRandRequestQueue), bz)
+			fmt.Sprintf("custom/%s/%s", protocol.RandRoute, rand.QueryRandRequestQueue),
+			bz,
+		)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
