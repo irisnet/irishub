@@ -13,12 +13,12 @@ import (
 	"github.com/irisnet/irishub/app/v1/params"
 	"github.com/irisnet/irishub/app/v3/asset/internal/types"
 	"github.com/irisnet/irishub/codec"
-	"github.com/irisnet/irishub/tests"
+	"github.com/irisnet/irishub/modules/guardian"
 	sdk "github.com/irisnet/irishub/types"
 )
 
 func TestKeeperIssueToken(t *testing.T) {
-	ms, accountKey, assetKey, paramskey, paramsTkey := tests.SetupMultiStore()
+	ms, accountKey, assetKey, guardianKey, paramskey, paramsTkey := setupMultiStore()
 
 	cdc := codec.New()
 	types.RegisterCodec(cdc)
@@ -28,7 +28,8 @@ func TestKeeperIssueToken(t *testing.T) {
 	pk := params.NewKeeper(cdc, paramskey, paramsTkey)
 	ak := auth.NewAccountKeeper(cdc, accountKey, auth.ProtoBaseAccount)
 	bk := bank.NewBaseKeeper(cdc, ak)
-	keeper := NewKeeper(cdc, assetKey, bk, types.DefaultCodespace, pk.Subspace(types.DefaultParamSpace))
+	gk := guardian.NewKeeper(cdc, guardianKey, guardian.DefaultCodespace)
+	keeper := NewKeeper(cdc, assetKey, bk, gk, types.DefaultCodespace, pk.Subspace(types.DefaultParamSpace))
 	addr := sdk.AccAddress([]byte("addr1"))
 
 	acc := ak.NewAccountWithAddress(ctx, addr)
@@ -46,7 +47,7 @@ func TestKeeperIssueToken(t *testing.T) {
 }
 
 func TestKeeperEditToken(t *testing.T) {
-	ms, accountKey, assetKey, paramskey, paramsTkey := tests.SetupMultiStore()
+	ms, accountKey, assetKey, guardianKey, paramskey, paramsTkey := setupMultiStore()
 
 	cdc := codec.New()
 	types.RegisterCodec(cdc)
@@ -56,7 +57,8 @@ func TestKeeperEditToken(t *testing.T) {
 	pk := params.NewKeeper(cdc, paramskey, paramsTkey)
 	ak := auth.NewAccountKeeper(cdc, accountKey, auth.ProtoBaseAccount)
 	bk := bank.NewBaseKeeper(cdc, ak)
-	keeper := NewKeeper(cdc, assetKey, bk, types.DefaultCodespace, pk.Subspace(types.DefaultParamSpace))
+	gk := guardian.NewKeeper(cdc, guardianKey, guardian.DefaultCodespace)
+	keeper := NewKeeper(cdc, assetKey, bk, gk, types.DefaultCodespace, pk.Subspace(types.DefaultParamSpace))
 	addr := sdk.AccAddress([]byte("addr1"))
 
 	acc := ak.NewAccountWithAddress(ctx, addr)
@@ -88,7 +90,7 @@ func TestKeeperEditToken(t *testing.T) {
 }
 
 func TestMintToken(t *testing.T) {
-	ms, accountKey, assetKey, paramskey, paramsTkey := tests.SetupMultiStore()
+	ms, accountKey, assetKey, guardianKey, paramskey, paramsTkey := setupMultiStore()
 
 	cdc := codec.New()
 	types.RegisterCodec(cdc)
@@ -98,7 +100,8 @@ func TestMintToken(t *testing.T) {
 	pk := params.NewKeeper(cdc, paramskey, paramsTkey)
 	ak := auth.NewAccountKeeper(cdc, accountKey, auth.ProtoBaseAccount)
 	bk := bank.NewBaseKeeper(cdc, ak)
-	keeper := NewKeeper(cdc, assetKey, bk, types.DefaultCodespace, pk.Subspace(types.DefaultParamSpace))
+	gk := guardian.NewKeeper(cdc, guardianKey, guardian.DefaultCodespace)
+	keeper := NewKeeper(cdc, assetKey, bk, gk, types.DefaultCodespace, pk.Subspace(types.DefaultParamSpace))
 	keeper.SetParamSet(ctx, types.DefaultParams())
 
 	addr := sdk.AccAddress([]byte("addr1"))
@@ -131,7 +134,7 @@ func TestMintToken(t *testing.T) {
 }
 
 func TestTransferOwnerKeeper(t *testing.T) {
-	ms, accountKey, assetKey, paramskey, paramsTkey := tests.SetupMultiStore()
+	ms, accountKey, assetKey, guardianKey, paramskey, paramsTkey := setupMultiStore()
 
 	cdc := codec.New()
 	types.RegisterCodec(cdc)
@@ -141,7 +144,8 @@ func TestTransferOwnerKeeper(t *testing.T) {
 	pk := params.NewKeeper(cdc, paramskey, paramsTkey)
 	ak := auth.NewAccountKeeper(cdc, accountKey, auth.ProtoBaseAccount)
 	bk := bank.NewBaseKeeper(cdc, ak)
-	keeper := NewKeeper(cdc, assetKey, bk, types.DefaultCodespace, pk.Subspace(types.DefaultParamSpace))
+	gk := guardian.NewKeeper(cdc, guardianKey, guardian.DefaultCodespace)
+	keeper := NewKeeper(cdc, assetKey, bk, gk, types.DefaultCodespace, pk.Subspace(types.DefaultParamSpace))
 
 	srcOwner := sdk.AccAddress([]byte("TokenSrcOwner"))
 

@@ -7,19 +7,40 @@ import (
 
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/log"
+	dbm "github.com/tendermint/tm-db"
 
 	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/app/v1/bank"
 	"github.com/irisnet/irishub/app/v1/params"
 	"github.com/irisnet/irishub/app/v3/asset/internal/types"
 	"github.com/irisnet/irishub/codec"
-	"github.com/irisnet/irishub/tests"
+	"github.com/irisnet/irishub/modules/guardian"
+	"github.com/irisnet/irishub/store"
 	sdk "github.com/irisnet/irishub/types"
 )
 
+func setupMultiStore() (sdk.MultiStore, *sdk.KVStoreKey, *sdk.KVStoreKey, *sdk.KVStoreKey, *sdk.KVStoreKey, *sdk.TransientStoreKey) {
+	db := dbm.NewMemDB()
+
+	accountKey := sdk.NewKVStoreKey("accountKey")
+	assetKey := sdk.NewKVStoreKey("assetKey")
+	guardianKey := sdk.NewKVStoreKey("guardianKey")
+	paramskey := sdk.NewKVStoreKey("params")
+	paramsTkey := sdk.NewTransientStoreKey("transient_params")
+
+	ms := store.NewCommitMultiStore(db)
+	ms.MountStoreWithDB(accountKey, sdk.StoreTypeIAVL, db)
+	ms.MountStoreWithDB(assetKey, sdk.StoreTypeIAVL, db)
+	ms.MountStoreWithDB(paramskey, sdk.StoreTypeIAVL, db)
+	ms.MountStoreWithDB(paramsTkey, sdk.StoreTypeIAVL, db)
+	ms.LoadLatestVersion()
+
+	return ms, accountKey, assetKey, guardianKey, paramskey, paramsTkey
+}
+
 // TestAssetAnteHandler tests the ante handler of asset
 func TestAssetAnteHandler(t *testing.T) {
-	ms, accountKey, assetKey, paramskey, paramsTkey := tests.SetupMultiStore()
+	ms, accountKey, assetKey, guardianKey, paramskey, paramsTkey := setupMultiStore()
 
 	cdc := codec.New()
 	types.RegisterCodec(cdc)
@@ -29,7 +50,8 @@ func TestAssetAnteHandler(t *testing.T) {
 	paramsKeeper := params.NewKeeper(cdc, paramskey, paramsTkey)
 	ak := auth.NewAccountKeeper(cdc, accountKey, auth.ProtoBaseAccount)
 	bk := bank.NewBaseKeeper(cdc, ak)
-	keeper := NewKeeper(cdc, assetKey, bk, types.DefaultCodespace, paramsKeeper.Subspace(types.DefaultParamSpace))
+	gk := guardian.NewKeeper(cdc, guardianKey, guardian.DefaultCodespace)
+	keeper := NewKeeper(cdc, assetKey, bk, gk, types.DefaultCodespace, paramsKeeper.Subspace(types.DefaultParamSpace))
 
 	//set params
 	keeper.SetParamSet(ctx, types.DefaultParams())
