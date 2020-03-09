@@ -676,14 +676,35 @@ func (k Keeper) AddResponse(
 		requestContext.BatchState = types.BATCHCOMPLETED
 
 		if len(requestContext.ModuleName) != 0 {
-			respCallback, _ := k.GetResponseCallback(requestContext.ModuleName)
-			respCallback(ctx, requestContextID, k.GetResponsesOutput(ctx, requestContextID, requestContext.BatchCounter))
+			k.Callback(ctx, requestContextID)
 		}
 	}
 
 	k.SetRequestContext(ctx, requestContextID, requestContext)
 
 	return request, response, nil
+}
+
+// Callback callbacks the corresponding response callback handler
+func (k Keeper) Callback(ctx sdk.Context, requestContextID []byte) {
+	requestContext, _ := k.GetRequestContext(ctx, requestContextID)
+
+	respCallback, _ := k.GetResponseCallback(requestContext.ModuleName)
+	outputs := k.GetResponsesOutput(ctx, requestContextID, requestContext.BatchCounter)
+
+	if len(outputs) >= int(requestContext.ResponseThreshold) {
+		respCallback(ctx, requestContextID, outputs, nil)
+	} else {
+		respCallback(
+			ctx,
+			requestContextID,
+			outputs,
+			fmt.Errorf(
+				"at least %d responses required, but %d responses received",
+				requestContext.ResponseThreshold, len(outputs),
+			),
+		)
+	}
 }
 
 // SetResponse sets the specified response
