@@ -17,6 +17,7 @@ type Keeper struct {
 	storeKey sdk.StoreKey
 	cdc      *codec.Codec
 	bk       types.BankKeeper
+	gk       types.GuardianKeeper
 
 	// codespace
 	codespace sdk.CodespaceType
@@ -24,11 +25,12 @@ type Keeper struct {
 	paramSpace params.Subspace
 }
 
-func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, bk types.BankKeeper, codespace sdk.CodespaceType, paramSpace params.Subspace) Keeper {
+func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, bk types.BankKeeper, gk types.GuardianKeeper, codespace sdk.CodespaceType, paramSpace params.Subspace) Keeper {
 	keeper := Keeper{
 		storeKey:   key,
 		cdc:        cdc,
 		bk:         bk,
+		gk:         gk,
 		codespace:  codespace,
 		paramSpace: paramSpace.WithTypeTable(types.ParamTypeTable()),
 	}

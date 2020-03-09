@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"github.com/irisnet/irishub/modules/guardian"
 	sdk "github.com/irisnet/irishub/types"
 )
 
@@ -11,8 +12,6 @@ var (
 
 	keyAccount        = sdk.NewKVStoreKey("acc")
 	prefixTotalSupply = []byte("totalSupply:")
-
-	tokenOwner, _ = sdk.AccAddressFromBech32("iaa1v6c3sa76s3grss3xu64tvn9nd556jlcw6azc85")
 )
 
 //Init Initializes module parameters during network upgrade
@@ -46,8 +45,8 @@ func (k Keeper) Init(ctx sdk.Context) {
 		store.Delete(key)
 	})
 
-	// delete tokens from token owners
-	k.deleteTokensFromAccounts(ctx, []sdk.AccAddress{tokenOwner})
+	// delete tokens from profilers
+	k.deleteTokensFromAccounts(ctx, k.getAllProfilers(ctx))
 
 	// delete total supplies
 	k.deleteTotalSupplies(ctx)
@@ -68,6 +67,20 @@ func (k Keeper) iterateWithPrefix(ctx sdk.Context, prefix []byte, op func(key []
 	for ; iterator.Valid(); iterator.Next() {
 		op(iterator.Key())
 	}
+}
+
+func (k Keeper) getAllProfilers(ctx sdk.Context) []sdk.AccAddress {
+	var profilers []sdk.AccAddress
+
+	iterator := k.gk.ProfilersIterator(ctx)
+	for ; iterator.Valid(); iterator.Next() {
+		var profiler guardian.Guardian
+		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &profiler)
+
+		profilers = append(profilers, profiler.Address)
+	}
+
+	return profilers
 }
 
 func (k Keeper) deleteTokensFromAccounts(ctx sdk.Context, addrs []sdk.AccAddress) {

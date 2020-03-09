@@ -20,3 +20,8 @@ type BankKeeper interface {
 
 	SendCoins(ctx sdk.Context, fromAddr sdk.AccAddress, toAddr sdk.AccAddress, amt sdk.Coins) (sdk.Tags, sdk.Error)
 }
+
+// GuardianKeeper defines the expected guardian keeper
+type GuardianKeeper interface {
+	ProfilersIterator(ctx sdk.Context) sdk.Iterator
+}
