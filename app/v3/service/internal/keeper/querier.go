@@ -2,6 +2,7 @@ package keeper
 
 import (
 	abci "github.com/tendermint/tendermint/abci/types"
+	cmn "github.com/tendermint/tendermint/libs/common"
 
 	"github.com/irisnet/irishub/app/v3/service/internal/types"
 	"github.com/irisnet/irishub/codec"
@@ -89,7 +90,8 @@ func queryBindings(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sd
 	iterator := k.ServiceBindingsIterator(ctx, params.ServiceName)
 	defer iterator.Close()
 
-	var bindings []types.ServiceBinding
+	bindings := make([]types.ServiceBinding, 0)
+
 	for ; iterator.Valid(); iterator.Next() {
 		var binding types.ServiceBinding
 		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &binding)
@@ -157,9 +159,10 @@ func queryRequests(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sd
 	iterator := k.ActiveRequestsIterator(ctx, params.ServiceName, params.Provider)
 	defer iterator.Close()
 
-	var requests []types.Request
+	requests := make([]types.Request, 0)
+
 	for ; iterator.Valid(); iterator.Next() {
-		var requestID []byte
+		var requestID cmn.HexBytes
 		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &requestID)
 
 		request, _ := k.GetRequest(ctx, requestID)

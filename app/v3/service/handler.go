@@ -1,7 +1,6 @@
 package service
 
 import (
-	"encoding/hex"
 	"fmt"
 
 	sdk "github.com/irisnet/irishub/types"
@@ -128,7 +127,7 @@ func handleMsgRequestService(ctx sdk.Context, k Keeper, msg MsgRequestService) s
 	}
 
 	tags := sdk.NewTags(
-		TagRequestContextID, []byte(hex.EncodeToString(requestContextID)),
+		TagRequestContextID, []byte(requestContextID.String()),
 		TagConsumer, []byte(msg.Consumer.String()),
 	)
 
@@ -146,6 +145,7 @@ func handleMsgRespondService(ctx sdk.Context, k Keeper, msg MsgRespondService) s
 
 	tags := sdk.NewTags(
 		TagRequestID, []byte(msg.RequestID),
+		TagRequestContextID, []byte(request.RequestContextID.String()),
 		TagConsumer, []byte(response.Consumer.String()),
 		TagProvider, []byte(response.Provider.String()),
 		TagServiceName, []byte(request.ServiceName),
@@ -158,7 +158,7 @@ func handleMsgRespondService(ctx sdk.Context, k Keeper, msg MsgRespondService) s
 
 // handleMsgPauseRequestContext handles MsgPauseRequestContext
 func handleMsgPauseRequestContext(ctx sdk.Context, k Keeper, msg MsgPauseRequestContext) sdk.Result {
-	if err := k.PauseRequestContext(ctx, msg.RequestContextID); err != nil {
+	if err := k.PauseRequestContext(ctx, msg.RequestContextID, msg.Consumer); err != nil {
 		return err.Result()
 	}
 
@@ -167,7 +167,7 @@ func handleMsgPauseRequestContext(ctx sdk.Context, k Keeper, msg MsgPauseRequest
 
 // handleMsgStartRequestContext handles MsgStartRequestContext
 func handleMsgStartRequestContext(ctx sdk.Context, k Keeper, msg MsgStartRequestContext) sdk.Result {
-	if err := k.StartRequestContext(ctx, msg.RequestContextID); err != nil {
+	if err := k.StartRequestContext(ctx, msg.RequestContextID, msg.Consumer); err != nil {
 		return err.Result()
 	}
 
@@ -176,7 +176,7 @@ func handleMsgStartRequestContext(ctx sdk.Context, k Keeper, msg MsgStartRequest
 
 // handleMsgKillRequestContext handles MsgKillRequestContext
 func handleMsgKillRequestContext(ctx sdk.Context, k Keeper, msg MsgKillRequestContext) sdk.Result {
-	if err := k.KillRequestContext(ctx, msg.RequestContextID); err != nil {
+	if err := k.KillRequestContext(ctx, msg.RequestContextID, msg.Consumer); err != nil {
 		return err.Result()
 	}
 
@@ -187,7 +187,7 @@ func handleMsgKillRequestContext(ctx sdk.Context, k Keeper, msg MsgKillRequestCo
 func handleMsgUpdateRequestContext(ctx sdk.Context, k Keeper, msg MsgUpdateRequestContext) sdk.Result {
 	if err := k.UpdateRequestContext(
 		ctx, msg.RequestContextID, msg.Providers, msg.ServiceFeeCap,
-		msg.Timeout, msg.RepeatedFrequency, msg.RepeatedTotal,
+		msg.Timeout, msg.RepeatedFrequency, msg.RepeatedTotal, msg.Consumer,
 	); err != nil {
 		return err.Result()
 	}

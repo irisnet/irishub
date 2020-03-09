@@ -18,7 +18,7 @@ import (
 func GetCmdQueryServiceDefinition(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "definition",
-		Short:   "Query service definition",
+		Short:   "Query a service definition",
 		Example: "iriscli service definition <service name>",
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -55,7 +55,7 @@ func GetCmdQueryServiceDefinition(cdc *codec.Codec) *cobra.Command {
 func GetCmdQueryServiceBinding(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "binding",
-		Short:   "Query service binding",
+		Short:   "Query a service binding",
 		Example: "iriscli service binding <service name> <provider>",
 		Args:    cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -98,7 +98,7 @@ func GetCmdQueryServiceBinding(cdc *codec.Codec) *cobra.Command {
 func GetCmdQueryServiceBindings(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "bindings",
-		Short:   "Query service bindings",
+		Short:   "Query all bindings of a service definition",
 		Example: "iriscli service bindings <service name>",
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -212,7 +212,7 @@ func GetCmdQueryServiceRequest(cdc *codec.Codec) *cobra.Command {
 func GetCmdQueryServiceRequests(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "requests",
-		Short:   "Query service requests by the service binding or request context ID",
+		Short:   "Query requests by the service binding or request context ID",
 		Example: "iriscli service requests <service-name> <provider> | <request-context-id> <batch-counter>",
 		Args:    cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -403,8 +403,8 @@ func GetCmdQueryRequestContext(cdc *codec.Codec) *cobra.Command {
 func GetCmdQueryEarnedFees(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "fees",
-		Short:   "Query the earned fees",
-		Example: "iriscli service fees <address>",
+		Short:   "Query the earned fees of a provider",
+		Example: "iriscli service fees <provider>",
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)

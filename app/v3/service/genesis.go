@@ -4,6 +4,8 @@ import (
 	"encoding/hex"
 	"fmt"
 
+	cmn "github.com/tendermint/tendermint/libs/common"
+
 	sdk "github.com/irisnet/irishub/types"
 )
 
@@ -37,18 +39,18 @@ func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 	requests := make(map[string]CompactRequest)
 	responses := make(map[string]Response)
 
-	k.IterateRequestContexts(ctx, func(requestContextID []byte, requestContext RequestContext) bool {
-		requestContexts[hex.EncodeToString(requestContextID)] = requestContext
+	k.IterateRequestContexts(ctx, func(requestContextID cmn.HexBytes, requestContext RequestContext) bool {
+		requestContexts[requestContextID.String()] = requestContext
 		return false
 	})
 
-	k.IterateRequests(ctx, func(requestID []byte, request CompactRequest) bool {
-		requests[RequestIDToString(requestID)] = request
+	k.IterateRequests(ctx, func(requestID cmn.HexBytes, request CompactRequest) bool {
+		requests[requestID.String()] = request
 		return false
 	})
 
-	k.IterateResponses(ctx, func(requestID []byte, response Response) bool {
-		responses[RequestIDToString(requestID)] = response
+	k.IterateResponses(ctx, func(requestID cmn.HexBytes, response Response) bool {
+		responses[requestID.String()] = response
 		return false
 	})
 

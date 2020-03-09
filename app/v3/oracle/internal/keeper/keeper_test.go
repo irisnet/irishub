@@ -1,8 +1,9 @@
 package keeper
 
 import (
-	"github.com/irisnet/irishub/app/v3/service/exported"
 	"testing"
+
+	"github.com/irisnet/irishub/app/v3/service/exported"
 
 	"github.com/irisnet/irishub/app/v3/oracle/internal/types"
 	sdk "github.com/irisnet/irishub/types"
