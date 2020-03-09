@@ -10,6 +10,7 @@ import (
 
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
+	cmn "github.com/tendermint/tendermint/libs/common"
 	"github.com/tendermint/tendermint/libs/log"
 	dbm "github.com/tendermint/tm-db"
 
@@ -124,7 +125,7 @@ func (m MockServiceKeeper) RegisterResponseCallback(moduleName string,
 }
 
 func (m MockServiceKeeper) GetRequestContext(ctx sdk.Context,
-	requestContextID []byte) (exported.RequestContext, bool) {
+	requestContextID cmn.HexBytes) (exported.RequestContext, bool) {
 	reqCtx, ok := m.cxtMap[string(requestContextID)]
 	return reqCtx, ok
 }
@@ -142,7 +143,7 @@ func (m MockServiceKeeper) CreateRequestContext(ctx sdk.Context,
 	repeatedTotal int64,
 	state exported.RequestContextState,
 	respThreshold uint16,
-	moduleName string) ([]byte, sdk.Error) {
+	moduleName string) (cmn.HexBytes, sdk.Error) {
 
 	reqCtx := exported.RequestContext{
 		ServiceName:       serviceName,
@@ -165,16 +166,17 @@ func (m MockServiceKeeper) CreateRequestContext(ctx sdk.Context,
 }
 
 func (m MockServiceKeeper) UpdateRequestContext(ctx sdk.Context,
-	requestContextID []byte,
+	requestContextID cmn.HexBytes,
 	providers []sdk.AccAddress,
 	serviceFeeCap sdk.Coins,
 	timeout int64,
 	repeatedFreq uint64,
-	repeatedTotal int64) sdk.Error {
+	repeatedTotal int64,
+	consumer sdk.AccAddress) sdk.Error {
 	return nil
 }
 
-func (m MockServiceKeeper) StartRequestContext(ctx sdk.Context, requestContextID []byte) sdk.Error {
+func (m MockServiceKeeper) StartRequestContext(ctx sdk.Context, requestContextID cmn.HexBytes, consumer sdk.AccAddress) sdk.Error {
 	reqCtx := m.cxtMap[string(requestContextID)]
 	callback := m.callbackMap[reqCtx.ModuleName]
 	for i := int64(reqCtx.BatchCounter + 1); i <= reqCtx.RepeatedTotal; i++ {
@@ -191,7 +193,7 @@ func (m MockServiceKeeper) StartRequestContext(ctx sdk.Context, requestContextID
 	return nil
 }
 
-func (m MockServiceKeeper) PauseRequestContext(ctx sdk.Context, requestContextID []byte) sdk.Error {
+func (m MockServiceKeeper) PauseRequestContext(ctx sdk.Context, requestContextID cmn.HexBytes, consumer sdk.AccAddress) sdk.Error {
 	reqCtx := m.cxtMap[string(requestContextID)]
 	reqCtx.State = exported.PAUSED
 	m.cxtMap[string(requestContextID)] = reqCtx
