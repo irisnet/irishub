@@ -7,26 +7,13 @@ import (
 
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/log"
-	dbm "github.com/tendermint/tm-db"
 
 	"github.com/irisnet/irishub/app/v3/rand/internal/types"
 	"github.com/irisnet/irishub/codec"
-	"github.com/irisnet/irishub/store"
 	sdk "github.com/irisnet/irishub/types"
 )
 
-func setupMultiStore() (sdk.MultiStore, *sdk.KVStoreKey) {
-	db := dbm.NewMemDB()
-	randKey := sdk.NewKVStoreKey("randkey")
-
-	ms := store.NewCommitMultiStore(db)
-	ms.MountStoreWithDB(randKey, sdk.StoreTypeIAVL, db)
-	_ = ms.LoadLatestVersion()
-
-	return ms, randKey
-}
-
-func TestRequestRandKeeper(t *testing.T) {
+func TestOracleRequestRandKeeper(t *testing.T) {
 	ms, randKey := setupMultiStore()
 
 	cdc := codec.New()
@@ -43,6 +30,7 @@ func TestRequestRandKeeper(t *testing.T) {
 	blockInterval := uint64(100)
 	destHeight := txHeight + int64(blockInterval)
 	consumer := sdk.AccAddress([]byte("consumer"))
+	serviceFeeCap := sdk.NewCoins(sdk.NewCoin(sdk.IrisAtto, sdk.NewInt(1000000000000000000)))
 
 	// build context
 	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewNopLogger())
@@ -59,11 +47,11 @@ func TestRequestRandKeeper(t *testing.T) {
 	require.True(t, len(requests) == 0)
 
 	// request a rand
-	_, err := keeper.RequestRand(ctx, consumer, blockInterval, false, sdk.NewCoins())
+	_, err := keeper.RequestRand(ctx, consumer, blockInterval, false, serviceFeeCap)
 	require.Nil(t, err)
 
 	// get request id
-	reqID := types.GenerateRequestID(types.NewRequest(txHeight, consumer, sdk.SHA256(txBytes), false, sdk.NewCoins()))
+	reqID := types.GenerateRequestID(types.NewRequest(txHeight, consumer, sdk.SHA256(txBytes), true, serviceFeeCap))
 
 	// get the pending request and assert the result is not nil
 	store := ctx.KVStore(randKey)

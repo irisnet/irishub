@@ -12,19 +12,31 @@ import (
 )
 
 type Keeper struct {
-	storeKey sdk.StoreKey
-	cdc      *codec.Codec
-
-	// codespace
+	storeKey  sdk.StoreKey
+	cdc       *codec.Codec
+	bk        types.BankKeeper
+	sk        types.ServiceKeeper
 	codespace sdk.CodespaceType
 }
 
-func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, codespace sdk.CodespaceType) Keeper {
-	return Keeper{
+func NewKeeper(
+	cdc *codec.Codec,
+	key sdk.StoreKey,
+	bk types.BankKeeper,
+	sk types.ServiceKeeper,
+	codespace sdk.CodespaceType,
+) Keeper {
+	keeper := Keeper{
 		storeKey:  key,
 		cdc:       cdc,
+		bk:        bk,
+		sk:        sk,
 		codespace: codespace,
 	}
+	if err := sk.RegisterResponseCallback(types.ModuleName, keeper.HandlerResponse); err != nil {
+		panic(err)
+	}
+	return keeper
 }
 
 // Codespace returns the codespace
@@ -38,7 +50,13 @@ func (k Keeper) GetCdc() *codec.Codec {
 }
 
 // RequestRand requests a random number
-func (k Keeper) RequestRand(ctx sdk.Context, consumer sdk.AccAddress, blockInterval uint64) (sdk.Tags, sdk.Error) {
+func (k Keeper) RequestRand(
+	ctx sdk.Context,
+	consumer sdk.AccAddress,
+	blockInterval uint64,
+	oracle bool,
+	serviceFeeCap sdk.Coins,
+) (sdk.Tags, sdk.Error) {
 	currentHeight := ctx.BlockHeight()
 	destHeight := currentHeight + int64(blockInterval)
 
@@ -46,7 +64,7 @@ func (k Keeper) RequestRand(ctx sdk.Context, consumer sdk.AccAddress, blockInter
 	txHash := sdk.SHA256(ctx.TxBytes())
 
 	// build request
-	request := types.NewRequest(currentHeight, consumer, txHash)
+	request := types.NewRequest(currentHeight, consumer, txHash, oracle, serviceFeeCap)
 
 	// generate the request id
 	reqID := types.GenerateRequestID(request)
@@ -65,7 +83,6 @@ func (k Keeper) RequestRand(ctx sdk.Context, consumer sdk.AccAddress, blockInter
 // SetRand stores the random number
 func (k Keeper) SetRand(ctx sdk.Context, reqID []byte, rand types.Rand) {
 	store := ctx.KVStore(k.storeKey)
-
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(rand)
 	store.Set(KeyRand(reqID), bz)
 }
@@ -73,7 +90,6 @@ func (k Keeper) SetRand(ctx sdk.Context, reqID []byte, rand types.Rand) {
 // EnqueueRandRequest enqueue the random number request
 func (k Keeper) EnqueueRandRequest(ctx sdk.Context, height int64, reqID []byte, request types.Request) {
 	store := ctx.KVStore(k.storeKey)
-
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(request)
 	store.Set(KeyRandRequestQueue(height, reqID), bz)
 }
@@ -81,9 +97,35 @@ func (k Keeper) EnqueueRandRequest(ctx sdk.Context, height int64, reqID []byte, 
 // DequeueRandRequest removes the random number request by the specified height and request id
 func (k Keeper) DequeueRandRequest(ctx sdk.Context, height int64, reqID []byte) {
 	store := ctx.KVStore(k.storeKey)
-
-	// delete the key
 	store.Delete(KeyRandRequestQueue(height, reqID))
+}
+
+// SetOracleRandRequest stores the oracle rand request
+func (k Keeper) SetOracleRandRequest(ctx sdk.Context, requestContextID []byte, request types.Request) {
+	store := ctx.KVStore(k.storeKey)
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(request)
+	store.Set(KeyOracleRandRequest(requestContextID), bz)
+}
+
+// GetOracleRandRequest retrieves the oracle rand request by the specified request id
+func (k Keeper) GetOracleRandRequest(ctx sdk.Context, requestContextID []byte) (types.Request, sdk.Error) {
+	store := ctx.KVStore(k.storeKey)
+
+	bz := store.Get(KeyOracleRandRequest(requestContextID))
+	if bz == nil {
+		return types.Request{}, types.ErrInvalidRequestContextID(k.codespace, fmt.Sprintf("invalid request context id: %s", hex.EncodeToString(requestContextID)))
+	}
+
+	var request types.Request
+	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &request)
+
+	return request, nil
+}
+
+// DeleteOracleRandRequest delete an oracle rand request
+func (k Keeper) DeleteOracleRandRequest(ctx sdk.Context, requestContextID []byte) {
+	store := ctx.KVStore(k.storeKey)
+	store.Delete(KeyOracleRandRequest(requestContextID))
 }
 
 // GetRand retrieves the random number by the specified request id
