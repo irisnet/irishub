@@ -118,7 +118,7 @@ func (m MockServiceKeeper) StartRequestContext(
 			Height:  ctx.BlockHeight() + 1,
 			Time:    ctx.BlockTime().Add(2 * time.Minute),
 		})
-		callback(ctx, requestContextID, responses)
+		callback(ctx, requestContextID, responses, nil)
 	}
 	return nil
 }

@@ -62,8 +62,13 @@ func (k Keeper) RequestService(ctx sdk.Context, reqID []byte, consumer sdk.AccAd
 }
 
 // HandlerResponse ...
-func (k Keeper) HandlerResponse(ctx sdk.Context, requestContextID cmn.HexBytes, responseOutput []string) {
-	if len(responseOutput) == 0 {
+func (k Keeper) HandlerResponse(ctx sdk.Context, requestContextID cmn.HexBytes, responseOutput []string, err error) {
+	if len(responseOutput) == 0 || err != nil {
+		ctx = ctx.WithLogger(ctx.Logger().With("handler", "HandlerResponse"))
+		ctx.Logger().Error("oracle feed failed",
+			"requestContextID", requestContextID.String(),
+			"err", err.Error(),
+		)
 		return
 	}
 
