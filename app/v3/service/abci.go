@@ -116,6 +116,7 @@ func EndBlocker(ctx sdk.Context, k Keeper) (tags sdk.Tags) {
 
 				if reqContext.State == RUNNING {
 					reqContext.BatchCounter++
+					reqContext.BatchResponseCount = 0
 					k.SetRequestContext(ctx, reqContextID, reqContext)
 
 					requestTags := k.InitiateRequests(ctx, reqContextID, providers)
