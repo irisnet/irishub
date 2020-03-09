@@ -308,7 +308,7 @@ func updateServiceBindingHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) 
 	}
 }
 
-// HTTP request handler to set a new withdrawal address for a provider.
+// HTTP request handler to set a withdrawal address for a provider.
 func setWithdrawAddrHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
