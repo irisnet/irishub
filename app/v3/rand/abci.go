@@ -84,7 +84,7 @@ func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, k Keeper) (tags s
 		reqID := GenerateRequestID(request)
 
 		// remove the request
-		k.DequeueRandRequest(ctx, lastBlockHeight, reqID)
+		k.DequeueOracleTimeoutRandRequest(ctx, lastBlockHeight, reqID)
 
 		expiredOracleRandReqNum++
 	}
