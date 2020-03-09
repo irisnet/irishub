@@ -11,18 +11,18 @@ Service模块允许在IRIS Hub中定义、绑定、调用服务。[了解更多i
 | [bind](#iriscli-service-bind)                     | 绑定一个服务        |
 | [binding](#iriscli-service-binding)               | 查询服务绑定                     |
 | [bindings](#iriscli-service-bindings)             | 查询服务绑定列表               |
-| [set-withdraw-addr](#iriscli-service-set-withdraw-addr)             | 设置提取地址                              |
-| [withdraw-addr](#iriscli-service-withdraw-addr)             | 查询提取地址                              |
+| [set-withdraw-addr](#iriscli-service-set-withdraw-addr)             | 设置服务提供者的提取地址                              |
+| [withdraw-addr](#iriscli-service-withdraw-addr)             | 查询服务提供者的提取地址                              |
 | [update-binding](#iriscli-service-update-binding) | 更新一个存在的服务绑定         |
 | [disable](#iriscli-service-disable)               | 禁用一个可用的服务绑定         |
 | [enable](#iriscli-service-enable)                 | 启用一个不可用的服务绑定       |
-| [refund-deposit](#iriscli-service-refund-deposit) | 取回一个服务绑定的所有押金                   |
+| [refund-deposit](#iriscli-service-refund-deposit) | 退还一个服务绑定的所有押金                   |
 | [call](#iriscli-service-call)                     | 调用服务                  |
-| [request](#iriscli-service-request)             | 查询服务请求                          |
-| [requests](#iriscli-service-requests)             | 查询服务请求列表               |
+| [request](#iriscli-service-request)             | 通过请求ID查询服务请求                          |
+| [requests](#iriscli-service-requests)             | 通过服务绑定或请求上下文查询服务请求列表              |
 | [respond](#iriscli-service-respond)               | 响应服务请求                 |
-| [response](#iriscli-service-response)             | 查询服务响应                   |
-| [responses](#iriscli-service-responses)             | 查询服务响应列表                             |
+| [response](#iriscli-service-response)             | 通过请求ID查询服务响应                   |
+| [responses](#iriscli-service-responses)             | 通过请求上下文ID和批次计数器查询服务响应列表                            |
 | [request-context](#iriscli-service-request-context)             | 查询请求上下文                             |
 | [update](#iriscli-service-update)             | 更新请求上下文                             |
 | [pause](#iriscli-service-pause)             | 暂停一个正在进行的请求上下文                             |
@@ -163,7 +163,7 @@ iriscli service update-binding <flags>
 | 名称，速记     | 默认 | 描述                                                | 必须 |
 | -------------- | ---- | --------------------------------------------------- | ---- |
 | --service-name |      | 服务名称                                            | 是   |
-| --deposit      |      | 增加的押金                  |      |
+| --deposit      |      | 增加的绑定押金                  |      |
 | --pricing      |      | 服务定价内容或路径，需符合Irishub Pricing JSON schema              |      |
 
 ### 更新一个存在的服务绑定
@@ -177,7 +177,7 @@ iriscli service update-binding --chain-id=<chain-id> --from=<key-name> --fee=0.3
 
 ## iriscli service set-withdraw-addr
 
-设置提取地址
+设置服务提供者的提取地址
 
 ```bash
 iriscli service set-withdraw-addr <withdrawal address>
@@ -191,7 +191,7 @@ iriscli service set-withdraw-addr <withdrawal address> --chain-id=<chain-id> --f
 
 ## iriscli service withdraw-addr
 
-查询提取地址
+查询服务提供者的提取地址
 
 ```bash
 iriscli service withdraw-addr <provider>
@@ -345,8 +345,8 @@ iriscli service respond <flags>
 | 名称，速记         | 默认 | 描述                      | 必须 |
 | ------------------ | ---- | ------------------------- | ---- |
 | --request-id       |      | 欲响应请求的ID            | 是   |
-| --data    |      | 响应的输出, 是一个Output JSON schema实例 | |
-| --error | | 响应的错误消息, 是一个Error JSON schema实例  | |
+| --data    |      | 服务响应的输出, 是一个Output JSON schema实例 | |
+| --error | | 服务响应的错误消息, 是一个Error JSON schema实例  | |
 
 ### 响应一个服务请求
 
