@@ -4,13 +4,16 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/irisnet/irishub/codec"
-	"github.com/irisnet/irishub/store"
-	sdk "github.com/irisnet/irishub/types"
 	"github.com/stretchr/testify/require"
+
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/log"
 	dbm "github.com/tendermint/tm-db"
+
+	"github.com/irisnet/irishub/app/v3/rand/internal/keeper"
+	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/store"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 func setupMultiStore() (sdk.MultiStore, *sdk.KVStoreKey) {
@@ -19,7 +22,7 @@ func setupMultiStore() (sdk.MultiStore, *sdk.KVStoreKey) {
 
 	ms := store.NewCommitMultiStore(db)
 	ms.MountStoreWithDB(randKey, sdk.StoreTypeIAVL, db)
-	ms.LoadLatestVersion()
+	_ = ms.LoadLatestVersion()
 
 	return ms, randKey
 }
@@ -30,7 +33,10 @@ func TestExportRandGenesis(t *testing.T) {
 	cdc := codec.New()
 	RegisterCodec(cdc)
 
-	keeper := NewKeeper(cdc, randKey, DefaultCodespace)
+	mockServiceKeeper := keeper.NewMockServiceKeeper()
+	mockBankKeeper := keeper.NewMockBankKeeper()
+
+	keeper := NewKeeper(cdc, randKey, mockBankKeeper, mockServiceKeeper, DefaultCodespace)
 
 	// define variables
 	txBytes := []byte("testtx")
@@ -46,8 +52,8 @@ func TestExportRandGenesis(t *testing.T) {
 	ctx = ctx.WithBlockHeight(txHeight).WithTxBytes(txBytes)
 
 	// request rands
-	keeper.RequestRand(ctx, consumer1, blockInterval1)
-	keeper.RequestRand(ctx, consumer2, blockInterval2)
+	_, _ = keeper.RequestRand(ctx, consumer1, blockInterval1, false, sdk.NewCoins())
+	_, _ = keeper.RequestRand(ctx, consumer2, blockInterval2, false, sdk.NewCoins())
 
 	// get the pending requests from queue
 	storedRequests := make(map[int64][]Request)

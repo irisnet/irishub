@@ -4,10 +4,11 @@ import (
 	"encoding/hex"
 	"fmt"
 
+	abci "github.com/tendermint/tendermint/abci/types"
+
 	"github.com/irisnet/irishub/app/v3/rand/internal/types"
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
-	abci "github.com/tendermint/tendermint/abci/types"
 )
 
 func NewQuerier(k Keeper) sdk.Querier {

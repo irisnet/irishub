@@ -13,14 +13,12 @@ func NewHandler(k Keeper) sdk.Handler {
 		default:
 			return sdk.ErrTxDecode("invalid message parsed in rand module").Result()
 		}
-
-		return sdk.ErrTxDecode("invalid message parsed in rand module").Result()
 	}
 }
 
 // handleMsgRequestRand handles MsgRequestRand
 func handleMsgRequestRand(ctx sdk.Context, k Keeper, msg MsgRequestRand) sdk.Result {
-	tags, err := k.RequestRand(ctx, msg.Consumer, msg.BlockInterval)
+	tags, err := k.RequestRand(ctx, msg.Consumer, msg.BlockInterval, msg.Oracle, msg.ServiceFeeCap)
 	if err != nil {
 		return err.Result()
 	}
