@@ -4,6 +4,8 @@ import (
 	"testing"
 	"time"
 
+	cmn "github.com/tendermint/tendermint/libs/common"
+
 	"github.com/stretchr/testify/require"
 
 	"github.com/irisnet/irishub/app/v1/auth"
@@ -54,7 +56,7 @@ func setRequestContext(
 	ctx sdk.Context, k Keeper, consumer sdk.AccAddress,
 	providers []sdk.AccAddress, state types.RequestContextState,
 	threshold uint16, moduleName string,
-) ([]byte, types.RequestContext) {
+) (cmn.HexBytes, types.RequestContext) {
 	requestContext := types.NewRequestContext(
 		testServiceName, providers, consumer, testInput,
 		testServiceFeeCap, testTimeout, false, true, testRepeatedFreq,
@@ -67,7 +69,7 @@ func setRequestContext(
 	return requestContextID, requestContext
 }
 
-func setRequest(ctx sdk.Context, k Keeper, consumer sdk.AccAddress, provider sdk.AccAddress, requestContextID []byte) []byte {
+func setRequest(ctx sdk.Context, k Keeper, consumer sdk.AccAddress, provider sdk.AccAddress, requestContextID []byte) cmn.HexBytes {
 	requestContext, _ := k.GetRequestContext(ctx, requestContextID)
 
 	_ = k.DeductServiceFees(ctx, consumer, testServiceFee)
@@ -273,7 +275,7 @@ func TestKeeper_Request_Context(t *testing.T) {
 	newRepeatedFreq := testRepeatedFreq + 10
 	newRepeatedTotal := int64(-1)
 
-	err = keeper.UpdateRequestContext(ctx, requestContextID, nil, newServiceFeeCap, newTimeout, newRepeatedFreq, newRepeatedTotal)
+	err = keeper.UpdateRequestContext(ctx, requestContextID, nil, newServiceFeeCap, newTimeout, newRepeatedFreq, newRepeatedTotal, consumer)
 	require.NoError(t, err)
 
 	requestContext, found = keeper.GetRequestContext(ctx, requestContextID)
@@ -291,7 +293,7 @@ func TestKeeper_Request_Context(t *testing.T) {
 	require.Equal(t, types.RUNNING, requestContext.State)
 
 	// pause
-	err = keeper.PauseRequestContext(ctx, requestContextID)
+	err = keeper.PauseRequestContext(ctx, requestContextID, consumer)
 	require.NoError(t, err)
 
 	requestContext, found = keeper.GetRequestContext(ctx, requestContextID)
@@ -300,7 +302,7 @@ func TestKeeper_Request_Context(t *testing.T) {
 	require.Equal(t, types.PAUSED, requestContext.State)
 
 	// start
-	err = keeper.StartRequestContext(ctx, requestContextID)
+	err = keeper.StartRequestContext(ctx, requestContextID, consumer)
 	require.NoError(t, err)
 
 	requestContext, found = keeper.GetRequestContext(ctx, requestContextID)
@@ -309,7 +311,7 @@ func TestKeeper_Request_Context(t *testing.T) {
 	require.Equal(t, types.RUNNING, requestContext.State)
 
 	// kill
-	err = keeper.KillRequestContext(ctx, requestContextID)
+	err = keeper.KillRequestContext(ctx, requestContextID, consumer)
 	require.NoError(t, err)
 
 	requestContext, found = keeper.GetRequestContext(ctx, requestContextID)
@@ -400,7 +402,7 @@ func TestKeeper_Respond_Service(t *testing.T) {
 
 	requestID := setRequest(ctx, keeper, consumer, provider, requestContextID)
 
-	requestIDStr := types.RequestIDToString(requestID)
+	requestIDStr := requestID.String()
 
 	_, _, err := keeper.AddResponse(ctx, requestIDStr, provider, testOutput, "")
 	require.NoError(t, err)
@@ -452,8 +454,8 @@ func TestKeeper_Request_Service_From_Module(t *testing.T) {
 	requestID1 := setRequest(ctx, keeper, consumer, provider1, requestContextID)
 	requestID2 := setRequest(ctx, keeper, consumer, provider2, requestContextID)
 
-	requestIDStr1 := types.RequestIDToString(requestID1)
-	requestIDStr2 := types.RequestIDToString(requestID2)
+	requestIDStr1 := requestID1.String()
+	requestIDStr2 := requestID2.String()
 
 	_, _, err = keeper.AddResponse(ctx, requestIDStr1, provider1, testOutput, "")
 	require.NoError(t, err)
@@ -476,6 +478,6 @@ func TestKeeper_Request_Service_From_Module(t *testing.T) {
 	require.True(t, callbacked)
 }
 
-func callback(ctx sdk.Context, requestContextID []byte, responses []string) {
+func callback(ctx sdk.Context, requestContextID cmn.HexBytes, responses []string, err error) {
 	callbacked = true
 }
