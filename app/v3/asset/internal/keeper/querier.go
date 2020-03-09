@@ -3,11 +3,11 @@ package keeper
 import (
 	"strings"
 
-	"github.com/irisnet/irishub/app/v3/asset/internal/types"
+	abci "github.com/tendermint/tendermint/abci/types"
 
+	"github.com/irisnet/irishub/app/v3/asset/internal/types"
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
-	abci "github.com/tendermint/tendermint/abci/types"
 )
 
 func NewQuerier(k Keeper) sdk.Querier {

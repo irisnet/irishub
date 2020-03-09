@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/irisnet/irishub/app/v3/asset/internal/types"
-
 	sdk "github.com/irisnet/irishub/types"
 )
 
