@@ -9,6 +9,8 @@ import (
 
 	"github.com/tidwall/gjson"
 
+	cmn "github.com/tendermint/tendermint/libs/common"
+
 	"github.com/irisnet/irishub/app/v3/rand/internal/types"
 	"github.com/irisnet/irishub/app/v3/service"
 	"github.com/irisnet/irishub/app/v3/service/exported"
@@ -64,7 +66,7 @@ func (k Keeper) RequestService(ctx sdk.Context, reqID []byte, consumer sdk.AccAd
 }
 
 // HandlerResponse ...
-func (k Keeper) HandlerResponse(ctx sdk.Context, requestContextID []byte, responseOutput []string) {
+func (k Keeper) HandlerResponse(ctx sdk.Context, requestContextID cmn.HexBytes, responseOutput []string) {
 	if len(responseOutput) == 0 {
 		return
 	}

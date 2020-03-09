@@ -1,6 +1,8 @@
 package types
 
 import (
+	cmn "github.com/tendermint/tendermint/libs/common"
+
 	"github.com/irisnet/irishub/app/v3/service"
 	"github.com/irisnet/irishub/app/v3/service/exported"
 	sdk "github.com/irisnet/irishub/types"
@@ -15,7 +17,7 @@ type ServiceKeeper interface {
 
 	GetRequestContext(
 		ctx sdk.Context,
-		requestContextID []byte,
+		requestContextID cmn.HexBytes,
 	) (exported.RequestContext, bool)
 
 	CreateRequestContext(
@@ -33,7 +35,7 @@ type ServiceKeeper interface {
 		state exported.RequestContextState,
 		respThreshold uint16,
 		respHandler string,
-	) ([]byte, sdk.Error)
+	) (cmn.HexBytes, sdk.Error)
 
 	ServiceBindingsIterator(ctx sdk.Context, serviceName string) sdk.Iterator
 
