@@ -39,21 +39,15 @@ func NewServiceBinding(
 
 // String implements fmt.Stringer
 func (binding ServiceBinding) String() string {
-	disabledTimeStr := ""
-
-	if !binding.DisabledTime.IsZero() {
-		disabledTimeStr = fmt.Sprintf("%v", binding.DisabledTime)
-	}
-
 	return fmt.Sprintf(`ServiceBinding:
 		ServiceName:             %s
 		Provider:                %s
 		Deposit:                 %s
 		Pricing:                 %s
 		Available:               %v,
-		DisabledTime:            %s`,
+		DisabledTime:            %v`,
 		binding.ServiceName, binding.Provider, binding.Deposit.MainUnitString(),
-		binding.Pricing, binding.Available, disabledTimeStr,
+		binding.Pricing, binding.Available, binding.DisabledTime,
 	)
 }
 
