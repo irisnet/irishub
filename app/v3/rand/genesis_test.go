@@ -57,7 +57,7 @@ func TestExportRandGenesis(t *testing.T) {
 	})
 	require.Equal(t, 2, len(storedRequests))
 
-	// precede to the new block
+	// proceed to the new block
 	ctx = ctx.WithBlockHeight(newBlockHeight)
 
 	// export requests
