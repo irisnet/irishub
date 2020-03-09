@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"strings"
 
+	cmn "github.com/tendermint/tendermint/libs/common"
+
 	sdk "github.com/irisnet/irishub/types"
 )
 
@@ -149,7 +151,7 @@ func (rc RequestContext) HumanString(converter sdk.CoinsConverter) string {
 
 // CompactRequest defines a compact request with a request context ID
 type CompactRequest struct {
-	RequestContextID           []byte
+	RequestContextID           cmn.HexBytes
 	RequestContextBatchCounter uint64
 	Provider                   sdk.AccAddress
 	ServiceFee                 sdk.Coins
@@ -158,7 +160,7 @@ type CompactRequest struct {
 
 // NewCompactRequest creates a new CompactRequest instance
 func NewCompactRequest(
-	requestContextID []byte,
+	requestContextID cmn.HexBytes,
 	batchCounter uint64,
 	provider sdk.AccAddress,
 	serviceFee sdk.Coins,
@@ -183,7 +185,7 @@ type Request struct {
 	SuperMode                  bool           `json:"super_mode"`
 	RequestHeight              int64          `json:"request_height"`
 	ExpirationHeight           int64          `json:"expiration_height"`
-	RequestContextID           []byte         `json:"request_context_id"`
+	RequestContextID           cmn.HexBytes   `json:"request_context_id"`
 	RequestContextBatchCounter uint64         `json:"request_context_batch_counter"`
 }
 
@@ -197,7 +199,7 @@ func NewRequest(
 	superMode bool,
 	requestHeight int64,
 	expirationHeight int64,
-	requestContextID []byte,
+	requestContextID cmn.HexBytes,
 	batchCounter uint64,
 ) Request {
 	return Request{
@@ -229,7 +231,7 @@ func (r Request) String() string {
 	BatchCounter:            %d`,
 		r.ServiceName, r.Provider, r.Consumer, r.Input, r.ServiceFee.String(),
 		r.SuperMode, r.RequestHeight, r.ExpirationHeight,
-		hex.EncodeToString(r.RequestContextID), r.RequestContextBatchCounter,
+		r.RequestContextID.String(), r.RequestContextBatchCounter,
 	)
 }
 
@@ -248,7 +250,7 @@ func (r Request) HumanString(converter sdk.CoinsConverter) string {
 	BatchCounter:            %d`,
 		r.ServiceName, r.Provider, r.Consumer, r.Input, converter.ToMainUnit(r.ServiceFee),
 		r.SuperMode, r.RequestHeight, r.ExpirationHeight,
-		hex.EncodeToString(r.RequestContextID), r.RequestContextBatchCounter,
+		r.RequestContextID.String(), r.RequestContextBatchCounter,
 	)
 }
 
@@ -289,7 +291,7 @@ type Response struct {
 	Consumer                   sdk.AccAddress `json:"consumer"`
 	Output                     string         `json:"output"`
 	Error                      string         `json:"error"`
-	RequestContextID           []byte         `json:"request_context_id"`
+	RequestContextID           cmn.HexBytes   `json:"request_context_id"`
 	RequestContextBatchCounter uint64         `json:"request_context_batch_counter"`
 }
 
@@ -299,7 +301,7 @@ func NewResponse(
 	consumer sdk.AccAddress,
 	output,
 	err string,
-	requestContextID []byte,
+	requestContextID cmn.HexBytes,
 	batchCounter uint64,
 ) Response {
 	return Response{
@@ -322,7 +324,7 @@ func (r Response) String() string {
 	RequestContextID:        %s
 	BatchCounter:            %d`,
 		r.Provider, r.Consumer, r.Output, r.Error,
-		hex.EncodeToString(r.RequestContextID),
+		r.RequestContextID.String(),
 		r.RequestContextBatchCounter,
 	)
 }
@@ -522,14 +524,14 @@ func (state *RequestContextBatchState) UnmarshalJSON(data []byte) error {
 }
 
 // ResponseCallback defines the response callback interface
-type ResponseCallback func(ctx sdk.Context, requestContextID []byte, reponses []string)
+type ResponseCallback func(ctx sdk.Context, requestContextID cmn.HexBytes, reponses []string)
 
 const (
 	requestIDLen = 42
 )
 
 // ConvertRequestID converts the given string to request ID
-func ConvertRequestID(requestIDStr string) ([]byte, error) {
+func ConvertRequestID(requestIDStr string) (cmn.HexBytes, error) {
 	if len(requestIDStr) != 2*requestIDLen {
 		return nil, errors.New("invalid request id")
 	}
@@ -542,13 +544,8 @@ func ConvertRequestID(requestIDStr string) ([]byte, error) {
 	return requestID, nil
 }
 
-// RequestIDToString returns the string representation of the given request ID
-func RequestIDToString(requestID []byte) string {
-	return hex.EncodeToString(requestID)
-}
-
 // GenerateRequestContextID generates a unique ID for the request context from the specified params
-func GenerateRequestContextID(blockHeight int64, intraCounter int16) []byte {
+func GenerateRequestContextID(blockHeight int64, intraCounter int16) cmn.HexBytes {
 	bz := make([]byte, 10)
 
 	binary.BigEndian.PutUint64(bz, uint64(blockHeight))
@@ -558,7 +555,7 @@ func GenerateRequestContextID(blockHeight int64, intraCounter int16) []byte {
 }
 
 // GenerateRequestID generates a unique request ID from the given params
-func GenerateRequestID(requestContextID []byte, requestContextBatchCounter uint64, batchRequestIndex int16) []byte {
+func GenerateRequestID(requestContextID cmn.HexBytes, requestContextBatchCounter uint64, batchRequestIndex int16) cmn.HexBytes {
 	bz := make([]byte, 10)
 
 	binary.BigEndian.PutUint64(bz, requestContextBatchCounter)
