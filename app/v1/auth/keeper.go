@@ -30,7 +30,7 @@ var (
 )
 
 var (
-	// globle total supply key handler implement
+	// globle total supply key handler
 	totalSupplyKeyHandler TotalSupplyKeyHandler
 )
 
