@@ -2,6 +2,7 @@ package keeper
 
 import (
 	abci "github.com/tendermint/tendermint/abci/types"
+	cmn "github.com/tendermint/tendermint/libs/common"
 
 	"github.com/irisnet/irishub/app/v3/service/internal/types"
 	"github.com/irisnet/irishub/codec"
@@ -161,7 +162,7 @@ func queryRequests(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sd
 	requests := make([]types.Request, 0)
 
 	for ; iterator.Valid(); iterator.Next() {
-		var requestID []byte
+		var requestID cmn.HexBytes
 		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &requestID)
 
 		request, _ := k.GetRequest(ctx, requestID)

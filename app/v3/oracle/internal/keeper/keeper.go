@@ -3,6 +3,8 @@ package keeper
 import (
 	"strings"
 
+	cmn "github.com/tendermint/tendermint/libs/common"
+
 	"github.com/irisnet/irishub/app/v3/oracle/internal/types"
 	service "github.com/irisnet/irishub/app/v3/service/exported"
 	"github.com/irisnet/irishub/codec"
@@ -172,7 +174,7 @@ func (k Keeper) EditFeed(ctx sdk.Context, msg types.MsgEditFeed) sdk.Error {
 
 //HandlerResponse is responsible for processing the data returned from the service module,
 //processed by the aggregate function, and then saved
-func (k Keeper) HandlerResponse(ctx sdk.Context, requestContextID []byte, responseOutput []string) {
+func (k Keeper) HandlerResponse(ctx sdk.Context, requestContextID cmn.HexBytes, responseOutput []string) {
 	if len(responseOutput) == 0 {
 		return
 	}
@@ -204,6 +206,6 @@ func (k Keeper) HandlerResponse(ctx sdk.Context, requestContextID []byte, respon
 	k.SetFeedValue(ctx, feed.FeedName, reqCtx.BatchCounter, feed.LatestHistory, value)
 }
 
-func (k Keeper) GetRequestContext(ctx sdk.Context, requestContextID []byte) (service.RequestContext, bool) {
+func (k Keeper) GetRequestContext(ctx sdk.Context, requestContextID cmn.HexBytes) (service.RequestContext, bool) {
 	return k.sk.GetRequestContext(ctx, requestContextID)
 }

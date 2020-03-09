@@ -1,8 +1,9 @@
 package types
 
 import (
-	"encoding/hex"
 	"fmt"
+
+	cmn "github.com/tendermint/tendermint/libs/common"
 
 	sdk "github.com/irisnet/irishub/types"
 )
@@ -121,7 +122,7 @@ func ErrInvalidResponse(codespace sdk.CodespaceType, msg string) sdk.Error {
 }
 
 func ErrInvalidRequestID(codespace sdk.CodespaceType, msg string) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidResponse, fmt.Sprintf("invalid request ID: %s", msg))
+	return sdk.NewError(codespace, CodeInvalidRequestID, fmt.Sprintf("invalid request ID: %s", msg))
 }
 
 func ErrInvalidProviders(codespace sdk.CodespaceType, msg string) sdk.Error {
@@ -144,16 +145,16 @@ func ErrInvalidThreshold(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidThreshold, msg)
 }
 
-func ErrUnknownRequest(codespace sdk.CodespaceType, requestID []byte) sdk.Error {
-	return sdk.NewError(codespace, CodeUnknownRequest, fmt.Sprintf("unknown request: %s", RequestIDToString(requestID)))
+func ErrUnknownRequest(codespace sdk.CodespaceType, requestID cmn.HexBytes) sdk.Error {
+	return sdk.NewError(codespace, CodeUnknownRequest, fmt.Sprintf("unknown request: %s", requestID.String()))
 }
 
-func ErrUnknownResponse(codespace sdk.CodespaceType, requestID []byte) sdk.Error {
-	return sdk.NewError(codespace, CodeUnknownResponse, fmt.Sprintf("unknown response: %s", RequestIDToString(requestID)))
+func ErrUnknownResponse(codespace sdk.CodespaceType, requestID cmn.HexBytes) sdk.Error {
+	return sdk.NewError(codespace, CodeUnknownResponse, fmt.Sprintf("unknown response: %s", requestID.String()))
 }
 
-func ErrUnknownRequestContext(codespace sdk.CodespaceType, requestContextID []byte) sdk.Error {
-	return sdk.NewError(codespace, CodeUnknownRequestContext, fmt.Sprintf("unknown request context: %s", hex.EncodeToString(requestContextID)))
+func ErrUnknownRequestContext(codespace sdk.CodespaceType, requestContextID cmn.HexBytes) sdk.Error {
+	return sdk.NewError(codespace, CodeUnknownRequestContext, fmt.Sprintf("unknown request context: %s", requestContextID.String()))
 }
 
 func ErrInvalidRequestContextID(codespace sdk.CodespaceType, msg string) sdk.Error {
