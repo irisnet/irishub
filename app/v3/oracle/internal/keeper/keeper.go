@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"encoding/hex"
 	"strings"
 
 	cmn "github.com/tendermint/tendermint/libs/common"
@@ -174,8 +175,13 @@ func (k Keeper) EditFeed(ctx sdk.Context, msg types.MsgEditFeed) sdk.Error {
 
 //HandlerResponse is responsible for processing the data returned from the service module,
 //processed by the aggregate function, and then saved
-func (k Keeper) HandlerResponse(ctx sdk.Context, requestContextID cmn.HexBytes, responseOutput []string) {
-	if len(responseOutput) == 0 {
+func (k Keeper) HandlerResponse(ctx sdk.Context, requestContextID []byte, responseOutput []string, err error) {
+	if len(responseOutput) == 0 || err != nil {
+		ctx = ctx.WithLogger(ctx.Logger().With("handler", "HandlerResponse").With("module", "iris/oracle"))
+		ctx.Logger().Error("oracle feed failed",
+			"requestContextID", hex.EncodeToString(requestContextID),
+			"err", err.Error(),
+		)
 		return
 	}
 
