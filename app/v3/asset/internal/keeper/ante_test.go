@@ -7,7 +7,6 @@ import (
 
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/log"
-	dbm "github.com/tendermint/tm-db"
 
 	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/app/v1/bank"
@@ -15,28 +14,8 @@ import (
 	"github.com/irisnet/irishub/app/v3/asset/internal/types"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/guardian"
-	"github.com/irisnet/irishub/store"
 	sdk "github.com/irisnet/irishub/types"
 )
-
-func setupMultiStore() (sdk.MultiStore, *sdk.KVStoreKey, *sdk.KVStoreKey, *sdk.KVStoreKey, *sdk.KVStoreKey, *sdk.TransientStoreKey) {
-	db := dbm.NewMemDB()
-
-	accountKey := sdk.NewKVStoreKey("accountKey")
-	assetKey := sdk.NewKVStoreKey("assetKey")
-	guardianKey := sdk.NewKVStoreKey("guardianKey")
-	paramskey := sdk.NewKVStoreKey("params")
-	paramsTkey := sdk.NewTransientStoreKey("transient_params")
-
-	ms := store.NewCommitMultiStore(db)
-	ms.MountStoreWithDB(accountKey, sdk.StoreTypeIAVL, db)
-	ms.MountStoreWithDB(assetKey, sdk.StoreTypeIAVL, db)
-	ms.MountStoreWithDB(paramskey, sdk.StoreTypeIAVL, db)
-	ms.MountStoreWithDB(paramsTkey, sdk.StoreTypeIAVL, db)
-	ms.LoadLatestVersion()
-
-	return ms, accountKey, assetKey, guardianKey, paramskey, paramsTkey
-}
 
 // TestAssetAnteHandler tests the ante handler of asset
 func TestAssetAnteHandler(t *testing.T) {
