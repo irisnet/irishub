@@ -297,7 +297,7 @@ func ConvertDenomToTokenId(denom string) (tokenId string, err error) {
 	return tokenId, nil
 }
 
-// TotalSupplyKeyHandler implements auth.TotalSupplyKeyHandler
-func TotalSupplyKeyHandler(denom string) (string, error) {
+// TotalSupplyKeyGen implements auth.TotalSupplyKeyGen
+func TotalSupplyKeyGen(denom string) (string, error) {
 	return ConvertDenomToTokenKeyId(denom)
 }

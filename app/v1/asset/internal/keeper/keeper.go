@@ -30,7 +30,7 @@ func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, bk types.BankKeeper, codespac
 		paramSpace: paramSpace.WithTypeTable(types.ParamTypeTable()),
 	}
 
-	auth.RegisterTotalSupplyKeyHandler(types.TotalSupplyKeyHandler)
+	auth.RegisterTotalSupplyKeyGen(types.TotalSupplyKeyGen)
 
 	return keeper
 }

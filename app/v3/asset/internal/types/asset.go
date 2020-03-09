@@ -32,10 +32,6 @@ func NewFungibleToken(
 	mintable bool,
 	owner types.AccAddress,
 ) FungibleToken {
-	symbol = strings.ToLower(strings.TrimSpace(symbol))
-	name = strings.TrimSpace(name)
-	minUnit = strings.ToLower(strings.TrimSpace(minUnit))
-
 	return FungibleToken{
 		Symbol:        symbol,
 		Name:          name,
@@ -158,7 +154,7 @@ func CheckSymbol(symbol string) sdk.Error {
 	return nil
 }
 
-// TotalSupplyKeyHandler implements auth.TotalSupplyKeyHandler
-func TotalSupplyKeyHandler(denom string) (string, error) {
+// TotalSupplyKeyGen implements auth.TotalSupplyKeyGen
+func TotalSupplyKeyGen(denom string) (string, error) {
 	return strings.Split(denom, "-")[0], nil
 }

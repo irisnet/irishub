@@ -30,16 +30,16 @@ var (
 )
 
 var (
-	// globle total supply key handler
-	totalSupplyKeyHandler TotalSupplyKeyHandler
+	// globle total supply key generator
+	totalSupplyKeyGen TotalSupplyKeyGen
 )
 
-// TotalSupplyKeyHandler defines an interface for total supply key handler
-type TotalSupplyKeyHandler func(denom string) (string, error)
+// TotalSupplyKeyGen defines an interface for total supply key generator
+type TotalSupplyKeyGen func(denom string) (string, error)
 
-// RegisterTotalSupplyKeyHandler sets a total supply key handler
-func RegisterTotalSupplyKeyHandler(tsKeyHandler TotalSupplyKeyHandler) {
-	totalSupplyKeyHandler = tsKeyHandler
+// RegisterTotalSupplyKeyGen sets a total supply key generator
+func RegisterTotalSupplyKeyGen(keyGen TotalSupplyKeyGen) {
+	totalSupplyKeyGen = keyGen
 }
 
 // This AccountKeeper encodes/decodes accounts using the
@@ -276,7 +276,7 @@ func (am AccountKeeper) DecreaseTotalLoosenToken(ctx sdk.Context, coins sdk.Coin
 
 // Turn a token id to key used to get it from the account store
 func TotalSupplyStoreKey(denom string) []byte {
-	keyId, _ := totalSupplyKeyHandler(denom)
+	keyId, _ := totalSupplyKeyGen(denom)
 	return append(totalSupplyKeyPrefix, keyId...)
 }
 
