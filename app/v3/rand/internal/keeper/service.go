@@ -18,7 +18,7 @@ import (
 )
 
 // RequestService ...
-func (k Keeper) RequestService(ctx sdk.Context, reqID []byte, consumer sdk.AccAddress) ([]byte, sdk.Error) {
+func (k Keeper) RequestService(ctx sdk.Context, reqID []byte, consumer sdk.AccAddress, serviceFeeCap sdk.Coins) ([]byte, sdk.Error) {
 	iterator := k.sk.ServiceBindingsIterator(ctx, types.ServiceName)
 	defer iterator.Close()
 
@@ -36,11 +36,7 @@ func (k Keeper) RequestService(ctx sdk.Context, reqID []byte, consumer sdk.AccAd
 
 	rand.Seed(time.Now().UnixNano())
 	provider := []sdk.AccAddress{bindings[rand.Intn(len(bindings))].Provider}
-
 	timeout := k.sk.GetParamSet(ctx).MaxRequestTimeout
-
-	// TODO
-	coins := sdk.NewCoins(sdk.NewCoin(sdk.IrisAtto, sdk.NewInt(1000000000000000000)))
 
 	requestContextID, err := k.sk.CreateRequestContext(
 		ctx,
@@ -48,7 +44,7 @@ func (k Keeper) RequestService(ctx sdk.Context, reqID []byte, consumer sdk.AccAd
 		provider,
 		consumer,
 		"{}",
-		coins,
+		serviceFeeCap,
 		timeout,
 		false,
 		false,

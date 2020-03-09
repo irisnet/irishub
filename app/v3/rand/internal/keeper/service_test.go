@@ -29,6 +29,7 @@ func TestOracleRequestRandKeeper(t *testing.T) {
 	blockInterval := uint64(100)
 	destHeight := txHeight + int64(blockInterval)
 	consumer := sdk.AccAddress([]byte("consumer"))
+	serviceFeeCap := sdk.NewCoins(sdk.NewCoin(sdk.IrisAtto, sdk.NewInt(1000000000000000000)))
 
 	// build context
 	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewNopLogger())
@@ -45,11 +46,11 @@ func TestOracleRequestRandKeeper(t *testing.T) {
 	require.True(t, len(requests) == 0)
 
 	// request a rand
-	_, err := keeper.RequestRand(ctx, consumer, blockInterval, false)
+	_, err := keeper.RequestRand(ctx, consumer, blockInterval, false, serviceFeeCap)
 	require.Nil(t, err)
 
 	// get request id
-	reqID := types.GenerateRequestID(types.NewRequest(txHeight, consumer, sdk.SHA256(txBytes), nil, true))
+	reqID := types.GenerateRequestID(types.NewRequest(txHeight, consumer, sdk.SHA256(txBytes), nil, true, serviceFeeCap))
 
 	// get the pending request and assert the result is not nil
 	store := ctx.KVStore(randKey)

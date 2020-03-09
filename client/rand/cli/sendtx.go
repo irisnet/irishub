@@ -18,7 +18,7 @@ func GetCmdRequestRand(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "request-rand",
 		Short:   "Request a random number",
-		Example: "iriscli rand request-rand --block-interval=10 --oracle=true",
+		Example: "iriscli rand request-rand --block-interval=10 --oracle=true --service-fee-cap=1iris",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
@@ -32,10 +32,20 @@ func GetCmdRequestRand(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
+			oracle := viper.GetBool(FlagOracle)
+
+			var serviceFeeCap sdk.Coins
+			if oracle {
+				if serviceFeeCap, err = cliCtx.ParseCoins(viper.GetString(FlagServiceFeeCap)); err != nil {
+					return err
+				}
+			}
+
 			msg := rand.MsgRequestRand{
 				Consumer:      consumer,
 				BlockInterval: uint64(viper.GetInt64(FlagBlockInterval)),
-				Oracle:        viper.GetBool(FlagOracle),
+				Oracle:        oracle,
+				ServiceFeeCap: serviceFeeCap,
 			}
 
 			if err := msg.ValidateBasic(); err != nil {
@@ -47,6 +57,7 @@ func GetCmdRequestRand(cdc *codec.Codec) *cobra.Command {
 	}
 
 	cmd.Flags().AddFlagSet(FsRequestRand)
+	_ = cmd.MarkFlagRequired(FlagOracle)
 
 	return cmd
 }

@@ -51,8 +51,8 @@ func TestExportRandGenesis(t *testing.T) {
 	ctx = ctx.WithBlockHeight(txHeight).WithTxBytes(txBytes)
 
 	// request rands
-	_, _ = keeper.RequestRand(ctx, consumer1, blockInterval1, false)
-	_, _ = keeper.RequestRand(ctx, consumer2, blockInterval2, false)
+	_, _ = keeper.RequestRand(ctx, consumer1, blockInterval1, false, sdk.NewCoins())
+	_, _ = keeper.RequestRand(ctx, consumer2, blockInterval2, false, sdk.NewCoins())
 
 	// get the pending requests from queue
 	storedRequests := make(map[int64][]Request)

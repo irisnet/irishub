@@ -31,7 +31,7 @@ func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, k Keeper) (tags s
 			// get the request id
 			reqID := GenerateRequestID(request)
 
-			if requestContextID, err := k.RequestService(ctx, reqID, request.Consumer); err == nil {
+			if requestContextID, err := k.RequestService(ctx, reqID, request.Consumer, request.ServiceFeeCap); err == nil {
 				request.ReqCtxID = requestContextID
 				k.EnqueueOracleTimeoutRandRequest(
 					ctx,

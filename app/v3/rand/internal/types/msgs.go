@@ -1,6 +1,8 @@
 package types
 
 import (
+	"fmt"
+
 	sdk "github.com/irisnet/irishub/types"
 )
 
@@ -18,9 +20,10 @@ var _ sdk.Msg = &MsgRequestRand{}
 
 // MsgRequestRand represents a msg for requesting a random number
 type MsgRequestRand struct {
-	Consumer      sdk.AccAddress `json:"consumer"`       // request address
-	BlockInterval uint64         `json:"block_interval"` // block interval after which the requested random number will be generated
-	Oracle        bool           `json:"oracle"`         // oracle method
+	Consumer      sdk.AccAddress `json:"consumer"`        // request address
+	BlockInterval uint64         `json:"block_interval"`  // block interval after which the requested random number will be generated
+	Oracle        bool           `json:"oracle"`          // oracle method
+	ServiceFeeCap sdk.Coins      `json:"service_fee_cap"` // service fee cap
 }
 
 // NewMsgRequestRand constructs a MsgRequestRand
@@ -28,11 +31,13 @@ func NewMsgRequestRand(
 	consumer sdk.AccAddress,
 	blockInterval uint64,
 	oracle bool,
+	serviceFeeCap sdk.Coins,
 ) MsgRequestRand {
 	return MsgRequestRand{
 		Consumer:      consumer,
 		BlockInterval: blockInterval,
 		Oracle:        oracle,
+		ServiceFeeCap: serviceFeeCap,
 	}
 }
 
@@ -47,7 +52,9 @@ func (msg MsgRequestRand) ValidateBasic() sdk.Error {
 	if len(msg.Consumer) == 0 {
 		return ErrInvalidConsumer(DefaultCodespace, "the consumer address must be specified")
 	}
-
+	if msg.Oracle && !validServiceCoins(msg.ServiceFeeCap) {
+		return ErrInvalidServiceFee(DefaultCodespace, fmt.Sprintf("invalid service fee: %s", msg.ServiceFeeCap))
+	}
 	return nil
 }
 
@@ -64,4 +71,8 @@ func (msg MsgRequestRand) GetSignBytes() []byte {
 // Implements Msg.
 func (msg MsgRequestRand) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Consumer}
+}
+
+func validServiceCoins(coins sdk.Coins) bool {
+	return coins.IsValidIrisAtto()
 }

@@ -18,10 +18,11 @@ func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec
 }
 
 type requestRandReq struct {
-	BaseTx        utils.BaseTx   `json:"base_tx"`        // base tx
-	Consumer      sdk.AccAddress `json:"consumer"`       // request address
-	BlockInterval uint64         `json:"block_interval"` // block interval
-	Oracle        bool           `json:"oracle"`         // oracle method
+	BaseTx        utils.BaseTx   `json:"base_tx"`         // base tx
+	Consumer      sdk.AccAddress `json:"consumer"`        // request address
+	BlockInterval uint64         `json:"block_interval"`  // block interval
+	Oracle        bool           `json:"oracle"`          // oracle method
+	ServiceFeeCap sdk.Coins      `json:"service_fee_cap"` // service fee cap
 }
 
 func requestRandHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
@@ -37,7 +38,7 @@ func requestRandHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Hand
 		}
 
 		// create the MsgRequestRand message
-		msg := rand.NewMsgRequestRand(req.Consumer, req.BlockInterval, req.Oracle)
+		msg := rand.NewMsgRequestRand(req.Consumer, req.BlockInterval, req.Oracle, req.ServiceFeeCap)
 		if err := msg.ValidateBasic(); err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return

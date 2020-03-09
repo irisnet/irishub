@@ -50,6 +50,7 @@ func (k Keeper) RequestRand(
 	consumer sdk.AccAddress,
 	blockInterval uint64,
 	oracle bool,
+	serviceFeeCap sdk.Coins,
 ) (sdk.Tags, sdk.Error) {
 	currentHeight := ctx.BlockHeight()
 	destHeight := currentHeight + int64(blockInterval)
@@ -58,7 +59,7 @@ func (k Keeper) RequestRand(
 	txHash := sdk.SHA256(ctx.TxBytes())
 
 	// build request
-	request := types.NewRequest(currentHeight, consumer, txHash, nil, oracle)
+	request := types.NewRequest(currentHeight, consumer, txHash, nil, oracle, serviceFeeCap)
 
 	// generate the request id
 	reqID := types.GenerateRequestID(request)
