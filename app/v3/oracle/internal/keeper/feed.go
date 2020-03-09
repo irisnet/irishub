@@ -4,6 +4,7 @@ import (
 	"github.com/irisnet/irishub/app/v3/oracle/internal/types"
 	service "github.com/irisnet/irishub/app/v3/service/exported"
 	sdk "github.com/irisnet/irishub/types"
+	cmn "github.com/tendermint/tendermint/libs/common"
 )
 
 //GetFeed return the feed by feedName
@@ -18,7 +19,7 @@ func (k Keeper) GetFeed(ctx sdk.Context, feedName string) (feed types.Feed, foun
 }
 
 //GetFeedByReqCtxID return feed by requestContextID
-func (k Keeper) GetFeedByReqCtxID(ctx sdk.Context, requestContextID []byte) (feed types.Feed, found bool) {
+func (k Keeper) GetFeedByReqCtxID(ctx sdk.Context, requestContextID cmn.HexBytes) (feed types.Feed, found bool) {
 	store := ctx.KVStore(k.storeKey)
 	bz := store.Get(GetReqCtxIDKey(requestContextID))
 	var feedName string

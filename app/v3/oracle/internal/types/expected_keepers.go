@@ -4,6 +4,7 @@ import (
 	service "github.com/irisnet/irishub/app/v3/service/exported"
 	"github.com/irisnet/irishub/modules/guardian"
 	sdk "github.com/irisnet/irishub/types"
+	cmn "github.com/tendermint/tendermint/libs/common"
 )
 
 //expected Service keeper
@@ -12,7 +13,7 @@ type ServiceKeeper interface {
 		respCallback service.ResponseCallback) sdk.Error
 
 	GetRequestContext(ctx sdk.Context,
-		requestContextID []byte) (service.RequestContext, bool)
+		requestContextID cmn.HexBytes) (service.RequestContext, bool)
 
 	CreateRequestContext(ctx sdk.Context,
 		serviceName string,
@@ -27,10 +28,10 @@ type ServiceKeeper interface {
 		repeatedTotal int64,
 		state service.RequestContextState,
 		respThreshold uint16,
-		respHandler string) ([]byte, sdk.Error)
+		respHandler string) (cmn.HexBytes, sdk.Error)
 
 	UpdateRequestContext(ctx sdk.Context,
-		requestContextID []byte,
+		requestContextID cmn.HexBytes,
 		providers []sdk.AccAddress,
 		serviceFeeCap sdk.Coins,
 		timeout int64,
@@ -39,11 +40,11 @@ type ServiceKeeper interface {
 		consumer sdk.AccAddress) sdk.Error
 
 	StartRequestContext(ctx sdk.Context,
-		requestContextID []byte,
+		requestContextID cmn.HexBytes,
 		consumer sdk.AccAddress) sdk.Error
 
 	PauseRequestContext(ctx sdk.Context,
-		requestContextID []byte,
+		requestContextID cmn.HexBytes,
 		consumer sdk.AccAddress) sdk.Error
 }
 
