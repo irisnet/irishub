@@ -70,10 +70,7 @@ func EndBlocker(ctx sdk.Context, k Keeper) (tags sdk.Tags) {
 
 			// callback
 			if len(reqContext.ModuleName) != 0 {
-				if reqContext.BatchResponseCount >= reqContext.ResponseThreshold {
-					respCallback, _ := k.GetResponseCallback(reqContext.ModuleName)
-					respCallback(ctx, reqContextID, k.GetResponsesOutput(ctx, reqContextID, reqContext.BatchCounter))
-				}
+				k.Callback(ctx, reqContextID)
 			}
 
 			reqContext.BatchState = BATCHCOMPLETED
