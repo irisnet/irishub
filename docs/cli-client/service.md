@@ -158,12 +158,12 @@ iriscli service update-binding <flags>
 | Name, shorthand | Default | Description                                                               | Required |
 | --------------- | ------- | ------------------------------------------------------------------------- | -------- |
 | --service-name  |         | Service name                                                              | Yes      |
-| --deposit       |         | Added deposit for the binding             |          |
+| --deposit       |         | Deposit added for the binding             |          |
 | --pricing        |         | Pricing context or path, which is an instance of the Irishub Service Pricing schema        |
 
 ### Update an existing service binding
 
-The following example updates the service binding with the additional 10iris deposit
+The following example updates the service binding with the additional 10 IRIS deposit
 
 ```bash
 iriscli service update-binding --chain-id=<chain-id> --from=<key-name> --fee=0.3iris 
@@ -224,11 +224,11 @@ iriscli service enable <service name> <flags>
 
 | Name, shorthand  | Default | Description                                                 | Required |
 | ---------------- | ------- | ----------------------------------------------------------- | -------- |
-| --deposit |         | Added deposit for enabling the binding |          |
+| --deposit |         | deposit added for enabling the binding |          |
 
 ### Enable an unavailable service binding
 
-The following example enables a service binding with the additional 10iris deposit.
+The following example enables an unavailable service binding with the additional 10 IRIS deposit.
 
 ```bash
 iriscli service enable <service name> --chain-id=<chain-id>  --from=<key-name> --fee=0.3iris --deposit=10iris
@@ -266,7 +266,7 @@ iriscli service call <flags>
 | --providers     |         | Provider list to request                             | Yes      |
 | --service-fee-cap |         | Maximum service fee to pay for a single request        | Yes      |
 | --data      |         | Input of the service request, which is an Input JSON schema instance | Yes      |
-| --timeout | | Request timeout, 0 means default timeout | |
+| --timeout | | Request timeout | |
 | --super-mode| false | Indicate if the signer is a super user
 | --repeated   |    false     | Indicate if the reqeust is repetitive                |          |
 | --frequency   |         | Request frequency when repeated, default to `timeout`              |          |

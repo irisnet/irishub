@@ -168,7 +168,7 @@ iriscli service update-binding <flags>
 
 ### 更新一个存在的服务绑定
 
-更新服务绑定，追加10iris的抵押。
+更新服务绑定，追加 10 IRIS 的抵押。
 
 ```bash
 iriscli service update-binding --chain-id=<chain-id> --from=<key-name> --fee=0.3iris 
@@ -229,11 +229,11 @@ iriscli service enable <service name> <flags>
 
 | 名称，速记       | 默认 | 描述                               | 必须 |
 | ---------------- | ---- | ---------------------------------- | ---- |
-| --deposit |      | 增加的押金 |      |
+| --deposit |      | 启用绑定增加的押金 |      |
 
 ### 启用一个不可用的服务绑定
 
-启用一个不可用的服务绑定，并且追加10iris的抵押。
+启用一个不可用的服务绑定，追加 10 IRIS 的抵押。
 
 ```bash
 iriscli service enable <service name> --chain-id=<chain-id>  --from=<key-name> --fee=0.3iris --deposit=10iris
@@ -241,7 +241,7 @@ iriscli service enable <service name> --chain-id=<chain-id>  --from=<key-name> -
 
 ## iriscli service refund-deposit
 
-取回所有押金。
+从一个服务绑定中退还所有的押金。
 
 ```bash
 iriscli service refund-deposit <service name>
@@ -271,7 +271,7 @@ iriscli service call <flags>
 | --providers     |         | 服务提供者列表                             | 是      |
 | --service-fee-cap |         | 愿意为单个请求支付的最大服务费用        | 是     |
 | --data      |         | 请求的输入，是一个Input JSON schema实例 | 是      |
-| --timeout | | 请求超时, 0意味着取系统默认超时 | |
+| --timeout | | 请求超时 | |
 | --super-mode| false | 签名者是否为超级用户 |
 | --repeated   |    false     | 请求是否为重复性的                |          |
 | --frequency   |         | 重复性请求的请求频率；默认为`timeout`值              |          |
@@ -296,7 +296,7 @@ iriscli service call --chain-id=<chain-id> --from=<key name> --fee=0.3iris --ser
 
 ## iriscli service request
 
-查询服务请求。
+通过请求ID查询服务请求。
 
 ```bash
 iriscli service request <request-id>
@@ -314,7 +314,7 @@ iriscli service request <request-id>
 
 ## iriscli service requests
 
-查询服务请求列表。
+通过服务绑定或请请求上下文ID查询服务请求列表。
 
 ```bash
 iriscli service requests [<service name> <provider>] | [<request-context-id> <batch-counter>]
@@ -326,7 +326,7 @@ iriscli service requests [<service name> <provider>] | [<request-context-id> <ba
 iriscli service requests <service name> <provider>
 ```
 
-### 根据请求上下文ID和批次计数器查询请求
+### 通过请求上下文ID和批次计数器查询服务请求列表
 
 ```bash
 iriscli service requests <request-context-id> <batch-counter>
@@ -369,7 +369,7 @@ iriscli service respond --chain-id=<chain-id> --from=<key-name> --fee=0.3iris
 
 ## iriscli service response
 
-查询服务响应。
+通过请求ID查询服务响应。
 
 ```bash
 iriscli service response <request-id>
@@ -387,13 +387,13 @@ iriscli service response <request-id>
 
 ## iriscli service responses
 
-根据指定的请求上下文ID以及批次计数器查询响应。
+通过请求上下文ID以及批次计数器查询服务响应列表。
 
 ```bash
 iriscli service responses <request-context-id> <batch-counter>
 ```
 
-### 根据指定的请求上下文ID以及批次计数器查询响应
+### 根据指定的请求上下文ID以及批次计数器查询服务响应
 
 ```bash
 iriscli service responses <request-context-id> <batch-counter>
