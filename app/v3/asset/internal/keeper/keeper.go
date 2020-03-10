@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/tendermint/tendermint/libs/log"
 
@@ -47,8 +48,12 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 
 // IssueToken issues a new token
 func (k Keeper) IssueToken(ctx sdk.Context, msg types.MsgIssueToken) (sdk.Tags, sdk.Error) {
+	symbol := strings.ToLower(msg.Symbol)
+	name := strings.TrimSpace(msg.Name)
+	minUnitAlias := strings.ToLower(strings.TrimSpace(msg.MinUnitAlias))
+
 	scale := int(msg.Decimal)
-	token := types.NewFungibleToken(msg.Symbol, msg.Name, msg.MinUnitAlias, msg.Decimal,
+	token := types.NewFungibleToken(symbol, name, minUnitAlias, msg.Decimal,
 		sdk.NewIntWithDecimal(int64(msg.InitialSupply), scale),
 		sdk.NewIntWithDecimal(int64(msg.MaxSupply), scale), msg.Mintable, msg.Owner)
 
