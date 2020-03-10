@@ -24,6 +24,7 @@ import (
 	"github.com/irisnet/irishub/app/v3/asset"
 	"github.com/irisnet/irishub/app/v3/gov"
 	"github.com/irisnet/irishub/app/v3/oracle"
+	"github.com/irisnet/irishub/app/v3/rand"
 	"github.com/irisnet/irishub/app/v3/service"
 	"github.com/irisnet/irishub/client/context"
 	htlctypes "github.com/irisnet/irishub/client/htlc/types"
@@ -442,6 +443,15 @@ func executeGetHtlc(t *testing.T, cmdStr string) htlctypes.OutputHTLC {
 	err := cdc.UnmarshalJSON([]byte(out), &h)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
 	return h
+}
+
+func executeGetRandRequests(t *testing.T, cmdStr string) rand.Requests {
+	out, _ := tests.ExecuteT(t, cmdStr, "")
+	var rs rand.Requests
+	cdc := app.MakeLatestCodec()
+	err := cdc.UnmarshalJSON([]byte(out), &rs)
+	require.NoError(t, err, "out %v\n, err %v", out, err)
+	return rs
 }
 
 func executeGetRand(t *testing.T, cmdStr string) randtypes.ReadableRand {
