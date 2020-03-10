@@ -2,6 +2,7 @@ package bank
 
 import (
 	"fmt"
+
 	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
@@ -60,9 +61,9 @@ func queryAccount(ctx sdk.Context, req abci.RequestQuery, keeper Keeper, cdc *co
 	return bz, nil
 }
 
-// defines the params for query: "custom/bank/token-stats"
+// defines the params for query: "custom/acc/token-stats"
 type QueryTokenStatsParams struct {
-	TokenId string
+	Symbol string
 }
 
 func queryTokenStats(ctx sdk.Context, req abci.RequestQuery, keeper Keeper, cdc *codec.Codec) ([]byte, sdk.Error) {
@@ -78,9 +79,10 @@ func queryTokenStats(ctx sdk.Context, req abci.RequestQuery, keeper Keeper, cdc 
 	totalSupplies := sdk.Coins{}
 	// TODO: bonded tokens for iris
 
-	if params.TokenId == "" { // query all
+	if params.Symbol == "" { // query all
 		looseTokens = bk.GetLoosenCoins(ctx)
 		burnedTokens = bk.GetCoins(ctx, auth.BurnedCoinsAccAddr)
+
 		iter := bk.am.GetTotalSupplies(ctx)
 		defer iter.Close()
 		for ; iter.Valid(); iter.Next() {
@@ -89,23 +91,24 @@ func queryTokenStats(ctx sdk.Context, req abci.RequestQuery, keeper Keeper, cdc 
 			totalSupplies = append(totalSupplies, ts)
 		}
 
-	} else if params.TokenId == sdk.Iris { // query iris
+	} else if params.Symbol == sdk.Iris { // query iris
 		looseTokens = bk.GetLoosenCoins(ctx)
 		burnedTokens = sdk.Coins{sdk.NewCoin(sdk.IrisAtto, bk.GetCoins(ctx, auth.BurnedCoinsAccAddr).AmountOf(sdk.IrisAtto))}
-	} else { // query !iris
-		if !sdk.IsCoinNameValid(params.TokenId) {
-			return nil, sdk.ErrUnknownRequest("unknown token id")
+	} else { // query non-iris
+		if !sdk.IsCoinNameValid(params.Symbol) {
+			return nil, sdk.ErrUnknownRequest("invalid symbol")
 		}
 
-		denom, err := sdk.GetCoinMinDenom(params.TokenId)
+		denom, err := sdk.GetCoinMinDenom(params.Symbol)
 		if err != nil {
 			return nil, sdk.ParseParamsErr(err)
 		}
+
 		burnedTokens = sdk.Coins{sdk.NewCoin(denom, bk.GetCoins(ctx, auth.BurnedCoinsAccAddr).AmountOf(denom))}
 
 		ts, found := bk.GetTotalSupply(ctx, denom)
 		if !found {
-			return nil, sdk.ErrUnknownRequest("unknown token id")
+			return nil, sdk.ErrUnknownRequest("unknown symbol")
 		}
 
 		totalSupplies = append(totalSupplies, ts)
@@ -116,6 +119,7 @@ func queryTokenStats(ctx sdk.Context, req abci.RequestQuery, keeper Keeper, cdc 
 		BurnedTokens: burnedTokens,
 		TotalSupply:  totalSupplies,
 	}
+
 	bz, err := codec.MarshalJSONIndent(cdc, tokenStats)
 	if err != nil {
 		return nil, sdk.MarshalResultErr(err)
