@@ -239,7 +239,7 @@ func (k Keeper) AddToken(ctx sdk.Context, token types.FungibleToken) sdk.Error {
 		return types.ErrAssetAlreadyExists(k.codespace, fmt.Sprintf("token already exists: %s", token.GetSymbol()))
 	}
 
-	//
+	// set token
 	if err := k.setToken(ctx, token); err != nil {
 		return err
 	}
@@ -248,11 +248,6 @@ func (k Keeper) AddToken(ctx sdk.Context, token types.FungibleToken) sdk.Error {
 	if err := k.setTokens(ctx, token.GetOwner(), token); err != nil {
 		return err
 	}
-
-	// // Set token to be prefixed with source
-	// if err := k.setTokens(ctx, sdk.AccAddress{}, token); err != nil {
-	// 	return err
-	// }
 
 	return nil
 }
