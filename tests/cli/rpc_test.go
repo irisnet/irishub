@@ -5,9 +5,10 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"fmt"
-	rpcclient "github.com/tendermint/tendermint/rpc/client"
 	"strings"
 	"testing"
+
+	rpcclient "github.com/tendermint/tendermint/rpc/client"
 )
 
 func TestTxSearch(t *testing.T) {
