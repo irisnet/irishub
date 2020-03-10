@@ -21,7 +21,7 @@ func setupMultiStore() (sdk.MultiStore, *sdk.KVStoreKey, *sdk.KVStoreKey, *sdk.K
 	ms.MountStoreWithDB(assetKey, sdk.StoreTypeIAVL, db)
 	ms.MountStoreWithDB(paramskey, sdk.StoreTypeIAVL, db)
 	ms.MountStoreWithDB(paramsTkey, sdk.StoreTypeIAVL, db)
-	ms.LoadLatestVersion()
+	_ = ms.LoadLatestVersion()
 
 	return ms, accountKey, assetKey, guardianKey, paramskey, paramsTkey
 }
