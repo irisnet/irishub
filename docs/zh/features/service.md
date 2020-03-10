@@ -40,7 +40,7 @@ iriscli service definition --def-chain-id=<def-chain-id> --service-name=<service
 
 ### 服务绑定
 
-在服务绑定中, 需要抵押一定数量的押金, 最小的抵押金额为该服务的服务费价格的`MinDepositMultiple`倍数。服务提供方可以随时更新他的服务绑定并调整服务价格，禁用、启用该服务绑定。如果想取回押金，需要禁用服务绑定并等待`ComplaintRetrospectParameter`+`ArbitrationTimelimitParameter`的周期。
+在服务绑定中，需要抵押一定数量的押金，最小的抵押金额为该服务的服务费价格的`MinDepositMultiple`倍数。服务提供方可以随时更新他的服务绑定并调整服务价格，禁用、启用该服务绑定。如果想取回押金，需要禁用服务绑定并等待`ComplaintRetrospectParameter`+`ArbitrationTimelimitParameter`的周期。
 
 ```bash
 # 服务绑定（抵押1000iris， 价格1iris， 平均响应时间10000毫秒， 服务可用性9999（10000次调用可用次数的整数表示））
@@ -58,7 +58,7 @@ iriscli service update-binding --chain-id=<chain-id> --from=<key-name> --fee=0.3
 # 禁用服务绑定
 iriscli service disable --chain-id=<chain-id>  --from=<key-name> --fee=0.3iris --def-chain-id=<def-chain-id> --service-name=<service-name>
 
-# 开启服务绑定, 并追加抵押100iris
+# 开启服务绑定，并追加抵押100iris
 iriscli service enable --chain-id=<chain-id>  --from=<key-name> --fee=0.3iris --def-chain-id=<def-chain-id> --service-name=<service-name> --deposit=100iris
 
 # 取回押金
@@ -105,8 +105,8 @@ iriscli service withdraw-fees --chain-id=<chain-id> --from=<key-name> --fee=0.3i
 ### 目前支持的属性
 
 * `description` 对该方法的描述
-* `output-privacy` 是否对该方法的输出进行加密处理，{`NoPrivacy`,`PubKeyEncryption`}
-* `output-cached` 是否对该方法的输出进行缓存，{`OffChainCached`,`NoCached`}
+* `output-privacy` 是否对该方法的输出进行加密处理，{`NoPrivacy`，`PubKeyEncryption`}
+* `output-cached` 是否对该方法的输出进行缓存，{`OffChainCached`，`NoCached`}
 
 ### IDL content参照
 

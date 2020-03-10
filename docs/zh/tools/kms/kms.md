@@ -9,7 +9,7 @@
 可以在[这里](https://github.com/tendermint/kms#installation)找到详细的构建说明。
 
 ::: tip
-在编译KMS的时候, 确保您已启用适用的功能：
+在编译KMS的时候，确保您已启用适用的功能：
 :::
 
 | Backend               | Recommended Command line              |

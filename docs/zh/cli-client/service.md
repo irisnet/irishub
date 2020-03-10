@@ -345,8 +345,8 @@ iriscli service respond <flags>
 | 名称，速记         | 默认 | 描述                      | 必须 |
 | ------------------ | ---- | ------------------------- | ---- |
 | --request-id       |      | 欲响应请求的ID            | 是   |
-| --data    |      | 服务响应的输出, 是一个Output JSON schema实例 | |
-| --error | | 服务响应的错误消息, 是一个Error JSON schema实例  | |
+| --data    |      | 服务响应的输出，是一个Output JSON schema实例 | |
+| --error | | 服务响应的错误消息，是一个Error JSON schema实例  | |
 
 ### 响应一个服务请求
 
@@ -430,10 +430,10 @@ iriscli service update <request-context-id> <flags>
 | 名称，速记         | 默认 | 描述                      | 必须 |
 | --------------- | ------- | -------------------------------------------------- | -------- |
 | --providers     |         | 服务提供者列表，为空则不更新                            | Yes      |
-| --service-fee-cap |         | 愿意为单个请求支付的最大服务费用, 为空则不更新       |      |
-| --timeout | | 请求超时, 为0则不更新 | |
-| --frequency   |         | 请求频率, 为0则不更新           |          |
-| --total  |         | 请求总数, 为0则不更新    |          |
+| --service-fee-cap |         | 愿意为单个请求支付的最大服务费用，为空则不更新       |      |
+| --timeout | | 请求超时，为0则不更新 | |
+| --frequency   |         | 请求频率，为0则不更新           |          |
+| --total  |         | 请求总数，为0则不更新    |          |
 
 ### 更新一个请求上下文
 

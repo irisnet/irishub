@@ -45,19 +45,19 @@
 
 ### 抵押阶段
 
-提交提议者至少抵押30%的 `MinDeposit` ，然后其他用户可以继续对该提议进行抵押， 当抵押额超过 `MinDeposit`, 提议才能进入投票阶段。该提议时间超过 `MaxDepositPeriod` ，还未进入投票阶段（总抵押未超过 `MinDeposit`），则提议会被删除，并不会返还抵押金。
+提交提议者至少抵押30%的 `MinDeposit` ，然后其他用户可以继续对该提议进行抵押， 当抵押额超过 `MinDeposit`，提议才能进入投票阶段。该提议时间超过 `MaxDepositPeriod` ，还未进入投票阶段（总抵押未超过 `MinDeposit`），则提议会被删除，并不会返还抵押金。
 
 不能对进入投票阶段的提议再进行抵押。
 
 ### 投票阶段
 
-只有验证人和委托人可以投一次票，不可重复投票。投票选项有：`Yes`同意, `Abstain`弃权,`No`不同意,`NoWithVeto`强烈不同意。
+只有验证人和委托人可以投一次票，不可重复投票。投票选项有：`Yes`同意，`Abstain`弃权,`No`不同意,`NoWithVeto`强烈不同意。
 
 ### 统计阶段
 
 统计结果有三类：同意，不同意，强烈不同意。
 
-在所有投票者的`voting_power`占系统总的`voting_power`的比例超过participation的前提下,如果强烈反对的`voting_power`占所有投票者的`voting_power` 超过 veto, 结果是强烈不同意。如果没有超过且赞同的`voting_power`占所有投票者的`voting_power` 超过 threshold，提议结果是同意。其他情况皆为不同意。
+在所有投票者的`voting_power`占系统总的`voting_power`的比例超过participation的前提下,如果强烈反对的`voting_power`占所有投票者的`voting_power` 超过 veto，结果是强烈不同意。如果没有超过且赞同的`voting_power`占所有投票者的`voting_power` 超过 threshold，提议结果是同意。其他情况皆为不同意。
 
 ### 销毁机制
 
@@ -96,7 +96,7 @@ iriscli gov query-proposal --proposal-id=<proposal-id>
 
 ### 社区基金使用提议
 
-有三种使用方式: `Burn`，`Distribute`和`Grant`。`Burn`表示从社区基金中销毁代币，`Grant`将从社区基金中向目标地址授予一定数量的token，`Distribute`将从社区基金中向目标`trustee`地址划转一定数量的token，再由`trustee`账户分发给其他账户。
+有三种使用方式：`Burn`，`Distribute`和`Grant`。`Burn`表示从社区基金中销毁代币，`Grant`将从社区基金中向目标地址授予一定数量的token，`Distribute`将从社区基金中向目标`trustee`地址划转一定数量的token，再由`trustee`账户分发给其他账户。
 
 ```bash
 # 提交 Burn 提议

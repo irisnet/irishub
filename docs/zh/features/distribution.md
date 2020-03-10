@@ -53,13 +53,13 @@ iriscli distribution withdraw-address <address-of-wallet-A>
 iriscli distribution withdraw-rewards --from=<key-name> --fee=0.3iris --chain-id=<chain-id>
 ```
 
-2.`WithdrawDelegatorReward` : 从指定验证人处提取委托收益。
+2.`WithdrawDelegatorReward` ：从指定验证人处提取委托收益。
 
 ```bash
 iriscli distribution withdraw-rewards --only-from-validator=<validator-address>  --from=<key-name> --fee=0.3iris --chain-id=<chain-id>
 ```
 
-3.`WithdrawValidatorRewardsAll` : 仅验证人可用，同时提取自己节点的抵押收益和佣金收益。
+3.`WithdrawValidatorRewardsAll` ：仅验证人可用，同时提取自己节点的抵押收益和佣金收益。
 
 ```bash
 iriscli distribution withdraw-rewards --is-validator=true --from=<key-name> --fee=0.3iris --chain-id=<chain-id>

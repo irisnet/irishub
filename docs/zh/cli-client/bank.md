@@ -35,7 +35,7 @@ ERROR: {"codespace":"sdk","code":9,"message":"account iaa1kenrwk5k4ng70e5s9zfstt
 
 ## iriscli bank coin-type
 
-在IRIShub上查询一种特殊的通证。 IRIShub上的本机通证是“ iris”，它具有以下可用单位：`iris-milli`, `iris-micro`, `iris-nano`, `iris-pico`, `iris-femto` 和 `iris-atto`。
+在IRIShub上查询一种特殊的通证。 IRIShub上的本机通证是“ iris”，它具有以下可用单位：`iris-milli`，`iris-micro`，`iris-nano`，`iris-pico`，`iris-femto` 和 `iris-atto`。
 
 ```bash
  iriscli bank coin-type <coin_name> <flags>
@@ -43,7 +43,7 @@ ERROR: {"codespace":"sdk","code":9,"message":"account iaa1kenrwk5k4ng70e5s9zfstt
 
 **标识：**
 
-| 名称, 速记   | 类型   | 必须 | 默认                  | 描述                                  |
+| 名称，速记   | 类型   | 必须 | 默认                  | 描述                                  |
 | ------------ | ------ | -------- | --------------------- | ------------------------------------- |
 | -h, --help   |        |          |                       | `coin-type`子命令的提示信息           |
 | --chain-id   | string |          |                       | tendermint节点的Chain ID              |
@@ -80,7 +80,7 @@ CoinType:
 
 **标识：**
 
-| 名称, 速记   | 类型   | 必须 | 默认                  | 描述                                 |
+| 名称，速记   | 类型   | 必须 | 默认                  | 描述                                 |
 | ------------ | ------ | -------- | --------------------- | ------------------------------------ |
 | -h, --help   |        |          |                       | `token-stats`子命令的提示信息        |
 | --chain-id   | string |          |                       | tendermint节点的Chain ID             |
@@ -116,7 +116,7 @@ iriscli bank account <address> <flags>
 
 **标识：**
 
-| 名称, 速记   | 类型   | 必须 | 默认                  | 描述                                 |
+| 名称，速记   | 类型   | 必须 | 默认                  | 描述                                 |
 | ------------ | ------ | -------- | --------------------- | ------------------------------------ |
 | -h, --help   |        |          |                       | `account`子命令的提示信息            |
 | --chain-id   | string |          |                       | tendermint节点的Chain ID             |
@@ -145,7 +145,7 @@ Account:
 
 ## iriscli bank send
 
-发送令牌到另一个地址，此命令包括 `generate`, `sign` 和 `broadcast` 这些步骤。
+发送令牌到另一个地址，此命令包括 `generate`，`sign` 和 `broadcast` 这些步骤。
 
 ```bash
 iriscli bank send --from=<key-name> --to=<address> --amount=<amount> --fee=<native-fee> --chain-id=<chain-id>
@@ -153,7 +153,7 @@ iriscli bank send --from=<key-name> --to=<address> --amount=<amount> --fee=<nati
 
 **标识：**
 
-| 名称, 速记 | 类型   | 必须 | 默认 | 描述                           |
+| 名称，速记 | 类型   | 必须 | 默认 | 描述                           |
 | ---------- | ------ | -------- | ---- | ------------------------------ |
 | --amount   | string | Yes      |      | 要发送的通证数量，例如：10iris |
 | --to       | string |          |      | 接收通证的Bech32编码地址       |
@@ -174,7 +174,7 @@ iriscli bank burn --from=<key-name> --amount=<amount-to-burn> --fee=<native-fee>
 
 **标识：**
 
-| 名称, 速记 | 类型   | 必须 | 默认 | 描述                         |
+| 名称，速记 | 类型   | 必须 | 默认 | 描述                         |
 | ---------- | ------ | -------- | ---- | ---------------------------- |
 | --amount   | string | Yes      |      | 要销毁的通证数量，例如10iris |
 
@@ -194,7 +194,7 @@ iriscli bank set-memo-regexp --regexp=<regular-expression> --from=<key-name> --f
 
 **标识：**
 
-| 名称, 速记 | 类型   | 必须 | 默认 | 描述                                          |
+| 名称，速记 | 类型   | 必须 | 默认 | 描述                                          |
 | ---------- | ------ | -------- | ---- | --------------------------------------------- |
 | --regexp   | string | Yes      |      | 正则表达式，最大长度为50，例如^[A-ZA-Z0-9]+ $ |
 

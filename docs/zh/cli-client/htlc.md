@@ -28,7 +28,7 @@ iriscli htlc create --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --to=<
 
 **标识：**
 
-| 名称, 速记                | 类型     | 必须 | 默认 | 描述                                                               |
+| 名称，速记                | 类型     | 必须 | 默认 | 描述                                                               |
 | ------------------------- | -------- | ---- | ---- | ------------------------------------------------------------------ |
 | --to                      | string   | 是   |      | Bech32编码的收款人地址                                             |
 | --receiver-on-other-chain | bytesHex |      |      | 另一条链上的HTLC认领接收地址                                       |
@@ -64,7 +64,7 @@ iriscli htlc claim --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --hash-
 
 **标识：**
 
-| 名称, 速记  | 类型     | 必须 | 默认 | 描述                           |
+| 名称，速记  | 类型     | 必须 | 默认 | 描述                           |
 | ----------- | -------- | ---- | ---- | ------------------------------ |
 | --hash-lock | bytesHex | 是   |      | T要发送锁定资金HTLC的Hash Lock |
 | --secret    | bytesHex | 是   |      | 用于生成hash lock的secret      |
@@ -91,7 +91,7 @@ iriscli htlc refund --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --hash
 
 **标识：**
 
-| 名称, 速记  | 类型     | 必须 | 默认 | 描述                    |
+| 名称，速记  | 类型     | 必须 | 默认 | 描述                    |
 | ----------- | -------- | ---- | ---- | ----------------------- |
 | --hash-lock | bytesHex | 是   |      | 要退款的HTLC的Hash Lock |
 

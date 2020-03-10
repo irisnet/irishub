@@ -76,7 +76,7 @@ iriscli distribution withdraw-rewards <flags>
 
 **标识：**
 
-| 名称, 速记            | 类型   | 必须 | 默认 | 描述                                 |
+| 名称，速记            | 类型   | 必须 | 默认 | 描述                                 |
 | --------------------- | ------ | ---- | ---- | ------------------------------------ |
 | --only-from-validator | string |      |      | 仅从此验证者地址中提取（以bech格式） |
 | --is-validator        | bool   |      | 否   | 同时取回验证人的佣金                 |

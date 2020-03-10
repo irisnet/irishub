@@ -113,13 +113,13 @@
 
 7. 解绑
 
-    按share数量解绑， 解绑100shares:
+    按share数量解绑， 解绑100shares：
 
     ```bash
     iriscli stake unbond --address-validator=<address-validator> --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --shares-amount=100
     ```
 
-    按比例解绑，解绑50%的token:
+    按比例解绑，解绑50%的token：
 
     ```bash
     iriscli stake unbond --address-validator=<address-validator> --chain-id=<chain-id> --from=<key-name> --fee=0.3iris  --share-percent=0.5
