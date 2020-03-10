@@ -50,7 +50,7 @@ iriscli rand query-rand <flags>
 | --------------- | ------ | -------- | ------- | ----------------------------------------- |
 | --request-id    | string | Yes      |         | The request id returned by the request tx |
 
-## Query a random number
+### Query a random number
 
 Query the random number after it is generated.
 
@@ -72,7 +72,7 @@ iriscli rand query-queue <flags>
 | --------------- | ----- | -------- | ------- | ---------------------------------------------------------- |
 | --queue-height  | int64 |          | 0       | The block height at which random numbers will be generated |
 
-## Query random number request queue
+### Query random number request queue
 
 Query the pending random number requests with an optional block height at which random numbers will be generated.
 
