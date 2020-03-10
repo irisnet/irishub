@@ -5,9 +5,10 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/irisnet/irishub/tests"
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/stretchr/testify/require"
 )
 
 func TestIrisCLIToken(t *testing.T) {
@@ -64,7 +65,7 @@ func TestIrisCLIToken(t *testing.T) {
 		t.Error("Test Failed: (19, 20) expected, received:", amt)
 	}
 
-	query := fmt.Sprintf("--symbol=%s ", symbol)
+	query := fmt.Sprintf("--symbol=%s", symbol)
 	token := executeGetToken(t, fmt.Sprintf("iriscli asset token tokens %s %v", query, flags))
 	require.Equal(t, strings.ToLower(strings.TrimSpace(symbol)), token.Symbol)
 	require.Equal(t, strings.ToLower(strings.TrimSpace(minUnit)), token.MinUnit)
@@ -88,7 +89,7 @@ func TestIrisCLIToken(t *testing.T) {
 	require.True(t, executeWrite(t, editCmd, sdk.DefaultKeyPass))
 	tests.WaitForNextNBlocksTM(2, port)
 
-	query = fmt.Sprintf("--symbol=%s ", symbol)
+	query = fmt.Sprintf("--symbol=%s", symbol)
 	token = executeGetToken(t, fmt.Sprintf("iriscli asset token tokens %s %v", query, flags))
 
 	require.Equal(t, name, token.Name)
@@ -117,7 +118,7 @@ func TestIrisCLIToken(t *testing.T) {
 	require.True(t, executeWrite(t, transferCmd, sdk.DefaultKeyPass))
 	tests.WaitForNextNBlocksTM(2, port)
 
-	query = fmt.Sprintf("--owner=%s ", barAddr.String())
+	query = fmt.Sprintf("--owner=%s", barAddr.String())
 	token = executeGetToken(t, fmt.Sprintf("iriscli asset token tokens %s %v", query, flags))
 	require.Equal(t, barAddr.String(), token.Owner.String())
 }
