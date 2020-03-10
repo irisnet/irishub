@@ -206,32 +206,33 @@ func validateDocument(schema []byte, document string) error {
 	return nil
 }
 
-// PricingSchema is the Pricing JSON Schema
-const PricingSchema = `
+const (
+	// PricingSchema is the Pricing JSON Schema
+	PricingSchema = `
 {
 	"$schema": "http://json-schema.org/draft-04/schema#",
-	"title": "Irishub Service Pricing",
-	"description": "The Irishub Service Pricing specification",
+	"title": "irishub-service-pricing",
+	"description": "IRIS Hub Service Pricing Schema",
 	"type": "object",
 	"definitions": {
 	  "coin": {
-		"description": "price coin",
+		"description": "pricing coin",
 		"type": "object",
 		"properties": {
-		  "denom": {
-			"description": "the denomination of the coin",
+		  "symbol": {
+			"description": "symbol of pricing coin",
 			"type": "string",
-			"pattern": "^([a-z][0-9a-z]{2}[:])?(([a-z][a-z0-9]{2,7}|x)\\.)?([a-z][a-z0-9]{2,7})(-[a-z]{3,5})?$"
+			"pattern": "^[a-z][a-z0-9]{2,7}$"
 		  },
 		  "amount": {
-			"description": "the amount of the coin",
+			"description": "pricing amount, in main unit",
 			"type": "string",
 			"pattern": "^[0-9]+(\\.[0-9]+)?$"
 		  }
 		},
 		"additionalProperties": false,
 		"required": [
-		  "denom",
+		  "symbol",
 		  "amount"
 		]
 	  },
@@ -320,3 +321,30 @@ const PricingSchema = `
 	]
   }
 `
+
+	// ResultSchema is the JSON Schema for the response result
+	ResultSchema = `
+	{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "irishub-service-result",
+    "description": "IRIS Hub Service Result Schema",
+    "type": "object",
+    "properties": {
+        "code": {
+            "description": "result code",
+            "type": "integer",
+            "enum": [200, 400, 500]
+         },
+         "message": {
+             "description": "result message",
+             "type": "string"
+         } 
+		},
+		"additionalProperties": false,
+    "required": [
+        "code",
+        "message"
+     ]
+  }
+  `
+)
