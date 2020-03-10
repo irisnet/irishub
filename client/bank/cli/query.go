@@ -3,15 +3,15 @@ package cli
 import (
 	"fmt"
 
+	"github.com/spf13/cobra"
+
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/app/v1/auth"
-	bankv1 "github.com/irisnet/irishub/app/v1/bank"
+	"github.com/irisnet/irishub/app/v1/bank"
 	"github.com/irisnet/irishub/app/v1/stake"
-	"github.com/irisnet/irishub/app/v3/asset"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/spf13/cobra"
 )
 
 // GetAccountCmd returns a query account that will display the state of the
@@ -59,6 +59,7 @@ func GetCmdQueryCoinType(cdc *codec.Codec) *cobra.Command {
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
+
 			res, err := cliCtx.GetCoinType(args[0])
 			if err != nil {
 				return err
@@ -71,10 +72,10 @@ func GetCmdQueryCoinType(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-// GetCmdQueryTokenStats performs token statistic query
+// GetCmdQueryTokenStats performs token statistics query
 func GetCmdQueryTokenStats(cdc *codec.Codec, decoder auth.AccountDecoder) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "token-stats [id]",
+		Use:     "token-stats [symbol]",
 		Short:   "Query token statistics",
 		Example: "iriscli bank token-stats iris",
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -86,7 +87,7 @@ func GetCmdQueryTokenStats(cdc *codec.Codec, decoder auth.AccountDecoder) *cobra
 				symbol = args[0]
 			}
 
-			params := asset.QueryTokenParams{
+			params := bank.QueryTokenStatsParams{
 				Symbol: symbol,
 			}
 
@@ -95,12 +96,12 @@ func GetCmdQueryTokenStats(cdc *codec.Codec, decoder auth.AccountDecoder) *cobra
 				return err
 			}
 
-			res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.AccountRoute, bankv1.QueryTokenStats), bz)
+			res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.AccountRoute, bank.QueryTokenStats), bz)
 			if err != nil {
 				return err
 			}
 
-			var tokenStats bankv1.TokenStats
+			var tokenStats bank.TokenStats
 			err = cdc.UnmarshalJSON(res, &tokenStats)
 			if err != nil {
 				return err

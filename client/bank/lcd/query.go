@@ -11,7 +11,6 @@ import (
 	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/app/v1/bank"
 	"github.com/irisnet/irishub/app/v1/stake"
-	"github.com/irisnet/irishub/app/v3/asset"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/codec"
@@ -73,13 +72,13 @@ func QueryCoinTypeRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) 
 	}
 }
 
-// QueryTokenStatsRequestHandlerFn performs token statistic query
+// QueryTokenStatsRequestHandlerFn performs token statistics query
 func QueryTokenStatsRequestHandlerFn(cdc *codec.Codec, decoder auth.AccountDecoder, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		symbol := vars["symbol"]
 
-		params := asset.QueryTokenParams{
+		params := bank.QueryTokenStatsParams{
 			Symbol: symbol,
 		}
 
