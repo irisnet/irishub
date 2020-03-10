@@ -39,15 +39,14 @@ var _, _, _, _ sdk.Msg = &MsgIssueToken{}, &MsgEditToken{}, &MsgMintToken{}, &Ms
 
 // MsgIssueToken
 type MsgIssueToken struct {
-	Symbol          string         `json:"symbol"`
-	CanonicalSymbol string         `json:"canonical_symbol"`
-	Name            string         `json:"name"`
-	Decimal         uint8          `json:"decimal"`
-	MinUnitAlias    string         `json:"min_unit_alias"`
-	InitialSupply   uint64         `json:"initial_supply"`
-	MaxSupply       uint64         `json:"max_supply"`
-	Mintable        bool           `json:"mintable"`
-	Owner           sdk.AccAddress `json:"owner"`
+	Symbol        string         `json:"symbol"`
+	Name          string         `json:"name"`
+	Decimal       uint8          `json:"decimal"`
+	MinUnitAlias  string         `json:"min_unit_alias"`
+	InitialSupply uint64         `json:"initial_supply"`
+	MaxSupply     uint64         `json:"max_supply"`
+	Mintable      bool           `json:"mintable"`
+	Owner         sdk.AccAddress `json:"owner"`
 }
 
 // NewMsgIssueToken - construct asset issue msg.
@@ -68,9 +67,9 @@ func NewMsgIssueToken(symbol string, minUnit string, name string, scale uint8, i
 func (msg MsgIssueToken) Route() string { return MsgRoute }
 func (msg MsgIssueToken) Type() string  { return TypeMsgIssueToken }
 
-func ValidateMsgIssueToken(msg *MsgIssueToken) sdk.Error {
-	msg.Symbol = strings.ToLower(strings.TrimSpace(msg.Symbol))
+func ValidateMsgIssueToken(msg MsgIssueToken) sdk.Error {
 	msg.Name = strings.TrimSpace(msg.Name)
+	msg.MinUnitAlias = strings.TrimSpace(msg.MinUnitAlias)
 
 	if msg.MaxSupply == 0 {
 		if msg.Mintable {
@@ -115,7 +114,7 @@ func ValidateMsgIssueToken(msg *MsgIssueToken) sdk.Error {
 
 // Implements Msg.
 func (msg MsgIssueToken) ValidateBasic() sdk.Error {
-	return ValidateMsgIssueToken(&msg)
+	return ValidateMsgIssueToken(msg)
 }
 
 // Implements Msg.
@@ -197,13 +196,11 @@ func (msg MsgTransferTokenOwner) Type() string { return TypeMsgTransferTokenOwne
 
 // MsgEditToken for editing a specified token
 type MsgEditToken struct {
-	Symbol          string         `json:"symbol"`           //  symbol of token
-	Owner           sdk.AccAddress `json:"owner"`            //  owner of token
-	CanonicalSymbol string         `json:"canonical_symbol"` //  canonical_symbol of token
-	MinUnitAlias    string         `json:"min_unit_alias"`   //  min_unit_alias of token
-	MaxSupply       uint64         `json:"max_supply"`
-	Mintable        Bool           `json:"mintable"` //  mintable of token
-	Name            string         `json:"name"`
+	Symbol    string         `json:"symbol"` //  symbol of token
+	Owner     sdk.AccAddress `json:"owner"`  //  owner of token
+	MaxSupply uint64         `json:"max_supply"`
+	Mintable  Bool           `json:"mintable"` //  mintable of token
+	Name      string         `json:"name"`
 }
 
 // NewMsgEditToken creates a MsgEditToken

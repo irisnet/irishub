@@ -10,15 +10,14 @@ import (
 
 // FungibleToken defines a struct for the fungible token
 type FungibleToken struct {
-	Symbol          string           `json:"symbol"`
-	Name            string           `json:"name"`
-	Decimal         uint8            `json:"decimal"`
-	CanonicalSymbol string           `json:"canonical_symbol"`
-	MinUnitAlias    string           `json:"min_unit_alias"`
-	InitialSupply   types.Int        `json:"initial_supply"`
-	MaxSupply       types.Int        `json:"max_supply"`
-	Mintable        bool             `json:"mintable"`
-	Owner           types.AccAddress `json:"owner"`
+	Symbol        string           `json:"symbol"`
+	Name          string           `json:"name"`
+	Decimal       uint8            `json:"decimal"`
+	MinUnitAlias  string           `json:"min_unit_alias"`
+	InitialSupply types.Int        `json:"initial_supply"`
+	MaxSupply     types.Int        `json:"max_supply"`
+	Mintable      bool             `json:"mintable"`
+	Owner         types.AccAddress `json:"owner"`
 }
 
 // NewFungibleToken constructs a new FungibleToken instance
@@ -129,7 +128,7 @@ func (tokens Tokens) Validate() sdk.Error {
 		maxSupply := uint64(token.MaxSupply.Div(exp).Int64())
 
 		msg := NewMsgIssueToken(token.Symbol, token.MinUnitAlias, token.Name, token.Decimal, initialSupply, maxSupply, token.Mintable, token.Owner)
-		if err := ValidateMsgIssueToken(&msg); err != nil {
+		if err := ValidateMsgIssueToken(msg); err != nil {
 			return err
 		}
 	}
