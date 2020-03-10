@@ -425,6 +425,7 @@ func (k Keeper) GetRequest(ctx sdk.Context, requestID cmn.HexBytes) (request typ
 	}
 
 	request = types.NewRequest(
+		requestID,
 		requestContext.ServiceName,
 		compactRequest.Provider,
 		requestContext.Consumer,

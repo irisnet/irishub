@@ -29,5 +29,8 @@ func (r Rand) String() string {
   RequestTxHash:     %s
   Height:            %d
   Value:             %s`,
-		hex.EncodeToString(r.RequestTxHash), r.Height, r.Value.Rat.FloatString(RandPrec))
+		hex.EncodeToString(r.RequestTxHash),
+		r.Height,
+		r.Value.Rat.FloatString(RandPrec),
+	)
 }

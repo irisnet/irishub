@@ -4,8 +4,9 @@ import (
 	"encoding/hex"
 	"fmt"
 
-	sdk "github.com/irisnet/irishub/types"
 	abci "github.com/tendermint/tendermint/abci/types"
+
+	sdk "github.com/irisnet/irishub/types"
 )
 
 // BeginBlocker handles block beginning logic for rand
@@ -17,33 +18,50 @@ func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, k Keeper) (tags s
 	lastBlockHash := []byte(ctx.BlockHeader().LastBlockId.Hash)
 
 	// get pending random number requests for lastBlockHeight
-	iterator := k.IterateRandRequestQueueByHeight(ctx, lastBlockHeight)
-	defer iterator.Close()
+	rqIterator := k.IterateRandRequestQueueByHeight(ctx, lastBlockHeight)
+	defer rqIterator.Close()
 
-	handledRandReqNum := 0
-	for ; iterator.Valid(); iterator.Next() {
+	handledNormalRandReqNum := 0
+	requestedOracleRandNum := 0
+	for ; rqIterator.Valid(); rqIterator.Next() {
 		var request Request
-		k.GetCdc().MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &request)
+		k.GetCdc().MustUnmarshalBinaryLengthPrefixed(rqIterator.Value(), &request)
 
-		// get the request id
-		reqID := GenerateRequestID(request)
+		if request.Oracle {
+			// get the request id
+			reqID := GenerateRequestID(request)
 
-		// generate a random number
-		rand := MakePRNG(lastBlockHash, currentTimestamp, request.Consumer).GetRand()
-		k.SetRand(ctx, reqID, NewRand(request.TxHash, lastBlockHeight, rand))
+			if requestContextID, err := k.RequestService(ctx, reqID, request.Consumer, request.ServiceFeeCap); err == nil {
+				k.SetOracleRandRequest(ctx, requestContextID, request)
+				requestedOracleRandNum++
+			} else {
+				ctx.Logger().Info(fmt.Sprintf("request service error : %s", err.Error()))
+			}
 
-		// remove the request
-		k.DequeueRandRequest(ctx, lastBlockHeight, reqID)
+			k.DequeueRandRequest(ctx, lastBlockHeight, reqID)
+		} else {
+			// get the request id
+			reqID := GenerateRequestID(request)
 
-		// add tags
-		tags = tags.AppendTags(sdk.NewTags(
-			TagReqID, []byte(hex.EncodeToString(reqID)),
-			TagRand, []byte(rand.Rat.FloatString(RandPrec)),
-		))
+			// generate a random number
+			rand := MakePRNG(lastBlockHash, currentTimestamp, request.Consumer, nil, false).GetRand()
+			k.SetRand(ctx, reqID, NewRand(request.TxHash, lastBlockHeight, rand))
 
-		handledRandReqNum++
+			// remove the request
+			k.DequeueRandRequest(ctx, lastBlockHeight, reqID)
+
+			// add tags
+			tags = tags.AppendTags(sdk.NewTags(
+				TagReqID, []byte(hex.EncodeToString(reqID)),
+				TagRand, []byte(rand.Rat.FloatString(RandPrec)),
+			))
+
+			handledNormalRandReqNum++
+		}
 	}
 
-	ctx.Logger().Info(fmt.Sprintf("%d rand requests are handled", handledRandReqNum))
+	ctx.Logger().Info(fmt.Sprintf("%d normal rand requests are handled", handledNormalRandReqNum))
+	ctx.Logger().Info(fmt.Sprintf("%d oracle rand requests are pending", requestedOracleRandNum))
+
 	return
 }
