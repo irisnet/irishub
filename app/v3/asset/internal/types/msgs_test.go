@@ -3,8 +3,9 @@ package types
 import (
 	"testing"
 
-	sdk "github.com/irisnet/irishub/types"
 	"github.com/stretchr/testify/require"
+
+	sdk "github.com/irisnet/irishub/types"
 )
 
 var (
@@ -105,7 +106,7 @@ func TestMsgEditTokenGetSignBytes(t *testing.T) {
 
 	res := msg.GetSignBytes()
 
-	expected := `{"type":"irishub/asset/MsgEditToken","value":{"canonical_symbol":"btc","max_supply":"21000000","min_unit_alias":"satoshi","mintable":"false","name":"BTC TOKEN","owner":"faa1damkuetjqqah8w","token_id":"x.btc"}}`
+	expected := `{"type":"irishub/asset/MsgEditToken","value":{"canonical_symbol":"btc","max_supply":"21000000","min_unit_alias":"satoshi","mintable":"false","name":"BTC TOKEN","owner":"faa1damkuetjqqah8w","symbol":"btc"}}`
 	require.Equal(t, expected, string(res))
 }
 
