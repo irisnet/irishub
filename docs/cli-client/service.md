@@ -289,6 +289,24 @@ iriscli service call --chain-id=<chain-id> --from=<key name> --fee=0.3iris --ser
 }
 ```
 
+## iriscli-service-request
+
+Query a request by the request ID
+
+```bash
+iriscli service request <request-id>
+```
+
+### Query a service request
+
+```bash
+iriscli service request <request-id>
+```
+
+:::tip
+You can retrieve the `request-id` in the result of [tendermint block](./tendermint.md#iriscli-tendermint-block)
+:::
+
 ## iriscli service requests
 
 Query service requests by the service binding or request context ID.
@@ -321,9 +339,9 @@ iriscli service respond <flags>
 
 | Name, shorthand    | Default | Description                                                    | Required |
 | ------------------ | ------- | -------------------------------------------------------------- | -------- |
-| --request-id       |         | ID of the request to respond to                         | Yes      |
-| --data    |        |          | Output of the service response, which is an Output JSON schema instance
-| --error    |         | Error msg of the service response, which is an Error JSON schema instance              |          |
+| --request-id       |         | ID of the request to respond to                                | Yes      |
+| --data             |         | Output of the service response, which is an Output JSON schema instance     |          |
+| --error            |         | Error msg of the service response, which is an Error JSON schema instance   |          |
 
 ### Respond to a service request
 
@@ -333,7 +351,7 @@ iriscli service respond --chain-id=<chain-id> --from=<key-name> --fee=0.3iris
 ```
 
 :::tip
-You can retrieve the `request-id` in the result of [tendermint block](#iriscli-tendermint-block)
+You can retrieve the `request-id` in the result of [tendermint block](./tendermint.md#iriscli-tendermint-block)
 :::
 
 ### Output example

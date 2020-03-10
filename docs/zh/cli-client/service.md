@@ -309,7 +309,7 @@ iriscli service request <request-id>
 ```
 
 :::tip
-你可以从[按高度获取区块信息](#iriscli-tendermint-block)的结果中获取`request-id`。
+你可以从[按高度获取区块信息](./tendermint.md#iriscli-tendermint-block)的结果中获取`request-id`。
 :::
 
 ## iriscli service requests
