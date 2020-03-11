@@ -71,7 +71,7 @@ func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Co
 		queryResponsesHandlerFn(cliCtx, cdc),
 	).Methods("GET")
 
-	// query the earned fees
+	// query the earned fees of a provider
 	r.HandleFunc(
 		fmt.Sprintf("/service/fees/{%s}", Provider),
 		queryEarnedFeesHandlerFn(cliCtx, cdc),
