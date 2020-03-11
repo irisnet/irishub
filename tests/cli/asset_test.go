@@ -70,8 +70,8 @@ func TestIrisCLIToken(t *testing.T) {
 	require.Equal(t, strings.ToLower(strings.TrimSpace(symbol)), token.Symbol)
 	require.Equal(t, strings.ToLower(strings.TrimSpace(minUnit)), token.MinUnit)
 	require.Equal(t, strings.TrimSpace(name), token.Name)
-	require.Equal(t, sdk.NewIntWithDecimal(int64(initialSupply), decimal), token.InitialSupply)
-	require.Equal(t, sdk.NewIntWithDecimal(int64(maxSupply), decimal), token.MaxSupply)
+	require.Equal(t, uint64(initialSupply), token.InitialSupply)
+	require.Equal(t, uint64(maxSupply), token.MaxSupply)
 	require.Equal(t, uint8(decimal), token.Scale)
 	require.Equal(t, mintable, token.Mintable)
 
@@ -93,7 +93,7 @@ func TestIrisCLIToken(t *testing.T) {
 	token = executeGetToken(t, fmt.Sprintf("iriscli asset token tokens %s %v", query, flags))
 
 	require.Equal(t, name, token.Name)
-	require.Equal(t, sdk.NewIntWithDecimal(int64(maxSupply), decimal), token.MaxSupply)
+	require.Equal(t, uint64(maxSupply), token.MaxSupply)
 	require.Equal(t, mintable, token.Mintable)
 
 	//mint a token
