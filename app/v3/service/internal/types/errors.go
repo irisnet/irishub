@@ -50,7 +50,7 @@ const (
 
 	CodeInvalidRequestInput   sdk.CodeType = 134
 	CodeInvalidResponseOutput sdk.CodeType = 135
-	CodeInvalidResponseErr    sdk.CodeType = 136
+	CodeInvalidResponseResult sdk.CodeType = 136
 
 	CodeInvalidAddress  sdk.CodeType = 137
 	CodeInvalidProfiler sdk.CodeType = 138
@@ -201,8 +201,8 @@ func ErrInvalidResponseOutput(codespace sdk.CodespaceType, msg string) sdk.Error
 	return sdk.NewError(codespace, CodeInvalidResponseOutput, fmt.Sprintf("invalid response output: %s", msg))
 }
 
-func ErrInvalidResponseErr(codespace sdk.CodespaceType, msg string) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidResponseErr, fmt.Sprintf("invalid response err: %s", msg))
+func ErrInvalidResponseResult(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidResponseResult, fmt.Sprintf("invalid response err: %s", msg))
 }
 
 func ErrInvalidProfiler(codespace sdk.CodespaceType, address sdk.AccAddress) sdk.Error {

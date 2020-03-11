@@ -14,7 +14,6 @@ import (
 type ServiceSchemas struct {
 	Input  map[string]interface{} `json:"input"`
 	Output map[string]interface{} `json:"output"`
-	Error  map[string]interface{} `json:"error"`
 }
 
 // ValidateServiceSchemas validates the given service schemas
@@ -29,10 +28,6 @@ func ValidateServiceSchemas(schemas string) sdk.Error {
 	}
 
 	if err := validateOutputSchema(svcSchemas.Output); err != nil {
-		return err
-	}
-
-	if err := validateErrorSchema(svcSchemas.Error); err != nil {
 		return err
 	}
 
@@ -62,6 +57,15 @@ func ValidateRequestInput(schemas string, input string) sdk.Error {
 	return nil
 }
 
+// ValidateResponseResult validates the response result against the result schema
+func ValidateResponseResult(result string) sdk.Error {
+	if err := validateDocument([]byte(ResultSchema), result); err != nil {
+		return ErrInvalidResponseResult(DefaultCodespace, err.Error())
+	}
+
+	return nil
+}
+
 // ValidateResponseOutput validates the response output against the output schema
 func ValidateResponseOutput(schemas string, output string) sdk.Error {
 	outputSchemaBz, err := parseOutputSchema(schemas)
@@ -71,20 +75,6 @@ func ValidateResponseOutput(schemas string, output string) sdk.Error {
 
 	if err := validateDocument(outputSchemaBz, output); err != nil {
 		return ErrInvalidResponseOutput(DefaultCodespace, err.Error())
-	}
-
-	return nil
-}
-
-// ValidateResponseError validates the response err against the error schema
-func ValidateResponseError(schemas string, errResp string) sdk.Error {
-	errSchemaBz, err := parseErrorSchema(schemas)
-	if err != nil {
-		return err
-	}
-
-	if err := validateDocument(errSchemaBz, errResp); err != nil {
-		return ErrInvalidResponseErr(DefaultCodespace, err.Error())
 	}
 
 	return nil
@@ -113,20 +103,6 @@ func validateOutputSchema(outputSchema map[string]interface{}) sdk.Error {
 	_, err = gojsonschema.NewSchema(gojsonschema.NewBytesLoader(outputSchemaBz))
 	if err != nil {
 		return ErrInvalidSchemas(DefaultCodespace, fmt.Sprintf("invalid output schema: %s", err))
-	}
-
-	return nil
-}
-
-func validateErrorSchema(errSchema map[string]interface{}) sdk.Error {
-	errSchemaBz, err := json.Marshal(errSchema)
-	if err != nil {
-		return ErrInvalidSchemas(DefaultCodespace, fmt.Sprintf("failed to marshal the err schema: %s", err))
-	}
-
-	_, err = gojsonschema.NewSchema(gojsonschema.NewBytesLoader(errSchemaBz))
-	if err != nil {
-		return ErrInvalidSchemas(DefaultCodespace, fmt.Sprintf("invalid error schema: %s", err))
 	}
 
 	return nil
@@ -170,21 +146,6 @@ func parseOutputSchema(schemas string) ([]byte, sdk.Error) {
 	}
 
 	return outputSchemaBz, nil
-}
-
-// parseErrorSchema parses the error schema from the given schemas
-func parseErrorSchema(schemas string) ([]byte, sdk.Error) {
-	svcSchemas, err := parseServiceSchemas(schemas)
-	if err != nil {
-		return nil, err
-	}
-
-	errSchemaBz, err2 := json.Marshal(svcSchemas.Error)
-	if err != nil {
-		return nil, ErrInvalidSchemas(DefaultCodespace, fmt.Sprintf("failed to marshal the err schema: %s", err2))
-	}
-
-	return errSchemaBz, nil
 }
 
 // validateDocument wraps the gojsonschema validation
