@@ -202,7 +202,7 @@ func ErrInvalidResponseOutput(codespace sdk.CodespaceType, msg string) sdk.Error
 }
 
 func ErrInvalidResponseResult(codespace sdk.CodespaceType, msg string) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidResponseResult, fmt.Sprintf("invalid response err: %s", msg))
+	return sdk.NewError(codespace, CodeInvalidResponseResult, fmt.Sprintf("invalid response result: %s", msg))
 }
 
 func ErrInvalidProfiler(codespace sdk.CodespaceType, address sdk.AccAddress) sdk.Error {

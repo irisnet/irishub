@@ -289,8 +289,8 @@ func (rs Requests) HumanString(converter sdk.CoinsConverter) string {
 type Response struct {
 	Provider                   sdk.AccAddress `json:"provider"`
 	Consumer                   sdk.AccAddress `json:"consumer"`
+	Result                     string         `json:"result"`
 	Output                     string         `json:"output"`
-	Error                      string         `json:"error"`
 	RequestContextID           cmn.HexBytes   `json:"request_context_id"`
 	RequestContextBatchCounter uint64         `json:"request_context_batch_counter"`
 }
@@ -299,16 +299,16 @@ type Response struct {
 func NewResponse(
 	provider,
 	consumer sdk.AccAddress,
-	output,
-	err string,
+	result,
+	output string,
 	requestContextID cmn.HexBytes,
 	batchCounter uint64,
 ) Response {
 	return Response{
 		Provider:                   provider,
 		Consumer:                   consumer,
+		Result:                     result,
 		Output:                     output,
-		Error:                      err,
 		RequestContextID:           requestContextID,
 		RequestContextBatchCounter: batchCounter,
 	}
@@ -319,11 +319,11 @@ func (r Response) String() string {
 	return fmt.Sprintf(`Response:
 	Provider:                %s
 	Consumer:                %s
+	Result:                  %s
 	Output:                  %s
-	Error:                   %s
 	RequestContextID:        %s
 	BatchCounter:            %d`,
-		r.Provider, r.Consumer, r.Output, r.Error,
+		r.Provider, r.Consumer, r.Result, r.Output,
 		r.RequestContextID.String(),
 		r.RequestContextBatchCounter,
 	)
@@ -344,6 +344,23 @@ func (rs Responses) String() string {
 	}
 
 	return str
+}
+
+// Result defines a struct for the response result
+type Result struct {
+	Code    uint16 `json:"code"`
+	Message string `json:"message"`
+}
+
+// ParseResult parses the given string to Result
+func ParseResult(result string) (Result, sdk.Error) {
+	var r Result
+
+	if err := json.Unmarshal([]byte(result), &r); err != nil {
+		return r, ErrInvalidResponseResult(DefaultCodespace, fmt.Sprintf("failed to unmarshal the result: %s", err))
+	}
+
+	return r, nil
 }
 
 // EarnedFees defines a struct for the fees earned by the provider
