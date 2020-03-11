@@ -10,8 +10,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/irisnet/irishub/app/v3/oracle"
-
 	"github.com/stretchr/testify/require"
 
 	"github.com/tendermint/tendermint/crypto"
@@ -25,10 +23,13 @@ import (
 	v3 "github.com/irisnet/irishub/app/v3"
 	"github.com/irisnet/irishub/app/v3/asset"
 	"github.com/irisnet/irishub/app/v3/gov"
+	"github.com/irisnet/irishub/app/v3/oracle"
+	"github.com/irisnet/irishub/app/v3/rand"
 	"github.com/irisnet/irishub/app/v3/service"
 	"github.com/irisnet/irishub/client/context"
 	htlctypes "github.com/irisnet/irishub/client/htlc/types"
 	"github.com/irisnet/irishub/client/keys"
+	randtypes "github.com/irisnet/irishub/client/rand/types"
 	"github.com/irisnet/irishub/client/stake"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/guardian"
@@ -442,4 +443,22 @@ func executeGetHtlc(t *testing.T, cmdStr string) htlctypes.OutputHTLC {
 	err := cdc.UnmarshalJSON([]byte(out), &h)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
 	return h
+}
+
+func executeGetRandRequests(t *testing.T, cmdStr string) rand.Requests {
+	out, _ := tests.ExecuteT(t, cmdStr, "")
+	var rs rand.Requests
+	cdc := app.MakeLatestCodec()
+	err := cdc.UnmarshalJSON([]byte(out), &rs)
+	require.NoError(t, err, "out %v\n, err %v", out, err)
+	return rs
+}
+
+func executeGetRand(t *testing.T, cmdStr string) randtypes.ReadableRand {
+	out, _ := tests.ExecuteT(t, cmdStr, "")
+	var r randtypes.ReadableRand
+	cdc := app.MakeLatestCodec()
+	err := cdc.UnmarshalJSON([]byte(out), &r)
+	require.NoError(t, err, "out %v\n, err %v", out, err)
+	return r
 }

@@ -2802,6 +2802,12 @@ paths:
                 block_interval:
                   type: integer
                   example: '10'
+                oracle:
+                  type: boolean
+                  example: false
+                service_fee_cap:
+                  type: string
+                  example: '1iris'
   '/rand/rands/{request-id}':
     get:
       summary: Query a random number by the specified request id
@@ -3778,6 +3784,12 @@ components:
           $ref: '#/components/schemas/Address'
         tx_hash:
           type: string
+        oracle:
+          type: boolean
+        service_fee_cap:
+          type: array
+          items:
+            $ref: '#/components/schemas/Coin'
     CoinSwapLiquidity:
       type: object
       properties:
