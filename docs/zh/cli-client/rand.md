@@ -20,16 +20,22 @@ iriscli rand request-rand <flags>
 
 **标志：**
 
-| 名称，速记       | 类型   | 必须 | 默认 | 描述                                 |
-| ---------------- | ------ | ---- | ---- | ------------------------------------ |
-| --block-interval | uint64 |      | 10   | 请求的随机数将在指定的区块间隔后生成 |
+| 名称，速记        | 类型   | 必须 | 默认  | 描述                                       |
+| ----------------- | ------ | ---- | ----- | ------------------------------------------ |
+| --block-interval  | uint64 |      | 10    | 请求的随机数将在指定的区块间隔后生成       |
+| --oracle          | bool   |      | false | 是否使用 Oracle 方式                       |
+| --service-fee-cap | string |      | ""    | 最大服务费用（如果使用 Oracle 方式则必填） |
 
 ### 请求一个随机数
 
 向 IRIS Hub 发送随机数请求，该随机数将在`--block-interval`指定块数后生成。
 
 ```bash
+# without oracle
 iriscli rand request-rand --block-interval=100 --from=<key-name> --chain-id=irishub --fee=0.3iris --commit
+
+# with oracle
+iriscli rand request-rand --block-interval=100 --oracle=true --service-fee-cap=1iris --from=<key-name> --chain-id=irishub --fee=0.3iris --commit
 ```
 
 :::tip
@@ -74,7 +80,7 @@ iriscli rand query-queue <flags>
 
 ## Query random number request queue
 
-查询尚未处理的随机数请求，可指定将要生成随机数的区块高度。
+查询尚未处理的随机数请求，可指定将要生成随机数（或请求 Service）的区块高度。
 
 ```bash
 iriscli rand query-queue --queue-height=100000

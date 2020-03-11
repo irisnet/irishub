@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/irisnet/irishub/tests"
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/stretchr/testify/require"
 )
 
 func TestIrisCLIStakeCreateValidator(t *testing.T) {

@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-
+  
 	"github.com/irisnet/irishub/tests"
 	sdk "github.com/irisnet/irishub/types"
 )

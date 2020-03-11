@@ -2,6 +2,7 @@ package types
 
 // nolint
 var (
+	TagAuthor           = "author"
 	TagServiceName      = "service-name"
 	TagProvider         = "provider"
 	TagConsumer         = "consumer"
