@@ -95,7 +95,7 @@ type TokenFeesOutput struct {
 func (tfo TokenFeesOutput) String() string {
 	var out strings.Builder
 	if tfo.Exist {
-		out.WriteString("The symbol has existed\n")
+		out.WriteString("The symbol already exists\n")
 	}
 
 	out.WriteString(fmt.Sprintf(`Fees:
@@ -110,7 +110,7 @@ func (tfo TokenFeesOutput) String() string {
 func (tfo TokenFeesOutput) HumanString(converter sdk.CoinsConverter) string {
 	var out strings.Builder
 	if tfo.Exist {
-		out.WriteString("The symbol has existed\n")
+		out.WriteString("The symbol already exists\n")
 	}
 
 	out.WriteString(fmt.Sprintf(`Fees:

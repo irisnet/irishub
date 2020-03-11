@@ -45,8 +45,8 @@ func (k Keeper) Init(ctx sdk.Context) {
 		store.Delete(key)
 	})
 
-	// delete tokens from profilers
-	k.deleteTokensFromAccounts(ctx, k.getAllProfilers(ctx))
+	// delete non-iris coins from profilers
+	k.deleteCoinsFromAccounts(ctx, k.getAllProfilers(ctx))
 
 	// delete total supplies
 	k.deleteTotalSupplies(ctx)
@@ -83,13 +83,13 @@ func (k Keeper) getAllProfilers(ctx sdk.Context) []sdk.AccAddress {
 	return profilers
 }
 
-func (k Keeper) deleteTokensFromAccounts(ctx sdk.Context, addrs []sdk.AccAddress) {
+func (k Keeper) deleteCoinsFromAccounts(ctx sdk.Context, addrs []sdk.AccAddress) {
 	for _, addr := range addrs {
 		coins := k.bk.GetCoins(ctx, addr)
-		tokens, _ := coins.SafeSub(sdk.NewCoins(sdk.NewCoin(sdk.IrisAtto, coins.AmountOf(sdk.IrisAtto))))
+		nonIrisCoins, _ := coins.SafeSub(sdk.NewCoins(sdk.NewCoin(sdk.IrisAtto, coins.AmountOf(sdk.IrisAtto))))
 
-		if !tokens.IsZero() {
-			_, _, _ = k.bk.SubtractCoins(ctx, addr, tokens)
+		if !nonIrisCoins.IsZero() {
+			_, _, _ = k.bk.SubtractCoins(ctx, addr, nonIrisCoins)
 		}
 	}
 }

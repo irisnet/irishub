@@ -188,9 +188,7 @@ func (k Keeper) MintToken(ctx sdk.Context, msg types.MsgMintToken) (sdk.Tags, sd
 		return nil, types.ErrAssetNotExists(k.codespace, fmt.Sprintf("denom of minting token is not equal to the issued token, expected:%s, actual:%s", expDenom, issuedAmt.Denom))
 	}
 
-	issuedMainUnitAmt := uint64(issuedAmt.Amount.Div(sdk.NewIntWithDecimal(1, int(token.Decimal))).Int64())
-	mintableMaxAmt := token.MaxSupply - issuedMainUnitAmt
-
+	mintableMaxAmt := uint64(sdk.NewIntWithDecimal(int64(token.MaxSupply), int(token.Decimal)).Sub(issuedAmt.Amount).Div(sdk.NewIntWithDecimal(1, int(token.Decimal))).Int64())
 	if msg.Amount > mintableMaxAmt {
 		return nil, types.ErrInvalidAssetMaxSupply(k.codespace, fmt.Sprintf("The amount of minting tokens plus the total amount of issued tokens has exceeded the maximum supply, only accepts amount (0, %d]", mintableMaxAmt))
 	}
@@ -257,7 +255,7 @@ func (k Keeper) AddToken(ctx sdk.Context, token types.FungibleToken) sdk.Error {
 	}
 
 	// Set token to be prefixed with owner
-	if err := k.setTokens(ctx, token.GetOwner(), token); err != nil {
+	if err := k.setOwnerToken(ctx, token.GetOwner(), token); err != nil {
 		return err
 	}
 
@@ -303,7 +301,7 @@ func (k Keeper) iterateTokensWithOwner(ctx sdk.Context, owner sdk.AccAddress, op
 	}
 }
 
-func (k Keeper) setTokens(ctx sdk.Context, owner sdk.AccAddress, token types.FungibleToken) sdk.Error {
+func (k Keeper) setOwnerToken(ctx sdk.Context, owner sdk.AccAddress, token types.FungibleToken) sdk.Error {
 	store := ctx.KVStore(k.storeKey)
 
 	symbol := token.GetSymbol()
@@ -329,7 +327,7 @@ func (k Keeper) resetStoreKeyForQueryToken(ctx sdk.Context, msg types.MsgTransfe
 	store.Delete(KeyTokens(msg.SrcOwner, token.GetSymbol()))
 
 	// add the new key
-	return k.setTokens(ctx, msg.DstOwner, token)
+	return k.setOwnerToken(ctx, msg.DstOwner, token)
 }
 
 func (k Keeper) getToken(ctx sdk.Context, symbol string) (token types.FungibleToken, err sdk.Error) {
