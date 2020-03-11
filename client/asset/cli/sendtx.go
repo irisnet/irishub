@@ -6,14 +6,15 @@ import (
 	"os"
 	"strings"
 
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+
 	"github.com/irisnet/irishub/app/v3/asset"
 	"github.com/irisnet/irishub/client"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 func GetTokenCmd(cdc *codec.Codec) *cobra.Command {
@@ -25,7 +26,7 @@ func GetTokenCmd(cdc *codec.Codec) *cobra.Command {
 	}
 	cmd.AddCommand(client.PostCommands(
 		getCmdIssueToken(cdc),
-		getCmdEditAsset(cdc),
+		getCmdEditToken(cdc),
 		getCmdMintToken(cdc),
 		getCmdTransferTokenOwner(cdc),
 	)...)
@@ -38,7 +39,7 @@ func GetTokenCmd(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-// getCmdIssueToken implements the issue asset command
+// getCmdIssueToken implements the issue token command
 func getCmdIssueToken(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "issue",
@@ -110,8 +111,8 @@ func getCmdIssueToken(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-// getCmdEditGateway implements the edit asset command
-func getCmdEditAsset(cdc *codec.Codec) *cobra.Command {
+// getCmdEditToken implements the edit token command
+func getCmdEditToken(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "edit",
 		Short:   "Edit an existing token",
