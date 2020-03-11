@@ -279,10 +279,10 @@ func (msg MsgEditFeed) GetSigners() []sdk.AccAddress {
 func ValidateFeedName(feedName string) sdk.Error {
 	feedName = strings.TrimSpace(feedName)
 	if len(feedName) == 0 || len(feedName) > MaxNameLen {
-		return ErrInvalidFeedName(DefaultCodespace)
+		return ErrInvalidFeedName(DefaultCodespace, feedName)
 	}
 	if !regPlainText.MatchString(feedName) {
-		return ErrInvalidFeedName(DefaultCodespace)
+		return ErrInvalidFeedName(DefaultCodespace, feedName)
 	}
 	return nil
 }

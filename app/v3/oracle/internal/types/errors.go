@@ -31,8 +31,8 @@ func ErrUnknownFeedName(codespace sdk.CodespaceType, feedName string) sdk.Error 
 	return sdk.NewError(codespace, CodeUnknownFeedName, "feed name %s does not exist", feedName)
 }
 
-func ErrInvalidFeedName(codespace sdk.CodespaceType) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidFeedName, "feed name length should be more than 0 and less than %d", MaxNameLen)
+func ErrInvalidFeedName(codespace sdk.CodespaceType, feedName string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidFeedName, "invalid feed name %s; only alphanumeric characters, _ and - accepted, the length ranges in (0,%d]", feedName, MaxNameLen)
 }
 
 func ErrExistedFeedName(codespace sdk.CodespaceType, feedName string) sdk.Error {
@@ -92,7 +92,7 @@ func ErrNotProfiler(codespace sdk.CodespaceType, profiler sdk.AccAddress) sdk.Er
 }
 
 func ErrInvalidDescription(codespace sdk.CodespaceType, descLen int) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidDescription, "description length should be no more than %d,actual length is %d", descLen)
+	return sdk.NewError(codespace, CodeInvalidDescription, "description length should be no more than %d,actual length is %d", MaxDescriptionLen, descLen)
 }
 
 func ErrInvalidTimeout(codespace sdk.CodespaceType, timeout int64, frequency uint64) sdk.Error {
