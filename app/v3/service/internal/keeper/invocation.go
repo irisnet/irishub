@@ -660,6 +660,11 @@ func (k Keeper) AddResponse(
 		if err := k.RefundServiceFee(ctx, request.Consumer, request.ServiceFee); err != nil {
 			return request, response, err
 		}
+
+		// slash the provider
+		if err := k.Slash(ctx, request.ServiceName, request.Provider); err != nil {
+			return request, response, err
+		}
 	}
 
 	requestContextID := request.RequestContextID
@@ -775,28 +780,40 @@ func (k Keeper) GetResponseOutputs(ctx sdk.Context, requestContextID cmn.HexByte
 	return outputs
 }
 
-// Slash
-func (k Keeper) Slash(ctx sdk.Context, binding types.ServiceBinding, slashCoins sdk.Coins) sdk.Error {
-	deposit, hasNeg := binding.Deposit.SafeSub(slashCoins)
-	if hasNeg {
-		errMsg := fmt.Sprintf("%s is less than %s", binding.Deposit, slashCoins)
-		panic(errMsg)
+// Slash slashes the specified provider
+func (k Keeper) Slash(ctx sdk.Context, serviceName string, provider sdk.AccAddress) sdk.Error {
+	binding, found := k.GetServiceBinding(ctx, serviceName, provider)
+
+	if found {
+		slashFraction := k.GetParamSet(ctx).SlashFraction
+		slashedCoins := sdk.NewCoins()
+
+		for _, coin := range binding.Deposit {
+			slashedCoinAmt := sdk.NewDecFromInt(coin.Amount).Mul(slashFraction).TruncateInt()
+			slashedCoins = slashedCoins.Add(sdk.NewCoins(sdk.NewCoin(coin.Denom, slashedCoinAmt)))
+		}
+
+		deposit, hasNeg := binding.Deposit.SafeSub(slashedCoins)
+		if hasNeg {
+			errMsg := fmt.Sprintf("%s is less than %s", binding.Deposit, slashedCoins)
+			panic(errMsg)
+		}
+
+		binding.Deposit = deposit
+		minDeposit := k.getMinDeposit(ctx, binding.Pricing)
+
+		if !binding.Deposit.IsAllGTE(minDeposit) {
+			binding.Available = false
+			binding.DisabledTime = ctx.BlockHeader().Time
+		}
+
+		_, err := k.bk.BurnCoins(ctx, auth.ServiceDepositCoinsAccAddr, slashedCoins)
+		if err != nil {
+			return err
+		}
+
+		k.SetServiceBinding(ctx, binding)
 	}
-
-	binding.Deposit = deposit
-	minDeposit := k.getMinDeposit(ctx, binding.Pricing)
-
-	if !binding.Deposit.IsAllGTE(minDeposit) {
-		binding.Available = false
-		binding.DisabledTime = ctx.BlockHeader().Time
-	}
-
-	_, err := k.bk.BurnCoins(ctx, auth.ServiceDepositCoinsAccAddr, slashCoins)
-	if err != nil {
-		return err
-	}
-
-	k.SetServiceBinding(ctx, binding)
 
 	return nil
 }
