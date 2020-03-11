@@ -34,8 +34,8 @@ type TokenOutput struct {
 	Name          string         `json:"name"`
 	Scale         uint8          `json:"scale"`
 	MinUnit       string         `json:"min_unit"`
-	InitialSupply sdk.Int        `json:"initial_supply"`
-	MaxSupply     sdk.Int        `json:"max_supply"`
+	InitialSupply uint64         `json:"initial_supply"`
+	MaxSupply     uint64         `json:"max_supply"`
 	Mintable      bool           `json:"mintable"`
 	Owner         sdk.AccAddress `json:"owner"`
 }
@@ -106,7 +106,7 @@ func (tfo TokenFeesOutput) String() string {
 	return out.String()
 }
 
-// String implements human
+// HumanString implements human
 func (tfo TokenFeesOutput) HumanString(converter sdk.CoinsConverter) string {
 	var out strings.Builder
 	if tfo.Exist {

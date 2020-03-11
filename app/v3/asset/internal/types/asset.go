@@ -14,8 +14,8 @@ type FungibleToken struct {
 	Name          string           `json:"name"`
 	Decimal       uint8            `json:"decimal"`
 	MinUnitAlias  string           `json:"min_unit_alias"`
-	InitialSupply types.Int        `json:"initial_supply"`
-	MaxSupply     types.Int        `json:"max_supply"`
+	InitialSupply uint64           `json:"initial_supply"`
+	MaxSupply     uint64           `json:"max_supply"`
 	Mintable      bool             `json:"mintable"`
 	Owner         types.AccAddress `json:"owner"`
 }
@@ -27,7 +27,7 @@ func NewFungibleToken(
 	minUnit string,
 	decimal uint8,
 	initialSupply,
-	maxSupply types.Int,
+	maxSupply uint64,
 	mintable bool,
 	owner types.AccAddress,
 ) FungibleToken {
@@ -64,7 +64,7 @@ func (ft FungibleToken) GetDenom() string {
 	return denom
 }
 
-func (ft FungibleToken) GetInitSupply() types.Int {
+func (ft FungibleToken) GetInitSupply() uint64 {
 	return ft.InitialSupply
 }
 
@@ -83,21 +83,18 @@ func (ft FungibleToken) GetCoinType() types.CoinType {
 
 // String implements fmt.Stringer
 func (ft FungibleToken) String() string {
-	ct := ft.GetCoinType()
-	initSupply, _ := ct.Convert(types.NewCoin(ft.GetDenom(), ft.InitialSupply).String(), ft.GetSymbol())
-	maxSupply, _ := ct.Convert(types.NewCoin(ft.GetDenom(), ft.MaxSupply).String(), ft.GetSymbol())
-
 	return fmt.Sprintf(`FungibleToken:
   Name:              %s
   Symbol:            %s
   Scale:             %d
   MinUnit:           %s
-  Initial Supply:    %s
-  Max Supply:        %s
+  Initial Supply:    %d
+  Max Supply:        %d
   Mintable:          %v
   Owner:             %s`,
-		ft.Name, ft.Symbol,
-		ft.Decimal, ft.MinUnitAlias, initSupply, maxSupply, ft.Mintable, ft.Owner)
+		ft.Name, ft.Symbol, ft.Decimal, ft.MinUnitAlias,
+		ft.InitialSupply, ft.MaxSupply, ft.Mintable, ft.Owner,
+	)
 }
 
 // Tokens is a set of tokens
@@ -123,11 +120,10 @@ func (tokens Tokens) Validate() sdk.Error {
 	}
 
 	for _, token := range tokens {
-		exp := sdk.NewIntWithDecimal(1, int(token.Decimal))
-		initialSupply := uint64(token.InitialSupply.Div(exp).Int64())
-		maxSupply := uint64(token.MaxSupply.Div(exp).Int64())
-
-		msg := NewMsgIssueToken(token.Symbol, token.MinUnitAlias, token.Name, token.Decimal, initialSupply, maxSupply, token.Mintable, token.Owner)
+		msg := NewMsgIssueToken(
+			token.Symbol, token.MinUnitAlias, token.Name, token.Decimal,
+			token.InitialSupply, token.MaxSupply, token.Mintable, token.Owner,
+		)
 		if err := ValidateMsgIssueToken(msg); err != nil {
 			return err
 		}

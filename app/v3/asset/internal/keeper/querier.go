@@ -138,8 +138,8 @@ func queryTokens(ctx sdk.Context, keeper Keeper, owner string) (tokens types.Tok
 }
 
 func getIrisToken() types.FungibleToken {
-	initSupply, _ := sdk.IrisCoinType.ConvertToMinDenomCoin(sdk.NewCoin(sdk.Iris, sdk.InitialIssue).String())
-	maxSupply, _ := sdk.IrisCoinType.ConvertToMinDenomCoin(sdk.NewCoin(sdk.Iris, sdk.NewInt(int64(types.MaximumAssetMaxSupply))).String())
+	initSupply := uint64(sdk.InitialIssue.Int64())
+	maxSupply := types.MaximumAssetMaxSupply
 
-	return types.NewFungibleToken(sdk.Iris, sdk.IrisCoinType.Desc, sdk.IrisAtto, sdk.AttoScale, initSupply.Amount, maxSupply.Amount, true, sdk.AccAddress{})
+	return types.NewFungibleToken(sdk.Iris, sdk.IrisCoinType.Desc, sdk.IrisAtto, sdk.AttoScale, initSupply, maxSupply, true, sdk.AccAddress{})
 }
