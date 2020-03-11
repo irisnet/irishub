@@ -570,6 +570,48 @@ func (k Keeper) NewRequestBatchIterator(ctx sdk.Context, requestBatchHeight int6
 	return sdk.KVStorePrefixIterator(store, GetNewRequestBatchSubspace(requestBatchHeight))
 }
 
+func (k Keeper) IterateNewRequestBatch(
+	ctx sdk.Context,
+	op func(height cmn.HexBytes, requestContextID cmn.HexBytes) bool,
+) {
+	store := ctx.KVStore(k.storeKey)
+
+	iterator := sdk.KVStorePrefixIterator(store, newRequestBatchKey)
+	defer iterator.Close()
+
+	for ; iterator.Valid(); iterator.Next() {
+		height := iterator.Key()[1:]
+
+		var requestContextID cmn.HexBytes
+		k.GetCdc().MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &requestContextID)
+
+		if stop := op(height, requestContextID); stop {
+			break
+		}
+	}
+}
+
+func (k Keeper) IterateExpiredRequestBatch(
+	ctx sdk.Context,
+	op func(height cmn.HexBytes, requestContextID cmn.HexBytes) bool,
+) {
+	store := ctx.KVStore(k.storeKey)
+
+	iterator := sdk.KVStorePrefixIterator(store, expiredRequestBatchKey)
+	defer iterator.Close()
+
+	for ; iterator.Valid(); iterator.Next() {
+		height := iterator.Key()[1:]
+
+		var requestContextID cmn.HexBytes
+		k.GetCdc().MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &requestContextID)
+
+		if stop := op(height, requestContextID); stop {
+			break
+		}
+	}
+}
+
 // ActiveRequestsIterator returns an iterator for all the active requests of the specified service binding
 func (k Keeper) ActiveRequestsIterator(ctx sdk.Context, serviceName string, provider sdk.AccAddress) sdk.Iterator {
 	store := ctx.KVStore(k.storeKey)

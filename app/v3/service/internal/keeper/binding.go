@@ -253,6 +253,25 @@ func (k Keeper) AllServiceBindingsIterator(ctx sdk.Context) sdk.Iterator {
 	return sdk.KVStorePrefixIterator(store, serviceBindingKey)
 }
 
+func (k Keeper) IterateServiceBindings(
+	ctx sdk.Context,
+	op func(name string, binding types.ServiceBinding) (stop bool),
+) {
+	store := ctx.KVStore(k.storeKey)
+
+	iterator := sdk.KVStorePrefixIterator(store, serviceBindingKey)
+	defer iterator.Close()
+
+	for ; iterator.Valid(); iterator.Next() {
+		var binding types.ServiceBinding
+		k.GetCdc().MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &binding)
+
+		if stop := op(binding.ServiceName, binding); stop {
+			break
+		}
+	}
+}
+
 // GetBasePrice gets the base price of the given service binding
 // Note: ensure that the binding is valid
 func (k Keeper) GetBasePrice(ctx sdk.Context, binding types.ServiceBinding) sdk.Coins {
