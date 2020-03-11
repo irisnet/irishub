@@ -180,20 +180,20 @@ const (
 		"description": "pricing coin",
 		"type": "object",
 		"properties": {
-		  "symbol": {
-			"description": "symbol of pricing coin",
+		  "denom": {
+			"description": "denom of pricing coin",
 			"type": "string",
-			"pattern": "^[a-z][a-z0-9]{2,7}$"
+			"pattern": "^([a-z][0-9a-z]{2}[:])?(([a-z][a-z0-9]{2,7}|x)\\.)?([a-z][a-z0-9]{2,7})(-[a-z]{3,5})?$"
 		  },
 		  "amount": {
-			"description": "pricing amount, in main unit",
+			"description": "amount of pricing coin",
 			"type": "string",
 			"pattern": "^[0-9]+(\\.[0-9]+)?$"
 		  }
 		},
 		"additionalProperties": false,
 		"required": [
-		  "symbol",
+		  "denom",
 		  "amount"
 		]
 	  },
