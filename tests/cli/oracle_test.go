@@ -5,10 +5,11 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/irisnet/irishub/app/v3/service"
 	"github.com/irisnet/irishub/tests"
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/stretchr/testify/require"
 )
 
 func TestIrisCLIOracle(t *testing.T) {
