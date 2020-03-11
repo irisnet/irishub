@@ -138,7 +138,7 @@ func handleMsgRequestService(ctx sdk.Context, k Keeper, msg MsgRequestService) s
 
 // handleMsgRespondService handles MsgRespondService
 func handleMsgRespondService(ctx sdk.Context, k Keeper, msg MsgRespondService) sdk.Result {
-	request, response, err := k.AddResponse(ctx, msg.RequestID, msg.Provider, msg.Output, msg.Error)
+	request, response, err := k.AddResponse(ctx, msg.RequestID, msg.Provider, msg.Result, msg.Output)
 	if err != nil {
 		return err.Result()
 	}
