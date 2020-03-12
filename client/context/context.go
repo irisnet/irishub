@@ -255,7 +255,7 @@ func (cliCtx CLIContext) GetCoinType(coinName string) (sdk.CoinType, error) {
 		return coinswap.GetUniCoinType(coinName)
 	} else {
 		params := asset.QueryTokenParams{
-			TokenId: coinName,
+			Symbol: coinName,
 		}
 
 		bz, err := cliCtx.Codec.MarshalJSON(params)
