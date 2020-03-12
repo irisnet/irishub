@@ -17,8 +17,13 @@ func (p *ProtocolV2) runtimeInvariants() []sdk.Invariant {
 		distr.DelAccumInvariants(p.distrKeeper, p.StakeKeeper),
 		distr.CanWithdrawInvariant(p.distrKeeper, p.StakeKeeper),
 
-		stake.SupplyInvariants(p.bankKeeper, p.StakeKeeper,
-			p.feeKeeper, p.distrKeeper, p.accountMapper),
+		stake.SupplyInvariants(
+			p.bankKeeper,
+			p.StakeKeeper,
+			p.feeKeeper,
+			p.distrKeeper,
+			p.accountMapper,
+		),
 		stake.NonNegativePowerInvariant(p.StakeKeeper),
 		stake.PositiveDelegationInvariant(p.StakeKeeper),
 		stake.DelegatorSharesInvariant(p.StakeKeeper),

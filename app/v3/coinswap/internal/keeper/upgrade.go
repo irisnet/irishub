@@ -1,9 +1,9 @@
 package keeper
 
 import (
-	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/tendermint/tendermint/crypto"
 
+	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/app/v3/coinswap/internal/types"
 	sdk "github.com/irisnet/irishub/types"
 )
@@ -37,10 +37,12 @@ func (k Keeper) Init(ctx sdk.Context, assetKeeper types.AssetKeeper, accountKeep
 			logger.Info("Create liquidity pool", "poolName", uniID)
 			_ = k.SetPool(ctx, types.NewPool(uniID, nil))
 			_ = k.SendCoinsFromAccountToPool(ctx, poolAcc.GetAddress(), uniID, coins)
-			logger.Info("Transfer coin to liquidity pool",
+			logger.Info(
+				"Transfer coin to liquidity pool",
 				"from", poolAcc.GetAddress().String(),
 				"amount", coins.String(),
-				"poolName", uniID)
+				"poolName", uniID,
+			)
 		}
 	}
 	logger.Info("End execute upgrade method")

@@ -11,7 +11,6 @@ import (
 	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/app/v1/bank"
 	"github.com/irisnet/irishub/app/v1/stake"
-	"github.com/irisnet/irishub/app/v3/asset"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/codec"
@@ -73,14 +72,16 @@ func QueryCoinTypeRequestHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) 
 	}
 }
 
-// QueryTokenStatsRequestHandlerFn performs token statistic query
+// QueryTokenStatsRequestHandlerFn performs token statistics query
 func QueryTokenStatsRequestHandlerFn(cdc *codec.Codec, decoder auth.AccountDecoder, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		tokenId := vars["id"]
-		params := asset.QueryTokenParams{
-			TokenId: tokenId,
+		symbol := vars["symbol"]
+
+		params := bank.QueryTokenStatsParams{
+			Symbol: symbol,
 		}
+
 		bz, err := cdc.MarshalJSON(params)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -101,12 +102,13 @@ func QueryTokenStatsRequestHandlerFn(cdc *codec.Codec, decoder auth.AccountDecod
 		}
 
 		// query bonded tokens for iris
-		if tokenId == "" || tokenId == sdk.Iris {
+		if symbol == "" || symbol == sdk.Iris {
 			resPool, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", protocol.StakeRoute, stake.QueryPool), nil)
 			if err != nil {
 				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 				return
 			}
+
 			var poolStatus stake.PoolStatus
 			err = cdc.UnmarshalJSON(resPool, &poolStatus)
 			if err != nil {

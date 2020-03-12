@@ -54,7 +54,6 @@ func init() {
 	FsPauseFeed.String(FlagFeedName, "", "The unique identifier of the feed")
 	FsPauseFeed.String(FlagCreator, "", "Address of the Feed creator")
 
-	FsEditFeed.String(FlagFeedName, "", "The unique identifier of the feed")
 	FsEditFeed.Uint64(FlagLatestHistory, 0, "The maximum Number of the latest history values to be saved for the Feed, range [1, 100]")
 	FsEditFeed.StringSlice(FlagProviders, []string{}, "The list of service provider addresses")
 	FsEditFeed.String(FlagDescription, "", "The description of the feed.")

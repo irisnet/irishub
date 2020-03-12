@@ -1,6 +1,8 @@
 package gov
 
-import sdk "github.com/irisnet/irishub/types"
+import (
+	sdk "github.com/irisnet/irishub/types"
+)
 
 const (
 	Insert string = "insert"
@@ -43,8 +45,11 @@ func (pp *ParameterProposal) Execute(ctx sdk.Context, k Keeper) sdk.Error {
 	ctx.Logger().Info("Execute ParameterProposal begin")
 	//check again
 	if len(pp.Params) != 1 {
-		ctx.Logger().Error("Execute ParameterProposal Failure", "info",
-			"the length of ParameterProposal's param should be one", "ProposalId", pp.ProposalID)
+		ctx.Logger().Error(
+			"Execute ParameterProposal Failure", "info",
+			"the length of ParameterProposal's param should be one", "ProposalId",
+			pp.ProposalID,
+		)
 		return nil
 	}
 	param := pp.Params[0]

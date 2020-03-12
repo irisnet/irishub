@@ -7,9 +7,8 @@ import (
 )
 
 const (
-	RestParamTokenID = "token-id"
-	RestParamSymbol  = "symbol"
-	RestParamOwner   = "owner"
+	RestParamSymbol = "symbol"
+	RestParamOwner  = "owner"
 )
 
 // RegisterRoutes registers asset-related REST handlers to a router

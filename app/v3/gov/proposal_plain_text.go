@@ -1,6 +1,8 @@
 package gov
 
-import sdk "github.com/irisnet/irishub/types"
+import (
+	sdk "github.com/irisnet/irishub/types"
+)
 
 var _ Proposal = (*PlainTextProposal)(nil)
 
