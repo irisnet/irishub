@@ -869,7 +869,7 @@ func (k Keeper) Slash(ctx sdk.Context, requestID cmn.HexBytes) (tags sdk.Tags, e
 
 	deposit, hasNeg := binding.Deposit.SafeSub(slashedCoins)
 	if hasNeg {
-		panic(fmt.Sprintf("%s is less than %s", binding.Deposit, slashedCoins))
+		return tags, sdk.ErrInsufficientCoins(fmt.Sprintf("%s is less than %s", binding.Deposit, slashedCoins))
 	}
 
 	_, err = k.bk.BurnCoins(ctx, auth.ServiceDepositCoinsAccAddr, slashedCoins)

@@ -1,8 +1,9 @@
 package service
 
 import (
-	sdk "github.com/irisnet/irishub/types"
 	cmn "github.com/tendermint/tendermint/libs/common"
+
+	sdk "github.com/irisnet/irishub/types"
 )
 
 // EndBlocker handles block ending logic for service
