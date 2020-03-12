@@ -7,24 +7,20 @@ import (
 
 // nolint
 type (
-	Keeper = keeper.Keeper
-
-	MsgCreateFeed = types.MsgCreateFeed
-	MsgStartFeed  = types.MsgStartFeed
-	MsgPauseFeed  = types.MsgPauseFeed
-	MsgEditFeed   = types.MsgEditFeed
-
-	GenesisState = types.GenesisState
-	FeedEntry    = types.FeedEntry
-
+	Keeper               = keeper.Keeper
+	MsgCreateFeed        = types.MsgCreateFeed
+	MsgStartFeed         = types.MsgStartFeed
+	MsgPauseFeed         = types.MsgPauseFeed
+	MsgEditFeed          = types.MsgEditFeed
+	GenesisState         = types.GenesisState
+	FeedEntry            = types.FeedEntry
 	QueryFeedParams      = types.QueryFeedParams
 	QueryFeedsParams     = types.QueryFeedsParams
 	QueryFeedValueParams = types.QueryFeedValueParams
-
-	FeedContext  = types.FeedContext
-	FeedsContext = types.FeedsContext
-	FeedValue    = types.FeedValue
-	FeedValues   = types.FeedValues
+	FeedContext          = types.FeedContext
+	FeedsContext         = types.FeedsContext
+	FeedValue            = types.FeedValue
+	FeedValues           = types.FeedValues
 )
 
 const (
@@ -35,9 +31,10 @@ const (
 )
 
 var (
-	NewKeeper  = keeper.NewKeeper
-	NewQuerier = keeper.NewQuerier
-
 	RegisterCodec                 = types.RegisterCodec
 	RequestContextStateFromString = types.RequestContextStateFromString
+
+	NewKeeper        = keeper.NewKeeper
+	NewQuerier       = keeper.NewQuerier
+	GetSvcDefinition = types.GetSvcDefinition
 )

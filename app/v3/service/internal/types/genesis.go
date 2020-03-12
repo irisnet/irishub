@@ -8,19 +8,19 @@ import (
 
 // GenesisState - all service state that must be provided at genesis
 type GenesisState struct {
-	Params            Params                      `json:"params"`             // service params
-	Definitions       []ServiceDefinition         `json:"definetions"`        // service definitions
-	Bindings          map[string][]ServiceBinding `json:"bindings"`           // service bindings
-	WithdrawAddresses []sdk.AccAddress            `json:"withdraw_addresses"` // withdraw addresses
-	RequestContexts   map[string]RequestContext   `json:"request_contexts"`   // request contexts
+	Params            Params                    `json:"params"`             // service params
+	Definitions       []ServiceDefinition       `json:"definitions"`        // service definitions
+	Bindings          []ServiceBinding          `json:"bindings"`           // service bindings
+	WithdrawAddresses map[string]sdk.AccAddress `json:"withdraw_addresses"` // withdraw addresses
+	RequestContexts   map[string]RequestContext `json:"request_contexts"`   // request contexts
 }
 
 // NewGenesisState constructs a GenesisState
 func NewGenesisState(
 	params Params,
 	definitions []ServiceDefinition,
-	bindings map[string][]ServiceBinding,
-	withdrawAddresses []sdk.AccAddress,
+	bindings []ServiceBinding,
+	withdrawAddresses map[string]sdk.AccAddress,
 	requestContexts map[string]RequestContext,
 ) GenesisState {
 	return GenesisState{
@@ -61,8 +61,10 @@ func ValidateGenesis(data GenesisState) error {
 		// TODO: validate Bindings
 	}
 
-	for range data.WithdrawAddresses {
-		// TODO: validate WithdrawAddresses
+	for providerAddressStr := range data.WithdrawAddresses {
+		if _, err := hex.DecodeString(providerAddressStr); err != nil {
+			return err
+		}
 	}
 
 	for requestContextID := range data.RequestContexts {

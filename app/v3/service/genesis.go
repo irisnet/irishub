@@ -17,11 +17,18 @@ func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
 
 	k.SetParamSet(ctx, data.Params)
 
-	// TODO: save service definitions
+	for _, definition := range data.Definitions {
+		k.SetServiceDefinition(ctx, definition)
+	}
 
-	// TODO: save service definition bindings
+	for _, binding := range data.Bindings {
+		k.SetServiceBinding(ctx, binding)
+	}
 
-	// TODO: save withdraw addresses
+	for providerAddressStr, withdrawAddress := range data.WithdrawAddresses {
+		providerAddress, _ := hex.DecodeString(providerAddressStr)
+		k.SetWithdrawAddress(ctx, providerAddress, withdrawAddress)
+	}
 
 	for reqContextIDStr, requestContext := range data.RequestContexts {
 		requestContextID, _ := hex.DecodeString(reqContextIDStr)
@@ -29,25 +36,29 @@ func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
 	}
 }
 
+func InitModuleServiceDefinition(ctx sdk.Context, k Keeper, svcDefinition ServiceDefinition) {
+	k.SetServiceDefinition(ctx, svcDefinition)
+}
+
 // ExportGenesis - output genesis parameters
 func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 	definitions := []ServiceDefinition{}
-	bindings := make(map[string][]ServiceBinding)
-	withdrawAddress := []sdk.AccAddress{}
+	bindings := []ServiceBinding{}
+	withdrawAddresses := make(map[string]sdk.AccAddress)
 	requestContexts := make(map[string]RequestContext)
 
 	k.IterateServiceDefinitions(
 		ctx,
-		func(name string, definition ServiceDefinition) bool {
-			// TODO
+		func(definition ServiceDefinition) bool {
+			definitions = append(definitions, definition)
 			return false
 		},
 	)
 
 	k.IterateServiceBindings(
 		ctx,
-		func(name string, binding ServiceBinding) bool {
-			// TODO
+		func(binding ServiceBinding) bool {
+			bindings = append(bindings, binding)
 			return false
 		},
 	)
@@ -55,7 +66,7 @@ func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 	k.IterateWithdrawAddresses(
 		ctx,
 		func(providerAddress sdk.AccAddress, withdrawAddress sdk.AccAddress) bool {
-			// TODO
+			withdrawAddresses[providerAddress.String()] = withdrawAddress
 			return false
 		},
 	)
@@ -68,27 +79,11 @@ func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 		},
 	)
 
-	k.IterateNewRequestBatch(
-		ctx,
-		func(height cmn.HexBytes, requestContextID cmn.HexBytes) bool {
-			// TODO
-			return false
-		},
-	)
-
-	k.IterateExpiredRequestBatch(
-		ctx,
-		func(height cmn.HexBytes, requestContextID cmn.HexBytes) bool {
-			// TODO
-			return false
-		},
-	)
-
 	return NewGenesisState(
 		k.GetParamSet(ctx),
 		definitions,
 		bindings,
-		withdrawAddress,
+		withdrawAddresses,
 		requestContexts,
 	)
 }

@@ -275,7 +275,7 @@ func (k Keeper) AllServiceBindingsIterator(ctx sdk.Context) sdk.Iterator {
 
 func (k Keeper) IterateServiceBindings(
 	ctx sdk.Context,
-	op func(name string, binding types.ServiceBinding) (stop bool),
+	op func(binding types.ServiceBinding) (stop bool),
 ) {
 	store := ctx.KVStore(k.storeKey)
 
@@ -286,7 +286,7 @@ func (k Keeper) IterateServiceBindings(
 		var binding types.ServiceBinding
 		k.GetCdc().MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &binding)
 
-		if stop := op(binding.ServiceName, binding); stop {
+		if stop := op(binding); stop {
 			break
 		}
 	}
