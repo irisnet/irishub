@@ -82,7 +82,7 @@ func TestFeed(t *testing.T) {
 	//================test StartFeed end================
 
 	//================test EditFeed start================
-	latestHistory := uint64(3)
+	latestHistory := uint64(1)
 	err = keeper.EditFeed(ctx, types.MsgEditFeed{
 		FeedName:          msg.FeedName,
 		LatestHistory:     latestHistory,
