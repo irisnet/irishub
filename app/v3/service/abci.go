@@ -16,14 +16,8 @@ func EndBlocker(ctx sdk.Context, k Keeper) (tags sdk.Tags) {
 	// handler for the active request on expired
 	expiredRequestHandler := func(requestID cmn.HexBytes, request Request) {
 		if !request.SuperMode {
-			slashTags, err := k.Slash(ctx, requestID)
-			if err != nil {
-				panic(err)
-			}
-
-			if err := k.RefundServiceFee(ctx, request.Consumer, request.ServiceFee); err != nil {
-				panic(err)
-			}
+			slashTags, _ := k.Slash(ctx, requestID)
+			_ = k.RefundServiceFee(ctx, request.Consumer, request.ServiceFee)
 
 			tags = tags.AppendTags(slashTags)
 		}
