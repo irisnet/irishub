@@ -26,14 +26,12 @@ func DefaultGenesisState() GenesisState {
 
 // InitGenesis - store genesis parameters
 func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
-	err := ValidateGenesis(data)
-	if err != nil {
+	if err := ValidateGenesis(data); err != nil {
 		// TODO: Handle this with #870
 		panic(err)
 	}
 
-	err = k.setInitialProposalID(ctx, StartingProposalID)
-	if err != nil {
+	if err := k.setInitialProposalID(ctx, StartingProposalID); err != nil {
 		// TODO: Handle this with #870
 		panic(err)
 	}
@@ -51,8 +49,7 @@ func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 }
 
 func ValidateGenesis(data GenesisState) error {
-	err := validateParams(data.Params)
-	if err != nil {
+	if err := validateParams(data.Params); err != nil {
 		return err
 	}
 	return nil
@@ -60,7 +57,6 @@ func ValidateGenesis(data GenesisState) error {
 
 // get raw genesis raw message for testing
 func DefaultGenesisStateForCliTest() GenesisState {
-
 	return GenesisState{
 		Params: DefaultParamsForTest(),
 	}

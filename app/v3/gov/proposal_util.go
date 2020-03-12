@@ -16,9 +16,7 @@ func createPlainTextInfo() pTypeInfo {
 		ProposalLevelNormal,
 		func(content Content) Proposal {
 			return buildProposal(content, func(p BasicProposal, content Content) Proposal {
-				return &PlainTextProposal{
-					p,
-				}
+				return &PlainTextProposal{p}
 			})
 		},
 	}
@@ -28,12 +26,15 @@ func createParameterInfo() pTypeInfo {
 		ProposalTypeParameter,
 		ProposalLevelImportant,
 		func(content Content) Proposal {
-			return buildProposal(content, func(p BasicProposal, content Content) Proposal {
-				return &ParameterProposal{
-					p,
-					content.GetParams(),
-				}
-			})
+			return buildProposal(
+				content,
+				func(p BasicProposal, content Content) Proposal {
+					return &ParameterProposal{
+						p,
+						content.GetParams(),
+					}
+				},
+			)
 		},
 	}
 }
@@ -42,18 +43,22 @@ func createSoftwareUpgradeInfo() pTypeInfo {
 		ProposalTypeSoftwareUpgrade,
 		ProposalLevelCritical,
 		func(content Content) Proposal {
-			return buildProposal(content, func(p BasicProposal, content Content) Proposal {
-				upgradeMsg := content.(MsgSubmitSoftwareUpgradeProposal)
-				proposal := &SoftwareUpgradeProposal{
-					p,
-					sdk.ProtocolDefinition{
-						Version:   upgradeMsg.Version,
-						Software:  upgradeMsg.Software,
-						Height:    upgradeMsg.SwitchHeight,
-						Threshold: upgradeMsg.Threshold},
-				}
-				return proposal
-			})
+			return buildProposal(
+				content,
+				func(p BasicProposal, content Content) Proposal {
+					upgradeMsg := content.(MsgSubmitSoftwareUpgradeProposal)
+					proposal := &SoftwareUpgradeProposal{
+						p,
+						sdk.ProtocolDefinition{
+							Version:   upgradeMsg.Version,
+							Software:  upgradeMsg.Software,
+							Height:    upgradeMsg.SwitchHeight,
+							Threshold: upgradeMsg.Threshold,
+						},
+					}
+					return proposal
+				},
+			)
 		},
 	}
 }
@@ -64,9 +69,7 @@ func createSystemHaltInfo() pTypeInfo {
 		ProposalLevelCritical,
 		func(content Content) Proposal {
 			return buildProposal(content, func(p BasicProposal, content Content) Proposal {
-				return &SystemHaltProposal{
-					p,
-				}
+				return &SystemHaltProposal{p}
 			})
 		},
 	}
@@ -77,23 +80,29 @@ func createCommunityTaxUsageInfo() pTypeInfo {
 		ProposalTypeCommunityTaxUsage,
 		ProposalLevelImportant,
 		func(content Content) Proposal {
-			return buildProposal(content, func(p BasicProposal, content Content) Proposal {
-				taxMsg := content.(MsgSubmitCommunityTaxUsageProposal)
-				proposal := &CommunityTaxUsageProposal{
-					p,
-					TaxUsage{
-						Usage:       taxMsg.Usage,
-						DestAddress: taxMsg.DestAddress,
-						Amount:      taxMsg.Amount,
-					},
-				}
-				return proposal
-			})
+			return buildProposal(
+				content,
+				func(p BasicProposal, content Content) Proposal {
+					taxMsg := content.(MsgSubmitCommunityTaxUsageProposal)
+					proposal := &CommunityTaxUsageProposal{
+						p,
+						TaxUsage{
+							Usage:       taxMsg.Usage,
+							DestAddress: taxMsg.DestAddress,
+							Amount:      taxMsg.Amount,
+						},
+					}
+					return proposal
+				},
+			)
 		},
 	}
 }
 
-func buildProposal(content Content, callback func(p BasicProposal, content Content) Proposal) Proposal {
+func buildProposal(
+	content Content,
+	callback func(p BasicProposal, content Content) Proposal,
+) Proposal {
 	var p = BasicProposal{
 		Title:        content.GetTitle(),
 		Description:  content.GetDescription(),

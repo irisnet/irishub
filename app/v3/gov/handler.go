@@ -62,8 +62,7 @@ func handleMsgDeposit(ctx sdk.Context, keeper Keeper, msg MsgDeposit) sdk.Result
 
 func handleMsgVote(ctx sdk.Context, keeper Keeper, msg MsgVote) sdk.Result {
 
-	err := keeper.AddVote(ctx, msg.ProposalID, msg.Voter, msg.Option)
-	if err != nil {
+	if err := keeper.AddVote(ctx, msg.ProposalID, msg.Voter, msg.Option); err != nil {
 		return err.Result()
 	}
 
