@@ -29,9 +29,10 @@ const (
 
 // exported variables and functions
 var (
-	TagReqID      = types.TagReqID
-	TagRandHeight = types.TagRandHeight
-	TagRand       = types.TagRand
+	TagReqID            = types.TagReqID
+	TagRequestContextID = types.TagRequestContextID
+	TagRandHeight       = types.TagRandHeight
+	TagRand             = types.TagRand
 
 	RegisterCodec     = types.RegisterCodec
 	NewMsgRequestRand = types.NewMsgRequestRand
