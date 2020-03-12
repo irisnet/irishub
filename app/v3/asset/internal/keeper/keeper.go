@@ -188,9 +188,11 @@ func (k Keeper) MintToken(ctx sdk.Context, msg types.MsgMintToken) (sdk.Tags, sd
 		return nil, types.ErrAssetNotExists(k.codespace, fmt.Sprintf("denom of minting token is not equal to the issued token, expected:%s, actual:%s", expDenom, issuedAmt.Denom))
 	}
 
-	mintableMaxAmt := uint64(sdk.NewIntWithDecimal(int64(token.MaxSupply), int(token.Decimal)).Sub(issuedAmt.Amount).Div(sdk.NewIntWithDecimal(1, int(token.Decimal))).Int64())
-	if msg.Amount > mintableMaxAmt {
-		return nil, types.ErrInvalidAssetMaxSupply(k.codespace, fmt.Sprintf("The amount of minting tokens plus the total amount of issued tokens has exceeded the maximum supply, only accepts amount (0, %d]", mintableMaxAmt))
+	mintableMaxAmt := sdk.NewIntWithDecimal(int64(token.MaxSupply), int(token.Decimal)).Sub(issuedAmt.Amount)
+	mintableMaxMainUnitAmt := uint64(mintableMaxAmt.Div(sdk.NewIntWithDecimal(1, int(token.Decimal))).Int64())
+
+	if msg.Amount > mintableMaxMainUnitAmt {
+		return nil, types.ErrInvalidAssetMaxSupply(k.codespace, fmt.Sprintf("The amount of minting tokens plus the total amount of issued tokens has exceeded the maximum supply, only accepts amount (0, %d]", mintableMaxMainUnitAmt))
 	}
 
 	mintCoin := sdk.NewCoin(expDenom, sdk.NewIntWithDecimal(int64(msg.Amount), int(token.Decimal)))
