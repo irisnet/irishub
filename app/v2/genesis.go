@@ -10,6 +10,8 @@ import (
 	"sort"
 	"strings"
 
+	tmtypes "github.com/tendermint/tendermint/types"
+
 	"github.com/irisnet/irishub/app/v1/asset"
 	"github.com/irisnet/irishub/app/v1/auth"
 	distr "github.com/irisnet/irishub/app/v1/distribution"
@@ -26,7 +28,6 @@ import (
 	"github.com/irisnet/irishub/modules/guardian"
 	"github.com/irisnet/irishub/types"
 	sdk "github.com/irisnet/irishub/types"
-	tmtypes "github.com/tendermint/tendermint/types"
 )
 
 // GenesisState state to unmarshal
@@ -49,10 +50,22 @@ type GenesisState struct {
 }
 
 // NewGenesisState genesis state constructor
-func NewGenesisState(accounts []GenesisAccount, authData auth.GenesisState, stakeData stake.GenesisState, mintData mint.GenesisState,
-	distrData distr.GenesisState, govData gov.GenesisState, upgradeData upgrade.GenesisState, serviceData service.GenesisState,
-	guardianData guardian.GenesisState, slashingData slashing.GenesisState, assetData asset.GenesisState, randData rand.GenesisState,
-	swapData coinswap.GenesisState, htlcData htlc.GenesisState) GenesisState {
+func NewGenesisState(
+	accounts []GenesisAccount,
+	authData auth.GenesisState,
+	stakeData stake.GenesisState,
+	mintData mint.GenesisState,
+	distrData distr.GenesisState,
+	govData gov.GenesisState,
+	upgradeData upgrade.GenesisState,
+	serviceData service.GenesisState,
+	guardianData guardian.GenesisState,
+	slashingData slashing.GenesisState,
+	assetData asset.GenesisState,
+	randData rand.GenesisState,
+	swapData coinswap.GenesisState,
+	htlcData htlc.GenesisState,
+) GenesisState {
 
 	return GenesisState{
 		Accounts:     accounts,
@@ -150,8 +163,7 @@ func IrisAppGenState(cdc *codec.Codec, genDoc tmtypes.GenesisDoc, appGenTxs []js
 // TODO: Error if there is a duplicate validator (#1708)
 // TODO: Ensure all state machine parameters are in genesis (#1704)
 func IrisValidateGenesisState(genesisState GenesisState) (err error) {
-	err = validateGenesisStateAccounts(genesisState.Accounts)
-	if err != nil {
+	if err = validateGenesisStateAccounts(genesisState.Accounts); err != nil {
 		return
 	}
 	// skip stakeData validation as genesis is created from txs
@@ -322,6 +334,7 @@ func convertToMinDenomCoins(coinStrArray []string) sdk.Coins {
 	if accountCoins.IsZero() {
 		panic("invalid genesis file, found account without any token")
 	}
+
 	return accountCoins
 }
 
@@ -336,6 +349,7 @@ func convertToGenesisState(genesisFileState GenesisFileState) GenesisState {
 		}
 		genesisAccounts = append(genesisAccounts, acc)
 	}
+
 	return GenesisState{
 		Accounts:     genesisAccounts,
 		AuthData:     genesisFileState.AuthData,
@@ -386,6 +400,7 @@ func NewGenesisFileAccount(acc *auth.BaseAccount) GenesisFileAccount {
 	for _, coin := range acc.Coins {
 		coins = append(coins, coin.String())
 	}
+
 	return GenesisFileAccount{
 		Address:       acc.Address,
 		Coins:         coins,
@@ -394,11 +409,22 @@ func NewGenesisFileAccount(acc *auth.BaseAccount) GenesisFileAccount {
 	}
 }
 
-func NewGenesisFileState(accounts []GenesisFileAccount, authData auth.GenesisState, stakeData stake.GenesisState, mintData mint.GenesisState,
-	distrData distr.GenesisState, govData gov.GenesisState, upgradeData upgrade.GenesisState, serviceData service.GenesisState,
-	guardianData guardian.GenesisState, slashingData slashing.GenesisState, assetData asset.GenesisState, randData rand.GenesisState,
-	swapData coinswap.GenesisState, htlcData htlc.GenesisState) GenesisFileState {
-
+func NewGenesisFileState(
+	accounts []GenesisFileAccount,
+	authData auth.GenesisState,
+	stakeData stake.GenesisState,
+	mintData mint.GenesisState,
+	distrData distr.GenesisState,
+	govData gov.GenesisState,
+	upgradeData upgrade.GenesisState,
+	serviceData service.GenesisState,
+	guardianData guardian.GenesisState,
+	slashingData slashing.GenesisState,
+	assetData asset.GenesisState,
+	randData rand.GenesisState,
+	swapData coinswap.GenesisState,
+	htlcData htlc.GenesisState,
+) GenesisFileState {
 	return GenesisFileState{
 		Accounts:     accounts,
 		AuthData:     authData,

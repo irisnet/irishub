@@ -3,12 +3,14 @@ package gov
 import (
 	"strconv"
 
+	stdprometheus "github.com/prometheus/client_golang/prometheus"
+
+	cfg "github.com/tendermint/tendermint/config"
+
 	distr "github.com/irisnet/irishub/app/v1/distribution/types"
 	"github.com/irisnet/irishub/app/v1/mint"
 	promutil "github.com/irisnet/irishub/tools/prometheus"
 	sdk "github.com/irisnet/irishub/types"
-	stdprometheus "github.com/prometheus/client_golang/prometheus"
-	cfg "github.com/tendermint/tendermint/config"
 )
 
 const (
@@ -33,26 +35,35 @@ func PrometheusMetrics(config *cfg.InstrumentationConfig) *Metrics {
 		return NopMetrics()
 	}
 
-	proposalStatusVec := stdprometheus.NewGaugeVec(stdprometheus.GaugeOpts{
-		Namespace: config.Namespace,
-		Subsystem: MetricsSubsystem,
-		Name:      "proposal_status",
-		Help:      "the status of the proposal",
-	}, []string{ProposalIDLabel})
+	proposalStatusVec := stdprometheus.NewGaugeVec(
+		stdprometheus.GaugeOpts{
+			Namespace: config.Namespace,
+			Subsystem: MetricsSubsystem,
+			Name:      "proposal_status",
+			Help:      "the status of the proposal",
+		},
+		[]string{ProposalIDLabel},
+	)
 
-	voteVec := stdprometheus.NewGaugeVec(stdprometheus.GaugeOpts{
-		Namespace: config.Namespace,
-		Subsystem: MetricsSubsystem,
-		Name:      "vote",
-		Help:      "validator vote the proposal",
-	}, []string{ValidatorLabel, ProposalIDLabel})
+	voteVec := stdprometheus.NewGaugeVec(
+		stdprometheus.GaugeOpts{
+			Namespace: config.Namespace,
+			Subsystem: MetricsSubsystem,
+			Name:      "vote",
+			Help:      "validator vote the proposal",
+		},
+		[]string{ValidatorLabel, ProposalIDLabel},
+	)
 
-	paramVec := stdprometheus.NewGaugeVec(stdprometheus.GaugeOpts{
-		Namespace: config.Namespace,
-		Subsystem: MetricsSubsystem,
-		Name:      "parameter",
-		Help:      "parameter changes",
-	}, []string{ParamKeyLabel})
+	paramVec := stdprometheus.NewGaugeVec(
+		stdprometheus.GaugeOpts{
+			Namespace: config.Namespace,
+			Subsystem: MetricsSubsystem,
+			Name:      "parameter",
+			Help:      "parameter changes",
+		},
+		[]string{ParamKeyLabel},
+	)
 
 	promutil.RegisterMetrics(proposalStatusVec, voteVec, paramVec)
 

@@ -7,6 +7,7 @@ import (
 
 // EndBlocker handles block ending logic for service
 func EndBlocker(ctx sdk.Context, k Keeper) (tags sdk.Tags) {
+	tags = sdk.NewTags()
 	ctx = ctx.WithCoinFlowTrigger(sdk.ServiceEndBlocker)
 	ctx = ctx.WithLogger(ctx.Logger().With("handler", "endBlock").With("module", "iris/service"))
 
