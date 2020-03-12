@@ -5,11 +5,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/irisnet/irishub/app/v1/auth"
+	"github.com/stretchr/testify/require"
 
+	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/app/v3/coinswap/internal/types"
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/stretchr/testify/require"
 )
 
 var (
@@ -17,7 +17,6 @@ var (
 )
 
 func TestGetUniId(t *testing.T) {
-
 	cases := []struct {
 		name         string
 		denom1       string
@@ -207,7 +206,7 @@ func TestKeeperDoubleSwap(t *testing.T) {
 
 	// second swap buy order
 	_, err = app.csk.HandleSwap(ctx, msg)
-	require.True(t, err == nil)
+	require.NoError(t, err)
 
 	poolBTC, existed = app.csk.GetPool(app.ctx, btcUniID)
 	require.True(t, existed)
