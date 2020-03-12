@@ -298,7 +298,7 @@ func ValidateDescription(desc string) sdk.Error {
 func ValidateAggregateFunc(aggregateFunc string) sdk.Error {
 	aggregateFunc = strings.TrimSpace(aggregateFunc)
 	if len(aggregateFunc) == 0 || len(aggregateFunc) > MaxAggregateFuncLen {
-		return ErrInvalidAggregateFunc(DefaultCodespace)
+		return ErrInvalidAggregateFunc(DefaultCodespace, len(aggregateFunc))
 	}
 	if _, err := GetAggregateFunc(aggregateFunc); err != nil {
 		return err
@@ -309,7 +309,7 @@ func ValidateAggregateFunc(aggregateFunc string) sdk.Error {
 func ValidateValueJsonPath(valueJsonPath string) sdk.Error {
 	valueJsonPath = strings.TrimSpace(valueJsonPath)
 	if len(valueJsonPath) == 0 || len(valueJsonPath) > MaxValueJsonPath {
-		return ErrInvalidValueJsonPath(DefaultCodespace)
+		return ErrInvalidValueJsonPath(DefaultCodespace, len(valueJsonPath))
 	}
 	return nil
 }
@@ -331,10 +331,10 @@ func ValidateCreator(creator sdk.AccAddress) sdk.Error {
 func validateServiceName(serviceName string) sdk.Error {
 	serviceName = strings.TrimSpace(serviceName)
 	if len(serviceName) == 0 || len(serviceName) > MaxNameLen {
-		return ErrInvalidServiceName(DefaultCodespace)
+		return ErrInvalidServiceName(DefaultCodespace, serviceName)
 	}
 	if !regPlainText.MatchString(serviceName) {
-		return ErrInvalidServiceName(DefaultCodespace)
+		return ErrInvalidServiceName(DefaultCodespace, serviceName)
 	}
 	return nil
 }

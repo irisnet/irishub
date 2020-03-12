@@ -43,8 +43,8 @@ func ErrUnauthorized(codespace sdk.CodespaceType, feedName string, owner sdk.Acc
 	return sdk.NewError(codespace, CodeUnauthorized, "feed %s does not belong to %s", feedName, owner.String())
 }
 
-func ErrInvalidServiceName(codespace sdk.CodespaceType) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidServiceName, "service name length should be more than 0 and less than %d", MaxNameLen)
+func ErrInvalidServiceName(codespace sdk.CodespaceType, serviceName string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidServiceName, "service name %s; only alphanumeric characters, _ and - accepted, the length ranges in (0,%d]", serviceName, MaxNameLen)
 }
 
 func ErrEmptyProviders(codespace sdk.CodespaceType) sdk.Error {
@@ -67,12 +67,12 @@ func ErrInvalidAddress(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidAddress, msg)
 }
 
-func ErrInvalidAggregateFunc(codespace sdk.CodespaceType) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidAggregateFunc, "aggregate function name length should be more than 0 and less than %d", MaxNameLen)
+func ErrInvalidAggregateFunc(codespace sdk.CodespaceType, len int) sdk.Error {
+	return sdk.ErrInvalidLength(codespace, CodeInvalidAggregateFunc, "aggregateFunc", len, MaxNameLen)
 }
 
-func ErrInvalidValueJsonPath(codespace sdk.CodespaceType) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidValueJsonPath, "json path length should be more than 0 and less than %d", MaxNameLen)
+func ErrInvalidValueJsonPath(codespace sdk.CodespaceType, len int) sdk.Error {
+	return sdk.ErrInvalidLength(codespace, CodeInvalidValueJsonPath, "valueJsonPath", len, MaxNameLen)
 }
 
 func ErrUnknownRequestContextID(codespace sdk.CodespaceType, reqCtxID []byte) sdk.Error {
@@ -92,7 +92,7 @@ func ErrNotProfiler(codespace sdk.CodespaceType, profiler sdk.AccAddress) sdk.Er
 }
 
 func ErrInvalidDescription(codespace sdk.CodespaceType, descLen int) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidDescription, "description length should be no more than %d,actual length is %d", MaxDescriptionLen, descLen)
+	return sdk.ErrInvalidLength(codespace, CodeInvalidDescription, "description", descLen, MaxDescriptionLen)
 }
 
 func ErrInvalidTimeout(codespace sdk.CodespaceType, timeout int64, frequency uint64) sdk.Error {
