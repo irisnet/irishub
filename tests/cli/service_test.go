@@ -309,6 +309,7 @@ func TestIrisCLIService(t *testing.T) {
 
 	rsStr = fmt.Sprintf("iriscli service respond %v", flags)
 	rsStr += fmt.Sprintf(" --request-id=%s", barRequestID)
+	rsStr += fmt.Sprintf(" --result=%s", result)
 	rsStr += fmt.Sprintf(" --data=%s", output)
 	rsStr += fmt.Sprintf(" --fee=%s", "0.4iris")
 	rsStr += fmt.Sprintf(" --from=%s", "bar")
