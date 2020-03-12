@@ -6,8 +6,9 @@ import (
 	"strings"
 	"time"
 
-	sdk "github.com/irisnet/irishub/types"
 	"github.com/pkg/errors"
+
+	sdk "github.com/irisnet/irishub/types"
 )
 
 //-----------------------------------------------------------
@@ -86,9 +87,17 @@ func (bp BasicProposal) String() string {
   Voting Start Time:  %s
   Voting End Time:    %s
   Description:        %s`,
-		bp.ProposalID, bp.Title, bp.ProposalType, bp.Proposer.String(),
-		bp.Status, bp.SubmitTime, bp.DepositEndTime,
-		bp.TotalDeposit.String(), bp.VotingStartTime, bp.VotingEndTime, bp.GetDescription(),
+		bp.ProposalID,
+		bp.Title,
+		bp.ProposalType,
+		bp.Proposer.String(),
+		bp.Status,
+		bp.SubmitTime,
+		bp.DepositEndTime,
+		bp.TotalDeposit.String(),
+		bp.VotingStartTime,
+		bp.VotingEndTime,
+		bp.GetDescription(),
 	)
 }
 
@@ -103,9 +112,16 @@ func (bp BasicProposal) HumanString(converter sdk.CoinsConverter) string {
   Voting Start Time:  %s
   Voting End Time:    %s
   Description:        %s`,
-		bp.ProposalID, bp.Title, bp.ProposalType,
-		bp.Status, bp.SubmitTime, bp.DepositEndTime,
-		converter.ToMainUnit(bp.TotalDeposit), bp.VotingStartTime, bp.VotingEndTime, bp.GetDescription(),
+		bp.ProposalID,
+		bp.Title,
+		bp.ProposalType,
+		bp.Status,
+		bp.SubmitTime,
+		bp.DepositEndTime,
+		converter.ToMainUnit(bp.TotalDeposit),
+		bp.VotingStartTime,
+		bp.VotingEndTime,
+		bp.GetDescription(),
 	)
 }
 
@@ -260,8 +276,7 @@ func (pt ProposalKind) MarshalJSON() ([]byte, error) {
 // Unmarshals from JSON assuming Bech32 encoding
 func (pt *ProposalKind) UnmarshalJSON(data []byte) error {
 	var s string
-	err := json.Unmarshal(data, &s)
-	if err != nil {
+	if err := json.Unmarshal(data, &s); err != nil {
 		return nil
 	}
 
@@ -434,5 +449,11 @@ func (tr TallyResult) String() string {
   Abstain:            %s
   No:                 %s
   NoWithVeto:         %s
-  SystemVotingPower:  %s`, tr.Yes.String(), tr.Abstain.String(), tr.No.String(), tr.NoWithVeto.String(), tr.SystemVotingPower.String())
+  SystemVotingPower:  %s`,
+		tr.Yes.String(),
+		tr.Abstain.String(),
+		tr.No.String(),
+		tr.NoWithVeto.String(),
+		tr.SystemVotingPower.String(),
+	)
 }

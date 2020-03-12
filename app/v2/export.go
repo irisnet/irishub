@@ -3,6 +3,8 @@ package v2
 import (
 	"encoding/json"
 
+	tmtypes "github.com/tendermint/tendermint/types"
+
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/app/v1/asset"
 	"github.com/irisnet/irishub/app/v1/auth"
@@ -19,7 +21,6 @@ import (
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/guardian"
 	sdk "github.com/irisnet/irishub/types"
-	tmtypes "github.com/tendermint/tendermint/types"
 )
 
 // export the state of iris for a genesis file

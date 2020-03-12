@@ -9,7 +9,12 @@ import (
 // name to identify transaction types
 const MsgRoute = "gov"
 
-var _, _, _, _ sdk.Msg = MsgSubmitProposal{}, MsgSubmitCommunityTaxUsageProposal{}, MsgDeposit{}, MsgVote{}
+var (
+	_ sdk.Msg = MsgSubmitProposal{}
+	_ sdk.Msg = MsgSubmitCommunityTaxUsageProposal{}
+	_ sdk.Msg = MsgDeposit{}
+	_ sdk.Msg = MsgVote{}
+)
 
 type Content interface {
 	sdk.Msg

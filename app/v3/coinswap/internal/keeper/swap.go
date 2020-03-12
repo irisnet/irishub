@@ -26,6 +26,7 @@ func (k Keeper) swapCoins(ctx sdk.Context, sender, recipient sdk.AccAddress, coi
 		return err
 	}
 	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, uniID, recipient.String(), coinBought.String(), sdk.CoinSwapOutputFlow, "")
+
 	return nil
 }
 
@@ -56,6 +57,7 @@ func (k Keeper) calculateWithExactInput(ctx sdk.Context, exactSoldCoin sdk.Coin,
 	param := k.GetParams(ctx)
 
 	boughtTokenAmt := getInputPrice(exactSoldCoin.Amount, inputReserve, outputReserve, param.Fee)
+
 	return boughtTokenAmt, nil
 }
 
@@ -78,10 +80,10 @@ func (k Keeper) tradeExactInputForOutput(ctx sdk.Context, input types.Input, out
 		return sdk.ZeroInt(), types.ErrConstraintNotMet(fmt.Sprintf("insufficient amount of %s, user expected: %s, actual: %s", output.Coin.Denom, output.Coin.Amount.String(), boughtTokenAmt.String()))
 	}
 	boughtToken := sdk.NewCoin(output.Coin.Denom, boughtTokenAmt)
-	err = k.swapCoins(ctx, input.Address, output.Address, input.Coin, boughtToken)
-	if err != nil {
+	if err = k.swapCoins(ctx, input.Address, output.Address, input.Coin, boughtToken); err != nil {
 		return sdk.ZeroInt(), err
 	}
+
 	return boughtTokenAmt, nil
 }
 
@@ -99,8 +101,7 @@ func (k Keeper) doubleTradeExactInputForOutput(ctx sdk.Context, input types.Inpu
 		return sdk.ZeroInt(), err
 	}
 	nativeCoin := sdk.NewCoin(sdk.IrisAtto, nativeAmount)
-	err = k.swapCoins(ctx, input.Address, output.Address, input.Coin, nativeCoin)
-	if err != nil {
+	if err = k.swapCoins(ctx, input.Address, output.Address, input.Coin, nativeCoin); err != nil {
 		return sdk.ZeroInt(), err
 	}
 
@@ -115,8 +116,7 @@ func (k Keeper) doubleTradeExactInputForOutput(ctx sdk.Context, input types.Inpu
 		return sdk.ZeroInt(), types.ErrConstraintNotMet(fmt.Sprintf("insufficient amount of %s, user expected: %s, actual: %s", output.Coin.Denom, output.Coin.Amount.String(), boughtAmt.String()))
 	}
 
-	err = k.swapCoins(ctx, input.Address, output.Address, nativeCoin, boughtToken)
-	if err != nil {
+	if err = k.swapCoins(ctx, input.Address, output.Address, nativeCoin, boughtToken); err != nil {
 		return sdk.ZeroInt(), err
 	}
 	return boughtAmt, nil

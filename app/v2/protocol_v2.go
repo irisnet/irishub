@@ -5,6 +5,10 @@ import (
 	"sort"
 	"strings"
 
+	abci "github.com/tendermint/tendermint/abci/types"
+	cfg "github.com/tendermint/tendermint/config"
+	"github.com/tendermint/tendermint/libs/log"
+
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/app/v1/asset"
 	"github.com/irisnet/irishub/app/v1/auth"
@@ -23,9 +27,6 @@ import (
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/guardian"
 	sdk "github.com/irisnet/irishub/types"
-	abci "github.com/tendermint/tendermint/abci/types"
-	cfg "github.com/tendermint/tendermint/config"
-	"github.com/tendermint/tendermint/libs/log"
 )
 
 var _ protocol.Protocol = (*ProtocolV2)(nil)
@@ -75,7 +76,14 @@ type ProtocolV2 struct {
 }
 
 // NewProtocolV2 protocol v2 constructor
-func NewProtocolV2(version uint64, log log.Logger, pk sdk.ProtocolKeeper, checkInvariant bool, trackCoinFlow bool, config *cfg.InstrumentationConfig) *ProtocolV2 {
+func NewProtocolV2(
+	version uint64,
+	log log.Logger,
+	pk sdk.ProtocolKeeper,
+	checkInvariant bool,
+	trackCoinFlow bool,
+	config *cfg.InstrumentationConfig,
+) *ProtocolV2 {
 	p0 := ProtocolV2{
 		version:        version,
 		logger:         log,
@@ -151,7 +159,6 @@ func (p *ProtocolV2) GetVersion() uint64 {
 
 // ValidateTx validate txs
 func (p *ProtocolV2) ValidateTx(ctx sdk.Context, txBytes []byte, msgs []sdk.Msg) sdk.Error {
-
 	serviceMsgNum := 0
 	for _, msg := range msgs {
 		if msg.Route() == service.MsgRoute {
@@ -215,34 +222,45 @@ func (p *ProtocolV2) configKeepers() {
 	)
 	p.paramsKeeper = params.NewKeeper(
 		p.cdc,
-		protocol.KeyParams, protocol.TkeyParams,
+		protocol.KeyParams,
+		protocol.TkeyParams,
 	)
 	p.feeKeeper = auth.NewFeeKeeper(
 		p.cdc,
-		protocol.KeyFee, p.paramsKeeper.Subspace(auth.DefaultParamSpace),
+		protocol.KeyFee,
+		p.paramsKeeper.Subspace(auth.DefaultParamSpace),
 	)
 	stakeKeeper := stake.NewKeeper(
 		p.cdc,
-		protocol.KeyStake, protocol.TkeyStake,
-		p.bankKeeper, p.paramsKeeper.Subspace(stake.DefaultParamspace),
+		protocol.KeyStake,
+		protocol.TkeyStake,
+		p.bankKeeper,
+		p.paramsKeeper.Subspace(stake.DefaultParamspace),
 		stake.DefaultCodespace,
 		stake.PrometheusMetrics(p.config),
 	)
-	p.mintKeeper = mint.NewKeeper(p.cdc, protocol.KeyMint,
+	p.mintKeeper = mint.NewKeeper(
+		p.cdc,
+		protocol.KeyMint,
 		p.paramsKeeper.Subspace(mint.DefaultParamSpace),
-		p.bankKeeper, p.feeKeeper,
+		p.bankKeeper,
+		p.feeKeeper,
 	)
 	p.distrKeeper = distr.NewKeeper(
 		p.cdc,
 		protocol.KeyDistr,
 		p.paramsKeeper.Subspace(distr.DefaultParamspace),
-		p.bankKeeper, &stakeKeeper, p.feeKeeper,
-		distr.DefaultCodespace, distr.PrometheusMetrics(p.config),
+		p.bankKeeper,
+		&stakeKeeper,
+		p.feeKeeper,
+		distr.DefaultCodespace,
+		distr.PrometheusMetrics(p.config),
 	)
 	p.slashingKeeper = slashing.NewKeeper(
 		p.cdc,
 		protocol.KeySlashing,
-		&stakeKeeper, p.paramsKeeper.Subspace(slashing.DefaultParamspace),
+		&stakeKeeper,
+		p.paramsKeeper.Subspace(slashing.DefaultParamspace),
 		slashing.DefaultCodespace,
 		slashing.PrometheusMetrics(p.config),
 	)
@@ -261,11 +279,26 @@ func (p *ProtocolV2) configKeepers() {
 	// NOTE: StakeKeeper above are passed by reference,
 	// so that it can be modified like below:
 	p.StakeKeeper = *stakeKeeper.SetHooks(
-		NewHooks(p.distrKeeper.Hooks(), p.slashingKeeper.Hooks()))
+		NewHooks(
+			p.distrKeeper.Hooks(),
+			p.slashingKeeper.Hooks(),
+		),
+	)
 
-	p.upgradeKeeper = upgrade.NewKeeper(p.cdc, protocol.KeyUpgrade, p.protocolKeeper, p.StakeKeeper, upgrade.PrometheusMetrics(p.config))
+	p.upgradeKeeper = upgrade.NewKeeper(
+		p.cdc,
+		protocol.KeyUpgrade,
+		p.protocolKeeper,
+		p.StakeKeeper,
+		upgrade.PrometheusMetrics(p.config),
+	)
 
-	p.assetKeeper = asset.NewKeeper(p.cdc, protocol.KeyAsset, p.bankKeeper, asset.DefaultCodespace, p.paramsKeeper.Subspace(asset.DefaultParamSpace))
+	p.assetKeeper = asset.NewKeeper(
+		p.cdc, protocol.KeyAsset,
+		p.bankKeeper,
+		asset.DefaultCodespace,
+		p.paramsKeeper.Subspace(asset.DefaultParamSpace),
+	)
 
 	p.govKeeper = gov.NewKeeper(
 		protocol.KeyGov,
@@ -283,7 +316,15 @@ func (p *ProtocolV2) configKeepers() {
 	)
 
 	p.randKeeper = rand.NewKeeper(p.cdc, protocol.KeyRand, rand.DefaultCodespace)
-	p.coinswapKeeper = coinswap.NewKeeper(p.cdc, protocol.KeySwap, p.bankKeeper, p.accountMapper, p.paramsKeeper.Subspace(coinswap.DefaultParamSpace))
+
+	p.coinswapKeeper = coinswap.NewKeeper(
+		p.cdc,
+		protocol.KeySwap,
+		p.bankKeeper,
+		p.accountMapper,
+		p.paramsKeeper.Subspace(coinswap.DefaultParamSpace),
+	)
+
 	p.htlcKeeper = htlc.NewKeeper(p.cdc, protocol.KeyHtlc, p.bankKeeper, htlc.DefaultCodespace)
 }
 
@@ -351,7 +392,16 @@ func (p *ProtocolV2) GetKVStoreKeyList() []*sdk.KVStoreKey {
 
 // configure all Params
 func (p *ProtocolV2) configParams() {
-	p.paramsKeeper.RegisterParamSet(&mint.Params{}, &slashing.Params{}, &service.Params{}, &auth.Params{}, &stake.Params{}, &distr.Params{}, &asset.Params{}, &gov.GovParams{}, &coinswap.Params{})
+	p.paramsKeeper.RegisterParamSet(
+		&mint.Params{},
+		&slashing.Params{},
+		&service.Params{},
+		&auth.Params{},
+		&stake.Params{},
+		&distr.Params{},
+		&asset.Params{},
+		&gov.GovParams{},
+		&coinswap.Params{})
 }
 
 // BeginBlocker application updates every begin block
@@ -373,6 +423,7 @@ func (p *ProtocolV2) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) a
 	ctx.CoinFlowTags().TagWrite()
 
 	tags = tags.AppendTags(slashTags).AppendTags(randTags).AppendTags(htlcTags)
+
 	return abci.ResponseBeginBlock{
 		Tags: tags.ToKVPairs(),
 	}
@@ -429,6 +480,7 @@ func (p *ProtocolV2) InitChainer(ctx sdk.Context, DeliverTx sdk.DeliverTx, req a
 	if err != nil {
 		panic(err)
 	}
+
 	gov.InitGenesis(ctx, p.govKeeper, genesisState.GovData)
 	auth.InitGenesis(ctx, p.feeKeeper, p.accountMapper, genesisState.AuthData)
 	slashing.InitGenesis(ctx, p.slashingKeeper, genesisState.SlashingData, genesisState.StakeData)
@@ -443,8 +495,7 @@ func (p *ProtocolV2) InitChainer(ctx sdk.Context, DeliverTx sdk.DeliverTx, req a
 	htlc.InitGenesis(ctx, p.htlcKeeper, genesisState.HtlcData)
 
 	// load the address to pubkey map
-	err = IrisValidateGenesisState(genesisState)
-	if err != nil {
+	if err = IrisValidateGenesisState(genesisState); err != nil {
 		panic(err) // TODO find a way to do this w/o panics
 	}
 
@@ -468,8 +519,12 @@ func (p *ProtocolV2) InitChainer(ctx sdk.Context, DeliverTx sdk.DeliverTx, req a
 	// sanity check
 	if len(req.Validators) > 0 {
 		if len(req.Validators) != len(validators) {
-			panic(fmt.Errorf("len(RequestInitChain.Validators) != len(validators) (%d != %d)",
-				len(req.Validators), len(validators)))
+			panic(
+				fmt.Errorf(
+					"len(RequestInitChain.Validators) != len(validators) (%d != %d)",
+					len(req.Validators), len(validators),
+				),
+			)
 		}
 		sort.Sort(abci.ValidatorUpdates(req.Validators))
 		sort.Sort(abci.ValidatorUpdates(validators))

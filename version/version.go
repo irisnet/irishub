@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/spf13/cobra"
+
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/types"
-	"github.com/spf13/cobra"
 )
 
 // Version - Iris Version
