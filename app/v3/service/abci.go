@@ -1,8 +1,9 @@
 package service
 
 import (
-	sdk "github.com/irisnet/irishub/types"
 	cmn "github.com/tendermint/tendermint/libs/common"
+
+	sdk "github.com/irisnet/irishub/types"
 )
 
 // EndBlocker handles block ending logic for service
@@ -13,121 +14,77 @@ func EndBlocker(ctx sdk.Context, k Keeper) (tags sdk.Tags) {
 
 	k.SetIntraTxCounter(ctx, 0)
 
-	params := k.GetParamSet(ctx)
-	slashFraction := params.SlashFraction
+	// handler for the active request on expired
+	expiredRequestHandler := func(requestID cmn.HexBytes, request Request) {
+		if !request.SuperMode {
+			slashTags, _ := k.Slash(ctx, requestID)
+			_ = k.RefundServiceFee(ctx, request.Consumer, request.ServiceFee)
 
-	// handle expired request batch queue
-
-	expiredReqBatchIterator := k.ExpiredRequestBatchIterator(ctx, ctx.BlockHeight())
-	defer expiredReqBatchIterator.Close()
-
-	for ; expiredReqBatchIterator.Valid(); expiredReqBatchIterator.Next() {
-		var reqContextID []byte
-		k.GetCdc().MustUnmarshalBinaryLengthPrefixed(expiredReqBatchIterator.Value(), &reqContextID)
-
-		reqContext, _ := k.GetRequestContext(ctx, reqContextID)
-
-		if reqContext.BatchState != BATCHCOMPLETED {
-			// iterate active requests
-			activeReqIterator := k.ActiveRequestsIteratorByReqCtx(ctx, reqContextID, reqContext.BatchCounter)
-			defer activeReqIterator.Close()
-
-			for ; activeReqIterator.Valid(); activeReqIterator.Next() {
-				var requestID cmn.HexBytes
-				k.GetCdc().MustUnmarshalBinaryLengthPrefixed(activeReqIterator.Value(), &requestID)
-
-				request, _ := k.GetRequest(ctx, requestID)
-
-				if !request.SuperMode {
-					binding, found := k.GetServiceBinding(ctx, request.ServiceName, request.Provider)
-					if found {
-						slashedCoins := sdk.NewCoins()
-
-						for _, coin := range binding.Deposit {
-							taxAmount := sdk.NewDecFromInt(coin.Amount).Mul(slashFraction).TruncateInt()
-							slashedCoins = slashedCoins.Add(sdk.NewCoins(sdk.NewCoin(coin.Denom, taxAmount)))
-						}
-
-						if err := k.Slash(ctx, binding, slashedCoins); err != nil {
-							panic(err)
-						}
-
-						if err := k.RefundServiceFee(ctx, request.Consumer, request.ServiceFee); err != nil {
-							panic(err)
-						}
-
-						tags.AppendTags(sdk.NewTags(
-							TagRequestID, []byte(requestID.String()),
-							TagProvider, []byte(request.Provider.String()),
-							TagConsumer, []byte(request.Consumer.String()),
-							TagSlashedCoins, []byte(slashedCoins.String()),
-						))
-					}
-				}
-
-				k.DeleteActiveRequest(ctx, reqContext.ServiceName, request.Provider, ctx.BlockHeight(), requestID)
-				k.DeleteActiveRequestByID(ctx, requestID)
-
-				k.GetMetrics().ActiveRequests.Add(-1)
-			}
-
-			// callback
-			if len(reqContext.ModuleName) != 0 {
-				k.Callback(ctx, reqContextID)
-			}
-
-			reqContext.BatchState = BATCHCOMPLETED
+			tags = tags.AppendTags(slashTags)
 		}
 
-		k.DeleteRequestBatchExpiration(ctx, reqContextID, ctx.BlockHeight())
-
-		if reqContext.State == RUNNING {
-			if reqContext.Repeated && (reqContext.RepeatedTotal < 0 || int64(reqContext.BatchCounter) < reqContext.RepeatedTotal) {
-				k.AddNewRequestBatch(ctx, reqContextID, ctx.BlockHeight()-reqContext.Timeout+int64(reqContext.RepeatedFrequency))
-			} else {
-				reqContext.State = COMPLETED
-			}
-		}
-
-		k.SetRequestContext(ctx, reqContextID, reqContext)
+		k.DeleteActiveRequest(ctx, request.ServiceName, request.Provider, request.ExpirationHeight, requestID)
 	}
 
-	// handle new request batch queue
-	newReqBatchIterator := k.NewRequestBatchIterator(ctx, ctx.BlockHeight())
-	defer newReqBatchIterator.Close()
+	// handler for the expired request batch
+	expiredRequestBatchHandler := func(requestContextID cmn.HexBytes, requestContext RequestContext) {
+		if requestContext.BatchState != BATCHCOMPLETED {
+			k.IterateActiveRequests(ctx, requestContextID, requestContext.BatchCounter, expiredRequestHandler)
 
-	for ; newReqBatchIterator.Valid(); newReqBatchIterator.Next() {
-		var reqContextID []byte
-		k.GetCdc().MustUnmarshalBinaryLengthPrefixed(newReqBatchIterator.Value(), &reqContextID)
+			if len(requestContext.ModuleName) != 0 {
+				k.Callback(ctx, requestContextID)
+			}
 
-		reqContext, _ := k.GetRequestContext(ctx, reqContextID)
+			requestContext.BatchState = BATCHCOMPLETED
+		}
 
-		if reqContext.State == RUNNING {
-			providers, totalPrices := k.FilterServiceProviders(ctx, reqContext.ServiceName, reqContext.Providers, reqContext.ServiceFeeCap)
+		k.DeleteRequestBatchExpiration(ctx, requestContextID, ctx.BlockHeight())
 
-			if len(reqContext.ModuleName) == 0 || len(providers) >= int(reqContext.ResponseThreshold) {
-				if !reqContext.SuperMode {
-					if err := k.DeductServiceFees(ctx, reqContext.Consumer, totalPrices); err != nil {
-						reqContext.State = PAUSED
-						k.SetRequestContext(ctx, reqContextID, reqContext)
+		if requestContext.State == RUNNING {
+			if requestContext.Repeated && (requestContext.RepeatedTotal < 0 || int64(requestContext.BatchCounter) < requestContext.RepeatedTotal) {
+				k.AddNewRequestBatch(ctx, requestContextID, ctx.BlockHeight()-requestContext.Timeout+int64(requestContext.RepeatedFrequency))
+			} else {
+				requestContext.State = COMPLETED
+			}
+		}
+
+		k.SetRequestContext(ctx, requestContextID, requestContext)
+	}
+
+	// handler for the new request batch
+	newRequestBatchHandler := func(requestContextID cmn.HexBytes, requestContext RequestContext) {
+		if requestContext.State == RUNNING {
+			providers, totalPrices := k.FilterServiceProviders(ctx, requestContext.ServiceName, requestContext.Providers, requestContext.ServiceFeeCap)
+
+			if len(requestContext.ModuleName) == 0 || len(providers) >= int(requestContext.ResponseThreshold) {
+				if !requestContext.SuperMode {
+					if err := k.DeductServiceFees(ctx, requestContext.Consumer, totalPrices); err != nil {
+						requestContext.State = PAUSED
+						k.SetRequestContext(ctx, requestContextID, requestContext)
 					}
 				}
 
-				if reqContext.State == RUNNING {
-					reqContext.BatchCounter++
-					reqContext.BatchResponseCount = 0
-					k.SetRequestContext(ctx, reqContextID, reqContext)
+				if requestContext.State == RUNNING {
+					requestContext.BatchCounter++
+					requestContext.BatchResponseCount = 0
+					k.SetRequestContext(ctx, requestContextID, requestContext)
 
-					requestTags := k.InitiateRequests(ctx, reqContextID, providers)
-					k.AddRequestBatchExpiration(ctx, reqContextID, ctx.BlockHeight()+reqContext.Timeout)
+					requestTags := k.InitiateRequests(ctx, requestContextID, providers)
+					k.AddRequestBatchExpiration(ctx, requestContextID, ctx.BlockHeight()+requestContext.Timeout)
 
 					tags = tags.AppendTags(requestTags)
 				}
 			}
 		}
 
-		k.DeleteNewRequestBatch(ctx, reqContextID, ctx.BlockHeight())
+		k.DeleteNewRequestBatch(ctx, requestContextID, ctx.BlockHeight())
 	}
 
-	return tags
+	// handle the expired request batch queue
+	k.IterateExpiredRequestBatch(ctx, ctx.BlockHeight(), expiredRequestBatchHandler)
+
+	// handle the new request batch queue
+	k.IterateNewRequestBatch(ctx, ctx.BlockHeight(), newRequestBatchHandler)
+
+	return
 }
