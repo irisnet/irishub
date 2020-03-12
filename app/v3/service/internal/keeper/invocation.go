@@ -330,6 +330,7 @@ func (k Keeper) InitiateRequests(
 ) (tags sdk.Tags) {
 	requestContext, _ := k.GetRequestContext(ctx, requestContextID)
 
+	tags = sdk.NewTags()
 	for providerIndex, provider := range providers {
 		request := k.buildRequest(
 			ctx, requestContextID, requestContext.BatchCounter,
@@ -340,11 +341,8 @@ func (k Keeper) InitiateRequests(
 		k.SetCompactRequest(ctx, requestID, request)
 
 		k.AddActiveRequest(ctx, requestContext.ServiceName, provider, ctx.BlockHeight()+requestContext.Timeout, requestID)
-		k.AddActiveRequestByID(ctx, requestID)
 
-		k.GetMetrics().ActiveRequests.Add(1)
-
-		tags = sdk.NewTags(
+		tags = tags.AppendTags(sdk.NewTags(
 			types.TagRequestID, []byte(requestID.String()),
 			types.TagProvider, []byte(provider.String()),
 			types.TagConsumer, []byte(requestContext.Consumer.String()),
@@ -352,7 +350,7 @@ func (k Keeper) InitiateRequests(
 			types.TagServiceFee, []byte(request.ServiceFee.String()),
 			types.TagRequestHeight, []byte(fmt.Sprintf("%d", request.RequestHeight)),
 			types.TagExpirationHeight, []byte(fmt.Sprintf("%d", request.RequestHeight+requestContext.Timeout)),
-		)
+		))
 	}
 
 	requestContext.BatchState = types.BATCHRUNNING
@@ -360,7 +358,7 @@ func (k Keeper) InitiateRequests(
 
 	k.SetRequestContext(ctx, requestContextID, requestContext)
 
-	return
+	return tags
 }
 
 // buildRequest builds a request for the given provider from the specified request context
@@ -477,14 +475,42 @@ func (k Keeper) AddActiveRequest(
 	expirationHeight int64,
 	requestID cmn.HexBytes,
 ) {
+	k.AddActiveRequestByBinding(ctx, serviceName, provider, expirationHeight, requestID)
+	k.AddActiveRequestByID(ctx, requestID)
+
+	k.GetMetrics().ActiveRequests.Add(1)
+}
+
+// DeleteActiveRequest deletes the specified active request
+func (k Keeper) DeleteActiveRequest(
+	ctx sdk.Context,
+	serviceName string,
+	provider sdk.AccAddress,
+	expirationHeight int64,
+	requestID cmn.HexBytes,
+) {
+	k.DeleteActiveRequestByBinding(ctx, serviceName, provider, expirationHeight, requestID)
+	k.DeleteActiveRequestByID(ctx, requestID)
+
+	k.GetMetrics().ActiveRequests.Add(-1)
+}
+
+// AddActiveRequestByBinding adds the specified active request by the binding
+func (k Keeper) AddActiveRequestByBinding(
+	ctx sdk.Context,
+	serviceName string,
+	provider sdk.AccAddress,
+	expirationHeight int64,
+	requestID cmn.HexBytes,
+) {
 	store := ctx.KVStore(k.storeKey)
 
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(requestID)
 	store.Set(GetActiveRequestKey(serviceName, provider, expirationHeight, requestID), bz)
 }
 
-// DeleteActiveRequest deletes the specified active request
-func (k Keeper) DeleteActiveRequest(
+// DeleteActiveRequestByBinding deletes the specified active request by the binding
+func (k Keeper) DeleteActiveRequestByBinding(
 	ctx sdk.Context,
 	serviceName string,
 	provider sdk.AccAddress,
@@ -558,16 +584,46 @@ func (k Keeper) HasNewRequestBatch(ctx sdk.Context, requestContextID cmn.HexByte
 	return store.Has(GetNewRequestBatchKey(requestContextID, requestBatchHeight))
 }
 
-// ExpiredRequestBatchIterator returns an iterator for the request batch expiration queue
-func (k Keeper) ExpiredRequestBatchIterator(ctx sdk.Context, expirationHeight int64) sdk.Iterator {
+// IterateExpiredRequestBatch iterates through the expired request batch queue in the specified height
+func (k Keeper) IterateExpiredRequestBatch(
+	ctx sdk.Context,
+	expirationHeight int64,
+	op func(requestContextID cmn.HexBytes, requestContext types.RequestContext),
+) {
 	store := ctx.KVStore(k.storeKey)
-	return sdk.KVStorePrefixIterator(store, GetExpiredRequestBatchSubspace(expirationHeight))
+
+	iterator := sdk.KVStorePrefixIterator(store, GetExpiredRequestBatchSubspace(expirationHeight))
+	defer iterator.Close()
+
+	for ; iterator.Valid(); iterator.Next() {
+		var requestContextID cmn.HexBytes
+		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &requestContextID)
+
+		requestContext, _ := k.GetRequestContext(ctx, requestContextID)
+
+		op(requestContextID, requestContext)
+	}
 }
 
-// NewRequestBatchIterator returns an iterator for the new request batch queue
-func (k Keeper) NewRequestBatchIterator(ctx sdk.Context, requestBatchHeight int64) sdk.Iterator {
+// IterateNewRequestBatch iterates through the new request batch queue in the specified height
+func (k Keeper) IterateNewRequestBatch(
+	ctx sdk.Context,
+	requestBatchHeight int64,
+	op func(requestContextID cmn.HexBytes, requestContext types.RequestContext),
+) {
 	store := ctx.KVStore(k.storeKey)
-	return sdk.KVStorePrefixIterator(store, GetNewRequestBatchSubspace(requestBatchHeight))
+
+	iterator := sdk.KVStorePrefixIterator(store, GetNewRequestBatchSubspace(requestBatchHeight))
+	defer iterator.Close()
+
+	for ; iterator.Valid(); iterator.Next() {
+		var requestContextID cmn.HexBytes
+		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &requestContextID)
+
+		requestContext, _ := k.GetRequestContext(ctx, requestContextID)
+
+		op(requestContextID, requestContext)
+	}
 }
 
 // ActiveRequestsIterator returns an iterator for all the active requests of the specified service binding
@@ -585,6 +641,26 @@ func (k Keeper) ActiveRequestsIteratorByReqCtx(ctx sdk.Context, requestContextID
 // AllActiveRequestsIterator returns an iterator for all the active requests
 func (k Keeper) AllActiveRequestsIterator(store sdk.KVStore) sdk.Iterator {
 	return sdk.KVStorePrefixIterator(store, activeRequestKey)
+}
+
+// IterateActiveRequests iterates through the active requests for the specified request context ID and batch counter
+func (k Keeper) IterateActiveRequests(
+	ctx sdk.Context,
+	requestContextID cmn.HexBytes,
+	batchCounter uint64,
+	op func(requestID cmn.HexBytes, request types.Request),
+) {
+	iterator := k.ActiveRequestsIteratorByReqCtx(ctx, requestContextID, batchCounter)
+	defer iterator.Close()
+
+	for ; iterator.Valid(); iterator.Next() {
+		var requestID cmn.HexBytes
+		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &requestID)
+
+		request, _ := k.GetRequest(ctx, requestID)
+
+		op(requestID, request)
+	}
 }
 
 // FilterServiceProviders gets the providers which satisfy the specified service fee requirement
@@ -674,7 +750,6 @@ func (k Keeper) AddResponse(
 	k.SetResponse(ctx, reqID, response)
 
 	k.DeleteActiveRequest(ctx, request.ServiceName, provider, request.ExpirationHeight, reqID)
-	k.DeleteActiveRequestByID(ctx, reqID)
 
 	requestContext, _ := k.GetRequestContext(ctx, requestContextID)
 	requestContext.BatchResponseCount++
@@ -693,7 +768,7 @@ func (k Keeper) AddResponse(
 }
 
 // Callback callbacks the corresponding response callback handler
-func (k Keeper) Callback(ctx sdk.Context, requestContextID []byte) {
+func (k Keeper) Callback(ctx sdk.Context, requestContextID cmn.HexBytes) {
 	requestContext, _ := k.GetRequestContext(ctx, requestContextID)
 
 	respCallback, _ := k.GetResponseCallback(requestContext.ModuleName)
@@ -707,8 +782,8 @@ func (k Keeper) Callback(ctx sdk.Context, requestContextID []byte) {
 			requestContextID,
 			outputs,
 			fmt.Errorf(
-				"at least %d responses required, but %d responses received",
-				requestContext.ResponseThreshold, len(outputs),
+				"batch %d at least %d responses required, but %d responses received",
+				requestContext.BatchCounter, requestContext.ResponseThreshold, len(outputs),
 			),
 		)
 	}
@@ -781,36 +856,48 @@ func (k Keeper) GetResponsesOutput(ctx sdk.Context, requestContextID cmn.HexByte
 	return outputs
 }
 
-// Slash
-func (k Keeper) Slash(ctx sdk.Context, binding types.ServiceBinding, slashCoins sdk.Coins) sdk.Error {
-	deposit, hasNeg := binding.Deposit.SafeSub(slashCoins)
+// Slash slashes the provider from the specified request
+// Ensure that the request is valid
+func (k Keeper) Slash(ctx sdk.Context, requestID cmn.HexBytes) (tags sdk.Tags, err sdk.Error) {
+	request, _ := k.GetRequest(ctx, requestID)
+	binding, _ := k.GetServiceBinding(ctx, request.ServiceName, request.Provider)
+
+	slashFraction := k.GetParamSet(ctx).SlashFraction
+
+	depositAmt := binding.Deposit.AmountOf(sdk.IrisAtto)
+	slashedAmt := sdk.NewDecFromInt(depositAmt).Mul(slashFraction).TruncateInt()
+	slashedCoins := sdk.NewCoins(sdk.NewCoin(sdk.IrisAtto, slashedAmt))
+
+	deposit, hasNeg := binding.Deposit.SafeSub(slashedCoins)
 	if hasNeg {
-		errMsg := fmt.Sprintf("%s is less than %s", binding.Deposit, slashCoins)
-		panic(errMsg)
+		return tags, sdk.ErrInsufficientCoins(fmt.Sprintf("%s is less than %s", binding.Deposit, slashedCoins))
+	}
+
+	_, err = k.bk.BurnCoins(ctx, auth.ServiceDepositCoinsAccAddr, slashedCoins)
+	if err != nil {
+		return tags, err
 	}
 
 	binding.Deposit = deposit
-	minDeposit := k.getMinDeposit(ctx, binding.Pricing)
+	if binding.Available {
+		minDeposit := k.getMinDeposit(ctx, binding.Pricing)
 
-	if !binding.Deposit.IsAllGTE(minDeposit) {
-		binding.Available = false
-		binding.DisabledTime = ctx.BlockHeader().Time
-	}
-
-	_, err := k.bk.BurnCoins(ctx, auth.ServiceDepositCoinsAccAddr, slashCoins)
-
-	if !slashCoins.IsZero() {
-		ctx.CoinFlowTags().AppendCoinFlowTag(ctx, auth.ServiceDepositCoinsAccAddr.String(),
-			"", slashCoins.String(), sdk.ServiceDepositBurnFlow, "")
-	}
-
-	if err != nil {
-		return err
+		if !binding.Deposit.IsAllGTE(minDeposit) {
+			binding.Available = false
+			binding.DisabledTime = ctx.BlockHeader().Time
+		}
 	}
 
 	k.SetServiceBinding(ctx, binding)
 
-	return nil
+	slashTags := sdk.NewTags(
+		types.TagRequestID, []byte(requestID.String()),
+		types.TagProvider, []byte(request.Provider.String()),
+		types.TagConsumer, []byte(request.Consumer.String()),
+		types.TagSlashedCoins, []byte(slashedCoins.String()),
+	)
+
+	return slashTags, nil
 }
 
 // RefundServiceFee refunds the service fee to the specified consumer

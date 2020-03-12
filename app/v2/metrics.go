@@ -5,6 +5,7 @@ import (
 	"github.com/go-kit/kit/metrics/discard"
 	"github.com/go-kit/kit/metrics/prometheus"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
+
 	cfg "github.com/tendermint/tendermint/config"
 )
 
@@ -20,12 +21,15 @@ func PrometheusMetrics(config *cfg.InstrumentationConfig) *Metrics {
 		return NopMetrics()
 	}
 	return &Metrics{
-		InvariantFailure: prometheus.NewCounterFrom(stdprometheus.CounterOpts{
-			Namespace: config.Namespace,
-			Subsystem: MetricsSubsystem,
-			Name:      "invariant_failure",
-			Help:      "invariant failure",
-		}, []string{"error"}),
+		InvariantFailure: prometheus.NewCounterFrom(
+			stdprometheus.CounterOpts{
+				Namespace: config.Namespace,
+				Subsystem: MetricsSubsystem,
+				Name:      "invariant_failure",
+				Help:      "invariant failure",
+			},
+			[]string{"error"},
+		),
 	}
 }
 

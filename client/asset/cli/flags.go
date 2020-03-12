@@ -14,7 +14,6 @@ const (
 	FlagMaxSupply     = "max-supply"
 	FlagMintable      = "mintable"
 	FlagOwner         = "owner"
-	FlagTokenID       = "token-id"
 	FlagTo            = "to"
 	FlagAmount        = "amount"
 )
@@ -38,7 +37,7 @@ func init() {
 	FsTokenIssue.Bool(FlagMintable, false, "whether the token can be minted, default false")
 
 	FsTokensQuery.String(FlagOwner, "", "the owner address to be queried")
-	FsTokensQuery.String(FlagTokenID, "", "The unique identifier of the token")
+	FsTokensQuery.String(FlagSymbol, "", "the symbol of the token")
 
 	FsFeeQuery.String(FlagSymbol, "", "the token symbol. Once created, it cannot be modified")
 
@@ -48,6 +47,6 @@ func init() {
 
 	FsTransferTokenOwner.String(FlagTo, "", "the new owner")
 
-	FsMintToken.String(FlagTo, "", "address of mint token to")
-	FsMintToken.Uint64(FlagAmount, 0, "amount of mint token")
+	FsMintToken.String(FlagTo, "", "address of minting token to")
+	FsMintToken.Uint64(FlagAmount, 0, "amount of minting token")
 }

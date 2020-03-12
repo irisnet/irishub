@@ -5,11 +5,13 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
+	abci "github.com/tendermint/tendermint/abci/types"
+
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/app/v1/auth"
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/stretchr/testify/require"
-	abci "github.com/tendermint/tendermint/abci/types"
 )
 
 func TestQueryAccount(t *testing.T) {
@@ -49,7 +51,7 @@ func TestQueryTokenStats(t *testing.T) {
 
 	// Test IrisCoinType Start ---------------
 	params := QueryTokenStatsParams{
-		TokenId: sdk.Iris,
+		Symbol: sdk.Iris,
 	}
 
 	bz, err := json.Marshal(params)
@@ -86,7 +88,7 @@ func TestQueryTokenStats(t *testing.T) {
 
 	// Test !IrisCoinType Start ---------------
 	params = QueryTokenStatsParams{
-		TokenId: "abc",
+		Symbol: "abc",
 	}
 
 	denom := "abc-min"
