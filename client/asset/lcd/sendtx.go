@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+
 	"github.com/irisnet/irishub/app/v3/asset"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
@@ -21,19 +22,19 @@ func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec
 
 	// edit a token
 	r.HandleFunc(
-		fmt.Sprintf("/asset/tokens/{%s}", RestParamTokenID),
+		fmt.Sprintf("/asset/tokens/{%s}", RestParamSymbol),
 		editTokenHandlerFn(cdc, cliCtx),
 	).Methods("PUT")
 
 	// transfer owner
 	r.HandleFunc(
-		fmt.Sprintf("/asset/tokens/{%s}/transfer", RestParamTokenID),
+		fmt.Sprintf("/asset/tokens/{%s}/transfer", RestParamSymbol),
 		transferOwnerHandlerFn(cdc, cliCtx),
 	).Methods("POST")
 
 	// mint token
 	r.HandleFunc(
-		fmt.Sprintf("/asset/tokens/{%s}/mint", RestParamTokenID),
+		fmt.Sprintf("/asset/tokens/{%s}/mint", RestParamSymbol),
 		mintTokenHandlerFn(cdc, cliCtx),
 	).Methods("POST")
 }
@@ -108,7 +109,7 @@ func issueTokenHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handl
 func editTokenHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		tokenId := vars[RestParamTokenID]
+		symbol := vars[RestParamSymbol]
 
 		var req editTokenReq
 		if err := utils.ReadPostBody(w, r, cdc, &req); err != nil {
@@ -126,7 +127,8 @@ func editTokenHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handle
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
-		msg := asset.NewMsgEditToken(req.Name, tokenId, req.MaxSupply, mintable, req.Owner)
+
+		msg := asset.NewMsgEditToken(req.Name, symbol, req.MaxSupply, mintable, req.Owner)
 		if err := msg.ValidateBasic(); err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -141,7 +143,8 @@ func editTokenHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handle
 func transferOwnerHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		tokenId := vars[RestParamTokenID]
+		symbol := vars[RestParamSymbol]
+
 		var req transferTokenOwnerReq
 		if err := utils.ReadPostBody(w, r, cdc, &req); err != nil {
 			return
@@ -153,7 +156,7 @@ func transferOwnerHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Ha
 		}
 
 		// create the MsgTransferTokenOwner message
-		msg := asset.NewMsgTransferTokenOwner(req.SrcOwner, req.DstOwner, tokenId)
+		msg := asset.NewMsgTransferTokenOwner(req.SrcOwner, req.DstOwner, symbol)
 		if err := msg.ValidateBasic(); err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -168,7 +171,7 @@ func transferOwnerHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Ha
 func mintTokenHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		tokenId := vars[RestParamTokenID]
+		symbol := vars[RestParamSymbol]
 		var req mintTokenReq
 		if err := utils.ReadPostBody(w, r, cdc, &req); err != nil {
 			return
@@ -180,7 +183,7 @@ func mintTokenHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handle
 		}
 
 		// create the MsgMintToken message
-		msg := asset.NewMsgMintToken(tokenId, req.Owner, req.To, req.Amount)
+		msg := asset.NewMsgMintToken(symbol, req.Owner, req.To, req.Amount)
 		if err := msg.ValidateBasic(); err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return

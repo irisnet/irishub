@@ -29,6 +29,19 @@ var (
 	HTLCLockedCoinsAccAddr = sdk.AccAddress(crypto.AddressHash([]byte("HTLCLockedCoins"))) // HTLCLockedCoinsAccAddr store All HTLC locked coins
 )
 
+var (
+	// globle total supply key generator
+	totalSupplyKeyGen TotalSupplyKeyGen
+)
+
+// TotalSupplyKeyGen defines an interface for total supply key generator
+type TotalSupplyKeyGen func(denom string) (string, error)
+
+// RegisterTotalSupplyKeyGen sets a total supply key generator
+func RegisterTotalSupplyKeyGen(keyGen TotalSupplyKeyGen) {
+	totalSupplyKeyGen = keyGen
+}
+
 // This AccountKeeper encodes/decodes accounts using the
 // go-amino (binary) encoding/decoding library.
 type AccountKeeper struct {
@@ -53,7 +66,7 @@ func NewAccountKeeper(cdc *codec.Codec, key sdk.StoreKey, proto func() Account) 
 	}
 }
 
-// Implaements sdk.AccountKeeper.
+// Implements sdk.AccountKeeper.
 func (am AccountKeeper) NewAccountWithAddress(ctx sdk.Context, addr sdk.AccAddress) Account {
 	acc := am.proto()
 	err := acc.SetAddress(addr)
@@ -261,10 +274,14 @@ func (am AccountKeeper) DecreaseTotalLoosenToken(ctx sdk.Context, coins sdk.Coin
 		"decreaseCoins", decreaseCoins.String(), "totalLoosenToken", totalLoosenToken.String())
 }
 
-// Turn a token id to key used to get it from the account store
+// TotalSupplyStoreKey returns a key for total supply
 func TotalSupplyStoreKey(denom string) []byte {
-	keyId, _ := sdk.ConvertDenomToTokenKeyId(denom)
-	return append(totalSupplyKeyPrefix, keyId...)
+	if totalSupplyKeyGen == nil {
+		totalSupplyKeyGen = defaultTotalSupplyKeyGen
+	}
+
+	key, _ := totalSupplyKeyGen(denom)
+	return append(totalSupplyKeyPrefix, key...)
 }
 
 func (am AccountKeeper) IncreaseTotalSupply(ctx sdk.Context, coin sdk.Coin) sdk.Error {
@@ -387,4 +404,8 @@ func (am AccountKeeper) encodeAccount(acc Account) []byte {
 func (am AccountKeeper) decodeAccount(bz []byte) (acc Account) {
 	am.cdc.MustUnmarshalBinaryBare(bz, &acc)
 	return
+}
+
+func defaultTotalSupplyKeyGen(denom string) (string, error) {
+	return strings.Split(denom, "-")[0], nil
 }

@@ -9,8 +9,7 @@ var (
 	TagActionIssueToken = []byte("issue_token")
 
 	TagAction = sdk.TagAction
-	TagId     = "token-id"
-	TagDenom  = "token-denom"
 	TagSymbol = "token-symbol"
+	TagDenom  = "token-denom"
 	TagOwner  = "token-owner"
 )

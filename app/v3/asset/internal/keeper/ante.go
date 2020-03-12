@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/irisnet/irishub/app/v3/asset/internal/types"
-
 	sdk "github.com/irisnet/irishub/types"
 )
 
@@ -36,8 +35,7 @@ func NewAnteHandler(k Keeper) sdk.AnteHandler {
 				fee = k.getTokenIssueFee(ctx, msg.Symbol)
 				break
 			case types.MsgMintToken:
-				_, symbol := types.GetTokenIDParts(msg.TokenId)
-				fee = k.getTokenMintFee(ctx, symbol)
+				fee = k.getTokenMintFee(ctx, msg.Symbol)
 				break
 			}
 			feeMap[sender] = feeMap[sender].Add(sdk.NewCoins(fee))
