@@ -712,41 +712,40 @@ func (k Keeper) AddResponse(
 	provider sdk.AccAddress,
 	result,
 	output string,
-) (request types.Request, response types.Response, err sdk.Error) {
+) (request types.Request, response types.Response, tags sdk.Tags, err sdk.Error) {
 	reqID, _ := types.ConvertRequestID(requestID)
 
 	request, found := k.GetRequest(ctx, reqID)
 	if !found {
-		return request, response, types.ErrUnknownRequest(k.codespace, reqID)
+		return request, response, tags, types.ErrUnknownRequest(k.codespace, reqID)
 	}
 
 	if !provider.Equals(request.Provider) {
-		return request, response, types.ErrInvalidResponse(k.codespace, "provider does not match")
+		return request, response, tags, types.ErrInvalidResponse(k.codespace, "provider does not match")
 	}
 
 	if !k.IsRequestActive(ctx, reqID) {
-		return request, response, types.ErrInvalidResponse(k.codespace, "request is not active")
+		return request, response, tags, types.ErrInvalidResponse(k.codespace, "request is not active")
 	}
 
 	svcDef, _ := k.GetServiceDefinition(ctx, request.ServiceName)
 
 	if len(output) > 0 {
-		if err := types.ValidateResponseOutput(svcDef.Schemas, output); err != nil {
-			return request, response, err
-		}
+		err := types.ValidateResponseOutput(svcDef.Schemas, output)
 
-		if err := k.AddEarnedFee(ctx, provider, request.ServiceFee); err != nil {
-			return request, response, err
-		}
-	} else {
-		// refund the service fee to the consumer
-		if err := k.RefundServiceFee(ctx, request.Consumer, request.ServiceFee); err != nil {
-			return request, response, err
-		}
+		if err != nil {
+			if err := k.RefundServiceFee(ctx, request.Consumer, request.ServiceFee); err != nil {
+				return request, response, tags, err
+			}
 
-		// slash the provider
-		if err := k.Slash(ctx, request.ServiceName, request.Provider); err != nil {
-			return request, response, err
+			tags, err := k.Slash(ctx, reqID)
+			if err != nil {
+				return request, response, tags, err
+			}
+		} else {
+			if err := k.AddEarnedFee(ctx, provider, request.ServiceFee); err != nil {
+				return request, response, tags, err
+			}
 		}
 	}
 
@@ -770,7 +769,7 @@ func (k Keeper) AddResponse(
 
 	k.SetRequestContext(ctx, requestContextID, requestContext)
 
-	return request, response, nil
+	return request, response, tags, nil
 }
 
 // Callback callbacks the corresponding response callback handler
@@ -788,7 +787,7 @@ func (k Keeper) Callback(ctx sdk.Context, requestContextID cmn.HexBytes) {
 			requestContextID,
 			outputs,
 			fmt.Errorf(
-				"batch %d at least %d responses required, but %d responses received",
+				"batch %d at least %d valid responses required, but %d received",
 				requestContext.BatchCounter, requestContext.ResponseThreshold, len(outputs),
 			),
 		)
