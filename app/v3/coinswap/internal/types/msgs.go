@@ -47,7 +47,6 @@ type MsgSwapOrder struct {
 func NewMsgSwapOrder(
 	input Input, output Output, deadline int64, isBuyOrder bool,
 ) MsgSwapOrder {
-
 	return MsgSwapOrder{
 		Input:      input,
 		Output:     output,
@@ -116,7 +115,6 @@ func NewMsgAddLiquidity(
 	maxToken sdk.Coin, exactIrisAmt, minLiquidity sdk.Int,
 	deadline int64, sender sdk.AccAddress,
 ) MsgAddLiquidity {
-
 	return MsgAddLiquidity{
 		MaxToken:     maxToken,
 		ExactIrisAmt: exactIrisAmt,
@@ -186,7 +184,6 @@ func NewMsgRemoveLiquidity(
 	minToken sdk.Int, withdrawLiquidity sdk.Coin, minIrisAmt sdk.Int,
 	deadline int64, sender sdk.AccAddress,
 ) MsgRemoveLiquidity {
-
 	return MsgRemoveLiquidity{
 		MinToken:          minToken,
 		WithdrawLiquidity: withdrawLiquidity,

@@ -28,8 +28,7 @@ func TestValidateParams(t *testing.T) {
 
 	for _, tc := range invalidTests {
 		t.Run(tc.name, func(t *testing.T) {
-			err := ValidateParams(tc.params)
-			if err != nil {
+			if err := ValidateParams(tc.params); err != nil {
 				require.False(t, tc.result)
 			} else {
 				require.True(t, tc.result)

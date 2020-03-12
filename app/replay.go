@@ -18,12 +18,12 @@ import (
 func Replay(logger log.Logger) int64 {
 	ctx := server.NewDefaultContext()
 	ctx.Config.RootDir = viper.GetString(tmcli.HomeFlag)
-	dbContext := node.DBContext{"state", ctx.Config}
+	dbContext := node.DBContext{ID: "state", Config: ctx.Config}
 	dbType := dbm.DBBackendType(dbContext.Config.DBBackend)
 	stateDB := dbm.NewDB(dbContext.ID, dbType, dbContext.Config.DBDir())
 	defer stateDB.Close()
 
-	blockDBContext := node.DBContext{"blockstore", ctx.Config}
+	blockDBContext := node.DBContext{ID: "blockstore", Config: ctx.Config}
 	blockStoreDB := dbm.NewDB(blockDBContext.ID, dbType, dbContext.Config.DBDir())
 	defer blockStoreDB.Close()
 	blockStore := bc.NewBlockStore(blockStoreDB)
