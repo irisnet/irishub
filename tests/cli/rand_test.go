@@ -52,6 +52,7 @@ func TestIrisCLIRand(t *testing.T) {
 	input := `{}`
 	// addedDeposit := "1iris"
 	// timeout := int64(5)
+	result := `{"code":200,"message":""}`
 	output := `{"seed":"3132333435363738393031323334353637383930313233343536373839303132"}`
 
 	// random test data
@@ -147,6 +148,7 @@ func TestIrisCLIRand(t *testing.T) {
 	srStr += fmt.Sprintf(" --from=%s", "foo")
 	srStr += fmt.Sprintf(" --fee=%s", "0.4iris")
 	srStr += fmt.Sprintf(" --request-id=%s", reqID)
+	srStr += fmt.Sprintf(" --result=%s", result)
 	srStr += fmt.Sprintf(" --data=%s", output)
 
 	success = executeWrite(t, srStr, sdk.DefaultKeyPass)
