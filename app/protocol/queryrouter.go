@@ -1,8 +1,9 @@
 package protocol
 
 import (
-	sdk "github.com/irisnet/irishub/types"
 	"log"
+
+	sdk "github.com/irisnet/irishub/types"
 )
 
 // QueryRouter provides queryables for each query path.
