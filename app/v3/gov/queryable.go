@@ -1,9 +1,10 @@
 package gov
 
 import (
+	abci "github.com/tendermint/tendermint/abci/types"
+
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
-	abci "github.com/tendermint/tendermint/abci/types"
 )
 
 // query endpoints supported by the governance Querier
@@ -48,8 +49,7 @@ type QueryProposalParams struct {
 // nolint: unparam
 func queryProposal(ctx sdk.Context, path []string, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
 	var params QueryProposalParams
-	err := keeper.cdc.UnmarshalJSON(req.Data, &params)
-	if err != nil {
+	if err := keeper.cdc.UnmarshalJSON(req.Data, &params); err != nil {
 		return nil, sdk.ParseParamsErr(err)
 	}
 
@@ -62,6 +62,7 @@ func queryProposal(ctx sdk.Context, path []string, req abci.RequestQuery, keeper
 	if err != nil {
 		return nil, sdk.MarshalResultErr(err)
 	}
+
 	return bz, nil
 }
 
@@ -74,8 +75,7 @@ type QueryDepositParams struct {
 // nolint: unparam
 func queryDeposit(ctx sdk.Context, path []string, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
 	var params QueryDepositParams
-	err := keeper.cdc.UnmarshalJSON(req.Data, &params)
-	if err != nil {
+	if err := keeper.cdc.UnmarshalJSON(req.Data, &params); err != nil {
 		return nil, sdk.ParseParamsErr(err)
 	}
 
@@ -97,6 +97,7 @@ func queryDeposit(ctx sdk.Context, path []string, req abci.RequestQuery, keeper 
 	if err != nil {
 		return nil, sdk.MarshalResultErr(err)
 	}
+
 	return bz, nil
 }
 
@@ -109,8 +110,7 @@ type QueryVoteParams struct {
 // nolint: unparam
 func queryVote(ctx sdk.Context, path []string, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
 	var params QueryVoteParams
-	err := keeper.cdc.UnmarshalJSON(req.Data, &params)
-	if err != nil {
+	if err := keeper.cdc.UnmarshalJSON(req.Data, &params); err != nil {
 		return nil, sdk.ParseParamsErr(err)
 	}
 
@@ -128,6 +128,7 @@ func queryVote(ctx sdk.Context, path []string, req abci.RequestQuery, keeper Kee
 	if err != nil {
 		return nil, sdk.MarshalResultErr(err)
 	}
+
 	return bz, nil
 }
 
@@ -139,8 +140,7 @@ type QueryDepositsParams struct {
 // nolint: unparam
 func queryDeposits(ctx sdk.Context, path []string, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
 	var params QueryDepositsParams
-	err := keeper.cdc.UnmarshalJSON(req.Data, &params)
-	if err != nil {
+	if err := keeper.cdc.UnmarshalJSON(req.Data, &params); err != nil {
 		return nil, sdk.ParseParamsErr(err)
 	}
 
@@ -166,6 +166,7 @@ func queryDeposits(ctx sdk.Context, path []string, req abci.RequestQuery, keeper
 	if err != nil {
 		return nil, sdk.MarshalResultErr(err)
 	}
+
 	return bz, nil
 }
 
@@ -177,8 +178,7 @@ type QueryVotesParams struct {
 // nolint: unparam
 func queryVotes(ctx sdk.Context, path []string, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
 	var params QueryVotesParams
-	err := keeper.cdc.UnmarshalJSON(req.Data, &params)
-	if err != nil {
+	if err := keeper.cdc.UnmarshalJSON(req.Data, &params); err != nil {
 		return nil, sdk.ParseParamsErr(err)
 	}
 
@@ -203,6 +203,7 @@ func queryVotes(ctx sdk.Context, path []string, req abci.RequestQuery, keeper Ke
 	if err != nil {
 		return nil, sdk.MarshalResultErr(err)
 	}
+
 	return bz, nil
 }
 
@@ -217,8 +218,7 @@ type QueryProposalsParams struct {
 // nolint: unparam
 func queryProposals(ctx sdk.Context, path []string, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
 	var params QueryProposalsParams
-	err := keeper.cdc.UnmarshalJSON(req.Data, &params)
-	if err != nil {
+	if err := keeper.cdc.UnmarshalJSON(req.Data, &params); err != nil {
 		return nil, sdk.ParseParamsErr(err)
 	}
 
@@ -245,8 +245,7 @@ func queryTally(ctx sdk.Context, path []string, req abci.RequestQuery, keeper Ke
 	// TODO: Dependant on #1914
 
 	var param QueryTallyParams
-	err := keeper.cdc.UnmarshalJSON(req.Data, &param)
-	if err != nil {
+	if err := keeper.cdc.UnmarshalJSON(req.Data, &param); err != nil {
 		return nil, sdk.ParseParamsErr(err)
 	}
 
@@ -269,5 +268,6 @@ func queryTally(ctx sdk.Context, path []string, req abci.RequestQuery, keeper Ke
 	if err != nil {
 		return nil, sdk.MarshalResultErr(err)
 	}
+
 	return bz, nil
 }

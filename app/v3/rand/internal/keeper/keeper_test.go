@@ -3,14 +3,16 @@ package keeper
 import (
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
+	abci "github.com/tendermint/tendermint/abci/types"
+	"github.com/tendermint/tendermint/libs/log"
+	dbm "github.com/tendermint/tm-db"
+
 	"github.com/irisnet/irishub/app/v3/rand/internal/types"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/store"
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/stretchr/testify/require"
-	abci "github.com/tendermint/tendermint/abci/types"
-	"github.com/tendermint/tendermint/libs/log"
-	dbm "github.com/tendermint/tm-db"
 )
 
 func setupMultiStore() (sdk.MultiStore, *sdk.KVStoreKey) {
@@ -19,7 +21,7 @@ func setupMultiStore() (sdk.MultiStore, *sdk.KVStoreKey) {
 
 	ms := store.NewCommitMultiStore(db)
 	ms.MountStoreWithDB(randKey, sdk.StoreTypeIAVL, db)
-	ms.LoadLatestVersion()
+	_ = ms.LoadLatestVersion()
 
 	return ms, randKey
 }
@@ -30,7 +32,10 @@ func TestRequestRandKeeper(t *testing.T) {
 	cdc := codec.New()
 	types.RegisterCodec(cdc)
 
-	keeper := NewKeeper(cdc, randKey, types.DefaultCodespace)
+	mockServiceKeeper := NewMockServiceKeeper()
+	mockBankKeeper := NewMockBankKeeper()
+
+	keeper := NewKeeper(cdc, randKey, mockBankKeeper, mockServiceKeeper, types.DefaultCodespace)
 
 	// define variables
 	txBytes := []byte("testtx")
@@ -54,11 +59,11 @@ func TestRequestRandKeeper(t *testing.T) {
 	require.True(t, len(requests) == 0)
 
 	// request a rand
-	_, err := keeper.RequestRand(ctx, consumer, blockInterval)
+	_, err := keeper.RequestRand(ctx, consumer, blockInterval, false, sdk.NewCoins())
 	require.Nil(t, err)
 
 	// get request id
-	reqID := types.GenerateRequestID(types.NewRequest(txHeight, consumer, sdk.SHA256(txBytes)))
+	reqID := types.GenerateRequestID(types.NewRequest(txHeight, consumer, sdk.SHA256(txBytes), false, sdk.NewCoins()))
 
 	// get the pending request and assert the result is not nil
 	store := ctx.KVStore(randKey)

@@ -1,6 +1,8 @@
 package types
 
-import "github.com/irisnet/irishub/types"
+import (
+	"github.com/irisnet/irishub/types"
+)
 
 const (
 	// QueryLiquidity liquidity query endpoint supported by the coinswap querier

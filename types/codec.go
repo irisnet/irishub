@@ -1,6 +1,8 @@
 package types
 
-import "github.com/irisnet/irishub/codec"
+import (
+	"github.com/irisnet/irishub/codec"
+)
 
 // Register the sdk message type
 func RegisterCodec(cdc *codec.Codec) {

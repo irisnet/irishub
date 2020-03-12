@@ -56,7 +56,13 @@ func handleMsgDefineService(ctx sdk.Context, k Keeper, msg MsgDefineService) sdk
 		return err.Result()
 	}
 
-	return sdk.Result{}
+	tags := sdk.NewTags(
+		TagAuthor, []byte(msg.Author.String()),
+	)
+
+	return sdk.Result{
+		Tags: tags,
+	}
 }
 
 // handleMsgBindService handles MsgBindService
@@ -68,7 +74,13 @@ func handleMsgBindService(ctx sdk.Context, k Keeper, msg MsgBindService) sdk.Res
 		return err.Result()
 	}
 
-	return sdk.Result{}
+	tags := sdk.NewTags(
+		TagProvider, []byte(msg.Provider.String()),
+	)
+
+	return sdk.Result{
+		Tags: tags,
+	}
 }
 
 // handleMsgUpdateServiceBinding handles MsgUpdateServiceBinding
@@ -80,14 +92,26 @@ func handleMsgUpdateServiceBinding(ctx sdk.Context, k Keeper, msg MsgUpdateServi
 		return err.Result()
 	}
 
-	return sdk.Result{}
+	tags := sdk.NewTags(
+		TagProvider, []byte(msg.Provider.String()),
+	)
+
+	return sdk.Result{
+		Tags: tags,
+	}
 }
 
 // handleMsgSetWithdrawAddress handles MsgSetWithdrawAddress
 func handleMsgSetWithdrawAddress(ctx sdk.Context, k Keeper, msg MsgSetWithdrawAddress) sdk.Result {
 	k.SetWithdrawAddress(ctx, msg.Provider, msg.WithdrawAddress)
 
-	return sdk.Result{}
+	tags := sdk.NewTags(
+		TagProvider, []byte(msg.Provider.String()),
+	)
+
+	return sdk.Result{
+		Tags: tags,
+	}
 }
 
 // handleMsgDisableService handles MsgDisableService
@@ -96,7 +120,13 @@ func handleMsgDisableService(ctx sdk.Context, k Keeper, msg MsgDisableService) s
 		return err.Result()
 	}
 
-	return sdk.Result{}
+	tags := sdk.NewTags(
+		TagProvider, []byte(msg.Provider.String()),
+	)
+
+	return sdk.Result{
+		Tags: tags,
+	}
 }
 
 // handleMsgEnableService handles MsgEnableService
@@ -105,7 +135,13 @@ func handleMsgEnableService(ctx sdk.Context, k Keeper, msg MsgEnableService) sdk
 		return err.Result()
 	}
 
-	return sdk.Result{}
+	tags := sdk.NewTags(
+		TagProvider, []byte(msg.Provider.String()),
+	)
+
+	return sdk.Result{
+		Tags: tags,
+	}
 }
 
 // handleMsgRefundServiceDeposit handles MsgRefundServiceDeposit
@@ -114,7 +150,13 @@ func handleMsgRefundServiceDeposit(ctx sdk.Context, k Keeper, msg MsgRefundServi
 		return err.Result()
 	}
 
-	return sdk.Result{}
+	tags := sdk.NewTags(
+		TagProvider, []byte(msg.Provider.String()),
+	)
+
+	return sdk.Result{
+		Tags: tags,
+	}
 }
 
 // handleMsgRequestService handles MsgRequestService
@@ -162,7 +204,13 @@ func handleMsgPauseRequestContext(ctx sdk.Context, k Keeper, msg MsgPauseRequest
 		return err.Result()
 	}
 
-	return sdk.Result{}
+	tags := sdk.NewTags(
+		TagConsumer, []byte(msg.Consumer.String()),
+	)
+
+	return sdk.Result{
+		Tags: tags,
+	}
 }
 
 // handleMsgStartRequestContext handles MsgStartRequestContext
@@ -171,7 +219,13 @@ func handleMsgStartRequestContext(ctx sdk.Context, k Keeper, msg MsgStartRequest
 		return err.Result()
 	}
 
-	return sdk.Result{}
+	tags := sdk.NewTags(
+		TagConsumer, []byte(msg.Consumer.String()),
+	)
+
+	return sdk.Result{
+		Tags: tags,
+	}
 }
 
 // handleMsgKillRequestContext handles MsgKillRequestContext
@@ -180,7 +234,13 @@ func handleMsgKillRequestContext(ctx sdk.Context, k Keeper, msg MsgKillRequestCo
 		return err.Result()
 	}
 
-	return sdk.Result{}
+	tags := sdk.NewTags(
+		TagConsumer, []byte(msg.Consumer.String()),
+	)
+
+	return sdk.Result{
+		Tags: tags,
+	}
 }
 
 // handleMsgUpdateRequestContext handles MsgUpdateRequestContext
@@ -192,7 +252,13 @@ func handleMsgUpdateRequestContext(ctx sdk.Context, k Keeper, msg MsgUpdateReque
 		return err.Result()
 	}
 
-	return sdk.Result{}
+	tags := sdk.NewTags(
+		TagConsumer, []byte(msg.Consumer.String()),
+	)
+
+	return sdk.Result{
+		Tags: tags,
+	}
 }
 
 // handleMsgWithdrawEarnedFees handles MsgWithdrawEarnedFees
@@ -201,7 +267,13 @@ func handleMsgWithdrawEarnedFees(ctx sdk.Context, k Keeper, msg MsgWithdrawEarne
 		return err.Result()
 	}
 
-	return sdk.Result{}
+	tags := sdk.NewTags(
+		TagProvider, []byte(msg.Provider.String()),
+	)
+
+	return sdk.Result{
+		Tags: tags,
+	}
 }
 
 // handleMsgWithdrawTax handles MsgWithdrawTax

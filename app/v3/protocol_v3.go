@@ -5,8 +5,6 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/irisnet/irishub/app/v3/oracle"
-
 	abci "github.com/tendermint/tendermint/abci/types"
 	cfg "github.com/tendermint/tendermint/config"
 	"github.com/tendermint/tendermint/libs/log"
@@ -17,7 +15,6 @@ import (
 	distr "github.com/irisnet/irishub/app/v1/distribution"
 	"github.com/irisnet/irishub/app/v1/mint"
 	"github.com/irisnet/irishub/app/v1/params"
-	"github.com/irisnet/irishub/app/v1/rand"
 	"github.com/irisnet/irishub/app/v1/slashing"
 	"github.com/irisnet/irishub/app/v1/stake"
 	"github.com/irisnet/irishub/app/v1/upgrade"
@@ -25,6 +22,8 @@ import (
 	"github.com/irisnet/irishub/app/v3/asset"
 	"github.com/irisnet/irishub/app/v3/coinswap"
 	"github.com/irisnet/irishub/app/v3/gov"
+	"github.com/irisnet/irishub/app/v3/oracle"
+	"github.com/irisnet/irishub/app/v3/rand"
 	"github.com/irisnet/irishub/app/v3/service"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/guardian"
@@ -278,7 +277,14 @@ func (p *ProtocolV3) configKeepers() {
 
 	p.upgradeKeeper = upgrade.NewKeeper(p.cdc, protocol.KeyUpgrade, p.protocolKeeper, p.StakeKeeper, upgrade.PrometheusMetrics(p.config))
 
-	p.assetKeeper = asset.NewKeeper(p.cdc, protocol.KeyAsset, p.bankKeeper, asset.DefaultCodespace, p.paramsKeeper.Subspace(asset.DefaultParamSpace))
+	p.assetKeeper = asset.NewKeeper(
+		p.cdc,
+		protocol.KeyAsset,
+		p.bankKeeper,
+		p.guardianKeeper,
+		asset.DefaultCodespace,
+		p.paramsKeeper.Subspace(asset.DefaultParamSpace),
+	)
 
 	p.govKeeper = gov.NewKeeper(
 		protocol.KeyGov,
@@ -294,7 +300,7 @@ func (p *ProtocolV3) configKeepers() {
 		gov.PrometheusMetrics(p.config),
 	)
 
-	p.randKeeper = rand.NewKeeper(p.cdc, protocol.KeyRand, rand.DefaultCodespace)
+	p.randKeeper = rand.NewKeeper(p.cdc, protocol.KeyRand, p.bankKeeper, p.serviceKeeper, rand.DefaultCodespace)
 	p.coinswapKeeper = coinswap.NewKeeper(p.cdc, protocol.KeySwap, p.bankKeeper, p.paramsKeeper.Subspace(coinswap.DefaultParamSpace))
 	p.htlcKeeper = htlc.NewKeeper(p.cdc, protocol.KeyHtlc, p.bankKeeper, htlc.DefaultCodespace)
 }

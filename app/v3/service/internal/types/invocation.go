@@ -177,6 +177,7 @@ func NewCompactRequest(
 
 // Request defines a request which contains the detailed request data
 type Request struct {
+	ID                         cmn.HexBytes   `json:"id"`
 	ServiceName                string         `json:"service_name"`
 	Provider                   sdk.AccAddress `json:"provider"`
 	Consumer                   sdk.AccAddress `json:"consumer"`
@@ -191,6 +192,7 @@ type Request struct {
 
 // NewRequest creates a new Request instance
 func NewRequest(
+	id cmn.HexBytes,
 	serviceName string,
 	provider,
 	consumer sdk.AccAddress,
@@ -203,6 +205,7 @@ func NewRequest(
 	batchCounter uint64,
 ) Request {
 	return Request{
+		ID:                         id,
 		ServiceName:                serviceName,
 		Provider:                   provider,
 		Consumer:                   consumer,
@@ -219,6 +222,7 @@ func NewRequest(
 // String implements Stringer
 func (r Request) String() string {
 	return fmt.Sprintf(`Request:
+	ID:                      %s
 	ServiceName:             %s
 	Provider:                %s
 	Consumer:                %s
@@ -229,7 +233,7 @@ func (r Request) String() string {
 	ExpirationHeight:        %d
 	RequestContextID:        %s
 	BatchCounter:            %d`,
-		r.ServiceName, r.Provider, r.Consumer, r.Input, r.ServiceFee.String(),
+		r.ID.String(), r.ServiceName, r.Provider, r.Consumer, r.Input, r.ServiceFee.String(),
 		r.SuperMode, r.RequestHeight, r.ExpirationHeight,
 		r.RequestContextID.String(), r.RequestContextBatchCounter,
 	)
@@ -238,6 +242,7 @@ func (r Request) String() string {
 // HumanString implements human stringer
 func (r Request) HumanString(converter sdk.CoinsConverter) string {
 	return fmt.Sprintf(`Request:
+	ID:                      %s
 	ServiceName:             %s
 	Provider:                %s
 	Consumer:                %s
@@ -248,7 +253,7 @@ func (r Request) HumanString(converter sdk.CoinsConverter) string {
 	ExpirationHeight:        %d
 	RequestContextID:        %s
 	BatchCounter:            %d`,
-		r.ServiceName, r.Provider, r.Consumer, r.Input, converter.ToMainUnit(r.ServiceFee),
+		r.ID.String(), r.ServiceName, r.Provider, r.Consumer, r.Input, converter.ToMainUnit(r.ServiceFee),
 		r.SuperMode, r.RequestHeight, r.ExpirationHeight,
 		r.RequestContextID.String(), r.RequestContextBatchCounter,
 	)

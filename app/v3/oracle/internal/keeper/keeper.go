@@ -156,7 +156,7 @@ func (k Keeper) EditFeed(ctx sdk.Context, msg types.MsgEditFeed) sdk.Error {
 		return err
 	}
 
-	if msg.LatestHistory > 1 {
+	if msg.LatestHistory > 0 {
 		cnt := k.getFeedValuesCnt(ctx, feed.FeedName)
 		if expectCnt := int(msg.LatestHistory); expectCnt < cnt {
 			k.deleteOldestFeedValue(ctx, feed.FeedName, cnt-expectCnt)
@@ -177,7 +177,7 @@ func (k Keeper) EditFeed(ctx sdk.Context, msg types.MsgEditFeed) sdk.Error {
 func (k Keeper) HandlerResponse(ctx sdk.Context, requestContextID cmn.HexBytes, responseOutput []string, err error) {
 	if len(responseOutput) == 0 || err != nil {
 		ctx = ctx.WithLogger(ctx.Logger().With("handler", "HandlerResponse"))
-		ctx.Logger().Error("oracle feed failed",
+		ctx.Logger().Error("Oracle feed failed",
 			"requestContextID", requestContextID.String(),
 			"err", err.Error(),
 		)

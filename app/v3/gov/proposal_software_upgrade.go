@@ -46,18 +46,25 @@ func (sp *SoftwareUpgradeProposal) Validate(ctx sdk.Context, k Keeper, verify bo
 
 func (sp *SoftwareUpgradeProposal) Execute(ctx sdk.Context, gk Keeper) sdk.Error {
 	if _, ok := gk.protocolKeeper.GetUpgradeConfig(ctx); ok {
-		ctx.Logger().Info("Execute SoftwareProposal Failure", "info",
-			fmt.Sprintf("Software Upgrade Switch Period is in process."))
+		ctx.Logger().Info(
+			"Execute SoftwareProposal Failure", "info",
+			fmt.Sprintf("Software Upgrade Switch Period is in process."),
+		)
 		return nil
 	}
 	if !gk.protocolKeeper.IsValidVersion(ctx, sp.ProtocolDefinition.Version) {
-		ctx.Logger().Info("Execute SoftwareProposal Failure", "info",
-			fmt.Sprintf("version [%v] in SoftwareUpgradeProposal isn't valid ", sp.ProposalID))
+		ctx.Logger().Info(
+			"Execute SoftwareProposal Failure", "info",
+			fmt.Sprintf("version [%v] in SoftwareUpgradeProposal isn't valid ",
+				sp.ProposalID),
+		)
 		return nil
 	}
 	if uint64(ctx.BlockHeight())+1 >= sp.ProtocolDefinition.Height {
-		ctx.Logger().Info("Execute SoftwareProposal Failure", "info",
-			fmt.Sprintf("switch height must be more than blockHeight + 1"))
+		ctx.Logger().Info(
+			"Execute SoftwareProposal Failure", "info",
+			fmt.Sprintf("switch height must be more than blockHeight + 1"),
+		)
 		return nil
 	}
 

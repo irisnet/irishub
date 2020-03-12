@@ -3,23 +3,36 @@ package types
 import (
 	"encoding/hex"
 	"fmt"
+	"strconv"
+
+	cmn "github.com/tendermint/tendermint/libs/common"
 
 	sdk "github.com/irisnet/irishub/types"
 )
 
 // Request represents a request for a random number
 type Request struct {
-	Height   int64          `json:"height"`   // the height of the block in which the request tx is included
-	Consumer sdk.AccAddress `json:"consumer"` // the request address
-	TxHash   []byte         `json:"txhash"`   // the request tx hash
+	Height        int64          `json:"height"`          // the height of the block in which the request tx is included
+	Consumer      sdk.AccAddress `json:"consumer"`        // the request address
+	TxHash        []byte         `json:"txhash"`          // the request tx hash
+	Oracle        bool           `json:"oracle"`          // oracle method
+	ServiceFeeCap sdk.Coins      `json:"service_fee_cap"` // service fee cap
 }
 
 // NewRequest constructs a request
-func NewRequest(height int64, consumer sdk.AccAddress, txHash []byte) Request {
+func NewRequest(
+	height int64,
+	consumer sdk.AccAddress,
+	txHash []byte,
+	oracle bool,
+	serviceFeeCap sdk.Coins,
+) Request {
 	return Request{
-		Height:   height,
-		Consumer: consumer,
-		TxHash:   txHash,
+		Height:        height,
+		Consumer:      consumer,
+		TxHash:        txHash,
+		Oracle:        oracle,
+		ServiceFeeCap: serviceFeeCap,
 	}
 }
 
@@ -28,8 +41,15 @@ func (r Request) String() string {
 	return fmt.Sprintf(`Request:
   Height:            %d
   Consumer:          %s
-  TxHash:            %s`,
-		r.Height, r.Consumer.String(), hex.EncodeToString(r.TxHash))
+  TxHash:            %s
+  Oracle:            %s
+  ServiceFeeCap:     %s`,
+		r.Height,
+		r.Consumer.String(),
+		hex.EncodeToString(r.TxHash),
+		strconv.FormatBool(r.Oracle),
+		r.ServiceFeeCap.String(),
+	)
 }
 
 // Requests is a set of requests
@@ -43,14 +63,21 @@ func (rs Requests) String() string {
 
 	var str string
 	for _, r := range rs {
-		str += fmt.Sprintf("Request:\n  Height: %d, Consumer: %s, TxHash: %s", r.Height, r.Consumer.String(), hex.EncodeToString(r.TxHash))
+		str += fmt.Sprintf(
+			"Request:\n  Height: %d, Consumer: %s, TxHash: %s, Oracle: %s, ServiceFeeCap: %s",
+			r.Height,
+			r.Consumer.String(),
+			hex.EncodeToString(r.TxHash),
+			strconv.FormatBool(r.Oracle),
+			r.ServiceFeeCap.String(),
+		)
 	}
 
 	return str
 }
 
 // GenerateRequestID generate a request id
-func GenerateRequestID(r Request) []byte {
+func GenerateRequestID(r Request) cmn.HexBytes {
 	reqID := make([]byte, 0)
 
 	reqID = append(reqID, sdk.Uint64ToBigEndian(uint64(r.Height))...)
