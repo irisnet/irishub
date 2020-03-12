@@ -61,7 +61,8 @@ func TestMsgSwapOrder(t *testing.T) {
 				Input{Address: sender, Coin: input},
 				Output{Address: recipient, Coin: output},
 				emptyTime, true,
-			), false,
+			),
+			false,
 		}, {
 			"no sender",
 			NewMsgSwapOrder(
@@ -75,7 +76,8 @@ func TestMsgSwapOrder(t *testing.T) {
 			NewMsgSwapOrder(
 				Input{Address: sender, Coin: input},
 				Output{Address: emptyAddr, Coin: output},
-				deadline, true),
+				deadline, true,
+			),
 			true,
 		}, {
 			"valid MsgSwapOrder",
