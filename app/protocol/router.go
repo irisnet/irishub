@@ -2,9 +2,9 @@ package protocol
 
 import (
 	"regexp"
+	"strings"
 
 	sdk "github.com/irisnet/irishub/types"
-	"strings"
 )
 
 // Router provides handlers for each transaction type.

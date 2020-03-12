@@ -2,21 +2,18 @@ package gov
 
 import (
 	"encoding/json"
+	"strconv"
 	"time"
 
 	"github.com/irisnet/irishub/app/v1/auth"
-	"github.com/irisnet/irishub/app/v3/gov/tags"
-
 	"github.com/irisnet/irishub/app/v1/bank"
 	"github.com/irisnet/irishub/app/v1/distribution"
+	"github.com/irisnet/irishub/app/v1/params"
 	stakeTypes "github.com/irisnet/irishub/app/v1/stake/types"
+	"github.com/irisnet/irishub/app/v3/gov/tags"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/guardian"
 	sdk "github.com/irisnet/irishub/types"
-
-	"strconv"
-
-	"github.com/irisnet/irishub/app/v1/params"
 )
 
 // nolint
@@ -27,35 +24,18 @@ var (
 
 // Governance ProtocolKeeper
 type Keeper struct {
-	// The (unexposed) keys used to access the stores from the Content.
-	storeKey sdk.StoreKey
-
-	// The codec codec for binary encoding/decoding.
-	cdc *codec.Codec
-
-	// The reference to the Param ProtocolKeeper to get and set Global Params
-	paramSpace   params.Subspace
-	paramsKeeper params.Keeper
-
-	protocolKeeper sdk.ProtocolKeeper
-
-	// The reference to the CoinKeeper to modify balances
-	ck bank.Keeper
-
-	dk distribution.Keeper
-
-	guardianKeeper guardian.Keeper
-
-	// The ValidatorSet to get information about validators
-	vs sdk.ValidatorSet
-
-	// The reference to the DelegationSet to get information about delegators
-	ds sdk.DelegationSet
-
-	// Reserved codespace
-	codespace sdk.CodespaceType
-
-	metrics *Metrics
+	storeKey       sdk.StoreKey        // The (unexposed) keys used to access the stores from the Content.
+	cdc            *codec.Codec        // The codec codec for binary encoding/decoding.
+	paramSpace     params.Subspace     // The reference to the Param ProtocolKeeper to get and set Global Params
+	paramsKeeper   params.Keeper       //
+	protocolKeeper sdk.ProtocolKeeper  //
+	ck             bank.Keeper         // The reference to the CoinKeeper to modify balances
+	dk             distribution.Keeper //
+	guardianKeeper guardian.Keeper     //
+	vs             sdk.ValidatorSet    // The ValidatorSet to get information about validators
+	ds             sdk.DelegationSet   // The reference to the DelegationSet to get information about delegators
+	codespace      sdk.CodespaceType   // Reserved codespace
+	metrics        *Metrics            //
 }
 
 // NewProtocolKeeper returns a governance keeper. It handles:
@@ -63,7 +43,12 @@ type Keeper struct {
 // - depositing funds into proposals, and activating upon sufficient funds being deposited
 // - users voting on proposals, with weight proportional to stake in the system
 // - and tallying the result of the vote.
-func NewKeeper(key sdk.StoreKey, cdc *codec.Codec, paramSpace params.Subspace, paramsKeeper params.Keeper, protocolKeeper sdk.ProtocolKeeper, ck bank.Keeper, dk distribution.Keeper, guardianKeeper guardian.Keeper, ds sdk.DelegationSet, codespace sdk.CodespaceType, metrics *Metrics) Keeper {
+func NewKeeper(
+	key sdk.StoreKey, cdc *codec.Codec, paramSpace params.Subspace,
+	paramsKeeper params.Keeper, protocolKeeper sdk.ProtocolKeeper,
+	ck bank.Keeper, dk distribution.Keeper, guardianKeeper guardian.Keeper,
+	ds sdk.DelegationSet, codespace sdk.CodespaceType, metrics *Metrics,
+) Keeper {
 	return Keeper{
 		key,
 		cdc,

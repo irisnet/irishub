@@ -3,9 +3,10 @@ package gov
 import (
 	"strconv"
 
+	tmstate "github.com/tendermint/tendermint/state"
+
 	"github.com/irisnet/irishub/app/v3/gov/tags"
 	sdk "github.com/irisnet/irishub/types"
-	tmstate "github.com/tendermint/tendermint/state"
 )
 
 // Called every block, process inflation, update validator set

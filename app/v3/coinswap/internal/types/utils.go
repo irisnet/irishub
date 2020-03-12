@@ -27,6 +27,7 @@ func GetUniID(denom1, denom2 string) (string, sdk.Error) {
 	if err != nil {
 		return "", ErrIllegalDenom(err.Error())
 	}
+
 	return fmt.Sprintf(FormatUniId, coinName), nil
 }
 
@@ -81,5 +82,6 @@ func GetUniDenom(uniID string) (string, sdk.Error) {
 	if err != nil {
 		return "", ErrIllegalUniId(fmt.Sprintf("illegal liquidity id: %s", uniID))
 	}
+
 	return uniDenom, nil
 }

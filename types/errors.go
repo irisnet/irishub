@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/irisnet/irishub/codec"
 	abci "github.com/tendermint/tendermint/abci/types"
 	cmn "github.com/tendermint/tendermint/libs/common"
+
+	"github.com/irisnet/irishub/codec"
 )
 
 // CodeType - ABCI code identifier within codespace
@@ -322,7 +323,8 @@ func AppendMsgToErr(msg string, err string) string {
 	if msgIdx != -1 {
 		errMsg := err[msgIdx+len("message\":\"") : len(err)-2]
 		errMsg = fmt.Sprintf("%s; %s", msg, errMsg)
-		return fmt.Sprintf("%s%s%s",
+		return fmt.Sprintf(
+			"%s%s%s",
 			err[:msgIdx+len("message\":\"")],
 			errMsg,
 			err[len(err)-2:],

@@ -2,8 +2,9 @@ package protoidl
 
 import (
 	"fmt"
-	"github.com/emicklei/proto"
 	"strings"
+
+	"github.com/emicklei/proto"
 )
 
 const maxElements = 200
