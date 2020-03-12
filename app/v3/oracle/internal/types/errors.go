@@ -92,7 +92,7 @@ func ErrNotProfiler(codespace sdk.CodespaceType, profiler sdk.AccAddress) sdk.Er
 }
 
 func ErrInvalidDescription(codespace sdk.CodespaceType, descLen int) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidDescription, "description length should be no more than %d, actual length is %d", MaxDescriptionLen, descLen)
+	return sdk.NewError(codespace, CodeInvalidDescription, "description length should be not more than %d, actual length is %d", MaxDescriptionLen, descLen)
 }
 
 func ErrInvalidTimeout(codespace sdk.CodespaceType, timeout int64, frequency uint64) sdk.Error {
