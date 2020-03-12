@@ -8,8 +8,9 @@ import (
 var (
 	ActionRequestRand = []byte("request_rand")
 
-	TagAction     = sdk.TagAction
-	TagReqID      = "request-id"
-	TagRandHeight = "rand-height"
-	TagRand       = "rand"
+	TagAction           = sdk.TagAction
+	TagReqID            = "request-id"
+	TagRequestContextID = "request-context-id"
+	TagRandHeight       = "rand-height"
+	TagRand             = "rand"
 )
