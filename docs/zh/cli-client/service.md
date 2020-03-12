@@ -281,7 +281,7 @@ iriscli service call <flags>
 
 ```bash
 iriscli service call --chain-id=<chain-id> --from=<key name> --fee=0.3iris --service-name=<service name>
---providers=<provider list> --service-fee-cap=1iris --data=<request data> -timeout=100 --repeated --frequency=150 --total=100
+--providers=<provider list> --service-fee-cap=1iris --data=<request data> --timeout=100 --repeated --frequency=150 --total=100
 ```
 
 ### 请求输入示例
@@ -448,7 +448,7 @@ iriscli service update <request-context-id> <flags>
 
 ```bash
 iriscli service update <request-context-id> --chain-id=<chain-id> --from=<key name> --fee=0.3iris
---providers=<provider list> --service-fee-cap=1iris -timeout=0 --frequency=150 --total=100
+--providers=<provider list> --service-fee-cap=1iris --timeout=0 --frequency=150 --total=100
 ```
 
 ## iriscli service pause
