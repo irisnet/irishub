@@ -1,7 +1,6 @@
 package rand
 
 import (
-	"encoding/hex"
 	"fmt"
 
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -36,10 +35,12 @@ func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, k Keeper) (tags s
 				requestedOracleRandNum++
 
 				// add tags
-				tags = tags.AppendTags(sdk.NewTags(
-					TagReqID, []byte(hex.EncodeToString(reqID)),
-					TagRequestContextID, []byte(hex.EncodeToString(requestContextID)),
-				))
+				tags = tags.AppendTags(
+					sdk.NewTags(
+						TagReqID, []byte(reqID.String()),
+						TagRequestContextID, []byte(requestContextID.String()),
+					),
+				)
 			} else {
 				ctx.Logger().Info(fmt.Sprintf("request service error : %s", err.Error()))
 			}
@@ -57,10 +58,12 @@ func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, k Keeper) (tags s
 			k.DequeueRandRequest(ctx, lastBlockHeight, reqID)
 
 			// add tags
-			tags = tags.AppendTags(sdk.NewTags(
-				TagReqID, []byte(hex.EncodeToString(reqID)),
-				TagRand, []byte(rand.Rat.FloatString(RandPrec)),
-			))
+			tags = tags.AppendTags(
+				sdk.NewTags(
+					TagReqID, []byte(reqID.String()),
+					TagRand, []byte(rand.Rat.FloatString(RandPrec)),
+				),
+			)
 
 			handledNormalRandReqNum++
 		}

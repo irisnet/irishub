@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"strconv"
 
+	cmn "github.com/tendermint/tendermint/libs/common"
+
 	sdk "github.com/irisnet/irishub/types"
 )
 
@@ -75,7 +77,7 @@ func (rs Requests) String() string {
 }
 
 // GenerateRequestID generate a request id
-func GenerateRequestID(r Request) []byte {
+func GenerateRequestID(r Request) cmn.HexBytes {
 	reqID := make([]byte, 0)
 
 	reqID = append(reqID, sdk.Uint64ToBigEndian(uint64(r.Height))...)
