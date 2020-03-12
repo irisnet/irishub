@@ -125,7 +125,7 @@ func TestMsgDefineServiceGetSignBytes(t *testing.T) {
 	msg := NewMsgDefineService(testServiceName, testServiceDesc, testServiceTags, testAuthor, testAuthorDesc, testSchemas)
 	res := msg.GetSignBytes()
 
-	expected := `{"type":"irishub/service/MsgDefineService","value":{"author":"faa1w3jhxapdv96hg6r0wgux6kuw","author_description":"test-author-desc","description":"test-service-desc","name":"test-service","schemas":"{\"input\":{\"type\":\"object\"},\"output\":{\"type\":\"object\"},\"error\":{\"type\":\"object\"}}","tags":["tag1","tag2"]}}`
+	expected := `{"type":"irishub/service/MsgDefineService","value":{"author":"faa1w3jhxapdv96hg6r0wgux6kuw","author_description":"test-author-desc","description":"test-service-desc","name":"test-service","schemas":"{\"input\":{\"type\":\"object\"},\"output\":{\"type\":\"object\"}}","tags":["tag1","tag2"]}}`
 	require.Equal(t, expected, string(res))
 }
 
@@ -805,7 +805,7 @@ func TestMsgRespondServiceGetSignBytes(t *testing.T) {
 	msg := NewMsgRespondService(testRequestID, testProvider, testResult, testOutput)
 	res := msg.GetSignBytes()
 
-	expected := `{"type":"irishub/service/MsgRespondService","value":{"error":"","output":"{\"last\":\"100\"}","provider":"faa1w3jhxapdwpex7anfv3jhynrxe9z","request_id":"3DB0FA99DCB058BC86041BADBD614D6839F8FA20E17CF8AD3BA14C3F1BF613BD00000000000000010001"}}`
+	expected := `{"type":"irishub/service/MsgRespondService","value":{"output":"{\"last\":\"100\"}","provider":"faa1w3jhxapdwpex7anfv3jhynrxe9z","request_id":"3DB0FA99DCB058BC86041BADBD614D6839F8FA20E17CF8AD3BA14C3F1BF613BD00000000000000010001","result":"{\"code\":200,\"message\":\"\"}"}}`
 	require.Equal(t, expected, string(res))
 }
 
