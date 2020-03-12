@@ -29,10 +29,7 @@ var (
 	DefaultParamSpace     = types.DefaultParamSpace
 	MaximumAssetMaxSupply = types.MaximumAssetMaxSupply
 	RegisterCodec         = types.RegisterCodec
-	CheckTokenID          = types.CheckTokenID
 	CheckSymbol           = types.CheckSymbol
-	GetTokenID            = types.GetTokenID
-	GetTokenIDParts       = types.GetTokenIDParts
 	ParseBool             = types.ParseBool
 
 	NewFungibleToken         = types.NewFungibleToken

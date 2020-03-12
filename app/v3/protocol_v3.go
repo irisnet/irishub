@@ -277,7 +277,14 @@ func (p *ProtocolV3) configKeepers() {
 
 	p.upgradeKeeper = upgrade.NewKeeper(p.cdc, protocol.KeyUpgrade, p.protocolKeeper, p.StakeKeeper, upgrade.PrometheusMetrics(p.config))
 
-	p.assetKeeper = asset.NewKeeper(p.cdc, protocol.KeyAsset, p.bankKeeper, asset.DefaultCodespace, p.paramsKeeper.Subspace(asset.DefaultParamSpace))
+	p.assetKeeper = asset.NewKeeper(
+		p.cdc,
+		protocol.KeyAsset,
+		p.bankKeeper,
+		p.guardianKeeper,
+		asset.DefaultCodespace,
+		p.paramsKeeper.Subspace(asset.DefaultParamSpace),
+	)
 
 	p.govKeeper = gov.NewKeeper(
 		protocol.KeyGov,

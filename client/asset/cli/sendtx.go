@@ -6,14 +6,15 @@ import (
 	"os"
 	"strings"
 
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+
 	"github.com/irisnet/irishub/app/v3/asset"
 	"github.com/irisnet/irishub/client"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 func GetTokenCmd(cdc *codec.Codec) *cobra.Command {
@@ -25,7 +26,7 @@ func GetTokenCmd(cdc *codec.Codec) *cobra.Command {
 	}
 	cmd.AddCommand(client.PostCommands(
 		getCmdIssueToken(cdc),
-		getCmdEditAsset(cdc),
+		getCmdEditToken(cdc),
 		getCmdMintToken(cdc),
 		getCmdTransferTokenOwner(cdc),
 	)...)
@@ -38,7 +39,7 @@ func GetTokenCmd(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-// getCmdIssueToken implements the issue asset command
+// getCmdIssueToken implements the issue token command
 func getCmdIssueToken(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "issue",
@@ -106,15 +107,16 @@ func getCmdIssueToken(cdc *codec.Codec) *cobra.Command {
 	_ = cmd.MarkFlagRequired(FlagName)
 	_ = cmd.MarkFlagRequired(FlagInitialSupply)
 	_ = cmd.MarkFlagRequired(FlagScale)
+
 	return cmd
 }
 
-// getCmdEditGateway implements the edit asset command
-func getCmdEditAsset(cdc *codec.Codec) *cobra.Command {
+// getCmdEditToken implements the edit token command
+func getCmdEditToken(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "edit",
-		Short:   "Edit a existed token",
-		Example: `iriscli asset token edit <token-id> --name="Cat Token" --max-supply=100000000000 --mintable=true --from=<your account name> --chain-id=<chain-id> --fee=0.6iris`,
+		Short:   "Edit an existing token",
+		Example: `iriscli asset token edit <symbol> --name="Cat Token" --max-supply=100000000000 --mintable=true --from=<your account name> --chain-id=<chain-id> --fee=0.6iris`,
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
@@ -129,19 +131,15 @@ func getCmdEditAsset(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			tokenId, err := sdk.ConvertIdToTokenKeyId(args[0])
-			if err != nil {
-				return err
-			}
 			name := viper.GetString(FlagName)
 			maxSupply := uint64(viper.GetInt(FlagMaxSupply))
+
 			mintable, err := asset.ParseBool(viper.GetString(FlagMintable))
 			if err != nil {
 				return err
 			}
-			var msg sdk.Msg
-			msg = asset.NewMsgEditToken(name, tokenId, maxSupply, mintable, owner)
 
+			msg := asset.NewMsgEditToken(name, args[0], maxSupply, mintable, owner)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -158,7 +156,7 @@ func getCmdMintToken(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "mint",
 		Short:   "The asset owner and operator can directly mint tokens to a specified address",
-		Example: `iriscli asset token mint [token-id] --amount=<amount> --to=<to> --from=<key-name> --chain-id=irishub --fee=0.3iris`,
+		Example: `iriscli asset token mint <symbol> --amount=<amount> --to=<to> --from=<key-name> --chain-id=irishub --fee=0.3iris`,
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
@@ -174,6 +172,7 @@ func getCmdMintToken(cdc *codec.Codec) *cobra.Command {
 			}
 
 			amount := uint64(viper.GetInt64(FlagAmount))
+
 			var to sdk.AccAddress
 			addr := viper.GetString(FlagTo)
 			if len(strings.TrimSpace(addr)) > 0 {
@@ -183,13 +182,8 @@ func getCmdMintToken(cdc *codec.Codec) *cobra.Command {
 				}
 			}
 
-			tokenId, err := sdk.ConvertIdToTokenKeyId(args[0])
-			if err != nil {
-				return err
-			}
-			var msg sdk.Msg
-			msg = asset.NewMsgMintToken(
-				tokenId, owner, to, amount,
+			msg := asset.NewMsgMintToken(
+				args[0], owner, to, amount,
 			)
 
 			if err := msg.ValidateBasic(); err != nil {
@@ -199,9 +193,8 @@ func getCmdMintToken(cdc *codec.Codec) *cobra.Command {
 			var prompt = "The token mint transaction will consume extra fee"
 
 			if !viper.GetBool(client.FlagGenerateOnly) {
-				tokenId, _ := sdk.ConvertIdToTokenKeyId(args[0])
 				// query fee
-				fee, err1 := queryTokenFees(cliCtx, tokenId)
+				fee, err1 := queryTokenFees(cliCtx, args[0])
 				if err1 != nil {
 					return fmt.Errorf("failed to query token mint fee: %s", err1.Error())
 				}
@@ -228,6 +221,7 @@ func getCmdMintToken(cdc *codec.Codec) *cobra.Command {
 
 	cmd.Flags().AddFlagSet(FsMintToken)
 	_ = cmd.MarkFlagRequired(FlagAmount)
+
 	return cmd
 }
 
@@ -236,7 +230,7 @@ func getCmdTransferTokenOwner(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "transfer",
 		Short:   "Transfer the owner of a token to a new owner",
-		Example: `iriscli asset token transfer [token-id] --to=<to> --from=<key-name> --chain-id=irishub --fee=0.3iris`,
+		Example: `iriscli asset token transfer <symbol> --to=<to> --from=<key-name> --chain-id=irishub --fee=0.3iris`,
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
@@ -266,7 +260,9 @@ func getCmdTransferTokenOwner(cdc *codec.Codec) *cobra.Command {
 			return utils.SendOrPrintTx(txCtx, cliCtx, []sdk.Msg{msg})
 		},
 	}
+
 	cmd.Flags().AddFlagSet(FsTransferTokenOwner)
 	_ = cmd.MarkFlagRequired(FlagTo)
+
 	return cmd
 }

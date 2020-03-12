@@ -3,12 +3,13 @@ package cli
 import (
 	"fmt"
 
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/app/v3/asset"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/codec"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 // getCmdQueryTokens implements the query tokens command.
@@ -16,14 +17,14 @@ func getCmdQueryTokens(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "tokens",
 		Short:   "Query details of a group of tokens",
-		Example: "iriscli asset token tokens --token-id=<token-id> --owner=<address>",
+		Example: "iriscli asset token tokens --symbol=<symbol> --owner=<address>",
 		PreRunE: preQueryTokenCmd,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
 			params := asset.QueryTokensParams{
-				Owner:   viper.GetString(FlagOwner),
-				TokenID: viper.GetString(FlagTokenID),
+				Owner:  viper.GetString(FlagOwner),
+				Symbol: viper.GetString(FlagSymbol),
 			}
 
 			bz := cdc.MustMarshalJSON(params)
@@ -36,6 +37,7 @@ func getCmdQueryTokens(cdc *codec.Codec) *cobra.Command {
 			if err := cdc.UnmarshalJSON(res, &tokens); err != nil {
 				return err
 			}
+
 			return cliCtx.PrintOutput(tokens)
 		},
 	}
@@ -53,6 +55,7 @@ func getCmdQueryFee(cdc *codec.Codec) *cobra.Command {
 		Example: "iriscli asset token fee [symbol]",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
+
 			// query token fees
 			symbol := args[0]
 			if err := asset.CheckSymbol(symbol); err != nil {
@@ -67,6 +70,7 @@ func getCmdQueryFee(cdc *codec.Codec) *cobra.Command {
 			return cliCtx.PrintOutput(fees)
 		},
 	}
+
 	return cmd
 }
 
@@ -74,8 +78,9 @@ func getCmdQueryFee(cdc *codec.Codec) *cobra.Command {
 func preQueryTokenCmd(cmd *cobra.Command, args []string) error {
 	flags := cmd.Flags()
 
-	if flags.Changed(FlagOwner) && flags.Changed(FlagTokenID) {
-		return fmt.Errorf("only one flag is allowed among the owner and token-id")
+	if flags.Changed(FlagOwner) && flags.Changed(FlagSymbol) {
+		return fmt.Errorf("only one flag is allowed among the owner and symbol")
 	}
+
 	return nil
 }
