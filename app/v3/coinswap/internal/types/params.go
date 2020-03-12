@@ -102,7 +102,6 @@ func validateFee(fee sdk.Rat) sdk.Error {
 	if !fee.GT(sdk.ZeroRat()) {
 		return sdk.ParseParamsErr(fmt.Errorf("fee is not positive: %s", fee.String()))
 	}
-
 	if !fee.LT(sdk.OneRat()) {
 		return sdk.ParseParamsErr(fmt.Errorf("fee must be less than 1: %s", fee.String()))
 	}

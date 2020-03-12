@@ -115,7 +115,8 @@ Proposal Parameter:    [Critical]         [Important]        [Normal]
   Veto:                 %s         %s        %s
   Participation:        %s         %s        %s
   Penalty:              %s         %s        %s
-`, p.SystemHaltPeriod,
+`,
+		p.SystemHaltPeriod,
 		p.CriticalDepositPeriod, p.ImportantDepositPeriod, p.NormalDepositPeriod,
 		p.CriticalMinDeposit.String(), p.ImportantMinDeposit.String(), p.NormalMinDeposit.String(),
 		p.CriticalVotingPeriod, p.ImportantVotingPeriod, p.NormalVotingPeriod,
@@ -133,34 +134,31 @@ func (p *GovParams) GetParamSpace() string {
 
 func (p *GovParams) KeyValuePairs() params.KeyValuePairs {
 	return params.KeyValuePairs{
-		{KeyCriticalDepositPeriod, &p.CriticalDepositPeriod},
-		{KeyCriticalMinDeposit, &p.CriticalMinDeposit},
-		{KeyCriticalVotingPeriod, &p.CriticalVotingPeriod},
-		{KeyCriticalMaxNum, &p.CriticalMaxNum},
-		{KeyCriticalThreshold, &p.CriticalThreshold},
-		{KeyCriticalVeto, &p.CriticalVeto},
-		{KeyCriticalParticipation, &p.CriticalParticipation},
-		{KeyCriticalPenalty, &p.CriticalPenalty},
-
-		{KeyImportantDepositPeriod, &p.ImportantDepositPeriod},
-		{KeyImportantMinDeposit, &p.ImportantMinDeposit},
-		{KeyImportantVotingPeriod, &p.ImportantVotingPeriod},
-		{KeyImportantMaxNum, &p.ImportantMaxNum},
-		{KeyImportantThreshold, &p.ImportantThreshold},
-		{KeyImportantVeto, &p.ImportantVeto},
-		{KeyImportantParticipation, &p.ImportantParticipation},
-		{KeyImportantPenalty, &p.ImportantPenalty},
-
-		{KeyNormalDepositPeriod, &p.NormalDepositPeriod},
-		{KeyNormalMinDeposit, &p.NormalMinDeposit},
-		{KeyNormalVotingPeriod, &p.NormalVotingPeriod},
-		{KeyNormalMaxNum, &p.NormalMaxNum},
-		{KeyNormalThreshold, &p.NormalThreshold},
-		{KeyNormalVeto, &p.NormalVeto},
-		{KeyNormalParticipation, &p.NormalParticipation},
-		{KeyNormalPenalty, &p.NormalPenalty},
-
-		{KeySystemHaltPeriod, &p.SystemHaltPeriod},
+		{Key: KeyCriticalDepositPeriod, Value: &p.CriticalDepositPeriod},
+		{Key: KeyCriticalMinDeposit, Value: &p.CriticalMinDeposit},
+		{Key: KeyCriticalVotingPeriod, Value: &p.CriticalVotingPeriod},
+		{Key: KeyCriticalMaxNum, Value: &p.CriticalMaxNum},
+		{Key: KeyCriticalThreshold, Value: &p.CriticalThreshold},
+		{Key: KeyCriticalVeto, Value: &p.CriticalVeto},
+		{Key: KeyCriticalParticipation, Value: &p.CriticalParticipation},
+		{Key: KeyCriticalPenalty, Value: &p.CriticalPenalty},
+		{Key: KeyImportantDepositPeriod, Value: &p.ImportantDepositPeriod},
+		{Key: KeyImportantMinDeposit, Value: &p.ImportantMinDeposit},
+		{Key: KeyImportantVotingPeriod, Value: &p.ImportantVotingPeriod},
+		{Key: KeyImportantMaxNum, Value: &p.ImportantMaxNum},
+		{Key: KeyImportantThreshold, Value: &p.ImportantThreshold},
+		{Key: KeyImportantVeto, Value: &p.ImportantVeto},
+		{Key: KeyImportantParticipation, Value: &p.ImportantParticipation},
+		{Key: KeyImportantPenalty, Value: &p.ImportantPenalty},
+		{Key: KeyNormalDepositPeriod, Value: &p.NormalDepositPeriod},
+		{Key: KeyNormalMinDeposit, Value: &p.NormalMinDeposit},
+		{Key: KeyNormalVotingPeriod, Value: &p.NormalVotingPeriod},
+		{Key: KeyNormalMaxNum, Value: &p.NormalMaxNum},
+		{Key: KeyNormalThreshold, Value: &p.NormalThreshold},
+		{Key: KeyNormalVeto, Value: &p.NormalVeto},
+		{Key: KeyNormalParticipation, Value: &p.NormalParticipation},
+		{Key: KeyNormalPenalty, Value: &p.NormalPenalty},
+		{Key: KeySystemHaltPeriod, Value: &p.SystemHaltPeriod},
 	}
 }
 
@@ -363,69 +361,96 @@ func DefaultParamsForTest() GovParams {
 }
 
 func validateParams(p GovParams) sdk.Error {
-	if err := validateDepositProcedure(DepositProcedure{
-		MaxDepositPeriod: p.CriticalDepositPeriod,
-		MinDeposit:       p.CriticalMinDeposit,
-	}, CRITICAL); err != nil {
+	if err := validateDepositProcedure(
+		DepositProcedure{
+			MaxDepositPeriod: p.CriticalDepositPeriod,
+			MinDeposit:       p.CriticalMinDeposit,
+		},
+		CRITICAL,
+	); err != nil {
 		return err
 	}
 
-	if err := validatorVotingProcedure(VotingProcedure{
-		VotingPeriod: p.CriticalVotingPeriod,
-	}, CRITICAL); err != nil {
+	if err := validatorVotingProcedure(
+		VotingProcedure{
+			VotingPeriod: p.CriticalVotingPeriod,
+		},
+		CRITICAL,
+	); err != nil {
 		return err
 	}
 
-	if err := validateTallyingProcedure(TallyingProcedure{
-		Threshold:     p.CriticalThreshold,
-		Veto:          p.CriticalVeto,
-		Participation: p.CriticalParticipation,
-		Penalty:       p.CriticalPenalty,
-	}, CRITICAL); err != nil {
+	if err := validateTallyingProcedure(
+		TallyingProcedure{
+			Threshold:     p.CriticalThreshold,
+			Veto:          p.CriticalVeto,
+			Participation: p.CriticalParticipation,
+			Penalty:       p.CriticalPenalty,
+		},
+		CRITICAL,
+	); err != nil {
 		return err
 	}
 
-	if err := validateDepositProcedure(DepositProcedure{
-		MaxDepositPeriod: p.ImportantDepositPeriod,
-		MinDeposit:       p.ImportantMinDeposit,
-	}, IMPORTANT); err != nil {
+	if err := validateDepositProcedure(
+		DepositProcedure{
+			MaxDepositPeriod: p.ImportantDepositPeriod,
+			MinDeposit:       p.ImportantMinDeposit,
+		},
+		IMPORTANT,
+	); err != nil {
 		return err
 	}
 
-	if err := validatorVotingProcedure(VotingProcedure{
-		VotingPeriod: p.ImportantVotingPeriod,
-	}, IMPORTANT); err != nil {
+	if err := validatorVotingProcedure(
+		VotingProcedure{
+			VotingPeriod: p.ImportantVotingPeriod,
+		},
+		IMPORTANT,
+	); err != nil {
 		return err
 	}
 
-	if err := validateTallyingProcedure(TallyingProcedure{
-		Threshold:     p.ImportantThreshold,
-		Veto:          p.ImportantVeto,
-		Participation: p.ImportantParticipation,
-		Penalty:       p.ImportantPenalty,
-	}, IMPORTANT); err != nil {
+	if err := validateTallyingProcedure(
+		TallyingProcedure{
+			Threshold:     p.ImportantThreshold,
+			Veto:          p.ImportantVeto,
+			Participation: p.ImportantParticipation,
+			Penalty:       p.ImportantPenalty,
+		},
+		IMPORTANT,
+	); err != nil {
 		return err
 	}
 
-	if err := validateDepositProcedure(DepositProcedure{
-		MaxDepositPeriod: p.NormalDepositPeriod,
-		MinDeposit:       p.NormalMinDeposit,
-	}, NORMAL); err != nil {
+	if err := validateDepositProcedure(
+		DepositProcedure{
+			MaxDepositPeriod: p.NormalDepositPeriod,
+			MinDeposit:       p.NormalMinDeposit,
+		},
+		NORMAL,
+	); err != nil {
 		return err
 	}
 
-	if err := validatorVotingProcedure(VotingProcedure{
-		VotingPeriod: p.NormalVotingPeriod,
-	}, NORMAL); err != nil {
+	if err := validatorVotingProcedure(
+		VotingProcedure{
+			VotingPeriod: p.NormalVotingPeriod,
+		},
+		NORMAL,
+	); err != nil {
 		return err
 	}
 
-	if err := validateTallyingProcedure(TallyingProcedure{
-		Threshold:     p.NormalThreshold,
-		Veto:          p.NormalVeto,
-		Participation: p.NormalParticipation,
-		Penalty:       p.NormalPenalty,
-	}, NORMAL); err != nil {
+	if err := validateTallyingProcedure(
+		TallyingProcedure{
+			Threshold:     p.NormalThreshold,
+			Veto:          p.NormalVeto,
+			Participation: p.NormalParticipation,
+			Penalty:       p.NormalPenalty,
+		},
+		NORMAL,
+	); err != nil {
 		return err
 	}
 
@@ -434,7 +459,11 @@ func validateParams(p GovParams) sdk.Error {
 	}
 
 	if p.SystemHaltPeriod < 0 || p.SystemHaltPeriod > 50000 {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidSystemHaltPeriod, fmt.Sprintf("SystemHaltPeriod should be between [0, 50000]"))
+		return sdk.NewError(
+			params.DefaultCodespace,
+			params.CodeInvalidSystemHaltPeriod,
+			fmt.Sprintf("SystemHaltPeriod should be between [0, 50000]"),
+		)
 	}
 
 	return nil
@@ -460,54 +489,98 @@ type TallyingProcedure struct {
 
 func validateDepositProcedure(dp DepositProcedure, level string) sdk.Error {
 	if dp.MinDeposit[0].Denom != sdk.IrisAtto {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidMinDepositDenom, fmt.Sprintf(level+"MinDeposit denom should be %s!", sdk.IrisAtto))
+		return sdk.NewError(
+			params.DefaultCodespace,
+			params.CodeInvalidMinDepositDenom,
+			fmt.Sprintf(level+"MinDeposit denom should be %s!", sdk.IrisAtto),
+		)
 	}
 
 	LowerBound, _ := sdk.IrisCoinType.ConvertToMinDenomCoin(fmt.Sprintf("%d%s", LOWER_BOUND_AMOUNT, sdk.Iris))
 	UpperBound, _ := sdk.IrisCoinType.ConvertToMinDenomCoin(fmt.Sprintf("%d%s", UPPER_BOUND_AMOUNT, sdk.Iris))
 
 	if dp.MinDeposit[0].Amount.LT(LowerBound.Amount) || dp.MinDeposit[0].Amount.GT(UpperBound.Amount) {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidMinDepositAmount, fmt.Sprintf(level+"MinDepositAmount"+dp.MinDeposit[0].String()+" should be larger than 10iris and less than 10000iris"))
+		return sdk.NewError(
+			params.DefaultCodespace,
+			params.CodeInvalidMinDepositAmount,
+			fmt.Sprintf(level+"MinDepositAmount"+dp.MinDeposit[0].String()+" should be larger than 10iris and less than 10000iris"),
+		)
 	}
 
 	if dp.MaxDepositPeriod < sdk.TwentySeconds || dp.MaxDepositPeriod > sdk.ThreeDays {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidDepositPeriod, fmt.Sprintf(level+"MaxDepositPeriod (%s) should be between 20s and %s", dp.MaxDepositPeriod.String(), sdk.ThreeDays.String()))
+		return sdk.NewError(
+			params.DefaultCodespace,
+			params.CodeInvalidDepositPeriod,
+			fmt.Sprintf(level+"MaxDepositPeriod (%s) should be between 20s and %s", dp.MaxDepositPeriod.String(), sdk.ThreeDays.String()),
+		)
 	}
 	return nil
 }
 
 func validatorVotingProcedure(vp VotingProcedure, level string) sdk.Error {
 	if vp.VotingPeriod < sdk.TwentySeconds || vp.VotingPeriod > sdk.Week {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidVotingPeriod, fmt.Sprintf(level+"VotingPeriod (%s) should be between 20s and 1 week", vp.VotingPeriod.String()))
+		return sdk.NewError(
+			params.DefaultCodespace,
+			params.CodeInvalidVotingPeriod,
+			fmt.Sprintf(level+"VotingPeriod (%s) should be between 20s and 1 week", vp.VotingPeriod.String()),
+		)
 	}
 	return nil
 }
 
 func validateTallyingProcedure(tp TallyingProcedure, level string) sdk.Error {
 	if tp.Threshold.LTE(sdk.ZeroDec()) || tp.Threshold.GTE(sdk.NewDec(1)) {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidThreshold, fmt.Sprintf("Invalid "+level+" Threshold ( "+tp.Threshold.String()+" ) should be (0,1)"))
+		return sdk.NewError(
+			params.DefaultCodespace,
+			params.CodeInvalidThreshold,
+			fmt.Sprintf("Invalid "+level+" Threshold ( "+tp.Threshold.String()+" ) should be (0,1)"),
+		)
 	}
 	if tp.Participation.LTE(sdk.ZeroDec()) || tp.Participation.GTE(sdk.NewDec(1)) {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidParticipation, fmt.Sprintf("Invalid "+level+" participation ( "+tp.Participation.String()+" ) should be (0,1)"))
+		return sdk.NewError(
+			params.DefaultCodespace,
+			params.CodeInvalidParticipation,
+			fmt.Sprintf("Invalid "+level+" participation ( "+tp.Participation.String()+" ) should be (0,1)"),
+		)
 	}
 	if tp.Veto.LTE(sdk.ZeroDec()) || tp.Veto.GTE(sdk.NewDec(1)) {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidVeto, fmt.Sprintf("Invalid "+level+" Veto ( "+tp.Veto.String()+" ) should be (0,1)"))
+		return sdk.NewError(
+			params.DefaultCodespace,
+			params.CodeInvalidVeto,
+			fmt.Sprintf("Invalid "+level+" Veto ( "+tp.Veto.String()+" ) should be (0,1)"),
+		)
 	}
 	if tp.Penalty.LT(sdk.ZeroDec()) || tp.Penalty.GTE(sdk.NewDec(1)) {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidGovernancePenalty, fmt.Sprintf("Invalid "+level+" GovernancePenalty ( "+tp.Penalty.String()+" ) should be [0,1)"))
+		return sdk.NewError(
+			params.DefaultCodespace,
+			params.CodeInvalidGovernancePenalty,
+			fmt.Sprintf("Invalid "+level+" GovernancePenalty ( "+tp.Penalty.String()+" ) should be [0,1)"),
+		)
 	}
 	return nil
 }
 
 func validateMaxNum(gp GovParams) sdk.Error {
 	if gp.CriticalMaxNum != STABLE_CRITIACAL_NUM {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidMaxProposalNum, fmt.Sprintf("The num of Max"+CRITICAL+"Proposal [%v] can only be %v.", gp.CriticalMaxNum, STABLE_CRITIACAL_NUM))
+		return sdk.NewError(
+			params.DefaultCodespace,
+			params.CodeInvalidMaxProposalNum,
+			fmt.Sprintf("The num of Max"+CRITICAL+"Proposal [%v] can only be %v.", gp.CriticalMaxNum, STABLE_CRITIACAL_NUM),
+		)
 	}
 	if gp.ImportantMaxNum < MIN_IMPORTANT_NUM {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidMaxProposalNum, fmt.Sprintf("The num of Max"+IMPORTANT+"Proposal [%v] should be no less than %v.", gp.CriticalMaxNum, MIN_IMPORTANT_NUM))
+		return sdk.NewError(
+			params.DefaultCodespace,
+			params.CodeInvalidMaxProposalNum,
+			fmt.Sprintf("The num of Max"+IMPORTANT+"Proposal [%v] should be no less than %v.", gp.CriticalMaxNum, MIN_IMPORTANT_NUM),
+		)
 	}
 	if gp.NormalMaxNum < MIN_NORMAL_NUM {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidMaxProposalNum, fmt.Sprintf("The num of Max"+NORMAL+"Proposal [%v] should be no less than %v.", gp.NormalMaxNum, MIN_NORMAL_NUM))
+		return sdk.NewError(
+			params.DefaultCodespace,
+			params.CodeInvalidMaxProposalNum,
+			fmt.Sprintf("The num of Max"+NORMAL+"Proposal [%v] should be no less than %v.", gp.NormalMaxNum, MIN_NORMAL_NUM),
+		)
 	}
 	return nil
 }

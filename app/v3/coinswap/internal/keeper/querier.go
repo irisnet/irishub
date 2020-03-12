@@ -3,9 +3,10 @@ package keeper
 import (
 	"fmt"
 
+	abci "github.com/tendermint/tendermint/abci/types"
+
 	"github.com/irisnet/irishub/app/v3/coinswap/internal/types"
 	sdk "github.com/irisnet/irishub/types"
-	abci "github.com/tendermint/tendermint/abci/types"
 )
 
 // NewQuerier creates a querier for coinswap REST endpoints

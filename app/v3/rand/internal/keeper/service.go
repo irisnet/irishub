@@ -17,7 +17,7 @@ import (
 )
 
 // RequestService request the service for oracle seed
-func (k Keeper) RequestService(ctx sdk.Context, reqID []byte, consumer sdk.AccAddress, serviceFeeCap sdk.Coins) ([]byte, sdk.Error) {
+func (k Keeper) RequestService(ctx sdk.Context, reqID cmn.HexBytes, consumer sdk.AccAddress, serviceFeeCap sdk.Coins) (cmn.HexBytes, sdk.Error) {
 	iterator := k.sk.ServiceBindingsIterator(ctx, types.ServiceName)
 	defer iterator.Close()
 
@@ -129,7 +129,7 @@ func (k Keeper) HandlerResponse(ctx sdk.Context, requestContextID cmn.HexBytes, 
 }
 
 // GetRequestContext retrieves the request context by the specified request context id
-func (k Keeper) GetRequestContext(ctx sdk.Context, requestContextID []byte) (exported.RequestContext, bool) {
+func (k Keeper) GetRequestContext(ctx sdk.Context, requestContextID cmn.HexBytes) (exported.RequestContext, bool) {
 	return k.sk.GetRequestContext(ctx, requestContextID)
 }
 
