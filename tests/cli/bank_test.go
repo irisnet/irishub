@@ -2,10 +2,12 @@ package cli
 
 import (
 	"fmt"
+	"testing"
+
+	"github.com/stretchr/testify/require"
+
 	"github.com/irisnet/irishub/tests"
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func TestIrisCLIBankSend(t *testing.T) {

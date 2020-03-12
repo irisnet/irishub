@@ -4,13 +4,14 @@ import (
 	"encoding/hex"
 	"fmt"
 
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+
 	"github.com/irisnet/irishub/app/protocol"
-	"github.com/irisnet/irishub/app/v1/rand"
+	"github.com/irisnet/irishub/app/v3/rand"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/rand/types"
 	"github.com/irisnet/irishub/codec"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 // GetCmdQueryRand implements the query-rand command.
@@ -42,8 +43,7 @@ func GetCmdQueryRand(cdc *codec.Codec) *cobra.Command {
 			}
 
 			var rawRand rand.Rand
-			err = cdc.UnmarshalJSON(res, &rawRand)
-			if err != nil {
+			if err = cdc.UnmarshalJSON(res, &rawRand); err != nil {
 				return err
 			}
 
@@ -68,7 +68,7 @@ func GetCmdQueryRandRequestQueue(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "query-queue",
 		Short:   "Query the random number request queue with an optional height",
-		Example: "iriscli rand query-queue [--queue-height=<queue height>]",
+		Example: "iriscli rand query-queue --queue-height=<queue height>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
@@ -92,8 +92,7 @@ func GetCmdQueryRandRequestQueue(cdc *codec.Codec) *cobra.Command {
 			}
 
 			var requests rand.Requests
-			err = cdc.UnmarshalJSON(res, &requests)
-			if err != nil {
+			if err = cdc.UnmarshalJSON(res, &requests); err != nil {
 				return err
 			}
 
