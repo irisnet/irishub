@@ -330,6 +330,7 @@ func (k Keeper) InitiateRequests(
 ) (tags sdk.Tags) {
 	requestContext, _ := k.GetRequestContext(ctx, requestContextID)
 
+	tags = sdk.NewTags()
 	for providerIndex, provider := range providers {
 		request := k.buildRequest(
 			ctx, requestContextID, requestContext.BatchCounter,
@@ -344,7 +345,7 @@ func (k Keeper) InitiateRequests(
 
 		k.GetMetrics().ActiveRequests.Add(1)
 
-		tags = sdk.NewTags(
+		tags = tags.AppendTags(sdk.NewTags(
 			types.TagRequestID, []byte(requestID.String()),
 			types.TagProvider, []byte(provider.String()),
 			types.TagConsumer, []byte(requestContext.Consumer.String()),
@@ -352,7 +353,7 @@ func (k Keeper) InitiateRequests(
 			types.TagServiceFee, []byte(request.ServiceFee.String()),
 			types.TagRequestHeight, []byte(fmt.Sprintf("%d", request.RequestHeight)),
 			types.TagExpirationHeight, []byte(fmt.Sprintf("%d", request.RequestHeight+requestContext.Timeout)),
-		)
+		))
 	}
 
 	requestContext.BatchState = types.BATCHRUNNING
@@ -360,7 +361,7 @@ func (k Keeper) InitiateRequests(
 
 	k.SetRequestContext(ctx, requestContextID, requestContext)
 
-	return
+	return tags
 }
 
 // buildRequest builds a request for the given provider from the specified request context
@@ -749,8 +750,8 @@ func (k Keeper) Callback(ctx sdk.Context, requestContextID []byte) {
 			requestContextID,
 			outputs,
 			fmt.Errorf(
-				"at least %d responses required, but %d responses received",
-				requestContext.ResponseThreshold, len(outputs),
+				"batch %d at least %d responses required, but %d responses received",
+				requestContext.BatchCounter, requestContext.ResponseThreshold, len(outputs),
 			),
 		)
 	}
