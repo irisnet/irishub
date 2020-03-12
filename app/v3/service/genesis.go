@@ -27,20 +27,6 @@ func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
 		requestContextID, _ := hex.DecodeString(reqContextIDStr)
 		k.SetRequestContext(ctx, requestContextID, requestContext)
 	}
-
-	// TODO: save withdraw addresses
-
-	// TODO: save withdraw addresses
-
-	for requestIDStr, request := range data.Requests {
-		requestID, _ := ConvertRequestID(requestIDStr)
-		k.SetCompactRequest(ctx, requestID, request)
-	}
-
-	for requestIDStr, response := range data.Responses {
-		requestID, _ := ConvertRequestID(requestIDStr)
-		k.SetResponse(ctx, requestID, response)
-	}
 }
 
 // ExportGenesis - output genesis parameters
@@ -49,10 +35,6 @@ func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 	bindings := make(map[string][]ServiceBinding)
 	withdrawAddress := []sdk.AccAddress{}
 	requestContexts := make(map[string]RequestContext)
-	newRequestBatch := make(map[string][]cmn.HexBytes)
-	expiredRequestBatch := make(map[string][]cmn.HexBytes)
-	requests := make(map[string]CompactRequest)
-	responses := make(map[string]Response)
 
 	k.IterateServiceDefinitions(
 		ctx,
@@ -70,13 +52,13 @@ func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 		},
 	)
 
-	// k.IterateWithdrawAddresses(
-	// 	ctx,
-	// 	func(provider sdk.AccAddress, withdrawAddress sdk.AccAddress) bool {
-	// 		// TODO
-	// 		return false
-	// 	},
-	// )
+	k.IterateWithdrawAddresses(
+		ctx,
+		func(providerAddress sdk.AccAddress, withdrawAddress sdk.AccAddress) bool {
+			// TODO
+			return false
+		},
+	)
 
 	k.IterateRequestContexts(
 		ctx,
@@ -102,32 +84,12 @@ func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 		},
 	)
 
-	k.IterateRequests(
-		ctx,
-		func(requestID cmn.HexBytes, request CompactRequest) bool {
-			requests[requestID.String()] = request
-			return false
-		},
-	)
-
-	k.IterateResponses(
-		ctx,
-		func(requestID cmn.HexBytes, response Response) bool {
-			responses[requestID.String()] = response
-			return false
-		},
-	)
-
 	return NewGenesisState(
 		k.GetParamSet(ctx),
 		definitions,
 		bindings,
 		withdrawAddress,
 		requestContexts,
-		newRequestBatch,
-		expiredRequestBatch,
-		requests,
-		responses,
 	)
 }
 

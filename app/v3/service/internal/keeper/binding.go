@@ -241,6 +241,26 @@ func (k Keeper) GetWithdrawAddress(ctx sdk.Context, provider sdk.AccAddress) sdk
 	return sdk.AccAddress(bz)
 }
 
+// IterateWithdrawAddresses iterates through all withdrawAddresses
+func (k Keeper) IterateWithdrawAddresses(
+	ctx sdk.Context,
+	op func(provider sdk.AccAddress, withdrawAddress sdk.AccAddress) (stop bool),
+) {
+	store := ctx.KVStore(k.storeKey)
+
+	iterator := sdk.KVStorePrefixIterator(store, withdrawAddrKey)
+	defer iterator.Close()
+
+	for ; iterator.Valid(); iterator.Next() {
+		providerAddress := sdk.AccAddress(iterator.Key()[1:])
+		withdrawAddress := sdk.AccAddress(iterator.Value())
+
+		if stop := op(providerAddress, withdrawAddress); stop {
+			break
+		}
+	}
+}
+
 // ServiceBindingsIterator returns an iterator for all bindings of the specified service
 func (k Keeper) ServiceBindingsIterator(ctx sdk.Context, serviceName string) sdk.Iterator {
 	store := ctx.KVStore(k.storeKey)
