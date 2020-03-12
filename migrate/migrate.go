@@ -30,6 +30,7 @@ import (
 	"github.com/irisnet/irishub/modules/mint"
 	"github.com/irisnet/irishub/modules/rand"
 	"github.com/irisnet/irishub/modules/service"
+	// "github.com/irisnet/irishub/modules/oracle"
 )
 
 const (
@@ -119,8 +120,8 @@ func Migrate(cdc *codec.Codec, initialState v0_17.GenesisFileState) (appState ge
 	appState[auth.ModuleName] = cdc.MustMarshalJSON(migrateAuth(initialState))
 	appState[staking.ModuleName] = cdc.MustMarshalJSON(migrateStaking(initialState))
 	appState[slashing.ModuleName] = cdc.MustMarshalJSON(migrateSlashing(initialState))
-	// appState[distribution.ModuleName] = cdc.MustMarshalJSON(migrateDistribution(initialState))
-	// appState[gov.ModuleName] = cdc.MustMarshalJSON(migrateGov(initialState))
+	appState[distribution.ModuleName] = cdc.MustMarshalJSON(migrateDistribution(initialState)) // TODO
+	appState[gov.ModuleName] = cdc.MustMarshalJSON(migrateGov(initialState))                   // TODO
 
 	// ------------------------------------------------------------
 	// irishub modules
@@ -130,8 +131,9 @@ func Migrate(cdc *codec.Codec, initialState v0_17.GenesisFileState) (appState ge
 	appState[htlc.ModuleName] = cdc.MustMarshalJSON(migrateHTLC(initialState))
 	appState[asset.ModuleName] = cdc.MustMarshalJSON(migrateAsset(initialState))
 	appState[coinswap.ModuleName] = cdc.MustMarshalJSON(migrateCoinswap(initialState))
-	// appState[guardian.ModuleName] = cdc.MustMarshalJSON(migrateGuardian(initialState))
-	// appState[service.ModuleName] = cdc.MustMarshalJSON(migrateService(initialState))
+	appState[guardian.ModuleName] = cdc.MustMarshalJSON(migrateGuardian(initialState)) // TODO
+	appState[service.ModuleName] = cdc.MustMarshalJSON(migrateService(initialState))   // TODO
+	// appState[oracle.ModuleName] = cdc.MustMarshalJSON(migrateOracle(initialState))  // TODO
 
 	return appState
 }
@@ -503,3 +505,9 @@ func migrateService(initialState v0_17.GenesisFileState) service.GenesisState {
 		Params: params,
 	}
 }
+
+// TODO
+// func migrateOracle(initialState v0_17.GenesisFileState) oracle.GenesisState {
+// 	return oracle.GenesisState{
+// 	}
+// }

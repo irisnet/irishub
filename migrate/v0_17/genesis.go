@@ -13,6 +13,7 @@ import (
 	"github.com/irisnet/irishub/migrate/v0_17/guardian"
 	"github.com/irisnet/irishub/migrate/v0_17/htlc"
 	"github.com/irisnet/irishub/migrate/v0_17/mint"
+	"github.com/irisnet/irishub/migrate/v0_17/oracle"
 	"github.com/irisnet/irishub/migrate/v0_17/rand"
 	"github.com/irisnet/irishub/migrate/v0_17/service"
 	"github.com/irisnet/irishub/migrate/v0_17/slashing"
@@ -30,6 +31,7 @@ type GenesisState struct {
 	UpgradeData  upgrade.GenesisState      `json:"upgrade"`
 	SlashingData slashing.GenesisState     `json:"slashing"`
 	ServiceData  service.GenesisState      `json:"service"`
+	OracleData   oracle.GenesisState       `json:"oracle"`
 	GuardianData guardian.GenesisState     `json:"guardian"`
 	AssetData    asset.GenesisState        `json:"asset"`
 	RandData     rand.GenesisState         `json:"rand"`
@@ -48,6 +50,7 @@ type GenesisFileState struct {
 	UpgradeData  upgrade.GenesisState      `json:"upgrade"`
 	SlashingData slashing.GenesisState     `json:"slashing"`
 	ServiceData  service.GenesisState      `json:"service"`
+	OracleData   oracle.GenesisState       `json:"oracle"`
 	GuardianData guardian.GenesisState     `json:"guardian"`
 	AssetData    asset.GenesisState        `json:"asset"`
 	RandData     rand.GenesisState         `json:"rand"`
@@ -94,6 +97,7 @@ func convertToGenesisState(genesisFileState GenesisFileState) GenesisState {
 		UpgradeData:  genesisFileState.UpgradeData,
 		SlashingData: genesisFileState.SlashingData,
 		ServiceData:  genesisFileState.ServiceData,
+		OracleData:   genesisFileState.OracleData,
 		GuardianData: genesisFileState.GuardianData,
 		AssetData:    genesisFileState.AssetData,
 		RandData:     genesisFileState.RandData,

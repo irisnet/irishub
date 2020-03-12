@@ -1,6 +1,8 @@
 package auth
 
-import sdk "github.com/cosmos/cosmos-sdk/types"
+import (
+	sdk "github.com/cosmos/cosmos-sdk/types"
+)
 
 type GenesisState struct {
 	CollectedFees sdk.Coins `json:"collected_fee"`
