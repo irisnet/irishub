@@ -177,7 +177,7 @@ func (k Keeper) EditFeed(ctx sdk.Context, msg types.MsgEditFeed) sdk.Error {
 func (k Keeper) HandlerResponse(ctx sdk.Context, requestContextID cmn.HexBytes, responseOutput []string, err error) {
 	if len(responseOutput) == 0 || err != nil {
 		ctx = ctx.WithLogger(ctx.Logger().With("handler", "HandlerResponse"))
-		ctx.Logger().Error("oracle feed failed",
+		ctx.Logger().Error("Oracle feed failed",
 			"requestContextID", requestContextID.String(),
 			"err", err.Error(),
 		)
