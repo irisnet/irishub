@@ -12,10 +12,11 @@ import (
 )
 
 type GenesisState struct {
-	Params          Params                    `json:"params"`           // service params
-	RequestContexts map[string]RequestContext `json:"request_contexts"` // request contexts
-	Requests        map[string]CompactRequest `json:"requests"`         // requests
-	Responses       map[string]Response       `json:"responses"`        // responses
+	Params            Params                    `json:"params"`             // service params
+	Definitions       []ServiceDefinition       `json:"definitions"`        // service definitions
+	Bindings          []ServiceBinding          `json:"bindings"`           // service bindings
+	WithdrawAddresses map[string]sdk.AccAddress `json:"withdraw_addresses"` // withdraw addresses
+	RequestContexts   map[string]RequestContext `json:"request_contexts"`   // request contexts
 }
 
 type Params struct {
@@ -27,6 +28,24 @@ type Params struct {
 	ComplaintRetrospect  time.Duration `json:"complaint_retrospect"`
 	ArbitrationTimeLimit time.Duration `json:"arbitration_time_limit"`
 	TxSizeLimit          uint64        `json:"tx_size_limit"`
+}
+
+type ServiceDefinition struct {
+	Name              string         `json:"name"`
+	Description       string         `json:"description"`
+	Tags              []string       `json:"tags"`
+	Author            sdk.AccAddress `json:"author"`
+	AuthorDescription string         `json:"author_description"`
+	Schemas           string         `json:"schemas"`
+}
+
+type ServiceBinding struct {
+	ServiceName  string         `json:"service_name"`
+	Provider     sdk.AccAddress `json:"provider"`
+	Deposit      sdk.Coins      `json:"deposit"`
+	Pricing      string         `json:"pricing"`
+	Available    bool           `json:"available"`
+	DisabledTime time.Time      `json:"disabled_time"`
 }
 
 type RequestContext struct {
@@ -55,15 +74,6 @@ type CompactRequest struct {
 	Provider                   sdk.AccAddress
 	ServiceFee                 sdk.Coins
 	RequestHeight              int64
-}
-
-type Response struct {
-	Provider                   sdk.AccAddress `json:"provider"`
-	Consumer                   sdk.AccAddress `json:"consumer"`
-	Output                     string         `json:"output"`
-	Error                      string         `json:"error"`
-	RequestContextID           cmn.HexBytes   `json:"request_context_id"`
-	RequestContextBatchCounter uint64         `json:"request_context_batch_counter"`
 }
 
 type RequestContextBatchState byte

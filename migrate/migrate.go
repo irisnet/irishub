@@ -507,7 +507,12 @@ func migrateService(initialState v0_17.GenesisFileState) service.GenesisState {
 }
 
 // TODO
-// func migrateOracle(initialState v0_17.GenesisFileState) oracle.GenesisState {
-// 	return oracle.GenesisState{
-// 	}
-// }
+/*
+func migrateOracle(initialState v0_17.GenesisFileState) oracle.GenesisState {
+	var entries oracle.Entries
+
+	return oracle.GenesisState{
+		Entries: entries
+	}
+}
+*/
