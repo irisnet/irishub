@@ -324,7 +324,7 @@ func (k Keeper) IterateRequestContexts(
 }
 
 // InitiateRequests creates requests for the given providers from the specified request context
-// Note: make sure that request context is valid and running, and providers are valid
+// Note: make sure that request context is valid and running
 func (k Keeper) InitiateRequests(
 	ctx sdk.Context,
 	requestContextID cmn.HexBytes,
