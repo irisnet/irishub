@@ -1,8 +1,11 @@
 package service
 
 import (
+	"encoding/json"
+
 	cmn "github.com/tendermint/tendermint/libs/common"
 
+	"github.com/irisnet/irishub/app/v3/service/internal/types"
 	sdk "github.com/irisnet/irishub/types"
 )
 
@@ -56,27 +59,39 @@ func EndBlocker(ctx sdk.Context, k Keeper) (tags sdk.Tags) {
 		if requestContext.State == RUNNING {
 			providers, totalPrices := k.FilterServiceProviders(ctx, requestContext.ServiceName, requestContext.Providers, requestContext.ServiceFeeCap)
 
-			if len(requestContext.ModuleName) == 0 || len(providers) >= int(requestContext.ResponseThreshold) {
-				if !requestContext.SuperMode {
-					if err := k.DeductServiceFees(ctx, requestContext.Consumer, totalPrices); err != nil {
-						requestContext.State = PAUSED
-						k.SetRequestContext(ctx, requestContextID, requestContext)
-					}
-				}
-
-				if requestContext.State == RUNNING {
-					requestContext.BatchCounter++
-					requestContext.BatchResponseCount = 0
+			if len(requestContext.ModuleName) == 0 && !requestContext.SuperMode {
+				if err := k.DeductServiceFees(ctx, requestContext.Consumer, totalPrices); err != nil {
+					requestContext.State = PAUSED
 					k.SetRequestContext(ctx, requestContextID, requestContext)
-
-					requestTags := k.InitiateRequests(ctx, requestContextID, providers)
-					k.AddRequestBatchExpiration(ctx, requestContextID, ctx.BlockHeight()+requestContext.Timeout)
-
-					tags = tags.AppendTags(requestTags)
+					return
 				}
 			}
-		}
 
+			// reset context batch state for new batch
+			requestContext.BatchCounter++
+			requestContext.BatchResponseCount = 0
+			requestContext.BatchRequestCount = uint16(len(providers))
+			requestContext.BatchState = types.BATCHRUNNING
+
+			batchState, _ := json.Marshal(BatchState{
+				BatchCounter:      requestContext.BatchCounter,
+				State:             requestContext.BatchState,
+				ResponseThreshold: requestContext.ResponseThreshold,
+				BatchRequestCount: requestContext.BatchRequestCount,
+			})
+
+			tags = tags.AppendTags(sdk.NewTags(
+				ActionNewBatch, []byte(requestContextID.String()),
+				ActionTag(ActionNewBatch, requestContextID.String()), []byte(batchState)))
+
+			// initiate requests
+			k.SetRequestContext(ctx, requestContextID, requestContext)
+
+			requestTags := k.InitiateRequests(ctx, requestContextID, providers)
+			k.AddRequestBatchExpiration(ctx, requestContextID, ctx.BlockHeight()+requestContext.Timeout)
+
+			tags = tags.AppendTags(requestTags)
+		}
 		k.DeleteNewRequestBatch(ctx, requestContextID, ctx.BlockHeight())
 	}
 

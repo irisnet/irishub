@@ -32,6 +32,7 @@ const (
 // nolint
 var (
 	// variables and functions aliases
+	ActionNewBatch             = types.ActionNewBatch
 	TagAuthor                  = types.TagAuthor
 	TagServiceName             = types.TagServiceName
 	TagProvider                = types.TagProvider
@@ -70,6 +71,7 @@ var (
 	NewMsgWithdrawEarnedFees   = types.NewMsgWithdrawEarnedFees
 	NewMsgWithdrawTax          = types.NewMsgWithdrawTax
 	ConvertRequestID           = types.ConvertRequestID
+	ActionTag                  = types.ActionTag
 )
 
 // nolint
@@ -114,4 +116,5 @@ type (
 	QueryRequestsByReqCtxParams = types.QueryRequestsByReqCtxParams
 	QueryResponsesParams        = types.QueryResponsesParams
 	QueryFeesParams             = types.QueryFeesParams
+	BatchState                  = types.BatchState
 )

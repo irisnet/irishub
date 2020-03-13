@@ -353,11 +353,6 @@ func (k Keeper) InitiateRequests(
 		))
 	}
 
-	requestContext.BatchState = types.BATCHRUNNING
-	requestContext.BatchRequestCount = uint16(len(providers))
-
-	k.SetRequestContext(ctx, requestContextID, requestContext)
-
 	return tags
 }
 
