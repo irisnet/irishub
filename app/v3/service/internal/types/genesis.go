@@ -53,12 +53,16 @@ func ValidateGenesis(data GenesisState) error {
 		return err
 	}
 
-	for range data.Definitions {
-		// TODO: validate Definitions
+	for _, definition := range data.Definitions {
+		if err := definition.Validate(); err != nil {
+			return err
+		}
 	}
 
-	for range data.Bindings {
-		// TODO: validate Bindings
+	for _, binding := range data.Bindings {
+		if err := binding.Validate(); err != nil {
+			return err
+		}
 	}
 
 	for providerAddressStr := range data.WithdrawAddresses {
