@@ -26,7 +26,7 @@ func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
 	}
 
 	for providerAddressStr, withdrawAddress := range data.WithdrawAddresses {
-		providerAddress, _ := hex.DecodeString(providerAddressStr)
+		providerAddress, _ := sdk.AccAddressFromBech32(providerAddressStr)
 		k.SetWithdrawAddress(ctx, providerAddress, withdrawAddress)
 	}
 
