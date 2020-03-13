@@ -347,13 +347,25 @@ func TestKeeper_Request_Service(t *testing.T) {
 	err := keeper.DeductServiceFees(ctx, consumer, totalServiceFees)
 	require.NoError(t, err)
 
+	// reset context batch state for new batch
 	requestContext.BatchCounter++
+	requestContext.BatchResponseCount = 0
+	requestContext.BatchRequestCount = uint16(len(providers))
+	requestContext.BatchState = types.BATCHRUNNING
+
 	keeper.SetRequestContext(ctx, requestContextID, requestContext)
 
 	keeper.InitiateRequests(ctx, requestContextID, newProviders)
 
+	var activeRequests types.Requests
+	keeper.IterateActiveRequests(ctx, requestContextID, requestContext.BatchCounter,
+		func(requestID cmn.HexBytes, request types.Request) {
+			activeRequests = append(activeRequests, request)
+		})
+
 	requestContext, _ = keeper.GetRequestContext(ctx, requestContextID)
 	require.Equal(t, len(newProviders), int(requestContext.BatchRequestCount))
+	require.Equal(t, len(newProviders), len(activeRequests))
 	require.Equal(t, types.BATCHRUNNING, requestContext.BatchState)
 
 	iterator := keeper.ActiveRequestsIteratorByReqCtx(ctx, requestContextID, requestContext.BatchCounter)

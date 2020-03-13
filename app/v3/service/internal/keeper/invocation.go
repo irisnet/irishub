@@ -686,16 +686,17 @@ func (k Keeper) FilterServiceProviders(
 
 // DeductServiceFees deducts the given service fees from the specified consumer
 func (k Keeper) DeductServiceFees(ctx sdk.Context, consumer sdk.AccAddress, serviceFees sdk.Coins) sdk.Error {
-	_, err := k.bk.SendCoins(ctx, consumer, auth.ServiceRequestCoinsAccAddr, serviceFees)
-
-	if !serviceFees.IsZero() {
-		ctx.CoinFlowTags().AppendCoinFlowTag(ctx, consumer.String(),
-			auth.ServiceDepositCoinsAccAddr.String(), serviceFees.String(), sdk.ServiceFeeDeductFlow, "")
+	if serviceFees.IsZero() {
+		return nil
 	}
+	_, err := k.bk.SendCoins(ctx, consumer, auth.ServiceRequestCoinsAccAddr, serviceFees)
 
 	if err != nil {
 		return err
 	}
+
+	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, consumer.String(),
+		auth.ServiceDepositCoinsAccAddr.String(), serviceFees.String(), sdk.ServiceFeeDeductFlow, "")
 
 	return nil
 }
