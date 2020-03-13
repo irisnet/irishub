@@ -324,7 +324,7 @@ func (k Keeper) IterateRequestContexts(
 }
 
 // InitiateRequests creates requests for the given providers from the specified request context
-// Note: make sure that request context is valid and running
+// Note: make sure that request context is valid and running, and providers are valid
 func (k Keeper) InitiateRequests(
 	ctx sdk.Context,
 	requestContextID cmn.HexBytes,
@@ -364,6 +364,17 @@ func (k Keeper) InitiateRequests(
 	k.SetRequestContext(ctx, requestContextID, requestContext)
 
 	return tags
+}
+
+// SkipCurrentRequestBatch skips the current request batch
+func (k Keeper) SkipCurrentRequestBatch(ctx sdk.Context, requestContextID cmn.HexBytes, requestContext types.RequestContext) {
+	requestContext.BatchCounter++
+	requestContext.BatchState = types.BATCHRUNNING
+	requestContext.BatchRequestCount = 0
+	requestContext.BatchResponseCount = 0
+
+	k.SetRequestContext(ctx, requestContextID, requestContext)
+	k.AddRequestBatchExpiration(ctx, requestContextID, ctx.BlockHeight()+requestContext.Timeout)
 }
 
 // buildRequest builds a request for the given provider from the specified request context
