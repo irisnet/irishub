@@ -747,6 +747,10 @@ func (k Keeper) AddResponse(
 				return request, response, tags, err
 			}
 		}
+	} else {
+		if err := k.RefundServiceFee(ctx, request.Consumer, request.ServiceFee); err != nil {
+			return request, response, tags, err
+		}
 	}
 
 	requestContextID := request.RequestContextID
