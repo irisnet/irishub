@@ -747,6 +747,10 @@ func (k Keeper) AddResponse(
 				return request, response, tags, err
 			}
 		}
+	} else {
+		if err := k.RefundServiceFee(ctx, request.Consumer, request.ServiceFee); err != nil {
+			return request, response, tags, err
+		}
 	}
 
 	requestContextID := request.RequestContextID
@@ -787,7 +791,7 @@ func (k Keeper) Callback(ctx sdk.Context, requestContextID cmn.HexBytes) {
 			requestContextID,
 			outputs,
 			fmt.Errorf(
-				"batch %d at least %d valid responses required, but %d received",
+				"batch %d at least %d valid outputs required, but %d received",
 				requestContext.BatchCounter, requestContext.ResponseThreshold, len(outputs),
 			),
 		)
