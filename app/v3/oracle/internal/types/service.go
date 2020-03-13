@@ -8,14 +8,14 @@ import (
 )
 
 const (
-	ServiceName       = "feed"
-	ServiceDesc       = "system moudle service for oracle"
+	ServiceName       = ModuleName
+	ServiceDesc       = "system service definition of oracle moudle"
 	ServiceSchemas    = `{"input":{"type":"object"},"output":{"type":"object"},"error":{"type":"object"}}`
 	AuthorDescription = "oracle module account"
 )
 
 var (
-	ServiceTags = []string{"oracle"}
+	ServiceTags = []string{ModuleName}
 	Auther      = sdk.AccAddress(crypto.AddressHash([]byte("oracle")))
 )
 

@@ -8,15 +8,15 @@ import (
 )
 
 const (
-	ServiceName          = "rand"
-	ServiceDesc          = "system moudle service for rand"
+	ServiceName          = ModuleName
+	ServiceDesc          = "system service definition of rand module"
 	ServiceSchemas       = `{"input":{"type":"object","properties":{}},"output":{"type":"object","properties":{"seed":{"description":"seed","type":"string","pattern":"^[0-9a-fA-F]{64}$"}}},"error":{"type":"string"}}`
 	ServiceValueJsonPath = "seed"
 	AuthorDescription    = "rand module account"
 )
 
 var (
-	ServiceTags = []string{"rand"}
+	ServiceTags = []string{ModuleName}
 	Auther      = sdk.AccAddress(crypto.AddressHash([]byte(ModuleName)))
 )
 
