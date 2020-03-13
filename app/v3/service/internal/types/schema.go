@@ -280,7 +280,7 @@ const (
 	"required": [
 	  "price"
 	]
-  }
+}
 `
 
 	// ResultSchema is the JSON Schema for the response  result
