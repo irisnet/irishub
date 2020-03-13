@@ -730,21 +730,19 @@ func (k Keeper) AddResponse(
 
 	svcDef, _ := k.GetServiceDefinition(ctx, request.ServiceName)
 
-	if len(output) > 0 {
-		if err := types.ValidateResponseOutput(svcDef.Schemas, output); err != nil {
-			tags, err := k.Slash(ctx, reqID)
-			if err != nil {
-				return request, response, tags, err
-			}
-
-			if err := k.RefundServiceFee(ctx, request.Consumer, request.ServiceFee); err != nil {
-				return request, response, tags, err
-			}
+	if len(output) > 0 && types.ValidateResponseOutput(svcDef.Schemas, output) != nil {
+		tags, err = k.Slash(ctx, reqID)
+		if err != nil {
+			panic(err)
 		}
-	}
 
-	if err := k.AddEarnedFee(ctx, provider, request.ServiceFee); err != nil {
-		return request, response, tags, err
+		if err := k.RefundServiceFee(ctx, request.Consumer, request.ServiceFee); err != nil {
+			panic(err)
+		}
+	} else {
+		if err := k.AddEarnedFee(ctx, provider, request.ServiceFee); err != nil {
+			return request, response, tags, err
+		}
 	}
 
 	requestContextID := request.RequestContextID
