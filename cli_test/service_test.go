@@ -154,7 +154,7 @@ func TestIrisCLIService(t *testing.T) {
 	searchResult := f.QueryTxs(1, 50, "message.action:call_service", fmt.Sprintf("message.sender:%s", consumer))
 	require.Len(t, searchResult.Txs, 1)
 
-	events := searchResult.Txs[0].Events
+	events := searchResult.Txs[0].Logs[0].Events
 	var reqID string
 	for _, e := range events {
 		for _, attribute := range e.Attributes {

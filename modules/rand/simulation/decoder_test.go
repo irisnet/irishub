@@ -7,7 +7,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	cmn "github.com/tendermint/tendermint/libs/common"
+	tmkv "github.com/tendermint/tendermint/libs/kv"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -30,10 +30,10 @@ func TestDecodeStore(t *testing.T) {
 	reqID := types.GenerateRequestID(request)
 	rand := types.NewRand([]byte("requestTxHash"), 100, big.NewRat(10, 1000).FloatString(types.RandPrec))
 
-	kvPairs := cmn.KVPairs{
-		cmn.KVPair{Key: types.KeyRand(reqID), Value: cdc.MustMarshalBinaryLengthPrefixed(rand)},
-		cmn.KVPair{Key: types.KeyRandRequestQueue(100, reqID), Value: cdc.MustMarshalBinaryLengthPrefixed(request)},
-		cmn.KVPair{Key: []byte{0x30}, Value: []byte{0x50}},
+	kvPairs := tmkv.Pairs{
+		tmkv.Pair{Key: types.KeyRand(reqID), Value: cdc.MustMarshalBinaryLengthPrefixed(rand)},
+		tmkv.Pair{Key: types.KeyRandRequestQueue(100, reqID), Value: cdc.MustMarshalBinaryLengthPrefixed(request)},
+		tmkv.Pair{Key: []byte{0x30}, Value: []byte{0x50}},
 	}
 
 	tests := []struct {

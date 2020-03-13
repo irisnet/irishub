@@ -10,7 +10,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/cosmos/cosmos-sdk/client/keys"
 	crkeys "github.com/cosmos/cosmos-sdk/crypto/keys"
 	"github.com/cosmos/cosmos-sdk/tests"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -29,7 +28,7 @@ func TestHTLC(t *testing.T) {
 	hashLock := htlc.HTLCHashLock(htlc.SHA256(append(secret, sdk.Uint64ToBigEndian(timestamp)...)))
 	timeLock := uint64(50)
 
-	kb, err := keys.NewKeyringFromDir(InitClientHome(""), nil)
+	kb, err := newKeybase()
 	require.NoError(t, err)
 	addrSender, _, err := CreateAddr(name, kb)
 	addrTo, _, err := CreateAddr("to", kb)

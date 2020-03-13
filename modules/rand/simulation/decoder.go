@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"fmt"
 
-	cmn "github.com/tendermint/tendermint/libs/common"
+	tmkv "github.com/tendermint/tendermint/libs/kv"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 
@@ -12,7 +12,7 @@ import (
 )
 
 // DecodeStore unmarshals the KVPair's Value to the corresponding rand type
-func DecodeStore(cdc *codec.Codec, kvA, kvB cmn.KVPair) string {
+func DecodeStore(cdc *codec.Codec, kvA, kvB tmkv.Pair) string {
 	switch {
 	case bytes.Equal(kvA.Key[:1], types.PrefixRand):
 		var randA, randB types.Rand

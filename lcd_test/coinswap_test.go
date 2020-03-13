@@ -10,7 +10,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/cosmos/cosmos-sdk/client/keys"
 	crkeys "github.com/cosmos/cosmos-sdk/crypto/keys"
 	"github.com/cosmos/cosmos-sdk/tests"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -30,7 +29,7 @@ func TestCoinswap(t *testing.T) {
 	deadline := "10m0s"
 	assets := []string{denomBTC, denomETH}
 
-	kb, err := keys.NewKeyringFromDir(InitClientHome(""), nil)
+	kb, err := newKeybase()
 	require.NoError(t, err)
 	addr, _, err := CreateAddr(name, kb)
 	require.NoError(t, err)
