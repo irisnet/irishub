@@ -283,29 +283,29 @@ const (
   }
 `
 
-	// ResultSchema is the JSON Schema for the response result
+	// ResultSchema is the JSON Schema for the response  result
 	ResultSchema = `
-	{
-    "$schema": "http://json-schema.org/draft-04/schema#",
-    "title": "irishub-service-result",
-    "description": "IRIS Hub Service Result Schema",
-    "type": "object",
-    "properties": {
-        "code": {
-            "description": "result code",
-            "type": "integer",
-            "enum": [200, 400, 500]
-         },
-         "message": {
-             "description": "result message",
-             "type": "string"
-         } 
-		},
-		"additionalProperties": false,
-    "required": [
-        "code",
-        "message"
-     ]
-  }
-  `
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"title": "irishub-service-result",
+	"description": "IRIS Hub Service Result Schema",
+	"type": "object",
+	"properties": {
+	  "code": {
+		"description": "result code",
+		"type": "integer",
+		"enum": [200, 400, 500]
+	  },
+	  "message": {
+		"description": "result message",
+		"type": "string"
+	  }
+	},
+	"additionalProperties": false,
+	"required": [
+	  "code",
+	  "message"
+	]
+}
+`
 )
