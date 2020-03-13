@@ -345,7 +345,7 @@ iriscli service respond <flags>
 | 名称，速记         | 默认 | 描述                      | 必须 |
 | ------------------ | ---- | ------------------------- | ---- |
 | --request-id       |      | 欲响应请求的ID            | 是   |
-| --result | | 服务响应的结果, 是一个Result JSON schema实例  | |
+| --result | | 服务响应的结果, 是一个Result JSON schema实例  | 是 |
 | --data    |      | 服务响应的输出, 是一个Output JSON schema实例 | |
 
 ### 响应一个服务请求

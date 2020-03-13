@@ -159,7 +159,7 @@ iriscli service update-binding <flags>
 | --------------- | ------- | ------------------------------------------------------------------------- | -------- |
 | --service-name  |         | Service name                                                              | Yes      |
 | --deposit       |         | Deposit added for the binding             |          |
-| --pricing        |         | Pricing context or path, which is an instance of the Irishub Service Pricing schema        |
+| --pricing        |         | Pricing content or path, which is an instance of the Irishub Service Pricing schema        |
 
 ### Update an existing service binding
 
