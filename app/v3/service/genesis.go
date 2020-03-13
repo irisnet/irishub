@@ -74,7 +74,10 @@ func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 	k.IterateRequestContexts(
 		ctx,
 		func(requestContextID cmn.HexBytes, requestContext RequestContext) bool {
-			requestContexts[requestContextID.String()] = requestContext
+			if requestContext.State != COMPLETED {
+				requestContext.State = PAUSED
+				requestContexts[requestContextID.String()] = requestContext
+			}
 			return false
 		},
 	)

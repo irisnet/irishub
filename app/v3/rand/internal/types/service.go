@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	ServiceName          = ModuleName
+	ServiceName          = "random"
 	ServiceDesc          = "system service definition of rand module"
 	ServiceSchemas       = `{"input":{"type":"object","properties":{}},"output":{"type":"object","properties":{"seed":{"description":"seed","type":"string","pattern":"^[0-9a-fA-F]{64}$"}}},"error":{"type":"string"}}`
 	ServiceValueJsonPath = "seed"
