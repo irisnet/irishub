@@ -36,8 +36,10 @@ func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
 	}
 }
 
-func InitModuleServiceDefinition(ctx sdk.Context, k Keeper, svcDefinition ServiceDefinition) {
-	k.SetServiceDefinition(ctx, svcDefinition)
+func InitModuleServiceDefinitions(ctx sdk.Context, k Keeper, svcDefinitions ...ServiceDefinition) {
+	for _, definition := range svcDefinitions {
+		k.SetServiceDefinition(ctx, definition)
+	}
 }
 
 // ExportGenesis - output genesis parameters

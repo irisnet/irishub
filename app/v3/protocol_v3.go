@@ -463,8 +463,8 @@ func (p *ProtocolV3) InitChainer(ctx sdk.Context, DeliverTx sdk.DeliverTx, req a
 	oracle.InitGenesis(ctx, p.oracleKeeper, genesisState.OracleData)
 
 	// init module service definition
-	service.InitModuleServiceDefinition(ctx, p.serviceKeeper, oracle.GetSvcDefinition())
-	service.InitModuleServiceDefinition(ctx, p.serviceKeeper, rand.GetSvcDefinition())
+	service.InitModuleServiceDefinitions(ctx, p.serviceKeeper, oracle.GetSvcDefinitions()...)
+	service.InitModuleServiceDefinitions(ctx, p.serviceKeeper, rand.GetSvcDefinitions()...)
 
 	// load the address to pubkey map
 	if err = IrisValidateGenesisState(genesisState); err != nil {

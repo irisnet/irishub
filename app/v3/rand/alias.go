@@ -42,7 +42,7 @@ var (
 	MakePRNG          = types.MakePRNG
 	GenerateRequestID = types.GenerateRequestID
 	CheckReqID        = types.CheckReqID
-	GetSvcDefinition  = types.GetSvcDefinition
+	GetSvcDefinitions = types.GetSvcDefinitions
 	NewKeeper         = keeper.NewKeeper
 	NewQuerier        = keeper.NewQuerier
 )

@@ -33,8 +33,8 @@ const (
 var (
 	RegisterCodec                 = types.RegisterCodec
 	RequestContextStateFromString = types.RequestContextStateFromString
+	GetSvcDefinitions             = types.GetSvcDefinitions
 
-	NewKeeper        = keeper.NewKeeper
-	NewQuerier       = keeper.NewQuerier
-	GetSvcDefinition = types.GetSvcDefinition
+	NewKeeper  = keeper.NewKeeper
+	NewQuerier = keeper.NewQuerier
 )

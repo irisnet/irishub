@@ -19,13 +19,15 @@ var (
 	Auther      = sdk.AccAddress(crypto.AddressHash([]byte("oracle")))
 )
 
-func GetSvcDefinition() service.ServiceDefinition {
-	return service.NewServiceDefinition(
-		ServiceName,
-		ServiceDesc,
-		ServiceTags,
-		Auther,
-		AuthorDescription,
-		ServiceSchemas,
-	)
+func GetSvcDefinitions() []service.ServiceDefinition {
+	return []service.ServiceDefinition{
+		service.NewServiceDefinition(
+			ServiceName,
+			ServiceDesc,
+			ServiceTags,
+			Auther,
+			AuthorDescription,
+			ServiceSchemas,
+		),
+	}
 }
