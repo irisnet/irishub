@@ -2,8 +2,9 @@ package types
 
 import (
 	"fmt"
-	sdk "github.com/irisnet/irishub/types"
 	"strings"
+
+	sdk "github.com/irisnet/irishub/types"
 )
 
 // GetUniId returns the unique uni id for the provided denominations.
@@ -56,7 +57,7 @@ func GetUniCoinType(uniId string) (sdk.CoinType, sdk.Error) {
 
 // CheckUniDenom returns nil if the uni denom is valid
 func CheckUniDenom(uniDenom string) sdk.Error {
-	if !sdk.IsCoinMinDenomValid(uniDenom) || !strings.HasPrefix(uniDenom, FormatUniABSPrefix) {
+	if !sdk.IsValidCoinDenom(uniDenom) || !strings.HasPrefix(uniDenom, FormatUniABSPrefix) {
 		return ErrIllegalDenom(fmt.Sprintf("illegal liquidity denomnation: %s", uniDenom))
 	}
 	return nil
@@ -76,7 +77,7 @@ func GetUniDenom(uniId string) (string, sdk.Error) {
 		return "", err
 	}
 
-	uniDenom, err := sdk.GetCoinMinDenom(uniId)
+	uniDenom, err := sdk.GetCoinDenom(uniId)
 	if err != nil {
 		return "", ErrIllegalUniId(fmt.Sprintf("illegal liquidity id: %s", uniId))
 	}

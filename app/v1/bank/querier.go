@@ -99,7 +99,7 @@ func queryTokenStats(ctx sdk.Context, req abci.RequestQuery, keeper Keeper, cdc 
 			return nil, sdk.ErrUnknownRequest("invalid symbol")
 		}
 
-		denom, err := sdk.GetCoinMinDenom(params.Symbol)
+		denom, err := sdk.GetCoinDenom(params.Symbol)
 		if err != nil {
 			return nil, sdk.ParseParamsErr(err)
 		}

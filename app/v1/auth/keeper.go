@@ -285,7 +285,7 @@ func TotalSupplyStoreKey(denom string) []byte {
 }
 
 func (am AccountKeeper) IncreaseTotalSupply(ctx sdk.Context, coin sdk.Coin) sdk.Error {
-	if !strings.HasSuffix(coin.Denom, sdk.MinDenomSuffix) {
+	if !strings.HasSuffix(coin.Denom, sdk.MinUnitSuffix) {
 		return sdk.ErrInvalidCoins(fmt.Sprintf("invalid coin [%s]", coin))
 	}
 
@@ -312,7 +312,7 @@ func (am AccountKeeper) IncreaseTotalSupply(ctx sdk.Context, coin sdk.Coin) sdk.
 }
 
 func (am AccountKeeper) DecreaseTotalSupply(ctx sdk.Context, coin sdk.Coin) sdk.Error {
-	if !strings.HasSuffix(coin.Denom, sdk.MinDenomSuffix) {
+	if !strings.HasSuffix(coin.Denom, sdk.MinUnitSuffix) {
 		return sdk.ErrInvalidCoins(fmt.Sprintf("invalid coin [%s]", coin))
 	}
 

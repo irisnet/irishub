@@ -556,7 +556,7 @@ func TestIsCoinMinDenomValid(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		res := IsCoinMinDenomValid(tc.denom)
+		res := IsValidCoinDenom(tc.denom)
 		if tc.expectedPass {
 			require.True(t, res)
 		} else {
