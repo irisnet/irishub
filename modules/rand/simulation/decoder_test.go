@@ -37,22 +37,23 @@ func TestDecodeStore(t *testing.T) {
 	}
 
 	tests := []struct {
+		pass        bool
 		name        string
 		expectedLog string
 	}{
-		{"rands", fmt.Sprintf("randA: %v\nrandB: %v", rand, rand)},
-		{"pending requests", fmt.Sprintf("requestA: %v\nrequestB: %v", request, request)},
-		{"other", ""},
+		{true, "rands", fmt.Sprintf("randA: %v\nrandB: %v", rand, rand)},
+		{true, "pending requests", fmt.Sprintf("requestA: %v\nrequestB: %v", request, request)},
+		{false, "other", ""},
 	}
 
 	for i, tt := range tests {
 		i, tt := i, tt
+
 		t.Run(tt.name, func(t *testing.T) {
-			switch i {
-			case len(tests) - 1:
-				require.Panics(t, func() { DecodeStore(cdc, kvPairs[i], kvPairs[i]) }, tt.name)
-			default:
+			if tt.pass {
 				require.Equal(t, tt.expectedLog, DecodeStore(cdc, kvPairs[i], kvPairs[i]), tt.name)
+			} else {
+				require.Panics(t, func() { DecodeStore(cdc, kvPairs[i], kvPairs[i]) }, tt.name)
 			}
 		})
 	}
