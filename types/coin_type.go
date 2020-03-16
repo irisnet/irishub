@@ -117,7 +117,7 @@ func (ct CoinType) ConvertToCoin(srcCoinStr string) (coin Coin, err error) {
 
 func (ct CoinType) GetUnit(name string) (u Unit, err error) {
 	for _, unit := range ct.Units {
-		if strings.ToLower(name) == strings.ToLower(unit.Name) {
+		if strings.EqualFold(name, unit.Name) {
 			return unit, nil
 		}
 	}
