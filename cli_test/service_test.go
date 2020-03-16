@@ -151,7 +151,7 @@ func TestIrisCLIService(t *testing.T) {
 	tests.WaitForNextNBlocksTM(1, f.Port)
 
 	// QueryTxs
-	searchResult := f.QueryTxs(1, 50, "message.action:call_service", fmt.Sprintf("message.sender:%s", consumer))
+	searchResult := f.QueryTxs(1, 50, "message.action=call_service", fmt.Sprintf("message.sender=%s", consumer))
 	require.Len(t, searchResult.Txs, 1)
 
 	events := searchResult.Txs[0].Logs[0].Events

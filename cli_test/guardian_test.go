@@ -31,7 +31,7 @@ func TestIrisCLIAddProfiler(t *testing.T) {
 
 	tests.WaitForNextNBlocksTM(1, f.Port)
 	// Ensure transaction tags can be queried
-	searchResult := f.QueryTxs(1, 50, "message.action:add_profiler", fmt.Sprintf("message.sender:%s", fooAddr))
+	searchResult := f.QueryTxs(1, 50, "message.action=add_profiler", fmt.Sprintf("message.sender=%s", fooAddr))
 	require.Len(t, searchResult.Txs, 1)
 
 	expGuardian := guardian.NewGuardian(description, guardian.Ordinary, barAddr, fooAddr)
@@ -45,7 +45,7 @@ func TestIrisCLIAddProfiler(t *testing.T) {
 
 	tests.WaitForNextNBlocksTM(1, f.Port)
 	// Ensure transaction tags can be queried
-	searchResult = f.QueryTxs(1, 50, "message.action:delete_profiler", fmt.Sprintf("message.sender:%s", fooAddr))
+	searchResult = f.QueryTxs(1, 50, "message.action=delete_profiler", fmt.Sprintf("message.sender=%s", fooAddr))
 	require.Len(t, searchResult.Txs, 1)
 
 	res = f.QueryProfilers()
@@ -76,7 +76,7 @@ func TestIrisCLIAddTrustee(t *testing.T) {
 
 	tests.WaitForNextNBlocksTM(1, f.Port)
 	// Ensure transaction tags can be queried
-	searchResult := f.QueryTxs(1, 50, "message.action:add_trustee", fmt.Sprintf("message.sender:%s", fooAddr))
+	searchResult := f.QueryTxs(1, 50, "message.action=add_trustee", fmt.Sprintf("message.sender=%s", fooAddr))
 	require.Len(t, searchResult.Txs, 1)
 
 	res := f.QueryTrustees()
@@ -88,7 +88,7 @@ func TestIrisCLIAddTrustee(t *testing.T) {
 
 	tests.WaitForNextNBlocksTM(1, f.Port)
 	// Ensure transaction tags can be queried
-	searchResult = f.QueryTxs(1, 50, "message.action:delete_trustee", fmt.Sprintf("message.sender:%s", fooAddr))
+	searchResult = f.QueryTxs(1, 50, "message.action=delete_trustee", fmt.Sprintf("message.sender=%s", fooAddr))
 	require.Len(t, searchResult.Txs, 1)
 
 	res = f.QueryTrustees()
