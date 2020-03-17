@@ -60,7 +60,7 @@ func (ft FungibleToken) GetOwner() types.AccAddress {
 }
 
 func (ft FungibleToken) GetDenom() string {
-	denom, _ := sdk.GetCoinMinDenom(ft.GetSymbol())
+	denom, _ := sdk.GetCoinDenom(ft.GetSymbol())
 	return denom
 }
 

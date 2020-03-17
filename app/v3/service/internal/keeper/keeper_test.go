@@ -4,9 +4,9 @@ import (
 	"testing"
 	"time"
 
-	cmn "github.com/tendermint/tendermint/libs/common"
-
 	"github.com/stretchr/testify/require"
+
+	cmn "github.com/tendermint/tendermint/libs/common"
 
 	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/app/v3/service/internal/types"
@@ -16,9 +16,9 @@ import (
 var (
 	testChainID = "test-chain"
 
-	testCoin1, _ = sdk.IrisCoinType.ConvertToMinDenomCoin("10000iris")
-	testCoin2, _ = sdk.IrisCoinType.ConvertToMinDenomCoin("100iris")
-	testCoin3, _ = sdk.IrisCoinType.ConvertToMinDenomCoin("1iris")
+	testCoin1, _ = sdk.IrisCoinType.ConvertToCoin("10000iris")
+	testCoin2, _ = sdk.IrisCoinType.ConvertToCoin("100iris")
+	testCoin3, _ = sdk.IrisCoinType.ConvertToCoin("1iris")
 
 	testServiceName = "test-service"
 	testServiceDesc = "test-service-desc"

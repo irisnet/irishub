@@ -2380,10 +2380,13 @@ paths:
                   type: string
                 aggregate_func:
                   type: string
+                  example: "avg"
                 value_json_path:
                   type: string
+                  example: "quote"
                 latest_history:
-                  type: integer
+                  type: string
+                  example: "2"
                 description:
                   type: string
                 creator:
@@ -2395,17 +2398,23 @@ paths:
                   items:
                     $ref: '#/components/schemas/Address'
                 input:
-                  type: integer
+                  type: string
+                  example: '{"base":"link","quote":"usdt"}'
                 timeout:
-                  type: integer
+                  type: string
+                  example: "2"
                 service_fee_cap:
                   type: string
+                  example: "1iris"
                 repeated_frequency:
-                  type: integer
+                  type: string
+                  example: "5"
                 repeated_total:
-                  type: integer
+                  type: string
+                  example: "-1"
                 response_threshold:
                   type: integer
+                  example: 1
         required: true
     get:
       summary: Query some feeds  by state
@@ -2435,6 +2444,13 @@ paths:
       description: Send transaction to start a feed
       tags:
         - Oracle
+      parameters:
+        - in: path
+          name: feed-name
+          description: the name of the feed
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: Unsigned tx was succesfully generated
@@ -2459,6 +2475,13 @@ paths:
       description: Send transaction to start a feed
       tags:
         - Oracle
+      parameters:
+        - in: path
+          name: feed-name
+          description: the name of the feed
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: Unsigned tx was succesfully generated
@@ -2483,6 +2506,13 @@ paths:
       description: Send transaction to define a feed
       tags:
         - Oracle
+      parameters:
+        - in: path
+          name: feed-name
+          description: the name of the feed
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: Unsigned tx was succesfully generated
@@ -2501,7 +2531,8 @@ paths:
                 feed_name:
                   type: string
                 latest_history:
-                  type: integer
+                  type: string
+                  example: "5"
                 description:
                   type: string
                 creator:
@@ -2511,15 +2542,20 @@ paths:
                   items:
                     $ref: '#/components/schemas/Address'
                 timeout:
-                  type: integer
+                  type: string
+                  example: "2"
                 service_fee_cap:
                   type: string
+                  example: "1iris"
                 repeated_frequency:
-                  type: integer
+                  type: string
+                  example: "5"
                 repeated_total:
-                  type: integer
+                  type: string
+                  example: "-1"
                 response_threshold:
                   type: integer
+                  example: 1
         required: true
     get:
       summary: Query a feed definition by name
@@ -3888,7 +3924,7 @@ components:
           example: 'data.eth.price'
         latest_history:
           type: string
-          example: 10
+          example: "10"
         request_context_id:
           type: string
           example: 'the request id of calling a service'
@@ -3911,17 +3947,17 @@ components:
           example: 'the data of calling a service'
         timeout:
           type: integer
-          example: 10
+          example: "10"
         service_fee_cap:
           type: array
           items:
             $ref: '#/components/schemas/Coin'
         repeated_frequency:
           type: integer
-          example: 5
+          example: "5"
         repeated_total:
           type: integer
-          example: -1
+          example: "-1"
         response_threshold:
           type: integer
           example: 1

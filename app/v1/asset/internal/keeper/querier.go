@@ -37,11 +37,11 @@ func queryToken(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, 
 
 	var token types.FungibleToken
 	if params.TokenId == sdk.Iris {
-		initSupply, err := sdk.IrisCoinType.ConvertToMinDenomCoin(sdk.NewCoin(sdk.Iris, sdk.InitialIssue).String())
+		initSupply, err := sdk.IrisCoinType.ConvertToCoin(sdk.NewCoin(sdk.Iris, sdk.InitialIssue).String())
 		if err != nil {
 			return nil, sdk.MarshalResultErr(err)
 		}
-		maxSupply, err := sdk.IrisCoinType.ConvertToMinDenomCoin(sdk.NewCoin(sdk.Iris, sdk.NewInt(int64(types.MaximumAssetMaxSupply))).String())
+		maxSupply, err := sdk.IrisCoinType.ConvertToCoin(sdk.NewCoin(sdk.Iris, sdk.NewInt(int64(types.MaximumAssetMaxSupply))).String())
 		if err != nil {
 			return nil, sdk.MarshalResultErr(err)
 		}
@@ -114,11 +114,11 @@ func queryTokens(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte,
 
 	// Add iris to the list
 	if source == types.NATIVE && owner.Empty() {
-		initSupply, err := sdk.IrisCoinType.ConvertToMinDenomCoin(sdk.NewCoin(sdk.Iris, sdk.InitialIssue).String())
+		initSupply, err := sdk.IrisCoinType.ConvertToCoin(sdk.NewCoin(sdk.Iris, sdk.InitialIssue).String())
 		if err != nil {
 			return nil, sdk.MarshalResultErr(err)
 		}
-		maxSupply, err := sdk.IrisCoinType.ConvertToMinDenomCoin(sdk.NewCoin(sdk.Iris, sdk.NewInt(int64(types.MaximumAssetMaxSupply))).String())
+		maxSupply, err := sdk.IrisCoinType.ConvertToCoin(sdk.NewCoin(sdk.Iris, sdk.NewInt(int64(types.MaximumAssetMaxSupply))).String())
 		if err != nil {
 			return nil, sdk.MarshalResultErr(err)
 		}

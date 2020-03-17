@@ -44,7 +44,7 @@ func TestIrisCLIRand(t *testing.T) {
 	serviceDesc := "rand"
 	serviceTags := []string{"tag1", "tag2"}
 	authorDesc := "author"
-	serviceSchemas := `{"input":{"type":"object","properties":{}},"output":{"type":"object","properties":{"seed":{"description":"seed","type":"string"}}},"error":{"type":"string"}}`
+	serviceSchemas := `{"input":{"type":"object","properties":{}},"output":{"type":"object","properties":{"seed":{"description":"seed","type":"string","pattern":"^[0-9a-fA-F]{64}$"}}},"error":{"type":"string"}}`
 	deposit := "10iris"
 	priceAmt := 1 // 1iris
 	pricing := fmt.Sprintf(`{"price":[{"denom":"iris-atto","amount":"%s"}]}`, sdk.NewIntWithDecimal(int64(priceAmt), 18).String())

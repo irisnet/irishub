@@ -11,8 +11,8 @@ import (
 )
 
 var (
-	testCoin1, _ = sdk.IrisCoinType.ConvertToMinDenomCoin("1000iris")
-	testCoin2, _ = sdk.IrisCoinType.ConvertToMinDenomCoin("100iris")
+	testCoin1, _ = sdk.IrisCoinType.ConvertToCoin("1000iris")
+	testCoin2, _ = sdk.IrisCoinType.ConvertToCoin("100iris")
 
 	testServiceName = "test-service"
 	testServiceDesc = "test-service-desc"
