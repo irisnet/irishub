@@ -66,7 +66,7 @@ func CheckVoucherDenom(voucherDenom string) sdk.Error {
 
 // CheckVoucherCoinName returns nil if the voucher coin name is valid
 func CheckVoucherCoinName(voucherCoinName string) sdk.Error {
-	if !sdk.IsCoinNameValid(voucherCoinName) || !strings.HasPrefix(voucherCoinName, LiquidityVoucherPrefix) {
+	if !sdk.IsValidCoinName(voucherCoinName) || !strings.HasPrefix(voucherCoinName, LiquidityVoucherPrefix) {
 		return ErrIllegalVoucherCoinName(fmt.Sprintf("illegal voucher coin name: %s", voucherCoinName))
 	}
 	return nil

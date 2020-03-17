@@ -107,6 +107,7 @@ func (ct CoinType) Convert(srcCoinStr string, destUnitName string) (destCoinStr 
 	return destCoinStr, errors.New("source unit (%s) not defined" + srcUnit)
 }
 
+// ConvertToCoin converts the given coin string to the min unit
 func (ct CoinType) ConvertToCoin(srcCoinStr string) (coin Coin, err error) {
 	if destCoinStr, err := ct.Convert(srcCoinStr, ct.MinUnit.Name); err == nil {
 		coin, err = ParseCoin(destCoinStr)
@@ -117,7 +118,7 @@ func (ct CoinType) ConvertToCoin(srcCoinStr string) (coin Coin, err error) {
 
 func (ct CoinType) GetUnit(name string) (u Unit, err error) {
 	for _, unit := range ct.Units {
-		if strings.ToLower(name) == strings.ToLower(unit.Name) {
+		if strings.EqualFold(name, unit.Name) {
 			return unit, nil
 		}
 	}

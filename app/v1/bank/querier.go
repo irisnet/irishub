@@ -95,7 +95,7 @@ func queryTokenStats(ctx sdk.Context, req abci.RequestQuery, keeper Keeper, cdc 
 		looseTokens = bk.GetLoosenCoins(ctx)
 		burnedTokens = sdk.Coins{sdk.NewCoin(sdk.IrisAtto, bk.GetCoins(ctx, auth.BurnedCoinsAccAddr).AmountOf(sdk.IrisAtto))}
 	} else { // query non-iris
-		if !sdk.IsCoinNameValid(params.Symbol) {
+		if !sdk.IsValidCoinName(params.Symbol) {
 			return nil, sdk.ErrUnknownRequest("invalid symbol")
 		}
 
