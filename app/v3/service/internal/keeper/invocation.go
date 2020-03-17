@@ -1047,11 +1047,25 @@ func (k Keeper) RefundServiceFees(ctx sdk.Context) sdk.Error {
 	return nil
 }
 
+// CheckAuthority checks if the operation on the specified request context is authorized
+func (k Keeper) CheckAuthority(ctx sdk.Context, requestContextID cmn.HexBytes) sdk.Error {
+	requestContext, found := k.GetRequestContext(ctx, requestContextID)
+	if !found {
+		return types.ErrUnknownRequestContext(k.codespace, requestContextID)
+	}
+
+	if len(requestContext.ModuleName) > 0 {
+		return types.ErrNotAuthorized(k.codespace)
+	}
+
+	return nil
+}
+
 // GetResponseCallback gets the registered module callback for response handling
 func (k Keeper) GetResponseCallback(moduleName string) (types.ResponseCallback, sdk.Error) {
 	respCallback, ok := k.respCallbacks[moduleName]
 	if !ok {
-		return nil, types.ErrModuleNameNotRegistered(k.Codespace(), moduleName)
+		return nil, types.ErrModuleNameNotRegistered(k.codespace, moduleName)
 	}
 
 	return respCallback, nil

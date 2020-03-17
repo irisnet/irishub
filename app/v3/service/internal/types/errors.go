@@ -40,21 +40,22 @@ const (
 	CodeUnknownRequestContext     sdk.CodeType = 124
 	CodeInvalidRequestContextID   sdk.CodeType = 125
 	CodeNotMatchingConsumer       sdk.CodeType = 126
-	CodeRequestContextNonRepeated sdk.CodeType = 127
-	CodeRequestContextNotStarted  sdk.CodeType = 128
-	CodeRequestContextNotPaused   sdk.CodeType = 129
-	CodeRequestContextCompleted   sdk.CodeType = 130
-	CodeModuleNameRegistered      sdk.CodeType = 131
-	CodeModuleNameNotRegistered   sdk.CodeType = 132
-	CodeNoEarnedFees              sdk.CodeType = 133
+	CodeNotAuthorized             sdk.CodeType = 127
+	CodeRequestContextNonRepeated sdk.CodeType = 128
+	CodeRequestContextNotStarted  sdk.CodeType = 129
+	CodeRequestContextNotPaused   sdk.CodeType = 130
+	CodeRequestContextCompleted   sdk.CodeType = 131
+	CodeModuleNameRegistered      sdk.CodeType = 132
+	CodeModuleNameNotRegistered   sdk.CodeType = 133
+	CodeNoEarnedFees              sdk.CodeType = 134
 
-	CodeInvalidRequestInput   sdk.CodeType = 134
-	CodeInvalidResponseOutput sdk.CodeType = 135
-	CodeInvalidResponseErr    sdk.CodeType = 136
+	CodeInvalidRequestInput   sdk.CodeType = 135
+	CodeInvalidResponseOutput sdk.CodeType = 136
+	CodeInvalidResponseErr    sdk.CodeType = 137
 
-	CodeInvalidAddress  sdk.CodeType = 137
-	CodeInvalidProfiler sdk.CodeType = 138
-	CodeInvalidTrustee  sdk.CodeType = 139
+	CodeInvalidAddress  sdk.CodeType = 138
+	CodeInvalidProfiler sdk.CodeType = 139
+	CodeInvalidTrustee  sdk.CodeType = 140
 )
 
 func ErrInvalidServiceName(codespace sdk.CodespaceType, serviceName string) sdk.Error {
@@ -162,6 +163,10 @@ func ErrInvalidRequestContextID(codespace sdk.CodespaceType, msg string) sdk.Err
 }
 
 func ErrNotMatchingConsumer(codespace sdk.CodespaceType) sdk.Error {
+	return sdk.NewError(codespace, CodeNotMatchingConsumer, "consumer does not match")
+}
+
+func ErrNotAuthorized(codespace sdk.CodespaceType) sdk.Error {
 	return sdk.NewError(codespace, CodeNotMatchingConsumer, "consumer does not match")
 }
 
