@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"github.com/tendermint/tendermint/crypto/tmhash"
 	"testing"
 	"time"
 
@@ -57,13 +58,14 @@ func setRequestContext(
 	providers []sdk.AccAddress, state types.RequestContextState,
 	threshold uint16, moduleName string,
 ) (cmn.HexBytes, types.RequestContext) {
+	ctx = ctx.WithTxHash(tmhash.Sum([]byte("tx_hash")))
 	requestContext := types.NewRequestContext(
 		testServiceName, providers, consumer, testInput,
 		testServiceFeeCap, testTimeout, false, true, testRepeatedFreq,
 		testRepeatedTotal, 0, 0, 0, types.BATCHCOMPLETED, state, threshold, moduleName,
 	)
 
-	requestContextID := types.GenerateRequestContextID(ctx.BlockHeight(), 0)
+	requestContextID := types.GenerateRequestContextID(ctx.TxHash(), 0)
 	k.SetRequestContext(ctx, requestContextID, requestContext)
 
 	return requestContextID, requestContext
@@ -81,7 +83,7 @@ func setRequest(ctx sdk.Context, k Keeper, consumer sdk.AccAddress, provider sdk
 
 	requestContext.BatchRequestCount++
 
-	requestID := types.GenerateRequestID(requestContextID, request.RequestContextBatchCounter, int16(requestContext.BatchRequestCount))
+	requestID := types.GenerateRequestID(requestContextID, request.RequestContextBatchCounter, ctx.BlockHeight(), int16(requestContext.BatchRequestCount))
 	k.SetCompactRequest(ctx, requestID, request)
 
 	requestContext.BatchState = types.BATCHRUNNING
@@ -336,7 +338,7 @@ func TestKeeper_Request_Service(t *testing.T) {
 	}
 
 	blockHeight := int64(1000)
-	ctx = ctx.WithBlockHeight(blockHeight)
+	ctx = ctx.WithBlockHeight(blockHeight).WithTxHash(tmhash.Sum([]byte("tx_hash")))
 
 	requestContextID, requestContext := setRequestContext(ctx, keeper, consumer, providers, types.RUNNING, 0, "")
 

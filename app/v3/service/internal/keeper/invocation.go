@@ -97,7 +97,7 @@ func (k Keeper) CreateRequestContext(
 		responseThreshold, moduleName,
 	)
 
-	requestContextID := types.GenerateRequestContextID(ctx.BlockHeight(), k.GetIntraTxCounter(ctx))
+	requestContextID := types.GenerateRequestContextID(ctx.TxHash(), ctx.MsgIndex())
 	k.SetRequestContext(ctx, requestContextID, requestContext)
 
 	if requestContext.State == types.RUNNING {
@@ -337,7 +337,7 @@ func (k Keeper) InitiateRequests(
 			requestContext.ServiceName, provider, requestContext.SuperMode,
 		)
 
-		requestID := types.GenerateRequestID(requestContextID, requestContext.BatchCounter, int16(providerIndex))
+		requestID := types.GenerateRequestID(requestContextID, requestContext.BatchCounter, ctx.BlockHeight(), int16(providerIndex))
 		k.SetCompactRequest(ctx, requestID, request)
 
 		k.AddActiveRequest(ctx, requestContext.ServiceName, provider, ctx.BlockHeight()+requestContext.Timeout, requestID)

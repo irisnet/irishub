@@ -33,7 +33,7 @@ const (
 	MaxTagLength         = 70  // max length of the tag
 
 	MaxProvidersNum     = 10 // max total number of the providers to request
-	RequestContextIDLen = 32 // length of the request context ID in bytes
+	RequestContextIDLen = 40 // length of the request context ID in bytes
 )
 
 // the service name only accepts alphanumeric characters, _ and -

@@ -532,7 +532,7 @@ func (state *RequestContextBatchState) UnmarshalJSON(data []byte) error {
 type ResponseCallback func(ctx sdk.Context, requestContextID cmn.HexBytes, responses []string, err error)
 
 const (
-	requestIDLen = 42
+	requestIDLen = 58
 )
 
 // ConvertRequestID converts the given string to request ID
@@ -550,21 +550,24 @@ func ConvertRequestID(requestIDStr string) (cmn.HexBytes, error) {
 }
 
 // GenerateRequestContextID generates a unique ID for the request context from the specified params
-func GenerateRequestContextID(blockHeight int64, intraCounter int16) cmn.HexBytes {
-	bz := make([]byte, 10)
+func GenerateRequestContextID(txHash []byte, msgIndex int64) cmn.HexBytes {
+	bz := make([]byte, 8)
 
-	binary.BigEndian.PutUint64(bz, uint64(blockHeight))
-	binary.BigEndian.PutUint16(bz[8:], uint16(intraCounter))
+	binary.BigEndian.PutUint64(bz, uint64(msgIndex))
 
-	return sdk.SHA256(bz)
+	return append(txHash, bz...)
 }
 
 // GenerateRequestID generates a unique request ID from the given params
-func GenerateRequestID(requestContextID cmn.HexBytes, requestContextBatchCounter uint64, batchRequestIndex int16) cmn.HexBytes {
-	bz := make([]byte, 10)
+func GenerateRequestID(requestContextID cmn.HexBytes, requestContextBatchCounter uint64, requestHeight int64, batchRequestIndex int16) cmn.HexBytes {
+	contextID := make([]byte, len(requestContextID))
+	copy(contextID, requestContextID)
+
+	bz := make([]byte, 18)
 
 	binary.BigEndian.PutUint64(bz, requestContextBatchCounter)
-	binary.BigEndian.PutUint16(bz[8:], uint16(batchRequestIndex))
+	binary.BigEndian.PutUint64(bz[8:], uint64(requestHeight))
+	binary.BigEndian.PutUint16(bz[16:], uint16(batchRequestIndex))
 
-	return append(requestContextID, bz...)
+	return append(contextID, bz...)
 }
