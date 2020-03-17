@@ -16,9 +16,9 @@ import (
 var (
 	testChainID = "test-chain"
 
-	testCoin1, _ = sdk.IrisCoinType.ConvertToMinDenomCoin("10000iris")
-	testCoin2, _ = sdk.IrisCoinType.ConvertToMinDenomCoin("100iris")
-	testCoin3, _ = sdk.IrisCoinType.ConvertToMinDenomCoin("1iris")
+	testCoin1, _ = sdk.IrisCoinType.ConvertToCoin("10000iris")
+	testCoin2, _ = sdk.IrisCoinType.ConvertToCoin("100iris")
+	testCoin3, _ = sdk.IrisCoinType.ConvertToCoin("1iris")
 
 	testServiceName = "test-service"
 	testServiceDesc = "test-service-desc"

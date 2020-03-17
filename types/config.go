@@ -16,8 +16,8 @@ const (
 
 var (
 	InitialIssue     = NewIntWithDecimal(2, 9) // 2 billion
-	FreeToken4Val, _ = IrisCoinType.ConvertToMinDenomCoin(fmt.Sprintf("%d%s", int64(100), Iris))
-	FreeToken4Acc, _ = IrisCoinType.ConvertToMinDenomCoin(fmt.Sprintf("%d%s", int64(150), Iris))
+	FreeToken4Val, _ = IrisCoinType.ConvertToCoin(fmt.Sprintf("%d%s", int64(100), Iris))
+	FreeToken4Acc, _ = IrisCoinType.ConvertToCoin(fmt.Sprintf("%d%s", int64(150), Iris))
 )
 
 // Can be configured through environment variables
