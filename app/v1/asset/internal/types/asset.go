@@ -110,7 +110,7 @@ func (ft FungibleToken) GetUniqueID() string {
 }
 
 func (ft FungibleToken) GetDenom() string {
-	denom, _ := sdk.GetCoinMinDenom(ft.GetUniqueID())
+	denom, _ := sdk.GetCoinDenom(ft.GetUniqueID())
 	return denom
 }
 

@@ -58,7 +58,7 @@ func (coin Coin) IsValid() bool {
 	if coin.IsNegative() {
 		return false
 	}
-	return IsCoinMinDenomValid(coin.Denom)
+	return IsValidCoinDenom(coin.Denom)
 }
 
 func (coin Coin) IsValidIrisAtto() bool {
@@ -574,7 +574,7 @@ var (
 	reCoinCompiled     = regexp.MustCompile(fmt.Sprintf(`^(%s)%s(%s)$`, reAmount, reSpace, reDenom))
 )
 
-func ParseCoinParts(coinStr string) (denom, amount string, err error) {
+func ParseCoinParts(coinStr string) (unit, amount string, err error) {
 	coinStr = strings.ToLower(strings.TrimSpace(coinStr))
 
 	matches := reCoinCompiled.FindStringSubmatch(coinStr)
@@ -582,7 +582,8 @@ func ParseCoinParts(coinStr string) (denom, amount string, err error) {
 		err = fmt.Errorf("invalid coin string: %s", coinStr)
 		return
 	}
-	denom, amount = matches[3], matches[1]
+
+	unit, amount = matches[3], matches[1]
 	return
 }
 
@@ -629,12 +630,12 @@ func ParseCoins(coinsStr string) (coins Coins, err error) {
 	return coins, nil
 }
 
-func IsCoinNameValid(coinName string) bool {
+func IsValidCoinName(coinName string) bool {
 	return reCoinNameCompiled.MatchString(coinName)
 }
 
-func IsCoinMinDenomValid(denom string) bool {
-	if denom != IrisAtto && (!strings.HasSuffix(denom, MinDenomSuffix) || strings.HasPrefix(denom, Iris+"-")) {
+func IsValidCoinDenom(denom string) bool {
+	if denom != IrisAtto && (!strings.HasSuffix(denom, MinUnitSuffix) || strings.HasPrefix(denom, Iris+"-")) {
 		return false
 	}
 	return reDenomCompiled.MatchString(denom)
