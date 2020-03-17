@@ -167,7 +167,7 @@ func ErrNotMatchingConsumer(codespace sdk.CodespaceType) sdk.Error {
 }
 
 func ErrNotAuthorized(codespace sdk.CodespaceType) sdk.Error {
-	return sdk.NewError(codespace, CodeNotMatchingConsumer, "consumer does not match")
+	return sdk.NewError(codespace, CodeNotAuthorized, "not authorized operation")
 }
 
 func ErrRequestContextNonRepeated(codespace sdk.CodespaceType) sdk.Error {
