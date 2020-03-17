@@ -51,3 +51,4 @@ func DefaultGenesisStateForTest() GenesisState {
 		PendingRandRequests: map[string][]Request{},
 	}
 }
+

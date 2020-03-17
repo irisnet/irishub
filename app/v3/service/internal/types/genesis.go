@@ -1,27 +1,34 @@
 package types
 
-import "encoding/hex"
+import (
+	"encoding/hex"
+
+	sdk "github.com/irisnet/irishub/types"
+)
 
 // GenesisState - all service state that must be provided at genesis
 type GenesisState struct {
-	Params          Params                    `json:"params"`           // service params
-	RequestContexts map[string]RequestContext `json:"request_contexts"` // request contexts
-	Requests        map[string]CompactRequest `json:"requests"`         // requests
-	Responses       map[string]Response       `json:"responses"`        // responses
+	Params            Params                    `json:"params"`             // service params
+	Definitions       []ServiceDefinition       `json:"definitions"`        // service definitions
+	Bindings          []ServiceBinding          `json:"bindings"`           // service bindings
+	WithdrawAddresses map[string]sdk.AccAddress `json:"withdraw_addresses"` // withdraw addresses
+	RequestContexts   map[string]RequestContext `json:"request_contexts"`   // request contexts
 }
 
 // NewGenesisState constructs a GenesisState
 func NewGenesisState(
 	params Params,
+	definitions []ServiceDefinition,
+	bindings []ServiceBinding,
+	withdrawAddresses map[string]sdk.AccAddress,
 	requestContexts map[string]RequestContext,
-	requests map[string]CompactRequest,
-	reponses map[string]Response,
 ) GenesisState {
 	return GenesisState{
-		Params:          params,
-		RequestContexts: requestContexts,
-		Requests:        requests,
-		Responses:       reponses,
+		Params:            params,
+		Definitions:       definitions,
+		Bindings:          bindings,
+		WithdrawAddresses: withdrawAddresses,
+		RequestContexts:   requestContexts,
 	}
 }
 
@@ -42,25 +49,30 @@ func DefaultGenesisStateForTest() GenesisState {
 // ValidateGenesis validates the provided service genesis state to ensure the
 // expected invariants holds.
 func ValidateGenesis(data GenesisState) error {
-	err := validateParams(data.Params)
-	if err != nil {
+	if err := validateParams(data.Params); err != nil {
 		return err
+	}
+
+	for _, definition := range data.Definitions {
+		if err := definition.Validate(); err != nil {
+			return err
+		}
+	}
+
+	for _, binding := range data.Bindings {
+		if err := binding.Validate(); err != nil {
+			return err
+		}
+	}
+
+	for providerAddressStr := range data.WithdrawAddresses {
+		if _, err := hex.DecodeString(providerAddressStr); err != nil {
+			return err
+		}
 	}
 
 	for requestContextID := range data.RequestContexts {
 		if _, err := hex.DecodeString(requestContextID); err != nil {
-			return err
-		}
-	}
-
-	for requestID := range data.Requests {
-		if _, err := ConvertRequestID(requestID); err != nil {
-			return err
-		}
-	}
-
-	for requestID := range data.Responses {
-		if _, err := ConvertRequestID(requestID); err != nil {
 			return err
 		}
 	}

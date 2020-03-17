@@ -19,12 +19,13 @@ type (
 
 // exported consts
 const (
-	ServiceName           = types.ModuleName
+	ModuleName            = types.ModuleName
 	DefaultCodespace      = types.DefaultCodespace
 	DefaultBlockInterval  = types.DefaultBlockInterval
 	RandPrec              = types.RandPrec
 	QueryRand             = types.QueryRand
 	QueryRandRequestQueue = types.QueryRandRequestQueue
+	ModuleServiceName     = types.ServiceName
 )
 
 // exported variables and functions
@@ -41,6 +42,7 @@ var (
 	MakePRNG          = types.MakePRNG
 	GenerateRequestID = types.GenerateRequestID
 	CheckReqID        = types.CheckReqID
+	GetSvcDefinitions = types.GetSvcDefinitions
 	NewKeeper         = keeper.NewKeeper
 	NewQuerier        = keeper.NewQuerier
 )

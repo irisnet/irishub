@@ -45,3 +45,24 @@ func (k Keeper) GetServiceDefinition(ctx sdk.Context, name string) (svcDef types
 	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &svcDef)
 	return svcDef, true
 }
+
+// IterateServiceDefinitions iterates through all service definitions
+func (k Keeper) IterateServiceDefinitions(
+	ctx sdk.Context,
+	op func(definition types.ServiceDefinition) (stop bool),
+) {
+	store := ctx.KVStore(k.storeKey)
+
+	iterator := sdk.KVStorePrefixIterator(store, serviceDefinitionKey)
+	defer iterator.Close()
+
+	for ; iterator.Valid(); iterator.Next() {
+		var definition types.ServiceDefinition
+		k.GetCdc().MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &definition)
+
+		if stop := op(definition); stop {
+			break
+		}
+	}
+
+}
