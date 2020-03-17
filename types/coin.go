@@ -630,7 +630,7 @@ func ParseCoins(coinsStr string) (coins Coins, err error) {
 	return coins, nil
 }
 
-func IsCoinNameValid(coinName string) bool {
+func IsValidCoinName(coinName string) bool {
 	return reCoinNameCompiled.MatchString(coinName)
 }
 

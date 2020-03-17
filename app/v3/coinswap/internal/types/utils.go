@@ -66,7 +66,7 @@ func CheckUniDenom(uniDenom string) sdk.Error {
 
 // CheckUniID returns nil if the uni id is valid
 func CheckUniID(uniID string) sdk.Error {
-	if !sdk.IsCoinNameValid(uniID) || !strings.HasPrefix(uniID, FormatUniABSPrefix) {
+	if !sdk.IsValidCoinName(uniID) || !strings.HasPrefix(uniID, FormatUniABSPrefix) {
 		return ErrIllegalUniId(fmt.Sprintf("illegal liquidity id: %s", uniID))
 	}
 	return nil
