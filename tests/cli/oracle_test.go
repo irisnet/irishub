@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"encoding/hex"
 	"fmt"
 	"testing"
 
@@ -132,9 +131,8 @@ func TestIrisCLIOracle(t *testing.T) {
 		// query requests by binding (foo)
 		fooRequests := executeGetServiceRequests(t, fmt.Sprintf("iriscli service requests %s %s %v", serviceName, fooAddr.String(), flags))
 		if len(fooRequests) == 1 {
-			requestContextID := hex.EncodeToString(fooRequests[0].RequestContextID)
 			//respond service
-			respondService(t, requestContextID, flags, output, port)
+			respondService(t, fooRequests[0].ID.String(), flags, output, port)
 			goto verifyValue
 		}
 		tests.WaitForNextNBlocksTM(1, port)
@@ -148,18 +146,16 @@ verifyValue:
 	require.Equal(t, "100.00000000", values[0].Data)
 }
 
-func respondService(t *testing.T, requestContextID string, flags string, output string, port string) (string, string) {
-	fooRequestID := requestContextID + hex.EncodeToString(sdk.Uint64ToBigEndian(1)) + "0000"
-
+func respondService(t *testing.T, requestID string, flags string, output string, port string) (string, string) {
 	rsStr := fmt.Sprintf("iriscli service respond %v", flags)
-	rsStr += fmt.Sprintf(" --request-id=%s", fooRequestID)
+	rsStr += fmt.Sprintf(" --request-id=%s", requestID)
 	rsStr += fmt.Sprintf(" --data=%s", output)
 	rsStr += fmt.Sprintf(" --fee=%s", "0.4iris")
 	rsStr += fmt.Sprintf(" --from=%s", "foo")
 
 	executeWrite(t, rsStr, sdk.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(1, port)
-	return fooRequestID, rsStr
+	return requestID, rsStr
 }
 
 func bindService(t *testing.T, flags string, serviceName string, deposit string, pricing string, port string) string {
