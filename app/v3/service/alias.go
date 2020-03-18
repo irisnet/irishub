@@ -70,6 +70,8 @@ var (
 	NewMsgWithdrawEarnedFees   = types.NewMsgWithdrawEarnedFees
 	NewMsgWithdrawTax          = types.NewMsgWithdrawTax
 	ConvertRequestID           = types.ConvertRequestID
+	GenerateRequestContextID   = types.GenerateRequestContextID
+	GenerateRequestID          = types.GenerateRequestID
 )
 
 // nolint

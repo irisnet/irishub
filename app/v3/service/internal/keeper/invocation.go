@@ -127,10 +127,6 @@ func (k Keeper) UpdateRequestContext(
 		return types.ErrNotMatchingConsumer(k.codespace)
 	}
 
-	if !requestContext.Repeated {
-		return types.ErrRequestContextNonRepeated(k.codespace)
-	}
-
 	if requestContext.State == types.COMPLETED {
 		return types.ErrRequestContextCompleted(k.codespace)
 	}
@@ -233,10 +229,6 @@ func (k Keeper) StartRequestContext(
 
 	if !consumer.Equals(requestContext.Consumer) {
 		return types.ErrNotMatchingConsumer(k.codespace)
-	}
-
-	if !requestContext.Repeated {
-		return types.ErrRequestContextNonRepeated(k.codespace)
 	}
 
 	if requestContext.State != types.PAUSED {

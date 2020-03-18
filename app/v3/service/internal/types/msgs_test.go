@@ -2,11 +2,12 @@ package types
 
 import (
 	"fmt"
-	"github.com/tendermint/tendermint/crypto/tmhash"
 	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
+
+	"github.com/tendermint/tendermint/crypto/tmhash"
 
 	sdk "github.com/irisnet/irishub/types"
 )
