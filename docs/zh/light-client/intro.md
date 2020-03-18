@@ -142,20 +142,20 @@ irislcd start --node=tcp://localhost:26657 --chain-id=<chain-id> --laddr=tcp://0
 ### Asset模块的APIs
 
 1. `POST /asset/tokens`: 发行一种通证
-2. `PUT /asset/tokens/{token-id}`: 编辑一个已存在的通证
-3. `POST /asset/tokens/{token-id}/mint`: 资产所有者和操作员可以直接将通证铸造到指定地址
-4. `POST /asset/tokens/{token-id}/transfer`: 转让通证的所有权
+2. `PUT /asset/tokens/{symbol}`: 编辑一个已存在的通证
+3. `POST /asset/tokens/{symbol}/mint`: 资产所有者可以直接将通证铸造到指定地址
+4. `POST /asset/tokens/{symbol}/transfer`: 转让通证的所有权
 5. `GET /asset/tokens`: 通过`owner`查询通证列表
-6. `GET /asset/tokens/{token-id}`: 通过`token-id`查询指定通证信息
+6. `GET /asset/tokens/{symbol}`: 通过`symbol`查询指定通证信息
 7. `GET /asset/tokens/{symbol}/fee`: 查询发行和铸造指定通证的费用
 
 ### Coinswap模块的APIs
 
-1. `POST /coinswap/liquidities/{id}/deposit`: 增加流动性
-2. `POST /coinswap/liquidities/{id}/withdraw`: 提现流动性
+1. `POST /coinswap/liquidities/{voucher-coin-name}/deposit`: 增加流动性
+2. `POST /coinswap/liquidities/{voucher-coin-name}/withdraw`: 提取流动性
 3. `POST /coinswap/liquidities/buy`: 兑换代币(购买)
 4. `POST /coinswap/liquidities/sell`: 兑换代币(出售)
-5. `GET /coinswap/liquidities/{id}`: 查询流动性
+5. `GET /coinswap/liquidities/{voucher-coin-name}`: 查询流动性
 
 ### HTLC模块的APIs
 
