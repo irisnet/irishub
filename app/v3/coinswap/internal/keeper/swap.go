@@ -182,7 +182,7 @@ func (k Keeper) tradeInputForExactOutput(ctx sdk.Context, input types.Input, out
 }
 
 /**
-Buy exact amount of a token by specifying the max amount of another token, non of them is iris
+Buy exact amount of a token by specifying the max amount of another token, none of them is iris
 @param input : max amount of the token to be payed
 @param output : exact amount of the token to be bought
 @param sender : address of the sender
