@@ -123,8 +123,11 @@ func (k Keeper) UpdateRequestContext(
 		return types.ErrUnknownRequestContext(k.codespace, requestContextID)
 	}
 
-	if !consumer.Equals(requestContext.Consumer) {
-		return types.ErrNotMatchingConsumer(k.codespace)
+	// check authority when called by module
+	if len(requestContext.ModuleName) > 0 {
+		if err := k.CheckAuthority(ctx, consumer, requestContextID, false); err != nil {
+			return err
+		}
 	}
 
 	if requestContext.State == types.COMPLETED {
@@ -198,8 +201,11 @@ func (k Keeper) PauseRequestContext(
 		return types.ErrUnknownRequestContext(k.codespace, requestContextID)
 	}
 
-	if !consumer.Equals(requestContext.Consumer) {
-		return types.ErrNotMatchingConsumer(k.codespace)
+	// check authority when called by module
+	if len(requestContext.ModuleName) > 0 {
+		if err := k.CheckAuthority(ctx, consumer, requestContextID, false); err != nil {
+			return err
+		}
 	}
 
 	if !requestContext.Repeated {
@@ -227,8 +233,11 @@ func (k Keeper) StartRequestContext(
 		return types.ErrUnknownRequestContext(k.codespace, requestContextID)
 	}
 
-	if !consumer.Equals(requestContext.Consumer) {
-		return types.ErrNotMatchingConsumer(k.codespace)
+	// check authority when called by module
+	if len(requestContext.ModuleName) > 0 {
+		if err := k.CheckAuthority(ctx, consumer, requestContextID, false); err != nil {
+			return err
+		}
 	}
 
 	if requestContext.State != types.PAUSED {
@@ -256,8 +265,11 @@ func (k Keeper) KillRequestContext(
 		return types.ErrUnknownRequestContext(k.codespace, requestContextID)
 	}
 
-	if !consumer.Equals(requestContext.Consumer) {
-		return types.ErrNotMatchingConsumer(k.codespace)
+	// check authority when called by module
+	if len(requestContext.ModuleName) > 0 {
+		if err := k.CheckAuthority(ctx, consumer, requestContextID, false); err != nil {
+			return err
+		}
 	}
 
 	if !requestContext.Repeated {
@@ -1039,11 +1051,34 @@ func (k Keeper) RefundServiceFees(ctx sdk.Context) sdk.Error {
 	return nil
 }
 
+// CheckAuthority checks if the operation on the specified request context is authorized
+func (k Keeper) CheckAuthority(
+	ctx sdk.Context,
+	consumer sdk.AccAddress,
+	requestContextID cmn.HexBytes,
+	checkModule bool,
+) sdk.Error {
+	requestContext, found := k.GetRequestContext(ctx, requestContextID)
+	if !found {
+		return types.ErrUnknownRequestContext(k.codespace, requestContextID)
+	}
+
+	if !consumer.Equals(requestContext.Consumer) {
+		return types.ErrNotAuthorized(k.codespace, "consumer not matching")
+	}
+
+	if checkModule && len(requestContext.ModuleName) > 0 {
+		return types.ErrNotAuthorized(k.codespace, "not authorized operation")
+	}
+
+	return nil
+}
+
 // GetResponseCallback gets the registered module callback for response handling
 func (k Keeper) GetResponseCallback(moduleName string) (types.ResponseCallback, sdk.Error) {
 	respCallback, ok := k.respCallbacks[moduleName]
 	if !ok {
-		return nil, types.ErrModuleNameNotRegistered(k.Codespace(), moduleName)
+		return nil, types.ErrModuleNameNotRegistered(k.codespace, moduleName)
 	}
 
 	return respCallback, nil

@@ -59,7 +59,7 @@ func TestExportRandGenesis(t *testing.T) {
 
 	mockServiceKeeper.SetServiceBinding(ctx,
 		service.NewServiceBinding(
-			ServiceName, provider, sdk.NewCoins(), "", true, time.Time{},
+			ModuleServiceName, provider, sdk.NewCoins(), "", true, time.Time{},
 		))
 
 	// request rands

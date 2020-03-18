@@ -99,7 +99,7 @@ func (k Keeper) HandlerResponse(ctx sdk.Context, requestContextID cmn.HexBytes, 
 		return
 	}
 
-	result := gjson.Get(responseOutput[0], types.ValueJsonPath)
+	result := gjson.Get(responseOutput[0], types.ServiceValueJsonPath)
 
 	seed, err := hex.DecodeString(result.String())
 	if err != nil || len(seed) != types.SeedBytesLength {

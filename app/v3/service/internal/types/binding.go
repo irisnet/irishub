@@ -97,3 +97,23 @@ func ParsePricing(pricing string) (Pricing, sdk.Error) {
 
 	return p, nil
 }
+
+func (binding ServiceBinding) Validate() sdk.Error {
+	if len(binding.Provider) == 0 {
+		return ErrInvalidAddress(DefaultCodespace, "provider missing")
+	}
+
+	if err := ValidateServiceName(binding.ServiceName); err != nil {
+		return err
+	}
+
+	if !validServiceCoins(binding.Deposit) {
+		return ErrInvalidDeposit(DefaultCodespace, fmt.Sprintf("invalid deposit: %s", binding.Deposit))
+	}
+
+	if len(binding.Pricing) == 0 {
+		return ErrInvalidPricing(DefaultCodespace, "pricing missing")
+	}
+
+	return validatePricing(binding.Pricing)
+}

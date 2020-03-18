@@ -513,7 +513,7 @@ func TestAmountOf(t *testing.T) {
 	}
 }
 
-func TestIsCoinNameValid(t *testing.T) {
+func TestIsValidCoinName(t *testing.T) {
 
 	cases := []struct {
 		name         string
@@ -530,7 +530,7 @@ func TestIsCoinNameValid(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		res := IsCoinNameValid(tc.coinName)
+		res := IsValidCoinName(tc.coinName)
 		if tc.expectedPass {
 			require.True(t, res)
 		} else {
@@ -539,7 +539,7 @@ func TestIsCoinNameValid(t *testing.T) {
 	}
 }
 
-func TestIsCoinMinDenomValid(t *testing.T) {
+func TestIsValidCoinDenom(t *testing.T) {
 
 	cases := []struct {
 		name         string
@@ -556,7 +556,7 @@ func TestIsCoinMinDenomValid(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		res := IsCoinMinDenomValid(tc.denom)
+		res := IsValidCoinDenom(tc.denom)
 		if tc.expectedPass {
 			require.True(t, res)
 		} else {
