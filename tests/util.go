@@ -2,18 +2,19 @@ package tests
 
 import (
 	"fmt"
-	"github.com/irisnet/irishub/store"
 	"io/ioutil"
 	"net/http"
+	"strings"
 	"time"
 
-	sdk "github.com/irisnet/irishub/types"
 	"github.com/tendermint/go-amino"
 	tmclient "github.com/tendermint/tendermint/rpc/client"
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"
 	rpcclient "github.com/tendermint/tendermint/rpc/lib/client"
 	dbm "github.com/tendermint/tm-db"
-	"strings"
+
+	"github.com/irisnet/irishub/store"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 // Wait for the next tendermint block from the Tendermint RPC
@@ -39,6 +40,14 @@ func WaitForNextNBlocksTM(n int64, port string) {
 		height = resBlock.Block.Height + n
 	}
 	waitForHeightTM(height, url)
+}
+
+// GetHeight returns block height
+func GetHeight(port string) int64 {
+	url := fmt.Sprintf("http://localhost:%v", port)
+	cl := tmclient.NewHTTP(url, "/websocket")
+	resBlock, _ := cl.Block(nil)
+	return resBlock.Block.Height
 }
 
 // Wait for the given height from the Tendermint RPC
