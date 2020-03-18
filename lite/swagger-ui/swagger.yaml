@@ -2717,7 +2717,7 @@ paths:
                 owner:
                   $ref: '#/components/schemas/Address'
                 max_supply:
-                  type: int
+                  type: integer
                   example: '21000000'
                 mintable:
                   type: string
@@ -2727,7 +2727,7 @@ paths:
                   example: 'BTC Token'
   '/asset/tokens/{symbol}/mint':
     post:
-      summary: The asset owner can directly mint tokens to a specified address
+      summary: Mint tokens to a specified address
       parameters:
         - in: path
           name: symbol
@@ -2757,7 +2757,7 @@ paths:
                 to:
                   $ref: '#/components/schemas/Address'
                 amount:
-                  type: int
+                  type: integer
                   example: '21000000'
   '/asset/tokens/{symbol}/transfer':
     post:

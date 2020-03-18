@@ -155,7 +155,7 @@ func getCmdEditToken(cdc *codec.Codec) *cobra.Command {
 func getCmdMintToken(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "mint",
-		Short:   "The asset owner and operator can directly mint tokens to a specified address",
+		Short:   "Mint tokens to a specified address",
 		Example: `iriscli asset token mint <symbol> --amount=<amount> --to=<to> --from=<key-name> --chain-id=irishub --fee=0.3iris`,
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
