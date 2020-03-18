@@ -17,7 +17,7 @@ import (
 )
 
 // RequestService request the service for oracle seed
-func (k Keeper) RequestService(ctx sdk.Context, reqID cmn.HexBytes, consumer sdk.AccAddress, serviceFeeCap sdk.Coins) (cmn.HexBytes, sdk.Error) {
+func (k Keeper) RequestService(ctx sdk.Context, consumer sdk.AccAddress, serviceFeeCap sdk.Coins) (cmn.HexBytes, sdk.Error) {
 	iterator := k.sk.ServiceBindingsIterator(ctx, types.ServiceName)
 	defer iterator.Close()
 
@@ -54,7 +54,7 @@ func (k Keeper) RequestService(ctx sdk.Context, reqID cmn.HexBytes, consumer sdk
 		false,
 		0,
 		0,
-		exported.RUNNING,
+		exported.PAUSED,
 		1,
 		types.ModuleName,
 	)

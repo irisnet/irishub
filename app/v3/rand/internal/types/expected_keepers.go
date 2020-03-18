@@ -37,6 +37,12 @@ type ServiceKeeper interface {
 		respHandler string,
 	) (cmn.HexBytes, sdk.Error)
 
+	StartRequestContext(
+		ctx sdk.Context,
+		requestContextID cmn.HexBytes,
+		consumer sdk.AccAddress,
+	) sdk.Error
+
 	ServiceBindingsIterator(ctx sdk.Context, serviceName string) sdk.Iterator
 
 	GetParamSet(ctx sdk.Context) service.Params

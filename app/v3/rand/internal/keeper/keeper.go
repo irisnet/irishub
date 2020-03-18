@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"strconv"
 
+	cmn "github.com/tendermint/tendermint/libs/common"
+
 	"github.com/irisnet/irishub/app/v3/rand/internal/types"
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
@@ -63,8 +65,14 @@ func (k Keeper) RequestRand(
 	// get tx hash
 	txHash := sdk.SHA256(ctx.TxBytes())
 
+	// create paused request context
+	requestContextID, err := k.RequestService(ctx, consumer, serviceFeeCap)
+	if err != nil {
+		return nil, err
+	}
+
 	// build request
-	request := types.NewRequest(currentHeight, consumer, txHash, oracle, serviceFeeCap)
+	request := types.NewRequest(currentHeight, consumer, txHash, oracle, serviceFeeCap, requestContextID)
 
 	// generate the request id
 	reqID := types.GenerateRequestID(request)
@@ -78,6 +86,15 @@ func (k Keeper) RequestRand(
 	)
 
 	return reqTags, nil
+}
+
+// StartRequestContext starts the service context
+func (k Keeper) StartRequestContext(
+	ctx sdk.Context,
+	serviceContextID cmn.HexBytes,
+	consumer sdk.AccAddress,
+) sdk.Error {
+	return k.sk.StartRequestContext(ctx, serviceContextID, consumer)
 }
 
 // SetRand stores the random number
