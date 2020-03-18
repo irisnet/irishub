@@ -39,7 +39,7 @@ const (
 	CodeUnknownResponse           sdk.CodeType = 123
 	CodeUnknownRequestContext     sdk.CodeType = 124
 	CodeInvalidRequestContextID   sdk.CodeType = 125
-	CodeNotMatchingConsumer       sdk.CodeType = 126
+	CodeNotAuthorized             sdk.CodeType = 126
 	CodeRequestContextNonRepeated sdk.CodeType = 127
 	CodeRequestContextNotStarted  sdk.CodeType = 128
 	CodeRequestContextNotPaused   sdk.CodeType = 129
@@ -161,8 +161,8 @@ func ErrInvalidRequestContextID(codespace sdk.CodespaceType, msg string) sdk.Err
 	return sdk.NewError(codespace, CodeInvalidRequestContextID, fmt.Sprintf("invalid request context ID: %s", msg))
 }
 
-func ErrNotMatchingConsumer(codespace sdk.CodespaceType) sdk.Error {
-	return sdk.NewError(codespace, CodeNotMatchingConsumer, "consumer does not match")
+func ErrNotAuthorized(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeNotAuthorized, msg)
 }
 
 func ErrRequestContextNonRepeated(codespace sdk.CodespaceType) sdk.Error {

@@ -313,7 +313,7 @@ func (cliCtx CLIContext) ParseCoin(coinStr string) (sdk.Coin, error) {
 		return sdk.ParseCoin(coinStr)
 	}
 
-	coin, err := coinType.ConvertToMinDenomCoin(coinStr)
+	coin, err := coinType.ConvertToCoin(coinStr)
 	if err != nil {
 		return sdk.Coin{}, err
 	}

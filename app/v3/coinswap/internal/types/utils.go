@@ -58,7 +58,7 @@ func GetUniCoinType(uniID string) (sdk.CoinType, sdk.Error) {
 
 // CheckUniDenom returns nil if the uni denom is valid
 func CheckUniDenom(uniDenom string) sdk.Error {
-	if !sdk.IsCoinMinDenomValid(uniDenom) || !strings.HasPrefix(uniDenom, FormatUniABSPrefix) {
+	if !sdk.IsValidCoinDenom(uniDenom) || !strings.HasPrefix(uniDenom, FormatUniABSPrefix) {
 		return ErrIllegalDenom(fmt.Sprintf("illegal liquidity denomnation: %s", uniDenom))
 	}
 	return nil
@@ -66,7 +66,7 @@ func CheckUniDenom(uniDenom string) sdk.Error {
 
 // CheckUniID returns nil if the uni id is valid
 func CheckUniID(uniID string) sdk.Error {
-	if !sdk.IsCoinNameValid(uniID) || !strings.HasPrefix(uniID, FormatUniABSPrefix) {
+	if !sdk.IsValidCoinName(uniID) || !strings.HasPrefix(uniID, FormatUniABSPrefix) {
 		return ErrIllegalUniId(fmt.Sprintf("illegal liquidity id: %s", uniID))
 	}
 	return nil
@@ -78,7 +78,7 @@ func GetUniDenom(uniID string) (string, sdk.Error) {
 		return "", err
 	}
 
-	uniDenom, err := sdk.GetCoinMinDenom(uniID)
+	uniDenom, err := sdk.GetCoinDenom(uniID)
 	if err != nil {
 		return "", ErrIllegalUniId(fmt.Sprintf("illegal liquidity id: %s", uniID))
 	}
