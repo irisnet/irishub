@@ -20,7 +20,6 @@ var (
 	activeRequestByIDKey   = []byte{0x09}
 	responseKey            = []byte{0x10}
 	earnedFeesKey          = []byte{0x11}
-	intraTxCounterKey      = []byte{0x12}
 )
 
 // GetServiceDefinitionKey returns the key for the service definition with the specified name
@@ -113,10 +112,6 @@ func GetResponseSubspaceByReqCtx(requestContextID []byte, batchCounter uint64) [
 
 func GetEarnedFeesKey(address sdk.AccAddress) []byte {
 	return append(earnedFeesKey, address.Bytes()...)
-}
-
-func GetIntraTxCounterKey() []byte {
-	return intraTxCounterKey
 }
 
 func getStringsKey(ss []string) (result []byte) {

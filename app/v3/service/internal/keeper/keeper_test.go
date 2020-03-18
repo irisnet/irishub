@@ -316,9 +316,7 @@ func TestKeeper_Request_Context(t *testing.T) {
 	require.NoError(t, err)
 
 	requestContext, found = keeper.GetRequestContext(ctx, requestContextID)
-	require.True(t, found)
-
-	require.Equal(t, types.COMPLETED, requestContext.State)
+	require.False(t, found)
 }
 
 func TestKeeper_Request_Service(t *testing.T) {
@@ -351,7 +349,8 @@ func TestKeeper_Request_Service(t *testing.T) {
 	requestContext.BatchCounter++
 	keeper.SetRequestContext(ctx, requestContextID, requestContext)
 
-	keeper.InitiateRequests(ctx, requestContextID, newProviders)
+	providerRequests := make(map[string][]types.CompactRequest)
+	keeper.InitiateRequests(ctx, requestContextID, newProviders, providerRequests)
 
 	requestContext, _ = keeper.GetRequestContext(ctx, requestContextID)
 	require.Equal(t, len(newProviders), int(requestContext.BatchRequestCount))
@@ -402,18 +401,21 @@ func TestKeeper_Respond_Service(t *testing.T) {
 	requestContext.BatchCounter++
 	keeper.SetRequestContext(ctx, requestContextID, requestContext)
 
-	requestID := setRequest(ctx, keeper, consumer, provider, requestContextID)
+	requestID1 := setRequest(ctx, keeper, consumer, provider, requestContextID)
+	requestID2 := setRequest(ctx, keeper, consumer, provider, requestContextID)
 
-	requestIDStr := requestID.String()
+	requestID1Str := requestID1.String()
+	requestID2Str := requestID2.String()
 
-	_, _, err := keeper.AddResponse(ctx, requestIDStr, provider, testOutput, "")
+	// respond request 1
+	_, _, err := keeper.AddResponse(ctx, requestID1Str, provider, testOutput, "")
 	require.NoError(t, err)
 
 	requestContext, _ = keeper.GetRequestContext(ctx, requestContextID)
 	require.Equal(t, uint16(1), requestContext.BatchResponseCount)
-	require.Equal(t, types.BATCHCOMPLETED, requestContext.BatchState)
+	require.Equal(t, types.BATCHRUNNING, requestContext.BatchState)
 
-	response, found := keeper.GetResponse(ctx, requestID)
+	response, found := keeper.GetResponse(ctx, requestID1)
 	require.True(t, found)
 
 	require.Equal(t, provider, response.Provider)
@@ -421,11 +423,23 @@ func TestKeeper_Respond_Service(t *testing.T) {
 	require.Equal(t, requestContextID, response.RequestContextID)
 	require.Equal(t, requestContext.BatchCounter, response.RequestContextBatchCounter)
 
+	// respond request 2
+	_, _, err = keeper.AddResponse(ctx, requestID2Str, provider, testOutput, "")
+	require.NoError(t, err)
+
+	requestContext, _ = keeper.GetRequestContext(ctx, requestContextID)
+	require.Equal(t, uint16(2), requestContext.BatchResponseCount)
+	require.Equal(t, types.BATCHCOMPLETED, requestContext.BatchState)
+
+	_, found = keeper.GetResponse(ctx, requestID1)
+	require.False(t, found)
+
 	earnedFees, found := keeper.GetEarnedFees(ctx, provider)
 	require.True(t, found)
 	require.True(t, !earnedFees.Coins.Empty())
 
-	require.False(t, keeper.IsRequestActive(ctx, requestID))
+	require.False(t, keeper.IsRequestActive(ctx, requestID1))
+	require.False(t, keeper.IsRequestActive(ctx, requestID2))
 }
 
 func TestKeeper_Request_Service_From_Module(t *testing.T) {

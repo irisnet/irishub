@@ -169,3 +169,12 @@ var (
 	TagRewardFromValidator = "withdraw-reward-from-validator-%s"
 	TagRewardCommission    = "withdraw-reward-commission"
 )
+
+// ActionTag returns action.tagsKeys
+func ActionTag(action string, tagKeys ...string) string {
+	tag := action
+	for _, key := range tagKeys {
+		tag = tag + "." + key
+	}
+	return tag
+}

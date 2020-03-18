@@ -1,6 +1,8 @@
 package service
 
 import (
+	"encoding/json"
+	"github.com/irisnet/irishub/app/v3/service/internal/types"
 	cmn "github.com/tendermint/tendermint/libs/common"
 
 	sdk "github.com/irisnet/irishub/types"
@@ -11,8 +13,6 @@ func EndBlocker(ctx sdk.Context, k Keeper) (tags sdk.Tags) {
 	tags = sdk.NewTags()
 	ctx = ctx.WithCoinFlowTrigger(sdk.ServiceEndBlocker)
 	ctx = ctx.WithLogger(ctx.Logger().With("handler", "endBlock").With("module", "iris/service"))
-
-	k.SetIntraTxCounter(ctx, 0)
 
 	// handler for the active request on expired
 	expiredRequestHandler := func(requestID cmn.HexBytes, request Request) {
@@ -30,12 +30,7 @@ func EndBlocker(ctx sdk.Context, k Keeper) (tags sdk.Tags) {
 	expiredRequestBatchHandler := func(requestContextID cmn.HexBytes, requestContext RequestContext) {
 		if requestContext.BatchState != BATCHCOMPLETED {
 			k.IterateActiveRequests(ctx, requestContextID, requestContext.BatchCounter, expiredRequestHandler)
-
-			if len(requestContext.ModuleName) != 0 {
-				k.Callback(ctx, requestContextID)
-			}
-
-			requestContext.BatchState = BATCHCOMPLETED
+			k.CompleteBatch(ctx, requestContext, requestContextID)
 		}
 
 		k.DeleteRequestBatchExpiration(ctx, requestContextID, ctx.BlockHeight())
@@ -44,12 +39,14 @@ func EndBlocker(ctx sdk.Context, k Keeper) (tags sdk.Tags) {
 			if requestContext.Repeated && (requestContext.RepeatedTotal < 0 || int64(requestContext.BatchCounter) < requestContext.RepeatedTotal) {
 				k.AddNewRequestBatch(ctx, requestContextID, ctx.BlockHeight()-requestContext.Timeout+int64(requestContext.RepeatedFrequency))
 			} else {
-				requestContext.State = COMPLETED
+				k.CompleteServiceContext(ctx, requestContext, requestContextID)
 			}
 		}
 
 		k.SetRequestContext(ctx, requestContextID, requestContext)
 	}
+
+	providerRequests := make(map[string][]types.CompactRequest)
 
 	// handler for the new request batch
 	newRequestBatchHandler := func(requestContextID cmn.HexBytes, requestContext RequestContext) {
@@ -69,7 +66,7 @@ func EndBlocker(ctx sdk.Context, k Keeper) (tags sdk.Tags) {
 					requestContext.BatchResponseCount = 0
 					k.SetRequestContext(ctx, requestContextID, requestContext)
 
-					requestTags := k.InitiateRequests(ctx, requestContextID, providers)
+					requestTags := k.InitiateRequests(ctx, requestContextID, providers, providerRequests)
 					k.AddRequestBatchExpiration(ctx, requestContextID, ctx.BlockHeight()+requestContext.Timeout)
 
 					tags = tags.AppendTags(requestTags)
@@ -85,6 +82,14 @@ func EndBlocker(ctx sdk.Context, k Keeper) (tags sdk.Tags) {
 
 	// handle the new request batch queue
 	k.IterateNewRequestBatch(ctx, ctx.BlockHeight(), newRequestBatchHandler)
+
+	for provider, requests := range providerRequests {
+		requestsJson, _ := json.Marshal(requests)
+		tags = tags.AppendTags(sdk.NewTags(
+			sdk.ActionTag(types.ActionNewBatchRequest, types.TagProvider), []byte(provider),
+			sdk.ActionTag(types.ActionNewBatchRequest, provider), requestsJson,
+		))
+	}
 
 	return
 }
