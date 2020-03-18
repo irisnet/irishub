@@ -130,7 +130,7 @@ iriscli asset token tokens <flags>
 | --symbol | string |          |         | The symbol of the token |
 | --owner    | string |          |         | The owner of the tokens            |
 
-### Query a token wich the specified symbol
+### Query a token with the specified symbol
 
 ```bash
 iriscli asset token tokens --symbol=kitty

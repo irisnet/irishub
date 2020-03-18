@@ -143,7 +143,7 @@ This api supports the following special parameters. By default, their values are
 
 1. `POST /asset/tokens`: Issue a token
 2. `PUT /asset/tokens/{symbol}`: Edit an existing token
-3. `POST /asset/tokens/{symbol}/mint`: The token owner can directly mint tokens to a specified address
+3. `POST /asset/tokens/{symbol}/mint`: Mint tokens to a specified address
 4. `POST /asset/tokens/{symbol}/transfer`: Transfer the owner of a token to a new owner
 5. `GET /asset/tokens`: Query tokens by condition
 6. `GET /asset/tokens/{symbol}`: Query a token by symbol

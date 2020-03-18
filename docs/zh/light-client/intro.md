@@ -143,7 +143,7 @@ irislcd start --node=tcp://localhost:26657 --chain-id=<chain-id> --laddr=tcp://0
 
 1. `POST /asset/tokens`: 发行一种通证
 2. `PUT /asset/tokens/{symbol}`: 编辑一个已存在的通证
-3. `POST /asset/tokens/{symbol}/mint`: 资产所有者可以直接将通证铸造到指定地址
+3. `POST /asset/tokens/{symbol}/mint`: 增发通证到指定地址
 4. `POST /asset/tokens/{symbol}/transfer`: 转让通证的所有权
 5. `GET /asset/tokens`: 通过`owner`查询通证列表
 6. `GET /asset/tokens/{symbol}`: 通过`symbol`查询指定通证信息
