@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"reflect"
 	"strings"
 
 	cmn "github.com/tendermint/tendermint/libs/common"
@@ -73,6 +74,11 @@ func NewRequestContext(
 		ResponseThreshold:  responseThreshold,
 		ModuleName:         moduleName,
 	}
+}
+
+// Empty returns true if empty
+func (rc RequestContext) Empty() bool {
+	return reflect.DeepEqual(rc, RequestContext{})
 }
 
 // String implements Stringer
@@ -219,6 +225,11 @@ func NewRequest(
 	}
 }
 
+// Empty returns true if empty
+func (r Request) Empty() bool {
+	return reflect.DeepEqual(r, Request{})
+}
+
 // String implements Stringer
 func (r Request) String() string {
 	return fmt.Sprintf(`Request:
@@ -317,6 +328,11 @@ func NewResponse(
 		RequestContextID:           requestContextID,
 		RequestContextBatchCounter: batchCounter,
 	}
+}
+
+// Empty returns true if empty
+func (r Response) Empty() bool {
+	return reflect.DeepEqual(r, Response{})
 }
 
 // String implements Stringer
@@ -550,6 +566,7 @@ type ResponseCallback func(ctx sdk.Context, requestContextID cmn.HexBytes, respo
 
 const (
 	requestIDLen = 58
+	contextIDLen = 40
 )
 
 // ConvertRequestID converts the given string to request ID
@@ -575,6 +592,16 @@ func GenerateRequestContextID(txHash []byte, msgIndex int64) cmn.HexBytes {
 	return append(txHash, bz...)
 }
 
+// SplitRequestContextID splits the given contextID to txHash and msgIndex
+func SplitRequestContextID(contextID cmn.HexBytes) (cmn.HexBytes, int64, error) {
+	if len(contextID) != contextIDLen {
+		return nil, 0, errors.New("invalid request context id")
+	}
+	txHash := contextID[0:32]
+	msgIndex := int64(binary.BigEndian.Uint64(contextID[32:40]))
+	return txHash, msgIndex, nil
+}
+
 // GenerateRequestID generates a unique request ID from the given params
 func GenerateRequestID(requestContextID cmn.HexBytes, requestContextBatchCounter uint64, requestHeight int64, batchRequestIndex int16) cmn.HexBytes {
 	contextID := make([]byte, len(requestContextID))
@@ -587,4 +614,16 @@ func GenerateRequestID(requestContextID cmn.HexBytes, requestContextBatchCounter
 	binary.BigEndian.PutUint16(bz[16:], uint16(batchRequestIndex))
 
 	return append(contextID, bz...)
+}
+
+// SplitRequestID splits the given contextID to contextID, batchCounter, requestHeight, batchRequestIndex
+func SplitRequestID(requestID cmn.HexBytes) (cmn.HexBytes, uint64, int64, int16, error) {
+	if len(requestID) != requestIDLen {
+		return nil, 0, 0, 0, errors.New("invalid request id")
+	}
+	contextID := requestID[0:40]
+	batchCounter := binary.BigEndian.Uint64(contextID[40:48])
+	requestHeight := int64(binary.BigEndian.Uint64(contextID[48:56]))
+	batchRequestIndex := int16(binary.BigEndian.Uint16(contextID[56:58]))
+	return contextID, batchCounter, requestHeight, batchRequestIndex, nil
 }

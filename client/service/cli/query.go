@@ -10,6 +10,7 @@ import (
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/app/v3/service"
 	"github.com/irisnet/irishub/client/context"
+	"github.com/irisnet/irishub/client/service/utils"
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
 )
@@ -198,8 +199,16 @@ func GetCmdQueryServiceRequest(cdc *codec.Codec) *cobra.Command {
 			}
 
 			var request service.Request
-			if err := cdc.UnmarshalJSON(res, &request); err != nil {
-				return err
+			_ = cdc.UnmarshalJSON(res, &request)
+			if len(request.ID) == 0 {
+				request, err = utils.QueryRequestByTxQuery(cliCtx, params)
+				if err != nil {
+					return err
+				}
+			}
+
+			if request.Empty() {
+				return fmt.Errorf("unknown request: %s", params.RequestID)
 			}
 
 			return cliCtx.PrintOutput(request)
@@ -301,8 +310,16 @@ func GetCmdQueryServiceResponse(cdc *codec.Codec) *cobra.Command {
 			}
 
 			var response service.Response
-			if err := cdc.UnmarshalJSON(res, &response); err != nil {
-				return err
+			_ = cdc.UnmarshalJSON(res, &response)
+			if len(response.RequestContextID) == 0 {
+				response, err = utils.QueryResponseByTxQuery(cliCtx, params)
+				if err != nil {
+					return err
+				}
+			}
+
+			if response.Empty() {
+				return fmt.Errorf("unknown response: %s", params.RequestID)
 			}
 
 			return cliCtx.PrintOutput(response)
@@ -377,19 +394,8 @@ func GetCmdQueryRequestContext(cdc *codec.Codec) *cobra.Command {
 				RequestContextID: requestContextID,
 			}
 
-			bz, err := cdc.MarshalJSON(params)
+			requestContext, err := utils.QueryRequestContext(cliCtx, params)
 			if err != nil {
-				return err
-			}
-
-			route := fmt.Sprintf("custom/%s/%s", protocol.ServiceRoute, service.QueryRequestContext)
-			res, err := cliCtx.QueryWithData(route, bz)
-			if err != nil {
-				return err
-			}
-
-			var requestContext service.RequestContext
-			if err := cdc.UnmarshalJSON(res, &requestContext); err != nil {
 				return err
 			}
 

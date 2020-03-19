@@ -136,10 +136,7 @@ func queryRequest(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sdk
 		return nil, types.ErrInvalidRequestID(types.DefaultCodespace, params.RequestID)
 	}
 
-	request, found := k.GetRequest(ctx, requestID)
-	if !found {
-		return nil, types.ErrUnknownRequest(types.DefaultCodespace, requestID)
-	}
+	request, _ := k.GetRequest(ctx, requestID)
 
 	bz, err := codec.MarshalJSONIndent(k.cdc, request)
 	if err != nil {
@@ -189,10 +186,7 @@ func queryResponse(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sd
 		return nil, types.ErrInvalidRequestID(types.DefaultCodespace, params.RequestID)
 	}
 
-	response, found := k.GetResponse(ctx, requestID)
-	if !found {
-		return nil, types.ErrUnknownResponse(types.DefaultCodespace, requestID)
-	}
+	response, _ := k.GetResponse(ctx, requestID)
 
 	bz, err := codec.MarshalJSONIndent(k.cdc, response)
 	if err != nil {
@@ -209,11 +203,7 @@ func queryRequestContext(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]by
 		return nil, sdk.ParseParamsErr(err)
 	}
 
-	requestContext, found := k.GetRequestContext(ctx, params.RequestContextID)
-	if !found {
-		return nil, types.ErrUnknownRequestContext(types.DefaultCodespace, params.RequestContextID)
-	}
-
+	requestContext, _ := k.GetRequestContext(ctx, params.RequestContextID)
 	bz, err := codec.MarshalJSONIndent(k.cdc, requestContext)
 	if err != nil {
 		return nil, sdk.MarshalResultErr(err)

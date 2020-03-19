@@ -248,7 +248,7 @@ func TestKeeper_Request_Context(t *testing.T) {
 	ctx = ctx.WithBlockHeight(blockHeight)
 
 	// create
-	requestContextID, err := keeper.CreateRequestContext(
+	requestContextID, _, err := keeper.CreateRequestContext(
 		ctx, testServiceName, providers, consumer, testInput,
 		testServiceFeeCap, testTimeout, false, true,
 		testRepeatedFreq, testRepeatedTotal, types.RUNNING, 0, "",

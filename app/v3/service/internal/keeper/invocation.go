@@ -38,43 +38,44 @@ func (k Keeper) CreateRequestContext(
 	state types.RequestContextState,
 	responseThreshold uint16,
 	moduleName string,
-) (cmn.HexBytes, sdk.Error) {
+) (cmn.HexBytes, sdk.Tags, sdk.Error) {
+	tags := sdk.NewTags()
 	if superMode {
 		_, found := k.gk.GetProfiler(ctx, consumer)
 		if !found {
-			return nil, types.ErrInvalidProfiler(k.codespace, consumer)
+			return nil, tags, types.ErrInvalidProfiler(k.codespace, consumer)
 		}
 	}
 
 	if len(moduleName) != 0 {
 		if _, err := k.GetResponseCallback(moduleName); err != nil {
-			return nil, err
+			return nil, tags, err
 		}
 
 		if err := types.ValidateRequest(
 			serviceName, serviceFeeCap, providers, input,
 			timeout, repeated, repeatedFrequency, repeatedTotal,
 		); err != nil {
-			return nil, err
+			return nil, tags, err
 		}
 
 		if responseThreshold < 1 || int(responseThreshold) > len(providers) {
-			return nil, types.ErrInvalidThreshold(k.codespace, fmt.Sprintf("response threshold must be between [1,%d]", len(providers)))
+			return nil, tags, types.ErrInvalidThreshold(k.codespace, fmt.Sprintf("response threshold must be between [1,%d]", len(providers)))
 		}
 	}
 
 	svcDef, found := k.GetServiceDefinition(ctx, serviceName)
 	if !found {
-		return nil, types.ErrUnknownServiceDefinition(k.codespace, serviceName)
+		return nil, tags, types.ErrUnknownServiceDefinition(k.codespace, serviceName)
 	}
 
 	if err := types.ValidateRequestInput(svcDef.Schemas, input); err != nil {
-		return nil, err
+		return nil, tags, err
 	}
 
 	params := k.GetParamSet(ctx)
 	if timeout > params.MaxRequestTimeout {
-		return nil, types.ErrInvalidTimeout(k.codespace, fmt.Sprintf("timeout [%d] must not be greater than the max request timeout [%d]", timeout, params.MaxRequestTimeout))
+		return nil, tags, types.ErrInvalidTimeout(k.codespace, fmt.Sprintf("timeout [%d] must not be greater than the max request timeout [%d]", timeout, params.MaxRequestTimeout))
 	}
 
 	if repeated {
@@ -105,7 +106,13 @@ func (k Keeper) CreateRequestContext(
 		k.AddNewRequestBatch(ctx, requestContextID, ctx.BlockHeight())
 	}
 
-	return requestContextID, nil
+	tags = sdk.NewTags(
+		sdk.TagAction, []byte(types.ActionCreateContext),
+		types.TagRequestContextID, []byte(requestContextID.String()),
+		types.TagConsumer, []byte(consumer.String()),
+	)
+
+	return requestContextID, tags, nil
 }
 
 // UpdateRequestContext updates the specified request context

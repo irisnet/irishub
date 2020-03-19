@@ -85,7 +85,7 @@ func EndBlocker(ctx sdk.Context, k Keeper) (tags sdk.Tags) {
 			stateJson, _ := json.Marshal(batchState)
 			tags = tags.AppendTags(sdk.NewTags(
 				sdk.ActionTag(types.ActionNewBatch, types.TagRequestContextID), []byte(requestContextID.String()),
-				sdk.ActionTag(types.ActionCompleteBatch, requestContextID.String()), stateJson,
+				sdk.ActionTag(types.ActionNewBatch, requestContextID.String()), stateJson,
 			))
 		}
 
