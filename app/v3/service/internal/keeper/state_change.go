@@ -8,7 +8,7 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 )
 
-// CompleteBatch completes a running bath
+// CompleteBatch completes a running batch
 func (k Keeper) CompleteBatch(ctx sdk.Context, requestContext types.RequestContext, requestContextID cmn.HexBytes,
 ) (types.RequestContext, sdk.Tags) {
 	tags := sdk.NewTags()
@@ -45,6 +45,7 @@ func (k Keeper) CompleteBatch(ctx sdk.Context, requestContext types.RequestConte
 	return requestContext, tags
 }
 
+// CompleteServiceContext completes a running or paused context
 func (k Keeper) CompleteServiceContext(ctx sdk.Context, context types.RequestContext, requestContextID cmn.HexBytes) sdk.Tags {
 	tags := sdk.NewTags()
 	k.DeleteRequestContext(ctx, requestContextID)

@@ -65,10 +65,6 @@ func EndBlocker(ctx sdk.Context, k Keeper) (tags sdk.Tags) {
 				}
 
 				if requestContext.State == RUNNING {
-					requestContext.BatchCounter++
-					requestContext.BatchResponseCount = 0
-					k.SetRequestContext(ctx, requestContextID, requestContext)
-
 					requestTags := k.InitiateRequests(ctx, requestContextID, providers, providerRequests)
 					k.AddRequestBatchExpiration(ctx, requestContextID, ctx.BlockHeight()+requestContext.Timeout)
 
@@ -77,6 +73,20 @@ func EndBlocker(ctx sdk.Context, k Keeper) (tags sdk.Tags) {
 			} else {
 				k.SkipCurrentRequestBatch(ctx, requestContextID, requestContext)
 			}
+
+			requestContext, _ := k.GetRequestContext(ctx, requestContextID)
+			batchState := types.BatchState{
+				BatchCounter:       requestContext.BatchCounter,
+				State:              requestContext.BatchState,
+				ResponseThreshold:  requestContext.ResponseThreshold,
+				BatchRequestCount:  requestContext.BatchRequestCount,
+				BatchResponseCount: requestContext.BatchResponseCount,
+			}
+			stateJson, _ := json.Marshal(batchState)
+			tags = tags.AppendTags(sdk.NewTags(
+				sdk.ActionTag(types.ActionNewBatch, types.TagRequestContextID), []byte(requestContextID.String()),
+				sdk.ActionTag(types.ActionCompleteBatch, requestContextID.String()), stateJson,
+			))
 		}
 
 		k.DeleteNewRequestBatch(ctx, requestContextID, ctx.BlockHeight())
