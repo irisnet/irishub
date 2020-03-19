@@ -21,9 +21,7 @@ func TestIrisCLIOracle(t *testing.T) {
 	// start iris server
 	proc := tests.GoExecuteTWithStdout(t, fmt.Sprintf("iris start --home=%s --rpc.laddr=%v --p2p.laddr=%v", irisHome, servAddr, p2pAddr))
 
-	defer func() {
-		_ = proc.Stop(false)
-	}()
+	defer func() { _ = proc.Stop(false) }()
 	tests.WaitForTMStart(port)
 	tests.WaitForNextNBlocksTM(2, port)
 
@@ -41,11 +39,7 @@ func TestIrisCLIOracle(t *testing.T) {
 	valueJsonPath := "last"
 	latestHistory := uint64(2)
 
-	serviceName := "test"
-	serviceDesc := "test"
-	serviceTags := []string{"tag1", "tag2"}
-	authorDesc := "author"
-	serviceSchemas := `{"input":{"type":"object"},"output":{"type":"object"},"error":{"type":"object"}}`
+	serviceName := "oracle"
 	deposit := "10iris"
 	priceAmt := 1 // 1iris
 	pricing := fmt.Sprintf(`{"price":[{"denom":"iris-atto","amount":"%s"}]}`, sdk.NewIntWithDecimal(int64(priceAmt), 18).String())
@@ -57,12 +51,6 @@ func TestIrisCLIOracle(t *testing.T) {
 	responseThreshold := uint16(1)
 	result := `{"code":200,"message":""}`
 	output := `{"last":100}`
-
-	// define service
-	svcDefOutput, _ := tests.ExecuteT(t, fmt.Sprintf("iriscli service definition %s %v", serviceName, flags), "")
-	require.Equal(t, "", svcDefOutput)
-
-	defineService(t, flags, serviceName, serviceDesc, serviceTags, authorDesc, serviceSchemas, port)
 
 	// bind service
 	_ = bindService(t, flags, serviceName, deposit, pricing, port)
@@ -177,18 +165,4 @@ func bindService(t *testing.T, flags string, serviceName string, deposit string,
 	executeWrite(t, sbStrFoo, sdk.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
 	return sbStrBar
-}
-
-func defineService(t *testing.T, flags string, serviceName string, serviceDesc string, serviceTags []string, authorDesc string, serviceSchemas string, port string) {
-	sdStr := fmt.Sprintf("iriscli service define %v", flags)
-	sdStr += fmt.Sprintf(" --from=%s", "foo")
-	sdStr += fmt.Sprintf(" --name=%s", serviceName)
-	sdStr += fmt.Sprintf(" --description=%s", serviceDesc)
-	sdStr += fmt.Sprintf(" --tags=%s", serviceTags)
-	sdStr += fmt.Sprintf(" --author-description=%s", authorDesc)
-	sdStr += fmt.Sprintf(" --schemas=%s", serviceSchemas)
-	sdStr += fmt.Sprintf(" --fee=%s", "0.4iris")
-
-	executeWrite(t, sdStr, sdk.DefaultKeyPass)
-	tests.WaitForNextNBlocksTM(2, port)
 }
