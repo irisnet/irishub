@@ -32,6 +32,7 @@ import (
 
 var _ protocol.Protocol = (*ProtocolV3)(nil)
 
+// nolint
 // ProtocolV3 define the protocol
 type ProtocolV3 struct {
 	version        uint64
@@ -107,6 +108,7 @@ func (p *ProtocolV3) Load() {
 func (p *ProtocolV3) Init(ctx sdk.Context) {
 	p.assetKeeper.Init(ctx)
 	p.coinswapKeeper.Init(ctx, p.assetKeeper, p.accountMapper)
+	p.serviceKeeper.Init(ctx, append(rand.GetSvcDefinitions(), oracle.GetSvcDefinitions()...))
 }
 
 // GetCodec get codec
@@ -433,8 +435,8 @@ func (p *ProtocolV3) InitChainer(ctx sdk.Context, DeliverTx sdk.DeliverTx, req a
 	})
 
 	// init system accounts
-	p.bankKeeper.AddCoins(ctx, auth.BurnedCoinsAccAddr, sdk.Coins{})
-	p.bankKeeper.AddCoins(ctx, auth.CommunityTaxCoinsAccAddr, sdk.Coins{})
+	_, _, _ = p.bankKeeper.AddCoins(ctx, auth.BurnedCoinsAccAddr, sdk.Coins{})
+	_, _, _ = p.bankKeeper.AddCoins(ctx, auth.CommunityTaxCoinsAccAddr, sdk.Coins{})
 
 	// load the accounts
 	for _, gacc := range genesisState.Accounts {
@@ -461,10 +463,6 @@ func (p *ProtocolV3) InitChainer(ctx sdk.Context, DeliverTx sdk.DeliverTx, req a
 	coinswap.InitGenesis(ctx, p.coinswapKeeper, genesisState.SwapData)
 	htlc.InitGenesis(ctx, p.htlcKeeper, genesisState.HtlcData)
 	oracle.InitGenesis(ctx, p.oracleKeeper, genesisState.OracleData)
-
-	// init module service definition
-	service.InitModuleServiceDefinitions(ctx, p.serviceKeeper, oracle.GetSvcDefinitions()...)
-	service.InitModuleServiceDefinitions(ctx, p.serviceKeeper, rand.GetSvcDefinitions()...)
 
 	// load the address to pubkey map
 	if err = IrisValidateGenesisState(genesisState); err != nil {

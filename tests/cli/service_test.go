@@ -417,5 +417,5 @@ func TestIrisCLIService(t *testing.T) {
 	barCoin = convertToIrisBaseAccount(t, newBarAcc)
 	newBarAmt := getAmountFromCoinStr(barCoin)
 
-	require.Equal(t, oldBarAmt+taxAmt, newBarAmt)
+	require.Equal(t, fmt.Sprintf("%.6f", oldBarAmt+taxAmt), fmt.Sprintf("%.6f", newBarAmt))
 }
