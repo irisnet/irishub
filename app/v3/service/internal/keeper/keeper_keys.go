@@ -19,8 +19,9 @@ var (
 	activeRequestKey       = []byte{0x08}
 	activeRequestByIDKey   = []byte{0x09}
 	responseKey            = []byte{0x10}
-	earnedFeesKey          = []byte{0x11}
-	intraTxCounterKey      = []byte{0x12}
+	requestVolumeKey       = []byte{0x11}
+	earnedFeesKey          = []byte{0x12}
+	intraTxCounterKey      = []byte{0x13}
 )
 
 // GetServiceDefinitionKey returns the key for the service definition with the specified name
@@ -99,6 +100,11 @@ func GetActiveRequestKeyByID(requestID []byte) []byte {
 // GetActiveRequestSubspaceByReqCtx returns the key for the active requests for the specified request context
 func GetActiveRequestSubspaceByReqCtx(requestContextID []byte, batchCounter uint64) []byte {
 	return append(append(activeRequestByIDKey, requestContextID...), sdk.Uint64ToBigEndian(batchCounter)...)
+}
+
+// GetRequestVolumeKey returns the key for the request volume for the specified consumer and binding
+func GetRequestVolumeKey(consumer sdk.AccAddress, serviceName string, provider sdk.AccAddress) []byte {
+	return append(append(requestVolumeKey, getStringsKey([]string{consumer.String(), serviceName, provider.String()})...), emptyByte...)
 }
 
 // GetResponseKey returns the key for the response for the given request ID

@@ -885,6 +885,40 @@ func (k Keeper) GetResponseOutputs(ctx sdk.Context, requestContextID cmn.HexByte
 	return outputs
 }
 
+// SetRequestVolume sets the request volume for the specified consumer and binding
+func (k Keeper) SetRequestVolume(
+	ctx sdk.Context,
+	consumer sdk.AccAddress,
+	serviceName string,
+	provider sdk.AccAddress,
+	volume uint64,
+) {
+	store := ctx.KVStore(k.storeKey)
+
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(volume)
+	store.Set(GetRequestVolumeKey(consumer, serviceName, provider), bz)
+}
+
+// GetRequestVolume gets the current request volume for the specified consumer and binding
+func (k Keeper) GetRequestVolume(
+	ctx sdk.Context,
+	consumer sdk.AccAddress,
+	serviceName string,
+	provider sdk.AccAddress,
+) uint64 {
+	store := ctx.KVStore(k.storeKey)
+
+	bz := store.Get(GetRequestVolumeKey(consumer, serviceName, provider))
+	if bz == nil {
+		return 0
+	}
+
+	var volume uint64
+	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &volume)
+
+	return volume
+}
+
 // Slash slashes the provider from the specified request
 // Ensure that the request is valid
 func (k Keeper) Slash(ctx sdk.Context, requestID cmn.HexBytes) (tags sdk.Tags, err sdk.Error) {
