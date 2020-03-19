@@ -180,20 +180,20 @@ const (
 		"description": "pricing coin",
 		"type": "object",
 		"properties": {
-		  "denom": {
-			"description": "denom of pricing coin",
+		  "symbol": {
+			"description": "symbol of pricing coin",
 			"type": "string",
-			"pattern": "^([a-z][0-9a-z]{2}[:])?(([a-z][a-z0-9]{2,7}|x)\\.)?([a-z][a-z0-9]{2,7})(-[a-z]{3,5})?$"
+			"pattern": "^[a-z][a-z0-9]{2,7}$"
 		  },
 		  "amount": {
-			"description": "amount of pricing coin",
+			"description": "amount of pricing coin, in main unit",
 			"type": "string",
 			"pattern": "^[0-9]+(\\.[0-9]+)?$"
 		  }
 		},
 		"additionalProperties": false,
 		"required": [
-		  "denom",
+		  "symbol",
 		  "amount"
 		]
 	  },
@@ -265,6 +265,7 @@ const (
 		"items": {
 		  "$ref": "#/definitions/promotion_by_time"
 		},
+		"maxItems": 5,
 		"uniqueItems": true
 	  },
 	  "promotions_by_volume": {
@@ -273,6 +274,7 @@ const (
 		"items": {
 		  "$ref": "#/definitions/promotion_by_volume"
 		},
+		"maxItems": 5,
 		"uniqueItems": true
 	  }
 	},
