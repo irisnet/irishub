@@ -60,7 +60,7 @@ iriscli service define --chain-id=<chain-id> --from=<key-name> --fee=0.3iris
 ### Schemas content example
 
 ```json
-{"input":{"$schema":"http://json-schema.org/draft-04/schema#","title":"BioIdentify service input","description":"BioIdentify service input specification","type":"object","properties":{"id":{"description":"id","type":"string"},"name":{"description":"name","type":"string"},"data":{"description":"data","type":"string"}},"required":["id","data"]},"output":{"$schema":"http://json-schema.org/draft-04/schema#","title":"BioIdentify service output","description":"BioIdentify service output specification","type":"object","properties":{"data":{"description":"result data","type":"string"}},"required":["data"]},"error":{"$schema":"http://json-schema.org/draft-04/schema#","title":"BioIdentify service error","description":"BioIdentify service error specification","type":"object","properties":{"code":{"description":"error code","type":"integer"},"msg":{"description":"detailed error msg","type":"string"}},"required":["msg"]}}
+{"input":{"$schema":"http://json-schema.org/draft-04/schema#","title":"BioIdentify service input","description":"BioIdentify service input specification","type":"object","properties":{"id":{"description":"id","type":"string"},"name":{"description":"name","type":"string"},"data":{"description":"data","type":"string"}},"required":["id","data"]},"output":{"$schema":"http://json-schema.org/draft-04/schema#","title":"BioIdentify service output","description":"BioIdentify service output specification","type":"object","properties":{"data":{"description":"result data","type":"string"}},"required":["data"]}}
 ```
 
 ## iriscli service definition
@@ -159,7 +159,7 @@ iriscli service update-binding <flags>
 | --------------- | ------- | ------------------------------------------------------------------------- | -------- |
 | --service-name  |         | Service name                                                              | Yes      |
 | --deposit       |         | Deposit added for the binding             |          |
-| --pricing        |         | Pricing context or path, which is an instance of the Irishub Service Pricing schema        |
+| --pricing        |         | Pricing content or path, which is an instance of the Irishub Service Pricing schema        |
 
 ### Update an existing service binding
 
@@ -322,19 +322,28 @@ iriscli service respond <flags>
 | Name, shorthand    | Default | Description                                                    | Required |
 | ------------------ | ------- | -------------------------------------------------------------- | -------- |
 | --request-id       |         | ID of the request to respond to                         | Yes      |
-| --data    |        |          | Output of the service response, which is an Output JSON schema instance
-| --error    |         | Error msg of the service response, which is an Error JSON schema instance              |          |
+| --result |         | Result of the service response, which is a Result JSON schema instance | Yes |
+| --data    |        | Output of the service response, which is an Output JSON schema instance | |
 
 ### Respond to a service request
 
 ```bash
 iriscli service respond --chain-id=<chain-id> --from=<key-name> --fee=0.3iris
---request-id=<request-id> --data=<response output>
+--request-id=<request-id> --result=<response result> --data=<response output>
 ```
 
 :::tip
 You can retrieve the `request-id` in the result of [tendermint block](#iriscli-tendermint-block)
 :::
+
+### Result example
+
+```
+{
+    "code": 200,
+    "message": ""
+}
+```
 
 ### Output example
 

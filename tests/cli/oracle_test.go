@@ -55,6 +55,7 @@ func TestIrisCLIOracle(t *testing.T) {
 	repeatedFreq := uint64(10)
 	repeatedTotal := int64(1)
 	responseThreshold := uint16(1)
+	result := `{"code":200,"message":""}`
 	output := `{"last":100}`
 
 	// define service
@@ -134,7 +135,7 @@ func TestIrisCLIOracle(t *testing.T) {
 		if len(fooRequests) == 1 {
 			requestContextID := hex.EncodeToString(fooRequests[0].RequestContextID)
 			//respond service
-			respondService(t, requestContextID, flags, output, port)
+			respondService(t, requestContextID, flags, result, output, port)
 			goto verifyValue
 		}
 		tests.WaitForNextNBlocksTM(1, port)
@@ -148,11 +149,12 @@ verifyValue:
 	require.Equal(t, "100.00000000", values[0].Data)
 }
 
-func respondService(t *testing.T, requestContextID string, flags string, output string, port string) (string, string) {
+func respondService(t *testing.T, requestContextID string, flags string, result string, output string, port string) (string, string) {
 	fooRequestID := requestContextID + hex.EncodeToString(sdk.Uint64ToBigEndian(1)) + "0000"
 
 	rsStr := fmt.Sprintf("iriscli service respond %v", flags)
 	rsStr += fmt.Sprintf(" --request-id=%s", fooRequestID)
+	rsStr += fmt.Sprintf(" --result=%s", result)
 	rsStr += fmt.Sprintf(" --data=%s", output)
 	rsStr += fmt.Sprintf(" --fee=%s", "0.4iris")
 	rsStr += fmt.Sprintf(" --from=%s", "foo")

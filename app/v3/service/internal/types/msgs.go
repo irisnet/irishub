@@ -531,26 +531,26 @@ func (msg MsgRequestService) GetSigners() []sdk.AccAddress {
 
 //______________________________________________________________________
 
-// MsgRespondService defines a message to respond a service request
+// MsgRespondService defines a message to respond to a service request
 type MsgRespondService struct {
 	RequestID string         `json:"request_id"`
 	Provider  sdk.AccAddress `json:"provider"`
+	Result    string         `json:"result"`
 	Output    string         `json:"output"`
-	Error     string         `json:"error"`
 }
 
 // NewMsgRespondService creates a new MsgRespondService instance
 func NewMsgRespondService(
 	requestID string,
 	provider sdk.AccAddress,
-	output,
-	err string,
+	result,
+	output string,
 ) MsgRespondService {
 	return MsgRespondService{
 		RequestID: requestID,
 		Provider:  provider,
+		Result:    result,
 		Output:    output,
-		Error:     err,
 	}
 }
 
@@ -576,26 +576,34 @@ func (msg MsgRespondService) ValidateBasic() sdk.Error {
 		return ErrInvalidAddress(DefaultCodespace, "provider missing")
 	}
 
-	_, err := ConvertRequestID(msg.RequestID)
-	if err != nil {
+	if _, err := ConvertRequestID(msg.RequestID); err != nil {
 		return ErrInvalidRequestID(DefaultCodespace, fmt.Sprintf("failed to parse %s", msg.RequestID))
 	}
 
-	if len(msg.Output) == 0 && len(msg.Error) == 0 {
-		return ErrInvalidResponse(DefaultCodespace, "either output or error should be specified, but neither was provided")
+	if len(msg.Result) == 0 {
+		return ErrInvalidResponseResult(DefaultCodespace, "result missing")
 	}
 
-	if len(msg.Output) > 0 && len(msg.Error) > 0 {
-		return ErrInvalidResponse(DefaultCodespace, "either output or error should be specified, but both were provided")
+	if err := ValidateResponseResult(msg.Result); err != nil {
+		return err
+	}
+
+	result, err := ParseResult(msg.Result)
+	if err != nil {
+		return err
+	}
+
+	if result.Code == 200 && len(msg.Output) == 0 {
+		return ErrInvalidResponse(DefaultCodespace, "output must be specified when the result code is 200")
+	}
+
+	if result.Code != 200 && len(msg.Output) != 0 {
+		return ErrInvalidResponse(DefaultCodespace, "output should not be specified when the result code is not 200")
 	}
 
 	if len(msg.Output) > 0 {
 		if !json.Valid([]byte(msg.Output)) {
 			return ErrInvalidResponseOutput(DefaultCodespace, "output is not valid JSON")
-		}
-	} else {
-		if !json.Valid([]byte(msg.Error)) {
-			return ErrInvalidResponseErr(DefaultCodespace, "err is not valid JSON")
 		}
 	}
 
