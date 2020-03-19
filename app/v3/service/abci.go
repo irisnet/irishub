@@ -46,7 +46,7 @@ func EndBlocker(ctx sdk.Context, k Keeper) (tags sdk.Tags) {
 		k.SetRequestContext(ctx, requestContextID, requestContext)
 	}
 
-	providerRequests := make(map[string][]types.CompactRequest)
+	providerRequests := make(map[string][]string)
 
 	// handler for the new request batch
 	newRequestBatchHandler := func(requestContextID cmn.HexBytes, requestContext RequestContext) {

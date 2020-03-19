@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"encoding/json"
 	cmn "github.com/tendermint/tendermint/libs/common"
 
 	"github.com/irisnet/irishub/app/v3/service/internal/types"
@@ -9,7 +10,8 @@ import (
 
 // CompleteBatch completes a running bath
 func (k Keeper) CompleteBatch(ctx sdk.Context, requestContext types.RequestContext, requestContextID cmn.HexBytes,
-) types.RequestContext {
+) (types.RequestContext, sdk.Tags) {
+	tags := sdk.NewTags()
 	requestContext.BatchState = types.BATCHCOMPLETED
 
 	if len(requestContext.ModuleName) != 0 {
@@ -25,7 +27,22 @@ func (k Keeper) CompleteBatch(ctx sdk.Context, requestContext types.RequestConte
 		k.DeleteCompactRequest(ctx, requestID)
 		k.DeleteResponse(ctx, requestID)
 	}
-	return requestContext
+
+	batchState := types.BatchState{
+		BatchCounter:       requestContext.BatchCounter,
+		State:              types.BATCHCOMPLETED,
+		ResponseThreshold:  requestContext.ResponseThreshold,
+		BatchRequestCount:  requestContext.BatchRequestCount,
+		BatchResponseCount: requestContext.BatchResponseCount,
+	}
+	stateJson, _ := json.Marshal(batchState)
+
+	tags = tags.AppendTags(sdk.NewTags(
+		sdk.ActionTag(types.ActionCompleteBatch, types.TagRequestContextID), []byte(requestContextID.String()),
+		sdk.ActionTag(types.ActionCompleteBatch, requestContextID.String()), stateJson,
+	))
+
+	return requestContext, tags
 }
 
 func (k Keeper) CompleteServiceContext(ctx sdk.Context, context types.RequestContext, requestContextID cmn.HexBytes) {

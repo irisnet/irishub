@@ -180,7 +180,7 @@ func handleMsgRequestService(ctx sdk.Context, k Keeper, msg MsgRequestService) s
 
 // handleMsgRespondService handles MsgRespondService
 func handleMsgRespondService(ctx sdk.Context, k Keeper, msg MsgRespondService) sdk.Result {
-	request, response, err := k.AddResponse(ctx, msg.RequestID, msg.Provider, msg.Output, msg.Error)
+	request, response, completeTags, err := k.AddResponse(ctx, msg.RequestID, msg.Provider, msg.Output, msg.Error)
 	if err != nil {
 		return err.Result()
 	}
@@ -192,6 +192,8 @@ func handleMsgRespondService(ctx sdk.Context, k Keeper, msg MsgRespondService) s
 		TagProvider, []byte(response.Provider.String()),
 		TagServiceName, []byte(request.ServiceName),
 	)
+
+	tags = tags.AppendTags(completeTags)
 
 	return sdk.Result{
 		Tags: tags,

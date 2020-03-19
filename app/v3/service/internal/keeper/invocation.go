@@ -338,7 +338,7 @@ func (k Keeper) InitiateRequests(
 	ctx sdk.Context,
 	requestContextID cmn.HexBytes,
 	providers []sdk.AccAddress,
-	providerRequests map[string][]types.CompactRequest,
+	providerRequests map[string][]string,
 ) (tags sdk.Tags) {
 	tags = sdk.NewTags()
 	requestContext, _ := k.GetRequestContext(ctx, requestContextID)
@@ -356,7 +356,10 @@ func (k Keeper) InitiateRequests(
 		k.AddActiveRequest(ctx, requestContext.ServiceName, provider, ctx.BlockHeight()+requestContext.Timeout, requestID)
 
 		requests = append(requests, request)
-		providerRequests[provider.String()] = append(providerRequests[provider.String()], request)
+
+		// tags for provider by one service
+		providerRequests[sdk.ActionTag(requestContext.ServiceName, provider.String())] =
+			append(providerRequests[sdk.ActionTag(requestContext.ServiceName, provider.String())], requestID.String())
 	}
 
 	requestContext.BatchState = types.BATCHRUNNING
@@ -734,36 +737,37 @@ func (k Keeper) AddResponse(
 	provider sdk.AccAddress,
 	output,
 	errMsg string,
-) (request types.Request, response types.Response, err sdk.Error) {
+) (request types.Request, response types.Response, tags sdk.Tags, err sdk.Error) {
+	tags = sdk.NewTags()
 	reqID, _ := types.ConvertRequestID(requestID)
 
 	request, found := k.GetRequest(ctx, reqID)
 	if !found {
-		return request, response, types.ErrUnknownRequest(k.codespace, reqID)
+		return request, response, tags, types.ErrUnknownRequest(k.codespace, reqID)
 	}
 
 	if !provider.Equals(request.Provider) {
-		return request, response, types.ErrInvalidResponse(k.codespace, "provider does not match")
+		return request, response, tags, types.ErrInvalidResponse(k.codespace, "provider does not match")
 	}
 
 	if !k.IsRequestActive(ctx, reqID) {
-		return request, response, types.ErrInvalidResponse(k.codespace, "request is not active")
+		return request, response, tags, types.ErrInvalidResponse(k.codespace, "request is not active")
 	}
 
 	svcDef, _ := k.GetServiceDefinition(ctx, request.ServiceName)
 
 	if len(output) > 0 {
 		if err := types.ValidateResponseOutput(svcDef.Schemas, output); err != nil {
-			return request, response, err
+			return request, response, tags, err
 		}
 	} else {
 		if err := types.ValidateResponseError(svcDef.Schemas, errMsg); err != nil {
-			return request, response, err
+			return request, response, tags, err
 		}
 	}
 
 	if err := k.AddEarnedFee(ctx, provider, request.ServiceFee); err != nil {
-		return request, response, err
+		return request, response, tags, err
 	}
 
 	requestContextID := request.RequestContextID
@@ -777,12 +781,12 @@ func (k Keeper) AddResponse(
 	requestContext.BatchResponseCount++
 
 	if requestContext.BatchResponseCount == requestContext.BatchRequestCount {
-		requestContext = k.CompleteBatch(ctx, requestContext, requestContextID)
+		requestContext, tags = k.CompleteBatch(ctx, requestContext, requestContextID)
 	}
 
 	k.SetRequestContext(ctx, requestContextID, requestContext)
 
-	return request, response, nil
+	return request, response, tags, nil
 }
 
 // Callback callbacks the corresponding response callback handler
