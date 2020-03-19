@@ -56,24 +56,24 @@ func EndBlocker(ctx sdk.Context, k Keeper) (tags sdk.Tags) {
 		if requestContext.State == RUNNING {
 			providers, totalPrices := k.FilterServiceProviders(ctx, requestContext.ServiceName, requestContext.Providers, requestContext.ServiceFeeCap)
 
-			if len(requestContext.ModuleName) == 0 || len(providers) >= int(requestContext.ResponseThreshold) {
+			if len(providers) > 0 && len(providers) >= int(requestContext.ResponseThreshold) {
 				if !requestContext.SuperMode {
 					if err := k.DeductServiceFees(ctx, requestContext.Consumer, totalPrices); err != nil {
+						requestContext.BatchState = BATCHCOMPLETED
 						requestContext.State = PAUSED
+
 						k.SetRequestContext(ctx, requestContextID, requestContext)
 					}
 				}
 
 				if requestContext.State == RUNNING {
-					requestContext.BatchCounter++
-					requestContext.BatchResponseCount = 0
-					k.SetRequestContext(ctx, requestContextID, requestContext)
-
 					requestTags := k.InitiateRequests(ctx, requestContextID, providers)
 					k.AddRequestBatchExpiration(ctx, requestContextID, ctx.BlockHeight()+requestContext.Timeout)
 
 					tags = tags.AppendTags(requestTags)
 				}
+			} else {
+				k.SkipCurrentRequestBatch(ctx, requestContextID, requestContext)
 			}
 		}
 

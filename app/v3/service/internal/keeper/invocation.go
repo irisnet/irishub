@@ -255,7 +255,9 @@ func (k Keeper) StartRequestContext(
 	requestContext.State = types.RUNNING
 	k.SetRequestContext(ctx, requestContextID, requestContext)
 
-	if requestContext.BatchState == types.BATCHCOMPLETED {
+	if requestContext.BatchState == types.BATCHCOMPLETED &&
+		(requestContext.BatchRequestCount == 0 ||
+			requestContext.BatchRequestCount != requestContext.BatchResponseCount) {
 		k.AddNewRequestBatch(ctx, requestContextID, ctx.BlockHeight())
 	}
 
@@ -341,8 +343,10 @@ func (k Keeper) InitiateRequests(
 	providers []sdk.AccAddress,
 ) (tags sdk.Tags) {
 	requestContext, _ := k.GetRequestContext(ctx, requestContextID)
+	requestContext.BatchCounter++
 
 	tags = sdk.NewTags()
+
 	for providerIndex, provider := range providers {
 		request := k.buildRequest(
 			ctx, requestContextID, requestContext.BatchCounter,
@@ -366,11 +370,23 @@ func (k Keeper) InitiateRequests(
 	}
 
 	requestContext.BatchState = types.BATCHRUNNING
+	requestContext.BatchResponseCount = 0
 	requestContext.BatchRequestCount = uint16(len(providers))
 
 	k.SetRequestContext(ctx, requestContextID, requestContext)
 
 	return tags
+}
+
+// SkipCurrentRequestBatch skips the current request batch
+func (k Keeper) SkipCurrentRequestBatch(ctx sdk.Context, requestContextID cmn.HexBytes, requestContext types.RequestContext) {
+	requestContext.BatchCounter++
+	requestContext.BatchState = types.BATCHRUNNING
+	requestContext.BatchRequestCount = 0
+	requestContext.BatchResponseCount = 0
+
+	k.SetRequestContext(ctx, requestContextID, requestContext)
+	k.AddRequestBatchExpiration(ctx, requestContextID, ctx.BlockHeight()+requestContext.Timeout)
 }
 
 // buildRequest builds a request for the given provider from the specified request context
