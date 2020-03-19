@@ -60,7 +60,7 @@ iriscli service define --chain-id=<chain-id> --from=<key-name> --fee=0.3iris
 ### Schemas内容示例
 
 ```json
-{"input":{"$schema":"http://json-schema.org/draft-04/schema#","title":"BioIdentify service input","description":"BioIdentify service input specification","type":"object","properties":{"id":{"description":"id","type":"string"},"name":{"description":"name","type":"string"},"data":{"description":"data","type":"string"}},"required":["id","data"]},"output":{"$schema":"http://json-schema.org/draft-04/schema#","title":"BioIdentify service output","description":"BioIdentify service output specification","type":"object","properties":{"data":{"description":"result data","type":"string"}},"required":["data"]},"error":{"$schema":"http://json-schema.org/draft-04/schema#","title":"BioIdentify service error","description":"BioIdentify service error specification","type":"object","properties":{"code":{"description":"error code","type":"integer"},"msg":{"description":"detailed error msg","type":"string"}},"required":["msg"]}}
+{"input":{"$schema":"http://json-schema.org/draft-04/schema#","title":"BioIdentify service input","description":"BioIdentify service input specification","type":"object","properties":{"id":{"description":"id","type":"string"},"name":{"description":"name","type":"string"},"data":{"description":"data","type":"string"}},"required":["id","data"]},"output":{"$schema":"http://json-schema.org/draft-04/schema#","title":"BioIdentify service output","description":"BioIdentify service output specification","type":"object","properties":{"data":{"description":"result data","type":"string"}},"required":["data"]}}
 ```
 
 ## iriscli service definition
@@ -345,19 +345,28 @@ iriscli service respond <flags>
 | 名称，速记         | 默认 | 描述                      | 必须 |
 | ------------------ | ---- | ------------------------- | ---- |
 | --request-id       |      | 欲响应请求的ID            | 是   |
+| --result | | 服务响应的结果, 是一个Result JSON schema实例  | 是 |
 | --data    |      | 服务响应的输出, 是一个Output JSON schema实例 | |
-| --error | | 服务响应的错误消息, 是一个Error JSON schema实例  | |
 
 ### 响应一个服务请求
 
 ```bash
 iriscli service respond --chain-id=<chain-id> --from=<key-name> --fee=0.3iris
---request-id=<request-id> --data=<response output>
+--request-id=<request-id> --result=<response result> --data=<response output>
 ```
 
 :::tip
 你可以从[按高度获取区块信息](#iriscli-tendermint-block)的结果中获取`request-id`。
 :::
+
+### 响应结果示例
+
+```json
+{
+    "code": 200,
+    "message": ""
+}
+```
 
 ### 响应输出示例
 
