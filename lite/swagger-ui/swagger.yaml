@@ -1624,7 +1624,7 @@ paths:
                   type: string
                 schemas:
                   type: string
-                  example: '{"input":{"type":"object"},"output":{"type":"object"},"error":{"type":"object"}}'
+                  example: '{"input":{"type":"object"},"output":{"type":"object"}}'
   '/service/definitions/{service-name}':
     get:
       summary: Query a service definition
@@ -2055,12 +2055,12 @@ paths:
                   type: string
                 provider:
                   $ref: '#/components/schemas/Address'
+                result:
+                  type: string
+                  example: '{"code":200,"message":""}'
                 output:
                   type: string
                   example: '{"name":"irisnet"}'
-                error:
-                  type: string
-                  example: ''
   '/service/responses/{request-id}':
     get:
       summary: Query a response by the request ID
@@ -4037,11 +4037,12 @@ components:
           $ref: '#/components/schemas/Address'
         consumer:
           $ref: '#/components/schemas/Address'
+        result:
+          type: string
+          example: '{"code":200,"message":""}'
         output:
           type: string
           example: '{"name":"irisnet"}'
-        error:
-          type: string
         request_context_id:
           type: string
         request_context_batch_counter:

@@ -255,7 +255,9 @@ func (k Keeper) StartRequestContext(
 	requestContext.State = types.RUNNING
 	k.SetRequestContext(ctx, requestContextID, requestContext)
 
-	if requestContext.BatchState == types.BATCHCOMPLETED {
+	if requestContext.BatchState == types.BATCHCOMPLETED &&
+		(requestContext.BatchRequestCount == 0 ||
+			requestContext.BatchRequestCount != requestContext.BatchResponseCount) {
 		k.AddNewRequestBatch(ctx, requestContextID, ctx.BlockHeight())
 	}
 
@@ -341,8 +343,10 @@ func (k Keeper) InitiateRequests(
 	providers []sdk.AccAddress,
 ) (tags sdk.Tags) {
 	requestContext, _ := k.GetRequestContext(ctx, requestContextID)
+	requestContext.BatchCounter++
 
 	tags = sdk.NewTags()
+
 	for providerIndex, provider := range providers {
 		request := k.buildRequest(
 			ctx, requestContextID, requestContext.BatchCounter,
@@ -366,11 +370,23 @@ func (k Keeper) InitiateRequests(
 	}
 
 	requestContext.BatchState = types.BATCHRUNNING
+	requestContext.BatchResponseCount = 0
 	requestContext.BatchRequestCount = uint16(len(providers))
 
 	k.SetRequestContext(ctx, requestContextID, requestContext)
 
 	return tags
+}
+
+// SkipCurrentRequestBatch skips the current request batch
+func (k Keeper) SkipCurrentRequestBatch(ctx sdk.Context, requestContextID cmn.HexBytes, requestContext types.RequestContext) {
+	requestContext.BatchCounter++
+	requestContext.BatchState = types.BATCHRUNNING
+	requestContext.BatchRequestCount = 0
+	requestContext.BatchResponseCount = 0
+
+	k.SetRequestContext(ctx, requestContextID, requestContext)
+	k.AddRequestBatchExpiration(ctx, requestContextID, ctx.BlockHeight()+requestContext.Timeout)
 }
 
 // buildRequest builds a request for the given provider from the specified request context
@@ -722,43 +738,44 @@ func (k Keeper) AddResponse(
 	ctx sdk.Context,
 	requestID string,
 	provider sdk.AccAddress,
-	output,
-	errMsg string,
-) (request types.Request, response types.Response, err sdk.Error) {
+	result,
+	output string,
+) (request types.Request, response types.Response, tags sdk.Tags, err sdk.Error) {
 	reqID, _ := types.ConvertRequestID(requestID)
 
 	request, found := k.GetRequest(ctx, reqID)
 	if !found {
-		return request, response, types.ErrUnknownRequest(k.codespace, reqID)
+		return request, response, tags, types.ErrUnknownRequest(k.codespace, reqID)
 	}
 
 	if !provider.Equals(request.Provider) {
-		return request, response, types.ErrInvalidResponse(k.codespace, "provider does not match")
+		return request, response, tags, types.ErrInvalidResponse(k.codespace, "provider does not match")
 	}
 
 	if !k.IsRequestActive(ctx, reqID) {
-		return request, response, types.ErrInvalidResponse(k.codespace, "request is not active")
+		return request, response, tags, types.ErrInvalidResponse(k.codespace, "request is not active")
 	}
 
 	svcDef, _ := k.GetServiceDefinition(ctx, request.ServiceName)
 
-	if len(output) > 0 {
-		if err := types.ValidateResponseOutput(svcDef.Schemas, output); err != nil {
-			return request, response, err
+	if len(output) > 0 && types.ValidateResponseOutput(svcDef.Schemas, output) != nil {
+		tags, err = k.Slash(ctx, reqID)
+		if err != nil {
+			panic(err)
+		}
+
+		if err := k.RefundServiceFee(ctx, request.Consumer, request.ServiceFee); err != nil {
+			panic(err)
 		}
 	} else {
-		if err := types.ValidateResponseError(svcDef.Schemas, errMsg); err != nil {
-			return request, response, err
+		if err := k.AddEarnedFee(ctx, provider, request.ServiceFee); err != nil {
+			return request, response, tags, err
 		}
-	}
-
-	if err := k.AddEarnedFee(ctx, provider, request.ServiceFee); err != nil {
-		return request, response, err
 	}
 
 	requestContextID := request.RequestContextID
 
-	response = types.NewResponse(provider, request.Consumer, output, errMsg, requestContextID, request.RequestContextBatchCounter)
+	response = types.NewResponse(provider, request.Consumer, result, output, requestContextID, request.RequestContextBatchCounter)
 	k.SetResponse(ctx, reqID, response)
 
 	k.DeleteActiveRequest(ctx, request.ServiceName, provider, request.ExpirationHeight, reqID)
@@ -776,7 +793,7 @@ func (k Keeper) AddResponse(
 
 	k.SetRequestContext(ctx, requestContextID, requestContext)
 
-	return request, response, nil
+	return request, response, tags, nil
 }
 
 // Callback callbacks the corresponding response callback handler
@@ -784,7 +801,7 @@ func (k Keeper) Callback(ctx sdk.Context, requestContextID cmn.HexBytes) {
 	requestContext, _ := k.GetRequestContext(ctx, requestContextID)
 
 	respCallback, _ := k.GetResponseCallback(requestContext.ModuleName)
-	outputs := k.GetResponsesOutput(ctx, requestContextID, requestContext.BatchCounter)
+	outputs := k.GetResponseOutputs(ctx, requestContextID, requestContext.BatchCounter)
 
 	if len(outputs) >= int(requestContext.ResponseThreshold) {
 		respCallback(ctx, requestContextID, outputs, nil)
@@ -794,7 +811,7 @@ func (k Keeper) Callback(ctx sdk.Context, requestContextID cmn.HexBytes) {
 			requestContextID,
 			outputs,
 			fmt.Errorf(
-				"batch %d at least %d responses required, but %d responses received",
+				"batch %d at least %d valid outputs required, but %d received",
 				requestContext.BatchCounter, requestContext.ResponseThreshold, len(outputs),
 			),
 		)
@@ -850,8 +867,8 @@ func (k Keeper) ResponsesIteratorByReqCtx(ctx sdk.Context, requestContextID cmn.
 	return sdk.KVStorePrefixIterator(store, GetResponseSubspaceByReqCtx(requestContextID, batchCounter))
 }
 
-// GetResponsesOutput retrieves all response outputs of the specified request context and batch counter
-func (k Keeper) GetResponsesOutput(ctx sdk.Context, requestContextID cmn.HexBytes, batchCounter uint64) []string {
+// GetResponseOutputs retrieves all response outputs of the specified request context and batch counter
+func (k Keeper) GetResponseOutputs(ctx sdk.Context, requestContextID cmn.HexBytes, batchCounter uint64) []string {
 	iterator := k.ResponsesIteratorByReqCtx(ctx, requestContextID, batchCounter)
 	defer iterator.Close()
 

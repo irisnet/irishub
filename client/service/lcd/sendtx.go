@@ -57,13 +57,13 @@ func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec
 		refundServiceDepositHandlerFn(cdc, cliCtx),
 	).Methods("POST")
 
-	// request a service binding
+	// call a service
 	r.HandleFunc(
 		"/service/requests",
 		requestServiceHandlerFn(cdc, cliCtx),
 	).Methods("POST")
 
-	// respond a service request
+	// respond to a service request
 	r.HandleFunc(
 		"/service/responses",
 		respondServiceHandlerFn(cdc, cliCtx),
@@ -93,7 +93,7 @@ func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec
 		updateRequestContextHandlerFn(cdc, cliCtx),
 	).Methods("PUT")
 
-	// withdraw the earned fees
+	// withdraw the earned fees of a provider
 	r.HandleFunc(
 		fmt.Sprintf("/service/fees/{%s}/withdraw", Provider),
 		withdrawEarnedFeesHandlerFn(cdc, cliCtx),
@@ -160,8 +160,8 @@ type respondServiceReq struct {
 	BaseTx    utils.BaseTx `json:"base_tx"` // basic tx info
 	RequestID string       `json:"request_id"`
 	Provider  string       `json:"provider"`
+	Result    string       `json:"result"`
 	Output    string       `json:"output"`
-	Error     string       `json:"error"`
 }
 
 type pauseRequestContextReq struct {
@@ -536,7 +536,7 @@ func respondServiceHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.H
 			return
 		}
 
-		msg := service.NewMsgRespondService(req.RequestID, provider, req.Output, req.Error)
+		msg := service.NewMsgRespondService(req.RequestID, provider, req.Result, req.Output)
 		if err = msg.ValidateBasic(); err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return

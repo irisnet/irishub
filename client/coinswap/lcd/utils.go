@@ -15,9 +15,10 @@ import (
 func queryLiquidity(cliCtx context.CLIContext, cdc *codec.Codec, endpoint string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		id := vars["id"]
+		voucherCoinName := vars["voucher-coin-name"]
+
 		params := coinswap.QueryLiquidityParams{
-			Id: id,
+			VoucherCoinName: voucherCoinName,
 		}
 
 		bz, err := cliCtx.Codec.MarshalJSON(params)

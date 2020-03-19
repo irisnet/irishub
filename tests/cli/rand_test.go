@@ -3,6 +3,8 @@ package cli
 import (
 	"encoding/hex"
 	"fmt"
+	"regexp"
+	"strconv"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -40,8 +42,8 @@ func TestIrisCLIRand(t *testing.T) {
 	require.Equal(t, "20iris", barCoin)
 
 	// service data
-	serviceName := "rand"
-	serviceDesc := "rand"
+	serviceName := "random"
+	serviceDesc := "random"
 	serviceTags := []string{"tag1", "tag2"}
 	authorDesc := "author"
 	serviceSchemas := `{"input":{"type":"object","properties":{}},"output":{"type":"object","properties":{"seed":{"description":"seed","type":"string","pattern":"^[0-9a-fA-F]{64}$"}}},"error":{"type":"string"}}`
@@ -52,10 +54,11 @@ func TestIrisCLIRand(t *testing.T) {
 	input := `{}`
 	// addedDeposit := "1iris"
 	// timeout := int64(5)
+	result := `{"code":200,"message":""}`
 	output := `{"seed":"3132333435363738393031323334353637383930313233343536373839303132"}`
 
 	// random test data
-	blockInterval := "5"
+	blockInterval := int64(5)
 	oracle := "true"
 	serviceFeeCap := "10iris"
 
@@ -74,11 +77,6 @@ func TestIrisCLIRand(t *testing.T) {
 
 	executeWrite(t, sdStr, sdk.DefaultKeyPass)
 	tests.WaitForNextNBlocksTM(2, port)
-
-	fooAcc = executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", fooAddr, flags))
-	fooCoin = convertToIrisBaseAccount(t, fooAcc)
-
-	println(fooCoin)
 
 	svcDef := executeGetServiceDefinition(t, fmt.Sprintf("iriscli service definition %s %v", serviceName, flags))
 	require.Equal(t, serviceName, svcDef.Name)
@@ -109,21 +107,23 @@ func TestIrisCLIRand(t *testing.T) {
 	rrStr := fmt.Sprintf("iriscli rand request-rand %v", flags)
 	rrStr += fmt.Sprintf(" --from=%s", "bar")
 	rrStr += fmt.Sprintf(" --fee=%s", "0.4iris")
-	rrStr += fmt.Sprintf(" --block-interval=%s", blockInterval)
+	rrStr += fmt.Sprintf(" --block-interval=%d", blockInterval)
 	rrStr += fmt.Sprintf(" --oracle=%s", oracle)
 	rrStr += fmt.Sprintf(" --service-fee-cap=%s", serviceFeeCap)
+	rrStr += " --commit"
 
-	success := executeWrite(t, rrStr, sdk.DefaultKeyPass)
+	success, out, _ := executeWriteRetStdStreams(t, rrStr, sdk.DefaultKeyPass)
 	require.True(t, success)
+
+	var regExp = regexp.MustCompile(`\"key\": \"rand-height\",\n.*?\"value\": \"(.*)\"`)
+	heightString := string(regExp.FindSubmatch([]byte(out))[1])
+	height, err := strconv.ParseInt(heightString, 10, 64)
+	require.NoError(t, err)
+
 	tests.WaitForNextNBlocksTM(2, port)
 
 	// query rand requests by height
-	height := 18
 	randRequests := executeGetRandRequests(t, fmt.Sprintf("iriscli rand query-queue --queue-height=%d %s %v", height, fooAddr.String(), flags))
-	if len(randRequests) == 0 {
-		t.Log("Error height: ", height)
-		return
-	}
 	require.Equal(t, 1, len(randRequests))
 
 	randReqID := hex.EncodeToString(rand.GenerateRequestID(randRequests[0]))
@@ -147,6 +147,7 @@ func TestIrisCLIRand(t *testing.T) {
 	srStr += fmt.Sprintf(" --from=%s", "foo")
 	srStr += fmt.Sprintf(" --fee=%s", "0.4iris")
 	srStr += fmt.Sprintf(" --request-id=%s", reqID)
+	srStr += fmt.Sprintf(" --result=%s", result)
 	srStr += fmt.Sprintf(" --data=%s", output)
 
 	success = executeWrite(t, srStr, sdk.DefaultKeyPass)

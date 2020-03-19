@@ -17,7 +17,7 @@ func NewQuerier(k Keeper) sdk.Querier {
 			return queryLiquidity(ctx, req, k)
 
 		default:
-			return nil, sdk.ErrUnknownRequest(fmt.Sprintf("%s is not a valid query request path", req.Path))
+			return nil, sdk.ErrUnknownRequest(fmt.Sprintf("%s is not a valid coinswap query request path", req.Path))
 		}
 	}
 }
@@ -31,24 +31,24 @@ func queryLiquidity(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, s
 		return nil, sdk.ErrUnknownRequest(sdk.AppendMsgToErr("incorrectly formatted request data", err.Error()))
 	}
 
-	uniDenom, err := types.GetUniDenom(params.Id)
+	voucherDenom, err := types.GetVoucherDenom(params.VoucherCoinName)
 	if err != nil {
 		return nil, sdk.ErrUnknownRequest(err.Error())
 	}
 
-	tokenDenom, err := types.GetCoinMinDenomFromUniDenom(uniDenom)
+	tokenDenom, err := types.GetUnderlyingDenom(voucherDenom)
 	if err != nil {
 		return nil, sdk.ErrUnknownRequest(err.Error())
 	}
 
-	pool, existed := k.GetPool(ctx, params.Id)
+	pool, existed := k.GetPool(ctx, params.VoucherCoinName)
 	if !existed {
-		return nil, types.ErrReservePoolNotExists(fmt.Sprintf("liquidity pool for %s not found", params.Id))
+		return nil, types.ErrReservePoolNotExists(fmt.Sprintf("liquidity pool for %s not found", params.VoucherCoinName))
 	}
 
 	iris := sdk.NewCoin(sdk.IrisAtto, pool.BalanceOf(sdk.IrisAtto))
 	token := sdk.NewCoin(tokenDenom, pool.BalanceOf(tokenDenom))
-	liquidity := sdk.NewCoin(uniDenom, pool.BalanceOf(uniDenom))
+	liquidity := sdk.NewCoin(voucherDenom, pool.BalanceOf(voucherDenom))
 
 	swapParams := k.GetParams(ctx)
 	fee := swapParams.Fee.DecimalString(types.MaxFeePrecision)

@@ -24,7 +24,7 @@ var (
 	testServiceDesc = "test-service-desc"
 	testServiceTags = []string{"tag1", "tag2"}
 	testAuthorDesc  = "test-author-desc"
-	testSchemas     = `{"input":{"type":"object"},"output":{"type":"object"},"error":{"type":"object"}}`
+	testSchemas     = `{"input":{"type":"object"},"output":{"type":"object"}}`
 
 	testDeposit      = sdk.NewCoins(testCoin1)
 	testPricing      = `{"price":[{"denom":"iris-atto","amount":"1000000000000000000"}]}`
@@ -32,6 +32,7 @@ var (
 	testAddedDeposit = sdk.NewCoins(testCoin2)
 
 	testInput         = `{"pair":"iris-usdt"}`
+	testResult        = `{"code":200,"message":""}`
 	testOutput        = `{"last":"100"}`
 	testServiceFee    = sdk.NewCoins(testCoin3)
 	testServiceFeeCap = sdk.NewCoins(testCoin3)
@@ -404,7 +405,7 @@ func TestKeeper_Respond_Service(t *testing.T) {
 
 	requestIDStr := requestID.String()
 
-	_, _, err := keeper.AddResponse(ctx, requestIDStr, provider, testOutput, "")
+	_, _, _, err := keeper.AddResponse(ctx, requestIDStr, provider, testResult, testOutput)
 	require.NoError(t, err)
 
 	requestContext, _ = keeper.GetRequestContext(ctx, requestContextID)
@@ -457,7 +458,7 @@ func TestKeeper_Request_Service_From_Module(t *testing.T) {
 	requestIDStr1 := requestID1.String()
 	requestIDStr2 := requestID2.String()
 
-	_, _, err = keeper.AddResponse(ctx, requestIDStr1, provider1, testOutput, "")
+	_, _, _, err = keeper.AddResponse(ctx, requestIDStr1, provider1, testResult, testOutput)
 	require.NoError(t, err)
 
 	requestContext, _ = keeper.GetRequestContext(ctx, requestContextID)
@@ -467,7 +468,7 @@ func TestKeeper_Request_Service_From_Module(t *testing.T) {
 	// callback has not occurred due to insufficient responses
 	require.False(t, callbacked)
 
-	_, _, err = keeper.AddResponse(ctx, requestIDStr2, provider2, testOutput, "")
+	_, _, _, err = keeper.AddResponse(ctx, requestIDStr2, provider2, testResult, testOutput)
 	require.NoError(t, err)
 
 	requestContext, _ = keeper.GetRequestContext(ctx, requestContextID)
