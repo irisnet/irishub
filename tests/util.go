@@ -42,14 +42,6 @@ func WaitForNextNBlocksTM(n int64, port string) {
 	waitForHeightTM(height, url)
 }
 
-// GetHeight returns block height
-func GetHeight(port string) int64 {
-	url := fmt.Sprintf("http://localhost:%v", port)
-	cl := tmclient.NewHTTP(url, "/websocket")
-	resBlock, _ := cl.Block(nil)
-	return resBlock.Block.Height
-}
-
 // Wait for the given height from the Tendermint RPC
 // on localhost
 func WaitForHeightTM(height int64, port string) {

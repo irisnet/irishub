@@ -3,6 +3,8 @@ package cli
 import (
 	"encoding/hex"
 	"fmt"
+	"regexp"
+	"strconv"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -107,19 +109,20 @@ func TestIrisCLIRand(t *testing.T) {
 	rrStr += fmt.Sprintf(" --block-interval=%d", blockInterval)
 	rrStr += fmt.Sprintf(" --oracle=%s", oracle)
 	rrStr += fmt.Sprintf(" --service-fee-cap=%s", serviceFeeCap)
+	rrStr += " --commit"
 
-	success := executeWrite(t, rrStr, sdk.DefaultKeyPass)
+	success, out, _ := executeWriteRetStdStreams(t, rrStr, sdk.DefaultKeyPass)
 	require.True(t, success)
-	height := tests.GetHeight(port) + blockInterval
+
+	var regExp = regexp.MustCompile(`\"key\": \"rand-height\",\n.*?\"value\": \"(.*)\"`)
+	heightString := string(regExp.FindSubmatch([]byte(out))[1])
+	height, err := strconv.ParseInt(heightString, 10, 64)
+	require.NoError(t, err)
+
 	tests.WaitForNextNBlocksTM(2, port)
 
 	// query rand requests by height
-
 	randRequests := executeGetRandRequests(t, fmt.Sprintf("iriscli rand query-queue --queue-height=%d %s %v", height, fooAddr.String(), flags))
-	if len(randRequests) == 0 {
-		t.Log("Error height: ", height)
-		return
-	}
 	require.Equal(t, 1, len(randRequests))
 
 	randReqID := hex.EncodeToString(rand.GenerateRequestID(randRequests[0]))
