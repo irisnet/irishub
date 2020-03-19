@@ -45,6 +45,12 @@ func (k Keeper) CompleteBatch(ctx sdk.Context, requestContext types.RequestConte
 	return requestContext, tags
 }
 
-func (k Keeper) CompleteServiceContext(ctx sdk.Context, context types.RequestContext, requestContextID cmn.HexBytes) {
+func (k Keeper) CompleteServiceContext(ctx sdk.Context, context types.RequestContext, requestContextID cmn.HexBytes) sdk.Tags {
+	tags := sdk.NewTags()
 	k.DeleteRequestContext(ctx, requestContextID)
+
+	tags = tags.AppendTags(sdk.NewTags(
+		sdk.ActionTag(types.ActionCompleteContext, types.TagRequestContextID), []byte(requestContextID.String()),
+	))
+	return tags
 }

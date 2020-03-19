@@ -39,7 +39,8 @@ func EndBlocker(ctx sdk.Context, k Keeper) (tags sdk.Tags) {
 			if requestContext.Repeated && (requestContext.RepeatedTotal < 0 || int64(requestContext.BatchCounter) < requestContext.RepeatedTotal) {
 				k.AddNewRequestBatch(ctx, requestContextID, ctx.BlockHeight()-requestContext.Timeout+int64(requestContext.RepeatedFrequency))
 			} else {
-				k.CompleteServiceContext(ctx, requestContext, requestContextID)
+				completeContextTags := k.CompleteServiceContext(ctx, requestContext, requestContextID)
+				tags = tags.AppendTags(completeContextTags)
 			}
 		}
 

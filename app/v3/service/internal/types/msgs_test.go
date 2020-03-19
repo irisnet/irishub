@@ -21,7 +21,7 @@ var (
 	testServiceTags = []string{"tag1", "tag2"}
 	testAuthor      = sdk.AccAddress([]byte("test-author"))
 	testAuthorDesc  = "test-author-desc"
-	testSchemas     = `{"input":{"type":"object"},"output":{"type":"object"},"error":{"type":"object"}}`
+	testSchemas     = `{"input":{"type":"object"},"output":{"type":"object"}}`
 
 	testProvider     = sdk.AccAddress([]byte("test-provider"))
 	testDeposit      = sdk.NewCoins(testCoin1)
@@ -37,8 +37,8 @@ var (
 	testRepeatedFreq  = uint64(120)
 	testRepeatedTotal = int64(100)
 
+	testResult           = `{"code":200,"message":""}`
 	testOutput           = `{"last":"100"}`
-	testErrMsg           = `{"code":-1}`
 	testTrustee          = sdk.AccAddress([]byte("test-trustee"))
 	testTaxWithdrawalAmt = sdk.NewCoins(testCoin1)
 
@@ -72,10 +72,9 @@ func TestMsgDefineServiceValidation(t *testing.T) {
 	invalidEmptyTags := []string{"t1", ""}
 	invalidDuplicateTags := []string{"t1", "t1"}
 
-	invalidSchemas := `{"input":"nonobject","output":"nonobject","error":"nonobject"}`
-	invalidSchemasNoInput := `{"output":{"type":"object"},"error":{"type":"object"}}`
-	invalidSchemasNoOutput := `{"input":{"type":"object"},"error":{"type":"object"}}`
-	invalidSchemasNoError := `{"input":{"type":"object"},"output":{"type":"object"}}`
+	invalidSchemas := `{"input":"nonobject","output":"nonobject"}`
+	invalidSchemasNoInput := `{"output":{"type":"object"}}`
+	invalidSchemasNoOutput := `{"input":{"type":"object"}}`
 
 	testMsgs := []MsgDefineService{
 		NewMsgDefineService(testServiceName, testServiceDesc, testServiceTags, testAuthor, testAuthorDesc, testSchemas),            // valid msg
@@ -91,7 +90,6 @@ func TestMsgDefineServiceValidation(t *testing.T) {
 		NewMsgDefineService(testServiceName, testServiceDesc, testServiceTags, testAuthor, testAuthorDesc, invalidSchemas),         // invalid schemas
 		NewMsgDefineService(testServiceName, testServiceDesc, testServiceTags, testAuthor, testAuthorDesc, invalidSchemasNoInput),  // missing input schema
 		NewMsgDefineService(testServiceName, testServiceDesc, testServiceTags, testAuthor, testAuthorDesc, invalidSchemasNoOutput), // missing output schema
-		NewMsgDefineService(testServiceName, testServiceDesc, testServiceTags, testAuthor, testAuthorDesc, invalidSchemasNoError),  // missing error schema                              // not possitive coin
 	}
 
 	testCases := []struct {
@@ -112,7 +110,6 @@ func TestMsgDefineServiceValidation(t *testing.T) {
 		{testMsgs[10], false, "invalid schemas"},
 		{testMsgs[11], false, "missing input schema"},
 		{testMsgs[12], false, "missing output schema"},
-		{testMsgs[13], false, "missing error schema"},
 	}
 
 	for i, tc := range testCases {
@@ -130,7 +127,7 @@ func TestMsgDefineServiceGetSignBytes(t *testing.T) {
 	msg := NewMsgDefineService(testServiceName, testServiceDesc, testServiceTags, testAuthor, testAuthorDesc, testSchemas)
 	res := msg.GetSignBytes()
 
-	expected := `{"type":"irishub/service/MsgDefineService","value":{"author":"faa1w3jhxapdv96hg6r0wgux6kuw","author_description":"test-author-desc","description":"test-service-desc","name":"test-service","schemas":"{\"input\":{\"type\":\"object\"},\"output\":{\"type\":\"object\"},\"error\":{\"type\":\"object\"}}","tags":["tag1","tag2"]}}`
+	expected := `{"type":"irishub/service/MsgDefineService","value":{"author":"faa1w3jhxapdv96hg6r0wgux6kuw","author_description":"test-author-desc","description":"test-service-desc","name":"test-service","schemas":"{\"input\":{\"type\":\"object\"},\"output\":{\"type\":\"object\"}}","tags":["tag1","tag2"]}}`
 	require.Equal(t, expected, string(res))
 }
 
@@ -736,14 +733,14 @@ func TestMsgRequestServiceGetSigners(t *testing.T) {
 
 // TestMsgRespondServiceRoute tests Route for MsgRespondService
 func TestMsgRespondServiceRoute(t *testing.T) {
-	msg := NewMsgRespondService(testRequestID, testProvider, testOutput, "")
+	msg := NewMsgRespondService(testRequestID, testProvider, testResult, testOutput)
 
 	require.Equal(t, MsgRoute, msg.Route())
 }
 
 // TestMsgRespondServiceType tests Type for MsgRespondService
 func TestMsgRespondServiceType(t *testing.T) {
-	msg := NewMsgRespondService(testRequestID, testProvider, testOutput, "")
+	msg := NewMsgRespondService(testRequestID, testProvider, testResult, testOutput)
 
 	require.Equal(t, "respond_service", msg.Type())
 }
@@ -754,17 +751,26 @@ func TestMsgRespondServiceValidation(t *testing.T) {
 
 	invalidRequestID := "invalidRequestID"
 	invalidOutput := "invalidOutput"
-	invalidErrMsg := "invalidErrMsg"
+
+	validResult400 := `{"code":400,"message":"invalid parameters"}`
+	invalidResult := "invalidResult"
+	invalidResultCode := `{"code":100,"message":""}`
+	invalidResultNoCode := `{"message":""}`
+	invalidResultNoMsg := `{"code":200}`
 
 	testMsgs := []MsgRespondService{
-		NewMsgRespondService(testRequestID, testProvider, testOutput, ""),         // valid msg
-		NewMsgRespondService(testRequestID, testProvider, "", testErrMsg),         // valid msg
-		NewMsgRespondService(testRequestID, emptyAddress, testOutput, ""),         // missing provider address
-		NewMsgRespondService(invalidRequestID, testProvider, testOutput, ""),      // invalid request ID
-		NewMsgRespondService(testRequestID, testProvider, "", ""),                 // neither output nor errMsg provided
-		NewMsgRespondService(testRequestID, testProvider, testOutput, testErrMsg), // both output and errMsg provided
-		NewMsgRespondService(testRequestID, testProvider, invalidOutput, ""),      // invalid output
-		NewMsgRespondService(testRequestID, testProvider, "", invalidErrMsg),      // invalid errMsg
+		NewMsgRespondService(testRequestID, testProvider, testResult, testOutput),     // valid msg
+		NewMsgRespondService(testRequestID, testProvider, validResult400, ""),         // valid msg
+		NewMsgRespondService(testRequestID, emptyAddress, testResult, testOutput),     // missing provider address
+		NewMsgRespondService(invalidRequestID, testProvider, testResult, testOutput),  // invalid request ID
+		NewMsgRespondService(testRequestID, testProvider, "", testOutput),             // missing result
+		NewMsgRespondService(testRequestID, testProvider, invalidResult, ""),          // invalid result
+		NewMsgRespondService(testRequestID, testProvider, invalidResultCode, ""),      // invalid result code
+		NewMsgRespondService(testRequestID, testProvider, invalidResultNoCode, ""),    // missing result code
+		NewMsgRespondService(testRequestID, testProvider, invalidResultNoMsg, ""),     // missing result message
+		NewMsgRespondService(testRequestID, testProvider, testResult, ""),             // output should be provided when the result code is 200
+		NewMsgRespondService(testRequestID, testProvider, testResult, invalidOutput),  // invalid output
+		NewMsgRespondService(testRequestID, testProvider, validResult400, testOutput), // output should not be provided when the result code is not 200
 	}
 
 	testCases := []struct {
@@ -776,10 +782,14 @@ func TestMsgRespondServiceValidation(t *testing.T) {
 		{testMsgs[1], true, ""},
 		{testMsgs[2], false, "missing provider address"},
 		{testMsgs[3], false, "invalid request ID"},
-		{testMsgs[4], false, "neither output nor errMsg provided"},
-		{testMsgs[5], false, "both output and errMsg provided"},
-		{testMsgs[6], false, "invalid output"},
-		{testMsgs[7], false, "invalid errMsg"},
+		{testMsgs[4], false, "missing result"},
+		{testMsgs[5], false, "invalid result"},
+		{testMsgs[6], false, "invalid result code"},
+		{testMsgs[7], false, "missing result code"},
+		{testMsgs[8], false, "missing result message"},
+		{testMsgs[9], false, "output should be provided when the result code is 200"},
+		{testMsgs[10], false, "invalid output"},
+		{testMsgs[11], false, "output should not be provided when the result code is not 200"},
 	}
 
 	for i, tc := range testCases {
@@ -794,16 +804,16 @@ func TestMsgRespondServiceValidation(t *testing.T) {
 
 // TestMsgRespondServiceGetSignBytes tests GetSignBytes for MsgRespondService
 func TestMsgRespondServiceGetSignBytes(t *testing.T) {
-	msg := NewMsgRespondService(testRequestID, testProvider, testOutput, "")
+	msg := NewMsgRespondService(testRequestID, testProvider, testResult, testOutput)
 	res := msg.GetSignBytes()
 
-	expected := `{"type":"irishub/service/MsgRespondService","value":{"error":"","output":"{\"last\":\"100\"}","provider":"faa1w3jhxapdwpex7anfv3jhynrxe9z","request_id":"3DB0FA99DCB058BC86041BADBD614D6839F8FA20E17CF8AD3BA14C3F1BF613BD0000000000000000000000000000000100000000000000010001"}}`
+	expected := `{"type":"irishub/service/MsgRespondService","value":{"output":"{\"last\":\"100\"}","provider":"faa1w3jhxapdwpex7anfv3jhynrxe9z","request_id":"3DB0FA99DCB058BC86041BADBD614D6839F8FA20E17CF8AD3BA14C3F1BF613BD0000000000000000000000000000000100000000000000010001","result":"{\"code\":200,\"message\":\"\"}"}}`
 	require.Equal(t, expected, string(res))
 }
 
 // TestMsgRespondServiceGetSigners tests GetSigners for MsgRespondService
 func TestMsgRespondServiceGetSigners(t *testing.T) {
-	msg := NewMsgRespondService(testRequestID, testProvider, testOutput, "")
+	msg := NewMsgRespondService(testRequestID, testProvider, testResult, testOutput)
 	res := msg.GetSigners()
 
 	expected := "[746573742D70726F7669646572]"

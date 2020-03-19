@@ -751,10 +751,9 @@ func (k Keeper) AddResponse(
 	ctx sdk.Context,
 	requestID string,
 	provider sdk.AccAddress,
-	output,
-	errMsg string,
+	result,
+	output string,
 ) (request types.Request, response types.Response, tags sdk.Tags, err sdk.Error) {
-	tags = sdk.NewTags()
 	reqID, _ := types.ConvertRequestID(requestID)
 
 	request, found := k.GetRequest(ctx, reqID)
@@ -772,23 +771,24 @@ func (k Keeper) AddResponse(
 
 	svcDef, _ := k.GetServiceDefinition(ctx, request.ServiceName)
 
-	if len(output) > 0 {
-		if err := types.ValidateResponseOutput(svcDef.Schemas, output); err != nil {
-			return request, response, tags, err
+	if len(output) > 0 && types.ValidateResponseOutput(svcDef.Schemas, output) != nil {
+		tags, err = k.Slash(ctx, reqID)
+		if err != nil {
+			panic(err)
+		}
+
+		if err := k.RefundServiceFee(ctx, request.Consumer, request.ServiceFee); err != nil {
+			panic(err)
 		}
 	} else {
-		if err := types.ValidateResponseError(svcDef.Schemas, errMsg); err != nil {
+		if err := k.AddEarnedFee(ctx, provider, request.ServiceFee); err != nil {
 			return request, response, tags, err
 		}
-	}
-
-	if err := k.AddEarnedFee(ctx, provider, request.ServiceFee); err != nil {
-		return request, response, tags, err
 	}
 
 	requestContextID := request.RequestContextID
 
-	response = types.NewResponse(provider, request.Consumer, output, errMsg, requestContextID, request.RequestContextBatchCounter)
+	response = types.NewResponse(provider, request.Consumer, result, output, requestContextID, request.RequestContextBatchCounter)
 	k.SetResponse(ctx, reqID, response)
 
 	k.DeleteActiveRequest(ctx, request.ServiceName, provider, request.ExpirationHeight, reqID)
@@ -810,7 +810,7 @@ func (k Keeper) Callback(ctx sdk.Context, requestContextID cmn.HexBytes) {
 	requestContext, _ := k.GetRequestContext(ctx, requestContextID)
 
 	respCallback, _ := k.GetResponseCallback(requestContext.ModuleName)
-	outputs := k.GetResponsesOutput(ctx, requestContextID, requestContext.BatchCounter)
+	outputs := k.GetResponseOutputs(ctx, requestContextID, requestContext.BatchCounter)
 
 	if len(outputs) >= int(requestContext.ResponseThreshold) {
 		respCallback(ctx, requestContextID, outputs, nil)
@@ -820,7 +820,7 @@ func (k Keeper) Callback(ctx sdk.Context, requestContextID cmn.HexBytes) {
 			requestContextID,
 			outputs,
 			fmt.Errorf(
-				"batch %d at least %d responses required, but %d responses received",
+				"batch %d at least %d valid outputs required, but %d received",
 				requestContext.BatchCounter, requestContext.ResponseThreshold, len(outputs),
 			),
 		)
@@ -883,8 +883,8 @@ func (k Keeper) ResponsesIteratorByReqCtx(ctx sdk.Context, requestContextID cmn.
 	return sdk.KVStorePrefixIterator(store, GetResponseSubspaceByReqCtx(requestContextID, batchCounter))
 }
 
-// GetResponsesOutput retrieves all response outputs of the specified request context and batch counter
-func (k Keeper) GetResponsesOutput(ctx sdk.Context, requestContextID cmn.HexBytes, batchCounter uint64) []string {
+// GetResponseOutputs retrieves all response outputs of the specified request context and batch counter
+func (k Keeper) GetResponseOutputs(ctx sdk.Context, requestContextID cmn.HexBytes, batchCounter uint64) []string {
 	iterator := k.ResponsesIteratorByReqCtx(ctx, requestContextID, batchCounter)
 	defer iterator.Close()
 

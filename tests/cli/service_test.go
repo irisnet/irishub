@@ -37,7 +37,7 @@ func TestIrisCLIService(t *testing.T) {
 	serviceDesc := "test"
 	serviceTags := []string{"tag1", "tag2"}
 	authorDesc := "author"
-	serviceSchemas := `{"input":{"type":"object"},"output":{"type":"object"},"error":{"type":"object"}}`
+	serviceSchemas := `{"input":{"type":"object"},"output":{"type":"object"}}`
 	deposit := "10iris"
 	priceAmt := 1 // 1iris
 	price := fmt.Sprintf("%diris", priceAmt)
@@ -48,7 +48,8 @@ func TestIrisCLIService(t *testing.T) {
 	timeout := int64(5)
 	repeatedFreq := uint64(20)
 	repeatedTotal := int64(10)
-	output := `{"last":100}`
+	result := `{"code":200,"message":""}`
+	output := `{"last":"100"}`
 
 	// define service
 	svcDefOutput, _ := tests.ExecuteT(t, fmt.Sprintf("iriscli service definition %s %v", serviceName, flags), "")
@@ -274,6 +275,7 @@ func TestIrisCLIService(t *testing.T) {
 
 	rsStr := fmt.Sprintf("iriscli service respond %v", flags)
 	rsStr += fmt.Sprintf(" --request-id=%s", fooRequestID)
+	rsStr += fmt.Sprintf(" --result=%s", result)
 	rsStr += fmt.Sprintf(" --data=%s", output)
 	rsStr += fmt.Sprintf(" --fee=%s", "0.4iris")
 	rsStr += fmt.Sprintf(" --from=%s", "foo")
@@ -286,8 +288,8 @@ func TestIrisCLIService(t *testing.T) {
 
 	require.Equal(t, fooAddr, fooResponse.Provider)
 	require.Equal(t, barAddr, fooResponse.Consumer)
+	require.Equal(t, result, fooResponse.Result)
 	require.Equal(t, output, fooResponse.Output)
-	require.Equal(t, "", fooResponse.Error)
 	require.Equal(t, requestContextID, fooResponse.RequestContextID.String())
 	require.Equal(t, uint64(1), fooResponse.RequestContextBatchCounter)
 
@@ -306,6 +308,7 @@ func TestIrisCLIService(t *testing.T) {
 
 	rsStr = fmt.Sprintf("iriscli service respond %v", flags)
 	rsStr += fmt.Sprintf(" --request-id=%s", barRequestID)
+	rsStr += fmt.Sprintf(" --result=%s", result)
 	rsStr += fmt.Sprintf(" --data=%s", output)
 	rsStr += fmt.Sprintf(" --fee=%s", "0.4iris")
 	rsStr += fmt.Sprintf(" --from=%s", "bar")
@@ -318,8 +321,8 @@ func TestIrisCLIService(t *testing.T) {
 
 	require.Equal(t, barAddr, barResponse.Provider)
 	require.Equal(t, barAddr, barResponse.Consumer)
+	require.Equal(t, result, fooResponse.Result)
 	require.Equal(t, output, barResponse.Output)
-	require.Equal(t, "", barResponse.Error)
 	require.Equal(t, requestContextID, barResponse.RequestContextID.String())
 	require.Equal(t, uint64(1), barResponse.RequestContextBatchCounter)
 

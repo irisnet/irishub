@@ -38,7 +38,7 @@ func TestAddAndRemoveLiquidity(t *testing.T) {
 	app := createTestApp(initCoins, 1)
 	sender := app.accounts[0].GetAddress()
 
-	uniID, _ := types.GetUniID(denom1, denom2)
+	uniID, _ := types.GetVoucherCoinName(denom1, denom2)
 
 	btcAmt, _ := sdk.NewIntFromString("1")
 	depositCoin := sdk.NewCoin(denom1, btcAmt)

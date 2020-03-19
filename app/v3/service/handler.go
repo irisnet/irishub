@@ -180,20 +180,20 @@ func handleMsgRequestService(ctx sdk.Context, k Keeper, msg MsgRequestService) s
 
 // handleMsgRespondService handles MsgRespondService
 func handleMsgRespondService(ctx sdk.Context, k Keeper, msg MsgRespondService) sdk.Result {
-	request, response, completeTags, err := k.AddResponse(ctx, msg.RequestID, msg.Provider, msg.Output, msg.Error)
+	request, response, tags, err := k.AddResponse(ctx, msg.RequestID, msg.Provider, msg.Result, msg.Output)
 	if err != nil {
 		return err.Result()
 	}
 
-	tags := sdk.NewTags(
-		TagRequestID, []byte(msg.RequestID),
-		TagRequestContextID, []byte(request.RequestContextID.String()),
-		TagConsumer, []byte(response.Consumer.String()),
-		TagProvider, []byte(response.Provider.String()),
-		TagServiceName, []byte(request.ServiceName),
+	tags = tags.AppendTags(
+		sdk.NewTags(
+			TagRequestID, []byte(msg.RequestID),
+			TagRequestContextID, []byte(request.RequestContextID.String()),
+			TagConsumer, []byte(response.Consumer.String()),
+			TagProvider, []byte(response.Provider.String()),
+			TagServiceName, []byte(request.ServiceName),
+		),
 	)
-
-	tags = tags.AppendTags(completeTags)
 
 	return sdk.Result{
 		Tags: tags,

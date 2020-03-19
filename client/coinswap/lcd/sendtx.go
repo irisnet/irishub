@@ -1,24 +1,25 @@
 package lcd
 
 import (
+	"net/http"
+	"time"
+
 	"github.com/gorilla/mux"
 	"github.com/irisnet/irishub/app/v3/coinswap"
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
-	"net/http"
-	"time"
 )
 
 func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec) {
 	r.HandleFunc(
-		"/coinswap/liquidities/{id}/deposit",
+		"/coinswap/liquidities/{voucher-coin-name}/deposit",
 		addLiquidityHandlerFn(cdc, cliCtx),
 	).Methods("POST")
 
 	r.HandleFunc(
-		"/coinswap/liquidities/{id}/withdraw",
+		"/coinswap/liquidities/{voucher-coin-name}/withdraw",
 		removeLiquidityHandlerFn(cdc, cliCtx),
 	).Methods("POST")
 
@@ -34,20 +35,20 @@ func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec
 }
 
 type addLiquidityReq struct {
-	BaseTx       utils.BaseTx `json:"base_tx"`
-	Id           string       `json:"id"`             // the unique liquidity id
-	MaxToken     string       `json:"max_token"`      // token to be deposited as liquidity with an upper bound for its amount
-	ExactIrisAmt string       `json:"exact_iris_amt"` // exact amount of iris-atto being add to the liquidity pool
-	MinLiquidity string       `json:"min_liquidity"`  // lower bound UNI sender is willing to accept for deposited coins
-	Deadline     string       `json:"deadline"`       // deadline duration, e.g. 10m
-	Sender       string       `json:"sender"`
+	BaseTx          utils.BaseTx `json:"base_tx"`
+	VoucherCoinName string       `json:"voucher_coin_name"` // the liquidity voucher coin name
+	MaxToken        string       `json:"max_token"`         // token to be deposited as liquidity with an upper bound for its amount
+	ExactIrisAmt    string       `json:"exact_iris_amt"`    // exact amount of iris-atto being add to the liquidity pool
+	MinLiquidity    string       `json:"min_liquidity"`     // lower bound the voucher sender is willing to accept for deposited coins
+	Deadline        string       `json:"deadline"`          // deadline duration, e.g. 10m
+	Sender          string       `json:"sender"`
 }
 
 type removeLiquidityReq struct {
 	BaseTx            utils.BaseTx `json:"base_tx"`
-	Id                string       `json:"id"`                 // the unique liquidity id
+	VoucherCoinName   string       `json:"voucher_coin_name"`  // the liquidity voucher coin name
 	MinToken          string       `json:"min_token"`          // coin to be withdrawn with a lower bound for its amount
-	WithdrawLiquidity string       `json:"withdraw_liquidity"` // amount of UNI to be burned to withdraw liquidity from a reserve pool
+	WithdrawLiquidity string       `json:"withdraw_liquidity"` // amount of the voucher to be burned to withdraw liquidity from a reserve pool
 	MinIrisAmt        string       `json:"min_iris_amt"`       // minimum amount of the native asset the sender is willing to accept
 	Deadline          string       `json:"deadline"`           // deadline duration, e.g. 10m
 	Sender            string       `json:"sender"`
@@ -73,15 +74,15 @@ type swapOrderReq struct {
 func addLiquidityHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		id := vars["id"]
+		id := vars["voucher-coin-name"]
 
-		uniDenom, err := coinswap.GetUniDenom(id)
+		voucherDenom, err := coinswap.GetVoucherDenom(id)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		tokenDenom, err := coinswap.GetCoinMinDenomFromUniDenom(uniDenom)
+		tokenDenom, err := coinswap.GetUnderlyingDenom(voucherDenom)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -147,9 +148,9 @@ func addLiquidityHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Han
 func removeLiquidityHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		id := vars["id"]
+		id := vars["voucher-coin-name"]
 
-		uniDenom, err := coinswap.GetUniDenom(id)
+		voucherDenom, err := coinswap.GetVoucherDenom(id)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -199,7 +200,7 @@ func removeLiquidityHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.
 			return
 		}
 
-		msg := coinswap.NewMsgRemoveLiquidity(minToken, sdk.NewCoin(uniDenom, liquidityAmt), minIris, deadline.Unix(), senderAddress)
+		msg := coinswap.NewMsgRemoveLiquidity(minToken, sdk.NewCoin(voucherDenom, liquidityAmt), minIris, deadline.Unix(), senderAddress)
 		err = msg.ValidateBasic()
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())

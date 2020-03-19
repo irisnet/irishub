@@ -14,7 +14,7 @@ const (
 	CodeNotPositive                  sdk.CodeType = 104
 	CodeConstraintNotMet             sdk.CodeType = 105
 	CodeIllegalDenom                 sdk.CodeType = 106
-	CodeIllegalUniId                 sdk.CodeType = 107
+	CodeIllegalVoucherCoinName       sdk.CodeType = 107
 	CodeReservePoolInsufficientFunds sdk.CodeType = 108
 )
 
@@ -29,14 +29,14 @@ func ErrEqualDenom(msg string) sdk.Error {
 	if msg != "" {
 		return sdk.NewError(DefaultCodespace, CodeEqualDenom, msg)
 	}
-	return sdk.NewError(DefaultCodespace, CodeEqualDenom, "input and output denomination are equal")
+	return sdk.NewError(DefaultCodespace, CodeEqualDenom, "input and output denominations are equal")
 }
 
-func ErrIllegalUniId(msg string) sdk.Error {
+func ErrIllegalVoucherCoinName(msg string) sdk.Error {
 	if msg != "" {
-		return sdk.NewError(DefaultCodespace, CodeIllegalUniId, msg)
+		return sdk.NewError(DefaultCodespace, CodeIllegalVoucherCoinName, msg)
 	}
-	return sdk.NewError(DefaultCodespace, CodeIllegalUniId, "illegal liquidity id")
+	return sdk.NewError(DefaultCodespace, CodeIllegalVoucherCoinName, "illegal voucher coin name")
 }
 
 func ErrIllegalDenom(msg string) sdk.Error {
