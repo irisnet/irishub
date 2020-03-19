@@ -28,14 +28,18 @@ func NewHandler(k Keeper) sdk.Handler {
 
 // handleMsgCreateFeed handles MsgCreateFeed
 func handleMsgCreateFeed(ctx sdk.Context, k Keeper, msg MsgCreateFeed) sdk.Result {
-	if err := k.CreateFeed(ctx, msg); err != nil {
+	tags, err := k.CreateFeed(ctx, msg)
+	if err != nil {
 		return err.Result()
 	}
-	return sdk.Result{
-		Tags: sdk.NewTags(
+
+	tags = tags.AppendTags(
+		sdk.NewTags(
 			types.TagFeedName, []byte(msg.FeedName),
 			types.TagCreator, []byte(msg.Creator.String()),
-		),
+		))
+	return sdk.Result{
+		Tags: tags,
 	}
 }
 

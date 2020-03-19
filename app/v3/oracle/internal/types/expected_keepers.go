@@ -28,7 +28,7 @@ type ServiceKeeper interface {
 		repeatedTotal int64,
 		state service.RequestContextState,
 		respThreshold uint16,
-		respHandler string) (cmn.HexBytes, sdk.Error)
+		respHandler string) (cmn.HexBytes, sdk.Tags, sdk.Error)
 
 	UpdateRequestContext(ctx sdk.Context,
 		requestContextID cmn.HexBytes,

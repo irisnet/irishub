@@ -59,6 +59,7 @@ func (k Keeper) RequestRand(
 	oracle bool,
 	serviceFeeCap sdk.Coins,
 ) (sdk.Tags, sdk.Error) {
+	tags := sdk.NewTags()
 	currentHeight := ctx.BlockHeight()
 	destHeight := currentHeight + int64(blockInterval)
 
@@ -66,7 +67,7 @@ func (k Keeper) RequestRand(
 	txHash := sdk.SHA256(ctx.TxBytes())
 
 	// create paused request context
-	requestContextID, err := k.RequestService(ctx, consumer, serviceFeeCap)
+	requestContextID, tags, err := k.RequestService(ctx, consumer, serviceFeeCap)
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +86,7 @@ func (k Keeper) RequestRand(
 		types.TagRandHeight, []byte(fmt.Sprintf("%d", destHeight)),
 	)
 
-	return reqTags, nil
+	return tags.AppendTags(reqTags), nil
 }
 
 // StartRequestContext starts the service context

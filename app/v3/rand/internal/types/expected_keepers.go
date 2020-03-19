@@ -35,7 +35,7 @@ type ServiceKeeper interface {
 		state exported.RequestContextState,
 		respThreshold uint16,
 		respHandler string,
-	) (cmn.HexBytes, sdk.Error)
+	) (cmn.HexBytes, sdk.Tags, sdk.Error)
 
 	StartRequestContext(
 		ctx sdk.Context,

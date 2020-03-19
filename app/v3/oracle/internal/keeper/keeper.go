@@ -40,17 +40,18 @@ func NewKeeper(cdc *codec.Codec, key sdk.StoreKey,
 }
 
 //CreateFeed create a stopped feed
-func (k Keeper) CreateFeed(ctx sdk.Context, msg types.MsgCreateFeed) sdk.Error {
+func (k Keeper) CreateFeed(ctx sdk.Context, msg types.MsgCreateFeed) (sdk.Tags, sdk.Error) {
+	tags := sdk.NewTags()
 	_, existed := k.gk.GetProfiler(ctx, msg.Creator)
 	if !existed {
-		return types.ErrNotProfiler(types.DefaultCodespace, msg.Creator)
+		return tags, types.ErrNotProfiler(types.DefaultCodespace, msg.Creator)
 	}
 
 	if _, found := k.GetFeed(ctx, msg.FeedName); found {
-		return types.ErrExistedFeedName(types.DefaultCodespace, msg.FeedName)
+		return tags, types.ErrExistedFeedName(types.DefaultCodespace, msg.FeedName)
 	}
 
-	requestContextID, err := k.sk.CreateRequestContext(ctx,
+	requestContextID, tags, err := k.sk.CreateRequestContext(ctx,
 		msg.ServiceName,
 		msg.Providers,
 		msg.Creator,
@@ -61,7 +62,7 @@ func (k Keeper) CreateFeed(ctx sdk.Context, msg types.MsgCreateFeed) sdk.Error {
 		true,
 		msg.RepeatedFrequency, msg.RepeatedTotal, service.PAUSED, msg.ResponseThreshold, types.ModuleName)
 	if err != nil {
-		return err
+		return tags, err
 	}
 
 	k.SetFeed(ctx, types.Feed{
@@ -74,7 +75,7 @@ func (k Keeper) CreateFeed(ctx sdk.Context, msg types.MsgCreateFeed) sdk.Error {
 		Creator:          msg.Creator,
 	})
 	k.Enqueue(ctx, msg.FeedName, service.PAUSED)
-	return nil
+	return tags, nil
 }
 
 //StartFeed start a stopped feed
