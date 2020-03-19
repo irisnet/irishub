@@ -349,7 +349,7 @@ func TestKeeper_Request_Service(t *testing.T) {
 	requestContext.BatchCounter++
 	keeper.SetRequestContext(ctx, requestContextID, requestContext)
 
-	providerRequests := make(map[string][]types.CompactRequest)
+	providerRequests := make(map[string][]string)
 	keeper.InitiateRequests(ctx, requestContextID, newProviders, providerRequests)
 
 	requestContext, _ = keeper.GetRequestContext(ctx, requestContextID)
