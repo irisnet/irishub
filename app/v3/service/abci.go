@@ -2,9 +2,10 @@ package service
 
 import (
 	"encoding/json"
-	"github.com/irisnet/irishub/app/v3/service/internal/types"
+
 	cmn "github.com/tendermint/tendermint/libs/common"
 
+	"github.com/irisnet/irishub/app/v3/service/internal/types"
 	sdk "github.com/irisnet/irishub/types"
 )
 

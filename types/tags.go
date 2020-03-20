@@ -170,7 +170,7 @@ var (
 	TagRewardCommission    = "withdraw-reward-commission"
 )
 
-// ActionTag returns action.tagsKeys
+// ActionTag appends action and all tagKeys
 func ActionTag(action string, tagKeys ...string) string {
 	tag := action
 	for _, key := range tagKeys {

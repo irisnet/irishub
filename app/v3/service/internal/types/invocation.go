@@ -624,6 +624,6 @@ func SplitRequestID(requestID cmn.HexBytes) (cmn.HexBytes, uint64, int64, int16,
 	contextID := requestID[0:40]
 	batchCounter := binary.BigEndian.Uint64(contextID[40:48])
 	requestHeight := int64(binary.BigEndian.Uint64(contextID[48:56]))
-	batchRequestIndex := int16(binary.BigEndian.Uint16(contextID[56:58]))
+	batchRequestIndex := int16(binary.BigEndian.Uint16(contextID[56:]))
 	return contextID, batchCounter, requestHeight, batchRequestIndex, nil
 }
