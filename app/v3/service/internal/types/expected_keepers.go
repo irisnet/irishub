@@ -1,6 +1,7 @@
 package types
 
 import (
+	"github.com/irisnet/irishub/app/v3/asset/exported"
 	"github.com/irisnet/irishub/modules/guardian"
 	sdk "github.com/irisnet/irishub/types"
 )
@@ -16,4 +17,9 @@ type BankKeeper interface {
 type GuardianKeeper interface {
 	GetProfiler(ctx sdk.Context, addr sdk.AccAddress) (guardian guardian.Guardian, found bool)
 	GetTrustee(ctx sdk.Context, addr sdk.AccAddress) (guardian guardian.Guardian, found bool)
+}
+
+// AssetKeeper defines the expected asset keeper (noalias)
+type AssetKeeper interface {
+	GetToken(ctx sdk.Context, symbol string) (token exported.Token, err sdk.Error)
 }

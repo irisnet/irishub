@@ -90,7 +90,7 @@ func (k Keeper) IssueToken(ctx sdk.Context, msg types.MsgIssueToken) (sdk.Tags, 
 // EditToken edits the specified token
 func (k Keeper) EditToken(ctx sdk.Context, msg types.MsgEditToken) (sdk.Tags, sdk.Error) {
 	// get the destination token
-	token, err := k.getToken(ctx, msg.Symbol)
+	token, err := k.GetToken(ctx, msg.Symbol)
 	if err != nil {
 		return nil, err
 	}
@@ -135,7 +135,7 @@ func (k Keeper) EditToken(ctx sdk.Context, msg types.MsgEditToken) (sdk.Tags, sd
 // TransferTokenOwner transfers the owner of the specified token to a new one
 func (k Keeper) TransferTokenOwner(ctx sdk.Context, msg types.MsgTransferTokenOwner) (sdk.Tags, sdk.Error) {
 	// get the destination token
-	token, err := k.getToken(ctx, msg.Symbol)
+	token, err := k.GetToken(ctx, msg.Symbol)
 	if err != nil {
 		return nil, err
 	}
@@ -164,7 +164,7 @@ func (k Keeper) TransferTokenOwner(ctx sdk.Context, msg types.MsgTransferTokenOw
 
 // MintToken mints specified amount token to a specified owner
 func (k Keeper) MintToken(ctx sdk.Context, msg types.MsgMintToken) (sdk.Tags, sdk.Error) {
-	token, err := k.getToken(ctx, msg.Symbol)
+	token, err := k.GetToken(ctx, msg.Symbol)
 	if err != nil {
 		return nil, err
 	}
@@ -292,7 +292,7 @@ func (k Keeper) iterateTokensWithOwner(ctx sdk.Context, owner sdk.AccAddress, op
 		var symbol string
 		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &symbol)
 
-		token, err := k.getToken(ctx, symbol)
+		token, err := k.GetToken(ctx, symbol)
 		if err != nil {
 			continue
 		}
@@ -332,7 +332,7 @@ func (k Keeper) resetStoreKeyForQueryToken(ctx sdk.Context, msg types.MsgTransfe
 	return k.setOwnerToken(ctx, msg.DstOwner, token)
 }
 
-func (k Keeper) getToken(ctx sdk.Context, symbol string) (token types.FungibleToken, err sdk.Error) {
+func (k Keeper) GetToken(ctx sdk.Context, symbol string) (token types.FungibleToken, err sdk.Error) {
 	store := ctx.KVStore(k.storeKey)
 
 	bz := store.Get(KeyToken(symbol))
