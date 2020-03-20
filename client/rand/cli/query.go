@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"encoding/hex"
 	"fmt"
 
 	"github.com/spf13/cobra"
@@ -10,7 +9,6 @@ import (
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/app/v3/rand"
 	"github.com/irisnet/irishub/client/context"
-	"github.com/irisnet/irishub/client/rand/types"
 	"github.com/irisnet/irishub/codec"
 )
 
@@ -42,18 +40,12 @@ func GetCmdQueryRand(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			var rawRand rand.Rand
-			if err = cdc.UnmarshalJSON(res, &rawRand); err != nil {
+			var random rand.Rand
+			if err = cdc.UnmarshalJSON(res, &random); err != nil {
 				return err
 			}
 
-			readableRand := types.ReadableRand{
-				RequestTxHash: hex.EncodeToString(rawRand.RequestTxHash),
-				Height:        rawRand.Height,
-				Value:         rawRand.Value.Rat.FloatString(rand.RandPrec),
-			}
-
-			return cliCtx.PrintOutput(readableRand)
+			return cliCtx.PrintOutput(random)
 		},
 	}
 
