@@ -66,7 +66,7 @@ func (k Keeper) RequestService(ctx sdk.Context, reqID cmn.HexBytes, consumer sdk
 }
 
 // HandlerResponse is responsible for processing the data returned from the service module
-func (k Keeper) HandlerResponse(ctx sdk.Context, requestContextID cmn.HexBytes, responseOutput []string, err error) {
+func (k Keeper) HandlerResponse(ctx sdk.Context, requestContextID cmn.HexBytes, responseOutput []string, err error) (tags sdk.Tags) {
 	if len(responseOutput) == 0 || err != nil {
 		ctx = ctx.WithLogger(ctx.Logger().With("handler", "HandlerResponse"))
 		ctx.Logger().Error(
@@ -77,13 +77,17 @@ func (k Keeper) HandlerResponse(ctx sdk.Context, requestContextID cmn.HexBytes, 
 			err.Error(),
 		)
 		k.DeleteOracleRandRequest(ctx, requestContextID)
-		return
+		return tags.AppendTags(
+			sdk.ErrTags(types.ModuleName, requestContextID.String(), "respond service failed"),
+		)
 	}
 
 	_, existed := k.sk.GetRequestContext(ctx, requestContextID)
 	if !existed {
 		k.DeleteOracleRandRequest(ctx, requestContextID)
-		return
+		return tags.AppendTags(
+			sdk.ErrTags(types.ModuleName, requestContextID.String(), "requestContextID has not existed"),
+		)
 	}
 
 	request, err := k.GetOracleRandRequest(ctx, requestContextID)
@@ -96,7 +100,9 @@ func (k Keeper) HandlerResponse(ctx sdk.Context, requestContextID cmn.HexBytes, 
 			err.Error(),
 		)
 		k.DeleteOracleRandRequest(ctx, requestContextID)
-		return
+		return tags.AppendTags(
+			sdk.ErrTags(types.ModuleName, requestContextID.String(), "can not find request"),
+		)
 	}
 
 	result := gjson.Get(responseOutput[0], types.ServiceValueJsonPath)
@@ -111,7 +117,9 @@ func (k Keeper) HandlerResponse(ctx sdk.Context, requestContextID cmn.HexBytes, 
 			err.Error(),
 		)
 		k.DeleteOracleRandRequest(ctx, requestContextID)
-		return
+		return tags.AppendTags(
+			sdk.ErrTags(types.ModuleName, requestContextID.String(), "invalid seed"),
+		)
 	}
 
 	currentTimestamp := ctx.BlockHeader().Time.Unix()
@@ -126,6 +134,11 @@ func (k Keeper) HandlerResponse(ctx sdk.Context, requestContextID cmn.HexBytes, 
 	k.SetRand(ctx, reqID, types.NewRand(request.TxHash, lastBlockHeight, rand))
 
 	k.DeleteOracleRandRequest(ctx, requestContextID)
+
+	return tags.AppendTags(sdk.NewTags(
+		types.TagReqID, []byte(reqID.String()),
+		types.TagRand(reqID.String()), []byte(rand.Rat.FloatString(types.RandPrec)),
+	))
 }
 
 // GetRequestContext retrieves the request context by the specified request context id

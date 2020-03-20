@@ -174,29 +174,40 @@ func (k Keeper) EditFeed(ctx sdk.Context, msg types.MsgEditFeed) sdk.Error {
 
 //HandlerResponse is responsible for processing the data returned from the service module,
 //processed by the aggregate function, and then saved
-func (k Keeper) HandlerResponse(ctx sdk.Context, requestContextID cmn.HexBytes, responseOutput []string, err error) {
+func (k Keeper) HandlerResponse(ctx sdk.Context,
+	requestContextID cmn.HexBytes,
+	responseOutput []string,
+	err error) (tags sdk.Tags) {
 	if len(responseOutput) == 0 || err != nil {
 		ctx = ctx.WithLogger(ctx.Logger().With("handler", "HandlerResponse"))
 		ctx.Logger().Error("Oracle feed failed",
 			"requestContextID", requestContextID.String(),
 			"err", err.Error(),
 		)
-		return
+		return tags.AppendTags(
+			sdk.ErrTags(types.ModuleName, requestContextID.String(), "service respond error"),
+		)
 	}
 
 	feed, found := k.GetFeedByReqCtxID(ctx, requestContextID)
 	if !found {
-		return
+		return tags.AppendTags(
+			sdk.ErrTags(types.ModuleName, requestContextID.String(), "feed has not existed"),
+		)
 	}
 
 	reqCtx, existed := k.sk.GetRequestContext(ctx, requestContextID)
 	if !existed {
-		return
+		return tags.AppendTags(
+			sdk.ErrTags(types.ModuleName, requestContextID.String(), "requestContextID has not existed"),
+		)
 	}
 
 	aggregate, err := types.GetAggregateFunc(feed.AggregateFunc)
 	if err != nil {
-		return
+		return tags.AppendTags(
+			sdk.ErrTags(types.ModuleName, requestContextID.String(), err.Error()),
+		)
 	}
 
 	var data []types.ArgsType
@@ -204,11 +215,17 @@ func (k Keeper) HandlerResponse(ctx sdk.Context, requestContextID cmn.HexBytes, 
 		result := gjson.Get(jsonStr, feed.ValueJsonPath)
 		data = append(data, result)
 	}
+
+	result := aggregate(data)
 	value := types.FeedValue{
-		Data:      aggregate(data),
+		Data:      result,
 		Timestamp: ctx.BlockTime(),
 	}
 	k.SetFeedValue(ctx, feed.FeedName, reqCtx.BatchCounter, feed.LatestHistory, value)
+	return sdk.NewTags(
+		types.TagFeedName, []byte(feed.FeedName),
+		types.TagFeedValue(feed.FeedName), []byte(result),
+	)
 }
 
 func (k Keeper) GetRequestContext(ctx sdk.Context, requestContextID cmn.HexBytes) (service.RequestContext, bool) {
