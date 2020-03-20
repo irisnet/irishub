@@ -138,7 +138,7 @@ func (binding ServiceBinding) Validate() sdk.Error {
 		return err
 	}
 
-	if !validServiceCoins(binding.Deposit) {
+	if !ValidServiceCoins(binding.Deposit) {
 		return ErrInvalidDeposit(DefaultCodespace, fmt.Sprintf("invalid deposit: %s", binding.Deposit))
 	}
 
@@ -146,5 +146,5 @@ func (binding ServiceBinding) Validate() sdk.Error {
 		return ErrInvalidPricing(DefaultCodespace, "pricing missing")
 	}
 
-	return validatePricing(binding.Pricing)
+	return ValidateBindingPricing(binding.Pricing)
 }

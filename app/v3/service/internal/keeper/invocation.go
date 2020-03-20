@@ -743,7 +743,7 @@ func (k Keeper) GetPrice(
 	consumer sdk.AccAddress,
 	binding types.ServiceBinding,
 ) sdk.Coins {
-	pricing, _ := k.ParsePricing(ctx, binding.Pricing)
+	pricing := k.GetPricing(ctx, binding.ServiceName, binding.Provider)
 
 	// get discounts
 	discountByTime := types.GetDiscountByTime(pricing, ctx.BlockTime())
@@ -980,7 +980,7 @@ func (k Keeper) Slash(ctx sdk.Context, requestID cmn.HexBytes) (tags sdk.Tags, e
 
 	binding.Deposit = deposit
 	if binding.Available {
-		minDeposit := k.getMinDeposit(ctx, binding.Pricing)
+		minDeposit := k.getMinDeposit(ctx, k.GetPricing(ctx, binding.ServiceName, binding.Provider))
 
 		if !binding.Deposit.IsAllGTE(minDeposit) {
 			binding.Available = false
