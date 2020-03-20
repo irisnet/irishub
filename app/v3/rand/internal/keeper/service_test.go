@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	abci "github.com/tendermint/tendermint/abci/types"
+	cmn "github.com/tendermint/tendermint/libs/common"
 	"github.com/tendermint/tendermint/libs/log"
 
 	"github.com/irisnet/irishub/app/v3/rand/internal/types"
@@ -72,7 +73,7 @@ func TestOracleRequestRandKeeper(t *testing.T) {
 	cdc.MustUnmarshalBinaryLengthPrefixed(bz, &request)
 	require.Equal(t, txHeight, request.Height)
 	require.Equal(t, consumer, request.Consumer)
-	require.Equal(t, sdk.SHA256(txBytes), request.TxHash)
+	require.Equal(t, cmn.HexBytes(sdk.SHA256(txBytes)), request.TxHash)
 
 	// get the rand and assert the result is nil
 	bz = store.Get(KeyRand(reqID))
