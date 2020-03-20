@@ -233,7 +233,7 @@ const (
 	  "price": {
 		"description": "base price",
 		"type": "string",
-		"pattern": "[0-9]+(\\.[0-9]+)?[a-z][a-z0-9]{2,7}(,[0-9]+(\\.[0-9]+)?[a-z][a-z0-9]{2,7})*"
+		"pattern": "^[0-9]+(\\.[0-9]+)?[a-z][a-z0-9]{2,7}(,[0-9]+(\\.[0-9]+)?[a-z][a-z0-9]{2,7})*$"
 	  },
 	  "promotions_by_time": {
 		"description": "promotions by time",
