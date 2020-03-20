@@ -425,14 +425,16 @@ func NewGenesisFileState(accounts []GenesisFileAccount, authData auth.GenesisSta
 // NewDefaultGenesisState generates the default state for iris.
 func NewDefaultGenesisFileState() GenesisFileState {
 	return GenesisFileState{
-		Accounts:     nil,
-		AuthData:     auth.DefaultGenesisState(),
-		StakeData:    stake.DefaultGenesisState(),
-		MintData:     mint.DefaultGenesisState(),
-		DistrData:    distr.DefaultGenesisState(),
-		GovData:      gov.DefaultGenesisState(),
-		UpgradeData:  upgrade.DefaultGenesisState(),
-		ServiceData:  service.DefaultGenesisState(),
+		Accounts:    nil,
+		AuthData:    auth.DefaultGenesisState(),
+		StakeData:   stake.DefaultGenesisState(),
+		MintData:    mint.DefaultGenesisState(),
+		DistrData:   distr.DefaultGenesisState(),
+		GovData:     gov.DefaultGenesisState(),
+		UpgradeData: upgrade.DefaultGenesisState(),
+		ServiceData: service.DefaultGenesisState(
+			append(rand.GetSvcDefinitions(), oracle.GetSvcDefinitions()...),
+		),
 		GuardianData: guardian.DefaultGenesisState(),
 		SlashingData: slashing.DefaultGenesisState(),
 		AssetData:    asset.DefaultGenesisState(),
