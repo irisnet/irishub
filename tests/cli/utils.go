@@ -29,7 +29,6 @@ import (
 	"github.com/irisnet/irishub/client/context"
 	htlctypes "github.com/irisnet/irishub/client/htlc/types"
 	"github.com/irisnet/irishub/client/keys"
-	randtypes "github.com/irisnet/irishub/client/rand/types"
 	"github.com/irisnet/irishub/client/stake"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/guardian"
@@ -451,9 +450,9 @@ func executeGetRandRequests(t *testing.T, cmdStr string) rand.Requests {
 	return rs
 }
 
-func executeGetRand(t *testing.T, cmdStr string) randtypes.ReadableRand {
+func executeGetRand(t *testing.T, cmdStr string) rand.Rand {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
-	var r randtypes.ReadableRand
+	var r rand.Rand
 	cdc := app.MakeLatestCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &r)
 	require.NoError(t, err, "out %v\n, err %v", out, err)

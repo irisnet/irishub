@@ -140,5 +140,5 @@ func TestIrisCLIRand(t *testing.T) {
 	rand := executeGetRand(t, fmt.Sprintf("iriscli rand query-rand --request-id=%s %v", randReqID, flags))
 	require.True(t, len(rand.RequestTxHash) > 0)
 	require.True(t, rand.Height > 0)
-	require.True(t, rand.Value != "")
+	require.True(t, rand.Value.String() != "")
 }
