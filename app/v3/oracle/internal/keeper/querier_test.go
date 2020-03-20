@@ -1,8 +1,9 @@
 package keeper
 
 import (
-	"github.com/irisnet/irishub/app/v3/service/exported"
 	"testing"
+
+	"github.com/irisnet/irishub/app/v3/service/exported"
 
 	"github.com/irisnet/irishub/app/v3/oracle/internal/types"
 	sdk "github.com/irisnet/irishub/types"
@@ -25,7 +26,6 @@ func TestNewQuerier(t *testing.T) {
 		Timeout:           10,
 		ServiceFeeCap:     sdk.NewCoins(sdk.NewCoin(sdk.IrisAtto, sdk.NewInt(100))),
 		RepeatedFrequency: 1,
-		RepeatedTotal:     10,
 		ResponseThreshold: 1,
 		Creator:           acc[0].GetAddress(),
 	}
@@ -62,7 +62,7 @@ func TestNewQuerier(t *testing.T) {
 		Timeout:           msg.Timeout,
 		ServiceFeeCap:     msg.ServiceFeeCap,
 		RepeatedFrequency: msg.RepeatedFrequency,
-		RepeatedTotal:     msg.RepeatedTotal,
+		RepeatedTotal:     -1,
 		ResponseThreshold: msg.ResponseThreshold,
 		State:             exported.PAUSED,
 	}, feedCtx)
@@ -95,7 +95,7 @@ func TestNewQuerier(t *testing.T) {
 		Timeout:           msg.Timeout,
 		ServiceFeeCap:     msg.ServiceFeeCap,
 		RepeatedFrequency: msg.RepeatedFrequency,
-		RepeatedTotal:     msg.RepeatedTotal,
+		RepeatedTotal:     -1,
 		ResponseThreshold: msg.ResponseThreshold,
 		State:             exported.PAUSED,
 	}, feedsCtx[0])

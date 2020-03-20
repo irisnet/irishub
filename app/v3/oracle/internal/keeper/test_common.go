@@ -179,17 +179,7 @@ func (m MockServiceKeeper) UpdateRequestContext(ctx sdk.Context,
 func (m MockServiceKeeper) StartRequestContext(ctx sdk.Context, requestContextID cmn.HexBytes, consumer sdk.AccAddress) sdk.Error {
 	reqCtx := m.cxtMap[string(requestContextID)]
 	callback := m.callbackMap[reqCtx.ModuleName]
-	for i := int64(reqCtx.BatchCounter + 1); i <= reqCtx.RepeatedTotal; i++ {
-		reqCtx.BatchCounter = uint64(i)
-		reqCtx.State = exported.RUNNING
-		m.cxtMap[string(requestContextID)] = reqCtx
-		ctx = ctx.WithBlockHeader(abci.Header{
-			ChainID: ctx.BlockHeader().ChainID,
-			Height:  ctx.BlockHeight() + 1,
-			Time:    ctx.BlockTime().Add(2 * time.Minute),
-		})
-		callback(ctx, requestContextID, responses, nil)
-	}
+	callback(ctx, requestContextID, responses, nil)
 	return nil
 }
 

@@ -60,7 +60,7 @@ func (k Keeper) CreateFeed(ctx sdk.Context, msg types.MsgCreateFeed) sdk.Error {
 		msg.Timeout,
 		false,
 		true,
-		msg.RepeatedFrequency, msg.RepeatedTotal, service.PAUSED, msg.ResponseThreshold, types.ModuleName)
+		msg.RepeatedFrequency, -1, service.PAUSED, msg.ResponseThreshold, types.ModuleName)
 	if err != nil {
 		return err
 	}
@@ -152,7 +152,7 @@ func (k Keeper) EditFeed(ctx sdk.Context, msg types.MsgEditFeed) sdk.Error {
 		msg.ServiceFeeCap,
 		msg.Timeout,
 		msg.RepeatedFrequency,
-		msg.RepeatedTotal,
+		-1,
 		msg.Creator); err != nil {
 		return err
 	}

@@ -23,7 +23,6 @@ func TestFeed(t *testing.T) {
 		Timeout:           10,
 		ServiceFeeCap:     sdk.NewCoins(sdk.NewCoin(sdk.IrisAtto, sdk.NewInt(100))),
 		RepeatedFrequency: 1,
-		RepeatedTotal:     10,
 		ResponseThreshold: 1,
 		Creator:           acc[0].GetAddress(),
 	}
@@ -89,7 +88,6 @@ func TestFeed(t *testing.T) {
 		Providers:         []sdk.AccAddress{acc[0].GetAddress()},
 		ServiceFeeCap:     sdk.NewCoins(sdk.NewCoin(sdk.IrisAtto, sdk.NewInt(100))),
 		RepeatedFrequency: 1,
-		RepeatedTotal:     10,
 		ResponseThreshold: 1,
 		Creator:           acc[0].GetAddress(),
 	})
