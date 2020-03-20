@@ -4,24 +4,22 @@ import (
 	"testing"
 	"time"
 
+	"github.com/irisnet/irishub/app/protocol"
+	"github.com/irisnet/irishub/app/v1/auth"
+	"github.com/irisnet/irishub/app/v1/bank"
+	"github.com/irisnet/irishub/app/v3/oracle/internal/types"
+	"github.com/irisnet/irishub/app/v3/service"
 	"github.com/irisnet/irishub/app/v3/service/exported"
-
+	"github.com/irisnet/irishub/codec"
+	"github.com/irisnet/irishub/modules/guardian"
+	"github.com/irisnet/irishub/store"
+	sdk "github.com/irisnet/irishub/types"
 	"github.com/stretchr/testify/require"
-
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
 	cmn "github.com/tendermint/tendermint/libs/common"
 	"github.com/tendermint/tendermint/libs/log"
 	dbm "github.com/tendermint/tm-db"
-
-	"github.com/irisnet/irishub/app/protocol"
-	"github.com/irisnet/irishub/app/v1/auth"
-	"github.com/irisnet/irishub/app/v1/bank"
-	"github.com/irisnet/irishub/app/v3/oracle/internal/types"
-	"github.com/irisnet/irishub/codec"
-	"github.com/irisnet/irishub/modules/guardian"
-	"github.com/irisnet/irishub/store"
-	sdk "github.com/irisnet/irishub/types"
 )
 
 var (
@@ -179,7 +177,9 @@ func (m MockServiceKeeper) UpdateRequestContext(ctx sdk.Context,
 func (m MockServiceKeeper) StartRequestContext(ctx sdk.Context, requestContextID cmn.HexBytes, consumer sdk.AccAddress) sdk.Error {
 	reqCtx := m.cxtMap[string(requestContextID)]
 	callback := m.callbackMap[reqCtx.ModuleName]
+	reqCtx.State = service.RUNNING
 	callback(ctx, requestContextID, responses, nil)
+	m.cxtMap[string(requestContextID)] = reqCtx
 	return nil
 }
 

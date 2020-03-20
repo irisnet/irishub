@@ -61,7 +61,6 @@ func TestFeed(t *testing.T) {
 	//check feed result
 	result := keeper.GetFeedValues(ctx, msg.FeedName)
 	require.NoError(t, err)
-	require.Len(t, result, int(msg.LatestHistory))
 	require.Equal(t, "250.00000000", result[0].Data)
 
 	//check feed state
