@@ -45,7 +45,7 @@ func TestIrisCLIService(t *testing.T) {
 	addedDeposit := "1iris"
 	serviceFeeCap := "10iris"
 	input := `{"pair":"iris-usdt"}`
-	timeout := int64(5)
+	timeout := int64(7)
 	repeatedFreq := uint64(20)
 	repeatedTotal := int64(10)
 	result := `{"code":200,"message":""}`
@@ -341,6 +341,11 @@ func TestIrisCLIService(t *testing.T) {
 
 	require.Equal(t, fooResponse, responses[0])
 	require.Equal(t, barResponse, responses[1])
+
+	// responses has been deleted on expiration height
+	tests.WaitForHeightTM(requests[0].ExpirationHeight, port)
+	responses = executeGetServiceResponses(t, fmt.Sprintf("iriscli service responses %s %d %v", requestContextID, 1, flags))
+	require.Equal(t, 0, len(responses))
 
 	// pause the request context
 	prcStr := fmt.Sprintf("iriscli service pause %s %v", requestContextID, flags)
