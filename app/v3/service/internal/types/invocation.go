@@ -565,13 +565,13 @@ func (state *RequestContextBatchState) UnmarshalJSON(data []byte) error {
 type ResponseCallback func(ctx sdk.Context, requestContextID cmn.HexBytes, responses []string, err error)
 
 const (
-	requestIDLen = 58
-	contextIDLen = 40
+	RequestIDLen = 58
+	ContextIDLen = 40
 )
 
 // ConvertRequestID converts the given string to request ID
 func ConvertRequestID(requestIDStr string) (cmn.HexBytes, error) {
-	if len(requestIDStr) != 2*requestIDLen {
+	if len(requestIDStr) != 2*RequestIDLen {
 		return nil, errors.New("invalid request id")
 	}
 
@@ -594,7 +594,7 @@ func GenerateRequestContextID(txHash []byte, msgIndex int64) cmn.HexBytes {
 
 // SplitRequestContextID splits the given contextID to txHash and msgIndex
 func SplitRequestContextID(contextID cmn.HexBytes) (cmn.HexBytes, int64, error) {
-	if len(contextID) != contextIDLen {
+	if len(contextID) != ContextIDLen {
 		return nil, 0, errors.New("invalid request context id")
 	}
 	txHash := contextID[0:32]
@@ -618,7 +618,7 @@ func GenerateRequestID(requestContextID cmn.HexBytes, requestContextBatchCounter
 
 // SplitRequestID splits the given contextID to contextID, batchCounter, requestHeight, batchRequestIndex
 func SplitRequestID(requestID cmn.HexBytes) (cmn.HexBytes, uint64, int64, int16, error) {
-	if len(requestID) != requestIDLen {
+	if len(requestID) != RequestIDLen {
 		return nil, 0, 0, 0, errors.New("invalid request id")
 	}
 	contextID := requestID[0:40]

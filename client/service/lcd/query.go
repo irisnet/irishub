@@ -200,8 +200,13 @@ func queryWithdrawAddrHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) htt
 func queryRequestHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		requestID := vars[RequestID]
+		requestIDStr := vars[RequestID]
 
+		requestID, err := service.ConvertRequestID(requestIDStr)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
 		params := service.QueryRequestParams{
 			RequestID: requestID,
 		}
@@ -301,7 +306,13 @@ func queryRequestsHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.Ha
 func queryResponseHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		requestID := vars[RequestID]
+		requestIDStr := vars[RequestID]
+
+		requestID, err := service.ConvertRequestID(requestIDStr)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
 
 		params := service.QueryResponseParams{
 			RequestID: requestID,

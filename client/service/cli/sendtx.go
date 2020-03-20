@@ -473,7 +473,11 @@ func GetCmdRespondService(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			requestID := viper.GetString(FlagRequestID)
+			requestIDStr := viper.GetString(FlagRequestID)
+			requestID, err := service.ConvertRequestID(requestIDStr)
+			if err != nil {
+				return err
+			}
 			result := viper.GetString(FlagResult)
 			output := viper.GetString(FlagData)
 

@@ -405,11 +405,8 @@ func TestKeeper_Respond_Service(t *testing.T) {
 	requestID1 := setRequest(ctx, keeper, consumer, provider, requestContextID)
 	requestID2 := setRequest(ctx, keeper, consumer, provider, requestContextID)
 
-	requestID1Str := requestID1.String()
-	requestID2Str := requestID2.String()
-
 	// respond request 1
-	_, _, _, err := keeper.AddResponse(ctx, requestID1Str, provider, testResult, testOutput)
+	_, _, _, err := keeper.AddResponse(ctx, requestID1, provider, testResult, testOutput)
 	require.NoError(t, err)
 
 	requestContext, _ = keeper.GetRequestContext(ctx, requestContextID)
@@ -425,7 +422,7 @@ func TestKeeper_Respond_Service(t *testing.T) {
 	require.Equal(t, requestContext.BatchCounter, response.RequestContextBatchCounter)
 
 	// respond request 2
-	_, _, _, err = keeper.AddResponse(ctx, requestID2Str, provider, testOutput, "")
+	_, _, _, err = keeper.AddResponse(ctx, requestID2, provider, testOutput, "")
 	require.NoError(t, err)
 
 	requestContext, _ = keeper.GetRequestContext(ctx, requestContextID)
@@ -472,10 +469,7 @@ func TestKeeper_Request_Service_From_Module(t *testing.T) {
 	requestID1 := setRequest(ctx, keeper, consumer, provider1, requestContextID)
 	requestID2 := setRequest(ctx, keeper, consumer, provider2, requestContextID)
 
-	requestIDStr1 := requestID1.String()
-	requestIDStr2 := requestID2.String()
-
-	_, _, _, err = keeper.AddResponse(ctx, requestIDStr1, provider1, testResult, testOutput)
+	_, _, _, err = keeper.AddResponse(ctx, requestID1, provider1, testResult, testOutput)
 	require.NoError(t, err)
 
 	requestContext, _ = keeper.GetRequestContext(ctx, requestContextID)
@@ -485,7 +479,7 @@ func TestKeeper_Request_Service_From_Module(t *testing.T) {
 	// callback has not occurred due to insufficient responses
 	require.False(t, callbacked)
 
-	_, _, _, err = keeper.AddResponse(ctx, requestIDStr2, provider2, testResult, testOutput)
+	_, _, _, err = keeper.AddResponse(ctx, requestID2, provider2, testResult, testOutput)
 	require.NoError(t, err)
 
 	requestContext, _ = keeper.GetRequestContext(ctx, requestContextID)

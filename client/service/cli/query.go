@@ -183,8 +183,12 @@ func GetCmdQueryServiceRequest(cdc *codec.Codec) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
+			requestID, err := service.ConvertRequestID(args[0])
+			if err != nil {
+				return err
+			}
 			params := service.QueryRequestParams{
-				RequestID: args[0],
+				RequestID: requestID,
 			}
 
 			bz, err := cdc.MarshalJSON(params)
@@ -294,8 +298,12 @@ func GetCmdQueryServiceResponse(cdc *codec.Codec) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
+			requestID, err := service.ConvertRequestID(args[0])
+			if err != nil {
+				return err
+			}
 			params := service.QueryResponseParams{
-				RequestID: args[0],
+				RequestID: requestID,
 			}
 
 			bz, err := cdc.MarshalJSON(params)

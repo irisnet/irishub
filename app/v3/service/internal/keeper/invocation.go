@@ -756,30 +756,28 @@ func (k Keeper) DeductServiceFees(ctx sdk.Context, consumer sdk.AccAddress, serv
 // AddResponse adds the response for the specified request ID
 func (k Keeper) AddResponse(
 	ctx sdk.Context,
-	requestID string,
+	requestID cmn.HexBytes,
 	provider sdk.AccAddress,
 	result,
 	output string,
 ) (request types.Request, response types.Response, tags sdk.Tags, err sdk.Error) {
-	reqID, _ := types.ConvertRequestID(requestID)
-
-	request, found := k.GetRequest(ctx, reqID)
+	request, found := k.GetRequest(ctx, requestID)
 	if !found {
-		return request, response, tags, types.ErrUnknownRequest(k.codespace, reqID)
+		return request, response, tags, types.ErrUnknownRequest(k.codespace, requestID)
 	}
 
 	if !provider.Equals(request.Provider) {
 		return request, response, tags, types.ErrInvalidResponse(k.codespace, "provider does not match")
 	}
 
-	if !k.IsRequestActive(ctx, reqID) {
+	if !k.IsRequestActive(ctx, requestID) {
 		return request, response, tags, types.ErrInvalidResponse(k.codespace, "request is not active")
 	}
 
 	svcDef, _ := k.GetServiceDefinition(ctx, request.ServiceName)
 
 	if len(output) > 0 && types.ValidateResponseOutput(svcDef.Schemas, output) != nil {
-		tags, err = k.Slash(ctx, reqID)
+		tags, err = k.Slash(ctx, requestID)
 		if err != nil {
 			panic(err)
 		}
@@ -796,9 +794,9 @@ func (k Keeper) AddResponse(
 	requestContextID := request.RequestContextID
 
 	response = types.NewResponse(provider, request.Consumer, result, output, requestContextID, request.RequestContextBatchCounter)
-	k.SetResponse(ctx, reqID, response)
+	k.SetResponse(ctx, requestID, response)
 
-	k.DeleteActiveRequest(ctx, request.ServiceName, provider, request.ExpirationHeight, reqID)
+	k.DeleteActiveRequest(ctx, request.ServiceName, provider, request.ExpirationHeight, requestID)
 
 	requestContext, _ := k.GetRequestContext(ctx, requestContextID)
 	requestContext.BatchResponseCount++

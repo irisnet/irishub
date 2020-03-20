@@ -43,7 +43,7 @@ var (
 	testTaxWithdrawalAmt = sdk.NewCoins(testCoin1)
 
 	testRequestContextID = GenerateRequestContextID(tmhash.Sum([]byte("test-request-context-id")), 0)
-	testRequestID        = GenerateRequestID(testRequestContextID, 1, 1, 1).String()
+	testRequestID        = GenerateRequestID(testRequestContextID, 1, 1, 1)
 )
 
 // TestMsgDefineServiceRoute tests Route for MsgDefineService
@@ -749,7 +749,7 @@ func TestMsgRespondServiceType(t *testing.T) {
 func TestMsgRespondServiceValidation(t *testing.T) {
 	emptyAddress := sdk.AccAddress{}
 
-	invalidRequestID := "invalidRequestID"
+	invalidRequestID := []byte("invalidRequestID")
 	invalidOutput := "invalidOutput"
 
 	validResult400 := `{"code":400,"message":"invalid parameters"}`
@@ -870,7 +870,7 @@ func TestMsgPauseRequestContextGetSignBytes(t *testing.T) {
 	msg := NewMsgPauseRequestContext(testRequestContextID, testConsumer)
 	res := msg.GetSignBytes()
 
-	expected := `{"type":"irishub/service/MsgPauseRequestContext","value":{"consumer":"faa1w3jhxapdvdhkuum4d4jhyl0qvse","request_context_id":"PbD6mdywWLyGBButvWFNaDn4+iDhfPitO6FMPxv2E70AAAAAAAAAAA=="}}`
+	expected := `{"type":"irishub/service/MsgPauseRequestContext","value":{"consumer":"faa1w3jhxapdvdhkuum4d4jhyl0qvse","request_context_id":"3DB0FA99DCB058BC86041BADBD614D6839F8FA20E17CF8AD3BA14C3F1BF613BD0000000000000000"}}`
 	require.Equal(t, expected, string(res))
 }
 
@@ -933,7 +933,7 @@ func TestMsgStartRequestContextGetSignBytes(t *testing.T) {
 	msg := NewMsgStartRequestContext(testRequestContextID, testConsumer)
 	res := msg.GetSignBytes()
 
-	expected := `{"type":"irishub/service/MsgStartRequestContext","value":{"consumer":"faa1w3jhxapdvdhkuum4d4jhyl0qvse","request_context_id":"PbD6mdywWLyGBButvWFNaDn4+iDhfPitO6FMPxv2E70AAAAAAAAAAA=="}}`
+	expected := `{"type":"irishub/service/MsgStartRequestContext","value":{"consumer":"faa1w3jhxapdvdhkuum4d4jhyl0qvse","request_context_id":"3DB0FA99DCB058BC86041BADBD614D6839F8FA20E17CF8AD3BA14C3F1BF613BD0000000000000000"}}`
 	require.Equal(t, expected, string(res))
 }
 
@@ -996,7 +996,7 @@ func TestMsgKillRequestContextGetSignBytes(t *testing.T) {
 	msg := NewMsgKillRequestContext(testRequestContextID, testConsumer)
 	res := msg.GetSignBytes()
 
-	expected := `{"type":"irishub/service/MsgKillRequestContext","value":{"consumer":"faa1w3jhxapdvdhkuum4d4jhyl0qvse","request_context_id":"PbD6mdywWLyGBButvWFNaDn4+iDhfPitO6FMPxv2E70AAAAAAAAAAA=="}}`
+	expected := `{"type":"irishub/service/MsgKillRequestContext","value":{"consumer":"faa1w3jhxapdvdhkuum4d4jhyl0qvse","request_context_id":"3DB0FA99DCB058BC86041BADBD614D6839F8FA20E17CF8AD3BA14C3F1BF613BD0000000000000000"}}`
 	require.Equal(t, expected, string(res))
 }
 
@@ -1077,7 +1077,7 @@ func TestMsgUpdateRequestContextGetSignBytes(t *testing.T) {
 	msg := NewMsgUpdateRequestContext(testRequestContextID, testProviders, testServiceFeeCap, testTimeout, testRepeatedFreq, testRepeatedTotal, testConsumer)
 	res := msg.GetSignBytes()
 
-	expected := `{"type":"irishub/service/MsgUpdateRequestContext","value":{"consumer":"faa1w3jhxapdvdhkuum4d4jhyl0qvse","providers":["faa1w3jhxapdwpex7anfv3jhynrxe9z"],"repeated_frequency":"120","repeated_total":"100","request_context_id":"PbD6mdywWLyGBButvWFNaDn4+iDhfPitO6FMPxv2E70AAAAAAAAAAA==","service_fee_cap":[{"amount":"100000000000000000000","denom":"iris-atto"}],"timeout":"100"}}`
+	expected := `{"type":"irishub/service/MsgUpdateRequestContext","value":{"consumer":"faa1w3jhxapdvdhkuum4d4jhyl0qvse","providers":["faa1w3jhxapdwpex7anfv3jhynrxe9z"],"repeated_frequency":"120","repeated_total":"100","request_context_id":"3DB0FA99DCB058BC86041BADBD614D6839F8FA20E17CF8AD3BA14C3F1BF613BD0000000000000000","service_fee_cap":[{"amount":"100000000000000000000","denom":"iris-atto"}],"timeout":"100"}}`
 	require.Equal(t, expected, string(res))
 }
 

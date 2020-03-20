@@ -75,7 +75,7 @@ func QueryRequestContextByTxQuery(cliCtx context.CLIContext, params service.Quer
 // QueryRequestByTxQuery will query for a single request via a direct txs tags query.
 func QueryRequestByTxQuery(cliCtx context.CLIContext, params service.QueryRequestParams) (
 	request service.Request, err error) {
-	requestID, err := service.ConvertRequestID(params.RequestID)
+	requestID := params.RequestID
 	if err != nil {
 		return request, nil
 	}
@@ -151,10 +151,7 @@ func QueryResponseByTxQuery(cliCtx context.CLIContext, params service.QueryRespo
 		return response, fmt.Errorf("unknown response: %s", params.RequestID)
 	}
 
-	requestID, err := service.ConvertRequestID(params.RequestID)
-	if err != nil {
-		return response, nil
-	}
+	requestID := params.RequestID
 
 	contextID, batchCounter, _, _, err := service.SplitRequestID(requestID)
 	if err != nil {
@@ -173,7 +170,7 @@ func QueryResponseByTxQuery(cliCtx context.CLIContext, params service.QueryRespo
 	for _, msg := range result.Txs[0].Tx.GetMsgs() {
 		if msg.Type() == service.TypeMsgRespondService {
 			responseMsg := msg.(service.MsgRespondService)
-			if responseMsg.RequestID != params.RequestID {
+			if responseMsg.RequestID.String() != params.RequestID.String() {
 				continue
 			}
 			response := service.NewResponse(

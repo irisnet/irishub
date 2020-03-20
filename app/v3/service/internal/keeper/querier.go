@@ -131,12 +131,11 @@ func queryRequest(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sdk
 		return nil, sdk.ParseParamsErr(err)
 	}
 
-	requestID, err := types.ConvertRequestID(params.RequestID)
-	if err != nil {
+	if len(params.RequestID) != types.RequestIDLen {
 		return nil, types.ErrInvalidRequestID(types.DefaultCodespace, params.RequestID)
 	}
 
-	request, _ := k.GetRequest(ctx, requestID)
+	request, _ := k.GetRequest(ctx, params.RequestID)
 
 	bz, err := codec.MarshalJSONIndent(k.cdc, request)
 	if err != nil {
@@ -181,12 +180,11 @@ func queryResponse(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sd
 		return nil, sdk.ParseParamsErr(err)
 	}
 
-	requestID, err := types.ConvertRequestID(params.RequestID)
-	if err != nil {
+	if len(params.RequestID) != types.RequestIDLen {
 		return nil, types.ErrInvalidRequestID(types.DefaultCodespace, params.RequestID)
 	}
 
-	response, _ := k.GetResponse(ctx, requestID)
+	response, _ := k.GetResponse(ctx, params.RequestID)
 
 	bz, err := codec.MarshalJSONIndent(k.cdc, response)
 	if err != nil {
