@@ -14,7 +14,7 @@ import (
 type Request struct {
 	Height        int64          `json:"height"`          // the height of the block in which the request tx is included
 	Consumer      sdk.AccAddress `json:"consumer"`        // the request address
-	TxHash        []byte         `json:"txhash"`          // the request tx hash
+	TxHash        cmn.HexBytes   `json:"txhash"`          // the request tx hash
 	Oracle        bool           `json:"oracle"`          // oracle method
 	ServiceFeeCap sdk.Coins      `json:"service_fee_cap"` // service fee cap
 }
@@ -23,7 +23,7 @@ type Request struct {
 func NewRequest(
 	height int64,
 	consumer sdk.AccAddress,
-	txHash []byte,
+	txHash cmn.HexBytes,
 	oracle bool,
 	serviceFeeCap sdk.Coins,
 ) Request {
@@ -46,7 +46,7 @@ func (r Request) String() string {
   ServiceFeeCap:     %s`,
 		r.Height,
 		r.Consumer.String(),
-		hex.EncodeToString(r.TxHash),
+		r.TxHash.String(),
 		strconv.FormatBool(r.Oracle),
 		r.ServiceFeeCap.String(),
 	)
@@ -64,10 +64,10 @@ func (rs Requests) String() string {
 	var str string
 	for _, r := range rs {
 		str += fmt.Sprintf(
-			"Request:\n  Height: %d, Consumer: %s, TxHash: %s, Oracle: %s, ServiceFeeCap: %s",
+			"Request:\n  Height: %d, Consumer: %s, TxHash: %s, Oracle: %s, ServiceFeeCap: %s\n",
 			r.Height,
 			r.Consumer.String(),
-			hex.EncodeToString(r.TxHash),
+			r.TxHash.String(),
 			strconv.FormatBool(r.Oracle),
 			r.ServiceFeeCap.String(),
 		)
