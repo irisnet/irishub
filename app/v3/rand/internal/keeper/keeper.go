@@ -67,10 +67,12 @@ func (k Keeper) RequestRand(
 	txHash := sdk.SHA256(ctx.TxBytes())
 
 	// create paused request context
-	requestContextID, tags, err := k.RequestService(ctx, consumer, serviceFeeCap)
+	requestContextID, requestTags, err := k.RequestService(ctx, consumer, serviceFeeCap)
 	if err != nil {
 		return nil, err
 	}
+
+	tags = tags.AppendTags(requestTags)
 
 	// build request
 	request := types.NewRequest(currentHeight, consumer, txHash, oracle, serviceFeeCap, requestContextID)
