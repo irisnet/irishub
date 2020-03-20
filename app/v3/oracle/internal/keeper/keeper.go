@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"encoding/json"
 	"strings"
 
 	cmn "github.com/tendermint/tendermint/libs/common"
@@ -214,9 +215,10 @@ func (k Keeper) HandlerResponse(ctx sdk.Context,
 		Timestamp: ctx.BlockTime(),
 	}
 	k.SetFeedValue(ctx, feed.FeedName, reqCtx.BatchCounter, feed.LatestHistory, value)
+	bz, _ := json.Marshal(value)
 	return sdk.NewTags(
 		types.TagFeedName, []byte(feed.FeedName),
-		types.TagFeedValue(feed.FeedName), []byte(result),
+		types.TagFeedValue(feed.FeedName), bz,
 	)
 }
 
