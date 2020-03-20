@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"encoding/hex"
-	"fmt"
 	"math/rand"
 	"time"
 
@@ -30,12 +29,12 @@ func (k Keeper) RequestService(ctx sdk.Context, reqID cmn.HexBytes, consumer sdk
 	}
 
 	if len(bindings) < 1 {
-		return nil, types.ErrInvalidServiceBindings(types.DefaultCodespace, fmt.Sprintf("no service bindings available"))
+		return nil, types.ErrInvalidServiceBindings(types.DefaultCodespace, "no service bindings available")
 	}
 
 	coins := k.bk.GetCoins(ctx, consumer)
 	if !coins.IsAllGTE(serviceFeeCap) {
-		return nil, types.ErrInsufficientBalance(types.DefaultCodespace, fmt.Sprintf("insufficient balance"))
+		return nil, types.ErrInsufficientBalance(types.DefaultCodespace, "insufficient balance")
 	}
 
 	rand.Seed(time.Now().UnixNano())
