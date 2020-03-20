@@ -1,7 +1,6 @@
 package types
 
 import (
-	"encoding/json"
 	"fmt"
 	"time"
 
@@ -68,6 +67,13 @@ func (bindings ServiceBindings) String() string {
 	return str
 }
 
+// RawPricing represents the raw pricing of a service binding
+type RawPricing struct {
+	Price              string              `json:"price"`                // base price string
+	PromotionsByTime   []PromotionByTime   `json:"promotions_by_time"`   // promotions by time
+	PromotionsByVolume []PromotionByVolume `json:"promotions_by_volume"` // promotions by volume
+}
+
 // Pricing represents the pricing of a service binding
 type Pricing struct {
 	Price              sdk.Coins           `json:"price"`                // base price
@@ -88,35 +94,9 @@ type PromotionByVolume struct {
 	Discount sdk.Dec `json:"discount"` // discount for the promotion
 }
 
-// ParsePricing parses the given pricing string
-func ParsePricing(pricing string) (Pricing, sdk.Error) {
-	var p Pricing
-	if err := json.Unmarshal([]byte(pricing), &p); err != nil {
-		return p, ErrInvalidPricing(DefaultCodespace, fmt.Sprintf("failed to unmarshal the pricing: %s", err))
-	}
-
-	return p, nil
-}
-
-// GetPrice gets the current price by the specified volume and time
-// Note: ensure that the pricing is valid
-func GetPrice(pricing string, time time.Time, volume uint64) sdk.Coins {
-	p, _ := ParsePricing(pricing)
-
-	// get discounts
-	discountByTime := GetDiscountByTime(p.PromotionsByTime, time)
-	discountByVolume := GetDiscountByVolume(p.PromotionsByVolume, volume)
-
-	// compute the price
-	basePrice := p.Price.AmountOf(sdk.IrisAtto)
-	price := sdk.NewDecFromInt(basePrice).Mul(discountByTime).Mul(discountByVolume)
-
-	return sdk.NewCoins(sdk.NewCoin(sdk.IrisAtto, price.TruncateInt()))
-}
-
-// GetDiscountByTime gets the current discount level by the specified time
-func GetDiscountByTime(promotionsByTime []PromotionByTime, time time.Time) sdk.Dec {
-	for _, p := range promotionsByTime {
+// GetDiscountByTime gets the discount level by the specified time
+func GetDiscountByTime(pricing Pricing, time time.Time) sdk.Dec {
+	for _, p := range pricing.PromotionsByTime {
 		if (time.Equal(p.StartTime) || time.After(p.StartTime)) &&
 			(time.Equal(p.EndTime) || time.Before(p.EndTime)) {
 			return p.Discount
@@ -126,21 +106,23 @@ func GetDiscountByTime(promotionsByTime []PromotionByTime, time time.Time) sdk.D
 	return sdk.OneDec()
 }
 
-// GetDiscountByVolume gets the current discount level by the specified volume
-func GetDiscountByVolume(promotionsByVolume []PromotionByVolume, volume uint64) sdk.Dec {
-	if len(promotionsByVolume) > 0 {
-		if volume < promotionsByVolume[0].Volume {
+// GetDiscountByVolume gets the discount level by the specified volume
+func GetDiscountByVolume(pricing Pricing, volume uint64) sdk.Dec {
+	promotionsByVol := pricing.PromotionsByVolume
+
+	if len(promotionsByVol) > 0 {
+		if volume < promotionsByVol[0].Volume {
 			return sdk.OneDec()
 		}
 
-		if volume >= promotionsByVolume[len(promotionsByVolume)-1].Volume {
-			return promotionsByVolume[len(promotionsByVolume)-1].Discount
+		if volume >= promotionsByVol[len(promotionsByVol)-1].Volume {
+			return promotionsByVol[len(promotionsByVol)-1].Discount
 		}
-	}
 
-	for i, p := range promotionsByVolume {
-		if volume < p.Volume {
-			return promotionsByVolume[i-1].Discount
+		for i, p := range promotionsByVol {
+			if volume < p.Volume {
+				return promotionsByVol[i-1].Discount
+			}
 		}
 	}
 

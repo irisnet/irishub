@@ -1,7 +1,9 @@
 package keeper
 
 import (
+	"encoding/json"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/irisnet/irishub/app/v1/auth"
@@ -25,13 +27,22 @@ func (k Keeper) AddServiceBinding(
 		return types.ErrServiceBindingExists(k.codespace)
 	}
 
-	minDeposit := k.getMinDeposit(ctx, pricing)
+	parsedPricing, err := k.ParsePricing(ctx, pricing)
+	if err != nil {
+		return err
+	}
+
+	if !types.ValidServiceCoins(parsedPricing.Price) {
+		return types.ErrInvalidPricing(k.codespace, fmt.Sprintf("invalid pricing coins: %s", parsedPricing.Price))
+	}
+
+	minDeposit := k.getMinDeposit(ctx, parsedPricing)
 	if !deposit.IsAllGTE(minDeposit) {
 		return types.ErrInvalidDeposit(k.codespace, fmt.Sprintf("insufficient deposit: minimal deposit %s, %s got", minDeposit, deposit))
 	}
 
 	// Send coins from the provider's account to ServiceDepositCoinsAccAddr
-	_, err := k.bk.SendCoins(ctx, provider, auth.ServiceDepositCoinsAccAddr, deposit)
+	_, err = k.bk.SendCoins(ctx, provider, auth.ServiceDepositCoinsAccAddr, deposit)
 	if err != nil {
 		return err
 	}
@@ -41,6 +52,8 @@ func (k Keeper) AddServiceBinding(
 
 	svcBinding := types.NewServiceBinding(serviceName, provider, deposit, pricing, available, disabledTime)
 	k.SetServiceBinding(ctx, svcBinding)
+
+	k.SetPricing(ctx, serviceName, provider, parsedPricing)
 
 	return nil
 }
@@ -52,7 +65,7 @@ func (k Keeper) UpdateServiceBinding(
 	provider sdk.AccAddress,
 	deposit sdk.Coins,
 	pricing string,
-) sdk.Error {
+) (err sdk.Error) {
 	binding, found := k.GetServiceBinding(ctx, serviceName, provider)
 	if !found {
 		return types.ErrUnknownServiceBinding(k.codespace)
@@ -66,15 +79,28 @@ func (k Keeper) UpdateServiceBinding(
 		updated = true
 	}
 
+	parsedPricing := k.GetPricing(ctx, serviceName, provider)
+
 	// update the pricing
 	if len(pricing) != 0 {
+		parsedPricing, err = k.ParsePricing(ctx, pricing)
+		if err != nil {
+			return err
+		}
+
+		if !types.ValidServiceCoins(parsedPricing.Price) {
+			return types.ErrInvalidPricing(k.codespace, fmt.Sprintf("invalid pricing coins: %s", parsedPricing.Price))
+		}
+
 		binding.Pricing = pricing
+		k.SetPricing(ctx, serviceName, provider, parsedPricing)
+
 		updated = true
 	}
 
 	// only check deposit when the binding is available and updated
 	if binding.Available && updated {
-		minDeposit := k.getMinDeposit(ctx, binding.Pricing)
+		minDeposit := k.getMinDeposit(ctx, parsedPricing)
 		if !binding.Deposit.IsAllGTE(minDeposit) {
 			return types.ErrInvalidDeposit(k.codespace, fmt.Sprintf("insufficient deposit: minimal deposit %s, %s got", minDeposit, binding.Deposit))
 		}
@@ -128,7 +154,7 @@ func (k Keeper) EnableService(ctx sdk.Context, serviceName string, provider sdk.
 		binding.Deposit = binding.Deposit.Add(deposit)
 	}
 
-	minDeposit := k.getMinDeposit(ctx, binding.Pricing)
+	minDeposit := k.getMinDeposit(ctx, k.GetPricing(ctx, serviceName, provider))
 	if !binding.Deposit.IsAllGTE(minDeposit) {
 		return types.ErrInvalidDeposit(k.codespace, fmt.Sprintf("insufficient deposit: minimal deposit %s, %s got", minDeposit, binding.Deposit))
 	}
@@ -223,6 +249,78 @@ func (k Keeper) GetServiceBinding(ctx sdk.Context, serviceName string, provider 
 	return svcBinding, true
 }
 
+// ParsePricing parses the given string to Pricing
+func (k Keeper) ParsePricing(ctx sdk.Context, pricing string) (p types.Pricing, err sdk.Error) {
+	var rawPricing types.RawPricing
+	if err := json.Unmarshal([]byte(pricing), &rawPricing); err != nil {
+		return p, types.ErrInvalidPricing(k.codespace, fmt.Sprintf("failed to unmarshal the pricing: %s", err))
+	}
+
+	var coins sdk.Coins
+
+	coinStrs := strings.Split(rawPricing.Price, ",")
+	for _, coinStr := range coinStrs {
+		unitName, amtStr, _ := sdk.ParseCoinParts(coinStr)
+		if err != nil {
+			return p, types.ErrInvalidPricing(k.codespace, fmt.Sprintf("failed to parse the pricing: %s", err))
+		}
+
+		amt, err := sdk.NewDecFromStr(amtStr)
+		if err != nil {
+			return p, types.ErrInvalidPricing(k.codespace, fmt.Sprintf("failed to parse the pricing: %s", err))
+		}
+
+		if unitName == sdk.Iris {
+			coins = coins.Add(sdk.NewCoins(sdk.NewCoin(
+				sdk.IrisAtto,
+				amt.Mul(sdk.NewDecFromInt(sdk.NewIntWithDecimal(1, 18))).TruncateInt(),
+			)))
+		} else {
+			token, err := k.ak.GetToken(ctx, unitName)
+			if err != nil {
+				return p, types.ErrInvalidPricing(k.codespace, fmt.Sprintf("failed to parse the pricing: %s", err))
+			}
+
+			coins = coins.Add(sdk.NewCoins(sdk.NewCoin(
+				token.GetDenom(),
+				amt.Mul(sdk.NewDecFromInt(sdk.NewIntWithDecimal(1, int(token.GetDecimal())))).TruncateInt(),
+			)))
+		}
+	}
+
+	p.Price = coins
+	p.PromotionsByTime = rawPricing.PromotionsByTime
+	p.PromotionsByVolume = rawPricing.PromotionsByVolume
+
+	return p, nil
+}
+
+// SetPricing sets the pricing
+func (k Keeper) SetPricing(
+	ctx sdk.Context,
+	serviceName string,
+	provider sdk.AccAddress,
+	pricing types.Pricing,
+) {
+	store := ctx.KVStore(k.storeKey)
+
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(pricing)
+	store.Set(GetPricingKey(serviceName, provider), bz)
+}
+
+// GetPricing retrieves the specified pricing
+func (k Keeper) GetPricing(ctx sdk.Context, serviceName string, provider sdk.AccAddress) (pricing types.Pricing) {
+	store := ctx.KVStore(k.storeKey)
+
+	bz := store.Get(GetPricingKey(serviceName, provider))
+	if bz == nil {
+		return
+	}
+
+	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &pricing)
+	return pricing
+}
+
 // SetWithdrawAddress sets the withdrawal address for the specified provider
 func (k Keeper) SetWithdrawAddress(ctx sdk.Context, provider, withdrawAddr sdk.AccAddress) {
 	store := ctx.KVStore(k.storeKey)
@@ -292,22 +390,13 @@ func (k Keeper) IterateServiceBindings(
 	}
 }
 
-// GetBasePrice gets the base price of the given service binding
-// Note: ensure that the binding is valid
-func (k Keeper) GetBasePrice(ctx sdk.Context, binding types.ServiceBinding) sdk.Coins {
-	pricing, _ := types.ParsePricing(binding.Pricing)
-	return pricing.Price
-}
-
 // getMinDeposit gets the minimal deposit required for the service binding
-// Note: ensure that the pricing is valid
-func (k Keeper) getMinDeposit(ctx sdk.Context, pricing string) sdk.Coins {
+func (k Keeper) getMinDeposit(ctx sdk.Context, pricing types.Pricing) sdk.Coins {
 	params := k.GetParamSet(ctx)
 	minDepositMultiple := sdk.NewInt(params.MinDepositMultiple)
 	minDepositParam := params.MinDeposit
 
-	p, _ := types.ParsePricing(pricing)
-	price := p.Price.AmountOf(sdk.IrisAtto)
+	price := pricing.Price.AmountOf(sdk.IrisAtto)
 
 	// minimal deposit = max(price * minDepositMultiple, minDepositParam)
 	minDeposit := sdk.NewCoins(sdk.NewCoin(sdk.IrisAtto, price.Mul(minDepositMultiple)))

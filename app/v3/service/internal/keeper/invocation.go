@@ -351,6 +351,7 @@ func (k Keeper) InitiateRequests(
 		request := k.buildRequest(
 			ctx, requestContextID, requestContext.BatchCounter,
 			requestContext.ServiceName, provider, requestContext.SuperMode,
+			requestContext.Consumer,
 		)
 
 		requestID := types.GenerateRequestID(requestContextID, requestContext.BatchCounter, int16(providerIndex))
@@ -389,8 +390,8 @@ func (k Keeper) SkipCurrentRequestBatch(ctx sdk.Context, requestContextID cmn.He
 	k.AddRequestBatchExpiration(ctx, requestContextID, ctx.BlockHeight()+requestContext.Timeout)
 }
 
-// buildRequest builds a request for the given provider from the specified request context
-// Note: make that the binding exists
+// buildRequest builds a request to the given provider from the specified request context
+// Note: make sure that the binding exists
 func (k Keeper) buildRequest(
 	ctx sdk.Context,
 	requestContextID cmn.HexBytes,
@@ -398,12 +399,13 @@ func (k Keeper) buildRequest(
 	serviceName string,
 	provider sdk.AccAddress,
 	superMode bool,
+	consumer sdk.AccAddress,
 ) types.CompactRequest {
 	var serviceFee sdk.Coins
 
 	if !superMode {
 		binding, _ := k.GetServiceBinding(ctx, serviceName, provider)
-		serviceFee = k.GetBasePrice(ctx, binding)
+		serviceFee = k.GetPrice(ctx, consumer, binding)
 	}
 
 	request := types.NewCompactRequest(
@@ -697,6 +699,7 @@ func (k Keeper) FilterServiceProviders(
 	serviceName string,
 	providers []sdk.AccAddress,
 	serviceFeeCap sdk.Coins,
+	consumer sdk.AccAddress,
 ) ([]sdk.AccAddress, sdk.Coins) {
 	var newProviders []sdk.AccAddress
 	var totalPrices sdk.Coins
@@ -705,7 +708,7 @@ func (k Keeper) FilterServiceProviders(
 		binding, found := k.GetServiceBinding(ctx, serviceName, provider)
 
 		if found && binding.Available {
-			price := k.GetBasePrice(ctx, binding)
+			price := k.GetPrice(ctx, consumer, binding)
 
 			if price.IsAllLTE(serviceFeeCap) {
 				newProviders = append(newProviders, provider)
@@ -731,6 +734,28 @@ func (k Keeper) DeductServiceFees(ctx sdk.Context, consumer sdk.AccAddress, serv
 	}
 
 	return nil
+}
+
+// GetPrice gets the current price for the specified consumer and binding
+// Note: ensure that the binding is valid
+func (k Keeper) GetPrice(
+	ctx sdk.Context,
+	consumer sdk.AccAddress,
+	binding types.ServiceBinding,
+) sdk.Coins {
+	pricing, _ := k.ParsePricing(ctx, binding.Pricing)
+
+	// get discounts
+	discountByTime := types.GetDiscountByTime(pricing, ctx.BlockTime())
+	discountByVolume := types.GetDiscountByVolume(
+		pricing, k.GetRequestVolume(ctx, consumer, binding.ServiceName, binding.Provider),
+	)
+
+	// compute the price
+	basePrice := pricing.Price.AmountOf(sdk.IrisAtto)
+	price := sdk.NewDecFromInt(basePrice).Mul(discountByTime).Mul(discountByVolume)
+
+	return sdk.NewCoins(sdk.NewCoin(sdk.IrisAtto, price.TruncateInt()))
 }
 
 // AddResponse adds the response for the specified request ID
@@ -779,6 +804,7 @@ func (k Keeper) AddResponse(
 	k.SetResponse(ctx, reqID, response)
 
 	k.DeleteActiveRequest(ctx, request.ServiceName, provider, request.ExpirationHeight, reqID)
+	k.IncreaseRequestVolume(ctx, request.Consumer, request.ServiceName, provider)
 
 	requestContext, _ := k.GetRequestContext(ctx, requestContextID)
 	requestContext.BatchResponseCount++
@@ -883,6 +909,17 @@ func (k Keeper) GetResponseOutputs(ctx sdk.Context, requestContextID cmn.HexByte
 	}
 
 	return outputs
+}
+
+// IncreaseRequestVolume increases the request volume by 1
+func (k Keeper) IncreaseRequestVolume(
+	ctx sdk.Context,
+	consumer sdk.AccAddress,
+	serviceName string,
+	provider sdk.AccAddress,
+) {
+	currentVolume := k.GetRequestVolume(ctx, consumer, serviceName, provider)
+	k.SetRequestVolume(ctx, consumer, serviceName, provider, currentVolume+1)
 }
 
 // SetRequestVolume sets the request volume for the specified consumer and binding

@@ -11,17 +11,18 @@ var (
 	// Keys for store prefixes
 	serviceDefinitionKey   = []byte{0x01}
 	serviceBindingKey      = []byte{0x02}
-	withdrawAddrKey        = []byte{0x03}
-	requestContextKey      = []byte{0x04}
-	expiredRequestBatchKey = []byte{0x05}
-	newRequestBatchKey     = []byte{0x06}
-	requestKey             = []byte{0x07}
-	activeRequestKey       = []byte{0x08}
-	activeRequestByIDKey   = []byte{0x09}
-	responseKey            = []byte{0x10}
-	requestVolumeKey       = []byte{0x11}
-	earnedFeesKey          = []byte{0x12}
-	intraTxCounterKey      = []byte{0x13}
+	pricingKey             = []byte{0x03}
+	withdrawAddrKey        = []byte{0x04}
+	requestContextKey      = []byte{0x05}
+	expiredRequestBatchKey = []byte{0x06}
+	newRequestBatchKey     = []byte{0x07}
+	requestKey             = []byte{0x08}
+	activeRequestKey       = []byte{0x09}
+	activeRequestByIDKey   = []byte{0x10}
+	responseKey            = []byte{0x11}
+	requestVolumeKey       = []byte{0x12}
+	earnedFeesKey          = []byte{0x13}
+	intraTxCounterKey      = []byte{0x14}
 )
 
 // GetServiceDefinitionKey returns the key for the service definition with the specified name
@@ -32,6 +33,11 @@ func GetServiceDefinitionKey(name string) []byte {
 // GetServiceBindingKey returns the key for the service binding with the specified name and provider
 func GetServiceBindingKey(serviceName string, provider sdk.AccAddress) []byte {
 	return append(serviceBindingKey, getStringsKey([]string{serviceName, provider.String()})...)
+}
+
+// GetPricingKey returns the key for the pricing of the specified binding
+func GetPricingKey(serviceName string, provider sdk.AccAddress) []byte {
+	return append(pricingKey, getStringsKey([]string{serviceName, provider.String()})...)
 }
 
 // GetWithdrawAddrKey returns the key for the withdrawal address of the specified provider
