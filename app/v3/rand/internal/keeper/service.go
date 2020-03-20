@@ -77,17 +77,13 @@ func (k Keeper) HandlerResponse(ctx sdk.Context, requestContextID cmn.HexBytes, 
 			err.Error(),
 		)
 		k.DeleteOracleRandRequest(ctx, requestContextID)
-		return tags.AppendTags(
-			sdk.ErrTags(types.ModuleName, requestContextID.String(), "respond service failed"),
-		)
+		return
 	}
 
 	_, existed := k.sk.GetRequestContext(ctx, requestContextID)
 	if !existed {
 		k.DeleteOracleRandRequest(ctx, requestContextID)
-		return tags.AppendTags(
-			sdk.ErrTags(types.ModuleName, requestContextID.String(), "requestContextID has not existed"),
-		)
+		return
 	}
 
 	request, err := k.GetOracleRandRequest(ctx, requestContextID)
@@ -100,9 +96,7 @@ func (k Keeper) HandlerResponse(ctx sdk.Context, requestContextID cmn.HexBytes, 
 			err.Error(),
 		)
 		k.DeleteOracleRandRequest(ctx, requestContextID)
-		return tags.AppendTags(
-			sdk.ErrTags(types.ModuleName, requestContextID.String(), "can not find request"),
-		)
+		return
 	}
 
 	result := gjson.Get(responseOutput[0], types.ServiceValueJsonPath)
@@ -117,9 +111,7 @@ func (k Keeper) HandlerResponse(ctx sdk.Context, requestContextID cmn.HexBytes, 
 			err.Error(),
 		)
 		k.DeleteOracleRandRequest(ctx, requestContextID)
-		return tags.AppendTags(
-			sdk.ErrTags(types.ModuleName, requestContextID.String(), "invalid seed"),
-		)
+		return
 	}
 
 	currentTimestamp := ctx.BlockHeader().Time.Unix()

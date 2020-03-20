@@ -2,8 +2,6 @@ package types
 
 import (
 	"bytes"
-	"fmt"
-
 	cmn "github.com/tendermint/tendermint/libs/common"
 )
 
@@ -114,17 +112,6 @@ type Tag = cmn.KVPair
 
 // Type synonym for convenience
 type Tags cmn.KVPairs
-
-var (
-	ErrTags = func(moduleName, key, value string) Tags {
-		errKey := fmt.Sprintf("error.%s.%s", moduleName, key)
-		errValue := fmt.Sprintf("%s.value", errKey)
-		return NewTags(
-			errKey, []byte("ERROR"),
-			errValue, []byte(value),
-		)
-	}
-)
 
 // New empty tags
 func EmptyTags() Tags {

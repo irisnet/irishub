@@ -184,30 +184,22 @@ func (k Keeper) HandlerResponse(ctx sdk.Context,
 			"requestContextID", requestContextID.String(),
 			"err", err.Error(),
 		)
-		return tags.AppendTags(
-			sdk.ErrTags(types.ModuleName, requestContextID.String(), "service respond error"),
-		)
+		return
 	}
 
 	feed, found := k.GetFeedByReqCtxID(ctx, requestContextID)
 	if !found {
-		return tags.AppendTags(
-			sdk.ErrTags(types.ModuleName, requestContextID.String(), "feed has not existed"),
-		)
+		return
 	}
 
 	reqCtx, existed := k.sk.GetRequestContext(ctx, requestContextID)
 	if !existed {
-		return tags.AppendTags(
-			sdk.ErrTags(types.ModuleName, requestContextID.String(), "requestContextID has not existed"),
-		)
+		return
 	}
 
 	aggregate, err := types.GetAggregateFunc(feed.AggregateFunc)
 	if err != nil {
-		return tags.AppendTags(
-			sdk.ErrTags(types.ModuleName, requestContextID.String(), err.Error()),
-		)
+		return
 	}
 
 	var data []types.ArgsType
