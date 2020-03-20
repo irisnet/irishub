@@ -341,7 +341,7 @@ func TestKeeper_Request_Service(t *testing.T) {
 
 	requestContextID, requestContext := setRequestContext(ctx, keeper, consumer, providers, types.RUNNING, 0, "")
 
-	newProviders, totalServiceFees := keeper.FilterServiceProviders(ctx, testServiceName, providers, testServiceFeeCap)
+	newProviders, totalServiceFees := keeper.FilterServiceProviders(ctx, testServiceName, providers, testServiceFeeCap, consumer)
 	require.Equal(t, providers, newProviders)
 	require.Equal(t, "2iris", totalServiceFees.MainUnitString())
 
@@ -419,6 +419,9 @@ func TestKeeper_Respond_Service(t *testing.T) {
 	require.Equal(t, consumer, response.Consumer)
 	require.Equal(t, requestContextID, response.RequestContextID)
 	require.Equal(t, requestContext.BatchCounter, response.RequestContextBatchCounter)
+
+	volume := keeper.GetRequestVolume(ctx, consumer, requestContext.ServiceName, provider)
+	require.Equal(t, uint64(1), volume)
 
 	earnedFees, found := keeper.GetEarnedFees(ctx, provider)
 	require.True(t, found)

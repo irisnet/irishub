@@ -177,7 +177,7 @@ func (msg MsgBindService) ValidateBasic() sdk.Error {
 		return err
 	}
 
-	if !validServiceCoins(msg.Deposit) {
+	if !ValidServiceCoins(msg.Deposit) {
 		return ErrInvalidDeposit(DefaultCodespace, fmt.Sprintf("invalid deposit: %s", msg.Deposit))
 	}
 
@@ -185,7 +185,7 @@ func (msg MsgBindService) ValidateBasic() sdk.Error {
 		return ErrInvalidPricing(DefaultCodespace, "pricing missing")
 	}
 
-	return validatePricing(msg.Pricing)
+	return ValidateBindingPricing(msg.Pricing)
 }
 
 // GetSigners implements Msg.
@@ -239,12 +239,12 @@ func (msg MsgUpdateServiceBinding) ValidateBasic() sdk.Error {
 		return err
 	}
 
-	if !msg.Deposit.Empty() && !validServiceCoins(msg.Deposit) {
+	if !msg.Deposit.Empty() && !ValidServiceCoins(msg.Deposit) {
 		return ErrInvalidDeposit(DefaultCodespace, fmt.Sprintf("invalid deposit: %s", msg.Deposit))
 	}
 
 	if len(msg.Pricing) != 0 {
-		return validatePricing(msg.Pricing)
+		return ValidateBindingPricing(msg.Pricing)
 	}
 
 	return nil
@@ -395,7 +395,7 @@ func (msg MsgEnableService) ValidateBasic() sdk.Error {
 		return err
 	}
 
-	if !msg.Deposit.Empty() && !validServiceCoins(msg.Deposit) {
+	if !msg.Deposit.Empty() && !ValidServiceCoins(msg.Deposit) {
 		return ErrInvalidDeposit(DefaultCodespace, fmt.Sprintf("invalid deposit: %s", msg.Deposit))
 	}
 
@@ -921,7 +921,7 @@ func (msg MsgWithdrawTax) ValidateBasic() sdk.Error {
 		return ErrInvalidAddress(DefaultCodespace, "destination address missing")
 	}
 
-	if !validServiceCoins(msg.Amount) {
+	if !ValidServiceCoins(msg.Amount) {
 		return sdk.ErrInvalidCoins(fmt.Sprintf("invalid withdrawal amount: %s", msg.Amount))
 	}
 
@@ -986,23 +986,6 @@ func ensureServiceDefLength(msg MsgDefineService) sdk.Error {
 	return nil
 }
 
-func validatePricing(pricing string) sdk.Error {
-	if err := ValidateBindingPricing(pricing); err != nil {
-		return err
-	}
-
-	p, err := ParsePricing(pricing)
-	if err != nil {
-		return err
-	}
-
-	if !validServiceCoins(p.Price) {
-		return ErrInvalidPricing(DefaultCodespace, fmt.Sprintf("invalid pricing coins: %s", p.Price))
-	}
-
-	return nil
-}
-
 // ValidateRequest validates the request params
 func ValidateRequest(
 	serviceName string,
@@ -1018,7 +1001,7 @@ func ValidateRequest(
 		return err
 	}
 
-	if !validServiceCoins(serviceFeeCap) {
+	if !ValidServiceCoins(serviceFeeCap) {
 		return ErrInvalidServiceFee(DefaultCodespace, fmt.Sprintf("invalid service fee: %s", serviceFeeCap))
 	}
 
@@ -1071,7 +1054,7 @@ func ValidateRequestContextUpdating(
 		return err
 	}
 
-	if !serviceFeeCap.Empty() && !validServiceCoins(serviceFeeCap) {
+	if !serviceFeeCap.Empty() && !ValidServiceCoins(serviceFeeCap) {
 		return ErrInvalidServiceFee(DefaultCodespace, fmt.Sprintf("invalid service fee: %s", serviceFeeCap))
 	}
 
@@ -1104,6 +1087,6 @@ func checkDuplicateProviders(providers []sdk.AccAddress) sdk.Error {
 	return nil
 }
 
-func validServiceCoins(coins sdk.Coins) bool {
+func ValidServiceCoins(coins sdk.Coins) bool {
 	return coins.IsValidIrisAtto()
 }
