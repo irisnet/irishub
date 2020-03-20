@@ -176,27 +176,6 @@ const (
 	"description": "IRIS Hub Service Pricing Schema",
 	"type": "object",
 	"definitions": {
-	  "coin": {
-		"description": "pricing coin",
-		"type": "object",
-		"properties": {
-		  "symbol": {
-			"description": "symbol of pricing coin",
-			"type": "string",
-			"pattern": "^[a-z][a-z0-9]{2,7}$"
-		  },
-		  "amount": {
-			"description": "amount of pricing coin, in main unit",
-			"type": "string",
-			"pattern": "^[0-9]+(\\.[0-9]+)?$"
-		  }
-		},
-		"additionalProperties": false,
-		"required": [
-		  "symbol",
-		  "amount"
-		]
-	  },
 	  "discount": {
 		"description": "promotion discount",
 		"type": "number",
@@ -253,11 +232,8 @@ const (
 	"properties": {
 	  "price": {
 		"description": "base price",
-		"type": "array",
-		"items": {
-		  "$ref": "#/definitions/coin"
-		},
-		"uniqueItems": true
+		"type": "string",
+		"pattern": "[0-9]+(\\.[0-9]+)?[a-z][a-z0-9]{2,7}(,[0-9]+(\\.[0-9]+)?[a-z][a-z0-9]{2,7})*"
 	  },
 	  "promotions_by_time": {
 		"description": "promotions by time",
