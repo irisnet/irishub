@@ -140,7 +140,7 @@ func QueryResponseByTxQuery(cliCtx context.CLIContext, params service.QueryRespo
 	response service.Response, err error) {
 	var tmTags []string
 	tmTags = append(tmTags, fmt.Sprintf("%s='%s'", sdk.TagAction, service.TypeMsgRespondService))
-	tmTags = append(tmTags, fmt.Sprintf("%s='%s'", service.TagRequestContextID, params.RequestID))
+	tmTags = append(tmTags, fmt.Sprintf("%s='%s'", service.TagRequestID, params.RequestID))
 
 	result, err := tx.SearchTxs(cliCtx, cliCtx.Codec, tmTags, 1, 1)
 	if err != nil {
@@ -161,14 +161,23 @@ func QueryResponseByTxQuery(cliCtx context.CLIContext, params service.QueryRespo
 		return response, err
 	}
 
+	// query request context
+	requestContext, err := QueryRequestContext(cliCtx, service.QueryRequestContextParams{
+		RequestContextID: contextID,
+	})
+
+	if err != nil {
+		return response, err
+	}
+
 	for _, msg := range result.Txs[0].Tx.GetMsgs() {
-		if msg.Type() == service.TypeMsgRequestService {
+		if msg.Type() == service.TypeMsgRespondService {
 			responseMsg := msg.(service.MsgRespondService)
 			if responseMsg.RequestID != params.RequestID {
 				continue
 			}
 			response := service.NewResponse(
-				responseMsg.Provider, sdk.AccAddress{},
+				responseMsg.Provider, requestContext.Consumer,
 				responseMsg.Result, responseMsg.Output,
 				contextID, batchCounter,
 			)

@@ -227,7 +227,7 @@ func NewRequest(
 
 // Empty returns true if empty
 func (r Request) Empty() bool {
-	return reflect.DeepEqual(r, Request{})
+	return len(r.ID) == 0
 }
 
 // String implements Stringer
@@ -332,7 +332,7 @@ func NewResponse(
 
 // Empty returns true if empty
 func (r Response) Empty() bool {
-	return reflect.DeepEqual(r, Response{})
+	return len(r.RequestContextID) == 0
 }
 
 // String implements Stringer

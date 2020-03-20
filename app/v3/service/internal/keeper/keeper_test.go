@@ -433,7 +433,7 @@ func TestKeeper_Respond_Service(t *testing.T) {
 	require.Equal(t, types.BATCHCOMPLETED, requestContext.BatchState)
 
 	_, found = keeper.GetResponse(ctx, requestID1)
-	require.False(t, found)
+	require.True(t, found)
 
 	earnedFees, found := keeper.GetEarnedFees(ctx, provider)
 	require.True(t, found)

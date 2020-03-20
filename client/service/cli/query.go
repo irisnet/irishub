@@ -200,7 +200,7 @@ func GetCmdQueryServiceRequest(cdc *codec.Codec) *cobra.Command {
 
 			var request service.Request
 			_ = cdc.UnmarshalJSON(res, &request)
-			if len(request.ID) == 0 {
+			if request.Empty() {
 				request, err = utils.QueryRequestByTxQuery(cliCtx, params)
 				if err != nil {
 					return err
@@ -311,7 +311,7 @@ func GetCmdQueryServiceResponse(cdc *codec.Codec) *cobra.Command {
 
 			var response service.Response
 			_ = cdc.UnmarshalJSON(res, &response)
-			if len(response.RequestContextID) == 0 {
+			if response.Empty() {
 				response, err = utils.QueryResponseByTxQuery(cliCtx, params)
 				if err != nil {
 					return err

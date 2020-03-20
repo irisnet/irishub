@@ -30,10 +30,13 @@ func EndBlocker(ctx sdk.Context, k Keeper) (tags sdk.Tags) {
 	expiredRequestBatchHandler := func(requestContextID cmn.HexBytes, requestContext RequestContext) {
 		if requestContext.BatchState != BATCHCOMPLETED {
 			k.IterateActiveRequests(ctx, requestContextID, requestContext.BatchCounter, expiredRequestHandler)
-			k.CompleteBatch(ctx, requestContext, requestContextID)
+			resContext, completeTags := k.CompleteBatch(ctx, requestContext, requestContextID)
+			requestContext = resContext
+			tags = tags.AppendTags(completeTags)
 		}
 
 		k.DeleteRequestBatchExpiration(ctx, requestContextID, ctx.BlockHeight())
+		k.SetRequestContext(ctx, requestContextID, requestContext)
 
 		if requestContext.State == RUNNING {
 			if requestContext.Repeated && (requestContext.RepeatedTotal < 0 || int64(requestContext.BatchCounter) < requestContext.RepeatedTotal) {
@@ -44,7 +47,7 @@ func EndBlocker(ctx sdk.Context, k Keeper) (tags sdk.Tags) {
 			}
 		}
 
-		k.SetRequestContext(ctx, requestContextID, requestContext)
+		k.CleanBatch(ctx, requestContext, requestContextID)
 	}
 
 	providerRequests := make(map[string][]string)

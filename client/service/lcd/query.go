@@ -11,6 +11,7 @@ import (
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/app/v3/service"
 	"github.com/irisnet/irishub/client/context"
+	serviceutils "github.com/irisnet/irishub/client/service/utils"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
@@ -62,7 +63,7 @@ func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Co
 	// query a request context
 	r.HandleFunc(
 		fmt.Sprintf("/service/contexts/{%s}", RequestContextID),
-		qeuryRequestContextHandlerFn(cliCtx, cdc),
+		queryRequestContextHandlerFn(cliCtx, cdc),
 	).Methods("GET")
 
 	// query responses by the request context ID and batch counter
@@ -218,7 +219,22 @@ func queryRequestHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.Han
 			return
 		}
 
-		utils.PostProcessResponse(w, cdc, res, cliCtx.Indent)
+		var request service.Request
+		_ = cdc.UnmarshalJSON(res, &request)
+		if request.Empty() {
+			request, err = serviceutils.QueryRequestByTxQuery(cliCtx, params)
+			if err != nil {
+				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+				return
+			}
+		}
+
+		if request.Empty() {
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, fmt.Sprintf("unknown request: %s", params.RequestID))
+			return
+		}
+
+		utils.PostProcessResponse(w, cdc, request, cliCtx.Indent)
 	}
 }
 
@@ -304,11 +320,26 @@ func queryResponseHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.Ha
 			return
 		}
 
-		utils.PostProcessResponse(w, cdc, res, cliCtx.Indent)
+		var response service.Response
+		_ = cdc.UnmarshalJSON(res, &response)
+		if response.Empty() {
+			response, err = serviceutils.QueryResponseByTxQuery(cliCtx, params)
+			if err != nil {
+				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+				return
+			}
+		}
+
+		if response.Empty() {
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, fmt.Sprintf("unknown request: %s", params.RequestID))
+			return
+		}
+
+		utils.PostProcessResponse(w, cdc, response, cliCtx.Indent)
 	}
 }
 
-func qeuryRequestContextHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
+func queryRequestContextHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		requestContextIDStr := vars[RequestContextID]
@@ -323,20 +354,13 @@ func qeuryRequestContextHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) h
 			RequestContextID: requestContextID,
 		}
 
-		bz, err := cdc.MarshalJSON(params)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
-		route := fmt.Sprintf("custom/%s/%s", protocol.ServiceRoute, service.QueryRequestContext)
-		res, err := cliCtx.QueryWithData(route, bz)
+		requestContext, err := serviceutils.QueryRequestContext(cliCtx, params)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
 
-		utils.PostProcessResponse(w, cdc, res, cliCtx.Indent)
+		utils.PostProcessResponse(w, cdc, requestContext, cliCtx.Indent)
 	}
 }
 

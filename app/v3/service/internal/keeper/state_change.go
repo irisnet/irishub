@@ -18,16 +18,6 @@ func (k Keeper) CompleteBatch(ctx sdk.Context, requestContext types.RequestConte
 		k.Callback(ctx, requestContextID)
 	}
 
-	// remove all requests and responses of this batch
-	iterator := k.RequestsIteratorByReqCtx(ctx, requestContextID, requestContext.BatchCounter)
-	defer iterator.Close()
-
-	for ; iterator.Valid(); iterator.Next() {
-		requestID := iterator.Key()[1:]
-		k.DeleteCompactRequest(ctx, requestID)
-		k.DeleteResponse(ctx, requestID)
-	}
-
 	batchState := types.BatchState{
 		BatchCounter:       requestContext.BatchCounter,
 		State:              types.BATCHCOMPLETED,
@@ -43,6 +33,19 @@ func (k Keeper) CompleteBatch(ctx sdk.Context, requestContext types.RequestConte
 	))
 
 	return requestContext, tags
+}
+
+// CleanBatch cleans up all requests and responses related to the batch
+func (k Keeper) CleanBatch(ctx sdk.Context, requestContext types.RequestContext, requestContextID cmn.HexBytes) {
+	// remove all requests and responses of this batch
+	iterator := k.RequestsIteratorByReqCtx(ctx, requestContextID, requestContext.BatchCounter)
+	defer iterator.Close()
+
+	for ; iterator.Valid(); iterator.Next() {
+		requestID := iterator.Key()[1:]
+		k.DeleteCompactRequest(ctx, requestID)
+		k.DeleteResponse(ctx, requestID)
+	}
 }
 
 // CompleteServiceContext completes a running or paused context
