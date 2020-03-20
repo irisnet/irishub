@@ -50,7 +50,7 @@ func GetCmdQueryRand(cdc *codec.Codec) *cobra.Command {
 	}
 
 	cmd.Flags().AddFlagSet(FsQueryRand)
-	cmd.MarkFlagRequired(FlagReqID)
+	_ = cmd.MarkFlagRequired(FlagReqID)
 
 	return cmd
 }
@@ -60,7 +60,7 @@ func GetCmdQueryRandRequestQueue(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "query-queue",
 		Short:   "Query the random number request queue with an optional height",
-		Example: "iriscli rand query-queue --queue-height=<queue height>",
+		Example: "iriscli rand query-queue [--queue-height=<height>]",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
