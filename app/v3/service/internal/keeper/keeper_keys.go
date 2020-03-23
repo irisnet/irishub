@@ -22,7 +22,6 @@ var (
 	responseKey            = []byte{0x11}
 	requestVolumeKey       = []byte{0x12}
 	earnedFeesKey          = []byte{0x13}
-	intraTxCounterKey      = []byte{0x14}
 )
 
 // GetServiceDefinitionKey returns the key for the service definition with the specified name
