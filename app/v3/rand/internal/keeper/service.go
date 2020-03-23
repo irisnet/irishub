@@ -65,6 +65,15 @@ func (k Keeper) RequestService(ctx sdk.Context, consumer sdk.AccAddress, service
 	return requestContextID, tags, nil
 }
 
+// StartRequestContext starts the service context
+func (k Keeper) StartRequestContext(
+	ctx sdk.Context,
+	serviceContextID cmn.HexBytes,
+	consumer sdk.AccAddress,
+) sdk.Error {
+	return k.sk.StartRequestContext(ctx, serviceContextID, consumer)
+}
+
 // HandlerResponse is responsible for processing the data returned from the service module
 func (k Keeper) HandlerResponse(ctx sdk.Context, requestContextID cmn.HexBytes, responseOutput []string, err error) (tags sdk.Tags) {
 	if len(responseOutput) == 0 || err != nil {

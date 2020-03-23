@@ -43,7 +43,7 @@ func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, k Keeper) (tags s
 					),
 				)
 			} else {
-				ctx.Logger().Info(fmt.Sprintf("request service error : %s", err.Error()))
+				ctx.Logger().Info(fmt.Sprintf("start service error : %s", err.Error()))
 			}
 
 			k.DequeueRandRequest(ctx, lastBlockHeight, reqID)

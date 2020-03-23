@@ -46,12 +46,14 @@ func (r Request) String() string {
   Consumer:          %s
   TxHash:            %s
   Oracle:            %s
-  ServiceFeeCap:     %s`,
+  ServiceFeeCap:     %s
+  ServiceContextID   %s`,
 		r.Height,
 		r.Consumer.String(),
 		r.TxHash.String(),
 		strconv.FormatBool(r.Oracle),
 		r.ServiceFeeCap.String(),
+		r.ServiceContextID.String(),
 	)
 }
 
@@ -66,14 +68,7 @@ func (rs Requests) String() string {
 
 	var str string
 	for _, r := range rs {
-		str += fmt.Sprintf(
-			"Request:\n  Height: %d, Consumer: %s, TxHash: %s, Oracle: %s, ServiceFeeCap: %s\n",
-			r.Height,
-			r.Consumer.String(),
-			r.TxHash.String(),
-			strconv.FormatBool(r.Oracle),
-			r.ServiceFeeCap.String(),
-		)
+		str += r.String() + "\n"
 	}
 
 	return str
