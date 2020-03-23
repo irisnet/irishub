@@ -57,14 +57,23 @@ func (k Keeper) RequestRand(
 	oracle bool,
 	serviceFeeCap sdk.Coins,
 ) (sdk.Tags, sdk.Error) {
+	tags := sdk.NewTags()
 	currentHeight := ctx.BlockHeight()
 	destHeight := currentHeight + int64(blockInterval)
 
 	// get tx hash
 	txHash := sdk.SHA256(ctx.TxBytes())
 
+	// create paused request context
+	requestContextID, requestTags, err := k.RequestService(ctx, consumer, serviceFeeCap)
+	if err != nil {
+		return nil, err
+	}
+
+	tags = tags.AppendTags(requestTags)
+
 	// build request
-	request := types.NewRequest(currentHeight, consumer, txHash, oracle, serviceFeeCap)
+	request := types.NewRequest(currentHeight, consumer, txHash, oracle, serviceFeeCap, requestContextID)
 
 	// generate the request id
 	reqID := types.GenerateRequestID(request)
@@ -73,11 +82,11 @@ func (k Keeper) RequestRand(
 	k.EnqueueRandRequest(ctx, destHeight, reqID, request)
 
 	reqTags := sdk.NewTags(
-		types.TagReqID, []byte(hex.EncodeToString(reqID)),
+		types.TagReqID, []byte(reqID.String()),
 		types.TagRandHeight, []byte(fmt.Sprintf("%d", destHeight)),
 	)
 
-	return reqTags, nil
+	return tags.AppendTags(reqTags), nil
 }
 
 // SetRand stores the random number

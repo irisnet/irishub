@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"encoding/hex"
 	"fmt"
 	"regexp"
 	"testing"
@@ -38,7 +37,7 @@ func TestIrisCLIService(t *testing.T) {
 	serviceDesc := "test"
 	serviceTags := []string{"tag1", "tag2"}
 	authorDesc := "author"
-	serviceSchemas := `{"input":{"type":"object"},"output":{"type":"object"},"error":{"type":"object"}}`
+	serviceSchemas := `{"input":{"type":"object"},"output":{"type":"object"}}`
 	deposit := "10iris"
 	priceAmt := 1 // 1iris
 	price := fmt.Sprintf("%diris", priceAmt)
@@ -46,10 +45,11 @@ func TestIrisCLIService(t *testing.T) {
 	addedDeposit := "1iris"
 	serviceFeeCap := "10iris"
 	input := `{"pair":"iris-usdt"}`
-	timeout := int64(5)
+	timeout := int64(7)
 	repeatedFreq := uint64(20)
 	repeatedTotal := int64(10)
-	output := `{"last":100}`
+	result := `{"code":200,"message":""}`
+	output := `{"last":"100"}`
 
 	// define service
 	svcDefOutput, _ := tests.ExecuteT(t, fmt.Sprintf("iriscli service definition %s %v", serviceName, flags), "")
@@ -271,10 +271,11 @@ func TestIrisCLIService(t *testing.T) {
 
 	// respond service (foo)
 
-	fooRequestID := requestContextID + hex.EncodeToString(sdk.Uint64ToBigEndian(1)) + "0000"
+	fooRequestID := fooRequests[0].ID.String()
 
 	rsStr := fmt.Sprintf("iriscli service respond %v", flags)
 	rsStr += fmt.Sprintf(" --request-id=%s", fooRequestID)
+	rsStr += fmt.Sprintf(" --result=%s", result)
 	rsStr += fmt.Sprintf(" --data=%s", output)
 	rsStr += fmt.Sprintf(" --fee=%s", "0.4iris")
 	rsStr += fmt.Sprintf(" --from=%s", "foo")
@@ -287,8 +288,8 @@ func TestIrisCLIService(t *testing.T) {
 
 	require.Equal(t, fooAddr, fooResponse.Provider)
 	require.Equal(t, barAddr, fooResponse.Consumer)
+	require.Equal(t, result, fooResponse.Result)
 	require.Equal(t, output, fooResponse.Output)
-	require.Equal(t, "", fooResponse.Error)
 	require.Equal(t, requestContextID, fooResponse.RequestContextID.String())
 	require.Equal(t, uint64(1), fooResponse.RequestContextBatchCounter)
 
@@ -303,10 +304,11 @@ func TestIrisCLIService(t *testing.T) {
 
 	// respond service (bar)
 
-	barRequestID := requestContextID + hex.EncodeToString(sdk.Uint64ToBigEndian(1)) + "0001"
+	barRequestID := barRequests[0].ID.String()
 
 	rsStr = fmt.Sprintf("iriscli service respond %v", flags)
 	rsStr += fmt.Sprintf(" --request-id=%s", barRequestID)
+	rsStr += fmt.Sprintf(" --result=%s", result)
 	rsStr += fmt.Sprintf(" --data=%s", output)
 	rsStr += fmt.Sprintf(" --fee=%s", "0.4iris")
 	rsStr += fmt.Sprintf(" --from=%s", "bar")
@@ -319,8 +321,8 @@ func TestIrisCLIService(t *testing.T) {
 
 	require.Equal(t, barAddr, barResponse.Provider)
 	require.Equal(t, barAddr, barResponse.Consumer)
+	require.Equal(t, result, fooResponse.Result)
 	require.Equal(t, output, barResponse.Output)
-	require.Equal(t, "", barResponse.Error)
 	require.Equal(t, requestContextID, barResponse.RequestContextID.String())
 	require.Equal(t, uint64(1), barResponse.RequestContextBatchCounter)
 
@@ -339,6 +341,11 @@ func TestIrisCLIService(t *testing.T) {
 
 	require.Equal(t, fooResponse, responses[0])
 	require.Equal(t, barResponse, responses[1])
+
+	// responses has been deleted on expiration height
+	tests.WaitForHeightTM(requests[0].ExpirationHeight, port)
+	responses = executeGetServiceResponses(t, fmt.Sprintf("iriscli service responses %s %d %v", requestContextID, 1, flags))
+	require.Equal(t, 0, len(responses))
 
 	// pause the request context
 	prcStr := fmt.Sprintf("iriscli service pause %s %v", requestContextID, flags)
@@ -397,7 +404,7 @@ func TestIrisCLIService(t *testing.T) {
 	fooCoin = convertToIrisBaseAccount(t, fooAcc)
 	newFooAmt := getAmountFromCoinStr(fooCoin)
 
-	require.Equal(t, oldFooAmt+earnedFeesAmt, newFooAmt)
+	require.Equal(t, fmt.Sprintf("%.6f", oldFooAmt+earnedFeesAmt), fmt.Sprintf("%.6f", newFooAmt))
 
 	// withdraw tax
 	barAcc = executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", barAddr, flags))
@@ -417,5 +424,5 @@ func TestIrisCLIService(t *testing.T) {
 	barCoin = convertToIrisBaseAccount(t, newBarAcc)
 	newBarAmt := getAmountFromCoinStr(barCoin)
 
-	require.Equal(t, oldBarAmt+taxAmt, newBarAmt)
+	require.Equal(t, fmt.Sprintf("%.6f", oldBarAmt+taxAmt), fmt.Sprintf("%.6f", newBarAmt))
 }

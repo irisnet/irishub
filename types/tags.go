@@ -2,7 +2,6 @@ package types
 
 import (
 	"bytes"
-
 	cmn "github.com/tendermint/tendermint/libs/common"
 )
 
@@ -21,8 +20,9 @@ const (
 	GovDepositFlow              = "GovDeposit"
 	GovDepositBurnFlow          = "GovDepositBurn"
 	GovDepositRefundFlow        = "GovDepositRefund"
-	ServiceDepositFlow          = "ServiceDeposit"
-	ServiceDepositRefundFlow    = "ServiceDepositRefund"
+	ServiceDepositBurnFlow      = "ServiceDepositBurn"
+	ServiceFeeRefundFlow        = "ServiceFeeRefund"
+	ServiceFeeDeductFlow        = "ServiceFeeDeduct"
 	MintTokenFlow               = "MintToken"
 	IssueTokenFlow              = "IssueToken"
 	CoinSwapInputFlow           = "CoinSwapInput"
@@ -168,3 +168,12 @@ var (
 	TagRewardFromValidator = "withdraw-reward-from-validator-%s"
 	TagRewardCommission    = "withdraw-reward-commission"
 )
+
+// ActionTag appends action and all tagKeys
+func ActionTag(action string, tagKeys ...string) string {
+	tag := action
+	for _, key := range tagKeys {
+		tag = tag + "." + key
+	}
+	return tag
+}

@@ -138,6 +138,31 @@ type InfoCoinFlow struct {
 	CoinFlow  []string          `json:"coin_flow"`
 }
 
+// QueryTx returns the tx info
+func QueryTx(cliCtx context.CLIContext, hash []byte) (Info, error) {
+	node, err := cliCtx.GetNode()
+	if err != nil {
+		return Info{}, err
+	}
+
+	res, err := node.Tx(hash, !cliCtx.TrustNode)
+	if err != nil {
+		return Info{}, err
+	}
+
+	if !cliCtx.TrustNode {
+		err := ValidateTxResult(cliCtx, res)
+		if err != nil {
+			return Info{}, err
+		}
+	}
+	resBlocks, err := getBlocksForTxResults(cliCtx, []*ctypes.ResultTx{res})
+	if err != nil {
+		return Info{}, err
+	}
+	return formatTxResult(cliCtx.Codec, res, resBlocks[res.Height])
+}
+
 func queryTxWithCoinFlow(cdc *codec.Codec, cliCtx context.CLIContext, hashHexStr string) ([]byte, error) {
 	hash, err := hex.DecodeString(hashHexStr)
 	if err != nil {

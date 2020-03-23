@@ -3,9 +3,10 @@ package protocol
 import (
 	"encoding/json"
 
+	tmtypes "github.com/tendermint/tendermint/types"
+
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
-	tmtypes "github.com/tendermint/tendermint/types"
 )
 
 type Protocol interface {

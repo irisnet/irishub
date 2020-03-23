@@ -56,7 +56,13 @@ func handleMsgDefineService(ctx sdk.Context, k Keeper, msg MsgDefineService) sdk
 		return err.Result()
 	}
 
-	return sdk.Result{}
+	tags := sdk.NewTags(
+		TagAuthor, []byte(msg.Author.String()),
+	)
+
+	return sdk.Result{
+		Tags: tags,
+	}
 }
 
 // handleMsgBindService handles MsgBindService
@@ -68,7 +74,13 @@ func handleMsgBindService(ctx sdk.Context, k Keeper, msg MsgBindService) sdk.Res
 		return err.Result()
 	}
 
-	return sdk.Result{}
+	tags := sdk.NewTags(
+		TagProvider, []byte(msg.Provider.String()),
+	)
+
+	return sdk.Result{
+		Tags: tags,
+	}
 }
 
 // handleMsgUpdateServiceBinding handles MsgUpdateServiceBinding
@@ -80,14 +92,26 @@ func handleMsgUpdateServiceBinding(ctx sdk.Context, k Keeper, msg MsgUpdateServi
 		return err.Result()
 	}
 
-	return sdk.Result{}
+	tags := sdk.NewTags(
+		TagProvider, []byte(msg.Provider.String()),
+	)
+
+	return sdk.Result{
+		Tags: tags,
+	}
 }
 
 // handleMsgSetWithdrawAddress handles MsgSetWithdrawAddress
 func handleMsgSetWithdrawAddress(ctx sdk.Context, k Keeper, msg MsgSetWithdrawAddress) sdk.Result {
 	k.SetWithdrawAddress(ctx, msg.Provider, msg.WithdrawAddress)
 
-	return sdk.Result{}
+	tags := sdk.NewTags(
+		TagProvider, []byte(msg.Provider.String()),
+	)
+
+	return sdk.Result{
+		Tags: tags,
+	}
 }
 
 // handleMsgDisableService handles MsgDisableService
@@ -96,7 +120,13 @@ func handleMsgDisableService(ctx sdk.Context, k Keeper, msg MsgDisableService) s
 		return err.Result()
 	}
 
-	return sdk.Result{}
+	tags := sdk.NewTags(
+		TagProvider, []byte(msg.Provider.String()),
+	)
+
+	return sdk.Result{
+		Tags: tags,
+	}
 }
 
 // handleMsgEnableService handles MsgEnableService
@@ -105,7 +135,13 @@ func handleMsgEnableService(ctx sdk.Context, k Keeper, msg MsgEnableService) sdk
 		return err.Result()
 	}
 
-	return sdk.Result{}
+	tags := sdk.NewTags(
+		TagProvider, []byte(msg.Provider.String()),
+	)
+
+	return sdk.Result{
+		Tags: tags,
+	}
 }
 
 // handleMsgRefundServiceDeposit handles MsgRefundServiceDeposit
@@ -114,22 +150,23 @@ func handleMsgRefundServiceDeposit(ctx sdk.Context, k Keeper, msg MsgRefundServi
 		return err.Result()
 	}
 
-	return sdk.Result{}
+	tags := sdk.NewTags(
+		TagProvider, []byte(msg.Provider.String()),
+	)
+
+	return sdk.Result{
+		Tags: tags,
+	}
 }
 
 // handleMsgRequestService handles MsgRequestService
 func handleMsgRequestService(ctx sdk.Context, k Keeper, msg MsgRequestService) sdk.Result {
-	requestContextID, err := k.CreateRequestContext(
+	_, tags, err := k.CreateRequestContext(
 		ctx, msg.ServiceName, msg.Providers, msg.Consumer, msg.Input, msg.ServiceFeeCap, msg.Timeout,
 		msg.SuperMode, msg.Repeated, msg.RepeatedFrequency, msg.RepeatedTotal, RUNNING, 0, "")
 	if err != nil {
 		return err.Result()
 	}
-
-	tags := sdk.NewTags(
-		TagRequestContextID, []byte(requestContextID.String()),
-		TagConsumer, []byte(msg.Consumer.String()),
-	)
 
 	return sdk.Result{
 		Tags: tags,
@@ -138,17 +175,19 @@ func handleMsgRequestService(ctx sdk.Context, k Keeper, msg MsgRequestService) s
 
 // handleMsgRespondService handles MsgRespondService
 func handleMsgRespondService(ctx sdk.Context, k Keeper, msg MsgRespondService) sdk.Result {
-	request, response, err := k.AddResponse(ctx, msg.RequestID, msg.Provider, msg.Output, msg.Error)
+	request, response, tags, err := k.AddResponse(ctx, msg.RequestID, msg.Provider, msg.Result, msg.Output)
 	if err != nil {
 		return err.Result()
 	}
 
-	tags := sdk.NewTags(
-		TagRequestID, []byte(msg.RequestID),
-		TagRequestContextID, []byte(request.RequestContextID.String()),
-		TagConsumer, []byte(response.Consumer.String()),
-		TagProvider, []byte(response.Provider.String()),
-		TagServiceName, []byte(request.ServiceName),
+	tags = tags.AppendTags(
+		sdk.NewTags(
+			TagRequestID, []byte(msg.RequestID),
+			TagRequestContextID, []byte(request.RequestContextID.String()),
+			TagConsumer, []byte(response.Consumer.String()),
+			TagProvider, []byte(response.Provider.String()),
+			TagServiceName, []byte(request.ServiceName),
+		),
 	)
 
 	return sdk.Result{
@@ -158,33 +197,67 @@ func handleMsgRespondService(ctx sdk.Context, k Keeper, msg MsgRespondService) s
 
 // handleMsgPauseRequestContext handles MsgPauseRequestContext
 func handleMsgPauseRequestContext(ctx sdk.Context, k Keeper, msg MsgPauseRequestContext) sdk.Result {
+	if err := k.CheckAuthority(ctx, msg.Consumer, msg.RequestContextID, true); err != nil {
+		return err.Result()
+	}
+
 	if err := k.PauseRequestContext(ctx, msg.RequestContextID, msg.Consumer); err != nil {
 		return err.Result()
 	}
 
-	return sdk.Result{}
+	tags := sdk.NewTags(
+		TagConsumer, []byte(msg.Consumer.String()),
+	)
+
+	return sdk.Result{
+		Tags: tags,
+	}
 }
 
 // handleMsgStartRequestContext handles MsgStartRequestContext
 func handleMsgStartRequestContext(ctx sdk.Context, k Keeper, msg MsgStartRequestContext) sdk.Result {
+	if err := k.CheckAuthority(ctx, msg.Consumer, msg.RequestContextID, true); err != nil {
+		return err.Result()
+	}
+
 	if err := k.StartRequestContext(ctx, msg.RequestContextID, msg.Consumer); err != nil {
 		return err.Result()
 	}
 
-	return sdk.Result{}
+	tags := sdk.NewTags(
+		TagConsumer, []byte(msg.Consumer.String()),
+	)
+
+	return sdk.Result{
+		Tags: tags,
+	}
 }
 
 // handleMsgKillRequestContext handles MsgKillRequestContext
 func handleMsgKillRequestContext(ctx sdk.Context, k Keeper, msg MsgKillRequestContext) sdk.Result {
+	if err := k.CheckAuthority(ctx, msg.Consumer, msg.RequestContextID, true); err != nil {
+		return err.Result()
+	}
+
 	if err := k.KillRequestContext(ctx, msg.RequestContextID, msg.Consumer); err != nil {
 		return err.Result()
 	}
 
-	return sdk.Result{}
+	tags := sdk.NewTags(
+		TagConsumer, []byte(msg.Consumer.String()),
+	)
+
+	return sdk.Result{
+		Tags: tags,
+	}
 }
 
 // handleMsgUpdateRequestContext handles MsgUpdateRequestContext
 func handleMsgUpdateRequestContext(ctx sdk.Context, k Keeper, msg MsgUpdateRequestContext) sdk.Result {
+	if err := k.CheckAuthority(ctx, msg.Consumer, msg.RequestContextID, true); err != nil {
+		return err.Result()
+	}
+
 	if err := k.UpdateRequestContext(
 		ctx, msg.RequestContextID, msg.Providers, msg.ServiceFeeCap,
 		msg.Timeout, msg.RepeatedFrequency, msg.RepeatedTotal, msg.Consumer,
@@ -192,7 +265,13 @@ func handleMsgUpdateRequestContext(ctx sdk.Context, k Keeper, msg MsgUpdateReque
 		return err.Result()
 	}
 
-	return sdk.Result{}
+	tags := sdk.NewTags(
+		TagConsumer, []byte(msg.Consumer.String()),
+	)
+
+	return sdk.Result{
+		Tags: tags,
+	}
 }
 
 // handleMsgWithdrawEarnedFees handles MsgWithdrawEarnedFees
@@ -201,7 +280,13 @@ func handleMsgWithdrawEarnedFees(ctx sdk.Context, k Keeper, msg MsgWithdrawEarne
 		return err.Result()
 	}
 
-	return sdk.Result{}
+	tags := sdk.NewTags(
+		TagProvider, []byte(msg.Provider.String()),
+	)
+
+	return sdk.Result{
+		Tags: tags,
+	}
 }
 
 // handleMsgWithdrawTax handles MsgWithdrawTax

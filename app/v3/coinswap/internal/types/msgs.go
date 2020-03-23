@@ -13,8 +13,8 @@ var (
 )
 
 const (
-	FormatUniABSPrefix = sdk.FormatUniABSPrefix
-	FormatUniId        = FormatUniABSPrefix + "%s"
+	LiquidityVoucherPrefix = sdk.LiquidityVoucherPrefix
+	FormatVoucherCoinName  = LiquidityVoucherPrefix + "%s"
 )
 
 /* --------------------------------------------------------------------------- */
@@ -47,7 +47,6 @@ type MsgSwapOrder struct {
 func NewMsgSwapOrder(
 	input Input, output Output, deadline int64, isBuyOrder bool,
 ) MsgSwapOrder {
-
 	return MsgSwapOrder{
 		Input:      input,
 		Output:     output,
@@ -67,13 +66,13 @@ func (msg MsgSwapOrder) ValidateBasic() sdk.Error {
 	if !(msg.Input.Coin.IsValid() && msg.Input.Coin.IsPositive()) {
 		return sdk.ErrInvalidCoins("input coin is invalid: " + msg.Input.Coin.String())
 	}
-	if strings.HasPrefix(msg.Input.Coin.Denom, FormatUniABSPrefix) {
+	if strings.HasPrefix(msg.Input.Coin.Denom, LiquidityVoucherPrefix) {
 		return sdk.ErrInvalidCoins("unsupported input coin type: " + msg.Input.Coin.String())
 	}
 	if !(msg.Output.Coin.IsValid() && msg.Output.Coin.IsPositive()) {
 		return sdk.ErrInvalidCoins("output coin is invalid: " + msg.Output.Coin.String())
 	}
-	if strings.HasPrefix(msg.Output.Coin.Denom, FormatUniABSPrefix) {
+	if strings.HasPrefix(msg.Output.Coin.Denom, LiquidityVoucherPrefix) {
 		return sdk.ErrInvalidCoins("unsupported output coin type: " + msg.Output.Coin.String())
 	}
 	if msg.Input.Coin.Denom == msg.Output.Coin.Denom {
@@ -105,8 +104,8 @@ func (msg MsgSwapOrder) GetSigners() []sdk.AccAddress {
 // MsgAddLiquidity - struct for adding liquidity to a reserve pool
 type MsgAddLiquidity struct {
 	MaxToken     sdk.Coin       `json:"max_token"`      // coin to be deposited as liquidity with an upper bound for its amount
-	ExactIrisAmt sdk.Int        `json:"exact_iris_amt"` // exact amount of native asset being add to the liquidity pool
-	MinLiquidity sdk.Int        `json:"min_liquidity"`  // lower bound UNI sender is willing to accept for deposited coins
+	ExactIrisAmt sdk.Int        `json:"exact_iris_amt"` // exact amount of native token to be added to the liquidity pool
+	MinLiquidity sdk.Int        `json:"min_liquidity"`  // lower bound the liquidity voucher sender is willing to accept for deposited coins
 	Deadline     int64          `json:"deadline"`
 	Sender       sdk.AccAddress `json:"sender"`
 }
@@ -116,7 +115,6 @@ func NewMsgAddLiquidity(
 	maxToken sdk.Coin, exactIrisAmt, minLiquidity sdk.Int,
 	deadline int64, sender sdk.AccAddress,
 ) MsgAddLiquidity {
-
 	return MsgAddLiquidity{
 		MaxToken:     maxToken,
 		ExactIrisAmt: exactIrisAmt,
@@ -140,7 +138,7 @@ func (msg MsgAddLiquidity) ValidateBasic() sdk.Error {
 	if msg.MaxToken.Denom == sdk.IrisAtto {
 		return sdk.ErrInvalidCoins("max token must be non-iris token")
 	}
-	if strings.HasPrefix(msg.MaxToken.Denom, FormatUniABSPrefix) {
+	if strings.HasPrefix(msg.MaxToken.Denom, LiquidityVoucherPrefix) {
 		return sdk.ErrInvalidCoins("max token must be non-liquidity token")
 	}
 	if msg.ExactIrisAmt.IsNil() || !msg.ExactIrisAmt.IsPositive() {
@@ -186,7 +184,6 @@ func NewMsgRemoveLiquidity(
 	minToken sdk.Int, withdrawLiquidity sdk.Coin, minIrisAmt sdk.Int,
 	deadline int64, sender sdk.AccAddress,
 ) MsgRemoveLiquidity {
-
 	return MsgRemoveLiquidity{
 		MinToken:          minToken,
 		WithdrawLiquidity: withdrawLiquidity,
@@ -210,7 +207,7 @@ func (msg MsgRemoveLiquidity) ValidateBasic() sdk.Error {
 	if !msg.WithdrawLiquidity.IsValid() || !msg.WithdrawLiquidity.IsPositive() {
 		return ErrNotPositive("withdraw liquidity is not valid: " + msg.WithdrawLiquidity.String())
 	}
-	if err := CheckUniDenom(msg.WithdrawLiquidity.Denom); err != nil {
+	if err := CheckVoucherDenom(msg.WithdrawLiquidity.Denom); err != nil {
 		return err
 	}
 	if msg.MinIrisAmt.IsNil() || msg.MinIrisAmt.IsNegative() {

@@ -14,7 +14,7 @@ func TestKeeper_service_Definition(t *testing.T) {
 	mapp.BeginBlock(abci.RequestBeginBlock{})
 	ctx := mapp.BaseApp.NewContext(false, abci.Header{})
 
-	coin, _ := sdk.IrisCoinType.ConvertToMinDenomCoin("1100iris")
+	coin, _ := sdk.IrisCoinType.ConvertToCoin("1100iris")
 	keeper.ck.AddCoins(ctx, addrs[1], sdk.Coins{coin})
 
 	serviceDef := NewSvcDef("myService",
@@ -49,15 +49,15 @@ func TestKeeper_service_Definition(t *testing.T) {
 	}
 
 	// test binding
-	deposit, _ := sdk.IrisCoinType.ConvertToMinDenomCoin("1000iris")
-	price, _ := sdk.IrisCoinType.ConvertToMinDenomCoin("1iris")
+	deposit, _ := sdk.IrisCoinType.ConvertToCoin("1000iris")
+	price, _ := sdk.IrisCoinType.ConvertToCoin("1iris")
 	svcBinding := NewSvcBinding(ctx, "testnet", "myService", "testnet",
 		addrs[1], Global, sdk.Coins{deposit}, []sdk.Coin{price},
 		Level{AvgRspTime: 10000, UsableTime: 9999}, true)
 	err := keeper.AddServiceBinding(ctx, svcBinding)
 	require.NoError(t, err)
 
-	coin, _ = sdk.IrisCoinType.ConvertToMinDenomCoin("100iris")
+	coin, _ = sdk.IrisCoinType.ConvertToCoin("100iris")
 	require.True(t, keeper.ck.HasCoins(ctx, addrs[1], sdk.Coins{coin}))
 
 	gotSvcBinding, found := keeper.GetServiceBinding(ctx, svcBinding.DefChainID, svcBinding.DefName, svcBinding.BindChainID, svcBinding.Provider)
@@ -84,7 +84,7 @@ func TestKeeper_service_Call(t *testing.T) {
 	mapp.BeginBlock(abci.RequestBeginBlock{})
 	ctx := mapp.BaseApp.NewContext(false, abci.Header{})
 
-	coin, _ := sdk.IrisCoinType.ConvertToMinDenomCoin("1100iris")
+	coin, _ := sdk.IrisCoinType.ConvertToCoin("1100iris")
 	keeper.ck.AddCoins(ctx, addrs[1], sdk.Coins{coin})
 	keeper.ck.AddCoins(ctx, addrs[2], sdk.Coins{coin})
 
@@ -98,8 +98,8 @@ func TestKeeper_service_Call(t *testing.T) {
 
 	keeper.AddServiceDefinition(ctx, serviceDef)
 
-	deposit, _ := sdk.IrisCoinType.ConvertToMinDenomCoin("1000iris")
-	price, _ := sdk.IrisCoinType.ConvertToMinDenomCoin("1iris")
+	deposit, _ := sdk.IrisCoinType.ConvertToCoin("1000iris")
+	price, _ := sdk.IrisCoinType.ConvertToCoin("1iris")
 	svcBinding := NewSvcBinding(ctx, "testnet", "myService", "testnet",
 		addrs[1], Global, sdk.Coins{deposit}, []sdk.Coin{price},
 		Level{AvgRspTime: 10000, UsableTime: 9999}, true)

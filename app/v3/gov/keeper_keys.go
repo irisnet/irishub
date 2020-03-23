@@ -46,36 +46,48 @@ func KeyVotesSubspace(proposalID uint64) []byte {
 
 // Returns the key for a proposalID in the activeProposalQueue
 func PrefixActiveProposalQueueTime(endTime time.Time) []byte {
-	return bytes.Join([][]byte{
-		PrefixActiveProposalQueue,
-		sdk.FormatTimeBytes(endTime),
-	}, KeyDelimiter)
+	return bytes.Join(
+		[][]byte{
+			PrefixActiveProposalQueue,
+			sdk.FormatTimeBytes(endTime),
+		},
+		KeyDelimiter,
+	)
 }
 
 // Returns the key for a proposalID in the activeProposalQueue
 func KeyActiveProposalQueueProposal(endTime time.Time, proposalID uint64) []byte {
-	return bytes.Join([][]byte{
-		PrefixActiveProposalQueue,
-		sdk.FormatTimeBytes(endTime),
-		sdk.Uint64ToBigEndian(proposalID),
-	}, KeyDelimiter)
+	return bytes.Join(
+		[][]byte{
+			PrefixActiveProposalQueue,
+			sdk.FormatTimeBytes(endTime),
+			sdk.Uint64ToBigEndian(proposalID),
+		},
+		KeyDelimiter,
+	)
 }
 
 // Returns the key for a proposalID in the activeProposalQueue
 func PrefixInactiveProposalQueueTime(endTime time.Time) []byte {
-	return bytes.Join([][]byte{
-		PrefixInactiveProposalQueue,
-		sdk.FormatTimeBytes(endTime),
-	}, KeyDelimiter)
+	return bytes.Join(
+		[][]byte{
+			PrefixInactiveProposalQueue,
+			sdk.FormatTimeBytes(endTime),
+		},
+		KeyDelimiter,
+	)
 }
 
 // Returns the key for a proposalID in the activeProposalQueue
 func KeyInactiveProposalQueueProposal(endTime time.Time, proposalID uint64) []byte {
-	return bytes.Join([][]byte{
-		PrefixInactiveProposalQueue,
-		sdk.FormatTimeBytes(endTime),
-		sdk.Uint64ToBigEndian(proposalID),
-	}, KeyDelimiter)
+	return bytes.Join(
+		[][]byte{
+			PrefixInactiveProposalQueue,
+			sdk.FormatTimeBytes(endTime),
+			sdk.Uint64ToBigEndian(proposalID),
+		},
+		KeyDelimiter,
+	)
 }
 
 // Key for getting a the next available proposalID from the store
@@ -88,5 +100,11 @@ var (
 )
 
 func KeyValidatorSet(proposalID uint64) []byte {
-	return bytes.Join([][]byte{PrefixValidatorSet, sdk.Uint64ToBigEndian(proposalID)}, KeyDelimiter)
+	return bytes.Join(
+		[][]byte{
+			PrefixValidatorSet,
+			sdk.Uint64ToBigEndian(proposalID),
+		},
+		KeyDelimiter,
+	)
 }

@@ -20,16 +20,22 @@ iriscli rand request-rand <flags>
 
 **Flags:**
 
-| Name, shorthand  | Type   | Required | Default | Description                                                                  |
-| ---------------- | ------ | -------- | ------- | ---------------------------------------------------------------------------- |
-| --block-interval | uint64 |          | 10      | The block interval after which the requested random number will be generated |
+| Name, shorthand   | Type   | Required | Default | Description                                                                  |
+| ----------------- | ------ | -------- | ------- | ---------------------------------------------------------------------------- |
+| --block-interval  | uint64 | true     | 10      | The block interval after which the requested random number will be generated |
+| --oracle          | bool   |          | false   | Whether to use the oracle method                                             |
+| --service-fee-cap | string |          | ""      | Max service fee, required if "oracle" is true                                |
 
 ### Request a random number
 
 Post a random number request to the IRIS Hub, the random number will be generated after `--block-interval` blocks.
 
 ```bash
+# without oracle
 iriscli rand request-rand --block-interval=100 --from=<key-name> --chain-id=irishub --fee=0.3iris --commit
+
+# with oracle
+iriscli rand request-rand --block-interval=100 --oracle=true --service-fee-cap=1iris --from=<key-name> --chain-id=irishub --fee=0.3iris --commit
 ```
 
 :::tip
@@ -74,7 +80,7 @@ iriscli rand query-queue <flags>
 
 ### Query random number request queue
 
-Query the pending random number requests with an optional block height at which random numbers will be generated.
+Query the pending random number requests with an optional block height at which random numbers will be generated or request service.
 
 ```bash
 iriscli rand query-queue --queue-height=100000

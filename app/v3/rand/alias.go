@@ -19,19 +19,21 @@ type (
 
 // exported consts
 const (
-	ServiceName           = types.ModuleName
+	ModuleName            = types.ModuleName
 	DefaultCodespace      = types.DefaultCodespace
 	DefaultBlockInterval  = types.DefaultBlockInterval
 	RandPrec              = types.RandPrec
 	QueryRand             = types.QueryRand
 	QueryRandRequestQueue = types.QueryRandRequestQueue
+	ModuleServiceName     = types.ServiceName
 )
 
 // exported variables and functions
 var (
-	TagReqID      = types.TagReqID
-	TagRandHeight = types.TagRandHeight
-	TagRand       = types.TagRand
+	TagReqID            = types.TagReqID
+	TagRequestContextID = types.TagRequestContextID
+	TagRandHeight       = types.TagRandHeight
+	TagRand             = types.TagRand
 
 	RegisterCodec     = types.RegisterCodec
 	NewMsgRequestRand = types.NewMsgRequestRand
@@ -40,6 +42,7 @@ var (
 	MakePRNG          = types.MakePRNG
 	GenerateRequestID = types.GenerateRequestID
 	CheckReqID        = types.CheckReqID
+	GetSvcDefinitions = types.GetSvcDefinitions
 	NewKeeper         = keeper.NewKeeper
 	NewQuerier        = keeper.NewQuerier
 )

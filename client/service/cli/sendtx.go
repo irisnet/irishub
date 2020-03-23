@@ -459,8 +459,7 @@ func GetCmdRespondService(cdc *codec.Codec) *cobra.Command {
 		Use:   "respond",
 		Short: "Respond to a service request",
 		Example: "iriscli service respond --chain-id=<chain-id> --from=<key name> --fee=0.3iris " +
-			"--request-id=<request-id> --data=<output content or path> --error=<err msg content or path>",
-		PreRunE: preCheckResponseCmd,
+			"--request-id=<request-id> --result=<result content or path> --data=<output content or path>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
@@ -474,9 +473,13 @@ func GetCmdRespondService(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			requestID := viper.GetString(FlagRequestID)
+			requestIDStr := viper.GetString(FlagRequestID)
+			requestID, err := service.ConvertRequestID(requestIDStr)
+			if err != nil {
+				return err
+			}
+			result := viper.GetString(FlagResult)
 			output := viper.GetString(FlagData)
-			errMsg := viper.GetString(FlagError)
 
 			if len(output) > 0 {
 				if !json.Valid([]byte(output)) {
@@ -500,29 +503,29 @@ func GetCmdRespondService(cdc *codec.Codec) *cobra.Command {
 				output = buf.String()
 			}
 
-			if len(errMsg) > 0 {
-				if !json.Valid([]byte(errMsg)) {
-					errMsgContent, err := ioutil.ReadFile(errMsg)
+			if len(result) > 0 {
+				if !json.Valid([]byte(result)) {
+					resultContent, err := ioutil.ReadFile(result)
 					if err != nil {
-						return fmt.Errorf("invalid err msg: neither JSON input nor path to .json file were provided")
+						return fmt.Errorf("invalid result: neither JSON input nor path to .json file were provided")
 					}
 
-					if !json.Valid(errMsgContent) {
-						return fmt.Errorf("invalid err msg: .json file content is invalid JSON")
+					if !json.Valid(resultContent) {
+						return fmt.Errorf("invalid result: .json file content is invalid JSON")
 					}
 
-					errMsg = string(errMsgContent)
+					result = string(resultContent)
 				}
 
 				buf := bytes.NewBuffer([]byte{})
-				if err := json.Compact(buf, []byte(errMsg)); err != nil {
-					return fmt.Errorf("failed to compact the err msg")
+				if err := json.Compact(buf, []byte(result)); err != nil {
+					return fmt.Errorf("failed to compact the result")
 				}
 
-				errMsg = buf.String()
+				result = buf.String()
 			}
 
-			msg := service.NewMsgRespondService(requestID, provider, output, errMsg)
+			msg := service.NewMsgRespondService(requestID, provider, result, output)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -533,6 +536,7 @@ func GetCmdRespondService(cdc *codec.Codec) *cobra.Command {
 
 	cmd.Flags().AddFlagSet(FsServiceRespond)
 	_ = cmd.MarkFlagRequired(FlagRequestID)
+	_ = cmd.MarkFlagRequired(FlagResult)
 
 	return cmd
 }
@@ -783,14 +787,4 @@ func GetCmdWithdrawTax(cdc *codec.Codec) *cobra.Command {
 	}
 
 	return cmd
-}
-
-func preCheckResponseCmd(cmd *cobra.Command, _ []string) error {
-	// make sure either the data or error is provided
-	flags := cmd.Flags()
-	if flags.Changed(FlagData) && flags.Changed(FlagError) {
-		return fmt.Errorf("only one flag is allowed among the data and error")
-	}
-
-	return nil
 }

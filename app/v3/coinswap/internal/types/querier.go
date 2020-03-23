@@ -1,6 +1,8 @@
 package types
 
-import "github.com/irisnet/irishub/types"
+import (
+	"github.com/irisnet/irishub/types"
+)
 
 const (
 	// QueryLiquidity liquidity query endpoint supported by the coinswap querier
@@ -9,7 +11,7 @@ const (
 
 // QueryLiquidityParams is the query parameters for 'custom/swap/liquidity'
 type QueryLiquidityParams struct {
-	Id string
+	VoucherCoinName string
 }
 
 // QueryLiquidityResponse is the query response for 'custom/swap/liquidity'

@@ -7,6 +7,8 @@ import (
 
 // nolint
 const (
+	TypeMsgRequestService = types.TypeMsgRequestService
+	TypeMsgRespondService = types.TypeMsgRespondService
 	DefaultParamSpace     = types.DefaultParamSpace
 	DefaultCodespace      = types.DefaultCodespace
 	MsgRoute              = types.MsgRoute
@@ -32,9 +34,16 @@ const (
 // nolint
 var (
 	// variables and functions aliases
+	TagAuthor                  = types.TagAuthor
 	TagServiceName             = types.TagServiceName
 	TagProvider                = types.TagProvider
 	TagConsumer                = types.TagConsumer
+	ActionCreateContext        = types.ActionCreateContext
+	ActionPauseContext         = types.ActionPauseContext
+	ActionCompleteContext      = types.ActionCompleteContext
+	ActionNewBatch             = types.ActionNewBatch
+	ActionNewBatchRequest      = types.ActionNewBatchRequest
+	ActionCompleteBatch        = types.ActionCompleteBatch
 	TagRequestContextID        = types.TagRequestContextID
 	TagRequestID               = types.TagRequestID
 	TagSlashedCoins            = types.TagSlashedCoins
@@ -68,7 +77,12 @@ var (
 	NewMsgUpdateRequestContext = types.NewMsgUpdateRequestContext
 	NewMsgWithdrawEarnedFees   = types.NewMsgWithdrawEarnedFees
 	NewMsgWithdrawTax          = types.NewMsgWithdrawTax
+	NewRequestContext          = types.NewRequestContext
 	ConvertRequestID           = types.ConvertRequestID
+	GenerateRequestContextID   = types.GenerateRequestContextID
+	GenerateRequestID          = types.GenerateRequestID
+	SplitRequestContextID      = types.SplitRequestContextID
+	SplitRequestID             = types.SplitRequestID
 )
 
 // nolint

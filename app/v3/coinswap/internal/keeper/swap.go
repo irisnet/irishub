@@ -8,54 +8,56 @@ import (
 )
 
 func (k Keeper) swapCoins(ctx sdk.Context, sender, recipient sdk.AccAddress, coinSold, coinBought sdk.Coin) sdk.Error {
-	uniID, err := types.GetUniID(coinSold.Denom, coinBought.Denom)
+	voucherCoinName, err := types.GetVoucherCoinName(coinSold.Denom, coinBought.Denom)
 	if err != nil {
 		return err
 	}
 
-	if err := k.SendCoinsFromAccountToPool(ctx, sender, uniID, sdk.NewCoins(coinSold)); err != nil {
+	if err := k.SendCoinsFromAccountToPool(ctx, sender, voucherCoinName, sdk.NewCoins(coinSold)); err != nil {
 		return err
 	}
-	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, sender.String(), uniID, coinSold.String(), sdk.CoinSwapInputFlow, "")
+	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, sender.String(), voucherCoinName, coinSold.String(), sdk.CoinSwapInputFlow, "")
 
 	if recipient.Empty() {
 		recipient = sender
 	}
 
-	if err := k.SendCoinsFromPoolToAccount(ctx, recipient, uniID, sdk.NewCoins(coinBought)); err != nil {
+	if err := k.SendCoinsFromPoolToAccount(ctx, recipient, voucherCoinName, sdk.NewCoins(coinBought)); err != nil {
 		return err
 	}
-	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, uniID, recipient.String(), coinBought.String(), sdk.CoinSwapOutputFlow, "")
+	ctx.CoinFlowTags().AppendCoinFlowTag(ctx, voucherCoinName, recipient.String(), coinBought.String(), sdk.CoinSwapOutputFlow, "")
+
 	return nil
 }
 
 /**
 Calculate the amount of another token to be received based on the exact amount of tokens sold
 @param exactSoldCoin : sold coin
-@param soldTokenDenom : received token's denom
-@return : token amount that will to be received
+@param soldTokenDenom : denom of the token to be received
+@return : amount of the token to be received
 */
 func (k Keeper) calculateWithExactInput(ctx sdk.Context, exactSoldCoin sdk.Coin, boughtTokenDenom string) (sdk.Int, sdk.Error) {
-	uniId, err := types.GetUniID(exactSoldCoin.Denom, boughtTokenDenom)
+	voucherCoinName, err := types.GetVoucherCoinName(exactSoldCoin.Denom, boughtTokenDenom)
 	if err != nil {
 		return sdk.ZeroInt(), err
 	}
-	pool, existed := k.GetPool(ctx, uniId)
+	pool, existed := k.GetPool(ctx, voucherCoinName)
 	if !existed {
-		return sdk.ZeroInt(), types.ErrReservePoolNotExists(fmt.Sprintf("liquidity pool for %s not found", uniId))
+		return sdk.ZeroInt(), types.ErrReservePoolNotExists(fmt.Sprintf("liquidity pool for %s not found", voucherCoinName))
 	}
 	inputReserve := pool.BalanceOf(exactSoldCoin.Denom)
 	outputReserve := pool.BalanceOf(boughtTokenDenom)
 
 	if !inputReserve.IsPositive() {
-		return sdk.ZeroInt(), types.ErrInsufficientFunds(fmt.Sprintf("reserve pool insufficient funds, actual [%s%s]", inputReserve.String(), exactSoldCoin.Denom))
+		return sdk.ZeroInt(), types.ErrInsufficientFunds(fmt.Sprintf("insufficient reserve pool funds, actual [%s%s]", inputReserve.String(), exactSoldCoin.Denom))
 	}
 	if !outputReserve.IsPositive() {
-		return sdk.ZeroInt(), types.ErrInsufficientFunds(fmt.Sprintf("reserve pool insufficient funds, actual [%s%s]", outputReserve.String(), boughtTokenDenom))
+		return sdk.ZeroInt(), types.ErrInsufficientFunds(fmt.Sprintf("insufficient reserve pool funds, actual [%s%s]", outputReserve.String(), boughtTokenDenom))
 	}
 	param := k.GetParams(ctx)
 
 	boughtTokenAmt := getInputPrice(exactSoldCoin.Amount, inputReserve, outputReserve, param.Fee)
+
 	return boughtTokenAmt, nil
 }
 
@@ -78,15 +80,15 @@ func (k Keeper) tradeExactInputForOutput(ctx sdk.Context, input types.Input, out
 		return sdk.ZeroInt(), types.ErrConstraintNotMet(fmt.Sprintf("insufficient amount of %s, user expected: %s, actual: %s", output.Coin.Denom, output.Coin.Amount.String(), boughtTokenAmt.String()))
 	}
 	boughtToken := sdk.NewCoin(output.Coin.Denom, boughtTokenAmt)
-	err = k.swapCoins(ctx, input.Address, output.Address, input.Coin, boughtToken)
-	if err != nil {
+	if err = k.swapCoins(ctx, input.Address, output.Address, input.Coin, boughtToken); err != nil {
 		return sdk.ZeroInt(), err
 	}
+
 	return boughtTokenAmt, nil
 }
 
 /**
-Sell exact amount of a token for buying another, non of them are iris
+Sell exact amount of a token for buying another, none of them is iris
 @param input: exact amount of the token to be sold
 @param output: min amount of the token to be bought
 @param sender: address of the sender
@@ -99,8 +101,7 @@ func (k Keeper) doubleTradeExactInputForOutput(ctx sdk.Context, input types.Inpu
 		return sdk.ZeroInt(), err
 	}
 	nativeCoin := sdk.NewCoin(sdk.IrisAtto, nativeAmount)
-	err = k.swapCoins(ctx, input.Address, output.Address, input.Coin, nativeCoin)
-	if err != nil {
+	if err = k.swapCoins(ctx, input.Address, output.Address, input.Coin, nativeCoin); err != nil {
 		return sdk.ZeroInt(), err
 	}
 
@@ -115,8 +116,7 @@ func (k Keeper) doubleTradeExactInputForOutput(ctx sdk.Context, input types.Inpu
 		return sdk.ZeroInt(), types.ErrConstraintNotMet(fmt.Sprintf("insufficient amount of %s, user expected: %s, actual: %s", output.Coin.Denom, output.Coin.Amount.String(), boughtAmt.String()))
 	}
 
-	err = k.swapCoins(ctx, input.Address, output.Address, nativeCoin, boughtToken)
-	if err != nil {
+	if err = k.swapCoins(ctx, input.Address, output.Address, nativeCoin, boughtToken); err != nil {
 		return sdk.ZeroInt(), err
 	}
 	return boughtAmt, nil
@@ -129,25 +129,25 @@ Calculate the amount of the token to be payed based on the exact amount of the t
 @return: actual amount of the token to be payed
 */
 func (k Keeper) calculateWithExactOutput(ctx sdk.Context, exactBoughtCoin sdk.Coin, soldTokenDenom string) (sdk.Int, sdk.Error) {
-	uniID, err := types.GetUniID(exactBoughtCoin.Denom, soldTokenDenom)
+	voucherCoinName, err := types.GetVoucherCoinName(exactBoughtCoin.Denom, soldTokenDenom)
 	if err != nil {
 		return sdk.ZeroInt(), types.ErrReservePoolNotExists(fmt.Sprintf("liquidity pool not found: %s", err.Error()))
 	}
-	pool, existed := k.GetPool(ctx, uniID)
+	pool, existed := k.GetPool(ctx, voucherCoinName)
 	if !existed {
-		return sdk.ZeroInt(), types.ErrReservePoolNotExists(fmt.Sprintf("liquidity pool for %s not found", uniID))
+		return sdk.ZeroInt(), types.ErrReservePoolNotExists(fmt.Sprintf("liquidity pool for %s not found", voucherCoinName))
 	}
 	outputReserve := pool.BalanceOf(exactBoughtCoin.Denom)
 	inputReserve := pool.BalanceOf(soldTokenDenom)
 
 	if !inputReserve.IsPositive() {
-		return sdk.ZeroInt(), types.ErrInsufficientFunds(fmt.Sprintf("reserve pool insufficient balance: [%s%s]", inputReserve.String(), soldTokenDenom))
+		return sdk.ZeroInt(), types.ErrInsufficientFunds(fmt.Sprintf("insufficient reserve pool balance: [%s%s]", inputReserve.String(), soldTokenDenom))
 	}
 	if !outputReserve.IsPositive() {
-		return sdk.ZeroInt(), types.ErrInsufficientFunds(fmt.Sprintf("reserve pool insufficient balance: [%s%s]", outputReserve.String(), exactBoughtCoin.Denom))
+		return sdk.ZeroInt(), types.ErrInsufficientFunds(fmt.Sprintf("insufficient reserve pool balance: [%s%s]", outputReserve.String(), exactBoughtCoin.Denom))
 	}
 	if exactBoughtCoin.Amount.GTE(outputReserve) {
-		return sdk.ZeroInt(), types.ErrInsufficientFunds(fmt.Sprintf("reserve pool insufficient balance of %s, user expected: %s, actual: %s", exactBoughtCoin.Denom, exactBoughtCoin.Amount.String(), outputReserve.String()))
+		return sdk.ZeroInt(), types.ErrInsufficientFunds(fmt.Sprintf("insufficient reserve pool balance of %s, user expected: %s, actual: %s", exactBoughtCoin.Denom, exactBoughtCoin.Amount.String(), outputReserve.String()))
 	}
 	param := k.GetParams(ctx)
 
@@ -182,7 +182,7 @@ func (k Keeper) tradeInputForExactOutput(ctx sdk.Context, input types.Input, out
 }
 
 /**
-Buy exact amount of a token by specifying the max amount of another token, non of them are iris
+Buy exact amount of a token by specifying the max amount of another token, none of them is iris
 @param input : max amount of the token to be payed
 @param output : exact amount of the token to be bought
 @param sender : address of the sender

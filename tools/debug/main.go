@@ -10,12 +10,14 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/spf13/cobra"
+
+	"github.com/tendermint/tendermint/crypto"
+	"github.com/tendermint/tendermint/crypto/ed25519"
+
 	iris "github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/modules/auth"
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/spf13/cobra"
-	"github.com/tendermint/tendermint/crypto"
-	"github.com/tendermint/tendermint/crypto/ed25519"
 )
 
 func init() {

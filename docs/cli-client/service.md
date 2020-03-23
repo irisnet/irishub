@@ -4,32 +4,32 @@ Service module allows you to define, bind, invoke services on the IRIS Hub. [Rea
 
 ## Available Commands
 
-| Name                                              | Description                                           |
-| ------------------------------------------------- | ----------------------------------------------------- |
-| [define](#iriscli-service-define)                 | Define a new service                      |
-| [definition](#iriscli-service-definition)         | Query a service definition                              |
-| [bind](#iriscli-service-bind)                     | Bind a service                     |
-| [binding](#iriscli-service-binding)               | Query a service binding                                 |
-| [bindings](#iriscli-service-bindings)             | Query all bindings of a service definition                              |
-| [set-withdraw-addr](#iriscli-service-set-withdraw-addr)             | Set a withdrawal address for a provider                              |
-| [withdraw-addr](#iriscli-service-withdraw-addr)             | Query the withdrawal address of a provider                              |
-| [update-binding](#iriscli-service-update-binding) | Update an existing service binding                              |
-| [disable](#iriscli-service-disable)               | Disable an available service binding                   |
-| [enable](#iriscli-service-enable)                 | Enable an unavailable service binding                 |
-| [refund-deposit](#iriscli-service-refund-deposit) | Refund all deposit from a service binding             |
-| [call](#iriscli-service-call)                     | Call a service                                 |
-| [request](#iriscli-service-request)             | Query a request by the request ID                          |
-| [requests](#iriscli-service-requests)             | Query requests by the service binding or request context                      |
-| [respond](#iriscli-service-respond)               | Respond to a service request                  |
-| [response](#iriscli-service-response)             | Query a response by the request ID                             |
-| [responses](#iriscli-service-responses)             | Query responses by the request context ID and batch counter                             |
-| [request-context](#iriscli-service-request-context)             | Query a request context                             |
-| [update](#iriscli-service-update)             | Update a request context                             |
-| [pause](#iriscli-service-pause)             | Pause a running request context                             |
-| [start](#iriscli-service-start)             | Start a paused request context                             |
-| [kill](#iriscli-service-kill)             | Terminate a request context                             |
-| [fees](#iriscli-service-fees)                     | Query the earned fees of a provider |
-| [withdraw-fees](#iriscli-service-withdraw-fees)   | Withdraw the earned fees of a provider          |
+| Name                                                    | Description                                                 |
+| ------------------------------------------------------- | ----------------------------------------------------------- |
+| [define](#iriscli-service-define)                       | Define a new service                                        |
+| [definition](#iriscli-service-definition)               | Query a service definition                                  |
+| [bind](#iriscli-service-bind)                           | Bind a service                                              |
+| [binding](#iriscli-service-binding)                     | Query a service binding                                     |
+| [bindings](#iriscli-service-bindings)                   | Query all bindings of a service definition                  |
+| [set-withdraw-addr](#iriscli-service-set-withdraw-addr) | Set a withdrawal address for a provider                     |
+| [withdraw-addr](#iriscli-service-withdraw-addr)         | Query the withdrawal address of a provider                  |
+| [update-binding](#iriscli-service-update-binding)       | Update an existing service binding                          |
+| [disable](#iriscli-service-disable)                     | Disable an available service binding                        |
+| [enable](#iriscli-service-enable)                       | Enable an unavailable service binding                       |
+| [refund-deposit](#iriscli-service-refund-deposit)       | Refund all deposit from a service binding                   |
+| [call](#iriscli-service-call)                           | Call a service                                              |
+| [request](#iriscli-service-request)                     | Query a request by the request ID                           |
+| [requests](#iriscli-service-requests)                   | Query requests by the service binding or request context    |
+| [respond](#iriscli-service-respond)                     | Respond to a service request                                |
+| [response](#iriscli-service-response)                   | Query a response by the request ID                          |
+| [responses](#iriscli-service-responses)                 | Query responses by the request context ID and batch counter |
+| [request-context](#iriscli-service-request-context)     | Query a request context                                     |
+| [update](#iriscli-service-update)                       | Update a request context                                    |
+| [pause](#iriscli-service-pause)                         | Pause a running request context                             |
+| [start](#iriscli-service-start)                         | Start a paused request context                              |
+| [kill](#iriscli-service-kill)                           | Terminate a request context                                 |
+| [fees](#iriscli-service-fees)                           | Query the earned fees of a provider                         |
+| [withdraw-fees](#iriscli-service-withdraw-fees)         | Withdraw the earned fees of a provider                      |
 
 ## iriscli service define
 
@@ -41,13 +41,13 @@ iriscli service define <flags>
 
 **Flags:**
 
-| Name, shorthand       | Default | Description                                                        | Required |
-| --------------------- | ------- | ------------------------------------------------------------------ | -------- |
-| --name        |         | Service name                                                       | Yes      |
-| --description |         | Service description                                                |          |
-| --author-description  |         | Service author description                                         |          |
-| --tags                |         | Service tags                                                       |          |
-| --schemas        |         | Service interface schemas content or path                  | Yes    |
+| Name, shorthand      | Default | Description                               | Required |
+| -------------------- | ------- | ----------------------------------------- | -------- |
+| --name               |         | Service name                              | Yes      |
+| --description        |         | Service description                       |          |
+| --author-description |         | Service author description                |          |
+| --tags               |         | Service tags                              |          |
+| --schemas            |         | Service interface schemas content or path | Yes      |
 
 ### define a service
 
@@ -60,7 +60,7 @@ iriscli service define --chain-id=<chain-id> --from=<key-name> --fee=0.3iris
 ### Schemas content example
 
 ```json
-{"input":{"$schema":"http://json-schema.org/draft-04/schema#","title":"BioIdentify service input","description":"BioIdentify service input specification","type":"object","properties":{"id":{"description":"id","type":"string"},"name":{"description":"name","type":"string"},"data":{"description":"data","type":"string"}},"required":["id","data"]},"output":{"$schema":"http://json-schema.org/draft-04/schema#","title":"BioIdentify service output","description":"BioIdentify service output specification","type":"object","properties":{"data":{"description":"result data","type":"string"}},"required":["data"]},"error":{"$schema":"http://json-schema.org/draft-04/schema#","title":"BioIdentify service error","description":"BioIdentify service error specification","type":"object","properties":{"code":{"description":"error code","type":"integer"},"msg":{"description":"detailed error msg","type":"string"}},"required":["msg"]}}
+{"input":{"$schema":"http://json-schema.org/draft-04/schema#","title":"BioIdentify service input","description":"BioIdentify service input specification","type":"object","properties":{"id":{"description":"id","type":"string"},"name":{"description":"name","type":"string"},"data":{"description":"data","type":"string"}},"required":["id","data"]},"output":{"$schema":"http://json-schema.org/draft-04/schema#","title":"BioIdentify service output","description":"BioIdentify service output specification","type":"object","properties":{"data":{"description":"result data","type":"string"}},"required":["data"]}}
 ```
 
 ## iriscli service definition
@@ -89,11 +89,11 @@ iriscli service bind <flags>
 
 **Flags:**
 
-| Name, shorthand | Default | Description                                                               | Required |
-| --------------- | ------- | ------------------------------------------------------------------------- | -------- |
-| --service-name  |         | Service name                                                              | Yes      |
-| --deposit       |         | Deposit of the binding                                                        | Yes      |
-| --pricing        |        | Pricing content or path, which is an instance of the Irishub Service Pricing schema                           | Yes          |
+| Name, shorthand | Default | Description                                                                         | Required |
+| --------------- | ------- | ----------------------------------------------------------------------------------- | -------- |
+| --service-name  |         | Service name                                                                        | Yes      |
+| --deposit       |         | Deposit of the binding                                                              | Yes      |
+| --pricing       |         | Pricing content or path, which is an instance of the Irishub Service Pricing schema | Yes      |
 
 ### Bind an existing service definition
 
@@ -155,11 +155,11 @@ iriscli service update-binding <flags>
 
 **Flags:**
 
-| Name, shorthand | Default | Description                                                               | Required |
-| --------------- | ------- | ------------------------------------------------------------------------- | -------- |
-| --service-name  |         | Service name                                                              | Yes      |
-| --deposit       |         | Deposit added for the binding             |          |
-| --pricing        |         | Pricing context or path, which is an instance of the Irishub Service Pricing schema        |
+| Name, shorthand | Default | Description                                                                         | Required |
+| --------------- | ------- | ----------------------------------------------------------------------------------- | -------- |
+| --service-name  |         | Service name                                                                        | Yes      |
+| --deposit       |         | Deposit added for the binding                                                       |          |
+| --pricing       |         | Pricing content or path, which is an instance of the Irishub Service Pricing schema |          |
 
 ### Update an existing service binding
 
@@ -222,9 +222,9 @@ iriscli service enable <service name> <flags>
 
 **Flags:**
 
-| Name, shorthand  | Default | Description                                                 | Required |
-| ---------------- | ------- | ----------------------------------------------------------- | -------- |
-| --deposit |         | deposit added for enabling the binding |          |
+| Name, shorthand | Default | Description                            | Required |
+| --------------- | ------- | -------------------------------------- | -------- |
+| --deposit       |         | deposit added for enabling the binding |          |
 
 ### Enable an unavailable service binding
 
@@ -260,23 +260,23 @@ iriscli service call <flags>
 
 **Flags:**
 
-| Name, shorthand | Default | Description                                        | Required |
-| --------------- | ------- | -------------------------------------------------- | -------- |
-| --service-name  |         | Service name                                       | Yes      |
-| --providers     |         | Provider list to request                             | Yes      |
-| --service-fee-cap |         | Maximum service fee to pay for a single request        | Yes      |
-| --data      |         | Input of the service request, which is an Input JSON schema instance | Yes      |
-| --timeout | | Request timeout | |
-| --super-mode| false | Indicate if the signer is a super user
-| --repeated   |    false     | Indicate if the reqeust is repetitive                |          |
-| --frequency   |         | Request frequency when repeated, default to `timeout`              |          |
-| --total  |         | Request count when repeated, -1 means unlimited    |          |
+| Name, shorthand   | Default | Description                                                          | Required |
+| ----------------- | ------- | -------------------------------------------------------------------- | -------- |
+| --service-name    |         | Service name                                                         | Yes      |
+| --providers       |         | Provider list to request                                             | Yes      |
+| --service-fee-cap |         | Maximum service fee to pay for a single request                      | Yes      |
+| --data            |         | Input of the service request, which is an Input JSON schema instance | Yes      |
+| --timeout         |         | Request timeout                                                      |          |
+| --super-mode      | false   | Indicate if the signer is a super user                               |
+| --repeated        | false   | Indicate if the reqeust is repetitive                                |          |
+| --frequency       |         | Request frequency when repeated, default to `timeout`                |          |
+| --total           |         | Request count when repeated, -1 means unlimited                      |          |
 
 ### Initiate a service invocation request
 
 ```bash
 iriscli service call --chain-id=<chain-id> --from=<key name> --fee=0.3iris --service-name=<service name>
---providers=<provider list> --service-fee-cap=1iris --data=<request data> -timeout=100 --repeated --frequency=150 --total=100
+--providers=<provider list> --service-fee-cap=1iris --data=<request data> --timeout=100 --repeated --frequency=150 --total=100
 ```
 
 ### Input example
@@ -337,22 +337,31 @@ iriscli service respond <flags>
 
 **Flags:**
 
-| Name, shorthand    | Default | Description                                                    | Required |
-| ------------------ | ------- | -------------------------------------------------------------- | -------- |
-| --request-id       |         | ID of the request to respond to                                | Yes      |
-| --data             |         | Output of the service response, which is an Output JSON schema instance     |          |
-| --error            |         | Error msg of the service response, which is an Error JSON schema instance   |          |
+| Name, shorthand | Default | Description                                                             | Required |
+| --------------- | ------- | ----------------------------------------------------------------------- | -------- |
+| --request-id    |         | ID of the request to respond to                                         | Yes      |
+| --result        |         | Result of the service response, which is a Result JSON schema instance  | Yes      |
+| --data          |         | Output of the service response, which is an Output JSON schema instance |          |
 
 ### Respond to a service request
 
 ```bash
 iriscli service respond --chain-id=<chain-id> --from=<key-name> --fee=0.3iris
---request-id=<request-id> --data=<response output>
+--request-id=<request-id> --result=<response result> --data=<response output>
 ```
 
 :::tip
 You can retrieve the `request-id` in the result of [tendermint block](./tendermint.md#iriscli-tendermint-block)
 :::
+
+### Result example
+
+```
+{
+    "code": 200,
+    "message": ""
+}
+```
 
 ### Output example
 
@@ -422,19 +431,19 @@ iriscli service update <request-context-id> <flags>
 
 **Flags:**
 
-| Name, shorthand | Default | Description                                        | Required |
-| --------------- | ------- | -------------------------------------------------- | -------- |
-| --providers     |         | Provider list to request, not updated if empty                            | Yes      |
-| --service-fee-cap |         | Maximum service fee to pay for a single request, not updated if empty       |      |
-| --timeout | | Request timeout, not updated if set to 0 | |
-| --frequency   |         | Request frequency, not updated if set to 0           |          |
-| --total  |         | Request count, not updated if set to 0    |          |
+| Name, shorthand   | Default | Description                                                           | Required |
+| ----------------- | ------- | --------------------------------------------------------------------- | -------- |
+| --providers       |         | Provider list to request, not updated if empty                        |          |
+| --service-fee-cap |         | Maximum service fee to pay for a single request, not updated if empty |          |
+| --timeout         |         | Request timeout, not updated if set to 0                              |          |
+| --frequency       |         | Request frequency, not updated if set to 0                            |          |
+| --total           |         | Request count, not updated if set to 0                                |          |
 
 ### Update a request context
 
 ```bash
 iriscli service update <request-context-id> --chain-id=<chain-id> --from=<key name> --fee=0.3iris
---providers=<provider list> --service-fee-cap=1iris -timeout=0 --frequency=150 --total=100
+--providers=<provider list> --service-fee-cap=1iris --timeout=0 --frequency=150 --total=100
 ```
 
 ## iriscli service pause

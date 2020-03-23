@@ -251,11 +251,11 @@ func (cliCtx CLIContext) GetCoinType(coinName string) (sdk.CoinType, error) {
 	}
 	if coinName == sdk.Iris {
 		coinType = sdk.IrisCoinType
-	} else if strings.HasPrefix(coinName, coinswap.FormatUniABSPrefix) {
-		return coinswap.GetUniCoinType(coinName)
+	} else if strings.HasPrefix(coinName, coinswap.LiquidityVoucherPrefix) {
+		return coinswap.GetVoucherCoinType(coinName)
 	} else {
 		params := asset.QueryTokenParams{
-			TokenId: coinName,
+			Symbol: coinName,
 		}
 
 		bz, err := cliCtx.Codec.MarshalJSON(params)
@@ -313,7 +313,7 @@ func (cliCtx CLIContext) ParseCoin(coinStr string) (sdk.Coin, error) {
 		return sdk.ParseCoin(coinStr)
 	}
 
-	coin, err := coinType.ConvertToMinDenomCoin(coinStr)
+	coin, err := coinType.ConvertToCoin(coinStr)
 	if err != nil {
 		return sdk.Coin{}, err
 	}

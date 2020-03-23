@@ -6,6 +6,7 @@ import (
 	"regexp"
 
 	sdk "github.com/irisnet/irishub/types"
+	cmn "github.com/tendermint/tendermint/libs/common"
 )
 
 const (
@@ -32,8 +33,7 @@ const (
 	MaxTagsNum           = 10  // max total number of the tags
 	MaxTagLength         = 70  // max length of the tag
 
-	MaxProvidersNum     = 10 // max total number of the providers to request
-	RequestContextIDLen = 32 // length of the request context ID in bytes
+	MaxProvidersNum = 10 // max total number of the providers to request
 )
 
 // the service name only accepts alphanumeric characters, _ and -
@@ -531,26 +531,26 @@ func (msg MsgRequestService) GetSigners() []sdk.AccAddress {
 
 //______________________________________________________________________
 
-// MsgRespondService defines a message to respond a service request
+// MsgRespondService defines a message to respond to a service request
 type MsgRespondService struct {
-	RequestID string         `json:"request_id"`
+	RequestID cmn.HexBytes   `json:"request_id"`
 	Provider  sdk.AccAddress `json:"provider"`
+	Result    string         `json:"result"`
 	Output    string         `json:"output"`
-	Error     string         `json:"error"`
 }
 
 // NewMsgRespondService creates a new MsgRespondService instance
 func NewMsgRespondService(
-	requestID string,
+	requestID cmn.HexBytes,
 	provider sdk.AccAddress,
-	output,
-	err string,
+	result,
+	output string,
 ) MsgRespondService {
 	return MsgRespondService{
 		RequestID: requestID,
 		Provider:  provider,
+		Result:    result,
 		Output:    output,
-		Error:     err,
 	}
 }
 
@@ -576,26 +576,34 @@ func (msg MsgRespondService) ValidateBasic() sdk.Error {
 		return ErrInvalidAddress(DefaultCodespace, "provider missing")
 	}
 
-	_, err := ConvertRequestID(msg.RequestID)
+	if len(msg.RequestID) != RequestIDLen {
+		return ErrInvalidRequestContextID(DefaultCodespace, fmt.Sprintf("length of the request ID must be %d in bytes", RequestIDLen))
+	}
+
+	if len(msg.Result) == 0 {
+		return ErrInvalidResponseResult(DefaultCodespace, "result missing")
+	}
+
+	if err := ValidateResponseResult(msg.Result); err != nil {
+		return err
+	}
+
+	result, err := ParseResult(msg.Result)
 	if err != nil {
-		return ErrInvalidRequestID(DefaultCodespace, fmt.Sprintf("failed to parse %s", msg.RequestID))
+		return err
 	}
 
-	if len(msg.Output) == 0 && len(msg.Error) == 0 {
-		return ErrInvalidResponse(DefaultCodespace, "either output or error should be specified, but neither was provided")
+	if result.Code == 200 && len(msg.Output) == 0 {
+		return ErrInvalidResponse(DefaultCodespace, "output must be specified when the result code is 200")
 	}
 
-	if len(msg.Output) > 0 && len(msg.Error) > 0 {
-		return ErrInvalidResponse(DefaultCodespace, "either output or error should be specified, but both were provided")
+	if result.Code != 200 && len(msg.Output) != 0 {
+		return ErrInvalidResponse(DefaultCodespace, "output should not be specified when the result code is not 200")
 	}
 
 	if len(msg.Output) > 0 {
 		if !json.Valid([]byte(msg.Output)) {
 			return ErrInvalidResponseOutput(DefaultCodespace, "output is not valid JSON")
-		}
-	} else {
-		if !json.Valid([]byte(msg.Error)) {
-			return ErrInvalidResponseErr(DefaultCodespace, "err is not valid JSON")
 		}
 	}
 
@@ -611,12 +619,12 @@ func (msg MsgRespondService) GetSigners() []sdk.AccAddress {
 
 // MsgPauseRequestContext defines a message to suspend a request context
 type MsgPauseRequestContext struct {
-	RequestContextID []byte         `json:"request_context_id"`
+	RequestContextID cmn.HexBytes   `json:"request_context_id"`
 	Consumer         sdk.AccAddress `json:"consumer"`
 }
 
 // NewMsgPauseRequestContext creates a new MsgPauseRequestContext instance
-func NewMsgPauseRequestContext(requestContextID []byte, consumer sdk.AccAddress) MsgPauseRequestContext {
+func NewMsgPauseRequestContext(requestContextID cmn.HexBytes, consumer sdk.AccAddress) MsgPauseRequestContext {
 	return MsgPauseRequestContext{
 		RequestContextID: requestContextID,
 		Consumer:         consumer,
@@ -645,8 +653,8 @@ func (msg MsgPauseRequestContext) ValidateBasic() sdk.Error {
 		return ErrInvalidAddress(DefaultCodespace, "consumer missing")
 	}
 
-	if len(msg.RequestContextID) != RequestContextIDLen {
-		return ErrInvalidRequestContextID(DefaultCodespace, fmt.Sprintf("length of the request context ID must be %d in bytes", RequestContextIDLen))
+	if len(msg.RequestContextID) != ContextIDLen {
+		return ErrInvalidRequestContextID(DefaultCodespace, fmt.Sprintf("length of the request context ID must be %d in bytes", ContextIDLen))
 	}
 
 	return nil
@@ -661,12 +669,12 @@ func (msg MsgPauseRequestContext) GetSigners() []sdk.AccAddress {
 
 // MsgStartRequestContext defines a message to resume a request context
 type MsgStartRequestContext struct {
-	RequestContextID []byte         `json:"request_context_id"`
+	RequestContextID cmn.HexBytes   `json:"request_context_id"`
 	Consumer         sdk.AccAddress `json:"consumer"`
 }
 
 // NewMsgStartRequestContext creates a new MsgStartRequestContext instance
-func NewMsgStartRequestContext(requestContextID []byte, consumer sdk.AccAddress) MsgStartRequestContext {
+func NewMsgStartRequestContext(requestContextID cmn.HexBytes, consumer sdk.AccAddress) MsgStartRequestContext {
 	return MsgStartRequestContext{
 		RequestContextID: requestContextID,
 		Consumer:         consumer,
@@ -695,8 +703,8 @@ func (msg MsgStartRequestContext) ValidateBasic() sdk.Error {
 		return ErrInvalidAddress(DefaultCodespace, "consumer missing")
 	}
 
-	if len(msg.RequestContextID) != RequestContextIDLen {
-		return ErrInvalidRequestContextID(DefaultCodespace, fmt.Sprintf("length of the request context ID must be %d in bytes", RequestContextIDLen))
+	if len(msg.RequestContextID) != ContextIDLen {
+		return ErrInvalidRequestContextID(DefaultCodespace, fmt.Sprintf("length of the request context ID must be %d in bytes", ContextIDLen))
 	}
 
 	return nil
@@ -711,12 +719,12 @@ func (msg MsgStartRequestContext) GetSigners() []sdk.AccAddress {
 
 // MsgKillRequestContext defines a message to terminate a request context
 type MsgKillRequestContext struct {
-	RequestContextID []byte         `json:"request_context_id"`
+	RequestContextID cmn.HexBytes   `json:"request_context_id"`
 	Consumer         sdk.AccAddress `json:"consumer"`
 }
 
 // NewMsgKillRequestContext creates a new MsgKillRequestContext instance
-func NewMsgKillRequestContext(requestContextID []byte, consumer sdk.AccAddress) MsgKillRequestContext {
+func NewMsgKillRequestContext(requestContextID cmn.HexBytes, consumer sdk.AccAddress) MsgKillRequestContext {
 	return MsgKillRequestContext{
 		RequestContextID: requestContextID,
 		Consumer:         consumer,
@@ -745,8 +753,8 @@ func (msg MsgKillRequestContext) ValidateBasic() sdk.Error {
 		return ErrInvalidAddress(DefaultCodespace, "consumer missing")
 	}
 
-	if len(msg.RequestContextID) != RequestContextIDLen {
-		return ErrInvalidRequestContextID(DefaultCodespace, fmt.Sprintf("length of the request context ID must be %d in bytes", RequestContextIDLen))
+	if len(msg.RequestContextID) != ContextIDLen {
+		return ErrInvalidRequestContextID(DefaultCodespace, fmt.Sprintf("length of the request context ID must be %d in bytes", ContextIDLen))
 	}
 
 	return nil
@@ -761,7 +769,7 @@ func (msg MsgKillRequestContext) GetSigners() []sdk.AccAddress {
 
 // MsgUpdateRequestContext defines a message to update a request context
 type MsgUpdateRequestContext struct {
-	RequestContextID  []byte           `json:"request_context_id"`
+	RequestContextID  cmn.HexBytes     `json:"request_context_id"`
 	Providers         []sdk.AccAddress `json:"providers"`
 	ServiceFeeCap     sdk.Coins        `json:"service_fee_cap"`
 	Timeout           int64            `json:"timeout"`
@@ -772,7 +780,7 @@ type MsgUpdateRequestContext struct {
 
 // NewMsgUpdateRequestContext creates a new MsgUpdateRequestContext instance
 func NewMsgUpdateRequestContext(
-	requestContextID []byte,
+	requestContextID cmn.HexBytes,
 	providers []sdk.AccAddress,
 	serviceFeeCap sdk.Coins,
 	timeout int64,
@@ -813,8 +821,8 @@ func (msg MsgUpdateRequestContext) ValidateBasic() sdk.Error {
 		return ErrInvalidAddress(DefaultCodespace, "consumer missing")
 	}
 
-	if len(msg.RequestContextID) != RequestContextIDLen {
-		return ErrInvalidRequestContextID(DefaultCodespace, fmt.Sprintf("length of the request context ID must be %d in bytes", RequestContextIDLen))
+	if len(msg.RequestContextID) != ContextIDLen {
+		return ErrInvalidRequestContextID(DefaultCodespace, fmt.Sprintf("length of the request context ID must be %d in bytes", ContextIDLen))
 	}
 
 	return ValidateRequestContextUpdating(msg.Providers, msg.ServiceFeeCap, msg.Timeout, msg.RepeatedFrequency, msg.RepeatedTotal)

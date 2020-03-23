@@ -31,7 +31,7 @@ const (
 	Atto      = "atto"
 	AttoScale = 18
 
-	MinDenomSuffix = "-min"
+	MinUnitSuffix = "-min"
 )
 
 var (
@@ -40,19 +40,19 @@ var (
 )
 
 type Unit struct {
-	Denom   string `json:"denom"`
+	Name    string `json:"name"`
 	Decimal uint8  `json:"decimal"`
 }
 
 func (u Unit) String() string {
 	return fmt.Sprintf("%s: %d",
-		u.Denom, u.Decimal,
+		u.Name, u.Decimal,
 	)
 }
 
-func NewUnit(denom string, decimal uint8) Unit {
+func NewUnit(name string, decimal uint8) Unit {
 	return Unit{
-		Denom:   denom,
+		Name:    name,
 		Decimal: decimal,
 	}
 }
@@ -80,18 +80,18 @@ type CoinType struct {
 	Desc    string `json:"desc"`
 }
 
-func (ct CoinType) Convert(srcCoinStr string, destDenom string) (destCoinStr string, err error) {
-	srcDenom, srcAmt, err := ParseCoinParts(srcCoinStr)
+func (ct CoinType) Convert(srcCoinStr string, destUnitName string) (destCoinStr string, err error) {
+	srcUnit, srcAmt, err := ParseCoinParts(srcCoinStr)
 	if err != nil {
 		return destCoinStr, err
 	}
 	var destUnit Unit
-	if destUnit, err = ct.GetUnit(destDenom); err != nil {
-		return destCoinStr, errors.New("destination unit (%s) not defined" + destDenom)
+	if destUnit, err = ct.GetUnit(destUnitName); err != nil {
+		return destCoinStr, errors.New("destination unit (%s) not defined" + destUnitName)
 	}
 
-	if srcUnit, err := ct.GetUnit(srcDenom); err == nil {
-		if srcUnit.Denom == destDenom {
+	if srcUnit, err := ct.GetUnit(srcUnit); err == nil {
+		if srcUnit.Name == destUnitName {
 			return srcCoinStr, nil
 		}
 		// dest amount = src amount * (10^(dest scale) / 10^(src scale))
@@ -101,27 +101,28 @@ func (ct CoinType) Convert(srcCoinStr string, destDenom string) (destCoinStr str
 			return destCoinStr, err
 		}
 		amt := amount.Mul(rat).DecimalString(int(ct.MinUnit.Decimal))
-		destCoinStr = fmt.Sprintf("%s%s", amt, destUnit.Denom)
+		destCoinStr = fmt.Sprintf("%s%s", amt, destUnit.Name)
 		return destCoinStr, nil
 	}
-	return destCoinStr, errors.New("source unit (%s) not defined" + srcDenom)
+	return destCoinStr, errors.New("source unit (%s) not defined" + srcUnit)
 }
 
-func (ct CoinType) ConvertToMinDenomCoin(srcCoinStr string) (coin Coin, err error) {
-	if destCoinStr, err := ct.Convert(srcCoinStr, ct.MinUnit.Denom); err == nil {
+// ConvertToCoin converts the given coin string to the min unit
+func (ct CoinType) ConvertToCoin(srcCoinStr string) (coin Coin, err error) {
+	if destCoinStr, err := ct.Convert(srcCoinStr, ct.MinUnit.Name); err == nil {
 		coin, err = ParseCoin(destCoinStr)
 		return coin, err
 	}
 	return coin, errors.New("convert error")
 }
 
-func (ct CoinType) GetUnit(denom string) (u Unit, err error) {
+func (ct CoinType) GetUnit(name string) (u Unit, err error) {
 	for _, unit := range ct.Units {
-		if strings.ToLower(denom) == strings.ToLower(unit.Denom) {
+		if strings.EqualFold(name, unit.Name) {
 			return unit, nil
 		}
 	}
-	return u, errors.New("unit (%s) not found" + denom)
+	return u, errors.New("unit (%s) not found" + name)
 }
 
 func (ct CoinType) GetMainUnit() (unit Unit) {
@@ -168,7 +169,7 @@ func GetCoinName(coinStr string) (coinName string, err error) {
 		return Iris, nil
 	}
 
-	if !strings.HasPrefix(denom, Iris+"-") && !strings.HasSuffix(denom, MinDenomSuffix) {
+	if !strings.HasPrefix(denom, Iris+"-") && !strings.HasSuffix(denom, MinUnitSuffix) {
 		return denom, nil
 	}
 
@@ -184,22 +185,22 @@ func GetCoinNameByDenom(denom string) (coinName string, err error) {
 		}
 		return Iris, nil
 	}
-	if !IsCoinMinDenomValid(denom) {
+	if !IsValidCoinDenom(denom) {
 		return "", fmt.Errorf("invalid denom for getting coin name: %s", denom)
 	}
-	coinName = strings.TrimSuffix(denom, MinDenomSuffix)
+	coinName = strings.TrimSuffix(denom, MinUnitSuffix)
 	if coinName == "" {
 		return coinName, fmt.Errorf("coin name is empty")
 	}
 	return coinName, nil
 }
 
-func GetCoinMinDenom(coinName string) (denom string, err error) {
+func GetCoinDenom(coinName string) (denom string, err error) {
 	coinName = strings.ToLower(strings.TrimSpace(coinName))
 
 	if coinName == Iris {
 		return IrisAtto, nil
 	}
 
-	return fmt.Sprintf("%s%s", coinName, MinDenomSuffix), nil
+	return fmt.Sprintf("%s%s", coinName, MinUnitSuffix), nil
 }

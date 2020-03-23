@@ -5,10 +5,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/irisnet/irishub/app/v3/asset"
+	"github.com/stretchr/testify/require"
+
 	"github.com/irisnet/irishub/tests"
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/stretchr/testify/require"
 )
 
 func TestIrisCLIToken(t *testing.T) {
@@ -41,8 +41,6 @@ func TestIrisCLIToken(t *testing.T) {
 	decimal := 18
 	mintable := true
 
-	tokenID := asset.GetTokenID(symbol)
-
 	// issue a token
 	issueCmd := fmt.Sprintf("iriscli asset token issue %v", flags)
 	issueCmd += fmt.Sprintf(" --from=%s", "foo")
@@ -67,13 +65,13 @@ func TestIrisCLIToken(t *testing.T) {
 		t.Error("Test Failed: (19, 20) expected, received:", amt)
 	}
 
-	query := fmt.Sprintf("--token-id=%s ", tokenID)
+	query := fmt.Sprintf("--symbol=%s", symbol)
 	token := executeGetToken(t, fmt.Sprintf("iriscli asset token tokens %s %v", query, flags))
 	require.Equal(t, strings.ToLower(strings.TrimSpace(symbol)), token.Symbol)
 	require.Equal(t, strings.ToLower(strings.TrimSpace(minUnit)), token.MinUnit)
 	require.Equal(t, strings.TrimSpace(name), token.Name)
-	require.Equal(t, sdk.NewIntWithDecimal(int64(initialSupply), decimal), token.InitialSupply)
-	require.Equal(t, sdk.NewIntWithDecimal(int64(maxSupply), decimal), token.MaxSupply)
+	require.Equal(t, uint64(initialSupply), token.InitialSupply)
+	require.Equal(t, uint64(maxSupply), token.MaxSupply)
 	require.Equal(t, uint8(decimal), token.Scale)
 	require.Equal(t, mintable, token.Mintable)
 
@@ -82,7 +80,7 @@ func TestIrisCLIToken(t *testing.T) {
 	maxSupply = 30000000000
 	mintable = true
 
-	editCmd := fmt.Sprintf("iriscli asset token edit %s", tokenID)
+	editCmd := fmt.Sprintf("iriscli asset token edit %s", symbol)
 	editCmd += fmt.Sprintf(" --from=%s", "foo")
 	editCmd += fmt.Sprintf(" --name=%s", name)
 	editCmd += fmt.Sprintf(" --max-supply=%d", maxSupply)
@@ -91,16 +89,16 @@ func TestIrisCLIToken(t *testing.T) {
 	require.True(t, executeWrite(t, editCmd, sdk.DefaultKeyPass))
 	tests.WaitForNextNBlocksTM(2, port)
 
-	query = fmt.Sprintf("--token-id=%s ", tokenID)
+	query = fmt.Sprintf("--symbol=%s", symbol)
 	token = executeGetToken(t, fmt.Sprintf("iriscli asset token tokens %s %v", query, flags))
 
 	require.Equal(t, name, token.Name)
-	require.Equal(t, sdk.NewIntWithDecimal(int64(maxSupply), decimal), token.MaxSupply)
+	require.Equal(t, uint64(maxSupply), token.MaxSupply)
 	require.Equal(t, mintable, token.Mintable)
 
 	//mint a token
 	amount := 1000
-	mintCmd := fmt.Sprintf("iriscli asset token mint %s", tokenID)
+	mintCmd := fmt.Sprintf("iriscli asset token mint %s", symbol)
 	mintCmd += fmt.Sprintf(" --from=%s", "foo")
 	mintCmd += fmt.Sprintf(" --to=%s", barAddr.String())
 	mintCmd += fmt.Sprintf(" --amount=%d", amount)
@@ -113,14 +111,14 @@ func TestIrisCLIToken(t *testing.T) {
 	require.Equal(t, balanceExp.String(), barAcc.GetCoins().String())
 
 	//transfer a token
-	transferCmd := fmt.Sprintf("iriscli asset token transfer %s", tokenID)
+	transferCmd := fmt.Sprintf("iriscli asset token transfer %s", symbol)
 	transferCmd += fmt.Sprintf(" --from=%s", "foo")
 	transferCmd += fmt.Sprintf(" --to=%s", barAddr.String())
 	transferCmd += fmt.Sprintf(" --fee=%s %v", "0.4iris", flags)
 	require.True(t, executeWrite(t, transferCmd, sdk.DefaultKeyPass))
 	tests.WaitForNextNBlocksTM(2, port)
 
-	query = fmt.Sprintf("--owner=%s ", barAddr.String())
+	query = fmt.Sprintf("--owner=%s", barAddr.String())
 	token = executeGetToken(t, fmt.Sprintf("iriscli asset token tokens %s %v", query, flags))
 	require.Equal(t, barAddr.String(), token.Owner.String())
 }

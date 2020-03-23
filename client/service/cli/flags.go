@@ -23,7 +23,7 @@ const (
 	FlagFrequency         = "frequency"
 	FlagTotal             = "total"
 	FlagRequestID         = "request-id"
-	FlagError             = "error"
+	FlagResult            = "result"
 )
 
 // common flagsets to add to various functions
@@ -70,6 +70,6 @@ func init() {
 	FsServiceUpdateRequestContext.Int64(FlagTotal, 0, "request count, not updated if set to 0")
 
 	FsServiceRespond.String(FlagRequestID, "", "ID of the request to respond")
+	FsServiceRespond.String(FlagResult, "", "content or path of the result of the service response, which is an Result JSON schema instance")
 	FsServiceRespond.String(FlagData, "", "content or path of the output of the service response, which is an Output JSON schema instance")
-	FsServiceRespond.String(FlagError, "", "content or path of the err msg of the service response, which is an Error JSON schema instance")
 }

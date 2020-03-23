@@ -2,7 +2,9 @@ package keeper
 
 import (
 	"fmt"
+
 	"github.com/irisnet/irishub/app/v1/asset/internal/types"
+	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/app/v1/params"
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
@@ -20,13 +22,17 @@ type Keeper struct {
 }
 
 func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, bk types.BankKeeper, codespace sdk.CodespaceType, paramSpace params.Subspace) Keeper {
-	return Keeper{
+	keeper := Keeper{
 		storeKey:   key,
 		cdc:        cdc,
 		bk:         bk,
 		codespace:  codespace,
 		paramSpace: paramSpace.WithTypeTable(types.ParamTypeTable()),
 	}
+
+	auth.RegisterTotalSupplyKeyGen(types.TotalSupplyKeyGen)
+
+	return keeper
 }
 
 // return the codespace
