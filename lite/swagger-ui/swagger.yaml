@@ -446,7 +446,7 @@ paths:
                       $ref: '#/components/schemas/Coin'
         '500':
           description: Internal Server Error
-  /bank/token-stats/{id}:
+  /bank/token-stats/{symbol}:
     get:
       tags:
         - Bank
@@ -455,7 +455,7 @@ paths:
         Get token statistics, such as total loose tokens, total bonded token and
         total burned token
       parameters:
-        - name: id
+        - name: symbol
           in: path
           required: false
           schema:
@@ -2570,12 +2570,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/FeedContext'
         '400':
-          description: Invalid token id
+          description: Invalid parameters
         '500':
           description: Internal Server Error
   /oracle/feeds/{feed-name}/values :
     get:
-      summary: Query the value of a feed  by name
+      summary: Query the value of a feed by name
       tags:
         - Oracle
       parameters:
@@ -2644,7 +2644,7 @@ paths:
       parameters:
         - in: query
           name: owner
-          description: 'the owner address of the destination token, optional when source is native, ignored when source is not native'
+          description: the owner address of the destination token
           required: false
           schema:
             type: string
@@ -2656,18 +2656,18 @@ paths:
               schema:
                 $ref: '#/components/schemas/Token'
         '400':
-          description: Invalid token id
+          description: Invalid parameters
         '500':
           description: Internal Server Error
-  '/asset/tokens/{token-id}':
+  '/asset/tokens/{symbol}':
     get:
-      summary: Query token by unique id
+      summary: Query a token by symbol
       tags:
         - Asset
       parameters:
         - in: path
-          name: token-id
-          description: the unique id of the token
+          name: symbol
+          description: symbol of the token
           required: true
           schema:
             type: string
@@ -2679,15 +2679,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/Token'
         '400':
-          description: Invalid token id
+          description: Invalid symbol
         '500':
           description: Internal Server Error
     put:
-      summary: Edit token information
+      summary: Edit an existing token
       parameters:
         - in: path
-          name: token-id
-          description: unique id of token
+          name: symbol
+          description: symbol of the token
           required: true
           schema:
             type: string
@@ -2711,7 +2711,7 @@ paths:
                 owner:
                   $ref: '#/components/schemas/Address'
                 max_supply:
-                  type: int
+                  type: integer
                   example: '21000000'
                 mintable:
                   type: string
@@ -2719,13 +2719,13 @@ paths:
                 name:
                   type: string
                   example: 'BTC Token'
-  '/asset/tokens/{token-id}/mint':
+  '/asset/tokens/{symbol}/mint':
     post:
-      summary: The asset owner and operator can directly mint tokens to a specified address
+      summary: Mint tokens to a specified address
       parameters:
         - in: path
-          name: token-id
-          description: unique id of token
+          name: symbol
+          description: symbol of the token
           required: true
           schema:
             type: string
@@ -2751,15 +2751,15 @@ paths:
                 to:
                   $ref: '#/components/schemas/Address'
                 amount:
-                  type: int
+                  type: integer
                   example: '21000000'
-  '/asset/tokens/{token-id}/transfer':
+  '/asset/tokens/{symbol}/transfer':
     post:
-      summary: Transfer token to a new owner
+      summary: Transfer the ownership of the token to a new owner
       parameters:
         - in: path
-          name: token-id
-          description: unique id of token
+          name: symbol
+          description: symbol of the token
           required: true
           schema:
             type: string
@@ -2786,7 +2786,7 @@ paths:
                   $ref: '#/components/schemas/Address'
   '/asset/tokens/{symbol}/fee':
     get:
-      summary: Query the fees for the issuance and minting of the token with the given symbol
+      summary: Query the fees for issuing and minting the token with the given symbol
       tags:
         - Asset
       parameters:
@@ -2804,7 +2804,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/TokenFeesOutput'
         '400':
-          description: Invalid id
+          description: Invalid symbol
         '500':
           description: Internal Server Error
   '/rand/rands':
@@ -2886,15 +2886,15 @@ paths:
           description: Invalid height if provided
         '500':
           description: Internal Server Error
-  '/coinswap/liquidities/{id}':
+  '/coinswap/liquidities/{voucher-coin-name}':
     get:
-      summary: Query liquidity by id
+      summary: Query liquidity by the voucher coin name
       tags:
         - CoinSwap
       parameters:
         - in: path
-          name: id
-          description: the unique liquidity id of the token-iris pair
+          name: voucher-coin-name
+          description: the liquidity voucher coin name of the token-iris pair
           required: true
           schema:
             type: string
@@ -2906,18 +2906,18 @@ paths:
               schema:
                 $ref: '#/components/schemas/CoinSwapLiquidity'
         '400':
-          description: Invalid Liquidity Id
+          description: Invalid Liquidity voucher coin name
         '500':
           description: Internal Server Error
-  '/coinswap/liquidities/{id}/deposit':
+  '/coinswap/liquidities/{voucher-coin-name}/deposit':
     post:
       summary: Add liquidity by exact iris amount, calculated token and liquidity amount
       tags:
         - CoinSwap
       parameters:
         - in: path
-          name: id
-          description: the unique liquidity id of the token-iris pair
+          name: voucher-coin-name
+          description: the liquidity voucher coin name of the token-iris pair
           required: true
           schema:
             type: string
@@ -2950,15 +2950,15 @@ paths:
                   example: '30s'
                 sender:
                   $ref: '#/components/schemas/Address'
-  '/coinswap/liquidities/{id}/withdraw':
+  '/coinswap/liquidities/{voucher-coin-name}/withdraw':
     post:
       summary: Remove liquidity by exact liquidity amount, calculated iris and token amount
       tags:
         - CoinSwap
       parameters:
         - in: path
-          name: id
-          description: the unique liquidity id of the token-iris pair
+          name: voucher-coin-name
+          description: the liquidity voucher coin name of the token-iris pair
           required: true
           schema:
             type: string
@@ -2993,7 +2993,7 @@ paths:
                   $ref: '#/components/schemas/Address'
   '/coinswap/liquidities/buy':
     post:
-      summary: Swap coin by exact output, calculated input
+      summary: Swap token by exact output, calculated input
       tags:
         - CoinSwap
       responses:
@@ -3020,7 +3020,7 @@ paths:
                   example: '30s'
   '/coinswap/liquidities/sell':
     post:
-      summary: Swap coin by exact input, calculated output
+      summary: Swap token by exact input, calculated output
       tags:
         - CoinSwap
       responses:
@@ -3871,9 +3871,6 @@ components:
         symbol:
           type: string
           example: 'eth'
-        canonical_symbol:
-          type: string
-          example: 'ETH'
         name:
           type: string
           example: 'ETH'
