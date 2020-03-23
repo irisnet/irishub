@@ -127,10 +127,6 @@ func GetEarnedFeesKey(address sdk.AccAddress) []byte {
 	return append(earnedFeesKey, address.Bytes()...)
 }
 
-func GetIntraTxCounterKey() []byte {
-	return intraTxCounterKey
-}
-
 func getStringsKey(ss []string) (result []byte) {
 	for _, s := range ss {
 		result = append(append(result, []byte(s)...), emptyByte...)

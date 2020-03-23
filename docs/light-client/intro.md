@@ -142,20 +142,20 @@ This api supports the following special parameters. By default, their values are
 ### Asset module APIs
 
 1. `POST /asset/tokens`: Issue a token
-2. `PUT /asset/tokens/{token-id}`: Edit an existing token
-3. `POST /asset/tokens/{token-id}/mint`: The asset owner and operator can directly mint tokens to a specified address
-4. `POST /asset/tokens/{token-id}/transfer`: transfer the owner of a token to a new owner
+2. `PUT /asset/tokens/{symbol}`: Edit an existing token
+3. `POST /asset/tokens/{symbol}/mint`: Mint tokens to a specified address
+4. `POST /asset/tokens/{symbol}/transfer`: Transfer the owner of a token to a new owner
 5. `GET /asset/tokens`: Query tokens by condition
-6. `GET /asset/tokens/{token-id}`: Query token by unique id
+6. `GET /asset/tokens/{symbol}`: Query a token by symbol
 7. `GET /asset/tokens/{symbol}/fee`: Query the fees for issuing and minting the specified token
 
 ### Coinswap module APIs
 
-1. `POST /coinswap/liquidities/{id}/deposit`: add liquidities
-2. `POST /coinswap/liquidities/{id}/withdraw`: withdraw liquidities
-3. `POST /coinswap/liquidities/buy`: swap token(buy a fixed number of  token)
-4. `POST /coinswap/liquidities/sell`: swap token(sell a fixed number of  token)
-5. `GET /coinswap/liquidities/{id}`: query liquidity by a liquidity id
+1. `POST /coinswap/liquidities/{voucher-coin-name}/deposit`: add liquidities
+2. `POST /coinswap/liquidities/{voucher-coin-name}/withdraw`: withdraw liquidities
+3. `POST /coinswap/liquidities/buy`: swap token(buy a fixed number of tokens)
+4. `POST /coinswap/liquidities/sell`: swap token(sell a fixed number of tokens)
+5. `GET /coinswap/liquidities/{voucher-coin-name}`: query liquidity by the voucher coin name
 
 ### HTLC module APIs
 

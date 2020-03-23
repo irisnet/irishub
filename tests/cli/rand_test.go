@@ -43,9 +43,6 @@ func TestIrisCLIRand(t *testing.T) {
 
 	// service data
 	serviceName := "random"
-	serviceDesc := "random"
-	serviceTags := []string{"tag1", "tag2"}
-	authorDesc := "author"
 	serviceSchemas := `{"input":{"type":"object","properties":{}},"output":{"type":"object","properties":{"seed":{"description":"seed","type":"string","pattern":"^[0-9a-fA-F]{64}$"}}},"error":{"type":"string"}}`
 	deposit := "10iris"
 	priceAmt := 1 // 1iris
@@ -61,22 +58,6 @@ func TestIrisCLIRand(t *testing.T) {
 	blockInterval := int64(5)
 	oracle := "true"
 	serviceFeeCap := "10iris"
-
-	// define service (foo)
-	svcDefOutput, _ := tests.ExecuteT(t, fmt.Sprintf("iriscli service definition %s %v", serviceName, flags), "")
-	require.Equal(t, "", svcDefOutput)
-
-	sdStr := fmt.Sprintf("iriscli service define %v", flags)
-	sdStr += fmt.Sprintf(" --from=%s", "foo")
-	sdStr += fmt.Sprintf(" --name=%s", serviceName)
-	sdStr += fmt.Sprintf(" --description=%s", serviceDesc)
-	sdStr += fmt.Sprintf(" --tags=%s", serviceTags)
-	sdStr += fmt.Sprintf(" --author-description=%s", authorDesc)
-	sdStr += fmt.Sprintf(" --schemas=%s", serviceSchemas)
-	sdStr += fmt.Sprintf(" --fee=%s", "0.4iris")
-
-	executeWrite(t, sdStr, sdk.DefaultKeyPass)
-	tests.WaitForNextNBlocksTM(2, port)
 
 	svcDef := executeGetServiceDefinition(t, fmt.Sprintf("iriscli service definition %s %v", serviceName, flags))
 	require.Equal(t, serviceName, svcDef.Name)
@@ -141,7 +122,7 @@ func TestIrisCLIRand(t *testing.T) {
 	require.Equal(t, uint64(1), serviceRequests[0].RequestContextBatchCounter)
 
 	// respond service request (foo)
-	reqID := hex.EncodeToString(serviceRequests[0].ID)
+	reqID := serviceRequests[0].ID.String()
 
 	srStr := fmt.Sprintf("iriscli service respond %v", flags)
 	srStr += fmt.Sprintf(" --from=%s", "foo")
@@ -159,5 +140,5 @@ func TestIrisCLIRand(t *testing.T) {
 	rand := executeGetRand(t, fmt.Sprintf("iriscli rand query-rand --request-id=%s %v", randReqID, flags))
 	require.True(t, len(rand.RequestTxHash) > 0)
 	require.True(t, rand.Height > 0)
-	require.True(t, rand.Value != "")
+	require.True(t, rand.Value.String() != "")
 }

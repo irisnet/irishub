@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"encoding/json"
 	"strings"
 
 	cmn "github.com/tendermint/tendermint/libs/common"
@@ -40,17 +41,18 @@ func NewKeeper(cdc *codec.Codec, key sdk.StoreKey,
 }
 
 //CreateFeed create a stopped feed
-func (k Keeper) CreateFeed(ctx sdk.Context, msg types.MsgCreateFeed) sdk.Error {
+func (k Keeper) CreateFeed(ctx sdk.Context, msg types.MsgCreateFeed) (sdk.Tags, sdk.Error) {
+	tags := sdk.NewTags()
 	_, existed := k.gk.GetProfiler(ctx, msg.Creator)
 	if !existed {
-		return types.ErrNotProfiler(types.DefaultCodespace, msg.Creator)
+		return tags, types.ErrNotProfiler(types.DefaultCodespace, msg.Creator)
 	}
 
 	if _, found := k.GetFeed(ctx, msg.FeedName); found {
-		return types.ErrExistedFeedName(types.DefaultCodespace, msg.FeedName)
+		return tags, types.ErrExistedFeedName(types.DefaultCodespace, msg.FeedName)
 	}
 
-	requestContextID, err := k.sk.CreateRequestContext(ctx,
+	requestContextID, tags, err := k.sk.CreateRequestContext(ctx,
 		msg.ServiceName,
 		msg.Providers,
 		msg.Creator,
@@ -59,9 +61,9 @@ func (k Keeper) CreateFeed(ctx sdk.Context, msg types.MsgCreateFeed) sdk.Error {
 		msg.Timeout,
 		false,
 		true,
-		msg.RepeatedFrequency, msg.RepeatedTotal, service.PAUSED, msg.ResponseThreshold, types.ModuleName)
+		msg.RepeatedFrequency, -1, service.PAUSED, msg.ResponseThreshold, types.ModuleName)
 	if err != nil {
-		return err
+		return tags, err
 	}
 
 	k.SetFeed(ctx, types.Feed{
@@ -74,7 +76,7 @@ func (k Keeper) CreateFeed(ctx sdk.Context, msg types.MsgCreateFeed) sdk.Error {
 		Creator:          msg.Creator,
 	})
 	k.Enqueue(ctx, msg.FeedName, service.PAUSED)
-	return nil
+	return tags, nil
 }
 
 //StartFeed start a stopped feed
@@ -151,7 +153,7 @@ func (k Keeper) EditFeed(ctx sdk.Context, msg types.MsgEditFeed) sdk.Error {
 		msg.ServiceFeeCap,
 		msg.Timeout,
 		msg.RepeatedFrequency,
-		msg.RepeatedTotal,
+		-1,
 		msg.Creator); err != nil {
 		return err
 	}
@@ -174,7 +176,10 @@ func (k Keeper) EditFeed(ctx sdk.Context, msg types.MsgEditFeed) sdk.Error {
 
 //HandlerResponse is responsible for processing the data returned from the service module,
 //processed by the aggregate function, and then saved
-func (k Keeper) HandlerResponse(ctx sdk.Context, requestContextID cmn.HexBytes, responseOutput []string, err error) {
+func (k Keeper) HandlerResponse(ctx sdk.Context,
+	requestContextID cmn.HexBytes,
+	responseOutput []string,
+	err error) (tags sdk.Tags) {
 	if len(responseOutput) == 0 || err != nil {
 		ctx = ctx.WithLogger(ctx.Logger().With("handler", "HandlerResponse"))
 		ctx.Logger().Error("Oracle feed failed",
@@ -204,11 +209,18 @@ func (k Keeper) HandlerResponse(ctx sdk.Context, requestContextID cmn.HexBytes, 
 		result := gjson.Get(jsonStr, feed.ValueJsonPath)
 		data = append(data, result)
 	}
+
+	result := aggregate(data)
 	value := types.FeedValue{
-		Data:      aggregate(data),
+		Data:      result,
 		Timestamp: ctx.BlockTime(),
 	}
 	k.SetFeedValue(ctx, feed.FeedName, reqCtx.BatchCounter, feed.LatestHistory, value)
+	bz, _ := json.Marshal(value)
+	return sdk.NewTags(
+		types.TagFeedName, []byte(feed.FeedName),
+		types.TagFeedValue(feed.FeedName), bz,
+	)
 }
 
 func (k Keeper) GetRequestContext(ctx sdk.Context, requestContextID cmn.HexBytes) (service.RequestContext, bool) {

@@ -1,21 +1,22 @@
 package types
 
 import (
-	"encoding/hex"
 	"fmt"
+
+	cmn "github.com/tendermint/tendermint/libs/common"
 
 	sdk "github.com/irisnet/irishub/types"
 )
 
 // Rand represents a random number with related data
 type Rand struct {
-	RequestTxHash []byte  `json:"request_tx_hash"` // the original request tx hash
-	Height        int64   `json:"height"`          // the height of the block used to generate the random number
-	Value         sdk.Rat `json:"value"`           // the actual random number
+	RequestTxHash cmn.HexBytes `json:"request_tx_hash"` // the original request tx hash
+	Height        int64        `json:"height"`          // the height of the block used to generate the random number
+	Value         sdk.Rat      `json:"value"`           // the actual random number
 }
 
 // NewRand constructs a Rand
-func NewRand(requestTxHash []byte, height int64, value sdk.Rat) Rand {
+func NewRand(requestTxHash cmn.HexBytes, height int64, value sdk.Rat) Rand {
 	return Rand{
 		RequestTxHash: requestTxHash,
 		Height:        height,
@@ -29,7 +30,7 @@ func (r Rand) String() string {
   RequestTxHash:     %s
   Height:            %d
   Value:             %s`,
-		hex.EncodeToString(r.RequestTxHash),
+		r.RequestTxHash.String(),
 		r.Height,
 		r.Value.Rat.FloatString(RandPrec),
 	)

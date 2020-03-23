@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"encoding/hex"
-	"fmt"
 	"math/rand"
 	"time"
 
@@ -17,7 +16,8 @@ import (
 )
 
 // RequestService request the service for oracle seed
-func (k Keeper) RequestService(ctx sdk.Context, reqID cmn.HexBytes, consumer sdk.AccAddress, serviceFeeCap sdk.Coins) (cmn.HexBytes, sdk.Error) {
+func (k Keeper) RequestService(ctx sdk.Context, consumer sdk.AccAddress, serviceFeeCap sdk.Coins) (cmn.HexBytes, sdk.Tags, sdk.Error) {
+	tags := sdk.NewTags()
 	iterator := k.sk.ServiceBindingsIterator(ctx, types.ServiceName)
 	defer iterator.Close()
 
@@ -30,19 +30,19 @@ func (k Keeper) RequestService(ctx sdk.Context, reqID cmn.HexBytes, consumer sdk
 	}
 
 	if len(bindings) < 1 {
-		return nil, types.ErrInvalidServiceBindings(types.DefaultCodespace, fmt.Sprintf("no service bindings available"))
+		return nil, tags, types.ErrInvalidServiceBindings(types.DefaultCodespace, "no service bindings available")
 	}
 
 	coins := k.bk.GetCoins(ctx, consumer)
 	if !coins.IsAllGTE(serviceFeeCap) {
-		return nil, types.ErrInsufficientBalance(types.DefaultCodespace, fmt.Sprintf("insufficient balance"))
+		return nil, tags, types.ErrInsufficientBalance(types.DefaultCodespace, "insufficient balance")
 	}
 
 	rand.Seed(time.Now().UnixNano())
 	provider := []sdk.AccAddress{bindings[rand.Intn(len(bindings))].Provider}
 	timeout := k.sk.GetParamSet(ctx).MaxRequestTimeout
 
-	requestContextID, err := k.sk.CreateRequestContext(
+	requestContextID, tags, err := k.sk.CreateRequestContext(
 		ctx,
 		types.ServiceName,
 		provider,
@@ -54,19 +54,28 @@ func (k Keeper) RequestService(ctx sdk.Context, reqID cmn.HexBytes, consumer sdk
 		false,
 		0,
 		0,
-		exported.RUNNING,
+		exported.PAUSED,
 		1,
 		types.ModuleName,
 	)
 	if err != nil {
-		return nil, err
+		return nil, tags, err
 	}
 
-	return requestContextID, nil
+	return requestContextID, tags, nil
+}
+
+// StartRequestContext starts the service context
+func (k Keeper) StartRequestContext(
+	ctx sdk.Context,
+	serviceContextID cmn.HexBytes,
+	consumer sdk.AccAddress,
+) sdk.Error {
+	return k.sk.StartRequestContext(ctx, serviceContextID, consumer)
 }
 
 // HandlerResponse is responsible for processing the data returned from the service module
-func (k Keeper) HandlerResponse(ctx sdk.Context, requestContextID cmn.HexBytes, responseOutput []string, err error) {
+func (k Keeper) HandlerResponse(ctx sdk.Context, requestContextID cmn.HexBytes, responseOutput []string, err error) (tags sdk.Tags) {
 	if len(responseOutput) == 0 || err != nil {
 		ctx = ctx.WithLogger(ctx.Logger().With("handler", "HandlerResponse"))
 		ctx.Logger().Error(
@@ -126,6 +135,11 @@ func (k Keeper) HandlerResponse(ctx sdk.Context, requestContextID cmn.HexBytes, 
 	k.SetRand(ctx, reqID, types.NewRand(request.TxHash, lastBlockHeight, rand))
 
 	k.DeleteOracleRandRequest(ctx, requestContextID)
+
+	return tags.AppendTags(sdk.NewTags(
+		types.TagReqID, []byte(reqID.String()),
+		types.TagRand(reqID.String()), []byte(rand.Rat.FloatString(types.RandPrec)),
+	))
 }
 
 // GetRequestContext retrieves the request context by the specified request context id

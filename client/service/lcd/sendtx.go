@@ -525,6 +525,13 @@ func respondServiceHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.H
 			return
 		}
 
+		requestIDStr := req.RequestID
+		requestID, err := service.ConvertRequestID(requestIDStr)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
 		baseReq := req.BaseTx.Sanitize()
 		if !baseReq.ValidateBasic(w) {
 			return
@@ -536,7 +543,7 @@ func respondServiceHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.H
 			return
 		}
 
-		msg := service.NewMsgRespondService(req.RequestID, provider, req.Result, req.Output)
+		msg := service.NewMsgRespondService(requestID, provider, req.Result, req.Output)
 		if err = msg.ValidateBasic(); err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return

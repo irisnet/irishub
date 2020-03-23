@@ -28,6 +28,7 @@ type Context struct {
 	header          abci.Header
 	chainID         string
 	txBytes         []byte
+	txHash          []byte
 	logger          log.Logger
 	voteInfo        []abci.VoteInfo
 	gasMeter        GasMeter
@@ -38,6 +39,7 @@ type Context struct {
 	coinFlowTrigger string
 	coinFlowTags    CoinFlowTags
 	validTxCounter  *ValidTxCounter
+	msgIndex        int64
 }
 
 // Read-only accessors
@@ -47,6 +49,7 @@ func (c Context) BlockHeight() int64              { return c.header.Height }
 func (c Context) BlockTime() time.Time            { return c.header.Time }
 func (c Context) ChainID() string                 { return c.chainID }
 func (c Context) TxBytes() []byte                 { return c.txBytes }
+func (c Context) TxHash() []byte                  { return c.txHash }
 func (c Context) Logger() log.Logger              { return c.logger }
 func (c Context) VoteInfos() []abci.VoteInfo      { return c.voteInfo }
 func (c Context) GasMeter() GasMeter              { return c.gasMeter }
@@ -56,6 +59,7 @@ func (c Context) MinimumFees() Coins              { return c.minimumFee }
 func (c Context) CoinFlowTags() CoinFlowTags      { return c.coinFlowTags }
 func (c Context) CoinFlowTrigger() string         { return c.coinFlowTrigger }
 func (c Context) ValidTxCounter() *ValidTxCounter { return c.validTxCounter }
+func (c Context) MsgIndex() int64                 { return c.msgIndex }
 
 // clone the header before returning
 func (c Context) BlockHeader() abci.Header {
@@ -132,8 +136,18 @@ func (c Context) WithCheckValidNum(txCounter *ValidTxCounter) Context {
 	return c
 }
 
+func (c Context) WithMsgIndex(msgIndex int64) Context {
+	c.msgIndex = msgIndex
+	return c
+}
+
 func (c Context) WithTxBytes(txBytes []byte) Context {
 	c.txBytes = txBytes
+	return c
+}
+
+func (c Context) WithTxHash(txHash []byte) Context {
+	c.txHash = txHash
 	return c
 }
 

@@ -33,16 +33,18 @@ func NewGenesisState(
 }
 
 // DefaultGenesisState returns the default genesis state
-func DefaultGenesisState() GenesisState {
+func DefaultGenesisState(moduleSvcDefinitions []ServiceDefinition) GenesisState {
 	return GenesisState{
-		Params: DefaultParams(),
+		Params:      DefaultParams(),
+		Definitions: moduleSvcDefinitions,
 	}
 }
 
 // get raw genesis raw message for testing
-func DefaultGenesisStateForTest() GenesisState {
+func DefaultGenesisStateForTest(moduleSvcDefinitions []ServiceDefinition) GenesisState {
 	return GenesisState{
-		Params: DefaultParamsForTest(),
+		Params:      DefaultParamsForTest(),
+		Definitions: moduleSvcDefinitions,
 	}
 }
 

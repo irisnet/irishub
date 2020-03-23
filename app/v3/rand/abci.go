@@ -11,6 +11,7 @@ import (
 // BeginBlocker handles block beginning logic for rand
 func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, k Keeper) (tags sdk.Tags) {
 	ctx = ctx.WithLogger(ctx.Logger().With("handler", "beginBlock").With("module", "iris/rand"))
+	tags = sdk.NewTags()
 
 	currentTimestamp := ctx.BlockHeader().Time.Unix()
 	lastBlockHeight := ctx.BlockHeight() - 1
@@ -30,19 +31,19 @@ func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, k Keeper) (tags s
 			// get the request id
 			reqID := GenerateRequestID(request)
 
-			if requestContextID, err := k.RequestService(ctx, reqID, request.Consumer, request.ServiceFeeCap); err == nil {
-				k.SetOracleRandRequest(ctx, requestContextID, request)
+			if err := k.StartRequestContext(ctx, request.ServiceContextID, request.Consumer); err == nil {
+				k.SetOracleRandRequest(ctx, request.ServiceContextID, request)
 				requestedOracleRandNum++
 
 				// add tags
 				tags = tags.AppendTags(
 					sdk.NewTags(
 						TagReqID, []byte(reqID.String()),
-						TagRequestContextID, []byte(requestContextID.String()),
+						TagRequestContextID, []byte(request.ServiceContextID.String()),
 					),
 				)
 			} else {
-				ctx.Logger().Info(fmt.Sprintf("request service error : %s", err.Error()))
+				ctx.Logger().Info(fmt.Sprintf("start service error : %s", err.Error()))
 			}
 
 			k.DequeueRandRequest(ctx, lastBlockHeight, reqID)
@@ -61,7 +62,7 @@ func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, k Keeper) (tags s
 			tags = tags.AppendTags(
 				sdk.NewTags(
 					TagReqID, []byte(reqID.String()),
-					TagRand, []byte(rand.Rat.FloatString(RandPrec)),
+					TagRand(reqID.String()), []byte(rand.Rat.FloatString(RandPrec)),
 				),
 			)
 

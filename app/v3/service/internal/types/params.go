@@ -210,7 +210,7 @@ func DefaultParams() Params {
 // default service module params for test
 func DefaultParamsForTest() Params {
 	return Params{
-		MaxRequestTimeout:    5,
+		MaxRequestTimeout:    10,
 		MinDepositMultiple:   10,
 		MinDeposit:           sdk.NewCoins(sdk.NewCoin(sdk.IrisAtto, sdk.NewIntWithDecimal(10, 18))), // 10iris
 		ServiceFeeTax:        sdk.NewDecWithPrec(1, 2),                                               // 1%

@@ -25,7 +25,6 @@ func GetCmdCreateFeed(cdc *codec.Codec) *cobra.Command {
 			`--providers="faa1hp29kuh22vpjjlnctmyml5s75evsnsd8r4x0mm,faa15rurzhkemsgfm42dnwhafjdv5s8e2pce0ku8ya" ` +
 			`--service-fee-cap=1iris ` +
 			`--timeout=2 ` +
-			`--frequency=10 ` +
 			`--total=10 ` +
 			`--threshold=1 ` +
 			`--aggregate-func="avg" ` +
@@ -69,7 +68,6 @@ func GetCmdCreateFeed(cdc *codec.Codec) *cobra.Command {
 				Timeout:           viper.GetInt64(FlagTimeout),
 				ServiceFeeCap:     serviceFeeCap,
 				RepeatedFrequency: uint64(viper.GetInt64(FlagFrequency)),
-				RepeatedTotal:     viper.GetInt64(FlagTotal),
 				ResponseThreshold: uint16(viper.GetInt(FlagThreshold)),
 				Creator:           creator,
 			}
@@ -173,7 +171,6 @@ func GetCmdEditFeed(cdc *codec.Codec) *cobra.Command {
 			`--timeout=2 ` +
 			`--frequency=10 ` +
 			`--threshold=5 ` +
-			`--total=-1 ` +
 			`--threshold=1`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
@@ -209,7 +206,6 @@ func GetCmdEditFeed(cdc *codec.Codec) *cobra.Command {
 				Timeout:           viper.GetInt64(FlagTimeout),
 				ServiceFeeCap:     serviceFeeCap,
 				RepeatedFrequency: uint64(viper.GetInt64(FlagFrequency)),
-				RepeatedTotal:     viper.GetInt64(FlagTotal),
 				ResponseThreshold: uint16(viper.GetInt(FlagThreshold)),
 				Creator:           creator,
 			}

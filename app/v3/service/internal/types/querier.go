@@ -2,6 +2,7 @@ package types
 
 import (
 	sdk "github.com/irisnet/irishub/types"
+	cmn "github.com/tendermint/tendermint/libs/common"
 )
 
 const (
@@ -41,7 +42,7 @@ type QueryWithdrawAddressParams struct {
 
 // QueryRequestParams defines the params to query the request by ID
 type QueryRequestParams struct {
-	RequestID string
+	RequestID []byte
 }
 
 // QueryRequestsParams defines the params to query all requests for a service binding
@@ -52,20 +53,20 @@ type QueryRequestsParams struct {
 
 // QueryResponseParams defines the params to query the response for a request
 type QueryResponseParams struct {
-	RequestID string
+	RequestID cmn.HexBytes
 }
 
 type QueryRequestContextParams struct {
-	RequestContextID []byte
+	RequestContextID cmn.HexBytes
 }
 
 type QueryRequestsByReqCtxParams struct {
-	RequestContextID []byte
+	RequestContextID cmn.HexBytes
 	BatchCounter     uint64
 }
 
 type QueryResponsesParams struct {
-	RequestContextID []byte
+	RequestContextID cmn.HexBytes
 	BatchCounter     uint64
 }
 
