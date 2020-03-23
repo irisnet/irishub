@@ -177,12 +177,9 @@ const (
 	"type": "object",
 	"definitions": {
 	  "discount": {
-		"description": "promotion discount",
-		"type": "number",
-		"minimum": 0,
-		"exclusiveMinimum": true,
-		"maximum": 1,
-		"exclusiveMaximum": true
+		"description": "promotion discount, greater than 0 and less than 1",
+		"type": "string",
+		"pattern": "^0\\.\\d*[1-9]$"
 	  },
 	  "promotion_by_time": {
 		"description": "promotion by time",
@@ -231,12 +228,12 @@ const (
 	},
 	"properties": {
 	  "price": {
-		"description": "base price",
+		"description": "base price in main unit, e.g. 0.5iris",
 		"type": "string",
-		"pattern": "^[0-9]+(\\.[0-9]+)?[a-z][a-z0-9]{2,7}(,[0-9]+(\\.[0-9]+)?[a-z][a-z0-9]{2,7})*$"
+		"pattern": "^\\d+(\\.\\d+)?[a-z][a-z0-9]{2,7}(,\\d+(\\.\\d+)?[a-z][a-z0-9]{2,7})*$"
 	  },
 	  "promotions_by_time": {
-		"description": "promotions by time",
+		"description": "promotions by time, in ascending order",
 		"type": "array",
 		"items": {
 		  "$ref": "#/definitions/promotion_by_time"
@@ -245,7 +242,7 @@ const (
 		"uniqueItems": true
 	  },
 	  "promotions_by_volume": {
-		"description": "promotions by volume",
+		"description": "promotions by volume, in ascending order",
 		"type": "array",
 		"items": {
 		  "$ref": "#/definitions/promotion_by_volume"
@@ -261,7 +258,7 @@ const (
 }
 `
 
-	// ResultSchema is the JSON Schema for the response  result
+	// ResultSchema is the JSON Schema for the response result
 	ResultSchema = `
 {
 	"$schema": "http://json-schema.org/draft-04/schema#",
