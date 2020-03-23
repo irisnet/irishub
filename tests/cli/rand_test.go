@@ -137,7 +137,7 @@ func TestIrisCLIRand(t *testing.T) {
 	tests.WaitForNextNBlocksTM(2, port)
 
 	// query random by request id
-	rand := executeGetRand(t, fmt.Sprintf("iriscli rand query-rand --request-id=%s %v", randReqID, flags))
+	rand := executeGetRand(t, fmt.Sprintf("iriscli rand query-rand %s %v", randReqID, flags))
 	require.True(t, len(rand.RequestTxHash) > 0)
 	require.True(t, rand.Height > 0)
 	require.True(t, rand.Value.String() != "")

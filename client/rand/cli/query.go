@@ -15,13 +15,14 @@ import (
 // GetCmdQueryRand implements the query-rand command.
 func GetCmdQueryRand(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "query-rand [request id]",
+		Use:     "query-rand [request-id]",
 		Short:   "Query a random number by the request id",
-		Example: "iriscli rand query-rand --request-id=<request id>",
+		Example: "iriscli rand query-rand <request id>",
+		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			reqID := viper.GetString(FlagReqID)
+			reqID := args[0]
 			if err := rand.CheckReqID(reqID); err != nil {
 				return err
 			}
@@ -50,7 +51,6 @@ func GetCmdQueryRand(cdc *codec.Codec) *cobra.Command {
 	}
 
 	cmd.Flags().AddFlagSet(FsQueryRand)
-	_ = cmd.MarkFlagRequired(FlagReqID)
 
 	return cmd
 }
