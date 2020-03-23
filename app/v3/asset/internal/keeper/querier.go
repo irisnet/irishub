@@ -105,7 +105,7 @@ func queryToken(ctx sdk.Context, keeper Keeper, symbol string) (types.TokenOutpu
 		return types.NewTokenOutputFrom(getIrisToken()), nil
 	}
 
-	token, err := keeper.GetToken(ctx, symbol)
+	token, err := keeper.getToken(ctx, symbol)
 	if err != nil {
 		return types.TokenOutput{}, err
 	}

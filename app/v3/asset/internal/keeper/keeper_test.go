@@ -40,7 +40,7 @@ func TestKeeperIssueToken(t *testing.T) {
 
 	assert.True(t, keeper.HasToken(ctx, msg.Symbol))
 
-	token, err := keeper.GetToken(ctx, msg.Symbol)
+	token, err := keeper.getToken(ctx, msg.Symbol)
 	ft := types.NewFungibleToken(msg.Symbol, msg.Name, msg.MinUnitAlias, msg.Decimal, msg.InitialSupply, msg.MaxSupply, msg.Mintable, msg.Owner)
 	assert.NoError(t, err)
 	assert.Equal(t, ft, token)
@@ -70,7 +70,7 @@ func TestKeeperEditToken(t *testing.T) {
 
 	assert.True(t, keeper.HasToken(ctx, msg.Symbol))
 
-	token, err := keeper.GetToken(ctx, msg.Symbol)
+	token, err := keeper.getToken(ctx, msg.Symbol)
 	ft := types.NewFungibleToken(msg.Symbol, msg.Name, msg.MinUnitAlias, msg.Decimal, msg.InitialSupply, msg.MaxSupply, msg.Mintable, msg.Owner)
 	assert.NoError(t, err)
 	assert.Equal(t, ft, token)
@@ -81,7 +81,7 @@ func TestKeeperEditToken(t *testing.T) {
 	_, err = keeper.EditToken(ctx, msgEditToken)
 	assert.NoError(t, err)
 
-	token, err = keeper.GetToken(ctx, ft.Symbol)
+	token, err = keeper.getToken(ctx, ft.Symbol)
 	assert.NoError(t, err)
 	ft.Name = msgEditToken.Name
 	ft.Mintable = false
@@ -119,7 +119,7 @@ func TestMintToken(t *testing.T) {
 
 	assert.True(t, keeper.HasToken(ctx, msg.Symbol))
 
-	token, err := keeper.GetToken(ctx, msg.Symbol)
+	token, err := keeper.getToken(ctx, msg.Symbol)
 	ft := types.NewFungibleToken(msg.Symbol, msg.Name, msg.MinUnitAlias, msg.Decimal, msg.InitialSupply, msg.MaxSupply, msg.Mintable, msg.Owner)
 	assert.NoError(t, err)
 	assert.Equal(t, ft, token)
@@ -157,7 +157,7 @@ func TestTransferOwnerKeeper(t *testing.T) {
 
 	assert.True(t, keeper.HasToken(ctx, issueMsg.Symbol))
 
-	tokenSrc, err := keeper.GetToken(ctx, issueMsg.Symbol)
+	tokenSrc, err := keeper.getToken(ctx, issueMsg.Symbol)
 	ft := types.NewFungibleToken(issueMsg.Symbol, issueMsg.Name, issueMsg.MinUnitAlias, issueMsg.Decimal, issueMsg.InitialSupply, issueMsg.MaxSupply, issueMsg.Mintable, issueMsg.Owner)
 	assert.NoError(t, err)
 
@@ -172,7 +172,7 @@ func TestTransferOwnerKeeper(t *testing.T) {
 	_, err = keeper.TransferTokenOwner(ctx, msg)
 	assert.NoError(t, err)
 
-	token1, err := keeper.GetToken(ctx, ft.Symbol)
+	token1, err := keeper.getToken(ctx, ft.Symbol)
 	assert.NoError(t, err)
 
 	tokenSrc.Owner = dstOwner

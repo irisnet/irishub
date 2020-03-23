@@ -21,5 +21,5 @@ type GuardianKeeper interface {
 
 // AssetKeeper defines the expected asset keeper (noalias)
 type AssetKeeper interface {
-	GetToken(ctx sdk.Context, symbol string) (token exported.Token, err sdk.Error)
+	GetToken(ctx sdk.Context, symbol string) (token exported.TokenI, err sdk.Error)
 }
