@@ -32,8 +32,8 @@ func (k Keeper) AddServiceBinding(
 		return err
 	}
 
-	if !types.ValidServiceCoins(parsedPricing.Price) {
-		return types.ErrInvalidPricing(k.codespace, fmt.Sprintf("invalid pricing coins: %s", parsedPricing.Price))
+	if err := types.ValidatePricing(parsedPricing); err != nil {
+		return err
 	}
 
 	minDeposit := k.getMinDeposit(ctx, parsedPricing)
@@ -88,8 +88,8 @@ func (k Keeper) UpdateServiceBinding(
 			return err
 		}
 
-		if !types.ValidServiceCoins(parsedPricing.Price) {
-			return types.ErrInvalidPricing(k.codespace, fmt.Sprintf("invalid pricing coins: %s", parsedPricing.Price))
+		if err := types.ValidatePricing(parsedPricing); err != nil {
+			return err
 		}
 
 		binding.Pricing = pricing
@@ -114,7 +114,9 @@ func (k Keeper) UpdateServiceBinding(
 		}
 	}
 
-	k.SetServiceBinding(ctx, binding)
+	if updated {
+		k.SetServiceBinding(ctx, binding)
+	}
 
 	return nil
 }
@@ -273,7 +275,7 @@ func (k Keeper) ParsePricing(ctx sdk.Context, pricing string) (p types.Pricing, 
 		if unitName == sdk.Iris {
 			coins = coins.Add(sdk.NewCoins(sdk.NewCoin(
 				sdk.IrisAtto,
-				amt.Mul(sdk.NewDecFromInt(sdk.NewIntWithDecimal(1, 18))).TruncateInt(),
+				amt.Mul(sdk.NewDecFromInt(sdk.NewIntWithDecimal(1, sdk.AttoScale))).TruncateInt(),
 			)))
 		} else {
 			token, err := k.ak.GetToken(ctx, unitName)

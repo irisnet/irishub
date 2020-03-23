@@ -97,8 +97,7 @@ type PromotionByVolume struct {
 // GetDiscountByTime gets the discount level by the specified time
 func GetDiscountByTime(pricing Pricing, time time.Time) sdk.Dec {
 	for _, p := range pricing.PromotionsByTime {
-		if (time.Equal(p.StartTime) || time.After(p.StartTime)) &&
-			(time.Equal(p.EndTime) || time.Before(p.EndTime)) {
+		if time.After(p.StartTime) && (time.Equal(p.EndTime) || time.Before(p.EndTime)) {
 			return p.Discount
 		}
 	}
@@ -107,26 +106,52 @@ func GetDiscountByTime(pricing Pricing, time time.Time) sdk.Dec {
 }
 
 // GetDiscountByVolume gets the discount level by the specified volume
+// Note: ensure that the promotions by volume are sorted in ascending order
 func GetDiscountByVolume(pricing Pricing, volume uint64) sdk.Dec {
 	promotionsByVol := pricing.PromotionsByVolume
 
-	if len(promotionsByVol) > 0 {
-		if volume < promotionsByVol[0].Volume {
-			return sdk.OneDec()
-		}
-
-		if volume >= promotionsByVol[len(promotionsByVol)-1].Volume {
-			return promotionsByVol[len(promotionsByVol)-1].Discount
-		}
-
-		for i, p := range promotionsByVol {
-			if volume < p.Volume {
-				return promotionsByVol[i-1].Discount
+	for i, p := range promotionsByVol {
+		if volume < p.Volume {
+			if i == 0 {
+				return sdk.OneDec()
 			}
+
+			return promotionsByVol[i-1].Discount
+		}
+
+		if i == len(promotionsByVol)-1 {
+			return p.Discount
 		}
 	}
 
 	return sdk.OneDec()
+}
+
+// ValidatePricing validates the given pricing
+func ValidatePricing(pricing Pricing) sdk.Error {
+	if !validServiceCoins(pricing.Price) {
+		return ErrInvalidPricing(DefaultCodespace, "invalid price")
+	}
+
+	// CONTRACT:
+	// p.EndTime > p.StartTime
+	// p[i].StartTime >= p[i-1].Endtime
+	for i, p := range pricing.PromotionsByTime {
+		if !p.EndTime.After(p.StartTime) ||
+			(i > 0 && p.StartTime.Before(pricing.PromotionsByTime[i-1].EndTime)) {
+			return ErrInvalidPricing(DefaultCodespace, fmt.Sprintf("invalid timing promotion %d", i))
+		}
+	}
+
+	// CONTRACT:
+	// p[i].Volume > p[i-1].Volume
+	for i, p := range pricing.PromotionsByVolume {
+		if i > 0 && p.Volume < pricing.PromotionsByVolume[i-1].Volume {
+			return ErrInvalidPricing(DefaultCodespace, fmt.Sprintf("invalid volume promotion %d", i))
+		}
+	}
+
+	return nil
 }
 
 func (binding ServiceBinding) Validate() sdk.Error {
@@ -138,7 +163,7 @@ func (binding ServiceBinding) Validate() sdk.Error {
 		return err
 	}
 
-	if !ValidServiceCoins(binding.Deposit) {
+	if !validServiceCoins(binding.Deposit) {
 		return ErrInvalidDeposit(DefaultCodespace, fmt.Sprintf("invalid deposit: %s", binding.Deposit))
 	}
 

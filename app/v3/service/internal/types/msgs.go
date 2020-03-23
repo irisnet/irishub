@@ -177,7 +177,7 @@ func (msg MsgBindService) ValidateBasic() sdk.Error {
 		return err
 	}
 
-	if !ValidServiceCoins(msg.Deposit) {
+	if !validServiceCoins(msg.Deposit) {
 		return ErrInvalidDeposit(DefaultCodespace, fmt.Sprintf("invalid deposit: %s", msg.Deposit))
 	}
 
@@ -239,7 +239,7 @@ func (msg MsgUpdateServiceBinding) ValidateBasic() sdk.Error {
 		return err
 	}
 
-	if !msg.Deposit.Empty() && !ValidServiceCoins(msg.Deposit) {
+	if !msg.Deposit.Empty() && !validServiceCoins(msg.Deposit) {
 		return ErrInvalidDeposit(DefaultCodespace, fmt.Sprintf("invalid deposit: %s", msg.Deposit))
 	}
 
@@ -395,7 +395,7 @@ func (msg MsgEnableService) ValidateBasic() sdk.Error {
 		return err
 	}
 
-	if !msg.Deposit.Empty() && !ValidServiceCoins(msg.Deposit) {
+	if !msg.Deposit.Empty() && !validServiceCoins(msg.Deposit) {
 		return ErrInvalidDeposit(DefaultCodespace, fmt.Sprintf("invalid deposit: %s", msg.Deposit))
 	}
 
@@ -921,7 +921,7 @@ func (msg MsgWithdrawTax) ValidateBasic() sdk.Error {
 		return ErrInvalidAddress(DefaultCodespace, "destination address missing")
 	}
 
-	if !ValidServiceCoins(msg.Amount) {
+	if !validServiceCoins(msg.Amount) {
 		return sdk.ErrInvalidCoins(fmt.Sprintf("invalid withdrawal amount: %s", msg.Amount))
 	}
 
@@ -1001,7 +1001,7 @@ func ValidateRequest(
 		return err
 	}
 
-	if !ValidServiceCoins(serviceFeeCap) {
+	if !validServiceCoins(serviceFeeCap) {
 		return ErrInvalidServiceFee(DefaultCodespace, fmt.Sprintf("invalid service fee: %s", serviceFeeCap))
 	}
 
@@ -1054,7 +1054,7 @@ func ValidateRequestContextUpdating(
 		return err
 	}
 
-	if !serviceFeeCap.Empty() && !ValidServiceCoins(serviceFeeCap) {
+	if !serviceFeeCap.Empty() && !validServiceCoins(serviceFeeCap) {
 		return ErrInvalidServiceFee(DefaultCodespace, fmt.Sprintf("invalid service fee: %s", serviceFeeCap))
 	}
 
@@ -1087,6 +1087,6 @@ func checkDuplicateProviders(providers []sdk.AccAddress) sdk.Error {
 	return nil
 }
 
-func ValidServiceCoins(coins sdk.Coins) bool {
+func validServiceCoins(coins sdk.Coins) bool {
 	return coins.IsValidIrisAtto()
 }
