@@ -27,7 +27,7 @@ var (
 	testSchemas     = `{"input":{"type":"object"},"output":{"type":"object"}}`
 
 	testDeposit      = sdk.NewCoins(testCoin1)
-	testPricing      = `{"price":[{"denom":"iris-atto","amount":"1000000000000000000"}]}`
+	testPricing      = `{"price":"1iris","promotions_by_volume":[{"volume":1,"discount":"0.8"}]}`
 	testWithdrawAddr = sdk.AccAddress([]byte("test-withdrawal-address"))
 	testAddedDeposit = sdk.NewCoins(testCoin2)
 
@@ -51,6 +51,9 @@ func setServiceDefinition(ctx sdk.Context, k Keeper, author sdk.AccAddress) {
 func setServiceBinding(ctx sdk.Context, k Keeper, provider sdk.AccAddress, available bool, disabledTime time.Time) {
 	svcBinding := types.NewServiceBinding(testServiceName, provider, testDeposit, testPricing, available, disabledTime)
 	k.SetServiceBinding(ctx, svcBinding)
+
+	pricing, _ := k.ParsePricing(ctx, testPricing)
+	k.SetPricing(ctx, testServiceName, provider, pricing)
 }
 
 func setRequestContext(
@@ -382,6 +385,14 @@ func TestKeeper_Request_Service(t *testing.T) {
 	}
 
 	require.Equal(t, newProviders, requestProviders)
+
+	// increase volume
+	keeper.SetRequestVolume(ctx, consumer, testServiceName, provider1, 1)
+	keeper.SetRequestVolume(ctx, consumer, testServiceName, provider2, 1)
+
+	// service fees will change due to the increased volume
+	_, totalServiceFees = keeper.FilterServiceProviders(ctx, testServiceName, providers, testServiceFeeCap, consumer)
+	require.Equal(t, "1.6iris", totalServiceFees.MainUnitString())
 }
 
 func TestKeeper_Respond_Service(t *testing.T) {
