@@ -35,7 +35,6 @@ iriscli oracle create <flags>
 | --service-fee-cap | string   | Yes      |         | Only providers charging a fee lower than the cap will be invoked.                             |
 | --timeout         | int64    |          |         | The maximum number of blocks to wait for a response since a request is sent, beyond which the request will be ignored. |
 | --frequency       | uint64   |          |         | The invocation frequency of sending repeated requests.                                                   |
-| --total           | int64    |          | -1      | The total number of calls for repetitive requests,  -1 means unlimited.                       |
 | --threshold       | uint16   |          | 1       | The minimum number of responses needed for aggregation, range [1, Length(providers)].         |
 | --aggregate-func  | string   | Yes      |         | The name of predefined function for processing the service responses, e.g.avg、max、min etc.  |
 | --value-json-path | string   | Yes      |         | The field name or path of Service response result used to retrieve the value property of aggregate-func from response results.        |
@@ -93,7 +92,6 @@ iriscli oracle edit <feed-name> <flags>
 | --service-fee-cap | string   | Yes      |         | Only providers charging a fee lower than the cap will be invoked.                             |
 | --timeout         | int64    |          |         | The maximum number of blocks to wait for a response since a request is sent, beyond which the request will be ignored. |
 | --frequency       | uint64   |          |         | The invocation frequency of sending repeated requests.                                                   |
-| --total           | int64    |          | -1      | The total number of calls for repetitive requests,  -1 means unlimited.                       |
 | --threshold       | uint16   |          | 1       | The minimum number of responses needed for aggregation, range [1, Length(providers)].         |
 
 ### Edit an existed feed

@@ -24,7 +24,7 @@
 1. **创建Feed**
 
 ```bash
-iriscli oracle create --feed-name="test-feed" --latest-history=10 --service-name="test-service" --input={request-data} --providers="faa1hp29kuh22vpjjlnctmyml5s75evsnsd8r4x0mm,faa15rurzhkemsgfm42dnwhafjdv5s8e2pce0ku8ya" --service-fee-cap=1iris --timeout=2 --frequency=10 --total=10 --threshold=1 --aggregate-func="avg" --value-json-path="high" --chain-id="irishub-test" --from=node0 --fee=0.3iris --commit
+iriscli oracle create --feed-name="test-feed" --latest-history=10 --service-name="test-service" --input={request-data} --providers="faa1hp29kuh22vpjjlnctmyml5s75evsnsd8r4x0mm,faa15rurzhkemsgfm42dnwhafjdv5s8e2pce0ku8ya" --service-fee-cap=1iris --timeout=2 --frequency=10 --threshold=1 --aggregate-func="avg" --value-json-path="high" --chain-id="irishub-test" --from=node0 --fee=0.3iris --commit
 ```
 
 2. **启动Feed**
@@ -48,6 +48,6 @@ iriscli oracle pause test-feed --chain-id="irishub-test" --from=node0 --fee=0.3i
 可以通过`edit`命令编辑已经存在的`feed`，改变`feed`的数据收集行为。
 
 ```bash
-iriscli oracle edit test-feed --latest-history=5 --providers="faa1r3tyupskwlh07dmhjw70frxzaaaufta37y25yr,faa1ydahnhrhkjh9j9u0jn8p3s272l0ecqj40vra8h" --service-fee-cap=1iris --timeout=6 --threshold=5 --total=-1 --threshold=3 --chain-id="irishub-test" --from=node0 --fee=0.3iris --commit
+iriscli oracle edit test-feed --latest-history=5 --providers="faa1r3tyupskwlh07dmhjw70frxzaaaufta37y25yr,faa1ydahnhrhkjh9j9u0jn8p3s272l0ecqj40vra8h" --service-fee-cap=1iris --timeout=6 --threshold=5 --threshold=3 --chain-id="irishub-test" --from=node0 --fee=0.3iris --commit
 ```
 需要注意的是，如果创建时的`latest-history`大于当前修改的值，oracle模块会删除多余的数据。

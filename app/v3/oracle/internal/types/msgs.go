@@ -49,7 +49,6 @@ type MsgCreateFeed struct {
 	Timeout           int64            `json:"timeout"`
 	ServiceFeeCap     sdk.Coins        `json:"service_fee_cap"`
 	RepeatedFrequency uint64           `json:"repeated_frequency"`
-	RepeatedTotal     int64            `json:"repeated_total"`
 	AggregateFunc     string           `json:"aggregate_func"`
 	ValueJsonPath     string           `json:"value_json_path"`
 	ResponseThreshold uint16           `json:"response_threshold"`
@@ -214,7 +213,6 @@ type MsgEditFeed struct {
 	Timeout           int64            `json:"timeout"`
 	ServiceFeeCap     sdk.Coins        `json:"service_fee_cap"`
 	RepeatedFrequency uint64           `json:"repeated_frequency"`
-	RepeatedTotal     int64            `json:"repeated_total"`
 	ResponseThreshold uint16           `json:"response_threshold"`
 	Creator           sdk.AccAddress   `json:"creator"`
 }

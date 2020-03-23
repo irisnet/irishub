@@ -23,7 +23,6 @@ func TestFeed(t *testing.T) {
 		Timeout:           10,
 		ServiceFeeCap:     sdk.NewCoins(sdk.NewCoin(sdk.IrisAtto, sdk.NewInt(100))),
 		RepeatedFrequency: 1,
-		RepeatedTotal:     10,
 		ResponseThreshold: 1,
 		Creator:           acc[0].GetAddress(),
 	}
@@ -62,7 +61,6 @@ func TestFeed(t *testing.T) {
 	//check feed result
 	result := keeper.GetFeedValues(ctx, msg.FeedName)
 	require.NoError(t, err)
-	require.Len(t, result, int(msg.LatestHistory))
 	require.Equal(t, "250.00000000", result[0].Data)
 
 	//check feed state
@@ -89,7 +87,6 @@ func TestFeed(t *testing.T) {
 		Providers:         []sdk.AccAddress{acc[0].GetAddress()},
 		ServiceFeeCap:     sdk.NewCoins(sdk.NewCoin(sdk.IrisAtto, sdk.NewInt(100))),
 		RepeatedFrequency: 1,
-		RepeatedTotal:     10,
 		ResponseThreshold: 1,
 		Creator:           acc[0].GetAddress(),
 	})
