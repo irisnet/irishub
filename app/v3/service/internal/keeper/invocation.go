@@ -821,7 +821,7 @@ func (k Keeper) AddResponse(
 	response = types.NewResponse(provider, request.Consumer, result, output, requestContextID, request.RequestContextBatchCounter)
 	k.SetResponse(ctx, requestID, response)
 
-	k.DeleteActiveRequest(ctx, request.ServiceName, provider, request.ExpirationHeight, reqID)
+	k.DeleteActiveRequest(ctx, request.ServiceName, provider, request.ExpirationHeight, requestID)
 	k.IncreaseRequestVolume(ctx, request.Consumer, request.ServiceName, provider)
 
 	requestContext, _ := k.GetRequestContext(ctx, requestContextID)

@@ -446,7 +446,7 @@ func TestKeeper_Respond_Service(t *testing.T) {
 	_, found = keeper.GetResponse(ctx, requestID2)
 	require.True(t, found)
   
-  volume := keeper.GetRequestVolume(ctx, consumer, requestContext.ServiceName, provider)
+    volume = keeper.GetRequestVolume(ctx, consumer, requestContext.ServiceName, provider)
 	require.Equal(t, uint64(2), volume)
 
 	earnedFees, found := keeper.GetEarnedFees(ctx, provider)
