@@ -24,7 +24,7 @@ Specific instructions[service](./service.md). After completing the `service` rel
 1. **Create Feed**
 
 ```bash
-iriscli oracle create --feed-name="test-feed" --latest-history=10 --service-name="test-service" --input={request-data} --providers="faa1hp29kuh22vpjjlnctmyml5s75evsnsd8r4x0mm,faa15rurzhkemsgfm42dnwhafjdv5s8e2pce0ku8ya" --service-fee-cap=1iris --timeout=2 --frequency=10 --total=10 --threshold=1 --aggregate-func="avg" --value-json-path="high" --chain-id="irishub-test" --from=node0 --fee=0.3iris --commit
+iriscli oracle create --feed-name="test-feed" --latest-history=10 --service-name="test-service" --input={request-data} --providers="faa1hp29kuh22vpjjlnctmyml5s75evsnsd8r4x0mm,faa15rurzhkemsgfm42dnwhafjdv5s8e2pce0ku8ya" --service-fee-cap=1iris --timeout=2 --frequency=10 --threshold=1 --aggregate-func="avg" --value-json-path="high" --chain-id="irishub-test" --from=node0 --fee=0.3iris --commit
 ```
 
 2. **Start Feed**
@@ -48,6 +48,6 @@ iriscli oracle pause test-feed --chain-id="irishub-test" --from=node0 --fee=0.3i
 You can use the edit command to edit an existing feed to change the data collection behavior of the feed.
 
 ```bash
-iriscli oracle edit test-feed --latest-history=5 --providers="faa1r3tyupskwlh07dmhjw70frxzaaaufta37y25yr,faa1ydahnhrhkjh9j9u0jn8p3s272l0ecqj40vra8h" --service-fee-cap=1iris --timeout=6 --threshold=5 --total=-1 --threshold=3 --chain-id="irishub-test" --from=node0 --fee=0.3iris --commit
+iriscli oracle edit test-feed --latest-history=5 --providers="faa1r3tyupskwlh07dmhjw70frxzaaaufta37y25yr,faa1ydahnhrhkjh9j9u0jn8p3s272l0ecqj40vra8h" --service-fee-cap=1iris --timeout=6 --threshold=5 --threshold=3 --chain-id="irishub-test" --from=node0 --fee=0.3iris --commit
 ```
 Note that if the `latest-history` at the time of creation is greater than the currently modified value, the oracle module will delete the extra data.

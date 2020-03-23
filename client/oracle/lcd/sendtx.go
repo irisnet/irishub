@@ -52,7 +52,6 @@ type createFeedReq struct {
 	Timeout           int64        `json:"timeout"`
 	ServiceFeeCap     string       `json:"service_fee_cap"`
 	RepeatedFrequency uint64       `json:"repeated_frequency"`
-	RepeatedTotal     int64        `json:"repeated_total"`
 	ResponseThreshold uint16       `json:"response_threshold"`
 }
 
@@ -66,7 +65,6 @@ type editFeedReq struct {
 	Timeout           int64        `json:"timeout"`
 	ServiceFeeCap     string       `json:"service_fee_cap"`
 	RepeatedFrequency uint64       `json:"repeated_frequency"`
-	RepeatedTotal     int64        `json:"repeated_total"`
 	ResponseThreshold uint16       `json:"response_threshold"`
 }
 
@@ -126,7 +124,6 @@ func createFeedHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handl
 			Timeout:           req.Timeout,
 			ServiceFeeCap:     serviceFeeCap,
 			RepeatedFrequency: req.RepeatedFrequency,
-			RepeatedTotal:     req.RepeatedTotal,
 			ResponseThreshold: req.ResponseThreshold,
 			AggregateFunc:     req.AggregateFunc,
 			ValueJsonPath:     req.ValueJsonPath,
@@ -184,7 +181,6 @@ func editFeedHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handler
 			Timeout:           req.Timeout,
 			ServiceFeeCap:     serviceFeeCap,
 			RepeatedFrequency: req.RepeatedFrequency,
-			RepeatedTotal:     req.RepeatedTotal,
 			ResponseThreshold: req.ResponseThreshold,
 			Creator:           creator,
 		}

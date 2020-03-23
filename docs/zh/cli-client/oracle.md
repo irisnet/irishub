@@ -35,7 +35,6 @@ iriscli oracle create <flags>
 | --service-fee-cap | string   | 是   |      | 单个请求愿意支付的服务费上限                                                      |
 | --timeout         | int64    |      |      | 请求等待响应的最大区块数, 响应超过这个时间，请求将被忽略                          |
 | --frequency       | uint64   |      |      | 重复性请求的调用频率                                                              |
-| --total           | int64    |      | -1   | 重复性请求的调用总数；-1表示无限重复                                              |
 | --threshold       | uint16   |      | 1    | 期待服务的最小响应数量，取值范围[1,服务提供者数量]                                      |
 | --aggregate-func  | string   | 是   |      | 对 Service 响应结果进行处理的 IRISHub 预定义方法，目前支持：avg/max/min/          |
 | --value-json-path | string   | 是   |      | Service响应结果中的字段名称或路径，用于从响应结果中获取调用 aggregate-func 的参数 |
@@ -95,7 +94,6 @@ iriscli oracle edit <feed-name> <flags>
 | --service-fee-cap | string   | 是   |      | 单个请求愿意支付的服务费上限                                        |
 | --timeout         | int64    |      |      | 请求等待响应的最大区块数, 响应超过这个时间，请求将被忽略            |
 | --frequency       | uint64   |      |      | 重复性请求的调用频率                                                |
-| --total           | int64    |      | -1   | 重复性请求的调用总数；-1表示无限重复                                |
 | --threshold       | uint16   |      | 1    | 期待的最小响应数，取值范围[1,服务提供者数量]                        |
 
 ### 编辑feed

@@ -47,7 +47,6 @@ func TestIrisCLIOracle(t *testing.T) {
 	input := `{"pair":"iris-usdt"}`
 	timeout := int64(5)
 	repeatedFreq := uint64(10)
-	repeatedTotal := int64(1)
 	responseThreshold := uint16(1)
 	result := `{"code":200,"message":""}`
 	output := `{"last":100}`
@@ -68,7 +67,6 @@ func TestIrisCLIOracle(t *testing.T) {
 	cfCmdStr += fmt.Sprintf(" --service-fee-cap=%s", serviceFeeCap)
 	cfCmdStr += fmt.Sprintf(" --timeout=%d", timeout)
 	cfCmdStr += fmt.Sprintf(" --frequency=%d", repeatedFreq)
-	cfCmdStr += fmt.Sprintf(" --total=%d", repeatedTotal)
 	cfCmdStr += fmt.Sprintf(" --threshold=%d", responseThreshold)
 	cfCmdStr += fmt.Sprintf(" --aggregate-func=%s", aggregateFunc)
 	cfCmdStr += fmt.Sprintf(" --value-json-path=%s", valueJsonPath)
@@ -92,7 +90,6 @@ func TestIrisCLIOracle(t *testing.T) {
 	require.Equal(t, timeout, feed.Timeout)
 	require.Equal(t, serviceFeeCap, feed.ServiceFeeCap.MainUnitString())
 	require.Equal(t, repeatedFreq, feed.RepeatedFrequency)
-	require.Equal(t, repeatedTotal, feed.RepeatedTotal)
 	require.Equal(t, responseThreshold, feed.ResponseThreshold)
 	require.Equal(t, service.PAUSED, feed.State)
 
