@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"encoding/hex"
 	"fmt"
 	"regexp"
 	"testing"
@@ -46,7 +45,7 @@ func TestIrisCLIService(t *testing.T) {
 	addedDeposit := "1iris"
 	serviceFeeCap := "10iris"
 	input := `{"pair":"iris-usdt"}`
-	timeout := int64(5)
+	timeout := int64(7)
 	repeatedFreq := uint64(20)
 	repeatedTotal := int64(10)
 	result := `{"code":200,"message":""}`
@@ -272,7 +271,7 @@ func TestIrisCLIService(t *testing.T) {
 
 	// respond service (foo)
 
-	fooRequestID := requestContextID + hex.EncodeToString(sdk.Uint64ToBigEndian(1)) + "0000"
+	fooRequestID := fooRequests[0].ID.String()
 
 	rsStr := fmt.Sprintf("iriscli service respond %v", flags)
 	rsStr += fmt.Sprintf(" --request-id=%s", fooRequestID)
@@ -305,7 +304,7 @@ func TestIrisCLIService(t *testing.T) {
 
 	// respond service (bar)
 
-	barRequestID := requestContextID + hex.EncodeToString(sdk.Uint64ToBigEndian(1)) + "0001"
+	barRequestID := barRequests[0].ID.String()
 
 	rsStr = fmt.Sprintf("iriscli service respond %v", flags)
 	rsStr += fmt.Sprintf(" --request-id=%s", barRequestID)
@@ -342,6 +341,11 @@ func TestIrisCLIService(t *testing.T) {
 
 	require.Equal(t, fooResponse, responses[0])
 	require.Equal(t, barResponse, responses[1])
+
+	// responses has been deleted on expiration height
+	tests.WaitForHeightTM(requests[0].ExpirationHeight, port)
+	responses = executeGetServiceResponses(t, fmt.Sprintf("iriscli service responses %s %d %v", requestContextID, 1, flags))
+	require.Equal(t, 0, len(responses))
 
 	// pause the request context
 	prcStr := fmt.Sprintf("iriscli service pause %s %v", requestContextID, flags)
@@ -400,7 +404,7 @@ func TestIrisCLIService(t *testing.T) {
 	fooCoin = convertToIrisBaseAccount(t, fooAcc)
 	newFooAmt := getAmountFromCoinStr(fooCoin)
 
-	require.Equal(t, oldFooAmt+earnedFeesAmt, newFooAmt)
+	require.Equal(t, fmt.Sprintf("%.6f", oldFooAmt+earnedFeesAmt), fmt.Sprintf("%.6f", newFooAmt))
 
 	// withdraw tax
 	barAcc = executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", barAddr, flags))

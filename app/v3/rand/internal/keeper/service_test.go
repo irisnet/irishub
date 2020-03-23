@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 
@@ -10,17 +11,19 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 
 	"github.com/irisnet/irishub/app/v3/rand/internal/types"
+	"github.com/irisnet/irishub/app/v3/service"
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
 )
 
 func TestOracleRequestRandKeeper(t *testing.T) {
-	ms, randKey := setupMultiStore()
+	ms, randKey, serviceKey := setupMultiStore()
 
 	cdc := codec.New()
 	types.RegisterCodec(cdc)
+	service.RegisterCodec(cdc)
 
-	mockServiceKeeper := NewMockServiceKeeper()
+	mockServiceKeeper := NewMockServiceKeeper(serviceKey)
 	mockBankKeeper := NewMockBankKeeper()
 
 	keeper := NewKeeper(cdc, randKey, mockBankKeeper, mockServiceKeeper, types.DefaultCodespace)
@@ -31,7 +34,8 @@ func TestOracleRequestRandKeeper(t *testing.T) {
 	blockInterval := uint64(100)
 	destHeight := txHeight + int64(blockInterval)
 	consumer := sdk.AccAddress([]byte("consumer"))
-	serviceFeeCap := sdk.NewCoins(sdk.NewCoin(sdk.IrisAtto, sdk.NewInt(1000000000000000000)))
+	provider := sdk.AccAddress([]byte("provider"))
+	serviceFeeCap := sdk.NewCoins()
 
 	// build context
 	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewNopLogger())
@@ -47,12 +51,17 @@ func TestOracleRequestRandKeeper(t *testing.T) {
 	})
 	require.True(t, len(requests) == 0)
 
+	mockServiceKeeper.SetServiceBinding(ctx,
+		service.NewServiceBinding(
+			types.ServiceName, provider, sdk.NewCoins(), "", true, time.Time{},
+		))
+
 	// request a rand
 	_, err := keeper.RequestRand(ctx, consumer, blockInterval, false, serviceFeeCap)
 	require.Nil(t, err)
 
 	// get request id
-	reqID := types.GenerateRequestID(types.NewRequest(txHeight, consumer, sdk.SHA256(txBytes), true, serviceFeeCap))
+	reqID := types.GenerateRequestID(types.NewRequest(txHeight, consumer, sdk.SHA256(txBytes), true, serviceFeeCap, nil))
 
 	// get the pending request and assert the result is not nil
 	store := ctx.KVStore(randKey)

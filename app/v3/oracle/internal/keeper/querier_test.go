@@ -31,7 +31,7 @@ func TestNewQuerier(t *testing.T) {
 	}
 
 	//================test CreateFeed start================
-	err := keeper.CreateFeed(ctx, msg)
+	_, err := keeper.CreateFeed(ctx, msg)
 	require.NoError(t, err)
 
 	//test QueryFeed

@@ -141,7 +141,7 @@ func (m MockServiceKeeper) CreateRequestContext(ctx sdk.Context,
 	repeatedTotal int64,
 	state exported.RequestContextState,
 	respThreshold uint16,
-	moduleName string) (cmn.HexBytes, sdk.Error) {
+	moduleName string) (cmn.HexBytes, sdk.Tags, sdk.Error) {
 
 	reqCtx := exported.RequestContext{
 		ServiceName:       serviceName,
@@ -160,7 +160,7 @@ func (m MockServiceKeeper) CreateRequestContext(ctx sdk.Context,
 		ModuleName:        moduleName,
 	}
 	m.cxtMap[string(mockReqCtxID)] = reqCtx
-	return mockReqCtxID, nil
+	return mockReqCtxID, sdk.NewTags(), nil
 }
 
 func (m MockServiceKeeper) UpdateRequestContext(ctx sdk.Context,

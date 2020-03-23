@@ -122,7 +122,7 @@ func TestIrisCLIRand(t *testing.T) {
 	require.Equal(t, uint64(1), serviceRequests[0].RequestContextBatchCounter)
 
 	// respond service request (foo)
-	reqID := hex.EncodeToString(serviceRequests[0].ID)
+	reqID := serviceRequests[0].ID.String()
 
 	srStr := fmt.Sprintf("iriscli service respond %v", flags)
 	srStr += fmt.Sprintf(" --from=%s", "foo")

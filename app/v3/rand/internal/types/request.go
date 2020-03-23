@@ -12,11 +12,12 @@ import (
 
 // Request represents a request for a random number
 type Request struct {
-	Height        int64          `json:"height"`          // the height of the block in which the request tx is included
-	Consumer      sdk.AccAddress `json:"consumer"`        // the request address
-	TxHash        cmn.HexBytes   `json:"txhash"`          // the request tx hash
-	Oracle        bool           `json:"oracle"`          // oracle method
-	ServiceFeeCap sdk.Coins      `json:"service_fee_cap"` // service fee cap
+	Height           int64          `json:"height"`             // the height of the block in which the request tx is included
+	Consumer         sdk.AccAddress `json:"consumer"`           // the request address
+	TxHash           cmn.HexBytes   `json:"txhash"`             // the request tx hash
+	Oracle           bool           `json:"oracle"`             // oracle method
+	ServiceFeeCap    sdk.Coins      `json:"service_fee_cap"`    // service fee cap
+	ServiceContextID cmn.HexBytes   `json:"service_context_id"` // service request context id
 }
 
 // NewRequest constructs a request
@@ -26,13 +27,15 @@ func NewRequest(
 	txHash cmn.HexBytes,
 	oracle bool,
 	serviceFeeCap sdk.Coins,
+	serviceContextID cmn.HexBytes,
 ) Request {
 	return Request{
-		Height:        height,
-		Consumer:      consumer,
-		TxHash:        txHash,
-		Oracle:        oracle,
-		ServiceFeeCap: serviceFeeCap,
+		Height:           height,
+		Consumer:         consumer,
+		TxHash:           txHash,
+		Oracle:           oracle,
+		ServiceFeeCap:    serviceFeeCap,
+		ServiceContextID: serviceContextID,
 	}
 }
 
@@ -43,12 +46,14 @@ func (r Request) String() string {
   Consumer:          %s
   TxHash:            %s
   Oracle:            %s
-  ServiceFeeCap:     %s`,
+  ServiceFeeCap:     %s
+  ServiceContextID   %s`,
 		r.Height,
 		r.Consumer.String(),
 		r.TxHash.String(),
 		strconv.FormatBool(r.Oracle),
 		r.ServiceFeeCap.String(),
+		r.ServiceContextID.String(),
 	)
 }
 
@@ -63,14 +68,7 @@ func (rs Requests) String() string {
 
 	var str string
 	for _, r := range rs {
-		str += fmt.Sprintf(
-			"Request:\n  Height: %d, Consumer: %s, TxHash: %s, Oracle: %s, ServiceFeeCap: %s\n",
-			r.Height,
-			r.Consumer.String(),
-			r.TxHash.String(),
-			strconv.FormatBool(r.Oracle),
-			r.ServiceFeeCap.String(),
-		)
+		str += r.String() + "\n"
 	}
 
 	return str

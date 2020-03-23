@@ -16,7 +16,8 @@ import (
 )
 
 // RequestService request the service for oracle seed
-func (k Keeper) RequestService(ctx sdk.Context, reqID cmn.HexBytes, consumer sdk.AccAddress, serviceFeeCap sdk.Coins) (cmn.HexBytes, sdk.Error) {
+func (k Keeper) RequestService(ctx sdk.Context, consumer sdk.AccAddress, serviceFeeCap sdk.Coins) (cmn.HexBytes, sdk.Tags, sdk.Error) {
+	tags := sdk.NewTags()
 	iterator := k.sk.ServiceBindingsIterator(ctx, types.ServiceName)
 	defer iterator.Close()
 
@@ -29,19 +30,19 @@ func (k Keeper) RequestService(ctx sdk.Context, reqID cmn.HexBytes, consumer sdk
 	}
 
 	if len(bindings) < 1 {
-		return nil, types.ErrInvalidServiceBindings(types.DefaultCodespace, "no service bindings available")
+		return nil, tags, types.ErrInvalidServiceBindings(types.DefaultCodespace, "no service bindings available")
 	}
 
 	coins := k.bk.GetCoins(ctx, consumer)
 	if !coins.IsAllGTE(serviceFeeCap) {
-		return nil, types.ErrInsufficientBalance(types.DefaultCodespace, "insufficient balance")
+		return nil, tags, types.ErrInsufficientBalance(types.DefaultCodespace, "insufficient balance")
 	}
 
 	rand.Seed(time.Now().UnixNano())
 	provider := []sdk.AccAddress{bindings[rand.Intn(len(bindings))].Provider}
 	timeout := k.sk.GetParamSet(ctx).MaxRequestTimeout
 
-	requestContextID, err := k.sk.CreateRequestContext(
+	requestContextID, tags, err := k.sk.CreateRequestContext(
 		ctx,
 		types.ServiceName,
 		provider,
@@ -53,15 +54,24 @@ func (k Keeper) RequestService(ctx sdk.Context, reqID cmn.HexBytes, consumer sdk
 		false,
 		0,
 		0,
-		exported.RUNNING,
+		exported.PAUSED,
 		1,
 		types.ModuleName,
 	)
 	if err != nil {
-		return nil, err
+		return nil, tags, err
 	}
 
-	return requestContextID, nil
+	return requestContextID, tags, nil
+}
+
+// StartRequestContext starts the service context
+func (k Keeper) StartRequestContext(
+	ctx sdk.Context,
+	serviceContextID cmn.HexBytes,
+	consumer sdk.AccAddress,
+) sdk.Error {
+	return k.sk.StartRequestContext(ctx, serviceContextID, consumer)
 }
 
 // HandlerResponse is responsible for processing the data returned from the service module

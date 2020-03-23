@@ -2,9 +2,11 @@ package keeper
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/irisnet/irishub/app/v3/service"
 	abci "github.com/tendermint/tendermint/abci/types"
 	cmn "github.com/tendermint/tendermint/libs/common"
 	"github.com/tendermint/tendermint/libs/log"
@@ -16,24 +18,27 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 )
 
-func setupMultiStore() (sdk.MultiStore, *sdk.KVStoreKey) {
+func setupMultiStore() (sdk.MultiStore, *sdk.KVStoreKey, *sdk.KVStoreKey) {
 	db := dbm.NewMemDB()
 	randKey := sdk.NewKVStoreKey("randkey")
+	serviceKey := sdk.NewKVStoreKey("servicekey")
 
 	ms := store.NewCommitMultiStore(db)
 	ms.MountStoreWithDB(randKey, sdk.StoreTypeIAVL, db)
+	ms.MountStoreWithDB(serviceKey, sdk.StoreTypeIAVL, db)
 	_ = ms.LoadLatestVersion()
 
-	return ms, randKey
+	return ms, randKey, serviceKey
 }
 
 func TestRequestRandKeeper(t *testing.T) {
-	ms, randKey := setupMultiStore()
+	ms, randKey, serviceKey := setupMultiStore()
 
 	cdc := codec.New()
 	types.RegisterCodec(cdc)
+	service.RegisterCodec(cdc)
 
-	mockServiceKeeper := NewMockServiceKeeper()
+	mockServiceKeeper := NewMockServiceKeeper(serviceKey)
 	mockBankKeeper := NewMockBankKeeper()
 
 	keeper := NewKeeper(cdc, randKey, mockBankKeeper, mockServiceKeeper, types.DefaultCodespace)
@@ -44,6 +49,7 @@ func TestRequestRandKeeper(t *testing.T) {
 	blockInterval := uint64(100)
 	destHeight := txHeight + int64(blockInterval)
 	consumer := sdk.AccAddress([]byte("consumer"))
+	provider := sdk.AccAddress([]byte("provider"))
 
 	// build context
 	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewNopLogger())
@@ -59,12 +65,17 @@ func TestRequestRandKeeper(t *testing.T) {
 	})
 	require.True(t, len(requests) == 0)
 
+	mockServiceKeeper.SetServiceBinding(ctx,
+		service.NewServiceBinding(
+			types.ServiceName, provider, sdk.NewCoins(), "", true, time.Time{},
+		))
+
 	// request a rand
 	_, err := keeper.RequestRand(ctx, consumer, blockInterval, false, sdk.NewCoins())
 	require.Nil(t, err)
 
 	// get request id
-	reqID := types.GenerateRequestID(types.NewRequest(txHeight, consumer, sdk.SHA256(txBytes), false, sdk.NewCoins()))
+	reqID := types.GenerateRequestID(types.NewRequest(txHeight, consumer, sdk.SHA256(txBytes), false, sdk.NewCoins(), nil))
 
 	// get the pending request and assert the result is not nil
 	store := ctx.KVStore(randKey)
