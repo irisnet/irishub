@@ -31,7 +31,7 @@ Any users can define a service. In service definition, use `protobuf` to standar
 
 ```bash
 # create a new service definition
-iriscli service define --chain-id=<chain-id>  --from=<key-name> --fee=0.6iris --gas=100000 --service-name=<service-name> --service-description=<service-description> --author-description=<author-description> --tags=<tag1>,<tag2> --idl-content=<idl-content> --file=</***/***.proto>
+iriscli service define --chain-id=irishub  --from=<key-name> --fee=0.6iris --gas=100000 --service-name=<service-name> --service-description=<service-description> --author-description=<author-description> --tags=<tag1>,<tag2> --idl-content=<idl-content> --file=</***/***.proto>
 
 # query service definition
 iriscli service definition --def-chain-id=<def-chain-id> --service-name=<service-name>
@@ -43,7 +43,7 @@ The minimum deposit amount for Service Binding is `MinDepositMultiple * Service 
 
 ```bash
 # create a new service binding
-iriscli service bind --chain-id=<chain-id>  --from=<key-name> --fee=0.3iris --service-name=<service-name> --def-chain-id=<def-chain-id> --bind-type=Local  --deposit=1000iris --prices=1iris --avg-rsp-time=10000 --usable-time=9999
+iriscli service bind --chain-id=irishub  --from=<key-name> --fee=0.3iris --service-name=<service-name> --def-chain-id=<def-chain-id> --bind-type=Local  --deposit=1000iris --prices=1iris --avg-rsp-time=10000 --usable-time=9999
 
 # query service binding
 iriscli service binding --def-chain-id=<def-chain-id> --service-name=<service-name> --bind-chain-id=<bind-chain-id> --provider=<provider-account-address>
@@ -52,16 +52,16 @@ iriscli service binding --def-chain-id=<def-chain-id> --service-name=<service-na
 iriscli service bindings --def-chain-id=<def-chain-id> --service-name=<service-name>
 
 # update a service binding
-iriscli service update-binding --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --service-name=<service-name> --def-chain-id=<def-chain-id> --bind-type=Local  --deposit=1iris --prices=1iris,2iris --avg-rsp-time=10000 --usable-time=100
+iriscli service update-binding --chain-id=irishub --from=<key-name> --fee=0.3iris --service-name=<service-name> --def-chain-id=<def-chain-id> --bind-type=Local  --deposit=1iris --prices=1iris,2iris --avg-rsp-time=10000 --usable-time=100
 
 # disable a available service binding
-iriscli service disable --chain-id=<chain-id>  --from=<key-name> --fee=0.3iris --def-chain-id=<def-chain-id> --service-name=<service-name>
+iriscli service disable --chain-id=irishub  --from=<key-name> --fee=0.3iris --def-chain-id=<def-chain-id> --service-name=<service-name>
 
 # enable an unavailable service binding
-iriscli service enable --chain-id=<chain-id>  --from=<key-name> --fee=0.3iris --def-chain-id=<def-chain-id> --service-name=<service-name> --deposit=100iris
+iriscli service enable --chain-id=irishub  --from=<key-name> --fee=0.3iris --def-chain-id=<def-chain-id> --service-name=<service-name> --deposit=100iris
 
 # refund all deposit from a service binding
-iriscli service refund-deposit --chain-id=<chain-id>  --from=<key-name> --fee=0.3iris --def-chain-id=<def-chain-id> --service-name=<service-name>
+iriscli service refund-deposit --chain-id=irishub  --from=<key-name> --fee=0.3iris --def-chain-id=<def-chain-id> --service-name=<service-name>
 ```
 
 ### Service Invocation
@@ -70,13 +70,13 @@ If the service consumer needs to initiate a service invocation request, the serv
 
 ```bash
 # initiate service invocation
-iriscli service call --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --def-chain-id=<def-chain-id> --service-name=<service-name> --method-id=1 --bind-chain-id=<bind-chain-id> --provider=<provider-account-address> --service-fee=1iris --request-data=<request-data>
+iriscli service call --chain-id=irishub --from=<key-name> --fee=0.3iris --def-chain-id=<def-chain-id> --service-name=<service-name> --method-id=1 --bind-chain-id=<bind-chain-id> --provider=<provider-account-address> --service-fee=1iris --request-data=<request-data>
 
 # query service requests
 iriscli service requests --def-chain-id=<def-chain-id> --service-name=<service-name> --bind-chain-id=<bind-chain-id> --provider=<provider-account-address>
 
 # respond a service invocation
-iriscli service respond --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --request-chain-id=<request-chain-id> --request-id=<request-id (e.g.230-130-0)> --response-data=<response-data>
+iriscli service respond --chain-id=irishub --from=<key-name> --fee=0.3iris --request-chain-id=<request-chain-id> --request-id=<request-id (e.g.230-130-0)> --response-data=<response-data>
 
 # query a service response
 iriscli service response --request-chain-id=<request-chain-id> --request-id=<request-id (e.g.230-130-0)>
@@ -85,10 +85,10 @@ iriscli service response --request-chain-id=<request-chain-id> --request-id=<req
 iriscli service fees <account-address>
 
 # refund all fees from service return fees
-iriscli service refund-fees --chain-id=<chain-id> --from=<key-name> --fee=0.3iris
+iriscli service refund-fees --chain-id=irishub --from=<key-name> --fee=0.3iris
 
 # withdraw all fees from service incoming fees
-iriscli service withdraw-fees --chain-id=<chain-id> --from=<key-name> --fee=0.3iris
+iriscli service withdraw-fees --chain-id=irishub --from=<key-name> --fee=0.3iris
 ```
 
 ## IDL extension

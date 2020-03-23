@@ -36,7 +36,7 @@ Service模块允许在IRIS Hub中定义、绑定、调用服务。[了解更多i
 定义一个新的服务。
 
 ```bash
-iriscli service define <flags>
+iriscli service define [flags]
 ```
 
 **标志：**
@@ -52,7 +52,7 @@ iriscli service define <flags>
 ### 定义一个新的服务
 
 ```bash
-iriscli service define --chain-id=<chain-id> --from=<key-name> --fee=0.3iris 
+iriscli service define --chain-id=irishub --from=<key-name> --fee=0.3iris 
 --name=<service name> --description=<service description> --author-description=<author description>
 --tags=tag1,tag2 --schemas=<schemas content or path/to/schemas.json>
 ```
@@ -68,7 +68,7 @@ iriscli service define --chain-id=<chain-id> --from=<key-name> --fee=0.3iris
 查询服务定义。
 
 ```bash
-iriscli service definition <service name>
+iriscli service definition [service-name] [flags]
 ```
 
 **标志：**
@@ -90,7 +90,7 @@ iriscli service definition <service name>
 绑定一个服务。
 
 ```bash
-iriscli service bind <flags>
+iriscli service bind [flags]
 ```
 
 **标志：**
@@ -106,7 +106,7 @@ iriscli service bind <flags>
 抵押`deposit`应该满足最小抵押数量需求，最小抵押数量为`price` * `MinDepositMultiple` 和 `MinDeposit`中的最大值（`MinDepositMultiple`以及`MinDeposit`是可治理参数）。
 
 ```bash
-iriscli service bind --chain-id=<chain-id> --from=<key-name> --fee=0.3iris
+iriscli service bind --chain-id=irishub --from=<key-name> --fee=0.3iris
 --service-name=<service name> --deposit=10000iris --pricing=<pricing>
 ```
 
@@ -128,7 +128,7 @@ iriscli service bind --chain-id=<chain-id> --from=<key-name> --fee=0.3iris
 查询服务绑定。
 
 ```bash
-iriscli service binding <service name> <provider>
+iriscli service binding [service-name] [provider] [flags]
 ```
 
 ### 查询一个服务绑定
@@ -142,7 +142,7 @@ iriscli service binding <service name> <provider>
 查询服务绑定列表。
 
 ```bash
-iriscli service bindings <service name>
+iriscli service bindings [service-name] [flags]
 ```
 
 ### 查询服务绑定列表
@@ -156,13 +156,12 @@ iriscli service bindings <service name>
 更新服务绑定。
 
 ```bash
-iriscli service update-binding <flags>
+iriscli service update-binding [service-name] [flags]
 ```
 
 **标志：**
 | 名称，速记     | 默认 | 描述                                                  | 必须 |
 | -------------- | ---- | ----------------------------------------------------- | ---- |
-| --service-name |      | 服务名称                                              | 是   |
 | --deposit      |      | 增加的绑定押金                                        |      |
 | --pricing      |      | 服务定价内容或路径，需符合Irishub Pricing JSON schema |      |
 
@@ -171,8 +170,7 @@ iriscli service update-binding <flags>
 更新服务绑定，追加 10 IRIS 的抵押。
 
 ```bash
-iriscli service update-binding --chain-id=<chain-id> --from=<key-name> --fee=0.3iris 
---service-name=<service-name> --deposit=10iris
+iriscli service update-binding <service-name> --chain-id=irishub --from=<key-name> --fee=0.3iris --deposit=10iris
 ```
 
 ## iriscli service set-withdraw-addr
@@ -180,13 +178,13 @@ iriscli service update-binding --chain-id=<chain-id> --from=<key-name> --fee=0.3
 设置服务提供者的提取地址
 
 ```bash
-iriscli service set-withdraw-addr <withdrawal address>
+iriscli service set-withdraw-addr [withdrawal-address] [flags]
 ```
 
 ### 设置一个提取地址
 
 ```bash
-iriscli service set-withdraw-addr <withdrawal address> --chain-id=<chain-id> --from=<key-name> --fee=0.3iris
+iriscli service set-withdraw-addr <withdrawal address> --chain-id=irishub --from=<key-name> --fee=0.3iris
 ```
 
 ## iriscli service withdraw-addr
@@ -194,7 +192,7 @@ iriscli service set-withdraw-addr <withdrawal address> --chain-id=<chain-id> --f
 查询服务提供者的提取地址
 
 ```bash
-iriscli service withdraw-addr <provider>
+iriscli service withdraw-addr [provider] [flags]
 ```
 
 ### 查询一个服务提供者的提取地址
@@ -208,13 +206,13 @@ iriscli service withdraw-addr <provider>
 禁用一个可用的服务绑定。
 
 ```bash
-iriscli service disable <service name>
+iriscli service disable [service-name] [flags]
 ```
 
 ### 禁用一个可用的服务绑定
 
 ```bash
-iriscli service disable <service name> --chain-id=<chain-id> --from=<key-name> --fee=0.3iris
+iriscli service disable <service name> --chain-id=irishub --from=<key-name> --fee=0.3iris
 ```
 
 ## iriscli service enable
@@ -222,7 +220,7 @@ iriscli service disable <service name> --chain-id=<chain-id> --from=<key-name> -
 启用一个不可用的服务绑定。
 
 ```bash
-iriscli service enable <service name> <flags>
+iriscli service enable [service-name] [flags]
 ```
 
 **标志：**
@@ -236,7 +234,7 @@ iriscli service enable <service name> <flags>
 启用一个不可用的服务绑定，追加 10 IRIS 的抵押。
 
 ```bash
-iriscli service enable <service name> --chain-id=<chain-id>  --from=<key-name> --fee=0.3iris --deposit=10iris
+iriscli service enable <service name> --chain-id=irishub  --from=<key-name> --fee=0.3iris --deposit=10iris
 ```
 
 ## iriscli service refund-deposit
@@ -244,7 +242,7 @@ iriscli service enable <service name> --chain-id=<chain-id>  --from=<key-name> -
 从一个服务绑定中退还所有的押金。
 
 ```bash
-iriscli service refund-deposit <service name>
+iriscli service refund-deposit [service-name] [flags]
 ```
 
 ### 取回所有押金
@@ -252,7 +250,7 @@ iriscli service refund-deposit <service name>
 取回抵押之前，必须先[禁用](#iriscli-service-disable)服务绑定。
 
 ```bash
-iriscli service refund-deposit <service name> --chain-id=<chain-id> --from=<key-name> --fee=0.3iris
+iriscli service refund-deposit <service name> --chain-id=irishub --from=<key-name> --fee=0.3iris
 ```
 
 ## iriscli service call
@@ -260,7 +258,7 @@ iriscli service refund-deposit <service name> --chain-id=<chain-id> --from=<key-
 调用服务。
 
 ```bash
-iriscli service call <flags>
+iriscli service call [flags]
 ```
 
 **标志：**
@@ -280,7 +278,7 @@ iriscli service call <flags>
 ### 发起一个服务调用请求
 
 ```bash
-iriscli service call --chain-id=<chain-id> --from=<key name> --fee=0.3iris --service-name=<service name>
+iriscli service call --chain-id=irishub --from=<key name> --fee=0.3iris --service-name=<service name>
 --providers=<provider list> --service-fee-cap=1iris --data=<request data> --timeout=100 --repeated --frequency=150 --total=100
 ```
 
@@ -299,7 +297,7 @@ iriscli service call --chain-id=<chain-id> --from=<key name> --fee=0.3iris --ser
 通过请求ID查询服务请求。
 
 ```bash
-iriscli service request <request-id>
+iriscli service request [request-id] [flags]
 ```
 
 ### 查询一个服务请求
@@ -317,7 +315,7 @@ iriscli service request <request-id>
 通过服务绑定或请请求上下文ID查询服务请求列表。
 
 ```bash
-iriscli service requests [<service name> <provider>] | [<request-context-id> <batch-counter>]
+iriscli service requests [service_name] [provider] | [request_context_id] [batch_counter] [flags]
 ```
 
 ### 查询服务绑定的活跃请求
@@ -337,7 +335,7 @@ iriscli service requests <request-context-id> <batch-counter>
 响应服务请求。
 
 ```bash
-iriscli service respond <flags>
+iriscli service respond [flags]
 ```
 
 **标志：**
@@ -351,12 +349,12 @@ iriscli service respond <flags>
 ### 响应一个服务请求
 
 ```bash
-iriscli service respond --chain-id=<chain-id> --from=<key-name> --fee=0.3iris
+iriscli service respond --chain-id=irishub --from=<key-name> --fee=0.3iris
 --request-id=<request-id> --result=<response result> --data=<response output>
 ```
 
 :::tip
-你可以从[按高度获取区块信息](#iriscli-tendermint-block)的结果中获取`request-id`。
+你可以从[按高度获取区块信息](./tendermint.md#iriscli-tendermint-block)的结果中获取`request-id`。
 :::
 
 ### 响应结果示例
@@ -381,7 +379,7 @@ iriscli service respond --chain-id=<chain-id> --from=<key-name> --fee=0.3iris
 通过请求ID查询服务响应。
 
 ```bash
-iriscli service response <request-id>
+iriscli service response [request-id] [flags]
 ```
 
 ### 查询一个服务响应
@@ -391,7 +389,7 @@ iriscli service response <request-id>
 ```
 
 :::tip
-你可以从[按高度获取区块信息](#iriscli-tendermint-block)的结果中获取`request-id`。
+你可以从[按高度获取区块信息](./tendermint.md#iriscli-tendermint-block)的结果中获取`request-id`。
 :::
 
 ## iriscli service responses
@@ -399,7 +397,7 @@ iriscli service response <request-id>
 通过请求上下文ID以及批次计数器查询服务响应列表。
 
 ```bash
-iriscli service responses <request-context-id> <batch-counter>
+iriscli service responses [request-context-id] [batch-counter] [flags]
 ```
 
 ### 根据指定的请求上下文ID以及批次计数器查询服务响应
@@ -413,7 +411,7 @@ iriscli service responses <request-context-id> <batch-counter>
 查询请求上下文。
 
 ```bash
-iriscli service request-context <request-context-id>
+iriscli service request-context [request-context-id] [flags]
 ```
 
 ### 查询一个请求上下文
@@ -431,7 +429,7 @@ iriscli service request-context <request-context-id>
 更新请求上下文。
 
 ```bash
-iriscli service update <request-context-id> <flags>
+iriscli service update [request-context-id] [flags]
 ```
 
 **标志：**
@@ -447,7 +445,7 @@ iriscli service update <request-context-id> <flags>
 ### 更新一个请求上下文
 
 ```bash
-iriscli service update <request-context-id> --chain-id=<chain-id> --from=<key name> --fee=0.3iris
+iriscli service update <request-context-id> --chain-id=irishub --from=<key name> --fee=0.3iris
 --providers=<provider list> --service-fee-cap=1iris --timeout=0 --frequency=150 --total=100
 ```
 
@@ -456,7 +454,7 @@ iriscli service update <request-context-id> --chain-id=<chain-id> --from=<key na
 暂停一个正在进行的请求上下文。
 
 ```bash
-iriscli service pause <request-context-id>
+iriscli service pause [request-context-id] [flags]
 ```
 
 ### 暂停一个正在进行的请求上下文
@@ -470,7 +468,7 @@ iriscli service pause <request-context-id>
 启动一个暂停的请求上下文。
 
 ```bash
-iriscli service start <request-context-id>
+iriscli service start [request-context-id] [flags]
 ```
 
 ### 启动一个暂停的请求上下文
@@ -484,7 +482,7 @@ iriscli service start <request-context-id>
 终止请求上下文。
 
 ```bash
-iriscli service kill <request-context-id>
+iriscli service kill [request-context-id] [flags]
 ```
 
 ### 终止一个请求上下文
@@ -498,7 +496,7 @@ iriscli service kill <request-context-id>
 查询服务提供者的收益。
 
 ```bash
-iriscli service fees <provider>
+iriscli service fees [provider] [flags]
 ```
 
 ### 查询服务提供者的收益
@@ -512,11 +510,11 @@ iriscli service fees <provider>
 提取服务提供者的收益。
 
 ```bash
-iriscli service withdraw-fees <flags>
+iriscli service withdraw-fees [flags]
 ```
 
 ### 提取服务提供者的收益
 
 ```bash
-iriscli service withdraw-fees --chain-id=<chain-id> --from=<key-name> --fee=0.3iris
+iriscli service withdraw-fees --chain-id=irishub --from=<key-name> --fee=0.3iris
 ```

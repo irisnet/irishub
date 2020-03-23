@@ -33,7 +33,7 @@
     该命令包括了交易“构造，签名，广播”的所有操作。 如从账户A转账10iris给账户B：
 
     ```bash
-    iriscli bank send --to=<address-of-wallet-B> --amount=10iris --fee=0.3iris --from=<key-name-of-wallet-A> --chain-id=<chain-id>
+    iriscli bank send --to=<address-of-wallet-B> --amount=10iris --fee=0.3iris --from=<key-name-of-wallet-A> --chain-id=irishub
     ```
 
     IRISnet支持多种代币流通，将来IRISnet可以在一个交易中包含多种代币交换——代币种类可以为任意在IRISnet中注册过的coin-type。
@@ -65,7 +65,7 @@
     对上述的离线交易进行签名：
 
     ```bash
-    iriscli tx sign <file> --chain-id=<chain-id> --name=<key-name>
+    iriscli tx sign <file> --chain-id=irishub --name=<key-name>
     ```
 
     将返回已签名的交易：

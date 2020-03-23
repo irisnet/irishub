@@ -38,7 +38,7 @@ ERROR: {"codespace":"sdk","code":9,"message":"account iaa1kenrwk5k4ng70e5s9zfstt
 在IRIShub上查询一种特殊的通证。 IRIShub上的本机通证是“ iris”，它具有以下可用单位：`iris-milli`，`iris-micro`，`iris-nano`，`iris-pico`，`iris-femto` 和 `iris-atto`。
 
 ```bash
- iriscli bank coin-type <coin_name> <flags>
+iriscli bank coin-type [coin-name] [flags]
 ```
 
 **标识：**
@@ -75,7 +75,7 @@ CoinType:
 查询通证统计信息，包括未质押通证总数，已销毁总数和已质押总数。
 
 ```bash
- iriscli bank token-stats <token-id> <flags>
+iriscli bank token-stats [symbol] [flags]
 ```
 
 **标识：**
@@ -111,7 +111,7 @@ TokenStats:
 该命令用于查询特定地址的余额信息。
 
 ```bash
-iriscli bank account <address> <flags>
+iriscli bank account [address] [flags]
 ```
 
 **标识：**
@@ -148,7 +148,7 @@ Account:
 发送令牌到另一个地址，此命令包括 `generate`，`sign` 和 `broadcast` 这些步骤。
 
 ```bash
-iriscli bank send --from=<key-name> --to=<address> --amount=<amount> --fee=<native-fee> --chain-id=<chain-id>
+iriscli bank send --from=<key-name> --to=<address> --amount=<amount> --fee=0.3iris --chain-id=irishub
 ```
 
 **标识：**
@@ -169,7 +169,7 @@ iriscli bank send --from=<key-name> --to=<address> --amount=10iris --fee=0.3iris
 此命令用于从您自己的地址销毁通证。
 
 ```bash
-iriscli bank burn --from=<key-name> --amount=<amount-to-burn> --fee=<native-fee> --chain-id=<chain-id>
+iriscli bank burn --from=<key-name> --amount=<amount-to-burn> --fee=0.3iris --chain-id=irishub
 ```
 
 **标识：**
@@ -181,7 +181,7 @@ iriscli bank burn --from=<key-name> --amount=<amount-to-burn> --fee=<native-fee>
 ### 销毁通证
 
 ```bash
- iriscli bank burn --from=<key-name> --amount=10iris --chain-id=irishub --fee=0.3iris
+iriscli bank burn --from=<key-name> --amount=10iris --chain-id=irishub --fee=0.3iris
 ```
 
 ## iriscli bank set-memo-regexp
@@ -189,7 +189,7 @@ iriscli bank burn --from=<key-name> --amount=<amount-to-burn> --fee=<native-fee>
 此命令用于为您自己的地址设置备注正则表达式，以便您只能从具有相应备注的交易中接收通证。
 
 ```bash
-iriscli bank set-memo-regexp --regexp=<regular-expression> --from=<key-name> --fee=<native-fee> --chain-id=<chain-id>
+iriscli bank set-memo-regexp --regexp=<regular-expression> --from=<key-name> --fee=0.3iris --chain-id=irishub
 ```
 
 **标识：**

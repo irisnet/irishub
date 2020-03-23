@@ -15,7 +15,7 @@ Rand module allows you to post a random number request to the IRIS Hub and query
 Request a random number.
 
 ```bash
-iriscli rand request-rand <flags>
+iriscli rand request-rand [flags]
 ```
 
 **Flags:**
@@ -47,7 +47,7 @@ You will get a unique request id if the tx is committed, which can be used to qu
 Query the generated random number by the request id.
 
 ```bash
-iriscli rand query-rand <flags>
+iriscli rand query-rand [flags]
 ```
 
 **Flags:**
@@ -69,7 +69,7 @@ iriscli rand query-rand --request-id=035a8d4cf64fcd428b5c77b1ca85bfed172d3787be9
 Query the pending random number requests with an optional block height.
 
 ```bash
-iriscli rand query-queue <flags>
+iriscli rand query-queue [flags]
 ```
 
 **Flags:**

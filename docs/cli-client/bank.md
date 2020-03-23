@@ -38,7 +38,7 @@ This is usually because the account address you are querying has no transactions
 Query a special kind of token on IRIShub. The native token on IRIShub is `iris`, which has the following available units: `iris-milli`, `iris-micro`, `iris-nano`, `iris-pico`, `iris-femto` and `iris-atto`.
 
 ```bash
- iriscli bank coin-type <coin_name> <flags>
+iriscli bank coin-type [coin-name] [flags]
 ```
 
 **Flags:**
@@ -75,7 +75,7 @@ CoinType:
 Query the token statistic, including total loose tokens, total burned tokens and total bonded tokens.
 
 ```bash
- iriscli bank token-stats <token-id> <flags>
+iriscli bank token-stats [symbol] [flags]
 ```
 
 **Flags:**
@@ -111,7 +111,7 @@ TokenStats:
 This command is used for querying balance information of certain address.
 
 ```bash
-iriscli bank account <address> <flags>
+iriscli bank account [address] [flags]
 ```
 
 **Flags:**
@@ -148,7 +148,7 @@ Account:
 Sending tokens to another address, this command includes `generate`, `sign` and `broadcast` steps.
 
 ```bash
-iriscli bank send --from=<key-name> --to=<address> --amount=<amount> --fee=<native-fee> --chain-id=<chain-id>
+iriscli bank send --from=<key-name> --to=<address> --amount=<amount> --fee=0.3iris --chain-id=irishub
 ```
 
 **Flags:**
@@ -169,7 +169,7 @@ iriscli bank send --from=<key-name> --to=<address> --amount=10iris --fee=0.3iris
 This command is used to burn tokens from your own address.
 
 ```bash
-iriscli bank burn --from=<key-name> --amount=<amount-to-burn> --fee=<native-fee> --chain-id=<chain-id>
+iriscli bank burn --from=<key-name> --amount=<amount-to-burn> --fee=0.3iris --chain-id=irishub
 ```
 
 **Flags:**
@@ -181,7 +181,7 @@ iriscli bank burn --from=<key-name> --amount=<amount-to-burn> --fee=<native-fee>
 ### Burn Token
 
 ```bash
- iriscli bank burn --from=<key-name> --amount=10iris --chain-id=irishub --fee=0.3iris
+iriscli bank burn --from=<key-name> --amount=10iris --chain-id=irishub --fee=0.3iris
 ```
 
 ## iriscli bank set-memo-regexp
@@ -189,7 +189,7 @@ iriscli bank burn --from=<key-name> --amount=<amount-to-burn> --fee=<native-fee>
 This command is used to set memo regexp for your own address, so that you can only receive coins from transactions with the corresponding memo.
 
 ```bash
-iriscli bank set-memo-regexp --regexp=<regular-expression> --from=<key-name> --fee=<native-fee> --chain-id=<chain-id>
+iriscli bank set-memo-regexp --regexp=<regular-expression> --from=<key-name> --fee=0.3iris --chain-id=irishub
 ```
 
 **Flags:**

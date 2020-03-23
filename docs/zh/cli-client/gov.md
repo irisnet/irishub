@@ -22,7 +22,7 @@
 查询提案的详细信息。
 
 ```bash
-iriscli gov query-proposal <flags>
+iriscli gov query-proposal [flags]
 ```
 
 **标识：**
@@ -42,7 +42,7 @@ iriscli gov query-proposal --chain-id=irishub --proposal-id=<proposal-id>
 按条件查询提案。
 
 ```bash
-iriscli gov query-proposals <flags>
+iriscli gov query-proposals [flags]
 ```
 
 **标识：**
@@ -71,7 +71,7 @@ iriscli gov query-proposals --chain-id=irishub --limit=3 --status=passed --depos
 查询投票信息。
 
 ```bash
-iriscli gov query-vote <flags>
+iriscli gov query-vote [flags]
 ```
 
 **标识：**
@@ -92,7 +92,7 @@ iriscli gov query-vote --chain-id=irishub --proposal-id=<proposal-id> --voter=<i
 查询提案的所有投票信息。
 
 ```bash
-iriscli gov query-votes <flags>
+iriscli gov query-votes [flags]
 ```
 
 **标识：**
@@ -112,7 +112,7 @@ iriscli gov query-votes --chain-id=irishub --proposal-id=<proposal-id>
 查询指定提案的抵押信息。
 
 ```bash
-iriscli gov query-deposit <flags>
+iriscli gov query-deposit [flags]
 ```
 
 **标识：**
@@ -133,7 +133,7 @@ iriscli gov query-deposit --chain-id=irishub --proposal-id=<proposal-id> --depos
 查询指定提案的所有抵押信息。
 
 ```bash
-iriscli gov query-deposits <flags>
+iriscli gov query-deposits [flags]
 ```
 
 **标识：**
@@ -153,7 +153,7 @@ iriscli gov query-deposits --chain-id=irishub --proposal-id=<proposal-id>
 查询提案投票的统计信息。
 
 ```bash
-iriscli gov query-tally <flags>
+iriscli gov query-tally [flags]
 ```
 
 **标识：**
@@ -173,7 +173,7 @@ iriscli gov query-tally --chain-id=irishub --proposal-id=<proposal-id>
 提交提案以及初始化抵押金额。
 
 ```bash
-iriscli gov submit-proposal <flags>
+iriscli gov submit-proposal [flags]
 ```
 
 **标识：**
@@ -225,7 +225,7 @@ iriscli gov submit-proposal --chain-id=irishub --title=<proposal-title> --descri
 为有效的提案抵押通证。
 
 ```bash
-iriscli gov deposit <flags>
+iriscli gov deposit [flags]
 
 ```
 
@@ -255,7 +255,7 @@ iriscli gov deposit --chain-id=irishub --proposal-id=<proposal-id> --deposit=50i
 :::
 
 ```bash
-iriscli gov vote <flags>
+iriscli gov vote [flags]
 ```
 
 **标识：**

@@ -79,7 +79,7 @@ Delegation:
 查询某个委托人发起的所有委托记录。
 
 ```bash
-iriscli stake delegations <delegator-address> <flags>
+iriscli stake delegations <delegator-address> [flags]
 ```
 
 ### 查询某个委托人发起的所有委托记录
@@ -93,7 +93,7 @@ iriscli stake delegations <iaa...>
 查询某个验证人接受的所有委托。
 
 ```bash
-iriscli stake delegations-to <validator-address> <flags>
+iriscli stake delegations-to <validator-address> [flags]
 ```
 
 ### 查询某个验证人接受的所有委托
@@ -122,7 +122,7 @@ Delegation:
 通过委托人与验证人地址查询unbonding-delegation记录。
 
 ```bash
-iriscli stake unbonding-delegation --address-delegator=<delegator-address> --address-validator=<validator-address> <flags>
+iriscli stake unbonding-delegation --address-delegator=<delegator-address> --address-validator=<validator-address> [flags]
 ```
 
 **标志：**
@@ -159,7 +159,7 @@ iriscli stake unbonding-delegations-from <iva...>
 查询验证人的所有转委托记录。
 
 ```bash
-iriscli stake redelegations-from <validator-address> <flags>
+iriscli stake redelegations-from <validator-address> [flags]
 ```
 
 ### 查询验证人的所有转委托记录
@@ -173,7 +173,7 @@ iriscli stake redelegations-from <iva...>
 通过委托人地址、原验证人地址、目标验证人地址查询转委托记录。
 
 ```bash
-iriscli stake redelegation --address-validator-source=<source-validator-address> --address-validator-dest=<destination-validator-address> --address-delegator=<address-delegator> <flags>
+iriscli stake redelegation --address-validator-source=<source-validator-address> --address-validator-dest=<destination-validator-address> --address-delegator=<address-delegator> [flags]
 ```
 
 **标志：**
@@ -255,7 +255,7 @@ Signing Info
 发送交易申请成为验证人，并委托一定数量的iris到该验证人。
 
 ```bash
-iriscli stake create-validator <flags>
+iriscli stake create-validator [flags]
 ```
 
 **标志：**
@@ -287,7 +287,7 @@ iriscli stake create-validator --chain-id=irishub --from=<key-name> --fee=0.3iri
 修改验证的的参数，包括佣金比率，验证人节点名称以及其他描述信息。
 
 ```bash
-iriscli stake edit-validator <flags>
+iriscli stake edit-validator [flags]
 ```
 
 **标志：**
@@ -315,7 +315,7 @@ iriscli stake edit-validator --from=<key-name> --chain-id=irishub --fee=0.3iris 
 向验证人委托通证。
 
 ```bash
-iriscli stake delegate --address-validator=<validator-address> <flags>
+iriscli stake delegate --address-validator=<validator-address> [flags]
 ```
 
 **标志：**
@@ -334,7 +334,7 @@ iriscli stake delegate --chain-id=irishub --from=<key-name> --fee=0.3iris --amou
 从验证人解委托通证。
 
 ```bash
-iriscli stake unbond <flags>
+iriscli stake unbond [flags]
 ```
 
 **标志：**
@@ -368,7 +368,7 @@ iriscli stake unbond --address-validator=<iva...> --shares-percent=0.1 --from=<k
 :::
 
 ```bash
-iriscli stake redelegate <flags>
+iriscli stake redelegate [flags]
 ```
 
 **标志：**
@@ -399,7 +399,7 @@ iriscli stake redelegate --chain-id=irishub --from=<key-name> --fee=0.3iris --ad
 在PoS网络中，验证人的收益主要来自于staking抵押获利，但是若验证人不能保持在线，就会被当作一种作恶行为。系统会剥夺其作为验证人参与共识的资格。这样一来，其的状态会变成jailed，且投票权将立刻变为零。这种状态将持续一段时间。当jailed期结束，验证人节点的operator需要执行unjail操作来让节点的状态变为unjailed，再次成为验证人或者候选验证人。
 
 ```bash
-iriscli stake unjail <flags>
+iriscli stake unjail [flags]
 ```
 
 ### 解禁被监禁的验证人

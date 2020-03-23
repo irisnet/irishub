@@ -24,7 +24,7 @@ iriscli tendermint tx CD117378EC1CE0BA4ED0E0EBCED01AF09DA8F6B7 --chain-id=irishu
 搜索所有匹配指定条件的交易
 
 ```bash
-iriscli tendermint txs <flags>
+iriscli tendermint txs [flags]
 
 ```
 

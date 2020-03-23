@@ -32,7 +32,7 @@ IRIS-SDK通过增强的IBC处理逻辑来支持服务语义，以允许分布式
 
 ```bash
 # 创建服务定义
-iriscli service define --chain-id=<chain-id>  --from=<key-name> --fee=0.6iris --gas=100000 --service-name=<service-name> --service-description=<service-description> --author-description=<author-description> --tags=<tag1>,<tag2> --idl-content=<idl-content> --file=</***/***.proto>
+iriscli service define --chain-id=irishub  --from=<key-name> --fee=0.6iris --gas=100000 --service-name=<service-name> --service-description=<service-description> --author-description=<author-description> --tags=<tag1>,<tag2> --idl-content=<idl-content> --file=</***/***.proto>
 
 # 查询服务定义
 iriscli service definition --def-chain-id=<def-chain-id> --service-name=<service-name>
@@ -44,7 +44,7 @@ iriscli service definition --def-chain-id=<def-chain-id> --service-name=<service
 
 ```bash
 # 服务绑定（抵押1000iris， 价格1iris， 平均响应时间10000毫秒， 服务可用性9999（10000次调用可用次数的整数表示））
-iriscli service bind --chain-id=<chain-id>  --from=<key-name> --fee=0.3iris --service-name=<service-name> --def-chain-id=<def-chain-id> --bind-type=Local  --deposit=1000iris --prices=1iris --avg-rsp-time=10000 --usable-time=9999
+iriscli service bind --chain-id=irishub  --from=<key-name> --fee=0.3iris --service-name=<service-name> --def-chain-id=<def-chain-id> --bind-type=Local  --deposit=1000iris --prices=1iris --avg-rsp-time=10000 --usable-time=9999
 
 # 查询服务绑定
 iriscli service binding --def-chain-id=<def-chain-id> --service-name=<service-name> --bind-chain-id=<bind-chain-id> --provider=<provider-account-address>
@@ -53,16 +53,16 @@ iriscli service binding --def-chain-id=<def-chain-id> --service-name=<service-na
 iriscli service bindings --def-chain-id=<def-chain-id> --service-name=<service-name>
 
 # 服务绑定更新
-iriscli service update-binding --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --service-name=<service-name> --def-chain-id=<def-chain-id> --bind-type=Local  --deposit=1iris --prices=1iris,2iris --avg-rsp-time=10000 --usable-time=100
+iriscli service update-binding --chain-id=irishub --from=<key-name> --fee=0.3iris --service-name=<service-name> --def-chain-id=<def-chain-id> --bind-type=Local  --deposit=1iris --prices=1iris,2iris --avg-rsp-time=10000 --usable-time=100
 
 # 禁用服务绑定
-iriscli service disable --chain-id=<chain-id>  --from=<key-name> --fee=0.3iris --def-chain-id=<def-chain-id> --service-name=<service-name>
+iriscli service disable --chain-id=irishub  --from=<key-name> --fee=0.3iris --def-chain-id=<def-chain-id> --service-name=<service-name>
 
 # 开启服务绑定，并追加抵押100iris
-iriscli service enable --chain-id=<chain-id>  --from=<key-name> --fee=0.3iris --def-chain-id=<def-chain-id> --service-name=<service-name> --deposit=100iris
+iriscli service enable --chain-id=irishub  --from=<key-name> --fee=0.3iris --def-chain-id=<def-chain-id> --service-name=<service-name> --deposit=100iris
 
 # 取回押金
-iriscli service refund-deposit --chain-id=<chain-id>  --from=<key-name> --fee=0.3iris --def-chain-id=<def-chain-id> --service-name=<service-name>
+iriscli service refund-deposit --chain-id=irishub  --from=<key-name> --fee=0.3iris --def-chain-id=<def-chain-id> --service-name=<service-name>
 ```
 
 ### 服务调用
@@ -71,13 +71,13 @@ iriscli service refund-deposit --chain-id=<chain-id>  --from=<key-name> --fee=0.
 
 ```bash
 # 发起服务调用
-iriscli service call --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --def-chain-id=<def-chain-id> --service-name=<service-name> --method-id=1 --bind-chain-id=<bind-chain-id> --provider=<provider-account-address> --service-fee=1iris --request-data=<request-data>
+iriscli service call --chain-id=irishub --from=<key-name> --fee=0.3iris --def-chain-id=<def-chain-id> --service-name=<service-name> --method-id=1 --bind-chain-id=<bind-chain-id> --provider=<provider-account-address> --service-fee=1iris --request-data=<request-data>
 
 # 查询服务请求列表
 iriscli service requests --def-chain-id=<def-chain-id> --service-name=<service-name> --bind-chain-id=<bind-chain-id> --provider=<provider-account-address>
 
 # 响应服务调用
-iriscli service respond --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --request-chain-id=<request-chain-id> --request-id=<request-id (e.g.230-130-0)> --response-data=<response-data>
+iriscli service respond --chain-id=irishub --from=<key-name> --fee=0.3iris --request-chain-id=<request-chain-id> --request-id=<request-id (e.g.230-130-0)> --response-data=<response-data>
 
 # 查询服务响应
 iriscli service response --request-chain-id=<request-chain-id> --request-id=<request-id (e.g.230-130-0)>
@@ -86,10 +86,10 @@ iriscli service response --request-chain-id=<request-chain-id> --request-id=<req
 iriscli service fees <account-address>
 
 # 从服务费退款中退还所有费用
-iriscli service refund-fees --chain-id=<chain-id> --from=<key-name> --fee=0.3iris
+iriscli service refund-fees --chain-id=irishub --from=<key-name> --fee=0.3iris
 
 # 从服务费收入中取回所有费用
-iriscli service withdraw-fees --chain-id=<chain-id> --from=<key-name> --fee=0.3iris
+iriscli service withdraw-fees --chain-id=irishub --from=<key-name> --fee=0.3iris
 ```
 
 ## IDL文件扩展

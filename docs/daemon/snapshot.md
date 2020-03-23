@@ -15,7 +15,7 @@ IRIShub can snapshot the latest data of the full node, including blocks, consens
 ## Usage
 
 ```bash
- iris snapshot <flags>
+ iris snapshot [flags]
 ```
 
 After the command is executed, a `data.bak` directory will be generated in the directory specified by `--tmp-dir`. Delete the old `data` directory, rename `data.bak` to `data`, and restart the node.

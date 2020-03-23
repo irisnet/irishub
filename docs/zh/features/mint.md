@@ -61,7 +61,7 @@ genesis中指定的初始通胀率是4%，这个值可以通过在governance中�
     如果不信任连接的全节点，请加上`--trust-node=false`这个标志。如果连接不上可信的全节点，这个接口十分必要。
 
     ```bash
-    iriscli bank token-stats --trust-node=false --chain-id=<chain-id> --node=<iris_node_url>
+    iriscli bank token-stats --trust-node=false --chain-id=irishub --node=<iris_node_url>
     ```
 
     示例输出：

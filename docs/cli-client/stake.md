@@ -79,7 +79,7 @@ Delegation:
 Query all delegations delegated from one delegator.
 
 ```bash
-iriscli stake delegations <delegator-address> <flags>
+iriscli stake delegations <delegator-address> [flags]
 ```
 
 ### Query all delegations of a delegator
@@ -93,7 +93,7 @@ iriscli stake delegations <iaa...>
 Query all delegations to one validator.
 
 ```bash
-iriscli stake delegations-to <validator-address> <flags>
+iriscli stake delegations-to <validator-address> [flags]
 ```
 
 ### Query all delegations to one validator
@@ -122,7 +122,7 @@ Delegation:
 Query an unbonding-delegation record based on delegator and validator address.
 
 ```bash
-iriscli stake unbonding-delegation --address-delegator=<delegator-address> --address-validator=<validator-address> <flags>
+iriscli stake unbonding-delegation --address-delegator=<delegator-address> --address-validator=<validator-address> [flags]
 ```
 
 **Flags:**
@@ -159,7 +159,7 @@ iriscli stake unbonding-delegations-from <iva...>
 Query all outgoing redelegations of a validator
 
 ```bash
-iriscli stake redelegations-from <validator-address> <flags>
+iriscli stake redelegations-from <validator-address> [flags]
 ```
 
 ### Query all outgoing redelegatations of a validator
@@ -173,7 +173,7 @@ iriscli stake redelegations-from <iva...>
 Query a redelegation record based on delegator and source validator address and destination validator address.
 
 ```bash
-iriscli stake redelegation --address-validator-source=<source-validator-address> --address-validator-dest=<destination-validator-address> --address-delegator=<address-delegator> <flags>
+iriscli stake redelegation --address-validator-source=<source-validator-address> --address-validator-dest=<destination-validator-address> --address-delegator=<address-delegator> [flags]
 ```
 
 **Flags:**
@@ -255,7 +255,7 @@ Signing Info
 Send a transaction to apply to be a validator and delegate a certain amount of iris to it.
 
 ```bash
-iriscli stake create-validator <flags>
+iriscli stake create-validator [flags]
 ```
 
 **Flags:**
@@ -287,7 +287,7 @@ Follow the [Mainnet](../get-started/mainnet.md#create-validator) instructions to
 Edit an existing validator's settings, such as commission rate, name, etc.
 
 ```bash
-iriscli stake edit-validator <flags>
+iriscli stake edit-validator [flags]
 ```
 
 **Flags:**
@@ -315,7 +315,7 @@ Please refer to [How to upload my validator's logo to the Explorers](../concepts
 Delegate tokens to a validator.
 
 ```bash
-iriscli stake delegate --address-validator=<validator-address> <flags>
+iriscli stake delegate --address-validator=<validator-address> [flags]
 ```
 
 **Flags:**
@@ -334,7 +334,7 @@ iriscli stake delegate --chain-id=irishub --from=<key-name> --fee=0.3iris --amou
 Unbond tokens from a validator.
 
 ```bash
-iriscli stake unbond <flags>
+iriscli stake unbond [flags]
 ```
 
 **Flags:**
@@ -368,7 +368,7 @@ There is no `unbonding time` during the redelegation, so you will not miss the r
 :::
 
 ```bash
-iriscli stake redelegate <flags>
+iriscli stake redelegate [flags]
 ```
 
 **Flags:**
@@ -399,7 +399,7 @@ iriscli stake redelegate --chain-id=irishub --from=<key-name> --fee=0.3iris --ad
 In Proof-of-Stake blockchain, validators will get block provisions by staking their token. But if they failed to keep online, they will be punished by slashing a small portion of their staked tokens. The offline validators will be removed from the validator set and put into jail, which means their voting power is zero. During the jail period, these nodes are not even validator candidates. Once the jail period ends, they can send `unjail` transactions to free themselves and become validator candidates again.
 
 ```bash
-iriscli stake unjail <flags>
+iriscli stake unjail [flags]
 ```
 
 ### Unjail a jailed validator

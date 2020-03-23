@@ -39,13 +39,13 @@ The `start` subcommand has the following flags:
 By default, IRISLCD doesn't trust the connected full node. But if you are sure about that the connected full node is trustable, then you should run IRISLCD with `--trust-node` flag:
 
 ```bash
-irislcd start --node=tcp://localhost:26657 --chain-id=<chain-id> --trust-node
+irislcd start --node=tcp://localhost:26657 --chain-id=irishub --trust-node
 ```
 
 To access your IRISLCD instance publicly, you need to specify `--laddr`:
 
 ```bash
-irislcd start --node=tcp://localhost:26657 --chain-id=<chain-id> --laddr=tcp://0.0.0.0:1317 --trust-node
+irislcd start --node=tcp://localhost:26657 --chain-id=irishub --laddr=tcp://0.0.0.0:1317 --trust-node
 ```
 
 ## REST APIs

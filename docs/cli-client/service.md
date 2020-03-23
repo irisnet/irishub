@@ -36,7 +36,7 @@ Service module allows you to define, bind, invoke services on the IRIS Hub. [Rea
 Define a new service.
 
 ```bash
-iriscli service define <flags>
+iriscli service define [flags]
 ```
 
 **Flags:**
@@ -52,7 +52,7 @@ iriscli service define <flags>
 ### define a service
 
 ```bash
-iriscli service define --chain-id=<chain-id> --from=<key-name> --fee=0.3iris 
+iriscli service define --chain-id=irishub --from=<key-name> --fee=0.3iris 
 --name=<service name> --description=<service description> --author-description=<author description>
 --tags=tag1,tag2 --schemas=<schemas content or path/to/schemas.json>
 ```
@@ -68,7 +68,7 @@ iriscli service define --chain-id=<chain-id> --from=<key-name> --fee=0.3iris
 Query a service definition.
 
 ```bash
-iriscli service definition <service name>
+iriscli service definition [service-name] [flags]
 ```
 
 ### Query a service definition
@@ -84,7 +84,7 @@ iriscli service definition <service name>
 Bind a service.
 
 ```bash
-iriscli service bind <flags>
+iriscli service bind [flags]
 ```
 
 **Flags:**
@@ -100,7 +100,7 @@ iriscli service bind <flags>
 The deposit needs to satisfy the minimum deposit requirement, which is the maximal one between `price` * `MinDepositMultiple` and `MinDeposit`(`MinDepositMultiple` and `MinDeposit` are the system parameters, which can be modified through the governance).
 
 ```bash
-iriscli service bind --chain-id=<chain-id> --from=<key-name> --fee=0.3iris
+iriscli service bind --chain-id=irishub --from=<key-name> --fee=0.3iris
 --service-name=<service name> --deposit=10000iris --pricing=<pricing>
 ```
 
@@ -128,7 +128,7 @@ iriscli service binding <service name> <provider>
 ### Query a service binding
 
 ```bash
-iriscli service binding <service name> <provider>
+iriscli service binding [service-name] [provider] [flags]
 ```
 
 ## iriscli service bindings
@@ -136,7 +136,7 @@ iriscli service binding <service name> <provider>
 Query all bindings of a service definition.
 
 ```bash
-iriscli service bindings <service name>
+iriscli service bindings [service-name] [flags]
 ```
 
 ### Query service binding list
@@ -150,14 +150,13 @@ iriscli service bindings <service name>
 Update a service binding.
 
 ```bash
-iriscli service update-binding <flags>
+iriscli service update-binding [service-name] [flags]
 ```
 
 **Flags:**
 
 | Name, shorthand | Default | Description                                                                         | Required |
 | --------------- | ------- | ----------------------------------------------------------------------------------- | -------- |
-| --service-name  |         | Service name                                                                        | Yes      |
 | --deposit       |         | Deposit added for the binding                                                       |          |
 | --pricing       |         | Pricing content or path, which is an instance of the Irishub Service Pricing schema |          |
 
@@ -166,8 +165,7 @@ iriscli service update-binding <flags>
 The following example updates the service binding with the additional 10 IRIS deposit
 
 ```bash
-iriscli service update-binding --chain-id=<chain-id> --from=<key-name> --fee=0.3iris 
---service-name=<service-name> --deposit=10iris
+iriscli service update-binding <service-name> --chain-id=irishub --from=<key-name> --fee=0.3iris --deposit=10iris
 ```
 
 ## iriscli service set-withdraw-addr
@@ -175,13 +173,13 @@ iriscli service update-binding --chain-id=<chain-id> --from=<key-name> --fee=0.3
 Set a withdrawal address for a provider.
 
 ```bash
-iriscli service set-withdraw-addr <withdrawal address>
+iriscli service set-withdraw-addr [withdrawal-address] [flags]
 ```
 
 ### Set a withdrawal address
 
 ```bash
-iriscli service set-withdraw-addr <withdrawal address> --chain-id=<chain-id> --from=<key-name> --fee=0.3iris
+iriscli service set-withdraw-addr <withdrawal address> --chain-id=irishub --from=<key-name> --fee=0.3iris
 ```
 
 ## iriscli service withdraw-addr
@@ -189,7 +187,7 @@ iriscli service set-withdraw-addr <withdrawal address> --chain-id=<chain-id> --f
 Query the withdrawal address of a provider.
 
 ```bash
-iriscli service withdraw-addr <provider>
+iriscli service withdraw-addr [provider] [flags]
 ```
 
 ### Query the withdrawal address of a provider
@@ -203,13 +201,13 @@ iriscli service withdraw-addr <provider>
 Disable an available service binding.
 
 ```bash
-iriscli service disable <service name>
+iriscli service disable [service-name] [flags]
 ```
 
 ### Disable an available service binding
 
 ```bash
-iriscli service disable <service name> --chain-id=<chain-id> --from=<key-name> --fee=0.3iris
+iriscli service disable <service name> --chain-id=irishub --from=<key-name> --fee=0.3iris
 ```
 
 ## iriscli service enable
@@ -217,7 +215,7 @@ iriscli service disable <service name> --chain-id=<chain-id> --from=<key-name> -
 Enable an unavailable service binding.
 
 ```bash
-iriscli service enable <service name> <flags>
+iriscli service enable [service-name] [flags]
 ```
 
 **Flags:**
@@ -231,7 +229,7 @@ iriscli service enable <service name> <flags>
 The following example enables an unavailable service binding with the additional 10 IRIS deposit.
 
 ```bash
-iriscli service enable <service name> --chain-id=<chain-id>  --from=<key-name> --fee=0.3iris --deposit=10iris
+iriscli service enable <service name> --chain-id=irishub  --from=<key-name> --fee=0.3iris --deposit=10iris
 ```
 
 ## iriscli service refund-deposit
@@ -239,7 +237,7 @@ iriscli service enable <service name> --chain-id=<chain-id>  --from=<key-name> -
 Refund all deposits from a service binding.
 
 ```bash
-iriscli service refund-deposit <service name>
+iriscli service refund-deposit [service-name] [flags]
 ```
 
 ### Refund all deposits from an unavailable service binding
@@ -247,7 +245,7 @@ iriscli service refund-deposit <service name>
 Before refunding, you should [disable](#iriscli-service-disable) the service binding first.
 
 ```bash
-iriscli service refund-deposit <service name> --chain-id=<chain-id>  --from=<key-name> --fee=0.3iris
+iriscli service refund-deposit <service name> --chain-id=irishub  --from=<key-name> --fee=0.3iris
 ```
 
 ## iriscli service call
@@ -255,7 +253,7 @@ iriscli service refund-deposit <service name> --chain-id=<chain-id>  --from=<key
 Call a service.
 
 ```bash
-iriscli service call <flags>
+iriscli service call [flags]
 ```
 
 **Flags:**
@@ -275,7 +273,7 @@ iriscli service call <flags>
 ### Initiate a service invocation request
 
 ```bash
-iriscli service call --chain-id=<chain-id> --from=<key name> --fee=0.3iris --service-name=<service name>
+iriscli service call --chain-id=irishub --from=<key name> --fee=0.3iris --service-name=<service name>
 --providers=<provider list> --service-fee-cap=1iris --data=<request data> --timeout=100 --repeated --frequency=150 --total=100
 ```
 
@@ -294,7 +292,7 @@ iriscli service call --chain-id=<chain-id> --from=<key name> --fee=0.3iris --ser
 Query a request by the request ID
 
 ```bash
-iriscli service request <request-id>
+iriscli service request [request-id] [flags]
 ```
 
 ### Query a service request
@@ -312,7 +310,7 @@ You can retrieve the `request-id` in the result of [tendermint block](./tendermi
 Query service requests by the service binding or request context ID.
 
 ```bash
-iriscli service requests [<service name> <provider>] | [<request-context-id> <batch-counter>]
+iriscli service requests [service_name] [provider] | [request_context_id] [batch_counter] [flags]
 ```
 
 ### Query active requests of a service binding
@@ -332,7 +330,7 @@ iriscli service requests <request-context-id> <batch-counter>
 Respond to a service request.
 
 ```bash
-iriscli service respond <flags>
+iriscli service respond [flags]
 ```
 
 **Flags:**
@@ -346,7 +344,7 @@ iriscli service respond <flags>
 ### Respond to a service request
 
 ```bash
-iriscli service respond --chain-id=<chain-id> --from=<key-name> --fee=0.3iris
+iriscli service respond --chain-id=irishub --from=<key-name> --fee=0.3iris
 --request-id=<request-id> --result=<response result> --data=<response output>
 ```
 
@@ -376,7 +374,7 @@ You can retrieve the `request-id` in the result of [tendermint block](./tendermi
 Query a service response.
 
 ```bash
-iriscli service response <request-id>
+iriscli service response [request-id] [flags]
 ```
 
 ### Query a service response
@@ -386,7 +384,7 @@ iriscli service response <request-id>
 ```
 
 :::tip
-You can retrieve the `request-id` in the result of [tendermint block](#iriscli-tendermint-block)
+You can retrieve the `request-id` in the result of [tendermint block](./tendermint.md#iriscli-tendermint-block)
 :::
 
 ## iriscli service responses
@@ -394,7 +392,7 @@ You can retrieve the `request-id` in the result of [tendermint block](#iriscli-t
 Query responses by the request context ID and batch counter
 
 ```bash
-iriscli service responses <request-context-id> <batch-counter>
+iriscli service responses [request-context-id] [batch-counter] [flags]
 ```
 
 ### Query responses by the request context ID and batch counter
@@ -408,7 +406,7 @@ iriscli service responses <request-context-id> <batch-counter>
 Query a request context.
 
 ```bash
-iriscli service request-context <request-context-id>
+iriscli service request-context [request-context-id] [flags]
 ```
 
 ### Query a request context
@@ -426,7 +424,7 @@ You can retrieve the `request-context-id` in the result of [service call](#irisc
 Update a request context
 
 ```bash
-iriscli service update <request-context-id> <flags>
+iriscli service update [request-context-id] [flags]
 ```
 
 **Flags:**
@@ -442,7 +440,7 @@ iriscli service update <request-context-id> <flags>
 ### Update a request context
 
 ```bash
-iriscli service update <request-context-id> --chain-id=<chain-id> --from=<key name> --fee=0.3iris
+iriscli service update <request-context-id> --chain-id=irishub --from=<key name> --fee=0.3iris
 --providers=<provider list> --service-fee-cap=1iris --timeout=0 --frequency=150 --total=100
 ```
 
@@ -451,7 +449,7 @@ iriscli service update <request-context-id> --chain-id=<chain-id> --from=<key na
 Pause a running request context.
 
 ```bash
-iriscli service pause <request-context-id>
+iriscli service pause [request-context-id] [flags]
 ```
 
 ### Pause a running request context
@@ -465,7 +463,7 @@ iriscli service pause <request-context-id>
 Start a paused request context.
 
 ```bash
-iriscli service start <request-context-id>
+iriscli service start [request-context-id] [flags]
 ```
 
 ### Start a paused request context
@@ -479,7 +477,7 @@ iriscli service start <request-context-id>
 Terminate a request context.
 
 ```bash
-iriscli service kill <request-context-id>
+iriscli service kill [request-context-id] [flags]
 ```
 
 ### Kill a request context
@@ -493,7 +491,7 @@ iriscli service kill <request-context-id>
 Query the earned fees of a provider.
 
 ```bash
-iriscli service fees <provider>
+iriscli service fees [provider] [flags]
 ```
 
 ### Query service fees
@@ -507,11 +505,11 @@ iriscli service fees <provider>
 Withdraw the earned fees of a provider.
 
 ```bash
-iriscli service withdraw-fees <flags>
+iriscli service withdraw-fees [flags]
 ```
 
 ### Withdraw the earned fees
 
 ```bash
-iriscli service withdraw-fees --chain-id=<chain-id> --from=<key-name> --fee=0.3iris
+iriscli service withdraw-fees --chain-id=irishub --from=<key-name> --fee=0.3iris
 ```
