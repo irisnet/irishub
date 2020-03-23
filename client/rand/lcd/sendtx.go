@@ -22,7 +22,7 @@ type requestRandReq struct {
 	Consumer      sdk.AccAddress `json:"consumer"`        // request address
 	BlockInterval uint64         `json:"block_interval"`  // block interval
 	Oracle        bool           `json:"oracle"`          // oracle method
-	ServiceFeeCap sdk.Coins      `json:"service_fee_cap"` // service fee cap
+	ServiceFeeCap string         `json:"service_fee_cap"` // service fee cap
 }
 
 func requestRandHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
@@ -37,8 +37,14 @@ func requestRandHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Hand
 			return
 		}
 
+		serviceFeeCap, err := cliCtx.ParseCoins(req.ServiceFeeCap)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
 		// create the MsgRequestRand message
-		msg := rand.NewMsgRequestRand(req.Consumer, req.BlockInterval, req.Oracle, req.ServiceFeeCap)
+		msg := rand.NewMsgRequestRand(req.Consumer, req.BlockInterval, req.Oracle, serviceFeeCap)
 		if err := msg.ValidateBasic(); err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return

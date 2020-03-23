@@ -29,7 +29,6 @@ import (
 	"github.com/irisnet/irishub/client/context"
 	htlctypes "github.com/irisnet/irishub/client/htlc/types"
 	"github.com/irisnet/irishub/client/keys"
-	randtypes "github.com/irisnet/irishub/client/rand/types"
 	"github.com/irisnet/irishub/client/stake"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/guardian"
@@ -44,9 +43,7 @@ import (
 func convertToIrisBaseAccount(t *testing.T, acc auth.BaseAccount) string {
 	cdc := codec.New()
 	codec.RegisterCrypto(cdc)
-	cliCtx := context.NewCLIContext().
-		WithCodec(cdc)
-
+	cliCtx := context.NewCLIContext().WithCodec(cdc)
 	coinstr := sdk.NewCoins(sdk.NewCoin(sdk.IrisAtto, acc.Coins.AmountOf(sdk.IrisAtto))).String()
 	coins, err := cliCtx.ConvertToMainUnit(coinstr)
 	require.NoError(t, err, "coins %v, err %v", coinstr, err)
@@ -72,7 +69,9 @@ func getAmountFromCoinStr(coinStr string) float64 {
 func modifyGenesisState(genesisState v3.GenesisFileState) v3.GenesisFileState {
 	genesisState.GovData = gov.DefaultGenesisStateForCliTest()
 	genesisState.UpgradeData = upgrade.DefaultGenesisStateForTest()
-	genesisState.ServiceData = service.DefaultGenesisStateForTest()
+	genesisState.ServiceData = service.DefaultGenesisStateForTest(
+		append(rand.GetSvcDefinitions(), oracle.GetSvcDefinitions()...),
+	)
 	genesisState.GuardianData = guardian.DefaultGenesisStateForTest()
 	genesisState.AssetData = asset.DefaultGenesisStateForTest()
 
@@ -116,8 +115,9 @@ func initializeFixtures(t *testing.T) (chainID, servAddr, port, irisHome, iriscl
 	executeWrite(t, fmt.Sprintf("iriscli keys delete --home=%s bar", iriscliHome), sdk.DefaultKeyPass)
 	executeWriteCheckErr(t, fmt.Sprintf("iriscli keys add --home=%s foo", iriscliHome), sdk.DefaultKeyPass)
 	executeWriteCheckErr(t, fmt.Sprintf("iriscli keys add --home=%s bar", iriscliHome), sdk.DefaultKeyPass)
-	fooAddr, _ := executeGetAddrPK(t, fmt.Sprintf(
-		"iriscli keys show foo --output=json --home=%s", iriscliHome))
+	fooAddr, _ := executeGetAddrPK(
+		t, fmt.Sprintf("iriscli keys show foo --output=json --home=%s", iriscliHome),
+	)
 	chainID = executeInit(t, fmt.Sprintf("iris init -o --moniker=foo --home=%s", irisHome))
 	genFile := filepath.Join(irisHome, "config", "genesis.json")
 	genDoc := readGenesisFile(t, genFile)
@@ -130,22 +130,18 @@ func initializeFixtures(t *testing.T) (chainID, servAddr, port, irisHome, iriscl
 	appStateJSON, err := codec.Cdc.MarshalJSON(appState)
 	require.NoError(t, err)
 	genDoc.AppState = appStateJSON
-	genDoc.SaveAs(genFile)
-	executeWriteCheckErr(t, fmt.Sprintf(
-		"iris gentx --name=foo --home=%s --home-client=%s", irisHome, iriscliHome),
-		sdk.DefaultKeyPass)
+	_ = genDoc.SaveAs(genFile)
+	executeWriteCheckErr(
+		t,
+		fmt.Sprintf("iris gentx --name=foo --home=%s --home-client=%s", irisHome, iriscliHome),
+		sdk.DefaultKeyPass,
+	)
 	executeWriteCheckErr(t, fmt.Sprintf("iris collect-gentxs --home=%s", irisHome), sdk.DefaultKeyPass)
 	// get a free port, also setup some common flags
 	servAddr, port, err = server.FreeTCPAddr()
 	require.NoError(t, err)
 	p2pAddr, _, err = server.FreeTCPAddr()
 	require.NoError(t, err)
-	return
-}
-
-func unmarshalStdTx(t *testing.T, s string) (stdTx auth.StdTx) {
-	cdc := app.MakeLatestCodec()
-	require.Nil(t, cdc.UnmarshalJSON([]byte(s), &stdTx))
 	return
 }
 
@@ -213,7 +209,7 @@ func executeInit(t *testing.T, cmdStr string) (chainID string) {
 func executeGetAddrPK(t *testing.T, cmdStr string) (sdk.AccAddress, crypto.PubKey) {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
 	var ko keys.KeyOutput
-	keys.UnmarshalJSON([]byte(out), &ko)
+	_ = keys.UnmarshalJSON([]byte(out), &ko)
 
 	pk, err := sdk.GetAccPubKeyBech32(ko.PubKey)
 	require.NoError(t, err)
@@ -454,9 +450,9 @@ func executeGetRandRequests(t *testing.T, cmdStr string) rand.Requests {
 	return rs
 }
 
-func executeGetRand(t *testing.T, cmdStr string) randtypes.ReadableRand {
+func executeGetRand(t *testing.T, cmdStr string) rand.Rand {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
-	var r randtypes.ReadableRand
+	var r rand.Rand
 	cdc := app.MakeLatestCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &r)
 	require.NoError(t, err, "out %v\n, err %v", out, err)

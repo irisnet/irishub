@@ -2,7 +2,6 @@ package types
 
 import (
 	"bytes"
-
 	cmn "github.com/tendermint/tendermint/libs/common"
 )
 
