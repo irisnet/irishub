@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"encoding/json"
 	"strings"
 
 	cmn "github.com/tendermint/tendermint/libs/common"
@@ -174,7 +175,10 @@ func (k Keeper) EditFeed(ctx sdk.Context, msg types.MsgEditFeed) sdk.Error {
 
 //HandlerResponse is responsible for processing the data returned from the service module,
 //processed by the aggregate function, and then saved
-func (k Keeper) HandlerResponse(ctx sdk.Context, requestContextID cmn.HexBytes, responseOutput []string, err error) {
+func (k Keeper) HandlerResponse(ctx sdk.Context,
+	requestContextID cmn.HexBytes,
+	responseOutput []string,
+	err error) (tags sdk.Tags) {
 	if len(responseOutput) == 0 || err != nil {
 		ctx = ctx.WithLogger(ctx.Logger().With("handler", "HandlerResponse"))
 		ctx.Logger().Error("Oracle feed failed",
@@ -204,11 +208,18 @@ func (k Keeper) HandlerResponse(ctx sdk.Context, requestContextID cmn.HexBytes, 
 		result := gjson.Get(jsonStr, feed.ValueJsonPath)
 		data = append(data, result)
 	}
+
+	result := aggregate(data)
 	value := types.FeedValue{
-		Data:      aggregate(data),
+		Data:      result,
 		Timestamp: ctx.BlockTime(),
 	}
 	k.SetFeedValue(ctx, feed.FeedName, reqCtx.BatchCounter, feed.LatestHistory, value)
+	bz, _ := json.Marshal(value)
+	return sdk.NewTags(
+		types.TagFeedName, []byte(feed.FeedName),
+		types.TagFeedValue(feed.FeedName), bz,
+	)
 }
 
 func (k Keeper) GetRequestContext(ctx sdk.Context, requestContextID cmn.HexBytes) (service.RequestContext, bool) {

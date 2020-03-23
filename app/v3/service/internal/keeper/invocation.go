@@ -787,7 +787,7 @@ func (k Keeper) AddResponse(
 		requestContext.BatchState = types.BATCHCOMPLETED
 
 		if len(requestContext.ModuleName) != 0 {
-			k.Callback(ctx, requestContextID)
+			tags = tags.AppendTags(k.Callback(ctx, requestContextID))
 		}
 	}
 
@@ -797,16 +797,16 @@ func (k Keeper) AddResponse(
 }
 
 // Callback callbacks the corresponding response callback handler
-func (k Keeper) Callback(ctx sdk.Context, requestContextID cmn.HexBytes) {
+func (k Keeper) Callback(ctx sdk.Context, requestContextID cmn.HexBytes) sdk.Tags {
 	requestContext, _ := k.GetRequestContext(ctx, requestContextID)
 
 	respCallback, _ := k.GetResponseCallback(requestContext.ModuleName)
 	outputs := k.GetResponseOutputs(ctx, requestContextID, requestContext.BatchCounter)
 
 	if len(outputs) >= int(requestContext.ResponseThreshold) {
-		respCallback(ctx, requestContextID, outputs, nil)
+		return respCallback(ctx, requestContextID, outputs, nil)
 	} else {
-		respCallback(
+		return respCallback(
 			ctx,
 			requestContextID,
 			outputs,

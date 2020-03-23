@@ -32,7 +32,7 @@ func EndBlocker(ctx sdk.Context, k Keeper) (tags sdk.Tags) {
 			k.IterateActiveRequests(ctx, requestContextID, requestContext.BatchCounter, expiredRequestHandler)
 
 			if len(requestContext.ModuleName) != 0 {
-				k.Callback(ctx, requestContextID)
+				tags = tags.AppendTags(k.Callback(ctx, requestContextID))
 			}
 
 			requestContext.BatchState = BATCHCOMPLETED
