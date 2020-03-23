@@ -2409,9 +2409,6 @@ paths:
                 repeated_frequency:
                   type: string
                   example: "5"
-                repeated_total:
-                  type: string
-                  example: "-1"
                 response_threshold:
                   type: integer
                   example: 1
@@ -2550,9 +2547,6 @@ paths:
                 repeated_frequency:
                   type: string
                   example: "5"
-                repeated_total:
-                  type: string
-                  example: "-1"
                 response_threshold:
                   type: integer
                   example: 1
