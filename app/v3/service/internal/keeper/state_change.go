@@ -15,6 +15,7 @@ func (k Keeper) CompleteBatch(ctx sdk.Context, requestContext types.RequestConte
 	requestContext.BatchState = types.BATCHCOMPLETED
 
 	if len(requestContext.ModuleName) != 0 {
+		tags = tags.AppendTags(k.Callback(ctx, requestContextID))
 		k.Callback(ctx, requestContextID)
 	}
 

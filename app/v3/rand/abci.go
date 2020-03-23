@@ -62,7 +62,7 @@ func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, k Keeper) (tags s
 			tags = tags.AppendTags(
 				sdk.NewTags(
 					TagReqID, []byte(reqID.String()),
-					TagRand, []byte(rand.Rat.FloatString(RandPrec)),
+					TagRand(reqID.String()), []byte(rand.Rat.FloatString(RandPrec)),
 				),
 			)
 

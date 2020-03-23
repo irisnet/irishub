@@ -562,7 +562,7 @@ func (state *RequestContextBatchState) UnmarshalJSON(data []byte) error {
 }
 
 // ResponseCallback defines the response callback interface
-type ResponseCallback func(ctx sdk.Context, requestContextID cmn.HexBytes, responses []string, err error)
+type ResponseCallback func(ctx sdk.Context, requestContextID cmn.HexBytes, responses []string, err error) sdk.Tags
 
 const (
 	RequestIDLen = 58

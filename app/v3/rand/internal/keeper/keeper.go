@@ -84,7 +84,7 @@ func (k Keeper) RequestRand(
 	k.EnqueueRandRequest(ctx, destHeight, reqID, request)
 
 	reqTags := sdk.NewTags(
-		types.TagReqID, []byte(hex.EncodeToString(reqID)),
+		types.TagReqID, []byte(reqID.String()),
 		types.TagRandHeight, []byte(fmt.Sprintf("%d", destHeight)),
 	)
 

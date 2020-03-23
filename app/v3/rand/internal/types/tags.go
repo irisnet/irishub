@@ -2,6 +2,7 @@
 package types
 
 import (
+	"fmt"
 	sdk "github.com/irisnet/irishub/types"
 )
 
@@ -12,5 +13,7 @@ var (
 	TagReqID            = "request-id"
 	TagRequestContextID = "request-context-id"
 	TagRandHeight       = "rand-height"
-	TagRand             = "rand"
+	TagRand             = func(reqID string) string {
+		return fmt.Sprintf("rand.%s", reqID)
+	}
 )
