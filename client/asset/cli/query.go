@@ -49,7 +49,7 @@ func getCmdQueryTokens(cdc *codec.Codec) *cobra.Command {
 // getCmdQueryFee implements the query asset related fees command.
 func getCmdQueryFee(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "fee",
+		Use:     "fee [symbol]",
 		Short:   "Query the asset related fees",
 		Args:    cobra.ExactArgs(1),
 		Example: "iriscli asset token fee [symbol]",

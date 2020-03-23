@@ -15,7 +15,7 @@ import (
 // GetCmdQueryRand implements the query-rand command.
 func GetCmdQueryRand(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "query-rand",
+		Use:     "query-rand [request id]",
 		Short:   "Query a random number by the request id",
 		Example: "iriscli rand query-rand --request-id=<request id>",
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -60,7 +60,7 @@ func GetCmdQueryRandRequestQueue(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "query-queue",
 		Short:   "Query the random number request queue with an optional height",
-		Example: "iriscli rand query-queue [--queue-height=<height>]",
+		Example: "iriscli rand query-queue --queue-height=<height>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 

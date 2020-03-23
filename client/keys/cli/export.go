@@ -23,7 +23,7 @@ func exportKeyCommand() *cobra.Command {
 		Short: "Export an existing key",
 		Long: `Export an existing key to the file,
 You can import the file by keys add --recover --keystore=<file>.`,
-		Example: "iriscli keys export <key name>",
+		Example: "iriscli keys export <key-name>",
 		RunE:    runExportCmd,
 		Args:    cobra.ExactArgs(1),
 	}
