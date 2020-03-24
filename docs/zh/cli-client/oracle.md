@@ -19,7 +19,7 @@ Oracle模块负责管理你在IRIS Hub上创建的feed。
 该命令用于创建一个新的feed
 
 ```bash
-iriscli oracle create <flags>
+iriscli oracle create [flags]
 ```
 
 **标识：**
@@ -42,7 +42,7 @@ iriscli oracle create <flags>
 ### 创建一个新的feed
 
 ```bash
-iriscli oracle create --chain-id="irishub-test" --from=node0 --fee=0.3iris --feed-name="test-feed" --latest-history=10 --service-name="test-service" --input={request-data} --providers="faa1hp29kuh22vpjjlnctmyml5s75evsnsd8r4x0mm,faa15rurzhkemsgfm42dnwhafjdv5s8e2pce0ku8ya" --service-fee-cap=1iris --timeout=2 --frequency=10 --total=10 --threshold=1 --aggregate-func="avg" --value-json-path="high" --commit
+iriscli oracle create --chain-id=irishub --from=node0 --fee=0.3iris --feed-name="test-feed" --latest-history=10 --service-name="test-service" --input=<request-data> --providers=<provide1_address>,<provider2_address> --service-fee-cap=1iris --timeout=2 --frequency=10 --total=10 --threshold=1 --aggregate-func="avg" --value-json-path="high" --commit
 ```
 
 ## iriscli oracle start
@@ -56,7 +56,7 @@ iriscli oracle start <feed-name>
 ### 启动一个处于`暂停`状态的feed
 
 ```bash
-iriscli oracle start test-feed --chain-id="irishub-test" --from=node0 --fee=0.3iris --commit
+iriscli oracle start test-feed --chain-id=irishub --from=node0 --fee=0.3iris --commit
 ```
 
 ## iriscli oracle pause
@@ -64,13 +64,13 @@ iriscli oracle start test-feed --chain-id="irishub-test" --from=node0 --fee=0.3i
 该命令用于暂停一个处于`运行`状态的feed
 
 ```bash
-iriscli oracle pause <feed-name>
+iriscli oracle pause [feed-name] [flags]
 ```
 
 ### 暂停一个处于`运行`状态的feed
 
 ```bash
-iriscli oracle pause test-feed --chain-id="irishub-test" --from=node0 --fee=0.3iris --commit
+iriscli oracle pause test-feed --chain-id=irishub --from=node0 --fee=0.3iris --commit
 ```
 
 ## iriscli oracle edit
@@ -78,7 +78,7 @@ iriscli oracle pause test-feed --chain-id="irishub-test" --from=node0 --fee=0.3i
 该命令用于编辑一个已经存在的feed
 
 ```bash
-iriscli oracle edit <feed-name> <flags>
+iriscli oracle edit [feed-name] [flags]
 ```
 
 **Flags:**
@@ -99,7 +99,7 @@ iriscli oracle edit <feed-name> <flags>
 ### 编辑feed
 
 ```bash
-iriscli oracle edit test-feed --chain-id="irishub-test" --from=node0 --fee=0.3iris --feed-name="test-feed" --latest-history=5 --commit
+iriscli oracle edit test-feed --chain-id=irishub --from=node0 --fee=0.3iris --latest-history=5 --commit
 ```
 
 ## iriscli oracle query-feed
@@ -107,7 +107,7 @@ iriscli oracle edit test-feed --chain-id="irishub-test" --from=node0 --fee=0.3ir
 该命令用于查询一个已存在的feed的信息
 
 ```bash
-iriscli oracle query-feed <feed name>
+iriscli oracle query-feed [feed-name] [flags]
 ```
 
 ### 查询一个已存在的feed的信息
@@ -121,7 +121,7 @@ iriscli oracle query-feed test-feed
 该命令用于查询一组feed的信息
 
 ```bash
-iriscli oracle query-feeds <flags>
+iriscli oracle query-feeds [flags]
 ```
 
 **标识：**
@@ -141,7 +141,7 @@ iriscli oracle query-feeds --state=running
 该命令用于查询指定feed的执行结果
 
 ```bash
-iriscli oracle query-value <feed name>
+iriscli oracle query-value test-feed
 ```
 
 ### 查询现存的feed的执行结果

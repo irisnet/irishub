@@ -2,7 +2,7 @@
 
 ## 概念
 
-[Hash Time Locked Contract（HTLC）](https://en.bitcoin.it/wiki/Hash_Time_Locked_Contracts) 是一个跨链原子交换协议。它以去中心化的方式完成用户间点对点的跨链交易。HTLC将跨链资产的交换过程分解为若干子过程。HTLC在协议上能够确保参与方之间的所有交换过程要么全部完成，要么一个都没发生。通过IRIS Hub的HTLC功能, 用户能够完成与Bitcoin、Ethereum、LTC以及其他所有支持HTLC的链之间的资产交换。
+[Hash Time Locked Contract（HTLC）](https://en.bitcoin.it/wiki/Hash_Time_Locked_Contracts) 是一个跨链原子交换协议。它以去中心化的方式完成用户间点对点的跨链交易。HTLC将跨链资产的交换过程分解为若干子过程。HTLC在协议上能够确保参与方之间的所有交换过程要么全部完成，要么一个都没发生。通过IRIS Hub的HTLC功能，用户能够完成与Bitcoin、Ethereum、LTC以及其他所有支持HTLC的链之间的资产交换。
 
 ## 交互过程
 
@@ -37,16 +37,16 @@
 | receiver             | Address  | 接收者地址                                                   |
 | receiverOnOtherChain | string   | 另一条链上的HTLC认领接收地址，最大128个字符                        |
 | amount               | Coins    | 欲交换的资产数量                                             |
-| hashLock             | string   | 由secret(和timestamp, 如果提供)生成的sha256哈希值; 32字节, 十六进制表示 |
-| timestamp            | uint64   | 时间戳, 如果提供则参与hash生成; 精度为秒                     |
-| timeLock             | uint64   | 过期区块数; [50, 25480] (大于5分钟, 小于48小时)              |
+| hashLock             | string   | 由secret(和timestamp，如果提供)生成的sha256哈希值；32字节，十六进制表示 |
+| timestamp            | uint64   | 时间戳，如果提供则参与hash生成；精度为秒                     |
+| timeLock             | uint64   | 过期区块数；[50, 25480] (大于5分钟, 小于48小时)              |
 
 ### 认领HTLC消息
 
 | **字段** | **类型** | **描述**                                        |
 | -------- | -------- | ----------------------------------------------- |
 | hashLock | string   | 创建HTLC时提供的hash lock                       |
-| secret   | string   | 参与生成hash lock的随机数; 32字节, 十六进制表示 |
+| secret   | string   | 参与生成hash lock的随机数；32字节, 十六进制表示 |
 
 ### 退款HTLC消息
 

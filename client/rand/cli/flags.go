@@ -8,7 +8,6 @@ import (
 
 const (
 	FlagReqID         = "request-id"
-	FlagConsumer      = "consumer"
 	FlagBlockInterval = "block-interval"
 	FlagOracle        = "oracle"
 	FlagServiceFeeCap = "service-fee-cap"

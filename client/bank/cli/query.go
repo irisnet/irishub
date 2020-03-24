@@ -53,7 +53,7 @@ func GetAccountCmd(cdc *codec.Codec, decoder auth.AccountDecoder) *cobra.Command
 // GetCmdQueryCoinType performs coin type query
 func GetCmdQueryCoinType(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "coin-type [coin_name]",
+		Use:     "coin-type [coin-name]",
 		Short:   "Query coin type",
 		Example: "iriscli bank coin-type iris",
 		Args:    cobra.ExactArgs(1),

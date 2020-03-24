@@ -38,7 +38,7 @@
 
 | [v0.14.1]      | [v0.15.0]        | 输入改变 | 输出改变 | 备注 |
 | --------------- | --------------- | --------------- | --------------- | ----- |
-| GET /bank/accounts/{address} | GET /bank/accounts/{address} | No | Yes | 1. 添加 `memo_regexp` 字段; <br> 2. 添加多资产支持 |
+| GET /bank/accounts/{address} | GET /bank/accounts/{address} | No | Yes | 1. 添加 `memo_regexp` 字段；<br> 2. 添加多资产支持 |
 
 #### Tendermint 模块
 

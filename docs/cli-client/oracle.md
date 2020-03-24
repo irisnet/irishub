@@ -19,7 +19,7 @@ Oracle module allows you to manage the feed on IRIS Hub
 This command is used to create a "paused" feed on IRIS Hub.
 
 ```bash
-iriscli oracle create <flags>
+iriscli oracle create [flags]
 ```
 
 **Flags:**
@@ -42,7 +42,7 @@ iriscli oracle create <flags>
 ### Create a new feed
 
 ```bash
-iriscli oracle create --chain-id="irishub-test" --from=node0 --fee=0.3iris --feed-name="test-feed" --latest-history=10 --service-name="test-service" --input={request-data} --providers="faa1hp29kuh22vpjjlnctmyml5s75evsnsd8r4x0mm,faa15rurzhkemsgfm42dnwhafjdv5s8e2pce0ku8ya" --service-fee-cap=1iris --timeout=2 --frequency=10 --total=10 --threshold=1 --aggregate-func="avg" --value-json-path="high" --commit
+iriscli oracle create --chain-id=irishub --from=node0 --fee=0.3iris --feed-name="test-feed" --latest-history=10 --service-name="test-service" --input=<request-data> --providers=<provide1_address>,<provider2_address> --service-fee-cap=1iris --timeout=2 --frequency=10 --total=10 --threshold=1 --aggregate-func="avg" --value-json-path="high" --commit
 ```
 
 ## iriscli oracle start
@@ -50,13 +50,13 @@ iriscli oracle create --chain-id="irishub-test" --from=node0 --fee=0.3iris --fee
 This command is used to start a feed in "paused" state
 
 ```bash
-iriscli oracle start <feed-name>
+iriscli oracle start [feed-name] [flags]
 ```
 
 ### Start a "paused" feed
 
 ```bash
-iriscli oracle start test-feed --chain-id="irishub-test" --from=node0 --fee=0.3iris --commit
+iriscli oracle start test-feed --chain-id=irishub --from=node0 --fee=0.3iris --commit
 ```
 
 ## iriscli oracle pause
@@ -64,13 +64,13 @@ iriscli oracle start test-feed --chain-id="irishub-test" --from=node0 --fee=0.3i
 This command is used to pause a feed in "running" state
 
 ```bash
-iriscli oracle pause <feed-name>
+iriscli oracle pause [feed-name] [flags]
 ```
 
 ### Pause a "running" feed
 
 ```bash
-iriscli oracle pause test-feed --chain-id="irishub-test" --from=node0 --fee=0.3iris --commit
+iriscli oracle pause test-feed --chain-id=irishub --from=node0 --fee=0.3iris --commit
 ```
 
 ## iriscli oracle edit
@@ -78,7 +78,7 @@ iriscli oracle pause test-feed --chain-id="irishub-test" --from=node0 --fee=0.3i
 This command is used to edit an existing feed on IRIS Hub.
 
 ```bash
-iriscli oracle edit <feed-name> <flags>
+iriscli oracle edit [feed-name] [flags]
 ```
 
 **Flags:**
@@ -97,7 +97,7 @@ iriscli oracle edit <feed-name> <flags>
 ### Edit an existed feed
 
 ```bash
-iriscli oracle edit test-feed --chain-id="irishub-test" --from=node0 --fee=0.3iris --latest-history=5 --commit
+iriscli oracle edit test-feed --chain-id=irishub --from=node0 --fee=0.3iris --latest-history=5 --commit
 ```
 
 ## iriscli oracle query-feed
@@ -105,7 +105,7 @@ iriscli oracle edit test-feed --chain-id="irishub-test" --from=node0 --fee=0.3ir
 This command is used to query a feed 
 
 ```bash
-iriscli oracle query-feed <feed name>
+iriscli oracle query-feed [feed-name] [flags]
 ```
 
 ### Query an existed feed
@@ -119,7 +119,7 @@ iriscli oracle query-feed test-feed
 This command is used to query a group of feed 
 
 ```bash
-iriscli oracle query-feeds <flags>
+iriscli oracle query-feeds [flags]
 ```
 
 **Flags:**
@@ -139,7 +139,7 @@ iriscli oracle query-feeds --state=running
 This command is used to query the result of a specified feed
 
 ```bash
-iriscli oracle query-value <feed name>
+iriscli oracle query-value test-feed
 ```
 
 ### Query the result of an existed feed

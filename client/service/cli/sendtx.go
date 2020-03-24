@@ -88,7 +88,7 @@ func GetCmdBindService(cdc *codec.Codec) *cobra.Command {
 		Use:   "bind",
 		Short: "Bind a service",
 		Example: "iriscli service bind --chain-id=<chain-id> --from=<key-name> --fee=0.3iris " +
-			"--service-name=<service name> --deposit=1iris --pricing=<pricing content or path>",
+			"--service-name=<service-name> --deposit=1iris --pricing=<pricing content or path>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
@@ -151,9 +151,9 @@ func GetCmdBindService(cdc *codec.Codec) *cobra.Command {
 
 func GetCmdUpdateServiceBinding(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "update-binding",
+		Use:   "update-binding [service-name]",
 		Short: "Update an existing service binding",
-		Example: "iriscli service update-binding <service name> --chain-id=<chain-id> --from=<key-name> " +
+		Example: "iriscli service update-binding <service-name> --chain-id=<chain-id> --from=<key-name> " +
 			"--fee=0.3iris --deposit=1iris --pricing=<pricing content or path>",
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -219,9 +219,9 @@ func GetCmdUpdateServiceBinding(cdc *codec.Codec) *cobra.Command {
 
 func GetCmdSetWithdrawAddr(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "set-withdraw-addr",
+		Use:   "set-withdraw-addr [withdrawal-address]",
 		Short: "Set a withdrawal address for a provider",
-		Example: "iriscli service set-withdraw-addr <withdrawal address> --chain-id=<chain-id> " +
+		Example: "iriscli service set-withdraw-addr <withdrawal-address> --chain-id=<chain-id> " +
 			"--from=<key-name> --fee=0.3iris",
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -256,9 +256,9 @@ func GetCmdSetWithdrawAddr(cdc *codec.Codec) *cobra.Command {
 
 func GetCmdDisableService(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "disable",
+		Use:     "disable [service-name]",
 		Short:   "Disable an available service binding",
-		Example: "iriscli service disable <service name> --chain-id=<chain-id> --from=<key-name> --fee=0.3iris",
+		Example: "iriscli service disable <service-name> --chain-id=<chain-id> --from=<key-name> --fee=0.3iris",
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
@@ -287,9 +287,9 @@ func GetCmdDisableService(cdc *codec.Codec) *cobra.Command {
 
 func GetCmdEnableService(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "enable",
+		Use:   "enable [service-name]",
 		Short: "Enable an unavailable service binding",
-		Example: "iriscli service enable <service name> --chain-id=<chain-id> --from=<key-name> " +
+		Example: "iriscli service enable <service-name> --chain-id=<chain-id> --from=<key-name> " +
 			"--fee=0.3iris --deposit=1iris",
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -331,9 +331,9 @@ func GetCmdEnableService(cdc *codec.Codec) *cobra.Command {
 
 func GetCmdRefundServiceDeposit(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "refund-deposit",
+		Use:   "refund-deposit [service-name]",
 		Short: "Refund all deposit from a service binding",
-		Example: "iriscli service refund-deposit <service name> --chain-id=<chain-id> --from=<key-name> " +
+		Example: "iriscli service refund-deposit <service-name> --chain-id=<chain-id> --from=<key-name> " +
 			"--fee=0.3iris",
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -365,7 +365,7 @@ func GetCmdRequestService(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "call",
 		Short: "Call a service",
-		Example: "iriscli service call --chain-id=<chain-id> --from=<key name> --fee=0.3iris --service-name=<service name> " +
+		Example: "iriscli service call --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --service-name=<service-name> " +
 			"--providers=<provider list> --service-fee-cap=1iris --data=<input content or path> -timeout=100 --repeated --frequency=150 --total=100",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
@@ -458,7 +458,7 @@ func GetCmdRespondService(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "respond",
 		Short: "Respond to a service request",
-		Example: "iriscli service respond --chain-id=<chain-id> --from=<key name> --fee=0.3iris " +
+		Example: "iriscli service respond --chain-id=<chain-id> --from=<key-name> --fee=0.3iris " +
 			"--request-id=<request-id> --result=<result content or path> --data=<output content or path>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
@@ -543,9 +543,9 @@ func GetCmdRespondService(cdc *codec.Codec) *cobra.Command {
 
 func GetCmdPauseRequestContext(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "pause",
+		Use:     "pause [request-context-id]",
 		Short:   "Pause a running request context",
-		Example: "iriscli service pause <request-context-id> --chain-id=<chain-id> --from=<key name> --fee=0.3iris",
+		Example: "iriscli service pause <request-context-id> --chain-id=<chain-id> --from=<key-name> --fee=0.3iris",
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
@@ -579,9 +579,9 @@ func GetCmdPauseRequestContext(cdc *codec.Codec) *cobra.Command {
 
 func GetCmdStartRequestContext(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "start",
+		Use:     "start [request-context-id]",
 		Short:   "Start a paused request context",
-		Example: "iriscli service start <request-context-id> --chain-id=<chain-id> --from=<key name> --fee=0.3iris",
+		Example: "iriscli service start <request-context-id> --chain-id=<chain-id> --from=<key-name> --fee=0.3iris",
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
@@ -615,9 +615,9 @@ func GetCmdStartRequestContext(cdc *codec.Codec) *cobra.Command {
 
 func GetCmdKillRequestContext(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "kill",
+		Use:     "kill [request-context-id]",
 		Short:   "Terminate a request context",
-		Example: "iriscli service kill <request-context-id> --chain-id=<chain-id> --from=<key name> --fee=0.3iris",
+		Example: "iriscli service kill <request-context-id> --chain-id=<chain-id> --from=<key-name> --fee=0.3iris",
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
@@ -651,9 +651,9 @@ func GetCmdKillRequestContext(cdc *codec.Codec) *cobra.Command {
 
 func GetCmdUpdateRequestContext(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "update",
+		Use:   "update [request-context-id]",
 		Short: "Update a request context",
-		Example: "iriscli service update <request-context-id> --chain-id=<chain-id> --from=<key name> --fee=0.3iris " +
+		Example: "iriscli service update <request-context-id> --chain-id=<chain-id> --from=<key-name> --fee=0.3iris " +
 			"--providers=<new providers> --service-fee-cap=2iris --timeout=0 --frequency=200 --total=200",
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -721,7 +721,7 @@ func GetCmdWithdrawEarnedFees(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "withdraw-fees",
 		Short:   "Withdraw the earned fees of a provider",
-		Example: "iriscli service withdraw-fees --chain-id=<chain-id> --from=<key name> --fee=0.3iris",
+		Example: "iriscli service withdraw-fees --chain-id=<chain-id> --from=<key-name> --fee=0.3iris",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
@@ -749,10 +749,10 @@ func GetCmdWithdrawEarnedFees(cdc *codec.Codec) *cobra.Command {
 
 func GetCmdWithdrawTax(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "withdraw-tax",
+		Use:   "withdraw-tax [destination-address]",
 		Short: "Withdraw the service tax",
-		Example: "iriscli service withdraw-tax <destination address> <withdrawal amount> --chain-id=<chain-id> " +
-			"--from=<key name> --fee=0.3iris",
+		Example: "iriscli service withdraw-tax <destination-address> <withdrawal-amount> --chain-id=<chain-id> " +
+			"--from=<key-name> --fee=0.3iris",
 		Args: cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().

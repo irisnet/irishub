@@ -39,13 +39,13 @@ IRISLCD有两个子命令:
 默认情况下，IRISLCD不信任连接的完整节点。但是，如果确定所连接的完整节点是可信任的，则应使用`--trust-node`标识运行IRISLCD：
 
 ```bash
-irislcd start --node=tcp://localhost:26657 --chain-id=<chain-id> --trust-node
+irislcd start --node=tcp://localhost:26657 --chain-id=irishub --trust-node
 ```
 
 要公开访问你的IRIS LCD实例，您需要指定`--ladder`：
 
 ```bash
-irislcd start --node=tcp://localhost:26657 --chain-id=<chain-id> --laddr=tcp://0.0.0.0:1317 --trust-node
+irislcd start --node=tcp://localhost:26657 --chain-id=irishub --laddr=tcp://0.0.0.0:1317 --trust-node
 ```
 
 ## REST APIs

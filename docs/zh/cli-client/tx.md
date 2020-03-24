@@ -15,7 +15,7 @@
 签名生成的离线交易文件。该文件由`generate-only`标志生成。
 
 ```bash
-iriscli tx sign <file> <flags>
+iriscli tx sign <file> [flags]
 ```
 
 ### 标志
@@ -77,7 +77,7 @@ iriscli tx broadcast signed.json --chain-id=irishub
 用多个账户为一个交易签名。这个交易只有在签名数满足multisig-threshold时才可以广播。
 
 ```bash
-iriscli tx multisign <file> <key-name> <[signature]...> <flags>
+iriscli tx multisign <file> <key-name> <[signature]...> [flags]
 ```
 
 ### 用多签密钥创建离线交易
