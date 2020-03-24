@@ -1,7 +1,6 @@
 package types
 
 import (
-	"encoding/json"
 	"fmt"
 	"time"
 
@@ -68,6 +67,13 @@ func (bindings ServiceBindings) String() string {
 	return str
 }
 
+// RawPricing represents the raw pricing of a service binding
+type RawPricing struct {
+	Price              string              `json:"price"`                // base price string
+	PromotionsByTime   []PromotionByTime   `json:"promotions_by_time"`   // promotions by time
+	PromotionsByVolume []PromotionByVolume `json:"promotions_by_volume"` // promotions by volume
+}
+
 // Pricing represents the pricing of a service binding
 type Pricing struct {
 	Price              sdk.Coins           `json:"price"`                // base price
@@ -79,23 +85,73 @@ type Pricing struct {
 type PromotionByTime struct {
 	StartTime time.Time `json:"start_time"` // starting time of the promotion
 	EndTime   time.Time `json:"end_time"`   // ending time of the promotion
-	Discount  float32   `json:"discount"`   // discount during the promotion
+	Discount  sdk.Dec   `json:"discount"`   // discount during the promotion
 }
 
 // PromotionByVolume defines the promotion activity by volume
 type PromotionByVolume struct {
 	Volume   uint64  `json:"volume"`   // minimal volume for the promotion
-	Discount float32 `json:"discount"` // discount for the promotion
+	Discount sdk.Dec `json:"discount"` // discount for the promotion
 }
 
-// ParsePricing parses the given pricing string
-func ParsePricing(pricing string) (Pricing, sdk.Error) {
-	var p Pricing
-	if err := json.Unmarshal([]byte(pricing), &p); err != nil {
-		return p, ErrInvalidPricing(DefaultCodespace, fmt.Sprintf("failed to unmarshal the pricing: %s", err))
+// GetDiscountByTime gets the discount level by the specified time
+func GetDiscountByTime(pricing Pricing, time time.Time) sdk.Dec {
+	for _, p := range pricing.PromotionsByTime {
+		if time.After(p.StartTime) && (time.Equal(p.EndTime) || time.Before(p.EndTime)) {
+			return p.Discount
+		}
 	}
 
-	return p, nil
+	return sdk.OneDec()
+}
+
+// GetDiscountByVolume gets the discount level by the specified volume
+// Note: ensure that the promotions by volume are sorted in ascending order
+func GetDiscountByVolume(pricing Pricing, volume uint64) sdk.Dec {
+	promotionsByVol := pricing.PromotionsByVolume
+
+	for i, p := range promotionsByVol {
+		if volume < p.Volume {
+			if i == 0 {
+				return sdk.OneDec()
+			}
+
+			return promotionsByVol[i-1].Discount
+		}
+
+		if i == len(promotionsByVol)-1 {
+			return p.Discount
+		}
+	}
+
+	return sdk.OneDec()
+}
+
+// ValidatePricing validates the given pricing
+func ValidatePricing(pricing Pricing) sdk.Error {
+	if !validServiceCoins(pricing.Price) {
+		return ErrInvalidPricing(DefaultCodespace, "invalid price")
+	}
+
+	// CONTRACT:
+	// p.EndTime > p.StartTime
+	// p[i].StartTime >= p[i-1].Endtime
+	for i, p := range pricing.PromotionsByTime {
+		if !p.EndTime.After(p.StartTime) ||
+			(i > 0 && p.StartTime.Before(pricing.PromotionsByTime[i-1].EndTime)) {
+			return ErrInvalidPricing(DefaultCodespace, fmt.Sprintf("invalid timing promotion %d", i))
+		}
+	}
+
+	// CONTRACT:
+	// p[i].Volume > p[i-1].Volume
+	for i, p := range pricing.PromotionsByVolume {
+		if i > 0 && p.Volume < pricing.PromotionsByVolume[i-1].Volume {
+			return ErrInvalidPricing(DefaultCodespace, fmt.Sprintf("invalid volume promotion %d", i))
+		}
+	}
+
+	return nil
 }
 
 func (binding ServiceBinding) Validate() sdk.Error {
@@ -115,5 +171,5 @@ func (binding ServiceBinding) Validate() sdk.Error {
 		return ErrInvalidPricing(DefaultCodespace, "pricing missing")
 	}
 
-	return validatePricing(binding.Pricing)
+	return ValidateBindingPricing(binding.Pricing)
 }
