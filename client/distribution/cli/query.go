@@ -14,9 +14,9 @@ import (
 // GetWithdrawAddress returns withdraw address of a given delegator address
 func GetWithdrawAddress(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:     "withdraw-address",
+		Use:     "withdraw-address [account-address]",
 		Short:   "Query withdraw address",
-		Example: "iriscli distribution withdraw-address <account address>",
+		Example: "iriscli distribution withdraw-address <account-address>",
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			// find the key to look up the account
@@ -54,7 +54,7 @@ func GetWithdrawAddress(cdc *codec.Codec) *cobra.Command {
 // GetRewards returns the all the rewards of validator or delegator
 func GetRewards(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "rewards",
+		Use:     "rewards [address]",
 		Short:   "Query all the rewards of validator or delegator",
 		Example: "iriscli distribution rewards <address>",
 		Args:    cobra.ExactArgs(1),

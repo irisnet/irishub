@@ -39,7 +39,7 @@ func addKeyCommand() *cobra.Command {
 		Long: `Add a public/private key pair to the key store.
 If you select --seed/-s you can recover a key from the seed
 phrase, otherwise, a new key will be generated.`,
-		Example: "iriscli keys add <key name>",
+		Example: "iriscli keys add <key-name>",
 		RunE:    runAddCmd,
 	}
 	cmd.Flags().StringSlice(flagMultisig, nil, "Construct and store a multisig public key (implies --pubkey)")

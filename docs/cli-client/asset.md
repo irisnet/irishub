@@ -18,7 +18,7 @@ Asset module allows you to manage assets on IRIS Hub
 This command is used to issue a new token on IRIS Hub.
 
 ```bash
-iriscli asset token issue <flags>
+iriscli asset token issue [flags]
 ```
 
 **Flags:**
@@ -36,7 +36,7 @@ iriscli asset token issue <flags>
 ### Issue a token
 
 ```bash
-iriscli asset token issue --symbol="kitty" --name="Kitty Token" --initial-supply=100000000000 --max-supply=1000000000000 --scale=0 --mintable=true --fee=1iris --from=<key-name> --commit
+iriscli asset token issue --symbol="kitty" --name="Kitty Token" --initial-supply=100000000000 --max-supply=1000000000000 --scale=0 --mintable=true --fee=1iris --chain-id=irishub --from=<key-name> --commit
 ```
 
 ### Send tokens
@@ -46,7 +46,7 @@ You can send any tokens you have just like [sending iris](./bank.md#iriscli-bank
 #### Send native tokens
 
 ```bash
-iriscli bank send --from=<key-name> --to=<address> --amount=10kitty --fee=0.3iris --chain-id=irishub
+iriscli bank send --from=<key-name> --to=<address> --amount=10kitty --fee=0.3iris --chain-id=irishub --commit
 ```
 
 ## iriscli asset token edit
@@ -54,7 +54,7 @@ iriscli bank send --from=<key-name> --to=<address> --amount=10kitty --fee=0.3iri
 Edit token informations
 
 ```bash
-iriscli asset token edit <symbol> <flags>
+iriscli asset token edit [symbol] [flags]
 ```
 
 **Flags:**
@@ -70,8 +70,7 @@ iriscli asset token edit <symbol> <flags>
 ### Edit Token
 
 ```bash
-iriscli asset token edit [symbol] --name="Cat Token" --max-supply=100000000000 --mintable=true --from=<key-name> --chain-id=irishub --fee=0.3iris
- --commit
+iriscli asset token edit kitty --name="Cat Token" --max-supply=100000000000 --mintable=true --from=<key-name> --chain-id=irishub --fee=0.3iris --commit
 ```
 
 ## iriscli asset token transfer
@@ -79,7 +78,7 @@ iriscli asset token edit [symbol] --name="Cat Token" --max-supply=100000000000 -
 Transfer the ownership of a token
 
 ```bash
-iriscli asset token transfer <symbol> <flags>
+iriscli asset token transfer [symbol] [flags]
 ```
 
 **Flags:**
@@ -99,7 +98,7 @@ iriscli asset token transfer kitty --to=<new-owner-address> --from=<key-name> --
 The asset owner can directly mint tokens to a specified address
 
 ```bash
-iriscli asset token mint <symbol> <flags>
+iriscli asset token mint [symbol] [flags]
 ```
 
 **Flags:**
@@ -120,7 +119,7 @@ iriscli asset token mint kitty --amount=1000000 --from=<key-name> --chain-id=iri
 Query the collection of tokens issued on IRIS Hub based on criteria.
 
 ```bash
-iriscli asset token tokens <flags>
+iriscli asset token tokens [flags]
 ```
 
 **Flags:**
@@ -130,16 +129,16 @@ iriscli asset token tokens <flags>
 | --symbol | string |          |         | The symbol of the token |
 | --owner    | string |          |         | The owner of the tokens            |
 
-### Query a token with the specified symbol
-
-```bash
-iriscli asset token tokens --symbol=kitty
-```
-
 ### Query all tokens
 
 ```bash
 iriscli asset token tokens
+```
+
+### Query a token with the specified symbol
+
+```bash
+iriscli asset token tokens --symbol=kitty
 ```
 
 ### Query all tokens of the specified owner
@@ -153,7 +152,7 @@ iriscli asset token tokens --owner=<address>
 Query the token related fees, including token issuance and minting
 
 ```bash
-iriscli asset token fee [symbol]
+iriscli asset token fee [symbol] [flags]
 ```
 
 ### query fees of issuing and minting a token

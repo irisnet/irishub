@@ -14,7 +14,7 @@ import (
 // GetCmdQueryFeed implements the query feed Content definition command
 func GetCmdQueryFeed(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "query-feed",
+		Use:     "query-feed [feed-name]",
 		Short:   "Query the feed definition",
 		Example: "iriscli oracle query-feed <feed-name>",
 		Args:    cobra.ExactArgs(1),
@@ -87,9 +87,9 @@ func GetCmdQueryFeeds(cdc *codec.Codec) *cobra.Command {
 // GetCmdQueryFeedValue implements the query feed value command
 func GetCmdQueryFeedValue(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "query-value",
+		Use:     "query-value [feed-name]",
 		Short:   "Query the feed result",
-		Example: "iriscli oracle query-value  <feed-name>",
+		Example: "iriscli oracle query-value <feed-name>",
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)

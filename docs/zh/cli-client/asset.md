@@ -18,12 +18,12 @@ Asset模块用于管理你在IRIS Hub上发行的资产。
 此命令用于在IRIS Hub上发行新通证。
 
 ```bash
-iriscli asset token issue <flags>
+iriscli asset token issue [flags]
 ```
 
 **标识：**
 
-| 名称, 速记       | 类型    | 必须 | 默认          | 描述                                                         |
+| 名称，速记       | 类型    | 必须 | 默认          | 描述                                                         |
 | ---------------- | ------- | ---- | ------------- | ------------------------------------------------------------ |
 | --name           | string  | 是   |               | 通证的名称，限制为32个unicode字符，例如"IRIS Network"        |
 | --symbol         | string  | 是   |               | 通证的符号，长度在3到8之间，字母数字字符，以字符开始，不区分大小写       |
@@ -36,7 +36,7 @@ iriscli asset token issue <flags>
 ### 发行通证
 
 ```bash
-iriscli asset token issue --symbol="kitty" --name="Kitty Token" --initial-supply=100000000000 --max-supply=1000000000000 --scale=0 --mintable=true --fee=1iris --from=<key-name> --commit
+iriscli asset token issue --symbol="kitty" --name="Kitty Token" --initial-supply=100000000000 --max-supply=1000000000000 --scale=0 --mintable=true --fee=1iris --chain-id=irishub --from=<key-name> --commit
 ```
 
 ### 发送通证
@@ -46,7 +46,7 @@ iriscli asset token issue --symbol="kitty" --name="Kitty Token" --initial-supply
 #### 发送通证
 
 ```bash
-iriscli bank send --from=<key-name> --to=<address> --amount=10kitty --fee=0.3iris --chain-id=irishub
+iriscli bank send --from=<key-name> --to=<address> --amount=10kitty --fee=0.3iris --chain-id=irishub --commit
 ```
 
 ## iriscli asset token edit
@@ -54,12 +54,12 @@ iriscli bank send --from=<key-name> --to=<address> --amount=10kitty --fee=0.3iri
 编辑通证信息。
 
 ```bash
-iriscli asset token edit [symbol] <flags>
+iriscli asset token edit [symbol] [flags]
 ```
 
 **标识：**
 
-| 名称, 速记   | 类型   | 必须 | 默认  | 描述                          |
+| 名称，速记   | 类型   | 必须 | 默认  | 描述                          |
 | ------------ | ------ | ---- | ----- | ----------------------------- |
 | --name       | string |      |       | 通证名称，例如：IRIS Network  |
 | --max-supply | uint   |      | 0     | 通证的最大供应量              |
@@ -70,7 +70,7 @@ iriscli asset token edit [symbol] <flags>
 ### 编辑通证
 
 ```bash
-iriscli asset token edit [symbol] --name="Cat Token" --max-supply=100000000000 --mintable=true --from=<key-name> --chain-id=irishub --fee=0.3iris --commit
+iriscli asset token edit kitty --name="Cat Token" --max-supply=100000000000 --mintable=true --from=<key-name> --chain-id=irishub --fee=0.3iris --commit
 ```
 
 ## iriscli asset token transfer
@@ -78,12 +78,12 @@ iriscli asset token edit [symbol] --name="Cat Token" --max-supply=100000000000 -
 转让通证所有权。
 
 ```bash
-iriscli asset token transfer [symbol] <flags>
+iriscli asset token transfer [symbol] [flags]
 ```
 
 **标识：**
 
-| 名称, 速记 | 类型   | 必须 | 默认 | 描述       |
+| 名称，速记 | 类型   | 必须 | 默认 | 描述       |
 | ---------- | ------ | ---- | ---- | ---------- |
 | --to       | string | 是   |      | 接收人地址 |
 
@@ -98,12 +98,12 @@ iriscli asset token transfer kitty --to=<new-owner-address> --from=<key-name> --
 通证所有者可以直接将通证增发到指定地址。
 
 ```bash
-iriscli asset token mint <symbol> <flags>
+iriscli asset token mint [symbol] [flags]
 ```
 
 **标识：**
 
-| 名称, 速记 | 类型   | 必须 | 默认 | 描述                                       |
+| 名称，速记 | 类型   | 必须 | 默认 | 描述                                       |
 | ---------- | ------ | ---- | ---- | ------------------------------------------ |
 | --to       | string |      |      | 增发的通证的接收地址，默认为发起该交易地址 |
 | --amount   | uint64 | 是   | 0    | 增发的数量                               |
@@ -119,12 +119,12 @@ iriscli asset token mint kitty --amount=1000000 --from=<key-name> --chain-id=iri
 根据条件查询在IRIS Hub上发行的通证的集合。
 
 ```bash
-iriscli asset token tokens <flags>
+iriscli asset token tokens [flags]
 ```
 
 **标识：**
 
-| 名称, 速记 | 类型   | 必须 | 默认 | 描述         |
+| 名称，速记 | 类型   | 必须 | 默认 | 描述         |
 | ---------- | ------ | ---- | ---- | ------------ |
 | --symbol | string |      |      | 通证的符号     |
 | --owner    | string |      |      | 通证的所有者 |
@@ -138,7 +138,7 @@ iriscli asset token tokens
 ### 查询指定的通证
 
 ```bash
-iriscli asset token tokens --symbol=<symbol>
+iriscli asset token tokens --symbol=kitty
 ```
 
 ### 查询指定所有者的所有通证
@@ -152,7 +152,7 @@ iriscli asset token tokens --owner=<address>
 查询与通证相关的费用，包括通证发行和增发。
 
 ```bash
-iriscli asset token fee [symbol]
+iriscli asset token fee [symbol] [flags]
 ```
 
 ### 查询发行和增发通证的费用

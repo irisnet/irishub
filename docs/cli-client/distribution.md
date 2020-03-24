@@ -16,7 +16,7 @@ The distribution module allows you to manage your [Staking Rewards](../concepts/
 Query the withdraw address of a delegator
 
 ```bash
-iriscli distribution withdraw-address <delegator-address> <flags>
+iriscli distribution withdraw-address [account-address] [flags]
 ```
 
 ### Query withdraw address
@@ -32,7 +32,7 @@ If the delegator did not specify the withdraw address other than himself, the qu
 Query all the rewards of a validator or a delegator
 
 ```bash
-iriscli distribution rewards <address> <flags>
+iriscli distribution rewards [address] [flags]
 ```
 
 ### Query rewards
@@ -57,7 +57,7 @@ Commission:   267.438208089888659537iris
 Set another address to receive the rewards instead of using the delegator address
 
 ```bash
-iriscli distribution set-withdraw-addr <withdraw-address> <flags>
+iriscli distribution set-withdraw-addr [withdraw-addr] [flags]
 ```
 
 ### Set withdraw address
@@ -71,7 +71,7 @@ iriscli distribution set-withdraw-addr <iaa...> --from=<key-name> --fee=0.3iris 
 Withdraw rewards to the withdraw-address(default is the delegator address, you can set to another address via [set-withdraw-addr](#iriscli-distribution-set-withdraw-addr))
 
 ```bash
-iriscli distribution withdraw-rewards <flags>
+iriscli distribution withdraw-rewards [flags]
 ```
 
 **Flags:**

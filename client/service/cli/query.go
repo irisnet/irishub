@@ -18,7 +18,7 @@ import (
 // GetCmdQueryServiceDefinition implements the query service definition command
 func GetCmdQueryServiceDefinition(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "definition",
+		Use:     "definition [service-name]",
 		Short:   "Query a service definition",
 		Example: "iriscli service definition <service name>",
 		Args:    cobra.ExactArgs(1),
@@ -55,7 +55,7 @@ func GetCmdQueryServiceDefinition(cdc *codec.Codec) *cobra.Command {
 // GetCmdQueryServiceBinding implements the query service binding command
 func GetCmdQueryServiceBinding(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "binding",
+		Use:     "binding [service-name] [provider]",
 		Short:   "Query a service binding",
 		Example: "iriscli service binding <service name> <provider>",
 		Args:    cobra.ExactArgs(2),
@@ -98,7 +98,7 @@ func GetCmdQueryServiceBinding(cdc *codec.Codec) *cobra.Command {
 // GetCmdQueryServiceBindings implements the query service bindings command
 func GetCmdQueryServiceBindings(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "bindings",
+		Use:     "bindings [service-name]",
 		Short:   "Query all bindings of a service definition",
 		Example: "iriscli service bindings <service name>",
 		Args:    cobra.ExactArgs(1),
@@ -135,7 +135,7 @@ func GetCmdQueryServiceBindings(cdc *codec.Codec) *cobra.Command {
 // GetCmdQueryWithdrawAddr implements the query withdraw address command
 func GetCmdQueryWithdrawAddr(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "withdraw-addr",
+		Use:     "withdraw-addr [provider]",
 		Short:   "Query the withdrawal address of a provider",
 		Example: "iriscli service withdraw-addr <provider>",
 		Args:    cobra.ExactArgs(1),
@@ -176,7 +176,7 @@ func GetCmdQueryWithdrawAddr(cdc *codec.Codec) *cobra.Command {
 
 func GetCmdQueryServiceRequest(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "request",
+		Use:     "request [request-id]",
 		Short:   "Query a request by the request ID",
 		Example: "iriscli service request <request-id>",
 		Args:    cobra.ExactArgs(1),
@@ -224,8 +224,8 @@ func GetCmdQueryServiceRequest(cdc *codec.Codec) *cobra.Command {
 
 func GetCmdQueryServiceRequests(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "requests",
-		Short:   "Query requests by the service binding or request context ID",
+		Use:     "requests [service-name] [provider] | [request-context-id] [batch-counter]",
+		Short:   "Query active requests by the service binding or request context ID",
 		Example: "iriscli service requests <service-name> <provider> | <request-context-id> <batch-counter>",
 		Args:    cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -291,7 +291,7 @@ func GetCmdQueryServiceRequests(cdc *codec.Codec) *cobra.Command {
 
 func GetCmdQueryServiceResponse(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "response",
+		Use:     "response [request-id]",
 		Short:   "Query a response by the request ID",
 		Example: "iriscli service response <request-id>",
 		Args:    cobra.ExactArgs(1),
@@ -339,8 +339,8 @@ func GetCmdQueryServiceResponse(cdc *codec.Codec) *cobra.Command {
 
 func GetCmdQueryServiceResponses(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "responses",
-		Short:   "Query responses by the request context ID and batch counter",
+		Use:     "responses [request-context-id] [batch-counter]",
+		Short:   "Query active responses by the request context ID and batch counter",
 		Example: "iriscli service responses <request-context-id> <batch-counter>",
 		Args:    cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -386,7 +386,7 @@ func GetCmdQueryServiceResponses(cdc *codec.Codec) *cobra.Command {
 
 func GetCmdQueryRequestContext(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "request-context",
+		Use:     "request-context [request-context-id]",
 		Short:   "Query a request context",
 		Example: "iriscli service request-context <request-context-id>",
 		Args:    cobra.ExactArgs(1),
@@ -416,7 +416,7 @@ func GetCmdQueryRequestContext(cdc *codec.Codec) *cobra.Command {
 
 func GetCmdQueryEarnedFees(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "fees",
+		Use:     "fees [provider]",
 		Short:   "Query the earned fees of a provider",
 		Example: "iriscli service fees <provider>",
 		Args:    cobra.ExactArgs(1),

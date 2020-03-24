@@ -15,7 +15,7 @@ Rand模块允许你向IRIS Hub发送随机数请求，查询随机数或待处�
 请求一个随机数。
 
 ```bash
-iriscli rand request-rand <flags>
+iriscli rand request-rand [flags]
 ```
 
 **标志：**
@@ -47,7 +47,7 @@ iriscli rand request-rand --block-interval=100 --oracle=true --service-fee-cap=1
 使用ID查询链上生成的随机数。
 
 ```bash
-iriscli rand query-rand <flags>
+iriscli rand query-rand [flags]
 ```
 
 **标志：**
@@ -56,7 +56,7 @@ iriscli rand query-rand <flags>
 | ------------ | ------ | ---- | ---- | ---------------------- |
 | --request-id | string |      |      | 请求ID，由请求交易返回 |
 
-## 查询随机数
+### 查询随机数
 
 查询已生成的随机数。
 
@@ -69,7 +69,7 @@ iriscli rand query-rand --request-id=035a8d4cf64fcd428b5c77b1ca85bfed172d3787be9
 查询随机数请求队列，支持可选的高度。
 
 ```bash
-iriscli rand query-queue <flags>
+iriscli rand query-queue [flags]
 ```
 
 **标志：**
@@ -78,7 +78,7 @@ iriscli rand query-queue <flags>
 | -------------- | ----- | ---- | ---- | -------------- |
 | --queue-height | int64 |      | 0    | 查询的目标高度 |
 
-## Query random number request queue
+### 查询随机数请求队列
 
 查询尚未处理的随机数请求，可指定将要生成随机数（或请求 Service）的区块高度。
 
