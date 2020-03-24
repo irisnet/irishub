@@ -14,6 +14,7 @@ import (
 	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/app/v1/bank"
 	"github.com/irisnet/irishub/app/v1/params"
+	"github.com/irisnet/irishub/app/v3/asset"
 	"github.com/irisnet/irishub/app/v3/service/internal/types"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/modules/guardian"
@@ -28,6 +29,7 @@ func makeTestCodec() *codec.Codec {
 	bank.RegisterCodec(cdc)
 	auth.RegisterCodec(cdc)
 	guardian.RegisterCodec(cdc)
+	asset.RegisterCodec(cdc)
 	types.RegisterCodec(cdc)
 	sdk.RegisterCodec(cdc)
 	codec.RegisterCrypto(cdc)
@@ -40,6 +42,7 @@ func createTestInput(t *testing.T, amt sdk.Int, nAccs int64) (sdk.Context, Keepe
 	keyParams := protocol.KeyParams
 	tkeyParams := protocol.TkeyParams
 	keyGuardian := protocol.KeyGuardian
+	keyAsset := protocol.KeyAsset
 	keyService := sdk.NewKVStoreKey("serviceKey")
 
 	db := dbm.NewMemDB()
@@ -48,6 +51,7 @@ func createTestInput(t *testing.T, amt sdk.Int, nAccs int64) (sdk.Context, Keepe
 	ms.MountStoreWithDB(keyParams, sdk.StoreTypeIAVL, db)
 	ms.MountStoreWithDB(tkeyParams, sdk.StoreTypeTransient, db)
 	ms.MountStoreWithDB(keyGuardian, sdk.StoreTypeIAVL, db)
+	ms.MountStoreWithDB(keyAsset, sdk.StoreTypeIAVL, db)
 	ms.MountStoreWithDB(keyService, sdk.StoreTypeIAVL, db)
 	err := ms.LoadLatestVersion()
 	require.Nil(t, err)
@@ -59,6 +63,7 @@ func createTestInput(t *testing.T, amt sdk.Int, nAccs int64) (sdk.Context, Keepe
 	ak := auth.NewAccountKeeper(cdc, keyAcc, auth.ProtoBaseAccount)
 	bk := bank.NewBaseKeeper(cdc, ak)
 	gk := guardian.NewKeeper(cdc, keyGuardian, guardian.DefaultCodespace)
+	assetKeeper := asset.NewKeeper(cdc, keyAsset, bk, gk, asset.DefaultCodespace, pk.Subspace(asset.DefaultParamSpace))
 
 	initialCoins := sdk.Coins{
 		sdk.NewCoin(sdk.IrisAtto, amt),
@@ -66,7 +71,7 @@ func createTestInput(t *testing.T, amt sdk.Int, nAccs int64) (sdk.Context, Keepe
 	initialCoins = initialCoins.Sort()
 	accs := createTestAccs(ctx, int(nAccs), initialCoins, &ak)
 
-	keeper := NewKeeper(cdc, keyService, bk, gk, types.DefaultCodespace, pk.Subspace(types.DefaultParamSpace), types.NopMetrics())
+	keeper := NewKeeper(cdc, keyService, bk, assetKeeper, gk, types.DefaultCodespace, pk.Subspace(types.DefaultParamSpace), types.NopMetrics())
 	keeper.SetParamSet(ctx, types.DefaultParams())
 
 	return ctx, keeper, accs

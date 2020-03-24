@@ -14,7 +14,7 @@ type BankKeeper interface {
 }
 
 type AssetKeeper interface {
-	GetAllTokens(ctx sdk.Context) (tokens []exported.Token)
+	GetAllTokens(ctx sdk.Context) (tokens []exported.TokenI)
 }
 
 type AccountKeeper interface {

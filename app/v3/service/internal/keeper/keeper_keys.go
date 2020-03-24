@@ -11,15 +11,17 @@ var (
 	// Keys for store prefixes
 	serviceDefinitionKey   = []byte{0x01}
 	serviceBindingKey      = []byte{0x02}
-	withdrawAddrKey        = []byte{0x03}
-	requestContextKey      = []byte{0x04}
-	expiredRequestBatchKey = []byte{0x05}
-	newRequestBatchKey     = []byte{0x06}
-	requestKey             = []byte{0x07}
-	activeRequestKey       = []byte{0x08}
-	activeRequestByIDKey   = []byte{0x09}
-	responseKey            = []byte{0x10}
-	earnedFeesKey          = []byte{0x11}
+	pricingKey             = []byte{0x03}
+	withdrawAddrKey        = []byte{0x04}
+	requestContextKey      = []byte{0x05}
+	expiredRequestBatchKey = []byte{0x06}
+	newRequestBatchKey     = []byte{0x07}
+	requestKey             = []byte{0x08}
+	activeRequestKey       = []byte{0x09}
+	activeRequestByIDKey   = []byte{0x10}
+	responseKey            = []byte{0x11}
+	requestVolumeKey       = []byte{0x12}
+	earnedFeesKey          = []byte{0x13}
 )
 
 // GetServiceDefinitionKey returns the key for the service definition with the specified name
@@ -30,6 +32,11 @@ func GetServiceDefinitionKey(name string) []byte {
 // GetServiceBindingKey returns the key for the service binding with the specified name and provider
 func GetServiceBindingKey(serviceName string, provider sdk.AccAddress) []byte {
 	return append(serviceBindingKey, getStringsKey([]string{serviceName, provider.String()})...)
+}
+
+// GetPricingKey returns the key for the pricing of the specified binding
+func GetPricingKey(serviceName string, provider sdk.AccAddress) []byte {
+	return append(pricingKey, getStringsKey([]string{serviceName, provider.String()})...)
 }
 
 // GetWithdrawAddrKey returns the key for the withdrawal address of the specified provider
@@ -98,6 +105,11 @@ func GetActiveRequestKeyByID(requestID []byte) []byte {
 // GetActiveRequestSubspaceByReqCtx returns the key for the active requests for the specified request context
 func GetActiveRequestSubspaceByReqCtx(requestContextID []byte, batchCounter uint64) []byte {
 	return append(append(activeRequestByIDKey, requestContextID...), sdk.Uint64ToBigEndian(batchCounter)...)
+}
+
+// GetRequestVolumeKey returns the key for the request volume for the specified consumer and binding
+func GetRequestVolumeKey(consumer sdk.AccAddress, serviceName string, provider sdk.AccAddress) []byte {
+	return append(append(requestVolumeKey, getStringsKey([]string{consumer.String(), serviceName, provider.String()})...), emptyByte...)
 }
 
 // GetResponseKey returns the key for the response for the given request ID

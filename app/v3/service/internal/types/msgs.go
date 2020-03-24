@@ -185,7 +185,7 @@ func (msg MsgBindService) ValidateBasic() sdk.Error {
 		return ErrInvalidPricing(DefaultCodespace, "pricing missing")
 	}
 
-	return validatePricing(msg.Pricing)
+	return ValidateBindingPricing(msg.Pricing)
 }
 
 // GetSigners implements Msg.
@@ -244,7 +244,7 @@ func (msg MsgUpdateServiceBinding) ValidateBasic() sdk.Error {
 	}
 
 	if len(msg.Pricing) != 0 {
-		return validatePricing(msg.Pricing)
+		return ValidateBindingPricing(msg.Pricing)
 	}
 
 	return nil
@@ -981,23 +981,6 @@ func ensureServiceDefLength(msg MsgDefineService) sdk.Error {
 
 	if len(msg.AuthorDescription) > MaxDescriptionLength {
 		return ErrInvalidLength(DefaultCodespace, fmt.Sprintf("invalid author description length; got: %d, max: %d", len(msg.AuthorDescription), MaxDescriptionLength))
-	}
-
-	return nil
-}
-
-func validatePricing(pricing string) sdk.Error {
-	if err := ValidateBindingPricing(pricing); err != nil {
-		return err
-	}
-
-	p, err := ParsePricing(pricing)
-	if err != nil {
-		return err
-	}
-
-	if !validServiceCoins(p.Price) {
-		return ErrInvalidPricing(DefaultCodespace, fmt.Sprintf("invalid pricing coins: %s", p.Price))
 	}
 
 	return nil
