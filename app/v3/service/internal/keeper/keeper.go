@@ -23,6 +23,9 @@ type Keeper struct {
 
 	// used to map the module name to response callback
 	respCallbacks map[string]types.ResponseCallback
+
+	// used to map the module name to state callback
+	stateCallbacks map[string]types.StateCallback
 }
 
 // NewKeeper
