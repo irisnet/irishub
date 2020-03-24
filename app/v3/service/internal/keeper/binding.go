@@ -280,7 +280,7 @@ func (k Keeper) ParsePricing(ctx sdk.Context, pricing string) (p types.Pricing, 
 		} else {
 			token, err := k.ak.GetToken(ctx, unitName)
 			if err != nil {
-				return p, types.ErrInvalidPricing(k.codespace, fmt.Sprintf("failed to parse the pricing: %s", err))
+				return p, types.ErrInvalidPricing(k.codespace, fmt.Sprintf("invalid price: %s", err))
 			}
 
 			coins = coins.Add(sdk.NewCoins(sdk.NewCoin(
