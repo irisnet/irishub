@@ -69,7 +69,7 @@ func (source *AssetSource) UnmarshalJSON(data []byte) error {
 	var s string
 	err := json.Unmarshal(data, &s)
 	if err != nil {
-		return nil
+		return err
 	}
 
 	bz2, err := AssetSourceFromString(s)
