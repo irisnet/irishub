@@ -34,7 +34,7 @@
 设置钱包B为取回收益的钱包：
 
 ```bash
-iriscli distribution set-withdraw-addr <address-of-wallet-B> --fee=0.3iris --from=<key-name-of- wallet-A> --chain-id=irishub
+iriscli distribution set-withdraw-addr <address-of-wallet-B> --fee=0.3iris --from=<key-name-of-wallet-A> --chain-id=irishub
 ```  
 
 查询委托账户对应的取回收益的钱包地址：
@@ -56,7 +56,7 @@ iriscli distribution withdraw-rewards --from=<key-name> --fee=0.3iris --chain-id
 2.`WithdrawDelegatorReward` ：从指定验证人处提取委托收益。
 
 ```bash
-iriscli distribution withdraw-rewards --only-from-validator=<validator-address>  --from=<key-name> --fee=0.3iris --chain-id=irishub
+iriscli distribution withdraw-rewards --only-from-validator=<validator-address> --from=<key-name> --fee=0.3iris --chain-id=irishub
 ```
 
 3.`WithdrawValidatorRewardsAll` ：仅验证人可用，同时提取自己节点的抵押收益和佣金收益。

@@ -385,13 +385,13 @@ Users must specify the redelegation token amount. There two options can do this:
 ### Redelegate amounts of shares to another validator
 
 ```bash
-iriscli stake redelegate --chain-id=irishub --from=<key-name> --fee=0.3iris --address-validator-source=iva106nhdckyf996q69v3qdxwe6y7408pvyv3hgcms --address-validator-dest=iva1xpqw0kq0ktt3we5gq43vjphh7xcjfy6sfqamll  --shares-amount=10
+iriscli stake redelegate --chain-id=irishub --from=<key-name> --fee=0.3iris --address-validator-source=iva106nhdckyf996q69v3qdxwe6y7408pvyv3hgcms --address-validator-dest=iva1xpqw0kq0ktt3we5gq43vjphh7xcjfy6sfqamll --shares-amount=10
 ```
 
 ### Redelegate percentage of shares to another validator
 
 ```bash
-iriscli stake redelegate --chain-id=irishub --from=<key-name> --fee=0.3iris --address-validator-source=iva106nhdckyf996q69v3qdxwe6y7408pvyv3hgcms --address-validator-dest=iva1xpqw0kq0ktt3we5gq43vjphh7xcjfy6sfqamll  --shares-percent=0.1
+iriscli stake redelegate --chain-id=irishub --from=<key-name> --fee=0.3iris --address-validator-source=iva106nhdckyf996q69v3qdxwe6y7408pvyv3hgcms --address-validator-dest=iva1xpqw0kq0ktt3we5gq43vjphh7xcjfy6sfqamll --shares-percent=0.1
 ```
 
 ## iriscli stake unjail

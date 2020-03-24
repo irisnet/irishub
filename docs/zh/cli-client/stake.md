@@ -2,7 +2,7 @@
 
 Stake模块提供了一系列查询staking状态和发送staking交易的命令。
 
-## Available Commands
+## 可用命令
 
 | 名称                                                                    | 描述                                                         |
 | ----------------------------------------------------------------------- | ------------------------------------------------------------ |
@@ -385,13 +385,13 @@ iriscli stake redelegate [flags]
 ### 转委托一定数量shares到其他验证人
 
 ```bash
-iriscli stake redelegate --chain-id=irishub --from=<key-name> --fee=0.3iris --address-validator-source=iva106nhdckyf996q69v3qdxwe6y7408pvyv3hgcms --address-validator-dest=iva1xpqw0kq0ktt3we5gq43vjphh7xcjfy6sfqamll  --shares-amount=10
+iriscli stake redelegate --chain-id=irishub --from=<key-name> --fee=0.3iris --address-validator-source=iva106nhdckyf996q69v3qdxwe6y7408pvyv3hgcms --address-validator-dest=iva1xpqw0kq0ktt3we5gq43vjphh7xcjfy6sfqamll --shares-amount=10
 ```
 
 ### 转委托一定比例shares到其他验证人
 
 ```bash
-iriscli stake redelegate --chain-id=irishub --from=<key-name> --fee=0.3iris --address-validator-source=iva106nhdckyf996q69v3qdxwe6y7408pvyv3hgcms --address-validator-dest=iva1xpqw0kq0ktt3we5gq43vjphh7xcjfy6sfqamll  --shares-percent=0.1
+iriscli stake redelegate --chain-id=irishub --from=<key-name> --fee=0.3iris --address-validator-source=iva106nhdckyf996q69v3qdxwe6y7408pvyv3hgcms --address-validator-dest=iva1xpqw0kq0ktt3we5gq43vjphh7xcjfy6sfqamll --shares-percent=0.1
 ```
 
 ## iriscli stake unjail

@@ -2,7 +2,7 @@
 
 Service module allows you to define, bind, invoke services on the IRIS Hub. [Read more about iService](../features/service.md).
 
-## Available Commands
+## 可用命令
 
 | Name                                                    | Description                                                 |
 | ------------------------------------------------------- | ----------------------------------------------------------- |
@@ -229,7 +229,7 @@ iriscli service enable [service-name] [flags]
 The following example enables an unavailable service binding with the additional 10 IRIS deposit.
 
 ```bash
-iriscli service enable <service name> --chain-id=irishub  --from=<key-name> --fee=0.3iris --deposit=10iris
+iriscli service enable <service name> --chain-id=irishub --from=<key-name> --fee=0.3iris --deposit=10iris
 ```
 
 ## iriscli service refund-deposit
@@ -245,7 +245,7 @@ iriscli service refund-deposit [service-name] [flags]
 Before refunding, you should [disable](#iriscli-service-disable) the service binding first.
 
 ```bash
-iriscli service refund-deposit <service name> --chain-id=irishub  --from=<key-name> --fee=0.3iris
+iriscli service refund-deposit <service name> --chain-id=irishub --from=<key-name> --fee=0.3iris
 ```
 
 ## iriscli service call
@@ -310,7 +310,7 @@ You can retrieve the `request-id` in the result of [tendermint block](./tendermi
 Query service requests by the service binding or request context ID.
 
 ```bash
-iriscli service requests [service_name] [provider] | [request_context_id] [batch_counter] [flags]
+iriscli service requests [service-name] [provider] | [request-context-id] [batch-counter] [flags]
 ```
 
 ### Query active requests of a service binding

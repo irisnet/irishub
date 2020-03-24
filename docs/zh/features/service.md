@@ -32,7 +32,7 @@ IRIS-SDK通过增强的IBC处理逻辑来支持服务语义，以允许分布式
 
 ```bash
 # 创建服务定义
-iriscli service define --chain-id=irishub  --from=<key-name> --fee=0.6iris --gas=100000 --service-name=<service-name> --service-description=<service-description> --author-description=<author-description> --tags=<tag1>,<tag2> --idl-content=<idl-content> --file=</***/***.proto>
+iriscli service define --chain-id=irishub --from=<key-name> --fee=0.6iris --gas=100000 --service-name=<service-name> --service-description=<service-description> --author-description=<author-description> --tags=<tag1>,<tag2> --idl-content=<idl-content> --file=</***/***.proto>
 
 # 查询服务定义
 iriscli service definition --def-chain-id=<def-chain-id> --service-name=<service-name>
@@ -44,7 +44,7 @@ iriscli service definition --def-chain-id=<def-chain-id> --service-name=<service
 
 ```bash
 # 服务绑定（抵押1000iris， 价格1iris， 平均响应时间10000毫秒， 服务可用性9999（10000次调用可用次数的整数表示））
-iriscli service bind --chain-id=irishub  --from=<key-name> --fee=0.3iris --service-name=<service-name> --def-chain-id=<def-chain-id> --bind-type=Local  --deposit=1000iris --prices=1iris --avg-rsp-time=10000 --usable-time=9999
+iriscli service bind --chain-id=irishub --from=<key-name> --fee=0.3iris --service-name=<service-name> --def-chain-id=<def-chain-id> --bind-type=Local --deposit=1000iris --prices=1iris --avg-rsp-time=10000 --usable-time=9999
 
 # 查询服务绑定
 iriscli service binding --def-chain-id=<def-chain-id> --service-name=<service-name> --bind-chain-id=<bind-chain-id> --provider=<provider-account-address>
@@ -53,16 +53,16 @@ iriscli service binding --def-chain-id=<def-chain-id> --service-name=<service-na
 iriscli service bindings --def-chain-id=<def-chain-id> --service-name=<service-name>
 
 # 服务绑定更新
-iriscli service update-binding --chain-id=irishub --from=<key-name> --fee=0.3iris --service-name=<service-name> --def-chain-id=<def-chain-id> --bind-type=Local  --deposit=1iris --prices=1iris,2iris --avg-rsp-time=10000 --usable-time=100
+iriscli service update-binding --chain-id=irishub --from=<key-name> --fee=0.3iris --service-name=<service-name> --def-chain-id=<def-chain-id> --bind-type=Local --deposit=1iris --prices=1iris,2iris --avg-rsp-time=10000 --usable-time=100
 
 # 禁用服务绑定
-iriscli service disable --chain-id=irishub  --from=<key-name> --fee=0.3iris --def-chain-id=<def-chain-id> --service-name=<service-name>
+iriscli service disable --chain-id=irishub --from=<key-name> --fee=0.3iris --def-chain-id=<def-chain-id> --service-name=<service-name>
 
 # 开启服务绑定，并追加抵押100iris
-iriscli service enable --chain-id=irishub  --from=<key-name> --fee=0.3iris --def-chain-id=<def-chain-id> --service-name=<service-name> --deposit=100iris
+iriscli service enable --chain-id=irishub --from=<key-name> --fee=0.3iris --def-chain-id=<def-chain-id> --service-name=<service-name> --deposit=100iris
 
 # 取回押金
-iriscli service refund-deposit --chain-id=irishub  --from=<key-name> --fee=0.3iris --def-chain-id=<def-chain-id> --service-name=<service-name>
+iriscli service refund-deposit --chain-id=irishub --from=<key-name> --fee=0.3iris --def-chain-id=<def-chain-id> --service-name=<service-name>
 ```
 
 ### 服务调用

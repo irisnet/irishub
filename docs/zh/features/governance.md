@@ -82,7 +82,7 @@ Mint Params:
   mint/Inflation=0.0400000000
 
 # 发送提议，返回参数修改的内容
-iriscli gov submit-proposal --title=<title> --description=<description> --type=Parameter --deposit=8iris  --param="mint/Inflation=0.0000000000" --from=<key_name> --chain-id=irishub --fee=0.3iris --commit
+iriscli gov submit-proposal --title=<title> --description=<description> --type=Parameter --deposit=8iris --param="mint/Inflation=0.0000000000" --from=<key_name> --chain-id=irishub --fee=0.3iris --commit
 
 # 对提议进行抵押
 iriscli gov deposit --proposal-id=<proposal-id> --deposit=1000iris --from=<key_name> --chain-id=irishub --fee=0.3iris --commit
@@ -100,13 +100,13 @@ iriscli gov query-proposal --proposal-id=<proposal-id>
 
 ```bash
 # 提交 Burn 提议
-iriscli gov submit-proposal --title="burn tokens 5%" --description=<description> --type="CommunityTaxUsage" --usage="Burn" --deposit="10iris"  --percent=0.05 --from=<key_name> --chain-id=irishub --fee=0.3iris --commit
+iriscli gov submit-proposal --title="burn tokens 5%" --description=<description> --type="CommunityTaxUsage" --usage="Burn" --deposit="10iris" --percent=0.05 --from=<key_name> --chain-id=irishub --fee=0.3iris --commit
 
 # 提交 Distribute 提议
-iriscli gov submit-proposal --title="distribute tokens 5%" --description="test" --type="CommunityTaxUsage" --usage="Distribute" --deposit="10iris"  --percent=0.05 --dest-address=<dest-address (only trustees)> --from=<key_name> --chain-id=irishub --fee=0.3iris --commit
+iriscli gov submit-proposal --title="distribute tokens 5%" --description="test" --type="CommunityTaxUsage" --usage="Distribute" --deposit="10iris" --percent=0.05 --dest-address=<dest-address (only trustees)> --from=<key_name> --chain-id=irishub --fee=0.3iris --commit
 
 # 提交 Grant 提议
-iriscli gov submit-proposal --title="grant tokens 5%" --description="test" --type="CommunityTaxUsage" --usage="Grant" --deposit="10iris"  --percent=0.05 --dest-address=<dest-address (only trustees)> --from=<key_name> --chain-id=irishub --fee=0.3iris --commit
+iriscli gov submit-proposal --title="grant tokens 5%" --description="test" --type="CommunityTaxUsage" --usage="Grant" --deposit="10iris" --percent=0.05 --dest-address=<dest-address (only trustees)> --from=<key_name> --chain-id=irishub --fee=0.3iris --commit
 ```
 
 ### 系统终止提议

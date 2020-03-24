@@ -81,7 +81,7 @@ Mint Params:
   mint/Inflation=0.0400000000
 
 # Send proposal for parameters change
-iriscli gov submit-proposal --title=<title> --description=<description> --type=Parameter --deposit=8iris  --param="mint/Inflation=0.0000000000" --from=<key-name> --chain-id=irishub --fee=0.3iris --commit
+iriscli gov submit-proposal --title=<title> --description=<description> --type=Parameter --deposit=8iris --param="mint/Inflation=0.0000000000" --from=<key-name> --chain-id=irishub --fee=0.3iris --commit
 
 # Deposit for a proposal
 iriscli gov deposit --proposal-id=<proposal-id> --deposit=1000iris --from=<key-name> --chain-id=irishub --fee=0.3iris --commit
@@ -99,13 +99,13 @@ There are three usages, `Burn`, `Distribute` and `Grant`. `Burn` means burning t
 
 ```bash
 # Submit Burn usage proposal
-iriscli gov submit-proposal --title="burn tokens 5%" --description=<description> --type="CommunityTaxUsage" --usage="Burn" --deposit="10iris"  --percent=0.05 --from=<key-name> --chain-id=irishub --fee=0.3iris --commit
+iriscli gov submit-proposal --title="burn tokens 5%" --description=<description> --type="CommunityTaxUsage" --usage="Burn" --deposit="10iris" --percent=0.05 --from=<key-name> --chain-id=irishub --fee=0.3iris --commit
 
 # Submit Distribute usage proposal
-iriscli gov submit-proposal --title="distribute tokens 5%" --description="test" --type="CommunityTaxUsage" --usage="Distribute" --deposit="10iris"  --percent=0.05 --dest-address=<dest-address (only trustees)> --from=<key-name> --chain-id=irishub --fee=0.3iris --commit
+iriscli gov submit-proposal --title="distribute tokens 5%" --description="test" --type="CommunityTaxUsage" --usage="Distribute" --deposit="10iris" --percent=0.05 --dest-address=<dest-address (only trustees)> --from=<key-name> --chain-id=irishub --fee=0.3iris --commit
 
 # Submit Grant usage proposal
-iriscli gov submit-proposal --title="grant tokens 5%" --description="test" --type="CommunityTaxUsage" --usage="Grant" --deposit="10iris"  --percent=0.05 --dest-address=<dest-address (only trustees)> --from=<key-name> --chain-id=irishub --fee=0.3iris --commit
+iriscli gov submit-proposal --title="grant tokens 5%" --description="test" --type="CommunityTaxUsage" --usage="Grant" --deposit="10iris" --percent=0.05 --dest-address=<dest-address (only trustees)> --from=<key-name> --chain-id=irishub --fee=0.3iris --commit
 ```
 
 ### Proposals on system halting

@@ -224,7 +224,7 @@ func GetCmdQueryServiceRequest(cdc *codec.Codec) *cobra.Command {
 
 func GetCmdQueryServiceRequests(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "requests [service_name] [provider] | [request_context_id] [batch_counter]",
+		Use:     "requests [service-name] [provider] | [request-context-id] [batch-counter]",
 		Short:   "Query active requests by the service binding or request context ID",
 		Example: "iriscli service requests <service-name> <provider> | <request-context-id> <batch-counter>",
 		Args:    cobra.ExactArgs(2),

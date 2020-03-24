@@ -234,7 +234,7 @@ iriscli service enable [service-name] [flags]
 启用一个不可用的服务绑定，追加 10 IRIS 的抵押。
 
 ```bash
-iriscli service enable <service name> --chain-id=irishub  --from=<key-name> --fee=0.3iris --deposit=10iris
+iriscli service enable <service name> --chain-id=irishub --from=<key-name> --fee=0.3iris --deposit=10iris
 ```
 
 ## iriscli service refund-deposit
@@ -315,7 +315,7 @@ iriscli service request <request-id>
 通过服务绑定或请请求上下文ID查询服务请求列表。
 
 ```bash
-iriscli service requests [service_name] [provider] | [request_context_id] [batch_counter] [flags]
+iriscli service requests [service-name] [provider] | [request-context-id] [batch-counter] [flags]
 ```
 
 ### 查询服务绑定的活跃请求

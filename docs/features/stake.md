@@ -99,7 +99,7 @@ As a delegator, the more bonded tokens it has on validator, the more rewards it 
 - Increase self-delegation
 
   ```bash
-  iriscli stake delegate --address-validator=<self-address-validator> --chain-id=irishub --from=<key-name> --fee=0.3iris  --amount=100iris
+  iriscli stake delegate --address-validator=<self-address-validator> --chain-id=irishub --from=<key-name> --fee=0.3iris --amount=100iris
   ```
 
 - Delegate tokens to other validators
@@ -107,7 +107,7 @@ As a delegator, the more bonded tokens it has on validator, the more rewards it 
   If you just want to be a delegator, you can skip the above steps.
 
   ```bash
-  iriscli stake delegate --address-validator=<other-address-validator> --chain-id=irishub --from=<key-name> --fee=0.3iris  --amount=100iris
+  iriscli stake delegate --address-validator=<other-address-validator> --chain-id=irishub --from=<key-name> --fee=0.3iris --amount=100iris
   ```
 
 - Unbond tokens from a validator
@@ -121,7 +121,7 @@ As a delegator, the more bonded tokens it has on validator, the more rewards it 
   use percentage for Unbonding
 
   ```bash
-  iriscli stake unbond --address-validator=<address-validator> --chain-id=irishub --from=<key-name> --fee=0.3iris  --share-percent=0.5
+  iriscli stake unbond --address-validator=<address-validator> --chain-id=irishub --from=<key-name> --fee=0.3iris --share-percent=0.5
   ```
 
 - Redelegate tokens to another validator

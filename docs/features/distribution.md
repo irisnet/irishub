@@ -31,7 +31,7 @@ By default, the reward will be paid to the wallet address which send the delegat
 The delegator could set a new wallet as reward paid address. To set another wallet(marked as `B`) as the paid address, delegator need to send another transaction from wallet `A`.
 
 ```bash
-iriscli distribution set-withdraw-addr <address-of-wallet-B> --fee=0.3iris --from=<key-name-of- wallet-A> --chain-id=irishub
+iriscli distribution set-withdraw-addr <address-of-wallet-B> --fee=0.3iris --from=<key-name-of-wallet-A> --chain-id=irishub
 ```  
 
 Query withdraw address:
@@ -53,7 +53,7 @@ There are 3 ways to withdraw rewards according to different scenarios
 - `WithdrawDelegatorReward` : Only withdraw the self-delegation reward of from designated validator
 
   ```bash
-  iriscli distribution withdraw-rewards --only-from-validator=<validator-address>  --from=<key-name> --fee=0.3iris --chain-id=irishub
+  iriscli distribution withdraw-rewards --only-from-validator=<validator-address> --from=<key-name> --fee=0.3iris --chain-id=irishub
   ```
 
 - `WithdrawValidatorRewardsAll` : Withdraw all delegation reward including commission benefit, only for validator

@@ -100,7 +100,7 @@
 5. 增加自己在验证人节点上委托的token
 
     ```bash
-    iriscli stake delegate --address-validator=<self-address-validator> --chain-id=irishub --from=<key-name> --fee=0.3iris  --amount=100iris 
+    iriscli stake delegate --address-validator=<self-address-validator> --chain-id=irishub --from=<key-name> --fee=0.3iris --amount=100iris 
     ```
 
 6. 委托
@@ -108,7 +108,7 @@
     向一个验证人委托一些IRIS
 
     ```bash
-    iriscli stake delegate --address-validator=<other-address-validator> --chain-id=irishub --from=<key-name> --fee=0.3iris  --amount=100iris
+    iriscli stake delegate --address-validator=<other-address-validator> --chain-id=irishub --from=<key-name> --fee=0.3iris --amount=100iris
     ```
 
 7. 解绑
@@ -122,7 +122,7 @@
     按比例解绑，解绑50%的token：
 
     ```bash
-    iriscli stake unbond --address-validator=<address-validator> --chain-id=irishub --from=<key-name> --fee=0.3iris  --share-percent=0.5
+    iriscli stake unbond --address-validator=<address-validator> --chain-id=irishub --from=<key-name> --fee=0.3iris --share-percent=0.5
     ```
 
 8. 转委托

@@ -65,7 +65,7 @@ This module is mainly used to transfer coins between accounts, query account bal
     Sign the transaction:
 
     ```bash
-    iriscli tx sign <file> --chain-id=irishub  --name=<key-name>
+    iriscli tx sign <file> --chain-id=irishub --name=<key-name>
     ```
 
     Return signed transactions:
