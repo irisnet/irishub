@@ -79,7 +79,7 @@ Delegation:
 查询某个委托人发起的所有委托记录。
 
 ```bash
-iriscli stake delegations <delegator-address> [flags]
+iriscli stake delegations [delegator-address] [flags]
 ```
 
 ### 查询某个委托人发起的所有委托记录
@@ -93,7 +93,7 @@ iriscli stake delegations <iaa...>
 查询某个验证人接受的所有委托。
 
 ```bash
-iriscli stake delegations-to <validator-address> [flags]
+iriscli stake delegations-to [validator-address] [flags]
 ```
 
 ### 查询某个验证人接受的所有委托

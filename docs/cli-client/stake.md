@@ -79,7 +79,7 @@ Delegation:
 Query all delegations delegated from one delegator.
 
 ```bash
-iriscli stake delegations <delegator-address> [flags]
+iriscli stake delegations [delegator-address] [flags]
 ```
 
 ### Query all delegations of a delegator
@@ -93,7 +93,7 @@ iriscli stake delegations <iaa...>
 Query all delegations to one validator.
 
 ```bash
-iriscli stake delegations-to <validator-address> [flags]
+iriscli stake delegations-to [validator-address] [flags]
 ```
 
 ### Query all delegations to one validator
@@ -159,7 +159,7 @@ iriscli stake unbonding-delegations-from <iva...>
 Query all outgoing redelegations of a validator
 
 ```bash
-iriscli stake redelegations-from <validator-address> [flags]
+iriscli stake redelegations-from [validator-address] [flags]
 ```
 
 ### Query all outgoing redelegatations of a validator

@@ -15,7 +15,7 @@ const flagModule = "module"
 
 func Commands(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "params [module-name]",
+		Use:     "params",
 		Short:   "Query parameter",
 		Example: "iriscli params --module=<module name>",
 		RunE: func(cmd *cobra.Command, args []string) error {
