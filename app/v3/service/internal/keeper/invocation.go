@@ -22,6 +22,17 @@ func (k Keeper) RegisterResponseCallback(moduleName string, respCallback types.R
 	return nil
 }
 
+// RegisterStateCallback registers a module callback for state handling
+func (k Keeper) RegisterStateCallback(moduleName string, stateCallback types.StateCallback) sdk.Error {
+	if _, ok := k.stateCallbacks[moduleName]; ok {
+		return types.ErrModuleNameRegistered(k.codespace, moduleName)
+	}
+
+	k.stateCallbacks[moduleName] = stateCallback
+
+	return nil
+}
+
 // CreateRequestContext creates a request context with the specified params
 func (k Keeper) CreateRequestContext(
 	ctx sdk.Context,
@@ -1128,4 +1139,14 @@ func (k Keeper) GetResponseCallback(moduleName string) (types.ResponseCallback, 
 	}
 
 	return respCallback, nil
+}
+
+// GetStateCallback gets the registered module callback for state handling
+func (k Keeper) GetStateCallback(moduleName string) (types.StateCallback, sdk.Error) {
+	stateCallback, ok := k.stateCallbacks[moduleName]
+	if !ok {
+		return nil, types.ErrModuleNameNotRegistered(k.codespace, moduleName)
+	}
+
+	return stateCallback, nil
 }
