@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/modules/guardian"
 	sdk "github.com/irisnet/irishub/types"
 )
@@ -10,7 +11,6 @@ var (
 	prefixOwnerGateway = []byte("ownerGateways:")
 	prefixOwnerToken   = []byte("ownerTokens:")
 
-	keyAccount        = sdk.NewKVStoreKey("acc")
 	prefixTotalSupply = []byte("totalSupply:")
 )
 
@@ -95,7 +95,7 @@ func (k Keeper) deleteCoinsFromAccounts(ctx sdk.Context, addrs []sdk.AccAddress)
 }
 
 func (k Keeper) deleteTotalSupplies(ctx sdk.Context) {
-	store := ctx.KVStore(keyAccount)
+	store := ctx.KVStore(protocol.KeyAccount)
 
 	iterator := sdk.KVStorePrefixIterator(store, prefixTotalSupply)
 	defer iterator.Close()
