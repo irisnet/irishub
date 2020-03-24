@@ -16,7 +16,7 @@ distribution模块用于管理自己的 [Staking 收益](../concepts/general-con
 查询委托人的提现地址。
 
 ```bash
-iriscli distribution withdraw-address <delegator-address> <flags>
+iriscli distribution withdraw-address [account-address] [flags]
 ```
 
 ### 查询提现地址
@@ -32,7 +32,7 @@ iriscli distribution withdraw-address <delegator-address>
 查询验证人或委托人的所有奖励。
 
 ```bash
-iriscli distribution rewards <address> <flags>
+iriscli distribution rewards [address] [flags]
 ```
 
 ### 查询奖励
@@ -57,7 +57,7 @@ Commission:   267.438208089888659537iris
 设置另一个地址以接收奖励，而不是使用委托人地址。
 
 ```bash
-iriscli distribution set-withdraw-addr <withdraw-address> <flags>
+iriscli distribution set-withdraw-addr [withdraw-addr] [flags]
 ```
 
 ### 设置提现地址
@@ -71,12 +71,12 @@ iriscli distribution set-withdraw-addr <iaa...> --from=<key-name> --fee=0.3iris 
 取回奖励到提现地址（默认为委托人地址，您可以通过 [set-withdraw-addr](#iriscli-distribution-set-withdraw-addr)重新设置提现地址)。
 
 ```bash
-iriscli distribution withdraw-rewards <flags>
+iriscli distribution withdraw-rewards [flags]
 ```
 
 **标识：**
 
-| 名称, 速记            | 类型   | 必须 | 默认 | 描述                                 |
+| 名称，速记            | 类型   | 必须 | 默认 | 描述                                 |
 | --------------------- | ------ | ---- | ---- | ------------------------------------ |
 | --only-from-validator | string |      |      | 仅从此验证者地址中提取（以bech格式） |
 | --is-validator        | bool   |      | 否   | 同时取回验证人的佣金                 |

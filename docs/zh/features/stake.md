@@ -94,13 +94,13 @@
 4. 修改验证人信息
 
     ```bash
-    iriscli stake edit-validator --from=<key-name> --chain-id=<chain-id> --fee=0.3iris --commission-rate=0.15 --moniker=<new-name>
+    iriscli stake edit-validator --from=<key-name> --chain-id=irishub --fee=0.3iris --commission-rate=0.15 --moniker=<new-name>
     ```
 
 5. 增加自己在验证人节点上委托的token
 
     ```bash
-    iriscli stake delegate --address-validator=<self-address-validator> --chain-id=<chain-id> --from=<key-name> --fee=0.3iris  --amount=100iris 
+    iriscli stake delegate --address-validator=<self-address-validator> --chain-id=irishub --from=<key-name> --fee=0.3iris --amount=100iris 
     ```
 
 6. 委托
@@ -108,21 +108,21 @@
     向一个验证人委托一些IRIS
 
     ```bash
-    iriscli stake delegate --address-validator=<other-address-validator> --chain-id=<chain-id> --from=<key-name> --fee=0.3iris  --amount=100iris
+    iriscli stake delegate --address-validator=<other-address-validator> --chain-id=irishub --from=<key-name> --fee=0.3iris --amount=100iris
     ```
 
 7. 解绑
 
-    按share数量解绑， 解绑100shares:
+    按share数量解绑， 解绑100shares：
 
     ```bash
-    iriscli stake unbond --address-validator=<address-validator> --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --shares-amount=100
+    iriscli stake unbond --address-validator=<address-validator> --chain-id=irishub --from=<key-name> --fee=0.3iris --shares-amount=100
     ```
 
-    按比例解绑，解绑50%的token:
+    按比例解绑，解绑50%的token：
 
     ```bash
-    iriscli stake unbond --address-validator=<address-validator> --chain-id=<chain-id> --from=<key-name> --fee=0.3iris  --share-percent=0.5
+    iriscli stake unbond --address-validator=<address-validator> --chain-id=irishub --from=<key-name> --fee=0.3iris --share-percent=0.5
     ```
 
 8. 转委托
@@ -130,13 +130,13 @@
     按share数量转委托， 转委托100shares到另外一个验证人节点:
 
     ```bash
-    iriscli stake redelegate --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --address-validator-source=<source-validator-address> --address-validator-dest=<destination-validator-address> --shares-amount=100
+    iriscli stake redelegate --chain-id=irishub --from=<key-name> --fee=0.3iris --address-validator-source=<source-validator-address> --address-validator-dest=<destination-validator-address> --shares-amount=100
     ```
 
     按比例转委托， 转委托50%的token到另外一个验证人节点:
 
     ```bash
-    iriscli stake redelegate --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --address-validator-source=<source-validator-address> --address-validator-dest=<destination-validator-address> --shares-percent=0.5
+    iriscli stake redelegate --chain-id=irishub --from=<key-name> --fee=0.3iris --address-validator-source=<source-validator-address> --address-validator-dest=<destination-validator-address> --shares-percent=0.5
     ```
 
 对于其它Staking相关的命令，请参考[stake-cli](../cli-client/stake.md)

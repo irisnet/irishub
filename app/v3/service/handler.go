@@ -182,7 +182,7 @@ func handleMsgRespondService(ctx sdk.Context, k Keeper, msg MsgRespondService) s
 
 	tags = tags.AppendTags(
 		sdk.NewTags(
-			TagRequestID, []byte(msg.RequestID),
+			TagRequestID, []byte(msg.RequestID.String()),
 			TagRequestContextID, []byte(request.RequestContextID.String()),
 			TagConsumer, []byte(response.Consumer.String()),
 			TagProvider, []byte(response.Provider.String()),

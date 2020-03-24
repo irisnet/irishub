@@ -39,13 +39,13 @@ The `start` subcommand has the following flags:
 By default, IRISLCD doesn't trust the connected full node. But if you are sure about that the connected full node is trustable, then you should run IRISLCD with `--trust-node` flag:
 
 ```bash
-irislcd start --node=tcp://localhost:26657 --chain-id=<chain-id> --trust-node
+irislcd start --node=tcp://localhost:26657 --chain-id=irishub --trust-node
 ```
 
 To access your IRISLCD instance publicly, you need to specify `--laddr`:
 
 ```bash
-irislcd start --node=tcp://localhost:26657 --chain-id=<chain-id> --laddr=tcp://0.0.0.0:1317 --trust-node
+irislcd start --node=tcp://localhost:26657 --chain-id=irishub --laddr=tcp://0.0.0.0:1317 --trust-node
 ```
 
 ## REST APIs
@@ -159,10 +159,10 @@ This api supports the following special parameters. By default, their values are
 
 ### HTLC module APIs
 
-1. `POST /htlc/htlcs`: 创建一个HTLC
-2. `GET /htlc/htlcs/{hash-lock}`: 通过hash-lock查询一个HTLC
-3. `POST /htlc/htlcs/{hash-lock}/claim`: 将一个OPEN状态的HTLC中锁定的资金发放到收款人地址
-4. `POST /htlc/htlcs/{hash-lock}/refund`: 从一个过期的HTLC中取回退款
+1. `POST /htlc/htlcs`: Create an HTLC
+2. `GET /htlc/htlcs/{hash-lock}`: Query an HTLC by hash-lock
+3. `POST /htlc/htlcs/{hash-lock}/claim`: Claim tokens locked in an OPEN HTLC to the recipient address
+4. `POST /htlc/htlcs/{hash-lock}/refund`: Refund from an expired HTLC
 
 ### Service module APIs
 

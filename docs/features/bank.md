@@ -33,7 +33,7 @@ This module is mainly used to transfer coins between accounts, query account bal
     For example, transfer 10iris from account A to account B:
 
     ```bash
-    iriscli bank send --to=<address-of-wallet-B> --amount=10iris --fee=0.3iris --from=<key-name-of-wallet-A> --chain-id=<chain-id>
+    iriscli bank send --to=<address-of-wallet-B> --amount=10iris --fee=0.3iris --from=<key-name-of-wallet-A> --chain-id=irishub
     ```
 
     IRISnet supports multiple tokens in circulation, and in the future IRISnet will be able to include multiple tokens in one transaction -- tokens can be any coin-type registered in IRISnet.
@@ -65,7 +65,7 @@ This module is mainly used to transfer coins between accounts, query account bal
     Sign the transaction:
 
     ```bash
-    iriscli tx sign <file> --chain-id=<chain-id>  --name=<key-name>
+    iriscli tx sign <file> --chain-id=irishub --name=<key-name>
     ```
 
     Return signed transactions:

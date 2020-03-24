@@ -10,8 +10,6 @@ Tendermint状态查询子命令
 | [txs](#iriscli-tendermint-txs)                       | 搜索查询所有符合指定匹配条件的交易                                         |
 | [block](#iriscli-tendermint-block)                   | 在给定高度获取区块的验证数据。如果未指定高度，则将使用最新高度作为默认高度 |
 | [validator-set](#iriscli-tendermint-validator-set)   | 查询指定高度的验证人信息                                                   |
-| [show-address](#iriscli-tendermint-show-address)     | 查询验证人的私钥对应的地址                                                 |
-| [show-validator](#iriscli-tendermint-show-validator) | 获取验证人的私钥对应的公钥                                                 |
 
 ## iriscli tendermint tx
 
@@ -26,7 +24,7 @@ iriscli tendermint tx CD117378EC1CE0BA4ED0E0EBCED01AF09DA8F6B7 --chain-id=irishu
 搜索所有匹配指定条件的交易
 
 ```bash
-iriscli tendermint txs <flags>
+iriscli tendermint txs [flags]
 
 ```
 
