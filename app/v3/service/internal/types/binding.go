@@ -47,7 +47,7 @@ func (binding ServiceBinding) String() string {
 		Deposit:                 %s
 		Pricing:                 %s
 		MinRespTime:             %d
-		Available:               %v,
+		Available:               %v
 		DisabledTime:            %v`,
 		binding.ServiceName, binding.Provider, binding.Deposit.MainUnitString(),
 		binding.Pricing, binding.MinRespTime, binding.Available, binding.DisabledTime,
