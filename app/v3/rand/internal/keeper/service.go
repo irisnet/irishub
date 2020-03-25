@@ -75,7 +75,19 @@ func (k Keeper) StartRequestContext(
 }
 
 func (k Keeper) HandlerStateChanged(ctx sdk.Context, requestContextID cmn.HexBytes, err string) (tags sdk.Tags) {
-	ctx.Logger().Info(err)
+	ctx = ctx.WithLogger(ctx.Logger().With("handler", "HandlerResponse").With("module", "iris/rand"))
+	reqCtx, existed := k.sk.GetRequestContext(ctx, requestContextID)
+	if !existed {
+		ctx.Logger().Error(
+			"Not existed requestContext",
+			"requestContextID", requestContextID.String(),
+		)
+		return
+	}
+	ctx.Logger().Error(
+		"Oracle state invalid", "requestContextID",
+		requestContextID.String(), "state", reqCtx.State.String(),
+	)
 	k.DeleteOracleRandRequest(ctx, requestContextID)
 	return
 }
@@ -83,7 +95,7 @@ func (k Keeper) HandlerStateChanged(ctx sdk.Context, requestContextID cmn.HexByt
 // HandlerResponse is responsible for processing the data returned from the service module
 func (k Keeper) HandlerResponse(ctx sdk.Context, requestContextID cmn.HexBytes, responseOutput []string, err error) (tags sdk.Tags) {
 	if len(responseOutput) == 0 || err != nil {
-		ctx = ctx.WithLogger(ctx.Logger().With("handler", "HandlerResponse"))
+		ctx = ctx.WithLogger(ctx.Logger().With("handler", "HandlerResponse").With("module", "iris/rand"))
 		ctx.Logger().Error(
 			"respond service failed",
 			"requestContextID",
