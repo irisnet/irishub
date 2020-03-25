@@ -59,6 +59,7 @@ func EndBlocker(ctx sdk.Context, k Keeper) (tags sdk.Tags) {
 			providers, totalPrices := k.FilterServiceProviders(
 				ctx, requestContext.ServiceName,
 				requestContext.Providers,
+				requestContext.Timeout,
 				requestContext.ServiceFeeCap,
 				requestContext.Consumer,
 			)
