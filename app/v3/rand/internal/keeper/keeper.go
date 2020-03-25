@@ -33,9 +33,8 @@ func NewKeeper(
 		sk:        sk,
 		codespace: codespace,
 	}
-	if err := sk.RegisterResponseCallback(types.ModuleName, keeper.HandlerResponse); err != nil {
-		panic(err)
-	}
+	_ = sk.RegisterResponseCallback(types.ModuleName, keeper.HandlerResponse)
+	_ = sk.RegisterStateCallback(types.ModuleName, keeper.HandlerStateChanged)
 	return keeper
 }
 

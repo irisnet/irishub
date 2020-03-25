@@ -74,6 +74,12 @@ func (k Keeper) StartRequestContext(
 	return k.sk.StartRequestContext(ctx, serviceContextID, consumer)
 }
 
+func (k Keeper) HandlerStateChanged(ctx sdk.Context, requestContextID cmn.HexBytes, err string) (tags sdk.Tags) {
+	ctx.Logger().Info(err)
+	k.DeleteOracleRandRequest(ctx, requestContextID)
+	return
+}
+
 // HandlerResponse is responsible for processing the data returned from the service module
 func (k Keeper) HandlerResponse(ctx sdk.Context, requestContextID cmn.HexBytes, responseOutput []string, err error) (tags sdk.Tags) {
 	if len(responseOutput) == 0 || err != nil {
