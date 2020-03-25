@@ -14,6 +14,7 @@ const (
 	FlagServiceName       = "service-name"
 	FlagDeposit           = "deposit"
 	FlagPricing           = "pricing"
+	FlagMinRespTime       = "min-resp-time"
 	FlagProviders         = "providers"
 	FlagServiceFeeCap     = "service-fee-cap"
 	FlagTimeout           = "timeout"
@@ -47,9 +48,11 @@ func init() {
 	FsServiceBind.String(FlagServiceName, "", "service name")
 	FsServiceBind.String(FlagDeposit, "", "deposit of the binding")
 	FsServiceBind.String(FlagPricing, "", "pricing content or path, which is an instance of the Irishub Service Pricing schema")
+	FsServiceBind.Uint64(FlagMinRespTime, 0, "minimum response time")
 
 	FsServiceUpdateBinding.String(FlagDeposit, "", "added deposit for the binding")
 	FsServiceUpdateBinding.String(FlagPricing, "", "pricing content or path, which is an instance of the Irishub Service Pricing schema")
+	FsServiceUpdateBinding.Uint64(FlagMinRespTime, 0, "minimum response time, not updated if set to 0")
 
 	FsServiceEnable.String(FlagDeposit, "", "added deposit for enabling the binding")
 
