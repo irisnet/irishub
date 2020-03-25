@@ -52,6 +52,7 @@ func NewKeeper(
 	}
 
 	keeper.respCallbacks = make(map[string]types.ResponseCallback)
+	keeper.stateCallbacks = make(map[string]types.StateCallback)
 
 	return keeper
 }
