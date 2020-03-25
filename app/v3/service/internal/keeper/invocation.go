@@ -14,10 +14,21 @@ import (
 // RegisterResponseCallback registers a module callback for response handling
 func (k Keeper) RegisterResponseCallback(moduleName string, respCallback types.ResponseCallback) sdk.Error {
 	if _, ok := k.respCallbacks[moduleName]; ok {
-		return types.ErrModuleNameRegistered(k.codespace, moduleName)
+		return types.ErrCallbackRegistered(k.codespace, "response callback", moduleName)
 	}
 
 	k.respCallbacks[moduleName] = respCallback
+
+	return nil
+}
+
+// RegisterStateCallback registers a module callback for state handling
+func (k Keeper) RegisterStateCallback(moduleName string, stateCallback types.StateCallback) sdk.Error {
+	if _, ok := k.stateCallbacks[moduleName]; ok {
+		return types.ErrCallbackRegistered(k.codespace, "state callback", moduleName)
+	}
+
+	k.stateCallbacks[moduleName] = stateCallback
 
 	return nil
 }
@@ -49,6 +60,10 @@ func (k Keeper) CreateRequestContext(
 
 	if len(moduleName) != 0 {
 		if _, err := k.GetResponseCallback(moduleName); err != nil {
+			return nil, tags, err
+		}
+
+		if _, err := k.GetStateCallback(moduleName); err != nil {
 			return nil, tags, err
 		}
 
@@ -1195,8 +1210,18 @@ func (k Keeper) CheckAuthority(
 func (k Keeper) GetResponseCallback(moduleName string) (types.ResponseCallback, sdk.Error) {
 	respCallback, ok := k.respCallbacks[moduleName]
 	if !ok {
-		return nil, types.ErrModuleNameNotRegistered(k.codespace, moduleName)
+		return nil, types.ErrCallbackNotRegistered(k.codespace, "response callback", moduleName)
 	}
 
 	return respCallback, nil
+}
+
+// GetStateCallback gets the registered module callback for state handling
+func (k Keeper) GetStateCallback(moduleName string) (types.StateCallback, sdk.Error) {
+	stateCallback, ok := k.stateCallbacks[moduleName]
+	if !ok {
+		return nil, types.ErrCallbackNotRegistered(k.codespace, "state callback", moduleName)
+	}
+
+	return stateCallback, nil
 }

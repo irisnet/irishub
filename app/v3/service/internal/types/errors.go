@@ -43,8 +43,8 @@ const (
 	CodeRequestContextNotStarted  sdk.CodeType = 127
 	CodeRequestContextNotPaused   sdk.CodeType = 128
 	CodeRequestContextCompleted   sdk.CodeType = 129
-	CodeModuleNameRegistered      sdk.CodeType = 130
-	CodeModuleNameNotRegistered   sdk.CodeType = 131
+	CodeCallbackRegistered        sdk.CodeType = 130
+	CodeCallbackNotRegistered     sdk.CodeType = 131
 	CodeNoEarnedFees              sdk.CodeType = 132
 
 	CodeInvalidRequestInput   sdk.CodeType = 133
@@ -176,12 +176,12 @@ func ErrRequestContextCompleted(codespace sdk.CodespaceType) sdk.Error {
 	return sdk.NewError(codespace, CodeRequestContextCompleted, "request context completed")
 }
 
-func ErrModuleNameRegistered(codespace sdk.CodespaceType, moduleName string) sdk.Error {
-	return sdk.NewError(codespace, CodeModuleNameRegistered, fmt.Sprintf("module %s already registered", moduleName))
+func ErrCallbackRegistered(codespace sdk.CodespaceType, cbType, moduleName string) sdk.Error {
+	return sdk.NewError(codespace, CodeCallbackRegistered, fmt.Sprintf("%s already registered for module %s", cbType, moduleName))
 }
 
-func ErrModuleNameNotRegistered(codespace sdk.CodespaceType, moduleName string) sdk.Error {
-	return sdk.NewError(codespace, CodeModuleNameNotRegistered, fmt.Sprintf("module %s not registered", moduleName))
+func ErrCallbackNotRegistered(codespace sdk.CodespaceType, cbType, moduleName string) sdk.Error {
+	return sdk.NewError(codespace, CodeCallbackNotRegistered, fmt.Sprintf("%s not registered for module %s", cbType, moduleName))
 }
 
 func ErrNoEarnedFees(codespace sdk.CodespaceType, provider sdk.AccAddress) sdk.Error {

@@ -4,10 +4,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/tendermint/tendermint/crypto/tmhash"
 	cmn "github.com/tendermint/tendermint/libs/common"
-
-	"github.com/stretchr/testify/require"
 
 	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/app/v3/service/internal/types"

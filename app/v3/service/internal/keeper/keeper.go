@@ -24,6 +24,9 @@ type Keeper struct {
 
 	// used to map the module name to response callback
 	respCallbacks map[string]types.ResponseCallback
+
+	// used to map the module name to state callback
+	stateCallbacks map[string]types.StateCallback
 }
 
 // NewKeeper
@@ -49,6 +52,7 @@ func NewKeeper(
 	}
 
 	keeper.respCallbacks = make(map[string]types.ResponseCallback)
+	keeper.stateCallbacks = make(map[string]types.StateCallback)
 
 	return keeper
 }
