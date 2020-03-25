@@ -1679,6 +1679,9 @@ paths:
                 pricing:
                   type: string
                   example: '{"price":[{"denom":"iris-atto","amount":"1000000000000000000"}]}'
+                min_resp_time:
+                  type: integer
+                  example: '50'
   '/service/bindings/{service-name}/{provider}':
     get:
       summary: Query a service binding
@@ -1747,6 +1750,9 @@ paths:
                 pricing:
                   type: string
                   example: '{"price":[{"denom":"iris-atto","amount":"1000000000000000000"}]}'
+                min_resp_time:
+                  type: integer
+                  example: '50'
   '/service/bindings/{service-name}':
     get:
       summary: Query all bindings of a service definition
@@ -3994,6 +4000,8 @@ components:
         pricing:
           type: string
           example: '{"price":[{"denom":"iris-atto","amount":"1000000"}]}'
+        min_resp_time:
+          type: integer
         available:
           type: boolean
         disabled_time:

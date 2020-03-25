@@ -94,6 +94,7 @@ iriscli service bind [flags]
 | --service-name  |         | Service name                                                                        | Yes      |
 | --deposit       |         | Deposit of the binding                                                              | Yes      |
 | --pricing       |         | Pricing content or path, which is an instance of the Irishub Service Pricing schema | Yes      |
+| --min-resp-time |         | Minimum response time | Yes |
 
 ### Bind an existing service definition
 
@@ -101,7 +102,7 @@ The deposit needs to satisfy the minimum deposit requirement, which is the maxim
 
 ```bash
 iriscli service bind --chain-id=irishub --from=<key-name> --fee=0.3iris
---service-name=<service name> --deposit=10000iris --pricing=<pricing>
+--service-name=<service name> --deposit=10000iris --pricing=<pricing> --min-resp-time=50
 ```
 
 ### Pricing content example
@@ -159,6 +160,7 @@ iriscli service update-binding [service-name] [flags]
 | --------------- | ------- | ----------------------------------------------------------------------------------- | -------- |
 | --deposit       |         | Deposit added for the binding                                                       |          |
 | --pricing       |         | Pricing content or path, which is an instance of the Irishub Service Pricing schema |          |
+| --min-resp-time |         | Minimum response time, not updated if set to 0 |  |
 
 ### Update an existing service binding
 

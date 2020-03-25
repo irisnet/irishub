@@ -116,12 +116,14 @@ type bindServiceReq struct {
 	Provider    string       `json:"provider"`
 	Deposit     string       `json:"deposit"`
 	Pricing     string       `json:"pricing"`
+	MinRespTime uint64       `json:"min_resp_time"`
 }
 
 type updateServiceBindingReq struct {
-	BaseTx  utils.BaseTx `json:"base_tx"` // basic tx info
-	Deposit string       `json:"deposit"`
-	Pricing string       `json:"pricing"`
+	BaseTx      utils.BaseTx `json:"base_tx"` // basic tx info
+	Deposit     string       `json:"deposit"`
+	Pricing     string       `json:"pricing"`
+	MinRespTime uint64       `json:"min_resp_time"`
 }
 
 type setWithdrawAddrReq struct {
@@ -251,7 +253,7 @@ func bindServiceHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Hand
 			return
 		}
 
-		msg := service.NewMsgBindService(req.ServiceName, provider, deposit, req.Pricing)
+		msg := service.NewMsgBindService(req.ServiceName, provider, deposit, req.Pricing, req.MinRespTime)
 		if err := msg.ValidateBasic(); err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -296,7 +298,7 @@ func updateServiceBindingHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) 
 			}
 		}
 
-		msg := service.NewMsgUpdateServiceBinding(serviceName, provider, deposit, req.Pricing)
+		msg := service.NewMsgUpdateServiceBinding(serviceName, provider, deposit, req.Pricing, req.MinRespTime)
 		if err := msg.ValidateBasic(); err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return

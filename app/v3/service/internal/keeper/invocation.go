@@ -728,11 +728,12 @@ func (k Keeper) IterateActiveRequests(
 	}
 }
 
-// FilterServiceProviders gets the providers which satisfy the specified service fee requirement
+// FilterServiceProviders gets the providers which satisfy the specified requirement
 func (k Keeper) FilterServiceProviders(
 	ctx sdk.Context,
 	serviceName string,
 	providers []sdk.AccAddress,
+	timeout int64,
 	serviceFeeCap sdk.Coins,
 	consumer sdk.AccAddress,
 ) ([]sdk.AccAddress, sdk.Coins) {
@@ -743,11 +744,13 @@ func (k Keeper) FilterServiceProviders(
 		binding, found := k.GetServiceBinding(ctx, serviceName, provider)
 
 		if found && binding.Available {
-			price := k.GetPrice(ctx, consumer, binding)
+			if binding.MinRespTime <= uint64(timeout) {
+				price := k.GetPrice(ctx, consumer, binding)
 
-			if price.IsAllLTE(serviceFeeCap) {
-				newProviders = append(newProviders, provider)
-				totalPrices = totalPrices.Add(price)
+				if price.IsAllLTE(serviceFeeCap) {
+					newProviders = append(newProviders, provider)
+					totalPrices = totalPrices.Add(price)
+				}
 			}
 		}
 	}

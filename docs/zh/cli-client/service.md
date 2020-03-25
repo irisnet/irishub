@@ -100,6 +100,7 @@ iriscli service bind [flags]
 | --service-name |      | 服务名称                                              | 是   |
 | --deposit      |      | 服务绑定的押金                                        | 是   |
 | --pricing      |      | 服务定价内容或路径，需符合Irishub Pricing JSON schema |      |
+| --min-resp-time |     | 最小响应时间 | 是 |
 
 ### 绑定一个存在的服务定义
 
@@ -107,7 +108,7 @@ iriscli service bind [flags]
 
 ```bash
 iriscli service bind --chain-id=irishub --from=<key-name> --fee=0.3iris
---service-name=<service name> --deposit=10000iris --pricing=<pricing>
+--service-name=<service name> --deposit=10000iris --pricing=<pricing> --min-resp-time=50
 ```
 
 ### Pricing内容示例
@@ -164,6 +165,7 @@ iriscli service update-binding [service-name] [flags]
 | -------------- | ---- | ----------------------------------------------------- | ---- |
 | --deposit      |      | 增加的绑定押金                                        |      |
 | --pricing      |      | 服务定价内容或路径，需符合Irishub Pricing JSON schema |      |
+| --min-resp-time |     | 最小响应时间，为0则不更新 | |
 
 ### 更新一个存在的服务绑定
 
