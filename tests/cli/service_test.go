@@ -41,7 +41,7 @@ func TestIrisCLIService(t *testing.T) {
 	deposit := "10iris"
 	priceAmt := 1 // 1iris
 	price := fmt.Sprintf("%diris", priceAmt)
-	pricing := fmt.Sprintf(`{"price":%diris"}`, priceAmt)
+	pricing := fmt.Sprintf(`{"price":"%diris"}`, priceAmt)
 	minRespTime := uint64(5)
 	addedDeposit := "1iris"
 	serviceFeeCap := "10iris"

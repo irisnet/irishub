@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"encoding/json"
+
 	cmn "github.com/tendermint/tendermint/libs/common"
 
 	"github.com/irisnet/irishub/app/v3/service/internal/types"
@@ -56,5 +57,31 @@ func (k Keeper) CompleteServiceContext(ctx sdk.Context, context types.RequestCon
 	tags = tags.AppendTags(sdk.NewTags(
 		sdk.ActionTag(types.ActionCompleteContext, types.TagRequestContextID), []byte(requestContextID.String()),
 	))
+	return tags
+}
+
+// OnRequestContextPaused handles the event where the specified request context is paused due to certain cause
+func (k Keeper) OnRequestContextPaused(
+	ctx sdk.Context,
+	requestContext types.RequestContext,
+	requestContextID cmn.HexBytes,
+	cause string,
+) sdk.Tags {
+	tags := sdk.NewTags()
+
+	requestContext.BatchState = types.BATCHCOMPLETED
+	requestContext.State = types.PAUSED
+
+	k.SetRequestContext(ctx, requestContextID, requestContext)
+
+	if len(requestContext.ModuleName) > 0 {
+		stateCallback, _ := k.GetStateCallback(requestContext.ModuleName)
+		tags = tags.AppendTags(stateCallback(ctx, requestContextID, cause))
+	} else {
+		tags = tags.AppendTags(sdk.NewTags(
+			sdk.ActionTag(types.ActionPauseContext, types.TagRequestContextID), []byte(requestContextID.String()),
+		))
+	}
+
 	return tags
 }

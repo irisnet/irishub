@@ -25,10 +25,13 @@ type Keeper struct {
 }
 
 // NewKeeper
-func NewKeeper(cdc *codec.Codec, key sdk.StoreKey,
+func NewKeeper(
+	cdc *codec.Codec,
+	key sdk.StoreKey,
 	codespace sdk.CodespaceType,
 	gk types.GuardianKeeper,
-	sk types.ServiceKeeper) Keeper {
+	sk types.ServiceKeeper,
+) Keeper {
 	keeper := Keeper{
 		storeKey:  key,
 		cdc:       cdc,
@@ -37,6 +40,7 @@ func NewKeeper(cdc *codec.Codec, key sdk.StoreKey,
 		codespace: codespace,
 	}
 	_ = sk.RegisterResponseCallback(types.ModuleName, keeper.HandlerResponse)
+	_ = sk.RegisterStateCallback(types.ModuleName, keeper.HandlerStateChanged)
 	return keeper
 }
 
@@ -52,7 +56,8 @@ func (k Keeper) CreateFeed(ctx sdk.Context, msg types.MsgCreateFeed) (sdk.Tags, 
 		return tags, types.ErrExistedFeedName(types.DefaultCodespace, msg.FeedName)
 	}
 
-	requestContextID, tags, err := k.sk.CreateRequestContext(ctx,
+	requestContextID, tags, err := k.sk.CreateRequestContext(
+		ctx,
 		msg.ServiceName,
 		msg.Providers,
 		msg.Creator,
@@ -61,7 +66,12 @@ func (k Keeper) CreateFeed(ctx sdk.Context, msg types.MsgCreateFeed) (sdk.Tags, 
 		msg.Timeout,
 		false,
 		true,
-		msg.RepeatedFrequency, -1, service.PAUSED, msg.ResponseThreshold, types.ModuleName)
+		msg.RepeatedFrequency,
+		-1,
+		service.PAUSED,
+		msg.ResponseThreshold,
+		types.ModuleName,
+	)
 	if err != nil {
 		return tags, err
 	}
@@ -76,6 +86,7 @@ func (k Keeper) CreateFeed(ctx sdk.Context, msg types.MsgCreateFeed) (sdk.Tags, 
 		Creator:          msg.Creator,
 	})
 	k.Enqueue(ctx, msg.FeedName, service.PAUSED)
+
 	return tags, nil
 }
 
@@ -148,13 +159,16 @@ func (k Keeper) EditFeed(ctx sdk.Context, msg types.MsgEditFeed) sdk.Error {
 		return types.ErrUnauthorized(types.DefaultCodespace, msg.FeedName, msg.Creator)
 	}
 
-	if err := k.sk.UpdateRequestContext(ctx, feed.RequestContextID,
+	if err := k.sk.UpdateRequestContext(
+		ctx,
+		feed.RequestContextID,
 		msg.Providers,
 		msg.ServiceFeeCap,
 		msg.Timeout,
 		msg.RepeatedFrequency,
 		-1,
-		msg.Creator); err != nil {
+		msg.Creator,
+	); err != nil {
 		return err
 	}
 
@@ -180,27 +194,38 @@ func (k Keeper) HandlerResponse(ctx sdk.Context,
 	requestContextID cmn.HexBytes,
 	responseOutput []string,
 	err error) (tags sdk.Tags) {
+	ctx = ctx.WithLogger(
+		ctx.Logger().With("handler", "HandlerResponse").With("module", "iris/oracle"),
+	)
 	if len(responseOutput) == 0 || err != nil {
-		ctx = ctx.WithLogger(ctx.Logger().With("handler", "HandlerResponse"))
-		ctx.Logger().Error("Oracle feed failed",
-			"requestContextID", requestContextID.String(),
-			"err", err.Error(),
+		ctx.Logger().Error(
+			"Oracle feed failed", "requestContextID",
+			requestContextID.String(), "err", err.Error(),
 		)
 		return
 	}
 
 	feed, found := k.GetFeedByReqCtxID(ctx, requestContextID)
 	if !found {
+		ctx.Logger().Error(
+			"Not existed requestContext", "requestContextID", requestContextID.String(),
+		)
 		return
 	}
 
 	reqCtx, existed := k.sk.GetRequestContext(ctx, requestContextID)
 	if !existed {
+		ctx.Logger().Error(
+			"Not existed requestContext", "requestContextID", requestContextID.String(),
+		)
 		return
 	}
 
 	aggregate, err := types.GetAggregateFunc(feed.AggregateFunc)
 	if err != nil {
+		ctx.Logger().Error(
+			"Not existed aggregateFunc", "aggregateFunc", feed.AggregateFunc,
+		)
 		return
 	}
 
@@ -221,6 +246,51 @@ func (k Keeper) HandlerResponse(ctx sdk.Context,
 		types.TagFeedName, []byte(feed.FeedName),
 		types.TagFeedValue(feed.FeedName), bz,
 	)
+}
+
+//HandlerStateChanged is responsible for update feed state
+func (k Keeper) HandlerStateChanged(ctx sdk.Context, requestContextID cmn.HexBytes, _ string) (tags sdk.Tags) {
+	ctx = ctx.WithLogger(
+		ctx.Logger().With("handler", "HandlerStateChanged").With("module", "iris/oracle"),
+	)
+	reqCtx, existed := k.sk.GetRequestContext(ctx, requestContextID)
+	if !existed {
+		ctx.Logger().Error(
+			"Not existed requestContext", "requestContextID", requestContextID.String(),
+		)
+		return
+	}
+
+	feed, found := k.GetFeedByReqCtxID(ctx, requestContextID)
+	if !found {
+		ctx.Logger().Error(
+			"Not existed feed", "requestContextID", requestContextID.String(),
+		)
+		return
+	}
+
+	var oldState service.RequestContextState
+	switch reqCtx.State {
+	case service.PAUSED:
+		oldState = service.RUNNING
+	case service.RUNNING:
+		oldState = service.PAUSED
+	case service.COMPLETED:
+		ctx.Logger().Error(
+			"Feed state invalid", "requestContextID",
+			requestContextID.String(), "state", reqCtx.State.String(),
+		)
+		return
+	}
+
+	ctx.Logger().Info(
+		"Feed state changed",
+		"feed", feed.FeedName,
+		"srcState", oldState,
+		"dstState", reqCtx.State.String(),
+	)
+	k.dequeueAndEnqueue(ctx, feed.FeedName, oldState, reqCtx.State)
+	return
 }
 
 func (k Keeper) GetRequestContext(ctx sdk.Context, requestContextID cmn.HexBytes) (service.RequestContext, bool) {

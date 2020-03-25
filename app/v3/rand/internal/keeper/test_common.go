@@ -40,10 +40,11 @@ func (m MockBankKeeper) GetCoins(ctx sdk.Context, addr sdk.AccAddress) sdk.Coins
 }
 
 type MockServiceKeeper struct {
-	storeKey    sdk.StoreKey
-	cdc         *codec.Codec
-	cxtMap      map[string]exported.RequestContext
-	callbackMap map[string]exported.ResponseCallback
+	storeKey         sdk.StoreKey
+	cdc              *codec.Codec
+	cxtMap           map[string]exported.RequestContext
+	callbackMap      map[string]exported.ResponseCallback
+	stateCallbackMap map[string]exported.StateCallback
 }
 
 func NewMockServiceKeeper(storeKey *sdk.KVStoreKey) MockServiceKeeper {
@@ -51,11 +52,13 @@ func NewMockServiceKeeper(storeKey *sdk.KVStoreKey) MockServiceKeeper {
 	service.RegisterCodec(cdc)
 	cxtMap := make(map[string]exported.RequestContext)
 	callbackMap := make(map[string]exported.ResponseCallback)
+	stateCallbackMap := make(map[string]exported.StateCallback)
 	return MockServiceKeeper{
-		storeKey:    storeKey,
-		cdc:         cdc,
-		cxtMap:      cxtMap,
-		callbackMap: callbackMap,
+		storeKey:         storeKey,
+		cdc:              cdc,
+		cxtMap:           cxtMap,
+		callbackMap:      callbackMap,
+		stateCallbackMap: stateCallbackMap,
 	}
 }
 
@@ -64,6 +67,14 @@ func (m MockServiceKeeper) RegisterResponseCallback(
 	respCallback exported.ResponseCallback,
 ) sdk.Error {
 	m.callbackMap[moduleName] = respCallback
+	return nil
+}
+
+func (m MockServiceKeeper) RegisterStateCallback(
+	moduleName string,
+	stateCallback exported.StateCallback,
+) sdk.Error {
+	m.stateCallbackMap[moduleName] = stateCallback
 	return nil
 }
 

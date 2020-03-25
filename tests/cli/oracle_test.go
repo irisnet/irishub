@@ -41,7 +41,7 @@ func TestIrisCLIOracle(t *testing.T) {
 	serviceName := "oracle"
 	deposit := "10iris"
 	priceAmt := 1 // 1iris
-	pricing := fmt.Sprintf(`{"price":%diris}`, priceAmt)
+	pricing := fmt.Sprintf(`{"price":"%diris"}`, priceAmt)
 	minRespTime := uint64(5)
 	serviceFeeCap := "10iris"
 	input := `{"pair":"iris-usdt"}`
