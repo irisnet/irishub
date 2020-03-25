@@ -52,11 +52,13 @@ func NewMockServiceKeeper(storeKey *sdk.KVStoreKey) MockServiceKeeper {
 	service.RegisterCodec(cdc)
 	cxtMap := make(map[string]exported.RequestContext)
 	callbackMap := make(map[string]exported.ResponseCallback)
+	stateCallbackMap := make(map[string]exported.StateCallback)
 	return MockServiceKeeper{
-		storeKey:    storeKey,
-		cdc:         cdc,
-		cxtMap:      cxtMap,
-		callbackMap: callbackMap,
+		storeKey:         storeKey,
+		cdc:              cdc,
+		cxtMap:           cxtMap,
+		callbackMap:      callbackMap,
+		stateCallbackMap: stateCallbackMap,
 	}
 }
 
@@ -68,8 +70,10 @@ func (m MockServiceKeeper) RegisterResponseCallback(
 	return nil
 }
 
-func (m MockServiceKeeper) RegisterStateCallback(moduleName string,
-	stateCallback exported.StateCallback) sdk.Error {
+func (m MockServiceKeeper) RegisterStateCallback(
+	moduleName string,
+	stateCallback exported.StateCallback,
+) sdk.Error {
 	m.stateCallbackMap[moduleName] = stateCallback
 	return nil
 }
