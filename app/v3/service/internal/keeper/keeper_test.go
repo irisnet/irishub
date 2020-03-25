@@ -404,7 +404,7 @@ func TestKeeper_Request_Service(t *testing.T) {
 	// satifying providers will change due to the condition changed
 	newTimeout := int64(40)
 
-	newProviders, totalServiceFees = keeper.FilterServiceProviders(ctx, testServiceName, providers, newTimeout, testServiceFeeCap, consumer)
+	newProviders, _ = keeper.FilterServiceProviders(ctx, testServiceName, providers, newTimeout, testServiceFeeCap, consumer)
 	require.Equal(t, 0, len(newProviders))
 }
 
