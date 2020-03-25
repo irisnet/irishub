@@ -56,7 +56,12 @@ func EndBlocker(ctx sdk.Context, k Keeper) (tags sdk.Tags) {
 	// handler for the new request batch
 	newRequestBatchHandler := func(requestContextID cmn.HexBytes, requestContext RequestContext) {
 		if requestContext.State == RUNNING {
-			providers, totalPrices := k.FilterServiceProviders(ctx, requestContext.ServiceName, requestContext.Providers, requestContext.ServiceFeeCap)
+			providers, totalPrices := k.FilterServiceProviders(
+				ctx, requestContext.ServiceName,
+				requestContext.Providers,
+				requestContext.ServiceFeeCap,
+				requestContext.Consumer,
+			)
 
 			if len(providers) > 0 && len(providers) >= int(requestContext.ResponseThreshold) {
 				if !requestContext.SuperMode {

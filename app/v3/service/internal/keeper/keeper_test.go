@@ -28,7 +28,7 @@ var (
 	testSchemas     = `{"input":{"type":"object"},"output":{"type":"object"}}`
 
 	testDeposit      = sdk.NewCoins(testCoin1)
-	testPricing      = `{"price":[{"denom":"iris-atto","amount":"1000000000000000000"}]}`
+	testPricing      = `{"price":"1iris","promotions_by_volume":[{"volume":1,"discount":"0.8"}]}`
 	testWithdrawAddr = sdk.AccAddress([]byte("test-withdrawal-address"))
 	testAddedDeposit = sdk.NewCoins(testCoin2)
 
@@ -52,6 +52,9 @@ func setServiceDefinition(ctx sdk.Context, k Keeper, author sdk.AccAddress) {
 func setServiceBinding(ctx sdk.Context, k Keeper, provider sdk.AccAddress, available bool, disabledTime time.Time) {
 	svcBinding := types.NewServiceBinding(testServiceName, provider, testDeposit, testPricing, available, disabledTime)
 	k.SetServiceBinding(ctx, svcBinding)
+
+	pricing, _ := k.ParsePricing(ctx, testPricing)
+	k.SetPricing(ctx, testServiceName, provider, pricing)
 }
 
 func setRequestContext(
@@ -340,7 +343,7 @@ func TestKeeper_Request_Service(t *testing.T) {
 
 	requestContextID, requestContext := setRequestContext(ctx, keeper, consumer, providers, types.RUNNING, 0, "")
 
-	newProviders, totalServiceFees := keeper.FilterServiceProviders(ctx, testServiceName, providers, testServiceFeeCap)
+	newProviders, totalServiceFees := keeper.FilterServiceProviders(ctx, testServiceName, providers, testServiceFeeCap, consumer)
 	require.Equal(t, providers, newProviders)
 	require.Equal(t, "2iris", totalServiceFees.MainUnitString())
 
@@ -382,6 +385,14 @@ func TestKeeper_Request_Service(t *testing.T) {
 	}
 
 	require.Equal(t, newProviders, requestProviders)
+
+	// increase volume
+	keeper.SetRequestVolume(ctx, consumer, testServiceName, provider1, 1)
+	keeper.SetRequestVolume(ctx, consumer, testServiceName, provider2, 1)
+
+	// service fees will change due to the increased volume
+	_, totalServiceFees = keeper.FilterServiceProviders(ctx, testServiceName, providers, testServiceFeeCap, consumer)
+	require.Equal(t, "1.6iris", totalServiceFees.MainUnitString())
 }
 
 func TestKeeper_Respond_Service(t *testing.T) {
@@ -421,6 +432,9 @@ func TestKeeper_Respond_Service(t *testing.T) {
 	require.Equal(t, requestContextID, response.RequestContextID)
 	require.Equal(t, requestContext.BatchCounter, response.RequestContextBatchCounter)
 
+	volume := keeper.GetRequestVolume(ctx, consumer, requestContext.ServiceName, provider)
+	require.Equal(t, uint64(1), volume)
+
 	// respond request 2
 	_, _, _, err = keeper.AddResponse(ctx, requestID2, provider, testOutput, "")
 	require.NoError(t, err)
@@ -429,8 +443,11 @@ func TestKeeper_Respond_Service(t *testing.T) {
 	require.Equal(t, uint16(2), requestContext.BatchResponseCount)
 	require.Equal(t, types.BATCHCOMPLETED, requestContext.BatchState)
 
-	_, found = keeper.GetResponse(ctx, requestID1)
+	_, found = keeper.GetResponse(ctx, requestID2)
 	require.True(t, found)
+  
+    volume = keeper.GetRequestVolume(ctx, consumer, requestContext.ServiceName, provider)
+	require.Equal(t, uint64(2), volume)
 
 	earnedFees, found := keeper.GetEarnedFees(ctx, provider)
 	require.True(t, found)

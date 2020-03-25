@@ -253,24 +253,6 @@ func (p *ProtocolV3) configKeepers() {
 		slashing.PrometheusMetrics(p.config),
 	)
 
-	p.serviceKeeper = service.NewKeeper(
-		p.cdc,
-		protocol.KeyService,
-		p.bankKeeper,
-		p.guardianKeeper,
-		service.DefaultCodespace,
-		p.paramsKeeper.Subspace(service.DefaultParamSpace),
-		service.PrometheusMetrics(p.config),
-	)
-
-	p.oracleKeeper = oracle.NewKeeper(
-		p.cdc,
-		protocol.KeyOracle,
-		oracle.DefaultCodespace,
-		p.guardianKeeper,
-		p.serviceKeeper,
-	)
-
 	// register the staking hooks
 	// NOTE: StakeKeeper above are passed by reference,
 	// so that it can be modified like below:
@@ -286,6 +268,25 @@ func (p *ProtocolV3) configKeepers() {
 		p.guardianKeeper,
 		asset.DefaultCodespace,
 		p.paramsKeeper.Subspace(asset.DefaultParamSpace),
+	)
+
+	p.serviceKeeper = service.NewKeeper(
+		p.cdc,
+		protocol.KeyService,
+		p.bankKeeper,
+		p.assetKeeper,
+		p.guardianKeeper,
+		service.DefaultCodespace,
+		p.paramsKeeper.Subspace(service.DefaultParamSpace),
+		service.PrometheusMetrics(p.config),
+	)
+
+	p.oracleKeeper = oracle.NewKeeper(
+		p.cdc,
+		protocol.KeyOracle,
+		oracle.DefaultCodespace,
+		p.guardianKeeper,
+		p.serviceKeeper,
 	)
 
 	p.govKeeper = gov.NewKeeper(
