@@ -14,9 +14,9 @@ func NewQuerier(k Keeper) sdk.Querier {
 	return func(ctx sdk.Context, path []string, req abci.RequestQuery) ([]byte, sdk.Error) {
 		switch path[0] {
 		case types.QueryToken:
-			return querierToken(ctx, req, k)
+			return queryToken(ctx, req, k)
 		case types.QueryTokens:
-			return querierTokens(ctx, req, k)
+			return queryTokens(ctx, req, k)
 		case types.QueryFees:
 			return queryFees(ctx, req, k)
 		default:
@@ -25,14 +25,18 @@ func NewQuerier(k Keeper) sdk.Querier {
 	}
 }
 
-func querierToken(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
+func queryToken(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
 	var params types.QueryTokenParams
 	err := keeper.cdc.UnmarshalJSON(req.Data, &params)
 	if err != nil {
 		return nil, sdk.ParseParamsErr(err)
 	}
 
-	token, err := queryToken(ctx, keeper, params.Symbol)
+	if err := types.CheckSymbol(params.Symbol); err != nil {
+		return nil, err
+	}
+
+	token, err := queryTokenBySymbol(ctx, keeper, strings.ToLower(params.Symbol))
 	if err != nil {
 		return nil, sdk.MarshalResultErr(err)
 	}
@@ -45,7 +49,7 @@ func querierToken(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte
 	return bz, nil
 }
 
-func querierTokens(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) (bz []byte, err sdk.Error) {
+func queryTokens(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) (bz []byte, err sdk.Error) {
 	var params types.QueryTokensParams
 	if err := keeper.cdc.UnmarshalJSON(req.Data, &params); err != nil {
 		return nil, sdk.ParseParamsErr(err)
@@ -54,16 +58,20 @@ func querierTokens(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) (bz []
 	var tokens []types.TokenOutput
 
 	if len(params.Symbol) > 0 {
-		token, err := queryToken(ctx, keeper, strings.ToLower(params.Symbol))
+		if err := types.CheckSymbol(params.Symbol); err != nil {
+			return nil, err
+		}
+
+		token, err := queryTokenBySymbol(ctx, keeper, strings.ToLower(params.Symbol))
 		if err != nil {
-			return nil, sdk.MarshalResultErr(err)
+			return nil, err
 		}
 
 		tokens = append(tokens, token)
 	} else {
-		tokens, err = queryTokens(ctx, keeper, params.Owner)
+		tokens, err = queryTokensByOwner(ctx, keeper, params.Owner)
 		if err != nil {
-			return nil, sdk.MarshalResultErr(err)
+			return nil, err
 		}
 	}
 
@@ -80,6 +88,10 @@ func queryFees(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, s
 	err := keeper.cdc.UnmarshalJSON(req.Data, &params)
 	if err != nil {
 		return nil, sdk.ParseParamsErr(err)
+	}
+
+	if err := types.CheckSymbol(params.Symbol); err != nil {
+		return nil, err
 	}
 
 	symbol := strings.ToLower(params.Symbol)
@@ -100,7 +112,7 @@ func queryFees(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, s
 	return bz, nil
 }
 
-func queryToken(ctx sdk.Context, keeper Keeper, symbol string) (types.TokenOutput, sdk.Error) {
+func queryTokenBySymbol(ctx sdk.Context, keeper Keeper, symbol string) (types.TokenOutput, sdk.Error) {
 	if symbol == sdk.Iris {
 		return types.NewTokenOutputFrom(getIrisToken()), nil
 	}
@@ -113,7 +125,7 @@ func queryToken(ctx sdk.Context, keeper Keeper, symbol string) (types.TokenOutpu
 	return types.NewTokenOutputFrom(token), nil
 }
 
-func queryTokens(ctx sdk.Context, keeper Keeper, owner string) (tokens types.TokensOutput, err sdk.Error) {
+func queryTokensByOwner(ctx sdk.Context, keeper Keeper, owner string) (tokens types.TokensOutput, err sdk.Error) {
 	if len(owner) == 0 {
 		keeper.IterateTokens(ctx, func(token types.FungibleToken) (stop bool) {
 			tokens = append(tokens, types.NewTokenOutputFrom(token))
