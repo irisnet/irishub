@@ -1932,7 +1932,7 @@ paths:
               properties:
                 base_tx:
                   $ref: '#/components/schemas/BaseTx'
-  '/service/requests':
+  '/service/contexts':
     post:
       summary: Call a service
       description: Call a service with the specified params

@@ -177,7 +177,7 @@ irislcd start --node=tcp://localhost:26657 --chain-id=irishub --laddr=tcp://0.0.
 9. `POST /service/bindings/{service-name}/{provider}/disable`: 禁用一个可用的服务绑定
 10. `POST /service/bindings/{service-name}/{provider}/enable`: 启用一个不可用的服务绑定
 11. `POST /service/bindings/{service-name}/{provider}/refund-deposit`: 取回一个服务绑定的所有押金
-12. `POST /service/requests`: 调用服务
+12. `POST /service/contexts`: 调用服务
 13. `GET /service/requests/{request-id}`: 查询服务请求
 14. `GET /service/requests/{service-name}/{provider}`: 查询一个服务绑定的活跃请求
 15. `GET /service/requests/{request-context-id}/{batch-counter}`: 根据请求上下文ID和批次计数器查询请求列表
