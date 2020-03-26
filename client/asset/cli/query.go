@@ -53,7 +53,7 @@ func getCmdQueryTokens(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "tokens [owner]",
 		Short:   "Query tokens by owner",
-		Example: "iriscli asset token tokens [owner]",
+		Example: "iriscli asset token tokens <owner>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
