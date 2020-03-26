@@ -62,7 +62,6 @@ func TestNewQuerier(t *testing.T) {
 		Timeout:           msg.Timeout,
 		ServiceFeeCap:     msg.ServiceFeeCap,
 		RepeatedFrequency: msg.RepeatedFrequency,
-		RepeatedTotal:     -1,
 		ResponseThreshold: msg.ResponseThreshold,
 		State:             exported.PAUSED,
 	}, feedCtx)
@@ -95,7 +94,6 @@ func TestNewQuerier(t *testing.T) {
 		Timeout:           msg.Timeout,
 		ServiceFeeCap:     msg.ServiceFeeCap,
 		RepeatedFrequency: msg.RepeatedFrequency,
-		RepeatedTotal:     -1,
 		ResponseThreshold: msg.ResponseThreshold,
 		State:             exported.PAUSED,
 	}, feedsCtx[0])
