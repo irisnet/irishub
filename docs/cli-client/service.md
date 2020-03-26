@@ -17,7 +17,7 @@ Service module allows you to define, bind, invoke services on the IRIS Hub. [Rea
 | [disable](#iriscli-service-disable)                     | Disable an available service binding                        |
 | [enable](#iriscli-service-enable)                       | Enable an unavailable service binding                       |
 | [refund-deposit](#iriscli-service-refund-deposit)       | Refund all deposit from a service binding                   |
-| [call](#iriscli-service-call)                           | Call a service                                              |
+| [call](#iriscli-service-call)                           | Initiate a service call                                     |
 | [request](#iriscli-service-request)                     | Query a request by the request ID                           |
 | [requests](#iriscli-service-requests)                   | Query requests by the service binding or request context    |
 | [respond](#iriscli-service-respond)                     | Respond to a service request                                |
@@ -252,7 +252,7 @@ iriscli service refund-deposit <service name> --chain-id=irishub --from=<key-nam
 
 ## iriscli service call
 
-Call a service.
+Initiate a service call.
 
 ```bash
 iriscli service call [flags]

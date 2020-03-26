@@ -17,7 +17,7 @@ Service模块允许在IRIS Hub中定义、绑定、调用服务。[了解更多i
 | [disable](#iriscli-service-disable)                     | 禁用一个可用的服务绑定                       |
 | [enable](#iriscli-service-enable)                       | 启用一个不可用的服务绑定                     |
 | [refund-deposit](#iriscli-service-refund-deposit)       | 退还一个服务绑定的所有押金                   |
-| [call](#iriscli-service-call)                           | 调用服务                                     |
+| [call](#iriscli-service-call)                           | 发起服务调用                               |
 | [request](#iriscli-service-request)                     | 通过请求ID查询服务请求                       |
 | [requests](#iriscli-service-requests)                   | 通过服务绑定或请求上下文查询服务请求列表     |
 | [respond](#iriscli-service-respond)                     | 响应服务请求                                 |
@@ -257,7 +257,7 @@ iriscli service refund-deposit <service name> --chain-id=irishub --from=<key-nam
 
 ## iriscli service call
 
-调用服务。
+发起服务调用。
 
 ```bash
 iriscli service call [flags]

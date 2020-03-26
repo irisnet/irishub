@@ -59,7 +59,7 @@ func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec
 
 	// call a service
 	r.HandleFunc(
-		"/service/requests",
+		"/service/contexts",
 		requestServiceHandlerFn(cdc, cliCtx),
 	).Methods("POST")
 

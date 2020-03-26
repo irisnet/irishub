@@ -177,7 +177,7 @@ This api supports the following special parameters. By default, their values are
 9. `POST /service/bindings/{service-name}/{provider}/disable`: Disable an available service binding
 10. `POST /service/bindings/{service-name}/{provider}/enable`: Enable an unavailable service binding
 11. `POST /service/bindings/{service-name}/{provider}/refund-deposit`: Refund all deposit from a service binding
-12. `POST /service/requests`: Call a service
+12. `POST /service/contexts`: Initiate a service call
 13. `GET /service/requests/{request-id}`: Query a request by the request ID
 14. `GET /service/requests/{service-name}/{provider}`: Query active requests of a service binding
 15. `GET /service/requests/{request-context-id}/{batch-counter}`: Query requests by the request context ID and batch counter
