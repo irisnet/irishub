@@ -120,7 +120,7 @@ iriscli asset token mint kitty --amount=1000000 --from=<key-name> --chain-id=iri
 查询通证。
 
 ```bash
-iriscli asset token token [symbol]
+iriscli asset token token [symbol] [flags]
 ```
 
 ### 查询通证
@@ -134,7 +134,7 @@ iriscli asset token token kitty
 查询指定所有者的通证集合。所有者是可选的。
 
 ```bash
-iriscli asset token tokens [owner]
+iriscli asset token tokens [owner] [flags]
 ```
 
 ### 查询所有通证

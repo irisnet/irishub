@@ -120,7 +120,7 @@ iriscli asset token mint kitty --amount=1000000 --from=<key-name> --chain-id=iri
 Query a token by symbol
 
 ```bash
-iriscli asset token token [symbol]
+iriscli asset token token [symbol] [flags]
 ```
 
 ### Query a token
@@ -134,7 +134,7 @@ iriscli asset token token kitty
 Query tokens by the owner which is optional
 
 ```bash
-iriscli asset token tokens [owner]
+iriscli asset token tokens [owner] [flags]
 ```
 
 ### Query all tokens
