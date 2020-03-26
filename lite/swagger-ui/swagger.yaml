@@ -1679,6 +1679,9 @@ paths:
                 pricing:
                   type: string
                   example: '{"price":[{"denom":"iris-atto","amount":"1000000000000000000"}]}'
+                min_resp_time:
+                  type: integer
+                  example: '50'
   '/service/bindings/{service-name}/{provider}':
     get:
       summary: Query a service binding
@@ -1747,6 +1750,9 @@ paths:
                 pricing:
                   type: string
                   example: '{"price":[{"denom":"iris-atto","amount":"1000000000000000000"}]}'
+                min_resp_time:
+                  type: integer
+                  example: '50'
   '/service/bindings/{service-name}':
     get:
       summary: Query all bindings of a service definition
@@ -1926,10 +1932,10 @@ paths:
               properties:
                 base_tx:
                   $ref: '#/components/schemas/BaseTx'
-  '/service/requests':
+  '/service/contexts':
     post:
-      summary: Call a service
-      description: Call a service with the specified params
+      summary: Initiate a service call
+      description: Initiate a service call with the specified params
       tags:
         - Service
       responses:
@@ -2617,6 +2623,9 @@ paths:
                 symbol:
                   type: string
                   example: 'cat'
+                min_unit:
+                  type: string
+                  example: 'min'
                 initial_supply:
                   type: string
                   example: '1000000000'
@@ -3760,15 +3769,11 @@ components:
     Token:
       type: object
       properties:
-        id:
-          type: string
-        family:
-          type: string
-        source:
-          type: string
         symbol:
           type: string
         name:
+          type: string
+        min_unit:
           type: string
         decimal:
           type: integer
@@ -3994,6 +3999,8 @@ components:
         pricing:
           type: string
           example: '{"price":[{"denom":"iris-atto","amount":"1000000"}]}'
+        min_resp_time:
+          type: integer
         available:
           type: boolean
         disabled_time:

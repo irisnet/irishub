@@ -13,6 +13,7 @@ type ServiceBinding struct {
 	Provider     sdk.AccAddress `json:"provider"`
 	Deposit      sdk.Coins      `json:"deposit"`
 	Pricing      string         `json:"pricing"`
+	MinRespTime  uint64         `json:"min_resp_time"`
 	Available    bool           `json:"available"`
 	DisabledTime time.Time      `json:"disabled_time"`
 }
@@ -23,6 +24,7 @@ func NewServiceBinding(
 	provider sdk.AccAddress,
 	deposit sdk.Coins,
 	pricing string,
+	minRespTime uint64,
 	available bool,
 	disabledTime time.Time,
 ) ServiceBinding {
@@ -31,6 +33,7 @@ func NewServiceBinding(
 		Provider:     provider,
 		Deposit:      deposit,
 		Pricing:      pricing,
+		MinRespTime:  minRespTime,
 		Available:    available,
 		DisabledTime: disabledTime,
 	}
@@ -43,10 +46,11 @@ func (binding ServiceBinding) String() string {
 		Provider:                %s
 		Deposit:                 %s
 		Pricing:                 %s
-		Available:               %v,
+		MinRespTime:             %d
+		Available:               %v
 		DisabledTime:            %v`,
 		binding.ServiceName, binding.Provider, binding.Deposit.MainUnitString(),
-		binding.Pricing, binding.Available, binding.DisabledTime,
+		binding.Pricing, binding.MinRespTime, binding.Available, binding.DisabledTime,
 	)
 }
 
@@ -165,6 +169,10 @@ func (binding ServiceBinding) Validate() sdk.Error {
 
 	if !validServiceCoins(binding.Deposit) {
 		return ErrInvalidDeposit(DefaultCodespace, fmt.Sprintf("invalid deposit: %s", binding.Deposit))
+	}
+
+	if binding.MinRespTime == 0 {
+		return ErrInvalidMinRespTime(DefaultCodespace, "minimum response time must be greater than 0")
 	}
 
 	if len(binding.Pricing) == 0 {

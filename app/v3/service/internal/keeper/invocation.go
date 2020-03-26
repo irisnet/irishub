@@ -14,10 +14,21 @@ import (
 // RegisterResponseCallback registers a module callback for response handling
 func (k Keeper) RegisterResponseCallback(moduleName string, respCallback types.ResponseCallback) sdk.Error {
 	if _, ok := k.respCallbacks[moduleName]; ok {
-		return types.ErrModuleNameRegistered(k.codespace, moduleName)
+		return types.ErrCallbackRegistered(k.codespace, "response callback", moduleName)
 	}
 
 	k.respCallbacks[moduleName] = respCallback
+
+	return nil
+}
+
+// RegisterStateCallback registers a module callback for state handling
+func (k Keeper) RegisterStateCallback(moduleName string, stateCallback types.StateCallback) sdk.Error {
+	if _, ok := k.stateCallbacks[moduleName]; ok {
+		return types.ErrCallbackRegistered(k.codespace, "state callback", moduleName)
+	}
+
+	k.stateCallbacks[moduleName] = stateCallback
 
 	return nil
 }
@@ -49,6 +60,10 @@ func (k Keeper) CreateRequestContext(
 
 	if len(moduleName) != 0 {
 		if _, err := k.GetResponseCallback(moduleName); err != nil {
+			return nil, tags, err
+		}
+
+		if _, err := k.GetStateCallback(moduleName); err != nil {
 			return nil, tags, err
 		}
 
@@ -713,11 +728,12 @@ func (k Keeper) IterateActiveRequests(
 	}
 }
 
-// FilterServiceProviders gets the providers which satisfy the specified service fee requirement
+// FilterServiceProviders gets the providers which satisfy the specified requirement
 func (k Keeper) FilterServiceProviders(
 	ctx sdk.Context,
 	serviceName string,
 	providers []sdk.AccAddress,
+	timeout int64,
 	serviceFeeCap sdk.Coins,
 	consumer sdk.AccAddress,
 ) ([]sdk.AccAddress, sdk.Coins) {
@@ -728,11 +744,13 @@ func (k Keeper) FilterServiceProviders(
 		binding, found := k.GetServiceBinding(ctx, serviceName, provider)
 
 		if found && binding.Available {
-			price := k.GetPrice(ctx, consumer, binding)
+			if binding.MinRespTime <= uint64(timeout) {
+				price := k.GetPrice(ctx, consumer, binding)
 
-			if price.IsAllLTE(serviceFeeCap) {
-				newProviders = append(newProviders, provider)
-				totalPrices = totalPrices.Add(price)
+				if price.IsAllLTE(serviceFeeCap) {
+					newProviders = append(newProviders, provider)
+					totalPrices = totalPrices.Add(price)
+				}
 			}
 		}
 	}
@@ -1195,8 +1213,18 @@ func (k Keeper) CheckAuthority(
 func (k Keeper) GetResponseCallback(moduleName string) (types.ResponseCallback, sdk.Error) {
 	respCallback, ok := k.respCallbacks[moduleName]
 	if !ok {
-		return nil, types.ErrModuleNameNotRegistered(k.codespace, moduleName)
+		return nil, types.ErrCallbackNotRegistered(k.codespace, "response callback", moduleName)
 	}
 
 	return respCallback, nil
+}
+
+// GetStateCallback gets the registered module callback for state handling
+func (k Keeper) GetStateCallback(moduleName string) (types.StateCallback, sdk.Error) {
+	stateCallback, ok := k.stateCallbacks[moduleName]
+	if !ok {
+		return nil, types.ErrCallbackNotRegistered(k.codespace, "state callback", moduleName)
+	}
+
+	return stateCallback, nil
 }

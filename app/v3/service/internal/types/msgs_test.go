@@ -26,6 +26,7 @@ var (
 	testProvider     = sdk.AccAddress([]byte("test-provider"))
 	testDeposit      = sdk.NewCoins(testCoin1)
 	testPricing      = `{"price":"0.5iris"}`
+	testMinRespTime  = uint64(50)
 	testWithdrawAddr = sdk.AccAddress([]byte("test-withdrawal-address"))
 	testAddedDeposit = sdk.NewCoins(testCoin2)
 
@@ -142,14 +143,14 @@ func TestMsgDefineServiceGetSigners(t *testing.T) {
 
 // TestMsgBindServiceRoute tests Route for MsgBindService
 func TestMsgBindServiceRoute(t *testing.T) {
-	msg := NewMsgBindService(testServiceName, testProvider, testDeposit, testPricing)
+	msg := NewMsgBindService(testServiceName, testProvider, testDeposit, testPricing, testMinRespTime)
 
 	require.Equal(t, MsgRoute, msg.Route())
 }
 
 // TestMsgBindServiceType tests Type for MsgBindService
 func TestMsgBindServiceType(t *testing.T) {
-	msg := NewMsgBindService(testServiceName, testProvider, testDeposit, testPricing)
+	msg := NewMsgBindService(testServiceName, testProvider, testDeposit, testPricing, testMinRespTime)
 
 	require.Equal(t, "bind_service", msg.Type())
 }
@@ -162,6 +163,8 @@ func TestMsgBindServiceValidation(t *testing.T) {
 	invalidLongName := strings.Repeat("s", MaxNameLength+1)
 	invalidDeposit := sdk.Coins{}
 	invalidDenomDeposit := sdk.NewCoins(sdk.NewCoin("eth-min", sdk.NewInt(1000)))
+	invalidMinRespTime := uint64(0)
+
 	invalidPricing := `{"price":"0.5iris","other":"notallowedfield"}`
 	invalidSymbolPricing := `{"price":"0.5invalidsymbol"}`
 	invalidPromotionTimePricing := `{"price":"0.5iris","promotions_by_time":` +
@@ -170,17 +173,18 @@ func TestMsgBindServiceValidation(t *testing.T) {
 		`[{"volume":0,"discount":"0.7"}]}`
 
 	testMsgs := []MsgBindService{
-		NewMsgBindService(testServiceName, testProvider, testDeposit, testPricing),                 // valid msg
-		NewMsgBindService(testServiceName, emptyAddress, testDeposit, testPricing),                 // missing provider address
-		NewMsgBindService(invalidName, testProvider, testDeposit, testPricing),                     // service name contains illegal characters
-		NewMsgBindService(invalidLongName, testProvider, testDeposit, testPricing),                 // too long service name
-		NewMsgBindService(testServiceName, testProvider, invalidDeposit, testPricing),              // invalid deposit
-		NewMsgBindService(testServiceName, testProvider, invalidDenomDeposit, testPricing),         // invalid deposit denom
-		NewMsgBindService(testServiceName, testProvider, testDeposit, ""),                          // missing pricing
-		NewMsgBindService(testServiceName, testProvider, testDeposit, invalidPricing),              // invalid Pricing JSON Schema instance
-		NewMsgBindService(testServiceName, testProvider, testDeposit, invalidSymbolPricing),        // invalid pricing symbol
-		NewMsgBindService(testServiceName, testProvider, testDeposit, invalidPromotionTimePricing), // invalid promotion time lack of time zone
-		NewMsgBindService(testServiceName, testProvider, testDeposit, invalidPromotionVolPricing),  // invalid promotion volume
+		NewMsgBindService(testServiceName, testProvider, testDeposit, testPricing, testMinRespTime),                 // valid msg
+		NewMsgBindService(testServiceName, emptyAddress, testDeposit, testPricing, testMinRespTime),                 // missing provider address
+		NewMsgBindService(invalidName, testProvider, testDeposit, testPricing, testMinRespTime),                     // service name contains illegal characters
+		NewMsgBindService(invalidLongName, testProvider, testDeposit, testPricing, testMinRespTime),                 // too long service name
+		NewMsgBindService(testServiceName, testProvider, invalidDeposit, testPricing, testMinRespTime),              // invalid deposit
+		NewMsgBindService(testServiceName, testProvider, invalidDenomDeposit, testPricing, testMinRespTime),         // invalid deposit denom
+		NewMsgBindService(testServiceName, testProvider, testDeposit, "", testMinRespTime),                          // missing pricing
+		NewMsgBindService(testServiceName, testProvider, testDeposit, invalidPricing, testMinRespTime),              // invalid Pricing JSON Schema instance
+		NewMsgBindService(testServiceName, testProvider, testDeposit, invalidSymbolPricing, testMinRespTime),        // invalid pricing symbol
+		NewMsgBindService(testServiceName, testProvider, testDeposit, invalidPromotionTimePricing, testMinRespTime), // invalid promotion time lack of time zone
+		NewMsgBindService(testServiceName, testProvider, testDeposit, invalidPromotionVolPricing, testMinRespTime),  // invalid promotion volume
+		NewMsgBindService(testServiceName, testProvider, testDeposit, testPricing, invalidMinRespTime),              // invalid minimum response time                               // invalid promotion volume
 	}
 
 	testCases := []struct {
@@ -199,6 +203,7 @@ func TestMsgBindServiceValidation(t *testing.T) {
 		{testMsgs[8], false, "invalid pricing symbol"},
 		{testMsgs[9], false, "invalid promotion time lack of time zone"},
 		{testMsgs[10], false, "invalid promotion volume"},
+		{testMsgs[11], false, "invalid minimum response time"},
 	}
 
 	for i, tc := range testCases {
@@ -213,16 +218,16 @@ func TestMsgBindServiceValidation(t *testing.T) {
 
 // TestMsgBindServiceGetSignBytes tests GetSignBytes for MsgBindService
 func TestMsgBindServiceGetSignBytes(t *testing.T) {
-	msg := NewMsgBindService(testServiceName, testProvider, testDeposit, testPricing)
+	msg := NewMsgBindService(testServiceName, testProvider, testDeposit, testPricing, testMinRespTime)
 	res := msg.GetSignBytes()
 
-	expected := `{"type":"irishub/service/MsgBindService","value":{"deposit":[{"amount":"1000000000000000000000","denom":"iris-atto"}],"pricing":"{\"price\":\"0.5iris\"}","provider":"faa1w3jhxapdwpex7anfv3jhynrxe9z","service_name":"test-service"}}`
+	expected := `{"type":"irishub/service/MsgBindService","value":{"deposit":[{"amount":"1000000000000000000000","denom":"iris-atto"}],"min_resp_time":"50","pricing":"{\"price\":\"0.5iris\"}","provider":"faa1w3jhxapdwpex7anfv3jhynrxe9z","service_name":"test-service"}}`
 	require.Equal(t, expected, string(res))
 }
 
 // TestMsgBindServiceGetSigners tests GetSigners for MsgBindService
 func TestMsgBindServiceGetSigners(t *testing.T) {
-	msg := NewMsgBindService(testServiceName, testProvider, testDeposit, testPricing)
+	msg := NewMsgBindService(testServiceName, testProvider, testDeposit, testPricing, testMinRespTime)
 	res := msg.GetSigners()
 
 	expected := "[746573742D70726F7669646572]"
@@ -231,14 +236,14 @@ func TestMsgBindServiceGetSigners(t *testing.T) {
 
 // TestMsgUpdateServiceBindingRoute tests Route for MsgUpdateServiceBinding
 func TestMsgUpdateServiceBindingRoute(t *testing.T) {
-	msg := NewMsgUpdateServiceBinding(testServiceName, testProvider, testAddedDeposit, "")
+	msg := NewMsgUpdateServiceBinding(testServiceName, testProvider, testAddedDeposit, "", 0)
 
 	require.Equal(t, MsgRoute, msg.Route())
 }
 
 // TestMsgUpdateServiceBindingType tests Type for MsgUpdateServiceBinding
 func TestMsgUpdateServiceBindingType(t *testing.T) {
-	msg := NewMsgUpdateServiceBinding(testServiceName, testProvider, testAddedDeposit, "")
+	msg := NewMsgUpdateServiceBinding(testServiceName, testProvider, testAddedDeposit, "", 0)
 
 	require.Equal(t, "update_service_binding", msg.Type())
 }
@@ -251,6 +256,7 @@ func TestMsgUpdateServiceBindingValidation(t *testing.T) {
 	invalidName := "invalid/service/name"
 	invalidLongName := strings.Repeat("s", MaxNameLength+1)
 	invalidDenomDeposit := sdk.NewCoins(sdk.NewCoin("eth-min", sdk.NewInt(1000)))
+
 	invalidPricing := `{"price":"0.5iris","other":"notallowedfield"}`
 	invalidSymbolPricing := `{"price":"0.5invalidsymbol"}`
 	invalidPromotionTimePricing := `{"price":"0.5iris","promotions_by_time":` +
@@ -259,18 +265,19 @@ func TestMsgUpdateServiceBindingValidation(t *testing.T) {
 		`[{"volume":0,"discount":"0.7"}]}`
 
 	testMsgs := []MsgUpdateServiceBinding{
-		NewMsgUpdateServiceBinding(testServiceName, testProvider, testAddedDeposit, testPricing),                 // valid msg
-		NewMsgUpdateServiceBinding(testServiceName, testProvider, emptyAddedDeposit, testPricing),                // empty deposit is allowed
-		NewMsgUpdateServiceBinding(testServiceName, testProvider, testAddedDeposit, ""),                          // empty pricing is allowed
-		NewMsgUpdateServiceBinding(testServiceName, testProvider, emptyAddedDeposit, ""),                         // deposit and pricing can be empty at the same time
-		NewMsgUpdateServiceBinding(testServiceName, emptyAddress, testAddedDeposit, testPricing),                 // missing provider address
-		NewMsgUpdateServiceBinding(invalidName, testProvider, testAddedDeposit, testPricing),                     // service name contains illegal characters
-		NewMsgUpdateServiceBinding(invalidLongName, testProvider, testAddedDeposit, testPricing),                 // too long service name
-		NewMsgUpdateServiceBinding(testServiceName, testProvider, invalidDenomDeposit, testPricing),              // invalid deposit denom
-		NewMsgUpdateServiceBinding(testServiceName, testProvider, testAddedDeposit, invalidPricing),              // invalid Pricing JSON Schema instance
-		NewMsgUpdateServiceBinding(testServiceName, testProvider, testAddedDeposit, invalidSymbolPricing),        // invalid pricing symbol
-		NewMsgUpdateServiceBinding(testServiceName, testProvider, testAddedDeposit, invalidPromotionTimePricing), // invalid promotion time lack of time zone
-		NewMsgUpdateServiceBinding(testServiceName, testProvider, testAddedDeposit, invalidPromotionVolPricing),  // invalid promotion volume
+		NewMsgUpdateServiceBinding(testServiceName, testProvider, testAddedDeposit, testPricing, testMinRespTime),                 // valid msg
+		NewMsgUpdateServiceBinding(testServiceName, testProvider, emptyAddedDeposit, testPricing, testMinRespTime),                // empty deposit is allowed
+		NewMsgUpdateServiceBinding(testServiceName, testProvider, testAddedDeposit, "", testMinRespTime),                          // empty pricing is allowed
+		NewMsgUpdateServiceBinding(testServiceName, testProvider, testAddedDeposit, testPricing, 0),                               // 0 is allowed for minimum response time
+		NewMsgUpdateServiceBinding(testServiceName, testProvider, emptyAddedDeposit, "", 0),                                       // deposit, pricing and min response time can be empty at the same time
+		NewMsgUpdateServiceBinding(testServiceName, emptyAddress, testAddedDeposit, testPricing, testMinRespTime),                 // missing provider address
+		NewMsgUpdateServiceBinding(invalidName, testProvider, testAddedDeposit, testPricing, testMinRespTime),                     // service name contains illegal characters
+		NewMsgUpdateServiceBinding(invalidLongName, testProvider, testAddedDeposit, testPricing, testMinRespTime),                 // too long service name
+		NewMsgUpdateServiceBinding(testServiceName, testProvider, invalidDenomDeposit, testPricing, testMinRespTime),              // invalid deposit denom
+		NewMsgUpdateServiceBinding(testServiceName, testProvider, testAddedDeposit, invalidPricing, testMinRespTime),              // invalid Pricing JSON Schema instance
+		NewMsgUpdateServiceBinding(testServiceName, testProvider, testAddedDeposit, invalidSymbolPricing, testMinRespTime),        // invalid pricing symbol
+		NewMsgUpdateServiceBinding(testServiceName, testProvider, testAddedDeposit, invalidPromotionTimePricing, testMinRespTime), // invalid promotion time lack of time zone
+		NewMsgUpdateServiceBinding(testServiceName, testProvider, testAddedDeposit, invalidPromotionVolPricing, testMinRespTime),  // invalid promotion volume
 	}
 
 	testCases := []struct {
@@ -282,14 +289,15 @@ func TestMsgUpdateServiceBindingValidation(t *testing.T) {
 		{testMsgs[1], true, ""},
 		{testMsgs[2], true, ""},
 		{testMsgs[3], true, ""},
-		{testMsgs[4], false, "missing provider address"},
-		{testMsgs[5], false, "service name contains illegal characters"},
-		{testMsgs[6], false, "too long service name"},
-		{testMsgs[7], false, "invalid deposit denom"},
-		{testMsgs[8], false, "invalid Pricing JSON Schema instance"},
-		{testMsgs[9], false, "invalid pricing symbol"},
-		{testMsgs[10], false, "invalid promotion time lack of time zone"},
-		{testMsgs[11], false, "invalid promotion volume"},
+		{testMsgs[4], true, ""},
+		{testMsgs[5], false, "missing provider address"},
+		{testMsgs[6], false, "service name contains illegal characters"},
+		{testMsgs[7], false, "too long service name"},
+		{testMsgs[8], false, "invalid deposit denom"},
+		{testMsgs[9], false, "invalid Pricing JSON Schema instance"},
+		{testMsgs[10], false, "invalid pricing symbol"},
+		{testMsgs[11], false, "invalid promotion time lack of time zone"},
+		{testMsgs[12], false, "invalid promotion volume"},
 	}
 
 	for i, tc := range testCases {
@@ -304,16 +312,16 @@ func TestMsgUpdateServiceBindingValidation(t *testing.T) {
 
 // TestMsgUpdateServiceBindingGetSignBytes tests GetSignBytes for MsgUpdateServiceBinding
 func TestMsgUpdateServiceBindingGetSignBytes(t *testing.T) {
-	msg := NewMsgUpdateServiceBinding(testServiceName, testProvider, testAddedDeposit, "")
+	msg := NewMsgUpdateServiceBinding(testServiceName, testProvider, testAddedDeposit, "", 0)
 	res := msg.GetSignBytes()
 
-	expected := `{"type":"irishub/service/MsgUpdateServiceBinding","value":{"deposit":[{"amount":"100000000000000000000","denom":"iris-atto"}],"pricing":"","provider":"faa1w3jhxapdwpex7anfv3jhynrxe9z","service_name":"test-service"}}`
+	expected := `{"type":"irishub/service/MsgUpdateServiceBinding","value":{"deposit":[{"amount":"100000000000000000000","denom":"iris-atto"}],"min_resp_time":"0","pricing":"","provider":"faa1w3jhxapdwpex7anfv3jhynrxe9z","service_name":"test-service"}}`
 	require.Equal(t, expected, string(res))
 }
 
 // TestMsgUpdateServiceBindingGetSigners tests GetSigners for MsgUpdateServiceBinding
 func TestMsgUpdateServiceBindingGetSigners(t *testing.T) {
-	msg := NewMsgUpdateServiceBinding(testServiceName, testProvider, testAddedDeposit, "")
+	msg := NewMsgUpdateServiceBinding(testServiceName, testProvider, testAddedDeposit, "", 0)
 	res := msg.GetSigners()
 
 	expected := "[746573742D70726F7669646572]"

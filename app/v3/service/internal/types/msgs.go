@@ -139,15 +139,17 @@ type MsgBindService struct {
 	Provider    sdk.AccAddress `json:"provider"`
 	Deposit     sdk.Coins      `json:"deposit"`
 	Pricing     string         `json:"pricing"`
+	MinRespTime uint64         `json:"min_resp_time"`
 }
 
 // NewMsgBindService creates a new MsgBindService instance
-func NewMsgBindService(serviceName string, provider sdk.AccAddress, deposit sdk.Coins, pricing string) MsgBindService {
+func NewMsgBindService(serviceName string, provider sdk.AccAddress, deposit sdk.Coins, pricing string, minRespTime uint64) MsgBindService {
 	return MsgBindService{
 		ServiceName: serviceName,
 		Provider:    provider,
 		Deposit:     deposit,
 		Pricing:     pricing,
+		MinRespTime: minRespTime,
 	}
 }
 
@@ -181,6 +183,10 @@ func (msg MsgBindService) ValidateBasic() sdk.Error {
 		return ErrInvalidDeposit(DefaultCodespace, fmt.Sprintf("invalid deposit: %s", msg.Deposit))
 	}
 
+	if msg.MinRespTime == 0 {
+		return ErrInvalidMinRespTime(DefaultCodespace, "minimum response time must be greater than 0")
+	}
+
 	if len(msg.Pricing) == 0 {
 		return ErrInvalidPricing(DefaultCodespace, "pricing missing")
 	}
@@ -201,15 +207,17 @@ type MsgUpdateServiceBinding struct {
 	Provider    sdk.AccAddress `json:"provider"`
 	Deposit     sdk.Coins      `json:"deposit"`
 	Pricing     string         `json:"pricing"`
+	MinRespTime uint64         `json:"min_resp_time"`
 }
 
 // NewMsgUpdateServiceBinding creates a new MsgUpdateServiceBinding instance
-func NewMsgUpdateServiceBinding(serviceName string, provider sdk.AccAddress, deposit sdk.Coins, pricing string) MsgUpdateServiceBinding {
+func NewMsgUpdateServiceBinding(serviceName string, provider sdk.AccAddress, deposit sdk.Coins, pricing string, minRespTime uint64) MsgUpdateServiceBinding {
 	return MsgUpdateServiceBinding{
 		ServiceName: serviceName,
 		Provider:    provider,
 		Deposit:     deposit,
 		Pricing:     pricing,
+		MinRespTime: minRespTime,
 	}
 }
 

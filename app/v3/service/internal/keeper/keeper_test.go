@@ -4,10 +4,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/tendermint/tendermint/crypto/tmhash"
 	cmn "github.com/tendermint/tendermint/libs/common"
-
-	"github.com/stretchr/testify/require"
 
 	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/app/v3/service/internal/types"
@@ -29,6 +29,7 @@ var (
 
 	testDeposit      = sdk.NewCoins(testCoin1)
 	testPricing      = `{"price":"1iris","promotions_by_volume":[{"volume":1,"discount":"0.8"}]}`
+	testMinRespTime  = uint64(50)
 	testWithdrawAddr = sdk.AccAddress([]byte("test-withdrawal-address"))
 	testAddedDeposit = sdk.NewCoins(testCoin2)
 
@@ -50,7 +51,7 @@ func setServiceDefinition(ctx sdk.Context, k Keeper, author sdk.AccAddress) {
 }
 
 func setServiceBinding(ctx sdk.Context, k Keeper, provider sdk.AccAddress, available bool, disabledTime time.Time) {
-	svcBinding := types.NewServiceBinding(testServiceName, provider, testDeposit, testPricing, available, disabledTime)
+	svcBinding := types.NewServiceBinding(testServiceName, provider, testDeposit, testPricing, testMinRespTime, available, disabledTime)
 	k.SetServiceBinding(ctx, svcBinding)
 
 	pricing, _ := k.ParsePricing(ctx, testPricing)
@@ -123,7 +124,7 @@ func TestKeeper_Bind_Service(t *testing.T) {
 
 	setServiceDefinition(ctx, keeper, author)
 
-	err := keeper.AddServiceBinding(ctx, testServiceName, provider, testDeposit, testPricing)
+	err := keeper.AddServiceBinding(ctx, testServiceName, provider, testDeposit, testPricing, testMinRespTime)
 	require.NoError(t, err)
 
 	svcBinding, found := keeper.GetServiceBinding(ctx, testServiceName, provider)
@@ -133,17 +134,23 @@ func TestKeeper_Bind_Service(t *testing.T) {
 	require.Equal(t, provider, svcBinding.Provider)
 	require.Equal(t, testDeposit, svcBinding.Deposit)
 	require.Equal(t, testPricing, svcBinding.Pricing)
+	require.Equal(t, testMinRespTime, svcBinding.MinRespTime)
 	require.True(t, svcBinding.Available)
 	require.True(t, svcBinding.DisabledTime.IsZero())
 
 	// update binding
-	err = keeper.UpdateServiceBinding(ctx, svcBinding.ServiceName, svcBinding.Provider, testAddedDeposit, testPricing)
+	newPricing := `{"price":"1iris"}`
+	newMinRespTime := uint64(80)
+
+	err = keeper.UpdateServiceBinding(ctx, svcBinding.ServiceName, svcBinding.Provider, testAddedDeposit, newPricing, newMinRespTime)
 	require.NoError(t, err)
 
 	updatedSvcBinding, found := keeper.GetServiceBinding(ctx, svcBinding.ServiceName, svcBinding.Provider)
 	require.True(t, found)
 
 	require.True(t, updatedSvcBinding.Deposit.IsEqual(svcBinding.Deposit.Add(testAddedDeposit)))
+	require.Equal(t, newPricing, updatedSvcBinding.Pricing)
+	require.Equal(t, newMinRespTime, updatedSvcBinding.MinRespTime)
 }
 
 func TestKeeper_Set_Withdraw_Address(t *testing.T) {
@@ -343,7 +350,7 @@ func TestKeeper_Request_Service(t *testing.T) {
 
 	requestContextID, requestContext := setRequestContext(ctx, keeper, consumer, providers, types.RUNNING, 0, "")
 
-	newProviders, totalServiceFees := keeper.FilterServiceProviders(ctx, testServiceName, providers, testServiceFeeCap, consumer)
+	newProviders, totalServiceFees := keeper.FilterServiceProviders(ctx, testServiceName, providers, testTimeout, testServiceFeeCap, consumer)
 	require.Equal(t, providers, newProviders)
 	require.Equal(t, "2iris", totalServiceFees.MainUnitString())
 
@@ -391,8 +398,14 @@ func TestKeeper_Request_Service(t *testing.T) {
 	keeper.SetRequestVolume(ctx, consumer, testServiceName, provider2, 1)
 
 	// service fees will change due to the increased volume
-	_, totalServiceFees = keeper.FilterServiceProviders(ctx, testServiceName, providers, testServiceFeeCap, consumer)
+	_, totalServiceFees = keeper.FilterServiceProviders(ctx, testServiceName, providers, testTimeout, testServiceFeeCap, consumer)
 	require.Equal(t, "1.6iris", totalServiceFees.MainUnitString())
+
+	// satifying providers will change due to the condition changed
+	newTimeout := int64(40)
+
+	newProviders, _ = keeper.FilterServiceProviders(ctx, testServiceName, providers, newTimeout, testServiceFeeCap, consumer)
+	require.Equal(t, 0, len(newProviders))
 }
 
 func TestKeeper_Respond_Service(t *testing.T) {
@@ -445,8 +458,8 @@ func TestKeeper_Respond_Service(t *testing.T) {
 
 	_, found = keeper.GetResponse(ctx, requestID2)
 	require.True(t, found)
-  
-    volume = keeper.GetRequestVolume(ctx, consumer, requestContext.ServiceName, provider)
+
+	volume = keeper.GetRequestVolume(ctx, consumer, requestContext.ServiceName, provider)
 	require.Equal(t, uint64(2), volume)
 
 	earnedFees, found := keeper.GetEarnedFees(ctx, provider)

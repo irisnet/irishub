@@ -103,17 +103,26 @@ func createTestAccs(ctx sdk.Context, numAccs int, initialCoins sdk.Coins, ak *au
 }
 
 type MockServiceKeeper struct {
-	cxtMap      map[string]exported.RequestContext
-	callbackMap map[string]exported.ResponseCallback
+	cxtMap           map[string]exported.RequestContext
+	callbackMap      map[string]exported.ResponseCallback
+	stateCallbackMap map[string]exported.StateCallback
 }
 
 func NewMockServiceKeeper() MockServiceKeeper {
 	cxtMap := make(map[string]exported.RequestContext)
 	callbackMap := make(map[string]exported.ResponseCallback)
+	stateCallbackMap := make(map[string]exported.StateCallback)
 	return MockServiceKeeper{
-		cxtMap:      cxtMap,
-		callbackMap: callbackMap,
+		cxtMap:           cxtMap,
+		callbackMap:      callbackMap,
+		stateCallbackMap: stateCallbackMap,
 	}
+}
+
+func (m MockServiceKeeper) RegisterStateCallback(moduleName string,
+	stateCallback exported.StateCallback) sdk.Error {
+	m.stateCallbackMap[moduleName] = stateCallback
+	return nil
 }
 
 func (m MockServiceKeeper) RegisterResponseCallback(moduleName string,

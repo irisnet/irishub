@@ -88,7 +88,7 @@ func GetCmdBindService(cdc *codec.Codec) *cobra.Command {
 		Use:   "bind",
 		Short: "Bind a service",
 		Example: "iriscli service bind --chain-id=<chain-id> --from=<key-name> --fee=0.3iris " +
-			"--service-name=<service-name> --deposit=1iris --pricing=<pricing content or path>",
+			"--service-name=<service-name> --deposit=1iris --pricing=<pricing content or path> --min-resp-time=50",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
@@ -103,6 +103,7 @@ func GetCmdBindService(cdc *codec.Codec) *cobra.Command {
 			}
 
 			serviceName := viper.GetString(FlagServiceName)
+			minRespTime := uint64(viper.GetInt64(FlagMinRespTime))
 
 			depositStr := viper.GetString(FlagDeposit)
 			deposit, err := cliCtx.ParseCoins(depositStr)
@@ -132,7 +133,7 @@ func GetCmdBindService(cdc *codec.Codec) *cobra.Command {
 
 			pricing = buf.String()
 
-			msg := service.NewMsgBindService(serviceName, provider, deposit, pricing)
+			msg := service.NewMsgBindService(serviceName, provider, deposit, pricing, minRespTime)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -145,6 +146,7 @@ func GetCmdBindService(cdc *codec.Codec) *cobra.Command {
 	_ = cmd.MarkFlagRequired(FlagServiceName)
 	_ = cmd.MarkFlagRequired(FlagDeposit)
 	_ = cmd.MarkFlagRequired(FlagPricing)
+	_ = cmd.MarkFlagRequired(FlagMinRespTime)
 
 	return cmd
 }
@@ -154,7 +156,7 @@ func GetCmdUpdateServiceBinding(cdc *codec.Codec) *cobra.Command {
 		Use:   "update-binding [service-name]",
 		Short: "Update an existing service binding",
 		Example: "iriscli service update-binding <service-name> --chain-id=<chain-id> --from=<key-name> " +
-			"--fee=0.3iris --deposit=1iris --pricing=<pricing content or path>",
+			"--fee=0.3iris --deposit=1iris --pricing=<pricing content or path> --min-resp-time=50",
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
@@ -203,7 +205,9 @@ func GetCmdUpdateServiceBinding(cdc *codec.Codec) *cobra.Command {
 				pricing = buf.String()
 			}
 
-			msg := service.NewMsgUpdateServiceBinding(args[0], provider, deposit, pricing)
+			minRespTime := uint64(viper.GetInt64(FlagMinRespTime))
+
+			msg := service.NewMsgUpdateServiceBinding(args[0], provider, deposit, pricing, minRespTime)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -364,7 +368,7 @@ func GetCmdRefundServiceDeposit(cdc *codec.Codec) *cobra.Command {
 func GetCmdRequestService(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "call",
-		Short: "Call a service",
+		Short: "Initiate a service call",
 		Example: "iriscli service call --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --service-name=<service-name> " +
 			"--providers=<provider list> --service-fee-cap=1iris --data=<input content or path> -timeout=100 --repeated --frequency=150 --total=100",
 		RunE: func(cmd *cobra.Command, args []string) error {
