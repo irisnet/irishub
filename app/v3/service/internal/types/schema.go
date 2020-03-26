@@ -141,7 +141,7 @@ func parseOutputSchema(schemas string) ([]byte, sdk.Error) {
 	}
 
 	outputSchemaBz, err2 := json.Marshal(svcSchemas.Output)
-	if err != nil {
+	if err2 != nil {
 		return nil, ErrInvalidSchemas(DefaultCodespace, fmt.Sprintf("failed to marshal the output schema: %s", err2))
 	}
 
