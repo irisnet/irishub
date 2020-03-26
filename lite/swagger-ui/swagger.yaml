@@ -2644,13 +2644,13 @@ paths:
         '500':
           description: Internal Server Error
     get:
-      summary: Query tokens by condition
+      summary: Query tokens by owner
       tags:
         - Asset
       parameters:
         - in: query
           name: owner
-          description: the owner address of the destination token
+          description: the owner address
           required: false
           schema:
             type: string
@@ -3786,13 +3786,6 @@ components:
           type: boolean
         owner:
           $ref: '#/components/schemas/Address'
-    GatewayFeeOutput:
-      type: object
-      properties:
-        exist:
-          type: boolean
-        fee:
-          $ref: '#/components/schemas/Coin'
     TokenFeesOutput:
       type: object
       properties:
