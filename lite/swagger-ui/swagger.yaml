@@ -1932,10 +1932,10 @@ paths:
               properties:
                 base_tx:
                   $ref: '#/components/schemas/BaseTx'
-  '/service/requests':
+  '/service/contexts':
     post:
-      summary: Call a service
-      description: Call a service with the specified params
+      summary: Initiate a service call
+      description: Initiate a service call with the specified params
       tags:
         - Service
       responses:
@@ -2623,6 +2623,9 @@ paths:
                 symbol:
                   type: string
                   example: 'cat'
+                min_unit:
+                  type: string
+                  example: 'min'
                 initial_supply:
                   type: string
                   example: '1000000000'
@@ -3766,15 +3769,11 @@ components:
     Token:
       type: object
       properties:
-        id:
-          type: string
-        family:
-          type: string
-        source:
-          type: string
         symbol:
           type: string
         name:
+          type: string
+        min_unit:
           type: string
         decimal:
           type: integer

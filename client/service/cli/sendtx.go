@@ -368,7 +368,7 @@ func GetCmdRefundServiceDeposit(cdc *codec.Codec) *cobra.Command {
 func GetCmdRequestService(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "call",
-		Short: "Call a service",
+		Short: "Initiate a service call",
 		Example: "iriscli service call --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --service-name=<service-name> " +
 			"--providers=<provider list> --service-fee-cap=1iris --data=<input content or path> -timeout=100 --repeated --frequency=150 --total=100",
 		RunE: func(cmd *cobra.Command, args []string) error {
