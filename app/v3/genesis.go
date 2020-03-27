@@ -355,6 +355,7 @@ func convertToGenesisState(genesisFileState GenesisFileState) GenesisState {
 		GenTxs:       genesisFileState.GenTxs,
 		SwapData:     genesisFileState.SwapData,
 		HtlcData:     genesisFileState.HtlcData,
+		OracleData:   genesisFileState.OracleData,
 	}
 }
 
@@ -441,6 +442,7 @@ func NewDefaultGenesisFileState() GenesisFileState {
 		RandData:     rand.DefaultGenesisState(),
 		SwapData:     coinswap.DefaultGenesisState(),
 		HtlcData:     htlc.DefaultGenesisState(),
+		OracleData:   oracle.DefaultGenesisState(),
 		GenTxs:       nil,
 	}
 }
