@@ -2632,7 +2632,7 @@ paths:
                 max_supply:
                   type: string
                   example: '2000000000'
-                decimal:
+                scale:
                   type: integer
                   example: 18
                 mintable:
@@ -3775,7 +3775,7 @@ components:
           type: string
         min_unit:
           type: string
-        decimal:
+        scale:
           type: integer
         initial_supply:
           type: string
