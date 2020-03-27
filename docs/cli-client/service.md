@@ -109,12 +109,7 @@ iriscli service bind --chain-id=irishub --from=<key-name> --fee=0.3iris
 
 ```json
 {
-    "price": [
-        {
-            "denom": "iris-atto",
-            "amount": "1000000000000000000"
-        }
-    ]
+    "price": "1iris"
 }
 ```
 
@@ -158,8 +153,8 @@ iriscli service update-binding [service-name] [flags]
 
 | Name, shorthand | Default | Description                                                                         | Required |
 | --------------- | ------- | ----------------------------------------------------------------------------------- | -------- |
-| --deposit       |         | Deposit added for the binding                                                       |          |
-| --pricing       |         | Pricing content or path, which is an instance of the Irishub Service Pricing schema |          |
+| --deposit       |         | Deposit added for the binding, not updated if empty                                                     |          |
+| --pricing       |         | Pricing content or path, which is an instance of the Irishub Service Pricing schema, not updated if empty |          |
 | --min-resp-time |         | Minimum response time, not updated if set to 0 |  |
 
 ### Update an existing service binding
@@ -265,8 +260,8 @@ iriscli service call [flags]
 | --service-name    |         | Service name                                                         | Yes      |
 | --providers       |         | Provider list to request                                             | Yes      |
 | --service-fee-cap |         | Maximum service fee to pay for a single request                      | Yes      |
-| --data            |         | Input of the service request, which is an Input JSON schema instance | Yes      |
-| --timeout         |         | Request timeout                                                      |          |
+| --data            |         | Content or path of the request input, which is an Input JSON schema instance | Yes      |
+| --timeout         |         | Request timeout                                                      |   Yes       |
 | --super-mode      | false   | Indicate if the signer is a super user                               |
 | --repeated        | false   | Indicate if the reqeust is repetitive                                |          |
 | --frequency       |         | Request frequency when repeated, default to `timeout`                |          |
@@ -291,7 +286,7 @@ iriscli service call --chain-id=irishub --from=<key name> --fee=0.3iris --servic
 
 ## iriscli-service-request
 
-Query a request by the request ID
+Query a request by the request ID.
 
 ```bash
 iriscli service request [request-id] [flags]
@@ -340,8 +335,8 @@ iriscli service respond [flags]
 | Name, shorthand | Default | Description                                                             | Required |
 | --------------- | ------- | ----------------------------------------------------------------------- | -------- |
 | --request-id    |         | ID of the request to respond to                                         | Yes      |
-| --result        |         | Result of the service response, which is a Result JSON schema instance  | Yes      |
-| --data          |         | Output of the service response, which is an Output JSON schema instance |          |
+| --result        |         | Content or path of the response result, which is a Result JSON schema instance  | Yes      |
+| --data          |         | Content or path of the response output, which is an Output JSON schema instance |          |
 
 ### Respond to a service request
 
@@ -391,7 +386,7 @@ You can retrieve the `request-id` in the result of [tendermint block](./tendermi
 
 ## iriscli service responses
 
-Query responses by the request context ID and batch counter
+Query responses by the request context ID and batch counter.
 
 ```bash
 iriscli service responses [request-context-id] [batch-counter] [flags]
@@ -423,7 +418,7 @@ You can retrieve the `request-context-id` in the result of [service call](#irisc
 
 ## iriscli service update
 
-Update a request context
+Update a request context.
 
 ```bash
 iriscli service update [request-context-id] [flags]
