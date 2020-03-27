@@ -240,47 +240,15 @@ func GetCmdQueryServiceRequests(cdc *codec.Codec) *cobra.Command {
 				queryByBinding = false
 			}
 
-			var params interface{}
-			var route string
+			var requests service.Requests
 
 			if queryByBinding {
-				params = service.QueryRequestsParams{
-					ServiceName: args[0],
-					Provider:    provider,
-				}
-
-				route = fmt.Sprintf("custom/%s/%s", protocol.ServiceRoute, service.QueryRequests)
+				requests, err = utils.QueryRequestsByBinding(cliCtx, args[0], provider)
 			} else {
-				requestContextID, err := hex.DecodeString(args[0])
-				if err != nil {
-					return err
-				}
-
-				batchCounter, err := strconv.ParseUint(args[1], 10, 64)
-				if err != nil {
-					return err
-				}
-
-				params = service.QueryRequestsByReqCtxParams{
-					RequestContextID: requestContextID,
-					BatchCounter:     batchCounter,
-				}
-
-				route = fmt.Sprintf("custom/%s/%s", protocol.ServiceRoute, service.QueryRequestsByReqCtx)
+				requests, err = utils.QueryRequestsByReqCtx(cliCtx, args[0], args[1])
 			}
 
-			bz, err := cdc.MarshalJSON(params)
 			if err != nil {
-				return err
-			}
-
-			res, err := cliCtx.QueryWithData(route, bz)
-			if err != nil {
-				return err
-			}
-
-			var requests service.Requests
-			if err := cdc.UnmarshalJSON(res, &requests); err != nil {
 				return err
 			}
 
