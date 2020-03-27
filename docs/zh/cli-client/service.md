@@ -108,7 +108,7 @@ iriscli service bind [flags]
 
 ```bash
 iriscli service bind --chain-id=irishub --from=<key-name> --fee=0.3iris
---service-name=<service name> --deposit=10000iris --pricing=<pricing> --min-resp-time=50
+--service-name=<service name> --deposit=10000iris --pricing=<pricing content or path/to/pricing.json> --min-resp-time=50
 ```
 
 ### Pricing内容示例
@@ -276,7 +276,7 @@ iriscli service call [flags]
 
 ```bash
 iriscli service call --chain-id=irishub --from=<key name> --fee=0.3iris --service-name=<service name>
---providers=<provider list> --service-fee-cap=1iris --data=<request data> --timeout=100 --repeated --frequency=150 --total=100
+--providers=<provider list> --service-fee-cap=1iris --data=<request input or path/to/input.json> --timeout=100 --repeated --frequency=150 --total=100
 ```
 
 ### 请求输入示例
@@ -347,7 +347,7 @@ iriscli service respond [flags]
 
 ```bash
 iriscli service respond --chain-id=irishub --from=<key-name> --fee=0.3iris
---request-id=<request-id> --result=<response result> --data=<response output>
+--request-id=<request-id> --result=<response result or path/to/result.json> --data=<response output or path/to/output.json>
 ```
 
 :::tip
