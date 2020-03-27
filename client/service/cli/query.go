@@ -174,6 +174,7 @@ func GetCmdQueryWithdrawAddr(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
+// GetCmdQueryServiceRequest implements the query service request command
 func GetCmdQueryServiceRequest(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "request [request-id]",
@@ -222,6 +223,7 @@ func GetCmdQueryServiceRequest(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
+// GetCmdQueryServiceRequests implements the query service requests command
 func GetCmdQueryServiceRequests(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "requests [service-name] [provider] | [request-context-id] [batch-counter]",
@@ -289,6 +291,7 @@ func GetCmdQueryServiceRequests(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
+// GetCmdQueryServiceResponse implements the query service response command
 func GetCmdQueryServiceResponse(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "response [request-id]",
@@ -337,6 +340,7 @@ func GetCmdQueryServiceResponse(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
+// GetCmdQueryServiceResponses implements the query service responses command
 func GetCmdQueryServiceResponses(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "responses [request-context-id] [batch-counter]",
@@ -384,6 +388,7 @@ func GetCmdQueryServiceResponses(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
+// GetCmdQueryRequestContext implements the query request context command
 func GetCmdQueryRequestContext(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "request-context [request-context-id]",
@@ -414,6 +419,7 @@ func GetCmdQueryRequestContext(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
+// GetCmdQueryEarnedFees implements the query earned fees command
 func GetCmdQueryEarnedFees(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "fees [provider]",
