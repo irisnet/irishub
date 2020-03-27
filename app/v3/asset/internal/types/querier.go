@@ -13,18 +13,17 @@ const (
 	QueryFees   = "fees"
 )
 
-// QueryTokenParams is the query parameters for 'custom/asset/tokens/{symbol}'
+// QueryTokenParams is the query parameters for 'custom/asset/token'
 type QueryTokenParams struct {
 	Symbol string
 }
 
 // QueryTokensParams is the query parameters for 'custom/asset/tokens'
 type QueryTokensParams struct {
-	Symbol string
-	Owner  string
+	Owner sdk.AccAddress
 }
 
-// QueryTokenFeesParams is the query parameters for 'custom/asset/fees/tokens'
+// QueryTokenFeesParams is the query parameters for 'custom/asset/fees'
 type QueryTokenFeesParams struct {
 	Symbol string
 }
@@ -84,9 +83,9 @@ func (tsop TokensOutput) String() string {
 	return tokens.String()
 }
 
-// TokenFeesOutput is for the token fees query output
+// TokenFeesOutput is used for the token fees query output
 type TokenFeesOutput struct {
-	Exist    bool     `json:"exist"`     // indicate if the token has existed
+	Exist    bool     `json:"exist"`     // indicate if the token already exists
 	IssueFee sdk.Coin `json:"issue_fee"` // issue fee
 	MintFee  sdk.Coin `json:"mint_fee"`  // mint fee
 }

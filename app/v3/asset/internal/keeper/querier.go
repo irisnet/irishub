@@ -49,30 +49,15 @@ func queryToken(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, 
 	return bz, nil
 }
 
-func queryTokens(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) (bz []byte, err sdk.Error) {
+func queryTokens(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
 	var params types.QueryTokensParams
 	if err := keeper.cdc.UnmarshalJSON(req.Data, &params); err != nil {
 		return nil, sdk.ParseParamsErr(err)
 	}
 
-	var tokens []types.TokenOutput
-
-	if len(params.Symbol) > 0 {
-		if err := types.CheckSymbol(params.Symbol); err != nil {
-			return nil, err
-		}
-
-		token, err := queryTokenBySymbol(ctx, keeper, strings.ToLower(params.Symbol))
-		if err != nil {
-			return nil, err
-		}
-
-		tokens = append(tokens, token)
-	} else {
-		tokens, err = queryTokensByOwner(ctx, keeper, params.Owner)
-		if err != nil {
-			return nil, err
-		}
+	tokens, err := queryTokensByOwner(ctx, keeper, params.Owner)
+	if err != nil {
+		return nil, err
 	}
 
 	bz, er := codec.MarshalJSONIndent(keeper.cdc, tokens)
@@ -125,7 +110,7 @@ func queryTokenBySymbol(ctx sdk.Context, keeper Keeper, symbol string) (types.To
 	return types.NewTokenOutputFrom(token), nil
 }
 
-func queryTokensByOwner(ctx sdk.Context, keeper Keeper, owner string) (tokens types.TokensOutput, err sdk.Error) {
+func queryTokensByOwner(ctx sdk.Context, keeper Keeper, owner sdk.AccAddress) (tokens types.TokensOutput, err sdk.Error) {
 	if len(owner) == 0 {
 		keeper.IterateTokens(ctx, func(token types.FungibleToken) (stop bool) {
 			tokens = append(tokens, types.NewTokenOutputFrom(token))
@@ -136,12 +121,7 @@ func queryTokensByOwner(ctx sdk.Context, keeper Keeper, owner string) (tokens ty
 		return
 	}
 
-	ownerAcc, er := sdk.AccAddressFromBech32(owner)
-	if er != nil {
-		return nil, sdk.ParseParamsErr(er)
-	}
-
-	keeper.iterateTokensWithOwner(ctx, ownerAcc, func(token types.FungibleToken) (stop bool) {
+	keeper.iterateTokensWithOwner(ctx, owner, func(token types.FungibleToken) (stop bool) {
 		tokens = append(tokens, types.NewTokenOutputFrom(token))
 		return false
 	})

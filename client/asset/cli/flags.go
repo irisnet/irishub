@@ -19,31 +19,24 @@ const (
 )
 
 var (
+	FsIssueToken         = flag.NewFlagSet("", flag.ContinueOnError)
 	FsEditToken          = flag.NewFlagSet("", flag.ContinueOnError)
-	FsTokenIssue         = flag.NewFlagSet("", flag.ContinueOnError)
-	FsTokensQuery        = flag.NewFlagSet("", flag.ContinueOnError)
-	FsFeeQuery           = flag.NewFlagSet("", flag.ContinueOnError)
 	FsTransferTokenOwner = flag.NewFlagSet("", flag.ContinueOnError)
 	FsMintToken          = flag.NewFlagSet("", flag.ContinueOnError)
 )
 
 func init() {
-	FsTokenIssue.String(FlagSymbol, "", "the token symbol. Once created, it cannot be modified")
-	FsTokenIssue.String(FlagName, "", "the token name, e.g. IRIS Network")
-	FsTokenIssue.String(FlagMinUnit, "", "the minimum unit name of token, e.g. wei")
-	FsTokenIssue.Uint8(FlagScale, 0, "the token decimal. The maximum value is 18")
-	FsTokenIssue.Uint64(FlagInitialSupply, 0, "the initial supply token of token")
-	FsTokenIssue.Uint64(FlagMaxSupply, asset.MaximumAssetMaxSupply, "the max supply of the token")
-	FsTokenIssue.Bool(FlagMintable, false, "whether the token can be minted, default false")
-
-	FsTokensQuery.String(FlagOwner, "", "the owner address to be queried")
-	FsTokensQuery.String(FlagSymbol, "", "the symbol of the token")
-
-	FsFeeQuery.String(FlagSymbol, "", "the token symbol. Once created, it cannot be modified")
+	FsIssueToken.String(FlagSymbol, "", "the token symbol. Once created, it cannot be modified")
+	FsIssueToken.String(FlagName, "", "the token name, e.g. IRIS Network")
+	FsIssueToken.String(FlagMinUnit, "", "the minimum unit name of the token, e.g. wei")
+	FsIssueToken.Uint8(FlagScale, 0, "the token decimal. The maximum value is 18")
+	FsIssueToken.Uint64(FlagInitialSupply, 0, "the initial supply of the token")
+	FsIssueToken.Uint64(FlagMaxSupply, asset.MaximumAssetMaxSupply, "the max supply of the token")
+	FsIssueToken.Bool(FlagMintable, false, "whether the token can be minted, default to false")
 
 	FsEditToken.String(FlagName, "[do-not-modify]", "the token name, e.g. IRIS Network")
-	FsEditToken.Uint64(FlagMaxSupply, 0, "the max supply of token")
-	FsEditToken.String(FlagMintable, "", "whether the token can be minted, default false")
+	FsEditToken.Uint64(FlagMaxSupply, 0, "the max supply of the token")
+	FsEditToken.String(FlagMintable, "", "whether the token can be minted, default to false")
 
 	FsTransferTokenOwner.String(FlagTo, "", "the new owner")
 
