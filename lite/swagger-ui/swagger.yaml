@@ -3944,9 +3944,6 @@ components:
         repeated_frequency:
           type: integer
           example: "5"
-        repeated_total:
-          type: integer
-          example: "-1"
         response_threshold:
           type: integer
           example: 1

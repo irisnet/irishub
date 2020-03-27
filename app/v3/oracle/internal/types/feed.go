@@ -80,7 +80,6 @@ type FeedContext struct {
 	Timeout           int64                       `json:"timeout"`
 	ServiceFeeCap     sdk.Coins                   `json:"service_fee_cap"`
 	RepeatedFrequency uint64                      `json:"repeated_frequency"`
-	RepeatedTotal     int64                       `json:"repeated_total"`
 	ResponseThreshold uint16                      `json:"response_threshold"`
 	State             service.RequestContextState `json:"state"`
 }
@@ -100,7 +99,6 @@ func (f FeedContext) String() string {
 	Timeout:                    %d
 	ServiceFeeCap:              %s
 	RepeatedFrequency:          %d
-	RepeatedTotal:              %d
 	ResponseThreshold:          %d
 	State:                      %s`,
 		f.Feed.String(),
@@ -110,7 +108,6 @@ func (f FeedContext) String() string {
 		f.Timeout,
 		f.ServiceFeeCap,
 		f.RepeatedFrequency,
-		f.RepeatedTotal,
 		f.ResponseThreshold,
 		f.State.String(),
 	)
@@ -130,7 +127,6 @@ func (f FeedContext) HumanString(converter sdk.CoinsConverter) string {
 	Timeout:                    %d
 	ServiceFeeCap:              %s
 	RepeatedFrequency:          %d
-	RepeatedTotal:              %d
 	ResponseThreshold:          %d
 	State:                      %s`,
 		f.Feed.String(),
@@ -140,7 +136,6 @@ func (f FeedContext) HumanString(converter sdk.CoinsConverter) string {
 		f.Timeout,
 		converter.ToMainUnit(f.ServiceFeeCap),
 		f.RepeatedFrequency,
-		f.RepeatedTotal,
 		f.ResponseThreshold,
 		f.State.String(),
 	)
