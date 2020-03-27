@@ -41,20 +41,20 @@ func (k Keeper) getTokenIssueFee(ctx sdk.Context, symbol string) sdk.Coin {
 	return sdk.NewCoin(sdk.IrisAtto, convertFeeToInt(fee))
 }
 
-// getTokenMintFee returns the token mint fee
+// getTokenMintFee returns the token minting fee
 func (k Keeper) getTokenMintFee(ctx sdk.Context, symbol string) sdk.Coin {
 	// get params
 	params := k.GetParamSet(ctx)
 	mintTokenFeeRatio := params.MintTokenFeeRatio
 
-	// compute the issurance fee and mint fee
+	// compute the issurance and minting fees
 	issueFee := k.getTokenIssueFee(ctx, symbol)
 	mintFee := sdk.NewDecFromInt(issueFee.Amount).Mul(mintTokenFeeRatio)
 
 	return sdk.NewCoin(sdk.IrisAtto, convertFeeToInt(mintFee))
 }
 
-// feeHandler handles the fee of gateway or asset
+// feeHandler handles the fee
 func feeHandler(ctx sdk.Context, k Keeper, feeAcc sdk.AccAddress, fee sdk.Coin) sdk.Error {
 	params := k.GetParamSet(ctx)
 	assetTaxRate := params.AssetTaxRate
@@ -86,7 +86,7 @@ func calcFeeByBase(name string, baseFee sdk.Int) sdk.Dec {
 	return actualFee
 }
 
-// calcFeeFactor computes the fee factor of the given name(common for gateway and asset)
+// calcFeeFactor computes the fee factor of the given name
 // Note: make sure that the name size is examined before invoking the function
 func calcFeeFactor(name string) sdk.Dec {
 	nameLen := len(name)
