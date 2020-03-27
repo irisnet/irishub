@@ -57,7 +57,7 @@ func NewKeeper(
 	return keeper
 }
 
-// Codespace return the codespace
+// Codespace returns the codespace
 func (k Keeper) Codespace() sdk.CodespaceType {
 	return k.codespace
 }
@@ -67,11 +67,12 @@ func (k Keeper) GetCdc() *codec.Codec {
 	return k.cdc
 }
 
+// GetMetrics returns the metrics
 func (k Keeper) GetMetrics() *types.Metrics {
 	return k.metrics
 }
 
-// InitMetrics
+// InitMetrics initializes the metrics
 func (k Keeper) InitMetrics(store sdk.KVStore) {
 	iterator := k.AllActiveRequestsIterator(store)
 	defer iterator.Close()
@@ -81,14 +82,14 @@ func (k Keeper) InitMetrics(store sdk.KVStore) {
 	}
 }
 
-// get service params from the global param store
+// GetParamSet gets service params from the global param store
 func (k Keeper) GetParamSet(ctx sdk.Context) types.Params {
 	var params types.Params
 	k.paramSpace.GetParamSet(ctx, &params)
 	return params
 }
 
-// set service params from the global param store
+// SetParamSet sets service params to the global param store
 func (k Keeper) SetParamSet(ctx sdk.Context, params types.Params) {
 	k.paramSpace.SetParamSet(ctx, &params)
 }

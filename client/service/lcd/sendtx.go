@@ -57,7 +57,7 @@ func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec
 		refundServiceDepositHandlerFn(cdc, cliCtx),
 	).Methods("POST")
 
-	// call a service
+	// initiate a service call
 	r.HandleFunc(
 		"/service/contexts",
 		requestServiceHandlerFn(cdc, cliCtx),
