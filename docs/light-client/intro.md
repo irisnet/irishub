@@ -145,8 +145,8 @@ This api supports the following special parameters. By default, their values are
 2. `PUT /asset/tokens/{symbol}`: Edit an existing token
 3. `POST /asset/tokens/{symbol}/mint`: Mint tokens to a specified address
 4. `POST /asset/tokens/{symbol}/transfer`: Transfer the owner of a token to a new owner
-5. `GET /asset/tokens`: Query tokens by condition
-6. `GET /asset/tokens/{symbol}`: Query a token by symbol
+5. `GET /asset/tokens/{symbol}`: Query a token by symbol
+6. `GET /asset/tokens`: Query tokens by owner
 7. `GET /asset/tokens/{symbol}/fee`: Query the fees for issuing and minting the specified token
 
 ### Coinswap module APIs
