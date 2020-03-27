@@ -96,7 +96,6 @@ func buildFeedContext(ctx sdk.Context, k Keeper, feed types.Feed) (feedCtx types
 		feedCtx.ServiceName = reqCtx.ServiceName
 		feedCtx.Input = reqCtx.Input
 		feedCtx.RepeatedFrequency = reqCtx.RepeatedFrequency
-		feedCtx.RepeatedTotal = reqCtx.RepeatedTotal
 		feedCtx.ServiceFeeCap = reqCtx.ServiceFeeCap
 		feedCtx.Timeout = reqCtx.Timeout
 		feedCtx.ResponseThreshold = reqCtx.ResponseThreshold
