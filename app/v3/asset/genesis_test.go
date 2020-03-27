@@ -61,25 +61,23 @@ func TestExportGenesis(t *testing.T) {
 		Tokens: Tokens{ft},
 	}
 
-	//InitGenesis
+	// initialize genesis
 	InitGenesis(ctx, keeper, genesis)
 
-	// query all token
+	// query all tokens
 	var tokens Tokens
 	keeper.IterateTokens(ctx, func(token FungibleToken) (stop bool) {
 		tokens = append(tokens, token)
 		return false
 	})
 
-	//check param
 	require.Equal(t, len(tokens), 1)
 
-	// export gateways
+	// export genesis
 	genesisState := ExportGenesis(ctx, keeper)
 
 	require.Equal(t, DefaultParams(), genesisState.Params)
 	for _, token := range genesisState.Tokens {
 		require.Equal(t, token, ft)
 	}
-
 }
