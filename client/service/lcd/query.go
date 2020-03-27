@@ -426,8 +426,8 @@ func queryEarnedFeesHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.
 			return
 		}
 
-		params := service.QueryFeesParams{
-			Address: provider,
+		params := service.QueryEarnedFeesParams{
+			Provider: provider,
 		}
 
 		bz, err := cdc.MarshalJSON(params)
@@ -436,7 +436,7 @@ func queryEarnedFeesHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.
 			return
 		}
 
-		route := fmt.Sprintf("custom/%s/%s", protocol.ServiceRoute, service.QueryFees)
+		route := fmt.Sprintf("custom/%s/%s", protocol.ServiceRoute, service.QueryEarnedFees)
 		res, err := cliCtx.QueryWithData(route, bz)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())

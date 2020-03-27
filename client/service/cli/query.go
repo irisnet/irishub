@@ -428,8 +428,8 @@ func GetCmdQueryEarnedFees(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			params := service.QueryFeesParams{
-				Address: provider,
+			params := service.QueryEarnedFeesParams{
+				Provider: provider,
 			}
 
 			bz, err := cdc.MarshalJSON(params)
@@ -437,7 +437,7 @@ func GetCmdQueryEarnedFees(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			route := fmt.Sprintf("custom/%s/%s", protocol.ServiceRoute, service.QueryFees)
+			route := fmt.Sprintf("custom/%s/%s", protocol.ServiceRoute, service.QueryEarnedFees)
 			res, err := cliCtx.QueryWithData(route, bz)
 			if err != nil {
 				return err
