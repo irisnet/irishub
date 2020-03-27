@@ -88,7 +88,7 @@ func GetCmdBindService(cdc *codec.Codec) *cobra.Command {
 		Use:   "bind",
 		Short: "Bind a service",
 		Example: "iriscli service bind --chain-id=<chain-id> --from=<key-name> --fee=0.3iris " +
-			"--service-name=<service-name> --deposit=1iris --pricing=<pricing content or path> --min-resp-time=50",
+			"--service-name=<service-name> --deposit=1iris --pricing=<pricing content or path/to/pricing.json> --min-resp-time=50",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
@@ -157,7 +157,7 @@ func GetCmdUpdateServiceBinding(cdc *codec.Codec) *cobra.Command {
 		Use:   "update-binding [service-name]",
 		Short: "Update an existing service binding",
 		Example: "iriscli service update-binding <service-name> --chain-id=<chain-id> --from=<key-name> " +
-			"--fee=0.3iris --deposit=1iris --pricing=<pricing content or path> --min-resp-time=50",
+			"--fee=0.3iris --deposit=1iris --pricing=<pricing content or path/to/pricing.json> --min-resp-time=50",
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
@@ -376,7 +376,7 @@ func GetCmdRequestService(cdc *codec.Codec) *cobra.Command {
 		Use:   "call",
 		Short: "Initiate a service call",
 		Example: "iriscli service call --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --service-name=<service-name> " +
-			"--providers=<provider list> --service-fee-cap=1iris --data=<input content or path> -timeout=100 --repeated --frequency=150 --total=100",
+			"--providers=<provider list> --service-fee-cap=1iris --data=<input content or path/to/input.json> -timeout=100 --repeated --frequency=150 --total=100",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
@@ -470,7 +470,7 @@ func GetCmdRespondService(cdc *codec.Codec) *cobra.Command {
 		Use:   "respond",
 		Short: "Respond to a service request",
 		Example: "iriscli service respond --chain-id=<chain-id> --from=<key-name> --fee=0.3iris " +
-			"--request-id=<request-id> --result=<result content or path> --data=<output content or path>",
+			"--request-id=<request-id> --result=<result content or path/to/result.json> --data=<output content or path/to/output.json>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
