@@ -187,7 +187,7 @@ func QueryResponseByTxQuery(cliCtx context.CLIContext, params service.QueryRespo
 	return response, nil
 }
 
-// QueryRequestsByBinding queries requests by the service binding
+// QueryRequestsByBinding queries active requests by the service binding
 func QueryRequestsByBinding(cliCtx context.CLIContext, serviceName string, provider sdk.AccAddress) (service.Requests, error) {
 	params := service.QueryRequestsParams{
 		ServiceName: serviceName,
@@ -213,7 +213,7 @@ func QueryRequestsByBinding(cliCtx context.CLIContext, serviceName string, provi
 	return requests, nil
 }
 
-// QueryRequestsByReqCtx queries requests by the request context ID
+// QueryRequestsByReqCtx queries active requests by the request context ID
 func QueryRequestsByReqCtx(cliCtx context.CLIContext, reqCtxIDStr, batchCounterStr string) (service.Requests, error) {
 	requestContextID, err := hex.DecodeString(reqCtxIDStr)
 	if err != nil {
