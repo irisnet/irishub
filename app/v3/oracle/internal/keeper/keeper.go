@@ -194,9 +194,6 @@ func (k Keeper) HandlerResponse(ctx sdk.Context,
 	requestContextID cmn.HexBytes,
 	responseOutput []string,
 	err error) (tags sdk.Tags) {
-	ctx = ctx.WithLogger(
-		ctx.Logger().With("handler", "HandlerResponse").With("module", "iris/oracle"),
-	)
 	if len(responseOutput) == 0 || err != nil {
 		ctx.Logger().Error(
 			"Oracle feed failed", "requestContextID",
@@ -250,9 +247,6 @@ func (k Keeper) HandlerResponse(ctx sdk.Context,
 
 //HandlerStateChanged is responsible for update feed state
 func (k Keeper) HandlerStateChanged(ctx sdk.Context, requestContextID cmn.HexBytes, _ string) (tags sdk.Tags) {
-	ctx = ctx.WithLogger(
-		ctx.Logger().With("handler", "HandlerStateChanged").With("module", "iris/oracle"),
-	)
 	reqCtx, existed := k.sk.GetRequestContext(ctx, requestContextID)
 	if !existed {
 		ctx.Logger().Error(
