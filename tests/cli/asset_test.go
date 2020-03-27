@@ -65,8 +65,7 @@ func TestIrisCLIToken(t *testing.T) {
 		t.Error("Test Failed: (19, 20) expected, received:", amt)
 	}
 
-	query := fmt.Sprintf("--symbol=%s", symbol)
-	token := executeGetToken(t, fmt.Sprintf("iriscli asset token tokens %s %v", query, flags))
+	token := executeGetToken(t, fmt.Sprintf("iriscli asset token token %s %v", symbol, flags))
 	require.Equal(t, strings.ToLower(strings.TrimSpace(symbol)), token.Symbol)
 	require.Equal(t, strings.ToLower(strings.TrimSpace(minUnit)), token.MinUnit)
 	require.Equal(t, strings.TrimSpace(name), token.Name)
@@ -89,8 +88,7 @@ func TestIrisCLIToken(t *testing.T) {
 	require.True(t, executeWrite(t, editCmd, sdk.DefaultKeyPass))
 	tests.WaitForNextNBlocksTM(2, port)
 
-	query = fmt.Sprintf("--symbol=%s", symbol)
-	token = executeGetToken(t, fmt.Sprintf("iriscli asset token tokens %s %v", query, flags))
+	token = executeGetToken(t, fmt.Sprintf("iriscli asset token token %s %v", symbol, flags))
 
 	require.Equal(t, name, token.Name)
 	require.Equal(t, uint64(maxSupply), token.MaxSupply)
@@ -118,7 +116,6 @@ func TestIrisCLIToken(t *testing.T) {
 	require.True(t, executeWrite(t, transferCmd, sdk.DefaultKeyPass))
 	tests.WaitForNextNBlocksTM(2, port)
 
-	query = fmt.Sprintf("--owner=%s", barAddr.String())
-	token = executeGetToken(t, fmt.Sprintf("iriscli asset token tokens %s %v", query, flags))
+	token = executeGetToken(t, fmt.Sprintf("iriscli asset token token %s %v", symbol, flags))
 	require.Equal(t, barAddr.String(), token.Owner.String())
 }

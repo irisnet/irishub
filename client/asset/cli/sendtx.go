@@ -20,7 +20,7 @@ import (
 func GetTokenCmd(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:                        "token",
-		Short:                      "token transaction subcommands",
+		Short:                      "token subcommands",
 		DisableFlagParsing:         true,
 		SuggestionsMinimumDistance: 2,
 	}
@@ -32,6 +32,7 @@ func GetTokenCmd(cdc *codec.Codec) *cobra.Command {
 	)...)
 
 	cmd.AddCommand(client.GetCommands(
+		getCmdQueryToken(cdc),
 		getCmdQueryTokens(cdc),
 		getCmdQueryFee(cdc),
 	)...)
@@ -102,7 +103,7 @@ func getCmdIssueToken(cdc *codec.Codec) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().AddFlagSet(FsTokenIssue)
+	cmd.Flags().AddFlagSet(FsIssueToken)
 	_ = cmd.MarkFlagRequired(FlagSymbol)
 	_ = cmd.MarkFlagRequired(FlagName)
 	_ = cmd.MarkFlagRequired(FlagInitialSupply)

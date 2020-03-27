@@ -63,16 +63,22 @@ func (k Keeper) RequestRand(
 	// get tx hash
 	txHash := sdk.SHA256(ctx.TxBytes())
 
-	// create paused request context
-	requestContextID, requestTags, err := k.RequestService(ctx, consumer, serviceFeeCap)
-	if err != nil {
-		return nil, err
+	var request types.Request
+	if oracle {
+		// create paused request context
+		requestContextID, requestTags, err := k.RequestService(ctx, consumer, serviceFeeCap)
+		if err != nil {
+			return nil, err
+		}
+
+		tags = tags.AppendTags(requestTags)
+
+		// build request
+		request = types.NewRequest(currentHeight, consumer, txHash, oracle, serviceFeeCap, requestContextID)
+	} else {
+		// build request
+		request = types.NewRequest(currentHeight, consumer, txHash, oracle, nil, nil)
 	}
-
-	tags = tags.AppendTags(requestTags)
-
-	// build request
-	request := types.NewRequest(currentHeight, consumer, txHash, oracle, serviceFeeCap, requestContextID)
 
 	// generate the request id
 	reqID := types.GenerateRequestID(request)

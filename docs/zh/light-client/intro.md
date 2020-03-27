@@ -141,12 +141,12 @@ irislcd start --node=tcp://localhost:26657 --chain-id=irishub --laddr=tcp://0.0.
 
 ### Asset模块的APIs
 
-1. `POST /asset/tokens`: 发行一种通证
+1. `POST /asset/tokens`: 发行一个通证
 2. `PUT /asset/tokens/{symbol}`: 编辑一个已存在的通证
 3. `POST /asset/tokens/{symbol}/mint`: 增发通证到指定地址
 4. `POST /asset/tokens/{symbol}/transfer`: 转让通证的所有权
-5. `GET /asset/tokens`: 通过`owner`查询通证列表
-6. `GET /asset/tokens/{symbol}`: 通过`symbol`查询指定通证信息
+5. `GET /asset/tokens/{symbol}`: 查询通证
+6. `GET /asset/tokens`: 查询指定所有者的通证集合
 7. `GET /asset/tokens/{symbol}/fee`: 查询发行和铸造指定通证的费用
 
 ### Coinswap模块的APIs
