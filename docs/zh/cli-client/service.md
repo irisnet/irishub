@@ -47,7 +47,7 @@ iriscli service define [flags]
 | --description        |      | 服务的描述                  |      |
 | --author-description |      | 服务创建者的描述            |      |
 | --tags               |      | 服务的标签列表              |      |
-| --schemas            |      | 服务接口的schemas内容或路径 | 是   |
+| --schemas            |      | 服务接口schemas的内容或文件路径 | 是   |
 
 ### 定义一个新的服务
 
@@ -99,7 +99,7 @@ iriscli service bind [flags]
 | -------------- | ---- | ----------------------------------------------------- | ---- |
 | --service-name |      | 服务名称                                              | 是   |
 | --deposit      |      | 服务绑定的押金                                        | 是   |
-| --pricing      |      | 服务定价内容或路径，需符合Irishub Pricing JSON schema |      |
+| --pricing      |      | 服务定价内容或文件路径，需符合Irishub Pricing JSON schema |   是   |
 | --min-resp-time |     | 最小响应时间 | 是 |
 
 ### 绑定一个存在的服务定义
@@ -108,19 +108,14 @@ iriscli service bind [flags]
 
 ```bash
 iriscli service bind --chain-id=irishub --from=<key-name> --fee=0.3iris
---service-name=<service name> --deposit=10000iris --pricing=<pricing> --min-resp-time=50
+--service-name=<service name> --deposit=10000iris --pricing=<pricing content or path/to/pricing.json> --min-resp-time=50
 ```
 
 ### Pricing内容示例
 
 ```json
 {
-    "price": [
-        {
-            "denom": "iris-atto",
-            "amount": "1000000000000000000"
-        }
-    ]
+    "price": "1iris"
 }
 ```
 
@@ -163,8 +158,8 @@ iriscli service update-binding [service-name] [flags]
 **标志：**
 | 名称，速记     | 默认 | 描述                                                  | 必须 |
 | -------------- | ---- | ----------------------------------------------------- | ---- |
-| --deposit      |      | 增加的绑定押金                                        |      |
-| --pricing      |      | 服务定价内容或路径，需符合Irishub Pricing JSON schema |      |
+| --deposit      |      | 增加的绑定押金，为空则不更新                                      |      |
+| --pricing      |      | 服务定价内容或文件路径，需符合Irishub Pricing JSON schema，为空则不更新 |      |
 | --min-resp-time |     | 最小响应时间，为0则不更新 | |
 
 ### 更新一个存在的服务绑定
@@ -177,7 +172,7 @@ iriscli service update-binding <service-name> --chain-id=irishub --from=<key-nam
 
 ## iriscli service set-withdraw-addr
 
-设置服务提供者的提取地址
+设置服务提供者的提取地址。
 
 ```bash
 iriscli service set-withdraw-addr [withdrawal-address] [flags]
@@ -191,7 +186,7 @@ iriscli service set-withdraw-addr <withdrawal address> --chain-id=irishub --from
 
 ## iriscli service withdraw-addr
 
-查询服务提供者的提取地址
+查询服务提供者的提取地址。
 
 ```bash
 iriscli service withdraw-addr [provider] [flags]
@@ -270,8 +265,8 @@ iriscli service call [flags]
 | --name            |       | 服务名称                                | 是   |
 | --providers       |       | 服务提供者列表                          | 是   |
 | --service-fee-cap |       | 愿意为单个请求支付的最大服务费用        | 是   |
-| --data            |       | 请求的输入，是一个Input JSON schema实例 | 是   |
-| --timeout         |       | 请求超时                                |      |
+| --data            |       | 请求输入的内容或文件路径，是一个Input JSON schema实例 | 是   |
+| --timeout         |       | 请求超时                                |   是   |
 | --super-mode      | false | 签名者是否为超级用户                    |
 | --repeated        | false | 请求是否为重复性的                      |      |
 | --frequency       |       | 重复性请求的请求频率；默认为`timeout`值 |      |
@@ -281,7 +276,7 @@ iriscli service call [flags]
 
 ```bash
 iriscli service call --chain-id=irishub --from=<key name> --fee=0.3iris --service-name=<service name>
---providers=<provider list> --service-fee-cap=1iris --data=<request data> --timeout=100 --repeated --frequency=150 --total=100
+--providers=<provider list> --service-fee-cap=1iris --data=<request input or path/to/input.json> --timeout=100 --repeated --frequency=150 --total=100
 ```
 
 ### 请求输入示例
@@ -345,14 +340,14 @@ iriscli service respond [flags]
 | 名称，速记   | 默认 | 描述                                         | 必须 |
 | ------------ | ---- | -------------------------------------------- | ---- |
 | --request-id |      | 欲响应请求的ID                               | 是   |
-| --result     |      | 服务响应的结果, 是一个Result JSON schema实例 | 是   |
-| --data       |      | 服务响应的输出, 是一个Output JSON schema实例 |      |
+| --result     |      | 响应结果的内容或文件路径, 是一个Result JSON schema实例 | 是   |
+| --data       |      | 响应输出的内容或文件路径, 是一个Output JSON schema实例 |      |
 
 ### 响应一个服务请求
 
 ```bash
 iriscli service respond --chain-id=irishub --from=<key-name> --fee=0.3iris
---request-id=<request-id> --result=<response result> --data=<response output>
+--request-id=<request-id> --result=<response result or path/to/result.json> --data=<response output or path/to/output.json>
 ```
 
 :::tip

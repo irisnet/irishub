@@ -108,10 +108,10 @@ func EndBlocker(ctx sdk.Context, k Keeper) (tags sdk.Tags) {
 	k.IterateNewRequestBatch(ctx, ctx.BlockHeight(), newRequestBatchHandler)
 
 	for provider, requests := range providerRequests {
-		requestsJson, _ := json.Marshal(requests)
+		requestsJSON, _ := json.Marshal(requests)
 		tags = tags.AppendTags(sdk.NewTags(
 			sdk.ActionTag(types.ActionNewBatchRequest, types.TagProvider), []byte(provider),
-			sdk.ActionTag(types.ActionNewBatchRequest, provider), requestsJson,
+			sdk.ActionTag(types.ActionNewBatchRequest, provider), requestsJSON,
 		))
 	}
 

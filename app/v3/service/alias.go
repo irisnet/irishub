@@ -23,7 +23,7 @@ const (
 	QueryRequestContext   = types.QueryRequestContext
 	QueryRequestsByReqCtx = types.QueryRequestsByReqCtx
 	QueryResponses        = types.QueryResponses
-	QueryFees             = types.QueryFees
+	QueryEarnedFees       = types.QueryEarnedFees
 	RUNNING               = types.RUNNING
 	PAUSED                = types.PAUSED
 	COMPLETED             = types.COMPLETED
@@ -126,5 +126,5 @@ type (
 	QueryRequestContextParams   = types.QueryRequestContextParams
 	QueryRequestsByReqCtxParams = types.QueryRequestsByReqCtxParams
 	QueryResponsesParams        = types.QueryResponsesParams
-	QueryFeesParams             = types.QueryFeesParams
+	QueryEarnedFeesParams       = types.QueryEarnedFeesParams
 )

@@ -1678,7 +1678,7 @@ paths:
                   example: '10000iris'
                 pricing:
                   type: string
-                  example: '{"price":[{"denom":"iris-atto","amount":"1000000000000000000"}]}'
+                  example: '{"price":"1iris"}'
                 min_resp_time:
                   type: integer
                   example: '50'
@@ -1749,7 +1749,7 @@ paths:
                   example: '1iris'
                 pricing:
                   type: string
-                  example: '{"price":[{"denom":"iris-atto","amount":"1000000000000000000"}]}'
+                  example: '{"price":"1iris"}'
                 min_resp_time:
                   type: integer
                   example: '50'
@@ -3988,7 +3988,7 @@ components:
             $ref: '#/components/schemas/Coin'
         pricing:
           type: string
-          example: '{"price":[{"denom":"iris-atto","amount":"1000000"}]}'
+          example: '{"price":"1iris"}'
         min_resp_time:
           type: integer
         available:

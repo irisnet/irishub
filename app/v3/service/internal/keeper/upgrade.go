@@ -5,6 +5,7 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 )
 
+// Init initializes the service module
 func (k Keeper) Init(ctx sdk.Context, svcDefinitions []types.ServiceDefinition) {
 	for _, definition := range svcDefinitions {
 		k.SetServiceDefinition(ctx, definition)

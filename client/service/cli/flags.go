@@ -43,15 +43,15 @@ func init() {
 	FsServiceDefine.String(FlagDescription, "", "service description")
 	FsServiceDefine.StringSlice(FlagTags, []string{}, "service tags")
 	FsServiceDefine.String(FlagAuthorDescription, "", "service author description")
-	FsServiceDefine.String(FlagSchemas, "", "interface schemas content or path")
+	FsServiceDefine.String(FlagSchemas, "", "interface schemas content or file path")
 
 	FsServiceBind.String(FlagServiceName, "", "service name")
 	FsServiceBind.String(FlagDeposit, "", "deposit of the binding")
-	FsServiceBind.String(FlagPricing, "", "pricing content or path, which is an instance of the Irishub Service Pricing schema")
+	FsServiceBind.String(FlagPricing, "", "pricing content or file path, which is an instance of the Irishub Service Pricing schema")
 	FsServiceBind.Uint64(FlagMinRespTime, 0, "minimum response time")
 
 	FsServiceUpdateBinding.String(FlagDeposit, "", "added deposit for the binding")
-	FsServiceUpdateBinding.String(FlagPricing, "", "pricing content or path, which is an instance of the Irishub Service Pricing schema")
+	FsServiceUpdateBinding.String(FlagPricing, "", "pricing content or file path, which is an instance of the Irishub Service Pricing schema")
 	FsServiceUpdateBinding.Uint64(FlagMinRespTime, 0, "minimum response time, not updated if set to 0")
 
 	FsServiceEnable.String(FlagDeposit, "", "added deposit for enabling the binding")
@@ -59,7 +59,7 @@ func init() {
 	FsServiceRequest.String(FlagServiceName, "", "service name")
 	FsServiceRequest.StringSlice(FlagProviders, []string{}, "provider list to request")
 	FsServiceRequest.String(FlagServiceFeeCap, "", "maximum service fee to pay for a single request")
-	FsServiceRequest.String(FlagData, "", "input of the service request, which is an Input JSON schema instance")
+	FsServiceRequest.String(FlagData, "", "content or file path of the request input, which is an Input JSON schema instance")
 	FsServiceRequest.Uint64(FlagTimeout, 0, "request timeout")
 	FsServiceRequest.Bool(FlagSuperMode, false, "indicate if the signer is a super user")
 	FsServiceRequest.Bool(FlagRepeated, false, "indicate if the request is repetitive")
@@ -72,7 +72,7 @@ func init() {
 	FsServiceUpdateRequestContext.Uint64(FlagFrequency, 0, "request frequency, not updated if set to 0")
 	FsServiceUpdateRequestContext.Int64(FlagTotal, 0, "request count, not updated if set to 0")
 
-	FsServiceRespond.String(FlagRequestID, "", "ID of the request to respond")
-	FsServiceRespond.String(FlagResult, "", "content or path of the result of the service response, which is an Result JSON schema instance")
-	FsServiceRespond.String(FlagData, "", "content or path of the output of the service response, which is an Output JSON schema instance")
+	FsServiceRespond.String(FlagRequestID, "", "ID of the request to respond to")
+	FsServiceRespond.String(FlagResult, "", "content or file path of the response result, which is an Result JSON schema instance")
+	FsServiceRespond.String(FlagData, "", "content or file path of the response output, which is an Output JSON schema instance")
 }

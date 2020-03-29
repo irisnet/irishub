@@ -122,8 +122,9 @@ func GetResponseSubspaceByReqCtx(requestContextID []byte, batchCounter uint64) [
 	return append(append(responseKey, requestContextID...), sdk.Uint64ToBigEndian(batchCounter)...)
 }
 
-func GetEarnedFeesKey(address sdk.AccAddress) []byte {
-	return append(earnedFeesKey, address.Bytes()...)
+// GetEarnedFeesKey returns the key for the earned fees of the specified provider
+func GetEarnedFeesKey(provider sdk.AccAddress) []byte {
+	return append(earnedFeesKey, provider.Bytes()...)
 }
 
 func getStringsKey(ss []string) (result []byte) {

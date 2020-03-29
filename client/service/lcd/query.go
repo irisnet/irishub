@@ -256,50 +256,20 @@ func queryRequestsHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.Ha
 			queryByBinding = false
 		}
 
-		var params interface{}
-		var route string
+		var requests service.Requests
 
 		if queryByBinding {
-			params = service.QueryRequestsParams{
-				ServiceName: arg1,
-				Provider:    provider,
-			}
-
-			route = fmt.Sprintf("custom/%s/%s", protocol.ServiceRoute, service.QueryRequests)
+			requests, err = serviceutils.QueryRequestsByBinding(cliCtx, arg1, provider)
 		} else {
-			requestContextID, err := hex.DecodeString(arg1)
-			if err != nil {
-				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-				return
-			}
-
-			batchCounter, err := strconv.ParseUint(arg2, 10, 64)
-			if err != nil {
-				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-				return
-			}
-
-			params = service.QueryRequestsByReqCtxParams{
-				RequestContextID: requestContextID,
-				BatchCounter:     batchCounter,
-			}
-
-			route = fmt.Sprintf("custom/%s/%s", protocol.ServiceRoute, service.QueryRequestsByReqCtx)
+			requests, err = serviceutils.QueryRequestsByReqCtx(cliCtx, arg1, arg2)
 		}
 
-		bz, err := cdc.MarshalJSON(params)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
-		res, err := cliCtx.QueryWithData(route, bz)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
 
-		utils.PostProcessResponse(w, cdc, res, cliCtx.Indent)
+		utils.PostProcessResponse(w, cdc, requests, cliCtx.Indent)
 	}
 }
 
@@ -426,8 +396,8 @@ func queryEarnedFeesHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.
 			return
 		}
 
-		params := service.QueryFeesParams{
-			Address: provider,
+		params := service.QueryEarnedFeesParams{
+			Provider: provider,
 		}
 
 		bz, err := cdc.MarshalJSON(params)
@@ -436,7 +406,7 @@ func queryEarnedFeesHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.
 			return
 		}
 
-		route := fmt.Sprintf("custom/%s/%s", protocol.ServiceRoute, service.QueryFees)
+		route := fmt.Sprintf("custom/%s/%s", protocol.ServiceRoute, service.QueryEarnedFees)
 		res, err := cliCtx.QueryWithData(route, bz)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
