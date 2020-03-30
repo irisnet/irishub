@@ -598,7 +598,7 @@ func GenerateRequestContextID(txHash []byte, msgIndex int64) cmn.HexBytes {
 // SplitRequestContextID splits the given contextID to txHash and msgIndex
 func SplitRequestContextID(contextID cmn.HexBytes) (cmn.HexBytes, int64, error) {
 	if len(contextID) != ContextIDLen {
-		return nil, 0, errors.New("invalid request context id")
+		return nil, 0, errors.New("invalid request context ID")
 	}
 	txHash := contextID[0:32]
 	msgIndex := int64(binary.BigEndian.Uint64(contextID[32:40]))
@@ -619,14 +619,16 @@ func GenerateRequestID(requestContextID cmn.HexBytes, requestContextBatchCounter
 	return append(contextID, bz...)
 }
 
-// SplitRequestID splits the given contextID to contextID, batchCounter, requestHeight, batchRequestIndex
+// SplitRequestID splits the given requestID to contextID, batchCounter, requestHeight, batchRequestIndex
 func SplitRequestID(requestID cmn.HexBytes) (cmn.HexBytes, uint64, int64, int16, error) {
 	if len(requestID) != RequestIDLen {
-		return nil, 0, 0, 0, errors.New("invalid request id")
+		return nil, 0, 0, 0, errors.New("invalid request ID")
 	}
+
 	contextID := requestID[0:40]
 	batchCounter := binary.BigEndian.Uint64(requestID[40:48])
 	requestHeight := int64(binary.BigEndian.Uint64(requestID[48:56]))
 	batchRequestIndex := int16(binary.BigEndian.Uint16(requestID[56:]))
+
 	return contextID, batchCounter, requestHeight, batchRequestIndex, nil
 }

@@ -42,6 +42,7 @@ func (svcDef ServiceDefinition) String() string {
 	)
 }
 
+// Validate validates the service definition
 func (svcDef ServiceDefinition) Validate() sdk.Error {
 	if len(svcDef.Author) == 0 {
 		return ErrInvalidAddress(DefaultCodespace, "author missing")

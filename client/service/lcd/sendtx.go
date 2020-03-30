@@ -375,7 +375,7 @@ func disableServiceHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.H
 			return
 		}
 
-		msg := service.NewMsgDisableService(serviceName, provider)
+		msg := service.NewMsgDisableServiceBinding(serviceName, provider)
 		if err := msg.ValidateBasic(); err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -420,7 +420,7 @@ func enableServiceHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Ha
 			}
 		}
 
-		msg := service.NewMsgEnableService(serviceName, provider, deposit)
+		msg := service.NewMsgEnableServiceBinding(serviceName, provider, deposit)
 		if err := msg.ValidateBasic(); err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -504,7 +504,7 @@ func requestServiceHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.H
 			providers = append(providers, provider)
 		}
 
-		msg := service.NewMsgRequestService(
+		msg := service.NewMsgCallService(
 			req.ServiceName, providers, consumer, req.Input, serviceFeeCap,
 			req.Timeout, req.SuperMode, req.Repeated, req.RepeatedFrequency, req.RepeatedTotal,
 		)

@@ -314,7 +314,7 @@ func (k Keeper) ParsePricing(ctx sdk.Context, pricing string) (p types.Pricing, 
 	return p, nil
 }
 
-// SetPricing sets the pricing
+// SetPricing sets the pricing for the specified service binding
 func (k Keeper) SetPricing(
 	ctx sdk.Context,
 	serviceName string,
@@ -327,7 +327,7 @@ func (k Keeper) SetPricing(
 	store.Set(GetPricingKey(serviceName, provider), bz)
 }
 
-// GetPricing retrieves the specified pricing
+// GetPricing retrieves the pricing of the specified service binding
 func (k Keeper) GetPricing(ctx sdk.Context, serviceName string, provider sdk.AccAddress) (pricing types.Pricing) {
 	store := ctx.KVStore(k.storeKey)
 
@@ -358,7 +358,7 @@ func (k Keeper) GetWithdrawAddress(ctx sdk.Context, provider sdk.AccAddress) sdk
 	return sdk.AccAddress(bz)
 }
 
-// IterateWithdrawAddresses iterates through all withdrawAddresses
+// IterateWithdrawAddresses iterates through all withdrawal addresses
 func (k Keeper) IterateWithdrawAddresses(
 	ctx sdk.Context,
 	op func(provider sdk.AccAddress, withdrawAddress sdk.AccAddress) (stop bool),
@@ -378,7 +378,7 @@ func (k Keeper) IterateWithdrawAddresses(
 	}
 }
 
-// ServiceBindingsIterator returns an iterator for all bindings of the specified service
+// ServiceBindingsIterator returns an iterator for all bindings of the specified service name
 func (k Keeper) ServiceBindingsIterator(ctx sdk.Context, serviceName string) sdk.Iterator {
 	store := ctx.KVStore(k.storeKey)
 	return sdk.KVStorePrefixIterator(store, GetBindingsSubspace(serviceName))
