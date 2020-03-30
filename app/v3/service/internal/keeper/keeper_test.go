@@ -265,7 +265,7 @@ func TestKeeper_Request_Context(t *testing.T) {
 	)
 	require.NoError(t, err)
 
-	require.True(t, keeper.HasNewRequestBatch(ctx, requestContextID, ctx.BlockHeight()))
+	require.True(t, keeper.HasNewRequestBatch(ctx, requestContextID))
 
 	requestContext, found := keeper.GetRequestContext(ctx, requestContextID)
 	require.True(t, found)
