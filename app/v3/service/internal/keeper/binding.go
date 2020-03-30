@@ -138,8 +138,8 @@ func (k Keeper) UpdateServiceBinding(
 	return nil
 }
 
-// DisableService disables the specified service binding
-func (k Keeper) DisableService(ctx sdk.Context, serviceName string, provider sdk.AccAddress) sdk.Error {
+// DisableServiceBinding disables the specified service binding
+func (k Keeper) DisableServiceBinding(ctx sdk.Context, serviceName string, provider sdk.AccAddress) sdk.Error {
 	binding, found := k.GetServiceBinding(ctx, serviceName, provider)
 	if !found {
 		return types.ErrUnknownServiceBinding(k.codespace)
@@ -157,8 +157,8 @@ func (k Keeper) DisableService(ctx sdk.Context, serviceName string, provider sdk
 	return nil
 }
 
-// EnableService enables the specified service binding
-func (k Keeper) EnableService(ctx sdk.Context, serviceName string, provider sdk.AccAddress, deposit sdk.Coins) sdk.Error {
+// EnableServiceBinding enables the specified service binding
+func (k Keeper) EnableServiceBinding(ctx sdk.Context, serviceName string, provider sdk.AccAddress, deposit sdk.Coins) sdk.Error {
 	binding, found := k.GetServiceBinding(ctx, serviceName, provider)
 	if !found {
 		return types.ErrUnknownServiceBinding(k.codespace)
@@ -175,7 +175,7 @@ func (k Keeper) EnableService(ctx sdk.Context, serviceName string, provider sdk.
 
 	minDeposit := k.getMinDeposit(ctx, k.GetPricing(ctx, serviceName, provider))
 	if !binding.Deposit.IsAllGTE(minDeposit) {
-		return types.ErrInvalidDeposit(k.codespace, fmt.Sprintf("insufficient deposit: minimal deposit %s, %s got", minDeposit, binding.Deposit))
+		return types.ErrInvalidDeposit(k.codespace, fmt.Sprintf("insufficient deposit: minimum deposit %s, %s got", minDeposit, binding.Deposit))
 	}
 
 	if !deposit.Empty() {
@@ -229,7 +229,7 @@ func (k Keeper) RefundDeposit(ctx sdk.Context, serviceName string, provider sdk.
 	return nil
 }
 
-// RefundDeposits refunds the deposits of all the binding services
+// RefundDeposits refunds the deposits of all the service bindings
 func (k Keeper) RefundDeposits(ctx sdk.Context) sdk.Error {
 	iterator := k.AllServiceBindingsIterator(ctx)
 	defer iterator.Close()
