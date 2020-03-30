@@ -198,11 +198,11 @@ func DefaultParams() Params {
 	return Params{
 		MaxRequestTimeout:    100,
 		MinDepositMultiple:   1000,
-		MinDeposit:           sdk.NewCoins(sdk.NewCoin(sdk.IrisAtto, sdk.NewIntWithDecimal(10, 18))), // 10000iris
-		ServiceFeeTax:        sdk.NewDecWithPrec(1, 2),                                               // 1%
-		SlashFraction:        sdk.NewDecWithPrec(1, 3),                                               // 0.1%
-		ComplaintRetrospect:  time.Duration(15 * sdk.Day),                                            // 15 days
-		ArbitrationTimeLimit: time.Duration(5 * sdk.Day),                                             // 5 days
+		MinDeposit:           sdk.NewCoins(sdk.NewCoin(sdk.IrisAtto, sdk.NewIntWithDecimal(10000, 18))), // 10000iris
+		ServiceFeeTax:        sdk.NewDecWithPrec(1, 2),                                                  // 1%
+		SlashFraction:        sdk.NewDecWithPrec(1, 3),                                                  // 0.1%
+		ComplaintRetrospect:  time.Duration(15 * sdk.Day),                                               // 15 days
+		ArbitrationTimeLimit: time.Duration(5 * sdk.Day),                                                // 5 days
 		TxSizeLimit:          4000,
 	}
 }
