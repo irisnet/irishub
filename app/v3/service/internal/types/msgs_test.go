@@ -401,7 +401,7 @@ func TestMsgDisableServiceBindingRoute(t *testing.T) {
 func TestMsgDisableServiceBindingType(t *testing.T) {
 	msg := NewMsgDisableServiceBinding(testServiceName, testProvider)
 
-	require.Equal(t, "disable_service", msg.Type())
+	require.Equal(t, "disable_service_binding", msg.Type())
 }
 
 // TestMsgDisableServiceBindingValidation tests ValidateBasic for MsgDisableServiceBinding
@@ -468,7 +468,7 @@ func TestMsgEnableServiceBindingRoute(t *testing.T) {
 func TestMsgEnableServiceBindingType(t *testing.T) {
 	msg := NewMsgEnableServiceBinding(testServiceName, testProvider, testAddedDeposit)
 
-	require.Equal(t, "enable_service", msg.Type())
+	require.Equal(t, "enable_service_binding", msg.Type())
 }
 
 // TestMsgEnableServiceBindingValidation tests ValidateBasic for MsgEnableServiceBinding
@@ -616,7 +616,7 @@ func TestMsgCallServiceType(t *testing.T) {
 		true, testRepeatedFreq, testRepeatedTotal,
 	)
 
-	require.Equal(t, "request_service", msg.Type())
+	require.Equal(t, "call_service", msg.Type())
 }
 
 // TestMsgCallServiceValidation tests ValidateBasic for MsgCallService
