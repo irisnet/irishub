@@ -249,11 +249,17 @@ func (msg MsgUpdateServiceBinding) ValidateBasic() sdk.Error {
 		return err
 	}
 
-	if err := ValidateServiceDeposit(msg.Deposit); err != nil {
-		return err
+	if !msg.Deposit.Empty() {
+		if err := ValidateServiceDeposit(msg.Deposit); err != nil {
+			return err
+		}
 	}
 
-	return ValidateBindingPricing(msg.Pricing)
+	if len(msg.Pricing) != 0 {
+		return ValidateBindingPricing(msg.Pricing)
+	}
+
+	return nil
 }
 
 // GetSigners implements Msg.
@@ -397,7 +403,11 @@ func (msg MsgEnableService) ValidateBasic() sdk.Error {
 		return err
 	}
 
-	return ValidateServiceDeposit(msg.Deposit)
+	if !msg.Deposit.Empty() {
+		return ValidateServiceDeposit(msg.Deposit)
+	}
+
+	return nil
 }
 
 // GetSigners implements Msg.
@@ -580,7 +590,7 @@ func (msg MsgRespondService) ValidateBasic() sdk.Error {
 		return err
 	}
 
-	if err := ValidateRequestID(msg.Provider); err != nil {
+	if err := ValidateRequestID(msg.RequestID); err != nil {
 		return err
 	}
 
@@ -638,7 +648,7 @@ func (msg MsgPauseRequestContext) ValidateBasic() sdk.Error {
 	if err := ValidateConsumer(msg.Consumer); err != nil {
 		return err
 	}
-	return ValidateRequestID(msg.RequestContextID)
+	return ValidateContextID(msg.RequestContextID)
 }
 
 // GetSigners implements Msg.
@@ -683,7 +693,7 @@ func (msg MsgStartRequestContext) ValidateBasic() sdk.Error {
 	if err := ValidateConsumer(msg.Consumer); err != nil {
 		return err
 	}
-	return ValidateRequestID(msg.RequestContextID)
+	return ValidateContextID(msg.RequestContextID)
 }
 
 // GetSigners implements Msg.
@@ -728,7 +738,7 @@ func (msg MsgKillRequestContext) ValidateBasic() sdk.Error {
 	if err := ValidateConsumer(msg.Consumer); err != nil {
 		return err
 	}
-	return ValidateRequestID(msg.RequestContextID)
+	return ValidateContextID(msg.RequestContextID)
 }
 
 // GetSigners implements Msg.
@@ -792,7 +802,7 @@ func (msg MsgUpdateRequestContext) ValidateBasic() sdk.Error {
 		return err
 	}
 
-	if err := ValidateRequestID(msg.RequestContextID); err != nil {
+	if err := ValidateContextID(msg.RequestContextID); err != nil {
 		return err
 	}
 
@@ -960,8 +970,10 @@ func ValidateRequestContextUpdating(
 		return err
 	}
 
-	if err := ValidateServiceFeeCap(serviceFeeCap); err != nil {
-		return err
+	if !serviceFeeCap.Empty() {
+		if err := ValidateServiceFeeCap(serviceFeeCap); err != nil {
+			return err
+		}
 	}
 
 	if timeout < 0 {
@@ -1055,14 +1067,14 @@ func ValidateWithdrawAmount(amount sdk.Coins) sdk.Error {
 }
 
 func ValidateServiceFeeCap(serviceFeeCap sdk.Coins) sdk.Error {
-	if !serviceFeeCap.Empty() && !ValidateServiceCoins(serviceFeeCap) {
+	if !ValidateServiceCoins(serviceFeeCap) {
 		return ErrInvalidServiceFee(DefaultCodespace, fmt.Sprintf("invalid service fee: %s", serviceFeeCap))
 	}
 	return nil
 }
 
 func ValidateServiceDeposit(deposit sdk.Coins) sdk.Error {
-	if !deposit.Empty() && !ValidateServiceCoins(deposit) {
+	if !ValidateServiceCoins(deposit) {
 		return ErrInvalidDeposit(DefaultCodespace, fmt.Sprintf("invalid deposit: %s", deposit))
 	}
 	return nil
@@ -1086,6 +1098,13 @@ func ValidateMinRespTime(minRespTime uint64) sdk.Error {
 func ValidateRequestID(reqID []byte) sdk.Error {
 	if len(reqID) != RequestIDLen {
 		return ErrInvalidRequestContextID(DefaultCodespace, fmt.Sprintf("length of the request ID must be %d in bytes", RequestIDLen))
+	}
+	return nil
+}
+
+func ValidateContextID(contextID []byte) sdk.Error {
+	if len(contextID) != ContextIDLen {
+		return ErrInvalidRequestContextID(DefaultCodespace, fmt.Sprintf("length of the request ID must be %d in bytes", ContextIDLen))
 	}
 	return nil
 }
