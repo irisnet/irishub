@@ -378,7 +378,7 @@ func (k Keeper) IterateWithdrawAddresses(
 	}
 }
 
-// ServiceBindingsIterator returns an iterator for all bindings of the specified service name
+// ServiceBindingsIterator returns an iterator for all bindings of the specified service definition
 func (k Keeper) ServiceBindingsIterator(ctx sdk.Context, serviceName string) sdk.Iterator {
 	store := ctx.KVStore(k.storeKey)
 	return sdk.KVStorePrefixIterator(store, GetBindingsSubspace(serviceName))
