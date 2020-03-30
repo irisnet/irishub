@@ -103,24 +103,24 @@ func (msg MsgDefineService) GetSignBytes() []byte {
 
 // ValidateBasic implements Msg
 func (msg MsgDefineService) ValidateBasic() sdk.Error {
-	if len(msg.Author) == 0 {
-		return ErrInvalidAddress(DefaultCodespace, "author missing")
-	}
-
-	if !validServiceName(msg.Name) {
-		return ErrInvalidServiceName(DefaultCodespace, msg.Name)
-	}
-
-	if err := ensureServiceDefLength(msg); err != nil {
+	if err := ValidateAuthor(msg.Author); err != nil {
 		return err
 	}
 
-	if sdk.HasDuplicate(msg.Tags) {
-		return ErrDuplicateTags(DefaultCodespace)
+	if err := ValidateServiceName(msg.Name); err != nil {
+		return err
 	}
 
-	if len(msg.Schemas) == 0 {
-		return ErrInvalidSchemas(DefaultCodespace, "schemas missing")
+	if err := ValidateTags(msg.Tags); err != nil {
+		return err
+	}
+
+	if err := ValidateSvcDescription(msg.Description); err != nil {
+		return err
+	}
+
+	if err := ValidateAuthorDescription(msg.AuthorDescription); err != nil {
+		return err
 	}
 
 	return ValidateServiceSchemas(msg.Schemas)
@@ -171,24 +171,20 @@ func (msg MsgBindService) GetSignBytes() []byte {
 
 // ValidateBasic implements Msg.
 func (msg MsgBindService) ValidateBasic() sdk.Error {
-	if len(msg.Provider) == 0 {
-		return ErrInvalidAddress(DefaultCodespace, "provider missing")
+	if err := ValidateProvider(msg.Provider); err != nil {
+		return err
 	}
 
 	if err := ValidateServiceName(msg.ServiceName); err != nil {
 		return err
 	}
 
-	if !validServiceCoins(msg.Deposit) {
-		return ErrInvalidDeposit(DefaultCodespace, fmt.Sprintf("invalid deposit: %s", msg.Deposit))
+	if err := ValidateServiceDeposit(msg.Deposit); err != nil {
+		return err
 	}
 
-	if msg.MinRespTime == 0 {
-		return ErrInvalidMinRespTime(DefaultCodespace, "minimum response time must be greater than 0")
-	}
-
-	if len(msg.Pricing) == 0 {
-		return ErrInvalidPricing(DefaultCodespace, "pricing missing")
+	if err := ValidateMinRespTime(msg.MinRespTime); err != nil {
+		return err
 	}
 
 	return ValidateBindingPricing(msg.Pricing)
@@ -211,7 +207,13 @@ type MsgUpdateServiceBinding struct {
 }
 
 // NewMsgUpdateServiceBinding creates a new MsgUpdateServiceBinding instance
-func NewMsgUpdateServiceBinding(serviceName string, provider sdk.AccAddress, deposit sdk.Coins, pricing string, minRespTime uint64) MsgUpdateServiceBinding {
+func NewMsgUpdateServiceBinding(
+	serviceName string,
+	provider sdk.AccAddress,
+	deposit sdk.Coins,
+	pricing string,
+	minRespTime uint64,
+) MsgUpdateServiceBinding {
 	return MsgUpdateServiceBinding{
 		ServiceName: serviceName,
 		Provider:    provider,
@@ -239,23 +241,19 @@ func (msg MsgUpdateServiceBinding) GetSignBytes() []byte {
 
 // ValidateBasic implements Msg.
 func (msg MsgUpdateServiceBinding) ValidateBasic() sdk.Error {
-	if len(msg.Provider) == 0 {
-		return ErrInvalidAddress(DefaultCodespace, "provider missing")
+	if err := ValidateProvider(msg.Provider); err != nil {
+		return err
 	}
 
 	if err := ValidateServiceName(msg.ServiceName); err != nil {
 		return err
 	}
 
-	if !msg.Deposit.Empty() && !validServiceCoins(msg.Deposit) {
-		return ErrInvalidDeposit(DefaultCodespace, fmt.Sprintf("invalid deposit: %s", msg.Deposit))
+	if err := ValidateServiceDeposit(msg.Deposit); err != nil {
+		return err
 	}
 
-	if len(msg.Pricing) != 0 {
-		return ValidateBindingPricing(msg.Pricing)
-	}
-
-	return nil
+	return ValidateBindingPricing(msg.Pricing)
 }
 
 // GetSigners implements Msg.
@@ -297,15 +295,11 @@ func (msg MsgSetWithdrawAddress) GetSignBytes() []byte {
 
 // ValidateBasic implements Msg.
 func (msg MsgSetWithdrawAddress) ValidateBasic() sdk.Error {
-	if len(msg.Provider) == 0 {
-		return ErrInvalidAddress(DefaultCodespace, "provider missing")
+	if err := ValidateProvider(msg.Provider); err != nil {
+		return err
 	}
 
-	if len(msg.WithdrawAddress) == 0 {
-		return ErrInvalidAddress(DefaultCodespace, "withdrawal address missing")
-	}
-
-	return nil
+	return ValidateWithdrawAddress(msg.WithdrawAddress)
 }
 
 // GetSigners implements Msg.
@@ -347,8 +341,8 @@ func (msg MsgDisableService) GetSignBytes() []byte {
 
 // ValidateBasic implements Msg.
 func (msg MsgDisableService) ValidateBasic() sdk.Error {
-	if len(msg.Provider) == 0 {
-		return ErrInvalidAddress(DefaultCodespace, "provider missing")
+	if err := ValidateProvider(msg.Provider); err != nil {
+		return err
 	}
 
 	return ValidateServiceName(msg.ServiceName)
@@ -395,19 +389,15 @@ func (msg MsgEnableService) GetSignBytes() []byte {
 
 // ValidateBasic implements Msg.
 func (msg MsgEnableService) ValidateBasic() sdk.Error {
-	if len(msg.Provider) == 0 {
-		return ErrInvalidAddress(DefaultCodespace, "provider missing")
+	if err := ValidateProvider(msg.Provider); err != nil {
+		return err
 	}
 
 	if err := ValidateServiceName(msg.ServiceName); err != nil {
 		return err
 	}
 
-	if !msg.Deposit.Empty() && !validServiceCoins(msg.Deposit) {
-		return ErrInvalidDeposit(DefaultCodespace, fmt.Sprintf("invalid deposit: %s", msg.Deposit))
-	}
-
-	return nil
+	return ValidateServiceDeposit(msg.Deposit)
 }
 
 // GetSigners implements Msg.
@@ -449,8 +439,8 @@ func (msg MsgRefundServiceDeposit) GetSignBytes() []byte {
 
 // ValidateBasic implements Msg.
 func (msg MsgRefundServiceDeposit) ValidateBasic() sdk.Error {
-	if len(msg.Provider) == 0 {
-		return ErrInvalidAddress(DefaultCodespace, "provider missing")
+	if err := ValidateProvider(msg.Provider); err != nil {
+		return err
 	}
 
 	return ValidateServiceName(msg.ServiceName)
@@ -522,13 +512,19 @@ func (msg MsgRequestService) GetSignBytes() []byte {
 
 // ValidateBasic implements Msg.
 func (msg MsgRequestService) ValidateBasic() sdk.Error {
-	if len(msg.Consumer) == 0 {
-		return ErrInvalidAddress(DefaultCodespace, "consumer missing")
+	if err := ValidateConsumer(msg.Consumer); err != nil {
+		return err
 	}
 
 	return ValidateRequest(
-		msg.ServiceName, msg.ServiceFeeCap, msg.Providers, msg.Input, msg.Timeout,
-		msg.Repeated, msg.RepeatedFrequency, msg.RepeatedTotal,
+		msg.ServiceName,
+		msg.ServiceFeeCap,
+		msg.Providers,
+		msg.Input,
+		msg.Timeout,
+		msg.Repeated,
+		msg.RepeatedFrequency,
+		msg.RepeatedTotal,
 	)
 }
 
@@ -551,7 +547,7 @@ type MsgRespondService struct {
 func NewMsgRespondService(
 	requestID cmn.HexBytes,
 	provider sdk.AccAddress,
-	result,
+	result string,
 	output string,
 ) MsgRespondService {
 	return MsgRespondService{
@@ -580,16 +576,12 @@ func (msg MsgRespondService) GetSignBytes() []byte {
 
 // ValidateBasic implements Msg.
 func (msg MsgRespondService) ValidateBasic() sdk.Error {
-	if len(msg.Provider) == 0 {
-		return ErrInvalidAddress(DefaultCodespace, "provider missing")
+	if err := ValidateProvider(msg.Provider); err != nil {
+		return err
 	}
 
-	if len(msg.RequestID) != RequestIDLen {
-		return ErrInvalidRequestContextID(DefaultCodespace, fmt.Sprintf("length of the request ID must be %d in bytes", RequestIDLen))
-	}
-
-	if len(msg.Result) == 0 {
-		return ErrInvalidResponseResult(DefaultCodespace, "result missing")
+	if err := ValidateRequestID(msg.Provider); err != nil {
+		return err
 	}
 
 	if err := ValidateResponseResult(msg.Result); err != nil {
@@ -601,21 +593,7 @@ func (msg MsgRespondService) ValidateBasic() sdk.Error {
 		return err
 	}
 
-	if result.Code == 200 && len(msg.Output) == 0 {
-		return ErrInvalidResponse(DefaultCodespace, "output must be specified when the result code is 200")
-	}
-
-	if result.Code != 200 && len(msg.Output) != 0 {
-		return ErrInvalidResponse(DefaultCodespace, "output should not be specified when the result code is not 200")
-	}
-
-	if len(msg.Output) > 0 {
-		if !json.Valid([]byte(msg.Output)) {
-			return ErrInvalidResponseOutput(DefaultCodespace, "output is not valid JSON")
-		}
-	}
-
-	return nil
+	return ValidateOutput(result.Code, msg.Output)
 }
 
 // GetSigners implements Msg.
@@ -657,15 +635,10 @@ func (msg MsgPauseRequestContext) GetSignBytes() []byte {
 
 // ValidateBasic implements Msg.
 func (msg MsgPauseRequestContext) ValidateBasic() sdk.Error {
-	if len(msg.Consumer) == 0 {
-		return ErrInvalidAddress(DefaultCodespace, "consumer missing")
+	if err := ValidateConsumer(msg.Consumer); err != nil {
+		return err
 	}
-
-	if len(msg.RequestContextID) != ContextIDLen {
-		return ErrInvalidRequestContextID(DefaultCodespace, fmt.Sprintf("length of the request context ID must be %d in bytes", ContextIDLen))
-	}
-
-	return nil
+	return ValidateRequestID(msg.RequestContextID)
 }
 
 // GetSigners implements Msg.
@@ -707,15 +680,10 @@ func (msg MsgStartRequestContext) GetSignBytes() []byte {
 
 // ValidateBasic implements Msg.
 func (msg MsgStartRequestContext) ValidateBasic() sdk.Error {
-	if len(msg.Consumer) == 0 {
-		return ErrInvalidAddress(DefaultCodespace, "consumer missing")
+	if err := ValidateConsumer(msg.Consumer); err != nil {
+		return err
 	}
-
-	if len(msg.RequestContextID) != ContextIDLen {
-		return ErrInvalidRequestContextID(DefaultCodespace, fmt.Sprintf("length of the request context ID must be %d in bytes", ContextIDLen))
-	}
-
-	return nil
+	return ValidateRequestID(msg.RequestContextID)
 }
 
 // GetSigners implements Msg.
@@ -757,15 +725,10 @@ func (msg MsgKillRequestContext) GetSignBytes() []byte {
 
 // ValidateBasic implements Msg.
 func (msg MsgKillRequestContext) ValidateBasic() sdk.Error {
-	if len(msg.Consumer) == 0 {
-		return ErrInvalidAddress(DefaultCodespace, "consumer missing")
+	if err := ValidateConsumer(msg.Consumer); err != nil {
+		return err
 	}
-
-	if len(msg.RequestContextID) != ContextIDLen {
-		return ErrInvalidRequestContextID(DefaultCodespace, fmt.Sprintf("length of the request context ID must be %d in bytes", ContextIDLen))
-	}
-
-	return nil
+	return ValidateRequestID(msg.RequestContextID)
 }
 
 // GetSigners implements Msg.
@@ -825,15 +788,21 @@ func (msg MsgUpdateRequestContext) GetSignBytes() []byte {
 
 // ValidateBasic implements Msg.
 func (msg MsgUpdateRequestContext) ValidateBasic() sdk.Error {
-	if len(msg.Consumer) == 0 {
-		return ErrInvalidAddress(DefaultCodespace, "consumer missing")
+	if err := ValidateConsumer(msg.Consumer); err != nil {
+		return err
 	}
 
-	if len(msg.RequestContextID) != ContextIDLen {
-		return ErrInvalidRequestContextID(DefaultCodespace, fmt.Sprintf("length of the request context ID must be %d in bytes", ContextIDLen))
+	if err := ValidateRequestID(msg.RequestContextID); err != nil {
+		return err
 	}
 
-	return ValidateRequestContextUpdating(msg.Providers, msg.ServiceFeeCap, msg.Timeout, msg.RepeatedFrequency, msg.RepeatedTotal)
+	return ValidateRequestContextUpdating(
+		msg.Providers,
+		msg.ServiceFeeCap,
+		msg.Timeout,
+		msg.RepeatedFrequency,
+		msg.RepeatedTotal,
+	)
 }
 
 // GetSigners implements Msg.
@@ -873,11 +842,7 @@ func (msg MsgWithdrawEarnedFees) GetSignBytes() []byte {
 
 // ValidateBasic implements Msg.
 func (msg MsgWithdrawEarnedFees) ValidateBasic() sdk.Error {
-	if len(msg.Provider) == 0 {
-		return ErrInvalidAddress(DefaultCodespace, "provider missing")
-	}
-
-	return nil
+	return ValidateProvider(msg.Provider)
 }
 
 // GetSigners implements Msg.
@@ -921,19 +886,15 @@ func (msg MsgWithdrawTax) GetSignBytes() []byte {
 
 // ValidateBasic implements Msg.
 func (msg MsgWithdrawTax) ValidateBasic() sdk.Error {
-	if len(msg.Trustee) == 0 {
-		return ErrInvalidAddress(DefaultCodespace, "trustee missing")
+	if err := ValidateTrustee(msg.Trustee); err != nil {
+		return err
 	}
 
-	if len(msg.DestAddress) == 0 {
-		return ErrInvalidAddress(DefaultCodespace, "destination address missing")
+	if err := ValidateDestAddress(msg.DestAddress); err != nil {
+		return err
 	}
 
-	if !validServiceCoins(msg.Amount) {
-		return sdk.ErrInvalidCoins(fmt.Sprintf("invalid withdrawal amount: %s", msg.Amount))
-	}
-
-	return nil
+	return ValidateWithdrawAmount(msg.Amount)
 }
 
 // GetSigners implements Msg.
@@ -942,57 +903,6 @@ func (msg MsgWithdrawTax) GetSigners() []sdk.AccAddress {
 }
 
 //______________________________________________________________________
-
-// ValidateServiceName validates the service name
-func ValidateServiceName(name string) sdk.Error {
-	if !validServiceName(name) {
-		return ErrInvalidServiceName(DefaultCodespace, name)
-	}
-
-	return ensureServiceNameLength(name)
-}
-
-func validServiceName(name string) bool {
-	return reServiceName.MatchString(name)
-}
-
-func ensureServiceNameLength(name string) sdk.Error {
-	if len(name) > MaxNameLength {
-		return ErrInvalidServiceName(DefaultCodespace, name)
-	}
-
-	return nil
-}
-
-func ensureServiceDefLength(msg MsgDefineService) sdk.Error {
-	if err := ensureServiceNameLength(msg.Name); err != nil {
-		return err
-	}
-
-	if len(msg.Description) > MaxDescriptionLength {
-		return ErrInvalidLength(DefaultCodespace, fmt.Sprintf("invalid description length; got: %d, max: %d", len(msg.Description), MaxDescriptionLength))
-	}
-
-	if len(msg.Tags) > MaxTagsNum {
-		return ErrInvalidLength(DefaultCodespace, fmt.Sprintf("invalid tags size; got: %d, max: %d", len(msg.Tags), MaxTagsNum))
-	}
-
-	for i, tag := range msg.Tags {
-		if len(tag) == 0 {
-			return ErrInvalidLength(DefaultCodespace, fmt.Sprintf("invalid tag[%d] length: tag must not be empty", i))
-		}
-
-		if len(tag) > MaxTagLength {
-			return ErrInvalidLength(DefaultCodespace, fmt.Sprintf("invalid tag[%d] length; got: %d, max: %d", i, len(tag), MaxTagLength))
-		}
-	}
-
-	if len(msg.AuthorDescription) > MaxDescriptionLength {
-		return ErrInvalidLength(DefaultCodespace, fmt.Sprintf("invalid author description length; got: %d, max: %d", len(msg.AuthorDescription), MaxDescriptionLength))
-	}
-
-	return nil
-}
 
 // ValidateRequest validates the request params
 func ValidateRequest(
@@ -1009,28 +919,16 @@ func ValidateRequest(
 		return err
 	}
 
-	if !validServiceCoins(serviceFeeCap) {
-		return ErrInvalidServiceFee(DefaultCodespace, fmt.Sprintf("invalid service fee: %s", serviceFeeCap))
-	}
-
-	if len(providers) == 0 {
-		return ErrInvalidProviders(DefaultCodespace, "providers missing")
-	}
-
-	if len(providers) > MaxProvidersNum {
-		return ErrInvalidProviders(DefaultCodespace, fmt.Sprintf("total number of the providers must not be greater than %d", MaxProvidersNum))
-	}
-
-	if err := checkDuplicateProviders(providers); err != nil {
+	if err := ValidateServiceFeeCap(serviceFeeCap); err != nil {
 		return err
 	}
 
-	if len(input) == 0 {
-		return ErrInvalidRequestInput(DefaultCodespace, "input missing")
+	if err := ValidateProvidersNoEmpty(providers); err != nil {
+		return err
 	}
 
-	if !json.Valid([]byte(input)) {
-		return ErrInvalidRequestInput(DefaultCodespace, "input is not valid JSON")
+	if err := ValidateInput(input); err != nil {
+		return err
 	}
 
 	if timeout <= 0 {
@@ -1058,12 +956,12 @@ func ValidateRequestContextUpdating(
 	repeatedFrequency uint64,
 	repeatedTotal int64,
 ) sdk.Error {
-	if err := checkDuplicateProviders(providers); err != nil {
+	if err := ValidateProvidersCanEmpty(providers); err != nil {
 		return err
 	}
 
-	if !serviceFeeCap.Empty() && !validServiceCoins(serviceFeeCap) {
-		return ErrInvalidServiceFee(DefaultCodespace, fmt.Sprintf("invalid service fee: %s", serviceFeeCap))
+	if err := ValidateServiceFeeCap(serviceFeeCap); err != nil {
+		return err
 	}
 
 	if timeout < 0 {
@@ -1081,6 +979,180 @@ func ValidateRequestContextUpdating(
 	return nil
 }
 
+func ValidateAuthor(author sdk.AccAddress) sdk.Error {
+	if len(author) == 0 {
+		return ErrInvalidAddress(DefaultCodespace, "author missing")
+	}
+	return nil
+}
+
+func ValidateProvider(provider sdk.AccAddress) sdk.Error {
+	if len(provider) == 0 {
+		return ErrInvalidAddress(DefaultCodespace, "provider missing")
+	}
+	return nil
+}
+
+func ValidateProvidersNoEmpty(providers []sdk.AccAddress) sdk.Error {
+	if len(providers) == 0 {
+		return ErrInvalidProviders(DefaultCodespace, "providers missing")
+	}
+
+	if len(providers) > MaxProvidersNum {
+		return ErrInvalidProviders(DefaultCodespace, fmt.Sprintf("total number of the providers must not be greater than %d", MaxProvidersNum))
+	}
+
+	if err := checkDuplicateProviders(providers); err != nil {
+		return err
+	}
+	return nil
+}
+
+func ValidateProvidersCanEmpty(providers []sdk.AccAddress) sdk.Error {
+	if err := checkDuplicateProviders(providers); err != nil {
+		return err
+	}
+	return nil
+}
+
+func ValidateWithdrawAddress(withdrawAddress sdk.AccAddress) sdk.Error {
+	if len(withdrawAddress) == 0 {
+		return ErrInvalidAddress(DefaultCodespace, "withdrawal address missing")
+	}
+	return nil
+}
+
+func ValidateTrustee(trustee sdk.AccAddress) sdk.Error {
+	if len(trustee) == 0 {
+		return ErrInvalidAddress(DefaultCodespace, "trustee missing")
+	}
+	return nil
+}
+
+func ValidateDestAddress(destAddress sdk.AccAddress) sdk.Error {
+	if len(destAddress) == 0 {
+		return ErrInvalidAddress(DefaultCodespace, "destination address missing")
+	}
+	return nil
+}
+
+func ValidateConsumer(consumer sdk.AccAddress) sdk.Error {
+	if len(consumer) == 0 {
+		return ErrInvalidAddress(DefaultCodespace, "consumer missing")
+	}
+	return nil
+}
+
+func ValidateServiceCoins(coins sdk.Coins) bool {
+	return coins.IsValidIrisAtto()
+}
+
+func ValidateWithdrawAmount(amount sdk.Coins) sdk.Error {
+	if !ValidateServiceCoins(amount) {
+		return sdk.ErrInvalidCoins(fmt.Sprintf("invalid withdrawal amount: %s", amount))
+	}
+	return nil
+}
+
+func ValidateServiceFeeCap(serviceFeeCap sdk.Coins) sdk.Error {
+	if !serviceFeeCap.Empty() && !ValidateServiceCoins(serviceFeeCap) {
+		return ErrInvalidServiceFee(DefaultCodespace, fmt.Sprintf("invalid service fee: %s", serviceFeeCap))
+	}
+	return nil
+}
+
+func ValidateServiceDeposit(deposit sdk.Coins) sdk.Error {
+	if !deposit.Empty() && !ValidateServiceCoins(deposit) {
+		return ErrInvalidDeposit(DefaultCodespace, fmt.Sprintf("invalid deposit: %s", deposit))
+	}
+	return nil
+}
+
+// ValidateServiceName validates the service name
+func ValidateServiceName(name string) sdk.Error {
+	if !reServiceName.MatchString(name) || len(name) > MaxNameLength {
+		return ErrInvalidServiceName(DefaultCodespace, name)
+	}
+	return nil
+}
+
+func ValidateMinRespTime(minRespTime uint64) sdk.Error {
+	if minRespTime == 0 {
+		return ErrInvalidMinRespTime(DefaultCodespace, "minimum response time must be greater than 0")
+	}
+	return nil
+}
+
+func ValidateRequestID(reqID []byte) sdk.Error {
+	if len(reqID) != RequestIDLen {
+		return ErrInvalidRequestContextID(DefaultCodespace, fmt.Sprintf("length of the request ID must be %d in bytes", RequestIDLen))
+	}
+	return nil
+}
+
+func ValidateTags(tags []string) sdk.Error {
+	if sdk.HasDuplicate(tags) {
+		return ErrDuplicateTags(DefaultCodespace)
+	}
+
+	if len(tags) > MaxTagsNum {
+		return ErrInvalidLength(DefaultCodespace, fmt.Sprintf("invalid tags size; got: %d, max: %d", len(tags), MaxTagsNum))
+	}
+
+	for i, tag := range tags {
+		if len(tag) == 0 {
+			return ErrInvalidLength(DefaultCodespace, fmt.Sprintf("invalid tag[%d] length: tag must not be empty", i))
+		}
+		if len(tag) > MaxTagLength {
+			return ErrInvalidLength(DefaultCodespace, fmt.Sprintf("invalid tag[%d] length; got: %d, max: %d", i, len(tag), MaxTagLength))
+		}
+	}
+
+	return nil
+}
+
+func ValidateSvcDescription(svcDescription string) sdk.Error {
+	if len(svcDescription) > MaxDescriptionLength {
+		return ErrInvalidLength(DefaultCodespace, fmt.Sprintf("invalid description length; got: %d, max: %d", len(svcDescription), MaxDescriptionLength))
+	}
+	return nil
+}
+
+func ValidateAuthorDescription(authorDescription string) sdk.Error {
+	if len(authorDescription) > MaxDescriptionLength {
+		return ErrInvalidLength(DefaultCodespace, fmt.Sprintf("invalid author description length; got: %d, max: %d", len(authorDescription), MaxDescriptionLength))
+	}
+	return nil
+}
+
+func ValidateInput(input string) sdk.Error {
+	if len(input) == 0 {
+		return ErrInvalidRequestInput(DefaultCodespace, "input missing")
+	}
+
+	if !json.Valid([]byte(input)) {
+		return ErrInvalidRequestInput(DefaultCodespace, "input is not valid JSON")
+	}
+
+	return nil
+}
+
+func ValidateOutput(code uint16, output string) sdk.Error {
+	if code == 200 && len(output) == 0 {
+		return ErrInvalidResponse(DefaultCodespace, "output must be specified when the result code is 200")
+	}
+
+	if code != 200 && len(output) != 0 {
+		return ErrInvalidResponse(DefaultCodespace, "output should not be specified when the result code is not 200")
+	}
+
+	if len(output) > 0 && !json.Valid([]byte(output)) {
+		return ErrInvalidResponseOutput(DefaultCodespace, "output is not valid JSON")
+	}
+
+	return nil
+}
+
 func checkDuplicateProviders(providers []sdk.AccAddress) sdk.Error {
 	providerArr := make([]string, len(providers))
 
@@ -1093,8 +1165,4 @@ func checkDuplicateProviders(providers []sdk.AccAddress) sdk.Error {
 	}
 
 	return nil
-}
-
-func validServiceCoins(coins sdk.Coins) bool {
-	return coins.IsValidIrisAtto()
 }

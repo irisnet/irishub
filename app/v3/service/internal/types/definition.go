@@ -17,7 +17,14 @@ type ServiceDefinition struct {
 }
 
 // NewServiceDefinition creates a new ServiceDefinition instance
-func NewServiceDefinition(name, description string, tags []string, author sdk.AccAddress, authorDescription, schemas string) ServiceDefinition {
+func NewServiceDefinition(
+	name string,
+	description string,
+	tags []string,
+	author sdk.AccAddress,
+	authorDescription,
+	schemas string,
+) ServiceDefinition {
 	return ServiceDefinition{
 		Name:              name,
 		Description:       description,
@@ -31,67 +38,41 @@ func NewServiceDefinition(name, description string, tags []string, author sdk.Ac
 // String implements fmt.Stringer
 func (svcDef ServiceDefinition) String() string {
 	return fmt.Sprintf(`ServiceDefinition:
-		Name:                  %s
-		Description:           %s
-		Tags:                  %v
-		Author:                %s
-		AuthorDescription:     %s
-		Schemas:               %s`,
-		svcDef.Name, svcDef.Description, svcDef.Tags,
-		svcDef.Author, svcDef.AuthorDescription, svcDef.Schemas,
+	Name:                  %s
+	Description:           %s
+	Tags:                  %v
+	Author:                %s
+	AuthorDescription:     %s
+	Schemas:               %s`,
+		svcDef.Name,
+		svcDef.Description,
+		svcDef.Tags,
+		svcDef.Author,
+		svcDef.AuthorDescription,
+		svcDef.Schemas,
 	)
 }
 
 func (svcDef ServiceDefinition) Validate() sdk.Error {
-	if len(svcDef.Author) == 0 {
-		return ErrInvalidAddress(DefaultCodespace, "author missing")
-	}
-
-	if !validServiceName(svcDef.Name) {
-		return ErrInvalidServiceName(DefaultCodespace, svcDef.Name)
-	}
-
-	if err := validateServiceDefLength(svcDef); err != nil {
+	if err := ValidateAuthor(svcDef.Author); err != nil {
 		return err
 	}
 
-	if sdk.HasDuplicate(svcDef.Tags) {
-		return ErrDuplicateTags(DefaultCodespace)
+	if err := ValidateServiceName(svcDef.Name); err != nil {
+		return err
 	}
 
-	if len(svcDef.Schemas) == 0 {
-		return ErrInvalidSchemas(DefaultCodespace, "schemas missing")
+	if err := ValidateTags(svcDef.Tags); err != nil {
+		return err
+	}
+
+	if err := ValidateSvcDescription(svcDef.Description); err != nil {
+		return err
+	}
+
+	if err := ValidateAuthorDescription(svcDef.AuthorDescription); err != nil {
+		return err
 	}
 
 	return ValidateServiceSchemas(svcDef.Schemas)
-}
-
-func validateServiceDefLength(svcDef ServiceDefinition) sdk.Error {
-	if err := ensureServiceNameLength(svcDef.Name); err != nil {
-		return err
-	}
-
-	if len(svcDef.Description) > MaxDescriptionLength {
-		return ErrInvalidLength(DefaultCodespace, fmt.Sprintf("invalid description length; got: %d, max: %d", len(svcDef.Description), MaxDescriptionLength))
-	}
-
-	if len(svcDef.Tags) > MaxTagsNum {
-		return ErrInvalidLength(DefaultCodespace, fmt.Sprintf("invalid tags size; got: %d, max: %d", len(svcDef.Tags), MaxTagsNum))
-	}
-
-	for i, tag := range svcDef.Tags {
-		if len(tag) == 0 {
-			return ErrInvalidLength(DefaultCodespace, fmt.Sprintf("invalid tag[%d] length: tag must not be empty", i))
-		}
-
-		if len(tag) > MaxTagLength {
-			return ErrInvalidLength(DefaultCodespace, fmt.Sprintf("invalid tag[%d] length; got: %d, max: %d", i, len(tag), MaxTagLength))
-		}
-	}
-
-	if len(svcDef.AuthorDescription) > MaxDescriptionLength {
-		return ErrInvalidLength(DefaultCodespace, fmt.Sprintf("invalid author description length; got: %d, max: %d", len(svcDef.AuthorDescription), MaxDescriptionLength))
-	}
-
-	return nil
 }

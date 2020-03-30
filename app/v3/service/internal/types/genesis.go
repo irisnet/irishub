@@ -73,8 +73,11 @@ func ValidateGenesis(data GenesisState) error {
 		}
 	}
 
-	for requestContextID := range data.RequestContexts {
+	for requestContextID, requestContext := range data.RequestContexts {
 		if _, err := hex.DecodeString(requestContextID); err != nil {
+			return err
+		}
+		if err := requestContext.Validate(); err != nil {
 			return err
 		}
 	}

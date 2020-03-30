@@ -16,11 +16,13 @@ func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
 		k.SetFeed(ctx, entry.Feed)
 		if reqCtx, found := k.GetRequestContext(ctx, entry.Feed.RequestContextID); found {
 			for _, value := range entry.Values {
-				k.SetFeedValue(ctx,
+				k.SetFeedValue(
+					ctx,
 					entry.Feed.FeedName,
 					reqCtx.BatchCounter,
 					entry.Feed.LatestHistory,
-					value)
+					value,
+				)
 			}
 			k.Enqueue(ctx, entry.Feed.FeedName, entry.State)
 		}
@@ -34,11 +36,14 @@ func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 	k.IteratorFeeds(ctx, func(feed types.Feed) {
 		reqCtx, found := k.GetRequestContext(ctx, feed.RequestContextID)
 		if found {
-			entries = append(entries, FeedEntry{
-				Feed:   feed,
-				Values: k.GetFeedValues(ctx, feed.FeedName),
-				State:  reqCtx.State,
-			})
+			entries = append(
+				entries,
+				FeedEntry{
+					Feed:   feed,
+					Values: k.GetFeedValues(ctx, feed.FeedName),
+					State:  reqCtx.State,
+				},
+			)
 		}
 	})
 	return GenesisState{
@@ -58,35 +63,4 @@ func DefaultGenesisStateForTest() GenesisState {
 	return GenesisState{
 		Entries: []FeedEntry{},
 	}
-}
-
-// ValidateGenesis validates the provided asset genesis state to ensure the
-// expected invariants holds.
-func ValidateGenesis(data GenesisState) error {
-	for _, entry := range data.Entries {
-		feed := entry.Feed
-		if err := types.ValidateFeedName(feed.FeedName); err != nil {
-			return err
-		}
-		if err := types.ValidateDescription(feed.Description); err != nil {
-			return err
-		}
-
-		if err := types.ValidateAggregateFunc(feed.AggregateFunc); err != nil {
-			return err
-		}
-
-		if err := types.ValidateValueJsonPath(feed.ValueJsonPath); err != nil {
-			return err
-		}
-
-		if err := types.ValidateLatestHistory(feed.LatestHistory); err != nil {
-			return err
-		}
-
-		if err := types.ValidateCreator(feed.Creator); err != nil {
-			return err
-		}
-	}
-	return nil
 }
