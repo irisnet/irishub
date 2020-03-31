@@ -101,8 +101,8 @@ func PrepForZeroHeightGenesis(ctx sdk.Context, k Keeper) {
 		panic(fmt.Sprintf("failed to refund the earned fees: %s", err))
 	}
 
-	// reset request context state
-	if err := k.ResetRequestContextStateAndBatch(ctx); err != nil {
+	// reset request contexts state and batch
+	if err := k.ResetRequestContextsStateAndBatch(ctx); err != nil {
 		panic(fmt.Sprintf("failed to reset the request context state: %s", err))
 	}
 }

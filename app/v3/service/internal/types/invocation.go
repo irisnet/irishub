@@ -98,8 +98,6 @@ func (rc RequestContext) Validate() sdk.Error {
 		return err
 	}
 
-	// TODO
-
 	return nil
 }
 

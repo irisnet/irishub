@@ -159,9 +159,3 @@ func (k Keeper) RefundServiceFees(ctx sdk.Context) sdk.Error {
 
 	return nil
 }
-
-// ResetRequestContextStateAndBatch reset request context state and batch
-func (k Keeper) ResetRequestContextStateAndBatch(ctx sdk.Context) sdk.Error {
-	// TODO
-	return nil
-}
