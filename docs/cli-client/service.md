@@ -30,6 +30,7 @@ Service module allows you to define, bind, invoke services on the IRIS Hub. [Rea
 | [kill](#iriscli-service-kill)                           | Terminate a request context                                 |
 | [fees](#iriscli-service-fees)                           | Query the earned fees of a provider                         |
 | [withdraw-fees](#iriscli-service-withdraw-fees)         | Withdraw the earned fees of a provider                      |
+| [withdraw-tax](#iriscli-service-withdraw-tax)           | Withdraw the service tax                      |
 
 ## iriscli service define
 
@@ -510,3 +511,21 @@ iriscli service withdraw-fees [flags]
 ```bash
 iriscli service withdraw-fees --chain-id=irishub --from=<key-name> --fee=0.3iris
 ```
+
+## iriscli service withdraw-tax
+
+Withdraw the service tax.
+
+```bash
+iriscli service withdraw-tax [destination-address] [withdrawal-amount] [flags]
+```
+
+### Withdraw the service tax
+
+```bash
+iriscli service withdraw-tax <destination-address> <withdrawal-amount> --chain-id=irishub --from=<key-name> --fee=0.3iris
+```
+
+:::tip
+Only the trustee can withdraw the service tax
+:::

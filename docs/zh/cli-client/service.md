@@ -30,6 +30,7 @@ Service模块允许在IRIS Hub中定义、绑定、调用服务。[了解更多i
 | [kill](#iriscli-service-kill)                           | 终止请求上下文                               |
 | [fees](#iriscli-service-fees)                           | 查询服务提供者的收益                         |
 | [withdraw-fees](#iriscli-service-withdraw-fees)         | 提取服务提供者的收益                         |
+| [withdraw-tax](#iriscli-service-withdraw-tax)           | 提取服务费税                      |
 
 ## iriscli service define
 
@@ -515,3 +516,21 @@ iriscli service withdraw-fees [flags]
 ```bash
 iriscli service withdraw-fees --chain-id=irishub --from=<key-name> --fee=0.3iris
 ```
+
+## iriscli service withdraw-tax
+
+提取服务费税。
+
+```bash
+iriscli service withdraw-tax [destination-address] [withdrawal-amount] [flags]
+```
+
+### 提取服务费税
+
+```bash
+iriscli service withdraw-tax <destination-address> <withdrawal-amount> --chain-id=irishub --from=<key-name> --fee=0.3iris
+```
+
+:::tip
+只有trustee才能提取服务费税
+:::
