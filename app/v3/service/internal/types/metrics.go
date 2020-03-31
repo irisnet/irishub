@@ -11,13 +11,15 @@ import (
 	promutil "github.com/irisnet/irishub/tools/prometheus"
 )
 
+// MetricsSubsystem defines the metrics name for the service module
 const MetricsSubsystem = "module_service"
 
+// Metrics defines a metrics struct
 type Metrics struct {
 	ActiveRequests metrics.Gauge
 }
 
-// PrometheusMetrics returns Metrics build using Prometheus client library.
+// PrometheusMetrics returns Metrics built using Prometheus client library.
 func PrometheusMetrics(config *cfg.InstrumentationConfig) *Metrics {
 	if !config.Prometheus {
 		return NopMetrics()
@@ -37,6 +39,7 @@ func PrometheusMetrics(config *cfg.InstrumentationConfig) *Metrics {
 	}
 }
 
+// NopMetrics returns a no-op metrics
 func NopMetrics() *Metrics {
 	return &Metrics{
 		ActiveRequests: discard.NewGauge(),

@@ -158,6 +158,7 @@ func ValidatePricing(pricing Pricing) sdk.Error {
 	return nil
 }
 
+// Validate validates the service binding
 func (binding ServiceBinding) Validate() sdk.Error {
 	if len(binding.Provider) == 0 {
 		return ErrInvalidAddress(DefaultCodespace, "provider missing")
