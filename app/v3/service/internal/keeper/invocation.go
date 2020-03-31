@@ -270,9 +270,8 @@ func (k Keeper) StartRequestContext(
 	requestContext.State = types.RUNNING
 	k.SetRequestContext(ctx, requestContextID, requestContext)
 
-	if requestContext.BatchState == types.BATCHCOMPLETED &&
-		(requestContext.BatchRequestCount == 0 ||
-			requestContext.BatchRequestCount != requestContext.BatchResponseCount) {
+	// add to the new request batch queue if existing in neither expired nor new request batch queue
+	if !k.HasRequestBatchExpiration(ctx, requestContextID) && !k.HasNewRequestBatch(ctx, requestContextID) {
 		k.AddNewRequestBatch(ctx, requestContextID, ctx.BlockHeight())
 	}
 
@@ -621,12 +620,22 @@ func (k Keeper) AddRequestBatchExpiration(ctx sdk.Context, requestContextID cmn.
 
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(requestContextID)
 	store.Set(GetExpiredRequestBatchKey(requestContextID, expirationHeight), bz)
+
+	k.SetRequestBatchExpirationHeight(ctx, requestContextID, expirationHeight)
 }
 
 // DeleteRequestBatchExpiration deletes the request batch from the expiration queue
 func (k Keeper) DeleteRequestBatchExpiration(ctx sdk.Context, requestContextID cmn.HexBytes, expirationHeight int64) {
 	store := ctx.KVStore(k.storeKey)
 	store.Delete(GetExpiredRequestBatchKey(requestContextID, expirationHeight))
+
+	k.DeleteRequestBatchExpirationHeight(ctx, requestContextID)
+}
+
+// HasRequestBatchExpiration checks if the request batch expiration of the specified request context exists
+func (k Keeper) HasRequestBatchExpiration(ctx sdk.Context, requestContextID cmn.HexBytes) bool {
+	store := ctx.KVStore(k.storeKey)
+	return store.Has(GetExpiredRequestBatchHeightKey(requestContextID))
 }
 
 // AddNewRequestBatch adds a request batch to the new request batch queue
@@ -635,18 +644,50 @@ func (k Keeper) AddNewRequestBatch(ctx sdk.Context, requestContextID cmn.HexByte
 
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(requestContextID)
 	store.Set(GetNewRequestBatchKey(requestContextID, requestBatchHeight), bz)
+
+	k.SetNewRequestBatchHeight(ctx, requestContextID, requestBatchHeight)
 }
 
 // DeleteNewRequestBatch deletes the request batch in the given height from the new request batch queue
 func (k Keeper) DeleteNewRequestBatch(ctx sdk.Context, requestContextID cmn.HexBytes, requestBatchHeight int64) {
 	store := ctx.KVStore(k.storeKey)
 	store.Delete(GetNewRequestBatchKey(requestContextID, requestBatchHeight))
+
+	k.DeleteNewRequestBatchHeight(ctx, requestContextID)
 }
 
-// HasNewRequestBatch checks if the new request batch from the specified request context exists in the given height
-func (k Keeper) HasNewRequestBatch(ctx sdk.Context, requestContextID cmn.HexBytes, requestBatchHeight int64) bool {
+// HasNewRequestBatch checks if the new request batch of the specified request context exists
+func (k Keeper) HasNewRequestBatch(ctx sdk.Context, requestContextID cmn.HexBytes) bool {
 	store := ctx.KVStore(k.storeKey)
-	return store.Has(GetNewRequestBatchKey(requestContextID, requestBatchHeight))
+	return store.Has(GetNewRequestBatchHeightKey(requestContextID))
+}
+
+// SetRequestBatchExpirationHeight sets the request batch expiration height for the specified request context
+func (k Keeper) SetRequestBatchExpirationHeight(ctx sdk.Context, requestContextID cmn.HexBytes, expirationHeight int64) {
+	store := ctx.KVStore(k.storeKey)
+
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(expirationHeight)
+	store.Set(GetExpiredRequestBatchHeightKey(requestContextID), bz)
+}
+
+// DeleteRequestBatchExpirationHeight deletes the request batch expiration height for the specified request context
+func (k Keeper) DeleteRequestBatchExpirationHeight(ctx sdk.Context, requestContextID cmn.HexBytes) {
+	store := ctx.KVStore(k.storeKey)
+	store.Delete(GetExpiredRequestBatchHeightKey(requestContextID))
+}
+
+// SetNewRequestBatchHeight sets the new request batch height for the specified request context
+func (k Keeper) SetNewRequestBatchHeight(ctx sdk.Context, requestContextID cmn.HexBytes, requestBatchHeight int64) {
+	store := ctx.KVStore(k.storeKey)
+
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(requestBatchHeight)
+	store.Set(GetNewRequestBatchHeightKey(requestContextID), bz)
+}
+
+// DeleteNewRequestBatchHeight deletes the new request batch height for the specified request context
+func (k Keeper) DeleteNewRequestBatchHeight(ctx sdk.Context, requestContextID cmn.HexBytes) {
+	store := ctx.KVStore(k.storeKey)
+	store.Delete(GetNewRequestBatchHeightKey(requestContextID))
 }
 
 // IterateExpiredRequestBatch iterates through the expired request batch queue in the specified height
