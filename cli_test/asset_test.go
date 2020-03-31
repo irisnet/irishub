@@ -52,7 +52,7 @@ func TestIrisCLIIssueToken(t *testing.T) {
 	tests.WaitForNextNBlocksTM(1, f.Port)
 
 	// Ensure transaction tags can be queried
-	searchResult := f.QueryTxs(1, 50, "message.action:issue_token", fmt.Sprintf("message.sender:%s", fooAddr))
+	searchResult := f.QueryTxs(1, 50, "message.action=issue_token", fmt.Sprintf("message.sender=%s", fooAddr))
 	require.Len(t, searchResult.Txs, 1)
 
 	// Ensure token is directly queryable
@@ -86,7 +86,7 @@ func TestIrisCLIIssueToken(t *testing.T) {
 	tests.WaitForNextNBlocksTM(1, f.Port)
 
 	// Ensure transaction tags can be queried
-	searchResult = f.QueryTxs(1, 50, "message.action:edit_token", fmt.Sprintf("message.sender:%s", fooAddr))
+	searchResult = f.QueryTxs(1, 50, "message.action=edit_token", fmt.Sprintf("message.sender=%s", fooAddr))
 	require.Len(t, searchResult.Txs, 1)
 
 	// Ensure token has been edited
@@ -106,7 +106,7 @@ func TestIrisCLIIssueToken(t *testing.T) {
 	tests.WaitForNextNBlocksTM(1, f.Port)
 
 	// Ensure transaction tags can be queried
-	searchResult = f.QueryTxs(1, 50, "message.action:mint_token", fmt.Sprintf("message.sender:%s", fooAddr))
+	searchResult = f.QueryTxs(1, 50, "message.action=mint_token", fmt.Sprintf("message.sender=%s", fooAddr))
 	require.Len(t, searchResult.Txs, 1)
 
 	// Ensure token has been minted
@@ -126,7 +126,7 @@ func TestIrisCLIIssueToken(t *testing.T) {
 	tests.WaitForNextNBlocksTM(1, f.Port)
 
 	// Ensure transaction tags can be queried
-	searchResult = f.QueryTxs(1, 50, "message.action:transfer_token", fmt.Sprintf("message.sender:%s", fooAddr))
+	searchResult = f.QueryTxs(1, 50, "message.action=transfer_token", fmt.Sprintf("message.sender=%s", fooAddr))
 	require.Len(t, searchResult.Txs, 1)
 
 	// Ensure token owner has been modified
@@ -145,7 +145,7 @@ func TestIrisCLIIssueToken(t *testing.T) {
 	tests.WaitForNextNBlocksTM(1, f.Port)
 
 	// Ensure transaction tags can be queried
-	searchResult = f.QueryTxs(1, 50, "message.action:burn_token", fmt.Sprintf("message.sender:%s", barAddr))
+	searchResult = f.QueryTxs(1, 50, "message.action=burn_token", fmt.Sprintf("message.sender=%s", barAddr))
 	require.Len(t, searchResult.Txs, 1)
 
 	// Ensure token has been burn

@@ -13,7 +13,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/cosmos/cosmos-sdk/client/keys"
 	crkeys "github.com/cosmos/cosmos-sdk/crypto/keys"
 	"github.com/cosmos/cosmos-sdk/tests"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -26,7 +25,7 @@ import (
 func TestRand(t *testing.T) {
 	name := "sender"
 	blockInterval := uint64(50)
-	kb, err := keys.NewKeyringFromDir(InitClientHome(""), nil)
+	kb, err := newKeybase()
 	require.NoError(t, err)
 	addr, _, err := CreateAddr(name, kb)
 	require.NoError(t, err)
@@ -37,8 +36,8 @@ func TestRand(t *testing.T) {
 
 	// request rand
 	resultTx := requestRand(t, port, name, kb, addr, blockInterval)
-	requestID := resultTx.Events[1].Attributes[0].Value
-	generateHeight, err := strconv.ParseInt(resultTx.Events[1].Attributes[1].Value, 10, 64)
+	requestID := resultTx.Logs[0].Events[1].Attributes[0].Value
+	generateHeight, err := strconv.ParseInt(resultTx.Logs[0].Events[1].Attributes[1].Value, 10, 64)
 	txHash := resultTx.TxHash
 	require.NoError(t, err)
 	tests.WaitForHeight(resultTx.Height+1, port)

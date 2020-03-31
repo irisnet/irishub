@@ -190,7 +190,7 @@ func (suite *KeeperTestSuite) TestClaimHTLC() {
 			claimedReceiverAmount := suite.app.AccountKeeper.GetAccount(suite.ctx, addrTo).GetCoins()
 
 			suite.True(originHTLCAmount.Sub(amount).IsEqual(claimedHTLCAmount), "TestData: %d", i)
-			suite.True(originReceiverAmount.Add(amount).IsEqual(claimedReceiverAmount), "TestData: %d", i)
+			suite.True(originReceiverAmount.Add(amount...).IsEqual(claimedReceiverAmount), "TestData: %d", i)
 		} else {
 			htlc := types.NewHTLC(
 				td.senderAddr,
@@ -266,7 +266,7 @@ func (suite *KeeperTestSuite) TestRefundHTLC() {
 	claimedSenderAmount := suite.app.AccountKeeper.GetAccount(suite.ctx, addrSender).GetCoins()
 
 	suite.True(originHTLCAmount.Sub(amount).IsEqual(claimedHTLCAmount))
-	suite.True(originSenderAmount.Add(amount).IsEqual(claimedSenderAmount))
+	suite.True(originSenderAmount.Add(amount...).IsEqual(claimedSenderAmount))
 }
 
 func (suite *KeeperTestSuite) TestIterateHTLCs() {

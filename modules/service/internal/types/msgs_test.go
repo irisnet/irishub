@@ -50,7 +50,7 @@ func TestMsgDefineServiceValidation(t *testing.T) {
 	testMsgs := []MsgDefineService{
 		NewMsgDefineService(testServiceName, testServiceDesc, testServiceTags, testAuthor, testAuthorDesc, testSchemas),            // valid msg
 		NewMsgDefineService(testServiceName, testServiceDesc, testServiceTags, emptyAddress, testAuthorDesc, testSchemas),          // missing author address
-		NewMsgDefineService("service/name", testServiceDesc, testServiceTags, testAuthor, testAuthorDesc, testSchemas),             // service name contains illegal charactors
+		NewMsgDefineService("service/name", testServiceDesc, testServiceTags, testAuthor, testAuthorDesc, testSchemas),             // service name contains illegal characters
 		NewMsgDefineService(invalidLongName, testServiceDesc, testServiceTags, testAuthor, testAuthorDesc, testSchemas),            // too long service name
 		NewMsgDefineService(testServiceName, invalidLongDesc, testServiceTags, testAuthor, testAuthorDesc, testSchemas),            // too long service description
 		NewMsgDefineService(testServiceName, testServiceDesc, invalidMoreTags, testAuthor, testAuthorDesc, testSchemas),            // too many tags
@@ -69,7 +69,7 @@ func TestMsgDefineServiceValidation(t *testing.T) {
 	}{
 		{testMsgs[0], true, ""},
 		{testMsgs[1], false, "missing author address"},
-		{testMsgs[2], false, "service name contains illegal charactors"},
+		{testMsgs[2], false, "service name contains illegal characters"},
 		{testMsgs[3], false, "too long service name"},
 		{testMsgs[4], false, "too long service description"},
 		{testMsgs[5], false, "too many tags"},

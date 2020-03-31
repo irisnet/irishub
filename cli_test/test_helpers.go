@@ -164,8 +164,11 @@ func InitFixtures(t *testing.T) (f *Fixtures) {
 	f.KeysAdd(keyBar)
 	f.KeysAdd(keyBaz)
 	f.KeysAdd(keyVesting)
-	f.KeysAdd(keyFooBarBaz, "--multisig-threshold=2", fmt.Sprintf(
-		"--multisig=%s,%s,%s", keyFoo, keyBar, keyBaz))
+	f.KeysAdd(
+		keyFooBarBaz,
+		"--multisig-threshold=2",
+		fmt.Sprintf("--multisig=%s,%s,%s", keyFoo, keyBar, keyBaz),
+	)
 
 	// ensure that CLI output is in JSON format
 	f.CLIConfig("output", "json")
@@ -305,8 +308,8 @@ func (f *Fixtures) KeysDelete(name string, flags ...string) {
 
 // KeysAdd is iriscli keys add
 func (f *Fixtures) KeysAdd(name string, flags ...string) {
-	cmd := fmt.Sprintf("%s keys add --keyring-backend=test --home=%s %s", f.IriscliBinary,
-		f.IriscliHome, name)
+	cmd := fmt.Sprintf("%s keys add --keyring-backend=test --home=%s %s",
+		f.IriscliBinary, f.IriscliHome, name)
 	executeWriteCheckErr(f.T, addFlags(cmd, flags))
 }
 
@@ -319,15 +322,15 @@ func (f *Fixtures) KeysAddRecover(name, mnemonic string, flags ...string) (exitS
 
 // KeysAddRecoverHDPath prepares iriscli keys add --recover --account --index
 func (f *Fixtures) KeysAddRecoverHDPath(name, mnemonic string, account uint32, index uint32, flags ...string) {
-	cmd := fmt.Sprintf("%s keys add --keyring-backend=test --home=%s --recover %s --account %d"+
-		" --index %d", f.IriscliBinary, f.IriscliHome, name, account, index)
+	cmd := fmt.Sprintf("%s keys add --keyring-backend=test --home=%s --recover %s --account %d --index %d",
+		f.IriscliBinary, f.IriscliHome, name, account, index)
 	executeWriteCheckErr(f.T, addFlags(cmd, flags), mnemonic)
 }
 
 // KeysShow is iriscli keys show
 func (f *Fixtures) KeysShow(name string, flags ...string) keys.KeyOutput {
-	cmd := fmt.Sprintf("%s keys show --keyring-backend=test --home=%s %s", f.IriscliBinary,
-		f.IriscliHome, name)
+	cmd := fmt.Sprintf("%s keys show --keyring-backend=test --home=%s %s",
+		f.IriscliBinary, f.IriscliHome, name)
 	out, _ := tests.ExecuteT(f.T, addFlags(cmd, flags), "")
 	var ko keys.KeyOutput
 	err := clientkeys.UnmarshalJSON([]byte(out), &ko)
@@ -357,8 +360,8 @@ func (f *Fixtures) CLIConfig(key, value string, flags ...string) {
 
 // TxSend is iriscli tx send
 func (f *Fixtures) TxSend(from string, to sdk.AccAddress, amount sdk.Coin, flags ...string) (bool, string, string) {
-	cmd := fmt.Sprintf("%s tx send --keyring-backend=test %s %s %s %v", f.IriscliBinary, from,
-		to, amount, f.Flags())
+	cmd := fmt.Sprintf("%s tx send --keyring-backend=test %s %s %s %v",
+		f.IriscliBinary, from, to, amount, f.Flags())
 	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), clientkeys.DefaultKeyPass)
 }
 
@@ -385,8 +388,9 @@ func (f *Fixtures) TxEncode(fileName string, flags ...string) (bool, string, str
 func (f *Fixtures) TxMultisign(fileName, name string, signaturesFiles []string,
 	flags ...string) (bool, string, string) {
 
-	cmd := fmt.Sprintf("%s tx multisign --keyring-backend=test %v %s %s %s", f.IriscliBinary, f.Flags(),
-		fileName, name, strings.Join(signaturesFiles, " "),
+	cmd := fmt.Sprintf(
+		"%s tx multisign --keyring-backend=test %v %s %s %s",
+		f.IriscliBinary, f.Flags(), fileName, name, strings.Join(signaturesFiles, " "),
 	)
 	return executeWriteRetStdStreams(f.T, cmd)
 }
@@ -396,8 +400,8 @@ func (f *Fixtures) TxMultisign(fileName, name string, signaturesFiles []string,
 
 // TxStakingCreateValidator is iriscli tx staking create-validator
 func (f *Fixtures) TxStakingCreateValidator(from, consPubKey string, amount sdk.Coin, flags ...string) (bool, string, string) {
-	cmd := fmt.Sprintf("%s tx staking create-validator %v --keyring-backend=test --from=%s"+
-		" --pubkey=%s", f.IriscliBinary, f.Flags(), from, consPubKey)
+	cmd := fmt.Sprintf("%s tx staking create-validator %v --keyring-backend=test --from=%s --pubkey=%s",
+		f.IriscliBinary, f.Flags(), from, consPubKey)
 	cmd += fmt.Sprintf(" --amount=%v --moniker=%v --commission-rate=%v", amount, from, "0.05")
 	cmd += fmt.Sprintf(" --commission-max-rate=%v --commission-max-change-rate=%v", "0.20", "0.10")
 	cmd += fmt.Sprintf(" --min-self-delegation=%v", "1")
@@ -441,12 +445,8 @@ func (f *Fixtures) TxGovVote(proposalID int, option gov.VoteOption, from string,
 func (f *Fixtures) TxGovSubmitParamChangeProposal(
 	from, proposalPath string, deposit sdk.Coin, flags ...string,
 ) (bool, string, string) {
-
-	cmd := fmt.Sprintf(
-		"%s tx gov submit-proposal param-change %s --keyring-backend=test --from=%s %v",
-		f.IriscliBinary, proposalPath, from, f.Flags(),
-	)
-
+	cmd := fmt.Sprintf("%s tx gov submit-proposal param-change %s --keyring-backend=test --from=%s %v",
+		f.IriscliBinary, proposalPath, from, f.Flags())
 	return executeWriteRetStdStreams(f.T, addFlags(cmd, flags), clientkeys.DefaultKeyPass)
 }
 
@@ -487,8 +487,8 @@ func (f *Fixtures) QueryAccount(address sdk.AccAddress, flags ...string) auth.Ba
 // iriscli query txs
 
 // QueryTxs is iriscli query txs
-func (f *Fixtures) QueryTxs(page, limit int, tags ...string) *sdk.SearchTxsResult {
-	cmd := fmt.Sprintf("%s query txs --page=%d --limit=%d --tags='%s' %v", f.IriscliBinary, page, limit, queryTags(tags), f.Flags())
+func (f *Fixtures) QueryTxs(page, limit int, events ...string) *sdk.SearchTxsResult {
+	cmd := fmt.Sprintf("%s query txs --page=%d --limit=%d --events='%s' %v", f.IriscliBinary, page, limit, queryEvents(events), f.Flags())
 	out, _ := tests.ExecuteT(f.T, cmd, "")
 	var result sdk.SearchTxsResult
 	cdc := app.MakeCodec()
@@ -498,8 +498,8 @@ func (f *Fixtures) QueryTxs(page, limit int, tags ...string) *sdk.SearchTxsResul
 }
 
 // QueryTxsInvalid query txs with wrong parameters and compare expected error
-func (f *Fixtures) QueryTxsInvalid(expectedErr error, page, limit int, tags ...string) {
-	cmd := fmt.Sprintf("%s query txs --page=%d --limit=%d --tags='%s' %v", f.IriscliBinary, page, limit, queryTags(tags), f.Flags())
+func (f *Fixtures) QueryTxsInvalid(expectedErr error, page, limit int, events ...string) {
+	cmd := fmt.Sprintf("%s query txs --page=%d --limit=%d --events='%s' %v", f.IriscliBinary, page, limit, queryEvents(events), f.Flags())
 	_, err := tests.ExecuteT(f.T, cmd, "")
 	require.EqualError(f.T, expectedErr, err)
 }
@@ -788,9 +788,9 @@ func addFlags(cmd string, flags []string) string {
 	return strings.TrimSpace(cmd)
 }
 
-func queryTags(tags []string) (out string) {
-	for _, tag := range tags {
-		out += tag + "&"
+func queryEvents(events []string) (out string) {
+	for _, event := range events {
+		out += event + "&"
 	}
 	return strings.TrimSuffix(out, "&")
 }

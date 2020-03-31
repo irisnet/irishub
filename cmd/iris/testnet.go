@@ -15,14 +15,16 @@ import (
 
 	tmconfig "github.com/tendermint/tendermint/config"
 	"github.com/tendermint/tendermint/crypto"
-	cmn "github.com/tendermint/tendermint/libs/common"
+	tmos "github.com/tendermint/tendermint/libs/os"
+	tmrand "github.com/tendermint/tendermint/libs/rand"
 	"github.com/tendermint/tendermint/types"
 	tmtime "github.com/tendermint/tendermint/types/time"
 
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/input"
-	"github.com/cosmos/cosmos-sdk/client/keys"
+	clientkeys "github.com/cosmos/cosmos-sdk/client/keys"
 	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/cosmos/cosmos-sdk/crypto/keys"
 	"github.com/cosmos/cosmos-sdk/server"
 	srvconfig "github.com/cosmos/cosmos-sdk/server/config"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -108,7 +110,7 @@ func InitTestnet(cmd *cobra.Command, config *tmconfig.Config, cdc *codec.Codec,
 	nodeCLIHome, startingIPAddress string, numValidators int) error {
 
 	if chainID == "" {
-		chainID = "chain-" + cmn.RandStr(6)
+		chainID = "chain-" + tmrand.Str(6)
 	}
 
 	monikers := make([]string, numValidators)
@@ -164,7 +166,7 @@ func InitTestnet(cmd *cobra.Command, config *tmconfig.Config, cdc *codec.Codec,
 
 		buf := bufio.NewReader(cmd.InOrStdin())
 		prompt := fmt.Sprintf(
-			"Password for account '%s' (default %s):", nodeDirName, keys.DefaultKeyPass,
+			"Password for account '%s' (default %s):", nodeDirName, clientkeys.DefaultKeyPass,
 		)
 
 		keyPass, err := input.GetPassword(prompt, buf)
@@ -176,10 +178,15 @@ func InitTestnet(cmd *cobra.Command, config *tmconfig.Config, cdc *codec.Codec,
 		}
 
 		if keyPass == "" {
-			keyPass = keys.DefaultKeyPass
+			keyPass = clientkeys.DefaultKeyPass
 		}
 
-		kb, err := keys.NewKeyringFromDir(clientDir, inBuf)
+		kb, err := keys.NewKeyring(
+			sdk.KeyringServiceName(),
+			viper.GetString(flags.FlagKeyringBackend),
+			viper.GetString(flagClientHome),
+			inBuf,
+		)
 		if err != nil {
 			return err
 		}
@@ -387,9 +394,9 @@ func writeFile(name string, dir string, contents []byte) error {
 	writePath := filepath.Join(dir)
 	file := filepath.Join(writePath, name)
 
-	if err := cmn.EnsureDir(writePath, 0700); err != nil {
+	if err := tmos.EnsureDir(writePath, 0700); err != nil {
 		return err
 	}
 
-	return cmn.WriteFile(file, contents, 0600)
+	return tmos.WriteFile(file, contents, 0600)
 }

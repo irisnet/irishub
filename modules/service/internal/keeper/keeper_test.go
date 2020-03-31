@@ -128,11 +128,11 @@ func (suite *KeeperTestSuite) TestServiceBinding() {
 	suite.Equal(providerCoins1.Sub(testDeposit), providerCoins2)
 
 	depositMaccCoins2 := suite.app.BankKeeper.GetCoins(suite.ctx, depositMaccAddr)
-	suite.Equal(depositMaccCoins1.Add(testDeposit), depositMaccCoins2)
+	suite.Equal(depositMaccCoins1.Add(testDeposit...), depositMaccCoins2)
 
 	binding, found = suite.app.ServiceKeeper.GetServiceBinding(suite.ctx, testChainID, testServiceName, testChainID, testProvider)
 	suite.True(found)
-	suite.Equal(testDeposit.Add(testDeposit), binding.Deposit)
+	suite.Equal(testDeposit.Add(testDeposit...), binding.Deposit)
 }
 
 func (suite *KeeperTestSuite) TestServiceRequest() {

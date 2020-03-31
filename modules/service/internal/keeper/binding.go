@@ -115,7 +115,7 @@ func (k Keeper) UpdateServiceBinding(
 
 	// Add coins to svcBinding deposit
 	if !newBinding.Deposit.IsAnyNegative() {
-		oldBinding.Deposit = oldBinding.Deposit.Add(newBinding.Deposit)
+		oldBinding.Deposit = oldBinding.Deposit.Add(newBinding.Deposit...)
 	}
 
 	// Send coins from provider's account to the deposit module account
@@ -182,7 +182,7 @@ func (k Keeper) Enable(ctx sdk.Context, defChainID, defName, bindChainID string,
 
 	// Add coins to svcBinding deposit
 	if !deposit.IsAnyNegative() {
-		binding.Deposit = binding.Deposit.Add(deposit)
+		binding.Deposit = binding.Deposit.Add(deposit...)
 	}
 
 	minDeposit, err := k.getMinDeposit(ctx, binding.Prices)
@@ -276,7 +276,7 @@ func (k Keeper) getMinDeposit(ctx sdk.Context, prices []sdk.Coin) (sdk.Coins, er
 		}
 
 		minInt := price.Amount.Mul(minDepositMultiple)
-		minDeposit = minDeposit.Add(sdk.NewCoins(sdk.NewCoin(price.Denom, minInt)))
+		minDeposit = minDeposit.Add(sdk.NewCoin(price.Denom, minInt))
 	}
 
 	return minDeposit, nil

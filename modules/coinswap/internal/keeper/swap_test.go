@@ -279,8 +279,8 @@ func (suite *TestSuite) TestTradeInputForExactOutput() {
 		bought := sdk.NewCoins(outputCoin)
 		sold := sdk.NewCoins(sdk.NewCoin(denomStandard, amt))
 
-		pb := poolBalances.Add(sold).Sub(bought)
-		sb := senderBlances.Add(bought).Sub(sold)
+		pb := poolBalances.Add(sold...).Sub(bought)
+		sb := senderBlances.Add(bought...).Sub(sold)
 
 		assertResult(suite, poolAddr, sender, pb, sb)
 
@@ -312,8 +312,8 @@ func (suite *TestSuite) TestTradeExactInputForOutput() {
 		sold := sdk.NewCoins(inputCoin)
 		bought := sdk.NewCoins(sdk.NewCoin(denomBTC, amt))
 
-		pb := poolBalances.Add(sold).Sub(bought)
-		sb := senderBlances.Add(bought).Sub(sold)
+		pb := poolBalances.Add(sold...).Sub(bought)
+		sb := senderBlances.Add(bought...).Sub(sold)
 
 		assertResult(suite, poolAddr, sender, pb, sb)
 

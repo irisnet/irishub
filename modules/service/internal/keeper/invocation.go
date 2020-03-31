@@ -249,7 +249,7 @@ func (k Keeper) AddReturnFee(ctx sdk.Context, address sdk.AccAddress, coins sdk.
 		return
 	}
 
-	k.SetReturnFee(ctx, address, fee.Coins.Add(coins))
+	k.SetReturnFee(ctx, address, fee.Coins.Add(coins...))
 }
 
 func (k Keeper) SetReturnFee(ctx sdk.Context, address sdk.AccAddress, coins sdk.Coins) {
@@ -303,7 +303,7 @@ func (k Keeper) AddIncomingFee(ctx sdk.Context, address sdk.AccAddress, coins sd
 	taxCoins := sdk.Coins{}
 	for _, coin := range coins {
 		taxAmount := sdk.NewDecFromInt(coin.Amount).Mul(feeTax).TruncateInt()
-		taxCoins = taxCoins.Add(sdk.NewCoins(sdk.NewCoin(coin.Denom, taxAmount)))
+		taxCoins = taxCoins.Add(sdk.NewCoin(coin.Denom, taxAmount))
 	}
 
 	if err := k.sk.SendCoinsFromModuleToModule(ctx, types.RequestAccName, types.TaxAccName, taxCoins); err != nil {
@@ -318,7 +318,7 @@ func (k Keeper) AddIncomingFee(ctx sdk.Context, address sdk.AccAddress, coins sd
 	}
 
 	fee, _ := k.GetIncomingFee(ctx, address)
-	k.SetIncomingFee(ctx, address, fee.Coins.Add(incomingFee))
+	k.SetIncomingFee(ctx, address, fee.Coins.Add(incomingFee...))
 	return nil
 }
 
