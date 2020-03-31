@@ -332,7 +332,7 @@ func GetCmdEnableServiceBinding(cdc *codec.Codec) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().AddFlagSet(FsServiceEnable)
+	cmd.Flags().AddFlagSet(FsServiceEnableBinding)
 
 	return cmd
 }
@@ -376,7 +376,7 @@ func GetCmdCallService(cdc *codec.Codec) *cobra.Command {
 		Use:   "call",
 		Short: "Initiate a service call",
 		Example: "iriscli service call --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --service-name=<service-name> " +
-			"--providers=<provider list> --service-fee-cap=1iris --data=<input content or path/to/input.json> -timeout=100 --repeated --frequency=150 --total=100",
+			"--providers=<provider list> --service-fee-cap=1iris --data=<input content or path/to/input.json> --timeout=100 --repeated --frequency=150 --total=100",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
@@ -454,7 +454,7 @@ func GetCmdCallService(cdc *codec.Codec) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().AddFlagSet(FsServiceRequest)
+	cmd.Flags().AddFlagSet(FsServiceCall)
 	_ = cmd.MarkFlagRequired(FlagServiceName)
 	_ = cmd.MarkFlagRequired(FlagProviders)
 	_ = cmd.MarkFlagRequired(FlagServiceFeeCap)
