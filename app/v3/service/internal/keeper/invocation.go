@@ -236,7 +236,7 @@ func (k Keeper) PauseRequestContext(
 	}
 
 	if requestContext.State != types.RUNNING {
-		return types.ErrRequestContextNotStarted(k.codespace)
+		return types.ErrRequestContextNotRunning(k.codespace)
 	}
 
 	requestContext.State = types.PAUSED

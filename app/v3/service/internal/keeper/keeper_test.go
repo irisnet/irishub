@@ -176,7 +176,7 @@ func TestKeeper_Disable_Service(t *testing.T) {
 	currentTime := time.Now().UTC()
 	ctx = ctx.WithBlockTime(currentTime)
 
-	err := keeper.DisableService(ctx, testServiceName, provider)
+	err := keeper.DisableServiceBinding(ctx, testServiceName, provider)
 	require.NoError(t, err)
 
 	svcBinding, found := keeper.GetServiceBinding(ctx, testServiceName, provider)
@@ -194,7 +194,7 @@ func TestKeeper_Enable_Service(t *testing.T) {
 	disabledTime := time.Now().UTC()
 	setServiceBinding(ctx, keeper, provider, false, disabledTime)
 
-	err := keeper.EnableService(ctx, testServiceName, provider, nil)
+	err := keeper.EnableServiceBinding(ctx, testServiceName, provider, nil)
 	require.NoError(t, err)
 
 	svcBinding, found := keeper.GetServiceBinding(ctx, testServiceName, provider)

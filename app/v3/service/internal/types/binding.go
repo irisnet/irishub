@@ -163,6 +163,7 @@ func ValidatePricing(pricing Pricing) sdk.Error {
 	return nil
 }
 
+// Validate validates the service binding
 func (binding ServiceBinding) Validate() sdk.Error {
 	if err := ValidateProvider(binding.Provider); err != nil {
 		return err

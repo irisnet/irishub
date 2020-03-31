@@ -53,6 +53,7 @@ func (svcDef ServiceDefinition) String() string {
 	)
 }
 
+// Validate validates the service definition
 func (svcDef ServiceDefinition) Validate() sdk.Error {
 	if err := ValidateAuthor(svcDef.Author); err != nil {
 		return err

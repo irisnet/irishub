@@ -180,10 +180,10 @@ This api supports the following special parameters. By default, their values are
 12. `POST /service/contexts`: Initiate a service call
 13. `GET /service/requests/{request-id}`: Query a request by the request ID
 14. `GET /service/requests/{service-name}/{provider}`: Query active requests of a service binding
-15. `GET /service/requests/{request-context-id}/{batch-counter}`: Query requests by the request context ID and batch counter
+15. `GET /service/requests/{request-context-id}/{batch-counter}`: Query active requests by the request context ID and batch counter
 16. `POST /service/responses`: Respond to a service request
 17. `GET /service/responses/{request-id}`: Query a response by the request ID
-18. `GET /service/responses/{request-context-id}/{batch-counter}`: Query responses by the request context ID and batch counter
+18. `GET /service/responses/{request-context-id}/{batch-counter}`: Query active responses by the request context ID and batch counter
 19. `GET /service/contexts/{request-context-id}`: Query a request context
 20. `PUT /service/contexts/{request-context-id}`: Update a request context
 21. `POST /service/contexts/{request-context-id}/pause`: Pause a running request context
