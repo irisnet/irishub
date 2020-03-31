@@ -1,6 +1,8 @@
 package oracle
 
 import (
+	"fmt"
+
 	"github.com/irisnet/irishub/app/v3/oracle/internal/types"
 	sdk "github.com/irisnet/irishub/types"
 )
@@ -62,5 +64,13 @@ func DefaultGenesisState() GenesisState {
 func DefaultGenesisStateForTest() GenesisState {
 	return GenesisState{
 		Entries: []FeedEntry{},
+	}
+}
+
+// PrepForZeroHeightGenesis refunds the deposits, service fees and earned fees
+func PrepForZeroHeightGenesis(ctx sdk.Context, k Keeper) {
+	// reset request contexts state and batch
+	if err := k.ResetFeedEntryState(ctx); err != nil {
+		panic(fmt.Sprintf("failed to reset the feed entry state: %s", err))
 	}
 }
