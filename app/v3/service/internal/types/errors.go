@@ -41,7 +41,7 @@ const (
 	CodeInvalidRequestContextID   sdk.CodeType = 125
 	CodeNotAuthorized             sdk.CodeType = 126
 	CodeRequestContextNonRepeated sdk.CodeType = 127
-	CodeRequestContextNotStarted  sdk.CodeType = 128
+	CodeRequestContextNotRunning  sdk.CodeType = 128
 	CodeRequestContextNotPaused   sdk.CodeType = 129
 	CodeRequestContextCompleted   sdk.CodeType = 130
 	CodeCallbackRegistered        sdk.CodeType = 131
@@ -169,8 +169,8 @@ func ErrRequestContextNonRepeated(codespace sdk.CodespaceType) sdk.Error {
 	return sdk.NewError(codespace, CodeRequestContextNonRepeated, "request context is non repeated")
 }
 
-func ErrRequestContextNotStarted(codespace sdk.CodespaceType) sdk.Error {
-	return sdk.NewError(codespace, CodeRequestContextNotStarted, "request context not started")
+func ErrRequestContextNotRunning(codespace sdk.CodespaceType) sdk.Error {
+	return sdk.NewError(codespace, CodeRequestContextNotRunning, "request context not running")
 }
 
 func ErrRequestContextNotPaused(codespace sdk.CodespaceType) sdk.Error {

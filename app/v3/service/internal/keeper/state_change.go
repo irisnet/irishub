@@ -26,11 +26,11 @@ func (k Keeper) CompleteBatch(ctx sdk.Context, requestContext types.RequestConte
 		BatchRequestCount:  requestContext.BatchRequestCount,
 		BatchResponseCount: requestContext.BatchResponseCount,
 	}
-	stateJson, _ := json.Marshal(batchState)
+	stateJSON, _ := json.Marshal(batchState)
 
 	tags = tags.AppendTags(sdk.NewTags(
 		sdk.ActionTag(types.ActionCompleteBatch, types.TagRequestContextID), []byte(requestContextID.String()),
-		sdk.ActionTag(types.ActionCompleteBatch, requestContextID.String()), stateJson,
+		sdk.ActionTag(types.ActionCompleteBatch, requestContextID.String()), stateJSON,
 	))
 
 	return requestContext, tags

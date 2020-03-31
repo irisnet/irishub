@@ -74,6 +74,7 @@ func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 				requestContext.State = PAUSED
 				requestContexts[requestContextID.String()] = requestContext
 			}
+
 			return false
 		},
 	)

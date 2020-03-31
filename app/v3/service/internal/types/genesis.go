@@ -11,7 +11,7 @@ type GenesisState struct {
 	Params            Params                    `json:"params"`             // service params
 	Definitions       []ServiceDefinition       `json:"definitions"`        // service definitions
 	Bindings          []ServiceBinding          `json:"bindings"`           // service bindings
-	WithdrawAddresses map[string]sdk.AccAddress `json:"withdraw_addresses"` // withdraw addresses
+	WithdrawAddresses map[string]sdk.AccAddress `json:"withdraw_addresses"` // withdrawal addresses
 	RequestContexts   map[string]RequestContext `json:"request_contexts"`   // request contexts
 }
 

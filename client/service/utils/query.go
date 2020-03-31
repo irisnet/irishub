@@ -57,8 +57,8 @@ func QueryRequestContextByTxQuery(cliCtx context.CLIContext, params service.Quer
 
 	if int64(len(txInfo.Tx.GetMsgs())) > msgIndex {
 		msg := txInfo.Tx.GetMsgs()[msgIndex]
-		if msg.Type() == service.TypeMsgRequestService {
-			requestMsg := msg.(service.MsgRequestService)
+		if msg.Type() == service.TypeMsgCallService {
+			requestMsg := msg.(service.MsgCallService)
 			requestContext := service.NewRequestContext(
 				requestMsg.ServiceName, requestMsg.Providers,
 				requestMsg.Consumer, requestMsg.Input, requestMsg.ServiceFeeCap,
@@ -67,6 +67,7 @@ func QueryRequestContextByTxQuery(cliCtx context.CLIContext, params service.Quer
 				uint64(requestMsg.RepeatedTotal), 0, 0,
 				service.BATCHCOMPLETED, service.COMPLETED, 0, "",
 			)
+
 			return requestContext, nil
 		}
 	}
@@ -114,6 +115,7 @@ func QueryRequestByTxQuery(cliCtx context.CLIContext, params service.QueryReques
 			if err != nil {
 				return request, err
 			}
+
 			if len(requests) > int(batchRequestIndex) {
 				compactRequest := requests[batchRequestIndex]
 				request = service.NewRequest(
@@ -129,6 +131,7 @@ func QueryRequestByTxQuery(cliCtx context.CLIContext, params service.QueryReques
 					compactRequest.RequestContextID,
 					compactRequest.RequestContextBatchCounter,
 				)
+
 				return request, nil
 			}
 		}
@@ -175,11 +178,13 @@ func QueryResponseByTxQuery(cliCtx context.CLIContext, params service.QueryRespo
 			if responseMsg.RequestID.String() != params.RequestID.String() {
 				continue
 			}
+
 			response := service.NewResponse(
 				responseMsg.Provider, requestContext.Consumer,
 				responseMsg.Result, responseMsg.Output,
 				contextID, batchCounter,
 			)
+
 			return response, nil
 		}
 	}

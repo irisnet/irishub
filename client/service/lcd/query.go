@@ -48,7 +48,7 @@ func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Co
 		queryRequestHandlerFn(cliCtx, cdc),
 	).Methods("GET")
 
-	// query requests by the service binding or request context ID
+	// query active requests by the service binding or request context ID
 	r.HandleFunc(
 		fmt.Sprintf("/service/requests/{%s}/{%s}", Arg1, Arg2),
 		queryRequestsHandlerFn(cliCtx, cdc),
@@ -66,7 +66,7 @@ func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Co
 		queryRequestContextHandlerFn(cliCtx, cdc),
 	).Methods("GET")
 
-	// query responses by the request context ID and batch counter
+	// query active responses by the request context ID and batch counter
 	r.HandleFunc(
 		fmt.Sprintf("/service/responses/{%s}/{%s}", RequestContextID, BatchCounter),
 		queryResponsesHandlerFn(cliCtx, cdc),

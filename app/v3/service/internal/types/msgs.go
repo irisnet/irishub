@@ -5,28 +5,29 @@ import (
 	"fmt"
 	"regexp"
 
-	sdk "github.com/irisnet/irishub/types"
 	cmn "github.com/tendermint/tendermint/libs/common"
+
+	sdk "github.com/irisnet/irishub/types"
 )
 
 const (
 	MsgRoute = "service" // route for service msgs
 
-	TypeMsgDefineService        = "define_service"         // type for MsgDefineService
-	TypeMsgBindService          = "bind_service"           // type for MsgBindService
-	TypeMsgUpdateServiceBinding = "update_service_binding" // type for MsgUpdateServiceBinding
-	TypeMsgSetWithdrawAddress   = "set_withdraw_address"   // type for MsgSetWithdrawAddress
-	TypeMsgDisableService       = "disable_service"        // type for MsgDisableService
-	TypeMsgEnableService        = "enable_service"         // type for MsgEnableService
-	TypeMsgRefundServiceDeposit = "refund_service_deposit" // type for MsgRefundServiceDeposit
-	TypeMsgRequestService       = "request_service"        // type for MsgRequestService
-	TypeMsgRespondService       = "respond_service"        // type for MsgRespondService
-	TypeMsgPauseRequestContext  = "pause_request_context"  // type for MsgPauseRequestContext
-	TypeMsgStartRequestContext  = "start_request_context"  // type for MsgStartRequestContext
-	TypeMsgKillRequestContext   = "kill_request_context"   // type for MsgKillRequestContext
-	TypeMsgUpdateRequestContext = "update_request_context" // type for MsgUpdateRequestContext
-	TypeMsgWithdrawEarnedFees   = "withdraw_earned_fees"   // type for MsgWithdrawEarnedFees
-	TypeMsgWithdrawTax          = "withdraw_tax"           // type for MsgWithdrawTax
+	TypeMsgDefineService         = "define_service"          // type for MsgDefineService
+	TypeMsgBindService           = "bind_service"            // type for MsgBindService
+	TypeMsgUpdateServiceBinding  = "update_service_binding"  // type for MsgUpdateServiceBinding
+	TypeMsgSetWithdrawAddress    = "set_withdraw_address"    // type for MsgSetWithdrawAddress
+	TypeMsgDisableServiceBinding = "disable_service_binding" // type for MsgDisableServiceBinding
+	TypeMsgEnableServiceBinding  = "enable_service_binding"  // type for MsgEnableServiceBinding
+	TypeMsgRefundServiceDeposit  = "refund_service_deposit"  // type for MsgRefundServiceDeposit
+	TypeMsgCallService           = "call_service"            // type for MsgCallService
+	TypeMsgRespondService        = "respond_service"         // type for MsgRespondService
+	TypeMsgPauseRequestContext   = "pause_request_context"   // type for MsgPauseRequestContext
+	TypeMsgStartRequestContext   = "start_request_context"   // type for MsgStartRequestContext
+	TypeMsgKillRequestContext    = "kill_request_context"    // type for MsgKillRequestContext
+	TypeMsgUpdateRequestContext  = "update_request_context"  // type for MsgUpdateRequestContext
+	TypeMsgWithdrawEarnedFees    = "withdraw_earned_fees"    // type for MsgWithdrawEarnedFees
+	TypeMsgWithdrawTax           = "withdraw_tax"            // type for MsgWithdrawTax
 
 	MaxNameLength        = 70  // max length of the service name
 	MaxDescriptionLength = 280 // max length of the service and author description
@@ -44,10 +45,10 @@ var (
 	_ sdk.Msg = MsgBindService{}
 	_ sdk.Msg = MsgUpdateServiceBinding{}
 	_ sdk.Msg = MsgSetWithdrawAddress{}
-	_ sdk.Msg = MsgDisableService{}
-	_ sdk.Msg = MsgEnableService{}
+	_ sdk.Msg = MsgDisableServiceBinding{}
+	_ sdk.Msg = MsgEnableServiceBinding{}
 	_ sdk.Msg = MsgRefundServiceDeposit{}
-	_ sdk.Msg = MsgRequestService{}
+	_ sdk.Msg = MsgCallService{}
 	_ sdk.Msg = MsgRespondService{}
 	_ sdk.Msg = MsgPauseRequestContext{}
 	_ sdk.Msg = MsgStartRequestContext{}
@@ -315,28 +316,28 @@ func (msg MsgSetWithdrawAddress) GetSigners() []sdk.AccAddress {
 
 //______________________________________________________________________
 
-// MsgDisableService defines a message to disable a service binding
-type MsgDisableService struct {
+// MsgDisableServiceBinding defines a message to disable a service binding
+type MsgDisableServiceBinding struct {
 	ServiceName string         `json:"service_name"`
 	Provider    sdk.AccAddress `json:"provider"`
 }
 
-// NewMsgDisableService creates a new MsgDisableService instance
-func NewMsgDisableService(serviceName string, provider sdk.AccAddress) MsgDisableService {
-	return MsgDisableService{
+// NewMsgDisableServiceBinding creates a new MsgDisableServiceBinding instance
+func NewMsgDisableServiceBinding(serviceName string, provider sdk.AccAddress) MsgDisableServiceBinding {
+	return MsgDisableServiceBinding{
 		ServiceName: serviceName,
 		Provider:    provider,
 	}
 }
 
 // Route implements Msg.
-func (msg MsgDisableService) Route() string { return MsgRoute }
+func (msg MsgDisableServiceBinding) Route() string { return MsgRoute }
 
 // Type implements Msg.
-func (msg MsgDisableService) Type() string { return TypeMsgDisableService }
+func (msg MsgDisableServiceBinding) Type() string { return TypeMsgDisableServiceBinding }
 
 // GetSignBytes implements Msg.
-func (msg MsgDisableService) GetSignBytes() []byte {
+func (msg MsgDisableServiceBinding) GetSignBytes() []byte {
 	b, err := msgCdc.MarshalJSON(msg)
 	if err != nil {
 		panic(err)
@@ -346,7 +347,7 @@ func (msg MsgDisableService) GetSignBytes() []byte {
 }
 
 // ValidateBasic implements Msg.
-func (msg MsgDisableService) ValidateBasic() sdk.Error {
+func (msg MsgDisableServiceBinding) ValidateBasic() sdk.Error {
 	if len(msg.Provider) == 0 {
 		return ErrInvalidAddress(DefaultCodespace, "provider missing")
 	}
@@ -355,22 +356,22 @@ func (msg MsgDisableService) ValidateBasic() sdk.Error {
 }
 
 // GetSigners implements Msg.
-func (msg MsgDisableService) GetSigners() []sdk.AccAddress {
+func (msg MsgDisableServiceBinding) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Provider}
 }
 
 //______________________________________________________________________
 
-// MsgEnableService defines a message to enable a service binding
-type MsgEnableService struct {
+// MsgEnableServiceBinding defines a message to enable a service binding
+type MsgEnableServiceBinding struct {
 	ServiceName string         `json:"service_name"`
 	Provider    sdk.AccAddress `json:"provider"`
 	Deposit     sdk.Coins      `json:"deposit"`
 }
 
-// NewMsgEnableService creates a new MsgEnableService instance
-func NewMsgEnableService(serviceName string, provider sdk.AccAddress, deposit sdk.Coins) MsgEnableService {
-	return MsgEnableService{
+// NewMsgEnableServiceBinding creates a new MsgEnableServiceBinding instance
+func NewMsgEnableServiceBinding(serviceName string, provider sdk.AccAddress, deposit sdk.Coins) MsgEnableServiceBinding {
+	return MsgEnableServiceBinding{
 		ServiceName: serviceName,
 		Provider:    provider,
 		Deposit:     deposit,
@@ -378,13 +379,13 @@ func NewMsgEnableService(serviceName string, provider sdk.AccAddress, deposit sd
 }
 
 // Route implements Msg.
-func (msg MsgEnableService) Route() string { return MsgRoute }
+func (msg MsgEnableServiceBinding) Route() string { return MsgRoute }
 
 // Type implements Msg.
-func (msg MsgEnableService) Type() string { return TypeMsgEnableService }
+func (msg MsgEnableServiceBinding) Type() string { return TypeMsgEnableServiceBinding }
 
 // GetSignBytes implements Msg.
-func (msg MsgEnableService) GetSignBytes() []byte {
+func (msg MsgEnableServiceBinding) GetSignBytes() []byte {
 	b, err := msgCdc.MarshalJSON(msg)
 	if err != nil {
 		panic(err)
@@ -394,7 +395,7 @@ func (msg MsgEnableService) GetSignBytes() []byte {
 }
 
 // ValidateBasic implements Msg.
-func (msg MsgEnableService) ValidateBasic() sdk.Error {
+func (msg MsgEnableServiceBinding) ValidateBasic() sdk.Error {
 	if len(msg.Provider) == 0 {
 		return ErrInvalidAddress(DefaultCodespace, "provider missing")
 	}
@@ -411,7 +412,7 @@ func (msg MsgEnableService) ValidateBasic() sdk.Error {
 }
 
 // GetSigners implements Msg.
-func (msg MsgEnableService) GetSigners() []sdk.AccAddress {
+func (msg MsgEnableServiceBinding) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Provider}
 }
 
@@ -463,8 +464,8 @@ func (msg MsgRefundServiceDeposit) GetSigners() []sdk.AccAddress {
 
 //______________________________________________________________________
 
-// MsgRequestService defines a message to request a service
-type MsgRequestService struct {
+// MsgCallService defines a message to initiate a service call
+type MsgCallService struct {
 	ServiceName       string           `json:"service_name"`
 	Providers         []sdk.AccAddress `json:"providers"`
 	Consumer          sdk.AccAddress   `json:"consumer"`
@@ -477,8 +478,8 @@ type MsgRequestService struct {
 	RepeatedTotal     int64            `json:"repeated_total"`
 }
 
-// NewMsgRequestService creates a new MsgRequestService instance
-func NewMsgRequestService(
+// NewMsgCallService creates a new MsgCallService instance
+func NewMsgCallService(
 	serviceName string,
 	providers []sdk.AccAddress,
 	consumer sdk.AccAddress,
@@ -489,8 +490,8 @@ func NewMsgRequestService(
 	repeated bool,
 	repeatedFrequency uint64,
 	repeatedTotal int64,
-) MsgRequestService {
-	return MsgRequestService{
+) MsgCallService {
+	return MsgCallService{
 		ServiceName:       serviceName,
 		Providers:         providers,
 		Consumer:          consumer,
@@ -505,13 +506,13 @@ func NewMsgRequestService(
 }
 
 // Route implements Msg.
-func (msg MsgRequestService) Route() string { return MsgRoute }
+func (msg MsgCallService) Route() string { return MsgRoute }
 
 // Type implements Msg.
-func (msg MsgRequestService) Type() string { return TypeMsgRequestService }
+func (msg MsgCallService) Type() string { return TypeMsgCallService }
 
 // GetSignBytes implements Msg.
-func (msg MsgRequestService) GetSignBytes() []byte {
+func (msg MsgCallService) GetSignBytes() []byte {
 	b, err := msgCdc.MarshalJSON(msg)
 	if err != nil {
 		panic(err)
@@ -521,7 +522,7 @@ func (msg MsgRequestService) GetSignBytes() []byte {
 }
 
 // ValidateBasic implements Msg.
-func (msg MsgRequestService) ValidateBasic() sdk.Error {
+func (msg MsgCallService) ValidateBasic() sdk.Error {
 	if len(msg.Consumer) == 0 {
 		return ErrInvalidAddress(DefaultCodespace, "consumer missing")
 	}
@@ -533,7 +534,7 @@ func (msg MsgRequestService) ValidateBasic() sdk.Error {
 }
 
 // GetSigners implements Msg.
-func (msg MsgRequestService) GetSigners() []sdk.AccAddress {
+func (msg MsgCallService) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Consumer}
 }
 
