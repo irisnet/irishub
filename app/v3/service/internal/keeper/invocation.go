@@ -176,13 +176,9 @@ func (k Keeper) UpdateRequestContext(
 			return types.ErrInvalidThreshold(k.codespace, fmt.Sprintf("response threshold [%d] must be between [1,%d]", respThreshold, len(providers)))
 		}
 
-		if respThreshold != 0 {
+		if respThreshold > 0 {
 			requestContext.ResponseThreshold = respThreshold
 		}
-	}
-
-	if len(providers) > 0 && requestContext.ResponseThreshold > 0 && len(providers) < int(requestContext.ResponseThreshold) {
-		return types.ErrInvalidProviders(k.codespace, fmt.Sprintf("length [%d] of providers must not be less than the response threshold [%d]", len(providers), requestContext.ResponseThreshold))
 	}
 
 	params := k.GetParamSet(ctx)
