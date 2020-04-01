@@ -2,35 +2,24 @@
 
 ## v0.17.0
 
-*Mar 25th, 2020*
+*Apr 1th, 2020*
 
 ### BREAKING CHANGES
 
-- Remove asset gateway related APIs
-
-### NON-BREAKING CHANGES
-
-- Add Oracle module APIs
-- Add GET /service/providers/{provider}/withdraw-address
-- Add POST /service/providers/{provider}/withdraw-address
-- Add GET /service/contexts/{request-context-id}
-- Add PUT /service/contexts/{request-context-id}
-- Add POST /service/contexts/{request-context-id}/start
-- Add POST /service/contexts/{request-context-id}/pause
-- Add POST /service/contexts/{request-context-id}/kill
-- Add GET /service/requests/{request-id}
-- Add GET /service/responses/{request-id}
-- Remove POST /service/fees/consumer/refund
+- Remove gateway related APIs in asset module
+- Replace token id with symbol
+- Replace `sdk.Dec` with `sdk.Coins` to specify the `CommunityTaxUsageProposal` amount
+- Refactor service module APIs
 
 #### Asset module APIs
 
-| [v0.16.1]                                    | [v0.17.0]                                  | input changed | output changed | notes                        |
-| -------------------------------------------- | ------------------------------------------ | ------------- | -------------- | ---------------------------- |
-| GET /asset/tokens/{id}                       | GET /asset/tokens/{symbol}                 | Yes           |                | Replace token id with symbol |
-| GET /asset/fees/tokens/{id}                  | GET /asset/tokens/{symbol}/fee             | Yes           |                | Replace token id with symbol |
-| POST /asset/tokens/{token-id}                | POST /asset/tokens/{symbol}                | Yes           |                | Replace token id with symbol |
-| POST /asset/tokens/{token-id}/transfer-owner | POST /asset/tokens/{symbol}/transfer-owner | Yes           |                | Replace token id with symbol |
-| POST /asset/tokens/{token-id}/mint           | POST /asset/tokens/{symbol}/mint           | Yes           |                | Replace token id with symbol |
+| [v0.16.1]                              | [v0.17.0]                            | input changed | output changed | notes                        |
+| -------------------------------------- | ------------------------------------ | ------------- | -------------- | ---------------------------- |
+| GET /asset/tokens/{id}                 | GET /asset/tokens/{symbol}           | Yes           |                | Replace token id with symbol |
+| GET /asset/fees/tokens/{id}            | GET /asset/tokens/{symbol}/fee       | Yes           |                | Replace token id with symbol |
+| POST /asset/tokens/{token-id}          | POST /asset/tokens/{symbol}          | Yes           |                | Replace token id with symbol |
+| POST /asset/tokens/{token-id}/transfer | POST /asset/tokens/{symbol}/transfer | Yes           |                | Replace token id with symbol |
+| POST /asset/tokens/{token-id}/mint     | POST /asset/tokens/{symbol}/mint     | Yes           |                | Replace token id with symbol |
 
 #### Bank module APIs
 
@@ -38,31 +27,17 @@
 | -------------------------- | ------------------------------ | ------------- | -------------- | ---------------------------- |
 | GET /bank/token-stats/{id} | GET /bank/token-stats/{symbol} | Yes           |                | Replace token id with symbol |
 
-#### Coinswap module APIs
-
-| [v0.16.1]                                | [v0.17.0]                                               | input changed | output changed | notes                             |
-| ---------------------------------------- | ------------------------------------------------------- | ------------- | -------------- | --------------------------------- |
-| POST /coinswap/liquidities/{id}/deposit  | POST /coinswap/liquidities/{voucher-coin-name}/deposit  | Yes           |                | Replace id with voucher-coin-name |
-| POST /coinswap/liquidities/{id}/withdraw | POST /coinswap/liquidities/{voucher-coin-name}/withdraw | Yes           |                | Replace id with voucher-coin-name |
-
 #### Gov module APIs
 
-| [v0.16.1]           | [v0.17.0]           | input changed | output changed | notes                                                        |
-| ------------------- | ------------------- | ------------- | -------------- | ------------------------------------------------------------ |
-| POST /gov/proposals | POST /gov/proposals | Yes           |                | Change `commTax` type from `sdk.Dec` to `sdk.Coins` in input |
-
-#### Rand module APIs
-
-| [v0.16.1]        | [v0.17.0]        | input changed | output changed | notes                                        |
-| ---------------- | ---------------- | ------------- | -------------- | -------------------------------------------- |
-| POST /rand/rands | POST /rand/rands | Yes           |                | Add `oracle` and `service_fee_cap` in input  |
-| GET /rand/queue  | POST /rand/queue |               | Yes            | Add `oracle` and `service_fee_cap` in output |
+| [v0.16.1]           | [v0.17.0]           | input changed | output changed | notes                                                      |
+| ------------------- | ------------------- | ------------- | -------------- | ---------------------------------------------------------- |
+| POST /gov/proposals | POST /gov/proposals | Yes           |                | Change `commTax.Amount` type from `sdk.Dec` to `sdk.Coins` |
 
 #### Service module APIs
 
 | [v0.16.1]                                                                  | [v0.17.0]                                                                                                | input changed | output changed | notes                                    |
 | -------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- | ------------- | -------------- | ---------------------------------------- |
-| GET /service/definitions/{defChainId}/{serviceName}                        | GET /service/definitions/{service-name}                                                                  | Yes           |                | Remove  `defChainId`                     |
+| GET /service/definitions/{defChainId}/{serviceName}                        | GET /service/definitions/{service-name}                                                                  | Yes           |                | Remove `defChainId`                      |
 | GET /service/bindings/{defChainId}/{serviceName}/{bindChainId}/{provider}  | GET /service/bindings/{service-name}/{provider}                                                          | Yes           |                | Remove `defChainId` and `bindChainId`    |
 | GET /service/bindings/{defChainId}/{serviceName}                           | GET /service/bindings/{service-name}                                                                     | Yes           |                | Remove `defChainId`                      |
 | GET /service/requests/{defChainId}/{serviceName}/{bindChainId}/{provider}  | /service/requests/{service-name}/{provider} </br> /service/requests/{request-context-id}/{batch-counter} | Yes           |                |                                          |
@@ -76,6 +51,37 @@
 | PUT /service/bindings/{defChainId}/{serviceName}/{provider}/deposit/refund | POST /service/bindings/{serviceName}/{provider}/refund-deposit                                           | Yes           |                | Remove `defChainId`                      |
 | POST /service/requests                                                     | POST /service/requests                                                                                   | Yes           |                |                                          |
 | POST /service/responses                                                    | POST /service/responses                                                                                  | Yes           |                |                                          |
+
+### NON-BREAKING CHANGES
+
+- Add Oracle module APIs
+- Improve coinswap voucher related naming conventions
+- Add `oracle` and `service_fee_cap` in rand request and query
+- Add GET /service/providers/{provider}/withdraw-address
+- Add POST /service/providers/{provider}/withdraw-address
+- Add GET /service/contexts/{request-context-id}
+- Add PUT /service/contexts/{request-context-id}
+- Add POST /service/contexts/{request-context-id}/start
+- Add POST /service/contexts/{request-context-id}/pause
+- Add POST /service/contexts/{request-context-id}/kill
+- Add GET /service/requests/{request-id}
+- Add GET /service/responses/{request-id}
+- Remove POST /service/fees/consumer/refund
+
+#### Coinswap module APIs
+
+| [v0.16.1]                                | [v0.17.0]                                               | input changed | output changed | notes                             |
+| ---------------------------------------- | ------------------------------------------------------- | ------------- | -------------- | --------------------------------- |
+| POST /coinswap/liquidities/{id}/deposit  | POST /coinswap/liquidities/{voucher-coin-name}/deposit  |               |                | Replace id with voucher-coin-name |
+| POST /coinswap/liquidities/{id}/withdraw | POST /coinswap/liquidities/{voucher-coin-name}/withdraw |               |                | Replace id with voucher-coin-name |
+| GET /coinswap/liquidities/{id}           | GET /coinswap/liquidities/{voucher-coin-name}           |               |                | Replace id with voucher-coin-name |
+
+#### Rand module APIs
+
+| [v0.16.1]        | [v0.17.0]        | input changed | output changed | notes                                        |
+| ---------------- | ---------------- | ------------- | -------------- | -------------------------------------------- |
+| POST /rand/rands | POST /rand/rands | Yes           |                | Add `oracle` and `service_fee_cap` in input  |
+| GET /rand/queue  | POST /rand/queue |               | Yes            | Add `oracle` and `service_fee_cap` in output |
 
 ## v0.16.0
 
