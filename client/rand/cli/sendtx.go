@@ -41,12 +41,7 @@ func GetCmdRequestRand(cdc *codec.Codec) *cobra.Command {
 				}
 			}
 
-			msg := rand.MsgRequestRand{
-				Consumer:      consumer,
-				BlockInterval: uint64(viper.GetInt64(FlagBlockInterval)),
-				Oracle:        oracle,
-				ServiceFeeCap: serviceFeeCap,
-			}
+			msg := rand.NewMsgRequestRand(consumer, uint64(viper.GetInt64(FlagBlockInterval)), oracle, serviceFeeCap)
 
 			if err := msg.ValidateBasic(); err != nil {
 				return err

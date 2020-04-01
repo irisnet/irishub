@@ -35,6 +35,8 @@ var (
 	TagRandHeight       = types.TagRandHeight
 	TagRand             = types.TagRand
 
+	NewKeeper         = keeper.NewKeeper
+	NewQuerier        = keeper.NewQuerier
 	RegisterCodec     = types.RegisterCodec
 	NewMsgRequestRand = types.NewMsgRequestRand
 	NewRand           = types.NewRand
@@ -43,6 +45,5 @@ var (
 	GenerateRequestID = types.GenerateRequestID
 	CheckReqID        = types.CheckReqID
 	GetSvcDefinitions = types.GetSvcDefinitions
-	NewKeeper         = keeper.NewKeeper
-	NewQuerier        = keeper.NewQuerier
+	ValidateGenesis   = types.ValidateGenesis
 )
