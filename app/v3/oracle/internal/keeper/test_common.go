@@ -4,6 +4,14 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/require"
+
+	abci "github.com/tendermint/tendermint/abci/types"
+	"github.com/tendermint/tendermint/crypto/secp256k1"
+	cmn "github.com/tendermint/tendermint/libs/common"
+	"github.com/tendermint/tendermint/libs/log"
+	dbm "github.com/tendermint/tm-db"
+
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/app/v1/auth"
 	"github.com/irisnet/irishub/app/v1/bank"
@@ -14,12 +22,6 @@ import (
 	"github.com/irisnet/irishub/modules/guardian"
 	"github.com/irisnet/irishub/store"
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/stretchr/testify/require"
-	abci "github.com/tendermint/tendermint/abci/types"
-	"github.com/tendermint/tendermint/crypto/secp256k1"
-	cmn "github.com/tendermint/tendermint/libs/common"
-	"github.com/tendermint/tendermint/libs/log"
-	dbm "github.com/tendermint/tm-db"
 )
 
 var (
@@ -103,17 +105,26 @@ func createTestAccs(ctx sdk.Context, numAccs int, initialCoins sdk.Coins, ak *au
 }
 
 type MockServiceKeeper struct {
-	cxtMap      map[string]exported.RequestContext
-	callbackMap map[string]exported.ResponseCallback
+	cxtMap           map[string]exported.RequestContext
+	callbackMap      map[string]exported.ResponseCallback
+	stateCallbackMap map[string]exported.StateCallback
 }
 
 func NewMockServiceKeeper() MockServiceKeeper {
 	cxtMap := make(map[string]exported.RequestContext)
 	callbackMap := make(map[string]exported.ResponseCallback)
+	stateCallbackMap := make(map[string]exported.StateCallback)
 	return MockServiceKeeper{
-		cxtMap:      cxtMap,
-		callbackMap: callbackMap,
+		cxtMap:           cxtMap,
+		callbackMap:      callbackMap,
+		stateCallbackMap: stateCallbackMap,
 	}
+}
+
+func (m MockServiceKeeper) RegisterStateCallback(moduleName string,
+	stateCallback exported.StateCallback) sdk.Error {
+	m.stateCallbackMap[moduleName] = stateCallback
+	return nil
 }
 
 func (m MockServiceKeeper) RegisterResponseCallback(moduleName string,
@@ -166,6 +177,7 @@ func (m MockServiceKeeper) CreateRequestContext(ctx sdk.Context,
 func (m MockServiceKeeper) UpdateRequestContext(ctx sdk.Context,
 	requestContextID cmn.HexBytes,
 	providers []sdk.AccAddress,
+	respThreshold uint16,
 	serviceFeeCap sdk.Coins,
 	timeout int64,
 	repeatedFreq uint64,

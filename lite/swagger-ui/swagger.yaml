@@ -1678,7 +1678,10 @@ paths:
                   example: '10000iris'
                 pricing:
                   type: string
-                  example: '{"price":[{"denom":"iris-atto","amount":"1000000000000000000"}]}'
+                  example: '{"price":"1iris"}'
+                min_resp_time:
+                  type: integer
+                  example: '50'
   '/service/bindings/{service-name}/{provider}':
     get:
       summary: Query a service binding
@@ -1746,7 +1749,10 @@ paths:
                   example: '1iris'
                 pricing:
                   type: string
-                  example: '{"price":[{"denom":"iris-atto","amount":"1000000000000000000"}]}'
+                  example: '{"price":"1iris"}'
+                min_resp_time:
+                  type: integer
+                  example: '50'
   '/service/bindings/{service-name}':
     get:
       summary: Query all bindings of a service definition
@@ -1926,10 +1932,10 @@ paths:
               properties:
                 base_tx:
                   $ref: '#/components/schemas/BaseTx'
-  '/service/requests':
+  '/service/contexts':
     post:
-      summary: Call a service
-      description: Call a service with the specified params
+      summary: Initiate a service call
+      description: Initiate a service call with the specified params
       tags:
         - Service
       responses:
@@ -2244,7 +2250,7 @@ paths:
                   $ref: '#/components/schemas/Address'
   '/service/requests/{request-context-id}/{batch-counter}':
     get:
-      summary: Query requests by the request context ID and batch counter
+      summary: Query active requests by the request context ID and batch counter
       tags:
         - Service
       parameters:
@@ -2275,7 +2281,7 @@ paths:
           description: Internal Server Error
   '/service/responses/{request-context-id}/{batch-counter}':
     get:
-      summary: Query responses by the request context ID and batch counter
+      summary: Query active responses by the request context ID and batch counter
       tags:
         - Service
       parameters:
@@ -2357,7 +2363,7 @@ paths:
           description: Internal Server Error
   /oracle/feeds:
     post:
-      summary: Define a new feed,the feed will be in "paused" state
+      summary: Define a new feed, the feed will be in "paused" state
       description: Send transaction to define a feed
       tags:
         - Oracle
@@ -2617,13 +2623,16 @@ paths:
                 symbol:
                   type: string
                   example: 'cat'
+                min_unit:
+                  type: string
+                  example: 'min'
                 initial_supply:
                   type: string
                   example: '1000000000'
                 max_supply:
                   type: string
                   example: '2000000000'
-                decimal:
+                scale:
                   type: integer
                   example: 18
                 mintable:
@@ -2638,13 +2647,13 @@ paths:
         '500':
           description: Internal Server Error
     get:
-      summary: Query tokens by condition
+      summary: Query tokens by owner
       tags:
         - Asset
       parameters:
         - in: query
           name: owner
-          description: the owner address of the destination token
+          description: the owner address
           required: false
           schema:
             type: string
@@ -3760,17 +3769,13 @@ components:
     Token:
       type: object
       properties:
-        id:
-          type: string
-        family:
-          type: string
-        source:
-          type: string
         symbol:
           type: string
         name:
           type: string
-        decimal:
+        min_unit:
+          type: string
+        scale:
           type: integer
         initial_supply:
           type: string
@@ -3780,13 +3785,6 @@ components:
           type: boolean
         owner:
           $ref: '#/components/schemas/Address'
-    GatewayFeeOutput:
-      type: object
-      properties:
-        exist:
-          type: boolean
-        fee:
-          $ref: '#/components/schemas/Coin'
     TokenFeesOutput:
       type: object
       properties:
@@ -3946,9 +3944,6 @@ components:
         repeated_frequency:
           type: integer
           example: "5"
-        repeated_total:
-          type: integer
-          example: "-1"
         response_threshold:
           type: integer
           example: 1
@@ -3993,7 +3988,9 @@ components:
             $ref: '#/components/schemas/Coin'
         pricing:
           type: string
-          example: '{"price":[{"denom":"iris-atto","amount":"1000000"}]}'
+          example: '{"price":"1iris"}'
+        min_resp_time:
+          type: integer
         available:
           type: boolean
         disabled_time:

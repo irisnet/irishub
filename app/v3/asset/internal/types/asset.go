@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/irisnet/irishub/types"
 	sdk "github.com/irisnet/irishub/types"
 )
 
@@ -17,7 +16,7 @@ type FungibleToken struct {
 	InitialSupply uint64           `json:"initial_supply"`
 	MaxSupply     uint64           `json:"max_supply"`
 	Mintable      bool             `json:"mintable"`
-	Owner         types.AccAddress `json:"owner"`
+	Owner         sdk.AccAddress `json:"owner"`
 }
 
 // NewFungibleToken constructs a new FungibleToken instance
@@ -29,7 +28,7 @@ func NewFungibleToken(
 	initialSupply,
 	maxSupply uint64,
 	mintable bool,
-	owner types.AccAddress,
+	owner sdk.AccAddress,
 ) FungibleToken {
 	return FungibleToken{
 		Symbol:        symbol,
@@ -55,7 +54,7 @@ func (ft FungibleToken) IsMintable() bool {
 	return ft.Mintable
 }
 
-func (ft FungibleToken) GetOwner() types.AccAddress {
+func (ft FungibleToken) GetOwner() sdk.AccAddress {
 	return ft.Owner
 }
 
@@ -68,12 +67,12 @@ func (ft FungibleToken) GetInitSupply() uint64 {
 	return ft.InitialSupply
 }
 
-func (ft FungibleToken) GetCoinType() types.CoinType {
-	units := make(types.Units, 2)
-	units[0] = types.NewUnit(ft.GetSymbol(), 0)
-	units[1] = types.NewUnit(ft.GetDenom(), ft.Decimal)
+func (ft FungibleToken) GetCoinType() sdk.CoinType {
+	units := make(sdk.Units, 2)
+	units[0] = sdk.NewUnit(ft.GetSymbol(), 0)
+	units[1] = sdk.NewUnit(ft.GetDenom(), ft.Decimal)
 
-	return types.CoinType{
+	return sdk.CoinType{
 		Name:    ft.GetSymbol(),
 		MinUnit: units[1],
 		Units:   units,

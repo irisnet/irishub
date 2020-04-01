@@ -63,7 +63,7 @@ func (ut *UsageType) UnmarshalJSON(data []byte) error {
 	var s string
 	err := json.Unmarshal(data, &s)
 	if err != nil {
-		return nil
+		return err
 	}
 
 	bz2, err := UsageTypeFromString(s)

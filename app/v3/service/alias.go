@@ -7,7 +7,7 @@ import (
 
 // nolint
 const (
-	TypeMsgRequestService = types.TypeMsgRequestService
+	TypeMsgCallService    = types.TypeMsgCallService
 	TypeMsgRespondService = types.TypeMsgRespondService
 	DefaultParamSpace     = types.DefaultParamSpace
 	DefaultCodespace      = types.DefaultCodespace
@@ -23,7 +23,7 @@ const (
 	QueryRequestContext   = types.QueryRequestContext
 	QueryRequestsByReqCtx = types.QueryRequestsByReqCtx
 	QueryResponses        = types.QueryResponses
-	QueryFees             = types.QueryFees
+	QueryEarnedFees       = types.QueryEarnedFees
 	RUNNING               = types.RUNNING
 	PAUSED                = types.PAUSED
 	COMPLETED             = types.COMPLETED
@@ -34,55 +34,55 @@ const (
 // nolint
 var (
 	// variables and functions aliases
-	TagAuthor                  = types.TagAuthor
-	TagServiceName             = types.TagServiceName
-	TagProvider                = types.TagProvider
-	TagConsumer                = types.TagConsumer
-	ActionCreateContext        = types.ActionCreateContext
-	ActionPauseContext         = types.ActionPauseContext
-	ActionCompleteContext      = types.ActionCompleteContext
-	ActionNewBatch             = types.ActionNewBatch
-	ActionNewBatchRequest      = types.ActionNewBatchRequest
-	ActionCompleteBatch        = types.ActionCompleteBatch
-	TagRequestContextID        = types.TagRequestContextID
-	TagRequestID               = types.TagRequestID
-	TagSlashedCoins            = types.TagSlashedCoins
-	KeyTxSizeLimit             = types.KeyTxSizeLimit
-	NewKeeper                  = keeper.NewKeeper
-	NewQuerier                 = keeper.NewQuerier
-	RegisterCodec              = types.RegisterCodec
-	NewGenesisState            = types.NewGenesisState
-	DefaultGenesisState        = types.DefaultGenesisState
-	DefaultGenesisStateForTest = types.DefaultGenesisStateForTest
-	ValidateGenesis            = types.ValidateGenesis
-	DefaultParams              = types.DefaultParams
-	PrometheusMetrics          = types.PrometheusMetrics
-	NewServiceDefinition       = types.NewServiceDefinition
-	NewServiceBinding          = types.NewServiceBinding
-	NewRequest                 = types.NewRequest
-	NewResponse                = types.NewResponse
-	NewEarnedFees              = types.NewEarnedFees
-	NewMsgDefineService        = types.NewMsgDefineService
-	NewMsgBindService          = types.NewMsgBindService
-	NewMsgUpdateServiceBinding = types.NewMsgUpdateServiceBinding
-	NewMsgSetWithdrawAddress   = types.NewMsgSetWithdrawAddress
-	NewMsgDisableService       = types.NewMsgDisableService
-	NewMsgEnableService        = types.NewMsgEnableService
-	NewMsgRefundServiceDeposit = types.NewMsgRefundServiceDeposit
-	NewMsgRequestService       = types.NewMsgRequestService
-	NewMsgRespondService       = types.NewMsgRespondService
-	NewMsgPauseRequestContext  = types.NewMsgPauseRequestContext
-	NewMsgStartRequestContext  = types.NewMsgStartRequestContext
-	NewMsgKillRequestContext   = types.NewMsgKillRequestContext
-	NewMsgUpdateRequestContext = types.NewMsgUpdateRequestContext
-	NewMsgWithdrawEarnedFees   = types.NewMsgWithdrawEarnedFees
-	NewMsgWithdrawTax          = types.NewMsgWithdrawTax
-	NewRequestContext          = types.NewRequestContext
-	ConvertRequestID           = types.ConvertRequestID
-	GenerateRequestContextID   = types.GenerateRequestContextID
-	GenerateRequestID          = types.GenerateRequestID
-	SplitRequestContextID      = types.SplitRequestContextID
-	SplitRequestID             = types.SplitRequestID
+	TagAuthor                   = types.TagAuthor
+	TagServiceName              = types.TagServiceName
+	TagProvider                 = types.TagProvider
+	TagConsumer                 = types.TagConsumer
+	ActionCreateContext         = types.ActionCreateContext
+	ActionPauseContext          = types.ActionPauseContext
+	ActionCompleteContext       = types.ActionCompleteContext
+	ActionNewBatch              = types.ActionNewBatch
+	ActionNewBatchRequest       = types.ActionNewBatchRequest
+	ActionCompleteBatch         = types.ActionCompleteBatch
+	TagRequestContextID         = types.TagRequestContextID
+	TagRequestID                = types.TagRequestID
+	TagSlashedCoins             = types.TagSlashedCoins
+	KeyTxSizeLimit              = types.KeyTxSizeLimit
+	NewKeeper                   = keeper.NewKeeper
+	NewQuerier                  = keeper.NewQuerier
+	RegisterCodec               = types.RegisterCodec
+	NewGenesisState             = types.NewGenesisState
+	DefaultGenesisState         = types.DefaultGenesisState
+	DefaultGenesisStateForTest  = types.DefaultGenesisStateForTest
+	ValidateGenesis             = types.ValidateGenesis
+	DefaultParams               = types.DefaultParams
+	PrometheusMetrics           = types.PrometheusMetrics
+	NewServiceDefinition        = types.NewServiceDefinition
+	NewServiceBinding           = types.NewServiceBinding
+	NewRequest                  = types.NewRequest
+	NewResponse                 = types.NewResponse
+	NewEarnedFees               = types.NewEarnedFees
+	NewMsgDefineService         = types.NewMsgDefineService
+	NewMsgBindService           = types.NewMsgBindService
+	NewMsgUpdateServiceBinding  = types.NewMsgUpdateServiceBinding
+	NewMsgSetWithdrawAddress    = types.NewMsgSetWithdrawAddress
+	NewMsgDisableServiceBinding = types.NewMsgDisableServiceBinding
+	NewMsgEnableServiceBinding  = types.NewMsgEnableServiceBinding
+	NewMsgRefundServiceDeposit  = types.NewMsgRefundServiceDeposit
+	NewMsgCallService           = types.NewMsgCallService
+	NewMsgRespondService        = types.NewMsgRespondService
+	NewMsgPauseRequestContext   = types.NewMsgPauseRequestContext
+	NewMsgStartRequestContext   = types.NewMsgStartRequestContext
+	NewMsgKillRequestContext    = types.NewMsgKillRequestContext
+	NewMsgUpdateRequestContext  = types.NewMsgUpdateRequestContext
+	NewMsgWithdrawEarnedFees    = types.NewMsgWithdrawEarnedFees
+	NewMsgWithdrawTax           = types.NewMsgWithdrawTax
+	NewRequestContext           = types.NewRequestContext
+	ConvertRequestID            = types.ConvertRequestID
+	GenerateRequestContextID    = types.GenerateRequestContextID
+	GenerateRequestID           = types.GenerateRequestID
+	SplitRequestContextID       = types.SplitRequestContextID
+	SplitRequestID              = types.SplitRequestID
 )
 
 // nolint
@@ -105,10 +105,10 @@ type (
 	MsgBindService              = types.MsgBindService
 	MsgUpdateServiceBinding     = types.MsgUpdateServiceBinding
 	MsgSetWithdrawAddress       = types.MsgSetWithdrawAddress
-	MsgDisableService           = types.MsgDisableService
-	MsgEnableService            = types.MsgEnableService
+	MsgDisableServiceBinding    = types.MsgDisableServiceBinding
+	MsgEnableServiceBinding     = types.MsgEnableServiceBinding
 	MsgRefundServiceDeposit     = types.MsgRefundServiceDeposit
-	MsgRequestService           = types.MsgRequestService
+	MsgCallService              = types.MsgCallService
 	MsgRespondService           = types.MsgRespondService
 	MsgPauseRequestContext      = types.MsgPauseRequestContext
 	MsgStartRequestContext      = types.MsgStartRequestContext
@@ -126,5 +126,5 @@ type (
 	QueryRequestContextParams   = types.QueryRequestContextParams
 	QueryRequestsByReqCtxParams = types.QueryRequestsByReqCtxParams
 	QueryResponsesParams        = types.QueryResponsesParams
-	QueryFeesParams             = types.QueryFeesParams
+	QueryEarnedFeesParams       = types.QueryEarnedFeesParams
 )

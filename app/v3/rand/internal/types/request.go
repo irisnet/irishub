@@ -42,12 +42,12 @@ func NewRequest(
 // String implements fmt.Stringer
 func (r Request) String() string {
 	return fmt.Sprintf(`Request:
-  Height:            %d
-  Consumer:          %s
-  TxHash:            %s
-  Oracle:            %s
-  ServiceFeeCap:     %s
-  ServiceContextID   %s`,
+	Height:            %d
+	Consumer:          %s
+	TxHash:            %s
+	Oracle:            %s
+	ServiceFeeCap:     %s
+	ServiceContextID   %s`,
 		r.Height,
 		r.Consumer.String(),
 		r.TxHash.String(),

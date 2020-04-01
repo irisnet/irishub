@@ -110,6 +110,12 @@ func (msg MsgCreateFeed) ValidateBasic() sdk.Error {
 
 // GetSignBytes implements Msg.
 func (msg MsgCreateFeed) GetSignBytes() []byte {
+	if len(msg.Providers) == 0 {
+		msg.Providers = nil
+	}
+	if msg.ServiceFeeCap.Empty() {
+		msg.ServiceFeeCap = nil
+	}
 	b, err := msgCdc.MarshalJSON(msg)
 	if err != nil {
 		panic(err)
@@ -262,6 +268,12 @@ func (msg MsgEditFeed) ValidateBasic() sdk.Error {
 
 // GetSignBytes implements Msg.
 func (msg MsgEditFeed) GetSignBytes() []byte {
+	if len(msg.Providers) == 0 {
+		msg.Providers = nil
+	}
+	if msg.ServiceFeeCap.Empty() {
+		msg.ServiceFeeCap = nil
+	}
 	b, err := msgCdc.MarshalJSON(msg)
 	if err != nil {
 		panic(err)

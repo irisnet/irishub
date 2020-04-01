@@ -18,7 +18,12 @@ type ServiceSchemas struct {
 
 // ValidateServiceSchemas validates the given service schemas
 func ValidateServiceSchemas(schemas string) sdk.Error {
+	if len(schemas) == 0 {
+		return ErrInvalidSchemas(DefaultCodespace, "schemas missing")
+	}
+
 	svcSchemas, err := parseServiceSchemas(schemas)
+
 	if err != nil {
 		return err
 	}
@@ -36,6 +41,10 @@ func ValidateServiceSchemas(schemas string) sdk.Error {
 
 // ValidateBindingPricing validates the given pricing against the Pricing JSON Schema
 func ValidateBindingPricing(pricing string) sdk.Error {
+	if len(pricing) == 0 {
+		return ErrInvalidPricing(DefaultCodespace, "pricing missing")
+	}
+
 	if err := validateDocument([]byte(PricingSchema), pricing); err != nil {
 		return ErrInvalidPricing(DefaultCodespace, err.Error())
 	}
@@ -59,6 +68,10 @@ func ValidateRequestInput(schemas string, input string) sdk.Error {
 
 // ValidateResponseResult validates the response result against the result schema
 func ValidateResponseResult(result string) sdk.Error {
+	if len(result) == 0 {
+		return ErrInvalidResponseResult(DefaultCodespace, "result missing")
+	}
+
 	if err := validateDocument([]byte(ResultSchema), result); err != nil {
 		return ErrInvalidResponseResult(DefaultCodespace, err.Error())
 	}
@@ -141,7 +154,7 @@ func parseOutputSchema(schemas string) ([]byte, sdk.Error) {
 	}
 
 	outputSchemaBz, err2 := json.Marshal(svcSchemas.Output)
-	if err != nil {
+	if err2 != nil {
 		return nil, ErrInvalidSchemas(DefaultCodespace, fmt.Sprintf("failed to marshal the output schema: %s", err2))
 	}
 
@@ -176,34 +189,10 @@ const (
 	"description": "IRIS Hub Service Pricing Schema",
 	"type": "object",
 	"definitions": {
-	  "coin": {
-		"description": "pricing coin",
-		"type": "object",
-		"properties": {
-		  "denom": {
-			"description": "denom of pricing coin",
-			"type": "string",
-			"pattern": "^([a-z][0-9a-z]{2}[:])?(([a-z][a-z0-9]{2,7}|x)\\.)?([a-z][a-z0-9]{2,7})(-[a-z]{3,5})?$"
-		  },
-		  "amount": {
-			"description": "amount of pricing coin",
-			"type": "string",
-			"pattern": "^[0-9]+(\\.[0-9]+)?$"
-		  }
-		},
-		"additionalProperties": false,
-		"required": [
-		  "denom",
-		  "amount"
-		]
-	  },
 	  "discount": {
-		"description": "promotion discount",
-		"type": "number",
-		"minimum": 0,
-		"exclusiveMinimum": true,
-		"maximum": 1,
-		"exclusiveMaximum": true
+		"description": "promotion discount, greater than 0 and less than 1",
+		"type": "string",
+		"pattern": "^0\\.\\d*[1-9]$"
 	  },
 	  "promotion_by_time": {
 		"description": "promotion by time",
@@ -252,27 +241,26 @@ const (
 	},
 	"properties": {
 	  "price": {
-		"description": "base price",
-		"type": "array",
-		"items": {
-		  "$ref": "#/definitions/coin"
-		},
-		"uniqueItems": true
+		"description": "base price in main unit, e.g. 0.5iris",
+		"type": "string",
+		"pattern": "^\\d+(\\.\\d+)?[a-z][a-z0-9]{2,7}(,\\d+(\\.\\d+)?[a-z][a-z0-9]{2,7})*$"
 	  },
 	  "promotions_by_time": {
-		"description": "promotions by time",
+		"description": "promotions by time, in ascending order",
 		"type": "array",
 		"items": {
 		  "$ref": "#/definitions/promotion_by_time"
 		},
+		"maxItems": 5,
 		"uniqueItems": true
 	  },
 	  "promotions_by_volume": {
-		"description": "promotions by volume",
+		"description": "promotions by volume, in ascending order",
 		"type": "array",
 		"items": {
 		  "$ref": "#/definitions/promotion_by_volume"
 		},
+		"maxItems": 5,
 		"uniqueItems": true
 	  }
 	},
@@ -283,7 +271,7 @@ const (
 }
 `
 
-	// ResultSchema is the JSON Schema for the response  result
+	// ResultSchema is the JSON Schema for the response result
 	ResultSchema = `
 {
 	"$schema": "http://json-schema.org/draft-04/schema#",

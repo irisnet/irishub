@@ -88,10 +88,11 @@ irislcd start --node=tcp://localhost:26657 --chain-id=irishub --laddr=tcp://0.0.
 ### Bank模块的APIs
 
 1. `GET /bank/coins/{coin-type}`: 查询coin的类型信息
-2. `GET /bank/token-stats/{id}`: 查询token统计信息
-3. `GET /bank/accounts/{address}`: 查询秘钥对象账户的信息
-4. `POST /bank/accounts/{address}/send`: 发起转账交易
-5. `POST /bank/accounts/{address}/burn`: 销毁token
+2. `GET /bank/token-stats`: 查询token统计信息
+3. `GET /bank/token-stats/{symbol}`: 查询指定token统计信息
+4. `GET /bank/accounts/{address}`: 查询链上账户信息
+5. `POST /bank/accounts/{address}/send`: 发起转账交易
+6. `POST /bank/accounts/{address}/burn`: 销毁token
 
 ### Stake模块的APIs
 
@@ -141,12 +142,12 @@ irislcd start --node=tcp://localhost:26657 --chain-id=irishub --laddr=tcp://0.0.
 
 ### Asset模块的APIs
 
-1. `POST /asset/tokens`: 发行一种通证
+1. `POST /asset/tokens`: 发行一个通证
 2. `PUT /asset/tokens/{symbol}`: 编辑一个已存在的通证
 3. `POST /asset/tokens/{symbol}/mint`: 增发通证到指定地址
 4. `POST /asset/tokens/{symbol}/transfer`: 转让通证的所有权
-5. `GET /asset/tokens`: 通过`owner`查询通证列表
-6. `GET /asset/tokens/{symbol}`: 通过`symbol`查询指定通证信息
+5. `GET /asset/tokens/{symbol}`: 查询通证
+6. `GET /asset/tokens`: 查询指定所有者的通证集合
 7. `GET /asset/tokens/{symbol}/fee`: 查询发行和铸造指定通证的费用
 
 ### Coinswap模块的APIs
@@ -177,7 +178,7 @@ irislcd start --node=tcp://localhost:26657 --chain-id=irishub --laddr=tcp://0.0.
 9. `POST /service/bindings/{service-name}/{provider}/disable`: 禁用一个可用的服务绑定
 10. `POST /service/bindings/{service-name}/{provider}/enable`: 启用一个不可用的服务绑定
 11. `POST /service/bindings/{service-name}/{provider}/refund-deposit`: 取回一个服务绑定的所有押金
-12. `POST /service/requests`: 调用服务
+12. `POST /service/contexts`: 发起服务调用
 13. `GET /service/requests/{request-id}`: 查询服务请求
 14. `GET /service/requests/{service-name}/{provider}`: 查询一个服务绑定的活跃请求
 15. `GET /service/requests/{request-context-id}/{batch-counter}`: 根据请求上下文ID和批次计数器查询请求列表

@@ -236,7 +236,7 @@ func (k Keeper) IterateTokens(ctx sdk.Context, op func(token types.FungibleToken
 }
 
 // GetAllTokens returns all existing tokens
-func (k Keeper) GetAllTokens(ctx sdk.Context) (tokens []exported.Token) {
+func (k Keeper) GetAllTokens(ctx sdk.Context) (tokens []exported.TokenI) {
 	k.IterateTokens(ctx, func(token types.FungibleToken) (stop bool) {
 		tokens = append(tokens, token)
 		return false
@@ -342,4 +342,9 @@ func (k Keeper) getToken(ctx sdk.Context, symbol string) (token types.FungibleTo
 
 	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &token)
 	return token, nil
+}
+
+// GetToken wraps getToken for export
+func (k Keeper) GetToken(ctx sdk.Context, symbol string) (token exported.TokenI, err sdk.Error) {
+	return k.getToken(ctx, symbol)
 }

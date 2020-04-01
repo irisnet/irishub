@@ -9,13 +9,20 @@ import (
 
 //expected Service keeper
 type ServiceKeeper interface {
-	RegisterResponseCallback(moduleName string,
-		respCallback service.ResponseCallback) sdk.Error
+	RegisterResponseCallback(
+		moduleName string, respCallback service.ResponseCallback,
+	) sdk.Error
 
-	GetRequestContext(ctx sdk.Context,
-		requestContextID cmn.HexBytes) (service.RequestContext, bool)
+	RegisterStateCallback(
+		moduleName string, stateCallback service.StateCallback,
+	) sdk.Error
 
-	CreateRequestContext(ctx sdk.Context,
+	GetRequestContext(
+		ctx sdk.Context, requestContextID cmn.HexBytes,
+	) (service.RequestContext, bool)
+
+	CreateRequestContext(
+		ctx sdk.Context,
 		serviceName string,
 		providers []sdk.AccAddress,
 		consumer sdk.AccAddress,
@@ -28,24 +35,32 @@ type ServiceKeeper interface {
 		repeatedTotal int64,
 		state service.RequestContextState,
 		respThreshold uint16,
-		respHandler string) (cmn.HexBytes, sdk.Tags, sdk.Error)
+		respHandler string,
+	) (cmn.HexBytes, sdk.Tags, sdk.Error)
 
-	UpdateRequestContext(ctx sdk.Context,
+	UpdateRequestContext(
+		ctx sdk.Context,
 		requestContextID cmn.HexBytes,
 		providers []sdk.AccAddress,
+		respThreshold uint16,
 		serviceFeeCap sdk.Coins,
 		timeout int64,
 		repeatedFreq uint64,
 		repeatedTotal int64,
-		consumer sdk.AccAddress) sdk.Error
+		consumer sdk.AccAddress,
+	) sdk.Error
 
-	StartRequestContext(ctx sdk.Context,
+	StartRequestContext(
+		ctx sdk.Context,
 		requestContextID cmn.HexBytes,
-		consumer sdk.AccAddress) sdk.Error
+		consumer sdk.AccAddress,
+	) sdk.Error
 
-	PauseRequestContext(ctx sdk.Context,
+	PauseRequestContext(
+		ctx sdk.Context,
 		requestContextID cmn.HexBytes,
-		consumer sdk.AccAddress) sdk.Error
+		consumer sdk.AccAddress,
+	) sdk.Error
 }
 
 // GuardianKeeper defines the expected guardian keeper (noalias)

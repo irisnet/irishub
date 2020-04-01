@@ -4,6 +4,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"strconv"
 
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/app/v3/service"
@@ -12,13 +13,14 @@ import (
 	sdk "github.com/irisnet/irishub/types"
 )
 
-// QueryRequestContext query a single request context
+// QueryRequestContext queries a single request context
 func QueryRequestContext(cliCtx context.CLIContext, params service.QueryRequestContextParams) (
 	requestContext service.RequestContext, err error) {
 	bz, err := cliCtx.Codec.MarshalJSON(params)
 	if err != nil {
 		return requestContext, err
 	}
+
 	route := fmt.Sprintf("custom/%s/%s", protocol.ServiceRoute, service.QueryRequestContext)
 	res, err := cliCtx.QueryWithData(route, bz)
 	if err != nil {
@@ -55,16 +57,17 @@ func QueryRequestContextByTxQuery(cliCtx context.CLIContext, params service.Quer
 
 	if int64(len(txInfo.Tx.GetMsgs())) > msgIndex {
 		msg := txInfo.Tx.GetMsgs()[msgIndex]
-		if msg.Type() == service.TypeMsgRequestService {
-			requestMsg := msg.(service.MsgRequestService)
+		if msg.Type() == service.TypeMsgCallService {
+			requestMsg := msg.(service.MsgCallService)
 			requestContext := service.NewRequestContext(
 				requestMsg.ServiceName, requestMsg.Providers,
 				requestMsg.Consumer, requestMsg.Input, requestMsg.ServiceFeeCap,
 				requestMsg.Timeout, requestMsg.SuperMode, requestMsg.Repeated,
 				requestMsg.RepeatedFrequency, requestMsg.RepeatedTotal,
-				uint64(requestMsg.RepeatedTotal), 0, 0,
+				uint64(requestMsg.RepeatedTotal), 0, 0, 0,
 				service.BATCHCOMPLETED, service.COMPLETED, 0, "",
 			)
+
 			return requestContext, nil
 		}
 	}
@@ -112,6 +115,7 @@ func QueryRequestByTxQuery(cliCtx context.CLIContext, params service.QueryReques
 			if err != nil {
 				return request, err
 			}
+
 			if len(requests) > int(batchRequestIndex) {
 				compactRequest := requests[batchRequestIndex]
 				request = service.NewRequest(
@@ -127,6 +131,7 @@ func QueryRequestByTxQuery(cliCtx context.CLIContext, params service.QueryReques
 					compactRequest.RequestContextID,
 					compactRequest.RequestContextBatchCounter,
 				)
+
 				return request, nil
 			}
 		}
@@ -173,14 +178,78 @@ func QueryResponseByTxQuery(cliCtx context.CLIContext, params service.QueryRespo
 			if responseMsg.RequestID.String() != params.RequestID.String() {
 				continue
 			}
+
 			response := service.NewResponse(
 				responseMsg.Provider, requestContext.Consumer,
 				responseMsg.Result, responseMsg.Output,
 				contextID, batchCounter,
 			)
+
 			return response, nil
 		}
 	}
 
 	return response, nil
+}
+
+// QueryRequestsByBinding queries active requests by the service binding
+func QueryRequestsByBinding(cliCtx context.CLIContext, serviceName string, provider sdk.AccAddress) (service.Requests, error) {
+	params := service.QueryRequestsParams{
+		ServiceName: serviceName,
+		Provider:    provider,
+	}
+
+	bz, err := cliCtx.Codec.MarshalJSON(params)
+	if err != nil {
+		return nil, err
+	}
+
+	route := fmt.Sprintf("custom/%s/%s", protocol.ServiceRoute, service.QueryRequests)
+	res, err := cliCtx.QueryWithData(route, bz)
+	if err != nil {
+		return nil, err
+	}
+
+	var requests service.Requests
+	if err := cliCtx.Codec.UnmarshalJSON(res, &requests); err != nil {
+		return nil, err
+	}
+
+	return requests, nil
+}
+
+// QueryRequestsByReqCtx queries active requests by the request context ID
+func QueryRequestsByReqCtx(cliCtx context.CLIContext, reqCtxIDStr, batchCounterStr string) (service.Requests, error) {
+	requestContextID, err := hex.DecodeString(reqCtxIDStr)
+	if err != nil {
+		return nil, err
+	}
+
+	batchCounter, err := strconv.ParseUint(batchCounterStr, 10, 64)
+	if err != nil {
+		return nil, err
+	}
+
+	params := service.QueryRequestsByReqCtxParams{
+		RequestContextID: requestContextID,
+		BatchCounter:     batchCounter,
+	}
+
+	bz, err := cliCtx.Codec.MarshalJSON(params)
+	if err != nil {
+		return nil, err
+	}
+
+	route := fmt.Sprintf("custom/%s/%s", protocol.ServiceRoute, service.QueryRequestsByReqCtx)
+	res, err := cliCtx.QueryWithData(route, bz)
+	if err != nil {
+		return nil, err
+	}
+
+	var requests service.Requests
+	if err := cliCtx.Codec.UnmarshalJSON(res, &requests); err != nil {
+		return nil, err
+	}
+
+	return requests, nil
 }

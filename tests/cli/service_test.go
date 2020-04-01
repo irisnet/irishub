@@ -41,7 +41,8 @@ func TestIrisCLIService(t *testing.T) {
 	deposit := "10iris"
 	priceAmt := 1 // 1iris
 	price := fmt.Sprintf("%diris", priceAmt)
-	pricing := fmt.Sprintf(`{"price":[{"denom":"iris-atto","amount":"%s"}]}`, sdk.NewIntWithDecimal(int64(priceAmt), 18).String())
+	pricing := fmt.Sprintf(`{"price":"%diris"}`, priceAmt)
+	minRespTime := uint64(5)
 	addedDeposit := "1iris"
 	serviceFeeCap := "10iris"
 	input := `{"pair":"iris-usdt"}`
@@ -84,6 +85,7 @@ func TestIrisCLIService(t *testing.T) {
 	sbStr += fmt.Sprintf(" --service-name=%s", serviceName)
 	sbStr += fmt.Sprintf(" --deposit=%s", deposit)
 	sbStr += fmt.Sprintf(" --pricing=%s", pricing)
+	sbStr += fmt.Sprintf(" --min-resp-time=%d", minRespTime)
 	sbStr += fmt.Sprintf(" --fee=%s", "0.4iris")
 
 	sbStrFoo := sbStr + fmt.Sprintf(" --from=%s", "foo")
@@ -119,6 +121,7 @@ func TestIrisCLIService(t *testing.T) {
 	require.Equal(t, fooAddr, svcBinding.Provider)
 	require.Equal(t, deposit, svcBinding.Deposit.MainUnitString())
 	require.Equal(t, pricing, svcBinding.Pricing)
+	require.Equal(t, minRespTime, svcBinding.MinRespTime)
 	require.True(t, svcBinding.Available)
 
 	svcBindings := executeGetServiceBindings(t, fmt.Sprintf("iriscli service bindings %s %v", serviceName, flags))
