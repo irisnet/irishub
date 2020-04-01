@@ -525,6 +525,10 @@ func (msg MsgCallService) Type() string { return TypeMsgCallService }
 
 // GetSignBytes implements Msg.
 func (msg MsgCallService) GetSignBytes() []byte {
+	if len(msg.Providers) == 0 {
+		msg.Providers = nil
+	}
+
 	if msg.ServiceFeeCap.Empty() {
 		msg.ServiceFeeCap = nil
 	}
@@ -832,6 +836,10 @@ func (msg MsgUpdateRequestContext) Type() string { return TypeMsgUpdateRequestCo
 
 // GetSignBytes implements Msg.
 func (msg MsgUpdateRequestContext) GetSignBytes() []byte {
+	if len(msg.Providers) == 0 {
+		msg.Providers = nil
+	}
+
 	if msg.ServiceFeeCap.Empty() {
 		msg.ServiceFeeCap = nil
 	}
