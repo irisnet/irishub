@@ -181,10 +181,6 @@ func (k Keeper) UpdateRequestContext(
 		}
 	}
 
-	if len(providers) > 0 && requestContext.ResponseThreshold > 0 && len(providers) < int(requestContext.ResponseThreshold) {
-		return types.ErrInvalidProviders(k.codespace, fmt.Sprintf("length [%d] of providers must not be less than the response threshold [%d]", len(providers), requestContext.ResponseThreshold))
-	}
-
 	params := k.GetParamSet(ctx)
 	if timeout > params.MaxRequestTimeout {
 		return types.ErrInvalidTimeout(k.codespace, fmt.Sprintf("timeout [%d] must not be greater than the max request timeout [%d]", timeout, params.MaxRequestTimeout))
