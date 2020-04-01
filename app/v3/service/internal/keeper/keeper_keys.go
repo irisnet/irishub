@@ -9,19 +9,21 @@ var (
 	emptyByte = []byte{0x00}
 
 	// Keys for store prefixes
-	serviceDefinitionKey   = []byte{0x01}
-	serviceBindingKey      = []byte{0x02}
-	pricingKey             = []byte{0x03}
-	withdrawAddrKey        = []byte{0x04}
-	requestContextKey      = []byte{0x05}
-	expiredRequestBatchKey = []byte{0x06}
-	newRequestBatchKey     = []byte{0x07}
-	requestKey             = []byte{0x08}
-	activeRequestKey       = []byte{0x09}
-	activeRequestByIDKey   = []byte{0x10}
-	responseKey            = []byte{0x11}
-	requestVolumeKey       = []byte{0x12}
-	earnedFeesKey          = []byte{0x13}
+	serviceDefinitionKey         = []byte{0x01}
+	serviceBindingKey            = []byte{0x02}
+	pricingKey                   = []byte{0x03}
+	withdrawAddrKey              = []byte{0x04}
+	requestContextKey            = []byte{0x05}
+	expiredRequestBatchKey       = []byte{0x06}
+	newRequestBatchKey           = []byte{0x07}
+	expiredRequestBatchHeightKey = []byte{0x08}
+	newRequestBatchHeightKey     = []byte{0x09}
+	requestKey                   = []byte{0x10}
+	activeRequestKey             = []byte{0x11}
+	activeRequestByIDKey         = []byte{0x12}
+	responseKey                  = []byte{0x13}
+	requestVolumeKey             = []byte{0x14}
+	earnedFeesKey                = []byte{0x15}
 )
 
 // GetServiceDefinitionKey returns the key for the service definition with the specified name
@@ -76,6 +78,16 @@ func GetNewRequestBatchSubspace(requestBatchHeight int64) []byte {
 	return append(newRequestBatchKey, sdk.Uint64ToBigEndian(uint64(requestBatchHeight))...)
 }
 
+// GetExpiredRequestBatchHeightKey returns the key for the current request batch expiration height of the specified request context
+func GetExpiredRequestBatchHeightKey(requestContextID []byte) []byte {
+	return append(expiredRequestBatchHeightKey, requestContextID...)
+}
+
+// GetNewRequestBatchHeightKey returns the key for the new request batch height of the specified request context
+func GetNewRequestBatchHeightKey(requestContextID []byte) []byte {
+	return append(newRequestBatchHeightKey, requestContextID...)
+}
+
 // GetRequestKey returns the key for the request with the specified request ID
 func GetRequestKey(requestID []byte) []byte {
 	return append(requestKey, requestID...)
@@ -122,8 +134,9 @@ func GetResponseSubspaceByReqCtx(requestContextID []byte, batchCounter uint64) [
 	return append(append(responseKey, requestContextID...), sdk.Uint64ToBigEndian(batchCounter)...)
 }
 
-func GetEarnedFeesKey(address sdk.AccAddress) []byte {
-	return append(earnedFeesKey, address.Bytes()...)
+// GetEarnedFeesKey returns the key for the earned fees of the specified provider
+func GetEarnedFeesKey(provider sdk.AccAddress) []byte {
+	return append(earnedFeesKey, provider.Bytes()...)
 }
 
 func getStringsKey(ss []string) (result []byte) {

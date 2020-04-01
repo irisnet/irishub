@@ -10,12 +10,13 @@ Asset module allows you to manage assets on IRIS Hub
 | [token edit](#iriscli-asset-token-edit)         | Edit an existing token             |
 | [token transfer](#iriscli-asset-token-transfer) | Transfer the ownership of a token  |
 | [token mint](#iriscli-asset-token-mint)         | Mint tokens to a specified address |
-| [token tokens](#iriscli-asset-token-tokens)     | Query details of a group of tokens |
+| [token token](#iriscli-asset-token-token)       | Query a token by symbol |
+| [token tokens](#iriscli-asset-token-tokens)     | Query tokens by owner |
 | [token fee](#iriscli-asset-token-fee)           | Query the token related fees       |
 
 ## iriscli asset token issue
 
-This command is used to issue a new token on IRIS Hub.
+Issue a new token
 
 ```bash
 iriscli asset token issue [flags]
@@ -43,7 +44,7 @@ iriscli asset token issue --symbol="kitty" --name="Kitty Token" --initial-supply
 
 You can send any tokens you have just like [sending iris](./bank.md#iriscli-bank-send)
 
-#### Send native tokens
+#### Send tokens
 
 ```bash
 iriscli bank send --from=<key-name> --to=<address> --amount=10kitty --fee=0.3iris --chain-id=irishub --commit
@@ -51,7 +52,7 @@ iriscli bank send --from=<key-name> --to=<address> --amount=10kitty --fee=0.3iri
 
 ## iriscli asset token edit
 
-Edit token informations
+Edit an existing token
 
 ```bash
 iriscli asset token edit [symbol] [flags]
@@ -62,7 +63,7 @@ iriscli asset token edit [symbol] [flags]
 | Name         | Type   | Required | Default | Description                                    |
 | ------------ | ------ | -------- | ------- | ---------------------------------------------- |
 | --name       | string |          |         | The token name, e.g. IRIS Network              |
-| --max-supply | uint   |          | 0       | The max supply of the token                    |
+| --max-supply | uint64   |          | 0       | The max supply of the token                    |
 | --mintable   | bool   |          | false   | Whether the token can be minted, default to false |
 
 `max-supply` should not be less than the current total supply
@@ -95,7 +96,7 @@ iriscli asset token transfer kitty --to=<new-owner-address> --from=<key-name> --
 
 ## iriscli asset token mint
 
-The asset owner can directly mint tokens to a specified address
+Mint tokens to a specified address
 
 ```bash
 iriscli asset token mint [symbol] [flags]
@@ -114,20 +115,27 @@ iriscli asset token mint [symbol] [flags]
 iriscli asset token mint kitty --amount=1000000 --from=<key-name> --chain-id=irishub --fee=0.3iris
 ```
 
-## iriscli asset token tokens
+## iriscli asset token token
 
-Query the collection of tokens issued on IRIS Hub based on criteria.
+Query a token by symbol
 
 ```bash
-iriscli asset token tokens [flags]
+iriscli asset token token [symbol] [flags]
 ```
 
-**Flags:**
+### Query a token
 
-| Name       | Type   | Required | Default | Description                        |
-| ---------- | ------ | -------- | ------- | ---------------------------------- |
-| --symbol | string |          |         | The symbol of the token |
-| --owner    | string |          |         | The owner of the tokens            |
+```bash
+iriscli asset token token kitty
+```
+
+## iriscli asset token tokens
+
+Query tokens by the owner which is optional
+
+```bash
+iriscli asset token tokens [owner] [flags]
+```
 
 ### Query all tokens
 
@@ -135,16 +143,10 @@ iriscli asset token tokens [flags]
 iriscli asset token tokens
 ```
 
-### Query a token with the specified symbol
+### Query tokens with the specified owner
 
 ```bash
-iriscli asset token tokens --symbol=kitty
-```
-
-### Query all tokens of the specified owner
-
-```bash
-iriscli asset token tokens --owner=<address>
+iriscli asset token tokens <owner>
 ```
 
 ## iriscli asset token fee

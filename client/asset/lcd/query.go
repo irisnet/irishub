@@ -11,33 +11,42 @@ import (
 	"github.com/irisnet/irishub/client/context"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/codec"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec) {
-	// Get token by symbol
+	// Query token by symbol
 	r.HandleFunc(
 		fmt.Sprintf("/asset/tokens/{%s}", RestParamSymbol),
 		queryTokenHandlerFn(cliCtx, cdc),
 	).Methods("GET")
-	// Search tokens
+
+	// Query tokens by owner
 	r.HandleFunc(
 		"/asset/tokens",
 		queryTokensHandlerFn(cliCtx, cdc),
 	).Methods("GET")
 
-	// Get token fees
+	// Query token fees
 	r.HandleFunc(
 		fmt.Sprintf("/asset/tokens/{%s}/fee", RestParamSymbol),
-		tokenFeesHandlerFn(cliCtx, cdc),
+		queryTokenFeesHandlerFn(cliCtx, cdc),
 	).Methods("GET")
 }
 
-// queryTokenHandlerFn performs token information query
+// queryTokenHandlerFn is the HTTP request handler to query token
 func queryTokenHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
+		symbol := vars[RestParamSymbol]
+
+		if err := asset.CheckSymbol(symbol); err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
 		params := asset.QueryTokenParams{
-			Symbol: vars[RestParamSymbol],
+			Symbol: symbol,
 		}
 
 		bz, err := cliCtx.Codec.MarshalJSON(params)
@@ -57,11 +66,24 @@ func queryTokenHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.Handl
 	}
 }
 
-// queryTokenHandlerFn performs token information query
+// queryTokensHandlerFn is the HTTP request handler to query tokens
 func queryTokensHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		ownerStr := r.FormValue(RestParamOwner)
+
+		var err error
+		var owner sdk.AccAddress
+
+		if len(ownerStr) > 0 {
+			owner, err = sdk.AccAddressFromBech32(ownerStr)
+			if err != nil {
+				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+				return
+			}
+		}
+
 		params := asset.QueryTokensParams{
-			Owner: r.FormValue(RestParamOwner),
+			Owner: owner,
 		}
 
 		bz, err := cliCtx.Codec.MarshalJSON(params)
@@ -81,12 +103,19 @@ func queryTokensHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.Hand
 	}
 }
 
-// tokenFeesHandlerFn is the HTTP request handler to query token fees
-func tokenFeesHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
+// queryTokenFeesHandlerFn is the HTTP request handler to query token fees
+func queryTokenFeesHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
+		symbol := vars[RestParamSymbol]
+
+		if err := asset.CheckSymbol(symbol); err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
 		params := asset.QueryTokenFeesParams{
-			Symbol: vars[RestParamSymbol],
+			Symbol: symbol,
 		}
 
 		bz, err := cliCtx.Codec.MarshalJSON(params)

@@ -236,7 +236,7 @@ func (k Keeper) PauseRequestContext(
 	}
 
 	if requestContext.State != types.RUNNING {
-		return types.ErrRequestContextNotStarted(k.codespace)
+		return types.ErrRequestContextNotRunning(k.codespace)
 	}
 
 	requestContext.State = types.PAUSED
@@ -270,9 +270,8 @@ func (k Keeper) StartRequestContext(
 	requestContext.State = types.RUNNING
 	k.SetRequestContext(ctx, requestContextID, requestContext)
 
-	if requestContext.BatchState == types.BATCHCOMPLETED &&
-		(requestContext.BatchRequestCount == 0 ||
-			requestContext.BatchRequestCount != requestContext.BatchResponseCount) {
+	// add to the new request batch queue if existing in neither expired nor new request batch queue
+	if !k.HasRequestBatchExpiration(ctx, requestContextID) && !k.HasNewRequestBatch(ctx, requestContextID) {
 		k.AddNewRequestBatch(ctx, requestContextID, ctx.BlockHeight())
 	}
 
@@ -396,11 +395,11 @@ func (k Keeper) InitiateRequests(
 	k.SetRequestContext(ctx, requestContextID, requestContext)
 
 	if len(requests) > 0 {
-		requestsJson, _ := json.Marshal(requests)
+		requestsJSON, _ := json.Marshal(requests)
 		tags = tags.AppendTags(sdk.NewTags(
 			sdk.ActionTag(types.ActionNewBatchRequest, types.TagServiceName), []byte(requestContext.ServiceName),
 			sdk.ActionTag(types.ActionNewBatchRequest, types.TagRequestContextID), []byte(requestContextID.String()),
-			sdk.ActionTag(types.ActionNewBatchRequest, requestContextID.String()), requestsJson,
+			sdk.ActionTag(types.ActionNewBatchRequest, requestContextID.String()), requestsJSON,
 		))
 	}
 
@@ -468,7 +467,7 @@ func (k Keeper) GetCompactRequest(ctx sdk.Context, requestID cmn.HexBytes) (requ
 	return request, true
 }
 
-// SetCompactRequest deletes the specified compact request
+// DeleteCompactRequest deletes the specified compact request
 func (k Keeper) DeleteCompactRequest(ctx sdk.Context, requestID cmn.HexBytes) {
 	store := ctx.KVStore(k.storeKey)
 
@@ -621,12 +620,22 @@ func (k Keeper) AddRequestBatchExpiration(ctx sdk.Context, requestContextID cmn.
 
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(requestContextID)
 	store.Set(GetExpiredRequestBatchKey(requestContextID, expirationHeight), bz)
+
+	k.SetRequestBatchExpirationHeight(ctx, requestContextID, expirationHeight)
 }
 
 // DeleteRequestBatchExpiration deletes the request batch from the expiration queue
 func (k Keeper) DeleteRequestBatchExpiration(ctx sdk.Context, requestContextID cmn.HexBytes, expirationHeight int64) {
 	store := ctx.KVStore(k.storeKey)
 	store.Delete(GetExpiredRequestBatchKey(requestContextID, expirationHeight))
+
+	k.DeleteRequestBatchExpirationHeight(ctx, requestContextID)
+}
+
+// HasRequestBatchExpiration checks if the request batch expiration of the specified request context exists
+func (k Keeper) HasRequestBatchExpiration(ctx sdk.Context, requestContextID cmn.HexBytes) bool {
+	store := ctx.KVStore(k.storeKey)
+	return store.Has(GetExpiredRequestBatchHeightKey(requestContextID))
 }
 
 // AddNewRequestBatch adds a request batch to the new request batch queue
@@ -635,18 +644,50 @@ func (k Keeper) AddNewRequestBatch(ctx sdk.Context, requestContextID cmn.HexByte
 
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(requestContextID)
 	store.Set(GetNewRequestBatchKey(requestContextID, requestBatchHeight), bz)
+
+	k.SetNewRequestBatchHeight(ctx, requestContextID, requestBatchHeight)
 }
 
 // DeleteNewRequestBatch deletes the request batch in the given height from the new request batch queue
 func (k Keeper) DeleteNewRequestBatch(ctx sdk.Context, requestContextID cmn.HexBytes, requestBatchHeight int64) {
 	store := ctx.KVStore(k.storeKey)
 	store.Delete(GetNewRequestBatchKey(requestContextID, requestBatchHeight))
+
+	k.DeleteNewRequestBatchHeight(ctx, requestContextID)
 }
 
-// HasNewRequestBatch checks if the new request batch from the specified request context exists in the given height
-func (k Keeper) HasNewRequestBatch(ctx sdk.Context, requestContextID cmn.HexBytes, requestBatchHeight int64) bool {
+// HasNewRequestBatch checks if the new request batch of the specified request context exists
+func (k Keeper) HasNewRequestBatch(ctx sdk.Context, requestContextID cmn.HexBytes) bool {
 	store := ctx.KVStore(k.storeKey)
-	return store.Has(GetNewRequestBatchKey(requestContextID, requestBatchHeight))
+	return store.Has(GetNewRequestBatchHeightKey(requestContextID))
+}
+
+// SetRequestBatchExpirationHeight sets the request batch expiration height for the specified request context
+func (k Keeper) SetRequestBatchExpirationHeight(ctx sdk.Context, requestContextID cmn.HexBytes, expirationHeight int64) {
+	store := ctx.KVStore(k.storeKey)
+
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(expirationHeight)
+	store.Set(GetExpiredRequestBatchHeightKey(requestContextID), bz)
+}
+
+// DeleteRequestBatchExpirationHeight deletes the request batch expiration height for the specified request context
+func (k Keeper) DeleteRequestBatchExpirationHeight(ctx sdk.Context, requestContextID cmn.HexBytes) {
+	store := ctx.KVStore(k.storeKey)
+	store.Delete(GetExpiredRequestBatchHeightKey(requestContextID))
+}
+
+// SetNewRequestBatchHeight sets the new request batch height for the specified request context
+func (k Keeper) SetNewRequestBatchHeight(ctx sdk.Context, requestContextID cmn.HexBytes, requestBatchHeight int64) {
+	store := ctx.KVStore(k.storeKey)
+
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(requestBatchHeight)
+	store.Set(GetNewRequestBatchHeightKey(requestContextID), bz)
+}
+
+// DeleteNewRequestBatchHeight deletes the new request batch height for the specified request context
+func (k Keeper) DeleteNewRequestBatchHeight(ctx sdk.Context, requestContextID cmn.HexBytes) {
+	store := ctx.KVStore(k.storeKey)
+	store.Delete(GetNewRequestBatchHeightKey(requestContextID))
 }
 
 // IterateExpiredRequestBatch iterates through the expired request batch queue in the specified height
@@ -897,7 +938,7 @@ func (k Keeper) GetResponse(ctx sdk.Context, requestID cmn.HexBytes) (response t
 	return response, true
 }
 
-// deleteResponse deletes a response with the speicified request ID
+// DeleteResponse deletes a response with the speicified request ID
 func (k Keeper) DeleteResponse(ctx sdk.Context, requestID cmn.HexBytes) {
 	store := ctx.KVStore(k.storeKey)
 
@@ -996,7 +1037,7 @@ func (k Keeper) GetRequestVolume(
 }
 
 // Slash slashes the provider from the specified request
-// Ensure that the request is valid
+// Note: ensure that the request is valid
 func (k Keeper) Slash(ctx sdk.Context, requestID cmn.HexBytes) (tags sdk.Tags, err sdk.Error) {
 	request, _ := k.GetRequest(ctx, requestID)
 	binding, _ := k.GetServiceBinding(ctx, request.ServiceName, request.Provider)
@@ -1037,153 +1078,6 @@ func (k Keeper) Slash(ctx sdk.Context, requestID cmn.HexBytes) (tags sdk.Tags, e
 	)
 
 	return slashTags, nil
-}
-
-// RefundServiceFee refunds the service fee to the specified consumer
-func (k Keeper) RefundServiceFee(ctx sdk.Context, consumer sdk.AccAddress, serviceFee sdk.Coins) sdk.Error {
-	_, err := k.bk.SendCoins(ctx, auth.ServiceRequestCoinsAccAddr, consumer, serviceFee)
-
-	if !serviceFee.IsZero() {
-		ctx.CoinFlowTags().AppendCoinFlowTag(ctx, auth.ServiceRequestCoinsAccAddr.String(),
-			consumer.String(), serviceFee.String(), sdk.ServiceFeeRefundFlow, "")
-	}
-
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// AddEarnedFee adds the earned fee for the given provider
-func (k Keeper) AddEarnedFee(ctx sdk.Context, provider sdk.AccAddress, fee sdk.Coins) sdk.Error {
-	params := k.GetParamSet(ctx)
-	taxRate := params.ServiceFeeTax
-
-	taxCoins := sdk.Coins{}
-	for _, coin := range fee {
-		taxAmount := sdk.NewDecFromInt(coin.Amount).Mul(taxRate).TruncateInt()
-		taxCoins = taxCoins.Add(sdk.NewCoins(sdk.NewCoin(coin.Denom, taxAmount)))
-	}
-
-	_, err := k.bk.SendCoins(ctx, auth.ServiceRequestCoinsAccAddr, auth.ServiceTaxCoinsAccAddr, taxCoins)
-	if err != nil {
-		return err
-	}
-
-	earnedFee, hasNeg := fee.SafeSub(taxCoins)
-	if hasNeg {
-		errMsg := fmt.Sprintf("%s is less than %s", fee, taxCoins)
-		return sdk.ErrInsufficientFunds(errMsg)
-	}
-
-	fees, _ := k.GetEarnedFees(ctx, provider)
-	k.SetEarnedFees(ctx, provider, fees.Coins.Add(earnedFee))
-
-	return nil
-}
-
-func (k Keeper) SetEarnedFees(ctx sdk.Context, provider sdk.AccAddress, fees sdk.Coins) {
-	store := ctx.KVStore(k.storeKey)
-
-	earnedFees := types.NewEarnedFees(provider, fees)
-	bz := k.cdc.MustMarshalBinaryLengthPrefixed(earnedFees)
-
-	store.Set(GetEarnedFeesKey(provider), bz)
-}
-
-func (k Keeper) DeleteEarnedFees(ctx sdk.Context, provider sdk.AccAddress) {
-	store := ctx.KVStore(k.storeKey)
-	store.Delete(GetEarnedFeesKey(provider))
-}
-
-func (k Keeper) GetEarnedFees(ctx sdk.Context, provider sdk.AccAddress) (fees types.EarnedFees, found bool) {
-	store := ctx.KVStore(k.storeKey)
-
-	bz := store.Get(GetEarnedFeesKey(provider))
-	if bz == nil {
-		return fees, false
-	}
-
-	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &fees)
-	return fees, true
-}
-
-// WithdrawEarnedFees withdraws the earned fees of the specified provider
-func (k Keeper) WithdrawEarnedFees(ctx sdk.Context, provider sdk.AccAddress) sdk.Error {
-	fees, found := k.GetEarnedFees(ctx, provider)
-	if !found {
-		return types.ErrNoEarnedFees(k.codespace, provider)
-	}
-
-	withdrawAddr := k.GetWithdrawAddress(ctx, provider)
-
-	_, err := k.bk.SendCoins(ctx, auth.ServiceRequestCoinsAccAddr, withdrawAddr, fees.Coins)
-	if err != nil {
-		return err
-	}
-
-	k.DeleteEarnedFees(ctx, provider)
-
-	return nil
-}
-
-// WithdrawTax withdraws the service tax to the speicified destination address by the trustee
-func (k Keeper) WithdrawTax(ctx sdk.Context, trustee sdk.AccAddress, destAddress sdk.AccAddress, amt sdk.Coins) sdk.Error {
-	if _, found := k.gk.GetTrustee(ctx, trustee); !found {
-		return types.ErrInvalidTrustee(k.codespace, trustee)
-	}
-
-	_, err := k.bk.SendCoins(ctx, auth.ServiceTaxCoinsAccAddr, destAddress, amt)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// AllEarnedFeesIterator returns an iterator for all the earned fees
-func (k Keeper) AllEarnedFeesIterator(ctx sdk.Context) sdk.Iterator {
-	store := ctx.KVStore(k.storeKey)
-	return sdk.KVStorePrefixIterator(store, earnedFeesKey)
-}
-
-// RefundEarnedFees refunds all the incoming fees
-func (k Keeper) RefundEarnedFees(ctx sdk.Context) sdk.Error {
-	iterator := k.AllEarnedFeesIterator(ctx)
-	defer iterator.Close()
-
-	for ; iterator.Valid(); iterator.Next() {
-		var earnedFees types.EarnedFees
-		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &earnedFees)
-
-		_, err := k.bk.SendCoins(ctx, auth.ServiceRequestCoinsAccAddr, earnedFees.Address, earnedFees.Coins)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// RefundServiceFees refunds the service fees of all the active requests
-func (k Keeper) RefundServiceFees(ctx sdk.Context) sdk.Error {
-	iterator := k.AllActiveRequestsIterator(ctx.KVStore(k.storeKey))
-	defer iterator.Close()
-
-	for ; iterator.Valid(); iterator.Next() {
-		var requestID cmn.HexBytes
-		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &requestID)
-
-		request, _ := k.GetRequest(ctx, requestID)
-
-		_, err := k.bk.SendCoins(ctx, auth.ServiceRequestCoinsAccAddr, request.Consumer, request.ServiceFee)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
 }
 
 // CheckAuthority checks if the operation on the specified request context is authorized
@@ -1227,4 +1121,24 @@ func (k Keeper) GetStateCallback(moduleName string) (types.StateCallback, sdk.Er
 	}
 
 	return stateCallback, nil
+}
+
+// ResetRequestContextsStateAndBatch reset request contexts state and batch
+func (k Keeper) ResetRequestContextsStateAndBatch(ctx sdk.Context) sdk.Error {
+	k.IterateRequestContexts(
+		ctx,
+		func(requestContextID cmn.HexBytes, requestContext types.RequestContext) bool {
+			requestContext.State = types.PAUSED
+			
+			requestContext.BatchState = types.BATCHCOMPLETED
+			requestContext.BatchCounter = 0
+			requestContext.BatchRequestCount = 0
+			requestContext.BatchResponseCount = 0
+
+			k.SetRequestContext(ctx, requestContextID, requestContext)
+			return false
+		},
+	)
+
+	return nil
 }

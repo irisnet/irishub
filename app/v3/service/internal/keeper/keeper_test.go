@@ -15,8 +15,6 @@ import (
 )
 
 var (
-	testChainID = "test-chain"
-
 	testCoin1, _ = sdk.IrisCoinType.ConvertToCoin("10000iris")
 	testCoin2, _ = sdk.IrisCoinType.ConvertToCoin("100iris")
 	testCoin3, _ = sdk.IrisCoinType.ConvertToCoin("1iris")
@@ -178,7 +176,7 @@ func TestKeeper_Disable_Service(t *testing.T) {
 	currentTime := time.Now().UTC()
 	ctx = ctx.WithBlockTime(currentTime)
 
-	err := keeper.DisableService(ctx, testServiceName, provider)
+	err := keeper.DisableServiceBinding(ctx, testServiceName, provider)
 	require.NoError(t, err)
 
 	svcBinding, found := keeper.GetServiceBinding(ctx, testServiceName, provider)
@@ -196,7 +194,7 @@ func TestKeeper_Enable_Service(t *testing.T) {
 	disabledTime := time.Now().UTC()
 	setServiceBinding(ctx, keeper, provider, false, disabledTime)
 
-	err := keeper.EnableService(ctx, testServiceName, provider, nil)
+	err := keeper.EnableServiceBinding(ctx, testServiceName, provider, nil)
 	require.NoError(t, err)
 
 	svcBinding, found := keeper.GetServiceBinding(ctx, testServiceName, provider)
@@ -265,7 +263,7 @@ func TestKeeper_Request_Context(t *testing.T) {
 	)
 	require.NoError(t, err)
 
-	require.True(t, keeper.HasNewRequestBatch(ctx, requestContextID, ctx.BlockHeight()))
+	require.True(t, keeper.HasNewRequestBatch(ctx, requestContextID))
 
 	requestContext, found := keeper.GetRequestContext(ctx, requestContextID)
 	require.True(t, found)

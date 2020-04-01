@@ -9,27 +9,22 @@ import (
 const (
 	DefaultCodespace sdk.CodespaceType = "asset"
 
-	CodeInvalidMoniker   sdk.CodeType = 100
-	CodeInvalidOwner     sdk.CodeType = 101
-	CodeInvalidAddress   sdk.CodeType = 102
-	CodeInvalidToAddress sdk.CodeType = 103
+	CodeNilAssetOwner            sdk.CodeType = 100
+	CodeInvalidAssetName         sdk.CodeType = 101
+	CodeInvalidAssetSymbol       sdk.CodeType = 102
+	CodeInvalidAssetMinUnitAlias sdk.CodeType = 103
+	CodeInvalidAssetInitSupply   sdk.CodeType = 104
+	CodeInvalidAssetMaxSupply    sdk.CodeType = 105
+	CodeInvalidAssetDecimal      sdk.CodeType = 106
+	CodeAssetAlreadyExists       sdk.CodeType = 107
+	CodeAssetNotExists           sdk.CodeType = 108
+	CodeAssetNotMintable         sdk.CodeType = 109
+	CodeInvalidOwner             sdk.CodeType = 110
+	CodeInvalidAddress           sdk.CodeType = 111
+	CodeInvalidToAddress         sdk.CodeType = 112
 
-	CodeNilAssetOwner               sdk.CodeType = 104
-	CodeInvalidAssetFamily          sdk.CodeType = 105
-	CodeInvalidTokenID              sdk.CodeType = 106
-	CodeInvalidAssetName            sdk.CodeType = 107
-	CodeInvalidAssetSymbol          sdk.CodeType = 108
-	CodeInvalidAssetCanonicalSymbol sdk.CodeType = 109
-	CodeInvalidAssetMinUnitAlias    sdk.CodeType = 110
-	CodeInvalidAssetInitSupply      sdk.CodeType = 111
-	CodeInvalidAssetMaxSupply       sdk.CodeType = 112
-	CodeInvalidAssetDecimal         sdk.CodeType = 113
-	CodeAssetAlreadyExists          sdk.CodeType = 114
-	CodeAssetNotExists              sdk.CodeType = 115
-	CodeAssetNotMintable            sdk.CodeType = 116
-
-	CodeInsufficientCoins       sdk.CodeType = 117
-	CodeSignersMissingInContext sdk.CodeType = 118
+	CodeInsufficientCoins       sdk.CodeType = 113
+	CodeSignersMissingInContext sdk.CodeType = 114
 )
 
 //----------------------------------------
@@ -39,20 +34,8 @@ func ErrNilAssetOwner(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeNilAssetOwner, msg)
 }
 
-func ErrInvalidAssetFamily(codespace sdk.CodespaceType, msg string) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidAssetFamily, msg)
-}
-
-func ErrInvalidTokenID(codespace sdk.CodespaceType, msg string) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidTokenID, msg)
-}
-
 func ErrInvalidAssetName(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidAssetName, msg)
-}
-
-func ErrInvalidAssetCanonicalSymbol(codespace sdk.CodespaceType, msg string) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidAssetCanonicalSymbol, msg)
 }
 
 func ErrInvalidAssetMinUnitAlias(codespace sdk.CodespaceType, msg string) sdk.Error {
@@ -84,13 +67,6 @@ func ErrAssetNotExists(codespace sdk.CodespaceType, msg string) sdk.Error {
 
 func ErrAssetNotMintable(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeAssetNotMintable, msg)
-}
-
-//----------------------------------------
-// Gateway error constructors
-
-func ErrInvalidMoniker(codespace sdk.CodespaceType, msg string) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidMoniker, msg)
 }
 
 func ErrInvalidOwner(codespace sdk.CodespaceType, msg string) sdk.Error {

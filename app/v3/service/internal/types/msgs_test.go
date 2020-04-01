@@ -390,36 +390,36 @@ func TestMsgSetWithdrawAddressGetSigners(t *testing.T) {
 	require.Equal(t, expected, fmt.Sprintf("%v", res))
 }
 
-// TestMsgDisableServiceRoute tests Route for MsgDisableService
-func TestMsgDisableServiceRoute(t *testing.T) {
-	msg := NewMsgDisableService(testServiceName, testProvider)
+// TestMsgDisableServiceBindingRoute tests Route for MsgDisableServiceBinding
+func TestMsgDisableServiceBindingRoute(t *testing.T) {
+	msg := NewMsgDisableServiceBinding(testServiceName, testProvider)
 
 	require.Equal(t, MsgRoute, msg.Route())
 }
 
-// TestMsgDisableServiceType tests Type for MsgDisableService
-func TestMsgDisableServiceType(t *testing.T) {
-	msg := NewMsgDisableService(testServiceName, testProvider)
+// TestMsgDisableServiceBindingType tests Type for MsgDisableServiceBinding
+func TestMsgDisableServiceBindingType(t *testing.T) {
+	msg := NewMsgDisableServiceBinding(testServiceName, testProvider)
 
-	require.Equal(t, "disable_service", msg.Type())
+	require.Equal(t, "disable_service_binding", msg.Type())
 }
 
-// TestMsgDisableServiceValidation tests ValidateBasic for MsgDisableService
-func TestMsgDisableServiceValidation(t *testing.T) {
+// TestMsgDisableServiceBindingValidation tests ValidateBasic for MsgDisableServiceBinding
+func TestMsgDisableServiceBindingValidation(t *testing.T) {
 	emptyAddress := sdk.AccAddress{}
 
 	invalidName := "invalid/service/name"
 	invalidLongName := strings.Repeat("s", MaxNameLength+1)
 
-	testMsgs := []MsgDisableService{
-		NewMsgDisableService(testServiceName, testProvider), // valid msg
-		NewMsgDisableService(testServiceName, emptyAddress), // missing provider address
-		NewMsgDisableService(invalidName, testProvider),     // service name contains illegal characters
-		NewMsgDisableService(invalidLongName, testProvider), // too long service name
+	testMsgs := []MsgDisableServiceBinding{
+		NewMsgDisableServiceBinding(testServiceName, testProvider), // valid msg
+		NewMsgDisableServiceBinding(testServiceName, emptyAddress), // missing provider address
+		NewMsgDisableServiceBinding(invalidName, testProvider),     // service name contains illegal characters
+		NewMsgDisableServiceBinding(invalidLongName, testProvider), // too long service name
 	}
 
 	testCases := []struct {
-		msg     MsgDisableService
+		msg     MsgDisableServiceBinding
 		expPass bool
 		errMsg  string
 	}{
@@ -439,40 +439,40 @@ func TestMsgDisableServiceValidation(t *testing.T) {
 	}
 }
 
-// TestMsgDisableServiceGetSignBytes tests GetSignBytes for MsgDisableService
-func TestMsgDisableServiceGetSignBytes(t *testing.T) {
-	msg := NewMsgDisableService(testServiceName, testProvider)
+// TestMsgDisableServiceBindingGetSignBytes tests GetSignBytes for MsgDisableServiceBinding
+func TestMsgDisableServiceBindingGetSignBytes(t *testing.T) {
+	msg := NewMsgDisableServiceBinding(testServiceName, testProvider)
 	res := msg.GetSignBytes()
 
-	expected := `{"type":"irishub/service/MsgDisableService","value":{"provider":"faa1w3jhxapdwpex7anfv3jhynrxe9z","service_name":"test-service"}}`
+	expected := `{"type":"irishub/service/MsgDisableServiceBinding","value":{"provider":"faa1w3jhxapdwpex7anfv3jhynrxe9z","service_name":"test-service"}}`
 	require.Equal(t, expected, string(res))
 }
 
-// TestMsgDisableServiceGetSigners tests GetSigners for MsgDisableService
-func TestMsgDisableServiceGetSigners(t *testing.T) {
-	msg := NewMsgDisableService(testServiceName, testProvider)
+// TestMsgDisableServiceBindingGetSigners tests GetSigners for MsgDisableServiceBinding
+func TestMsgDisableServiceBindingGetSigners(t *testing.T) {
+	msg := NewMsgDisableServiceBinding(testServiceName, testProvider)
 	res := msg.GetSigners()
 
 	expected := "[746573742D70726F7669646572]"
 	require.Equal(t, expected, fmt.Sprintf("%v", res))
 }
 
-// TestMsgEnableServiceRoute tests Route for MsgEnableService
-func TestMsgEnableServiceRoute(t *testing.T) {
-	msg := NewMsgEnableService(testServiceName, testProvider, testAddedDeposit)
+// TestMsgEnableServiceBindingRoute tests Route for MsgEnableServiceBinding
+func TestMsgEnableServiceBindingRoute(t *testing.T) {
+	msg := NewMsgEnableServiceBinding(testServiceName, testProvider, testAddedDeposit)
 
 	require.Equal(t, MsgRoute, msg.Route())
 }
 
-// TestMsgEnableServiceType tests Type for MsgEnableService
-func TestMsgEnableServiceType(t *testing.T) {
-	msg := NewMsgEnableService(testServiceName, testProvider, testAddedDeposit)
+// TestMsgEnableServiceBindingType tests Type for MsgEnableServiceBinding
+func TestMsgEnableServiceBindingType(t *testing.T) {
+	msg := NewMsgEnableServiceBinding(testServiceName, testProvider, testAddedDeposit)
 
-	require.Equal(t, "enable_service", msg.Type())
+	require.Equal(t, "enable_service_binding", msg.Type())
 }
 
-// TestMsgEnableServiceValidation tests ValidateBasic for MsgEnableService
-func TestMsgEnableServiceValidation(t *testing.T) {
+// TestMsgEnableServiceBindingValidation tests ValidateBasic for MsgEnableServiceBinding
+func TestMsgEnableServiceBindingValidation(t *testing.T) {
 	emptyAddress := sdk.AccAddress{}
 	emptyAddedDeposit := sdk.Coins{}
 
@@ -480,17 +480,17 @@ func TestMsgEnableServiceValidation(t *testing.T) {
 	invalidLongName := strings.Repeat("s", MaxNameLength+1)
 	invalidDenomDeposit := sdk.NewCoins(sdk.NewCoin("eth-min", sdk.NewInt(1000)))
 
-	testMsgs := []MsgEnableService{
-		NewMsgEnableService(testServiceName, testProvider, testAddedDeposit),    // valid msg
-		NewMsgEnableService(testServiceName, testProvider, emptyAddedDeposit),   // empty deposit is allowed
-		NewMsgEnableService(testServiceName, emptyAddress, testAddedDeposit),    // missing provider address
-		NewMsgEnableService(invalidName, testProvider, testAddedDeposit),        // service name contains illegal characters
-		NewMsgEnableService(invalidLongName, testProvider, testAddedDeposit),    // too long service name
-		NewMsgEnableService(testServiceName, testProvider, invalidDenomDeposit), // invalid deposit denom
+	testMsgs := []MsgEnableServiceBinding{
+		NewMsgEnableServiceBinding(testServiceName, testProvider, testAddedDeposit),    // valid msg
+		NewMsgEnableServiceBinding(testServiceName, testProvider, emptyAddedDeposit),   // empty deposit is allowed
+		NewMsgEnableServiceBinding(testServiceName, emptyAddress, testAddedDeposit),    // missing provider address
+		NewMsgEnableServiceBinding(invalidName, testProvider, testAddedDeposit),        // service name contains illegal characters
+		NewMsgEnableServiceBinding(invalidLongName, testProvider, testAddedDeposit),    // too long service name
+		NewMsgEnableServiceBinding(testServiceName, testProvider, invalidDenomDeposit), // invalid deposit denom
 	}
 
 	testCases := []struct {
-		msg     MsgEnableService
+		msg     MsgEnableServiceBinding
 		expPass bool
 		errMsg  string
 	}{
@@ -512,18 +512,18 @@ func TestMsgEnableServiceValidation(t *testing.T) {
 	}
 }
 
-// TestMsgEnableServiceGetSignBytes tests GetSignBytes for MsgEnableService
-func TestMsgEnableServiceGetSignBytes(t *testing.T) {
-	msg := NewMsgEnableService(testServiceName, testProvider, testAddedDeposit)
+// TestMsgEnableServiceBindingGetSignBytes tests GetSignBytes for MsgEnableServiceBinding
+func TestMsgEnableServiceBindingGetSignBytes(t *testing.T) {
+	msg := NewMsgEnableServiceBinding(testServiceName, testProvider, testAddedDeposit)
 	res := msg.GetSignBytes()
 
-	expected := `{"type":"irishub/service/MsgEnableService","value":{"deposit":[{"amount":"100000000000000000000","denom":"iris-atto"}],"provider":"faa1w3jhxapdwpex7anfv3jhynrxe9z","service_name":"test-service"}}`
+	expected := `{"type":"irishub/service/MsgEnableServiceBinding","value":{"deposit":[{"amount":"100000000000000000000","denom":"iris-atto"}],"provider":"faa1w3jhxapdwpex7anfv3jhynrxe9z","service_name":"test-service"}}`
 	require.Equal(t, expected, string(res))
 }
 
-// TestMsgEnableServiceGetSigners tests GetSigners for MsgEnableService
-func TestMsgEnableServiceGetSigners(t *testing.T) {
-	msg := NewMsgEnableService(testServiceName, testProvider, testAddedDeposit)
+// TestMsgEnableServiceBindingGetSigners tests GetSigners for MsgEnableServiceBinding
+func TestMsgEnableServiceBindingGetSigners(t *testing.T) {
+	msg := NewMsgEnableServiceBinding(testServiceName, testProvider, testAddedDeposit)
 	res := msg.GetSigners()
 
 	expected := "[746573742D70726F7669646572]"
@@ -597,9 +597,9 @@ func TestMsgRefundServiceDepositGetSigners(t *testing.T) {
 	require.Equal(t, expected, fmt.Sprintf("%v", res))
 }
 
-// TestMsgRequestServiceRoute tests Route for MsgRequestService
-func TestMsgRequestServiceRoute(t *testing.T) {
-	msg := NewMsgRequestService(
+// TestMsgCallServiceRoute tests Route for MsgCallService
+func TestMsgCallServiceRoute(t *testing.T) {
+	msg := NewMsgCallService(
 		testServiceName, testProviders, testConsumer,
 		testInput, testServiceFeeCap, testTimeout, false,
 		true, testRepeatedFreq, testRepeatedTotal,
@@ -608,19 +608,19 @@ func TestMsgRequestServiceRoute(t *testing.T) {
 	require.Equal(t, MsgRoute, msg.Route())
 }
 
-// TestMsgRequestServiceType tests Type for MsgRequestService
-func TestMsgRequestServiceType(t *testing.T) {
-	msg := NewMsgRequestService(
+// TestMsgCallServiceType tests Type for MsgCallService
+func TestMsgCallServiceType(t *testing.T) {
+	msg := NewMsgCallService(
 		testServiceName, testProviders, testConsumer,
 		testInput, testServiceFeeCap, testTimeout, false,
 		true, testRepeatedFreq, testRepeatedTotal,
 	)
 
-	require.Equal(t, "request_service", msg.Type())
+	require.Equal(t, "call_service", msg.Type())
 }
 
-// TestMsgRequestServiceValidation tests ValidateBasic for MsgRequestService
-func TestMsgRequestServiceValidation(t *testing.T) {
+// TestMsgCallServiceValidation tests ValidateBasic for MsgCallService
+func TestMsgCallServiceValidation(t *testing.T) {
 	emptyAddress := sdk.AccAddress{}
 
 	invalidName := "invalid/service/name"
@@ -634,71 +634,71 @@ func TestMsgRequestServiceValidation(t *testing.T) {
 	invalidRepeatedTotal1 := int64(-2)
 	invalidRepeatedTotal2 := int64(0)
 
-	testMsgs := []MsgRequestService{
-		NewMsgRequestService(
+	testMsgs := []MsgCallService{
+		NewMsgCallService(
 			testServiceName, testProviders, testConsumer, testInput, testServiceFeeCap,
 			testTimeout, false, true, testRepeatedFreq, testRepeatedTotal,
 		), // valid msg
-		NewMsgRequestService(
+		NewMsgCallService(
 			testServiceName, testProviders, emptyAddress, testInput, testServiceFeeCap,
 			testTimeout, false, true, testRepeatedFreq, testRepeatedTotal,
 		), // missing consumer address
-		NewMsgRequestService(
+		NewMsgCallService(
 			invalidName, testProviders, testConsumer, testInput, testServiceFeeCap,
 			testTimeout, false, true, testRepeatedFreq, testRepeatedTotal,
 		), // service name contains illegal characters
-		NewMsgRequestService(
+		NewMsgCallService(
 			invalidLongName, testProviders, testConsumer, testInput, testServiceFeeCap,
 			testTimeout, false, true, testRepeatedFreq, testRepeatedTotal,
 		), // too long service name
-		NewMsgRequestService(
+		NewMsgCallService(
 			testServiceName, testProviders, testConsumer, testInput, invalidDenomCoins,
 			testTimeout, false, true, testRepeatedFreq, testRepeatedTotal,
 		), // invalid service fee denom
-		NewMsgRequestService(
+		NewMsgCallService(
 			testServiceName, nil, testConsumer, testInput, testServiceFeeCap,
 			testTimeout, false, true, testRepeatedFreq, testRepeatedTotal,
 		), // missing providers
-		NewMsgRequestService(
+		NewMsgCallService(
 			testServiceName, invalidDuplicateProviders, testConsumer, testInput, testServiceFeeCap,
 			testTimeout, false, true, testRepeatedFreq, testRepeatedTotal,
 		), // duplicate providers
-		NewMsgRequestService(
+		NewMsgCallService(
 			testServiceName, testProviders, testConsumer, "", testServiceFeeCap,
 			testTimeout, false, true, testRepeatedFreq, testRepeatedTotal,
 		), // missing input
-		NewMsgRequestService(
+		NewMsgCallService(
 			testServiceName, testProviders, testConsumer, invalidInput, testServiceFeeCap,
 			testTimeout, false, true, testRepeatedFreq, testRepeatedTotal,
 		), // invalid input
-		NewMsgRequestService(
+		NewMsgCallService(
 			testServiceName, testProviders, testConsumer, testInput, testServiceFeeCap,
 			invalidTimeout, false, true, testRepeatedFreq, testRepeatedTotal,
 		), // invalid timeout
-		NewMsgRequestService(
+		NewMsgCallService(
 			testServiceName, testProviders, testConsumer, testInput, testServiceFeeCap,
 			testTimeout, false, true, invalidLessRepeatedFreq, testRepeatedTotal,
 		), // invalid repeated frequency
-		NewMsgRequestService(
+		NewMsgCallService(
 			testServiceName, testProviders, testConsumer, testInput, testServiceFeeCap,
 			testTimeout, false, true, testRepeatedFreq, invalidRepeatedTotal1,
 		), // repeated total can not be less than -1
-		NewMsgRequestService(
+		NewMsgCallService(
 			testServiceName, testProviders, testConsumer, testInput, testServiceFeeCap,
 			testTimeout, false, true, testRepeatedFreq, invalidRepeatedTotal2,
 		), // repeated total can not be zero
-		NewMsgRequestService(
+		NewMsgCallService(
 			testServiceName, testProviders, testConsumer, testInput, testServiceFeeCap,
 			testTimeout, false, true, uint64(0), testRepeatedTotal,
 		), // frequency can be zero
-		NewMsgRequestService(
+		NewMsgCallService(
 			testServiceName, testProviders, testConsumer, testInput, testServiceFeeCap,
 			testTimeout, false, false, invalidLessRepeatedFreq, invalidRepeatedTotal1,
 		), // do not check the repeated frequency and total when not repeated
 	}
 
 	testCases := []struct {
-		msg     MsgRequestService
+		msg     MsgCallService
 		expPass bool
 		errMsg  string
 	}{
@@ -729,22 +729,22 @@ func TestMsgRequestServiceValidation(t *testing.T) {
 	}
 }
 
-// TestMsgRequestServiceGetSignBytes tests GetSignBytes for MsgRequestService
-func TestMsgRequestServiceGetSignBytes(t *testing.T) {
-	msg := NewMsgRequestService(
+// TestMsgCallServiceGetSignBytes tests GetSignBytes for MsgCallService
+func TestMsgCallServiceGetSignBytes(t *testing.T) {
+	msg := NewMsgCallService(
 		testServiceName, testProviders, testConsumer,
 		testInput, testServiceFeeCap, testTimeout, false,
 		true, testRepeatedFreq, testRepeatedTotal,
 	)
 	res := msg.GetSignBytes()
 
-	expected := `{"type":"irishub/service/MsgRequestService","value":{"consumer":"faa1w3jhxapdvdhkuum4d4jhyl0qvse","input":"{\"pair\":\"iris-usdt\"}","providers":["faa1w3jhxapdwpex7anfv3jhynrxe9z"],"repeated":true,"repeated_frequency":"120","repeated_total":"100","service_fee_cap":[{"amount":"100000000000000000000","denom":"iris-atto"}],"service_name":"test-service","super_mode":false,"timeout":"100"}}`
+	expected := `{"type":"irishub/service/MsgCallService","value":{"consumer":"faa1w3jhxapdvdhkuum4d4jhyl0qvse","input":"{\"pair\":\"iris-usdt\"}","providers":["faa1w3jhxapdwpex7anfv3jhynrxe9z"],"repeated":true,"repeated_frequency":"120","repeated_total":"100","service_fee_cap":[{"amount":"100000000000000000000","denom":"iris-atto"}],"service_name":"test-service","super_mode":false,"timeout":"100"}}`
 	require.Equal(t, expected, string(res))
 }
 
-// TestMsgRequestServiceGetSigners tests GetSigners for MsgRequestService
-func TestMsgRequestServiceGetSigners(t *testing.T) {
-	msg := NewMsgRequestService(
+// TestMsgCallServiceGetSigners tests GetSigners for MsgCallService
+func TestMsgCallServiceGetSigners(t *testing.T) {
+	msg := NewMsgCallService(
 		testServiceName, testProviders, testConsumer,
 		testInput, testServiceFeeCap, testTimeout,
 		false, true, testRepeatedFreq, testRepeatedTotal,

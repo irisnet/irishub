@@ -8,7 +8,7 @@ import (
 	"github.com/irisnet/irishub/client/context"
 )
 
-// queryTokenFees retrieves the fees of token issuance and minting for the specified id
+// queryTokenFees retrieves the fees of issuance and minting for the specified symbol
 func queryTokenFees(cliCtx context.CLIContext, symbol string) (asset.TokenFeesOutput, error) {
 	params := asset.QueryTokenFeesParams{
 		Symbol: symbol,
@@ -16,8 +16,8 @@ func queryTokenFees(cliCtx context.CLIContext, symbol string) (asset.TokenFeesOu
 
 	bz := cliCtx.Codec.MustMarshalJSON(params)
 
-	path := fmt.Sprintf("custom/%s/fees/tokens", protocol.AssetRoute)
-	res, err := cliCtx.QueryWithData(path, bz)
+	route := fmt.Sprintf("custom/%s/fees/tokens", protocol.AssetRoute)
+	res, err := cliCtx.QueryWithData(route, bz)
 	if err != nil {
 		return asset.TokenFeesOutput{}, err
 	}
