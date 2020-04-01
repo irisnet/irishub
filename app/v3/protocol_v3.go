@@ -460,10 +460,10 @@ func (p *ProtocolV3) InitChainer(ctx sdk.Context, DeliverTx sdk.DeliverTx, req a
 	guardian.InitGenesis(ctx, p.guardianKeeper, genesisState.GuardianData)
 	upgrade.InitGenesis(ctx, p.upgradeKeeper, genesisState.UpgradeData)
 	asset.InitGenesis(ctx, p.assetKeeper, genesisState.AssetData)
-	rand.InitGenesis(ctx, p.randKeeper, genesisState.RandData)
 	coinswap.InitGenesis(ctx, p.coinswapKeeper, genesisState.SwapData)
 	htlc.InitGenesis(ctx, p.htlcKeeper, genesisState.HtlcData)
 	oracle.InitGenesis(ctx, p.oracleKeeper, genesisState.OracleData)
+	rand.InitGenesis(ctx, p.randKeeper, genesisState.RandData)
 
 	// load the address to pubkey map
 	if err = IrisValidateGenesisState(genesisState); err != nil {

@@ -16,18 +16,23 @@ func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
 	//init feed
 	for _, entry := range data.Entries {
 		k.SetFeed(ctx, entry.Feed)
-		if reqCtx, found := k.GetRequestContext(ctx, entry.Feed.RequestContextID); found {
-			for _, value := range entry.Values {
-				k.SetFeedValue(
-					ctx,
-					entry.Feed.FeedName,
-					reqCtx.BatchCounter,
-					entry.Feed.LatestHistory,
-					value,
-				)
-			}
-			k.Enqueue(ctx, entry.Feed.FeedName, entry.State)
+
+		reqCtx, found := k.GetRequestContext(ctx, entry.Feed.RequestContextID)
+		if !found {
+			panic(fmt.Errorf("no servcie request context"))
 		}
+
+		for _, value := range entry.Values {
+			k.SetFeedValue(
+				ctx,
+				entry.Feed.FeedName,
+				reqCtx.BatchCounter,
+				entry.Feed.LatestHistory,
+				value,
+			)
+		}
+
+		k.Enqueue(ctx, entry.Feed.FeedName, entry.State)
 	}
 }
 
