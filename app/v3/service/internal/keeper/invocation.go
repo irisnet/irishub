@@ -301,7 +301,8 @@ func (k Keeper) KillRequestContext(
 		return types.ErrRequestContextNonRepeated(k.codespace)
 	}
 
-	k.CompleteServiceContext(ctx, requestContext, requestContextID)
+	requestContext.State = types.COMPLETED
+	k.SetRequestContext(ctx, requestContextID, requestContext)
 
 	return nil
 }
