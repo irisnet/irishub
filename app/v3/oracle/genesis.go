@@ -19,7 +19,7 @@ func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
 
 		reqCtx, found := k.GetRequestContext(ctx, entry.Feed.RequestContextID)
 		if !found {
-			panic(fmt.Errorf("no servcie request context"))
+			panic(fmt.Errorf("unknown servcie request context: %s", entry.Feed.RequestContextID))
 		}
 
 		for _, value := range entry.Values {

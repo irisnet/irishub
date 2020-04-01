@@ -19,7 +19,7 @@ func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
 			// check request context exists
 			if request.Oracle {
 				if _, success := k.GetRequestContext(ctx, request.ServiceContextID); !success {
-					panic(fmt.Errorf("no service request context"))
+					panic(fmt.Errorf("unknown servcie request context: %s", request.ServiceContextID))
 				}
 			}
 
