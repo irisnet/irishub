@@ -162,6 +162,10 @@ func (msg MsgBindService) Type() string { return TypeMsgBindService }
 
 // GetSignBytes implements Msg.
 func (msg MsgBindService) GetSignBytes() []byte {
+	if msg.Deposit.Empty() {
+		msg.Deposit = nil
+	}
+
 	b, err := msgCdc.MarshalJSON(msg)
 	if err != nil {
 		panic(err)
@@ -232,6 +236,10 @@ func (msg MsgUpdateServiceBinding) Type() string { return TypeMsgUpdateServiceBi
 
 // GetSignBytes implements Msg.
 func (msg MsgUpdateServiceBinding) GetSignBytes() []byte {
+	if msg.Deposit.Empty() {
+		msg.Deposit = nil
+	}
+
 	b, err := msgCdc.MarshalJSON(msg)
 	if err != nil {
 		panic(err)
@@ -386,6 +394,10 @@ func (msg MsgEnableServiceBinding) Type() string { return TypeMsgEnableServiceBi
 
 // GetSignBytes implements Msg.
 func (msg MsgEnableServiceBinding) GetSignBytes() []byte {
+	if msg.Deposit.Empty() {
+		msg.Deposit = nil
+	}
+
 	b, err := msgCdc.MarshalJSON(msg)
 	if err != nil {
 		panic(err)
@@ -513,6 +525,14 @@ func (msg MsgCallService) Type() string { return TypeMsgCallService }
 
 // GetSignBytes implements Msg.
 func (msg MsgCallService) GetSignBytes() []byte {
+	if len(msg.Providers) == 0 {
+		msg.Providers = nil
+	}
+
+	if msg.ServiceFeeCap.Empty() {
+		msg.ServiceFeeCap = nil
+	}
+
 	b, err := msgCdc.MarshalJSON(msg)
 	if err != nil {
 		panic(err)
@@ -789,6 +809,14 @@ func (msg MsgUpdateRequestContext) Type() string { return TypeMsgUpdateRequestCo
 
 // GetSignBytes implements Msg.
 func (msg MsgUpdateRequestContext) GetSignBytes() []byte {
+	if len(msg.Providers) == 0 {
+		msg.Providers = nil
+	}
+
+	if msg.ServiceFeeCap.Empty() {
+		msg.ServiceFeeCap = nil
+	}
+
 	b, err := msgCdc.MarshalJSON(msg)
 	if err != nil {
 		panic(err)
@@ -887,6 +915,10 @@ func (msg MsgWithdrawTax) Type() string { return TypeMsgWithdrawTax }
 
 // GetSignBytes implements Msg.
 func (msg MsgWithdrawTax) GetSignBytes() []byte {
+	if msg.Amount.Empty() {
+		msg.Amount = nil
+	}
+
 	b, err := msgCdc.MarshalJSON(msg)
 	if err != nil {
 		panic(err)
