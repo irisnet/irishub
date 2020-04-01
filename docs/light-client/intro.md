@@ -87,11 +87,12 @@ This api supports the following special parameters. By default, their values are
 
 ### Bank module APIs
 
-1. `GET /bank/coins/{type}`: Get coin type
-2. `GET /bank/token-stats`: Get token statistic
-3. `GET /bank/accounts/{address}`: Get the account information on blockchain
-4. `POST /bank/accounts/{address}/send`: Send coins (build -> sign -> send)
-5. `POST /bank/accounts/{address}/burn`: Burn coins
+1. `GET /bank/coins/{type}`: Query coin type
+2. `GET /bank/token-stats`: Query token statistic
+3. `GET /bank/token-stats/{symbol}`: Query the specified token statistic
+4. `GET /bank/accounts/{address}`: Query the account information on blockchain
+5. `POST /bank/accounts/{address}/send`: Send coins (build -> sign -> send)
+6. `POST /bank/accounts/{address}/burn`: Burn coins
 
 ### Stake module APIs
 
