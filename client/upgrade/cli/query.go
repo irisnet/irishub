@@ -31,30 +31,44 @@ func GetInfoCmd(storeName string, cdc *codec.Codec) *cobra.Command {
 				WithLogger(os.Stdout).
 				WithAccountDecoder(utils.GetAccountDecoder(cdc))
 
-			res_currentVersion, _ := cliCtx.QueryStore(sdk.CurrentVersionKey, sdk.MainStore)
+			resCurrentVersion, err := cliCtx.QueryStore(sdk.CurrentVersionKey, sdk.MainStore)
+			if err != nil {
+				return err
+			}
 			var currentVersion uint64
-			cdc.MustUnmarshalBinaryLengthPrefixed(res_currentVersion, &currentVersion)
+			cdc.MustUnmarshalBinaryLengthPrefixed(resCurrentVersion, &currentVersion)
 
-			res_proposalID, _ := cliCtx.QueryStore(upgrade.GetSuccessVersionKey(currentVersion), storeName)
+			resProposalID, err := cliCtx.QueryStore(upgrade.GetSuccessVersionKey(currentVersion), storeName)
+			if err != nil {
+				return err
+			}
 			var proposalID uint64
-			cdc.MustUnmarshalBinaryLengthPrefixed(res_proposalID, &proposalID)
-
-			res_currentVersionInfo, err := cliCtx.QueryStore(upgrade.GetProposalIDKey(proposalID), storeName)
-			var currentVersionInfo upgrade.VersionInfo
-			cdc.MustUnmarshalBinaryLengthPrefixed(res_currentVersionInfo, &currentVersionInfo)
-
-			res_upgradeInProgress, _ := cliCtx.QueryStore(sdk.UpgradeConfigKey, sdk.MainStore)
-			var upgradeInProgress sdk.UpgradeConfig
-			if err == nil && len(res_upgradeInProgress) != 0 {
-				cdc.MustUnmarshalBinaryLengthPrefixed(res_upgradeInProgress, &upgradeInProgress)
+			if len(resProposalID) > 0 {
+				cdc.MustUnmarshalBinaryLengthPrefixed(resProposalID, &proposalID)
 			}
 
-			res_LastFailedVersion, err := cliCtx.QueryStore(sdk.LastFailedVersionKey, sdk.MainStore)
+			resCurrentVersionInfo, err := cliCtx.QueryStore(upgrade.GetProposalIDKey(proposalID), storeName)
+			if err != nil {
+				return err
+			}
+			var currentVersionInfo upgrade.VersionInfo
+			if len(resCurrentVersionInfo) > 0 {
+				cdc.MustUnmarshalBinaryLengthPrefixed(resCurrentVersionInfo, &currentVersionInfo)
+			}
+
+			resUpgradeInProgress, err := cliCtx.QueryStore(sdk.UpgradeConfigKey, sdk.MainStore)
+			if err != nil {
+				return err
+			}
+			var upgradeInProgress sdk.UpgradeConfig
+			if len(resUpgradeInProgress) > 0 {
+				cdc.MustUnmarshalBinaryLengthPrefixed(resUpgradeInProgress, &upgradeInProgress)
+			}
+
+			resLastFailedVersion, err := cliCtx.QueryStore(sdk.LastFailedVersionKey, sdk.MainStore)
 			var lastFailedVersion uint64
-			if err == nil && len(res_LastFailedVersion) != 0 {
-				cdc.MustUnmarshalBinaryLengthPrefixed(res_LastFailedVersion, &lastFailedVersion)
-			} else {
-				lastFailedVersion = 0
+			if err == nil && len(resLastFailedVersion) > 0 {
+				cdc.MustUnmarshalBinaryLengthPrefixed(resLastFailedVersion, &lastFailedVersion)
 			}
 
 			upgradeInfoOutput := upgcli.NewUpgradeInfoOutput(currentVersionInfo, lastFailedVersion, upgradeInProgress)
@@ -77,17 +91,17 @@ func GetCmdQuerySignals(storeName string, cdc *codec.Codec) *cobra.Command {
 				WithLogger(os.Stdout).
 				WithAccountDecoder(utils.GetAccountDecoder(cdc))
 
-			res_upgradeConfig, err := cliCtx.QueryStore(sdk.UpgradeConfigKey, sdk.MainStore)
+			resUpgradeConfig, err := cliCtx.QueryStore(sdk.UpgradeConfigKey, sdk.MainStore)
 			if err != nil {
 				return err
 			}
-			if len(res_upgradeConfig) == 0 {
+			if len(resUpgradeConfig) == 0 {
 				fmt.Println("No Software Upgrade Switch Period is in process.")
 				return err
 			}
 
 			var upgradeConfig sdk.UpgradeConfig
-			if err = cdc.UnmarshalBinaryLengthPrefixed(res_upgradeConfig, &upgradeConfig); err != nil {
+			if err = cdc.UnmarshalBinaryLengthPrefixed(resUpgradeConfig, &upgradeConfig); err != nil {
 				return err
 			}
 
