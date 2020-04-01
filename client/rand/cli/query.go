@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"encoding/hex"
 	"fmt"
 
 	"github.com/spf13/cobra"
@@ -10,20 +9,20 @@ import (
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/app/v3/rand"
 	"github.com/irisnet/irishub/client/context"
-	"github.com/irisnet/irishub/client/rand/types"
 	"github.com/irisnet/irishub/codec"
 )
 
 // GetCmdQueryRand implements the query-rand command.
 func GetCmdQueryRand(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "query-rand",
+		Use:     "query-rand [request-id]",
 		Short:   "Query a random number by the request id",
-		Example: "iriscli rand query-rand --request-id=<request id>",
+		Example: "iriscli rand query-rand <request id>",
+		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			reqID := viper.GetString(FlagReqID)
+			reqID := args[0]
 			if err := rand.CheckReqID(reqID); err != nil {
 				return err
 			}
@@ -42,23 +41,16 @@ func GetCmdQueryRand(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			var rawRand rand.Rand
-			if err = cdc.UnmarshalJSON(res, &rawRand); err != nil {
+			var random rand.Rand
+			if err = cdc.UnmarshalJSON(res, &random); err != nil {
 				return err
 			}
 
-			readableRand := types.ReadableRand{
-				RequestTxHash: hex.EncodeToString(rawRand.RequestTxHash),
-				Height:        rawRand.Height,
-				Value:         rawRand.Value.Rat.FloatString(rand.RandPrec),
-			}
-
-			return cliCtx.PrintOutput(readableRand)
+			return cliCtx.PrintOutput(random)
 		},
 	}
 
 	cmd.Flags().AddFlagSet(FsQueryRand)
-	cmd.MarkFlagRequired(FlagReqID)
 
 	return cmd
 }
@@ -68,7 +60,7 @@ func GetCmdQueryRandRequestQueue(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "query-queue",
 		Short:   "Query the random number request queue with an optional height",
-		Example: "iriscli rand query-queue --queue-height=<queue height>",
+		Example: "iriscli rand query-queue --queue-height=<height>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 

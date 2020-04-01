@@ -272,8 +272,8 @@ func CollectStdTxs(cdc *codec.Codec, moniker string, genTxsDir string, genDoc tm
 	return appGenTxs, persistentPeers, nil
 }
 
-// convert string array into min-denom coins
-func convertToMinDenomCoins(coinStrArray []string) sdk.Coins {
+// convert string array into coins
+func convertToCoins(coinStrArray []string) sdk.Coins {
 	var accountCoins sdk.Coins
 	irisCoin := sdk.NewInt64Coin(sdk.IrisAtto, 0)
 	for _, coinStr := range coinStrArray {
@@ -282,7 +282,7 @@ func convertToMinDenomCoins(coinStrArray []string) sdk.Coins {
 			panic(fmt.Sprintf("fatal error: failed to parse coin name from %s", coinStr))
 		}
 		if coinName == sdk.Iris {
-			convertedIrisCoin, err := sdk.IrisCoinType.ConvertToMinDenomCoin(coinStr)
+			convertedIrisCoin, err := sdk.IrisCoinType.ConvertToCoin(coinStr)
 			if err != nil {
 				panic(fmt.Sprintf("fatal error in converting %s to %s", coinStr, sdk.IrisAtto))
 			}
@@ -301,7 +301,7 @@ func convertToGenesisState(genesisFileState GenesisFileState) GenesisState {
 	for _, gacc := range genesisFileState.Accounts {
 		acc := GenesisAccount{
 			Address:       gacc.Address,
-			Coins:         convertToMinDenomCoins(gacc.Coins),
+			Coins:         convertToCoins(gacc.Coins),
 			AccountNumber: gacc.AccountNumber,
 			Sequence:      gacc.Sequence,
 		}

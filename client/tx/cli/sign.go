@@ -44,7 +44,7 @@ recommended to set such parameters manually.
 The --multisig=<multisig_key> flag generates a signature on behalf of a multisig account
 key. It implies --signature-only. Full multisig signed transactions may eventually
 be generated via the 'multisign' command.`,
-		Example: "iriscli tx sign <file> --name <key name> --chain-id=<chain-id>",
+		Example: "iriscli tx sign <file> --name <key-name> --chain-id=<chain-id>",
 		PreRun:  preSignCmd,
 		RunE:    makeSignCmd(codec, decoder),
 		Args:    cobra.ExactArgs(1),

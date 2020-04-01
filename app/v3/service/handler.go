@@ -18,14 +18,14 @@ func NewHandler(k Keeper) sdk.Handler {
 			return handleMsgUpdateServiceBinding(ctx, k, msg)
 		case MsgSetWithdrawAddress:
 			return handleMsgSetWithdrawAddress(ctx, k, msg)
-		case MsgDisableService:
-			return handleMsgDisableService(ctx, k, msg)
-		case MsgEnableService:
-			return handleMsgEnableService(ctx, k, msg)
+		case MsgDisableServiceBinding:
+			return handleMsgDisableServiceBinding(ctx, k, msg)
+		case MsgEnableServiceBinding:
+			return handleMsgEnableServiceBinding(ctx, k, msg)
 		case MsgRefundServiceDeposit:
 			return handleMsgRefundServiceDeposit(ctx, k, msg)
-		case MsgRequestService:
-			return handleMsgRequestService(ctx, k, msg)
+		case MsgCallService:
+			return handleMsgCallService(ctx, k, msg)
 		case MsgRespondService:
 			return handleMsgRespondService(ctx, k, msg)
 		case MsgPauseRequestContext:
@@ -69,7 +69,7 @@ func handleMsgDefineService(ctx sdk.Context, k Keeper, msg MsgDefineService) sdk
 func handleMsgBindService(ctx sdk.Context, k Keeper, msg MsgBindService) sdk.Result {
 	if err := k.AddServiceBinding(
 		ctx, msg.ServiceName, msg.Provider,
-		msg.Deposit, msg.Pricing,
+		msg.Deposit, msg.Pricing, msg.MinRespTime,
 	); err != nil {
 		return err.Result()
 	}
@@ -87,7 +87,7 @@ func handleMsgBindService(ctx sdk.Context, k Keeper, msg MsgBindService) sdk.Res
 func handleMsgUpdateServiceBinding(ctx sdk.Context, k Keeper, msg MsgUpdateServiceBinding) sdk.Result {
 	if err := k.UpdateServiceBinding(
 		ctx, msg.ServiceName, msg.Provider,
-		msg.Deposit, msg.Pricing,
+		msg.Deposit, msg.Pricing, msg.MinRespTime,
 	); err != nil {
 		return err.Result()
 	}
@@ -114,9 +114,9 @@ func handleMsgSetWithdrawAddress(ctx sdk.Context, k Keeper, msg MsgSetWithdrawAd
 	}
 }
 
-// handleMsgDisableService handles MsgDisableService
-func handleMsgDisableService(ctx sdk.Context, k Keeper, msg MsgDisableService) sdk.Result {
-	if err := k.DisableService(ctx, msg.ServiceName, msg.Provider); err != nil {
+// handleMsgDisableServiceBinding handles MsgDisableServiceBinding
+func handleMsgDisableServiceBinding(ctx sdk.Context, k Keeper, msg MsgDisableServiceBinding) sdk.Result {
+	if err := k.DisableServiceBinding(ctx, msg.ServiceName, msg.Provider); err != nil {
 		return err.Result()
 	}
 
@@ -129,9 +129,9 @@ func handleMsgDisableService(ctx sdk.Context, k Keeper, msg MsgDisableService) s
 	}
 }
 
-// handleMsgEnableService handles MsgEnableService
-func handleMsgEnableService(ctx sdk.Context, k Keeper, msg MsgEnableService) sdk.Result {
-	if err := k.EnableService(ctx, msg.ServiceName, msg.Provider, msg.Deposit); err != nil {
+// handleMsgEnableServiceBinding handles MsgEnableServiceBinding
+func handleMsgEnableServiceBinding(ctx sdk.Context, k Keeper, msg MsgEnableServiceBinding) sdk.Result {
+	if err := k.EnableServiceBinding(ctx, msg.ServiceName, msg.Provider, msg.Deposit); err != nil {
 		return err.Result()
 	}
 
@@ -159,19 +159,14 @@ func handleMsgRefundServiceDeposit(ctx sdk.Context, k Keeper, msg MsgRefundServi
 	}
 }
 
-// handleMsgRequestService handles MsgRequestService
-func handleMsgRequestService(ctx sdk.Context, k Keeper, msg MsgRequestService) sdk.Result {
-	requestContextID, err := k.CreateRequestContext(
+// handleMsgCallService handles MsgCallService
+func handleMsgCallService(ctx sdk.Context, k Keeper, msg MsgCallService) sdk.Result {
+	_, tags, err := k.CreateRequestContext(
 		ctx, msg.ServiceName, msg.Providers, msg.Consumer, msg.Input, msg.ServiceFeeCap, msg.Timeout,
 		msg.SuperMode, msg.Repeated, msg.RepeatedFrequency, msg.RepeatedTotal, RUNNING, 0, "")
 	if err != nil {
 		return err.Result()
 	}
-
-	tags := sdk.NewTags(
-		TagRequestContextID, []byte(requestContextID.String()),
-		TagConsumer, []byte(msg.Consumer.String()),
-	)
 
 	return sdk.Result{
 		Tags: tags,
@@ -180,17 +175,19 @@ func handleMsgRequestService(ctx sdk.Context, k Keeper, msg MsgRequestService) s
 
 // handleMsgRespondService handles MsgRespondService
 func handleMsgRespondService(ctx sdk.Context, k Keeper, msg MsgRespondService) sdk.Result {
-	request, response, err := k.AddResponse(ctx, msg.RequestID, msg.Provider, msg.Output, msg.Error)
+	request, response, tags, err := k.AddResponse(ctx, msg.RequestID, msg.Provider, msg.Result, msg.Output)
 	if err != nil {
 		return err.Result()
 	}
 
-	tags := sdk.NewTags(
-		TagRequestID, []byte(msg.RequestID),
-		TagRequestContextID, []byte(request.RequestContextID.String()),
-		TagConsumer, []byte(response.Consumer.String()),
-		TagProvider, []byte(response.Provider.String()),
-		TagServiceName, []byte(request.ServiceName),
+	tags = tags.AppendTags(
+		sdk.NewTags(
+			TagRequestID, []byte(msg.RequestID.String()),
+			TagRequestContextID, []byte(request.RequestContextID.String()),
+			TagConsumer, []byte(response.Consumer.String()),
+			TagProvider, []byte(response.Provider.String()),
+			TagServiceName, []byte(request.ServiceName),
+		),
 	)
 
 	return sdk.Result{
@@ -200,7 +197,7 @@ func handleMsgRespondService(ctx sdk.Context, k Keeper, msg MsgRespondService) s
 
 // handleMsgPauseRequestContext handles MsgPauseRequestContext
 func handleMsgPauseRequestContext(ctx sdk.Context, k Keeper, msg MsgPauseRequestContext) sdk.Result {
-	if err := k.CheckAuthority(ctx, msg.RequestContextID); err != nil {
+	if err := k.CheckAuthority(ctx, msg.Consumer, msg.RequestContextID, true); err != nil {
 		return err.Result()
 	}
 
@@ -219,7 +216,7 @@ func handleMsgPauseRequestContext(ctx sdk.Context, k Keeper, msg MsgPauseRequest
 
 // handleMsgStartRequestContext handles MsgStartRequestContext
 func handleMsgStartRequestContext(ctx sdk.Context, k Keeper, msg MsgStartRequestContext) sdk.Result {
-	if err := k.CheckAuthority(ctx, msg.RequestContextID); err != nil {
+	if err := k.CheckAuthority(ctx, msg.Consumer, msg.RequestContextID, true); err != nil {
 		return err.Result()
 	}
 
@@ -238,7 +235,7 @@ func handleMsgStartRequestContext(ctx sdk.Context, k Keeper, msg MsgStartRequest
 
 // handleMsgKillRequestContext handles MsgKillRequestContext
 func handleMsgKillRequestContext(ctx sdk.Context, k Keeper, msg MsgKillRequestContext) sdk.Result {
-	if err := k.CheckAuthority(ctx, msg.RequestContextID); err != nil {
+	if err := k.CheckAuthority(ctx, msg.Consumer, msg.RequestContextID, true); err != nil {
 		return err.Result()
 	}
 
@@ -257,7 +254,7 @@ func handleMsgKillRequestContext(ctx sdk.Context, k Keeper, msg MsgKillRequestCo
 
 // handleMsgUpdateRequestContext handles MsgUpdateRequestContext
 func handleMsgUpdateRequestContext(ctx sdk.Context, k Keeper, msg MsgUpdateRequestContext) sdk.Result {
-	if err := k.CheckAuthority(ctx, msg.RequestContextID); err != nil {
+	if err := k.CheckAuthority(ctx, msg.Consumer, msg.RequestContextID, true); err != nil {
 		return err.Result()
 	}
 

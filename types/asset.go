@@ -1,5 +1,5 @@
 package types
 
 const (
-	FormatUniABSPrefix = "uni:"
+	LiquidityVoucherPrefix = "uni:"
 )

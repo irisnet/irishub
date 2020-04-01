@@ -144,7 +144,7 @@ func TestMsgRemoveLiquidity(t *testing.T) {
 		expectPass bool
 	}{
 		{"no withdraw coin", NewMsgRemoveLiquidity(amt, sdk.Coin{}, sdk.OneInt(), deadline, sender), false},
-		{"zero withdraw coin", NewMsgRemoveLiquidity(amt, sdk.NewCoin(unidenom, sdk.ZeroInt()), sdk.OneInt(), deadline, sender), false},
+		{"zero withdraw coin", NewMsgRemoveLiquidity(amt, sdk.NewCoin(voucherDenom, sdk.ZeroInt()), sdk.OneInt(), deadline, sender), false},
 		{"invalid minimum token amount", NewMsgRemoveLiquidity(sdk.NewInt(-100), withdrawLiquidity, sdk.OneInt(), deadline, sender), false},
 		{"invalid minimum iris amount", NewMsgRemoveLiquidity(amt, withdrawLiquidity, sdk.NewInt(-100), deadline, sender), false},
 		{"deadline not initialized", NewMsgRemoveLiquidity(amt, withdrawLiquidity, sdk.OneInt(), emptyTime, sender), false},

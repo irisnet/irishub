@@ -6,7 +6,6 @@ import (
 	abci "github.com/tendermint/tendermint/abci/types"
 	cmn "github.com/tendermint/tendermint/libs/common"
 
-	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/app/v3/rand/internal/types"
 	"github.com/irisnet/irishub/app/v3/service"
 	"github.com/irisnet/irishub/app/v3/service/exported"
@@ -41,23 +40,25 @@ func (m MockBankKeeper) GetCoins(ctx sdk.Context, addr sdk.AccAddress) sdk.Coins
 }
 
 type MockServiceKeeper struct {
-	storeKey    sdk.StoreKey
-	cdc         *codec.Codec
-	cxtMap      map[string]exported.RequestContext
-	callbackMap map[string]exported.ResponseCallback
+	storeKey         sdk.StoreKey
+	cdc              *codec.Codec
+	cxtMap           map[string]exported.RequestContext
+	callbackMap      map[string]exported.ResponseCallback
+	stateCallbackMap map[string]exported.StateCallback
 }
 
-func NewMockServiceKeeper() MockServiceKeeper {
-	storeKey := protocol.KeyService
+func NewMockServiceKeeper(storeKey *sdk.KVStoreKey) MockServiceKeeper {
 	cdc := codec.New()
 	service.RegisterCodec(cdc)
 	cxtMap := make(map[string]exported.RequestContext)
 	callbackMap := make(map[string]exported.ResponseCallback)
+	stateCallbackMap := make(map[string]exported.StateCallback)
 	return MockServiceKeeper{
-		storeKey:    storeKey,
-		cdc:         cdc,
-		cxtMap:      cxtMap,
-		callbackMap: callbackMap,
+		storeKey:         storeKey,
+		cdc:              cdc,
+		cxtMap:           cxtMap,
+		callbackMap:      callbackMap,
+		stateCallbackMap: stateCallbackMap,
 	}
 }
 
@@ -66,6 +67,14 @@ func (m MockServiceKeeper) RegisterResponseCallback(
 	respCallback exported.ResponseCallback,
 ) sdk.Error {
 	m.callbackMap[moduleName] = respCallback
+	return nil
+}
+
+func (m MockServiceKeeper) RegisterStateCallback(
+	moduleName string,
+	stateCallback exported.StateCallback,
+) sdk.Error {
+	m.stateCallbackMap[moduleName] = stateCallback
 	return nil
 }
 
@@ -92,7 +101,7 @@ func (m MockServiceKeeper) CreateRequestContext(
 	state exported.RequestContextState,
 	respThreshold uint16,
 	moduleName string,
-) (cmn.HexBytes, sdk.Error) {
+) (cmn.HexBytes, sdk.Tags, sdk.Error) {
 	reqCtx := exported.RequestContext{
 		ServiceName:       serviceName,
 		Providers:         providers,
@@ -110,12 +119,12 @@ func (m MockServiceKeeper) CreateRequestContext(
 		ModuleName:        moduleName,
 	}
 	m.cxtMap[string(mockReqCtxID)] = reqCtx
-	return mockReqCtxID, nil
+	return mockReqCtxID, sdk.NewTags(), nil
 }
 
 func (m MockServiceKeeper) StartRequestContext(
 	ctx sdk.Context,
-	requestContextID []byte,
+	requestContextID cmn.HexBytes,
 	consumer sdk.AccAddress,
 ) sdk.Error {
 	reqCtx := m.cxtMap[string(requestContextID)]

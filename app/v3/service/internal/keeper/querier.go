@@ -33,8 +33,8 @@ func NewQuerier(k Keeper) sdk.Querier {
 			return queryRequestsByReqCtx(ctx, req, k)
 		case types.QueryResponses:
 			return queryResponses(ctx, req, k)
-		case types.QueryFees:
-			return queryFees(ctx, req, k)
+		case types.QueryEarnedFees:
+			return queryEarnedFees(ctx, req, k)
 		default:
 			return nil, sdk.ErrUnknownRequest("unknown service query endpoint")
 		}
@@ -131,15 +131,11 @@ func queryRequest(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sdk
 		return nil, sdk.ParseParamsErr(err)
 	}
 
-	requestID, err := types.ConvertRequestID(params.RequestID)
-	if err != nil {
+	if len(params.RequestID) != types.RequestIDLen {
 		return nil, types.ErrInvalidRequestID(types.DefaultCodespace, params.RequestID)
 	}
 
-	request, found := k.GetRequest(ctx, requestID)
-	if !found {
-		return nil, types.ErrUnknownRequest(types.DefaultCodespace, requestID)
-	}
+	request, _ := k.GetRequest(ctx, params.RequestID)
 
 	bz, err := codec.MarshalJSONIndent(k.cdc, request)
 	if err != nil {
@@ -184,15 +180,11 @@ func queryResponse(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sd
 		return nil, sdk.ParseParamsErr(err)
 	}
 
-	requestID, err := types.ConvertRequestID(params.RequestID)
-	if err != nil {
+	if len(params.RequestID) != types.RequestIDLen {
 		return nil, types.ErrInvalidRequestID(types.DefaultCodespace, params.RequestID)
 	}
 
-	response, found := k.GetResponse(ctx, requestID)
-	if !found {
-		return nil, types.ErrUnknownResponse(types.DefaultCodespace, requestID)
-	}
+	response, _ := k.GetResponse(ctx, params.RequestID)
 
 	bz, err := codec.MarshalJSONIndent(k.cdc, response)
 	if err != nil {
@@ -209,11 +201,7 @@ func queryRequestContext(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]by
 		return nil, sdk.ParseParamsErr(err)
 	}
 
-	requestContext, found := k.GetRequestContext(ctx, params.RequestContextID)
-	if !found {
-		return nil, types.ErrUnknownRequestContext(types.DefaultCodespace, params.RequestContextID)
-	}
-
+	requestContext, _ := k.GetRequestContext(ctx, params.RequestContextID)
 	bz, err := codec.MarshalJSONIndent(k.cdc, requestContext)
 	if err != nil {
 		return nil, sdk.MarshalResultErr(err)
@@ -276,16 +264,16 @@ func queryResponses(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, s
 	return bz, nil
 }
 
-func queryFees(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sdk.Error) {
-	var params types.QueryFeesParams
+func queryEarnedFees(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sdk.Error) {
+	var params types.QueryEarnedFeesParams
 	err := k.cdc.UnmarshalJSON(req.Data, &params)
 	if err != nil {
 		return nil, sdk.ParseParamsErr(err)
 	}
 
-	fees, found := k.GetEarnedFees(ctx, params.Address)
+	fees, found := k.GetEarnedFees(ctx, params.Provider)
 	if !found {
-		return nil, types.ErrNoEarnedFees(types.DefaultCodespace, params.Address)
+		return nil, types.ErrNoEarnedFees(types.DefaultCodespace, params.Provider)
 	}
 
 	bz, err := codec.MarshalJSONIndent(k.cdc, fees)

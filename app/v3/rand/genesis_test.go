@@ -3,6 +3,7 @@ package rand
 import (
 	"strconv"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 
@@ -11,29 +12,33 @@ import (
 	dbm "github.com/tendermint/tm-db"
 
 	"github.com/irisnet/irishub/app/v3/rand/internal/keeper"
+	"github.com/irisnet/irishub/app/v3/service"
 	"github.com/irisnet/irishub/codec"
 	"github.com/irisnet/irishub/store"
 	sdk "github.com/irisnet/irishub/types"
 )
 
-func setupMultiStore() (sdk.MultiStore, *sdk.KVStoreKey) {
+func setupMultiStore() (sdk.MultiStore, *sdk.KVStoreKey, *sdk.KVStoreKey) {
 	db := dbm.NewMemDB()
 	randKey := sdk.NewKVStoreKey("randkey")
+	serviceKey := sdk.NewKVStoreKey("servicekey")
 
 	ms := store.NewCommitMultiStore(db)
 	ms.MountStoreWithDB(randKey, sdk.StoreTypeIAVL, db)
+	ms.MountStoreWithDB(serviceKey, sdk.StoreTypeIAVL, db)
 	_ = ms.LoadLatestVersion()
 
-	return ms, randKey
+	return ms, randKey, serviceKey
 }
 
 func TestExportRandGenesis(t *testing.T) {
-	ms, randKey := setupMultiStore()
+	ms, randKey, serviceKey := setupMultiStore()
 
 	cdc := codec.New()
 	RegisterCodec(cdc)
+	service.RegisterCodec(cdc)
 
-	mockServiceKeeper := keeper.NewMockServiceKeeper()
+	mockServiceKeeper := keeper.NewMockServiceKeeper(serviceKey)
 	mockBankKeeper := keeper.NewMockBankKeeper()
 
 	keeper := NewKeeper(cdc, randKey, mockBankKeeper, mockServiceKeeper, DefaultCodespace)
@@ -44,12 +49,18 @@ func TestExportRandGenesis(t *testing.T) {
 	newBlockHeight := txHeight + 50
 	consumer1 := sdk.AccAddress([]byte("consumer1"))
 	consumer2 := sdk.AccAddress([]byte("consumer2"))
+	provider := sdk.AccAddress([]byte("provider"))
 	blockInterval1 := uint64(100)
 	blockInterval2 := uint64(200)
 
 	// build context
 	ctx := sdk.NewContext(ms, abci.Header{}, false, log.NewNopLogger())
 	ctx = ctx.WithBlockHeight(txHeight).WithTxBytes(txBytes)
+
+	mockServiceKeeper.SetServiceBinding(ctx,
+		service.NewServiceBinding(
+			ModuleServiceName, provider, sdk.NewCoins(), "", 0, true, time.Time{},
+		))
 
 	// request rands
 	_, _ = keeper.RequestRand(ctx, consumer1, blockInterval1, false, sdk.NewCoins())

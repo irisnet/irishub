@@ -9,7 +9,7 @@
 - expired: HTLC过期并且可退还
 - refunded: HTLC已退还
 
-## Available Commands
+## 可用命令
 
 | Name                                   | Description                                      |
 | -------------------------------------- | ------------------------------------------------ |
@@ -23,12 +23,12 @@
 创建一个 HTLC。
 
 ```bash
-iriscli htlc create --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --to=<to> --receiver-on-other-chain=<receiver-on-other-chain> --amount=<amount> --secret=<secret> --time-lock=<time-lock> --timestamp=<timestamp>
+iriscli htlc create --chain-id=irishub --from=<key-name> --fee=0.3iris --to=<to> --receiver-on-other-chain=<receiver-on-other-chain> --amount=<amount> --secret=<secret> --time-lock=<time-lock> --timestamp=<timestamp>
 ```
 
 **标识：**
 
-| 名称, 速记                | 类型     | 必须 | 默认 | 描述                                                               |
+| 名称，速记                | 类型     | 必须 | 默认 | 描述                                                               |
 | ------------------------- | -------- | ---- | ---- | ------------------------------------------------------------------ |
 | --to                      | string   | 是   |      | Bech32编码的收款人地址                                             |
 | --receiver-on-other-chain | bytesHex |      |      | 另一条链上的HTLC认领接收地址                                       |
@@ -50,7 +50,7 @@ iriscli htlc create \
 --time-lock=50 \
 --timestamp=1580000000 \
 --fee=0.3iris \
---chain-id=test \
+--chain-id=irishub \
 --commit
 ```
 
@@ -59,12 +59,12 @@ iriscli htlc create \
 将 HTLC 中锁定的资金发送到收款人地址。
 
 ```bash
-iriscli htlc claim --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --hash-lock=<hash-lock> --secret=<secret>
+iriscli htlc claim --chain-id=irishub --from=<key-name> --fee=0.3iris --hash-lock=<hash-lock> --secret=<secret>
 ```
 
 **标识：**
 
-| 名称, 速记  | 类型     | 必须 | 默认 | 描述                           |
+| 名称，速记  | 类型     | 必须 | 默认 | 描述                           |
 | ----------- | -------- | ---- | ---- | ------------------------------ |
 | --hash-lock | bytesHex | 是   |      | T要发送锁定资金HTLC的Hash Lock |
 | --secret    | bytesHex | 是   |      | 用于生成hash lock的secret      |
@@ -77,7 +77,7 @@ iriscli htlc claim \
 --hash-lock=bae5acb11ad90a20cb07023f4bf0fcf4d38549feff486dd40a1fbe871b4aabdf \
 --secret=382aa2863398a31474616f1498d7a9feba132c4bcf9903940b8a5c72a46e4a41 \
 --fee=0.3iris \
---chain-id=test \
+--chain-id=irishub \
 --commit
 ```
 
@@ -86,12 +86,12 @@ iriscli htlc claim \
 从过期的 HTLC 中取回退款。
 
 ```bash
-iriscli htlc refund --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --hash-lock=<hash-lock>
+iriscli htlc refund --chain-id=irishub --from=<key-name> --fee=0.3iris --hash-lock=<hash-lock>
 ```
 
 **标识：**
 
-| 名称, 速记  | 类型     | 必须 | 默认 | 描述                    |
+| 名称，速记  | 类型     | 必须 | 默认 | 描述                    |
 | ----------- | -------- | ---- | ---- | ----------------------- |
 | --hash-lock | bytesHex | 是   |      | 要退款的HTLC的Hash Lock |
 
@@ -102,7 +102,7 @@ iriscli htlc refund \
 --from=node0 \
 --hash-lock=bae5acb11ad90a20cb07023f4bf0fcf4d38549feff486dd40a1fbe871b4aabdf \
 --fee=0.3iris \
---chain-id=test \
+--chain-id=irishub \
 --commit
 ```
 

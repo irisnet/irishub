@@ -17,48 +17,74 @@ func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
 
 	k.SetParamSet(ctx, data.Params)
 
+	for _, definition := range data.Definitions {
+		k.SetServiceDefinition(ctx, definition)
+	}
+
+	for _, binding := range data.Bindings {
+		k.SetServiceBinding(ctx, binding)
+	}
+
+	for providerAddressStr, withdrawAddress := range data.WithdrawAddresses {
+		providerAddress, _ := sdk.AccAddressFromBech32(providerAddressStr)
+		k.SetWithdrawAddress(ctx, providerAddress, withdrawAddress)
+	}
+
 	for reqContextIDStr, requestContext := range data.RequestContexts {
 		requestContextID, _ := hex.DecodeString(reqContextIDStr)
 		k.SetRequestContext(ctx, requestContextID, requestContext)
-	}
-
-	for requestIDStr, request := range data.Requests {
-		requestID, _ := ConvertRequestID(requestIDStr)
-		k.SetCompactRequest(ctx, requestID, request)
-	}
-
-	for requestIDStr, response := range data.Responses {
-		requestID, _ := ConvertRequestID(requestIDStr)
-		k.SetResponse(ctx, requestID, response)
 	}
 }
 
 // ExportGenesis - output genesis parameters
 func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
+	definitions := []ServiceDefinition{}
+	bindings := []ServiceBinding{}
+	withdrawAddresses := make(map[string]sdk.AccAddress)
 	requestContexts := make(map[string]RequestContext)
-	requests := make(map[string]CompactRequest)
-	responses := make(map[string]Response)
 
-	k.IterateRequestContexts(ctx, func(requestContextID cmn.HexBytes, requestContext RequestContext) bool {
-		requestContexts[requestContextID.String()] = requestContext
-		return false
-	})
+	k.IterateServiceDefinitions(
+		ctx,
+		func(definition ServiceDefinition) bool {
+			definitions = append(definitions, definition)
+			return false
+		},
+	)
 
-	k.IterateRequests(ctx, func(requestID cmn.HexBytes, request CompactRequest) bool {
-		requests[requestID.String()] = request
-		return false
-	})
+	k.IterateServiceBindings(
+		ctx,
+		func(binding ServiceBinding) bool {
+			bindings = append(bindings, binding)
+			return false
+		},
+	)
 
-	k.IterateResponses(ctx, func(requestID cmn.HexBytes, response Response) bool {
-		responses[requestID.String()] = response
-		return false
-	})
+	k.IterateWithdrawAddresses(
+		ctx,
+		func(providerAddress sdk.AccAddress, withdrawAddress sdk.AccAddress) bool {
+			withdrawAddresses[providerAddress.String()] = withdrawAddress
+			return false
+		},
+	)
+
+	k.IterateRequestContexts(
+		ctx,
+		func(requestContextID cmn.HexBytes, requestContext RequestContext) bool {
+			if requestContext.State != COMPLETED {
+				requestContext.State = PAUSED
+				requestContexts[requestContextID.String()] = requestContext
+			}
+
+			return false
+		},
+	)
 
 	return NewGenesisState(
 		k.GetParamSet(ctx),
+		definitions,
+		bindings,
+		withdrawAddresses,
 		requestContexts,
-		requests,
-		responses,
 	)
 }
 

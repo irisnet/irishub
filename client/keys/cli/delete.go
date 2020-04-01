@@ -21,7 +21,7 @@ func deleteKeyCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "delete <name>",
 		Short:   "Delete the given key",
-		Example: "iriscli keys delete <key name>",
+		Example: "iriscli keys delete <key-name>",
 		Long: `Delete a key from the store.
 Note that removing offline or ledger keys will remove
 only the public key references stored locally, i.e.

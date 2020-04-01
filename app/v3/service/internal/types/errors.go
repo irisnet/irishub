@@ -20,9 +20,9 @@ const (
 
 	CodeInvalidDeposit            sdk.CodeType = 106
 	CodeInvalidPricing            sdk.CodeType = 107
-	CodeServiceBindingExists      sdk.CodeType = 108
-	CodeUnknownServiceBinding     sdk.CodeType = 109
-	CodeNoWithdrawAddr            sdk.CodeType = 110
+	CodeInvalidMinRespTime        sdk.CodeType = 108
+	CodeServiceBindingExists      sdk.CodeType = 109
+	CodeUnknownServiceBinding     sdk.CodeType = 110
 	CodeServiceBindingUnavailable sdk.CodeType = 111
 	CodeServiceBindingAvailable   sdk.CodeType = 112
 	CodeIncorrectRefundTime       sdk.CodeType = 113
@@ -39,23 +39,22 @@ const (
 	CodeUnknownResponse           sdk.CodeType = 123
 	CodeUnknownRequestContext     sdk.CodeType = 124
 	CodeInvalidRequestContextID   sdk.CodeType = 125
-	CodeNotMatchingConsumer       sdk.CodeType = 126
-	CodeNotAuthorized             sdk.CodeType = 127
-	CodeRequestContextNonRepeated sdk.CodeType = 128
-	CodeRequestContextNotStarted  sdk.CodeType = 129
-	CodeRequestContextNotPaused   sdk.CodeType = 130
-	CodeRequestContextCompleted   sdk.CodeType = 131
-	CodeModuleNameRegistered      sdk.CodeType = 132
-	CodeModuleNameNotRegistered   sdk.CodeType = 133
-	CodeNoEarnedFees              sdk.CodeType = 134
+	CodeNotAuthorized             sdk.CodeType = 126
+	CodeRequestContextNonRepeated sdk.CodeType = 127
+	CodeRequestContextNotRunning  sdk.CodeType = 128
+	CodeRequestContextNotPaused   sdk.CodeType = 129
+	CodeRequestContextCompleted   sdk.CodeType = 130
+	CodeCallbackRegistered        sdk.CodeType = 131
+	CodeCallbackNotRegistered     sdk.CodeType = 132
+	CodeNoEarnedFees              sdk.CodeType = 133
 
-	CodeInvalidRequestInput   sdk.CodeType = 135
-	CodeInvalidResponseOutput sdk.CodeType = 136
-	CodeInvalidResponseErr    sdk.CodeType = 137
+	CodeInvalidRequestInput   sdk.CodeType = 134
+	CodeInvalidResponseOutput sdk.CodeType = 135
+	CodeInvalidResponseResult sdk.CodeType = 136
 
-	CodeInvalidAddress  sdk.CodeType = 138
-	CodeInvalidProfiler sdk.CodeType = 139
-	CodeInvalidTrustee  sdk.CodeType = 140
+	CodeInvalidAddress  sdk.CodeType = 137
+	CodeInvalidProfiler sdk.CodeType = 138
+	CodeInvalidTrustee  sdk.CodeType = 139
 )
 
 func ErrInvalidServiceName(codespace sdk.CodespaceType, serviceName string) sdk.Error {
@@ -90,16 +89,16 @@ func ErrInvalidPricing(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidPricing, fmt.Sprintf("invalid pricing: %s", msg))
 }
 
+func ErrInvalidMinRespTime(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidMinRespTime, msg)
+}
+
 func ErrServiceBindingExists(codespace sdk.CodespaceType) sdk.Error {
 	return sdk.NewError(codespace, CodeServiceBindingExists, "service binding already exists")
 }
 
 func ErrUnknownServiceBinding(codespace sdk.CodespaceType) sdk.Error {
 	return sdk.NewError(codespace, CodeUnknownServiceBinding, "service binding does not exist")
-}
-
-func ErrNoWithdrawAddr(codespace sdk.CodespaceType, provider sdk.AccAddress) sdk.Error {
-	return sdk.NewError(codespace, CodeNoWithdrawAddr, fmt.Sprintf("no withdraw address for %s", provider))
 }
 
 func ErrServiceBindingUnavailable(codespace sdk.CodespaceType) sdk.Error {
@@ -122,8 +121,8 @@ func ErrInvalidResponse(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidResponse, fmt.Sprintf("invalid response: %s", msg))
 }
 
-func ErrInvalidRequestID(codespace sdk.CodespaceType, msg string) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidRequestID, fmt.Sprintf("invalid request ID: %s", msg))
+func ErrInvalidRequestID(codespace sdk.CodespaceType, requestID cmn.HexBytes) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidRequestID, fmt.Sprintf("invalid request ID: %s", requestID.String()))
 }
 
 func ErrInvalidProviders(codespace sdk.CodespaceType, msg string) sdk.Error {
@@ -162,8 +161,8 @@ func ErrInvalidRequestContextID(codespace sdk.CodespaceType, msg string) sdk.Err
 	return sdk.NewError(codespace, CodeInvalidRequestContextID, fmt.Sprintf("invalid request context ID: %s", msg))
 }
 
-func ErrNotMatchingConsumer(codespace sdk.CodespaceType) sdk.Error {
-	return sdk.NewError(codespace, CodeNotMatchingConsumer, "consumer does not match")
+func ErrNotAuthorized(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeNotAuthorized, msg)
 }
 
 func ErrNotAuthorized(codespace sdk.CodespaceType) sdk.Error {
@@ -174,8 +173,8 @@ func ErrRequestContextNonRepeated(codespace sdk.CodespaceType) sdk.Error {
 	return sdk.NewError(codespace, CodeRequestContextNonRepeated, "request context is non repeated")
 }
 
-func ErrRequestContextNotStarted(codespace sdk.CodespaceType) sdk.Error {
-	return sdk.NewError(codespace, CodeRequestContextNotStarted, "request context not started")
+func ErrRequestContextNotRunning(codespace sdk.CodespaceType) sdk.Error {
+	return sdk.NewError(codespace, CodeRequestContextNotRunning, "request context not running")
 }
 
 func ErrRequestContextNotPaused(codespace sdk.CodespaceType) sdk.Error {
@@ -186,12 +185,12 @@ func ErrRequestContextCompleted(codespace sdk.CodespaceType) sdk.Error {
 	return sdk.NewError(codespace, CodeRequestContextCompleted, "request context completed")
 }
 
-func ErrModuleNameRegistered(codespace sdk.CodespaceType, moduleName string) sdk.Error {
-	return sdk.NewError(codespace, CodeModuleNameRegistered, fmt.Sprintf("module %s already registered", moduleName))
+func ErrCallbackRegistered(codespace sdk.CodespaceType, cbType, moduleName string) sdk.Error {
+	return sdk.NewError(codespace, CodeCallbackRegistered, fmt.Sprintf("%s already registered for module %s", cbType, moduleName))
 }
 
-func ErrModuleNameNotRegistered(codespace sdk.CodespaceType, moduleName string) sdk.Error {
-	return sdk.NewError(codespace, CodeModuleNameNotRegistered, fmt.Sprintf("module %s not registered", moduleName))
+func ErrCallbackNotRegistered(codespace sdk.CodespaceType, cbType, moduleName string) sdk.Error {
+	return sdk.NewError(codespace, CodeCallbackNotRegistered, fmt.Sprintf("%s not registered for module %s", cbType, moduleName))
 }
 
 func ErrNoEarnedFees(codespace sdk.CodespaceType, provider sdk.AccAddress) sdk.Error {
@@ -206,8 +205,8 @@ func ErrInvalidResponseOutput(codespace sdk.CodespaceType, msg string) sdk.Error
 	return sdk.NewError(codespace, CodeInvalidResponseOutput, fmt.Sprintf("invalid response output: %s", msg))
 }
 
-func ErrInvalidResponseErr(codespace sdk.CodespaceType, msg string) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidResponseErr, fmt.Sprintf("invalid response err: %s", msg))
+func ErrInvalidResponseResult(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidResponseResult, fmt.Sprintf("invalid response result: %s", msg))
 }
 
 func ErrInvalidProfiler(codespace sdk.CodespaceType, address sdk.AccAddress) sdk.Error {

@@ -32,6 +32,7 @@ import (
 
 var _ protocol.Protocol = (*ProtocolV3)(nil)
 
+// nolint
 // ProtocolV3 define the protocol
 type ProtocolV3 struct {
 	version        uint64
@@ -107,6 +108,7 @@ func (p *ProtocolV3) Load() {
 func (p *ProtocolV3) Init(ctx sdk.Context) {
 	p.assetKeeper.Init(ctx)
 	p.coinswapKeeper.Init(ctx, p.assetKeeper, p.accountMapper)
+	p.serviceKeeper.Init(ctx, append(rand.GetSvcDefinitions(), oracle.GetSvcDefinitions()...))
 }
 
 // GetCodec get codec
@@ -251,24 +253,6 @@ func (p *ProtocolV3) configKeepers() {
 		slashing.PrometheusMetrics(p.config),
 	)
 
-	p.serviceKeeper = service.NewKeeper(
-		p.cdc,
-		protocol.KeyService,
-		p.bankKeeper,
-		p.guardianKeeper,
-		service.DefaultCodespace,
-		p.paramsKeeper.Subspace(service.DefaultParamSpace),
-		service.PrometheusMetrics(p.config),
-	)
-
-	p.oracleKeeper = oracle.NewKeeper(
-		p.cdc,
-		protocol.KeyOracle,
-		oracle.DefaultCodespace,
-		p.guardianKeeper,
-		p.serviceKeeper,
-	)
-
 	// register the staking hooks
 	// NOTE: StakeKeeper above are passed by reference,
 	// so that it can be modified like below:
@@ -284,6 +268,25 @@ func (p *ProtocolV3) configKeepers() {
 		p.guardianKeeper,
 		asset.DefaultCodespace,
 		p.paramsKeeper.Subspace(asset.DefaultParamSpace),
+	)
+
+	p.serviceKeeper = service.NewKeeper(
+		p.cdc,
+		protocol.KeyService,
+		p.bankKeeper,
+		p.assetKeeper,
+		p.guardianKeeper,
+		service.DefaultCodespace,
+		p.paramsKeeper.Subspace(service.DefaultParamSpace),
+		service.PrometheusMetrics(p.config),
+	)
+
+	p.oracleKeeper = oracle.NewKeeper(
+		p.cdc,
+		protocol.KeyOracle,
+		oracle.DefaultCodespace,
+		p.guardianKeeper,
+		p.serviceKeeper,
 	)
 
 	p.govKeeper = gov.NewKeeper(
@@ -433,8 +436,8 @@ func (p *ProtocolV3) InitChainer(ctx sdk.Context, DeliverTx sdk.DeliverTx, req a
 	})
 
 	// init system accounts
-	p.bankKeeper.AddCoins(ctx, auth.BurnedCoinsAccAddr, sdk.Coins{})
-	p.bankKeeper.AddCoins(ctx, auth.CommunityTaxCoinsAccAddr, sdk.Coins{})
+	_, _, _ = p.bankKeeper.AddCoins(ctx, auth.BurnedCoinsAccAddr, sdk.Coins{})
+	_, _, _ = p.bankKeeper.AddCoins(ctx, auth.CommunityTaxCoinsAccAddr, sdk.Coins{})
 
 	// load the accounts
 	for _, gacc := range genesisState.Accounts {
@@ -442,8 +445,6 @@ func (p *ProtocolV3) InitChainer(ctx sdk.Context, DeliverTx sdk.DeliverTx, req a
 		acc.AccountNumber = p.accountMapper.GetNextAccountNumber(ctx)
 		p.accountMapper.SetGenesisAccount(ctx, acc)
 	}
-
-	//upgrade.InitGenesis(ctx, p.upgradeKeeper, p.Router(), genesisState.UpgradeData)
 
 	// load the initial stake information
 	validators, err := stake.InitGenesis(ctx, p.StakeKeeper, genesisState.StakeData)
@@ -465,21 +466,18 @@ func (p *ProtocolV3) InitChainer(ctx sdk.Context, DeliverTx sdk.DeliverTx, req a
 	oracle.InitGenesis(ctx, p.oracleKeeper, genesisState.OracleData)
 
 	// load the address to pubkey map
-	err = IrisValidateGenesisState(genesisState)
-	if err != nil {
+	if err = IrisValidateGenesisState(genesisState); err != nil {
 		panic(err) // TODO find a way to do this w/o panics
 	}
 
 	if len(genesisState.GenTxs) > 0 {
 		for _, genTx := range genesisState.GenTxs {
 			var tx auth.StdTx
-			err = p.cdc.UnmarshalJSON(genTx, &tx)
-			if err != nil {
+			if err = p.cdc.UnmarshalJSON(genTx, &tx); err != nil {
 				panic(err)
 			}
 			bz := p.cdc.MustMarshalBinaryLengthPrefixed(tx)
-			res := DeliverTx(bz)
-			if !res.IsOK() {
+			if res := DeliverTx(bz); !res.IsOK() {
 				panic(res.Log)
 			}
 		}
@@ -490,8 +488,13 @@ func (p *ProtocolV3) InitChainer(ctx sdk.Context, DeliverTx sdk.DeliverTx, req a
 	// sanity check
 	if len(req.Validators) > 0 {
 		if len(req.Validators) != len(validators) {
-			panic(fmt.Errorf("len(RequestInitChain.Validators) != len(validators) (%d != %d)",
-				len(req.Validators), len(validators)))
+			panic(
+				fmt.Errorf(
+					"len(RequestInitChain.Validators) != len(validators) (%d != %d)",
+					len(req.Validators),
+					len(validators),
+				),
+			)
 		}
 		sort.Sort(abci.ValidatorUpdates(req.Validators))
 		sort.Sort(abci.ValidatorUpdates(validators))

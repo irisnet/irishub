@@ -29,13 +29,13 @@ func DefaultGenesisState() GenesisState {
 // InitGenesis new coinswap genesis
 func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
 	if err := types.ValidateParams(data.Params); err != nil {
-		panic(fmt.Errorf("panic for ValidateGenesis,%v", err))
+		panic(fmt.Errorf("panic for ValidateGenesis, %v", err))
 	}
 	k.SetParams(ctx, data.Params)
 
 	for _, pool := range data.Pools {
-		if err := CheckUniId(pool.Name); err != nil {
-			panic(fmt.Errorf("panic for ValidateGenesis,%v", err))
+		if err := CheckVoucherCoinName(pool.Name); err != nil {
+			panic(fmt.Errorf("panic for ValidateGenesis, %v", err))
 		}
 		if pool.Balance().Empty() {
 			panic(fmt.Sprintf("empty pool: %s", pool.Name))

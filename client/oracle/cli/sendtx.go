@@ -16,16 +16,15 @@ import (
 func GetCmdCreateFeed(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create",
-		Short: `create a new feed,the feed will be in "paused" state`,
-		Example: `iriscli oracle create --chain-id="irishub-test" --from=node0 --fee=0.3iris  --commit ` +
+		Short: `Create a new feed, the feed will be in "paused" state`,
+		Example: `iriscli oracle create --chain-id=<chain-id> --from=<key-name> --fee=0.3iris ` +
 			`--feed-name="test-feed" ` +
 			`--latest-history=10 ` +
 			`--service-name="test-service" ` +
-			`--input={request-data} ` +
-			`--providers="faa1hp29kuh22vpjjlnctmyml5s75evsnsd8r4x0mm,faa15rurzhkemsgfm42dnwhafjdv5s8e2pce0ku8ya" ` +
+			`--input=<request-data> ` +
+			`--providers=<provide1_address>,<provider2_address> ` +
 			`--service-fee-cap=1iris ` +
 			`--timeout=2 ` +
-			`--frequency=10 ` +
 			`--total=10 ` +
 			`--threshold=1 ` +
 			`--aggregate-func="avg" ` +
@@ -69,7 +68,6 @@ func GetCmdCreateFeed(cdc *codec.Codec) *cobra.Command {
 				Timeout:           viper.GetInt64(FlagTimeout),
 				ServiceFeeCap:     serviceFeeCap,
 				RepeatedFrequency: uint64(viper.GetInt64(FlagFrequency)),
-				RepeatedTotal:     viper.GetInt64(FlagTotal),
 				ResponseThreshold: uint16(viper.GetInt(FlagThreshold)),
 				Creator:           creator,
 			}
@@ -95,10 +93,10 @@ func GetCmdCreateFeed(cdc *codec.Codec) *cobra.Command {
 // GetCmdStartFeed implements start a feed command
 func GetCmdStartFeed(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "start",
+		Use:     "start [feed-name]",
 		Short:   `Start a feed in "paused" state`,
 		Args:    cobra.ExactArgs(1),
-		Example: `iriscli oracle start <feed-name> --chain-id="irishub-test" --from=<creator> --fee=0.3iris --commit `,
+		Example: `iriscli oracle start <feed-name> --chain-id=<chain-id> --from=<key-name> --fee=0.3iris`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
@@ -129,10 +127,10 @@ func GetCmdStartFeed(cdc *codec.Codec) *cobra.Command {
 // GetCmdPauseFeed implements pause a running feed command
 func GetCmdPauseFeed(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "pause",
+		Use:     "pause [feed-name]",
 		Short:   `Pause a feed in "running" state`,
 		Args:    cobra.ExactArgs(1),
-		Example: `iriscli oracle pause <feed-name> --chain-id="irishub-test" --from=<creator> --fee=0.3iris --commit  `,
+		Example: `iriscli oracle pause <feed-name> --chain-id=<chain-id> --from=<key-name> --fee=0.3iris`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
@@ -163,17 +161,16 @@ func GetCmdPauseFeed(cdc *codec.Codec) *cobra.Command {
 // GetCmdEditFeed implements edit a feed command
 func GetCmdEditFeed(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "edit",
+		Use:   "edit [feed-name]",
 		Short: "Modify the feed information and update service invocation parameters by feed creator",
 		Args:  cobra.ExactArgs(1),
-		Example: `iriscli oracle edit <feed-name> --chain-id="irishub-test" --from=<creator> --fee=0.3iris --commit  ` +
+		Example: `iriscli oracle edit <feed-name> --chain-id=<chain-id> --from=<key-name> --fee=0.3iris ` +
 			`--latest-history=10 ` +
-			`--providers="faa1r3tyupskwlh07dmhjw70frxzaaaufta37y25yr,faa1ydahnhrhkjh9j9u0jn8p3s272l0ecqj40vra8h"` +
+			`--providers=<provide1_address>,<provider2_address> ` +
 			`--service-fee-cap=1iris ` +
 			`--timeout=2 ` +
 			`--frequency=10 ` +
 			`--threshold=5 ` +
-			`--total=-1 ` +
 			`--threshold=1`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
@@ -209,7 +206,6 @@ func GetCmdEditFeed(cdc *codec.Codec) *cobra.Command {
 				Timeout:           viper.GetInt64(FlagTimeout),
 				ServiceFeeCap:     serviceFeeCap,
 				RepeatedFrequency: uint64(viper.GetInt64(FlagFrequency)),
-				RepeatedTotal:     viper.GetInt64(FlagTotal),
 				ResponseThreshold: uint16(viper.GetInt(FlagThreshold)),
 				Creator:           creator,
 			}

@@ -88,7 +88,7 @@ func GetCmdBindService(cdc *codec.Codec) *cobra.Command {
 		Use:   "bind",
 		Short: "Bind a service",
 		Example: "iriscli service bind --chain-id=<chain-id> --from=<key-name> --fee=0.3iris " +
-			"--service-name=<service name> --deposit=1iris --pricing=<pricing content or path>",
+			"--service-name=<service-name> --deposit=1iris --pricing=<pricing content or path/to/pricing.json> --min-resp-time=50",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
@@ -103,6 +103,7 @@ func GetCmdBindService(cdc *codec.Codec) *cobra.Command {
 			}
 
 			serviceName := viper.GetString(FlagServiceName)
+			minRespTime := uint64(viper.GetInt64(FlagMinRespTime))
 
 			depositStr := viper.GetString(FlagDeposit)
 			deposit, err := cliCtx.ParseCoins(depositStr)
@@ -132,7 +133,7 @@ func GetCmdBindService(cdc *codec.Codec) *cobra.Command {
 
 			pricing = buf.String()
 
-			msg := service.NewMsgBindService(serviceName, provider, deposit, pricing)
+			msg := service.NewMsgBindService(serviceName, provider, deposit, pricing, minRespTime)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -145,16 +146,18 @@ func GetCmdBindService(cdc *codec.Codec) *cobra.Command {
 	_ = cmd.MarkFlagRequired(FlagServiceName)
 	_ = cmd.MarkFlagRequired(FlagDeposit)
 	_ = cmd.MarkFlagRequired(FlagPricing)
+	_ = cmd.MarkFlagRequired(FlagMinRespTime)
 
 	return cmd
 }
 
+// GetCmdUpdateServiceBinding implements updating a service binding command
 func GetCmdUpdateServiceBinding(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "update-binding",
+		Use:   "update-binding [service-name]",
 		Short: "Update an existing service binding",
-		Example: "iriscli service update-binding <service name> --chain-id=<chain-id> --from=<key-name> " +
-			"--fee=0.3iris --deposit=1iris --pricing=<pricing content or path>",
+		Example: "iriscli service update-binding <service-name> --chain-id=<chain-id> --from=<key-name> " +
+			"--fee=0.3iris --deposit=1iris --pricing=<pricing content or path/to/pricing.json> --min-resp-time=50",
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
@@ -203,7 +206,9 @@ func GetCmdUpdateServiceBinding(cdc *codec.Codec) *cobra.Command {
 				pricing = buf.String()
 			}
 
-			msg := service.NewMsgUpdateServiceBinding(args[0], provider, deposit, pricing)
+			minRespTime := uint64(viper.GetInt64(FlagMinRespTime))
+
+			msg := service.NewMsgUpdateServiceBinding(args[0], provider, deposit, pricing, minRespTime)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -217,11 +222,12 @@ func GetCmdUpdateServiceBinding(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
+// GetCmdSetWithdrawAddr implements setting a withdrawal address command
 func GetCmdSetWithdrawAddr(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "set-withdraw-addr",
+		Use:   "set-withdraw-addr [withdrawal-address]",
 		Short: "Set a withdrawal address for a provider",
-		Example: "iriscli service set-withdraw-addr <withdrawal address> --chain-id=<chain-id> " +
+		Example: "iriscli service set-withdraw-addr <withdrawal-address> --chain-id=<chain-id> " +
 			"--from=<key-name> --fee=0.3iris",
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -254,11 +260,12 @@ func GetCmdSetWithdrawAddr(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-func GetCmdDisableService(cdc *codec.Codec) *cobra.Command {
+// GetCmdDisableServiceBinding implements disabling a service binding command
+func GetCmdDisableServiceBinding(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "disable",
+		Use:     "disable [service-name]",
 		Short:   "Disable an available service binding",
-		Example: "iriscli service disable <service name> --chain-id=<chain-id> --from=<key-name> --fee=0.3iris",
+		Example: "iriscli service disable <service-name> --chain-id=<chain-id> --from=<key-name> --fee=0.3iris",
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
@@ -273,7 +280,7 @@ func GetCmdDisableService(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			msg := service.NewMsgDisableService(args[0], provider)
+			msg := service.NewMsgDisableServiceBinding(args[0], provider)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -285,11 +292,12 @@ func GetCmdDisableService(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-func GetCmdEnableService(cdc *codec.Codec) *cobra.Command {
+// GetCmdEnableServiceBinding implements enabling a service binding command
+func GetCmdEnableServiceBinding(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "enable",
+		Use:   "enable [service-name]",
 		Short: "Enable an unavailable service binding",
-		Example: "iriscli service enable <service name> --chain-id=<chain-id> --from=<key-name> " +
+		Example: "iriscli service enable <service-name> --chain-id=<chain-id> --from=<key-name> " +
 			"--fee=0.3iris --deposit=1iris",
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -315,7 +323,7 @@ func GetCmdEnableService(cdc *codec.Codec) *cobra.Command {
 				}
 			}
 
-			msg := service.NewMsgEnableService(args[0], provider, deposit)
+			msg := service.NewMsgEnableServiceBinding(args[0], provider, deposit)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -324,16 +332,17 @@ func GetCmdEnableService(cdc *codec.Codec) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().AddFlagSet(FsServiceEnable)
+	cmd.Flags().AddFlagSet(FsServiceEnableBinding)
 
 	return cmd
 }
 
+// GetCmdRefundServiceDeposit implements refunding deposit command
 func GetCmdRefundServiceDeposit(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "refund-deposit",
+		Use:   "refund-deposit [service-name]",
 		Short: "Refund all deposit from a service binding",
-		Example: "iriscli service refund-deposit <service name> --chain-id=<chain-id> --from=<key-name> " +
+		Example: "iriscli service refund-deposit <service-name> --chain-id=<chain-id> --from=<key-name> " +
 			"--fee=0.3iris",
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -361,12 +370,13 @@ func GetCmdRefundServiceDeposit(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-func GetCmdRequestService(cdc *codec.Codec) *cobra.Command {
+// GetCmdCallService implements initiating a service call command
+func GetCmdCallService(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "call",
-		Short: "Call a service",
-		Example: "iriscli service call --chain-id=<chain-id> --from=<key name> --fee=0.3iris --service-name=<service name> " +
-			"--providers=<provider list> --service-fee-cap=1iris --data=<input content or path> -timeout=100 --repeated --frequency=150 --total=100",
+		Short: "Initiate a service call",
+		Example: "iriscli service call --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --service-name=<service-name> " +
+			"--providers=<provider list> --service-fee-cap=1iris --data=<input content or path/to/input.json> --timeout=100 --repeated --frequency=150 --total=100",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
@@ -432,7 +442,7 @@ func GetCmdRequestService(cdc *codec.Codec) *cobra.Command {
 				total = viper.GetInt64(FlagTotal)
 			}
 
-			msg := service.NewMsgRequestService(
+			msg := service.NewMsgCallService(
 				serviceName, providers, consumer, input, serviceFeeCap,
 				timeout, superMode, repeated, frequency, total,
 			)
@@ -444,7 +454,7 @@ func GetCmdRequestService(cdc *codec.Codec) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().AddFlagSet(FsServiceRequest)
+	cmd.Flags().AddFlagSet(FsServiceCall)
 	_ = cmd.MarkFlagRequired(FlagServiceName)
 	_ = cmd.MarkFlagRequired(FlagProviders)
 	_ = cmd.MarkFlagRequired(FlagServiceFeeCap)
@@ -454,13 +464,13 @@ func GetCmdRequestService(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
+// GetCmdRespondService implements responding to a service request command
 func GetCmdRespondService(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "respond",
 		Short: "Respond to a service request",
-		Example: "iriscli service respond --chain-id=<chain-id> --from=<key name> --fee=0.3iris " +
-			"--request-id=<request-id> --data=<output content or path> --error=<err msg content or path>",
-		PreRunE: preCheckResponseCmd,
+		Example: "iriscli service respond --chain-id=<chain-id> --from=<key-name> --fee=0.3iris " +
+			"--request-id=<request-id> --result=<result content or path/to/result.json> --data=<output content or path/to/output.json>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
@@ -474,9 +484,36 @@ func GetCmdRespondService(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			requestID := viper.GetString(FlagRequestID)
+			requestIDStr := viper.GetString(FlagRequestID)
+			requestID, err := service.ConvertRequestID(requestIDStr)
+			if err != nil {
+				return err
+			}
+
+			result := viper.GetString(FlagResult)
 			output := viper.GetString(FlagData)
-			errMsg := viper.GetString(FlagError)
+
+			if len(result) > 0 {
+				if !json.Valid([]byte(result)) {
+					resultContent, err := ioutil.ReadFile(result)
+					if err != nil {
+						return fmt.Errorf("invalid result: neither JSON input nor path to .json file were provided")
+					}
+
+					if !json.Valid(resultContent) {
+						return fmt.Errorf("invalid result: .json file content is invalid JSON")
+					}
+
+					result = string(resultContent)
+				}
+
+				buf := bytes.NewBuffer([]byte{})
+				if err := json.Compact(buf, []byte(result)); err != nil {
+					return fmt.Errorf("failed to compact the result")
+				}
+
+				result = buf.String()
+			}
 
 			if len(output) > 0 {
 				if !json.Valid([]byte(output)) {
@@ -500,29 +537,7 @@ func GetCmdRespondService(cdc *codec.Codec) *cobra.Command {
 				output = buf.String()
 			}
 
-			if len(errMsg) > 0 {
-				if !json.Valid([]byte(errMsg)) {
-					errMsgContent, err := ioutil.ReadFile(errMsg)
-					if err != nil {
-						return fmt.Errorf("invalid err msg: neither JSON input nor path to .json file were provided")
-					}
-
-					if !json.Valid(errMsgContent) {
-						return fmt.Errorf("invalid err msg: .json file content is invalid JSON")
-					}
-
-					errMsg = string(errMsgContent)
-				}
-
-				buf := bytes.NewBuffer([]byte{})
-				if err := json.Compact(buf, []byte(errMsg)); err != nil {
-					return fmt.Errorf("failed to compact the err msg")
-				}
-
-				errMsg = buf.String()
-			}
-
-			msg := service.NewMsgRespondService(requestID, provider, output, errMsg)
+			msg := service.NewMsgRespondService(requestID, provider, result, output)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -533,15 +548,17 @@ func GetCmdRespondService(cdc *codec.Codec) *cobra.Command {
 
 	cmd.Flags().AddFlagSet(FsServiceRespond)
 	_ = cmd.MarkFlagRequired(FlagRequestID)
+	_ = cmd.MarkFlagRequired(FlagResult)
 
 	return cmd
 }
 
+// GetCmdPauseRequestContext implements pausing a request context command
 func GetCmdPauseRequestContext(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "pause",
+		Use:     "pause [request-context-id]",
 		Short:   "Pause a running request context",
-		Example: "iriscli service pause <request-context-id> --chain-id=<chain-id> --from=<key name> --fee=0.3iris",
+		Example: "iriscli service pause <request-context-id> --chain-id=<chain-id> --from=<key-name> --fee=0.3iris",
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
@@ -573,11 +590,12 @@ func GetCmdPauseRequestContext(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
+// GetCmdStartRequestContext implements restarting a request context command
 func GetCmdStartRequestContext(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "start",
+		Use:     "start [request-context-id]",
 		Short:   "Start a paused request context",
-		Example: "iriscli service start <request-context-id> --chain-id=<chain-id> --from=<key name> --fee=0.3iris",
+		Example: "iriscli service start <request-context-id> --chain-id=<chain-id> --from=<key-name> --fee=0.3iris",
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
@@ -609,11 +627,12 @@ func GetCmdStartRequestContext(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
+// GetCmdKillRequestContext implements terminating a request context command
 func GetCmdKillRequestContext(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "kill",
+		Use:     "kill [request-context-id]",
 		Short:   "Terminate a request context",
-		Example: "iriscli service kill <request-context-id> --chain-id=<chain-id> --from=<key name> --fee=0.3iris",
+		Example: "iriscli service kill <request-context-id> --chain-id=<chain-id> --from=<key-name> --fee=0.3iris",
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
@@ -645,11 +664,12 @@ func GetCmdKillRequestContext(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
+// GetCmdUpdateRequestContext implements updating a request context command
 func GetCmdUpdateRequestContext(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "update",
+		Use:   "update [request-context-id]",
 		Short: "Update a request context",
-		Example: "iriscli service update <request-context-id> --chain-id=<chain-id> --from=<key name> --fee=0.3iris " +
+		Example: "iriscli service update <request-context-id> --chain-id=<chain-id> --from=<key-name> --fee=0.3iris " +
 			"--providers=<new providers> --service-fee-cap=2iris --timeout=0 --frequency=200 --total=200",
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -713,11 +733,12 @@ func GetCmdUpdateRequestContext(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
+// GetCmdWithdrawEarnedFees implements withdrawing earned fees command
 func GetCmdWithdrawEarnedFees(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "withdraw-fees",
 		Short:   "Withdraw the earned fees of a provider",
-		Example: "iriscli service withdraw-fees --chain-id=<chain-id> --from=<key name> --fee=0.3iris",
+		Example: "iriscli service withdraw-fees --chain-id=<chain-id> --from=<key-name> --fee=0.3iris",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
@@ -743,12 +764,13 @@ func GetCmdWithdrawEarnedFees(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
+// GetCmdWithdrawTax implements withdrawing tax command
 func GetCmdWithdrawTax(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "withdraw-tax",
+		Use:   "withdraw-tax [destination-address] [withdrawal-amount]",
 		Short: "Withdraw the service tax",
-		Example: "iriscli service withdraw-tax <destination address> <withdrawal amount> --chain-id=<chain-id> " +
-			"--from=<key name> --fee=0.3iris",
+		Example: "iriscli service withdraw-tax <destination-address> <withdrawal-amount> --chain-id=<chain-id> " +
+			"--from=<key-name> --fee=0.3iris",
 		Args: cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
@@ -783,14 +805,4 @@ func GetCmdWithdrawTax(cdc *codec.Codec) *cobra.Command {
 	}
 
 	return cmd
-}
-
-func preCheckResponseCmd(cmd *cobra.Command, _ []string) error {
-	// make sure either the data or error is provided
-	flags := cmd.Flags()
-	if flags.Changed(FlagData) && flags.Changed(FlagError) {
-		return fmt.Errorf("only one flag is allowed among the data and error")
-	}
-
-	return nil
 }

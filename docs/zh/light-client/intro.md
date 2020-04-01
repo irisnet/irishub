@@ -39,13 +39,13 @@ IRISLCD有两个子命令:
 默认情况下，IRISLCD不信任连接的完整节点。但是，如果确定所连接的完整节点是可信任的，则应使用`--trust-node`标识运行IRISLCD：
 
 ```bash
-irislcd start --node=tcp://localhost:26657 --chain-id=<chain-id> --trust-node
+irislcd start --node=tcp://localhost:26657 --chain-id=irishub --trust-node
 ```
 
 要公开访问你的IRIS LCD实例，您需要指定`--ladder`：
 
 ```bash
-irislcd start --node=tcp://localhost:26657 --chain-id=<chain-id> --laddr=tcp://0.0.0.0:1317 --trust-node
+irislcd start --node=tcp://localhost:26657 --chain-id=irishub --laddr=tcp://0.0.0.0:1317 --trust-node
 ```
 
 ## REST APIs
@@ -141,21 +141,21 @@ irislcd start --node=tcp://localhost:26657 --chain-id=<chain-id> --laddr=tcp://0
 
 ### Asset模块的APIs
 
-1. `POST /asset/tokens`: 发行一种通证
-2. `PUT /asset/tokens/{token-id}`: 编辑一个已存在的通证
-3. `POST /asset/tokens/{token-id}/mint`: 资产所有者和操作员可以直接将通证铸造到指定地址
-4. `POST /asset/tokens/{token-id}/transfer`: 转让通证的所有权
-5. `GET /asset/tokens`: 通过`owner`查询通证列表
-6. `GET /asset/tokens/{token-id}`: 通过`token-id`查询指定通证信息
+1. `POST /asset/tokens`: 发行一个通证
+2. `PUT /asset/tokens/{symbol}`: 编辑一个已存在的通证
+3. `POST /asset/tokens/{symbol}/mint`: 增发通证到指定地址
+4. `POST /asset/tokens/{symbol}/transfer`: 转让通证的所有权
+5. `GET /asset/tokens/{symbol}`: 查询通证
+6. `GET /asset/tokens`: 查询指定所有者的通证集合
 7. `GET /asset/tokens/{symbol}/fee`: 查询发行和铸造指定通证的费用
 
 ### Coinswap模块的APIs
 
-1. `POST /coinswap/liquidities/{id}/deposit`: 增加流动性
-2. `POST /coinswap/liquidities/{id}/withdraw`: 提现流动性
+1. `POST /coinswap/liquidities/{voucher-coin-name}/deposit`: 增加流动性
+2. `POST /coinswap/liquidities/{voucher-coin-name}/withdraw`: 提取流动性
 3. `POST /coinswap/liquidities/buy`: 兑换代币(购买)
 4. `POST /coinswap/liquidities/sell`: 兑换代币(出售)
-5. `GET /coinswap/liquidities/{id}`: 查询流动性
+5. `GET /coinswap/liquidities/{voucher-coin-name}`: 查询流动性
 
 ### HTLC模块的APIs
 
@@ -177,7 +177,7 @@ irislcd start --node=tcp://localhost:26657 --chain-id=<chain-id> --laddr=tcp://0
 9. `POST /service/bindings/{service-name}/{provider}/disable`: 禁用一个可用的服务绑定
 10. `POST /service/bindings/{service-name}/{provider}/enable`: 启用一个不可用的服务绑定
 11. `POST /service/bindings/{service-name}/{provider}/refund-deposit`: 取回一个服务绑定的所有押金
-12. `POST /service/requests`: 调用服务
+12. `POST /service/contexts`: 发起服务调用
 13. `GET /service/requests/{request-id}`: 查询服务请求
 14. `GET /service/requests/{service-name}/{provider}`: 查询一个服务绑定的活跃请求
 15. `GET /service/requests/{request-context-id}/{batch-counter}`: 根据请求上下文ID和批次计数器查询请求列表

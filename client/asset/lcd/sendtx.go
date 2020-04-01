@@ -41,7 +41,7 @@ func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec
 
 type issueTokenReq struct {
 	BaseTx        utils.BaseTx   `json:"base_tx"`
-	Owner         sdk.AccAddress `json:"owner"` //  Owner of the token
+	Owner         sdk.AccAddress `json:"owner"` // owner of the token
 	Symbol        string         `json:"symbol"`
 	Name          string         `json:"name"`
 	Scale         uint8          `json:"scale"`
@@ -53,9 +53,9 @@ type issueTokenReq struct {
 
 type editTokenReq struct {
 	BaseTx    utils.BaseTx   `json:"base_tx"`
-	Owner     sdk.AccAddress `json:"owner"` //  owner of asset
+	Owner     sdk.AccAddress `json:"owner"` //  owner of the token
 	MaxSupply uint64         `json:"max_supply"`
-	Mintable  string         `json:"mintable"` //  mintable of asset
+	Mintable  string         `json:"mintable"` // mintable of the token
 	Name      string         `json:"name"`
 }
 
@@ -68,8 +68,8 @@ type transferTokenOwnerReq struct {
 type mintTokenReq struct {
 	BaseTx utils.BaseTx   `json:"base_tx"`
 	Owner  sdk.AccAddress `json:"owner"`  // the current owner address of the token
-	To     sdk.AccAddress `json:"to"`     // address of mint token to
-	Amount uint64         `json:"amount"` // amount of mint token
+	To     sdk.AccAddress `json:"to"`     // address of minting token to
+	Amount uint64         `json:"amount"` // amount of minting token
 }
 
 func issueTokenHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
@@ -84,7 +84,7 @@ func issueTokenHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handl
 			return
 		}
 
-		// create the MsgEditGateway message
+		// create the MsgIssueToken message
 		msg := asset.MsgIssueToken{
 			Symbol:        req.Symbol,
 			Name:          req.Name,
@@ -121,13 +121,13 @@ func editTokenHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handle
 			return
 		}
 
-		// create the MsgEditToken message
 		mintable, err := asset.ParseBool(req.Mintable)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
+		// create the MsgEditToken message
 		msg := asset.NewMsgEditToken(req.Name, symbol, req.MaxSupply, mintable, req.Owner)
 		if err := msg.ValidateBasic(); err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -172,6 +172,7 @@ func mintTokenHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handle
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		symbol := vars[RestParamSymbol]
+
 		var req mintTokenReq
 		if err := utils.ReadPostBody(w, r, cdc, &req); err != nil {
 			return

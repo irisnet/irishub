@@ -50,8 +50,8 @@ type FeedValue struct {
 // String implements fmt.Stringer
 func (f FeedValue) String() string {
 	return fmt.Sprintf(` FeedValue:
-		Data:                 %s
-		Timestamp:            %s`,
+	Data:                 %s
+	Timestamp:            %s`,
 		f.Data,
 		f.Timestamp.String(),
 	)
@@ -61,15 +61,15 @@ type FeedValues []FeedValue
 
 // String implements fmt.Stringer
 func (fv FeedValues) String() string {
-	var bf bytes.Buffer
-	bf.WriteString("[")
-	for _, f := range fv {
-		bf.WriteString("\n")
-		bf.WriteString(f.String())
-		bf.WriteString("\n")
+	if len(fv) == 0 {
+		return "[]"
 	}
-	bf.WriteString("]")
-	return bf.String()
+
+	var str string
+	for _, f := range fv {
+		str += f.String() + "\n"
+	}
+	return str
 }
 
 type FeedContext struct {
@@ -80,7 +80,6 @@ type FeedContext struct {
 	Timeout           int64                       `json:"timeout"`
 	ServiceFeeCap     sdk.Coins                   `json:"service_fee_cap"`
 	RepeatedFrequency uint64                      `json:"repeated_frequency"`
-	RepeatedTotal     int64                       `json:"repeated_total"`
 	ResponseThreshold uint16                      `json:"response_threshold"`
 	State             service.RequestContextState `json:"state"`
 }
@@ -100,7 +99,6 @@ func (f FeedContext) String() string {
 	Timeout:                    %d
 	ServiceFeeCap:              %s
 	RepeatedFrequency:          %d
-	RepeatedTotal:              %d
 	ResponseThreshold:          %d
 	State:                      %s`,
 		f.Feed.String(),
@@ -110,7 +108,34 @@ func (f FeedContext) String() string {
 		f.Timeout,
 		f.ServiceFeeCap,
 		f.RepeatedFrequency,
-		f.RepeatedTotal,
+		f.ResponseThreshold,
+		f.State.String(),
+	)
+}
+
+func (f FeedContext) HumanString(converter sdk.CoinsConverter) string {
+	var bf bytes.Buffer
+	for _, addr := range f.Providers {
+		bf.WriteString(addr.String())
+		bf.WriteString(",")
+	}
+	return fmt.Sprintf(`FeedContext:
+	%s
+	ServiceName:                %s
+	Providers:                  %s
+	Input:                      %s
+	Timeout:                    %d
+	ServiceFeeCap:              %s
+	RepeatedFrequency:          %d
+	ResponseThreshold:          %d
+	State:                      %s`,
+		f.Feed.String(),
+		f.ServiceName,
+		bf.String(),
+		f.Input,
+		f.Timeout,
+		converter.ToMainUnit(f.ServiceFeeCap),
+		f.RepeatedFrequency,
 		f.ResponseThreshold,
 		f.State.String(),
 	)
@@ -120,13 +145,26 @@ type FeedsContext []FeedContext
 
 // String implements fmt.Stringer
 func (fc FeedsContext) String() string {
-	var bf bytes.Buffer
-	bf.WriteString("[")
-	for _, f := range fc {
-		bf.WriteString("\n")
-		bf.WriteString(f.String())
-		bf.WriteString("\n")
+	if len(fc) == 0 {
+		return "[]"
 	}
-	bf.WriteString("]")
-	return bf.String()
+
+	var str string
+	for _, f := range fc {
+		str += f.String() + "\n"
+	}
+	return str
+}
+
+// HumanString implements human stringer
+func (fc FeedsContext) HumanString(converter sdk.CoinsConverter) string {
+	if len(fc) == 0 {
+		return "[]"
+	}
+
+	var str string
+	for _, f := range fc {
+		str += f.HumanString(converter) + "\n"
+	}
+	return str
 }

@@ -11,6 +11,7 @@ import (
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/app/v3/service"
 	"github.com/irisnet/irishub/client/context"
+	serviceutils "github.com/irisnet/irishub/client/service/utils"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/codec"
 	sdk "github.com/irisnet/irishub/types"
@@ -47,7 +48,7 @@ func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Co
 		queryRequestHandlerFn(cliCtx, cdc),
 	).Methods("GET")
 
-	// query requests by the service binding or request context ID
+	// query active requests by the service binding or request context ID
 	r.HandleFunc(
 		fmt.Sprintf("/service/requests/{%s}/{%s}", Arg1, Arg2),
 		queryRequestsHandlerFn(cliCtx, cdc),
@@ -62,16 +63,16 @@ func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Co
 	// query a request context
 	r.HandleFunc(
 		fmt.Sprintf("/service/contexts/{%s}", RequestContextID),
-		qeuryRequestContextHandlerFn(cliCtx, cdc),
+		queryRequestContextHandlerFn(cliCtx, cdc),
 	).Methods("GET")
 
-	// query responses by the request context ID and batch counter
+	// query active responses by the request context ID and batch counter
 	r.HandleFunc(
 		fmt.Sprintf("/service/responses/{%s}/{%s}", RequestContextID, BatchCounter),
 		queryResponsesHandlerFn(cliCtx, cdc),
 	).Methods("GET")
 
-	// query the earned fees
+	// query the earned fees of a provider
 	r.HandleFunc(
 		fmt.Sprintf("/service/fees/{%s}", Provider),
 		queryEarnedFeesHandlerFn(cliCtx, cdc),
@@ -199,8 +200,13 @@ func queryWithdrawAddrHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) htt
 func queryRequestHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		requestID := vars[RequestID]
+		requestIDStr := vars[RequestID]
 
+		requestID, err := service.ConvertRequestID(requestIDStr)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
 		params := service.QueryRequestParams{
 			RequestID: requestID,
 		}
@@ -218,7 +224,22 @@ func queryRequestHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.Han
 			return
 		}
 
-		utils.PostProcessResponse(w, cdc, res, cliCtx.Indent)
+		var request service.Request
+		_ = cdc.UnmarshalJSON(res, &request)
+		if request.Empty() {
+			request, err = serviceutils.QueryRequestByTxQuery(cliCtx, params)
+			if err != nil {
+				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+				return
+			}
+		}
+
+		if request.Empty() {
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, fmt.Sprintf("unknown request: %s", params.RequestID))
+			return
+		}
+
+		utils.PostProcessResponse(w, cdc, request, cliCtx.Indent)
 	}
 }
 
@@ -235,57 +256,33 @@ func queryRequestsHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.Ha
 			queryByBinding = false
 		}
 
-		var params interface{}
-		var route string
+		var requests service.Requests
 
 		if queryByBinding {
-			params = service.QueryRequestsParams{
-				ServiceName: arg1,
-				Provider:    provider,
-			}
-
-			route = fmt.Sprintf("custom/%s/%s", protocol.ServiceRoute, service.QueryRequests)
+			requests, err = serviceutils.QueryRequestsByBinding(cliCtx, arg1, provider)
 		} else {
-			requestContextID, err := hex.DecodeString(arg1)
-			if err != nil {
-				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-				return
-			}
-
-			batchCounter, err := strconv.ParseUint(arg2, 10, 64)
-			if err != nil {
-				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-				return
-			}
-
-			params = service.QueryRequestsByReqCtxParams{
-				RequestContextID: requestContextID,
-				BatchCounter:     batchCounter,
-			}
-
-			route = fmt.Sprintf("custom/%s/%s", protocol.ServiceRoute, service.QueryRequestsByReqCtx)
+			requests, err = serviceutils.QueryRequestsByReqCtx(cliCtx, arg1, arg2)
 		}
 
-		bz, err := cdc.MarshalJSON(params)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
-		res, err := cliCtx.QueryWithData(route, bz)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
 
-		utils.PostProcessResponse(w, cdc, res, cliCtx.Indent)
+		utils.PostProcessResponse(w, cdc, requests, cliCtx.Indent)
 	}
 }
 
 func queryResponseHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		requestID := vars[RequestID]
+		requestIDStr := vars[RequestID]
+
+		requestID, err := service.ConvertRequestID(requestIDStr)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
 
 		params := service.QueryResponseParams{
 			RequestID: requestID,
@@ -304,11 +301,26 @@ func queryResponseHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.Ha
 			return
 		}
 
-		utils.PostProcessResponse(w, cdc, res, cliCtx.Indent)
+		var response service.Response
+		_ = cdc.UnmarshalJSON(res, &response)
+		if response.Empty() {
+			response, err = serviceutils.QueryResponseByTxQuery(cliCtx, params)
+			if err != nil {
+				utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+				return
+			}
+		}
+
+		if response.Empty() {
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, fmt.Sprintf("unknown request: %s", params.RequestID))
+			return
+		}
+
+		utils.PostProcessResponse(w, cdc, response, cliCtx.Indent)
 	}
 }
 
-func qeuryRequestContextHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
+func queryRequestContextHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		requestContextIDStr := vars[RequestContextID]
@@ -323,20 +335,13 @@ func qeuryRequestContextHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) h
 			RequestContextID: requestContextID,
 		}
 
-		bz, err := cdc.MarshalJSON(params)
-		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
-		route := fmt.Sprintf("custom/%s/%s", protocol.ServiceRoute, service.QueryRequestContext)
-		res, err := cliCtx.QueryWithData(route, bz)
+		requestContext, err := serviceutils.QueryRequestContext(cliCtx, params)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
 
-		utils.PostProcessResponse(w, cdc, res, cliCtx.Indent)
+		utils.PostProcessResponse(w, cdc, requestContext, cliCtx.Indent)
 	}
 }
 
@@ -391,8 +396,8 @@ func queryEarnedFeesHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.
 			return
 		}
 
-		params := service.QueryFeesParams{
-			Address: provider,
+		params := service.QueryEarnedFeesParams{
+			Provider: provider,
 		}
 
 		bz, err := cdc.MarshalJSON(params)
@@ -401,7 +406,7 @@ func queryEarnedFeesHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.
 			return
 		}
 
-		route := fmt.Sprintf("custom/%s/%s", protocol.ServiceRoute, service.QueryFees)
+		route := fmt.Sprintf("custom/%s/%s", protocol.ServiceRoute, service.QueryEarnedFees)
 		res, err := cliCtx.QueryWithData(route, bz)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())

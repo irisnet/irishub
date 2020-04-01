@@ -57,13 +57,13 @@ func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec
 		refundServiceDepositHandlerFn(cdc, cliCtx),
 	).Methods("POST")
 
-	// request a service binding
+	// initiate a service call
 	r.HandleFunc(
-		"/service/requests",
+		"/service/contexts",
 		requestServiceHandlerFn(cdc, cliCtx),
 	).Methods("POST")
 
-	// respond a service request
+	// respond to a service request
 	r.HandleFunc(
 		"/service/responses",
 		respondServiceHandlerFn(cdc, cliCtx),
@@ -93,7 +93,7 @@ func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec
 		updateRequestContextHandlerFn(cdc, cliCtx),
 	).Methods("PUT")
 
-	// withdraw the earned fees
+	// withdraw the earned fees of a provider
 	r.HandleFunc(
 		fmt.Sprintf("/service/fees/{%s}/withdraw", Provider),
 		withdrawEarnedFeesHandlerFn(cdc, cliCtx),
@@ -116,12 +116,14 @@ type bindServiceReq struct {
 	Provider    string       `json:"provider"`
 	Deposit     string       `json:"deposit"`
 	Pricing     string       `json:"pricing"`
+	MinRespTime uint64       `json:"min_resp_time"`
 }
 
 type updateServiceBindingReq struct {
-	BaseTx  utils.BaseTx `json:"base_tx"` // basic tx info
-	Deposit string       `json:"deposit"`
-	Pricing string       `json:"pricing"`
+	BaseTx      utils.BaseTx `json:"base_tx"` // basic tx info
+	Deposit     string       `json:"deposit"`
+	Pricing     string       `json:"pricing"`
+	MinRespTime uint64       `json:"min_resp_time"`
 }
 
 type setWithdrawAddrReq struct {
@@ -129,11 +131,11 @@ type setWithdrawAddrReq struct {
 	WithdrawAddress string       `json:"withdraw_address"`
 }
 
-type disableServiceReq struct {
+type disableServiceBindingReq struct {
 	BaseTx utils.BaseTx `json:"base_tx"` // basic tx info`
 }
 
-type enableServiceReq struct {
+type enableServiceBindingReq struct {
 	BaseTx  utils.BaseTx `json:"base_tx"` // basic tx info
 	Deposit string       `json:"deposit"`
 }
@@ -142,7 +144,7 @@ type refundServiceDepositReq struct {
 	BaseTx utils.BaseTx `json:"base_tx"` // basic tx info`
 }
 
-type requestServiceReq struct {
+type callServiceReq struct {
 	BaseTx            utils.BaseTx `json:"base_tx"` // basic tx info
 	ServiceName       string       `json:"service_name"`
 	Providers         []string     `json:"providers"`
@@ -160,8 +162,8 @@ type respondServiceReq struct {
 	BaseTx    utils.BaseTx `json:"base_tx"` // basic tx info
 	RequestID string       `json:"request_id"`
 	Provider  string       `json:"provider"`
+	Result    string       `json:"result"`
 	Output    string       `json:"output"`
-	Error     string       `json:"error"`
 }
 
 type pauseRequestContextReq struct {
@@ -251,7 +253,7 @@ func bindServiceHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Hand
 			return
 		}
 
-		msg := service.NewMsgBindService(req.ServiceName, provider, deposit, req.Pricing)
+		msg := service.NewMsgBindService(req.ServiceName, provider, deposit, req.Pricing, req.MinRespTime)
 		if err := msg.ValidateBasic(); err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -296,7 +298,7 @@ func updateServiceBindingHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) 
 			}
 		}
 
-		msg := service.NewMsgUpdateServiceBinding(serviceName, provider, deposit, req.Pricing)
+		msg := service.NewMsgUpdateServiceBinding(serviceName, provider, deposit, req.Pricing, req.MinRespTime)
 		if err := msg.ValidateBasic(); err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -362,7 +364,7 @@ func disableServiceHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.H
 			return
 		}
 
-		var req disableServiceReq
+		var req disableServiceBindingReq
 		err = utils.ReadPostBody(w, r, cdc, &req)
 		if err != nil {
 			return
@@ -373,7 +375,7 @@ func disableServiceHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.H
 			return
 		}
 
-		msg := service.NewMsgDisableService(serviceName, provider)
+		msg := service.NewMsgDisableServiceBinding(serviceName, provider)
 		if err := msg.ValidateBasic(); err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -398,7 +400,7 @@ func enableServiceHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Ha
 			return
 		}
 
-		var req enableServiceReq
+		var req enableServiceBindingReq
 		err = utils.ReadPostBody(w, r, cdc, &req)
 		if err != nil {
 			return
@@ -418,7 +420,7 @@ func enableServiceHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Ha
 			}
 		}
 
-		msg := service.NewMsgEnableService(serviceName, provider, deposit)
+		msg := service.NewMsgEnableServiceBinding(serviceName, provider, deposit)
 		if err := msg.ValidateBasic(); err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -468,7 +470,7 @@ func refundServiceDepositHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) 
 
 func requestServiceHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req requestServiceReq
+		var req callServiceReq
 		err := utils.ReadPostBody(w, r, cdc, &req)
 		if err != nil {
 			return
@@ -502,7 +504,7 @@ func requestServiceHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.H
 			providers = append(providers, provider)
 		}
 
-		msg := service.NewMsgRequestService(
+		msg := service.NewMsgCallService(
 			req.ServiceName, providers, consumer, req.Input, serviceFeeCap,
 			req.Timeout, req.SuperMode, req.Repeated, req.RepeatedFrequency, req.RepeatedTotal,
 		)
@@ -525,6 +527,13 @@ func respondServiceHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.H
 			return
 		}
 
+		requestIDStr := req.RequestID
+		requestID, err := service.ConvertRequestID(requestIDStr)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
 		baseReq := req.BaseTx.Sanitize()
 		if !baseReq.ValidateBasic(w) {
 			return
@@ -536,7 +545,7 @@ func respondServiceHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.H
 			return
 		}
 
-		msg := service.NewMsgRespondService(req.RequestID, provider, req.Output, req.Error)
+		msg := service.NewMsgRespondService(requestID, provider, req.Result, req.Output)
 		if err = msg.ValidateBasic(); err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return

@@ -1,5 +1,6 @@
 package exported
 
-type Token interface {
+type TokenI interface {
 	GetDenom() string
+	GetDecimal() uint8
 }

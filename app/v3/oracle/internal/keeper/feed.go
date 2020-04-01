@@ -105,8 +105,7 @@ func (k Keeper) Dequeue(ctx sdk.Context, feedName string, state service.RequestC
 }
 
 //dequeueAndEnqueue will move feedName  from the 'dequeueState' queue to a 'enqueueState' queue
-func (k Keeper) dequeueAndEnqueue(ctx sdk.Context,
-	feedName string,
+func (k Keeper) dequeueAndEnqueue(ctx sdk.Context, feedName string,
 	dequeueState, enqueueState service.RequestContextState) {
 	store := ctx.KVStore(k.storeKey)
 	store.Delete(GetFeedStateKey(feedName, dequeueState))

@@ -258,9 +258,9 @@ func (p *GovParams) ReadOnly() bool {
 
 // default minting module parameters
 func DefaultParams() GovParams {
-	var criticalMinDeposit, _ = sdk.IrisCoinType.ConvertToMinDenomCoin(fmt.Sprintf("%d%s", CRITICAL_DEPOSIT, sdk.Iris))
-	var importantMinDeposit, _ = sdk.IrisCoinType.ConvertToMinDenomCoin(fmt.Sprintf("%d%s", IMPORTANT_DEPOSIT, sdk.Iris))
-	var normalMinDeposit, _ = sdk.IrisCoinType.ConvertToMinDenomCoin(fmt.Sprintf("%d%s", NORMAL_DEPOSIT, sdk.Iris))
+	var criticalMinDeposit, _ = sdk.IrisCoinType.ConvertToCoin(fmt.Sprintf("%d%s", CRITICAL_DEPOSIT, sdk.Iris))
+	var importantMinDeposit, _ = sdk.IrisCoinType.ConvertToCoin(fmt.Sprintf("%d%s", IMPORTANT_DEPOSIT, sdk.Iris))
+	var normalMinDeposit, _ = sdk.IrisCoinType.ConvertToCoin(fmt.Sprintf("%d%s", NORMAL_DEPOSIT, sdk.Iris))
 
 	if sdk.NetworkType == sdk.Mainnet {
 		return GovParams{
@@ -326,9 +326,9 @@ func DefaultParams() GovParams {
 }
 
 func DefaultParamsForTest() GovParams {
-	var criticalMinDeposit, _ = sdk.IrisCoinType.ConvertToMinDenomCoin(fmt.Sprintf("%d%s", 10, sdk.Iris))
-	var importantMinDeposit, _ = sdk.IrisCoinType.ConvertToMinDenomCoin(fmt.Sprintf("%d%s", 10, sdk.Iris))
-	var normalMinDeposit, _ = sdk.IrisCoinType.ConvertToMinDenomCoin(fmt.Sprintf("%d%s", 10, sdk.Iris))
+	var criticalMinDeposit, _ = sdk.IrisCoinType.ConvertToCoin(fmt.Sprintf("%d%s", 10, sdk.Iris))
+	var importantMinDeposit, _ = sdk.IrisCoinType.ConvertToCoin(fmt.Sprintf("%d%s", 10, sdk.Iris))
+	var normalMinDeposit, _ = sdk.IrisCoinType.ConvertToCoin(fmt.Sprintf("%d%s", 10, sdk.Iris))
 
 	return GovParams{
 		CriticalDepositPeriod: time.Duration(30 * time.Second),
@@ -462,8 +462,8 @@ func validateDepositProcedure(dp DepositProcedure, level string) sdk.Error {
 		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidMinDepositDenom, fmt.Sprintf(level+"MinDeposit denom should be %s!", sdk.IrisAtto))
 	}
 
-	LowerBound, _ := sdk.IrisCoinType.ConvertToMinDenomCoin(fmt.Sprintf("%d%s", LOWER_BOUND_AMOUNT, sdk.Iris))
-	UpperBound, _ := sdk.IrisCoinType.ConvertToMinDenomCoin(fmt.Sprintf("%d%s", UPPER_BOUND_AMOUNT, sdk.Iris))
+	LowerBound, _ := sdk.IrisCoinType.ConvertToCoin(fmt.Sprintf("%d%s", LOWER_BOUND_AMOUNT, sdk.Iris))
+	UpperBound, _ := sdk.IrisCoinType.ConvertToCoin(fmt.Sprintf("%d%s", UPPER_BOUND_AMOUNT, sdk.Iris))
 
 	if dp.MinDeposit[0].Amount.LT(LowerBound.Amount) || dp.MinDeposit[0].Amount.GT(UpperBound.Amount) {
 		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidMinDepositAmount, fmt.Sprintf(level+"MinDepositAmount"+dp.MinDeposit[0].String()+" should be larger than 10iris and less than 10000iris"))

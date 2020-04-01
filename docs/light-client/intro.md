@@ -39,13 +39,13 @@ The `start` subcommand has the following flags:
 By default, IRISLCD doesn't trust the connected full node. But if you are sure about that the connected full node is trustable, then you should run IRISLCD with `--trust-node` flag:
 
 ```bash
-irislcd start --node=tcp://localhost:26657 --chain-id=<chain-id> --trust-node
+irislcd start --node=tcp://localhost:26657 --chain-id=irishub --trust-node
 ```
 
 To access your IRISLCD instance publicly, you need to specify `--laddr`:
 
 ```bash
-irislcd start --node=tcp://localhost:26657 --chain-id=<chain-id> --laddr=tcp://0.0.0.0:1317 --trust-node
+irislcd start --node=tcp://localhost:26657 --chain-id=irishub --laddr=tcp://0.0.0.0:1317 --trust-node
 ```
 
 ## REST APIs
@@ -142,27 +142,27 @@ This api supports the following special parameters. By default, their values are
 ### Asset module APIs
 
 1. `POST /asset/tokens`: Issue a token
-2. `PUT /asset/tokens/{token-id}`: Edit an existing token
-3. `POST /asset/tokens/{token-id}/mint`: The asset owner and operator can directly mint tokens to a specified address
-4. `POST /asset/tokens/{token-id}/transfer`: transfer the owner of a token to a new owner
-5. `GET /asset/tokens`: Query tokens by condition
-6. `GET /asset/tokens/{token-id}`: Query token by unique id
+2. `PUT /asset/tokens/{symbol}`: Edit an existing token
+3. `POST /asset/tokens/{symbol}/mint`: Mint tokens to a specified address
+4. `POST /asset/tokens/{symbol}/transfer`: Transfer the owner of a token to a new owner
+5. `GET /asset/tokens/{symbol}`: Query a token by symbol
+6. `GET /asset/tokens`: Query tokens by owner
 7. `GET /asset/tokens/{symbol}/fee`: Query the fees for issuing and minting the specified token
 
 ### Coinswap module APIs
 
-1. `POST /coinswap/liquidities/{id}/deposit`: add liquidities
-2. `POST /coinswap/liquidities/{id}/withdraw`: withdraw liquidities
-3. `POST /coinswap/liquidities/buy`: swap token(buy a fixed number of  token)
-4. `POST /coinswap/liquidities/sell`: swap token(sell a fixed number of  token)
-5. `GET /coinswap/liquidities/{id}`: query liquidity by a liquidity id
+1. `POST /coinswap/liquidities/{voucher-coin-name}/deposit`: add liquidities
+2. `POST /coinswap/liquidities/{voucher-coin-name}/withdraw`: withdraw liquidities
+3. `POST /coinswap/liquidities/buy`: swap token(buy a fixed number of tokens)
+4. `POST /coinswap/liquidities/sell`: swap token(sell a fixed number of tokens)
+5. `GET /coinswap/liquidities/{voucher-coin-name}`: query liquidity by the voucher coin name
 
 ### HTLC module APIs
 
-1. `POST /htlc/htlcs`: 创建一个HTLC
-2. `GET /htlc/htlcs/{hash-lock}`: 通过hash-lock查询一个HTLC
-3. `POST /htlc/htlcs/{hash-lock}/claim`: 将一个OPEN状态的HTLC中锁定的资金发放到收款人地址
-4. `POST /htlc/htlcs/{hash-lock}/refund`: 从一个过期的HTLC中取回退款
+1. `POST /htlc/htlcs`: Create an HTLC
+2. `GET /htlc/htlcs/{hash-lock}`: Query an HTLC by hash-lock
+3. `POST /htlc/htlcs/{hash-lock}/claim`: Claim tokens locked in an OPEN HTLC to the recipient address
+4. `POST /htlc/htlcs/{hash-lock}/refund`: Refund from an expired HTLC
 
 ### Service module APIs
 
@@ -177,13 +177,13 @@ This api supports the following special parameters. By default, their values are
 9. `POST /service/bindings/{service-name}/{provider}/disable`: Disable an available service binding
 10. `POST /service/bindings/{service-name}/{provider}/enable`: Enable an unavailable service binding
 11. `POST /service/bindings/{service-name}/{provider}/refund-deposit`: Refund all deposit from a service binding
-12. `POST /service/requests`: Call a service
+12. `POST /service/contexts`: Initiate a service call
 13. `GET /service/requests/{request-id}`: Query a request by the request ID
 14. `GET /service/requests/{service-name}/{provider}`: Query active requests of a service binding
-15. `GET /service/requests/{request-context-id}/{batch-counter}`: Query requests by the request context ID and batch counter
+15. `GET /service/requests/{request-context-id}/{batch-counter}`: Query active requests by the request context ID and batch counter
 16. `POST /service/responses`: Respond to a service request
 17. `GET /service/responses/{request-id}`: Query a response by the request ID
-18. `GET /service/responses/{request-context-id}/{batch-counter}`: Query responses by the request context ID and batch counter
+18. `GET /service/responses/{request-context-id}/{batch-counter}`: Query active responses by the request context ID and batch counter
 19. `GET /service/contexts/{request-context-id}`: Query a request context
 20. `PUT /service/contexts/{request-context-id}`: Update a request context
 21. `POST /service/contexts/{request-context-id}/pause`: Pause a running request context

@@ -609,12 +609,13 @@ func validateBasicTxMsgs(msgs []sdk.Msg) sdk.Error {
 
 // retrieve the context for the tx w/ txBytes and other memoized values.
 func (app *BaseApp) getContextForTx(mode RunTxMode, txBytes []byte) (ctx sdk.Context) {
-	txHash := hex.EncodeToString(tmhash.Sum(txBytes))
+	txHash := tmhash.Sum(txBytes)
 	ctx = app.getState(mode).ctx.
 		WithTxBytes(txBytes).
 		WithVoteInfos(app.voteInfos).
 		WithConsensusParams(app.consensusParams).
-		WithCoinFlowTrigger(txHash)
+		WithCoinFlowTrigger(hex.EncodeToString(txHash)).
+		WithTxHash(txHash)
 	if mode == RunTxModeSimulate {
 		ctx, _ = ctx.CacheContext()
 	}
@@ -630,6 +631,7 @@ func (app *BaseApp) runMsgs(ctx sdk.Context, msgs []sdk.Msg, mode RunTxMode) (re
 	var code sdk.CodeType
 	var codespace sdk.CodespaceType
 	for msgIdx, msg := range msgs {
+		ctx = ctx.WithMsgIndex(int64(msgIdx))
 		// Match route.
 		msgRoute := msg.Route()
 		handler := app.Engine.GetCurrentProtocol().GetRouter().Route(msgRoute)

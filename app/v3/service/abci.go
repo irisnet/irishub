@@ -1,8 +1,11 @@
 package service
 
 import (
+	"encoding/json"
+
 	cmn "github.com/tendermint/tendermint/libs/common"
 
+	"github.com/irisnet/irishub/app/v3/service/internal/types"
 	sdk "github.com/irisnet/irishub/types"
 )
 
@@ -11,8 +14,6 @@ func EndBlocker(ctx sdk.Context, k Keeper) (tags sdk.Tags) {
 	tags = sdk.NewTags()
 	ctx = ctx.WithCoinFlowTrigger(sdk.ServiceEndBlocker)
 	ctx = ctx.WithLogger(ctx.Logger().With("handler", "endBlock").With("module", "iris/service"))
-
-	k.SetIntraTxCounter(ctx, 0)
 
 	// handler for the active request on expired
 	expiredRequestHandler := func(requestID cmn.HexBytes, request Request) {
@@ -30,51 +31,71 @@ func EndBlocker(ctx sdk.Context, k Keeper) (tags sdk.Tags) {
 	expiredRequestBatchHandler := func(requestContextID cmn.HexBytes, requestContext RequestContext) {
 		if requestContext.BatchState != BATCHCOMPLETED {
 			k.IterateActiveRequests(ctx, requestContextID, requestContext.BatchCounter, expiredRequestHandler)
-
-			if len(requestContext.ModuleName) != 0 {
-				k.Callback(ctx, requestContextID)
-			}
-
-			requestContext.BatchState = BATCHCOMPLETED
+			resContext, completeTags := k.CompleteBatch(ctx, requestContext, requestContextID)
+			requestContext = resContext
+			tags = tags.AppendTags(completeTags)
 		}
 
 		k.DeleteRequestBatchExpiration(ctx, requestContextID, ctx.BlockHeight())
+		k.SetRequestContext(ctx, requestContextID, requestContext)
 
 		if requestContext.State == RUNNING {
 			if requestContext.Repeated && (requestContext.RepeatedTotal < 0 || int64(requestContext.BatchCounter) < requestContext.RepeatedTotal) {
 				k.AddNewRequestBatch(ctx, requestContextID, ctx.BlockHeight()-requestContext.Timeout+int64(requestContext.RepeatedFrequency))
 			} else {
-				requestContext.State = COMPLETED
+				completeContextTags := k.CompleteServiceContext(ctx, requestContext, requestContextID)
+				tags = tags.AppendTags(completeContextTags)
 			}
 		}
 
-		k.SetRequestContext(ctx, requestContextID, requestContext)
+		k.CleanBatch(ctx, requestContext, requestContextID)
 	}
+
+	providerRequests := make(map[string][]string)
 
 	// handler for the new request batch
 	newRequestBatchHandler := func(requestContextID cmn.HexBytes, requestContext RequestContext) {
 		if requestContext.State == RUNNING {
-			providers, totalPrices := k.FilterServiceProviders(ctx, requestContext.ServiceName, requestContext.Providers, requestContext.ServiceFeeCap)
+			providers, totalPrices := k.FilterServiceProviders(
+				ctx, requestContext.ServiceName,
+				requestContext.Providers,
+				requestContext.Timeout,
+				requestContext.ServiceFeeCap,
+				requestContext.Consumer,
+			)
 
-			if len(requestContext.ModuleName) == 0 || len(providers) >= int(requestContext.ResponseThreshold) {
+			if len(providers) > 0 && len(providers) >= int(requestContext.ResponseThreshold) {
 				if !requestContext.SuperMode {
 					if err := k.DeductServiceFees(ctx, requestContext.Consumer, totalPrices); err != nil {
-						requestContext.State = PAUSED
-						k.SetRequestContext(ctx, requestContextID, requestContext)
+						tags = tags.AppendTags(
+							k.OnRequestContextPaused(ctx, requestContext, requestContextID, "insufficient balances"),
+						)
 					}
 				}
 
 				if requestContext.State == RUNNING {
-					requestContext.BatchCounter++
-					requestContext.BatchResponseCount = 0
-					k.SetRequestContext(ctx, requestContextID, requestContext)
-
-					requestTags := k.InitiateRequests(ctx, requestContextID, providers)
+					requestTags := k.InitiateRequests(ctx, requestContextID, providers, providerRequests)
 					k.AddRequestBatchExpiration(ctx, requestContextID, ctx.BlockHeight()+requestContext.Timeout)
 
 					tags = tags.AppendTags(requestTags)
 				}
+			} else {
+				k.SkipCurrentRequestBatch(ctx, requestContextID, requestContext)
 			}
+
+			requestContext, _ := k.GetRequestContext(ctx, requestContextID)
+			batchState := types.BatchState{
+				BatchCounter:       requestContext.BatchCounter,
+				State:              requestContext.BatchState,
+				ResponseThreshold:  requestContext.ResponseThreshold,
+				BatchRequestCount:  requestContext.BatchRequestCount,
+				BatchResponseCount: requestContext.BatchResponseCount,
+			}
+			stateJSON, _ := json.Marshal(batchState)
+			tags = tags.AppendTags(sdk.NewTags(
+				sdk.ActionTag(types.ActionNewBatch, types.TagRequestContextID), []byte(requestContextID.String()),
+				sdk.ActionTag(types.ActionNewBatch, requestContextID.String()), stateJSON,
+			))
 		}
 
 		k.DeleteNewRequestBatch(ctx, requestContextID, ctx.BlockHeight())
@@ -85,6 +106,14 @@ func EndBlocker(ctx sdk.Context, k Keeper) (tags sdk.Tags) {
 
 	// handle the new request batch queue
 	k.IterateNewRequestBatch(ctx, ctx.BlockHeight(), newRequestBatchHandler)
+
+	for provider, requests := range providerRequests {
+		requestsJSON, _ := json.Marshal(requests)
+		tags = tags.AppendTags(sdk.NewTags(
+			sdk.ActionTag(types.ActionNewBatchRequest, types.TagProvider), []byte(provider),
+			sdk.ActionTag(types.ActionNewBatchRequest, provider), requestsJSON,
+		))
+	}
 
 	return
 }

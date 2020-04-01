@@ -17,27 +17,27 @@ type (
 )
 
 const (
-	DefaultCodespace   = types.DefaultCodespace
-	ModuleName         = types.ModuleName
-	FormatUniABSPrefix = types.FormatUniABSPrefix
-	QueryLiquidity     = types.QueryLiquidity
-	DefaultParamSpace  = types.DefaultParamSpace
+	DefaultCodespace       = types.DefaultCodespace
+	ModuleName             = types.ModuleName
+	LiquidityVoucherPrefix = types.LiquidityVoucherPrefix
+	QueryLiquidity         = types.QueryLiquidity
+	DefaultParamSpace      = types.DefaultParamSpace
 )
 
 var (
-	RegisterCodec               = types.RegisterCodec
-	NewMsgSwapOrder             = types.NewMsgSwapOrder
-	NewMsgAddLiquidity          = types.NewMsgAddLiquidity
-	NewMsgRemoveLiquidity       = types.NewMsgRemoveLiquidity
-	NewKeeper                   = keeper.NewKeeper
-	NewQuerier                  = keeper.NewQuerier
-	ErrInvalidDeadline          = types.ErrInvalidDeadline
-	ErrNotPositive              = types.ErrNotPositive
-	ErrConstraintNotMet         = types.ErrConstraintNotMet
-	GetUniId                    = types.GetUniID
-	GetCoinMinDenomFromUniDenom = types.GetCoinMinDenomFromUniDenom
-	GetUniDenom                 = types.GetUniDenom
-	GetUniCoinType              = types.GetUniCoinType
-	CheckUniDenom               = types.CheckUniDenom
-	CheckUniId                  = types.CheckUniID
+	RegisterCodec         = types.RegisterCodec
+	NewMsgSwapOrder       = types.NewMsgSwapOrder
+	NewMsgAddLiquidity    = types.NewMsgAddLiquidity
+	NewMsgRemoveLiquidity = types.NewMsgRemoveLiquidity
+	NewKeeper             = keeper.NewKeeper
+	NewQuerier            = keeper.NewQuerier
+	ErrInvalidDeadline    = types.ErrInvalidDeadline
+	ErrNotPositive        = types.ErrNotPositive
+	ErrConstraintNotMet   = types.ErrConstraintNotMet
+	GetVoucherCoinName    = types.GetVoucherCoinName
+	GetUnderlyingDenom    = types.GetUnderlyingDenom
+	GetVoucherDenom       = types.GetVoucherDenom
+	GetVoucherCoinType    = types.GetVoucherCoinType
+	CheckVoucherDenom     = types.CheckVoucherDenom
+	CheckVoucherCoinName  = types.CheckVoucherCoinName
 )
