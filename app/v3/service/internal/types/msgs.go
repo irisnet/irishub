@@ -1059,8 +1059,14 @@ func ValidateRequestContextUpdating(
 	repeatedFrequency uint64,
 	repeatedTotal int64,
 ) sdk.Error {
-	if err := checkDuplicateProviders(providers); err != nil {
-		return err
+	if len(providers) > MaxProvidersNum {
+		return ErrInvalidProviders(DefaultCodespace, fmt.Sprintf("total number of the providers must not be greater than %d", MaxProvidersNum))
+	}
+
+	if len(providers) > 0 {
+		if err := checkDuplicateProviders(providers); err != nil {
+			return err
+		}
 	}
 
 	if !serviceFeeCap.Empty() && !validServiceCoins(serviceFeeCap) {
