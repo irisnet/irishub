@@ -60,6 +60,9 @@ func (msg MsgRequestRand) ValidateBasic() sdk.Error {
 
 // Implements Msg.
 func (msg MsgRequestRand) GetSignBytes() []byte {
+	if msg.ServiceFeeCap.Empty() {
+		msg.ServiceFeeCap = nil
+	}
 	b, err := msgCdc.MarshalJSON(msg)
 	if err != nil {
 		panic(err)
