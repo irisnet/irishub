@@ -259,7 +259,7 @@ func handleMsgUpdateRequestContext(ctx sdk.Context, k Keeper, msg MsgUpdateReque
 	}
 
 	if err := k.UpdateRequestContext(
-		ctx, msg.RequestContextID, msg.Providers, msg.ServiceFeeCap,
+		ctx, msg.RequestContextID, msg.Providers, 0, msg.ServiceFeeCap,
 		msg.Timeout, msg.RepeatedFrequency, msg.RepeatedTotal, msg.Consumer,
 	); err != nil {
 		return err.Result()
