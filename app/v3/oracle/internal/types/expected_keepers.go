@@ -42,6 +42,7 @@ type ServiceKeeper interface {
 		ctx sdk.Context,
 		requestContextID cmn.HexBytes,
 		providers []sdk.AccAddress,
+		respThreshold uint16,
 		serviceFeeCap sdk.Coins,
 		timeout int64,
 		repeatedFreq uint64,

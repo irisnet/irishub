@@ -3,18 +3,18 @@ package keeper
 import (
 	"testing"
 
-	"github.com/irisnet/irishub/app/v3/service/exported"
+	"github.com/stretchr/testify/require"
 
 	"github.com/irisnet/irishub/app/v3/oracle/internal/types"
+	"github.com/irisnet/irishub/app/v3/service/exported"
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/stretchr/testify/require"
 )
 
 func TestFeed(t *testing.T) {
 	ctx, keeper, acc := createTestInput(t, sdk.NewInt(1000000), 2)
 	msg := types.MsgCreateFeed{
 		FeedName:          "ethPrice",
-		ServiceName:       "GetRthPrice",
+		ServiceName:       "GetEthPrice",
 		AggregateFunc:     "avg",
 		ValueJsonPath:     "high",
 		LatestHistory:     5,
