@@ -18,6 +18,7 @@ func (k Keeper) AddServiceBinding(
 	provider sdk.AccAddress,
 	deposit sdk.Coins,
 	pricing string,
+	minRespTime uint64,
 ) sdk.Error {
 	if _, found := k.GetServiceDefinition(ctx, serviceName); !found {
 		return types.ErrUnknownServiceDefinition(k.codespace, serviceName)
@@ -25,6 +26,11 @@ func (k Keeper) AddServiceBinding(
 
 	if _, found := k.GetServiceBinding(ctx, serviceName, provider); found {
 		return types.ErrServiceBindingExists(k.codespace)
+	}
+
+	maxReqTimeout := k.GetParamSet(ctx).MaxRequestTimeout
+	if minRespTime > uint64(maxReqTimeout) {
+		return types.ErrInvalidMinRespTime(k.codespace, fmt.Sprintf("minimum response time [%d] must not be greater than maximum request timeout [%d]", minRespTime, maxReqTimeout))
 	}
 
 	parsedPricing, err := k.ParsePricing(ctx, pricing)
@@ -50,7 +56,7 @@ func (k Keeper) AddServiceBinding(
 	available := true
 	disabledTime := time.Time{}
 
-	svcBinding := types.NewServiceBinding(serviceName, provider, deposit, pricing, available, disabledTime)
+	svcBinding := types.NewServiceBinding(serviceName, provider, deposit, pricing, minRespTime, available, disabledTime)
 	k.SetServiceBinding(ctx, svcBinding)
 
 	k.SetPricing(ctx, serviceName, provider, parsedPricing)
@@ -65,6 +71,7 @@ func (k Keeper) UpdateServiceBinding(
 	provider sdk.AccAddress,
 	deposit sdk.Coins,
 	pricing string,
+	minRespTime uint64,
 ) (err sdk.Error) {
 	binding, found := k.GetServiceBinding(ctx, serviceName, provider)
 	if !found {
@@ -72,6 +79,16 @@ func (k Keeper) UpdateServiceBinding(
 	}
 
 	updated := false
+
+	if minRespTime != 0 {
+		maxReqTimeout := k.GetParamSet(ctx).MaxRequestTimeout
+		if minRespTime > uint64(maxReqTimeout) {
+			return types.ErrInvalidMinRespTime(k.codespace, fmt.Sprintf("minimum response time [%d] must not be greater than maximum request timeout [%d]", minRespTime, maxReqTimeout))
+		}
+
+		binding.MinRespTime = minRespTime
+		updated = true
+	}
 
 	// add the deposit
 	if !deposit.Empty() {
@@ -121,8 +138,8 @@ func (k Keeper) UpdateServiceBinding(
 	return nil
 }
 
-// DisableService disables the specified service binding
-func (k Keeper) DisableService(ctx sdk.Context, serviceName string, provider sdk.AccAddress) sdk.Error {
+// DisableServiceBinding disables the specified service binding
+func (k Keeper) DisableServiceBinding(ctx sdk.Context, serviceName string, provider sdk.AccAddress) sdk.Error {
 	binding, found := k.GetServiceBinding(ctx, serviceName, provider)
 	if !found {
 		return types.ErrUnknownServiceBinding(k.codespace)
@@ -140,8 +157,8 @@ func (k Keeper) DisableService(ctx sdk.Context, serviceName string, provider sdk
 	return nil
 }
 
-// EnableService enables the specified service binding
-func (k Keeper) EnableService(ctx sdk.Context, serviceName string, provider sdk.AccAddress, deposit sdk.Coins) sdk.Error {
+// EnableServiceBinding enables the specified service binding
+func (k Keeper) EnableServiceBinding(ctx sdk.Context, serviceName string, provider sdk.AccAddress, deposit sdk.Coins) sdk.Error {
 	binding, found := k.GetServiceBinding(ctx, serviceName, provider)
 	if !found {
 		return types.ErrUnknownServiceBinding(k.codespace)
@@ -158,7 +175,7 @@ func (k Keeper) EnableService(ctx sdk.Context, serviceName string, provider sdk.
 
 	minDeposit := k.getMinDeposit(ctx, k.GetPricing(ctx, serviceName, provider))
 	if !binding.Deposit.IsAllGTE(minDeposit) {
-		return types.ErrInvalidDeposit(k.codespace, fmt.Sprintf("insufficient deposit: minimal deposit %s, %s got", minDeposit, binding.Deposit))
+		return types.ErrInvalidDeposit(k.codespace, fmt.Sprintf("insufficient deposit: minimum deposit %s, %s got", minDeposit, binding.Deposit))
 	}
 
 	if !deposit.Empty() {
@@ -212,7 +229,7 @@ func (k Keeper) RefundDeposit(ctx sdk.Context, serviceName string, provider sdk.
 	return nil
 }
 
-// RefundDeposits refunds the deposits of all the binding services
+// RefundDeposits refunds the deposits of all the service bindings
 func (k Keeper) RefundDeposits(ctx sdk.Context) sdk.Error {
 	iterator := k.AllServiceBindingsIterator(ctx)
 	defer iterator.Close()
@@ -297,7 +314,7 @@ func (k Keeper) ParsePricing(ctx sdk.Context, pricing string) (p types.Pricing, 
 	return p, nil
 }
 
-// SetPricing sets the pricing
+// SetPricing sets the pricing for the specified service binding
 func (k Keeper) SetPricing(
 	ctx sdk.Context,
 	serviceName string,
@@ -310,7 +327,7 @@ func (k Keeper) SetPricing(
 	store.Set(GetPricingKey(serviceName, provider), bz)
 }
 
-// GetPricing retrieves the specified pricing
+// GetPricing retrieves the pricing of the specified service binding
 func (k Keeper) GetPricing(ctx sdk.Context, serviceName string, provider sdk.AccAddress) (pricing types.Pricing) {
 	store := ctx.KVStore(k.storeKey)
 
@@ -341,7 +358,7 @@ func (k Keeper) GetWithdrawAddress(ctx sdk.Context, provider sdk.AccAddress) sdk
 	return sdk.AccAddress(bz)
 }
 
-// IterateWithdrawAddresses iterates through all withdrawAddresses
+// IterateWithdrawAddresses iterates through all withdrawal addresses
 func (k Keeper) IterateWithdrawAddresses(
 	ctx sdk.Context,
 	op func(provider sdk.AccAddress, withdrawAddress sdk.AccAddress) (stop bool),
@@ -361,7 +378,7 @@ func (k Keeper) IterateWithdrawAddresses(
 	}
 }
 
-// ServiceBindingsIterator returns an iterator for all bindings of the specified service
+// ServiceBindingsIterator returns an iterator for all bindings of the specified service definition
 func (k Keeper) ServiceBindingsIterator(ctx sdk.Context, serviceName string) sdk.Iterator {
 	store := ctx.KVStore(k.storeKey)
 	return sdk.KVStorePrefixIterator(store, GetBindingsSubspace(serviceName))
@@ -392,7 +409,7 @@ func (k Keeper) IterateServiceBindings(
 	}
 }
 
-// getMinDeposit gets the minimal deposit required for the service binding
+// getMinDeposit gets the minimum deposit required for the service binding
 func (k Keeper) getMinDeposit(ctx sdk.Context, pricing types.Pricing) sdk.Coins {
 	params := k.GetParamSet(ctx)
 	minDepositMultiple := sdk.NewInt(params.MinDepositMultiple)
@@ -400,7 +417,7 @@ func (k Keeper) getMinDeposit(ctx sdk.Context, pricing types.Pricing) sdk.Coins 
 
 	price := pricing.Price.AmountOf(sdk.IrisAtto)
 
-	// minimal deposit = max(price * minDepositMultiple, minDepositParam)
+	// minimum deposit = max(price * minDepositMultiple, minDepositParam)
 	minDeposit := sdk.NewCoins(sdk.NewCoin(sdk.IrisAtto, price.Mul(minDepositMultiple)))
 	if minDeposit.IsAllLT(minDepositParam) {
 		minDeposit = minDepositParam

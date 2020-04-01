@@ -10,12 +10,13 @@ Asset模块用于管理你在IRIS Hub上发行的资产。
 | [token edit-token](#iriscli-asset-token-edit)   | 编辑通证                   |
 | [token transfer](#iriscli-asset-token-transfer) | 转让通证所有权             |
 | [token mint](#iriscli-asset-token-mint)         | 增发通证到指定账户         |
-| [token tokens](#iriscli-asset-token-tokens)     | 查询符合条件的一组通证信息 |
+| [token token](#iriscli-asset-token-token)       | 查询通证 |
+| [token tokens](#iriscli-asset-token-tokens)     | 查询指定所有者的通证集合 |
 | [token fee](#iriscli-asset-token-fee)           | 查询通证相关费用           |
 
 ## iriscli asset token issue
 
-此命令用于在IRIS Hub上发行新通证。
+发行一个新通证。
 
 ```bash
 iriscli asset token issue [flags]
@@ -51,7 +52,7 @@ iriscli bank send --from=<key-name> --to=<address> --amount=10kitty --fee=0.3iri
 
 ## iriscli asset token edit
 
-编辑通证信息。
+编辑通证。
 
 ```bash
 iriscli asset token edit [symbol] [flags]
@@ -95,7 +96,7 @@ iriscli asset token transfer kitty --to=<new-owner-address> --from=<key-name> --
 
 ## iriscli asset token mint
 
-通证所有者可以直接将通证增发到指定地址。
+增发通证到指定地址。
 
 ```bash
 iriscli asset token mint [symbol] [flags]
@@ -114,20 +115,27 @@ iriscli asset token mint [symbol] [flags]
 iriscli asset token mint kitty --amount=1000000 --from=<key-name> --chain-id=irishub --fee=0.3iris
 ```
 
-## iriscli asset token tokens
+## iriscli asset token token
 
-根据条件查询在IRIS Hub上发行的通证的集合。
+查询通证。
 
 ```bash
-iriscli asset token tokens [flags]
+iriscli asset token token [symbol] [flags]
 ```
 
-**标识：**
+### 查询通证
 
-| 名称，速记 | 类型   | 必须 | 默认 | 描述         |
-| ---------- | ------ | ---- | ---- | ------------ |
-| --symbol | string |      |      | 通证的符号     |
-| --owner    | string |      |      | 通证的所有者 |
+```bash
+iriscli asset token token kitty
+```
+
+## iriscli asset token tokens
+
+查询指定所有者的通证集合。所有者是可选的。
+
+```bash
+iriscli asset token tokens [owner] [flags]
+```
 
 ### 查询所有通证
 
@@ -135,16 +143,10 @@ iriscli asset token tokens [flags]
 iriscli asset token tokens
 ```
 
-### 查询指定的通证
+### 查询指定所有者的通证
 
 ```bash
-iriscli asset token tokens --symbol=kitty
-```
-
-### 查询指定所有者的所有通证
-
-```bash
-iriscli asset token tokens --owner=<address>
+iriscli asset token tokens <owner>
 ```
 
 ## iriscli asset token fee

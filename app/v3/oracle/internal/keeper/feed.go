@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"github.com/irisnet/irishub/app/v3/oracle/internal/types"
+	"github.com/irisnet/irishub/app/v3/service/exported"
 	service "github.com/irisnet/irishub/app/v3/service/exported"
 	sdk "github.com/irisnet/irishub/types"
 	cmn "github.com/tendermint/tendermint/libs/common"
@@ -40,7 +41,11 @@ func (k Keeper) IteratorFeeds(ctx sdk.Context, fn func(feed types.Feed)) {
 }
 
 //IteratorFeedsByState will foreach all feeds by state
-func (k Keeper) IteratorFeedsByState(ctx sdk.Context, state service.RequestContextState, fn func(feed types.Feed)) {
+func (k Keeper) IteratorFeedsByState(
+	ctx sdk.Context,
+	state service.RequestContextState,
+	fn func(feed types.Feed),
+) {
 	store := ctx.KVStore(k.storeKey)
 	iterator := sdk.KVStorePrefixIterator(store, GetFeedStatePrefixKey(state))
 	defer iterator.Close()
@@ -51,7 +56,6 @@ func (k Keeper) IteratorFeedsByState(ctx sdk.Context, state service.RequestConte
 			fn(feed)
 		}
 	}
-	return
 }
 
 //SetFeed will save a feed to store
@@ -65,11 +69,13 @@ func (k Keeper) SetFeed(ctx sdk.Context, feed types.Feed) {
 }
 
 //SetFeedValue will save a feed result to store
-func (k Keeper) SetFeedValue(ctx sdk.Context,
+func (k Keeper) SetFeedValue(
+	ctx sdk.Context,
 	feedName string,
 	batchCounter uint64,
 	latestHistory uint64,
-	value types.FeedValue) {
+	value types.FeedValue,
+) {
 	store := ctx.KVStore(k.storeKey)
 	counter := k.getFeedValuesCnt(ctx, feedName)
 	delta := counter - int(latestHistory)
@@ -105,9 +111,12 @@ func (k Keeper) Dequeue(ctx sdk.Context, feedName string, state service.RequestC
 }
 
 //dequeueAndEnqueue will move feedName  from the 'dequeueState' queue to a 'enqueueState' queue
-func (k Keeper) dequeueAndEnqueue(ctx sdk.Context,
+func (k Keeper) dequeueAndEnqueue(
+	ctx sdk.Context,
 	feedName string,
-	dequeueState, enqueueState service.RequestContextState) {
+	dequeueState service.RequestContextState,
+	enqueueState service.RequestContextState,
+) {
 	store := ctx.KVStore(k.storeKey)
 	store.Delete(GetFeedStateKey(feedName, dequeueState))
 
@@ -133,4 +142,21 @@ func (k Keeper) deleteOldestFeedValue(ctx sdk.Context, feedName string, delta in
 		store.Delete(iterator.Key())
 		i++
 	}
+}
+
+func (k Keeper) ResetFeedEntryState(ctx sdk.Context) sdk.Error {
+	k.IteratorFeedsByState(
+		ctx,
+		exported.RUNNING,
+		func(feed types.Feed) {
+			k.dequeueAndEnqueue(
+				ctx,
+				feed.FeedName,
+				exported.RUNNING,
+				exported.PAUSED,
+			)
+		},
+	)
+
+	return nil
 }

@@ -41,7 +41,8 @@ func TestIrisCLIOracle(t *testing.T) {
 	serviceName := "oracle"
 	deposit := "10iris"
 	priceAmt := 1 // 1iris
-	pricing := fmt.Sprintf(`{"price":%diris}`, priceAmt)
+	pricing := fmt.Sprintf(`{"price":"%diris"}`, priceAmt)
+	minRespTime := uint64(5)
 	serviceFeeCap := "10iris"
 	input := `{"pair":"iris-usdt"}`
 	timeout := int64(5)
@@ -51,7 +52,7 @@ func TestIrisCLIOracle(t *testing.T) {
 	output := `{"last":100}`
 
 	// bind service
-	_ = bindService(t, flags, serviceName, deposit, pricing, port)
+	_ = bindService(t, flags, serviceName, deposit, pricing, minRespTime, port)
 
 	//create feed
 	cfCmdStr := fmt.Sprintf("iriscli oracle create %v", flags)
@@ -145,11 +146,12 @@ func respondService(t *testing.T, requestID string, flags string, result string,
 	return requestID, rsStr
 }
 
-func bindService(t *testing.T, flags string, serviceName string, deposit string, pricing string, port string) string {
+func bindService(t *testing.T, flags string, serviceName string, deposit string, pricing string, minRespTime uint64, port string) string {
 	sbStr := fmt.Sprintf("iriscli service bind %v", flags)
 	sbStr += fmt.Sprintf(" --service-name=%s", serviceName)
 	sbStr += fmt.Sprintf(" --deposit=%s", deposit)
 	sbStr += fmt.Sprintf(" --pricing=%s", pricing)
+	sbStr += fmt.Sprintf(" --min-resp-time=%d", minRespTime)
 	sbStr += fmt.Sprintf(" --fee=%s", "0.4iris")
 
 	sbStrFoo := sbStr + fmt.Sprintf(" --from=%s", "foo")

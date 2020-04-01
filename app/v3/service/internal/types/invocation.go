@@ -77,6 +77,31 @@ func NewRequestContext(
 }
 
 // Empty returns true if empty
+func (rc RequestContext) Validate() sdk.Error {
+	if err := ValidateServiceName(rc.ServiceName); err != nil {
+		return err
+	}
+
+	if err := ValidateProvidersNoEmpty(rc.Providers); err != nil {
+		return err
+	}
+
+	if err := ValidateConsumer((rc.Consumer)); err != nil {
+		return err
+	}
+
+	if err := ValidateInput(rc.Input); err != nil {
+		return err
+	}
+
+	if err := ValidateServiceFeeCap(rc.ServiceFeeCap); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Empty returns true if empty
 func (rc RequestContext) Empty() bool {
 	return reflect.DeepEqual(rc, RequestContext{})
 }
@@ -111,10 +136,23 @@ func (rc RequestContext) String() string {
 	State:                   %s
 	ResponseThreshold:       %d
 	ModuleName:              %s`,
-		rc.ServiceName, providers, rc.Consumer, rc.Input, rc.ServiceFeeCap.String(),
-		rc.Timeout, rc.SuperMode, rc.Repeated, rc.RepeatedFrequency, rc.RepeatedTotal,
-		rc.BatchCounter, rc.BatchRequestCount, rc.BatchResponseCount, rc.BatchState, rc.State,
-		rc.ResponseThreshold, rc.ModuleName,
+		rc.ServiceName,
+		providers,
+		rc.Consumer,
+		rc.Input,
+		rc.ServiceFeeCap.String(),
+		rc.Timeout,
+		rc.SuperMode,
+		rc.Repeated,
+		rc.RepeatedFrequency,
+		rc.RepeatedTotal,
+		rc.BatchCounter,
+		rc.BatchRequestCount,
+		rc.BatchResponseCount,
+		rc.BatchState,
+		rc.State,
+		rc.ResponseThreshold,
+		rc.ModuleName,
 	)
 }
 
@@ -148,10 +186,23 @@ func (rc RequestContext) HumanString(converter sdk.CoinsConverter) string {
 	State:                   %s
 	ResponseThreshold:       %d
 	ModuleName:              %s`,
-		rc.ServiceName, providers, rc.Consumer, rc.Input, converter.ToMainUnit(rc.ServiceFeeCap),
-		rc.Timeout, rc.SuperMode, rc.Repeated, rc.RepeatedFrequency, rc.RepeatedTotal,
-		rc.BatchCounter, rc.BatchRequestCount, rc.BatchResponseCount, rc.BatchState, rc.State,
-		rc.ResponseThreshold, rc.ModuleName,
+		rc.ServiceName,
+		providers,
+		rc.Consumer,
+		rc.Input,
+		converter.ToMainUnit(rc.ServiceFeeCap),
+		rc.Timeout,
+		rc.SuperMode,
+		rc.Repeated,
+		rc.RepeatedFrequency,
+		rc.RepeatedTotal,
+		rc.BatchCounter,
+		rc.BatchRequestCount,
+		rc.BatchResponseCount,
+		rc.BatchState,
+		rc.State,
+		rc.ResponseThreshold,
+		rc.ModuleName,
 	)
 }
 
@@ -244,9 +295,17 @@ func (r Request) String() string {
 	ExpirationHeight:        %d
 	RequestContextID:        %s
 	BatchCounter:            %d`,
-		r.ID.String(), r.ServiceName, r.Provider, r.Consumer, r.Input, r.ServiceFee.String(),
-		r.SuperMode, r.RequestHeight, r.ExpirationHeight,
-		r.RequestContextID.String(), r.RequestContextBatchCounter,
+		r.ID.String(),
+		r.ServiceName,
+		r.Provider,
+		r.Consumer,
+		r.Input,
+		r.ServiceFee.String(),
+		r.SuperMode,
+		r.RequestHeight,
+		r.ExpirationHeight,
+		r.RequestContextID.String(),
+		r.RequestContextBatchCounter,
 	)
 }
 
@@ -264,9 +323,17 @@ func (r Request) HumanString(converter sdk.CoinsConverter) string {
 	ExpirationHeight:        %d
 	RequestContextID:        %s
 	BatchCounter:            %d`,
-		r.ID.String(), r.ServiceName, r.Provider, r.Consumer, r.Input, converter.ToMainUnit(r.ServiceFee),
-		r.SuperMode, r.RequestHeight, r.ExpirationHeight,
-		r.RequestContextID.String(), r.RequestContextBatchCounter,
+		r.ID.String(),
+		r.ServiceName,
+		r.Provider,
+		r.Consumer,
+		r.Input,
+		converter.ToMainUnit(r.ServiceFee),
+		r.SuperMode,
+		r.RequestHeight,
+		r.ExpirationHeight,
+		r.RequestContextID.String(),
+		r.RequestContextBatchCounter,
 	)
 }
 
@@ -344,7 +411,10 @@ func (r Response) String() string {
 	Output:                  %s
 	RequestContextID:        %s
 	BatchCounter:            %d`,
-		r.Provider, r.Consumer, r.Result, r.Output,
+		r.Provider,
+		r.Consumer,
+		r.Result,
+		r.Output,
 		r.RequestContextID.String(),
 		r.RequestContextBatchCounter,
 	)
@@ -403,7 +473,8 @@ func (e EarnedFees) String() string {
 	return fmt.Sprintf(`EarnedFees:
 	Address:                 %s
 	Coins:                   %s`,
-		e.Address, e.Coins.String(),
+		e.Address,
+		e.Coins.String(),
 	)
 }
 
@@ -412,7 +483,8 @@ func (e EarnedFees) HumanString(converter sdk.CoinsConverter) string {
 	return fmt.Sprintf(`EarnedFees:
 	Address:                 %s
 	Coins:                   %s`,
-		e.Address, converter.ToMainUnit(e.Coins),
+		e.Address,
+		converter.ToMainUnit(e.Coins),
 	)
 }
 
@@ -564,6 +636,9 @@ func (state *RequestContextBatchState) UnmarshalJSON(data []byte) error {
 // ResponseCallback defines the response callback interface
 type ResponseCallback func(ctx sdk.Context, requestContextID cmn.HexBytes, responses []string, err error) sdk.Tags
 
+// StateCallback defines the state callback interface
+type StateCallback func(ctx sdk.Context, requestContextID cmn.HexBytes, cause string) sdk.Tags
+
 const (
 	RequestIDLen = 58
 	ContextIDLen = 40
@@ -595,7 +670,7 @@ func GenerateRequestContextID(txHash []byte, msgIndex int64) cmn.HexBytes {
 // SplitRequestContextID splits the given contextID to txHash and msgIndex
 func SplitRequestContextID(contextID cmn.HexBytes) (cmn.HexBytes, int64, error) {
 	if len(contextID) != ContextIDLen {
-		return nil, 0, errors.New("invalid request context id")
+		return nil, 0, errors.New("invalid request context ID")
 	}
 	txHash := contextID[0:32]
 	msgIndex := int64(binary.BigEndian.Uint64(contextID[32:40]))
@@ -616,14 +691,16 @@ func GenerateRequestID(requestContextID cmn.HexBytes, requestContextBatchCounter
 	return append(contextID, bz...)
 }
 
-// SplitRequestID splits the given contextID to contextID, batchCounter, requestHeight, batchRequestIndex
+// SplitRequestID splits the given requestID to contextID, batchCounter, requestHeight, batchRequestIndex
 func SplitRequestID(requestID cmn.HexBytes) (cmn.HexBytes, uint64, int64, int16, error) {
 	if len(requestID) != RequestIDLen {
-		return nil, 0, 0, 0, errors.New("invalid request id")
+		return nil, 0, 0, 0, errors.New("invalid request ID")
 	}
+
 	contextID := requestID[0:40]
 	batchCounter := binary.BigEndian.Uint64(requestID[40:48])
 	requestHeight := int64(binary.BigEndian.Uint64(requestID[48:56]))
 	batchRequestIndex := int16(binary.BigEndian.Uint16(requestID[56:]))
+
 	return contextID, batchCounter, requestHeight, batchRequestIndex, nil
 }

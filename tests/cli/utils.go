@@ -421,11 +421,11 @@ func executeGetFeedValue(t *testing.T, cmdStr string) oracle.FeedValues {
 
 func executeGetToken(t *testing.T, cmdStr string) asset.TokenOutput {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
-	var token asset.TokensOutput
+	var token asset.TokenOutput
 	cdc := app.MakeLatestCodec()
 	err := cdc.UnmarshalJSON([]byte(out), &token)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
-	return token[0]
+	return token
 }
 
 func executeWriteCheckErr(t *testing.T, cmdStr string, writes ...string) {

@@ -33,8 +33,8 @@ func NewQuerier(k Keeper) sdk.Querier {
 			return queryRequestsByReqCtx(ctx, req, k)
 		case types.QueryResponses:
 			return queryResponses(ctx, req, k)
-		case types.QueryFees:
-			return queryFees(ctx, req, k)
+		case types.QueryEarnedFees:
+			return queryEarnedFees(ctx, req, k)
 		default:
 			return nil, sdk.ErrUnknownRequest("unknown service query endpoint")
 		}
@@ -264,16 +264,16 @@ func queryResponses(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, s
 	return bz, nil
 }
 
-func queryFees(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sdk.Error) {
-	var params types.QueryFeesParams
+func queryEarnedFees(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sdk.Error) {
+	var params types.QueryEarnedFeesParams
 	err := k.cdc.UnmarshalJSON(req.Data, &params)
 	if err != nil {
 		return nil, sdk.ParseParamsErr(err)
 	}
 
-	fees, found := k.GetEarnedFees(ctx, params.Address)
+	fees, found := k.GetEarnedFees(ctx, params.Provider)
 	if !found {
-		return nil, types.ErrNoEarnedFees(types.DefaultCodespace, params.Address)
+		return nil, types.ErrNoEarnedFees(types.DefaultCodespace, params.Provider)
 	}
 
 	bz, err := codec.MarshalJSONIndent(k.cdc, fees)

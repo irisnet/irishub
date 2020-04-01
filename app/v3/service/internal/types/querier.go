@@ -16,7 +16,7 @@ const (
 	QueryRequestContext   = "context"          // QueryRequestContext
 	QueryRequestsByReqCtx = "requests_by_ctx"  // QueryRequestsByReqCtx
 	QueryResponses        = "responses"        // QueryResponses
-	QueryFees             = "fees"             // QueryFees
+	QueryEarnedFees       = "fees"             // QueryEarnedFees
 )
 
 // QueryDefinitionParams defines the params to query a service definition
@@ -30,7 +30,7 @@ type QueryBindingParams struct {
 	Provider    sdk.AccAddress
 }
 
-// QueryBindingsParams defines the params to query all service bindings of a service
+// QueryBindingsParams defines the params to query all bindings of a service definition
 type QueryBindingsParams struct {
 	ServiceName string
 }
@@ -45,32 +45,35 @@ type QueryRequestParams struct {
 	RequestID []byte
 }
 
-// QueryRequestsParams defines the params to query all requests for a service binding
+// QueryRequestsParams defines the params to query active requests for a service binding
 type QueryRequestsParams struct {
 	ServiceName string
 	Provider    sdk.AccAddress
 }
 
-// QueryResponseParams defines the params to query the response for a request
+// QueryResponseParams defines the params to query the response to a request
 type QueryResponseParams struct {
 	RequestID cmn.HexBytes
 }
 
+// QueryRequestContextParams defines the params to query the request context
 type QueryRequestContextParams struct {
 	RequestContextID cmn.HexBytes
 }
 
+// QueryRequestsByReqCtxParams defines the params to query active requests by the request context ID
 type QueryRequestsByReqCtxParams struct {
 	RequestContextID cmn.HexBytes
 	BatchCounter     uint64
 }
 
+// QueryResponsesParams defines the params to query active responses by the request context ID
 type QueryResponsesParams struct {
 	RequestContextID cmn.HexBytes
 	BatchCounter     uint64
 }
 
-// QueryFeesParams defines the params to query the earned fees for a provider
-type QueryFeesParams struct {
-	Address sdk.AccAddress
+// QueryEarnedFeesParams defines the params to query the earned fees for a provider
+type QueryEarnedFeesParams struct {
+	Provider sdk.AccAddress
 }

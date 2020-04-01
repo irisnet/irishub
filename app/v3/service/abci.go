@@ -59,6 +59,7 @@ func EndBlocker(ctx sdk.Context, k Keeper) (tags sdk.Tags) {
 			providers, totalPrices := k.FilterServiceProviders(
 				ctx, requestContext.ServiceName,
 				requestContext.Providers,
+				requestContext.Timeout,
 				requestContext.ServiceFeeCap,
 				requestContext.Consumer,
 			)
@@ -66,10 +67,9 @@ func EndBlocker(ctx sdk.Context, k Keeper) (tags sdk.Tags) {
 			if len(providers) > 0 && len(providers) >= int(requestContext.ResponseThreshold) {
 				if !requestContext.SuperMode {
 					if err := k.DeductServiceFees(ctx, requestContext.Consumer, totalPrices); err != nil {
-						requestContext.BatchState = BATCHCOMPLETED
-						requestContext.State = PAUSED
-
-						k.SetRequestContext(ctx, requestContextID, requestContext)
+						tags = tags.AppendTags(
+							k.OnRequestContextPaused(ctx, requestContext, requestContextID, "insufficient balances"),
+						)
 					}
 				}
 
@@ -91,10 +91,10 @@ func EndBlocker(ctx sdk.Context, k Keeper) (tags sdk.Tags) {
 				BatchRequestCount:  requestContext.BatchRequestCount,
 				BatchResponseCount: requestContext.BatchResponseCount,
 			}
-			stateJson, _ := json.Marshal(batchState)
+			stateJSON, _ := json.Marshal(batchState)
 			tags = tags.AppendTags(sdk.NewTags(
 				sdk.ActionTag(types.ActionNewBatch, types.TagRequestContextID), []byte(requestContextID.String()),
-				sdk.ActionTag(types.ActionNewBatch, requestContextID.String()), stateJson,
+				sdk.ActionTag(types.ActionNewBatch, requestContextID.String()), stateJSON,
 			))
 		}
 
@@ -108,10 +108,10 @@ func EndBlocker(ctx sdk.Context, k Keeper) (tags sdk.Tags) {
 	k.IterateNewRequestBatch(ctx, ctx.BlockHeight(), newRequestBatchHandler)
 
 	for provider, requests := range providerRequests {
-		requestsJson, _ := json.Marshal(requests)
+		requestsJSON, _ := json.Marshal(requests)
 		tags = tags.AppendTags(sdk.NewTags(
 			sdk.ActionTag(types.ActionNewBatchRequest, types.TagProvider), []byte(provider),
-			sdk.ActionTag(types.ActionNewBatchRequest, provider), requestsJson,
+			sdk.ActionTag(types.ActionNewBatchRequest, provider), requestsJSON,
 		))
 	}
 

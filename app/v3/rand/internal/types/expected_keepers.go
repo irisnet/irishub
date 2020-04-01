@@ -15,6 +15,11 @@ type ServiceKeeper interface {
 		respCallback exported.ResponseCallback,
 	) sdk.Error
 
+	RegisterStateCallback(
+		moduleName string,
+		stateCallback exported.StateCallback,
+	) sdk.Error
+
 	GetRequestContext(
 		ctx sdk.Context,
 		requestContextID cmn.HexBytes,

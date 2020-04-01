@@ -174,6 +174,7 @@ func GetCmdQueryWithdrawAddr(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
+// GetCmdQueryServiceRequest implements the query service request command
 func GetCmdQueryServiceRequest(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "request [request-id]",
@@ -222,6 +223,7 @@ func GetCmdQueryServiceRequest(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
+// GetCmdQueryServiceRequests implements the query service requests command
 func GetCmdQueryServiceRequests(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "requests [service-name] [provider] | [request-context-id] [batch-counter]",
@@ -238,47 +240,15 @@ func GetCmdQueryServiceRequests(cdc *codec.Codec) *cobra.Command {
 				queryByBinding = false
 			}
 
-			var params interface{}
-			var route string
+			var requests service.Requests
 
 			if queryByBinding {
-				params = service.QueryRequestsParams{
-					ServiceName: args[0],
-					Provider:    provider,
-				}
-
-				route = fmt.Sprintf("custom/%s/%s", protocol.ServiceRoute, service.QueryRequests)
+				requests, err = utils.QueryRequestsByBinding(cliCtx, args[0], provider)
 			} else {
-				requestContextID, err := hex.DecodeString(args[0])
-				if err != nil {
-					return err
-				}
-
-				batchCounter, err := strconv.ParseUint(args[1], 10, 64)
-				if err != nil {
-					return err
-				}
-
-				params = service.QueryRequestsByReqCtxParams{
-					RequestContextID: requestContextID,
-					BatchCounter:     batchCounter,
-				}
-
-				route = fmt.Sprintf("custom/%s/%s", protocol.ServiceRoute, service.QueryRequestsByReqCtx)
+				requests, err = utils.QueryRequestsByReqCtx(cliCtx, args[0], args[1])
 			}
 
-			bz, err := cdc.MarshalJSON(params)
 			if err != nil {
-				return err
-			}
-
-			res, err := cliCtx.QueryWithData(route, bz)
-			if err != nil {
-				return err
-			}
-
-			var requests service.Requests
-			if err := cdc.UnmarshalJSON(res, &requests); err != nil {
 				return err
 			}
 
@@ -289,6 +259,7 @@ func GetCmdQueryServiceRequests(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
+// GetCmdQueryServiceResponse implements the query service response command
 func GetCmdQueryServiceResponse(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "response [request-id]",
@@ -337,6 +308,7 @@ func GetCmdQueryServiceResponse(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
+// GetCmdQueryServiceResponses implements the query service responses command
 func GetCmdQueryServiceResponses(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "responses [request-context-id] [batch-counter]",
@@ -384,6 +356,7 @@ func GetCmdQueryServiceResponses(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
+// GetCmdQueryRequestContext implements the query request context command
 func GetCmdQueryRequestContext(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "request-context [request-context-id]",
@@ -414,6 +387,7 @@ func GetCmdQueryRequestContext(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
+// GetCmdQueryEarnedFees implements the query earned fees command
 func GetCmdQueryEarnedFees(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "fees [provider]",
@@ -428,8 +402,8 @@ func GetCmdQueryEarnedFees(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			params := service.QueryFeesParams{
-				Address: provider,
+			params := service.QueryEarnedFeesParams{
+				Provider: provider,
 			}
 
 			bz, err := cdc.MarshalJSON(params)
@@ -437,7 +411,7 @@ func GetCmdQueryEarnedFees(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			route := fmt.Sprintf("custom/%s/%s", protocol.ServiceRoute, service.QueryFees)
+			route := fmt.Sprintf("custom/%s/%s", protocol.ServiceRoute, service.QueryEarnedFees)
 			res, err := cliCtx.QueryWithData(route, bz)
 			if err != nil {
 				return err
