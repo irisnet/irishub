@@ -24,7 +24,7 @@ var (
 type BatchState struct {
 	BatchCounter       uint64                   `json:"batch_counter"`
 	State              RequestContextBatchState `json:"state"`
-	ResponseThreshold  uint16                   `json:"response_threshold"`
+	BatchRespThreshold uint16                   `json:"batch_resp_threshold"`
 	BatchRequestCount  uint16                   `json:"batch_request_count"`
 	BatchResponseCount uint16                   `json:"batch_response_count"`
 }

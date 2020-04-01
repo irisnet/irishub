@@ -22,7 +22,7 @@ func (k Keeper) CompleteBatch(ctx sdk.Context, requestContext types.RequestConte
 	batchState := types.BatchState{
 		BatchCounter:       requestContext.BatchCounter,
 		State:              types.BATCHCOMPLETED,
-		ResponseThreshold:  requestContext.ResponseThreshold,
+		BatchRespThreshold: requestContext.BatchRespThreshold,
 		BatchRequestCount:  requestContext.BatchRequestCount,
 		BatchResponseCount: requestContext.BatchResponseCount,
 	}

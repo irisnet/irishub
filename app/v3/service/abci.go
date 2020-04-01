@@ -87,7 +87,7 @@ func EndBlocker(ctx sdk.Context, k Keeper) (tags sdk.Tags) {
 			batchState := types.BatchState{
 				BatchCounter:       requestContext.BatchCounter,
 				State:              requestContext.BatchState,
-				ResponseThreshold:  requestContext.ResponseThreshold,
+				BatchRespThreshold: requestContext.BatchRespThreshold,
 				BatchRequestCount:  requestContext.BatchRequestCount,
 				BatchResponseCount: requestContext.BatchResponseCount,
 			}

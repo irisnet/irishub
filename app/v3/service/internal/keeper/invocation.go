@@ -75,7 +75,7 @@ func (k Keeper) CreateRequestContext(
 		}
 
 		if responseThreshold < 1 || int(responseThreshold) > len(providers) {
-			return nil, tags, types.ErrInvalidThreshold(k.codespace, fmt.Sprintf("response threshold must be between [1,%d]", len(providers)))
+			return nil, tags, types.ErrInvalidThreshold(k.codespace, fmt.Sprintf("response threshold [%d] must be between [1,%d]", responseThreshold, len(providers)))
 		}
 	}
 
@@ -105,13 +105,14 @@ func (k Keeper) CreateRequestContext(
 	batchCounter := uint64(0)
 	batchRequestCount := uint16(0)
 	batchResponseCount := uint16(0)
+	batchRespThreshold := responseThreshold
 	batchState := types.BATCHCOMPLETED
 
 	requestContext := types.NewRequestContext(
 		serviceName, providers, consumer, input, serviceFeeCap, timeout,
 		superMode, repeated, repeatedFrequency, repeatedTotal, batchCounter,
-		batchRequestCount, batchResponseCount, batchState, state,
-		responseThreshold, moduleName,
+		batchRequestCount, batchResponseCount, batchRespThreshold,
+		batchState, state, responseThreshold, moduleName,
 	)
 
 	requestContextID := types.GenerateRequestContextID(ctx.TxHash(), ctx.MsgIndex())
@@ -135,6 +136,7 @@ func (k Keeper) UpdateRequestContext(
 	ctx sdk.Context,
 	requestContextID cmn.HexBytes,
 	providers []sdk.AccAddress,
+	respThreshold uint16,
 	serviceFeeCap sdk.Coins,
 	timeout int64,
 	repeatedFreq uint64,
@@ -157,14 +159,26 @@ func (k Keeper) UpdateRequestContext(
 		return types.ErrRequestContextCompleted(k.codespace)
 	}
 
-	if len(requestContext.ModuleName) != 0 {
+	if len(requestContext.ModuleName) > 0 {
 		if err := types.ValidateRequestContextUpdating(providers, serviceFeeCap, timeout, repeatedFreq, repeatedTotal); err != nil {
 			return err
 		}
-	}
 
-	if len(providers) > 0 && requestContext.ResponseThreshold > 0 && len(providers) < int(requestContext.ResponseThreshold) {
-		return types.ErrInvalidProviders(k.codespace, fmt.Sprintf("length [%d] of providers must not be less than the response threshold [%d]", len(providers), requestContext.ResponseThreshold))
+		if respThreshold == 0 {
+			respThreshold = requestContext.ResponseThreshold
+		}
+
+		if len(providers) == 0 {
+			providers = requestContext.Providers
+		}
+
+		if respThreshold > uint16(len(providers)) {
+			return types.ErrInvalidThreshold(k.codespace, fmt.Sprintf("response threshold [%d] must be between [1,%d]", respThreshold, len(providers)))
+		}
+
+		if respThreshold > 0 {
+			requestContext.ResponseThreshold = respThreshold
+		}
 	}
 
 	params := k.GetParamSet(ctx)
@@ -391,6 +405,7 @@ func (k Keeper) InitiateRequests(
 	requestContext.BatchState = types.BATCHRUNNING
 	requestContext.BatchResponseCount = 0
 	requestContext.BatchRequestCount = uint16(len(providers))
+	requestContext.BatchRespThreshold = requestContext.ResponseThreshold
 
 	k.SetRequestContext(ctx, requestContextID, requestContext)
 
@@ -412,6 +427,7 @@ func (k Keeper) SkipCurrentRequestBatch(ctx sdk.Context, requestContextID cmn.He
 	requestContext.BatchState = types.BATCHRUNNING
 	requestContext.BatchRequestCount = 0
 	requestContext.BatchResponseCount = 0
+	requestContext.BatchRespThreshold = requestContext.ResponseThreshold
 
 	k.SetRequestContext(ctx, requestContextID, requestContext)
 	k.AddRequestBatchExpiration(ctx, requestContextID, ctx.BlockHeight()+requestContext.Timeout)
@@ -902,7 +918,7 @@ func (k Keeper) Callback(ctx sdk.Context, requestContextID cmn.HexBytes) sdk.Tag
 	respCallback, _ := k.GetResponseCallback(requestContext.ModuleName)
 	outputs := k.GetResponseOutputs(ctx, requestContextID, requestContext.BatchCounter)
 
-	if len(outputs) >= int(requestContext.ResponseThreshold) {
+	if len(outputs) >= int(requestContext.BatchRespThreshold) {
 		return respCallback(ctx, requestContextID, outputs, nil)
 	} else {
 		return respCallback(
@@ -911,7 +927,7 @@ func (k Keeper) Callback(ctx sdk.Context, requestContextID cmn.HexBytes) sdk.Tag
 			outputs,
 			fmt.Errorf(
 				"batch %d at least %d valid outputs required, but %d received",
-				requestContext.BatchCounter, requestContext.ResponseThreshold, len(outputs),
+				requestContext.BatchCounter, requestContext.BatchRespThreshold, len(outputs),
 			),
 		)
 	}

@@ -29,6 +29,7 @@ type RequestContext struct {
 	BatchCounter       uint64                   `json:"batch_counter"`
 	BatchRequestCount  uint16                   `json:"batch_request_count"`
 	BatchResponseCount uint16                   `json:"batch_response_count"`
+	BatchRespThreshold uint16                   `json:"batch_resp_threshold"`
 	BatchState         RequestContextBatchState `json:"batch_state"`
 	State              RequestContextState      `json:"state"`
 	ResponseThreshold  uint16                   `json:"response_threshold"`
@@ -50,6 +51,7 @@ func NewRequestContext(
 	batchCounter uint64,
 	batchRequestCount,
 	batchResponseCount uint16,
+	batchRespThreshold uint16,
 	batchState RequestContextBatchState,
 	state RequestContextState,
 	responseThreshold uint16,
@@ -69,6 +71,7 @@ func NewRequestContext(
 		BatchCounter:       batchCounter,
 		BatchRequestCount:  batchRequestCount,
 		BatchResponseCount: batchResponseCount,
+		BatchRespThreshold: batchRespThreshold,
 		BatchState:         batchState,
 		State:              state,
 		ResponseThreshold:  responseThreshold,
@@ -132,6 +135,7 @@ func (rc RequestContext) String() string {
 	BatchCounter:            %d
 	BatchRequestCount:       %d
 	BatchResponseCount:      %d
+	BatchRespThreshold:      %d
 	BatchState:              %s
 	State:                   %s
 	ResponseThreshold:       %d
@@ -149,6 +153,7 @@ func (rc RequestContext) String() string {
 		rc.BatchCounter,
 		rc.BatchRequestCount,
 		rc.BatchResponseCount,
+    rc.BatchRespThreshold,
 		rc.BatchState,
 		rc.State,
 		rc.ResponseThreshold,
@@ -182,6 +187,7 @@ func (rc RequestContext) HumanString(converter sdk.CoinsConverter) string {
 	BatchCounter:            %d
 	BatchRequestCount:       %d
 	BatchResponseCount:      %d
+	BatchRespThreshold:      %d
 	BatchState:              %s
 	State:                   %s
 	ResponseThreshold:       %d
@@ -199,6 +205,7 @@ func (rc RequestContext) HumanString(converter sdk.CoinsConverter) string {
 		rc.BatchCounter,
 		rc.BatchRequestCount,
 		rc.BatchResponseCount,
+    rc.BatchRespThreshold,
 		rc.BatchState,
 		rc.State,
 		rc.ResponseThreshold,

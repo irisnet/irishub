@@ -163,6 +163,7 @@ func (k Keeper) EditFeed(ctx sdk.Context, msg types.MsgEditFeed) sdk.Error {
 		ctx,
 		feed.RequestContextID,
 		msg.Providers,
+		msg.ResponseThreshold,
 		msg.ServiceFeeCap,
 		msg.Timeout,
 		msg.RepeatedFrequency,

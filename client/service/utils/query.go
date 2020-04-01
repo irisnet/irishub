@@ -64,7 +64,7 @@ func QueryRequestContextByTxQuery(cliCtx context.CLIContext, params service.Quer
 				requestMsg.Consumer, requestMsg.Input, requestMsg.ServiceFeeCap,
 				requestMsg.Timeout, requestMsg.SuperMode, requestMsg.Repeated,
 				requestMsg.RepeatedFrequency, requestMsg.RepeatedTotal,
-				uint64(requestMsg.RepeatedTotal), 0, 0,
+				uint64(requestMsg.RepeatedTotal), 0, 0, 0,
 				service.BATCHCOMPLETED, service.COMPLETED, 0, "",
 			)
 
