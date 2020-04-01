@@ -9,29 +9,35 @@ IRIS Service (a.k.a. "iService") is intended to bridge the gap between the block
 ## Service Definition
 
 ### Service interface schema
-Any user can define services on the blockchain. A service _definition_ must be made in the standard language of [JSON Schema](https://json-schema.org/) and should comprise of two parts: _input_ and _output_.  Here is a simplified example:
+Any user can define services on the blockchain. The interface of a service must be specified in terms of its _input_ and _output_ using the standard language of [JSON Schema](https://json-schema.org/).  Here is an example:
 
 ```json
 {
-  "input": {
-    "type": "object",
-    "properties": {
-      "base": {
-        "description": "base token denom",
-        "type": "string"
-      },
-      "quote": {
-        "description": "quote token denom",
-        "type": "string"
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "service-def-example",
+  "description": "Schema for a service example",
+  "type": "object",
+  "properties":{
+    "input":{
+      "type":"object",
+      "properties":{
+        "base":{
+          "description":"base token denom",
+          "type":"string"
+        },
+        "quote":{
+          "description":"quote token denom",
+          "type":"string"
+        }
       }
-    }
-  },
-  "output": {
-    "type": "object",
-    "properties": {
-      "price": {
-        "description": "price",
-        "type": "number"
+    },
+    "output":{
+      "type":"object",
+      "properties":{
+        "price":{
+          "description":"price",
+          "type":"number"
+        }
       }
     }
   }
@@ -39,7 +45,16 @@ Any user can define services on the blockchain. A service _definition_ must be m
 ```
 
 ### Service result schema
-Service providers respond to a user request, which contains an input object, by sending back a response that contains a _result_ object and an optional output object.   
+Service providers respond to a user request (containing an input object) by sending back a response that consists of a _result_ object and an optional output object, the latter of which is required only when the result code equals 200.  The result object must conform to this [schema](service-result.json), and here is an example of a compliant instance:
+
+```json
+{
+  "result" : {
+    "code": 400,
+    "message": "user input out of range"
+  }
+}
+```
 
 Once you have a definition ready, you can publish it to the blockchain by executing the following command:
 
@@ -59,28 +74,23 @@ Whoever is willing to provide a service as specified by an existing definition c
 A consumer should be able to publish a service request (input) destined to the provider address, and see a response (output) transaction coming back from this address.
 
 ### Pricing
-The pricing object must conform to this [JSON schema](service-pricing.json), and the following is a compliant example:  
+The pricing object must conform to this [schema](service-pricing.json), and the following is a compliant instance:  
 
 ```json
 {
-    "price": [
-        {
-            "denom": "iris",
-            "amount": "0.1"
-        }
-    ],
-    "promotions_by_time": [
-        {
-            "start_time": "2020-01-01T00:00:00Z",
-            "end_time": "2020-03-31T23:59:59Z",
-            "discount": 0.7
-        },
-        {
-            "start_time": "2020-04-01T00:00:00Z",
-            "end_time": "2019-06-30T23:59:59Z",
-            "discount": 0.9
-        }
-    ]
+  "price": "0.1iris",
+  "promotions_by_time": [
+    {
+      "start_time": "2020-01-01T00:00:00Z",
+      "end_time": "2020-03-31T23:59:59Z",
+      "discount": 0.7
+    },
+    {
+      "start_time": "2020-04-01T00:00:00Z",
+      "end_time": "2019-06-30T23:59:59Z",
+      "discount": 0.9
+    }
+  ]
 }
 ```
 
@@ -90,7 +100,7 @@ Operating a service provider signifies serious commitment, therefore, a deposit 
 > **_NOTE:_** `service/DepositMultiple`, `service/MinDeposit` and `service/SlashFraction` are system parameters that can be changed through on-chain [governance](governance.md).
 
 ### Lifecycle
-Service bindings can be updated at any time by their owners to adjust pricing or increase deposit; they can be disabled and re-enabled as well.  If a binding owner no longer wants to run the service provider, she needs to disable the binding and wait for a certain period of time before she can claim the her deposit.
+Service bindings can be updated at any time by their owners to adjust pricing or increase deposit; they can be disabled and re-enabled as well.  If a binding owner no longer wants to run the service provider, she needs to disable the binding and wait for a certain period of time before she can claim back her deposit.
 
 ```bash
 # create a new service binding
@@ -138,24 +148,4 @@ iriscli service schema <schema-name>
 If the service consumer needs to initiate a service invocation request, the service fee specified by the service provider needs to be paid. The service provider needs to respond to the service request within the block height defined by `MaxRequestTimeout`. If the service provider does not respond in time, the deposit of the 'SlashFraction' ratio will be deducted from the service provider's service binding deposit and the service fee will be refunded to the service consumer's return pool. If the service call is responded normally, the system will deduct the `ServiceFeeTax` ratio from the service fee, and add the remaining service fee to the service provider's incoming pool. The service provider/consumer can initiate the `withdraw-fees`/`refund-fees` transaction to retrieve all of the tokens in the incoming/return pool.
 
 ```bash
-# initiate service invocation
-iriscli service call --chain-id=irishub --from=<key-name> --fee=0.3iris --def-chain-id=<def-chain-id> --service-name=<service-name> --method-id=1 --bind-chain-id=<bind-chain-id> --provider=<provider-account-address> --service-fee=1iris --request-data=<request-data>
-
-# query service requests
-iriscli service requests --def-chain-id=<def-chain-id> --service-name=<service-name> --bind-chain-id=<bind-chain-id> --provider=<provider-account-address>
-
-# respond a service invocation
-iriscli service respond --chain-id=irishub --from=<key-name> --fee=0.3iris --request-chain-id=<request-chain-id> --request-id=<request-id (e.g.230-130-0)> --response-data=<response-data>
-
-# query a service response
-iriscli service response --request-chain-id=<request-chain-id> --request-id=<request-id (e.g.230-130-0)>
-
-# query return and incoming fee of a particular address
-iriscli service fees <account-address>
-
-# refund all fees from service return fees
-iriscli service refund-fees --chain-id=irishub --from=<key-name> --fee=0.3iris
-
-# withdraw all fees from service incoming fees
-iriscli service withdraw-fees --chain-id=irishub --from=<key-name> --fee=0.3iris
 ```
