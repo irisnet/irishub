@@ -1122,3 +1122,23 @@ func (k Keeper) GetStateCallback(moduleName string) (types.StateCallback, sdk.Er
 
 	return stateCallback, nil
 }
+
+// ResetRequestContextsStateAndBatch reset request contexts state and batch
+func (k Keeper) ResetRequestContextsStateAndBatch(ctx sdk.Context) sdk.Error {
+	k.IterateRequestContexts(
+		ctx,
+		func(requestContextID cmn.HexBytes, requestContext types.RequestContext) bool {
+			requestContext.State = types.PAUSED
+			
+			requestContext.BatchState = types.BATCHCOMPLETED
+			requestContext.BatchCounter = 0
+			requestContext.BatchRequestCount = 0
+			requestContext.BatchResponseCount = 0
+
+			k.SetRequestContext(ctx, requestContextID, requestContext)
+			return false
+		},
+	)
+
+	return nil
+}

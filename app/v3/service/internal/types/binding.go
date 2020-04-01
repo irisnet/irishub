@@ -42,15 +42,20 @@ func NewServiceBinding(
 // String implements fmt.Stringer
 func (binding ServiceBinding) String() string {
 	return fmt.Sprintf(`ServiceBinding:
-		ServiceName:             %s
-		Provider:                %s
-		Deposit:                 %s
-		Pricing:                 %s
-		MinRespTime:             %d
-		Available:               %v
-		DisabledTime:            %v`,
-		binding.ServiceName, binding.Provider, binding.Deposit.MainUnitString(),
-		binding.Pricing, binding.MinRespTime, binding.Available, binding.DisabledTime,
+	ServiceName:             %s
+	Provider:                %s
+	Deposit:                 %s
+	Pricing:                 %s
+	MinRespTime:             %d
+	Available:               %v
+	DisabledTime:            %v`,
+		binding.ServiceName,
+		binding.Provider,
+		binding.Deposit.MainUnitString(),
+		binding.Pricing,
+		binding.MinRespTime,
+		binding.Available,
+		binding.DisabledTime,
 	)
 }
 
@@ -133,7 +138,7 @@ func GetDiscountByVolume(pricing Pricing, volume uint64) sdk.Dec {
 
 // ValidatePricing validates the given pricing
 func ValidatePricing(pricing Pricing) sdk.Error {
-	if !validServiceCoins(pricing.Price) {
+	if !ValidateServiceCoins(pricing.Price) {
 		return ErrInvalidPricing(DefaultCodespace, "invalid price")
 	}
 
@@ -160,24 +165,20 @@ func ValidatePricing(pricing Pricing) sdk.Error {
 
 // Validate validates the service binding
 func (binding ServiceBinding) Validate() sdk.Error {
-	if len(binding.Provider) == 0 {
-		return ErrInvalidAddress(DefaultCodespace, "provider missing")
+	if err := ValidateProvider(binding.Provider); err != nil {
+		return err
 	}
 
 	if err := ValidateServiceName(binding.ServiceName); err != nil {
 		return err
 	}
 
-	if !validServiceCoins(binding.Deposit) {
-		return ErrInvalidDeposit(DefaultCodespace, fmt.Sprintf("invalid deposit: %s", binding.Deposit))
+	if err := ValidateServiceDeposit(binding.Deposit); err != nil {
+		return err
 	}
 
-	if binding.MinRespTime == 0 {
-		return ErrInvalidMinRespTime(DefaultCodespace, "minimum response time must be greater than 0")
-	}
-
-	if len(binding.Pricing) == 0 {
-		return ErrInvalidPricing(DefaultCodespace, "pricing missing")
+	if err := ValidateMinRespTime(binding.MinRespTime); err != nil {
+		return err
 	}
 
 	return ValidateBindingPricing(binding.Pricing)

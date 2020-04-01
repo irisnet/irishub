@@ -49,11 +49,13 @@ func (msg MsgRequestRand) Type() string { return MsgTypeRequestRand }
 
 // Implements Msg.
 func (msg MsgRequestRand) ValidateBasic() sdk.Error {
-	if len(msg.Consumer) == 0 {
-		return ErrInvalidConsumer(DefaultCodespace, "the consumer address must be specified")
+	if err := ValidateConsumer(msg.Consumer); err != nil {
+		return err
 	}
-	if msg.Oracle && !validServiceCoins(msg.ServiceFeeCap) {
-		return ErrInvalidServiceFee(DefaultCodespace, fmt.Sprintf("invalid service fee: %s", msg.ServiceFeeCap))
+	if msg.Oracle {
+		if err := ValidateServiceFeeCap(msg.ServiceFeeCap); err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -76,6 +78,16 @@ func (msg MsgRequestRand) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Consumer}
 }
 
-func validServiceCoins(coins sdk.Coins) bool {
-	return coins.IsValidIrisAtto()
+func ValidateConsumer(consumer sdk.AccAddress) sdk.Error {
+	if len(consumer) == 0 {
+		return ErrInvalidConsumer(DefaultCodespace, "consumer missing")
+	}
+	return nil
+}
+
+func ValidateServiceFeeCap(coins sdk.Coins) sdk.Error {
+	if !coins.IsValidIrisAtto() {
+		return ErrInvalidServiceFee(DefaultCodespace, fmt.Sprintf("invalid service fee: %s", coins))
+	}
+	return nil
 }

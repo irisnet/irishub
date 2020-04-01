@@ -77,6 +77,31 @@ func NewRequestContext(
 }
 
 // Empty returns true if empty
+func (rc RequestContext) Validate() sdk.Error {
+	if err := ValidateServiceName(rc.ServiceName); err != nil {
+		return err
+	}
+
+	if err := ValidateProvidersNoEmpty(rc.Providers); err != nil {
+		return err
+	}
+
+	if err := ValidateConsumer((rc.Consumer)); err != nil {
+		return err
+	}
+
+	if err := ValidateInput(rc.Input); err != nil {
+		return err
+	}
+
+	if err := ValidateServiceFeeCap(rc.ServiceFeeCap); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Empty returns true if empty
 func (rc RequestContext) Empty() bool {
 	return reflect.DeepEqual(rc, RequestContext{})
 }
@@ -111,10 +136,23 @@ func (rc RequestContext) String() string {
 	State:                   %s
 	ResponseThreshold:       %d
 	ModuleName:              %s`,
-		rc.ServiceName, providers, rc.Consumer, rc.Input, rc.ServiceFeeCap.String(),
-		rc.Timeout, rc.SuperMode, rc.Repeated, rc.RepeatedFrequency, rc.RepeatedTotal,
-		rc.BatchCounter, rc.BatchRequestCount, rc.BatchResponseCount, rc.BatchState, rc.State,
-		rc.ResponseThreshold, rc.ModuleName,
+		rc.ServiceName,
+		providers,
+		rc.Consumer,
+		rc.Input,
+		rc.ServiceFeeCap.String(),
+		rc.Timeout,
+		rc.SuperMode,
+		rc.Repeated,
+		rc.RepeatedFrequency,
+		rc.RepeatedTotal,
+		rc.BatchCounter,
+		rc.BatchRequestCount,
+		rc.BatchResponseCount,
+		rc.BatchState,
+		rc.State,
+		rc.ResponseThreshold,
+		rc.ModuleName,
 	)
 }
 
@@ -148,10 +186,23 @@ func (rc RequestContext) HumanString(converter sdk.CoinsConverter) string {
 	State:                   %s
 	ResponseThreshold:       %d
 	ModuleName:              %s`,
-		rc.ServiceName, providers, rc.Consumer, rc.Input, converter.ToMainUnit(rc.ServiceFeeCap),
-		rc.Timeout, rc.SuperMode, rc.Repeated, rc.RepeatedFrequency, rc.RepeatedTotal,
-		rc.BatchCounter, rc.BatchRequestCount, rc.BatchResponseCount, rc.BatchState, rc.State,
-		rc.ResponseThreshold, rc.ModuleName,
+		rc.ServiceName,
+		providers,
+		rc.Consumer,
+		rc.Input,
+		converter.ToMainUnit(rc.ServiceFeeCap),
+		rc.Timeout,
+		rc.SuperMode,
+		rc.Repeated,
+		rc.RepeatedFrequency,
+		rc.RepeatedTotal,
+		rc.BatchCounter,
+		rc.BatchRequestCount,
+		rc.BatchResponseCount,
+		rc.BatchState,
+		rc.State,
+		rc.ResponseThreshold,
+		rc.ModuleName,
 	)
 }
 
@@ -244,9 +295,17 @@ func (r Request) String() string {
 	ExpirationHeight:        %d
 	RequestContextID:        %s
 	BatchCounter:            %d`,
-		r.ID.String(), r.ServiceName, r.Provider, r.Consumer, r.Input, r.ServiceFee.String(),
-		r.SuperMode, r.RequestHeight, r.ExpirationHeight,
-		r.RequestContextID.String(), r.RequestContextBatchCounter,
+		r.ID.String(),
+		r.ServiceName,
+		r.Provider,
+		r.Consumer,
+		r.Input,
+		r.ServiceFee.String(),
+		r.SuperMode,
+		r.RequestHeight,
+		r.ExpirationHeight,
+		r.RequestContextID.String(),
+		r.RequestContextBatchCounter,
 	)
 }
 
@@ -264,9 +323,17 @@ func (r Request) HumanString(converter sdk.CoinsConverter) string {
 	ExpirationHeight:        %d
 	RequestContextID:        %s
 	BatchCounter:            %d`,
-		r.ID.String(), r.ServiceName, r.Provider, r.Consumer, r.Input, converter.ToMainUnit(r.ServiceFee),
-		r.SuperMode, r.RequestHeight, r.ExpirationHeight,
-		r.RequestContextID.String(), r.RequestContextBatchCounter,
+		r.ID.String(),
+		r.ServiceName,
+		r.Provider,
+		r.Consumer,
+		r.Input,
+		converter.ToMainUnit(r.ServiceFee),
+		r.SuperMode,
+		r.RequestHeight,
+		r.ExpirationHeight,
+		r.RequestContextID.String(),
+		r.RequestContextBatchCounter,
 	)
 }
 
@@ -344,7 +411,10 @@ func (r Response) String() string {
 	Output:                  %s
 	RequestContextID:        %s
 	BatchCounter:            %d`,
-		r.Provider, r.Consumer, r.Result, r.Output,
+		r.Provider,
+		r.Consumer,
+		r.Result,
+		r.Output,
 		r.RequestContextID.String(),
 		r.RequestContextBatchCounter,
 	)
@@ -403,7 +473,8 @@ func (e EarnedFees) String() string {
 	return fmt.Sprintf(`EarnedFees:
 	Address:                 %s
 	Coins:                   %s`,
-		e.Address, e.Coins.String(),
+		e.Address,
+		e.Coins.String(),
 	)
 }
 
@@ -412,7 +483,8 @@ func (e EarnedFees) HumanString(converter sdk.CoinsConverter) string {
 	return fmt.Sprintf(`EarnedFees:
 	Address:                 %s
 	Coins:                   %s`,
-		e.Address, converter.ToMainUnit(e.Coins),
+		e.Address,
+		converter.ToMainUnit(e.Coins),
 	)
 }
 
