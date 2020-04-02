@@ -1,6 +1,8 @@
 package oracle
 
 import (
+	"fmt"
+
 	"github.com/irisnet/irishub/app/v3/oracle/internal/types"
 	sdk "github.com/irisnet/irishub/types"
 )
@@ -14,16 +16,23 @@ func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
 	//init feed
 	for _, entry := range data.Entries {
 		k.SetFeed(ctx, entry.Feed)
-		if reqCtx, found := k.GetRequestContext(ctx, entry.Feed.RequestContextID); found {
-			for _, value := range entry.Values {
-				k.SetFeedValue(ctx,
-					entry.Feed.FeedName,
-					reqCtx.BatchCounter,
-					entry.Feed.LatestHistory,
-					value)
-			}
-			k.Enqueue(ctx, entry.Feed.FeedName, entry.State)
+
+		reqCtx, found := k.GetRequestContext(ctx, entry.Feed.RequestContextID)
+		if !found {
+			panic(fmt.Errorf("unknown servcie request context: %s", entry.Feed.RequestContextID))
 		}
+
+		for _, value := range entry.Values {
+			k.SetFeedValue(
+				ctx,
+				entry.Feed.FeedName,
+				reqCtx.BatchCounter,
+				entry.Feed.LatestHistory,
+				value,
+			)
+		}
+
+		k.Enqueue(ctx, entry.Feed.FeedName, entry.State)
 	}
 }
 
@@ -34,11 +43,14 @@ func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 	k.IteratorFeeds(ctx, func(feed types.Feed) {
 		reqCtx, found := k.GetRequestContext(ctx, feed.RequestContextID)
 		if found {
-			entries = append(entries, FeedEntry{
-				Feed:   feed,
-				Values: k.GetFeedValues(ctx, feed.FeedName),
-				State:  reqCtx.State,
-			})
+			entries = append(
+				entries,
+				FeedEntry{
+					Feed:   feed,
+					Values: k.GetFeedValues(ctx, feed.FeedName),
+					State:  reqCtx.State,
+				},
+			)
 		}
 	})
 	return GenesisState{
@@ -60,33 +72,10 @@ func DefaultGenesisStateForTest() GenesisState {
 	}
 }
 
-// ValidateGenesis validates the provided asset genesis state to ensure the
-// expected invariants holds.
-func ValidateGenesis(data GenesisState) error {
-	for _, entry := range data.Entries {
-		feed := entry.Feed
-		if err := types.ValidateFeedName(feed.FeedName); err != nil {
-			return err
-		}
-		if err := types.ValidateDescription(feed.Description); err != nil {
-			return err
-		}
-
-		if err := types.ValidateAggregateFunc(feed.AggregateFunc); err != nil {
-			return err
-		}
-
-		if err := types.ValidateValueJsonPath(feed.ValueJsonPath); err != nil {
-			return err
-		}
-
-		if err := types.ValidateLatestHistory(feed.LatestHistory); err != nil {
-			return err
-		}
-
-		if err := types.ValidateCreator(feed.Creator); err != nil {
-			return err
-		}
+// PrepForZeroHeightGenesis refunds the deposits, service fees and earned fees
+func PrepForZeroHeightGenesis(ctx sdk.Context, k Keeper) {
+	// reset request contexts state and batch
+	if err := k.ResetFeedEntryState(ctx); err != nil {
+		panic(fmt.Sprintf("failed to reset the feed entry state: %s", err))
 	}
-	return nil
 }

@@ -2,6 +2,7 @@ package types
 
 import (
 	"encoding/hex"
+	"fmt"
 
 	sdk "github.com/irisnet/irishub/types"
 )
@@ -11,7 +12,7 @@ type GenesisState struct {
 	Params            Params                    `json:"params"`             // service params
 	Definitions       []ServiceDefinition       `json:"definitions"`        // service definitions
 	Bindings          []ServiceBinding          `json:"bindings"`           // service bindings
-	WithdrawAddresses map[string]sdk.AccAddress `json:"withdraw_addresses"` // withdraw addresses
+	WithdrawAddresses map[string]sdk.AccAddress `json:"withdraw_addresses"` // withdrawal addresses
 	RequestContexts   map[string]RequestContext `json:"request_contexts"`   // request contexts
 }
 
@@ -73,9 +74,18 @@ func ValidateGenesis(data GenesisState) error {
 		}
 	}
 
-	for requestContextID := range data.RequestContexts {
+	for requestContextID, requestContext := range data.RequestContexts {
 		if _, err := hex.DecodeString(requestContextID); err != nil {
 			return err
+		}
+		if err := requestContext.Validate(); err != nil {
+			return err
+		}
+		if requestContext.State != PAUSED {
+			return fmt.Errorf("invalid request context state, ID:%s, State:%s", requestContextID, requestContext.State)
+		}
+		if requestContext.BatchState != BATCHCOMPLETED {
+			return fmt.Errorf("invalid request context batch state, ID:%s, BatchState:%s", requestContextID, requestContext.BatchState)
 		}
 	}
 

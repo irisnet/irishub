@@ -85,37 +85,39 @@ func TestGovWithRandomMessages(t *testing.T) {
 
 	setup := func(r *rand.Rand, accs []simulation.Account) {
 		ctx := mapp.NewContext(false, abci.Header{})
-		stake.InitGenesis(ctx, stakeKeeper, stake.DefaultGenesisState())
+		_, _ = stake.InitGenesis(ctx, stakeKeeper, stake.DefaultGenesisState())
 
 		gov.InitGenesis(ctx, govKeeper, gov.DefaultGenesisState())
 	}
 
 	// Test with unscheduled votes
-	simulation.Simulate(
+	_ = simulation.Simulate(
 		t, mapp.BaseApp, appStateFn,
 		[]simulation.WeightedOperation{
-			{2, SimulateMsgSubmitProposal(govKeeper, stakeKeeper)},
-			{3, SimulateMsgDeposit(govKeeper, stakeKeeper)},
-			{20, SimulateMsgVote(govKeeper, stakeKeeper)},
+			{Weight: 2, Op: SimulateMsgSubmitProposal(govKeeper, stakeKeeper)},
+			{Weight: 3, Op: SimulateMsgDeposit(govKeeper, stakeKeeper)},
+			{Weight: 20, Op: SimulateMsgVote(govKeeper, stakeKeeper)},
 		}, []simulation.RandSetup{
 			setup,
 		}, []simulation.Invariant{
 			//AllInvariants(),
-		}, 10, 100,
+		},
+		10, 100,
 		false,
 	)
 
 	// Test with scheduled votes
-	simulation.Simulate(
+	_ = simulation.Simulate(
 		t, mapp.BaseApp, appStateFn,
 		[]simulation.WeightedOperation{
-			{10, SimulateSubmittingVotingAndSlashingForProposal(govKeeper, stakeKeeper)},
-			{5, SimulateMsgDeposit(govKeeper, stakeKeeper)},
+			{Weight: 10, Op: SimulateSubmittingVotingAndSlashingForProposal(govKeeper, stakeKeeper)},
+			{Weight: 5, Op: SimulateMsgDeposit(govKeeper, stakeKeeper)},
 		}, []simulation.RandSetup{
 			setup,
 		}, []simulation.Invariant{
 			gov.AllInvariants(),
-		}, 10, 100,
+		},
+		10, 100,
 		false,
 	)
 }

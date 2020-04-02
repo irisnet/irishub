@@ -20,7 +20,8 @@ func TestIrisCLISubmitProposal(t *testing.T) {
 	// start iris server
 	proc := tests.GoExecuteTWithStdout(t, fmt.Sprintf("iris start --home=%s --rpc.laddr=%v --p2p.laddr=%v", irisHome, servAddr, p2pAddr))
 
-	defer proc.Stop(false)
+	defer func() { _ = proc.Stop(false) }()
+
 	tests.WaitForTMStart(port)
 	tests.WaitForNextNBlocksTM(2, port)
 

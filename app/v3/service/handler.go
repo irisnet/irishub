@@ -18,14 +18,14 @@ func NewHandler(k Keeper) sdk.Handler {
 			return handleMsgUpdateServiceBinding(ctx, k, msg)
 		case MsgSetWithdrawAddress:
 			return handleMsgSetWithdrawAddress(ctx, k, msg)
-		case MsgDisableService:
-			return handleMsgDisableService(ctx, k, msg)
-		case MsgEnableService:
-			return handleMsgEnableService(ctx, k, msg)
+		case MsgDisableServiceBinding:
+			return handleMsgDisableServiceBinding(ctx, k, msg)
+		case MsgEnableServiceBinding:
+			return handleMsgEnableServiceBinding(ctx, k, msg)
 		case MsgRefundServiceDeposit:
 			return handleMsgRefundServiceDeposit(ctx, k, msg)
-		case MsgRequestService:
-			return handleMsgRequestService(ctx, k, msg)
+		case MsgCallService:
+			return handleMsgCallService(ctx, k, msg)
 		case MsgRespondService:
 			return handleMsgRespondService(ctx, k, msg)
 		case MsgPauseRequestContext:
@@ -114,9 +114,9 @@ func handleMsgSetWithdrawAddress(ctx sdk.Context, k Keeper, msg MsgSetWithdrawAd
 	}
 }
 
-// handleMsgDisableService handles MsgDisableService
-func handleMsgDisableService(ctx sdk.Context, k Keeper, msg MsgDisableService) sdk.Result {
-	if err := k.DisableService(ctx, msg.ServiceName, msg.Provider); err != nil {
+// handleMsgDisableServiceBinding handles MsgDisableServiceBinding
+func handleMsgDisableServiceBinding(ctx sdk.Context, k Keeper, msg MsgDisableServiceBinding) sdk.Result {
+	if err := k.DisableServiceBinding(ctx, msg.ServiceName, msg.Provider); err != nil {
 		return err.Result()
 	}
 
@@ -129,9 +129,9 @@ func handleMsgDisableService(ctx sdk.Context, k Keeper, msg MsgDisableService) s
 	}
 }
 
-// handleMsgEnableService handles MsgEnableService
-func handleMsgEnableService(ctx sdk.Context, k Keeper, msg MsgEnableService) sdk.Result {
-	if err := k.EnableService(ctx, msg.ServiceName, msg.Provider, msg.Deposit); err != nil {
+// handleMsgEnableServiceBinding handles MsgEnableServiceBinding
+func handleMsgEnableServiceBinding(ctx sdk.Context, k Keeper, msg MsgEnableServiceBinding) sdk.Result {
+	if err := k.EnableServiceBinding(ctx, msg.ServiceName, msg.Provider, msg.Deposit); err != nil {
 		return err.Result()
 	}
 
@@ -159,8 +159,8 @@ func handleMsgRefundServiceDeposit(ctx sdk.Context, k Keeper, msg MsgRefundServi
 	}
 }
 
-// handleMsgRequestService handles MsgRequestService
-func handleMsgRequestService(ctx sdk.Context, k Keeper, msg MsgRequestService) sdk.Result {
+// handleMsgCallService handles MsgCallService
+func handleMsgCallService(ctx sdk.Context, k Keeper, msg MsgCallService) sdk.Result {
 	_, tags, err := k.CreateRequestContext(
 		ctx, msg.ServiceName, msg.Providers, msg.Consumer, msg.Input, msg.ServiceFeeCap, msg.Timeout,
 		msg.SuperMode, msg.Repeated, msg.RepeatedFrequency, msg.RepeatedTotal, RUNNING, 0, "")
@@ -259,7 +259,7 @@ func handleMsgUpdateRequestContext(ctx sdk.Context, k Keeper, msg MsgUpdateReque
 	}
 
 	if err := k.UpdateRequestContext(
-		ctx, msg.RequestContextID, msg.Providers, msg.ServiceFeeCap,
+		ctx, msg.RequestContextID, msg.Providers, 0, msg.ServiceFeeCap,
 		msg.Timeout, msg.RepeatedFrequency, msg.RepeatedTotal, msg.Consumer,
 	); err != nil {
 		return err.Result()

@@ -2250,7 +2250,7 @@ paths:
                   $ref: '#/components/schemas/Address'
   '/service/requests/{request-context-id}/{batch-counter}':
     get:
-      summary: Query requests by the request context ID and batch counter
+      summary: Query active requests by the request context ID and batch counter
       tags:
         - Service
       parameters:
@@ -2281,7 +2281,7 @@ paths:
           description: Internal Server Error
   '/service/responses/{request-context-id}/{batch-counter}':
     get:
-      summary: Query responses by the request context ID and batch counter
+      summary: Query active responses by the request context ID and batch counter
       tags:
         - Service
       parameters:
@@ -2363,7 +2363,7 @@ paths:
           description: Internal Server Error
   /oracle/feeds:
     post:
-      summary: Define a new feed,the feed will be in "paused" state
+      summary: Define a new feed, the feed will be in "paused" state
       description: Send transaction to define a feed
       tags:
         - Oracle

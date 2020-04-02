@@ -15,8 +15,6 @@ import (
 )
 
 var (
-	testChainID = "test-chain"
-
 	testCoin1, _ = sdk.IrisCoinType.ConvertToCoin("10000iris")
 	testCoin2, _ = sdk.IrisCoinType.ConvertToCoin("100iris")
 	testCoin3, _ = sdk.IrisCoinType.ConvertToCoin("1iris")
@@ -66,7 +64,8 @@ func setRequestContext(
 	requestContext := types.NewRequestContext(
 		testServiceName, providers, consumer, testInput,
 		testServiceFeeCap, testTimeout, false, true, testRepeatedFreq,
-		testRepeatedTotal, 0, 0, 0, types.BATCHCOMPLETED, state, threshold, moduleName,
+		testRepeatedTotal, 0, 0, 0, threshold, types.BATCHCOMPLETED,
+		state, threshold, moduleName,
 	)
 
 	requestContextID := types.GenerateRequestContextID(ctx.TxHash(), 0)
@@ -178,7 +177,7 @@ func TestKeeper_Disable_Service(t *testing.T) {
 	currentTime := time.Now().UTC()
 	ctx = ctx.WithBlockTime(currentTime)
 
-	err := keeper.DisableService(ctx, testServiceName, provider)
+	err := keeper.DisableServiceBinding(ctx, testServiceName, provider)
 	require.NoError(t, err)
 
 	svcBinding, found := keeper.GetServiceBinding(ctx, testServiceName, provider)
@@ -196,7 +195,7 @@ func TestKeeper_Enable_Service(t *testing.T) {
 	disabledTime := time.Now().UTC()
 	setServiceBinding(ctx, keeper, provider, false, disabledTime)
 
-	err := keeper.EnableService(ctx, testServiceName, provider, nil)
+	err := keeper.EnableServiceBinding(ctx, testServiceName, provider, nil)
 	require.NoError(t, err)
 
 	svcBinding, found := keeper.GetServiceBinding(ctx, testServiceName, provider)
@@ -265,7 +264,7 @@ func TestKeeper_Request_Context(t *testing.T) {
 	)
 	require.NoError(t, err)
 
-	require.True(t, keeper.HasNewRequestBatch(ctx, requestContextID, ctx.BlockHeight()))
+	require.True(t, keeper.HasNewRequestBatch(ctx, requestContextID))
 
 	requestContext, found := keeper.GetRequestContext(ctx, requestContextID)
 	require.True(t, found)
@@ -287,7 +286,7 @@ func TestKeeper_Request_Context(t *testing.T) {
 	newRepeatedFreq := testRepeatedFreq + 10
 	newRepeatedTotal := int64(-1)
 
-	err = keeper.UpdateRequestContext(ctx, requestContextID, nil, newServiceFeeCap, newTimeout, newRepeatedFreq, newRepeatedTotal, consumer)
+	err = keeper.UpdateRequestContext(ctx, requestContextID, nil, 0, newServiceFeeCap, newTimeout, newRepeatedFreq, newRepeatedTotal, consumer)
 	require.NoError(t, err)
 
 	requestContext, found = keeper.GetRequestContext(ctx, requestContextID)

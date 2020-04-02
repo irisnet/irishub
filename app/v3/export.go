@@ -190,9 +190,11 @@ func (p *ProtocolV3) prepForZeroHeightGenesis(ctx sdk.Context) {
 	})
 
 	/* Handle gov state. */
-
 	gov.PrepForZeroHeightGenesis(ctx, p.govKeeper)
 
 	/* Handle service state. */
 	service.PrepForZeroHeightGenesis(ctx, p.serviceKeeper)
+
+	/* Handle oracle state. */
+	oracle.PrepForZeroHeightGenesis(ctx, p.oracleKeeper)
 }

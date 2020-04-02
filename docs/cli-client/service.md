@@ -19,10 +19,10 @@ Service module allows you to define, bind, invoke services on the IRIS Hub. [Rea
 | [refund-deposit](#iriscli-service-refund-deposit)       | Refund all deposit from a service binding                   |
 | [call](#iriscli-service-call)                           | Initiate a service call                                     |
 | [request](#iriscli-service-request)                     | Query a request by the request ID                           |
-| [requests](#iriscli-service-requests)                   | Query requests by the service binding or request context    |
+| [requests](#iriscli-service-requests)                   | Query active requests by the service binding or request context ID   |
 | [respond](#iriscli-service-respond)                     | Respond to a service request                                |
 | [response](#iriscli-service-response)                   | Query a response by the request ID                          |
-| [responses](#iriscli-service-responses)                 | Query responses by the request context ID and batch counter |
+| [responses](#iriscli-service-responses)                 | Query active responses by the request context ID and batch counter |
 | [request-context](#iriscli-service-request-context)     | Query a request context                                     |
 | [update](#iriscli-service-update)                       | Update a request context                                    |
 | [pause](#iriscli-service-pause)                         | Pause a running request context                             |
@@ -304,7 +304,7 @@ You can retrieve the `request-id` in the result of [tendermint block](./tendermi
 
 ## iriscli service requests
 
-Query service requests by the service binding or request context ID.
+Query active requests by the service binding or request context ID.
 
 ```bash
 iriscli service requests [service-name] [provider] | [request-context-id] [batch-counter] [flags]
@@ -386,7 +386,7 @@ You can retrieve the `request-id` in the result of [tendermint block](./tendermi
 
 ## iriscli service responses
 
-Query responses by the request context ID and batch counter.
+Query active responses by the request context ID and batch counter.
 
 ```bash
 iriscli service responses [request-context-id] [batch-counter] [flags]
