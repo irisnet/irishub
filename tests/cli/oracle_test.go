@@ -43,7 +43,7 @@ func TestIrisCLIOracle(t *testing.T) {
 	serviceDesc := "oracle"
 	serviceTags := []string{"tag1", "tag2"}
 	authorDesc := "author"
-	serviceSchemas := `{"input":{"type":"object"},"output":{"type":"object"},"error":{"type":"object"}}`
+	serviceSchemas := `{"input":{"type":"object"},"output":{"type":"object"}}`
 	deposit := "10iris"
 	priceAmt := 1 // 1iris
 	pricing := fmt.Sprintf(`{"price":"%diris"}`, priceAmt)

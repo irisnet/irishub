@@ -14,15 +14,17 @@ const (
 	AuthorDescription    = "rand module account"
 	ServiceSchemas       = `
 	{
-		"$schema": "http://json-schema.org/draft-04/schema#",
-		"title": "irishub-random-seed",
-		"description": "IRIS Hub Random Seed Schema",
-		"type": "object",
 		"input": {
+			"$schema": "http://json-schema.org/draft-04/schema#",
+			"title": "irishub-random-seed-input",
+			"description": "IRIS Hub Random Seed Input Schema",
 			"type": "object",
 			"additionalProperties": false
 		},
 		"output": {
+			"$schema": "http://json-schema.org/draft-04/schema#",
+			"title": "irishub-random-seed-output",
+			"description": "IRIS Hub Random Seed Output Schema",
 			"type": "object",
 			"properties": {
 				"seed": {
