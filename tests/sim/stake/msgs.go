@@ -2,6 +2,10 @@ package stake
 
 import (
 	"fmt"
+	"math/rand"
+
+	abci "github.com/tendermint/tendermint/abci/types"
+
 	"github.com/irisnet/irishub/mock"
 	"github.com/irisnet/irishub/mock/baseapp"
 	"github.com/irisnet/irishub/mock/simulation"
@@ -10,8 +14,6 @@ import (
 	"github.com/irisnet/irishub/modules/stake/keeper"
 	"github.com/irisnet/irishub/modules/stake/types"
 	sdk "github.com/irisnet/irishub/types"
-	abci "github.com/tendermint/tendermint/abci/types"
-	"math/rand"
 )
 
 // SimulateMsgCreateValidator

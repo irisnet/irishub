@@ -6,14 +6,14 @@ import (
 	"math/big"
 	"math/rand"
 
+	"github.com/tendermint/tendermint/crypto"
+
 	"github.com/irisnet/irishub/mock"
+	"github.com/irisnet/irishub/mock/baseapp"
 	"github.com/irisnet/irishub/mock/simulation"
 	"github.com/irisnet/irishub/modules/auth"
 	"github.com/irisnet/irishub/modules/bank"
 	sdk "github.com/irisnet/irishub/types"
-	"github.com/tendermint/tendermint/crypto"
-
-	"github.com/irisnet/irishub/mock/baseapp"
 )
 
 // SingleInputSendTx tests and runs a single msg send w/ auth, with one input and one output, where both
