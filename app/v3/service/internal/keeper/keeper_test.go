@@ -327,7 +327,8 @@ func TestKeeper_Request_Context(t *testing.T) {
 	require.NoError(t, err)
 
 	requestContext, found = keeper.GetRequestContext(ctx, requestContextID)
-	require.False(t, found)
+	require.True(t, found)
+	require.Equal(t, types.COMPLETED, requestContext.State)
 }
 
 func TestKeeper_Request_Service(t *testing.T) {
