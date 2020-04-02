@@ -1,5 +1,88 @@
 # IRISLCD 更新日志
 
+## v0.17.0
+
+*Apr 1th, 2020*
+
+### 不兼容修改
+
+- 删除Asset模块中与gateway相关的APIs
+- token id替换为symbol
+- 将`sdk.Dec`替换为`sdk.Coins`以指定`CommunityTaxUsageProposal`的金额
+- 重构service模块APIs
+
+#### Asset 模块
+
+| [v0.16.1]                              | [v0.17.0]                            | 输入改变 | 输出改变 | 备注                 |
+| -------------------------------------- | ------------------------------------ | -------- | -------- | -------------------- |
+| GET /asset/tokens/{id}                 | GET /asset/tokens/{symbol}           | Yes      |          | token id替换为symbol |
+| GET /asset/fees/tokens/{id}            | GET /asset/tokens/{symbol}/fee       | Yes      |          | token id替换为symbol |
+| POST /asset/tokens/{token-id}          | POST /asset/tokens/{symbol}          | Yes      |          | token id替换为symbol |
+| POST /asset/tokens/{token-id}/transfer | POST /asset/tokens/{symbol}/transfer | Yes      |          | token id替换为symbol |
+| POST /asset/tokens/{token-id}/mint     | POST /asset/tokens/{symbol}/mint     | Yes      |          | token id替换为symbol |
+
+#### Bank 模块
+
+| [v0.16.1]                  | [v0.17.0]                      | 输入改变 | 输出改变 | 备注                 |
+| -------------------------- | ------------------------------ | -------- | -------- | -------------------- |
+| GET /bank/token-stats/{id} | GET /bank/token-stats/{symbol} | Yes      |          | token id替换为symbol |
+
+#### Gov 模块
+
+| [v0.16.1]           | [v0.17.0]           | input changed | output changed | notes                                            |
+| ------------------- | ------------------- | ------------- | -------------- | ------------------------------------------------ |
+| POST /gov/proposals | POST /gov/proposals | Yes           |                | `commTax.Amount`类型从`sdk.Dec`更改为`sdk.Coins` |
+
+#### Service 模块
+
+| [v0.16.1]                                                                  | [v0.17.0]                                                                                                | 输入改变 | 输出改变 | 备注                            |
+| -------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- | -------- | -------- | ------------------------------- |
+| GET /service/definitions/{defChainId}/{serviceName}                        | GET /service/definitions/{service-name}                                                                  | Yes      |          | 删除`defChainId`                |
+| GET /service/bindings/{defChainId}/{serviceName}/{bindChainId}/{provider}  | GET /service/bindings/{service-name}/{provider}                                                          | Yes      |          | 删除`defChainId`和`bindChainId` |
+| GET /service/bindings/{defChainId}/{serviceName}                           | GET /service/bindings/{service-name}                                                                     | Yes      |          | 删除`defChainId`                |
+| GET /service/requests/{defChainId}/{serviceName}/{bindChainId}/{provider}  | /service/requests/{service-name}/{provider} </br> /service/requests/{request-context-id}/{batch-counter} | Yes      |          |                                 |
+| GET /service/responses/{reqChainId}/{reqId}                                | GET /service/responses/{request-id}                                                                      | Yes      |          |                                 |
+| GET /service/fees/{address}                                                | GET /service/fees/{provider}                                                                             |          | Yes      | 只返回服务提供者的`EarnedFees`  |
+| POST /service/definitions                                                  | POST /service/definitions                                                                                | Yes      |          |                                 |
+| POST /service/bindings                                                     | POST /service/bindings                                                                                   | Yes      |          |                                 |
+| PUT /service/bindings/{defChainId}/{serviceName}/{provider}                | PUT /service/bindings/{serviceName}/{provider}                                                           | Yes      |          | 删除`defChainId`                |
+| PUT /service/bindings/{defChainId}/{serviceName}/{provider}/disable        | POST /service/bindings/{serviceName}/{provider}/disable                                                  | Yes      |          | 删除`defChainId`                |
+| PUT /service/bindings/{defChainId}/{serviceName}/{provider}/enable         | POST /service/bindings/{serviceName}/{provider}/enable                                                   | Yes      |          | 删除`defChainId`                |
+| PUT /service/bindings/{defChainId}/{serviceName}/{provider}/deposit/refund | POST /service/bindings/{serviceName}/{provider}/refund-deposit                                           | Yes      |          | 删除`defChainId`                |
+| POST /service/requests                                                     | POST /service/requests                                                                                   | Yes      |          |                                 |
+| POST /service/responses                                                    | POST /service/responses                                                                                  | Yes      |          |                                 |
+
+### 兼容修改
+
+- 增加Oracle模块的APIs
+- 改进coinswap凭证相关的命名约定
+- 在rand请求和查询中增加`oracle`和`service_fee_cap`
+- 增加 GET /service/providers/{provider}/withdraw-address
+- 增加 POST /service/providers/{provider}/withdraw-address
+- 增加 GET /service/contexts/{request-context-id}
+- 增加 PUT /service/contexts/{request-context-id}
+- 增加 POST /service/contexts/{request-context-id}/start
+- 增加 POST /service/contexts/{request-context-id}/pause
+- 增加 POST /service/contexts/{request-context-id}/kill
+- 增加 GET /service/requests/{request-id}
+- 增加 GET /service/responses/{request-id}
+- 删除 POST /service/fees/consumer/refund
+
+#### Coinswap 模块
+
+| [v0.16.1]                                | [v0.17.0]                                               | 输入改变 | 输出改变 | 备注                      |
+| ---------------------------------------- | ------------------------------------------------------- | -------- | -------- | ------------------------- |
+| POST /coinswap/liquidities/{id}/deposit  | POST /coinswap/liquidities/{voucher-coin-name}/deposit  |          |          | id替换为voucher-coin-name |
+| POST /coinswap/liquidities/{id}/withdraw | POST /coinswap/liquidities/{voucher-coin-name}/withdraw |          |          | id替换为voucher-coin-name |
+| GET /coinswap/liquidities/{id}           | GET /coinswap/liquidities/{voucher-coin-name}           |          |          | id替换为voucher-coin-name |
+
+#### Rand 模块
+
+| [v0.16.1]        | [v0.17.0]        | 输入改变 | 输出改变 | 备注                            |
+| ---------------- | ---------------- | -------- | -------- | ------------------------------- |
+| POST /rand/rands | POST /rand/rands | Yes      |          | 增加`oracle`和`service_fee_cap` |
+| GET /rand/queue  | POST /rand/queue |          | Yes      | 增加`oracle`和`service_fee_cap` |
+
 ## v0.16.0
 
 *Nov 20th, 2019*

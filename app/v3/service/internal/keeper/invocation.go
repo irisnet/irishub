@@ -176,13 +176,9 @@ func (k Keeper) UpdateRequestContext(
 			return types.ErrInvalidThreshold(k.codespace, fmt.Sprintf("response threshold [%d] must be between [1,%d]", respThreshold, len(providers)))
 		}
 
-		if respThreshold != 0 {
+		if respThreshold > 0 {
 			requestContext.ResponseThreshold = respThreshold
 		}
-	}
-
-	if len(providers) > 0 && requestContext.ResponseThreshold > 0 && len(providers) < int(requestContext.ResponseThreshold) {
-		return types.ErrInvalidProviders(k.codespace, fmt.Sprintf("length [%d] of providers must not be less than the response threshold [%d]", len(providers), requestContext.ResponseThreshold))
 	}
 
 	params := k.GetParamSet(ctx)
@@ -1141,4 +1137,24 @@ func (k Keeper) GetStateCallback(moduleName string) (types.StateCallback, sdk.Er
 	}
 
 	return stateCallback, nil
+}
+
+// ResetRequestContextsStateAndBatch reset request contexts state and batch
+func (k Keeper) ResetRequestContextsStateAndBatch(ctx sdk.Context) sdk.Error {
+	k.IterateRequestContexts(
+		ctx,
+		func(requestContextID cmn.HexBytes, requestContext types.RequestContext) bool {
+			requestContext.State = types.PAUSED
+
+			requestContext.BatchState = types.BATCHCOMPLETED
+			requestContext.BatchCounter = 0
+			requestContext.BatchRequestCount = 0
+			requestContext.BatchResponseCount = 0
+
+			k.SetRequestContext(ctx, requestContextID, requestContext)
+			return false
+		},
+	)
+
+	return nil
 }
