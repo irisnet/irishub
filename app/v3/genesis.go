@@ -399,11 +399,16 @@ func NewGenesisFileAccount(acc *auth.BaseAccount) GenesisFileAccount {
 	}
 }
 
-func NewGenesisFileState(accounts []GenesisFileAccount, authData auth.GenesisState, stakeData stake.GenesisState, mintData mint.GenesisState,
-	distrData distr.GenesisState, govData gov.GenesisState, upgradeData upgrade.GenesisState, serviceData service.GenesisState,
-	guardianData guardian.GenesisState, slashingData slashing.GenesisState, assetData asset.GenesisState, randData rand.GenesisState,
-	swapData coinswap.GenesisState, htlcData htlc.GenesisState, oracleData oracle.GenesisState) GenesisFileState {
-
+func NewGenesisFileState(
+	accounts []GenesisFileAccount, authData auth.GenesisState,
+	stakeData stake.GenesisState, mintData mint.GenesisState,
+	distrData distr.GenesisState, govData gov.GenesisState,
+	upgradeData upgrade.GenesisState, serviceData service.GenesisState,
+	guardianData guardian.GenesisState, slashingData slashing.GenesisState,
+	assetData asset.GenesisState, randData rand.GenesisState,
+	swapData coinswap.GenesisState, htlcData htlc.GenesisState,
+	oracleData oracle.GenesisState,
+) GenesisFileState {
 	return GenesisFileState{
 		Accounts:     accounts,
 		AuthData:     authData,
@@ -426,16 +431,14 @@ func NewGenesisFileState(accounts []GenesisFileAccount, authData auth.GenesisSta
 // NewDefaultGenesisState generates the default state for iris.
 func NewDefaultGenesisFileState() GenesisFileState {
 	return GenesisFileState{
-		Accounts:    nil,
-		AuthData:    auth.DefaultGenesisState(),
-		StakeData:   stake.DefaultGenesisState(),
-		MintData:    mint.DefaultGenesisState(),
-		DistrData:   distr.DefaultGenesisState(),
-		GovData:     gov.DefaultGenesisState(),
-		UpgradeData: upgrade.DefaultGenesisState(),
-		ServiceData: service.DefaultGenesisState(
-			append(rand.GetSvcDefinitions(), oracle.GetSvcDefinitions()...),
-		),
+		Accounts:     nil,
+		AuthData:     auth.DefaultGenesisState(),
+		StakeData:    stake.DefaultGenesisState(),
+		MintData:     mint.DefaultGenesisState(),
+		DistrData:    distr.DefaultGenesisState(),
+		GovData:      gov.DefaultGenesisState(),
+		UpgradeData:  upgrade.DefaultGenesisState(),
+		ServiceData:  service.DefaultGenesisState(rand.GetSvcDefinitions()),
 		GuardianData: guardian.DefaultGenesisState(),
 		SlashingData: slashing.DefaultGenesisState(),
 		AssetData:    asset.DefaultGenesisState(),

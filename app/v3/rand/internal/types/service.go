@@ -10,9 +10,34 @@ import (
 const (
 	ServiceName          = "random"
 	ServiceDesc          = "system service definition of rand module"
-	ServiceSchemas       = `{"input":{"type":"object","properties":{}},"output":{"type":"object","properties":{"seed":{"description":"seed","type":"string","pattern":"^[0-9a-fA-F]{64}$"}}},"error":{"type":"string"}}`
 	ServiceValueJsonPath = "seed"
 	AuthorDescription    = "rand module account"
+	ServiceSchemas       = `
+	{
+		"$schema": "http://json-schema.org/draft-04/schema#",
+		"title": "irishub-random-seed",
+		"description": "IRIS Hub Random Seed Schema",
+		"type": "object",
+		"input": {
+			"type": "object",
+			"additionalProperties": false
+		},
+		"output": {
+			"type": "object",
+			"properties": {
+				"seed": {
+					"description": "random seed",
+					"type": "string",
+					"pattern": "^[0-9a-fA-F]{64}$"
+				}
+			},
+			"additionalProperties": false,
+			"required": [
+				"seed"
+			]
+		}
+	}
+	`
 )
 
 var (

@@ -33,9 +33,8 @@ const (
 var (
 	RequestContextStateFromString = types.RequestContextStateFromString
 
-	NewKeeper         = keeper.NewKeeper
-	NewQuerier        = keeper.NewQuerier
-	RegisterCodec     = types.RegisterCodec
-	GetSvcDefinitions = types.GetSvcDefinitions
-	ValidateGenesis   = types.ValidateGenesis
+	NewKeeper       = keeper.NewKeeper
+	NewQuerier      = keeper.NewQuerier
+	RegisterCodec   = types.RegisterCodec
+	ValidateGenesis = types.ValidateGenesis
 )
