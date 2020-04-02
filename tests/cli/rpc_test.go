@@ -23,12 +23,12 @@ func TestTxSearch(t *testing.T) {
 
 	rpc := rpcclient.NewHTTP("tcp://irisnet-rpc.rainbow.one:26657", "/websocket")
 
-	rpc.Start()
-	defer rpc.Stop()
+	_ = rpc.Start()
+	defer func() { _ = rpc.Stop() }()
 
 	tx, err := rpc.Tx(txHashBz[:], false)
 	if err != nil {
 		fmt.Println(err.Error())
 	}
-	fmt.Println(fmt.Sprintf("%v", tx))
+	fmt.Printf("%v\n", tx)
 }
