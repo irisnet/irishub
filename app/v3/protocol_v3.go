@@ -108,7 +108,7 @@ func (p *ProtocolV3) Load() {
 func (p *ProtocolV3) Init(ctx sdk.Context) {
 	p.assetKeeper.Init(ctx)
 	p.coinswapKeeper.Init(ctx, p.assetKeeper, p.accountMapper)
-	p.serviceKeeper.Init(ctx, append(rand.GetSvcDefinitions(), oracle.GetSvcDefinitions()...))
+	p.serviceKeeper.Init(ctx, rand.GetSvcDefinitions())
 }
 
 // GetCodec get codec

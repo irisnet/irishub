@@ -42,7 +42,8 @@ func TestIrisCLIRand(t *testing.T) {
 	require.Equal(t, "20iris", barCoin)
 
 	// service data
-	serviceName := "random"
+	serviceName := rand.ServiceName
+
 	deposit := "10iris"
 	priceAmt := 1 // 1iris
 	pricing := fmt.Sprintf(`{"price":"%diris"}`, priceAmt)
