@@ -105,13 +105,13 @@ func (k Keeper) CreateRequestContext(
 	batchCounter := uint64(0)
 	batchRequestCount := uint16(0)
 	batchResponseCount := uint16(0)
-	batchRespThreshold := responseThreshold
+	batchResponseThreshold := responseThreshold
 	batchState := types.BATCHCOMPLETED
 
 	requestContext := types.NewRequestContext(
 		serviceName, providers, consumer, input, serviceFeeCap, timeout,
 		superMode, repeated, repeatedFrequency, repeatedTotal, batchCounter,
-		batchRequestCount, batchResponseCount, batchRespThreshold,
+		batchRequestCount, batchResponseCount, batchResponseThreshold,
 		batchState, state, responseThreshold, moduleName,
 	)
 
@@ -406,7 +406,7 @@ func (k Keeper) InitiateRequests(
 	requestContext.BatchState = types.BATCHRUNNING
 	requestContext.BatchResponseCount = 0
 	requestContext.BatchRequestCount = uint16(len(providers))
-	requestContext.BatchRespThreshold = requestContext.ResponseThreshold
+	requestContext.BatchResponseThreshold = requestContext.ResponseThreshold
 
 	k.SetRequestContext(ctx, requestContextID, requestContext)
 
@@ -428,7 +428,7 @@ func (k Keeper) SkipCurrentRequestBatch(ctx sdk.Context, requestContextID cmn.He
 	requestContext.BatchState = types.BATCHRUNNING
 	requestContext.BatchRequestCount = 0
 	requestContext.BatchResponseCount = 0
-	requestContext.BatchRespThreshold = requestContext.ResponseThreshold
+	requestContext.BatchResponseThreshold = requestContext.ResponseThreshold
 
 	k.SetRequestContext(ctx, requestContextID, requestContext)
 	k.AddRequestBatchExpiration(ctx, requestContextID, ctx.BlockHeight()+requestContext.Timeout)
@@ -919,7 +919,7 @@ func (k Keeper) Callback(ctx sdk.Context, requestContextID cmn.HexBytes) sdk.Tag
 	respCallback, _ := k.GetResponseCallback(requestContext.ModuleName)
 	outputs := k.GetResponseOutputs(ctx, requestContextID, requestContext.BatchCounter)
 
-	if len(outputs) >= int(requestContext.BatchRespThreshold) {
+	if len(outputs) >= int(requestContext.BatchResponseThreshold) {
 		return respCallback(ctx, requestContextID, outputs, nil)
 	} else {
 		return respCallback(
@@ -928,7 +928,7 @@ func (k Keeper) Callback(ctx sdk.Context, requestContextID cmn.HexBytes) sdk.Tag
 			outputs,
 			fmt.Errorf(
 				"batch %d at least %d valid outputs required, but %d received",
-				requestContext.BatchCounter, requestContext.BatchRespThreshold, len(outputs),
+				requestContext.BatchCounter, requestContext.BatchResponseThreshold, len(outputs),
 			),
 		)
 	}
@@ -1146,9 +1146,8 @@ func (k Keeper) ResetRequestContextsStateAndBatch(ctx sdk.Context) sdk.Error {
 		ctx,
 		func(requestContextID cmn.HexBytes, requestContext types.RequestContext) bool {
 			requestContext.State = types.PAUSED
-			
+
 			requestContext.BatchState = types.BATCHCOMPLETED
-			requestContext.BatchCounter = 0
 			requestContext.BatchRequestCount = 0
 			requestContext.BatchResponseCount = 0
 
