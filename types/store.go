@@ -34,6 +34,7 @@ type Store interface { //nolint
 // something that can persist to disk
 type Committer interface {
 	Commit([]*KVStoreKey) CommitID
+	CommitWithVersion([]*KVStoreKey, int64) CommitID
 	LastCommitID() CommitID
 	SetPruning(PruningStrategy)
 }
