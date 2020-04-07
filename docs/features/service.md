@@ -13,33 +13,40 @@ Any user can define services on the blockchain. The interface of a service must 
 
 ```json
 {
-  "$schema": "http://json-schema.org/draft-04/schema#",
-  "title": "service-def-example",
-  "description": "Schema for a service example",
-  "type": "object",
-  "properties":{
-    "input":{
-      "type":"object",
-      "properties":{
-        "base":{
-          "description":"base token denom",
-          "type":"string"
-        },
-        "quote":{
-          "description":"quote token denom",
-          "type":"string"
-        }
+  "input": {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "service-def-input-example",
+    "description": "Schema for a service input example",
+    "type": "object",
+    "properties": {
+      "base": {
+        "description": "base token denom",
+        "type": "string"
+      },
+      "quote": {
+        "description": "quote token denom",
+        "type": "string"
       }
     },
-    "output":{
-      "type":"object",
-      "properties":{
-        "price":{
-          "description":"price",
-          "type":"number"
-        }
+    "required": [
+      "base",
+      "quote"
+    ]
+  },
+  "output": {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "service-def-output-example",
+    "description": "Schema for a service output example",
+    "type": "object",
+    "properties": {
+      "price": {
+        "description": "price",
+        "type": "number"
       }
-    }
+    },
+    "required": [
+      "price"
+    ]
   }
 }
 ```
