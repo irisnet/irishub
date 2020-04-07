@@ -106,7 +106,7 @@ type PromotionByVolume struct {
 // GetDiscountByTime gets the discount level by the specified time
 func GetDiscountByTime(pricing Pricing, time time.Time) sdk.Dec {
 	for _, p := range pricing.PromotionsByTime {
-		if (time.After(p.StartTime) || time.Equal(p.StartTime)) && (time.Before(p.EndTime) || time.Equal(p.EndTime)) {
+		if !time.Before(p.StartTime) && !time.After(p.EndTime) {
 			return p.Discount
 		}
 	}
