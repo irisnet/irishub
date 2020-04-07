@@ -851,6 +851,11 @@ func (k Keeper) GetPrice(
 	basePrice := pricing.Price.AmountOf(sdk.IrisAtto)
 	price := sdk.NewDecFromInt(basePrice).Mul(discountByTime).Mul(discountByVolume)
 
+	// set to 1 if price < 1 iris-atto
+	if price.LT(sdk.OneDec()) {
+		price = sdk.OneDec()
+	}
+
 	return sdk.NewCoins(sdk.NewCoin(sdk.IrisAtto, price.TruncateInt()))
 }
 
