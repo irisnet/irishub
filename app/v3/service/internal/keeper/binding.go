@@ -278,7 +278,7 @@ func (k Keeper) ParsePricing(ctx sdk.Context, pricing string) (p types.Pricing, 
 
 	unitName, amtStr, err2 := sdk.ParseCoinParts(rawPricing.Price)
 	if err2 != nil {
-		return p, types.ErrInvalidPricing(k.codespace, fmt.Sprintf("failed to parse the pricing: %s", err))
+		return p, types.ErrInvalidPricing(k.codespace, fmt.Sprintf("failed to parse the pricing: %s", err2.Error()))
 	}
 
 	amt, err := sdk.NewDecFromStr(amtStr)
