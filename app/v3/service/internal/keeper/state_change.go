@@ -20,11 +20,11 @@ func (k Keeper) CompleteBatch(ctx sdk.Context, requestContext types.RequestConte
 	}
 
 	batchState := types.BatchState{
-		BatchCounter:       requestContext.BatchCounter,
-		State:              types.BATCHCOMPLETED,
-		BatchRespThreshold: requestContext.BatchRespThreshold,
-		BatchRequestCount:  requestContext.BatchRequestCount,
-		BatchResponseCount: requestContext.BatchResponseCount,
+		BatchCounter:           requestContext.BatchCounter,
+		State:                  types.BATCHCOMPLETED,
+		BatchResponseThreshold: requestContext.BatchResponseThreshold,
+		BatchRequestCount:      requestContext.BatchRequestCount,
+		BatchResponseCount:     requestContext.BatchResponseCount,
 	}
 	stateJSON, _ := json.Marshal(batchState)
 

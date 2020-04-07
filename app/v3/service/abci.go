@@ -39,6 +39,11 @@ func EndBlocker(ctx sdk.Context, k Keeper) (tags sdk.Tags) {
 		k.DeleteRequestBatchExpiration(ctx, requestContextID, ctx.BlockHeight())
 		k.SetRequestContext(ctx, requestContextID, requestContext)
 
+		if requestContext.State == COMPLETED {
+			completeContextTags := k.CompleteServiceContext(ctx, requestContext, requestContextID)
+			tags = tags.AppendTags(completeContextTags)
+		}
+
 		if requestContext.State == RUNNING {
 			if requestContext.Repeated && (requestContext.RepeatedTotal < 0 || int64(requestContext.BatchCounter) < requestContext.RepeatedTotal) {
 				k.AddNewRequestBatch(ctx, requestContextID, ctx.BlockHeight()-requestContext.Timeout+int64(requestContext.RepeatedFrequency))
@@ -85,11 +90,11 @@ func EndBlocker(ctx sdk.Context, k Keeper) (tags sdk.Tags) {
 
 			requestContext, _ := k.GetRequestContext(ctx, requestContextID)
 			batchState := types.BatchState{
-				BatchCounter:       requestContext.BatchCounter,
-				State:              requestContext.BatchState,
-				BatchRespThreshold: requestContext.BatchRespThreshold,
-				BatchRequestCount:  requestContext.BatchRequestCount,
-				BatchResponseCount: requestContext.BatchResponseCount,
+				BatchCounter:           requestContext.BatchCounter,
+				State:                  requestContext.BatchState,
+				BatchResponseThreshold: requestContext.BatchResponseThreshold,
+				BatchRequestCount:      requestContext.BatchRequestCount,
+				BatchResponseCount:     requestContext.BatchResponseCount,
 			}
 			stateJSON, _ := json.Marshal(batchState)
 			tags = tags.AppendTags(sdk.NewTags(

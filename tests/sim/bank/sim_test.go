@@ -31,10 +31,10 @@ func TestBankWithRandomMessages(t *testing.T) {
 		return json.RawMessage("{}")
 	}
 
-	simulation.Simulate(
+	_ = simulation.Simulate(
 		t, mapp.BaseApp, appStateFn,
 		[]simulation.WeightedOperation{
-			{1, SingleInputSendMsg(mapper, bankKeeper)},
+			{Weight: 1, Op: SingleInputSendMsg(mapper, bankKeeper)},
 		},
 		[]simulation.RandSetup{},
 		[]simulation.Invariant{
