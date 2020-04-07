@@ -16,23 +16,24 @@ import (
 
 // RequestContext defines a context which holds request-related data
 type RequestContext struct {
-	ServiceName        string                   `json:"service_name"`
-	Providers          []sdk.AccAddress         `json:"providers"`
-	Consumer           sdk.AccAddress           `json:"consumer"`
-	Input              string                   `json:"input"`
-	ServiceFeeCap      sdk.Coins                `json:"service_fee_cap"`
-	Timeout            int64                    `json:"timeout"`
-	SuperMode          bool                     `json:"super_mode"`
-	Repeated           bool                     `json:"repeated"`
-	RepeatedFrequency  uint64                   `json:"repeated_frequency"`
-	RepeatedTotal      int64                    `json:"repeated_total"`
-	BatchCounter       uint64                   `json:"batch_counter"`
-	BatchRequestCount  uint16                   `json:"batch_request_count"`
-	BatchResponseCount uint16                   `json:"batch_response_count"`
-	BatchState         RequestContextBatchState `json:"batch_state"`
-	State              RequestContextState      `json:"state"`
-	ResponseThreshold  uint16                   `json:"response_threshold"`
-	ModuleName         string                   `json:"module_name"`
+	ServiceName            string                   `json:"service_name"`
+	Providers              []sdk.AccAddress         `json:"providers"`
+	Consumer               sdk.AccAddress           `json:"consumer"`
+	Input                  string                   `json:"input"`
+	ServiceFeeCap          sdk.Coins                `json:"service_fee_cap"`
+	Timeout                int64                    `json:"timeout"`
+	SuperMode              bool                     `json:"super_mode"`
+	Repeated               bool                     `json:"repeated"`
+	RepeatedFrequency      uint64                   `json:"repeated_frequency"`
+	RepeatedTotal          int64                    `json:"repeated_total"`
+	BatchCounter           uint64                   `json:"batch_counter"`
+	BatchRequestCount      uint16                   `json:"batch_request_count"`
+	BatchResponseCount     uint16                   `json:"batch_response_count"`
+	BatchResponseThreshold uint16                   `json:"batch_response_threshold"`
+	BatchState             RequestContextBatchState `json:"batch_state"`
+	State                  RequestContextState      `json:"state"`
+	ResponseThreshold      uint16                   `json:"response_threshold"`
+	ModuleName             string                   `json:"module_name"`
 }
 
 // NewRequestContext creates a new RequestContext instance
@@ -50,30 +51,57 @@ func NewRequestContext(
 	batchCounter uint64,
 	batchRequestCount,
 	batchResponseCount uint16,
+	batchResponseThreshold uint16,
 	batchState RequestContextBatchState,
 	state RequestContextState,
 	responseThreshold uint16,
 	moduleName string,
 ) RequestContext {
 	return RequestContext{
-		ServiceName:        serviceName,
-		Providers:          providers,
-		Consumer:           consumer,
-		Input:              input,
-		ServiceFeeCap:      serviceFeeCap,
-		Timeout:            timeout,
-		SuperMode:          superMode,
-		Repeated:           repeated,
-		RepeatedFrequency:  repeatedFrequency,
-		RepeatedTotal:      repeatedTotal,
-		BatchCounter:       batchCounter,
-		BatchRequestCount:  batchRequestCount,
-		BatchResponseCount: batchResponseCount,
-		BatchState:         batchState,
-		State:              state,
-		ResponseThreshold:  responseThreshold,
-		ModuleName:         moduleName,
+		ServiceName:            serviceName,
+		Providers:              providers,
+		Consumer:               consumer,
+		Input:                  input,
+		ServiceFeeCap:          serviceFeeCap,
+		Timeout:                timeout,
+		SuperMode:              superMode,
+		Repeated:               repeated,
+		RepeatedFrequency:      repeatedFrequency,
+		RepeatedTotal:          repeatedTotal,
+		BatchCounter:           batchCounter,
+		BatchRequestCount:      batchRequestCount,
+		BatchResponseCount:     batchResponseCount,
+		BatchResponseThreshold: batchResponseThreshold,
+		BatchState:             batchState,
+		State:                  state,
+		ResponseThreshold:      responseThreshold,
+		ModuleName:             moduleName,
 	}
+}
+
+// Empty returns true if empty
+func (rc RequestContext) Validate() sdk.Error {
+	if err := ValidateServiceName(rc.ServiceName); err != nil {
+		return err
+	}
+
+	if err := ValidateProvidersNoEmpty(rc.Providers); err != nil {
+		return err
+	}
+
+	if err := ValidateConsumer((rc.Consumer)); err != nil {
+		return err
+	}
+
+	if err := ValidateInput(rc.Input); err != nil {
+		return err
+	}
+
+	if err := ValidateServiceFeeCap(rc.ServiceFeeCap); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // Empty returns true if empty
@@ -107,14 +135,29 @@ func (rc RequestContext) String() string {
 	BatchCounter:            %d
 	BatchRequestCount:       %d
 	BatchResponseCount:      %d
+	BatchResponseThreshold:  %d
 	BatchState:              %s
 	State:                   %s
 	ResponseThreshold:       %d
 	ModuleName:              %s`,
-		rc.ServiceName, providers, rc.Consumer, rc.Input, rc.ServiceFeeCap.String(),
-		rc.Timeout, rc.SuperMode, rc.Repeated, rc.RepeatedFrequency, rc.RepeatedTotal,
-		rc.BatchCounter, rc.BatchRequestCount, rc.BatchResponseCount, rc.BatchState, rc.State,
-		rc.ResponseThreshold, rc.ModuleName,
+		rc.ServiceName,
+		providers,
+		rc.Consumer,
+		rc.Input,
+		rc.ServiceFeeCap.String(),
+		rc.Timeout,
+		rc.SuperMode,
+		rc.Repeated,
+		rc.RepeatedFrequency,
+		rc.RepeatedTotal,
+		rc.BatchCounter,
+		rc.BatchRequestCount,
+		rc.BatchResponseCount,
+		rc.BatchResponseThreshold,
+		rc.BatchState,
+		rc.State,
+		rc.ResponseThreshold,
+		rc.ModuleName,
 	)
 }
 
@@ -144,14 +187,29 @@ func (rc RequestContext) HumanString(converter sdk.CoinsConverter) string {
 	BatchCounter:            %d
 	BatchRequestCount:       %d
 	BatchResponseCount:      %d
+	BatchResponseThreshold:  %d
 	BatchState:              %s
 	State:                   %s
 	ResponseThreshold:       %d
 	ModuleName:              %s`,
-		rc.ServiceName, providers, rc.Consumer, rc.Input, converter.ToMainUnit(rc.ServiceFeeCap),
-		rc.Timeout, rc.SuperMode, rc.Repeated, rc.RepeatedFrequency, rc.RepeatedTotal,
-		rc.BatchCounter, rc.BatchRequestCount, rc.BatchResponseCount, rc.BatchState, rc.State,
-		rc.ResponseThreshold, rc.ModuleName,
+		rc.ServiceName,
+		providers,
+		rc.Consumer,
+		rc.Input,
+		converter.ToMainUnit(rc.ServiceFeeCap),
+		rc.Timeout,
+		rc.SuperMode,
+		rc.Repeated,
+		rc.RepeatedFrequency,
+		rc.RepeatedTotal,
+		rc.BatchCounter,
+		rc.BatchRequestCount,
+		rc.BatchResponseCount,
+		rc.BatchResponseThreshold,
+		rc.BatchState,
+		rc.State,
+		rc.ResponseThreshold,
+		rc.ModuleName,
 	)
 }
 
@@ -244,9 +302,17 @@ func (r Request) String() string {
 	ExpirationHeight:        %d
 	RequestContextID:        %s
 	BatchCounter:            %d`,
-		r.ID.String(), r.ServiceName, r.Provider, r.Consumer, r.Input, r.ServiceFee.String(),
-		r.SuperMode, r.RequestHeight, r.ExpirationHeight,
-		r.RequestContextID.String(), r.RequestContextBatchCounter,
+		r.ID.String(),
+		r.ServiceName,
+		r.Provider,
+		r.Consumer,
+		r.Input,
+		r.ServiceFee.String(),
+		r.SuperMode,
+		r.RequestHeight,
+		r.ExpirationHeight,
+		r.RequestContextID.String(),
+		r.RequestContextBatchCounter,
 	)
 }
 
@@ -264,9 +330,17 @@ func (r Request) HumanString(converter sdk.CoinsConverter) string {
 	ExpirationHeight:        %d
 	RequestContextID:        %s
 	BatchCounter:            %d`,
-		r.ID.String(), r.ServiceName, r.Provider, r.Consumer, r.Input, converter.ToMainUnit(r.ServiceFee),
-		r.SuperMode, r.RequestHeight, r.ExpirationHeight,
-		r.RequestContextID.String(), r.RequestContextBatchCounter,
+		r.ID.String(),
+		r.ServiceName,
+		r.Provider,
+		r.Consumer,
+		r.Input,
+		converter.ToMainUnit(r.ServiceFee),
+		r.SuperMode,
+		r.RequestHeight,
+		r.ExpirationHeight,
+		r.RequestContextID.String(),
+		r.RequestContextBatchCounter,
 	)
 }
 
@@ -344,7 +418,10 @@ func (r Response) String() string {
 	Output:                  %s
 	RequestContextID:        %s
 	BatchCounter:            %d`,
-		r.Provider, r.Consumer, r.Result, r.Output,
+		r.Provider,
+		r.Consumer,
+		r.Result,
+		r.Output,
 		r.RequestContextID.String(),
 		r.RequestContextBatchCounter,
 	)
@@ -403,7 +480,8 @@ func (e EarnedFees) String() string {
 	return fmt.Sprintf(`EarnedFees:
 	Address:                 %s
 	Coins:                   %s`,
-		e.Address, e.Coins.String(),
+		e.Address,
+		e.Coins.String(),
 	)
 }
 
@@ -412,7 +490,8 @@ func (e EarnedFees) HumanString(converter sdk.CoinsConverter) string {
 	return fmt.Sprintf(`EarnedFees:
 	Address:                 %s
 	Coins:                   %s`,
-		e.Address, converter.ToMainUnit(e.Coins),
+		e.Address,
+		converter.ToMainUnit(e.Coins),
 	)
 }
 

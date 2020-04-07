@@ -13,7 +13,9 @@ type (
 
 	// ResponseCallback defines the response callback interface
 	ResponseCallback = types.ResponseCallback
-	StateCallback    = types.StateCallback
+
+	// StateCallback defines the state callback interface
+	StateCallback = types.StateCallback
 )
 
 const (

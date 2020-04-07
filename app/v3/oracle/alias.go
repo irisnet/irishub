@@ -31,10 +31,10 @@ const (
 )
 
 var (
-	RegisterCodec                 = types.RegisterCodec
 	RequestContextStateFromString = types.RequestContextStateFromString
-	GetSvcDefinitions             = types.GetSvcDefinitions
 
-	NewKeeper  = keeper.NewKeeper
-	NewQuerier = keeper.NewQuerier
+	NewKeeper       = keeper.NewKeeper
+	NewQuerier      = keeper.NewQuerier
+	RegisterCodec   = types.RegisterCodec
+	ValidateGenesis = types.ValidateGenesis
 )

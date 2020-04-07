@@ -1982,6 +1982,164 @@ paths:
                 repeated_total:
                   type: integer
                   example: '100'
+  '/service/contexts/{request-context-id}':
+    get:
+      summary: Query a request context
+      tags:
+        - Service
+      parameters:
+        - in: path
+          name: request-context-id
+          description: request context ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RequestContext'
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
+    put:
+      summary: Update a request context
+      description: Update a request context
+      tags:
+        - Service
+      parameters:
+        - in: path
+          name: request-context-id
+          description: request context ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Unsigned tx was succesfully generated
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_tx:
+                  $ref: '#/components/schemas/BaseTx'
+                providers:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Address'
+                service_fee_cap:
+                  type: string
+                  example: '1iris'
+                timeout:
+                  type: integer
+                  example: '0'
+                repeated_frequency:
+                  type: integer
+                  example: '0'
+                repeated_total:
+                  type: integer
+                  example: '0'
+                consumer:
+                  $ref: '#/components/schemas/Address'
+  '/service/contexts/{request-context-id}/pause':
+    post:
+      summary: Pause a running request context
+      description: Pause a running request context
+      tags:
+        - Service
+      parameters:
+        - in: path
+          name: request-context-id
+          description: request context ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Unsigned tx was succesfully generated
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_tx:
+                  $ref: '#/components/schemas/BaseTx'
+                consumer:
+                  $ref: '#/components/schemas/Address'
+  '/service/contexts/{request-context-id}/start':
+    post:
+      summary: Start a paused request context
+      description: Start a paused request context
+      tags:
+        - Service
+      parameters:
+        - in: path
+          name: request-context-id
+          description: request context ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Unsigned tx was succesfully generated
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_tx:
+                  $ref: '#/components/schemas/BaseTx'
+                consumer:
+                  $ref: '#/components/schemas/Address'
+  '/service/contexts/{request-context-id}/kill':
+    post:
+      summary: Terminate a request context
+      description: Terminate a request context
+      tags:
+        - Service
+      parameters:
+        - in: path
+          name: request-context-id
+          description: request context ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Unsigned tx was succesfully generated
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_tx:
+                  $ref: '#/components/schemas/BaseTx'
+                consumer:
+                  $ref: '#/components/schemas/Address'
   '/service/requests/{request-id}':
     get:
       summary: Query a request by the request ID
@@ -2090,164 +2248,6 @@ paths:
           description: Invalid parameters
         '500':
           description: Internal Server Error
-  '/service/contexts/{request-context-id}/pause':
-    post:
-      summary: Pause a running request context
-      description: Pause a running request context
-      tags:
-        - Service
-      parameters:
-        - in: path
-          name: request-context-id
-          description: request context ID
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Unsigned tx was succesfully generated
-        '400':
-          description: Invalid parameters
-        '500':
-          description: Internal Server Error
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                base_tx:
-                  $ref: '#/components/schemas/BaseTx'
-                consumer:
-                  $ref: '#/components/schemas/Address'
-  '/service/contexts/{request-context-id}/start':
-    post:
-      summary: Start a paused request context
-      description: Start a paused request context
-      tags:
-        - Service
-      parameters:
-        - in: path
-          name: request-context-id
-          description: request context ID
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Unsigned tx was succesfully generated
-        '400':
-          description: Invalid parameters
-        '500':
-          description: Internal Server Error
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                base_tx:
-                  $ref: '#/components/schemas/BaseTx'
-                consumer:
-                  $ref: '#/components/schemas/Address'
-  '/service/contexts/{request-context-id}/kill':
-    post:
-      summary: Terminate a request context
-      description: Terminate a request context
-      tags:
-        - Service
-      parameters:
-        - in: path
-          name: request-context-id
-          description: request context ID
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Unsigned tx was succesfully generated
-        '400':
-          description: Invalid parameters
-        '500':
-          description: Internal Server Error
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                base_tx:
-                  $ref: '#/components/schemas/BaseTx'
-                consumer:
-                  $ref: '#/components/schemas/Address'
-  '/service/contexts/{request-context-id}':
-    get:
-      summary: Query a request context
-      tags:
-        - Service
-      parameters:
-        - in: path
-          name: request-context-id
-          description: request context ID
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RequestContext'
-        '400':
-          description: Invalid parameters
-        '500':
-          description: Internal Server Error
-    put:
-      summary: Update a request context
-      description: Update a request context
-      tags:
-        - Service
-      parameters:
-        - in: path
-          name: request-context-id
-          description: request context ID
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Unsigned tx was succesfully generated
-        '400':
-          description: Invalid parameters
-        '500':
-          description: Internal Server Error
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                base_tx:
-                  $ref: '#/components/schemas/BaseTx'
-                providers:
-                  type: array
-                  items: 
-                    $ref: '#/components/schemas/Address'
-                service_fee_cap:
-                  type: string
-                  example: '1iris'
-                timeout:
-                  type: integer
-                  example: '0'
-                repeated_frequency:
-                  type: integer
-                  example: '0'
-                repeated_total:
-                  type: integer
-                  example: '0'
-                consumer:
-                  $ref: '#/components/schemas/Address'
   '/service/requests/{request-context-id}/{batch-counter}':
     get:
       summary: Query active requests by the request context ID and batch counter
@@ -4071,6 +4071,8 @@ components:
         batch_request_count:
           type: integer
         batch_response_count:
+          type: integer
+        batch_response_threshold:
           type: integer
         batch_state:
           type: string

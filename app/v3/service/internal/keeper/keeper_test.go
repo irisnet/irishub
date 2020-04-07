@@ -15,8 +15,6 @@ import (
 )
 
 var (
-	testChainID = "test-chain"
-
 	testCoin1, _ = sdk.IrisCoinType.ConvertToCoin("10000iris")
 	testCoin2, _ = sdk.IrisCoinType.ConvertToCoin("100iris")
 	testCoin3, _ = sdk.IrisCoinType.ConvertToCoin("1iris")
@@ -66,7 +64,8 @@ func setRequestContext(
 	requestContext := types.NewRequestContext(
 		testServiceName, providers, consumer, testInput,
 		testServiceFeeCap, testTimeout, false, true, testRepeatedFreq,
-		testRepeatedTotal, 0, 0, 0, types.BATCHCOMPLETED, state, threshold, moduleName,
+		testRepeatedTotal, 0, 0, 0, threshold, types.BATCHCOMPLETED,
+		state, threshold, moduleName,
 	)
 
 	requestContextID := types.GenerateRequestContextID(ctx.TxHash(), 0)
@@ -287,7 +286,7 @@ func TestKeeper_Request_Context(t *testing.T) {
 	newRepeatedFreq := testRepeatedFreq + 10
 	newRepeatedTotal := int64(-1)
 
-	err = keeper.UpdateRequestContext(ctx, requestContextID, nil, newServiceFeeCap, newTimeout, newRepeatedFreq, newRepeatedTotal, consumer)
+	err = keeper.UpdateRequestContext(ctx, requestContextID, nil, 0, newServiceFeeCap, newTimeout, newRepeatedFreq, newRepeatedTotal, consumer)
 	require.NoError(t, err)
 
 	requestContext, found = keeper.GetRequestContext(ctx, requestContextID)
@@ -327,7 +326,8 @@ func TestKeeper_Request_Context(t *testing.T) {
 	require.NoError(t, err)
 
 	requestContext, found = keeper.GetRequestContext(ctx, requestContextID)
-	require.False(t, found)
+	require.True(t, found)
+	require.Equal(t, types.COMPLETED, requestContext.State)
 }
 
 func TestKeeper_Request_Service(t *testing.T) {

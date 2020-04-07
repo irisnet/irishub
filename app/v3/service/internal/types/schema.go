@@ -18,7 +18,12 @@ type ServiceSchemas struct {
 
 // ValidateServiceSchemas validates the given service schemas
 func ValidateServiceSchemas(schemas string) sdk.Error {
+	if len(schemas) == 0 {
+		return ErrInvalidSchemas(DefaultCodespace, "schemas missing")
+	}
+
 	svcSchemas, err := parseServiceSchemas(schemas)
+
 	if err != nil {
 		return err
 	}
@@ -36,6 +41,10 @@ func ValidateServiceSchemas(schemas string) sdk.Error {
 
 // ValidateBindingPricing validates the given pricing against the Pricing JSON Schema
 func ValidateBindingPricing(pricing string) sdk.Error {
+	if len(pricing) == 0 {
+		return ErrInvalidPricing(DefaultCodespace, "pricing missing")
+	}
+
 	if err := validateDocument([]byte(PricingSchema), pricing); err != nil {
 		return ErrInvalidPricing(DefaultCodespace, err.Error())
 	}
@@ -59,6 +68,10 @@ func ValidateRequestInput(schemas string, input string) sdk.Error {
 
 // ValidateResponseResult validates the response result against the result schema
 func ValidateResponseResult(result string) sdk.Error {
+	if len(result) == 0 {
+		return ErrInvalidResponseResult(DefaultCodespace, "result missing")
+	}
+
 	if err := validateDocument([]byte(ResultSchema), result); err != nil {
 		return ErrInvalidResponseResult(DefaultCodespace, err.Error())
 	}
@@ -230,7 +243,7 @@ const (
 	  "price": {
 		"description": "base price in main unit, e.g. 0.5iris",
 		"type": "string",
-		"pattern": "^\\d+(\\.\\d+)?[a-z][a-z0-9]{2,7}(,\\d+(\\.\\d+)?[a-z][a-z0-9]{2,7})*$"
+		"pattern": "^\\d+(\\.\\d+)?[a-z][a-z0-9]{2,7}$"
 	  },
 	  "promotions_by_time": {
 		"description": "promotions by time, in ascending order",

@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+
 	cmn "github.com/tendermint/tendermint/libs/common"
 )
 

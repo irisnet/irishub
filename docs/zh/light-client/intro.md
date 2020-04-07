@@ -88,10 +88,11 @@ irislcd start --node=tcp://localhost:26657 --chain-id=irishub --laddr=tcp://0.0.
 ### Bank模块的APIs
 
 1. `GET /bank/coins/{coin-type}`: 查询coin的类型信息
-2. `GET /bank/token-stats/{id}`: 查询token统计信息
-3. `GET /bank/accounts/{address}`: 查询秘钥对象账户的信息
-4. `POST /bank/accounts/{address}/send`: 发起转账交易
-5. `POST /bank/accounts/{address}/burn`: 销毁token
+2. `GET /bank/token-stats`: 查询token统计信息
+3. `GET /bank/token-stats/{symbol}`: 查询指定token统计信息
+4. `GET /bank/accounts/{address}`: 查询链上账户信息
+5. `POST /bank/accounts/{address}/send`: 发起转账交易
+6. `POST /bank/accounts/{address}/burn`: 销毁token
 
 ### Stake模块的APIs
 
@@ -178,17 +179,17 @@ irislcd start --node=tcp://localhost:26657 --chain-id=irishub --laddr=tcp://0.0.
 10. `POST /service/bindings/{service-name}/{provider}/enable`: 启用一个不可用的服务绑定
 11. `POST /service/bindings/{service-name}/{provider}/refund-deposit`: 取回一个服务绑定的所有押金
 12. `POST /service/contexts`: 发起服务调用
-13. `GET /service/requests/{request-id}`: 查询服务请求
-14. `GET /service/requests/{service-name}/{provider}`: 查询一个服务绑定的活跃请求
-15. `GET /service/requests/{request-context-id}/{batch-counter}`: 根据请求上下文ID和批次计数器查询请求列表
-16. `POST /service/responses`: 响应服务请求
-17. `GET /service/responses/{request-id}`: 查询服务响应
-18. `GET /service/responses/{request-context-id}/{batch-counter}`: 根据请求上下文ID和批次计数器查询服务响应列表
-19. `GET /service/contexts/{request-context-id}`: 查询请求上下文
-20. `PUT /service/contexts/{request-context-id}`: 更新请求上下文
-21. `POST /service/contexts/{request-context-id}/pause`: 暂停一个正在进行的请求上下文
-22. `POST /service/contexts/{request-context-id}/start`: 启动一个暂停的请求上下文
-23. `POST /service/contexts/{request-context-id}/kill`: 终止请求上下文
+13. `GET /service/contexts/{request-context-id}`: 查询请求上下文
+14. `PUT /service/contexts/{request-context-id}`: 更新请求上下文
+15. `POST /service/contexts/{request-context-id}/pause`: 暂停一个正在进行的请求上下文
+16. `POST /service/contexts/{request-context-id}/start`: 启动一个暂停的请求上下文
+17. `POST /service/contexts/{request-context-id}/kill`: 终止请求上下文
+18. `GET /service/requests/{request-id}`: 查询服务请求
+19. `GET /service/requests/{service-name}/{provider}`: 查询一个服务绑定的活跃请求
+20. `GET /service/requests/{request-context-id}/{batch-counter}`: 根据请求上下文ID和批次计数器查询请求列表
+21. `POST /service/responses`: 响应服务请求
+22. `GET /service/responses/{request-id}`: 查询服务响应
+23. `GET /service/responses/{request-context-id}/{batch-counter}`: 根据请求上下文ID和批次计数器查询服务响应列表
 24. `GET /service/fees/{provider}`: 查询服务提供者的收益
 25. `POST /service/fees/{provider}/withdraw`: 提取服务提供者的收益
 

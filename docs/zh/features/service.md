@@ -1,119 +1,157 @@
-# iService
+# Service
+
+> **_提示：_** 本文档中显示的命令仅供说明。有关命令的准确语法，请参阅[cli docs](../client/service.md)。
 
 ## 简介
 
-IRIS Services（又名“iService”）旨在对链下服务从定义、绑定（服务提供方注册）、调用到治理（分析和争端解决）的全生命周期传递，来跨越区块链世界和传统业务应用世界之间的鸿沟。
+IRIS服务（又称iService）旨在弥合区块链和传统应用之间的鸿沟。它规范化了链外服务的定义和绑定（提供者注册），促进了调用以及与这些服务的交互，并能调解服务治理过程（分析和争议解决）。
 
-IRIS-SDK通过增强的IBC处理逻辑来支持服务语义，以允许分布式商业服务在区块链互联网上可用。我们引入接口描述语言（[Interface description language](https://en.wikipedia.org/wiki/Interface-description-language)，
-简称IDL）对服务进行标准化定义来满足跨语言的服务调用。目前支持的IDL语言为[protobuf](https://developers.google.com/protocol-buffers/)。该模块的主要功能点如下：
+## 服务定义
 
-1. 服务定义
-2. 服务绑定
-3. 服务调用
-4. 争议解决 (TODO)
-5. 服务分析 (TODO)
+### 服务接口 schema
 
-### 系统参数
+任何用户都可以在区块链上定义服务。必须使用[JSON Schema](https://JSON-Schema.org/)根据服务的输入和输出指定服务的接口。下面是一个示例：
 
-以下参数均可通过[governance](governance.md)修改
+```json
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "service-def-example",
+  "description": "Schema for a service example",
+  "type": "object",
+  "properties":{
+    "input":{
+      "type":"object",
+      "properties":{
+        "base":{
+          "description":"base token denom",
+          "type":"string"
+        },
+        "quote":{
+          "description":"quote token denom",
+          "type":"string"
+        }
+      }
+    },
+    "output":{
+      "type":"object",
+      "properties":{
+        "price":{
+          "description":"price",
+          "type":"number"
+        }
+      }
+    }
+  }
+}
+```
 
-* `MinDepositMultiple`    服务绑定抵押金额（相对于服务价格）最小的倍数
-* `MaxRequestTimeout`     服务调用最大等待区块个数
-* `ServiceFeeTax`         服务费的税收比例
-* `SlashFraction`         惩罚百分比
-* `ComplaintRetrospect`   可提起争议最大时长
-* `ArbitrationTimeLimit`  争议解决最大时长
+### 服务结果 schema
 
-## 使用场景
+服务提供者为响应用户请求（包含一个输入对象），发送回一个由结果对象和可选的输出对象组成的响应。结果code等于200时输出对象必须提供。结果对象必须符合此[schema](service-result.json)，下面是一个示例：
 
-### 服务定义
+```json
+{
+  "result" : {
+    "code": 400,
+    "message": "user input out of range"
+  }
+}
+```
 
-任何用户可以发起服务定义请求，在服务定义中，使用`protobuf`对该服务的方法，方法的输入、输出参数进行标准化定义。为了更好的支持服务的属性，IRISnet对`protobuf`进行了一些扩展，详细请参照[IDL文件扩展](#idl文件扩展)
+一旦服务定义就绪，就可以通过执行以下命令将其发布到区块链：
 
 ```bash
 # 创建服务定义
-iriscli service define --chain-id=irishub --from=<key-name> --fee=0.6iris --gas=100000 --service-name=<service-name> --service-description=<service-description> --author-description=<author-description> --tags=<tag1>,<tag2> --idl-content=<idl-content> --file=</***/***.proto>
+iriscli service define <service-name> <schemas-json or path/to/schemas.json> --description=<service-description> --author-description=<author-description> --tags=<tag1,tag2,...>
 
 # 查询服务定义
-iriscli service definition --def-chain-id=<def-chain-id> --service-name=<service-name>
+iriscli service definition <service-name>
 ```
 
-### 服务绑定
+## 服务绑定
 
-在服务绑定中，需要抵押一定数量的押金，最小的抵押金额为该服务的服务费价格的`MinDepositMultiple`倍数。服务提供方可以随时更新他的服务绑定并调整服务价格，禁用、启用该服务绑定。如果想取回押金，需要禁用服务绑定并等待`ComplaintRetrospectParameter`+`ArbitrationTimelimitParameter`的周期。
+任何人通过创建对现有服务定义的绑定，就可以提供相应的服务。绑定主要由三个组件组成：提供者地址（执行`绑定`交易的账户地址）、定价和押金。
+
+### 提供者地址
+
+消费者应该能够向目标提供者地址发起服务请求（输入），并能获取从该地址返回的响应（输出）。
+
+### 定价
+
+定价必须符合此[schema](service-pricing.json)。下面是一个定价示例：
+
+```json
+{
+  "price": "0.1iris",
+  "promotions_by_time": [
+    {
+      "start_time": "2020-01-01T00:00:00Z",
+      "end_time": "2020-03-31T23:59:59Z",
+      "discount": 0.7
+    },
+    {
+      "start_time": "2020-04-01T00:00:00Z",
+      "end_time": "2019-06-30T23:59:59Z",
+      "discount": 0.9
+    }
+  ]
+}
+```
+
+### 押金
+
+创建服务绑定需要一定的押金用于服务承诺。押金必须大于 _押金阈值_，该值由`max(DepositMultiple*price,MinDeposit)`得出。如果服务提供者未能在超时之前响应请求，则其绑定押金的一小部分，即`SlashFraction*deposit`将被扣除。如果押金降至阈值以下，服务绑定将被暂时禁用，直到其所有者增加足够的押金重新激活。
+
+> **_提示：_**  `service/DepositMultiple`、`service/MinDeposit`和`service/SlashFraction`是可以通过链上[治理](governance.md)更改的系统参数。
+
+### 生命周期
+
+服务绑定可以由其所有者随时更新，以调整定价或增加押金；也可以被禁用和重新启用。如果服务绑定所有者不想再提供服务，则需要禁用绑定并等待一段时间，然后才能取回押金。
 
 ```bash
-# 服务绑定（抵押1000iris， 价格1iris， 平均响应时间10000毫秒， 服务可用性9999（10000次调用可用次数的整数表示））
-iriscli service bind --chain-id=irishub --from=<key-name> --fee=0.3iris --service-name=<service-name> --def-chain-id=<def-chain-id> --bind-type=Local --deposit=1000iris --prices=1iris --avg-rsp-time=10000 --usable-time=9999
+# 创建服务绑定
+iriscli service bind <service-name> <deposit> <pricing-json or path/to/pricing.json>
 
-# 查询服务绑定
-iriscli service binding --def-chain-id=<def-chain-id> --service-name=<service-name> --bind-chain-id=<bind-chain-id> --provider=<provider-account-address>
+# 更新服务绑定
+iriscli service update-binding <service-name> --deposit=<added-deposit> --pricing=<pricing-json or path/to/pricing.json>
 
-# 查询服务绑定列表
-iriscli service bindings --def-chain-id=<def-chain-id> --service-name=<service-name>
+# 设置收益提取地址
+iriscli service set-withdraw-addr <withdrawal-address>
 
-# 服务绑定更新
-iriscli service update-binding --chain-id=irishub --from=<key-name> --fee=0.3iris --service-name=<service-name> --def-chain-id=<def-chain-id> --bind-type=Local --deposit=1iris --prices=1iris,2iris --avg-rsp-time=10000 --usable-time=100
+# 提取收益到指定的提取地址
+iriscli service withdraw-fees
+
+# 启用服务绑定
+iriscli service enable <service-name> <added-deposit>
 
 # 禁用服务绑定
-iriscli service disable --chain-id=irishub --from=<key-name> --fee=0.3iris --def-chain-id=<def-chain-id> --service-name=<service-name>
+iriscli service disable <service-name>
 
-# 开启服务绑定，并追加抵押100iris
-iriscli service enable --chain-id=irishub --from=<key-name> --fee=0.3iris --def-chain-id=<def-chain-id> --service-name=<service-name> --deposit=100iris
+# 取回服务绑定的押金
+iriscli service refund-deposit <service-name>
 
-# 取回押金
-iriscli service refund-deposit --chain-id=irishub --from=<key-name> --fee=0.3iris --def-chain-id=<def-chain-id> --service-name=<service-name>
+# 受托人提取服务税到指定地址
+iriscli service withdraw-tax <destination-address> <withdrawal-amount>
+
+# 查询服务绑定
+iriscli service binding <service-name> <provider-address>
+
+# 查询一个服务的绑定列表
+iriscli service bindings <service-name>
+
+# 查询服务提供者的收益提取地址
+iriscli service withdraw-addr <provider-address>
+
+# 查询服务提供者的收益
+iriscli service fees <provider-address>
+
+# 查询系统 schemas（有效的 schema 名称: pricing, result）
+iriscli service schema <schema-name>
 ```
 
-### 服务调用
+## 服务调用
 
-服务消费者如果需要发起服务调用请求，需要支付服务提供方指定的服务费。服务提供方需要在`MaxRequestTimeout`定义的区块高度内响应该服务请求，如果超时未响应，将从服务提供方的该服务绑定押金中扣除`SlashFraction`比例的押金，同时该次服务调用的服务费将退还到服务消费者的退费池中。如果服务调用被正常响应，系统从该次服务调用的服务费中将扣除`ServiceFeeTax`比例的系统税收，同时将剩余的服务费加入到服务提供方的收入池中。服务提供方/消费者可以发起`withdraw-fees`/`refund-fees`交易取回自己在收入池/退费池中所有的token。
+服务消费者如果需要发起服务调用请求，需要支付服务提供方指定的服务费。服务提供方需要在MaxRequestTimeout定义的区块高度内响应该服务请求，如果超时未响应，将从服务提供方的该服务绑定押金中扣除SlashFraction比例的押金，同时该次服务调用的服务费将退还到服务消费者的退费池中。如果服务调用被正常响应，系统从该次服务调用的服务费中将扣除ServiceFeeTax比例的系统税收，同时将剩余的服务费加入到服务提供方的收入池中。服务提供方/消费者可以发起withdraw-fees/refund-fees交易取回自己在收入池/退费池中所有的token。
 
 ```bash
-# 发起服务调用
-iriscli service call --chain-id=irishub --from=<key-name> --fee=0.3iris --def-chain-id=<def-chain-id> --service-name=<service-name> --method-id=1 --bind-chain-id=<bind-chain-id> --provider=<provider-account-address> --service-fee=1iris --request-data=<request-data>
-
-# 查询服务请求列表
-iriscli service requests --def-chain-id=<def-chain-id> --service-name=<service-name> --bind-chain-id=<bind-chain-id> --provider=<provider-account-address>
-
-# 响应服务调用
-iriscli service respond --chain-id=irishub --from=<key-name> --fee=0.3iris --request-chain-id=<request-chain-id> --request-id=<request-id (e.g.230-130-0)> --response-data=<response-data>
-
-# 查询服务响应
-iriscli service response --request-chain-id=<request-chain-id> --request-id=<request-id (e.g.230-130-0)>
-
-# 查询指定地址的服务费退款和收入
-iriscli service fees <account-address>
-
-# 从服务费退款中退还所有费用
-iriscli service refund-fees --chain-id=irishub --from=<key-name> --fee=0.3iris
-
-# 从服务费收入中取回所有费用
-iriscli service withdraw-fees --chain-id=irishub --from=<key-name> --fee=0.3iris
 ```
-
-## IDL文件扩展
-
-在使用proto文件对服务的方法，输入、输出参数进行标准化定义时，可通过注释的方式增加method属性。
-
-### 注释标准
-
-* 使用 `//@Attribute 属性： 值`的方式添加在rpc方法上，即可将该属性添加为方法的属性。例如:
-
-    > //@Attribute description: sayHello
-
-### 目前支持的属性
-
-* `description` 对该方法的描述
-* `output-privacy` 是否对该方法的输出进行加密处理，{`NoPrivacy`，`PubKeyEncryption`}
-* `output-cached` 是否对该方法的输出进行缓存，{`OffChainCached`，`NoCached`}
-
-### IDL content参照
-
-* IDL content参照
-
-    > syntax = \"proto3\";\n\npackage helloworld;\n\n// The greeting service definition.\nservice Greeter {\n    //@Attribute description: sayHello\n    //@Attribute output-privacy: NoPrivacy\n    //@Attribute output-cached: NoCached\n    rpc SayHello (HelloRequest) returns (HelloReply) {}\n}\n\n// The request message containing the user's name.\nmessage HelloRequest {\n    string name = 1;\n}\n\n// The response message containing the greetings\nmessage HelloReply {\n    string message = 1;\n}\n
-
-* IDL文件参照
-
-    [test.proto](https://github.com/irisnet/irishub/blob/master/docs/features/test.proto)

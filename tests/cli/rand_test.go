@@ -42,8 +42,8 @@ func TestIrisCLIRand(t *testing.T) {
 	require.Equal(t, "20iris", barCoin)
 
 	// service data
-	serviceName := "random"
-	serviceSchemas := `{"input":{"type":"object","properties":{}},"output":{"type":"object","properties":{"seed":{"description":"seed","type":"string","pattern":"^[0-9a-fA-F]{64}$"}}},"error":{"type":"string"}}`
+	serviceName := rand.ServiceName
+
 	deposit := "10iris"
 	priceAmt := 1 // 1iris
 	pricing := fmt.Sprintf(`{"price":"%diris"}`, priceAmt)
@@ -59,10 +59,6 @@ func TestIrisCLIRand(t *testing.T) {
 	blockInterval := int64(5)
 	oracle := "true"
 	serviceFeeCap := "10iris"
-
-	svcDef := executeGetServiceDefinition(t, fmt.Sprintf("iriscli service definition %s %v", serviceName, flags))
-	require.Equal(t, serviceName, svcDef.Name)
-	require.Equal(t, serviceSchemas, svcDef.Schemas)
 
 	// bind service (foo)
 	sbStr := fmt.Sprintf("iriscli service bind %v", flags)
