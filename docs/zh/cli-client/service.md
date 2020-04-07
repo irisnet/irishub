@@ -99,7 +99,7 @@ iriscli service bind [flags]
 | -------------- | ---- | ----------------------------------------------------- | ---- |
 | --service-name |      | 服务名称                                              | 是   |
 | --deposit      |      | 服务绑定的押金                                        | 是   |
-| --pricing      |      | 服务定价内容或文件路径，需符合Irishub Pricing JSON schema |   是   |
+| --pricing      |      | 服务定价内容或文件路径，是一个[Irishub Service Pricing JSON Schema](../features/service-pricing.md)实例 |   是   |
 | --min-resp-time |     | 最小响应时间 | 是 |
 
 ### 绑定一个存在的服务定义
@@ -159,7 +159,7 @@ iriscli service update-binding [service-name] [flags]
 | 名称，速记     | 默认 | 描述                                                  | 必须 |
 | -------------- | ---- | ----------------------------------------------------- | ---- |
 | --deposit      |      | 增加的绑定押金，为空则不更新                                      |      |
-| --pricing      |      | 服务定价内容或文件路径，需符合Irishub Pricing JSON schema，为空则不更新 |      |
+| --pricing      |      | 服务定价内容或文件路径，是一个[Irishub Service Pricing JSON Schema](../features/service-pricing.md)实例，为空则不更新 |      |
 | --min-resp-time |     | 最小响应时间，为0则不更新 | |
 
 ### 更新一个存在的服务绑定
@@ -265,7 +265,7 @@ iriscli service call [flags]
 | --name            |       | 服务名称                                | 是   |
 | --providers       |       | 服务提供者列表                          | 是   |
 | --service-fee-cap |       | 愿意为单个请求支付的最大服务费用        | 是   |
-| --data            |       | 请求输入的内容或文件路径，是一个Input JSON schema实例 | 是   |
+| --data            |       | 请求输入的内容或文件路径，是一个Input JSON Schema实例 | 是   |
 | --timeout         |       | 请求超时                                |   是   |
 | --super-mode      | false | 签名者是否为超级用户                    |
 | --repeated        | false | 请求是否为重复性的                      |      |
@@ -340,8 +340,8 @@ iriscli service respond [flags]
 | 名称，速记   | 默认 | 描述                                         | 必须 |
 | ------------ | ---- | -------------------------------------------- | ---- |
 | --request-id |      | 欲响应请求的ID                               | 是   |
-| --result     |      | 响应结果的内容或文件路径, 是一个Result JSON schema实例 | 是   |
-| --data       |      | 响应输出的内容或文件路径, 是一个Output JSON schema实例 |      |
+| --result     |      | 响应结果的内容或文件路径, 是一个[Irishub Service Result JSON Schema](../features/service-result.md)实例 | 是   |
+| --data       |      | 响应输出的内容或文件路径, 是一个Output JSON Schema实例 |      |
 
 ### 响应一个服务请求
 

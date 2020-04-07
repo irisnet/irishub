@@ -4,15 +4,15 @@ Asset模块用于管理你在IRIS Hub上发行的资产。
 
 ## 可用命令
 
-| 名称                                            | 描述                       |
-| ----------------------------------------------- | -------------------------- |
-| [token issue](#iriscli-asset-token-issue)       | 发行通证                   |
-| [token edit-token](#iriscli-asset-token-edit)   | 编辑通证                   |
-| [token transfer](#iriscli-asset-token-transfer) | 转让通证所有权             |
-| [token mint](#iriscli-asset-token-mint)         | 增发通证到指定账户         |
-| [token token](#iriscli-asset-token-token)       | 查询通证 |
+| 名称                                            | 描述                     |
+| ----------------------------------------------- | ------------------------ |
+| [token issue](#iriscli-asset-token-issue)       | 发行通证                 |
+| [token edit-token](#iriscli-asset-token-edit)   | 编辑通证                 |
+| [token transfer](#iriscli-asset-token-transfer) | 转让通证所有权           |
+| [token mint](#iriscli-asset-token-mint)         | 增发通证到指定账户       |
+| [token token](#iriscli-asset-token-token)       | 查询通证                 |
 | [token tokens](#iriscli-asset-token-tokens)     | 查询指定所有者的通证集合 |
-| [token fee](#iriscli-asset-token-fee)           | 查询通证相关费用           |
+| [token fee](#iriscli-asset-token-fee)           | 查询通证相关费用         |
 
 ## iriscli asset token issue
 
@@ -24,15 +24,15 @@ iriscli asset token issue [flags]
 
 **标识：**
 
-| 名称，速记       | 类型    | 必须 | 默认          | 描述                                                         |
-| ---------------- | ------- | ---- | ------------- | ------------------------------------------------------------ |
-| --name           | string  | 是   |               | 通证的名称，限制为32个unicode字符，例如"IRIS Network"        |
-| --symbol         | string  | 是   |               | 通证的符号，长度在3到8之间，字母数字字符，以字符开始，不区分大小写       |
-| --initial-supply | uint64  | 是   |               | 此通证的初始供应。 增发前的数量不应超过1000亿。              |
-| --max-supply     | uint64  |      | 1000000000000 | 通证上限，总供应不能超过最大供应。 增发前的数量不应超过1万亿 |
-| --scale          | uint8   | 是   |               | 通证最多可以有18位小数                                       |
-| --min-unit       | string  |      |               | 最小单位别名                                                 |
-| --mintable       | boolean |      | false         | 首次发行后是否可以增发此通证                                 |
+| 名称，速记       | 类型    | 必须 | 默认          | 描述                                                               |
+| ---------------- | ------- | ---- | ------------- | ------------------------------------------------------------------ |
+| --name           | string  | 是   |               | 通证的名称，限制为32个unicode字符，例如"IRIS Network"              |
+| --symbol         | string  | 是   |               | 通证的符号，长度在3到8之间，字母数字字符，以字符开始，不区分大小写 |
+| --initial-supply | uint64  | 是   |               | 此通证的初始供应。 增发前的数量不应超过1000亿。                    |
+| --max-supply     | uint64  |      | 1000000000000 | 通证上限，总供应不能超过最大供应。 增发前的数量不应超过1万亿       |
+| --scale          | uint8   | 是   |               | 通证最多可以有18位小数                                             |
+| --min-unit       | string  |      |               | 最小单位别名                                                       |
+| --mintable       | boolean |      | false         | 首次发行后是否可以增发此通证                                       |
 
 ### 发行通证
 
@@ -107,7 +107,7 @@ iriscli asset token mint [symbol] [flags]
 | 名称，速记 | 类型   | 必须 | 默认 | 描述                                       |
 | ---------- | ------ | ---- | ---- | ------------------------------------------ |
 | --to       | string |      |      | 增发的通证的接收地址，默认为发起该交易地址 |
-| --amount   | uint64 | 是   | 0    | 增发的数量                               |
+| --amount   | uint64 | 是   | 0    | 增发的数量                                 |
 
 ### 增发通证
 
