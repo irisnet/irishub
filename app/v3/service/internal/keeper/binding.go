@@ -3,7 +3,6 @@ package keeper
 import (
 	"encoding/json"
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/irisnet/irishub/app/v1/auth"
@@ -277,34 +276,31 @@ func (k Keeper) ParsePricing(ctx sdk.Context, pricing string) (p types.Pricing, 
 
 	var coins sdk.Coins
 
-	coinStrs := strings.Split(rawPricing.Price, ",")
-	for _, coinStr := range coinStrs {
-		unitName, amtStr, _ := sdk.ParseCoinParts(coinStr)
+	unitName, amtStr, err2 := sdk.ParseCoinParts(rawPricing.Price)
+	if err2 != nil {
+		return p, types.ErrInvalidPricing(k.codespace, fmt.Sprintf("failed to parse the pricing: %s", err))
+	}
+
+	amt, err := sdk.NewDecFromStr(amtStr)
+	if err != nil {
+		return p, types.ErrInvalidPricing(k.codespace, fmt.Sprintf("failed to parse the pricing: %s", err))
+	}
+
+	if unitName == sdk.Iris {
+		coins = sdk.NewCoins(sdk.NewCoin(
+			sdk.IrisAtto,
+			amt.Mul(sdk.NewDecFromInt(sdk.NewIntWithDecimal(1, sdk.AttoScale))).TruncateInt(),
+		))
+	} else {
+		token, err := k.ak.GetToken(ctx, unitName)
 		if err != nil {
-			return p, types.ErrInvalidPricing(k.codespace, fmt.Sprintf("failed to parse the pricing: %s", err))
+			return p, types.ErrInvalidPricing(k.codespace, fmt.Sprintf("invalid price: %s", err))
 		}
 
-		amt, err := sdk.NewDecFromStr(amtStr)
-		if err != nil {
-			return p, types.ErrInvalidPricing(k.codespace, fmt.Sprintf("failed to parse the pricing: %s", err))
-		}
-
-		if unitName == sdk.Iris {
-			coins = coins.Add(sdk.NewCoins(sdk.NewCoin(
-				sdk.IrisAtto,
-				amt.Mul(sdk.NewDecFromInt(sdk.NewIntWithDecimal(1, sdk.AttoScale))).TruncateInt(),
-			)))
-		} else {
-			token, err := k.ak.GetToken(ctx, unitName)
-			if err != nil {
-				return p, types.ErrInvalidPricing(k.codespace, fmt.Sprintf("invalid price: %s", err))
-			}
-
-			coins = coins.Add(sdk.NewCoins(sdk.NewCoin(
-				token.GetDenom(),
-				amt.Mul(sdk.NewDecFromInt(sdk.NewIntWithDecimal(1, int(token.GetDecimal())))).TruncateInt(),
-			)))
-		}
+		coins = sdk.NewCoins(sdk.NewCoin(
+			token.GetDenom(),
+			amt.Mul(sdk.NewDecFromInt(sdk.NewIntWithDecimal(1, int(token.GetDecimal())))).TruncateInt(),
+		))
 	}
 
 	p.Price = coins
