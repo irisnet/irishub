@@ -106,7 +106,7 @@ type PromotionByVolume struct {
 // GetDiscountByTime gets the discount level by the specified time
 func GetDiscountByTime(pricing Pricing, time time.Time) sdk.Dec {
 	for _, p := range pricing.PromotionsByTime {
-		if !time.Before(p.StartTime) && !time.After(p.EndTime) {
+		if !time.Before(p.StartTime) && time.Before(p.EndTime) {
 			return p.Discount
 		}
 	}
@@ -144,10 +144,10 @@ func ValidatePricing(pricing Pricing) sdk.Error {
 
 	// CONTRACT:
 	// p.EndTime > p.StartTime
-	// p[i].StartTime > p[i-1].EndTime
+	// p[i].StartTime >= p[i-1].EndTime
 	for i, p := range pricing.PromotionsByTime {
 		if !p.EndTime.After(p.StartTime) ||
-			(i > 0 && !p.StartTime.After(pricing.PromotionsByTime[i-1].EndTime)) {
+			(i > 0 && p.StartTime.Before(pricing.PromotionsByTime[i-1].EndTime)) {
 			return ErrInvalidPricing(DefaultCodespace, fmt.Sprintf("invalid timing promotion %d", i))
 		}
 	}
