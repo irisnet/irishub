@@ -69,9 +69,7 @@ func getAmountFromCoinStr(coinStr string) float64 {
 func modifyGenesisState(genesisState v3.GenesisFileState) v3.GenesisFileState {
 	genesisState.GovData = gov.DefaultGenesisStateForCliTest()
 	genesisState.UpgradeData = upgrade.DefaultGenesisStateForTest()
-	genesisState.ServiceData = service.DefaultGenesisStateForTest(
-		append(rand.GetSvcDefinitions(), oracle.GetSvcDefinitions()...),
-	)
+	genesisState.ServiceData = service.DefaultGenesisStateForTest(rand.GetSvcDefinitions())
 	genesisState.GuardianData = guardian.DefaultGenesisStateForTest()
 	genesisState.AssetData = asset.DefaultGenesisStateForTest()
 

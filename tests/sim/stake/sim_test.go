@@ -5,6 +5,8 @@ import (
 	"math/rand"
 	"testing"
 
+	abci "github.com/tendermint/tendermint/abci/types"
+
 	"github.com/irisnet/irishub/mock"
 	"github.com/irisnet/irishub/mock/simulation"
 	"github.com/irisnet/irishub/modules/auth"
@@ -14,7 +16,6 @@ import (
 	"github.com/irisnet/irishub/modules/stake"
 	"github.com/irisnet/irishub/modules/stake/types"
 	sdk "github.com/irisnet/irishub/types"
-	abci "github.com/tendermint/tendermint/abci/types"
 )
 
 // TestStakeWithRandomMessages
@@ -46,8 +47,7 @@ func TestStakeWithRandomMessages(t *testing.T) {
 		}
 	})
 
-	err := mapp.CompleteSetup(distrKey)
-	if err != nil {
+	if err := mapp.CompleteSetup(distrKey); err != nil {
 		panic(err)
 	}
 
@@ -78,24 +78,29 @@ func TestStakeWithRandomMessages(t *testing.T) {
 			validator := stake.NewValidator(valAddr, accs[i].PubKey, stake.Description{})
 			validator.Tokens = decAmt
 			validator.DelegatorShares = decAmt
-			delegation := stake.Delegation{accs[i].Address, valAddr, decAmt, 0}
+			delegation := stake.Delegation{
+				DelegatorAddr: accs[i].Address,
+				ValidatorAddr: valAddr,
+				Shares:        decAmt,
+				Height:        0,
+			}
 			validators = append(validators, validator)
 			delegations = append(delegations, delegation)
 		}
 		stakeGenesis.Validators = validators
 		stakeGenesis.Bonds = delegations
 
-		stake.InitGenesis(ctx, stakeKeeper, stakeGenesis)
+		_, _ = stake.InitGenesis(ctx, stakeKeeper, stakeGenesis)
 	}
 
-	simulation.Simulate(
+	_ = simulation.Simulate(
 		t, mapp.BaseApp, appStateFn,
 		[]simulation.WeightedOperation{
-			{10, SimulateMsgCreateValidator(mapper, stakeKeeper)},
-			{5, SimulateMsgEditValidator(stakeKeeper)},
-			{15, SimulateMsgDelegate(mapper, stakeKeeper)},
-			{10, SimulateMsgBeginUnbonding(mapper, stakeKeeper)},
-			{10, SimulateMsgBeginRedelegate(mapper, stakeKeeper)},
+			{Weight: 10, Op: SimulateMsgCreateValidator(mapper, stakeKeeper)},
+			{Weight: 5, Op: SimulateMsgEditValidator(stakeKeeper)},
+			{Weight: 15, Op: SimulateMsgDelegate(mapper, stakeKeeper)},
+			{Weight: 10, Op: SimulateMsgBeginUnbonding(mapper, stakeKeeper)},
+			{Weight: 10, Op: SimulateMsgBeginRedelegate(mapper, stakeKeeper)},
 		}, []simulation.RandSetup{
 			//Setup(mapp, stakeKeeper),
 			GenesisSetUp,

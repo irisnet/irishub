@@ -25,7 +25,8 @@ const (
 	RandPrec              = types.RandPrec
 	QueryRand             = types.QueryRand
 	QueryRandRequestQueue = types.QueryRandRequestQueue
-	ModuleServiceName     = types.ServiceName
+	ServiceName           = types.ServiceName
+	ServiceSchemas        = types.ServiceSchemas
 )
 
 // exported variables and functions

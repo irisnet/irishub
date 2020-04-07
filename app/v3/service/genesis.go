@@ -86,11 +86,6 @@ func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 
 // PrepForZeroHeightGenesis refunds the deposits, service fees and earned fees
 func PrepForZeroHeightGenesis(ctx sdk.Context, k Keeper) {
-	// refund deposits from all binding services
-	if err := k.RefundDeposits(ctx); err != nil {
-		panic(fmt.Sprintf("failed to refund the deposits: %s", err))
-	}
-
 	// refund service fees from all active requests
 	if err := k.RefundServiceFees(ctx); err != nil {
 		panic(fmt.Sprintf("failed to refund the service fees: %s", err))
