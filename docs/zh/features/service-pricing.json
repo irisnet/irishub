@@ -1,0 +1,86 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"title": "irishub-service-pricing",
+	"description": "IRIS Hub Service Pricing Schema",
+	"type": "object",
+	"definitions": {
+	  "discount": {
+		"description": "promotion discount, greater than 0 and less than 1",
+		"type": "string",
+		"pattern": "^0\\.\\d*[1-9]$"
+	  },
+	  "promotion_by_time": {
+		"description": "promotion by time",
+		"type": "object",
+		"properties": {
+		  "start_time": {
+			"description": "starting time of the promotion",
+			"type": "string",
+			"format": "date-time"
+		  },
+		  "end_time": {
+			"description": "ending time of the promotion",
+			"type": "string",
+			"format": "date-time"
+		  },
+		  "discount": {
+			"$ref": "#/definitions/discount"
+		  }
+		},
+		"additionalProperties": false,
+		"required": [
+		  "start_time",
+		  "end_time",
+		  "discount"
+		]
+	  },
+	  "promotion_by_volume": {
+		"description": "promotion by volume",
+		"type": "object",
+		"properties": {
+		  "volume": {
+			"description": "minimal volume for the promotion",
+			"type": "integer",
+			"minimum": 1
+		  },
+		  "discount": {
+			"$ref": "#/definitions/discount"
+		  }
+		},
+		"additionalProperties": false,
+		"required": [
+		  "volume",
+		  "discount"
+		]
+	  }
+	},
+	"properties": {
+	  "price": {
+		"description": "base price in main unit, e.g. 0.5iris",
+		"type": "string",
+		"pattern": "^\\d+(\\.\\d+)?[a-z][a-z0-9]{2,7}$"
+	  },
+	  "promotions_by_time": {
+		"description": "promotions by time, in ascending order",
+		"type": "array",
+		"items": {
+		  "$ref": "#/definitions/promotion_by_time"
+		},
+		"maxItems": 5,
+		"uniqueItems": true
+	  },
+	  "promotions_by_volume": {
+		"description": "promotions by volume, in ascending order",
+		"type": "array",
+		"items": {
+		  "$ref": "#/definitions/promotion_by_volume"
+		},
+		"maxItems": 5,
+		"uniqueItems": true
+	  }
+	},
+	"additionalProperties": false,
+	"required": [
+	  "price"
+	]
+}

@@ -93,7 +93,7 @@ iriscli service bind [flags]
 | --------------- | ------- | ----------------------------------------------------------------------------------- | -------- |
 | --service-name  |         | Service name                                                                        | Yes      |
 | --deposit       |         | Deposit of the binding                                                              | Yes      |
-| --pricing       |         | Pricing content or file path, which is an instance of the Irishub Service Pricing schema | Yes      |
+| --pricing       |         | Pricing content or file path, which is an instance of [Irishub Service Pricing JSON Schema](../features/service-pricing.md) | Yes      |
 | --min-resp-time |         | Minimum response time | Yes |
 
 ### Bind an existing service definition
@@ -154,7 +154,7 @@ iriscli service update-binding [service-name] [flags]
 | Name, shorthand | Default | Description                                                                         | Required |
 | --------------- | ------- | ----------------------------------------------------------------------------------- | -------- |
 | --deposit       |         | Deposit added for the binding, not updated if empty                                                     |          |
-| --pricing       |         | Pricing content or file path, which is an instance of the Irishub Service Pricing schema, not updated if empty |          |
+| --pricing       |         | Pricing content or file path, which is an instance of [Irishub Service Pricing JSON Schema](../features/service-pricing.md), not updated if empty |          |
 | --min-resp-time |         | Minimum response time, not updated if set to 0 |  |
 
 ### Update an existing service binding
@@ -260,7 +260,7 @@ iriscli service call [flags]
 | --service-name    |         | Service name                                                         | Yes      |
 | --providers       |         | Provider list to request                                             | Yes      |
 | --service-fee-cap |         | Maximum service fee to pay for a single request                      | Yes      |
-| --data            |         | Content or file path of the request input, which is an Input JSON schema instance | Yes      |
+| --data            |         | Content or file path of the request input, which is an Input JSON Schema instance | Yes      |
 | --timeout         |         | Request timeout                                                      |   Yes       |
 | --super-mode      | false   | Indicate if the signer is a super user                               |
 | --repeated        | false   | Indicate if the reqeust is repetitive                                |          |
@@ -335,8 +335,8 @@ iriscli service respond [flags]
 | Name, shorthand | Default | Description                                                             | Required |
 | --------------- | ------- | ----------------------------------------------------------------------- | -------- |
 | --request-id    |         | ID of the request to respond to                                         | Yes      |
-| --result        |         | Content or file path of the response result, which is a Result JSON schema instance  | Yes      |
-| --data          |         | Content or file path of the response output, which is an Output JSON schema instance |          |
+| --result        |         | Content or file path of the response result, which is an instance of [Irishub Service Result JSON Schema](../features/service-result.md)  | Yes      |
+| --data          |         | Content or file path of the response output, which is an Output JSON Schema instance |          |
 
 ### Respond to a service request
 
