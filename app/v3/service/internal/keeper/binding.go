@@ -274,36 +274,39 @@ func (k Keeper) ParsePricing(ctx sdk.Context, pricing string) (p types.Pricing, 
 		return p, types.ErrInvalidPricing(k.codespace, fmt.Sprintf("failed to unmarshal the pricing: %s", err))
 	}
 
-	var coins sdk.Coins
-
 	unitName, amtStr, err2 := sdk.ParseCoinParts(rawPricing.Price)
 	if err2 != nil {
-		return p, types.ErrInvalidPricing(k.codespace, fmt.Sprintf("failed to parse the pricing: %s", err2.Error()))
+		return p, types.ErrInvalidPricing(k.codespace, fmt.Sprintf("failed to parse the price: %s", err2.Error()))
 	}
 
-	amt, err := sdk.NewDecFromStr(amtStr)
-	if err != nil {
-		return p, types.ErrInvalidPricing(k.codespace, fmt.Sprintf("failed to parse the pricing: %s", err))
-	}
+	var denom string
+	var scale int
 
 	if unitName == sdk.Iris {
-		coins = sdk.NewCoins(sdk.NewCoin(
-			sdk.IrisAtto,
-			amt.Mul(sdk.NewDecFromInt(sdk.NewIntWithDecimal(1, sdk.AttoScale))).TruncateInt(),
-		))
+		denom = sdk.IrisAtto
+		scale = sdk.AttoScale
 	} else {
 		token, err := k.ak.GetToken(ctx, unitName)
 		if err != nil {
 			return p, types.ErrInvalidPricing(k.codespace, fmt.Sprintf("invalid price: %s", err))
 		}
 
-		coins = sdk.NewCoins(sdk.NewCoin(
-			token.GetDenom(),
-			amt.Mul(sdk.NewDecFromInt(sdk.NewIntWithDecimal(1, int(token.GetDecimal())))).TruncateInt(),
-		))
+		denom = token.GetDenom()
+		scale = int(token.GetDecimal())
 	}
 
-	p.Price = coins
+	amt, err := sdk.NewRatFromDecimal(amtStr, scale)
+	if err != nil {
+		return p, types.ErrInvalidPricing(k.codespace, fmt.Sprintf("failed to parse the price: %s", err))
+	}
+
+	denomAmtStr := amt.Mul(sdk.NewRatFromInt(sdk.NewIntWithDecimal(1, scale))).DecimalString(scale)
+	denomAmt, ok := sdk.NewIntFromString(denomAmtStr)
+	if !ok {
+		return p, types.ErrInvalidPricing(k.codespace, "failed to parse the price: invalid amount")
+	}
+
+	p.Price = sdk.NewCoins(sdk.NewCoin(denom, denomAmt))
 	p.PromotionsByTime = rawPricing.PromotionsByTime
 	p.PromotionsByVolume = rawPricing.PromotionsByVolume
 
