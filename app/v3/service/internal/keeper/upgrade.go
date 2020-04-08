@@ -7,6 +7,9 @@ import (
 
 // Init initializes the service module
 func (k Keeper) Init(ctx sdk.Context, svcDefinitions []types.ServiceDefinition) {
+	// reset params
+	k.SetParamSet(ctx, types.DefaultParams())
+
 	for _, definition := range svcDefinitions {
 		k.SetServiceDefinition(ctx, definition)
 	}
