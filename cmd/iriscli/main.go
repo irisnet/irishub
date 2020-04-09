@@ -5,7 +5,10 @@ import (
 	"os"
 	"path"
 
-	oraclecmd "github.com/irisnet/irishub/client/oracle/cli"
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+
+	"github.com/tendermint/tendermint/libs/cli"
 
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/app/protocol"
@@ -17,6 +20,7 @@ import (
 	guardiancmd "github.com/irisnet/irishub/client/guardian/cli"
 	htlccmd "github.com/irisnet/irishub/client/htlc/cli"
 	keyscmd "github.com/irisnet/irishub/client/keys/cli"
+	oraclecmd "github.com/irisnet/irishub/client/oracle/cli"
 	paramscmd "github.com/irisnet/irishub/client/params/cli"
 	randcmd "github.com/irisnet/irishub/client/rand/cli"
 	servicecmd "github.com/irisnet/irishub/client/service/cli"
@@ -28,9 +32,6 @@ import (
 	upgradecmd "github.com/irisnet/irishub/client/upgrade/cli"
 	"github.com/irisnet/irishub/client/utils"
 	"github.com/irisnet/irishub/version"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
-	"github.com/tendermint/tendermint/libs/cli"
 )
 
 // rootCmd is the entry point for this binary
@@ -219,6 +220,7 @@ func main() {
 			servicecmd.GetCmdQueryRequestContext(cdc),
 			servicecmd.GetCmdQueryServiceResponses(cdc),
 			servicecmd.GetCmdQueryEarnedFees(cdc),
+			servicecmd.GetCmdQuerySchema(cdc),
 		)...)
 	serviceCmd.AddCommand(
 		client.PostCommands(
