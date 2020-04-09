@@ -1,6 +1,7 @@
 package types
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -180,9 +181,38 @@ func validateDocument(schema []byte, document string) error {
 	return nil
 }
 
+// SchemaType defines the schema type
+type SchemaType string
+
+// String implements fmt.Stringer
+func (schema SchemaType) String() string {
+	return string(schema)
+}
+
+// MarshalJSON marshals the schema to JSON
+func (schema SchemaType) MarshalJSON() ([]byte, error) {
+	buf := bytes.NewBuffer([]byte{})
+	if err := json.Compact(buf, []byte(schema)); err != nil {
+		return nil, err
+	}
+
+	return json.Marshal(buf.String())
+}
+
+// UnmarshalJSON unmarshals the data to the schema
+func (schema *SchemaType) UnmarshalJSON(data []byte) error {
+	var s string
+	if err := json.Unmarshal(data, &s); err != nil {
+		return nil
+	}
+
+	*schema = SchemaType(s)
+	return nil
+}
+
 const (
 	// PricingSchema is the Pricing JSON Schema
-	PricingSchema = `
+	PricingSchema SchemaType = `
 {
 	"$schema": "http://json-schema.org/draft-04/schema#",
 	"title": "irishub-service-pricing",
@@ -272,7 +302,7 @@ const (
 `
 
 	// ResultSchema is the JSON Schema for the response result
-	ResultSchema = `
+	ResultSchema SchemaType = `
 {
 	"$schema": "http://json-schema.org/draft-04/schema#",
 	"title": "irishub-service-result",
