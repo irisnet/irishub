@@ -1,6 +1,8 @@
 package keeper
 
 import (
+	"strings"
+
 	abci "github.com/tendermint/tendermint/abci/types"
 	cmn "github.com/tendermint/tendermint/libs/common"
 
@@ -35,6 +37,8 @@ func NewQuerier(k Keeper) sdk.Querier {
 			return queryResponses(ctx, req, k)
 		case types.QueryEarnedFees:
 			return queryEarnedFees(ctx, req, k)
+		case types.QuerySchema:
+			return querySchema(ctx, req, k)
 		default:
 			return nil, sdk.ErrUnknownRequest("unknown service query endpoint")
 		}
@@ -62,8 +66,7 @@ func queryDefinition(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, 
 
 func queryBinding(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sdk.Error) {
 	var params types.QueryBindingParams
-	err := k.cdc.UnmarshalJSON(req.Data, &params)
-	if err != nil {
+	if err := k.cdc.UnmarshalJSON(req.Data, &params); err != nil {
 		return nil, sdk.ParseParamsErr(err)
 	}
 
@@ -82,8 +85,7 @@ func queryBinding(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sdk
 
 func queryBindings(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sdk.Error) {
 	var params types.QueryBindingsParams
-	err := k.cdc.UnmarshalJSON(req.Data, &params)
-	if err != nil {
+	if err := k.cdc.UnmarshalJSON(req.Data, &params); err != nil {
 		return nil, sdk.ParseParamsErr(err)
 	}
 
@@ -109,8 +111,7 @@ func queryBindings(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sd
 
 func queryWithdrawAddress(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sdk.Error) {
 	var params types.QueryWithdrawAddressParams
-	err := k.cdc.UnmarshalJSON(req.Data, &params)
-	if err != nil {
+	if err := k.cdc.UnmarshalJSON(req.Data, &params); err != nil {
 		return nil, sdk.ParseParamsErr(err)
 	}
 
@@ -126,8 +127,7 @@ func queryWithdrawAddress(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]b
 
 func queryRequest(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sdk.Error) {
 	var params types.QueryRequestParams
-	err := k.cdc.UnmarshalJSON(req.Data, &params)
-	if err != nil {
+	if err := k.cdc.UnmarshalJSON(req.Data, &params); err != nil {
 		return nil, sdk.ParseParamsErr(err)
 	}
 
@@ -147,8 +147,7 @@ func queryRequest(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sdk
 
 func queryRequests(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sdk.Error) {
 	var params types.QueryRequestsParams
-	err := k.cdc.UnmarshalJSON(req.Data, &params)
-	if err != nil {
+	if err := k.cdc.UnmarshalJSON(req.Data, &params); err != nil {
 		return nil, sdk.ParseParamsErr(err)
 	}
 
@@ -175,8 +174,7 @@ func queryRequests(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sd
 
 func queryResponse(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sdk.Error) {
 	var params types.QueryResponseParams
-	err := k.cdc.UnmarshalJSON(req.Data, &params)
-	if err != nil {
+	if err := k.cdc.UnmarshalJSON(req.Data, &params); err != nil {
 		return nil, sdk.ParseParamsErr(err)
 	}
 
@@ -196,8 +194,7 @@ func queryResponse(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sd
 
 func queryRequestContext(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sdk.Error) {
 	var params types.QueryRequestContextParams
-	err := k.cdc.UnmarshalJSON(req.Data, &params)
-	if err != nil {
+	if err := k.cdc.UnmarshalJSON(req.Data, &params); err != nil {
 		return nil, sdk.ParseParamsErr(err)
 	}
 
@@ -212,8 +209,7 @@ func queryRequestContext(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]by
 
 func queryRequestsByReqCtx(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sdk.Error) {
 	var params types.QueryRequestsByReqCtxParams
-	err := k.cdc.UnmarshalJSON(req.Data, &params)
-	if err != nil {
+	if err := k.cdc.UnmarshalJSON(req.Data, &params); err != nil {
 		return nil, sdk.ParseParamsErr(err)
 	}
 
@@ -239,8 +235,7 @@ func queryRequestsByReqCtx(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]
 
 func queryResponses(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sdk.Error) {
 	var params types.QueryResponsesParams
-	err := k.cdc.UnmarshalJSON(req.Data, &params)
-	if err != nil {
+	if err := k.cdc.UnmarshalJSON(req.Data, &params); err != nil {
 		return nil, sdk.ParseParamsErr(err)
 	}
 
@@ -266,8 +261,7 @@ func queryResponses(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, s
 
 func queryEarnedFees(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sdk.Error) {
 	var params types.QueryEarnedFeesParams
-	err := k.cdc.UnmarshalJSON(req.Data, &params)
-	if err != nil {
+	if err := k.cdc.UnmarshalJSON(req.Data, &params); err != nil {
 		return nil, sdk.ParseParamsErr(err)
 	}
 
@@ -277,6 +271,30 @@ func queryEarnedFees(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, 
 	}
 
 	bz, err := codec.MarshalJSONIndent(k.cdc, fees)
+	if err != nil {
+		return nil, sdk.MarshalResultErr(err)
+	}
+
+	return bz, nil
+}
+
+func querySchema(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sdk.Error) {
+	var params types.QuerySchemaParams
+	if err := k.cdc.UnmarshalJSON(req.Data, &params); err != nil {
+		return nil, sdk.ParseParamsErr(err)
+	}
+
+	var schema types.SchemaType
+
+	if strings.ToLower(params.SchemaName) == "pricing" {
+		schema = types.PricingSchema
+	} else if strings.ToLower(params.SchemaName) == "result" {
+		schema = types.ResultSchema
+	} else {
+		return nil, types.ErrInvalidSchemaName(types.DefaultCodespace)
+	}
+
+	bz, err := codec.MarshalJSONIndent(k.cdc, schema)
 	if err != nil {
 		return nil, sdk.MarshalResultErr(err)
 	}
