@@ -30,6 +30,7 @@ Service模块允许在IRIS Hub中定义、绑定、调用服务。[了解更多i
 | [kill](#iriscli-service-kill)                           | 终止请求上下文                               |
 | [fees](#iriscli-service-fees)                           | 查询服务提供者的收益                         |
 | [withdraw-fees](#iriscli-service-withdraw-fees)         | 提取服务提供者的收益                         |
+| [schema](#iriscli-service-schema)         | 通过 schema 名称查询系统 schema |
 
 ## iriscli service define
 
@@ -514,4 +515,24 @@ iriscli service withdraw-fees [flags]
 
 ```bash
 iriscli service withdraw-fees --chain-id=irishub --from=<key-name> --fee=0.3iris
+```
+
+## iriscli service schema
+
+通过 schema 名称查询系统 schema。有效的 schema 名称为 `pricing`（服务定价）和 `result`（响应结果）。
+
+```bash
+iriscli service schema [schema-name] [flags]
+```
+
+### 查询服务定价 schema
+
+```bash
+iriscli service schema pricing
+```
+
+### 查询响应结果 schema
+
+```bash
+iriscli service schema result
 ```

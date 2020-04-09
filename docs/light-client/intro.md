@@ -192,6 +192,7 @@ This api supports the following special parameters. By default, their values are
 23. `GET /service/responses/{request-context-id}/{batch-counter}`: Query active responses by the request context ID and batch counter
 24. `GET /service/fees/{provider}`: Query the earned fees of a provider
 25. `POST /service/fees/{provider}/withdraw`: Withdraw the earned fees of a provider
+26. `GET /service/schemas/{schema-name}`: Query the system schema by the schema name
 
 ### Oracle module APIs
 
