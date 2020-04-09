@@ -10,37 +10,44 @@ IRIS服务（又称iService）旨在弥合区块链和传统应用之间的鸿�
 
 ### 服务接口 schema
 
-任何用户都可以在区块链上定义服务。必须使用[JSON Schema](https://JSON-Schema.org/)根据服务的输入和输出指定服务的接口。下面是一个示例：
+任何用户都可以在区块链上定义服务。服务的接口即输入和输出需要使用[JSON Schema](https://JSON-Schema.org/)来指定。下面是一个示例：
 
 ```json
 {
-  "$schema": "http://json-schema.org/draft-04/schema#",
-  "title": "service-def-example",
-  "description": "Schema for a service example",
-  "type": "object",
-  "properties":{
-    "input":{
-      "type":"object",
-      "properties":{
-        "base":{
-          "description":"base token denom",
-          "type":"string"
-        },
-        "quote":{
-          "description":"quote token denom",
-          "type":"string"
-        }
+  "input": {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "service-def-input-example",
+    "description": "Schema for a service input example",
+    "type": "object",
+    "properties": {
+      "base": {
+        "description": "base token denom",
+        "type": "string"
+      },
+      "quote": {
+        "description": "quote token denom",
+        "type": "string"
       }
     },
-    "output":{
-      "type":"object",
-      "properties":{
-        "price":{
-          "description":"price",
-          "type":"number"
-        }
+    "required": [
+      "base",
+      "quote"
+    ]
+  },
+  "output": {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "service-def-output-example",
+    "description": "Schema for a service output example",
+    "type": "object",
+    "properties": {
+      "price": {
+        "description": "price",
+        "type": "number"
       }
-    }
+    },
+    "required": [
+      "price"
+    ]
   }
 }
 ```
