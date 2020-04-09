@@ -77,6 +77,12 @@ func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Co
 		fmt.Sprintf("/service/fees/{%s}", Provider),
 		queryEarnedFeesHandlerFn(cliCtx, cdc),
 	).Methods("GET")
+
+	// query the system schema by the schema name
+	r.HandleFunc(
+		fmt.Sprintf("/service/schemas/{%s}", SchemaName),
+		querySchemaHandlerFn(cliCtx, cdc),
+	).Methods("GET")
 }
 
 func queryDefinitionHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
@@ -407,6 +413,31 @@ func queryEarnedFeesHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.
 		}
 
 		route := fmt.Sprintf("custom/%s/%s", protocol.ServiceRoute, service.QueryEarnedFees)
+		res, err := cliCtx.QueryWithData(route, bz)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		utils.PostProcessResponse(w, cdc, res, cliCtx.Indent)
+	}
+}
+
+func querySchemaHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+
+		params := service.QuerySchemaParams{
+			SchemaName: vars[SchemaName],
+		}
+
+		bz, err := cdc.MarshalJSON(params)
+		if err != nil {
+			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		route := fmt.Sprintf("custom/%s/%s", protocol.ServiceRoute, service.QuerySchema)
 		res, err := cliCtx.QueryWithData(route, bz)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
