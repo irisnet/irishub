@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.16.2
+
+*Apr 9th, 2020*
+
+### Tendermint
+
+* [\#110](https://github.com/irisnet/tendermint/pull/110) Defend against DoS attacks
+
 ## 0.16.1
 
 *Jan 9th, 2020*
