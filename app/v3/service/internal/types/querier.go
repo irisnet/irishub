@@ -6,17 +6,18 @@ import (
 )
 
 const (
-	QueryDefinition       = "definition"       // QueryDefinition
-	QueryBinding          = "binding"          // QueryBinding
-	QueryBindings         = "bindings"         // QueryBindings
-	QueryWithdrawAddress  = "withdraw_address" // QueryWithdrawAddress
-	QueryRequest          = "request"          // QueryRequest
-	QueryRequests         = "requests"         // QueryRequests
-	QueryResponse         = "response"         // QueryResponse
-	QueryRequestContext   = "context"          // QueryRequestContext
-	QueryRequestsByReqCtx = "requests_by_ctx"  // QueryRequestsByReqCtx
-	QueryResponses        = "responses"        // QueryResponses
-	QueryEarnedFees       = "fees"             // QueryEarnedFees
+	QueryDefinition       = "definition"       // query definition
+	QueryBinding          = "binding"          // query binding
+	QueryBindings         = "bindings"         // query bindings
+	QueryWithdrawAddress  = "withdraw_address" // query withdrawal address
+	QueryRequest          = "request"          // query request
+	QueryRequests         = "requests"         // query requests
+	QueryResponse         = "response"         // query response
+	QueryRequestContext   = "context"          // query request context
+	QueryRequestsByReqCtx = "requests_by_ctx"  // query requests by the request context
+	QueryResponses        = "responses"        // query responses
+	QueryEarnedFees       = "fees"             // query earned fees
+	QuerySchema           = "schema"           // query schema
 )
 
 // QueryDefinitionParams defines the params to query a service definition
@@ -76,4 +77,9 @@ type QueryResponsesParams struct {
 // QueryEarnedFeesParams defines the params to query the earned fees for a provider
 type QueryEarnedFeesParams struct {
 	Provider sdk.AccAddress
+}
+
+// QuerySchemaParams defines the params to query the system schemas by the schema name
+type QuerySchemaParams struct {
+	SchemaName string
 }

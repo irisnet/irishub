@@ -24,6 +24,7 @@ const (
 	QueryRequestsByReqCtx = types.QueryRequestsByReqCtx
 	QueryResponses        = types.QueryResponses
 	QueryEarnedFees       = types.QueryEarnedFees
+	QuerySchema           = types.QuerySchema
 	RUNNING               = types.RUNNING
 	PAUSED                = types.PAUSED
 	COMPLETED             = types.COMPLETED
@@ -127,4 +128,5 @@ type (
 	QueryRequestsByReqCtxParams = types.QueryRequestsByReqCtxParams
 	QueryResponsesParams        = types.QueryResponsesParams
 	QueryEarnedFeesParams       = types.QueryEarnedFeesParams
+	QuerySchemaParams           = types.QuerySchemaParams
 )
