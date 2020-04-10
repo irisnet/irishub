@@ -101,7 +101,6 @@ type (
 	Response                    = types.Response
 	Responses                   = types.Responses
 	EarnedFees                  = types.EarnedFees
-	SchemaType                  = types.SchemaType
 	Metrics                     = types.Metrics
 	MsgDefineService            = types.MsgDefineService
 	MsgBindService              = types.MsgBindService
