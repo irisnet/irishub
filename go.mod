@@ -33,7 +33,7 @@ require (
 
 replace (
 	github.com/tendermint/iavl => github.com/irisnet/iavl v0.12.3
-	github.com/tendermint/tendermint => github.com/irisnet/tendermint v0.32.1
+	github.com/tendermint/tendermint => github.com/irisnet/tendermint v0.32.2
 	golang.org/x/crypto => github.com/tendermint/crypto v0.0.0-20180820045704-3764759f34a5
 )
 
