@@ -284,7 +284,7 @@ func querySchema(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sdk.
 		return nil, sdk.ParseParamsErr(err)
 	}
 
-	var schema types.SchemaType
+	var schema string
 
 	if strings.ToLower(params.SchemaName) == "pricing" {
 		schema = types.PricingSchema

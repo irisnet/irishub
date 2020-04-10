@@ -454,7 +454,7 @@ func GetCmdQuerySchema(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			var schema service.SchemaType
+			var schema utils.SchemaType
 			if err := cdc.UnmarshalJSON(res, &schema); err != nil {
 				return err
 			}

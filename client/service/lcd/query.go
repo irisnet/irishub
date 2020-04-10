@@ -444,6 +444,12 @@ func querySchemaHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.Hand
 			return
 		}
 
-		utils.PostProcessResponse(w, cdc, res, cliCtx.Indent)
+		var schema serviceutils.SchemaType
+		if err := cdc.UnmarshalJSON(res, &schema); err != nil {
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		utils.PostProcessResponse(w, cdc, schema, cliCtx.Indent)
 	}
 }
