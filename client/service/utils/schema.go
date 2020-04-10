@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"bytes"
 	"encoding/json"
 )
 
@@ -15,12 +14,7 @@ func (schema SchemaType) String() string {
 
 // MarshalJSON marshals the schema to JSON
 func (schema SchemaType) MarshalJSON() ([]byte, error) {
-	buf := bytes.NewBuffer([]byte{})
-	if err := json.Compact(buf, []byte(schema)); err != nil {
-		return nil, err
-	}
-
-	return json.Marshal(buf.String())
+	return []byte(schema.String()), nil
 }
 
 // UnmarshalJSON unmarshals the data to the schema

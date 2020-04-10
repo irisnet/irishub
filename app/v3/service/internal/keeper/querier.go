@@ -284,11 +284,12 @@ func querySchema(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sdk.
 		return nil, sdk.ParseParamsErr(err)
 	}
 
+	var schemaName = strings.ToLower(params.SchemaName)
 	var schema string
 
-	if strings.ToLower(params.SchemaName) == "pricing" {
+	if schemaName == "pricing" {
 		schema = types.PricingSchema
-	} else if strings.ToLower(params.SchemaName) == "result" {
+	} else if schemaName == "result" {
 		schema = types.ResultSchema
 	} else {
 		return nil, types.ErrInvalidSchemaName(types.DefaultCodespace)
