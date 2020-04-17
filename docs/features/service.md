@@ -4,7 +4,7 @@
 
 ## Summary
 
-IRIS Service (a.k.a. "iService") is intended to bridge the gap between the blockchain world and the conventional application world.  It formalizes off-chain service definition and binding (provider registration), facilitates invocation and interaction with those services, and mediates service governance process (profiling and dispute resolution).
+IRIS Service (a.k.a. iService) is intended to bridge the gap between the blockchain world and the conventional application world.  It formalizes off-chain service definition and binding (provider registration), facilitates invocation and interaction with those services, and mediates service governance process (profiling and dispute resolution).
 
 ## Service Definition
 
@@ -52,7 +52,7 @@ Any user can define services on the blockchain. The interface of a service must 
 ```
 
 ### Service result schema
-Service providers respond to a user request (containing an input object) by sending back a response that consists of a _result_ object and an optional output object, the latter of which is required only when the result code equals 200.  The result object must conform to this [schema](service-result.json), and here is an example of a compliant instance:
+Service providers respond to a user request by sending back a response that consists of a _result_ object and an optional output object, the latter of which is required only when the result code equals 200.  The result object must conform to this [schema](service-result.json), and here is an example of a valid instance:
 
 ```json
 {
@@ -75,17 +75,19 @@ iriscli service definition <service-name>
 
 ## Service Binding
 
-Whoever is willing to provide a service as specified by an existing definition can do so by creating a _binding_ to that definition.  A binding essentially consists of three components: _provider address_ (address of whoever executes the `bind` transaction), _pricing_ and _deposit_.  
+Whoever is willing to provide a service as specified by an existing definition can do so by creating a _binding_ to that definition.  A binding essentially consists of four components: _provider address_, _pricing_, _deposit_ and _quality of service_.  
 
 ### Provider address
-A consumer should be able to publish a service request (input) destined to the provider address, and see a response (output) transaction coming back from this address.
+A provider address represents an _endpoint_ that a _service provider_ (i.e., an off-chain server/daemon) listens to for incoming requests. Before a provider can accept and process any service requests, its human operator/owner has to create a blockchain address for it and execute a `bind` transaction to attach this provider address to the service definition in question.
+
+To invoke a service, a user/consumer sends a request transaction targeting the provider address of a valid binding; the provider detects and processes the incoming request, and sends back the result in a response transaction.
 
 ### Pricing
-The pricing object must conform to this [schema](service-pricing.json), and the following is a compliant instance:  
+The pricing object specifies how the provider charges for its service; it must conform to this [schema](service-pricing.json), and the following is a valid instance:
 
 ```json
 {
-  "price": "0.1iris",
+  "price": "0.5iris",
   "promotions_by_time": [
     {
       "start_time": "2020-01-01T00:00:00Z",
@@ -101,47 +103,49 @@ The pricing object must conform to this [schema](service-pricing.json), and the 
 }
 ```
 
-### Deposit
-Operating a service provider signifies serious commitment, therefore, a deposit is required for creating a binding.  The deposit amount must be larger than the _deposit threshold_, derived as `max(DepositMultiple*price, MinDeposit)`.  If a provider fails to respond to a request before it times out, a small portion of its binding deposit, i.e., `SlashFraction*deposit`, will be slashed.  Should the deposit drop below the threshold, the binding would be disabled temporarily until its owner re-activates it by adding more deposit.
+Providers can opt to accept tokens other than `iris` for their services, e.g., `0.03link`. Price is a factor that consumers will consider when picking from a number of providers that offer the same service.
 
-> **_NOTE:_** `service/DepositMultiple`, `service/MinDeposit` and `service/SlashFraction` are system parameters that can be changed through on-chain [governance](governance.md).
+### Deposit
+Operating a service provider signifies serious responsibility, therefore, a deposit is required for creating a binding.  The deposit amount must be larger than the _deposit threshold_, derived as `max(MinDepositMultiple * price, MinDeposit)`.  If a provider fails to respond to a request before it times out, a small portion of its binding deposit, i.e., `SlashFraction * deposit`, will be forfeited and destroyed.  Should the deposit drop below the threshold, the binding would be disabled temporarily until its owner re-activates it by adding more deposit.
+
+> **_NOTE:_** `service/MinDepositMultiple`, `service/MinDeposit` and `service/SlashFraction` are system parameters that can be changed through on-chain [governance](governance.md).
+
+### Quality of service
+This quality commitment is declared in terms of average number of blocks it takes the provider to send a response back to the blockchain.  It is another factor that consumers take into account when choosing potential providers.
 
 ### Lifecycle
-Service bindings can be updated at any time by their owners to adjust pricing or increase deposit; they can be disabled and re-enabled as well.  If a binding owner no longer wants to run the service provider, she needs to disable the binding and wait for a certain period of time before she can claim back her deposit.
+Service bindings can be updated at any time by their owners to adjust pricing, increase deposit or change QoS commitment; they can be disabled and re-enabled as well.  If a provider owner no longer wants to offer the service, she needs to disable the binding and wait for a certain period of time before she can claim back her deposit.
 
 ```bash
 # create a new service binding
-iriscli service bind <service-name> <deposit> <pricing-json or path/to/pricing.json>
+iriscli service bind <service-name> <provider-address> <deposit> <qos> <pricing-json or path/to/pricing.json>
 
 # update a service binding
-iriscli service update-binding <service-name> --deposit=<added-deposit> --pricing=<pricing-json or path/to/pricing.json>
+iriscli service update-binding <service-name> <provider-address> --deposit=<added-deposit> --qos=<qos> --pricing=<pricing-json or path/to/pricing.json>
 
 # set withdrawal account
 iriscli service set-withdraw-addr <withdrawal-address>
 
 # withdraw earned fees into withdrawal account
-iriscli service withdraw-fees
+iriscli service withdraw-fees [<provider-address>]
 
 # enable an inactive service binding
-iriscli service enable <service-name> <added-deposit>
+iriscli service enable <service-name> <provider-address> <added-deposit>
 
 # disable an active service binding
-iriscli service disable <service-name>
+iriscli service disable <service-name> <provider-address>
 
 # request refund of service binding deposit
-iriscli service refund-deposit <service-name>
+iriscli service refund-deposit <service-name> <provider-address>
 
-# a trustee withdraws service tax into given account
-iriscli service withdraw-tax <destination-address>
-
-# query service binding
+# query a specific service binding
 iriscli service binding <service-name> <provider-address>
 
-# query service bindings
+# query all bindings of a service
 iriscli service bindings <service-name>
 
-# query a provider's withdrawal address
-iriscli service withdraw-addr <provider-address>
+# query a provider owner's withdrawal address
+iriscli service withdraw-addr <owner-address>
 
 # query a provider's earned fees
 iriscli service fees <provider-address>
