@@ -236,10 +236,7 @@ When a request object is generated, the associated service fee is **not** paid t
 ### Tax
 Right before a service fee is paid to a provider, a _tax_, in the amount of `ServiceFeeTax * fee` is collected and sent to the community pool.
 
-### Slashing
-When a provider fails to respond to a request in time or when it sends back an invalid output, a penalty of `SlashFraction * deposit` will be deducted from the associated binding deposit and destroyed.
-
-> **_NOTE:_** `service/ServiceFeeTax` and `service/SlashFraction` are system parameters that can be changed through on-chain [governance](governance.md).
+> **_NOTE:_** `service/ServiceFeeTax` is a system parameter that can be changed through on-chain [governance](governance.md).
 
 ### Commands
 ```bash
