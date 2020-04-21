@@ -51,20 +51,7 @@ Any user can define services on the blockchain. The interface of a service must 
 }
 ```
 
-### Service result schema
-Service providers respond to a user request by sending back a response that consists of a _result_ object and an optional output object, the latter of which is required only when the result code equals 200.  The result object must conform to this [schema](service-result.json), and here is an example of a valid instance:
-
-```json
-{
-  "result" : {
-    "code": 400,
-    "message": "user input out of range"
-  }
-}
-```
-
-Once you have a definition ready, you can publish it to the blockchain by executing the following command:
-
+### Commands
 ```bash
 # create a new service definition
 iriscli service define <service-name> <schemas-json or path/to/schemas.json> --description=<service-description> --author-description=<author-description> --tags=<tag1,tag2,...>
@@ -113,7 +100,7 @@ Operating a service provider signifies serious responsibility, therefore, a depo
 ### Quality of service
 This quality commitment is declared in terms of average number of blocks it takes the provider to send a response back to the blockchain.  It is another factor that consumers take into account when choosing potential providers.
 
-### Lifecycle
+### Commands
 Service bindings can be updated at any time by their owners to adjust pricing, increase deposit or change QoS commitment; they can be disabled and re-enabled as well.  If a provider owner no longer wants to offer the service, she needs to disable the binding and wait for a certain period of time before she can claim back her deposit.
 
 ```bash
@@ -122,12 +109,6 @@ iriscli service bind <service-name> <provider-address> <deposit> <qos> <pricing-
 
 # update a service binding
 iriscli service update-binding <service-name> <provider-address> --deposit=<added-deposit> --qos=<qos> --pricing=<pricing-json or path/to/pricing.json>
-
-# set withdrawal account
-iriscli service set-withdraw-addr <withdrawal-address>
-
-# withdraw earned fees into withdrawal account
-iriscli service withdraw-fees [<provider-address>]
 
 # enable an inactive service binding
 iriscli service enable <service-name> <provider-address> <added-deposit>
@@ -138,25 +119,144 @@ iriscli service disable <service-name> <provider-address>
 # request refund of service binding deposit
 iriscli service refund-deposit <service-name> <provider-address>
 
+# list all the bindings of a service
+iriscli service bindings <service-name>
+
+# list all the bindings of a service, owned by a given account
+iriscli service bindings <service-name> --owner <address>
+
 # query a specific service binding
 iriscli service binding <service-name> <provider-address>
 
-# query all bindings of a service
-iriscli service bindings <service-name>
-
-# query a provider owner's withdrawal address
-iriscli service withdraw-addr <owner-address>
-
-# query a provider's earned fees
-iriscli service fees <provider-address>
-
-# query system schemas (valid names: pricing, result)
-iriscli service schema <schema-name>
+# query the pricing schema
+iriscli service schema pricing
 ```
 
 ## Service Invocation
 
-If the service consumer needs to initiate a service invocation request, the service fee specified by the service provider needs to be paid. The service provider needs to respond to the service request within the block height defined by `MaxRequestTimeout`. If the service provider does not respond in time, the deposit of the 'SlashFraction' ratio will be deducted from the service provider's service binding deposit and the service fee will be refunded to the service consumer's return pool. If the service call is responded normally, the system will deduct the `ServiceFeeTax` ratio from the service fee, and add the remaining service fee to the service provider's incoming pool. The service provider/consumer can initiate the `withdraw-fees`/`refund-fees` transaction to retrieve all of the tokens in the incoming/return pool.
+### Request context
+A consumer specifies how she would like to invoke a service by creating a _request context_, which behaves like a smart contract that automatically generates the actual request(s).  A request context consists of about a dozen parameters that can be roughly divided into five groups, as explained below.
+
+#### Target and input
+* _service name_: name of the target service to be called
+* _input data_: json input that conforms to the input schema of the called service
+
+#### Provider filtering
+* _provider list_: comma separated addresses of candidate service providers
+* _service fee cap_: maximum service fee the consumer is willing to pay for any call
+* _timeout_: number of blocks the consumer is willing to wait for any response to come back
+
+#### Response handling
+* _module_: name of the module containing the callback function
+* _response threshold_: minimum number of responses that must be received to invoke the callback
+> **_NOTE:_** These two parameters can **not** be set from CLI or API; they are only available to other modules that use iService, such as [oracle](oracle.md) and [random](random.md).
+
+#### Repetition
+* _repeated_: boolean flag indicating whether this request context is repeated or not
+* _frequency_: number of blocks representing the frequency of repeated call batches
+* _total_: total number of call batches, where a negative number means "unlimited"
+
+### Request batch
+For a repeated request context, _batches_ of new request objects will be generated at the specified frequency, until the total number of batches is reached or the consumer (i.e., context creator) runs out of fee.  Only one request batch is created for a non-repeated context.
+
+A request batch is comprised of a number of _request_ objects, each representing a service call to a chosen provider; only those providers that charge a fee lower than `service fee cap` and commits to a QoS better than `timeout` will be selected.
+
+### Commands
+When a request context is successfully created, a `context id` is returned to the consumer and the context is automatically started.  The consumer can later update, pause and start the context at will; she can permanently kill the context as well.
 
 ```bash
+# create a repeated request context, with no callback
+iriscli service call --service-name=<service name> --data=<request input> --providers=<provider list> --service-fee-cap=1iris --timeout 50 --repeated --frequency=50 --total=100
+
+# update an existing request context
+iriscli service update <request-context-id> --frequency=20 --total=200
+
+# pause a running request context
+iriscli service pause <request-context-id>
+
+# start a paused request context
+iriscli service start <request-context-id>
+
+# permanently kill a request context
+iriscli service kill <request-context-id>
+
+# query a previously created request context by its id
+iriscli service request-context <request-context-id>
+
+# list all the requests generated for a given request batch
+iriscli service requests <request-context-id> <batch-counter>
+
+# list all the responses received for a given request batch
+iriscli service responses <request-context-id> <batch-counter>
+
+# query a response given its associated request id
+iriscli service response <request-id>
 ```
+
+## Service Response
+
+A service provider monitors the blockchain, through either queries or event subscription, for any requests that are targeted toward itself.  After processing such a request, the service provider sends back a response comprised of a _result_ object and an optional output object that conforms to the output schema of the service.
+
+### Service result schema
+The result object must conform to this [schema](service-result.json), and here is an example of a valid instance:
+
+```json
+{
+  "result" : {
+    "code": 400,
+    "message": "user input out of range"
+  }
+}
+```
+
+The output object is required in the response only when the result code equals `200`.
+
+### Commands
+```bash
+# list all pending requests targeting a given provider
+iriscli service requests <service-name> <provider>
+
+# query a specific service request
+iriscli service request <request-id>
+
+# send a response back, matching a specific request
+iriscli service respond --request-id=<request-id> --result='{"code":200,"message":"success"}' --data=<response output>
+
+# query the result schema
+iriscli service schema result
+```
+
+## Service Fees
+
+Any user who creates service bindings and operates service providers should define a _withdrawal address_; when the user withdraws service fees earned by her providers, this is where the fund will be sent to.  If not set, the withdrawal address is the same as the user address.
+
+### Escrow
+When a request object is generated, the associated service fee is **not** paid to the targeted provider immediately; instead, the fee is kept in an internal _escrow_ account for custody.  When a response comes back in time (i.e., before the request times out), the corresponding fee  (after tax) will be released from escrow to the provider; otherwise, the fee will be refunded to the consumer.
+
+### Tax
+Right before a service fee is paid to a provider, a _tax_, in the amount of `ServiceFeeTax * fee` is collected and sent to the community pool.
+
+### Slashing
+When a provider fails to respond to a request in time or when it sends back an invalid output, a penalty of `SlashFraction * deposit` will be deducted from the associated binding deposit and destroyed.
+
+> **_NOTE:_** `service/ServiceFeeTax` and `service/SlashFraction` are system parameters that can be changed through on-chain [governance](governance.md).
+
+### Commands
+```bash
+# set withdrawal address
+iriscli service set-withdraw-addr <withdrawal-address>
+
+# query withdrawal address of a given account
+iriscli service withdraw-addr <address>
+
+# query a provider's earned fees
+iriscli service fees <provider-address>
+
+# withdraw earned fees from all providers
+iriscli service withdraw-fees
+
+# withdraw earned fees from a given provider
+iriscli service withdraw-fees <provider-address>
+```
+
+## Service Governance (TODO)
