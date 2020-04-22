@@ -135,7 +135,7 @@ iriscli service schema pricing
 ## Service Invocation
 
 ### Request context
-A consumer specifies how she would like to invoke a service by creating a _request context_, which behaves like a smart contract that automatically generates the actual request(s).  A request context consists of about a dozen parameters that can be roughly divided into five groups, as explained below.
+A consumer specifies how she would like to invoke a service by creating a _request context_, which behaves like a smart contract that automatically generates the actual request(s).  A request context consists of about a dozen parameters that can be roughly divided into four groups, as explained below.
 
 #### Target and input
 * _service name_: name of the target service to be called
@@ -157,9 +157,9 @@ A consumer specifies how she would like to invoke a service by creating a _reque
 * _total_: total number of call batches, where a negative number means "unlimited"
 
 ### Request batch
-For a repeated request context, _batches_ of new request objects will be generated at the specified frequency, until the total number of batches is reached or the consumer (i.e., context creator) runs out of fee.  Only one request batch is created for a non-repeated context.
+For a repeated request context, _batches_ of new request objects will be generated at the specified frequency, until the total number of batches is reached or the consumer (i.e., context creator) runs out of fee.  Only one request batch is generated for a non-repeated context.
 
-A request batch is comprised of a number of _request_ objects, each representing a service call to a chosen provider; only those providers that charge a fee lower than `service fee cap` and commits to a QoS better than `timeout` will be selected.
+A request batch is comprised of a number of _request_ objects, each representing a service call to a chosen provider; only those providers that charge a fee lower than `service fee cap` and commit to a QoS better than `timeout` will be selected.
 
 ### Commands
 When a request context is successfully created, a `context id` is returned to the consumer and the context is automatically started.  The consumer can later update, pause and start the context at will; she can permanently kill the context as well.
@@ -189,7 +189,7 @@ iriscli service requests <request-context-id> <batch-counter>
 # list all the responses received for a given request batch
 iriscli service responses <request-context-id> <batch-counter>
 
-# query a response given its associated request id
+# query a specific response
 iriscli service response <request-id>
 ```
 
@@ -216,7 +216,7 @@ The output object is required in the response only when the result code equals `
 # list all pending requests targeting a given provider
 iriscli service requests <service-name> <provider>
 
-# query a specific service request
+# query a specific request
 iriscli service request <request-id>
 
 # send a response back, matching a specific request
