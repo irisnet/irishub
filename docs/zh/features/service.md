@@ -54,7 +54,7 @@ IRIS服务（又称iService）旨在弥合区块链和传统应用之间的鸿�
 
 ### 服务结果 schema
 
-为响应用户请求，服务提供者发送一个由 _结果_ 对象和可选的输出对象组成的响应。结果code等于200时输出对象必须提供。_结果_ 对象必须符合此[schema](service-result.json)，下面是一个示例：
+为响应用户请求，服务提供者发送一个由 _结果_ 对象和可选的输出对象组成的响应。结果code等于200时输出对象必须提供。_结果_ 对象必须符合此[schema](service-result.json)。下面是一个示例：
 
 ```json
 {
@@ -81,10 +81,9 @@ iriscli service definition <service-name>
 
 ### 提供者地址
 
-提供者地址是 _服务提供者_ （即链外服务进程）用来监听请求的一个端点。在服务提供者能够接受并处理服务请求之前，其运营者或所有者必须为它创建一个链上地址，并且发起一个 `绑定` 交易
-将这个地址关联到相关的服务定义。
+提供者地址是 _服务提供者_ （即链外服务进程）用来监听请求的一个端点。在服务提供者能够接受并处理服务请求之前，其运营者或所有者必须为它创建一个链上地址，并且发起一个 `绑定` 交易将这个地址关联到相关的服务定义。
 
-为调用一个服务，用户或消费者通过发起一个请求交易向一个有效服务绑定的提供者地址发起请求；而后服务提供者检测和处理这个请求，并且通过一个响应交易回传处理结果。
+为调用一个服务，用户或消费者通过发起一个请求交易向一个有效服务绑定的提供者地址发起请求；服务提供者检测和处理这个请求，并且通过一个响应交易发送处理结果。
 
 ### 定价
 
@@ -108,22 +107,28 @@ iriscli service definition <service-name>
 }
 ```
 
+服务提供者能选择接受 `iris` 以外的 tokens 作为服务费用，例如 `0.03link`。价格是消费者从多个提供相同服务的提供者中遴选的一个考虑因素。
+
 ### 押金
 
-创建服务绑定需要一定的押金用于服务承诺。押金必须大于 _押金阈值_，该值由`max(DepositMultiple*price,MinDeposit)`得出。如果服务提供者未能在超时之前响应请求，则其绑定押金的一小部分，即`SlashFraction*deposit`将被扣除。如果押金降至阈值以下，服务绑定将被暂时禁用，直到其所有者增加足够的押金重新激活。
+运营一个服务提供者意味着重要的服务责任，因此创建服务绑定需要一定数量的押金。押金数量必须大于 _押金阈值_，该值为 `MinDepositMultiple * price` 与 `MinDeposit` 两者中的最大值。如果服务提供者未能在超时之前响应请求，则其绑定押金的一小部分，即 `SlashFraction * deposit` 将被罚没和销毁。如果押金降至阈值以下，服务绑定将被暂时禁用，直到其所有者增加足够的押金重新激活。
 
-> **_提示：_**  `service/DepositMultiple`、`service/MinDeposit`和`service/SlashFraction`是可以通过链上[治理](governance.md)更改的系统参数。
+> **_提示：_**  `service/MinDepositMultiple`、`service/MinDeposit` 和 `service/SlashFraction`是可以通过链上[治理](governance.md)更改的系统参数。
 
-### 生命周期
+### 服务质量
 
-服务绑定可以由其所有者随时更新，以调整定价或增加押金；也可以被禁用和重新启用。如果服务绑定所有者不想再提供服务，则需要禁用绑定并等待一段时间，然后才能取回押金。
+服务质量承诺是根据提供者将服务响应发送回区块链所需的平均区块数来声明的。这是消费者选择潜在提供者时考虑的另一个因素。
+
+### 命令
+
+服务绑定可以由其所有者随时更新，以调整定价、增加押金或者改变 QoS；也可以被禁用和重新启用。如果服务提供者的所有者不想再提供服务，则需要禁用绑定并等待一段时间，才能取回押金。
 
 ```bash
 # 创建服务绑定
-iriscli service bind <service-name> <deposit> <pricing-json or path/to/pricing.json>
+iriscli service bind <service-name> <provider-address> <deposit> <min-response-time> <pricing-json or path/to/pricing.json>
 
 # 更新服务绑定
-iriscli service update-binding <service-name> --deposit=<added-deposit> --pricing=<pricing-json or path/to/pricing.json>
+iriscli service update-binding <service-name> --deposit=<added-deposit> --min-resp-time=<min-response-time> --pricing=<pricing-json or path/to/pricing.json>
 
 # 设置收益提取地址
 iriscli service set-withdraw-addr <withdrawal-address>
@@ -161,7 +166,35 @@ iriscli service schema <schema-name>
 
 ## 服务调用
 
-服务消费者如果需要发起服务调用请求，需要支付服务提供方指定的服务费。服务提供方需要在MaxRequestTimeout定义的区块高度内响应该服务请求，如果超时未响应，将从服务提供方的该服务绑定押金中扣除SlashFraction比例的押金，同时该次服务调用的服务费将退还到服务消费者的退费池中。如果服务调用被正常响应，系统从该次服务调用的服务费中将扣除ServiceFeeTax比例的系统税收，同时将剩余的服务费加入到服务提供方的收入池中。服务提供方/消费者可以发起withdraw-fees/refund-fees交易取回自己在收入池/退费池中所有的token。
+### 请求上下文
+
+消费者通过创建一个 _请求上下文_ 来指定如何调用一个服务。_请求上下文_ 像智能合约一样自动产生实际的请求。_请求上下文_ 由一些参数组成，可以大致分为如下五组：
+
+#### 目标和输入
+
+* _服务名_：要调用的目标服务的名称
+* _输入数据_：符合目标服务输入 schema 的 json 格式数据
+
+#### 提供者过滤
+
+* _提供者列表_：逗号分隔的候选服务提供者的地址列表
+* _服务费上限_：消费者愿意为每次调用支付的最大服务费用
+* _超时_：消费者为接收响应愿意等待的区块数
+
+#### 响应处理
+
+* _模块_：包含回调函数的模块名称
+* _响应阈值_：为调用回调函数所需接收的最小响应数
+
+> **_提示：_** 这两个参数不能从 CLI 和 API 设置；它们只对使用 iService 的其他模块可用，比如 [oracle](oracle.md) 和 [random](random.md)。
+
+#### 重复性
+
+* _重复_：指示请求上下文是否可重复的一个布尔标志
+* _频率_：重复调用批次之间的区块间隔数
+* _总数_: 重复调用批次的总数，负数表示无限
+
+
 
 ```bash
 ```
