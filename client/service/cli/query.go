@@ -428,3 +428,40 @@ func GetCmdQueryEarnedFees(cdc *codec.Codec) *cobra.Command {
 
 	return cmd
 }
+
+// GetCmdQuerySchema implements the query schema command
+func GetCmdQuerySchema(cdc *codec.Codec) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "schema [schema-name]",
+		Short:   "Query the system schema by the schema name, only pricing and result allowed",
+		Example: "iriscli service schema <schema-name>",
+		Args:    cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+
+			params := service.QuerySchemaParams{
+				SchemaName: args[0],
+			}
+
+			bz, err := cdc.MarshalJSON(params)
+			if err != nil {
+				return err
+			}
+
+			route := fmt.Sprintf("custom/%s/%s", protocol.ServiceRoute, service.QuerySchema)
+			res, err := cliCtx.QueryWithData(route, bz)
+			if err != nil {
+				return err
+			}
+
+			var schema utils.SchemaType
+			if err := cdc.UnmarshalJSON(res, &schema); err != nil {
+				return err
+			}
+
+			return cliCtx.PrintOutput(schema)
+		},
+	}
+
+	return cmd
+}

@@ -2361,6 +2361,27 @@ paths:
           description: Invalid parameters
         '500':
           description: Internal Server Error
+  '/service/schemas/{schema-name}':
+    get:
+      summary: Query the system schema by the schema name
+      tags:
+        - Service
+      parameters:
+        - in: path
+          name: schema-name
+          description: schema name, only pricing and result allowed
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: string
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
   /oracle/feeds:
     post:
       summary: Define a new feed, the feed will be in "paused" state

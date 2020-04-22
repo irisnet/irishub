@@ -192,6 +192,7 @@ irislcd start --node=tcp://localhost:26657 --chain-id=irishub --laddr=tcp://0.0.
 23. `GET /service/responses/{request-context-id}/{batch-counter}`: 根据请求上下文ID和批次计数器查询服务响应列表
 24. `GET /service/fees/{provider}`: 查询服务提供者的收益
 25. `POST /service/fees/{provider}/withdraw`: 提取服务提供者的收益
+26. `GET /service/schemas/{schema-name}`: 通过 schema 名称查询系统 schema
 
 ### Oracle模块的APIs
 

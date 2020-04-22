@@ -30,6 +30,7 @@ Service module allows you to define, bind, invoke services on the IRIS Hub. [Rea
 | [kill](#iriscli-service-kill)                           | Terminate a request context                                 |
 | [fees](#iriscli-service-fees)                           | Query the earned fees of a provider                         |
 | [withdraw-fees](#iriscli-service-withdraw-fees)         | Withdraw the earned fees of a provider                      |
+| [schema](#iriscli-service-schema)         | Query the system schema by the schema name       |
 
 ## iriscli service define
 
@@ -509,4 +510,24 @@ iriscli service withdraw-fees [flags]
 
 ```bash
 iriscli service withdraw-fees --chain-id=irishub --from=<key-name> --fee=0.3iris
+```
+
+## iriscli service schema
+
+Query the system schema by the schema name, only pricing and result allowed.
+
+```bash
+iriscli service schema [schema-name] [flags]
+```
+
+### Qeury the service pricing schema
+
+```bash
+iriscli service schema pricing
+```
+
+### Qeury the response result schema
+
+```bash
+iriscli service schema result
 ```

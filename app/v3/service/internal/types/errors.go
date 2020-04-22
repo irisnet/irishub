@@ -51,10 +51,11 @@ const (
 	CodeInvalidRequestInput   sdk.CodeType = 134
 	CodeInvalidResponseOutput sdk.CodeType = 135
 	CodeInvalidResponseResult sdk.CodeType = 136
+	CodeInvalidSchemaName     sdk.CodeType = 137
 
-	CodeInvalidAddress  sdk.CodeType = 137
-	CodeInvalidProfiler sdk.CodeType = 138
-	CodeInvalidTrustee  sdk.CodeType = 139
+	CodeInvalidAddress  sdk.CodeType = 138
+	CodeInvalidProfiler sdk.CodeType = 139
+	CodeInvalidTrustee  sdk.CodeType = 140
 )
 
 func ErrInvalidServiceName(codespace sdk.CodespaceType, serviceName string) sdk.Error {
@@ -203,6 +204,10 @@ func ErrInvalidResponseOutput(codespace sdk.CodespaceType, msg string) sdk.Error
 
 func ErrInvalidResponseResult(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidResponseResult, fmt.Sprintf("invalid response result: %s", msg))
+}
+
+func ErrInvalidSchemaName(codespace sdk.CodespaceType) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidSchemaName, "invalid schema name: only pricing and result allowed")
 }
 
 func ErrInvalidProfiler(codespace sdk.CodespaceType, address sdk.AccAddress) sdk.Error {
