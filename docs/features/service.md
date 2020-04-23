@@ -83,7 +83,7 @@ The pricing object specifies how the provider charges for its service; it must c
     },
     {
       "start_time": "2020-04-01T00:00:00Z",
-      "end_time": "2019-06-30T23:59:59Z",
+      "end_time": "2020-06-30T23:59:59Z",
       "discount": 0.9
     }
   ]
