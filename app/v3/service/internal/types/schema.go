@@ -182,11 +182,10 @@ func validateDocument(schema []byte, document string) error {
 
 const (
 	// PricingSchema is the Pricing JSON Schema
-	PricingSchema = `
-{
+	PricingSchema = `{
 	"$schema": "http://json-schema.org/draft-04/schema#",
-	"title": "irishub-service-pricing",
-	"description": "IRIS Hub Service Pricing Schema",
+	"title": "iris-service-pricing",
+	"description": "IRIS Service Pricing Schema",
 	"type": "object",
 	"definitions": {
 	  "discount": {
@@ -268,15 +267,13 @@ const (
 	"required": [
 	  "price"
 	]
-}
-`
+}`
 
 	// ResultSchema is the JSON Schema for the response result
-	ResultSchema = `
-{
+	ResultSchema = `{
 	"$schema": "http://json-schema.org/draft-04/schema#",
-	"title": "irishub-service-result",
-	"description": "IRIS Hub Service Result Schema",
+	"title": "iris-service-result",
+	"description": "IRIS Service Result Schema",
 	"type": "object",
 	"properties": {
 	  "code": {
@@ -294,6 +291,5 @@ const (
 	  "code",
 	  "message"
 	]
-}
-`
+}`
 )
