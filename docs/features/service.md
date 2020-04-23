@@ -159,7 +159,7 @@ A consumer specifies how she would like to invoke a service by creating a _reque
 ### Request batch
 For a repeated request context, _batches_ of new request objects will be generated at the specified frequency, until the total number of batches is reached or the consumer (i.e., context creator) runs out of fee.  Only one request batch is generated for a non-repeated context.
 
-A request batch is comprised of a number of _request_ objects, each representing a service call to a chosen provider; only those providers that charge a fee lower than `service fee cap` and commit to a QoS better than `timeout` will be selected.
+A request batch is comprised of a number of _request_ objects, each representing a service call to a chosen provider; only those providers that charge a fee not greater than `service fee cap` and commit to a QoS better than `timeout` will be selected.
 
 ### Commands
 When a request context is successfully created, a `context id` is returned to the consumer and the context is automatically started.  The consumer can later update, pause and start the context at will; she can permanently kill the context as well.
