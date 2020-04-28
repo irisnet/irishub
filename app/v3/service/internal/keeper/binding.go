@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"time"
@@ -57,8 +58,9 @@ func (k Keeper) AddServiceBinding(
 	disabledTime := time.Time{}
 
 	svcBinding := types.NewServiceBinding(serviceName, provider, deposit, pricing, qos, available, disabledTime, owner)
-	k.SetServiceBinding(ctx, svcBinding)
 
+	k.SetServiceBinding(ctx, svcBinding)
+	k.SetOwnerServiceBindings(ctx, svcBinding)
 	k.SetPricing(ctx, serviceName, provider, parsedPricing)
 
 	return nil
@@ -294,6 +296,35 @@ func (k Keeper) GetServiceBinding(ctx sdk.Context, serviceName string, provider 
 
 	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &svcBinding)
 	return svcBinding, true
+}
+
+// SetOwnerServiceBindings sets the owner service bindings
+func (k Keeper) SetOwnerServiceBindings(ctx sdk.Context, svcBinding types.ServiceBinding) {
+	store := ctx.KVStore(k.storeKey)
+	store.Set(GetOwnerServiceBindingsKey(svcBinding.Owner, svcBinding.ServiceName, svcBinding.Provider), []byte{})
+}
+
+// GetOwnerServiceBindings retrieves the service bindings with the specified service name and owner
+func (k Keeper) GetOwnerServiceBindings(ctx sdk.Context, owner sdk.AccAddress, serviceName string) []types.ServiceBinding {
+	store := ctx.KVStore(k.storeKey)
+
+	bindings := make([]types.ServiceBinding, 0)
+
+	iterator := sdk.KVStorePrefixIterator(store, GetOwnerBindingsSubspace(owner, serviceName))
+	defer iterator.Close()
+
+	for ; iterator.Valid(); iterator.Next() {
+		bindingKey := bytes.Split(iterator.Key()[sdk.AddrLen+1:], emptyByte)
+		serviceName := string(bindingKey[0])
+		provider := sdk.AccAddress(bindingKey[1])
+
+		binding, found := k.GetServiceBinding(ctx, serviceName, provider)
+		if found {
+			bindings = append(bindings, binding)
+		}
+	}
+
+	return bindings
 }
 
 // ParsePricing parses the given string to Pricing

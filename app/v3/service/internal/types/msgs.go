@@ -210,7 +210,7 @@ func (msg MsgBindService) ValidateBasic() sdk.Error {
 
 // GetSigners implements Msg.
 func (msg MsgBindService) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{msg.Owner}
+	return []sdk.AccAddress{msg.Owner, msg.Provider}
 }
 
 //______________________________________________________________________
