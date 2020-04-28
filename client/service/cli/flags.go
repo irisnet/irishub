@@ -38,6 +38,7 @@ var (
 	FsServiceCall                 = flag.NewFlagSet("", flag.ContinueOnError)
 	FsServiceRespond              = flag.NewFlagSet("", flag.ContinueOnError)
 	FsServiceUpdateRequestContext = flag.NewFlagSet("", flag.ContinueOnError)
+	FsServiceQueryBindings        = flag.NewFlagSet("", flag.ContinueOnError)
 )
 
 func init() {
@@ -78,4 +79,6 @@ func init() {
 	FsServiceRespond.String(FlagRequestID, "", "ID of the request to respond to")
 	FsServiceRespond.String(FlagResult, "", "content or file path of the response result, which is an Result JSON schema instance")
 	FsServiceRespond.String(FlagData, "", "content or file path of the response output, which is an Output JSON schema instance")
+
+	FsServiceQueryBindings.String(FlagOwner, "", "the owner of bindings, which is optional")
 }

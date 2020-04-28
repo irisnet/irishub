@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 
 	"github.com/irisnet/irishub/app/protocol"
 	"github.com/irisnet/irishub/app/v3/service"
@@ -99,14 +100,26 @@ func GetCmdQueryServiceBinding(cdc *codec.Codec) *cobra.Command {
 func GetCmdQueryServiceBindings(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "bindings [service-name]",
-		Short:   "Query all bindings of a service definition",
+		Short:   "Query all bindings of a service definition with an optional owner",
 		Example: "iriscli service bindings <service name>",
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
+			var err error
+			var owner sdk.AccAddress
+
+			ownerStr := viper.GetString(FlagOwner)
+			if len(ownerStr) > 0 {
+				owner, err = sdk.AccAddressFromBech32(ownerStr)
+				if err != nil {
+					return err
+				}
+			}
+
 			params := service.QueryBindingsParams{
 				ServiceName: args[0],
+				Owner:       owner,
 			}
 
 			bz, err := cdc.MarshalJSON(params)
@@ -417,7 +430,7 @@ func GetCmdQueryEarnedFees(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			var fees service.EarnedFees
+			var fees service.EarnedFeesOutput
 			if err := cdc.UnmarshalJSON(res, &fees); err != nil {
 				return err
 			}

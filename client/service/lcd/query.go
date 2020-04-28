@@ -30,7 +30,7 @@ func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Co
 		queryBindingHandlerFn(cliCtx, cdc),
 	).Methods("GET")
 
-	// query all bindings of a service definition
+	// query all bindings of a service definition with an optional owner
 	r.HandleFunc(
 		fmt.Sprintf("/service/bindings/{%s}", ServiceName),
 		queryBindingsHandlerFn(cliCtx, cdc),
@@ -149,9 +149,22 @@ func queryBindingsHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.Ha
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		serviceName := vars[ServiceName]
+		ownerStr := r.FormValue("owner")
+
+		var err error
+		var owner sdk.AccAddress
+
+		if len(ownerStr) > 0 {
+			owner, err = sdk.AccAddressFromBech32(ownerStr)
+			if err != nil {
+				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+				return
+			}
+		}
 
 		params := service.QueryBindingsParams{
 			ServiceName: serviceName,
+			Owner:       owner,
 		}
 
 		bz, err := cliCtx.Codec.MarshalJSON(params)
