@@ -25,7 +25,8 @@ var (
 	responseKey                  = []byte{0x14}
 	requestVolumeKey             = []byte{0x15}
 	earnedFeesKey                = []byte{0x16}
-	ownerEarnedFeesKey           = []byte{0x17}
+	earnedFeesByOwnerKey         = []byte{0x17}
+	ownerEarnedFeesKey           = []byte{0x18}
 )
 
 // GetServiceDefinitionKey returns the key for the service definition with the specified name
@@ -40,7 +41,12 @@ func GetServiceBindingKey(serviceName string, provider sdk.AccAddress) []byte {
 
 // GetOwnerServiceBindingsKey returns the key for the service bindings with the specified service name and owner
 func GetOwnerServiceBindingsKey(owner sdk.AccAddress, serviceName string, provider sdk.AccAddress) []byte {
-	return append(ownerServiceBindingsKey, getStringsKey([]string{owner.String(), serviceName, provider.String()})...)
+	return append(append(append(append(
+		ownerServiceBindingsKey,
+		owner.Bytes()...),
+		[]byte(serviceName)...),
+		emptyByte...),
+		provider.Bytes()...)
 }
 
 // GetPricingKey returns the key for the pricing of the specified binding
@@ -60,7 +66,7 @@ func GetBindingsSubspace(serviceName string) []byte {
 
 // GetOwnerBindingsSubspace returns the key for retrieving bindings of the specified service name and owner
 func GetOwnerBindingsSubspace(owner sdk.AccAddress, serviceName string) []byte {
-	return append(append(ownerServiceBindingsKey, getStringsKey([]string{owner.String(), serviceName})...), emptyByte...)
+	return append(append(append(ownerServiceBindingsKey, owner.Bytes()...), []byte(serviceName)...), emptyByte...)
 }
 
 // GetRequestContextKey returns the key for the request context with the specified ID
@@ -149,6 +155,16 @@ func GetResponseSubspaceByReqCtx(requestContextID []byte, batchCounter uint64) [
 // GetEarnedFeesKey returns the key for the earned fees of the specified provider
 func GetEarnedFeesKey(provider sdk.AccAddress) []byte {
 	return append(earnedFeesKey, provider.Bytes()...)
+}
+
+// GetEarnedFeesByOwnerKey returns the key for the earned fees of the specified owner and provider
+func GetEarnedFeesByOwnerKey(owner, provider sdk.AccAddress) []byte {
+	return append(append(earnedFeesByOwnerKey, owner.Bytes()...), provider.Bytes()...)
+}
+
+// GetEarnedFeesSubspace returns the key prefix for the earned fees of the specified owner
+func GetEarnedFeesSubspace(owner sdk.AccAddress) []byte {
+	return append(earnedFeesByOwnerKey, owner.Bytes()...)
 }
 
 // GetOwnerEarnedFeesKey returns the key for the earned fees of the specified owner
