@@ -69,12 +69,13 @@ func handleMsgDefineService(ctx sdk.Context, k Keeper, msg MsgDefineService) sdk
 func handleMsgBindService(ctx sdk.Context, k Keeper, msg MsgBindService) sdk.Result {
 	if err := k.AddServiceBinding(
 		ctx, msg.ServiceName, msg.Provider,
-		msg.Deposit, msg.Pricing, msg.MinRespTime,
+		msg.Deposit, msg.Pricing, msg.QoS, msg.Owner,
 	); err != nil {
 		return err.Result()
 	}
 
 	tags := sdk.NewTags(
+		TagOwner, []byte(msg.Owner.String()),
 		TagProvider, []byte(msg.Provider.String()),
 	)
 
@@ -87,12 +88,13 @@ func handleMsgBindService(ctx sdk.Context, k Keeper, msg MsgBindService) sdk.Res
 func handleMsgUpdateServiceBinding(ctx sdk.Context, k Keeper, msg MsgUpdateServiceBinding) sdk.Result {
 	if err := k.UpdateServiceBinding(
 		ctx, msg.ServiceName, msg.Provider,
-		msg.Deposit, msg.Pricing, msg.MinRespTime,
+		msg.Deposit, msg.Pricing, msg.QoS, msg.Owner,
 	); err != nil {
 		return err.Result()
 	}
 
 	tags := sdk.NewTags(
+		TagOwner, []byte(msg.Owner.String()),
 		TagProvider, []byte(msg.Provider.String()),
 	)
 
@@ -103,10 +105,10 @@ func handleMsgUpdateServiceBinding(ctx sdk.Context, k Keeper, msg MsgUpdateServi
 
 // handleMsgSetWithdrawAddress handles MsgSetWithdrawAddress
 func handleMsgSetWithdrawAddress(ctx sdk.Context, k Keeper, msg MsgSetWithdrawAddress) sdk.Result {
-	k.SetWithdrawAddress(ctx, msg.Provider, msg.WithdrawAddress)
+	k.SetWithdrawAddress(ctx, msg.Owner, msg.WithdrawAddress)
 
 	tags := sdk.NewTags(
-		TagProvider, []byte(msg.Provider.String()),
+		TagOwner, []byte(msg.Owner.String()),
 	)
 
 	return sdk.Result{
@@ -116,11 +118,12 @@ func handleMsgSetWithdrawAddress(ctx sdk.Context, k Keeper, msg MsgSetWithdrawAd
 
 // handleMsgDisableServiceBinding handles MsgDisableServiceBinding
 func handleMsgDisableServiceBinding(ctx sdk.Context, k Keeper, msg MsgDisableServiceBinding) sdk.Result {
-	if err := k.DisableServiceBinding(ctx, msg.ServiceName, msg.Provider); err != nil {
+	if err := k.DisableServiceBinding(ctx, msg.ServiceName, msg.Provider, msg.Owner); err != nil {
 		return err.Result()
 	}
 
 	tags := sdk.NewTags(
+		TagOwner, []byte(msg.Owner.String()),
 		TagProvider, []byte(msg.Provider.String()),
 	)
 
@@ -131,11 +134,12 @@ func handleMsgDisableServiceBinding(ctx sdk.Context, k Keeper, msg MsgDisableSer
 
 // handleMsgEnableServiceBinding handles MsgEnableServiceBinding
 func handleMsgEnableServiceBinding(ctx sdk.Context, k Keeper, msg MsgEnableServiceBinding) sdk.Result {
-	if err := k.EnableServiceBinding(ctx, msg.ServiceName, msg.Provider, msg.Deposit); err != nil {
+	if err := k.EnableServiceBinding(ctx, msg.ServiceName, msg.Provider, msg.Deposit, msg.Owner); err != nil {
 		return err.Result()
 	}
 
 	tags := sdk.NewTags(
+		TagOwner, []byte(msg.Owner.String()),
 		TagProvider, []byte(msg.Provider.String()),
 	)
 
@@ -146,11 +150,12 @@ func handleMsgEnableServiceBinding(ctx sdk.Context, k Keeper, msg MsgEnableServi
 
 // handleMsgRefundServiceDeposit handles MsgRefundServiceDeposit
 func handleMsgRefundServiceDeposit(ctx sdk.Context, k Keeper, msg MsgRefundServiceDeposit) sdk.Result {
-	if err := k.RefundDeposit(ctx, msg.ServiceName, msg.Provider); err != nil {
+	if err := k.RefundDeposit(ctx, msg.ServiceName, msg.Provider, msg.Owner); err != nil {
 		return err.Result()
 	}
 
 	tags := sdk.NewTags(
+		TagOwner, []byte(msg.Owner.String()),
 		TagProvider, []byte(msg.Provider.String()),
 	)
 
@@ -163,7 +168,8 @@ func handleMsgRefundServiceDeposit(ctx sdk.Context, k Keeper, msg MsgRefundServi
 func handleMsgCallService(ctx sdk.Context, k Keeper, msg MsgCallService) sdk.Result {
 	_, tags, err := k.CreateRequestContext(
 		ctx, msg.ServiceName, msg.Providers, msg.Consumer, msg.Input, msg.ServiceFeeCap, msg.Timeout,
-		msg.SuperMode, msg.Repeated, msg.RepeatedFrequency, msg.RepeatedTotal, RUNNING, 0, "")
+		msg.SuperMode, msg.Repeated, msg.RepeatedFrequency, msg.RepeatedTotal, RUNNING, 0, "",
+	)
 	if err != nil {
 		return err.Result()
 	}
@@ -276,12 +282,12 @@ func handleMsgUpdateRequestContext(ctx sdk.Context, k Keeper, msg MsgUpdateReque
 
 // handleMsgWithdrawEarnedFees handles MsgWithdrawEarnedFees
 func handleMsgWithdrawEarnedFees(ctx sdk.Context, k Keeper, msg MsgWithdrawEarnedFees) sdk.Result {
-	if err := k.WithdrawEarnedFees(ctx, msg.Provider); err != nil {
+	if err := k.WithdrawEarnedFees(ctx, msg.Owner, msg.Provider); err != nil {
 		return err.Result()
 	}
 
 	tags := sdk.NewTags(
-		TagProvider, []byte(msg.Provider.String()),
+		TagOwner, []byte(msg.Provider.String()),
 	)
 
 	return sdk.Result{

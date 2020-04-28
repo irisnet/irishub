@@ -11,6 +11,7 @@ var (
 
 	TagAuthor           = "author"
 	TagServiceName      = "service-name"
+	TagOwner            = "owner"
 	TagProvider         = "provider"
 	TagConsumer         = "consumer"
 	TagRequestContextID = "request-context-id"

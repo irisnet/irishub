@@ -37,6 +37,7 @@ var (
 	// variables and functions aliases
 	TagAuthor                   = types.TagAuthor
 	TagServiceName              = types.TagServiceName
+	TagOwner                    = types.TagOwner
 	TagProvider                 = types.TagProvider
 	TagConsumer                 = types.TagConsumer
 	ActionCreateContext         = types.ActionCreateContext
