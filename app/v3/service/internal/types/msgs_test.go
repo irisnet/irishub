@@ -233,7 +233,7 @@ func TestMsgBindServiceGetSigners(t *testing.T) {
 	msg := NewMsgBindService(testServiceName, testProvider, testDeposit, testPricing, testQoS, testOwner)
 	res := msg.GetSigners()
 
-	expected := "[746573742D6F776E6572]"
+	expected := "[746573742D6F776E6572 746573742D70726F7669646572]"
 	require.Equal(t, expected, fmt.Sprintf("%v", res))
 }
 
