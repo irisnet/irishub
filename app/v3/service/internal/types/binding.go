@@ -13,9 +13,10 @@ type ServiceBinding struct {
 	Provider     sdk.AccAddress `json:"provider"`
 	Deposit      sdk.Coins      `json:"deposit"`
 	Pricing      string         `json:"pricing"`
-	MinRespTime  uint64         `json:"min_resp_time"`
+	QoS          uint64         `json:"qos"`
 	Available    bool           `json:"available"`
 	DisabledTime time.Time      `json:"disabled_time"`
+	Owner        sdk.AccAddress `json:"owner"`
 }
 
 // NewServiceBinding creates a new ServiceBinding instance
@@ -24,18 +25,20 @@ func NewServiceBinding(
 	provider sdk.AccAddress,
 	deposit sdk.Coins,
 	pricing string,
-	minRespTime uint64,
+	qos uint64,
 	available bool,
 	disabledTime time.Time,
+	owner sdk.AccAddress,
 ) ServiceBinding {
 	return ServiceBinding{
 		ServiceName:  serviceName,
 		Provider:     provider,
 		Deposit:      deposit,
 		Pricing:      pricing,
-		MinRespTime:  minRespTime,
+		QoS:          qos,
 		Available:    available,
 		DisabledTime: disabledTime,
+		Owner:        owner,
 	}
 }
 
@@ -46,16 +49,18 @@ func (binding ServiceBinding) String() string {
 	Provider:                %s
 	Deposit:                 %s
 	Pricing:                 %s
-	MinRespTime:             %d
+	QoS:                     %d
 	Available:               %v
-	DisabledTime:            %v`,
+	DisabledTime:            %v
+	Owner:                   %s`,
 		binding.ServiceName,
 		binding.Provider,
 		binding.Deposit.MainUnitString(),
 		binding.Pricing,
-		binding.MinRespTime,
+		binding.QoS,
 		binding.Available,
 		binding.DisabledTime,
+		binding.Owner,
 	)
 }
 
@@ -169,6 +174,10 @@ func (binding ServiceBinding) Validate() sdk.Error {
 		return err
 	}
 
+	if err := ValidateOwner(binding.Owner); err != nil {
+		return err
+	}
+
 	if err := ValidateServiceName(binding.ServiceName); err != nil {
 		return err
 	}
@@ -177,7 +186,7 @@ func (binding ServiceBinding) Validate() sdk.Error {
 		return err
 	}
 
-	if err := ValidateMinRespTime(binding.MinRespTime); err != nil {
+	if err := ValidateQoS(binding.QoS); err != nil {
 		return err
 	}
 
