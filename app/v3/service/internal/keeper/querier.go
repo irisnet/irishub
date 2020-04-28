@@ -89,16 +89,20 @@ func queryBindings(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sd
 		return nil, sdk.ParseParamsErr(err)
 	}
 
-	iterator := k.ServiceBindingsIterator(ctx, params.ServiceName)
-	defer iterator.Close()
-
 	bindings := make([]types.ServiceBinding, 0)
 
-	for ; iterator.Valid(); iterator.Next() {
-		var binding types.ServiceBinding
-		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &binding)
+	if params.Owner.Empty() {
+		iterator := k.ServiceBindingsIterator(ctx, params.ServiceName)
+		defer iterator.Close()
 
-		bindings = append(bindings, binding)
+		for ; iterator.Valid(); iterator.Next() {
+			var binding types.ServiceBinding
+			k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &binding)
+
+			bindings = append(bindings, binding)
+		}
+	} else {
+		bindings = k.GetOwnerServiceBindings(ctx, params.Owner, params.ServiceName)
 	}
 
 	bz, err := codec.MarshalJSONIndent(k.cdc, bindings)
@@ -270,7 +274,7 @@ func queryEarnedFees(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, 
 		return nil, types.ErrNoEarnedFees(types.DefaultCodespace, params.Provider)
 	}
 
-	bz, err := codec.MarshalJSONIndent(k.cdc, fees)
+	bz, err := codec.MarshalJSONIndent(k.cdc, types.EarnedFeesOutput{EarnedFees: fees})
 	if err != nil {
 		return nil, sdk.MarshalResultErr(err)
 	}
