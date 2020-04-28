@@ -33,22 +33,22 @@ func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec
 		updateServiceBindingHandlerFn(cdc, cliCtx),
 	).Methods("PUT")
 
-	// set a new withdrawal address for a provider
+	// set a withdrawal address for an owner
 	r.HandleFunc(
-		fmt.Sprintf("/service/providers/{%s}/withdraw-address", Provider),
+		fmt.Sprintf("/service/owners/{%s}/withdraw-address", Owner),
 		setWithdrawAddrHandlerFn(cdc, cliCtx),
 	).Methods("POST")
 
 	// disable a service binding
 	r.HandleFunc(
 		fmt.Sprintf("/service/bindings/{%s}/{%s}/disable", ServiceName, Provider),
-		disableServiceHandlerFn(cdc, cliCtx),
+		disableServiceBindingHandlerFn(cdc, cliCtx),
 	).Methods("POST")
 
 	// enable a service binding
 	r.HandleFunc(
 		fmt.Sprintf("/service/bindings/{%s}/{%s}/enable", ServiceName, Provider),
-		enableServiceHandlerFn(cdc, cliCtx),
+		enableServiceBindingHandlerFn(cdc, cliCtx),
 	).Methods("POST")
 
 	// refund deposit from a service binding
@@ -116,14 +116,16 @@ type bindServiceReq struct {
 	Provider    string       `json:"provider"`
 	Deposit     string       `json:"deposit"`
 	Pricing     string       `json:"pricing"`
-	MinRespTime uint64       `json:"min_resp_time"`
+	QoS         uint64       `json:"qos"`
+	Owner       string       `json:"owner"`
 }
 
 type updateServiceBindingReq struct {
-	BaseTx      utils.BaseTx `json:"base_tx"` // basic tx info
-	Deposit     string       `json:"deposit"`
-	Pricing     string       `json:"pricing"`
-	MinRespTime uint64       `json:"min_resp_time"`
+	BaseTx  utils.BaseTx `json:"base_tx"` // basic tx info
+	Deposit string       `json:"deposit"`
+	Pricing string       `json:"pricing"`
+	QoS     uint64       `json:"qos"`
+	Owner   string       `json:"owner"`
 }
 
 type setWithdrawAddrReq struct {
@@ -132,16 +134,19 @@ type setWithdrawAddrReq struct {
 }
 
 type disableServiceBindingReq struct {
-	BaseTx utils.BaseTx `json:"base_tx"` // basic tx info`
+	BaseTx utils.BaseTx `json:"base_tx"` // basic tx info
+	Owner  string       `json:"owner"`
 }
 
 type enableServiceBindingReq struct {
 	BaseTx  utils.BaseTx `json:"base_tx"` // basic tx info
 	Deposit string       `json:"deposit"`
+	Owner   string       `json:"owner"`
 }
 
 type refundServiceDepositReq struct {
 	BaseTx utils.BaseTx `json:"base_tx"` // basic tx info`
+	Owner  string       `json:"owner"`
 }
 
 type callServiceReq struct {
@@ -193,6 +198,7 @@ type updateRequestContextReq struct {
 
 type withdrawEarnedFeesReq struct {
 	BaseTx utils.BaseTx `json:"base_tx"` // basic tx info
+	Owner  string       `json:"owner"`
 }
 
 // HTTP request handler to define a service.
@@ -241,10 +247,22 @@ func bindServiceHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Hand
 			return
 		}
 
-		provider, err := sdk.AccAddressFromBech32(req.Provider)
+		owner, err := sdk.AccAddressFromBech32(req.Owner)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
+		}
+
+		var provider sdk.AccAddress
+
+		if len(req.Provider) > 0 {
+			provider, err = sdk.AccAddressFromBech32(req.Provider)
+			if err != nil {
+				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+				return
+			}
+		} else {
+			provider = owner
 		}
 
 		deposit, err := cliCtx.ParseCoins(req.Deposit)
@@ -253,7 +271,7 @@ func bindServiceHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Hand
 			return
 		}
 
-		msg := service.NewMsgBindService(req.ServiceName, provider, deposit, req.Pricing, req.MinRespTime)
+		msg := service.NewMsgBindService(req.ServiceName, provider, deposit, req.Pricing, req.QoS, owner)
 		if err := msg.ValidateBasic(); err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -289,6 +307,18 @@ func updateServiceBindingHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) 
 			return
 		}
 
+		var owner sdk.AccAddress
+
+		if len(req.Owner) > 0 {
+			owner, err = sdk.AccAddressFromBech32(req.Owner)
+			if err != nil {
+				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+				return
+			}
+		} else {
+			owner = provider
+		}
+
 		var deposit sdk.Coins
 		if req.Deposit != "" {
 			deposit, err = cliCtx.ParseCoins(req.Deposit)
@@ -298,7 +328,7 @@ func updateServiceBindingHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) 
 			}
 		}
 
-		msg := service.NewMsgUpdateServiceBinding(serviceName, provider, deposit, req.Pricing, req.MinRespTime)
+		msg := service.NewMsgUpdateServiceBinding(serviceName, provider, deposit, req.Pricing, req.QoS, owner)
 		if err := msg.ValidateBasic(); err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -310,13 +340,13 @@ func updateServiceBindingHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) 
 	}
 }
 
-// HTTP request handler to set a withdrawal address for a provider.
+// HTTP request handler to set a withdrawal address for an owner.
 func setWithdrawAddrHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		providerStr := vars[Provider]
+		ownerStr := vars[Owner]
 
-		provider, err := sdk.AccAddressFromBech32(providerStr)
+		owner, err := sdk.AccAddressFromBech32(ownerStr)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -339,7 +369,7 @@ func setWithdrawAddrHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.
 			return
 		}
 
-		msg := service.NewMsgSetWithdrawAddress(provider, withdrawAddr)
+		msg := service.NewMsgSetWithdrawAddress(owner, withdrawAddr)
 		if err := msg.ValidateBasic(); err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -351,8 +381,8 @@ func setWithdrawAddrHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.
 	}
 }
 
-// HTTP request handler to disable a service.
-func disableServiceHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+// HTTP request handler to disable a service binding.
+func disableServiceBindingHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		serviceName := vars[ServiceName]
@@ -375,7 +405,19 @@ func disableServiceHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.H
 			return
 		}
 
-		msg := service.NewMsgDisableServiceBinding(serviceName, provider)
+		var owner sdk.AccAddress
+
+		if len(req.Owner) > 0 {
+			owner, err = sdk.AccAddressFromBech32(req.Owner)
+			if err != nil {
+				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+				return
+			}
+		} else {
+			owner = provider
+		}
+
+		msg := service.NewMsgDisableServiceBinding(serviceName, provider, owner)
 		if err := msg.ValidateBasic(); err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -387,8 +429,8 @@ func disableServiceHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.H
 	}
 }
 
-// HTTP request handler to enable a service.
-func enableServiceHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+// HTTP request handler to enable a service binding.
+func enableServiceBindingHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		serviceName := vars[ServiceName]
@@ -411,6 +453,18 @@ func enableServiceHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Ha
 			return
 		}
 
+		var owner sdk.AccAddress
+
+		if len(req.Owner) > 0 {
+			owner, err = sdk.AccAddressFromBech32(req.Owner)
+			if err != nil {
+				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+				return
+			}
+		} else {
+			owner = provider
+		}
+
 		var deposit sdk.Coins
 		if len(req.Deposit) != 0 {
 			deposit, err = cliCtx.ParseCoins(req.Deposit)
@@ -420,7 +474,7 @@ func enableServiceHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Ha
 			}
 		}
 
-		msg := service.NewMsgEnableServiceBinding(serviceName, provider, deposit)
+		msg := service.NewMsgEnableServiceBinding(serviceName, provider, deposit, owner)
 		if err := msg.ValidateBasic(); err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -456,7 +510,19 @@ func refundServiceDepositHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) 
 			return
 		}
 
-		msg := service.NewMsgRefundServiceDeposit(serviceName, provider)
+		var owner sdk.AccAddress
+
+		if len(req.Owner) > 0 {
+			owner, err = sdk.AccAddressFromBech32(req.Owner)
+			if err != nil {
+				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+				return
+			}
+		} else {
+			owner = provider
+		}
+
+		msg := service.NewMsgRefundServiceDeposit(serviceName, provider, owner)
 		if err = msg.ValidateBasic(); err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -763,7 +829,19 @@ func withdrawEarnedFeesHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) ht
 			return
 		}
 
-		msg := service.NewMsgWithdrawEarnedFees(provider)
+		var owner sdk.AccAddress
+
+		if len(req.Owner) > 0 {
+			owner, err = sdk.AccAddressFromBech32(req.Owner)
+			if err != nil {
+				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+				return
+			}
+		} else {
+			owner = provider
+		}
+
+		msg := service.NewMsgWithdrawEarnedFees(owner, provider)
 		if err = msg.ValidateBasic(); err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return

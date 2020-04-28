@@ -36,9 +36,9 @@ func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Co
 		queryBindingsHandlerFn(cliCtx, cdc),
 	).Methods("GET")
 
-	// query the withdrawal address of a provider
+	// query the withdrawal address of an owner
 	r.HandleFunc(
-		fmt.Sprintf("/service/providers/{%s}/withdraw-address", Provider),
+		fmt.Sprintf("/service/owners/{%s}/withdraw-address", Owner),
 		queryWithdrawAddrHandlerFn(cliCtx, cdc),
 	).Methods("GET")
 
@@ -174,16 +174,16 @@ func queryBindingsHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.Ha
 func queryWithdrawAddrHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		providerStr := vars[Provider]
+		ownerStr := vars[Owner]
 
-		provider, err := sdk.AccAddressFromBech32(providerStr)
+		owner, err := sdk.AccAddressFromBech32(ownerStr)
 		if err != nil {
 			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
 		params := service.QueryWithdrawAddressParams{
-			Provider: provider,
+			Owner: owner,
 		}
 
 		bz, err := cliCtx.Codec.MarshalJSON(params)

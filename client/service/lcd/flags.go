@@ -2,6 +2,7 @@ package lcd
 
 const (
 	ServiceName      = "service-name"
+	Owner            = "owner"
 	Provider         = "provider"
 	Consumer         = "consumer"
 	RequestID        = "request-id"
