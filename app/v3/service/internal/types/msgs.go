@@ -934,7 +934,7 @@ func (msg MsgWithdrawEarnedFees) GetSignBytes() []byte {
 
 // ValidateBasic implements Msg.
 func (msg MsgWithdrawEarnedFees) ValidateBasic() sdk.Error {
-	return ValidateOwner(msg.Provider)
+	return ValidateOwner(msg.Owner)
 }
 
 // GetSigners implements Msg.
