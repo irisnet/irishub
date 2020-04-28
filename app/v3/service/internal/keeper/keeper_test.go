@@ -51,6 +51,7 @@ func setServiceDefinition(ctx sdk.Context, k Keeper, author sdk.AccAddress) {
 func setServiceBinding(ctx sdk.Context, k Keeper, provider, owner sdk.AccAddress, available bool, disabledTime time.Time) {
 	svcBinding := types.NewServiceBinding(testServiceName, provider, testDeposit, testPricing, testQoS, available, disabledTime, owner)
 	k.SetServiceBinding(ctx, svcBinding)
+	k.SetOwnerServiceBindings(ctx, svcBinding)
 
 	pricing, _ := k.ParsePricing(ctx, testPricing)
 	k.SetPricing(ctx, testServiceName, provider, pricing)
@@ -138,6 +139,10 @@ func TestKeeper_Bind_Service(t *testing.T) {
 	require.True(t, svcBinding.Available)
 	require.True(t, svcBinding.DisabledTime.IsZero())
 	require.Equal(t, owner, svcBinding.Owner)
+
+	svcBindings := keeper.GetOwnerServiceBindings(ctx, owner, testServiceName)
+	require.Equal(t, 1, len(svcBindings))
+	require.Equal(t, svcBinding, svcBindings[0])
 
 	// update binding
 	newPricing := `{"price":"1iris"}`
@@ -468,7 +473,7 @@ func TestKeeper_Respond_Service(t *testing.T) {
 
 	earnedFees, found := keeper.GetEarnedFees(ctx, provider)
 	require.True(t, found)
-	require.True(t, !earnedFees.Coins.Empty())
+	require.True(t, !earnedFees.Empty())
 
 	require.False(t, keeper.IsRequestActive(ctx, requestID1))
 	require.False(t, keeper.IsRequestActive(ctx, requestID2))
