@@ -36,9 +36,9 @@ type QueryBindingsParams struct {
 	ServiceName string
 }
 
-// QueryWithdrawAddressParams defines the params to query the withdrawal address of a provider
+// QueryWithdrawAddressParams defines the params to query the withdrawal address of an owner
 type QueryWithdrawAddressParams struct {
-	Provider sdk.AccAddress
+	Owner sdk.AccAddress
 }
 
 // QueryRequestParams defines the params to query the request by ID

@@ -115,7 +115,7 @@ func queryWithdrawAddress(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]b
 		return nil, sdk.ParseParamsErr(err)
 	}
 
-	withdrawAddr := k.GetWithdrawAddress(ctx, params.Provider)
+	withdrawAddr := k.GetWithdrawAddress(ctx, params.Owner)
 
 	bz, err := codec.MarshalJSONIndent(k.cdc, withdrawAddr)
 	if err != nil {
