@@ -142,6 +142,8 @@ func GetCmdQueryServiceBindings(cdc *codec.Codec) *cobra.Command {
 		},
 	}
 
+	cmd.Flags().AddFlagSet(FsServiceQueryBindings)
+
 	return cmd
 }
 
