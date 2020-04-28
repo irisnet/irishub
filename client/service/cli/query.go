@@ -135,20 +135,20 @@ func GetCmdQueryServiceBindings(cdc *codec.Codec) *cobra.Command {
 // GetCmdQueryWithdrawAddr implements the query withdraw address command
 func GetCmdQueryWithdrawAddr(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "withdraw-addr [provider]",
-		Short:   "Query the withdrawal address of a provider",
-		Example: "iriscli service withdraw-addr <provider>",
+		Use:     "withdraw-addr [address]",
+		Short:   "Query the withdrawal address of an owner",
+		Example: "iriscli service withdraw-addr <address>",
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			provider, err := sdk.AccAddressFromBech32(args[0])
+			owner, err := sdk.AccAddressFromBech32(args[0])
 			if err != nil {
 				return err
 			}
 
 			params := service.QueryWithdrawAddressParams{
-				Provider: provider,
+				Owner: owner,
 			}
 
 			bz, err := cdc.MarshalJSON(params)
@@ -390,9 +390,9 @@ func GetCmdQueryRequestContext(cdc *codec.Codec) *cobra.Command {
 // GetCmdQueryEarnedFees implements the query earned fees command
 func GetCmdQueryEarnedFees(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "fees [provider]",
+		Use:     "fees [provider-address]",
 		Short:   "Query the earned fees of a provider",
-		Example: "iriscli service fees <provider>",
+		Example: "iriscli service fees <provider-address>",
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)

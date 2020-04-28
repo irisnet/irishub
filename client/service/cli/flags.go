@@ -12,9 +12,11 @@ const (
 	FlagAuthorDescription = "author-description"
 	FlagSchemas           = "schemas"
 	FlagServiceName       = "service-name"
+	FlagOwner             = "owner"
+	FlagProvider          = "provider"
 	FlagDeposit           = "deposit"
 	FlagPricing           = "pricing"
-	FlagMinRespTime       = "min-resp-time"
+	FlagQoS               = "qos"
 	FlagProviders         = "providers"
 	FlagServiceFeeCap     = "service-fee-cap"
 	FlagTimeout           = "timeout"
@@ -46,13 +48,14 @@ func init() {
 	FsServiceDefine.String(FlagSchemas, "", "interface schemas content or file path")
 
 	FsServiceBind.String(FlagServiceName, "", "service name")
+	FsServiceBind.String(FlagProvider, "", "provider address, default to the owner")
 	FsServiceBind.String(FlagDeposit, "", "deposit of the binding")
 	FsServiceBind.String(FlagPricing, "", "pricing content or file path, which is an instance of the Irishub Service Pricing schema")
-	FsServiceBind.Uint64(FlagMinRespTime, 0, "minimum response time")
+	FsServiceBind.Uint64(FlagQoS, 0, "quality of service, in terms of minimum response time")
 
 	FsServiceUpdateBinding.String(FlagDeposit, "", "added deposit for the binding")
 	FsServiceUpdateBinding.String(FlagPricing, "", "pricing content or file path, which is an instance of the Irishub Service Pricing schema")
-	FsServiceUpdateBinding.Uint64(FlagMinRespTime, 0, "minimum response time, not updated if set to 0")
+	FsServiceUpdateBinding.Uint64(FlagQoS, 0, "quality of service, in terms of minimum response time, not updated if set to 0")
 
 	FsServiceEnableBinding.String(FlagDeposit, "", "added deposit for enabling the binding")
 

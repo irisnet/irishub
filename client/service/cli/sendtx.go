@@ -88,7 +88,7 @@ func GetCmdBindService(cdc *codec.Codec) *cobra.Command {
 		Use:   "bind",
 		Short: "Bind a service",
 		Example: "iriscli service bind --chain-id=<chain-id> --from=<key-name> --fee=0.3iris " +
-			"--service-name=<service-name> --deposit=1iris --pricing=<pricing content or path/to/pricing.json> --min-resp-time=50",
+			"--service-name=<service-name> --deposit=1iris --pricing=<pricing content or path/to/pricing.json> --qos=50",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
@@ -97,13 +97,25 @@ func GetCmdBindService(cdc *codec.Codec) *cobra.Command {
 			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).
 				WithCliCtx(cliCtx)
 
-			provider, err := cliCtx.GetFromAddress()
+			owner, err := cliCtx.GetFromAddress()
 			if err != nil {
 				return err
 			}
 
+			var provider sdk.AccAddress
+
+			providerStr := viper.GetString(FlagProvider)
+			if len(providerStr) > 0 {
+				provider, err = sdk.AccAddressFromBech32(providerStr)
+				if err != nil {
+					return err
+				}
+			} else {
+				provider = owner
+			}
+
 			serviceName := viper.GetString(FlagServiceName)
-			minRespTime := uint64(viper.GetInt64(FlagMinRespTime))
+			qos := uint64(viper.GetInt64(FlagQoS))
 
 			depositStr := viper.GetString(FlagDeposit)
 			deposit, err := cliCtx.ParseCoins(depositStr)
@@ -133,7 +145,7 @@ func GetCmdBindService(cdc *codec.Codec) *cobra.Command {
 
 			pricing = buf.String()
 
-			msg := service.NewMsgBindService(serviceName, provider, deposit, pricing, minRespTime)
+			msg := service.NewMsgBindService(serviceName, provider, deposit, pricing, qos, owner)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -146,7 +158,7 @@ func GetCmdBindService(cdc *codec.Codec) *cobra.Command {
 	_ = cmd.MarkFlagRequired(FlagServiceName)
 	_ = cmd.MarkFlagRequired(FlagDeposit)
 	_ = cmd.MarkFlagRequired(FlagPricing)
-	_ = cmd.MarkFlagRequired(FlagMinRespTime)
+	_ = cmd.MarkFlagRequired(FlagQoS)
 
 	return cmd
 }
@@ -154,11 +166,11 @@ func GetCmdBindService(cdc *codec.Codec) *cobra.Command {
 // GetCmdUpdateServiceBinding implements updating a service binding command
 func GetCmdUpdateServiceBinding(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "update-binding [service-name]",
+		Use:   "update-binding [service-name] [provider-address]",
 		Short: "Update an existing service binding",
-		Example: "iriscli service update-binding <service-name> --chain-id=<chain-id> --from=<key-name> " +
-			"--fee=0.3iris --deposit=1iris --pricing=<pricing content or path/to/pricing.json> --min-resp-time=50",
-		Args: cobra.ExactArgs(1),
+		Example: "iriscli service update-binding <service-name> <provider-address> --chain-id=<chain-id> --from=<key-name> " +
+			"--fee=0.3iris --deposit=1iris --pricing=<pricing content or path/to/pricing.json> --qos=50",
+		Args: cobra.RangeArgs(1, 2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
@@ -167,9 +179,20 @@ func GetCmdUpdateServiceBinding(cdc *codec.Codec) *cobra.Command {
 			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).
 				WithCliCtx(cliCtx)
 
-			provider, err := cliCtx.GetFromAddress()
+			owner, err := cliCtx.GetFromAddress()
 			if err != nil {
 				return err
+			}
+
+			var provider sdk.AccAddress
+
+			if len(args) > 1 {
+				provider, err = sdk.AccAddressFromBech32(args[1])
+				if err != nil {
+					return err
+				}
+			} else {
+				provider = owner
 			}
 
 			var deposit sdk.Coins
@@ -206,9 +229,9 @@ func GetCmdUpdateServiceBinding(cdc *codec.Codec) *cobra.Command {
 				pricing = buf.String()
 			}
 
-			minRespTime := uint64(viper.GetInt64(FlagMinRespTime))
+			qos := uint64(viper.GetInt64(FlagQoS))
 
-			msg := service.NewMsgUpdateServiceBinding(args[0], provider, deposit, pricing, minRespTime)
+			msg := service.NewMsgUpdateServiceBinding(args[0], provider, deposit, pricing, qos, owner)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -226,7 +249,7 @@ func GetCmdUpdateServiceBinding(cdc *codec.Codec) *cobra.Command {
 func GetCmdSetWithdrawAddr(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "set-withdraw-addr [withdrawal-address]",
-		Short: "Set a withdrawal address for a provider",
+		Short: "Set a withdrawal address for an owner",
 		Example: "iriscli service set-withdraw-addr <withdrawal-address> --chain-id=<chain-id> " +
 			"--from=<key-name> --fee=0.3iris",
 		Args: cobra.ExactArgs(1),
@@ -238,7 +261,7 @@ func GetCmdSetWithdrawAddr(cdc *codec.Codec) *cobra.Command {
 			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).
 				WithCliCtx(cliCtx)
 
-			provider, err := cliCtx.GetFromAddress()
+			owner, err := cliCtx.GetFromAddress()
 			if err != nil {
 				return err
 			}
@@ -248,7 +271,7 @@ func GetCmdSetWithdrawAddr(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			msg := service.NewMsgSetWithdrawAddress(provider, withdrawAddr)
+			msg := service.NewMsgSetWithdrawAddress(owner, withdrawAddr)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -263,10 +286,10 @@ func GetCmdSetWithdrawAddr(cdc *codec.Codec) *cobra.Command {
 // GetCmdDisableServiceBinding implements disabling a service binding command
 func GetCmdDisableServiceBinding(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "disable [service-name]",
+		Use:     "disable [service-name] [provider-address]",
 		Short:   "Disable an available service binding",
-		Example: "iriscli service disable <service-name> --chain-id=<chain-id> --from=<key-name> --fee=0.3iris",
-		Args:    cobra.ExactArgs(1),
+		Example: "iriscli service disable <service-name> <provider-address> --chain-id=<chain-id> --from=<key-name> --fee=0.3iris",
+		Args:    cobra.RangeArgs(1, 2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
@@ -275,12 +298,23 @@ func GetCmdDisableServiceBinding(cdc *codec.Codec) *cobra.Command {
 			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).
 				WithCliCtx(cliCtx)
 
-			provider, err := cliCtx.GetFromAddress()
+			owner, err := cliCtx.GetFromAddress()
 			if err != nil {
 				return err
 			}
 
-			msg := service.NewMsgDisableServiceBinding(args[0], provider)
+			var provider sdk.AccAddress
+
+			if len(args) > 1 {
+				provider, err = sdk.AccAddressFromBech32(args[1])
+				if err != nil {
+					return err
+				}
+			} else {
+				provider = owner
+			}
+
+			msg := service.NewMsgDisableServiceBinding(args[0], provider, owner)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -295,11 +329,11 @@ func GetCmdDisableServiceBinding(cdc *codec.Codec) *cobra.Command {
 // GetCmdEnableServiceBinding implements enabling a service binding command
 func GetCmdEnableServiceBinding(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "enable [service-name]",
+		Use:   "enable [service-name] [provider-address]",
 		Short: "Enable an unavailable service binding",
-		Example: "iriscli service enable <service-name> --chain-id=<chain-id> --from=<key-name> " +
+		Example: "iriscli service enable <service-name> <provider-address> --chain-id=<chain-id> --from=<key-name> " +
 			"--fee=0.3iris --deposit=1iris",
-		Args: cobra.ExactArgs(1),
+		Args: cobra.RangeArgs(1, 2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
@@ -308,14 +342,25 @@ func GetCmdEnableServiceBinding(cdc *codec.Codec) *cobra.Command {
 			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).
 				WithCliCtx(cliCtx)
 
-			provider, err := cliCtx.GetFromAddress()
+			owner, err := cliCtx.GetFromAddress()
 			if err != nil {
 				return err
 			}
 
-			depositStr := viper.GetString(FlagDeposit)
+			var provider sdk.AccAddress
+
+			if len(args) > 1 {
+				provider, err = sdk.AccAddressFromBech32(args[1])
+				if err != nil {
+					return err
+				}
+			} else {
+				provider = owner
+			}
 
 			var deposit sdk.Coins
+
+			depositStr := viper.GetString(FlagDeposit)
 			if len(depositStr) != 0 {
 				deposit, err = cliCtx.ParseCoins(depositStr)
 				if err != nil {
@@ -323,7 +368,7 @@ func GetCmdEnableServiceBinding(cdc *codec.Codec) *cobra.Command {
 				}
 			}
 
-			msg := service.NewMsgEnableServiceBinding(args[0], provider, deposit)
+			msg := service.NewMsgEnableServiceBinding(args[0], provider, deposit, owner)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -340,11 +385,11 @@ func GetCmdEnableServiceBinding(cdc *codec.Codec) *cobra.Command {
 // GetCmdRefundServiceDeposit implements refunding deposit command
 func GetCmdRefundServiceDeposit(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "refund-deposit [service-name]",
+		Use:   "refund-deposit [service-name] [provider-address]",
 		Short: "Refund all deposit from a service binding",
-		Example: "iriscli service refund-deposit <service-name> --chain-id=<chain-id> --from=<key-name> " +
+		Example: "iriscli service refund-deposit <service-name> <provider-address> --chain-id=<chain-id> --from=<key-name> " +
 			"--fee=0.3iris",
-		Args: cobra.ExactArgs(1),
+		Args: cobra.RangeArgs(1, 2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
@@ -353,12 +398,23 @@ func GetCmdRefundServiceDeposit(cdc *codec.Codec) *cobra.Command {
 			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).
 				WithCliCtx(cliCtx)
 
-			provider, err := cliCtx.GetFromAddress()
+			owner, err := cliCtx.GetFromAddress()
 			if err != nil {
 				return err
 			}
 
-			msg := service.NewMsgRefundServiceDeposit(args[0], provider)
+			var provider sdk.AccAddress
+
+			if len(args) > 1 {
+				provider, err = sdk.AccAddressFromBech32(args[1])
+				if err != nil {
+					return err
+				}
+			} else {
+				provider = owner
+			}
+
+			msg := service.NewMsgRefundServiceDeposit(args[0], provider, owner)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -736,9 +792,10 @@ func GetCmdUpdateRequestContext(cdc *codec.Codec) *cobra.Command {
 // GetCmdWithdrawEarnedFees implements withdrawing earned fees command
 func GetCmdWithdrawEarnedFees(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "withdraw-fees",
-		Short:   "Withdraw the earned fees of a provider",
-		Example: "iriscli service withdraw-fees --chain-id=<chain-id> --from=<key-name> --fee=0.3iris",
+		Use:     "withdraw-fees [provider-address]",
+		Short:   "Withdraw the earned fees of the specified provider or all providers if not given",
+		Example: "iriscli service withdraw-fees <provider-address> --chain-id=<chain-id> --from=<key-name> --fee=0.3iris",
+		Args:    cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc).
@@ -747,12 +804,21 @@ func GetCmdWithdrawEarnedFees(cdc *codec.Codec) *cobra.Command {
 			txCtx := utils.NewTxContextFromCLI().WithCodec(cdc).
 				WithCliCtx(cliCtx)
 
-			provider, err := cliCtx.GetFromAddress()
+			owner, err := cliCtx.GetFromAddress()
 			if err != nil {
 				return err
 			}
 
-			msg := service.NewMsgWithdrawEarnedFees(provider)
+			var provider sdk.AccAddress
+
+			if len(args) > 0 {
+				provider, err = sdk.AccAddressFromBech32(args[0])
+				if err != nil {
+					return err
+				}
+			}
+
+			msg := service.NewMsgWithdrawEarnedFees(owner, provider)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
