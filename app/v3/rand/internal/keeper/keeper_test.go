@@ -67,7 +67,7 @@ func TestRequestRandKeeper(t *testing.T) {
 
 	mockServiceKeeper.SetServiceBinding(ctx,
 		service.NewServiceBinding(
-			types.ServiceName, provider, sdk.NewCoins(), "", 0, true, time.Time{},
+			types.ServiceName, provider, sdk.NewCoins(), "", 0, true, time.Time{}, provider,
 		))
 
 	// request a rand
