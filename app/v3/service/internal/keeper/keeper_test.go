@@ -27,7 +27,7 @@ var (
 
 	testDeposit      = sdk.NewCoins(testCoin1)
 	testPricing      = `{"price":"1iris","promotions_by_volume":[{"volume":1,"discount":"0.8"}]}`
-	testMinRespTime  = uint64(50)
+	testQoS          = uint64(50)
 	testWithdrawAddr = sdk.AccAddress([]byte("test-withdrawal-address"))
 	testAddedDeposit = sdk.NewCoins(testCoin2)
 
@@ -48,8 +48,8 @@ func setServiceDefinition(ctx sdk.Context, k Keeper, author sdk.AccAddress) {
 	k.SetServiceDefinition(ctx, svcDef)
 }
 
-func setServiceBinding(ctx sdk.Context, k Keeper, provider sdk.AccAddress, available bool, disabledTime time.Time) {
-	svcBinding := types.NewServiceBinding(testServiceName, provider, testDeposit, testPricing, testMinRespTime, available, disabledTime)
+func setServiceBinding(ctx sdk.Context, k Keeper, provider, owner sdk.AccAddress, available bool, disabledTime time.Time) {
+	svcBinding := types.NewServiceBinding(testServiceName, provider, testDeposit, testPricing, testQoS, available, disabledTime, owner)
 	k.SetServiceBinding(ctx, svcBinding)
 
 	pricing, _ := k.ParsePricing(ctx, testPricing)
@@ -119,11 +119,12 @@ func TestKeeper_Bind_Service(t *testing.T) {
 	ctx, keeper, accs := createTestInput(t, sdk.NewIntWithDecimal(20000, 18), 2)
 
 	author := accs[0].GetAddress()
-	provider := accs[1].GetAddress()
+	owner := accs[1].GetAddress()
+	provider := owner
 
 	setServiceDefinition(ctx, keeper, author)
 
-	err := keeper.AddServiceBinding(ctx, testServiceName, provider, testDeposit, testPricing, testMinRespTime)
+	err := keeper.AddServiceBinding(ctx, testServiceName, provider, testDeposit, testPricing, testQoS, owner)
 	require.NoError(t, err)
 
 	svcBinding, found := keeper.GetServiceBinding(ctx, testServiceName, provider)
@@ -133,15 +134,16 @@ func TestKeeper_Bind_Service(t *testing.T) {
 	require.Equal(t, provider, svcBinding.Provider)
 	require.Equal(t, testDeposit, svcBinding.Deposit)
 	require.Equal(t, testPricing, svcBinding.Pricing)
-	require.Equal(t, testMinRespTime, svcBinding.MinRespTime)
+	require.Equal(t, testQoS, svcBinding.QoS)
 	require.True(t, svcBinding.Available)
 	require.True(t, svcBinding.DisabledTime.IsZero())
+	require.Equal(t, owner, svcBinding.Owner)
 
 	// update binding
 	newPricing := `{"price":"1iris"}`
-	newMinRespTime := uint64(80)
+	newQoS := uint64(80)
 
-	err = keeper.UpdateServiceBinding(ctx, svcBinding.ServiceName, svcBinding.Provider, testAddedDeposit, newPricing, newMinRespTime)
+	err = keeper.UpdateServiceBinding(ctx, svcBinding.ServiceName, svcBinding.Provider, testAddedDeposit, newPricing, newQoS, owner)
 	require.NoError(t, err)
 
 	updatedSvcBinding, found := keeper.GetServiceBinding(ctx, svcBinding.ServiceName, svcBinding.Provider)
@@ -149,35 +151,35 @@ func TestKeeper_Bind_Service(t *testing.T) {
 
 	require.True(t, updatedSvcBinding.Deposit.IsEqual(svcBinding.Deposit.Add(testAddedDeposit)))
 	require.Equal(t, newPricing, updatedSvcBinding.Pricing)
-	require.Equal(t, newMinRespTime, updatedSvcBinding.MinRespTime)
+	require.Equal(t, newQoS, updatedSvcBinding.QoS)
 }
 
 func TestKeeper_Set_Withdraw_Address(t *testing.T) {
 	ctx, keeper, accs := createTestInput(t, sdk.NewIntWithDecimal(2000, 18), 2)
 
-	provider := accs[0].GetAddress()
+	owner := accs[0].GetAddress()
 
-	setServiceBinding(ctx, keeper, provider, true, time.Time{})
+	withdrawAddr := keeper.GetWithdrawAddress(ctx, owner)
+	require.Equal(t, owner, withdrawAddr)
 
-	withdrawAddr := keeper.GetWithdrawAddress(ctx, provider)
-	require.Equal(t, provider, withdrawAddr)
+	keeper.SetWithdrawAddress(ctx, owner, testWithdrawAddr)
 
-	keeper.SetWithdrawAddress(ctx, provider, testWithdrawAddr)
-
-	withdrawAddr = keeper.GetWithdrawAddress(ctx, provider)
+	withdrawAddr = keeper.GetWithdrawAddress(ctx, owner)
 	require.Equal(t, testWithdrawAddr, withdrawAddr)
 }
 
-func TestKeeper_Disable_Service(t *testing.T) {
+func TestKeeper_Disable_Service_Binding(t *testing.T) {
 	ctx, keeper, accs := createTestInput(t, sdk.NewIntWithDecimal(2000, 18), 1)
 
-	provider := accs[0].GetAddress()
-	setServiceBinding(ctx, keeper, provider, true, time.Time{})
+	owner := accs[0].GetAddress()
+	provider := owner
+
+	setServiceBinding(ctx, keeper, provider, owner, true, time.Time{})
 
 	currentTime := time.Now().UTC()
 	ctx = ctx.WithBlockTime(currentTime)
 
-	err := keeper.DisableServiceBinding(ctx, testServiceName, provider)
+	err := keeper.DisableServiceBinding(ctx, testServiceName, provider, owner)
 	require.NoError(t, err)
 
 	svcBinding, found := keeper.GetServiceBinding(ctx, testServiceName, provider)
@@ -187,15 +189,16 @@ func TestKeeper_Disable_Service(t *testing.T) {
 	require.Equal(t, currentTime, svcBinding.DisabledTime)
 }
 
-func TestKeeper_Enable_Service(t *testing.T) {
+func TestKeeper_Enable_Service_Binding(t *testing.T) {
 	ctx, keeper, accs := createTestInput(t, sdk.NewIntWithDecimal(2000, 18), 1)
 
-	provider := accs[0].GetAddress()
+	owner := accs[0].GetAddress()
+	provider := owner
 
 	disabledTime := time.Now().UTC()
-	setServiceBinding(ctx, keeper, provider, false, disabledTime)
+	setServiceBinding(ctx, keeper, provider, owner, false, disabledTime)
 
-	err := keeper.EnableServiceBinding(ctx, testServiceName, provider, nil)
+	err := keeper.EnableServiceBinding(ctx, testServiceName, provider, nil, owner)
 	require.NoError(t, err)
 
 	svcBinding, found := keeper.GetServiceBinding(ctx, testServiceName, provider)
@@ -208,10 +211,11 @@ func TestKeeper_Enable_Service(t *testing.T) {
 func TestKeeper_Refund_Deposit(t *testing.T) {
 	ctx, keeper, accs := createTestInput(t, sdk.NewIntWithDecimal(20000, 18), 1)
 
-	provider := accs[0].GetAddress()
+	owner := accs[0].GetAddress()
+	provider := owner
 
 	disabledTime := time.Now().UTC()
-	setServiceBinding(ctx, keeper, provider, false, disabledTime)
+	setServiceBinding(ctx, keeper, provider, owner, false, disabledTime)
 
 	_, err := keeper.bk.SendCoins(ctx, provider, auth.ServiceDepositCoinsAccAddr, testDeposit)
 	require.NoError(t, err)
@@ -220,7 +224,7 @@ func TestKeeper_Refund_Deposit(t *testing.T) {
 	blockTime := disabledTime.Add(params.ArbitrationTimeLimit).Add(params.ComplaintRetrospect)
 	ctx = ctx.WithBlockTime(blockTime)
 
-	err = keeper.RefundDeposit(ctx, testServiceName, provider)
+	err = keeper.RefundDeposit(ctx, testServiceName, provider, owner)
 	require.NoError(t, err)
 
 	svcBinding, found := keeper.GetServiceBinding(ctx, testServiceName, provider)
@@ -342,7 +346,7 @@ func TestKeeper_Request_Service(t *testing.T) {
 	setServiceDefinition(ctx, keeper, author)
 
 	for _, provider := range providers {
-		setServiceBinding(ctx, keeper, provider, true, time.Time{})
+		setServiceBinding(ctx, keeper, provider, provider, true, time.Time{})
 	}
 
 	blockHeight := int64(1000)
