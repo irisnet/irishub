@@ -43,7 +43,7 @@ func TestIrisCLIService(t *testing.T) {
 	priceAmt := 1 // 1iris
 	price := fmt.Sprintf("%diris", priceAmt)
 	pricing := fmt.Sprintf(`{"price":"%diris"}`, priceAmt)
-	minRespTime := uint64(5)
+	qos := uint64(5)
 	addedDeposit := "1iris"
 	serviceFeeCap := "10iris"
 	input := `{"pair":"iris-usdt"}`
@@ -86,7 +86,7 @@ func TestIrisCLIService(t *testing.T) {
 	sbStr += fmt.Sprintf(" --service-name=%s", serviceName)
 	sbStr += fmt.Sprintf(" --deposit=%s", deposit)
 	sbStr += fmt.Sprintf(" --pricing=%s", pricing)
-	sbStr += fmt.Sprintf(" --min-resp-time=%d", minRespTime)
+	sbStr += fmt.Sprintf(" --qos=%d", qos)
 	sbStr += fmt.Sprintf(" --fee=%s", "0.4iris")
 
 	sbStrFoo := sbStr + fmt.Sprintf(" --from=%s", "foo")
@@ -122,11 +122,16 @@ func TestIrisCLIService(t *testing.T) {
 	require.Equal(t, fooAddr, svcBinding.Provider)
 	require.Equal(t, deposit, svcBinding.Deposit.MainUnitString())
 	require.Equal(t, pricing, svcBinding.Pricing)
-	require.Equal(t, minRespTime, svcBinding.MinRespTime)
+	require.Equal(t, qos, svcBinding.QoS)
 	require.True(t, svcBinding.Available)
+	require.Equal(t, fooAddr, svcBinding.Owner)
 
 	svcBindings := executeGetServiceBindings(t, fmt.Sprintf("iriscli service bindings %s %v", serviceName, flags))
 	require.Equal(t, 2, len(svcBindings))
+
+	svcBindings = executeGetServiceBindings(t, fmt.Sprintf("iriscli service bindings %s --owner %s %v", serviceName, fooAddr.String(), flags))
+	require.Equal(t, 1, len(svcBindings))
+	require.Equal(t, svcBinding, svcBindings[0])
 
 	// update binding
 	ubStr := fmt.Sprintf("iriscli service update-binding %s %v", serviceName, flags)
@@ -391,10 +396,10 @@ func TestIrisCLIService(t *testing.T) {
 	require.Equal(t, service.COMPLETED, requestContext.State)
 
 	// query fees(bar)
-	fees := executeGetServiceFees(t, fmt.Sprintf("iriscli service fees %s %v", barAddr.String(), flags))
+	feesOutput := executeGetServiceFees(t, fmt.Sprintf("iriscli service fees %s %v", barAddr.String(), flags))
 
 	earnedFeesAmt := float64(priceAmt) * (1 - 0.01)
-	require.Equal(t, fmt.Sprintf("%giris", earnedFeesAmt), fees.Coins.MainUnitString())
+	require.Equal(t, fmt.Sprintf("%giris", earnedFeesAmt), feesOutput.EarnedFees.MainUnitString())
 
 	fooAcc = executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", fooAddr, flags))
 	fooCoin = convertToIrisBaseAccount(t, fooAcc)

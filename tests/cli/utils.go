@@ -390,13 +390,13 @@ func executeGetRequestContext(t *testing.T, cmdStr string) service.RequestContex
 	return requestContext
 }
 
-func executeGetServiceFees(t *testing.T, cmdStr string) service.EarnedFees {
+func executeGetServiceFees(t *testing.T, cmdStr string) service.EarnedFeesOutput {
 	out, _ := tests.ExecuteT(t, cmdStr, "")
-	var fees service.EarnedFees
+	var feesOutput service.EarnedFeesOutput
 	cdc := app.MakeLatestCodec()
-	err := cdc.UnmarshalJSON([]byte(out), &fees)
+	err := cdc.UnmarshalJSON([]byte(out), &feesOutput)
 	require.NoError(t, err, "out %v\n, err %v", out, err)
-	return fees
+	return feesOutput
 }
 
 func executeGetFeed(t *testing.T, cmdStr string) oracle.FeedContext {
