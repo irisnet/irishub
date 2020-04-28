@@ -802,7 +802,7 @@ func (k Keeper) FilterServiceProviders(
 		binding, found := k.GetServiceBinding(ctx, serviceName, provider)
 
 		if found && binding.Available {
-			if binding.MinRespTime <= uint64(timeout) {
+			if binding.QoS <= uint64(timeout) {
 				price := k.GetPrice(ctx, consumer, binding)
 
 				if price.IsAllLTE(serviceFeeCap) {

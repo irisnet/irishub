@@ -84,13 +84,13 @@ func (k Keeper) GetEarnedFees(ctx sdk.Context, provider sdk.AccAddress) (fees ty
 }
 
 // WithdrawEarnedFees withdraws the earned fees of the specified provider
-func (k Keeper) WithdrawEarnedFees(ctx sdk.Context, provider sdk.AccAddress) sdk.Error {
+func (k Keeper) WithdrawEarnedFees(ctx sdk.Context, owner, provider sdk.AccAddress) sdk.Error {
 	fees, found := k.GetEarnedFees(ctx, provider)
 	if !found {
 		return types.ErrNoEarnedFees(k.codespace, provider)
 	}
 
-	withdrawAddr := k.GetWithdrawAddress(ctx, provider)
+	withdrawAddr := k.GetWithdrawAddress(ctx, owner)
 
 	_, err := k.bk.SendCoins(ctx, auth.ServiceRequestCoinsAccAddr, withdrawAddr, fees.Coins)
 	if err != nil {
