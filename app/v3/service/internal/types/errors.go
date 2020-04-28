@@ -186,8 +186,8 @@ func ErrCallbackNotRegistered(codespace sdk.CodespaceType, cbType, moduleName st
 	return sdk.NewError(codespace, CodeCallbackNotRegistered, fmt.Sprintf("%s not registered for module %s", cbType, moduleName))
 }
 
-func ErrNoEarnedFees(codespace sdk.CodespaceType, provider sdk.AccAddress) sdk.Error {
-	return sdk.NewError(codespace, CodeNoEarnedFees, fmt.Sprintf("no earned fees for %s", provider))
+func ErrNoEarnedFees(codespace sdk.CodespaceType, address sdk.AccAddress) sdk.Error {
+	return sdk.NewError(codespace, CodeNoEarnedFees, fmt.Sprintf("no earned fees for %s", address))
 }
 
 func ErrInvalidRequestInput(codespace sdk.CodespaceType, msg string) sdk.Error {

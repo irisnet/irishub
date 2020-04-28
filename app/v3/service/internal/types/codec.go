@@ -28,7 +28,6 @@ func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(CompactRequest{}, "irishub/service/CompactRequest", nil)
 	cdc.RegisterConcrete(Request{}, "irishub/service/Request", nil)
 	cdc.RegisterConcrete(Response{}, "irishub/service/Response", nil)
-	cdc.RegisterConcrete(EarnedFees{}, "irishub/service/EarnedFees", nil)
 
 	cdc.RegisterConcrete(&Params{}, "irishub/service/Params", nil)
 }

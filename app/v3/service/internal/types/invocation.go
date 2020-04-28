@@ -461,38 +461,19 @@ func ParseResult(result string) (Result, sdk.Error) {
 	return r, nil
 }
 
-// EarnedFees defines a struct for the fees earned by the provider
-type EarnedFees struct {
-	Address sdk.AccAddress `json:"address"`
-	Coins   sdk.Coins      `json:"coins"`
-}
-
-// NewEarnedFees creates a new EarnedFees instance
-func NewEarnedFees(address sdk.AccAddress, coins sdk.Coins) EarnedFees {
-	return EarnedFees{
-		Address: address,
-		Coins:   coins,
-	}
+// EarnedFeesOutput wrappers the earned fees for output
+type EarnedFeesOutput struct {
+	EarnedFees sdk.Coins `json:"earned_fees"`
 }
 
 // String implements Stringer
-func (e EarnedFees) String() string {
-	return fmt.Sprintf(`EarnedFees:
-	Address:                 %s
-	Coins:                   %s`,
-		e.Address,
-		e.Coins.String(),
-	)
+func (e EarnedFeesOutput) String() string {
+	return e.EarnedFees.String()
 }
 
 // HumanString implements human stringer
-func (e EarnedFees) HumanString(converter sdk.CoinsConverter) string {
-	return fmt.Sprintf(`EarnedFees:
-	Address:                 %s
-	Coins:                   %s`,
-		e.Address,
-		converter.ToMainUnit(e.Coins),
-	)
+func (e EarnedFeesOutput) HumanString(converter sdk.CoinsConverter) string {
+	return converter.ToMainUnit(e.EarnedFees)
 }
 
 // RequestContextState defines the state for the request context

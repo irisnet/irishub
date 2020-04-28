@@ -892,7 +892,9 @@ func (k Keeper) AddResponse(
 			panic(err)
 		}
 	} else {
-		if err := k.AddEarnedFee(ctx, provider, request.ServiceFee); err != nil {
+		binding, _ := k.GetServiceBinding(ctx, request.ServiceName, provider)
+
+		if err := k.AddEarnedFee(ctx, binding.Owner, provider, request.ServiceFee); err != nil {
 			return request, response, tags, err
 		}
 	}

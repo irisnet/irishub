@@ -63,7 +63,6 @@ var (
 	NewServiceBinding           = types.NewServiceBinding
 	NewRequest                  = types.NewRequest
 	NewResponse                 = types.NewResponse
-	NewEarnedFees               = types.NewEarnedFees
 	NewMsgDefineService         = types.NewMsgDefineService
 	NewMsgBindService           = types.NewMsgBindService
 	NewMsgUpdateServiceBinding  = types.NewMsgUpdateServiceBinding
@@ -101,7 +100,7 @@ type (
 	CompactRequest              = types.CompactRequest
 	Response                    = types.Response
 	Responses                   = types.Responses
-	EarnedFees                  = types.EarnedFees
+	EarnedFeesOutput            = types.EarnedFeesOutput
 	Metrics                     = types.Metrics
 	MsgDefineService            = types.MsgDefineService
 	MsgBindService              = types.MsgBindService
