@@ -20,7 +20,7 @@ const (
 
 	CodeInvalidDeposit            sdk.CodeType = 106
 	CodeInvalidPricing            sdk.CodeType = 107
-	CodeInvalidMinRespTime        sdk.CodeType = 108
+	CodeInvalidQoS                sdk.CodeType = 108
 	CodeServiceBindingExists      sdk.CodeType = 109
 	CodeUnknownServiceBinding     sdk.CodeType = 110
 	CodeServiceBindingUnavailable sdk.CodeType = 111
@@ -39,20 +39,20 @@ const (
 	CodeUnknownResponse           sdk.CodeType = 123
 	CodeUnknownRequestContext     sdk.CodeType = 124
 	CodeInvalidRequestContextID   sdk.CodeType = 125
-	CodeNotAuthorized             sdk.CodeType = 126
-	CodeRequestContextNonRepeated sdk.CodeType = 127
-	CodeRequestContextNotRunning  sdk.CodeType = 128
-	CodeRequestContextNotPaused   sdk.CodeType = 129
-	CodeRequestContextCompleted   sdk.CodeType = 130
-	CodeCallbackRegistered        sdk.CodeType = 131
-	CodeCallbackNotRegistered     sdk.CodeType = 132
-	CodeNoEarnedFees              sdk.CodeType = 133
+	CodeRequestContextNonRepeated sdk.CodeType = 126
+	CodeRequestContextNotRunning  sdk.CodeType = 127
+	CodeRequestContextNotPaused   sdk.CodeType = 128
+	CodeRequestContextCompleted   sdk.CodeType = 129
+	CodeCallbackRegistered        sdk.CodeType = 130
+	CodeCallbackNotRegistered     sdk.CodeType = 131
+	CodeNoEarnedFees              sdk.CodeType = 132
 
-	CodeInvalidRequestInput   sdk.CodeType = 134
-	CodeInvalidResponseOutput sdk.CodeType = 135
-	CodeInvalidResponseResult sdk.CodeType = 136
-	CodeInvalidSchemaName     sdk.CodeType = 137
+	CodeInvalidRequestInput   sdk.CodeType = 133
+	CodeInvalidResponseOutput sdk.CodeType = 134
+	CodeInvalidResponseResult sdk.CodeType = 135
+	CodeInvalidSchemaName     sdk.CodeType = 136
 
+	CodeNotAuthorized   sdk.CodeType = 137
 	CodeInvalidAddress  sdk.CodeType = 138
 	CodeInvalidProfiler sdk.CodeType = 139
 	CodeInvalidTrustee  sdk.CodeType = 140
@@ -90,8 +90,8 @@ func ErrInvalidPricing(codespace sdk.CodespaceType, msg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidPricing, fmt.Sprintf("invalid pricing: %s", msg))
 }
 
-func ErrInvalidMinRespTime(codespace sdk.CodespaceType, msg string) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidMinRespTime, msg)
+func ErrInvalidQoS(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidQoS, msg)
 }
 
 func ErrServiceBindingExists(codespace sdk.CodespaceType) sdk.Error {
@@ -162,10 +162,6 @@ func ErrInvalidRequestContextID(codespace sdk.CodespaceType, msg string) sdk.Err
 	return sdk.NewError(codespace, CodeInvalidRequestContextID, fmt.Sprintf("invalid request context ID: %s", msg))
 }
 
-func ErrNotAuthorized(codespace sdk.CodespaceType, msg string) sdk.Error {
-	return sdk.NewError(codespace, CodeNotAuthorized, msg)
-}
-
 func ErrRequestContextNonRepeated(codespace sdk.CodespaceType) sdk.Error {
 	return sdk.NewError(codespace, CodeRequestContextNonRepeated, "request context is non repeated")
 }
@@ -208,6 +204,10 @@ func ErrInvalidResponseResult(codespace sdk.CodespaceType, msg string) sdk.Error
 
 func ErrInvalidSchemaName(codespace sdk.CodespaceType) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidSchemaName, "invalid schema name: only pricing and result allowed")
+}
+
+func ErrNotAuthorized(codespace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codespace, CodeNotAuthorized, msg)
 }
 
 func ErrInvalidProfiler(codespace sdk.CodespaceType, address sdk.AccAddress) sdk.Error {
