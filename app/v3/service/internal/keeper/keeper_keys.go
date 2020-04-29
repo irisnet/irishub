@@ -11,7 +11,7 @@ var (
 	// Keys for store prefixes
 	serviceDefinitionKey         = []byte{0x01}
 	serviceBindingKey            = []byte{0x02}
-	ownerServiceBindingsKey      = []byte{0x03}
+	ownerServiceBindingKey       = []byte{0x03}
 	pricingKey                   = []byte{0x04}
 	withdrawAddrKey              = []byte{0x05}
 	requestContextKey            = []byte{0x06}
@@ -39,10 +39,10 @@ func GetServiceBindingKey(serviceName string, provider sdk.AccAddress) []byte {
 	return append(serviceBindingKey, getStringsKey([]string{serviceName, provider.String()})...)
 }
 
-// GetOwnerServiceBindingsKey returns the key for the service bindings with the specified service name and owner
+// GetOwnerServiceBindingKey returns the key for the service bindings with the specified service name and owner
 func GetOwnerServiceBindingsKey(owner sdk.AccAddress, serviceName string, provider sdk.AccAddress) []byte {
 	return append(append(append(append(
-		ownerServiceBindingsKey,
+		ownerServiceBindingKey,
 		owner.Bytes()...),
 		[]byte(serviceName)...),
 		emptyByte...),
@@ -66,7 +66,7 @@ func GetBindingsSubspace(serviceName string) []byte {
 
 // GetOwnerBindingsSubspace returns the key for retrieving bindings of the specified service name and owner
 func GetOwnerBindingsSubspace(owner sdk.AccAddress, serviceName string) []byte {
-	return append(append(append(ownerServiceBindingsKey, owner.Bytes()...), []byte(serviceName)...), emptyByte...)
+	return append(append(append(ownerServiceBindingKey, owner.Bytes()...), []byte(serviceName)...), emptyByte...)
 }
 
 // GetRequestContextKey returns the key for the request context with the specified ID

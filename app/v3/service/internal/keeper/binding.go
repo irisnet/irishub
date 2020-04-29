@@ -60,7 +60,7 @@ func (k Keeper) AddServiceBinding(
 	svcBinding := types.NewServiceBinding(serviceName, provider, deposit, pricing, qos, available, disabledTime, owner)
 
 	k.SetServiceBinding(ctx, svcBinding)
-	k.SetOwnerServiceBindings(ctx, svcBinding)
+	k.SetOwnerServiceBinding(ctx, svcBinding)
 	k.SetPricing(ctx, serviceName, provider, parsedPricing)
 
 	return nil
@@ -298,8 +298,8 @@ func (k Keeper) GetServiceBinding(ctx sdk.Context, serviceName string, provider 
 	return svcBinding, true
 }
 
-// SetOwnerServiceBindings sets the owner service bindings
-func (k Keeper) SetOwnerServiceBindings(ctx sdk.Context, svcBinding types.ServiceBinding) {
+// SetOwnerServiceBinding sets the owner service bindings
+func (k Keeper) SetOwnerServiceBinding(ctx sdk.Context, svcBinding types.ServiceBinding) {
 	store := ctx.KVStore(k.storeKey)
 	store.Set(GetOwnerServiceBindingsKey(svcBinding.Owner, svcBinding.ServiceName, svcBinding.Provider), []byte{})
 }

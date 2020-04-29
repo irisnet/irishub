@@ -23,7 +23,7 @@ func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
 
 	for _, binding := range data.Bindings {
 		k.SetServiceBinding(ctx, binding)
-		k.SetOwnerServiceBindings(ctx, binding)
+		k.SetOwnerServiceBinding(ctx, binding)
 	}
 
 	for ownerAddressStr, withdrawAddress := range data.WithdrawAddresses {

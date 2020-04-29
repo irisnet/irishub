@@ -51,7 +51,7 @@ func setServiceDefinition(ctx sdk.Context, k Keeper, author sdk.AccAddress) {
 func setServiceBinding(ctx sdk.Context, k Keeper, provider, owner sdk.AccAddress, available bool, disabledTime time.Time) {
 	svcBinding := types.NewServiceBinding(testServiceName, provider, testDeposit, testPricing, testQoS, available, disabledTime, owner)
 	k.SetServiceBinding(ctx, svcBinding)
-	k.SetOwnerServiceBindings(ctx, svcBinding)
+	k.SetOwnerServiceBinding(ctx, svcBinding)
 
 	pricing, _ := k.ParsePricing(ctx, testPricing)
 	k.SetPricing(ctx, testServiceName, provider, pricing)
