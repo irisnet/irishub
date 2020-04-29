@@ -301,7 +301,7 @@ func (k Keeper) GetServiceBinding(ctx sdk.Context, serviceName string, provider 
 // SetOwnerServiceBinding sets the owner service bindings
 func (k Keeper) SetOwnerServiceBinding(ctx sdk.Context, svcBinding types.ServiceBinding) {
 	store := ctx.KVStore(k.storeKey)
-	store.Set(GetOwnerServiceBindingsKey(svcBinding.Owner, svcBinding.ServiceName, svcBinding.Provider), []byte{})
+	store.Set(GetOwnerServiceBindingKey(svcBinding.Owner, svcBinding.ServiceName, svcBinding.Provider), []byte{})
 }
 
 // GetOwnerServiceBindings retrieves the service bindings with the specified service name and owner
