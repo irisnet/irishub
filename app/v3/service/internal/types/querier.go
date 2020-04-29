@@ -31,7 +31,7 @@ type QueryBindingParams struct {
 	Provider    sdk.AccAddress
 }
 
-// QueryBindingsParams defines the params to query all bindings of a service definition
+// QueryBindingsParams defines the params to query all bindings of a service definition with an optional owner
 type QueryBindingsParams struct {
 	ServiceName string
 	Owner       sdk.AccAddress
