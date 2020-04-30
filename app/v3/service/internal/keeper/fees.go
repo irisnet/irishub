@@ -133,13 +133,11 @@ func (k Keeper) WithdrawEarnedFees(ctx sdk.Context, owner, provider sdk.AccAddre
 
 		withdrawFees = earnedFees
 	} else {
-		store := ctx.KVStore(k.storeKey)
-
-		iterator := sdk.KVStorePrefixIterator(store, GetOwnerProvidersSubspace(owner))
+		iterator := k.OwnerProvidersIterator(ctx, owner)
 		defer iterator.Close()
 
 		for ; iterator.Valid(); iterator.Next() {
-			provider := iterator.Key()[sdk.AddrLen+1:]
+			provider := sdk.AccAddress(iterator.Key()[sdk.AddrLen+1:])
 			k.DeleteEarnedFees(ctx, provider)
 		}
 

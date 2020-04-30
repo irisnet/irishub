@@ -364,6 +364,12 @@ func (k Keeper) SetOwnerProvider(ctx sdk.Context, owner, provider sdk.AccAddress
 	store.Set(GetOwnerProviderKey(owner, provider), []byte{})
 }
 
+// OwnerProvidersIterator returns an iterator for all providers of the specified owner
+func (k Keeper) OwnerProvidersIterator(ctx sdk.Context, owner sdk.AccAddress) sdk.Iterator {
+	store := ctx.KVStore(k.storeKey)
+	return sdk.KVStorePrefixIterator(store, GetOwnerProvidersSubspace(owner))
+}
+
 // ParsePricing parses the given string to Pricing
 func (k Keeper) ParsePricing(ctx sdk.Context, pricing string) (p types.Pricing, err sdk.Error) {
 	var rawPricing types.RawPricing
