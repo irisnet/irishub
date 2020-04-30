@@ -53,8 +53,8 @@ func (k Keeper) AddServiceBinding(
 		return types.ErrInvalidDeposit(k.codespace, fmt.Sprintf("insufficient deposit: minimum deposit %s, %s got", minDeposit, deposit))
 	}
 
-	// Send coins from the provider's account to ServiceDepositCoinsAccAddr
-	_, err = k.bk.SendCoins(ctx, provider, auth.ServiceDepositCoinsAccAddr, deposit)
+	// Send coins from the owner's account to ServiceDepositCoinsAccAddr
+	_, err = k.bk.SendCoins(ctx, owner, auth.ServiceDepositCoinsAccAddr, deposit)
 	if err != nil {
 		return err
 	}
@@ -141,8 +141,8 @@ func (k Keeper) UpdateServiceBinding(
 	}
 
 	if !deposit.Empty() {
-		// Send coins from the provider's account to ServiceDepositCoinsAccAddr
-		_, err := k.bk.SendCoins(ctx, provider, auth.ServiceDepositCoinsAccAddr, deposit)
+		// Send coins from the owner's account to ServiceDepositCoinsAccAddr
+		_, err := k.bk.SendCoins(ctx, owner, auth.ServiceDepositCoinsAccAddr, deposit)
 		if err != nil {
 			return err
 		}
@@ -215,8 +215,8 @@ func (k Keeper) EnableServiceBinding(
 	}
 
 	if !deposit.Empty() {
-		// Send coins from the provider's account to ServiceDepositCoinsAccAddr
-		_, err := k.bk.SendCoins(ctx, provider, auth.ServiceDepositCoinsAccAddr, deposit)
+		// Send coins from the owner's account to ServiceDepositCoinsAccAddr
+		_, err := k.bk.SendCoins(ctx, owner, auth.ServiceDepositCoinsAccAddr, deposit)
 		if err != nil {
 			return err
 		}
@@ -257,8 +257,8 @@ func (k Keeper) RefundDeposit(ctx sdk.Context, serviceName string, provider, own
 		return types.ErrIncorrectRefundTime(k.codespace, fmt.Sprintf("%v", refundableTime))
 	}
 
-	// Send coins from ServiceDepositCoinsAccAddr to the provider's account
-	_, err := k.bk.SendCoins(ctx, auth.ServiceDepositCoinsAccAddr, binding.Provider, binding.Deposit)
+	// Send coins from ServiceDepositCoinsAccAddr to the owner's account
+	_, err := k.bk.SendCoins(ctx, auth.ServiceDepositCoinsAccAddr, binding.Owner, binding.Deposit)
 	if err != nil {
 		return err
 	}
@@ -278,7 +278,7 @@ func (k Keeper) RefundDeposits(ctx sdk.Context) sdk.Error {
 		var binding types.ServiceBinding
 		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &binding)
 
-		_, err := k.bk.SendCoins(ctx, auth.ServiceDepositCoinsAccAddr, binding.Provider, binding.Deposit)
+		_, err := k.bk.SendCoins(ctx, auth.ServiceDepositCoinsAccAddr, binding.Owner, binding.Deposit)
 		if err != nil {
 			return err
 		}
