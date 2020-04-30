@@ -440,6 +440,7 @@ func TestKeeper_Respond_Service(t *testing.T) {
 	consumer := accs[2].GetAddress()
 
 	setServiceDefinition(ctx, keeper, author)
+	keeper.SetOwner(ctx, provider, provider)
 
 	blockHeight := int64(1000)
 	ctx = ctx.WithBlockHeight(blockHeight)
@@ -452,7 +453,7 @@ func TestKeeper_Respond_Service(t *testing.T) {
 	requestID1 := setRequest(ctx, keeper, consumer, provider, requestContextID)
 	requestID2 := setRequest(ctx, keeper, consumer, provider, requestContextID)
 
-	// respond request 1
+	// respond to request 1
 	_, _, _, err := keeper.AddResponse(ctx, requestID1, provider, testResult, testOutput)
 	require.NoError(t, err)
 
@@ -471,7 +472,7 @@ func TestKeeper_Respond_Service(t *testing.T) {
 	volume := keeper.GetRequestVolume(ctx, consumer, requestContext.ServiceName, provider)
 	require.Equal(t, uint64(1), volume)
 
-	// respond request 2
+	// respond to request 2
 	_, _, _, err = keeper.AddResponse(ctx, requestID2, provider, testOutput, "")
 	require.NoError(t, err)
 
@@ -488,6 +489,10 @@ func TestKeeper_Respond_Service(t *testing.T) {
 	earnedFees, found := keeper.GetEarnedFees(ctx, provider)
 	require.True(t, found)
 	require.True(t, !earnedFees.Empty())
+
+	ownerEarnedFees, found := keeper.GetOwnerEarnedFees(ctx, provider)
+	require.True(t, found)
+	require.Equal(t, earnedFees, ownerEarnedFees)
 
 	require.False(t, keeper.IsRequestActive(ctx, requestID1))
 	require.False(t, keeper.IsRequestActive(ctx, requestID2))
