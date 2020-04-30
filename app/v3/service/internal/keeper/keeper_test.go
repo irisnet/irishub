@@ -53,6 +53,9 @@ func setServiceBinding(ctx sdk.Context, k Keeper, provider, owner sdk.AccAddress
 	k.SetServiceBinding(ctx, svcBinding)
 	k.SetOwnerServiceBinding(ctx, svcBinding)
 
+	k.SetOwner(ctx, provider, owner)
+	k.SetOwnerProvider(ctx, owner, provider)
+
 	pricing, _ := k.ParsePricing(ctx, testPricing)
 	k.SetPricing(ctx, testServiceName, provider, pricing)
 }
@@ -143,6 +146,17 @@ func TestKeeper_Bind_Service(t *testing.T) {
 	svcBindings := keeper.GetOwnerServiceBindings(ctx, owner, testServiceName)
 	require.Equal(t, 1, len(svcBindings))
 	require.Equal(t, svcBinding, svcBindings[0])
+
+	providerOwner, found := keeper.GetOwner(ctx, provider)
+	require.True(t, found)
+	require.Equal(t, owner, providerOwner)
+
+	iterator := keeper.OwnerProvidersIterator(ctx, owner)
+	defer iterator.Close()
+
+	for ; iterator.Valid(); iterator.Next() {
+		require.Equal(t, provider, sdk.AccAddress(iterator.Key()[sdk.AddrLen+1:]))
+	}
 
 	// update binding
 	newPricing := `{"price":"1iris"}`
