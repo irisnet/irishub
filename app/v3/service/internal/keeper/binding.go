@@ -29,6 +29,11 @@ func (k Keeper) AddServiceBinding(
 		return types.ErrServiceBindingExists(k.codespace)
 	}
 
+	currentOwner, found := k.GetOwner(ctx, provider)
+	if found && !owner.Equals(currentOwner) {
+		return types.ErrNotAuthorized(k.codespace, "owner not matching")
+	}
+
 	maxReqTimeout := k.GetParamSet(ctx).MaxRequestTimeout
 	if qos > uint64(maxReqTimeout) {
 		return types.ErrInvalidQoS(k.codespace, fmt.Sprintf("qos [%d] must not be greater than maximum request timeout [%d]", qos, maxReqTimeout))
@@ -62,6 +67,11 @@ func (k Keeper) AddServiceBinding(
 	k.SetServiceBinding(ctx, svcBinding)
 	k.SetOwnerServiceBinding(ctx, svcBinding)
 	k.SetPricing(ctx, serviceName, provider, parsedPricing)
+
+	if currentOwner.Empty() {
+		k.SetOwner(ctx, provider, owner)
+		k.SetOwnerProvider(ctx, owner, provider)
+	}
 
 	return nil
 }
@@ -325,6 +335,33 @@ func (k Keeper) GetOwnerServiceBindings(ctx sdk.Context, owner sdk.AccAddress, s
 	}
 
 	return bindings
+}
+
+// SetOwner sets an owner for the specified provider
+func (k Keeper) SetOwner(ctx sdk.Context, provider, owner sdk.AccAddress) {
+	store := ctx.KVStore(k.storeKey)
+
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(owner)
+	store.Set(GetOwnerKey(provider), bz)
+}
+
+// GetOwner gets the owner for the specified provider
+func (k Keeper) GetOwner(ctx sdk.Context, provider sdk.AccAddress) (addr sdk.AccAddress, found bool) {
+	store := ctx.KVStore(k.storeKey)
+
+	bz := store.Get(GetOwnerKey(provider))
+	if bz == nil {
+		return addr, false
+	}
+
+	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &addr)
+	return addr, true
+}
+
+// SetOwnerProvider sets the provider with the owner
+func (k Keeper) SetOwnerProvider(ctx sdk.Context, owner, provider sdk.AccAddress) {
+	store := ctx.KVStore(k.storeKey)
+	store.Set(GetOwnerProviderKey(owner, provider), []byte{})
 }
 
 // ParsePricing parses the given string to Pricing
