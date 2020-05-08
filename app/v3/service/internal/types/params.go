@@ -197,12 +197,12 @@ func (p *Params) ReadOnly() bool {
 func DefaultParams() Params {
 	return Params{
 		MaxRequestTimeout:    100,
-		MinDepositMultiple:   1000,
-		MinDeposit:           sdk.NewCoins(sdk.NewCoin(sdk.IrisAtto, sdk.NewIntWithDecimal(10000, 18))), // 10000iris
-		ServiceFeeTax:        sdk.NewDecWithPrec(1, 2),                                                  // 1%
-		SlashFraction:        sdk.NewDecWithPrec(1, 3),                                                  // 0.1%
-		ComplaintRetrospect:  time.Duration(15 * sdk.Day),                                               // 15 days
-		ArbitrationTimeLimit: time.Duration(5 * sdk.Day),                                                // 5 days
+		MinDepositMultiple:   200,
+		MinDeposit:           sdk.NewCoins(sdk.NewCoin(sdk.IrisAtto, sdk.NewIntWithDecimal(6000, 18))), // 6000iris
+		ServiceFeeTax:        sdk.NewDecWithPrec(1, 1),                                                 // 10%
+		SlashFraction:        sdk.NewDecWithPrec(1, 3),                                                 // 0.1%
+		ComplaintRetrospect:  time.Duration(15 * sdk.Day),                                              // 15 days
+		ArbitrationTimeLimit: time.Duration(5 * sdk.Day),                                               // 5 days
 		TxSizeLimit:          4000,
 	}
 }
@@ -213,7 +213,7 @@ func DefaultParamsForTest() Params {
 		MaxRequestTimeout:    10,
 		MinDepositMultiple:   10,
 		MinDeposit:           sdk.NewCoins(sdk.NewCoin(sdk.IrisAtto, sdk.NewIntWithDecimal(10, 18))), // 10iris
-		ServiceFeeTax:        sdk.NewDecWithPrec(1, 2),                                               // 1%
+		ServiceFeeTax:        sdk.NewDecWithPrec(1, 1),                                               // 10%
 		SlashFraction:        sdk.NewDecWithPrec(1, 3),                                               // 0.1%
 		ComplaintRetrospect:  20 * time.Second,                                                       // 20 seconds
 		ArbitrationTimeLimit: 20 * time.Second,                                                       // 20 seconds
@@ -262,7 +262,7 @@ func validateMaxRequestTimeout(v int64) sdk.Error {
 
 func validateMinDepositMultiple(v int64) sdk.Error {
 	if sdk.NetworkType == sdk.Mainnet {
-		if v < 500 || v > 5000 {
+		if v < 100 || v > 5000 {
 			return sdk.NewError(params.DefaultCodespace, params.CodeInvalidMinDepositMultiple, fmt.Sprintf("Invalid MinDepositMultiple [%d] should be between [500, 5000]", v))
 		}
 	} else if v < 10 || v > 5000 {
@@ -272,7 +272,6 @@ func validateMinDepositMultiple(v int64) sdk.Error {
 }
 
 func validateMinDeposit(v sdk.Coins) sdk.Error {
-	max := sdk.NewCoins(sdk.NewCoin(sdk.IrisAtto, sdk.NewIntWithDecimal(100000, 18)))
 	var min sdk.Coins
 
 	if sdk.NetworkType == sdk.Mainnet {
@@ -281,8 +280,8 @@ func validateMinDeposit(v sdk.Coins) sdk.Error {
 		min = sdk.NewCoins(sdk.NewCoin(sdk.IrisAtto, sdk.NewIntWithDecimal(10, 18)))
 	}
 
-	if v.IsAllLT(min) || v.IsAllGT(max) {
-		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidMinDeposit, fmt.Sprintf("Invalid MinDeposit [%s] should be between [%s, %s]", v, min, max))
+	if v.IsAllLT(min) {
+		return sdk.NewError(params.DefaultCodespace, params.CodeInvalidMinDeposit, fmt.Sprintf("Invalid MinDeposit [%s] must not be less than %s", v, min))
 	}
 
 	return nil
