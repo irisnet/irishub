@@ -124,7 +124,7 @@ iriscli service enable <service-name> <provider-address> <added-deposit>
 iriscli service disable <service-name> <provider-address>>
 
 # 取回服务绑定的押金
-iriscli service refund-deposit <service-name>
+iriscli service refund-deposit <service-name> <provider-address>
 
 # 查询一个服务的所有绑定
 iriscli service bindings <service-name>
@@ -167,7 +167,7 @@ iriscli service schema pricing
 
 * _重复_：指示请求上下文是否可重复的一个布尔标志
 * _频率_：重复调用批次之间的区块间隔数
-* _总数_: 重复调用批次的总数，负数表示无限
+* _总数_：重复调用批次的总数，负数表示无限
 
 ### 请求批次
 
@@ -230,7 +230,7 @@ iriscli service response <request-id>
 ### 命令
 
 ```bash
-# 查询所有特定于指定服务提供者的待处理请求
+# 查询指定服务提供者的所有待处理请求
 iriscli service requests <service-name> <provider>
 
 # 通过请求 ID 查询请求
