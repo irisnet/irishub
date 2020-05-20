@@ -238,7 +238,6 @@ func main() {
 			servicecmd.GetCmdKillRequestContext(cdc),
 			servicecmd.GetCmdUpdateRequestContext(cdc),
 			servicecmd.GetCmdWithdrawEarnedFees(cdc),
-			servicecmd.GetCmdWithdrawTax(cdc),
 		)...)
 
 	rootCmd.AddCommand(

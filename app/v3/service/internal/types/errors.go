@@ -55,7 +55,6 @@ const (
 	CodeNotAuthorized   sdk.CodeType = 137
 	CodeInvalidAddress  sdk.CodeType = 138
 	CodeInvalidProfiler sdk.CodeType = 139
-	CodeInvalidTrustee  sdk.CodeType = 140
 )
 
 func ErrInvalidServiceName(codespace sdk.CodespaceType, serviceName string) sdk.Error {
@@ -212,10 +211,6 @@ func ErrNotAuthorized(codespace sdk.CodespaceType, msg string) sdk.Error {
 
 func ErrInvalidProfiler(codespace sdk.CodespaceType, address sdk.AccAddress) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidProfiler, fmt.Sprintf("invalid profiler: %s", address))
-}
-
-func ErrInvalidTrustee(codespace sdk.CodespaceType, address sdk.AccAddress) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidTrustee, fmt.Sprintf("invalid trustee: %s", address))
 }
 
 func ErrInvalidAddress(codespace sdk.CodespaceType, msg string) sdk.Error {

@@ -27,7 +27,6 @@ const (
 	TypeMsgKillRequestContext    = "kill_request_context"    // type for MsgKillRequestContext
 	TypeMsgUpdateRequestContext  = "update_request_context"  // type for MsgUpdateRequestContext
 	TypeMsgWithdrawEarnedFees    = "withdraw_earned_fees"    // type for MsgWithdrawEarnedFees
-	TypeMsgWithdrawTax           = "withdraw_tax"            // type for MsgWithdrawTax
 
 	MaxNameLength        = 70  // max length of the service name
 	MaxDescriptionLength = 280 // max length of the service and author description
@@ -55,7 +54,6 @@ var (
 	_ sdk.Msg = MsgKillRequestContext{}
 	_ sdk.Msg = MsgUpdateRequestContext{}
 	_ sdk.Msg = MsgWithdrawEarnedFees{}
-	_ sdk.Msg = MsgWithdrawTax{}
 )
 
 //______________________________________________________________________
@@ -944,62 +942,6 @@ func (msg MsgWithdrawEarnedFees) GetSigners() []sdk.AccAddress {
 
 //______________________________________________________________________
 
-// MsgWithdrawTax defines a message to withdraw the service tax
-type MsgWithdrawTax struct {
-	Trustee     sdk.AccAddress `json:"trustee"`
-	DestAddress sdk.AccAddress `json:"dest_address"`
-	Amount      sdk.Coins      `json:"amount"`
-}
-
-// NewMsgWithdrawTax creates a new MsgWithdrawTax instance
-func NewMsgWithdrawTax(trustee, destAddress sdk.AccAddress, amount sdk.Coins) MsgWithdrawTax {
-	return MsgWithdrawTax{
-		Trustee:     trustee,
-		DestAddress: destAddress,
-		Amount:      amount,
-	}
-}
-
-// Route implements Msg.
-func (msg MsgWithdrawTax) Route() string { return MsgRoute }
-
-// Type implements Msg.
-func (msg MsgWithdrawTax) Type() string { return TypeMsgWithdrawTax }
-
-// GetSignBytes implements Msg.
-func (msg MsgWithdrawTax) GetSignBytes() []byte {
-	if msg.Amount.Empty() {
-		msg.Amount = nil
-	}
-
-	b, err := msgCdc.MarshalJSON(msg)
-	if err != nil {
-		panic(err)
-	}
-
-	return sdk.MustSortJSON(b)
-}
-
-// ValidateBasic implements Msg.
-func (msg MsgWithdrawTax) ValidateBasic() sdk.Error {
-	if err := ValidateTrustee(msg.Trustee); err != nil {
-		return err
-	}
-
-	if err := ValidateDestAddress(msg.DestAddress); err != nil {
-		return err
-	}
-
-	return ValidateWithdrawAmount(msg.Amount)
-}
-
-// GetSigners implements Msg.
-func (msg MsgWithdrawTax) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{msg.Trustee}
-}
-
-//______________________________________________________________________
-
 // ValidateRequest validates the request params
 func ValidateRequest(
 	serviceName string,
@@ -1131,20 +1073,6 @@ func ValidateOwner(owner sdk.AccAddress) sdk.Error {
 func ValidateWithdrawAddress(withdrawAddress sdk.AccAddress) sdk.Error {
 	if len(withdrawAddress) == 0 {
 		return ErrInvalidAddress(DefaultCodespace, "withdrawal address missing")
-	}
-	return nil
-}
-
-func ValidateTrustee(trustee sdk.AccAddress) sdk.Error {
-	if len(trustee) == 0 {
-		return ErrInvalidAddress(DefaultCodespace, "trustee missing")
-	}
-	return nil
-}
-
-func ValidateDestAddress(destAddress sdk.AccAddress) sdk.Error {
-	if len(destAddress) == 0 {
-		return ErrInvalidAddress(DefaultCodespace, "destination address missing")
 	}
 	return nil
 }

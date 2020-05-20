@@ -20,7 +20,6 @@ func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(MsgKillRequestContext{}, "irishub/service/MsgKillRequestContext", nil)
 	cdc.RegisterConcrete(MsgUpdateRequestContext{}, "irishub/service/MsgUpdateRequestContext", nil)
 	cdc.RegisterConcrete(MsgWithdrawEarnedFees{}, "irishub/service/MsgWithdrawEarnedFees", nil)
-	cdc.RegisterConcrete(MsgWithdrawTax{}, "irishub/service/MsgWithdrawTax", nil)
 
 	cdc.RegisterConcrete(ServiceDefinition{}, "irishub/service/ServiceDefinition", nil)
 	cdc.RegisterConcrete(ServiceBinding{}, "irishub/service/ServiceBinding", nil)

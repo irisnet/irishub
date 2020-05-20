@@ -38,8 +38,6 @@ func NewHandler(k Keeper) sdk.Handler {
 			return handleMsgUpdateRequestContext(ctx, k, msg)
 		case MsgWithdrawEarnedFees:
 			return handleMsgWithdrawEarnedFees(ctx, k, msg)
-		case MsgWithdrawTax:
-			return handleMsgWithdrawTax(ctx, k, msg)
 		default:
 			errMsg := fmt.Sprintf("unrecognized service message type: %T", msg)
 			return sdk.ErrUnknownRequest(errMsg).Result()
@@ -293,13 +291,4 @@ func handleMsgWithdrawEarnedFees(ctx sdk.Context, k Keeper, msg MsgWithdrawEarne
 	return sdk.Result{
 		Tags: tags,
 	}
-}
-
-// handleMsgWithdrawTax handles MsgWithdrawTax
-func handleMsgWithdrawTax(ctx sdk.Context, k Keeper, msg MsgWithdrawTax) sdk.Result {
-	if err := k.WithdrawTax(ctx, msg.Trustee, msg.DestAddress, msg.Amount); err != nil {
-		return err.Result()
-	}
-
-	return sdk.Result{}
 }

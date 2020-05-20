@@ -77,7 +77,6 @@ var (
 	NewMsgKillRequestContext    = types.NewMsgKillRequestContext
 	NewMsgUpdateRequestContext  = types.NewMsgUpdateRequestContext
 	NewMsgWithdrawEarnedFees    = types.NewMsgWithdrawEarnedFees
-	NewMsgWithdrawTax           = types.NewMsgWithdrawTax
 	NewRequestContext           = types.NewRequestContext
 	ConvertRequestID            = types.ConvertRequestID
 	GenerateRequestContextID    = types.GenerateRequestContextID
@@ -116,7 +115,6 @@ type (
 	MsgKillRequestContext       = types.MsgKillRequestContext
 	MsgUpdateRequestContext     = types.MsgUpdateRequestContext
 	MsgWithdrawEarnedFees       = types.MsgWithdrawEarnedFees
-	MsgWithdrawTax              = types.MsgWithdrawTax
 	QueryDefinitionParams       = types.QueryDefinitionParams
 	QueryBindingParams          = types.QueryBindingParams
 	QueryBindingsParams         = types.QueryBindingsParams

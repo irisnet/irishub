@@ -37,7 +37,7 @@ func (k Keeper) AddEarnedFee(ctx sdk.Context, provider sdk.AccAddress, fee sdk.C
 		taxCoins = taxCoins.Add(sdk.NewCoins(sdk.NewCoin(coin.Denom, taxAmount)))
 	}
 
-	_, err := k.bk.SendCoins(ctx, auth.ServiceRequestCoinsAccAddr, auth.ServiceTaxCoinsAccAddr, taxCoins)
+	_, err := k.bk.SendCoins(ctx, auth.ServiceRequestCoinsAccAddr, auth.CommunityTaxCoinsAccAddr, taxCoins)
 	if err != nil {
 		return err
 	}
@@ -161,20 +161,6 @@ func (k Keeper) WithdrawEarnedFees(ctx sdk.Context, owner, provider sdk.AccAddre
 	withdrawAddr := k.GetWithdrawAddress(ctx, owner)
 
 	_, err := k.bk.SendCoins(ctx, auth.ServiceRequestCoinsAccAddr, withdrawAddr, withdrawFees)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// WithdrawTax withdraws the service tax to the speicified destination address by the trustee
-func (k Keeper) WithdrawTax(ctx sdk.Context, trustee sdk.AccAddress, destAddress sdk.AccAddress, amt sdk.Coins) sdk.Error {
-	if _, found := k.gk.GetTrustee(ctx, trustee); !found {
-		return types.ErrInvalidTrustee(k.codespace, trustee)
-	}
-
-	_, err := k.bk.SendCoins(ctx, auth.ServiceTaxCoinsAccAddr, destAddress, amt)
 	if err != nil {
 		return err
 	}

@@ -43,6 +43,7 @@ func TestIrisCLIService(t *testing.T) {
 	priceAmt := 1 // 1iris
 	price := fmt.Sprintf("%diris", priceAmt)
 	pricing := fmt.Sprintf(`{"price":"%diris"}`, priceAmt)
+	taxRate := 0.1
 	qos := uint64(5)
 	addedDeposit := "1iris"
 	serviceFeeCap := "10iris"
@@ -398,7 +399,7 @@ func TestIrisCLIService(t *testing.T) {
 	// query fees(bar)
 	feesOutput := executeGetServiceFees(t, fmt.Sprintf("iriscli service fees %s %v", barAddr.String(), flags))
 
-	earnedFeesAmt := float64(priceAmt) * (1 - 0.01)
+	earnedFeesAmt := float64(priceAmt) * (1 - taxRate)
 	require.Equal(t, fmt.Sprintf("%giris", earnedFeesAmt), feesOutput.EarnedFees.MainUnitString())
 
 	fooAcc = executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", fooAddr, flags))
@@ -414,24 +415,4 @@ func TestIrisCLIService(t *testing.T) {
 	newFooAmt := getAmountFromCoinStr(fooCoin)
 
 	require.Equal(t, fmt.Sprintf("%.6f", oldFooAmt+earnedFeesAmt), fmt.Sprintf("%.6f", newFooAmt))
-
-	// withdraw tax
-	barAcc = executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", barAddr, flags))
-	barCoin = convertToIrisBaseAccount(t, barAcc)
-	oldBarAmt := getAmountFromCoinStr(barCoin)
-
-	taxAmt := float64(priceAmt) * 0.01
-
-	wtStr := fmt.Sprintf("iriscli service withdraw-tax %s %s %v", barAddr.String(), fmt.Sprintf("%giris", taxAmt), flags)
-	wtStr += fmt.Sprintf(" --fee=%s", "0.4iris")
-	wtStr += fmt.Sprintf(" --from=%s", "foo")
-
-	executeWrite(t, wtStr, sdk.DefaultKeyPass)
-	tests.WaitForNextNBlocksTM(2, port)
-
-	newBarAcc := executeGetAccount(t, fmt.Sprintf("iriscli bank account %s %v", barAddr, flags))
-	barCoin = convertToIrisBaseAccount(t, newBarAcc)
-	newBarAmt := getAmountFromCoinStr(barCoin)
-
-	require.Equal(t, fmt.Sprintf("%.6f", oldBarAmt+taxAmt), fmt.Sprintf("%.6f", newBarAmt))
 }
