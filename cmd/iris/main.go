@@ -4,160 +4,137 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"strings"
+	"os"
 
-	"github.com/irisnet/irishub/app"
-	bam "github.com/irisnet/irishub/app"
-	"github.com/irisnet/irishub/app/protocol"
-	"github.com/irisnet/irishub/client"
-	"github.com/irisnet/irishub/server"
-	irisInit "github.com/irisnet/irishub/server/init"
-	"github.com/irisnet/irishub/version"
-	"github.com/pkg/errors"
+	"golang.org/x/net/context"
+
+	"github.com/cosmos/cosmos-sdk/baseapp"
+	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/debug"
+	"github.com/cosmos/cosmos-sdk/client/flags"
+	"github.com/cosmos/cosmos-sdk/server"
+	"github.com/cosmos/cosmos-sdk/store"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/x/auth/types"
+	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
+	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	abci "github.com/tendermint/tendermint/abci/types"
-	cfg "github.com/tendermint/tendermint/config"
 	"github.com/tendermint/tendermint/libs/cli"
 	"github.com/tendermint/tendermint/libs/log"
-	"github.com/tendermint/tendermint/node"
-	"github.com/tendermint/tendermint/p2p"
-	pvm "github.com/tendermint/tendermint/privval"
-	"github.com/tendermint/tendermint/proxy"
 	tmtypes "github.com/tendermint/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
+
+	"github.com/irisnet/irishub/app"
+
+	"github.com/irisnet/irishub/address"
+)
+
+var (
+	encodingConfig = app.MakeEncodingConfig()
+	initClientCtx  = client.Context{}.
+			WithJSONMarshaler(encodingConfig.Marshaler).
+			WithTxGenerator(encodingConfig.TxGenerator).
+			WithCodec(encodingConfig.Amino).
+			WithInput(os.Stdin).
+			WithAccountRetriever(types.NewAccountRetriever(encodingConfig.Marshaler)).
+			WithBroadcastMode(flags.BroadcastBlock)
 )
 
 func main() {
-	//	sdk.InitBech32Prefix()
-	cdc := app.MakeLatestCodec()
+	appCodec, cdc := app.MakeCodecs()
+
+	config := sdk.GetConfig()
+	config.SetBech32PrefixForAccount(address.Bech32PrefixAccAddr, address.Bech32PrefixAccPub)
+	config.SetBech32PrefixForValidator(address.Bech32PrefixValAddr, address.Bech32PrefixValPub)
+	config.SetBech32PrefixForConsensusNode(address.Bech32PrefixConsAddr, address.Bech32PrefixConsPub)
+	config.Seal()
+
 	ctx := server.NewDefaultContext()
 	cobra.EnableCommandSorting = false
 	rootCmd := &cobra.Command{
-		Use:               "iris",
-		Short:             "IRIS Hub Daemon (Server)",
-		PersistentPreRunE: server.PersistentPreRunEFn(ctx),
-	}
-
-	rootCmd.PersistentFlags().String("log_level", ctx.Config.LogLevel, "Log level")
-
-	tendermintCmd := &cobra.Command{
-		Use:   "tendermint",
-		Short: "Tendermint subcommands",
-	}
-
-	tendermintCmd.AddCommand(
-		server.ShowNodeIDCmd(ctx),
-		server.ShowValidatorCmd(ctx),
-		server.ShowAddressCmd(ctx),
-	)
-
-	startCmd := server.StartCmd(ctx, newApp)
-	startCmd.Flags().Bool(app.FlagReplay, false, "Replay the last block")
-	rootCmd.AddCommand(
-		irisInit.InitCmd(ctx, cdc),
-		irisInit.GenTxCmd(ctx, cdc),
-		irisInit.AddGenesisAccountCmd(ctx, cdc),
-		irisInit.TestnetFilesCmd(ctx, cdc),
-		irisInit.CollectGenTxsCmd(ctx, cdc),
-		startCmd,
-		//server.TestnetFilesCmd(ctx, cdc, app.IrisAppInit()),
-		server.UnsafeResetAllCmd(ctx),
-		client.LineBreak,
-		tendermintCmd,
-		server.ResetCmd(ctx, cdc, resetAppState),
-		server.ExportCmd(ctx, cdc, exportAppStateAndTMValidators),
-		server.SnapshotCmd(ctx, cdc, resetAppState),
-		client.LineBreak,
-	)
-
-	rootCmd.AddCommand(
-		version.ServeVersionCommand(cdc),
-	)
-
-	// prepare and add flags
-	executor := cli.PrepareBaseCmd(rootCmd, "IRIS", app.DefaultNodeHome)
-	executor.Execute()
-}
-
-func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, config *cfg.InstrumentationConfig) abci.Application {
-	return app.NewIrisApp(logger, db, config, traceStore,
-		bam.SetPruning(viper.GetString("pruning")),
-		bam.SetMinimumFees(viper.GetString("minimum_fees")),
-		bam.SetCheckInvariant(viper.GetBool("check_invariant")),
-		bam.SetTrackCoinFlow(viper.GetBool("track_coin_flow")),
-	)
-}
-
-func exportAppStateAndTMValidators(ctx *server.Context,
-	logger log.Logger, db dbm.DB, traceStore io.Writer, height int64, forZeroHeight bool,
-) (int64, json.RawMessage, []tmtypes.GenesisValidator, error) {
-	gApp := app.NewIrisApp(logger, db, ctx.Config.Instrumentation, traceStore)
-	lastBlockHeight := gApp.LastBlockHeight()
-	if height > 0 && height < lastBlockHeight {
-		err := gApp.LoadVersion(height, protocol.KeyMain, false)
-		if err != nil {
-			if strings.Contains(err.Error(), fmt.Sprintf("wanted to load target %v but only found up to", height)) {
-				return height, nil, nil, fmt.Errorf("unable to export snapshot height state %v that does not exist. "+
-					"If necessary, reset the application state to the specified height using command reset, and then export the state", height)
-			}
-			return height, nil, nil, err
-		}
-	} else {
-		height = lastBlockHeight
-	}
-	appState, validators, err := gApp.ExportAppStateAndValidators(forZeroHeight)
-	return height, appState, validators, err
-}
-
-func resetAppState(ctx *server.Context,
-	logger log.Logger, db dbm.DB, traceStore io.Writer, height int64) error {
-	gApp := app.NewIrisApp(logger, db, ctx.Config.Instrumentation, traceStore)
-	if height > 0 {
-		if replay, replayHeight := gApp.ResetOrReplay(height); replay {
-			_, err := startNodeAndReplay(ctx, gApp, replayHeight)
-			if err != nil {
+		Use:   "iris",
+		Short: "IRIS Hub Daemon (Server)",
+		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
+			if err := client.SetCmdClientContextHandler(initClientCtx, cmd); err != nil {
 				return err
 			}
-		}
+			return server.InterceptConfigsPreRunHandler(cmd)
+		},
 	}
-	if height == 0 {
-		return errors.New("No need to reset to zero height, it is always consistent with genesis.json")
+
+	rootCmd.AddCommand(
+		genutilcli.InitCmd(app.ModuleBasics, app.DefaultNodeHome),
+		genutilcli.CollectGenTxsCmd(banktypes.GenesisBalancesIterator{}),
+		genutilcli.MigrateGenesisCmd(),
+		genutilcli.GenTxCmd(
+			app.ModuleBasics, banktypes.GenesisBalancesIterator{},
+		),
+		genutilcli.ValidateGenesisCmd(app.ModuleBasics),
+		AddGenesisAccountCmd(ctx, cdc, appCodec, app.DefaultCLIHome),
+		cli.NewCompletionCmd(rootCmd, true),
+		testnetCmd(ctx, cdc, app.ModuleBasics, banktypes.GenesisBalancesIterator{}),
+		debug.Cmd(),
+	)
+
+	server.AddCommands(rootCmd, newApp, exportAppStateAndTMValidators)
+
+	executorCtx := context.Background()
+	executorCtx = context.WithValue(executorCtx, client.ClientContextKey, &client.Context{})
+	executorCtx = context.WithValue(executorCtx, server.ServerContextKey, server.NewDefaultContext())
+
+	executor := cli.PrepareBaseCmd(rootCmd, "", app.DefaultNodeHome)
+	if err := executor.ExecuteContext(executorCtx); err != nil {
+		fmt.Printf("failed execution: %s, exiting...\n", err)
+		os.Exit(1)
 	}
-	return nil
 }
 
-func startNodeAndReplay(ctx *server.Context, app *app.IrisApp, height int64) (n *node.Node, err error) {
-	cfg := ctx.Config
-	cfg.BaseConfig.ReplayHeight = height
+func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, appOpts server.AppOptions) server.Application {
+	var cache sdk.MultiStorePersistentCache
 
-	nodeKey, err := p2p.LoadOrGenNodeKey(cfg.NodeKeyFile())
+	if cast.ToBool(appOpts.Get(server.FlagInterBlockCache)) {
+		cache = store.NewCommitKVStoreCacheManager()
+	}
+
+	skipUpgradeHeights := make(map[int64]bool)
+	for _, h := range cast.ToIntSlice(appOpts.Get(server.FlagUnsafeSkipUpgrades)) {
+		skipUpgradeHeights[int64(h)] = true
+	}
+
+	pruningOpts, err := server.GetPruningOptionsFromFlags(appOpts)
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
-	newNode := func(c chan int) {
-		defer func() {
-			c <- 0
-		}()
-		n, err = node.NewNode(
-			cfg,
-			pvm.LoadOrGenFilePV(cfg.PrivValidatorFile()),
-			nodeKey,
-			proxy.NewLocalClientCreator(app),
-			node.DefaultGenesisDocProviderFunc(cfg),
-			node.DefaultDBProvider,
-			node.DefaultMetricsProvider(cfg.Instrumentation),
-			ctx.Logger.With("module", "node"),
-		)
-		if err != nil {
-			c <- 1
+
+	return app.NewIrisApp(
+		logger, db, traceStore, true, skipUpgradeHeights,
+		cast.ToString(appOpts.Get(flags.FlagHome)),
+		cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod)),
+		baseapp.SetPruning(pruningOpts),
+		baseapp.SetMinGasPrices(cast.ToString(appOpts.Get(server.FlagMinGasPrices))),
+		baseapp.SetHaltHeight(cast.ToUint64(appOpts.Get(server.FlagHaltHeight))),
+		baseapp.SetHaltTime(cast.ToUint64(appOpts.Get(server.FlagHaltTime))),
+		baseapp.SetInterBlockCache(cache),
+		baseapp.SetTrace(cast.ToBool(appOpts.Get(server.FlagTrace))),
+	)
+}
+
+func exportAppStateAndTMValidators(
+	logger log.Logger, db dbm.DB, traceStore io.Writer, height int64, forZeroHeight bool, jailWhiteList []string,
+) (json.RawMessage, []tmtypes.GenesisValidator, *abci.ConsensusParams, error) {
+
+	var irisApp *app.IrisApp
+	if height != -1 {
+		irisApp = app.NewIrisApp(logger, db, traceStore, false, map[int64]bool{}, "", uint(1))
+
+		if err := irisApp.LoadHeight(height); err != nil {
+			return nil, nil, nil, err
 		}
+	} else {
+		irisApp = app.NewIrisApp(logger, db, traceStore, true, map[int64]bool{}, "", uint(1))
 	}
-	ch := make(chan int)
-	go newNode(ch)
-	v := <-ch
-	if v == 0 {
-		err = nil
-	}
-	return nil, err
+
+	return irisApp.ExportAppStateAndValidators(forZeroHeight, jailWhiteList)
 }

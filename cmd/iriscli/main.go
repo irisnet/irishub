@@ -1,389 +1,141 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
-	"path"
 
+	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/flags"
+	"github.com/cosmos/cosmos-sdk/client/keys"
+	"github.com/cosmos/cosmos-sdk/client/rpc"
+	"github.com/cosmos/cosmos-sdk/server"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/version"
+	authclient "github.com/cosmos/cosmos-sdk/x/auth/client"
+	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
+	"github.com/cosmos/cosmos-sdk/x/auth/types"
+	bankcmd "github.com/cosmos/cosmos-sdk/x/bank/client/cli"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
-
 	"github.com/tendermint/tendermint/libs/cli"
 
+	"github.com/irisnet/irishub/address"
 	"github.com/irisnet/irishub/app"
-	"github.com/irisnet/irishub/app/protocol"
-	"github.com/irisnet/irishub/client"
-	assetcmd "github.com/irisnet/irishub/client/asset/cli"
-	bankcmd "github.com/irisnet/irishub/client/bank/cli"
-	distributioncmd "github.com/irisnet/irishub/client/distribution/cli"
-	govcmd "github.com/irisnet/irishub/client/gov/cli"
-	guardiancmd "github.com/irisnet/irishub/client/guardian/cli"
-	htlccmd "github.com/irisnet/irishub/client/htlc/cli"
-	keyscmd "github.com/irisnet/irishub/client/keys/cli"
-	oraclecmd "github.com/irisnet/irishub/client/oracle/cli"
-	paramscmd "github.com/irisnet/irishub/client/params/cli"
-	randcmd "github.com/irisnet/irishub/client/rand/cli"
-	servicecmd "github.com/irisnet/irishub/client/service/cli"
-	slashingcmd "github.com/irisnet/irishub/client/slashing/cli"
-	stakecmd "github.com/irisnet/irishub/client/stake/cli"
-	tendermintrpccmd "github.com/irisnet/irishub/client/tendermint/rpc"
-	tenderminttxcmd "github.com/irisnet/irishub/client/tendermint/tx"
-	txcmd "github.com/irisnet/irishub/client/tx/cli"
-	upgradecmd "github.com/irisnet/irishub/client/upgrade/cli"
-	"github.com/irisnet/irishub/client/utils"
-	"github.com/irisnet/irishub/version"
 )
 
-// rootCmd is the entry point for this binary
 var (
-	rootCmd = &cobra.Command{
+	encodingConfig = app.MakeEncodingConfig()
+	initClientCtx  = client.Context{}.
+			WithJSONMarshaler(encodingConfig.Marshaler).
+			WithTxGenerator(encodingConfig.TxGenerator).
+			WithCodec(encodingConfig.Amino).
+			WithInput(os.Stdin).
+			WithAccountRetriever(types.NewAccountRetriever(encodingConfig.Marshaler)).
+			WithBroadcastMode(flags.BroadcastBlock)
+)
+
+func init() {
+	authclient.Codec = encodingConfig.Marshaler
+}
+
+// TODO: setup keybase, viper object, etc. to be passed into
+// the below functions and eliminate global vars, like we do
+// with the cdc
+func main() {
+	cobra.EnableCommandSorting = false
+
+	// Read in the configuration file for the sdk
+	config := sdk.GetConfig()
+	config.SetBech32PrefixForAccount(address.Bech32PrefixAccAddr, address.Bech32PrefixAccPub)
+	config.SetBech32PrefixForValidator(address.Bech32PrefixValAddr, address.Bech32PrefixValPub)
+	config.SetBech32PrefixForConsensusNode(address.Bech32PrefixConsAddr, address.Bech32PrefixConsPub)
+	config.Seal()
+
+	rootCmd := &cobra.Command{
 		Use:   "iriscli",
 		Short: "irishub command line interface",
-	}
-)
-
-func main() {
-	defer func() {
-		if r := recover(); r != nil {
-			switch rType := r.(type) {
-			case string:
-				println(rType)
-			default:
-				panic(r)
+		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
+			if err := client.SetCmdClientContextHandler(initClientCtx, cmd); err != nil {
+				return err
 			}
-		}
-	}()
-	//	sdk.InitBech32Prefix()
-	cobra.EnableCommandSorting = false
-	cdc := app.MakeLatestCodec()
-
-	rootCmd.AddCommand(client.ConfigCmd())
-
-	rootCmd.AddCommand(tendermintrpccmd.StatusCommand())
-	//Add tx commands
-	txCmd := &cobra.Command{
-		Use:   "tx",
-		Short: "Tx subcommands",
+			return server.InterceptConfigsPreRunHandler(cmd)
+		},
 	}
-	txCmd.AddCommand(
-		client.PostCommands(
-			txcmd.GetSignCommand(cdc, utils.GetAccountDecoder(cdc)),
-			txcmd.GetMultiSignCommand(cdc, utils.GetAccountDecoder(cdc)),
-			txcmd.GetBroadcastCommand(cdc),
-		)...)
-	rootCmd.AddCommand(
-		txCmd,
-	)
-	//Add state commands
-	tendermintCmd := &cobra.Command{
-		Use:   "tendermint",
-		Short: "Tendermint state querying subcommands",
-	}
-	tendermintCmd.AddCommand(
-		tenderminttxcmd.QueryTxCmd(cdc),
-		tenderminttxcmd.SearchTxCmd(cdc),
-		tendermintrpccmd.BlockCommand(),
-		tendermintrpccmd.BlockResultCommand(),
-		tendermintrpccmd.ValidatorCommand(),
-	)
-	rootCmd.AddCommand(tendermintCmd)
-	rootCmd.AddCommand(client.LineBreak)
-
-	//Add bank commands
-	bankCmd := &cobra.Command{
-		Use:   "bank",
-		Short: "Bank subcommands",
-	}
-	bankCmd.AddCommand(
-		client.GetCommands(
-			bankcmd.GetCmdQueryCoinType(cdc),
-			bankcmd.GetAccountCmd(cdc, utils.GetAccountDecoder(cdc)),
-			bankcmd.GetCmdQueryTokenStats(cdc, utils.GetAccountDecoder(cdc)),
-		)...)
-	bankCmd.AddCommand(
-		client.PostCommands(
-			bankcmd.SendTxCmd(cdc),
-			bankcmd.BurnTxCmd(cdc),
-			bankcmd.SetMemoRegCmd(cdc),
-		)...)
-	rootCmd.AddCommand(
-		bankCmd,
-	)
-
-	//Add distribution commands
-	distributionCmd := &cobra.Command{
-		Use:   "distribution",
-		Short: "Distribution subcommands",
-	}
-	distributionCmd.AddCommand(
-		client.GetCommands(
-			distributioncmd.GetWithdrawAddress(cdc),
-			distributioncmd.GetRewards(cdc),
-		)...)
-	distributionCmd.AddCommand(
-		client.PostCommands(
-			distributioncmd.GetCmdSetWithdrawAddr(cdc),
-			distributioncmd.GetCmdWithdrawRewards(cdc),
-		)...)
-	rootCmd.AddCommand(
-		distributionCmd,
-	)
-
-	//Add gov commands
-	govCmd := &cobra.Command{
-		Use:   "gov",
-		Short: "Governance and voting subcommands",
-	}
-	govCmd.AddCommand(
-		client.GetCommands(
-			govcmd.GetCmdQueryProposal(cdc),
-			govcmd.GetCmdQueryProposals(cdc),
-			govcmd.GetCmdQueryVote(cdc),
-			govcmd.GetCmdQueryVotes(cdc),
-			govcmd.GetCmdQueryDeposit(cdc),
-			govcmd.GetCmdQueryDeposits(cdc),
-			govcmd.GetCmdQueryTally(cdc),
-		)...)
-	govCmd.AddCommand(
-		client.PostCommands(
-			govcmd.GetCmdSubmitProposal(cdc),
-			govcmd.GetCmdDeposit(cdc),
-			govcmd.GetCmdVote(cdc),
-		)...)
-	rootCmd.AddCommand(
-		govCmd,
-	)
-
-	//Add staking and slashing commands
-	stakeCmd := &cobra.Command{
-		Use:   "stake",
-		Short: "Stake and validation subcommands",
-	}
-	stakeCmd.AddCommand(
-		client.GetCommands(
-			stakecmd.GetCmdQueryValidator(cdc),
-			stakecmd.GetCmdQueryValidators(cdc),
-			stakecmd.GetCmdQueryDelegation(cdc),
-			stakecmd.GetCmdQueryDelegations(cdc),
-			stakecmd.GetCmdQueryUnbondingDelegation(cdc),
-			stakecmd.GetCmdQueryUnbondingDelegations(cdc),
-			stakecmd.GetCmdQueryValidatorDelegations(cdc),
-			stakecmd.GetCmdQueryValidatorUnbondingDelegations(cdc),
-			stakecmd.GetCmdQueryValidatorRedelegations(cdc),
-			stakecmd.GetCmdQueryRedelegation(cdc),
-			stakecmd.GetCmdQueryRedelegations(cdc),
-			stakecmd.GetCmdQueryPool(cdc),
-			stakecmd.GetCmdQueryParams(cdc),
-			slashingcmd.GetCmdQuerySigningInfo(protocol.SlashingRoute, cdc),
-		)...)
-	stakeCmd.AddCommand(
-		client.PostCommands(
-			stakecmd.GetCmdCreateValidator(cdc),
-			stakecmd.GetCmdEditValidator(cdc),
-			stakecmd.GetCmdDelegate(cdc),
-			stakecmd.GetCmdUnbond(cdc),
-			stakecmd.GetCmdRedelegate(cdc),
-			slashingcmd.GetCmdUnrevoke(cdc),
-		)...)
-	rootCmd.AddCommand(
-		stakeCmd,
-	)
-
-	//Add upgrade commands
-	upgradeCmd := &cobra.Command{
-		Use:   "upgrade",
-		Short: "Software Upgrade subcommands",
-	}
-	upgradeCmd.AddCommand(
-		client.GetCommands(
-			upgradecmd.GetInfoCmd("upgrade", cdc),
-			upgradecmd.GetCmdQuerySignals("upgrade", cdc),
-		)...)
-	rootCmd.AddCommand(
-		upgradeCmd,
-	)
-
-	//Add service commands
-	serviceCmd := &cobra.Command{
-		Use:   "service",
-		Short: "Service subcommands",
-	}
-	serviceCmd.AddCommand(
-		client.GetCommands(
-			servicecmd.GetCmdQueryServiceDefinition(cdc),
-			servicecmd.GetCmdQueryServiceBinding(cdc),
-			servicecmd.GetCmdQueryServiceBindings(cdc),
-			servicecmd.GetCmdQueryWithdrawAddr(cdc),
-			servicecmd.GetCmdQueryServiceRequest(cdc),
-			servicecmd.GetCmdQueryServiceRequests(cdc),
-			servicecmd.GetCmdQueryServiceResponse(cdc),
-			servicecmd.GetCmdQueryRequestContext(cdc),
-			servicecmd.GetCmdQueryServiceResponses(cdc),
-			servicecmd.GetCmdQueryEarnedFees(cdc),
-			servicecmd.GetCmdQuerySchema(cdc),
-		)...)
-	serviceCmd.AddCommand(
-		client.PostCommands(
-			servicecmd.GetCmdDefineService(cdc),
-			servicecmd.GetCmdBindService(cdc),
-			servicecmd.GetCmdUpdateServiceBinding(cdc),
-			servicecmd.GetCmdSetWithdrawAddr(cdc),
-			servicecmd.GetCmdDisableServiceBinding(cdc),
-			servicecmd.GetCmdEnableServiceBinding(cdc),
-			servicecmd.GetCmdRefundServiceDeposit(cdc),
-			servicecmd.GetCmdCallService(cdc),
-			servicecmd.GetCmdRespondService(cdc),
-			servicecmd.GetCmdPauseRequestContext(cdc),
-			servicecmd.GetCmdStartRequestContext(cdc),
-			servicecmd.GetCmdKillRequestContext(cdc),
-			servicecmd.GetCmdUpdateRequestContext(cdc),
-			servicecmd.GetCmdWithdrawEarnedFees(cdc),
-			servicecmd.GetCmdWithdrawTax(cdc),
-		)...)
 
 	rootCmd.AddCommand(
-		serviceCmd,
+		rpc.StatusCommand(),
+		queryCmd(),
+		txCmd(),
+		flags.LineBreak,
+		flags.LineBreak,
+		keys.Commands(),
+		flags.LineBreak,
+		version.NewVersionCommand(),
+		cli.NewCompletionCmd(rootCmd, true),
 	)
 
-	//Add oracle commands
-	oracleCmd := &cobra.Command{
-		Use:   "oracle",
-		Short: "Oracle subcommands",
-	}
-	oracleCmd.AddCommand(
-		client.PostCommands(
-			oraclecmd.GetCmdCreateFeed(cdc),
-			oraclecmd.GetCmdStartFeed(cdc),
-			oraclecmd.GetCmdPauseFeed(cdc),
-			oraclecmd.GetCmdEditFeed(cdc),
-		)...,
-	)
-	oracleCmd.AddCommand(
-		client.GetCommands(
-			oraclecmd.GetCmdQueryFeed(cdc),
-			oraclecmd.GetCmdQueryFeeds(cdc),
-			oraclecmd.GetCmdQueryFeedValue(cdc),
-		)...,
-	)
-	rootCmd.AddCommand(
-		oracleCmd,
-	)
+	// Add flags and prefix all env exposed with GA
+	executor := cli.PrepareMainCmd(rootCmd, "GA", app.DefaultCLIHome)
 
-	//add guardian command
-	guardianCmd := &cobra.Command{
-		Use:   "guardian",
-		Short: "Guardian subcommands",
-	}
-	guardianCmd.AddCommand(
-		client.GetCommands(
-			guardiancmd.GetCmdQueryProfilers(cdc),
-			guardiancmd.GetCmdQueryTrustees(cdc),
-		)...)
+	ctx := context.Background()
+	ctx = context.WithValue(ctx, client.ClientContextKey, &client.Context{})
+	ctx = context.WithValue(ctx, server.ServerContextKey, server.NewDefaultContext())
 
-	guardianCmd.AddCommand(
-		client.PostCommands(
-			guardiancmd.GetCmdCreateProfiler(cdc),
-			guardiancmd.GetCmdDeleteProfiler(cdc),
-			guardiancmd.GetCmdCreateTrustee(cdc),
-			guardiancmd.GetCmdDeleteTrustee(cdc),
-		)...)
-	rootCmd.AddCommand(
-		guardianCmd,
-	)
-
-	// add asset commands
-	assetCmd := &cobra.Command{
-		Use:   "asset",
-		Short: "Asset subcommands",
-	}
-	assetCmd.AddCommand(assetcmd.GetTokenCmd(cdc))
-	rootCmd.AddCommand(
-		assetCmd,
-	)
-
-	// add rand commands
-	randCmd := &cobra.Command{
-		Use:   "rand",
-		Short: "Rand subcommands",
-	}
-
-	randCmd.AddCommand(
-		client.PostCommands(
-			randcmd.GetCmdRequestRand(cdc),
-		)...)
-
-	randCmd.AddCommand(
-		client.GetCommands(
-			randcmd.GetCmdQueryRand(cdc),
-			randcmd.GetCmdQueryRandRequestQueue(cdc),
-		)...)
-
-	rootCmd.AddCommand(
-		randCmd,
-	)
-
-	// add HTLC commands
-	htlcCmd := &cobra.Command{
-		Use:   "htlc",
-		Short: "HTLC subcommands",
-	}
-	htlcCmd.AddCommand(
-		client.PostCommands(
-			htlccmd.GetCmdCreateHTLC(cdc),
-			htlccmd.GetCmdClaimHTLC(cdc),
-			htlccmd.GetCmdRefundHTLC(cdc),
-		)...)
-
-	htlcCmd.AddCommand(
-		client.GetCommands(
-			htlccmd.GetCmdQueryHTLC(cdc),
-		)...)
-
-	rootCmd.AddCommand(
-		htlcCmd,
-	)
-
-	paramsCmd := client.GetCommands(paramscmd.Commands(cdc))[0]
-
-	//Add keys and version commands
-	rootCmd.AddCommand(
-		client.LineBreak,
-		keyscmd.Commands(),
-		paramsCmd,
-		client.LineBreak,
-		version.ServeVersionCommand(cdc),
-	)
-
-	// prepare and add flags
-	executor := cli.PrepareMainCmd(rootCmd, "IRISCLI", app.DefaultCLIHome)
-	err := initConfig(rootCmd)
-	if err != nil {
-		panic(err)
-	}
-
-	if err := executor.Execute(); err != nil {
-		fmt.Println(err)
+	if err := executor.ExecuteContext(ctx); err != nil {
+		fmt.Printf("failed execution: %s, exiting...\n", err)
 		os.Exit(1)
 	}
 }
 
-func initConfig(cmd *cobra.Command) error {
-	home, err := cmd.PersistentFlags().GetString(cli.HomeFlag)
-	if err != nil {
-		return err
+func queryCmd() *cobra.Command {
+	queryCmd := &cobra.Command{
+		Use:                        "query",
+		Aliases:                    []string{"q"},
+		Short:                      "Querying subcommands",
+		DisableFlagParsing:         true,
+		SuggestionsMinimumDistance: 2,
+		RunE:                       client.ValidateCmd,
 	}
 
-	cfgFile := path.Join(home, "config", "config.toml")
-	if _, err := os.Stat(cfgFile); err == nil {
-		viper.SetConfigFile(cfgFile)
+	queryCmd.AddCommand(
+		authcmd.GetAccountCmd(encodingConfig.Amino),
+		flags.LineBreak,
+		rpc.ValidatorCommand(encodingConfig.Amino),
+		rpc.BlockCommand(),
+		authcmd.QueryTxsByEventsCmd(encodingConfig.Amino),
+		authcmd.QueryTxCmd(encodingConfig.Amino),
+		flags.LineBreak,
+	)
 
-		if err := viper.ReadInConfig(); err != nil {
-			return err
-		}
+	app.ModuleBasics.AddQueryCommands(queryCmd, initClientCtx)
+
+	return queryCmd
+}
+
+func txCmd() *cobra.Command {
+	txCmd := &cobra.Command{
+		Use:                        "tx",
+		Short:                      "Transactions subcommands",
+		DisableFlagParsing:         true,
+		SuggestionsMinimumDistance: 2,
+		RunE:                       client.ValidateCmd,
 	}
 
-	if err := viper.BindPFlag(cli.EncodingFlag, cmd.PersistentFlags().Lookup(cli.EncodingFlag)); err != nil {
-		return err
-	}
-	return viper.BindPFlag(cli.OutputFlag, cmd.PersistentFlags().Lookup(cli.OutputFlag))
+	txCmd.AddCommand(
+		bankcmd.NewSendTxCmd(),
+		flags.LineBreak,
+		authcmd.GetSignCommand(initClientCtx),
+		authcmd.GetSignBatchCommand(encodingConfig.Amino),
+		authcmd.GetMultiSignCommand(initClientCtx),
+		authcmd.GetValidateSignaturesCommand(initClientCtx),
+		flags.LineBreak,
+		authcmd.GetBroadcastCommand(initClientCtx),
+		authcmd.GetEncodeCommand(initClientCtx),
+		authcmd.GetDecodeCommand(initClientCtx),
+		flags.LineBreak,
+	)
+
+	app.ModuleBasics.AddTxCommands(txCmd, initClientCtx)
+
+	return txCmd
 }
