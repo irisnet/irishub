@@ -14,4 +14,4 @@ jobs:
         env:
           GO111MODULE: "on"
         with:
-          args: make test_unit
+          args: make test-unit
