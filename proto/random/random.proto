@@ -1,0 +1,27 @@
+syntax = "proto3";
+package iris.random;
+
+import "gogoproto/gogo.proto";
+import "cosmos_proto/cosmos.proto";
+
+option go_package = "github.com/irisnet/irishub/modules/random/types";
+
+// MsgRequestRandom defines an sdk.Msg type that supports requesting a random number
+message MsgRequestRandom {
+    uint64 block_interval = 1 [(gogoproto.moretags) = "yaml:\"block_interval\""];
+    bytes consumer = 2 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
+}
+
+// Random defines the feed standard
+message Random {
+    bytes request_tx_hash = 1 [(gogoproto.moretags) = "yaml:\"request_tx_hash\""];
+    int64 height = 2;
+    string value = 3;
+}
+
+// Request defines the random request standard
+message Request {
+    int64 height = 1;
+    bytes consumer = 2 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
+    bytes tx_hash = 3 [(gogoproto.moretags) = "yaml:\"tx_hash\""];
+}
