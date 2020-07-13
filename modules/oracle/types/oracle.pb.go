@@ -5,21 +5,25 @@ package types
 
 import (
 	fmt "fmt"
-	io "io"
-	math "math"
-	math_bits "math/bits"
-
 	github_com_cosmos_cosmos_sdk_types "github.com/cosmos/cosmos-sdk/types"
 	types "github.com/cosmos/cosmos-sdk/types"
 	_ "github.com/gogo/protobuf/gogoproto"
 	proto "github.com/gogo/protobuf/proto"
+	github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"
+	_ "github.com/golang/protobuf/ptypes/timestamp"
 	_ "github.com/regen-network/cosmos-proto"
+	github_com_tendermint_tendermint_libs_bytes "github.com/tendermint/tendermint/libs/bytes"
+	io "io"
+	math "math"
+	math_bits "math/bits"
+	time "time"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
+var _ = time.Kitchen
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the proto package it is being compiled against.
@@ -41,7 +45,7 @@ type MsgCreateFeed struct {
 	RepeatedFrequency uint64                                          `protobuf:"varint,10,opt,name=repeated_frequency,json=repeatedFrequency,proto3" json:"repeated_frequency,omitempty" yaml:"repeated_frequency"`
 	AggregateFunc     string                                          `protobuf:"bytes,11,opt,name=aggregate_func,json=aggregateFunc,proto3" json:"aggregate_func,omitempty" yaml:"aggregate_func"`
 	ValueJsonPath     string                                          `protobuf:"bytes,12,opt,name=value_json_path,json=valueJsonPath,proto3" json:"value_json_path,omitempty" yaml:"value_json_path"`
-	ResponseThreshold int32                                           `protobuf:"varint,13,opt,name=response_threshold,json=responseThreshold,proto3" json:"response_threshold,omitempty" yaml:"response_threshold"`
+	ResponseThreshold uint32                                          `protobuf:"varint,13,opt,name=response_threshold,json=responseThreshold,proto3" json:"response_threshold,omitempty" yaml:"response_threshold"`
 }
 
 func (m *MsgCreateFeed) Reset()         { *m = MsgCreateFeed{} }
@@ -161,7 +165,7 @@ func (m *MsgCreateFeed) GetValueJsonPath() string {
 	return ""
 }
 
-func (m *MsgCreateFeed) GetResponseThreshold() int32 {
+func (m *MsgCreateFeed) GetResponseThreshold() uint32 {
 	if m != nil {
 		return m.ResponseThreshold
 	}
@@ -283,7 +287,7 @@ type MsgEditFeed struct {
 	Timeout           int64                                           `protobuf:"varint,5,opt,name=timeout,proto3" json:"timeout,omitempty"`
 	ServiceFeeCap     github_com_cosmos_cosmos_sdk_types.Coins        `protobuf:"bytes,6,rep,name=service_fee_cap,json=serviceFeeCap,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Coins" json:"service_fee_cap" yaml:"service_fee_cap"`
 	RepeatedFrequency uint64                                          `protobuf:"varint,7,opt,name=repeated_frequency,json=repeatedFrequency,proto3" json:"repeated_frequency,omitempty" yaml:"repeated_frequency"`
-	ResponseThreshold int32                                           `protobuf:"varint,8,opt,name=response_threshold,json=responseThreshold,proto3" json:"response_threshold,omitempty" yaml:"response_threshold"`
+	ResponseThreshold uint32                                          `protobuf:"varint,8,opt,name=response_threshold,json=responseThreshold,proto3" json:"response_threshold,omitempty" yaml:"response_threshold"`
 	Creator           github_com_cosmos_cosmos_sdk_types.AccAddress   `protobuf:"bytes,9,opt,name=creator,proto3,casttype=github.com/cosmos/cosmos-sdk/types.AccAddress" json:"creator,omitempty"`
 }
 
@@ -369,7 +373,7 @@ func (m *MsgEditFeed) GetRepeatedFrequency() uint64 {
 	return 0
 }
 
-func (m *MsgEditFeed) GetResponseThreshold() int32 {
+func (m *MsgEditFeed) GetResponseThreshold() uint32 {
 	if m != nil {
 		return m.ResponseThreshold
 	}
@@ -383,60 +387,218 @@ func (m *MsgEditFeed) GetCreator() github_com_cosmos_cosmos_sdk_types.AccAddress
 	return nil
 }
 
+// Feed defines the feed standard
+type Feed struct {
+	FeedName         string                                               `protobuf:"bytes,1,opt,name=feed_name,json=feedName,proto3" json:"feed_name,omitempty" yaml:"feed_name"`
+	Description      string                                               `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
+	AggregateFunc    string                                               `protobuf:"bytes,3,opt,name=aggregate_func,json=aggregateFunc,proto3" json:"aggregate_func,omitempty" yaml:"aggregate_func"`
+	ValueJsonPath    string                                               `protobuf:"bytes,4,opt,name=value_json_path,json=valueJsonPath,proto3" json:"value_json_path,omitempty" yaml:"value_json_path"`
+	LatestHistory    uint64                                               `protobuf:"varint,5,opt,name=latest_history,json=latestHistory,proto3" json:"latest_history,omitempty" yaml:"latest_history"`
+	RequestContextID github_com_tendermint_tendermint_libs_bytes.HexBytes `protobuf:"bytes,6,opt,name=request_context_id,json=requestContextId,proto3,casttype=github.com/tendermint/tendermint/libs/bytes.HexBytes" json:"request_context_id,omitempty" yaml:"request_context_id"`
+	Creator          github_com_cosmos_cosmos_sdk_types.AccAddress        `protobuf:"bytes,7,opt,name=creator,proto3,casttype=github.com/cosmos/cosmos-sdk/types.AccAddress" json:"creator,omitempty"`
+}
+
+func (m *Feed) Reset()         { *m = Feed{} }
+func (m *Feed) String() string { return proto.CompactTextString(m) }
+func (*Feed) ProtoMessage()    {}
+func (*Feed) Descriptor() ([]byte, []int) {
+	return fileDescriptor_dc470b50b143d488, []int{4}
+}
+func (m *Feed) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *Feed) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_Feed.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *Feed) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Feed.Merge(m, src)
+}
+func (m *Feed) XXX_Size() int {
+	return m.Size()
+}
+func (m *Feed) XXX_DiscardUnknown() {
+	xxx_messageInfo_Feed.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Feed proto.InternalMessageInfo
+
+func (m *Feed) GetFeedName() string {
+	if m != nil {
+		return m.FeedName
+	}
+	return ""
+}
+
+func (m *Feed) GetDescription() string {
+	if m != nil {
+		return m.Description
+	}
+	return ""
+}
+
+func (m *Feed) GetAggregateFunc() string {
+	if m != nil {
+		return m.AggregateFunc
+	}
+	return ""
+}
+
+func (m *Feed) GetValueJsonPath() string {
+	if m != nil {
+		return m.ValueJsonPath
+	}
+	return ""
+}
+
+func (m *Feed) GetLatestHistory() uint64 {
+	if m != nil {
+		return m.LatestHistory
+	}
+	return 0
+}
+
+func (m *Feed) GetRequestContextID() github_com_tendermint_tendermint_libs_bytes.HexBytes {
+	if m != nil {
+		return m.RequestContextID
+	}
+	return nil
+}
+
+func (m *Feed) GetCreator() github_com_cosmos_cosmos_sdk_types.AccAddress {
+	if m != nil {
+		return m.Creator
+	}
+	return nil
+}
+
+// FeedValue defines the feed result standard
+type FeedValue struct {
+	Data      string    `protobuf:"bytes,1,opt,name=data,proto3" json:"data,omitempty"`
+	Timestamp time.Time `protobuf:"bytes,6,opt,name=timestamp,proto3,stdtime" json:"timestamp"`
+}
+
+func (m *FeedValue) Reset()         { *m = FeedValue{} }
+func (m *FeedValue) String() string { return proto.CompactTextString(m) }
+func (*FeedValue) ProtoMessage()    {}
+func (*FeedValue) Descriptor() ([]byte, []int) {
+	return fileDescriptor_dc470b50b143d488, []int{5}
+}
+func (m *FeedValue) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *FeedValue) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_FeedValue.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *FeedValue) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_FeedValue.Merge(m, src)
+}
+func (m *FeedValue) XXX_Size() int {
+	return m.Size()
+}
+func (m *FeedValue) XXX_DiscardUnknown() {
+	xxx_messageInfo_FeedValue.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_FeedValue proto.InternalMessageInfo
+
+func (m *FeedValue) GetData() string {
+	if m != nil {
+		return m.Data
+	}
+	return ""
+}
+
+func (m *FeedValue) GetTimestamp() time.Time {
+	if m != nil {
+		return m.Timestamp
+	}
+	return time.Time{}
+}
+
 func init() {
 	proto.RegisterType((*MsgCreateFeed)(nil), "iris.oracle.MsgCreateFeed")
 	proto.RegisterType((*MsgStartFeed)(nil), "iris.oracle.MsgStartFeed")
 	proto.RegisterType((*MsgPauseFeed)(nil), "iris.oracle.MsgPauseFeed")
 	proto.RegisterType((*MsgEditFeed)(nil), "iris.oracle.MsgEditFeed")
+	proto.RegisterType((*Feed)(nil), "iris.oracle.Feed")
+	proto.RegisterType((*FeedValue)(nil), "iris.oracle.FeedValue")
 }
 
 func init() { proto.RegisterFile("oracle/oracle.proto", fileDescriptor_dc470b50b143d488) }
 
 var fileDescriptor_dc470b50b143d488 = []byte{
-	// 673 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x55, 0xcd, 0x6e, 0xd3, 0x4c,
-	0x14, 0x8d, 0x9b, 0xbf, 0x66, 0x92, 0x7c, 0xfd, 0x70, 0x0b, 0x4c, 0x2b, 0x11, 0x5b, 0x5e, 0x79,
-	0xd3, 0x44, 0x85, 0x5d, 0x57, 0x34, 0x15, 0x11, 0x14, 0x0a, 0x95, 0x61, 0xc5, 0xc6, 0x9a, 0xda,
-	0x37, 0xb6, 0x21, 0xf6, 0x98, 0x99, 0x71, 0xa5, 0xec, 0x78, 0x02, 0xc4, 0x73, 0xf0, 0x24, 0x5d,
-	0x76, 0x83, 0xc4, 0xca, 0xa0, 0xf6, 0x0d, 0xb2, 0x84, 0x0d, 0xb2, 0xc7, 0x69, 0x93, 0x16, 0x09,
-	0x08, 0x5d, 0x74, 0x35, 0xbe, 0xe7, 0xcc, 0xdc, 0xb9, 0xc7, 0x73, 0xcf, 0x0c, 0x5a, 0xa5, 0x8c,
-	0x38, 0x23, 0xe8, 0xc9, 0xa1, 0x1b, 0x33, 0x2a, 0xa8, 0xda, 0x0c, 0x58, 0xc0, 0xbb, 0x12, 0xda,
-	0x58, 0xf3, 0xa8, 0x47, 0x73, 0xbc, 0x97, 0x7d, 0xc9, 0x29, 0x1b, 0xeb, 0x0e, 0xe5, 0x21, 0xe5,
-	0xb6, 0x24, 0x64, 0x50, 0x50, 0x78, 0x8e, 0x12, 0xe3, 0x18, 0x0a, 0xc6, 0xf8, 0x5c, 0x43, 0xed,
-	0x7d, 0xee, 0xed, 0x32, 0x20, 0x02, 0x06, 0x00, 0xae, 0xba, 0x85, 0x1a, 0x43, 0x00, 0xd7, 0x8e,
-	0x48, 0x08, 0x58, 0xd1, 0x15, 0xb3, 0xd1, 0x5f, 0x9b, 0xa4, 0xda, 0xff, 0x63, 0x12, 0x8e, 0xb6,
-	0x8d, 0x73, 0xca, 0xb0, 0x96, 0xb3, 0xef, 0xe7, 0x24, 0x04, 0xf5, 0x21, 0xfa, 0x6f, 0x44, 0x04,
-	0x70, 0x61, 0xfb, 0x01, 0x17, 0x94, 0x8d, 0xf1, 0x92, 0xae, 0x98, 0x95, 0xfe, 0xfa, 0x24, 0xd5,
-	0x6e, 0xcb, 0x75, 0xf3, 0xbc, 0x61, 0xb5, 0x25, 0xf0, 0x58, 0xc6, 0xaa, 0x8e, 0x9a, 0x2e, 0x70,
-	0x87, 0x05, 0xb1, 0x08, 0x68, 0x84, 0xcb, 0xd9, 0xb6, 0xd6, 0x2c, 0xa4, 0x3e, 0x45, 0x75, 0x27,
-	0x2b, 0x92, 0x32, 0x5c, 0xd1, 0x15, 0xb3, 0xd5, 0xdf, 0xfa, 0x9e, 0x6a, 0x9b, 0x5e, 0x20, 0xfc,
-	0xe4, 0xb0, 0xeb, 0xd0, 0xb0, 0x10, 0x5c, 0x0c, 0x9b, 0xdc, 0x7d, 0x5b, 0xe8, 0xdc, 0x71, 0x9c,
-	0x1d, 0xd7, 0x65, 0xc0, 0xb9, 0x35, 0xcd, 0xa0, 0x6e, 0xa3, 0x16, 0x07, 0x76, 0x14, 0x38, 0x20,
-	0x65, 0x56, 0x73, 0x99, 0x77, 0x27, 0xa9, 0xb6, 0x2a, 0xcb, 0x9d, 0x65, 0x0d, 0xab, 0x59, 0x84,
-	0xb9, 0xd8, 0x17, 0xa8, 0x11, 0x33, 0x7a, 0x14, 0xb8, 0xc0, 0x38, 0xae, 0xe9, 0xe5, 0xc5, 0x4a,
-	0xb9, 0xc8, 0xa1, 0xae, 0xa1, 0x6a, 0x10, 0xc5, 0x89, 0xc0, 0xf5, 0x5c, 0xb5, 0x0c, 0x54, 0x8c,
-	0xea, 0x22, 0x08, 0x81, 0x26, 0x02, 0x2f, 0xeb, 0x8a, 0x59, 0xb6, 0xa6, 0xa1, 0xfa, 0x5e, 0x41,
-	0x2b, 0xd3, 0xfa, 0x86, 0x00, 0xb6, 0x43, 0x62, 0xdc, 0xd0, 0xcb, 0x66, 0xf3, 0x7e, 0xab, 0x5b,
-	0x9c, 0xfa, 0x2e, 0x0d, 0xa2, 0xfe, 0xde, 0x71, 0xaa, 0x95, 0x26, 0xa9, 0x76, 0x67, 0x5e, 0x52,
-	0xb1, 0xc4, 0xf8, 0xf4, 0x55, 0x33, 0xff, 0xa0, 0xe6, 0x2c, 0x15, 0xb7, 0xda, 0xc5, 0xea, 0x01,
-	0xc0, 0x2e, 0x89, 0xd5, 0x67, 0x48, 0x65, 0x10, 0x67, 0x2d, 0xe3, 0xda, 0x43, 0x06, 0xef, 0x12,
-	0x88, 0x9c, 0x31, 0x46, 0xf9, 0xa1, 0xdf, 0x9b, 0xa4, 0xda, 0xba, 0xdc, 0xf2, 0xea, 0x1c, 0xc3,
-	0xba, 0x35, 0x05, 0x07, 0x53, 0x2c, 0x6b, 0x1f, 0xe2, 0x79, 0x0c, 0x3c, 0x22, 0xc0, 0x1e, 0x26,
-	0x91, 0x83, 0x9b, 0xf9, 0x79, 0xcc, 0xb4, 0xcf, 0x3c, 0x6f, 0x58, 0xed, 0x73, 0x60, 0x90, 0x44,
-	0x8e, 0xda, 0x47, 0x2b, 0x47, 0x64, 0x94, 0x80, 0xfd, 0x86, 0xd3, 0xc8, 0x8e, 0x89, 0xf0, 0x71,
-	0x2b, 0x4f, 0xb1, 0x71, 0xa1, 0xff, 0xd2, 0x04, 0xc3, 0x6a, 0xe7, 0xc8, 0x1e, 0xa7, 0xd1, 0x01,
-	0x11, 0xbe, 0xd4, 0xc4, 0x63, 0x1a, 0x71, 0xb0, 0x85, 0xcf, 0x80, 0xfb, 0x74, 0xe4, 0xe2, 0xb6,
-	0xae, 0x98, 0xd5, 0x79, 0x4d, 0x97, 0xe7, 0xe4, 0x9a, 0x24, 0xf8, 0xea, 0x1c, 0xfb, 0xa0, 0xa0,
-	0xd6, 0x3e, 0xf7, 0x5e, 0x0a, 0xc2, 0xc4, 0xa2, 0xb6, 0xba, 0xce, 0x96, 0x9f, 0x16, 0x74, 0x40,
-	0x12, 0x0e, 0x37, 0xa2, 0xa0, 0x1f, 0x15, 0xd4, 0xdc, 0xe7, 0xde, 0x23, 0x37, 0x58, 0xf8, 0x07,
-	0x5d, 0xba, 0x35, 0x96, 0xae, 0xde, 0x1a, 0x57, 0x6f, 0xa6, 0xf2, 0x5f, 0xde, 0x4c, 0x73, 0x76,
-	0xaf, 0x5c, 0x83, 0xdd, 0x67, 0x8c, 0x5d, 0xfd, 0xbd, 0xb1, 0x6b, 0x37, 0xc1, 0xd8, 0xf5, 0x05,
-	0x8d, 0xfd, 0x6b, 0x4b, 0x2d, 0x2f, 0x66, 0xa9, 0xd9, 0xee, 0x6b, 0xfc, 0x6b, 0xf7, 0xf5, 0x9f,
-	0x1c, 0x9f, 0x76, 0x94, 0x93, 0xd3, 0x8e, 0xf2, 0xed, 0xb4, 0xa3, 0x7c, 0x3c, 0xeb, 0x94, 0x4e,
-	0xce, 0x3a, 0xa5, 0x2f, 0x67, 0x9d, 0xd2, 0xeb, 0xde, 0x4c, 0xc6, 0xec, 0xd1, 0x8d, 0x40, 0xe4,
-	0xa3, 0x9f, 0x1c, 0xf6, 0x42, 0xea, 0x26, 0x23, 0xe0, 0xc5, 0xd3, 0x2c, 0xd3, 0x1f, 0xd6, 0xf2,
-	0x97, 0xf4, 0xc1, 0xcf, 0x00, 0x00, 0x00, 0xff, 0xff, 0x18, 0x06, 0x50, 0x64, 0xb8, 0x07, 0x00,
-	0x00,
+	// 847 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x56, 0x4f, 0x6f, 0xdc, 0x44,
+	0x14, 0x8f, 0xbb, 0xce, 0x6e, 0x76, 0x76, 0x97, 0x06, 0x37, 0x80, 0x13, 0x89, 0xb5, 0xe5, 0xd3,
+	0x5e, 0xea, 0x55, 0x0b, 0xa7, 0x9e, 0xa8, 0x03, 0x51, 0x5b, 0x08, 0x54, 0xa6, 0xe2, 0xc0, 0xc5,
+	0x9a, 0xb5, 0xdf, 0x7a, 0x07, 0x6c, 0x8f, 0x3b, 0x33, 0x8e, 0xba, 0x37, 0xce, 0x1c, 0x50, 0x6f,
+	0x7c, 0x07, 0x3e, 0x49, 0x8f, 0xbd, 0x20, 0x71, 0x72, 0x51, 0xf2, 0x0d, 0xf6, 0x58, 0x2e, 0xc8,
+	0x1e, 0x3b, 0xb1, 0x37, 0x48, 0x90, 0x4d, 0x91, 0x72, 0x9a, 0x79, 0x7f, 0x66, 0xe6, 0xfd, 0xe6,
+	0xfd, 0xde, 0xd3, 0x43, 0x77, 0x28, 0xc3, 0x7e, 0x04, 0x53, 0xb9, 0xd8, 0x29, 0xa3, 0x82, 0x6a,
+	0x03, 0xc2, 0x08, 0xb7, 0xa5, 0xea, 0x60, 0x2f, 0xa4, 0x21, 0x2d, 0xf5, 0xd3, 0x62, 0x27, 0x5d,
+	0x0e, 0xf6, 0x7d, 0xca, 0x63, 0xca, 0x3d, 0x69, 0x90, 0x42, 0x65, 0xd2, 0x5b, 0x26, 0xb1, 0x4c,
+	0xa1, 0xb6, 0x18, 0x21, 0xa5, 0x61, 0x04, 0xd3, 0x52, 0x9a, 0x65, 0xf3, 0xa9, 0x20, 0x31, 0x70,
+	0x81, 0xe3, 0x54, 0x3a, 0x58, 0xbf, 0x77, 0xd1, 0xe8, 0x98, 0x87, 0x87, 0x0c, 0xb0, 0x80, 0x23,
+	0x80, 0x40, 0xbb, 0x87, 0xfa, 0x73, 0x80, 0xc0, 0x4b, 0x70, 0x0c, 0xba, 0x62, 0x2a, 0x93, 0xbe,
+	0xb3, 0xb7, 0xca, 0x8d, 0xdd, 0x25, 0x8e, 0xa3, 0x07, 0xd6, 0xb9, 0xc9, 0x72, 0x77, 0x8a, 0xfd,
+	0xd7, 0x38, 0x06, 0xed, 0x33, 0xf4, 0x5e, 0x84, 0x05, 0x70, 0xe1, 0x2d, 0x08, 0x17, 0x94, 0x2d,
+	0xf5, 0x5b, 0xa6, 0x32, 0x51, 0x9d, 0xfd, 0x55, 0x6e, 0x7c, 0x20, 0xcf, 0xb5, 0xed, 0x96, 0x3b,
+	0x92, 0x8a, 0x47, 0x52, 0xd6, 0x4c, 0x34, 0x08, 0x80, 0xfb, 0x8c, 0xa4, 0x82, 0xd0, 0x44, 0xef,
+	0x14, 0xcf, 0xba, 0x4d, 0x95, 0xf6, 0x25, 0xea, 0xf9, 0x45, 0x90, 0x94, 0xe9, 0xaa, 0xa9, 0x4c,
+	0x86, 0xce, 0xbd, 0xb7, 0xb9, 0x71, 0x37, 0x24, 0x62, 0x91, 0xcd, 0x6c, 0x9f, 0xc6, 0xd5, 0x8f,
+	0x54, 0xcb, 0x5d, 0x1e, 0xfc, 0x58, 0x7d, 0xc4, 0x43, 0xdf, 0x7f, 0x18, 0x04, 0x0c, 0x38, 0x77,
+	0xeb, 0x1b, 0xb4, 0x07, 0x68, 0xc8, 0x81, 0x9d, 0x10, 0x1f, 0x24, 0xcc, 0xed, 0x12, 0xe6, 0x47,
+	0xab, 0xdc, 0xb8, 0x23, 0xc3, 0x6d, 0x5a, 0x2d, 0x77, 0x50, 0x89, 0x25, 0xd8, 0x6f, 0x50, 0x3f,
+	0x65, 0xf4, 0x84, 0x04, 0xc0, 0xb8, 0xde, 0x35, 0x3b, 0x9b, 0x85, 0x72, 0x71, 0x87, 0xb6, 0x87,
+	0xb6, 0x49, 0x92, 0x66, 0x42, 0xef, 0x95, 0xa8, 0xa5, 0xa0, 0xe9, 0xa8, 0x57, 0xe4, 0x8a, 0x66,
+	0x42, 0xdf, 0x31, 0x95, 0x49, 0xc7, 0xad, 0x45, 0xed, 0x27, 0x05, 0xdd, 0xae, 0xe3, 0x9b, 0x03,
+	0x78, 0x3e, 0x4e, 0xf5, 0xbe, 0xd9, 0x99, 0x0c, 0xee, 0x0f, 0xed, 0x8a, 0x16, 0x87, 0x94, 0x24,
+	0xce, 0x93, 0x57, 0xb9, 0xb1, 0xb5, 0xca, 0x8d, 0x0f, 0xdb, 0x90, 0xaa, 0x23, 0xd6, 0x6f, 0x6f,
+	0x8c, 0xc9, 0x7f, 0x88, 0xb9, 0xb8, 0x8a, 0xbb, 0xa3, 0xea, 0xf4, 0x11, 0xc0, 0x21, 0x4e, 0xb5,
+	0xaf, 0x90, 0xc6, 0x20, 0x2d, 0x28, 0x13, 0x78, 0x73, 0x06, 0xcf, 0x33, 0x48, 0xfc, 0xa5, 0x8e,
+	0xca, 0xa4, 0x7f, 0xbc, 0xca, 0x8d, 0x7d, 0xf9, 0xe4, 0x65, 0x1f, 0xcb, 0x7d, 0xbf, 0x56, 0x1e,
+	0xd5, 0xba, 0x82, 0x3e, 0x38, 0x0c, 0x19, 0x84, 0x58, 0x80, 0x37, 0xcf, 0x12, 0x5f, 0x1f, 0x94,
+	0xf9, 0x68, 0xd0, 0xa7, 0x6d, 0xb7, 0xdc, 0xd1, 0xb9, 0xe2, 0x28, 0x4b, 0x7c, 0xcd, 0x41, 0xb7,
+	0x4f, 0x70, 0x94, 0x81, 0xf7, 0x03, 0xa7, 0x89, 0x97, 0x62, 0xb1, 0xd0, 0x87, 0xe5, 0x15, 0x07,
+	0x17, 0xf8, 0xd7, 0x1c, 0x2c, 0x77, 0x54, 0x6a, 0x9e, 0x70, 0x9a, 0x3c, 0xc5, 0x62, 0x21, 0x31,
+	0xf1, 0x94, 0x26, 0x1c, 0x3c, 0xb1, 0x60, 0xc0, 0x17, 0x34, 0x0a, 0xf4, 0x91, 0xa9, 0x4c, 0x46,
+	0x6d, 0x4c, 0xeb, 0x3e, 0x25, 0x26, 0xa9, 0x7c, 0x76, 0xae, 0xfb, 0x45, 0x41, 0xc3, 0x63, 0x1e,
+	0x7e, 0x2b, 0x30, 0x13, 0x9b, 0x96, 0xd5, 0xbb, 0xa4, 0x7c, 0x1d, 0xd0, 0x53, 0x9c, 0x71, 0xb8,
+	0x11, 0x01, 0xfd, 0xa5, 0xa2, 0xc1, 0x31, 0x0f, 0xbf, 0x08, 0xc8, 0xc6, 0x1f, 0xb4, 0xd6, 0x35,
+	0x6e, 0x5d, 0xee, 0x1a, 0x97, 0x3b, 0x53, 0xe7, 0x8a, 0x9d, 0xa9, 0x55, 0xee, 0xea, 0x3b, 0x28,
+	0xf7, 0x46, 0x61, 0x6f, 0xff, 0x7b, 0x61, 0x77, 0x6f, 0x42, 0x61, 0xf7, 0x36, 0x2c, 0xec, 0x7f,
+	0x2e, 0xa9, 0x9d, 0xcd, 0x4a, 0xaa, 0xc9, 0xbe, 0xfe, 0xb5, 0xd9, 0xf7, 0xb3, 0x8a, 0xd4, 0xff,
+	0x95, 0x76, 0x6b, 0x1d, 0xad, 0x73, 0xfd, 0x8e, 0xa6, 0x5e, 0xb5, 0xa3, 0x5d, 0x26, 0xff, 0xf6,
+	0x15, 0xc9, 0xff, 0xab, 0x52, 0x64, 0xf0, 0x79, 0x56, 0xf8, 0xf8, 0x34, 0x11, 0xf0, 0x42, 0x78,
+	0x24, 0xd0, 0xbb, 0xe5, 0xf7, 0x93, 0xd3, 0xdc, 0xd8, 0x75, 0xa5, 0xf5, 0x50, 0x1a, 0x1f, 0x7f,
+	0xde, 0xcc, 0xea, 0xfa, 0x39, 0xeb, 0x6d, 0x6e, 0x7c, 0xda, 0xc8, 0x97, 0x80, 0x24, 0x00, 0x16,
+	0x93, 0x44, 0x34, 0xb7, 0x11, 0x99, 0xf1, 0xe9, 0x6c, 0x29, 0x80, 0xdb, 0x8f, 0xe0, 0x85, 0x53,
+	0x6c, 0xdc, 0x5d, 0xd6, 0x7e, 0xa6, 0x45, 0x86, 0xde, 0xb5, 0xc9, 0xe0, 0xa3, 0x7e, 0xc1, 0x85,
+	0xef, 0x8a, 0xdf, 0xd3, 0x34, 0xa4, 0x06, 0x58, 0x60, 0xc9, 0x05, 0xb7, 0xdc, 0x6b, 0x0e, 0xea,
+	0x9f, 0x0f, 0x4e, 0x25, 0xfa, 0xc1, 0xfd, 0x03, 0x5b, 0x8e, 0x56, 0x76, 0x3d, 0x5a, 0xd9, 0xcf,
+	0x6a, 0x0f, 0x67, 0xa7, 0x28, 0xd0, 0x97, 0x6f, 0x0c, 0xc5, 0xbd, 0x38, 0xe6, 0x3c, 0x7e, 0x75,
+	0x3a, 0x56, 0x5e, 0x9f, 0x8e, 0x95, 0x3f, 0x4f, 0xc7, 0xca, 0xcb, 0xb3, 0xf1, 0xd6, 0xeb, 0xb3,
+	0xf1, 0xd6, 0x1f, 0x67, 0xe3, 0xad, 0xef, 0xa7, 0x8d, 0xb0, 0x8b, 0x39, 0x30, 0x01, 0x51, 0xae,
+	0x8b, 0x6c, 0x36, 0x8d, 0x69, 0x90, 0x45, 0xc0, 0xab, 0x69, 0x51, 0x62, 0x98, 0x75, 0xcb, 0x37,
+	0x3f, 0xf9, 0x3b, 0x00, 0x00, 0xff, 0xff, 0x90, 0xf5, 0x95, 0x0a, 0x4b, 0x0a, 0x00, 0x00,
 }
 
 func (m *MsgCreateFeed) Marshal() (dAtA []byte, err error) {
@@ -715,6 +877,114 @@ func (m *MsgEditFeed) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
+func (m *Feed) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *Feed) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Feed) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Creator) > 0 {
+		i -= len(m.Creator)
+		copy(dAtA[i:], m.Creator)
+		i = encodeVarintOracle(dAtA, i, uint64(len(m.Creator)))
+		i--
+		dAtA[i] = 0x3a
+	}
+	if len(m.RequestContextID) > 0 {
+		i -= len(m.RequestContextID)
+		copy(dAtA[i:], m.RequestContextID)
+		i = encodeVarintOracle(dAtA, i, uint64(len(m.RequestContextID)))
+		i--
+		dAtA[i] = 0x32
+	}
+	if m.LatestHistory != 0 {
+		i = encodeVarintOracle(dAtA, i, uint64(m.LatestHistory))
+		i--
+		dAtA[i] = 0x28
+	}
+	if len(m.ValueJsonPath) > 0 {
+		i -= len(m.ValueJsonPath)
+		copy(dAtA[i:], m.ValueJsonPath)
+		i = encodeVarintOracle(dAtA, i, uint64(len(m.ValueJsonPath)))
+		i--
+		dAtA[i] = 0x22
+	}
+	if len(m.AggregateFunc) > 0 {
+		i -= len(m.AggregateFunc)
+		copy(dAtA[i:], m.AggregateFunc)
+		i = encodeVarintOracle(dAtA, i, uint64(len(m.AggregateFunc)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.Description) > 0 {
+		i -= len(m.Description)
+		copy(dAtA[i:], m.Description)
+		i = encodeVarintOracle(dAtA, i, uint64(len(m.Description)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.FeedName) > 0 {
+		i -= len(m.FeedName)
+		copy(dAtA[i:], m.FeedName)
+		i = encodeVarintOracle(dAtA, i, uint64(len(m.FeedName)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *FeedValue) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *FeedValue) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *FeedValue) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	n1, err1 := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.Timestamp, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(m.Timestamp):])
+	if err1 != nil {
+		return 0, err1
+	}
+	i -= n1
+	i = encodeVarintOracle(dAtA, i, uint64(n1))
+	i--
+	dAtA[i] = 0x32
+	if len(m.Data) > 0 {
+		i -= len(m.Data)
+		copy(dAtA[i:], m.Data)
+		i = encodeVarintOracle(dAtA, i, uint64(len(m.Data)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintOracle(dAtA []byte, offset int, v uint64) int {
 	offset -= sovOracle(v)
 	base := offset
@@ -863,6 +1133,57 @@ func (m *MsgEditFeed) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovOracle(uint64(l))
 	}
+	return n
+}
+
+func (m *Feed) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.FeedName)
+	if l > 0 {
+		n += 1 + l + sovOracle(uint64(l))
+	}
+	l = len(m.Description)
+	if l > 0 {
+		n += 1 + l + sovOracle(uint64(l))
+	}
+	l = len(m.AggregateFunc)
+	if l > 0 {
+		n += 1 + l + sovOracle(uint64(l))
+	}
+	l = len(m.ValueJsonPath)
+	if l > 0 {
+		n += 1 + l + sovOracle(uint64(l))
+	}
+	if m.LatestHistory != 0 {
+		n += 1 + sovOracle(uint64(m.LatestHistory))
+	}
+	l = len(m.RequestContextID)
+	if l > 0 {
+		n += 1 + l + sovOracle(uint64(l))
+	}
+	l = len(m.Creator)
+	if l > 0 {
+		n += 1 + l + sovOracle(uint64(l))
+	}
+	return n
+}
+
+func (m *FeedValue) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Data)
+	if l > 0 {
+		n += 1 + l + sovOracle(uint64(l))
+	}
+	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.Timestamp)
+	n += 1 + l + sovOracle(uint64(l))
 	return n
 }
 
@@ -1264,7 +1585,7 @@ func (m *MsgCreateFeed) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.ResponseThreshold |= int32(b&0x7F) << shift
+				m.ResponseThreshold |= uint32(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1761,7 +2082,7 @@ func (m *MsgEditFeed) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.ResponseThreshold |= int32(b&0x7F) << shift
+				m.ResponseThreshold |= uint32(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1798,6 +2119,392 @@ func (m *MsgEditFeed) Unmarshal(dAtA []byte) error {
 			m.Creator = append(m.Creator[:0], dAtA[iNdEx:postIndex]...)
 			if m.Creator == nil {
 				m.Creator = []byte{}
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipOracle(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthOracle
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthOracle
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *Feed) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowOracle
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: Feed: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: Feed: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field FeedName", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowOracle
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthOracle
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthOracle
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.FeedName = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Description", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowOracle
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthOracle
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthOracle
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Description = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AggregateFunc", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowOracle
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthOracle
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthOracle
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.AggregateFunc = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ValueJsonPath", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowOracle
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthOracle
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthOracle
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ValueJsonPath = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 5:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field LatestHistory", wireType)
+			}
+			m.LatestHistory = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowOracle
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.LatestHistory |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RequestContextID", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowOracle
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthOracle
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex < 0 {
+				return ErrInvalidLengthOracle
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.RequestContextID = append(m.RequestContextID[:0], dAtA[iNdEx:postIndex]...)
+			if m.RequestContextID == nil {
+				m.RequestContextID = []byte{}
+			}
+			iNdEx = postIndex
+		case 7:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowOracle
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthOracle
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex < 0 {
+				return ErrInvalidLengthOracle
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Creator = append(m.Creator[:0], dAtA[iNdEx:postIndex]...)
+			if m.Creator == nil {
+				m.Creator = []byte{}
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipOracle(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthOracle
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthOracle
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *FeedValue) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowOracle
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: FeedValue: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: FeedValue: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Data", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowOracle
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthOracle
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthOracle
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Data = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Timestamp", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowOracle
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthOracle
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthOracle
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.Timestamp, dAtA[iNdEx:postIndex]); err != nil {
+				return err
 			}
 			iNdEx = postIndex
 		default:
