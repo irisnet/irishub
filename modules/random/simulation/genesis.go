@@ -8,23 +8,23 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/types/module"
-	"github.com/cosmos/cosmos-sdk/x/simulation"
+	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 
-	"github.com/irisnet/irishub/modules/rand/internal/types"
+	"github.com/irisnet/irishub/modules/random/types"
 )
 
 // GenPendingRandomRequests gets the randomized requests
-func GenPendingRandomRequests(r *rand.Random) map[string][]types.Request {
-	pendingRequestNum := simulation.RandomIntBetween(r, 10, 50)
+func GenPendingRandomRequests(r *rand.Rand) map[string][]types.Request {
+	pendingRequestNum := simtypes.RandIntBetween(r, 10, 50)
 	pendingRequests := make(map[string][]types.Request)
 
 	for i := 0; i < pendingRequestNum; i++ {
-		height := simulation.RandomIntBetween(r, 100, 100000)
-		consumerAccounts := simulation.RandomomAccounts(r, 1)
-		txHash := []byte(simulation.RandomStringOfLength(r, 32))
+		height := simtypes.RandIntBetween(r, 100, 100000)
+		consumerAccounts := simtypes.RandomAccounts(r, 1)
+		txHash := []byte(simtypes.RandStringOfLength(r, 32))
 
 		request := types.NewRequest(int64(height), consumerAccounts[0].Address, txHash)
-		leftHeight := fmt.Sprintf("%d", simulation.RandomIntBetween(r, 100, 100000))
+		leftHeight := fmt.Sprintf("%d", simtypes.RandIntBetween(r, 100, 100000))
 
 		pendingRequests[leftHeight] = append(pendingRequests[leftHeight], request)
 	}
@@ -34,7 +34,7 @@ func GenPendingRandomRequests(r *rand.Random) map[string][]types.Request {
 
 // RandomomizedGenState generates a random GenesisState for rand
 func RandomomizedGenState(simState *module.SimulationState) {
-	pendingRequests := GenPendingRandomRequests(simState.Random)
+	pendingRequests := GenPendingRandomRequests(simState.Rand)
 	randGenesis := types.NewGenesisState(pendingRequests)
 
 	fmt.Printf("Selected randomly generated rand genesis:\n%s\n", codec.MustMarshalJSONIndent(simState.Cdc, randGenesis))

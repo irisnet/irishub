@@ -47,7 +47,7 @@ func NewKeeper(
 }
 
 //CreateFeed create a stopped feed
-func (k Keeper) CreateFeed(ctx sdk.Context, msg types.MsgCreateFeed) error {
+func (k Keeper) CreateFeed(ctx sdk.Context, msg *types.MsgCreateFeed) error {
 	_, existed := k.gk.GetProfiler(ctx, msg.Creator)
 	if !existed {
 		return sdkerrors.Wrapf(types.ErrNotProfiler, msg.Creator.String())
@@ -92,7 +92,7 @@ func (k Keeper) CreateFeed(ctx sdk.Context, msg types.MsgCreateFeed) error {
 }
 
 //StartFeed start a stopped feed
-func (k Keeper) StartFeed(ctx sdk.Context, msg types.MsgStartFeed) error {
+func (k Keeper) StartFeed(ctx sdk.Context, msg *types.MsgStartFeed) error {
 	feed, found := k.GetFeed(ctx, msg.FeedName)
 	if !found {
 		return sdkerrors.Wrapf(types.ErrUnknownFeedName, msg.FeedName)
@@ -121,7 +121,7 @@ func (k Keeper) StartFeed(ctx sdk.Context, msg types.MsgStartFeed) error {
 }
 
 //PauseFeed pause a running feed
-func (k Keeper) PauseFeed(ctx sdk.Context, msg types.MsgPauseFeed) error {
+func (k Keeper) PauseFeed(ctx sdk.Context, msg *types.MsgPauseFeed) error {
 	feed, found := k.GetFeed(ctx, msg.FeedName)
 	if !found {
 		return sdkerrors.Wrapf(types.ErrUnknownFeedName, msg.FeedName)
@@ -150,7 +150,7 @@ func (k Keeper) PauseFeed(ctx sdk.Context, msg types.MsgPauseFeed) error {
 }
 
 //EditFeed edit a feed
-func (k Keeper) EditFeed(ctx sdk.Context, msg types.MsgEditFeed) error {
+func (k Keeper) EditFeed(ctx sdk.Context, msg *types.MsgEditFeed) error {
 	feed, found := k.GetFeed(ctx, msg.FeedName)
 	if !found {
 		return sdkerrors.Wrapf(types.ErrUnknownFeedName, msg.FeedName)
@@ -240,7 +240,6 @@ func (k Keeper) HandlerResponse(ctx sdk.Context,
 		Timestamp: ctx.BlockTime(),
 	}
 	k.SetFeedValue(ctx, feed.FeedName, reqCtx.BatchCounter, feed.LatestHistory, value)
-
 
 	bz, _ := json.Marshal(value)
 

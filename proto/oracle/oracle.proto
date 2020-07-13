@@ -4,6 +4,7 @@ package iris.oracle;
 import "gogoproto/gogo.proto";
 import "cosmos_proto/cosmos.proto";
 import "cosmos_proto/types.proto";
+import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/irisnet/irishub/modules/oracle/types";
 
@@ -21,7 +22,7 @@ message MsgCreateFeed {
     uint64 repeated_frequency = 10 [(gogoproto.moretags) = "yaml:\"repeated_frequency\""];
     string aggregate_func = 11 [(gogoproto.moretags) = "yaml:\"aggregate_func\""];
     string value_json_path = 12 [(gogoproto.moretags) = "yaml:\"value_json_path\""];
-    int32 response_threshold = 13 [(gogoproto.moretags) = "yaml:\"response_threshold\""];
+    uint32 response_threshold = 13 [(gogoproto.moretags) = "yaml:\"response_threshold\""];
 }
 
 // MsgPauseFeed defines an sdk.Msg type that supports stating a feed
@@ -45,6 +46,23 @@ message MsgEditFeed {
     int64 timeout = 5;
     repeated cosmos.Coin service_fee_cap = 6 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "yaml:\"service_fee_cap\""];
     uint64 repeated_frequency = 7 [(gogoproto.moretags) = "yaml:\"repeated_frequency\""];
-    int32 response_threshold = 8 [(gogoproto.moretags) = "yaml:\"response_threshold\""];
+    uint32 response_threshold = 8 [(gogoproto.moretags) = "yaml:\"response_threshold\""];
     bytes creator = 9 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
+}
+
+// Feed defines the feed standard
+message Feed {
+    string feed_name = 1 [(gogoproto.moretags) = "yaml:\"feed_name\""];
+    string description = 2;
+    string aggregate_func = 3 [(gogoproto.moretags) = "yaml:\"aggregate_func\""];
+    string value_json_path = 4 [(gogoproto.moretags) = "yaml:\"value_json_path\""];
+    uint64 latest_history = 5 [(gogoproto.moretags) = "yaml:\"latest_history\""];
+    bytes request_context_id = 6 [(gogoproto.customname) = "RequestContextID", (gogoproto.casttype) = "github.com/tendermint/tendermint/libs/bytes.HexBytes", (gogoproto.moretags) = "yaml:\"request_context_id\""];
+    bytes creator = 7 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
+}
+
+// FeedValue defines the feed result standard
+message FeedValue {
+    string data = 1;
+    google.protobuf.Timestamp timestamp = 6 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false];
 }

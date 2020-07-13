@@ -7,8 +7,9 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irishub/modules/oracle/types"
 	"github.com/irismod/service/exported"
+
+	"github.com/irisnet/irishub/modules/oracle/types"
 )
 
 func TestFeed(t *testing.T) {

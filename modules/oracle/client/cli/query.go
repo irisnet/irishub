@@ -2,11 +2,13 @@ package cli
 
 import (
 	"fmt"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/irisnet/irishub/modules/oracle/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+
+	"github.com/irisnet/irishub/modules/oracle/types"
 )
 
 // GetQueryCmd returns the cli query commands for the guardian module.

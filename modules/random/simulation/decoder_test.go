@@ -13,7 +13,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irishub/modules/rand/internal/types"
+	"github.com/irisnet/irishub/modules/random/types"
 )
 
 func makeTestCodec() (clientCtx client.Context) {

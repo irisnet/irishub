@@ -4,6 +4,7 @@ package types
 const (
 	EventTypeSetFeed = "set_feed"
 
-	AttributeKeyFeedName  = "feed_name"
-	AttributeKeyFeedValue = "feed_value"
+	AttributeValueCategory = ModuleName
+	AttributeKeyFeedName   = "feed_name"
+	AttributeKeyFeedValue  = "feed_value"
 )

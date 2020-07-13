@@ -4,6 +4,32 @@ import (
 	"io"
 	"os"
 
+	"github.com/irismod/coinswap"
+	coinswapkeeper "github.com/irismod/coinswap/keeper"
+	coinswaptypes "github.com/irismod/coinswap/types"
+	"github.com/irismod/htlc"
+	htlckeeper "github.com/irismod/htlc/keeper"
+	htlctypes "github.com/irismod/htlc/types"
+	"github.com/irismod/nft"
+	nftkeeper "github.com/irismod/nft/keeper"
+	nfttypes "github.com/irismod/nft/types"
+	"github.com/irismod/service"
+	servicekeeper "github.com/irismod/service/keeper"
+	servicetypes "github.com/irismod/service/types"
+	"github.com/irismod/token"
+	tokenkeeper "github.com/irismod/token/keeper"
+	tokentypes "github.com/irismod/token/types"
+
+	"github.com/irisnet/irishub/modules/guardian"
+	guardiankeeper "github.com/irisnet/irishub/modules/guardian/keeper"
+	guardiantypes "github.com/irisnet/irishub/modules/guardian/types"
+	"github.com/irisnet/irishub/modules/oracle"
+	oracleKeeper "github.com/irisnet/irishub/modules/oracle/keeper"
+	oracletypes "github.com/irisnet/irishub/modules/oracle/types"
+	"github.com/irisnet/irishub/modules/random"
+	randomkeeper "github.com/irisnet/irishub/modules/random/keeper"
+	randomtypes "github.com/irisnet/irishub/modules/random/types"
+
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client/rpc"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -105,6 +131,14 @@ var (
 		upgrade.AppModuleBasic{},
 		evidence.AppModuleBasic{},
 		transfer.AppModuleBasic{},
+		guardian.AppModuleBasic{},
+		token.AppModuleBasic{},
+		nft.AppModuleBasic{},
+		htlc.AppModuleBasic{},
+		coinswap.AppModuleBasic{},
+		service.AppModuleBasic{},
+		oracle.AppModuleBasic{},
+		random.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -116,6 +150,11 @@ var (
 		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
 		govtypes.ModuleName:            {authtypes.Burner},
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
+		tokentypes.ModuleName:          {authtypes.Minter, authtypes.Burner},
+		htlctypes.ModuleName:           nil,
+		coinswaptypes.ModuleName:       {authtypes.Minter, authtypes.Burner},
+		servicetypes.DepositAccName:    {authtypes.Burner},
+		servicetypes.RequestAccName:    nil,
 	}
 
 	// module accounts that are allowed to receive tokens
@@ -162,6 +201,15 @@ type SimApp struct {
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
 	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
 
+	GuardianKeeper guardiankeeper.Keeper
+	TokenKeeper    tokenkeeper.Keeper
+	NftKeeper      nftkeeper.Keeper
+	HtlcKeeper     htlckeeper.Keeper
+	CoinswapKeeper coinswapkeeper.Keeper
+	ServiceKeeper  servicekeeper.Keeper
+	OracleKeeper   oracleKeeper.Keeper
+	RandomKeeper   randomkeeper.Keeper
+
 	// the module manager
 	mm *module.Manager
 
@@ -191,6 +239,8 @@ func NewSimApp(
 		minttypes.StoreKey, distrtypes.StoreKey, slashingtypes.StoreKey,
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
+		guardiantypes.StoreKey, tokentypes.StoreKey, nfttypes.StoreKey, htlctypes.StoreKey,
+		coinswaptypes.StoreKey, servicetypes.StoreKey, oracletypes.StoreKey, randomtypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -289,6 +339,24 @@ func NewSimApp(
 	evidenceKeeper.SetRouter(evidenceRouter)
 	app.EvidenceKeeper = *evidenceKeeper
 
+	app.GuardianKeeper = guardiankeeper.NewKeeper(appCodec, keys[guardiantypes.StoreKey])
+	app.TokenKeeper = tokenkeeper.NewKeeper(
+		appCodec, keys[tokentypes.StoreKey], app.GetSubspace(tokentypes.ModuleName),
+		app.AccountKeeper, app.BankKeeper, authtypes.FeeCollectorName,
+	)
+	app.NftKeeper = nftkeeper.NewKeeper(appCodec, keys[nfttypes.StoreKey])
+
+	app.HtlcKeeper = htlckeeper.NewKeeper(appCodec, keys[htlctypes.StoreKey], app.AccountKeeper, app.BankKeeper)
+
+	app.CoinswapKeeper = coinswapkeeper.NewKeeper(appCodec, keys[coinswaptypes.StoreKey], app.GetSubspace(coinswaptypes.ModuleName), app.BankKeeper, app.AccountKeeper)
+
+	app.ServiceKeeper = servicekeeper.NewKeeper(appCodec, keys[servicetypes.StoreKey], app.AccountKeeper, app.BankKeeper,
+		servicekeeper.MockTokenKeeper{}, app.GetSubspace(servicetypes.ModuleName), authtypes.FeeCollectorName)
+
+	app.OracleKeeper = oracleKeeper.NewKeeper(appCodec, keys[oracletypes.StoreKey], app.GetSubspace(oracletypes.ModuleName), app.GuardianKeeper, app.ServiceKeeper)
+
+	app.RandomKeeper = randomkeeper.NewKeeper(appCodec, keys[randomtypes.StoreKey])
+
 	// NOTE: Any module instantiated in the module manager that is later modified
 	// must be passed by reference here.
 	app.mm = module.NewManager(
@@ -307,6 +375,14 @@ func NewSimApp(
 		ibc.NewAppModule(app.IBCKeeper),
 		params.NewAppModule(app.ParamsKeeper),
 		transferModule,
+		guardian.NewAppModule(appCodec, app.GuardianKeeper),
+		token.NewAppModule(appCodec, app.TokenKeeper, app.AccountKeeper, app.BankKeeper),
+		nft.NewAppModule(appCodec, app.NftKeeper, app.AccountKeeper, app.BankKeeper),
+		htlc.NewAppModule(appCodec, app.HtlcKeeper, app.AccountKeeper, app.BankKeeper),
+		coinswap.NewAppModule(appCodec, app.CoinswapKeeper, app.AccountKeeper, app.BankKeeper),
+		service.NewAppModule(appCodec, app.ServiceKeeper, app.AccountKeeper, app.BankKeeper),
+		oracle.NewAppModule(appCodec, app.OracleKeeper),
+		random.NewAppModule(appCodec, app.RandomKeeper, app.AccountKeeper, app.BankKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -354,6 +430,14 @@ func NewSimApp(
 		evidence.NewAppModule(app.EvidenceKeeper),
 		ibc.NewAppModule(app.IBCKeeper),
 		transferModule,
+		guardian.NewAppModule(appCodec, app.GuardianKeeper),
+		token.NewAppModule(appCodec, app.TokenKeeper, app.AccountKeeper, app.BankKeeper),
+		nft.NewAppModule(appCodec, app.NftKeeper, app.AccountKeeper, app.BankKeeper),
+		htlc.NewAppModule(appCodec, app.HtlcKeeper, app.AccountKeeper, app.BankKeeper),
+		coinswap.NewAppModule(appCodec, app.CoinswapKeeper, app.AccountKeeper, app.BankKeeper),
+		service.NewAppModule(appCodec, app.ServiceKeeper, app.AccountKeeper, app.BankKeeper),
+		oracle.NewAppModule(appCodec, app.OracleKeeper),
+		random.NewAppModule(appCodec, app.RandomKeeper, app.AccountKeeper, app.BankKeeper),
 	)
 
 	app.sm.RegisterStoreDecoders()

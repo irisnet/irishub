@@ -9,7 +9,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
-	"github.com/irisnet/irishub/modules/rand/internal/types"
+	"github.com/irisnet/irishub/modules/random/types"
 )
 
 // NewQuerier creates a new rand Querier instance

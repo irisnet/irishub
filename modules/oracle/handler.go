@@ -1,84 +1,90 @@
 package oracle
 
 import (
-	"fmt"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
-	"github.com/irisnet/irishub/modules/oracle/internal/types"
+	"github.com/irisnet/irishub/modules/oracle/keeper"
+	"github.com/irisnet/irishub/modules/oracle/types"
 )
 
 // NewHandler returns a handler for all the "oracle" type messages
-func NewHandler(k Keeper) sdk.Handler {
-	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
+func NewHandler(k keeper.Keeper) sdk.Handler {
+	return func(ctx sdk.Context, msg sdk.Msg) (*sdk.Result, error) {
+		ctx = ctx.WithEventManager(sdk.NewEventManager())
 		switch msg := msg.(type) {
-		case MsgCreateFeed:
+		case *types.MsgCreateFeed:
 			return handleMsgCreateFeed(ctx, k, msg)
-		case MsgStartFeed:
+		case *types.MsgStartFeed:
 			return handleMsgStartFeed(ctx, k, msg)
-		case MsgPauseFeed:
+		case *types.MsgPauseFeed:
 			return handleMsgPauseFeed(ctx, k, msg)
-		case MsgEditFeed:
+		case *types.MsgEditFeed:
 			return handleMsgEditFeed(ctx, k, msg)
 		default:
-			errMsg := fmt.Sprintf("unrecognized oracle message type: %T", msg)
-			return sdk.ErrUnknownRequest(errMsg).Result()
+			return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unrecognized %s message type: %T", types.ModuleName, msg)
 		}
 	}
 }
 
 // handleMsgCreateFeed handles MsgCreateFeed
-func handleMsgCreateFeed(ctx sdk.Context, k Keeper, msg MsgCreateFeed) sdk.Result {
-	tags, err := k.CreateFeed(ctx, msg)
+func handleMsgCreateFeed(ctx sdk.Context, k keeper.Keeper, msg *types.MsgCreateFeed) (*sdk.Result, error) {
+	err := k.CreateFeed(ctx, msg)
 	if err != nil {
-		return err.Result()
+		return nil, err
 	}
 
-	tags = tags.AppendTags(
-		sdk.NewTags(
-			types.TagFeedName, []byte(msg.FeedName),
-			types.TagCreator, []byte(msg.Creator.String()),
-		))
-	return sdk.Result{
-		Tags: tags,
-	}
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator.String()),
+		),
+	})
+	return &sdk.Result{Events: ctx.EventManager().ABCIEvents()}, nil
 }
 
 // handleMsgStartFeed handles MsgStartFeed
-func handleMsgStartFeed(ctx sdk.Context, k Keeper, msg MsgStartFeed) sdk.Result {
+func handleMsgStartFeed(ctx sdk.Context, k keeper.Keeper, msg *types.MsgStartFeed) (*sdk.Result, error) {
 	if err := k.StartFeed(ctx, msg); err != nil {
-		return err.Result()
+		return nil, err
 	}
-	return sdk.Result{
-		Tags: sdk.NewTags(
-			types.TagFeedName, []byte(msg.FeedName),
-			types.TagCreator, []byte(msg.Creator.String()),
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator.String()),
 		),
-	}
+	})
+	return &sdk.Result{Events: ctx.EventManager().ABCIEvents()}, nil
 }
 
 // handleMsgPauseFeed handles MsgPauseFeed
-func handleMsgPauseFeed(ctx sdk.Context, k Keeper, msg MsgPauseFeed) sdk.Result {
+func handleMsgPauseFeed(ctx sdk.Context, k keeper.Keeper, msg *types.MsgPauseFeed) (*sdk.Result, error) {
 	if err := k.PauseFeed(ctx, msg); err != nil {
-		return err.Result()
+		return nil, err
 	}
-	return sdk.Result{
-		Tags: sdk.NewTags(
-			types.TagFeedName, []byte(msg.FeedName),
-			types.TagCreator, []byte(msg.Creator.String()),
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator.String()),
 		),
-	}
+	})
+	return &sdk.Result{Events: ctx.EventManager().ABCIEvents()}, nil
 }
 
 // handleMsgEditFeed handles MsgEditFeed
-func handleMsgEditFeed(ctx sdk.Context, k Keeper, msg MsgEditFeed) sdk.Result {
+func handleMsgEditFeed(ctx sdk.Context, k keeper.Keeper, msg *types.MsgEditFeed) (*sdk.Result, error) {
 	if err := k.EditFeed(ctx, msg); err != nil {
-		return err.Result()
+		return nil, err
 	}
-	return sdk.Result{
-		Tags: sdk.NewTags(
-			types.TagFeedName, []byte(msg.FeedName),
-			types.TagCreator, []byte(msg.Creator.String()),
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator.String()),
 		),
-	}
+	})
+	return &sdk.Result{Events: ctx.EventManager().ABCIEvents()}, nil
 }

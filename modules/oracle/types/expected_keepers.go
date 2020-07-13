@@ -3,8 +3,9 @@ package types
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	service "github.com/irismod/service/exported"
-	guardiantypes "github.com/irisnet/irishub/modules/guardian/types"
 	tmbytes "github.com/tendermint/tendermint/libs/bytes"
+
+	guardiantypes "github.com/irisnet/irishub/modules/guardian/types"
 )
 
 //expected Service keeper

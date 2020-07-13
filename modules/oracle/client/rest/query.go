@@ -2,12 +2,14 @@ package rest
 
 import (
 	"fmt"
+	"net/http"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/types/rest"
-	"github.com/irisnet/irishub/modules/oracle/types"
-	"net/http"
 	"github.com/gorilla/mux"
+
 	oracleClient "github.com/irisnet/irishub/modules/oracle/client"
+	"github.com/irisnet/irishub/modules/oracle/types"
 )
 
 func registerQueryRoutes(cliCtx client.Context, r *mux.Router) {

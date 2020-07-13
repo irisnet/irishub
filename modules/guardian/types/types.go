@@ -10,6 +10,13 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
+type GuardianI interface {
+	GetDescription() string
+	GetAccountType() AccountType
+	GetAddress() sdk.AccAddress
+	GetAddedBy() sdk.AccAddress
+}
+
 // Profilers is a collection of Guardian
 type Profilers []Guardian
 

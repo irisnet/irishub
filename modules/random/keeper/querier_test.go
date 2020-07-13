@@ -10,8 +10,8 @@ import (
 
 	abci "github.com/tendermint/tendermint/abci/types"
 
-	"github.com/irisnet/irishub/modules/rand/internal/keeper"
-	"github.com/irisnet/irishub/modules/rand/internal/types"
+	"github.com/irisnet/irishub/modules/random/keeper"
+	"github.com/irisnet/irishub/modules/random/types"
 )
 
 func TestQuerierSuite(t *testing.T) {

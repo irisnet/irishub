@@ -2,10 +2,10 @@ package oracle
 
 import (
 	"fmt"
-	"github.com/irisnet/irishub/modules/oracle/keeper"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
+	"github.com/irisnet/irishub/modules/oracle/keeper"
 	"github.com/irisnet/irishub/modules/oracle/types"
 )
 

@@ -4,42 +4,43 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/cosmos/cosmos-sdk/client"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/rest"
+	authclient "github.com/cosmos/cosmos-sdk/x/auth/client"
 	"github.com/gorilla/mux"
-	"github.com/irisnet/irishub/app/v3/oracle"
-	"github.com/irisnet/irishub/client/context"
-	"github.com/irisnet/irishub/client/utils"
-	"github.com/irisnet/irishub/codec"
-	sdk "github.com/irisnet/irishub/types"
+
+	"github.com/irisnet/irishub/modules/oracle/types"
 )
 
-func registerTxRoutes(cliCtx client.Context, r *mux.Router, cdc *codec.Codec) {
+func registerTxRoutes(cliCtx client.Context, r *mux.Router) {
 	// define a feed
 	r.HandleFunc(
 		"/oracle/feeds",
-		createFeedHandlerFn(cdc, cliCtx),
+		createFeedHandlerFn(cliCtx),
 	).Methods("POST")
 
 	// edit a feed
 	r.HandleFunc(
 		fmt.Sprintf("/oracle/feeds/{%s}", FeedName),
-		editFeedHandlerFn(cdc, cliCtx),
+		editFeedHandlerFn(cliCtx),
 	).Methods("PUT")
 
 	// start a feed
 	r.HandleFunc(
 		fmt.Sprintf("/oracle/feeds/{%s}/start", FeedName),
-		startFeedHandlerFn(cdc, cliCtx),
+		startFeedHandlerFn(cliCtx),
 	).Methods("POST")
 
 	// pause a feed
 	r.HandleFunc(
 		fmt.Sprintf("/oracle/feeds/{%s}/pause", FeedName),
-		pauseFeedHandlerFn(cdc, cliCtx),
+		pauseFeedHandlerFn(cliCtx),
 	).Methods("POST")
 }
 
 type createFeedReq struct {
-	BaseTx            utils.BaseTx `json:"base_tx"` // basic tx info
+	BaseReq           rest.BaseReq `json:"base_req" yaml:"base_req"`
 	FeedName          string       `json:"feed_name"`
 	AggregateFunc     string       `json:"aggregate_func"`
 	ValueJsonPath     string       `json:"value_json_path"`
@@ -52,11 +53,11 @@ type createFeedReq struct {
 	Timeout           int64        `json:"timeout"`
 	ServiceFeeCap     string       `json:"service_fee_cap"`
 	RepeatedFrequency uint64       `json:"repeated_frequency"`
-	ResponseThreshold uint16       `json:"response_threshold"`
+	ResponseThreshold uint32       `json:"response_threshold"`
 }
 
 type editFeedReq struct {
-	BaseTx            utils.BaseTx `json:"base_tx"` // basic tx info
+	BaseReq           rest.BaseReq `json:"base_req" yaml:"base_req"`
 	FeedName          string       `json:"feed_name"`
 	Description       string       `json:"description"`
 	LatestHistory     uint64       `json:"latest_history"`
@@ -65,35 +66,34 @@ type editFeedReq struct {
 	Timeout           int64        `json:"timeout"`
 	ServiceFeeCap     string       `json:"service_fee_cap"`
 	RepeatedFrequency uint64       `json:"repeated_frequency"`
-	ResponseThreshold uint16       `json:"response_threshold"`
+	ResponseThreshold uint32       `json:"response_threshold"`
 }
 
 type startFeedReq struct {
-	BaseTx  utils.BaseTx `json:"base_tx"` // basic tx info
+	BaseReq rest.BaseReq `json:"base_req" yaml:"base_req"`
 	Creator string       `json:"creator"`
 }
 
 type pauseFeedReq struct {
-	BaseTx  utils.BaseTx `json:"base_tx"` // basic tx info
+	BaseReq rest.BaseReq `json:"base_req" yaml:"base_req"`
 	Creator string       `json:"creator"`
 }
 
-func createFeedHandlerFn(cdc *codec.Codec, cliCtx client.Context) http.HandlerFunc {
+func createFeedHandlerFn(cliCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req createFeedReq
-		err := utils.ReadPostBody(w, r, cdc, &req)
-		if err != nil {
+		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
 			return
 		}
 
-		baseReq := req.BaseTx.Sanitize()
-		if !baseReq.ValidateBasic(w) {
+		req.BaseReq = req.BaseReq.Sanitize()
+		if !req.BaseReq.ValidateBasic(w) {
 			return
 		}
 
 		creator, err := sdk.AccAddressFromBech32(req.Creator)
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
@@ -101,19 +101,19 @@ func createFeedHandlerFn(cdc *codec.Codec, cliCtx client.Context) http.HandlerFu
 		for _, addr := range req.Providers {
 			provider, err := sdk.AccAddressFromBech32(addr)
 			if err != nil {
-				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+				rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 				return
 			}
 			providers = append(providers, provider)
 		}
 
-		serviceFeeCap, err := cliCtx.ParseCoins(req.ServiceFeeCap)
+		serviceFeeCap, err := sdk.ParseCoins(req.ServiceFeeCap)
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		msg := oracle.MsgCreateFeed{
+		msg := &types.MsgCreateFeed{
 			FeedName:          req.FeedName,
 			LatestHistory:     req.LatestHistory,
 			Description:       req.Description,
@@ -129,31 +129,29 @@ func createFeedHandlerFn(cdc *codec.Codec, cliCtx client.Context) http.HandlerFu
 			ValueJsonPath:     req.ValueJsonPath,
 		}
 		if err := msg.ValidateBasic(); err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
-		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
+		authclient.WriteGenerateStdTxResponse(w, cliCtx, req.BaseReq, []sdk.Msg{msg})
 	}
 }
 
-func editFeedHandlerFn(cdc *codec.Codec, cliCtx client.Context) http.HandlerFunc {
+func editFeedHandlerFn(cliCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req editFeedReq
-		err := utils.ReadPostBody(w, r, cdc, &req)
-		if err != nil {
+		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
 			return
 		}
 
-		baseReq := req.BaseTx.Sanitize()
-		if !baseReq.ValidateBasic(w) {
+		req.BaseReq = req.BaseReq.Sanitize()
+		if !req.BaseReq.ValidateBasic(w) {
 			return
 		}
 
 		creator, err := sdk.AccAddressFromBech32(req.Creator)
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
@@ -161,19 +159,19 @@ func editFeedHandlerFn(cdc *codec.Codec, cliCtx client.Context) http.HandlerFunc
 		for _, addr := range req.Providers {
 			provider, err := sdk.AccAddressFromBech32(addr)
 			if err != nil {
-				utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+				rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 				return
 			}
 			providers = append(providers, provider)
 		}
 
-		serviceFeeCap, err := cliCtx.ParseCoins(req.ServiceFeeCap)
+		serviceFeeCap, err := sdk.ParseCoins(req.ServiceFeeCap)
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		msg := oracle.MsgEditFeed{
+		msg := &types.MsgEditFeed{
 			FeedName:          req.FeedName,
 			LatestHistory:     req.LatestHistory,
 			Description:       req.Description,
@@ -185,83 +183,78 @@ func editFeedHandlerFn(cdc *codec.Codec, cliCtx client.Context) http.HandlerFunc
 			Creator:           creator,
 		}
 		if err := msg.ValidateBasic(); err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
-		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
+		authclient.WriteGenerateStdTxResponse(w, cliCtx, req.BaseReq, []sdk.Msg{msg})
 	}
 }
 
-func startFeedHandlerFn(cdc *codec.Codec, cliCtx client.Context) http.HandlerFunc {
+func startFeedHandlerFn(cliCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req startFeedReq
-		err := utils.ReadPostBody(w, r, cdc, &req)
-		if err != nil {
+		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
 			return
 		}
 
-		baseReq := req.BaseTx.Sanitize()
-		if !baseReq.ValidateBasic(w) {
+		req.BaseReq = req.BaseReq.Sanitize()
+		if !req.BaseReq.ValidateBasic(w) {
 			return
 		}
 
 		creator, err := sdk.AccAddressFromBech32(req.Creator)
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
 		vars := mux.Vars(r)
 		feedName := vars[FeedName]
 
-		msg := oracle.MsgStartFeed{
+		msg := &types.MsgStartFeed{
 			FeedName: feedName,
 			Creator:  creator,
 		}
 		if err := msg.ValidateBasic(); err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
-		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
+		authclient.WriteGenerateStdTxResponse(w, cliCtx, req.BaseReq, []sdk.Msg{msg})
 	}
 }
 
-func pauseFeedHandlerFn(cdc *codec.Codec, cliCtx client.Context) http.HandlerFunc {
+func pauseFeedHandlerFn(cliCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req pauseFeedReq
-		err := utils.ReadPostBody(w, r, cdc, &req)
-		if err != nil {
+		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
 			return
 		}
 
-		baseReq := req.BaseTx.Sanitize()
-		if !baseReq.ValidateBasic(w) {
+		req.BaseReq = req.BaseReq.Sanitize()
+		if !req.BaseReq.ValidateBasic(w) {
 			return
 		}
 
 		creator, err := sdk.AccAddressFromBech32(req.Creator)
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
 		vars := mux.Vars(r)
 		feedName := vars[FeedName]
 
-		msg := oracle.MsgStartFeed{
+		msg := &types.MsgStartFeed{
 			FeedName: feedName,
 			Creator:  creator,
 		}
 		if err := msg.ValidateBasic(); err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		txCtx := utils.BuildReqTxCtx(cliCtx, baseReq, w)
-		utils.WriteGenerateStdTxResponse(w, txCtx, []sdk.Msg{msg})
+		authclient.WriteGenerateStdTxResponse(w, cliCtx, req.BaseReq, []sdk.Msg{msg})
 	}
 }

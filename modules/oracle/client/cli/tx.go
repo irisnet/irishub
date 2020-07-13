@@ -8,9 +8,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/version"
-	"github.com/irisnet/irishub/modules/oracle/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+
+	"github.com/irisnet/irishub/modules/oracle/types"
 )
 
 // GetTxCmd returns the transaction commands for the guardian module.
