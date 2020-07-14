@@ -159,7 +159,7 @@ A consumer specifies how she would like to invoke a service by creating a _reque
 ### Request batch
 For a repeated request context, _batches_ of new request objects will be generated at the specified frequency, until the total number of batches is reached or the consumer (i.e., context creator) runs out of fee.  Only one request batch is generated for a non-repeated context.
 
-A request batch is comprised of a number of _request_ objects, each representing a service call to a chosen provider; only those providers that charge a fee lower than `service fee cap` and commit to a QoS better than `timeout` will be selected.
+A request batch is comprised of a number of _request_ objects, each representing a service call to a chosen provider; only those providers that charge a fee no greater than `service fee cap` and commit to a QoS better than `timeout` will be selected.
 
 ### Commands
 When a request context is successfully created, a `context id` is returned to the consumer and the context is automatically started.  The consumer can later update, pause and start the context at will; she can permanently kill the context as well.
@@ -228,7 +228,7 @@ iriscli service schema result
 
 ## Service Fees
 
-Any user who creates service bindings and operates service providers should define a _withdrawal address_; when the user withdraws service fees earned by her providers, this is where the fund will be sent to.  If not set, the withdrawal address is the same as the user address.
+Any user who creates service bindings and operates service providers should define a _withdrawal address_; when the user withdraws service fees earned by her providers, this is where the fund will be sent. If not set, the withdrawal address is the same as the user address.
 
 ### Escrow
 When a request object is generated, the associated service fee is **not** paid to the targeted provider immediately; instead, the fee is kept in an internal _escrow_ account for custody.  When a response comes back in time (i.e., before the request times out), the corresponding fee  (after tax) will be released from escrow to the provider; otherwise, the fee will be refunded to the consumer.

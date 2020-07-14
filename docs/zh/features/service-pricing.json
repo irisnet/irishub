@@ -1,7 +1,7 @@
 {
 	"$schema": "http://json-schema.org/draft-04/schema#",
-	"title": "irishub-service-pricing",
-	"description": "IRIS Hub Service Pricing Schema",
+	"title": "iris-service-pricing",
+	"description": "IRIS Service Pricing Schema",
 	"type": "object",
 	"definitions": {
 	  "discount": {
