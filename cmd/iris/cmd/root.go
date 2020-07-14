@@ -28,6 +28,7 @@ import (
 	tmtypes "github.com/tendermint/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
 
+	"github.com/irisnet/irishub/address"
 	"github.com/irisnet/irishub/app"
 )
 
@@ -70,6 +71,12 @@ func Execute() error {
 }
 
 func init() {
+	config := sdk.GetConfig()
+	config.SetBech32PrefixForAccount(address.Bech32PrefixAccAddr, address.Bech32PrefixAccPub)
+	config.SetBech32PrefixForValidator(address.Bech32PrefixValAddr, address.Bech32PrefixValPub)
+	config.SetBech32PrefixForConsensusNode(address.Bech32PrefixConsAddr, address.Bech32PrefixConsPub)
+	config.Seal()
+
 	authclient.Codec = encodingConfig.Marshaler
 
 	rootCmd.AddCommand(
