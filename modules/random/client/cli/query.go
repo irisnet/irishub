@@ -8,7 +8,6 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/client/flags"
 
 	"github.com/irisnet/irishub/modules/random/types"
 )
@@ -23,10 +22,10 @@ func GetQueryCmd(clientCtx client.Context) *cobra.Command {
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
 	}
-	randQueryCmd.AddCommand(flags.GetCommands(
+	randQueryCmd.AddCommand(
 		GetCmdQueryRandom(clientCtx),
 		GetCmdQueryRandomRequestQueue(clientCtx),
-	)...)
+	)
 	return randQueryCmd
 }
 

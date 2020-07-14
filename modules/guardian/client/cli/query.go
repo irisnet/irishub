@@ -6,7 +6,6 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/client/flags"
 
 	"github.com/irisnet/irishub/modules/guardian/types"
 )
@@ -20,10 +19,10 @@ func GetQueryCmd(clientCtx client.Context) *cobra.Command {
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
 	}
-	txCmd.AddCommand(flags.GetCommands(
+	txCmd.AddCommand(
 		GetCmdQueryProfilers(clientCtx),
 		GetCmdQueryTrustees(clientCtx),
-	)...)
+	)
 	return txCmd
 }
 

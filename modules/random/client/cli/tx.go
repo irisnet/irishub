@@ -4,7 +4,6 @@ import (
 	"strconv"
 
 	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	"github.com/spf13/cobra"
 
@@ -20,9 +19,9 @@ func GetTxCmd(clientCtx client.Context) *cobra.Command {
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
 	}
-	randTxCmd.AddCommand(flags.PostCommands(
+	randTxCmd.AddCommand(
 		GetCmdRequestRandom(clientCtx),
-	)...)
+	)
 	return randTxCmd
 }
 

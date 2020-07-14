@@ -51,8 +51,7 @@ build_tags_comma_sep := $(subst $(whitespace),$(comma),$(build_tags))
 # process linker flags
 
 ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=iris \
-		  -X github.com/cosmos/cosmos-sdk/version.ServerName=iris \
-		  -X github.com/cosmos/cosmos-sdk/version.ClientName=iriscli \
+		  -X github.com/cosmos/cosmos-sdk/version.AppName=iris \
 		  -X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
 		  -X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
 		  -X "github.com/cosmos/cosmos-sdk/version.BuildTags=$(build_tags_comma_sep)" \
@@ -79,10 +78,8 @@ include contrib/devtools/Makefile
 build: go.sum
 ifeq ($(OS),Windows_NT)
 	go build $(BUILD_FLAGS) -o build/iris.exe ./cmd/iris
-	go build $(BUILD_FLAGS) -o build/iriscli.exe ./cmd/iriscli
 else
 	go build $(BUILD_FLAGS) -o build/iris ./cmd/iris
-	go build $(BUILD_FLAGS) -o build/iriscli ./cmd/iriscli
 endif
 
 build-linux: go.sum
@@ -97,7 +94,6 @@ endif
 
 install: go.sum
 	go install $(BUILD_FLAGS) ./cmd/iris
-	go install $(BUILD_FLAGS) ./cmd/iriscli
 
 update-swagger-docs: statik
 	$(BINDIR)/statik -src=lite/swagger-ui -dest=lite -f -m

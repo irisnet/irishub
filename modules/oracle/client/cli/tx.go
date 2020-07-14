@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/version"
@@ -23,12 +22,12 @@ func GetTxCmd() *cobra.Command {
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
 	}
-	txCmd.AddCommand(flags.PostCommands(
+	txCmd.AddCommand(
 		GetCmdCreateFeed(),
 		GetCmdStartFeed(),
 		GetCmdPauseFeed(),
 		GetCmdEditFeed(),
-	)...)
+	)
 	return txCmd
 }
 

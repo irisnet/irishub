@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
@@ -20,11 +19,11 @@ func GetQueryCmd(clientCtx client.Context) *cobra.Command {
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
 	}
-	txCmd.AddCommand(flags.GetCommands(
+	txCmd.AddCommand(
 		GetCmdQueryFeed(clientCtx),
 		GetCmdQueryFeeds(clientCtx),
 		GetCmdQueryFeedValue(clientCtx),
-	)...)
+	)
 	return txCmd
 }
 
