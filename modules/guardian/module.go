@@ -63,7 +63,7 @@ func (AppModuleBasic) RegisterRESTRoutes(clientCtx client.Context, rtr *mux.Rout
 
 // GetTxCmd returns the root tx command for the guardian module.
 func (AppModuleBasic) GetTxCmd(_ client.Context) *cobra.Command {
-	return nil
+	return cli.GetTxCmd()
 }
 
 // GetQueryCmd returns no root query command for the guardian module.

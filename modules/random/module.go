@@ -65,8 +65,8 @@ func (AppModuleBasic) RegisterRESTRoutes(clientCtx client.Context, rtr *mux.Rout
 }
 
 // GetTxCmd returns the root tx command for the random module.
-func (AppModuleBasic) GetTxCmd(_ client.Context) *cobra.Command {
-	return nil
+func (AppModuleBasic) GetTxCmd(clientCtx client.Context) *cobra.Command {
+	return cli.GetTxCmd(clientCtx)
 }
 
 // GetQueryCmd returns no root query command for the random module.
