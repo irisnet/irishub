@@ -1,54 +1,54 @@
-package keeper
+package keeper_test
 
 import (
-	"testing"
-
-	"github.com/irismod/service/exported"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/stretchr/testify/require"
+	"github.com/irismod/service/exported"
 	abci "github.com/tendermint/tendermint/abci/types"
 
+	guardiantypes "github.com/irisnet/irishub/modules/guardian/types"
+	"github.com/irisnet/irishub/modules/oracle/keeper"
 	"github.com/irisnet/irishub/modules/oracle/types"
 )
 
-func TestNewQuerier(t *testing.T) {
-	ctx, keeper, acc := createTestInput(t, sdk.NewInt(1000000), 2)
-	query := NewQuerier(keeper)
+func (suite *KeeperTestSuite) TestNewQuerier() {
+	// add profiler
+	suite.app.GuardianKeeper.AddProfiler(suite.ctx, guardiantypes.NewGuardian("test", guardiantypes.Ordinary, addrs[0], addrs[0]))
 
-	msg := types.MsgCreateFeed{
+	msg := &types.MsgCreateFeed{
 		FeedName:          "ethPrice",
-		ServiceName:       "GetRthPrice",
+		ServiceName:       "GetEthPrice",
 		AggregateFunc:     "avg",
 		ValueJsonPath:     "high",
 		LatestHistory:     5,
-		Providers:         []sdk.AccAddress{acc[0].GetAddress()},
+		Providers:         []sdk.AccAddress{addrs[1]},
 		Input:             "xxxx",
 		Timeout:           10,
-		ServiceFeeCap:     sdk.NewCoins(sdk.NewCoin(sdk.IrisAtto, sdk.NewInt(100))),
+		ServiceFeeCap:     sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100))),
 		RepeatedFrequency: 1,
 		ResponseThreshold: 1,
-		Creator:           acc[0].GetAddress(),
+		Creator:           addrs[0],
 	}
 
 	//================test CreateFeed start================
-	_, err := keeper.CreateFeed(ctx, msg)
-	require.NoError(t, err)
+	err := suite.keeper.CreateFeed(suite.ctx, msg)
+	suite.NoError(err)
 
 	//test QueryFeed
+	querier := keeper.NewQuerier(suite.keeper)
+
 	params := types.QueryFeedParams{
 		FeedName: msg.FeedName,
 	}
-	bz := keeper.cdc.MustMarshalJSON(params)
-	res, err := query(ctx, []string{types.QueryFeed}, abci.RequestQuery{
+	bz := suite.app.Codec().MustMarshalJSON(params)
+	res, err := querier(suite.ctx, []string{types.QueryFeed}, abci.RequestQuery{
 		Data: bz,
 	})
-	require.NoError(t, err)
+	suite.NoError(err)
 
 	var feedCtx types.FeedContext
-	keeper.cdc.MustUnmarshalJSON(res, &feedCtx)
+	suite.app.Codec().MustUnmarshalJSON(res, &feedCtx)
 
-	require.EqualValues(t, types.FeedContext{
+	suite.EqualValues(types.FeedContext{
 		Feed: types.Feed{
 			FeedName:         msg.FeedName,
 			AggregateFunc:    msg.AggregateFunc,
@@ -71,16 +71,16 @@ func TestNewQuerier(t *testing.T) {
 	params1 := types.QueryFeedsParams{
 		State: "paused",
 	}
-	bz = keeper.cdc.MustMarshalJSON(params1)
-	res, err = query(ctx, []string{types.QueryFeeds}, abci.RequestQuery{
+	bz = suite.app.Codec().MustMarshalJSON(params1)
+	res, err = querier(suite.ctx, []string{types.QueryFeeds}, abci.RequestQuery{
 		Data: bz,
 	})
-	require.NoError(t, err)
+	suite.NoError(err)
 
 	var feedsCtx []types.FeedContext
-	keeper.cdc.MustUnmarshalJSON(res, &feedsCtx)
-	require.Len(t, feedsCtx, 1)
-	require.EqualValues(t, types.FeedContext{
+	suite.app.Codec().MustUnmarshalJSON(res, &feedsCtx)
+	suite.Len(feedsCtx, 1)
+	suite.EqualValues(types.FeedContext{
 		Feed: types.Feed{
 			FeedName:         msg.FeedName,
 			AggregateFunc:    msg.AggregateFunc,
@@ -100,23 +100,23 @@ func TestNewQuerier(t *testing.T) {
 	}, feedsCtx[0])
 
 	//================test StartFeed start================
-	err = keeper.StartFeed(ctx, types.MsgStartFeed{
+	err = suite.keeper.StartFeed(suite.ctx, &types.MsgStartFeed{
 		FeedName: msg.FeedName,
-		Creator:  acc[0].GetAddress(),
+		Creator:  addrs[0],
 	})
-	require.NoError(t, err)
+	suite.NoError(err)
 
 	//test QueryValue
 	params2 := types.QueryFeedValueParams{
 		FeedName: msg.FeedName,
 	}
-	bz = keeper.cdc.MustMarshalJSON(params2)
-	res, err = query(ctx, []string{types.QueryFeedValue}, abci.RequestQuery{
+	bz = suite.app.Codec().MustMarshalJSON(params2)
+	res, err = querier(suite.ctx, []string{types.QueryFeedValue}, abci.RequestQuery{
 		Data: bz,
 	})
-	require.NoError(t, err)
+	suite.NoError(err)
 	var feedValues types.FeedValues
-	keeper.cdc.MustUnmarshalJSON(res, &feedValues)
-	require.Len(t, feedsCtx, 1)
-	require.Equal(t, "250.00000000", feedValues[0].Data)
+	suite.app.Codec().MustUnmarshalJSON(res, &feedValues)
+	suite.Len(feedsCtx, 1)
+	suite.Equal("250.00000000", feedValues[0].Data)
 }

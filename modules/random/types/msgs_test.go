@@ -1,8 +1,9 @@
 package types
 
 import (
-	"fmt"
 	"testing"
+
+	"github.com/tendermint/tendermint/crypto"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
@@ -12,7 +13,7 @@ import (
 
 var (
 	emptyAddr     sdk.AccAddress
-	testAddr      = sdk.AccAddress("testAddr")
+	testAddr, _   = sdk.AccAddressFromHex(crypto.AddressHash([]byte("test")).String())
 	blockInterval = uint64(10)
 )
 
@@ -63,7 +64,7 @@ func TestMsgRequestRandomGetSignBytes(t *testing.T) {
 	var msg = NewMsgRequestRandom(testAddr, blockInterval)
 	res := msg.GetSignBytes()
 
-	expected := `{"type":"irishub/rand/MsgRequestRandom","value":{"block_interval":"10","consumer":"faa1w3jhxazpv3j8yxhn3j0"}}`
+	expected := `{"type":"irishub/rand/MsgRequestRandom","value":{"block_interval":"10","consumer":"iaa1n7rdpqvgf37ktx30a2sv2kkszk3m7ncmakdj4g"}}`
 	require.Equal(t, expected, string(res))
 }
 
@@ -71,6 +72,5 @@ func TestMsgRequestRandomGetSigners(t *testing.T) {
 	var msg = NewMsgRequestRandom(testAddr, blockInterval)
 	res := msg.GetSigners()
 
-	expected := "[7465737441646472]"
-	require.Equal(t, expected, fmt.Sprintf("%v", res))
+	require.Equal(t, []sdk.AccAddress{testAddr}, res)
 }

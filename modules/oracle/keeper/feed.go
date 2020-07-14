@@ -122,9 +122,8 @@ func (k Keeper) dequeueAndEnqueue(
 	store := ctx.KVStore(k.storeKey)
 	store.Delete(types.GetFeedStateKey(feedName, dequeueState))
 
-	var feedNameBz gogotypes.StringValue
-	bz := k.cdc.MustMarshalBinaryBare(&feedNameBz)
-	store.Set(types.GetFeedStateKey(feedNameBz.Value, enqueueState), bz)
+	bz := k.cdc.MustMarshalBinaryBare(&gogotypes.StringValue{Value: feedName})
+	store.Set(types.GetFeedStateKey(feedName, enqueueState), bz)
 }
 
 func (k Keeper) getFeedValuesCnt(ctx sdk.Context, feedName string) (i int) {

@@ -1,42 +1,89 @@
-package keeper
+package keeper_test
 
 import (
 	"testing"
 
-	"github.com/stretchr/testify/require"
-
+	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-
 	"github.com/irismod/service/exported"
+	servicetypes "github.com/irismod/service/types"
+	"github.com/stretchr/testify/suite"
+	abci "github.com/tendermint/tendermint/abci/types"
+	"github.com/tendermint/tendermint/crypto"
+	tmbytes "github.com/tendermint/tendermint/libs/bytes"
 
+	guardiantypes "github.com/irisnet/irishub/modules/guardian/types"
+	"github.com/irisnet/irishub/modules/oracle/keeper"
 	"github.com/irisnet/irishub/modules/oracle/types"
+	"github.com/irisnet/irishub/simapp"
 )
 
-func TestFeed(t *testing.T) {
-	ctx, keeper, acc := createTestInput(t, sdk.NewInt(1000000), 2)
-	msg := types.MsgCreateFeed{
+var (
+	testAddr1, _ = sdk.AccAddressFromHex(crypto.AddressHash([]byte("test1")).String())
+	testAddr2, _ = sdk.AccAddressFromHex(crypto.AddressHash([]byte("test2")).String())
+
+	addrs = []sdk.AccAddress{testAddr1, testAddr2}
+
+	mockReqCtxID = []byte("mockRequest")
+	responses    = []string{
+		`{"last":100,"high":100,"low":50}`,
+		`{"last":100,"high":200,"low":50}`,
+		`{"last":100,"high":300,"low":50}`,
+		`{"last":100,"high":400,"low":50}`,
+	}
+)
+
+type KeeperTestSuite struct {
+	suite.Suite
+
+	cdc    *codec.Codec
+	ctx    sdk.Context
+	app    *simapp.SimApp
+	keeper keeper.Keeper
+}
+
+func (suite *KeeperTestSuite) SetupTest() {
+	app := simapp.Setup(false)
+
+	suite.cdc = app.Codec()
+	suite.ctx = app.BaseApp.NewContext(false, abci.Header{})
+	suite.app = app
+
+	serviceKeeper := NewMockServiceKeeper()
+	suite.keeper = keeper.NewKeeper(app.AppCodec(), app.GetKey(types.StoreKey), app.GetSubspace(types.ModuleName), app.GuardianKeeper, serviceKeeper)
+}
+
+func TestKeeperTestSuite(t *testing.T) {
+	suite.Run(t, new(KeeperTestSuite))
+}
+
+func (suite *KeeperTestSuite) TestFeed() {
+	// add profiler
+	suite.app.GuardianKeeper.AddProfiler(suite.ctx, guardiantypes.NewGuardian("test", guardiantypes.Ordinary, addrs[0], addrs[0]))
+
+	msg := &types.MsgCreateFeed{
 		FeedName:          "ethPrice",
 		ServiceName:       "GetEthPrice",
 		AggregateFunc:     "avg",
 		ValueJsonPath:     "high",
 		LatestHistory:     5,
-		Providers:         []sdk.AccAddress{acc[0].GetAddress()},
+		Providers:         []sdk.AccAddress{addrs[1]},
 		Input:             "xxxx",
 		Timeout:           10,
-		ServiceFeeCap:     sdk.NewCoins(sdk.NewCoin(sdk.IrisAtto, sdk.NewInt(100))),
+		ServiceFeeCap:     sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100))),
 		RepeatedFrequency: 1,
 		ResponseThreshold: 1,
-		Creator:           acc[0].GetAddress(),
+		Creator:           addrs[0],
 	}
 
 	//================test CreateFeed start================
-	_, err := keeper.CreateFeed(ctx, msg)
-	require.NoError(t, err)
+	err := suite.keeper.CreateFeed(suite.ctx, msg)
+	suite.NoError(err)
 
 	//check feed existed
-	feed, existed := keeper.GetFeed(ctx, msg.FeedName)
-	require.True(t, existed)
-	require.EqualValues(t, types.Feed{
+	feed, existed := suite.keeper.GetFeed(suite.ctx, msg.FeedName)
+	suite.True(existed)
+	suite.EqualValues(types.Feed{
 		FeedName:         msg.FeedName,
 		AggregateFunc:    msg.AggregateFunc,
 		ValueJsonPath:    msg.ValueJsonPath,
@@ -47,57 +94,57 @@ func TestFeed(t *testing.T) {
 
 	//check feed state
 	var feeds []types.Feed
-	keeper.IteratorFeedsByState(ctx, exported.PAUSED, func(feed types.Feed) {
+	suite.keeper.IteratorFeedsByState(suite.ctx, exported.PAUSED, func(feed types.Feed) {
 		feeds = append(feeds, feed)
 	})
-	require.Len(t, feeds, 1)
-	require.Equal(t, msg.FeedName, feeds[0].FeedName)
+	suite.Len(feeds, 1)
+	suite.Equal(msg.FeedName, feeds[0].FeedName)
 	//================test CreateFeed end================
 
 	//================test StartFeed start================
-	err = keeper.StartFeed(ctx, types.MsgStartFeed{
+	err = suite.keeper.StartFeed(suite.ctx, &types.MsgStartFeed{
 		FeedName: msg.FeedName,
-		Creator:  acc[0].GetAddress(),
+		Creator:  addrs[0],
 	})
 
 	//check feed result
-	result := keeper.GetFeedValues(ctx, msg.FeedName)
-	require.NoError(t, err)
-	require.Equal(t, "250.00000000", result[0].Data)
+	result := suite.keeper.GetFeedValues(suite.ctx, msg.FeedName)
+	suite.NoError(err)
+	suite.Equal("250.00000000", result[0].Data)
 
 	//check feed state
 	var feeds1 []types.Feed
-	keeper.IteratorFeedsByState(ctx, exported.RUNNING, func(feed types.Feed) {
+	suite.keeper.IteratorFeedsByState(suite.ctx, exported.RUNNING, func(feed types.Feed) {
 		feeds1 = append(feeds1, feed)
 	})
-	require.Len(t, feeds1, 1)
-	require.Equal(t, msg.FeedName, feeds1[0].FeedName)
+	suite.Len(feeds1, 1)
+	suite.Equal(msg.FeedName, feeds1[0].FeedName)
 
 	//start again, will return error
-	err = keeper.StartFeed(ctx, types.MsgStartFeed{
+	err = suite.keeper.StartFeed(suite.ctx, &types.MsgStartFeed{
 		FeedName: msg.FeedName,
-		Creator:  acc[0].GetAddress(),
+		Creator:  addrs[0],
 	})
-	require.Error(t, err)
+	suite.Error(err)
 	//================test StartFeed end================
 
 	//================test EditFeed start================
 	latestHistory := uint64(1)
-	err = keeper.EditFeed(ctx, types.MsgEditFeed{
+	err = suite.keeper.EditFeed(suite.ctx, &types.MsgEditFeed{
 		FeedName:          msg.FeedName,
 		LatestHistory:     latestHistory,
-		Providers:         []sdk.AccAddress{acc[0].GetAddress()},
-		ServiceFeeCap:     sdk.NewCoins(sdk.NewCoin(sdk.IrisAtto, sdk.NewInt(100))),
+		Providers:         []sdk.AccAddress{addrs[0]},
+		ServiceFeeCap:     sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100))),
 		RepeatedFrequency: 1,
 		ResponseThreshold: 1,
-		Creator:           acc[0].GetAddress(),
+		Creator:           addrs[0],
 	})
-	require.NoError(t, err)
+	suite.NoError(err)
 
 	//check feed existed
-	feed, existed = keeper.GetFeed(ctx, msg.FeedName)
-	require.True(t, existed)
-	require.EqualValues(t, types.Feed{
+	feed, existed = suite.keeper.GetFeed(suite.ctx, msg.FeedName)
+	suite.True(existed)
+	suite.EqualValues(types.Feed{
 		FeedName:         msg.FeedName,
 		AggregateFunc:    msg.AggregateFunc,
 		ValueJsonPath:    msg.ValueJsonPath,
@@ -108,41 +155,141 @@ func TestFeed(t *testing.T) {
 	//================test EditFeed end================
 
 	//================test PauseFeed start================
-	err = keeper.PauseFeed(ctx, types.MsgPauseFeed{
+	err = suite.keeper.PauseFeed(suite.ctx, &types.MsgPauseFeed{
 		FeedName: msg.FeedName,
-		Creator:  acc[0].GetAddress(),
+		Creator:  addrs[0],
 	})
-	require.NoError(t, err)
+	suite.NoError(err)
 
-	reqCtx, existed := keeper.sk.GetRequestContext(ctx, feed.RequestContextID)
-	require.True(t, existed)
-	require.Equal(t, exported.PAUSED, reqCtx.State)
+	reqCtx, existed := suite.keeper.GetRequestContext(suite.ctx, feed.RequestContextID)
+	suite.True(existed)
+	suite.Equal(exported.PAUSED, reqCtx.State)
 
 	//pause again, will return error
-	err = keeper.PauseFeed(ctx, types.MsgPauseFeed{
+	err = suite.keeper.PauseFeed(suite.ctx, &types.MsgPauseFeed{
 		FeedName: msg.FeedName,
-		Creator:  acc[0].GetAddress(),
+		Creator:  addrs[0],
 	})
-	require.Error(t, err)
+	suite.Error(err)
 
 	//Start Feed again
-	err = keeper.StartFeed(ctx, types.MsgStartFeed{
+	err = suite.keeper.StartFeed(suite.ctx, &types.MsgStartFeed{
 		FeedName: msg.FeedName,
-		Creator:  acc[0].GetAddress(),
+		Creator:  addrs[0],
 	})
 
 	//check feed result
-	result = keeper.GetFeedValues(ctx, msg.FeedName)
-	require.NoError(t, err)
-	require.Len(t, result, int(latestHistory))
-	require.Equal(t, "250.00000000", result[0].Data)
+	result = suite.keeper.GetFeedValues(suite.ctx, msg.FeedName)
+	suite.NoError(err)
+	suite.Len(result, int(latestHistory))
+	suite.Equal("250.00000000", result[0].Data)
 
 	//check feed state
 	var feeds2 []types.Feed
-	keeper.IteratorFeedsByState(ctx, exported.RUNNING, func(feed types.Feed) {
+	suite.keeper.IteratorFeedsByState(suite.ctx, exported.RUNNING, func(feed types.Feed) {
 		feeds2 = append(feeds2, feed)
 	})
-	require.Len(t, feeds2, 1)
-	require.Equal(t, msg.FeedName, feeds2[0].FeedName)
+	suite.Len(feeds2, 1)
+	suite.Equal(msg.FeedName, feeds2[0].FeedName)
 	//================test PauseFeed end================
+}
+
+var _ types.ServiceKeeper = MockServiceKeeper{}
+
+type MockServiceKeeper struct {
+	cxtMap           map[string]exported.RequestContext
+	callbackMap      map[string]exported.ResponseCallback
+	stateCallbackMap map[string]exported.StateCallback
+}
+
+func NewMockServiceKeeper() MockServiceKeeper {
+	cxtMap := make(map[string]exported.RequestContext)
+	callbackMap := make(map[string]exported.ResponseCallback)
+	stateCallbackMap := make(map[string]exported.StateCallback)
+	return MockServiceKeeper{
+		cxtMap:           cxtMap,
+		callbackMap:      callbackMap,
+		stateCallbackMap: stateCallbackMap,
+	}
+}
+
+func (m MockServiceKeeper) RegisterStateCallback(moduleName string,
+	stateCallback exported.StateCallback) error {
+	m.stateCallbackMap[moduleName] = stateCallback
+	return nil
+}
+
+func (m MockServiceKeeper) RegisterResponseCallback(moduleName string,
+	respCallback exported.ResponseCallback) error {
+	m.callbackMap[moduleName] = respCallback
+	return nil
+}
+
+func (m MockServiceKeeper) GetRequestContext(ctx sdk.Context,
+	requestContextID tmbytes.HexBytes) (exported.RequestContext, bool) {
+	reqCtx, ok := m.cxtMap[string(requestContextID)]
+	return reqCtx, ok
+}
+
+func (m MockServiceKeeper) CreateRequestContext(ctx sdk.Context,
+	serviceName string,
+	providers []sdk.AccAddress,
+	consumer sdk.AccAddress,
+	input string,
+	serviceFeeCap sdk.Coins,
+	timeout int64,
+	superMode,
+	repeated bool,
+	repeatedFrequency uint64,
+	repeatedTotal int64,
+	state exported.RequestContextState,
+	respThreshold uint32,
+	moduleName string) (tmbytes.HexBytes, error) {
+
+	reqCtx := exported.RequestContext{
+		ServiceName:       serviceName,
+		Providers:         providers,
+		Consumer:          consumer,
+		Input:             input,
+		ServiceFeeCap:     serviceFeeCap,
+		Timeout:           timeout,
+		SuperMode:         superMode,
+		Repeated:          repeated,
+		RepeatedFrequency: repeatedFrequency,
+		RepeatedTotal:     repeatedTotal,
+		BatchCounter:      0,
+		State:             state,
+		ResponseThreshold: respThreshold,
+		ModuleName:        moduleName,
+	}
+	m.cxtMap[string(mockReqCtxID)] = reqCtx
+	return mockReqCtxID, nil
+}
+
+func (m MockServiceKeeper) UpdateRequestContext(ctx sdk.Context,
+	requestContextID tmbytes.HexBytes,
+	providers []sdk.AccAddress,
+	respThreshold uint32,
+	serviceFeeCap sdk.Coins,
+	timeout int64,
+	repeatedFreq uint64,
+	repeatedTotal int64,
+	consumer sdk.AccAddress) error {
+	return nil
+}
+
+func (m MockServiceKeeper) StartRequestContext(ctx sdk.Context, requestContextID tmbytes.HexBytes, consumer sdk.AccAddress) error {
+	reqCtx := m.cxtMap[string(requestContextID)]
+	callback := m.callbackMap[reqCtx.ModuleName]
+	reqCtx.State = servicetypes.RUNNING
+	callback(ctx, requestContextID, responses, nil)
+	m.cxtMap[string(requestContextID)] = reqCtx
+	return nil
+}
+
+func (m MockServiceKeeper) PauseRequestContext(ctx sdk.Context, requestContextID tmbytes.HexBytes, consumer sdk.AccAddress) error {
+	reqCtx := m.cxtMap[string(requestContextID)]
+	reqCtx.State = exported.PAUSED
+	m.cxtMap[string(requestContextID)] = reqCtx
+	return nil
 }

@@ -3,14 +3,14 @@ package guardian_test
 import (
 	"testing"
 
-	"github.com/stretchr/testify/suite"
-
-	abci "github.com/tendermint/tendermint/abci/types"
-
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/stretchr/testify/suite"
+	abci "github.com/tendermint/tendermint/abci/types"
 
 	"github.com/irisnet/irishub/modules/guardian"
+	"github.com/irisnet/irishub/modules/guardian/keeper"
+	"github.com/irisnet/irishub/modules/guardian/types"
 	"github.com/irisnet/irishub/simapp"
 )
 
@@ -19,7 +19,7 @@ type TestSuite struct {
 
 	cdc    *codec.Codec
 	ctx    sdk.Context
-	keeper guardian.Keeper
+	keeper keeper.Keeper
 }
 
 func (suite *TestSuite) SetupTest() {
@@ -36,6 +36,6 @@ func TestGenesisSuite(t *testing.T) {
 
 func (suite *TestSuite) TestExportGenesis() {
 	exportedGenesis := guardian.ExportGenesis(suite.ctx, suite.keeper)
-	defaultGenesis := guardian.DefaultGenesisState()
+	defaultGenesis := types.DefaultGenesisState()
 	suite.Equal(exportedGenesis, defaultGenesis)
 }

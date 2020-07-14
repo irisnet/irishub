@@ -392,8 +392,11 @@ func NewSimApp(
 	app.mm.SetOrderBeginBlockers(
 		upgradetypes.ModuleName, minttypes.ModuleName, distrtypes.ModuleName, slashingtypes.ModuleName,
 		evidencetypes.ModuleName, stakingtypes.ModuleName, ibchost.ModuleName,
+		htlctypes.ModuleName, randomtypes.ModuleName,
 	)
-	app.mm.SetOrderEndBlockers(crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName)
+	app.mm.SetOrderEndBlockers(crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName,
+		servicetypes.ModuleName,
+	)
 
 	// NOTE: The genutils moodule must occur after staking so that pools are
 	// properly initialized with tokens from genesis accounts.
@@ -404,6 +407,8 @@ func NewSimApp(
 		capabilitytypes.ModuleName, authtypes.ModuleName, distrtypes.ModuleName, stakingtypes.ModuleName, banktypes.ModuleName,
 		slashingtypes.ModuleName, govtypes.ModuleName, minttypes.ModuleName, crisistypes.ModuleName,
 		ibchost.ModuleName, genutiltypes.ModuleName, evidencetypes.ModuleName, ibctransfertypes.ModuleName,
+		guardiantypes.ModuleName, tokentypes.ModuleName, nfttypes.ModuleName, htlctypes.ModuleName,
+		coinswaptypes.ModuleName, servicetypes.ModuleName, oracletypes.ModuleName, randomtypes.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -616,6 +621,10 @@ func initParamsKeeper(appCodec codec.Marshaler, key, tkey sdk.StoreKey) paramske
 	paramsKeeper.Subspace(slashingtypes.ModuleName)
 	paramsKeeper.Subspace(govtypes.ModuleName).WithKeyTable(govtypes.ParamKeyTable())
 	paramsKeeper.Subspace(crisistypes.ModuleName)
+	paramsKeeper.Subspace(tokentypes.ModuleName)
+	paramsKeeper.Subspace(htlctypes.ModuleName)
+	paramsKeeper.Subspace(coinswaptypes.ModuleName)
+	paramsKeeper.Subspace(servicetypes.ModuleName)
 
 	return paramsKeeper
 }

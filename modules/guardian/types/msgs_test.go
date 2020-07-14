@@ -52,7 +52,7 @@ func TestMsgAddProfilerType(t *testing.T) {
 func TestMsgAddProfilerGetSignBytes(t *testing.T) {
 	msg := NewMsgAddProfiler(description, testAddr, sender)
 	res := msg.GetSignBytes()
-	expected := `{"type":"irishub/guardian/MsgAddProfiler","value":{"add_guardian":{"added_by":"faa1pgm8hyk0pvphmlvfjc8wsvk4daluz5tgkwnkl5","address":"faa1n7rdpqvgf37ktx30a2sv2kkszk3m7ncm9et244","description":"description"}}}`
+	expected := `{"type":"irishub/guardian/MsgAddProfiler","value":{"add_guardian":{"added_by":"iaa1pgm8hyk0pvphmlvfjc8wsvk4daluz5tgwp4wlf","address":"iaa1n7rdpqvgf37ktx30a2sv2kkszk3m7ncmakdj4g","description":"description"}}}`
 	require.Equal(t, expected, string(res))
 }
 
@@ -111,7 +111,7 @@ func TestMsgDeleteProfilerType(t *testing.T) {
 func TestMsgDeleteProfilerGetSignBytes(t *testing.T) {
 	msg := NewMsgDeleteProfiler(testAddr, sender)
 	res := msg.GetSignBytes()
-	expected := `{"type":"irishub/guardian/MsgDeleteProfiler","value":{"delete_guardian":{"address":"faa1n7rdpqvgf37ktx30a2sv2kkszk3m7ncm9et244","deleted_by":"faa1pgm8hyk0pvphmlvfjc8wsvk4daluz5tgkwnkl5"}}}`
+	expected := `{"type":"irishub/guardian/MsgDeleteProfiler","value":{"delete_guardian":{"address":"iaa1n7rdpqvgf37ktx30a2sv2kkszk3m7ncmakdj4g","deleted_by":"iaa1pgm8hyk0pvphmlvfjc8wsvk4daluz5tgwp4wlf"}}}`
 	require.Equal(t, expected, string(res))
 }
 
@@ -169,7 +169,7 @@ func TestMsgAddTrusteeType(t *testing.T) {
 func TestMsgAddTrusteeGetSignBytes(t *testing.T) {
 	msg := NewMsgAddTrustee(description, testAddr, sender)
 	res := msg.GetSignBytes()
-	expected := `{"type":"irishub/guardian/MsgAddTrustee","value":{"add_guardian":{"added_by":"faa1pgm8hyk0pvphmlvfjc8wsvk4daluz5tgkwnkl5","address":"faa1n7rdpqvgf37ktx30a2sv2kkszk3m7ncm9et244","description":"description"}}}`
+	expected := `{"type":"irishub/guardian/MsgAddTrustee","value":{"add_guardian":{"added_by":"iaa1pgm8hyk0pvphmlvfjc8wsvk4daluz5tgwp4wlf","address":"iaa1n7rdpqvgf37ktx30a2sv2kkszk3m7ncmakdj4g","description":"description"}}}`
 	require.Equal(t, expected, string(res))
 }
 
@@ -228,7 +228,7 @@ func TestMsgDeleteTrusteeType(t *testing.T) {
 func TestMsgDeleteTrusteeGetSignBytes(t *testing.T) {
 	msg := NewMsgDeleteTrustee(testAddr, sender)
 	res := msg.GetSignBytes()
-	expected := `{"type":"irishub/guardian/MsgDeleteTrustee","value":{"delete_guardian":{"address":"faa1n7rdpqvgf37ktx30a2sv2kkszk3m7ncm9et244","deleted_by":"faa1pgm8hyk0pvphmlvfjc8wsvk4daluz5tgkwnkl5"}}}`
+	expected := `{"type":"irishub/guardian/MsgDeleteTrustee","value":{"delete_guardian":{"address":"iaa1n7rdpqvgf37ktx30a2sv2kkszk3m7ncmakdj4g","deleted_by":"iaa1pgm8hyk0pvphmlvfjc8wsvk4daluz5tgwp4wlf"}}}`
 	require.Equal(t, expected, string(res))
 }
 

@@ -4,13 +4,14 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/stretchr/testify/suite"
-
-	abci "github.com/tendermint/tendermint/abci/types"
-
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/stretchr/testify/suite"
+	abci "github.com/tendermint/tendermint/abci/types"
 
+	"github.com/irisnet/irishub/modules/random"
+	"github.com/irisnet/irishub/modules/random/keeper"
+	"github.com/irisnet/irishub/modules/random/types"
 	"github.com/irisnet/irishub/simapp"
 )
 
@@ -30,7 +31,7 @@ type GenesisTestSuite struct {
 
 	cdc    *codec.Codec
 	ctx    sdk.Context
-	keeper random.Keeper
+	keeper keeper.Keeper
 }
 
 func (suite *GenesisTestSuite) SetupTest() {
@@ -58,8 +59,8 @@ func (suite *GenesisTestSuite) TestExportGenesis() {
 	suite.ctx = suite.ctx.WithBlockHeight(testNewHeight)
 
 	// get the pending requests from queue
-	storedRequests := make(map[int64][]random.Request)
-	suite.keeper.IterateRandomRequestQueue(suite.ctx, func(h int64, r random.Request) bool {
+	storedRequests := make(map[int64][]types.Request)
+	suite.keeper.IterateRandomRequestQueue(suite.ctx, func(h int64, r types.Request) bool {
 		storedRequests[h] = append(storedRequests[h], r)
 		return false
 	})
