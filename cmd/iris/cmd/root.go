@@ -13,7 +13,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/keys"
 	"github.com/cosmos/cosmos-sdk/client/rpc"
 	"github.com/cosmos/cosmos-sdk/server"
-	"github.com/cosmos/cosmos-sdk/simapp"
 	"github.com/cosmos/cosmos-sdk/store"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authclient "github.com/cosmos/cosmos-sdk/x/auth/client"
@@ -44,7 +43,7 @@ var (
 		},
 	}
 
-	encodingConfig = simapp.MakeEncodingConfig()
+	encodingConfig = app.MakeEncodingConfig()
 	initClientCtx  = client.Context{}.
 			WithJSONMarshaler(encodingConfig.Marshaler).
 			WithTxGenerator(encodingConfig.TxGenerator).
@@ -66,7 +65,7 @@ func Execute() error {
 	ctx = context.WithValue(ctx, client.ClientContextKey, &client.Context{})
 	ctx = context.WithValue(ctx, server.ServerContextKey, server.NewDefaultContext())
 
-	executor := cli.PrepareBaseCmd(rootCmd, "", simapp.DefaultNodeHome)
+	executor := cli.PrepareBaseCmd(rootCmd, "", app.DefaultNodeHome)
 	return executor.ExecuteContext(ctx)
 }
 
@@ -74,11 +73,11 @@ func init() {
 	authclient.Codec = encodingConfig.Marshaler
 
 	rootCmd.AddCommand(
-		genutilcli.InitCmd(simapp.ModuleBasics, simapp.DefaultNodeHome),
+		genutilcli.InitCmd(app.ModuleBasics, app.DefaultNodeHome),
 		genutilcli.CollectGenTxsCmd(banktypes.GenesisBalancesIterator{}),
 		genutilcli.MigrateGenesisCmd(),
-		genutilcli.GenTxCmd(simapp.ModuleBasics, banktypes.GenesisBalancesIterator{}),
-		genutilcli.ValidateGenesisCmd(simapp.ModuleBasics),
+		genutilcli.GenTxCmd(app.ModuleBasics, banktypes.GenesisBalancesIterator{}),
+		genutilcli.ValidateGenesisCmd(app.ModuleBasics),
 		AddGenesisAccountCmd(),
 		cli.NewCompletionCmd(rootCmd, true),
 		testnetCmd(app.ModuleBasics, banktypes.GenesisBalancesIterator{}),
@@ -114,7 +113,7 @@ func queryCommand() *cobra.Command {
 		authcmd.QueryTxCmd(encodingConfig.Amino),
 	)
 
-	simapp.ModuleBasics.AddQueryCommands(cmd, initClientCtx)
+	app.ModuleBasics.AddQueryCommands(cmd, initClientCtx)
 	cmd.PersistentFlags().String(flags.FlagChainID, "", "The network chain ID")
 
 	return cmd
@@ -141,7 +140,7 @@ func txCommand() *cobra.Command {
 		flags.LineBreak,
 	)
 
-	simapp.ModuleBasics.AddTxCommands(cmd, initClientCtx)
+	app.ModuleBasics.AddTxCommands(cmd, initClientCtx)
 	cmd.PersistentFlags().String(flags.FlagChainID, "", "The network chain ID")
 
 	return cmd
@@ -164,7 +163,7 @@ func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, appOpts server.A
 		panic(err)
 	}
 
-	return simapp.NewSimApp(
+	return app.NewIrisApp(
 		logger, db, traceStore, true, skipUpgradeHeights,
 		cast.ToString(appOpts.Get(flags.FlagHome)),
 		cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod)),
@@ -181,16 +180,16 @@ func exportAppStateAndTMValidators(
 	logger log.Logger, db dbm.DB, traceStore io.Writer, height int64, forZeroHeight bool, jailWhiteList []string,
 ) (json.RawMessage, []tmtypes.GenesisValidator, *abci.ConsensusParams, error) {
 
-	var simApp *simapp.SimApp
+	var irisApp *app.IrisApp
 	if height != -1 {
-		simApp = simapp.NewSimApp(logger, db, traceStore, false, map[int64]bool{}, "", uint(1))
+		irisApp = app.NewIrisApp(logger, db, traceStore, false, map[int64]bool{}, "", uint(1))
 
-		if err := simApp.LoadHeight(height); err != nil {
+		if err := irisApp.LoadHeight(height); err != nil {
 			return nil, nil, nil, err
 		}
 	} else {
-		simApp = simapp.NewSimApp(logger, db, traceStore, true, map[int64]bool{}, "", uint(1))
+		irisApp = app.NewIrisApp(logger, db, traceStore, true, map[int64]bool{}, "", uint(1))
 	}
 
-	return simApp.ExportAppStateAndValidators(forZeroHeight, jailWhiteList)
+	return irisApp.ExportAppStateAndValidators(forZeroHeight, jailWhiteList)
 }
