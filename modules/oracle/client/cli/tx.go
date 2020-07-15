@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/version"
@@ -50,6 +51,10 @@ func GetCmdCreateFeed() *cobra.Command {
 			`--value-json-path="high"`, version.AppName),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
+			clientCtx, err := client.ReadTxCommandFlags(clientCtx, cmd.Flags())
+			if err != nil {
+				return err
+			}
 
 			creator := clientCtx.GetFromAddress()
 
@@ -98,6 +103,7 @@ func GetCmdCreateFeed() *cobra.Command {
 	_ = cmd.MarkFlagRequired(FlagProviders)
 	_ = cmd.MarkFlagRequired(FlagServiceFeeCap)
 	_ = cmd.MarkFlagRequired(FlagTimeout)
+	flags.AddTxFlagsToCmd(cmd)
 	return cmd
 }
 
@@ -110,6 +116,10 @@ func GetCmdStartFeed() *cobra.Command {
 		Example: fmt.Sprintf(`%s oracle start <feed-name> --chain-id=<chain-id> --from=<key-name> --fee=0.3iris`, version.AppName),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
+			clientCtx, err := client.ReadTxCommandFlags(clientCtx, cmd.Flags())
+			if err != nil {
+				return err
+			}
 
 			creator := clientCtx.GetFromAddress()
 			msg := &types.MsgStartFeed{
@@ -124,6 +134,7 @@ func GetCmdStartFeed() *cobra.Command {
 		},
 	}
 	cmd.Flags().AddFlagSet(FsStartFeed)
+	flags.AddTxFlagsToCmd(cmd)
 	return cmd
 }
 
@@ -136,6 +147,10 @@ func GetCmdPauseFeed() *cobra.Command {
 		Example: fmt.Sprintf(`%s oracle pause <feed-name> --chain-id=<chain-id> --from=<key-name> --fee=0.3iris`, version.AppName),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
+			clientCtx, err := client.ReadTxCommandFlags(clientCtx, cmd.Flags())
+			if err != nil {
+				return err
+			}
 
 			creator := clientCtx.GetFromAddress()
 			msg := &types.MsgPauseFeed{
@@ -150,6 +165,7 @@ func GetCmdPauseFeed() *cobra.Command {
 		},
 	}
 	cmd.Flags().AddFlagSet(FsStartFeed)
+	flags.AddTxFlagsToCmd(cmd)
 	return cmd
 }
 
@@ -169,6 +185,10 @@ func GetCmdEditFeed() *cobra.Command {
 			`--threshold=1`, version.AppName),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
+			clientCtx, err := client.ReadTxCommandFlags(clientCtx, cmd.Flags())
+			if err != nil {
+				return err
+			}
 
 			creator := clientCtx.GetFromAddress()
 			var providers []sdk.AccAddress
@@ -204,5 +224,6 @@ func GetCmdEditFeed() *cobra.Command {
 		},
 	}
 	cmd.Flags().AddFlagSet(FsEditFeed)
+	flags.AddTxFlagsToCmd(cmd)
 	return cmd
 }

@@ -3,9 +3,9 @@ package cli
 import (
 	"fmt"
 
-	"github.com/spf13/cobra"
-
 	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/flags"
+	"github.com/spf13/cobra"
 
 	"github.com/irisnet/irishub/modules/mint/types"
 )
@@ -27,7 +27,7 @@ func GetQueryCmd(clientCtx client.Context) *cobra.Command {
 
 // GetCmdQueryParams implements a command to return the current minting parameters.
 func GetCmdQueryParams(clientCtx client.Context) *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "params",
 		Short: "Query the current minting parameters",
 		Args:  cobra.NoArgs,
@@ -51,4 +51,6 @@ func GetCmdQueryParams(clientCtx client.Context) *cobra.Command {
 			return clientCtx.PrintOutput(params)
 		},
 	}
+	flags.AddQueryFlagsToCmd(cmd)
+	return cmd
 }

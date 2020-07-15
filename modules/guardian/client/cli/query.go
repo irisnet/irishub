@@ -3,9 +3,9 @@ package cli
 import (
 	"fmt"
 
-	"github.com/spf13/cobra"
-
 	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/flags"
+	"github.com/spf13/cobra"
 
 	"github.com/irisnet/irishub/modules/guardian/types"
 )
@@ -51,6 +51,7 @@ func GetCmdQueryProfilers(clientCtx client.Context) *cobra.Command {
 			return clientCtx.PrintOutput(profilers)
 		},
 	}
+	flags.AddQueryFlagsToCmd(cmd)
 	return cmd
 }
 
@@ -79,5 +80,6 @@ func GetCmdQueryTrustees(clientCtx client.Context) *cobra.Command {
 			return clientCtx.PrintOutput(trustees)
 		},
 	}
+	flags.AddQueryFlagsToCmd(cmd)
 	return cmd
 }

@@ -10,13 +10,13 @@ import (
 // RegisterCodec registers the necessary x/bank interfaces and concrete types
 // on the provided Amino codec. These types are used for Amino JSON serialization.
 func RegisterCodec(cdc *codec.Codec) {
-	cdc.RegisterConcrete(MsgCreateFeed{}, "irishub/oracle/MsgCreateFeed", nil)
-	cdc.RegisterConcrete(MsgStartFeed{}, "irishub/oracle/MsgStartFeed", nil)
-	cdc.RegisterConcrete(MsgPauseFeed{}, "irishub/oracle/MsgPauseFeed", nil)
-	cdc.RegisterConcrete(MsgEditFeed{}, "irishub/oracle/MsgEditFeed", nil)
+	cdc.RegisterConcrete(&MsgCreateFeed{}, "irishub/oracle/MsgCreateFeed", nil)
+	cdc.RegisterConcrete(&MsgStartFeed{}, "irishub/oracle/MsgStartFeed", nil)
+	cdc.RegisterConcrete(&MsgPauseFeed{}, "irishub/oracle/MsgPauseFeed", nil)
+	cdc.RegisterConcrete(&MsgEditFeed{}, "irishub/oracle/MsgEditFeed", nil)
 
-	cdc.RegisterConcrete(Feed{}, "irishub/oracle/Feed", nil)
-	cdc.RegisterConcrete(FeedContext{}, "irishub/oracle/FeedContext", nil)
+	cdc.RegisterConcrete(&Feed{}, "irishub/oracle/Feed", nil)
+	cdc.RegisterConcrete(&FeedContext{}, "irishub/oracle/FeedContext", nil)
 }
 
 func RegisterInterfaces(registry types.InterfaceRegistry) {

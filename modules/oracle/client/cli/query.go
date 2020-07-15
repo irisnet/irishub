@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
@@ -64,6 +65,7 @@ func GetCmdQueryFeed(clientCtx client.Context) *cobra.Command {
 		},
 	}
 	cmd.Flags().AddFlagSet(FsQueryFeed)
+	flags.AddQueryFlagsToCmd(cmd)
 	return cmd
 }
 
@@ -103,6 +105,7 @@ func GetCmdQueryFeeds(clientCtx client.Context) *cobra.Command {
 		},
 	}
 	cmd.Flags().AddFlagSet(FsQueryFeeds)
+	flags.AddQueryFlagsToCmd(cmd)
 	return cmd
 }
 
@@ -143,5 +146,6 @@ func GetCmdQueryFeedValue(clientCtx client.Context) *cobra.Command {
 		},
 	}
 	cmd.Flags().AddFlagSet(FsQueryFeedValue)
+	flags.AddQueryFlagsToCmd(cmd)
 	return cmd
 }

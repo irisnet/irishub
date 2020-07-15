@@ -11,10 +11,10 @@ import (
 // on the provided Amino codec. These types are used for Amino JSON serialization.
 func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterInterface((*GuardianI)(nil), nil)
-	cdc.RegisterConcrete(MsgAddProfiler{}, "irishub/guardian/MsgAddProfiler", nil)
-	cdc.RegisterConcrete(MsgAddTrustee{}, "irishub/guardian/MsgAddTrustee", nil)
-	cdc.RegisterConcrete(MsgDeleteProfiler{}, "irishub/guardian/MsgDeleteProfiler", nil)
-	cdc.RegisterConcrete(MsgDeleteTrustee{}, "irishub/guardian/MsgDeleteTrustee", nil)
+	cdc.RegisterConcrete(&MsgAddProfiler{}, "irishub/guardian/MsgAddProfiler", nil)
+	cdc.RegisterConcrete(&MsgAddTrustee{}, "irishub/guardian/MsgAddTrustee", nil)
+	cdc.RegisterConcrete(&MsgDeleteProfiler{}, "irishub/guardian/MsgDeleteProfiler", nil)
+	cdc.RegisterConcrete(&MsgDeleteTrustee{}, "irishub/guardian/MsgDeleteTrustee", nil)
 }
 
 func RegisterInterfaces(registry types.InterfaceRegistry) {

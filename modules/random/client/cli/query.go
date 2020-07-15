@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/spf13/cobra"
-
 	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/flags"
+	"github.com/spf13/cobra"
 
 	"github.com/irisnet/irishub/modules/random/types"
 )
@@ -75,7 +75,7 @@ func GetCmdQueryRandom(clientCtx client.Context) *cobra.Command {
 			return clientCtx.PrintOutput(readableRandom)
 		},
 	}
-
+	flags.AddQueryFlagsToCmd(cmd)
 	return cmd
 }
 
@@ -126,6 +126,6 @@ func GetCmdQueryRandomRequestQueue(clientCtx client.Context) *cobra.Command {
 			return clientCtx.PrintOutput(requests)
 		},
 	}
-
+	flags.AddQueryFlagsToCmd(cmd)
 	return cmd
 }

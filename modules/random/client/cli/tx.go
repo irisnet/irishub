@@ -4,6 +4,7 @@ import (
 	"strconv"
 
 	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	"github.com/spf13/cobra"
 
@@ -33,9 +34,12 @@ func GetCmdRequestRandom(clientCtx client.Context) *cobra.Command {
 		Example: "iriscli tx rand request-rand [block-interval]",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
+			clientCtx, err := client.ReadTxCommandFlags(clientCtx, cmd.Flags())
+			if err != nil {
+				return err
+			}
 
 			var blockInterval uint64
-			var err error
 
 			if len(args) > 0 {
 				blockInterval, err = strconv.ParseUint(args[0], 10, 64)
@@ -54,6 +58,6 @@ func GetCmdRequestRandom(clientCtx client.Context) *cobra.Command {
 			return tx.GenerateOrBroadcastTx(clientCtx, msg)
 		},
 	}
-
+	flags.AddTxFlagsToCmd(cmd)
 	return cmd
 }

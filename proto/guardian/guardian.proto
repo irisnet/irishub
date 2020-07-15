@@ -55,6 +55,6 @@ enum AccountType{
 
     // GENESIS defines a genesis account type
     GENESIS = 0 [(gogoproto.enumvalue_customname) = "Genesis"];
-    // Ordinary defines a ordinary account type
-    Ordinary = 1 [(gogoproto.enumvalue_customname) = "Ordinary"];
+    // ORDINARY defines a ordinary account type
+    ORDINARY = 1 [(gogoproto.enumvalue_customname) = "Ordinary"];
 }

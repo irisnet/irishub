@@ -7,11 +7,11 @@ require (
 	github.com/gogo/protobuf v1.3.1
 	github.com/golang/protobuf v1.4.2
 	github.com/gorilla/mux v1.7.4
-	github.com/irismod/coinswap v0.0.0-20200714035941-be2bc6108ebc
-	github.com/irismod/htlc v0.0.0-20200714084518-0998f5894fc1
-	github.com/irismod/nft v1.1.1-0.20200714065728-1e3d1589e4e0
-	github.com/irismod/service v1.1.1-0.20200714084319-148dad3b3488
-	github.com/irismod/token v1.1.1-0.20200714084638-0987573de7d9
+	github.com/irismod/coinswap v0.0.0-20200715080622-d52fc4903014
+	github.com/irismod/htlc v0.0.0-20200715080701-b24d617463b8
+	github.com/irismod/nft v1.1.1-0.20200715080847-4db44a11aca4
+	github.com/irismod/service v1.1.1-0.20200715080927-2d28d2709ae4
+	github.com/irismod/token v1.1.1-0.20200715081357-d25e2e1bbe00
 	github.com/onsi/ginkgo v1.8.0 // indirect
 	github.com/onsi/gomega v1.5.0 // indirect
 	github.com/otiai10/copy v1.2.0
