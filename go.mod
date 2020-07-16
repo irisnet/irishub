@@ -8,8 +8,8 @@ require (
 	github.com/golang/protobuf v1.4.2
 	github.com/gorilla/mux v1.7.4
 	github.com/irismod/coinswap v0.0.0-20200715080622-d52fc4903014
-	github.com/irismod/htlc v0.0.0-20200715080701-b24d617463b8
-	github.com/irismod/nft v1.1.1-0.20200715080847-4db44a11aca4
+	github.com/irismod/htlc v0.0.0-20200715111249-2a1a0ac8fd03
+	github.com/irismod/nft v1.1.1-0.20200715111436-98a9b9ee71cb
 	github.com/irismod/service v1.1.1-0.20200715080927-2d28d2709ae4
 	github.com/irismod/token v1.1.1-0.20200715081357-d25e2e1bbe00
 	github.com/onsi/ginkgo v1.8.0 // indirect
