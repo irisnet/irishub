@@ -5,6 +5,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/simapp/helpers"
+	simappparams "github.com/cosmos/cosmos-sdk/simapp/params"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
@@ -36,7 +37,9 @@ func WeightedOperations(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKe
 					return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to generate fees"), nil, err
 				}
 
-				tx := helpers.GenTx(
+				txGen := simappparams.MakeEncodingConfig().TxGenerator
+				tx, err := helpers.GenTx(
+					txGen,
 					[]sdk.Msg{msg},
 					fees,
 					helpers.DefaultGenTxGas,
@@ -45,6 +48,9 @@ func WeightedOperations(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKe
 					[]uint64{account.GetSequence()},
 					simAccount.PrivKey,
 				)
+				if err != nil {
+					return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to generate mock tx"), nil, err
+				}
 
 				if _, _, err := app.Deliver(tx); err != nil {
 					return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to deliver tx"), nil, err
