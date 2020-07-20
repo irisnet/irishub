@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"context"
 	"encoding/hex"
 	"fmt"
 	"strconv"
@@ -46,30 +47,17 @@ func GetCmdQueryRandom(clientCtx client.Context) *cobra.Command {
 				return err
 			}
 
-			params := types.QueryRandomParams{
-				ReqID: args[0],
-			}
+			queryClient := types.NewQueryClient(clientCtx)
 
-			bz, err := clientCtx.Codec.MarshalJSON(params)
+			res, err := queryClient.Random(context.Background(), &types.QueryRandomRequest{ReqId: args[0]})
 			if err != nil {
-				return err
-			}
-
-			route := fmt.Sprintf("custom/%s/%s", types.QuerierRoute, types.QueryRandom)
-			res, _, err := clientCtx.QueryWithData(route, bz)
-			if err != nil {
-				return err
-			}
-
-			var rawRandom types.Random
-			if err := clientCtx.Codec.UnmarshalJSON(res, &rawRandom); err != nil {
 				return err
 			}
 
 			readableRandom := types.ReadableRandom{
-				RequestTxHash: hex.EncodeToString(rawRandom.RequestTxHash),
-				Height:        rawRandom.Height,
-				Value:         rawRandom.Value,
+				RequestTxHash: hex.EncodeToString(res.Random.RequestTxHash),
+				Height:        res.Random.Height,
+				Value:         res.Random.Value,
 			}
 
 			return clientCtx.PrintOutput(readableRandom)
@@ -103,27 +91,14 @@ func GetCmdQueryRandomRequestQueue(clientCtx client.Context) *cobra.Command {
 				return fmt.Errorf("the height must not be less than 0: %d", height)
 			}
 
-			params := types.QueryRandomRequestQueueParams{
-				Height: height,
-			}
+			queryClient := types.NewQueryClient(clientCtx)
 
-			bz, err := clientCtx.Codec.MarshalJSON(params)
+			res, err := queryClient.RandomRequestQueue(context.Background(), &types.QueryRandomRequestQueueRequest{Height: height})
 			if err != nil {
 				return err
 			}
 
-			route := fmt.Sprintf("custom/%s/%s", types.QuerierRoute, types.QueryRandomRequestQueue)
-			res, _, err := clientCtx.QueryWithData(route, bz)
-			if err != nil {
-				return err
-			}
-
-			var requests types.Requests
-			if err := clientCtx.Codec.UnmarshalJSON(res, &requests); err != nil {
-				return err
-			}
-
-			return clientCtx.PrintOutput(requests)
+			return clientCtx.PrintOutput(res.Requests)
 		},
 	}
 	flags.AddQueryFlagsToCmd(cmd)

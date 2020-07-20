@@ -49,7 +49,7 @@ func (suite *KeeperTestSuite) TestNewQuerier() {
 	suite.app.Codec().MustUnmarshalJSON(res, &feedCtx)
 
 	suite.EqualValues(types.FeedContext{
-		Feed: types.Feed{
+		Feed: &types.Feed{
 			FeedName:         msg.FeedName,
 			AggregateFunc:    msg.AggregateFunc,
 			ValueJsonPath:    msg.ValueJsonPath,
@@ -81,7 +81,7 @@ func (suite *KeeperTestSuite) TestNewQuerier() {
 	suite.app.Codec().MustUnmarshalJSON(res, &feedsCtx)
 	suite.Len(feedsCtx, 1)
 	suite.EqualValues(types.FeedContext{
-		Feed: types.Feed{
+		Feed: &types.Feed{
 			FeedName:         msg.FeedName,
 			AggregateFunc:    msg.AggregateFunc,
 			ValueJsonPath:    msg.ValueJsonPath,

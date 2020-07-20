@@ -33,11 +33,13 @@ type KeeperTestSuite struct {
 	cdc    *codec.Codec
 	ctx    sdk.Context
 	keeper keeper.Keeper
+	app    *simapp.SimApp
 }
 
 func (suite *KeeperTestSuite) SetupTest() {
 	app := simapp.Setup(false)
 
+	suite.app = app
 	suite.cdc = app.Codec()
 	suite.ctx = app.BaseApp.NewContext(false, abci.Header{})
 	suite.keeper = app.RandomKeeper

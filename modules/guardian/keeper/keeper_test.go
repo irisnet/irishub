@@ -35,11 +35,13 @@ type KeeperTestSuite struct {
 	cdc    *codec.Codec
 	ctx    sdk.Context
 	keeper keeper.Keeper
+	app    *simapp.SimApp
 }
 
 func (suite *KeeperTestSuite) SetupTest() {
 	app := simapp.Setup(false)
 
+	suite.app = app
 	suite.cdc = app.Codec()
 	suite.ctx = app.BaseApp.NewContext(false, abci.Header{})
 	suite.keeper = app.GuardianKeeper
@@ -66,7 +68,7 @@ func (suite *KeeperTestSuite) TestAddProfiler() {
 		},
 	)
 
-	suite.Equal(2, len(profilers))
+	suite.Equal(1, len(profilers))
 	suite.Contains(profilers, profiler)
 }
 
@@ -99,7 +101,7 @@ func (suite *KeeperTestSuite) TestAddTrustee() {
 			return false
 		},
 	)
-	suite.Equal(2, len(trustees))
+	suite.Equal(1, len(trustees))
 	suite.Contains(trustees, trustee)
 }
 
@@ -127,7 +129,7 @@ func (suite *KeeperTestSuite) TestQueryProfilers() {
 
 	err := suite.cdc.UnmarshalJSON(res, &profilers)
 	suite.NoError(err)
-	suite.Len(profilers, 2)
+	suite.Len(profilers, 1)
 	suite.Contains(profilers, profiler)
 }
 
@@ -142,7 +144,7 @@ func (suite *KeeperTestSuite) TestQueryTrustees() {
 
 	err := suite.cdc.UnmarshalJSON(res, &trustees)
 	suite.NoError(err)
-	suite.Len(trustees, 2)
+	suite.Len(trustees, 1)
 	suite.Contains(trustees, trustee)
 }
 

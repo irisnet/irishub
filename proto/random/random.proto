@@ -1,5 +1,5 @@
 syntax = "proto3";
-package iris.random;
+package irishub.random;
 
 import "gogoproto/gogo.proto";
 import "cosmos_proto/cosmos.proto";

@@ -5,17 +5,16 @@ import (
 	"fmt"
 	"math/rand"
 
-	"github.com/gogo/protobuf/grpc"
-
-	"github.com/gorilla/mux"
-	"github.com/spf13/cobra"
-	abci "github.com/tendermint/tendermint/abci/types"
-
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
+	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
+	"github.com/gogo/protobuf/grpc"
+	"github.com/gorilla/mux"
+	"github.com/spf13/cobra"
+	abci "github.com/tendermint/tendermint/abci/types"
 
 	"github.com/irisnet/irishub/modules/mint/client/cli"
 	"github.com/irisnet/irishub/modules/mint/client/rest"
@@ -28,6 +27,7 @@ var (
 	_ module.AppModule           = AppModule{}
 	_ module.AppModuleBasic      = AppModuleBasic{}
 	_ module.AppModuleSimulation = AppModule{}
+	_ module.InterfaceModule     = AppModuleBasic{}
 )
 
 // AppModuleBasic defines the basic application module used by the mint module.
@@ -72,6 +72,10 @@ func (AppModuleBasic) GetQueryCmd(clientCtx client.Context) *cobra.Command {
 	return cli.GetQueryCmd(clientCtx)
 }
 
+// RegisterInterfaceTypes registers interfaces and implementations of the mint module.
+func (AppModuleBasic) RegisterInterfaceTypes(_ codectypes.InterfaceRegistry) {
+}
+
 //____________________________________________________________________________
 
 // AppModule implements an application module for the mint module.
@@ -82,6 +86,7 @@ type AppModule struct {
 }
 
 func (am AppModule) RegisterQueryService(server grpc.Server) {
+	types.RegisterQueryServer(server, am.keeper)
 }
 
 // NewAppModule creates a new AppModule object

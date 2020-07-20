@@ -1,5 +1,5 @@
 syntax = "proto3";
-package iris.mint;
+package irishub.mint;
 
 import "gogoproto/gogo.proto";
 import "cosmos_proto/cosmos.proto";

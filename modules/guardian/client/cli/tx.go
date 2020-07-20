@@ -102,6 +102,7 @@ func GetCmdDeleteProfiler() *cobra.Command {
 	}
 	cmd.Flags().AddFlagSet(FsDeleteGuardian)
 	_ = cmd.MarkFlagRequired(FlagAddress)
+	flags.AddTxFlagsToCmd(cmd)
 	return cmd
 }
 

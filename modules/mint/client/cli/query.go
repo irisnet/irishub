@@ -1,7 +1,7 @@
 package cli
 
 import (
-	"fmt"
+	"context"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -37,18 +37,14 @@ func GetCmdQueryParams(clientCtx client.Context) *cobra.Command {
 				return err
 			}
 
-			route := fmt.Sprintf("custom/%s/%s", types.QuerierRoute, types.QueryParameters)
-			res, _, err := clientCtx.QueryWithData(route, nil)
+			queryClient := types.NewQueryClient(clientCtx)
+
+			res, err := queryClient.Params(context.Background(), &types.QueryParamsRequest{})
 			if err != nil {
 				return err
 			}
 
-			var params types.Params
-			if err := clientCtx.Codec.UnmarshalJSON(res, &params); err != nil {
-				return err
-			}
-
-			return clientCtx.PrintOutput(params)
+			return clientCtx.PrintOutput(res.Params)
 		},
 	}
 	flags.AddQueryFlagsToCmd(cmd)

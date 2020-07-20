@@ -1,5 +1,5 @@
 syntax = "proto3";
-package iris.guardian;
+package irishub.guardian;
 
 import "gogoproto/gogo.proto";
 import "cosmos_proto/cosmos.proto";

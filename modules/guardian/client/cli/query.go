@@ -1,7 +1,7 @@
 package cli
 
 import (
-	"fmt"
+	"context"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -38,17 +38,14 @@ func GetCmdQueryProfilers(clientCtx client.Context) *cobra.Command {
 				return err
 			}
 
-			res, _, err := clientCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", types.QuerierRoute, types.QueryProfilers), nil)
+			queryClient := types.NewQueryClient(clientCtx)
+
+			res, err := queryClient.Profilers(context.Background(), &types.QueryProfilersRequest{})
 			if err != nil {
 				return err
 			}
 
-			var profilers types.Profilers
-			if err := clientCtx.Codec.UnmarshalJSON(res, &profilers); err != nil {
-				return err
-			}
-
-			return clientCtx.PrintOutput(profilers)
+			return clientCtx.PrintOutput(res.Profilers)
 		},
 	}
 	flags.AddQueryFlagsToCmd(cmd)
@@ -67,17 +64,14 @@ func GetCmdQueryTrustees(clientCtx client.Context) *cobra.Command {
 				return err
 			}
 
-			res, _, err := clientCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", types.QuerierRoute, types.QueryTrustees), nil)
+			queryClient := types.NewQueryClient(clientCtx)
+
+			res, err := queryClient.Trustees(context.Background(), &types.QueryTrusteesRequest{})
 			if err != nil {
 				return err
 			}
 
-			var trustees types.Trustees
-			if err := clientCtx.Codec.UnmarshalJSON(res, &trustees); err != nil {
-				return err
-			}
-
-			return clientCtx.PrintOutput(trustees)
+			return clientCtx.PrintOutput(res.Trustees)
 		},
 	}
 	flags.AddQueryFlagsToCmd(cmd)

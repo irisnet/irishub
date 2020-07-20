@@ -1,7 +1,7 @@
 package cli
 
 import (
-	"fmt"
+	"context"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -41,27 +41,14 @@ func GetCmdQueryFeed(clientCtx client.Context) *cobra.Command {
 				return err
 			}
 
-			params := types.QueryFeedParams{
-				FeedName: args[0],
-			}
+			queryClient := types.NewQueryClient(clientCtx)
 
-			bz, err := clientCtx.Codec.MarshalJSON(params)
+			res, err := queryClient.Feed(context.Background(), &types.QueryFeedRequest{FeedName: args[0]})
 			if err != nil {
 				return err
 			}
 
-			route := fmt.Sprintf("custom/%s/%s", types.QuerierRoute, types.QueryFeed)
-			res, _, err := clientCtx.QueryWithData(route, bz)
-			if err != nil {
-				return err
-			}
-
-			var feedCtx types.FeedContext
-			if err := clientCtx.Codec.UnmarshalJSON(res, &feedCtx); err != nil {
-				return err
-			}
-
-			return clientCtx.PrintOutput(feedCtx)
+			return clientCtx.PrintOutput(res.Feed)
 		},
 	}
 	cmd.Flags().AddFlagSet(FsQueryFeed)
@@ -81,27 +68,14 @@ func GetCmdQueryFeeds(clientCtx client.Context) *cobra.Command {
 				return err
 			}
 
-			params := types.QueryFeedsParams{
-				State: viper.GetString(FlagFeedState),
-			}
+			queryClient := types.NewQueryClient(clientCtx)
 
-			bz, err := clientCtx.Codec.MarshalJSON(params)
+			res, err := queryClient.Feeds(context.Background(), &types.QueryFeedsRequest{State: viper.GetString(FlagFeedState)})
 			if err != nil {
 				return err
 			}
 
-			route := fmt.Sprintf("custom/%s/%s", types.QuerierRoute, types.QueryFeeds)
-			res, _, err := clientCtx.QueryWithData(route, bz)
-			if err != nil {
-				return err
-			}
-
-			var feedCtx types.FeedsContext
-			if err := clientCtx.Codec.UnmarshalJSON(res, &feedCtx); err != nil {
-				return err
-			}
-
-			return clientCtx.PrintOutput(feedCtx)
+			return clientCtx.PrintOutput(res.Feeds)
 		},
 	}
 	cmd.Flags().AddFlagSet(FsQueryFeeds)
@@ -122,27 +96,14 @@ func GetCmdQueryFeedValue(clientCtx client.Context) *cobra.Command {
 				return err
 			}
 
-			params := types.QueryFeedParams{
-				FeedName: args[0],
-			}
+			queryClient := types.NewQueryClient(clientCtx)
 
-			bz, err := clientCtx.Codec.MarshalJSON(params)
+			res, err := queryClient.FeedValue(context.Background(), &types.QueryFeedValueRequest{FeedName: args[0]})
 			if err != nil {
 				return err
 			}
 
-			route := fmt.Sprintf("custom/%s/%s", types.QuerierRoute, types.QueryFeedValue)
-			res, _, err := clientCtx.QueryWithData(route, bz)
-			if err != nil {
-				return err
-			}
-
-			var feedValue types.FeedValues
-			if err := clientCtx.Codec.UnmarshalJSON(res, &feedValue); err != nil {
-				return err
-			}
-
-			return clientCtx.PrintOutput(feedValue)
+			return clientCtx.PrintOutput(res.FeedValues)
 		},
 	}
 	cmd.Flags().AddFlagSet(FsQueryFeedValue)

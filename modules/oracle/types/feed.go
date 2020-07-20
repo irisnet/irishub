@@ -3,10 +3,6 @@ package types
 import (
 	"bytes"
 	"fmt"
-
-	sdk "github.com/cosmos/cosmos-sdk/types"
-
-	service "github.com/irismod/service/exported"
 )
 
 type FeedValues []FeedValue
@@ -22,19 +18,6 @@ func (fv FeedValues) String() string {
 		str += f.String() + "\n"
 	}
 	return str
-}
-
-// FeedContext represents a struct that keeps track of the feed runtime state
-type FeedContext struct {
-	Feed              Feed                        `json:"feed"`
-	ServiceName       string                      `json:"service_name"`
-	Providers         []sdk.AccAddress            `json:"providers"`
-	Input             string                      `json:"input"`
-	Timeout           int64                       `json:"timeout"`
-	ServiceFeeCap     sdk.Coins                   `json:"service_fee_cap"`
-	RepeatedFrequency uint64                      `json:"repeated_frequency"`
-	ResponseThreshold uint32                      `json:"response_threshold"`
-	State             service.RequestContextState `json:"state"`
 }
 
 // String implements fmt.Stringer

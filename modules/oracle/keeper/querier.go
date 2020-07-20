@@ -37,7 +37,7 @@ func queryFeed(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, error)
 	if !found {
 		return nil, sdkerrors.Wrapf(types.ErrUnknownFeedName, params.FeedName)
 	}
-	feedCtx := buildFeedContext(ctx, k, feed)
+	feedCtx := BuildFeedContext(ctx, k, feed)
 
 	bz, err := codec.MarshalJSONIndent(k.cdc, feedCtx)
 	if err != nil {
@@ -56,7 +56,7 @@ func queryFeeds(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, error
 	var result types.FeedsContext
 	if len(state) == 0 {
 		k.IteratorFeeds(ctx, func(feed types.Feed) {
-			result = append(result, buildFeedContext(ctx, k, feed))
+			result = append(result, BuildFeedContext(ctx, k, feed))
 		})
 	} else {
 		state, err := types.RequestContextStateFromString(params.State)
@@ -64,7 +64,7 @@ func queryFeeds(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, error
 			return nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, err.Error())
 		}
 		k.IteratorFeedsByState(ctx, state, func(feed types.Feed) {
-			result = append(result, buildFeedContext(ctx, k, feed))
+			result = append(result, BuildFeedContext(ctx, k, feed))
 		})
 	}
 
@@ -89,7 +89,7 @@ func queryFeedValue(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, e
 	return bz, nil
 }
 
-func buildFeedContext(ctx sdk.Context, k Keeper, feed types.Feed) (feedCtx types.FeedContext) {
+func BuildFeedContext(ctx sdk.Context, k Keeper, feed types.Feed) (feedCtx types.FeedContext) {
 	reqCtx, found := k.sk.GetRequestContext(ctx, feed.RequestContextID)
 	if found {
 		feedCtx.Providers = reqCtx.Providers
@@ -101,6 +101,6 @@ func buildFeedContext(ctx sdk.Context, k Keeper, feed types.Feed) (feedCtx types
 		feedCtx.Timeout = reqCtx.Timeout
 		feedCtx.State = reqCtx.State
 	}
-	feedCtx.Feed = feed
+	feedCtx.Feed = &feed
 	return feedCtx
 }
