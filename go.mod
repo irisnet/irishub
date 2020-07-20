@@ -27,10 +27,11 @@ require (
 	github.com/tendermint/tendermint v0.33.6
 	github.com/tendermint/tm-db v0.5.1
 	github.com/tidwall/gjson v1.6.0
+	google.golang.org/grpc v1.30.0
 	gopkg.in/yaml.v2 v2.3.0
 )
 
 replace (
-	github.com/cosmos/cosmos-sdk v0.34.4-0.20200713224032-8a62e1ab8127 => github.com/irisnet/cosmos-sdk v0.34.4-0.20200717065137-a210020eec46
+	github.com/cosmos/cosmos-sdk => github.com/irisnet/cosmos-sdk v0.19.1-0.20200720031859-08f888c08df5
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.2-alpha.regen.4
 )

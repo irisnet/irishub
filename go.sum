@@ -94,8 +94,6 @@ github.com/coreos/go-systemd v0.0.0-20180511133405-39ca1b05acc7/go.mod h1:F5haX7
 github.com/coreos/go-systemd v0.0.0-20190321100706-95778dfbb74e/go.mod h1:F5haX7vjVVG0kc13fIWeqUViNPyEJxv/OmvnBo0Yme4=
 github.com/coreos/pkg v0.0.0-20160727233714-3ac0863d7acf/go.mod h1:E3G3o1h8I7cfcXa63jLwjI0eiQQMgzzUDFVpN/nH/eA=
 github.com/coreos/pkg v0.0.0-20180928190104-399ea9e2e55f/go.mod h1:E3G3o1h8I7cfcXa63jLwjI0eiQQMgzzUDFVpN/nH/eA=
-github.com/cosmos/cosmos-sdk v0.34.4-0.20200716143106-10783f27d0cf h1:kAha7sivUqRtYtJ7uvW/s91vksTWWQPh8gcxmIX/Z3Q=
-github.com/cosmos/cosmos-sdk v0.34.4-0.20200716143106-10783f27d0cf/go.mod h1:bN7+WscdYTynCxMV2m7Om1NM9ajMDTtQQ/H5fzPeB6U=
 github.com/cosmos/go-bip39 v0.0.0-20180819234021-555e2067c45d h1:49RLWk1j44Xu4fjHb6JFYmeUnDORVwHNkDxaQ0ctCVU=
 github.com/cosmos/go-bip39 v0.0.0-20180819234021-555e2067c45d/go.mod h1:tSxLoYXyBmiFeKpvmq4dzayMdCjCnu8uqmCysIGBT2Y=
 github.com/cosmos/ledger-cosmos-go v0.11.1 h1:9JIYsGnXP613pb2vPjFeMMjBI5lEDsEaF6oYorTy6J4=
@@ -273,6 +271,8 @@ github.com/irismod/service v1.1.1-0.20200717083211-da28297d9e73 h1:UbKukhlL6TpSw
 github.com/irismod/service v1.1.1-0.20200717083211-da28297d9e73/go.mod h1:sgnrrU+KRKXELIfBA3obRJPc/b2+a/X6oF8YI0SNxv8=
 github.com/irismod/token v1.1.1-0.20200717083658-a6d44d130830 h1:YZo3zx5LtQ5BulUJThHV65Rzq2P5GRXWwOhgL2iVbOg=
 github.com/irismod/token v1.1.1-0.20200717083658-a6d44d130830/go.mod h1:q7X7ga+0XPRPMyeWl343rhlJ8AkeWQ8v74vgh5wu44o=
+github.com/irisnet/cosmos-sdk v0.19.1-0.20200720031859-08f888c08df5 h1:oKJuW4CdpHwJDL6y7kktw1p7GAWCP0/KbfHdLbwXogk=
+github.com/irisnet/cosmos-sdk v0.19.1-0.20200720031859-08f888c08df5/go.mod h1:bN7+WscdYTynCxMV2m7Om1NM9ajMDTtQQ/H5fzPeB6U=
 github.com/jessevdk/go-flags v0.0.0-20141203071132-1679536dcc89/go.mod h1:4FA24M0QyGHXBuZZK/XkWh8h0e1EYbRYJSGM75WSRxI=
 github.com/jmespath/go-jmespath v0.0.0-20180206201540-c2b33e8439af/go.mod h1:Nht3zPeWKUH0NzdCt2Blrr5ys8VGpn0CEB0cQHVjt7k=
 github.com/jmhodges/levigo v1.0.0 h1:q5EC36kV79HWeTBWsod3mG11EgStG3qArTKcvlksN1U=
