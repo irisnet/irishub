@@ -8,6 +8,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
+	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/spf13/cobra"
 
 	"github.com/irisnet/irishub/modules/random/types"
@@ -35,7 +36,7 @@ func GetCmdQueryRandom(clientCtx client.Context) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "rand",
 		Short:   "Query a random number by the request id",
-		Example: "iriscli query rand rand <request id>",
+		Example: fmt.Sprintf("%s query rand rand <request id>", version.AppName),
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.ReadQueryCommandFlags(clientCtx, cmd.Flags())

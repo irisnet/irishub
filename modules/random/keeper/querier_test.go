@@ -3,11 +3,10 @@ package keeper_test
 import (
 	"encoding/hex"
 	"fmt"
-	"math/big"
 	"testing"
 
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/suite"
-
 	abci "github.com/tendermint/tendermint/abci/types"
 
 	"github.com/irisnet/irishub/modules/random/keeper"
@@ -29,7 +28,7 @@ func (suite *KeeperTestSuite) TestNewQuerier() {
 	suite.Nil(res)
 
 	// init rand
-	rand := types.NewRandom(types.SHA256(testTxBytes), testHeight, big.NewRat(testRandomNumerator, testRandomDenomiator).FloatString(types.RandomPrec))
+	rand := types.NewRandom(types.SHA256(testTxBytes), testHeight, sdk.NewDecWithPrec(testRandomNumerator, testRandomDenomiator).String())
 	suite.keeper.SetRandom(suite.ctx, testReqID, rand)
 
 	storedRandom, err := suite.keeper.GetRandom(suite.ctx, testReqID)
@@ -52,8 +51,7 @@ func (suite *KeeperTestSuite) TestNewQuerier() {
 	suite.Equal(storedRandom, resultRandom)
 
 	// test queryRandomRequestQueue
-
-	request, err := suite.keeper.RequestRandom(suite.ctx, testConsumer, testBlockInterval)
+	request, err := suite.keeper.RequestRandom(suite.ctx, testConsumer, testBlockInterval, false, sdk.NewCoins())
 
 	bz, errRes = suite.cdc.MarshalJSON(types.QueryRandomRequestQueueParams{Height: int64(testBlockInterval)})
 	suite.NoError(errRes)

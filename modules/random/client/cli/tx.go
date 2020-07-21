@@ -1,12 +1,15 @@
 package cli
 
 import (
-	"strconv"
+	"fmt"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 
 	"github.com/irisnet/irishub/modules/random/types"
 )
@@ -31,7 +34,7 @@ func GetCmdRequestRandom(clientCtx client.Context) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "request-rand",
 		Short:   "Request a random number with an optional block interval",
-		Example: "iriscli tx rand request-rand [block-interval]",
+		Example: fmt.Sprintf("%s tx rand request-rand [--block-interval=10] [--oracle=true --service-fee-cap=1iris]", version.AppName),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 			clientCtx, err := client.ReadTxCommandFlags(clientCtx, cmd.Flags())
@@ -39,18 +42,19 @@ func GetCmdRequestRandom(clientCtx client.Context) *cobra.Command {
 				return err
 			}
 
-			var blockInterval uint64
+			consumer := clientCtx.GetFromAddress()
 
-			if len(args) > 0 {
-				blockInterval, err = strconv.ParseUint(args[0], 10, 64)
-				if err != nil {
+			oracle := viper.GetBool(FlagOracle)
+
+			var serviceFeeCap sdk.Coins
+			if oracle {
+				if serviceFeeCap, err = sdk.ParseCoins(viper.GetString(FlagServiceFeeCap)); err != nil {
 					return err
 				}
 			}
 
-			consumer := clientCtx.GetFromAddress()
+			msg := types.NewMsgRequestRandom(consumer, uint64(viper.GetInt64(FlagBlockInterval)), oracle, serviceFeeCap)
 
-			msg := types.NewMsgRequestRandom(consumer, blockInterval)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}

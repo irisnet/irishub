@@ -27,7 +27,7 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 
 // handleMsgRequestRandom handles MsgRequestRandom
 func handleMsgRequestRandom(ctx sdk.Context, k keeper.Keeper, msg *types.MsgRequestRandom) (*sdk.Result, error) {
-	request, err := k.RequestRandom(ctx, msg.Consumer, msg.BlockInterval)
+	request, err := k.RequestRandom(ctx, msg.Consumer, msg.BlockInterval, msg.Oracle, msg.ServiceFeeCap)
 	if err != nil {
 		return nil, err
 	}

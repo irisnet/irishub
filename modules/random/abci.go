@@ -13,39 +13,62 @@ import (
 // BeginBlocker handles block beginning logic for rand
 func BeginBlocker(ctx sdk.Context, k keeper.Keeper) {
 	currentTimestamp := ctx.BlockHeader().Time.Unix()
-	preBlockHeight := ctx.BlockHeight() - 1
-	preBlockHash := ctx.BlockHeader().LastBlockId.Hash
+	lastBlockHeight := ctx.BlockHeight() - 1
+	lastBlockHash := []byte(ctx.BlockHeader().LastBlockId.Hash)
 
 	// get pending random number requests for lastBlockHeight
-	iterator := k.IterateRandomRequestQueueByHeight(ctx, preBlockHeight)
-	defer iterator.Close()
+	rqIterator := k.IterateRandomRequestQueueByHeight(ctx, lastBlockHeight)
+	defer rqIterator.Close()
 
-	handledRandomReqNum := 0
-	for ; iterator.Valid(); iterator.Next() {
+	handledNormalRandReqNum := 0
+	requestedOracleRandNum := 0
+
+	for ; rqIterator.Valid(); rqIterator.Next() {
 		var request types.Request
-		k.GetCdc().MustUnmarshalBinaryBare(iterator.Value(), &request)
+		k.GetCdc().MustUnmarshalBinaryBare(rqIterator.Value(), &request)
 
-		// get the request id
-		reqID := types.GenerateRequestID(request)
+		if request.Oracle {
+			// get the request id
+			reqID := types.GenerateRequestID(request)
 
-		// generate a random number
-		rand := types.MakePRNG(preBlockHash, currentTimestamp, request.Consumer).GetRandom()
-		k.SetRandom(ctx, reqID, types.NewRandom(request.TxHash, preBlockHeight, rand.FloatString(types.RandomPrec)))
+			if err := k.StartRequestContext(ctx, request.ServiceContextID, request.Consumer); err == nil {
+				k.SetOracleRandRequest(ctx, request.ServiceContextID, request)
+				requestedOracleRandNum++
 
-		// remove the request
-		k.DequeueRandomRequest(ctx, preBlockHeight, reqID)
+				ctx.EventManager().EmitEvent(
+					sdk.NewEvent(
+						types.EventTypeGenerateRandom,
+						sdk.NewAttribute(types.AttributeKeyRequestID, hex.EncodeToString(reqID)),
+						sdk.NewAttribute(types.AttributeKeyRequestContextID, request.ServiceContextID.String()),
+					),
+				)
+			} else {
+				ctx.Logger().Info(fmt.Sprintf("start service error : %s", err.Error()))
+			}
 
-		ctx.EventManager().EmitEvent(
-			sdk.NewEvent(
-				types.EventTypeGenerateRandom,
-				sdk.NewAttribute(types.AttributeKeyRequestID, hex.EncodeToString(reqID)),
-				sdk.NewAttribute(types.AttributeKeyRandom, rand.FloatString(types.RandomPrec)),
-			),
-		)
+			k.DequeueRandomRequest(ctx, lastBlockHeight, reqID)
+		} else {
+			// get the request id
+			reqID := types.GenerateRequestID(request)
 
-		handledRandomReqNum++
+			// generate a random number
+			rand := types.MakePRNG(lastBlockHash, currentTimestamp, request.Consumer, nil, false).GetRand()
+			k.SetRandom(ctx, reqID, types.NewRandom(request.TxHash, lastBlockHeight, rand.String()))
+
+			// remove the request
+			k.DequeueRandomRequest(ctx, lastBlockHeight, reqID)
+
+			ctx.EventManager().EmitEvent(
+				sdk.NewEvent(
+					types.EventTypeGenerateRandom,
+					sdk.NewAttribute(types.AttributeKeyRequestID, hex.EncodeToString(reqID)),
+					sdk.NewAttribute(types.AttributeKeyRandom, rand.String()),
+				),
+			)
+			handledNormalRandReqNum++
+		}
 	}
 
-	k.Logger(ctx).Info(fmt.Sprintf("%d rand requests are handled", handledRandomReqNum))
+	k.Logger(ctx).Info(fmt.Sprintf("%d rand requests are handled", handledNormalRandReqNum))
 	return
 }

@@ -6,6 +6,8 @@ import (
 
 // rand module sentinel errors
 var (
-	ErrInvalidReqID  = sdkerrors.Register(ModuleName, 2, "invalid request id")
-	ErrInvalidHeight = sdkerrors.Register(ModuleName, 3, "invalid height, must be greater than 0")
+	ErrInvalidReqID            = sdkerrors.Register(ModuleName, 2, "invalid request id")
+	ErrInvalidHeight           = sdkerrors.Register(ModuleName, 3, "invalid height, must be greater than 0")
+	ErrInvalidServiceBindings  = sdkerrors.Register(ModuleName, 4, "no service bindings available")
+	ErrInvalidRequestContextID = sdkerrors.Register(ModuleName, 5, "invalid request context id")
 )

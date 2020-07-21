@@ -14,10 +14,17 @@ const (
 var _ sdk.Msg = &MsgRequestRandom{}
 
 // NewMsgRequestRandom constructs a MsgRequestRandom
-func NewMsgRequestRandom(consumer sdk.AccAddress, blockInterval uint64) *MsgRequestRandom {
+func NewMsgRequestRandom(
+	consumer sdk.AccAddress,
+	blockInterval uint64,
+	oracle bool,
+	serviceFeeCap sdk.Coins,
+) *MsgRequestRandom {
 	return &MsgRequestRandom{
 		Consumer:      consumer,
 		BlockInterval: blockInterval,
+		Oracle:        oracle,
+		ServiceFeeCap: serviceFeeCap,
 	}
 }
 

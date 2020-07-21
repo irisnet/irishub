@@ -355,7 +355,7 @@ func NewSimApp(
 
 	app.OracleKeeper = oracleKeeper.NewKeeper(appCodec, keys[oracletypes.StoreKey], app.GetSubspace(oracletypes.ModuleName), app.GuardianKeeper, app.ServiceKeeper)
 
-	app.RandomKeeper = randomkeeper.NewKeeper(appCodec, keys[randomtypes.StoreKey])
+	app.RandomKeeper = randomkeeper.NewKeeper(appCodec, keys[randomtypes.StoreKey], app.BankKeeper, app.ServiceKeeper)
 
 	// NOTE: Any module instantiated in the module manager that is later modified
 	// must be passed by reference here.

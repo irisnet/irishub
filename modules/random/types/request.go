@@ -6,14 +6,25 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	tmbytes "github.com/tendermint/tendermint/libs/bytes"
 )
 
 // NewRequest constructs a request
-func NewRequest(height int64, consumer sdk.AccAddress, txHash []byte) Request {
+func NewRequest(
+	height int64,
+	consumer sdk.AccAddress,
+	txHash tmbytes.HexBytes,
+	oracle bool,
+	serviceFeeCap sdk.Coins,
+	serviceContextID tmbytes.HexBytes,
+) Request {
 	return Request{
-		Height:   height,
-		Consumer: consumer,
-		TxHash:   txHash,
+		Height:           height,
+		Consumer:         consumer,
+		TxHash:           txHash,
+		Oracle:           oracle,
+		ServiceFeeCap:    serviceFeeCap,
+		ServiceContextID: serviceContextID,
 	}
 }
 

@@ -31,7 +31,7 @@ func requestRandomHandlerFn(cliCtx client.Context) http.HandlerFunc {
 		}
 
 		// create the MsgRequestRandom message
-		msg := types.NewMsgRequestRandom(req.Consumer, req.BlockInterval)
+		msg := types.NewMsgRequestRandom(req.Consumer, req.BlockInterval, req.Oracle, req.ServiceFeeCap)
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return

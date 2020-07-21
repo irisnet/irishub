@@ -1,7 +1,7 @@
 package types
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	"fmt"
 )
 
 const (
@@ -19,9 +19,10 @@ const (
 )
 
 var (
-	KeyDelimiter             = []byte(":")                 // key delimiter
-	PrefixRandom             = []byte("rands:")            // key prefix for the random number
-	PrefixRandomRequestQueue = []byte("randRequestQueue:") // key prefix for the random number request queue
+	KeyDelimiter              = []byte(":")                   // key delimiter
+	PrefixRandom              = []byte("rands:")              // key prefix for the random number
+	PrefixRandomRequestQueue  = []byte("randRequestQueue:")   // key prefix for the random number request queue
+	PrefixOracleRandomRequest = []byte("oracleRandRequests:") // key prefix for the oracle request
 )
 
 // KeyRandom returns the key for a random number by the specified request id
@@ -31,11 +32,15 @@ func KeyRandom(reqID []byte) []byte {
 
 // KeyRandomRequestQueue returns the key for the random number request queue by the given height and request id
 func KeyRandomRequestQueue(height int64, reqID []byte) []byte {
-	prefix := append(PrefixRandomRequestQueue, sdk.Uint64ToBigEndian(uint64(height))...)
-	return append(append(prefix, KeyDelimiter...), reqID...)
+	return append([]byte(fmt.Sprintf("randRequestQueue:%d:", height)), reqID...)
 }
 
-// KeyRandomRequestQueueSubspace returns the key prefix for iterating through all requests at the specified height
+// KeyRandRequestQueueSubspace returns the key prefix for iterating through all requests at the specified height
 func KeyRandomRequestQueueSubspace(height int64) []byte {
-	return append(append(PrefixRandomRequestQueue, sdk.Uint64ToBigEndian(uint64(height))...), KeyDelimiter...)
+	return []byte(fmt.Sprintf("randRequestQueue:%d:", height))
+}
+
+// KeyOracleRandRequest returns the key for an OracleRandRequest by the specified requestContextID
+func KeyOracleRandomRequest(requestContextID []byte) []byte {
+	return append(PrefixOracleRandomRequest, requestContextID...)
 }

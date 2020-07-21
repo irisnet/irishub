@@ -30,7 +30,7 @@ func WeightedOperations(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKe
 
 				spendable := bk.SpendableCoins(ctx, account.GetAddress())
 
-				msg := types.NewMsgRequestRandom(simAccount.Address, uint64(blockInterval))
+				msg := types.NewMsgRequestRandom(simAccount.Address, uint64(blockInterval), false, nil)
 
 				fees, err := simtypes.RandomFees(r, ctx, spendable)
 				if err != nil {

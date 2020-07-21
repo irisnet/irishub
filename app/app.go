@@ -354,7 +354,7 @@ func NewIrisApp(
 
 	app.oracleKeeper = oracleKeeper.NewKeeper(appCodec, keys[oracletypes.StoreKey], app.GetSubspace(oracletypes.ModuleName), app.guardianKeeper, app.serviceKeeper)
 
-	app.randomKeeper = randomkeeper.NewKeeper(appCodec, keys[randomtypes.StoreKey])
+	app.randomKeeper = randomkeeper.NewKeeper(appCodec, keys[randomtypes.StoreKey], app.bankKeeper, app.serviceKeeper)
 	// NOTE: Any module instantiated in the module manager that is later modified
 	// must be passed by reference here.
 	app.mm = module.NewManager(

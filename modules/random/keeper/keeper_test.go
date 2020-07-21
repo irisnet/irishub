@@ -2,7 +2,6 @@ package keeper_test
 
 import (
 	"encoding/json"
-	"math/big"
 	"testing"
 
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -50,7 +49,7 @@ func TestKeeperTestSuite(t *testing.T) {
 }
 
 func (suite *KeeperTestSuite) TestSetRandom() {
-	rand := types.NewRandom(types.SHA256(testTxBytes), testHeight, big.NewRat(testRandomNumerator, testRandomDenomiator).FloatString(types.RandomPrec))
+	rand := types.NewRandom(types.SHA256(testTxBytes), testHeight, sdk.NewDecWithPrec(testRandomNumerator, testRandomDenomiator).String())
 	suite.keeper.SetRandom(suite.ctx, testReqID, rand)
 
 	storedRandom, err := suite.keeper.GetRandom(suite.ctx, testReqID)
@@ -63,10 +62,10 @@ func (suite *KeeperTestSuite) TestSetRandom() {
 func (suite *KeeperTestSuite) TestRequestRandom() {
 	suite.ctx = suite.ctx.WithBlockHeight(testHeight).WithTxBytes(testTxBytes)
 
-	request, err := suite.keeper.RequestRandom(suite.ctx, testConsumer, testBlockInterval)
+	request, err := suite.keeper.RequestRandom(suite.ctx, testConsumer, testBlockInterval, false, nil)
 	suite.NoError(err)
 
-	expectedRequest := types.NewRequest(testHeight, testConsumer, types.SHA256(testTxBytes))
+	expectedRequest := types.NewRequest(testHeight, testConsumer, types.SHA256(testTxBytes), false, nil, nil)
 	suite.Equal(request, expectedRequest)
 
 	iterator := suite.keeper.IterateRandomRequestQueueByHeight(suite.ctx, testHeight+int64(testBlockInterval))

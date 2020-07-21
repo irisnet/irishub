@@ -4,6 +4,8 @@ import (
 	gocontext "context"
 	"encoding/hex"
 
+	sdk "github.com/cosmos/cosmos-sdk/types"
+
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
@@ -35,7 +37,7 @@ func (suite *KeeperTestSuite) TestGRPCRandomRequestQueue() {
 	_, _, addr := authtypes.KeyTestPubAddr()
 	reqID := []byte("test_req_id")
 	txHash := []byte("test_hash")
-	request := types.NewRequest(1, addr, txHash)
+	request := types.NewRequest(1, addr, txHash, false, sdk.NewCoins(), nil)
 
 	queryHelper := baseapp.NewQueryServerTestHelper(ctx, app.InterfaceRegistry())
 	types.RegisterQueryServer(queryHelper, app.RandomKeeper)

@@ -50,9 +50,9 @@ func (suite *GenesisTestSuite) TestExportGenesis() {
 	suite.ctx = suite.ctx.WithBlockHeight(testHeight).WithTxBytes(testTxBytes)
 
 	// request rands
-	_, err := suite.keeper.RequestRandom(suite.ctx, testConsumer1, testBlockInterval1)
+	_, err := suite.keeper.RequestRandom(suite.ctx, testConsumer1, testBlockInterval1, false, sdk.NewCoins())
 	suite.NoError(err)
-	_, err = suite.keeper.RequestRandom(suite.ctx, testConsumer2, testBlockInterval2)
+	_, err = suite.keeper.RequestRandom(suite.ctx, testConsumer2, testBlockInterval2, false, sdk.NewCoins())
 	suite.NoError(err)
 
 	// precede to the new block
