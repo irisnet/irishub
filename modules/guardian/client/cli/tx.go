@@ -62,7 +62,7 @@ func GetCmdCreateProfiler() *cobra.Command {
 				return err
 			}
 
-			return tx.GenerateOrBroadcastTx(clientCtx, msg)
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
 	cmd.Flags().AddFlagSet(FsAddGuardian)
@@ -97,7 +97,7 @@ func GetCmdDeleteProfiler() *cobra.Command {
 				return err
 			}
 
-			return tx.GenerateOrBroadcastTx(clientCtx, msg)
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
 	cmd.Flags().AddFlagSet(FsDeleteGuardian)
@@ -135,7 +135,7 @@ func GetCmdCreateTrustee() *cobra.Command {
 				return err
 			}
 
-			return tx.GenerateOrBroadcastTx(clientCtx, msg)
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
 	cmd.Flags().AddFlagSet(FsAddGuardian)
@@ -169,7 +169,7 @@ func GetCmdDeleteTrustee() *cobra.Command {
 				return err
 			}
 
-			return tx.GenerateOrBroadcastTx(clientCtx, msg)
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
 	cmd.Flags().AddFlagSet(FsDeleteGuardian)

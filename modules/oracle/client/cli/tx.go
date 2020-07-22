@@ -91,7 +91,7 @@ func GetCmdCreateFeed() *cobra.Command {
 				return err
 			}
 
-			return tx.GenerateOrBroadcastTx(clientCtx, msg)
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
 	cmd.Flags().AddFlagSet(FsCreateFeed)
@@ -130,7 +130,7 @@ func GetCmdStartFeed() *cobra.Command {
 				return err
 			}
 
-			return tx.GenerateOrBroadcastTx(clientCtx, msg)
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
 	cmd.Flags().AddFlagSet(FsStartFeed)
@@ -161,7 +161,7 @@ func GetCmdPauseFeed() *cobra.Command {
 				return err
 			}
 
-			return tx.GenerateOrBroadcastTx(clientCtx, msg)
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
 	cmd.Flags().AddFlagSet(FsStartFeed)
@@ -220,7 +220,7 @@ func GetCmdEditFeed() *cobra.Command {
 				return err
 			}
 
-			return tx.GenerateOrBroadcastTx(clientCtx, msg)
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
 	cmd.Flags().AddFlagSet(FsEditFeed)

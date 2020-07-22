@@ -15,7 +15,7 @@ import (
 )
 
 // GetTxCmd returns the transaction commands for the rand module.
-func GetTxCmd(clientCtx client.Context) *cobra.Command {
+func GetTxCmd() *cobra.Command {
 	randTxCmd := &cobra.Command{
 		Use:                        types.ModuleName,
 		Short:                      "Random transaction subcommands",
@@ -24,13 +24,13 @@ func GetTxCmd(clientCtx client.Context) *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 	randTxCmd.AddCommand(
-		GetCmdRequestRandom(clientCtx),
+		GetCmdRequestRandom(),
 	)
 	return randTxCmd
 }
 
 // GetCmdRequestRandom implements the request-rand command.
-func GetCmdRequestRandom(clientCtx client.Context) *cobra.Command {
+func GetCmdRequestRandom() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "request-rand",
 		Short:   "Request a random number with an optional block interval",
@@ -59,7 +59,7 @@ func GetCmdRequestRandom(clientCtx client.Context) *cobra.Command {
 				return err
 			}
 
-			return tx.GenerateOrBroadcastTx(clientCtx, msg)
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
 	cmd.Flags().AddFlagSet(FsRequestRand)

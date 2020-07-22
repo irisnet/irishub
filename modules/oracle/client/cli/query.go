@@ -2,9 +2,11 @@ package cli
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
+	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
@@ -12,7 +14,7 @@ import (
 )
 
 // GetQueryCmd returns the cli query commands for the guardian module.
-func GetQueryCmd(clientCtx client.Context) *cobra.Command {
+func GetQueryCmd() *cobra.Command {
 	txCmd := &cobra.Command{
 		Use:                        types.ModuleName,
 		Short:                      "Querying commands for the oracle module",
@@ -21,21 +23,22 @@ func GetQueryCmd(clientCtx client.Context) *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 	txCmd.AddCommand(
-		GetCmdQueryFeed(clientCtx),
-		GetCmdQueryFeeds(clientCtx),
-		GetCmdQueryFeedValue(clientCtx),
+		GetCmdQueryFeed(),
+		GetCmdQueryFeeds(),
+		GetCmdQueryFeedValue(),
 	)
 	return txCmd
 }
 
 // GetCmdQueryFeed implements the query feed Content definition command
-func GetCmdQueryFeed(clientCtx client.Context) *cobra.Command {
+func GetCmdQueryFeed() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "query-feed [feed-name]",
 		Short:   "Query the feed definition",
-		Example: "iriscli oracle query-feed <feed-name>",
+		Example: fmt.Sprintf("%s oracle query-feed <feed-name>", version.AppName),
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx := client.GetClientContextFromCmd(cmd)
 			clientCtx, err := client.ReadQueryCommandFlags(clientCtx, cmd.Flags())
 			if err != nil {
 				return err
@@ -57,12 +60,13 @@ func GetCmdQueryFeed(clientCtx client.Context) *cobra.Command {
 }
 
 // GetCmdQueryFeed implements the query feed Content definition command
-func GetCmdQueryFeeds(clientCtx client.Context) *cobra.Command {
+func GetCmdQueryFeeds() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "query-feeds",
 		Short:   "Query a group of feed definition",
-		Example: "iriscli oracle query-feeds",
+		Example: fmt.Sprintf("%s oracle query-feeds", version.AppName),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx := client.GetClientContextFromCmd(cmd)
 			clientCtx, err := client.ReadQueryCommandFlags(clientCtx, cmd.Flags())
 			if err != nil {
 				return err
@@ -84,13 +88,14 @@ func GetCmdQueryFeeds(clientCtx client.Context) *cobra.Command {
 }
 
 // GetCmdQueryFeedValue implements the query feed value command
-func GetCmdQueryFeedValue(clientCtx client.Context) *cobra.Command {
+func GetCmdQueryFeedValue() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "query-value [feed-name]",
 		Short:   "Query the feed result",
-		Example: "iriscli oracle query-value <feed-name>",
+		Example: fmt.Sprintf("%s oracle query-value <feed-name>", version.AppName),
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx := client.GetClientContextFromCmd(cmd)
 			clientCtx, err := client.ReadQueryCommandFlags(clientCtx, cmd.Flags())
 			if err != nil {
 				return err

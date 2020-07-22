@@ -121,7 +121,7 @@ func queryCommand() *cobra.Command {
 		authcmd.QueryTxCmd(),
 	)
 
-	app.ModuleBasics.AddQueryCommands(cmd, initClientCtx)
+	app.ModuleBasics.AddQueryCommands(cmd)
 	cmd.PersistentFlags().String(flags.FlagChainID, "", "The network chain ID")
 
 	return cmd
@@ -148,7 +148,7 @@ func txCommand() *cobra.Command {
 		flags.LineBreak,
 	)
 
-	app.ModuleBasics.AddTxCommands(cmd, initClientCtx)
+	app.ModuleBasics.AddTxCommands(cmd)
 	cmd.PersistentFlags().String(flags.FlagChainID, "", "The network chain ID")
 
 	return cmd

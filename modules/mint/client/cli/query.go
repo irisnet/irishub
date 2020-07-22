@@ -11,7 +11,7 @@ import (
 )
 
 // GetQueryCmd returns the cli query commands for the mint module.
-func GetQueryCmd(clientCtx client.Context) *cobra.Command {
+func GetQueryCmd() *cobra.Command {
 	mintingQueryCmd := &cobra.Command{
 		Use:                        types.ModuleName,
 		Short:                      "Querying commands for the minting module",
@@ -20,18 +20,19 @@ func GetQueryCmd(clientCtx client.Context) *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 	mintingQueryCmd.AddCommand(
-		GetCmdQueryParams(clientCtx),
+		GetCmdQueryParams(),
 	)
 	return mintingQueryCmd
 }
 
 // GetCmdQueryParams implements a command to return the current minting parameters.
-func GetCmdQueryParams(clientCtx client.Context) *cobra.Command {
+func GetCmdQueryParams() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "params",
 		Short: "Query the current minting parameters",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx := client.GetClientContextFromCmd(cmd)
 			clientCtx, err := client.ReadQueryCommandFlags(clientCtx, cmd.Flags())
 			if err != nil {
 				return err
