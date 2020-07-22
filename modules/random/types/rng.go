@@ -12,7 +12,7 @@ const SeedBytesLength = 32 //
 
 // RNG is a random number generator
 type RNG interface {
-	GetRand() sdk.Dec // interface which returns a random number between (0,1)
+	GetRand() big.Rat // interface which returns a random number between [0,1)
 }
 
 // PRNG represents a pseudo-random number implementation based on block for RNG
@@ -36,7 +36,7 @@ func MakePRNG(blockHash []byte, blockTimestampt int64, txInitiator sdk.AccAddres
 }
 
 // GetRand implements RNG
-func (p PRNG) GetRand() sdk.Dec {
+func (p PRNG) GetRand() *big.Rat {
 	seedBT := big.NewInt(p.BlockTimestamp)
 	seedBH := new(big.Int).Div(new(big.Int).SetBytes(SHA256(p.BlockHash)), seedBT)
 	seedTI := new(big.Int).Div(new(big.Int).SetBytes(SHA256(p.TxInitiator)), seedBT)
@@ -54,7 +54,7 @@ func (p PRNG) GetRand() sdk.Dec {
 	precision := new(big.Int).Exp(big.NewInt(10), big.NewInt(RandPrec), nil)
 
 	// Generate a random number between [0,1) with `RandPrec` precision from seed
-	rand := sdk.NewDecFromBigInt(new(big.Int).Div(new(big.Int).Mod(seed, precision), precision))
+	rand := new(big.Rat).SetFrac(new(big.Int).Mod(seed, precision), precision)
 
 	return rand
 }

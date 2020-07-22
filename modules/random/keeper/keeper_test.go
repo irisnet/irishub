@@ -2,6 +2,7 @@ package keeper_test
 
 import (
 	"encoding/json"
+	"math/big"
 	"testing"
 
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -49,7 +50,7 @@ func TestKeeperTestSuite(t *testing.T) {
 }
 
 func (suite *KeeperTestSuite) TestSetRandom() {
-	rand := types.NewRandom(types.SHA256(testTxBytes), testHeight, sdk.NewDecWithPrec(testRandomNumerator, testRandomDenomiator).String())
+	rand := types.NewRandom(types.SHA256(testTxBytes), testHeight, big.NewRat(testRandomNumerator, testRandomDenomiator).FloatString(types.RandPrec))
 	suite.keeper.SetRandom(suite.ctx, testReqID, rand)
 
 	storedRandom, err := suite.keeper.GetRandom(suite.ctx, testReqID)

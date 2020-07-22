@@ -150,7 +150,7 @@ func (k Keeper) HandlerResponse(ctx sdk.Context, requestContextID tmbytes.HexByt
 
 	// generate a random number
 	rand := types.MakePRNG(lastBlockHash, currentTimestamp, request.Consumer, seed, true).GetRand()
-	k.SetRandom(ctx, reqID, types.NewRandom(request.TxHash, lastBlockHeight, rand.String()))
+	k.SetRandom(ctx, reqID, types.NewRandom(request.TxHash, lastBlockHeight, rand.FloatString(types.RandPrec)))
 
 	k.DeleteOracleRandRequest(ctx, requestContextID)
 }

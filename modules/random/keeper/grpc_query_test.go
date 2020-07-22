@@ -4,10 +4,9 @@ import (
 	gocontext "context"
 	"encoding/hex"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
-
 	"github.com/cosmos/cosmos-sdk/baseapp"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	"github.com/cosmos/cosmos-sdk/testutil/testdata"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/irisnet/irishub/modules/random/types"
 )
@@ -34,7 +33,7 @@ func (suite *KeeperTestSuite) TestGRPCQueryRandom() {
 
 func (suite *KeeperTestSuite) TestGRPCRandomRequestQueue() {
 	app, ctx := suite.app, suite.ctx
-	_, _, addr := authtypes.KeyTestPubAddr()
+	_, _, addr := testdata.KeyTestPubAddr()
 	reqID := []byte("test_req_id")
 	txHash := []byte("test_hash")
 	request := types.NewRequest(1, addr, txHash, false, sdk.NewCoins(), nil)

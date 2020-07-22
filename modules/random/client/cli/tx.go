@@ -62,6 +62,7 @@ func GetCmdRequestRandom(clientCtx client.Context) *cobra.Command {
 			return tx.GenerateOrBroadcastTx(clientCtx, msg)
 		},
 	}
+	cmd.Flags().AddFlagSet(FsRequestRand)
 	flags.AddTxFlagsToCmd(cmd)
 	return cmd
 }
