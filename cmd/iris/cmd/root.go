@@ -47,11 +47,12 @@ var (
 	encodingConfig = app.MakeEncodingConfig()
 	initClientCtx  = client.Context{}.
 			WithJSONMarshaler(encodingConfig.Marshaler).
-			WithTxGenerator(encodingConfig.TxGenerator).
+			WithTxConfig(encodingConfig.TxConfig).
 			WithCodec(encodingConfig.Amino).
 			WithInput(os.Stdin).
 			WithAccountRetriever(types.NewAccountRetriever(encodingConfig.Marshaler)).
-			WithBroadcastMode(flags.BroadcastBlock)
+			WithBroadcastMode(flags.BroadcastBlock).
+			WithHomeDir(app.DefaultNodeHome)
 )
 
 // Execute executes the root command.
@@ -81,11 +82,11 @@ func init() {
 
 	rootCmd.AddCommand(
 		genutilcli.InitCmd(app.ModuleBasics, app.DefaultNodeHome),
-		genutilcli.CollectGenTxsCmd(banktypes.GenesisBalancesIterator{}),
+		genutilcli.CollectGenTxsCmd(banktypes.GenesisBalancesIterator{}, app.DefaultNodeHome),
 		genutilcli.MigrateGenesisCmd(),
-		genutilcli.GenTxCmd(app.ModuleBasics, banktypes.GenesisBalancesIterator{}),
+		genutilcli.GenTxCmd(app.ModuleBasics, banktypes.GenesisBalancesIterator{}, app.DefaultNodeHome),
 		genutilcli.ValidateGenesisCmd(app.ModuleBasics),
-		AddGenesisAccountCmd(),
+		AddGenesisAccountCmd(app.DefaultNodeHome),
 		cli.NewCompletionCmd(rootCmd, true),
 		testnetCmd(app.ModuleBasics, banktypes.GenesisBalancesIterator{}),
 		debug.Cmd(),
@@ -98,7 +99,7 @@ func init() {
 		rpc.StatusCommand(),
 		queryCommand(),
 		txCommand(),
-		keys.Commands(),
+		keys.Commands(app.DefaultNodeHome),
 	)
 }
 
@@ -113,11 +114,11 @@ func queryCommand() *cobra.Command {
 	}
 
 	cmd.AddCommand(
-		authcmd.GetAccountCmd(encodingConfig.Amino),
-		rpc.ValidatorCommand(encodingConfig.Amino),
+		authcmd.GetAccountCmd(),
+		rpc.ValidatorCommand(),
 		rpc.BlockCommand(),
-		authcmd.QueryTxsByEventsCmd(encodingConfig.Amino),
-		authcmd.QueryTxCmd(encodingConfig.Amino),
+		authcmd.QueryTxsByEventsCmd(),
+		authcmd.QueryTxCmd(),
 	)
 
 	app.ModuleBasics.AddQueryCommands(cmd, initClientCtx)

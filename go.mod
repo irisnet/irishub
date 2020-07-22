@@ -3,15 +3,15 @@ module github.com/irisnet/irishub
 go 1.14
 
 require (
-	github.com/cosmos/cosmos-sdk v0.34.4-0.20200716143106-10783f27d0cf
+	github.com/cosmos/cosmos-sdk v0.28.2-0.20200720202246-efa73c7edb31
 	github.com/gogo/protobuf v1.3.1
 	github.com/golang/protobuf v1.4.2
 	github.com/gorilla/mux v1.7.4
-	github.com/irismod/coinswap v0.0.0-20200717084559-d162bdf94677
-	github.com/irismod/htlc v0.0.0-20200717084245-6c78f425eb6b
-	github.com/irismod/nft v1.1.1-0.20200717090223-19ae27993d05
-	github.com/irismod/service v1.1.1-0.20200717083211-da28297d9e73
-	github.com/irismod/token v1.1.1-0.20200717083658-a6d44d130830
+	github.com/irismod/coinswap v0.0.0-20200721093053-e585e581e525
+	github.com/irismod/htlc v0.0.0-20200721092811-be4336cf4342
+	github.com/irismod/nft v1.1.1-0.20200721091935-62d83eb529b8
+	github.com/irismod/service v1.1.1-0.20200721090656-293a004c3e4a
+	github.com/irismod/token v1.1.1-0.20200721084222-d8e73c09418b
 	github.com/onsi/ginkgo v1.8.0 // indirect
 	github.com/onsi/gomega v1.5.0 // indirect
 	github.com/otiai10/copy v1.2.0
@@ -32,6 +32,6 @@ require (
 )
 
 replace (
-	github.com/cosmos/cosmos-sdk => github.com/irisnet/cosmos-sdk v0.19.1-0.20200720031859-08f888c08df5
+	github.com/cosmos/cosmos-sdk => /Users/bianjie/github.com/cosmos/cosmos-sdk
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.2-alpha.regen.4
 )

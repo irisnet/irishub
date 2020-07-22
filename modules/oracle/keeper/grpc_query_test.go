@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	"github.com/cosmos/cosmos-sdk/testutil/testdata"
 
 	"github.com/irisnet/irishub/modules/oracle/keeper"
 	"github.com/irisnet/irishub/modules/oracle/types"
@@ -13,7 +13,7 @@ import (
 
 func (suite *KeeperTestSuite) TestGRPCQueryFeed() {
 	app, ctx := suite.app, suite.ctx
-	_, _, addr := authtypes.KeyTestPubAddr()
+	_, _, addr := testdata.KeyTestPubAddr()
 
 	queryHelper := baseapp.NewQueryServerTestHelper(ctx, app.InterfaceRegistry())
 	types.RegisterQueryServer(queryHelper, app.OracleKeeper)
