@@ -1,0 +1,27 @@
+syntax = "proto3";
+package irishub.mint;
+
+import "cosmos/query/pagination.proto";
+import "mint/mint.proto";
+import "gogoproto/gogo.proto";
+import "cosmos_proto/cosmos.proto";
+
+option go_package = "github.com/irisnet/irishub/modules/mint/types";
+
+// Query creates service with guardian as rpc
+service Query {
+    // Parameters queries the mint parameters
+    rpc Params (QueryParamsRequest) returns (QueryParamsResponse) {
+    }
+}
+
+// QueryParametersRequest is request type for the Query/Parameters RPC method
+message QueryParamsRequest {
+}
+
+// QueryParametersResponse is response type for the Query/Parameters RPC method
+message QueryParamsResponse {
+    Params params = 1 [(gogoproto.nullable) = false];
+
+    cosmos.query.PageResponse res = 2;
+}

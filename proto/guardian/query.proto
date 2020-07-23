@@ -1,0 +1,37 @@
+syntax = "proto3";
+package irishub.guardian;
+
+import "gogoproto/gogo.proto";
+import "guardian/guardian.proto";
+import "cosmos_proto/cosmos.proto";
+
+option go_package = "github.com/irisnet/irishub/modules/guardian/types";
+
+// Query creates service with guardian as rpc
+service Query {
+    // Profilers returns all profilers
+    rpc Profilers (QueryProfilersRequest) returns (QueryProfilersResponse) {
+    }
+
+    // Trustees returns all trustees
+    rpc Trustees (QueryTrusteesRequest) returns (QueryTrusteesResponse) {
+    }
+}
+
+// QueryProfilersRequest is request type for the Query/Profilers RPC method
+message QueryProfilersRequest {
+}
+
+// QueryProfilersResponse is response type for the Query/Profilers RPC method
+message QueryProfilersResponse {
+    repeated Guardian profilers = 1 [(gogoproto.nullable) = false];
+}
+
+// QueryTrusteesRequest is request type for the Query/Trustees RPC method
+message QueryTrusteesRequest {
+}
+
+// QueryTrusteesResponse is response type for the Query/Trustees RPC method
+message QueryTrusteesResponse {
+    repeated Guardian trustees = 1 [(gogoproto.nullable) = false];
+}

@@ -1,42 +1,37 @@
 module github.com/irisnet/irishub
 
+go 1.14
+
 require (
-	github.com/bartekn/go-bip39 v0.0.0-20171116152956-a05967ea095d
-	github.com/bgentry/speakeasy v0.1.0
-	github.com/btcsuite/btcd v0.0.0-20190115013929-ed77733ec07d
-	github.com/cosmos/go-bip39 v0.0.0-20180618194314-52158e4697b8
-	github.com/cosmos/ledger-cosmos-go v0.10.3
-	github.com/emicklei/proto v1.6.5
-	github.com/go-kit/kit v0.6.0
-	github.com/gogo/protobuf v1.1.1
-	github.com/gorilla/context v1.1.1 // indirect
-	github.com/gorilla/mux v1.6.2
-	github.com/mattn/go-isatty v0.0.4
-	github.com/mitchellh/go-homedir v1.0.0
-	github.com/pelletier/go-toml v1.2.0
-	github.com/pkg/errors v0.8.1
-	github.com/prometheus/client_golang v0.9.1
+	github.com/cosmos/cosmos-sdk v0.34.4-0.20200721190130-5d71020270ae
+	github.com/gogo/protobuf v1.3.1
+	github.com/golang/protobuf v1.4.2
+	github.com/gorilla/mux v1.7.4
+	github.com/irismod/coinswap v0.0.0-20200722055706-deeded9d99b8
+	github.com/irismod/htlc v0.0.0-20200722060015-b71f49c9b167
+	github.com/irismod/nft v1.1.1-0.20200722060344-38fec5db63a2
+	github.com/irismod/service v1.1.1-0.20200723031529-6abecb02ceb1
+	github.com/irismod/token v1.1.1-0.20200723031618-028bdd6fb30a
+	github.com/onsi/ginkgo v1.8.0 // indirect
+	github.com/onsi/gomega v1.5.0 // indirect
+	github.com/otiai10/copy v1.2.0
+	github.com/pkg/errors v0.9.1
 	github.com/rakyll/statik v0.1.7
-	github.com/spf13/cobra v0.0.1
-	github.com/spf13/pflag v1.0.3
-	github.com/spf13/viper v1.0.0
-	github.com/stretchr/testify v1.3.0
-	github.com/syndtr/goleveldb v1.0.1-0.20190318030020-c3a204f8e965
-	github.com/tendermint/btcd v0.1.1
-	github.com/tendermint/go-amino v0.14.1
-	github.com/tendermint/iavl v0.12.1
-	github.com/tendermint/tendermint v0.31.0
-	github.com/tendermint/tm-db v0.1.1
-	github.com/tendermint/tmlibs v0.9.0
-	github.com/tidwall/gjson v1.5.0
-	github.com/xeipuuv/gojsonschema v1.2.0
-	golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2
+	github.com/regen-network/cosmos-proto v0.3.0
+	github.com/snikch/goodman v0.0.0-20171125024755-10e37e294daa
+	github.com/spf13/cast v1.3.1
+	github.com/spf13/cobra v1.0.0
+	github.com/spf13/pflag v1.0.5
+	github.com/spf13/viper v1.7.0
+	github.com/stretchr/testify v1.6.1
+	github.com/tendermint/tendermint v0.33.6
+	github.com/tendermint/tm-db v0.5.1
+	github.com/tidwall/gjson v1.6.0
+	google.golang.org/grpc v1.30.0
+	gopkg.in/yaml.v2 v2.3.0
 )
 
 replace (
-	github.com/tendermint/iavl => github.com/irisnet/iavl v0.12.3
-	github.com/tendermint/tendermint => github.com/irisnet/tendermint v0.32.2-0.20200312080607-e72160dff3eb
-	golang.org/x/crypto => github.com/tendermint/crypto v0.0.0-20180820045704-3764759f34a5
+	github.com/cosmos/cosmos-sdk => github.com/irisnet/cosmos-sdk v0.19.1-0.20200722022502-e2d6c76ae750
+	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.2-alpha.regen.4
 )
-
-go 1.13
