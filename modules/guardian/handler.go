@@ -34,7 +34,7 @@ func handleMsgAddProfiler(ctx sdk.Context, k keeper.Keeper, msg *types.MsgAddPro
 		return nil, sdkerrors.Wrap(types.ErrUnknownOperator, msg.AddGuardian.AddedBy.String())
 	}
 	if _, found := k.GetProfiler(ctx, msg.AddGuardian.Address); found {
-		return nil, sdkerrors.Wrap(types.ErrUnknownProfiler, msg.AddGuardian.Address.String())
+		return nil, sdkerrors.Wrap(types.ErrProfilerExists, msg.AddGuardian.Address.String())
 	}
 	profiler := types.NewGuardian(msg.AddGuardian.Description, types.Ordinary, msg.AddGuardian.Address, msg.AddGuardian.AddedBy)
 	k.AddProfiler(ctx, profiler)
@@ -61,7 +61,7 @@ func handleMsgAddTrustee(ctx sdk.Context, k keeper.Keeper, msg *types.MsgAddTrus
 		return nil, sdkerrors.Wrap(types.ErrUnknownOperator, msg.AddGuardian.AddedBy.String())
 	}
 	if _, found := k.GetTrustee(ctx, msg.AddGuardian.Address); found {
-		return nil, sdkerrors.Wrap(types.ErrUnknownTrustee, msg.AddGuardian.Address.String())
+		return nil, sdkerrors.Wrap(types.ErrTrusteeExists, msg.AddGuardian.Address.String())
 	}
 	trustee := types.NewGuardian(msg.AddGuardian.Description, types.Ordinary, msg.AddGuardian.Address, msg.AddGuardian.AddedBy)
 	k.AddTrustee(ctx, trustee)
