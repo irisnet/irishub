@@ -15,7 +15,7 @@ IRIShub可以导出区块链状态并将其输出为json格式的字符串，该
 ## 用法
 
 ```bash
- iris export <flags>
+ iris export [flags]
 ```
 
 ## 标识

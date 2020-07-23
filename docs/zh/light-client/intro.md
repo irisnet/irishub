@@ -39,13 +39,13 @@ IRISLCD有两个子命令:
 默认情况下，IRISLCD不信任连接的完整节点。但是，如果确定所连接的完整节点是可信任的，则应使用`--trust-node`标识运行IRISLCD：
 
 ```bash
-irislcd start --node=tcp://localhost:26657 --chain-id=<chain-id> --trust-node
+irislcd start --node=tcp://localhost:26657 --chain-id=irishub --trust-node
 ```
 
 要公开访问你的IRIS LCD实例，您需要指定`--ladder`：
 
 ```bash
-irislcd start --node=tcp://localhost:26657 --chain-id=<chain-id> --laddr=tcp://0.0.0.0:1317 --trust-node
+irislcd start --node=tcp://localhost:26657 --chain-id=irishub --laddr=tcp://0.0.0.0:1317 --trust-node
 ```
 
 ## REST APIs
@@ -88,10 +88,11 @@ irislcd start --node=tcp://localhost:26657 --chain-id=<chain-id> --laddr=tcp://0
 ### Bank模块的APIs
 
 1. `GET /bank/coins/{coin-type}`: 查询coin的类型信息
-2. `GET /bank/token-stats/{id}`: 查询token统计信息
-3. `GET /bank/accounts/{address}`: 查询秘钥对象账户的信息
-4. `POST /bank/accounts/{address}/send`: 发起转账交易
-5. `POST /bank/accounts/{address}/burn`: 销毁token
+2. `GET /bank/token-stats`: 查询token统计信息
+3. `GET /bank/token-stats/{symbol}`: 查询指定token统计信息
+4. `GET /bank/accounts/{address}`: 查询链上账户信息
+5. `POST /bank/accounts/{address}/send`: 发起转账交易
+6. `POST /bank/accounts/{address}/burn`: 销毁token
 
 ### Stake模块的APIs
 
@@ -141,24 +142,21 @@ irislcd start --node=tcp://localhost:26657 --chain-id=<chain-id> --laddr=tcp://0
 
 ### Asset模块的APIs
 
-1. `GET /asset/gateways/{moniker}`: 查询指定名字所对应的网关信息
-2. `GET /asset/gateways`: 查询所有网关信息，提供一个可选的owner参数
-3. `GET /asset/fees/gateways/{moniker}`: 查询指定网关的创建费用
-4. `GET /asset/fees/tokens/{id}`: 查询指定通证的发行和增发费用
-5. `POST /asset/gateways`: 创建一个网关
-6. `PUT /asset/gateways/{moniker}`: 编辑一个存在的网关
-7. `POST /asset/gateways/{moniker}/transfer`: 转让指定网关的所有权
-8. `PUT /asset/tokens/{token-id}`: 编辑一个已经存在的通证
-9. `POST /asset/tokens/{token-id}/mint`: 通证所有者和操作者可以直接将铸造该通证到指定地址
-10. `POST /asset/tokens/{token-id}/transfer-owner`: 将通证的所有者转移到新所有者
+1. `POST /asset/tokens`: 发行一个通证
+2. `PUT /asset/tokens/{symbol}`: 编辑一个已存在的通证
+3. `POST /asset/tokens/{symbol}/mint`: 增发通证到指定地址
+4. `POST /asset/tokens/{symbol}/transfer`: 转让通证的所有权
+5. `GET /asset/tokens/{symbol}`: 查询通证
+6. `GET /asset/tokens`: 查询指定所有者的通证集合
+7. `GET /asset/tokens/{symbol}/fee`: 查询发行和铸造指定通证的费用
 
 ### Coinswap模块的APIs
 
-1. `POST /coinswap/liquidities/{id}/deposit`: 增加流动性
-2. `POST /coinswap/liquidities/{id}/withdraw`: 提现流动性
+1. `POST /coinswap/liquidities/{voucher-coin-name}/deposit`: 增加流动性
+2. `POST /coinswap/liquidities/{voucher-coin-name}/withdraw`: 提取流动性
 3. `POST /coinswap/liquidities/buy`: 兑换代币(购买)
 4. `POST /coinswap/liquidities/sell`: 兑换代币(出售)
-5. `GET /coinswap/liquidities/{id}`: 查询流动性
+5. `GET /coinswap/liquidities/{voucher-coin-name}`: 查询流动性
 
 ### HTLC模块的APIs
 
@@ -169,22 +167,42 @@ irislcd start --node=tcp://localhost:26657 --chain-id=<chain-id> --laddr=tcp://0
 
 ### Service模块的APIs
 
-1. `POST /service/definitions`: 添加服务定义
-2. `GET /service/definitions/{defChainId}/{serviceName}`: 查询服务定义
-3. `POST /service/bindings`: 添加服务绑定
-4. `GET /service/bindings/{defChainId}/{serviceName}/{bindChainId}/{provider}`: 查询服务绑定
-5. `GET /service/bindings/{defChainId}/{serviceName}`: 查询服务绑定列表
-6. `PUT /service/bindings/{defChainId}/{serviceName}/{provider}`: 更新服务绑定
-7. `PUT /service/bindings/{defChainId}/{serviceName}/{provider}/disable`: 使绑定失效
-8. `PUT /service/bindings/{defChainId}/{serviceName}/{provider}/enable`: 重新启用绑定
-9. `PUT /service/bindings/{defChainId}/{serviceName}/{provider}/deposit/refund`: 取回服务绑定的抵押
-10. `POST /service/requests`: 请求服务
-11. `GET /service/requests/{defChainId}/{serviceName}/{bindChainId}/{provider}`: 查询某服务提供者收到的服务请求
-12. `POST /service/responses`: 响应服务请求
-13. `GET /service/responses/{reqChainId}/{reqId}`: 查询服务响应
-14. `GET /service/fees/{address}`:  查询（某个地址的）服务费用
-15. `POST /service/fees/{address}/refund`: 消费者取回（未被响应的）服务费用
-16. `POST /service/fees/{address}/withdraw`: 服务提供者取回服务收益
+1. `POST /service/definitions`: 定义一个新的服务
+2. `GET /service/definitions/{service-name}`: 查询服务定义
+3. `POST /service/bindings`: 绑定一个服务
+4. `GET /service/bindings/{service-name}/{provider}`: 查询服务绑定
+5. `GET /service/bindings{service-name}`: 查询服务绑定列表
+6. `POST /service/providers/{provider}/withdraw-address`: 设置提取地址
+7. `GET /service/providers/{provider}/withdraw-address`: 查询提取地址
+8. `PUT /service/bindings/{service-name}/{provider}`: 更新一个存在的服务绑定
+9. `POST /service/bindings/{service-name}/{provider}/disable`: 禁用一个可用的服务绑定
+10. `POST /service/bindings/{service-name}/{provider}/enable`: 启用一个不可用的服务绑定
+11. `POST /service/bindings/{service-name}/{provider}/refund-deposit`: 取回一个服务绑定的所有押金
+12. `POST /service/contexts`: 发起服务调用
+13. `GET /service/contexts/{request-context-id}`: 查询请求上下文
+14. `PUT /service/contexts/{request-context-id}`: 更新请求上下文
+15. `POST /service/contexts/{request-context-id}/pause`: 暂停一个正在进行的请求上下文
+16. `POST /service/contexts/{request-context-id}/start`: 启动一个暂停的请求上下文
+17. `POST /service/contexts/{request-context-id}/kill`: 终止请求上下文
+18. `GET /service/requests/{request-id}`: 查询服务请求
+19. `GET /service/requests/{service-name}/{provider}`: 查询一个服务绑定的活跃请求
+20. `GET /service/requests/{request-context-id}/{batch-counter}`: 根据请求上下文ID和批次计数器查询请求列表
+21. `POST /service/responses`: 响应服务请求
+22. `GET /service/responses/{request-id}`: 查询服务响应
+23. `GET /service/responses/{request-context-id}/{batch-counter}`: 根据请求上下文ID和批次计数器查询服务响应列表
+24. `GET /service/fees/{provider}`: 查询服务提供者的收益
+25. `POST /service/fees/{provider}/withdraw`: 提取服务提供者的收益
+26. `GET /service/schemas/{schema-name}`: 通过 schema 名称查询系统 schema
+
+### Oracle模块的APIs
+
+1. `POST /oracle/feeds`: 创建一个初始状态为`paused`的Feed。
+2. `POST /oracle/feeds/<feed-name>/start`: 启动一个处于`paused`的Feed。
+3. `POST /oracle/feeds/<feed-name>/pause`: 暂停一个处于`running`的Feed。
+4. `PUT /oracle/feeds/<feed-name>`: 更新Feed的相关信息。
+5. `GET /oracle/feeds/<feed-name>`: 通过名称查询Feed的相关信息。
+6. `GET /oracle/feeds?state=<state>`: 通过状态查询符合条件的一组Feed。
+7. `GET /oracle/feeds/<feed-name>/values`: 查询Feed的执行结果，按照时间倒序排列
 
 ### Rand模块的APIs
 

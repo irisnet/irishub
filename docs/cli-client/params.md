@@ -3,7 +3,7 @@
 Params module allows you to query the system parameters which can be governed (except the gov params) by the [gov module](./gov.md).
 
 ```bash
- iriscli params <flags>
+ iriscli params [flags]
 ```
 
 **Flags:**
@@ -87,7 +87,7 @@ Slashing Params:
   slashing/SignedBlocksWindow:       34560
   slashing/MinSignedPerWindow:       0.7000000000
   slashing/DoubleSignJailDuration:   48h0m0s
-  slashing/DowntimeJailDuration:     36h0m0s
+  slashing/DowntimeJailDuration:     0h10m0s
   slashing/CensorshipJailDuration:   48h0m0s
   slashing/SlashFractionDoubleSign:  0.0100000000
   slashing/SlashFractionDowntime:    0.0003000000

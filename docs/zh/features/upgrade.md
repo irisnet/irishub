@@ -26,7 +26,7 @@
 rm -rf iris
 rm -rf .iriscli
 iris init gen-tx --name=<key-name> --home=<path-to-your-home>
-iris init --gen-txs --chain-id=<chain-id> -o --home=<path-to-your-home>
+iris init --gen-txs --chain-id=irishub -o --home=<path-to-your-home>
 iris start --home=<path-to-your-home>
 ```
 
@@ -34,13 +34,13 @@ iris start --home=<path-to-your-home>
 
 ```bash
 # 发送升级提议
-iriscli gov submit-proposal --title=<title> --description=<description> --type="SoftwareUpgrade" --deposit=100iris --from=<key-name> --chain-id=<chain-id> --fee=0.3iris --software=https://github.com/irisnet/irishub/tree/v0.13.1 --version=2 --switch-height=80 --threshold=0.9 --commit
+iriscli gov submit-proposal --title=<title> --description=<description> --type="SoftwareUpgrade" --deposit=100iris --from=<key-name> --chain-id=irishub --fee=0.3iris --software=https://github.com/irisnet/irishub/tree/v0.13.1 --version=2 --switch-height=80 --threshold=0.9 --commit
 
 # 对提议进行抵押
-iriscli gov deposit --proposal-id=<proposal-id> --deposit=1000iris --from=<key-name> --chain-id=<chain-id> --fee=0.3iris --commit
+iriscli gov deposit --proposal-id=<proposal-id> --deposit=1000iris --from=<key-name> --chain-id=irishub --fee=0.3iris --commit
 
 # 对提议投票
-iriscli gov vote --proposal-id=<proposal-id> --option=Yes --from=<key-name> --chain-id=<chain-id> --fee=0.3iris --commit
+iriscli gov vote --proposal-id=<proposal-id> --option=Yes --from=<key-name> --chain-id=irishub --fee=0.3iris --commit
 
 # 查询提议情况
 iriscli gov query-proposal --proposal-id=<proposal-id>
@@ -87,7 +87,7 @@ iriscli upgrade info --trust-node
 ## 命令详情
 
 ```bash
-iriscli gov submit-proposal --title=<title> --description=<description> --type="SoftwareUpgrade" --deposit=100iris --from=<key-name> --chain-id=<chain-id> --fee=0.3iris --software=https://github.com/irisnet/irishub/tree/v0.13.1 --version=2 --switch-height=80 --threshold=0.9 --commit
+iriscli gov submit-proposal --title=<title> --description=<description> --type="SoftwareUpgrade" --deposit=100iris --from=<key-name> --chain-id=irishub --fee=0.3iris --software=https://github.com/irisnet/irishub/tree/v0.13.1 --version=2 --switch-height=80 --threshold=0.9 --commit
 ```
 
 * `--type`  "SoftwareUpgrade" 软件升级提议的类型

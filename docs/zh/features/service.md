@@ -1,119 +1,279 @@
-# iService
+# Service
+
+> **_提示：_** 本文档中显示的命令仅供说明。有关命令的准确语法，请参阅[cli docs](../client/service.md)。
 
 ## 简介
 
-IRIS Services（又名“iService”）旨在对链下服务从定义、绑定（服务提供方注册）、调用到治理（分析和争端解决）的全生命周期传递，来跨越区块链世界和传统业务应用世界之间的鸿沟。
+IRIS 服务（又称iService）旨在弥合区块链和传统应用之间的鸿沟。它规范化了链外服务的定义和绑定（提供者注册），促进了调用以及与这些服务的交互，并能调解服务治理过程（分析和争议解决）。
 
-IRIS-SDK通过增强的IBC处理逻辑来支持服务语义，以允许分布式商业服务在区块链互联网上可用。我们引入接口描述语言（[Interface description language](https://en.wikipedia.org/wiki/Interface-description-language)，
-简称IDL）对服务进行标准化定义来满足跨语言的服务调用。目前支持的IDL语言为[protobuf](https://developers.google.com/protocol-buffers/)。该模块的主要功能点如下：
+## 服务定义
 
-1. 服务定义
-2. 服务绑定
-3. 服务调用
-4. 争议解决 (TODO)
-5. 服务分析 (TODO)
+### 服务接口 schema
 
-### 系统参数
+任何用户都可以在区块链上定义服务。服务的接口即输入和输出需要使用[JSON Schema](https://JSON-Schema.org/)来指定。下面是一个示例：
 
-以下参数均可通过[governance](governance.md)修改
+```json
+{
+  "input": {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "service-def-input-example",
+    "description": "Schema for a service input example",
+    "type": "object",
+    "properties": {
+      "base": {
+        "description": "base token denom",
+        "type": "string"
+      },
+      "quote": {
+        "description": "quote token denom",
+        "type": "string"
+      }
+    },
+    "required": [
+      "base",
+      "quote"
+    ]
+  },
+  "output": {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "service-def-output-example",
+    "description": "Schema for a service output example",
+    "type": "object",
+    "properties": {
+      "price": {
+        "description": "price",
+        "type": "number"
+      }
+    },
+    "required": [
+      "price"
+    ]
+  }
+}
+```
 
-* `MinDepositMultiple`    服务绑定抵押金额（相对于服务价格）最小的倍数
-* `MaxRequestTimeout`     服务调用最大等待区块个数
-* `ServiceFeeTax`         服务费的税收比例
-* `SlashFraction`         惩罚百分比
-* `ComplaintRetrospect`   可提起争议最大时长
-* `ArbitrationTimeLimit`  争议解决最大时长
-
-## 使用场景
-
-### 服务定义
-
-任何用户可以发起服务定义请求，在服务定义中，使用`protobuf`对该服务的方法，方法的输入、输出参数进行标准化定义。为了更好的支持服务的属性，IRISnet对`protobuf`进行了一些扩展，详细请参照[IDL文件扩展](#idl文件扩展)
+### 命令
 
 ```bash
 # 创建服务定义
-iriscli service define --chain-id=<chain-id>  --from=<key-name> --fee=0.6iris --gas=100000 --service-name=<service-name> --service-description=<service-description> --author-description=<author-description> --tags=<tag1>,<tag2> --idl-content=<idl-content> --file=</***/***.proto>
+iriscli service define <service-name> <schemas-json or path/to/schemas.json> --description=<service-description> --author-description=<author-description> --tags=<tag1,tag2,...>
 
 # 查询服务定义
-iriscli service definition --def-chain-id=<def-chain-id> --service-name=<service-name>
+iriscli service definition <service-name>
 ```
 
-### 服务绑定
+## 服务绑定
 
-在服务绑定中, 需要抵押一定数量的押金, 最小的抵押金额为该服务的服务费价格的`MinDepositMultiple`倍数。服务提供方可以随时更新他的服务绑定并调整服务价格，禁用、启用该服务绑定。如果想取回押金，需要禁用服务绑定并等待`ComplaintRetrospectParameter`+`ArbitrationTimelimitParameter`的周期。
+通过创建对现有服务定义的绑定, 任何用户都可以提供相应的服务。绑定主要由四个部分组成：_提供者地址_、_定价_、_押金_ 以及 _服务质量_。
+
+### 提供者地址
+
+提供者地址是 _服务提供者_ （即链外服务/进程）用来监听请求的一个端点。在服务提供者能够接受并处理服务请求之前，其运营者或所有者必须为它创建一个链上地址，并且发起一个 `绑定` 交易将这个地址关联到相关的服务定义。
+
+为调用一个服务，用户或消费者通过发起一个请求交易向一个有效服务绑定的提供者地址发起请求；服务提供者检测和处理这个请求，并且通过一个响应交易发送处理结果。
+
+### 定价
+
+定价指定服务提供者如何对其提供的服务收费。定价必须符合此[schema](service-pricing.json)。下面是一个示例：
+
+```json
+{
+  "price": "0.1iris",
+  "promotions_by_time": [
+    {
+      "start_time": "2020-01-01T00:00:00Z",
+      "end_time": "2020-03-31T23:59:59Z",
+      "discount": 0.7
+    },
+    {
+      "start_time": "2020-04-01T00:00:00Z",
+      "end_time": "2020-06-30T23:59:59Z",
+      "discount": 0.9
+    }
+  ]
+}
+```
+
+服务提供者能选择接受 `iris` 以外的 tokens 作为服务费用，例如 `0.03link`。价格是消费者从多个提供相同服务的提供者中遴选的一个考虑因素。
+
+### 押金
+
+运营一个服务提供者意味着重要的服务责任，因此创建服务绑定需要一定数量的押金。押金数量必须大于 _押金阈值_，该值为 `MinDepositMultiple * price` 与 `MinDeposit` 两者中的最大值。如果服务提供者未能在超时之前响应请求，则其绑定押金的一小部分，即 `SlashFraction * deposit` 将被罚没和销毁。如果押金降至阈值以下，服务绑定将被暂时禁用，直到其所有者增加足够的押金重新激活。
+
+> **_提示：_**  `service/MinDepositMultiple`、`service/MinDeposit` 和 `service/SlashFraction`是可以通过链上[治理](governance.md)更改的系统参数。
+
+### 服务质量
+
+服务质量承诺是根据提供者将服务响应发送回区块链所需的平均区块数来声明的。这是消费者选择潜在提供者时考虑的另一个因素。
+
+### 命令
+
+服务绑定可以由其所有者随时更新，以调整定价、增加押金或者改变 QoS；也可以被禁用和重新启用。如果服务提供者的所有者不想再提供服务，则需要禁用绑定并等待一段时间，才能取回押金。
 
 ```bash
-# 服务绑定（抵押1000iris， 价格1iris， 平均响应时间10000毫秒， 服务可用性9999（10000次调用可用次数的整数表示））
-iriscli service bind --chain-id=<chain-id>  --from=<key-name> --fee=0.3iris --service-name=<service-name> --def-chain-id=<def-chain-id> --bind-type=Local  --deposit=1000iris --prices=1iris --avg-rsp-time=10000 --usable-time=9999
+# 创建服务绑定
+iriscli service bind <service-name> <provider-address> <deposit> <min-response-time> <pricing-json or path/to/pricing.json>
 
-# 查询服务绑定
-iriscli service binding --def-chain-id=<def-chain-id> --service-name=<service-name> --bind-chain-id=<bind-chain-id> --provider=<provider-account-address>
+# 更新服务绑定
+iriscli service update-binding <service-name> <provider-address> --deposit=<added-deposit> --min-resp-time=<min-response-time> --pricing=<pricing-json or path/to/pricing.json>
 
-# 查询服务绑定列表
-iriscli service bindings --def-chain-id=<def-chain-id> --service-name=<service-name>
+# 启用一个不可用的服务绑定
+iriscli service enable <service-name> <provider-address> <added-deposit>
 
-# 服务绑定更新
-iriscli service update-binding --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --service-name=<service-name> --def-chain-id=<def-chain-id> --bind-type=Local  --deposit=1iris --prices=1iris,2iris --avg-rsp-time=10000 --usable-time=100
+# 禁用一个可用的服务绑定
+iriscli service disable <service-name> <provider-address>>
 
-# 禁用服务绑定
-iriscli service disable --chain-id=<chain-id>  --from=<key-name> --fee=0.3iris --def-chain-id=<def-chain-id> --service-name=<service-name>
+# 取回服务绑定的押金
+iriscli service refund-deposit <service-name>
 
-# 开启服务绑定, 并追加抵押100iris
-iriscli service enable --chain-id=<chain-id>  --from=<key-name> --fee=0.3iris --def-chain-id=<def-chain-id> --service-name=<service-name> --deposit=100iris
+# 查询一个服务的所有绑定
+iriscli service bindings <service-name>
 
-# 取回押金
-iriscli service refund-deposit --chain-id=<chain-id>  --from=<key-name> --fee=0.3iris --def-chain-id=<def-chain-id> --service-name=<service-name>
+# 查询一个账户所拥有的所有绑定
+iriscli service bindings <service-name> --owner <address>
+
+# 查询指定的服务绑定
+iriscli service binding <service-name> <provider-address>
+
+# 查询定价 schema
+iriscli service schema pricing
 ```
 
-### 服务调用
+## 服务调用
 
-服务消费者如果需要发起服务调用请求，需要支付服务提供方指定的服务费。服务提供方需要在`MaxRequestTimeout`定义的区块高度内响应该服务请求，如果超时未响应，将从服务提供方的该服务绑定押金中扣除`SlashFraction`比例的押金，同时该次服务调用的服务费将退还到服务消费者的退费池中。如果服务调用被正常响应，系统从该次服务调用的服务费中将扣除`ServiceFeeTax`比例的系统税收，同时将剩余的服务费加入到服务提供方的收入池中。服务提供方/消费者可以发起`withdraw-fees`/`refund-fees`交易取回自己在收入池/退费池中所有的token。
+### 请求上下文
+
+消费者通过创建一个 _请求上下文_ 来指定如何调用一个服务。_请求上下文_ 像智能合约一样自动生成实际的请求。_请求上下文_ 由一些参数组成，可以大致分为如下四组：
+
+#### 目标和输入
+
+* _服务名_：要调用的目标服务的名称
+* _输入数据_：符合目标服务输入 schema 的 json 格式数据
+
+#### 提供者过滤
+
+* _提供者列表_：逗号分隔的候选服务提供者的地址列表
+* _服务费上限_：消费者愿意为每次调用支付的最大服务费用
+* _超时_：消费者为接收响应愿意等待的区块数
+
+#### 响应处理
+
+* _模块_：包含回调函数的模块名称
+* _响应阈值_：为调用回调函数所需接收的最小响应数
+
+> **_提示：_** 这两个参数不能从 CLI 和 API 设置；它们只对使用 iService 的其他模块可用，比如 [oracle](oracle.md) 和 [random](random.md)。
+
+#### 重复性
+
+* _重复_：指示请求上下文是否可重复的一个布尔标志
+* _频率_：重复调用批次之间的区块间隔数
+* _总数_: 重复调用批次的总数，负数表示无限
+
+### 请求批次
+
+对于一个重复性的请求上下文，新的请求 _批次_ 将以指定的频率生成，直至达到指定的批次总数或者消费者（即该请求上下文的创建者）余额不足。对于非重复性的请求上下文，将只生成一个请求批次。
+
+一个请求批次由若干 _请求_ 对象组成，_请求_ 表示一个向符合遴选条件的服务提供者发起的服务调用。只有那些费用不高于 `服务费上限` 并且 QoS 优于 `超时` 的提供者才能被选中。
+
+### 命令
+
+在成功创建一个请求上下文之后，一个 _上下文 ID_ 将返回给消费者，同时该上下文将自动启动。消费者之后能按意愿更新、暂停以及启动该上下文，也可以永久终止它。
 
 ```bash
-# 发起服务调用
-iriscli service call --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --def-chain-id=<def-chain-id> --service-name=<service-name> --method-id=1 --bind-chain-id=<bind-chain-id> --provider=<provider-account-address> --service-fee=1iris --request-data=<request-data>
+# 创建一个重复性的请求上下文（无回调函数）
+iriscli service call --service-name=<service name> --data=<request input> --providers=<provider list> --service-fee-cap=1iris --timeout 50 --repeated --frequency=50 --total=100
 
-# 查询服务请求列表
-iriscli service requests --def-chain-id=<def-chain-id> --service-name=<service-name> --bind-chain-id=<bind-chain-id> --provider=<provider-account-address>
+# 更新一个存在的请求上下文
+iriscli service update <request-context-id> --frequency=20 --total=200
 
-# 响应服务调用
-iriscli service respond --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --request-chain-id=<request-chain-id> --request-id=<request-id (e.g.230-130-0)> --response-data=<response-data>
+# 暂停一个正在运行的请求上下文
+iriscli service pause <request-context-id>
 
-# 查询服务响应
-iriscli service response --request-chain-id=<request-chain-id> --request-id=<request-id (e.g.230-130-0)>
+# 启动一个暂停的请求上下文
+iriscli service start <request-context-id>
 
-# 查询指定地址的服务费退款和收入
-iriscli service fees <account-address>
+# 永久终止一个请求上下文
+iriscli service kill <request-context-id>
 
-# 从服务费退款中退还所有费用
-iriscli service refund-fees --chain-id=<chain-id> --from=<key-name> --fee=0.3iris
+# 通过 ID 查询请求上下文
+iriscli service request-context <request-context-id>
 
-# 从服务费收入中取回所有费用
-iriscli service withdraw-fees --chain-id=<chain-id> --from=<key-name> --fee=0.3iris
+# 查询一个请求批次的所有请求
+iriscli service requests <request-context-id> <batch-counter>
+
+# 查询一个请求批次的所有响应
+iriscli service responses <request-context-id> <batch-counter>
+
+# 通过请求 ID 查询对应的响应
+iriscli service response <request-id>
 ```
 
-## IDL文件扩展
+## 服务响应
 
-在使用proto文件对服务的方法，输入、输出参数进行标准化定义时，可通过注释的方式增加method属性。
+服务提供者通过查询或者事件订阅来监听链上针对自己的请求。在处理完成一个请求之后，服务提供者发送回一个由 _结果_ 对象和可选的符合服务输出 schema 的输出对象组成的响应。
 
-### 注释标准
+### 服务结果 schema
 
-* 使用 `//@Attribute 属性： 值`的方式添加在rpc方法上，即可将该属性添加为方法的属性。例如:
+服务结果对象必须符合此[schema](service-result.json)。下面是一个示例：
 
-    > //@Attribute description: sayHello
+```json
+{
+  "result" : {
+    "code": 400,
+    "message": "user input out of range"
+  }
+}
+```
 
-### 目前支持的属性
+当结果 code 等于200时输出对象必须提供。
 
-* `description` 对该方法的描述
-* `output-privacy` 是否对该方法的输出进行加密处理，{`NoPrivacy`,`PubKeyEncryption`}
-* `output-cached` 是否对该方法的输出进行缓存，{`OffChainCached`,`NoCached`}
+### 命令
 
-### IDL content参照
+```bash
+# 查询所有特定于指定服务提供者的待处理请求
+iriscli service requests <service-name> <provider>
 
-* IDL content参照
+# 通过请求 ID 查询请求
+iriscli service request <request-id>
 
-    > syntax = \"proto3\";\n\npackage helloworld;\n\n// The greeting service definition.\nservice Greeter {\n    //@Attribute description: sayHello\n    //@Attribute output-privacy: NoPrivacy\n    //@Attribute output-cached: NoCached\n    rpc SayHello (HelloRequest) returns (HelloReply) {}\n}\n\n// The request message containing the user's name.\nmessage HelloRequest {\n    string name = 1;\n}\n\n// The response message containing the greetings\nmessage HelloReply {\n    string message = 1;\n}\n
+# 发送指定请求的响应
+iriscli service respond --request-id=<request-id> --result='{"code":200,"message":"success"}' --data=<response output>
 
-* IDL文件参照
+# 查询服务结果 schema
+iriscli service schema result
+```
 
-    [test.proto](https://github.com/irisnet/irishub/blob/master/docs/features/test.proto)
+## 服务费用
+
+任何创建服务绑定并运营服务提供者的用户应该指定一个 _提取地址_。当用户提取服务提供者赚取的服务费时，服务费将被发送到该地址。如果没有设置此地址，它将是该用户的地址。
+
+### 托管
+
+在一个请求产生之后，关联的服务费 **不会** 立即支付给目标服务提供者，而是由一个内部账户 _托管_。当响应及时（在请求超时前）被发送，相应的服务费（扣除服务税之后的部分）将从该 _托管_ 账户释放到服务提供者。否则，服务费将退还给消费者。
+
+### 税
+
+在向服务提供者支付服务费之前，一部分 _税_ 将被收取并发送到社区资金池，其数量为 `ServiceFeeTax * fee`。
+
+> **_提示：_** `service/ServiceFeeTax` 是可以通过链上[治理](governance.md)更改的系统参数。
+
+### 命令
+
+```bash
+# 设置提取地址
+iriscli service set-withdraw-addr <withdrawal-address>
+
+# 查询提取地址
+iriscli service withdraw-addr <address>
+
+# 查询指定服务提供者赚取的服务费
+iriscli service fees <provider-address>
+
+# 提取所有服务提供者赚取的服务费
+iriscli service withdraw-fees
+
+# 从指定服务提供者提取赚取的服务费
+iriscli service withdraw-fees <provider-address>
+```
+
+## 服务治理 (TODO)

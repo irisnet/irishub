@@ -43,7 +43,7 @@ Details in [Mint](../features/mint.md)
 | ---------------------------------- | ----------------------------------------- | ------------- | ------- |
 | `slashing/CensorshipJailDuration`  | Censorship Jail Duration                  | (0, 4week)    | 48h0m0s |
 | `slashing/DoubleSignJailDuration`  | DoubleSign Jail Duration                  | (0, 4week)    | 48h0m0s |
-| `slashing/DowntimeJailDuration`    | Downtime Jail Duration                    | (0, 4week)    | 36h0m0s |
+| `slashing/DowntimeJailDuration`    | Downtime Jail Duration                    | (0, 4week)    | 0h10m0s |
 | `slashing/MaxEvidenceAge`          | Acceptable earliest time of the evidence  | [1day, +∞)    | 51840   |
 | `slashing/MinSignedPerWindow`      | Minimum voting ratio in the slash window  | [0.5, 0.9]    | 0.7     |
 | `slashing/SignedBlocksWindow`      | The number of blocks for slash statistics | [100, 140000] | 34560   |

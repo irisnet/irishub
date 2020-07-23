@@ -22,12 +22,12 @@
 查询提案的详细信息。
 
 ```bash
-iriscli gov query-proposal <flags>
+iriscli gov query-proposal [flags]
 ```
 
 **标识：**
 
-| 名称, 速记    | 类型 | 必须 | 默认 | 描述     |
+| 名称，速记    | 类型 | 必须 | 默认 | 描述     |
 | ------------- | ---- | -------- | ---- | -------- |
 | --proposal-id | uint | 是       |      | 提案的Id |
 
@@ -42,12 +42,12 @@ iriscli gov query-proposal --chain-id=irishub --proposal-id=<proposal-id>
 按条件查询提案。
 
 ```bash
-iriscli gov query-proposals <flags>
+iriscli gov query-proposals [flags]
 ```
 
 **标识：**
 
-| 名称, 速记  | 类型    | 必须 | 默认 | 描述                                  |
+| 名称，速记  | 类型    | 必须 | 默认 | 描述                                  |
 | ----------- | ------- | -------- | ---- | ------------------------------------- |
 | --depositor | Address |          |      | 按抵押人地址过滤提案                  |
 | --limit     | uint    |          |      | 限制返回提案的个数， 默认返回所有提案 |
@@ -71,12 +71,12 @@ iriscli gov query-proposals --chain-id=irishub --limit=3 --status=passed --depos
 查询投票信息。
 
 ```bash
-iriscli gov query-vote <flags>
+iriscli gov query-vote [flags]
 ```
 
 **标识：**
 
-| 名称, 速记    | 类型    | 必须 | 默认 | 描述       |
+| 名称，速记    | 类型    | 必须 | 默认 | 描述       |
 | ------------- | ------- | -------- | ---- | ---------- |
 | --proposal-id | uint    | 是       |      | 提案的Id   |
 | --voter       | Address | 是       |      | 投票人地址 |
@@ -92,12 +92,12 @@ iriscli gov query-vote --chain-id=irishub --proposal-id=<proposal-id> --voter=<i
 查询提案的所有投票信息。
 
 ```bash
-iriscli gov query-votes <flags>
+iriscli gov query-votes [flags]
 ```
 
 **标识：**
 
-| 名称, 速记    | 类型 | 必须 | 默认 | 描述     |
+| 名称，速记    | 类型 | 必须 | 默认 | 描述     |
 | ------------- | ---- | -------- | ---- | -------- |
 | --proposal-id | uint | 是       |      | 提案的Id |
 
@@ -112,12 +112,12 @@ iriscli gov query-votes --chain-id=irishub --proposal-id=<proposal-id>
 查询指定提案的抵押信息。
 
 ```bash
-iriscli gov query-deposit <flags>
+iriscli gov query-deposit [flags]
 ```
 
 **标识：**
 
-| 名称, 速记    | 类型    | 必须 | 默认 | 描述       |
+| 名称，速记    | 类型    | 必须 | 默认 | 描述       |
 | ------------- | ------- | -------- | ---- | ---------- |
 | --proposal-id | uint    | 是       |      | 提案的Id   |
 | --depositor   | Address | 是       |      | 抵押人地址 |
@@ -133,12 +133,12 @@ iriscli gov query-deposit --chain-id=irishub --proposal-id=<proposal-id> --depos
 查询指定提案的所有抵押信息。
 
 ```bash
-iriscli gov query-deposits <flags>
+iriscli gov query-deposits [flags]
 ```
 
 **标识：**
 
-| 名称, 速记    | 类型 | 必须 | 默认 | 描述     |
+| 名称，速记    | 类型 | 必须 | 默认 | 描述     |
 | ------------- | ---- | -------- | ---- | -------- |
 | --proposal-id | uint | 是       |      | 提案的Id |
 
@@ -153,12 +153,12 @@ iriscli gov query-deposits --chain-id=irishub --proposal-id=<proposal-id>
 查询提案投票的统计信息。
 
 ```bash
-iriscli gov query-tally <flags>
+iriscli gov query-tally [flags]
 ```
 
 **标识：**
 
-| 名称, 速记    | 类型 | 必须 | 默认 | 描述     |
+| 名称，速记    | 类型 | 必须 | 默认 | 描述     |
 | ------------- | ---- | -------- | ---- | -------- |
 | --proposal-id |  uint    | 是       |      | 提案的Id |
 
@@ -173,18 +173,18 @@ iriscli gov query-tally --chain-id=irishub --proposal-id=<proposal-id>
 提交提案以及初始化抵押金额。
 
 ```bash
-iriscli gov submit-proposal <flags>
+iriscli gov submit-proposal [flags]
 ```
 
 **标识：**
 
-| 名称, 速记               | 类型   | 必须 | 默认  | 描述                                                                                           |
+| 名称，速记               | 类型   | 必须 | 默认  | 描述                                                                                           |
 | ------------------------ | ------ | -------- | ----- | ---------------------------------------------------------------------------------------------- |
 | --deposit                | Coin   | 是       |       | 初始抵押金额(至少最小抵押金额的30% of)                                                         |
 | --description            | string | 是       |       | 提案的描述信息                                                                                 |
 | --param                  | string |          |       | 提案修改的参数，例如`mint/Inflation=0.050`                                                     |
 | --title                  | string | 是       |       | 提案的标题                                                                                     |
-| --type                   | string | 是       |       | 提案的类型（PlainText/Parameter/SoftwareUpgrade/SoftwareHalt/CommunityTaxUsage/TokenAddition） |
+| --type                   | string | 是       |       | 提案的类型（PlainText/Parameter/SoftwareUpgrade/SoftwareHalt/CommunityTaxUsage） |
 | --version                | uint   |          | 0     | 升级的版本                                                                                     |
 | --software               | string |          |       | 新软件的地址                                                                                   |
 | --switch-height          | uint   |          | 0     | 软件升级过程中，切换的区块高度                                                                 |
@@ -214,21 +214,10 @@ iriscli gov submit-proposal --chain-id=irishub --title=<proposal-title> --descri
 
 ### 提交软件升级提案
 
-**必须参数：** `--software`, `--version`, `--switch-height`, `--threshold`
+**必须参数：** `--software`，`--version`，`--switch-height`，`--threshold`
 
 ```bash
 iriscli gov submit-proposal --chain-id=irishub --title=<proposal-title> --description=<proposal-description> --from=<key-name> --fee=0.3iris --deposit=2000iris --type=SoftwareUpgrade --software=https://github.com/irisnet/irishub/tree/v0.15.1 --version=2 --switch-height=8000 --threshold=0.8
-```
-
-### 提交通证添加提案
-
-**所需参数：**
-
-- 必选: `--token-symbol`, `--token-canonical-symbol`, `--token-name`
-- 可选: `--token-decimal`, `--token-min-unit-alias`
-
-```bash
-iriscli gov submit-proposal --chain-id=irishub --title=<proposal-title> --description=<proposal-description> --from=<key-name> --fee=1iris --deposit=2000iris --type=TokenAddition --token-symbol=btc --token-canonical-symbol=btc --token-name=Bitcoin --token-decimal=18 --token-min-unit-alias=satoshi
 ```
 
 ## iriscli gov deposit
@@ -236,13 +225,13 @@ iriscli gov submit-proposal --chain-id=irishub --title=<proposal-title> --descri
 为有效的提案抵押通证。
 
 ```bash
-iriscli gov deposit <flags>
+iriscli gov deposit [flags]
 
 ```
 
 **标识：**
 
-| 名称, 速记    | 类型 | 必须 | 默认 | 描述           |
+| 名称，速记    | 类型 | 必须 | 默认 | 描述           |
 | ------------- | ---- | -------- | ---- | -------------- |
 | --deposit     | Coin | 是       |      | 抵押的通证金额 |
 | --proposal-id | uint | 是       |      | 提案Id         |
@@ -266,12 +255,12 @@ iriscli gov deposit --chain-id=irishub --proposal-id=<proposal-id> --deposit=50i
 :::
 
 ```bash
-iriscli gov vote <flags>
+iriscli gov vote [flags]
 ```
 
 **标识：**
 
-| 名称, 速记    | 类型   | 必须 | 默认 | 描述                            |
+| 名称，速记    | 类型   | 必须 | 默认 | 描述                            |
 | ------------- | ------ | -------- | ---- | ------------------------------- |
 | --option      | string | 是       |      | 选项：Yes/No/NoWithVeto/Abstain |
 | --proposal-id | uint   | 是       |      | 提案Id                          |

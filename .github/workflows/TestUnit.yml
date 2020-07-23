@@ -10,4 +10,8 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v1
       - name: Run unit tests
-        run: sudo docker run -v $(pwd):/irishub irisnet/golang sh -c "make test_unit"
+        uses: cedrickring/golang-action/go1.14@1.5.2
+        env:
+          GO111MODULE: "on"
+        with:
+          args: make test-unit

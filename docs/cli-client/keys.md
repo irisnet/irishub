@@ -20,7 +20,7 @@ Keys allows you to manage your local tendermint keystore (wallets) for iris.
 Create a new key (wallet), or recover from mnemonic/keystore.
 
 ```bash
-iriscli keys add <key-name> <flags>
+iriscli keys add <key-name> [flags]
 ```
 
 **Flags:**
@@ -108,7 +108,7 @@ iriscli keys list
 Get details of a local key.
 
 ```bash
-iriscli keys show <key-name> <flags>
+iriscli keys show <key-name> [flags]
 ```
 
 **Flags:**
@@ -154,7 +154,7 @@ MyKey    local    iva12nda6xwpmp000jghyneazh4kkgl2tnzyx7trze    ivp1addwnpepqfw5
 Export the keystore of a key to a json file
 
 ```bash
-iriscli keys export <key-name> <flags>
+iriscli keys export <key-name> [flags]
 ```
 
 **Flags:**
@@ -174,7 +174,7 @@ iriscli keys export Mykey --output-file=<path-to-keystore>
 Delete a local key by the given name.
 
 ```bash
-iriscli keys delete <key-name> <flags>
+iriscli keys delete <key-name> [flags]
 ```
 
 **Flags:**
@@ -205,7 +205,7 @@ iriscli keys update MyKey
 Create a bip39 mnemonic, sometimes called a seed phrase, by reading from the system entropy. To pass your own entropy, use `unsafe-entropy` mode.
 
 ```bash
-iriscli keys mnemonic <flags>
+iriscli keys mnemonic [flags]
 ```
 
 **Flags:**
@@ -237,7 +237,7 @@ Derive a new private key using an interactive command that will prompt you for e
 Optionally specify a bip39 mnemonic, a bip39 passphrase to further secure the mnemonic, and a bip32 HD path to derive a specific account. The key will be stored under the given name and encrypted with the given password. The only input that is required is the encryption password.
 
 ```bash
-iriscli keys new <key-name> <flags>
+iriscli keys new <key-name> [flags]
 ```
 
 **Flags:**

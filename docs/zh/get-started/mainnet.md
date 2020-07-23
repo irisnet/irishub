@@ -53,7 +53,7 @@ iriscli keys add <key-name>
 # 可以使用此命令安装 jq
 # apt-get update && apt-get install -y jq
 
-# 如果输出为 false, 则表明您的节点已经完成同步
+# 如果输出为 false，则表明您的节点已经完成同步
 iriscli status | jq .sync_info.catching_up
 ```
 

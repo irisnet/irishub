@@ -20,7 +20,7 @@ Keys模块用于管理IRIS的Tendermint本地密钥库（钱包）。
 创建一个新的密钥（钱包），或通过助记词/密钥库导入已有密钥。
 
 ```bash
-iriscli keys add <key-name> <flags>
+iriscli keys add <key-name> [flags]
 ```
 
 **标志：**
@@ -108,7 +108,7 @@ iriscli keys list
 查询本地密钥的详细信息。
 
 ```bash
-iriscli keys show <key-name> <flags>
+iriscli keys show <key-name> [flags]
 ```
 
 **标志：**
@@ -154,7 +154,7 @@ MyKey    local    iva12nda6xwpmp000jghyneazh4kkgl2tnzyx7trze    ivp1addwnpepqfw5
 将密钥keystore信息导出为json文件。
 
 ```bash
-iriscli keys export <key-name> <flags>
+iriscli keys export <key-name> [flags]
 ```
 
 **标志：**
@@ -174,7 +174,7 @@ iriscli keys export Mykey --output-file=<path-to-keystore>
 根据名称删除本地密钥
 
 ```bash
-iriscli keys delete <key-name> <flags>
+iriscli keys delete <key-name> [flags]
 ```
 
 **标志：**
@@ -205,7 +205,7 @@ iriscli keys update MyKey
 通过读取系统熵来创建24个单词组成的bip39助记词（也称为种子短语）。如果需要传递自定义的熵，请使用`unsafe-entropy`模式。
 
 ```bash
-iriscli keys mnemonic <flags>
+iriscli keys mnemonic [flags]
 ```
 
 **标志：**
@@ -237,7 +237,7 @@ police possible oval milk network indicate usual blossom spring wasp taste canal
 指定bip39助记词、用于保护助记词的bip39密码、bip32 HD路径，以派生特定帐户。 密钥将以给定名称存储并用给定密码加密。 唯一需要的输入是加密密码。
 
 ```bash
-iriscli keys new <key-name> <flags>
+iriscli keys new <key-name> [flags]
 ```
 
 **标志：**
