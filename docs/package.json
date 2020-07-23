@@ -11,7 +11,7 @@
   "license": "ISC",
   "devDependencies": {
     "@vuepress/plugin-search": "^1.0.0-rc.1",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.19",
     "markdown-it": "^8.4.2",
     "markdown-it-meta": "0.0.1",
     "vuepress": "^1.4.0"
