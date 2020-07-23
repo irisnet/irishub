@@ -52,7 +52,8 @@ var (
 			WithInput(os.Stdin).
 			WithAccountRetriever(types.NewAccountRetriever(encodingConfig.Marshaler)).
 			WithBroadcastMode(flags.BroadcastBlock).
-			WithHomeDir(app.DefaultNodeHome)
+			WithHomeDir(app.DefaultNodeHome).
+			WithInterfaceRegistry(encodingConfig.InterfaceRegistry)
 )
 
 // Execute executes the root command.
