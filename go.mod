@@ -10,8 +10,8 @@ require (
 	github.com/irismod/coinswap v0.0.0-20200722055706-deeded9d99b8
 	github.com/irismod/htlc v0.0.0-20200722060015-b71f49c9b167
 	github.com/irismod/nft v1.1.1-0.20200722060344-38fec5db63a2
-	github.com/irismod/service v1.1.1-0.20200722054903-0b768875f575
-	github.com/irismod/token v1.1.1-0.20200722054744-fd9a711dc2e8
+	github.com/irismod/service v1.1.1-0.20200723031529-6abecb02ceb1
+	github.com/irismod/token v1.1.1-0.20200723031618-028bdd6fb30a
 	github.com/onsi/ginkgo v1.8.0 // indirect
 	github.com/onsi/gomega v1.5.0 // indirect
 	github.com/otiai10/copy v1.2.0
