@@ -10,14 +10,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/spf13/cobra"
-	tmconfig "github.com/tendermint/tendermint/config"
-	"github.com/tendermint/tendermint/crypto"
-	tmos "github.com/tendermint/tendermint/libs/os"
-	tmrand "github.com/tendermint/tendermint/libs/rand"
-	"github.com/tendermint/tendermint/types"
-	tmtime "github.com/tendermint/tendermint/types/time"
-
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	clientkeys "github.com/cosmos/cosmos-sdk/client/keys"
@@ -32,6 +24,17 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/genutil"
 	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+	servicetypes "github.com/irismod/service/types"
+	"github.com/spf13/cobra"
+	tmconfig "github.com/tendermint/tendermint/config"
+	"github.com/tendermint/tendermint/crypto"
+	tmos "github.com/tendermint/tendermint/libs/os"
+	tmrand "github.com/tendermint/tendermint/libs/rand"
+	"github.com/tendermint/tendermint/types"
+	tmtime "github.com/tendermint/tendermint/types/time"
+
+	guardiantypes "github.com/irisnet/irishub/modules/guardian/types"
+	randomtypes "github.com/irisnet/irishub/modules/random/types"
 )
 
 var (
@@ -257,6 +260,27 @@ func initGenFiles(
 ) error {
 
 	appGenState := mbm.DefaultGenesis(cdc)
+
+	// add the profiler and trustees in the genesis state
+	var guardianGenState guardiantypes.GenesisState
+	cdc.MustUnmarshalJSON(appGenState[guardiantypes.ModuleName], &guardianGenState)
+
+	for _, account := range genAccounts {
+		guardian := guardiantypes.NewGuardian(
+			"genesis", guardiantypes.Genesis,
+			account.GetAddress(), account.GetAddress(),
+		)
+		guardianGenState.Profilers = append(guardianGenState.Profilers, guardian)
+		guardianGenState.Trustees = append(guardianGenState.Trustees, guardian)
+	}
+	appGenState[guardiantypes.ModuleName] = cdc.MustMarshalJSON(guardianGenState)
+
+	// add system service in the genesis state
+	var serviceGenState servicetypes.GenesisState
+	cdc.MustUnmarshalJSON(appGenState[servicetypes.ModuleName], &serviceGenState)
+	serviceGenState.Definitions = append(serviceGenState.Definitions, randomtypes.GetSvcDefinitions()...)
+
+	appGenState[servicetypes.ModuleName] = cdc.MustMarshalJSON(serviceGenState)
 
 	// set the accounts in the genesis state
 	var authGenState authtypes.GenesisState

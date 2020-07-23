@@ -14,15 +14,8 @@ jobs:
     steps:
       - name: Checkout source code
         uses: actions/checkout@v1
-      - name: Get image tag      
-        run: |
-          if [[ ${{github.ref}} == "refs/heads/master" ]]; then
-            echo latest > ${{github.sha}}.TAG;
-          else
-            echo ${${{github.ref}}##/} > ${{github.sha}}.TAG;
-          fi
-      - name: Build irishub mainnet image
-        run: source ~/.bashrc; sudo docker build -t irisnet/irishub:`cat ${{github.sha}}.TAG` .
+      - name: Build irishub image
+        run: source ~/.bashrc; sudo docker build -t irisnet/irishub:latest .
 
 #   push-images:
 #     name: Push Images
@@ -31,7 +24,5 @@ jobs:
 #     steps:
       - name: Login dockerhub
         run: sudo docker login -u ${{secrets.DOCKER_USER}} -p ${{secrets.DOCKER_PASS}}
-      - name: Publish irishub testnet image
-        run: sudo docker push irisnet/irishub:testnet-`cat ${{github.sha}}.TAG`
-      - name: Publish irishub mainnet image
-        run: sudo docker push irisnet/irishub:`cat ${{github.sha}}.TAG`
+      - name: Publish irishub image
+        run: sudo docker push irisnet/irishub:latest
