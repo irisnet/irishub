@@ -15,21 +15,27 @@ Rand module allows you to post a random number request to the IRIS Hub and query
 Request a random number.
 
 ```bash
-iriscli rand request-rand <flags>
+iriscli rand request-rand [flags]
 ```
 
 **Flags:**
 
-| Name, shorthand  | Type   | Required | Default | Description                                                                  |
-| ---------------- | ------ | -------- | ------- | ---------------------------------------------------------------------------- |
-| --block-interval | uint64 |          | 10      | The block interval after which the requested random number will be generated |
+| Name, shorthand   | Type   | Required | Default | Description                                                                  |
+| ----------------- | ------ | -------- | ------- | ---------------------------------------------------------------------------- |
+| --block-interval  | uint64 | true     | 10      | The block interval after which the requested random number will be generated |
+| --oracle          | bool   |          | false   | Whether to use the oracle method                                             |
+| --service-fee-cap | string |          | ""      | Max service fee, required if "oracle" is true                                |
 
 ### Request a random number
 
 Post a random number request to the IRIS Hub, the random number will be generated after `--block-interval` blocks.
 
 ```bash
+# without oracle
 iriscli rand request-rand --block-interval=100 --from=<key-name> --chain-id=irishub --fee=0.3iris --commit
+
+# with oracle
+iriscli rand request-rand --block-interval=100 --oracle=true --service-fee-cap=1iris --from=<key-name> --chain-id=irishub --fee=0.3iris --commit
 ```
 
 :::tip
@@ -41,7 +47,7 @@ You will get a unique request id if the tx is committed, which can be used to qu
 Query the generated random number by the request id.
 
 ```bash
-iriscli rand query-rand <flags>
+iriscli rand query-rand [flags]
 ```
 
 **Flags:**
@@ -50,7 +56,7 @@ iriscli rand query-rand <flags>
 | --------------- | ------ | -------- | ------- | ----------------------------------------- |
 | --request-id    | string | Yes      |         | The request id returned by the request tx |
 
-## Query a random number
+### Query a random number
 
 Query the random number after it is generated.
 
@@ -63,7 +69,7 @@ iriscli rand query-rand --request-id=035a8d4cf64fcd428b5c77b1ca85bfed172d3787be9
 Query the pending random number requests with an optional block height.
 
 ```bash
-iriscli rand query-queue <flags>
+iriscli rand query-queue [flags]
 ```
 
 **Flags:**
@@ -72,9 +78,9 @@ iriscli rand query-queue <flags>
 | --------------- | ----- | -------- | ------- | ---------------------------------------------------------- |
 | --queue-height  | int64 |          | 0       | The block height at which random numbers will be generated |
 
-## Query random number request queue
+### Query random number request queue
 
-Query the pending random number requests with an optional block height at which random numbers will be generated.
+Query the pending random number requests with an optional block height at which random numbers will be generated or request service.
 
 ```bash
 iriscli rand query-queue --queue-height=100000

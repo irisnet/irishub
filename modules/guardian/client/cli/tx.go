@@ -1,25 +1,21 @@
 package cli
 
 import (
-	"bufio"
 	"fmt"
 
+	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/flags"
+	"github.com/cosmos/cosmos-sdk/client/tx"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/client/context"
-	"github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/cosmos/cosmos-sdk/codec"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/auth"
-	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
-
-	"github.com/irisnet/irishub/modules/guardian/internal/types"
+	"github.com/irisnet/irishub/modules/guardian/types"
 )
 
 // GetTxCmd returns the transaction commands for the guardian module.
-func GetTxCmd(cdc *codec.Codec) *cobra.Command {
+func GetTxCmd() *cobra.Command {
 	txCmd := &cobra.Command{
 		Use:                        types.ModuleName,
 		Short:                      "guardian transaction subcommands",
@@ -27,28 +23,30 @@ func GetTxCmd(cdc *codec.Codec) *cobra.Command {
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
 	}
-	txCmd.AddCommand(flags.PostCommands(
-		GetCmdCreateProfiler(cdc),
-		GetCmdDeleteProfiler(cdc),
-		GetCmdCreateTrustee(cdc),
-		GetCmdDeleteTrustee(cdc),
-	)...)
+	txCmd.AddCommand(
+		GetCmdCreateProfiler(),
+		GetCmdDeleteProfiler(),
+		GetCmdCreateTrustee(),
+		GetCmdDeleteTrustee(),
+	)
 	return txCmd
 }
 
 // GetCmdCreateProfiler implements the create profiler command.
-func GetCmdCreateProfiler(cdc *codec.Codec) *cobra.Command {
+func GetCmdCreateProfiler() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "add-profiler",
 		Short: "Add a new profiler",
-		Example: "iriscli tx guardian add-profiler --chain-id=<chain-id> --from=<key-name> --fees=0.3iris " +
-			"--address=<added address> --description=<name>",
+		Example: fmt.Sprintf("%s tx guardian add-profiler --chain-id=<chain-id> --from=<key-name> --fees=0.3iris "+
+			"--address=<added address> --description=<name>", version.AppName),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			inBuf := bufio.NewReader(cmd.InOrStdin())
-			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
-			cliCtx := context.NewCLIContext().WithCodec(cdc)
+			clientCtx := client.GetClientContextFromCmd(cmd)
+			clientCtx, err := client.ReadTxCommandFlags(clientCtx, cmd.Flags())
+			if err != nil {
+				return err
+			}
 
-			fromAddr := cliCtx.GetFromAddress()
+			fromAddr := clientCtx.GetFromAddress()
 
 			paStr := viper.GetString(FlagAddress)
 			if len(paStr) == 0 {
@@ -60,55 +58,69 @@ func GetCmdCreateProfiler(cdc *codec.Codec) *cobra.Command {
 			}
 			description := viper.GetString(FlagDescription)
 			msg := types.NewMsgAddProfiler(description, pAddr, fromAddr)
-			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
 	cmd.Flags().AddFlagSet(FsAddGuardian)
 	_ = cmd.MarkFlagRequired(FlagAddress)
 	_ = cmd.MarkFlagRequired(FlagDescription)
+	flags.AddTxFlagsToCmd(cmd)
 	return cmd
 }
 
 // GetCmdDeleteProfiler implements the delete profiler command.
-func GetCmdDeleteProfiler(cdc *codec.Codec) *cobra.Command {
+func GetCmdDeleteProfiler() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "delete-profiler",
 		Short: "Delete a profiler",
-		Example: "iriscli tx guardian delete-profiler --chain-id=<chain-id> --from=<key-name> --fees=0.3iris " +
-			"--address=<deleted address>",
+		Example: fmt.Sprintf("%s tx guardian delete-profiler --chain-id=<chain-id> --from=<key-name> --fees=0.3iris "+
+			"--address=<deleted address>", version.AppName),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			inBuf := bufio.NewReader(cmd.InOrStdin())
-			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
-			cliCtx := context.NewCLIContext().WithCodec(cdc)
+			clientCtx := client.GetClientContextFromCmd(cmd)
+			clientCtx, err := client.ReadTxCommandFlags(clientCtx, cmd.Flags())
+			if err != nil {
+				return err
+			}
 
-			fromAddr := cliCtx.GetFromAddress()
+			fromAddr := clientCtx.GetFromAddress()
 			paStr := viper.GetString(FlagAddress)
 			pAddr, err := sdk.AccAddressFromBech32(paStr)
 			if err != nil {
 				return err
 			}
 			msg := types.NewMsgDeleteProfiler(pAddr, fromAddr)
-			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
 	cmd.Flags().AddFlagSet(FsDeleteGuardian)
 	_ = cmd.MarkFlagRequired(FlagAddress)
+	flags.AddTxFlagsToCmd(cmd)
 	return cmd
 }
 
 // GetCmdCreateTrustee implements the create trustee command.
-func GetCmdCreateTrustee(cdc *codec.Codec) *cobra.Command {
+func GetCmdCreateTrustee() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "add-trustee",
 		Short: "Add a new trustee",
-		Example: "iriscli tx guardian add-trustee --chain-id=<chain-id> --from=<key-name> --fees=0.3iris " +
-			"--address=<added address> --description=<name>",
+		Example: fmt.Sprintf("%s tx guardian add-trustee --chain-id=<chain-id> --from=<key-name> --fees=0.3iris "+
+			"--address=<added address> --description=<name>", version.AppName),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			inBuf := bufio.NewReader(cmd.InOrStdin())
-			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
-			cliCtx := context.NewCLIContext().WithCodec(cdc)
+			clientCtx := client.GetClientContextFromCmd(cmd)
+			clientCtx, err := client.ReadTxCommandFlags(clientCtx, cmd.Flags())
+			if err != nil {
+				return err
+			}
 
-			fromAddr := cliCtx.GetFromAddress()
+			fromAddr := clientCtx.GetFromAddress()
 			taStr := viper.GetString(FlagAddress)
 			if len(taStr) == 0 {
 				return fmt.Errorf("must use --address flag")
@@ -119,37 +131,49 @@ func GetCmdCreateTrustee(cdc *codec.Codec) *cobra.Command {
 			}
 			description := viper.GetString(FlagDescription)
 			msg := types.NewMsgAddTrustee(description, tAddr, fromAddr)
-			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
 	cmd.Flags().AddFlagSet(FsAddGuardian)
 	_ = cmd.MarkFlagRequired(FlagDescription)
+	flags.AddTxFlagsToCmd(cmd)
 	return cmd
 }
 
 // GetCmdDeleteTrustee implements the delete trustee command.
-func GetCmdDeleteTrustee(cdc *codec.Codec) *cobra.Command {
+func GetCmdDeleteTrustee() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "delete-trustee",
 		Short: "Delete a trustee",
-		Example: "iriscli tx guardian delete-trustee --chain-id=<chain-id> --from=<key-name> --fees=0.3iris " +
-			"--address=<deleted address>",
+		Example: fmt.Sprintf("%s tx guardian delete-trustee --chain-id=<chain-id> --from=<key-name> --fees=0.3iris "+
+			"--address=<deleted address>", version.AppName),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			inBuf := bufio.NewReader(cmd.InOrStdin())
-			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
-			cliCtx := context.NewCLIContext().WithCodec(cdc)
+			clientCtx := client.GetClientContextFromCmd(cmd)
+			clientCtx, err := client.ReadTxCommandFlags(clientCtx, cmd.Flags())
+			if err != nil {
+				return err
+			}
 
-			fromAddr := cliCtx.GetFromAddress()
+			fromAddr := clientCtx.GetFromAddress()
 			taStr := viper.GetString(FlagAddress)
 			tAddr, err := sdk.AccAddressFromBech32(taStr)
 			if err != nil {
 				return err
 			}
 			msg := types.NewMsgDeleteTrustee(tAddr, fromAddr)
-			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
 	cmd.Flags().AddFlagSet(FsDeleteGuardian)
 	_ = cmd.MarkFlagRequired(FlagAddress)
+	flags.AddTxFlagsToCmd(cmd)
 	return cmd
 }

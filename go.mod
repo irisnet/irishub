@@ -1,33 +1,37 @@
 module github.com/irisnet/irishub
 
+go 1.14
+
 require (
-	github.com/btcsuite/btcd v0.0.0-20190807005414-4063feeff79a // indirect
-	github.com/cosmos/cosmos-sdk v0.34.4-0.20191227175754-9a183ffbcc01
-	github.com/cosmos/go-bip39 v0.0.0-20180819234021-555e2067c45d // indirect
-	github.com/emicklei/proto v1.9.0
-	github.com/go-kit/kit v0.9.0
-	github.com/golang/mock v1.3.1 // indirect
-	github.com/gorilla/mux v1.7.3
+	github.com/cosmos/cosmos-sdk v0.34.4-0.20200721190130-5d71020270ae
+	github.com/gogo/protobuf v1.3.1
+	github.com/golang/protobuf v1.4.2
+	github.com/gorilla/mux v1.7.4
+	github.com/irismod/coinswap v0.0.0-20200722055706-deeded9d99b8
+	github.com/irismod/htlc v0.0.0-20200722060015-b71f49c9b167
+	github.com/irismod/nft v1.1.1-0.20200722060344-38fec5db63a2
+	github.com/irismod/service v1.1.1-0.20200723031529-6abecb02ceb1
+	github.com/irismod/token v1.1.1-0.20200723031618-028bdd6fb30a
 	github.com/onsi/ginkgo v1.8.0 // indirect
 	github.com/onsi/gomega v1.5.0 // indirect
-	github.com/otiai10/copy v1.0.2
-	github.com/otiai10/curr v0.0.0-20190513014714-f5a3d24e5776 // indirect
-	github.com/pkg/errors v0.8.1
-	github.com/prometheus/client_golang v1.1.0
-	github.com/rakyll/statik v0.1.6
-	github.com/rcrowley/go-metrics v0.0.0-20190706150252-9beb055b7962 // indirect
+	github.com/otiai10/copy v1.2.0
+	github.com/pkg/errors v0.9.1
+	github.com/rakyll/statik v0.1.7
+	github.com/regen-network/cosmos-proto v0.3.0
 	github.com/snikch/goodman v0.0.0-20171125024755-10e37e294daa
-	github.com/spf13/afero v1.2.2 // indirect
-	github.com/spf13/cobra v0.0.5
+	github.com/spf13/cast v1.3.1
+	github.com/spf13/cobra v1.0.0
 	github.com/spf13/pflag v1.0.5
-	github.com/spf13/viper v1.6.1
-	github.com/stretchr/testify v1.4.0
-	github.com/tendermint/go-amino v0.15.1
-	github.com/tendermint/tendermint v0.32.8
-	github.com/tendermint/tm-db v0.2.0
-	golang.org/x/crypto v0.0.0-20191011191535-87dc89f01550 // indirect
-	golang.org/x/net v0.0.0-20190827160401-ba9fcec4b297 // indirect
-	golang.org/x/text v0.3.2 // indirect
+	github.com/spf13/viper v1.7.0
+	github.com/stretchr/testify v1.6.1
+	github.com/tendermint/tendermint v0.33.6
+	github.com/tendermint/tm-db v0.5.1
+	github.com/tidwall/gjson v1.6.0
+	google.golang.org/grpc v1.30.0
+	gopkg.in/yaml.v2 v2.3.0
 )
 
-go 1.13
+replace (
+	github.com/cosmos/cosmos-sdk => github.com/irisnet/cosmos-sdk v0.19.1-0.20200722022502-e2d6c76ae750
+	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.2-alpha.regen.4
+)

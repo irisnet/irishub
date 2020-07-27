@@ -1,118 +1,259 @@
 # Service
 
-## Basic Function Description
+> **_NOTE:_** Commands shown in this document are for illustration purpose only.  For accurate syntax of commands, please refer to [cli docs](../cli-client/service.md).
 
-IRIS Services (a.k.a. "iService") intend to bridge the gap between the blockchain world and the conventional business application world, by mediating a complete lifecycle of off-chain services -- from their definition, binding (provider registration), invocation, to their governance (profiling and dispute resolution). By enhancing the IBC processing logic to support service semantics, the IRIS SDK is intended to allow distributed business services to be available across the internet of blockchains. The [Interface description language](https://en.wikipedia.org/wiki/Interface_description_language) (IDL) we introduced is
-to work with the service standardized definitions to satisfy service invocations across different programming languages.
-The currently supported IDL language is [protobuf](https://developers.google.com/protocol-buffers/). The main functions of this module are as follows:
+## Summary
 
-1. Service Definition
-2. Service Binding
-3. Service Invocation
-4. Dispute Resolution (TODO)
-5. Service Analysis (TODO)
+IRIS Service (a.k.a. iService) is intended to bridge the gap between the blockchain world and the conventional application world.  It formalizes off-chain service definition and binding (provider registration), facilitates invocation and interaction with those services, and mediates service governance process (profiling and dispute resolution).
 
-### System parameters
+## Service Definition
 
-The following parameters can be modified by [governance](governance.md)
+### Service interface schema
+Any user can define services on the blockchain. The interface of a service must be specified in terms of its _input_ and _output_ using the standard language of [JSON Schema](https://json-schema.org/).  Here is an example:
 
-* `MinDepositMultiple`    a multiple of the minimum deposit amount of service binding
-* `MaxRequestTimeout`     maximum number of waiting blocks for service invocation
-* `ServiceFeeTax`         tax rate of service fee
-* `SlashFraction`         slash fraction
-* `ComplaintRetrospect`   maximum time for submit a dispute
-* `ArbitrationTimeLimit`  maximum time of dispute resolution
-
-## Interactive process
-
-### Service definition
-
-Any users can define a service. In service definition, use `protobuf` to standardize the definition of the service's method, its input and output parameters. In order to support attributes of iService better, IRISnet has made some extensions to `protobuf`, please refer to [IDL extension](#idl-extension) for details.
-
-```bash
-# create a new service definition
-iriscli service define --chain-id=<chain-id>  --from=<key-name> --fee=0.6iris --gas=100000 --service-name=<service-name> --service-description=<service-description> --author-description=<author-description> --tags=<tag1>,<tag2> --idl-content=<idl-content> --file=</***/***.proto>
-
-# query service definition
-iriscli service definition --def-chain-id=<def-chain-id> --service-name=<service-name>
+```json
+{
+  "input": {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "service-def-input-example",
+    "description": "Schema for a service input example",
+    "type": "object",
+    "properties": {
+      "base": {
+        "description": "base token denom",
+        "type": "string"
+      },
+      "quote": {
+        "description": "quote token denom",
+        "type": "string"
+      }
+    },
+    "required": [
+      "base",
+      "quote"
+    ]
+  },
+  "output": {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "service-def-output-example",
+    "description": "Schema for a service output example",
+    "type": "object",
+    "properties": {
+      "price": {
+        "description": "price",
+        "type": "number"
+      }
+    },
+    "required": [
+      "price"
+    ]
+  }
+}
 ```
 
-### Service Binding
+### Commands
+```bash
+# create a new service definition
+iriscli service define <service-name> <schemas-json or path/to/schemas.json> --description=<service-description> --author-description=<author-description> --tags=<tag1,tag2,...>
 
-The minimum deposit amount for Service Binding is `MinDepositMultiple * Service fee`. The service provider can update his service binding and adjust the Service fee at any time, disable and enable the service binding. If the provider want to refund the deposit, he needs to disable service binding first and wait for a period of `ComplaintRetrospectParameter` + `ArbitrationTimelimitParameter`.
+# query service definition
+iriscli service definition <service-name>
+```
+
+## Service Binding
+
+Whoever is willing to provide a service as specified by an existing definition can do so by creating a _binding_ to that definition.  A binding essentially consists of four components: _provider address_, _pricing_, _deposit_ and _quality of service_.  
+
+### Provider address
+A provider address represents an _endpoint_ that a _service provider_ (i.e., an off-chain server/daemon) listens to for incoming requests. Before a provider can accept and process any service requests, its human operator/owner has to create a blockchain address for it and execute a `bind` transaction to attach this provider address to the service definition in question.
+
+To invoke a service, a user/consumer sends a request transaction targeting the provider address of a valid binding; the provider detects and processes the incoming request, and sends back the result in a response transaction.
+
+### Pricing
+The pricing object specifies how the provider charges for its service; it must conform to this [schema](service-pricing.json), and the following is a valid instance:
+
+```json
+{
+  "price": "0.5iris",
+  "promotions_by_time": [
+    {
+      "start_time": "2020-01-01T00:00:00Z",
+      "end_time": "2020-03-31T23:59:59Z",
+      "discount": 0.7
+    },
+    {
+      "start_time": "2020-04-01T00:00:00Z",
+      "end_time": "2020-06-30T23:59:59Z",
+      "discount": 0.9
+    }
+  ]
+}
+```
+
+Providers can opt to accept tokens other than `iris` for their services, e.g., `0.03link`. Price is a factor that consumers will consider when picking from a number of providers that offer the same service.
+
+### Deposit
+Operating a service provider signifies serious responsibility, therefore, a deposit is required for creating a binding.  The deposit amount must be larger than the _deposit threshold_, derived as `max(MinDepositMultiple * price, MinDeposit)`.  If a provider fails to respond to a request before it times out, a small portion of its binding deposit, i.e., `SlashFraction * deposit`, will be forfeited and destroyed.  Should the deposit drop below the threshold, the binding would be disabled temporarily until its owner re-activates it by adding more deposit.
+
+> **_NOTE:_** `service/MinDepositMultiple`, `service/MinDeposit` and `service/SlashFraction` are system parameters that can be changed through on-chain [governance](governance.md).
+
+### Quality of service
+This quality commitment is declared in terms of average number of blocks it takes the provider to send a response back to the blockchain.  It is another factor that consumers take into account when choosing potential providers.
+
+### Commands
+Service bindings can be updated at any time by their owners to adjust pricing, increase deposit or change QoS commitment; they can be disabled and re-enabled as well.  If a provider owner no longer wants to offer the service, she needs to disable the binding and wait for a certain period of time before she can claim back her deposit.
 
 ```bash
 # create a new service binding
-iriscli service bind --chain-id=<chain-id>  --from=<key-name> --fee=0.3iris --service-name=<service-name> --def-chain-id=<def-chain-id> --bind-type=Local  --deposit=1000iris --prices=1iris --avg-rsp-time=10000 --usable-time=9999
-
-# query service binding
-iriscli service binding --def-chain-id=<def-chain-id> --service-name=<service-name> --bind-chain-id=<bind-chain-id> --provider=<provider-account-address>
-
-# query service bindings
-iriscli service bindings --def-chain-id=<def-chain-id> --service-name=<service-name>
+iriscli service bind <service-name> <provider-address> <deposit> <qos> <pricing-json or path/to/pricing.json>
 
 # update a service binding
-iriscli service update-binding --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --service-name=<service-name> --def-chain-id=<def-chain-id> --bind-type=Local  --deposit=1iris --prices=1iris,2iris --avg-rsp-time=10000 --usable-time=100
+iriscli service update-binding <service-name> <provider-address> --deposit=<added-deposit> --qos=<qos> --pricing=<pricing-json or path/to/pricing.json>
 
-# disable a available service binding
-iriscli service disable --chain-id=<chain-id>  --from=<key-name> --fee=0.3iris --def-chain-id=<def-chain-id> --service-name=<service-name>
+# enable an inactive service binding
+iriscli service enable <service-name> <provider-address> <added-deposit>
 
-# enable an unavailable service binding
-iriscli service enable --chain-id=<chain-id>  --from=<key-name> --fee=0.3iris --def-chain-id=<def-chain-id> --service-name=<service-name> --deposit=100iris
+# disable an active service binding
+iriscli service disable <service-name> <provider-address>
 
-# refund all deposit from a service binding
-iriscli service refund-deposit --chain-id=<chain-id>  --from=<key-name> --fee=0.3iris --def-chain-id=<def-chain-id> --service-name=<service-name>
+# request refund of service binding deposit
+iriscli service refund-deposit <service-name> <provider-address>
+
+# list all the bindings of a service
+iriscli service bindings <service-name>
+
+# list all the bindings of a service, owned by a given account
+iriscli service bindings <service-name> --owner <address>
+
+# query a specific service binding
+iriscli service binding <service-name> <provider-address>
+
+# query the pricing schema
+iriscli service schema pricing
 ```
 
-### Service Invocation
+## Service Invocation
 
-If the service consumer needs to initiate a service invocation request, the service fee specified by the service provider needs to be paid. The service provider needs to respond to the service request within the block height defined by `MaxRequestTimeout`. If the service provider does not respond in time, the deposit of the 'SlashFraction' ratio will be deducted from the service provider's service binding deposit and the service fee will be refunded to the service consumer's return pool. If the service call is responded normally, the system will deduct the `ServiceFeeTax` ratio from the service fee, and add the remaining service fee to the service provider's incoming pool. The service provider/consumer can initiate the `withdraw-fees`/`refund-fees` transaction to retrieve all of the tokens in the incoming/return pool.
+### Request context
+A consumer specifies how she would like to invoke a service by creating a _request context_, which behaves like a smart contract that automatically generates the actual request(s).  A request context consists of about a dozen parameters that can be roughly divided into four groups, as explained below.
+
+#### Target and input
+* _service name_: name of the target service to be called
+* _input data_: json input that conforms to the input schema of the called service
+
+#### Provider filtering
+* _provider list_: comma separated addresses of candidate service providers
+* _service fee cap_: maximum service fee the consumer is willing to pay for any call
+* _timeout_: number of blocks the consumer is willing to wait for any response to come back
+
+#### Response handling
+* _module_: name of the module containing the callback function
+* _response threshold_: minimum number of responses that must be received to invoke the callback
+> **_NOTE:_** These two parameters can **not** be set from CLI or API; they are only available to other modules that use iService, such as [oracle](oracle.md) and [random](random.md).
+
+#### Repetition
+* _repeated_: boolean flag indicating whether this request context is repeated or not
+* _frequency_: number of blocks representing the frequency of repeated call batches
+* _total_: total number of call batches, where a negative number means "unlimited"
+
+### Request batch
+For a repeated request context, _batches_ of new request objects will be generated at the specified frequency, until the total number of batches is reached or the consumer (i.e., context creator) runs out of fee.  Only one request batch is generated for a non-repeated context.
+
+A request batch is comprised of a number of _request_ objects, each representing a service call to a chosen provider; only those providers that charge a fee no greater than `service fee cap` and commit to a QoS better than `timeout` will be selected.
+
+### Commands
+When a request context is successfully created, a `context id` is returned to the consumer and the context is automatically started.  The consumer can later update, pause and start the context at will; she can permanently kill the context as well.
 
 ```bash
-# initiate service invocation
-iriscli service call --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --def-chain-id=<def-chain-id> --service-name=<service-name> --method-id=1 --bind-chain-id=<bind-chain-id> --provider=<provider-account-address> --service-fee=1iris --request-data=<request-data>
+# create a repeated request context, with no callback
+iriscli service call --service-name=<service name> --data=<request input> --providers=<provider list> --service-fee-cap=1iris --timeout 50 --repeated --frequency=50 --total=100
 
-# query service requests
-iriscli service requests --def-chain-id=<def-chain-id> --service-name=<service-name> --bind-chain-id=<bind-chain-id> --provider=<provider-account-address>
+# update an existing request context
+iriscli service update <request-context-id> --frequency=20 --total=200
 
-# respond a service invocation
-iriscli service respond --chain-id=<chain-id> --from=<key-name> --fee=0.3iris --request-chain-id=<request-chain-id> --request-id=<request-id (e.g.230-130-0)> --response-data=<response-data>
+# pause a running request context
+iriscli service pause <request-context-id>
 
-# query a service response
-iriscli service response --request-chain-id=<request-chain-id> --request-id=<request-id (e.g.230-130-0)>
+# start a paused request context
+iriscli service start <request-context-id>
 
-# query return and incoming fee of a particular address
-iriscli service fees <account-address>
+# permanently kill a request context
+iriscli service kill <request-context-id>
 
-# refund all fees from service return fees
-iriscli service refund-fees --chain-id=<chain-id> --from=<key-name> --fee=0.3iris
+# query a previously created request context by its id
+iriscli service request-context <request-context-id>
 
-# withdraw all fees from service incoming fees
-iriscli service withdraw-fees --chain-id=<chain-id> --from=<key-name> --fee=0.3iris
+# list all the requests generated for a given request batch
+iriscli service requests <request-context-id> <batch-counter>
+
+# list all the responses received for a given request batch
+iriscli service responses <request-context-id> <batch-counter>
+
+# query a specific response
+iriscli service response <request-id>
 ```
 
-## IDL extension
+## Service Response
 
-When using proto file to standardize the definition of the service's method, its input and output parameters, the method attributes can be added through annotations.
+A service provider monitors the blockchain, through either queries or event subscription, for any requests that are targeted toward itself.  After processing such a request, the service provider sends back a response comprised of a _result_ object and an optional output object that conforms to the output schema of the service.
 
-### Annotation standard
+### Service result schema
+The result object must conform to this [schema](service-result.json), and here is an example of a valid instance:
 
-* If `//@Attribute attribute:  value` wrote on top of `rpc method`, it will be added to the method attributes. Eg.
+```json
+{
+  "result" : {
+    "code": 400,
+    "message": "user input out of range"
+  }
+}
+```
 
-    > //@Attribute description: sayHello
+The output object is required in the response only when the result code equals `200`.
 
-### Currently supported attributes
+### Commands
+```bash
+# list all pending requests targeting a given provider
+iriscli service requests <service-name> <provider>
 
-* `description` The name of this method in the service
-* `output_privacy` Whether the output of the method is encrypted, {`NoPrivacy`,`PubKeyEncryption`}
-* `output_cached` Whether the output of the method is cached, {`OffChainCached`, `NoCached`}
+# query a specific request
+iriscli service request <request-id>
 
-### IDL content example
+# send a response back, matching a specific request
+iriscli service respond --request-id=<request-id> --result='{"code":200,"message":"success"}' --data=<response output>
 
-* idl-content example
+# query the result schema
+iriscli service schema result
+```
 
-    > syntax = \"proto3\";\n\npackage helloworld;\n\n// The greeting service definition.\nservice Greeter {\n    //@Attribute description: sayHello\n    //@Attribute output_privacy: NoPrivacy\n    //@Attribute output_cached: NoCached\n    rpc SayHello (HelloRequest) returns (HelloReply) {}\n}\n\n// The request message containing the user's name.\nmessage HelloRequest {\n    string name = 1;\n}\n\n// The response message containing the greetings\nmessage HelloReply {\n    string message = 1;\n}\n
+## Service Fees
 
-* IDL file example
+Any user who creates service bindings and operates service providers should define a _withdrawal address_; when the user withdraws service fees earned by her providers, this is where the fund will be sent. If not set, the withdrawal address is the same as the user address.
 
-    [test.proto](https://github.com/irisnet/irishub/blob/master/docs/features/test.proto)
+### Escrow
+When a request object is generated, the associated service fee is **not** paid to the targeted provider immediately; instead, the fee is kept in an internal _escrow_ account for custody.  When a response comes back in time (i.e., before the request times out), the corresponding fee  (after tax) will be released from escrow to the provider; otherwise, the fee will be refunded to the consumer.
+
+### Tax
+Right before a service fee is paid to a provider, a _tax_, in the amount of `ServiceFeeTax * fee` is collected and sent to the community pool.
+
+> **_NOTE:_** `service/ServiceFeeTax` is a system parameter that can be changed through on-chain [governance](governance.md).
+
+### Commands
+```bash
+# set withdrawal address
+iriscli service set-withdraw-addr <withdrawal-address>
+
+# query withdrawal address of a given account
+iriscli service withdraw-addr <address>
+
+# query a provider's earned fees
+iriscli service fees <provider-address>
+
+# withdraw earned fees from all providers
+iriscli service withdraw-fees
+
+# withdraw earned fees from a given provider
+iriscli service withdraw-fees <provider-address>
+```
+
+## Service Governance (TODO)

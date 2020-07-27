@@ -16,8 +16,8 @@
 不同级别对应的具体 Proposal：
 
 - Critical：`SoftwareUpgrade`, `SystemHalt`
-- Important：`Parameter`,`TokenAddition`
-- Normal：`CommunityTaxUsage`,`PlainText`
+- Important：`Parameter`, `CommunityTaxUsage`, `TokenAddition`
+- Normal：`PlainText`
 
 `SoftwareUpgrade Proposal` 和 `SystemHalt Proposal` 只能由profiler发起。
 
@@ -45,19 +45,19 @@
 
 ### 抵押阶段
 
-提交提议者至少抵押30%的 `MinDeposit` ，然后其他用户可以继续对该提议进行抵押， 当抵押额超过 `MinDeposit`, 提议才能进入投票阶段。该提议时间超过 `MaxDepositPeriod` ，还未进入投票阶段（总抵押未超过 `MinDeposit`），则提议会被删除，并不会返还抵押金。
+提交提议者至少抵押30%的 `MinDeposit` ，然后其他用户可以继续对该提议进行抵押,当抵押额超过 `MinDeposit`，提议才能进入投票阶段。该提议时间超过 `MaxDepositPeriod` ，还未进入投票阶段（总抵押未超过 `MinDeposit`），则提议会被删除，并不会返还抵押金。
 
 不能对进入投票阶段的提议再进行抵押。
 
 ### 投票阶段
 
-只有验证人和委托人可以投一次票，不可重复投票。投票选项有：`Yes`同意, `Abstain`弃权,`No`不同意,`NoWithVeto`强烈不同意。
+只有验证人和委托人可以投一次票，不可重复投票。投票选项有：`Yes`同意，`Abstain`弃权,`No`不同意,`NoWithVeto`强烈不同意。
 
 ### 统计阶段
 
 统计结果有三类：同意，不同意，强烈不同意。
 
-在所有投票者的`voting_power`占系统总的`voting_power`的比例超过participation的前提下,如果强烈反对的`voting_power`占所有投票者的`voting_power` 超过 veto, 结果是强烈不同意。如果没有超过且赞同的`voting_power`占所有投票者的`voting_power` 超过 threshold，提议结果是同意。其他情况皆为不同意。
+在所有投票者的`voting_power`占系统总的`voting_power`的比例超过participation的前提下,如果强烈反对的`voting_power`占所有投票者的`voting_power` 超过 veto，结果是强烈不同意。如果没有超过且赞同的`voting_power`占所有投票者的`voting_power` 超过 threshold，提议结果是同意。其他情况皆为不同意。
 
 ### 销毁机制
 
@@ -82,13 +82,13 @@ Mint Params:
   mint/Inflation=0.0400000000
 
 # 发送提议，返回参数修改的内容
-iriscli gov submit-proposal --title=<title> --description=<description> --type=Parameter --deposit=8iris  --param="mint/Inflation=0.0000000000" --from=<key_name> --chain-id=<chain-id> --fee=0.3iris --commit
+iriscli gov submit-proposal --title=<title> --description=<description> --type=Parameter --deposit=8iris --param="mint/Inflation=0.0000000000" --from=<key_name> --chain-id=irishub --fee=0.3iris --commit
 
 # 对提议进行抵押
-iriscli gov deposit --proposal-id=<proposal-id> --deposit=1000iris --from=<key_name> --chain-id=<chain-id> --fee=0.3iris --commit
+iriscli gov deposit --proposal-id=<proposal-id> --deposit=1000iris --from=<key_name> --chain-id=irishub --fee=0.3iris --commit
 
 # 对提议投票
-iriscli gov vote --proposal-id=<proposal-id> --option=Yes --from=<key_name> --chain-id=<chain-id> --fee=0.3iris --commit
+iriscli gov vote --proposal-id=<proposal-id> --option=Yes --from=<key_name> --chain-id=irishub --fee=0.3iris --commit
 
 # 查询提议情况
 iriscli gov query-proposal --proposal-id=<proposal-id>
@@ -96,17 +96,17 @@ iriscli gov query-proposal --proposal-id=<proposal-id>
 
 ### 社区基金使用提议
 
-有三种使用方式: `Burn`，`Distribute` and `Grant`。 `Burn`表示从社区基金中销毁代币。`Distribute` and `Grant` 将从社区基金中向目标受托人账户转移代币，然后受托人将这些代币分发或赠给其他账户。
+有三种使用方式：`Burn`，`Distribute`和`Grant`。`Burn`表示从社区基金中销毁代币，`Grant`将从社区基金中向目标地址授予一定数量的token，`Distribute`将从社区基金中向目标`trustee`地址划转一定数量的token，再由`trustee`账户分发给其他账户。
 
 ```bash
 # 提交 Burn 提议
-iriscli gov submit-proposal --title="burn tokens 5%" --description=<description> --type="CommunityTaxUsage" --usage="Burn" --deposit="10iris"  --percent=0.05 --from=<key_name> --chain-id=<chain-id> --fee=0.3iris --commit
+iriscli gov submit-proposal --title="burn tokens 5%" --description=<description> --type="CommunityTaxUsage" --usage="Burn" --deposit="10iris" --percent=0.05 --from=<key_name> --chain-id=irishub --fee=0.3iris --commit
 
 # 提交 Distribute 提议
-iriscli gov submit-proposal --title="distribute tokens 5%" --description="test" --type="CommunityTaxUsage" --usage="Distribute" --deposit="10iris"  --percent=0.05 --dest-address=<dest-address (only trustees)> --from=<key_name> --chain-id=<chain-id> --fee=0.3iris --commit
+iriscli gov submit-proposal --title="distribute tokens 5%" --description="test" --type="CommunityTaxUsage" --usage="Distribute" --deposit="10iris" --percent=0.05 --dest-address=<dest-address (only trustees)> --from=<key_name> --chain-id=irishub --fee=0.3iris --commit
 
 # 提交 Grant 提议
-iriscli gov submit-proposal --title="grant tokens 5%" --description="test" --type="CommunityTaxUsage" --usage="Grant" --deposit="10iris"  --percent=0.05 --dest-address=<dest-address (only trustees)> --from=<key_name> --chain-id=<chain-id> --fee=0.3iris --commit
+iriscli gov submit-proposal --title="grant tokens 5%" --description="test" --type="CommunityTaxUsage" --usage="Grant" --deposit="10iris" --percent=0.05 --dest-address=<dest-address (only trustees)> --from=<key_name> --chain-id=irishub --fee=0.3iris --commit
 ```
 
 ### 系统终止提议
@@ -115,7 +115,7 @@ iriscli gov submit-proposal --title="grant tokens 5%" --description="test" --typ
 
 ```bash
 # 发送系统终止提议
-iriscli gov submit-proposal --title=<title> --description=<description> --type=SystemHalt --deposit=10iris --fee=0.3iris --from=<key_name> --chain-id=<chain-id> --commit
+iriscli gov submit-proposal --title=<title> --description=<description> --type=SystemHalt --deposit=10iris --fee=0.3iris --from=<key_name> --chain-id=irishub --commit
 ```
 
 ### 软件升级提议

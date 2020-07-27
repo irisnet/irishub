@@ -2,10 +2,13 @@ package guardian
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	"github.com/irisnet/irishub/modules/guardian/keeper"
+	"github.com/irisnet/irishub/modules/guardian/types"
 )
 
 // InitGenesis stores genesis data
-func InitGenesis(ctx sdk.Context, keeper Keeper, data GenesisState) {
+func InitGenesis(ctx sdk.Context, keeper keeper.Keeper, data types.GenesisState) {
 	// Add profilers
 	for _, profiler := range data.Profilers {
 		keeper.AddProfiler(ctx, profiler)
@@ -17,26 +20,23 @@ func InitGenesis(ctx sdk.Context, keeper Keeper, data GenesisState) {
 }
 
 // ExportGenesis outputs genesis data
-func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
-	profilersIterator := k.ProfilersIterator(ctx)
-	defer profilersIterator.Close()
+func ExportGenesis(ctx sdk.Context, k keeper.Keeper) types.GenesisState {
+	var profilers []types.Guardian
+	k.IterateProfilers(
+		ctx,
+		func(profiler types.Guardian) bool {
+			profilers = append(profilers, profiler)
+			return false
+		},
+	)
+	var trustees []types.Guardian
+	k.IterateTrustees(
+		ctx,
+		func(trustee types.Guardian) bool {
+			trustees = append(trustees, trustee)
+			return false
+		},
+	)
 
-	var profilers []Guardian
-	var profiler Guardian
-	for ; profilersIterator.Valid(); profilersIterator.Next() {
-		ModuleCdc.MustUnmarshalBinaryLengthPrefixed(profilersIterator.Value(), &profiler)
-		profilers = append(profilers, profiler)
-	}
-
-	trusteesIterator := k.TrusteesIterator(ctx)
-	defer trusteesIterator.Close()
-
-	var trustees []Guardian
-	var trustee Guardian
-	for ; trusteesIterator.Valid(); trusteesIterator.Next() {
-		ModuleCdc.MustUnmarshalBinaryLengthPrefixed(trusteesIterator.Value(), &trustee)
-		trustees = append(trustees, trustee)
-	}
-
-	return NewGenesisState(profilers, trustees)
+	return types.NewGenesisState(profilers, trustees)
 }

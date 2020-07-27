@@ -28,7 +28,7 @@ The `start` subcommand has the following flags:
 
 | Flag       | Type   | Default                 | Required | Description                                                     |
 | ---------- | ------ | ----------------------- | -------- | --------------------------------------------------------------- |
-| chain-id   | string |                         | Yes     | Chain ID of Tendermint node                                     |
+| chain-id   | string |                         | Yes      | Chain ID of Tendermint node                                     |
 | home       | string | "$HOME/.irislcd"        |          | Directory for config and data, such as key and checkpoint       |
 | node       | string | "tcp://localhost:26657" |          | Full node to connect to                                         |
 | laddr      | string | "tcp://localhost:1317"  |          | Address for server to listen on                                 |
@@ -39,13 +39,13 @@ The `start` subcommand has the following flags:
 By default, IRISLCD doesn't trust the connected full node. But if you are sure about that the connected full node is trustable, then you should run IRISLCD with `--trust-node` flag:
 
 ```bash
-irislcd start --node=tcp://localhost:26657 --chain-id=<chain-id> --trust-node
+irislcd start --node=tcp://localhost:26657 --chain-id=irishub --trust-node
 ```
 
 To access your IRISLCD instance publicly, you need to specify `--laddr`:
 
 ```bash
-irislcd start --node=tcp://localhost:26657 --chain-id=<chain-id> --laddr=tcp://0.0.0.0:1317 --trust-node
+irislcd start --node=tcp://localhost:26657 --chain-id=irishub --laddr=tcp://0.0.0.0:1317 --trust-node
 ```
 
 ## REST APIs
@@ -87,11 +87,12 @@ This api supports the following special parameters. By default, their values are
 
 ### Bank module APIs
 
-1. `GET /bank/coins/{type}`: Get coin type
-2. `GET /bank/token-stats`: Get token statistic
-3. `GET /bank/accounts/{address}`: Get the account information on blockchain
-4. `POST /bank/accounts/{address}/send`: Send coins (build -> sign -> send)
-5. `POST /bank/accounts/{address}/burn`: Burn coins
+1. `GET /bank/coins/{type}`: Query coin type
+2. `GET /bank/token-stats`: Query token statistic
+3. `GET /bank/token-stats/{symbol}`: Query the specified token statistic
+4. `GET /bank/accounts/{address}`: Query the account information on blockchain
+5. `POST /bank/accounts/{address}/send`: Send coins (build -> sign -> send)
+6. `POST /bank/accounts/{address}/burn`: Burn coins
 
 ### Stake module APIs
 
@@ -141,50 +142,68 @@ This api supports the following special parameters. By default, their values are
 
 ### Asset module APIs
 
-1. `GET /asset/gateways/{moniker}`: Query the gateway of a given moniker
-2. `GET /asset/gateways`: Query all the gateways with an optional owner
-3. `GET /asset/fees/gateways/{moniker}`: Query the creation fee of a given gateway
-4. `GET /asset/fees/tokens/{id}`: Query the fees for issuing and minting the specified token
-5. `POST /asset/gateways`: Create a gateway
-6. `PUT /asset/gateways/{moniker}`: Edit an existing gateway
-7. `POST /asset/gateways/{moniker}/transfer`: Transfer the ownership of the given gateway
-8. `PUT /asset/tokens/{token-id}`: Edit an existing token
-9. `POST /asset/tokens/{token-id}/mint`: The asset owner and operator can directly mint tokens to a specified address
-10. `POST /asset/tokens/{token-id}/transfer-owner`: transfer the owner of a token to a new owner
+1. `POST /asset/tokens`: Issue a token
+2. `PUT /asset/tokens/{symbol}`: Edit an existing token
+3. `POST /asset/tokens/{symbol}/mint`: Mint tokens to a specified address
+4. `POST /asset/tokens/{symbol}/transfer`: Transfer the owner of a token to a new owner
+5. `GET /asset/tokens/{symbol}`: Query a token by symbol
+6. `GET /asset/tokens`: Query tokens by owner
+7. `GET /asset/tokens/{symbol}/fee`: Query the fees for issuing and minting the specified token
 
 ### Coinswap module APIs
 
-1. `POST /coinswap/liquidities/{id}/deposit`: add liquidities
-2. `POST /coinswap/liquidities/{id}/withdraw`: withdraw liquidities
-3. `POST /coinswap/liquidities/buy`: swap token(buy a fixed number of  token)
-4. `POST /coinswap/liquidities/sell`: swap token(sell a fixed number of  token)
-5. `GET /coinswap/liquidities/{id}`: query liquidity by a liquidity id
+1. `POST /coinswap/liquidities/{voucher-coin-name}/deposit`: add liquidities
+2. `POST /coinswap/liquidities/{voucher-coin-name}/withdraw`: withdraw liquidities
+3. `POST /coinswap/liquidities/buy`: swap token(buy a fixed number of tokens)
+4. `POST /coinswap/liquidities/sell`: swap token(sell a fixed number of tokens)
+5. `GET /coinswap/liquidities/{voucher-coin-name}`: query liquidity by the voucher coin name
 
 ### HTLC module APIs
 
-1. `POST /htlc/htlcs`: 创建一个HTLC
-2. `GET /htlc/htlcs/{hash-lock}`: 通过hash-lock查询一个HTLC
-3. `POST /htlc/htlcs/{hash-lock}/claim`: 将一个OPEN状态的HTLC中锁定的资金发放到收款人地址
-4. `POST /htlc/htlcs/{hash-lock}/refund`: 从一个过期的HTLC中取回退款
+1. `POST /htlc/htlcs`: Create an HTLC
+2. `GET /htlc/htlcs/{hash-lock}`: Query an HTLC by hash-lock
+3. `POST /htlc/htlcs/{hash-lock}/claim`: Claim tokens locked in an OPEN HTLC to the recipient address
+4. `POST /htlc/htlcs/{hash-lock}/refund`: Refund from an expired HTLC
 
 ### Service module APIs
 
-1. `POST /service/definitions`: Add a service definition
-2. `GET /service/definitions/{defChainId}/{serviceName}`: Query service definition
-3. `POST /service/bindings`: Add a service binding
-4. `GET /service/bindings/{defChainId}/{serviceName}/{bindChainId}/{provider}`: Query service binding
-5. `GET /service/bindings/{defChainId}/{serviceName}`: Query service binding list
-6. `PUT /service/bindings/{defChainId}/{serviceName}/{provider}`: Update a service binding
-7. `PUT /service/bindings/{defChainId}/{serviceName}/{provider}/disable`: Disable service binding
-8. `PUT /service/bindings/{defChainId}/{serviceName}/{provider}/enable`: Enable service binding
-9. `PUT /service/bindings/{defChainId}/{serviceName}/{provider}/deposit/refund`: Refund deposit from a service binding
-10. `POST /service/requests`: Call service
-11. `GET /service/requests/{defChainId}/{serviceName}/{bindChainId}/{provider}`: Query service requests of a provider
-12. `POST /service/responses`: Respond service call
-13. `GET /service/responses/{reqChainId}/{reqId}`: Query service response
-14. `GET /service/fees/{address}`:  Query service fees of a address
-15. `POST /service/fees/{address}/refund`: Refund service return fee of consumer
-16. `POST /service/fees/{address}/withdraw`: Withdraw service incoming fee of provider
+1. `POST /service/definitions`: Define a new service
+2. `GET /service/definitions/{service-name}`: Query a service definition
+3. `POST /service/bindings`: Bind a service
+4. `GET /service/bindings/{service-name}/{provider}`: Query a service binding
+5. `GET /service/bindings{service-name}`: Query all bindings of a service definition
+6. `POST /service/providers/{provider}/withdraw-address`: Set a withdrawal address for the provider
+7. `GET /service/providers/{provider}/withdraw-address`: Query the withdrawal address of a provider
+8. `PUT /service/bindings/{service-name}/{provider}`: Update a service binding
+9. `POST /service/bindings/{service-name}/{provider}/disable`: Disable an available service binding
+10. `POST /service/bindings/{service-name}/{provider}/enable`: Enable an unavailable service binding
+11. `POST /service/bindings/{service-name}/{provider}/refund-deposit`: Refund all deposit from a service binding
+12. `POST /service/contexts`: Initiate a service call
+13. `GET /service/contexts/{request-context-id}`: Query a request context
+14. `PUT /service/contexts/{request-context-id}`: Update a request context
+15. `POST /service/contexts/{request-context-id}/pause`: Pause a running request context
+16. `POST /service/contexts/{request-context-id}/start`: Start a paused request context
+17. `POST /service/contexts/{request-context-id}/kill`: Terminate a request context
+18. `GET /service/requests/{request-id}`: Query a request by the request ID
+19. `GET /service/requests/{service-name}/{provider}`: Query active requests of a service binding
+20. `GET /service/requests/{request-context-id}/{batch-counter}`: Query active requests by the request context ID and batch counter
+21. `POST /service/responses`: Respond to a service request
+22. `GET /service/responses/{request-id}`: Query a response by the request ID
+23. `GET /service/responses/{request-context-id}/{batch-counter}`: Query active responses by the request context ID and batch counter
+24. `GET /service/fees/{provider}`: Query the earned fees of a provider
+25. `POST /service/fees/{provider}/withdraw`: Withdraw the earned fees of a provider
+26. `GET /service/schemas/{schema-name}`: Query the system schema by the schema name
+
+### Oracle module APIs
+
+1. `POST /oracle/feeds`: Define a new Feed with the initial state of paused.
+2. `POST /oracle/feeds/<feed-name>/start`: Start a paused Feed created by the tx signer.
+3. `POST /oracle/feeds/<feed-name>/pause`: Pause a running Feed created by the tx signer.
+4. `PUT /oracle/feeds/<feed-name>`: Update a Feed definition created by the tx signer.
+5. `GET /oracle/feeds/<feed-name>`: Query Feed information by its name.
+6. `GET /oracle/feeds?state=<state>`: Query Feed list by Feed state.
+7. `GET /oracle/feeds/<feed-name>/values`: Query the result of the feed by its name, in descending order of timestamp.
+
 
 ### Rand module APIs
 

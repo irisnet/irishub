@@ -15,7 +15,7 @@ Tx module allows you to sign or broadcast transactions
 Sign transactions in generated offline file. The file created with the --generate-only flag.
 
 ```bash
-iriscli tx sign <file> <flags>
+iriscli tx sign <file> [flags]
 ```
 
 ### Flags
@@ -76,7 +76,7 @@ iriscli tx broadcast signed.json --chain-id=irishub
 Sign a transaction by multiple accounts. The tx could be broadcasted only when the number of signatures meets the multisig-threshold.
 
 ```bash
-iriscli tx multisign <file> <key-name> <[signature]...> <flags>
+iriscli tx multisign <file> <key-name> <[signature]...> [flags]
 ```
 
 ### Generate an offline tx by multisig key

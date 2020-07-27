@@ -3,7 +3,7 @@
 Params模块允许查询系统里预设的参数，查询结果中除了Gov模块的参数，其他都可以通过[Gov模块](./gov.md)发起提议来修改。
 
 ```bash
- iriscli params <flags>
+ iriscli params [flags]
 ```
 
 **标志:**
@@ -87,7 +87,7 @@ Slashing Params:
   slashing/SignedBlocksWindow:       34560
   slashing/MinSignedPerWindow:       0.7000000000
   slashing/DoubleSignJailDuration:   48h0m0s
-  slashing/DowntimeJailDuration:     36h0m0s
+  slashing/DowntimeJailDuration:     0h10m0s
   slashing/CensorshipJailDuration:   48h0m0s
   slashing/SlashFractionDoubleSign:  0.0100000000
   slashing/SlashFractionDowntime:    0.0003000000

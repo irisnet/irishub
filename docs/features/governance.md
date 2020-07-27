@@ -7,7 +7,6 @@
 3. On-chain governance proposals on software upgrade
 4. On-chain governance proposals on software halt
 5. On-chain governance proposals on tax usage
-6. On-chain governance proposals on token addition
 
 ## Interactive process
 
@@ -16,8 +15,8 @@
 Specific Proposal for different levels:
 
 - Critical：`SoftwareUpgrade`, `SystemHalt`
-- Important：`Parameter`,`TokenAddition`
-- Normal：`CommunityTaxUsage`,`PlainText`
+- Important：`Parameter`, `CommunityTaxUsage`, `TokenAddition`
+- Normal：`PlainText`
 
 `SoftwareUpgrade Proposal` and `SystemHalt Proposal` can only be submitted by the profiler.
 
@@ -82,13 +81,13 @@ Mint Params:
   mint/Inflation=0.0400000000
 
 # Send proposal for parameters change
-iriscli gov submit-proposal --title=<title> --description=<description> --type=Parameter --deposit=8iris  --param="mint/Inflation=0.0000000000" --from=<key-name> --chain-id=<chain-id> --fee=0.3iris --commit
+iriscli gov submit-proposal --title=<title> --description=<description> --type=Parameter --deposit=8iris --param="mint/Inflation=0.0000000000" --from=<key-name> --chain-id=irishub --fee=0.3iris --commit
 
 # Deposit for a proposal
-iriscli gov deposit --proposal-id=<proposal-id> --deposit=1000iris --from=<key-name> --chain-id=<chain-id> --fee=0.3iris --commit
+iriscli gov deposit --proposal-id=<proposal-id> --deposit=1000iris --from=<key-name> --chain-id=irishub --fee=0.3iris --commit
 
 # Vote for a proposal
-iriscli gov vote --proposal-id=<proposal-id> --option=Yes --from=<key-name> --chain-id=<chain-id> --fee=0.3iris --commit
+iriscli gov vote --proposal-id=<proposal-id> --option=Yes --from=<key-name> --chain-id=irishub --fee=0.3iris --commit
 
 # Query the state of a proposal
 iriscli gov query-proposal --proposal-id=<proposal-id>
@@ -96,17 +95,17 @@ iriscli gov query-proposal --proposal-id=<proposal-id>
 
 ### Proposals on community funds usage
 
-There are three usages, `Burn`, `Distribute` and `Grant`. `Burn` means burning tokens from community funds. `Distribute` and `Grant` will transfer tokens to the destination trustee's account from community funds.
+There are three usages, `Burn`, `Distribute` and `Grant`. `Burn` means burning tokens from community funds. `Grant` will transfer tokens from community funds to the destination address. `Distribute` will transfer tokens from community funds to the destination `trustee` address, and then will be assigned to other addresses by the `trustee` account.
 
 ```bash
 # Submit Burn usage proposal
-iriscli gov submit-proposal --title="burn tokens 5%" --description=<description> --type="CommunityTaxUsage" --usage="Burn" --deposit="10iris"  --percent=0.05 --from=<key-name> --chain-id=<chain-id> --fee=0.3iris --commit
+iriscli gov submit-proposal --title="burn tokens 5%" --description=<description> --type="CommunityTaxUsage" --usage="Burn" --deposit="10iris" --percent=0.05 --from=<key-name> --chain-id=irishub --fee=0.3iris --commit
 
 # Submit Distribute usage proposal
-iriscli gov submit-proposal --title="distribute tokens 5%" --description="test" --type="CommunityTaxUsage" --usage="Distribute" --deposit="10iris"  --percent=0.05 --dest-address=<dest-address (only trustees)> --from=<key-name> --chain-id=<chain-id> --fee=0.3iris --commit
+iriscli gov submit-proposal --title="distribute tokens 5%" --description="test" --type="CommunityTaxUsage" --usage="Distribute" --deposit="10iris" --percent=0.05 --dest-address=<dest-address (only trustees)> --from=<key-name> --chain-id=irishub --fee=0.3iris --commit
 
 # Submit Grant usage proposal
-iriscli gov submit-proposal --title="grant tokens 5%" --description="test" --type="CommunityTaxUsage" --usage="Grant" --deposit="10iris"  --percent=0.05 --dest-address=<dest-address (only trustees)> --from=<key-name> --chain-id=<chain-id> --fee=0.3iris --commit
+iriscli gov submit-proposal --title="grant tokens 5%" --description="test" --type="CommunityTaxUsage" --usage="Grant" --deposit="10iris" --percent=0.05 --dest-address=<dest-address (only trustees)> --from=<key-name> --chain-id=irishub --fee=0.3iris --commit
 ```
 
 ### Proposals on system halting
@@ -115,7 +114,7 @@ Sending this proposal which can terminate the system, the node will be closed af
 
 ```bash
 # submit the SystemHaltProposal
-iriscli gov submit-proposal --title=<title> --description=<description> --type=SystemHalt --deposit=10iris --fee=0.3iris --from=<key-name> --chain-id=<chain-id> --commit
+iriscli gov submit-proposal --title=<title> --description=<description> --type=SystemHalt --deposit=10iris --fee=0.3iris --from=<key-name> --chain-id=irishub --commit
 ```
 
 ### Proposals on software upgrade

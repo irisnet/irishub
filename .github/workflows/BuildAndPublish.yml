@@ -1,0 +1,37 @@
+name: BuildAndPublish
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - v.*
+
+jobs:
+  build-images:
+    name: Build Images
+#    runs-on: self-hosted
+    runs-on: ubuntu-16.04
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v1
+      - name: Get image tag      
+        run: |
+          if [[ ${{github.ref}} == "refs/heads/master" ]]; then
+            echo latest > ${{github.sha}}.TAG;
+          else
+            echo ${${{github.ref}}##/} > ${{github.sha}}.TAG;
+          fi
+      - name: Build irishub mainnet image
+        run: source ~/.bashrc; sudo docker build -t irisnet/irishub:`cat ${{github.sha}}.TAG` .
+
+#   push-images:
+#     name: Push Images
+#     runs-on: self-hosted
+#     needs: build-images
+#     steps:
+      - name: Login dockerhub
+        run: sudo docker login -u ${{secrets.DOCKER_USER}} -p ${{secrets.DOCKER_PASS}}
+      - name: Publish irishub testnet image
+        run: sudo docker push irisnet/irishub:testnet-`cat ${{github.sha}}.TAG`
+      - name: Publish irishub mainnet image
+        run: sudo docker push irisnet/irishub:`cat ${{github.sha}}.TAG`

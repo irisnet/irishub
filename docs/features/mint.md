@@ -60,7 +60,7 @@ There are two command line interfaces and two LCD restful APIs which can query t
     You can use `--trust-node` flag to indicate whether the connected full node is trustable or not. If you can't access to a trustable node, this command line is very helpful.
 
     ```bash
-    iriscli bank token-stats --trust-node=false --chain-id=<chain-id> --node=<iris-node-url>
+    iriscli bank token-stats --trust-node=false --chain-id=irishub --node=<iris-node-url>
     ```
 
     Example Output:

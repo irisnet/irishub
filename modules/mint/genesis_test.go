@@ -3,6 +3,8 @@ package mint_test
 import (
 	"testing"
 
+	"github.com/irisnet/irishub/modules/mint/types"
+
 	"github.com/stretchr/testify/suite"
 
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -35,7 +37,7 @@ func TestGenesisSuite(t *testing.T) {
 }
 
 func (suite *TestSuite) TestExportGenesis() {
-	defaultGenesis := mint.DefaultGenesisState()
+	defaultGenesis := types.DefaultGenesisState()
 	exportedGenesis := mint.ExportGenesis(suite.ctx, suite.app.MintKeeper)
 	suite.Equal(defaultGenesis, exportedGenesis)
 }
