@@ -154,7 +154,6 @@ var (
 		coinswaptypes.ModuleName:       {authtypes.Minter, authtypes.Burner},
 		servicetypes.DepositAccName:    {authtypes.Burner},
 		servicetypes.RequestAccName:    nil,
-		recordtypes.ModuleName:         {authtypes.Minter, authtypes.Burner},
 	}
 
 	// module accounts that are allowed to receive tokens
