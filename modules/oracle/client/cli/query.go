@@ -15,19 +15,19 @@ import (
 
 // GetQueryCmd returns the cli query commands for the guardian module.
 func GetQueryCmd() *cobra.Command {
-	txCmd := &cobra.Command{
+	cmd := &cobra.Command{
 		Use:                        types.ModuleName,
 		Short:                      "Querying commands for the oracle module",
 		DisableFlagParsing:         true,
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
 	}
-	txCmd.AddCommand(
+	cmd.AddCommand(
 		GetCmdQueryFeed(),
 		GetCmdQueryFeeds(),
 		GetCmdQueryFeedValue(),
 	)
-	return txCmd
+	return cmd
 }
 
 // GetCmdQueryFeed implements the query feed Content definition command

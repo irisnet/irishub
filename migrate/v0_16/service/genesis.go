@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	cmn "github.com/tendermint/tendermint/libs/common"
+	tmbytes "github.com/tendermint/tendermint/libs/bytes"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -69,7 +69,7 @@ type RequestContext struct {
 }
 
 type CompactRequest struct {
-	RequestContextID           cmn.HexBytes
+	RequestContextID           tmbytes.HexBytes
 	RequestContextBatchCounter uint64
 	Provider                   sdk.AccAddress
 	ServiceFee                 sdk.Coins
