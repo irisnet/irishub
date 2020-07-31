@@ -74,6 +74,9 @@ import (
 	"github.com/irismod/nft"
 	nftkeeper "github.com/irismod/nft/keeper"
 	nfttypes "github.com/irismod/nft/types"
+	"github.com/irismod/record"
+	recordkeeper "github.com/irismod/record/keeper"
+	recordtypes "github.com/irismod/record/types"
 	"github.com/irismod/service"
 	servicekeeper "github.com/irismod/service/keeper"
 	servicetypes "github.com/irismod/service/types"
@@ -128,6 +131,7 @@ var (
 		transfer.AppModuleBasic{},
 		guardian.AppModuleBasic{},
 		token.AppModuleBasic{},
+		record.AppModuleBasic{},
 		nft.AppModuleBasic{},
 		htlc.AppModuleBasic{},
 		coinswap.AppModuleBasic{},
@@ -199,6 +203,7 @@ type IrisApp struct {
 
 	guardianKeeper guardiankeeper.Keeper
 	tokenKeeper    tokenkeeper.Keeper
+	recordKeeper   recordkeeper.Keeper
 	nftKeeper      nftkeeper.Keeper
 	htlcKeeper     htlckeeper.Keeper
 	coinswapKeeper coinswapkeeper.Keeper
@@ -235,7 +240,7 @@ func NewIrisApp(
 		minttypes.StoreKey, distrtypes.StoreKey, slashingtypes.StoreKey,
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
-		guardiantypes.StoreKey, tokentypes.StoreKey, nfttypes.StoreKey, htlctypes.StoreKey,
+		guardiantypes.StoreKey, tokentypes.StoreKey, nfttypes.StoreKey, htlctypes.StoreKey, recordtypes.StoreKey,
 		coinswaptypes.StoreKey, servicetypes.StoreKey, oracletypes.StoreKey, randomtypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -340,6 +345,7 @@ func NewIrisApp(
 		appCodec, keys[tokentypes.StoreKey], app.GetSubspace(tokentypes.ModuleName),
 		app.accountKeeper, app.bankKeeper, authtypes.FeeCollectorName,
 	)
+	app.recordKeeper = recordkeeper.NewKeeper(appCodec, keys[recordtypes.StoreKey])
 	app.nftKeeper = nftkeeper.NewKeeper(appCodec, keys[nfttypes.StoreKey])
 
 	app.htlcKeeper = htlckeeper.NewKeeper(appCodec, keys[htlctypes.StoreKey], app.accountKeeper, app.bankKeeper)
@@ -372,6 +378,7 @@ func NewIrisApp(
 		transferModule,
 		guardian.NewAppModule(appCodec, app.guardianKeeper),
 		token.NewAppModule(appCodec, app.tokenKeeper, app.accountKeeper, app.bankKeeper),
+		record.NewAppModule(appCodec, app.recordKeeper, app.accountKeeper, app.bankKeeper),
 		nft.NewAppModule(appCodec, app.nftKeeper, app.accountKeeper, app.bankKeeper),
 		htlc.NewAppModule(appCodec, app.htlcKeeper, app.accountKeeper, app.bankKeeper),
 		coinswap.NewAppModule(appCodec, app.coinswapKeeper, app.accountKeeper, app.bankKeeper),
@@ -402,7 +409,7 @@ func NewIrisApp(
 		capabilitytypes.ModuleName, authtypes.ModuleName, distrtypes.ModuleName, stakingtypes.ModuleName, banktypes.ModuleName,
 		slashingtypes.ModuleName, govtypes.ModuleName, minttypes.ModuleName, crisistypes.ModuleName,
 		ibchost.ModuleName, genutiltypes.ModuleName, evidencetypes.ModuleName, ibctransfertypes.ModuleName,
-		guardiantypes.ModuleName, tokentypes.ModuleName, nfttypes.ModuleName, htlctypes.ModuleName,
+		guardiantypes.ModuleName, tokentypes.ModuleName, nfttypes.ModuleName, htlctypes.ModuleName, recordtypes.ModuleName,
 		coinswaptypes.ModuleName, servicetypes.ModuleName, oracletypes.ModuleName, randomtypes.ModuleName,
 	)
 
@@ -432,6 +439,7 @@ func NewIrisApp(
 		transferModule,
 		guardian.NewAppModule(appCodec, app.guardianKeeper),
 		token.NewAppModule(appCodec, app.tokenKeeper, app.accountKeeper, app.bankKeeper),
+		record.NewAppModule(appCodec, app.recordKeeper, app.accountKeeper, app.bankKeeper),
 		nft.NewAppModule(appCodec, app.nftKeeper, app.accountKeeper, app.bankKeeper),
 		htlc.NewAppModule(appCodec, app.htlcKeeper, app.accountKeeper, app.bankKeeper),
 		coinswap.NewAppModule(appCodec, app.coinswapKeeper, app.accountKeeper, app.bankKeeper),
@@ -617,6 +625,7 @@ func initParamsKeeper(appCodec codec.Marshaler, key, tkey sdk.StoreKey) paramske
 	paramsKeeper.Subspace(govtypes.ModuleName).WithKeyTable(govtypes.ParamKeyTable())
 	paramsKeeper.Subspace(crisistypes.ModuleName)
 	paramsKeeper.Subspace(tokentypes.ModuleName)
+	paramsKeeper.Subspace(recordtypes.ModuleName)
 	paramsKeeper.Subspace(htlctypes.ModuleName)
 	paramsKeeper.Subspace(coinswaptypes.ModuleName)
 	paramsKeeper.Subspace(servicetypes.ModuleName)
