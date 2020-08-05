@@ -43,6 +43,12 @@ tags:
     description: HTLC module APIs
   - name: Supply
     description: Supply module APIs
+  - name: Token
+    description: Token module APIs
+  - name: NFT
+    description: NFT module APIs
+  - name: Record
+    description: Record module APIs
   - name: version
   - name: Mint
     description: Minting module APIs
@@ -1927,7 +1933,688 @@ paths:
           description: Invalid coin denomination
         500:
           description: Internal Server Error
-
+  '/token/tokens':
+    post:
+      summary: Issue a token
+      tags:
+        - Token
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: token
+          required: true
+          schema:
+            type: object
+            properties:
+              base_req:
+                $ref: '#/definitions/BaseReq'
+              owner:
+                $ref: '#/definitions/Address'
+              name:
+                type: string
+                example: 'Hello Kitty'
+              symbol:
+                type: string
+                example: 'cat'
+              min_unit:
+                type: string
+                example: 'min'
+              initial_supply:
+                type: string
+                example: '1000000000'
+              max_supply:
+                type: string
+                example: '2000000000'
+              scale:
+                type: integer
+                example: 18
+              mintable:
+                type: boolean
+                example: true
+      responses:
+        200:
+          description: Unsigned tx was succesfully generated
+        400:
+          description: Invalid parameters
+        500:
+          description: Internal Server Error
+    get:
+      summary: Query tokens by owner
+      tags:
+        - Token
+      parameters:
+        - in: query
+          name: owner
+          description: the owner address
+          required: false
+          schema:
+            type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/definitions/Token'
+        400:
+          description: Invalid parameters
+        500:
+          description: Internal Server Error
+  '/token/tokens/{symbol}':
+    get:
+      summary: Query a token by symbol
+      tags:
+        - Token
+      parameters:
+        - in: path
+          name: symbol
+          description: symbol of the token
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/definitions/Token'
+        400:
+          description: Invalid symbol
+        500:
+          description: Internal Server Error
+    put:
+      summary: Edit an existing token
+      parameters:
+        - in: path
+          name: symbol
+          description: symbol of the token
+          required: true
+          schema:
+            type: string
+        - in: body
+          name: token
+          required: true
+          schema:
+            type: object
+            properties:
+              base_req:
+                $ref: '#/definitions/BaseReq'
+              owner:
+                $ref: '#/definitions/Address'
+              max_supply:
+                type: string
+                example: '21000000'
+              mintable:
+                type: string
+                example: ""
+              name:
+                type: string
+                example: 'BTC Token'
+      tags:
+        - Token
+      responses:
+        200:
+          description: Unsigned tx was succesfully generated
+        400:
+          description: Invalid parameters
+        500:
+          description: Internal Server Error
+  '/token/tokens/{symbol}/mint':
+    post:
+      summary: Mint tokens to a specified address
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: symbol
+          description: symbol of the token
+          required: true
+          schema:
+            type: string
+        - in: body
+          name: token
+          required: true
+          schema:
+            type: object
+            properties:
+              base_req:
+                $ref: '#/definitions/BaseReq'
+              owner:
+                $ref: '#/definitions/Address'
+              to:
+                $ref: '#/definitions/Address'
+              amount:
+                type: string
+                example: '21000000'
+      tags:
+        - Token
+      responses:
+        200:
+          description: Unsigned tx was succesfully generated
+        400:
+          description: Invalid parameters
+        500:
+          description: Internal Server Error
+  '/token/tokens/{symbol}/transfer':
+    post:
+      summary: Transfer the ownership of the token to a new owner
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: symbol
+          description: symbol of the token
+          required: true
+          schema:
+            type: string
+        - in: body
+          name: transfer
+          required: true
+          schema:
+            type: object
+            properties:
+              base_req:
+                $ref: '#/definitions/BaseReq'
+              src_owner:
+                $ref: '#/definitions/Address'
+              dst_owner:
+                $ref: '#/definitions/Address'
+      tags:
+        - Token
+      responses:
+        200:
+          description: Unsigned tx was succesfully generated
+        400:
+          description: Invalid parameters
+        500:
+          description: Internal Server Error
+  '/token/tokens/{symbol}/fee':
+    get:
+      summary: Query the fees for issuing and minting the token with the given symbol
+      tags:
+        - Token
+      parameters:
+        - in: path
+          name: symbol
+          description: the token symbol
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/definitions/TokenFeesOutput'
+        400:
+          description: Invalid symbol
+        500:
+          description: Internal Server Error
+  '/token/tokens/params':
+    get:
+      summary: Query the params for issuing and minting the token with the given symbol
+      tags:
+        - Token
+      parameters:
+        - in: path
+          name: symbol
+          description: the token symbol
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/definitions/TokenFeesOutput'
+        400:
+          description: Invalid symbol
+        500:
+          description: Internal Server Error
+  '/nft/nfts/mint':
+    post:
+      summary: Mint an NFT to a specified address
+      tags:
+        - NFT
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: MintNFTReq
+          required: true
+          schema:
+            type: object
+            properties:
+              base_req:
+                $ref: '#/definitions/BaseReq'
+              owner:
+                $ref: '#/definitions/Address'
+                example: 'caa12jyx7smkhpzgjudh73gxmcgt9chxtpeufsq2cj'
+              recipient:
+                $ref: '#/definitions/Address'
+                example: 'caa12jyx7smkhpzgjudh73gxmcgt9chxtpeufsq2cj'
+              token_id:
+                type: string
+              token_uri:
+                type: string
+              denom:
+                type: string
+              token_data:
+                type: string
+      responses:
+        200:
+          description: Unsigned tx was succesfully generated
+        400:
+          description: Invalid parameters
+        500:
+          description: Internal Server Error
+  "/nft/nfts/denoms/issue":
+    post:
+      summary: Mint an NFT to a specified address
+      tags:
+        - NFT
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: MintNFTReq
+          required: true
+          schema:
+            type: object
+            properties:
+              base_req:
+                $ref: '#/definitions/BaseReq'
+              owner:
+                $ref: '#/definitions/Address'
+                example: 'caa12jyx7smkhpzgjudh73gxmcgt9chxtpeufsq2cj'
+              denom:
+                type: string
+              schema:
+                type: string
+      responses:
+        200:
+          description: Unsigned tx was succesfully generated
+        400:
+          description: Invalid parameters
+        500:
+          description: Internal Server Error
+  '/nft/nfts/{denom}/{token-id}':
+    get:
+      summary: Query an NFT by the denom and ID
+      tags:
+        - NFT
+      parameters:
+        - in: path
+          name: denom
+          description: denom of the NFT
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: token-id
+          description: ID of the NFT
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/definitions/NFT'
+        400:
+          description: Invalid parameters
+        500:
+          description: Internal Server Error
+    put:
+      summary: Edit an NFT of the specified denom and ID
+      tags:
+        - NFT
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: denom
+          description: denom of the NFT
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: token-id
+          description: ID of the NFT
+          required: true
+          schema:
+            type: string
+        - in: body
+          name: EditNFTReq
+          required: true
+          schema:
+            type: object
+            properties:
+              base_req:
+                $ref: '#/definitions/BaseReq'
+              owner:
+                $ref: '#/definitions/Address'
+                example: 'caa12jyx7smkhpzgjudh73gxmcgt9chxtpeufsq2cj'
+              token_uri:
+                type: string
+              token_data:
+                type: string
+      responses:
+        200:
+          description: Unsigned tx was succesfully generated
+        400:
+          description: Invalid parameters
+        500:
+          description: Internal Server Error
+  '/nft/nfts/{denom}/{token-id}/transfer':
+    post:
+      summary: Transfer the ownership of an NFT of the specified denom and ID
+      tags:
+        - NFT
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: denom
+          description: denom of the NFT
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: token-id
+          description: ID of the NFT
+          required: true
+          schema:
+            type: string
+        - in: body
+          name: TransferNFTReq
+          required: true
+          schema:
+            type: object
+            properties:
+              base_req:
+                $ref: '#/definitions/BaseReq'
+              owner:
+                $ref: '#/definitions/Address'
+                example: 'caa12jyx7smkhpzgjudh73gxmcgt9chxtpeufsq2cj'
+              recipient:
+                $ref: '#/definitions/Address'
+                example: 'caa12jyx7smkhpzgjudh73gxmcgt9chxtpeufsq2cj'
+              token_uri:
+                type: string
+              token_data:
+                type: string
+      responses:
+        200:
+          description: Unsigned tx was succesfully generated
+        400:
+          description: Invalid parameters
+        500:
+          description: Internal Server Error
+  '/nft/nfts/{denom}/{token-id}/burn':
+    post:
+      summary: Burn an NFT of the specified denom and ID
+      tags:
+        - NFT
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: denom
+          description: denom of the NFT
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: token-id
+          description: ID of the NFT
+          required: true
+          schema:
+            type: string
+        - in: body
+          name: BurnNFTReq
+          required: true
+          schema:
+            type: object
+            properties:
+              base_req:
+                $ref: '#/definitions/BaseReq'
+              owner:
+                $ref: '#/definitions/Address'
+                example: 'caa12jyx7smkhpzgjudh73gxmcgt9chxtpeufsq2cj'
+      responses:
+        200:
+          description: Unsigned tx was succesfully generated
+        400:
+          description: Invalid parameters
+        500:
+          description: Internal Server Error
+  '/nft/nfts/collections/{denom}':
+    get:
+      summary: Query the NFT collection of the specified denom
+      tags:
+        - NFT
+      parameters:
+        - in: path
+          name: denom
+          description: denom of the collection
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+        400:
+          description: Invalid parameters
+        500:
+          description: Internal Server Error
+  '/nft/nfts/owners/{address}':
+    get:
+      summary: Query the collections of NFTs owned by an address
+      tags:
+        - NFT
+      parameters:
+        - in: path
+          name: address
+          description: owner address
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: denom
+          description: optional denom
+          required: false
+          schema:
+            type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/definitions/NFTOwner'
+        400:
+          description: Invalid parameters
+        500:
+          description: Internal Server Error
+  '/nft/nfts/denoms':
+    get:
+      summary: Query all existing denoms
+      tags:
+        - NFT
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+        400:
+          description: Invalid parameters
+        500:
+          description: Internal Server Error
+  '/nft/nfts/supplies/{denom}':
+    get:
+      summary: Query the supply of NFTs of the specified denom
+      tags:
+        - NFT
+      parameters:
+        - in: path
+          name: denom
+          description: denom of NFTs
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: integer
+        400:
+          description: Invalid parameters
+        500:
+          description: Internal Server Error
+  '/nft/nfts/denom/{denom}':
+    get:
+      summary: Query a denom
+      tags:
+        - NFT
+      parameters:
+        - in: path
+          name: denom
+          description: denom of NFTs
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/definitions/Denom'
+        400:
+          description: Invalid parameters
+        500:
+          description: Internal Server Error
+  '/record/records':
+    post:
+      summary: Create a record
+      tags:
+        - Record
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: record
+          required: true
+          schema:
+            type: object
+            properties:
+              base_req:
+                $ref: '#/definitions/BaseReq'
+              contents:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    digest:
+                      type: string
+                    digest_algo:
+                      type: string
+                      example: 'SHA256'
+                    uri:
+                      type: string
+                    meta:
+                      type: string
+              creator:
+                $ref: '#/definitions/Address'
+      responses:
+        200:
+          description: Unsigned tx was succesfully generated
+        400:
+          description: Invalid parameters
+        500:
+          description: Internal Server Error
+  '/record/records/{record-id}':
+    get:
+      summary: Query a record by id
+      tags:
+        - Record
+      parameters:
+        - in: path
+          name: record-id
+          description: id of the record
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tx_hash:
+                    type: string
+                  contents:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        digest:
+                          type: string
+                        digest_algo:
+                          type: string
+                          example: 'SHA256'
+                        uri:
+                          type: string
+                        meta:
+                          type: string
+                  creator:
+                    $ref: '#/definitions/Address'
+        400:
+          description: Invalid symbol
+        500:
+          description: Internal Server Error
   /service/definitions:
     post:
       summary: Add a service definition
@@ -3935,22 +4622,14 @@ definitions:
   Token:
     type: object
     properties:
-      family:
-        type: string
-      source:
-        type: string
-      gateway:
-        type: string
       symbol:
         type: string
       name:
         type: string
-      decimal:
+      min_unit:
+        type: string
+      scale:
         type: integer
-      canonical_symbol:
-        type: string
-      min_unit_alias:
-        type: string
       initial_supply:
         type: string
       max_supply:
@@ -3958,4 +4637,63 @@ definitions:
       mintable:
         type: boolean
       owner:
+        $ref: '#/definitions/Address'
+  TokenFeesOutput:
+    type: object
+    properties:
+      exist:
+        type: boolean
+      issue_fee:
+        $ref: '#/definitions/Coin'
+      mint_fee:
+        $ref: '#/definitions/Coin'
+  TokenParamsOutput:
+    type: object
+    properties:
+      token_tax_rate:
+        $ref: '#definitions/Dec'
+      issue_token_base_fee:
+        $ref: '#/definitions/Coin'
+      min_token_fee_ratio: 
+        $ref: '#definitions/Dec'
+  Dec:
+    type: object
+    properties:
+      i:
+        type: string
+  NFT:
+    type: object
+    properties:
+      id:
+        type: string
+      owner:
+        $ref: '#/definitions/Address'
+      token_uri:
+        type: string
+  IDCollection:
+    type: object
+    properties:
+      denom:
+        type: string
+      IDs:
+        type: array
+        items:
+          type: string
+  NFTOwner:
+    type: object
+    properties:
+      address:
+        $ref: '#/definitions/Address'
+      id_collections:
+        type: array
+        items:
+          $ref: '#/definitions/IDCollection'
+  Denom:
+    type: object
+    properties:
+      name:
+        type: string
+      schema: 
+        type: string
+      creator: 
         $ref: '#/definitions/Address'
