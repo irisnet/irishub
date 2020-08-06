@@ -2210,33 +2210,33 @@ paths:
           description: Internal Server Error
   /ibc/clients/connections:
     get:
-    summary: Query all client connection paths
-    tags:
-      - IBC
-    produces:
-      - application/json
-    parameters:
-      - in: query
-        name: page
-        description: Page number
-        type: integer
-        x-example: 1
-      - in: query
-        name: limit
-        description: Maximum number of items per page
-        type: integer
-        x-example: 1
-    responses:
-      200:
-        description: OK
-        schema:
-          type: array
-          items:
-            $ref: "#/definitions/ConnectionPaths"
-      400:
-        description: Bad Request
-      500:
-        description: Internal Server Error
+      summary: Query all client connection paths
+      tags:
+        - IBC
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: page
+          description: Page number
+          type: integer
+          x-example: 1
+        - in: query
+          name: limit
+          description: Maximum number of items per page
+          type: integer
+          x-example: 1
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/ConnectionPaths"
+        400:
+          description: Bad Request
+        500:
+          description: Internal Server Error
   /ibc/clients/{client-id}/connections:
     get:
       summary: Query connections of a client
