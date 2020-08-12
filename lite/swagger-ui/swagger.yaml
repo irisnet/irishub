@@ -257,60 +257,6 @@ paths:
     $ref: cosmos-swagger.yaml#/paths/~1distribution~1community_pool
   /distribution/parameters:
     $ref: cosmos-swagger.yaml#/paths/~1distribution~1parameters
-  /ibc/clients/{client-id}/consensus-state:
-    $ref: cosmos-swagger.yaml#/paths/~1ibc~1clients~1{client-id}~1consensus-state
-  /ibc/clients/{client-id}/client-state:
-    $ref: cosmos-swagger.yaml#/paths/~1ibc~1clients~1{client-id}~1client-state
-  /ibc/clients/{client-id}/roots/{height}:
-    $ref: cosmos-swagger.yaml#/paths/~1ibc~1clients~1{client-id}~1roots~1{height}
-  /ibc/header:
-    $ref: cosmos-swagger.yaml#/paths/~1ibc~1header
-  /ibc/node-state:
-    $ref: cosmos-swagger.yaml#/paths/~1ibc~1node-state
-  /ibc/path:
-    $ref: cosmos-swagger.yaml#/paths/~1ibc~1path
-  /ibc/clients:
-    $ref: cosmos-swagger.yaml#/paths/~1ibc~1clients
-  /ibc/clients/{client-id}/update:
-    $ref: cosmos-swagger.yaml#/paths/~1ibc~1clients~1{client-id}~1update
-  /ibc/clients/{client-id}/misbehaviour:
-    $ref: cosmos-swagger.yaml#/paths/~1ibc~1clients~1{client-id}~1misbehaviour
-  /ibc/connections:
-    $ref: cosmos-swagger.yaml#/paths/~1ibc~1connections
-  /ibc/connections/{connection-id}:
-    $ref: cosmos-swagger.yaml#/paths/~1ibc~1connections~1{connection-id}
-  /ibc/clients/connections:
-    $ref: cosmos-swagger.yaml#/paths/~1ibc~1clients~1connections
-  /ibc/clients/{client-id}/connections:
-    $ref: cosmos-swagger.yaml#/paths/~1ibc~1clients~1{client-id}~1connections
-  /ibc/connections/open-init:
-    $ref: cosmos-swagger.yaml#/paths/~1ibc~1connections~1open-init
-  /ibc/connections/open-try:
-    $ref: cosmos-swagger.yaml#/paths/~1ibc~1connections~1open-try
-  /ibc/connections/{connection-id}/open-ack:
-    $ref: cosmos-swagger.yaml#/paths/~1ibc~1connections~1{connection-id}~1open-ack
-  /ibc/connections/{connection-id}/open-confirm:
-    $ref: cosmos-swagger.yaml#/paths/~1ibc~1connections~1{connection-id}~1open-confirm
-  /ibc/ports/{port-id}/channels/{channel-id}:
-    $ref: cosmos-swagger.yaml#/paths/~1ibc~1ports~1{port-id}~1channels~1{channel-id}
-  /ibc/channels/open-init:
-    $ref: cosmos-swagger.yaml#/paths/~1ibc~1channels~1open-init
-  /ibc/channels/open-try:
-    $ref: cosmos-swagger.yaml#/paths/~1ibc~1channels~1open-try
-  /ibc/ports/{port-id}/channels/{channel-id}/open-ack:
-    $ref: cosmos-swagger.yaml#/paths/~1ibc~1ports~1{port-id}~1channels~1{channel-id}~1open-ack
-  /ibc/ports/{port-id}/channels/{channel-id}/open-confirm:
-    $ref: cosmos-swagger.yaml#/paths/~1ibc~1ports~1{port-id}~1channels~1{channel-id}~1open-confirm
-  /ibc/ports/{port-id}/channels/{channel-id}/close-init:
-    $ref: cosmos-swagger.yaml#/paths/~1ibc~1ports~1{port-id}~1channels~1{channel-id}~1close-init
-  /ibc/ports/{port-id}/channels/{channel-id}/close-confirm:
-    $ref: cosmos-swagger.yaml#/paths/~1ibc~1ports~1{port-id}~1channels~1{channel-id}~1close-confirm
-  /ibc/ports/{port-id}/channels/{channel-id}/next-sequence-recv:
-    $ref: cosmos-swagger.yaml#/paths/~1ibc~1ports~1{port-id}~1channels~1{channel-id}~1next-sequence-recv
-  /ibc/ports/{port-id}/channels/{channel-id}/transfer:
-    $ref: cosmos-swagger.yaml#/paths/~1ibc~1ports~1{port-id}~1channels~1{channel-id}~1transfer
-  /ibc/packets/receive:
-    $ref: cosmos-swagger.yaml#/paths/~1ibc~1packets~1receive
   /supply/total:
     $ref: cosmos-swagger.yaml#/paths/~1supply~1total
   /supply/total/{denomination}:
@@ -2668,53 +2614,6 @@ definitions:
     $ref: cosmos-swagger.yaml#/definitions/ParamChange
   Supply:
     $ref: cosmos-swagger.yaml#/definitions/Supply
-  IBCValidator:
-    $ref: cosmos-swagger.yaml#/definitions/IBCValidator
-  ConsensusState:
-    $ref: cosmos-swagger.yaml#/definitions/ConsensusState
-  Root:
-    $ref: cosmos-swagger.yaml#/definitions/Root
-  Prefix:
-    $ref: cosmos-swagger.yaml#/definitions/Prefix
-  ValidatorSet:
-    $ref: cosmos-swagger.yaml#/definitions/ValidatorSet
-  ClientState:
-    $ref: cosmos-swagger.yaml#/definitions/ClientState
-  Proof:
-    $ref: cosmos-swagger.yaml#/definitions/Proof
-  Commit:
-    $ref: cosmos-swagger.yaml#/definitions/Commit
-  SignedHeader:
-    $ref: cosmos-swagger.yaml#/definitions/SignedHeader
-  Header:
-    $ref: cosmos-swagger.yaml#/definitions/Header
-  ConnectionResponse:
-    $ref: cosmos-swagger.yaml#/definitions/ConnectionResponse
-  Connection:
-    $ref: cosmos-swagger.yaml#/definitions/Connection
-  ConnectionCounterparty:
-    $ref: cosmos-swagger.yaml#/definitions/ConnectionCounterparty
-  ProofPath:
-    $ref: cosmos-swagger.yaml#/definitions/ProofPath
-  ConnectionPaths:
-    $ref: cosmos-swagger.yaml#/definitions/ConnectionPaths
-  ClientConnectionsResponse:
-    $ref: cosmos-swagger.yaml#/definitions/ClientConnectionsResponse
-  ChannelResponse:
-    $ref: cosmos-swagger.yaml#/definitions/ChannelResponse
-  Channel:
-    $ref: cosmos-swagger.yaml#/definitions/Channel
-  ChannelCounterparty:
-    $ref: cosmos-swagger.yaml#/definitions/ChannelCounterparty
-  Packet:
-    $ref: cosmos-swagger.yaml#/definitions/Packet
-  # TODO: DuplicateVoteEvidence
-  DuplicateVoteEvidence:
-    $ref: cosmos-swagger.yaml#/definitions/DuplicateVoteEvidence
-  Evidence:
-    $ref: cosmos-swagger.yaml#/definitions/Evidence
-
-
 
 
   Token:
