@@ -51,11 +51,16 @@ tags:
     description: NFT module APIs
   - name: Record
     description: Record module APIs
+  - name: Oracle
+    description: Oracle module APIs
   - name: version
+    description: Query app version
   - name: Mint
     description: Minting module APIs
   - name: Misc
     description: Query app version
+  - name: Params
+    description: Query system Params
 paths:
   /node_info:
     get:
@@ -252,12 +257,6 @@ paths:
     $ref: cosmos-swagger.yaml#/paths/~1distribution~1community_pool
   /distribution/parameters:
     $ref: cosmos-swagger.yaml#/paths/~1distribution~1parameters
-  /minting/parameters:
-    $ref: cosmos-swagger.yaml#/paths/~1minting~1parameters
-  /minting/inflation:
-    $ref: cosmos-swagger.yaml#/paths/~1minting~1inflation
-  /minting/annual-provisions:
-    $ref: cosmos-swagger.yaml#/paths/~1minting~1annual-provisions
   /ibc/clients/{client-id}/consensus-state:
     $ref: cosmos-swagger.yaml#/paths/~1ibc~1clients~1{client-id}~1consensus-state
   /ibc/clients/{client-id}/client-state:
@@ -316,7 +315,25 @@ paths:
     $ref: cosmos-swagger.yaml#/paths/~1supply~1total
   /supply/total/{denomination}:
     $ref: cosmos-swagger.yaml#/paths/~1supply~1total~1{denomination}
-  
+    
+  '/mint/parameters':
+    get:
+      summary: Query the current mint parameter values
+      tags:
+        - Mint
+      produces:
+        - application/json
+      responses:
+        200:
+          description: OK
+          schema:
+            properties:
+              mint_denom:
+                type: string
+              inflation:
+                type: string
+        500:
+          description: Internal Server Error
   '/token/tokens':
     post:
       summary: Issue a token
@@ -2385,6 +2402,196 @@ paths:
           description: OK
         '500':
           description: Internal Server Error
+  '/oracle/feeds/{feed-name}':
+    put:
+      summary: Edit a feed
+      description: Send transaction to edit a feed
+      tags:
+        - Oracle
+      parameters:
+        - in: path
+          name: feed-name
+          description: feed name
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Unsigned tx was succesfully generated
+        '400':
+          description: Invalid service binding deposit refund body
+        '500':
+          description: Internal Server Error 
+    get:
+      summary: Query a feed definition
+      tags:
+        - Oracle
+      parameters:
+        - in: path
+          name: feed-name
+          description: feed name
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/definitions/Feed'
+        400:
+          description: Invalid symbol
+        500:
+          description: Internal Server Error
+  '/oracle/feeds':
+    post:
+      summary: Define a feed
+      tags:
+        - Oracle
+      responses:
+        '200':
+          description: Unsigned tx was succesfully generated
+        '400':
+          description: Invalid parameters
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_req:
+                  $ref: '#/definitions/BaseReq'
+                feed_name:
+                  type: string
+                aggregate_func:
+                  type: string
+                value_json_path:
+                  type: string
+                latest_history:
+                  type: string
+                description:
+                  type: string
+                creator:
+                  type: string
+                service_name:
+                  type: string
+                providers:
+                  type: array
+                  items:
+                    type: string
+                input:
+                  type: string
+                timeout:
+                  type: integer
+                service_fee_cap:
+                  type: string
+                repeated_frequency:
+                  type: integer
+                response_threshold:
+                  type: integer
+    get:
+      summary: Guery a feed list by condition
+      tags:
+        - Oracle
+      parameters:
+        - in: query
+          name: state
+          description: the state of '/oracle/feeds'
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+        '500':
+          description: Internal Server Error
+  '/oracle/feeds/{feed-name}/values':
+    get:
+      summary: Guery a feed list by feedname
+      tags:
+        - Oracle
+      parameters:
+        - in: path
+          name: feed-name
+          description: the name of feeds
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+        '500':
+          description: Internal Server Error
+  '/oracle/feeds/{feed-name}/start':
+    post:
+      summary: Start a feed
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: feed-name
+          description: the name of feeds
+          required: true
+          schema:
+            type: string
+        - in: body
+          name: ReadRESTReq
+          required: true
+          schema:
+            type: object
+            properties:
+              base_req:
+                $ref: '#/definitions/BaseReq'
+              creator:
+                $ref: '#/definitions/Address'
+      tags:
+        - Oracle
+      responses:
+        200:
+          description: Unsigned tx was succesfully generated
+        400:
+          description: Invalid parameters
+        500:
+          description: Internal Server Error
+  '/oracle/feeds/{feed-name}/pause':
+    post:
+      summary: Pause a feed
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: feed-name
+          description: the name of feeds
+          required: true
+          schema:
+            type: string
+        - in: body
+          name: pauseFeedReq
+          required: true
+          schema:
+            type: object
+            properties:
+              base_req:
+                $ref: '#/definitions/BaseReq'
+              creator:
+                $ref: '#/definitions/Address'
+      tags:
+        - Oracle
+      responses:
+        200:
+          description: Unsigned tx was succesfully generated
+        400:
+          description: Invalid parameters
+        500:
+          description: Internal Server Error
+  
 
 definitions:
   CheckTxResult:
@@ -2588,3 +2795,23 @@ definitions:
         type: string
       creator: 
         $ref: '#/definitions/Address'
+  Feed: 
+    type: object
+    properties:
+      feed-name:
+        type: string
+      description:
+        type: string 
+      aggregate_func:
+        type: string
+      value_json_path:
+        type: string 
+      latest_history:
+        type: integer
+      request_context_id:
+        type: string
+      creator:
+        $ref: '#/definitions/Address'
+
+      
+      
