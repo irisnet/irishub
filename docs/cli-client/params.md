@@ -1,4 +1,4 @@
-# iriscli params
+# Params
 
 Params module allows you to query the system parameters which can be governed (except the gov params) by the [gov module](./gov.md).
 
@@ -92,7 +92,7 @@ Among them, the parameters available for query for each subspace are as follows:
 | `Fee`           | Charge rate                   | 0.003     |
 | `StandardDenom` | The name of the token charged | iris-atto |
 
-##service
+## service
 
 | key                    | description                                         | default    |
 | ---------------------- | --------------------------------------------------- | ---------- |
