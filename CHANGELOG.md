@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.16.3
+
+*Aug 25th, 2020*
+
+### Application
+
+* [\#4d4c06](https://github.com/irisnet/irishub/commit/4d4c06a6dfdccc4271734ef6eef95960f000384f) Bump ledger-cosmos-go to support cosmos ledger 2.0
+
 ## 0.16.2
 
 *Apr 9th, 2020*
