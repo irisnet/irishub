@@ -71,7 +71,7 @@ Among them, the parameters available for query for each subspace are as follows:
 | `votingparams`  | Related parameters of the voting mortgage phase  |         |
 | `tallyparams`   | Related parameters of the voting tally phase     |         |
 
-## slashing
+## crisis
 
 | key           | description  | default |
 | ------------- | ------------ | ------- |

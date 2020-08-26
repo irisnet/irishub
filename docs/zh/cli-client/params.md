@@ -70,7 +70,7 @@ iris query params subspace [subspace] [key] [flags]
 | `votingparams`  | 提议投票阶段的相关参数 |         |
 | `tallyparams`   | 投票统计阶段的相关参数 |         |
 
-## slashing
+## crisis
 
 | key           | description | default |
 | ------------- | ----------- | ------- |
