@@ -1,6 +1,6 @@
 # Staking
 
-## Introduction
+## Summary
 
 This specification briefly introduces the functionality of stake module and what user should do with the provided commands.
 
@@ -42,100 +42,5 @@ The Byzantine-fault-tolerant POS blockchain network assume that the Byzantine no
 ### Rewards
   
 As a delegator, the more bonded tokens it has on validator, the more rewards it will earn. For a validator operator, it will have extra rewards: validator commission. The rewards come from token inflation and transaction fee. As for how to calculate the rewards and how to get the rewards, please refer to [mint](mint.md) and [distribution](distribution.md).
-
-## What Users Can Do
-
-- Create a full node
-  Please refer to [Run a Full Node](../get-started/mainnet.md#run-a-full-node).
-
-- Apply to be validator
-
-  Please refer to [Upgrade to Validator Node](../get-started/mainnet.md#upgrade-to-validator-node).
-
-- Query your own validator
-
-  Users can query their own validators by their wallet address. But firstly users have to convert their wallet addresses to validator operator address pattern:
-
-  ```bash
-  iriscli keys show <key-name> --bech=val
-  ```
-
-  Example Output:
-
-  ```bash
-  NAME:   TYPE:   ADDRESS:                                      PUBKEY:
-  faucet  local   iva1ljemm0yznz58qxxs8xyak7fashcfxf5lawld0p    ivp1addwnpepqtdme789cpm8zww058ndlhzpwst3s0mxnhdhu5uyps0wjucaufha6rzn3ga
-  ```
-
-  Then, example command to query validator:
-
-  ```bash
-  iriscli stake validator iva1ljemm0yznz58qxxs8xyak7fashcfxf5lawld0p
-  ```
-
-  Example Output:
-
-  ```bash
-  Validator
-  Operator Address: iva1ljemm0yznz58qxxs8xyak7fashcfxf5lawld0p
-  Validator Consensus Pubkey: icp1zcjduepq8fnuxnceuy4n0fzfc6rvf0spx56waw67lqkrhxwsxgnf8zgk0nus66rkg4
-  Jailed: false
-  Status: Bonded
-  Tokens: 100.0000000000
-  Delegator Shares: 100.0000000000
-  Description: {node2   }
-  Bond Height: 0
-  Unbonding Height: 0
-  Minimum Unbonding Time: 1970-01-01 00:00:00 +0000 UTC
-  Commission: {{0.1000000000 0.2000000000 0.0100000000 0001-01-01 00:00:00 +0000 UTC}}
-  ```
-
-- Edit validator
-
-  ```bash
-  iriscli stake edit-validator --from=<key-name> --chain-id=irishub --fee=0.3iris --commission-rate=0.15 --moniker=<new-name>
-  ```
-
-- Increase self-delegation
-
-  ```bash
-  iriscli stake delegate --address-validator=<self-address-validator> --chain-id=irishub --from=<key-name> --fee=0.3iris --amount=100iris
-  ```
-
-- Delegate tokens to other validators
-
-  If you just want to be a delegator, you can skip the above steps.
-
-  ```bash
-  iriscli stake delegate --address-validator=<other-address-validator> --chain-id=irishub --from=<key-name> --fee=0.3iris --amount=100iris
-  ```
-
-- Unbond tokens from a validator
-
-  use amount for Unbonding
-
-  ```bash
-  iriscli stake unbond --address-validator=<address-validator> --chain-id=irishub --from=<key-name> --fee=0.3iris --shares-amount=100
-  ```
-  
-  use percentage for Unbonding
-
-  ```bash
-  iriscli stake unbond --address-validator=<address-validator> --chain-id=irishub --from=<key-name> --fee=0.3iris --share-percent=0.5
-  ```
-
-- Redelegate tokens to another validator
-
-  use amount for Redelegation
-
-  ```bash
-  iriscli stake redelegate --chain-id=irishub --from=<key-name> --fee=0.3iris --address-validator-source=<source-validator-address> --address-validator-dest=<destination-validator-address> --shares-amount=100
-  ```
-  
-  use percentage for Redelegation
-
-  ```bash
-  iriscli stake redelegate --chain-id=irishub --from=<key-name> --fee=0.3iris --address-validator-source=<source-validator-address> --address-validator-dest=<destination-validator-address> --shares-percent=0.5
-  ```
 
 For other staking commands, please refer to [stake cli client](../cli-client/stake.md)
