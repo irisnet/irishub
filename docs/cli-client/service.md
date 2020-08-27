@@ -301,7 +301,7 @@ iris q service request <request-id>
 ```
 
 :::tip
-You can retrieve the `request-id` in the result of [tendermint block](./tendermint.md#iriscli-tendermint-block)
+You can retrieve the `request-id` in the result of [tendermint block](./tendermint.md#iris-q-tendermint-block)
 :::
 
 ## iris q service requests
@@ -383,7 +383,7 @@ iris q service response <request-id>
 ```
 
 :::tip
-You can retrieve the `request-id` in the result of [tendermint block](./tendermint.md#iriscli-tendermint-block)
+You can retrieve the `request-id` in the result of [tendermint block](./tendermint.md#iris-q-tendermint-block)
 :::
 
 ## iris q service responses
