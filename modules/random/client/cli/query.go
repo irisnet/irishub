@@ -62,7 +62,13 @@ func GetCmdQueryRandom() *cobra.Command {
 				Value:         res.Random.Value,
 			}
 
-			return clientCtx.PrintOutput(readableRandom)
+			output, err := clientCtx.JSONMarshaler.MarshalJSON(readableRandom)
+			if err != nil {
+				return err
+			}
+
+			fmt.Println(string(output))
+			return nil
 		},
 	}
 	flags.AddQueryFlagsToCmd(cmd)
@@ -101,7 +107,7 @@ func GetCmdQueryRandomRequestQueue() *cobra.Command {
 				return err
 			}
 
-			return clientCtx.PrintOutput(res.Requests)
+			return clientCtx.PrintOutput(res)
 		},
 	}
 	flags.AddQueryFlagsToCmd(cmd)
