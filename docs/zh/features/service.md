@@ -1,16 +1,14 @@
 # Service
 
-> **_提示：_** 本文档中显示的命令仅供说明。有关命令的准确语法，请参阅[cli docs](../client/service.md)。
-
 ## 简介
 
-IRIS 服务（又称iService）旨在弥合区块链和传统应用之间的鸿沟。它规范化了链外服务的定义和绑定（提供者注册），促进了调用以及与这些服务的交互，并能调解服务治理过程（分析和争议解决）。
+Service 旨在弥合区块链和传统应用之间的鸿沟。它规范化了链外服务的定义和绑定（提供者注册），便于调用和交互，并能调解服务治理过程（分析和争议解决）。
 
 ## 服务定义
 
 ### 服务接口 schema
 
-任何用户都可以在区块链上定义服务。服务的接口即输入和输出需要使用[JSON Schema](https://JSON-Schema.org/)来指定。下面是一个示例：
+服务的接口即输入和输出需要使用 [JSON Schema](https://JSON-Schema.org/) 来指定。下面是一个示例：
 
 ```json
 {
@@ -52,19 +50,21 @@ IRIS 服务（又称iService）旨在弥合区块链和传统应用之间的鸿�
 }
 ```
 
-### 命令
+### 操作
+
+`CLI`
 
 ```bash
 # 创建服务定义
-iriscli service define <service-name> <schemas-json or path/to/schemas.json> --description=<service-description> --author-description=<author-description> --tags=<tag1,tag2,...>
+iris tx service define <service-name> <schemas-json or path/to/schemas.json> --description=<service-description> --author-description=<author-description> --tags=<tag1,tag2,...>
 
 # 查询服务定义
-iriscli service definition <service-name>
+iris query service definition <service-name>
 ```
 
 ## 服务绑定
 
-通过创建对现有服务定义的绑定, 任何用户都可以提供相应的服务。绑定主要由四个部分组成：_提供者地址_、_定价_、_押金_ 以及 _服务质量_。
+通过创建对现有服务定义的绑定, 可以提供相应的服务。绑定主要由四个部分组成：_提供者地址_、_定价_、_押金_ 以及 _服务质量_。
 
 ### 提供者地址
 
@@ -74,11 +74,11 @@ iriscli service definition <service-name>
 
 ### 定价
 
-定价指定服务提供者如何对其提供的服务收费。定价必须符合此[schema](service-pricing.json)。下面是一个示例：
+定价指定服务提供者如何对其提供的服务收费。定价必须符合此 [schema](./service-pricing.json)。下面是一个示例：
 
 ```json
 {
-  "price": "0.1iris",
+  "price": "100iris",
   "promotions_by_time": [
     {
       "start_time": "2020-01-01T00:00:00Z",
@@ -94,56 +94,58 @@ iriscli service definition <service-name>
 }
 ```
 
-服务提供者能选择接受 `iris` 以外的 tokens 作为服务费用，例如 `0.03link`。价格是消费者从多个提供相同服务的提供者中遴选的一个考虑因素。
+价格是消费者从多个提供相同服务的提供者中遴选的一个考虑因素。
 
 ### 押金
 
 运营一个服务提供者意味着重要的服务责任，因此创建服务绑定需要一定数量的押金。押金数量必须大于 _押金阈值_，该值为 `MinDepositMultiple * price` 与 `MinDeposit` 两者中的最大值。如果服务提供者未能在超时之前响应请求，则其绑定押金的一小部分，即 `SlashFraction * deposit` 将被罚没和销毁。如果押金降至阈值以下，服务绑定将被暂时禁用，直到其所有者增加足够的押金重新激活。
 
-> **_提示：_**  `service/MinDepositMultiple`、`service/MinDeposit` 和 `service/SlashFraction`是可以通过链上[治理](governance.md)更改的系统参数。
+> **_提示：_**  `service/MinDepositMultiple`、`service/MinDeposit` 和 `service/SlashFraction` 是可以更改的系统参数。
 
 ### 服务质量
 
 服务质量承诺是根据提供者将服务响应发送回区块链所需的平均区块数来声明的。这是消费者选择潜在提供者时考虑的另一个因素。
 
-### 命令
+### 操作
 
 服务绑定可以由其所有者随时更新，以调整定价、增加押金或者改变 QoS；也可以被禁用和重新启用。如果服务提供者的所有者不想再提供服务，则需要禁用绑定并等待一段时间，才能取回押金。
 
+`CLI`
+
 ```bash
 # 创建服务绑定
-iriscli service bind <service-name> <provider-address> <deposit> <min-response-time> <pricing-json or path/to/pricing.json>
+iris tx service bind --service-name=<service-name> --provider=<provider-address> --deposit=<deposit> --qos=<qos> --pricing=<pricing-json or path/to/pricing.json>
 
 # 更新服务绑定
-iriscli service update-binding <service-name> <provider-address> --deposit=<added-deposit> --min-resp-time=<min-response-time> --pricing=<pricing-json or path/to/pricing.json>
+iris tx service update-binding <service-name> <provider-address> --deposit=<added-deposit> --qos=<qos> --pricing=<pricing-json or path/to/pricing.json>
 
 # 启用一个不可用的服务绑定
-iriscli service enable <service-name> <provider-address> <added-deposit>
+iris tx service enable <service-name> <provider-address> <added-deposit>
 
 # 禁用一个可用的服务绑定
-iriscli service disable <service-name> <provider-address>>
+iris tx service disable <service-name> <provider-address>
 
 # 取回服务绑定的押金
-iriscli service refund-deposit <service-name>
+iris tx service refund-deposit <service-name> <provider-address>
 
 # 查询一个服务的所有绑定
-iriscli service bindings <service-name>
+iris query service bindings <service-name>
 
 # 查询一个账户所拥有的所有绑定
-iriscli service bindings <service-name> --owner <address>
+iris query service bindings <service-name> --owner <address>
 
 # 查询指定的服务绑定
-iriscli service binding <service-name> <provider-address>
+iris query service binding <service-name> <provider-address>
 
 # 查询定价 schema
-iriscli service schema pricing
+iris query service schema pricing
 ```
 
 ## 服务调用
 
 ### 请求上下文
 
-消费者通过创建一个 _请求上下文_ 来指定如何调用一个服务。_请求上下文_ 像智能合约一样自动生成实际的请求。_请求上下文_ 由一些参数组成，可以大致分为如下四组：
+消费者通过创建一个 _请求上下文_ 来指定如何调用一个服务。_请求上下文_ 像智能合约一样自动生成实际的请求。_请求上下文_ 由一些参数组成，大致可以分为如下四组：
 
 #### 目标和输入
 
@@ -167,7 +169,7 @@ iriscli service schema pricing
 
 * _重复_：指示请求上下文是否可重复的一个布尔标志
 * _频率_：重复调用批次之间的区块间隔数
-* _总数_: 重复调用批次的总数，负数表示无限
+* _总数_：重复调用批次的总数，负数表示无限
 
 ### 请求批次
 
@@ -175,37 +177,39 @@ iriscli service schema pricing
 
 一个请求批次由若干 _请求_ 对象组成，_请求_ 表示一个向符合遴选条件的服务提供者发起的服务调用。只有那些费用不高于 `服务费上限` 并且 QoS 优于 `超时` 的提供者才能被选中。
 
-### 命令
+### 操作
 
 在成功创建一个请求上下文之后，一个 _上下文 ID_ 将返回给消费者，同时该上下文将自动启动。消费者之后能按意愿更新、暂停以及启动该上下文，也可以永久终止它。
 
+`CLI`
+
 ```bash
 # 创建一个重复性的请求上下文（无回调函数）
-iriscli service call --service-name=<service name> --data=<request input> --providers=<provider list> --service-fee-cap=1iris --timeout 50 --repeated --frequency=50 --total=100
+iris tx service call --service-name=<service-name> --data=<request-input> --providers=<provider-list> --service-fee-cap=1iris --timeout 50 --repeated --frequency=50 --total=100
 
 # 更新一个存在的请求上下文
-iriscli service update <request-context-id> --frequency=20 --total=200
+iris tx service update <request-context-id> --frequency=20 --total=200
 
 # 暂停一个正在运行的请求上下文
-iriscli service pause <request-context-id>
+iris tx service pause <request-context-id>
 
 # 启动一个暂停的请求上下文
-iriscli service start <request-context-id>
+iris tx service start <request-context-id>
 
 # 永久终止一个请求上下文
-iriscli service kill <request-context-id>
+iris tx service kill <request-context-id>
 
 # 通过 ID 查询请求上下文
-iriscli service request-context <request-context-id>
+iris query service request-context <request-context-id>
 
 # 查询一个请求批次的所有请求
-iriscli service requests <request-context-id> <batch-counter>
+iris query service requests <request-context-id> <batch-counter>
 
 # 查询一个请求批次的所有响应
-iriscli service responses <request-context-id> <batch-counter>
+iris query service responses <request-context-id> <batch-counter>
 
 # 通过请求 ID 查询对应的响应
-iriscli service response <request-id>
+iris query service response <request-id>
 ```
 
 ## 服务响应
@@ -214,7 +218,7 @@ iriscli service response <request-id>
 
 ### 服务结果 schema
 
-服务结果对象必须符合此[schema](service-result.json)。下面是一个示例：
+服务结果对象必须符合此 [schema](./service-result.json)。下面是一个示例：
 
 ```json
 {
@@ -227,20 +231,22 @@ iriscli service response <request-id>
 
 当结果 code 等于200时输出对象必须提供。
 
-### 命令
+### 操作
+
+`CLI`
 
 ```bash
-# 查询所有特定于指定服务提供者的待处理请求
-iriscli service requests <service-name> <provider>
+# 查询指定服务提供者的待处理请求
+iris query service requests <service-name> <provider-address>
 
 # 通过请求 ID 查询请求
-iriscli service request <request-id>
+iris query service request <request-id>
 
 # 发送指定请求的响应
-iriscli service respond --request-id=<request-id> --result='{"code":200,"message":"success"}' --data=<response output>
+iris tx service respond --request-id=<request-id> --result='{"code":200,"message":"success"}' --data=<response output>
 
 # 查询服务结果 schema
-iriscli service schema result
+iris query service schema result
 ```
 
 ## 服务费用
@@ -249,31 +255,31 @@ iriscli service schema result
 
 ### 托管
 
-在一个请求产生之后，关联的服务费 **不会** 立即支付给目标服务提供者，而是由一个内部账户 _托管_。当响应及时（在请求超时前）被发送，相应的服务费（扣除服务税之后的部分）将从该 _托管_ 账户释放到服务提供者。否则，服务费将退还给消费者。
+在一个请求产生之后，关联的服务费 **不会** 立即支付给目标服务提供者，而是被托管在一个内部 _托管_ 账户。当响应及时（在请求超时前）被发送，相应的服务费（扣除服务税之后的部分）将从该 _托管_ 账户释放到服务提供者。否则，服务费将退还给消费者。
 
 ### 税
 
 在向服务提供者支付服务费之前，一部分 _税_ 将被收取并发送到社区资金池，其数量为 `ServiceFeeTax * fee`。
 
-> **_提示：_** `service/ServiceFeeTax` 是可以通过链上[治理](governance.md)更改的系统参数。
+> **_提示：_** `service/ServiceFeeTax` 是可以更改的系统参数。
 
-### 命令
+### 操作
+
+`CLI`
 
 ```bash
 # 设置提取地址
-iriscli service set-withdraw-addr <withdrawal-address>
+iris tx service set-withdraw-addr <withdrawal-address>
 
 # 查询提取地址
-iriscli service withdraw-addr <address>
+iris query service withdraw-addr <address>
 
 # 查询指定服务提供者赚取的服务费
-iriscli service fees <provider-address>
+iris query service fees <provider-address>
 
 # 提取所有服务提供者赚取的服务费
-iriscli service withdraw-fees
+iris tx service withdraw-fees
 
 # 从指定服务提供者提取赚取的服务费
-iriscli service withdraw-fees <provider-address>
+iris tx service withdraw-fees <provider-address>
 ```
-
-## 服务治理 (TODO)
