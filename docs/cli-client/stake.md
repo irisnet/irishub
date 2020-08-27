@@ -1,30 +1,30 @@
-# staking
+# Staking
 
 Staking module provides a set of subcommands to query staking state and send staking transactions.
 
 ## Available Commands
 
-| Name                                                                    | Description                                                                                   |
-| ----------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| [validator](#iris-q-staking-validator)                                   | Query a validator                                                                             |
-| [validators](#iris-q-staking-validators)                                 | Query for all validators                                                                      |
-| [delegation](#iris-q-staking-delegation)                                 | Query a delegation based on address and validator address                                     |
-| [delegations](#iris-q-staking-delegations)                               | Query all delegations made from one delegator                                                 |
-| [delegations-to](#iris-q-staking-delegations-to)                         | Query all delegations to one validator                                                        |
-| [unbonding-delegation](#iris-q-staking-unbonding-delegation)             | Query an unbonding-delegation record based on delegator and validator address                 |
-| [unbonding-delegations](#iris-q-staking-unbonding-delegations)           | Query all unbonding-delegations records for one delegator                                     |
-| [unbonding-delegations-from](#iris-q-staking-unbonding-delegations-from) | Query all unbonding delegatations from a validator                                            |
-| [redelegations-from](#iris-q-staking-redelegations-from)                 | Query all outgoing redelegatations from a validator                                           |
-| [redelegation](#iris-q-staking-redelegation)                             | Query a redelegation record based on delegator and a source and destination validator address |
-| [redelegations](#iris-q-staking-redelegations)                           | Query all redelegations records for one delegator                                             |
-| [pool](#iris-q-staking-pool)                                             | Query the current staking pool values                                                         |
-| [params](#iris-q-staking-params)                                 | Query the current staking parameters information                                              |
-| [historical-info](#iris-q-staking-historical-info)                             | Query a validator's signing information                                                       |
-| [create-validator](#iris-tx-staking-create-validator)                     | Create new validator initialized with a self-delegation to it                                 |
-| [edit-validator](#iris-tx-staking-edit-validator)                         | Edit existing validator account                                                               |
-| [delegate](#iris-tx-staking-delegate)                                     | Delegate liquid tokens to an validator                                                        |
-| [unbond](#iris-tx-staking-unbond)                                         | Unbond shares from a validator                                                                |
-| [redelegate](#iris-tx-staking-redelegate)                                 | Redelegate illiquid tokens from one validator to another                                      |
+| Name                                                         | Description                                                  |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| [validator](#iris-q-staking-validator)                       | Query a validator                                            |
+| [validators](#iris-q-staking-validators)                     | Query for all validators                                     |
+| [delegation](#iris-q-staking-delegation)                     | Query a delegation based on address and validator address    |
+| [delegations](#iris-q-staking-delegations)                   | Query all delegations made from one delegator                |
+| [delegations-to](#iris-q-staking-delegations-to)             | Query all delegations to one validator                       |
+| [unbonding-delegation](#iris-q-staking-unbonding-delegation) | Query an unbonding-delegation record based on delegator and validator address |
+| [unbonding-delegations](#iris-q-staking-unbonding-delegations) | Query all unbonding-delegations records for one delegator    |
+| [unbonding-delegations-from](#iris-q-staking-unbonding-delegations-from) | Query all unbonding delegatations from a validator           |
+| [redelegations-from](#iris-q-staking-redelegations-from)     | Query all outgoing redelegatations from a validator          |
+| [redelegation](#iris-q-staking-redelegation)                 | Query a redelegation record based on delegator and a source and destination validator address |
+| [redelegations](#iris-q-staking-redelegations)               | Query all redelegations records for one delegator            |
+| [pool](#iris-q-staking-pool)                                 | Query the current staking pool values                        |
+| [params](#iris-q-staking-params)                             | Query the current staking parameters information             |
+| [historical-info](#iris-q-staking-historical-info)           | Query historical info at given height                        |
+| [create-validator](#iris-tx-staking-create-validator)        | Create new validator initialized with a self-delegation to it |
+| [edit-validator](#iris-tx-staking-edit-validator)            | Edit existing validator account                              |
+| [delegate](#iris-tx-staking-delegate)                        | Delegate liquid tokens to an validator                       |
+| [unbond](#iris-tx-staking-unbond)                            | Unbond shares from a validator                               |
+| [redelegate](#iris-tx-staking-redelegate)                    | Redelegate illiquid tokens from one validator to another     |
 
 ## iris q staking validator
 
