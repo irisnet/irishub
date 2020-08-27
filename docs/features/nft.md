@@ -2,25 +2,25 @@
 
 ## Introduction
 
-`NFT` provides the ability to digitize assets. Through this module, each off-chain asset will be modeled as a unique on-chain asset.
+`NFT` provides the ability to digitize assets. Through this module, each off-chain asset will be modeled as a unique on-chain nft.
 
-Assets on the chain are identified by `ID`. With the help of the secure and non-tamperable features of the blockchain, the ownership of assets will be clarified. The transaction process of assets among members will also be publicly recorded to facilitate traceability and dispute settlement.
+nft on the chain are identified by `ID`. With the help of the secure and non-tamperable features of the blockchain, the ownership of nft will be clarified. The transaction process of nft among members will also be publicly recorded to facilitate traceability and dispute settlement.
 
-Asset metadata (`metadata`) can be stored directly on the chain, or the `URI` of its storage source outside the chain can be stored on the chain. Asset metadata is organized according to a specific [JSON Schema](https://JSON-Schema.org/). [Here](./nft-metadata.json) is an example of metadata JSON Schema.
+nft metadata (`metadata`) can be stored directly on the chain, or the `URI` of its storage source outside the chain can be stored on the chain. nft metadata is organized according to a specific [JSON Schema](https://JSON-Schema.org/). [Here](./nft-metadata.json) is an example of metadata JSON Schema.
 
-Assets need to be issued before creation to declare their abstract properties:
+nft need to be issued before creation to declare their abstract properties:
 
 -_Denom_: the globally unique asset class identifier
 
--_Metadata Specification_: The JSON Schema that asset metadata should follow
+-_Metadata Specification_: The JSON Schema that nft metadata should follow
 
-Each specific asset is described by the following elements:
+Each specific nft is described by the following elements:
 
--_Denom_: the category of the asset
+-_Denom_: the category of the nft
 
--_ID_: The identifier of the asset, which is unique in this asset class; this ID is generated off-chain
+-_ID_: The identifier of the nft, which is unique in this nft denom; this ID is generated off-chain
 
--_Metadata_: The structure containing the specific data of the asset
+-_Metadata_: The structure containing the specific data of the nft
 
 -_Metadata URI_: When metadata is stored off-chain, this URI indicates its storage location
 
@@ -28,7 +28,7 @@ Each specific asset is described by the following elements:
 
 ### issued
 
-Specify the asset Denom (asset category) and metadata JSON Schema to issue assets.
+Specify the nft Denom (nft category) and metadata JSON Schema to issue nft.
 
 `CLI`
 
@@ -38,7 +38,7 @@ iris tx nft issue <denom> --schema=<schema-content or path/to/schema.json>
 
 ### Additional issuance
 
-After the asset is issued, additional issuance (create) of specific assets of this type can be made. The asset ID, recipient address, metadata, or URI must be specified.
+After the nft is issued, additional issuance (create) of specific nft of this type can be made. The nft ID, recipient address, metadata, or URI must be specified.
 
 `CLI`
 
@@ -48,7 +48,7 @@ iris tx nft mint <denom> ---recipient=<recipient-address> --token-id=<token-id> 
 
 ### Edit
 
-The metadata of the specified asset can be updated.
+The metadata of the specified nft can be updated.
 
 `CLI`
 
@@ -58,7 +58,7 @@ iris tx nft edit <denom> <token-id> --token-uri=<token-uri> --token-data=<token-
 
 ### Transfer
 
-Transfer designated assets.
+Transfer designated nft.
 
 `CLI`
 
@@ -68,7 +68,7 @@ iris tx nft transfer <denom> <token-id> --recipient=<recipient-address>
 
 ### Destroy
 
-You can destroy the created assets.
+You can destroy the created nft.
 
 `CLI`
 
@@ -76,9 +76,9 @@ You can destroy the created assets.
 iris tx nft burn <denom> <token-id>
 ```
 
-### Query the specified asset class
+### Query the specified nft denom
 
-Query asset class information based on Denom.
+Query nft denom information based on Denom.
 
 `CLI`
 
@@ -86,9 +86,9 @@ Query asset class information based on Denom.
 iris q query nft denom <denom>
 ```
 
-### Query all asset category information
+### Query all nft denom information
 
-Query all issued asset class information.
+Query all issued nft denom information.
 
 `CLI`
 
@@ -96,9 +96,9 @@ Query all issued asset class information.
 iris q nft denoms
 ```
 
-### Query the total amount of assets in a specified category
+### Query the total amount of nft in a specified denom
 
-Query the total amount of assets according to Denom; accept the optional owner parameter.
+Query the total amount of nft according to Denom; accept the optional owner parameter.
 
 `CLI`
 
@@ -106,9 +106,9 @@ Query the total amount of assets according to Denom; accept the optional owner p
 iris q nft supply <denom> --owner=<owner>
 ```
 
-### Query all assets of the specified account
+### Query all nft of the specified account
 
-Query all assets owned by an account; you can specify the Denom parameter.
+Query all nft owned by an account; you can specify the Denom parameter.
 
 `CLI`
 
@@ -116,9 +116,9 @@ Query all assets owned by an account; you can specify the Denom parameter.
 iris q nft owner --denom=<denom>
 ```
 
-### Query all assets of a specified category
+### Query all nft of a specified denom
 
-Query all assets according to Denom.
+Query all nft according to Denom.
 
 `CLI`
 
@@ -126,9 +126,9 @@ Query all assets according to Denom.
 iris q nft collection <denom>
 ```
 
-### Query specified assets
+### Query specified nft
 
-Query specific assets based on Denom and ID.
+Query specific nft based on Denom and ID.
 
 `CLI`
 
