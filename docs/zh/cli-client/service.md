@@ -7,30 +7,30 @@ Service模块允许在IRIS Hub中定义、绑定、调用服务。[了解更多i
 | 名称                                                    | 描述                                         |
 | ------------------------------------------------------- | -------------------------------------------- |
 | [define](#iris-tx-service-define)                       | 定义一个新的服务                             |
-| [definition](#iris-q-service-definition)               | 查询服务定义                                 |
+| [definition](#iris-q-service-definition)                | 查询服务定义                                 |
 | [bind](#iris-tx-service-bind)                           | 绑定一个服务                                 |
-| [binding](#iris-q-service-binding)                     | 查询服务绑定                                 |
-| [bindings](#iris-q-service-bindings)                   | 查询服务绑定列表                             |
+| [binding](#iris-q-service-binding)                      | 查询服务绑定                                 |
+| [bindings](#iris-q-service-bindings)                    | 查询服务绑定列表                             |
 | [set-withdraw-addr](#iris-tx-service-set-withdraw-addr) | 设置服务提供者的提取地址                     |
-| [withdraw-addr](#iris-q-service-withdraw-addr)         | 查询服务提供者的提取地址                     |
+| [withdraw-addr](#iris-q-service-withdraw-addr)          | 查询服务提供者的提取地址                     |
 | [update-binding](#iris-tx-service-update-binding)       | 更新一个存在的服务绑定                       |
 | [disable](#iris-tx-service-disable)                     | 禁用一个可用的服务绑定                       |
 | [enable](#iris-tx-service-enable)                       | 启用一个不可用的服务绑定                     |
 | [refund-deposit](#iris-tx-service-refund-deposit)       | 退还一个服务绑定的所有押金                   |
-| [call](#iris-tx-service-call)                           | 发起服务调用                               |
-| [request](#iris-q-service-request)                     | 通过请求ID查询服务请求                       |
-| [requests](#iris-q-service-requests)                   | 通过服务绑定或请求上下文查询服务请求列表     |
+| [call](#iris-tx-service-call)                           | 发起服务调用                                 |
+| [request](#iris-q-service-request)                      | 通过请求ID查询服务请求                       |
+| [requests](#iris-q-service-requests)                    | 通过服务绑定或请求上下文查询服务请求列表     |
 | [respond](#iris-tx-service-respond)                     | 响应服务请求                                 |
-| [response](#iris-q-service-response)                   | 通过请求ID查询服务响应                       |
-| [responses](#iris-q-service-responses)                 | 通过请求上下文ID和批次计数器查询服务响应列表 |
-| [request-context](#iris-q-service-request-context)     | 查询请求上下文                               |
+| [response](#iris-q-service-response)                    | 通过请求ID查询服务响应                       |
+| [responses](#iris-q-service-responses)                  | 通过请求上下文ID和批次计数器查询服务响应列表 |
+| [request-context](#iris-q-service-request-context)      | 查询请求上下文                               |
 | [update](#iris-tx-service-update)                       | 更新请求上下文                               |
 | [pause](#iris-tx-service-pause)                         | 暂停一个正在进行的请求上下文                 |
 | [start](#iris-tx-service-start)                         | 启动一个暂停的请求上下文                     |
 | [kill](#iris-tx-service-kill)                           | 终止请求上下文                               |
-| [fees](#iris-q-service-fees)                           | 查询服务提供者的收益                         |
+| [fees](#iris-q-service-fees)                            | 查询服务提供者的收益                         |
 | [withdraw-fees](#iris-tx-service-withdraw-fees)         | 提取服务提供者的收益                         |
-| [schema](#iris-q-service-schema)         | 通过 schema 名称查询系统 schema |
+| [schema](#iris-q-service-schema)                        | 通过 schema 名称查询系统 schema              |
 
 ## iris tx service define
 
@@ -42,12 +42,12 @@ iris tx service define [flags]
 
 **标志：**
 
-| 名称，速记           | 默认 | 描述                        | 必须 |
-| -------------------- | ---- | --------------------------- | ---- |
-| --name               |      | 服务名称                    | 是   |
-| --description        |      | 服务的描述                  |      |
-| --author-description |      | 服务创建者的描述            |      |
-| --tags               |      | 服务的标签列表              |      |
+| 名称，速记           | 默认 | 描述                            | 必须 |
+| -------------------- | ---- | ------------------------------- | ---- |
+| --name               |      | 服务名称                        | 是   |
+| --description        |      | 服务的描述                      |      |
+| --author-description |      | 服务创建者的描述                |      |
+| --tags               |      | 服务的标签列表                  |      |
 | --schemas            |      | 服务接口schemas的内容或文件路径 | 是   |
 
 ### 定义一个新的服务
@@ -90,12 +90,12 @@ iris tx service bind [flags]
 
 **标志：**
 
-| 名称，速记     | 默认 | 描述                                                  | 必须 |
-| -------------- | ---- | ----------------------------------------------------- | ---- |
-| --service-name |      | 服务名称                                              | 是   |
-| --deposit      |      | 服务绑定的押金                                        | 是   |
-| --pricing      |      | 服务定价内容或文件路径，是一个[Irishub Service Pricing JSON Schema](../features/service-pricing.md)实例 |   是   |
-| --qos          |      | 最小响应时间 | 是 |
+| 名称，速记     | 默认 | 描述                                                         | 必须 |
+| -------------- | ---- | ------------------------------------------------------------ | ---- |
+| --service-name |      | 服务名称                                                     | 是   |
+| --deposit      |      | 服务绑定的押金                                               | 是   |
+| --pricing      |      | 服务定价内容或文件路径，是一个[Irishub Service Pricing JSON Schema](../features/service-pricing.md)实例 | 是   |
+| --qos          |      | 最小响应时间                                                 | 是   |
 | --provider     |      | 服务提供者地址
 
 ### 绑定一个存在的服务定义
@@ -152,11 +152,11 @@ iris tx service update-binding [service-name] [provider-address] [flags]
 ```
 
 **标志：**
-| 名称，速记     | 默认 | 描述                                                  | 必须 |
-| -------------- | ---- | ----------------------------------------------------- | ---- |
-| --deposit      |      | 增加的绑定押金，为空则不更新                                      |      |
-| --pricing      |      | 服务定价内容或文件路径，是一个[Irishub Service Pricing JSON Schema](../features/service-pricing.md)实例，为空则不更新 |      |
-| --qos |     | 最小响应时间，为0则不更新 | |
+| 名称，速记 | 默认 | 描述                                                         | 必须 |
+| ---------- | ---- | ------------------------------------------------------------ | ---- |
+| --deposit  |      | 增加的绑定押金，为空则不更新                                 |      |
+| --pricing  |      | 服务定价内容或文件路径，是一个[Irishub Service Pricing JSON Schema](../features/service-pricing.md)实例，为空则不更新 |      |
+| --qos      |      | 最小响应时间，为0则不更新                                    |      |
 
 ### 更新一个存在的服务绑定
 
@@ -256,17 +256,17 @@ iris tx service call [flags]
 
 **标志：**
 
-| 名称，速记        | 默认  | 描述                                    | 必须 |
-| ----------------- | ----- | --------------------------------------- | ---- |
-| --name            |       | 服务名称                                | 是   |
-| --providers       |       | 服务提供者列表                          | 是   |
-| --service-fee-cap |       | 愿意为单个请求支付的最大服务费用        | 是   |
+| 名称，速记        | 默认  | 描述                                                  | 必须 |
+| ----------------- | ----- | ----------------------------------------------------- | ---- |
+| --name            |       | 服务名称                                              | 是   |
+| --providers       |       | 服务提供者列表                                        | 是   |
+| --service-fee-cap |       | 愿意为单个请求支付的最大服务费用                      | 是   |
 | --data            |       | 请求输入的内容或文件路径，是一个Input JSON Schema实例 | 是   |
-| --timeout         |       | 请求超时                                |   是   |
-| --super-mode      | false | 签名者是否为超级用户                    |
-| --repeated        | false | 请求是否为重复性的                      |      |
-| --frequency       |       | 重复性请求的请求频率；默认为`timeout`值 |      |
-| --total           |       | 重复性请求的请求总数，-1表示无限制      |      |
+| --timeout         |       | 请求超时                                              | 是   |
+| --super-mode      | false | 签名者是否为超级用户                                  |      |
+| --repeated        | false | 请求是否为重复性的                                    |      |
+| --frequency       |       | 重复性请求的请求频率；默认为`timeout`值               |      |
+| --total           |       | 重复性请求的请求总数，-1表示无限制                    |      |
 
 ### 发起一个服务调用请求
 
@@ -333,11 +333,11 @@ iris tx service respond [flags]
 
 **标志：**
 
-| 名称，速记   | 默认 | 描述                                         | 必须 |
-| ------------ | ---- | -------------------------------------------- | ---- |
-| --request-id |      | 欲响应请求的ID                               | 是   |
+| 名称，速记   | 默认 | 描述                                                         | 必须 |
+| ------------ | ---- | ------------------------------------------------------------ | ---- |
+| --request-id |      | 欲响应请求的ID                                               | 是   |
 | --result     |      | 响应结果的内容或文件路径, 是一个[Irishub Service Result JSON Schema](../features/service-result.md)实例 | 是   |
-| --data       |      | 响应输出的内容或文件路径, 是一个Output JSON Schema实例 |      |
+| --data       |      | 响应输出的内容或文件路径, 是一个Output JSON Schema实例       |      |
 
 ### 响应一个服务请求
 
@@ -531,3 +531,4 @@ iris q service schema pricing
 ```bash
 iris q service schema result
 ```
+
