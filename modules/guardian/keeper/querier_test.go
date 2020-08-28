@@ -20,7 +20,7 @@ func (suite *KeeperTestSuite) TestNewQuerier() {
 		Path: "",
 		Data: []byte{},
 	}
-	querier := keeper.NewQuerier(suite.keeper)
+	querier := keeper.NewQuerier(suite.keeper, suite.cdc)
 	res, err := querier(suite.ctx, []string{"other"}, req)
 	suite.Error(err)
 	suite.Nil(res)

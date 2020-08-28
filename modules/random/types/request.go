@@ -28,9 +28,6 @@ func NewRequest(
 	}
 }
 
-// Requests is a set of requests
-type Requests []Request
-
 // GenerateRequestID generate a request id
 func GenerateRequestID(r Request) []byte {
 	reqID := make([]byte, 0)
