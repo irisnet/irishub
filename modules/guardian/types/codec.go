@@ -9,7 +9,7 @@ import (
 
 // RegisterCodec registers the necessary module/guardian interfaces and concrete types
 // on the provided Amino codec. These types are used for Amino JSON serialization.
-func RegisterCodec(cdc *codec.Codec) {
+func RegisterCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterInterface((*GuardianI)(nil), nil)
 	cdc.RegisterConcrete(&MsgAddProfiler{}, "irishub/guardian/MsgAddProfiler", nil)
 	cdc.RegisterConcrete(&MsgAddTrustee{}, "irishub/guardian/MsgAddTrustee", nil)
@@ -35,7 +35,7 @@ func RegisterInterfaces(registry types.InterfaceRegistry) {
 var (
 	amino = codec.New()
 
-	ModuleCdc = codec.NewHybridCodec(amino, types.NewInterfaceRegistry())
+	ModuleCdc = codec.NewAminoCodec(amino)
 )
 
 func init() {

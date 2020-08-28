@@ -11,20 +11,20 @@ import (
 )
 
 // NewQuerier creates a querier for guardian REST endpoints
-func NewQuerier(k Keeper) sdk.Querier {
+func NewQuerier(k Keeper, legacyQuerierCdc codec.JSONMarshaler) sdk.Querier {
 	return func(ctx sdk.Context, path []string, _ abci.RequestQuery) ([]byte, error) {
 		switch path[0] {
 		case types.QueryProfilers:
-			return queryProfilers(ctx, k)
+			return queryProfilers(ctx, k, legacyQuerierCdc)
 		case types.QueryTrustees:
-			return queryTrustees(ctx, k)
+			return queryTrustees(ctx, k, legacyQuerierCdc)
 		default:
 			return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unknown query path: %s", path[0])
 		}
 	}
 }
 
-func queryProfilers(ctx sdk.Context, k Keeper) ([]byte, error) {
+func queryProfilers(ctx sdk.Context, k Keeper, legacyQuerierCdc codec.JSONMarshaler) ([]byte, error) {
 	var profilers []types.Guardian
 	k.IterateProfilers(
 		ctx,
@@ -34,14 +34,14 @@ func queryProfilers(ctx sdk.Context, k Keeper) ([]byte, error) {
 		},
 	)
 
-	bz, err := codec.MarshalJSONIndent(k.cdc, profilers)
+	bz, err := codec.MarshalJSONIndent(legacyQuerierCdc, profilers)
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
 	}
 	return bz, nil
 }
 
-func queryTrustees(ctx sdk.Context, k Keeper) ([]byte, error) {
+func queryTrustees(ctx sdk.Context, k Keeper, legacyQuerierCdc codec.JSONMarshaler) ([]byte, error) {
 	var trustees []types.Guardian
 	k.IterateTrustees(
 		ctx,
@@ -51,7 +51,7 @@ func queryTrustees(ctx sdk.Context, k Keeper) ([]byte, error) {
 		},
 	)
 
-	bz, err := codec.MarshalJSONIndent(k.cdc, trustees)
+	bz, err := codec.MarshalJSONIndent(legacyQuerierCdc, trustees)
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
 	}

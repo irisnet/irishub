@@ -3,19 +3,19 @@ module github.com/irisnet/irishub
 go 1.14
 
 require (
-	github.com/cosmos/cosmos-sdk v0.34.4-0.20200721190130-5d71020270ae
+	github.com/cosmos/cosmos-sdk v0.34.4-0.20200825201020-d9fd4d2ca9a3
 	github.com/gogo/protobuf v1.3.1
 	github.com/golang/protobuf v1.4.2
-	github.com/gorilla/mux v1.7.4
-	github.com/irismod/coinswap v0.0.0-20200722055706-deeded9d99b8
-	github.com/irismod/htlc v0.0.0-20200722060015-b71f49c9b167
-	github.com/irismod/nft v1.1.1-0.20200722060344-38fec5db63a2
-	github.com/irismod/record v1.1.1-0.20200731015314-a365015d8218
-	github.com/irismod/service v1.1.1-0.20200723031529-6abecb02ceb1
-	github.com/irismod/token v1.1.1-0.20200723031618-028bdd6fb30a
+	github.com/gorilla/mux v1.8.0
+	github.com/grpc-ecosystem/grpc-gateway v1.14.7
+	github.com/irismod/coinswap v0.0.0-20200827095052-263fd77f19be
+	github.com/irismod/htlc v0.0.0-20200827094903-ca91f61f97fb
+	github.com/irismod/nft v1.1.1-0.20200827095318-d16861212579
+	github.com/irismod/record v1.1.1-0.20200827095301-3e27fc43ae73
+	github.com/irismod/service v1.1.1-0.20200827094816-e2e2334b7500
+	github.com/irismod/token v1.1.1-0.20200827133251-9350f810840b
 	github.com/onsi/ginkgo v1.8.0 // indirect
 	github.com/onsi/gomega v1.5.0 // indirect
-	github.com/otiai10/copy v1.2.0
 	github.com/pkg/errors v0.9.1
 	github.com/rakyll/statik v0.1.7
 	github.com/regen-network/cosmos-proto v0.3.0
@@ -23,16 +23,16 @@ require (
 	github.com/spf13/cast v1.3.1
 	github.com/spf13/cobra v1.0.0
 	github.com/spf13/pflag v1.0.5
-	github.com/spf13/viper v1.7.0
+	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.6.1
-	github.com/tendermint/tendermint v0.33.6
-	github.com/tendermint/tm-db v0.5.1
+	github.com/tendermint/tendermint v0.34.0-rc3
+	github.com/tendermint/tm-db v0.6.1
 	github.com/tidwall/gjson v1.6.0
-	google.golang.org/grpc v1.30.0
+	google.golang.org/grpc v1.31.0
 	gopkg.in/yaml.v2 v2.3.0
 )
 
 replace (
-	github.com/cosmos/cosmos-sdk => github.com/irisnet/cosmos-sdk v0.19.1-0.20200722022502-e2d6c76ae750
+	github.com/cosmos/cosmos-sdk => github.com/irisnet/cosmos-sdk v0.34.4-0.20200827085823-7b1a0adbfd1e
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.2-alpha.regen.4
 )

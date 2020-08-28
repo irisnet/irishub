@@ -7,7 +7,7 @@ import (
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	distributiontypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	"github.com/stretchr/testify/require"
-	abci "github.com/tendermint/tendermint/abci/types"
+	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 
 	"github.com/irisnet/irishub/modules/mint"
 	"github.com/irisnet/irishub/modules/mint/types"
@@ -31,7 +31,7 @@ func TestBeginBlocker(t *testing.T) {
 func createTestApp(isCheckTx bool) (*simapp.SimApp, sdk.Context) {
 	app := simapp.Setup(isCheckTx)
 
-	ctx := app.BaseApp.NewContext(isCheckTx, abci.Header{Height: 2})
+	ctx := app.BaseApp.NewContext(isCheckTx, tmproto.Header{Height: 2})
 	app.MintKeeper.SetParamSet(ctx, types.NewParams(
 		sdk.DefaultBondDenom,
 		sdk.NewDecWithPrec(4, 2),
