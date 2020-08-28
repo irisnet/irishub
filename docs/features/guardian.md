@@ -1,6 +1,6 @@
 # Guardian
 
-## Introduction
+## Summary
 
 IRISnet introduce two types of privileged system user controlled by foundations, the profiler and the trustee.
 
