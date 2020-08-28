@@ -51,7 +51,7 @@ func GetCmdQueryFeed() *cobra.Command {
 				return err
 			}
 
-			return clientCtx.PrintOutput(res.Feed)
+			return clientCtx.PrintOutput(&res.Feed)
 		},
 	}
 	cmd.Flags().AddFlagSet(FsQueryFeed)
@@ -79,7 +79,7 @@ func GetCmdQueryFeeds() *cobra.Command {
 				return err
 			}
 
-			return clientCtx.PrintOutput(res.Feeds)
+			return clientCtx.PrintOutput(res)
 		},
 	}
 	cmd.Flags().AddFlagSet(FsQueryFeeds)
@@ -108,7 +108,7 @@ func GetCmdQueryFeedValue() *cobra.Command {
 				return err
 			}
 
-			return clientCtx.PrintOutput(res.FeedValues)
+			return clientCtx.PrintOutput(res)
 		},
 	}
 	cmd.Flags().AddFlagSet(FsQueryFeedValue)

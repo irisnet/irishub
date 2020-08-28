@@ -16,7 +16,7 @@ func TestQuerierSuite(t *testing.T) {
 }
 
 func (suite *KeeperTestSuite) TestNewQuerier() {
-	querier := keeper.NewQuerier(suite.app.MintKeeper)
+	querier := keeper.NewQuerier(suite.app.MintKeeper, suite.cdc)
 	res, err := querier(suite.ctx, []string{"other"}, abci.RequestQuery{})
 	suite.Error(err)
 	suite.Nil(res)

@@ -2,7 +2,7 @@ syntax = "proto3";
 package irismod.service;
 
 import "gogoproto/gogo.proto";
-import "cosmos_proto/types.proto";
+import "cosmos_proto/coin.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/duration.proto";
 
@@ -23,7 +23,7 @@ message MsgDefineService {
 message MsgBindService {
   string service_name                  = 1 [(gogoproto.moretags) = "yaml:\"service_name\""];
   string provider                      = 2 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
-  repeated cosmos_sdk.v1.Coin deposit  = 3 [
+  repeated cosmos.base.v1beta1.Coin deposit  = 3 [
     (gogoproto.nullable)   = false,
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
   ];
@@ -36,7 +36,7 @@ message MsgBindService {
 message MsgUpdateServiceBinding {
   string service_name  = 1;
   bytes provider       = 2 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
-  repeated cosmos_sdk.v1.Coin deposit  = 3 [
+  repeated cosmos.base.v1beta1.Coin deposit  = 3 [
     (gogoproto.nullable)   = false,
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
   ];
@@ -65,7 +65,7 @@ message MsgDisableServiceBinding {
 message MsgEnableServiceBinding {
   string service_name = 1 [(gogoproto.moretags) = "yaml:\"service_name\""];
   bytes provider      = 2 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
-  repeated cosmos_sdk.v1.Coin deposit  = 3 [
+  repeated cosmos.base.v1beta1.Coin deposit  = 3 [
     (gogoproto.nullable)   = false,
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
   ];
@@ -87,7 +87,7 @@ message MsgCallService {
   ];
   bytes consumer = 3 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
   string input = 4;
-  repeated cosmos_sdk.v1.Coin service_fee_cap  = 5 [
+  repeated cosmos.base.v1beta1.Coin service_fee_cap  = 5 [
     (gogoproto.nullable)   = false,
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins",
     (gogoproto.moretags) = "yaml:\"service_fee_cap\""
@@ -152,7 +152,7 @@ message MsgUpdateRequestContext {
     (gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"
   ];
   bytes consumer = 3 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
-  repeated cosmos_sdk.v1.Coin service_fee_cap  = 4 [
+  repeated cosmos.base.v1beta1.Coin service_fee_cap  = 4 [
     (gogoproto.nullable)   = false,
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins",
     (gogoproto.moretags) = "yaml:\"service_fee_cap\""
@@ -182,7 +182,7 @@ message ServiceDefinition {
 message ServiceBinding {
   string service_name                  = 1 [(gogoproto.moretags) = "yaml:\"service_name\""];
   string provider                      = 2 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
-  repeated cosmos_sdk.v1.Coin deposit  = 3 [
+  repeated cosmos.base.v1beta1.Coin deposit  = 3 [
     (gogoproto.nullable)   = false,
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
   ];
@@ -205,7 +205,7 @@ message RequestContext {
   ];
   bytes consumer = 3 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
   string input = 4;
-  repeated cosmos_sdk.v1.Coin service_fee_cap  = 5 [
+  repeated cosmos.base.v1beta1.Coin service_fee_cap  = 5 [
     (gogoproto.nullable)   = false,
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins",
     (gogoproto.moretags) = "yaml:\"service_fee_cap\""
@@ -235,7 +235,7 @@ message Request {
   bytes provider      = 3 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
   bytes consumer      = 4 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
   string input        = 5;
-  repeated cosmos_sdk.v1.Coin service_fee  = 6 [
+  repeated cosmos.base.v1beta1.Coin service_fee  = 6 [
     (gogoproto.nullable)   = false,
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins",
     (gogoproto.moretags) = "yaml:\"service_fee\""
@@ -260,7 +260,7 @@ message CompactRequest {
   ];
   uint64 request_context_batch_counter = 2 [(gogoproto.moretags) = "yaml:\"request_context_batch_counter\""];
   bytes provider      = 3 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
-  repeated cosmos_sdk.v1.Coin service_fee  = 4 [
+  repeated cosmos.base.v1beta1.Coin service_fee  = 4 [
     (gogoproto.nullable)   = false,
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins",
     (gogoproto.moretags) = "yaml:\"service_fee\""
@@ -285,7 +285,7 @@ message Response {
 
 // Pricing defines a standard for service pricing.
 message Pricing {
-  repeated cosmos_sdk.v1.Coin price  = 6 [
+  repeated cosmos.base.v1beta1.Coin price  = 6 [
     (gogoproto.nullable)   = false,
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
   ];
@@ -359,7 +359,7 @@ message Params {
 
   int64 max_request_timeout  = 1 [(gogoproto.moretags) = "yaml:\"max_request_timeout\""];
   int64 min_deposit_multiple = 2 [(gogoproto.moretags) = "yaml:\"min_deposit_multiple\""];
-  repeated cosmos_sdk.v1.Coin min_deposit = 3 [
+  repeated cosmos.base.v1beta1.Coin min_deposit = 3 [
     (gogoproto.nullable) = false,
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
   ];
