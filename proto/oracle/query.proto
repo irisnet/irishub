@@ -5,7 +5,7 @@ import "oracle/oracle.proto";
 import "irismod/service.proto";
 import "gogoproto/gogo.proto";
 import "cosmos_proto/cosmos.proto";
-import "cosmos_proto/types.proto";
+import "cosmos_proto/coin.proto";
 
 option go_package = "github.com/irisnet/irishub/modules/oracle/types";
 
@@ -63,7 +63,7 @@ message FeedContext {
     repeated bytes providers = 3 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
     string input = 4;
     int64 timeout = 5;
-    repeated cosmos_sdk.v1.Coin service_fee_cap = 6 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "yaml:\"service_fee_cap\""];
+    repeated cosmos.base.v1beta1.Coin service_fee_cap = 6 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "yaml:\"service_fee_cap\""];
     uint64 repeated_frequency = 7 [(gogoproto.moretags) = "yaml:\"repeated_frequency\""];
     uint32 response_threshold = 8 [(gogoproto.moretags) = "yaml:\"response_threshold\""];
     irismod.service.RequestContextState state = 9;
