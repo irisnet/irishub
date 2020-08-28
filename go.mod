@@ -8,12 +8,12 @@ require (
 	github.com/golang/protobuf v1.4.2
 	github.com/gorilla/mux v1.8.0
 	github.com/grpc-ecosystem/grpc-gateway v1.14.7
-	github.com/irismod/coinswap v0.0.0-20200827095052-263fd77f19be
-	github.com/irismod/htlc v0.0.0-20200827094903-ca91f61f97fb
+	github.com/irismod/coinswap v0.0.0-20200828021228-f86e9736690e
+	github.com/irismod/htlc v0.0.0-20200828011507-7176034a189a
 	github.com/irismod/nft v1.1.1-0.20200827095318-d16861212579
 	github.com/irismod/record v1.1.1-0.20200827095301-3e27fc43ae73
-	github.com/irismod/service v1.1.1-0.20200827094816-e2e2334b7500
-	github.com/irismod/token v1.1.1-0.20200827133251-9350f810840b
+	github.com/irismod/service v1.1.1-0.20200828020549-9b948317f24d
+	github.com/irismod/token v1.1.1-0.20200828023713-a0063f4e9bdc
 	github.com/onsi/ginkgo v1.8.0 // indirect
 	github.com/onsi/gomega v1.5.0 // indirect
 	github.com/pkg/errors v0.9.1
