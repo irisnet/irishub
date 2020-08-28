@@ -3,7 +3,7 @@ package irishub.oracle;
 
 import "gogoproto/gogo.proto";
 import "cosmos_proto/cosmos.proto";
-import "cosmos_proto/types.proto";
+import "cosmos_proto/coin.proto";
 import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/irisnet/irishub/modules/oracle/types";
@@ -18,7 +18,7 @@ message MsgCreateFeed {
     repeated bytes providers = 6 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
     string input = 7;
     int64 timeout = 8;
-    repeated cosmos_sdk.v1.Coin service_fee_cap = 9 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "yaml:\"service_fee_cap\""];
+    repeated cosmos.base.v1beta1.Coin service_fee_cap = 9 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "yaml:\"service_fee_cap\""];
     uint64 repeated_frequency = 10 [(gogoproto.moretags) = "yaml:\"repeated_frequency\""];
     string aggregate_func = 11 [(gogoproto.moretags) = "yaml:\"aggregate_func\""];
     string value_json_path = 12 [(gogoproto.moretags) = "yaml:\"value_json_path\""];
@@ -44,7 +44,7 @@ message MsgEditFeed {
     uint64 latest_history = 3 [(gogoproto.moretags) = "yaml:\"latest_history\""];
     repeated bytes providers = 4 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
     int64 timeout = 5;
-    repeated cosmos_sdk.v1.Coin service_fee_cap = 6 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "yaml:\"service_fee_cap\""];
+    repeated cosmos.base.v1beta1.Coin service_fee_cap = 6 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "yaml:\"service_fee_cap\""];
     uint64 repeated_frequency = 7 [(gogoproto.moretags) = "yaml:\"repeated_frequency\""];
     uint32 response_threshold = 8 [(gogoproto.moretags) = "yaml:\"response_threshold\""];
     bytes creator = 9 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
