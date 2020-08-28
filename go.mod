@@ -13,7 +13,7 @@ require (
 	github.com/irismod/nft v1.1.1-0.20200827095318-d16861212579
 	github.com/irismod/record v1.1.1-0.20200827095301-3e27fc43ae73
 	github.com/irismod/service v1.1.1-0.20200828020549-9b948317f24d
-	github.com/irismod/token v1.1.1-0.20200827133251-9350f810840b
+	github.com/irismod/token v1.1.1-0.20200828023713-a0063f4e9bdc
 	github.com/onsi/ginkgo v1.8.0 // indirect
 	github.com/onsi/gomega v1.5.0 // indirect
 	github.com/pkg/errors v0.9.1

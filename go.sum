@@ -302,6 +302,8 @@ github.com/irismod/service v1.1.1-0.20200828020549-9b948317f24d h1:+CEarP0r7vbk3
 github.com/irismod/service v1.1.1-0.20200828020549-9b948317f24d/go.mod h1:ID4dmeafXHw8pFLDynH7l4mGIXetd5jrtFmY4qnxpHU=
 github.com/irismod/token v1.1.1-0.20200827133251-9350f810840b h1:8rlvs4TLWaF15yD9QZZzv3MXTAQqUsz74b9fG36cTSM=
 github.com/irismod/token v1.1.1-0.20200827133251-9350f810840b/go.mod h1:hOxUjOsE1biJa8ReBzY58rz3ZJeglth+HbU2iftcZik=
+github.com/irismod/token v1.1.1-0.20200828023713-a0063f4e9bdc h1:0rR737LNZwRPSZlspNfBpz2bGUCYe+UKwFiIDT4YTlA=
+github.com/irismod/token v1.1.1-0.20200828023713-a0063f4e9bdc/go.mod h1:hOxUjOsE1biJa8ReBzY58rz3ZJeglth+HbU2iftcZik=
 github.com/irisnet/cosmos-sdk v0.34.4-0.20200827085823-7b1a0adbfd1e h1:UWcFWDRtMxKOaRfApfwcByxAzeYpwPGCRUXtIhj0kL0=
 github.com/irisnet/cosmos-sdk v0.34.4-0.20200827085823-7b1a0adbfd1e/go.mod h1:HXb9uKlB4sR4BFP32aSboY1Se4QhbFbYcJN6Dexil2U=
 github.com/jessevdk/go-flags v0.0.0-20141203071132-1679536dcc89/go.mod h1:4FA24M0QyGHXBuZZK/XkWh8h0e1EYbRYJSGM75WSRxI=
