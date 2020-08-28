@@ -46,22 +46,16 @@ IRISHub 允许个人和公司创建和发行他们自己的资产，用于他们
 
 - **资产**
 
-  - [发行资产](../cli-client/token.md#iriscli-asset-token-issue)
+  - [发行资产](../cli-client/token.md#iris-tx-token-issue)
 
-    - [发行原生资产](../cli-client/token.md#发行通证)
+  - [查询资产列表](../cli-client/token.md#iris-query-token-tokens)
 
-    - [转账](../cli-client/token.md#发送通证)
+  - [编辑资产信息](../cli-client/token.md#iris-tx-token-edit)
 
-  - [查询资产列表](../cli-client/token.md#iriscli-asset-token-tokens)
+  - [增发](../cli-client/token.md#iris-tx-token-mint)
 
-  - [编辑资产信息](../cli-client/token.md#iriscli-asset-token-edit)
-
-  - [增发](../cli-client/token.md#iriscli-asset-token-mint)
-
-  - [销毁](../cli-client/bank.md#iriscli-bank-burn)
-
-  - [转让所有权](../cli-client/token.md#iriscli-asset-token-transfer)
+  - [转让所有权](../cli-client/token.md#iris-tx-token-transfer)
 
 - **费用**
 
-  - [查询资产发行和增发费用](../cli-client/token.md#查询发行和增发通证的费用)
+  - [查询资产发行和增发费用](../cli-client/token.md#iris-query-token-fee)
