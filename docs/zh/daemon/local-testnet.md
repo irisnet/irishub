@@ -21,7 +21,17 @@ order: 3
 初始化genesis.json文件，它将帮助你启动网络
 
 ```bash
-iris init --chain-id=testing --moniker=testing
+iris init testing --chain-id=testing
+```
+
+替换genesis.json中默认的stake，使用iris作为唯一抵押通证
+
+```bash
+# linux
+sed -i 's/stake/iris/g' ~/.iris/config/genesis.json
+
+# macOS
+sed -i '' 's/stake/iris/g' ~/.iris/config/genesis.json
 ```
 
 ### 创建一个钱包
@@ -29,7 +39,7 @@ iris init --chain-id=testing --moniker=testing
 创建一个钱包作为您的验证人帐户
 
 ```bash
-iriscli keys add MyValidator
+iris keys add MyValidator
 ```
 
 ### iris add-genesis-account
@@ -41,7 +51,7 @@ iriscli keys add MyValidator
 :::
 
 ```bash
-iris add-genesis-account $(iriscli keys show MyValidator --address) 100000000iris
+iris add-genesis-account $(iris keys show MyValidator --address) 100000000iris
 ```
 
 ### iris gentx
@@ -49,7 +59,7 @@ iris add-genesis-account $(iriscli keys show MyValidator --address) 100000000iri
 生成创建验证人的交易。gentx存储在`~/.iris/config/`中
 
 ```bash
-iris gentx --name MyValidator
+iris gentx MyValidator --amount=100000000iris --chain-id=testing
 ```
 
 ### iris collect-gentxs
@@ -76,21 +86,6 @@ iris start
 
 ```bash
 iris unsafe-reset-all
-```
-
-### iris reset
-
-与[iris unsafe-reset-all](#iris-unsafe-reset-all)不同，此命令允许将节点的区块链状态重置为指定的高度，因此可以更快地修复区块链数据库。
-
-```bash
-# e.g. reset the blockchain state to height 100
-iris reset --height 100
-```
-
-还有一个修复区块链数据库的方式，如果在主网上出现 `Wrong Block.Header.AppHash`的错误，请确认您使用的是正确的[主网版本](../get-started/install.md#最新版本)，然后通过以下方式重新启动节点：
-
-```bash
-iris start --replay-last-block
 ```
 
 ### iris tendermint
@@ -134,16 +129,16 @@ iris tendermint show-address
 
 ```bash
 # Work from the irishub repo
-cd $GOPATH/src/github.com/irisnet/irishub
+cd [your-irishub-repo]
 
 # Build the linux binary in ./build
-make build_linux
+make build-linux
 
 # Quick init a 4-node testnet configs
-make testnet_init
+make testnet-init
 ```
 
-`make testnet_init`将调用`iris testnet`命令在`build/nodecluster`目录下生成4个节点的测试网配置文件。
+`make testnet-init`将调用`iris testnet`命令在`build/nodecluster`目录下生成4个节点的测试网配置文件。
 
 ```bash
 $ tree -L 3 build/nodecluster/
@@ -183,7 +178,7 @@ build/nodecluster/
 ### 启动
 
 ```bash
-make testnet_start
+make testnet-start
 ```
 
 该命令将使用ubuntu:16.04的docker镜像创建4个节点的测试网。下表列出了每个节点的端口：
@@ -198,7 +193,7 @@ make testnet_start
 要更新二进制文件，只需重新构建它并重新启动节点即可：
 
 ```bash
-make build_linux testnet_start
+make build-linux testnet-start
 ```
 
 ### 停止
@@ -206,15 +201,7 @@ make build_linux testnet_start
 停止所有正在运行的节点：
 
 ```bash
-make testnet_stop
-```
-
-### 重置
-
-要停止所有正在运行的节点并将网络重置为创世状态：
-
-```bash
-make testnet_unsafe_reset
+make testnet-stop
 ```
 
 ### 清理
@@ -222,5 +209,5 @@ make testnet_unsafe_reset
 要停止所有正在运行的节点并删除`build/`目录中的所有文件：
 
 ```bash
-make testnet_clean
+make testnet-clean
 ```

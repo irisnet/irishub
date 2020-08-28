@@ -21,7 +21,17 @@ We use the default [home directory](intro.md#home-directory) for all the followi
 Initialize the genesis.json file that will help you to bootstrap the network
 
 ```bash
-iris init --chain-id=testing --moniker=testing
+iris init testing --chain-id=testing
+```
+
+Replace the default `stake` in genesis.json and use `iris` as the only staking coin
+
+```bash
+# linux
+sed -i 's/stake/iris/g' ~/.iris/config/genesis.json
+
+# macOS
+sed -i '' 's/stake/iris/g' ~/.iris/config/genesis.json
 ```
 
 ### create a key
@@ -29,7 +39,7 @@ iris init --chain-id=testing --moniker=testing
 Create a key to hold your validator account
 
 ```bash
-iriscli keys add MyValidator
+iris keys add MyValidator
 ```
 
 ### iris add-genesis-account
@@ -41,7 +51,7 @@ this command lets you set the number of coins. Make sure this account has some i
 :::
 
 ```bash
-iris add-genesis-account $(iriscli keys show MyValidator --address) 100000000iris
+iris add-genesis-account $(iris keys show MyValidator --address) 100000000iris
 ```
 
 ### iris gentx
@@ -49,7 +59,7 @@ iris add-genesis-account $(iriscli keys show MyValidator --address) 100000000iri
 Generate the transaction that creates your validator. The gentxs are stored in `~/.iris/config/gentx/`
 
 ```bash
-iris gentx --name MyValidator
+iris gentx MyValidator --amount=100000000iris --chain-id=testing
 ```
 
 ### iris collect-gentxs
@@ -76,21 +86,6 @@ This is useful when your local blockchain database somehow breaks and you are no
 
 ```bash
 iris unsafe-reset-all
-```
-
-### iris reset
-
-Unlike [iris unsafe-reset-all](#iris-unsafe-reset-all), this command allows you to reset the blockchain state of your node to a specified height, so you can fix your blockchain database much faster.
-
-```bash
-# e.g. reset the blockchain state to height 100
-iris reset --height 100
-```
-
-And there is another option to fix the blockchain database, if you got a `Wrong Block.Header.AppHash` error on the Mainnet, confirm you are using the correct [Mainnet Version](../get-started/install.md#latest-version), then restart your node by:
-
-```bash
-iris start --replay-last-block
 ```
 
 ### iris tendermint
@@ -134,16 +129,16 @@ Please refer to [Export Blockchain State](export.md)
 
 ```bash
 # Work from the irishub repo
-cd $GOPATH/src/github.com/irisnet/irishub
+cd [your-irishub-repo]
 
 # Build the linux binary in ./build
-make build_linux
+make build-linux
 
 # Quick init a 4-node testnet configs
-make testnet_init
+make testnet-init
 ```
 
-The `make testnet_init` generates config files for a 4-node testnet in the `./build/nodecluster` directory by calling the `iris testnet` command:
+The `make testnet-init` generates config files for a 4-node testnet in the `./build/nodecluster` directory by calling the `iris testnet` command:
 
 ```bash
 $ tree -L 3 build/nodecluster/
@@ -183,7 +178,7 @@ build/nodecluster/
 ### Start
 
 ```bash
-make testnet_start
+make testnet-start
 ```
 
 This command creates a 4-node network using the ubuntu:16.04 docker image. The ports for each node are found in this table:
@@ -198,7 +193,7 @@ This command creates a 4-node network using the ubuntu:16.04 docker image. The p
 To update the binary, just rebuild it and restart the nodes:
 
 ```bash
-make build_linux testnet_start
+make build-linux testnet-start
 ```
 
 ### Stop
@@ -206,15 +201,7 @@ make build_linux testnet_start
 To stop all the running nodes:
 
 ```bash
-make testnet_stop
-```
-
-### Reset
-
-To stop all the running nodes and reset the network to the genesis state:
-
-```bash
-make testnet_unsafe_reset
+make testnet-stop
 ```
 
 ### Clean
@@ -222,5 +209,5 @@ make testnet_unsafe_reset
 To stop all the running nodes and delete all the files in the `build/` directory:
 
 ```bash
-make testnet_clean
+make testnet-clean
 ```
