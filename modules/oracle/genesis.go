@@ -39,7 +39,7 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, data types.GenesisState) {
 }
 
 // ExportGenesis - output genesis parameters
-func ExportGenesis(ctx sdk.Context, k keeper.Keeper) types.GenesisState {
+func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	// export created feed and value
 	var entries []types.FeedEntry
 	k.IteratorFeeds(ctx, func(feed types.Feed) {
@@ -55,7 +55,7 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) types.GenesisState {
 			)
 		}
 	})
-	return types.GenesisState{
+	return &types.GenesisState{
 		Entries: entries,
 	}
 }

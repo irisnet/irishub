@@ -10,6 +10,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/server/api"
 	"github.com/cosmos/cosmos-sdk/simapp"
+	simappparams "github.com/cosmos/cosmos-sdk/simapp/params"
 	"github.com/cosmos/cosmos-sdk/std"
 	"github.com/cosmos/cosmos-sdk/testutil/testdata"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -19,6 +20,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 	authrest "github.com/cosmos/cosmos-sdk/x/auth/client/rest"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
+	authsims "github.com/cosmos/cosmos-sdk/x/auth/simulation"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
@@ -86,6 +88,7 @@ import (
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/log"
 	tmos "github.com/tendermint/tendermint/libs/os"
+	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
 
 	"github.com/irisnet/irishub/modules/guardian"
@@ -170,7 +173,7 @@ var _ simapp.App = (*IrisApp)(nil)
 // capabilities aren't needed for testing.
 type IrisApp struct {
 	*baseapp.BaseApp
-	cdc               *codec.Codec
+	cdc               *codec.LegacyAmino
 	appCodec          codec.Marshaler
 	interfaceRegistry types.InterfaceRegistry
 
@@ -221,19 +224,19 @@ type IrisApp struct {
 // NewIrisApp returns a reference to an initialized IrisApp.
 func NewIrisApp(
 	logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bool, skipUpgradeHeights map[int64]bool,
-	homePath string, invCheckPeriod uint, baseAppOptions ...func(*baseapp.BaseApp),
+	homePath string, invCheckPeriod uint, encodingConfig simappparams.EncodingConfig, baseAppOptions ...func(*baseapp.BaseApp),
 ) *IrisApp {
 
 	// TODO: Remove cdc in favor of appCodec once all modules are migrated.
-	encodingConfig := MakeEncodingConfig()
 	appCodec := encodingConfig.Marshaler
 	cdc := encodingConfig.Amino
 	interfaceRegistry := encodingConfig.InterfaceRegistry
 
-	bApp := baseapp.NewBaseApp(appName, logger, db, authtypes.DefaultTxDecoder(cdc), baseAppOptions...)
+	bApp := baseapp.NewBaseApp(appName, logger, db, encodingConfig.TxConfig.TxDecoder(), baseAppOptions...)
 	bApp.SetCommitMultiStoreTracer(traceStore)
 	bApp.SetAppVersion(version.Version)
-	bApp.GRPCQueryRouter().SetAnyUnpacker(interfaceRegistry)
+	bApp.GRPCQueryRouter().SetInterfaceRegistry(interfaceRegistry)
+	bApp.GRPCQueryRouter().RegisterSimulateService(bApp.Simulate, interfaceRegistry, std.DefaultPublicKeyCodec{})
 
 	keys := sdk.NewKVStoreKeys(
 		authtypes.StoreKey, banktypes.StoreKey, stakingtypes.StoreKey,
@@ -257,10 +260,10 @@ func NewIrisApp(
 		memKeys:           memKeys,
 	}
 
-	app.paramsKeeper = initParamsKeeper(appCodec, keys[paramstypes.StoreKey], tkeys[paramstypes.TStoreKey])
+	app.paramsKeeper = initParamsKeeper(appCodec, cdc, keys[paramstypes.StoreKey], tkeys[paramstypes.TStoreKey])
 
 	// set the BaseApp's parameter store
-	bApp.SetParamStore(app.paramsKeeper.Subspace(baseapp.Paramspace).WithKeyTable(std.ConsensusParamsKeyTable()))
+	bApp.SetParamStore(app.paramsKeeper.Subspace(baseapp.Paramspace).WithKeyTable(paramskeeper.ConsensusParamsKeyTable()))
 
 	// add capability keeper and ScopeToModule for ibc module
 	app.capabilityKeeper = capabilitykeeper.NewKeeper(appCodec, keys[capabilitytypes.StoreKey], memKeys[capabilitytypes.MemStoreKey])
@@ -311,15 +314,13 @@ func NewIrisApp(
 	)
 
 	// Create IBC Keeper
-	// TODO: remove amino codec dependency once Tendermint version is upgraded with
-	// protobuf changes
 	app.ibcKeeper = ibckeeper.NewKeeper(
-		app.cdc, appCodec, keys[ibchost.StoreKey], app.stakingKeeper, scopedIBCKeeper,
+		appCodec, keys[ibchost.StoreKey], app.stakingKeeper, scopedIBCKeeper,
 	)
 
 	// Create Transfer Keepers
 	app.transferKeeper = ibctransferkeeper.NewKeeper(
-		appCodec, keys[ibctransfertypes.StoreKey],
+		appCodec, keys[ibctransfertypes.StoreKey], app.GetSubspace(ibctransfertypes.ModuleName),
 		app.ibcKeeper.ChannelKeeper, &app.ibcKeeper.PortKeeper,
 		app.accountKeeper, app.bankKeeper, scopedTransferKeeper,
 	)
@@ -361,8 +362,8 @@ func NewIrisApp(
 	// NOTE: Any module instantiated in the module manager that is later modified
 	// must be passed by reference here.
 	app.mm = module.NewManager(
-		genutil.NewAppModule(app.accountKeeper, app.stakingKeeper, app.BaseApp.DeliverTx),
-		auth.NewAppModule(appCodec, app.accountKeeper),
+		genutil.NewAppModule(app.accountKeeper, app.stakingKeeper, app.BaseApp.DeliverTx, encodingConfig.TxConfig),
+		auth.NewAppModule(appCodec, app.accountKeeper, authsims.RandomGenesisAccounts),
 		bank.NewAppModule(appCodec, app.bankKeeper, app.accountKeeper),
 		capability.NewAppModule(appCodec, *app.capabilityKeeper),
 		crisis.NewAppModule(&app.crisisKeeper),
@@ -414,7 +415,7 @@ func NewIrisApp(
 	)
 
 	app.mm.RegisterInvariants(&app.crisisKeeper)
-	app.mm.RegisterRoutes(app.Router(), app.QueryRouter())
+	app.mm.RegisterRoutes(app.Router(), app.QueryRouter(), codec.NewAminoCodec(encodingConfig.Amino))
 	app.mm.RegisterQueryServices(app.GRPCQueryRouter())
 
 	// add test gRPC service for testing gRPC queries in isolation
@@ -425,7 +426,7 @@ func NewIrisApp(
 	// NOTE: this is not required apps that don't use the simulator for fuzz testing
 	// transactions
 	app.sm = module.NewSimulationManager(
-		auth.NewAppModule(appCodec, app.accountKeeper),
+		auth.NewAppModule(appCodec, app.accountKeeper, authsims.RandomGenesisAccounts),
 		bank.NewAppModule(appCodec, app.bankKeeper, app.accountKeeper),
 		capability.NewAppModule(appCodec, *app.capabilityKeeper),
 		gov.NewAppModule(appCodec, app.govKeeper, app.accountKeeper, app.bankKeeper),
@@ -461,7 +462,7 @@ func NewIrisApp(
 	app.SetAnteHandler(
 		ante.NewAnteHandler(
 			app.accountKeeper, app.bankKeeper, ante.DefaultSigVerificationGasConsumer,
-			authtypes.LegacyAminoJSONHandler{},
+			encodingConfig.TxConfig.SignModeHandler(),
 		),
 	)
 	app.SetEndBlocker(app.EndBlocker)
@@ -477,7 +478,7 @@ func NewIrisApp(
 	// sub-keepers.
 	// This must be done during creation of baseapp rather than in InitChain so
 	// that in-memory capabilities get regenerated on app restart
-	ctx := app.BaseApp.NewUncachedContext(true, abci.Header{})
+	ctx := app.BaseApp.NewUncachedContext(true, tmproto.Header{})
 	app.capabilityKeeper.InitializeAndSeal(ctx)
 
 	app.ScopedIBCKeeper = scopedIBCKeeper
@@ -489,7 +490,7 @@ func NewIrisApp(
 // MakeCodecs constructs the *std.Codec and *codec.Codec instances used by
 // IrisApp. It is useful for tests and clients who do not want to construct the
 // full irisApp
-func MakeCodecs() (codec.Marshaler, *codec.Codec) {
+func MakeCodecs() (codec.Marshaler, *codec.LegacyAmino) {
 	config := MakeEncodingConfig()
 	return config.Marshaler, config.Amino
 }
@@ -511,7 +512,7 @@ func (app *IrisApp) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.R
 func (app *IrisApp) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
 	var genesisState GenesisState
 	app.cdc.MustUnmarshalJSON(req.AppStateBytes, &genesisState)
-	return app.mm.InitGenesis(ctx, app.cdc, genesisState)
+	return app.mm.InitGenesis(ctx, app.appCodec, genesisState)
 }
 
 // LoadHeight loads a particular height
@@ -540,11 +541,11 @@ func (app *IrisApp) BlockedAddrs() map[string]bool {
 	return blockedAddrs
 }
 
-// Codec returns IrisApp's codec.
+// LegacyAmino returns IrisApp's codec.
 //
 // NOTE: This is solely to be used for testing purposes as it may be desirable
 // for modules to register their own custom testing types.
-func (app *IrisApp) Codec() *codec.Codec {
+func (app *IrisApp) LegacyAmino() *codec.LegacyAmino {
 	return app.cdc
 }
 
@@ -613,8 +614,8 @@ func GetMaccPerms() map[string][]string {
 }
 
 // initParamsKeeper init params keeper and its subspaces
-func initParamsKeeper(appCodec codec.Marshaler, key, tkey sdk.StoreKey) paramskeeper.Keeper {
-	paramsKeeper := paramskeeper.NewKeeper(appCodec, key, tkey)
+func initParamsKeeper(appCodec codec.BinaryMarshaler, legacyAmino *codec.LegacyAmino, key, tkey sdk.StoreKey) paramskeeper.Keeper {
+	paramsKeeper := paramskeeper.NewKeeper(appCodec, legacyAmino, key, tkey)
 
 	paramsKeeper.Subspace(authtypes.ModuleName)
 	paramsKeeper.Subspace(banktypes.ModuleName)
@@ -624,6 +625,7 @@ func initParamsKeeper(appCodec codec.Marshaler, key, tkey sdk.StoreKey) paramske
 	paramsKeeper.Subspace(slashingtypes.ModuleName)
 	paramsKeeper.Subspace(govtypes.ModuleName).WithKeyTable(govtypes.ParamKeyTable())
 	paramsKeeper.Subspace(crisistypes.ModuleName)
+	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(tokentypes.ModuleName)
 	paramsKeeper.Subspace(recordtypes.ModuleName)
 	paramsKeeper.Subspace(htlctypes.ModuleName)

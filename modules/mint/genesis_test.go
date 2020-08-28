@@ -3,23 +3,20 @@ package mint_test
 import (
 	"testing"
 
-	"github.com/irisnet/irishub/modules/mint/types"
-
-	"github.com/stretchr/testify/suite"
-
-	abci "github.com/tendermint/tendermint/abci/types"
-
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/stretchr/testify/suite"
+	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 
 	"github.com/irisnet/irishub/modules/mint"
+	"github.com/irisnet/irishub/modules/mint/types"
 	"github.com/irisnet/irishub/simapp"
 )
 
 type TestSuite struct {
 	suite.Suite
 
-	cdc *codec.Codec
+	cdc codec.JSONMarshaler
 	ctx sdk.Context
 	app *simapp.SimApp
 }
@@ -27,8 +24,8 @@ type TestSuite struct {
 func (suite *TestSuite) SetupTest() {
 	app := simapp.Setup(false)
 
-	suite.cdc = app.Codec()
-	suite.ctx = app.BaseApp.NewContext(false, abci.Header{})
+	suite.cdc = codec.NewAminoCodec(app.LegacyAmino())
+	suite.ctx = app.BaseApp.NewContext(false, tmproto.Header{})
 	suite.app = app
 }
 

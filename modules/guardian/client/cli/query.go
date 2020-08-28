@@ -48,7 +48,7 @@ func GetCmdQueryProfilers() *cobra.Command {
 				return err
 			}
 
-			return clientCtx.PrintOutput(res.Profilers)
+			return clientCtx.PrintOutput(res)
 		},
 	}
 	flags.AddQueryFlagsToCmd(cmd)
@@ -75,7 +75,7 @@ func GetCmdQueryTrustees() *cobra.Command {
 				return err
 			}
 
-			return clientCtx.PrintOutput(res.Trustees)
+			return clientCtx.PrintOutput(res)
 		},
 	}
 	flags.AddQueryFlagsToCmd(cmd)

@@ -9,7 +9,7 @@ import (
 
 // RegisterCodec registers the necessary x/bank interfaces and concrete types
 // on the provided Amino codec. These types are used for Amino JSON serialization.
-func RegisterCodec(cdc *codec.Codec) {
+func RegisterCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgCreateFeed{}, "irishub/oracle/MsgCreateFeed", nil)
 	cdc.RegisterConcrete(&MsgStartFeed{}, "irishub/oracle/MsgStartFeed", nil)
 	cdc.RegisterConcrete(&MsgPauseFeed{}, "irishub/oracle/MsgPauseFeed", nil)
@@ -31,7 +31,7 @@ func RegisterInterfaces(registry types.InterfaceRegistry) {
 var (
 	amino = codec.New()
 
-	ModuleCdc = codec.NewHybridCodec(amino, types.NewInterfaceRegistry())
+	ModuleCdc = codec.NewAminoCodec(amino)
 )
 
 func init() {
