@@ -1,0 +1,19 @@
+syntax = "proto3";
+package irishub.oracle;
+
+import "oracle/oracle.proto";
+import "irismod/service.proto";
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/irisnet/irishub/modules/oracle/types";
+
+// GenesisState defines the oracle module's genesis state.
+message GenesisState {
+    repeated FeedEntry entries = 1 [(gogoproto.nullable) = false];
+}
+
+message FeedEntry {
+    Feed feed = 1 [(gogoproto.nullable) = false];
+    irismod.service.RequestContextState state = 2;
+    repeated FeedValue values = 3 [(gogoproto.nullable) = false];
+}

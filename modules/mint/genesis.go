@@ -1,13 +1,17 @@
 package mint
 
 import (
+	"errors"
 	"fmt"
+
+	"github.com/irisnet/irishub/modules/mint/keeper"
+	"github.com/irisnet/irishub/modules/mint/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 // InitGenesis new mint genesis
-func InitGenesis(ctx sdk.Context, keeper Keeper, data GenesisState) {
+func InitGenesis(ctx sdk.Context, keeper keeper.Keeper, data types.GenesisState) {
 	if err := ValidateGenesis(data); err != nil {
 		panic(fmt.Errorf("failed to initialize mint genesis state: %s", err.Error()))
 	}
@@ -16,8 +20,17 @@ func InitGenesis(ctx sdk.Context, keeper Keeper, data GenesisState) {
 }
 
 // ExportGenesis returns a GenesisState for a given context and keeper.
-func ExportGenesis(ctx sdk.Context, keeper Keeper) GenesisState {
+func ExportGenesis(ctx sdk.Context, keeper keeper.Keeper) *types.GenesisState {
 	minter := keeper.GetMinter(ctx)
 	params := keeper.GetParamSet(ctx)
-	return NewGenesisState(minter, params)
+	return types.NewGenesisState(minter, params)
+}
+
+// ValidateGenesis performs basic validation of supply genesis data returning an
+// error for any failed validation criteria.
+func ValidateGenesis(data types.GenesisState) error {
+	if !data.Minter.InflationBase.IsPositive() {
+		return errors.New("base inflation must be positive")
+	}
+	return data.Params.Validate()
 }

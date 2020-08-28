@@ -16,7 +16,7 @@ POW网络中，在每个区块生成期间，所有矿工竞争计算工作证�
 
 ### 通胀率
 
-genesis中指定的初始通胀率是4%，这个值可以通过在governance中提交`参数修改`的提议来修改。相关步骤, 请查阅[governance](governance.md)。
+genesis中指定的初始通胀率是4%，这个值可以通过在governance中提交`参数修改`的提议来修改。相关步骤，请查阅[governance](governance.md)。
 
 ### 通胀计算
 
@@ -28,9 +28,9 @@ genesis中指定的初始通胀率是4%，这个值可以通过在governance中�
  blockInflationAmount = AnnualInflationAmount * blockCostTime / (year)
 ```
 
-`inflationBasement`的值被定义在genesis文件中. 默认情况下，genesis里面写入的值是 `2000000000iris`(20亿个iris, `1 iris`等于`1*10^18 iris-atto`)。
+`inflationBasement`的值被定义在genesis文件中. 默认情况下，genesis里面写入的值是 `2000000000iris`(20亿个iris，`1 iris`等于`1*10^18 iris-atto`)。
 
-假设`blockCostTime`是5000毫秒， 通胀比例`inflationRate`是`4%`, 那么这个块增发的token数量是`12675235125611580094iris-atto` (`12.675235125611580094iris`)
+假设`blockCostTime`是5000毫秒，通胀比例`inflationRate`是`4%`，那么这个块增发的token数量是`12675235125611580094iris-atto` (`12.675235125611580094iris`)
 
 ## 对用户的影响
 
@@ -46,7 +46,7 @@ genesis中指定的初始通胀率是4%，这个值可以通过在governance中�
     iriscli stake pool --node=<iris_node_url>
     ```
 
-    示例输出:
+    示例输出：
 
     ```bash
     Pool
@@ -61,10 +61,10 @@ genesis中指定的初始通胀率是4%，这个值可以通过在governance中�
     如果不信任连接的全节点，请加上`--trust-node=false`这个标志。如果连接不上可信的全节点，这个接口十分必要。
 
     ```bash
-    iriscli bank token-stats --trust-node=false --chain-id=<chain-id> --node=<iris_node_url>
+    iriscli bank token-stats --trust-node=false --chain-id=irishub --node=<iris_node_url>
     ```
 
-    示例输出:
+    示例输出：
 
     ```bash
     TokenStats:

@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.16.2
+
+*Apr 9th, 2020*
+
+### Tendermint
+
+* [\#110](https://github.com/irisnet/tendermint/pull/110) Defend against DoS attacks
+
+## 0.16.1
+
+*Jan 9th, 2020*
+
+### CLI
+* [\#2109](https://github.com/irisnet/irishub/issues/2109) Fix the bug that the hash lock can not be specified in the CLI
+
+### Application
+* [\#2118](https://github.com/irisnet/irishub/pull/2118) Improve the UX of snapshot
+* [\#2119](https://github.com/irisnet/irishub/issues/2119) Prune iavlstore version using rootstore version
+
 ## 0.16.0
 
 *Nov 22th, 2019*

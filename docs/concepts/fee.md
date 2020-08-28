@@ -26,7 +26,7 @@ The total gas needed for executing the transaction is the sum of gas needed for 
 Example
 
 ```bash
-iriscli bank send --amount=1iris --fee=0.3iris --gas=50000 --chain-id=<chain-id> --from=<key-name> --to=<account-address>
+iriscli bank send --amount=1iris --fee=0.3iris --gas=50000 --chain-id=irishub --from=<key-name> --to=<account-address>
 ```
 
 This example is a transfer transaction. The maximum fee `--fee` is set to be 0.3iris and the maximum gas `--gas` is set to be 50000. Therefore, the gas price here is 6000iris-nano/Gas. Suppose that 10000 gas is used to execute the transaction, then 0.06iris will be paid to validators and left 0.24iris will be refunded to user.

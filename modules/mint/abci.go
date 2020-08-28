@@ -2,10 +2,13 @@ package mint
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	"github.com/irisnet/irishub/modules/mint/keeper"
+	"github.com/irisnet/irishub/modules/mint/types"
 )
 
 // BeginBlocker handles block beginning logic for mint
-func BeginBlocker(ctx sdk.Context, k Keeper) {
+func BeginBlocker(ctx sdk.Context, k keeper.Keeper) {
 	logger := k.Logger(ctx)
 	// Get block BFT time and block height
 	blockTime := ctx.BlockHeader().Time
@@ -41,10 +44,10 @@ func BeginBlocker(ctx sdk.Context, k Keeper) {
 
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
-			EventTypeMint,
-			sdk.NewAttribute(AttributeKeyLastInflationTime, lastInflationTime.String()),
-			sdk.NewAttribute(AttributeKeyInflationTime, blockTime.String()),
-			sdk.NewAttribute(AttributeKeyMintCoin, mintedCoin.Amount.String()),
+			types.EventTypeMint,
+			sdk.NewAttribute(types.AttributeKeyLastInflationTime, lastInflationTime.String()),
+			sdk.NewAttribute(types.AttributeKeyInflationTime, blockTime.String()),
+			sdk.NewAttribute(types.AttributeKeyMintCoin, mintedCoin.Amount.String()),
 		),
 	)
 }

@@ -36,7 +36,7 @@
 
 ## 恶意投票
 
-执行区块时, 收到某验证人对同一高度同一Round区块进行不同签名的作恶证据（称为Double Sign），如果作恶的时间距当前区块时间小于`MaxEvidenceAge`，则以`SlashFractionDoubleSign`比例惩罚验证人的绑定的token,并jail验证人。直到jail时间超过`DoubleSignJailDuration`，才能通过unjail命令解除jail。
+执行区块时，收到某验证人对同一高度同一Round区块进行不同签名的作恶证据（称为Double Sign），如果作恶的时间距当前区块时间小于`MaxEvidenceAge`，则以`SlashFractionDoubleSign`比例惩罚验证人的绑定的token,并jail验证人。直到jail时间超过`DoubleSignJailDuration`，才能通过unjail命令解除jail。
 
 **参数：**
 
@@ -46,7 +46,7 @@
 
 ## 打包不合法的交易
 
-如果节点在执行区块过程中，检测到其中交易只要没有通过`txDecoder`, `validateTx`, `validateBasicTxMsgs`, 则以`SlashFractionCensorship`比例惩罚验证人的绑定的token, 并jail验证人。直到jail时间超过`CensorshipJailDuration`，才能通过unjail命令解除jail。
+如果节点在执行区块过程中，检测到其中交易只要没有通过`txDecoder`，`validateTx`，`validateBasicTxMsgs`，则以`SlashFractionCensorship`比例惩罚验证人的绑定的token，并jail验证人。直到jail时间超过`CensorshipJailDuration`，才能通过unjail命令解除jail。
 
 * `txDecode` 对Tx的反序列化
 * `validateTx` 对Tx的大小限制
