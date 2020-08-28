@@ -46,23 +46,23 @@ Note: The parameters above can all be governed.
 
 - **Tokens**
 
-  - [Issue Token](../cli-client/asset.md#iriscli-asset-token-issue)
+  - [Issue Token](../cli-client/token.md#iriscli-asset-token-issue)
 
-    - [Issue a native token](../cli-client/asset.md#issue-a-token)
+    - [Issue a native token](../cli-client/token.md#issue-a-token)
   
-    - [Send tokens](../cli-client/asset.md#send-tokens)
+    - [Send tokens](../cli-client/token.md#send-tokens)
 
-  - [Query Tokens](../cli-client/asset.md#iriscli-asset-token-tokens)
+  - [Query Tokens](../cli-client/token.md#iriscli-asset-token-tokens)
 
-  - [Edit Token](../cli-client/asset.md#iriscli-asset-token-edit)
+  - [Edit Token](../cli-client/token.md#iriscli-asset-token-edit)
 
-  - [Mint Token](../cli-client/asset.md#iriscli-asset-token-mint)
+  - [Mint Token](../cli-client/token.md#iriscli-asset-token-mint)
 
   - [Burn Token](../cli-client/bank.md#iriscli-bank-burn)
 
-  - [Transfer Ownership](../cli-client/asset.md#iriscli-asset-token-transfer)
+  - [Transfer Ownership](../cli-client/token.md#iriscli-asset-token-transfer)
 
 - **Fees**
   
-  - [Query Native Token Fee](../cli-client/asset.md#query-fee-of-issuing-and-minting-a-token)
+  - [Query Native Token Fee](../cli-client/token.md#query-fee-of-issuing-and-minting-a-token)
   

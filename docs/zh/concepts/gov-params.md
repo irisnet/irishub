@@ -63,7 +63,7 @@
 | `asset/CreateGatewayBaseFee` | 创建网关的基准费用                             | [0, +∞)  | 120000000000000000000000iris-atto |
 | `asset/GatewayAssetFeeRatio` | 发行网关资产的费率(相对于native资产的发行费用) | [0, 1]   | 0.1                               |
 
-详见 [Asset](../features/asset.md)
+详见 [Asset](../features/token.md)
 
 ## Service 模块可治理参数
 
