@@ -6,6 +6,9 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	servicetypes "github.com/irismod/service/types"
+	guardiantypes "github.com/irisnet/irishub/modules/guardian/types"
+	randomtypes "github.com/irisnet/irishub/modules/random/types"
 	"net"
 	"os"
 	"path/filepath"
@@ -274,6 +277,27 @@ func initGenFiles(
 ) error {
 
 	appGenState := mbm.DefaultGenesis(clientCtx.JSONMarshaler)
+
+	// add the profiler and trustees in the genesis state
+	var guardianGenState guardiantypes.GenesisState
+	clientCtx.JSONMarshaler.MustUnmarshalJSON(appGenState[guardiantypes.ModuleName], &guardianGenState)
+
+	for _, account := range genAccounts {
+		guardian := guardiantypes.NewGuardian(
+			"genesis", guardiantypes.Genesis,
+			account.GetAddress(), account.GetAddress(),
+		)
+		guardianGenState.Profilers = append(guardianGenState.Profilers, guardian)
+		guardianGenState.Trustees = append(guardianGenState.Trustees, guardian)
+	}
+	appGenState[guardiantypes.ModuleName] = clientCtx.JSONMarshaler.MustMarshalJSON(guardianGenState)
+
+	// add system service in the genesis state
+	var serviceGenState servicetypes.GenesisState
+	clientCtx.JSONMarshaler.MustUnmarshalJSON(appGenState[servicetypes.ModuleName], &serviceGenState)
+	serviceGenState.Definitions = append(serviceGenState.Definitions, randomtypes.GetSvcDefinitions()...)
+
+	appGenState[servicetypes.ModuleName] = clientCtx.JSONMarshaler.MustMarshalJSON(serviceGenState)
 
 	// set the accounts in the genesis state
 	var authGenState authtypes.GenesisState
