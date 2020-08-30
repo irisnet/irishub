@@ -290,14 +290,14 @@ func initGenFiles(
 		guardianGenState.Profilers = append(guardianGenState.Profilers, guardian)
 		guardianGenState.Trustees = append(guardianGenState.Trustees, guardian)
 	}
-	appGenState[guardiantypes.ModuleName] = clientCtx.JSONMarshaler.MustMarshalJSON(guardianGenState)
+	appGenState[guardiantypes.ModuleName] = clientCtx.JSONMarshaler.MustMarshalJSON(&guardianGenState)
 
 	// add system service in the genesis state
 	var serviceGenState servicetypes.GenesisState
 	clientCtx.JSONMarshaler.MustUnmarshalJSON(appGenState[servicetypes.ModuleName], &serviceGenState)
 	serviceGenState.Definitions = append(serviceGenState.Definitions, randomtypes.GetSvcDefinitions()...)
 
-	appGenState[servicetypes.ModuleName] = clientCtx.JSONMarshaler.MustMarshalJSON(serviceGenState)
+	appGenState[servicetypes.ModuleName] = clientCtx.JSONMarshaler.MustMarshalJSON(&serviceGenState)
 
 	// set the accounts in the genesis state
 	var authGenState authtypes.GenesisState
