@@ -304,6 +304,8 @@ github.com/irismod/token v1.1.1-0.20200827133251-9350f810840b h1:8rlvs4TLWaF15yD
 github.com/irismod/token v1.1.1-0.20200827133251-9350f810840b/go.mod h1:hOxUjOsE1biJa8ReBzY58rz3ZJeglth+HbU2iftcZik=
 github.com/irismod/token v1.1.1-0.20200828023713-a0063f4e9bdc h1:0rR737LNZwRPSZlspNfBpz2bGUCYe+UKwFiIDT4YTlA=
 github.com/irismod/token v1.1.1-0.20200828023713-a0063f4e9bdc/go.mod h1:hOxUjOsE1biJa8ReBzY58rz3ZJeglth+HbU2iftcZik=
+github.com/irismod/token v1.1.1-0.20200828081910-fe351310ac96 h1:h/6mimW300AVA/9oRtkNRwyZmKO3a/7OrU9B9OS2TSw=
+github.com/irismod/token v1.1.1-0.20200828081910-fe351310ac96/go.mod h1:hOxUjOsE1biJa8ReBzY58rz3ZJeglth+HbU2iftcZik=
 github.com/irisnet/cosmos-sdk v0.34.4-0.20200827085823-7b1a0adbfd1e h1:UWcFWDRtMxKOaRfApfwcByxAzeYpwPGCRUXtIhj0kL0=
 github.com/irisnet/cosmos-sdk v0.34.4-0.20200827085823-7b1a0adbfd1e/go.mod h1:HXb9uKlB4sR4BFP32aSboY1Se4QhbFbYcJN6Dexil2U=
 github.com/jessevdk/go-flags v0.0.0-20141203071132-1679536dcc89/go.mod h1:4FA24M0QyGHXBuZZK/XkWh8h0e1EYbRYJSGM75WSRxI=
@@ -388,6 +390,8 @@ github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e/go.mod h1:zD1mROLA
 github.com/oklog/oklog v0.3.2/go.mod h1:FCV+B7mhrz4o+ueLpx+KqkyXRGMWOYEvfiXtdGtbWGs=
 github.com/oklog/run v1.0.0/go.mod h1:dlhp/R75TPv97u0XWUtDeV/lRKWPKSdTuV0TZvrmrQA=
 github.com/oklog/ulid v1.3.1/go.mod h1:CirwcVhetQ6Lv90oh/F+FBtV6XMibvdAFo93nm5qn4U=
+github.com/olebedev/config v0.0.0-20190528211619-364964f3a8e4 h1:JnVsYEQzhEcOspy6ngIYNF2u0h2mjkXZptzX0IzZQ4g=
+github.com/olebedev/config v0.0.0-20190528211619-364964f3a8e4/go.mod h1:RL5+WRxWTAXqqCi9i+eZlHrUtO7AQujUqWi+xMohmc4=
 github.com/olekukonko/tablewriter v0.0.0-20170122224234-a0225b3f23b5/go.mod h1:vsDQFd/mU46D+Z4whnwzcISnGGzXWMclvtLoiIKAKIo=
 github.com/onsi/ginkgo v1.6.0/go.mod h1:lLunBs/Ym6LB5Z9jYTR76FiuTmxDTDusOGeTQH+WWjE=
 github.com/onsi/ginkgo v1.7.0/go.mod h1:lLunBs/Ym6LB5Z9jYTR76FiuTmxDTDusOGeTQH+WWjE=
