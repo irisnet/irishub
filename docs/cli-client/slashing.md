@@ -23,7 +23,7 @@ iris tx slashing unjail [flags]
 Query the current slashing parameters .
 
 ```bash
-iris query bank total [flags]
+iris query slashing params  [flags]
 ```
 
 ## iris query slashing signing-info

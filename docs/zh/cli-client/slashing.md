@@ -23,7 +23,7 @@ iris tx slashing unjail [flags]
 查询当前`Slashing`的参数信息。
 
 ```bash
-iris query bank total [flags]
+iris query slashing params [flags]
 ```
 
 ## iris query slashing signing-info
