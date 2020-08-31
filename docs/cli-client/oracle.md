@@ -10,9 +10,9 @@ Oracle module allows you to manage the feed on IRIS Hub
 | [start](#iris-tx-oracle-start)             | Start a feed in "paused" state                                                         |
 | [pause](#iris-tx-oracle-pause)             | Pause a feed in "running" state                                                        |
 | [edit](#iris-tx-oracle-edit)               | Modify the feed information and update service invocation parameters by feed creator      |
-| [query-feed](#iris-query-oracle-query-feed)   | Query the feed definition                                                   |
-| [query-feeds](#iris-query-oracle-query-feeds) | Query a group of feed definition                                          |
-| [query-value](#iris-query-oracle-query-value) | Query the feed result                                                |
+| [feed](#iris-query-oracle-feed)            | Query the feed definition                                                   |
+| [feeds](#iris-query-oracle-feeds)          | Query a group of feed definition                                          |
+| [value](#iris-query-oracle-value)          | Query the feed result                                                |
 
 ## iris tx oracle create
 
@@ -101,26 +101,26 @@ iris tx oracle edit [feed-name] [flags]
 iris tx oracle edit test-feed --chain-id=irishub --from=node0 --fees=0.3iris --latest-history=5 --commit
 ```
 
-## iris query oracle query-feed
+## iris query oracle feed
 
 This command is used to query a feed 
 
 ```bash
-iris query oracle query-feed [feed-name] [flags]
+iris query oracle feed [feed-name] [flags]
 ```
 
 ### Query an existed feed
 
 ```bash
-iris query oracle query-feed test-feed
+iris query oracle feed test-feed
 ```
 
-## iris query oracle query-feeds
+## iris query oracle feeds
 
 This command is used to query a group of feed 
 
 ```bash
-iris query oracle query-feeds [flags]
+iris query oracle feeds [flags]
 ```
 
 **Flags:**
@@ -132,19 +132,19 @@ iris query oracle query-feeds [flags]
 ### Query a group of feed
 
 ```bash
-iris query oracle query-feeds --state=running
+iris query oracle feeds --state=running
 ```
 
-## iris query oracle query-value
+## iris query oracle value
 
 This command is used to query the result of a specified feed
 
 ```bash
-iris query oracle query-value test-feed
+iris query oracle value test-feed
 ```
 
 ### Query the result of an existed feed
 
 ```bash
-iris query oracle query-value test-feed
+iris query oracle value test-feed
 ```

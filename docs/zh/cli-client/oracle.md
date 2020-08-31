@@ -6,13 +6,13 @@ Oracle模块负责管理你在IRIS Hub上创建的feed。
 
 | 名称                                       | 描述                                 |
 | ------------------------------------------ | ------------------------------------ |
-| [create](#iriscli-oracle-create)           | 创建一个新的feed，初始状态为"paused" |
-| [start](#iriscli-oracle-start)             | 启动一个处于"paused"状态的feed       |
-| [pause](#iriscli-oracle-pause)             | 暂停一个处于"running"状态的feed      |
-| [edit](#iriscli-oracle-edit)               | feed的所有者编辑一个feed的相关信息并更新服务调用参数   |
-| [query-feed](#iriscli-oracle-query-feed)   | 通过名称查询一个feed信息             |
-| [query-feeds](#iriscli-oracle-query-feeds) | 查询一组feed信息                     |
-| [query-value](#iriscli-oracle-query-value) | 通过名称查询feed的执行结果           |
+| [create](#iris-tx-oracle-create)           | 创建一个新的feed，初始状态为"paused" |
+| [start](#iris-tx-oracle-start)             | 启动一个处于"paused"状态的feed       |
+| [pause](#iris-tx-oracle-pause)             | 暂停一个处于"running"状态的feed      |
+| [edit](#iris-tx-oracle-edit)               | feed的所有者编辑一个feed的相关信息并更新服务调用参数   |
+| [feed](#iris-query-oracle-feed)            | 通过名称查询一个feed信息             |
+| [feeds](#iris-query-oracle-feeds)          | 查询一组feed信息                     |
+| [value](#iris-query-oracle-value)          | 通过名称查询feed的执行结果           |
 
 ## iris tx oracle create
 
@@ -100,26 +100,26 @@ iris tx oracle edit [feed-name] [flags]
 iris tx oracle edit test-feed --chain-id=irishub --from=node0 --fees=0.3iris --latest-history=5 --commit
 ```
 
-## iris query oracle query-feed
+## iris query oracle feed
 
 该命令用于查询一个已存在的feed的信息
 
 ```bash
-iris query oracle query-feed [feed-name] [flags]
+iris query oracle feed [feed-name] [flags]
 ```
 
 ### 查询一个已存在的feed的信息
 
 ```bash
-iris query oracle query-feed test-feed
+iris query oracle feed test-feed
 ```
 
-## iris query oracle query-feeds
+## iris query oracle feeds
 
 该命令用于查询一组feed的信息
 
 ```bash
-iris query oracle query-feeds [flags]
+iris query oracle feeds [flags]
 ```
 
 **标识：**
@@ -131,19 +131,19 @@ iris query oracle query-feeds [flags]
 ### 查询一组feed的信息
 
 ```bash
-iris query oracle query-feeds --state=running
+iris query oracle feeds --state=running
 ```
 
-## iris query oracle query-value
+## iris query oracle value
 
 该命令用于查询指定feed的执行结果
 
 ```bash
-iris query oracle query-value test-feed
+iris query oracle value test-feed
 ```
 
 ### 查询现存的feed的执行结果
 
 ```bash
-iris query oracle query-value test-feed
+iris query oracle value test-feed
 ```
