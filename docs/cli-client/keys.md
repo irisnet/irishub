@@ -89,7 +89,7 @@ If you don't have all the permission of sub-keys, you can ask for the pubkeys to
 Offline key can be created by "iris keys add --pubkey".
 :::
 
-How to use multisig key to sign and broadcast a transaction,  please refer to [multisign](tx.md#iriscli-tx-multisign)
+How to use multisig key to sign and broadcast a transaction,  please refer to [multisign](tx.md#iris-tx-multisign)
 
 
 ## iris keys delete
@@ -121,15 +121,11 @@ Export the keystore of a key to a json file
 iris keys export <key-name> [flags]
 ```
 
-
 ### Export keystore
 
 ```bash
 iris keys export Mykey --output-file=<path-to-keystore>
 ```
-
-
-
 
 ## iris keys import
 
@@ -156,8 +152,6 @@ List all the keys stored by this key manager along with their associated name, t
 ```bash
 iris keys list
 ```
-
-
 
 ## iris keys migrate
 
@@ -199,11 +193,8 @@ iris keys mnemonic
 You'll get a bip39 mnemonic with 24 words, e.g.:
 
 ```bash
-police possible oval milk network indicate usual blossom spring wasp taste canal announce purpose rib mind river pet brown web response sting remain airport
+beauty entire blue tape ordinary fix rotate learn smart tiger dolphin cycle cigar dish alcohol slab bachelor vital design consider paper panther mad eternal
 ```
-
-
-
 
 ## iris keys parse
 
@@ -214,10 +205,6 @@ Convert and print to stdout key addresses and fingerprints from hexadecimal into
 ```bash
 iris keys parse <hex-or-bech32-address> [flags]
 ```
-
-
-
-
 
 ## iris keys show
 
@@ -246,8 +233,13 @@ iris keys show MyKey
 The following infos will be shown:
 
 ```bash
-NAME:    TYPE:    ADDRESS:                                      PUBKEY:
-MyKey    local    iaa1kkm4w5pvmcw0e3vjcxqtfxwqpm3k0zak83e7nf    iap1addwnpepq0gsl90v9dgac3r9hzgz53ul5ml5ynq89ax9x8qs5jgv5z5vyssskzc7exa
+- name: Mykey
+  type: local
+  address: iaa1tulwx2hwz4dv8te6cflhda64dn0984harlzegw
+  pubkey: iap1addwnpepq24rufap6u0sysqcpgsfzqhw3x8nfkhqhtmpgqt0369rlyqcg0vkgwzc4k0
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
 ```
 
 ### Get validator operator address
@@ -261,8 +253,13 @@ iris keys show MyKey --bech val
 Example Output:
 
 ```bash
-NAME:    TYPE:    ADDRESS:                                      PUBKEY:
-MyKey    local    iva12nda6xwpmp000jghyneazh4kkgl2tnzyx7trze    ivp1addwnpepqfw52vyzt9xgshxmw7vgpfqrey30668g36f9z837kj9dy68kn2wxqm8gtmk
+- name: Mykey
+  type: local
+  address: iva1tulwx2hwz4dv8te6cflhda64dn0984hakwgk4f
+  pubkey: ivp1addwnpepq24rufap6u0sysqcpgsfzqhw3x8nfkhqhtmpgqt0369rlyqcg0vkgd8e6zy
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
 ```
 
 

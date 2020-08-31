@@ -19,7 +19,7 @@ iris bank account iaa1a0x4g8rqc90l3z9jh98x7mkd0w77e9q9r300h
 Error: decoding bech32 failed: checksum failed. Expected 9r300k, got 9r300h.
 ```
 
-This means the account address is misspelled, please double check the address.
+This means the account address misspelled, please double check the address.
 
 ## iris query bank balances
 

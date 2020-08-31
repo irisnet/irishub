@@ -113,9 +113,6 @@ iris keys delete <key-name> [flags]
 iris keys delete MyKey
 ```
 
-
-
-
 ## iris keys export
 
 将密钥keystore信息导出为json文件。
@@ -140,7 +137,6 @@ iris keys export Mykey --output-file=<path-to-keystore>
 iris keys import <name> <keyfile> [flags]
 ```
 
-
 ## iris keys list
 
 返回此密钥管理器存储的所有密钥的名称、类型、地址和公钥列表。
@@ -156,8 +152,6 @@ iris keys import <name> <keyfile> [flags]
 ```bash
 iris keys list
 ```
-
-
 
 ## iris keys migrate
 
@@ -198,7 +192,7 @@ iris keys mnemonic
 执行上述命令后你将得到24个单词组成的助记词，例如：
 
 ```bash
-police possible oval milk network indicate usual blossom spring wasp taste canal announce purpose rib mind river pet brown web response sting remain airport
+beauty entire blue tape ordinary fix rotate learn smart tiger dolphin cycle cigar dish alcohol slab bachelor vital design consider paper panther mad eternal
 ```
 
 ## iris keys parse
@@ -210,8 +204,6 @@ police possible oval milk network indicate usual blossom spring wasp taste canal
 ```bash
 iris keys parse <hex-or-bech32-address> [flags]
 ```
-
-
 
 ## iris keys show
 
@@ -240,8 +232,13 @@ iris keys show MyKey
 执行命令后将会显示以下信息：
 
 ```bash
-NAME:    TYPE:    ADDRESS:                                      PUBKEY:
-MyKey    local    iaa1kkm4w5pvmcw0e3vjcxqtfxwqpm3k0zak83e7nf    iap1addwnpepq0gsl90v9dgac3r9hzgz53ul5ml5ynq89ax9x8qs5jgv5z5vyssskzc7exa
+- name: Mykey
+  type: local
+  address: iaa1tulwx2hwz4dv8te6cflhda64dn0984harlzegw
+  pubkey: iap1addwnpepq24rufap6u0sysqcpgsfzqhw3x8nfkhqhtmpgqt0369rlyqcg0vkgwzc4k0
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
 ```
 
 ### 查询验证人operator地址
@@ -255,6 +252,11 @@ iris keys show MyKey --bech val
 示例输出：
 
 ```bash
-NAME:    TYPE:    ADDRESS:                                      PUBKEY:
-MyKey    local    iva12nda6xwpmp000jghyneazh4kkgl2tnzyx7trze    ivp1addwnpepqfw52vyzt9xgshxmw7vgpfqrey30668g36f9z837kj9dy68kn2wxqm8gtmk
+- name: Mykey
+  type: local
+  address: iva1tulwx2hwz4dv8te6cflhda64dn0984hakwgk4f
+  pubkey: ivp1addwnpepq24rufap6u0sysqcpgsfzqhw3x8nfkhqhtmpgqt0369rlyqcg0vkgd8e6zy
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
 ```

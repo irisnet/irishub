@@ -2,7 +2,7 @@
 
 The distribution module allows you to manage your [Staking Rewards](../concepts/general-concepts.md#staking-rewards).
 
-## Available Subommands
+## Available Subcommands
 
 | Name                                                                                      | Description                                                  |
 | ----------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |

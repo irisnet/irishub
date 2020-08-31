@@ -63,7 +63,7 @@ Details in [Slashing](../features/slashing.md)
 | `asset/CreateGatewayBaseFee` | Base fee for creating gateway tokens             | [0, +∞) | 120000000000000000000000iris-atto |
 | `asset/GatewayAssetFeeRatio` | Fee ratio for issuing and minting gateway tokens | [0, 1]  | 0.1                               |
 
-Details in [Asset](../features/token.md)
+Details in [Token](../features/token.md)
 
 ## Parameters in Service
 
