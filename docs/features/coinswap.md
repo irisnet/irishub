@@ -1,6 +1,6 @@
 # Coinswap Token Exchange
 
-## Introduction
+## Summary
 
 This document describes the implementation of the [Constant Product Market Maker Model](https://github.com/runtimeverification/verified-smart-contracts/blob/uniswap/uniswap/x-y-k.pdf) token exchange protocol on IRISHub. 
 
