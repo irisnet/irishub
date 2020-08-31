@@ -292,6 +292,8 @@ github.com/irismod/record v1.1.1-0.20200827095301-3e27fc43ae73 h1:DjsV6syYu1na1O
 github.com/irismod/record v1.1.1-0.20200827095301-3e27fc43ae73/go.mod h1:slwVI+gGuBJo1OJPv0vw/GFeRPs9KB8K+0aecfmGSps=
 github.com/irismod/service v1.1.1-0.20200830041912-b2ced48a06ab h1:y/+fLhlrag+oiY/kLo9AU1wkI/s3nm3g0GEuOXiqpkw=
 github.com/irismod/service v1.1.1-0.20200830041912-b2ced48a06ab/go.mod h1:ID4dmeafXHw8pFLDynH7l4mGIXetd5jrtFmY4qnxpHU=
+github.com/irismod/service v1.1.1-0.20200831103113-6c6a5a77d22f h1:9ekSaU+Gu7rHrGWqaebCtQuBTtMYcfJcP8ONjy3JDNs=
+github.com/irismod/service v1.1.1-0.20200831103113-6c6a5a77d22f/go.mod h1:ID4dmeafXHw8pFLDynH7l4mGIXetd5jrtFmY4qnxpHU=
 github.com/irismod/token v1.1.1-0.20200831030503-21db6eea21a9/go.mod h1:hOxUjOsE1biJa8ReBzY58rz3ZJeglth+HbU2iftcZik=
 github.com/irismod/token v1.1.1-0.20200831092317-7be7d71fe448 h1:LldR6+rQ1JgXv6EGpsVe+M1OD3ljWTFYawlSkp/gq6M=
 github.com/irismod/token v1.1.1-0.20200831092317-7be7d71fe448/go.mod h1:hOxUjOsE1biJa8ReBzY58rz3ZJeglth+HbU2iftcZik=
