@@ -23,7 +23,7 @@ There are the following states involved in the lifecycle of an HTLC:
 Create an HTLC
 
 ```bash
-iris tx htlc create --chain-id=irishub --from=<key-name> --fee=0.3iris --to=<to> --receiver-on-other-chain=<receiver-on-other-chain> --amount=<amount> --secret=<secret> --time-lock=<time-lock> --timestamp=<timestamp>
+iris tx htlc create --chain-id=irishub --from=<key-name> --fees=0.3iris --to=<to> --receiver-on-other-chain=<receiver-on-other-chain> --amount=<amount> --secret=<secret> --time-lock=<time-lock> --timestamp=<timestamp>
 ```
 
 **Flags:**
@@ -49,7 +49,7 @@ iris tx htlc create \
 --secret=382aa2863398a31474616f1498d7a9feba132c4bcf9903940b8a5c72a46e4a41 \
 --time-lock=50 \
 --timestamp=1580000000 \
---fee=0.3iris \
+--fees=0.3iris \
 --chain-id=irishub \
 --commit
 ```
@@ -59,7 +59,7 @@ iris tx htlc create \
 Claim an opened HTLC
 
 ```bash
-iris tx htlc claim --chain-id=irishub --from=<key-name> --fee=0.3iris --hash-lock=<hash-lock> --secret=<secret>
+iris tx htlc claim --chain-id=irishub --from=<key-name> --fees=0.3iris --hash-lock=<hash-lock> --secret=<secret>
 ```
 
 **Flags:**
@@ -76,7 +76,7 @@ iris tx htlc claim \
 --from=node0 \
 --hash-lock=bae5acb11ad90a20cb07023f4bf0fcf4d38549feff486dd40a1fbe871b4aabdf \
 --secret=382aa2863398a31474616f1498d7a9feba132c4bcf9903940b8a5c72a46e4a41 \
---fee=0.3iris \
+--fees=0.3iris \
 --chain-id=irishub \
 --commit
 ```
@@ -86,7 +86,7 @@ iris tx htlc claim \
 Refund from an expired HTLC
 
 ```bash
-iris tx htlc refund --chain-id=irishub --from=<key-name> --fee=0.3iris --hash-lock=<hash-lock>
+iris tx htlc refund --chain-id=irishub --from=<key-name> --fees=0.3iris --hash-lock=<hash-lock>
 ```
 
 **Flags:**
@@ -101,7 +101,7 @@ iris tx htlc refund --chain-id=irishub --from=<key-name> --fee=0.3iris --hash-lo
 iris tx htlc refund \
 --from=node0 \
 --hash-lock=bae5acb11ad90a20cb07023f4bf0fcf4d38549feff486dd40a1fbe871b4aabdf \
---fee=0.3iris \
+--fees=0.3iris \
 --chain-id=irishub \
 --commit
 ```

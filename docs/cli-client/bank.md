@@ -69,5 +69,5 @@ iris tx bank send [from_key_or_address] [to_address] [amount] [flags]
 ### Send tokens to another address
 
 ```bash
-iris tx bank send --from=<key-name> --to=<address> --amount=10iris --fee=0.3iris --chain-id=irishub
+iris tx bank send --from=<key-name> --to=<address> --amount=10iris --fees=0.3iris --chain-id=irishub
 ```

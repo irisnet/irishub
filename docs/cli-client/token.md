@@ -1,6 +1,6 @@
-# iris asset
+# iris token
 
-Asset module allows you to manage assets on IRIS Hub
+Token module allows you to manage assets on IRIS Hub
 
 ## Available Commands
 
@@ -38,7 +38,7 @@ iris tx token issue [flags]
 ### Issue a token
 
 ```bash
-iris tx token issue --symbol="kitty" --name="Kitty Token" --initial-supply=100000000000 --max-supply=1000000000000 --scale=0 --mintable=true --fee=1iris --chain-id=irishub --from=<key-name> --commit
+iris tx token issue --symbol="kitty" --name="Kitty Token" --initial-supply=100000000000 --max-supply=1000000000000 --scale=0 --mintable=true --fees=1iris --chain-id=irishub --from=<key-name> --commit
 ```
 
 ### Send tokens
@@ -48,7 +48,7 @@ You can send any tokens you have just like [sending iris](./bank.md#iris-tx-bank
 #### Send tokens
 
 ```bash
-iris tx bank send --from=<key-name> --to=<address> --amount=10kitty --fee=0.3iris --chain-id=irishub --commit
+iris tx bank send --from=<key-name> --to=<address> --amount=10kitty --fees=0.3iris --chain-id=irishub --commit
 ```
 
 ## iris tx token edit
@@ -72,7 +72,7 @@ iris tx token edit [symbol] [flags]
 ### Edit Token
 
 ```bash
-iris tx token edit kitty --name="Cat Token" --max-supply=100000000000 --mintable=true --from=<key-name> --chain-id=irishub --fee=0.3iris --commit
+iris tx token edit kitty --name="Cat Token" --max-supply=100000000000 --mintable=true --from=<key-name> --chain-id=irishub --fees=0.3iris --commit
 ```
 
 ## iris tx token transfer
@@ -92,7 +92,7 @@ iris tx token transfer [symbol] [flags]
 ### Transfer Token Owner
 
 ```bash
-iris tx token transfer kitty --to=<new-owner-address> --from=<key-name> --chain-id=irishub --fee=0.3iris --commit
+iris tx token transfer kitty --to=<new-owner-address> --from=<key-name> --chain-id=irishub --fees=0.3iris --commit
 ```
 
 ## iris tx token mint
@@ -113,7 +113,7 @@ iris tx token mint [symbol] [flags]
 ### Mint Token
 
 ```bash
-iris tx token mint kitty --amount=1000000 --from=<key-name> --chain-id=irishub --fee=0.3iris
+iris tx token mint kitty --amount=1000000 --from=<key-name> --chain-id=irishub --fees=0.3iris
 ```
 
 ## iris query token token
@@ -135,7 +135,7 @@ iris query token token kitty
 Query tokens by the owner which is optional
 
 ```bash
-iiris query token tokens [owner] [flags]
+iris query token tokens [owner] [flags]
 ```
 
 ### Query all tokens

@@ -1,4 +1,4 @@
-# iriscli oracle
+# iris oracle
 
 Oracle模块负责管理你在IRIS Hub上创建的feed。
 
@@ -42,7 +42,7 @@ iris tx oracle create [flags]
 ### 创建一个新的feed
 
 ```bash
-iris tx oracle create --chain-id=irishub --from=node0 --fee=0.3iris --feed-name="test-feed" --latest-history=10 --service-name="test-service" --input=<request-data> --providers=<provide1_address>,<provider2_address> --service-fee-cap=1iris --timeout=2 --frequency=10 --total=10 --threshold=1 --aggregate-func="avg" --value-json-path="high" --commit
+iris tx oracle create --chain-id=irishub --from=node0 --fees=0.3iris --feed-name="test-feed" --latest-history=10 --service-name="test-service" --input=<request-data> --providers=<provide1_address>,<provider2_address> --service-fee-cap=1iris --timeout=2 --frequency=10 --total=10 --threshold=1 --aggregate-func="avg" --value-json-path="high" --commit
 ```
 
 ## iris tx oracle start
@@ -56,7 +56,7 @@ iris tx oracle start <feed-name>
 ### 启动一个处于`暂停`状态的feed
 
 ```bash
-iris tx oracle start test-feed --chain-id=irishub --from=node0 --fee=0.3iris --commit
+iris tx oracle start test-feed --chain-id=irishub --from=node0 --fees=0.3iris --commit
 ```
 
 ## iris tx oracle pause
@@ -70,7 +70,7 @@ iris tx oracle pause [feed-name] [flags]
 ### 暂停一个处于`运行`状态的feed
 
 ```bash
-iris tx oracle pause test-feed --chain-id=irishub --from=node0 --fee=0.3iris --commit
+iris tx oracle pause test-feed --chain-id=irishub --from=node0 --fees=0.3iris --commit
 ```
 
 ## iris tx oracle edit
@@ -97,7 +97,7 @@ iris tx oracle edit [feed-name] [flags]
 ### 编辑feed
 
 ```bash
-iris tx oracle edit test-feed --chain-id=irishub --from=node0 --fee=0.3iris --latest-history=5 --commit
+iris tx oracle edit test-feed --chain-id=irishub --from=node0 --fees=0.3iris --latest-history=5 --commit
 ```
 
 ## iris query oracle query-feed

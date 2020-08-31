@@ -1,6 +1,6 @@
-# iris asset
+# iris token
 
-asset模块用于管理你在IRIS Hub上发行的资产。
+token模块用于管理你在IRIS Hub上发行的资产。
 
 ## 可用命令
 
@@ -38,7 +38,7 @@ iris tx token issue [flags]
 ### 发行通证
 
 ```bash
-iris tx token issue --symbol="kitty" --name="Kitty Token" --initial-supply=100000000000 --max-supply=1000000000000 --scale=0 --mintable=true --fee=1iris --chain-id=irishub --from=<key-name> --commit
+iris tx token issue --symbol="kitty" --name="Kitty Token" --initial-supply=100000000000 --max-supply=1000000000000 --scale=0 --mintable=true --fees=1iris --chain-id=irishub --from=<key-name> --commit
 ```
 
 ### 发送通证
@@ -48,7 +48,7 @@ iris tx token issue --symbol="kitty" --name="Kitty Token" --initial-supply=10000
 #### 发送通证
 
 ```bash
-iris tx bank send --from=<key-name> --to=<address> --amount=10kitty --fee=0.3iris --chain-id=irishub --commit
+iris tx bank send --from=<key-name> --to=<address> --amount=10kitty --fees=0.3iris --chain-id=irishub --commit
 ```
 
 ## iris tx token edit
@@ -72,7 +72,7 @@ iris tx token edit [symbol] [flags]
 ### 编辑通证
 
 ```bash
-iris tx token edit kitty --name="Cat Token" --max-supply=100000000000 --mintable=true --from=<key-name> --chain-id=irishub --fee=0.3iris --commit
+iris tx token edit kitty --name="Cat Token" --max-supply=100000000000 --mintable=true --from=<key-name> --chain-id=irishub --fees=0.3iris --commit
 ```
 
 ## iris tx token transfer
@@ -92,7 +92,7 @@ iris tx token transfer [symbol] [flags]
 ### 转让通证所有者
 
 ```bash
-iris tx token transfer kitty --to=<new-owner-address> --from=<key-name> --chain-id=irishub --fee=0.3iris --commit
+iris tx token transfer kitty --to=<new-owner-address> --from=<key-name> --chain-id=irishub --fees=0.3iris --commit
 ```
 
 ## iris tx token mint
@@ -113,7 +113,7 @@ iris tx token mint [symbol] [flags]
 ### 增发通证
 
 ```bash
-iris tx token mint kitty --amount=1000000 --from=<key-name> --chain-id=irishub --fee=0.3iris
+iris tx token mint kitty --amount=1000000 --from=<key-name> --chain-id=irishub --fees=0.3iris
 ```
 
 ## iris query token token
