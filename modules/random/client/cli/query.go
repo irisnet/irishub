@@ -66,7 +66,7 @@ func GetCmdQueryRandom() *cobra.Command {
 // GetCmdQueryRandomRequestQueue implements the query queue command.
 func GetCmdQueryRandomRequestQueue() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "query-queue [gen-height]",
+		Use:     "queue [gen-height]",
 		Short:   "Query the random number request queue with an optional height",
 		Example: fmt.Sprintf("%s query random queue <gen-height>", version.AppName),
 		RunE: func(cmd *cobra.Command, args []string) error {
