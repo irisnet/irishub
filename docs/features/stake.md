@@ -40,7 +40,87 @@ Delegators can transfer their delegation from one validator to another one. Rede
 The Byzantine-fault-tolerant POS blockchain network assume that the Byzantine nodes possess less than 1/3 of total voting power. These Byzantine nodes must be punished. So it is necessary to collect the evidence of Byzantine behavior. According to the evidence, stake module will aotumatically slash a certain mount of token from corresponding validators and delegators. The slashed tokens are just burned. Besides, the Byzantine validators will be removed from the validator set and put into jail, which means their voting power is zero. During the jail period, these nodes are not event validator candidates . Once the jail period is end, they can send transactions to unjail themselves and become validator candidates again.
 
 ### Rewards
-  
+
 As a delegator, the more bonded tokens it has on validator, the more rewards it will earn. For a validator operator, it will have extra rewards: validator commission. The rewards come from token inflation and transaction fee. As for how to calculate the rewards and how to get the rewards, please refer to [mint](mint.md) and [distribution](distribution.md).
+
+## What Users Can Do
+
+- Query your own validator
+
+  Users can query their own validators by their wallet address. But firstly users have to convert their wallet addresses to validator operator address pattern:
+
+  ```bash
+  iris keys show <key-name>
+  ```
+
+  Example Output:
+
+  ```text
+  - name: node0
+    type: local
+    address: iaa1w9lvhwlvkwqvg08q84n2k4nn896u9pqx93velx
+    pubkey: iap1addwnpepq03g7u43y3gwfz3pd4gkwz7d4mt600kzsc5cj2ysx58a5hp84qyduxtw28r
+    mnemonic: ""
+    threshold: 0
+    pubkeys: []
+  ```
+
+  Then, example command to query validator:
+
+  ```bash
+  iris q staking validator iva14n9md3sq9xwscs96za8n85m0j9y2yu3cagxgke
+  ```
+
+  Example Output:
+
+  ```json
+  {
+      "operator_address": "iva14n9md3sq9xwscs96za8n85m0j9y2yu3cagxgke",
+      "consensus_pubkey": "icp1zcjduepq9meszzqu54gpxvs4vzvuv85qvv5ef0egz3sde0ps4dvktcv77uds0kkhgf",
+      "status": 3,
+      "tokens": "100000000",
+      "delegator_shares": "100000000.000000000000000000",
+      "description": {
+        "moniker": "node0"
+      },
+      "unbonding_time": "1970-01-01T00:00:00Z",
+      "commission": {
+        "commission_rates": {
+          "rate": "1.000000000000000000",
+          "max_rate": "1.000000000000000000",
+          "max_change_rate": "1.000000000000000000"
+        },
+        "update_time": "2020-08-26T06:43:07.065305Z"
+      },
+      "min_self_delegation": "1"
+    }
+  ```
+
+- Edit validator
+
+  ```bash
+  iris tx staking edit-validator --from=<key-name> --chain-id=irishub --fees=0.3iris --commission-rate=0.15 --moniker=<new-name>
+  ```
+
+- Delegate tokens to other validators
+
+  If you just want to be a delegator, you can skip the above steps.
+
+  ```bash
+  iris tx staking delegate iva14n9md3sq9xwscs96za8n85m0j9y2yu3cagxgke 1000iris --chain-id=irishub --from=<key-name> --fees=0.3iris
+  ```
+
+- Unbond tokens from a validator
+
+  ```bash
+iris tx staking unbond iva14n9md3sq9xwscs96za8n85m0j9y2yu3cagxgke 1000iris --chain-id=irishub --from=<key-name> --fees=0.3iris
+  ```
+  
+- Redelegate tokens to another validator
+
+  ```bash
+iris tx staking redelegate iva14n9md3sq9xwscs96za8n85m0j9y2yu3cagxgke iva1l2rsakp388kuv9k8qzq6lrm9taddae7fpx59wm 100iris --from mykey --chain-id=irishub --from=<key-name> --fees=0.3iris
+  ```
+  
 
 For other staking commands, please refer to [stake cli client](../cli-client/stake.md)

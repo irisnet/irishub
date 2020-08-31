@@ -40,7 +40,85 @@
 拜占庭容错的POS区块链网络假定拜占庭节点的投票权不到总投票权的1/3。这些拜占庭节点必须受到惩罚。因此，有必要收集拜占庭行为的证据。根据证据，放样模块将自动从相应的验证者和委托者处削减一定数量的令牌。此外，拜占庭验证人节点将从验证人集合中删除并投入监狱，这意味着其投票权为零。在监禁期间，这些节点不是验证人的候选对象。监禁期结束后，他们可以发送交易取消监禁并再次成为验证者候选人。
 
 ### 奖励
-  
+
 作为委托人，他在验证人节点上拥有的令牌越多，它将获得的奖励就越多。对于验证人，它将获得额外的奖励：验证者佣金。奖励来自令牌通货膨胀和交易费。至于如何计算奖励以及如何获得奖励，请参考[mint](mint.md)和[distribution](distribution.md)。
 
-有关其他命令，请参考[stake cli client](../cli-client/stake.md)
+## 用户操作
+
+- 查询自己的验证人节点
+
+查询验证人地址的编码格式的钱包地址：
+
+ ```bash
+iris keys show <key-name>
+ ```
+
+ 示例输出:
+
+  ```text
+  - name: node0
+    type: local
+    address: iaa1w9lvhwlvkwqvg08q84n2k4nn896u9pqx93velx
+    pubkey: iap1addwnpepq03g7u43y3gwfz3pd4gkwz7d4mt600kzsc5cj2ysx58a5hp84qyduxtw28r
+    mnemonic: ""
+    threshold: 0
+    pubkeys: []
+  ```
+
+查询验证人信息：
+
+```bash
+iris q staking validator iva14n9md3sq9xwscs96za8n85m0j9y2yu3cagxgke
+```
+
+ 示例输出:
+
+```json
+  {
+      "operator_address": "iva14n9md3sq9xwscs96za8n85m0j9y2yu3cagxgke",
+      "consensus_pubkey": "icp1zcjduepq9meszzqu54gpxvs4vzvuv85qvv5ef0egz3sde0ps4dvktcv77uds0kkhgf",
+      "status": 3,
+      "tokens": "100000000",
+      "delegator_shares": "100000000.000000000000000000",
+      "description": {
+        "moniker": "node0"
+      },
+      "unbonding_time": "1970-01-01T00:00:00Z",
+      "commission": {
+        "commission_rates": {
+          "rate": "1.000000000000000000",
+          "max_rate": "1.000000000000000000",
+          "max_change_rate": "1.000000000000000000"
+        },
+        "update_time": "2020-08-26T06:43:07.065305Z"
+      },
+      "min_self_delegation": "1"
+    }
+```
+
+- 修改验证人信息
+
+```bash
+  iris tx staking edit-validator --from=<key-name> --chain-id=irishub --fees=0.3iris --commission-rate=0.15 --moniker=<new-name>
+```
+
+- 委托
+
+```bash
+  iris tx staking delegate iva14n9md3sq9xwscs96za8n85m0j9y2yu3cagxgke 1000iris --chain-id=irishub --from=<key-name> --fees=0.3iris
+```
+
+- 解绑
+
+  ```bash
+iris tx staking unbond iva14n9md3sq9xwscs96za8n85m0j9y2yu3cagxgke 1000iris --chain-id=irishub --from=<key-name> --fees=0.3iris
+  ```
+
+- 转委托
+
+  ```bash
+iris tx staking redelegate iva14n9md3sq9xwscs96za8n85m0j9y2yu3cagxgke iva1l2rsakp388kuv9k8qzq6lrm9taddae7fpx59wm 100iris --from mykey --chain-id=irishub --from=<key-name> --fees=0.3iris
+  ```
+
+对于其它Staking相关的命令，请参考[stake-cli](../cli-client/stake.md)
+
