@@ -1,16 +1,17 @@
-package simulation
+package simulation_test
 
 import (
 	"fmt"
 	"testing"
 	"time"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/types/kv"
 	"github.com/stretchr/testify/require"
 
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/kv"
+
+	"github.com/irisnet/irishub/modules/mint/simulation"
 	"github.com/irisnet/irishub/modules/mint/types"
-	"github.com/irisnet/irishub/modules/random/simulation"
 	"github.com/irisnet/irishub/simapp"
 )
 
