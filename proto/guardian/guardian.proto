@@ -49,8 +49,6 @@ message Guardian {
 
 // AccountType defines the guardian account type
 enum AccountType{
-    option (gogoproto.enum_stringer)         = false;
-    option (gogoproto.goproto_enum_stringer) = false;
     option (gogoproto.goproto_enum_prefix)   = false;
 
     // GENESIS defines a genesis account type
