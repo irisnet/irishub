@@ -54,10 +54,10 @@ Any user can define services on the blockchain. The interface of a service must 
 ### Commands
 ```bash
 # create a new service definition
-iriscli service define <service-name> <schemas-json or path/to/schemas.json> --description=<service-description> --author-description=<author-description> --tags=<tag1,tag2,...>
+iris tx service define <service-name> <schemas-json or path/to/schemas.json> --description=<service-description> --author-description=<author-description> --tags=<tag1,tag2,...>
 
 # query service definition
-iriscli service definition <service-name>
+iris q service definition <service-name>
 ```
 
 ## Service Binding
@@ -105,31 +105,31 @@ Service bindings can be updated at any time by their owners to adjust pricing, i
 
 ```bash
 # create a new service binding
-iriscli service bind <service-name> <provider-address> <deposit> <qos> <pricing-json or path/to/pricing.json>
+iris tx service bind <service-name> <provider-address> <deposit> <qos> <pricing-json or path/to/pricing.json>
 
 # update a service binding
-iriscli service update-binding <service-name> <provider-address> --deposit=<added-deposit> --qos=<qos> --pricing=<pricing-json or path/to/pricing.json>
+iris tx service update-binding <service-name> <provider-address> --deposit=<added-deposit> --qos=<qos> --pricing=<pricing-json or path/to/pricing.json>
 
 # enable an inactive service binding
-iriscli service enable <service-name> <provider-address> <added-deposit>
+iris tx service enable <service-name> <provider-address> <added-deposit>
 
 # disable an active service binding
-iriscli service disable <service-name> <provider-address>
+iris tx service disable <service-name> <provider-address>
 
 # request refund of service binding deposit
-iriscli service refund-deposit <service-name> <provider-address>
+iris tx service refund-deposit <service-name> <provider-address>
 
 # list all the bindings of a service
-iriscli service bindings <service-name>
+iris tx service bindings <service-name>
 
 # list all the bindings of a service, owned by a given account
-iriscli service bindings <service-name> --owner <address>
+iris q service bindings service bindings <service-name> --owner <address>
 
 # query a specific service binding
-iriscli service binding <service-name> <provider-address>
+iris q service binding <service-name> <provider-address>
 
 # query the pricing schema
-iriscli service schema pricing
+iris q service service schema pricing
 ```
 
 ## Service Invocation
@@ -159,38 +159,38 @@ A consumer specifies how she would like to invoke a service by creating a _reque
 ### Request batch
 For a repeated request context, _batches_ of new request objects will be generated at the specified frequency, until the total number of batches is reached or the consumer (i.e., context creator) runs out of fee.  Only one request batch is generated for a non-repeated context.
 
-A request batch is comprised of a number of _request_ objects, each representing a service call to a chosen provider; only those providers that charge a fee no greater than `service fee cap` and commit to a QoS better than `timeout` will be selected.
+A request batch is comprised of a number of _request_ objects, each representing a service call to a chosen provider; only those providers that charge a fee lower than `service fee cap` and commit to a QoS better than `timeout` will be selected.
 
 ### Commands
 When a request context is successfully created, a `context id` is returned to the consumer and the context is automatically started.  The consumer can later update, pause and start the context at will; she can permanently kill the context as well.
 
 ```bash
 # create a repeated request context, with no callback
-iriscli service call --service-name=<service name> --data=<request input> --providers=<provider list> --service-fee-cap=1iris --timeout 50 --repeated --frequency=50 --total=100
+irisc tx service call --service-name=<service name> --data=<request input> --providers=<provider list> --service-fee-cap=1iris --timeout 50 --repeated --frequency=50 --total=100
 
 # update an existing request context
-iriscli service update <request-context-id> --frequency=20 --total=200
+irisc tx service update <request-context-id> --frequency=20 --total=200
 
 # pause a running request context
-iriscli service pause <request-context-id>
+irisc tx service pause <request-context-id>
 
 # start a paused request context
-iriscli service start <request-context-id>
+irisc tx service start <request-context-id>
 
 # permanently kill a request context
-iriscli service kill <request-context-id>
+irisc tx service kill <request-context-id>
 
 # query a previously created request context by its id
-iriscli service request-context <request-context-id>
+iris q service request-context <request-context-id>
 
 # list all the requests generated for a given request batch
-iriscli service requests <request-context-id> <batch-counter>
+iris q service requests <request-context-id> <batch-counter>
 
 # list all the responses received for a given request batch
-iriscli service responses <request-context-id> <batch-counter>
+iris q service responses <request-context-id> <batch-counter>
 
 # query a specific response
-iriscli service response <request-id>
+iris q service response <request-id>
 ```
 
 ## Service Response
@@ -214,21 +214,21 @@ The output object is required in the response only when the result code equals `
 ### Commands
 ```bash
 # list all pending requests targeting a given provider
-iriscli service requests <service-name> <provider>
+iris q service requests <service-name> <provider>
 
 # query a specific request
-iriscli service request <request-id>
+iris q service request <request-id>
 
 # send a response back, matching a specific request
-iriscli service respond --request-id=<request-id> --result='{"code":200,"message":"success"}' --data=<response output>
+iris tx service respond --request-id=<request-id> --result='{"code":200,"message":"success"}' --data=<response output>
 
 # query the result schema
-iriscli service schema result
+iris q service schema result
 ```
 
 ## Service Fees
 
-Any user who creates service bindings and operates service providers should define a _withdrawal address_; when the user withdraws service fees earned by her providers, this is where the fund will be sent. If not set, the withdrawal address is the same as the user address.
+Any user who creates service bindings and operates service providers should define a _withdrawal address_; when the user withdraws service fees earned by her providers, this is where the fund will be sent to.  If not set, the withdrawal address is the same as the user address.
 
 ### Escrow
 When a request object is generated, the associated service fee is **not** paid to the targeted provider immediately; instead, the fee is kept in an internal _escrow_ account for custody.  When a response comes back in time (i.e., before the request times out), the corresponding fee  (after tax) will be released from escrow to the provider; otherwise, the fee will be refunded to the consumer.
@@ -241,19 +241,19 @@ Right before a service fee is paid to a provider, a _tax_, in the amount of `Ser
 ### Commands
 ```bash
 # set withdrawal address
-iriscli service set-withdraw-addr <withdrawal-address>
+iris tx service set-withdraw-addr <withdrawal-address>
 
 # query withdrawal address of a given account
-iriscli service withdraw-addr <address>
+iris q service withdraw-addr <address>
 
 # query a provider's earned fees
-iriscli service fees <provider-address>
+iris q service fees <provider-address>
 
 # withdraw earned fees from all providers
-iriscli service withdraw-fees
+iris tx service withdraw-fees
 
 # withdraw earned fees from a given provider
-iriscli service withdraw-fees <provider-address>
+iris tx service withdraw-fees <provider-address>
 ```
 
 ## Service Governance (TODO)

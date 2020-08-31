@@ -18,7 +18,7 @@ message MsgRequestRandom {
 
 // Random defines the feed standard
 message Random {
-    bytes request_tx_hash = 1 [(gogoproto.moretags) = "yaml:\"request_tx_hash\""];
+    bytes request_tx_hash = 1 [(gogoproto.moretags) = "yaml:\"request_tx_hash\"", (gogoproto.casttype) = "github.com/tendermint/tendermint/libs/bytes.HexBytes"];
     int64 height = 2;
     string value = 3;
 }
@@ -27,7 +27,7 @@ message Random {
 message Request {
     int64 height = 1;
     bytes consumer = 2 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
-    bytes tx_hash = 3 [(gogoproto.moretags) = "yaml:\"tx_hash\""];
+    bytes tx_hash = 3 [(gogoproto.moretags) = "yaml:\"tx_hash\"", (gogoproto.casttype) = "github.com/tendermint/tendermint/libs/bytes.HexBytes"];
     bool oracle = 4;
     repeated cosmos.base.v1beta1.Coin service_fee_cap = 5 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "yaml:\"service_fee_cap\""];
     bytes service_context_id = 6 [(gogoproto.customname) = "ServiceContextID", (gogoproto.casttype) = "github.com/tendermint/tendermint/libs/bytes.HexBytes", (gogoproto.moretags) = "yaml:\"service_context_id\""];

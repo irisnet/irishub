@@ -2,7 +2,7 @@
 
 ## 简介
 
-本文简要介绍了stake模块的功能以及常见用户接口。
+本文简要介绍了staking模块的功能以及常见用户接口。
 
 ## 概念
 
@@ -29,114 +29,96 @@
 
 ### 绑定，解绑和解绑期
 
-验证人节点的所有者必须将他们自己流通的token绑定到自己的验证人节点。验证人节点投票权重与绑定的token数量成正比，包括所有者自己绑定的token和来自其他委托人的token。验证人节点的所有者可以通过发送解绑交易来降低他们自己绑定的token。委托人同样可以通过发送解绑交易来降低绑定的token。但是，这些被解绑的token不会立即成为流通的token。执行解绑交易之后，在解绑期结束之前，相应的验证人节点的所有者或委托人不能再次在相同的验证人节点上发起解绑交易。通常，解绑期为三周。一旦解绑期结束，被解绑的token将自动成为流通的token。解绑期机制对POS区块链网络的安全性很重要。此外，如果验证人节点的所有者在自己的验证人节点上没有绑定token，则相应的验证人会被踢出验证人集。
+验证人节点的所有者必须将他们自己流通的token绑定到自己的验证人节点。验证人节点投票权重与绑定的token数量成正比，包括所有者自己绑定的token和来自其他委托人的token。验证人节点的所有者可以通过发
 
 ### 转委托
 
-委托人可以将其抵押的token从一个验证人转移到另一个验证人。这个可以分为两个步骤：从第一个验证人上解绑和把解绑的token绑定到另一个验证人上。正如我们上面所说，在解绑期结束之前，解绑操作不能立即完成，这意味着委托人不能立即发送再次转委托交易。
+委托人可以将其令牌从一个验证节点转移到另一个验证节点。转委托可以分为两个步骤：从第一个验证节点处取消绑定并绑定到另一个验证节点。如上所述，在解除绑定期结束之前无法立即完成未绑定操作，这意味着委托人无法立即发送其他转委托交易。
 
-### 作恶证据和惩罚
+### 证据&&惩罚
 
-拜占庭容错POS区块链网络假设拜占庭节点拥有不到总投票权重的1/3，而且要惩罚这些作恶节点。因此有必要收集作恶行为的证据。根据收集到的证据，stake模块将从相应的验证人和委托人中拿走一定数量的token。被拿走的token会被销毁。此外，作恶验证人将会被踢出验证人集，并被标记为关押(jailed)状态，而且他们的投票权将立刻变为零。在关押期间，这些节点也不是候选验证人。当关押期结束，他们可以发送unjail交易来解除关押状态并再次成为候选验证人。
+拜占庭容错的POS区块链网络假定拜占庭节点的投票权不到总投票权的1/3。这些拜占庭节点必须受到惩罚。因此，有必要收集拜占庭行为的证据。根据证据，放样模块将自动从相应的验证者和委托者处削减一定数量的令牌。此外，拜占庭验证人节点将从验证人集合中删除并投入监狱，这意味着其投票权为零。在监禁期间，这些节点不是验证人的候选对象。监禁期结束后，他们可以发送交易取消监禁并再次成为验证者候选人。
 
-### 收益
+### 奖励
 
-作为委托人，向验证人抵押token的份额越多，获得的收益就越多。对于验证人节点的所有者，它将有额外的收益：验证人佣金。奖励来自token通胀和交易费。至于如何计算奖励以及如何获得奖励，请参阅[mint](mint.md)和[distribution](distribution.md)。
+作为委托人，他在验证人节点上拥有的令牌越多，它将获得的奖励就越多。对于验证人，它将获得额外的奖励：验证者佣金。奖励来自令牌通货膨胀和交易费。至于如何计算奖励以及如何获得奖励，请参考[mint](mint.md)和[distribution](distribution.md)。
 
 ## 用户操作
 
-1. 运行全节点
+- 查询自己的验证人节点
 
-    请参考[运行全节点](../get-started/mainnet.md#运行全节点)。
+查询验证人地址的编码格式的钱包地址：
 
-2. 申请成为验证人
+ ```bash
+iris keys show <key-name>
+ ```
 
-    请参考[升级为验证人节点](../get-started/mainnet.md#升级为验证人节点)。
+ 示例输出:
 
-3. 查询自己的验证人节点
+  ```text
+  - name: node0
+    type: local
+    address: iaa1w9lvhwlvkwqvg08q84n2k4nn896u9pqx93velx
+    pubkey: iap1addwnpepq03g7u43y3gwfz3pd4gkwz7d4mt600kzsc5cj2ysx58a5hp84qyduxtw28r
+    mnemonic: ""
+    threshold: 0
+    pubkeys: []
+  ```
 
-    查询验证人地址的编码格式的钱包地址：
+查询验证人信息：
 
-    ```bash
-    iriscli keys show <key-name> --bech=val
-    ```
+```bash
+iris q staking validator iva14n9md3sq9xwscs96za8n85m0j9y2yu3cagxgke
+```
 
-    示例输出：
+ 示例输出:
 
-    ```bash
-    NAME:   TYPE:   ADDRESS:                                      PUBKEY:
-    faucet  local   iva1ljemm0yznz58qxxs8xyak7fashcfxf5lawld0p    ivp1addwnpepqtdme789cpm8zww058ndlhzpwst3s0mxnhdhu5uyps0wjucaufha6rzn3ga
-    ```
+```json
+  {
+      "operator_address": "iva14n9md3sq9xwscs96za8n85m0j9y2yu3cagxgke",
+      "consensus_pubkey": "icp1zcjduepq9meszzqu54gpxvs4vzvuv85qvv5ef0egz3sde0ps4dvktcv77uds0kkhgf",
+      "status": 3,
+      "tokens": "100000000",
+      "delegator_shares": "100000000.000000000000000000",
+      "description": {
+        "moniker": "node0"
+      },
+      "unbonding_time": "1970-01-01T00:00:00Z",
+      "commission": {
+        "commission_rates": {
+          "rate": "1.000000000000000000",
+          "max_rate": "1.000000000000000000",
+          "max_change_rate": "1.000000000000000000"
+        },
+        "update_time": "2020-08-26T06:43:07.065305Z"
+      },
+      "min_self_delegation": "1"
+    }
+```
 
-    查询验证人信息：
+- 修改验证人信息
 
-    ```bash
-    iriscli stake validator iva1ljemm0yznz58qxxs8xyak7fashcfxf5lawld0p
-    ```
+```bash
+  iris tx staking edit-validator --from=<key-name> --chain-id=irishub --fees=0.3iris --commission-rate=0.15 --moniker=<new-name>
+```
 
-    示例输出：
+- 委托
 
-    ```bash
-    Validator
-    Operator Address: iva1ljemm0yznz58qxxs8xyak7fashcfxf5lawld0p
-    Validator Consensus Pubkey: icp1zcjduepq8fnuxnceuy4n0fzfc6rvf0spx56waw67lqkrhxwsxgnf8zgk0nus66rkg4
-    Jailed: false
-    Status: Bonded
-    Tokens: 100.0000000000
-    Delegator Shares: 100.0000000000
-    Description: {node2   }
-    Bond Height: 0
-    Unbonding Height: 0
-    Minimum Unbonding Time: 1970-01-01 00:00:00 +0000 UTC
-    Commission: {{0.1000000000 0.2000000000 0.0100000000 0001-01-01 00:00:00 +0000 UTC}}
-    ```
+```bash
+  iris tx staking delegate iva14n9md3sq9xwscs96za8n85m0j9y2yu3cagxgke 1000iris --chain-id=irishub --from=<key-name> --fees=0.3iris
+```
 
-4. 修改验证人信息
+- 解绑
 
-    ```bash
-    iriscli stake edit-validator --from=<key-name> --chain-id=irishub --fee=0.3iris --commission-rate=0.15 --moniker=<new-name>
-    ```
+  ```bash
+iris tx staking unbond iva14n9md3sq9xwscs96za8n85m0j9y2yu3cagxgke 1000iris --chain-id=irishub --from=<key-name> --fees=0.3iris
+  ```
 
-5. 增加自己在验证人节点上委托的token
+- 转委托
 
-    ```bash
-    iriscli stake delegate --address-validator=<self-address-validator> --chain-id=irishub --from=<key-name> --fee=0.3iris --amount=100iris 
-    ```
-
-6. 委托
-
-    向一个验证人委托一些IRIS
-
-    ```bash
-    iriscli stake delegate --address-validator=<other-address-validator> --chain-id=irishub --from=<key-name> --fee=0.3iris --amount=100iris
-    ```
-
-7. 解绑
-
-    按share数量解绑， 解绑100shares：
-
-    ```bash
-    iriscli stake unbond --address-validator=<address-validator> --chain-id=irishub --from=<key-name> --fee=0.3iris --shares-amount=100
-    ```
-
-    按比例解绑，解绑50%的token：
-
-    ```bash
-    iriscli stake unbond --address-validator=<address-validator> --chain-id=irishub --from=<key-name> --fee=0.3iris --share-percent=0.5
-    ```
-
-8. 转委托
-
-    按share数量转委托， 转委托100shares到另外一个验证人节点:
-
-    ```bash
-    iriscli stake redelegate --chain-id=irishub --from=<key-name> --fee=0.3iris --address-validator-source=<source-validator-address> --address-validator-dest=<destination-validator-address> --shares-amount=100
-    ```
-
-    按比例转委托， 转委托50%的token到另外一个验证人节点:
-
-    ```bash
-    iriscli stake redelegate --chain-id=irishub --from=<key-name> --fee=0.3iris --address-validator-source=<source-validator-address> --address-validator-dest=<destination-validator-address> --shares-percent=0.5
-    ```
+  ```bash
+iris tx staking redelegate iva14n9md3sq9xwscs96za8n85m0j9y2yu3cagxgke iva1l2rsakp388kuv9k8qzq6lrm9taddae7fpx59wm 100iris --from mykey --chain-id=irishub --from=<key-name> --fees=0.3iris
+  ```
 
 对于其它Staking相关的命令，请参考[stake-cli](../cli-client/stake.md)
+
