@@ -2,7 +2,6 @@ package cli
 
 import (
 	"context"
-	"encoding/hex"
 	"fmt"
 	"strconv"
 
@@ -56,19 +55,7 @@ func GetCmdQueryRandom() *cobra.Command {
 				return err
 			}
 
-			readableRandom := types.ReadableRandom{
-				RequestTxHash: hex.EncodeToString(res.Random.RequestTxHash),
-				Height:        res.Random.Height,
-				Value:         res.Random.Value,
-			}
-
-			output, err := clientCtx.JSONMarshaler.MarshalJSON(readableRandom)
-			if err != nil {
-				return err
-			}
-
-			fmt.Println(string(output))
-			return nil
+			return clientCtx.PrintOutput(res.Random)
 		},
 	}
 	flags.AddQueryFlagsToCmd(cmd)
