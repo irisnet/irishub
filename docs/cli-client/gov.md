@@ -1,282 +1,265 @@
-# iriscli gov
+# Gov
 
 This module provides the basic functionalities for [Governance](../features/governance.md).
 
 ## Available Commands
 
-| Name                                            | Description                                                     |
-| ----------------------------------------------- | --------------------------------------------------------------- |
-| [query-proposal](#iriscli-gov-query-proposal)   | Query details of a single proposal                              |
-| [query-proposals](#iriscli-gov-query-proposals) | Query proposals by conditions                                   |
-| [query-vote](#iriscli-gov-query-vote)           | Query vote                                                      |
-| [query-votes](#iriscli-gov-query-votes)         | Query votes on a proposal                                       |
-| [query-deposit](#iriscli-gov-query-deposit)     | Query details of a deposit                                      |
-| [query-deposits](#iriscli-gov-query-deposits)   | Query deposits on a proposal                                    |
-| [query-tally](#iriscli-gov-query-tally)         | Query the statistics of a proposal                              |
-| [submit-proposal](#iriscli-gov-submit-proposal) | Submit a proposal along with an initial deposit                 |
-| [deposit](#iriscli-gov-deposit)                 | Deposit tokens for an active proposal                           |
-| [vote](#iriscli-gov-vote)                       | Vote for an active proposal, options: Yes/No/NoWithVeto/Abstain |
+| Name                                            | Description                                                  |
+| ----------------------------------------------- | ------------------------------------------------------------ |
+| [proposal](#iris-q-gov-proposal)                | Query details of a single proposal                           |
+| [proposals](#iris-q-gov-proposals)              | Query proposals with optional filter                         |
+| [vote](#iris-q-gov-vote)                        | Query details of a single vote                               |
+| [votes](#iris-q-gov-votes)                      | Query votes on a proposal                                    |
+| [deposit](#iris-q-gov-deposit)                  | Query details of a deposit                                   |
+| [deposits](#iris-q-gov-deposits)                | Query deposits on a proposal                                 |
+| [tally](#iris-q-gov-tally)                      | Get the tally of a proposal vote                             |
+| [param](#iris-q-gov-param)                      | Query the parameters (voting                                 |
+| [params](#iris-q-gov-params)                    | Query the parameters of the governance process               |
+| [submit-proposal](#iris-tx-gov-submit-proposal) | Submit a proposal along with an initial deposit              |
+| [deposit](#iris-tx-gov-deposit)                 | Deposit tokens for an active proposal                        |
+| [vote](#iris-tx-gov-vote)                       | Vote for an active proposal, options: yes/no/no_with_veto/abstain |
 
-## iriscli gov query-proposal
+## iris q gov proposal
 
 Query details of a proposal
 
 ```bash
-iriscli gov query-proposal [flags]
+iris query gov proposal [proposal-id] [flags]
 ```
-
-**Flags:**
-
-| Name, shorthand | Type | Required | Default | Description            |
-| --------------- | ---- | -------- | ------- | ---------------------- |
-| --proposal-id   | uint | Yes      |         | Identity of a proposal |
 
 ### Query a proposal
 
 ```bash
-iriscli gov query-proposal --chain-id=irishub --proposal-id=<proposal-id>
+iris query gov proposal <proposal-id>
 ```
 
-## iriscli gov query-proposals
+## iris q gov proposals
 
-Query proposals by conditions
+Query proposals with optional filter
 
 ```bash
-iriscli gov query-proposals [flags]
+iris query gov proposals [flags]
 ```
 
 **Flags:**
 
-| Name, shorthand | Type    | Required | Default | Description                                                         |
-| --------------- | ------- | -------- | ------- | ------------------------------------------------------------------- |
-| --depositor     | Address |          |         | Filter proposals by depositor address                               |
+| Name, shorthand | Type    | Required | Default | Description                                                  |
+| --------------- | ------- | -------- | ------- | ------------------------------------------------------------ |
+| --depositor     | Address |          |         | Filter proposals by depositor address                        |
 | --limit         | uint    |          |         | Limit to the latest [number] of proposals. Default to all proposals |
-| --status        | string  |          |         | Filter proposals by status (passed / rejected)                      |
-| --voter         | Address |          |         | Filter proposals by voter address                                   |
+| --status        | string  |          |         | Filter proposals by status                                   |
+| --voter         | Address |          |         | Filter proposals by voter address                            |
 
 ### Query all proposals
 
 ```bash
-iriscli gov query-proposals --chain-id=irishub
+iris query gov proposals
 ```
 
 ### Query proposals by conditions
 
 ```bash
-iriscli gov query-proposals --chain-id=irishub --limit=3 --status=passed --depositor=<iaa...>
+iris query gov proposals --limit=3 --status=Passed --depositor=<iaa...>
 ```
 
-## iriscli gov query-vote
+## iris q gov vote
 
-Query a vote
+Query details of a single vote
 
 ```bash
-iriscli gov query-vote [flags]
+iris query gov vote [proposal-id] [voter-addr] [flags]
 ```
-
-**Flags:**
-
-| Name, shorthand | Type | Required | Default | Description            |
-| --------------- | ---- | -------- | ------- | ---------------------- |
-| --proposal-id   |  uint    | Yes      |         | Identity of a proposal |
-| --voter         |  Address    | Yes      |         | Bech32 voter address   |
 
 ### Query a vote
 
 ```bash
-iriscli gov query-vote --chain-id=irishub --proposal-id=<proposal-id> --voter=<iaa...>
+iris query gov vote <proposal-id> <iaa...>
 ```
 
-## iriscli gov query-votes
+## iris q gov votes
 
-Query all votes of a proposal
+Query votes on a proposal
 
 ```bash
-iriscli gov query-votes [flags]
+iris query gov votes [proposal-id] [flags]
 ```
-
-**Flags:**
-
-| Name, shorthand | Type | Required | Default | Description            |
-| --------------- | ---- | -------- | ------- | ---------------------- |
-| --proposal-id   |  uint    | Yes      |         | Identity of a proposal |
 
 ### Query all votes of a proposal
 
 ```bash
-iriscli gov query-votes --chain-id=irishub --proposal-id=<proposal-id>
+iris query gov votes <proposal-id>
 
 ```
 
-## iriscli gov query-deposit
+## iris q gov deposit
 
-Query a deposit of a proposal
+Query details for a single proposal deposit on a proposal by its identifier
 
 ```bash
-iriscli gov query-deposit [flags]
-
+iris query gov deposit [proposal-id] [depositer-addr] [flags]
 ```
-
-**Flags:**
-
-| Name, shorthand | Type | Required | Default | Description              |
-| --------------- | ---- | -------- | ------- | ------------------------ |
-| --proposal-id   | uint     | Yes      |         | Identity of a proposal   |
-| --depositor     |  Address    | Yes      |         | Bech32 depositor address |
 
 ### Query a deposit of a proposal
 
 ```bash
-iriscli gov query-deposit --chain-id=irishub --proposal-id=<proposal-id> --depositor=<iaa...>
-
+iris query gov deposit <proposal-id> <iaa...>
 ```
 
-## iriscli gov query-deposits
+## iris q gov deposits
 
-Query all deposits of a proposal
+Query details for all deposits on a proposal
 
 ```bash
-iriscli gov query-deposits [flags]
-
+iris query gov deposits [proposal-id] [flags]
 ```
-
-**Flags:**
-
-| Name, shorthand | Type | Required | Default | Description            |
-| --------------- | ---- | -------- | ------- | ---------------------- |
-| --proposal-id   |   uint   | Yes      |         | Identity of a proposal |
 
 ### Query all deposits of a proposal
 
 ```bash
-iriscli gov query-deposits --chain-id=irishub --proposal-id=<proposal-id>
-
+iris query gov deposits <proposal-id>
 ```
 
-## iriscli gov query-tally
+## iris q gov tally
 
-Query the statistics of a proposal
+Query tally of votes on a proposal. You can find the proposal-id by running "iris query gov proposals".
 
 ```bash
-iriscli gov query-tally [flags]
-
+iris query gov tally [proposal-id] [flags]
 ```
-
-**Flags:**
-
-| Name, shorthand | Type | Required | Default | Description            |
-| --------------- | ---- | -------- | ------- | ---------------------- |
-| --proposal-id   |  uint    | Yes      |         | Identity of a proposal |
 
 ### Query the statistics of a proposal
 
 ```bash
-iriscli gov query-tally --chain-id=irishub --proposal-id=<proposal-id>
-
+iris query gov tally <proposal-id>
 ```
 
-## iriscli gov submit-proposal
+## iris q gov param
 
-Submit a proposal along with an initial deposit
+Query the parameters (voting|tallying|deposit) of the governance process.
 
 ```bash
-iriscli gov submit-proposal [flags]
+iris query gov param [param-type] [flags]
+```
 
+Example:
+```bash
+> iris query gov param voting
+> iris query gov param tallying
+> iris query gov param deposit
+```
+
+## iris q gov params
+
+Query the all the parameters for the governance process.
+
+```bash
+iris query gov param [param-type] [flags]
+```
+
+## iris tx gov submit-proposal
+
+Submit a proposal along with an initial deposit. Proposal title, description, type and deposit can be given directly or through a proposal JSON file.
+Available Commands: `community-pool-spend`、`param-change`、`software-upgrade` 
+
+### iris tx gov submit-proposal community-pool-spend
+
+Submit a community pool spend proposal along with an initial deposit.
+The proposal details must be supplied via a JSON file.
+
+```bash
+iris tx gov submit-proposal community-pool-spend <path/to/proposal.json> --from=<key_or_address>
+```
+
+Where proposal.json contains:
+```json
+{
+  "title": "Community Pool Spend",
+  "description": "Pay me some Atoms!",
+  "recipient": "cosmos1s5afhd6gxevu37mkqcvvsj8qeylhn0rz46zdlq",
+  "amount": "1000stake",
+  "deposit": "1000stake"
+}
+```
+
+### iris tx gov submit-proposal param-change
+
+Submit a parameter proposal along with an initial deposit.
+The proposal details must be supplied via a JSON file. For values that contains
+objects, only non-empty fields will be updated.
+
+IMPORTANT: Currently parameter changes are evaluated but not validated, so it is
+very important that any "value" change is valid (ie. correct type and within bounds)
+for its respective parameter, eg. "MaxValidators" should be an integer and not a decimal.
+
+Proper vetting of a parameter change proposal should prevent this from happening
+(no deposits should occur during the governance process), but it should be noted
+regardless.
+
+```bash
+iris tx gov submit-proposal param-change <path/to/proposal.json> --from=<key_or_address>
+```
+Where proposal.json contains:
+```json
+{
+  "title": "Staking Param Change",
+  "description": "Update max validators",
+  "changes": [
+    {
+      "subspace": "staking",
+      "key": "MaxValidators",
+      "value": 105
+    }
+  ],
+  "deposit": "1000stake"
+}
+```
+
+### iris tx gov submit-proposal software-upgrade
+
+Submit a software upgrade along with an initial deposit.
+Please specify a unique name and height OR time for the upgrade to take effect.
+
+```bash
+iris tx gov submit-proposal software-upgrade [name] (--upgrade-height [height] | --upgrade-time [time]) (--upgrade-info [info]) [flags]
 ```
 
 **Flags:**
 
-| Name, shorthand          | Type   | Required | Default | Description                                                                                                    |
-| ------------------------ | ------ | -------- | ------- | -------------------------------------------------------------------------------------------------------------- |
-| --deposit                | Coin   | Yes      |         | Initial deposit of the proposal(at least  30% of minDeposit)                                                   |
-| --description            | string | Yes      |         | Description of the proposal                                                                                    |
-| --param                  | string |          |         | On-chain Parameter to be changed, eg. mint/Inflation=0.050                                                     |
-| --title                  | string | Yes      |         | Title of the proposal                                                                                          |
-| --type                   | string | Yes      |         | ProposalType of the proposal(PlainText/Parameter/SoftwareUpgrade/SoftwareHalt/CommunityTaxUsage) |
-| --version                | uint   |          | 0       | The version of the new protocol                                                                                |
-| --software               | string |          |         | The software of the new protocol                                                                               |
-| --switch-height          | uint   |          | 0       | The switch height of the new protocol                                                                          |
-| --threshold              | string |          | "0.8"   | The upgrade signal threshold of the software upgrade                                                           |
-| --token-canonical-symbol | string |          |         | The source symbol of a external token                                                                          |
-| --token-symbol           | string |          |         | The token symbol. Once created, it cannot be modified                                                          |
-| --token-name             | string |          |         | The token name                                                                                                 |
-| --token-decimal          | uint   |          |         | The token decimal. The maximum value is 18                                                                     |
-| --token-min-unit-alias   | string |          |         | The token symbol minimum alias                                                                                 |
-| --token-initial-supply   | uint64 |          |         | The initial supply token of token                                                                              |
+| Name, shorthand  | Type   | Required | Default | Description                                                  |
+| ---------------- | ------ | -------- | ------- | ------------------------------------------------------------ |
+| --deposit        | Coin   | Yes      |         | Deposit of the proposal                                      |
+| --title          | string | Yes      |         | Title of proposal                                            |
+| --description    | string | Yes      |         | Description of proposal                                      |
+| --upgrade-height | int64  |          |         | The height at which the upgrade must happen (not to be used together with --upgrade-time) |
+| --time           | string |          |         | The time at which the upgrade must happen (not to be used together with --upgrade-height) |
+| --info           | string |          |         | Optional info for the planned upgrade such as commit hash, etc. |
 
-:::tip
-The proposer must deposit at least 30% of the [MinDeposit](../features/governance.md#proposal-level) to submit a proposal.
-:::
 
-### Submit a Parameter Change Proposal
+## iris tx gov deposit
 
-:::tip
-[What parameters can be changed online?](../concepts/gov-params.md)
-:::
-
-**Unique Required Params:** `--param`
+Submit a deposit for an active proposal. You can find the proposal-id by running "iris query gov proposals".
 
 ```bash
-iriscli gov submit-proposal --chain-id=irishub --title=<proposal-title> --description=<proposal-description> --from=<key-name> --fee=0.3iris --deposit=2000iris --type=Parameter --param='mint/Inflation=0.050'
-
+iris tx gov deposit [proposal-id] [deposit] [flags]
 ```
-
-### Submit a Software Upgrade Proposal
-
-**Unique Required Params:** `--software`, `--version`, `--switch-height`, `--threshold`
-
-```bash
-iriscli gov submit-proposal --chain-id=irishub --title=<proposal-title> --description=<proposal-description> --from=<key-name> --fee=0.3iris --deposit=2000iris --type=SoftwareUpgrade --software=https://github.com/irisnet/irishub/tree/v0.15.1 --version=2 --switch-height=8000 --threshold=0.8
-
-```
-
-## iriscli gov deposit
-
-Deposit tokens for an active proposal
-
-```bash
-iriscli gov deposit [flags]
-
-```
-
-**Flags:**
-
-| Name, shorthand | Type | Required | Default | Description             |
-| --------------- | ---- | -------- | ------- | ----------------------- |
-| --deposit       | Coin | Yes      |         | Deposit of the proposal |
-| --proposal-id   | uint | Yes      |         | Identity of a proposal  |
 
 ### Deposit for an active proposal
 
-When the total deposit amount exceeds the [MinDeposit](../features/governance.md#proposal-level), the proposal will enter the voting procedure.
-
 ```bash
-iriscli gov deposit --chain-id=irishub --proposal-id=<proposal-id> --deposit=50iris --from=<key-name> --fee=0.3iris
+iris tx gov deposit [proposal-id] [deposit]
 ```
 
-## iriscli gov vote
+## iris tx gov vote
 
-Vote for an active proposal, options: Yes/No/NoWithVeto/Abstain
-
-:::tip
-[No VS NoWithVeto](../features/governance.md#burning-mechanism)
-
-Only validators and delegators can vote for proposals in the voting period.
-:::
+Submit a vote for an active proposal. You can find the proposal-id by running "iris query gov proposals".
+Vote for an active proposal, options: yes/no/no_with_veto/abstain.
 
 ```bash
-iriscli gov vote [flags]
+iris tx gov vote [proposal-id] [option] [flags]
 ```
-
-**Flags:**
-
-| Name, shorthand | Type   | Required | Default | Description                            |
-| --------------- | ------ | -------- | ------- | -------------------------------------- |
-| --option        | string | Yes      |         | Vote option: Yes/No/NoWithVeto/Abstain |
-| --proposal-id   | uint   | Yes      |         | Identity of a proposal                 |
 
 ### Vote for an active proposal
 
 ```bash
-iriscli gov vote --chain-id=irishub --proposal-id=<proposal-id> --option=Yes --from=<key-name> --fee=0.3iris
+iriscli gov vote <proposal-id> <option> --from=<key-name> --fee=0.3iris
 ```
