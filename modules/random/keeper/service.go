@@ -5,13 +5,13 @@ import (
 	"math/rand"
 	"time"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	servicetypes "github.com/irismod/service/types"
-
 	"github.com/tidwall/gjson"
 
 	tmbytes "github.com/tendermint/tendermint/libs/bytes"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	servicetypes "github.com/irismod/service/types"
 
 	"github.com/irismod/service/exported"
 

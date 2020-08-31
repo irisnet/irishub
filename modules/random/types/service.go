@@ -1,9 +1,10 @@
 package types
 
 import (
+	"github.com/tendermint/tendermint/crypto"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	servicetypes "github.com/irismod/service/types"
-	"github.com/tendermint/tendermint/crypto"
 
 	"github.com/irisnet/irishub/modules/oracle/types"
 )
