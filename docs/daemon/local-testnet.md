@@ -24,16 +24,6 @@ Initialize the genesis.json file that will help you to bootstrap the network
 iris init testing --chain-id=testing
 ```
 
-Replace the default `stake` in genesis.json and use `iris` as the only staking coin
-
-```bash
-# linux
-sed -i 's/stake/iris/g' ~/.iris/config/genesis.json
-
-# macOS
-sed -i '' 's/stake/iris/g' ~/.iris/config/genesis.json
-```
-
 ### create a key
 
 Create a key to hold your validator account
@@ -47,11 +37,11 @@ iris keys add MyValidator
 Add that key into the genesis.app_state.accounts array in the genesis file
 
 :::tip
-this command lets you set the number of coins. Make sure this account has some iris which is the only staking coin on IRISnet
+this command lets you set the number of coins. Make sure this account has some iris-atto which is the only staking coin on IRISnet
 :::
 
 ```bash
-iris add-genesis-account $(iris keys show MyValidator --address) 100000000iris
+iris add-genesis-account $(iris keys show MyValidator --address) 100000000000000000000iris-atto
 ```
 
 ### iris gentx
@@ -59,7 +49,7 @@ iris add-genesis-account $(iris keys show MyValidator --address) 100000000iris
 Generate the transaction that creates your validator. The gentxs are stored in `~/.iris/config/gentx/`
 
 ```bash
-iris gentx MyValidator --amount=100000000iris --chain-id=testing
+iris gentx MyValidator --chain-id=testing
 ```
 
 ### iris collect-gentxs

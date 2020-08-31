@@ -18,20 +18,10 @@ order: 3
 
 ### iris init
 
-初始化genesis.json文件，它将帮助你启动网络
+初始化 genesis.json 文件，它将帮助你启动网络
 
 ```bash
 iris init testing --chain-id=testing
-```
-
-替换genesis.json中默认的stake，使用iris作为唯一抵押通证
-
-```bash
-# linux
-sed -i 's/stake/iris/g' ~/.iris/config/genesis.json
-
-# macOS
-sed -i '' 's/stake/iris/g' ~/.iris/config/genesis.json
 ```
 
 ### 创建一个钱包
@@ -47,11 +37,11 @@ iris keys add MyValidator
 将该钱包地址添加到genesis文件中的genesis.app_state.accounts数组中
 
 :::tip
-此命令使您可以设置通证数量。确保此帐户有iris，这是IRISnet上唯一的质押通证
+此命令使您可以设置通证数量。确保此帐户有iris-atto，这是IRISnet上唯一的质押通证
 :::
 
 ```bash
-iris add-genesis-account $(iris keys show MyValidator --address) 100000000iris
+iris add-genesis-account $(iris keys show MyValidator --address) 100000000000000000000iris-atto
 ```
 
 ### iris gentx
@@ -59,7 +49,7 @@ iris add-genesis-account $(iris keys show MyValidator --address) 100000000iris
 生成创建验证人的交易。gentx存储在`~/.iris/config/`中
 
 ```bash
-iris gentx MyValidator --amount=100000000iris --chain-id=testing
+iris gentx MyValidator --chain-id=testing
 ```
 
 ### iris collect-gentxs
