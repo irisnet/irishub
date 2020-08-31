@@ -39,7 +39,7 @@ func queryFeedHandlerFn(cliCtx client.Context) http.HandlerFunc {
 			FeedName: vars[FeedName],
 		}
 
-		bz, err := cliCtx.Codec.MarshalJSON(params)
+		bz, err := cliCtx.JSONMarshaler.MarshalJSON(params)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -69,7 +69,7 @@ func queryFeedsHandlerFn(cliCtx client.Context) http.HandlerFunc {
 			State: oracleClient.GetUrlParam(r.URL, FeedState),
 		}
 
-		bz, err := cliCtx.Codec.MarshalJSON(params)
+		bz, err := cliCtx.JSONMarshaler.MarshalJSON(params)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -99,7 +99,7 @@ func queryFeedValuesHandlerFn(cliCtx client.Context) http.HandlerFunc {
 			FeedName: vars[FeedName],
 		}
 
-		bz, err := cliCtx.Codec.MarshalJSON(params)
+		bz, err := cliCtx.JSONMarshaler.MarshalJSON(params)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
