@@ -1,7 +1,6 @@
 package types
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -85,48 +84,32 @@ func AccountTypeFromString(str string) (AccountType, error) {
 	}
 }
 
-// is defined AccountType?
-func validAccountType(bt AccountType) bool {
-	return bt == Genesis || bt == Ordinary
+// ValidAccountType returns true if the AccountType option is valid and false otherwise.
+func ValidAccountType(option AccountType) bool {
+	if option == Genesis ||
+		option == Ordinary {
+		return true
+	}
+	return false
 }
 
-// Format for Printf / Sprintf, returns bech32 when using %s
-func (bt AccountType) Format(s fmt.State, verb rune) {
+// Marshal needed for protobuf compatibility.
+func (at AccountType) Marshal() ([]byte, error) {
+	return []byte{byte(at)}, nil
+}
+
+// Unmarshal needed for protobuf compatibility.
+func (at *AccountType) Unmarshal(data []byte) error {
+	*at = AccountType(data[0])
+	return nil
+}
+
+// Format implements the fmt.Formatter interface.
+func (at AccountType) Format(s fmt.State, verb rune) {
 	switch verb {
 	case 's':
-		_, _ = s.Write([]byte(fmt.Sprintf("%s", bt.String())))
+		s.Write([]byte(at.String()))
 	default:
-		_, _ = s.Write([]byte(fmt.Sprintf("%v", byte(bt))))
+		s.Write([]byte(fmt.Sprintf("%v", byte(at))))
 	}
-}
-
-// String converts BindingType byte to String
-func (bt AccountType) String() string {
-	switch bt {
-	case Genesis:
-		return "Genesis"
-	case Ordinary:
-		return "Ordinary"
-	default:
-		return ""
-	}
-}
-
-// MarshalJSON marshals AccountType to JSON using string
-func (bt AccountType) MarshalJSON() ([]byte, error) {
-	return json.Marshal(bt.String())
-}
-
-// UnmarshalJSON unmarshals AccountType from JSON assuming Bech32 encoding
-func (bt *AccountType) UnmarshalJSON(data []byte) error {
-	var s string
-	if err := json.Unmarshal(data, &s); err != nil {
-		return nil
-	}
-	bz2, err := AccountTypeFromString(s)
-	if err != nil {
-		return err
-	}
-	*bt = bz2
-	return nil
 }
