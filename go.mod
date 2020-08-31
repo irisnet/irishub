@@ -1,6 +1,6 @@
 module github.com/irisnet/irishub
 
-go 1.14
+go 1.15
 
 require (
 	github.com/cosmos/cosmos-sdk v0.34.4-0.20200825201020-d9fd4d2ca9a3
@@ -36,4 +36,5 @@ require (
 replace (
 	github.com/cosmos/cosmos-sdk => github.com/irisnet/cosmos-sdk v0.34.4-0.20200831031220-2888c60c9b92
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.2-alpha.regen.4
+	github.com/keybase/go-keychain => github.com/99designs/go-keychain v0.0.0-20191008050251-8e49817e8af4
 )

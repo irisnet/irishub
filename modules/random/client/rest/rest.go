@@ -19,7 +19,7 @@ func RegisterHandlers(cliCtx client.Context, r *mux.Router) {
 	registerTxRoutes(cliCtx, r)
 }
 
-// RequestRandomReq defines the properties of a request rand request's body
+// RequestRandomReq defines the properties of a request random request's body
 type RequestRandomReq struct {
 	BaseReq       rest.BaseReq   `json:"base_req" yaml:"base_req"` // base req
 	Consumer      sdk.AccAddress `json:"consumer"`                 // request address

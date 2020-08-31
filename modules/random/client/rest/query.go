@@ -1,7 +1,6 @@
 package rest
 
 import (
-	"encoding/hex"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -14,13 +13,13 @@ import (
 )
 
 func registerQueryRoutes(cliCtx client.Context, r *mux.Router) {
-	// query rand by the request id
-	r.HandleFunc(fmt.Sprintf("/rand/rands/{%s}", RestRequestID), queryRandomHandlerFn(cliCtx)).Methods("GET")
-	// query rand request queue by an optional heigth
-	r.HandleFunc("/rand/queue", queryQueueHandlerFn(cliCtx)).Methods("GET")
+	// query random by the request id
+	r.HandleFunc(fmt.Sprintf("/random/randoms/{%s}", RestRequestID), queryRandomHandlerFn(cliCtx)).Methods("GET")
+	// query random request queue by an optional heigth
+	r.HandleFunc("/random/queue", queryQueueHandlerFn(cliCtx)).Methods("GET")
 }
 
-// HTTP request handler to query rand by the request id.
+// HTTP request handler to query random by the request id.
 func queryRandomHandlerFn(cliCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
@@ -53,21 +52,15 @@ func queryRandomHandlerFn(cliCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		var rawRandom types.Random
-		if err := cliCtx.JSONMarshaler.UnmarshalJSON(res, &rawRandom); err != nil {
+		var random types.Random
+		if err := cliCtx.JSONMarshaler.UnmarshalJSON(res, &random); err != nil {
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
 
-		readableRandom := types.ReadableRandom{
-			RequestTxHash: hex.EncodeToString(rawRandom.RequestTxHash),
-			Height:        rawRandom.Height,
-			Value:         rawRandom.Value,
-		}
-
 		cliCtx = cliCtx.WithHeight(height)
 
-		rest.PostProcessResponse(w, cliCtx, readableRandom)
+		rest.PostProcessResponse(w, cliCtx, random)
 	}
 }
 

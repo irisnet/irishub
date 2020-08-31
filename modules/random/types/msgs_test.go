@@ -26,7 +26,7 @@ func TestMsgRequestRandomRoute(t *testing.T) {
 	// build a MsgRequestRandom
 	msg := NewMsgRequestRandom(testAddr, blockInterval, false, serviceFeeCap)
 
-	require.Equal(t, "rand", msg.Route())
+	require.Equal(t, "random", msg.Route())
 }
 
 func TestMsgRequestRandomValidation(t *testing.T) {
@@ -56,7 +56,7 @@ func TestMsgRequestRandomGetSignBytes(t *testing.T) {
 	var msg = NewMsgRequestRandom(testAddr, blockInterval, true, serviceFeeCap)
 	res := msg.GetSignBytes()
 
-	expected := "{\"type\":\"irishub/rand/MsgRequestRandom\",\"value\":{\"block_interval\":\"10\",\"consumer\":\"cosmos1w3jhxazpv3j8y5jww2c\",\"oracle\":true,\"service_fee_cap\":[{\"amount\":\"1000000000000000000\",\"denom\":\"iris-atto\"}]}}"
+	expected := "{\"type\":\"irishub/random/MsgRequestRandom\",\"value\":{\"block_interval\":\"10\",\"consumer\":\"cosmos1w3jhxazpv3j8y5jww2c\",\"oracle\":true,\"service_fee_cap\":[{\"amount\":\"1000000000000000000\",\"denom\":\"iris-atto\"}]}}"
 	require.Equal(t, expected, string(res))
 }
 

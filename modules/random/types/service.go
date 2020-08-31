@@ -10,9 +10,9 @@ import (
 
 const (
 	ServiceName          = "random"
-	ServiceDesc          = "system service definition of rand module"
+	ServiceDesc          = "system service definition of random module"
 	ServiceValueJsonPath = "seed"
-	AuthorDescription    = "rand module account"
+	AuthorDescription    = "random module account"
 	ServiceSchemas       = `
 	{
 		"input": {

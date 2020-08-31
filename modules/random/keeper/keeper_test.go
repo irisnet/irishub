@@ -50,12 +50,12 @@ func TestKeeperTestSuite(t *testing.T) {
 }
 
 func (suite *KeeperTestSuite) TestSetRandom() {
-	rand := types.NewRandom(types.SHA256(testTxBytes), testHeight, big.NewRat(testRandomNumerator, testRandomDenomiator).FloatString(types.RandPrec))
-	suite.keeper.SetRandom(suite.ctx, testReqID, rand)
+	random := types.NewRandom(types.SHA256(testTxBytes), testHeight, big.NewRat(testRandomNumerator, testRandomDenomiator).FloatString(types.RandPrec))
+	suite.keeper.SetRandom(suite.ctx, testReqID, random)
 
 	storedRandom, err := suite.keeper.GetRandom(suite.ctx, testReqID)
 	suite.NoError(err)
-	randJson, _ := json.Marshal(rand)
+	randJson, _ := json.Marshal(random)
 	storedRandomJson, _ := json.Marshal(storedRandom)
 	suite.Equal(string(randJson), string(storedRandomJson))
 }

@@ -5,20 +5,21 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/spf13/cobra"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/version"
-	"github.com/spf13/cobra"
 
 	"github.com/irisnet/irishub/modules/random/types"
 )
 
-// GetQueryCmd returns the cli query commands for the rand module.
+// GetQueryCmd returns the cli query commands for the random module.
 func GetQueryCmd() *cobra.Command {
-	// Group rand queries under a subcommand
+	// Group random queries under a subcommand
 	randQueryCmd := &cobra.Command{
 		Use:                        types.ModuleName,
-		Short:                      "Querying commands for the rand module",
+		Short:                      "Querying commands for the random module",
 		DisableFlagParsing:         true,
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
@@ -30,12 +31,12 @@ func GetQueryCmd() *cobra.Command {
 	return randQueryCmd
 }
 
-// GetCmdQueryRandom implements the query rand command.
+// GetCmdQueryRandom implements the query random command.
 func GetCmdQueryRandom() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "rand [request-id]",
+		Use:     "random [request-id]",
 		Short:   "Query a random number by the request id",
-		Example: fmt.Sprintf("%s query rand rand <request id>", version.AppName),
+		Example: fmt.Sprintf("%s query random random <request id>", version.AppName),
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
@@ -67,7 +68,7 @@ func GetCmdQueryRandomRequestQueue() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "query-queue [gen-height]",
 		Short:   "Query the random number request queue with an optional height",
-		Example: fmt.Sprintf("%s query rand queue <gen-height>", version.AppName),
+		Example: fmt.Sprintf("%s query random queue <gen-height>", version.AppName),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 			clientCtx, err := client.ReadQueryCommandFlags(clientCtx, cmd.Flags())

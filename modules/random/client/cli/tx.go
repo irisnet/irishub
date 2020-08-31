@@ -14,7 +14,7 @@ import (
 	"github.com/irisnet/irishub/modules/random/types"
 )
 
-// GetTxCmd returns the transaction commands for the rand module.
+// GetTxCmd returns the transaction commands for the random module.
 func GetTxCmd() *cobra.Command {
 	randTxCmd := &cobra.Command{
 		Use:                        types.ModuleName,
@@ -29,12 +29,12 @@ func GetTxCmd() *cobra.Command {
 	return randTxCmd
 }
 
-// GetCmdRequestRandom implements the request-rand command.
+// GetCmdRequestRandom implements the request-random command.
 func GetCmdRequestRandom() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "request-rand",
+		Use:     "request-random",
 		Short:   "Request a random number with an optional block interval",
-		Example: fmt.Sprintf("%s tx rand request-rand [--block-interval=10] [--oracle=true --service-fee-cap=1iris]", version.AppName),
+		Example: fmt.Sprintf("%s tx random request-random [--block-interval=10] [--oracle=true --service-fee-cap=1iris]", version.AppName),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 			clientCtx, err := client.ReadTxCommandFlags(clientCtx, cmd.Flags())

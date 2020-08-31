@@ -14,7 +14,7 @@ import (
 	"github.com/irisnet/irishub/modules/random/types"
 )
 
-// Keeper defines the rand module Keeper
+// Keeper defines the random module Keeper
 type Keeper struct {
 	cdc           codec.Marshaler
 	storeKey      sdk.StoreKey
@@ -22,7 +22,7 @@ type Keeper struct {
 	serviceKeeper types.ServiceKeeper
 }
 
-// NewKeeper returns a new rand keeper
+// NewKeeper returns a new random keeper
 func NewKeeper(cdc codec.Marshaler, key sdk.StoreKey, bankKeeper types.BankKeeper, serviceKeeper types.ServiceKeeper) Keeper {
 	keeper := Keeper{
 		cdc:           cdc,
@@ -82,9 +82,9 @@ func (k Keeper) RequestRandom(ctx sdk.Context, consumer sdk.AccAddress,
 }
 
 // SetRandom stores the random number
-func (k Keeper) SetRandom(ctx sdk.Context, reqID []byte, rand types.Random) {
+func (k Keeper) SetRandom(ctx sdk.Context, reqID []byte, random types.Random) {
 	store := ctx.KVStore(k.storeKey)
-	bz := k.cdc.MustMarshalBinaryBare(&rand)
+	bz := k.cdc.MustMarshalBinaryBare(&random)
 	store.Set(types.KeyRandom(reqID), bz)
 }
 
@@ -101,14 +101,14 @@ func (k Keeper) DequeueRandomRequest(ctx sdk.Context, height int64, reqID []byte
 	store.Delete(types.KeyRandomRequestQueue(height, reqID))
 }
 
-// SetOracleRandRequest stores the oracle rand request
+// SetOracleRandRequest stores the oracle random request
 func (k Keeper) SetOracleRandRequest(ctx sdk.Context, requestContextID []byte, request types.Request) {
 	store := ctx.KVStore(k.storeKey)
 	bz := k.cdc.MustMarshalBinaryBare(&request)
 	store.Set(types.KeyOracleRandomRequest(requestContextID), bz)
 }
 
-// GetOracleRandRequest retrieves the oracle rand request by the specified request id
+// GetOracleRandRequest retrieves the oracle random request by the specified request id
 func (k Keeper) GetOracleRandRequest(ctx sdk.Context, requestContextID []byte) (types.Request, error) {
 	store := ctx.KVStore(k.storeKey)
 
@@ -123,7 +123,7 @@ func (k Keeper) GetOracleRandRequest(ctx sdk.Context, requestContextID []byte) (
 	return request, nil
 }
 
-// DeleteOracleRandRequest delete an oracle rand request
+// DeleteOracleRandRequest delete an oracle random request
 func (k Keeper) DeleteOracleRandRequest(ctx sdk.Context, requestContextID []byte) {
 	store := ctx.KVStore(k.storeKey)
 	store.Delete(types.KeyOracleRandomRequest(requestContextID))
@@ -138,10 +138,10 @@ func (k Keeper) GetRandom(ctx sdk.Context, reqID []byte) (types.Random, error) {
 		return types.Random{}, sdkerrors.Wrap(types.ErrInvalidReqID, hex.EncodeToString(reqID))
 	}
 
-	var rand types.Random
-	k.cdc.MustUnmarshalBinaryBare(bz, &rand)
+	var random types.Random
+	k.cdc.MustUnmarshalBinaryBare(bz, &random)
 
-	return rand, nil
+	return random, nil
 }
 
 // IterateRandoms iterates through all the random numbers
@@ -152,10 +152,10 @@ func (k Keeper) IterateRandoms(ctx sdk.Context, op func(r types.Random) (stop bo
 	defer iterator.Close()
 
 	for ; iterator.Valid(); iterator.Next() {
-		var rand types.Random
-		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &rand)
+		var random types.Random
+		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &random)
 
-		if stop := op(rand); stop {
+		if stop := op(random); stop {
 			break
 		}
 	}

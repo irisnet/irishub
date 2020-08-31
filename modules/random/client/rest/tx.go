@@ -3,20 +3,21 @@ package rest
 import (
 	"net/http"
 
+	"github.com/gorilla/mux"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	"github.com/cosmos/cosmos-sdk/types/rest"
-	"github.com/gorilla/mux"
 
 	"github.com/irisnet/irishub/modules/random/types"
 )
 
 func registerTxRoutes(cliCtx client.Context, r *mux.Router) {
 	// request rands
-	r.HandleFunc("/rand/rands", requestRandomHandlerFn(cliCtx)).Methods("POST")
+	r.HandleFunc("/random/randoms", requestRandomHandlerFn(cliCtx)).Methods("POST")
 }
 
-// HTTP request handler to request rand.
+// HTTP request handler to request random
 func requestRandomHandlerFn(cliCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req RequestRandomReq
