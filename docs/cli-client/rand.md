@@ -1,21 +1,21 @@
-# iriscli rand
+# Random
 
 Rand module allows you to post a random number request to the IRIS Hub and query the random numbers or the pending random number requests.
 
 ## Available Commands
 
-| Name                                       | Description                                                      |
-| ------------------------------------------ | ---------------------------------------------------------------- |
-| [request-rand](#iriscli-rand-request-rand) | Request a random number                                          |
-| [query-rand](#iriscli-rand-query-rand)     | Query the generated random number by the request id              |
-| [query-queue](#iriscli-rand-query-queue)   | Query the pending random number requests with an optional height |
+| Name                                       | Description                                                  |
+| ------------------------------------------ | ------------------------------------------------------------ |
+| [request-rand](#iris-tx-rand-request-rand) | Request a random number                                      |
+| [query-rand](#iris-q-rand-rand)            | Query the generated random number by the request id          |
+| [query-queue](#iris-q-rand-queue)          | Query the pending random number requests with an optional height |
 
-## iriscli rand request-rand
+## iris tx rand request-rand
 
 Request a random number.
 
 ```bash
-iriscli rand request-rand [flags]
+iris tx rand request-rand [flags]
 ```
 
 **Flags:**
@@ -32,56 +32,44 @@ Post a random number request to the IRIS Hub, the random number will be generate
 
 ```bash
 # without oracle
-iriscli rand request-rand --block-interval=100 --from=<key-name> --chain-id=irishub --fee=0.3iris --commit
+iris tx rand request-rand --block-interval=100 --from=<key-name> --chain-id=irishub --fee=0.3iris --commit
 
 # with oracle
-iriscli rand request-rand --block-interval=100 --oracle=true --service-fee-cap=1iris --from=<key-name> --chain-id=irishub --fee=0.3iris --commit
+iris tx rand request-rand --block-interval=100 --oracle=true --service-fee-cap=1iris --from=<key-name> --chain-id=irishub --fee=0.3iris --commit
 ```
 
 :::tip
 You will get a unique request id if the tx is committed, which can be used to query the status of the request. You can also [query the tx detail](./tendermint.md#iriscli-tendermint-tx) to get the request id.
 :::
 
-## iriscli rand query-rand
+## iris q rand rand
 
 Query the generated random number by the request id.
 
 ```bash
-iriscli rand query-rand [flags]
+iris query rand rand <request-id> [flags]
 ```
-
-**Flags:**
-
-| Name, shorthand | Type   | Required | Default | Description                               |
-| --------------- | ------ | -------- | ------- | ----------------------------------------- |
-| --request-id    | string | Yes      |         | The request id returned by the request tx |
 
 ### Query a random number
 
 Query the random number after it is generated.
 
 ```bash
-iriscli rand query-rand --request-id=035a8d4cf64fcd428b5c77b1ca85bfed172d3787be9bdf0887bbe8bbeec3932c
+iris q rand rand <request-id>
 ```
 
-## iriscli rand query-queue
+## iris q rand queue
 
 Query the pending random number requests with an optional block height.
 
 ```bash
-iriscli rand query-queue [flags]
+iris query rand queue <gen-height> [flags]
 ```
-
-**Flags:**
-
-| Name, shorthand | Type  | Required | Default | Description                                                |
-| --------------- | ----- | -------- | ------- | ---------------------------------------------------------- |
-| --queue-height  | int64 |          | 0       | The block height at which random numbers will be generated |
 
 ### Query random number request queue
 
 Query the pending random number requests with an optional block height at which random numbers will be generated or request service.
 
 ```bash
-iriscli rand query-queue --queue-height=100000
+iris query rand queue 100000
 ```
