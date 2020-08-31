@@ -6,8 +6,8 @@ import (
 	"testing"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/kv"
 	"github.com/stretchr/testify/require"
-	tmkv "github.com/tendermint/tendermint/libs/kv"
 
 	"github.com/irisnet/irishub/modules/mint/simulation"
 	"github.com/irisnet/irishub/modules/random/types"
@@ -22,10 +22,12 @@ func TestDecodeStore(t *testing.T) {
 	reqID := types.GenerateRequestID(request)
 	rand := types.NewRandom([]byte("requestTxHash"), 100, big.NewRat(10, 1000).FloatString(types.RandPrec))
 
-	kvPairs := tmkv.Pairs{
-		tmkv.Pair{Key: types.KeyRandom(reqID), Value: cdc.MustMarshalBinaryBare(&rand)},
-		tmkv.Pair{Key: types.KeyRandomRequestQueue(100, reqID), Value: cdc.MustMarshalBinaryBare(request)},
-		tmkv.Pair{Key: []byte{0x30}, Value: []byte{0x50}},
+	kvPairs := kv.Pairs{
+		Pairs: []kv.Pair{
+			{Key: types.KeyRandom(reqID), Value: cdc.MustMarshalBinaryBare(&rand)},
+			{Key: types.KeyRandomRequestQueue(100, reqID), Value: cdc.MustMarshalBinaryBare(request)},
+			{Key: []byte{0x30}, Value: []byte{0x50}},
+		},
 	}
 
 	tests := []struct {
@@ -45,7 +47,7 @@ func TestDecodeStore(t *testing.T) {
 			if tt.pass {
 				require.Equal(t, tt.expectedLog, NewDecodeStore(cdc), tt.name)
 			} else {
-				require.Panics(t, func() { dec(kvPairs[i], kvPairs[i]) }, tt.name)
+				require.Panics(t, func() { dec(kvPairs.Pairs[i], kvPairs.Pairs[i]) }, tt.name)
 			}
 		})
 	}

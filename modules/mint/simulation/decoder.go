@@ -4,17 +4,16 @@ import (
 	"bytes"
 	"fmt"
 
-	tmkv "github.com/tendermint/tendermint/libs/kv"
-
 	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/cosmos/cosmos-sdk/types/kv"
 
 	"github.com/irisnet/irishub/modules/mint/types"
 )
 
 // NewDecodeStore returns a function closure that unmarshals the KVPair's values
 // to the corresponding types.
-func NewDecodeStore(cdc codec.Marshaler) func(kvA, kvB tmkv.Pair) string {
-	return func(kvA, kvB tmkv.Pair) string {
+func NewDecodeStore(cdc codec.Marshaler) func(kvA, kvB kv.Pair) string {
+	return func(kvA, kvB kv.Pair) string {
 		switch {
 		case bytes.Equal(kvA.Key, types.MinterKey):
 			var minterA, minterB types.Minter

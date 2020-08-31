@@ -8,8 +8,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/suite"
-	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/crypto"
+	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 
 	"github.com/irisnet/irishub/modules/random/keeper"
 	"github.com/irisnet/irishub/modules/random/types"
@@ -30,7 +30,7 @@ var (
 type KeeperTestSuite struct {
 	suite.Suite
 
-	cdc    *codec.Codec
+	cdc    codec.JSONMarshaler
 	ctx    sdk.Context
 	keeper keeper.Keeper
 	app    *simapp.SimApp
@@ -40,8 +40,8 @@ func (suite *KeeperTestSuite) SetupTest() {
 	app := simapp.Setup(false)
 
 	suite.app = app
-	suite.cdc = app.Codec()
-	suite.ctx = app.BaseApp.NewContext(false, abci.Header{})
+	suite.cdc = codec.NewAminoCodec(app.LegacyAmino())
+	suite.ctx = app.BaseApp.NewContext(false, tmproto.Header{})
 	suite.keeper = app.RandomKeeper
 }
 
@@ -74,7 +74,7 @@ func (suite *KeeperTestSuite) TestRequestRandom() {
 
 	for ; iterator.Valid(); iterator.Next() {
 		var request types.Request
-		suite.cdc.MustUnmarshalBinaryBare(iterator.Value(), &request)
+		suite.app.AppCodec().MustUnmarshalBinaryBare(iterator.Value(), &request)
 		suite.Equal(expectedRequest, request)
 	}
 }

@@ -1,22 +1,16 @@
 package types
 
-// GenesisState - all distribution state that must be provided at genesis
-type GenesisState struct {
-	Minter Minter `json:"minter"` // minter object
-	Params Params `json:"params"` // inflation params
-}
-
 // NewGenesisState constructs a GenesisState
-func NewGenesisState(minter Minter, params Params) GenesisState {
-	return GenesisState{
+func NewGenesisState(minter Minter, params Params) *GenesisState {
+	return &GenesisState{
 		Minter: minter,
 		Params: params,
 	}
 }
 
 // DefaultGenesisState gets raw genesis raw message for testing
-func DefaultGenesisState() GenesisState {
-	return GenesisState{
+func DefaultGenesisState() *GenesisState {
+	return &GenesisState{
 		Minter: DefaultMinter(),
 		Params: DefaultParams(),
 	}
