@@ -49,14 +49,11 @@ iris q staking pool --node=<iris_node_url>
 示例输出：
 
 ```bash
-Pool
-Loose Tokens: 1846663.900384156921391687
-Bonded Tokens: 425182.329615843078608313
-Token Supply: 2271846.230000000000000000
-Bonded Ratio: 0.187152776500000000
+bonded_tokens: "100000000000000000000"
+not_bonded_tokens: "0"
 ```
 
-**`/stake/pool`**
+**`/staking/pool`**
 
 这个 restful api 的用法请参阅 LCD swagger 文档。
 
