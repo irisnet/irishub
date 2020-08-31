@@ -6,12 +6,14 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
-	servicetypes "github.com/irismod/service/types"
-	guardiantypes "github.com/irisnet/irishub/modules/guardian/types"
-	randomtypes "github.com/irisnet/irishub/modules/random/types"
 	"net"
 	"os"
 	"path/filepath"
+
+	servicetypes "github.com/irismod/service/types"
+
+	guardiantypes "github.com/irisnet/irishub/modules/guardian/types"
+	randomtypes "github.com/irisnet/irishub/modules/random/types"
 
 	"github.com/spf13/cobra"
 	tmconfig "github.com/tendermint/tendermint/config"
