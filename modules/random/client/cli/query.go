@@ -2,7 +2,6 @@ package cli
 
 import (
 	"context"
-	"encoding/hex"
 	"fmt"
 	"strconv"
 
@@ -56,13 +55,7 @@ func GetCmdQueryRandom() *cobra.Command {
 				return err
 			}
 
-			readableRandom := types.ReadableRandom{
-				RequestTxHash: hex.EncodeToString(res.Random.RequestTxHash),
-				Height:        res.Random.Height,
-				Value:         res.Random.Value,
-			}
-
-			return clientCtx.PrintOutput(readableRandom)
+			return clientCtx.PrintOutput(res.Random)
 		},
 	}
 	flags.AddQueryFlagsToCmd(cmd)
@@ -101,7 +94,7 @@ func GetCmdQueryRandomRequestQueue() *cobra.Command {
 				return err
 			}
 
-			return clientCtx.PrintOutput(res.Requests)
+			return clientCtx.PrintOutput(res)
 		},
 	}
 	flags.AddQueryFlagsToCmd(cmd)

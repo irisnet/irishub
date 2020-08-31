@@ -20,7 +20,7 @@ func InitGenesis(ctx sdk.Context, keeper keeper.Keeper, data types.GenesisState)
 }
 
 // ExportGenesis outputs genesis data
-func ExportGenesis(ctx sdk.Context, k keeper.Keeper) types.GenesisState {
+func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	var profilers []types.Guardian
 	k.IterateProfilers(
 		ctx,

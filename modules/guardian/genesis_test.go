@@ -6,7 +6,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/suite"
-	abci "github.com/tendermint/tendermint/abci/types"
+	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 
 	"github.com/irisnet/irishub/modules/guardian"
 	"github.com/irisnet/irishub/modules/guardian/keeper"
@@ -17,7 +17,7 @@ import (
 type TestSuite struct {
 	suite.Suite
 
-	cdc    *codec.Codec
+	cdc    codec.JSONMarshaler
 	ctx    sdk.Context
 	keeper keeper.Keeper
 }
@@ -25,8 +25,8 @@ type TestSuite struct {
 func (suite *TestSuite) SetupTest() {
 	app := simapp.Setup(false)
 
-	suite.cdc = app.Codec()
-	suite.ctx = app.BaseApp.NewContext(false, abci.Header{})
+	suite.cdc = codec.NewAminoCodec(app.LegacyAmino())
+	suite.ctx = app.BaseApp.NewContext(false, tmproto.Header{})
 	suite.keeper = app.GuardianKeeper
 }
 

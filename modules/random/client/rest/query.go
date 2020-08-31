@@ -40,7 +40,7 @@ func queryRandomHandlerFn(cliCtx client.Context) http.HandlerFunc {
 			ReqID: reqID,
 		}
 
-		bz, err := cliCtx.Codec.MarshalJSON(params)
+		bz, err := cliCtx.JSONMarshaler.MarshalJSON(params)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -54,7 +54,7 @@ func queryRandomHandlerFn(cliCtx client.Context) http.HandlerFunc {
 		}
 
 		var rawRandom types.Random
-		if err := cliCtx.Codec.UnmarshalJSON(res, &rawRandom); err != nil {
+		if err := cliCtx.JSONMarshaler.UnmarshalJSON(res, &rawRandom); err != nil {
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
@@ -96,7 +96,7 @@ func queryQueueHandlerFn(cliCtx client.Context) http.HandlerFunc {
 			Height: genHeight,
 		}
 
-		bz, err := cliCtx.Codec.MarshalJSON(params)
+		bz, err := cliCtx.JSONMarshaler.MarshalJSON(params)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return

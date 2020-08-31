@@ -11,21 +11,21 @@ import (
 )
 
 // NewQuerier returns a minting Querier handler.
-func NewQuerier(k Keeper) sdk.Querier {
+func NewQuerier(k Keeper, legacyQuerierCdc codec.JSONMarshaler) sdk.Querier {
 	return func(ctx sdk.Context, path []string, _ abci.RequestQuery) ([]byte, error) {
 		switch path[0] {
 		case types.QueryParameters:
-			return queryParams(ctx, k)
+			return queryParams(ctx, k, legacyQuerierCdc)
 		default:
 			return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unknown query path: %s", path[0])
 		}
 	}
 }
 
-func queryParams(ctx sdk.Context, k Keeper) ([]byte, error) {
+func queryParams(ctx sdk.Context, k Keeper, legacyQuerierCdc codec.JSONMarshaler) ([]byte, error) {
 	params := k.GetParamSet(ctx)
 
-	res, err := codec.MarshalJSONIndent(k.cdc, params)
+	res, err := codec.MarshalJSONIndent(legacyQuerierCdc, params)
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
 	}

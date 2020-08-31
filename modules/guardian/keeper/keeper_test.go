@@ -4,6 +4,8 @@ import (
 	"encoding/hex"
 	"testing"
 
+	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
+
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/suite"
@@ -32,7 +34,7 @@ var (
 type KeeperTestSuite struct {
 	suite.Suite
 
-	cdc    *codec.Codec
+	cdc    codec.JSONMarshaler
 	ctx    sdk.Context
 	keeper keeper.Keeper
 	app    *simapp.SimApp
@@ -42,8 +44,8 @@ func (suite *KeeperTestSuite) SetupTest() {
 	app := simapp.Setup(false)
 
 	suite.app = app
-	suite.cdc = app.Codec()
-	suite.ctx = app.BaseApp.NewContext(false, abci.Header{})
+	suite.cdc = codec.NewAminoCodec(app.LegacyAmino())
+	suite.ctx = app.BaseApp.NewContext(false, tmproto.Header{})
 	suite.keeper = app.GuardianKeeper
 }
 
@@ -123,7 +125,7 @@ func (suite *KeeperTestSuite) TestQueryProfilers() {
 	suite.keeper.AddProfiler(suite.ctx, profiler)
 
 	var profilers []types.Guardian
-	querier := keeper.NewQuerier(suite.keeper)
+	querier := keeper.NewQuerier(suite.keeper, suite.cdc)
 	res, sdkErr := querier(suite.ctx, []string{types.QueryProfilers}, abci.RequestQuery{})
 	suite.NoError(sdkErr)
 
@@ -138,7 +140,7 @@ func (suite *KeeperTestSuite) TestQueryTrustees() {
 	suite.keeper.AddTrustee(suite.ctx, trustee)
 
 	var trustees []types.Guardian
-	querier := keeper.NewQuerier(suite.keeper)
+	querier := keeper.NewQuerier(suite.keeper, suite.cdc)
 	res, sdkErr := querier(suite.ctx, []string{types.QueryTrustees}, abci.RequestQuery{})
 	suite.NoError(sdkErr)
 
@@ -153,7 +155,7 @@ func newPubKey(pk string) (res crypto.PubKey) {
 	if err != nil {
 		panic(err)
 	}
-	var pkEd ed25519.PubKeyEd25519
+	var pkEd = make(ed25519.PubKey, ed25519.PubKeySize)
 	copy(pkEd[:], pkBytes[:])
 	return pkEd
 }

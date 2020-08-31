@@ -13,6 +13,7 @@ import (
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/gogo/protobuf/grpc"
 	"github.com/gorilla/mux"
+	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/spf13/cobra"
 	abci "github.com/tendermint/tendermint/abci/types"
 
@@ -26,7 +27,6 @@ var (
 	_ module.AppModule           = AppModule{}
 	_ module.AppModuleBasic      = AppModuleBasic{}
 	_ module.AppModuleSimulation = AppModule{}
-	_ module.InterfaceModule     = AppModuleBasic{}
 )
 
 // AppModuleBasic defines the basic application module used by the oracle module.
@@ -38,7 +38,7 @@ type AppModuleBasic struct {
 func (AppModuleBasic) Name() string { return types.ModuleName }
 
 // RegisterCodec registers the oracle module's types for the given codec.
-func (AppModuleBasic) RegisterCodec(cdc *codec.Codec) {
+func (AppModuleBasic) RegisterCodec(cdc *codec.LegacyAmino) {
 	types.RegisterCodec(cdc)
 }
 
@@ -49,7 +49,7 @@ func (AppModuleBasic) DefaultGenesis(cdc codec.JSONMarshaler) json.RawMessage {
 }
 
 // ValidateGenesis performs genesis state validation for the oracle module.
-func (AppModuleBasic) ValidateGenesis(cdc codec.JSONMarshaler, bz json.RawMessage) error {
+func (AppModuleBasic) ValidateGenesis(cdc codec.JSONMarshaler, config client.TxEncodingConfig, bz json.RawMessage) error {
 	var data types.GenesisState
 	if err := cdc.UnmarshalJSON(bz, &data); err != nil {
 		return fmt.Errorf("failed to unmarshal %s genesis state: %w", types.ModuleName, err)
@@ -63,6 +63,10 @@ func (AppModuleBasic) RegisterRESTRoutes(clientCtx client.Context, rtr *mux.Rout
 	rest.RegisterHandlers(clientCtx, rtr)
 }
 
+// RegisterGRPCRoutes registers the gRPC Gateway routes for the oracle module.
+func (a AppModuleBasic) RegisterGRPCRoutes(clientCtx client.Context, mux *runtime.ServeMux) {
+}
+
 // GetTxCmd returns the root tx command for the oracle module.
 func (AppModuleBasic) GetTxCmd() *cobra.Command {
 	return cli.GetTxCmd()
@@ -73,8 +77,8 @@ func (AppModuleBasic) GetQueryCmd() *cobra.Command {
 	return cli.GetQueryCmd()
 }
 
-// RegisterInterfaceTypes implements InterfaceModule.RegisterInterfaceTypes
-func (a AppModuleBasic) RegisterInterfaceTypes(registry codectypes.InterfaceRegistry) {
+// RegisterInterfaces registers interfaces and implementations of the oracle module.
+func (AppModuleBasic) RegisterInterfaces(registry codectypes.InterfaceRegistry) {
 	types.RegisterInterfaces(registry)
 }
 
@@ -114,9 +118,9 @@ func (am AppModule) Route() sdk.Route {
 // QuerierRoute returns the oracle module's querier route name.
 func (AppModule) QuerierRoute() string { return types.RouterKey }
 
-// NewQuerierHandler returns the oracle module sdk.Querier.
-func (am AppModule) NewQuerierHandler() sdk.Querier {
-	return keeper.NewQuerier(am.keeper)
+// LegacyQuerierHandler returns the oracle module sdk.Querier.
+func (am AppModule) LegacyQuerierHandler(legacyQuerierCdc codec.JSONMarshaler) sdk.Querier {
+	return keeper.NewQuerier(am.keeper, legacyQuerierCdc)
 }
 
 // InitGenesis performs genesis initialization for the oracle module. It returns

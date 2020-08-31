@@ -13,22 +13,22 @@ import (
 )
 
 // NewQuerier creates a new rand Querier instance
-func NewQuerier(k Keeper) sdk.Querier {
+func NewQuerier(k Keeper, legacyQuerierCdc codec.JSONMarshaler) sdk.Querier {
 	return func(ctx sdk.Context, path []string, req abci.RequestQuery) ([]byte, error) {
 		switch path[0] {
 		case types.QueryRandom:
-			return queryRandom(ctx, req, k)
+			return queryRandom(ctx, req, k, legacyQuerierCdc)
 		case types.QueryRandomRequestQueue:
-			return queryRandomRequestQueue(ctx, req, k)
+			return queryRandomRequestQueue(ctx, req, k, legacyQuerierCdc)
 		default:
 			return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unknown query path: %s", path[0])
 		}
 	}
 }
 
-func queryRandom(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, error) {
+func queryRandom(ctx sdk.Context, req abci.RequestQuery, k Keeper, legacyQuerierCdc codec.JSONMarshaler) ([]byte, error) {
 	var params types.QueryRandomParams
-	if err := keeper.cdc.UnmarshalJSON(req.Data, &params); err != nil {
+	if err := legacyQuerierCdc.UnmarshalJSON(req.Data, &params); err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, err.Error())
 	}
 
@@ -37,12 +37,12 @@ func queryRandom(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte,
 		return nil, sdkerrors.Wrap(types.ErrInvalidReqID, params.ReqID)
 	}
 
-	rand, err2 := keeper.GetRandom(ctx, reqID)
+	rand, err2 := k.GetRandom(ctx, reqID)
 	if err2 != nil {
 		return nil, err2
 	}
 
-	bz, err := codec.MarshalJSONIndent(keeper.cdc, rand)
+	bz, err := codec.MarshalJSONIndent(legacyQuerierCdc, rand)
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
 	}
@@ -50,9 +50,9 @@ func queryRandom(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte,
 	return bz, nil
 }
 
-func queryRandomRequestQueue(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, error) {
+func queryRandomRequestQueue(ctx sdk.Context, req abci.RequestQuery, k Keeper, legacyQuerierCdc codec.JSONMarshaler) ([]byte, error) {
 	var params types.QueryRandomRequestQueueParams
-	if err := keeper.cdc.UnmarshalJSON(req.Data, &params); err != nil {
+	if err := legacyQuerierCdc.UnmarshalJSON(req.Data, &params); err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, err.Error())
 	}
 
@@ -64,13 +64,13 @@ func queryRandomRequestQueue(ctx sdk.Context, req abci.RequestQuery, keeper Keep
 
 	if params.Height == 0 {
 		// query all pending requests
-		requests = queryAllRandomRequestsInQueue(ctx, keeper)
+		requests = queryAllRandomRequestsInQueue(ctx, k)
 	} else {
 		// query the pending requests by the specified height
-		requests = queryRandomRequestQueueByHeight(ctx, params.Height, keeper)
+		requests = queryRandomRequestQueueByHeight(ctx, params.Height, k)
 	}
 
-	bz, err := codec.MarshalJSONIndent(keeper.cdc, requests)
+	bz, err := codec.MarshalJSONIndent(legacyQuerierCdc, requests)
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
 	}
@@ -78,15 +78,15 @@ func queryRandomRequestQueue(ctx sdk.Context, req abci.RequestQuery, keeper Keep
 	return bz, nil
 }
 
-func queryRandomRequestQueueByHeight(ctx sdk.Context, height int64, keeper Keeper) []types.Request {
+func queryRandomRequestQueueByHeight(ctx sdk.Context, height int64, k Keeper) []types.Request {
 	var requests = make([]types.Request, 0)
 
-	iterator := keeper.IterateRandomRequestQueueByHeight(ctx, height)
+	iterator := k.IterateRandomRequestQueueByHeight(ctx, height)
 	defer iterator.Close()
 
 	for ; iterator.Valid(); iterator.Next() {
 		var request types.Request
-		keeper.cdc.MustUnmarshalBinaryBare(iterator.Value(), &request)
+		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &request)
 
 		requests = append(requests, request)
 	}
@@ -94,10 +94,10 @@ func queryRandomRequestQueueByHeight(ctx sdk.Context, height int64, keeper Keepe
 	return requests
 }
 
-func queryAllRandomRequestsInQueue(ctx sdk.Context, keeper Keeper) []types.Request {
+func queryAllRandomRequestsInQueue(ctx sdk.Context, k Keeper) []types.Request {
 	var requests = make([]types.Request, 0)
 
-	keeper.IterateRandomRequestQueue(ctx, func(h int64, r types.Request) (stop bool) {
+	k.IterateRandomRequestQueue(ctx, func(h int64, r types.Request) (stop bool) {
 		requests = append(requests, r)
 		return false
 	})
