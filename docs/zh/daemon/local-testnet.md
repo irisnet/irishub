@@ -34,19 +34,19 @@ iris keys add MyValidator
 
 ### iris add-genesis-account
 
-将该钱包地址添加到genesis文件中的genesis.app_state.accounts数组中
+将该钱包地址添加到 genesis 文件中的 genesis.app_state.accounts 数组中
 
 :::tip
-此命令使您可以设置通证数量。确保此帐户有iris-atto，这是IRISnet上唯一的质押通证
+此命令使您可以设置通证数量。确保此帐户有 uiris，这是 IRISnet 上唯一的质押通证
 :::
 
 ```bash
-iris add-genesis-account $(iris keys show MyValidator --address) 100000000000000000000iris-atto
+iris add-genesis-account $(iris keys show MyValidator --address) 100000000uiris
 ```
 
 ### iris gentx
 
-生成创建验证人的交易。gentx存储在`~/.iris/config/`中
+生成创建验证人的交易。gentx 存储在 `~/.iris/config/` 中
 
 ```bash
 iris gentx MyValidator --chain-id=testing
@@ -62,7 +62,7 @@ iris collect-gentxs
 
 ### iris start
 
-现在可以启动`iris`了
+现在可以启动 `iris` 了
 
 ```bash
 iris start
@@ -70,7 +70,7 @@ iris start
 
 ### iris unsafe-reset-all
 
-可以使用此命令来重置节点，包括本地区块链数据库，地址簿文件，并将priv_validator.json重置为创世状态。
+可以使用此命令来重置节点，包括本地区块链数据库，地址簿文件，并将 priv_validator.json 重置为创世状态。
 
 当本地区块链数据库以某种方式中断和无法同步或参与共识时，这是有用的。
 
@@ -80,17 +80,17 @@ iris unsafe-reset-all
 
 ### iris tendermint
 
-查询可以在p2p连接中使用的唯一节点ID，例如在[config.toml](intro.md#cnofig-toml)中`seeds`和`persistent_peers`的格式`<node-id>@ip:26656`。
+查询可以在 p2p 连接中使用的唯一节点 ID，例如在 [config.toml](intro.md#cnofig-toml) 中 `seeds` 和 `persistent_peers` 的格式 `<node-id>@ip:26656`。
 
-节点ID存储在[node_key.json](intro.md#node_key-json)中。
+节点 ID 存储在 [node_key.json](intro.md#node_key-json) 中。
 
 ```bash
 iris tendermint show-node-id
 ```
 
- 查询[Tendermint Pubkey](../concepts/validator-faq.md#tendermint-密钥)，用于[identify your validator](../cli-client/stake.md#iriscli-stake-create-validator),并将用于在共识过程中签署Pre-vote/Pre-commit。
+ 查询 [Tendermint Pubkey](../concepts/validator-faq.md#tendermint-密钥)，用于 [identify your validator](../cli-client/stake.md#iriscli-stake-create-validator)，并将用于在共识过程中签署 Pre-vote/Pre-commit。
 
-[Tendermint Key](../concepts/validator-faq.md#tendermint-密钥)存储在[priv_validator.json](intro.md#priv_validator-json)中，创建验证人后，请一定要记得[备份](../concepts/validator-faq.md#如何备份验证人节点)。
+[Tendermint Key](../concepts/validator-faq.md#tendermint-密钥) 存储在 [priv_validator.json](intro.md#priv_validator-json) 中，创建验证人后，请一定要记得[备份](../concepts/validator-faq.md#如何备份验证人节点)。
 
 ```bash
 iris tendermint show-validator
@@ -128,7 +128,7 @@ make build-linux
 make testnet-init
 ```
 
-`make testnet-init`将调用`iris testnet`命令在`build/nodecluster`目录下生成4个节点的测试网配置文件。
+`make testnet-init` 将调用 `iris testnet` 命令在 `build/nodecluster` 目录下生成4个节点的测试网配置文件。
 
 ```bash
 $ tree -L 3 build/nodecluster/
@@ -171,7 +171,7 @@ build/nodecluster/
 make testnet-start
 ```
 
-该命令将使用ubuntu:16.04的docker镜像创建4个节点的测试网。下表列出了每个节点的端口：
+该命令将使用 ubuntu:16.04 的 docker 镜像创建4个节点的测试网。下表列出了每个节点的端口：
 
 | Node      | P2P Port | RPC Port |
 | --------- | -------- | -------- |
@@ -196,7 +196,7 @@ make testnet-stop
 
 ### 清理
 
-要停止所有正在运行的节点并删除`build/`目录中的所有文件：
+要停止所有正在运行的节点并删除 `build/` 目录中的所有文件：
 
 ```bash
 make testnet-clean
