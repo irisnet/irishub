@@ -1,6 +1,6 @@
 module github.com/irisnet/irishub
 
-go 1.15
+go 1.14
 
 require (
 	github.com/cosmos/cosmos-sdk v0.34.4-0.20200825201020-d9fd4d2ca9a3
