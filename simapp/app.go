@@ -4,6 +4,12 @@ import (
 	"io"
 	"os"
 
+	abci "github.com/tendermint/tendermint/abci/types"
+	"github.com/tendermint/tendermint/libs/log"
+	tmos "github.com/tendermint/tendermint/libs/os"
+	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
+	dbm "github.com/tendermint/tm-db"
+
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client/rpc"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -67,6 +73,7 @@ import (
 	upgradeclient "github.com/cosmos/cosmos-sdk/x/upgrade/client"
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
+
 	"github.com/irismod/coinswap"
 	coinswapkeeper "github.com/irismod/coinswap/keeper"
 	coinswaptypes "github.com/irismod/coinswap/types"
@@ -85,11 +92,6 @@ import (
 	"github.com/irismod/token"
 	tokenkeeper "github.com/irismod/token/keeper"
 	tokentypes "github.com/irismod/token/types"
-	abci "github.com/tendermint/tendermint/abci/types"
-	"github.com/tendermint/tendermint/libs/log"
-	tmos "github.com/tendermint/tendermint/libs/os"
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
-	dbm "github.com/tendermint/tm-db"
 
 	"github.com/irisnet/irishub/modules/guardian"
 	guardiankeeper "github.com/irisnet/irishub/modules/guardian/keeper"
@@ -123,7 +125,9 @@ var (
 		mint.AppModuleBasic{},
 		distr.AppModuleBasic{},
 		gov.NewAppModuleBasic(
-			paramsclient.ProposalHandler, distrclient.ProposalHandler, upgradeclient.ProposalHandler,
+			paramsclient.ProposalHandler,
+			distrclient.ProposalHandler,
+			upgradeclient.ProposalHandler,
 		),
 		params.AppModuleBasic{},
 		crisis.AppModuleBasic{},
@@ -222,8 +226,11 @@ type SimApp struct {
 
 // NewSimApp returns a reference to an initialized SimApp.
 func NewSimApp(
-	logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bool, skipUpgradeHeights map[int64]bool,
-	homePath string, invCheckPeriod uint, encodingConfig simappparams.EncodingConfig, baseAppOptions ...func(*baseapp.BaseApp),
+	logger log.Logger, db dbm.DB, traceStore io.Writer,
+	loadLatest bool, skipUpgradeHeights map[int64]bool,
+	homePath string, invCheckPeriod uint,
+	encodingConfig simappparams.EncodingConfig,
+	baseAppOptions ...func(*baseapp.BaseApp),
 ) *SimApp {
 
 	// TODO: Remove cdc in favor of appCodec once all modules are migrated.
@@ -351,12 +358,21 @@ func NewSimApp(
 
 	app.HtlcKeeper = htlckeeper.NewKeeper(appCodec, keys[htlctypes.StoreKey], app.AccountKeeper, app.BankKeeper)
 
-	app.CoinswapKeeper = coinswapkeeper.NewKeeper(appCodec, keys[coinswaptypes.StoreKey], app.GetSubspace(coinswaptypes.ModuleName), app.BankKeeper, app.AccountKeeper)
+	app.CoinswapKeeper = coinswapkeeper.NewKeeper(
+		appCodec, keys[coinswaptypes.StoreKey], app.GetSubspace(coinswaptypes.ModuleName),
+		app.BankKeeper, app.AccountKeeper,
+	)
 
-	app.ServiceKeeper = servicekeeper.NewKeeper(appCodec, keys[servicetypes.StoreKey], app.AccountKeeper, app.BankKeeper,
-		servicekeeper.MockTokenKeeper{}, app.GetSubspace(servicetypes.ModuleName), authtypes.FeeCollectorName)
+	app.ServiceKeeper = servicekeeper.NewKeeper(
+		appCodec, keys[servicetypes.StoreKey], app.AccountKeeper, app.BankKeeper,
+		servicekeeper.MockTokenKeeper{}, app.GetSubspace(servicetypes.ModuleName),
+		authtypes.FeeCollectorName,
+	)
 
-	app.OracleKeeper = oracleKeeper.NewKeeper(appCodec, keys[oracletypes.StoreKey], app.GetSubspace(oracletypes.ModuleName), app.GuardianKeeper, app.ServiceKeeper)
+	app.OracleKeeper = oracleKeeper.NewKeeper(
+		appCodec, keys[oracletypes.StoreKey], app.GetSubspace(oracletypes.ModuleName),
+		app.GuardianKeeper, app.ServiceKeeper,
+	)
 
 	app.RandomKeeper = randomkeeper.NewKeeper(appCodec, keys[randomtypes.StoreKey], app.BankKeeper, app.ServiceKeeper)
 

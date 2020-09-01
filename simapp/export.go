@@ -18,8 +18,14 @@ import (
 // ExportAppStateAndValidators exports the state of the application for a genesis
 // file.
 func (app *SimApp) ExportAppStateAndValidators(
-	forZeroHeight bool, jailAllowedAddrs []string,
-) (appState json.RawMessage, validators []tmtypes.GenesisValidator, cp *abci.ConsensusParams, err error) {
+	forZeroHeight bool,
+	jailAllowedAddrs []string,
+) (
+	appState json.RawMessage,
+	validators []tmtypes.GenesisValidator,
+	cp *abci.ConsensusParams,
+	err error,
+) {
 
 	// as if they could withdraw from the start of the next block
 	ctx := app.NewContext(true, tmproto.Header{Height: app.LastBlockHeight()})
@@ -65,10 +71,13 @@ func (app *SimApp) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs []
 	/* Handle fee distribution state. */
 
 	// withdraw all validator commission
-	app.StakingKeeper.IterateValidators(ctx, func(_ int64, val exported.ValidatorI) (stop bool) {
-		_, _ = app.DistrKeeper.WithdrawValidatorCommission(ctx, val.GetOperator())
-		return false
-	})
+	app.StakingKeeper.IterateValidators(
+		ctx,
+		func(_ int64, val exported.ValidatorI) (stop bool) {
+			_, _ = app.DistrKeeper.WithdrawValidatorCommission(ctx, val.GetOperator())
+			return false
+		},
+	)
 
 	// withdraw all delegator rewards
 	dels := app.StakingKeeper.GetAllDelegations(ctx)
