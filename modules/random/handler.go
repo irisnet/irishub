@@ -11,7 +11,7 @@ import (
 	"github.com/irisnet/irishub/modules/random/types"
 )
 
-// NewHandler returns a handler for all rand msgs
+// NewHandler returns a handler for all random msgs
 func NewHandler(k keeper.Keeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) (*sdk.Result, error) {
 		ctx = ctx.WithEventManager(sdk.NewEventManager())

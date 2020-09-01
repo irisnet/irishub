@@ -1,18 +1,19 @@
 package types
 
 import (
+	"github.com/tendermint/tendermint/crypto"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	servicetypes "github.com/irismod/service/types"
-	"github.com/tendermint/tendermint/crypto"
 
 	"github.com/irisnet/irishub/modules/oracle/types"
 )
 
 const (
 	ServiceName          = "random"
-	ServiceDesc          = "system service definition of rand module"
+	ServiceDesc          = "system service definition of random module"
 	ServiceValueJsonPath = "seed"
-	AuthorDescription    = "rand module account"
+	AuthorDescription    = "random module account"
 	ServiceSchemas       = `
 	{
 		"input": {

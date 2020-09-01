@@ -5,13 +5,13 @@ import (
 	"math/rand"
 	"time"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	servicetypes "github.com/irismod/service/types"
-
 	"github.com/tidwall/gjson"
 
 	tmbytes "github.com/tendermint/tendermint/libs/bytes"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	servicetypes "github.com/irismod/service/types"
 
 	"github.com/irismod/service/exported"
 
@@ -143,14 +143,14 @@ func (k Keeper) HandlerResponse(ctx sdk.Context, requestContextID tmbytes.HexByt
 
 	currentTimestamp := ctx.BlockHeader().Time.Unix()
 	lastBlockHeight := ctx.BlockHeight() - 1
-	lastBlockHash := []byte(ctx.BlockHeader().LastBlockId.Hash)
+	lastBlockHash := ctx.BlockHeader().LastBlockId.Hash
 
 	// get the request id
 	reqID := types.GenerateRequestID(request)
 
 	// generate a random number
-	rand := types.MakePRNG(lastBlockHash, currentTimestamp, request.Consumer, seed, true).GetRand()
-	k.SetRandom(ctx, reqID, types.NewRandom(request.TxHash, lastBlockHeight, rand.FloatString(types.RandPrec)))
+	random := types.MakePRNG(lastBlockHash, currentTimestamp, request.Consumer, seed, true).GetRand()
+	k.SetRandom(ctx, reqID, types.NewRandom(request.TxHash, lastBlockHeight, random.FloatString(types.RandPrec)))
 
 	k.DeleteOracleRandRequest(ctx, requestContextID)
 }

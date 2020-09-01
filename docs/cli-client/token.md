@@ -48,7 +48,7 @@ You can send any tokens you have just like [sending iris](./bank.md#iris-tx-bank
 #### Send tokens
 
 ```bash
-iris tx bank send --from=<key-name> --to=<address> --amount=10kitty --fees=0.3iris --chain-id=irishub --commit
+iris tx bank send [from_key_or_address] [to_address] [amount] [flags]
 ```
 
 ## iris tx token edit

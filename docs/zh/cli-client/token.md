@@ -48,7 +48,7 @@ iris tx token issue --symbol="kitty" --name="Kitty Token" --initial-supply=10000
 #### 发送通证
 
 ```bash
-iris tx bank send --from=<key-name> --to=<address> --amount=10kitty --fees=0.3iris --chain-id=irishub --commit
+iris tx bank send [from_key_or_address] [to_address] [amount] [flags]
 ```
 
 ## iris tx token edit

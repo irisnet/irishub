@@ -71,6 +71,6 @@ iris tx bank send [from_key_or_address] [to_address] [amount] [flags]
 ### 将通证发送到另一个地址
 
 ```bash
-iris tx bank send --from=<key-name> --to=<address> --amount=10iris --fees=0.3iris --chain-id=irishub
+iris tx bank send [from_key_or_address] [to_address] [amount] [flags]
 ```
 
