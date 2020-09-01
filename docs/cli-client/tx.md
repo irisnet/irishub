@@ -17,7 +17,7 @@ Tx module allows you to sign or broadcast transactions
 Sign transactions in generated offline file. The file created with the --generate-only flag.
 
 ```bash
-iriscli tx sign <file> [flags]
+iris tx sign <file> [flags]
 ```
 
 ### Flags

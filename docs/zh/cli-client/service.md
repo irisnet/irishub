@@ -1,4 +1,4 @@
-# iriscli service
+# Service
 
 Service模块允许在IRIS Hub中定义、绑定、调用服务。[了解更多iService内容](../features/service.md)。
 
@@ -199,7 +199,7 @@ iris query service withdraw-addr <provider>
 禁用一个可用的服务绑定。
 
 ```bash
-iriscli tx service disable [service-name] [flags]
+iris tx service disable [service-name] [flags]
 ```
 
 ### 禁用一个可用的服务绑定
@@ -372,7 +372,7 @@ iris tx service respond --chain-id=irishub --from=<key-name> --fees=0.3iris
 通过请求ID查询服务响应。
 
 ```bash
-iriscli service response [request-id] [flags]
+iris query service response [request-id] [flags]
 ```
 
 ### 查询一个服务响应
@@ -461,7 +461,7 @@ iris tx service pause <request-context-id>
 启动一个暂停的请求上下文。
 
 ```bash
-iriscli service start [request-context-id] [flags]
+iris tx service start [request-context-id] [flags]
 ```
 
 ### 启动一个暂停的请求上下文

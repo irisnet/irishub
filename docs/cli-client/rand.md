@@ -39,7 +39,7 @@ iris tx random request-random --block-interval=100 --oracle=true --service-fee-c
 ```
 
 :::tip
-You will get a unique request id if the tx is committed, which can be used to query the status of the request. You can also [query the tx detail](./tendermint.md#iriscli-tendermint-tx) to get the request id.
+You will get a unique request id if the tx is committed, which can be used to query the status of the request. You can also [query the tx detail](./tx.md#iris-query-tx) to get the request id.
 :::
 
 ## iris query random random

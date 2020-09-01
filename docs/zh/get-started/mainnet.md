@@ -40,7 +40,7 @@ iris start
 
 ```bash
 # 创建一个新钱包
-iriscli keys add <key-name>
+iris keys add <key-name>
 ```
 
 :::warning
@@ -54,7 +54,7 @@ iriscli keys add <key-name>
 # apt-get update && apt-get install -y jq
 
 # 如果输出为 false，则表明您的节点已经完成同步
-iriscli status | jq .sync_info.catching_up
+iris status | jq .sync_info.catching_up
 ```
 
 ### 创建验证人
@@ -62,7 +62,7 @@ iriscli status | jq .sync_info.catching_up
 只有节点已完成同步时，才可以运行以下命令将您的节点升级为验证人：
 
 ```bash
-iriscli stake create-validator \
+iris tx staking create-validator \
     --pubkey=$(iris tendermint show-validator) \
     --moniker=<your-validator-name> \
     --amount=<amount-to-be-delegated, e.g. 10000iris> \

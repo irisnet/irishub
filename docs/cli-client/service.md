@@ -348,7 +348,7 @@ iris tx service respond --chain-id=irishub --from=<key-name> --fees=0.3iris
 ```
 
 :::tip
-You can retrieve the `request-id` in the result of [tendermint block](./tendermint.md#iriscli-tendermint-block)
+You can retrieve the `request-id` in the result of tendermint block
 :::
 
 ### Result example
@@ -383,7 +383,7 @@ iris query service response <request-id>
 ```
 
 :::tip
-You can retrieve the `request-id` in the result of [tendermint block](./tendermint.md#iris-query-tendermint-block)
+You can retrieve the `request-id` in the result of tendermint block
 :::
 
 ## iris query service responses

@@ -39,7 +39,7 @@ iris tx random request-random --block-interval=100 --oracle=true --service-fee-c
 ```
 
 :::tip
-如果交易已被执行，你将获得一个唯一的请求ID，该ID可用于查询请求状态。你也可以通过[查询交易详情](./tendermint.md#iriscli-tendermint-tx)获取请求ID。
+如果交易已被执行，你将获得一个唯一的请求ID，该ID可用于查询请求状态。你也可以通过[查询交易详情](./tx.md#iris-query-tx)获取请求ID。
 :::
 
 ## iris query random random
