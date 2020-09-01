@@ -14,7 +14,7 @@ import (
 func BeginBlocker(ctx sdk.Context, k keeper.Keeper) {
 	currentTimestamp := ctx.BlockHeader().Time.Unix()
 	lastBlockHeight := ctx.BlockHeight() - 1
-	lastBlockHash := []byte(ctx.BlockHeader().LastBlockId.Hash)
+	lastBlockHash := ctx.BlockHeader().LastBlockId.Hash
 
 	// get pending random number requests for lastBlockHeight
 	rqIterator := k.IterateRandomRequestQueueByHeight(ctx, lastBlockHeight)

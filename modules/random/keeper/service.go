@@ -143,7 +143,7 @@ func (k Keeper) HandlerResponse(ctx sdk.Context, requestContextID tmbytes.HexByt
 
 	currentTimestamp := ctx.BlockHeader().Time.Unix()
 	lastBlockHeight := ctx.BlockHeight() - 1
-	lastBlockHash := []byte(ctx.BlockHeader().LastBlockId.Hash)
+	lastBlockHash := ctx.BlockHeader().LastBlockId.Hash
 
 	// get the request id
 	reqID := types.GenerateRequestID(request)
