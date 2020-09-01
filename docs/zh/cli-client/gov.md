@@ -6,20 +6,20 @@
 
 | 名称                                            | 描述                                                  |
 | ----------------------------------------------- | ------------------------------------------------------------ |
-| [proposal](#iris-q-gov-proposal)                | 查询单个提案的详细信息                           |
-| [proposals](#iris-q-gov-proposals)              | 使用可选过滤器提案                         |
-| [vote](#iris-q-gov-vote)                        | 查询一次投票的详细信息                               |
-| [votes](#iris-q-gov-votes)                      | 查询提案的投票                                    |
-| [deposit](#iris-q-gov-deposit)                  | 查询摸个抵押人在某个提案的抵押信息                                   |
-| [deposits](#iris-q-gov-deposits)                | 查询提案的所有抵押信息                                 |
-| [tally](#iris-q-gov-tally)                      | 汇总提案投票                            |
-| [param](#iris-q-gov-param)                      | 查询参数                            |
-| [params](#iris-q-gov-params)                    | 查询治理流程的参数               |
+| [proposal](#iris-query-gov-proposal)                | 查询单个提案的详细信息                           |
+| [proposals](#iris-query-gov-proposals)              | 使用可选过滤器提案                         |
+| [vote](#iris-query-gov-vote)                        | 查询一次投票的详细信息                               |
+| [votes](#iris-query-gov-votes)                      | 查询提案的投票                                    |
+| [deposit](#iris-query-gov-deposit)                  | 查询摸个抵押人在某个提案的抵押信息                                   |
+| [deposits](#iris-query-gov-deposits)                | 查询提案的所有抵押信息                                 |
+| [tally](#iris-query-gov-tally)                      | 汇总提案投票                            |
+| [param](#iris-query-gov-param)                      | 查询参数                            |
+| [params](#iris-query-gov-params)                    | 查询治理流程的参数               |
 | [submit-proposal](#iris-tx-gov-submit-proposal) | 提交提案              |
 | [deposit](#iris-tx-gov-deposit)                 | 为有效的提案抵押代币                        |
 | [vote](#iris-tx-gov-vote)                       | 为活跃的提案投票:可选值： yes/no/no_with_veto/abstain |
 
-## iris q gov proposal
+## iris query gov proposal
 
 查询单个提案的详细信息
 
@@ -33,7 +33,7 @@ iris query gov proposal [proposal-id] [flags]
 iris query gov proposal <proposal-id>
 ```
 
-## iris q gov proposals
+## iris query gov proposals
 
 使用可选过滤器提案
 
@@ -62,7 +62,7 @@ iris query gov proposals
 iris query gov proposals --limit=3 --status=Passed --depositor=<iaa...>
 ```
 
-## iris q gov vote
+## iris query gov vote
 
 查询一次投票的详细信息
 
@@ -76,7 +76,7 @@ iris query gov vote [proposal-id] [voter-addr] [flags]
 iris query gov vote <proposal-id> <iaa...>
 ```
 
-## iris q gov votes
+## iris query gov votes
 
 查询提案的投票信息
 
@@ -90,7 +90,7 @@ iris query gov votes [proposal-id] [flags]
 iris query gov votes <proposal-id>
 ```
 
-## iris q gov deposit
+## iris query gov deposit
 
 通过提案ID查询提案中的某个抵押人的抵押信息
 
@@ -104,7 +104,7 @@ iris query gov deposit [proposal-id] [depositer-addr] [flags]
 iris query gov deposit <proposal-id> <iaa...>
 ```
 
-## iris q gov deposits
+## iris query gov deposits
 
 查询提案中所有抵押信息
 
@@ -118,7 +118,7 @@ iris query gov deposits [proposal-id] [flags]
 iris query gov deposits <proposal-id>
 ```
 
-## iris q gov tally
+## iris query gov tally
 
 查询提案的计票结果。 您可以通过运行`iris query gov proposal`来查询提案ID。
 
@@ -132,7 +132,7 @@ iris query gov tally [proposal-id] [flags]
 iris query gov tally <proposal-id>
 ```
 
-## iris q gov param
+## iris query gov param
 
 查询治理过程的参数。
 
@@ -147,7 +147,7 @@ iris query gov param [param-type] [flags]
 > iris query gov param deposit
 ```
 
-## iris q gov params
+## iris query gov params
 
 查询治理过程的所有参数。
 

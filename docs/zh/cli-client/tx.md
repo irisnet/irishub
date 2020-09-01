@@ -9,8 +9,8 @@
 | [sign](#iris-tx-sign)           | 签名生成的离线交易文件   |
 | [broadcast](#iris-tx-broadcast) | 广播一个已签名交易到网络 |
 | [multisig](#iris-tx-multisign)  | 用多个账户为同一交易签名 |
-| [tx](#iris-q-tx)                | 使用交易hash查询交易     |
-| [txs](#iris-q-txs)              | 使用Tag查询交易          |
+| [tx](#iris-query-tx)                | 使用交易hash查询交易     |
+| [txs](#iris-query-txs)              | 使用Tag查询交易          |
 
 ## iris tx sign
 
@@ -127,13 +127,13 @@ iris tx multisign --chain-id=irishub unsigned.json <multisig-keyname> signed-1.j
 
 现在可以[广播](#iris-tx-broadcast)这个已签名交易了。
 
-## iris q tx
+## iris query tx
 
 ```bash
 iris query tx [hash] [flags]
 ```
 
-## iris q txs
+## iris query txs
 
 ```bash
 iris query txs --events 'message.sender=<iaa...>&message.action=xxxx' --page 1 --limit 30

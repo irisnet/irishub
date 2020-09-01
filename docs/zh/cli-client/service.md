@@ -7,30 +7,30 @@ Service模块允许在IRIS Hub中定义、绑定、调用服务。[了解更多i
 | 名称                                                    | 描述                                         |
 | ------------------------------------------------------- | -------------------------------------------- |
 | [define](#iris-tx-service-define)                       | 定义一个新的服务                             |
-| [definition](#iris-q-service-definition)                | 查询服务定义                                 |
+| [definition](#iris-query-service-definition)                | 查询服务定义                                 |
 | [bind](#iris-tx-service-bind)                           | 绑定一个服务                                 |
-| [binding](#iris-q-service-binding)                      | 查询服务绑定                                 |
-| [bindings](#iris-q-service-bindings)                    | 查询服务绑定列表                             |
+| [binding](#iris-query-service-binding)                      | 查询服务绑定                                 |
+| [bindings](#iris-query-service-bindings)                    | 查询服务绑定列表                             |
 | [set-withdraw-addr](#iris-tx-service-set-withdraw-addr) | 设置服务提供者的提取地址                     |
-| [withdraw-addr](#iris-q-service-withdraw-addr)          | 查询服务提供者的提取地址                     |
+| [withdraw-addr](#iris-query-service-withdraw-addr)          | 查询服务提供者的提取地址                     |
 | [update-binding](#iris-tx-service-update-binding)       | 更新一个存在的服务绑定                       |
 | [disable](#iris-tx-service-disable)                     | 禁用一个可用的服务绑定                       |
 | [enable](#iris-tx-service-enable)                       | 启用一个不可用的服务绑定                     |
 | [refund-deposit](#iris-tx-service-refund-deposit)       | 退还一个服务绑定的所有押金                   |
 | [call](#iris-tx-service-call)                           | 发起服务调用                                 |
-| [request](#iris-q-service-request)                      | 通过请求ID查询服务请求                       |
-| [requests](#iris-q-service-requests)                    | 通过服务绑定或请求上下文查询服务请求列表     |
+| [request](#iris-query-service-request)                      | 通过请求ID查询服务请求                       |
+| [requests](#iris-query-service-requests)                    | 通过服务绑定或请求上下文查询服务请求列表     |
 | [respond](#iris-tx-service-respond)                     | 响应服务请求                                 |
-| [response](#iris-q-service-response)                    | 通过请求ID查询服务响应                       |
-| [responses](#iris-q-service-responses)                  | 通过请求上下文ID和批次计数器查询服务响应列表 |
-| [request-context](#iris-q-service-request-context)      | 查询请求上下文                               |
+| [response](#iris-query-service-response)                    | 通过请求ID查询服务响应                       |
+| [responses](#iris-query-service-responses)                  | 通过请求上下文ID和批次计数器查询服务响应列表 |
+| [request-context](#iris-query-service-request-context)      | 查询请求上下文                               |
 | [update](#iris-tx-service-update)                       | 更新请求上下文                               |
 | [pause](#iris-tx-service-pause)                         | 暂停一个正在进行的请求上下文                 |
 | [start](#iris-tx-service-start)                         | 启动一个暂停的请求上下文                     |
 | [kill](#iris-tx-service-kill)                           | 终止请求上下文                               |
-| [fees](#iris-q-service-fees)                            | 查询服务提供者的收益                         |
+| [fees](#iris-query-service-fees)                            | 查询服务提供者的收益                         |
 | [withdraw-fees](#iris-tx-service-withdraw-fees)         | 提取服务提供者的收益                         |
-| [schema](#iris-q-service-schema)                        | 通过 schema 名称查询系统 schema              |
+| [schema](#iris-query-service-schema)                        | 通过 schema 名称查询系统 schema              |
 
 ## iris tx service define
 
@@ -64,12 +64,12 @@ iris tx service define --chain-id=irishub --from=<key-name> --fees=0.3iris
 {"input":{"$schema":"http://json-schema.org/draft-04/schema#","title":"BioIdentify service input","description":"BioIdentify service input specification","type":"object","properties":{"id":{"description":"id","type":"string"},"name":{"description":"name","type":"string"},"data":{"description":"data","type":"string"}},"required":["id","data"]},"output":{"$schema":"http://json-schema.org/draft-04/schema#","title":"BioIdentify service output","description":"BioIdentify service output specification","type":"object","properties":{"data":{"description":"result data","type":"string"}},"required":["data"]}}
 ```
 
-## iris q service definition
+## iris query service definition
 
 查询服务定义。
 
 ```bash
-iris q service definition [service-name] [flags]
+iris query service definition [service-name] [flags]
 ```
 
 ### 查询一个服务定义
@@ -77,7 +77,7 @@ iris q service definition [service-name] [flags]
 查询指定服务定义的详细信息。
 
 ```bash
-iris q service definition <service name>
+iris query service definition <service name>
 ```
 
 ## iris tx service bind
@@ -115,32 +115,32 @@ iris tx service bind --chain-id=irishub --from=<key-name> --fees=0.3iris
 }
 ```
 
-## iris q service binding
+## iris query service binding
 
 查询服务绑定。
 
 ```bash
-iris q service binding [service-name] [provider] [flags]
+iris query service binding [service-name] [provider] [flags]
 ```
 
 ### 查询一个服务绑定
 
 ```bash
-iris q service binding <service name> <provider>
+iris query service binding <service name> <provider>
 ```
 
-## iris q service bindings
+## iris query service bindings
 
 查询服务绑定列表。
 
 ```bash
-iris q service bindings [service-name] [flags]
+iris query service bindings [service-name] [flags]
 ```
 
 ### 查询服务绑定列表
 
 ```bash
-iris q service bindings <service name> --owner=<address>
+iris query service bindings <service name> --owner=<address>
 ```
 
 ## iris tx service update-binding
@@ -180,18 +180,18 @@ iris tx service set-withdraw-addr [withdrawal-address] [flags]
 iris tx service set-withdraw-addr <withdrawal address> --chain-id=irishub --from=<key-name> --fees=0.3iris
 ```
 
-## iris q service withdraw-addr
+## iris query service withdraw-addr
 
 查询服务提供者的提取地址。
 
 ```bash
-iris q service withdraw-addr [provider] [flags]
+iris query service withdraw-addr [provider] [flags]
 ```
 
 ### 查询一个服务提供者的提取地址
 
 ```bash
-iris q service withdraw-addr <provider>
+iris query service withdraw-addr <provider>
 ```
 
 ## iris tx service disable
@@ -285,42 +285,42 @@ iris tx service call --chain-id=irishub --from=<key name> --fees=0.3iris --servi
 }
 ```
 
-## iris q service request
+## iris query service request
 
 通过请求ID查询服务请求。
 
 ```bash
-iris q service request [request-id] [flags]
+iris query service request [request-id] [flags]
 ```
 
 ### 查询一个服务请求
 
 ```bash
-iris q service request <request-id>
+iris query service request <request-id>
 ```
 
 :::tip
-你可以从[按高度获取区块信息](./tendermint.md#iris-q-tendermint-block)的结果中获取`request-id`。
+你可以从[按高度获取区块信息](./tendermint.md#iris-query-tendermint-block)的结果中获取`request-id`。
 :::
 
-## iris q service requests
+## iris query service requests
 
 通过服务绑定或请请求上下文ID查询服务请求列表。
 
 ```bash
-iris q service requests [service-name] [provider] | [request-context-id] [batch-counter] [flags]
+iris query service requests [service-name] [provider] | [request-context-id] [batch-counter] [flags]
 ```
 
 ### 查询服务绑定的活跃请求
 
 ```bash
-iris q service requests <service name> <provider>
+iris query service requests <service name> <provider>
 ```
 
 ### 通过请求上下文ID和批次计数器查询服务请求列表
 
 ```bash
-iris q service requests <request-context-id> <batch-counter>
+iris query service requests <request-context-id> <batch-counter>
 ```
 
 ## iris tx service respond
@@ -347,7 +347,7 @@ iris tx service respond --chain-id=irishub --from=<key-name> --fees=0.3iris
 ```
 
 :::tip
-你可以从[按高度获取区块信息](./tendermint.md#iris-q-tendermint-block)的结果中获取`request-id`。
+你可以从[按高度获取区块信息](./tendermint.md#iris-query-tendermint-block)的结果中获取`request-id`。
 :::
 
 ### 响应结果示例
@@ -367,7 +367,7 @@ iris tx service respond --chain-id=irishub --from=<key-name> --fees=0.3iris
 }
 ```
 
-## iris q service response
+## iris query service response
 
 通过请求ID查询服务响应。
 
@@ -378,39 +378,39 @@ iriscli service response [request-id] [flags]
 ### 查询一个服务响应
 
 ```bash
-iris q service response [request-id] [flags]
+iris query service response [request-id] [flags]
 ```
 
 :::tip
-你可以从[按高度获取区块信息](./tendermint.md#iris-q-tendermint-block)的结果中获取`request-id`。
+你可以从[按高度获取区块信息](./tendermint.md#iris-query-tendermint-block)的结果中获取`request-id`。
 :::
 
-## iris q service responses
+## iris query service responses
 
 通过请求上下文ID以及批次计数器查询服务响应列表。
 
 ```bash
-iris q service responses [request-context-id] [batch-counter] [flags]
+iris query service responses [request-context-id] [batch-counter] [flags]
 ```
 
 ### 根据指定的请求上下文ID以及批次计数器查询服务响应
 
 ```bash
-iris q service responses <request-context-id> <batch-counter>
+iris query service responses <request-context-id> <batch-counter>
 ```
 
-## iris q service request-context
+## iris query service request-context
 
 查询请求上下文。
 
 ```bash
-iris q service request-context [request-context-id] [flags]
+iris query service request-context [request-context-id] [flags]
 ```
 
 ### 查询一个请求上下文
 
 ```bash
-iris q service request-context <request-context-id>
+iris query service request-context <request-context-id>
 ```
 
 :::tip
@@ -484,18 +484,18 @@ iris tx service kill [request-context-id] [flags]
 iris tx service kill <request-context-id>
 ```
 
-## iris q service fees
+## iris query service fees
 
 查询服务提供者的收益。
 
 ```bash
-iris q service  fees [provider] [flags]
+iris query service  fees [provider] [flags]
 ```
 
 ### 查询服务提供者的收益
 
 ```bash
-iris q service fees <provider>
+iris query service fees <provider>
 ```
 
 ## iris tx service withdraw-fees
@@ -512,23 +512,23 @@ iris tx service withdraw-fees [flags]
 iris tx service withdraw-fees --chain-id=irishub --from=<key-name> --fees=0.3iris
 ```
 
-## iris q service schema
+## iris query service schema
 
 通过 schema 名称查询系统 schema。有效的 schema 名称为 `pricing`（服务定价）和 `result`（响应结果）。
 
 ```bash
-iris q service schema [schema-name] [flags]
+iris query service schema [schema-name] [flags]
 ```
 
 ### 查询服务定价 schema
 
 ```bash
-iris q service schema pricing
+iris query service schema pricing
 ```
 
 ### 查询响应结果 schema
 
 ```bash
-iris q service schema result
+iris query service schema result
 ```
 

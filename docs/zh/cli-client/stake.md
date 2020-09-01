@@ -6,43 +6,43 @@ Staking模块提供了一系列查询staking状态和发送staking交易的命�
 
 | 名称                                                         | 描述                                                         |
 | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| [validator](#iris-q-staking-validator)                       | 查询某个验证者                                               |
-| [validators](#iris-q-staking-validators)                     | 查询所有的验证者                                             |
-| [delegation](#iris-q-staking-delegation)                     | 基于委托者地址和验证者地址的委托查询                         |
-| [delegations](#iris-q-staking-delegations)                   | 基于委托者地址的所有委托查询                                 |
-| [delegations-to](#iris-q-staking-delegations-to)             | 查询在某个验证人上的所有委托                                 |
-| [unbonding-delegation](#iris-q-staking-unbonding-delegation) | 基于委托者地址和验证者地址的unbonding-delegation记录查询     |
-| [unbonding-delegations](#iris-q-staking-unbonding-delegations) | 基于委托者地址的所有unbonding-delegation记录查询             |
-| [unbonding-delegations-from](#iris-q-staking-unbonding-delegations-from) | 基于验证者地址的所有unbonding-delegation记录查询             |
-| [redelegations-from](#iris-q-staking-redelegations-from)     | 基于某一验证者的所有转委托查询                               |
-| [redelegation](#iris-q-staking-redelegation)                 | 基于委托者地址，原验证者地址和目标验证者地址的转委托记录查询 |
-| [redelegations](#iris-q-staking-redelegations)               | 基于委托者地址的所有转委托记录查询                           |
-| [pool](#iris-q-staking-pool)                                 | 查询最新的权益池                                             |
-| [params](#iris-q-staking-params)                             | 查询最新的权益参数信息                                       |
-| [historical-info](#iris-q-staking-historical-info)           | 查询给定高度的历史信息                                       |
+| [validator](#iris-query-staking-validator)                       | 查询某个验证者                                               |
+| [validators](#iris-query-staking-validators)                     | 查询所有的验证者                                             |
+| [delegation](#iris-query-staking-delegation)                     | 基于委托者地址和验证者地址的委托查询                         |
+| [delegations](#iris-query-staking-delegations)                   | 基于委托者地址的所有委托查询                                 |
+| [delegations-to](#iris-query-staking-delegations-to)             | 查询在某个验证人上的所有委托                                 |
+| [unbonding-delegation](#iris-query-staking-unbonding-delegation) | 基于委托者地址和验证者地址的unbonding-delegation记录查询     |
+| [unbonding-delegations](#iris-query-staking-unbonding-delegations) | 基于委托者地址的所有unbonding-delegation记录查询             |
+| [unbonding-delegations-from](#iris-query-staking-unbonding-delegations-from) | 基于验证者地址的所有unbonding-delegation记录查询             |
+| [redelegations-from](#iris-query-staking-redelegations-from)     | 基于某一验证者的所有转委托查询                               |
+| [redelegation](#iris-query-staking-redelegation)                 | 基于委托者地址，原验证者地址和目标验证者地址的转委托记录查询 |
+| [redelegations](#iris-query-staking-redelegations)               | 基于委托者地址的所有转委托记录查询                           |
+| [pool](#iris-query-staking-pool)                                 | 查询最新的权益池                                             |
+| [params](#iris-query-staking-params)                             | 查询最新的权益参数信息                                       |
+| [historical-info](#iris-query-staking-historical-info)           | 查询给定高度的历史信息                                       |
 | [create-validator](#iris-tx-staking-create-validator)        | 以自委托的方式创建一个新的验证者                             |
 | [edit-validator](#iris-tx-staking-edit-validator)            | 编辑已存在的验证者信息                                       |
 | [delegate](#iris-tx-staking-delegate)                        | 委托一定代币到某个验证者                                     |
 | [unbond](#iris-tx-staking-unbond)                            | 从指定的验证者解绑一定的股份                                 |
 | [redelegate](#iris-tx-staking-redelegate)                    | 转委托一定的token从一个验证者到另一个验证者                  |
 
-## iris q staking validator
+## iris query staking validator
 
 ### 通过地址查询验证人
 
 ```bash
-iris q staking validator <iva...>
+iris query staking validator <iva...>
 ```
 
-## iris q staking validators
+## iris query staking validators
 
 ### 查询所有验证人
 
 ```bash
-iris q staking validators
+iris query staking validators
 ```
 
-## iris q staking delegation
+## iris query staking delegation
 
 通过委托人地址和验证人地址查询委托交易。
 
@@ -66,32 +66,32 @@ Delegation:
   Height:     26
 ```
 
-## iris q staking delegations
+## iris query staking delegations
 
 查询某个委托人发起的所有委托记录。
 
 ```bash
-iris q staking delegations [delegator-address] [flags]
+iris query staking delegations [delegator-address] [flags]
 ```
 
 ### 查询某个委托人发起的所有委托记录
 
 ```bash
-iris q staking delegations <iaa...>
+iris query staking delegations <iaa...>
 ```
 
-## iris q staking delegations-to
+## iris query staking delegations-to
 
 查询某个验证人接受的所有委托。
 
 ```bash
-iris q staking delegations-to [validator-address] [flags]
+iris query staking delegations-to [validator-address] [flags]
 ```
 
 ### 查询某个验证人接受的所有委托
 
 ```bash
-iris q staking delegations-to <iva...>
+iris query staking delegations-to <iva...>
 ```
 
 示例输出:
@@ -109,78 +109,78 @@ Delegation:
   Height:     26
 ```
 
-## iris q staking unbonding-delegation
+## iris query staking unbonding-delegation
 
 通过委托人与验证人地址查询unbonding-delegation记录。
 
 ```bash
-iris q staking unbonding-delegation [delegator-addr] [validator-addr] [flags]```
+iris query staking unbonding-delegation [delegator-addr] [validator-addr] [flags]```
 ```
 
 ### 查询unbonding-delegation记录
 
 ```bash
-iris q staking unbonding-delegation [delegator-addr] [validator-addr] [flags]```
+iris query staking unbonding-delegation [delegator-addr] [validator-addr] [flags]```
 ```
 
-## iris q staking unbonding-delegations
+## iris query staking unbonding-delegations
 
 ### 查询委托人的所有未绑定委托记录
 
 ```bash
-iris q staking unbonding-delegations <iaa...>
+iris query staking unbonding-delegations <iaa...>
 ```
 
-## iris q staking unbonding-delegations-from
+## iris query staking unbonding-delegations-from
 
 ### 查询验证人的所有未绑定委托记录
 
 ```bash
-iris q staking unbonding-delegations-from <iva...>
+iris query staking unbonding-delegations-from <iva...>
 ```
 
-## iris q staking redelegations-from
+## iris query staking redelegations-from
 
 查询验证人的所有转委托记录。
 
 ```bash
-iris q staking redelegations-from [validator-address] [flags]
+iris query staking redelegations-from [validator-address] [flags]
 ```
 
 ### 查询验证人的所有转委托记录
 
 ```bash
-iris q staking redelegations-from <iva...>
+iris query staking redelegations-from <iva...>
 ```
 
-## iris q staking redelegation
+## iris query staking redelegation
 
 通过委托人地址、原验证人地址、目标验证人地址查询转委托记录。
 
 ```bash
-iris q staking redelegation [delegator-addr] [src-validator-addr] [dst-validator-addr] [flags]
+iris query staking redelegation [delegator-addr] [src-validator-addr] [dst-validator-addr] [flags]
 ```
 
 ### 查询转委托记录
 
 ```bash
-iris q staking redelegation <iaa...> <iva...> <iva...> 
+iris query staking redelegation <iaa...> <iva...> <iva...> 
 ```
 
-## iris q staking redelegations
+## iris query staking redelegations
 
 ### 查询委托人的所有转委托记录
 
 ```bash
-iris q staking redelegations <iaa...>
+iris query staking redelegations <iaa...>
 ```
 
-## iris q staking pool
+## iris query staking pool
 
 ### 查询当前权益池
 
 ```bash
-iris q staking pool
+iris query staking pool
 ```
 
 示例输出:
@@ -193,20 +193,20 @@ Pool:
   Bonded Ratio:   0.2952602076
 ```
 
-## iris q staking params
+## iris query staking params
 
 ### 查询当前权益参数信息
 
 ```bash
-iris q staking params
+iris query staking params
 ```
 
-## iris q staking historical-info
+## iris query staking historical-info
 
 ### 查询给定高度的历史信息
 
 ```bash
-iris q staking historical-info <height>
+iris query staking historical-info <height>
 ```
 
 ## iris tx staking create-validator

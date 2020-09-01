@@ -6,43 +6,43 @@ Staking module provides a set of subcommands to query staking state and send sta
 
 | Name                                                         | Description                                                  |
 | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| [validator](#iris-q-staking-validator)                       | Query a validator                                            |
-| [validators](#iris-q-staking-validators)                     | Query for all validators                                     |
-| [delegation](#iris-q-staking-delegation)                     | Query a delegation based on address and validator address    |
-| [delegations](#iris-q-staking-delegations)                   | Query all delegations made from one delegator                |
-| [delegations-to](#iris-q-staking-delegations-to)             | Query all delegations to one validator                       |
-| [unbonding-delegation](#iris-q-staking-unbonding-delegation) | Query an unbonding-delegation record based on delegator and validator address |
-| [unbonding-delegations](#iris-q-staking-unbonding-delegations) | Query all unbonding-delegations records for one delegator    |
-| [unbonding-delegations-from](#iris-q-staking-unbonding-delegations-from) | Query all unbonding delegatations from a validator           |
-| [redelegations-from](#iris-q-staking-redelegations-from)     | Query all outgoing redelegatations from a validator          |
-| [redelegation](#iris-q-staking-redelegation)                 | Query a redelegation record based on delegator and a source and destination validator address |
-| [redelegations](#iris-q-staking-redelegations)               | Query all redelegations records for one delegator            |
-| [pool](#iris-q-staking-pool)                                 | Query the current staking pool values                        |
-| [params](#iris-q-staking-params)                             | Query the current staking parameters information             |
-| [historical-info](#iris-q-staking-historical-info)           | Query historical info at given height                        |
+| [validator](#iris-query-staking-validator)                       | Query a validator                                            |
+| [validators](#iris-query-staking-validators)                     | Query for all validators                                     |
+| [delegation](#iris-query-staking-delegation)                     | Query a delegation based on address and validator address    |
+| [delegations](#iris-query-staking-delegations)                   | Query all delegations made from one delegator                |
+| [delegations-to](#iris-query-staking-delegations-to)             | Query all delegations to one validator                       |
+| [unbonding-delegation](#iris-query-staking-unbonding-delegation) | Query an unbonding-delegation record based on delegator and validator address |
+| [unbonding-delegations](#iris-query-staking-unbonding-delegations) | Query all unbonding-delegations records for one delegator    |
+| [unbonding-delegations-from](#iris-query-staking-unbonding-delegations-from) | Query all unbonding delegatations from a validator           |
+| [redelegations-from](#iris-query-staking-redelegations-from)     | Query all outgoing redelegatations from a validator          |
+| [redelegation](#iris-query-staking-redelegation)                 | Query a redelegation record based on delegator and a source and destination validator address |
+| [redelegations](#iris-query-staking-redelegations)               | Query all redelegations records for one delegator            |
+| [pool](#iris-query-staking-pool)                                 | Query the current staking pool values                        |
+| [params](#iris-query-staking-params)                             | Query the current staking parameters information             |
+| [historical-info](#iris-query-staking-historical-info)           | Query historical info at given height                        |
 | [create-validator](#iris-tx-staking-create-validator)        | Create new validator initialized with a self-delegation to it |
 | [edit-validator](#iris-tx-staking-edit-validator)            | Edit existing validator account                              |
 | [delegate](#iris-tx-staking-delegate)                        | Delegate liquid tokens to an validator                       |
 | [unbond](#iris-tx-staking-unbond)                            | Unbond shares from a validator                               |
 | [redelegate](#iris-tx-staking-redelegate)                    | Redelegate illiquid tokens from one validator to another     |
 
-## iris q staking validator
+## iris query staking validator
 
 ### Query a validator by validator address
 
 ```bash
-iris q staking validator <iva...>
+iris query staking validator <iva...>
 ```
 
-## iris q staking validators
+## iris query staking validators
 
 ### Query all validators
 
 ```bash
-iris q staking validators
+iris query staking validators
 ```
 
-## iris q staking delegation
+## iris query staking delegation
 
 Query a delegation based on delegator address and validator address.
 
@@ -66,32 +66,32 @@ Delegation:
   Height:     26
 ```
 
-## iris q staking delegations
+## iris query staking delegations
 
 Query all delegations delegated from one delegator.
 
 ```bash
-iris q staking delegations [delegator-address] [flags]
+iris query staking delegations [delegator-address] [flags]
 ```
 
 ### Query all delegations of a delegator
 
 ```bash
-iris q staking delegations <iaa...>
+iris query staking delegations <iaa...>
 ```
 
-## iris q staking delegations-to
+## iris query staking delegations-to
 
 Query all delegations to one validator.
 
 ```bash
-iris q staking delegations-to [validator-address] [flags]
+iris query staking delegations-to [validator-address] [flags]
 ```
 
 ### Query all delegations to one validator
 
 ```bash
-iris q staking delegations-to <iva...>
+iris query staking delegations-to <iva...>
 ```
 
 Example Output:
@@ -109,78 +109,78 @@ Delegation:
   Height:     26
 ```
 
-## iris q staking unbonding-delegation
+## iris query staking unbonding-delegation
 
 Query an unbonding-delegation record based on delegator and validator address.
 
 ```bash
-iris q staking unbonding-delegation [delegator-addr] [validator-addr] [flags]```
+iris query staking unbonding-delegation [delegator-addr] [validator-addr] [flags]```
 ```
 
 ### Query an unbonding delegation record
 
 ```bash
-iris q staking unbonding-delegation <iaa...> <iva...>
+iris query staking unbonding-delegation <iaa...> <iva...>
 ```
 
-## iris q staking unbonding-delegations
+## iris query staking unbonding-delegations
 
 ### Query all unbonding delegations records of a delegator
 
 ```bash
-iris q staking unbonding-delegations <iaa...>
+iris query staking unbonding-delegations <iaa...>
 ```
 
-## iris q staking unbonding-delegations-from
+## iris query staking unbonding-delegations-from
 
 ### Query all unbonding delegations from a validator
 
 ```bash
-iris q staking unbonding-delegations-from <iva...>
+iris query staking unbonding-delegations-from <iva...>
 ```
 
-## iris q staking redelegations-from
+## iris query staking redelegations-from
 
 Query all outgoing redelegations of a validator
 
 ```bash
-iris q staking redelegations-from [validator-address] [flags]
+iris query staking redelegations-from [validator-address] [flags]
 ```
 
 ### Query all outgoing redelegatations of a validator
 
 ```bash
-iris q staking redelegations-from <iva...>
+iris query staking redelegations-from <iva...>
 ```
 
-## iris q staking redelegation
+## iris query staking redelegation
 
 Query a redelegation record based on delegator and source validator address and destination validator address.
 
 ```bash
-iris q staking redelegation [delegator-addr] [src-validator-addr] [dst-validator-addr] [flags]
+iris query staking redelegation [delegator-addr] [src-validator-addr] [dst-validator-addr] [flags]
 ```
 
 ### Query a redelegation record
 
 ```bash
-iris q staking redelegation <iaa...> <iva...> <iva...> 
+iris query staking redelegation <iaa...> <iva...> <iva...> 
 ```
 
-## iris q staking redelegations
+## iris query staking redelegations
 
 ### Query all redelegations records of a delegator
 
 ```bash
-iris q staking redelegations <iaa...>
+iris query staking redelegations <iaa...>
 ```
 
-## iris q staking pool
+## iris query staking pool
 
 ### Query the current staking pool values
 
 ```bash
-iris q staking pool
+iris query staking pool
 ```
 
 Example Output:
@@ -193,20 +193,20 @@ Pool:
   Bonded Ratio:   0.2952602076
 ```
 
-## iris q staking params
+## iris query staking params
 
 ### Query the current staking parameters information
 
 ```bash
-iris q staking params
+iris query staking params
 ```
 
-## iris q staking historical-info
+## iris query staking historical-info
 
 ### Query historical info at given height
 
 ```bash
-iris q staking historical-info <height>
+iris query staking historical-info <height>
 ```
 
 ## iris tx staking create-validator
