@@ -1,122 +1,221 @@
 # Governance
 
-## Basic Function Description
+## Concepts
 
-1. On-chain governance proposals on plain text
-2. On-chain governance proposals on parameter change
-3. On-chain governance proposals on software upgrade
-4. On-chain governance proposals on software halt
-5. On-chain governance proposals on tax usage
+The governance process is divided in a few steps that are outlined below:
 
-## Interactive process
+- **Proposal submission:** Proposal is submitted to the blockchain with a
+  deposit.
 
-### Proposal Level
+- **Vote:** Once deposit reaches a certain value (`MinDeposit`), proposal is
+  confirmed and vote opens. Bonded Iris holders can then send `TxGovVote`
+  transactions to vote on the proposal.
 
-Specific Proposal for different levels:
+- If the proposal involves a software upgrade:
+  
+  - **Signal:** Validators start signaling that they are ready to switch to the
+    new version.
 
-- Critical：`SoftwareUpgrade`, `SystemHalt`
-- Important：`Parameter`, `CommunityTaxUsage`, `TokenAddition`
-- Normal：`PlainText`
+  - **Switch:** Once more than 75% of validators have signaled that they are
+    ready to switch, their software automatically flips to the new version.
 
-`SoftwareUpgrade Proposal` and `SystemHalt Proposal` can only be submitted by the profiler.
+### Proposal submission
 
-Different levels correspond to different parameters：
+#### Right to submit a proposal
 
-| GovParams     | Critical  | Important | Normal      | Range                  |
-| ------------- | --------- | --------- | ----------- | ---------------------- |
-| MinDeposit    | 4000 iris | 2000 iris | 1000 iris   | [10iris,10000iris]     |
-| DepositPeriod | 24 hours  | 24 hours  | 24 hours    | [20s,3d]               |
-| VotingPeriod  | 120 hours | 120 hours | 120 hours   | [20s,7d]               |
-| MaxNum        | 1         | 5         | 7           | Critical==1, other(1,) |
-| Participation | 0.5       | 0.5       | 0.5 |(0,1)  |                        |
-| Threshold     | 0.75      | 0.67      | 0.5 |(0,1)  |                        |
-| Veto          | 0.33      | 0.33      | 0.33 |(0,1) |                        |
-| Penalty       | 0         | 0         | 0 |(0,1)    |                        |
+Any Iris holder, whether bonded or unbonded, can submit proposals by sending a
+`TxGovProposal` transaction. Once a proposal is submitted, it is identified by
+its unique `proposalID`.
 
-- `MinDeposit`  The minimum of  deposit
-- `DepositPeriod`  Window period for deposit
-- `VotingPeriod` Window period for voting
-- `MaxNum` The maximum number of proposal that can exist at the same time
-- `Penalty`   The proportion of the slash
-- `Veto`  the power of Veto / all voted power
-- `Threshold` the power of Yes / all voted power
-- `Participation` all voted power / total voting power
+#### Proposal types
 
-### Deposit Procedure
+In the initial version of the governance module, there are two types of
+proposal:
 
-The proposer at least deposit more the 30% amount of `MinDeposit` to submit a proposal, when the total deposit amount exceeds `MinDeposit`, the proposal enter the voting procedure. If the time exceeds `MaxDepositPeriod` and the total deposit has not yet exceeded `MinDeposit`, the proposal will be deleted and the full deposit won't be refunded. It is not allowed to deposit a proposal which is in voting procedure.
+- `PlainTextProposal` All the proposals that do not involve a modification of
+  the source code go under this type. For example, an opinion poll would use a
+  proposal of type `PlainTextProposal`.
 
-### Voting Procedure
+- `SoftwareUpgradeProposal`. If accepted, validators are expected to update
+  their software in accordance with the proposal. They must do so by following
+  a 2-steps process described in the [Software Upgrade](#software-upgrade)
+  section below. Software upgrade roadmap may be discussed and agreed on via
+  `PlainTextProposals`, but actual software upgrades must be performed via
+  `SoftwareUpgradeProposals`.
 
-Only the validator and delegator can vote , and they can't vote twice for one proposal. The voting options are `Yes` , `Abstain` , `No` , `NoWithVeto` .
+Other modules may expand upon the governance module by implementing their own
+proposal types and handlers. These types are registered and processed through the
+governance module (eg. `ParamChangeProposal`), which then execute the respective
+module's proposal handler when a proposal passes. This custom handler may perform
+arbitrary state changes.
 
-### Tallying Procedure
+### Deposit
 
-There are three tallying results: `PASS`, `REJECT`, `REJECTVETO`.
+To prevent spam, proposals must be submitted with a deposit in the coins defined in the `MinDeposit` param. The voting period will not start until the proposal's deposit equals `MinDeposit`.
 
-On the premise that the `voting_power of all voters` / `total voting_power of the system` exceeds `participation`, if the ratio of `NoWithVeto` voting power to all voters' voting power over `veto`, the result is `REJECTVETO`. Then if the ratio of `Yes` voting power to all voter's voting power over `threshold`, the result is `PASS`. Otherwise, the result is `REJECT`.
+When a proposal is submitted, it has to be accompanied by a deposit that must be strictly positive, but can be inferior to `MinDeposit`. The submitter doesn't need to pay for the entire deposit on their own. If a proposal's deposit is inferior to `MinDeposit`, other token holders can increase the proposal's deposit by sending a `Deposit` transaction. The deposit is kept in an escrow in the governance `ModuleAccount` until the proposal is finalized (passed or rejected).
 
-### Burning Mechanism
+Once the proposal's deposit reaches `MinDeposit`, it enters voting period. If proposal's deposit does not reach `MinDeposit` before `MaxDepositPeriod`, proposal closes and nobody can deposit on it anymore.
 
-Whether the proposal is passed or not, 20% `Deposit` will be burned for the cost of governance. The remaining `Deposit` will be returned. But if the result of proposal is `REJECTVETO`,  all `Deposit` will be burned.
+#### Deposit refund and burn
 
-### Slashing Mechanism
+When a proposal finalized, the coins from the deposit are either refunded or burned, according to the final tally of the proposal:
 
-The validator should be slashed according to the proportion of `Penalty` if he fails to vote for a proposal.
+- If the proposal is approved or if it's rejected but _not_ vetoed, deposits will automatically be refunded to their respective depositor (transferred from the governance `ModuleAccount`).
 
-If the validator quit from validator set in voting procedure, then he wont be slashed.
+- When the proposal is vetoed with a supermajority, deposits be burned from the governance `ModuleAccount`.
+
+### Vote
+
+#### Participants
+
+_Participants_ are users that have the right to vote on proposals. On the
+Cosmos Hub, participants are bonded Iris holders. Unbonded Iris holders and
+other users do not get the right to participate in governance. However, they
+can submit and deposit on proposals.
+
+Note that some _participants_ can be forbidden to vote on a proposal under a
+certain validator if:
+
+- _participant_ bonded or unbonded Iris to said validator after proposal
+  entered voting period.
+
+- _participant_ became validator after proposal entered voting period.
+
+This does not prevent _participant_ to vote with Iris bonded to other
+validators. For example, if a _participant_ bonded some Iris to validator A
+before a proposal entered voting period and other Iris to validator B after
+proposal entered voting period, only the vote under validator B will be
+forbidden.
+
+#### Voting period
+
+Once a proposal reaches `MinDeposit`, it immediately enters `Voting period`. We
+define `Voting period` as the interval between the moment the vote opens and
+the moment the vote closes. `Voting period` should always be shorter than
+`Unbonding period` to prevent double voting. The initial value of
+`Voting period` is 2 weeks.
+
+#### Option set
+
+The option set of a proposal refers to the set of choices a participant can
+choose from when casting its vote.
+
+The initial option set includes the following options:
+
+- `Yes`
+- `No`
+- `NoWithVeto`
+- `Abstain`
+
+`NoWithVeto` counts as `No` but also adds a `Veto` vote. `Abstain` option
+allows voters to signal that they do not intend to vote in favor or against the
+proposal but accept the result of the vote.
+
+_Note: from the UI, for urgent proposals we should maybe add a ‘Not Urgent’
+option that casts a `NoWithVeto` vote._
+
+#### Quorum
+
+Quorum is defined as the minimum percentage of voting power that needs to be
+casted on a proposal for the result to be valid.
+
+#### Threshold
+
+Threshold is defined as the minimum proportion of `Yes` votes (excluding
+`Abstain` votes) for the proposal to be accepted.
+
+Initially, the threshold is set at 50% with a possibility to veto if more than
+1/3rd of votes (excluding `Abstain` votes) are `NoWithVeto` votes. This means
+that proposals are accepted if the proportion of `Yes` votes (excluding
+`Abstain` votes) at the end of the voting period is superior to 50% and if the
+proportion of `NoWithVeto` votes is inferior to 1/3 (excluding `Abstain`
+votes).
+
+Proposals can be accepted before the end of the voting period if they meet a special condition. Namely, if the ratio of `Yes` votes to `InitTotalVotingPower`exceeds 2:3, the proposal will be immediately accepted, even if the `Voting period` is not finished. `InitTotalVotingPower` is the total voting power of all bonded Iris holders at the moment when the vote opens.
+This condition exists so that the network can react quickly in case of urgency.
+
+#### Inheritance
+
+If a delegator does not vote, it will inherit its validator vote.
+
+- If the delegator votes before its validator, it will not inherit from the
+  validator's vote.
+
+- If the delegator votes after its validator, it will override its validator
+  vote with its own. If the proposal is urgent, it is possible
+  that the vote will close before delegators have a chance to react and
+  override their validator's vote. This is not a problem, as proposals require more than 2/3rd of the total voting power to pass before the end of the voting period. If more than 2/3rd of validators collude, they can censor the votes of delegators anyway.
+
+#### Validator’s punishment for non-voting
+
+At present, validators are not punished for failing to vote.
+
+#### Governance address
+
+Later, we may add permissioned keys that could only sign txs from certain modules. For the MVP, the `Governance address` will be the main validator address generated at account creation. This address corresponds to a different PrivKey than the Tendermint PrivKey which is responsible for signing consensus messages. Validators thus do not have to sign governance transactions with the sensitive Tendermint PrivKey.
+
+### Software Upgrade
+
+The governance process for the software upgrade is described in [`Upgrade`](../upgrade.md)
 
 ## Usage Scenario
 
-### Usage scenario of parameter change
+### Parameter change
 
-Change the parameters through the command lines
+The parameters of modules can be changed by demand through a proposal of parameter change.
 
 ```bash
-# Query parameters can be changed by the modules'name in gov
-iriscli params --module=mint
+# Query module parameters which can be changed through gov. e.g. query the service params
+iris query service params
 
-# Result
-Mint Params:
-  mint/Inflation=0.0400000000
+# Parameter list
+arbitration_time_limit: 432000s
+base_denom: stake
+complaint_retrospect: 1296000s
+max_request_timeout: "100"
+min_deposit:
+- amount: "6000"
+  denom: stake
+min_deposit_multiple: "200"
+service_fee_tax: "0.100000000000000000"
+slash_fraction: "0.001000000000000000"
+tx_size_limit: "4000"
 
 # Send proposal for parameters change
-iriscli gov submit-proposal --title=<title> --description=<description> --type=Parameter --deposit=8iris --param="mint/Inflation=0.0000000000" --from=<key-name> --chain-id=irishub --fee=0.3iris --commit
+echo '{
+  "title": "Service Param Change",
+  "description": "Update max request timeout",
+  "changes": [
+    {
+      "subspace": "service",
+      "key": "MaxRequestTimeout",
+      "value": 150
+    }
+  ],
+  "deposit": "1000iris"
+}' > proposal.json
 
-# Deposit for a proposal
-iriscli gov deposit --proposal-id=<proposal-id> --deposit=1000iris --from=<key-name> --chain-id=irishub --fee=0.3iris --commit
-
-# Vote for a proposal
-iriscli gov vote --proposal-id=<proposal-id> --option=Yes --from=<key-name> --chain-id=irishub --fee=0.3iris --commit
-
-# Query the state of a proposal
-iriscli gov query-proposal --proposal-id=<proposal-id>
+iris tx gov submit-proposal param-change proposal.json --from=<key-name> --fees=0.3iris --chain-id=irishub -b block -y
 ```
 
-### Proposals on community funds usage
+### Community pool spending
 
-There are three usages, `Burn`, `Distribute` and `Grant`. `Burn` means burning tokens from community funds. `Grant` will transfer tokens from community funds to the destination address. `Distribute` will transfer tokens from community funds to the destination `trustee` address, and then will be assigned to other addresses by the `trustee` account.
+The community pool funds can be spent through the governance process.
 
 ```bash
-# Submit Burn usage proposal
-iriscli gov submit-proposal --title="burn tokens 5%" --description=<description> --type="CommunityTaxUsage" --usage="Burn" --deposit="10iris" --percent=0.05 --from=<key-name> --chain-id=irishub --fee=0.3iris --commit
+# Submit a proposal for community pool spending
+echo '{
+  "title": "Community Pool Spend",
+  "description": "Developer rewards",
+  "recipient": "iaa1s5afhd6gxevu37mkqcvvsj8qeylhn0rz46zdlq",
+  "amount": "10000iris",
+  "deposit": "1000iris"
+}' > proposal.json
 
-# Submit Distribute usage proposal
-iriscli gov submit-proposal --title="distribute tokens 5%" --description="test" --type="CommunityTaxUsage" --usage="Distribute" --deposit="10iris" --percent=0.05 --dest-address=<dest-address (only trustees)> --from=<key-name> --chain-id=irishub --fee=0.3iris --commit
-
-# Submit Grant usage proposal
-iriscli gov submit-proposal --title="grant tokens 5%" --description="test" --type="CommunityTaxUsage" --usage="Grant" --deposit="10iris" --percent=0.05 --dest-address=<dest-address (only trustees)> --from=<key-name> --chain-id=irishub --fee=0.3iris --commit
+iris tx gov submit-proposal community-pool-spend proposal.json --from=<key-name> --fees=0.3iris --chain-id=irishub -b block -y
 ```
 
-### Proposals on system halting
+### Software upgrade
 
-Sending this proposal which can terminate the system, the node will be closed after systemHaltHeight (= proposal height + systemHaltPeriod), and only `query-only` mode is available after re-starting the node.
-
-```bash
-# submit the SystemHaltProposal
-iriscli gov submit-proposal --title=<title> --description=<description> --type=SystemHalt --deposit=10iris --fee=0.3iris --from=<key-name> --chain-id=irishub --commit
-```
-
-### Proposals on software upgrade
-
-Detail in [Upgrade](upgrade.md)
+Usage on the software upgrade is introduced in [`Upgrade`](../upgrade.md)
