@@ -10,7 +10,7 @@ import (
 	"github.com/irisnet/irishub/modules/random/types"
 )
 
-// BeginBlocker handles block beginning logic for rand
+// BeginBlocker handles block beginning logic for random
 func BeginBlocker(ctx sdk.Context, k keeper.Keeper) {
 	currentTimestamp := ctx.BlockHeader().Time.Unix()
 	lastBlockHeight := ctx.BlockHeight() - 1
@@ -52,8 +52,8 @@ func BeginBlocker(ctx sdk.Context, k keeper.Keeper) {
 			reqID := types.GenerateRequestID(request)
 
 			// generate a random number
-			rand := types.MakePRNG(lastBlockHash, currentTimestamp, request.Consumer, nil, false).GetRand()
-			k.SetRandom(ctx, reqID, types.NewRandom(request.TxHash, lastBlockHeight, rand.FloatString(types.RandPrec)))
+			random := types.MakePRNG(lastBlockHash, currentTimestamp, request.Consumer, nil, false).GetRand()
+			k.SetRandom(ctx, reqID, types.NewRandom(request.TxHash, lastBlockHeight, random.FloatString(types.RandPrec)))
 
 			// remove the request
 			k.DequeueRandomRequest(ctx, lastBlockHeight, reqID)
@@ -62,13 +62,13 @@ func BeginBlocker(ctx sdk.Context, k keeper.Keeper) {
 				sdk.NewEvent(
 					types.EventTypeGenerateRandom,
 					sdk.NewAttribute(types.AttributeKeyRequestID, hex.EncodeToString(reqID)),
-					sdk.NewAttribute(types.AttributeKeyRandom, rand.String()),
+					sdk.NewAttribute(types.AttributeKeyRandom, random.String()),
 				),
 			)
 			handledNormalRandReqNum++
 		}
 	}
 
-	k.Logger(ctx).Info(fmt.Sprintf("%d rand requests are handled", handledNormalRandReqNum))
+	k.Logger(ctx).Info(fmt.Sprintf("%d random requests are handled", handledNormalRandReqNum))
 	return
 }

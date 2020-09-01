@@ -5,11 +5,13 @@ import (
 	"math/big"
 	"testing"
 
-	"github.com/cosmos/cosmos-sdk/codec"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/suite"
+
 	"github.com/tendermint/tendermint/crypto"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
+
+	"github.com/cosmos/cosmos-sdk/codec"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/irisnet/irishub/modules/random/keeper"
 	"github.com/irisnet/irishub/modules/random/types"
@@ -50,12 +52,12 @@ func TestKeeperTestSuite(t *testing.T) {
 }
 
 func (suite *KeeperTestSuite) TestSetRandom() {
-	rand := types.NewRandom(types.SHA256(testTxBytes), testHeight, big.NewRat(testRandomNumerator, testRandomDenomiator).FloatString(types.RandPrec))
-	suite.keeper.SetRandom(suite.ctx, testReqID, rand)
+	random := types.NewRandom(types.SHA256(testTxBytes), testHeight, big.NewRat(testRandomNumerator, testRandomDenomiator).FloatString(types.RandPrec))
+	suite.keeper.SetRandom(suite.ctx, testReqID, random)
 
 	storedRandom, err := suite.keeper.GetRandom(suite.ctx, testReqID)
 	suite.NoError(err)
-	randJson, _ := json.Marshal(rand)
+	randJson, _ := json.Marshal(random)
 	storedRandomJson, _ := json.Marshal(storedRandom)
 	suite.Equal(string(randJson), string(storedRandomJson))
 }

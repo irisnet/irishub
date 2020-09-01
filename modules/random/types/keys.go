@@ -5,8 +5,8 @@ import (
 )
 
 const (
-	// ModuleName is the name of the rand module
-	ModuleName = "rand"
+	// ModuleName is the name of the random module
+	ModuleName = "random"
 
 	// StoreKey is the string store representation
 	StoreKey = ModuleName
@@ -20,7 +20,7 @@ const (
 
 var (
 	KeyDelimiter              = []byte(":")                   // key delimiter
-	PrefixRandom              = []byte("rands:")              // key prefix for the random number
+	PrefixRandom              = []byte("randoms:")            // key prefix for the random number
 	PrefixRandomRequestQueue  = []byte("randRequestQueue:")   // key prefix for the random number request queue
 	PrefixOracleRandomRequest = []byte("oracleRandRequests:") // key prefix for the oracle request
 )

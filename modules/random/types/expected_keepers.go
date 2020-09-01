@@ -1,11 +1,13 @@
 package types
 
 import (
+	tmbytes "github.com/tendermint/tendermint/libs/bytes"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+
 	service "github.com/irismod/service/exported"
 	servicetypes "github.com/irismod/service/types"
-	tmbytes "github.com/tendermint/tendermint/libs/bytes"
 )
 
 // accountKeeper defines the expected account keeper used for simulations (noalias)
