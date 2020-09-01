@@ -1,96 +1,126 @@
 # Software Upgrade
 
-## Introduction
+## Concepts
 
-The module supports the infrastructure of the blockchain software upgrade. IRIShub will be upgraded to the new version after an Upgrade Proposal is passed and is fully compatible with the historical data on the blockchain.
+### Plan
 
-## Interaction Process
+The `Upgrade` module defines a `Plan` type in which a live upgrade is scheduled
+to occur. A `Plan` can be scheduled at a specific block height or time, but not both.
+A `Plan` is created once a (frozen) release candidate along with an appropriate upgrade
+`Handler` (see below) is agreed upon, where the `Name` of a `Plan` corresponds to a
+specific `Handler`. Typically, a `Plan` is created through a governance proposal
+process, where if voted upon and passed, will be scheduled. The `Info` of a `Plan`
+may contain various metadata about the upgrade, typically application specific
+upgrade info to be included on-chain such as a git commit that validators could
+automatically upgrade to.
 
-### Governance process of software upgrade proposal
+#### Sidecar Process
 
-1. Submit a software upgrade proposal and vote to make the proposal pass
-2. More details about governance process is in GOV [User Guide](governance.md)
+If an operator running the application binary also runs a sidecar process to assist
+in the automatic download and upgrade of a binary, the `Info` allows this process to
+be seamless. Namely, the `Upgrade` module fulfills the
+[Irisd Upgradeable Binary Specification]()
+specification and `irisd` can optionally be used to fully automate the upgrade
+process for node operators. By populating the `Info` field with the necessary information,
+binaries can automatically be downloaded. See [here]()
+for more info.
 
-### The process of software upgrade
-
-1. Install a new software.
-2. Once reach the `switch-height` determined by `SoftwareUpgradeProposal`, it will be counted whether the proportion of voting power of upgraded software exceeds threshold determined by `SoftwareUpgradeProposal`.
-3. If it exceeds threshold, the software will be upgraded, otherwise the upgrade fails.
-4. For validators who fail to upgrade in time, it is necessary to install and run the new version of the software.
-
-## Usage Scenarios
-
-You need to start a local testnet first:
-
-### Submit a software upgrade proposal
-
-```bash
-# Send an upgrade proposal
-iriscli gov submit-proposal --title=<title> --description=<description> --type="SoftwareUpgrade" --deposit=100iris --from=<key-name> --chain-id=irishub --fee=0.3iris --software=https://github.com/irisnet/irishub/tree/v0.13.1 --version=2 --switch-height=80 --threshold=0.9 --commit
-
-# Deposit for a proposal
-iriscli gov deposit --proposal-id=<proposal-id> --deposit=1000iris --from=<key-name> --chain-id=irishub --fee=0.3iris --commit
-
-# Vote for a proposal
-iriscli gov vote --proposal-id=<proposal-id> --option=Yes --from=<key-name> --chain-id=irishub --fee=0.3iris --commit
-
-# Query the state of a proposal
-iriscli gov query-proposal --proposal-id=<proposal-id>
+```go
+type Plan struct {
+  Name   string
+  Time   Time
+  Height int64
+  Info   string
+}
 ```
 
-### Upgrade software
+### Handler
 
-* Scenario 1
+The `Upgrade` module facilitates upgrading from major version X to major version Y. To
+accomplish this, node operators must first upgrade their current binary to a new
+binary that has a corresponding `Handler` for the new version Y. It is assumed that
+this version has fully been tested and approved by the community at large. This
+`Handler` defines what state migrations need to occur before the new binary Y
+can successfully run the chain. Naturally, this `Handler` is application specific
+and not defined on a per-module basis. Registering a `Handler` is done via
+`Keeper#SetUpgradeHandler` in the application.
 
-Implement following operations at the certain height（80 block height）:
-
-```bash
-# 1. Download the new version:iris1
-
-# 2. Close the old one
-kill -f iris
-
-# 3. Install the new version, iris1 and start it（copy to bin）
-iris1 start --home=<path-to-your-home>
-
-# 4. Upgrade automatically when reach the switch-height
-
-# 5. Query whether the current version has been successfully upgraded
-iriscli upgrade info --trust-node
+```go
+type UpgradeHandler func(Context, Plan)
 ```
 
-* Scenario 2
+During each `EndBlock` execution, the `Upgrade` module checks if there exists a
+`Plan` that should execute (is scheduled at that time or height). If so, the corresponding
+`Handler` is executed. If the `Plan` is expected to execute but no `Handler` is registered
+or if the binary was upgraded too early, the node will gracefully panic and exit.
 
-The operations in Scenario 1 haven't been implemented at the certain time (80 block height), report apphash conflicts errors after the new version become valid:
+### StoreLoader
 
-```bash
-# 1. Download the new version, iris1
+The `Upgrade` module also facilitates store migrations as part of the upgrade. The
+`StoreLoader` sets the migrations that need to occur before the new binary can 
+successfully run the chain. This `StoreLoader` is also application specific and 
+not defined on a per-module basis. Registering this `StoreLoader` is done via
+`app#SetStoreLoader` in the application.
 
-# 2. Close the old one
-kill -f iris
-
-# 3. Install the new version iris1 and start it
-iris1 start --home=<path-to-your-home>
-
-# 4. Query whether the current version has been successfully upgraded
-iriscli upgrade info --trust-node
+```go
+func UpgradeStoreLoader (upgradeHeight int64, storeUpgrades *store.StoreUpgrades) baseapp.StoreLoader
 ```
 
-## Command details
+If there's a planned upgrade and the upgrade height is reached, the old binary writes `UpgradeInfo` to the disk before panic'ing.
 
-```bash
-iriscli gov submit-proposal --title=<title> --description=<description> --type="SoftwareUpgrade" --deposit=100iris --from=<key-name> --chain-id=irishub --fee=0.3iris --software=https://github.com/irisnet/irishub/tree/v0.13.1 --version=2 --switch-height=80 --threshold=0.9 --commit
+```go
+type UpgradeInfo struct {
+  Name    string
+  Height  int64
+}
 ```
 
-* `--type`  The type of Software upgrade proposal is "SoftwareUpgrade"
-* `--version`  The version of the new protocol
-* `--software`  The software of the new protocol
-* `--switch-height` The switchheight of the new protocol
-* `--threshold`  The threshold of "SoftwareUpgrade"
-* Other parameters refer to [Gov User Guide](governance.md)
+This information is critical to ensure the `StoreUpgrades` happens smoothly at correct height and
+expected upgrade. It eliminiates the chances for the new binary to execute `StoreUpgrades` multiple
+times everytime on restart. Also if there are multiple upgrades planned on same height, the `Name`
+will ensure these `StoreUpgrades` takes place only in planned upgrade handler.
 
-Query the version details of current software
+### Proposal
 
-```bash
-iriscli upgrade info --trust-node
+Typically, a `Plan` is proposed and submitted through governance via a `SoftwareUpgradeProposal`.
+This proposal prescribes to the standard governance process. If the proposal passes,
+the `Plan`, which targets a specific `Handler`, is persisted and scheduled. The
+upgrade can be delayed or hastened by updating the `Plan.Time` in a new proposal.
+
+```go
+type SoftwareUpgradeProposal struct {
+  Title       string
+  Description string
+  Plan        Plan
+}
 ```
+
+#### Governance Process
+
+When a upgrade proposal is accepted, the upgrade process is devided into two steps.
+
+##### Signal
+
+After a SoftwareUpgradeProposal is accepted, validators are expected to download and install the new version of the software while continuing to run the previous version. Once a validator has downloaded and installed the upgrade, it will start signaling to the network that it is ready to switch by including the proposal's proposalID in its precommits.
+
+Note: There is only one signal slot per precommit. If several SoftwareUpgradeProposals are accepted in a short timeframe, a pipeline will form and they will be implemented one after the other in the order that they were accepted.
+
+##### Switch
+
+Once a block contains more than 2/3rd precommits where a common SoftwareUpgradeProposal is signaled, all the nodes (including validator nodes, non-validating full nodes and light-nodes) are expected to switch to the new version of the software.
+
+#### Cancelling Upgrade Proposals
+
+Upgrade proposals can be cancelled. There exists a `CancelSoftwareUpgrade` proposal
+type, which can be voted on and passed and will remove the scheduled upgrade `Plan`.
+Of course this requires that the upgrade was known to be a bad idea well before the
+upgrade itself, to allow time for a vote.
+
+If such a possibility is desired, the upgrade height is to be
+`2 * (VotingPeriod + DepositPeriod) + (SafetyDelta)` from the beginning of the
+upgrade proposal. The `SafetyDelta` is the time available from the success of an
+upgrade proposal and the realization it was a bad idea (due to external social consensus).
+
+A `CancelSoftwareUpgrade` proposal can also be made while the original
+`SoftwareUpgradeProposal` is still being voted upon, as long as the `VotingPeriod`
+ends after the `SoftwareUpgradeProposal`.
