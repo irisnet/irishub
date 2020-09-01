@@ -9,15 +9,15 @@ Tx module allows you to sign or broadcast transactions
 | [sign](#iris-tx-sign)           | Sign transactions generated offline                          |
 | [broadcast](#iris-tx-broadcast) | Broadcast a signed transaction to the network                |
 | [multisig](#iris-tx-multisign)  | Sign the same transaction by multiple accounts               |
-| [tx](#iris-q-tx)                | Query for a transaction by hash in a committed block         |
-| [txs](#iris-q-txs)              | Search for transactions that match the exact given events where results are paginated |
+| [tx](#iris-query-tx)                | Query for a transaction by hash in a committed block         |
+| [txs](#iris-query-txs)              | Search for transactions that match the exact given events where results are paginated |
 
 ## iris tx sign
 
 Sign transactions in generated offline file. The file created with the --generate-only flag.
 
 ```bash
-iriscli tx sign <file> [flags]
+iris tx sign <file> [flags]
 ```
 
 ### Flags
@@ -58,7 +58,7 @@ iris tx sign unsigned.json --name=<key-name> > signed.tx
 The `signed.json` should look like:
 
 ```json
-{"type":"auth/StdTx","value":{"msg":[{"type":"cosmos-sdk/Send","value":{"inputs":[{"address":"iaa106nhdckyf996q69v3qdxwe6y7408pvyvyxzhxh","coins":[{"denom":"iris-atto","amount":"10000000000000000000"}]}],"outputs":[{"address":"iaa1893x4l2rdshytfzvfpduecpswz7qtpstevr742","coins":[{"denom":"iris-atto","amount":"10000000000000000000"}]}]}}],"fee":{"amount":[{"denom":"iris-atto","amount":"40000000000000000"}],"gas":"200000"},"signatures":[{"pub_key":{"type":"tendermint/PubKeySecp256k1","value":"Auouudrg0P86v2kq2lykdr97AJYGHyD6BJXAQtjR1gzd"},"signature":"sJewd6lKjma49rAiGVfdT+V0YYerKNx6ZksdumVCvuItqGm24bEN9msh7IJ12Sil1lYjqQjdAcjVCX/77FKlIQ==","account_number":"0","sequence":"3"}],"memo":"test"}}
+{"type":"auth/StdTx","value":{"msg":[{"type":"cosmos-sdk/Send","value":{"inputs":[{"address":"iaa106nhdckyf996q69v3qdxwe6y7408pvyvyxzhxh","coins":[{"denom":"uiris","amount":"1000000"}]}],"outputs":[{"address":"iaa1893x4l2rdshytfzvfpduecpswz7qtpstevr742","coins":[{"denom":"uiris","amount":"1000000"}]}]}}],"fee":{"amount":[{"denom":"uiris","amount":"4000000"}],"gas":"200000"},"signatures":[{"pub_key":{"type":"tendermint/PubKeySecp256k1","value":"Auouudrg0P86v2kq2lykdr97AJYGHyD6BJXAQtjR1gzd"},"signature":"sJewd6lKjma49rAiGVfdT+V0YYerKNx6ZksdumVCvuItqGm24bEN9msh7IJ12Sil1lYjqQjdAcjVCX/77FKlIQ==","account_number":"0","sequence":"3"}],"memo":"test"}}
 ```
 
 Note the `signature` in the `signed.json` should no longer be empty after signing.
@@ -90,7 +90,7 @@ No multisig key? [Create one](keys.md#create-a-multisig-key)
 :::
 
 ```bash
-iris tx bank send <from> <to> 10iris --fee=0.3iris --chain-id=irishub --from=<multisig-keyname> --generate-only > unsigned.json
+iris tx bank send <from> <to> 10iris --fees=0.3iris --chain-id=irishub --from=<multisig-keyname> --generate-only > unsigned.json
 ```
 
 ### Sign the multisig tx
@@ -126,13 +126,13 @@ iris tx multisign --chain-id=irishub unsigned.json <multisig-keyname> signed-1.j
 ```
 
 Now you can [broadcast the signed tx](#iris-tx-broadcast).
-## iris q tx
+## iris query tx
 
 ```bash
 iris query tx [hash] [flags]
 ```
 
-## iris q txs
+## iris query txs
 
 ```bash
 iris query txs --events 'message.sender=<iaa...>&message.action=xxxx' --page 1 --limit 30

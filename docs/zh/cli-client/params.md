@@ -33,7 +33,7 @@ iris query params subspace [subspace] [key] [flags]
 | `UnbondingTime`     | 抵押解绑时间           | 3w        |
 | `MaxValidators`     | 最大验证人数量         | 100       |
 | `MaxEntries`        | 解绑、转委托的最大数量 | 7         |
-| `BondDenom`         | 可抵押的代币           | iris-atto |
+| `BondDenom`         | 可抵押的代币           | uiris |
 | `HistoricalEntries` |                        | 100       |
 
 ## mint
@@ -41,7 +41,7 @@ iris query params subspace [subspace] [key] [flags]
 | key         | description    | default   |
 | ----------- | -------------- | --------- |
 | `Inflation` | 代币增发频率   | 0.04      |
-| `MintDenom` | 增发的代币名称 | iris-atto |
+| `MintDenom` | 增发的代币名称 | uiris |
 
 ## distribution
 
@@ -89,7 +89,7 @@ iris query params subspace [subspace] [key] [flags]
 | key             | description          | default   |
 | --------------- | -------------------- | --------- |
 | `Fee`           | 支付的手续费率       | 0.003     |
-| `StandardDenom` | 支付的手续费代币名称 | iris-atto |
+| `StandardDenom` | 支付的手续费代币名称 | uiris |
 
 ##service
 
@@ -103,6 +103,6 @@ iris query params subspace [subspace] [key] [flags]
 | `ComplaintRetrospect`  | 投诉周期                    | 15d       |
 | `ArbitrationTimeLimit` | 仲裁周期                    | 5d        |
 | `TxSizeLimit`          | 交易最大字节数(service模块) | 4000      |
-| `BaseDenom`            | 服务费支持的代币            | iris-atto |
+| `BaseDenom`            | 服务费支持的代币            | uiris |
 
 
