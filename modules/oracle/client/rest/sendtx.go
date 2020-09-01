@@ -4,40 +4,25 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/cosmos/cosmos-sdk/client/tx"
+	"github.com/gorilla/mux"
 
 	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/rest"
-	"github.com/gorilla/mux"
 
 	"github.com/irisnet/irishub/modules/oracle/types"
 )
 
 func registerTxRoutes(cliCtx client.Context, r *mux.Router) {
 	// define a feed
-	r.HandleFunc(
-		"/oracle/feeds",
-		createFeedHandlerFn(cliCtx),
-	).Methods("POST")
-
+	r.HandleFunc("/oracle/feeds", createFeedHandlerFn(cliCtx)).Methods("POST")
 	// edit a feed
-	r.HandleFunc(
-		fmt.Sprintf("/oracle/feeds/{%s}", FeedName),
-		editFeedHandlerFn(cliCtx),
-	).Methods("PUT")
-
+	r.HandleFunc(fmt.Sprintf("/oracle/feeds/{%s}", FeedName), editFeedHandlerFn(cliCtx)).Methods("PUT")
 	// start a feed
-	r.HandleFunc(
-		fmt.Sprintf("/oracle/feeds/{%s}/start", FeedName),
-		startFeedHandlerFn(cliCtx),
-	).Methods("POST")
-
+	r.HandleFunc(fmt.Sprintf("/oracle/feeds/{%s}/start", FeedName), startFeedHandlerFn(cliCtx)).Methods("POST")
 	// pause a feed
-	r.HandleFunc(
-		fmt.Sprintf("/oracle/feeds/{%s}/pause", FeedName),
-		pauseFeedHandlerFn(cliCtx),
-	).Methods("POST")
+	r.HandleFunc(fmt.Sprintf("/oracle/feeds/{%s}/pause", FeedName), pauseFeedHandlerFn(cliCtx)).Methods("POST")
 }
 
 type createFeedReq struct {

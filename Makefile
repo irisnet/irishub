@@ -103,9 +103,6 @@ update-swagger-docs: statik
     	echo "\033[92mSwagger docs are in sync\033[0m";\
     fi
 
-install-tool: go.sum
-	go install -mod=readonly $(BUILD_FLAGS) ./cmd/iristool
-
 ########################################
 ### Tools & dependencies
 
@@ -146,10 +143,6 @@ test-race:
 
 test-cover:
 	@go test -mod=readonly -timeout 30m -race -coverprofile=coverage.txt -covermode=atomic -tags='ledger test_ledger_mock' ./...
-
-test-build: build
-	@go test -ldflags='$(denomflags)' -mod=readonly -p 4 `go list ./cli_test/...` -tags=cli_test -v
-
 
 lint: golangci-lint
 	golangci-lint run

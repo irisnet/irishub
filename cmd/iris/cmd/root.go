@@ -202,8 +202,12 @@ func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, appOpts serverty
 }
 
 func exportAppStateAndTMValidators(
-	logger log.Logger, db dbm.DB, traceStore io.Writer, height int64, forZeroHeight bool, jailWhiteList []string,
-) (json.RawMessage, []tmtypes.GenesisValidator, *abci.ConsensusParams, error) {
+	logger log.Logger, db dbm.DB, traceStore io.Writer,
+	height int64, forZeroHeight bool, jailWhiteList []string,
+) (
+	json.RawMessage, []tmtypes.GenesisValidator,
+	*abci.ConsensusParams, error,
+) {
 
 	encCfg := app.MakeEncodingConfig() // Ideally, we would reuse the one created by NewRootCmd.
 	encCfg.Marshaler = codec.NewProtoCodec(encCfg.InterfaceRegistry)

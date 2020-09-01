@@ -11,14 +11,13 @@ import (
 	"path/filepath"
 
 	"github.com/spf13/cobra"
+
 	tmconfig "github.com/tendermint/tendermint/config"
 	"github.com/tendermint/tendermint/crypto"
 	tmos "github.com/tendermint/tendermint/libs/os"
 	tmrand "github.com/tendermint/tendermint/libs/rand"
 	"github.com/tendermint/tendermint/types"
 	tmtime "github.com/tendermint/tendermint/types/time"
-
-	guardiantypes "github.com/irisnet/irishub/modules/guardian/types"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -34,6 +33,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/genutil"
 	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+
+	guardiantypes "github.com/irisnet/irishub/modules/guardian/types"
 )
 
 var (
@@ -114,7 +115,6 @@ func InitTestnet(
 	algoStr string,
 	numValidators int,
 ) error {
-
 	if chainID == "" {
 		chainID = "chain-" + tmrand.NewRand().Str(6)
 	}
@@ -274,7 +274,6 @@ func initGenFiles(
 	genAccounts []authtypes.GenesisAccount, genBalances []banktypes.Balance,
 	genFiles []string, numValidators int,
 ) error {
-
 	appGenState := mbm.DefaultGenesis(clientCtx.JSONMarshaler)
 
 	// add the profiler and trustees in the genesis state
@@ -404,13 +403,11 @@ func writeFile(name string, dir string, contents []byte) error {
 	writePath := filepath.Join(dir)
 	file := filepath.Join(writePath, name)
 
-	err := tmos.EnsureDir(writePath, 0755)
-	if err != nil {
+	if err := tmos.EnsureDir(writePath, 0755); err != nil {
 		return err
 	}
 
-	err = tmos.WriteFile(file, contents, 0644)
-	if err != nil {
+	if err := tmos.WriteFile(file, contents, 0644); err != nil {
 		return err
 	}
 
