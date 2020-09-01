@@ -23,13 +23,13 @@ IRISnet引入了两种由基金会控制且具有一定特殊权益的系统用�
     添加profiler （仅限Genesis Profiler）
 
     ```bash
-    iris tx guardian add-profiler --address=<profiler-address> --description=<profiler-description> --chain-id=irishub --from=<key-name> --fee=0.3iris
+    iris tx guardian add-profiler --address=<profiler-address> --description=<profiler-description> --chain-id=irishub --from=<key-name> --fees=0.3iris
     ```
 
     添加trustee（仅限Genesis Trustee）
 
     ```bash
-    iris tx guardian add-trustee --address=<trustee-address> --description=<trustee-description> --chain-id=irishub --from=<key-name> --fee=0.3iris 
+    iris tx guardian add-trustee --address=<trustee-address> --description=<trustee-description> --chain-id=irishub --from=<key-name> --fees=0.3iris 
     ```
 
 2. 查询profiler和trustee列表
@@ -55,7 +55,7 @@ IRISnet引入了两种由基金会控制且具有一定特殊权益的系统用�
     该模式免除服务费
 
     ```bash
-    iris tx service call --def-chain-id=<def-chain-id> --service-name=<service-name> --method-id=<method-id> --bind-chain-id=<bind-chain-id> --provider=<provider-address> --service-fee=1iris --request-data=<request-data> --chain-id=irishub --from=<key-name> --fee=0.3iris --profiling=true
+    iris tx service call --def-chain-id=<def-chain-id> --service-name=<service-name> --method-id=<method-id> --bind-chain-id=<bind-chain-id> --provider=<provider-address> --service-fee=1iris --request-data=<request-data> --chain-id=irishub --from=<key-name> --fees=0.3iris --profiling=true
     ```
 
 5. 通过`CommunityTaxUsage`治理取回交易税费
@@ -65,7 +65,7 @@ IRISnet引入了两种由基金会控制且具有一定特殊权益的系统用�
 6. Trustee从`iService`服务费税池中提取代币到指定账户
 
     ```bash
-    iris tx service withdraw-tax --dest-address=<destination-address> --withdraw-amount=1iris --chain-id=irishub --from=<key-name> --fee=0.3iris
+    iris tx service withdraw-tax --dest-address=<destination-address> --withdraw-amount=1iris --chain-id=irishub --from=<key-name> --fees=0.3iris
     ```
 
 7. 删除profiler和trustee
@@ -73,11 +73,11 @@ IRISnet引入了两种由基金会控制且具有一定特殊权益的系统用�
     删除profiler：（仅限Genesis Profiler）
 
     ```bash
-    iris tx guardian delete-profiler --chain-id=irishub --from=<key-name> --fee=0.3iris --address=<profiler-address>
+    iris tx guardian delete-profiler --chain-id=irishub --from=<key-name> --fees=0.3iris --address=<profiler-address>
     ```
 
     删除trustee：（仅限Genesis Trustee）
 
     ```bash
-    iris tx guardian delete-trustee --chain-id=irishub --from=<key-name> --fee=0.3iris --address=<trustee-address>
+    iris tx guardian delete-trustee --chain-id=irishub --from=<key-name> --fees=0.3iris --address=<trustee-address>
     ```

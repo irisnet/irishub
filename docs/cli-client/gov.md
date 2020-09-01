@@ -6,20 +6,20 @@ This module provides the basic functionalities for [Governance](../features/gove
 
 | Name                                            | Description                                                  |
 | ----------------------------------------------- | ------------------------------------------------------------ |
-| [proposal](#iris-q-gov-proposal)                | Query details of a single proposal                           |
-| [proposals](#iris-q-gov-proposals)              | Query proposals with optional filter                         |
-| [vote](#iris-q-gov-vote)                        | Query details of a single vote                               |
-| [votes](#iris-q-gov-votes)                      | Query votes on a proposal                                    |
-| [deposit](#iris-q-gov-deposit)                  | Query details of a deposit                                   |
-| [deposits](#iris-q-gov-deposits)                | Query deposits on a proposal                                 |
-| [tally](#iris-q-gov-tally)                      | Get the tally of a proposal vote                             |
-| [param](#iris-q-gov-param)                      | Query the parameters (voting                                 |
-| [params](#iris-q-gov-params)                    | Query the parameters of the governance process               |
+| [proposal](#iris-query-gov-proposal)                | Query details of a single proposal                           |
+| [proposals](#iris-query-gov-proposals)              | Query proposals with optional filter                         |
+| [vote](#iris-query-gov-vote)                        | Query details of a single vote                               |
+| [votes](#iris-query-gov-votes)                      | Query votes on a proposal                                    |
+| [deposit](#iris-query-gov-deposit)                  | Query details of a deposit                                   |
+| [deposits](#iris-query-gov-deposits)                | Query deposits on a proposal                                 |
+| [tally](#iris-query-gov-tally)                      | Get the tally of a proposal vote                             |
+| [param](#iris-query-gov-param)                      | Query the parameters (voting                                 |
+| [params](#iris-query-gov-params)                    | Query the parameters of the governance process               |
 | [submit-proposal](#iris-tx-gov-submit-proposal) | Submit a proposal along with an initial deposit              |
 | [deposit](#iris-tx-gov-deposit)                 | Deposit tokens for an active proposal                        |
 | [vote](#iris-tx-gov-vote)                       | Vote for an active proposal, options: yes/no/no_with_veto/abstain |
 
-## iris q gov proposal
+## iris query gov proposal
 
 Query details of a proposal
 
@@ -33,7 +33,7 @@ iris query gov proposal [proposal-id] [flags]
 iris query gov proposal <proposal-id>
 ```
 
-## iris q gov proposals
+## iris query gov proposals
 
 Query proposals with optional filter
 
@@ -62,7 +62,7 @@ iris query gov proposals
 iris query gov proposals --limit=3 --status=Passed --depositor=<iaa...>
 ```
 
-## iris q gov vote
+## iris query gov vote
 
 Query details of a single vote
 
@@ -76,7 +76,7 @@ iris query gov vote [proposal-id] [voter-addr] [flags]
 iris query gov vote <proposal-id> <iaa...>
 ```
 
-## iris q gov votes
+## iris query gov votes
 
 Query votes on a proposal
 
@@ -91,7 +91,7 @@ iris query gov votes <proposal-id>
 
 ```
 
-## iris q gov deposit
+## iris query gov deposit
 
 Query details for a single proposal deposit on a proposal by its identifier
 
@@ -105,7 +105,7 @@ iris query gov deposit [proposal-id] [depositer-addr] [flags]
 iris query gov deposit <proposal-id> <iaa...>
 ```
 
-## iris q gov deposits
+## iris query gov deposits
 
 Query details for all deposits on a proposal
 
@@ -119,7 +119,7 @@ iris query gov deposits [proposal-id] [flags]
 iris query gov deposits <proposal-id>
 ```
 
-## iris q gov tally
+## iris query gov tally
 
 Query tally of votes on a proposal. You can find the proposal-id by running "iris query gov proposals".
 
@@ -133,7 +133,7 @@ iris query gov tally [proposal-id] [flags]
 iris query gov tally <proposal-id>
 ```
 
-## iris q gov param
+## iris query gov param
 
 Query the parameters (voting|tallying|deposit) of the governance process.
 
@@ -148,7 +148,7 @@ Example:
 > iris query gov param deposit
 ```
 
-## iris q gov params
+## iris query gov params
 
 Query the all the parameters for the governance process.
 
@@ -261,5 +261,5 @@ iris tx gov vote [proposal-id] [option] [flags]
 ### Vote for an active proposal
 
 ```bash
-iriscli gov vote <proposal-id> <option> --from=<key-name> --fee=0.3iris
+iris tx gov vote <proposal-id> <option> --from=<key-name> --fees=0.3iris
 ```

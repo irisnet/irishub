@@ -18,7 +18,7 @@
 
 不能或不想运行验证人节点的人仍然可以作为委托人参与到POS网络中。委托人可以将token委托给验证人，委托人将从相应的验证人那里获得一定的token份额。委托token也称为绑定token给验证人。稍后我们将对其进行详细说明。此外，验证节点的所有者也是委托人。验证节点的所有者不仅可以在其自己的验证节点上抵押token，而且也可以在其他验证节点上抵押token。
 
-::: danger
+:::danger
 **验证节点的所有者在解绑自己抵押的代币时，切勿完全解绑。 一旦完全解绑，该验证人节点将被处于jailed状态，该节点将收不到任何奖励或者佣金， 在该节点上委托代币的投资人的利益也会收到相应的损失。 所以，无论如何请保留至少1iris在抵押状态。**
 **如果一旦验证人全部解委托，可以通过重新`delegate`和`unjail`的命令来恢复**
 :::
@@ -49,13 +49,13 @@
 
 查询验证人地址的编码格式的钱包地址：
 
- ```bash
+```bash
 iris keys show <key-name>
- ```
+```
 
  示例输出:
 
-  ```text
+  ```bash
   - name: node0
     type: local
     address: iaa1w9lvhwlvkwqvg08q84n2k4nn896u9pqx93velx
@@ -99,26 +99,26 @@ iris q staking validator iva14n9md3sq9xwscs96za8n85m0j9y2yu3cagxgke
 - 修改验证人信息
 
 ```bash
-  iris tx staking edit-validator --from=<key-name> --chain-id=irishub --fees=0.3iris --commission-rate=0.15 --moniker=<new-name>
+iris tx staking edit-validator --from=<key-name> --chain-id=irishub --fees=0.3iris --commission-rate=0.15 --moniker=<new-name>
 ```
 
 - 委托
 
 ```bash
-  iris tx staking delegate iva14n9md3sq9xwscs96za8n85m0j9y2yu3cagxgke 1000iris --chain-id=irishub --from=<key-name> --fees=0.3iris
+iris tx staking delegate iva14n9md3sq9xwscs96za8n85m0j9y2yu3cagxgke 1000iris --chain-id=irishub --from=<key-name> --fees=0.3iris
 ```
 
 - 解绑
 
-  ```bash
+```bash
 iris tx staking unbond iva14n9md3sq9xwscs96za8n85m0j9y2yu3cagxgke 1000iris --chain-id=irishub --from=<key-name> --fees=0.3iris
-  ```
+```
 
 - 转委托
 
-  ```bash
+```bash
 iris tx staking redelegate iva14n9md3sq9xwscs96za8n85m0j9y2yu3cagxgke iva1l2rsakp388kuv9k8qzq6lrm9taddae7fpx59wm 100iris --from mykey --chain-id=irishub --from=<key-name> --fees=0.3iris
-  ```
+```
 
 对于其它Staking相关的命令，请参考[stake-cli](../cli-client/stake.md)
 

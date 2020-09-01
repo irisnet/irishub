@@ -121,7 +121,7 @@ In this version, all POST methods (except '/tx/broadcast') just generate unsigne
 
 | [v0.14.1]                    | [v0.15.0]                    | input changed | output changed | notes                                                        |
 | ---------------------------- | ---------------------------- | ------------- | -------------- | ------------------------------------------------------------ |
-| GET /bank/accounts/{address} | GET /bank/accounts/{address} | No            | Yes            | 1. Add `memo_regexp` in output; <br> 2. Tokens other than iris-atto could show up in output when people start using the newly introduced asset functionality. |
+| GET /bank/accounts/{address} | GET /bank/accounts/{address} | No            | Yes            | 1. Add `memo_regexp` in output; <br> 2. Tokens other than uiris could show up in output when people start using the newly introduced asset functionality. |
 
 #### Tendermint module APIs
 
@@ -179,11 +179,9 @@ In this version, all POST methods (except '/tx/broadcast') just generate unsigne
 
 | [v0.13.1]                               | [v0.14.0]                          | input changed | output changed |
 | --------------------------------------- | ---------------------------------- | ------------- | -------------- |
-| GET /bank/coin/{coin-type}              | GET /bank/coins/{type}             | No            | No             |
 | GET /bank/token-stats                   | GET /bank/token-stats              | No            | Yes            |
 | GET /bank/balances/{address}            | GET /bank/accounts/{address}       | No            | Yes            |
 | POST /bank/accounts/{address}/transfers | POST /bank/accounts/{address}/send | Yes           | No             |
-| POST /bank/burn                         | POST /bank/accounts/{address}/burn | Yes           | No             |
 
 #### Stake module APIs
 

@@ -9,8 +9,8 @@
 | [sign](#iris-tx-sign)           | 签名生成的离线交易文件   |
 | [broadcast](#iris-tx-broadcast) | 广播一个已签名交易到网络 |
 | [multisig](#iris-tx-multisign)  | 用多个账户为同一交易签名 |
-| [tx](#iris-q-tx)                | 使用交易hash查询交易     |
-| [txs](#iris-q-txs)              | 使用Tag查询交易          |
+| [tx](#iris-query-tx)                | 使用交易hash查询交易     |
+| [txs](#iris-query-txs)              | 使用Tag查询交易          |
 
 ## iris tx sign
 
@@ -58,7 +58,7 @@ iris tx sign unsigned.json --name=<key-name> > signed.tx
 `signed.json` 看起来是这样的：
 
 ```json
-{"type":"auth/StdTx","value":{"msg":[{"type":"cosmos-sdk/Send","value":{"inputs":[{"address":"iaa106nhdckyf996q69v3qdxwe6y7408pvyvyxzhxh","coins":[{"denom":"iris-atto","amount":"10000000000000000000"}]}],"outputs":[{"address":"iaa1893x4l2rdshytfzvfpduecpswz7qtpstevr742","coins":[{"denom":"iris-atto","amount":"10000000000000000000"}]}]}}],"fee":{"amount":[{"denom":"iris-atto","amount":"40000000000000000"}],"gas":"200000"},"signatures":[{"pub_key":{"type":"tendermint/PubKeySecp256k1","value":"Auouudrg0P86v2kq2lykdr97AJYGHyD6BJXAQtjR1gzd"},"signature":"sJewd6lKjma49rAiGVfdT+V0YYerKNx6ZksdumVCvuItqGm24bEN9msh7IJ12Sil1lYjqQjdAcjVCX/77FKlIQ==","account_number":"0","sequence":"3"}],"memo":"test"}}
+{"type":"auth/StdTx","value":{"msg":[{"type":"cosmos-sdk/Send","value":{"inputs":[{"address":"iaa106nhdckyf996q69v3qdxwe6y7408pvyvyxzhxh","coins":[{"denom":"uiris","amount":"10000000"}]}],"outputs":[{"address":"iaa1893x4l2rdshytfzvfpduecpswz7qtpstevr742","coins":[{"denom":"uiris","amount":"10000000"}]}]}}],"fee":{"amount":[{"denom":"uiris","amount":"40000000"}],"gas":"200000"},"signatures":[{"pub_key":{"type":"tendermint/PubKeySecp256k1","value":"Auouudrg0P86v2kq2lykdr97AJYGHyD6BJXAQtjR1gzd"},"signature":"sJewd6lKjma49rAiGVfdT+V0YYerKNx6ZksdumVCvuItqGm24bEN9msh7IJ12Sil1lYjqQjdAcjVCX/77FKlIQ==","account_number":"0","sequence":"3"}],"memo":"test"}}
 ```
 
 签名之后，`signed.json`中的`signature`字段将不再为空。
@@ -90,7 +90,7 @@ iris tx multisign <file> <key-name> <[signature]...> [flags]
 :::
 
 ```bash
-iris tx bank send <from> <to> 10iris --fee=0.3iris --chain-id=irishub --from=<multisig-keyname> --generate-only > unsigned.json
+iris tx bank send <from> <to> 10iris --fees=0.3iris --chain-id=irishub --from=<multisig-keyname> --generate-only > unsigned.json
 ```
 
 ### 签名多签交易
@@ -127,13 +127,13 @@ iris tx multisign --chain-id=irishub unsigned.json <multisig-keyname> signed-1.j
 
 现在可以[广播](#iris-tx-broadcast)这个已签名交易了。
 
-## iris q tx
+## iris query tx
 
 ```bash
 iris query tx [hash] [flags]
 ```
 
-## iris q txs
+## iris query txs
 
 ```bash
 iris query txs --events 'message.sender=<iaa...>&message.action=xxxx' --page 1 --limit 30

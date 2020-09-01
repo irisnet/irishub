@@ -47,8 +47,8 @@ returns
               "address": "iaa1rulhmls7g9cjh239vnkjnw870t5urrutsfwvmc",
               "coins": [
                 {
-                  "denom": "iris-atto",
-                  "amount": "2000000000000000000"
+                  "denom": "uiris",
+                  "amount": "2000000"
                 }
               ]
             }
@@ -58,8 +58,8 @@ returns
               "address": "iaa1rulhmls7g9cjh239vnkjnw870t5urrutsfwvmc",
               "coins": [
                 {
-                  "denom": "iris-atto",
-                  "amount": "2000000000000000000"
+                  "denom": "uiris",
+                  "amount": "2000000"
                 }
               ]
             }
@@ -70,8 +70,8 @@ returns
     "fee": {
       "amount": [
         {
-          "denom": "iris-atto",
-          "amount": "400000000000000000"
+          "denom": "uiris",
+          "amount": "4000000"
         }
       ],
       "gas": "50000"

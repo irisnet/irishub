@@ -1,9 +1,9 @@
 # Fee Model
 
-Specify the maximum fee you want to pay by `--fee`. Gas is the unit used to measure how many resources needed to execute the transaction. Specify the maximum gas limit by `-—gas`. If the maximum gas is too small, it won't be enough for executing the transaction. If the fee is too low, fee paid for each unit of gas will be less than the minimum gas-price and validators won't execute the transaction neither. The fee(minimum unit)/gas must be greater than 6*10^12 iris-atto. We recommend that you set your maximum gas to 50000 and set your maximum fee to 0.3iris. Fee will be consumed according to actual gas used and spare fee will be reimbursed to users.
+Specify the maximum fee you want to pay by `--fee`. Gas is the unit used to measure how many resources needed to execute the transaction. Specify the maximum gas limit by `-—gas`. If the maximum gas is too small, it won't be enough for executing the transaction. If the fee is too low, fee paid for each unit of gas will be less than the minimum gas-price and validators won't execute the transaction neither. The fee(minimum unit)/gas must be greater than 6*10^4 uiris. We recommend that you set your maximum gas to 50000 and set your maximum fee to 0.3iris. Fee will be consumed according to actual gas used and spare fee will be reimbursed to users.
 
 :::tip
-Certain types of transactions may consume more gas (e.g. creating validators), so it is recommended to set `--gas=100000 --fee=0.6iris` to ensure the smooth execution of transactions.
+Certain types of transactions may consume more gas (e.g. creating validators), so it is recommended to set `--gas=100000 --fees=0.6iris` to ensure the smooth execution of transactions.
 :::
 
 ## Fee
@@ -26,7 +26,7 @@ The total gas needed for executing the transaction is the sum of gas needed for 
 Example
 
 ```bash
-iriscli bank send --amount=1iris --fee=0.3iris --gas=50000 --chain-id=irishub --from=<key-name> --to=<account-address>
+iris tx bank send <from-address> <to-address>  1iris --fees=0.3iris --gas=50000 --chain-id=irishub --from=<key-name>
 ```
 
 This example is a transfer transaction. The maximum fee `--fee` is set to be 0.3iris and the maximum gas `--gas` is set to be 50000. Therefore, the gas price here is 6000iris-nano/Gas. Suppose that 10000 gas is used to execute the transaction, then 0.06iris will be paid to validators and left 0.24iris will be refunded to user.

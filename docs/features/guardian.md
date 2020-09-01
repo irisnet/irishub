@@ -23,13 +23,13 @@ IRISnet introduce two types of privileged system user controlled by foundations,
     Add Profiler (Genesis Profiler account only)
 
     ```bash
-    iris tx guardian add-profiler --address=<profiler-address> --description=<profiler-description> --chain-id=irishub --from=<key-name> --fee=0.3iris
+    iris tx guardian add-profiler --address=<profiler-address> --description=<profiler-description> --chain-id=irishub --from=<key-name> --fees=0.3iris
     ```
 
     Add Trustee (Genesis Trustee account only)
 
     ```bash
-    iris tx guardian add-trustee --address=<trustee-address> --description=<trustee-description> --chain-id=irishub --from=<key-name> --fee=0.3iris
+    iris tx guardian add-trustee --address=<trustee-address> --description=<trustee-description> --chain-id=irishub --from=<key-name> --fees=0.3iris
     ```
 
 2. Query Profiler and Trustee list
@@ -55,7 +55,7 @@ IRISnet introduce two types of privileged system user controlled by foundations,
     Service fee exempted
 
     ```bash
-    iris tx service call --def-chain-id=<def-chain-id> --service-name=<service-name> --method-id=<method-id> --bind-chain-id=<bind-chain-id> --provider=<provider-address> --service-fee=1iris --request-data=<request-data> --chain-id=irishub --from=<key-name> --fee=0.3iris --profiling=true
+    iris tx service call --def-chain-id=<def-chain-id> --service-name=<service-name> --method-id=<method-id> --bind-chain-id=<bind-chain-id> --provider=<provider-address> --service-fee=1iris --request-data=<request-data> --chain-id=irishub --from=<key-name> --fees=0.3iris --profiling=true
     ```
 
 5. Trustee to be the destination address of `CommunityTaxUsage` proposal
@@ -65,7 +65,7 @@ IRISnet introduce two types of privileged system user controlled by foundations,
 6. Trustee withdraw service fee tax
 
     ```bash
-    iris tx service withdraw-tax --dest-address=<destination-address> --withdraw-amount=1iris --chain-id=irishub --from=<key-name> --fee=0.3iris
+    iris tx service withdraw-tax --dest-address=<destination-address> --withdraw-amount=1iris --chain-id=irishub --from=<key-name> --fees=0.3iris
     ```
 
 7. Delete Profiler and Trustee (Genesis Trustee account only)
@@ -73,11 +73,11 @@ IRISnet introduce two types of privileged system user controlled by foundations,
     Delete Profiler (Genesis Trustee account only)
 
     ```bash
-    iris tx guardian delete-profiler --chain-id=irishub --from=<key-name> --fee=0.3iris --address=<profiler-address>
+    iris tx guardian delete-profiler --chain-id=irishub --from=<key-name> --fees=0.3iris --address=<profiler-address>
     ```
 
     Delete Trustee (Genesis Trustee account only)
 
     ```bash
-    iris tx guardian delete-trustee --chain-id=irishub --from=<key-name> --fee=0.3iris --address=<trustee-address>
+    iris tx guardian delete-trustee --chain-id=irishub --from=<key-name> --fees=0.3iris --address=<trustee-address>
     ```

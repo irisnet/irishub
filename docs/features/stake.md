@@ -18,7 +18,7 @@ Validator is a full IRIShub node. If its voting power is zero, it is just a norm
 
 People that cannot, or do not want to run validator nodes, can still participate in the staking process as delegators. After delegating some tokens to validators, delegators will gain shares from corresponding validators. Delegating tokens is also called bonding tokens to validators. Later we will have detailed description on it. Besides, a validator operator is also a delegator. Usually, a validator operator not only has delegation on its own validator, but also can have delegation on other validators.
 
-::: danger
+:::danger
 **It is strongly NOT recommended that validator operator COMPLETELY unbind self-delegation tokens, Cause the validator will be jailed (removed out of validator set) if he do so. The delegator who bonded tokens to this validator will also suffer losses.
 So, it is recommended that validator operator reserve at least 1 iris while unbonding tokens.**
 :::
@@ -49,13 +49,13 @@ As a delegator, the more bonded tokens it has on validator, the more rewards it 
 
   Users can query their own validators by their wallet address. But firstly users have to convert their wallet addresses to validator operator address pattern:
 
-  ```bash
-  iris keys show <key-name>
-  ```
+```bash
+iris keys show <key-name>
+```
 
   Example Output:
 
-  ```text
+  ```bash
   - name: node0
     type: local
     address: iaa1w9lvhwlvkwqvg08q84n2k4nn896u9pqx93velx
@@ -67,9 +67,9 @@ As a delegator, the more bonded tokens it has on validator, the more rewards it 
 
   Then, example command to query validator:
 
-  ```bash
-  iris q staking validator iva14n9md3sq9xwscs96za8n85m0j9y2yu3cagxgke
-  ```
+```bash
+iris q staking validator iva14n9md3sq9xwscs96za8n85m0j9y2yu3cagxgke
+```
 
   Example Output:
 
@@ -98,29 +98,29 @@ As a delegator, the more bonded tokens it has on validator, the more rewards it 
 
 - Edit validator
 
-  ```bash
-  iris tx staking edit-validator --from=<key-name> --chain-id=irishub --fees=0.3iris --commission-rate=0.15 --moniker=<new-name>
-  ```
+```bash
+iris tx staking edit-validator --from=<key-name> --chain-id=irishub --fees=0.3iris --commission-rate=0.15 --moniker=<new-name>
+```
 
 - Delegate tokens to other validators
 
   If you just want to be a delegator, you can skip the above steps.
 
-  ```bash
-  iris tx staking delegate iva14n9md3sq9xwscs96za8n85m0j9y2yu3cagxgke 1000iris --chain-id=irishub --from=<key-name> --fees=0.3iris
-  ```
+```bash
+iris tx staking delegate iva14n9md3sq9xwscs96za8n85m0j9y2yu3cagxgke 1000iris --chain-id=irishub --from=<key-name> --fees=0.3iris
+```
 
 - Unbond tokens from a validator
 
-  ```bash
+```bash
 iris tx staking unbond iva14n9md3sq9xwscs96za8n85m0j9y2yu3cagxgke 1000iris --chain-id=irishub --from=<key-name> --fees=0.3iris
-  ```
+```
   
 - Redelegate tokens to another validator
 
-  ```bash
+```bash
 iris tx staking redelegate iva14n9md3sq9xwscs96za8n85m0j9y2yu3cagxgke iva1l2rsakp388kuv9k8qzq6lrm9taddae7fpx59wm 100iris --from mykey --chain-id=irishub --from=<key-name> --fees=0.3iris
-  ```
+```
   
 
 For other staking commands, please refer to [stake cli client](../cli-client/stake.md)
