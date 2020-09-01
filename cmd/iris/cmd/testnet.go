@@ -10,11 +10,6 @@ import (
 	"os"
 	"path/filepath"
 
-	servicetypes "github.com/irismod/service/types"
-
-	guardiantypes "github.com/irisnet/irishub/modules/guardian/types"
-	randomtypes "github.com/irisnet/irishub/modules/random/types"
-
 	"github.com/spf13/cobra"
 	tmconfig "github.com/tendermint/tendermint/config"
 	"github.com/tendermint/tendermint/crypto"
@@ -22,6 +17,8 @@ import (
 	tmrand "github.com/tendermint/tendermint/libs/rand"
 	"github.com/tendermint/tendermint/types"
 	tmtime "github.com/tendermint/tendermint/types/time"
+
+	guardiantypes "github.com/irisnet/irishub/modules/guardian/types"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -293,13 +290,6 @@ func initGenFiles(
 		guardianGenState.Trustees = append(guardianGenState.Trustees, guardian)
 	}
 	appGenState[guardiantypes.ModuleName] = clientCtx.JSONMarshaler.MustMarshalJSON(&guardianGenState)
-
-	// add system service in the genesis state
-	var serviceGenState servicetypes.GenesisState
-	clientCtx.JSONMarshaler.MustUnmarshalJSON(appGenState[servicetypes.ModuleName], &serviceGenState)
-	serviceGenState.Definitions = append(serviceGenState.Definitions, randomtypes.GetSvcDefinitions()...)
-
-	appGenState[servicetypes.ModuleName] = clientCtx.JSONMarshaler.MustMarshalJSON(&serviceGenState)
 
 	// set the accounts in the genesis state
 	var authGenState authtypes.GenesisState
