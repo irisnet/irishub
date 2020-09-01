@@ -34,7 +34,7 @@
 设置钱包B为取回收益的钱包：
 
 ```bash
-iriscli distribution set-withdraw-addr <address-of-wallet-B> --fee=0.3iris --from=<key-name-of-wallet-A> --chain-id=irishub
+iriscli distribution set-withdraw-addr <address-of-wallet-B> --fees=0.3iris --from=<key-name-of-wallet-A> --chain-id=irishub
 ```  
 
 查询委托账户对应的取回收益的钱包地址：
@@ -50,19 +50,19 @@ iriscli distribution withdraw-address <address-of-wallet-A>
 1.`WithdrawDelegationRewardsAll` : 提取所有在外的委托收益（从一个或者多个验证人处）。
 
 ```bash
-iriscli distribution withdraw-rewards --from=<key-name> --fee=0.3iris --chain-id=irishub
+iriscli distribution withdraw-rewards --from=<key-name> --fees=0.3iris --chain-id=irishub
 ```
 
 2.`WithdrawDelegatorReward` ：从指定验证人处提取委托收益。
 
 ```bash
-iriscli distribution withdraw-rewards --only-from-validator=<validator-address> --from=<key-name> --fee=0.3iris --chain-id=irishub
+iriscli distribution withdraw-rewards --only-from-validator=<validator-address> --from=<key-name> --fees=0.3iris --chain-id=irishub
 ```
 
 3.`WithdrawValidatorRewardsAll` ：仅验证人可用，同时提取自己节点的抵押收益和佣金收益。
 
 ```bash
-iriscli distribution withdraw-rewards --is-validator=true --from=<key-name> --fee=0.3iris --chain-id=irishub
+iriscli distribution withdraw-rewards --is-validator=true --from=<key-name> --fees=0.3iris --chain-id=irishub
 ```
 
 ### 查询收益
@@ -87,7 +87,7 @@ iriscli distribution withdraw-rewards --is-validator=true --from=<key-name> --fe
 2. 使用`dry-run`模式(模拟执行并不会广播交易)。注：此方法需要账户余额大于fee，实际执行不会扣除fee。
 
     ```bash
-    iriscli distribution withdraw-rewards --is-validator=true --from=node0 --dry-run --chain-id=irishub-stage --fee=0.3iris --commit
+    iriscli distribution withdraw-rewards --is-validator=true --from=node0 --dry-run --chain-id=irishub-stage --fees=0.3iris --commit
     ```
 
     示例输出（`withdraw-reward-total`就是预计的抵押获益）：
@@ -102,8 +102,8 @@ iriscli distribution withdraw-rewards --is-validator=true --from=<key-name> --fe
     simulation fee denom =
     simulation tag action = withdraw-validator-rewards-all
     simulation tag source-validator = iva1rulhmls7g9cjh239vnkjnw870t5urrut9cyrxl
-    simulation tag withdraw-reward-total = 2035775375047308887487iris-atto
+    simulation tag withdraw-reward-total = 2035775375047308887487uiris
     simulation tag withdraw-address = iaa18cgtskr6cgqyyady8mumk05xk2g9c95qgw5556
-    simulation tag withdraw-reward-from-validator-iva1rulhmls7g9cjh239vnkjnw870t5urrut9cyrxl = 1052484144134629789682iris-atto
-    simulation tag withdraw-reward-commission = 983291230912679097804iris-atto
+    simulation tag withdraw-reward-from-validator-iva1rulhmls7g9cjh239vnkjnw870t5urrut9cyrxl = 1052484144134629789682uiris
+    simulation tag withdraw-reward-commission = 983291230912679097804uiris
     ```

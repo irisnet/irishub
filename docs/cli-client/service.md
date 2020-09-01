@@ -53,7 +53,7 @@ iris tx service define [flags]
 ### define a service
 
 ```bash
-iris tx service define --chain-id=irishub --from=<key-name> --fee=0.3iris 
+iris tx service define --chain-id=irishub --from=<key-name> --fees=0.3iris 
 --name=<service name> --description=<service description> --author-description=<author description>
 --tags=tag1,tag2 --schemas=<schemas content or path/to/schemas.json>
 ```
@@ -103,7 +103,7 @@ iris tx service bind [flags]
 The deposit needs to satisfy the minimum deposit requirement, which is the maximal one between `price` * `MinDepositMultiple` and `MinDeposit`(`MinDepositMultiple` and `MinDeposit` are the system parameters, which can be modified through the governance).
 
 ```bash
-iris tx service bind --chain-id=irishub --from=<key-name> --fee=0.3iris
+iris tx service bind --chain-id=irishub --from=<key-name> --fees=0.3iris
 --service-name=<service name> --deposit=10000iris --pricing=<pricing content or path/to/pricing.json> --min-resp-time=50
 ```
 
@@ -164,7 +164,7 @@ iris tx service update-binding [service-name] [provider-address] [flags]
 The following example updates the service binding with the additional 10 IRIS deposit
 
 ```bash
-iris tx service update-binding <service-name> --chain-id=irishub --from=<key-name> --fee=0.3iris --deposit=10iris
+iris tx service update-binding <service-name> --chain-id=irishub --from=<key-name> --fees=0.3iris --deposit=10iris
 ```
 
 ## iris tx service set-withdraw-addr
@@ -178,7 +178,7 @@ iris tx service set-withdraw-addr [withdrawal-address] [flags]
 ### Set a withdrawal address
 
 ```bash
-iris tx service set-withdraw-addr <withdrawal address> --chain-id=irishub --from=<key-name> --fee=0.3iris
+iris tx service set-withdraw-addr <withdrawal address> --chain-id=irishub --from=<key-name> --fees=0.3iris
 ```
 
 ## iris q service withdraw-addr
@@ -206,7 +206,7 @@ iris tx service disable [service-name] [provider-address] [flags]
 ### Disable an available service binding
 
 ```bash
-iris tx service disable <service name> --chain-id=irishub --from=<key-name> --fee=0.3iris
+iris tx service disable <service name> --chain-id=irishub --from=<key-name> --fees=0.3iris
 ```
 
 ## iris tx service enable
@@ -228,7 +228,7 @@ iris tx service enable [service-name] [provider-address] [flags]
 The following example enables an unavailable service binding with the additional 10 IRIS deposit.
 
 ```bash
-iris tx service enable <service name> --chain-id=irishub --from=<key-name> --fee=0.3iris --deposit=10iris
+iris tx service enable <service name> --chain-id=irishub --from=<key-name> --fees=0.3iris --deposit=10iris
 ```
 
 ## iris tx service refund-deposit
@@ -244,7 +244,7 @@ iris tx service refund-deposit [service-name] [provider-address] [flags]
 Before refunding, you should [disable](#iris-tx-service-disable) the service binding first.
 
 ```bash
-iris tx service refund-deposit <service name> --chain-id=irishub --from=<key-name> --fee=0.3iris
+iris tx service refund-deposit <service name> --chain-id=irishub --from=<key-name> --fees=0.3iris
 ```
 
 ## iris tx service call
@@ -272,7 +272,7 @@ iris tx service call [flags]
 ### Initiate a service invocation request
 
 ```bash
-iris tx service call --chain-id=irishub --from=<key name> --fee=0.3iris --service-name=<service name>
+iris tx service call --chain-id=irishub --from=<key name> --fees=0.3iris --service-name=<service name>
 --providers=<provider list> --service-fee-cap=1iris --data=<request input or path/to/input.json> --timeout=100 --repeated --frequency=150 --total=100
 ```
 
@@ -343,7 +343,7 @@ iris tx service respond [flags]
 ### Respond to a service request
 
 ```bash
-iris tx service respond --chain-id=irishub --from=<key-name> --fee=0.3iris
+iris tx service respond --chain-id=irishub --from=<key-name> --fees=0.3iris
 --request-id=<request-id> --result=<response result or path/to/result.json> --data=<response output or path/to/output.json>
 ```
 
@@ -439,7 +439,7 @@ iris tx service update [request-context-id] [flags]
 ### Update a request context
 
 ```bash
-iris tx service update <request-context-id> --chain-id=irishub --from=<key name> --fee=0.3iris
+iris tx service update <request-context-id> --chain-id=irishub --from=<key name> --fees=0.3iris
 --providers=<provider list> --service-fee-cap=1iris --timeout=0 --frequency=150 --total=100
 ```
 
@@ -510,7 +510,7 @@ iris tx service withdraw-fees [provider-address] [flags]
 ### Withdraw the earned fees
 
 ```bash
-iris tx service withdraw-fees [provider-address] --chain-id=irishub --from=<key-name> --fee=0.3iris
+iris tx service withdraw-fees [provider-address] --chain-id=irishub --from=<key-name> --fees=0.3iris
 ```
 
 ## iris q service schema

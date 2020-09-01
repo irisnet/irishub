@@ -7,7 +7,7 @@ All the IRIS holders may participate in the on-chain governance. If the communit
 
 | key                      | Description                          | Range               | Current       |
 | ------------------------ | ------------------------------------ | ------------------- | ------------- |
-| `auth/gasPriceThreshold` | minimum of gas price                 | (0, 10^18iris-atto] | 6000000000000 |
+| `auth/gasPriceThreshold` | minimum of gas price                 | (0, 10^6uiris] | 0.6 |
 | `auth/txSizeLimit`       | the limitation of the normal tx size | [500, 1500]         | 1000          |
 
 ## Parameters in Stake
@@ -58,10 +58,8 @@ Details in [Slashing](../features/slashing.md)
 | key                          | Description                                      | Range   | Current                           |
 | ---------------------------- | ------------------------------------------------ | ------- | --------------------------------- |
 | `asset/AssetTaxRate`         | Asset tax rate                                   | [0, 1]  | 0.4                               |
-| `asset/IssueTokenBaseFee`    | Base fee for issuing tokens                      | [0, +∞) | 60000000000000000000000iris-atto  |
+| `asset/IssueTokenBaseFee`    | Base fee for issuing tokens                      | [0, +∞) | 60000000000uiris  |
 | `asset/MintTokenFeeRatio`    | Fee ratio for minting tokens                     | [0, 1]  | 0.1                               |
-| `asset/CreateGatewayBaseFee` | Base fee for creating gateway tokens             | [0, +∞) | 120000000000000000000000iris-atto |
-| `asset/GatewayAssetFeeRatio` | Fee ratio for issuing and minting gateway tokens | [0, 1]  | 0.1                               |
 
 Details in [Token](../features/token.md)
 

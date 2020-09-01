@@ -34,7 +34,7 @@ Among them, the parameters available for query for each subspace are as follows:
 | `UnbondingTime`     | Mortgage redemption time                                     | 3w(weeks) |
 | `MaxValidators`     | Maximum number of validators                                 | 100       |
 | `MaxEntries`        | The maximum number of unbinding/redelegation orders in progress | 7         |
-| `BondDenom`         | Bond denom                                                   | iris-atto |
+| `BondDenom`         | Bond denom                                                   | uiris |
 | `HistoricalEntries` |                                                              | 100       |
 
 ## mint
@@ -42,7 +42,7 @@ Among them, the parameters available for query for each subspace are as follows:
 | key         | description                 | default   |
 | ----------- | --------------------------- | --------- |
 | `Inflation` | Token issuance frequency    | 0.04      |
-| `MintDenom` | Denom of the token mintable | iris-atto |
+| `MintDenom` | Denom of the token mintable | uiris     |
 
 ## distribution
 
@@ -90,7 +90,7 @@ Among them, the parameters available for query for each subspace are as follows:
 | key             | description                   | default   |
 | --------------- | ----------------------------- | --------- |
 | `Fee`           | Charge rate                   | 0.003     |
-| `StandardDenom` | The name of the token charged | iris-atto |
+| `StandardDenom` | The name of the token charged | uiris     |
 
 ## service
 
@@ -104,5 +104,5 @@ Among them, the parameters available for query for each subspace are as follows:
 | `ComplaintRetrospect`  | Complaint Retrospect                                | 15d        |
 | `ArbitrationTimeLimit` | Arbitration period                                  | 5d         |
 | `TxSizeLimit`          | The maximum number of bytes per service transaction | 4000       |
-| `BaseDenom`            | Tokens supported by service fees                    | iris-atto  |
+| `BaseDenom`            | Tokens supported by service fees                    | uiris      |
 

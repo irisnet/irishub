@@ -70,7 +70,7 @@ iriscli stake create-validator \
     --amount=<amount-to-be-delegated, e.g. 10000iris> \
     --commission-rate=0.1 \
     --gas=100000 \
-    --fee=0.6iris \
+    --fees=0.6iris \
     --chain-id=irishub \
     --from=<key-name> \
     --commit

@@ -53,7 +53,7 @@ iris tx service define [flags]
 ### 定义一个新的服务
 
 ```bash
-iris tx service define --chain-id=irishub --from=<key-name> --fee=0.3iris 
+iris tx service define --chain-id=irishub --from=<key-name> --fees=0.3iris 
 --name=<service name> --description=<service description> --author-description=<author description>
 --tags=tag1,tag2 --schemas=<schemas content or path/to/schemas.json>
 ```
@@ -103,7 +103,7 @@ iris tx service bind [flags]
 抵押`deposit`应该满足最小抵押数量需求，最小抵押数量为`price` * `MinDepositMultiple` 和 `MinDeposit`中的最大值（`MinDepositMultiple`以及`MinDeposit`是可治理参数）。
 
 ```bash
-iris tx service bind --chain-id=irishub --from=<key-name> --fee=0.3iris
+iris tx service bind --chain-id=irishub --from=<key-name> --fees=0.3iris
 --service-name=<service name> --deposit=10000iris --pricing=<pricing content or path/to/pricing.json> --min-resp-time=50
 ```
 
@@ -163,7 +163,7 @@ iris tx service update-binding [service-name] [provider-address] [flags]
 更新服务绑定，追加 10 IRIS 的抵押。
 
 ```bash
-iris tx service update-binding <service-name> --chain-id=irishub --from=<key-name> --fee=0.3iris --deposit=10iris
+iris tx service update-binding <service-name> --chain-id=irishub --from=<key-name> --fees=0.3iris --deposit=10iris
 ```
 
 ## iris tx service set-withdraw-addr
@@ -177,7 +177,7 @@ iris tx service set-withdraw-addr [withdrawal-address] [flags]
 ### 设置一个提取地址
 
 ```bash
-iris tx service set-withdraw-addr <withdrawal address> --chain-id=irishub --from=<key-name> --fee=0.3iris
+iris tx service set-withdraw-addr <withdrawal address> --chain-id=irishub --from=<key-name> --fees=0.3iris
 ```
 
 ## iris q service withdraw-addr
@@ -205,7 +205,7 @@ iriscli tx service disable [service-name] [flags]
 ### 禁用一个可用的服务绑定
 
 ```bash
-iris tx service disable <service name> --chain-id=irishub --from=<key-name> --fee=0.3iris
+iris tx service disable <service name> --chain-id=irishub --from=<key-name> --fees=0.3iris
 ```
 
 ## iris tx service enable
@@ -227,7 +227,7 @@ iris tx service enable [service-name] [provider-address] [flags]
 启用一个不可用的服务绑定，追加 10 IRIS 的抵押。
 
 ```bash
-iris tx service enable <service name> --chain-id=irishub --from=<key-name> --fee=0.3iris --deposit=10iris
+iris tx service enable <service name> --chain-id=irishub --from=<key-name> --fees=0.3iris --deposit=10iris
 ```
 
 ## iris tx service refund-deposit
@@ -243,7 +243,7 @@ iris tx service refund-deposit [service-name] [provider-address] [flags]
 取回抵押之前，必须先[禁用](#iris-tx-service-disable)服务绑定。
 
 ```bash
-iris tx service refund-deposit <service name> --chain-id=irishub --from=<key-name> --fee=0.3iris
+iris tx service refund-deposit <service name> --chain-id=irishub --from=<key-name> --fees=0.3iris
 ```
 
 ## iris tx service call
@@ -271,7 +271,7 @@ iris tx service call [flags]
 ### 发起一个服务调用请求
 
 ```bash
-iris tx service call --chain-id=irishub --from=<key name> --fee=0.3iris --service-name=<service name>
+iris tx service call --chain-id=irishub --from=<key name> --fees=0.3iris --service-name=<service name>
 --providers=<provider list> --service-fee-cap=1iris --data=<request input or path/to/input.json> --timeout=100 --repeated --frequency=150 --total=100
 ```
 
@@ -342,7 +342,7 @@ iris tx service respond [flags]
 ### 响应一个服务请求
 
 ```bash
-iris tx service respond --chain-id=irishub --from=<key-name> --fee=0.3iris
+iris tx service respond --chain-id=irishub --from=<key-name> --fees=0.3iris
 --request-id=<request-id> --result=<response result or path/to/result.json> --data=<response output or path/to/output.json>
 ```
 
@@ -438,7 +438,7 @@ iris tx service update [request-context-id] [flags]
 ### 更新一个请求上下文
 
 ```bash
-iris tx service update <request-context-id> --chain-id=irishub --from=<key name> --fee=0.3iris
+iris tx service update <request-context-id> --chain-id=irishub --from=<key name> --fees=0.3iris
 --providers=<provider list> --service-fee-cap=1iris --timeout=0 --frequency=150 --total=100
 ```
 
@@ -509,7 +509,7 @@ iris tx service withdraw-fees [flags]
 ### 提取服务提供者的收益
 
 ```bash
-iris tx service withdraw-fees --chain-id=irishub --from=<key-name> --fee=0.3iris
+iris tx service withdraw-fees --chain-id=irishub --from=<key-name> --fees=0.3iris
 ```
 
 ## iris q service schema

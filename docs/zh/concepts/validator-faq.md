@@ -184,7 +184,7 @@ IRISnet 基础概念请参考 [基础概念](general-concepts.md)
 - 如果当前时间已经超过了 `Jailed Until`，即可执行[解禁](../cli-client/stake.md#iriscli-stake-unjail)操作：
   
   ```bash
-  iriscli stake unjail --from=<key-name> --fee=0.3iris --chain-id=irishub
+  iriscli stake unjail --from=<key-name> --fees=0.3iris --chain-id=irishub
   ```
 
 - 再次检查您的验证人，看看您的投票权是否恢复。

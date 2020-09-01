@@ -253,5 +253,5 @@ iris tx gov vote [proposal-id] [option] [flags]
 ### 为活跃的提案投票
 
 ```bash
-iriscli gov vote <proposal-id> <option> --from=<key-name> --fee=0.3iris
+iriscli gov vote <proposal-id> <option> --from=<key-name> --fees=0.3iris
 ```

@@ -239,7 +239,7 @@ iris tx staking create-validator [flags]
 ### 创建验证人
 
 ```bash
-iris tx staking create-validator --chain-id=irishub --from=<key-name> --fee=0.3iris --pubkey=<validator-pubKey> --commission-rate=0.1 --amount=100iris --moniker=<validator-name>
+iris tx staking create-validator --chain-id=irishub --from=<key-name> --fees=0.3iris --pubkey=<validator-pubKey> --commission-rate=0.1 --amount=100iris --moniker=<validator-name>
 ```
 
 :::tip
@@ -270,7 +270,7 @@ iris tx staking edit-validator [flags]
 ### 编辑验证人信息
 
 ```bash
-iris tx staking edit-validator --from=<key-name> --chain-id=irishub --fee=0.3iris --commission-rate=0.10 --moniker=<validator-name>
+iris tx staking edit-validator --from=<key-name> --chain-id=irishub --fees=0.3iris --commission-rate=0.10 --moniker=<validator-name>
 ```
 
 ### 上传验证人头像
@@ -286,7 +286,7 @@ iris tx staking delegate [validator-addr] [amount] [flags]
 ```
 
 ```bash
-iris tx staking delegate <iva...> <amount> --chain-id=irishub --from=<key-name> --fee=0.3iris
+iris tx staking delegate <iva...> <amount> --chain-id=irishub --from=<key-name> --fees=0.3iris
 ```
 
 ## iris tx staking unbond
@@ -300,7 +300,7 @@ iris tx staking unbond [validator-addr] [amount] [flags]
 ### 从验证人中解委托一定数量的代币
 
 ```bash
-iris tx staking unbond <iva...> 10iris --from=<key-name> --chain-id=irishub --fee=0.3iris
+iris tx staking unbond <iva...> 10iris --from=<key-name> --chain-id=irishub --fees=0.3iris
 ```
 
 ## iris tx staking redelegate
@@ -318,5 +318,5 @@ iris tx staking redelegate [src-validator-addr] [dst-validator-addr] [amount] [f
 ### 转委托一定数量代币到其他验证人
 
 ```bash
-iris tx staking redelegate <iva...> <iva...> 10iris --chain-id=irishub --from=<key-name> --fee=0.3iris
+iris tx staking redelegate <iva...> <iva...> 10iris --chain-id=irishub --from=<key-name> --fees=0.3iris
 ```

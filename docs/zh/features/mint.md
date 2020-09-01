@@ -28,9 +28,9 @@ AnnualInflationAmount = inflationBasement * inflationRate
 blockInflationAmount = AnnualInflationAmount * blockCostTime / (year)
 ```
 
-`inflationBasement` 的值被定义在 genesis 文件中. 默认情况下，genesis 里面写入的值是 `2000000000iris`（20亿个 iris，`1 iris` 等于 `1*10^18 iris-atto`）。
+`inflationBasement` 的值被定义在 genesis 文件中. 默认情况下，genesis 里面写入的值是 `2000000000iris`（20亿个 iris，`1 iris` 等于 `1*10^18 uiris`）。
 
-假设 `blockCostTime` 是5000毫秒，通胀比例 `inflationRate` 是 `4%`，那么这个块增发的 token 数量是 `12675235125611580094iris-atto`（`12.675235125611580094iris`）
+假设 `blockCostTime` 是5000毫秒，通胀比例 `inflationRate` 是 `4%`，那么这个块增发的 token 数量是 `12675235125611580094uiris`（`12.675235125611580094iris`）
 
 ## 对用户的影响
 
