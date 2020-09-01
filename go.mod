@@ -12,8 +12,8 @@ require (
 	github.com/irismod/htlc v0.0.0-20200830023142-e3da67f16b03
 	github.com/irismod/nft v1.1.1-0.20200827095318-d16861212579
 	github.com/irismod/record v1.1.1-0.20200827095301-3e27fc43ae73
-	github.com/irismod/service v1.1.1-0.20200830041912-b2ced48a06ab
-	github.com/irismod/token v1.1.1-0.20200831030503-21db6eea21a9
+	github.com/irismod/service v1.1.1-0.20200831103113-6c6a5a77d22f
+	github.com/irismod/token v1.1.1-0.20200831162307-f05f6766f5b7
 	github.com/olebedev/config v0.0.0-20190528211619-364964f3a8e4
 	github.com/onsi/ginkgo v1.8.0 // indirect
 	github.com/onsi/gomega v1.5.0 // indirect
@@ -34,7 +34,7 @@ require (
 )
 
 replace (
-	github.com/cosmos/cosmos-sdk => github.com/irisnet/cosmos-sdk v0.34.4-0.20200831031220-2888c60c9b92
+	github.com/cosmos/cosmos-sdk => github.com/irisnet/cosmos-sdk v0.34.4-0.20200901015208-34368bb70a52
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.2-alpha.regen.4
 	github.com/keybase/go-keychain => github.com/99designs/go-keychain v0.0.0-20191008050251-8e49817e8af4
 )
