@@ -13,7 +13,7 @@ require (
 	github.com/irismod/nft v1.1.1-0.20200827095318-d16861212579
 	github.com/irismod/record v1.1.1-0.20200827095301-3e27fc43ae73
 	github.com/irismod/service v1.1.1-0.20200831103113-6c6a5a77d22f
-	github.com/irismod/token v1.1.1-0.20200831092317-7be7d71fe448
+	github.com/irismod/token v1.1.1-0.20200831162307-f05f6766f5b7
 	github.com/olebedev/config v0.0.0-20190528211619-364964f3a8e4
 	github.com/onsi/ginkgo v1.8.0 // indirect
 	github.com/onsi/gomega v1.5.0 // indirect
@@ -34,6 +34,6 @@ require (
 )
 
 replace (
-	github.com/cosmos/cosmos-sdk => github.com/irisnet/cosmos-sdk v0.34.4-0.20200831031220-2888c60c9b92
+	github.com/cosmos/cosmos-sdk => github.com/irisnet/cosmos-sdk v0.34.4-0.20200901015208-34368bb70a52
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.2-alpha.regen.4
 )
