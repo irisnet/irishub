@@ -59,7 +59,7 @@ Once the proposal's deposit reaches `MinDeposit`, it enters voting period. If pr
 
 #### Deposit refund and burn
 
-When a the a proposal finalized, the coins from the deposit are either refunded or burned, according to the final tally of the proposal:
+When a proposal finalized, the coins from the deposit are either refunded or burned, according to the final tally of the proposal:
 
 - If the proposal is approved or if it's rejected but _not_ vetoed, deposits will automatically be refunded to their respective depositor (transferred from the governance `ModuleAccount`).
 
