@@ -38,7 +38,7 @@ iris tx token issue [flags]
 ### 发行通证
 
 ```bash
-iris tx token issue --symbol="kitty" --name="Kitty Token" --initial-supply=100000000000 --max-supply=1000000000000 --scale=0 --mintable=true --fees=1iris --chain-id=irishub --from=<key-name> --commit
+iris tx token issue --name="Kitty Token" --symbol="kitty" --min-unit="kitty" --scale=0 --initial-supply=100000000000 --max-supply=1000000000000 --mintable=true --from=<key-name> --chain-id=<chain-id> --fees=<fee>
 ```
 
 ### 发送通证
@@ -72,7 +72,7 @@ iris tx token edit [symbol] [flags]
 ### 编辑通证
 
 ```bash
-iris tx token edit kitty --name="Cat Token" --max-supply=100000000000 --mintable=true --from=<key-name> --chain-id=irishub --fees=0.3iris --commit
+iris tx token edit <symbol> --name="Cat Token" --max-supply=100000000000 --mintable=true --from=<key-name> --chain-id=<chain-id> --fees=<fee>
 ```
 
 ## iris tx token transfer
@@ -92,7 +92,7 @@ iris tx token transfer [symbol] [flags]
 ### 转让通证所有者
 
 ```bash
-iris tx token transfer kitty --to=<new-owner-address> --from=<key-name> --chain-id=irishub --fees=0.3iris --commit
+iris tx token transfer <symbol> --to=<to> --from=<key-name> --chain-id=<chain-id> --fees=<fee>
 ```
 
 ## iris tx token mint
@@ -113,7 +113,7 @@ iris tx token mint [symbol] [flags]
 ### 增发通证
 
 ```bash
-iris tx token mint kitty --amount=1000000 --from=<key-name> --chain-id=irishub --fees=0.3iris
+iris tx token mint <symbol> --amount=<amount> --to=<to> --from=<key-name> --chain-id=<chain-id> --fees=<fee>
 ```
 
 ## iris query token token
@@ -121,13 +121,13 @@ iris tx token mint kitty --amount=1000000 --from=<key-name> --chain-id=irishub -
 查询通证。
 
 ```bash
-iris query token token [symbol] [flags]
+iris query token token [denom] [flags]
 ```
 
 ### 查询通证
 
 ```bash
-iris query token token kitty
+iris query token token <denom>
 ```
 
 ## iris query token tokens
