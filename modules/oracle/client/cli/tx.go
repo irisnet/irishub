@@ -3,13 +3,14 @@ package cli
 import (
 	"fmt"
 
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/version"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 
 	"github.com/irisnet/irishub/modules/oracle/types"
 )
@@ -37,18 +38,21 @@ func GetCmdCreateFeed() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create",
 		Short: `Create a new feed, the feed will be in "paused" state`,
-		Example: fmt.Sprintf(`%s oracle create --chain-id=<chain-id> --from=<key-name> --fee=0.3iris `+
-			`--feed-name="test-feed" `+
-			`--latest-history=10 `+
-			`--service-name="test-service" `+
-			`--input=<request-data> `+
-			`--providers=<provide1_address>,<provider2_address> `+
-			`--service-fee-cap=1iris `+
-			`--timeout=2 `+
-			`--total=10 `+
-			`--threshold=1 `+
-			`--aggregate-func="avg" `+
-			`--value-json-path="high"`, version.AppName),
+		Example: fmt.Sprintf(
+			`%s tx oracle create --chain-id=<chain-id> --from=<key-name> --fee=0.3iris `+
+				`--feed-name="test-feed" `+
+				`--latest-history=10 `+
+				`--service-name="test-service" `+
+				`--input=<request-data> `+
+				`--providers=<provide1_address>,<provider2_address> `+
+				`--service-fee-cap=1iris `+
+				`--timeout=2 `+
+				`--total=10 `+
+				`--threshold=1 `+
+				`--aggregate-func="avg" `+
+				`--value-json-path="high"`,
+			version.AppName,
+		),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 			clientCtx, err := client.ReadTxCommandFlags(clientCtx, cmd.Flags())
@@ -113,7 +117,7 @@ func GetCmdStartFeed() *cobra.Command {
 		Use:     "start [feed-name]",
 		Short:   `Start a feed in "paused" state`,
 		Args:    cobra.ExactArgs(1),
-		Example: fmt.Sprintf(`%s oracle start <feed-name> --chain-id=<chain-id> --from=<key-name> --fee=0.3iris`, version.AppName),
+		Example: fmt.Sprintf(`%s tx oracle start <feed-name> --chain-id=<chain-id> --from=<key-name> --fee=0.3iris`, version.AppName),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 			clientCtx, err := client.ReadTxCommandFlags(clientCtx, cmd.Flags())
@@ -144,7 +148,7 @@ func GetCmdPauseFeed() *cobra.Command {
 		Use:     "pause [feed-name]",
 		Short:   `Pause a feed in "running" state`,
 		Args:    cobra.ExactArgs(1),
-		Example: fmt.Sprintf(`%s oracle pause <feed-name> --chain-id=<chain-id> --from=<key-name> --fee=0.3iris`, version.AppName),
+		Example: fmt.Sprintf(`%s tx oracle pause <feed-name> --chain-id=<chain-id> --from=<key-name> --fee=0.3iris`, version.AppName),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 			clientCtx, err := client.ReadTxCommandFlags(clientCtx, cmd.Flags())
@@ -175,14 +179,17 @@ func GetCmdEditFeed() *cobra.Command {
 		Use:   "edit [feed-name]",
 		Short: "Modify the feed information and update service invocation parameters by feed creator",
 		Args:  cobra.ExactArgs(1),
-		Example: fmt.Sprintf(`%s oracle edit <feed-name> --chain-id=<chain-id> --from=<key-name> --fee=0.3iris `+
-			`--latest-history=10 `+
-			`--providers=<provide1_address>,<provider2_address> `+
-			`--service-fee-cap=1iris `+
-			`--timeout=2 `+
-			`--frequency=10 `+
-			`--threshold=5 `+
-			`--threshold=1`, version.AppName),
+		Example: fmt.Sprintf(
+			`%s tx oracle edit <feed-name> --chain-id=<chain-id> --from=<key-name> --fee=0.3iris `+
+				`--latest-history=10 `+
+				`--providers=<provide1_address>,<provider2_address> `+
+				`--service-fee-cap=1iris `+
+				`--timeout=2 `+
+				`--frequency=10 `+
+				`--threshold=5 `+
+				`--threshold=1`,
+			version.AppName,
+		),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 			clientCtx, err := client.ReadTxCommandFlags(clientCtx, cmd.Flags())

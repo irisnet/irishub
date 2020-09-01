@@ -9,7 +9,7 @@ import (
 
 // RegisterCodec registers concrete types on the codec.
 func RegisterCodec(cdc *codec.LegacyAmino) {
-	cdc.RegisterConcrete(&MsgRequestRandom{}, "irishub/rand/MsgRequestRandom", nil)
+	cdc.RegisterConcrete(&MsgRequestRandom{}, "irishub/random/MsgRequestRandom", nil)
 }
 
 func RegisterInterfaces(registry types.InterfaceRegistry) {

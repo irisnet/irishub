@@ -12,7 +12,7 @@ import (
 	"github.com/irisnet/irishub/modules/random/types"
 )
 
-// NewQuerier creates a new rand Querier instance
+// NewQuerier creates a new random Querier instance
 func NewQuerier(k Keeper, legacyQuerierCdc codec.JSONMarshaler) sdk.Querier {
 	return func(ctx sdk.Context, path []string, req abci.RequestQuery) ([]byte, error) {
 		switch path[0] {
@@ -37,12 +37,12 @@ func queryRandom(ctx sdk.Context, req abci.RequestQuery, k Keeper, legacyQuerier
 		return nil, sdkerrors.Wrap(types.ErrInvalidReqID, params.ReqID)
 	}
 
-	rand, err2 := k.GetRandom(ctx, reqID)
+	random, err2 := k.GetRandom(ctx, reqID)
 	if err2 != nil {
 		return nil, err2
 	}
 
-	bz, err := codec.MarshalJSONIndent(legacyQuerierCdc, rand)
+	bz, err := codec.MarshalJSONIndent(legacyQuerierCdc, random)
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
 	}
@@ -57,7 +57,7 @@ func queryRandomRequestQueue(ctx sdk.Context, req abci.RequestQuery, k Keeper, l
 	}
 
 	if params.Height < 0 {
-		return nil, sdkerrors.Wrap(types.ErrInvalidHeight, string(params.Height))
+		return nil, sdkerrors.Wrap(types.ErrInvalidHeight, string(rune(params.Height)))
 	}
 
 	var requests []types.Request
