@@ -354,7 +354,7 @@ func NewIrisApp(
 	app.coinswapKeeper = coinswapkeeper.NewKeeper(appCodec, keys[coinswaptypes.StoreKey], app.GetSubspace(coinswaptypes.ModuleName), app.bankKeeper, app.accountKeeper)
 
 	app.serviceKeeper = servicekeeper.NewKeeper(appCodec, keys[servicetypes.StoreKey], app.accountKeeper, app.bankKeeper,
-		servicekeeper.MockTokenKeeper{}, app.GetSubspace(servicetypes.ModuleName), authtypes.FeeCollectorName)
+		WrapToken(app.tokenKeeper), app.GetSubspace(servicetypes.ModuleName), authtypes.FeeCollectorName)
 
 	app.oracleKeeper = oracleKeeper.NewKeeper(appCodec, keys[oracletypes.StoreKey], app.GetSubspace(oracletypes.ModuleName), app.guardianKeeper, app.serviceKeeper)
 
@@ -460,8 +460,8 @@ func NewIrisApp(
 	app.SetInitChainer(app.InitChainer)
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetAnteHandler(
-		ante.NewAnteHandler(
-			app.accountKeeper, app.bankKeeper, ante.DefaultSigVerificationGasConsumer,
+		NewAnteHandler(
+			app.accountKeeper, app.bankKeeper, app.tokenKeeper, ante.DefaultSigVerificationGasConsumer,
 			encodingConfig.TxConfig.SignModeHandler(),
 		),
 	)
