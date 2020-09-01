@@ -8,23 +8,24 @@ import (
 	"os"
 	"strings"
 
-	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/cosmos/cosmos-sdk/codec"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	tokentypes "github.com/irismod/token/types"
 	"github.com/olebedev/config"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
+
 	"github.com/tendermint/tendermint/libs/cli"
+
+	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/flags"
+	"github.com/cosmos/cosmos-sdk/codec"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	tokentypes "github.com/irismod/token/types"
 )
 
 const (
-	formatJson = "json"
-
+	formatJson     = "json"
 	cmdScopeGlobal = "global"
-
 	filedTypeMap   = "map"
 	filedTypeArray = "array"
 )

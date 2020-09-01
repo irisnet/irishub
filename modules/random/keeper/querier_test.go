@@ -31,7 +31,11 @@ func (suite *KeeperTestSuite) TestNewQuerier() {
 	suite.Nil(res)
 
 	// init random
-	random := types.NewRandom(types.SHA256(testTxBytes), testHeight, big.NewRat(testRandomNumerator, testRandomDenomiator).FloatString(types.RandPrec))
+	random := types.NewRandom(
+		types.SHA256(testTxBytes),
+		testHeight,
+		big.NewRat(testRandomNumerator, testRandomDenomiator).FloatString(types.RandPrec),
+	)
 	suite.keeper.SetRandom(suite.ctx, testReqID, random)
 
 	storedRandom, err := suite.keeper.GetRandom(suite.ctx, testReqID)

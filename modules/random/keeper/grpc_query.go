@@ -48,7 +48,6 @@ func (k Keeper) RandomRequestQueue(c context.Context, req *types.QueryRandomRequ
 	ctx := sdk.UnwrapSDKContext(c)
 
 	var requests []types.Request
-
 	if req.Height == 0 {
 		// query all pending requests
 		requests = queryAllRandomRequestsInQueue(ctx, k)
@@ -56,5 +55,6 @@ func (k Keeper) RandomRequestQueue(c context.Context, req *types.QueryRandomRequ
 		// query the pending requests by the specified height
 		requests = queryRandomRequestQueueByHeight(ctx, req.Height, k)
 	}
+
 	return &types.QueryRandomRequestQueueResponse{Requests: requests}, nil
 }

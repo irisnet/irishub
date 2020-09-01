@@ -3,13 +3,14 @@ package cli
 import (
 	"fmt"
 
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/version"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 
 	"github.com/irisnet/irishub/modules/guardian/types"
 )
@@ -37,8 +38,10 @@ func GetCmdCreateProfiler() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "add-profiler",
 		Short: "Add a new profiler",
-		Example: fmt.Sprintf("%s tx guardian add-profiler --chain-id=<chain-id> --from=<key-name> --fees=0.3iris "+
-			"--address=<added address> --description=<name>", version.AppName),
+		Example: fmt.Sprintf(
+			"%s tx guardian add-profiler --chain-id=<chain-id> --from=<key-name> --fees=0.3iris --address=<added address> --description=<name>",
+			version.AppName,
+		),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 			clientCtx, err := client.ReadTxCommandFlags(clientCtx, cmd.Flags())
@@ -77,8 +80,10 @@ func GetCmdDeleteProfiler() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "delete-profiler",
 		Short: "Delete a profiler",
-		Example: fmt.Sprintf("%s tx guardian delete-profiler --chain-id=<chain-id> --from=<key-name> --fees=0.3iris "+
-			"--address=<deleted address>", version.AppName),
+		Example: fmt.Sprintf(
+			"%s tx guardian delete-profiler --chain-id=<chain-id> --from=<key-name> --fees=0.3iris --address=<deleted address>",
+			version.AppName,
+		),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 			clientCtx, err := client.ReadTxCommandFlags(clientCtx, cmd.Flags())
@@ -111,8 +116,10 @@ func GetCmdCreateTrustee() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "add-trustee",
 		Short: "Add a new trustee",
-		Example: fmt.Sprintf("%s tx guardian add-trustee --chain-id=<chain-id> --from=<key-name> --fees=0.3iris "+
-			"--address=<added address> --description=<name>", version.AppName),
+		Example: fmt.Sprintf(
+			"%s tx guardian add-trustee --chain-id=<chain-id> --from=<key-name> --fees=0.3iris --address=<added address> --description=<name>",
+			version.AppName,
+		),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 			clientCtx, err := client.ReadTxCommandFlags(clientCtx, cmd.Flags())
@@ -149,8 +156,10 @@ func GetCmdDeleteTrustee() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "delete-trustee",
 		Short: "Delete a trustee",
-		Example: fmt.Sprintf("%s tx guardian delete-trustee --chain-id=<chain-id> --from=<key-name> --fees=0.3iris "+
-			"--address=<deleted address>", version.AppName),
+		Example: fmt.Sprintf(
+			"%s tx guardian delete-trustee --chain-id=<chain-id> --from=<key-name> --fees=0.3iris --address=<deleted address>",
+			version.AppName,
+		),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 			clientCtx, err := client.ReadTxCommandFlags(clientCtx, cmd.Flags())

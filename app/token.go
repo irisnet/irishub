@@ -2,6 +2,7 @@ package app
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
 	servicetypes "github.com/irismod/service/types"
 	tokenkeeper "github.com/irismod/token/keeper"
 )

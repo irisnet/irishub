@@ -5,8 +5,9 @@ import (
 	"math"
 	"strconv"
 
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/tidwall/gjson"
+
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 var (
