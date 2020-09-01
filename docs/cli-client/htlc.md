@@ -1,4 +1,4 @@
-# iriscli htlc
+# iris htlc
 
 [HTLC module](../features/htlc.md) allows you to manage local Hash Time Locked Contracts (HTLCs) for atomic swaps with other chains.
 
@@ -13,17 +13,17 @@ There are the following states involved in the lifecycle of an HTLC:
 
 | Name                                   | Description                 |
 | -------------------------------------- | --------------------------- |
-| [create](#iriscli-htlc-create)         | Create an HTLC              |
-| [claim](#iriscli-htlc-claim)           | Claim an opened HTLC        |
-| [refund](#iriscli-htlc-refund)         | Refund from an expired HTLC |
-| [query-htlc](#iriscli-htlc-query-htlc) | Query details of an HTLC    |
+| [create](#iris-tx-htlc-create)         | Create an HTLC              |
+| [claim](#iris-tx-htlc-claim)           | Claim an opened HTLC        |
+| [refund](#iris-tx-htlc-refund)         | Refund from an expired HTLC |
+| [htlc](#iris-query-htlc-htlc)          | Query details of an HTLC    |
 
-## iriscli htlc create
+## iris tx htlc create
 
 Create an HTLC
 
 ```bash
-iriscli htlc create --chain-id=irishub --from=<key-name> --fee=0.3iris --to=<to> --receiver-on-other-chain=<receiver-on-other-chain> --amount=<amount> --secret=<secret> --time-lock=<time-lock> --timestamp=<timestamp>
+iris tx htlc create --to=<recipient> --receiver-on-other-chain=<receiver-on-other-chain> --amount=<amount> --secret=<secret> --hash-lock=<hash-lock> --timestamp=<timestamp> --time-lock=<time-lock> --from=mykey
 ```
 
 **Flags:**
@@ -41,7 +41,7 @@ iriscli htlc create --chain-id=irishub --from=<key-name> --fee=0.3iris --to=<to>
 ### Create an HTLC
 
 ```bash
-iriscli htlc create \
+iris tx htlc create \
 --from=node0 \
 --to=faa1zx6n0jussc3lx0dk0rax6zsk80vgzyy7kyfud5 \
 --receiver-on-other-chain=0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826 \
@@ -49,75 +49,51 @@ iriscli htlc create \
 --secret=382aa2863398a31474616f1498d7a9feba132c4bcf9903940b8a5c72a46e4a41 \
 --time-lock=50 \
 --timestamp=1580000000 \
---fee=0.3iris \
+--fees=0.3iris \
 --chain-id=irishub \
 --commit
 ```
 
-## iriscli htlc claim
+## iris tx htlc claim
 
 Claim an opened HTLC
 
 ```bash
-iriscli htlc claim --chain-id=irishub --from=<key-name> --fee=0.3iris --hash-lock=<hash-lock> --secret=<secret>
+iris tx htlc claim [hash-lock] [secret] [flags]
 ```
-
-**Flags:**
-
-| Name, shorthand | Type     | Required | Default | Description                                      |
-| --------------- | -------- | -------- | ------- | ------------------------------------------------ |
-| --hash-lock     | bytesHex | Yes      |         | The hash lock identifying the HTLC to be claimed |
-| --secret        | bytesHex | Yes      |         | The secret for generating hash lock              |
 
 ### Claim an opened HTLC
 
 ```bash
-iriscli htlc claim \
---from=node0 \
---hash-lock=bae5acb11ad90a20cb07023f4bf0fcf4d38549feff486dd40a1fbe871b4aabdf \
---secret=382aa2863398a31474616f1498d7a9feba132c4bcf9903940b8a5c72a46e4a41 \
---fee=0.3iris \
---chain-id=irishub \
---commit
+iris tx claim [hash-lock] [secret] [flags]
 ```
 
-## iriscli htlc refund
+## iris tx htlc refund
 
 Refund from an expired HTLC
 
 ```bash
-iriscli htlc refund --chain-id=irishub --from=<key-name> --fee=0.3iris --hash-lock=<hash-lock>
+iris tx htlc refund [hash-lock] [flags]
 ```
-
-**Flags:**
-
-| Name, shorthand | Type     | Required | Default | Description                                       |
-| --------------- | -------- | -------- | ------- | ------------------------------------------------- |
-| --hash-lock     | bytesHex | Yes      |         | The hash lock identifying the HTLC to be refunded |
 
 ### Refund from an expired HTLC
 
 ```bash
-iriscli htlc refund \
---from=node0 \
---hash-lock=bae5acb11ad90a20cb07023f4bf0fcf4d38549feff486dd40a1fbe871b4aabdf \
---fee=0.3iris \
---chain-id=irishub \
---commit
+iris tx htlc refund [hash-lock] [flags]
 ```
 
-## iriscli htlc query-htlc
+## iris query htlc htlc
 
 Query details of an HTLC
 
 ```bash
-iriscli htlc query-htlc <hash-lock>
+iris query htlc htlc <hash-lock>
 ```
 
 ### Query details of an HTLC
 
 ```bash
-iriscli htlc query-htlc bae5acb11ad90a20cb07023f4bf0fcf4d38549feff486dd40a1fbe871b4aabdf
+iris query htlc htlc bae5acb11ad90a20cb07023f4bf0fcf4d38549feff486dd40a1fbe871b4aabdf
 ```
 
 After that, you will get the detailed info for the HTLC.

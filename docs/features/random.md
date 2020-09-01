@@ -71,6 +71,6 @@ rand = seed mod 10^20 / 10^20
 
 ## Actions
 
-- [Request Random Number](../cli-client/rand.md#iriscli-rand-request-rand)
-- [Query Random Number](../cli-client/rand.md#iriscli-rand-query-rand)
-- [Query Random Queue](../cli-client/rand.md#iriscli-rand-query-queue)
+- [Request Random Number](../cli-client/rand.md#iris-tx-random-request-random)
+- [Query Random Number](../cli-client/rand.md#iris-query-random-random)
+- [Query Random Queue](../cli-client/rand.md#iris-query-random-queue)
