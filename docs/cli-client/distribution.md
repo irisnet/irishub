@@ -92,5 +92,5 @@ iris tx distribution withdraw-all-rewards [flags]
 Withdraw rewards from a given delegation address, and optionally withdraw validator commission if the delegation address given is a validator operator.
 
 ```bash
-iris tx distribution withdraw-rewards [validator-addr] [flags]```
+iris tx distribution withdraw-rewards [validator-addr] [flags]
 ```

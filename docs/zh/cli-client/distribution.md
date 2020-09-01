@@ -92,5 +92,5 @@ iris tx distribution withdraw-all-rewards [flags]
 取回收益，有以下几种模式: 取回所有奖励、从指定的验证者取回委派奖励、验证人取回所有奖励以及佣金。
 
 ```bash
-iris tx distribution withdraw-rewards [validator-addr] [flags]```
+iris tx distribution withdraw-rewards [validator-addr] [flags]
 ```

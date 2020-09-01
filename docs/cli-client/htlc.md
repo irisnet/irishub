@@ -23,7 +23,7 @@ There are the following states involved in the lifecycle of an HTLC:
 Create an HTLC
 
 ```bash
-iris tx htlc create --chain-id=irishub --from=<key-name> --fees=0.3iris --to=<to> --receiver-on-other-chain=<receiver-on-other-chain> --amount=<amount> --secret=<secret> --time-lock=<time-lock> --timestamp=<timestamp>
+iris tx htlc create --to=<recipient> --receiver-on-other-chain=<receiver-on-other-chain> --amount=<amount> --secret=<secret> --hash-lock=<hash-lock> --timestamp=<timestamp> --time-lock=<time-lock> --from=mykey
 ```
 
 **Flags:**
@@ -59,26 +59,13 @@ iris tx htlc create \
 Claim an opened HTLC
 
 ```bash
-iris tx htlc claim --chain-id=irishub --from=<key-name> --fees=0.3iris --hash-lock=<hash-lock> --secret=<secret>
+iris tx htlc claim [hash-lock] [secret] [flags]
 ```
-
-**Flags:**
-
-| Name, shorthand | Type     | Required | Default | Description                                      |
-| --------------- | -------- | -------- | ------- | ------------------------------------------------ |
-| --hash-lock     | bytesHex | Yes      |         | The hash lock identifying the HTLC to be claimed |
-| --secret        | bytesHex | Yes      |         | The secret for generating hash lock              |
 
 ### Claim an opened HTLC
 
 ```bash
-iris tx htlc claim \
---from=node0 \
---hash-lock=bae5acb11ad90a20cb07023f4bf0fcf4d38549feff486dd40a1fbe871b4aabdf \
---secret=382aa2863398a31474616f1498d7a9feba132c4bcf9903940b8a5c72a46e4a41 \
---fees=0.3iris \
---chain-id=irishub \
---commit
+iris tx claim [hash-lock] [secret] [flags]
 ```
 
 ## iris tx htlc refund
@@ -86,24 +73,13 @@ iris tx htlc claim \
 Refund from an expired HTLC
 
 ```bash
-iris tx htlc refund --chain-id=irishub --from=<key-name> --fees=0.3iris --hash-lock=<hash-lock>
+iris tx htlc refund [hash-lock] [flags]
 ```
-
-**Flags:**
-
-| Name, shorthand | Type     | Required | Default | Description                                       |
-| --------------- | -------- | -------- | ------- | ------------------------------------------------- |
-| --hash-lock     | bytesHex | Yes      |         | The hash lock identifying the HTLC to be refunded |
 
 ### Refund from an expired HTLC
 
 ```bash
-iris tx htlc refund \
---from=node0 \
---hash-lock=bae5acb11ad90a20cb07023f4bf0fcf4d38549feff486dd40a1fbe871b4aabdf \
---fees=0.3iris \
---chain-id=irishub \
---commit
+iris tx htlc refund [hash-lock] [flags]
 ```
 
 ## iris query htlc htlc
