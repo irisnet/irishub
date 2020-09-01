@@ -18,8 +18,14 @@ import (
 // ExportAppStateAndValidators exports the state of the application for a genesis
 // file.
 func (app *IrisApp) ExportAppStateAndValidators(
-	forZeroHeight bool, jailAllowedAddrs []string,
-) (appState json.RawMessage, validators []tmtypes.GenesisValidator, cp *abci.ConsensusParams, err error) {
+	forZeroHeight bool,
+	jailAllowedAddrs []string,
+) (
+	appState json.RawMessage,
+	validators []tmtypes.GenesisValidator,
+	cp *abci.ConsensusParams,
+	err error,
+) {
 
 	// as if they could withdraw from the start of the next block
 	ctx := app.NewContext(true, tmproto.Header{Height: app.LastBlockHeight()})
@@ -87,16 +93,19 @@ func (app *IrisApp) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs [
 	ctx = ctx.WithBlockHeight(0)
 
 	// reinitialize all validators
-	app.stakingKeeper.IterateValidators(ctx, func(_ int64, val exported.ValidatorI) (stop bool) {
-		// donate any unwithdrawn outstanding reward fraction tokens to the community pool
-		scraps := app.distrKeeper.GetValidatorOutstandingRewardsCoins(ctx, val.GetOperator())
-		feePool := app.distrKeeper.GetFeePool(ctx)
-		feePool.CommunityPool = feePool.CommunityPool.Add(scraps...)
-		app.distrKeeper.SetFeePool(ctx, feePool)
+	app.stakingKeeper.IterateValidators(
+		ctx,
+		func(_ int64, val exported.ValidatorI) (stop bool) {
+			// donate any unwithdrawn outstanding reward fraction tokens to the community pool
+			scraps := app.distrKeeper.GetValidatorOutstandingRewardsCoins(ctx, val.GetOperator())
+			feePool := app.distrKeeper.GetFeePool(ctx)
+			feePool.CommunityPool = feePool.CommunityPool.Add(scraps...)
+			app.distrKeeper.SetFeePool(ctx, feePool)
 
-		app.distrKeeper.Hooks().AfterValidatorCreated(ctx, val.GetOperator())
-		return false
-	})
+			app.distrKeeper.Hooks().AfterValidatorCreated(ctx, val.GetOperator())
+			return false
+		},
+	)
 
 	// reinitialize all delegations
 	for _, del := range dels {
@@ -110,22 +119,28 @@ func (app *IrisApp) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs [
 	/* Handle staking state. */
 
 	// iterate through redelegations, reset creation height
-	app.stakingKeeper.IterateRedelegations(ctx, func(_ int64, red stakingtypes.Redelegation) (stop bool) {
-		for i := range red.Entries {
-			red.Entries[i].CreationHeight = 0
-		}
-		app.stakingKeeper.SetRedelegation(ctx, red)
-		return false
-	})
+	app.stakingKeeper.IterateRedelegations(
+		ctx,
+		func(_ int64, red stakingtypes.Redelegation) (stop bool) {
+			for i := range red.Entries {
+				red.Entries[i].CreationHeight = 0
+			}
+			app.stakingKeeper.SetRedelegation(ctx, red)
+			return false
+		},
+	)
 
 	// iterate through unbonding delegations, reset creation height
-	app.stakingKeeper.IterateUnbondingDelegations(ctx, func(_ int64, ubd stakingtypes.UnbondingDelegation) (stop bool) {
-		for i := range ubd.Entries {
-			ubd.Entries[i].CreationHeight = 0
-		}
-		app.stakingKeeper.SetUnbondingDelegation(ctx, ubd)
-		return false
-	})
+	app.stakingKeeper.IterateUnbondingDelegations(
+		ctx,
+		func(_ int64, ubd stakingtypes.UnbondingDelegation) (stop bool) {
+			for i := range ubd.Entries {
+				ubd.Entries[i].CreationHeight = 0
+			}
+			app.stakingKeeper.SetUnbondingDelegation(ctx, ubd)
+			return false
+		},
+	)
 
 	// Iterate through validators by power descending, reset bond heights, and
 	// update bond intra-tx counters.

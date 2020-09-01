@@ -33,9 +33,12 @@ func GetTxCmd() *cobra.Command {
 // GetCmdRequestRandom implements the request-random command.
 func GetCmdRequestRandom() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "request-random",
-		Short:   "Request a random number with an optional block interval",
-		Example: fmt.Sprintf("%s tx random request-random [--block-interval=10] [--oracle=true --service-fee-cap=1iris]", version.AppName),
+		Use:   "request-random",
+		Short: "Request a random number with an optional block interval",
+		Example: fmt.Sprintf(
+			"%s tx random request-random [--block-interval=10] [--oracle=true --service-fee-cap=1iris]",
+			version.AppName,
+		),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 			clientCtx, err := client.ReadTxCommandFlags(clientCtx, cmd.Flags())

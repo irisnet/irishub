@@ -1,9 +1,11 @@
 package keeper_test
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/irismod/service/exported"
 	abci "github.com/tendermint/tendermint/abci/types"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	"github.com/irismod/service/exported"
 
 	guardiantypes "github.com/irisnet/irishub/modules/guardian/types"
 	"github.com/irisnet/irishub/modules/oracle/keeper"
@@ -111,9 +113,11 @@ func (suite *KeeperTestSuite) TestNewQuerier() {
 		FeedName: msg.FeedName,
 	}
 	bz = suite.cdc.MustMarshalJSON(params2)
-	res, err = querier(suite.ctx, []string{types.QueryFeedValue}, abci.RequestQuery{
-		Data: bz,
-	})
+	res, err = querier(
+		suite.ctx,
+		[]string{types.QueryFeedValue},
+		abci.RequestQuery{Data: bz},
+	)
 	suite.NoError(err)
 	var feedValues types.FeedValues
 	suite.cdc.MustUnmarshalJSON(res, &feedValues)
