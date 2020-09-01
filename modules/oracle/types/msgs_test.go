@@ -3,8 +3,9 @@ package types
 import (
 	"testing"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 var (
@@ -19,8 +20,9 @@ func TestMsgCreateFeed_ValidateBasic(t *testing.T) {
 		testCase string
 		MsgCreateFeed
 		expectPass bool
-	}{
-		{"basic good", MsgCreateFeed{
+	}{{
+		"basic good",
+		MsgCreateFeed{
 			FeedName:          "feedEthPrice",
 			AggregateFunc:     "avg",
 			ValueJsonPath:     "data.price",
@@ -34,8 +36,11 @@ func TestMsgCreateFeed_ValidateBasic(t *testing.T) {
 			RepeatedFrequency: 5,
 			ResponseThreshold: 1,
 			Creator:           addr1,
-		}, true},
-		{"wrong FeedName,invalid char", MsgCreateFeed{
+		},
+		true,
+	}, {
+		"wrong FeedName,invalid char",
+		MsgCreateFeed{
 			FeedName:          "$feedEthPrice",
 			AggregateFunc:     "avg",
 			ValueJsonPath:     "data.price",
@@ -49,8 +54,11 @@ func TestMsgCreateFeed_ValidateBasic(t *testing.T) {
 			RepeatedFrequency: 5,
 			ResponseThreshold: 1,
 			Creator:           addr1,
-		}, false},
-		{"wrong FeedName,invalid length", MsgCreateFeed{
+		},
+		false,
+	}, {
+		"wrong FeedName,invalid length",
+		MsgCreateFeed{
 			FeedName:          "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
 			AggregateFunc:     "avg",
 			ValueJsonPath:     "data.price",
@@ -64,8 +72,10 @@ func TestMsgCreateFeed_ValidateBasic(t *testing.T) {
 			RepeatedFrequency: 5,
 			ResponseThreshold: 1,
 			Creator:           addr1,
-		}, false},
-		{"wrong AggregateFunc", MsgCreateFeed{
+		}, false,
+	}, {
+		"wrong AggregateFunc",
+		MsgCreateFeed{
 			FeedName:          "feedEthPrice",
 			AggregateFunc:     "",
 			ValueJsonPath:     "data.price",
@@ -79,8 +89,11 @@ func TestMsgCreateFeed_ValidateBasic(t *testing.T) {
 			RepeatedFrequency: 5,
 			ResponseThreshold: 1,
 			Creator:           addr1,
-		}, false},
-		{"wrong ValueJsonPath", MsgCreateFeed{
+		},
+		false,
+	}, {
+		"wrong ValueJsonPath",
+		MsgCreateFeed{
 			FeedName:          "feedEthPrice",
 			AggregateFunc:     "avg",
 			ValueJsonPath:     "",
@@ -94,8 +107,11 @@ func TestMsgCreateFeed_ValidateBasic(t *testing.T) {
 			RepeatedFrequency: 5,
 			ResponseThreshold: 1,
 			Creator:           addr1,
-		}, false},
-		{"wrong MaxLatestHistory(=0)", MsgCreateFeed{
+		},
+		false,
+	}, {
+		"wrong MaxLatestHistory(=0)",
+		MsgCreateFeed{
 			FeedName:          "feedEthPrice",
 			AggregateFunc:     "avg",
 			ValueJsonPath:     "data.price",
@@ -109,8 +125,11 @@ func TestMsgCreateFeed_ValidateBasic(t *testing.T) {
 			RepeatedFrequency: 5,
 			ResponseThreshold: 1,
 			Creator:           addr1,
-		}, false},
-		{"wrong MaxLatestHistory(>100)", MsgCreateFeed{
+		},
+		false,
+	}, {
+		"wrong MaxLatestHistory(>100)",
+		MsgCreateFeed{
 			FeedName:          "feedEthPrice",
 			AggregateFunc:     "avg",
 			ValueJsonPath:     "data.price",
@@ -124,8 +143,11 @@ func TestMsgCreateFeed_ValidateBasic(t *testing.T) {
 			RepeatedFrequency: 5,
 			ResponseThreshold: 1,
 			Creator:           addr1,
-		}, false},
-		{"wrong Description(>200)", MsgCreateFeed{
+		},
+		false,
+	}, {
+		"wrong Description(>200)",
+		MsgCreateFeed{
 			FeedName:          "feedEthPrice",
 			AggregateFunc:     "avg",
 			ValueJsonPath:     "data.price",
@@ -139,8 +161,11 @@ func TestMsgCreateFeed_ValidateBasic(t *testing.T) {
 			RepeatedFrequency: 5,
 			ResponseThreshold: 1,
 			Creator:           addr1,
-		}, false},
-		{"wrong ServiceName(>70)", MsgCreateFeed{
+		},
+		false,
+	}, {
+		"wrong ServiceName(>70)",
+		MsgCreateFeed{
 			FeedName:          "feedEthPrice",
 			AggregateFunc:     "avg",
 			ValueJsonPath:     "data.price",
@@ -154,8 +179,11 @@ func TestMsgCreateFeed_ValidateBasic(t *testing.T) {
 			RepeatedFrequency: 5,
 			ResponseThreshold: 1,
 			Creator:           addr1,
-		}, false},
-		{"wrong ServiceName,invalid char", MsgCreateFeed{
+		},
+		false,
+	}, {
+		"wrong ServiceName,invalid char",
+		MsgCreateFeed{
 			FeedName:          "feedEthPrice",
 			AggregateFunc:     "avg",
 			ValueJsonPath:     "data.price",
@@ -169,8 +197,10 @@ func TestMsgCreateFeed_ValidateBasic(t *testing.T) {
 			RepeatedFrequency: 5,
 			ResponseThreshold: 1,
 			Creator:           addr1,
-		}, false},
-		{"empty Providers", MsgCreateFeed{
+		}, false,
+	}, {
+		"empty Providers",
+		MsgCreateFeed{
 			FeedName:          "feedEthPrice",
 			AggregateFunc:     "avg",
 			ValueJsonPath:     "data.price",
@@ -184,8 +214,11 @@ func TestMsgCreateFeed_ValidateBasic(t *testing.T) {
 			RepeatedFrequency: 5,
 			ResponseThreshold: 1,
 			Creator:           addr1,
-		}, false},
-		{"invalid ResponseThreshold", MsgCreateFeed{
+		},
+		false,
+	}, {
+		"invalid ResponseThreshold",
+		MsgCreateFeed{
 			FeedName:          "feedEthPrice",
 			AggregateFunc:     "avg",
 			ValueJsonPath:     "data.price",
@@ -199,8 +232,11 @@ func TestMsgCreateFeed_ValidateBasic(t *testing.T) {
 			RepeatedFrequency: 5,
 			ResponseThreshold: 3,
 			Creator:           addr1,
-		}, false},
-		{"invalid ResponseThreshold", MsgCreateFeed{
+		},
+		false,
+	}, {
+		"invalid ResponseThreshold",
+		MsgCreateFeed{
 			FeedName:          "feedEthPrice",
 			AggregateFunc:     "avg",
 			ValueJsonPath:     "data.price",
@@ -214,8 +250,8 @@ func TestMsgCreateFeed_ValidateBasic(t *testing.T) {
 			RepeatedFrequency: 5,
 			ResponseThreshold: 1,
 			Creator:           emptyAddr,
-		}, false},
-	}
+		}, false,
+	}}
 
 	for _, tc := range tests {
 		if tc.expectPass {
@@ -231,24 +267,35 @@ func TestMsgStartFeed_ValidateBasic(t *testing.T) {
 		testCase string
 		MsgStartFeed
 		expectPass bool
-	}{
-		{"basic good", MsgStartFeed{
+	}{{
+		"basic good",
+		MsgStartFeed{
 			FeedName: "feedEthPrice",
 			Creator:  addr1,
-		}, true},
-		{"wrong FeedName,invalid char", MsgStartFeed{
+		},
+		true,
+	}, {
+		"wrong FeedName,invalid char",
+		MsgStartFeed{
 			FeedName: "$feedEthPrice",
 			Creator:  addr1,
-		}, false},
-		{"wrong FeedName,invalid length", MsgStartFeed{
+		},
+		false,
+	}, {
+		"wrong FeedName,invalid length",
+		MsgStartFeed{
 			FeedName: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
 			Creator:  addr1,
-		}, false},
-		{"empty Creator", MsgStartFeed{
+		},
+		false,
+	}, {
+		"empty Creator",
+		MsgStartFeed{
 			FeedName: "feedEthPrice",
 			Creator:  emptyAddr,
-		}, false},
-	}
+		},
+		false,
+	}}
 
 	for _, tc := range tests {
 		if tc.expectPass {
@@ -264,24 +311,35 @@ func TestMsgPauseFeed_ValidateBasic(t *testing.T) {
 		testCase string
 		MsgPauseFeed
 		expectPass bool
-	}{
-		{"basic good", MsgPauseFeed{
+	}{{
+		"basic good",
+		MsgPauseFeed{
 			FeedName: "feedEthPrice",
 			Creator:  addr1,
-		}, true},
-		{"wrong FeedName,invalid char", MsgPauseFeed{
+		},
+		true,
+	}, {
+		"wrong FeedName,invalid char",
+		MsgPauseFeed{
 			FeedName: "$feedEthPrice",
 			Creator:  addr1,
-		}, false},
-		{"wrong FeedName,invalid length", MsgPauseFeed{
+		},
+		false,
+	}, {
+		"wrong FeedName,invalid length",
+		MsgPauseFeed{
 			FeedName: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
 			Creator:  addr1,
-		}, false},
-		{"empty Creator", MsgPauseFeed{
+		},
+		false,
+	}, {
+		"empty Creator",
+		MsgPauseFeed{
 			FeedName: "feedEthPrice",
 			Creator:  emptyAddr,
-		}, false},
-	}
+		},
+		false,
+	}}
 
 	for _, tc := range tests {
 		if tc.expectPass {
@@ -297,8 +355,9 @@ func TestMsgEditFeed_ValidateBasic(t *testing.T) {
 		testCase string
 		MsgEditFeed
 		expectPass bool
-	}{
-		{"basic good", MsgEditFeed{
+	}{{
+		"basic good",
+		MsgEditFeed{
 			FeedName:          "feedEthPrice",
 			LatestHistory:     10,
 			Providers:         []sdk.AccAddress{addr1, addr2},
@@ -306,8 +365,11 @@ func TestMsgEditFeed_ValidateBasic(t *testing.T) {
 			RepeatedFrequency: 5,
 			ResponseThreshold: 1,
 			Creator:           addr1,
-		}, true},
-		{"wrong FeedName,invalid char", MsgEditFeed{
+		},
+		true,
+	}, {
+		"wrong FeedName, invalid char",
+		MsgEditFeed{
 			FeedName:          "$feedEthPrice",
 			LatestHistory:     10,
 			Providers:         []sdk.AccAddress{addr1, addr2},
@@ -315,8 +377,11 @@ func TestMsgEditFeed_ValidateBasic(t *testing.T) {
 			RepeatedFrequency: 5,
 			ResponseThreshold: 1,
 			Creator:           addr1,
-		}, false},
-		{"wrong FeedName,invalid length", MsgEditFeed{
+		},
+		false,
+	}, {
+		"wrong FeedName, invalid length",
+		MsgEditFeed{
 			FeedName:          "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
 			LatestHistory:     10,
 			Providers:         []sdk.AccAddress{addr1, addr2},
@@ -324,8 +389,11 @@ func TestMsgEditFeed_ValidateBasic(t *testing.T) {
 			RepeatedFrequency: 5,
 			ResponseThreshold: 1,
 			Creator:           addr1,
-		}, false},
-		{"wrong MaxLatestHistory(>100)", MsgEditFeed{
+		},
+		false,
+	}, {
+		"wrong MaxLatestHistory(>100)",
+		MsgEditFeed{
 			FeedName:          "feedEthPrice",
 			LatestHistory:     101,
 			Providers:         []sdk.AccAddress{addr1, addr2},
@@ -333,8 +401,11 @@ func TestMsgEditFeed_ValidateBasic(t *testing.T) {
 			RepeatedFrequency: 5,
 			ResponseThreshold: 1,
 			Creator:           addr1,
-		}, false},
-		{"invalid ResponseThreshold", MsgEditFeed{
+		},
+		false,
+	}, {
+		"invalid ResponseThreshold",
+		MsgEditFeed{
 			FeedName:          "feedEthPrice",
 			LatestHistory:     10,
 			Providers:         []sdk.AccAddress{addr1, addr2},
@@ -342,8 +413,11 @@ func TestMsgEditFeed_ValidateBasic(t *testing.T) {
 			RepeatedFrequency: 5,
 			ResponseThreshold: 3,
 			Creator:           addr1,
-		}, false},
-		{"empty Creator", MsgEditFeed{
+		},
+		false,
+	}, {
+		"empty Creator",
+		MsgEditFeed{
 			FeedName:          "feedEthPrice",
 			LatestHistory:     10,
 			Providers:         []sdk.AccAddress{addr1, addr2},
@@ -351,7 +425,9 @@ func TestMsgEditFeed_ValidateBasic(t *testing.T) {
 			RepeatedFrequency: 5,
 			ResponseThreshold: 1,
 			Creator:           emptyAddr,
-		}, false},
+		},
+		false,
+	},
 	}
 
 	for _, tc := range tests {

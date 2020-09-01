@@ -1,9 +1,11 @@
 package types
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	service "github.com/irismod/service/exported"
 	tmbytes "github.com/tendermint/tendermint/libs/bytes"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	service "github.com/irismod/service/exported"
 
 	guardiantypes "github.com/irisnet/irishub/modules/guardian/types"
 )
