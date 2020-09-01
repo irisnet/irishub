@@ -76,7 +76,7 @@ type UpgradeInfo struct {
 ```
 
 This information is critical to ensure the `StoreUpgrades` happens smoothly at correct height and
-expected upgrade. It eliminiates the chances for the new binary to execute `StoreUpgrades` multiple
+expected upgrade. It eliminates the chances for the new binary to execute `StoreUpgrades` multiple
 times everytime on restart. Also if there are multiple upgrades planned on same height, the `Name`
 will ensure these `StoreUpgrades` takes place only in planned upgrade handler.
 
