@@ -1,10 +1,11 @@
 package rest
 
 import (
+	"github.com/gorilla/mux"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/rest"
-	"github.com/gorilla/mux"
 )
 
 // Rest variable names
@@ -19,7 +20,7 @@ func RegisterHandlers(cliCtx client.Context, r *mux.Router) {
 	registerTxRoutes(cliCtx, r)
 }
 
-// RequestRandomReq defines the properties of a request rand request's body
+// RequestRandomReq defines the properties of a request random request's body
 type RequestRandomReq struct {
 	BaseReq       rest.BaseReq   `json:"base_req" yaml:"base_req"` // base req
 	Consumer      sdk.AccAddress `json:"consumer"`                 // request address

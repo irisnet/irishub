@@ -13,7 +13,7 @@ import (
 // InitGenesis stores genesis data
 func InitGenesis(ctx sdk.Context, k keeper.Keeper, data types.GenesisState) {
 	if err := types.ValidateGenesis(data); err != nil {
-		panic(fmt.Errorf("failed to initialize rand genesis state: %s", err.Error()))
+		panic(fmt.Errorf("failed to initialize random genesis state: %s", err.Error()))
 	}
 	for height, requests := range data.PendingRandomRequests {
 		for _, request := range requests.Requests {

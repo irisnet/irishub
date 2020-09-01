@@ -4,10 +4,12 @@ import (
 	"strconv"
 	"testing"
 
+	"github.com/stretchr/testify/suite"
+
+	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
+
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/stretchr/testify/suite"
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 
 	"github.com/irisnet/irishub/modules/random"
 	"github.com/irisnet/irishub/modules/random/keeper"

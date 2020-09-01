@@ -172,14 +172,14 @@ testnet-init:
 	@if ! [ -f build/iris ]; then $(MAKE) build-linux ; fi
 	@if ! [ -f build/nodecluster/node0/iris/config/genesis.json ]; then docker run --rm -v $(CURDIR)/build:/home alpine:3.11 /home/iris testnet --v 4 --output-dir /home/nodecluster --chain-id irishub-test --keyring-backend test --starting-ip-address 192.168.10.2 ; fi
 	@echo "To install jq command, please refer to this page: https://stedolan.github.io/jq/download/"
-	@jq '.app_state.accounts+= [{"address": "iaa1ljemm0yznz58qxxs8xyak7fashcfxf5lgl4zjx", "coins": [ "1000000iris" ], "sequence_number": "0", "account_number": "0"}]' build/nodecluster/node0/iris/config/genesis.json > build/genesis_temp.json ;
+	@jq '.app_state.accounts+= [{"address": "iaa1ljemm0yznz58qxxs8xyak7fashcfxf5lgl4zjx", "coins": [ "1000000000000uiris" ], "sequence_number": "0", "account_number": "0"}]' build/nodecluster/node0/iris/config/genesis.json > build/genesis_temp.json ;
 	@sudo cp build/genesis_temp.json build/nodecluster/node0/iris/config/genesis.json
 	@sudo cp build/genesis_temp.json build/nodecluster/node1/iris/config/genesis.json
 	@sudo cp build/genesis_temp.json build/nodecluster/node2/iris/config/genesis.json
 	@sudo cp build/genesis_temp.json build/nodecluster/node3/iris/config/genesis.json
 	@rm build/genesis_temp.json
 	@echo "Faucet address: iaa1ljemm0yznz58qxxs8xyak7fashcfxf5lgl4zjx" ;
-	@echo "Faucet coin amount: 1000000iris"
+	@echo "Faucet coin amount: 1000000000000uiris"
 	@echo "Faucet key seed: tube lonely pause spring gym veteran know want grid tired taxi such same mesh charge orient bracket ozone concert once good quick dry boss"
 
 testnet-start:

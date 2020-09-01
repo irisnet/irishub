@@ -18,6 +18,8 @@ import (
 	"github.com/tendermint/tendermint/types"
 	tmtime "github.com/tendermint/tendermint/types/time"
 
+	guardiantypes "github.com/irisnet/irishub/modules/guardian/types"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
@@ -274,6 +276,20 @@ func initGenFiles(
 ) error {
 
 	appGenState := mbm.DefaultGenesis(clientCtx.JSONMarshaler)
+
+	// add the profiler and trustees in the genesis state
+	var guardianGenState guardiantypes.GenesisState
+	clientCtx.JSONMarshaler.MustUnmarshalJSON(appGenState[guardiantypes.ModuleName], &guardianGenState)
+
+	for _, account := range genAccounts {
+		guardian := guardiantypes.NewGuardian(
+			"genesis", guardiantypes.Genesis,
+			account.GetAddress(), account.GetAddress(),
+		)
+		guardianGenState.Profilers = append(guardianGenState.Profilers, guardian)
+		guardianGenState.Trustees = append(guardianGenState.Trustees, guardian)
+	}
+	appGenState[guardiantypes.ModuleName] = clientCtx.JSONMarshaler.MustMarshalJSON(&guardianGenState)
 
 	// set the accounts in the genesis state
 	var authGenState authtypes.GenesisState
