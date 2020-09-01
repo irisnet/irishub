@@ -86,6 +86,7 @@ import (
 	tokenkeeper "github.com/irismod/token/keeper"
 	tokentypes "github.com/irismod/token/types"
 	abci "github.com/tendermint/tendermint/abci/types"
+	"github.com/tendermint/tendermint/crypto"
 	"github.com/tendermint/tendermint/libs/log"
 	tmos "github.com/tendermint/tendermint/libs/os"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
@@ -106,6 +107,12 @@ import (
 )
 
 const appName = "IrisApp"
+
+func init() {
+	tokentypes.SetNativeToken("iris", "Irishub staking token", sdk.DefaultBondDenom,
+		6, 2000000000, 10000000000,
+		true, sdk.AccAddress(crypto.AddressHash([]byte(tokentypes.ModuleName))))
+}
 
 var (
 	// DefaultNodeHome default home directories for the application daemon
