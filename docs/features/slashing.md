@@ -1,6 +1,6 @@
 # Slashing
 
-## Introduction
+## Summary
 
 Collect the validator's abnormal behavior and implement the corresponding slashing mechanism according to the type of abnormal behavior.
 
@@ -13,7 +13,7 @@ There are three main types:
 ## Punishment mechanism
 
 1. Calculate the number of tokens bonded to the validator node based on the voting power owned by the current validator.
-2. Punish validator  with a certain percentage of the token and kick it out of the validator set; at the same time prohibit the validator from re-entering the validator set for a period of time, a process known as the jail validator.
+2. Punish validator  with a certain percentage of the token and kick it out of the validator set; at the same time prohibit the validator from re-entering the validator set for a period, a process known as the jail validator.
 3. For different types of abnormal behavior, different penalty proportion and jail time are used.
 4. Penalty rules:
 
@@ -31,28 +31,16 @@ In the fixed time window `SignedBlocksWindow`, the ratio of the time of the vali
 
 * `SignedBlocksWindow` default: 20000
 * `MinSignedPerWindow` default: 0.5
-* `DowntimeJailDuration` default: 2Days
-* `SlashFractionDowntime` default: 0.005
+* `DowntimeJailDuration` default: 10Minutes
+* `SlashFractionDowntime` default: 0.01
 
 ## Double Sign
 
-When executing a block, it receives evidence that a validator has voted for conflicting votes of the same round at the same height. If the time of the evidence from the current block time is less than `MaxEvidenceAge`, the validator's bonded token will be penalized in the `SlashFractionDoubleSign` ratio, and the validator will be jailed. Until the jail time exceeds `DoubleSignJailDuration`, the validator can be released by executing `unjail` command.
+When executing a block, it receives evidence that a validator has voted for conflicting votes of the same round at the same height. the validator's bonded token will be penalized in the `SlashFractionDoubleSign` ratio, and the validator will be jailed. Until the jail time exceeds `DoubleSignJailDuration`, the validator can be released by executing `unjail` command.
 
 **parameters:**
 
-* `MaxEvidenceAge` default: 1Day
-* `DoubleSignJailDuration` default: 5Days
-* `SlashFractionDoubleSign`default: 0.01
+* `DowntimeJailDuration` default: 10Minutes
+* `SlashFractionDoubleSign`default: 0.05
 
-## Proposer Censorship
-
-If the node is in the process of processing a new block, it detects if any transaction does not pass `txDecoder`, `validateTx`, `validateBasicTxMsgs`, the validator's bonded token will be slashed by `SlashFractionCensorship` percent, and the validator will be jailed. Until the jail time exceeds `CensorshipJailDuration`, the validator can be unjailed by executing the `unjail` command after jailing period.
-
-* `txDecode` Deserialization of Tx
-* `validateTx` Size limit for Tx
-* `validateBasicTxMsgs` Basic check on msg in Tx
-
-**parameters:**
-
-* `CensorshipJailDuration` default: 7Days
-* `SlashFractionCensorship` default: 0.02
+For related operations of the `Slashing` module, please refer to [cli-slashing](../cli-client/slashing.md)
