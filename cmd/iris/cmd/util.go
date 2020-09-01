@@ -33,12 +33,13 @@ const (
 var (
 	cmdCfg = NewCmdConfig().appendFromFlag(cmdScopeGlobal, cmdScopeGlobal, "fees").
 		appendFromFlag(cmdScopeGlobal, cmdScopeGlobal, "amount").
+		appendFromFlag(cmdScopeGlobal, cmdScopeGlobal, "deposit").
+		appendFromFlag(cmdScopeGlobal, cmdScopeGlobal, "service-fee-cap").
 		appendFromArgs("bank", "send", 2).
 		appendFromArgs("staking", "delegate", 1).
 		appendFromArgs("staking", "redelegate", 2).
 		appendFromArgs("staking", "unbond", 1).
 		appendFromArgs("distribution", "fund-community-pool", 0).
-		appendFromArgs("token", "burn", 0).
 		appendFromArgs("gov", "deposit", 1).
 		appendFromResponse("query", "account", "coins", filedTypeArray).
 		appendFromResponse("token", "params", "issue_token_base_fee", filedTypeMap).
