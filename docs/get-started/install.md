@@ -6,7 +6,7 @@ order: 2
 
 ## Latest Version
 
-The Latest IRIShub version for Mainnet is [v0.16.3](https://github.com/irisnet/irishub/releases/latest)
+The Latest IRIShub version for Mainnet is [v0.16.3](https://github.com/irisnet/irishub/releases/v0.16.3)
 
 ## Install `go`
 

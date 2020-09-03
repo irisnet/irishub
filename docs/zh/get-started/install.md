@@ -6,7 +6,7 @@ order: 2
 
 ## 最新版本
 
-IRIShub 主网的最新版本是[v0.16.3](https://github.com/irisnet/irishub/releases/latest)
+IRIShub 主网的最新版本是[v0.16.3](https://github.com/irisnet/irishub/releases/v0.16.3)
 
 ## 安装`go`
 
