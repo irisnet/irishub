@@ -8,10 +8,10 @@
 
 1. 账户查询
 
-    可以通过账户地址查询该账户的余额。
+    查询指定账户的余额。
 
     ```bash
-    iris q bank account <account-address>
+    iris query bank balances [address] --denom=[denom]
     ```
 
 2. 账户间转账

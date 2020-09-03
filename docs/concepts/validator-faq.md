@@ -153,7 +153,7 @@ There are 2 kinds of validator addresses:
 
 3. `Add a PGP key` to your Keybase account (I believe you will see this option after sign-up), and you will get a 16-digit string
 
-4. [Edit your validator](cli-client/staking.md#iris-tx-staking-edit-validator) and specify `--identity=<the_16_digit_string>`
+4. [Edit your validator](../cli-client/staking.md#iris-tx-staking-edit-validator) and specify `--identity=<the_16_digit_string>`
 
 ## Common Problems
 
@@ -244,7 +244,7 @@ then you can do these:
 
 #### What if I lost my Tendermint Key
 
-That means you have **Lost Your Validator Forever!** You can only create a new one and [redelegate](cli-client/staking.md#iris-tx-staking-redelegate) all of your shares to the new Validator.
+That means you have **Lost Your Validator Forever!** You can only create a new one and [redelegate](../cli-client/staking.md#iris-tx-staking-redelegate) all of your shares to the new Validator.
 
 ## Community Channels
 

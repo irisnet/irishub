@@ -10,21 +10,9 @@ Bank模块用于管理本地帐户中的资产
 | [total](#iris-query-bank-total)                  | 查询链上币的总数           |
 | [send](#iris-tx-bank-send)                       | 创建、签名、广播一个转账交易 |
 
-## 常见问题
-
-### ERROR: decoding bech32 failed
-
-```bash
-iris bank account iaa1a0x4g8rqc90l3z9jh98x7mkd0w77e9q9r300h 
-Error: decoding bech32 failed: checksum failed. Expected 9r300k, got 9r300h.
-```
-
-这表示该帐户地址拼写错误，请仔细检查该地址。
-
-
 ## iris query bank balances
 
-该命令用于查询特定地址的余额信息。
+该命令用于查询指定账户的余额信息。
 
 ```bash
 iris query bank balances [address] [flags]

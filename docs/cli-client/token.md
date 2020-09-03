@@ -166,8 +166,14 @@ iris query token fee kitty
 
 ## iris query token params
 
-Query the token related params
+Query token module params
 
 ```bash
 iris query token params [flags]
+```
+
+### query token module params
+
+```bash
+iris query token params
 ```

@@ -17,7 +17,7 @@ All the IRIS holders may participate in the on-chain governance. If the communit
 | `stake/MaxValidators` | maximum number of validators | [100, 200] | 100      |
 | `stake/UnbondingTime` | unbonding time               | [2week,)   | 504h0m0s |
 
-Details in [Stake](features/staking.md)
+Details in [Stake](../features/staking.md)
 
 ## Parameters in Distribution
 

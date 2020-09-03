@@ -52,7 +52,7 @@ The validator and its delegators can share the following rewards by proportion:
 
 - **Block Inflation**
 
-  Block Inflation exists to incentivize IRIS holders to stake. The more staked IRIS tokens are, more secure the network become(Read more about [Staking](features/staking.md)).
+  Block Inflation exists to incentivize IRIS holders to stake. The more staked IRIS tokens are, more secure the network become(Read more about [Staking](../features/staking.md)).
 
   Block Inflation will be [distributed every block](../features/mint.md). [Inflation rate](../features/mint.md) in IRISnet for the first year will be 4%.  **This ration could be adjusted by `parameter-change` proposals**.
   In this way, loose IRIS will devalue year by year.
