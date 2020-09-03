@@ -6,7 +6,7 @@ order: 2
 
 ## 最新版本
 
-IRIShub 主网的最新版本是[irishub v1.0-alpha](https://github.com/irisnet/irishub/releases/latest)
+IRIShub 主网的最新版本是[v0.16.3](https://github.com/irisnet/irishub/releases/v0.16.3)
 
 ## 安装`go`
 
@@ -39,8 +39,9 @@ go version
 请确保您的服务器可以访问 google.com，因为我们的项目依赖于google提供的某些库（如果您无法访问google.com，也可以尝试添加代理：`export GOPROXY=https://goproxy.io`）
 
 ```bash
-git clone --branch v1.0-alpha https://github.com/irisnet/irishub
-cd irishub && make install
+git clone --branch v0.16.3 https://github.com/irisnet/irishub
+cd irishub
+make install
 ```
 
 如果环境变量配置无误，则通过运行以上命令即可完成`iris`的安装。现在检查您的`iris`版本是否正确：
