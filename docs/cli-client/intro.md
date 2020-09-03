@@ -69,7 +69,7 @@ All POST commands have the following global flags:
 | [params](./params.md)             | Query parameters of modules                                  |
 | [rand](./rand.md)                 | Random Number subcommands                                    |
 | [service](./service.md)           | Service subcommands                                          |
-| [stake](./stake.md)               | Staking subcommands for validators and delegators            |
+| [stake](cli-client/staking.md)               | Staking subcommands for validators and delegators            |
 | [status](./status.md)             | Query remote node for status                                 |
 | [tendermint](./tendermint.md)     | Tendermint state querying subcommands                        |
 | [token](./token.md)               | Token subcommands                                            |

@@ -1,4 +1,4 @@
-# iris token
+# Token
 
 Token module allows you to manage assets on IRIS Hub
 

@@ -1,4 +1,4 @@
-# iris keys
+# Keys
 
 Keys模块用于管理IRIS的Tendermint本地密钥库（钱包）。
 

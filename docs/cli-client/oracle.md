@@ -1,4 +1,4 @@
-# iris oracle
+# Oracle
 
 Oracle module allows you to manage the feed on IRIS Hub
 

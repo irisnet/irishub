@@ -1,4 +1,4 @@
-# iris htlc
+# HTLC
 
 [HTLC模块](../features/htlc.md)提供了与其他链进行原子交换的相关功能。
 

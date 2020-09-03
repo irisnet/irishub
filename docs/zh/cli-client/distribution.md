@@ -1,4 +1,4 @@
-# iris distribution
+# Distribution
 
 distribution模块用于管理自己的 [Staking 收益](../concepts/general-concepts.md#staking-收益)。
 

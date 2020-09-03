@@ -153,7 +153,7 @@ IRISnet 基础概念请参考 [基础概念](general-concepts.md)
 
 3. 点击`Add a PGP key`，创建一个PGP私钥，完成后您将获得一个16位的字符串
 
-4. [编辑验证人](../cli-client/stake.md#iris-tx-staking-edit-validator)信息并指定`--identity=<16位的PGP字符串>`
+4. [编辑验证人](../cli-client/staking.md#iris-tx-staking-edit-validator)信息并指定`--identity=<16位的PGP字符串>`
 
 ## 常见错误
 
@@ -261,7 +261,7 @@ Linux可以打开（每个进程）的默认文件数是 `1024`，而 `iris` 进
 
 #### 如果我丢失了Tendermint密钥怎么办
 
-这意味着您 **永远失去了您的验证人！**您只能创建一个新的验证人，并将所有通证[转委托](../cli-client/stake.md#iris-tx-staking-redelegate)给新的验证人。
+这意味着您 **永远失去了您的验证人！**您只能创建一个新的验证人，并将所有通证[转委托](../cli-client/staking.md#iris-tx-staking-redelegate)给新的验证人。
 
 ## 加入社区
 

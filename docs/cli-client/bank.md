@@ -1,4 +1,4 @@
-# iris bank
+# Bank
 
 Bank module allows you to manage assets in your local accounts
 

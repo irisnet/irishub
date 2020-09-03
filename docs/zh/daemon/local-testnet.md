@@ -88,7 +88,7 @@ iris unsafe-reset-all
 iris tendermint show-node-id
 ```
 
- 查询 [Tendermint Pubkey](../concepts/validator-faq.md#tendermint-密钥)，用于 [identify your validator](../cli-client/stake.md#iris-tx-staking-create-validator)，并将用于在共识过程中签署 Pre-vote/Pre-commit。
+查询 [Tendermint Pubkey](../concepts/validator-faq.md#tendermint-密钥)，用于 [identify your validator](../cli-client/staking.md#iris-tx-staking-create-validator)，并将用于在共识过程中签署 Pre-vote/Pre-commit。
 
 [Tendermint Key](../concepts/validator-faq.md#tendermint-密钥) 存储在 [priv_validator.json](intro.md#priv_validator-json) 中，创建验证人后，请一定要记得[备份](../concepts/validator-faq.md#如何备份验证人节点)。
 

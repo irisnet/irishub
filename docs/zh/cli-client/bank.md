@@ -1,4 +1,4 @@
-# iris bank
+# Bank
 
 Bank模块用于管理本地帐户中的资产
 

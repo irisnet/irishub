@@ -11,7 +11,7 @@ This module is mainly used to transfer coins between accounts, query account bal
     Query the account information of a certain account address.
 
     ```bash
-    iris q bank account <account-address>
+    iris query bank balances [address]
     ```
 
 2. Transfer between accounts

@@ -1,4 +1,4 @@
-# iris token
+# Token
 
 token模块用于管理你在IRIS Hub上发行的资产。
 

@@ -67,7 +67,7 @@ order: 1
 | [params](./params.md)             | 查询治理参数子命令                                  |
 | [rand](./rand.md)                 | 随机数子命令                                    |
 | [service](./service.md)           | 服务子命令                                          |
-| [stake](./stake.md)               | Staking管理子命令            |
+| [stake](./cli-client/staking.md)               | Staking管理子命令            |
 | [status](./status.md)             | 查询远程节点的状态                                 |
 | [tendermint](./tendermint.md)     | Tendermint状态查询子命令                        |
 | [token](./token.md)               | 资产管理子命令                                            |

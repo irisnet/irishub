@@ -1,4 +1,4 @@
-# iris keys
+# Keys
 
 Keys allows you to manage your local tendermint keystore (wallets) for iris.
 
