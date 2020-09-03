@@ -17,7 +17,7 @@
 | `stake/MaxValidators` | 验证人的最大数量 | [100, 200]  | 100      |
 | `stake/UnbondingTime` | 解绑时间         | [2week, +∞) | 504h0m0s |
 
-详见 [Staking](../features/stake.md)
+详见 [Staking](../features/staking.md)
 
 ## Distribution 模块可治理参数
 

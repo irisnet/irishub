@@ -1,4 +1,4 @@
-# iris tx service
+# Service
 
 Service module allows you to define, bind, invoke services on the IRIS Hub. [Read more about iService](../features/service.md).
 

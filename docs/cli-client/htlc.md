@@ -1,4 +1,4 @@
-# iris htlc
+# HTLC
 
 [HTLC module](../features/htlc.md) allows you to manage local Hash Time Locked Contracts (HTLCs) for atomic swaps with other chains.
 

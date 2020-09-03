@@ -1,4 +1,4 @@
-# iris token
+# Token
 
 token模块用于管理你在IRIS Hub上发行的资产。
 
@@ -164,17 +164,17 @@ iris query token fee [symbol] [flags]
 iris query token fee kitty
 ```
 
-## iris query token fee
+## iris query token params
 
-查询与通证相关的参数，包括通证发行和增发。
+查询通证模块参数。
 
 ```bash
-iris query token fee [symbol] [flags]
+iris query token params [flags]
 ```
 
-### 查询发行和增发通证的参数
+### 查询通证模块参数
 
 ```bash
-iris query token params kitty
+iris query token params
 ```
 

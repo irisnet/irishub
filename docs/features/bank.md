@@ -8,10 +8,10 @@ This module is mainly used to transfer coins between accounts, query account bal
 
 1. Query the balances of an account
 
-    Query the account information of a certain account address.
-
+    Query the total balance of an account or of a specific denomination.
+    
     ```bash
-    iris q bank account <account-address>
+    iris query bank balances [address] --denom=[denom]
     ```
 
 2. Transfer between accounts

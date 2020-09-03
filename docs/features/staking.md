@@ -123,4 +123,4 @@ iris tx staking redelegate iva14n9md3sq9xwscs96za8n85m0j9y2yu3cagxgke iva1l2rsak
 ```
   
 
-For other staking commands, please refer to [stake cli client](../cli-client/stake.md)
+For other staking commands, please refer to [stake cli client](../cli-client/staking.md)

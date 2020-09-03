@@ -120,5 +120,5 @@ iris tx staking unbond iva14n9md3sq9xwscs96za8n85m0j9y2yu3cagxgke 1000iris --cha
 iris tx staking redelegate iva14n9md3sq9xwscs96za8n85m0j9y2yu3cagxgke iva1l2rsakp388kuv9k8qzq6lrm9taddae7fpx59wm 100iris --from mykey --chain-id=irishub --from=<key-name> --fees=0.3iris
 ```
 
-对于其它Staking相关的命令，请参考[stake-cli](../cli-client/stake.md)
+对于其它Staking相关的命令，请参考[stake-cli](../cli-client/staking.md)
 

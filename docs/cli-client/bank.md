@@ -1,4 +1,4 @@
-# iris bank
+# Bank
 
 Bank module allows you to manage assets in your local accounts
 
@@ -9,17 +9,6 @@ Bank module allows you to manage assets in your local accounts
 | [balances](#iris-query-bank-balances)            | Query for account balances by address                     |
 | [total](#iris-query-bank-total)                  | Query the total supply of coins of the chain                   |
 | [send](#iris-tx-bank-send)                       | Create and/or sign and broadcast a MsgSend transaction     |
-
-## Common Problems
-
-### ERROR: decoding bech32 failed
-
-```bash
-iris bank account iaa1a0x4g8rqc90l3z9jh98x7mkd0w77e9q9r300h 
-Error: decoding bech32 failed: checksum failed. Expected 9r300k, got 9r300h.
-```
-
-This means the account address misspelled, please double check the address.
 
 ## iris query bank balances
 
