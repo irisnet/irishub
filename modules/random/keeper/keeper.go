@@ -48,7 +48,8 @@ func (k Keeper) GetCdc() codec.Marshaler {
 }
 
 // RequestRandom requests a random number
-func (k Keeper) RequestRandom(ctx sdk.Context, consumer sdk.AccAddress,
+func (k Keeper) RequestRandom(
+	ctx sdk.Context, consumer sdk.AccAddress,
 	blockInterval uint64, oracle bool,
 	serviceFeeCap sdk.Coins,
 ) (types.Request, error) {

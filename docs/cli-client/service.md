@@ -1,4 +1,4 @@
-# iris tx service
+# Service
 
 Service module allows you to define, bind, invoke services on the IRIS Hub. [Read more about iService](../features/service.md).
 
@@ -7,30 +7,30 @@ Service module allows you to define, bind, invoke services on the IRIS Hub. [Rea
 | Name                                                    | Description                                                 |
 | ------------------------------------------------------- | ----------------------------------------------------------- |
 | [define](#iris-tx-service-define)                       | Define a new service                                        |
-| [definition](#iris-q-service-definition)               | Query a service definition                                  |
+| [definition](#iris-query-service-definition)               | Query a service definition                                  |
 | [bind](#iris-tx-service-bind)                           | Bind a service                                              |
-| [binding](#iris-q-service-binding)                     | Query a service binding                                     |
-| [bindings](#iris-q-service-bindings)                   | Query all bindings of a service definition                  |
+| [binding](#iris-query-service-binding)                     | Query a service binding                                     |
+| [bindings](#iris-query-service-bindings)                   | Query all bindings of a service definition                  |
 | [set-withdraw-addr](#iris-tx-service-set-withdraw-addr) | Set a withdrawal address for a provider                     |
-| [withdraw-addr](#iris-q-service-withdraw-addr)         | Query the withdrawal address of a provider                  |
+| [withdraw-addr](#iris-query-service-withdraw-addr)         | Query the withdrawal address of a provider                  |
 | [update-binding](#iris-tx-service-update-binding)       | Update an existing service binding                          |
 | [disable](#iris-tx-service-disable)                     | Disable an available service binding                        |
 | [enable](#iris-tx-service-enable)                       | Enable an unavailable service binding                       |
 | [refund-deposit](#iris-tx-service-refund-deposit)       | Refund all deposit from a service binding                   |
 | [call](#iris-tx-service-call)                           | Initiate a service call                                     |
-| [request](#iris-q-service-request)                     | Query a request by the request ID                           |
-| [requests](#iris-q-service-requests)                   | Query active requests by the service binding or request context ID   |
+| [request](#iris-query-service-request)                     | Query a request by the request ID                           |
+| [requests](#iris-query-service-requests)                   | Query active requests by the service binding or request context ID   |
 | [respond](#iris-tx-service-respond)                     | Respond to a service request                                |
-| [response](#iris-q-service-response)                   | Query a response by the request ID                          |
-| [responses](#iris-q-service-responses)                 | Query active responses by the request context ID and batch counter |
-| [request-context](#iris-q-service-request-context)     | Query a request context                                     |
+| [response](#iris-query-service-response)                   | Query a response by the request ID                          |
+| [responses](#iris-query-service-responses)                 | Query active responses by the request context ID and batch counter |
+| [request-context](#iris-query-service-request-context)     | Query a request context                                     |
 | [update](#iris-tx-service-update)                       | Update a request context                                    |
 | [pause](#iris-tx-service-pause)                         | Pause a running request context                             |
 | [start](#iris-tx-service-start)                         | Start a paused request context                              |
 | [kill](#iris-tx-service-kill)                           | Terminate a request context                                 |
-| [fees](#iris-q-service-fees)                           | Query the earned fees of a provider                         |
+| [fees](#iris-query-service-fees)                           | Query the earned fees of a provider                         |
 | [withdraw-fees](#iris-tx-service-withdraw-fees)         | Withdraw the earned fees of a provider                      |
-| [schema](#iris-q-service-schema)         | Query the system schema by the schema name       |
+| [schema](#iris-query-service-schema)         | Query the system schema by the schema name       |
 
 ## iris tx service define
 
@@ -53,7 +53,7 @@ iris tx service define [flags]
 ### define a service
 
 ```bash
-iris tx service define --chain-id=irishub --from=<key-name> --fee=0.3iris 
+iris tx service define --chain-id=irishub --from=<key-name> --fees=0.3iris 
 --name=<service name> --description=<service description> --author-description=<author description>
 --tags=tag1,tag2 --schemas=<schemas content or path/to/schemas.json>
 ```
@@ -64,12 +64,12 @@ iris tx service define --chain-id=irishub --from=<key-name> --fee=0.3iris
 {"input":{"$schema":"http://json-schema.org/draft-04/schema#","title":"BioIdentify service input","description":"BioIdentify service input specification","type":"object","properties":{"id":{"description":"id","type":"string"},"name":{"description":"name","type":"string"},"data":{"description":"data","type":"string"}},"required":["id","data"]},"output":{"$schema":"http://json-schema.org/draft-04/schema#","title":"BioIdentify service output","description":"BioIdentify service output specification","type":"object","properties":{"data":{"description":"result data","type":"string"}},"required":["data"]}}
 ```
 
-## iris q service definition
+## iris query service definition
 
 Query a service definition.
 
 ```bash
-iris q service definition [service-name] [flags]
+iris query service definition [service-name] [flags]
 ```
 
 ### Query a service definition
@@ -77,7 +77,7 @@ iris q service definition [service-name] [flags]
 Query the detailed info of the service definition with the specified service name.
 
 ```bash
-iris q service definition <service name>
+iris query service definition <service name>
 ```
 
 ## iris tx service bind
@@ -103,7 +103,7 @@ iris tx service bind [flags]
 The deposit needs to satisfy the minimum deposit requirement, which is the maximal one between `price` * `MinDepositMultiple` and `MinDeposit`(`MinDepositMultiple` and `MinDeposit` are the system parameters, which can be modified through the governance).
 
 ```bash
-iris tx service bind --chain-id=irishub --from=<key-name> --fee=0.3iris
+iris tx service bind --chain-id=irishub --from=<key-name> --fees=0.3iris
 --service-name=<service name> --deposit=10000iris --pricing=<pricing content or path/to/pricing.json> --min-resp-time=50
 ```
 
@@ -115,32 +115,32 @@ iris tx service bind --chain-id=irishub --from=<key-name> --fee=0.3iris
 }
 ```
 
-## iris q service binding
+## iris query service binding
 
 Query a service binding.
 
 ```bash
-iris q service binding <service name> <provider>
+iris query service binding <service name> <provider>
 ```
 
 ### Query a service binding
 
 ```bash
-iris q service binding [service-name] [provider] [flags]
+iris query service binding [service-name] [provider] [flags]
 ```
 
-## iris q service bindings
+## iris query service bindings
 
 Query all bindings of a service definition.
 
 ```bash
-iris q service bindings [service-name] [flags]
+iris query service bindings [service-name] [flags]
 ```
 
 ### Query service binding list
 
 ```bash
-iris q service bindings <service name> --owner=<address>
+iris query service bindings <service name> --owner=<address>
 ```
 
 ## iris tx service update-binding
@@ -164,7 +164,7 @@ iris tx service update-binding [service-name] [provider-address] [flags]
 The following example updates the service binding with the additional 10 IRIS deposit
 
 ```bash
-iris tx service update-binding <service-name> --chain-id=irishub --from=<key-name> --fee=0.3iris --deposit=10iris
+iris tx service update-binding <service-name> --chain-id=irishub --from=<key-name> --fees=0.3iris --deposit=10iris
 ```
 
 ## iris tx service set-withdraw-addr
@@ -178,21 +178,21 @@ iris tx service set-withdraw-addr [withdrawal-address] [flags]
 ### Set a withdrawal address
 
 ```bash
-iris tx service set-withdraw-addr <withdrawal address> --chain-id=irishub --from=<key-name> --fee=0.3iris
+iris tx service set-withdraw-addr <withdrawal address> --chain-id=irishub --from=<key-name> --fees=0.3iris
 ```
 
-## iris q service withdraw-addr
+## iris query service withdraw-addr
 
 Query the withdrawal address of a provider.
 
 ```bash
-iris q service withdraw-addr [provider] [flags]
+iris query service withdraw-addr [provider] [flags]
 ```
 
 ### Query the withdrawal address of a provider
 
 ```bash
-iris q service withdraw-addr <provider>
+iris query service withdraw-addr <provider>
 ```
 
 ## iris tx service disable
@@ -206,7 +206,7 @@ iris tx service disable [service-name] [provider-address] [flags]
 ### Disable an available service binding
 
 ```bash
-iris tx service disable <service name> --chain-id=irishub --from=<key-name> --fee=0.3iris
+iris tx service disable <service name> --chain-id=irishub --from=<key-name> --fees=0.3iris
 ```
 
 ## iris tx service enable
@@ -228,7 +228,7 @@ iris tx service enable [service-name] [provider-address] [flags]
 The following example enables an unavailable service binding with the additional 10 IRIS deposit.
 
 ```bash
-iris tx service enable <service name> --chain-id=irishub --from=<key-name> --fee=0.3iris --deposit=10iris
+iris tx service enable <service name> --chain-id=irishub --from=<key-name> --fees=0.3iris --deposit=10iris
 ```
 
 ## iris tx service refund-deposit
@@ -244,7 +244,7 @@ iris tx service refund-deposit [service-name] [provider-address] [flags]
 Before refunding, you should [disable](#iris-tx-service-disable) the service binding first.
 
 ```bash
-iris tx service refund-deposit <service name> --chain-id=irishub --from=<key-name> --fee=0.3iris
+iris tx service refund-deposit <service name> --chain-id=irishub --from=<key-name> --fees=0.3iris
 ```
 
 ## iris tx service call
@@ -272,7 +272,7 @@ iris tx service call [flags]
 ### Initiate a service invocation request
 
 ```bash
-iris tx service call --chain-id=irishub --from=<key name> --fee=0.3iris --service-name=<service name>
+iris tx service call --chain-id=irishub --from=<key name> --fees=0.3iris --service-name=<service name>
 --providers=<provider list> --service-fee-cap=1iris --data=<request input or path/to/input.json> --timeout=100 --repeated --frequency=150 --total=100
 ```
 
@@ -286,42 +286,42 @@ iris tx service call --chain-id=irishub --from=<key name> --fee=0.3iris --servic
 }
 ```
 
-## iris q service request
+## iris query service request
 
 Query a request by the request ID.
 
 ```bash
-iris q service request [request-id] [flags]
+iris query service request [request-id] [flags]
 ```
 
 ### Query a service request
 
 ```bash
-iris q service request <request-id>
+iris query service request <request-id>
 ```
 
 :::tip
-You can retrieve the `request-id` in the result of [tendermint block](./tendermint.md#iris-q-tendermint-block)
+You can retrieve the `request-id` in the result of [tendermint block](./tendermint.md#iris-query-tendermint-block)
 :::
 
-## iris q service requests
+## iris query service requests
 
 Query active requests by the service binding or request context ID.
 
 ```bash
-iris q service requests [service-name] [provider] | [request-context-id] [batch-counter] [flags]
+iris query service requests [service-name] [provider] | [request-context-id] [batch-counter] [flags]
 ```
 
 ### Query active requests of a service binding
 
 ```bash
-iris q service requests <service name> <provider>
+iris query service requests <service name> <provider>
 ```
 
 ### Query service requests by the request context ID and batch counter
 
 ```bash
-iris q service requests <request-context-id> <batch-counter>
+iris query service requests <request-context-id> <batch-counter>
 ```
 
 ## iris tx service respond
@@ -343,12 +343,12 @@ iris tx service respond [flags]
 ### Respond to a service request
 
 ```bash
-iris tx service respond --chain-id=irishub --from=<key-name> --fee=0.3iris
+iris tx service respond --chain-id=irishub --from=<key-name> --fees=0.3iris
 --request-id=<request-id> --result=<response result or path/to/result.json> --data=<response output or path/to/output.json>
 ```
 
 :::tip
-You can retrieve the `request-id` in the result of [tendermint block](./tendermint.md#iriscli-tendermint-block)
+You can retrieve the `request-id` in the result of tendermint block
 :::
 
 ### Result example
@@ -368,50 +368,50 @@ You can retrieve the `request-id` in the result of [tendermint block](./tendermi
 }
 ```
 
-## iris q service response
+## iris query service response
 
 Query a service response.
 
 ```bash
-iris q service response [request-id] [flags]
+iris query service response [request-id] [flags]
 ```
 
 ### Query a service response
 
 ```bash
-iris q service response <request-id>
+iris query service response <request-id>
 ```
 
 :::tip
-You can retrieve the `request-id` in the result of [tendermint block](./tendermint.md#iris-q-tendermint-block)
+You can retrieve the `request-id` in the result of tendermint block
 :::
 
-## iris q service responses
+## iris query service responses
 
 Query active responses by the request context ID and batch counter.
 
 ```bash
-iris q service responses [request-context-id] [batch-counter] [flags]
+iris query service responses [request-context-id] [batch-counter] [flags]
 ```
 
 ### Query responses by the request context ID and batch counter
 
 ```bash
-iris q service responses <request-context-id> <batch-counter>
+iris query service responses <request-context-id> <batch-counter>
 ```
 
-## iris q service request-context
+## iris query service request-context
 
 Query a request context.
 
 ```bash
-iris q service request-context [request-context-id] [flags]
+iris query service request-context [request-context-id] [flags]
 ```
 
 ### Query a request context
 
 ```bash
-iris q service request-context <request-context-id>
+iris query service request-context <request-context-id>
 ```
 
 :::tip
@@ -439,7 +439,7 @@ iris tx service update [request-context-id] [flags]
 ### Update a request context
 
 ```bash
-iris tx service update <request-context-id> --chain-id=irishub --from=<key name> --fee=0.3iris
+iris tx service update <request-context-id> --chain-id=irishub --from=<key name> --fees=0.3iris
 --providers=<provider list> --service-fee-cap=1iris --timeout=0 --frequency=150 --total=100
 ```
 
@@ -485,18 +485,18 @@ iris tx service kill [request-context-id] [flags]
 iris tx service kill <request-context-id>
 ```
 
-## iris q service fees
+## iris query service fees
 
 Query the earned fees of a provider.
 
 ```bash
-iris q service fees [provider] [flags]
+iris query service fees [provider] [flags]
 ```
 
 ### Query service fees
 
 ```bash
-iris q service fees <provider>
+iris query service fees <provider>
 ```
 
 ## iris tx service withdraw-fees
@@ -510,26 +510,26 @@ iris tx service withdraw-fees [provider-address] [flags]
 ### Withdraw the earned fees
 
 ```bash
-iris tx service withdraw-fees [provider-address] --chain-id=irishub --from=<key-name> --fee=0.3iris
+iris tx service withdraw-fees [provider-address] --chain-id=irishub --from=<key-name> --fees=0.3iris
 ```
 
-## iris q service schema
+## iris query service schema
 
 Query the system schema by the schema name, only pricing and result allowed.
 
 ```bash
-iris q service schema [schema-name] [flags]
+iris query service schema [schema-name] [flags]
 ```
 
 ### Query the service pricing schema
 
 ```bash
-iris q service schema pricing
+iris query service schema pricing
 ```
 
 ### Query the response result schema
 
 ```bash
-iris q service schema result
+iris query service schema result
 ```
 

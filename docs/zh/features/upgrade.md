@@ -1,104 +1,83 @@
 # 软件升级
 
-## 简介
+## 概念
 
-该模块是支持区块链软件平滑升级的基础设施，通过UpgradeProposal在约定高度切换到新版的代码，并对历史版本的链上数据完全兼容。
+### 计划
 
-## 交互流程
+升级模块定义一个 `Plan`（`计划`） 类型，该计划调度一个在线升级过程。`计划` 可以安排在一个特定的区块高度或时间，但不能同时指定两者。一旦对一个（冻结的）候选发布版本以及一个合适的处理器达成一致，则一个 `计划` 被创建，其 `Name` 对应一个特定的处理器。通常，`计划` 通过一个治理提议过程被创建，当投票通过时，该计划将被调度。一个计划的 `Info` 可以包含关于这次升级的各种元数据，典型的，要包含一些上链的特定于应用的升级信息，诸如验证人能自动升级的 `Git` 提交。
 
-### 软件升级提议治理流程
+#### 边车进程
 
-1. 用户提交升级软件的提议并且经过投票使该提议通过
-2. 治理流程详细见GOV的[用户手册](governance.md)
+如果一个运行应用程序二进制的运营者也运行一个边车进程来辅助自动下载和升级二进制，`Info` 允许这个进程是无摩擦的。即，升级模块 实现 [Iirsd 可升级的二进制规范]() 指定的规范，并且 `Irisd` 能可选地被用于为节点运营者完全自动化升级过程。通过用必要的信息填充 `Info` 字段，二进制能够被自动下载。参考[这里]()。
 
-### 升级软件流程
-
-1. 用户一旦安装新软件，节点就会自动广播全网，本节点已经安装新软件。
-2. 到达限定的时间（由软件升级提议决定），链上会统计升级到新软件的voting power比例是否超过软件升级的阈值（由软件升级提议决定）。
-3. 如果超过，软件进行升级，否则升级失败。
-4. 对于没有及时参与升级的节点，需要安装并运行新版本软件。
-
-## 使用场景
-
-### 创建使用环境
-
-```bash
-rm -rf iris
-rm -rf .iriscli
-iris init gen-tx --name=<key-name> --home=<path-to-your-home>
-iris init --gen-txs --chain-id=irishub -o --home=<path-to-your-home>
-iris start --home=<path-to-your-home>
+```go
+type Plan struct {
+  Name   string
+  Time   Time
+  Height int64
+  Info   string
+}
 ```
 
-### 提交软件升级的提议
+### 处理器
 
-```bash
-# 发送升级提议
-iriscli gov submit-proposal --title=<title> --description=<description> --type="SoftwareUpgrade" --deposit=100iris --from=<key-name> --chain-id=irishub --fee=0.3iris --software=https://github.com/irisnet/irishub/tree/v0.13.1 --version=2 --switch-height=80 --threshold=0.9 --commit
+`升级` 模块便于从主版本 X 升级到主版本 Y。为完成这个过程，节点运营者必须首先将当前的二进制升级到一个新二进制，该二进制有一个与新版本 Y 相对应的 `处理器`。假定这个版本已经过大部分社区成员的充分测试和批准。这个 `处理器` 定义了在新二进制 Y 成功运行链之前需要完成的状态迁移。当然，这个 `处理器` 是特定于应用而不是在模块基础上定义的。通过应用中的 `Keeper#SetUpgradeHandler` 完成 `处理器` 的注册。
 
-# 对提议进行抵押
-iriscli gov deposit --proposal-id=<proposal-id> --deposit=1000iris --from=<key-name> --chain-id=irishub --fee=0.3iris --commit
-
-# 对提议投票
-iriscli gov vote --proposal-id=<proposal-id> --option=Yes --from=<key-name> --chain-id=irishub --fee=0.3iris --commit
-
-# 查询提议情况
-iriscli gov query-proposal --proposal-id=<proposal-id>
+```go
+type UpgradeHandler func(Context, Plan)
 ```
 
-### 升级软件
+在每个 `EndBlock` 执行期间，`升级` 模块检查是否存在一个应该执行的 `计划`（被调度在 `EndBlock` 运行时的区块高度或时间）。如果存在，则执行对应的 `处理器`。如果这个计划期待被执行但没有注册相应的处理器，或者二进制升级过早时，节点将优雅地 `panic` 并退出。
 
-* 场景一
+### 存储加载器
 
-用户在指定的高度（例如80），完成以下动作：
+升级模块也有助于将存储迁移作为升级的一部分。`存储加载器` 执行在新二进制成功运行链之前需要完成的迁移。`存储加载器` 也是特定于应用而不是基于模块定义的。通过应用中的 `app#SetStoreLoader` 完成 `存储加载器` 的注册。
 
-```bash
-# 1. 下载新版本iris1
-
-# 2. 关闭旧软件
-kill -f iris
-
-# 3. 安装新版本 iris1 并启动（copy to bin）
-iris1 start --home=<path-to-your-home>
-
-# 4. 区块到达指定高度，自动升级
-
-# 5. 查询当前版本是否升级成功
-iriscli upgrade info --trust-node
+```go
+func UpgradeStoreLoader (upgradeHeight int64, storeUpgrades *store.StoreUpgrades) baseapp.StoreLoader
 ```
 
-* 场景二
+如果存在一个计划的升级并且已到达升级高度，在 panic 之前旧的二进制将写 `升级信息（UpgradeInfo）` 到磁盘。
 
-用户在指定的高度（例如80），没有安装新软件，软件无法继续运行：
-
-```bash
-# 1. 下载新版本iris1
-
-# 2. 关闭旧软件
-kill -f iris
-
-# 3. 安装新版本 iris1 并启动
-iris1 start --home=<path-to-your-home>
-
-# 4. 查询当前版本是否升级成功
-iriscli upgrade info --trust-node
+```go
+type UpgradeInfo struct {
+  Name    string
+  Height  int64
+}
 ```
 
-## 命令详情
+这个信息对于确保 `存储升级` 在正确的区块高度顺利执行以及确保升级符合预期至关重要。它消除了新二进制每次重启时多次执行 `存储升级` 的机会。而且，如果在相同的高度存在多个升级计划，`Name` 将确保这些 `存储升级` 仅仅发生在计划的升级处理器中。
 
-```bash
-iriscli gov submit-proposal --title=<title> --description=<description> --type="SoftwareUpgrade" --deposit=100iris --from=<key-name> --chain-id=irishub --fee=0.3iris --software=https://github.com/irisnet/irishub/tree/v0.13.1 --version=2 --switch-height=80 --threshold=0.9 --commit
+### 提议
+
+通常，一个 `计划` 经由 `软件升级提议（SoftwareUpgradeProposal）` 通过治理的方式被提出并提交。这个提议规定了标准的治理过程。如果这个提议被通过，目标为一个特定 `处理器` 的 `计划` 将被持久化并调度。通过在一个新的提议中更新计划时间（`Plan.Time`），升级可以被推迟或者加速。
+
+```go
+type SoftwareUpgradeProposal struct {
+  Title       string
+  Description string
+  Plan        Plan
+}
 ```
 
-* `--type`  "SoftwareUpgrade" 软件升级提议的类型
-* `--version`  新软件协议版本号
-* `--software`  新软件的下载地址
-* `--switch-height` 新软件升级的高度
-* `--threshold`  软件升级的阈值
-* 其他参数可参考Governance的[用户手册](governance.md)
+#### 治理过程
 
-```bash
-iriscli upgrade info --trust-node
-```
+当一个升级提议被接受时，升级过程分为如下两个步骤。
 
-* 查询当前软件具体版本信息
+##### 发信号
+
+软件升级提议被接受后，期待验证人下载并安装软件的新版本，同时继续运行之前的版本。一旦一个验证人已经下载并安装了升级版，它将开始向网络发出切换就绪的信号，这将在它的预提交中包含这个提议的 ID。
+
+注意：每个预提交仅有一个信号槽。如果在短时间内接受了几个软件升级提议，它们将在一个管道中按被接受的顺序依次处理。
+
+##### 切换
+
+一旦一个区块包含多于 2/3 的预提交（标识一个共同的软件升级提议），期待所有节点（包括验证人节点，非验证全节点以及轻节点）切换到软件的新版本。
+
+#### 取消升级提议
+
+升级提议可以被取消。存在一个 `取消软件升级 （CancelSoftwareUpgrade）`的提议类型，当该类型提议投票通过时，将移除之前被调度的升级计划。当然，这需要在升级之前就知道该升级计划不被接受，从而有时间为取消升级投票。
+
+如果需要这样的可能性，升级高度将是自升级提议开始后的 `2 *（投票期 + 抵押期）+ （安全增量）`。`安全增量（SafetyDelta）` 是从一个升级提议成功到意识到该提议是一个不好的主意（由于外部社会共识）之间的可用时间。
+
+`取消软件升级` 提议也可以在原来的 `软件升级提议` 仍然处于投票过程时被提交，只要其`投票期` 在 `软件升级提议` 之后结束。

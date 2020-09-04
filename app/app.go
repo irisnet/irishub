@@ -4,6 +4,13 @@ import (
 	"io"
 	"os"
 
+	abci "github.com/tendermint/tendermint/abci/types"
+	"github.com/tendermint/tendermint/crypto"
+	"github.com/tendermint/tendermint/libs/log"
+	tmos "github.com/tendermint/tendermint/libs/os"
+	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
+	dbm "github.com/tendermint/tm-db"
+
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client/rpc"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -67,6 +74,7 @@ import (
 	upgradeclient "github.com/cosmos/cosmos-sdk/x/upgrade/client"
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
+
 	"github.com/irismod/coinswap"
 	coinswapkeeper "github.com/irismod/coinswap/keeper"
 	coinswaptypes "github.com/irismod/coinswap/types"
@@ -85,11 +93,6 @@ import (
 	"github.com/irismod/token"
 	tokenkeeper "github.com/irismod/token/keeper"
 	tokentypes "github.com/irismod/token/types"
-	abci "github.com/tendermint/tendermint/abci/types"
-	"github.com/tendermint/tendermint/libs/log"
-	tmos "github.com/tendermint/tendermint/libs/os"
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
-	dbm "github.com/tendermint/tm-db"
 
 	"github.com/irisnet/irishub/modules/guardian"
 	guardiankeeper "github.com/irisnet/irishub/modules/guardian/keeper"
@@ -107,6 +110,14 @@ import (
 
 const appName = "IrisApp"
 
+func init() {
+	tokentypes.SetNativeToken(
+		"iris", "Irishub staking token", sdk.DefaultBondDenom,
+		6, 2000000000, 10000000000,
+		true, sdk.AccAddress(crypto.AddressHash([]byte(tokentypes.ModuleName))),
+	)
+}
+
 var (
 	// DefaultNodeHome default home directories for the application daemon
 	DefaultNodeHome = os.ExpandEnv("$HOME/.iris")
@@ -123,7 +134,9 @@ var (
 		mint.AppModuleBasic{},
 		distr.AppModuleBasic{},
 		gov.NewAppModuleBasic(
-			paramsclient.ProposalHandler, distrclient.ProposalHandler, upgradeclient.ProposalHandler,
+			paramsclient.ProposalHandler,
+			distrclient.ProposalHandler,
+			upgradeclient.ProposalHandler,
 		),
 		params.AppModuleBasic{},
 		crisis.AppModuleBasic{},
@@ -223,8 +236,11 @@ type IrisApp struct {
 
 // NewIrisApp returns a reference to an initialized IrisApp.
 func NewIrisApp(
-	logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bool, skipUpgradeHeights map[int64]bool,
-	homePath string, invCheckPeriod uint, encodingConfig simappparams.EncodingConfig, baseAppOptions ...func(*baseapp.BaseApp),
+	logger log.Logger, db dbm.DB, traceStore io.Writer,
+	loadLatest bool, skipUpgradeHeights map[int64]bool,
+	homePath string, invCheckPeriod uint,
+	encodingConfig simappparams.EncodingConfig,
+	baseAppOptions ...func(*baseapp.BaseApp),
 ) *IrisApp {
 
 	// TODO: Remove cdc in favor of appCodec once all modules are migrated.
@@ -302,6 +318,7 @@ func NewIrisApp(
 		AddRoute(paramproposal.RouterKey, params.NewParamChangeProposalHandler(app.paramsKeeper)).
 		AddRoute(distrtypes.RouterKey, distr.NewCommunityPoolSpendProposalHandler(app.distrKeeper)).
 		AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(app.upgradeKeeper))
+
 	app.govKeeper = govkeeper.NewKeeper(
 		appCodec, keys[govtypes.StoreKey], app.GetSubspace(govtypes.ModuleName), app.accountKeeper, app.bankKeeper,
 		&stakingKeeper, govRouter,
@@ -351,12 +368,20 @@ func NewIrisApp(
 
 	app.htlcKeeper = htlckeeper.NewKeeper(appCodec, keys[htlctypes.StoreKey], app.accountKeeper, app.bankKeeper)
 
-	app.coinswapKeeper = coinswapkeeper.NewKeeper(appCodec, keys[coinswaptypes.StoreKey], app.GetSubspace(coinswaptypes.ModuleName), app.bankKeeper, app.accountKeeper)
+	app.coinswapKeeper = coinswapkeeper.NewKeeper(
+		appCodec, keys[coinswaptypes.StoreKey], app.GetSubspace(coinswaptypes.ModuleName),
+		app.bankKeeper, app.accountKeeper,
+	)
 
-	app.serviceKeeper = servicekeeper.NewKeeper(appCodec, keys[servicetypes.StoreKey], app.accountKeeper, app.bankKeeper,
-		WrapToken(app.tokenKeeper), app.GetSubspace(servicetypes.ModuleName), authtypes.FeeCollectorName)
+	app.serviceKeeper = servicekeeper.NewKeeper(
+		appCodec, keys[servicetypes.StoreKey], app.accountKeeper, app.bankKeeper,
+		WrapToken(app.tokenKeeper), app.GetSubspace(servicetypes.ModuleName), authtypes.FeeCollectorName,
+	)
 
-	app.oracleKeeper = oracleKeeper.NewKeeper(appCodec, keys[oracletypes.StoreKey], app.GetSubspace(oracletypes.ModuleName), app.guardianKeeper, app.serviceKeeper)
+	app.oracleKeeper = oracleKeeper.NewKeeper(
+		appCodec, keys[oracletypes.StoreKey], app.GetSubspace(oracletypes.ModuleName),
+		app.guardianKeeper, app.serviceKeeper,
+	)
 
 	app.randomKeeper = randomkeeper.NewKeeper(appCodec, keys[randomtypes.StoreKey], app.bankKeeper, app.serviceKeeper)
 	// NOTE: Any module instantiated in the module manager that is later modified
@@ -393,11 +418,12 @@ func NewIrisApp(
 	// CanWithdrawInvariant invariant.
 	// NOTE: staking module is required if HistoricalEntries param > 0
 	app.mm.SetOrderBeginBlockers(
-		upgradetypes.ModuleName, minttypes.ModuleName, distrtypes.ModuleName, slashingtypes.ModuleName,
-		evidencetypes.ModuleName, stakingtypes.ModuleName, ibchost.ModuleName,
-		htlctypes.ModuleName, randomtypes.ModuleName,
+		upgradetypes.ModuleName, minttypes.ModuleName, distrtypes.ModuleName,
+		slashingtypes.ModuleName, evidencetypes.ModuleName, stakingtypes.ModuleName,
+		ibchost.ModuleName, htlctypes.ModuleName, randomtypes.ModuleName,
 	)
-	app.mm.SetOrderEndBlockers(crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName,
+	app.mm.SetOrderEndBlockers(
+		crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName,
 		servicetypes.ModuleName,
 	)
 
@@ -461,7 +487,8 @@ func NewIrisApp(
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetAnteHandler(
 		NewAnteHandler(
-			app.accountKeeper, app.bankKeeper, app.tokenKeeper, ante.DefaultSigVerificationGasConsumer,
+			app.accountKeeper, app.bankKeeper, app.tokenKeeper,
+			ante.DefaultSigVerificationGasConsumer,
 			encodingConfig.TxConfig.SignModeHandler(),
 		),
 	)

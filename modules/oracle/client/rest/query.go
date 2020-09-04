@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/gorilla/mux"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/types/rest"
-	"github.com/gorilla/mux"
 
 	oracleClient "github.com/irisnet/irishub/modules/oracle/client"
 	"github.com/irisnet/irishub/modules/oracle/types"

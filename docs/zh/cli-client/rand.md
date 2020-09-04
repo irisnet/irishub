@@ -4,18 +4,18 @@ Rand模块允许你向IRIS Hub发送随机数请求，查询随机数或待处�
 
 ## 可用命令
 
-| 名称                                       | 描述                               |
-| ------------------------------------------ | ---------------------------------- |
-| [request-rand](#iris-tx-rand-request-rand) | 请求一个随机数                     |
-| [query-rand](#iris-q-rand-rand)            | 使用ID查询链上生成的随机数         |
-| [query-queue](#iris-q-rand-queue)          | 查询随机数请求队列，支持可选的高度 |
+| 名称                                             | 描述                               |
+| ------------------------------------------------ | ---------------------------------- |
+| [request-random](#iris-tx-random-request-random) | 请求一个随机数                     |
+| [query-random](#iris-query-random-random)        | 使用ID查询链上生成的随机数         |
+| [query-queue](#iris-query-random-queue)          | 查询随机数请求队列，支持可选的高度 |
 
-## iris tx rand request-rand
+## iris tx random request-random
 
 请求一个随机数。
 
 ```bash
-iris tx rand request-rand [flags]
+iris tx random request-random [flags]
 ```
 
 **标志：**
@@ -32,22 +32,22 @@ iris tx rand request-rand [flags]
 
 ```bash
 # without oracle
-iris tx rand request-rand --block-interval=100 --from=<key-name> --chain-id=irishub --fee=0.3iris --commit
+iris tx random request-random --block-interval=100 --from=<key-name> --chain-id=irishub --fees=0.3iris --commit
 
 # with oracle
-iris tx rand request-rand --block-interval=100 --oracle=true --service-fee-cap=1iris --from=<key-name> --chain-id=irishub --fee=0.3iris --commit
+iris tx random request-random --block-interval=100 --oracle=true --service-fee-cap=1iris --from=<key-name> --chain-id=irishub --fees=0.3iris --commit
 ```
 
 :::tip
-如果交易已被执行，你将获得一个唯一的请求ID，该ID可用于查询请求状态。你也可以通过[查询交易详情](./tendermint.md#iriscli-tendermint-tx)获取请求ID。
+如果交易已被执行，你将获得一个唯一的请求ID，该ID可用于查询请求状态。你也可以通过[查询交易详情](./tx.md#iris-query-tx)获取请求ID。
 :::
 
-## iris q rand rand
+## iris query random random
 
 使用ID查询链上生成的随机数。
 
 ```bash
-iris query rand rand <request-id> [flags]
+iris query random random <request-id> [flags]
 ```
 
 ### 查询随机数
@@ -55,15 +55,15 @@ iris query rand rand <request-id> [flags]
 查询已生成的随机数。
 
 ```bash
-iris q rand rand <request-id>
+iris query random random <request-id>
 ```
 
-## iris q rand queue
+## iris query random queue
 
 查询随机数请求队列，支持可选的高度。
 
 ```bash
-iris query rand queue <gen-height> [flags]
+iris query random queue <gen-height> [flags]
 ```
 
 ### 查询随机数请求队列
@@ -71,5 +71,5 @@ iris query rand queue <gen-height> [flags]
 查询尚未处理的随机数请求，可指定将要生成随机数（或请求 Service）的区块高度。
 
 ```bash
-iris query rand queue 100000
+iris query random queue 100000
 ```

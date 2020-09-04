@@ -87,7 +87,6 @@ irislcd start --node=tcp://localhost:26657 --chain-id=irishub --laddr=tcp://0.0.
 
 ### Bank模块的APIs
 
-1. `GET /bank/coins/{coin-type}`: 查询coin的类型信息
 2. `GET /bank/token-stats`: 查询token统计信息
 3. `GET /bank/token-stats/{symbol}`: 查询指定token统计信息
 4. `GET /bank/accounts/{address}`: 查询链上账户信息

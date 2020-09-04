@@ -8,10 +8,10 @@ This module is mainly used to transfer coins between accounts, query account bal
 
 1. Query the balances of an account
 
-    Query the account information of a certain account address.
-
+    Query the total balance of an account or of a specific denomination.
+    
     ```bash
-    iris q bank account <account-address>
+    iris query bank balances [address] --denom=[denom]
     ```
 
 2. Transfer between accounts
@@ -19,7 +19,7 @@ This module is mainly used to transfer coins between accounts, query account bal
     For example, transfer 10iris from account A to account B:
 
     ```bash
-    iris tx bank send [A] [B] [10iris] --fee=0.3iris --from=<key-name-of-wallet-A> --chain-id=irishub
+    iris tx bank send [A] [B] [10iris] --fees=0.3iris --from=<key-name-of-wallet-A> --chain-id=irishub
     ```
 
     IRISnet supports multiple tokens in circulation, and in the future IRISnet will be able to include multiple tokens in one transaction.
@@ -29,7 +29,7 @@ This module is mainly used to transfer coins between accounts, query account bal
     To improve account security, IRISnet supports offline signing of transactions to protect the account's private key. In any transaction, you can build an unsigned transaction using the flag --generate-only. Take transfer transaction as an example:
 
     ```bash
-    iris tx bank send [from_key_or_address] [to_address] [amount] --amount=10iris --fee=0.3iris --from=<key-name-of-wallet-A> --generate-only
+    iris tx bank send [from_key_or_address] [to_address] [amount] --amount=10iris --fees=0.3iris --from=<key-name-of-wallet-A> --generate-only
     ```
 
     Return the built transaction with empty signatures:

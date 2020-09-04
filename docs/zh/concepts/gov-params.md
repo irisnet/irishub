@@ -7,7 +7,7 @@
 
 | 字段                     | 描述             | 有效范围            | 当前值        |
 | ------------------------ | ---------------- | ------------------- | ------------- |
-| `auth/gasPriceThreshold` | 最小的gas单价    | (0, 10^18iris-atto] | 6000000000000 |
+| `auth/gasPriceThreshold` | 最小的gas单价    | (0, 10^6uiris] | 6000000000000 |
 | `auth/txSizeLimit`       | 普通交易大小限制 | [500, 1500]         | 1000          |
 
 ## Stake 模块可治理参数
@@ -17,7 +17,7 @@
 | `stake/MaxValidators` | 验证人的最大数量 | [100, 200]  | 100      |
 | `stake/UnbondingTime` | 解绑时间         | [2week, +∞) | 504h0m0s |
 
-详见 [Staking](../features/stake.md)
+详见 [Staking](../features/staking.md)
 
 ## Distribution 模块可治理参数
 
@@ -58,10 +58,8 @@
 | 字段                         | 描述                                           | 有效范围 | 当前值                            |
 | ---------------------------- | ---------------------------------------------- | -------- | --------------------------------- |
 | `asset/AssetTaxRate`         | 资产税率，即Community Tax的比例                | [0, 1]   | 0.4                               |
-| `asset/IssueTokenBaseFee`    | 发行Token的基准费用                            | [0, +∞)  | 60000000000000000000000iris-atto  |
+| `asset/IssueTokenBaseFee`    | 发行Token的基准费用                            | [0, +∞)  | 60000000000uiris  |
 | `asset/MintTokenFeeRatio`    | 增发Token的费率(相对于发行费用)                | [0, 1]   | 0.1                               |
-| `asset/CreateGatewayBaseFee` | 创建网关的基准费用                             | [0, +∞)  | 120000000000000000000000iris-atto |
-| `asset/GatewayAssetFeeRatio` | 发行网关资产的费率(相对于native资产的发行费用) | [0, 1]   | 0.1                               |
 
 详见 [Token](../features/token.md)
 

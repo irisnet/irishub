@@ -33,8 +33,7 @@ func RegisterInterfaces(registry types.InterfaceRegistry) {
 }
 
 var (
-	amino = codec.New()
-
+	amino     = codec.New()
 	ModuleCdc = codec.NewAminoCodec(amino)
 )
 
