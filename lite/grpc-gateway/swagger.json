@@ -5,6 +5,90 @@
     "version": "1.0.0"
   },
   "paths": {
+    "/irishub/mint/params": {
+      "get": {
+        "summary": "Parameters queries the mint parameters",
+        "operationId": "MintParams",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "params": {
+                  "type": "object",
+                  "properties": {
+                    "mint_denom": {
+                      "type": "string",
+                      "title": "type of coin to mint"
+                    },
+                    "inflation": {
+                      "type": "string",
+                      "title": "inflation rate"
+                    }
+                  },
+                  "title": "mint parameters"
+                },
+                "res": {
+                  "type": "object",
+                  "properties": {
+                    "next_key": {
+                      "type": "string",
+                      "format": "byte",
+                      "title": "next_key is the key to be passed to PageRequest.key to\nquery the next page most efficiently"
+                    },
+                    "total": {
+                      "type": "string",
+                      "format": "uint64",
+                      "title": "total is total number of results available if PageRequest.count_total\nwas set, its value is undefined otherwise"
+                    }
+                  },
+                  "description": "message SomeResponse {\n         repeated Bar results = 1;\n         PageResponse page = 2;\n }",
+                  "title": "PageResponse is to be embedded in gRPC response messages where the corresponding\nrequest message has used PageRequest"
+                }
+              },
+              "title": "QueryParametersResponse is response type for the Query/Parameters RPC method"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
+                },
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "details": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "type_url": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "type": "string",
+                        "format": "byte"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Query"
+        ]
+      }
+    },
     "/irishub/oracle/feeds": {
       "get": {
         "summary": "QueryFeedsRequest queries the feed list",
@@ -567,17 +651,22 @@
     }
   },
   "definitions": {
-    "cosmos.base.v1beta1.Coin": {
+    "cosmos.query.PageResponse": {
       "type": "object",
       "properties": {
-        "denom": {
-          "type": "string"
+        "next_key": {
+          "type": "string",
+          "format": "byte",
+          "title": "next_key is the key to be passed to PageRequest.key to\nquery the next page most efficiently"
         },
-        "amount": {
-          "type": "string"
+        "total": {
+          "type": "string",
+          "format": "uint64",
+          "title": "total is total number of results available if PageRequest.count_total\nwas set, its value is undefined otherwise"
         }
       },
-      "description": "Coin defines a token with a denomination and an amount.\n\nNOTE: The amount field is an Int which implements the custom method\nsignatures required by gogoproto."
+      "description": "message SomeResponse {\n         repeated Bar results = 1;\n         PageResponse page = 2;\n }",
+      "title": "PageResponse is to be embedded in gRPC response messages where the corresponding\nrequest message has used PageRequest"
     },
     "google.protobuf.Any": {
       "type": "object",
@@ -620,6 +709,69 @@
           }
         }
       }
+    },
+    "irishub.mint.Params": {
+      "type": "object",
+      "properties": {
+        "mint_denom": {
+          "type": "string",
+          "title": "type of coin to mint"
+        },
+        "inflation": {
+          "type": "string",
+          "title": "inflation rate"
+        }
+      },
+      "title": "mint parameters"
+    },
+    "irishub.mint.QueryParamsResponse": {
+      "type": "object",
+      "properties": {
+        "params": {
+          "type": "object",
+          "properties": {
+            "mint_denom": {
+              "type": "string",
+              "title": "type of coin to mint"
+            },
+            "inflation": {
+              "type": "string",
+              "title": "inflation rate"
+            }
+          },
+          "title": "mint parameters"
+        },
+        "res": {
+          "type": "object",
+          "properties": {
+            "next_key": {
+              "type": "string",
+              "format": "byte",
+              "title": "next_key is the key to be passed to PageRequest.key to\nquery the next page most efficiently"
+            },
+            "total": {
+              "type": "string",
+              "format": "uint64",
+              "title": "total is total number of results available if PageRequest.count_total\nwas set, its value is undefined otherwise"
+            }
+          },
+          "description": "message SomeResponse {\n         repeated Bar results = 1;\n         PageResponse page = 2;\n }",
+          "title": "PageResponse is to be embedded in gRPC response messages where the corresponding\nrequest message has used PageRequest"
+        }
+      },
+      "title": "QueryParametersResponse is response type for the Query/Parameters RPC method"
+    },
+    "cosmos.base.v1beta1.Coin": {
+      "type": "object",
+      "properties": {
+        "denom": {
+          "type": "string"
+        },
+        "amount": {
+          "type": "string"
+        }
+      },
+      "description": "Coin defines a token with a denomination and an amount.\n\nNOTE: The amount field is an Int which implements the custom method\nsignatures required by gogoproto."
     },
     "irishub.oracle.Feed": {
       "type": "object",

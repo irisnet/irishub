@@ -6,6 +6,14 @@
   },
   "apis": [
     {
+      "url": "./mint/query.swagger.json",
+      "operationIds": {
+        "rename": {
+          "Params": "MintParams"
+        }
+      }
+    },
+    {
       "url": "./oracle/query.swagger.json",
       "operationIds": {
         "rename": {
