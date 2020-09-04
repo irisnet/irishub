@@ -4,6 +4,7 @@ package irishub.oracle;
 import "oracle/oracle.proto";
 import "irismod/service.proto";
 import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
 import "cosmos_proto/cosmos.proto";
 import "cosmos_proto/coin.proto";
 
@@ -13,14 +14,17 @@ option go_package = "github.com/irisnet/irishub/modules/oracle/types";
 service Query {
     // Feed queries the feed
     rpc Feed (QueryFeedRequest) returns (QueryFeedResponse) {
+      option (google.api.http).get = "/irishub/oracle/feeds/{feed_name}";
     }
 
     // QueryFeedsRequest queries the feed list
     rpc Feeds (QueryFeedsRequest) returns (QueryFeedsResponse) {
+      option (google.api.http).get = "/irishub/oracle/feeds";
     }
 
     // FeedValue queries the feed value
     rpc FeedValue (QueryFeedValueRequest) returns (QueryFeedValueResponse) {
+      option (google.api.http).get = "/irishub/oracle/feeds/{feed_name}/value";
     }
 }
 
