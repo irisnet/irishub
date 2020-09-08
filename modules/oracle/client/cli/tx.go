@@ -1,7 +1,10 @@
 package cli
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -43,7 +46,7 @@ func GetCmdCreateFeed() *cobra.Command {
 				`--feed-name="test-feed" `+
 				`--latest-history=10 `+
 				`--service-name="test-service" `+
-				`--input=<request-data> `+
+				`--input=<request data or path/to/input.json> `+
 				`--providers=<provide1_address>,<provider2_address> `+
 				`--service-fee-cap=1iris `+
 				`--timeout=2 `+
@@ -76,6 +79,28 @@ func GetCmdCreateFeed() *cobra.Command {
 				return err
 			}
 
+			input := viper.GetString(FlagInput)
+
+			if !json.Valid([]byte(input)) {
+				inputContent, err := ioutil.ReadFile(input)
+				if err != nil {
+					return fmt.Errorf("invalid input data: neither JSON input nor path to .json file were provided")
+				}
+
+				if !json.Valid(inputContent) {
+					return fmt.Errorf("invalid input data: .json file content is invalid JSON")
+				}
+
+				input = string(inputContent)
+			}
+
+			buf := bytes.NewBuffer([]byte{})
+			if err := json.Compact(buf, []byte(input)); err != nil {
+				return fmt.Errorf("failed to compact the input data")
+			}
+
+			input = buf.String()
+
 			msg := &types.MsgCreateFeed{
 				FeedName:          viper.GetString(FlagFeedName),
 				AggregateFunc:     viper.GetString(FlagAggregateFunc),
@@ -84,7 +109,7 @@ func GetCmdCreateFeed() *cobra.Command {
 				Description:       viper.GetString(FlagDescription),
 				ServiceName:       viper.GetString(FlagServiceName),
 				Providers:         providers,
-				Input:             viper.GetString(FlagInput),
+				Input:             input,
 				Timeout:           viper.GetInt64(FlagTimeout),
 				ServiceFeeCap:     serviceFeeCap,
 				RepeatedFrequency: uint64(viper.GetInt64(FlagFrequency)),
