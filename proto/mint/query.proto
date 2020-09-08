@@ -4,6 +4,7 @@ package irishub.mint;
 import "cosmos/query/pagination.proto";
 import "mint/mint.proto";
 import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
 import "cosmos_proto/cosmos.proto";
 
 option go_package = "github.com/irisnet/irishub/modules/mint/types";
@@ -12,6 +13,7 @@ option go_package = "github.com/irisnet/irishub/modules/mint/types";
 service Query {
     // Parameters queries the mint parameters
     rpc Params (QueryParamsRequest) returns (QueryParamsResponse) {
+      option (google.api.http).get = "/irishub/mint/params";
     }
 }
 

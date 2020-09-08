@@ -619,6 +619,7 @@ func (app *SimApp) RegisterAPIRoutes(apiSvr *api.Server) {
 	rpc.RegisterRoutes(apiSvr.ClientCtx, apiSvr.Router)
 	authrest.RegisterTxRoutes(apiSvr.ClientCtx, apiSvr.Router)
 	ModuleBasics.RegisterRESTRoutes(apiSvr.ClientCtx, apiSvr.Router)
+	ModuleBasics.RegisterGRPCRoutes(apiSvr.ClientCtx, apiSvr.GRPCRouter)
 }
 
 // GetMaccPerms returns a copy of the module account permissions

@@ -95,13 +95,14 @@ install: go.sum
 	go install $(BUILD_FLAGS) ./cmd/iris
 
 update-swagger-docs: statik
-	$(BINDIR)/statik -src=lite/swagger-ui -dest=lite -f -m
+	$(BINDIR)/statik -src=lite/grpc-gateway -dest=lite/grpc-gateway -f -m
 	@if [ -n "$(git status --porcelain)" ]; then \
         echo "\033[91mSwagger docs are out of sync!!!\033[0m";\
         exit 1;\
     else \
     	echo "\033[92mSwagger docs are in sync\033[0m";\
     fi
+.PHONY: update-swagger-docs
 
 ########################################
 ### Tools & dependencies
@@ -125,8 +126,13 @@ clean:
 distclean: clean
 	rm -rf vendor/
 
+proto-all: proto-tools proto-gen proto-swagger-gen
+
 proto-gen:
 	@./scripts/protocgen.sh
+
+proto-swagger-gen:
+	@./scripts/protoc-swagger-gen.sh
 
 ########################################
 ### Testing

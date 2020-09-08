@@ -12,8 +12,8 @@ require (
 	github.com/irismod/htlc v0.0.0-20200901103718-c3bf89708dce
 	github.com/irismod/nft v1.1.1-0.20200827095318-d16861212579
 	github.com/irismod/record v1.1.1-0.20200827095301-3e27fc43ae73
-	github.com/irismod/service v1.1.1-0.20200901115916-d898b826bf10
-	github.com/irismod/token v1.1.1-0.20200901121217-d3aa04e760e3
+	github.com/irismod/service v1.1.1-0.20200907104108-32cc849fcbd3
+	github.com/irismod/token v1.1.1-0.20200908025947-f96e0322c283
 	github.com/olebedev/config v0.0.0-20190528211619-364964f3a8e4
 	github.com/onsi/ginkgo v1.8.0 // indirect
 	github.com/onsi/gomega v1.5.0 // indirect
@@ -29,6 +29,7 @@ require (
 	github.com/tendermint/tendermint v0.34.0-rc3
 	github.com/tendermint/tm-db v0.6.1
 	github.com/tidwall/gjson v1.6.0
+	google.golang.org/genproto v0.0.0-20200526211855-cb27e3aa2013
 	google.golang.org/grpc v1.31.0
 	gopkg.in/yaml.v2 v2.3.0
 )
