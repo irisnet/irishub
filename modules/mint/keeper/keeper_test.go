@@ -4,12 +4,14 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/suite"
+
+	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
+
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
-	"github.com/stretchr/testify/require"
-	"github.com/stretchr/testify/suite"
-	abci "github.com/tendermint/tendermint/abci/types"
 
 	"github.com/irisnet/irishub/modules/mint/types"
 	"github.com/irisnet/irishub/simapp"
@@ -18,7 +20,7 @@ import (
 type KeeperTestSuite struct {
 	suite.Suite
 
-	cdc *codec.Codec
+	cdc codec.JSONMarshaler
 	ctx sdk.Context
 	app *simapp.SimApp
 }
@@ -26,8 +28,8 @@ type KeeperTestSuite struct {
 func (suite *KeeperTestSuite) SetupTest() {
 	app := simapp.Setup(false)
 
-	suite.cdc = app.Codec()
-	suite.ctx = app.BaseApp.NewContext(false, abci.Header{})
+	suite.cdc = codec.NewAminoCodec(app.LegacyAmino())
+	suite.ctx = app.BaseApp.NewContext(false, tmproto.Header{})
 	suite.app = app
 
 	app.MintKeeper.SetParamSet(suite.ctx, types.DefaultParams())

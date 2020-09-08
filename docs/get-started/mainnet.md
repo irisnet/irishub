@@ -40,7 +40,7 @@ You can [create a new wallet](../cli-client/keys.md#create-a-new-key) or [import
 
 ```bash
 # create a new wallet
-iriscli keys add <key-name>
+iris keys add <key-name>
 ```
 
 :::warning
@@ -56,7 +56,7 @@ write the seed phrase in a safe place! It is the only way to recover your accoun
 # apt-get update && apt-get install -y jq
 
 # if the output is false, means your node has caught-up
-iriscli status | jq .sync_info.catching_up
+iris status | jq .sync_info.catching_up
 ```
 
 ### Create Validator
@@ -64,13 +64,13 @@ iriscli status | jq .sync_info.catching_up
 Only if your node has caught-up, you can run the following command to upgrade your node to be a validator.
 
 ```bash
-iriscli stake create-validator \
+iris tx staking create-validator \
     --pubkey=$(iris tendermint show-validator) \
     --moniker=<your-validator-name> \
     --amount=<amount-to-be-delegated, e.g. 10000iris> \
     --commission-rate=0.1 \
     --gas=100000 \
-    --fee=0.6iris \
+    --fees=0.6iris \
     --chain-id=irishub \
     --from=<key-name> \
     --commit

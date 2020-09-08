@@ -18,14 +18,15 @@ import (
 	coinswaptypes "github.com/irismod/coinswap/types"
 	htlctypes "github.com/irismod/htlc/types"
 	servicetypes "github.com/irismod/service/types"
+	"github.com/pkg/errors"
+	"github.com/spf13/cobra"
+
 	"github.com/irisnet/irishub/migrate/v0_16"
 	"github.com/irisnet/irishub/migrate/v0_16/stake"
 	"github.com/irisnet/irishub/migrate/v0_16/types"
 	guardiantypes "github.com/irisnet/irishub/modules/guardian/types"
 	minttypes "github.com/irisnet/irishub/modules/mint/types"
 	randomtypes "github.com/irisnet/irishub/modules/random/types"
-	"github.com/pkg/errors"
-	"github.com/spf13/cobra"
 )
 
 const (
@@ -150,17 +151,16 @@ func migrateAuth(initialState v0_16.GenesisFileState) (authtypes.GenesisState, b
 		balances = append(balances, banktypes.Balance{Address: acc.Address, Coins: coins})
 	}
 
-	authGenesisState := authtypes.GenesisState{
-		Params:   params,
-		Accounts: accounts,
-	}
+	authGenesisState := authtypes.NewGenesisState(
+		params, accounts,
+	)
 
 	bankGenesisState := banktypes.GenesisState{
 		Params:   banktypes.DefaultParams(),
 		Balances: balances,
 	}
 
-	return authGenesisState, bankGenesisState
+	return *authGenesisState, bankGenesisState
 }
 
 func migrateStaking(initialState v0_16.GenesisFileState) stakingtypes.GenesisState {
@@ -244,7 +244,7 @@ func migrateStaking(initialState v0_16.GenesisFileState) stakingtypes.GenesisSta
 				DelegatorAddress: b.DelegatorAddr,
 				ValidatorAddress: b.ValidatorAddr,
 				Entries: []stakingtypes.UnbondingDelegationEntry{
-					stakingtypes.UnbondingDelegationEntry{
+					{
 						CreationHeight: b.CreationHeight,
 						CompletionTime: b.MinTime,
 						InitialBalance: b.InitialBalance.Amount,
@@ -295,10 +295,10 @@ func migrateSlashing(initialState v0_16.GenesisFileState) slashingtypes.GenesisS
 		SlashFractionDoubleSign: initialState.SlashingData.Params.SlashFractionDoubleSign,
 		SlashFractionDowntime:   initialState.SlashingData.Params.SlashFractionDowntime,
 	}
-	var signingInfos = make(map[string]slashingtypes.ValidatorSigningInfo)
+	var validatorSigningInfos = make(map[string]slashingtypes.ValidatorSigningInfo)
 	for ba, vs := range initialState.SlashingData.SigningInfos {
 		acc, _ := sdk.ConsAddressFromBech32(ba)
-		signingInfos[ba] = slashingtypes.ValidatorSigningInfo{
+		validatorSigningInfos[ba] = slashingtypes.ValidatorSigningInfo{
 			Address:             acc,
 			StartHeight:         vs.StartHeight,
 			IndexOffset:         vs.IndexOffset,
@@ -306,8 +306,16 @@ func migrateSlashing(initialState v0_16.GenesisFileState) slashingtypes.GenesisS
 			Tombstoned:          false, // TODO
 			MissedBlocksCounter: vs.MissedBlocksCounter,
 		}
-
 	}
+
+	var signingInfos []slashingtypes.SigningInfo
+	for addr, validatorSigningInfo := range validatorSigningInfos {
+		signingInfos = append(signingInfos, slashingtypes.SigningInfo{
+			Address:              addr,
+			ValidatorSigningInfo: validatorSigningInfo,
+		})
+	}
+
 	var mMissedBlocks = make(map[string][]slashingtypes.MissedBlock)
 	for ba, mbs := range initialState.SlashingData.MissedBlocks {
 		var missedBlocks []slashingtypes.MissedBlock
@@ -323,10 +331,18 @@ func migrateSlashing(initialState v0_16.GenesisFileState) slashingtypes.GenesisS
 		mMissedBlocks[ba] = missedBlocks
 	}
 
+	var missedBlocks []slashingtypes.ValidatorMissedBlocks
+	for addr, missedBlock := range mMissedBlocks {
+		missedBlocks = append(missedBlocks, slashingtypes.ValidatorMissedBlocks{
+			Address:      addr,
+			MissedBlocks: missedBlock,
+		})
+	}
+
 	return slashingtypes.GenesisState{
 		Params:       params,
 		SigningInfos: signingInfos,
-		MissedBlocks: mMissedBlocks,
+		MissedBlocks: missedBlocks,
 	}
 }
 
@@ -383,13 +399,13 @@ func migrateGov(initialState v0_16.GenesisFileState) govtypes.GenesisState {
 		VotingPeriod: initialState.GovData.Params.NormalVotingPeriod,
 	}
 	tallyParams := govtypes.TallyParams{
-		Quorum:    initialState.GovData.Params.NormalParticipation,
-		Threshold: initialState.GovData.Params.NormalThreshold,
-		Veto:      initialState.GovData.Params.NormalVeto,
+		Quorum:        initialState.GovData.Params.NormalParticipation,
+		Threshold:     initialState.GovData.Params.NormalThreshold,
+		VetoThreshold: initialState.GovData.Params.NormalVeto,
 	}
 
 	return govtypes.GenesisState{
-		StartingProposalID: govtypes.DefaultStartingProposalID,
+		StartingProposalId: govtypes.DefaultStartingProposalID,
 		Deposits:           deposits,
 		Votes:              votes,
 		Proposals:          proposals,
@@ -416,7 +432,7 @@ func migrateMint(initialState v0_16.GenesisFileState) minttypes.GenesisState {
 }
 
 func migrateRand(initialState v0_16.GenesisFileState) randomtypes.GenesisState {
-	var pendingRandomRequests = make(map[string][]randomtypes.Request)
+	var pendingRandomRequests = make(map[string]randomtypes.Requests)
 	for lh, rs := range initialState.RandData.PendingRandRequests {
 		var requests []randomtypes.Request
 		for _, r := range rs {
@@ -429,7 +445,7 @@ func migrateRand(initialState v0_16.GenesisFileState) randomtypes.GenesisState {
 				},
 			)
 		}
-		pendingRandomRequests[lh] = requests
+		pendingRandomRequests[lh] = randomtypes.Requests{Requests: requests}
 	}
 
 	return randomtypes.GenesisState{
@@ -453,7 +469,7 @@ func migrateHTLC(initialState v0_16.GenesisFileState) htlctypes.GenesisState {
 	}
 
 	return htlctypes.GenesisState{
-		PendingHTLCs: pendingHTLCs,
+		PendingHtlcs: pendingHTLCs,
 	}
 }
 

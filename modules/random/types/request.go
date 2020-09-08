@@ -4,9 +4,10 @@ import (
 	"encoding/hex"
 	"fmt"
 
+	tmbytes "github.com/tendermint/tendermint/libs/bytes"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	tmbytes "github.com/tendermint/tendermint/libs/bytes"
 )
 
 // NewRequest constructs a request
@@ -27,9 +28,6 @@ func NewRequest(
 		ServiceContextID: serviceContextID,
 	}
 }
-
-// Requests is a set of requests
-type Requests []Request
 
 // GenerateRequestID generate a request id
 func GenerateRequestID(r Request) []byte {

@@ -54,9 +54,9 @@ func (p PRNG) GetRand() *big.Rat {
 	precision := new(big.Int).Exp(big.NewInt(10), big.NewInt(RandPrec), nil)
 
 	// Generate a random number between [0,1) with `RandPrec` precision from seed
-	rand := new(big.Rat).SetFrac(new(big.Int).Mod(seed, precision), precision)
+	random := new(big.Rat).SetFrac(new(big.Int).Mod(seed, precision), precision)
 
-	return rand
+	return random
 }
 
 // SHA256 wraps sha256.Sum256 with result converted to slice

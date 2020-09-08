@@ -1,9 +1,11 @@
 package keeper_test
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/irismod/service/exported"
 	abci "github.com/tendermint/tendermint/abci/types"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	"github.com/irismod/service/exported"
 
 	guardiantypes "github.com/irisnet/irishub/modules/guardian/types"
 	"github.com/irisnet/irishub/modules/oracle/keeper"
@@ -34,19 +36,19 @@ func (suite *KeeperTestSuite) TestNewQuerier() {
 	suite.NoError(err)
 
 	//test QueryFeed
-	querier := keeper.NewQuerier(suite.keeper)
+	querier := keeper.NewQuerier(suite.keeper, suite.cdc)
 
 	params := types.QueryFeedParams{
 		FeedName: msg.FeedName,
 	}
-	bz := suite.app.Codec().MustMarshalJSON(params)
+	bz := suite.cdc.MustMarshalJSON(params)
 	res, err := querier(suite.ctx, []string{types.QueryFeed}, abci.RequestQuery{
 		Data: bz,
 	})
 	suite.NoError(err)
 
 	var feedCtx types.FeedContext
-	suite.app.Codec().MustUnmarshalJSON(res, &feedCtx)
+	suite.cdc.MustUnmarshalJSON(res, &feedCtx)
 
 	suite.EqualValues(types.FeedContext{
 		Feed: &types.Feed{
@@ -71,14 +73,14 @@ func (suite *KeeperTestSuite) TestNewQuerier() {
 	params1 := types.QueryFeedsParams{
 		State: "paused",
 	}
-	bz = suite.app.Codec().MustMarshalJSON(params1)
+	bz = suite.cdc.MustMarshalJSON(params1)
 	res, err = querier(suite.ctx, []string{types.QueryFeeds}, abci.RequestQuery{
 		Data: bz,
 	})
 	suite.NoError(err)
 
 	var feedsCtx []types.FeedContext
-	suite.app.Codec().MustUnmarshalJSON(res, &feedsCtx)
+	suite.cdc.MustUnmarshalJSON(res, &feedsCtx)
 	suite.Len(feedsCtx, 1)
 	suite.EqualValues(types.FeedContext{
 		Feed: &types.Feed{
@@ -110,13 +112,15 @@ func (suite *KeeperTestSuite) TestNewQuerier() {
 	params2 := types.QueryFeedValueParams{
 		FeedName: msg.FeedName,
 	}
-	bz = suite.app.Codec().MustMarshalJSON(params2)
-	res, err = querier(suite.ctx, []string{types.QueryFeedValue}, abci.RequestQuery{
-		Data: bz,
-	})
+	bz = suite.cdc.MustMarshalJSON(params2)
+	res, err = querier(
+		suite.ctx,
+		[]string{types.QueryFeedValue},
+		abci.RequestQuery{Data: bz},
+	)
 	suite.NoError(err)
 	var feedValues types.FeedValues
-	suite.app.Codec().MustUnmarshalJSON(res, &feedValues)
+	suite.cdc.MustUnmarshalJSON(res, &feedValues)
 	suite.Len(feedsCtx, 1)
 	suite.Equal("250.00000000", feedValues[0].Data)
 }

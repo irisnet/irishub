@@ -179,7 +179,6 @@
 
 | [v0.13.1]      | [v0.14.0]        | 输入改变 | 输出改变 |
 | --------------- | --------------- | --------------- | --------------- |
-| GET /bank/coin/{coin-type} | GET /bank/coins/{type} | No | No |
 | GET /bank/token-stats | GET /bank/token-stats | No | Yes |
 | GET /bank/balances/{address} | GET /bank/accounts/{address} | No | Yes |
 | POST /bank/accounts/{address}/transfers | POST /bank/accounts/{address}/send | Yes | No |

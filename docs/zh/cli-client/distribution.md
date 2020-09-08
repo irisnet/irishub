@@ -1,104 +1,96 @@
-# iriscli distribution
+# Distribution
 
 distribution模块用于管理自己的 [Staking 收益](../concepts/general-concepts.md#staking-收益)。
 
 ## 可用命令
 
-| 名称                                                            | 描述                                                                                           |
-| --------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| [withdraw-address](#iriscli-distribution-withdraw-address)      | 查询提现地址                                                                                   |
-| [rewards](#iriscli-distribution-rewards)                        | 查询验证人或委托人的所有奖励                                                                   |
-| [set-withdraw-address](#iriscli-distribution-set-withdraw-addr) | 设置提现地址                                                                                   |
-| [withdraw-rewards](#iriscli-distribution-withdraw-rewards)      | 取回收益，有以下几种模式: 取回所有奖励、从指定的验证者取回委派奖励、验证人取回所有奖励以及佣金 |
+| 名称                                                                                      | 描述                                                                                           |
+| ----------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| [commission](#iris-query-distribution-commission)                                         | 查询分配的验证人佣金                                                                                |
+| [community-pool](#iris-query-distribution-community-pool)                                 | 查询社区池总币数                                                                   |
+| [params](#iris-query-distribution-params)                                                 | 查询分配参数                                                                                   |
+| [rewards](#iris-query-distribution-rewards)                                               | 查询所有分销委托人收益或来自指定验证人的收益 |
+| [slashes](#iris-query-distribution-slashes)                                               | 查询验证人指定块范围内的分割                                                                                   |
+| [validator-outstanding-rewards](#iris-tx-distribution-validator-outstanding-rewards)      | 查询验证人的未付奖励分配及其所有授权                                                                                   |
+| [fund-community-pool](#iris-tx-distribution-fund-community-pool)                          | 为社区基金池提供指定数额的资金                                                                                  |
+| [set-withdraw-addr](#iris-tx-distribution-set-withdraw-addr)                              | 设置提现地址                                                                                   |
+| [withdraw-all-rewards](#iris-tx-distribution-withdraw-all-rewards)                        | 取回委托人所有收益                                                                                   |
+| [withdraw-rewards](#iris-tx-distribution-withdraw-rewards)                                | 取回收益，有以下几种模式: 取回所有奖励、从指定的验证者取回委派奖励、验证人取回所有奖励以及佣金  |
 
-## iriscli distribution withdraw-address
+## iris query distribution commission
 
-查询委托人的提现地址。
+查询分配的验证人佣金。
 
 ```bash
-iriscli distribution withdraw-address [account-address] [flags]
+iris query distribution commission [validator] [flags]
 ```
 
-### 查询提现地址
+## iris query distribution community-pool
+
+查询社区池总币数。
 
 ```bash
-iriscli distribution withdraw-address <delegator-address>
+iris query distribution community-pool [flags]
 ```
 
-如果委托人未指定提现地址，则查询结果为空。
+## iris query distribution params
 
-## iriscli distribution rewards
-
-查询验证人或委托人的所有奖励。
+查询分配参数。
 
 ```bash
-iriscli distribution rewards [address] [flags]
+ iris query distribution params [flags]
 ```
 
-### 查询奖励
+## iris query distribution rewards
+
+查询所有分销委托人收益或来自指定验证人的收益。
 
 ```bash
-iriscli distribution rewards <iaa...>
+iris query distribution rewards [delegator-addr] [validator-addr] [flags]
 ```
 
-输出:
+## iris query distribution slashes
+
+查询验证人指定块范围内的分割。
 
 ```bash
-Total:        270.33761964714393479iris
-Delegations:  
-  validator: iva..., reward: 2.899411557255275253iris
-  validator: iva..., reward: 2.899411557255275253iris
-  validator: iva..., reward: 2.899411557255275253iris
-Commission:   267.438208089888659537iris
+iris query distribution slashes [validator] [start-height] [end-height] [flags]
 ```
 
-## iriscli distribution set-withdraw-addr
+## iris query distribution validator-outstanding-rewards
 
-设置另一个地址以接收奖励，而不是使用委托人地址。
+查询验证人的未付奖励分配及其所有授权。
 
 ```bash
-iriscli distribution set-withdraw-addr [withdraw-addr] [flags]
+iris query distribution validator-outstanding-rewards [validator] [flags]
+```
+## iris tx distribution fund-community-pool
+
+为社区基金池提供指定数额的资金。
+
+```bash
+iris tx distribution fund-community-pool [amount] [flags] [validator-addr] [flags]
+```
+## iris tx distribution set-withdraw-addr
+
+设置提现地址。
+
+```bash
+iris tx distribution set-withdraw-addr [withdraw-addr] [flags]
 ```
 
-### 设置提现地址
+## iris tx distribution withdraw-all-rewards
+
+取回委托人所有收益。
 
 ```bash
-iriscli distribution set-withdraw-addr <iaa...> --from=<key-name> --fee=0.3iris --chain-id=irishub
+iris tx distribution withdraw-all-rewards [flags]
 ```
 
-## iriscli distribution withdraw-rewards
+## iris tx distribution withdraw-rewards
 
-取回奖励到提现地址（默认为委托人地址，您可以通过 [set-withdraw-addr](#iriscli-distribution-set-withdraw-addr)重新设置提现地址)。
-
-```bash
-iriscli distribution withdraw-rewards [flags]
-```
-
-**标识：**
-
-| 名称，速记            | 类型   | 必须 | 默认 | 描述                                 |
-| --------------------- | ------ | ---- | ---- | ------------------------------------ |
-| --only-from-validator | string |      |      | 仅从此验证者地址中提取（以bech格式） |
-| --is-validator        | bool   |      | 否   | 同时取回验证人的佣金                 |
-
-:::tip
-不要同时指定以上两个标志。
-:::
-
-### 从指定的验证者取回委派奖励
+取回收益，有以下几种模式: 取回所有奖励、从指定的验证者取回委派奖励、验证人取回所有奖励以及佣金。
 
 ```bash
-iriscli distribution withdraw-rewards --only-from-validator=<validator-address> --from=<key-name> --fee=0.3iris --chain-id=irishub
-```
-
-### 取回所有奖励
-
-```bash
-iriscli distribution withdraw-rewards --from=<key-name> --fee=0.3iris --chain-id=irishub
-```
-
-### 验证人取回所有奖励以及佣金
-
-```bash
-iriscli distribution withdraw-rewards --is-validator=true --from=<key-name> --fee=0.3iris --chain-id=irishub
+iris tx distribution withdraw-rewards [validator-addr] [flags]
 ```

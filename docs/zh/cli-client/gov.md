@@ -1,266 +1,257 @@
-# iriscli gov
+# Gov
 
-该模块提供了[链上治理](../features/governance.md)的基本功能。
+此模块提供[治理](../../features/governance.md)的基本功能
 
 ## 可用命令
 
-| 名称                                            | 描述                                              |
-| ----------------------------------------------- | ------------------------------------------------- |
-| [query-proposal](#iriscli-gov-query-proposal)   | 查询单个提案的详细信息                            |
-| [query-proposals](#iriscli-gov-query-proposals) | 按条件查询提案                                    |
-| [query-vote](#iriscli-gov-query-vote)           | 查询投票                                          |
-| [query-votes](#iriscli-gov-query-votes)         | 按条件查询投票                                    |
-| [query-deposit](#iriscli-gov-query-deposit)     | 查询抵押详情                                      |
-| [query-deposits](#iriscli-gov-query-deposits)   | 查询所有抵押                                      |
-| [query-tally](#iriscli-gov-query-tally)         | 查询提案的统计信息                                |
-| [submit-proposal](#iriscli-gov-submit-proposal) | 提交提案以及初始化抵押金额                        |
-| [deposit](#iriscli-gov-deposit)                 | 为有效的提案抵押通证                              |
-| [vote](#iriscli-gov-vote)                       | 为有效的提案投票，选项：Yes/No/NoWithVeto/Abstain |
+| 名称                                            | 描述                                                  |
+| ----------------------------------------------- | ------------------------------------------------------------ |
+| [proposal](#iris-query-gov-proposal)                | 查询单个提案的详细信息                           |
+| [proposals](#iris-query-gov-proposals)              | 使用可选过滤器提案                         |
+| [vote](#iris-query-gov-vote)                        | 查询一次投票的详细信息                               |
+| [votes](#iris-query-gov-votes)                      | 查询提案的投票                                    |
+| [deposit](#iris-query-gov-deposit)                  | 查询摸个抵押人在某个提案的抵押信息                                   |
+| [deposits](#iris-query-gov-deposits)                | 查询提案的所有抵押信息                                 |
+| [tally](#iris-query-gov-tally)                      | 汇总提案投票                            |
+| [param](#iris-query-gov-param)                      | 查询参数                            |
+| [params](#iris-query-gov-params)                    | 查询治理流程的参数               |
+| [submit-proposal](#iris-tx-gov-submit-proposal) | 提交提案              |
+| [deposit](#iris-tx-gov-deposit)                 | 为有效的提案抵押代币                        |
+| [vote](#iris-tx-gov-vote)                       | 为活跃的提案投票:可选值： yes/no/no_with_veto/abstain |
 
-## iriscli gov query-proposal
+## iris query gov proposal
 
-查询提案的详细信息。
+查询单个提案的详细信息
 
 ```bash
-iriscli gov query-proposal [flags]
+iris query gov proposal [proposal-id] [flags]
+```
+
+### 查询单个提案
+
+```bash
+iris query gov proposal <proposal-id>
+```
+
+## iris query gov proposals
+
+使用可选过滤器提案
+
+```bash
+iris query gov proposals [flags]
 ```
 
 **标识：**
 
-| 名称，速记    | 类型 | 必须 | 默认 | 描述     |
-| ------------- | ---- | -------- | ---- | -------- |
-| --proposal-id | uint | 是       |      | 提案的Id |
-
-### 查询一个提议信息
-
-```bash
-iriscli gov query-proposal --chain-id=irishub --proposal-id=<proposal-id>
-```
-
-## iriscli gov query-proposals
-
-按条件查询提案。
-
-```bash
-iriscli gov query-proposals [flags]
-```
-
-**标识：**
-
-| 名称，速记  | 类型    | 必须 | 默认 | 描述                                  |
-| ----------- | ------- | -------- | ---- | ------------------------------------- |
-| --depositor | Address |          |      | 按抵押人地址过滤提案                  |
-| --limit     | uint    |          |      | 限制返回提案的个数， 默认返回所有提案 |
-| --status    | string  |          |      | 按状态过滤提案 (passed / rejected)    |
-| --voter     | Address |          |      | 按投票人地址过滤提案                  |
+| 名称, 速记  | 类型    | 必须 | 默认 | 描述                                  |
+| ----------- | ------- | ---- | ---- | ------------------------------------- |
+| --depositor | Address |      |      | 按抵押人地址过滤提案                  |
+| --limit     | uint    |      |      | 返回最新[数量]个提案。 默认为所有提案 |
+| --status    | string  |      |      | 按状态过滤提案                        |
+| --voter     | Address |      |      | 按投票人地址过滤提案                  |
 
 ### 查询所有提案
 
 ```bash
-iriscli gov query-proposals --chain-id=irishub
+iris query gov proposals
 ```
 
 ### 按条件查询提案
 
 ```bash
-iriscli gov query-proposals --chain-id=irishub --limit=3 --status=passed --depositor=<iaa...>
+iris query gov proposals --limit=3 --status=Passed --depositor=<iaa...>
 ```
 
-## iriscli gov query-vote
+## iris query gov vote
 
-查询投票信息。
+查询一次投票的详细信息
 
 ```bash
-iriscli gov query-vote [flags]
+iris query gov vote [proposal-id] [voter-addr] [flags]
+```
+
+### 查询单个投票的信息
+
+```bash
+iris query gov vote <proposal-id> <iaa...>
+```
+
+## iris query gov votes
+
+查询提案的投票信息
+
+```bash
+iris query gov votes [proposal-id] [flags]
+```
+
+### 查询提案的所有投票
+
+```bash
+iris query gov votes <proposal-id>
+```
+
+## iris query gov deposit
+
+通过提案ID查询提案中的某个抵押人的抵押信息
+
+```bash
+iris query gov deposit [proposal-id] [depositer-addr] [flags]
+```
+
+### 查询单个抵押信息
+
+```bash
+iris query gov deposit <proposal-id> <iaa...>
+```
+
+## iris query gov deposits
+
+查询提案中所有抵押信息
+
+```bash
+iris query gov deposits [proposal-id] [flags]
+```
+
+### 查询提案的所有抵押信息
+
+```bash
+iris query gov deposits <proposal-id>
+```
+
+## iris query gov tally
+
+查询提案的计票结果。 您可以通过运行`iris query gov proposal`来查询提案ID。
+
+```bash
+iris query gov tally [proposal-id] [flags]
+```
+
+### 查询提案统计信息
+
+```bash
+iris query gov tally <proposal-id>
+```
+
+## iris query gov param
+
+查询治理过程的参数。
+
+```bash
+iris query gov param [param-type] [flags]
+```
+
+例如:
+```bash
+> iris query gov param voting
+> iris query gov param tallying
+> iris query gov param deposit
+```
+
+## iris query gov params
+
+查询治理过程的所有参数。
+
+```bash
+iris query gov param [param-type] [flags]
+```
+
+## iris tx gov submit-proposal
+
+提交提案并附带初始委托。 提案标题、描述、类型和抵押可以直接提供，也可以通过JSON文件提供。
+可用命令：`community-pool-spend`，`param-change`，`software-upgrade`
+
+### iris tx gov submit-proposal community-pool-spend
+
+提交提案并附带初始委托，提案详细信息必须通过JSON文件提供。
+
+```bash
+iris tx gov submit-proposal community-pool-spend <path/to/proposal.json> --from=<key_or_address>
+```
+
+`proposal.json` 包含:
+```json
+{
+  "title": "Community Pool Spend",
+  "description": "Pay me some Atoms!",
+  "recipient": "cosmos1s5afhd6gxevu37mkqcvvsj8qeylhn0rz46zdlq",
+  "amount": "1000stake",
+  "deposit": "1000stake"
+}
+```
+
+### iris tx gov submit-proposal param-change
+
+提交参数修改提案。提案详细信息必须通过JSON文件提供。 对于包含的值，只有非空字段将被更新。
+
+目前，参数更改已评估但尚未通过验证，因此
+非常重要的一点是，任何“值”更改都是有效的（即正确的类型且在范围之内）
+对于其各自的参数，例如。 `MaxValidators`应为整数而不是十进制。
+
+```bash
+iris tx gov submit-proposal param-change <path/to/proposal.json> --from=<key_or_address>
+```
+
+`proposal.json` 包含:
+
+```json
+{
+  "title": "Staking Param Change",
+  "description": "Update max validators",
+  "changes": [
+    {
+      "subspace": "staking",
+      "key": "MaxValidators",
+      "value": 105
+    }
+  ],
+  "deposit": "1000stake"
+}
+```
+
+### iris tx gov submit-proposal software-upgrade
+
+提交软件升级提案，指定唯一的名称和高度或时间，以使升级生效。
+
+```bash
+iris tx gov submit-proposal software-upgrade [name] (--upgrade-height [height] | --upgrade-time [time]) (--upgrade-info [info]) [flags]
 ```
 
 **标识：**
 
-| 名称，速记    | 类型    | 必须 | 默认 | 描述       |
-| ------------- | ------- | -------- | ---- | ---------- |
-| --proposal-id | uint    | 是       |      | 提案的Id   |
-| --voter       | Address | 是       |      | 投票人地址 |
+| 名称, 速记       | 类型   | 必须 | 默认 | 描述                                                   |
+| ---------------- | ------ | ---- | ---- | ------------------------------------------------------ |
+| --deposit        | Coin   | Yes  |      | 提案抵押的代币                                         |
+| --title          | string | Yes  |      | 提案的标题                                             |
+| --description    | string | Yes  |      | 提案的描述                                             |
+| --upgrade-height | int64  |      |      | 升级必须发生的高度（不要与`--upgrade-time`一起使用）   |
+| --time           | string |      |      | 升级必须发生的时间（不要与`--upgrade-height`一起使用） |
+| --info           | string |      |      | 计划升级的可选信息，例如提交哈希等。                   |
 
-### 查询一个投票信息
 
-```bash
-iriscli gov query-vote --chain-id=irishub --proposal-id=<proposal-id> --voter=<iaa...>
-```
+## iris tx gov deposit
 
-## iriscli gov query-votes
-
-查询提案的所有投票信息。
-
-```bash
-iriscli gov query-votes [flags]
-```
-
-**标识：**
-
-| 名称，速记    | 类型 | 必须 | 默认 | 描述     |
-| ------------- | ---- | -------- | ---- | -------- |
-| --proposal-id | uint | 是       |      | 提案的Id |
-
-### 查询指定提案的所有投票信息
+为某个提案抵押代币。 您可以通过运行`iris query gov proposal`来查询提案ID。
 
 ```bash
-iriscli gov query-votes --chain-id=irishub --proposal-id=<proposal-id>
+iris tx gov deposit [proposal-id] [deposit] [flags]
 ```
 
-## iriscli gov query-deposit
-
-查询指定提案的抵押信息。
+### 为有效的提案抵押
 
 ```bash
-iriscli gov query-deposit [flags]
+iris tx gov deposit [proposal-id] [deposit]
 ```
 
-**标识：**
+## iris tx gov vote
 
-| 名称，速记    | 类型    | 必须 | 默认 | 描述       |
-| ------------- | ------- | -------- | ---- | ---------- |
-| --proposal-id | uint    | 是       |      | 提案的Id   |
-| --depositor   | Address | 是       |      | 抵押人地址 |
-
-### 查询指定人的抵押信息
+为一个活跃的提案投票， 可选值: yes/no/no_with_veto/abstain.
 
 ```bash
-iriscli gov query-deposit --chain-id=irishub --proposal-id=<proposal-id> --depositor=<iaa...>
+iris tx gov vote [proposal-id] [option] [flags]
 ```
 
-## iriscli gov query-deposits
-
-查询指定提案的所有抵押信息。
+### 为活跃的提案投票
 
 ```bash
-iriscli gov query-deposits [flags]
+iris tx gov vote <proposal-id> <option> --from=<key-name> --fees=0.3iris
 ```
-
-**标识：**
-
-| 名称，速记    | 类型 | 必须 | 默认 | 描述     |
-| ------------- | ---- | -------- | ---- | -------- |
-| --proposal-id | uint | 是       |      | 提案的Id |
-
-### 查询指定提案的所有抵押信息
-
-```bash
-iriscli gov query-deposits --chain-id=irishub --proposal-id=<proposal-id>
-```
-
-## iriscli gov query-tally
-
-查询提案投票的统计信息。
-
-```bash
-iriscli gov query-tally [flags]
-```
-
-**标识：**
-
-| 名称，速记    | 类型 | 必须 | 默认 | 描述     |
-| ------------- | ---- | -------- | ---- | -------- |
-| --proposal-id |  uint    | 是       |      | 提案的Id |
-
-### 查询提案投票的统计信息
-
-```bash
-iriscli gov query-tally --chain-id=irishub --proposal-id=<proposal-id>
-```
-
-## iriscli gov submit-proposal
-
-提交提案以及初始化抵押金额。
-
-```bash
-iriscli gov submit-proposal [flags]
-```
-
-**标识：**
-
-| 名称，速记               | 类型   | 必须 | 默认  | 描述                                                                                           |
-| ------------------------ | ------ | -------- | ----- | ---------------------------------------------------------------------------------------------- |
-| --deposit                | Coin   | 是       |       | 初始抵押金额(至少最小抵押金额的30% of)                                                         |
-| --description            | string | 是       |       | 提案的描述信息                                                                                 |
-| --param                  | string |          |       | 提案修改的参数，例如`mint/Inflation=0.050`                                                     |
-| --title                  | string | 是       |       | 提案的标题                                                                                     |
-| --type                   | string | 是       |       | 提案的类型（PlainText/Parameter/SoftwareUpgrade/SoftwareHalt/CommunityTaxUsage） |
-| --version                | uint   |          | 0     | 升级的版本                                                                                     |
-| --software               | string |          |       | 新软件的地址                                                                                   |
-| --switch-height          | uint   |          | 0     | 软件升级过程中，切换的区块高度                                                                 |
-| --threshold              | string |          | "0.8" | 软件升级的升级信号阈值                                                                         |
-| --token-canonical-symbol | string |          |       | 外部通证的源符号                                                                               |
-| --token-symbol           | string |          |       | 通证符号。 创建后，将无法修改                                                                  |
-| --token-name             | string |          |       | 通证名称                                                                                       |
-| --token-decimal          | uint   |          |       | 通证的最大精度，最大值为18                                                                     |
-| --token-min-unit-alias   | string |          |       | 通证最小单位别名                                                                               |
-| --token-initial-supply   | uint64 |          |       | 通证初始总量                                                                                   |
-
-:::tip
-提案人必须至少抵押[MinDeposit](../features/governance.md#提议级别)的30％才能提交提案。
-:::
-
-### 提交参数修改提案
-
-:::tip
-[有哪些参数可以在线修改？](../concepts/gov-params.md)
-:::
-
-**唯一必须参数：** `--param`
-
-```bash
-iriscli gov submit-proposal --chain-id=irishub --title=<proposal-title> --description=<proposal-description> --from=<key-name> --fee=0.3iris --deposit=2000iris --type=Parameter --param='mint/Inflation=0.050'
-```
-
-### 提交软件升级提案
-
-**必须参数：** `--software`，`--version`，`--switch-height`，`--threshold`
-
-```bash
-iriscli gov submit-proposal --chain-id=irishub --title=<proposal-title> --description=<proposal-description> --from=<key-name> --fee=0.3iris --deposit=2000iris --type=SoftwareUpgrade --software=https://github.com/irisnet/irishub/tree/v0.15.1 --version=2 --switch-height=8000 --threshold=0.8
-```
-
-## iriscli gov deposit
-
-为有效的提案抵押通证。
-
-```bash
-iriscli gov deposit [flags]
-
-```
-
-**标识：**
-
-| 名称，速记    | 类型 | 必须 | 默认 | 描述           |
-| ------------- | ---- | -------- | ---- | -------------- |
-| --deposit     | Coin | 是       |      | 抵押的通证金额 |
-| --proposal-id | uint | 是       |      | 提案Id         |
-
-### 为有效的提案抵押通证
-
-当总抵押金额超过[MinDeposit](../features/governance.md#提议级别)时，提案将进入投票阶段。
-
-```bash
-iriscli gov deposit --chain-id=irishub --proposal-id=<proposal-id> --deposit=50iris --from=<key-name> --fee=0.3iris
-```
-
-## iriscli gov vote
-
-为有效的提案投票，选项：Yes/No/NoWithVeto/Abstain。
-
-:::tip
-[No VS NoWithVeto](../features/governance.md#销毁机制)
-
-在投票期内，只有验证人和委托人可以对提案进行投票。
-:::
-
-```bash
-iriscli gov vote [flags]
-```
-
-**标识：**
-
-| 名称，速记    | 类型   | 必须 | 默认 | 描述                            |
-| ------------- | ------ | -------- | ---- | ------------------------------- |
-| --option      | string | 是       |      | 选项：Yes/No/NoWithVeto/Abstain |
-| --proposal-id | uint   | 是       |      | 提案Id                          |

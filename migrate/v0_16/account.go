@@ -2,6 +2,7 @@ package v0_16
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
 	"github.com/irisnet/irishub/migrate/v0_16/types"
 )
 

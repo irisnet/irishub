@@ -1,95 +1,108 @@
-# iriscli params
+# Params
 
 Params module allows you to query the system parameters which can be governed (except the gov params) by the [gov module](./gov.md).
 
 ```bash
- iriscli params [flags]
+iris query params subspace [subspace] [key] [flags]
 ```
 
-**Flags:**
+Subspace currently supports the following:`auth`、`bank`、`staking`、`mint`、`distribution`、`slashing`、`gov`、`crisis`、`token`、`record`、`htlc`、`coinswap`、`service`.
 
-| Name, shorthand | Default | Description        | Required |
-| --------------- | ------- | ------------------ | -------- |
-| --module        |         | Name of the module |          |
+Among them, the parameters available for query for each subspace are as follows:
 
-## Query all parameters
+## auth
 
-```bash
-iriscli params
-```
+| key                      | description                                                  | default |
+| ------------------------ | ------------------------------------------------------------ | ------- |
+| `MaxMemoCharacters`      | Maximum number of characters in the memo field in a transaction | 256     |
+| `TxSigLimit`             | Maximum number of signatures per transaction                 | 7       |
+| `TxSizeCostPerByte`      | The amount of gas consumed per byte of the transaction       | 10      |
+| `SigVerifyCostED25519`   | Gas spent on edd2519 algorithm signature verification        | 590     |
+| `SigVerifyCostSecp256k1` | Gas spent on secp256k1 algorithm signature verification      | 1000    |
 
-Example Output:
+## bank
 
-```bash
-Slashing Params:
-  slashing/MaxEvidenceAge:           51840
-  slashing/SignedBlocksWindow:       34560
-  slashing/MinSignedPerWindow:       0.5000000000
-  slashing/DoubleSignJailDuration:   48h0m0s
-  slashing/DowntimeJailDuration:     24h0m0s
-  slashing/CensorshipJailDuration:   48h0m0s
-  slashing/SlashFractionDoubleSign:  0.0100000000
-  slashing/SlashFractionDowntime:    0.0000000000
-  slashing/SlashFractionCensorship:  0.0000000000
-Service Params:
-  service/MaxRequestTimeout:     100
-  service/MinDepositMultiple:    1000
-  service/ServiceFeeTax:         0.0100000000
-  service/SlashFraction:         0.0010000000
-  service/ComplaintRetrospect:   360h0m0s
-  service/ArbitrationTimeLimit:  120h0m0s
-  service/TxSizeLimit:           4000
-Asset Params:
-  asset/AssetTaxRate:          0.4000000000
-  asset/IssueTokenBaseFee:     300000000000000000000000iris-atto
-  asset/MintTokenFeeRatio:     0.1000000000
-  asset/CreateGatewayBaseFee:  600000000000000000000000iris-atto
-  asset/GatewayAssetFeeRatio:  0.1000000000
-Auth Params:
-  auth/gasPriceThreshold:  6000000000000
-  auth/txSizeLimit:        1000
-Stake Params:
-  stake/UnbondingTime:  504h0m0s
-  stake/MaxValidators:  100
-Mint Params:
-  mint/Inflation:  0.0400000000
-Distribution Params:
-  distr/CommunityTax:        0.0200000000
-  distr/BaseProposerReward:  0.0100000000
-  distr/CommunityTax:        0.0400000000
+| key                  | description                                        | default |
+| -------------------- | -------------------------------------------------- | ------- |
+| `SendEnabled`        | Tokens that support transfer                       | {}      |
+| `DefaultSendEnabled` | Whether to enable the transfer function by default | true    |
 
-Gov Params:
-System Halt Period:  60
-Proposal Parameter:  [Critical]                         [Important]                        [Normal]
-  DepositPeriod:     24h0m0s                            24h0m0s                            24h0m0s
-  MinDeposit:        4000000000000000000000iris-atto    2000000000000000000000iris-atto    1000000000000000000000iris-atto
-  Voting Period:     2m0s                               2m0s                               2m0s
-  Max Num:           1                                  5                                  7
-  Threshold:         0.7500000000                       0.6700000000                       0.5000000000
-  Veto:              0.3300000000                       0.3300000000                       0.3300000000
-  Participation:     0.5000000000                       0.5000000000                       0.5000000000
-  Penalty:           0.0000000000                       0.0000000000                       0.0000000000
-```
+## staking
 
-## Query parameters of a module
+| key                 | description                                                  | default   |
+| ------------------- | ------------------------------------------------------------ | --------- |
+| `UnbondingTime`     | Mortgage redemption time                                     | 3w(weeks) |
+| `MaxValidators`     | Maximum number of validators                                 | 100       |
+| `MaxEntries`        | The maximum number of unbinding/redelegation orders in progress | 7         |
+| `BondDenom`         | Bond denom                                                   | uiris |
+| `HistoricalEntries` |                                                              | 100       |
 
-Available module names can be queried by [query all parameters](#query-all-parameters).
+## mint
 
-```bash
-iriscli params --module=slashing
-```
+| key         | description                 | default   |
+| ----------- | --------------------------- | --------- |
+| `Inflation` | Token issuance frequency    | 0.04      |
+| `MintDenom` | Denom of the token mintable | uiris     |
 
-Example Output:
+## distribution
 
-```bash
-Slashing Params:
-  slashing/MaxEvidenceAge:           51840
-  slashing/SignedBlocksWindow:       34560
-  slashing/MinSignedPerWindow:       0.7000000000
-  slashing/DoubleSignJailDuration:   48h0m0s
-  slashing/DowntimeJailDuration:     0h10m0s
-  slashing/CensorshipJailDuration:   48h0m0s
-  slashing/SlashFractionDoubleSign:  0.0100000000
-  slashing/SlashFractionDowntime:    0.0003000000
-  slashing/SlashFractionCensorship:  0.0000000000
-```
+| key                   | description                                       | default |
+| --------------------- | ------------------------------------------------- | ------- |
+| `communitytax`        | Fees charged for withdrawal                       | 0.02    |
+| `baseproposerreward`  | The base reward rate of the block proposer        | 0.01    |
+| `bonusproposerreward` | Reward rate for block proposers                   | 0.04    |
+| `withdrawaddrenabled` | Whether to support setting the withdrawal address | true    |
+
+## slashing
+
+| key                       | description                           | default |
+| ------------------------- | ------------------------------------- | ------- |
+| `SignedBlocksWindow`      | Sliding window for downtime slashing  | 100     |
+| `MinSignedPerWindow`      | Minimum signature rate in each window | 0.5     |
+| `DowntimeJailDuration`    | Maximum downtime  (continuous)        | 10m     |
+| `SlashFractionDoubleSign` | Penalty coefficient for double sign   | 1/20    |
+| `SlashFractionDowntime`   | Penalty coefficient for downtime      | 1/100   |
+
+## gov
+
+| key             | description                                      | default |
+| --------------- | ------------------------------------------------ | ------- |
+| `depositparams` | Related parameters of the deposit mortgage phase |         |
+| `votingparams`  | Related parameters of the voting mortgage phase  |         |
+| `tallyparams`   | Related parameters of the voting tally phase     |         |
+
+## crisis
+
+| key           | description  | default |
+| ------------- | ------------ | ------- |
+| `ConstantFee` | Constant Fee |         |
+
+## token
+
+| key                 | description                       | default   |
+| ------------------- | --------------------------------- | --------- |
+| `TokenTaxRate`      | Base rate for issuing/mint tokens | 0.4       |
+| `IssueTokenBaseFee` | Base token for issuing tokens     | 60000iris |
+| `MintTokenFeeRatio` | Rate for mint tokens              | 0.1       |
+
+## coinswap
+
+| key             | description                   | default   |
+| --------------- | ----------------------------- | --------- |
+| `Fee`           | Charge rate                   | 0.003     |
+| `StandardDenom` | The name of the token charged | uiris     |
+
+## service
+
+| key                    | description                                         | default    |
+| ---------------------- | --------------------------------------------------- | ---------- |
+| `MaxRequestTimeout`    | Maximum service request timeout                     | 100(block) |
+| `MinDepositMultiple`   | Minimum deposit multiple                            | 200        |
+| `MinDeposit`           | Minimum deposit amount                              | 6000iris   |
+| `ServiceFeeTax`        | Service rate                                        | 0.1        |
+| `SlashFraction`        | Slash  Fraction                                     | 0.001      |
+| `ComplaintRetrospect`  | Complaint Retrospect                                | 15d        |
+| `ArbitrationTimeLimit` | Arbitration period                                  | 5d         |
+| `TxSizeLimit`          | The maximum number of bytes per service transaction | 4000       |
+| `BaseDenom`            | Tokens supported by service fees                    | uiris      |
+

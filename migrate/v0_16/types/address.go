@@ -7,9 +7,10 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/cosmos/cosmos-sdk/crypto/codec"
+	"github.com/cosmos/cosmos-sdk/types/bech32"
+
 	"github.com/tendermint/tendermint/crypto"
-	"github.com/tendermint/tendermint/crypto/encoding/amino"
-	"github.com/tendermint/tendermint/libs/bech32"
 )
 
 const (
@@ -437,7 +438,7 @@ func GetAccPubKeyBech32(pubkey string) (pk crypto.PubKey, err error) {
 		return nil, err
 	}
 
-	pk, err = cryptoamino.PubKeyFromBytes(bz)
+	pk, err = codec.PubKeyFromBytes(bz)
 	if err != nil {
 		return nil, err
 	}
@@ -465,7 +466,7 @@ func GetValPubKeyBech32(pubkey string) (pk crypto.PubKey, err error) {
 		return nil, err
 	}
 
-	pk, err = cryptoamino.PubKeyFromBytes(bz)
+	pk, err = codec.PubKeyFromBytes(bz)
 	if err != nil {
 		return nil, err
 	}
@@ -493,7 +494,7 @@ func GetConsPubKeyBech32(pubkey string) (pk crypto.PubKey, err error) {
 		return nil, err
 	}
 
-	pk, err = cryptoamino.PubKeyFromBytes(bz)
+	pk, err = codec.PubKeyFromBytes(bz)
 	if err != nil {
 		return nil, err
 	}

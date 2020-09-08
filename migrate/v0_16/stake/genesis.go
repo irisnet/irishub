@@ -1,11 +1,13 @@
 package stake
 
 import (
+	"time"
+
 	tmamino "github.com/cosmos/cosmos-sdk/crypto/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/irisnet/irishub/migrate/v0_16/types"
 	"github.com/tendermint/tendermint/crypto"
-	"time"
+
+	"github.com/irisnet/irishub/migrate/v0_16/types"
 )
 
 type GenesisState struct {
@@ -97,8 +99,8 @@ type UnbondingDelegation struct {
 	ValidatorAddr  sdk.ValAddress `json:"validator_addr"`  // validator unbonding from operator addr
 	CreationHeight int64          `json:"creation_height"` // height which the unbonding took place
 	MinTime        time.Time      `json:"min_time"`        // unix time for unbonding completion
-	InitialBalance sdk.Coin     `json:"initial_balance"` // atoms initially scheduled to receive at completion
-	Balance        sdk.Coin     `json:"balance"`         // atoms to receive at completion
+	InitialBalance sdk.Coin       `json:"initial_balance"` // atoms initially scheduled to receive at completion
+	Balance        sdk.Coin       `json:"balance"`         // atoms to receive at completion
 }
 
 type Redelegation struct {
@@ -107,8 +109,8 @@ type Redelegation struct {
 	ValidatorDstAddr sdk.ValAddress `json:"validator_dst_addr"` // validator redelegation destination operator addr
 	CreationHeight   int64          `json:"creation_height"`    // height which the redelegation took place
 	MinTime          time.Time      `json:"min_time"`           // unix time for redelegation completion
-	InitialBalance   sdk.Coin     `json:"initial_balance"`    // initial balance when redelegation started
-	Balance          sdk.Coin     `json:"balance"`            // current balance
+	InitialBalance   sdk.Coin       `json:"initial_balance"`    // initial balance when redelegation started
+	Balance          sdk.Coin       `json:"balance"`            // current balance
 	SharesSrc        sdk.Dec        `json:"shares_src"`         // amount of source shares redelegating
 	SharesDst        sdk.Dec        `json:"shares_dst"`         // amount of destination shares redelegating
 }

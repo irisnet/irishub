@@ -4,10 +4,11 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/spf13/cobra"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/version"
-	"github.com/spf13/cobra"
 
 	"github.com/irisnet/irishub/modules/guardian/types"
 )
@@ -48,7 +49,7 @@ func GetCmdQueryProfilers() *cobra.Command {
 				return err
 			}
 
-			return clientCtx.PrintOutput(res.Profilers)
+			return clientCtx.PrintOutput(res)
 		},
 	}
 	flags.AddQueryFlagsToCmd(cmd)
@@ -75,7 +76,7 @@ func GetCmdQueryTrustees() *cobra.Command {
 				return err
 			}
 
-			return clientCtx.PrintOutput(res.Trustees)
+			return clientCtx.PrintOutput(res)
 		},
 	}
 	flags.AddQueryFlagsToCmd(cmd)

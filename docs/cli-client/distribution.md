@@ -1,104 +1,96 @@
-# iriscli distribution
+# Distribution
 
 The distribution module allows you to manage your [Staking Rewards](../concepts/general-concepts.md#staking-rewards).
 
-## Available Subommands
+## Available Subcommands
 
-| Name                                                         | Description                                                  |
-| ------------------------------------------------------------ | ------------------------------------------------------------ |
-| [withdraw-address](#iriscli-distribution-withdraw-address)   | Query withdraw address                                       |
-| [rewards](#iriscli-distribution-rewards)                     | Query all the rewards of validator or delegator              |
-| [set-withdraw-address](#iriscli-distribution-set-withdraw-addr) | Change withdraw address                                      |
-| [withdraw-rewards](#iriscli-distribution-withdraw-rewards)   | withdraw rewards for either: all-delegations, a delegation, or a validator |
+| Name                                                                                      | Description                                                  |
+| ----------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| [commission](#iris-query-distribution-commission)                                         | Query distribution validator commission                                                                                |
+| [community-pool](#iris-query-distribution-community-pool)                                 | Query the amount of coins in the community pool                                                                   |
+| [params](#iris-query-distribution-params)                                                 | Query distribution params                                                                                   |
+| [rewards](#iris-query-distribution-rewards)                                               | Query all distribution delegator rewards or rewards from a particular validator  |
+| [slashes](#iris-query-distribution-slashes)                                               | Query distribution validator slashes.                                                                                   |
+| [validator-outstanding-rewards](#iris-tx-distribution-validator-outstanding-rewards)      | Query distribution outstanding (un-withdrawn) rewards for a validator and all their delegations                                                                                   |
+| [fund-community-pool](#iris-tx-distribution-fund-community-pool)                          | Funds the community pool with the specified amount                                                         |
+| [set-withdraw-addr](#iris-tx-distribution-set-withdraw-addr)                              | Set the withdraw address for rewards associated with a delegator address                                                                                   |
+| [withdraw-all-rewards](#iris-tx-distribution-withdraw-all-rewards)                        | Withdraw all rewards for a single delegator                                                                                   |
+| [withdraw-rewards](#iris-tx-distribution-withdraw-rewards)                                | Withdraw rewards from a given delegation address,and optionally withdraw validator commission if the delegation address given is a validator operator  |
 
-## iriscli distribution withdraw-address
+## iris query distribution commission
 
-Query the withdraw address of a delegator
+Query validator commission rewards from delegators to that validator.
 
 ```bash
-iriscli distribution withdraw-address [account-address] [flags]
+iris query distribution commission [validator] [flags]
 ```
 
-### Query withdraw address
+## iris query distribution community-pool
+
+Query all coins in the community pool which is under Governance control.
 
 ```bash
-iriscli distribution withdraw-address <delegator-address>
+iris query distribution community-pool [flags]
 ```
 
-If the delegator did not specify the withdraw address other than himself, the query result will be empty.
+## iris query distribution params
 
-## iriscli distribution rewards
-
-Query all the rewards of a validator or a delegator
+Query distribution params.
 
 ```bash
-iriscli distribution rewards [address] [flags]
+ iris query distribution params [flags]
 ```
 
-### Query rewards
+## iris query distribution rewards
+
+Query all rewards earned by a delegator, optionally restrict to rewards from a single validator.
 
 ```bash
-iriscli distribution rewards <iaa...>
+iris query distribution rewards [delegator-addr] [validator-addr] [flags]
 ```
 
-Output:
+## iris query distribution slashes
+
+Query all slashes of a validator for a given block range.
 
 ```bash
-Total:        270.33761964714393479iris
-Delegations:  
-  validator: iva..., reward: 2.899411557255275253iris
-  validator: iva..., reward: 2.899411557255275253iris
-  validator: iva..., reward: 2.899411557255275253iris
-Commission:   267.438208089888659537iris
+iris query distribution slashes [validator] [start-height] [end-height] [flags]
 ```
 
-## iriscli distribution set-withdraw-addr
+## iris query distribution validator-outstanding-rewards
 
-Set another address to receive the rewards instead of using the delegator address
+Query distribution outstanding (un-withdrawn) rewards for a validator and all their delegations.
 
 ```bash
-iriscli distribution set-withdraw-addr [withdraw-addr] [flags]
+iris query distribution validator-outstanding-rewards [validator] [flags]
+```
+## iris tx distribution fund-community-pool
+
+Funds the community pool with the specified amount.
+
+```bash
+iris tx distribution fund-community-pool [amount] [flags] [validator-addr] [flags]
+```
+## iris tx distribution set-withdraw-addr
+
+Set the withdraw address for rewards associated with a delegator address.
+
+```bash
+iris tx distribution set-withdraw-addr [withdraw-addr] [flags]
 ```
 
-### Set withdraw address
+## iris tx distribution withdraw-all-rewards
+
+Withdraw all rewards for a single delegator.
 
 ```bash
-iriscli distribution set-withdraw-addr <iaa...> --from=<key-name> --fee=0.3iris --chain-id=irishub
+iris tx distribution withdraw-all-rewards [flags]
 ```
 
-## iriscli distribution withdraw-rewards
+## iris tx distribution withdraw-rewards
 
-Withdraw rewards to the withdraw-address(default is the delegator address, you can set to another address via [set-withdraw-addr](#iriscli-distribution-set-withdraw-addr))
-
-```bash
-iriscli distribution withdraw-rewards [flags]
-```
-
-**Flags:**
-
-| Name, shorthand       | type   | Required | Default  | Description                                                         |
-| --------------------- | -----  | -------- | -------- | ------------------------------------------------------------------- |
-| --only-from-validator | string |          |          | Only withdraw from this validator address (in bech)                 |
-| --is-validator        | bool   |          | false    | Also withdraw validator's commission                                |
-
-:::tip
-Do not specify the above 2 flags together
-:::
-
-### Withdraw delegation rewards from a specified validator
+Withdraw rewards from a given delegation address, and optionally withdraw validator commission if the delegation address given is a validator operator.
 
 ```bash
-iriscli distribution withdraw-rewards --only-from-validator=<validator-address> --from=<key-name> --fee=0.3iris --chain-id=irishub
-```
-
-### Withdraw all delegation rewards
-
-```bash
-iriscli distribution withdraw-rewards --from=<key-name> --fee=0.3iris --chain-id=irishub
-```
-
-### Validator withdraws all delegation rewards and commission rewards
-
-```bash
-iriscli distribution withdraw-rewards --is-validator=true --from=<key-name> --fee=0.3iris --chain-id=irishub
+iris tx distribution withdraw-rewards [validator-addr] [flags]
 ```

@@ -4,39 +4,25 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/gorilla/mux"
+
 	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/rest"
-	authclient "github.com/cosmos/cosmos-sdk/x/auth/client"
-	"github.com/gorilla/mux"
 
 	"github.com/irisnet/irishub/modules/oracle/types"
 )
 
 func registerTxRoutes(cliCtx client.Context, r *mux.Router) {
 	// define a feed
-	r.HandleFunc(
-		"/oracle/feeds",
-		createFeedHandlerFn(cliCtx),
-	).Methods("POST")
-
+	r.HandleFunc("/oracle/feeds", createFeedHandlerFn(cliCtx)).Methods("POST")
 	// edit a feed
-	r.HandleFunc(
-		fmt.Sprintf("/oracle/feeds/{%s}", FeedName),
-		editFeedHandlerFn(cliCtx),
-	).Methods("PUT")
-
+	r.HandleFunc(fmt.Sprintf("/oracle/feeds/{%s}", FeedName), editFeedHandlerFn(cliCtx)).Methods("PUT")
 	// start a feed
-	r.HandleFunc(
-		fmt.Sprintf("/oracle/feeds/{%s}/start", FeedName),
-		startFeedHandlerFn(cliCtx),
-	).Methods("POST")
-
+	r.HandleFunc(fmt.Sprintf("/oracle/feeds/{%s}/start", FeedName), startFeedHandlerFn(cliCtx)).Methods("POST")
 	// pause a feed
-	r.HandleFunc(
-		fmt.Sprintf("/oracle/feeds/{%s}/pause", FeedName),
-		pauseFeedHandlerFn(cliCtx),
-	).Methods("POST")
+	r.HandleFunc(fmt.Sprintf("/oracle/feeds/{%s}/pause", FeedName), pauseFeedHandlerFn(cliCtx)).Methods("POST")
 }
 
 type createFeedReq struct {
@@ -82,7 +68,7 @@ type pauseFeedReq struct {
 func createFeedHandlerFn(cliCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req createFeedReq
-		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
+		if !rest.ReadRESTReq(w, r, cliCtx.JSONMarshaler, &req) {
 			return
 		}
 
@@ -133,14 +119,14 @@ func createFeedHandlerFn(cliCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		authclient.WriteGenerateStdTxResponse(w, cliCtx, req.BaseReq, []sdk.Msg{msg})
+		tx.WriteGeneratedTxResponse(cliCtx, w, req.BaseReq, msg)
 	}
 }
 
 func editFeedHandlerFn(cliCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req editFeedReq
-		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
+		if !rest.ReadRESTReq(w, r, cliCtx.JSONMarshaler, &req) {
 			return
 		}
 
@@ -187,14 +173,14 @@ func editFeedHandlerFn(cliCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		authclient.WriteGenerateStdTxResponse(w, cliCtx, req.BaseReq, []sdk.Msg{msg})
+		tx.WriteGeneratedTxResponse(cliCtx, w, req.BaseReq, msg)
 	}
 }
 
 func startFeedHandlerFn(cliCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req startFeedReq
-		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
+		if !rest.ReadRESTReq(w, r, cliCtx.JSONMarshaler, &req) {
 			return
 		}
 
@@ -221,14 +207,14 @@ func startFeedHandlerFn(cliCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		authclient.WriteGenerateStdTxResponse(w, cliCtx, req.BaseReq, []sdk.Msg{msg})
+		tx.WriteGeneratedTxResponse(cliCtx, w, req.BaseReq, msg)
 	}
 }
 
 func pauseFeedHandlerFn(cliCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req pauseFeedReq
-		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
+		if !rest.ReadRESTReq(w, r, cliCtx.JSONMarshaler, &req) {
 			return
 		}
 
@@ -255,6 +241,6 @@ func pauseFeedHandlerFn(cliCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		authclient.WriteGenerateStdTxResponse(w, cliCtx, req.BaseReq, []sdk.Msg{msg})
+		tx.WriteGeneratedTxResponse(cliCtx, w, req.BaseReq, msg)
 	}
 }

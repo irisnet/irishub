@@ -5,11 +5,13 @@ import (
 	"math/big"
 	"testing"
 
+	"github.com/stretchr/testify/suite"
+
+	"github.com/tendermint/tendermint/crypto"
+	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
+
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/stretchr/testify/suite"
-	abci "github.com/tendermint/tendermint/abci/types"
-	"github.com/tendermint/tendermint/crypto"
 
 	"github.com/irisnet/irishub/modules/random/keeper"
 	"github.com/irisnet/irishub/modules/random/types"
@@ -30,7 +32,7 @@ var (
 type KeeperTestSuite struct {
 	suite.Suite
 
-	cdc    *codec.Codec
+	cdc    codec.JSONMarshaler
 	ctx    sdk.Context
 	keeper keeper.Keeper
 	app    *simapp.SimApp
@@ -40,8 +42,8 @@ func (suite *KeeperTestSuite) SetupTest() {
 	app := simapp.Setup(false)
 
 	suite.app = app
-	suite.cdc = app.Codec()
-	suite.ctx = app.BaseApp.NewContext(false, abci.Header{})
+	suite.cdc = codec.NewAminoCodec(app.LegacyAmino())
+	suite.ctx = app.BaseApp.NewContext(false, tmproto.Header{})
 	suite.keeper = app.RandomKeeper
 }
 
@@ -50,12 +52,16 @@ func TestKeeperTestSuite(t *testing.T) {
 }
 
 func (suite *KeeperTestSuite) TestSetRandom() {
-	rand := types.NewRandom(types.SHA256(testTxBytes), testHeight, big.NewRat(testRandomNumerator, testRandomDenomiator).FloatString(types.RandPrec))
-	suite.keeper.SetRandom(suite.ctx, testReqID, rand)
+	random := types.NewRandom(
+		types.SHA256(testTxBytes),
+		testHeight,
+		big.NewRat(testRandomNumerator, testRandomDenomiator).FloatString(types.RandPrec),
+	)
+	suite.keeper.SetRandom(suite.ctx, testReqID, random)
 
 	storedRandom, err := suite.keeper.GetRandom(suite.ctx, testReqID)
 	suite.NoError(err)
-	randJson, _ := json.Marshal(rand)
+	randJson, _ := json.Marshal(random)
 	storedRandomJson, _ := json.Marshal(storedRandom)
 	suite.Equal(string(randJson), string(storedRandomJson))
 }
@@ -74,7 +80,7 @@ func (suite *KeeperTestSuite) TestRequestRandom() {
 
 	for ; iterator.Valid(); iterator.Next() {
 		var request types.Request
-		suite.cdc.MustUnmarshalBinaryBare(iterator.Value(), &request)
+		suite.app.AppCodec().MustUnmarshalBinaryBare(iterator.Value(), &request)
 		suite.Equal(expectedRequest, request)
 	}
 }

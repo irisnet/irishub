@@ -1,26 +1,26 @@
 package rest
 
 import (
-	"encoding/hex"
 	"fmt"
 	"net/http"
 	"strconv"
 
+	"github.com/gorilla/mux"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/types/rest"
-	"github.com/gorilla/mux"
 
 	"github.com/irisnet/irishub/modules/random/types"
 )
 
 func registerQueryRoutes(cliCtx client.Context, r *mux.Router) {
-	// query rand by the request id
-	r.HandleFunc(fmt.Sprintf("/rand/rands/{%s}", RestRequestID), queryRandomHandlerFn(cliCtx)).Methods("GET")
-	// query rand request queue by an optional heigth
-	r.HandleFunc("/rand/queue", queryQueueHandlerFn(cliCtx)).Methods("GET")
+	// query random by the request id
+	r.HandleFunc(fmt.Sprintf("/random/randoms/{%s}", RestRequestID), queryRandomHandlerFn(cliCtx)).Methods("GET")
+	// query random request queue by an optional heigth
+	r.HandleFunc("/random/queue", queryQueueHandlerFn(cliCtx)).Methods("GET")
 }
 
-// HTTP request handler to query rand by the request id.
+// HTTP request handler to query random by the request id.
 func queryRandomHandlerFn(cliCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
@@ -40,7 +40,7 @@ func queryRandomHandlerFn(cliCtx client.Context) http.HandlerFunc {
 			ReqID: reqID,
 		}
 
-		bz, err := cliCtx.Codec.MarshalJSON(params)
+		bz, err := cliCtx.JSONMarshaler.MarshalJSON(params)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -53,21 +53,15 @@ func queryRandomHandlerFn(cliCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		var rawRandom types.Random
-		if err := cliCtx.Codec.UnmarshalJSON(res, &rawRandom); err != nil {
+		var random types.Random
+		if err := cliCtx.JSONMarshaler.UnmarshalJSON(res, &random); err != nil {
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
 
-		readableRandom := types.ReadableRandom{
-			RequestTxHash: hex.EncodeToString(rawRandom.RequestTxHash),
-			Height:        rawRandom.Height,
-			Value:         rawRandom.Value,
-		}
-
 		cliCtx = cliCtx.WithHeight(height)
 
-		rest.PostProcessResponse(w, cliCtx, readableRandom)
+		rest.PostProcessResponse(w, cliCtx, random)
 	}
 }
 
@@ -96,7 +90,7 @@ func queryQueueHandlerFn(cliCtx client.Context) http.HandlerFunc {
 			Height: genHeight,
 		}
 
-		bz, err := cliCtx.Codec.MarshalJSON(params)
+		bz, err := cliCtx.JSONMarshaler.MarshalJSON(params)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return

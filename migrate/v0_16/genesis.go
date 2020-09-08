@@ -4,6 +4,20 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"time"
+
+	"github.com/pkg/errors"
+
+	abcitypes "github.com/tendermint/tendermint/abci/types"
+	tmbytes "github.com/tendermint/tendermint/libs/bytes"
+	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
+	tmtypes "github.com/tendermint/tendermint/types"
+	tmtime "github.com/tendermint/tendermint/types/time"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	"github.com/irisnet/irishub/migrate/v0_16/auth"
 	"github.com/irisnet/irishub/migrate/v0_16/coinswap"
 	"github.com/irisnet/irishub/migrate/v0_16/distribution"
 	"github.com/irisnet/irishub/migrate/v0_16/gov"
@@ -13,18 +27,9 @@ import (
 	"github.com/irisnet/irishub/migrate/v0_16/rand"
 	"github.com/irisnet/irishub/migrate/v0_16/service"
 	"github.com/irisnet/irishub/migrate/v0_16/slashing"
-	"github.com/irisnet/irishub/migrate/v0_16/upgrade"
-	"io/ioutil"
-	"time"
-
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/irisnet/irishub/migrate/v0_16/auth"
 	"github.com/irisnet/irishub/migrate/v0_16/stake"
 	"github.com/irisnet/irishub/migrate/v0_16/types"
-	"github.com/pkg/errors"
-	tmbytes "github.com/tendermint/tendermint/libs/bytes"
-	tmtypes "github.com/tendermint/tendermint/types"
-	tmtime "github.com/tendermint/tendermint/types/time"
+	"github.com/irisnet/irishub/migrate/v0_16/upgrade"
 )
 
 type GenesisFileState struct {
@@ -55,7 +60,7 @@ type GenesisFileAccount struct {
 type GenesisDoc struct {
 	GenesisTime     time.Time                  `json:"genesis_time"`
 	ChainID         string                     `json:"chain_id"`
-	ConsensusParams *ConsensusParams           `json:"consensus_params,omitempty"`
+	ConsensusParams *tmproto.ConsensusParams   `json:"consensus_params,omitempty"`
 	Validators      []tmtypes.GenesisValidator `json:"validators,omitempty"`
 	AppHash         tmbytes.HexBytes           `json:"app_hash"`
 	AppState        json.RawMessage            `json:"app_state,omitempty"`
@@ -64,9 +69,9 @@ type GenesisDoc struct {
 // ConsensusParams contains consensus critical parameters that determine the
 // validity of blocks.
 type ConsensusParams struct {
-	BlockSize tmtypes.BlockParams     `json:"block_size"`
+	BlockSize abcitypes.BlockParams   `json:"block_size"`
 	Evidence  EvidenceParams          `json:"evidence"`
-	Validator tmtypes.ValidatorParams `json:"validator"`
+	Validator tmproto.ValidatorParams `json:"validator"`
 }
 
 // EvidenceParams determine how we handle evidence of malfeasance
@@ -112,16 +117,9 @@ func (genDoc *GenesisDoc) ValidateAndComplete() error {
 	}
 
 	if genDoc.ConsensusParams == nil {
-		defalutConsensusParams := tmtypes.DefaultConsensusParams()
-		genDoc.ConsensusParams = &ConsensusParams{
-			BlockSize: defalutConsensusParams.Block,
-			Evidence: EvidenceParams{
-				MaxAge: defalutConsensusParams.Evidence.MaxAgeNumBlocks,
-			},
-			Validator: defalutConsensusParams.Validator,
-		}
+		genDoc.ConsensusParams = tmtypes.DefaultConsensusParams()
 	} else {
-		if err := genDoc.ConsensusParams.Validate(); err != nil {
+		if err := tmtypes.ValidateConsensusParams(*genDoc.ConsensusParams); err != nil {
 			return err
 		}
 	}
@@ -174,7 +172,7 @@ func (params ConsensusParams) Validate() error {
 	// Check if keyType is a known ABCIPubKeyType
 	for i := 0; i < len(params.Validator.PubKeyTypes); i++ {
 		keyType := params.Validator.PubKeyTypes[i]
-		if _, ok := tmtypes.ABCIPubKeyTypesToAminoNames[keyType]; !ok {
+		if _, ok := tmtypes.ABCIPubKeyTypesToNames[keyType]; !ok {
 			return errors.Errorf("params.Validator.PubKeyTypes[%d], %s, is an unknown pubkey type",
 				i, keyType)
 		}

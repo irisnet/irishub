@@ -4,10 +4,12 @@ import (
 	"strconv"
 	"testing"
 
+	"github.com/stretchr/testify/suite"
+
+	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
+
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/stretchr/testify/suite"
-	abci "github.com/tendermint/tendermint/abci/types"
 
 	"github.com/irisnet/irishub/modules/random"
 	"github.com/irisnet/irishub/modules/random/keeper"
@@ -29,7 +31,7 @@ var (
 type GenesisTestSuite struct {
 	suite.Suite
 
-	cdc    *codec.Codec
+	cdc    codec.JSONMarshaler
 	ctx    sdk.Context
 	keeper keeper.Keeper
 }
@@ -37,8 +39,8 @@ type GenesisTestSuite struct {
 func (suite *GenesisTestSuite) SetupTest() {
 	app := simapp.Setup(false)
 
-	suite.cdc = app.Codec()
-	suite.ctx = app.BaseApp.NewContext(false, abci.Header{})
+	suite.cdc = codec.NewAminoCodec(app.LegacyAmino())
+	suite.ctx = app.BaseApp.NewContext(false, tmproto.Header{})
 	suite.keeper = app.RandomKeeper
 }
 
@@ -75,6 +77,6 @@ func (suite *GenesisTestSuite) TestExportGenesis() {
 	for height, requests := range exportedRequests {
 		h, _ := strconv.ParseInt(height, 10, 64)
 		storedHeight := h + testNewHeight - 1
-		suite.Equal(storedRequests[storedHeight], requests)
+		suite.Equal(storedRequests[storedHeight], requests.Requests)
 	}
 }

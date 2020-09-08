@@ -5,9 +5,8 @@ import (
 	"fmt"
 
 	"github.com/pkg/errors"
-	
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	
 )
 
 type GenesisState struct {

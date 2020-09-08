@@ -1,12 +1,12 @@
 package types
 
 import (
-	"github.com/tendermint/go-amino"
-	tmtypes "github.com/tendermint/tendermint/types"
+	"github.com/cosmos/cosmos-sdk/codec"
+	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 )
 
-var CodeC = amino.NewCodec()
+var CodeC = codec.New()
 
 func init() {
-	tmtypes.RegisterBlockAmino(CodeC)
+	cryptocodec.RegisterCrypto(CodeC)
 }

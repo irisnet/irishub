@@ -1,11 +1,14 @@
 package keeper
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	gogotypes "github.com/gogo/protobuf/types"
+
+	tmbytes "github.com/tendermint/tendermint/libs/bytes"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
+
 	"github.com/irismod/service/exported"
 	servicetypes "github.com/irismod/service/types"
-	tmbytes "github.com/tendermint/tendermint/libs/bytes"
 
 	"github.com/irisnet/irishub/modules/oracle/types"
 )

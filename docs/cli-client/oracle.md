@@ -1,4 +1,4 @@
-# iriscli oracle
+# Oracle
 
 Oracle module allows you to manage the feed on IRIS Hub
 
@@ -6,20 +6,21 @@ Oracle module allows you to manage the feed on IRIS Hub
 
 | Name                                       | Description                                                                            |
 | ------------------------------------------ | -------------------------------------------------------------------------------------- |
-| [create](#iriscli-oracle-create)           | Create a new feed, the feed will be in "paused" state                                   |
-| [start](#iriscli-oracle-start)             | Start a feed in "paused" state                                                         |
-| [pause](#iriscli-oracle-pause)             | Pause a feed in "running" state                                                        |
-| [edit](#iriscli-oracle-edit)               | Feed creator modify the feed information and update service invocation parameters      |
-| [query-feed](#iriscli-oracle-query-feed)   | Query feed definition by feed name                                                   |
-| [query-feeds](#iriscli-oracle-query-feeds) | Query a group of definitions by feed state                                          |
-| [query-value](#iriscli-oracle-query-value) | Query the feed's value by feed name                                                |
+| [create](#iris-tx-oracle-create)           | Create a new feed, the feed will be in "paused" state                                   |
+| [start](#iris-tx-oracle-start)             | Start a feed in "paused" state                                                         |
+| [pause](#iris-tx-oracle-pause)             | Pause a feed in "running" state                                                        |
+| [edit](#iris-tx-oracle-edit)               | Modify the feed information and update service invocation parameters by feed creator      |
+| [feed](#iris-query-oracle-feed)            | Query the feed definition                                                   |
+| [feeds](#iris-query-oracle-feeds)          | Query a group of feed definition                                          |
+| [value](#iris-query-oracle-value)          | Query the feed result                                                |
 
-## iriscli oracle create
+## iris tx oracle create
 
-This command is used to create a "paused" feed on IRIS Hub.
+This command is used to create a new feed, the feed will be in "paused" state.
+
 
 ```bash
-iriscli oracle create [flags]
+iris tx oracle create [flags]
 ```
 
 **Flags:**
@@ -42,43 +43,43 @@ iriscli oracle create [flags]
 ### Create a new feed
 
 ```bash
-iriscli oracle create --chain-id=irishub --from=node0 --fee=0.3iris --feed-name="test-feed" --latest-history=10 --service-name="test-service" --input=<request-data> --providers=<provide1_address>,<provider2_address> --service-fee-cap=1iris --timeout=2 --frequency=10 --total=10 --threshold=1 --aggregate-func="avg" --value-json-path="high" --commit
+iris tx oracle create --chain-id=irishub --from=node0 --fees=0.3iris --feed-name="test-feed" --latest-history=10 --service-name="test-service" --input=<request-data> --providers=<provide1_address>,<provider2_address> --service-fee-cap=1iris --timeout=2 --frequency=10 --total=10 --threshold=1 --aggregate-func="avg" --value-json-path="high" --commit
 ```
 
-## iriscli oracle start
+## iris tx oracle start
 
 This command is used to start a feed in "paused" state
 
 ```bash
-iriscli oracle start [feed-name] [flags]
+iris tx oracle start [feed-name] [flags]
 ```
 
 ### Start a "paused" feed
 
 ```bash
-iriscli oracle start test-feed --chain-id=irishub --from=node0 --fee=0.3iris --commit
+iris tx oracle start test-feed --chain-id=irishub --from=node0 --fees=0.3iris --commit
 ```
 
-## iriscli oracle pause
+## iris tx oracle pause
 
 This command is used to pause a feed in "running" state
 
 ```bash
-iriscli oracle pause [feed-name] [flags]
+iris tx oracle pause [feed-name] [flags]
 ```
 
 ### Pause a "running" feed
 
 ```bash
-iriscli oracle pause test-feed --chain-id=irishub --from=node0 --fee=0.3iris --commit
+iris tx oracle pause test-feed --chain-id=irishub --from=node0 --fees=0.3iris --commit
 ```
 
-## iriscli oracle edit
+## iris tx oracle edit
 
 This command is used to edit an existing feed on IRIS Hub.
 
 ```bash
-iriscli oracle edit [feed-name] [flags]
+iris tx oracle edit [feed-name] [flags]
 ```
 
 **Flags:**
@@ -97,29 +98,29 @@ iriscli oracle edit [feed-name] [flags]
 ### Edit an existed feed
 
 ```bash
-iriscli oracle edit test-feed --chain-id=irishub --from=node0 --fee=0.3iris --latest-history=5 --commit
+iris tx oracle edit test-feed --chain-id=irishub --from=node0 --fees=0.3iris --latest-history=5 --commit
 ```
 
-## iriscli oracle query-feed
+## iris query oracle feed
 
 This command is used to query a feed 
 
 ```bash
-iriscli oracle query-feed [feed-name] [flags]
+iris query oracle feed [feed-name] [flags]
 ```
 
 ### Query an existed feed
 
 ```bash
-iriscli oracle query-feed test-feed
+iris query oracle feed test-feed
 ```
 
-## iriscli oracle query-feeds
+## iris query oracle feeds
 
 This command is used to query a group of feed 
 
 ```bash
-iriscli oracle query-feeds [flags]
+iris query oracle feeds [flags]
 ```
 
 **Flags:**
@@ -131,19 +132,19 @@ iriscli oracle query-feeds [flags]
 ### Query a group of feed
 
 ```bash
-iriscli oracle query-feeds --state=running
+iris query oracle feeds --state=running
 ```
 
-## iriscli oracle query-value
+## iris query oracle value
 
 This command is used to query the result of a specified feed
 
 ```bash
-iriscli oracle query-value test-feed
+iris query oracle value test-feed
 ```
 
 ### Query the result of an existed feed
 
 ```bash
-iriscli oracle query-value test-feed
+iris query oracle value test-feed
 ```
