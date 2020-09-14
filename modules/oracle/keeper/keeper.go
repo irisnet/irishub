@@ -51,8 +51,7 @@ func NewKeeper(
 
 //CreateFeed create a stopped feed
 func (k Keeper) CreateFeed(ctx sdk.Context, msg *types.MsgCreateFeed) error {
-	_, existed := k.gk.GetProfiler(ctx, msg.Creator)
-	if !existed {
+	if _, existed := k.gk.GetProfiler(ctx, msg.Creator); !existed {
 		return sdkerrors.Wrapf(types.ErrNotProfiler, msg.Creator.String())
 	}
 

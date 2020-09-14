@@ -36,7 +36,7 @@ func GetCmdQueryFeed() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "feed [feed-name]",
 		Short:   "Query the feed definition",
-		Example: fmt.Sprintf("%s q oracle query-feed <feed-name>", version.AppName),
+		Example: fmt.Sprintf("%s query oracle query-feed <feed-name>", version.AppName),
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
@@ -65,7 +65,7 @@ func GetCmdQueryFeeds() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "feeds",
 		Short:   "Query a group of feed definition",
-		Example: fmt.Sprintf("%s q oracle query-feeds", version.AppName),
+		Example: fmt.Sprintf("%s query oracle query-feeds", version.AppName),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 			clientCtx, err := client.ReadQueryCommandFlags(clientCtx, cmd.Flags())
@@ -93,7 +93,7 @@ func GetCmdQueryFeedValue() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "value [feed-name]",
 		Short:   "Query the feed result",
-		Example: fmt.Sprintf("%s q oracle query-value <feed-name>", version.AppName),
+		Example: fmt.Sprintf("%s query oracle query-value <feed-name>", version.AppName),
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
