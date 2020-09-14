@@ -2,14 +2,13 @@
 
 ## Summary
 
-This document describes the implementation of the [Constant Product Market Maker Model](https://github.com/runtimeverification/verified-smart-contracts/blob/uniswap/uniswap/x-y-k.pdf) token exchange protocol on IRISHub. 
+This document describes the implementation of the [Constant Product Market Maker Model](https://github.com/runtimeverification/verified-smart-contracts/blob/uniswap/uniswap/x-y-k.pdf) token exchange protocol on IRISHub.
 
 Coinswap supports Token to IRIS and Token to Token exchange. The whole exchange process is implemented on-chain. To generate on-chain assets, you can use the multi-asset management function on IRIS Hub.
 
 Before exchange with Coinswap, the market maker needs to deposit the token to the liquidity pool at the current market price (based on the IRIS token), then the exchange rate between the two tokens on IRIS Hub will vary in real-time according to the on-chain trading situation. When the exchange rate in the liquidity pool is inconsistent with that of other platforms, the arbitrageurs can make a profit. They arbitrage price differences between different platforms and make the exchange rate in the liquidity pool closer to the current market exchange rate.
 
 During the exchange process, the 3/1000 handling fee will be deducted and re-added to the liquidity pool as rewards to the market maker. Market makers can retrieve their tokens at any time without a lock-up period. When the run-off situation occurs, it is useful for the market maker to withdraw the deposit token in time to avoid losses. Therefore, the more tokens deposited in the liquidity pool, the stabler the exchange rate change caused by the exchange process, and the more profit the market maker will make.
-
 
 ## Concepts
 

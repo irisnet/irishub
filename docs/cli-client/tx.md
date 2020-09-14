@@ -4,13 +4,13 @@ Tx module allows you to sign or broadcast transactions
 
 ## Available Commands
 
-| Name                            | Description                                                  |
-| ------------------------------- | ------------------------------------------------------------ |
-| [sign](#iris-tx-sign)           | Sign transactions generated offline                          |
-| [broadcast](#iris-tx-broadcast) | Broadcast a signed transaction to the network                |
-| [multisig](#iris-tx-multisign)  | Sign the same transaction by multiple accounts               |
-| [tx](#iris-query-tx)                | Query for a transaction by hash in a committed block         |
-| [txs](#iris-query-txs)              | Search for transactions that match the exact given events where results are paginated |
+| Name                            | Description                                                                           |
+| ------------------------------- | ------------------------------------------------------------------------------------- |
+| [sign](#iris-tx-sign)           | Sign transactions generated offline                                                   |
+| [broadcast](#iris-tx-broadcast) | Broadcast a signed transaction to the network                                         |
+| [multisig](#iris-tx-multisign)  | Sign the same transaction by multiple accounts                                        |
+| [tx](#iris-query-tx)            | Query for a transaction by hash in a committed block                                  |
+| [txs](#iris-query-txs)          | Search for transactions that match the exact given events where results are paginated |
 
 ## iris tx sign
 
@@ -22,14 +22,13 @@ iris tx sign <file> [flags]
 
 ### Flags
 
-| Name, shorthand  | Type   | Required | Default | Description                                                  |
-| ---------------- | ------ | -------- | ------- | ------------------------------------------------------------ |
-| --append         | bool   | true     | true    | Attach a signature to an existing signature.                 |
-| --from           | string | true     |         | Key name for signature                                       |
-| --offline        | bool   | true     |         | Offline mode.                                                |
-| --signature-only | bool   | true     |         | Print only the generated signature, then exit                |
+| Name, shorthand  | Type   | Required | Default | Description                                                                        |
+| ---------------- | ------ | -------- | ------- | ---------------------------------------------------------------------------------- |
+| --append         | bool   | true     | true    | Attach a signature to an existing signature.                                       |
+| --from           | string | true     |         | Key name for signature                                                             |
+| --offline        | bool   | true     |         | Offline mode.                                                                      |
+| --signature-only | bool   | true     |         | Print only the generated signature, then exit                                      |
 | --multisig       | string |          | true    | Address of the multisig account on behalf of which the transaction shall be signed |
-
 
 ### Generate an offline tx
 
@@ -46,7 +45,32 @@ iris tx bank send iaa1w9lvhwlvkwqvg08q84n2k4nn896u9pqx93velx iaa15uys54epmd2xzhc
 The `unsigned.json` should look like:
 
 ```json
-{"type":"cosmos-sdk/StdTx","value":{"msg":[{"type":"cosmos-sdk/MsgSend","value":{"from_address":"iaa1w9lvhwlvkwqvg08q84n2k4nn896u9pqx93velx","to_address":"iaa15uys54epmd2xzhcn32szps56wvev40tt908h62","amount":[{"denom":"iris","amount":"10"}]}}],"fee":{"amount":[],"gas":"200000"},"signatures":null,"memo":""}}
+{
+    "type": "cosmos-sdk/StdTx",
+    "value": {
+        "msg": [
+            {
+                "type": "cosmos-sdk/MsgSend",
+                "value": {
+                    "from_address": "iaa1w9lvhwlvkwqvg08q84n2k4nn896u9pqx93velx",
+                    "to_address": "iaa15uys54epmd2xzhcn32szps56wvev40tt908h62",
+                    "amount": [
+                        {
+                            "denom": "iris",
+                            "amount": "10"
+                        }
+                    ]
+                }
+            }
+        ],
+        "fee": {
+            "amount": [],
+            "gas": "200000"
+        },
+        "signatures": null,
+        "memo": ""
+    }
+}
 ```
 
 ### Sign tx offline
@@ -58,7 +82,61 @@ iris tx sign unsigned.json --name=<key-name> > signed.tx
 The `signed.json` should look like:
 
 ```json
-{"type":"auth/StdTx","value":{"msg":[{"type":"cosmos-sdk/Send","value":{"inputs":[{"address":"iaa106nhdckyf996q69v3qdxwe6y7408pvyvyxzhxh","coins":[{"denom":"uiris","amount":"1000000"}]}],"outputs":[{"address":"iaa1893x4l2rdshytfzvfpduecpswz7qtpstevr742","coins":[{"denom":"uiris","amount":"1000000"}]}]}}],"fee":{"amount":[{"denom":"uiris","amount":"4000000"}],"gas":"200000"},"signatures":[{"pub_key":{"type":"tendermint/PubKeySecp256k1","value":"Auouudrg0P86v2kq2lykdr97AJYGHyD6BJXAQtjR1gzd"},"signature":"sJewd6lKjma49rAiGVfdT+V0YYerKNx6ZksdumVCvuItqGm24bEN9msh7IJ12Sil1lYjqQjdAcjVCX/77FKlIQ==","account_number":"0","sequence":"3"}],"memo":"test"}}
+{
+    "type": "auth/StdTx",
+    "value": {
+        "msg": [
+            {
+                "type": "cosmos-sdk/Send",
+                "value": {
+                    "inputs": [
+                        {
+                            "address": "iaa106nhdckyf996q69v3qdxwe6y7408pvyvyxzhxh",
+                            "coins": [
+                                {
+                                    "denom": "uiris",
+                                    "amount": "1000000"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        {
+                            "address": "iaa1893x4l2rdshytfzvfpduecpswz7qtpstevr742",
+                            "coins": [
+                                {
+                                    "denom": "uiris",
+                                    "amount": "1000000"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        ],
+        "fee": {
+            "amount": [
+                {
+                    "denom": "uiris",
+                    "amount": "4000000"
+                }
+            ],
+            "gas": "200000"
+        },
+        "signatures": [
+            {
+                "pub_key": {
+                    "type": "tendermint/PubKeySecp256k1",
+                    "value": "Auouudrg0P86v2kq2lykdr97AJYGHyD6BJXAQtjR1gzd"
+                },
+                "signature": "sJewd6lKjma49rAiGVfdT+V0YYerKNx6ZksdumVCvuItqGm24bEN9msh7IJ12Sil1lYjqQjdAcjVCX/77FKlIQ==",
+                "account_number": "0",
+                "sequence": "3"
+            }
+        ],
+        "memo": "test"
+    }
+}
 ```
 
 Note the `signature` in the `signed.json` should no longer be empty after signing.
@@ -126,6 +204,7 @@ iris tx multisign --chain-id=irishub unsigned.json <multisig-keyname> signed-1.j
 ```
 
 Now you can [broadcast the signed tx](#iris-tx-broadcast).
+
 ## iris query tx
 
 ```bash
@@ -137,6 +216,7 @@ iris query tx [hash] [flags]
 ```bash
 iris query txs --events 'message.sender=<iaa...>&message.action=xxxx' --page 1 --limit 30
 ```
+
 Among the possible values of `message.action`:
 
 | module       | Msg                                       | action               |
@@ -171,4 +251,3 @@ Among the possible values of `message.action`:
 |              | irismod/MsgEditToken                      | edit_token           |
 |              | irismod/MsgTransferTokenOwner             | transfer_token_owner |
 |              | irismod/MsgMintToken                      | mint_token           |
-

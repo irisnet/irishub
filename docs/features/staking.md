@@ -53,48 +53,48 @@ As a delegator, the more bonded tokens it has on validator, the more rewards it 
 iris keys show <key-name>
 ```
 
-  Example Output:
+Example Output:
 
-  ```bash
-  - name: node0
+```bash
+- name: node0
     type: local
     address: iaa1w9lvhwlvkwqvg08q84n2k4nn896u9pqx93velx
     pubkey: iap1addwnpepq03g7u43y3gwfz3pd4gkwz7d4mt600kzsc5cj2ysx58a5hp84qyduxtw28r
     mnemonic: ""
     threshold: 0
     pubkeys: []
-  ```
+```
 
-  Then, example command to query validator:
+Then, example command to query validator:
 
 ```bash
 iris q staking validator iva14n9md3sq9xwscs96za8n85m0j9y2yu3cagxgke
 ```
 
-  Example Output:
+Example Output:
 
-  ```json
-  {
-      "operator_address": "iva14n9md3sq9xwscs96za8n85m0j9y2yu3cagxgke",
-      "consensus_pubkey": "icp1zcjduepq9meszzqu54gpxvs4vzvuv85qvv5ef0egz3sde0ps4dvktcv77uds0kkhgf",
-      "status": 3,
-      "tokens": "100000000",
-      "delegator_shares": "100000000.000000000000000000",
-      "description": {
-        "moniker": "node0"
-      },
-      "unbonding_time": "1970-01-01T00:00:00Z",
-      "commission": {
-        "commission_rates": {
-          "rate": "1.000000000000000000",
-          "max_rate": "1.000000000000000000",
-          "max_change_rate": "1.000000000000000000"
-        },
-        "update_time": "2020-08-26T06:43:07.065305Z"
-      },
-      "min_self_delegation": "1"
-    }
-  ```
+```json
+{
+    "operator_address": "iva14n9md3sq9xwscs96za8n85m0j9y2yu3cagxgke",
+    "consensus_pubkey": "icp1zcjduepq9meszzqu54gpxvs4vzvuv85qvv5ef0egz3sde0ps4dvktcv77uds0kkhgf",
+    "status": 3,
+    "tokens": "100000000",
+    "delegator_shares": "100000000.000000000000000000",
+    "description": {
+    "moniker": "node0"
+    },
+    "unbonding_time": "1970-01-01T00:00:00Z",
+    "commission": {
+    "commission_rates": {
+        "rate": "1.000000000000000000",
+        "max_rate": "1.000000000000000000",
+        "max_change_rate": "1.000000000000000000"
+    },
+    "update_time": "2020-08-26T06:43:07.065305Z"
+    },
+    "min_self_delegation": "1"
+}
+```
 
 - Edit validator
 
@@ -103,8 +103,7 @@ iris tx staking edit-validator --from=<key-name> --chain-id=irishub --fees=0.3ir
 ```
 
 - Delegate tokens to other validators
-
-  If you just want to be a delegator, you can skip the above steps.
+If you just want to be a delegator, you can skip the above steps.
 
 ```bash
 iris tx staking delegate iva14n9md3sq9xwscs96za8n85m0j9y2yu3cagxgke 1000iris --chain-id=irishub --from=<key-name> --fees=0.3iris
@@ -121,6 +120,5 @@ iris tx staking unbond iva14n9md3sq9xwscs96za8n85m0j9y2yu3cagxgke 1000iris --cha
 ```bash
 iris tx staking redelegate iva14n9md3sq9xwscs96za8n85m0j9y2yu3cagxgke iva1l2rsakp388kuv9k8qzq6lrm9taddae7fpx59wm 100iris --from mykey --chain-id=irishub --from=<key-name> --fees=0.3iris
 ```
-  
 
 For other staking commands, please refer to [stake cli client](../cli-client/staking.md)

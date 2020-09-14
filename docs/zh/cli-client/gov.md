@@ -5,18 +5,18 @@
 ## 可用命令
 
 | 名称                                            | 描述                                                  |
-| ----------------------------------------------- | ------------------------------------------------------------ |
-| [proposal](#iris-query-gov-proposal)                | 查询单个提案的详细信息                           |
-| [proposals](#iris-query-gov-proposals)              | 使用可选过滤器提案                         |
-| [vote](#iris-query-gov-vote)                        | 查询一次投票的详细信息                               |
-| [votes](#iris-query-gov-votes)                      | 查询提案的投票                                    |
-| [deposit](#iris-query-gov-deposit)                  | 查询摸个抵押人在某个提案的抵押信息                                   |
-| [deposits](#iris-query-gov-deposits)                | 查询提案的所有抵押信息                                 |
-| [tally](#iris-query-gov-tally)                      | 汇总提案投票                            |
-| [param](#iris-query-gov-param)                      | 查询参数                            |
-| [params](#iris-query-gov-params)                    | 查询治理流程的参数               |
-| [submit-proposal](#iris-tx-gov-submit-proposal) | 提交提案              |
-| [deposit](#iris-tx-gov-deposit)                 | 为有效的提案抵押代币                        |
+| ----------------------------------------------- | ----------------------------------------------------- |
+| [proposal](#iris-query-gov-proposal)            | 查询单个提案的详细信息                                |
+| [proposals](#iris-query-gov-proposals)          | 使用可选过滤器提案                                    |
+| [vote](#iris-query-gov-vote)                    | 查询一次投票的详细信息                                |
+| [votes](#iris-query-gov-votes)                  | 查询提案的投票                                        |
+| [deposit](#iris-query-gov-deposit)              | 查询摸个抵押人在某个提案的抵押信息                    |
+| [deposits](#iris-query-gov-deposits)            | 查询提案的所有抵押信息                                |
+| [tally](#iris-query-gov-tally)                  | 汇总提案投票                                          |
+| [param](#iris-query-gov-param)                  | 查询参数                                              |
+| [params](#iris-query-gov-params)                | 查询治理流程的参数                                    |
+| [submit-proposal](#iris-tx-gov-submit-proposal) | 提交提案                                              |
+| [deposit](#iris-tx-gov-deposit)                 | 为有效的提案抵押代币                                  |
 | [vote](#iris-tx-gov-vote)                       | 为活跃的提案投票:可选值： yes/no/no_with_veto/abstain |
 
 ## iris query gov proposal
@@ -141,6 +141,7 @@ iris query gov param [param-type] [flags]
 ```
 
 例如:
+
 ```bash
 > iris query gov param voting
 > iris query gov param tallying
@@ -169,13 +170,14 @@ iris tx gov submit-proposal community-pool-spend <path/to/proposal.json> --from=
 ```
 
 `proposal.json` 包含:
+
 ```json
 {
-  "title": "Community Pool Spend",
-  "description": "Pay me some Atoms!",
-  "recipient": "cosmos1s5afhd6gxevu37mkqcvvsj8qeylhn0rz46zdlq",
-  "amount": "1000stake",
-  "deposit": "1000stake"
+    "title": "Community Pool Spend",
+    "description": "Pay me some Atoms!",
+    "recipient": "cosmos1s5afhd6gxevu37mkqcvvsj8qeylhn0rz46zdlq",
+    "amount": "1000stake",
+    "deposit": "1000stake"
 }
 ```
 
@@ -195,16 +197,16 @@ iris tx gov submit-proposal param-change <path/to/proposal.json> --from=<key_or_
 
 ```json
 {
-  "title": "Staking Param Change",
-  "description": "Update max validators",
-  "changes": [
-    {
-      "subspace": "staking",
-      "key": "MaxValidators",
-      "value": 105
-    }
-  ],
-  "deposit": "1000stake"
+    "title": "Staking Param Change",
+    "description": "Update max validators",
+    "changes": [
+        {
+        "subspace": "staking",
+        "key": "MaxValidators",
+        "value": 105
+        }
+    ],
+    "deposit": "1000stake"
 }
 ```
 
@@ -226,7 +228,6 @@ iris tx gov submit-proposal software-upgrade [name] (--upgrade-height [height] |
 | --upgrade-height | int64  |      |      | 升级必须发生的高度（不要与`--upgrade-time`一起使用）   |
 | --time           | string |      |      | 升级必须发生的时间（不要与`--upgrade-height`一起使用） |
 | --info           | string |      |      | 计划升级的可选信息，例如提交哈希等。                   |
-
 
 ## iris tx gov deposit
 
