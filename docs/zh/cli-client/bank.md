@@ -53,12 +53,5 @@ iris tx bank send [from_key_or_address] [to_address] [amount] [flags]
 
 | 名称，速记 | 类型   | 必须 | 默认 | 描述                           |
 | ---------- | ------ | -------- | ---- | ------------------------------ |
-| --amount   | string | Yes      |      | 要发送的通证数量，例如：10iris |
-| --to       | string |          |      | 接收通证的Bech32编码地址       |
-
-### 将通证发送到另一个地址
-
-```bash
-iris tx bank send [from_key_or_address] [to_address] [amount] [flags]
-```
+| -h, --help |        |          |      | `balances`子命令的提示信息        |
 

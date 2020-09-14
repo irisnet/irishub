@@ -62,4 +62,4 @@ Supposed that Alice swaps BTC for IRIS with Bob. The atomic swap process between
 
 - [Refund HTLC](../cli-client/htlc.md#iris-tx-htlc-refund)
 
-- [Query HTLC](../cli-client/htlc.md#iris-q-htlc-htlc)
+- [Query HTLC](../cli-client/htlc.md#iris-query-htlc-htlc)

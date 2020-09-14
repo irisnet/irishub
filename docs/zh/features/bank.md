@@ -19,7 +19,7 @@
     该命令包括了交易“构造，签名，广播”的所有操作。 如从账户A转账10iris给账户B：
 
     ```bash
-    iris tx bank send [A] [B] [10iris] --fees=0.3iris --from=<key-name-of-wallet-A> --chain-id=irishub
+    iris tx bank send [A] [B] [10iris] --fees=0.3iris --chain-id=irishub
     ```
 
     IRISnet支持多种代币流通，将来IRISnet可以在一个交易中包含多种代币交换。
@@ -29,7 +29,7 @@
     为了提高账户安全性，IRISnet支持交易离线签名保护账户的私钥。在任意交易中，使用参数--generate-only可以构建一个未签名的交易。使用转账交易作为示例：
 
     ```bash
-    iris tx bank send [from_key_or_address] [to_address] [amount] --amount=10iris --fees=0.3iris --from=<key-name-of-wallet-A> --generate-only
+    iris tx bank send [from_key_or_address] [to_address] [amount] --fees=0.3iris --generate-only
     ```
 
     以上命令将构建一未签名交易：

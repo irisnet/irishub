@@ -59,4 +59,4 @@
 - [创建 HTLC](../cli-client/htlc.md#iris-tx-htlc-create)
 - [认领 HTLC](../cli-client/htlc.md#iris-tx-htlc-claim)
 - [退款 HTLC](../cli-client/htlc.md#iris-tx-htlc-refund)
-- [查询 HTLC](../cli-client/htlc.md#iris-q-htlc-htlc)
+- [查询 HTLC](../cli-client/htlc.md#iris-query-htlc-htlc)

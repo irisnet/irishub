@@ -52,11 +52,5 @@ iris tx bank send [from_key_or_address] [to_address] [amount] [flags]
 
 | Name, shorthand | Type   | Required | Default | Description                                   |
 | --------------- | ------ | -------- | ------- | --------------------------------------------- |
-| --amount        | string | true     |         | Amount of coins to send, for instance: 10iris |
-| --to            | string |          |         | Bech32 encoding address to receive coins      |
+| -h, --help |        |          |      | Help for balances        |
 
-### Send tokens to another address
-
-```bash
-iris tx bank send [from_key_or_address] [to_address] [amount] [flags]
-```

@@ -54,7 +54,7 @@ Any user can define services on the blockchain. The interface of a service must 
 ### Commands
 ```bash
 # create a new service definition
-iris tx service define <service-name> <schemas-json or path/to/schemas.json> --description=<service-description> --author-description=<author-description> --tags=<tag1,tag2,...>
+iris tx service define --name=<service-name> <schemas-json or path/to/schemas.json> --description=<service-description> --author-description=<author-description> --tags=<tag1,tag2,...>
 
 # query service definition
 iris q service definition <service-name>
@@ -74,7 +74,7 @@ The pricing object specifies how the provider charges for its service; it must c
 
 ```json
 {
-  "price": "0.5iris",
+  "price": "0.5uiris",
   "promotions_by_time": [
     {
       "start_time": "2020-01-01T00:00:00Z",
@@ -105,13 +105,13 @@ Service bindings can be updated at any time by their owners to adjust pricing, i
 
 ```bash
 # create a new service binding
-iris tx service bind <service-name> <provider-address> <deposit> <qos> <pricing-json or path/to/pricing.json>
+iris tx service bind <service-name> <provider-address> --deposit=<deposit> --qos=<qos> --pricing=<pricing-json or path/to/pricing.json>
 
 # update a service binding
 iris tx service update-binding <service-name> <provider-address> --deposit=<added-deposit> --qos=<qos> --pricing=<pricing-json or path/to/pricing.json>
 
 # enable an inactive service binding
-iris tx service enable <service-name> <provider-address> <added-deposit>
+iris tx service enable <service-name> <provider-address> --deposit=<added-deposit>
 
 # disable an active service binding
 iris tx service disable <service-name> <provider-address>
@@ -129,7 +129,7 @@ iris q service bindings service bindings <service-name> --owner <address>
 iris q service binding <service-name> <provider-address>
 
 # query the pricing schema
-iris q service service schema pricing
+iris q service schema pricing
 ```
 
 ## Service Invocation
