@@ -11,7 +11,7 @@ require (
 	github.com/irismod/coinswap v0.0.0-20200914014751-f00db373b5b3
 	github.com/irismod/htlc v0.0.0-20200914014716-71f9674bc9fc
 	github.com/irismod/nft v1.1.1-0.20200914065515-02c48bcd1f19
-	github.com/irismod/record v1.1.1-0.20200827095301-3e27fc43ae73
+	github.com/irismod/record v1.1.1-0.20200914093830-172e439307a6
 	github.com/irismod/service v1.1.1-0.20200907104108-32cc849fcbd3
 	github.com/irismod/token v1.1.1-0.20200908025947-f96e0322c283
 	github.com/olebedev/config v0.0.0-20190528211619-364964f3a8e4

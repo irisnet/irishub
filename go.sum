@@ -292,8 +292,8 @@ github.com/irismod/htlc v0.0.0-20200914014716-71f9674bc9fc h1:2PBYc+qwE2eaI7J+1V
 github.com/irismod/htlc v0.0.0-20200914014716-71f9674bc9fc/go.mod h1:bP5l2IbAVZAZXPrQmXrghEgWpyakNJfeoxmPq0d1SI8=
 github.com/irismod/nft v1.1.1-0.20200914065515-02c48bcd1f19 h1:gCNi0QvkjYjHXZTDlRAoGd1bZWoeoqfQZiqEkPra+NY=
 github.com/irismod/nft v1.1.1-0.20200914065515-02c48bcd1f19/go.mod h1:Z7ldmmxR7snUP9QLH3G46gR2yA4nU9WE3hjEcTBNfeY=
-github.com/irismod/record v1.1.1-0.20200827095301-3e27fc43ae73 h1:DjsV6syYu1na1O0w3hlfAROOUPOCJCIPegJTMQt3X0U=
-github.com/irismod/record v1.1.1-0.20200827095301-3e27fc43ae73/go.mod h1:slwVI+gGuBJo1OJPv0vw/GFeRPs9KB8K+0aecfmGSps=
+github.com/irismod/record v1.1.1-0.20200914093830-172e439307a6 h1:8MfDYyBDRyJvR9n+fTlz1jCyIY8eB2Ifb0W78tOrSK8=
+github.com/irismod/record v1.1.1-0.20200914093830-172e439307a6/go.mod h1:OWImrk2vz069W+cUqZEfkJKzKgmqUF4++oiUCupHuXA=
 github.com/irismod/service v1.1.1-0.20200907104108-32cc849fcbd3 h1:S9dYaG6baI79kTzR17LJFP9Qoo5G70tOvd1wEt0wRRo=
 github.com/irismod/service v1.1.1-0.20200907104108-32cc849fcbd3/go.mod h1:TDqGPcCn8q1VITLLMjsa8X2JtuH66oXz6SkfIkeDpV4=
 github.com/irismod/token v1.1.1-0.20200908025947-f96e0322c283 h1:9PoMS12ccwiCSwjn1NmeMNyV9Kplpit1Rj098BVUk2Y=
