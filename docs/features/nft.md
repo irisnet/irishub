@@ -43,7 +43,7 @@ After the nft is issued, additional issuance (create) of specific nft of this ty
 `CLI`
 
 ```bash
-iris tx nft mint <denom> ---recipient=<recipient-address> --token-id=<token-id> --token-uri=<token-uri> --token-data=<token-data>
+iris tx nft mint <denom> <token-id> --recipient=<recipient-address> --uri=<token-uri> --data=<token-data>
 ```
 
 ### Edit
@@ -53,7 +53,7 @@ The metadata of the specified nft can be updated.
 `CLI`
 
 ```bash
-iris tx nft edit <denom> <token-id> --token-uri=<token-uri> --token-data=<token-data>
+iris tx nft edit <denom> <token-id> --uri=<token-uri> --data=<token-data>
 ```
 
 ### Transfer
@@ -63,7 +63,7 @@ Transfer designated nft.
 `CLI`
 
 ```bash
-iris tx nft transfer <denom> <token-id> --recipient=<recipient-address>
+iris tx nft transfer <recipient-address> <denom> <token-id>
 ```
 
 ### Destroy
@@ -83,7 +83,7 @@ Query nft denom information based on Denom.
 `CLI`
 
 ```bash
-iris q query nft denom <denom>
+iris q nft denom <denom>
 ```
 
 ### Query all nft denom information
@@ -113,7 +113,7 @@ Query all nft owned by an account; you can specify the Denom parameter.
 `CLI`
 
 ```bash
-iris q nft owner --denom=<denom>
+iris q nft owner <address> --denom=<denom>
 ```
 
 ### Query all nft of a specified denom

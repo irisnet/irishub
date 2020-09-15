@@ -43,7 +43,7 @@ iris tx nft issue <denom> --schema=<schema-content or path/to/schema.json>
 `CLI`
 
 ```bash
-iris tx nft mint <denom> ---recipient=<recipient-address> --token-id=<token-id> --token-uri=<token-uri> --token-data=<token-data>
+iris tx nft mint <denom> <token-id> --recipient=<recipient-address> --uri=<token-uri> --data=<token-data>
 ```
 
 ### 编辑
@@ -53,7 +53,7 @@ iris tx nft mint <denom> ---recipient=<recipient-address> --token-id=<token-id> 
 `CLI`
 
 ```bash
-iris tx nft edit <denom> <token-id> --token-uri=<token-uri> --token-data=<token-data>
+iris tx nft edit <denom> <token-id> --uri=<token-uri> --data=<token-data>
 ```
 
 ### 转移
@@ -63,7 +63,7 @@ iris tx nft edit <denom> <token-id> --token-uri=<token-uri> --token-data=<token-
 `CLI`
 
 ```bash
-iris tx nft transfer <denom> <token-id> --recipient=<recipient-address>
+iris tx nft transfer <recipient-address> <denom> <token-id>
 ```
 
 ### 销毁
@@ -83,7 +83,7 @@ iris tx nft burn <denom> <token-id>
 `CLI`
 
 ```bash
-iris q query nft denom <denom>
+iris q nft denom <denom>
 ```
 
 ### 查询所有资产类别信息
@@ -113,7 +113,7 @@ iris q nft supply <denom> --owner=<owner>
 `CLI`
 
 ```bash
-iris q nft owner --denom=<denom>
+iris q nft owner <address> --denom=<denom>
 ```
 
 ### 查询指定类别的所有资产
