@@ -3,6 +3,7 @@ package irishub.guardian;
 
 import "gogoproto/gogo.proto";
 import "guardian/guardian.proto";
+import "google/api/annotations.proto";
 import "cosmos_proto/cosmos.proto";
 
 option go_package = "github.com/irisnet/irishub/modules/guardian/types";
@@ -11,10 +12,12 @@ option go_package = "github.com/irisnet/irishub/modules/guardian/types";
 service Query {
     // Profilers returns all profilers
     rpc Profilers (QueryProfilersRequest) returns (QueryProfilersResponse) {
+        option (google.api.http).get = "/irishub/guardian/profilers";
     }
 
     // Trustees returns all trustees
     rpc Trustees (QueryTrusteesRequest) returns (QueryTrusteesResponse) {
+        option (google.api.http).get = "/irishub/guardian/trustees";
     }
 }
 

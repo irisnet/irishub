@@ -40,7 +40,7 @@ func queryRandomHandlerFn(cliCtx client.Context) http.HandlerFunc {
 			ReqID: reqID,
 		}
 
-		bz, err := cliCtx.JSONMarshaler.MarshalJSON(params)
+		bz, err := cliCtx.LegacyAmino.MarshalJSON(params)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -90,7 +90,7 @@ func queryQueueHandlerFn(cliCtx client.Context) http.HandlerFunc {
 			Height: genHeight,
 		}
 
-		bz, err := cliCtx.JSONMarshaler.MarshalJSON(params)
+		bz, err := cliCtx.LegacyAmino.MarshalJSON(params)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return

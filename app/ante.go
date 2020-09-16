@@ -14,8 +14,8 @@ import (
 // numbers, checks signatures & account numbers, and deducts fees from the first
 // signer.
 func NewAnteHandler(
-	ak authkeeper.AccountKeeper, bankKeeper bankkeeper.Keeper, tk tokenkeeper.Keeper,
-	sigGasConsumer ante.SignatureVerificationGasConsumer,
+	ak authkeeper.AccountKeeper, bankKeeper bankkeeper.Keeper,
+	tk tokenkeeper.Keeper, sigGasConsumer ante.SignatureVerificationGasConsumer,
 	signModeHandler signing.SignModeHandler,
 ) sdk.AnteHandler {
 	return sdk.ChainAnteDecorators(

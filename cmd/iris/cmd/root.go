@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"context"
-	"encoding/json"
 	"io"
 	"os"
 
@@ -25,10 +24,8 @@ import (
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
 	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
-	abci "github.com/tendermint/tendermint/abci/types"
 	tmcli "github.com/tendermint/tendermint/libs/cli"
 	"github.com/tendermint/tendermint/libs/log"
-	tmtypes "github.com/tendermint/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
 
 	"github.com/irisnet/irishub/address"
@@ -107,7 +104,7 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 		debug.Cmd(),
 	)
 
-	server.AddCommands(rootCmd, app.DefaultNodeHome, newApp, exportAppStateAndTMValidators)
+	server.AddCommands(rootCmd, app.DefaultNodeHome, newApp, createIrisappAndExport)
 
 	// add keybase, auxiliary RPC, query, and tx child commands
 	rootCmd.AddCommand(
@@ -201,14 +198,11 @@ func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, appOpts serverty
 	)
 }
 
-func exportAppStateAndTMValidators(
-	logger log.Logger, db dbm.DB, traceStore io.Writer,
-	height int64, forZeroHeight bool, jailWhiteList []string,
-) (
-	json.RawMessage, []tmtypes.GenesisValidator,
-	*abci.ConsensusParams, error,
-) {
-
+// createIrisappAndExport creates a new irisapp (optionally at a given height)
+// and exports state.
+func createIrisappAndExport(
+	logger log.Logger, db dbm.DB, traceStore io.Writer, height int64, forZeroHeight bool, jailAllowedAddrs []string,
+) (servertypes.ExportedApp, error) {
 	encCfg := app.MakeEncodingConfig() // Ideally, we would reuse the one created by NewRootCmd.
 	encCfg.Marshaler = codec.NewProtoCodec(encCfg.InterfaceRegistry)
 	var irisApp *app.IrisApp
@@ -216,11 +210,11 @@ func exportAppStateAndTMValidators(
 		irisApp = app.NewIrisApp(logger, db, traceStore, false, map[int64]bool{}, "", uint(1), encCfg)
 
 		if err := irisApp.LoadHeight(height); err != nil {
-			return nil, nil, nil, err
+			return servertypes.ExportedApp{}, err
 		}
 	} else {
 		irisApp = app.NewIrisApp(logger, db, traceStore, true, map[int64]bool{}, "", uint(1), encCfg)
 	}
 
-	return irisApp.ExportAppStateAndValidators(forZeroHeight, jailWhiteList)
+	return irisApp.ExportAppStateAndValidators(forZeroHeight, jailAllowedAddrs)
 }

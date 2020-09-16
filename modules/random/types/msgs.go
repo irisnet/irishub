@@ -44,7 +44,7 @@ func (msg MsgRequestRandom) ValidateBasic() error {
 
 // GetSignBytes implements Msg.
 func (msg MsgRequestRandom) GetSignBytes() []byte {
-	b, err := ModuleCdc.MarshalJSON(msg)
+	b, err := ModuleCdc.MarshalJSON(&msg)
 	if err != nil {
 		panic(err)
 	}
