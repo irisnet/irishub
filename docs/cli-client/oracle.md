@@ -43,7 +43,7 @@ iris tx oracle create [flags]
 ### Create a new feed
 
 ```bash
-iris tx oracle create --chain-id=irishub --from=node0 --fees=0.3iris --feed-name="test-feed" --latest-history=10 --service-name="test-service" --input=<request-data> --providers=<provide1_address>,<provider2_address> --service-fee-cap=1iris --timeout=2 --frequency=10 --total=10 --threshold=1 --aggregate-func="avg" --value-json-path="high" --commit
+iris tx oracle create --chain-id=irishub --from=node0 --fees=0.3iris --feed-name="test-feed" --latest-history=10 --service-name="test-service" --input=<request-data> --providers=<provide1_address>,<provider2_address> --service-fee-cap=1iris --timeout=2 --frequency=10 --total=10 --threshold=1 --aggregate-func="avg" --value-json-path="high"  -b block -y
 ```
 
 ## iris tx oracle start
@@ -57,7 +57,7 @@ iris tx oracle start [feed-name] [flags]
 ### Start a "paused" feed
 
 ```bash
-iris tx oracle start test-feed --chain-id=irishub --from=node0 --fees=0.3iris --commit
+iris tx oracle start test-feed --chain-id=irishub --from=node0 --fees=0.3iris  -b block -y
 ```
 
 ## iris tx oracle pause
@@ -71,7 +71,7 @@ iris tx oracle pause [feed-name] [flags]
 ### Pause a "running" feed
 
 ```bash
-iris tx oracle pause test-feed --chain-id=irishub --from=node0 --fees=0.3iris --commit
+iris tx oracle pause test-feed --chain-id=irishub --from=node0 --fees=0.3iris  -b block -y
 ```
 
 ## iris tx oracle edit
@@ -84,9 +84,8 @@ iris tx oracle edit [feed-name] [flags]
 
 **Flags:**
 
-| Name, shorthand   | Type     | Required | Default | Description                                                                                   |
-| ----------------- | -------- | -------- | ------- | --------------------------------------------------------------------------------------------- |
-| --feed-name       | string   | Yes      |         | The unique identifier of the feed.                                                            |
+| Name, shorthand   | Type     | Required | Default | Description          |
+| ----------------- | -------- | -------- | ------- | -------------------- |
 | --description     | string   |          |         | The description of the feed.                                                                  |
 | --latest-history  | uint64   | Yes      |         | The maximum Number of the latest history values to be saved for the Feed, range [1, 100].                |
 | --providers       | []string | Yes      |         | The list of service provider addresses.                                                       |
@@ -98,7 +97,7 @@ iris tx oracle edit [feed-name] [flags]
 ### Edit an existed feed
 
 ```bash
-iris tx oracle edit test-feed --chain-id=irishub --from=node0 --fees=0.3iris --latest-history=5 --commit
+iris tx oracle edit test-feed --chain-id=irishub --from=node0 --fees=0.3iris --latest-history=5  -b block -y
 ```
 
 ## iris query oracle feed
@@ -143,8 +142,3 @@ This command is used to query the result of a specified feed
 iris query oracle value test-feed
 ```
 
-### Query the result of an existed feed
-
-```bash
-iris query oracle value test-feed
-```

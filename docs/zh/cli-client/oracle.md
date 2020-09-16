@@ -42,7 +42,7 @@ iris tx oracle create [flags]
 ### 创建一个新的feed
 
 ```bash
-iris tx oracle create --chain-id=irishub --from=node0 --fees=0.3iris --feed-name="test-feed" --latest-history=10 --service-name="test-service" --input=<request-data> --providers=<provide1_address>,<provider2_address> --service-fee-cap=1iris --timeout=2 --frequency=10 --total=10 --threshold=1 --aggregate-func="avg" --value-json-path="high" --commit
+iris tx oracle create --chain-id=irishub --from=node0 --fees=0.3iris --feed-name="test-feed" --latest-history=10 --service-name="test-service" --input=<request-data> --providers=<provide1_address>,<provider2_address> --service-fee-cap=1iris --timeout=2 --frequency=10 --total=10 --threshold=1 --aggregate-func="avg" --value-json-path="high" -b block -y
 ```
 
 ## iris tx oracle start
@@ -56,7 +56,7 @@ iris tx oracle start <feed-name>
 ### 启动一个处于`暂停`状态的feed
 
 ```bash
-iris tx oracle start test-feed --chain-id=irishub --from=node0 --fees=0.3iris --commit
+iris tx oracle start test-feed --chain-id=irishub --from=node0 --fees=0.3iris -b block -y
 ```
 
 ## iris tx oracle pause
@@ -70,7 +70,7 @@ iris tx oracle pause [feed-name] [flags]
 ### 暂停一个处于`运行`状态的feed
 
 ```bash
-iris tx oracle pause test-feed --chain-id=irishub --from=node0 --fees=0.3iris --commit
+iris tx oracle pause test-feed --chain-id=irishub --from=node0 --fees=0.3iris -b block -y
 ```
 
 ## iris tx oracle edit
@@ -85,7 +85,6 @@ iris tx oracle edit [feed-name] [flags]
 
 | 名称, 速记        | 类型     | 必须 | 默认 | 描述                                                                |
 | ----------------- | -------- | ---- | ---- | ------------------------------------------------------------------- |
-| --feed-name       | string   | 是   |      | feed的名称，唯一标识                                                |
 | --description     | string   |      |      | feed的描述                                                          |
 | --latest-history  | uint64   | 是   |      | feed执行结果保留的最大数目(按照时间降序保留)，范围取值为： [1, 100] |
 | --providers       | []string | 是   |      | 服务提供者的地址列表                                                |
@@ -97,7 +96,7 @@ iris tx oracle edit [feed-name] [flags]
 ### 编辑feed
 
 ```bash
-iris tx oracle edit test-feed --chain-id=irishub --from=node0 --fees=0.3iris --latest-history=5 --commit
+iris tx oracle edit test-feed --chain-id=irishub --from=node0 --fees=0.3iris --latest-history=5  -b block -y
 ```
 
 ## iris query oracle feed
@@ -142,8 +141,3 @@ iris query oracle feeds --state=running
 iris query oracle value test-feed
 ```
 
-### 查询现存的feed的执行结果
-
-```bash
-iris query oracle value test-feed
-```

@@ -32,10 +32,10 @@ Post a random number request to the IRIS Hub, the random number will be generate
 
 ```bash
 # without oracle
-iris tx random request-random --block-interval=100 --from=<key-name> --chain-id=irishub --fees=0.3iris --commit
+iris tx random request-random --block-interval=100 --from=<key-name> --chain-id=irishub --fees=0.3iris -b block -y
 
 # with oracle
-iris tx random request-random --block-interval=100 --oracle=true --service-fee-cap=1iris --from=<key-name> --chain-id=irishub --fees=0.3iris --commit
+iris tx random request-random --block-interval=100 --oracle=true --service-fee-cap=1iris --from=<key-name> --chain-id=irishub --fees=0.3iris -b block -y
 ```
 
 :::tip
@@ -48,14 +48,6 @@ Query the generated random number by the request id.
 
 ```bash
 iris query random random <request-id> [flags]
-```
-
-### Query a random number
-
-Query the random number after it is generated.
-
-```bash
-iris query random random <request-id>
 ```
 
 ## iris query random queue

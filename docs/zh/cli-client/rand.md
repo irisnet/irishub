@@ -32,10 +32,10 @@ iris tx random request-random [flags]
 
 ```bash
 # without oracle
-iris tx random request-random --block-interval=100 --from=<key-name> --chain-id=irishub --fees=0.3iris --commit
+iris tx random request-random --block-interval=100 --from=<key-name> --chain-id=irishub --fees=0.3iris -b block -y
 
 # with oracle
-iris tx random request-random --block-interval=100 --oracle=true --service-fee-cap=1iris --from=<key-name> --chain-id=irishub --fees=0.3iris --commit
+iris tx random request-random --block-interval=100 --oracle=true --service-fee-cap=1iris --from=<key-name> --chain-id=irishub --fees=0.3iris -b block -y
 ```
 
 :::tip
@@ -48,14 +48,6 @@ iris tx random request-random --block-interval=100 --oracle=true --service-fee-c
 
 ```bash
 iris query random random <request-id> [flags]
-```
-
-### 查询随机数
-
-查询已生成的随机数。
-
-```bash
-iris query random random <request-id>
 ```
 
 ## iris query random queue
