@@ -535,8 +535,8 @@ func NewIrisApp(
 }
 
 // MakeCodecs constructs the *std.Codec and *codec.LegacyAmino instances used by
-// simapp. It is useful for tests and clients who do not want to construct the
-// full simapp
+// irisapp. It is useful for tests and clients who do not want to construct the
+// full irisapp
 func MakeCodecs() (codec.Marshaler, *codec.LegacyAmino) {
 	config := MakeEncodingConfig()
 	return config.Marshaler, config.Amino
