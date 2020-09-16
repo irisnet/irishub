@@ -97,7 +97,7 @@ func (msg MsgCreateFeed) GetSignBytes() []byte {
 	if msg.ServiceFeeCap.Empty() {
 		msg.ServiceFeeCap = nil
 	}
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 
 // GetSigners implements Msg.
@@ -127,7 +127,7 @@ func (msg MsgStartFeed) ValidateBasic() error {
 
 // GetSignBytes implements Msg.
 func (msg MsgStartFeed) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 
 // GetSigners implements Msg.
@@ -157,7 +157,7 @@ func (msg MsgPauseFeed) ValidateBasic() error {
 
 // GetSignBytes implements Msg.
 func (msg MsgPauseFeed) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 
 // GetSigners implements Msg.
@@ -218,7 +218,7 @@ func (msg MsgEditFeed) GetSignBytes() []byte {
 	if msg.ServiceFeeCap.Empty() {
 		msg.ServiceFeeCap = nil
 	}
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 
 // GetSigners implements Msg.

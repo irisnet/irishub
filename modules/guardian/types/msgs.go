@@ -38,7 +38,7 @@ func (msg MsgAddProfiler) Type() string { return TypeMsgAddProfiler }
 
 // GetSignBytes implements Msg.
 func (msg MsgAddProfiler) GetSignBytes() []byte {
-	b, err := ModuleCdc.MarshalJSON(msg)
+	b, err := ModuleCdc.MarshalJSON(&msg)
 	if err != nil {
 		panic(err)
 	}
@@ -75,7 +75,7 @@ func (msg MsgDeleteProfiler) Type() string { return TypeMsgDeleteProfiler }
 
 // GetSignBytes implements Msg.
 func (msg MsgDeleteProfiler) GetSignBytes() []byte {
-	b, err := ModuleCdc.MarshalJSON(msg)
+	b, err := ModuleCdc.MarshalJSON(&msg)
 	if err != nil {
 		panic(err)
 	}
@@ -113,7 +113,7 @@ func (msg MsgAddTrustee) Type() string { return TypeMsgAddTrustee }
 
 // GetSignBytes implements Msg.
 func (msg MsgAddTrustee) GetSignBytes() []byte {
-	b, err := ModuleCdc.MarshalJSON(msg)
+	b, err := ModuleCdc.MarshalJSON(&msg)
 	if err != nil {
 		panic(err)
 	}
@@ -150,7 +150,7 @@ func (msg MsgDeleteTrustee) Type() string { return TypeMsgDeleteTrustee }
 
 // GetSignBytes implements Msg.
 func (msg MsgDeleteTrustee) GetSignBytes() []byte {
-	b, err := ModuleCdc.MarshalJSON(msg)
+	b, err := ModuleCdc.MarshalJSON(&msg)
 	if err != nil {
 		panic(err)
 	}

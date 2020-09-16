@@ -18,8 +18,8 @@ import (
 	"github.com/irisnet/irishub/modules/oracle/types"
 )
 
-// GetTxCmd returns the transaction commands for the guardian module.
-func GetTxCmd() *cobra.Command {
+// NewTxCmd returns the transaction commands for the oracle module.
+func NewTxCmd() *cobra.Command {
 	txCmd := &cobra.Command{
 		Use:                        types.ModuleName,
 		Short:                      "oracle transaction subcommands",

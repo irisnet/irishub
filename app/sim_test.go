@@ -70,8 +70,8 @@ func TestFullAppSimulation(t *testing.T) {
 		require.NoError(t, os.RemoveAll(dir))
 	}()
 
-	app := NewIrisApp(logger, db, nil, true, map[int64]bool{}, DefaultNodeHome, simapp.FlagPeriodValue, MakeEncodingConfig(), interBlockCacheOpt())
-	require.Equal(t, "SimApp", app.Name())
+	app := NewIrisApp(logger, db, nil, true, map[int64]bool{}, DefaultNodeHome, simapp.FlagPeriodValue, MakeEncodingConfig(), fauxMerkleModeOpt)
+	require.Equal(t, "IrisApp", app.Name())
 
 	// run randomized simulation
 	_, simParams, simErr := simulation.SimulateFromSeed(
@@ -107,8 +107,8 @@ func TestAppImportExport(t *testing.T) {
 		require.NoError(t, os.RemoveAll(dir))
 	}()
 
-	app := NewIrisApp(logger, db, nil, true, map[int64]bool{}, DefaultNodeHome, simapp.FlagPeriodValue, MakeEncodingConfig(), interBlockCacheOpt())
-	require.Equal(t, "SimApp", app.Name())
+	app := NewIrisApp(logger, db, nil, true, map[int64]bool{}, DefaultNodeHome, simapp.FlagPeriodValue, MakeEncodingConfig(), fauxMerkleModeOpt)
+	require.Equal(t, "IrisApp", app.Name())
 
 	// Run randomized simulation
 	_, simParams, simErr := simulation.SimulateFromSeed(
@@ -133,7 +133,7 @@ func TestAppImportExport(t *testing.T) {
 
 	fmt.Printf("exporting genesis...\n")
 
-	appState, _, consensusParams, err := app.ExportAppStateAndValidators(false, []string{})
+	exported, err := app.ExportAppStateAndValidators(false, []string{})
 	require.NoError(t, err)
 
 	fmt.Printf("importing genesis...\n")
@@ -146,30 +146,27 @@ func TestAppImportExport(t *testing.T) {
 		require.NoError(t, os.RemoveAll(newDir))
 	}()
 
-	newApp := NewIrisApp(logger, db, nil, true, map[int64]bool{}, DefaultNodeHome, simapp.FlagPeriodValue, MakeEncodingConfig(), interBlockCacheOpt())
-	require.Equal(t, "SimApp", newApp.Name())
+	newApp := NewIrisApp(log.NewNopLogger(), newDB, nil, true, map[int64]bool{}, DefaultNodeHome, simapp.FlagPeriodValue, MakeEncodingConfig(), fauxMerkleModeOpt)
+	require.Equal(t, "IrisApp", newApp.Name())
 
 	var genesisState GenesisState
-	err = json.Unmarshal(appState, &genesisState)
+	err = json.Unmarshal(exported.AppState, &genesisState)
 	require.NoError(t, err)
 
 	ctxA := app.NewContext(true, tmproto.Header{Height: app.LastBlockHeight()})
 	ctxB := newApp.NewContext(true, tmproto.Header{Height: app.LastBlockHeight()})
 	newApp.mm.InitGenesis(ctxB, app.AppCodec(), genesisState)
-	newApp.StoreConsensusParams(ctxB, consensusParams)
+	newApp.StoreConsensusParams(ctxB, exported.ConsensusParams)
 
 	fmt.Printf("comparing stores...\n")
 
 	storeKeysPrefixes := []StoreKeysPrefixes{
 		{app.keys[authtypes.StoreKey], newApp.keys[authtypes.StoreKey], [][]byte{}},
-		{
-			app.keys[stakingtypes.StoreKey],
-			newApp.keys[stakingtypes.StoreKey],
+		{app.keys[stakingtypes.StoreKey], newApp.keys[stakingtypes.StoreKey],
 			[][]byte{
 				stakingtypes.UnbondingQueueKey, stakingtypes.RedelegationQueueKey, stakingtypes.ValidatorQueueKey,
 				stakingtypes.HistoricalInfoKey,
-			},
-		}, // ordering may change but it doesn't matter
+			}}, // ordering may change but it doesn't matter
 		{app.keys[slashingtypes.StoreKey], newApp.keys[slashingtypes.StoreKey], [][]byte{}},
 		{app.keys[minttypes.StoreKey], newApp.keys[minttypes.StoreKey], [][]byte{}},
 		{app.keys[distrtypes.StoreKey], newApp.keys[distrtypes.StoreKey], [][]byte{}},
@@ -206,8 +203,8 @@ func TestAppSimulationAfterImport(t *testing.T) {
 		require.NoError(t, os.RemoveAll(dir))
 	}()
 
-	app := NewIrisApp(logger, db, nil, true, map[int64]bool{}, DefaultNodeHome, simapp.FlagPeriodValue, MakeEncodingConfig(), interBlockCacheOpt())
-	require.Equal(t, "SimApp", app.Name())
+	app := NewIrisApp(logger, db, nil, true, map[int64]bool{}, DefaultNodeHome, simapp.FlagPeriodValue, MakeEncodingConfig(), fauxMerkleModeOpt)
+	require.Equal(t, "IrisApp", app.Name())
 
 	// Run randomized simulation
 	stopEarly, simParams, simErr := simulation.SimulateFromSeed(
@@ -237,7 +234,7 @@ func TestAppSimulationAfterImport(t *testing.T) {
 
 	fmt.Printf("exporting genesis...\n")
 
-	appState, _, _, err := app.ExportAppStateAndValidators(true, []string{})
+	exported, err := app.ExportAppStateAndValidators(true, []string{})
 	require.NoError(t, err)
 
 	fmt.Printf("importing genesis...\n")
@@ -250,11 +247,11 @@ func TestAppSimulationAfterImport(t *testing.T) {
 		require.NoError(t, os.RemoveAll(newDir))
 	}()
 
-	newApp := NewIrisApp(logger, db, nil, true, map[int64]bool{}, DefaultNodeHome, simapp.FlagPeriodValue, MakeEncodingConfig(), interBlockCacheOpt())
-	require.Equal(t, "SimApp", newApp.Name())
+	newApp := NewIrisApp(log.NewNopLogger(), newDB, nil, true, map[int64]bool{}, DefaultNodeHome, simapp.FlagPeriodValue, MakeEncodingConfig(), fauxMerkleModeOpt)
+	require.Equal(t, "IrisApp", newApp.Name())
 
 	newApp.InitChain(abci.RequestInitChain{
-		AppStateBytes: appState,
+		AppStateBytes: exported.AppState,
 	})
 
 	_, _, err = simulation.SimulateFromSeed(

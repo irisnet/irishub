@@ -21,7 +21,7 @@ func registerTxRoutes(cliCtx client.Context, r *mux.Router) {
 func requestRandomHandlerFn(cliCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req RequestRandomReq
-		if !rest.ReadRESTReq(w, r, cliCtx.JSONMarshaler, &req) {
+		if !rest.ReadRESTReq(w, r, cliCtx.LegacyAmino, &req) {
 			return
 		}
 

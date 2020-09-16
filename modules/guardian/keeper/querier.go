@@ -11,7 +11,7 @@ import (
 )
 
 // NewQuerier creates a querier for guardian REST endpoints
-func NewQuerier(k Keeper, legacyQuerierCdc codec.JSONMarshaler) sdk.Querier {
+func NewQuerier(k Keeper, legacyQuerierCdc *codec.LegacyAmino) sdk.Querier {
 	return func(ctx sdk.Context, path []string, _ abci.RequestQuery) ([]byte, error) {
 		switch path[0] {
 		case types.QueryProfilers:
@@ -24,7 +24,7 @@ func NewQuerier(k Keeper, legacyQuerierCdc codec.JSONMarshaler) sdk.Querier {
 	}
 }
 
-func queryProfilers(ctx sdk.Context, k Keeper, legacyQuerierCdc codec.JSONMarshaler) ([]byte, error) {
+func queryProfilers(ctx sdk.Context, k Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
 	var profilers []types.Guardian
 	k.IterateProfilers(
 		ctx,
@@ -41,7 +41,7 @@ func queryProfilers(ctx sdk.Context, k Keeper, legacyQuerierCdc codec.JSONMarsha
 	return bz, nil
 }
 
-func queryTrustees(ctx sdk.Context, k Keeper, legacyQuerierCdc codec.JSONMarshaler) ([]byte, error) {
+func queryTrustees(ctx sdk.Context, k Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
 	var trustees []types.Guardian
 	k.IterateTrustees(
 		ctx,

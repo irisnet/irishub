@@ -15,8 +15,8 @@ import (
 	"github.com/irisnet/irishub/modules/random/types"
 )
 
-// GetTxCmd returns the transaction commands for the random module.
-func GetTxCmd() *cobra.Command {
+// NewTxCmd returns the transaction commands for the random module.
+func NewTxCmd() *cobra.Command {
 	randTxCmd := &cobra.Command{
 		Use:                        types.ModuleName,
 		Short:                      "Random transaction subcommands",

@@ -14,7 +14,7 @@ import (
 	"github.com/irisnet/irishub/modules/oracle/types"
 )
 
-// GetQueryCmd returns the cli query commands for the guardian module.
+// GetQueryCmd returns the cli query commands for the oracle module.
 func GetQueryCmd() *cobra.Command {
 	txCmd := &cobra.Command{
 		Use:                        types.ModuleName,
