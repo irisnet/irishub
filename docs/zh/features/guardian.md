@@ -62,13 +62,7 @@ IRISnet引入了两种由基金会控制且具有一定特殊权益的系统用�
 
     详细参考[governance](governance.md#社区基金使用提议)
 
-6. Trustee从`iService`服务费税池中提取代币到指定账户
-
-    ```bash
-    iris tx service withdraw-tax --dest-address=<destination-address> --withdraw-amount=1iris --chain-id=irishub --from=<key-name> --fees=0.3iris
-    ```
-
-7. 删除profiler和trustee
+6. 删除profiler和trustee
 
     删除profiler：（仅限Genesis Profiler）
 

@@ -11,7 +11,7 @@ distribution模块用于管理自己的 [Staking 收益](../concepts/general-con
 | [params](#iris-query-distribution-params)                                                 | 查询分配参数                                                                                   |
 | [rewards](#iris-query-distribution-rewards)                                               | 查询所有分销委托人收益或来自指定验证人的收益 |
 | [slashes](#iris-query-distribution-slashes)                                               | 查询验证人指定块范围内的分割                                                                                   |
-| [validator-outstanding-rewards](#iris-tx-distribution-validator-outstanding-rewards)      | 查询验证人的未付奖励分配及其所有授权                                                                                   |
+| [validator-outstanding-rewards](#iris-query-distribution-validator-outstanding-rewards)      | 查询验证人的未付奖励分配及其所有授权                                                                                   |
 | [fund-community-pool](#iris-tx-distribution-fund-community-pool)                          | 为社区基金池提供指定数额的资金                                                                                  |
 | [set-withdraw-addr](#iris-tx-distribution-set-withdraw-addr)                              | 设置提现地址                                                                                   |
 | [withdraw-all-rewards](#iris-tx-distribution-withdraw-all-rewards)                        | 取回委托人所有收益                                                                                   |
@@ -69,7 +69,7 @@ iris query distribution validator-outstanding-rewards [validator] [flags]
 为社区基金池提供指定数额的资金。
 
 ```bash
-iris tx distribution fund-community-pool [amount] [flags] [validator-addr] [flags]
+iris tx distribution fund-community-pool [amount] [flags]
 ```
 ## iris tx distribution set-withdraw-addr
 

@@ -62,13 +62,7 @@ IRISnet introduce two types of privileged system user controlled by foundations,
 
     Details in [governance](governance.md#proposals-on-community-funds-usage)
 
-6. Trustee withdraw service fee tax
-
-    ```bash
-    iris tx service withdraw-tax --dest-address=<destination-address> --withdraw-amount=1iris --chain-id=irishub --from=<key-name> --fees=0.3iris
-    ```
-
-7. Delete Profiler and Trustee (Genesis Trustee account only)
+6. Delete Profiler and Trustee (Genesis Trustee account only)
 
     Delete Profiler (Genesis Trustee account only)
 
