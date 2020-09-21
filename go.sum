@@ -308,8 +308,8 @@ github.com/irismod/nft v1.1.1-0.20200915095131-b66f07afde69 h1:+4VDIPUosF+SMJABQ
 github.com/irismod/nft v1.1.1-0.20200915095131-b66f07afde69/go.mod h1:cmgKg2YtDsPB0KKt5idi59rFdcITPBYr+0NE5uGbrKo=
 github.com/irismod/record v1.1.1-0.20200915095052-b09bac8a9f01 h1:mlLNQNgqYtbNFiDDR6omEF6ryO2nx+bSPVLeeEQzHKI=
 github.com/irismod/record v1.1.1-0.20200915095052-b09bac8a9f01/go.mod h1:USzloJa0M80DmsSPL1T7DDAUUUgRDGRgNXPbtaxJ1aY=
-github.com/irismod/service v1.1.1-0.20200915095033-776ef78666f4 h1:7PRoFVKshtWuwr59nPZk42WaRj9RTuF6VcWhfuv5uAc=
-github.com/irismod/service v1.1.1-0.20200915095033-776ef78666f4/go.mod h1:StmAvUPQr8N7lbq3Fn0sR70SCqzO8tcBHXP2TL87nA8=
+github.com/irismod/service v1.1.1-0.20200921071541-a03a4af10dee h1:pZTqoO+07D51anes/dlEDRGMf5YU12tUQg1gTSbLwrs=
+github.com/irismod/service v1.1.1-0.20200921071541-a03a4af10dee/go.mod h1:1Kg73VzgKM9SX34CfwzFalT8BVbroPJXcxWwV+1Zxps=
 github.com/irismod/token v1.1.1-0.20200915095151-8b310fd600ba h1:ACsyur4cQuo0RW/BBcLzs4S8258rwT6CADCO/g8pgZ4=
 github.com/irismod/token v1.1.1-0.20200915095151-8b310fd600ba/go.mod h1:vCllQABarG3a9UFBTLo7iGA+Pv7CkXjKN7fXaH5uaKE=
 github.com/irisnet/cosmos-sdk v0.34.4-0.20200918054421-c8b3462ab7a2 h1:24ta6RNCZFNXyu9CTflA1paLbUmKoWsZve3wCLO1ahU=
@@ -581,12 +581,12 @@ github.com/tendermint/tm-db v0.6.1 h1:w3X87itMPXopcRPlFiqspEKhw4FXihPk2rnFFkP0zG
 github.com/tendermint/tm-db v0.6.1/go.mod h1:m3x9kRP4UFd7JODJL0yBAZqE7wTw+S37uAE90cTx7OA=
 github.com/tendermint/tm-db v0.6.2 h1:DOn8jwCdjJblrCFJbtonEIPD1IuJWpbRUUdR8GWE4RM=
 github.com/tendermint/tm-db v0.6.2/go.mod h1:GYtQ67SUvATOcoY8/+x6ylk8Qo02BQyLrAs+yAcLvGI=
-github.com/tidwall/gjson v1.6.0 h1:9VEQWz6LLMUsUl6PueE49ir4Ka6CzLymOAZDxpFsTDc=
-github.com/tidwall/gjson v1.6.0/go.mod h1:P256ACg0Mn+j1RXIDXoss50DeIABTYK1PULOJHhxOls=
+github.com/tidwall/gjson v1.6.1 h1:LRbvNuNuvAiISWg6gxLEFuCe72UKy5hDqhxW/8183ws=
+github.com/tidwall/gjson v1.6.1/go.mod h1:BaHyNc5bjzYkPqgLq7mdVzeiRtULKULXLgZFKsxEHI0=
 github.com/tidwall/match v1.0.1 h1:PnKP62LPNxHKTwvHHZZzdOAOCtsJTjo6dZLCwpKm5xc=
 github.com/tidwall/match v1.0.1/go.mod h1:LujAq0jyVjBy028G1WhWfIzbpQfMO8bBZ6Tyb0+pL9E=
-github.com/tidwall/pretty v1.0.0 h1:HsD+QiTn7sK6flMKIvNmpqz1qrpP3Ps6jOKIKMooyg4=
-github.com/tidwall/pretty v1.0.0/go.mod h1:XNkn88O1ChpSDQmQeStsy+sBenx6DDtFZJxhVysOjyk=
+github.com/tidwall/pretty v1.0.2 h1:Z7S3cePv9Jwm1KwS0513MRaoUe3S01WPbLNV40pwWZU=
+github.com/tidwall/pretty v1.0.2/go.mod h1:XNkn88O1ChpSDQmQeStsy+sBenx6DDtFZJxhVysOjyk=
 github.com/tmc/grpc-websocket-proxy v0.0.0-20170815181823-89b8d40f7ca8/go.mod h1:ncp9v5uamzpCO7NfCPTXjqaC+bZgJeR0sMTm6dMHP7U=
 github.com/tmc/grpc-websocket-proxy v0.0.0-20190109142713-0ad062ec5ee5/go.mod h1:ncp9v5uamzpCO7NfCPTXjqaC+bZgJeR0sMTm6dMHP7U=
 github.com/tv42/httpunix v0.0.0-20150427012821-b75d8614f926/go.mod h1:9ESjWnEqriFuLhtthL60Sar/7RFoluCcXsuvEwTV5KM=

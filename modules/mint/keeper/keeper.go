@@ -46,7 +46,7 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 	return ctx.Logger().With("module", fmt.Sprintf("%s", types.ModuleName))
 }
 
-//______________________________________________________________________
+// ______________________________________________________________________
 
 // GetMinter returns the minter
 func (k Keeper) GetMinter(ctx sdk.Context) (minter types.Minter) {

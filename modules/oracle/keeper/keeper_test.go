@@ -79,43 +79,46 @@ func (suite *KeeperTestSuite) TestFeed() {
 		Creator:           addrs[0],
 	}
 
-	//================test CreateFeed start================
+	// ================test CreateFeed start================
 	err := suite.keeper.CreateFeed(suite.ctx, msg)
 	suite.NoError(err)
 
-	//check feed existed
+	// check feed existed
 	feed, existed := suite.keeper.GetFeed(suite.ctx, msg.FeedName)
 	suite.True(existed)
-	suite.EqualValues(types.Feed{
-		FeedName:         msg.FeedName,
-		AggregateFunc:    msg.AggregateFunc,
-		ValueJsonPath:    msg.ValueJsonPath,
-		LatestHistory:    msg.LatestHistory,
-		RequestContextID: mockReqCtxID,
-		Creator:          msg.Creator,
-	}, feed)
+	suite.EqualValues(
+		types.Feed{
+			FeedName:         msg.FeedName,
+			AggregateFunc:    msg.AggregateFunc,
+			ValueJsonPath:    msg.ValueJsonPath,
+			LatestHistory:    msg.LatestHistory,
+			RequestContextID: mockReqCtxID,
+			Creator:          msg.Creator,
+		},
+		feed,
+	)
 
-	//check feed state
+	// check feed state
 	var feeds []types.Feed
 	suite.keeper.IteratorFeedsByState(suite.ctx, exported.PAUSED, func(feed types.Feed) {
 		feeds = append(feeds, feed)
 	})
 	suite.Len(feeds, 1)
 	suite.Equal(msg.FeedName, feeds[0].FeedName)
-	//================test CreateFeed end================
+	// ================test CreateFeed end================
 
-	//================test StartFeed start================
+	// ================test StartFeed start================
 	err = suite.keeper.StartFeed(suite.ctx, &types.MsgStartFeed{
 		FeedName: msg.FeedName,
 		Creator:  addrs[0],
 	})
 
-	//check feed result
+	// check feed result
 	result := suite.keeper.GetFeedValues(suite.ctx, msg.FeedName)
 	suite.NoError(err)
 	suite.Equal("250.00000000", result[0].Data)
 
-	//check feed state
+	// check feed state
 	var feeds1 []types.Feed
 	suite.keeper.IteratorFeedsByState(suite.ctx, exported.RUNNING, func(feed types.Feed) {
 		feeds1 = append(feeds1, feed)
@@ -123,15 +126,15 @@ func (suite *KeeperTestSuite) TestFeed() {
 	suite.Len(feeds1, 1)
 	suite.Equal(msg.FeedName, feeds1[0].FeedName)
 
-	//start again, will return error
+	// start again, will return error
 	err = suite.keeper.StartFeed(suite.ctx, &types.MsgStartFeed{
 		FeedName: msg.FeedName,
 		Creator:  addrs[0],
 	})
 	suite.Error(err)
-	//================test StartFeed end================
+	// ================test StartFeed end================
 
-	//================test EditFeed start================
+	// ================test EditFeed start================
 	latestHistory := uint64(1)
 	err = suite.keeper.EditFeed(suite.ctx, &types.MsgEditFeed{
 		FeedName:          msg.FeedName,
@@ -144,20 +147,23 @@ func (suite *KeeperTestSuite) TestFeed() {
 	})
 	suite.NoError(err)
 
-	//check feed existed
+	// check feed existed
 	feed, existed = suite.keeper.GetFeed(suite.ctx, msg.FeedName)
 	suite.True(existed)
-	suite.EqualValues(types.Feed{
-		FeedName:         msg.FeedName,
-		AggregateFunc:    msg.AggregateFunc,
-		ValueJsonPath:    msg.ValueJsonPath,
-		LatestHistory:    latestHistory,
-		RequestContextID: feed.RequestContextID,
-		Creator:          msg.Creator,
-	}, feed)
-	//================test EditFeed end================
+	suite.EqualValues(
+		types.Feed{
+			FeedName:         msg.FeedName,
+			AggregateFunc:    msg.AggregateFunc,
+			ValueJsonPath:    msg.ValueJsonPath,
+			LatestHistory:    latestHistory,
+			RequestContextID: feed.RequestContextID,
+			Creator:          msg.Creator,
+		},
+		feed,
+	)
+	// ================test EditFeed end================
 
-	//================test PauseFeed start================
+	// ================test PauseFeed start================
 	err = suite.keeper.PauseFeed(suite.ctx, &types.MsgPauseFeed{
 		FeedName: msg.FeedName,
 		Creator:  addrs[0],
@@ -168,33 +174,33 @@ func (suite *KeeperTestSuite) TestFeed() {
 	suite.True(existed)
 	suite.Equal(exported.PAUSED, reqCtx.State)
 
-	//pause again, will return error
+	// pause again, will return error
 	err = suite.keeper.PauseFeed(suite.ctx, &types.MsgPauseFeed{
 		FeedName: msg.FeedName,
 		Creator:  addrs[0],
 	})
 	suite.Error(err)
 
-	//Start Feed again
+	// Start Feed again
 	err = suite.keeper.StartFeed(suite.ctx, &types.MsgStartFeed{
 		FeedName: msg.FeedName,
 		Creator:  addrs[0],
 	})
 
-	//check feed result
+	// check feed result
 	result = suite.keeper.GetFeedValues(suite.ctx, msg.FeedName)
 	suite.NoError(err)
 	suite.Len(result, int(latestHistory))
 	suite.Equal("250.00000000", result[0].Data)
 
-	//check feed state
+	// check feed state
 	var feeds2 []types.Feed
 	suite.keeper.IteratorFeedsByState(suite.ctx, exported.RUNNING, func(feed types.Feed) {
 		feeds2 = append(feeds2, feed)
 	})
 	suite.Len(feeds2, 1)
 	suite.Equal(msg.FeedName, feeds2[0].FeedName)
-	//================test PauseFeed end================
+	// ================test PauseFeed end================
 }
 
 var _ types.ServiceKeeper = MockServiceKeeper{}
@@ -203,33 +209,46 @@ type MockServiceKeeper struct {
 	cxtMap           map[string]exported.RequestContext
 	callbackMap      map[string]exported.ResponseCallback
 	stateCallbackMap map[string]exported.StateCallback
+	moduleServiceMap map[string]*exported.ModuleService
 }
 
 func NewMockServiceKeeper() MockServiceKeeper {
 	cxtMap := make(map[string]exported.RequestContext)
 	callbackMap := make(map[string]exported.ResponseCallback)
 	stateCallbackMap := make(map[string]exported.StateCallback)
+	moduleServiceMap := make(map[string]*exported.ModuleService)
 	return MockServiceKeeper{
 		cxtMap:           cxtMap,
 		callbackMap:      callbackMap,
 		stateCallbackMap: stateCallbackMap,
+		moduleServiceMap: moduleServiceMap,
 	}
 }
 
-func (m MockServiceKeeper) RegisterStateCallback(moduleName string,
-	stateCallback exported.StateCallback) error {
+func (m MockServiceKeeper) RegisterStateCallback(
+	moduleName string, stateCallback exported.StateCallback,
+) error {
 	m.stateCallbackMap[moduleName] = stateCallback
 	return nil
 }
 
-func (m MockServiceKeeper) RegisterResponseCallback(moduleName string,
-	respCallback exported.ResponseCallback) error {
+func (m MockServiceKeeper) RegisterResponseCallback(
+	moduleName string, respCallback exported.ResponseCallback,
+) error {
 	m.callbackMap[moduleName] = respCallback
 	return nil
 }
 
-func (m MockServiceKeeper) GetRequestContext(ctx sdk.Context,
-	requestContextID tmbytes.HexBytes) (exported.RequestContext, bool) {
+func (m MockServiceKeeper) RegisterModuleService(
+	moduleName string, moduleService *exported.ModuleService,
+) error {
+	m.moduleServiceMap[moduleName] = moduleService
+	return nil
+}
+
+func (m MockServiceKeeper) GetRequestContext(
+	ctx sdk.Context, requestContextID tmbytes.HexBytes,
+) (exported.RequestContext, bool) {
 	reqCtx, ok := m.cxtMap[string(requestContextID)]
 	return reqCtx, ok
 }
@@ -247,8 +266,10 @@ func (m MockServiceKeeper) CreateRequestContext(ctx sdk.Context,
 	repeatedTotal int64,
 	state exported.RequestContextState,
 	respThreshold uint32,
-	moduleName string) (tmbytes.HexBytes, error) {
-
+	moduleName string,
+) (
+	tmbytes.HexBytes, error,
+) {
 	reqCtx := exported.RequestContext{
 		ServiceName:       serviceName,
 		Providers:         providers,
