@@ -4,7 +4,7 @@ token模块用于管理你在IRIS Hub上发行的资产。
 
 ## 可用命令
 
-| 名称                                            | 描述                     |
+| 名称                                | 描述                     |
 | ----------------------------------- | ------------------------ |
 | [issue](#iris-tx-token-issue)       | 发行通证                 |
 | [edit](#iris-tx-token-edit)         | 编辑通证                 |
@@ -177,4 +177,3 @@ iris query token params [flags]
 ```bash
 iris query token params
 ```
-

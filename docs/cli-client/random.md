@@ -4,10 +4,10 @@ Rand module allows you to post a random number request to the IRIS Hub and query
 
 ## Available Commands
 
-| Name                                             | Description                                                  |
-| ------------------------------------------------ | ------------------------------------------------------------ |
-| [request-random](#iris-tx-random-request-random) | Request a random number                                      |
-| [query-random](#iris-query-random-random)        | Query the generated random number by the request id          |
+| Name                                             | Description                                                      |
+| ------------------------------------------------ | ---------------------------------------------------------------- |
+| [request-random](#iris-tx-random-request-random) | Request a random number                                          |
+| [query-random](#iris-query-random-random)        | Query the generated random number by the request id              |
 | [query-queue](#iris-query-random-queue)          | Query the pending random number requests with an optional height |
 
 ## iris tx random request-random
@@ -32,10 +32,10 @@ Post a random number request to the IRIS Hub, the random number will be generate
 
 ```bash
 # without oracle
-iris tx random request-random --block-interval=100 --from=<key-name> --chain-id=irishub --fees=0.3iris --commit
+iris tx random request-random --block-interval=100 --from=<key-name> --chain-id=irishub --fees=0.3iris
 
 # with oracle
-iris tx random request-random --block-interval=100 --oracle=true --service-fee-cap=1iris --from=<key-name> --chain-id=irishub --fees=0.3iris --commit
+iris tx random request-random --block-interval=100 --oracle=true --service-fee-cap=1iris --from=<key-name> --chain-id=irishub --fees=0.3iris
 ```
 
 :::tip

@@ -8,14 +8,14 @@ Bech32 is a new Bitcoin address format proposed by Pieter Wuille and Greg Maxwel
 
 ## Human Readable Part Table
 
-| HRP  | Definition                              |
-| ---- | --------------------------------------- |
-| iaa  | IRISnet Account Address                 |
-| iap  | IRISnet Account Public Key              |
-| iva  | IRISnet Validator's Operator Address    |
-| ivp  | IRISnet Validator's Operator Public Key |
-| ica  | Tendermint Consensus Address            |
-| icp  | Tendermint Consensus Public Key         |
+| HRP | Definition                              |
+| --- | --------------------------------------- |
+| iaa | IRISnet Account Address                 |
+| iap | IRISnet Account Public Key              |
+| iva | IRISnet Validator's Operator Address    |
+| ivp | IRISnet Validator's Operator Public Key |
+| ica | Tendermint Consensus Address            |
+| icp | Tendermint Consensus Public Key         |
 
 ## Encoding
 

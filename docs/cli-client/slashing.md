@@ -1,4 +1,5 @@
 # Slashing
+
 Slashing module can unjail validator previously jailed for downtime
 
 ## Available Commands
