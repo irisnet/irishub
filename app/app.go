@@ -168,6 +168,17 @@ var (
 	allowedReceivingModAcc = map[string]bool{
 		distrtypes.ModuleName: true,
 	}
+
+	nativeToken = tokentypes.Token{
+		Symbol:        "iris",
+		Name:          "Irishub staking token",
+		Scale:         6,
+		MinUnit:       "uiris",
+		InitialSupply: 2000000000,
+		MaxSupply:     10000000000,
+		Mintable:      true,
+		Owner:         sdk.AccAddress(crypto.AddressHash([]byte(tokentypes.ModuleName))),
+	}
 )
 
 // Verify app interface at compile time
@@ -236,9 +247,14 @@ func init() {
 	DefaultNodeHome = filepath.Join(userHomeDir, ".iris")
 
 	tokentypes.SetNativeToken(
-		"iris", "Irishub staking token", "uiris",
-		6, 2000000000, 10000000000,
-		true, sdk.AccAddress(crypto.AddressHash([]byte(tokentypes.ModuleName))),
+		nativeToken.Symbol,
+		nativeToken.Name,
+		nativeToken.MinUnit,
+		nativeToken.Scale,
+		nativeToken.InitialSupply,
+		nativeToken.MaxSupply,
+		nativeToken.Mintable,
+		nativeToken.Owner,
 	)
 }
 
@@ -565,7 +581,7 @@ func (app *IrisApp) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 	var serviceGenState servicetypes.GenesisState
 	app.appCodec.MustUnmarshalJSON(genesisState[servicetypes.ModuleName], &serviceGenState)
 	serviceGenState.Definitions = append(serviceGenState.Definitions, servicetypes.GenOraclePriceSvcDefinition())
-	serviceGenState.Bindings = append(serviceGenState.Bindings, servicetypes.GenOraclePriceSvcBinding("iris"))
+	serviceGenState.Bindings = append(serviceGenState.Bindings, servicetypes.GenOraclePriceSvcBinding(nativeToken.Symbol))
 	serviceGenState.Definitions = append(serviceGenState.Definitions, randomtypes.GetSvcDefinition())
 	genesisState[servicetypes.ModuleName] = app.appCodec.MustMarshalJSON(&serviceGenState)
 
