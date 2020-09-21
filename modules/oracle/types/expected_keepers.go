@@ -10,7 +10,7 @@ import (
 	guardiantypes "github.com/irisnet/irishub/modules/guardian/types"
 )
 
-//expected Service keeper
+// expected Service keeper
 type ServiceKeeper interface {
 	RegisterResponseCallback(
 		moduleName string, respCallback service.ResponseCallback,
@@ -18,6 +18,10 @@ type ServiceKeeper interface {
 
 	RegisterStateCallback(
 		moduleName string, stateCallback service.StateCallback,
+	) error
+
+	RegisterModuleService(
+		moduleName string, moduleService *service.ModuleService,
 	) error
 
 	GetRequestContext(

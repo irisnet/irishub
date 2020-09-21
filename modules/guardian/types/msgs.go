@@ -55,7 +55,7 @@ func (msg MsgAddProfiler) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.AddGuardian.AddedBy}
 }
 
-//______________________________________________________________________
+// ______________________________________________________________________
 
 // NewMsgDeleteProfiler constructs a MsgDeleteProfiler
 func NewMsgDeleteProfiler(address, deletedBy sdk.AccAddress) *MsgDeleteProfiler {
@@ -92,7 +92,7 @@ func (msg MsgDeleteProfiler) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.DeleteGuardian.DeletedBy}
 }
 
-//______________________________________________________________________
+// ______________________________________________________________________
 
 // NewMsgAddTrustee constructs a MsgAddTrustee
 func NewMsgAddTrustee(description string, address, addedAddress sdk.AccAddress) *MsgAddTrustee {
@@ -130,7 +130,7 @@ func (msg MsgAddTrustee) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.AddGuardian.AddedBy}
 }
 
-//______________________________________________________________________
+// ______________________________________________________________________
 
 // NewMsgDeleteTrustee constructs a MsgDeleteTrustee
 func NewMsgDeleteTrustee(address, deletedBy sdk.AccAddress) *MsgDeleteTrustee {
@@ -167,7 +167,7 @@ func (msg MsgDeleteTrustee) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.DeleteGuardian.DeletedBy}
 }
 
-//______________________________________________________________________
+// ______________________________________________________________________
 
 // ValidateBasic validate the AddGuardian
 func (g AddGuardian) ValidateBasic() error {

@@ -61,7 +61,6 @@ func queryRandomRequestQueue(ctx sdk.Context, req abci.RequestQuery, k Keeper, l
 	}
 
 	var requests []types.Request
-
 	if params.Height == 0 {
 		// query all pending requests
 		requests = queryAllRandomRequestsInQueue(ctx, k)

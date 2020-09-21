@@ -34,6 +34,7 @@ func NewKeeper(cdc codec.Marshaler, key sdk.StoreKey, bankKeeper types.BankKeepe
 
 	_ = serviceKeeper.RegisterResponseCallback(types.ModuleName, keeper.HandlerResponse)
 	_ = serviceKeeper.RegisterStateCallback(types.ModuleName, keeper.HandlerStateChanged)
+
 	return keeper
 }
 
@@ -49,10 +50,10 @@ func (k Keeper) GetCdc() codec.Marshaler {
 
 // RequestRandom requests a random number
 func (k Keeper) RequestRandom(
-	ctx sdk.Context, consumer sdk.AccAddress,
-	blockInterval uint64, oracle bool,
-	serviceFeeCap sdk.Coins,
-) (types.Request, error) {
+	ctx sdk.Context, consumer sdk.AccAddress, blockInterval uint64, oracle bool, serviceFeeCap sdk.Coins,
+) (
+	types.Request, error,
+) {
 	currentHeight := ctx.BlockHeight()
 	destHeight := currentHeight + int64(blockInterval)
 
