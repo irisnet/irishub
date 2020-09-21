@@ -11,9 +11,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	servicetypes "github.com/irismod/service/types"
-
 	"github.com/irismod/service/exported"
+	servicetypes "github.com/irismod/service/types"
 
 	"github.com/irisnet/irishub/modules/random/types"
 )
@@ -44,35 +43,14 @@ func (k Keeper) RequestService(ctx sdk.Context, consumer sdk.AccAddress, service
 	provider := []sdk.AccAddress{bindings[rand.Intn(len(bindings))].Provider}
 	timeout := k.serviceKeeper.GetParams(ctx).MaxRequestTimeout
 
-	requestContextID, err := k.serviceKeeper.CreateRequestContext(
-		ctx,
-		types.ServiceName,
-		provider,
-		consumer,
-		"{}",
-		serviceFeeCap,
-		timeout,
-		false,
-		false,
-		0,
-		0,
-		exported.PAUSED,
-		1,
-		types.ModuleName,
+	return k.serviceKeeper.CreateRequestContext(
+		ctx, types.ServiceName, provider, consumer, `{"header":{}}`, serviceFeeCap,
+		timeout, false, false, 0, 0, exported.PAUSED, 1, types.ModuleName,
 	)
-	if err != nil {
-		return nil, err
-	}
-
-	return requestContextID, nil
 }
 
 // StartRequestContext starts the service context
-func (k Keeper) StartRequestContext(
-	ctx sdk.Context,
-	serviceContextID tmbytes.HexBytes,
-	consumer sdk.AccAddress,
-) error {
+func (k Keeper) StartRequestContext(ctx sdk.Context, serviceContextID tmbytes.HexBytes, consumer sdk.AccAddress) error {
 	return k.serviceKeeper.StartRequestContext(ctx, serviceContextID, consumer)
 }
 
@@ -86,8 +64,9 @@ func (k Keeper) HandlerStateChanged(ctx sdk.Context, requestContextID tmbytes.He
 		return
 	}
 	ctx.Logger().Error(
-		"Oracle state invalid", "requestContextID",
-		requestContextID.String(), "state", reqCtx.State.String(),
+		"Oracle state invalid",
+		"requestContextID", requestContextID.String(),
+		"state", reqCtx.State.String(),
 	)
 	k.DeleteOracleRandRequest(ctx, requestContextID)
 	return
@@ -98,17 +77,14 @@ func (k Keeper) HandlerResponse(ctx sdk.Context, requestContextID tmbytes.HexByt
 	if len(responseOutput) == 0 || err != nil {
 		ctx.Logger().Error(
 			"respond service failed",
-			"requestContextID",
-			requestContextID.String(),
-			"err",
-			err.Error(),
+			"requestContextID", requestContextID.String(),
+			"err", err.Error(),
 		)
 		k.DeleteOracleRandRequest(ctx, requestContextID)
 		return
 	}
 
-	_, existed := k.serviceKeeper.GetRequestContext(ctx, requestContextID)
-	if !existed {
+	if _, existed := k.serviceKeeper.GetRequestContext(ctx, requestContextID); !existed {
 		k.DeleteOracleRandRequest(ctx, requestContextID)
 		return
 	}
@@ -117,25 +93,21 @@ func (k Keeper) HandlerResponse(ctx sdk.Context, requestContextID tmbytes.HexByt
 	if err != nil {
 		ctx.Logger().Error(
 			"can not find request",
-			"requestContextID",
-			requestContextID.String(),
-			"err",
-			err.Error(),
+			"requestContextID", requestContextID.String(),
+			"err", err.Error(),
 		)
 		k.DeleteOracleRandRequest(ctx, requestContextID)
 		return
 	}
 
-	result := gjson.Get(responseOutput[0], types.ServiceValueJsonPath)
+	result := gjson.Get(responseOutput[0], types.ServiceValueJSONPath)
 
 	seed, err := hex.DecodeString(result.String())
 	if err != nil || len(seed) != types.SeedBytesLength {
 		ctx.Logger().Error(
 			"invalid seed",
-			"seed",
-			hex.EncodeToString(seed),
-			"err",
-			err.Error(),
+			"seed", hex.EncodeToString(seed),
+			"err", err.Error(),
 		)
 		k.DeleteOracleRandRequest(ctx, requestContextID)
 		return
@@ -151,7 +123,6 @@ func (k Keeper) HandlerResponse(ctx sdk.Context, requestContextID tmbytes.HexByt
 	// generate a random number
 	random := types.MakePRNG(lastBlockHash, currentTimestamp, request.Consumer, seed, true).GetRand()
 	k.SetRandom(ctx, reqID, types.NewRandom(request.TxHash, lastBlockHeight, random.FloatString(types.RandPrec)))
-
 	k.DeleteOracleRandRequest(ctx, requestContextID)
 }
 

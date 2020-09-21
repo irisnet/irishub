@@ -85,7 +85,7 @@ func (AppModuleBasic) RegisterInterfaces(registry codectypes.InterfaceRegistry) 
 	types.RegisterInterfaces(registry)
 }
 
-//____________________________________________________________________________
+// ____________________________________________________________________________
 
 // AppModule implements an application module for the oracle module.
 type AppModule struct {
@@ -112,12 +112,11 @@ func NewAppModule(cdc codec.Marshaler, keeper keeper.Keeper) AppModule {
 func (AppModule) Name() string { return types.ModuleName }
 
 // RegisterInvariants registers the oracle module invariants.
-func (am AppModule) RegisterInvariants(ir sdk.InvariantRegistry) {
-}
+func (am AppModule) RegisterInvariants(ir sdk.InvariantRegistry) {}
 
 // Route returns the message routing key for the oracle module.
 func (am AppModule) Route() sdk.Route {
-	return sdk.Route{}
+	return sdk.NewRoute(types.RouterKey, NewHandler(am.keeper))
 }
 
 // QuerierRoute returns the oracle module's querier route name.
@@ -155,7 +154,7 @@ func (AppModule) EndBlock(_ sdk.Context, _ abci.RequestEndBlock) []abci.Validato
 	return []abci.ValidatorUpdate{}
 }
 
-//____________________________________________________________________________
+// ____________________________________________________________________________
 
 // AppModuleSimulation functions
 
@@ -174,8 +173,7 @@ func (AppModule) RandomizedParams(r *rand.Rand) []simtypes.ParamChange {
 }
 
 // RegisterStoreDecoder registers a decoder for oracle module's types
-func (am AppModule) RegisterStoreDecoder(sdr sdk.StoreDecoderRegistry) {
-}
+func (am AppModule) RegisterStoreDecoder(sdr sdk.StoreDecoderRegistry) {}
 
 // WeightedOperations returns the all the oracle module operations with their respective weights.
 func (am AppModule) WeightedOperations(simState module.SimulationState) []simtypes.WeightedOperation {
