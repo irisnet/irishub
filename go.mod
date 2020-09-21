@@ -12,7 +12,7 @@ require (
 	github.com/irismod/htlc v0.0.0-20200915095211-4696dcfd19a4
 	github.com/irismod/nft v1.1.1-0.20200915095131-b66f07afde69
 	github.com/irismod/record v1.1.1-0.20200915095052-b09bac8a9f01
-	github.com/irismod/service v1.1.1-0.20200915095033-776ef78666f4
+	github.com/irismod/service v1.1.1-0.20200921071541-a03a4af10dee
 	github.com/irismod/token v1.1.1-0.20200915095151-8b310fd600ba
 	github.com/olebedev/config v0.0.0-20190528211619-364964f3a8e4
 	github.com/pkg/errors v0.9.1
@@ -37,5 +37,3 @@ replace (
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.2-alpha.regen.4
 	github.com/keybase/go-keychain => github.com/99designs/go-keychain v0.0.0-20191008050251-8e49817e8af4
 )
-
-replace github.com/irismod/service => github.com/SegueII/service v1.1.1-0.20200921055157-b0b83af8ce9f

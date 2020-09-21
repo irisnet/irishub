@@ -26,8 +26,6 @@ github.com/DataDog/zstd v1.4.1/go.mod h1:1jcaCB/ufaK+sKp1NBhlGmpz41jOoPQ35bpF36t
 github.com/Knetic/govaluate v3.0.1-0.20171022003610-9aa49832a739+incompatible/go.mod h1:r7JcOSlj0wfOMncg0iLm8Leh48TZaKVeNIfJntJ2wa0=
 github.com/OneOfOne/xxhash v1.2.2 h1:KMrpdQIwFcEqXDklaen+P1axHaj9BSKzvpUUfnHldSE=
 github.com/OneOfOne/xxhash v1.2.2/go.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAElWljhcU=
-github.com/SegueII/service v1.1.1-0.20200921055157-b0b83af8ce9f h1:GUIzqSV9EuesfUOQKo9N7EUtouwAgWviiIueNBSIIAo=
-github.com/SegueII/service v1.1.1-0.20200921055157-b0b83af8ce9f/go.mod h1:1Kg73VzgKM9SX34CfwzFalT8BVbroPJXcxWwV+1Zxps=
 github.com/Shopify/sarama v1.19.0/go.mod h1:FVkBWblsNy7DGZRfXLU0O9RCGt5g3g3yEuWXgklEdEo=
 github.com/Shopify/toxiproxy v2.1.4+incompatible/go.mod h1:OXgGpZ6Cli1/URJOF1DMxUHB2q5Ap20/P/eIdh4G0pI=
 github.com/VividCortex/gohistogram v1.0.0 h1:6+hBz+qvs0JOrrNhhmR7lFxo5sINxBCGXrdtl/UvroE=
@@ -310,6 +308,8 @@ github.com/irismod/nft v1.1.1-0.20200915095131-b66f07afde69 h1:+4VDIPUosF+SMJABQ
 github.com/irismod/nft v1.1.1-0.20200915095131-b66f07afde69/go.mod h1:cmgKg2YtDsPB0KKt5idi59rFdcITPBYr+0NE5uGbrKo=
 github.com/irismod/record v1.1.1-0.20200915095052-b09bac8a9f01 h1:mlLNQNgqYtbNFiDDR6omEF6ryO2nx+bSPVLeeEQzHKI=
 github.com/irismod/record v1.1.1-0.20200915095052-b09bac8a9f01/go.mod h1:USzloJa0M80DmsSPL1T7DDAUUUgRDGRgNXPbtaxJ1aY=
+github.com/irismod/service v1.1.1-0.20200921071541-a03a4af10dee h1:pZTqoO+07D51anes/dlEDRGMf5YU12tUQg1gTSbLwrs=
+github.com/irismod/service v1.1.1-0.20200921071541-a03a4af10dee/go.mod h1:1Kg73VzgKM9SX34CfwzFalT8BVbroPJXcxWwV+1Zxps=
 github.com/irismod/token v1.1.1-0.20200915095151-8b310fd600ba h1:ACsyur4cQuo0RW/BBcLzs4S8258rwT6CADCO/g8pgZ4=
 github.com/irismod/token v1.1.1-0.20200915095151-8b310fd600ba/go.mod h1:vCllQABarG3a9UFBTLo7iGA+Pv7CkXjKN7fXaH5uaKE=
 github.com/irisnet/cosmos-sdk v0.34.4-0.20200918054421-c8b3462ab7a2 h1:24ta6RNCZFNXyu9CTflA1paLbUmKoWsZve3wCLO1ahU=
