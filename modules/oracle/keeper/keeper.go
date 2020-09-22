@@ -40,8 +40,18 @@ func NewKeeper(
 		sk:         sk,
 		paramSpace: paramSpace,
 	}
+
 	_ = sk.RegisterResponseCallback(types.ModuleName, keeper.HandlerResponse)
 	_ = sk.RegisterStateCallback(types.ModuleName, keeper.HandlerStateChanged)
+	_ = sk.RegisterModuleService(
+		servicetypes.RegisterModuleName,
+		&servicetypes.ModuleService{
+			ServiceName:     servicetypes.OraclePriceServiceName,
+			Provider:        servicetypes.OraclePriceServiceProvider,
+			ReuquestService: keeper.ModuleServiceRequest,
+		},
+	)
+
 	return keeper
 }
 

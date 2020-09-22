@@ -20,9 +20,7 @@ func NewValidateOracleAuthDecorator(k Keeper, ak types.AuthKeeper) ValidateOracl
 }
 
 // AnteHandle returns an AnteHandler that checks if the creator is authorized
-func (dtf ValidateOracleAuthDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (newCtx sdk.Context, err error) {
-	// new ctx
-	newCtx = sdk.Context{}
+func (dtf ValidateOracleAuthDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (sdk.Context, error) {
 	for _, msg := range tx.GetMsgs() {
 		// only check consecutive msgs which are routed to token from the beginning
 		if msg.Route() != types.ModuleName {
