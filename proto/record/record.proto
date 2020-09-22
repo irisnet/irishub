@@ -1,0 +1,40 @@
+syntax = "proto3";
+package irismod.record;
+
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/irisnet/irismod/modules/record/types";
+option (gogoproto.goproto_getters_all)  = false;
+
+// MsgCreateValidator defines an SDK message for creating a new validator.
+message MsgCreateRecord {
+  option (gogoproto.equal) = true;
+
+  repeated Content contents = 1 [(gogoproto.nullable) = false];
+  bytes            creator  = 2 [
+    (gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"
+  ];
+}
+
+// Content defines the detailed information for a record.
+message Content {
+  option (gogoproto.equal)            = true;
+
+  string  digest      = 1;
+  string  digest_algo = 2 [(gogoproto.moretags) = "yaml:\"digest_algo\""];
+  string  uri  = 3 [(gogoproto.customname) = "URI"];
+  string  meta = 4;
+}
+
+message Record {
+  option (gogoproto.equal)            = true;
+
+  bytes tx_hash  = 1 [
+    (gogoproto.moretags) = "yaml:\"tx_hash\"",
+    (gogoproto.casttype) = "github.com/tendermint/tendermint/libs/bytes.HexBytes"
+  ];
+  repeated Content contents = 2 [(gogoproto.nullable) = false];
+  bytes            creator  = 3 [
+    (gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"
+  ];
+}

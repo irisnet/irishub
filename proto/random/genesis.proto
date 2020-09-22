@@ -1,0 +1,16 @@
+syntax = "proto3";
+package irismod.random;
+
+import "random/random.proto";
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/irisnet/irismod/modules/random/types";
+
+// GenesisState defines the random module's genesis state.
+message GenesisState {
+    map<string, Requests> pending_random_requests = 1 [(gogoproto.nullable) = false];
+}
+
+message Requests {
+    repeated Request requests = 1 [(gogoproto.nullable) = false];
+}

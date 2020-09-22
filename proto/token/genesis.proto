@@ -1,0 +1,14 @@
+syntax = "proto3";
+package irismod.token;
+
+import "gogoproto/gogo.proto";
+import "token/token.proto";
+
+option go_package = "github.com/irisnet/irismod/modules/token/types";
+
+// GenesisState defines the token module's genesis state.
+message GenesisState {
+    Params params = 1 [(gogoproto.nullable) = false];
+    repeated Token tokens = 2 [(gogoproto.nullable) = false];
+}
+

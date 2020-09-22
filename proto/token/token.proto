@@ -1,0 +1,90 @@
+syntax = "proto3";
+package irismod.token;
+
+import "cosmos_proto/coin.proto";
+import "cosmos_proto/cosmos.proto";
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+
+option go_package = "github.com/irisnet/irismod/modules/token/types";
+option (gogoproto.goproto_getters_all)  = false;
+
+// MsgIssueToken defines an SDK message for issuing a new token.
+message MsgIssueToken {
+  string symbol         = 1;
+  string name           = 2;
+  uint32 scale          = 3;
+  string min_unit       = 4 [(gogoproto.moretags) = "yaml:\"min_unit\""];
+  uint64 initial_supply = 5 [(gogoproto.moretags) = "yaml:\"initial_supply\""];
+  uint64 max_supply     = 6 [(gogoproto.moretags) = "yaml:\"max_supply\""];
+  bool   mintable       = 7;
+  bytes  owner          = 8 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
+}
+
+// MsgMintToken defines an SDK message for transferring the token owner.
+message MsgTransferTokenOwner {
+  bytes  src_owner = 1 [
+    (gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress",
+    (gogoproto.moretags) = "yaml:\"src_owner\""
+  ];
+  bytes  dst_owner = 2 [
+    (gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress",
+    (gogoproto.moretags) = "yaml:\"dst_owner\""
+  ];
+  string symbol    = 3;
+}
+
+// MsgEditToken defines an SDK message for editing a new token.
+message MsgEditToken {
+  string symbol     = 1;
+  string name       = 2;
+  uint64 max_supply = 3 [(gogoproto.moretags) = "yaml:\"max_supply\""];
+  string mintable   = 4 [(gogoproto.casttype) = "Bool"];
+  bytes  owner      = 5 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
+}
+
+// MsgMintToken defines an SDK message for minting a new token.
+message MsgMintToken {
+  string symbol = 1;
+  uint64 amount = 2;
+  bytes  to     = 3 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
+  bytes  owner  = 4 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
+}
+
+// Token defines a standard for the fungible token
+message Token {
+  option (gogoproto.goproto_stringer) = false;
+  option (gogoproto.goproto_getters)  = false;
+
+  string symbol         = 1;
+  string name           = 2;
+  uint32 scale          = 3;
+  string min_unit       = 4 [(gogoproto.moretags) = "yaml:\"min_unit\""];
+  uint64 initial_supply = 5 [(gogoproto.moretags) = "yaml:\"initial_supply\""];
+  uint64 max_supply     = 6 [(gogoproto.moretags) = "yaml:\"max_supply\""];
+  bool   mintable       = 7;
+  bytes  owner          = 8 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
+}
+
+// token parameters
+message Params {
+  option (gogoproto.equal)            = true;
+  option (gogoproto.goproto_stringer) = false;
+
+  string token_tax_rate = 1 [
+    (gogoproto.moretags)   = "yaml:\"token_tax_rate\"",
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable)   = false
+  ];
+
+  cosmos.base.v1beta1.Coin issue_token_base_fee = 2 [
+    (gogoproto.moretags)   = "yaml:\"issue_token_base_fee\"",
+    (gogoproto.nullable)   = false
+  ];
+
+  string mint_token_fee_ratio = 3 [
+    (gogoproto.moretags)   = "yaml:\"mint_token_fee_ratio\"",
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable)   = false
+  ];
+}

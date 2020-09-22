@@ -1,0 +1,214 @@
+syntax = "proto3";
+package irismod.service;
+
+import "cosmos_proto/coin.proto";
+import "cosmos_proto/pagination.proto";
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "service/service.proto";
+
+option go_package = "github.com/irisnet/irismod/modules/service/types";
+
+// Query creates service with iservice as rpc
+service Query {
+    // Definition returns service definition
+    rpc Definition(QueryDefinitionRequest) returns (QueryDefinitionResponse) {
+        option (google.api.http).get = "/irismod/service/definitions/{service_name}";
+    }
+
+    // Binding returns service Binding with service name and provider
+    rpc Binding(QueryBindingRequest) returns (QueryBindingResponse) {
+        option (google.api.http).get = "/irismod/service/bindings/{service_name}/{provider}";
+    }
+
+    // Bindings returns all service Bindings with service name and owner
+    rpc Bindings(QueryBindingsRequest) returns (QueryBindingsResponse) {
+        option (google.api.http).get = "/irismod/service/bindings/{service_name}";
+    }
+
+    // WithdrawAddress returns the withdraw address of the binding owner
+    rpc WithdrawAddress(QueryWithdrawAddressRequest) returns (QueryWithdrawAddressResponse) {
+        option (google.api.http).get = "/irismod/service/{owner}/withdraw-address";
+    }
+
+    // RequestContext returns the request context
+    rpc RequestContext(QueryRequestContextRequest) returns (QueryRequestContextResponse) {
+        option (google.api.http).get = "/irismod/service/contexts/{request_context_id}";
+    }
+
+    // Request returns the request
+    rpc Request(QueryRequestRequest) returns (QueryRequestResponse) {
+        option (google.api.http).get = "/irismod/service/requests/{request_id}";
+    }
+
+    // Request returns all requests of one service with provider
+    rpc Requests(QueryRequestsRequest) returns (QueryRequestsResponse) {
+        option (google.api.http).get = "/irismod/service/requests/{service_name}/{provider}";
+    }
+
+    // RequestsByReqCtx returns all requests of one service call batch
+    rpc RequestsByReqCtx(QueryRequestsByReqCtxRequest) returns (QueryRequestsByReqCtxResponse) {
+        option (google.api.http).get = "/irismod/service/requests/{request_context_id}/{batch_counter}";
+    }
+
+    // Response returns the response of request
+    rpc Response(QueryResponseRequest) returns (QueryResponseResponse) {
+        option (google.api.http).get = "/irismod/service/responses/{request_id}";
+    }
+
+    // Responses returns all responses of one service call batch
+    rpc Responses(QueryResponsesRequest) returns (QueryResponsesResponse) {
+        option (google.api.http).get = "/irismod/service/responses/{request_context_id}/{batch_counter}";
+    }
+
+    // EarnedFees returns the earned service fee of one provider
+    rpc EarnedFees(QueryEarnedFeesRequest) returns (QueryEarnedFeesResponse) {
+        option (google.api.http).get = "/irismod/service/fees/{provider}";
+    }
+
+    // Schema returns the schema
+    rpc Schema(QuerySchemaRequest) returns (QuerySchemaResponse) {
+        option (google.api.http).get = "/irismod/service/schemas/{schema_name}";
+    }
+
+    // Params queries the service parameters
+    rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
+        option (google.api.http).get = "/irismod/service/params";
+    }
+}
+
+// QueryDefinitionRequest is request type for the Query/Definition RPC method
+message QueryDefinitionRequest {
+    string service_name = 1;
+}
+
+// QueryDefinitionResponse is response type for the Query/Definition RPC method
+message QueryDefinitionResponse {
+    ServiceDefinition service_definition = 1;
+}
+
+// QueryBindingRequest is request type for the Query/Binding RPC method
+message QueryBindingRequest {
+    string service_name = 1;
+    bytes provider = 2 [ (gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress" ];
+}
+
+// QueryDefinitionResponse is response type for the Query/Binding RPC method
+message QueryBindingResponse {
+    ServiceBinding service_binding = 1;
+}
+
+// QueryBindingsRequest is request type for the Query/Bindings RPC method
+message QueryBindingsRequest {
+    string service_name = 1;
+    bytes owner = 2 [ (gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress" ];
+}
+
+// QueryDefinitionsResponse is response type for the Query/Bindings RPC method
+message QueryBindingsResponse {
+    repeated ServiceBinding service_bindings = 1;
+}
+
+// QueryWithdrawAddressRequest is request type for the Query/WithdrawAddress RPC method
+message QueryWithdrawAddressRequest {
+    bytes owner = 1 [ (gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress" ];
+}
+
+// QueryWithdrawAddressResponse is response type for the Query/WithdrawAddress RPC method
+message QueryWithdrawAddressResponse {
+    bytes withdraw_address = 1 [ (gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress" ];
+}
+
+// QueryRequestContextRequest is request type for the Query/RequestContext RPC method
+message QueryRequestContextRequest {
+    bytes request_context_id = 1 [ (gogoproto.casttype) = "github.com/tendermint/tendermint/libs/bytes.HexBytes" ];
+}
+
+// QueryRequestContextResponse is response type for the Query/RequestContext RPC method
+message QueryRequestContextResponse {
+    RequestContext request_context = 1;
+}
+
+// QueryRequestRequest is request type for the Query/Request RPC method
+message QueryRequestRequest {
+    bytes request_id = 1 [ (gogoproto.casttype) = "github.com/tendermint/tendermint/libs/bytes.HexBytes" ];
+}
+
+// QueryRequestResponse is response type for the Query/Request RPC method
+message QueryRequestResponse {
+    Request request = 1;
+}
+
+// QueryRequestsRequest is request type for the Query/Requests RPC method
+message QueryRequestsRequest {
+    string service_name = 1;
+    bytes provider = 2 [ (gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress" ];
+}
+
+// QueryRequestsResponse is response type for the Query/Requests RPC method
+message QueryRequestsResponse {
+    repeated Request requests = 1;
+}
+
+// QueryRequestsByReqCtxRequest is request type for the Query/RequestsByReqCtx RPC method
+message QueryRequestsByReqCtxRequest {
+    bytes request_context_id = 1 [ (gogoproto.casttype) = "github.com/tendermint/tendermint/libs/bytes.HexBytes" ];
+    uint64 batch_counter = 2;
+}
+
+// QueryRequestsByReqCtxResponse is response type for the Query/RequestsByReqCtx RPC method
+message QueryRequestsByReqCtxResponse {
+    repeated Request requests = 1;
+}
+
+// QueryResponseRequest is request type for the Query/Response RPC method
+message QueryResponseRequest {
+    bytes request_id = 1 [ (gogoproto.casttype) = "github.com/tendermint/tendermint/libs/bytes.HexBytes" ];
+}
+
+// QueryResponseResponse is response type for the Query/Response RPC method
+message QueryResponseResponse {
+    Response response = 1;
+}
+
+// QueryResponsesRequest is request type for the Query/Responses RPC method
+message QueryResponsesRequest {
+    bytes request_context_id = 1 [ (gogoproto.casttype) = "github.com/tendermint/tendermint/libs/bytes.HexBytes" ];
+    uint64 batch_counter = 2;
+}
+
+// QueryResponsesResponse is response type for the Query/Responses RPC method
+message QueryResponsesResponse {
+    repeated Response responses = 1;
+}
+
+// QueryEarnedFeesRequest is request type for the Query/EarnedFees RPC method
+message QueryEarnedFeesRequest {
+    bytes provider = 1 [ (gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress" ];
+}
+
+// QueryEarnedFeesResponse is response type for the Query/EarnedFees RPC method
+message QueryEarnedFeesResponse {
+    repeated cosmos.base.v1beta1.Coin fees = 1 [ (gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "yaml:\"service_fee\"" ];
+}
+
+// QuerySchemaRequest is request type for the Query/Schema RPC method
+message QuerySchemaRequest {
+    string schema_name = 1;
+}
+
+// QuerySchemaResponse is response type for the Query/Schema RPC method
+message QuerySchemaResponse {
+    string schema = 1;
+}
+
+// QueryParametersRequest is request type for the Query/Parameters RPC method
+message QueryParamsRequest {
+}
+
+// QueryParametersResponse is response type for the Query/Parameters RPC method
+message QueryParamsResponse {
+    service.Params params = 1 [ (gogoproto.nullable) = false ];
+
+    cosmos.query.PageResponse res = 2;
+}

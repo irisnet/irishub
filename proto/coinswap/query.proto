@@ -1,0 +1,29 @@
+syntax = "proto3";
+package irismod.coinswap;
+
+import "cosmos_proto/coin.proto";
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+
+option go_package = "github.com/irisnet/irismod/modules/coinswap/types";
+
+// Query creates service with coinswap as rpc
+service Query {
+    // Liquidity returns the total liquidity available for the provided denomination
+    rpc Liquidity (QueryLiquidityRequest) returns (QueryLiquidityResponse) {
+      option (google.api.http).get = "/irismod/coinswap/liquidities/{id}";
+    }
+}
+
+// QueryLiquidityRequest is request type for the Query/Liquidity RPC method
+message QueryLiquidityRequest {
+    string id = 1;
+}
+
+// QueryLiquidityResponse is response type for the Query/Liquidity RPC method
+message QueryLiquidityResponse {
+    cosmos.base.v1beta1.Coin standard = 1 [(gogoproto.nullable) = false];
+    cosmos.base.v1beta1.Coin token = 2 [(gogoproto.nullable) = false];
+    cosmos.base.v1beta1.Coin liquidity = 3 [(gogoproto.nullable) = false];
+    string fee = 4;
+}

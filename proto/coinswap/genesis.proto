@@ -1,0 +1,13 @@
+syntax = "proto3";
+package irismod.coinswap;
+
+import "gogoproto/gogo.proto";
+import "coinswap/coinswap.proto";
+
+option go_package = "github.com/irisnet/irismod/modules/coinswap/types";
+
+// GenesisState defines the coinswap module's genesis state.
+message GenesisState {
+    Params params = 1 [(gogoproto.nullable) = false];
+}
+

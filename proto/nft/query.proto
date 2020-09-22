@@ -1,0 +1,102 @@
+syntax = "proto3";
+package irismod.nft;
+
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "nft/nft.proto";
+
+option go_package = "github.com/irisnet/irismod/modules/nft/types";
+
+// Query defines the gRPC querier service for nft module
+service Query {
+    // Supply queries the total supply of a given denom or owner
+    rpc Supply(QuerySupplyRequest) returns (QuerySupplyResponse) {
+      option (google.api.http).get = "/irismod/nft/supplies/{denom}";
+    }
+
+    // Owner queries the NFTs of the specified owner
+    rpc Owner(QueryOwnerRequest) returns (QueryOwnerResponse) {
+      option (google.api.http).get = "/irismod/nft/owners/{owner}";
+    }
+
+    // Collection queries the NFTs of the specified denom
+    rpc Collection(QueryCollectionRequest) returns (QueryCollectionResponse) {
+      option (google.api.http).get = "/irismod/nft/collections/{denom}";
+    }
+
+    // Denom queries the definition of a given denom
+    rpc Denom(QueryDenomRequest) returns (QueryDenomResponse) {
+      option (google.api.http).get = "/irismod/nft/denoms/{denom}";
+    }
+
+    // Denoms queries all the denoms
+    rpc Denoms(QueryDenomsRequest) returns (QueryDenomsResponse) {
+      option (google.api.http).get = "/irismod/nft/denoms";
+    }
+
+    // NFT queries the NFT for the given denom and token ID
+    rpc NFT(QueryNFTRequest) returns (QueryNFTResponse) {
+      option (google.api.http).get = "/irismod/nft/nfts/{denom}/{id}";
+    }
+}
+
+// QuerySupplyRequest is the request type for the Query/HTLC RPC method
+message QuerySupplyRequest {
+    string denom = 1;
+    bytes owner = 2 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
+}
+
+// QuerySupplyResponse is the response type for the Query/Supply RPC method
+message QuerySupplyResponse {
+    uint64 amount = 1;
+}
+
+// QueryOwnerRequest is the request type for the Query/Owner RPC method
+message QueryOwnerRequest {
+    string denom = 1;
+    bytes owner = 2 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
+}
+
+// QueryOwnerResponse is the response type for the Query/Owner RPC method
+message QueryOwnerResponse {
+    Owner owner = 1;
+}
+
+// QueryCollectionRequest is the request type for the Query/Collection RPC method
+message QueryCollectionRequest {
+    string denom = 1;
+}
+
+// QueryCollectionResponse is the response type for the Query/Collection RPC method
+message QueryCollectionResponse {
+    Collection collection = 1;
+}
+
+// QueryDenomRequest is the request type for the Query/Denom RPC method
+message QueryDenomRequest {
+    string denom = 1;
+}
+
+// QueryDenomResponse is the response type for the Query/Denom RPC method
+message QueryDenomResponse {
+    Denom denom = 1;
+}
+
+// QueryDenomsRequest is the request type for the Query/Denoms RPC method
+message QueryDenomsRequest {}
+
+// QueryDenomsResponse is the response type for the Query/Denoms RPC method
+message QueryDenomsResponse {
+    repeated Denom denoms = 1 [(gogoproto.nullable) = false];
+}
+
+// QueryNFTRequest is the request type for the Query/NFT RPC method
+message QueryNFTRequest {
+    string denom = 1;
+    string id = 2;
+}
+
+// QueryNFTResponse is the response type for the Query/NFT RPC method
+message QueryNFTResponse {
+    BaseNFT nft = 1 [(gogoproto.customname) = "NFT"];
+}

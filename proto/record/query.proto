@@ -1,0 +1,25 @@
+syntax = "proto3";
+package irismod.record;
+
+import "record/record.proto";
+import "google/api/annotations.proto";
+
+option go_package = "github.com/irisnet/irismod/modules/record/types";
+
+// Query defines the gRPC querier service for record module
+service Query {
+    // Record queries the record by the given record ID
+    rpc Record (QueryRecordRequest) returns (QueryRecordResponse) {
+      option (google.api.http).get = "/irismod/record/records/{record_id}";
+    }
+}
+
+// QueryRecordRequest is the request type for the Query/Record RPC method
+message QueryRecordRequest {
+    bytes record_id = 1;
+}
+
+// QueryRecordResponse is the response type for the Query/Record RPC method
+message QueryRecordResponse {
+    record.Record record = 1;
+}
