@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/hex"
 	"fmt"
-	"strings"
 
 	"github.com/spf13/cobra"
 
@@ -35,18 +34,11 @@ func GetQueryCmd() *cobra.Command {
 // GetCmdQueryHTLC implements the query HTLC command.
 func GetCmdQueryHTLC() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "htlc [hash-lock]",
-		Short: "Query an HTLC",
-		Long: strings.TrimSpace(
-			fmt.Sprintf(`Query details of an HTLC with the specified hash lock.
-
-Example:
-$ %s query htlc htlc <hash-lock>
-`,
-				version.AppName,
-			),
-		),
-		Args: cobra.ExactArgs(1),
+		Use:     "htlc [hash-lock]",
+		Short:   "Query an HTLC",
+		Long:    "Query details of an HTLC with the specified hash lock.",
+		Example: fmt.Sprintf("$ %s query htlc htlc <hash-lock>", version.AppName),
+		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 			clientCtx, err := client.ReadQueryCommandFlags(clientCtx, cmd.Flags())

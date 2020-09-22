@@ -88,6 +88,12 @@ import (
 	"github.com/irisnet/irismod/modules/nft"
 	nftkeeper "github.com/irisnet/irismod/modules/nft/keeper"
 	nfttypes "github.com/irisnet/irismod/modules/nft/types"
+	"github.com/irisnet/irismod/modules/oracle"
+	oracleKeeper "github.com/irisnet/irismod/modules/oracle/keeper"
+	oracletypes "github.com/irisnet/irismod/modules/oracle/types"
+	"github.com/irisnet/irismod/modules/random"
+	randomkeeper "github.com/irisnet/irismod/modules/random/keeper"
+	randomtypes "github.com/irisnet/irismod/modules/random/types"
 	"github.com/irisnet/irismod/modules/record"
 	recordkeeper "github.com/irisnet/irismod/modules/record/keeper"
 	recordtypes "github.com/irisnet/irismod/modules/record/types"
@@ -97,13 +103,6 @@ import (
 	"github.com/irisnet/irismod/modules/token"
 	tokenkeeper "github.com/irisnet/irismod/modules/token/keeper"
 	tokentypes "github.com/irisnet/irismod/modules/token/types"
-
-	"github.com/irisnet/irismod/modules/oracle"
-	oracleKeeper "github.com/irisnet/irismod/modules/oracle/keeper"
-	oracletypes "github.com/irisnet/irismod/modules/oracle/types"
-	"github.com/irisnet/irismod/modules/random"
-	randomkeeper "github.com/irisnet/irismod/modules/random/keeper"
-	randomtypes "github.com/irisnet/irismod/modules/random/types"
 )
 
 const appName = "SimApp"
@@ -357,7 +356,7 @@ func NewSimApp(
 
 	app.TokenKeeper = tokenkeeper.NewKeeper(
 		appCodec, keys[tokentypes.StoreKey], app.GetSubspace(tokentypes.ModuleName),
-		app.AccountKeeper, app.BankKeeper, authtypes.FeeCollectorName,
+		app.BankKeeper, authtypes.FeeCollectorName,
 	)
 	app.RecordKeeper = recordkeeper.NewKeeper(appCodec, keys[recordtypes.StoreKey])
 

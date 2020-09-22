@@ -18,7 +18,6 @@ type Keeper struct {
 	storeKey sdk.StoreKey
 	cdc      codec.Marshaler
 
-	accountKeeper types.AccountKeeper
 	// The bankKeeper to reduce the supply of the network
 	bankKeeper types.BankKeeper
 
@@ -28,27 +27,22 @@ type Keeper struct {
 	paramSpace paramstypes.Subspace
 }
 
-func NewKeeper(cdc codec.Marshaler, key sdk.StoreKey, paramSpace paramstypes.Subspace,
-	accountKeeper types.AccountKeeper, bankKeeper types.BankKeeper, feeCollectorName string) Keeper {
-	// ensure token module account is set
-	if addr := accountKeeper.GetModuleAddress(types.ModuleName); addr == nil {
-		panic(fmt.Sprintf("%s module account has not been set", types.ModuleName))
-	}
-
+func NewKeeper(
+	cdc codec.Marshaler, key sdk.StoreKey, paramSpace paramstypes.Subspace,
+	bankKeeper types.BankKeeper, feeCollectorName string,
+) Keeper {
 	// set KeyTable if it has not already been set
 	if !paramSpace.HasKeyTable() {
 		paramSpace = paramSpace.WithKeyTable(types.ParamKeyTable())
 	}
 
-	keeper := Keeper{
+	return Keeper{
 		storeKey:         key,
 		cdc:              cdc,
 		paramSpace:       paramSpace,
 		bankKeeper:       bankKeeper,
 		feeCollectorName: feeCollectorName,
 	}
-
-	return keeper
 }
 
 // Logger returns a module-specific logger.
@@ -80,12 +74,7 @@ func (k Keeper) IssueToken(ctx sdk.Context, msg types.MsgIssueToken) error {
 	}
 
 	// sent coins to owner's account
-	if err := k.bankKeeper.SendCoinsFromModuleToAccount(
-		ctx, types.ModuleName, token.Owner, mintCoins,
-	); err != nil {
-		return err
-	}
-	return nil
+	return k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, token.Owner, mintCoins)
 }
 
 // EditToken edits the specified token
@@ -120,11 +109,7 @@ func (k Keeper) EditToken(ctx sdk.Context, msg types.MsgEditToken) error {
 		token.Mintable = msg.Mintable.ToBool()
 	}
 
-	if err := k.setToken(ctx, *token); err != nil {
-		return err
-	}
-
-	return nil
+	return k.setToken(ctx, *token)
 }
 
 // TransferTokenOwner transfers the owner of the specified token to a new one
@@ -147,11 +132,7 @@ func (k Keeper) TransferTokenOwner(ctx sdk.Context, msg types.MsgTransferTokenOw
 	}
 
 	// reset all index for query-token
-	if err := k.resetStoreKeyForQueryToken(ctx, msg, *token); err != nil {
-		return err
-	}
-
-	return nil
+	return k.resetStoreKeyForQueryToken(ctx, msg, *token)
 }
 
 // MintToken mints specified amount token to a specified owner
@@ -176,7 +157,11 @@ func (k Keeper) MintToken(ctx sdk.Context, msg types.MsgMintToken) error {
 	mintableMaxMainUnitAmt := uint64(mintableMaxAmt.Quo(sdk.NewIntWithDecimal(1, int(token.Scale))).Int64())
 
 	if msg.Amount > mintableMaxMainUnitAmt {
-		return sdkerrors.Wrapf(types.ErrInvalidMaxSupply, "The amount of minting tokens plus the total amount of issued tokens has exceeded the maximum supply, only accepts amount (0, %d]", mintableMaxMainUnitAmt)
+		return sdkerrors.Wrapf(
+			types.ErrInvalidMaxSupply,
+			"The amount of minting tokens plus the total amount of issued tokens has exceeded the maximum supply, only accepts amount (0, %d]",
+			mintableMaxMainUnitAmt,
+		)
 	}
 
 	mintCoin := sdk.NewCoin(token.MinUnit, sdk.NewIntWithDecimal(int64(msg.Amount), int(token.Scale)))
@@ -193,9 +178,5 @@ func (k Keeper) MintToken(ctx sdk.Context, msg types.MsgMintToken) error {
 	}
 
 	// sent coins to owner's account
-	if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, mintAcc, mintCoins); err != nil {
-		return err
-	}
-
-	return nil
+	return k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, mintAcc, mintCoins)
 }

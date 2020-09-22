@@ -19,6 +19,7 @@ func (k Keeper) GetNFT(ctx sdk.Context, denomID, tokenID string) (nft exported.N
 
 	var baseNFT types.BaseNFT
 	k.cdc.MustUnmarshalBinaryBare(bz, &baseNFT)
+
 	return baseNFT, nil
 }
 
@@ -33,6 +34,7 @@ func (k Keeper) GetNFTs(ctx sdk.Context, denom string) (nfts []exported.NFT) {
 		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &baseNFT)
 		nfts = append(nfts, baseNFT)
 	}
+
 	return nfts
 }
 
@@ -48,6 +50,7 @@ func (k Keeper) Authorize(ctx sdk.Context,
 	if !owner.Equals(nft.GetOwner()) {
 		return types.BaseNFT{}, sdkerrors.Wrap(types.ErrUnauthorized, owner.String())
 	}
+
 	return nft.(types.BaseNFT), nil
 }
 

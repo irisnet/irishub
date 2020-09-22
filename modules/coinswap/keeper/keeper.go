@@ -211,7 +211,6 @@ func (k Keeper) RemoveLiquidity(ctx sdk.Context, msg *types.MsgRemoveLiquidity) 
 }
 
 func (k Keeper) removeLiquidity(ctx sdk.Context, poolAddr, sender sdk.AccAddress, deductUniCoin, irisWithdrawCoin, tokenWithdrawCoin sdk.Coin) error {
-
 	deltaCoins := sdk.NewCoins(deductUniCoin)
 
 	// send liquidity vouchers to be burned from sender account to module account

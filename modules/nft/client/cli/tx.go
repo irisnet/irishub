@@ -39,13 +39,17 @@ func NewTxCmd() *cobra.Command {
 // GetCmdMintNFT is the CLI command for a MintNFT transaction
 func GetCmdIssueDenom() *cobra.Command {
 	cmd := &cobra.Command{
-		Use: "issue [denom]",
-		Long: strings.TrimSpace(
-			fmt.Sprintf(`Issue a new denom.
-Example:
-$ %s tx nft issue [denomID] --from=<key-name> --name=<name> --schema=<schema> --name=<name> --chain-id=<chain-id> --fees=<fee>`,
-				version.AppName,
-			),
+		Use:  "issue [denom]",
+		Long: "Issue a new denom.",
+		Example: fmt.Sprintf(
+			"$ %s tx nft issue <denomID> "+
+				"--from=<key-name> "+
+				"--name=<name> "+
+				"--schema=<schema> "+
+				"--name=<name> "+
+				"--chain-id=<chain-id> "+
+				"--fees=<fee>",
+			version.AppName,
 		),
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -75,13 +79,16 @@ $ %s tx nft issue [denomID] --from=<key-name> --name=<name> --schema=<schema> --
 // GetCmdMintNFT is the CLI command for a MintNFT transaction
 func GetCmdMintNFT() *cobra.Command {
 	cmd := &cobra.Command{
-		Use: "mint [denomID] [tokenID]",
-		Long: strings.TrimSpace(
-			fmt.Sprintf(`Mint an NFT and set the owner to the recipient.
-Example:
-$ %s tx nft mint [denomID] [tokenID] --uri=<uri> --recipient=<recipient> --from=<key-name> --chain-id=<chain-id> --fees=<fee>`,
-				version.AppName,
-			),
+		Use:  "mint [denomID] [tokenID]",
+		Long: "Mint an NFT and set the owner to the recipient.",
+		Example: fmt.Sprintf(
+			"$ %s tx nft mint <denomID> <tokenID> "+
+				"--uri=<uri> "+
+				"--recipient=<recipient> "+
+				"--from=<key-name> "+
+				"--chain-id=<chain-id> "+
+				"--fees=<fee>",
+			version.AppName,
 		),
 		Args: cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -125,13 +132,15 @@ $ %s tx nft mint [denomID] [tokenID] --uri=<uri> --recipient=<recipient> --from=
 // GetCmdEditNFT is the CLI command for sending an MsgEditNFT transaction
 func GetCmdEditNFT() *cobra.Command {
 	cmd := &cobra.Command{
-		Use: "edit [denomID] [tokenID]",
-		Long: strings.TrimSpace(
-			fmt.Sprintf(`Edit the tokenData of an NFT.
-Example:
-$ %s tx nft edit [denomID] [tokenID] --uri=<uri> --from=<key-name> --chain-id=<chain-id> --fees=<fee>`,
-				version.AppName,
-			),
+		Use:  "edit [denomID] [tokenID]",
+		Long: "Edit the tokenData of an NFT.",
+		Example: fmt.Sprintf(
+			"$ %s tx nft edit <denomID> <tokenID> "+
+				"--uri=<uri> "+
+				"--from=<key-name> "+
+				"--chain-id=<chain-id> "+
+				"--fees=<fee>",
+			version.AppName,
 		),
 		Args: cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -164,13 +173,15 @@ $ %s tx nft edit [denomID] [tokenID] --uri=<uri> --from=<key-name> --chain-id=<c
 // GetCmdTransferNFT is the CLI command for sending a TransferNFT transaction
 func GetCmdTransferNFT() *cobra.Command {
 	cmd := &cobra.Command{
-		Use: "transfer [recipient] [denomID] [tokenID]",
-		Long: strings.TrimSpace(
-			fmt.Sprintf(`Transfer a NFT to a recipient.
-Example:
-$ %s tx nft transfer [recipient] [denomID] [tokenID] --uri=<uri> --from=<key-name> --chain-id=<chain-id> --fees=<fee>`,
-				version.AppName,
-			),
+		Use:  "transfer [recipient] [denomID] [tokenID]",
+		Long: "Transfer a NFT to a recipient.",
+		Example: fmt.Sprintf(
+			"$ %s tx nft transfer <recipient> <denomID> <tokenID> "+
+				"--uri=<uri> "+
+				"--from=<key-name> "+
+				"--chain-id=<chain-id> "+
+				"--fees=<fee>",
+			version.AppName,
 		),
 		Args: cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -209,13 +220,14 @@ $ %s tx nft transfer [recipient] [denomID] [tokenID] --uri=<uri> --from=<key-nam
 // GetCmdBurnNFT is the CLI command for sending a BurnNFT transaction
 func GetCmdBurnNFT() *cobra.Command {
 	cmd := &cobra.Command{
-		Use: "burn [denomID] [tokenID]",
-		Long: strings.TrimSpace(
-			fmt.Sprintf(`Burn an NFT.
-Example:
-$ %s tx nft burn [denomID] [tokenID] --from=<key-name> --chain-id=<chain-id> --fees=<fee>`,
-				version.AppName,
-			),
+		Use:  "burn [denomID] [tokenID]",
+		Long: "Burn an NFT.",
+		Example: fmt.Sprintf(
+			"$ %s tx nft burn <denomID> <tokenID> "+
+				"--from=<key-name> "+
+				"--chain-id=<chain-id> "+
+				"--fees=<fee>",
+			version.AppName,
 		),
 		Args: cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {

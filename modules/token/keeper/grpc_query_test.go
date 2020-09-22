@@ -18,7 +18,7 @@ func (suite *KeeperTestSuite) TestGRPCQueryToken() {
 	types.RegisterQueryServer(queryHelper, app.TokenKeeper)
 	queryClient := types.NewQueryClient(queryHelper)
 
-	suite.app.TokenKeeper.AddToken(ctx, token)
+	_ = suite.app.TokenKeeper.AddToken(ctx, token)
 
 	// Query token
 	tokenResp1, err := queryClient.Token(gocontext.Background(), &types.QueryTokenRequest{Denom: "btc"})

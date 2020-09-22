@@ -31,8 +31,7 @@ func NewQuerier(k Keeper, legacyQuerierCdc *codec.LegacyAmino) sdk.Querier {
 
 func queryToken(ctx sdk.Context, req abci.RequestQuery, keeper Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
 	var params types.QueryTokenParams
-	err := legacyQuerierCdc.UnmarshalJSON(req.Data, &params)
-	if err != nil {
+	if err := legacyQuerierCdc.UnmarshalJSON(req.Data, &params); err != nil {
 		return nil, err
 	}
 
@@ -41,12 +40,7 @@ func queryToken(ctx sdk.Context, req abci.RequestQuery, keeper Keeper, legacyQue
 		return nil, err
 	}
 
-	bz, err := codec.MarshalJSONIndent(legacyQuerierCdc, token)
-	if err != nil {
-		return nil, err
-	}
-
-	return bz, nil
+	return codec.MarshalJSONIndent(legacyQuerierCdc, token)
 }
 
 func queryTokens(ctx sdk.Context, req abci.RequestQuery, keeper Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
@@ -60,8 +54,7 @@ func queryTokens(ctx sdk.Context, req abci.RequestQuery, keeper Keeper, legacyQu
 
 func queryFees(ctx sdk.Context, req abci.RequestQuery, keeper Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
 	var params types.QueryTokenFeesParams
-	err := legacyQuerierCdc.UnmarshalJSON(req.Data, &params)
-	if err != nil {
+	if err := legacyQuerierCdc.UnmarshalJSON(req.Data, &params); err != nil {
 		return nil, err
 	}
 
@@ -79,19 +72,10 @@ func queryFees(ctx sdk.Context, req abci.RequestQuery, keeper Keeper, legacyQuer
 		MintFee:  mintFee,
 	}
 
-	bz, err := codec.MarshalJSONIndent(legacyQuerierCdc, fees)
-	if err != nil {
-		return nil, err
-	}
-
-	return bz, nil
+	return codec.MarshalJSONIndent(legacyQuerierCdc, fees)
 }
 
 func queryParams(ctx sdk.Context, _ abci.RequestQuery, keeper Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
 	params := keeper.GetParamSet(ctx)
-	bz, err := codec.MarshalJSONIndent(legacyQuerierCdc, params)
-	if err != nil {
-		return nil, err
-	}
-	return bz, nil
+	return codec.MarshalJSONIndent(legacyQuerierCdc, params)
 }

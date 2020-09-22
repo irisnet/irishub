@@ -8,7 +8,7 @@ import (
 	service "github.com/irisnet/irismod/modules/service/exported"
 )
 
-//expected Service keeper
+// expected Service keeper
 type ServiceKeeper interface {
 	RegisterResponseCallback(
 		moduleName string, respCallback service.ResponseCallback,
@@ -16,6 +16,10 @@ type ServiceKeeper interface {
 
 	RegisterStateCallback(
 		moduleName string, stateCallback service.StateCallback,
+	) error
+
+	RegisterModuleService(
+		moduleName string, moduleService *service.ModuleService,
 	) error
 
 	GetRequestContext(

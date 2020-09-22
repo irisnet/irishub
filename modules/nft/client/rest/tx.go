@@ -16,34 +16,15 @@ import (
 
 func registerTxRoutes(cliCtx client.Context, r *mux.Router, queryRoute string) {
 	// Mint an NFT
-	r.HandleFunc(
-		"/nft/nfts/denoms/issue",
-		issueDenomHandlerFn(cliCtx),
-	).Methods("POST")
-
+	r.HandleFunc("/nft/nfts/denoms/issue", issueDenomHandlerFn(cliCtx)).Methods("POST")
 	// Mint an NFT
-	r.HandleFunc(
-		"/nft/nfts/mint",
-		mintNFTHandlerFn(cliCtx),
-	).Methods("POST")
-
+	r.HandleFunc("/nft/nfts/mint", mintNFTHandlerFn(cliCtx)).Methods("POST")
 	// Update an NFT tokenData
-	r.HandleFunc(
-		fmt.Sprintf("/nft/nfts/{%s}/{%s}", RestParamDenom, RestParamTokenID),
-		editNFTHandlerFn(cliCtx),
-	).Methods("PUT")
-
+	r.HandleFunc(fmt.Sprintf("/nft/nfts/{%s}/{%s}", RestParamDenom, RestParamTokenID), editNFTHandlerFn(cliCtx)).Methods("PUT")
 	// Transfer an NFT to an address
-	r.HandleFunc(
-		fmt.Sprintf("/nft/nfts/{%s}/{%s}/transfer", RestParamDenom, RestParamTokenID),
-		transferNFTHandlerFn(cliCtx),
-	).Methods("POST")
-
+	r.HandleFunc(fmt.Sprintf("/nft/nfts/{%s}/{%s}/transfer", RestParamDenom, RestParamTokenID), transferNFTHandlerFn(cliCtx)).Methods("POST")
 	// Burn an NFT
-	r.HandleFunc(
-		fmt.Sprintf("/nft/nfts/{%s}/{%s}/burn", RestParamDenom, RestParamTokenID),
-		burnNFTHandlerFn(cliCtx),
-	).Methods("POST")
+	r.HandleFunc(fmt.Sprintf("/nft/nfts/{%s}/{%s}/burn", RestParamDenom, RestParamTokenID), burnNFTHandlerFn(cliCtx)).Methods("POST")
 }
 
 func issueDenomHandlerFn(cliCtx client.Context) http.HandlerFunc {

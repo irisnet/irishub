@@ -42,13 +42,21 @@ func NewTxCmd() *cobra.Command {
 // getCmdIssueToken implements the issue token command
 func getCmdIssueToken() *cobra.Command {
 	cmd := &cobra.Command{
-		Use: "issue",
-		Long: strings.TrimSpace(
-			fmt.Sprintf(`Issue a new token.
-Example:
-$ %s tx token issue --name="Kitty Token" --symbol="kitty" --min-unit="kitty" --scale=0 --initial-supply=100000000000 --max-supply=1000000000000 --mintable=true --from=<key-name> --chain-id=<chain-id> --fees=<fee>`,
-				version.AppName,
-			),
+		Use:  "issue",
+		Long: "Issue a new token.",
+		Example: fmt.Sprintf(
+			"$ %s tx token issue "+
+				"--name=\"Kitty Token\" "+
+				"--symbol=\"kitty\" "+
+				"--min-unit=\"kitty\" "+
+				"--scale=0 "+
+				"--initial-supply=100000000000 "+
+				"--max-supply=1000000000000 "+
+				"--mintable=true "+
+				"--from=<key-name> "+
+				"--chain-id=<chain-id> "+
+				"--fees=<fee>",
+			version.AppName,
 		),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
@@ -117,13 +125,17 @@ $ %s tx token issue --name="Kitty Token" --symbol="kitty" --min-unit="kitty" --s
 // getCmdEditToken implements the edit token command
 func getCmdEditToken() *cobra.Command {
 	cmd := &cobra.Command{
-		Use: "edit [symbol]",
-		Long: strings.TrimSpace(
-			fmt.Sprintf(`Edit an existing token.
-Example:
-$ %s tx token edit <symbol> --name="Cat Token" --max-supply=100000000000 --mintable=true --from=<key-name> --chain-id=<chain-id> --fees=<fee>`,
-				version.AppName,
-			),
+		Use:  "edit [symbol]",
+		Long: "Edit an existing token.",
+		Example: fmt.Sprintf(
+			"$ %s tx token edit <symbol> "+
+				"--name=\"Cat Token\" "+
+				"--max-supply=100000000000 "+
+				"--mintable=true "+
+				"--from=<key-name> "+
+				"--chain-id=<chain-id> "+
+				"--fees=<fee>",
+			version.AppName,
 		),
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -160,13 +172,16 @@ $ %s tx token edit <symbol> --name="Cat Token" --max-supply=100000000000 --minta
 
 func getCmdMintToken() *cobra.Command {
 	cmd := &cobra.Command{
-		Use: "mint [symbol]",
-		Long: strings.TrimSpace(
-			fmt.Sprintf(`Mint tokens to a specified address.
-Example:
-$ %s tx token mint <symbol> --amount=<amount> --to=<to> --from=<key-name> --chain-id=<chain-id> --fees=<fee>`,
-				version.AppName,
-			),
+		Use:  "mint [symbol]",
+		Long: "Mint tokens to a specified address.",
+		Example: fmt.Sprintf(
+			"$ %s tx token mint <symbol> "+
+				"--amount=<amount> "+
+				"--to=<to> "+
+				"--from=<key-name> "+
+				"--chain-id=<chain-id> "+
+				"--fees=<fee>",
+			version.AppName,
 		),
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -236,13 +251,15 @@ $ %s tx token mint <symbol> --amount=<amount> --to=<to> --from=<key-name> --chai
 // getCmdTransferTokenOwner implements the transfer token owner command
 func getCmdTransferTokenOwner() *cobra.Command {
 	cmd := &cobra.Command{
-		Use: "transfer [symbol]",
-		Long: strings.TrimSpace(
-			fmt.Sprintf(`Transfer the owner of a token to a new owner.
-Example:
-$ %s tx token transfer <symbol> --to=<to> --from=<key-name> --chain-id=<chain-id> --fees=<fee>`,
-				version.AppName,
-			),
+		Use:  "transfer [symbol]",
+		Long: "Transfer the owner of a token to a new owner.",
+		Example: fmt.Sprintf(
+			"$ %s tx token transfer <symbol> "+
+				"--to=<to> "+
+				"--from=<key-name> "+
+				"--chain-id=<chain-id> "+
+				"--fees=<fee>",
+			version.AppName,
 		),
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {

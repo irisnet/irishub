@@ -70,7 +70,7 @@ func (suite *KeeperTestSuite) setHTLC(state types.HTLCState) {
 	suite.keeper.SetHTLC(suite.ctx, htlc, hashLock)
 
 	if state == types.Open || state == types.Expired {
-		suite.app.BankKeeper.SendCoinsFromAccountToModule(suite.ctx, sender, types.ModuleName, amount)
+		_ = suite.app.BankKeeper.SendCoinsFromAccountToModule(suite.ctx, sender, types.ModuleName, amount)
 	}
 }
 

@@ -33,7 +33,7 @@ var (
 	regPlainText = regexp.MustCompile(`^[a-zA-Z][a-zA-Z0-9_-]*$`)
 )
 
-//______________________________________________________________________
+// ______________________________________________________________________
 
 // Route implements Msg.
 func (msg MsgCreateFeed) Route() string {
@@ -68,7 +68,6 @@ func (msg MsgCreateFeed) ValidateBasic() error {
 	}
 	if len(msg.Providers) == 0 {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "providers missing")
-
 	}
 
 	if err := ValidateAggregateFunc(msg.AggregateFunc); err != nil {
@@ -86,6 +85,7 @@ func (msg MsgCreateFeed) ValidateBasic() error {
 	if err := ValidateCreator(msg.Creator); err != nil {
 		return err
 	}
+
 	return validateResponseThreshold(msg.ResponseThreshold, len(msg.Providers))
 }
 
@@ -105,7 +105,7 @@ func (msg MsgCreateFeed) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Creator}
 }
 
-//_____________________________________________________________________
+// _____________________________________________________________________
 
 // Route implements Msg.
 func (msg MsgStartFeed) Route() string {
@@ -135,7 +135,7 @@ func (msg MsgStartFeed) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Creator}
 }
 
-//______________________________________________________________________
+// ______________________________________________________________________
 
 // Route implements Msg.
 func (msg MsgPauseFeed) Route() string {
@@ -165,7 +165,7 @@ func (msg MsgPauseFeed) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Creator}
 }
 
-//______________________________________________________________________
+// ______________________________________________________________________
 
 // Route implements Msg.
 func (msg MsgEditFeed) Route() string {

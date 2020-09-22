@@ -174,6 +174,7 @@ func CreateTestAddrs(numAddrs int) []sdk.AccAddress {
 		addresses = append(addresses, testAddr(buffer.String(), bech))
 		buffer.Reset()
 	}
+
 	return addresses
 }
 

@@ -37,7 +37,6 @@ func ParamKeyTable() paramtypes.KeyTable {
 
 // KeyValuePairs implements paramtypes.KeyValuePairs
 func (p *Params) ParamSetPairs() paramtypes.ParamSetPairs {
-
 	return paramtypes.ParamSetPairs{
 		paramtypes.NewParamSetPair(KeyFee, &p.Fee, validateFee),
 		paramtypes.NewParamSetPair(KeyStandardDenom, &p.StandardDenom, validateStandardDenom),

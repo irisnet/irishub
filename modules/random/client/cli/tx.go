@@ -48,9 +48,8 @@ func GetCmdRequestRandom() *cobra.Command {
 
 			consumer := clientCtx.GetFromAddress()
 
-			oracle := viper.GetBool(FlagOracle)
-
 			var serviceFeeCap sdk.Coins
+			oracle := viper.GetBool(FlagOracle)
 			if oracle {
 				if serviceFeeCap, err = sdk.ParseCoins(viper.GetString(FlagServiceFeeCap)); err != nil {
 					return err
@@ -58,7 +57,6 @@ func GetCmdRequestRandom() *cobra.Command {
 			}
 
 			msg := types.NewMsgRequestRandom(consumer, uint64(viper.GetInt64(FlagBlockInterval)), oracle, serviceFeeCap)
-
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}

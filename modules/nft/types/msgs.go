@@ -71,7 +71,8 @@ func (msg MsgIssueDenom) GetSigners() []sdk.AccAddress {
 // NewMsgTransferNFT is a constructor function for MsgSetName
 func NewMsgTransferNFT(
 	id, denom, name, tokenURI, tokenData string,
-	sender, recipient sdk.AccAddress) *MsgTransferNFT {
+	sender, recipient sdk.AccAddress,
+) *MsgTransferNFT {
 	return &MsgTransferNFT{
 		Id:        strings.ToLower(strings.TrimSpace(id)),
 		Denom:     strings.TrimSpace(denom),

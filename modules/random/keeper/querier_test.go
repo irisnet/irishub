@@ -58,7 +58,7 @@ func (suite *KeeperTestSuite) TestNewQuerier() {
 	suite.Equal(storedRandom, resultRandom)
 
 	// test queryRandomRequestQueue
-	request, err := suite.keeper.RequestRandom(suite.ctx, testConsumer, testBlockInterval, false, sdk.NewCoins())
+	request, _ := suite.keeper.RequestRandom(suite.ctx, testConsumer, testBlockInterval, false, sdk.NewCoins())
 
 	bz, errRes = suite.cdc.MarshalJSON(types.QueryRandomRequestQueueParams{Height: int64(testBlockInterval)})
 	suite.NoError(errRes)

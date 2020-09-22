@@ -27,7 +27,8 @@ func WeightedOperations(
 	ak types.AccountKeeper,
 	bk types.BankKeeper) simulation.WeightedOperations {
 	var weightCreate int
-	appParams.GetOrGenerate(cdc, OpWeightMsgCreateRecord, &weightCreate, nil,
+	appParams.GetOrGenerate(
+		cdc, OpWeightMsgCreateRecord, &weightCreate, nil,
 		func(_ *rand.Rand) {
 			weightCreate = 50
 		},
@@ -67,7 +68,7 @@ func SimulateCreateRecord(ak types.AccountKeeper, bk types.BankKeeper) simtypes.
 			return simtypes.NoOpMsg(types.ModuleName, types.EventTypeCreateRecord, err.Error()), nil, err
 		}
 		txGen := simappparams.MakeEncodingConfig().TxConfig
-		tx, err := helpers.GenTx(
+		tx, _ := helpers.GenTx(
 			txGen,
 			[]sdk.Msg{msg},
 			fees,
@@ -89,8 +90,7 @@ func SimulateCreateRecord(ak types.AccountKeeper, bk types.BankKeeper) simtypes.
 func genRecord(r *rand.Rand, accs []simtypes.Account) (types.Record, error) {
 	var record types.Record
 	txHash := make([]byte, 32)
-	_, err := r.Read(txHash)
-	if err != nil {
+	if _, err := r.Read(txHash); err != nil {
 		return record, err
 	}
 

@@ -31,25 +31,29 @@ func WeightedOperations(
 	k keeper.Keeper, ak types.AccountKeeper, bk types.BankKeeper) simulation.WeightedOperations {
 
 	var weightMint, weightEdit, weightBurn, weightTransfer int
-	appParams.GetOrGenerate(cdc, OpWeightMsgMintNFT, &weightMint, nil,
+	appParams.GetOrGenerate(
+		cdc, OpWeightMsgMintNFT, &weightMint, nil,
 		func(_ *rand.Rand) {
 			weightMint = 100
 		},
 	)
 
-	appParams.GetOrGenerate(cdc, OpWeightMsgEditNFT, &weightEdit, nil,
+	appParams.GetOrGenerate(
+		cdc, OpWeightMsgEditNFT, &weightEdit, nil,
 		func(_ *rand.Rand) {
 			weightEdit = 50
 		},
 	)
 
-	appParams.GetOrGenerate(cdc, OpWeightMsgTransferNFT, &weightTransfer, nil,
+	appParams.GetOrGenerate(
+		cdc, OpWeightMsgTransferNFT, &weightTransfer, nil,
 		func(_ *rand.Rand) {
 			weightTransfer = 50
 		},
 	)
 
-	appParams.GetOrGenerate(cdc, OpWeightMsgBurnNFT, &weightBurn, nil,
+	appParams.GetOrGenerate(
+		cdc, OpWeightMsgBurnNFT, &weightBurn, nil,
 		func(_ *rand.Rand) {
 			weightBurn = 10
 		},
@@ -77,8 +81,11 @@ func WeightedOperations(
 
 // SimulateMsgTransferNFT simulates the transfer of an NFT
 func SimulateMsgTransferNFT(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKeeper) simtypes.Operation {
-	return func(r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context,
-		accs []simtypes.Account, chainID string) (opMsg simtypes.OperationMsg, fOps []simtypes.FutureOperation, err error) {
+	return func(
+		r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
+	) (
+		opMsg simtypes.OperationMsg, fOps []simtypes.FutureOperation, err error,
+	) {
 		ownerAddr, denom, nftID := getRandomNFTFromOwner(ctx, k, r)
 		if ownerAddr.Empty() {
 			err = fmt.Errorf("invalid account")
@@ -134,8 +141,11 @@ func SimulateMsgTransferNFT(k keeper.Keeper, ak types.AccountKeeper, bk types.Ba
 
 // SimulateMsgEditNFT simulates an edit tokenData transaction
 func SimulateMsgEditNFT(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKeeper) simtypes.Operation {
-	return func(r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context,
-		accs []simtypes.Account, chainID string) (opMsg simtypes.OperationMsg, fOps []simtypes.FutureOperation, err error) {
+	return func(
+		r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
+	) (
+		opMsg simtypes.OperationMsg, fOps []simtypes.FutureOperation, err error,
+	) {
 		ownerAddr, denom, nftID := getRandomNFTFromOwner(ctx, k, r)
 		if ownerAddr.Empty() {
 			err = fmt.Errorf("account invalid")
@@ -189,9 +199,11 @@ func SimulateMsgEditNFT(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKe
 
 // SimulateMsgMintNFT simulates a mint of an NFT
 func SimulateMsgMintNFT(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKeeper) simtypes.Operation {
-	return func(r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context,
-		accs []simtypes.Account, chainID string) (opMsg simtypes.OperationMsg, fOps []simtypes.FutureOperation, err error) {
-
+	return func(
+		r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
+	) (
+		opMsg simtypes.OperationMsg, fOps []simtypes.FutureOperation, err error,
+	) {
 		randomSender, _ := simtypes.RandomAcc(r, accs)
 		randomRecipient, _ := simtypes.RandomAcc(r, accs)
 
@@ -243,8 +255,11 @@ func SimulateMsgMintNFT(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKe
 
 // SimulateMsgBurnNFT simulates a burn of an existing NFT
 func SimulateMsgBurnNFT(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKeeper) simtypes.Operation {
-	return func(r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context,
-		accs []simtypes.Account, chainID string) (opMsg simtypes.OperationMsg, fOps []simtypes.FutureOperation, err error) {
+	return func(
+		r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
+	) (
+		opMsg simtypes.OperationMsg, fOps []simtypes.FutureOperation, err error,
+	) {
 		ownerAddr, denom, nftID := getRandomNFTFromOwner(ctx, k, r)
 		if ownerAddr.Empty() {
 			err = fmt.Errorf("invalid account")

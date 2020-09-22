@@ -12,6 +12,17 @@ import (
 	"github.com/irisnet/irismod/modules/nft/exported"
 )
 
+var (
+	amino     = codec.NewLegacyAmino()
+	ModuleCdc = codec.NewAminoCodec(amino)
+)
+
+func init() {
+	RegisterLegacyAminoCodec(amino)
+	cryptocodec.RegisterCrypto(amino)
+	amino.Seal()
+}
+
 // RegisterLegacyAminoCodec concrete types on codec
 func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgIssueDenom{}, "irismod/nft/MsgIssueDenom", nil)
@@ -36,18 +47,6 @@ func RegisterInterfaces(registry types.InterfaceRegistry) {
 	registry.RegisterImplementations((*exported.NFT)(nil),
 		&BaseNFT{},
 	)
-}
-
-var (
-	amino = codec.NewLegacyAmino()
-
-	ModuleCdc = codec.NewAminoCodec(amino)
-)
-
-func init() {
-	RegisterLegacyAminoCodec(amino)
-	cryptocodec.RegisterCrypto(amino)
-	amino.Seal()
 }
 
 // return supply protobuf code

@@ -5,10 +5,9 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/irisnet/irismod/modules/service/exported"
-
 	"github.com/irisnet/irismod/modules/oracle/keeper"
 	"github.com/irisnet/irismod/modules/oracle/types"
+	"github.com/irisnet/irismod/modules/service/exported"
 )
 
 func (suite *KeeperTestSuite) TestNewQuerier() {
@@ -27,84 +26,94 @@ func (suite *KeeperTestSuite) TestNewQuerier() {
 		Creator:           addrs[0],
 	}
 
-	//================test CreateFeed start================
+	// ================test CreateFeed start================
 	err := suite.keeper.CreateFeed(suite.ctx, msg)
 	suite.NoError(err)
 
-	//test QueryFeed
+	// test QueryFeed
 	querier := keeper.NewQuerier(suite.keeper, suite.cdc)
 
 	params := types.QueryFeedParams{
 		FeedName: msg.FeedName,
 	}
 	bz := suite.cdc.MustMarshalJSON(params)
-	res, err := querier(suite.ctx, []string{types.QueryFeed}, abci.RequestQuery{
-		Data: bz,
-	})
+	res, err := querier(
+		suite.ctx,
+		[]string{types.QueryFeed},
+		abci.RequestQuery{Data: bz},
+	)
 	suite.NoError(err)
 
 	var feedCtx types.FeedContext
 	suite.cdc.MustUnmarshalJSON(res, &feedCtx)
 
-	suite.EqualValues(types.FeedContext{
-		Feed: &types.Feed{
-			FeedName:         msg.FeedName,
-			AggregateFunc:    msg.AggregateFunc,
-			ValueJsonPath:    msg.ValueJsonPath,
-			LatestHistory:    msg.LatestHistory,
-			RequestContextID: mockReqCtxID,
-			Creator:          msg.Creator,
+	suite.EqualValues(
+		types.FeedContext{
+			Feed: &types.Feed{
+				FeedName:         msg.FeedName,
+				AggregateFunc:    msg.AggregateFunc,
+				ValueJsonPath:    msg.ValueJsonPath,
+				LatestHistory:    msg.LatestHistory,
+				RequestContextID: mockReqCtxID,
+				Creator:          msg.Creator,
+			},
+			ServiceName:       msg.ServiceName,
+			Providers:         msg.Providers,
+			Input:             msg.Input,
+			Timeout:           msg.Timeout,
+			ServiceFeeCap:     msg.ServiceFeeCap,
+			RepeatedFrequency: msg.RepeatedFrequency,
+			ResponseThreshold: msg.ResponseThreshold,
+			State:             exported.PAUSED,
 		},
-		ServiceName:       msg.ServiceName,
-		Providers:         msg.Providers,
-		Input:             msg.Input,
-		Timeout:           msg.Timeout,
-		ServiceFeeCap:     msg.ServiceFeeCap,
-		RepeatedFrequency: msg.RepeatedFrequency,
-		ResponseThreshold: msg.ResponseThreshold,
-		State:             exported.PAUSED,
-	}, feedCtx)
+		feedCtx,
+	)
 
-	//test QueryFeeds
+	// test QueryFeeds
 	params1 := types.QueryFeedsParams{
 		State: "paused",
 	}
 	bz = suite.cdc.MustMarshalJSON(params1)
-	res, err = querier(suite.ctx, []string{types.QueryFeeds}, abci.RequestQuery{
-		Data: bz,
-	})
+	res, err = querier(
+		suite.ctx,
+		[]string{types.QueryFeeds},
+		abci.RequestQuery{Data: bz},
+	)
 	suite.NoError(err)
 
 	var feedsCtx []types.FeedContext
 	suite.cdc.MustUnmarshalJSON(res, &feedsCtx)
 	suite.Len(feedsCtx, 1)
-	suite.EqualValues(types.FeedContext{
-		Feed: &types.Feed{
-			FeedName:         msg.FeedName,
-			AggregateFunc:    msg.AggregateFunc,
-			ValueJsonPath:    msg.ValueJsonPath,
-			LatestHistory:    msg.LatestHistory,
-			RequestContextID: mockReqCtxID,
-			Creator:          msg.Creator,
+	suite.EqualValues(
+		types.FeedContext{
+			Feed: &types.Feed{
+				FeedName:         msg.FeedName,
+				AggregateFunc:    msg.AggregateFunc,
+				ValueJsonPath:    msg.ValueJsonPath,
+				LatestHistory:    msg.LatestHistory,
+				RequestContextID: mockReqCtxID,
+				Creator:          msg.Creator,
+			},
+			ServiceName:       msg.ServiceName,
+			Providers:         msg.Providers,
+			Input:             msg.Input,
+			Timeout:           msg.Timeout,
+			ServiceFeeCap:     msg.ServiceFeeCap,
+			RepeatedFrequency: msg.RepeatedFrequency,
+			ResponseThreshold: msg.ResponseThreshold,
+			State:             exported.PAUSED,
 		},
-		ServiceName:       msg.ServiceName,
-		Providers:         msg.Providers,
-		Input:             msg.Input,
-		Timeout:           msg.Timeout,
-		ServiceFeeCap:     msg.ServiceFeeCap,
-		RepeatedFrequency: msg.RepeatedFrequency,
-		ResponseThreshold: msg.ResponseThreshold,
-		State:             exported.PAUSED,
-	}, feedsCtx[0])
+		feedsCtx[0],
+	)
 
-	//================test StartFeed start================
+	// ================test StartFeed start================
 	err = suite.keeper.StartFeed(suite.ctx, &types.MsgStartFeed{
 		FeedName: msg.FeedName,
 		Creator:  addrs[0],
 	})
 	suite.NoError(err)
 
-	//test QueryValue
+	// test QueryValue
 	params2 := types.QueryFeedValueParams{
 		FeedName: msg.FeedName,
 	}

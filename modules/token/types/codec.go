@@ -7,6 +7,17 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
+var (
+	amino     = codec.NewLegacyAmino()
+	ModuleCdc = codec.NewAminoCodec(amino)
+)
+
+func init() {
+	RegisterLegacyAminoCodec(amino)
+	cryptocodec.RegisterCrypto(amino)
+	amino.Seal()
+}
+
 func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterInterface((*TokenI)(nil), nil)
 
@@ -30,16 +41,4 @@ func RegisterInterfaces(registry types.InterfaceRegistry) {
 		(*TokenI)(nil),
 		&Token{},
 	)
-}
-
-var (
-	amino = codec.NewLegacyAmino()
-
-	ModuleCdc = codec.NewAminoCodec(amino)
-)
-
-func init() {
-	RegisterLegacyAminoCodec(amino)
-	cryptocodec.RegisterCrypto(amino)
-	amino.Seal()
 }

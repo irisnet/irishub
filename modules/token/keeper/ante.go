@@ -9,24 +9,19 @@ import (
 
 type ValidateTokenFeeDecorator struct {
 	k  Keeper
-	ak types.AccountKeeper
 	bk types.BankKeeper
 }
 
-func NewValidateTokenFeeDecorator(k Keeper, ak types.AccountKeeper, bk types.BankKeeper) ValidateTokenFeeDecorator {
+func NewValidateTokenFeeDecorator(k Keeper, bk types.BankKeeper) ValidateTokenFeeDecorator {
 	return ValidateTokenFeeDecorator{
 		k:  k,
-		ak: ak,
 		bk: bk,
 	}
 }
 
 // AnteHandle returns an AnteHandler that checks if the balance of
 // the fee payer is sufficient for token related fee
-func (dtf ValidateTokenFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (newCtx sdk.Context, err error) {
-
-	// new ctx
-	newCtx = sdk.Context{}
+func (dtf ValidateTokenFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (sdk.Context, error) {
 	// total fee
 	feeMap := make(map[string]sdk.Coin)
 	for _, msg := range tx.GetMsgs() {
@@ -58,7 +53,8 @@ func (dtf ValidateTokenFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simu
 		balance := dtf.bk.GetBalance(ctx, owner, fee.Denom)
 		if balance.IsLT(fee) {
 			return ctx, sdkerrors.Wrapf(
-				sdkerrors.ErrInsufficientFunds, "insufficient coins for token fee; %s < %s", balance, fee)
+				sdkerrors.ErrInsufficientFunds, "insufficient coins for token fee; %s < %s", balance, fee,
+			)
 		}
 	}
 	// continue

@@ -15,7 +15,7 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, data types.GenesisState) {
 		panic(err.Error())
 	}
 
-	//init feed
+	// init feed
 	for _, entry := range data.Entries {
 		k.SetFeed(ctx, entry.Feed)
 

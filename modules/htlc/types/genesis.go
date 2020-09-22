@@ -7,9 +7,7 @@ import (
 )
 
 // NewGenesisState constructs a new GenesisState instance
-func NewGenesisState(
-	pendingHtlcs map[string]HTLC,
-) GenesisState {
+func NewGenesisState(pendingHtlcs map[string]HTLC) GenesisState {
 	return GenesisState{
 		PendingHtlcs: pendingHtlcs,
 	}

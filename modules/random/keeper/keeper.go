@@ -3,7 +3,6 @@ package keeper
 import (
 	"bytes"
 	"encoding/hex"
-	"fmt"
 	"strconv"
 
 	"github.com/tendermint/tendermint/libs/log"
@@ -39,7 +38,7 @@ func NewKeeper(cdc codec.Marshaler, key sdk.StoreKey, bankKeeper types.BankKeepe
 
 // Logger returns a module-specific logger.
 func (k Keeper) Logger(ctx sdk.Context) log.Logger {
-	return ctx.Logger().With("module", fmt.Sprintf("%s", types.ModuleName))
+	return ctx.Logger().With("module", types.ModuleName)
 }
 
 // GetCdc returns the cdc

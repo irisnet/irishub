@@ -24,15 +24,17 @@ func (k Keeper) GetOwner(ctx sdk.Context, address sdk.AccAddress, denom string) 
 			idsMap[denom] = append(ids, tokenID)
 		} else {
 			idsMap[denom] = []string{tokenID}
-			owner.IDCollections = append(owner.IDCollections, types.IDCollection{
-				Denom: denom,
-			})
+			owner.IDCollections = append(
+				owner.IDCollections,
+				types.IDCollection{Denom: denom},
+			)
 		}
 	}
 
 	for i := 0; i < len(owner.IDCollections); i++ {
 		owner.IDCollections[i].Ids = idsMap[owner.IDCollections[i].Denom]
 	}
+
 	return owner
 }
 
@@ -48,9 +50,10 @@ func (k Keeper) GetOwners(ctx sdk.Context) (owners types.Owners) {
 		address, denom, id, _ := types.SplitKeyOwner(key)
 		if _, ok := idcsMap[address.String()]; !ok {
 			idcsMap[address.String()] = types.IDCollections{}
-			owners = append(owners, types.Owner{
-				Address: address,
-			})
+			owners = append(
+				owners,
+				types.Owner{Address: address},
+			)
 		}
 		idcs := idcsMap[address.String()]
 		idcs = idcs.Add(denom, id)
@@ -59,6 +62,7 @@ func (k Keeper) GetOwners(ctx sdk.Context) (owners types.Owners) {
 	for i, owner := range owners {
 		owners[i].IDCollections = idcsMap[owner.Address.String()]
 	}
+
 	return owners
 }
 

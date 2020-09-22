@@ -36,28 +36,33 @@ func WeightedOperations(
 	cdc codec.JSONMarshaler,
 	k keeper.Keeper,
 	ak types.AccountKeeper,
-	bk types.BankKeeper) simulation.WeightedOperations {
+	bk types.BankKeeper,
+) simulation.WeightedOperations {
 
 	var weightIssue, weightEdit, weightMint, weightTransfer int
-	appParams.GetOrGenerate(cdc, OpWeightMsgIssueToken, &weightIssue, nil,
+	appParams.GetOrGenerate(
+		cdc, OpWeightMsgIssueToken, &weightIssue, nil,
 		func(_ *rand.Rand) {
 			weightIssue = 100
 		},
 	)
 
-	appParams.GetOrGenerate(cdc, OpWeightMsgEditToken, &weightEdit, nil,
+	appParams.GetOrGenerate(
+		cdc, OpWeightMsgEditToken, &weightEdit, nil,
 		func(_ *rand.Rand) {
 			weightEdit = 50
 		},
 	)
 
-	appParams.GetOrGenerate(cdc, OpWeightMsgMintToken, &weightMint, nil,
+	appParams.GetOrGenerate(
+		cdc, OpWeightMsgMintToken, &weightMint, nil,
 		func(_ *rand.Rand) {
 			weightMint = 50
 		},
 	)
 
-	appParams.GetOrGenerate(cdc, OpWeightMsgTransferTokenOwner, &weightTransfer, nil,
+	appParams.GetOrGenerate(
+		cdc, OpWeightMsgTransferTokenOwner, &weightTransfer, nil,
 		func(_ *rand.Rand) {
 			weightTransfer = 50
 		},
@@ -268,11 +273,13 @@ func SimulateTransferTokenOwner(k keeper.Keeper, ak types.AccountKeeper, bk type
 	}
 }
 
-func selectOneToken(ctx sdk.Context,
+func selectOneToken(
+	ctx sdk.Context,
 	k keeper.Keeper,
 	ak types.AccountKeeper,
 	bk types.BankKeeper,
-	mint bool) (token types.TokenI, maxFees sdk.Coins) {
+	mint bool,
+) (token types.TokenI, maxFees sdk.Coins) {
 	tokens := k.GetTokens(ctx, nil)
 	if len(tokens) == 0 {
 		panic("No token available")
@@ -329,11 +336,13 @@ func genToken(ctx sdk.Context,
 	return token, maxFees
 }
 
-func filterAccount(ctx sdk.Context,
+func filterAccount(
+	ctx sdk.Context,
 	r *rand.Rand,
 	ak authkeeper.AccountKeeper,
 	bk types.BankKeeper,
-	accs []simtypes.Account, fee sdk.Coin) (owner sdk.AccAddress, maxFees sdk.Coins) {
+	accs []simtypes.Account, fee sdk.Coin,
+) (owner sdk.AccAddress, maxFees sdk.Coins) {
 loop:
 	simAccount, _ := simtypes.RandomAcc(r, accs)
 	account := ak.GetAccount(ctx, simAccount.Address)
@@ -347,10 +356,7 @@ loop:
 	return
 }
 
-func randToken(r *rand.Rand,
-	accs []simtypes.Account,
-) types.Token {
-
+func randToken(r *rand.Rand, accs []simtypes.Account) types.Token {
 	symbol := randStringBetween(r, types.MinimumSymbolLen, types.MaximumSymbolLen)
 	minUint := randStringBetween(r, types.MinimumMinUnitLen, types.MaximumMinUnitLen)
 	name := randStringBetween(r, 1, types.MaximumNameLen)

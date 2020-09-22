@@ -15,14 +15,16 @@ func NewGenesisState(params Params, tokens []Token) GenesisState {
 }
 
 //SetNativeToken reset the system's default native token
-func SetNativeToken(symbol,
-	name,
+func SetNativeToken(
+	symbol string,
+	name string,
 	minUnit string,
 	decimal uint32,
 	initialSupply,
 	maxSupply uint64,
 	mintable bool,
-	owner sdk.AccAddress) {
+	owner sdk.AccAddress,
+) {
 	nativeToken = NewToken(symbol, name, minUnit, decimal, initialSupply, maxSupply, mintable, owner)
 }
 

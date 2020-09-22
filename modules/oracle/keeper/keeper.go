@@ -2,7 +2,9 @@ package keeper
 
 import (
 	"encoding/json"
+	"fmt"
 	"strings"
+	"time"
 
 	"github.com/tidwall/gjson"
 
@@ -13,18 +15,15 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 
-	servicetypes "github.com/irisnet/irismod/modules/service/types"
-
 	"github.com/irisnet/irismod/modules/oracle/types"
+	servicetypes "github.com/irisnet/irismod/modules/service/types"
 )
 
 // Keeper
 type Keeper struct {
-	cdc      codec.Marshaler
-	storeKey sdk.StoreKey
-
-	sk types.ServiceKeeper
-
+	cdc        codec.Marshaler
+	storeKey   sdk.StoreKey
+	sk         types.ServiceKeeper
 	paramSpace paramtypes.Subspace
 }
 
@@ -46,7 +45,7 @@ func NewKeeper(
 	return keeper
 }
 
-//CreateFeed create a stopped feed
+// CreateFeed create a stopped feed
 func (k Keeper) CreateFeed(ctx sdk.Context, msg *types.MsgCreateFeed) error {
 	if _, found := k.GetFeed(ctx, msg.FeedName); found {
 		return sdkerrors.Wrapf(types.ErrExistedFeedName, msg.FeedName)
@@ -86,7 +85,7 @@ func (k Keeper) CreateFeed(ctx sdk.Context, msg *types.MsgCreateFeed) error {
 	return nil
 }
 
-//StartFeed start a stopped feed
+// StartFeed start a stopped feed
 func (k Keeper) StartFeed(ctx sdk.Context, msg *types.MsgStartFeed) error {
 	feed, found := k.GetFeed(ctx, msg.FeedName)
 	if !found {
@@ -102,7 +101,7 @@ func (k Keeper) StartFeed(ctx sdk.Context, msg *types.MsgStartFeed) error {
 		return sdkerrors.Wrapf(types.ErrUnknownFeedName, msg.FeedName)
 	}
 
-	//Can not start feed in "running" state
+	// Can not start feed in "running" state
 	if reqCtx.State == servicetypes.RUNNING {
 		return sdkerrors.Wrapf(types.ErrInvalidFeedState, msg.FeedName)
 	}
@@ -115,7 +114,7 @@ func (k Keeper) StartFeed(ctx sdk.Context, msg *types.MsgStartFeed) error {
 	return nil
 }
 
-//PauseFeed pause a running feed
+// PauseFeed pause a running feed
 func (k Keeper) PauseFeed(ctx sdk.Context, msg *types.MsgPauseFeed) error {
 	feed, found := k.GetFeed(ctx, msg.FeedName)
 	if !found {
@@ -131,7 +130,7 @@ func (k Keeper) PauseFeed(ctx sdk.Context, msg *types.MsgPauseFeed) error {
 		return sdkerrors.Wrapf(types.ErrUnknownFeedName, msg.FeedName)
 	}
 
-	//Can only pause feed in "running" state
+	// Can only pause feed in "running" state
 	if reqCtx.State != servicetypes.RUNNING {
 		return sdkerrors.Wrapf(types.ErrInvalidFeedState, msg.FeedName)
 	}
@@ -144,7 +143,7 @@ func (k Keeper) PauseFeed(ctx sdk.Context, msg *types.MsgPauseFeed) error {
 	return nil
 }
 
-//EditFeed edit a feed
+// EditFeed edit a feed
 func (k Keeper) EditFeed(ctx sdk.Context, msg *types.MsgEditFeed) error {
 	feed, found := k.GetFeed(ctx, msg.FeedName)
 	if !found {
@@ -185,16 +184,17 @@ func (k Keeper) EditFeed(ctx sdk.Context, msg *types.MsgEditFeed) error {
 	return nil
 }
 
-//HandlerResponse is responsible for processing the data returned from the servicetypes module,
-//processed by the aggregate function, and then saved
+// HandlerResponse is responsible for processing the data returned from the servicetypes module,
+// processed by the aggregate function, and then saved
 func (k Keeper) HandlerResponse(ctx sdk.Context,
 	requestContextID tmbytes.HexBytes,
 	responseOutput []string,
 	err error) {
 	if len(responseOutput) == 0 || err != nil {
 		ctx.Logger().Error(
-			"Oracle feed failed", "requestContextID",
-			requestContextID.String(), "err", err.Error(),
+			"Oracle feed failed",
+			"requestContextID", requestContextID.String(),
+			"err", err.Error(),
 		)
 		return
 	}
@@ -247,7 +247,7 @@ func (k Keeper) HandlerResponse(ctx sdk.Context,
 	)
 }
 
-//HandlerStateChanged is responsible for update feed state
+// HandlerStateChanged is responsible for update feed state
 func (k Keeper) HandlerStateChanged(ctx sdk.Context, requestContextID tmbytes.HexBytes, _ string) {
 	reqCtx, existed := k.sk.GetRequestContext(ctx, requestContextID)
 	if !existed {
@@ -273,8 +273,9 @@ func (k Keeper) HandlerStateChanged(ctx sdk.Context, requestContextID tmbytes.He
 		oldState = servicetypes.PAUSED
 	case servicetypes.COMPLETED:
 		ctx.Logger().Error(
-			"Feed state invalid", "requestContextID",
-			requestContextID.String(), "state", reqCtx.State.String(),
+			"Feed state invalid",
+			"requestContextID", requestContextID.String(),
+			"state", reqCtx.State.String(),
 		)
 		return
 	}
@@ -286,9 +287,37 @@ func (k Keeper) HandlerStateChanged(ctx sdk.Context, requestContextID tmbytes.He
 		"dstState", reqCtx.State.String(),
 	)
 	k.dequeueAndEnqueue(ctx, feed.FeedName, oldState, reqCtx.State)
-	return
 }
 
 func (k Keeper) GetRequestContext(ctx sdk.Context, requestContextID tmbytes.HexBytes) (servicetypes.RequestContext, bool) {
 	return k.sk.GetRequestContext(ctx, requestContextID)
+}
+
+func (k Keeper) ModuleServiceRequest(ctx sdk.Context, input string) (result string, output string) {
+	feedName := gjson.Get(input, "body").Get("pair").String()
+	if _, found := k.GetFeed(ctx, feedName); !found {
+		result = `{"code":"400","message":"feed not found"}`
+		return
+	}
+
+	feedValues := k.GetFeedValues(ctx, feedName)
+	if len(feedValues) == 0 {
+		result = `{"code":"401","message":"no value"}`
+		return
+	}
+
+	value := feedValues[len(feedValues)-1]
+
+	valueData := value.Data
+	valueTime := value.Timestamp
+
+	if time.Since(valueTime) > time.Duration(time.Minute*5) {
+		result = `{"code":"402","message":"all values expired"}`
+		return
+	}
+
+	result = `{"code":"200","message":""}`
+	output = fmt.Sprintf(`{"header":{},"body":{"rate":"%s"}}`, valueData)
+
+	return
 }

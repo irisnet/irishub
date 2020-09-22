@@ -64,6 +64,7 @@ func (k Keeper) GetToken(ctx sdk.Context, denom string) (types.TokenI, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	return &token, nil
 }
 
@@ -88,11 +89,7 @@ func (k Keeper) AddToken(ctx sdk.Context, token types.Token) error {
 	}
 
 	// Set token to be prefixed with min_unit
-	if err := k.setWithMinUnit(ctx, token.MinUnit, token.Symbol); err != nil {
-		return err
-	}
-
-	return nil
+	return k.setWithMinUnit(ctx, token.MinUnit, token.Symbol)
 }
 
 // HasToken asserts a token exists

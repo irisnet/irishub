@@ -100,12 +100,11 @@ func queryCollection(ctx sdk.Context, req abci.RequestQuery, k Keeper, legacyQue
 func queryDenom(ctx sdk.Context, req abci.RequestQuery, k Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
 	var params types.QueryDenomParams
 
-	err := legacyQuerierCdc.UnmarshalJSON(req.Data, &params)
-	if err != nil {
+	if err := legacyQuerierCdc.UnmarshalJSON(req.Data, &params); err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, err.Error())
 	}
 
-	denom, err := k.GetDenom(ctx, params.ID)
+	denom, _ := k.GetDenom(ctx, params.ID)
 
 	bz, err := codec.MarshalJSONIndent(legacyQuerierCdc, denom)
 	if err != nil {
@@ -129,8 +128,7 @@ func queryDenoms(ctx sdk.Context, req abci.RequestQuery, k Keeper, legacyQuerier
 func queryNFT(ctx sdk.Context, req abci.RequestQuery, k Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
 	var params types.QueryNFTParams
 
-	err := legacyQuerierCdc.UnmarshalJSON(req.Data, &params)
-	if err != nil {
+	if err := legacyQuerierCdc.UnmarshalJSON(req.Data, &params); err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, err.Error())
 	}
 

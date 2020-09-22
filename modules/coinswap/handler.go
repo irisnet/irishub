@@ -47,9 +47,7 @@ func handleMsgSwapOrder(ctx sdk.Context, k keeper.Keeper, msg *types.MsgSwapOrde
 		),
 	)
 
-	return &sdk.Result{
-		Events: ctx.EventManager().ABCIEvents(),
-	}, nil
+	return &sdk.Result{Events: ctx.EventManager().ABCIEvents()}, nil
 }
 
 // handleMsgAddLiquidity handles MsgAddLiquidity. If the reserve pool does not exist, it will be
@@ -72,9 +70,7 @@ func handleMsgAddLiquidity(ctx sdk.Context, k keeper.Keeper, msg *types.MsgAddLi
 		),
 	)
 
-	return &sdk.Result{
-		Events: ctx.EventManager().ABCIEvents(),
-	}, nil
+	return &sdk.Result{Events: ctx.EventManager().ABCIEvents()}, nil
 }
 
 // handleMsgRemoveLiquidity handles MsgRemoveLiquidity
@@ -96,7 +92,5 @@ func handleMsgRemoveLiquidity(ctx sdk.Context, k keeper.Keeper, msg *types.MsgRe
 		),
 	)
 
-	return &sdk.Result{
-		Events: ctx.EventManager().ABCIEvents(),
-	}, nil
+	return &sdk.Result{Events: ctx.EventManager().ABCIEvents()}, nil
 }

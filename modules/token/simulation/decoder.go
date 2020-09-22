@@ -6,9 +6,10 @@ import (
 	"bytes"
 	"fmt"
 
+	gogotypes "github.com/gogo/protobuf/types"
+
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/types/kv"
-	gogotypes "github.com/gogo/protobuf/types"
 
 	"github.com/irisnet/irismod/modules/token/types"
 )

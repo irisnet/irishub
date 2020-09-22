@@ -33,7 +33,7 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 
 // handleMsgCreateHTLC handles MsgCreateHTLC
 func handleMsgCreateHTLC(ctx sdk.Context, k keeper.Keeper, msg *types.MsgCreateHTLC) (*sdk.Result, error) {
-	err := k.CreateHTLC(
+	if err := k.CreateHTLC(
 		ctx,
 		msg.Sender,
 		msg.To,
@@ -42,8 +42,7 @@ func handleMsgCreateHTLC(ctx sdk.Context, k keeper.Keeper, msg *types.MsgCreateH
 		msg.HashLock,
 		msg.Timestamp,
 		msg.TimeLock,
-	)
-	if err != nil {
+	); err != nil {
 		return nil, err
 	}
 
@@ -69,8 +68,7 @@ func handleMsgCreateHTLC(ctx sdk.Context, k keeper.Keeper, msg *types.MsgCreateH
 
 // handleMsgClaimHTLC handles MsgClaimHTLC
 func handleMsgClaimHTLC(ctx sdk.Context, k keeper.Keeper, msg *types.MsgClaimHTLC) (*sdk.Result, error) {
-	err := k.ClaimHTLC(ctx, msg.HashLock, msg.Secret)
-	if err != nil {
+	if err := k.ClaimHTLC(ctx, msg.HashLock, msg.Secret); err != nil {
 		return nil, err
 	}
 
@@ -93,8 +91,7 @@ func handleMsgClaimHTLC(ctx sdk.Context, k keeper.Keeper, msg *types.MsgClaimHTL
 
 // handleMsgRefundHTLC handles MsgRefundHTLC
 func handleMsgRefundHTLC(ctx sdk.Context, k keeper.Keeper, msg *types.MsgRefundHTLC) (*sdk.Result, error) {
-	err := k.RefundHTLC(ctx, msg.HashLock)
-	if err != nil {
+	if err := k.RefundHTLC(ctx, msg.HashLock); err != nil {
 		return nil, err
 	}
 

@@ -38,7 +38,11 @@ var (
 var _, _, _, _ sdk.Msg = &MsgIssueToken{}, &MsgEditToken{}, &MsgMintToken{}, &MsgTransferTokenOwner{}
 
 // NewMsgIssueToken - construct token issue msg.
-func NewMsgIssueToken(symbol string, minUnit string, name string, scale uint32, initialSupply, maxSupply uint64, mintable bool, owner sdk.AccAddress) *MsgIssueToken {
+func NewMsgIssueToken(
+	symbol string, minUnit string, name string,
+	scale uint32, initialSupply, maxSupply uint64,
+	mintable bool, owner sdk.AccAddress,
+) *MsgIssueToken {
 	return &MsgIssueToken{
 		Symbol:        symbol,
 		Name:          name,

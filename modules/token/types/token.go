@@ -31,8 +31,8 @@ var _ proto.Message = &Token{}
 
 // NewToken constructs a new Token instance
 func NewToken(
-	symbol,
-	name,
+	symbol string,
+	name string,
 	minUnit string,
 	scale uint32,
 	initialSupply,

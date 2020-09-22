@@ -15,7 +15,7 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, data types.GenesisState) {
 
 	k.SetParamSet(ctx, data.Params)
 
-	//init tokens
+	// init tokens
 	for _, token := range data.Tokens {
 		if err := k.AddToken(ctx, token); err != nil {
 			panic(err.Error())

@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -55,19 +54,16 @@ func GetCmdDefineService() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "define",
 		Short: "Define a new service",
-		Long: strings.TrimSpace(
-			fmt.Sprintf(
-				"Define a new service based on the given params.\n\n"+
-					"Example:\n"+
-					"$ %s tx service define "+
-					"--name=<service name> "+
-					"--description=<service description> "+
-					"--author-description=<author description> "+
-					"--tags=<tag1,tag2,...> "+
-					"--schemas=<schemas content or path/to/schemas.json> "+
-					"--from mykey\n",
-				version.AppName,
-			),
+		Long:  "Define a new service based on the given params.",
+		Example: fmt.Sprintf(
+			"$ %s tx service define "+
+				"--name=<service name> "+
+				"--description=<service description> "+
+				"--author-description=<author description> "+
+				"--tags=<tag1,tag2,...> "+
+				"--schemas=<schemas content or path/to/schemas.json> "+
+				"--from mykey",
+			version.AppName,
 		),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
@@ -126,19 +122,16 @@ func GetCmdBindService() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "bind",
 		Short: "Bind an existing service definition",
-		Long: strings.TrimSpace(
-			fmt.Sprintf(
-				"Bind an existing service definition.\n\n"+
-					"Example:\n"+
-					"$ %s tx service bind "+
-					"--service-name=<service-name> "+
-					"--deposit=1stake "+
-					"--pricing=<pricing content or path/to/pricing.json> "+
-					"--qos=50 "+
-					"--options=<non-functional requirements content or path/to/options.json>"+
-					"--from mykey\n",
-				version.AppName,
-			),
+		Long:  "Bind an existing service definition.",
+		Example: fmt.Sprintf(
+			"$ %s tx service bind "+
+				"--service-name=<service-name> "+
+				"--deposit=1stake "+
+				"--pricing=<pricing content or path/to/pricing.json> "+
+				"--qos=50 "+
+				"--options=<non-functional requirements content or path/to/options.json>"+
+				"--from mykey",
+			version.AppName,
 		),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
@@ -227,18 +220,15 @@ func GetCmdUpdateServiceBinding() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "update-binding [service-name] [provider-address]",
 		Short: "Update an existing service binding",
-		Long: strings.TrimSpace(
-			fmt.Sprintf(
-				"Update an existing service binding.\n\n"+
-					"Example:\n"+
-					"$ %s tx service update-binding <service-name> <provider-address> "+
-					"--deposit=1stake "+
-					"--pricing=<pricing content or path/to/pricing.json> "+
-					"--qos=50 "+
-					"--options=<non-functional requirements content or path/to/options.json>"+
-					"--from mykey\n",
-				version.AppName,
-			),
+		Long:  "Update an existing service binding.",
+		Example: fmt.Sprintf(
+			"$ %s tx service update-binding <service-name> <provider-address> "+
+				"--deposit=1stake "+
+				"--pricing=<pricing content or path/to/pricing.json> "+
+				"--qos=50 "+
+				"--options=<non-functional requirements content or path/to/options.json>"+
+				"--from mykey",
+			version.AppName,
 		),
 		Args: cobra.RangeArgs(1, 2),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -324,17 +314,11 @@ func GetCmdUpdateServiceBinding() *cobra.Command {
 // GetCmdSetWithdrawAddr implements setting a withdrawal address command
 func GetCmdSetWithdrawAddr() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "set-withdraw-addr [withdrawal-address]",
-		Short: "Set a withdrawal address for an owner",
-		Long: strings.TrimSpace(
-			fmt.Sprintf(
-				"Set a withdrawal address for an owner.\n\n"+
-					"Example:\n"+
-					"$ %s tx service set-withdraw-addr <withdrawal-address> --from mykey\n",
-				version.AppName,
-			),
-		),
-		Args: cobra.ExactArgs(1),
+		Use:     "set-withdraw-addr [withdrawal-address]",
+		Short:   "Set a withdrawal address for an owner",
+		Long:    "Set a withdrawal address for an owner.",
+		Example: fmt.Sprintf("$ %s tx service set-withdraw-addr <withdrawal-address> --from mykey", version.AppName),
+		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 			clientCtx, err := client.ReadTxCommandFlags(clientCtx, cmd.Flags())
@@ -364,17 +348,11 @@ func GetCmdSetWithdrawAddr() *cobra.Command {
 // GetCmdDisableServiceBinding implements disabling a service binding command
 func GetCmdDisableServiceBinding() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "disable [service-name] [provider-address]",
-		Short: "Disable an available service binding",
-		Long: strings.TrimSpace(
-			fmt.Sprintf(
-				"Disable an available service binding.\n\n"+
-					"Example:\n"+
-					"$ %s tx service disable <service-name> <provider-address> --from mykey\n",
-				version.AppName,
-			),
-		),
-		Args: cobra.RangeArgs(1, 2),
+		Use:     "disable [service-name] [provider-address]",
+		Short:   "Disable an available service binding",
+		Long:    "Disable an available service binding.",
+		Example: fmt.Sprintf("$ %s tx service disable <service-name> <provider-address> --from mykey", version.AppName),
+		Args:    cobra.RangeArgs(1, 2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 			clientCtx, err := client.ReadTxCommandFlags(clientCtx, cmd.Flags())
@@ -409,17 +387,11 @@ func GetCmdDisableServiceBinding() *cobra.Command {
 // GetCmdEnableServiceBinding implements enabling a service binding command
 func GetCmdEnableServiceBinding() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "enable [service-name] [provider-address]",
-		Short: "Enable an unavailable service binding",
-		Long: strings.TrimSpace(
-			fmt.Sprintf(
-				"Enable an unavailable service binding.\n\n"+
-					"Example:\n"+
-					"$ %s tx service enable <service-name> <provider-address> --deposit=1stake --from mykey\n",
-				version.AppName,
-			),
-		),
-		Args: cobra.RangeArgs(1, 2),
+		Use:     "enable [service-name] [provider-address]",
+		Short:   "Enable an unavailable service binding",
+		Long:    "Enable an unavailable service binding.",
+		Example: fmt.Sprintf("$ %s tx service enable <service-name> <provider-address> --deposit=1stake --from mykey", version.AppName),
+		Args:    cobra.RangeArgs(1, 2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 			clientCtx, err := client.ReadTxCommandFlags(clientCtx, cmd.Flags())
@@ -466,17 +438,11 @@ func GetCmdEnableServiceBinding() *cobra.Command {
 // GetCmdRefundServiceDeposit implements refunding deposit command
 func GetCmdRefundServiceDeposit() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "refund-deposit [service-name] [provider-address]",
-		Short: "Refund all deposit from a service binding",
-		Long: strings.TrimSpace(
-			fmt.Sprintf(
-				"Refund all deposit from a service binding.\n\n"+
-					"Example:\n"+
-					"$ %s tx service refund-deposit <service-name> <provider-address> --from mykey\n",
-				version.AppName,
-			),
-		),
-		Args: cobra.RangeArgs(1, 2),
+		Use:     "refund-deposit [service-name] [provider-address]",
+		Short:   "Refund all deposit from a service binding",
+		Long:    "Refund all deposit from a service binding.",
+		Example: fmt.Sprintf("$ %s tx service refund-deposit <service-name> <provider-address> --from mykey", version.AppName),
+		Args:    cobra.RangeArgs(1, 2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 			clientCtx, err := client.ReadTxCommandFlags(clientCtx, cmd.Flags())
@@ -513,22 +479,19 @@ func GetCmdCallService() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "call",
 		Short: "Initiate a service call",
-		Long: strings.TrimSpace(
-			fmt.Sprintf(
-				"Initiate a service call.\n\n"+
-					"Example:\n"+
-					"$ %s tx service call "+
-					"--service-name=<service-name> "+
-					"--providers=<provider list> "+
-					"--service-fee-cap=1stake "+
-					"--data=<input content or path/to/input.json> "+
-					"--timeout=100 "+
-					"--repeated "+
-					"--frequency=150 "+
-					"--total=100 "+
-					"--from mykey\n",
-				version.AppName,
-			),
+		Long:  "Initiate a service call.",
+		Example: fmt.Sprintf(
+			"$ %s tx service call "+
+				"--service-name=<service-name> "+
+				"--providers=<provider list> "+
+				"--service-fee-cap=1stake "+
+				"--data=<input content or path/to/input.json> "+
+				"--timeout=100 "+
+				"--repeated "+
+				"--frequency=150 "+
+				"--total=100 "+
+				"--from mykey",
+			version.AppName,
 		),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
@@ -618,17 +581,14 @@ func GetCmdRespondService() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "respond",
 		Short: "Respond to a service request",
-		Long: strings.TrimSpace(
-			fmt.Sprintf(
-				"Respond to an active service request."+
-					"Example:"+
-					"$ %s tx service respond "+
-					"--request-id=<request-id> "+
-					"--result=<result content or path/to/result.json>"+
-					"--data=<output content or path/to/output.json> "+
-					"--from mykey\n",
-				version.AppName,
-			),
+		Long:  "Respond to an active service request.",
+		Example: fmt.Sprintf(
+			"$ %s tx service respond "+
+				"--request-id=<request-id> "+
+				"--result=<result content or path/to/result.json>"+
+				"--data=<output content or path/to/output.json> "+
+				"--from mykey",
+			version.AppName,
 		),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
@@ -712,17 +672,11 @@ func GetCmdRespondService() *cobra.Command {
 // GetCmdPauseRequestContext implements pausing a request context command
 func GetCmdPauseRequestContext() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "pause [request-context-id]",
-		Short: "Pause a running request context",
-		Long: strings.TrimSpace(
-			fmt.Sprintf(
-				"Pause a running request context.\n\n"+
-					"Example:\n"+
-					"$ %s tx service pause <request-context-id> --from mykey\n",
-				version.AppName,
-			),
-		),
-		Args: cobra.ExactArgs(1),
+		Use:     "pause [request-context-id]",
+		Short:   "Pause a running request context",
+		Long:    "Pause a running request context.",
+		Example: fmt.Sprintf("$ %s tx service pause <request-context-id> --from mykey", version.AppName),
+		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 			clientCtx, err := client.ReadTxCommandFlags(clientCtx, cmd.Flags())
@@ -753,17 +707,11 @@ func GetCmdPauseRequestContext() *cobra.Command {
 // GetCmdStartRequestContext implements restarting a request context command
 func GetCmdStartRequestContext() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "start [request-context-id]",
-		Short: "Start a paused request context",
-		Long: strings.TrimSpace(
-			fmt.Sprintf(
-				"Start a paused request context.\n\n"+
-					"Example:\n"+
-					"$ %s tx service start <request-context-id> --from mykey\n",
-				version.AppName,
-			),
-		),
-		Args: cobra.ExactArgs(1),
+		Use:     "start [request-context-id]",
+		Short:   "Start a paused request context",
+		Long:    "Start a paused request context.",
+		Example: fmt.Sprintf("$ %s tx service start <request-context-id> --from mykey", version.AppName),
+		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 			clientCtx, err := client.ReadTxCommandFlags(clientCtx, cmd.Flags())
@@ -794,17 +742,11 @@ func GetCmdStartRequestContext() *cobra.Command {
 // GetCmdKillRequestContext implements terminating a request context command
 func GetCmdKillRequestContext() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "kill [request-context-id]",
-		Short: "Terminate a request context",
-		Long: strings.TrimSpace(
-			fmt.Sprintf(
-				"Terminate a request context.\n\n"+
-					"Example:\n"+
-					"$ %s tx service kill <request-context-id> --from mykey\n",
-				version.AppName,
-			),
-		),
-		Args: cobra.ExactArgs(1),
+		Use:     "kill [request-context-id]",
+		Short:   "Terminate a request context",
+		Long:    "Terminate a request context.",
+		Example: fmt.Sprintf("$ %s tx service kill <request-context-id> --from mykey", version.AppName),
+		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 			clientCtx, err := client.ReadTxCommandFlags(clientCtx, cmd.Flags())
@@ -837,19 +779,16 @@ func GetCmdUpdateRequestContext() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "update [request-context-id]",
 		Short: "Update a request context",
-		Long: strings.TrimSpace(
-			fmt.Sprintf(
-				"Update a request context.\n\n"+
-					"Example:\n"+
-					"$ %s tx service update <request-context-id> "+
-					"--providers=<new providers> "+
-					"--service-fee-cap=2iris "+
-					"--timeout=0 "+
-					"--frequency=200 "+
-					"--total=200 "+
-					"--from mykey\n",
-				version.AppName,
-			),
+		Long:  "Update a request context.",
+		Example: fmt.Sprintf(
+			"$ %s tx service update <request-context-id> "+
+				"--providers=<new providers> "+
+				"--service-fee-cap=2iris "+
+				"--timeout=0 "+
+				"--frequency=200 "+
+				"--total=200 "+
+				"--from mykey",
+			version.AppName,
 		),
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -912,17 +851,11 @@ func GetCmdUpdateRequestContext() *cobra.Command {
 // GetCmdWithdrawEarnedFees implements withdrawing earned fees command
 func GetCmdWithdrawEarnedFees() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "withdraw-fees [provider-address]",
-		Short: "Withdraw the earned fees of a provider or owner",
-		Long: strings.TrimSpace(
-			fmt.Sprintf(
-				"Withdraw the earned fees of the specified provider, for all providers of the owner if the provider not given.\n\n"+
-					"Example:\n"+
-					"$ %s tx service withdraw-fees <provider-address> --from mykey\n",
-				version.AppName,
-			),
-		),
-		Args: cobra.MaximumNArgs(1),
+		Use:     "withdraw-fees [provider-address]",
+		Short:   "Withdraw the earned fees of a provider or owner",
+		Long:    "Withdraw the earned fees of the specified provider, for all providers of the owner if the provider not given.",
+		Example: fmt.Sprintf("$ %s tx service withdraw-fees <provider-address> --from mykey", version.AppName),
+		Args:    cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 			clientCtx, err := client.ReadTxCommandFlags(clientCtx, cmd.Flags())

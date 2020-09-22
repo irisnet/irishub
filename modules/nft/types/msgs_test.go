@@ -15,7 +15,9 @@ func TestNewMsgTransferNFT(t *testing.T) {
 	newMsgTransferNFT := types.NewMsgTransferNFT(
 		fmt.Sprintf("     %s     ", denomID),
 		fmt.Sprintf("     %s     ", denom),
-		fmt.Sprintf("     %s     ", id), tokenURI, tokenData, address, address2)
+		fmt.Sprintf("     %s     ", id),
+		tokenURI, tokenData, address, address2,
+	)
 	require.Equal(t, newMsgTransferNFT.Sender, address)
 	require.Equal(t, newMsgTransferNFT.Recipient, address2)
 	require.Equal(t, newMsgTransferNFT.Denom, denom)
@@ -58,7 +60,9 @@ func TestNewMsgEditNFT(t *testing.T) {
 		fmt.Sprintf("     %s     ", id),
 		fmt.Sprintf("     %s     ", denom),
 		fmt.Sprintf("     %s     ", nftName),
-		fmt.Sprintf("     %s     ", tokenURI), tokenData, address)
+		fmt.Sprintf("     %s     ", tokenURI),
+		tokenData, address,
+	)
 
 	require.Equal(t, newMsgEditNFT.Sender.String(), address.String())
 	require.Equal(t, newMsgEditNFT.Id, id)
@@ -103,7 +107,9 @@ func TestNewMsgMintNFT(t *testing.T) {
 		fmt.Sprintf("     %s     ", id),
 		fmt.Sprintf("     %s     ", denom),
 		fmt.Sprintf("     %s     ", nftName),
-		fmt.Sprintf("     %s     ", tokenURI), tokenData, address, address2)
+		fmt.Sprintf("     %s     ", tokenURI),
+		tokenData, address, address2,
+	)
 
 	require.Equal(t, newMsgMintNFT.Sender.String(), address.String())
 	require.Equal(t, newMsgMintNFT.Recipient.String(), address2.String())
@@ -137,9 +143,11 @@ func TestMsgMintNFTGetSignBytesMethod(t *testing.T) {
 }
 
 func TestNewMsgBurnNFT(t *testing.T) {
-	newMsgBurnNFT := types.NewMsgBurnNFT(address,
+	newMsgBurnNFT := types.NewMsgBurnNFT(
+		address,
 		fmt.Sprintf("     %s     ", id),
-		fmt.Sprintf("     %s     ", denom))
+		fmt.Sprintf("     %s     ", denom),
+	)
 
 	require.Equal(t, newMsgBurnNFT.Sender.String(), address.String())
 	require.Equal(t, newMsgBurnNFT.Id, id)

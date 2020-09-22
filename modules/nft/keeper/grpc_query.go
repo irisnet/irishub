@@ -23,17 +23,13 @@ func (k Keeper) Supply(c context.Context, request *types.QuerySupplyRequest) (*t
 	default:
 		supply = k.GetTotalSupplyOfOwner(ctx, denom, request.Owner)
 	}
-	return &types.QuerySupplyResponse{
-		Amount: supply,
-	}, nil
+	return &types.QuerySupplyResponse{Amount: supply}, nil
 }
 
 func (k Keeper) Owner(c context.Context, request *types.QueryOwnerRequest) (*types.QueryOwnerResponse, error) {
 	ctx := sdk.UnwrapSDKContext(c)
 	owner := k.GetOwner(ctx, request.Owner, request.Denom)
-	return &types.QueryOwnerResponse{
-		Owner: &owner,
-	}, nil
+	return &types.QueryOwnerResponse{Owner: &owner}, nil
 }
 
 func (k Keeper) Collection(c context.Context, request *types.QueryCollectionRequest) (*types.QueryCollectionResponse, error) {
@@ -44,9 +40,7 @@ func (k Keeper) Collection(c context.Context, request *types.QueryCollectionRequ
 	if err != nil {
 		return nil, err
 	}
-	return &types.QueryCollectionResponse{
-		Collection: &collection,
-	}, nil
+	return &types.QueryCollectionResponse{Collection: &collection}, nil
 }
 
 func (k Keeper) Denom(c context.Context, request *types.QueryDenomRequest) (*types.QueryDenomResponse, error) {
@@ -58,9 +52,7 @@ func (k Keeper) Denom(c context.Context, request *types.QueryDenomRequest) (*typ
 		return nil, err
 	}
 
-	return &types.QueryDenomResponse{
-		Denom: &denomObject,
-	}, nil
+	return &types.QueryDenomResponse{Denom: &denomObject}, nil
 }
 
 func (k Keeper) Denoms(c context.Context, request *types.QueryDenomsRequest) (*types.QueryDenomsResponse, error) {
@@ -86,7 +78,5 @@ func (k Keeper) NFT(c context.Context, request *types.QueryNFTRequest) (*types.Q
 		return nil, sdkerrors.Wrapf(types.ErrUnknownNFT, "invalid type NFT %s from collection %s", request.Id, request.Denom)
 	}
 
-	return &types.QueryNFTResponse{
-		NFT: &baseNFT,
-	}, nil
+	return &types.QueryNFTResponse{NFT: &baseNFT}, nil
 }

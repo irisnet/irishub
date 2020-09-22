@@ -85,7 +85,7 @@ func (suite *KeeperSuite) TestQueryCollection() {
 	suite.Nil(errRes)
 
 	query.Data = bz
-	res, err = querier(suite.ctx, []string{"collection"}, query)
+	_, err = querier(suite.ctx, []string{"collection"}, query)
 	suite.NoError(err)
 
 	queryCollectionParams = types.NewQuerySupplyParams(denomID, nil)

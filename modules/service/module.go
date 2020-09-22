@@ -118,8 +118,7 @@ func NewAppModule(cdc codec.Marshaler, keeper keeper.Keeper, accountKeeper types
 func (AppModule) Name() string { return types.ModuleName }
 
 // RegisterInvariants registers the service module invariants.
-func (am AppModule) RegisterInvariants(ir sdk.InvariantRegistry) {
-}
+func (am AppModule) RegisterInvariants(ir sdk.InvariantRegistry) {}
 
 // Route returns the message routing key for the service module.
 func (am AppModule) Route() sdk.Route {
@@ -167,8 +166,7 @@ func (am AppModule) EndBlock(ctx sdk.Context, _ abci.RequestEndBlock) []abci.Val
 // AppModuleSimulation functions
 
 // GenerateGenesisState creates a randomized GenState of the service module.
-func (AppModule) GenerateGenesisState(simState *module.SimulationState) {
-}
+func (AppModule) GenerateGenesisState(simState *module.SimulationState) {}
 
 // ProposalContents doesn't return any content functions for governance proposals.
 func (AppModule) ProposalContents(simState module.SimulationState) []simtypes.WeightedProposalContent {

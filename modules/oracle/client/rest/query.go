@@ -15,22 +15,11 @@ import (
 
 func registerQueryRoutes(cliCtx client.Context, r *mux.Router) {
 	// query a feed definition
-	r.HandleFunc(
-		fmt.Sprintf("/oracle/feeds/{%s}", FeedName),
-		queryFeedHandlerFn(cliCtx),
-	).Methods("GET")
-
+	r.HandleFunc(fmt.Sprintf("/oracle/feeds/{%s}", FeedName), queryFeedHandlerFn(cliCtx)).Methods("GET")
 	// query a feed list by condition
-	r.HandleFunc(
-		fmt.Sprintf("/oracle/feeds"),
-		queryFeedsHandlerFn(cliCtx),
-	).Methods("GET")
-
+	r.HandleFunc("/oracle/feeds", queryFeedsHandlerFn(cliCtx)).Methods("GET")
 	// query a feed value by feed name
-	r.HandleFunc(
-		fmt.Sprintf("/oracle/feeds/{%s}/values", FeedName),
-		queryFeedValuesHandlerFn(cliCtx),
-	).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/oracle/feeds/{%s}/values", FeedName), queryFeedValuesHandlerFn(cliCtx)).Methods("GET")
 }
 
 func queryFeedHandlerFn(cliCtx client.Context) http.HandlerFunc {
@@ -65,7 +54,6 @@ func queryFeedHandlerFn(cliCtx client.Context) http.HandlerFunc {
 
 func queryFeedsHandlerFn(cliCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
 		params := types.QueryFeedsParams{
 			State: oracleClient.GetUrlParam(r.URL, FeedState),
 		}

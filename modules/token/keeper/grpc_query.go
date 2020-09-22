@@ -55,8 +55,7 @@ func (k Keeper) Tokens(c context.Context, req *types.QueryTokensRequest) (*types
 		}
 
 		var err error
-		result[i], err = codectypes.NewAnyWithValue(msg)
-		if err != nil {
+		if result[i], err = codectypes.NewAnyWithValue(msg); err != nil {
 			return nil, status.Error(codes.Internal, err.Error())
 		}
 	}
@@ -79,12 +78,11 @@ func (k Keeper) Fees(c context.Context, req *types.QueryFeesRequest) (*types.Que
 	issueFee := k.GetTokenIssueFee(ctx, symbol)
 	mintFee := k.GetTokenMintFee(ctx, symbol)
 
-	resp := &types.QueryFeesResponse{
+	return &types.QueryFeesResponse{
 		Exist:    k.HasToken(ctx, symbol),
 		IssueFee: issueFee,
 		MintFee:  mintFee,
-	}
-	return resp, nil
+	}, nil
 }
 
 func (k Keeper) Params(c context.Context, req *types.QueryParamsRequest) (*types.QueryParamsResponse, error) {

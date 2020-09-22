@@ -10,7 +10,8 @@ import (
 // SetCollection save all NFT and return error if existed
 func (k Keeper) SetCollection(ctx sdk.Context, collection types.Collection) error {
 	for _, nft := range collection.NFTs {
-		if err := k.MintNFT(ctx,
+		if err := k.MintNFT(
+			ctx,
 			collection.Denom.Id,
 			nft.GetID(),
 			nft.GetName(),

@@ -35,8 +35,7 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 			h.ExpirationHeight = h.ExpirationHeight - uint64(ctx.BlockHeight()) + 1
 			pendingHtlcs[hlock.String()] = h
 		} else if h.State == types.Expired {
-			err := k.RefundHTLC(ctx, hlock)
-			if err != nil {
+			if err := k.RefundHTLC(ctx, hlock); err != nil {
 				panic(fmt.Errorf("failed to export the HTLC genesis state: %s", hlock.String()))
 			}
 		}

@@ -12,10 +12,7 @@ import (
 
 // RegisterInvariants registers all supply invariants
 func RegisterInvariants(ir sdk.InvariantRegistry, k Keeper) {
-	ir.RegisterRoute(
-		types.ModuleName, "supply",
-		SupplyInvariant(k),
-	)
+	ir.RegisterRoute(types.ModuleName, "supply", SupplyInvariant(k))
 }
 
 // AllInvariants runs all invariants of the nfts module.
@@ -41,14 +38,19 @@ func SupplyInvariant(k Keeper) sdk.Invariant {
 		for denom, supply := range ownersCollectionsSupply {
 			if supply != k.GetTotalSupply(ctx, denom) {
 				count++
-				msg += fmt.Sprintf("total %s NFTs supply invariance:\n"+
-					"\ttotal %s NFTs supply: %d\n"+
-					"\tsum of %s NFTs by owner: %d\n", denom, denom, supply, denom, ownersCollectionsSupply[denom])
+				msg += fmt.Sprintf(
+					"total %s NFTs supply invariance:\n"+
+						"\ttotal %s NFTs supply: %d\n"+
+						"\tsum of %s NFTs by owner: %d\n",
+					denom, denom, supply, denom, ownersCollectionsSupply[denom],
+				)
 			}
 		}
 		broken := count != 0
 
-		return sdk.FormatInvariant(types.ModuleName, "supply", fmt.Sprintf(
-			"%d NFT supply invariants found\n%s", count, msg)), broken
+		return sdk.FormatInvariant(
+			types.ModuleName, "supply",
+			fmt.Sprintf("%d NFT supply invariants found\n%s", count, msg),
+		), broken
 	}
 }

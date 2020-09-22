@@ -32,16 +32,11 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 	}
 }
 
-func HandleMsgIssueDenom(ctx sdk.Context, msg *types.MsgIssueDenom, k keeper.Keeper,
-) (*sdk.Result, error) {
+func HandleMsgIssueDenom(ctx sdk.Context, msg *types.MsgIssueDenom, k keeper.Keeper) (*sdk.Result, error) {
 	id := strings.ToLower(strings.TrimSpace(msg.Id))
 	name := strings.ToLower(strings.TrimSpace(msg.Name))
 
-	if err := k.IssueDenom(ctx,
-		id,
-		name,
-		msg.Schema,
-		msg.Sender); err != nil {
+	if err := k.IssueDenom(ctx, id, name, msg.Schema, msg.Sender); err != nil {
 		return nil, err
 	}
 
@@ -60,19 +55,18 @@ func HandleMsgIssueDenom(ctx sdk.Context, msg *types.MsgIssueDenom, k keeper.Kee
 }
 
 // HandleMsgTransferNFT handler for MsgTransferNFT
-func HandleMsgTransferNFT(ctx sdk.Context, msg *types.MsgTransferNFT, k keeper.Keeper,
-) (*sdk.Result, error) {
+func HandleMsgTransferNFT(ctx sdk.Context, msg *types.MsgTransferNFT, k keeper.Keeper) (*sdk.Result, error) {
 	id := strings.ToLower(strings.TrimSpace(msg.Id))
 	denom := strings.ToLower(strings.TrimSpace(msg.Denom))
 
-	if err := k.TransferOwner(ctx,
-		denom,
-		id,
+	if err := k.TransferOwner(
+		ctx, denom, id,
 		strings.TrimSpace(msg.Name),
 		strings.TrimSpace(msg.URI),
 		msg.Data,
 		msg.Sender,
-		msg.Recipient); err != nil {
+		msg.Recipient,
+	); err != nil {
 		return nil, err
 	}
 
@@ -93,18 +87,17 @@ func HandleMsgTransferNFT(ctx sdk.Context, msg *types.MsgTransferNFT, k keeper.K
 }
 
 // HandleMsgEditNFT handler for MsgEditNFT
-func HandleMsgEditNFT(ctx sdk.Context, msg *types.MsgEditNFT, k keeper.Keeper,
-) (*sdk.Result, error) {
+func HandleMsgEditNFT(ctx sdk.Context, msg *types.MsgEditNFT, k keeper.Keeper) (*sdk.Result, error) {
 	id := strings.ToLower(strings.TrimSpace(msg.Id))
 	denom := strings.ToLower(strings.TrimSpace(msg.Denom))
 
-	if err := k.EditNFT(ctx,
-		denom,
-		id,
+	if err := k.EditNFT(
+		ctx, denom, id,
 		strings.TrimSpace(msg.Name),
 		strings.TrimSpace(msg.URI),
 		msg.Data,
-		msg.Sender); err != nil {
+		msg.Sender,
+	); err != nil {
 		return nil, err
 	}
 
@@ -125,18 +118,17 @@ func HandleMsgEditNFT(ctx sdk.Context, msg *types.MsgEditNFT, k keeper.Keeper,
 }
 
 // HandleMsgMintNFT handles MsgMintNFT
-func HandleMsgMintNFT(ctx sdk.Context, msg *types.MsgMintNFT, k keeper.Keeper,
-) (*sdk.Result, error) {
+func HandleMsgMintNFT(ctx sdk.Context, msg *types.MsgMintNFT, k keeper.Keeper) (*sdk.Result, error) {
 	id := strings.ToLower(strings.TrimSpace(msg.Id))
 	denom := strings.ToLower(strings.TrimSpace(msg.Denom))
 
-	if err := k.MintNFT(ctx,
-		denom,
-		id,
+	if err := k.MintNFT(
+		ctx, denom, id,
 		strings.TrimSpace(msg.Name),
 		strings.TrimSpace(msg.URI),
 		msg.Data,
-		msg.Recipient); err != nil {
+		msg.Recipient,
+	); err != nil {
 		return nil, err
 	}
 
@@ -158,16 +150,11 @@ func HandleMsgMintNFT(ctx sdk.Context, msg *types.MsgMintNFT, k keeper.Keeper,
 }
 
 // HandleMsgBurnNFT handles MsgBurnNFT
-func HandleMsgBurnNFT(ctx sdk.Context, msg *types.MsgBurnNFT, k keeper.Keeper,
-) (*sdk.Result, error) {
+func HandleMsgBurnNFT(ctx sdk.Context, msg *types.MsgBurnNFT, k keeper.Keeper) (*sdk.Result, error) {
 	id := strings.ToLower(strings.TrimSpace(msg.Id))
 	denom := strings.ToLower(strings.TrimSpace(msg.Denom))
 
-	if err := k.BurnNFT(ctx,
-		denom,
-		id,
-		msg.Sender,
-	); err != nil {
+	if err := k.BurnNFT(ctx, denom, id, msg.Sender); err != nil {
 		return nil, err
 	}
 
