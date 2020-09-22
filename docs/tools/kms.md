@@ -17,7 +17,7 @@ When compiling the KMS, ensure you have enabled the applicable features:
 :::
 
 | Backend               | Recommended Command line              |
-|-----------------------|---------------------------------------|
+| --------------------- | ------------------------------------- |
 | YubiHSM               | ```cargo build --features yubihsm```  |
 | Ledger+Tendermint App | ```cargo build --features ledgertm``` |
 

@@ -9,8 +9,8 @@
 | [sign](#iris-tx-sign)           | 签名生成的离线交易文件   |
 | [broadcast](#iris-tx-broadcast) | 广播一个已签名交易到网络 |
 | [multisig](#iris-tx-multisign)  | 用多个账户为同一交易签名 |
-| [tx](#iris-query-tx)                | 使用交易hash查询交易     |
-| [txs](#iris-query-txs)              | 使用Tag查询交易          |
+| [tx](#iris-query-tx)            | 使用交易hash查询交易     |
+| [txs](#iris-query-txs)          | 使用Tag查询交易          |
 
 ## iris tx sign
 
@@ -29,7 +29,7 @@ iris tx sign <file> [flags]
 | --multisig       | string |      | true  | 代表交易签名的multisig帐户的地址 |
 | --from           | string | 是   |       | 用于签名的私钥名称               |
 | --offline        | bool   |      | false | 离线模式                         |
-| --signature-only | bool   |    | false | 仅打印生成的签名，然后退出       |
+| --signature-only | bool   |      | false | 仅打印生成的签名，然后退出       |
 
 ### 生成离线交易
 
@@ -46,7 +46,32 @@ iris tx bank send iaa1w9lvhwlvkwqvg08q84n2k4nn896u9pqx93velx iaa15uys54epmd2xzhc
 `unsigned.json` 看起来是这样的：
 
 ```json
-{"type":"cosmos-sdk/StdTx","value":{"msg":[{"type":"cosmos-sdk/MsgSend","value":{"from_address":"iaa1w9lvhwlvkwqvg08q84n2k4nn896u9pqx93velx","to_address":"iaa15uys54epmd2xzhcn32szps56wvev40tt908h62","amount":[{"denom":"iris","amount":"10"}]}}],"fee":{"amount":[],"gas":"200000"},"signatures":null,"memo":""}}
+{
+    "type": "cosmos-sdk/StdTx",
+    "value": {
+        "msg": [
+            {
+                "type": "cosmos-sdk/MsgSend",
+                "value": {
+                    "from_address": "iaa1w9lvhwlvkwqvg08q84n2k4nn896u9pqx93velx",
+                    "to_address": "iaa15uys54epmd2xzhcn32szps56wvev40tt908h62",
+                    "amount": [
+                        {
+                            "denom": "iris",
+                            "amount": "10"
+                        }
+                    ]
+                }
+            }
+        ],
+        "fee": {
+            "amount": [],
+            "gas": "200000"
+        },
+        "signatures": null,
+        "memo": ""
+    }
+}
 ```
 
 ### 签名离线交易
@@ -58,7 +83,61 @@ iris tx sign unsigned.json --name=<key-name> > signed.tx
 `signed.json` 看起来是这样的：
 
 ```json
-{"type":"auth/StdTx","value":{"msg":[{"type":"cosmos-sdk/Send","value":{"inputs":[{"address":"iaa106nhdckyf996q69v3qdxwe6y7408pvyvyxzhxh","coins":[{"denom":"uiris","amount":"10000000"}]}],"outputs":[{"address":"iaa1893x4l2rdshytfzvfpduecpswz7qtpstevr742","coins":[{"denom":"uiris","amount":"10000000"}]}]}}],"fee":{"amount":[{"denom":"uiris","amount":"40000000"}],"gas":"200000"},"signatures":[{"pub_key":{"type":"tendermint/PubKeySecp256k1","value":"Auouudrg0P86v2kq2lykdr97AJYGHyD6BJXAQtjR1gzd"},"signature":"sJewd6lKjma49rAiGVfdT+V0YYerKNx6ZksdumVCvuItqGm24bEN9msh7IJ12Sil1lYjqQjdAcjVCX/77FKlIQ==","account_number":"0","sequence":"3"}],"memo":"test"}}
+{
+    "type": "auth/StdTx",
+    "value": {
+        "msg": [
+            {
+                "type": "cosmos-sdk/Send",
+                "value": {
+                    "inputs": [
+                        {
+                            "address": "iaa106nhdckyf996q69v3qdxwe6y7408pvyvyxzhxh",
+                            "coins": [
+                                {
+                                    "denom": "uiris",
+                                    "amount": "10000000"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        {
+                            "address": "iaa1893x4l2rdshytfzvfpduecpswz7qtpstevr742",
+                            "coins": [
+                                {
+                                    "denom": "uiris",
+                                    "amount": "10000000"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        ],
+        "fee": {
+            "amount": [
+                {
+                    "denom": "uiris",
+                    "amount": "40000000"
+                }
+            ],
+            "gas": "200000"
+        },
+        "signatures": [
+            {
+                "pub_key": {
+                    "type": "tendermint/PubKeySecp256k1",
+                    "value": "Auouudrg0P86v2kq2lykdr97AJYGHyD6BJXAQtjR1gzd"
+                },
+                "signature": "sJewd6lKjma49rAiGVfdT+V0YYerKNx6ZksdumVCvuItqGm24bEN9msh7IJ12Sil1lYjqQjdAcjVCX/77FKlIQ==",
+                "account_number": "0",
+                "sequence": "3"
+            }
+        ],
+        "memo": "test"
+    }
+}
 ```
 
 签名之后，`signed.json`中的`signature`字段将不再为空。
@@ -138,6 +217,7 @@ iris query tx [hash] [flags]
 ```bash
 iris query txs --events 'message.sender=<iaa...>&message.action=xxxx' --page 1 --limit 30
 ```
+
 其中`message.action`可取值：
 
 | module       | Msg                                       | action               |

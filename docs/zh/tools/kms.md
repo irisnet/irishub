@@ -17,7 +17,7 @@ KMS是密钥管理系统的简称，请参阅[Tendermint KMS](https://github.com
 :::
 
 | Backend               | Recommended Command line              |
-|-----------------------|---------------------------------------|
+| --------------------- | ------------------------------------- |
 | YubiHSM               | ```cargo build --features yubihsm```  |
 | Ledger+Tendermint App | ```cargo build --features ledgertm``` |
 

@@ -11,19 +11,27 @@
 
 ## 可用命令
 
-| Name                                   | Description                                      |
-| -------------------------------------- | ------------------------------------------------ |
-| [create](#iris-tx-htlc-create)         | 创建HTLC                                         |
-| [claim](#iris-tx-htlc-claim)           | 将一个OPEN状态的HTLC中锁定的资金发放到收款人地址 |
-| [refund](#iris-tx-htlc-refund)         | 从过期的HTLC中取回退款                           |
-| [htlc](#iris-query-htlc-htlc)          | 查询一个HTLC的详细信息                           |
+| Name                           | Description                                      |
+| ------------------------------ | ------------------------------------------------ |
+| [create](#iris-tx-htlc-create) | 创建HTLC                                         |
+| [claim](#iris-tx-htlc-claim)   | 将一个OPEN状态的HTLC中锁定的资金发放到收款人地址 |
+| [refund](#iris-tx-htlc-refund) | 从过期的HTLC中取回退款                           |
+| [htlc](#iris-query-htlc-htlc)  | 查询一个HTLC的详细信息                           |
 
 ## iris tx htlc create
 
 创建一个 HTLC。
 
 ```bash
-iris tx htlc create --to=<recipient> --receiver-on-other-chain=<receiver-on-other-chain> --amount=<amount> --secret=<secret> --hash-lock=<hash-lock> --timestamp=<timestamp> --time-lock=<time-lock> --from=mykey
+iris tx htlc create \
+    --to=<recipient> \
+    --receiver-on-other-chain=<receiver-on-other-chain> \
+    --amount=<amount> \
+    --secret=<secret> \
+    --hash-lock=<hash-lock> \
+    --timestamp=<timestamp> \
+    --time-lock=<time-lock> \
+    --from=mykey
 ```
 
 **标识：**
@@ -50,8 +58,7 @@ iris tx htlc create \
 --time-lock=50 \
 --timestamp=1580000000 \
 --fees=0.3iris \
---chain-id=irishub \
---commit
+--chain-id=irishub
 ```
 
 ## iris tx htlc claim

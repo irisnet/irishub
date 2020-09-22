@@ -4,19 +4,19 @@ This module provides the basic functionalities for [Governance](../features/gove
 
 ## Available Commands
 
-| Name                                            | Description                                                  |
-| ----------------------------------------------- | ------------------------------------------------------------ |
-| [proposal](#iris-query-gov-proposal)                | Query details of a single proposal                           |
-| [proposals](#iris-query-gov-proposals)              | Query proposals with optional filter                         |
-| [vote](#iris-query-gov-vote)                        | Query details of a single vote                               |
-| [votes](#iris-query-gov-votes)                      | Query votes on a proposal                                    |
-| [deposit](#iris-query-gov-deposit)                  | Query details of a deposit                                   |
-| [deposits](#iris-query-gov-deposits)                | Query deposits on a proposal                                 |
-| [tally](#iris-query-gov-tally)                      | Get the tally of a proposal vote                             |
-| [param](#iris-query-gov-param)                      | Query the parameters (voting                                 |
-| [params](#iris-query-gov-params)                    | Query the parameters of the governance process               |
-| [submit-proposal](#iris-tx-gov-submit-proposal) | Submit a proposal along with an initial deposit              |
-| [deposit](#iris-tx-gov-deposit)                 | Deposit tokens for an active proposal                        |
+| Name                                            | Description                                                       |
+| ----------------------------------------------- | ----------------------------------------------------------------- |
+| [proposal](#iris-query-gov-proposal)            | Query details of a single proposal                                |
+| [proposals](#iris-query-gov-proposals)          | Query proposals with optional filter                              |
+| [vote](#iris-query-gov-vote)                    | Query details of a single vote                                    |
+| [votes](#iris-query-gov-votes)                  | Query votes on a proposal                                         |
+| [deposit](#iris-query-gov-deposit)              | Query details of a deposit                                        |
+| [deposits](#iris-query-gov-deposits)            | Query deposits on a proposal                                      |
+| [tally](#iris-query-gov-tally)                  | Get the tally of a proposal vote                                  |
+| [param](#iris-query-gov-param)                  | Query the parameters (voting                                      |
+| [params](#iris-query-gov-params)                | Query the parameters of the governance process                    |
+| [submit-proposal](#iris-tx-gov-submit-proposal) | Submit a proposal along with an initial deposit                   |
+| [deposit](#iris-tx-gov-deposit)                 | Deposit tokens for an active proposal                             |
 | [vote](#iris-tx-gov-vote)                       | Vote for an active proposal, options: yes/no/no_with_veto/abstain |
 
 ## iris query gov proposal
@@ -43,12 +43,12 @@ iris query gov proposals [flags]
 
 **Flags:**
 
-| Name, shorthand | Type    | Required | Default | Description                                                  |
-| --------------- | ------- | -------- | ------- | ------------------------------------------------------------ |
-| --depositor     | Address |          |         | Filter proposals by depositor address                        |
+| Name, shorthand | Type    | Required | Default | Description                                                         |
+| --------------- | ------- | -------- | ------- | ------------------------------------------------------------------- |
+| --depositor     | Address |          |         | Filter proposals by depositor address                               |
 | --limit         | uint    |          |         | Limit to the latest [number] of proposals. Default to all proposals |
-| --status        | string  |          |         | Filter proposals by status                                   |
-| --voter         | Address |          |         | Filter proposals by voter address                            |
+| --status        | string  |          |         | Filter proposals by status                                          |
+| --voter         | Address |          |         | Filter proposals by voter address                                   |
 
 ### Query all proposals
 
@@ -142,6 +142,7 @@ iris query gov param [param-type] [flags]
 ```
 
 Example:
+
 ```bash
 > iris query gov param voting
 > iris query gov param tallying
@@ -159,7 +160,7 @@ iris query gov param [param-type] [flags]
 ## iris tx gov submit-proposal
 
 Submit a proposal along with an initial deposit. Proposal title, description, type and deposit can be given directly or through a proposal JSON file.
-Available Commands: `community-pool-spend`、`param-change`、`software-upgrade` 
+Available Commands: `community-pool-spend`、`param-change`、`software-upgrade`
 
 ### iris tx gov submit-proposal community-pool-spend
 
@@ -171,13 +172,14 @@ iris tx gov submit-proposal community-pool-spend <path/to/proposal.json> --from=
 ```
 
 Where proposal.json contains:
+
 ```json
 {
-  "title": "Community Pool Spend",
-  "description": "Pay me some Atoms!",
-  "recipient": "cosmos1s5afhd6gxevu37mkqcvvsj8qeylhn0rz46zdlq",
-  "amount": "1000stake",
-  "deposit": "1000stake"
+    "title": "Community Pool Spend",
+    "description": "Pay me some Atoms!",
+    "recipient": "cosmos1s5afhd6gxevu37mkqcvvsj8qeylhn0rz46zdlq",
+    "amount": "1000stake",
+    "deposit": "1000stake"
 }
 ```
 
@@ -198,19 +200,21 @@ regardless.
 ```bash
 iris tx gov submit-proposal param-change <path/to/proposal.json> --from=<key_or_address>
 ```
+
 Where proposal.json contains:
+
 ```json
 {
-  "title": "Staking Param Change",
-  "description": "Update max validators",
-  "changes": [
-    {
-      "subspace": "staking",
-      "key": "MaxValidators",
-      "value": 105
-    }
-  ],
-  "deposit": "1000stake"
+    "title": "Staking Param Change",
+    "description": "Update max validators",
+    "changes": [
+        {
+        "subspace": "staking",
+        "key": "MaxValidators",
+        "value": 105
+        }
+    ],
+    "deposit": "1000stake"
 }
 ```
 
@@ -225,15 +229,14 @@ iris tx gov submit-proposal software-upgrade [name] (--upgrade-height [height] |
 
 **Flags:**
 
-| Name, shorthand  | Type   | Required | Default | Description                                                  |
-| ---------------- | ------ | -------- | ------- | ------------------------------------------------------------ |
-| --deposit        | Coin   | Yes      |         | Deposit of the proposal                                      |
-| --title          | string | Yes      |         | Title of proposal                                            |
-| --description    | string | Yes      |         | Description of proposal                                      |
+| Name, shorthand  | Type   | Required | Default | Description                                                                               |
+| ---------------- | ------ | -------- | ------- | ----------------------------------------------------------------------------------------- |
+| --deposit        | Coin   | Yes      |         | Deposit of the proposal                                                                   |
+| --title          | string | Yes      |         | Title of proposal                                                                         |
+| --description    | string | Yes      |         | Description of proposal                                                                   |
 | --upgrade-height | int64  |          |         | The height at which the upgrade must happen (not to be used together with --upgrade-time) |
 | --time           | string |          |         | The time at which the upgrade must happen (not to be used together with --upgrade-height) |
-| --info           | string |          |         | Optional info for the planned upgrade such as commit hash, etc. |
-
+| --info           | string |          |         | Optional info for the planned upgrade such as commit hash, etc.                           |
 
 ## iris tx gov deposit
 

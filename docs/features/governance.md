@@ -184,16 +184,16 @@ tx_size_limit: "4000"
 
 # Send proposal for parameters change
 echo '{
-  "title": "Service Param Change",
-  "description": "Update max request timeout",
-  "changes": [
-    {
-      "subspace": "service",
-      "key": "MaxRequestTimeout",
-      "value": 150
-    }
-  ],
-  "deposit": "1000iris"
+    "title": "Service Param Change",
+    "description": "Update max request timeout",
+    "changes": [
+        {
+        "subspace": "service",
+        "key": "MaxRequestTimeout",
+        "value": 150
+        }
+    ],
+    "deposit": "1000iris"
 }' > proposal.json
 
 iris tx gov submit-proposal param-change proposal.json --from=<key-name> --fees=0.3iris --chain-id=irishub -b block -y
@@ -206,11 +206,11 @@ The community pool funds can be spent through the governance process.
 ```bash
 # Submit a proposal for community pool spending
 echo '{
-  "title": "Community Pool Spend",
-  "description": "Developer rewards",
-  "recipient": "iaa1s5afhd6gxevu37mkqcvvsj8qeylhn0rz46zdlq",
-  "amount": "10000iris",
-  "deposit": "1000iris"
+    "title": "Community Pool Spend",
+    "description": "Developer rewards",
+    "recipient": "iaa1s5afhd6gxevu37mkqcvvsj8qeylhn0rz46zdlq",
+    "amount": "10000iris",
+    "deposit": "1000iris"
 }' > proposal.json
 
 iris tx gov submit-proposal community-pool-spend proposal.json --from=<key-name> --fees=0.3iris --chain-id=irishub -b block -y

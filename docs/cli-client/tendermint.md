@@ -21,7 +21,7 @@ iris tendermint show-address
 
 ## iris tendermint show-node-id
 
-显示此节点ID 
+显示此节点ID
 
 ```bash
 iris tendermint show-node-id

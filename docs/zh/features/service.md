@@ -14,41 +14,41 @@ IRIS服务（又称iService）旨在弥合区块链和传统应用之间的鸿�
 
 ```json
 {
-  "input": {
-    "$schema": "http://json-schema.org/draft-04/schema#",
-    "title": "service-def-input-example",
-    "description": "Schema for a service input example",
-    "type": "object",
-    "properties": {
-      "base": {
-        "description": "base token denom",
-        "type": "string"
-      },
-      "quote": {
-        "description": "quote token denom",
-        "type": "string"
-      }
+    "input": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "title": "service-def-input-body-example",
+        "description": "Schema for a service input body example",
+        "type": "object",
+        "properties": {
+            "base": {
+                "description": "base token denom",
+                "type": "string"
+            },
+            "quote": {
+                "description": "quote token denom",
+                "type": "string"
+            }
+        },
+        "required": [
+            "base",
+            "quote"
+        ]
     },
-    "required": [
-      "base",
-      "quote"
-    ]
-  },
-  "output": {
-    "$schema": "http://json-schema.org/draft-04/schema#",
-    "title": "service-def-output-example",
-    "description": "Schema for a service output example",
-    "type": "object",
-    "properties": {
-      "price": {
-        "description": "price",
-        "type": "number"
-      }
-    },
-    "required": [
-      "price"
-    ]
-  }
+    "output": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "title": "service-def-output-body-example",
+        "description": "Schema for a service output body example",
+        "type": "object",
+        "properties": {
+            "price": {
+                "description": "price",
+                "type": "number"
+            }
+        },
+        "required": [
+            "price"
+        ]
+    }
 }
 ```
 

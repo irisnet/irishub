@@ -12,13 +12,13 @@ Among them, the parameters available for query for each subspace are as follows:
 
 ## auth
 
-| key                      | description                                                  | default |
-| ------------------------ | ------------------------------------------------------------ | ------- |
+| key                      | description                                                     | default |
+| ------------------------ | --------------------------------------------------------------- | ------- |
 | `MaxMemoCharacters`      | Maximum number of characters in the memo field in a transaction | 256     |
-| `TxSigLimit`             | Maximum number of signatures per transaction                 | 7       |
-| `TxSizeCostPerByte`      | The amount of gas consumed per byte of the transaction       | 10      |
-| `SigVerifyCostED25519`   | Gas spent on edd2519 algorithm signature verification        | 590     |
-| `SigVerifyCostSecp256k1` | Gas spent on secp256k1 algorithm signature verification      | 1000    |
+| `TxSigLimit`             | Maximum number of signatures per transaction                    | 7       |
+| `TxSizeCostPerByte`      | The amount of gas consumed per byte of the transaction          | 10      |
+| `SigVerifyCostED25519`   | Gas spent on edd2519 algorithm signature verification           | 590     |
+| `SigVerifyCostSecp256k1` | Gas spent on secp256k1 algorithm signature verification         | 1000    |
 
 ## bank
 
@@ -29,20 +29,20 @@ Among them, the parameters available for query for each subspace are as follows:
 
 ## staking
 
-| key                 | description                                                  | default   |
-| ------------------- | ------------------------------------------------------------ | --------- |
-| `UnbondingTime`     | Mortgage redemption time                                     | 3w(weeks) |
-| `MaxValidators`     | Maximum number of validators                                 | 100       |
+| key                 | description                                                     | default   |
+| ------------------- | --------------------------------------------------------------- | --------- |
+| `UnbondingTime`     | Mortgage redemption time                                        | 3w(weeks) |
+| `MaxValidators`     | Maximum number of validators                                    | 100       |
 | `MaxEntries`        | The maximum number of unbinding/redelegation orders in progress | 7         |
-| `BondDenom`         | Bond denom                                                   | uiris |
-| `HistoricalEntries` |                                                              | 100       |
+| `BondDenom`         | Bond denom                                                      | uiris     |
+| `HistoricalEntries` |                                                                 | 100       |
 
 ## mint
 
-| key         | description                 | default   |
-| ----------- | --------------------------- | --------- |
-| `Inflation` | Token issuance frequency    | 0.04      |
-| `MintDenom` | Denom of the token mintable | uiris     |
+| key         | description                 | default |
+| ----------- | --------------------------- | ------- |
+| `Inflation` | Token issuance frequency    | 0.04    |
+| `MintDenom` | Denom of the token mintable | uiris   |
 
 ## distribution
 
@@ -87,10 +87,10 @@ Among them, the parameters available for query for each subspace are as follows:
 
 ## coinswap
 
-| key             | description                   | default   |
-| --------------- | ----------------------------- | --------- |
-| `Fee`           | Charge rate                   | 0.003     |
-| `StandardDenom` | The name of the token charged | uiris     |
+| key             | description                   | default |
+| --------------- | ----------------------------- | ------- |
+| `Fee`           | Charge rate                   | 0.003   |
+| `StandardDenom` | The name of the token charged | uiris   |
 
 ## service
 
@@ -105,4 +105,3 @@ Among them, the parameters available for query for each subspace are as follows:
 | `ArbitrationTimeLimit` | Arbitration period                                  | 5d         |
 | `TxSizeLimit`          | The maximum number of bytes per service transaction | 4000       |
 | `BaseDenom`            | Tokens supported by service fees                    | uiris      |
-

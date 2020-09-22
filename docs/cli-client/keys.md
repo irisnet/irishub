@@ -4,17 +4,17 @@ Keys allows you to manage your local tendermint keystore (wallets) for iris.
 
 ## Available Commands
 
-| Name                               | Description                                                                                  |
-| ---------------------------------- | -------------------------------------------------------------------------------------------- |
-| [add](#iris-keys-add)              | Add an encrypted private key (either newly generated or recovered), encrypt it, and save to disk  |
-| [delete](#iris-keys-delete)        | Delete the given key                                                                         |
-| [export](#iris-keys-export)        | Export private keys                                                              |
-| [import](#iris-keys-import)        | Import private keys into the local keybase                        |
-| [list](#iris-keys-list)            | List all keys                                                                                |
-| [migrate](#iris-keys-migrate)      | Migrate keys from the legacy (db-based) Keybase                   |
-| [mnemonic](#iris-keys-mnemonic)    | Compute the bip39 mnemonic for some input entropy |
-| [parse](#iris-keys-parse)          | Parse address from hex to bech32 and vice versa                       |
-| [show](#iris-keys-show)            | Retrieve key information by name or address                                                             |
+| Name                            | Description                                                                                      |
+| ------------------------------- | ------------------------------------------------------------------------------------------------ |
+| [add](#iris-keys-add)           | Add an encrypted private key (either newly generated or recovered), encrypt it, and save to disk |
+| [delete](#iris-keys-delete)     | Delete the given key                                                                             |
+| [export](#iris-keys-export)     | Export private keys                                                                              |
+| [import](#iris-keys-import)     | Import private keys into the local keybase                                                       |
+| [list](#iris-keys-list)         | List all keys                                                                                    |
+| [migrate](#iris-keys-migrate)   | Migrate keys from the legacy (db-based) Keybase                                                  |
+| [mnemonic](#iris-keys-mnemonic) | Compute the bip39 mnemonic for some input entropy                                                |
+| [parse](#iris-keys-parse)       | Parse address from hex to bech32 and vice versa                                                  |
+| [show](#iris-keys-show)         | Retrieve key information by name or address                                                      |
 
 ## iris keys add
 
@@ -26,22 +26,22 @@ iris keys add <key-name> [flags]
 
 **Flags:**
 
-| Name, shorthand      | Default   | Description                                                       | Required |
-| -------------------- | --------- | ----------------------------------------------------------------- | -------- |
-| --multisig           |           | Construct and store a multisig public key                         |          |
-| --multisig-threshold |     1     | K out of N required signatures                                    |          |
-| --nosort             |   false   | Keys passed to --multisig are taken in the order they're supplied |          |
-| --pubkey             |           | Parse a public key in bech32 format and save it to disk           |          |
-| --interactive        |   false   | Interactively prompt user for BIP39 passphrase and mnemonic       |          |
-| --ledger             |   false   | Store a local reference to a private key on a Ledger device       |          |
-| --recover            |   false   | Provide seed phrase to recover existing key instead of creating   |          |
-| --no-backup          |   false   | Don't print out seed phrase (if others are watching the terminal) |          |
-| --dry-run            |   false   | Perform action, but don't add key to local keystore               |          |
-| --hd-path            |           | Manual HD Path derivation (overrides BIP44 config)                |          |
-| --coin-type          |    118    | coin type number for HD derivation                                |          |
-| --account            |     0     | Account number for HD derivation                                  |          |
-| --index              |     0     | Address index number for HD derivation                            |          |
-| --algo               |  secp256k | Key signing algorithm to generate keys for                        |          |
+| Name, shorthand      | Default  | Description                                                       | Required |
+| -------------------- | -------- | ----------------------------------------------------------------- | -------- |
+| --multisig           |          | Construct and store a multisig public key                         |          |
+| --multisig-threshold | 1        | K out of N required signatures                                    |          |
+| --nosort             | false    | Keys passed to --multisig are taken in the order they're supplied |          |
+| --pubkey             |          | Parse a public key in bech32 format and save it to disk           |          |
+| --interactive        | false    | Interactively prompt user for BIP39 passphrase and mnemonic       |          |
+| --ledger             | false    | Store a local reference to a private key on a Ledger device       |          |
+| --recover            | false    | Provide seed phrase to recover existing key instead of creating   |          |
+| --no-backup          | false    | Don't print out seed phrase (if others are watching the terminal) |          |
+| --dry-run            | false    | Perform action, but don't add key to local keystore               |          |
+| --hd-path            |          | Manual HD Path derivation (overrides BIP44 config)                |          |
+| --coin-type          | 118      | coin type number for HD derivation                                |          |
+| --account            | 0        | Account number for HD derivation                                  |          |
+| --index              | 0        | Address index number for HD derivation                            |          |
+| --algo               | secp256k | Key signing algorithm to generate keys for                        |          |
 
 ### Create a new key
 
@@ -90,7 +90,6 @@ Offline key can be created by "iris keys add --pubkey".
 :::
 
 How to use multisig key to sign and broadcast a transaction,  please refer to [multisign](tx.md#iris-tx-multisign)
-
 
 ## iris keys delete
 
@@ -143,8 +142,8 @@ List all the keys stored by this key manager along with their associated name, t
 
 **Flags:**
 
-| Name, shorthand | Default | Description          | Required |
-| --------------- | ------- | -------------------- | -------- |
+| Name, shorthand | Default | Description     | Required |
+| --------------- | ------- | --------------- | -------- |
 | --list-name     |         | List names only |          |
 
 ### List all keys
@@ -160,7 +159,7 @@ Migrate key information from the legacy (db-based) Keybase to the new keyring-ba
 **Flags:**
 
 | Name, shorthand | Default | Description                                                              | Required |
-| --------------- | ------- | --------------------                                                     | -------- |
+| --------------- | ------- | ------------------------------------------------------------------------ | -------- |
 | --dry-run       |         | Run migration without actually persisting any changes to the new Keybase |          |
 
 ### Migrate key information
@@ -168,7 +167,6 @@ Migrate key information from the legacy (db-based) Keybase to the new keyring-ba
 ```bash
 iris keys migrate [flags]
 ```
-
 
 ## iris keys mnemonic
 
@@ -218,11 +216,11 @@ iris keys show <key-name> [flags]
 
 | Name, shorthand      | Default | Description                                         | Required |
 | -------------------- | ------- | --------------------------------------------------- | -------- |
-| --address            |  false  | Output the address only (overrides --output)        |          |
-| --bech               |   acc   | The Bech32 prefix encoding for a key (acc/val/cons) |          |
-| --device             |  false  | Output the address in a ledger device                                       |          |
-| --multisig-threshold |    1    | K out of N required signatures                      |          |
-| --pubkey             |  false  | Output the public key only (overrides --output)     |          |
+| --address            | false   | Output the address only (overrides --output)        |          |
+| --bech               | acc     | The Bech32 prefix encoding for a key (acc/val/cons) |          |
+| --device             | false   | Output the address in a ledger device               |          |
+| --multisig-threshold | 1       | K out of N required signatures                      |          |
+| --pubkey             | false   | Output the public key only (overrides --output)     |          |
 
 ### Get details of a local key
 
@@ -261,9 +259,3 @@ Example Output:
   threshold: 0
   pubkeys: []
 ```
-
-
-
-
-
-
