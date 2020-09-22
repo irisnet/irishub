@@ -7,15 +7,21 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/signing"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 
-	tokenkeeper "github.com/irismod/token/keeper"
+	oraclekeeper "github.com/irisnet/irismod/modules/oracle/keeper"
+	oracletypes "github.com/irisnet/irismod/modules/oracle/types"
+	tokenkeeper "github.com/irisnet/irismod/modules/token/keeper"
 )
 
 // NewAnteHandler returns an AnteHandler that checks and increments sequence
 // numbers, checks signatures & account numbers, and deducts fees from the first
 // signer.
 func NewAnteHandler(
-	ak authkeeper.AccountKeeper, bankKeeper bankkeeper.Keeper,
-	tk tokenkeeper.Keeper, sigGasConsumer ante.SignatureVerificationGasConsumer,
+	ak authkeeper.AccountKeeper,
+	bk bankkeeper.Keeper,
+	tk tokenkeeper.Keeper,
+	ok oraclekeeper.Keeper,
+	oak oracletypes.AuthKeeper,
+	sigGasConsumer ante.SignatureVerificationGasConsumer,
 	signModeHandler signing.SignModeHandler,
 ) sdk.AnteHandler {
 	return sdk.ChainAnteDecorators(
@@ -28,10 +34,11 @@ func NewAnteHandler(
 		ante.NewConsumeGasForTxSizeDecorator(ak),
 		ante.NewSetPubKeyDecorator(ak), // SetPubKeyDecorator must be called before all signature verification decorators
 		ante.NewValidateSigCountDecorator(ak),
-		ante.NewDeductFeeDecorator(ak, bankKeeper),
+		ante.NewDeductFeeDecorator(ak, bk),
 		ante.NewSigGasConsumeDecorator(ak, sigGasConsumer),
 		ante.NewSigVerificationDecorator(ak, signModeHandler),
 		ante.NewIncrementSequenceDecorator(ak),
-		tokenkeeper.NewValidateTokenFeeDecorator(tk, ak, bankKeeper),
+		tokenkeeper.NewValidateTokenFeeDecorator(tk, bk),
+		oraclekeeper.NewValidateOracleAuthDecorator(ok, oak),
 	)
 }
