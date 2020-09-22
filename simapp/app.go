@@ -76,24 +76,30 @@ import (
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
-	"github.com/irismod/coinswap"
-	coinswapkeeper "github.com/irismod/coinswap/keeper"
-	coinswaptypes "github.com/irismod/coinswap/types"
-	"github.com/irismod/htlc"
-	htlckeeper "github.com/irismod/htlc/keeper"
-	htlctypes "github.com/irismod/htlc/types"
-	"github.com/irismod/nft"
-	nftkeeper "github.com/irismod/nft/keeper"
-	nfttypes "github.com/irismod/nft/types"
-	"github.com/irismod/record"
-	recordkeeper "github.com/irismod/record/keeper"
-	recordtypes "github.com/irismod/record/types"
-	"github.com/irismod/service"
-	servicekeeper "github.com/irismod/service/keeper"
-	servicetypes "github.com/irismod/service/types"
-	"github.com/irismod/token"
-	tokenkeeper "github.com/irismod/token/keeper"
-	tokentypes "github.com/irismod/token/types"
+	"github.com/irisnet/irismod/modules/coinswap"
+	coinswapkeeper "github.com/irisnet/irismod/modules/coinswap/keeper"
+	coinswaptypes "github.com/irisnet/irismod/modules/coinswap/types"
+	"github.com/irisnet/irismod/modules/htlc"
+	htlckeeper "github.com/irisnet/irismod/modules/htlc/keeper"
+	htlctypes "github.com/irisnet/irismod/modules/htlc/types"
+	"github.com/irisnet/irismod/modules/nft"
+	nftkeeper "github.com/irisnet/irismod/modules/nft/keeper"
+	nfttypes "github.com/irisnet/irismod/modules/nft/types"
+	"github.com/irisnet/irismod/modules/oracle"
+	oracleKeeper "github.com/irisnet/irismod/modules/oracle/keeper"
+	oracletypes "github.com/irisnet/irismod/modules/oracle/types"
+	"github.com/irisnet/irismod/modules/random"
+	randomkeeper "github.com/irisnet/irismod/modules/random/keeper"
+	randomtypes "github.com/irisnet/irismod/modules/random/types"
+	"github.com/irisnet/irismod/modules/record"
+	recordkeeper "github.com/irisnet/irismod/modules/record/keeper"
+	recordtypes "github.com/irisnet/irismod/modules/record/types"
+	"github.com/irisnet/irismod/modules/service"
+	servicekeeper "github.com/irisnet/irismod/modules/service/keeper"
+	servicetypes "github.com/irisnet/irismod/modules/service/types"
+	"github.com/irisnet/irismod/modules/token"
+	tokenkeeper "github.com/irisnet/irismod/modules/token/keeper"
+	tokentypes "github.com/irisnet/irismod/modules/token/types"
 
 	"github.com/irisnet/irishub/modules/guardian"
 	guardiankeeper "github.com/irisnet/irishub/modules/guardian/keeper"
@@ -101,12 +107,6 @@ import (
 	"github.com/irisnet/irishub/modules/mint"
 	mintkeeper "github.com/irisnet/irishub/modules/mint/keeper"
 	minttypes "github.com/irisnet/irishub/modules/mint/types"
-	"github.com/irisnet/irishub/modules/oracle"
-	oracleKeeper "github.com/irisnet/irishub/modules/oracle/keeper"
-	oracletypes "github.com/irisnet/irishub/modules/oracle/types"
-	"github.com/irisnet/irishub/modules/random"
-	randomkeeper "github.com/irisnet/irishub/modules/random/keeper"
-	randomtypes "github.com/irisnet/irishub/modules/random/types"
 )
 
 const appName = "SimApp"
@@ -363,7 +363,7 @@ func NewSimApp(
 	app.GuardianKeeper = guardiankeeper.NewKeeper(appCodec, keys[guardiantypes.StoreKey])
 	app.TokenKeeper = tokenkeeper.NewKeeper(
 		appCodec, keys[tokentypes.StoreKey], app.GetSubspace(tokentypes.ModuleName),
-		app.AccountKeeper, app.BankKeeper, authtypes.FeeCollectorName,
+		app.BankKeeper, authtypes.FeeCollectorName,
 	)
 	app.RecordKeeper = recordkeeper.NewKeeper(appCodec, keys[recordtypes.StoreKey])
 
@@ -384,7 +384,7 @@ func NewSimApp(
 
 	app.OracleKeeper = oracleKeeper.NewKeeper(
 		appCodec, keys[oracletypes.StoreKey], app.GetSubspace(oracletypes.ModuleName),
-		app.GuardianKeeper, app.ServiceKeeper,
+		app.ServiceKeeper,
 	)
 
 	app.RandomKeeper = randomkeeper.NewKeeper(appCodec, keys[randomtypes.StoreKey], app.BankKeeper, app.ServiceKeeper)

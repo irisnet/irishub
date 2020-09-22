@@ -20,7 +20,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	tokentypes "github.com/irismod/token/types"
+	tokentypes "github.com/irisnet/irismod/modules/token/types"
 )
 
 const (
