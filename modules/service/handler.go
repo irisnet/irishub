@@ -241,6 +241,7 @@ func handleMsgRespondService(ctx sdk.Context, k keeper.Keeper, msg *types.MsgRes
 			sdk.NewAttribute(sdk.AttributeKeySender, msg.Provider.String()),
 			sdk.NewAttribute(types.AttributeKeyRequestContextID, request.RequestContextId.String()),
 			sdk.NewAttribute(types.AttributeKeyRequestID, msg.RequestId.String()),
+			sdk.NewAttribute(types.AttributeKeyConsumer, request.Consumer.String()),
 		),
 	})
 
