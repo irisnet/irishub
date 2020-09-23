@@ -8,11 +8,10 @@ require (
 	github.com/golang/protobuf v1.4.2
 	github.com/gorilla/mux v1.8.0
 	github.com/grpc-ecosystem/grpc-gateway v1.14.8
-	github.com/irisnet/irismod v0.0.0-20200923032150-344f4fbd5816
+	github.com/irisnet/irismod v0.0.0-20200923095055-099c9e4eafed
 	github.com/olebedev/config v0.0.0-20190528211619-364964f3a8e4
 	github.com/pkg/errors v0.9.1
 	github.com/rakyll/statik v0.1.7
-	github.com/regen-network/cosmos-proto v0.3.0
 	github.com/snikch/goodman v0.0.0-20171125024755-10e37e294daa
 	github.com/spf13/cast v1.3.1
 	github.com/spf13/cobra v1.0.0
