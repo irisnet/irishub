@@ -316,8 +316,7 @@ func (k Keeper) ModuleServiceRequest(ctx sdk.Context, input string) (result stri
 		return
 	}
 
-	value := feedValues[len(feedValues)-1]
-
+	value := feedValues[0]
 	valueData := value.Data
 	valueTime := value.Timestamp
 
