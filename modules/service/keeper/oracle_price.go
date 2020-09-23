@@ -55,15 +55,13 @@ func (k Keeper) GetExchangedPrice(
 		if err != nil {
 			return nil, rawDenom, err
 		}
+		if rate.IsZero() {
+			return nil, rawDenom, sdkerrors.Wrapf(types.ErrInvalidResponseOutputBody, "rate can not be zero")
+		}
 		realPrice = price.Mul(rate)
 	}
-
-	// set to 1 if price < 1
-	if realPrice.LT(sdk.OneDec()) {
-		realPrice = sdk.OneDec()
-	}
-
-	return sdk.NewCoins(sdk.NewCoin(baseDenom, price.TruncateInt())), rawDenom, nil
+	
+	return sdk.NewCoins(sdk.NewCoin(baseDenom, realPrice.TruncateInt())), rawDenom, nil
 }
 
 func CheckResult(jsonStr string) (string, string) {
