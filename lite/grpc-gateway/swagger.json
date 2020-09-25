@@ -51,7 +51,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "type": "object",
               "properties": {
@@ -194,7 +194,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "type": "object",
               "properties": {
@@ -342,7 +342,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "type": "object",
               "properties": {
@@ -419,7 +419,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "type": "object",
               "properties": {
@@ -493,8 +493,7 @@
                         "format": "byte"
                       },
                       "oracle": {
-                        "type": "boolean",
-                        "format": "boolean"
+                        "type": "boolean"
                       },
                       "service_fee_cap": {
                         "type": "array",
@@ -524,7 +523,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "type": "object",
               "properties": {
@@ -603,7 +602,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "type": "object",
               "properties": {
@@ -773,7 +772,7 @@
       },
       "description": "Coin defines a token with a denomination and an amount.\n\nNOTE: The amount field is an Int which implements the custom method\nsignatures required by gogoproto."
     },
-    "irishub.oracle.Feed": {
+    "irismod.oracle.Feed": {
       "type": "object",
       "properties": {
         "feed_name": {
@@ -803,7 +802,7 @@
       },
       "title": "Feed defines the feed standard"
     },
-    "irishub.oracle.FeedContext": {
+    "irismod.oracle.FeedContext": {
       "type": "object",
       "properties": {
         "feed": {
@@ -890,7 +889,7 @@
       },
       "title": "FeedContext defines the feed context struct"
     },
-    "irishub.oracle.FeedValue": {
+    "irismod.oracle.FeedValue": {
       "type": "object",
       "properties": {
         "data": {
@@ -903,7 +902,7 @@
       },
       "title": "FeedValue defines the feed result standard"
     },
-    "irishub.oracle.QueryFeedResponse": {
+    "irismod.oracle.QueryFeedResponse": {
       "type": "object",
       "properties": {
         "feed": {
@@ -996,7 +995,7 @@
       },
       "title": "QueryFeedResponse is response type for the Query/Feed RPC method"
     },
-    "irishub.oracle.QueryFeedValueResponse": {
+    "irismod.oracle.QueryFeedValueResponse": {
       "type": "object",
       "properties": {
         "feed_values": {
@@ -1018,7 +1017,7 @@
       },
       "title": "QueryFeedValueResponse is response type for the Query/FeedValue RPC method"
     },
-    "irishub.oracle.QueryFeedsResponse": {
+    "irismod.oracle.QueryFeedsResponse": {
       "type": "object",
       "properties": {
         "feeds": {
@@ -1125,7 +1124,7 @@
       "description": "- RUNNING: RUNNING defines the running request context status.\n - PAUSED: PAUSED defines the paused request context status.\n - COMPLETED: COMPLETED defines the completed request context status.",
       "title": "RequestContextState is a type alias that represents a request status as a byte"
     },
-    "irishub.random.QueryRandomRequestQueueResponse": {
+    "irismod.random.QueryRandomRequestQueueResponse": {
       "type": "object",
       "properties": {
         "requests": {
@@ -1146,8 +1145,7 @@
                 "format": "byte"
               },
               "oracle": {
-                "type": "boolean",
-                "format": "boolean"
+                "type": "boolean"
               },
               "service_fee_cap": {
                 "type": "array",
@@ -1175,7 +1173,7 @@
       },
       "title": "QueryRandomRequestQueueResponse is response type for the Query/RandomRequestQueue RPC method"
     },
-    "irishub.random.QueryRandomResponse": {
+    "irismod.random.QueryRandomResponse": {
       "type": "object",
       "properties": {
         "random": {
@@ -1198,7 +1196,7 @@
       },
       "title": "QueryParametersResponse is response type for the Query/Random RPC method"
     },
-    "irishub.random.Random": {
+    "irismod.random.Random": {
       "type": "object",
       "properties": {
         "request_tx_hash": {
@@ -1215,7 +1213,7 @@
       },
       "title": "Random defines the feed standard"
     },
-    "irishub.random.Request": {
+    "irismod.random.Request": {
       "type": "object",
       "properties": {
         "height": {
@@ -1231,8 +1229,7 @@
           "format": "byte"
         },
         "oracle": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "service_fee_cap": {
           "type": "array",
