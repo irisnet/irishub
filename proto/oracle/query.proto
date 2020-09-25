@@ -5,7 +5,6 @@ import "oracle/oracle.proto";
 import "service/service.proto";
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
-import "cosmos_proto/cosmos.proto";
 import "cosmos_proto/coin.proto";
 
 option go_package = "github.com/irisnet/irismod/modules/oracle/types";
@@ -13,18 +12,18 @@ option go_package = "github.com/irisnet/irismod/modules/oracle/types";
 // Query creates service with guardian as rpc
 service Query {
     // Feed queries the feed
-    rpc Feed (QueryFeedRequest) returns (QueryFeedResponse) {
-      option (google.api.http).get = "/irishub/oracle/feeds/{feed_name}";
+    rpc Feed(QueryFeedRequest) returns (QueryFeedResponse) {
+        option (google.api.http).get = "/irishub/oracle/feeds/{feed_name}";
     }
 
     // QueryFeedsRequest queries the feed list
-    rpc Feeds (QueryFeedsRequest) returns (QueryFeedsResponse) {
-      option (google.api.http).get = "/irishub/oracle/feeds";
+    rpc Feeds(QueryFeedsRequest) returns (QueryFeedsResponse) {
+        option (google.api.http).get = "/irishub/oracle/feeds";
     }
 
     // FeedValue queries the feed value
-    rpc FeedValue (QueryFeedValueRequest) returns (QueryFeedValueResponse) {
-      option (google.api.http).get = "/irishub/oracle/feeds/{feed_name}/value";
+    rpc FeedValue(QueryFeedValueRequest) returns (QueryFeedValueResponse) {
+        option (google.api.http).get = "/irishub/oracle/feeds/{feed_name}/value";
     }
 }
 
@@ -35,7 +34,7 @@ message QueryFeedRequest {
 
 // QueryFeedResponse is response type for the Query/Feed RPC method
 message QueryFeedResponse {
-    FeedContext feed = 1 [(gogoproto.nullable) = false];
+    FeedContext feed = 1 [ (gogoproto.nullable) = false ];
 }
 
 // QueryFeedsRequest is request type for the Query/Feeds RPC method
@@ -45,7 +44,7 @@ message QueryFeedsRequest {
 
 // QueryFeedsResponse is response type for the Query/Feeds RPC method
 message QueryFeedsResponse {
-    repeated FeedContext feeds = 1 [(gogoproto.nullable) = false];
+    repeated FeedContext feeds = 1 [ (gogoproto.nullable) = false ];
 }
 
 // QueryFeedValueRequest is request type for the Query/FeedValue RPC method
@@ -55,7 +54,7 @@ message QueryFeedValueRequest {
 
 // QueryFeedValueResponse is response type for the Query/FeedValue RPC method
 message QueryFeedValueResponse {
-    repeated FeedValue feed_values = 1 [(gogoproto.nullable) = false];
+    repeated FeedValue feed_values = 1 [ (gogoproto.nullable) = false ];
 }
 
 // FeedContext defines the feed context struct
@@ -63,13 +62,12 @@ message FeedContext {
     option (gogoproto.goproto_stringer) = false;
 
     Feed feed = 1;
-    string service_name = 2 [(gogoproto.moretags) = "yaml:\"service_name\""];
-    repeated bytes providers = 3 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
+    string service_name = 2 [ (gogoproto.moretags) = "yaml:\"service_name\"" ];
+    repeated bytes providers = 3 [ (gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress" ];
     string input = 4;
     int64 timeout = 5;
-    repeated cosmos.base.v1beta1.Coin service_fee_cap = 6 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "yaml:\"service_fee_cap\""];
-    uint64 repeated_frequency = 7 [(gogoproto.moretags) = "yaml:\"repeated_frequency\""];
-    uint32 response_threshold = 8 [(gogoproto.moretags) = "yaml:\"response_threshold\""];
+    repeated cosmos.base.v1beta1.Coin service_fee_cap = 6 [ (gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "yaml:\"service_fee_cap\"" ];
+    uint64 repeated_frequency = 7 [ (gogoproto.moretags) = "yaml:\"repeated_frequency\"" ];
+    uint32 response_threshold = 8 [ (gogoproto.moretags) = "yaml:\"response_threshold\"" ];
     irismod.service.RequestContextState state = 9;
 }
-

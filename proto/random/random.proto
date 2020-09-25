@@ -2,23 +2,21 @@ syntax = "proto3";
 package irismod.random;
 
 import "gogoproto/gogo.proto";
-import "service/service.proto";
-import "cosmos_proto/cosmos.proto";
 import "cosmos_proto/coin.proto";
 
 option go_package = "github.com/irisnet/irismod/modules/random/types";
 
 // MsgRequestRandom defines an sdk.Msg type that supports requesting a random number
 message MsgRequestRandom {
-    uint64 block_interval = 1 [(gogoproto.moretags) = "yaml:\"block_interval\""];
-    bytes consumer = 2 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
+    uint64 block_interval = 1 [ (gogoproto.moretags) = "yaml:\"block_interval\"" ];
+    bytes consumer = 2 [ (gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress" ];
     bool oracle = 3;
-    repeated cosmos.base.v1beta1.Coin service_fee_cap = 4 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "yaml:\"service_fee_cap\""];
+    repeated cosmos.base.v1beta1.Coin service_fee_cap = 4 [ (gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "yaml:\"service_fee_cap\"" ];
 }
 
 // Random defines the feed standard
 message Random {
-    bytes request_tx_hash = 1 [(gogoproto.moretags) = "yaml:\"request_tx_hash\"", (gogoproto.casttype) = "github.com/tendermint/tendermint/libs/bytes.HexBytes"];
+    bytes request_tx_hash = 1 [ (gogoproto.moretags) = "yaml:\"request_tx_hash\"", (gogoproto.casttype) = "github.com/tendermint/tendermint/libs/bytes.HexBytes" ];
     int64 height = 2;
     string value = 3;
 }
@@ -26,9 +24,9 @@ message Random {
 // Request defines the random request standard
 message Request {
     int64 height = 1;
-    bytes consumer = 2 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
-    bytes tx_hash = 3 [(gogoproto.moretags) = "yaml:\"tx_hash\"", (gogoproto.casttype) = "github.com/tendermint/tendermint/libs/bytes.HexBytes"];
+    bytes consumer = 2 [ (gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress" ];
+    bytes tx_hash = 3 [ (gogoproto.moretags) = "yaml:\"tx_hash\"", (gogoproto.casttype) = "github.com/tendermint/tendermint/libs/bytes.HexBytes" ];
     bool oracle = 4;
-    repeated cosmos.base.v1beta1.Coin service_fee_cap = 5 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "yaml:\"service_fee_cap\""];
-    bytes service_context_id = 6 [(gogoproto.customname) = "ServiceContextID", (gogoproto.casttype) = "github.com/tendermint/tendermint/libs/bytes.HexBytes", (gogoproto.moretags) = "yaml:\"service_context_id\""];
+    repeated cosmos.base.v1beta1.Coin service_fee_cap = 5 [ (gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "yaml:\"service_fee_cap\"" ];
+    bytes service_context_id = 6 [ (gogoproto.customname) = "ServiceContextID", (gogoproto.casttype) = "github.com/tendermint/tendermint/libs/bytes.HexBytes", (gogoproto.moretags) = "yaml:\"service_context_id\"" ];
 }

@@ -4,20 +4,19 @@ package irismod.random;
 import "random/random.proto";
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
-import "cosmos_proto/cosmos.proto";
 
 option go_package = "github.com/irisnet/irismod/modules/random/types";
 
 // Query creates service with guardian as rpc
 service Query {
     // Random queries the random result
-    rpc Random (QueryRandomRequest) returns (QueryRandomResponse) {
-      option (google.api.http).get = "/irishub/random/randoms/{req_id}";
+    rpc Random(QueryRandomRequest) returns (QueryRandomResponse) {
+        option (google.api.http).get = "/irishub/random/randoms/{req_id}";
     }
 
     // RandomRequestQueue queries the random request queue
-    rpc RandomRequestQueue (QueryRandomRequestQueueRequest) returns (QueryRandomRequestQueueResponse) {
-      option (google.api.http).get = "/irishub/random/queue";
+    rpc RandomRequestQueue(QueryRandomRequestQueueRequest) returns (QueryRandomRequestQueueResponse) {
+        option (google.api.http).get = "/irishub/random/queue";
     }
 }
 
@@ -38,5 +37,5 @@ message QueryRandomRequestQueueRequest {
 
 // QueryRandomRequestQueueResponse is response type for the Query/RandomRequestQueue RPC method
 message QueryRandomRequestQueueResponse {
-    repeated Request requests = 1 [(gogoproto.nullable) = false];
+    repeated Request requests = 1 [ (gogoproto.nullable) = false ];
 }
