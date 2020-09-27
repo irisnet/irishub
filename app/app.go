@@ -87,7 +87,7 @@ import (
 	nftkeeper "github.com/irisnet/irismod/modules/nft/keeper"
 	nfttypes "github.com/irisnet/irismod/modules/nft/types"
 	"github.com/irisnet/irismod/modules/oracle"
-	oracleKeeper "github.com/irisnet/irismod/modules/oracle/keeper"
+	oraclekeeper "github.com/irisnet/irismod/modules/oracle/keeper"
 	oracletypes "github.com/irisnet/irismod/modules/oracle/types"
 	"github.com/irisnet/irismod/modules/random"
 	randomkeeper "github.com/irisnet/irismod/modules/random/keeper"
@@ -228,7 +228,7 @@ type IrisApp struct {
 	htlcKeeper     htlckeeper.Keeper
 	coinswapKeeper coinswapkeeper.Keeper
 	serviceKeeper  servicekeeper.Keeper
-	oracleKeeper   oracleKeeper.Keeper
+	oracleKeeper   oraclekeeper.Keeper
 	randomKeeper   randomkeeper.Keeper
 
 	// the module manager
@@ -404,7 +404,7 @@ func NewIrisApp(
 		WrapToken(app.tokenKeeper), app.GetSubspace(servicetypes.ModuleName), authtypes.FeeCollectorName,
 	)
 
-	app.oracleKeeper = oracleKeeper.NewKeeper(
+	app.oracleKeeper = oraclekeeper.NewKeeper(
 		appCodec, keys[oracletypes.StoreKey], app.GetSubspace(oracletypes.ModuleName),
 		app.serviceKeeper,
 	)
