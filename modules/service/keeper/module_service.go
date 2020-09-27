@@ -79,6 +79,8 @@ func (k Keeper) RequestModuleService(
 			sdk.NewAttribute(sdk.AttributeKeySender, moduleService.Provider.String()),
 			sdk.NewAttribute(types.AttributeKeyRequestContextID, request.RequestContextId.String()),
 			sdk.NewAttribute(types.AttributeKeyRequestID, requestIDs[0].String()),
+			sdk.NewAttribute(types.AttributeKeyServiceName, request.ServiceName),
+			sdk.NewAttribute(types.AttributeKeyConsumer, request.Consumer.String()),
 		),
 	})
 
