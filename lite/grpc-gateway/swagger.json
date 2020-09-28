@@ -8901,7 +8901,7 @@
         ]
       }
     },
-    "/irishub/oracle/feeds": {
+    "/irismod/oracle/feeds": {
       "get": {
         "summary": "QueryFeedsRequest queries the feed list",
         "operationId": "Feeds",
@@ -9052,7 +9052,7 @@
         ]
       }
     },
-    "/irishub/oracle/feeds/{feed_name}": {
+    "/irismod/oracle/feeds/{feed_name}": {
       "get": {
         "summary": "Feed queries the feed",
         "operationId": "Feed",
@@ -9200,7 +9200,7 @@
         ]
       }
     },
-    "/irishub/oracle/feeds/{feed_name}/value": {
+    "/irismod/oracle/feeds/{feed_name}/value": {
       "get": {
         "summary": "FeedValue queries the feed value",
         "operationId": "FeedValue",
@@ -9277,7 +9277,7 @@
         ]
       }
     },
-    "/irishub/random/queue": {
+    "/irismod/random/queue": {
       "get": {
         "summary": "RandomRequestQueue queries the random request queue",
         "operationId": "RandomRequestQueue",
@@ -9382,7 +9382,7 @@
         ]
       }
     },
-    "/irishub/random/randoms/{req_id}": {
+    "/irismod/random/randoms/{req_id}": {
       "get": {
         "summary": "Random queries the random result",
         "operationId": "Random",
