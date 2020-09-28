@@ -11,12 +11,12 @@ option go_package = "github.com/irisnet/irismod/modules/random/types";
 service Query {
     // Random queries the random result
     rpc Random(QueryRandomRequest) returns (QueryRandomResponse) {
-        option (google.api.http).get = "/irishub/random/randoms/{req_id}";
+        option (google.api.http).get = "/irismod/random/randoms/{req_id}";
     }
 
     // RandomRequestQueue queries the random request queue
     rpc RandomRequestQueue(QueryRandomRequestQueueRequest) returns (QueryRandomRequestQueueResponse) {
-        option (google.api.http).get = "/irishub/random/queue";
+        option (google.api.http).get = "/irismod/random/queue";
     }
 }
 

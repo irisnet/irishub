@@ -20,7 +20,7 @@ func init() {
 
 // RegisterLegacyAminoCodec registers concrete types on the codec.
 func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
-	cdc.RegisterConcrete(&MsgRequestRandom{}, "irishub/random/MsgRequestRandom", nil)
+	cdc.RegisterConcrete(&MsgRequestRandom{}, "irismod/random/MsgRequestRandom", nil)
 }
 
 func RegisterInterfaces(registry types.InterfaceRegistry) {

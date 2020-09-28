@@ -57,7 +57,7 @@ func TestMsgRequestRandomGetSignBytes(t *testing.T) {
 	var msg = NewMsgRequestRandom(testAddr, blockInterval, true, serviceFeeCap)
 	res := msg.GetSignBytes()
 
-	expected := fmt.Sprintf("{\"type\":\"irishub/random/MsgRequestRandom\",\"value\":{\"block_interval\":\"10\",\"consumer\":\"cosmos1w3jhxazpv3j8y5jww2c\",\"oracle\":true,\"service_fee_cap\":[{\"amount\":\"1000000000000000000\",\"denom\":\"%s\"}]}}", sdk.DefaultBondDenom)
+	expected := fmt.Sprintf("{\"type\":\"irismod/random/MsgRequestRandom\",\"value\":{\"block_interval\":\"10\",\"consumer\":\"cosmos1w3jhxazpv3j8y5jww2c\",\"oracle\":true,\"service_fee_cap\":[{\"amount\":\"1000000000000000000\",\"denom\":\"%s\"}]}}", sdk.DefaultBondDenom)
 	require.Equal(t, expected, string(res))
 }
 

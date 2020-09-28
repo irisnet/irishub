@@ -19,14 +19,14 @@ const (
 	{
 		"input": {
 			"$schema": "http://json-schema.org/draft-04/schema#",
-			"title": "irishub-random-seed-input-body",
+			"title": "random-seed-input-body",
 			"description": "IRIS Hub Random Seed Input Body Schema",
 			"type": "object",
 			"additionalProperties": false
 		},
 		"output": {
 			"$schema": "http://json-schema.org/draft-04/schema#",
-			"title": "irishub-random-seed-output-body",
+			"title": "random-seed-output-body",
 			"description": "IRIS Hub Random Seed Output Body Schema",
 			"type": "object",
 			"properties": {
