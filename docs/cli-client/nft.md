@@ -1,4 +1,4 @@
-# Nft
+# NFT
 
 `NFT` provides the ability to digitize assets. Through this module, each off-chain asset will be modeled as a unique on-chain nft.
 

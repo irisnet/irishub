@@ -32,10 +32,10 @@ iris tx random request-random [flags]
 
 ```bash
 # without oracle
-iris tx random request-random --block-interval=100 --from=<key-name> --chain-id=irishub --fees=0.3iris -b block -y
+iris tx random request-random --block-interval=100 --from=<key-name> --chain-id=irishub --fees=0.3iris
 
 # with oracle
-iris tx random request-random --block-interval=100 --oracle=true --service-fee-cap=1iris --from=<key-name> --chain-id=irishub --fees=0.3iris -b block -y
+iris tx random request-random --block-interval=100 --oracle=true --service-fee-cap=1iris --from=<key-name> --chain-id=irishub --fees=0.3iris
 ```
 
 :::tip

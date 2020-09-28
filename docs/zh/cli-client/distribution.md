@@ -64,6 +64,7 @@ iris query distribution slashes [validator] [start-height] [end-height] [flags]
 ```bash
 iris query distribution validator-outstanding-rewards [validator] [flags]
 ```
+
 ## iris tx distribution fund-community-pool
 
 为社区基金池提供指定数额的资金。
@@ -71,6 +72,7 @@ iris query distribution validator-outstanding-rewards [validator] [flags]
 ```bash
 iris tx distribution fund-community-pool [amount] [flags]
 ```
+
 ## iris tx distribution set-withdraw-addr
 
 设置提现地址。

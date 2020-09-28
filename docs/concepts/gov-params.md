@@ -5,10 +5,10 @@ All the IRIS holders may participate in the on-chain governance. If the communit
 
 ## Parameters in Auth
 
-| key                      | Description                          | Range               | Current       |
-| ------------------------ | ------------------------------------ | ------------------- | ------------- |
-| `auth/gasPriceThreshold` | minimum of gas price                 | (0, 10^6uiris] | 0.6 |
-| `auth/txSizeLimit`       | the limitation of the normal tx size | [500, 1500]         | 1000          |
+| key                      | Description                          | Range          | Current |
+| ------------------------ | ------------------------------------ | -------------- | ------- |
+| `auth/gasPriceThreshold` | minimum of gas price                 | (0, 10^6uiris] | 0.6     |
+| `auth/txSizeLimit`       | the limitation of the normal tx size | [500, 1500]    | 1000    |
 
 ## Parameters in Stake
 
@@ -55,11 +55,11 @@ Details in [Slashing](../features/slashing.md)
 
 ## Parameters in Asset
 
-| key                          | Description                                      | Range   | Current                           |
-| ---------------------------- | ------------------------------------------------ | ------- | --------------------------------- |
-| `asset/AssetTaxRate`         | Asset tax rate                                   | [0, 1]  | 0.4                               |
-| `asset/IssueTokenBaseFee`    | Base fee for issuing tokens                      | [0, +∞) | 60000000000uiris  |
-| `asset/MintTokenFeeRatio`    | Fee ratio for minting tokens                     | [0, 1]  | 0.1                               |
+| key                       | Description                  | Range   | Current          |
+| ------------------------- | ---------------------------- | ------- | ---------------- |
+| `asset/AssetTaxRate`      | Asset tax rate               | [0, 1]  | 0.4              |
+| `asset/IssueTokenBaseFee` | Base fee for issuing tokens  | [0, +∞) | 60000000000uiris |
+| `asset/MintTokenFeeRatio` | Fee ratio for minting tokens | [0, 1]  | 0.1              |
 
 Details in [Token](../features/token.md)
 

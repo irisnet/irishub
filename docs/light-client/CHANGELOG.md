@@ -119,8 +119,8 @@ In this version, all POST methods (except '/tx/broadcast') just generate unsigne
 
 #### Bank module APIs
 
-| [v0.14.1]                    | [v0.15.0]                    | input changed | output changed | notes                                                        |
-| ---------------------------- | ---------------------------- | ------------- | -------------- | ------------------------------------------------------------ |
+| [v0.14.1]                    | [v0.15.0]                    | input changed | output changed | notes                                                                                                                                                     |
+| ---------------------------- | ---------------------------- | ------------- | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | GET /bank/accounts/{address} | GET /bank/accounts/{address} | No            | Yes            | 1. Add `memo_regexp` in output; <br> 2. Tokens other than uiris could show up in output when people start using the newly introduced asset functionality. |
 
 #### Tendermint module APIs
@@ -185,14 +185,14 @@ In this version, all POST methods (except '/tx/broadcast') just generate unsigne
 
 #### Stake module APIs
 
-| [v0.13.1]                                                    | [v0.14.0]                                                    | input changed | output changed |
-| ------------------------------------------------------------ | ------------------------------------------------------------ | ------------- | -------------- |
-| POST /stake/delegators/{delegatorAddr}/delegate              | POST /stake/delegators/{delegatorAddr}/delegations           | No            | No             |
-| POST /stake/delegators/{delegatorAddr}/redelegate            | POST /stake/delegators/{delegatorAddr}/redelegations         | No            | No             |
-| POST /stake/delegators/{delegatorAddr}/unbond                | POST /stake/delegators/{delegatorAddr}/unbonding-delegations | No            | No             |
-| GET /stake/delegators/{delegatorAddr}/unbonding_delegations  | GET /stake/delegators/{delegatorAddr}/unbonding-delegations  | No            | No             |
+| [v0.13.1]                                                                   | [v0.14.0]                                                                   | input changed | output changed |
+| --------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ------------- | -------------- |
+| POST /stake/delegators/{delegatorAddr}/delegate                             | POST /stake/delegators/{delegatorAddr}/delegations                          | No            | No             |
+| POST /stake/delegators/{delegatorAddr}/redelegate                           | POST /stake/delegators/{delegatorAddr}/redelegations                        | No            | No             |
+| POST /stake/delegators/{delegatorAddr}/unbond                               | POST /stake/delegators/{delegatorAddr}/unbonding-delegations                | No            | No             |
+| GET /stake/delegators/{delegatorAddr}/unbonding_delegations                 | GET /stake/delegators/{delegatorAddr}/unbonding-delegations                 | No            | No             |
 | GET /stake/delegators/{delegatorAddr}/unbonding_delegations/{validatorAddr} | GET /stake/delegators/{delegatorAddr}/unbonding-delegations/{validatorAddr} | No            | No             |
-| GET /stake/validators/{validatorAddr}/unbonding_delegations  | GET /stake/validators/{validatorAddr}/unbonding-delegations  | No            | No             |
+| GET /stake/validators/{validatorAddr}/unbonding_delegations                 | GET /stake/validators/{validatorAddr}/unbonding-delegations                 | No            | No             |
 
 #### Slash module APIs
 
@@ -215,19 +215,19 @@ In this version, all POST methods (except '/tx/broadcast') just generate unsigne
 
 #### Service module APIs
 
-| [v0.13.1]                                                    | [v0.14.0]                                                    | input changed | output changed |
-| ------------------------------------------------------------ | ------------------------------------------------------------ | ------------- | -------------- |
-| POST /service/definition                                     | POST /service/definitions                                    | No            | No             |
-| GET /service/definition/{defChainId}/{serviceName}           | GET /service/definitions/{defChainId}/{serviceName}          | No            | No             |
-| POST /service/binding                                        | POST /service/bindings                                       | No            | No             |
-| GET /service/binding/{defChainId}/{serviceName}/{bindChainId}/{provider} | GET /service/bindings/{defChainId}/{serviceName}/{bindChainId}/{provider} | No            | No             |
-| PUT /service/binding/{defChainId}/{serviceName}/{provider}   | PUT /service/bindings/{defChainId}/{serviceName}/{provider}  | No            | No             |
-| PUT /service/binding/{defChainId}/{serviceName}/{provider}/disable | PUT /service/bindings/{defChainId}/{serviceName}/{provider}/disable | No            | No             |
-| PUT /service/binding/{defChainId}/{serviceName}/{provider}/enable | PUT /service/bindings/{defChainId}/{serviceName}/{provider}/enable | No            | No             |
+| [v0.13.1]                                                                 | [v0.14.0]                                                                  | input changed | output changed |
+| ------------------------------------------------------------------------- | -------------------------------------------------------------------------- | ------------- | -------------- |
+| POST /service/definition                                                  | POST /service/definitions                                                  | No            | No             |
+| GET /service/definition/{defChainId}/{serviceName}                        | GET /service/definitions/{defChainId}/{serviceName}                        | No            | No             |
+| POST /service/binding                                                     | POST /service/bindings                                                     | No            | No             |
+| GET /service/binding/{defChainId}/{serviceName}/{bindChainId}/{provider}  | GET /service/bindings/{defChainId}/{serviceName}/{bindChainId}/{provider}  | No            | No             |
+| PUT /service/binding/{defChainId}/{serviceName}/{provider}                | PUT /service/bindings/{defChainId}/{serviceName}/{provider}                | No            | No             |
+| PUT /service/binding/{defChainId}/{serviceName}/{provider}/disable        | PUT /service/bindings/{defChainId}/{serviceName}/{provider}/disable        | No            | No             |
+| PUT /service/binding/{defChainId}/{serviceName}/{provider}/enable         | PUT /service/bindings/{defChainId}/{serviceName}/{provider}/enable         | No            | No             |
 | PUT /service/binding/{defChainId}/{serviceName}/{provider}/deposit/refund | PUT /service/bindings/{defChainId}/{serviceName}/{provider}/deposit/refund | No            | No             |
-| POST /service/request                                        | POST /service/requests                                       | No            | No             |
-| POST /service/response                                       | POST /service/responses                                      | No            | No             |
-| GET /service/response/{reqChainId}/{reqId}                   | GET /service/responses/{reqChainId}/{reqId}                  | No            | No             |
+| POST /service/request                                                     | POST /service/requests                                                     | No            | No             |
+| POST /service/response                                                    | POST /service/responses                                                    | No            | No             |
+| GET /service/response/{reqChainId}/{reqId}                                | GET /service/responses/{reqChainId}/{reqId}                                | No            | No             |
 
 #### Query app version
 

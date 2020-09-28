@@ -116,3 +116,8 @@ func (k Keeper) IterateTrustees(
 		}
 	}
 }
+
+func (k Keeper) Authorized(ctx sdk.Context, addr sdk.AccAddress) bool {
+	_, found := k.GetProfiler(ctx, addr)
+	return found
+}

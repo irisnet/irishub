@@ -9,7 +9,7 @@ This module is mainly used to transfer coins between accounts, query account bal
 1. Query the balances of an account
 
     Query the total balance of an account or of a specific denomination.
-    
+
     ```bash
     iris query bank balances [address] --denom=[denom]
     ```
@@ -36,13 +36,13 @@ This module is mainly used to transfer coins between accounts, query account bal
 
     ```json
     {
-      "type": "auth/StdTx",
-      "value": {
-        "msg": [ "txMsg" ],
-        "fee": "fee",
-        "signatures": null,
-        "memo": ""
-      }
+        "type": "auth/StdTx",
+        "value": {
+            "msg": [ "txMsg" ],
+            "fee": "fee",
+            "signatures": null,
+            "memo": ""
+        }
     }
     ```
 
@@ -58,23 +58,23 @@ This module is mainly used to transfer coins between accounts, query account bal
 
     ```json
     {
-      "type": "auth/StdTx",
-      "value": {
-        "msg": [ "txMsg" ],
-        "fee": "fee",
-        "signatures": [
-          {
-            "pub_key": {
-              "type": "tendermint/PubKeySecp256k1",
-              "value": "A+qXW5isQDb7blT/KwEgQHepji8RfpzIstkHpKoZq0kr"
-            },
-            "signature": "5hxk/R81SWmKAGi4kTW2OapezQZpp6zEnaJbVcyDiWRfgBm4Uejq8+CDk6uzk0aFSgAZzz06E014UkgGpelU7w==",
-            "account_number": "0",
-            "sequence": "11"
-          }
-        ],
-        "memo": ""
-      }
+        "type": "auth/StdTx",
+        "value": {
+            "msg": [ "txMsg" ],
+            "fee": "fee",
+            "signatures": [
+            {
+                "pub_key": {
+                "type": "tendermint/PubKeySecp256k1",
+                "value": "A+qXW5isQDb7blT/KwEgQHepji8RfpzIstkHpKoZq0kr"
+                },
+                "signature": "5hxk/R81SWmKAGi4kTW2OapezQZpp6zEnaJbVcyDiWRfgBm4Uejq8+CDk6uzk0aFSgAZzz06E014UkgGpelU7w==",
+                "account_number": "0",
+                "sequence": "11"
+            }
+            ],
+            "memo": ""
+        }
     }
     ```
 

@@ -38,7 +38,7 @@ func (msg MsgAddProfiler) Type() string { return TypeMsgAddProfiler }
 
 // GetSignBytes implements Msg.
 func (msg MsgAddProfiler) GetSignBytes() []byte {
-	b, err := ModuleCdc.MarshalJSON(msg)
+	b, err := ModuleCdc.MarshalJSON(&msg)
 	if err != nil {
 		panic(err)
 	}
@@ -55,7 +55,7 @@ func (msg MsgAddProfiler) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.AddGuardian.AddedBy}
 }
 
-//______________________________________________________________________
+// ______________________________________________________________________
 
 // NewMsgDeleteProfiler constructs a MsgDeleteProfiler
 func NewMsgDeleteProfiler(address, deletedBy sdk.AccAddress) *MsgDeleteProfiler {
@@ -75,7 +75,7 @@ func (msg MsgDeleteProfiler) Type() string { return TypeMsgDeleteProfiler }
 
 // GetSignBytes implements Msg.
 func (msg MsgDeleteProfiler) GetSignBytes() []byte {
-	b, err := ModuleCdc.MarshalJSON(msg)
+	b, err := ModuleCdc.MarshalJSON(&msg)
 	if err != nil {
 		panic(err)
 	}
@@ -92,7 +92,7 @@ func (msg MsgDeleteProfiler) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.DeleteGuardian.DeletedBy}
 }
 
-//______________________________________________________________________
+// ______________________________________________________________________
 
 // NewMsgAddTrustee constructs a MsgAddTrustee
 func NewMsgAddTrustee(description string, address, addedAddress sdk.AccAddress) *MsgAddTrustee {
@@ -113,7 +113,7 @@ func (msg MsgAddTrustee) Type() string { return TypeMsgAddTrustee }
 
 // GetSignBytes implements Msg.
 func (msg MsgAddTrustee) GetSignBytes() []byte {
-	b, err := ModuleCdc.MarshalJSON(msg)
+	b, err := ModuleCdc.MarshalJSON(&msg)
 	if err != nil {
 		panic(err)
 	}
@@ -130,7 +130,7 @@ func (msg MsgAddTrustee) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.AddGuardian.AddedBy}
 }
 
-//______________________________________________________________________
+// ______________________________________________________________________
 
 // NewMsgDeleteTrustee constructs a MsgDeleteTrustee
 func NewMsgDeleteTrustee(address, deletedBy sdk.AccAddress) *MsgDeleteTrustee {
@@ -150,7 +150,7 @@ func (msg MsgDeleteTrustee) Type() string { return TypeMsgDeleteTrustee }
 
 // GetSignBytes implements Msg.
 func (msg MsgDeleteTrustee) GetSignBytes() []byte {
-	b, err := ModuleCdc.MarshalJSON(msg)
+	b, err := ModuleCdc.MarshalJSON(&msg)
 	if err != nil {
 		panic(err)
 	}
@@ -167,7 +167,7 @@ func (msg MsgDeleteTrustee) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.DeleteGuardian.DeletedBy}
 }
 
-//______________________________________________________________________
+// ______________________________________________________________________
 
 // ValidateBasic validate the AddGuardian
 func (g AddGuardian) ValidateBasic() error {

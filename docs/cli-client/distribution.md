@@ -11,7 +11,7 @@ The distribution module allows you to manage your [Staking Rewards](../concepts/
 | [params](#iris-query-distribution-params)                                                 | Query distribution params                                                                                   |
 | [rewards](#iris-query-distribution-rewards)                                               | Query all distribution delegator rewards or rewards from a particular validator  |
 | [slashes](#iris-query-distribution-slashes)                                               | Query distribution validator slashes.                                                                                   |
-| [validator-outstanding-rewards](#iris-query-distribution-validator-outstanding-rewards)      | Query distribution outstanding (un-withdrawn) rewards for a validator and all their delegations                                                                                   |
+| [validator-outstanding-rewards](#iris-query-distribution-validator-outstanding-rewards)   | Query distribution outstanding (un-withdrawn) rewards for a validator and all their delegations                                                                                   |
 | [fund-community-pool](#iris-tx-distribution-fund-community-pool)                          | Funds the community pool with the specified amount                                                         |
 | [set-withdraw-addr](#iris-tx-distribution-set-withdraw-addr)                              | Set the withdraw address for rewards associated with a delegator address                                                                                   |
 | [withdraw-all-rewards](#iris-tx-distribution-withdraw-all-rewards)                        | Withdraw all rewards for a single delegator                                                                                   |
@@ -64,6 +64,7 @@ Query distribution outstanding (un-withdrawn) rewards for a validator and all th
 ```bash
 iris query distribution validator-outstanding-rewards [validator] [flags]
 ```
+
 ## iris tx distribution fund-community-pool
 
 Funds the community pool with the specified amount.
@@ -71,6 +72,7 @@ Funds the community pool with the specified amount.
 ```bash
 iris tx distribution fund-community-pool [amount] [flags]
 ```
+
 ## iris tx distribution set-withdraw-addr
 
 Set the withdraw address for rewards associated with a delegator address.

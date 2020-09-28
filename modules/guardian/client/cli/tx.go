@@ -15,8 +15,8 @@ import (
 	"github.com/irisnet/irishub/modules/guardian/types"
 )
 
-// GetTxCmd returns the transaction commands for the guardian module.
-func GetTxCmd() *cobra.Command {
+// NewTxCmd returns the transaction commands for the guardian module.
+func NewTxCmd() *cobra.Command {
 	txCmd := &cobra.Command{
 		Use:                        types.ModuleName,
 		Short:                      "guardian transaction subcommands",

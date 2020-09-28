@@ -7,30 +7,30 @@ Service模块允许在IRIS Hub中定义、绑定、调用服务。[了解更多i
 | 名称                                                    | 描述                                         |
 | ------------------------------------------------------- | -------------------------------------------- |
 | [define](#iris-tx-service-define)                       | 定义一个新的服务                             |
-| [definition](#iris-query-service-definition)                | 查询服务定义                                 |
+| [definition](#iris-query-service-definition)            | 查询服务定义                                 |
 | [bind](#iris-tx-service-bind)                           | 绑定一个服务                                 |
-| [binding](#iris-query-service-binding)                      | 查询服务绑定                                 |
-| [bindings](#iris-query-service-bindings)                    | 查询服务绑定列表                             |
+| [binding](#iris-query-service-binding)                  | 查询服务绑定                                 |
+| [bindings](#iris-query-service-bindings)                | 查询服务绑定列表                             |
 | [set-withdraw-addr](#iris-tx-service-set-withdraw-addr) | 设置服务提供者的提取地址                     |
-| [withdraw-addr](#iris-query-service-withdraw-addr)          | 查询服务提供者的提取地址                     |
+| [withdraw-addr](#iris-query-service-withdraw-addr)      | 查询服务提供者的提取地址                     |
 | [update-binding](#iris-tx-service-update-binding)       | 更新一个存在的服务绑定                       |
 | [disable](#iris-tx-service-disable)                     | 禁用一个可用的服务绑定                       |
 | [enable](#iris-tx-service-enable)                       | 启用一个不可用的服务绑定                     |
 | [refund-deposit](#iris-tx-service-refund-deposit)       | 退还一个服务绑定的所有押金                   |
 | [call](#iris-tx-service-call)                           | 发起服务调用                                 |
-| [request](#iris-query-service-request)                      | 通过请求ID查询服务请求                       |
-| [requests](#iris-query-service-requests)                    | 通过服务绑定或请求上下文查询服务请求列表     |
+| [request](#iris-query-service-request)                  | 通过请求ID查询服务请求                       |
+| [requests](#iris-query-service-requests)                | 通过服务绑定或请求上下文查询服务请求列表     |
 | [respond](#iris-tx-service-respond)                     | 响应服务请求                                 |
-| [response](#iris-query-service-response)                    | 通过请求ID查询服务响应                       |
-| [responses](#iris-query-service-responses)                  | 通过请求上下文ID和批次计数器查询服务响应列表 |
-| [request-context](#iris-query-service-request-context)      | 查询请求上下文                               |
+| [response](#iris-query-service-response)                | 通过请求ID查询服务响应                       |
+| [responses](#iris-query-service-responses)              | 通过请求上下文ID和批次计数器查询服务响应列表 |
+| [request-context](#iris-query-service-request-context)  | 查询请求上下文                               |
 | [update](#iris-tx-service-update)                       | 更新请求上下文                               |
 | [pause](#iris-tx-service-pause)                         | 暂停一个正在进行的请求上下文                 |
 | [start](#iris-tx-service-start)                         | 启动一个暂停的请求上下文                     |
 | [kill](#iris-tx-service-kill)                           | 终止请求上下文                               |
-| [fees](#iris-query-service-fees)                            | 查询服务提供者的收益                         |
+| [fees](#iris-query-service-fees)                        | 查询服务提供者的收益                         |
 | [withdraw-fees](#iris-tx-service-withdraw-fees)         | 提取服务提供者的收益                         |
-| [schema](#iris-query-service-schema)                        | 通过 schema 名称查询系统 schema              |
+| [schema](#iris-query-service-schema)                    | 通过 schema 名称查询系统 schema              |
 
 ## iris tx service define
 
@@ -53,15 +53,60 @@ iris tx service define [flags]
 ### 定义一个新的服务
 
 ```bash
-iris tx service define --chain-id=irishub --from=<key-name> --fees=0.3iris 
---name=<service name> --description=<service description> --author-description=<author description>
---tags=tag1,tag2 --schemas=<schemas content or path/to/schemas.json>
+iris tx service define \
+    --name=<service name> \
+    --description=<service description> \
+    --author-description=<author description> \
+    --tags=tag1,tag2 --schemas=<schemas content or path/to/schemas.json> \
+    --chain-id=irishub \
+    --from=<key-name> \
+    --fees=0.3iris
 ```
 
 ### Schemas内容示例
 
 ```json
-{"input":{"$schema":"http://json-schema.org/draft-04/schema#","title":"BioIdentify service input","description":"BioIdentify service input specification","type":"object","properties":{"id":{"description":"id","type":"string"},"name":{"description":"name","type":"string"},"data":{"description":"data","type":"string"}},"required":["id","data"]},"output":{"$schema":"http://json-schema.org/draft-04/schema#","title":"BioIdentify service output","description":"BioIdentify service output specification","type":"object","properties":{"data":{"description":"result data","type":"string"}},"required":["data"]}}
+{
+    "input": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "title": "BioIdentify service input body",
+        "description": "BioIdentify service input body specification",
+        "type": "object",
+        "properties": {
+            "id": {
+                "description": "id",
+                "type": "string"
+            },
+            "name": {
+                "description": "name",
+                "type": "string"
+            },
+            "data": {
+                "description": "data",
+                "type": "string"
+            }
+        },
+        "required": [
+            "id",
+            "data"
+        ]
+    },
+    "output": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "title": "BioIdentify service output body",
+        "description": "BioIdentify service output body specification",
+        "type": "object",
+        "properties": {
+            "data": {
+                "description": "result data",
+                "type": "string"
+            }
+        },
+        "required": [
+            "data"
+        ]
+    }
+}
 ```
 
 ## iris query service definition
@@ -90,21 +135,29 @@ iris tx service bind [flags]
 
 **标志：**
 
-| 名称，速记     | 默认 | 描述                                                         | 必须 |
-| -------------- | ---- | ------------------------------------------------------------ | ---- |
-| --service-name |      | 服务名称                                                     | 是   |
-| --deposit      |      | 服务绑定的押金                                               | 是   |
+| 名称，速记     | 默认 | 描述                                                                                                    | 必须 |
+| -------------- | ---- | ------------------------------------------------------------------------------------------------------- | ---- |
+| --service-name |      | 服务名称                                                                                                | 是   |
+| --deposit      |      | 服务绑定的押金                                                                                          | 是   |
 | --pricing      |      | 服务定价内容或文件路径，是一个[Irishub Service Pricing JSON Schema](../features/service-pricing.md)实例 | 是   |
-| --qos          |      | 最小响应时间                                                 | 是   |
-| --provider     |      | 服务提供者地址
+| --qos          |      | 最小响应时间                                                                                            | 是   |
+| --options      |      | 非功能性需求选项                                                                                        | 是   |
+| --provider     |      | 服务提供者地址                                                                                          |      |
 
 ### 绑定一个存在的服务定义
 
 抵押`deposit`应该满足最小抵押数量需求，最小抵押数量为`price` * `MinDepositMultiple` 和 `MinDeposit`中的最大值（`MinDepositMultiple`以及`MinDeposit`是可治理参数）。
 
 ```bash
-iris tx service bind --chain-id=irishub --from=<key-name> --fees=0.3iris
---service-name=<service name> --deposit=10000iris --pricing=<pricing content or path/to/pricing.json> --qos=50
+iris tx service bind \
+    --service-name=<service name> \
+    --deposit=10000iris \
+    --pricing=<pricing content or path/to/pricing.json> \
+    --qos=50 \
+    --options=<non-functional requirements options content or path/to/options.json> \
+    --chain-id=irishub \
+    --from=<key-name> \
+    --fees=0.3iris
 ```
 
 ### Pricing内容示例
@@ -146,18 +199,26 @@ iris tx service update-binding [service-name] [provider-address] [flags]
 ```
 
 **标志：**
-| 名称，速记 | 默认 | 描述                                                         | 必须 |
-| ---------- | ---- | ------------------------------------------------------------ | ---- |
-| --deposit  |      | 增加的绑定押金，为空则不更新                                 |      |
+| 名称，速记 | 默认 | 描述                                                                                                                  | 必须 |
+| ---------- | ---- | --------------------------------------------------------------------------------------------------------------------- | ---- |
+| --deposit  |      | 增加的绑定押金，为空则不更新                                                                                          |      |
 | --pricing  |      | 服务定价内容或文件路径，是一个[Irishub Service Pricing JSON Schema](../features/service-pricing.md)实例，为空则不更新 |      |
-| --qos      |      | 最小响应时间，为0则不更新                                    |      |
+| --qos      |      | 最小响应时间，为0则不更新                                                                                             |      |
+| --options  |      | 非功能性需求选项                                                                                                      |      |
 
 ### 更新一个存在的服务绑定
 
 更新服务绑定，追加 10 IRIS 的抵押。
 
 ```bash
-iris tx service update-binding <service-name> <prvider-address>  --chain-id=irishub --from=<key-name> --fees=0.3iris --deposit=10iris
+iris tx service update-binding <service-name> <provider-address> \
+    --deposit=10iris \
+    --options=<non-functional requirements options content or path/to/options.json> \
+    --pricing='{"price":"1iris"}' \
+    --qos=50 \
+    --chain-id=<chain-id> \
+    --from=<key name> \
+    --fees=0.3iris
 ```
 
 ## iris tx service set-withdraw-addr
@@ -247,16 +308,32 @@ iris tx service call [flags]
 ### 发起一个服务调用请求
 
 ```bash
-iris tx service call --chain-id=irishub --from=<key name> --fees=0.3iris --service-name=<service name> --providers=<provider list> --service-fee-cap=1iris --data=<request input or path/to/input.json> --timeout=100 --repeated --frequency=150 --total=100
+iris tx service call \
+    --service-name=<service name>
+    --providers=<provider list> \
+    --service-fee-cap=1iris \
+    --data=<request input or path/to/input.json> \
+    --timeout=100 \
+    --repeated \
+    --frequency=150 \
+    --total=100 \
+    --chain-id=irishub \
+    --from=<key name> \
+    --fees=0.3iris
 ```
 
 ### 请求输入示例
 
 ```json
 {
-    "id": "1",
-    "name": "irisnet",
-    "data": "facedata"
+    "header": {
+        ...
+    },
+    "body": {
+        "id": "1",
+        "name": "irisnet",
+        "data": "facedata"
+    }
 }
 ```
 
@@ -308,16 +385,22 @@ iris tx service respond [flags]
 
 **标志：**
 
-| 名称，速记   | 默认 | 描述                                                         | 必须 |
-| ------------ | ---- | ------------------------------------------------------------ | ---- |
-| --request-id |      | 欲响应请求的ID                                               | 是   |
+| 名称，速记   | 默认 | 描述                                                                                                    | 必须 |
+| ------------ | ---- | ------------------------------------------------------------------------------------------------------- | ---- |
+| --request-id |      | 欲响应请求的ID                                                                                          | 是   |
 | --result     |      | 响应结果的内容或文件路径, 是一个[Irishub Service Result JSON Schema](../features/service-result.md)实例 | 是   |
-| --data       |      | 响应输出的内容或文件路径, 是一个Output JSON Schema实例       |      |
+| --data       |      | 响应输出的内容或文件路径, 是一个Output JSON Schema实例                                                  |      |
 
 ### 响应一个服务请求
 
 ```bash
-iris tx service respond --chain-id=irishub --from=<key-name> --fees=0.3iris --request-id=<request-id> --result=<response result or path/to/result.json> --data=<response output or path/to/output.json>
+iris tx service respond \
+    --request-id=<request-id> \
+    --result=<response result or path/to/result.json> \
+    --data=<response output or path/to/output.json>
+    --chain-id=irishub \
+    --from=<key-name> \
+    --fees=0.3iris
 ```
 
 :::tip
@@ -337,7 +420,12 @@ iris tx service respond --chain-id=irishub --from=<key-name> --fees=0.3iris --re
 
 ```json
 {
-    "data": "userdata"
+    "header": {
+        ...
+    },
+    "body": {
+        "data": "userdata"
+    }
 }
 ```
 
@@ -412,7 +500,15 @@ iris tx service update [request-context-id] [flags]
 ### 更新一个请求上下文
 
 ```bash
-iris tx service update <request-context-id> --chain-id=irishub --from=<key name> --fees=0.3iris --providers=<provider list> --service-fee-cap=1iris --timeout=0 --frequency=150 --total=100
+iris tx service update <request-context-id> \
+    --providers=<provider list> \
+    --service-fee-cap=1iris \
+    --timeout=0 \
+    --frequency=150 \
+    --total=100 \
+    --chain-id=irishub \
+    --from=<key name> \
+    --fees=0.3iris
 ```
 
 ## iris tx service pause
@@ -435,6 +531,7 @@ iris tx service pause <request-context-id>
 
 ```bash
 iris tx service start [request-context-id] [flags]
+```
 
 ## iris tx service kill
 
@@ -485,4 +582,3 @@ iris query service schema pricing
 ```bash
 iris query service schema result
 ```
-

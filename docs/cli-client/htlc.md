@@ -11,19 +11,27 @@ There are the following states involved in the lifecycle of an HTLC:
 
 ## Available Commands
 
-| Name                                   | Description                 |
-| -------------------------------------- | --------------------------- |
-| [create](#iris-tx-htlc-create)         | Create an HTLC              |
-| [claim](#iris-tx-htlc-claim)           | Claim an opened HTLC        |
-| [refund](#iris-tx-htlc-refund)         | Refund from an expired HTLC |
-| [htlc](#iris-query-htlc-htlc)          | Query details of an HTLC    |
+| Name                           | Description                 |
+| ------------------------------ | --------------------------- |
+| [create](#iris-tx-htlc-create) | Create an HTLC              |
+| [claim](#iris-tx-htlc-claim)   | Claim an opened HTLC        |
+| [refund](#iris-tx-htlc-refund) | Refund from an expired HTLC |
+| [htlc](#iris-query-htlc-htlc)  | Query details of an HTLC    |
 
 ## iris tx htlc create
 
 Create an HTLC
 
 ```bash
-iris tx htlc create --to=<recipient> --receiver-on-other-chain=<receiver-on-other-chain> --amount=<amount> --secret=<secret> --hash-lock=<hash-lock> --timestamp=<timestamp> --time-lock=<time-lock> --from=mykey
+iris tx htlc create \
+    --to=<recipient> \
+    --receiver-on-other-chain=<receiver-on-other-chain> \
+    --amount=<amount> \
+    --secret=<secret> \
+    --hash-lock=<hash-lock> \
+    --timestamp=<timestamp> \
+    --time-lock=<time-lock> \
+    --from=mykey
 ```
 
 **Flags:**
@@ -50,8 +58,7 @@ iris tx htlc create \
 --time-lock=50 \
 --timestamp=1580000000 \
 --fees=0.3iris \
---chain-id=irishub \
--b block -y
+--chain-id=irishub
 ```
 
 ## iris tx htlc claim

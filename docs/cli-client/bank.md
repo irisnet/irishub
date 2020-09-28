@@ -4,11 +4,11 @@ Bank module allows you to manage assets in your local accounts
 
 ## Available Commands
 
-| Name                                             | Description                         |
-| ------------------------------------------------ | ----------------------------------- |
-| [balances](#iris-query-bank-balances)            | Query for account balances by address                     |
-| [total](#iris-query-bank-total)                  | Query the total supply of coins of the chain                   |
-| [send](#iris-tx-bank-send)                       | Create and/or sign and broadcast a MsgSend transaction     |
+| Name                                  | Description                                            |
+| ------------------------------------- | ------------------------------------------------------ |
+| [balances](#iris-query-bank-balances) | Query for account balances by address                  |
+| [total](#iris-query-bank-total)       | Query the total supply of coins of the chain           |
+| [send](#iris-tx-bank-send)            | Create and/or sign and broadcast a MsgSend transaction |
 
 ## iris query bank balances
 
@@ -20,10 +20,10 @@ iris query bank balances [address] [flags]
 
 **Flags:**
 
-| Name, shorthand | Type   | Required | Default               | Description                                                   |
-| --------------- | ------ | -------- | --------------------- | ------------------------------------------------------------- |
-| -h, --help      |        |          |                       | Help for coin-type                                            |
-| --denom         | string |          |                       | The specific balance denomination to query for                |
+| Name, shorthand | Type   | Required | Default | Description                                    |
+| --------------- | ------ | -------- | ------- | ---------------------------------------------- |
+| -h, --help      |        |          |         | Help for coin-type                             |
+| --denom         | string |          |         | The specific balance denomination to query for |
 
 ### iris query bank total
 
@@ -32,13 +32,13 @@ Query total supply of coins that are held by accounts in the chain.
 ```bash
 iris query bank total [flags]
 ```
+
 **Flags:**
 
-| Name, shorthand | Type   | Required | Default               | Description                                                   |
-| --------------- | ------ | -------- | --------------------- | ------------------------------------------------------------- |
-| -h, --help      |        |          |                       | Help for coin-type                                            |
-| --denom         | string |          |                       | The specific balance denomination to query for                |
-
+| Name, shorthand | Type   | Required | Default | Description                                    |
+| --------------- | ------ | -------- | ------- | ---------------------------------------------- |
+| -h, --help      |        |          |         | Help for coin-type                             |
+| --denom         | string |          |         | The specific balance denomination to query for |
 
 ## iris tx bank send
 
