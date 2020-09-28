@@ -57,8 +57,7 @@ iris tx oracle create \
     --value-json-path="high" \
     --chain-id=irishub \
     --from=node0 \
-    --fees=0.3iris \
-   
+    --fees=0.3iris 
 ```
 
 ## iris tx oracle start
