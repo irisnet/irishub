@@ -46,7 +46,7 @@ iris tx nft mint [denomID] [tokenID] [flags]
 
 | Name, shorthand      | Required | Default | Description     |
 | ----------- | ----- | -------------------------------------- | ---- |
-| --uri       |  |  URI of off-line token data              |      |
+| --uri       |  |  URI of off-chain token data              |      |
 | --recipient  | |  Receiver of the nft   |  |
 | --name       |  | The name of nft     |      |
 
@@ -63,7 +63,7 @@ iris tx nft edit [denomID] [tokenID] [flags]
 
 | Name, shorthand      | Required | Default | Description     |
 | ----------- | ----- | -------------------------------------- | ---- |
-| --uri       |  |   URI of off-line token data                   |      |
+| --uri       |  |   URI of off-chain token data                   |      |
 | --name       |  | The name of nft       |      |
 
 
@@ -79,7 +79,7 @@ iris tx nft transfer [recipient] [denomID] [tokenID] [flags]
 
 | Name, shorthand      | Required | Default | Description     |
 | ----------- | ----- | -------------------------------------- | ---- |
-| --uri       |  |  URI of off-line token data                |      |
+| --uri       |  |  URI of off-chain token data                |      |
 | --name       |  | The name of nft       |      |
 
 
