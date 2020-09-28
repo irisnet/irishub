@@ -78,7 +78,7 @@ iris q service definition <service-name>
 
 ```json
 {
-  "price": "0.1uiris",
+  "price": "0.1iris",
   "promotions_by_time": [
     {
       "start_time": "2020-01-01T00:00:00Z",

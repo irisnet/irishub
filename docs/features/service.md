@@ -78,7 +78,7 @@ The pricing object specifies how the provider charges for its service; it must c
 
 ```json
 {
-  "price": "0.5uiris",
+  "price": "0.1iris",
   "promotions_by_time": [
     {
       "start_time": "2020-01-01T00:00:00Z",
