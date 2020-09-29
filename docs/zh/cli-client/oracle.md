@@ -100,7 +100,6 @@ iris tx oracle edit [feed-name] [flags]
 
 | 名称, 速记        | 类型     | 必须 | 默认 | 描述                                                                |
 | ----------------- | -------- | ---- | ---- | ------------------------------------------------------------------- |
-| --feed-name       | string   | 是   |      | feed的名称，唯一标识                                                |
 | --description     | string   |      |      | feed的描述                                                          |
 | --latest-history  | uint64   | 是   |      | feed执行结果保留的最大数目(按照时间降序保留)，范围取值为： [1, 100] |
 | --providers       | []string | 是   |      | 服务提供者的地址列表                                                |
@@ -152,12 +151,6 @@ iris query oracle feeds --state=running
 ## iris query oracle value
 
 该命令用于查询指定feed的执行结果
-
-```bash
-iris query oracle value test-feed
-```
-
-### 查询现存的feed的执行结果
 
 ```bash
 iris query oracle value test-feed

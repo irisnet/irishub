@@ -77,7 +77,6 @@ iris tx oracle edit test-feed \
     --service-fee-cap=1iris \
     --timeout=6 \
     --threshold=5 \
-    --threshold=3 \
     --chain-id="irishub-test" \
     --from=node0 \
     --fees=0.3iris \

@@ -66,13 +66,7 @@ iris tx htlc create \
 将 HTLC 中锁定的资金发送到收款人地址。
 
 ```bash
-iris tx htlc claim [hash-lock] [secret] [flags]
-```
-
-### 将 HTLC 中锁定的资金发送到收款人地址
-
-```bash
-iris tx htlc claim [hash-lock] [secret] [flags]
+iris tx htlc claim [hash-lock] [secret] [flags] --from=mykey
 ```
 
 ## iris tx htlc refund
@@ -80,13 +74,7 @@ iris tx htlc claim [hash-lock] [secret] [flags]
 从过期的 HTLC 中取回退款。
 
 ```bash
-iris tx htlc refund [hash-lock] [flags]
-```
-
-### 从过期的 HTLC 中取回退款
-
-```bash
-iris tx htlc refund [hash-lock] [flags]
+iris tx htlc refund [hash-lock] [flags] --from=mykey
 ```
 
 ## iris query htlc htlc

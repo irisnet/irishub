@@ -102,8 +102,7 @@ casted on a proposal for the result to be valid.
 
 #### 阈值
 
-Threshold is defined as the minimum proportion of `Yes` votes (excluding
-`Abstain` votes) for the proposal to be accepted.
+Threshold is defined as the minimum proportion of `Yes` votes (excluding `Abstain` votes) for the proposal to be accepted.
 
 阈值被定义为，为使提议被接受而所需要的 `赞成` 票的最小比例。
 
@@ -171,7 +170,7 @@ echo '{
   "deposit": "1000iris"
 }' > proposal.json
 
-iris tx gov submit-proposal param-change proposal.json --from=<key-name> --fees=0.3iris --chain-id=irishub -b block -y
+iris tx gov submit-proposal param-change proposal.json --from=<key-name> --fees=0.3iris --chain-id=irishub
 ```
 
 ### 社区池基金消费
@@ -188,7 +187,7 @@ echo '{
   "deposit": "1000iris"
 }' > proposal.json
 
-iris tx gov submit-proposal community-pool-spend proposal.json --from=<key-name> --fees=0.3iris --chain-id=irishub -b block -y
+iris tx gov submit-proposal community-pool-spend proposal.json --from=<key-name> --fees=0.3iris --chain-id=irishub
 ```
 
 ### 软件升级
