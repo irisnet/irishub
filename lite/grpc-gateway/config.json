@@ -1,0 +1,33 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "IrisHub - GRPC Gateway",
+    "version": "1.0.0"
+  },
+  "apis": [
+    {
+      "url": "./mint/query.swagger.json",
+      "operationIds": {
+        "rename": {
+          "Params": "MintParams"
+        }
+      }
+    },
+    {
+      "url": "./oracle/query.swagger.json",
+      "operationIds": {
+        "rename": {
+          "Params": "OracleParams"
+        }
+      }
+    },
+    {
+      "url": "./random/query.swagger.json",
+      "operationIds": {
+        "rename": {
+          "Params": "RandomParams"
+        }
+      }
+    }
+  ]
+}

@@ -4,27 +4,27 @@ Staking module provides a set of subcommands to query staking state and send sta
 
 ## Available Commands
 
-| Name                                                         | Description                                                  |
-| ------------------------------------------------------------ | ------------------------------------------------------------ |
-| [validator](#iris-query-staking-validator)                       | Query a validator                                            |
-| [validators](#iris-query-staking-validators)                     | Query for all validators                                     |
-| [delegation](#iris-query-staking-delegation)                     | Query a delegation based on address and validator address    |
-| [delegations](#iris-query-staking-delegations)                   | Query all delegations made from one delegator                |
-| [delegations-to](#iris-query-staking-delegations-to)             | Query all delegations to one validator                       |
-| [unbonding-delegation](#iris-query-staking-unbonding-delegation) | Query an unbonding-delegation record based on delegator and validator address |
-| [unbonding-delegations](#iris-query-staking-unbonding-delegations) | Query all unbonding-delegations records for one delegator    |
-| [unbonding-delegations-from](#iris-query-staking-unbonding-delegations-from) | Query all unbonding delegatations from a validator           |
-| [redelegations-from](#iris-query-staking-redelegations-from)     | Query all outgoing redelegatations from a validator          |
-| [redelegation](#iris-query-staking-redelegation)                 | Query a redelegation record based on delegator and a source and destination validator address |
-| [redelegations](#iris-query-staking-redelegations)               | Query all redelegations records for one delegator            |
-| [pool](#iris-query-staking-pool)                                 | Query the current staking pool values                        |
-| [params](#iris-query-staking-params)                             | Query the current staking parameters information             |
-| [historical-info](#iris-query-staking-historical-info)           | Query historical info at given height                        |
-| [create-validator](#iris-tx-staking-create-validator)        | Create new validator initialized with a self-delegation to it |
-| [edit-validator](#iris-tx-staking-edit-validator)            | Edit existing validator account                              |
-| [delegate](#iris-tx-staking-delegate)                        | Delegate liquid tokens to an validator                       |
-| [unbond](#iris-tx-staking-unbond)                            | Unbond shares from a validator                               |
-| [redelegate](#iris-tx-staking-redelegate)                    | Redelegate illiquid tokens from one validator to another     |
+| Name                                                                         | Description                                                                                   |
+| ---------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| [validator](#iris-query-staking-validator)                                   | Query a validator                                                                             |
+| [validators](#iris-query-staking-validators)                                 | Query for all validators                                                                      |
+| [delegation](#iris-query-staking-delegation)                                 | Query a delegation based on address and validator address                                     |
+| [delegations](#iris-query-staking-delegations)                               | Query all delegations made from one delegator                                                 |
+| [delegations-to](#iris-query-staking-delegations-to)                         | Query all delegations to one validator                                                        |
+| [unbonding-delegation](#iris-query-staking-unbonding-delegation)             | Query an unbonding-delegation record based on delegator and validator address                 |
+| [unbonding-delegations](#iris-query-staking-unbonding-delegations)           | Query all unbonding-delegations records for one delegator                                     |
+| [unbonding-delegations-from](#iris-query-staking-unbonding-delegations-from) | Query all unbonding delegatations from a validator                                            |
+| [redelegations-from](#iris-query-staking-redelegations-from)                 | Query all outgoing redelegatations from a validator                                           |
+| [redelegation](#iris-query-staking-redelegation)                             | Query a redelegation record based on delegator and a source and destination validator address |
+| [redelegations](#iris-query-staking-redelegations)                           | Query all redelegations records for one delegator                                             |
+| [pool](#iris-query-staking-pool)                                             | Query the current staking pool values                                                         |
+| [params](#iris-query-staking-params)                                         | Query the current staking parameters information                                              |
+| [historical-info](#iris-query-staking-historical-info)                       | Query historical info at given height                                                         |
+| [create-validator](#iris-tx-staking-create-validator)                        | Create new validator initialized with a self-delegation to it                                 |
+| [edit-validator](#iris-tx-staking-edit-validator)                            | Edit existing validator account                                                               |
+| [delegate](#iris-tx-staking-delegate)                                        | Delegate liquid tokens to an validator                                                        |
+| [unbond](#iris-tx-staking-unbond)                                            | Unbond shares from a validator                                                                |
+| [redelegate](#iris-tx-staking-redelegate)                                    | Redelegate illiquid tokens from one validator to another                                      |
 
 ## iris query staking validator
 
@@ -164,7 +164,7 @@ iris query staking redelegation [delegator-addr] [src-validator-addr] [dst-valid
 ### Query a redelegation record
 
 ```bash
-iris query staking redelegation <iaa...> <iva...> <iva...> 
+iris query staking redelegation <iaa...> <iva...> <iva...>
 ```
 
 ## iris query staking redelegations
@@ -219,22 +219,22 @@ iris tx staking create-validator [flags]
 
 **Flags:**
 
-| Name, shorthand              | type   | Required | Default | Description                                                  |
-| ---------------------------- | ------ | -------- | ------- | ------------------------------------------------------------ |
-| --amount                     | string | Yes      |         | Amount of coins to bond                                      |
-| --commission-rate            | float  | Yes      | 0.0     | The initial commission rate percentage                       |
-| --commission-max-rate        | float  |          | 0.0     | The maximum commission rate percentage                       |
-| --commission-max-change-rate | float  |          | 0.0     | The maximum commission change rate percentage (per day)      |
-| --min-self-delegation        | string |          |         | The minimum self delegation required on the validator        |
-| --details                    | string |          |         | Optional details                                             |
-| --genesis-format             | bool   |          | false   | Export the transaction in gen-tx format; it implies --generate-only |
-| --identity                   | string |          |         | Optional identity signature (ex. UPort or Keybase)           |
-| --ip                         | string |          |         | Node's public IP. It takes effect only when used in combination with |
-| --node-id                    | string |          |         | The node's ID                                                |
-| --moniker                    | string | Yes      |         | Validator name                                               |
+| Name, shorthand              | type   | Required | Default | Description                                                                                      |
+| ---------------------------- | ------ | -------- | ------- | ------------------------------------------------------------------------------------------------ |
+| --amount                     | string | Yes      |         | Amount of coins to bond                                                                          |
+| --commission-rate            | float  | Yes      | 0.0     | The initial commission rate percentage                                                           |
+| --commission-max-rate        | float  |          | 0.0     | The maximum commission rate percentage                                                           |
+| --commission-max-change-rate | float  |          | 0.0     | The maximum commission change rate percentage (per day)                                          |
+| --min-self-delegation        | string |          |         | The minimum self delegation required on the validator                                            |
+| --details                    | string |          |         | Optional details                                                                                 |
+| --genesis-format             | bool   |          | false   | Export the transaction in gen-tx format; it implies --generate-only                              |
+| --identity                   | string |          |         | Optional identity signature (ex. UPort or Keybase)                                               |
+| --ip                         | string |          |         | Node's public IP. It takes effect only when used in combination with                             |
+| --node-id                    | string |          |         | The node's ID                                                                                    |
+| --moniker                    | string | Yes      |         | Validator name                                                                                   |
 | --pubkey                     | string | Yes      |         | Go-Amino encoded hex PubKey of the validator. For Ed25519 the go-amino prepend hex is 1624de6220 |
-| --website                    | string |          |         | Optional website                                             |
-| --security-contact           | string |          |         | The validator's (optional) security contact email            |
+| --website                    | string |          |         | Optional website                                                                                 |
+| --security-contact           | string |          |         | The validator's (optional) security contact email                                                |
 
 ### Create a validator
 

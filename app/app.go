@@ -3,6 +3,7 @@ package app
 import (
 	"io"
 	"os"
+	"path/filepath"
 
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/crypto"
@@ -29,6 +30,7 @@ import (
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authsims "github.com/cosmos/cosmos-sdk/x/auth/simulation"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	"github.com/cosmos/cosmos-sdk/x/auth/vesting"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
@@ -55,10 +57,10 @@ import (
 	ibctransferkeeper "github.com/cosmos/cosmos-sdk/x/ibc-transfer/keeper"
 	ibctransfertypes "github.com/cosmos/cosmos-sdk/x/ibc-transfer/types"
 	ibcclient "github.com/cosmos/cosmos-sdk/x/ibc/02-client"
-	ibcclienttypes "github.com/cosmos/cosmos-sdk/x/ibc/02-client/types"
 	porttypes "github.com/cosmos/cosmos-sdk/x/ibc/05-port/types"
 	ibchost "github.com/cosmos/cosmos-sdk/x/ibc/24-host"
 	ibckeeper "github.com/cosmos/cosmos-sdk/x/ibc/keeper"
+	ibcmock "github.com/cosmos/cosmos-sdk/x/ibc/testing/mock"
 	"github.com/cosmos/cosmos-sdk/x/params"
 	paramsclient "github.com/cosmos/cosmos-sdk/x/params/client"
 	paramskeeper "github.com/cosmos/cosmos-sdk/x/params/keeper"
@@ -75,24 +77,30 @@ import (
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
-	"github.com/irismod/coinswap"
-	coinswapkeeper "github.com/irismod/coinswap/keeper"
-	coinswaptypes "github.com/irismod/coinswap/types"
-	"github.com/irismod/htlc"
-	htlckeeper "github.com/irismod/htlc/keeper"
-	htlctypes "github.com/irismod/htlc/types"
-	"github.com/irismod/nft"
-	nftkeeper "github.com/irismod/nft/keeper"
-	nfttypes "github.com/irismod/nft/types"
-	"github.com/irismod/record"
-	recordkeeper "github.com/irismod/record/keeper"
-	recordtypes "github.com/irismod/record/types"
-	"github.com/irismod/service"
-	servicekeeper "github.com/irismod/service/keeper"
-	servicetypes "github.com/irismod/service/types"
-	"github.com/irismod/token"
-	tokenkeeper "github.com/irismod/token/keeper"
-	tokentypes "github.com/irismod/token/types"
+	"github.com/irisnet/irismod/modules/coinswap"
+	coinswapkeeper "github.com/irisnet/irismod/modules/coinswap/keeper"
+	coinswaptypes "github.com/irisnet/irismod/modules/coinswap/types"
+	"github.com/irisnet/irismod/modules/htlc"
+	htlckeeper "github.com/irisnet/irismod/modules/htlc/keeper"
+	htlctypes "github.com/irisnet/irismod/modules/htlc/types"
+	"github.com/irisnet/irismod/modules/nft"
+	nftkeeper "github.com/irisnet/irismod/modules/nft/keeper"
+	nfttypes "github.com/irisnet/irismod/modules/nft/types"
+	"github.com/irisnet/irismod/modules/oracle"
+	oracleKeeper "github.com/irisnet/irismod/modules/oracle/keeper"
+	oracletypes "github.com/irisnet/irismod/modules/oracle/types"
+	"github.com/irisnet/irismod/modules/random"
+	randomkeeper "github.com/irisnet/irismod/modules/random/keeper"
+	randomtypes "github.com/irisnet/irismod/modules/random/types"
+	"github.com/irisnet/irismod/modules/record"
+	recordkeeper "github.com/irisnet/irismod/modules/record/keeper"
+	recordtypes "github.com/irisnet/irismod/modules/record/types"
+	"github.com/irisnet/irismod/modules/service"
+	servicekeeper "github.com/irisnet/irismod/modules/service/keeper"
+	servicetypes "github.com/irisnet/irismod/modules/service/types"
+	"github.com/irisnet/irismod/modules/token"
+	tokenkeeper "github.com/irisnet/irismod/modules/token/keeper"
+	tokentypes "github.com/irisnet/irismod/modules/token/types"
 
 	"github.com/irisnet/irishub/modules/guardian"
 	guardiankeeper "github.com/irisnet/irishub/modules/guardian/keeper"
@@ -100,27 +108,13 @@ import (
 	"github.com/irisnet/irishub/modules/mint"
 	mintkeeper "github.com/irisnet/irishub/modules/mint/keeper"
 	minttypes "github.com/irisnet/irishub/modules/mint/types"
-	"github.com/irisnet/irishub/modules/oracle"
-	oracleKeeper "github.com/irisnet/irishub/modules/oracle/keeper"
-	oracletypes "github.com/irisnet/irishub/modules/oracle/types"
-	"github.com/irisnet/irishub/modules/random"
-	randomkeeper "github.com/irisnet/irishub/modules/random/keeper"
-	randomtypes "github.com/irisnet/irishub/modules/random/types"
 )
 
 const appName = "IrisApp"
 
-func init() {
-	tokentypes.SetNativeToken(
-		"iris", "Irishub staking token", sdk.DefaultBondDenom,
-		6, 2000000000, 10000000000,
-		true, sdk.AccAddress(crypto.AddressHash([]byte(tokentypes.ModuleName))),
-	)
-}
-
 var (
 	// DefaultNodeHome default home directories for the application daemon
-	DefaultNodeHome = os.ExpandEnv("$HOME/.iris")
+	DefaultNodeHome string
 
 	// ModuleBasics defines the module BasicManager is in charge of setting up basic,
 	// non-dependant module elements, such as codec registration
@@ -134,9 +128,7 @@ var (
 		mint.AppModuleBasic{},
 		distr.AppModuleBasic{},
 		gov.NewAppModuleBasic(
-			paramsclient.ProposalHandler,
-			distrclient.ProposalHandler,
-			upgradeclient.ProposalHandler,
+			paramsclient.ProposalHandler, distrclient.ProposalHandler, upgradeclient.ProposalHandler, upgradeclient.CancelProposalHandler,
 		),
 		params.AppModuleBasic{},
 		crisis.AppModuleBasic{},
@@ -175,6 +167,17 @@ var (
 	// module accounts that are allowed to receive tokens
 	allowedReceivingModAcc = map[string]bool{
 		distrtypes.ModuleName: true,
+	}
+
+	nativeToken = tokentypes.Token{
+		Symbol:        "iris",
+		Name:          "Irishub staking token",
+		Scale:         6,
+		MinUnit:       "uiris",
+		InitialSupply: 2000000000,
+		MaxSupply:     10000000000,
+		Mintable:      true,
+		Owner:         sdk.AccAddress(crypto.AddressHash([]byte(tokentypes.ModuleName))),
 	}
 )
 
@@ -216,6 +219,7 @@ type IrisApp struct {
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
 	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
+	ScopedIBCMockKeeper  capabilitykeeper.ScopedKeeper
 
 	guardianKeeper guardiankeeper.Keeper
 	tokenKeeper    tokenkeeper.Keeper
@@ -234,13 +238,30 @@ type IrisApp struct {
 	sm *module.SimulationManager
 }
 
+func init() {
+	userHomeDir, err := os.UserHomeDir()
+	if err != nil {
+		panic(err)
+	}
+
+	DefaultNodeHome = filepath.Join(userHomeDir, ".iris")
+
+	tokentypes.SetNativeToken(
+		nativeToken.Symbol,
+		nativeToken.Name,
+		nativeToken.MinUnit,
+		nativeToken.Scale,
+		nativeToken.InitialSupply,
+		nativeToken.MaxSupply,
+		nativeToken.Mintable,
+		nativeToken.Owner,
+	)
+}
+
 // NewIrisApp returns a reference to an initialized IrisApp.
 func NewIrisApp(
-	logger log.Logger, db dbm.DB, traceStore io.Writer,
-	loadLatest bool, skipUpgradeHeights map[int64]bool,
-	homePath string, invCheckPeriod uint,
-	encodingConfig simappparams.EncodingConfig,
-	baseAppOptions ...func(*baseapp.BaseApp),
+	logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bool, skipUpgradeHeights map[int64]bool,
+	homePath string, invCheckPeriod uint, encodingConfig simappparams.EncodingConfig, baseAppOptions ...func(*baseapp.BaseApp),
 ) *IrisApp {
 
 	// TODO: Remove cdc in favor of appCodec once all modules are migrated.
@@ -285,6 +306,9 @@ func NewIrisApp(
 	app.capabilityKeeper = capabilitykeeper.NewKeeper(appCodec, keys[capabilitytypes.StoreKey], memKeys[capabilitytypes.MemStoreKey])
 	scopedIBCKeeper := app.capabilityKeeper.ScopeToModule(ibchost.ModuleName)
 	scopedTransferKeeper := app.capabilityKeeper.ScopeToModule(ibctransfertypes.ModuleName)
+	// NOTE: the IBC mock keeper and application module is used only for testing core IBC. Do
+	// note replicate if you do not need to test core IBC or light clients.
+	scopedIBCMockKeeper := app.capabilityKeeper.ScopeToModule(ibcmock.ModuleName)
 
 	// add keepers
 	app.accountKeeper = authkeeper.NewAccountKeeper(
@@ -312,18 +336,6 @@ func NewIrisApp(
 	)
 	app.upgradeKeeper = upgradekeeper.NewKeeper(skipUpgradeHeights, keys[upgradetypes.StoreKey], appCodec, homePath)
 
-	// register the proposal types
-	govRouter := govtypes.NewRouter()
-	govRouter.AddRoute(govtypes.RouterKey, govtypes.ProposalHandler).
-		AddRoute(paramproposal.RouterKey, params.NewParamChangeProposalHandler(app.paramsKeeper)).
-		AddRoute(distrtypes.RouterKey, distr.NewCommunityPoolSpendProposalHandler(app.distrKeeper)).
-		AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(app.upgradeKeeper))
-
-	app.govKeeper = govkeeper.NewKeeper(
-		appCodec, keys[govtypes.StoreKey], app.GetSubspace(govtypes.ModuleName), app.accountKeeper, app.bankKeeper,
-		&stakingKeeper, govRouter,
-	)
-
 	// register the staking hooks
 	// NOTE: stakingKeeper above is passed by reference, so that it will contain these hooks
 	app.stakingKeeper = *stakingKeeper.SetHooks(
@@ -335,6 +347,18 @@ func NewIrisApp(
 		appCodec, keys[ibchost.StoreKey], app.stakingKeeper, scopedIBCKeeper,
 	)
 
+	// register the proposal types
+	govRouter := govtypes.NewRouter()
+	govRouter.AddRoute(govtypes.RouterKey, govtypes.ProposalHandler).
+		AddRoute(paramproposal.RouterKey, params.NewParamChangeProposalHandler(app.paramsKeeper)).
+		AddRoute(distrtypes.RouterKey, distr.NewCommunityPoolSpendProposalHandler(app.distrKeeper)).
+		AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(app.upgradeKeeper)).
+		AddRoute(ibchost.RouterKey, ibcclient.NewClientUpdateProposalHandler(app.ibcKeeper.ClientKeeper))
+	app.govKeeper = govkeeper.NewKeeper(
+		appCodec, keys[govtypes.StoreKey], app.GetSubspace(govtypes.ModuleName), app.accountKeeper, app.bankKeeper,
+		&stakingKeeper, govRouter,
+	)
+
 	// Create Transfer Keepers
 	app.transferKeeper = ibctransferkeeper.NewKeeper(
 		appCodec, keys[ibctransfertypes.StoreKey], app.GetSubspace(ibctransfertypes.ModuleName),
@@ -343,25 +367,27 @@ func NewIrisApp(
 	)
 	transferModule := transfer.NewAppModule(app.transferKeeper)
 
+	// NOTE: the IBC mock keeper and application module is used only for testing core IBC. Do
+	// note replicate if you do not need to test core IBC or light clients.
+	mockModule := ibcmock.NewAppModule(scopedIBCMockKeeper)
+
 	// Create static IBC router, add transfer route, then set and seal it
 	ibcRouter := porttypes.NewRouter()
 	ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferModule)
+	ibcRouter.AddRoute(ibcmock.ModuleName, mockModule)
 	app.ibcKeeper.SetRouter(ibcRouter)
 
 	// create evidence keeper with router
 	evidenceKeeper := evidencekeeper.NewKeeper(
 		appCodec, keys[evidencetypes.StoreKey], &app.stakingKeeper, app.slashingKeeper,
 	)
-	evidenceRouter := evidencetypes.NewRouter().
-		AddRoute(ibcclienttypes.RouterKey, ibcclient.HandlerClientMisbehaviour(app.ibcKeeper.ClientKeeper))
-
-	evidenceKeeper.SetRouter(evidenceRouter)
+	// If evidence needs to be handled for the app, set routes in router here and seal
 	app.evidenceKeeper = *evidenceKeeper
 
 	app.guardianKeeper = guardiankeeper.NewKeeper(appCodec, keys[guardiantypes.StoreKey])
 	app.tokenKeeper = tokenkeeper.NewKeeper(
 		appCodec, keys[tokentypes.StoreKey], app.GetSubspace(tokentypes.ModuleName),
-		app.accountKeeper, app.bankKeeper, authtypes.FeeCollectorName,
+		app.bankKeeper, authtypes.FeeCollectorName,
 	)
 	app.recordKeeper = recordkeeper.NewKeeper(appCodec, keys[recordtypes.StoreKey])
 	app.nftKeeper = nftkeeper.NewKeeper(appCodec, keys[nfttypes.StoreKey])
@@ -380,15 +406,20 @@ func NewIrisApp(
 
 	app.oracleKeeper = oracleKeeper.NewKeeper(
 		appCodec, keys[oracletypes.StoreKey], app.GetSubspace(oracletypes.ModuleName),
-		app.guardianKeeper, app.serviceKeeper,
+		app.serviceKeeper,
 	)
 
 	app.randomKeeper = randomkeeper.NewKeeper(appCodec, keys[randomtypes.StoreKey], app.bankKeeper, app.serviceKeeper)
+
 	// NOTE: Any module instantiated in the module manager that is later modified
 	// must be passed by reference here.
 	app.mm = module.NewManager(
-		genutil.NewAppModule(app.accountKeeper, app.stakingKeeper, app.BaseApp.DeliverTx, encodingConfig.TxConfig),
+		genutil.NewAppModule(
+			app.accountKeeper, app.stakingKeeper, app.BaseApp.DeliverTx,
+			encodingConfig.TxConfig,
+		),
 		auth.NewAppModule(appCodec, app.accountKeeper, authsims.RandomGenesisAccounts),
+		vesting.NewAppModule(app.accountKeeper, app.bankKeeper),
 		bank.NewAppModule(appCodec, app.bankKeeper, app.accountKeeper),
 		capability.NewAppModule(appCodec, *app.capabilityKeeper),
 		crisis.NewAppModule(&app.crisisKeeper),
@@ -427,13 +458,13 @@ func NewIrisApp(
 		servicetypes.ModuleName,
 	)
 
-	// NOTE: The genutils moodule must occur after staking so that pools are
+	// NOTE: The genutils module must occur after staking so that pools are
 	// properly initialized with tokens from genesis accounts.
 	// NOTE: Capability module must occur first so that it can initialize any capabilities
 	// so that other modules that want to create or claim capabilities afterwards in InitChain
 	// can do so safely.
 	app.mm.SetOrderInitGenesis(
-		capabilitytypes.ModuleName, authtypes.ModuleName, distrtypes.ModuleName, stakingtypes.ModuleName, banktypes.ModuleName,
+		capabilitytypes.ModuleName, authtypes.ModuleName, banktypes.ModuleName, distrtypes.ModuleName, stakingtypes.ModuleName,
 		slashingtypes.ModuleName, govtypes.ModuleName, minttypes.ModuleName, crisistypes.ModuleName,
 		ibchost.ModuleName, genutiltypes.ModuleName, evidencetypes.ModuleName, ibctransfertypes.ModuleName,
 		guardiantypes.ModuleName, tokentypes.ModuleName, nfttypes.ModuleName, htlctypes.ModuleName, recordtypes.ModuleName,
@@ -441,7 +472,7 @@ func NewIrisApp(
 	)
 
 	app.mm.RegisterInvariants(&app.crisisKeeper)
-	app.mm.RegisterRoutes(app.Router(), app.QueryRouter(), codec.NewAminoCodec(encodingConfig.Amino))
+	app.mm.RegisterRoutes(app.Router(), app.QueryRouter(), encodingConfig.Amino)
 	app.mm.RegisterQueryServices(app.GRPCQueryRouter())
 
 	// add test gRPC service for testing gRPC queries in isolation
@@ -485,38 +516,46 @@ func NewIrisApp(
 	// initialize BaseApp
 	app.SetInitChainer(app.InitChainer)
 	app.SetBeginBlocker(app.BeginBlocker)
-	app.SetAnteHandler(
-		NewAnteHandler(
-			app.accountKeeper, app.bankKeeper, app.tokenKeeper,
-			ante.DefaultSigVerificationGasConsumer,
-			encodingConfig.TxConfig.SignModeHandler(),
-		),
-	)
+	app.SetAnteHandler(NewAnteHandler(
+		app.accountKeeper,
+		app.bankKeeper,
+		app.tokenKeeper,
+		app.oracleKeeper,
+		app.guardianKeeper,
+		ante.DefaultSigVerificationGasConsumer,
+		encodingConfig.TxConfig.SignModeHandler(),
+	))
 	app.SetEndBlocker(app.EndBlocker)
 
 	if loadLatest {
 		if err := app.LoadLatestVersion(); err != nil {
 			tmos.Exit(err.Error())
 		}
-	}
 
-	// Initialize and seal the capability keeper so all persistent capabilities
-	// are loaded in-memory and prevent any further modules from creating scoped
-	// sub-keepers.
-	// This must be done during creation of baseapp rather than in InitChain so
-	// that in-memory capabilities get regenerated on app restart
-	ctx := app.BaseApp.NewUncachedContext(true, tmproto.Header{})
-	app.capabilityKeeper.InitializeAndSeal(ctx)
+		// Initialize and seal the capability keeper so all persistent capabilities
+		// are loaded in-memory and prevent any further modules from creating scoped
+		// sub-keepers.
+		// This must be done during creation of baseapp rather than in InitChain so
+		// that in-memory capabilities get regenerated on app restart.
+		// Note that since this reads from the store, we can only perform it when
+		// `loadLatest` is set to true.
+		ctx := app.BaseApp.NewUncachedContext(true, tmproto.Header{})
+		app.capabilityKeeper.InitializeAndSeal(ctx)
+	}
 
 	app.ScopedIBCKeeper = scopedIBCKeeper
 	app.ScopedTransferKeeper = scopedTransferKeeper
 
+	// NOTE: the IBC mock keeper and application module is used only for testing core IBC. Do
+	// note replicate if you do not need to test core IBC or light clients.
+	app.ScopedIBCMockKeeper = scopedIBCMockKeeper
+
 	return app
 }
 
-// MakeCodecs constructs the *std.Codec and *codec.Codec instances used by
-// IrisApp. It is useful for tests and clients who do not want to construct the
-// full irisApp
+// MakeCodecs constructs the *std.Codec and *codec.LegacyAmino instances used by
+// irisapp. It is useful for tests and clients who do not want to construct the
+// full irisapp
 func MakeCodecs() (codec.Marshaler, *codec.LegacyAmino) {
 	config := MakeEncodingConfig()
 	return config.Marshaler, config.Amino
@@ -543,8 +582,9 @@ func (app *IrisApp) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 	// add system service at InitChainer, overwrite if it exists
 	var serviceGenState servicetypes.GenesisState
 	app.appCodec.MustUnmarshalJSON(genesisState[servicetypes.ModuleName], &serviceGenState)
-	serviceGenState.Definitions = append(serviceGenState.Definitions, randomtypes.GetSvcDefinitions()...)
-
+	serviceGenState.Definitions = append(serviceGenState.Definitions, servicetypes.GenOraclePriceSvcDefinition())
+	serviceGenState.Bindings = append(serviceGenState.Bindings, servicetypes.GenOraclePriceSvcBinding(nativeToken.Symbol))
+	serviceGenState.Definitions = append(serviceGenState.Definitions, randomtypes.GetSvcDefinition())
 	genesisState[servicetypes.ModuleName] = app.appCodec.MustMarshalJSON(&serviceGenState)
 
 	return app.mm.InitGenesis(ctx, app.appCodec, genesisState)
@@ -576,7 +616,7 @@ func (app *IrisApp) BlockedAddrs() map[string]bool {
 	return blockedAddrs
 }
 
-// LegacyAmino returns IrisApp's codec.
+// LegacyAmino returns IrisApp's amino codec.
 //
 // NOTE: This is solely to be used for testing purposes as it may be desirable
 // for modules to register their own custom testing types.
@@ -634,9 +674,11 @@ func (app *IrisApp) SimulationManager() *module.SimulationManager {
 // RegisterAPIRoutes registers all application module routes with the provided
 // API server.
 func (app *IrisApp) RegisterAPIRoutes(apiSvr *api.Server) {
-	rpc.RegisterRoutes(apiSvr.ClientCtx, apiSvr.Router)
-	authrest.RegisterTxRoutes(apiSvr.ClientCtx, apiSvr.Router)
-	ModuleBasics.RegisterRESTRoutes(apiSvr.ClientCtx, apiSvr.Router)
+	clientCtx := apiSvr.ClientCtx
+	rpc.RegisterRoutes(clientCtx, apiSvr.Router)
+	authrest.RegisterTxRoutes(clientCtx, apiSvr.Router)
+	ModuleBasics.RegisterRESTRoutes(clientCtx, apiSvr.Router)
+	ModuleBasics.RegisterGRPCRoutes(apiSvr.ClientCtx, apiSvr.GRPCRouter)
 }
 
 // GetMaccPerms returns a copy of the module account permissions

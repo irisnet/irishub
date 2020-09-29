@@ -20,7 +20,7 @@ import (
 type KeeperTestSuite struct {
 	suite.Suite
 
-	cdc codec.JSONMarshaler
+	cdc *codec.LegacyAmino
 	ctx sdk.Context
 	app *simapp.SimApp
 }
@@ -28,7 +28,7 @@ type KeeperTestSuite struct {
 func (suite *KeeperTestSuite) SetupTest() {
 	app := simapp.Setup(false)
 
-	suite.cdc = codec.NewAminoCodec(app.LegacyAmino())
+	suite.cdc = app.LegacyAmino()
 	suite.ctx = app.BaseApp.NewContext(false, tmproto.Header{})
 	suite.app = app
 

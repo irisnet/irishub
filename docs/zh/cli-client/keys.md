@@ -4,17 +4,17 @@ Keys模块用于管理IRIS的Tendermint本地密钥库（钱包）。
 
 ## 可用命令
 
-| 名称                               | 描述                                                         |
-| ---------------------------------- | ------------------------------------------------------------ |
-| [add](#iris-keys-add)              | 创建新密钥，加密后存入磁盘  |
-| [delete](#iris-keys-delete)        | 删除指定的密钥                                                                         |
-| [export](#iris-keys-export)        | 将密钥导出为json文件                                                              |
-| [import](#iris-keys-import)        | 从本地钥匙库导入私钥                        |
-| [list](#iris-keys-list)            | 列出所有密钥                                                                                |
-| [migrate](#iris-keys-migrate)      | 从钥匙库将密钥信息迁移到另一个钥匙库                   |
-| [mnemonic](#iris-keys-mnemonic)    | 从一些输入熵中计算出bip32助记词 |
-| [parse](#iris-keys-parse)          | 将地址从hex解析为bech32，反之亦然                       |
-| [show](#iris-keys-show)            | 按名称或地址检索密钥信息                                                             |
+| 名称                            | 描述                                 |
+| ------------------------------- | ------------------------------------ |
+| [add](#iris-keys-add)           | 创建新密钥，加密后存入磁盘           |
+| [delete](#iris-keys-delete)     | 删除指定的密钥                       |
+| [export](#iris-keys-export)     | 将密钥导出为json文件                 |
+| [import](#iris-keys-import)     | 从本地钥匙库导入私钥                 |
+| [list](#iris-keys-list)         | 列出所有密钥                         |
+| [migrate](#iris-keys-migrate)   | 从钥匙库将密钥信息迁移到另一个钥匙库 |
+| [mnemonic](#iris-keys-mnemonic) | 从一些输入熵中计算出bip32助记词      |
+| [parse](#iris-keys-parse)       | 将地址从hex解析为bech32，反之亦然    |
+| [show](#iris-keys-show)         | 按名称或地址检索密钥信息             |
 
 ## iris keys add
 
@@ -26,23 +26,22 @@ iris keys add <key-name> [flags]
 
 **标志：**
 
-| 名称，速记           | 默认      | 描述                                               | 必须 |
-| -------------------- | --------- | -------------------------------------------------- | ---- |
-| --multisig           |           | 构造和存储multisig公钥                        |          |
-| --multisig-threshold |     1     | 指定多签密钥最少签名数                                    |          |
-| --nosort             |   false   | 传递给--multisig的密钥按其提供的顺序获取 |          |
-| --pubkey             |           | 解析bech32格式的公钥并将其保存到磁盘           |          |
-| --interactive        |   false   | 交互式提示用户输入BIP39密码和助记词       |          |
-| --ledger             |   false   | 对本地设备上的密钥存储的引用       |          |
-| --recover            |   false   | 提供种子短语来恢复现有密钥           |          |
-| --no-backup          |   false   | 不要打印出种子短语（如果其他人正在观看终端） |          |
-| --dry-run            |   false   | 执行操作，但不要向本地密钥库添加密钥               |          |
-| --hd-path            |           | 手动HD路径导出（覆盖BIP44 配置）                |          |
-| --coin-type          |    118    | HD衍生的硬币类型编号                                |          |
-| --account            |     0     | 高清衍生账号                                 |          |
-| --index              |     0     | HD派生的地址索引号                            |          |
-| --algo               |  secp256k | 生成密钥的密钥签名算法                        |          |
-
+| 名称，速记           | 默认     | 描述                                         | 必须 |
+| -------------------- | -------- | -------------------------------------------- | ---- |
+| --multisig           |          | 构造和存储multisig公钥                       |      |
+| --multisig-threshold | 1        | 指定多签密钥最少签名数                       |      |
+| --nosort             | false    | 传递给--multisig的密钥按其提供的顺序获取     |      |
+| --pubkey             |          | 解析bech32格式的公钥并将其保存到磁盘         |      |
+| --interactive        | false    | 交互式提示用户输入BIP39密码和助记词          |      |
+| --ledger             | false    | 对本地设备上的密钥存储的引用                 |      |
+| --recover            | false    | 提供种子短语来恢复现有密钥                   |      |
+| --no-backup          | false    | 不要打印出种子短语（如果其他人正在观看终端） |      |
+| --dry-run            | false    | 执行操作，但不要向本地密钥库添加密钥         |      |
+| --hd-path            |          | 手动HD路径导出（覆盖BIP44 配置）             |      |
+| --coin-type          | 118      | HD衍生的硬币类型编号                         |      |
+| --account            | 0        | 高清衍生账号                                 |      |
+| --index              | 0        | HD派生的地址索引号                           |      |
+| --algo               | secp256k | 生成密钥的密钥签名算法                       |      |
 
 ### 创建密钥
 
@@ -143,9 +142,9 @@ iris keys import <name> <keyfile> [flags]
 
 **标志：**
 
-| 名称，速记        | 默认     | 描述                  | 必须 |
-| --------------- | ------- | -------------------- | -------- |
-| --list-name     |         | List names only |          |
+| 名称，速记  | 默认 | 描述            | 必须 |
+| ----------- | ---- | --------------- | ---- |
+| --list-name |      | List names only |      |
 
 ### 列出所有密钥
 
@@ -159,9 +158,9 @@ iris keys list
 
 **标志：**
 
-| 名称，速记        | 默认     | 描述                                                                     | 必须 |          
-| --------------- | ------- | ------------------------------------------------------------------------ | -------- |
-| --dry-run       |         | Run migration without actually persisting any changes to the new Keybase |          |
+| 名称，速记 | 默认 | 描述                                                                     | 必须 |
+| ---------- | ---- | ------------------------------------------------------------------------ | ---- |
+| --dry-run  |      | Run migration without actually persisting any changes to the new Keybase |      |
 
 ### 迁移钥匙信息
 
@@ -215,13 +214,13 @@ iris keys show <key-name> [flags]
 
 **标志：**
 
-| 名称, 速记           | 默认 | 描述                                 | 必须 |
-| -------------------- | ---- | ------------------------------------ | ---- |
-| --address            |false | 仅输出地址（覆盖 --output）          |      |
-| --bech               | acc  | 在账本设备中输出地址                 |      |
-| --device             |false | 查询命令帮助                         |      |
-| --multisig-threshold | 1    | N个必需签名中的K个       |      |
-| --pubkey             |false | 仅输出公钥 覆盖 --output）           |      |
+| 名称, 速记           | 默认  | 描述                        | 必须 |
+| -------------------- | ----- | --------------------------- | ---- |
+| --address            | false | 仅输出地址（覆盖 --output） |      |
+| --bech               | acc   | 在账本设备中输出地址        |      |
+| --device             | false | 查询命令帮助                |      |
+| --multisig-threshold | 1     | N个必需签名中的K个          |      |
+| --pubkey             | false | 仅输出公钥 覆盖 --output）  |      |
 
 ### 查询指定密钥
 

@@ -3,7 +3,11 @@ package migrate
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 	"time"
+
+	tmjson "github.com/tendermint/tendermint/libs/json"
+	tmtypes "github.com/tendermint/tendermint/types"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -15,9 +19,9 @@ import (
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	coinswaptypes "github.com/irismod/coinswap/types"
-	htlctypes "github.com/irismod/htlc/types"
-	servicetypes "github.com/irismod/service/types"
+	coinswaptypes "github.com/irisnet/irismod/modules/coinswap/types"
+	htlctypes "github.com/irisnet/irismod/modules/htlc/types"
+	servicetypes "github.com/irisnet/irismod/modules/service/types"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
@@ -26,12 +30,15 @@ import (
 	"github.com/irisnet/irishub/migrate/v0_16/types"
 	guardiantypes "github.com/irisnet/irishub/modules/guardian/types"
 	minttypes "github.com/irisnet/irishub/modules/mint/types"
-	randomtypes "github.com/irisnet/irishub/modules/random/types"
+	randomtypes "github.com/irisnet/irismod/modules/random/types"
 )
 
 const (
 	flagGenesisTime = "genesis-time"
 	flagChainID     = "chain-id"
+	IRISATTO        = "iris-atto"
+	UIRIS           = "uiris"
+	Precision       = 12
 )
 
 // MigrateGenesisCmd returns a command to execute genesis state migration.
@@ -66,7 +73,7 @@ $ %s migrate /path/to/genesis.json --chain-id=cosmoshub-3 --genesis-time=2019-04
 
 			newGenState := Migrate(cdc, initialState)
 
-			genDoc.AppState, err = cdc.MarshalJSON(newGenState)
+			genDoc.AppState, err = json.MarshalIndent(newGenState, "", "  ")
 			if err != nil {
 				return errors.Wrap(err, "failed to JSON marshal migrated genesis state")
 			}
@@ -88,7 +95,24 @@ $ %s migrate /path/to/genesis.json --chain-id=cosmoshub-3 --genesis-time=2019-04
 				genDoc.ChainID = chainID
 			}
 
-			bz, err := codec.MarshalJSONIndent(cdc, genDoc)
+			consensusParams := tmtypes.DefaultConsensusParams()
+			consensusParams.Block.MaxBytes = genDoc.ConsensusParams.BlockSize.MaxBytes
+			consensusParams.Block.MaxGas = genDoc.ConsensusParams.BlockSize.MaxGas
+
+			consensusParams.Evidence.MaxNum = uint32(genDoc.ConsensusParams.Evidence.MaxAge)
+
+			consensusParams.Validator.PubKeyTypes = genDoc.ConsensusParams.Validator.PubKeyTypes
+
+			newGenDoc := tmtypes.GenesisDoc{
+				GenesisTime:     genDoc.GenesisTime,
+				ChainID:         genDoc.ChainID,
+				ConsensusParams: consensusParams,
+				Validators:      genDoc.Validators,
+				AppHash:         genDoc.AppHash,
+				AppState:        genDoc.AppState,
+			}
+
+			bz, err := tmjson.MarshalIndent(newGenDoc, "", "  ")
 			if err != nil {
 				return errors.Wrap(err, "failed to marshal genesis doc")
 			}
@@ -111,12 +135,12 @@ func Migrate(cdc codec.JSONMarshaler, initialState v0_16.GenesisFileState) (appS
 	// sdk modules
 	// ------------------------------------------------------------
 	authGenesisState, bankGenesisState := migrateAuth(initialState)
-	appState[authtypes.ModuleName] = cdc.MustMarshalJSON(authGenesisState)
-	appState[banktypes.ModuleName] = cdc.MustMarshalJSON(bankGenesisState)
+	appState[authtypes.ModuleName] = cdc.MustMarshalJSON(&authGenesisState)
+	appState[banktypes.ModuleName] = cdc.MustMarshalJSON(&bankGenesisState)
 	appState[stakingtypes.ModuleName] = cdc.MustMarshalJSON(migrateStaking(initialState))
 	appState[slashingtypes.ModuleName] = cdc.MustMarshalJSON(migrateSlashing(initialState))
-	appState[distributiontypes.ModuleName] = cdc.MustMarshalJSON(migrateDistribution(initialState)) // TODO
-	appState[govtypes.ModuleName] = cdc.MustMarshalJSON(migrateGov(initialState))                   // TODO
+	appState[distributiontypes.ModuleName] = cdc.MustMarshalJSON(migrateDistribution(initialState))
+	appState[govtypes.ModuleName] = cdc.MustMarshalJSON(migrateGov(initialState))
 
 	// ------------------------------------------------------------
 	// irishub modules
@@ -140,11 +164,12 @@ func migrateAuth(initialState v0_16.GenesisFileState) (authtypes.GenesisState, b
 	for _, acc := range initialState.Accounts {
 		var coins sdk.Coins
 		for _, c := range acc.Coins {
-			coin, err := sdk.ParseCoin(c)
+			coinStr := strings.ReplaceAll(c, IRISATTO, UIRIS)
+			coin, err := sdk.ParseCoin(coinStr)
 			if err != nil {
 				panic(err)
 			}
-			coins = append(coins, coin)
+			coins = append(coins, convertCoin(coin))
 		}
 		baseAccount := authtypes.NewBaseAccount(acc.Address, nil, acc.AccountNumber, acc.Sequence)
 		accounts = append(accounts, baseAccount)
@@ -163,7 +188,7 @@ func migrateAuth(initialState v0_16.GenesisFileState) (authtypes.GenesisState, b
 	return *authGenesisState, bankGenesisState
 }
 
-func migrateStaking(initialState v0_16.GenesisFileState) stakingtypes.GenesisState {
+func migrateStaking(initialState v0_16.GenesisFileState) *stakingtypes.GenesisState {
 	params := stakingtypes.Params{
 		UnbondingTime:     initialState.StakeData.Params.UnbondingTime,
 		MaxValidators:     uint32(initialState.StakeData.Params.MaxValidators),
@@ -178,7 +203,7 @@ func migrateStaking(initialState v0_16.GenesisFileState) stakingtypes.GenesisSta
 			lastValidatorPowers,
 			stakingtypes.LastValidatorPower{
 				Address: lvp.Address,
-				Power:   lvp.Power.Quo(sdk.NewInt(sdk.Precision)).Int64(), // TODO
+				Power:   lvp.Power.Quo(sdk.NewInt(sdk.Precision)).Int64(),
 			},
 		)
 	}
@@ -202,7 +227,7 @@ func migrateStaking(initialState v0_16.GenesisFileState) stakingtypes.GenesisSta
 				ConsensusPubkey: sdk.MustBech32ifyPubKey(sdk.Bech32PubKeyTypeConsPub, v.ConsPubKey),
 				Jailed:          v.Jailed,
 				Status:          status,
-				Tokens:          sdk.NewIntFromBigInt(v.Tokens.BigInt()), // TODO
+				Tokens:          sdk.NewIntFromBigInt(v.Tokens.BigInt()),
 				DelegatorShares: v.DelegatorShares,
 				Description: stakingtypes.Description{
 					Moniker:         v.Description.Moniker,
@@ -275,7 +300,7 @@ func migrateStaking(initialState v0_16.GenesisFileState) stakingtypes.GenesisSta
 	}
 	exported := initialState.StakeData.Exported
 
-	return stakingtypes.GenesisState{
+	return &stakingtypes.GenesisState{
 		Params:               params,
 		LastTotalPower:       lastTotalPower,
 		LastValidatorPowers:  lastValidatorPowers,
@@ -287,7 +312,7 @@ func migrateStaking(initialState v0_16.GenesisFileState) stakingtypes.GenesisSta
 	}
 }
 
-func migrateSlashing(initialState v0_16.GenesisFileState) slashingtypes.GenesisState {
+func migrateSlashing(initialState v0_16.GenesisFileState) *slashingtypes.GenesisState {
 	params := slashingtypes.Params{
 		SignedBlocksWindow:      initialState.SlashingData.Params.SignedBlocksWindow,
 		MinSignedPerWindow:      initialState.SlashingData.Params.MinSignedPerWindow,
@@ -339,15 +364,14 @@ func migrateSlashing(initialState v0_16.GenesisFileState) slashingtypes.GenesisS
 		})
 	}
 
-	return slashingtypes.GenesisState{
+	return &slashingtypes.GenesisState{
 		Params:       params,
 		SigningInfos: signingInfos,
 		MissedBlocks: missedBlocks,
 	}
 }
 
-// TODO
-func migrateDistribution(initialState v0_16.GenesisFileState) distributiontypes.GenesisState {
+func migrateDistribution(initialState v0_16.GenesisFileState) *distributiontypes.GenesisState {
 	v016params := initialState.DistrData.Params
 	params := distributiontypes.Params{
 		CommunityTax:        v016params.CommunityTax,
@@ -373,7 +397,7 @@ func migrateDistribution(initialState v0_16.GenesisFileState) distributiontypes.
 	var delegatorStartingInfos []distributiontypes.DelegatorStartingInfoRecord
 	var validatorSlashEvents []distributiontypes.ValidatorSlashEventRecord
 
-	return distributiontypes.GenesisState{
+	return &distributiontypes.GenesisState{
 		Params:                          params,
 		FeePool:                         feePool,
 		DelegatorWithdrawInfos:          delegatorWithdrawInfos,
@@ -387,7 +411,7 @@ func migrateDistribution(initialState v0_16.GenesisFileState) distributiontypes.
 	}
 }
 
-func migrateGov(initialState v0_16.GenesisFileState) govtypes.GenesisState {
+func migrateGov(initialState v0_16.GenesisFileState) *govtypes.GenesisState {
 	var deposits govtypes.Deposits
 	var votes govtypes.Votes
 	var proposals govtypes.Proposals
@@ -404,7 +428,7 @@ func migrateGov(initialState v0_16.GenesisFileState) govtypes.GenesisState {
 		VetoThreshold: initialState.GovData.Params.NormalVeto,
 	}
 
-	return govtypes.GenesisState{
+	return &govtypes.GenesisState{
 		StartingProposalId: govtypes.DefaultStartingProposalID,
 		Deposits:           deposits,
 		Votes:              votes,
@@ -415,7 +439,7 @@ func migrateGov(initialState v0_16.GenesisFileState) govtypes.GenesisState {
 	}
 }
 
-func migrateMint(initialState v0_16.GenesisFileState) minttypes.GenesisState {
+func migrateMint(initialState v0_16.GenesisFileState) *minttypes.GenesisState {
 	minter := minttypes.Minter{
 		LastUpdate:    initialState.MintData.Minter.LastUpdate,
 		InflationBase: initialState.MintData.Minter.InflationBase,
@@ -425,13 +449,13 @@ func migrateMint(initialState v0_16.GenesisFileState) minttypes.GenesisState {
 		MintDenom: sdk.DefaultBondDenom,
 	}
 
-	return minttypes.GenesisState{
+	return &minttypes.GenesisState{
 		Minter: minter,
 		Params: params,
 	}
 }
 
-func migrateRand(initialState v0_16.GenesisFileState) randomtypes.GenesisState {
+func migrateRand(initialState v0_16.GenesisFileState) *randomtypes.GenesisState {
 	var pendingRandomRequests = make(map[string]randomtypes.Requests)
 	for lh, rs := range initialState.RandData.PendingRandRequests {
 		var requests []randomtypes.Request
@@ -448,12 +472,12 @@ func migrateRand(initialState v0_16.GenesisFileState) randomtypes.GenesisState {
 		pendingRandomRequests[lh] = randomtypes.Requests{Requests: requests}
 	}
 
-	return randomtypes.GenesisState{
+	return &randomtypes.GenesisState{
 		PendingRandomRequests: pendingRandomRequests,
 	}
 }
 
-func migrateHTLC(initialState v0_16.GenesisFileState) htlctypes.GenesisState {
+func migrateHTLC(initialState v0_16.GenesisFileState) *htlctypes.GenesisState {
 	var pendingHTLCs = make(map[string]htlctypes.HTLC)
 	for hk, h := range initialState.HtlcData.PendingHTLCs {
 		pendingHTLCs[hk] = htlctypes.NewHTLC(
@@ -468,24 +492,24 @@ func migrateHTLC(initialState v0_16.GenesisFileState) htlctypes.GenesisState {
 		)
 	}
 
-	return htlctypes.GenesisState{
+	return &htlctypes.GenesisState{
 		PendingHtlcs: pendingHTLCs,
 	}
 }
 
-func migrateCoinswap(initialState v0_16.GenesisFileState) coinswaptypes.GenesisState {
+func migrateCoinswap(initialState v0_16.GenesisFileState) *coinswaptypes.GenesisState {
 	fee, _ := sdk.NewDecFromStr(initialState.SwapData.Params.Fee.FloatString(sdk.Precision))
 	params := coinswaptypes.Params{
 		Fee:           fee,
 		StandardDenom: sdk.DefaultBondDenom,
 	}
 
-	return coinswaptypes.GenesisState{
+	return &coinswaptypes.GenesisState{
 		Params: params,
 	}
 }
 
-func migrateGuardian(initialState v0_16.GenesisFileState) guardiantypes.GenesisState {
+func migrateGuardian(initialState v0_16.GenesisFileState) *guardiantypes.GenesisState {
 	var profilers guardiantypes.Profilers
 	var trustees guardiantypes.Trustees
 
@@ -502,13 +526,13 @@ func migrateGuardian(initialState v0_16.GenesisFileState) guardiantypes.GenesisS
 		})
 	}
 
-	return guardiantypes.GenesisState{
+	return &guardiantypes.GenesisState{
 		Profilers: profilers,
 		Trustees:  trustees,
 	}
 }
 
-func migrateService(initialState v0_16.GenesisFileState) servicetypes.GenesisState {
+func migrateService(initialState v0_16.GenesisFileState) *servicetypes.GenesisState {
 	params := servicetypes.Params{
 		MaxRequestTimeout:    initialState.ServiceData.Params.MaxRequestTimeout,
 		MinDepositMultiple:   initialState.ServiceData.Params.MinDepositMultiple,
@@ -521,7 +545,14 @@ func migrateService(initialState v0_16.GenesisFileState) servicetypes.GenesisSta
 		BaseDenom:            servicetypes.DefaultBaseDenom,
 	}
 
-	return servicetypes.GenesisState{
+	return &servicetypes.GenesisState{
 		Params: params,
+	}
+}
+
+func convertCoin(coin sdk.Coin) sdk.Coin {
+	return sdk.Coin{
+		Denom:  coin.Denom,
+		Amount: coin.Amount.Quo(sdk.NewInt(Precision)),
 	}
 }

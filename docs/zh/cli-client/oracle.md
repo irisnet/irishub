@@ -4,15 +4,15 @@ Oracle模块负责管理你在IRIS Hub上创建的feed。
 
 ## 可用命令
 
-| 名称                                       | 描述                                 |
-| ------------------------------------------ | ------------------------------------ |
-| [create](#iris-tx-oracle-create)           | 创建一个新的feed，初始状态为"paused" |
-| [start](#iris-tx-oracle-start)             | 启动一个处于"paused"状态的feed       |
-| [pause](#iris-tx-oracle-pause)             | 暂停一个处于"running"状态的feed      |
-| [edit](#iris-tx-oracle-edit)               | feed的所有者编辑一个feed的相关信息并更新服务调用参数   |
-| [feed](#iris-query-oracle-feed)            | 通过名称查询一个feed信息             |
-| [feeds](#iris-query-oracle-feeds)          | 查询一组feed信息                     |
-| [value](#iris-query-oracle-value)          | 通过名称查询feed的执行结果           |
+| 名称                              | 描述                                                 |
+| --------------------------------- | ---------------------------------------------------- |
+| [create](#iris-tx-oracle-create)  | 创建一个新的feed，初始状态为"paused"                 |
+| [start](#iris-tx-oracle-start)    | 启动一个处于"paused"状态的feed                       |
+| [pause](#iris-tx-oracle-pause)    | 暂停一个处于"running"状态的feed                      |
+| [edit](#iris-tx-oracle-edit)      | feed的所有者编辑一个feed的相关信息并更新服务调用参数 |
+| [feed](#iris-query-oracle-feed)   | 通过名称查询一个feed信息                             |
+| [feeds](#iris-query-oracle-feeds) | 查询一组feed信息                                     |
+| [value](#iris-query-oracle-value) | 通过名称查询feed的执行结果                           |
 
 ## iris tx oracle create
 
@@ -35,14 +35,29 @@ iris tx oracle create [flags]
 | --service-fee-cap | string   | 是   |      | 单个请求愿意支付的服务费上限                                                      |
 | --timeout         | int64    |      |      | 请求等待响应的最大区块数, 响应超过这个时间，请求将被忽略                          |
 | --frequency       | uint64   |      |      | 重复性请求的调用频率                                                              |
-| --threshold       | uint16   |      | 1    | 期待服务的最小响应数量，取值范围[1,服务提供者数量]                                      |
+| --threshold       | uint16   |      | 1    | 期待服务的最小响应数量，取值范围[1,服务提供者数量]                                |
 | --aggregate-func  | string   | 是   |      | 对 Service 响应结果进行处理的 IRISHub 预定义方法，目前支持：avg/max/min/          |
 | --value-json-path | string   | 是   |      | Service响应结果中的字段名称或路径，用于从响应结果中获取调用 aggregate-func 的参数 |
 
 ### 创建一个新的feed
 
 ```bash
-iris tx oracle create --chain-id=irishub --from=node0 --fees=0.3iris --feed-name="test-feed" --latest-history=10 --service-name="test-service" --input=<request-data> --providers=<provide1_address>,<provider2_address> --service-fee-cap=1iris --timeout=2 --frequency=10 --total=10 --threshold=1 --aggregate-func="avg" --value-json-path="high" --commit
+iris tx oracle create \
+    --feed-name="test-feed" \
+    --latest-history=10 \
+    --service-name="test-service" \
+    --input=<request-data> \
+    --providers=<provide1_address>,<provider2_address> \
+    --service-fee-cap=1iris \
+    --timeout=2 \
+    --frequency=10 \
+    --total=10 \
+    --threshold=1 \
+    --aggregate-func="avg" \
+    --value-json-path="high" \
+    --chain-id=irishub \
+    --from=node0 \
+    --fees=0.3iris
 ```
 
 ## iris tx oracle start
@@ -56,7 +71,7 @@ iris tx oracle start <feed-name>
 ### 启动一个处于`暂停`状态的feed
 
 ```bash
-iris tx oracle start test-feed --chain-id=irishub --from=node0 --fees=0.3iris --commit
+iris tx oracle start test-feed --chain-id=irishub --from=node0 --fees=0.3iris
 ```
 
 ## iris tx oracle pause
@@ -70,7 +85,7 @@ iris tx oracle pause [feed-name] [flags]
 ### 暂停一个处于`运行`状态的feed
 
 ```bash
-iris tx oracle pause test-feed --chain-id=irishub --from=node0 --fees=0.3iris --commit
+iris tx oracle pause test-feed --chain-id=irishub --from=node0 --fees=0.3iris
 ```
 
 ## iris tx oracle edit
@@ -97,7 +112,7 @@ iris tx oracle edit [feed-name] [flags]
 ### 编辑feed
 
 ```bash
-iris tx oracle edit test-feed --chain-id=irishub --from=node0 --fees=0.3iris --latest-history=5 --commit
+iris tx oracle edit test-feed --chain-id=irishub --from=node0 --fees=0.3iris --latest-history=5
 ```
 
 ## iris query oracle feed

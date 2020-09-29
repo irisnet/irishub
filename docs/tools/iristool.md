@@ -36,59 +36,59 @@ returns
 
 ```json
 {
-  "type": "irishub/bank/StdTx",
-  "value": {
-    "msg": [
-      {
-        "type": "irishub/bank/Send",
-        "value": {
-          "inputs": [
+    "type": "irishub/bank/StdTx",
+    "value": {
+        "msg": [
             {
-              "address": "iaa1rulhmls7g9cjh239vnkjnw870t5urrutsfwvmc",
-              "coins": [
-                {
-                  "denom": "uiris",
-                  "amount": "2000000"
+                "type": "irishub/bank/Send",
+                "value": {
+                    "inputs": [
+                        {
+                            "address": "iaa1rulhmls7g9cjh239vnkjnw870t5urrutsfwvmc",
+                            "coins": [
+                                {
+                                    "denom": "uiris",
+                                    "amount": "2000000"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        {
+                            "address": "iaa1rulhmls7g9cjh239vnkjnw870t5urrutsfwvmc",
+                            "coins": [
+                                {
+                                    "denom": "uiris",
+                                    "amount": "20000000"
+                                }
+                            ]
+                        }
+                    ]
                 }
-              ]
             }
-          ],
-          "outputs": [
-            {
-              "address": "iaa1rulhmls7g9cjh239vnkjnw870t5urrutsfwvmc",
-              "coins": [
+        ],
+        "fee": {
+            "amount": [
                 {
-                  "denom": "uiris",
-                  "amount": "20000000"
+                    "denom": "uiris",
+                    "amount": "4000000"
                 }
-              ]
-            }
-          ]
-        }
-      }
-    ],
-    "fee": {
-      "amount": [
-        {
-          "denom": "uiris",
-          "amount": "4000000"
-        }
-      ],
-      "gas": "50000"
-    },
-    "signatures": [
-      {
-        "pub_key": {
-          "type": "tendermint/PubKeySecp256k1",
-          "value": "AuPVONwsFm63Zj0unY4ic49T/Et+q1fwBZ+9F5V7tLRx"
+            ],
+            "gas": "50000"
         },
-        "signature": "ClnK5ZkHyhmc7JE7Q+TR+yaEJ705eaxn8mJJcK6Mq917MFOqZGOVKr3laqjyqjEy6QvKWF2VAXcZ+Rtb4+uIGA==",
-        "account_number": "0",
-        "sequence": "3959"
-      }
-    ],
-    "memo": ""
-  }
+        "signatures": [
+            {
+                "pub_key": {
+                    "type": "tendermint/PubKeySecp256k1",
+                    "value": "AuPVONwsFm63Zj0unY4ic49T/Et+q1fwBZ+9F5V7tLRx"
+                },
+                "signature": "ClnK5ZkHyhmc7JE7Q+TR+yaEJ705eaxn8mJJcK6Mq917MFOqZGOVKr3laqjyqjEy6QvKWF2VAXcZ+Rtb4+uIGA==",
+                "account_number": "0",
+                "sequence": "3959"
+            }
+        ],
+        "memo": ""
+    }
 }
 ```
 
@@ -96,7 +96,7 @@ returns
 
 ```bash
 iristool debug addr iaa1rulhmls7g9cjh239vnkjnw870t5urrutsfwvmc
-  ```
+```
 
 returns
 

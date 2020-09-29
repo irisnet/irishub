@@ -55,9 +55,6 @@ ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=iris \
 		  -X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
 		  -X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
 		  -X "github.com/cosmos/cosmos-sdk/version.BuildTags=$(build_tags_comma_sep)" \
-		  -X github.com/cosmos/cosmos-sdk/types.reDnmString=[a-z][a-z0-9:-]{2,15}
-
-denomflags = -X github.com/cosmos/cosmos-sdk/types.reDnmString=[a-z][a-z0-9:-]{2,15}
 
 ifeq ($(WITH_CLEVELDB),yes)
   ldflags += -X github.com/cosmos/cosmos-sdk/types.DBBackend=cleveldb
@@ -95,13 +92,14 @@ install: go.sum
 	go install $(BUILD_FLAGS) ./cmd/iris
 
 update-swagger-docs: statik
-	$(BINDIR)/statik -src=lite/swagger-ui -dest=lite -f -m
+	$(BINDIR)/statik -src=lite/grpc-gateway -dest=lite/grpc-gateway -f -m
 	@if [ -n "$(git status --porcelain)" ]; then \
         echo "\033[91mSwagger docs are out of sync!!!\033[0m";\
         exit 1;\
     else \
     	echo "\033[92mSwagger docs are in sync\033[0m";\
     fi
+.PHONY: update-swagger-docs
 
 ########################################
 ### Tools & dependencies
@@ -125,8 +123,13 @@ clean:
 distclean: clean
 	rm -rf vendor/
 
+proto-all: proto-tools proto-gen proto-swagger-gen
+
 proto-gen:
 	@./scripts/protocgen.sh
+
+proto-swagger-gen:
+	@./scripts/protoc-swagger-gen.sh
 
 ########################################
 ### Testing
@@ -136,7 +139,7 @@ test: test-unit test-build
 test-all: test-race test-cover
 
 test-unit:
-	@VERSION=$(VERSION) go test -ldflags='$(denomflags)' -mod=readonly -tags='ledger test_ledger_mock' ${PACKAGES_UNITTEST}
+	@VERSION=$(VERSION) go test -mod=readonly -tags='ledger test_ledger_mock' ${PACKAGES_UNITTEST}
 
 test-race:
 	@VERSION=$(VERSION) go test -mod=readonly -race -tags='ledger test_ledger_mock' ./...

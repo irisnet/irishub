@@ -60,7 +60,7 @@ type GenesisFileAccount struct {
 type GenesisDoc struct {
 	GenesisTime     time.Time                  `json:"genesis_time"`
 	ChainID         string                     `json:"chain_id"`
-	ConsensusParams *tmproto.ConsensusParams   `json:"consensus_params,omitempty"`
+	ConsensusParams ConsensusParams   `json:"consensus_params,omitempty"`
 	Validators      []tmtypes.GenesisValidator `json:"validators,omitempty"`
 	AppHash         tmbytes.HexBytes           `json:"app_hash"`
 	AppState        json.RawMessage            `json:"app_state,omitempty"`
@@ -116,12 +116,8 @@ func (genDoc *GenesisDoc) ValidateAndComplete() error {
 		return errors.Errorf("chain_id in genesis doc is too long (max: %d)", tmtypes.MaxChainIDLen)
 	}
 
-	if genDoc.ConsensusParams == nil {
-		genDoc.ConsensusParams = tmtypes.DefaultConsensusParams()
-	} else {
-		if err := tmtypes.ValidateConsensusParams(*genDoc.ConsensusParams); err != nil {
-			return err
-		}
+	if err :=  genDoc.ConsensusParams.Validate(); err != nil {
+		return err
 	}
 
 	for i, v := range genDoc.Validators {

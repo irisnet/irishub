@@ -72,8 +72,7 @@ iris tx staking create-validator \
     --gas=100000 \
     --fees=0.6iris \
     --chain-id=irishub \
-    --from=<key-name> \
-    --commit
+    --from=<key-name>
 ```
 
 :::warning

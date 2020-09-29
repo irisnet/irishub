@@ -8,14 +8,14 @@
 
 #### 边车进程
 
-如果一个运行应用程序二进制的运营者也运行一个边车进程来辅助自动下载和升级二进制，`Info` 允许这个进程是无摩擦的。即，升级模块 实现 [Iirsd 可升级的二进制规范]() 指定的规范，并且 `Irisd` 能可选地被用于为节点运营者完全自动化升级过程。通过用必要的信息填充 `Info` 字段，二进制能够被自动下载。参考[这里]()。
+如果一个运行应用程序二进制的运营者也运行一个边车进程来辅助自动下载和升级二进制，`Info` 允许这个进程是无摩擦的。即，升级模块实现 [cosmosd 可升级的二进制规范](https://github.com/regen-network/cosmosd#upgradeable-binary-specification) 指定的规范，并且 `cosmosd` 能可选地被用于为节点运营者完全自动化升级过程。通过用必要的信息填充 `Info` 字段，二进制能够被自动下载。参考[这里](https://github.com/regen-network/cosmosd#auto-download)。
 
 ```go
 type Plan struct {
-  Name   string
-  Time   Time
-  Height int64
-  Info   string
+    Name   string
+    Time   Time
+    Height int64
+    Info   string
 }
 ```
 
@@ -41,8 +41,8 @@ func UpgradeStoreLoader (upgradeHeight int64, storeUpgrades *store.StoreUpgrades
 
 ```go
 type UpgradeInfo struct {
-  Name    string
-  Height  int64
+    Name    string
+    Height  int64
 }
 ```
 
@@ -54,9 +54,9 @@ type UpgradeInfo struct {
 
 ```go
 type SoftwareUpgradeProposal struct {
-  Title       string
-  Description string
-  Plan        Plan
+    Title       string
+    Description string
+    Plan        Plan
 }
 ```
 
