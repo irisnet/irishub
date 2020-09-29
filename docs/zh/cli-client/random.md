@@ -50,14 +50,6 @@ iris tx random request-random --block-interval=100 --oracle=true --service-fee-c
 iris query random random <request-id> [flags]
 ```
 
-### 查询随机数
-
-查询已生成的随机数。
-
-```bash
-iris query random random <request-id>
-```
-
 ## iris query random queue
 
 查询随机数请求队列，支持可选的高度。

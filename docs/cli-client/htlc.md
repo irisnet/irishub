@@ -66,13 +66,7 @@ iris tx htlc create \
 Claim an opened HTLC
 
 ```bash
-iris tx htlc claim [hash-lock] [secret] [flags]
-```
-
-### Claim an opened HTLC
-
-```bash
-iris tx claim [hash-lock] [secret] [flags]
+iris tx htlc claim [hash-lock] [secret] [flags] --from=mykey
 ```
 
 ## iris tx htlc refund
@@ -80,13 +74,7 @@ iris tx claim [hash-lock] [secret] [flags]
 Refund from an expired HTLC
 
 ```bash
-iris tx htlc refund [hash-lock] [flags]
-```
-
-### Refund from an expired HTLC
-
-```bash
-iris tx htlc refund [hash-lock] [flags]
+iris tx htlc refund [hash-lock] [flags] --from=mykey
 ```
 
 ## iris query htlc htlc

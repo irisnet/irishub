@@ -56,7 +56,7 @@ IRIS服务（又称iService）旨在弥合区块链和传统应用之间的鸿�
 
 ```bash
 # 创建服务定义
-iris tx service define <service-name> <schemas-json or path/to/schemas.json> --description=<service-description> --author-description=<author-description> --tags=<tag1,tag2,...>
+iris tx service define --name=<service-name> <schemas-json or path/to/schemas.json> --description=<service-description> --author-description=<author-description> --tags=<tag1,tag2,...>
 
 # 查询服务定义
 iris q service definition <service-name>
@@ -112,13 +112,13 @@ iris q service definition <service-name>
 
 ```bash
 # 创建服务绑定
-iris tx service bind <service-name> <provider-address> <deposit> <qos> <pricing-json or path/to/pricing.json>
+iris tx service bind <service-name> <provider-address> --deposit=<deposit> --qos=<qos> --pricing=<pricing-json or path/to/pricing.json>
 
 # 更新服务绑定
 iris tx service update-binding <service-name> <provider-address> --deposit=<added-deposit> --qos=<qos> --pricing=<pricing-json or path/to/pricing.json>
 
 # 启用一个不可用的服务绑定
-iris tx service enable <service-name> <provider-address> <added-deposit>
+iris tx service enable <service-name> <provider-address> --deposit=<added-deposit>
 
 # 禁用一个可用的服务绑定
 iris tx service disable <service-name> <provider-address>
@@ -136,7 +136,7 @@ iris q service bindings service bindings <service-name> --owner <address>
 iris q service binding <service-name> <provider-address>
 
 # 查询定价 schema
-iris q service service schema pricing
+iris q service schema pricing
 ```
 
 ## 服务调用

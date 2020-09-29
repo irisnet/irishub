@@ -21,7 +21,9 @@ Remember to set your `$GOPATH`, `$GOBIN`, and `$PATH` environment variables, for
 ```bash
 mkdir -p $HOME/go/bin
 echo "export GOPATH=$HOME/go" >> ~/.bashrc
+source ~/.bashrc
 echo "export GOBIN=$GOPATH/bin" >> ~/.bashrc
+source ~/.bashrc
 echo "export PATH=$PATH:$GOBIN" >> ~/.bashrc
 source ~/.bashrc
 ```
