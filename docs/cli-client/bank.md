@@ -50,7 +50,6 @@ iris tx bank send [from_key_or_address] [to_address] [amount] [flags]
 
 **Flags:**
 
-| Name, shorthand | Type   | Required | Default | Description                                   |
-| --------------- | ------ | -------- | ------- | --------------------------------------------- |
-| -h, --help |        |          |      | Help for balances        |
-
+| Name, shorthand | Type | Required | Default | Description       |
+| --------------- | ---- | -------- | ------- | ----------------- |
+| -h, --help      |      |          |         | Help for balances |

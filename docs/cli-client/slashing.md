@@ -21,7 +21,7 @@ iris tx slashing unjail [flags]
 
 ## iris query slashing params
 
-Query the current slashing parameters .
+Query the current slashing parameters.
 
 ```bash
 iris query slashing params  [flags]
@@ -29,7 +29,7 @@ iris query slashing params  [flags]
 
 ## iris query slashing signing-info
 
-Query a validator's signing information
+Query a validator's signing information.
 
 ```bash
 iris query slashing signing-info [validator-conspub] [flags]
@@ -37,7 +37,7 @@ iris query slashing signing-info [validator-conspub] [flags]
 
 ## iris query slashing signing-infos
 
-Query signing information of all validators
+Query signing information of all validators.
 
 ```bash
 iris query slashing signing-infos [flags]

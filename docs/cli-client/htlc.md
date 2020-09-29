@@ -36,8 +36,8 @@ iris tx htlc create \
 
 **Flags:**
 
-| Name, shorthand           | Type     | Required | Default | Description     |
-| ------------------------- | -------- | -------- | ------- | ---------------- |
+| Name, shorthand           | Type     | Required | Default | Description                                                                                           |
+| ------------------------- | -------- | -------- | ------- | ----------------------------------------------------------------------------------------------------- |
 | --to                      | string   | Yes      |         | Bech32 encoding address to receive coins                                                              |
 | --receiver-on-other-chain | string   |          |         | The claim receiving address on the other chain                                                        |
 | --amount                  | string   | Yes      |         | Similar to the amount in the original transfer                                                        |
@@ -76,7 +76,6 @@ Refund from an expired HTLC
 ```bash
 iris tx htlc refund [hash-lock] [flags] --from=mykey
 ```
-
 
 ## iris query htlc htlc
 

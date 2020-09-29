@@ -36,13 +36,13 @@
 
     ```json
     {
-      "type": "auth/StdTx",
-      "value": {
-        "msg": [ "txMsg" ],
-        "fee": "fee",
-        "signatures": null,
-        "memo": ""
-      }
+        "type": "auth/StdTx",
+        "value": {
+            "msg": [ "txMsg" ],
+            "fee": "fee",
+            "signatures": null,
+            "memo": ""
+        }
     }
     ```
 
@@ -58,23 +58,23 @@
 
     ```json
     {
-      "type": "auth/StdTx",
-      "value": {
+        "type": "auth/StdTx",
+        "value": {
         "msg": [ "txMsg" ],
         "fee": "fee",
         "signatures": [
-          {
+            {
             "pub_key": {
-              "type": "tendermint/PubKeySecp256k1",
-              "value": "A+qXW5isQDb7blT/KwEgQHepji8RfpzIstkHpKoZq0kr"
+                "type": "tendermint/PubKeySecp256k1",
+                "value": "A+qXW5isQDb7blT/KwEgQHepji8RfpzIstkHpKoZq0kr"
             },
             "signature": "5hxk/R81SWmKAGi4kTW2OapezQZpp6zEnaJbVcyDiWRfgBm4Uejq8+CDk6uzk0aFSgAZzz06E014UkgGpelU7w==",
             "account_number": "0",
             "sequence": "11"
-          }
+            }
         ],
         "memo": ""
-      }
+        }
     }
     ```
 

@@ -102,8 +102,7 @@ casted on a proposal for the result to be valid.
 
 #### 阈值
 
-Threshold is defined as the minimum proportion of `Yes` votes (excluding
-`Abstain` votes) for the proposal to be accepted.
+Threshold is defined as the minimum proportion of `Yes` votes (excluding `Abstain` votes) for the proposal to be accepted.
 
 阈值被定义为，为使提议被接受而所需要的 `赞成` 票的最小比例。
 

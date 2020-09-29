@@ -155,4 +155,3 @@ iris query oracle feeds --state=running
 ```bash
 iris query oracle value test-feed
 ```
-

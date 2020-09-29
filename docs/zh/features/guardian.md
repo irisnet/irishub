@@ -29,7 +29,7 @@ IRISnet引入了两种由基金会控制且具有一定特殊权益的系统用�
     添加trustee（仅限Genesis Trustee）
 
     ```bash
-    iris tx guardian add-trustee --address=<trustee-address> --description=<trustee-description> --chain-id=irishub --from=<key-name> --fees=0.3iris 
+    iris tx guardian add-trustee --address=<trustee-address> --description=<trustee-description> --chain-id=irishub --from=<key-name> --fees=0.3iris
     ```
 
 2. 查询profiler和trustee列表
