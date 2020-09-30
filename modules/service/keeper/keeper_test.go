@@ -220,7 +220,7 @@ func (suite *KeeperTestSuite) TestRefundDeposit() {
 	disabledTime := time.Now().UTC()
 	suite.setServiceBinding(false, disabledTime, testProvider, testOwner)
 
-	_, err := suite.app.BankKeeper.AddCoins(suite.ctx, suite.keeper.GetServiceDepositAccount(suite.ctx).GetAddress(), testDeposit)
+	err := suite.app.BankKeeper.AddCoins(suite.ctx, suite.keeper.GetServiceDepositAccount(suite.ctx).GetAddress(), testDeposit)
 	suite.NoError(err)
 
 	params := suite.keeper.GetParams(suite.ctx)

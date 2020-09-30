@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"time"
@@ -65,7 +66,7 @@ func addLiquidityHandlerFn(cliCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		status, e := cliCtx.Client.Status()
+		status, e := cliCtx.Client.Status(context.Background())
 		if e != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, e.Error())
 			return
@@ -133,7 +134,7 @@ func removeLiquidityHandlerFn(cliCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		status, e := cliCtx.Client.Status()
+		status, e := cliCtx.Client.Status(context.Background())
 		if e != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, e.Error())
 			return
@@ -207,7 +208,7 @@ func swapOrderHandlerFn(cliCtx client.Context, isBuyOrder bool) http.HandlerFunc
 		input := types.Input{Address: senderAddress, Coin: req.Input.Coin}
 		output := types.Output{Address: recipientAddress, Coin: req.Output.Coin}
 
-		status, e := cliCtx.Client.Status()
+		status, e := cliCtx.Client.Status(context.Background())
 		if e != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, e.Error())
 			return

@@ -100,7 +100,7 @@ func QueryRequestByTxQuery(
 		return request, err
 	}
 
-	blockResult, err := node.BlockResults(&requestHeight)
+	blockResult, err := node.BlockResults(context.Background(), &requestHeight)
 	if err != nil {
 		return request, err
 	}
