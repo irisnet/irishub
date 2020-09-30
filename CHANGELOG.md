@@ -47,5 +47,4 @@ Ref: https://keepachangelog.com/en/1.0.0/
 
 <!-- Release links -->
 
-[Unreleased]: https://github.com/irisnet/irismod/compare/v1.1.0...HEAD
-[v1.0.0]: https://github.com/irisnet/irismod/releases/tag/v1.1.0
+[v1.1.0]: https://github.com/irisnet/irismod/releases/tag/v1.1.0
