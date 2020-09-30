@@ -1,12 +1,19 @@
 {
     "swagger": "2.0",
     "info": {
-        "title": "IrisHub - GRPC Gateway",
+        "title": "IRISHub - Legacy REST and gRPC Gateway docs",
+        "description": "A REST interface for state queries, legacy transactions",
         "version": "1.0.0"
     },
     "apis": [
         {
-            "url": "./cosmos/auth/v1beta1/query.swagger.json",
+            "url": "./lite/swagger_legacy.yaml",
+            "dereference": {
+                "circular": "ignore"
+            }
+        },
+        {
+            "url": "./tmp-swagger-gen/cosmos/auth/v1beta1/query.swagger.json",
             "operationIds": {
                 "rename": {
                     "Params": "AuthParams"
@@ -14,7 +21,7 @@
             }
         },
         {
-            "url": "./cosmos/bank/v1beta1/query.swagger.json",
+            "url": "./tmp-swagger-gen/cosmos/bank/v1beta1/query.swagger.json",
             "operationIds": {
                 "rename": {
                     "Params": "BankParams"
@@ -22,7 +29,7 @@
             }
         },
         {
-            "url": "./cosmos/distribution/v1beta1/query.swagger.json",
+            "url": "./tmp-swagger-gen/cosmos/distribution/v1beta1/query.swagger.json",
             "operationIds": {
                 "rename": {
                     "Params": "DistributionParams"
@@ -30,7 +37,7 @@
             }
         },
         {
-            "url": "./cosmos/evidence/v1beta1/query.swagger.json",
+            "url": "./tmp-swagger-gen/cosmos/evidence/v1beta1/query.swagger.json",
             "operationIds": {
                 "rename": {
                     "Params": "EvidenceParams"
@@ -38,7 +45,7 @@
             }
         },
         {
-            "url": "./cosmos/gov/v1beta1/query.swagger.json",
+            "url": "./tmp-swagger-gen/cosmos/gov/v1beta1/query.swagger.json",
             "operationIds": {
                 "rename": {
                     "Params": "GovParams"
@@ -46,7 +53,7 @@
             }
         },
         {
-            "url": "./cosmos/params/v1beta1/query.swagger.json",
+            "url": "./tmp-swagger-gen/cosmos/params/v1beta1/query.swagger.json",
             "operationIds": {
                 "rename": {
                     "Params": "Params"
@@ -54,7 +61,7 @@
             }
         },
         {
-            "url": "./cosmos/slashing/v1beta1/query.swagger.json",
+            "url": "./tmp-swagger-gen/cosmos/slashing/v1beta1/query.swagger.json",
             "operationIds": {
                 "rename": {
                     "Params": "SlashingParams"
@@ -62,7 +69,7 @@
             }
         },
         {
-            "url": "./cosmos/staking/v1beta1/query.swagger.json",
+            "url": "./tmp-swagger-gen/cosmos/staking/v1beta1/query.swagger.json",
             "operationIds": {
                 "rename": {
                     "Params": "StakingParams",
@@ -71,7 +78,7 @@
             }
         },
         {
-            "url": "./cosmos/upgrade/v1beta1/query.swagger.json",
+            "url": "./tmp-swagger-gen/cosmos/upgrade/v1beta1/query.swagger.json",
             "operationIds": {
                 "rename": {
                     "Params": "UpgradeParams"
@@ -79,7 +86,7 @@
             }
         },
         {
-            "url": "./ibc/channel/query.swagger.json",
+            "url": "./tmp-swagger-gen/ibc/channel/query.swagger.json",
             "operationIds": {
                 "rename": {
                     "Params": "IBCChannelParams"
@@ -87,7 +94,7 @@
             }
         },
         {
-            "url": "./ibc/client/query.swagger.json",
+            "url": "./tmp-swagger-gen/ibc/client/query.swagger.json",
             "operationIds": {
                 "rename": {
                     "Params": "IBCClientParams"
@@ -95,7 +102,7 @@
             }
         },
         {
-            "url": "./ibc/connection/query.swagger.json",
+            "url": "./tmp-swagger-gen/ibc/connection/query.swagger.json",
             "operationIds": {
                 "rename": {
                     "Params": "IBCConnectionParams"
@@ -103,7 +110,7 @@
             }
         },
         {
-            "url": "./ibc/transfer/query.swagger.json",
+            "url": "./tmp-swagger-gen/ibc/transfer/query.swagger.json",
             "operationIds": {
                 "rename": {
                     "Params": "IBCTransferParams"
@@ -111,7 +118,7 @@
             }
         },
         {
-            "url": "./coinswap/query.swagger.json",
+            "url": "./tmp-swagger-gen/coinswap/query.swagger.json",
             "operationIds": {
                 "rename": {
                     "Params": "CoinswapParams"
@@ -119,7 +126,7 @@
             }
         },
         {
-            "url": "./htlc/query.swagger.json",
+            "url": "./tmp-swagger-gen/htlc/query.swagger.json",
             "operationIds": {
                 "rename": {
                     "Params": "HTLCParams"
@@ -127,7 +134,7 @@
             }
         },
         {
-            "url": "./nft/query.swagger.json",
+            "url": "./tmp-swagger-gen/nft/query.swagger.json",
             "operationIds": {
                 "rename": {
                     "Params": "NFTParams"
@@ -135,7 +142,7 @@
             }
         },
         {
-            "url": "./oracle/query.swagger.json",
+            "url": "./tmp-swagger-gen/oracle/query.swagger.json",
             "operationIds": {
                 "rename": {
                     "Params": "OracleParams"
@@ -143,7 +150,7 @@
             }
         },
         {
-            "url": "./random/query.swagger.json",
+            "url": "./tmp-swagger-gen/random/query.swagger.json",
             "operationIds": {
                 "rename": {
                     "Params": "RandomParams"
@@ -151,7 +158,7 @@
             }
         },
         {
-            "url": "./record/query.swagger.json",
+            "url": "./tmp-swagger-gen/record/query.swagger.json",
             "operationIds": {
                 "rename": {
                     "Params": "RecordParams"
@@ -159,7 +166,7 @@
             }
         },
         {
-            "url": "./service/query.swagger.json",
+            "url": "./tmp-swagger-gen/service/query.swagger.json",
             "operationIds": {
                 "rename": {
                     "Params": "ServiceParams"
@@ -167,7 +174,7 @@
             }
         },
         {
-            "url": "./token/query.swagger.json",
+            "url": "./tmp-swagger-gen/token/query.swagger.json",
             "operationIds": {
                 "rename": {
                     "Params": "TokenParams"
@@ -175,7 +182,7 @@
             }
         },
         {
-            "url": "./mint/query.swagger.json",
+            "url": "./tmp-swagger-gen/mint/query.swagger.json",
             "operationIds": {
                 "rename": {
                     "Params": "MintParams"
@@ -183,7 +190,7 @@
             }
         },
         {
-            "url": "./guardian/query.swagger.json",
+            "url": "./tmp-swagger-gen/guardian/query.swagger.json",
             "operationIds": {
                 "rename": {
                     "Params": "GuardianParams"

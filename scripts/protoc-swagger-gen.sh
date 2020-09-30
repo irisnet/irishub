@@ -2,8 +2,8 @@
 
 set -eo pipefail
 
-IRISMOD_VERSION=v0.0.0-20200928025052-eb7d598532a1
-SDK_VERSION=v0.34.4-0.20200918054421-c8b3462ab7a2
+IRISMOD_VERSION=v1.1.1-0.20200930082942-4882cf4fd17a
+SDK_VERSION=v0.28.2-0.20200930073142-1e1bec2e65a6
 
 chmod -R 755 ${GOPATH}/pkg/mod/github.com/irisnet/irismod@${IRISMOD_VERSION}/proto
 chmod -R 755 ${GOPATH}/pkg/mod/github.com/irisnet/cosmos-sdk@${SDK_VERSION}/proto/cosmos
@@ -12,6 +12,8 @@ chmod -R 755 ${GOPATH}/pkg/mod/github.com/irisnet/cosmos-sdk@${SDK_VERSION}/prot
 cp -r ${GOPATH}/pkg/mod/github.com/irisnet/irismod@${IRISMOD_VERSION}/proto ./
 cp -r ${GOPATH}/pkg/mod/github.com/irisnet/cosmos-sdk@${SDK_VERSION}/proto/cosmos ./proto
 cp -r ${GOPATH}/pkg/mod/github.com/irisnet/cosmos-sdk@${SDK_VERSION}/proto/ibc ./proto
+
+mkdir -p ./tmp-swagger-gen
 
 proto_dirs=$(find ./proto -path -prune -o -name 'query.proto' -print0 | xargs -0 -n1 dirname | sort | uniq)
 for dir in $proto_dirs; do
@@ -24,20 +26,20 @@ for dir in $proto_dirs; do
             -I "proto" \
             -I "third_party/proto" \
             "$query_file" \
-            --swagger_out=logtostderr=true,stderrthreshold=1000,fqn_for_swagger_name=true,simple_operation_ids=true:.
+            --swagger_out ./tmp-swagger-gen \
+            --swagger_opt logtostderr=true --swagger_opt fqn_for_swagger_name=true --swagger_opt simple_operation_ids=true
     fi
 done
 
 # combine swagger files
 # uses nodejs package `swagger-combine`.
 # all the individual swagger files need to be configured in `config.json` for merging
-swagger-combine ./lite/grpc-gateway/config.json -o ./lite/grpc-gateway/swagger.json --continueOnConflictingPaths true --includeDefinitions true
+swagger-combine ./lite/config.json -o ./lite/swagger-ui/swagger.yaml -f yaml --continueOnConflictingPaths true --includeDefinitions true
 
-# clean swagger files & empty folder
-find ./ -name 'query.swagger.json' -exec rm {} \;
-find ./ -type d -empty | xargs -n 1 rm -rf
-rm -r ./cosmos
+# clean swagger files
+rm -rf ./tmp-swagger-gen
 
+# clean proto files
 rm -rf ./proto/cosmos
 rm -rf ./proto/ibc
 

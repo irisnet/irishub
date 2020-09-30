@@ -92,7 +92,7 @@ install: go.sum
 	go install $(BUILD_FLAGS) ./cmd/iris
 
 update-swagger-docs: statik
-	$(BINDIR)/statik -src=lite/grpc-gateway -dest=lite/grpc-gateway -f -m
+	$(BINDIR)/statik -src=lite/swagger-ui -dest=lite -f -m
 	@if [ -n "$(git status --porcelain)" ]; then \
         echo "\033[91mSwagger docs are out of sync!!!\033[0m";\
         exit 1;\
@@ -118,7 +118,7 @@ draw-deps:
 	@goviz -i ./cmd/iris -d 2 | dot -Tpng -o dependency-graph.png
 
 clean:
-	rm -rf snapcraft-local.yaml build/
+	rm -rf snapcraft-local.yaml build/ tmp-swagger-gen/
 
 distclean: clean
 	rm -rf vendor/
