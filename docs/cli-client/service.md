@@ -177,12 +177,6 @@ Query a service binding.
 iris query service binding <service name> <provider>
 ```
 
-### Query a service binding
-
-```bash
-iris query service binding [service-name] [provider] [flags]
-```
-
 ## iris query service bindings
 
 Query all bindings of a service definition.
@@ -194,7 +188,7 @@ iris query service bindings [service-name] [flags]
 ### Query service binding list
 
 ```bash
-iris query service bindings <service name> --owner=<address>
+iris query service bindings <service name> <owner address>
 ```
 
 ## iris tx service update-binding
@@ -237,12 +231,6 @@ Set a withdrawal address for a provider.
 iris tx service set-withdraw-addr [withdrawal-address] [flags]
 ```
 
-### Set a withdrawal address
-
-```bash
-iris tx service set-withdraw-addr <withdrawal address> --chain-id=irishub --from=<key-name> --fees=0.3iris
-```
-
 ## iris query service withdraw-addr
 
 Query the withdrawal address of a provider.
@@ -251,24 +239,12 @@ Query the withdrawal address of a provider.
 iris query service withdraw-addr [provider] [flags]
 ```
 
-### Query the withdrawal address of a provider
-
-```bash
-iris query service withdraw-addr <provider>
-```
-
 ## iris tx service disable
 
 Disable an available service binding.
 
 ```bash
 iris tx service disable [service-name] [provider-address] [flags]
-```
-
-### Disable an available service binding
-
-```bash
-iris tx service disable <service name> --chain-id=irishub --from=<key-name> --fees=0.3iris
 ```
 
 ## iris tx service enable
@@ -290,7 +266,7 @@ iris tx service enable [service-name] [provider-address] [flags]
 The following example enables an unavailable service binding with the additional 10 IRIS deposit.
 
 ```bash
-iris tx service enable <service name> --chain-id=irishub --from=<key-name> --fees=0.3iris --deposit=10iris
+iris tx service enable <service name> <provider-address> --chain-id=irishub --from=<key-name> --fees=0.3iris --deposit=10iris
 ```
 
 ## iris tx service refund-deposit
@@ -306,7 +282,7 @@ iris tx service refund-deposit [service-name] [provider-address] [flags]
 Before refunding, you should [disable](#iris-tx-service-disable) the service binding first.
 
 ```bash
-iris tx service refund-deposit <service name> --chain-id=irishub --from=<key-name> --fees=0.3iris
+iris tx service refund-deposit <service name> <provider-address> --chain-id=irishub --from=<key-name> --fees=0.3iris
 ```
 
 ## iris tx service call
@@ -463,12 +439,6 @@ Query a service response.
 iris query service response [request-id] [flags]
 ```
 
-### Query a service response
-
-```bash
-iris query service response <request-id>
-```
-
 :::tip
 You can retrieve the `request-id` in the result of tendermint block
 :::
@@ -587,24 +557,12 @@ Query the earned fees of a provider.
 iris query service fees [provider] [flags]
 ```
 
-### Query service fees
-
-```bash
-iris query service fees <provider>
-```
-
 ## iris tx service withdraw-fees
 
 Withdraw the earned fees of a provider.
 
 ```bash
 iris tx service withdraw-fees [provider-address] [flags]
-```
-
-### Withdraw the earned fees
-
-```bash
-iris tx service withdraw-fees [provider-address] --chain-id=irishub --from=<key-name> --fees=0.3iris
 ```
 
 ## iris query service schema

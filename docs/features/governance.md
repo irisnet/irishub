@@ -196,7 +196,7 @@ echo '{
     "deposit": "1000iris"
 }' > proposal.json
 
-iris tx gov submit-proposal param-change proposal.json --from=<key-name> --fees=0.3iris --chain-id=irishub -b block -y
+iris tx gov submit-proposal param-change proposal.json --from=<key-name> --fees=0.3iris --chain-id=irishub
 ```
 
 ### Community pool spending
@@ -213,7 +213,7 @@ echo '{
     "deposit": "1000iris"
 }' > proposal.json
 
-iris tx gov submit-proposal community-pool-spend proposal.json --from=<key-name> --fees=0.3iris --chain-id=irishub -b block -y
+iris tx gov submit-proposal community-pool-spend proposal.json --from=<key-name> --fees=0.3iris --chain-id=irishub
 ```
 
 ### Software upgrade

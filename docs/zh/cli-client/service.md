@@ -176,12 +176,6 @@ iris tx service bind \
 iris query service binding [service-name] [provider] [flags]
 ```
 
-### 查询一个服务绑定
-
-```bash
-iris query service binding <service name> <provider>
-```
-
 ## iris query service bindings
 
 查询服务绑定列表。
@@ -193,7 +187,7 @@ iris query service bindings [service-name] [flags]
 ### 查询服务绑定列表
 
 ```bash
-iris query service bindings <service name> --owner=<address>
+iris query service bindings <service name> <owner address>
 ```
 
 ## iris tx service update-binding
@@ -235,12 +229,6 @@ iris tx service update-binding <service-name> <provider-address> \
 iris tx service set-withdraw-addr [withdrawal-address] [flags]
 ```
 
-### 设置一个提取地址
-
-```bash
-iris tx service set-withdraw-addr <withdrawal address> --chain-id=irishub --from=<key-name> --fees=0.3iris
-```
-
 ## iris query service withdraw-addr
 
 查询服务提供者的提取地址。
@@ -249,24 +237,12 @@ iris tx service set-withdraw-addr <withdrawal address> --chain-id=irishub --from
 iris query service withdraw-addr [provider] [flags]
 ```
 
-### 查询一个服务提供者的提取地址
-
-```bash
-iris query service withdraw-addr <provider>
-```
-
 ## iris tx service disable
 
 禁用一个可用的服务绑定。
 
 ```bash
-iris tx service disable [service-name] [flags]
-```
-
-### 禁用一个可用的服务绑定
-
-```bash
-iris tx service disable <service name> --chain-id=irishub --from=<key-name> --fees=0.3iris
+iris tx service disable [service-name] [provider-address] [flags]
 ```
 
 ## iris tx service enable
@@ -288,7 +264,7 @@ iris tx service enable [service-name] [provider-address] [flags]
 启用一个不可用的服务绑定，追加 10 IRIS 的抵押。
 
 ```bash
-iris tx service enable <service name> --chain-id=irishub --from=<key-name> --fees=0.3iris --deposit=10iris
+iris tx service enable <service name> <provider-address> --chain-id=irishub --from=<key-name> --fees=0.3iris --deposit=10iris
 ```
 
 ## iris tx service refund-deposit
@@ -304,7 +280,7 @@ iris tx service refund-deposit [service-name] [provider-address] [flags]
 取回抵押之前，必须先[禁用](#iris-tx-service-disable)服务绑定。
 
 ```bash
-iris tx service refund-deposit <service name> --chain-id=irishub --from=<key-name> --fees=0.3iris
+iris tx service refund-deposit <service name>  <provider-address> --chain-id=irishub --from=<key-name> --fees=0.3iris
 ```
 
 ## iris tx service call
@@ -319,7 +295,7 @@ iris tx service call [flags]
 
 | 名称，速记        | 默认  | 描述                                                  | 必须 |
 | ----------------- | ----- | ----------------------------------------------------- | ---- |
-| --name            |       | 服务名称                                              | 是   |
+| --service-name     |       | 服务名称                                              | 是   |
 | --providers       |       | 服务提供者列表                                        | 是   |
 | --service-fee-cap |       | 愿意为单个请求支付的最大服务费用                      | 是   |
 | --data            |       | 请求输入的内容或文件路径，是一个Input JSON Schema实例 | 是   |
@@ -557,12 +533,6 @@ iris tx service pause <request-context-id>
 iris tx service start [request-context-id] [flags]
 ```
 
-### 启动一个暂停的请求上下文
-
-```bash
-iris tx service start <request-context-id>
-```
-
 ## iris tx service kill
 
 终止请求上下文。
@@ -582,13 +552,7 @@ iris tx service kill <request-context-id>
 查询服务提供者的收益。
 
 ```bash
-iris query service  fees [provider] [flags]
-```
-
-### 查询服务提供者的收益
-
-```bash
-iris query service fees <provider>
+iris query service fees [provider] [flags]
 ```
 
 ## iris tx service withdraw-fees
@@ -597,12 +561,6 @@ iris query service fees <provider>
 
 ```bash
 iris tx service withdraw-fees [flags]
-```
-
-### 提取服务提供者的收益
-
-```bash
-iris tx service withdraw-fees --chain-id=irishub --from=<key-name> --fees=0.3iris
 ```
 
 ## iris query service schema

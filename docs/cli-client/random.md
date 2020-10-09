@@ -50,14 +50,6 @@ Query the generated random number by the request id.
 iris query random random <request-id> [flags]
 ```
 
-### Query a random number
-
-Query the random number after it is generated.
-
-```bash
-iris query random random <request-id>
-```
-
 ## iris query random queue
 
 Query the pending random number requests with an optional block height.

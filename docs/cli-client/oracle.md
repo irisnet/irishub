@@ -156,9 +156,3 @@ This command is used to query the result of a specified feed
 ```bash
 iris query oracle value test-feed
 ```
-
-### Query the result of an existed feed
-
-```bash
-iris query oracle value test-feed
-```

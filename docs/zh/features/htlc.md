@@ -32,14 +32,14 @@
 
 ### 创建HTLC消息
 
-| **字段**             | **类型** | **描述**                                                     |
-| -------------------- | -------- | ------------------------------------------------------------ |
-| receiver             | Address  | 接收者地址                                                   |
-| receiverOnOtherChain | string   | 另一条链上的HTLC认领接收地址，最大128个字符                        |
-| amount               | Coins    | 欲交换的资产数量                                             |
+| **字段**             | **类型** | **描述**                                                                |
+| -------------------- | -------- | ----------------------------------------------------------------------- |
+| receiver             | Address  | 接收者地址                                                              |
+| receiverOnOtherChain | string   | 另一条链上的HTLC认领接收地址，最大128个字符                             |
+| amount               | Coins    | 欲交换的资产数量                                                        |
 | hashLock             | string   | 由secret(和timestamp，如果提供)生成的sha256哈希值；32字节，十六进制表示 |
-| timestamp            | uint64   | 时间戳，如果提供则参与hash生成；精度为秒                     |
-| timeLock             | uint64   | 过期区块数；[50, 25480] (大于5分钟, 小于48小时)              |
+| timestamp            | uint64   | 时间戳，如果提供则参与hash生成；精度为秒                                |
+| timeLock             | uint64   | 过期区块数；[50, 25480] (大于5分钟, 小于48小时)                         |
 
 ### 认领HTLC消息
 
@@ -59,4 +59,4 @@
 - [创建 HTLC](../cli-client/htlc.md#iris-tx-htlc-create)
 - [认领 HTLC](../cli-client/htlc.md#iris-tx-htlc-claim)
 - [退款 HTLC](../cli-client/htlc.md#iris-tx-htlc-refund)
-- [查询 HTLC](../cli-client/htlc.md#iris-q-htlc-htlc)
+- [查询 HTLC](../cli-client/htlc.md#iris-query-htlc-htlc)

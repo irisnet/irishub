@@ -21,7 +21,9 @@ IRIShub 主网的最新版本是[v0.16.3](https://github.com/irisnet/irishub/rel
 ```bash
 mkdir -p $HOME/go/bin
 echo "export GOPATH=$HOME/go" >> ~/.bashrc
+source ~/.bashrc
 echo "export GOBIN=$GOPATH/bin" >> ~/.bashrc
+source ~/.bashrc
 echo "export PATH=$PATH:$GOBIN" >> ~/.bashrc
 source ~/.bashrc
 ```
