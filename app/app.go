@@ -17,9 +17,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/server/api"
+	"github.com/cosmos/cosmos-sdk/server/config"
 	"github.com/cosmos/cosmos-sdk/simapp"
 	simappparams "github.com/cosmos/cosmos-sdk/simapp/params"
-	"github.com/cosmos/cosmos-sdk/std"
 	"github.com/cosmos/cosmos-sdk/testutil/testdata"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
@@ -87,7 +87,7 @@ import (
 	nftkeeper "github.com/irisnet/irismod/modules/nft/keeper"
 	nfttypes "github.com/irisnet/irismod/modules/nft/types"
 	"github.com/irisnet/irismod/modules/oracle"
-	oracleKeeper "github.com/irisnet/irismod/modules/oracle/keeper"
+	oraclekeeper "github.com/irisnet/irismod/modules/oracle/keeper"
 	oracletypes "github.com/irisnet/irismod/modules/oracle/types"
 	"github.com/irisnet/irismod/modules/random"
 	randomkeeper "github.com/irisnet/irismod/modules/random/keeper"
@@ -102,6 +102,7 @@ import (
 	tokenkeeper "github.com/irisnet/irismod/modules/token/keeper"
 	tokentypes "github.com/irisnet/irismod/modules/token/types"
 
+	"github.com/irisnet/irishub/lite"
 	"github.com/irisnet/irishub/modules/guardian"
 	guardiankeeper "github.com/irisnet/irishub/modules/guardian/keeper"
 	guardiantypes "github.com/irisnet/irishub/modules/guardian/types"
@@ -228,7 +229,7 @@ type IrisApp struct {
 	htlcKeeper     htlckeeper.Keeper
 	coinswapKeeper coinswapkeeper.Keeper
 	serviceKeeper  servicekeeper.Keeper
-	oracleKeeper   oracleKeeper.Keeper
+	oracleKeeper   oraclekeeper.Keeper
 	randomKeeper   randomkeeper.Keeper
 
 	// the module manager
@@ -273,7 +274,7 @@ func NewIrisApp(
 	bApp.SetCommitMultiStoreTracer(traceStore)
 	bApp.SetAppVersion(version.Version)
 	bApp.GRPCQueryRouter().SetInterfaceRegistry(interfaceRegistry)
-	bApp.GRPCQueryRouter().RegisterSimulateService(bApp.Simulate, interfaceRegistry, std.DefaultPublicKeyCodec{})
+	bApp.GRPCQueryRouter().RegisterSimulateService(bApp.Simulate, interfaceRegistry)
 
 	keys := sdk.NewKVStoreKeys(
 		authtypes.StoreKey, banktypes.StoreKey, stakingtypes.StoreKey,
@@ -404,7 +405,7 @@ func NewIrisApp(
 		WrapToken(app.tokenKeeper), app.GetSubspace(servicetypes.ModuleName), authtypes.FeeCollectorName,
 	)
 
-	app.oracleKeeper = oracleKeeper.NewKeeper(
+	app.oracleKeeper = oraclekeeper.NewKeeper(
 		appCodec, keys[oracletypes.StoreKey], app.GetSubspace(oracletypes.ModuleName),
 		app.serviceKeeper,
 	)
@@ -673,12 +674,16 @@ func (app *IrisApp) SimulationManager() *module.SimulationManager {
 
 // RegisterAPIRoutes registers all application module routes with the provided
 // API server.
-func (app *IrisApp) RegisterAPIRoutes(apiSvr *api.Server) {
+func (app *IrisApp) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APIConfig) {
 	clientCtx := apiSvr.ClientCtx
 	rpc.RegisterRoutes(clientCtx, apiSvr.Router)
 	authrest.RegisterTxRoutes(clientCtx, apiSvr.Router)
 	ModuleBasics.RegisterRESTRoutes(clientCtx, apiSvr.Router)
 	ModuleBasics.RegisterGRPCRoutes(apiSvr.ClientCtx, apiSvr.GRPCRouter)
+
+	if apiConfig.Swagger {
+		lite.RegisterSwaggerAPI(clientCtx, apiSvr.Router)
+	}
 }
 
 // GetMaccPerms returns a copy of the module account permissions

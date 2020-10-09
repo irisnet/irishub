@@ -1,0 +1,3369 @@
+---
+swagger: "2.0"
+info:
+  version: "3.0"
+  title: Lite for IRISHub
+  description: A REST interface for state queries, transaction generation and broadcasting.
+tags:
+  - name: Transactions
+    description: Search, encode, or broadcast transactions.
+  - name: Tendermint RPC
+    description: Tendermint APIs, such as query blocks, transactions and validatorset
+  - name: Auth
+    description: Authenticate accounts
+  - name: Bank
+    description: Create and broadcast transactions
+  - name: Validator
+    description: Validator module APIs
+  #  - name: Governance
+  #    description: Governance module APIs
+  - name: Supply
+    description: Supply module APIs
+  - name: Token
+    description: Token module APIs
+  - name: NFT
+    description: NFT module APIs
+  - name: Record
+    description: Record module APIs
+  - name: Service
+    description: Service module APIs
+  - name: Identity
+    description: Identity module APIs
+  - name: Misc
+    description: Query app version
+host: localhost:1317
+paths:
+  /node_info:
+    get:
+      description: Information about the connected node
+      summary: The properties of the connected node
+      tags:
+        - Tendermint RPC
+      produces:
+        - application/json
+      responses:
+        200:
+          description: Node status
+          schema:
+            type: object
+            properties:
+              application_version:
+                properties:
+                  build_tags:
+                    type: string
+                  client_name:
+                    type: string
+                  commit:
+                    type: string
+                  go:
+                    type: string
+                  name:
+                    type: string
+                  server_name:
+                    type: string
+                  version:
+                    type: string
+              node_info:
+                properties:
+                  id:
+                    type: string
+                  moniker:
+                    type: string
+                    example: validator-name
+                  protocol_version:
+                    properties:
+                      p2p:
+                        type: string
+                        example: 7
+                      block:
+                        type: string
+                        example: 10
+                      app:
+                        type: string
+                        example: 0
+                  network:
+                    type: string
+                    example: IRISHub-2
+                  channels:
+                    type: string
+                  listen_addr:
+                    type: string
+                    example: 192.168.56.1:26656
+                  version:
+                    description: Tendermint version
+                    type: string
+                    example: 0.15.0
+                  other:
+                    description: more information on versions
+                    type: object
+                    properties:
+                      tx_index:
+                        type: string
+                        example: on
+                      rpc_address:
+                        type: string
+                        example: tcp://0.0.0.0:26657
+        500:
+          description: Failed to query node status
+  /syncing:
+    get:
+      summary: Syncing state of node
+      tags:
+        - Tendermint RPC
+      description: Get if the node is currently syning with other nodes
+      produces:
+        - application/json
+      responses:
+        200:
+          description: Node syncing status
+          schema:
+            type: object
+            properties:
+              syncing:
+                type: boolean
+        500:
+          description: Server internal error
+  /blocks/latest:
+    get:
+      summary: Get the latest block
+      tags:
+        - Tendermint RPC
+      produces:
+        - application/json
+      responses:
+        200:
+          description: The latest block
+          schema:
+            $ref: "#/definitions/BlockQuery"
+        500:
+          description: Server internal error
+  /blocks/{height}:
+    get:
+      summary: Get a block at a certain height
+      tags:
+        - Tendermint RPC
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: height
+          description: Block height
+          required: true
+          type: number
+          x-example: 1
+      responses:
+        200:
+          description: The block at a specific height
+          schema:
+            $ref: "#/definitions/BlockQuery"
+        404:
+          description: Request block height doesn't
+        400:
+          description: Invalid height
+        500:
+          description: Server internal error
+  /validatorsets/latest:
+    get:
+      summary: Get the latest validator set
+      tags:
+        - Tendermint RPC
+      produces:
+        - application/json
+      responses:
+        200:
+          description: The validator set at the latest block height
+          schema:
+            type: object
+            properties:
+              block_height:
+                type: string
+              validators:
+                type: array
+                items:
+                  $ref: "#/definitions/TendermintValidator"
+        500:
+          description: Server internal error
+  /validatorsets/{height}:
+    get:
+      summary: Get a validator set a certain height
+      tags:
+        - Tendermint RPC
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: height
+          description: Block height
+          required: true
+          type: number
+          x-example: 1
+      responses:
+        200:
+          description: The validator set at a specific block height
+          schema:
+            type: object
+            properties:
+              block_height:
+                type: string
+              validators:
+                type: array
+                items:
+                  $ref: "#/definitions/TendermintValidator"
+        404:
+          description: Block at height not available
+        400:
+          description: Invalid height
+        500:
+          description: Server internal error
+  /txs/{hash}:
+    get:
+      deprecated: true
+      summary: Get a Tx by hash
+      tags:
+        - Transactions
+      description: Retrieve a transaction using its hash.
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: hash
+          description: Tx hash
+          required: true
+          type: string
+          x-example: BCBE20E8D46758B96AE5883B792858296AC06E51435490FBDCAE25A72B3CC76B
+      responses:
+        200:
+          description: Tx with the provided hash
+          schema:
+            $ref: "#/definitions/TxQuery"
+        500:
+          description: Internal Server Error
+  /txs:
+    get:
+      deprecated: true
+      tags:
+        - Transactions
+      summary: Search transactions
+      description: Search transactions by events.
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: message.action
+          type: string
+          description: "transaction events such as 'message.action=send' which results in the following endpoint: 'GET /txs?message.action=send'. note that each module documents its own events. look for xx_events.md in the corresponding cosmos-sdk/docs/spec directory"
+          x-example: "send"
+        - in: query
+          name: message.sender
+          type: string
+          description: "transaction tags with sender: 'GET /txs?message.action=send&message.sender=iaa1g7cl85hm2f9jkp7pp2cd5l7tkzzrmffjah9tsf'"
+          x-example: "iaa12jyx7smkhpzgjudh73gxmcgt9chxtpeue6y6cy"
+        - in: query
+          name: page
+          description: Page number
+          type: integer
+          x-example: 1
+        - in: query
+          name: limit
+          description: Maximum number of items per page
+          type: integer
+          x-example: 1
+        - in: query
+          name: tx.minheight
+          type: integer
+          description: "transactions on blocks with height greater or equal this value"
+          x-example: 25
+        - in: query
+          name: tx.maxheight
+          type: integer
+          description: "transactions on blocks with height less than or equal this value"
+          x-example: 800000
+      responses:
+        200:
+          description: All txs matching the provided events
+          schema:
+            $ref: "#/definitions/PaginatedQueryTxs"
+        400:
+          description: Invalid search events
+        500:
+          description: Internal Server Error
+    post:
+      tags:
+        - Transactions
+      summary: Broadcast a signed tx
+      description: Broadcast a signed tx to a full node
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: txBroadcast
+          description: The tx must be a signed StdTx. The supported broadcast modes include `"block"`(return after tx commit), `"sync"`(return afer CheckTx) and `"async"`(return right away).
+          required: true
+          schema:
+            type: object
+            properties:
+              tx:
+                $ref: "#/definitions/StdTx"
+              mode:
+                type: string
+                example: block
+      responses:
+        200:
+          description: Tx broadcasting result
+          schema:
+            $ref: "#/definitions/BroadcastTxCommitResult"
+        500:
+          description: Internal Server Error
+  /txs/encode:
+    post:
+      deprecated: true
+      tags:
+        - Transactions
+      summary: Encode a transaction to the Amino wire format
+      description: Encode a transaction (signed or not) from JSON to base64-encoded Amino serialized bytes
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: tx
+          description: The tx to encode
+          required: true
+          schema:
+            type: object
+            properties:
+              tx:
+                $ref: "#/definitions/StdTx"
+      responses:
+        200:
+          description: The tx was successfully decoded and re-encoded
+          schema:
+            type: object
+            properties:
+              tx:
+                type: string
+                example: The base64-encoded Amino-serialized bytes for the tx
+        400:
+          description: The tx was malformated
+        500:
+          description: Server internal error
+  /txs/decode:
+    post:
+      deprecated: true
+      tags:
+        - Transactions
+      summary: Decode a transaction from the Amino wire format
+      description: Decode a transaction (signed or not) from base64-encoded Amino serialized bytes to JSON
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: tx
+          description: The tx to decode
+          required: true
+          schema:
+            type: object
+            properties:
+              tx:
+                type: string
+                example: SvBiXe4KPqijYZoKFFHEzJ8c2HPAfv2EFUcIhx0yPagwEhTy0vPA+GGhCEslKXa4Af0uB+mfShoMCgVzdGFrZRIDMTAwEgQQwJoM
+      responses:
+        200:
+          description: The tx was successfully decoded
+          schema:
+            $ref: "#/definitions/StdTx"
+        400:
+          description: The tx was malformated
+        500:
+          description: Server internal error
+  /bank/balances/{address}:
+    get:
+      deprecated: true
+      summary: Get the account balances
+      tags:
+        - Bank
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: address
+          description: Account address in bech32 format
+          required: true
+          type: string
+          x-example: 1g7cl85hm2f9jkp7pp2cd5l7tkzzrmffjah9tsf
+      responses:
+        200:
+          description: Account balances
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Coin"
+        500:
+          description: Server internal error
+  /bank/accounts/{address}/transfers:
+    post:
+      deprecated: true
+      summary: Send coins from one account to another
+      tags:
+        - Bank
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: address
+          description: Account address in bech32 format
+          required: true
+          type: string
+          x-example: 1g7cl85hm2f9jkp7pp2cd5l7tkzzrmffjah9tsf
+        - in: body
+          name: account
+          description: The sender and tx information
+          required: true
+          schema:
+            type: object
+            properties:
+              base_req:
+                $ref: "#/definitions/BaseReq"
+              amount:
+                type: array
+                items:
+                  $ref: "#/definitions/Coin"
+      responses:
+        202:
+          description: Tx was succesfully generated
+          schema:
+            $ref: "#/definitions/StdTx"
+        400:
+          description: Invalid request
+        500:
+          description: Server internal error
+  /auth/accounts/{address}:
+    get:
+      deprecated: true
+      summary: Get the account information on blockchain
+      tags:
+        - Auth
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: address
+          description: Account address
+          required: true
+          type: string
+          x-example: 1g7cl85hm2f9jkp7pp2cd5l7tkzzrmffjah9tsf
+      responses:
+        200:
+          description: Account information on the blockchain
+          schema:
+            type: object
+            properties:
+              type:
+                type: string
+              value:
+                type: object
+                properties:
+                  account_number:
+                    type: string
+                  address:
+                    type: string
+                  coins:
+                    type: array
+                    items:
+                      $ref: "#/definitions/Coin"
+                  public_key:
+                    $ref: "#/definitions/PublicKey"
+                  sequence:
+                    type: string
+        500:
+          description: Server internel error
+  /validator/validators/{name}:
+    get:
+      deprecated: true
+      summary: Get a validator information by name
+      tags:
+        - Validator
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: name
+          description: Validator name
+          required: true
+          type: string
+          x-example: v1
+      responses:
+        200:
+          description: validator information on the blockchain
+          schema:
+            $ref: "#/definitions/Validator"
+        400:
+          description: Invalid request
+        500:
+          description: Server internal error
+  /validator/validators:
+    get:
+      deprecated: true
+      summary: Get validator list
+      tags:
+        - Validator
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: jailed
+          description: Query by validator status
+          type: boolean
+          x-example: true
+        - in: query
+          name: page
+          description: Page number
+          type: integer
+          x-example: 1
+        - in: query
+          name: limit
+          description: Maximum number of items per page
+          type: integer
+          x-example: 1
+      responses:
+        200:
+          description: validator information on the blockchain
+          schema:
+            type: array
+            $ref: "#/definitions/Validator"
+        400:
+          description: Invalid request
+        500:
+          description: Server internal error
+  /validator/parameters:
+    get:
+      deprecated: true
+      summary: Get the parameters information in validator module
+      tags:
+        - Validator
+      produces:
+        - application/json
+      responses:
+        200:
+          description: parameters information in validator module
+          schema:
+            properties:
+              historical_entries:
+                type: integer
+                example: 100
+        400:
+          description: Invalid request
+        500:
+          description: Server internal error
+  #  /gov/proposals:
+  #    post:
+  #      summary: Submit a proposal
+  #      description: Send transaction to submit a proposal
+  #      consumes:
+  #        - application/json
+  #      produces:
+  #        - application/json
+  #      tags:
+  #        - Governance
+  #      parameters:
+  #        - description: valid value of `"proposal_type"` can be `"text"`, `"parameter_change"`, `"software_upgrade"`
+  #          name: post_proposal_body
+  #          in: body
+  #          required: true
+  #          schema:
+  #            type: object
+  #            properties:
+  #              base_req:
+  #                $ref: "#/definitions/BaseReq"
+  #              title:
+  #                type: string
+  #              description:
+  #                type: string
+  #              proposal_type:
+  #                type: string
+  #                example: "text"
+  #              proposer:
+  #                $ref: "#/definitions/Address"
+  #              initial_deposit:
+  #                type: array
+  #                items:
+  #                  $ref: "#/definitions/Coin"
+  #      responses:
+  #        200:
+  #          description: Tx was succesfully generated
+  #          schema:
+  #            $ref: "#/definitions/StdTx"
+  #        400:
+  #          description: Invalid proposal body
+  #        500:
+  #          description: Internal Server Error
+  #    get:
+  #      summary: Query proposals
+  #      description: Query proposals information with parameters
+  #      produces:
+  #        - application/json
+  #      tags:
+  #        - Governance
+  #      parameters:
+  #        - in: query
+  #          name: voter
+  #          description: voter address
+  #          required: false
+  #          type: string
+  #        - in: query
+  #          name: depositor
+  #          description: depositor address
+  #          required: false
+  #          type: string
+  #        - in: query
+  #          name: status
+  #          description: proposal status, valid values can be `"deposit_period"`, `"voting_period"`, `"passed"`, `"rejected"`
+  #          required: false
+  #          type: string
+  #      responses:
+  #        200:
+  #          description: OK
+  #          schema:
+  #            type: array
+  #            items:
+  #              $ref: "#/definitions/TextProposal"
+  #        400:
+  #          description: Invalid query parameters
+  #        500:
+  #          description: Internal Server Error
+  #  /gov/proposals/param_change:
+  #    post:
+  #      summary: Generate a parameter change proposal transaction
+  #      description: Generate a parameter change proposal transaction
+  #      consumes:
+  #        - application/json
+  #      produces:
+  #        - application/json
+  #      tags:
+  #        - Governance
+  #      parameters:
+  #        - description: The parameter change proposal body that contains all parameter changes
+  #          name: post_proposal_body
+  #          in: body
+  #          required: true
+  #          schema:
+  #            type: object
+  #            properties:
+  #              base_req:
+  #                $ref: "#/definitions/BaseReq"
+  #              title:
+  #                type: string
+  #                x-example: "Param Change"
+  #              description:
+  #                type: string
+  #                x-example: "Update max validators"
+  #              proposer:
+  #                $ref: "#/definitions/Address"
+  #              deposit:
+  #                type: array
+  #                items:
+  #                  $ref: "#/definitions/Coin"
+  #              changes:
+  #                type: array
+  #                items:
+  #                  $ref: "#/definitions/ParamChange"
+  #      responses:
+  #        200:
+  #          description: The transaction was succesfully generated
+  #          schema:
+  #            $ref: "#/definitions/StdTx"
+  #        400:
+  #          description: Invalid proposal body
+  #        500:
+  #          description: Internal Server Error
+  #  /gov/proposals/{proposalId}:
+  #    get:
+  #      summary: Query a proposal
+  #      description: Query a proposal by id
+  #      produces:
+  #        - application/json
+  #      tags:
+  #        - Governance
+  #      parameters:
+  #        - type: string
+  #          name: proposalId
+  #          required: true
+  #          in: path
+  #          x-example: "2"
+  #      responses:
+  #        200:
+  #          description: OK
+  #          schema:
+  #            $ref: "#/definitions/TextProposal"
+  #        400:
+  #          description: Invalid proposal id
+  #        500:
+  #          description: Internal Server Error
+  #  /gov/proposals/{proposalId}/proposer:
+  #    get:
+  #      summary: Query proposer
+  #      description: Query for the proposer for a proposal
+  #      produces:
+  #        - application/json
+  #      tags:
+  #        - Governance
+  #      parameters:
+  #        - type: string
+  #          name: proposalId
+  #          required: true
+  #          in: path
+  #          x-example: "2"
+  #      responses:
+  #        200:
+  #          description: OK
+  #          schema:
+  #            $ref: "#/definitions/Proposer"
+  #        400:
+  #          description: Invalid proposal ID
+  #        500:
+  #          description: Internal Server Error
+  #  /gov/proposals/{proposalId}/deposits:
+  #    get:
+  #      summary: Query deposits
+  #      description: Query deposits by proposalId
+  #      produces:
+  #        - application/json
+  #      tags:
+  #        - Governance
+  #      parameters:
+  #        - type: string
+  #          name: proposalId
+  #          required: true
+  #          in: path
+  #          x-example: "2"
+  #      responses:
+  #        200:
+  #          description: OK
+  #          schema:
+  #            type: array
+  #            items:
+  #              $ref: "#/definitions/Deposit"
+  #        400:
+  #          description: Invalid proposal id
+  #        500:
+  #          description: Internal Server Error
+  #    post:
+  #      summary: Deposit tokens to a proposal
+  #      description: Send transaction to deposit tokens to a proposal
+  #      consumes:
+  #        - application/json
+  #      produces:
+  #        - application/json
+  #      tags:
+  #        - Governance
+  #      parameters:
+  #        - type: string
+  #          description: proposal id
+  #          name: proposalId
+  #          required: true
+  #          in: path
+  #          x-example: "2"
+  #        - description: ""
+  #          name: post_deposit_body
+  #          in: body
+  #          required: true
+  #          schema:
+  #            type: object
+  #            properties:
+  #              base_req:
+  #                $ref: "#/definitions/BaseReq"
+  #              depositor:
+  #                $ref: "#/definitions/Address"
+  #              amount:
+  #                type: array
+  #                items:
+  #                  $ref: "#/definitions/Coin"
+  #      responses:
+  #        200:
+  #          description: OK
+  #          schema:
+  #            $ref: "#/definitions/BroadcastTxCommitResult"
+  #        400:
+  #          description: Invalid proposal id or deposit body
+  #        401:
+  #          description: Key password is wrong
+  #        500:
+  #          description: Internal Server Error
+  #  /gov/proposals/{proposalId}/deposits/{depositor}:
+  #    get:
+  #      summary: Query deposit
+  #      description: Query deposit by proposalId and depositor address
+  #      produces:
+  #        - application/json
+  #      tags:
+  #        - Governance
+  #      parameters:
+  #        - type: string
+  #          description: proposal id
+  #          name: proposalId
+  #          required: true
+  #          in: path
+  #          x-example: "2"
+  #        - type: string
+  #          description: Bech32 depositor address
+  #          name: depositor
+  #          required: true
+  #          in: path
+  #          x-example: 1g7cl85hm2f9jkp7pp2cd5l7tkzzrmffjah9tsf
+  #      responses:
+  #        200:
+  #          description: OK
+  #          schema:
+  #            $ref: "#/definitions/Deposit"
+  #        400:
+  #          description: Invalid proposal id or depositor address
+  #        404:
+  #          description: Found no deposit
+  #        500:
+  #          description: Internal Server Error
+  #  /gov/proposals/{proposalId}/votes:
+  #    get:
+  #      summary: Query voters
+  #      description: Query voters information by proposalId
+  #      produces:
+  #        - application/json
+  #      tags:
+  #        - Governance
+  #      parameters:
+  #        - type: string
+  #          description: proposal id
+  #          name: proposalId
+  #          required: true
+  #          in: path
+  #          x-example: "2"
+  #      responses:
+  #        200:
+  #          description: OK
+  #          schema:
+  #            type: array
+  #            items:
+  #              $ref: "#/definitions/Vote"
+  #        400:
+  #          description: Invalid proposal id
+  #        500:
+  #          description: Internal Server Error
+  #    post:
+  #      summary: Vote a proposal
+  #      description: Send transaction to vote a proposal
+  #      consumes:
+  #        - application/json
+  #      produces:
+  #        - application/json
+  #      tags:
+  #        - Governance
+  #      parameters:
+  #        - type: string
+  #          description: proposal id
+  #          name: proposalId
+  #          required: true
+  #          in: path
+  #          x-example: "2"
+  #        - description: valid value of `"option"` field can be `"yes"`, `"no"`, `"no_with_veto"` and `"abstain"`
+  #          name: post_vote_body
+  #          in: body
+  #          required: true
+  #          schema:
+  #            type: object
+  #            properties:
+  #              base_req:
+  #                $ref: "#/definitions/BaseReq"
+  #              voter:
+  #                $ref: "#/definitions/Address"
+  #              option:
+  #                type: string
+  #                example: "yes"
+  #      responses:
+  #        200:
+  #          description: OK
+  #          schema:
+  #            $ref: "#/definitions/BroadcastTxCommitResult"
+  #        400:
+  #          description: Invalid proposal id or vote body
+  #        401:
+  #          description: Key password is wrong
+  #        500:
+  #          description: Internal Server Error
+  #  /gov/proposals/{proposalId}/votes/{voter}:
+  #    get:
+  #      summary: Query vote
+  #      description: Query vote information by proposal Id and voter address
+  #      produces:
+  #        - application/json
+  #      tags:
+  #        - Governance
+  #      parameters:
+  #        - type: string
+  #          description: proposal id
+  #          name: proposalId
+  #          required: true
+  #          in: path
+  #          x-example: "2"
+  #        - type: string
+  #          description: Bech32 voter address
+  #          name: voter
+  #          required: true
+  #          in: path
+  #          x-example: 1g7cl85hm2f9jkp7pp2cd5l7tkzzrmffjah9tsf
+  #      responses:
+  #        200:
+  #          description: OK
+  #          schema:
+  #            $ref: "#/definitions/Vote"
+  #        400:
+  #          description: Invalid proposal id or voter address
+  #        404:
+  #          description: Found no vote
+  #        500:
+  #          description: Internal Server Error
+  #  /gov/proposals/{proposalId}/tally:
+  #    get:
+  #      summary: Get a proposal's tally result at the current time
+  #      description: Gets a proposal's tally result at the current time. If the proposal is pending deposits (i.e status 'DepositPeriod') it returns an empty tally result.
+  #      produces:
+  #        - application/json
+  #      tags:
+  #        - Governance
+  #      parameters:
+  #        - type: string
+  #          description: proposal id
+  #          name: proposalId
+  #          required: true
+  #          in: path
+  #          x-example: "2"
+  #      responses:
+  #        200:
+  #          description: OK
+  #          schema:
+  #            $ref: "#/definitions/TallyResult"
+  #        400:
+  #          description: Invalid proposal id
+  #        500:
+  #          description: Internal Server Error
+  #  /gov/parameters/deposit:
+  #    get:
+  #      summary: Query governance deposit parameters
+  #      description: Query governance deposit parameters. The max_deposit_period units are in nanoseconds.
+  #      produces:
+  #        - application/json
+  #      tags:
+  #        - Governance
+  #      responses:
+  #        200:
+  #          description: OK
+  #          schema:
+  #            type: object
+  #            properties:
+  #              min_deposit:
+  #                type: array
+  #                items:
+  #                  $ref: "#/definitions/Coin"
+  #              max_deposit_period:
+  #                type: string
+  #                example: "86400000000000"
+  #        400:
+  #          description: <other_path> is not a valid query request path
+  #        404:
+  #          description: Found no deposit parameters
+  #        500:
+  #          description: Internal Server Error
+  #  /gov/parameters/tallying:
+  #    get:
+  #      summary: Query governance tally parameters
+  #      description: Query governance tally parameters
+  #      produces:
+  #        - application/json
+  #      tags:
+  #        - Governance
+  #      responses:
+  #        200:
+  #          description: OK
+  #          schema:
+  #            properties:
+  #              threshold:
+  #                type: string
+  #                example: "0.5000000000"
+  #              veto:
+  #                type: string
+  #                example: "0.3340000000"
+  #              governance_penalty:
+  #                type: string
+  #                example: "0.0100000000"
+  #        400:
+  #          description: <other_path> is not a valid query request path
+  #        404:
+  #          description: Found no tally parameters
+  #        500:
+  #          description: Internal Server Error
+  #  /gov/parameters/voting:
+  #    get:
+  #      summary: Query governance voting parameters
+  #      description: Query governance voting parameters. The voting_period units are in nanoseconds.
+  #      produces:
+  #        - application/json
+  #      tags:
+  #        - Governance
+  #      responses:
+  #        200:
+  #          description: OK
+  #          schema:
+  #            properties:
+  #              voting_period:
+  #                type: string
+  #                example: "86400000000000"
+  #        400:
+  #          description: <other_path> is not a valid query request path
+  #        404:
+  #          description: Found no voting parameters
+  #        500:
+  #          description: Internal Server Error
+  /supply/total:
+    get:
+      deprecated: true
+      summary: Total supply of coins in the chain
+      tags:
+        - Supply
+      produces:
+        - application/json
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: "#/definitions/Supply"
+        500:
+          description: Internal Server Error
+  /supply/total/{denomination}:
+    parameters:
+      - in: path
+        name: denomination
+        description: Coin denomination
+        required: true
+        type: string
+        x-example: uatom
+    get:
+      deprecated: true
+      summary: Total supply of a single coin denomination
+      tags:
+        - Supply
+      produces:
+        - application/json
+      responses:
+        200:
+          description: OK
+          schema:
+            type: string
+        400:
+          description: Invalid coin denomination
+        500:
+          description: Internal Server Error
+  "/token":
+    post:
+      deprecated: true
+      summary: Issue a token
+      tags:
+        - Token
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: token
+          required: true
+          schema:
+            type: object
+            properties:
+              base_req:
+                $ref: "#/definitions/BaseReq"
+              owner:
+                $ref: "#/definitions/Address"
+              name:
+                type: string
+                example: "Hello Kitty"
+              symbol:
+                type: string
+                example: "cat"
+              min_unit:
+                type: string
+                example: "min"
+              initial_supply:
+                type: string
+                example: "1000000000"
+              max_supply:
+                type: string
+                example: "2000000000"
+              scale:
+                type: integer
+                example: 18
+              mintable:
+                type: boolean
+                example: true
+      responses:
+        200:
+          description: Unsigned tx was succesfully generated
+        400:
+          description: Invalid parameters
+        500:
+          description: Internal Server Error
+    get:
+      deprecated: true
+      summary: Query tokens by owner
+      tags:
+        - Token
+      parameters:
+        - in: query
+          name: owner
+          description: the owner address
+          required: false
+          schema:
+            type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/Token"
+        400:
+          description: Invalid parameters
+        500:
+          description: Internal Server Error
+  "/token/tokens/{symbol}":
+    get:
+      deprecated: true
+      summary: Query a token by symbol
+      tags:
+        - Token
+      parameters:
+        - in: path
+          name: symbol
+          description: symbol of the token
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/Token"
+        400:
+          description: Invalid symbol
+        500:
+          description: Internal Server Error
+    put:
+      deprecated: true
+      summary: Edit an existing token
+      parameters:
+        - in: path
+          name: symbol
+          description: symbol of the token
+          required: true
+          schema:
+            type: string
+        - in: body
+          name: token
+          required: true
+          schema:
+            type: object
+            properties:
+              base_req:
+                $ref: "#/definitions/BaseReq"
+              owner:
+                $ref: "#/definitions/Address"
+              max_supply:
+                type: string
+                example: "21000000"
+              mintable:
+                type: string
+                example: ""
+              name:
+                type: string
+                example: "BTC Token"
+      tags:
+        - Token
+      responses:
+        200:
+          description: Unsigned tx was succesfully generated
+        400:
+          description: Invalid parameters
+        500:
+          description: Internal Server Error
+  "/token/tokens/{symbol}/mint":
+    post:
+      deprecated: true
+      summary: Mint tokens to a specified address
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: symbol
+          description: symbol of the token
+          required: true
+          schema:
+            type: string
+        - in: body
+          name: token
+          required: true
+          schema:
+            type: object
+            properties:
+              base_req:
+                $ref: "#/definitions/BaseReq"
+              owner:
+                $ref: "#/definitions/Address"
+              to:
+                $ref: "#/definitions/Address"
+              amount:
+                type: string
+                example: "21000000"
+      tags:
+        - Token
+      responses:
+        200:
+          description: Unsigned tx was succesfully generated
+        400:
+          description: Invalid parameters
+        500:
+          description: Internal Server Error
+  "/token/tokens/{symbol}/transfer":
+    post:
+      deprecated: true
+      summary: Transfer the ownership of the token to a new owner
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: symbol
+          description: symbol of the token
+          required: true
+          schema:
+            type: string
+        - in: body
+          name: transfer
+          required: true
+          schema:
+            type: object
+            properties:
+              base_req:
+                $ref: "#/definitions/BaseReq"
+              src_owner:
+                $ref: "#/definitions/Address"
+              dst_owner:
+                $ref: "#/definitions/Address"
+      tags:
+        - Token
+      responses:
+        200:
+          description: Unsigned tx was succesfully generated
+        400:
+          description: Invalid parameters
+        500:
+          description: Internal Server Error
+  "/token/tokens/{symbol}/fee":
+    get:
+      deprecated: true
+      summary: Query the fees for issuing and minting the token with the given symbol
+      tags:
+        - Token
+      parameters:
+        - in: path
+          name: symbol
+          description: the token symbol
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/TokenFeesOutput"
+        400:
+          description: Invalid symbol
+        500:
+          description: Internal Server Error
+  "/nft/nfts/mint":
+    post:
+      deprecated: true
+      summary: Mint an NFT to a specified address
+      tags:
+        - NFT
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: MintNFTReq
+          required: true
+          schema:
+            type: object
+            properties:
+              base_req:
+                $ref: "#/definitions/BaseReq"
+              owner:
+                $ref: "#/definitions/Address"
+                example: "iaa12jyx7smkhpzgjudh73gxmcgt9chxtpeue6y6cy"
+              recipient:
+                $ref: "#/definitions/Address"
+                example: "iaa12jyx7smkhpzgjudh73gxmcgt9chxtpeue6y6cy"
+              token_id:
+                type: string
+              token_uri:
+                type: string
+              denom:
+                type: string
+      responses:
+        200:
+          description: Unsigned tx was succesfully generated
+        400:
+          description: Invalid parameters
+        500:
+          description: Internal Server Error
+  "/nft/nfts/{denom}/{token-id}":
+    get:
+      deprecated: true
+      summary: Query an NFT by the denom and ID
+      tags:
+        - NFT
+      parameters:
+        - in: path
+          name: denom
+          description: denom of the NFT
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: token-id
+          description: ID of the NFT
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/NFT"
+        400:
+          description: Invalid parameters
+        500:
+          description: Internal Server Error
+    put:
+      deprecated: true
+      summary: Edit an NFT of the specified denom and ID
+      tags:
+        - NFT
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: denom
+          description: denom of the NFT
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: token-id
+          description: ID of the NFT
+          required: true
+          schema:
+            type: string
+        - in: body
+          name: EditNFTReq
+          required: true
+          schema:
+            type: object
+            properties:
+              base_req:
+                $ref: "#/definitions/BaseReq"
+              owner:
+                $ref: "#/definitions/Address"
+                example: "iaa12jyx7smkhpzgjudh73gxmcgt9chxtpeue6y6cy"
+              token_uri:
+                type: string
+      responses:
+        200:
+          description: Unsigned tx was succesfully generated
+        400:
+          description: Invalid parameters
+        500:
+          description: Internal Server Error
+  "/nft/nfts/{denom}/{token-id}/transfer":
+    post:
+      deprecated: true
+      summary: Transfer the ownership of an NFT of the specified denom and ID
+      tags:
+        - NFT
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: denom
+          description: denom of the NFT
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: token-id
+          description: ID of the NFT
+          required: true
+          schema:
+            type: string
+        - in: body
+          name: TransferNFTReq
+          required: true
+          schema:
+            type: object
+            properties:
+              base_req:
+                $ref: "#/definitions/BaseReq"
+              owner:
+                $ref: "#/definitions/Address"
+                example: "iaa12jyx7smkhpzgjudh73gxmcgt9chxtpeue6y6cy"
+              recipient:
+                $ref: "#/definitions/Address"
+                example: "iaa12jyx7smkhpzgjudh73gxmcgt9chxtpeue6y6cy"
+      responses:
+        200:
+          description: Unsigned tx was succesfully generated
+        400:
+          description: Invalid parameters
+        500:
+          description: Internal Server Error
+  "/nft/nfts/{denom}/{token-id}/burn":
+    post:
+      deprecated: true
+      summary: Burn an NFT of the specified denom and ID
+      tags:
+        - NFT
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: denom
+          description: denom of the NFT
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: token-id
+          description: ID of the NFT
+          required: true
+          schema:
+            type: string
+        - in: body
+          name: BurnNFTReq
+          required: true
+          schema:
+            type: object
+            properties:
+              base_req:
+                $ref: "#/definitions/BaseReq"
+              owner:
+                $ref: "#/definitions/Address"
+                example: "iaa12jyx7smkhpzgjudh73gxmcgt9chxtpeue6y6cy"
+      responses:
+        200:
+          description: Unsigned tx was succesfully generated
+        400:
+          description: Invalid parameters
+        500:
+          description: Internal Server Error
+  "/nft/nfts/collections/{denom}":
+    get:
+      deprecated: true
+      summary: Query the NFT collection of the specified denom
+      tags:
+        - NFT
+      parameters:
+        - in: path
+          name: denom
+          description: denom of the collection
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+        400:
+          description: Invalid parameters
+        500:
+          description: Internal Server Error
+  "/nft/nfts/owners/{address}":
+    get:
+      deprecated: true
+      summary: Query the collections of NFTs owned by an address
+      tags:
+        - NFT
+      parameters:
+        - in: path
+          name: address
+          description: owner address
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: denom
+          description: optional denom
+          required: false
+          schema:
+            type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/definitions/NFTOwner"
+        400:
+          description: Invalid parameters
+        500:
+          description: Internal Server Error
+  "/nft/nfts/denoms":
+    get:
+      deprecated: true
+      summary: Query all existing denoms
+      tags:
+        - NFT
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+        400:
+          description: Invalid parameters
+        500:
+          description: Internal Server Error
+  "/nft/nfts/supplies/{denom}":
+    get:
+      deprecated: true
+      summary: Query the supply of NFTs of the specified denom
+      tags:
+        - NFT
+      parameters:
+        - in: path
+          name: denom
+          description: denom of NFTs
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: integer
+        400:
+          description: Invalid parameters
+        500:
+          description: Internal Server Error
+  "/record/records":
+    post:
+      deprecated: true
+      summary: Create a record
+      tags:
+        - Record
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: record
+          required: true
+          schema:
+            type: object
+            properties:
+              base_req:
+                $ref: "#/definitions/BaseReq"
+              contents:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    digest:
+                      type: string
+                    digest_algo:
+                      type: string
+                      example: "SHA256"
+                    uri:
+                      type: string
+                    meta:
+                      type: string
+              creator:
+                $ref: "#/definitions/Address"
+      responses:
+        200:
+          description: Unsigned tx was succesfully generated
+        400:
+          description: Invalid parameters
+        500:
+          description: Internal Server Error
+  "/record/records/{record-id}":
+    get:
+      deprecated: true
+      summary: Query a record by id
+      tags:
+        - Record
+      parameters:
+        - in: path
+          name: record-id
+          description: id of the record
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tx_hash:
+                    type: string
+                  contents:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        digest:
+                          type: string
+                        digest_algo:
+                          type: string
+                          example: "SHA256"
+                        uri:
+                          type: string
+                        meta:
+                          type: string
+                  creator:
+                    $ref: "#/definitions/Address"
+        400:
+          description: Invalid symbol
+        500:
+          description: Internal Server Error
+  "/service/definitions":
+    post:
+      deprecated: true
+      summary: Define a service
+      description: Define a service with JSON schemas
+      tags:
+        - Service
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: DefineServiceReq
+          required: true
+          schema:
+            type: object
+            properties:
+              base_req:
+                $ref: "#/definitions/BaseReq"
+              name:
+                type: string
+              description:
+                type: string
+              tags:
+                type: array
+                items:
+                  type: string
+              author:
+                $ref: "#/definitions/Address"
+              author_description:
+                type: string
+              schemas:
+                type: string
+                example: '{"input":{"type":"object"},"output":{"type":"object"}}'
+      responses:
+        "200":
+          description: Unsigned tx was succesfully generated
+        "400":
+          description: Invalid parameters
+        "500":
+          description: Internal Server Error
+  "/service/definitions/{service-name}":
+    get:
+      deprecated: true
+      summary: Query a service definition
+      tags:
+        - Service
+      parameters:
+        - in: path
+          name: service-name
+          description: service name
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/ServiceDefinition"
+        "400":
+          description: Invalid parameters
+        "500":
+          description: Internal Server Error
+  "/service/bindings":
+    post:
+      deprecated: true
+      summary: Bind a service
+      description: Bind a service
+      tags:
+        - Service
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: BindServiceReq
+          required: true
+          schema:
+            type: object
+            properties:
+              base_req:
+                $ref: "#/definitions/BaseReq"
+              service_name:
+                type: string
+              provider:
+                $ref: "#/definitions/Address"
+              deposit:
+                type: string
+                example: "10000iris"
+              pricing:
+                type: string
+                example: '{"price":"1iris"}'
+              min_resp_time:
+                type: integer
+                example: "50"
+      responses:
+        "200":
+          description: Unsigned tx was succesfully generated
+        "400":
+          description: Invalid parameters
+        "500":
+          description: Internal Server Error
+  "/service/bindings/{service-name}/{provider}":
+    get:
+      deprecated: true
+      summary: Query a service binding
+      tags:
+        - Service
+      parameters:
+        - in: path
+          name: service-name
+          description: service name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: provider
+          description: provider address
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/ServiceBinding"
+        "400":
+          description: Invalid parameters
+        "500":
+          description: Internal Server Error
+    put:
+      deprecated: true
+      summary: Update a service binding
+      description: Update a service binding
+      tags:
+        - Service
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: service-name
+          description: service name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: provider
+          description: provider address
+          required: true
+          schema:
+            type: string
+        - in: body
+          name: UpdateServiceBindingReq
+          required: true
+          schema:
+            type: object
+            properties:
+              base_req:
+                $ref: "#/definitions/BaseReq"
+              deposit:
+                type: string
+                example: "1iris"
+              pricing:
+                type: string
+                example: '{"price":"1iris"}'
+              min_resp_time:
+                type: integer
+                example: "50"
+      responses:
+        "200":
+          description: Unsigned tx was succesfully generated
+        "400":
+          description: Invalid parameters
+        "500":
+          description: Internal Server Error
+  "/service/bindings/{service-name}":
+    get:
+      deprecated: true
+      summary: Query all bindings of a service definition
+      tags:
+        - Service
+      parameters:
+        - in: path
+          name: service-name
+          description: service name
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/definitions/ServiceBinding"
+        "400":
+          description: Invalid parameters
+        "500":
+          description: Internal Server Error
+  "/service/providers/{provider}/withdraw-address":
+    get:
+      deprecated: true
+      summary: Query the withdrawal address of a provider
+      tags:
+        - Service
+      parameters:
+        - in: path
+          name: provider
+          description: provider address
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: "#/definitions/Address"
+        "400":
+          description: Invalid parameters
+        "500":
+          description: Internal Server Error
+    post:
+      deprecated: true
+      summary: Set a withdrawal address for a provider
+      tags:
+        - Service
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: provider
+          description: provider adress
+          required: true
+          schema:
+            type: string
+        - in: body
+          name: SetWithdrawAddrReq
+          required: true
+          schema:
+            type: object
+            properties:
+              base_req:
+                $ref: "#/definitions/BaseReq"
+              withdraw_address:
+                $ref: "#/definitions/Address"
+      responses:
+        "200":
+          description: Unsigned tx was succesfully generated
+        "400":
+          description: Invalid parameters
+        "500":
+          description: Internal Server Error
+  "/service/bindings/{service-name}/{provider}/disable":
+    post:
+      deprecated: true
+      summary: Disable an available service binding
+      description: Disable an available service binding by the service name and provider
+      tags:
+        - Service
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: service-name
+          description: service name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: provider
+          description: provider address
+          required: true
+          schema:
+            type: string
+        - in: body
+          name: DisableServiceBindingReq
+          required: true
+          schema:
+            type: object
+            properties:
+              base_req:
+                $ref: "#/definitions/BaseReq"
+      responses:
+        "200":
+          description: Unsigned tx was succesfully generated
+        "400":
+          description: Invalid parameters
+        "500":
+          description: Internal Server Error
+  "/service/bindings/{service-name}/{provider}/enable":
+    post:
+      deprecated: true
+      summary: Enable an unavailable service binding
+      description: Enable an unavailable service binding by the service name and provider
+      tags:
+        - Service
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: service-name
+          description: service name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: provider
+          description: provider address
+          required: true
+          schema:
+            type: string
+        - in: body
+          name: EnableServiceBindingReq
+          required: true
+          schema:
+            type: object
+            properties:
+              base_req:
+                $ref: "#/definitions/BaseReq"
+              deposit:
+                type: string
+                example: "1iris"
+      responses:
+        "200":
+          description: Unsigned tx was succesfully generated
+        "400":
+          description: Invalid parameters
+        "500":
+          description: Internal Server Error
+  "/service/bindings/{service-name}/{provider}/refund-deposit":
+    post:
+      deprecated: true
+      summary: Refund all deposit from a service binding
+      description: Refund all deposit from a service binding
+      tags:
+        - Service
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: service-name
+          description: service name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: provider
+          description: provider address
+          required: true
+          schema:
+            type: string
+        - in: body
+          name: RefundServiceDepositReq
+          required: true
+          schema:
+            type: object
+            properties:
+              base_req:
+                $ref: "#/definitions/BaseReq"
+      responses:
+        "200":
+          description: Unsigned tx was succesfully generated
+        "400":
+          description: Invalid parameters
+        "500":
+          description: Internal Server Error
+  "/service/contexts":
+    post:
+      deprecated: true
+      summary: Initiate a service call
+      description: Initiate a service call with the specified params
+      tags:
+        - Service
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: CallServiceReq
+          required: true
+          schema:
+            type: object
+            properties:
+              base_req:
+                $ref: "#/definitions/BaseReq"
+              service_name:
+                type: string
+              providers:
+                type: array
+                items:
+                  $ref: "#/definitions/Address"
+              consumer:
+                $ref: "#/definitions/Address"
+              input:
+                type: string
+                example: '{"id":1}'
+              service_fee_cap:
+                type: string
+                example: "1iris"
+              timeout:
+                type: integer
+                example: "20"
+              super_mode:
+                type: boolean
+                example: false
+              repeated:
+                type: boolean
+                example: true
+              repeated_frequency:
+                type: integer
+                example: "50"
+              repeated_total:
+                type: integer
+                example: "100"
+      responses:
+        "200":
+          description: Unsigned tx was succesfully generated
+        "400":
+          description: Invalid parameters
+        "500":
+          description: Internal Server Error
+  "/service/contexts/{request-context-id}":
+    get:
+      deprecated: true
+      summary: Query a request context
+      tags:
+        - Service
+      parameters:
+        - in: path
+          name: request-context-id
+          description: request context ID
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/RequestContext"
+        "400":
+          description: Invalid parameters
+        "500":
+          description: Internal Server Error
+    put:
+      deprecated: true
+      summary: Update a request context
+      description: Update a request context
+      tags:
+        - Service
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: request-context-id
+          description: request context ID
+          required: true
+          schema:
+            type: string
+        - in: body
+          name: UpdateRequestContextReq
+          required: true
+          schema:
+            type: object
+            properties:
+              base_req:
+                $ref: "#/definitions/BaseReq"
+              providers:
+                type: array
+                items:
+                  $ref: "#/definitions/Address"
+              service_fee_cap:
+                type: string
+                example: "1iris"
+              timeout:
+                type: integer
+                example: "0"
+              repeated_frequency:
+                type: integer
+                example: "0"
+              repeated_total:
+                type: integer
+                example: "0"
+              consumer:
+                $ref: "#/definitions/Address"
+      responses:
+        "200":
+          description: Unsigned tx was succesfully generated
+        "400":
+          description: Invalid parameters
+        "500":
+          description: Internal Server Error
+  "/service/contexts/{request-context-id}/pause":
+    post:
+      deprecated: true
+      summary: Pause a running request context
+      description: Pause a running request context
+      tags:
+        - Service
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: request-context-id
+          description: request context ID
+          required: true
+          schema:
+            type: string
+        - in: body
+          name: PauseRequestContextReq
+          required: true
+          schema:
+            type: object
+            properties:
+              base_req:
+                $ref: "#/definitions/BaseReq"
+              consumer:
+                $ref: "#/definitions/Address"
+      responses:
+        "200":
+          description: Unsigned tx was succesfully generated
+        "400":
+          description: Invalid parameters
+        "500":
+          description: Internal Server Error
+  "/service/contexts/{request-context-id}/start":
+    post:
+      deprecated: true
+      summary: Start a paused request context
+      description: Start a paused request context
+      tags:
+        - Service
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: request-context-id
+          description: request context ID
+          required: true
+          schema:
+            type: string
+        - in: body
+          name: StartRequestContextReq
+          required: true
+          schema:
+            type: object
+            properties:
+              base_req:
+                $ref: "#/definitions/BaseReq"
+              consumer:
+                $ref: "#/definitions/Address"
+      responses:
+        "200":
+          description: Unsigned tx was succesfully generated
+        "400":
+          description: Invalid parameters
+        "500":
+          description: Internal Server Error
+  "/service/contexts/{request-context-id}/kill":
+    post:
+      deprecated: true
+      summary: Terminate a request context
+      description: Terminate a request context
+      tags:
+        - Service
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: request-context-id
+          description: request context ID
+          required: true
+          schema:
+            type: string
+        - in: body
+          name: KillRequestContextReq
+          required: true
+          schema:
+            type: object
+            properties:
+              base_req:
+                $ref: "#/definitions/BaseReq"
+              consumer:
+                $ref: "#/definitions/Address"
+      responses:
+        "200":
+          description: Unsigned tx was succesfully generated
+        "400":
+          description: Invalid parameters
+        "500":
+          description: Internal Server Error
+  "/service/requests/{request-id}":
+    get:
+      deprecated: true
+      summary: Query a request by the request ID
+      tags:
+        - Service
+      parameters:
+        - in: path
+          name: request-id
+          description: request ID
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/ServiceRequest"
+        "400":
+          description: Invalid parameters
+        "500":
+          description: Internal Server Error
+  "/service/requests/{service-name}/{provider}":
+    get:
+      deprecated: true
+      summary: Query active requests of a service binding
+      tags:
+        - Service
+      parameters:
+        - in: path
+          name: service-name
+          description: service name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: provider
+          description: provider address
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/definitions/ServiceRequest"
+        "400":
+          description: Invalid parameters
+        "500":
+          description: Internal Server Error
+  "/service/responses":
+    post:
+      deprecated: true
+      summary: Respond to a service request
+      description: Respond to a service request by the request ID
+      tags:
+        - Service
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: RespondServiceReq
+          required: true
+          schema:
+            type: object
+            properties:
+              base_req:
+                $ref: "#/definitions/BaseReq"
+              request_id:
+                type: string
+              provider:
+                $ref: "#/definitions/Address"
+              result:
+                type: string
+                example: '{"code":200,"message":""}'
+              output:
+                type: string
+                example: '{"name":"irisnet"}'
+      responses:
+        "200":
+          description: Unsigned tx was succesfully generated
+        "400":
+          description: Invalid parameters
+        "500":
+          description: Internal Server Error
+  "/service/responses/{request-id}":
+    get:
+      deprecated: true
+      summary: Query a response by the request ID
+      tags:
+        - Service
+      parameters:
+        - in: path
+          name: request-id
+          description: request ID
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/ServiceResponse"
+        "400":
+          description: Invalid parameters
+        "500":
+          description: Internal Server Error
+  "/service/requests/{request-context-id}/{batch-counter}":
+    get:
+      deprecated: true
+      summary: Query active requests by the request context ID and batch counter
+      tags:
+        - Service
+      parameters:
+        - in: path
+          name: request-context-id
+          description: request context ID
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: batch-counter
+          description: batch counter
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/definitions/ServiceRequest"
+        "400":
+          description: Invalid parameters
+        "500":
+          description: Internal Server Error
+  "/service/responses/{request-context-id}/{batch-counter}":
+    get:
+      deprecated: true
+      summary: Query active responses by the request context ID and batch counter
+      tags:
+        - Service
+      parameters:
+        - in: path
+          name: request-context-id
+          description: request context ID
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: batch-counter
+          description: batch counter
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/definitions/ServiceResponse"
+        "400":
+          description: Invalid parameters
+        "500":
+          description: Internal Server Error
+  "/service/fees/{provider}/withdraw":
+    post:
+      deprecated: true
+      summary: Withdraw the earned fees of a provider
+      description: Withdraw the earned fees of a provider
+      tags:
+        - Service
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: provider
+          description: provider address
+          required: true
+          schema:
+            type: string
+        - in: body
+          name: WithdrawEarnedFeesReq
+          required: true
+          schema:
+            type: object
+            properties:
+              base_req:
+                $ref: "#/definitions/BaseReq"
+      responses:
+        "200":
+          description: Unsigned tx was succesfully generated
+        "400":
+          description: Invalid parameters
+        "500":
+          description: Internal Server Error
+  "/service/fees/{provider}":
+    get:
+      deprecated: true
+      summary: Query the earned fees of a provider
+      tags:
+        - Service
+      parameters:
+        - in: path
+          name: provider
+          description: provider
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/EarnedFees"
+        "400":
+          description: Invalid parameters
+        "500":
+          description: Internal Server Error
+  "/service/schemas/{schema-name}":
+    get:
+      deprecated: true
+      summary: Query the system schema by the schema name
+      tags:
+        - Service
+      parameters:
+        - in: path
+          name: schema-name
+          description: schema name, only pricing and result allowed
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Invalid parameters
+        "500":
+          description: Internal Server Error
+  "/identity/identities":
+    post:
+      deprecated: true
+      summary: Create an identity
+      tags:
+        - Identity
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: CreateIdentityReq
+          required: true
+          schema:
+            type: object
+            properties:
+              base_req:
+                $ref: "#/definitions/BaseReq"
+              id:
+                type: string
+                example: "2c4355bcceef470b823ca0fe24a2d900"
+              pubkey:
+                type: string
+                example: "02fdf3dde4468dad14138acc85e0152ee1ee08750627df5dd5c17a1013fe5d59ea"
+              pubkey_algo:
+                type: string
+                example: "ECDSA"
+              certificate:
+                type: string
+              credentials:
+                type: string
+                example: "https://kyc.com/user/10001"
+              owner:
+                $ref: "#/definitions/Address"
+      responses:
+        200:
+          description: Unsigned tx was succesfully generated
+        400:
+          description: Invalid parameters
+        500:
+          description: Internal Server Error
+  "/identity/identities/{id}":
+    get:
+      deprecated: true
+      summary: Query an identity
+      tags:
+        - Identity
+      parameters:
+        - in: path
+          name: id
+          description: ID of the identity
+          required: true
+          schema:
+            type: string
+            example: "2c4355bcceef470b823ca0fe24a2d900"
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/Identity"
+        400:
+          description: Invalid ID
+        500:
+          description: Internal Server Error
+    put:
+      deprecated: true
+      summary: Update an identity
+      tags:
+        - Identity
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: id
+          description: ID of the identity
+          required: true
+          schema:
+            type: string
+            example: "2c4355bcceef470b823ca0fe24a2d900"
+        - in: body
+          name: UpdateIdentityReq
+          required: true
+          schema:
+            type: object
+            properties:
+              base_req:
+                $ref: "#/definitions/BaseReq"
+              pubkey:
+                type: string
+                example: "02fdf3dde4468dad14138acc85e0152ee1ee08750627df5dd5c17a1013fe5d59ea"
+              pubkey_algo:
+                type: string
+                example: "ECDSA"
+              certificate:
+                type: string
+              credentials:
+                type: string
+                example: "https://kyc.com/user/10001"
+              owner:
+                $ref: "#/definitions/Address"
+      responses:
+        200:
+          description: Unsigned tx was succesfully generated
+        400:
+          description: Invalid parameters
+        500:
+          description: Internal Server Error
+definitions:
+  CheckTxResult:
+    type: object
+    properties:
+      code:
+        type: integer
+      data:
+        type: string
+      gas_used:
+        type: integer
+      gas_wanted:
+        type: integer
+      info:
+        type: string
+      log:
+        type: string
+      tags:
+        type: array
+        items:
+          $ref: "#/definitions/KVPair"
+    example:
+      code: 0
+      data: data
+      log: log
+      gas_used: 5000
+      gas_wanted: 10000
+      info: info
+      tags:
+        - ""
+        - ""
+  DeliverTxResult:
+    type: object
+    properties:
+      code:
+        type: integer
+      data:
+        type: string
+      gas_used:
+        type: integer
+      gas_wanted:
+        type: integer
+      info:
+        type: string
+      log:
+        type: string
+      tags:
+        type: array
+        items:
+          $ref: "#/definitions/KVPair"
+    example:
+      code: 5
+      data: data
+      log: log
+      gas_used: 5000
+      gas_wanted: 10000
+      info: info
+      tags:
+        - ""
+        - ""
+  BroadcastTxCommitResult:
+    type: object
+    properties:
+      check_tx:
+        $ref: "#/definitions/CheckTxResult"
+      deliver_tx:
+        $ref: "#/definitions/DeliverTxResult"
+      hash:
+        $ref: "#/definitions/Hash"
+      height:
+        type: integer
+  KVPair:
+    type: object
+    properties:
+      key:
+        type: string
+      value:
+        type: string
+  Msg:
+    type: string
+  Address:
+    type: string
+    description: bech32 encoded address
+    example: iaa1g7cl85hm2f9jkp7pp2cd5l7tkzzrmffjah9tsf
+  ValidatorAddress:
+    type: string
+    description: bech32 encoded address
+    example: iva1zx9jugxl5nzggdgzmut8adnc8rgwztm0dyez3r
+  Coin:
+    type: object
+    properties:
+      denom:
+        type: string
+        example: point
+      amount:
+        type: string
+        example: "50"
+  Hash:
+    type: string
+    example: EE5F3404034C524501629B56E0DDC38FAD651F04
+  TxQuery:
+    type: object
+    properties:
+      hash:
+        type: string
+        example: "D085138D913993919295FF4B0A9107F1F2CDE0D37A87CE0644E217CBF3B49656"
+      height:
+        type: number
+        example: 368
+      tx:
+        $ref: "#/definitions/StdTx"
+      result:
+        type: object
+        properties:
+          log:
+            type: string
+          gas_wanted:
+            type: string
+            example: "200000"
+          gas_used:
+            type: string
+            example: "26354"
+          tags:
+            type: array
+            items:
+              $ref: "#/definitions/KVPair"
+  PaginatedQueryTxs:
+    type: object
+    properties:
+      total_count:
+        type: number
+        example: 1
+      count:
+        type: number
+        example: 1
+      page_number:
+        type: number
+        example: 1
+      page_total:
+        type: number
+        example: 1
+      limit:
+        type: number
+        example: 30
+      txs:
+        type: array
+        items:
+          $ref: "#/definitions/TxQuery"
+  StdTx:
+    type: object
+    properties:
+      msg:
+        type: array
+        items:
+          $ref: "#/definitions/Msg"
+      fee:
+        type: object
+        properties:
+          gas:
+            type: string
+          amount:
+            type: array
+            items:
+              $ref: "#/definitions/Coin"
+      memo:
+        type: string
+      signature:
+        type: object
+        properties:
+          signature:
+            type: string
+            example: MEUCIQD02fsDPra8MtbRsyB1w7bqTM55Wu138zQbFcWx4+CFyAIge5WNPfKIuvzBZ69MyqHsqD8S1IwiEp+iUb6VSdtlpgY=
+          pub_key:
+            type: object
+            properties:
+              type:
+                type: string
+                example: "tendermint/PubKeySecp256k1"
+              value:
+                type: string
+                example: "Avz04VhtKJh8ACCVzlI8aTosGy0ikFXKIVHQ3jKMrosH"
+          account_number:
+            type: string
+            example: "0"
+          sequence:
+            type: string
+            example: "0"
+  BlockID:
+    type: object
+    properties:
+      hash:
+        $ref: "#/definitions/Hash"
+      parts:
+        type: object
+        properties:
+          total:
+            type: number
+            example: 0
+          hash:
+            $ref: "#/definitions/Hash"
+  BlockHeader:
+    type: object
+    properties:
+      chain_id:
+        type: string
+        example: IRISHub
+      height:
+        type: number
+        example: 1
+      time:
+        type: string
+        example: "2017-12-30T05:53:09.287+01:00"
+      num_txs:
+        type: number
+        example: 0
+      last_block_id:
+        $ref: "#/definitions/BlockID"
+      total_txs:
+        type: number
+        example: 35
+      last_commit_hash:
+        $ref: "#/definitions/Hash"
+      data_hash:
+        $ref: "#/definitions/Hash"
+      validators_hash:
+        $ref: "#/definitions/Hash"
+      next_validators_hash:
+        $ref: "#/definitions/Hash"
+      consensus_hash:
+        $ref: "#/definitions/Hash"
+      app_hash:
+        $ref: "#/definitions/Hash"
+      last_results_hash:
+        $ref: "#/definitions/Hash"
+      evidence_hash:
+        $ref: "#/definitions/Hash"
+      proposer_address:
+        $ref: "#/definitions/Address"
+      version:
+        type: object
+        properties:
+          block:
+            type: string
+            example: 10
+          app:
+            type: string
+            example: 0
+  Block:
+    type: object
+    properties:
+      header:
+        $ref: "#/definitions/BlockHeader"
+      txs:
+        type: array
+        items:
+          type: string
+      evidence:
+        type: array
+        items:
+          type: string
+      last_commit:
+        type: object
+        properties:
+          block_id:
+            $ref: "#/definitions/BlockID"
+          precommits:
+            type: array
+            items:
+              type: object
+              properties:
+                validator_address:
+                  type: string
+                validator_index:
+                  type: string
+                  example: "0"
+                height:
+                  type: string
+                  example: "0"
+                round:
+                  type: string
+                  example: "0"
+                timestamp:
+                  type: string
+                  example: "2017-12-30T05:53:09.287+01:00"
+                type:
+                  type: number
+                  example: 2
+                block_id:
+                  $ref: "#/definitions/BlockID"
+                signature:
+                  type: string
+                  example: "7uTC74QlknqYWEwg7Vn6M8Om7FuZ0EO4bjvuj6rwH1mTUJrRuMMZvAAqT9VjNgP0RA/TDp6u/92AqrZfXJSpBQ=="
+  BlockQuery:
+    type: object
+    properties:
+      block_meta:
+        type: object
+        properties:
+          header:
+            $ref: "#/definitions/BlockHeader"
+          block_id:
+            $ref: "#/definitions/BlockID"
+      block:
+        $ref: "#/definitions/Block"
+  DelegationDelegatorReward:
+    type: object
+    properties:
+      validator_address:
+        $ref: "#/definitions/ValidatorAddress"
+      reward:
+        type: array
+        items:
+          $ref: "#/definitions/Coin"
+  DelegatorTotalRewards:
+    type: object
+    properties:
+      rewards:
+        type: array
+        items:
+          $ref: "#/definitions/DelegationDelegatorReward"
+      total:
+        type: array
+        items:
+          $ref: "#/definitions/Coin"
+  BaseReq:
+    type: object
+    properties:
+      from:
+        type: string
+        example: "iaa12jyx7smkhpzgjudh73gxmcgt9chxtpeue6y6cy"
+        description: Sender address or Keybase name to generate a transaction
+      memo:
+        type: string
+        example: "Sent via IRISHub"
+      chain_id:
+        type: string
+        example: "IRISHub"
+      account_number:
+        type: string
+        example: "0"
+      sequence:
+        type: string
+        example: "1"
+      gas:
+        type: string
+        example: "200000"
+      gas_adjustment:
+        type: string
+        example: "1.2"
+      fees:
+        type: array
+        items:
+          $ref: "#/definitions/Coin"
+      simulate:
+        type: boolean
+        example: false
+        description: Estimate gas for a transaction (cannot be used in conjunction with generate_only)
+  TendermintValidator:
+    type: object
+    properties:
+      address:
+        $ref: "#/definitions/ValidatorAddress"
+      pub_key:
+        type: string
+        example: icp1ulx45dfpqr6dfashqwasg835vvuz25f7v827w0sxcl028ywktr5l0ct938h3cslc5nf
+      voting_power:
+        type: string
+        example: "1000"
+      proposer_priority:
+        type: string
+        example: "1000"
+  TextProposal:
+    type: object
+    properties:
+      proposal_id:
+        type: integer
+      title:
+        type: string
+      description:
+        type: string
+      proposal_type:
+        type: string
+      proposal_status:
+        type: string
+      final_tally_result:
+        $ref: "#/definitions/TallyResult"
+      submit_time:
+        type: string
+      total_deposit:
+        type: array
+        items:
+          $ref: "#/definitions/Coin"
+      voting_start_time:
+        type: string
+  Proposer:
+    type: object
+    properties:
+      proposal_id:
+        type: string
+      proposer:
+        type: string
+  Deposit:
+    type: object
+    properties:
+      amount:
+        type: array
+        items:
+          $ref: "#/definitions/Coin"
+      proposal_id:
+        type: string
+      depositor:
+        $ref: "#/definitions/Address"
+  TallyResult:
+    type: object
+    properties:
+      yes:
+        type: string
+        example: "0.0000000000"
+      abstain:
+        type: string
+        example: "0.0000000000"
+      no:
+        type: string
+        example: "0.0000000000"
+      no_with_veto:
+        type: string
+        example: "0.0000000000"
+  Vote:
+    type: object
+    properties:
+      voter:
+        type: string
+      proposal_id:
+        type: string
+      option:
+        type: string
+  Validator:
+    type: object
+    properties:
+      name:
+        type: string
+      moniker:
+        type: string
+      pubkey:
+        type: string
+      power:
+        type: integer
+      details:
+        type: string
+      jailed:
+        type: boolean
+      Operator:
+        $ref: "#/definitions/Address"
+  PublicKey:
+    type: object
+    properties:
+      type:
+        type: string
+      value:
+        type: string
+  ParamChange:
+    type: object
+    properties:
+      subspace:
+        type: string
+        example: "staking"
+      key:
+        type: string
+        example: "MaxValidators"
+      subkey:
+        type: string
+        example: ""
+      value:
+        type: object
+  Supply:
+    type: object
+    properties:
+      total:
+        type: array
+        items:
+          $ref: "#/definitions/Coin"
+  Token:
+    type: object
+    properties:
+      symbol:
+        type: string
+      name:
+        type: string
+      min_unit:
+        type: string
+      scale:
+        type: integer
+      initial_supply:
+        type: string
+      max_supply:
+        type: string
+      mintable:
+        type: boolean
+      owner:
+        $ref: "#/definitions/Address"
+  TokenFeesOutput:
+    type: object
+    properties:
+      exist:
+        type: boolean
+      issue_fee:
+        $ref: "#/definitions/Coin"
+      mint_fee:
+        $ref: "#/definitions/Coin"
+  NFT:
+    type: object
+    properties:
+      id:
+        type: string
+      owner:
+        $ref: "#/definitions/Address"
+      token_uri:
+        type: string
+  IDCollection:
+    type: object
+    properties:
+      denom:
+        type: string
+      IDs:
+        type: array
+        items:
+          type: string
+  NFTOwner:
+    type: object
+    properties:
+      address:
+        $ref: "#/definitions/Address"
+      id_collections:
+        type: array
+        items:
+          $ref: "#/definitions/IDCollection"
+  ServiceDefinition:
+    type: object
+    properties:
+      name:
+        type: string
+      description:
+        type: string
+      tags:
+        type: array
+        items:
+          type: string
+      author:
+        $ref: "#/definitions/Address"
+      author_description:
+        type: string
+      schemas:
+        type: string
+        example: '{"input":{"type":"object"},"output":{"type":"object"},"error":{"type":"object"}}'
+  ServiceBinding:
+    type: object
+    properties:
+      service_name:
+        type: string
+      provider:
+        $ref: "#/definitions/Address"
+      deposit:
+        type: array
+        items:
+          $ref: "#/definitions/Coin"
+      pricing:
+        type: string
+        example: '{"price":"1iris"}'
+      min_resp_time:
+        type: integer
+      available:
+        type: boolean
+      disabled_time:
+        type: string
+  ServiceRequest:
+    type: object
+    properties:
+      service_name:
+        type: string
+      provider:
+        $ref: "#/definitions/Address"
+      consumer:
+        $ref: "#/definitions/Address"
+      input:
+        type: string
+        example: '{"id":1}'
+      service_fee:
+        type: array
+        items:
+          $ref: "#/definitions/Coin"
+      super_mode:
+        type: boolean
+      request_height:
+        type: integer
+      expiration_height:
+        type: integer
+      request_context_id:
+        type: string
+      request_context_batch_counter:
+        type: integer
+  ServiceResponse:
+    type: object
+    properties:
+      provider:
+        $ref: "#/definitions/Address"
+      consumer:
+        $ref: "#/definitions/Address"
+      result:
+        type: string
+        example: '{"code":200,"message":""}'
+      output:
+        type: string
+        example: '{"name":"irisnet"}'
+      request_context_id:
+        type: string
+      request_context_batch_counter:
+        type: integer
+  RequestContext:
+    type: object
+    properties:
+      service_name:
+        type: string
+      providers:
+        type: array
+        items:
+          $ref: "#/definitions/Address"
+      consumer:
+        $ref: "#/definitions/Address"
+      input:
+        type: string
+        example: '{"id":1}'
+      service_fee_cap:
+        type: array
+        items:
+          $ref: "#/definitions/Coin"
+      timeout:
+        type: integer
+      super_mode:
+        type: boolean
+      repeated:
+        type: boolean
+      repeated_frequency:
+        type: integer
+      repeated_total:
+        type: integer
+      batch_counter:
+        type: integer
+      batch_request_count:
+        type: integer
+      batch_response_count:
+        type: integer
+      batch_response_threshold:
+        type: integer
+      batch_state:
+        type: string
+      state:
+        type: string
+      response_threshold:
+        type: integer
+      module_name:
+        type: string
+  EarnedFees:
+    type: object
+    properties:
+      address:
+        $ref: "#/definitions/Address"
+      coins:
+        type: array
+        items:
+          $ref: "#/definitions/Coin"
+  Identity:
+    type: object
+    properties:
+      id:
+        type: string
+        example: "2c4355bcceef470b823ca0fe24a2d900"
+      pubkeys:
+        type: array
+        items:
+          type: object
+          properties:
+            pubkey:
+              type: string
+              example: "02fdf3dde4468dad14138acc85e0152ee1ee08750627df5dd5c17a1013fe5d59ea"
+            algorithm:
+              type: string
+              example: "ECDSA"
+      certificates:
+        type: array
+        items:
+          type: string
+      credentials:
+        type: string
+        example: "https://kyc.com/user/10001"
+      owner:
+        $ref: "#/definitions/Address"

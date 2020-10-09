@@ -79,8 +79,10 @@ func (app *IrisApp) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs [
 
 	// withdraw all delegator rewards
 	dels := app.stakingKeeper.GetAllDelegations(ctx)
-	for _, delegation := range dels {
-		_, _ = app.distrKeeper.WithdrawDelegationRewards(ctx, delegation.DelegatorAddress, delegation.ValidatorAddress)
+	for _, del := range dels {
+		delegatorAddress, _ := sdk.AccAddressFromBech32(del.DelegatorAddress)
+		validatorAddress, _ := sdk.ValAddressFromBech32(del.ValidatorAddress)
+		_, _ = app.distrKeeper.WithdrawDelegationRewards(ctx, delegatorAddress, validatorAddress)
 	}
 
 	// clear validator slash events
@@ -107,8 +109,10 @@ func (app *IrisApp) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs [
 
 	// reinitialize all delegations
 	for _, del := range dels {
-		app.distrKeeper.Hooks().BeforeDelegationCreated(ctx, del.DelegatorAddress, del.ValidatorAddress)
-		app.distrKeeper.Hooks().AfterDelegationModified(ctx, del.DelegatorAddress, del.ValidatorAddress)
+		delegatorAddress, _ := sdk.AccAddressFromBech32(del.DelegatorAddress)
+		validatorAddress, _ := sdk.ValAddressFromBech32(del.ValidatorAddress)
+		app.distrKeeper.Hooks().BeforeDelegationCreated(ctx, delegatorAddress, validatorAddress)
+		app.distrKeeper.Hooks().AfterDelegationModified(ctx, delegatorAddress, validatorAddress)
 	}
 
 	// reset context height

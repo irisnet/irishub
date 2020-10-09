@@ -91,7 +91,7 @@ func SetupWithGenesisValSet(t *testing.T, valSet *tmtypes.ValidatorSet, genAccs 
 
 	for _, val := range valSet.Validators {
 		validator := stakingtypes.Validator{
-			OperatorAddress:   val.Address.Bytes(),
+			OperatorAddress:   val.Address.String(),
 			ConsensusPubkey:   sdk.MustBech32ifyPubKey(sdk.Bech32PubKeyTypeConsPub, val.PubKey),
 			Jailed:            false,
 			Status:            sdk.Bonded,
@@ -269,8 +269,7 @@ func addTestAddrs(app *SimApp, ctx sdk.Context, accNum int, accAmt sdk.Int, stra
 func saveAccount(app *SimApp, ctx sdk.Context, addr sdk.AccAddress, initCoins sdk.Coins) {
 	acc := app.AccountKeeper.NewAccountWithAddress(ctx, addr)
 	app.AccountKeeper.SetAccount(ctx, acc)
-	_, err := app.BankKeeper.AddCoins(ctx, addr, initCoins)
-	if err != nil {
+	if err := app.BankKeeper.AddCoins(ctx, addr, initCoins); err != nil {
 		panic(err)
 	}
 }

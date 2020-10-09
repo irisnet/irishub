@@ -2,25 +2,52 @@
 
 set -eo pipefail
 
-proto_dirs=$(find ./proto -path -prune -o -name '*.proto' -print0 | xargs -0 -n1 dirname | sort | uniq)
+IRISMOD_VERSION=v1.1.1-0.20200930082942-4882cf4fd17a
+SDK_VERSION=v0.28.2-0.20200930073142-1e1bec2e65a6
+
+chmod -R 755 ${GOPATH}/pkg/mod/github.com/irisnet/irismod@${IRISMOD_VERSION}/proto
+chmod -R 755 ${GOPATH}/pkg/mod/github.com/irisnet/cosmos-sdk@${SDK_VERSION}/proto/cosmos
+chmod -R 755 ${GOPATH}/pkg/mod/github.com/irisnet/cosmos-sdk@${SDK_VERSION}/proto/ibc
+
+cp -r ${GOPATH}/pkg/mod/github.com/irisnet/irismod@${IRISMOD_VERSION}/proto ./
+cp -r ${GOPATH}/pkg/mod/github.com/irisnet/cosmos-sdk@${SDK_VERSION}/proto/cosmos ./proto
+cp -r ${GOPATH}/pkg/mod/github.com/irisnet/cosmos-sdk@${SDK_VERSION}/proto/ibc ./proto
+
+mkdir -p ./tmp-swagger-gen
+
+proto_dirs=$(find ./proto -path -prune -o -name 'query.proto' -print0 | xargs -0 -n1 dirname | sort | uniq)
 for dir in $proto_dirs; do
 
-  # generate swagger files (filter query files)
-  query_file=$(find "${dir}" -maxdepth 1 -name 'query.proto')
-  echo $query_file
-  if [[ ! -z "$query_file" ]]; then
-    protoc  \
-    -I "proto" \
-    -I "third_party/proto" \
-    "$query_file" \
-    --swagger_out=logtostderr=true,stderrthreshold=1000,fqn_for_swagger_name=true,simple_operation_ids=true:.
-  fi
+    # generate swagger files (filter query files)
+    query_file=$(find "${dir}" -maxdepth 1 -name 'query.proto')
+    echo $query_file
+    if [[ ! -z "$query_file" ]]; then
+        protoc \
+            -I "proto" \
+            -I "third_party/proto" \
+            "$query_file" \
+            --swagger_out ./tmp-swagger-gen \
+            --swagger_opt logtostderr=true --swagger_opt fqn_for_swagger_name=true --swagger_opt simple_operation_ids=true
+    fi
 done
 
 # combine swagger files
 # uses nodejs package `swagger-combine`.
 # all the individual swagger files need to be configured in `config.json` for merging
-swagger-combine ./lite/grpc-gateway/config.json -o ./lite/grpc-gateway/swagger.json --continueOnConflictingPaths true --includeDefinitions true
+swagger-combine ./lite/config.json -o ./lite/swagger-ui/swagger.yaml -f yaml --continueOnConflictingPaths true --includeDefinitions true
 
 # clean swagger files
-find ./ -name 'query.swagger.json' -exec rm {} \;
+rm -rf ./tmp-swagger-gen
+
+# clean proto files
+rm -rf ./proto/cosmos
+rm -rf ./proto/ibc
+
+rm -rf ./proto/coinswap
+rm -rf ./proto/htlc
+rm -rf ./proto/nft
+rm -rf ./proto/oracle
+rm -rf ./proto/random
+rm -rf ./proto/record
+rm -rf ./proto/service
+rm -rf ./proto/token
