@@ -293,8 +293,8 @@ github.com/inconshreveable/mousetrap v1.0.0/go.mod h1:PxqpIevigyE2G7u3NXJIT2ANyt
 github.com/influxdata/influxdb1-client v0.0.0-20191209144304-8bf82d3c094d/go.mod h1:qj24IKcXYK6Iy9ceXlo3Tc+vtHo9lIhSX5JddghvEPo=
 github.com/irisnet/cosmos-sdk v0.28.2-0.20200930073142-1e1bec2e65a6 h1:0VyLgIPH3mHrIEKSQodCg5/x2aEGQw3Bf/uf+QTGu08=
 github.com/irisnet/cosmos-sdk v0.28.2-0.20200930073142-1e1bec2e65a6/go.mod h1:bLowJxl+f0nyM10MQbRIyBdXqC7yb5GErM/qsmSbz3M=
-github.com/irisnet/irismod v1.1.1-0.20200930082942-4882cf4fd17a h1:L8T91U93+Qzs/UHV6Tw+/yzTjhi7Ot4w1W6O1seCCpE=
-github.com/irisnet/irismod v1.1.1-0.20200930082942-4882cf4fd17a/go.mod h1:Wn5ZxsMT/mTaI8/oBAmG8kr0j8OQ0YZi0vwVZYGqEX8=
+github.com/irisnet/irismod v1.1.1-0.20201012075847-524732fc5780 h1:SCGrZ/Cinv+oTJrQrXTvUrGw+gRYl1a6JTtcYySR57Y=
+github.com/irisnet/irismod v1.1.1-0.20201012075847-524732fc5780/go.mod h1:Wn5ZxsMT/mTaI8/oBAmG8kr0j8OQ0YZi0vwVZYGqEX8=
 github.com/jessevdk/go-flags v0.0.0-20141203071132-1679536dcc89/go.mod h1:4FA24M0QyGHXBuZZK/XkWh8h0e1EYbRYJSGM75WSRxI=
 github.com/jessevdk/go-flags v1.4.0/go.mod h1:4FA24M0QyGHXBuZZK/XkWh8h0e1EYbRYJSGM75WSRxI=
 github.com/jmespath/go-jmespath v0.0.0-20180206201540-c2b33e8439af/go.mod h1:Nht3zPeWKUH0NzdCt2Blrr5ys8VGpn0CEB0cQHVjt7k=
