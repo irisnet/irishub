@@ -459,7 +459,7 @@ func (k Keeper) buildRequest(
 
 	if !superMode {
 		binding, _ := k.GetServiceBinding(ctx, serviceName, provider)
-		serviceFee = k.GetPrice(ctx, consumer, binding)
+		serviceFee, _, _ = k.GetExchangedPrice(ctx, consumer, binding)
 	}
 
 	return types.NewCompactRequest(
@@ -606,10 +606,7 @@ func (k Keeper) DeleteActiveRequestByBinding(
 }
 
 // AddActiveRequestByID adds the specified active request by request ID
-func (k Keeper) AddActiveRequestByID(
-	ctx sdk.Context,
-	requestID tmbytes.HexBytes,
-) {
+func (k Keeper) AddActiveRequestByID(ctx sdk.Context, requestID tmbytes.HexBytes) {
 	store := ctx.KVStore(k.storeKey)
 
 	bz := k.cdc.MustMarshalBinaryBare(&gogotypes.BytesValue{Value: requestID})
@@ -617,19 +614,13 @@ func (k Keeper) AddActiveRequestByID(
 }
 
 // DeleteActiveRequestByID deletes the specified active request by request ID
-func (k Keeper) DeleteActiveRequestByID(
-	ctx sdk.Context,
-	requestID tmbytes.HexBytes,
-) {
+func (k Keeper) DeleteActiveRequestByID(ctx sdk.Context, requestID tmbytes.HexBytes) {
 	store := ctx.KVStore(k.storeKey)
 	store.Delete(types.GetActiveRequestKeyByID(requestID))
 }
 
 // IsRequestActive checks if the specified request is active
-func (k Keeper) IsRequestActive(
-	ctx sdk.Context,
-	requestID tmbytes.HexBytes,
-) bool {
+func (k Keeper) IsRequestActive(ctx sdk.Context, requestID tmbytes.HexBytes) bool {
 	store := ctx.KVStore(k.storeKey)
 	return store.Has(types.GetActiveRequestKeyByID(requestID))
 }
@@ -735,7 +726,7 @@ func (k Keeper) IterateExpiredRequestBatch(
 func (k Keeper) IterateNewRequestBatch(
 	ctx sdk.Context,
 	requestBatchHeight int64,
-	op func(requestContextID tmbytes.HexBytes, requestContext types.RequestContext),
+	op func(requestContextID tmbytes.HexBytes, requestContext *types.RequestContext),
 ) {
 	store := ctx.KVStore(k.storeKey)
 
@@ -748,7 +739,7 @@ func (k Keeper) IterateNewRequestBatch(
 
 		requestContext, _ := k.GetRequestContext(ctx, requestContextID.Value)
 
-		op(requestContextID.Value, requestContext)
+		op(requestContextID.Value, &requestContext)
 	}
 }
 
@@ -827,34 +818,6 @@ func (k Keeper) FilterServiceProviders(
 // DeductServiceFees deducts the given service fees from the specified consumer
 func (k Keeper) DeductServiceFees(ctx sdk.Context, consumer sdk.AccAddress, serviceFees sdk.Coins) error {
 	return k.bankKeeper.SendCoinsFromAccountToModule(ctx, consumer, types.RequestAccName, serviceFees)
-}
-
-// GetPrice gets the current price for the specified consumer and binding
-// Note: ensure that the binding is valid
-func (k Keeper) GetPrice(
-	ctx sdk.Context,
-	consumer sdk.AccAddress,
-	binding types.ServiceBinding,
-) sdk.Coins {
-	pricing := k.GetPricing(ctx, binding.ServiceName, binding.Provider)
-
-	// get discounts
-	discountByTime := types.GetDiscountByTime(pricing, ctx.BlockTime())
-	discountByVolume := types.GetDiscountByVolume(
-		pricing, k.GetRequestVolume(ctx, consumer, binding.ServiceName, binding.Provider),
-	)
-
-	// compute the price
-	baseDenom := k.BaseDenom(ctx)
-	basePrice := pricing.Price.AmountOf(baseDenom)
-	price := sdk.NewDecFromInt(basePrice).Mul(discountByTime).Mul(discountByVolume)
-
-	// set to 1 if price < 1
-	if price.LT(sdk.OneDec()) {
-		price = sdk.OneDec()
-	}
-
-	return sdk.NewCoins(sdk.NewCoin(baseDenom, price.TruncateInt()))
 }
 
 // AddResponse adds the response for the specified request ID

@@ -66,15 +66,14 @@ func (k Keeper) CompleteServiceContext(ctx sdk.Context, context types.RequestCon
 // OnRequestContextPaused handles the event where the specified request context is paused due to certain cause
 func (k Keeper) OnRequestContextPaused(
 	ctx sdk.Context,
-	requestContext types.RequestContext,
+	requestContext *types.RequestContext,
 	requestContextID tmbytes.HexBytes,
 	cause string,
 ) {
-
 	requestContext.BatchState = types.BATCHCOMPLETED
 	requestContext.State = types.PAUSED
 
-	k.SetRequestContext(ctx, requestContextID, requestContext)
+	k.SetRequestContext(ctx, requestContextID, *requestContext)
 
 	if len(requestContext.ModuleName) > 0 {
 		stateCallback, _ := k.GetStateCallback(requestContext.ModuleName)

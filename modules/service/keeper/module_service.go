@@ -72,6 +72,9 @@ func (k Keeper) RequestModuleService(
 		return err
 	}
 
+	requestContext.State = types.COMPLETED
+	k.SetRequestContext(ctx, reqContextID, requestContext)
+
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			sdk.EventTypeMessage,

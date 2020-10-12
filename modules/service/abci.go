@@ -14,7 +14,7 @@ import (
 
 // EndBlocker handles block ending logic for service
 func EndBlocker(ctx sdk.Context, k keeper.Keeper) {
-	ctx = ctx.WithLogger(ctx.Logger().With("handler", "endBlock").With("module", "iris/service"))
+	ctx = ctx.WithLogger(ctx.Logger().With("handler", "endBlock").With("module", "irismod/service"))
 
 	// handler for the active request on expired
 	expiredRequestHandler := func(requestID tmbytes.HexBytes, request types.Request) {
@@ -55,7 +55,7 @@ func EndBlocker(ctx sdk.Context, k keeper.Keeper) {
 	providerRequests := make(map[string][]string)
 
 	// handler for the new request batch
-	newRequestBatchHandler := func(requestContextID tmbytes.HexBytes, requestContext types.RequestContext) {
+	newRequestBatchHandler := func(requestContextID tmbytes.HexBytes, requestContext *types.RequestContext) {
 		if requestContext.State == types.RUNNING {
 			providers, totalPrices, rawDenom, err := k.FilterServiceProviders(
 				ctx,
@@ -83,11 +83,11 @@ func EndBlocker(ctx sdk.Context, k keeper.Keeper) {
 				}
 
 				if requestContext.State == types.RUNNING {
-					k.InitiateRequests(ctx, requestContextID, providers, providerRequests)
+					_ = k.InitiateRequests(ctx, requestContextID, providers, providerRequests)
 					k.AddRequestBatchExpiration(ctx, requestContextID, ctx.BlockHeight()+requestContext.Timeout)
 				}
 			} else {
-				k.SkipCurrentRequestBatch(ctx, requestContextID, requestContext)
+				k.SkipCurrentRequestBatch(ctx, requestContextID, *requestContext)
 			}
 
 			requestContext, _ := k.GetRequestContext(ctx, requestContextID)
