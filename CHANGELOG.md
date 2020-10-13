@@ -39,6 +39,7 @@ Ref: https://keepachangelog.com/en/1.0.0/
 
 ### Bug Fixes
 
+* (modules/coinswap) [\#19](https://github.com/irisnet/irismod/pull/19) Check liquidity reserve by supply.
 * (modules/service) [\#18](https://github.com/irisnet/irismod/pull/18) Fix incorrect price in request and fix init request when insufficient banlances.
 
 ## [v1.1.0] - 2020-09-30
