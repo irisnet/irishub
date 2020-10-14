@@ -112,7 +112,7 @@ func (k Keeper) AddLiquidity(ctx sdk.Context, msg *types.MsgAddLiquidity) error 
 	} else {
 		mintLiquidityAmt = (liquidity.Mul(msg.ExactStandardAmt)).Quo(standardReserveAmt)
 		if mintLiquidityAmt.LT(msg.MinLiquidity) {
-			return sdkerrors.Wrap(types.ErrConstraintNotMet, fmt.Sprintf("liquidityAmt amount not met, user expected: no less than %s, actual: %s", msg.MinLiquidity.String(), mintLiquidityAmt.String()))
+			return sdkerrors.Wrap(types.ErrConstraintNotMet, fmt.Sprintf("liquidity amount not met, user expected: no less than %s, actual: %s", msg.MinLiquidity.String(), mintLiquidityAmt.String()))
 		}
 		depositAmt := (tokenReserveAmt.Mul(msg.ExactStandardAmt)).Quo(standardReserveAmt).AddRaw(1)
 		depositToken = sdk.NewCoin(msg.MaxToken.Denom, depositAmt)
@@ -170,8 +170,7 @@ func (k Keeper) RemoveLiquidity(ctx sdk.Context, msg *types.MsgRemoveLiquidity) 
 
 	standardReserveAmt := reservePool.AmountOf(standardDenom)
 	tokenReserveAmt := reservePool.AmountOf(minTokenDenom)
-	liquidityReserve := k.bk.GetBalance(ctx, k.ak.GetModuleAddress(types.ModuleName), uniDenom).Amount
-
+	liquidityReserve := k.bk.GetSupply(ctx).GetTotal().AmountOf(uniDenom)
 	if standardReserveAmt.LT(msg.MinStandardAmt) {
 		return sdkerrors.Wrap(types.ErrInsufficientFunds, fmt.Sprintf("insufficient %s funds, user expected: %s, actual: %s", standardDenom, msg.MinStandardAmt.String(), standardReserveAmt.String()))
 	}

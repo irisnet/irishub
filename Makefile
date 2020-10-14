@@ -3,6 +3,8 @@
 PACKAGES_SIMTEST=$(shell go list ./... | grep '/simulation')
 PACKAGES_UNITTEST=$(shell go list ./... | grep -v '/simulation' | grep -v '/cli_test')
 
+ldflags = -X github.com/cosmos/cosmos-sdk/types.reDnmString=[a-z][a-z0-9:]{2,15}
+
 all: tools lint
 
 # The below include contains the tools.
@@ -41,7 +43,7 @@ proto-gen:
 test: test-unit
 
 test-unit:
-	@VERSION=$(VERSION) go test -mod=readonly -tags='ledger test_ledger_mock' ${PACKAGES_UNITTEST}
+	@VERSION=$(VERSION) go test -mod=readonly -tags='ledger test_ledger_mock' -ldflags '$(ldflags)' ${PACKAGES_UNITTEST}
 
 lint: golangci-lint
 	golangci-lint run
