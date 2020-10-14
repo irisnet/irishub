@@ -19,9 +19,13 @@ import (
 	tmtypes "github.com/tendermint/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
 
+	"github.com/cosmos/cosmos-sdk/baseapp"
 	bam "github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
+	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	"github.com/cosmos/cosmos-sdk/simapp/helpers"
+	storetypes "github.com/cosmos/cosmos-sdk/store/types"
+	"github.com/cosmos/cosmos-sdk/testutil/network"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
@@ -48,8 +52,9 @@ var DefaultConsensusParams = &abci.ConsensusParams{
 
 // Setup initializes a new SimApp. A Nop logger is set in SimApp.
 func Setup(isCheckTx bool) *SimApp {
-	db := dbm.NewMemDB()
-	app := NewSimApp(log.NewNopLogger(), db, nil, true, map[int64]bool{}, DefaultNodeHome, 5, MakeEncodingConfig())
+	app := NewSimApp(
+		log.NewNopLogger(), dbm.NewMemDB(), nil, true, map[int64]bool{}, DefaultNodeHome, 5, MakeEncodingConfig(),
+	)
 	if !isCheckTx {
 		// init chain must be called to stop deliverState from being nil
 		genesisState := NewDefaultGenesisState()
@@ -67,6 +72,31 @@ func Setup(isCheckTx bool) *SimApp {
 			},
 		)
 	}
+
+	return app
+}
+
+func SimAppConstructor(val network.Validator) servertypes.Application {
+	app := NewSimApp(
+		val.Ctx.Logger, dbm.NewMemDB(), nil, true, make(map[int64]bool), val.Ctx.Config.RootDir, 0, MakeEncodingConfig(),
+		baseapp.SetPruning(storetypes.NewPruningOptionsFromString(val.AppConfig.Pruning)),
+		baseapp.SetMinGasPrices(val.AppConfig.MinGasPrices),
+	)
+
+	genesisState := NewDefaultGenesisState()
+	stateBytes, err := json.MarshalIndent(genesisState, "", " ")
+	if err != nil {
+		panic(err)
+	}
+
+	// Initialize the chain
+	app.InitChain(
+		abci.RequestInitChain{
+			Validators:      []abci.ValidatorUpdate{},
+			ConsensusParams: DefaultConsensusParams,
+			AppStateBytes:   stateBytes,
+		},
+	)
 
 	return app
 }

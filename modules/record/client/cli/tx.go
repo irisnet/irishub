@@ -2,7 +2,6 @@ package cli
 
 import (
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -40,12 +39,14 @@ func GetCmdCreateRecord() *cobra.Command {
 			}
 
 			fromAddr := clientCtx.GetFromAddress()
+			uri, _ := cmd.Flags().GetString(FlagURI)
+			meta, _ := cmd.Flags().GetString(FlagMeta)
 
 			content := types.Content{
 				Digest:     args[0],
 				DigestAlgo: args[1],
-				URI:        viper.GetString(FlagURI),
-				Meta:       viper.GetString(FlagMeta),
+				URI:        uri,
+				Meta:       meta,
 			}
 
 			msg := types.NewMsgCreateRecord([]types.Content{content}, fromAddr)
