@@ -66,18 +66,14 @@ func (s *IntegrationTestSuite) TestQueryRecordGRPC() {
 	args := []string{
 		fmt.Sprintf("--%s=%s", recordcli.FlagURI, uri),
 		fmt.Sprintf("--%s=%s", recordcli.FlagMeta, meta),
-		// ---------------------------------------------------------------------------
+
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
 		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(10))).String()),
 	}
 
-	// ---------------------------------------------------------------------------
-
 	respType := proto.Message(&sdk.TxResponse{})
 	expectedCode := uint32(0)
-
-	// ---------------------------------------------------------------------------
 
 	bz, err := recordtestutil.MsgCreateRecordExec(clientCtx, from.String(), digest, digestAlgo, args...)
 	s.Require().NoError(err)
@@ -103,8 +99,6 @@ func (s *IntegrationTestSuite) TestQueryRecordGRPC() {
 		URI:        uri,
 		Meta:       meta,
 	}}
-
-	// ---------------------------------------------------------------------------
 
 	resp, err := rest.GetRequest(url)
 	s.Require().NoError(err)
