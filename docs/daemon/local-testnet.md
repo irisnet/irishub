@@ -41,7 +41,7 @@ this command lets you set the number of coins. Make sure this account has some u
 :::
 
 ```bash
-iris add-genesis-account $(iris keys show MyValidator --address) 100000000uiris
+iris add-genesis-account $(iris keys show MyValidator --address) 150000000uiris
 ```
 
 ### iris gentx
@@ -49,7 +49,7 @@ iris add-genesis-account $(iris keys show MyValidator --address) 100000000uiris
 Generate the transaction that creates your validator. The gentxs are stored in `~/.iris/config/gentx/`
 
 ```bash
-iris gentx MyValidator --chain-id=testing
+iris gentx MyValidator --chain-id=testing --amount 100000000uiris
 ```
 
 ### iris collect-gentxs
@@ -61,6 +61,12 @@ iris collect-gentxs
 ```
 
 ### iris start
+
+Change the default token denom to `uiris`
+
+```bash
+sed -i '' 's/stake/uiris/g' $HOME/.iris/config/genesis.json
+```
 
 Now it‘s ready to start `iris`
 

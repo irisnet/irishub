@@ -295,6 +295,8 @@ github.com/irisnet/cosmos-sdk v0.34.4-0.20201014023301-f172e47973d0 h1:ZQg12Ecw6
 github.com/irisnet/cosmos-sdk v0.34.4-0.20201014023301-f172e47973d0/go.mod h1:YZcO00Tq/qqj4ncsfn+PobyTelsot7wEMGPpxEbEAT0=
 github.com/irisnet/irismod v1.1.1-0.20201014032837-8a52ce399500 h1:7g7yo1T77T78TWAOGTyuijLzKXE3Ex3GlNCxJA2CEmw=
 github.com/irisnet/irismod v1.1.1-0.20201014032837-8a52ce399500/go.mod h1:op0aGNvficnObLs9tYTW9LGiznDpTrfNBpIqfoeFDvM=
+github.com/irisnet/irismod v1.1.1-0.20201014072931-cfb6e5adbf84 h1:vii/XlR5+fd9MUAatsf5WxLePA3RogIHPk2BSsqYT/I=
+github.com/irisnet/irismod v1.1.1-0.20201014072931-cfb6e5adbf84/go.mod h1:op0aGNvficnObLs9tYTW9LGiznDpTrfNBpIqfoeFDvM=
 github.com/jessevdk/go-flags v0.0.0-20141203071132-1679536dcc89/go.mod h1:4FA24M0QyGHXBuZZK/XkWh8h0e1EYbRYJSGM75WSRxI=
 github.com/jessevdk/go-flags v1.4.0/go.mod h1:4FA24M0QyGHXBuZZK/XkWh8h0e1EYbRYJSGM75WSRxI=
 github.com/jmespath/go-jmespath v0.0.0-20180206201540-c2b33e8439af/go.mod h1:Nht3zPeWKUH0NzdCt2Blrr5ys8VGpn0CEB0cQHVjt7k=
