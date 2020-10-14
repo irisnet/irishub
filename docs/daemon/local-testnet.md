@@ -63,6 +63,7 @@ iris collect-gentxs
 ### iris start
 
 Change the default token denom to `uiris`
+
 ```bash
 sed -i '' 's/stake/uiris/g' $HOME/.iris/config/genesis.json
 ```
