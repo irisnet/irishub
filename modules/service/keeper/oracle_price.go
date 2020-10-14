@@ -60,7 +60,7 @@ func (k Keeper) GetExchangedPrice(
 		}
 		realPrice = price.Mul(rate)
 	}
-	
+
 	return sdk.NewCoins(sdk.NewCoin(baseDenom, realPrice.TruncateInt())), rawDenom, nil
 }
 
