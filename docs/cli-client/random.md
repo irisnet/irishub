@@ -7,8 +7,8 @@ Rand module allows you to post a random number request to the IRIS Hub and query
 | Name                                             | Description                                                      |
 | ------------------------------------------------ | ---------------------------------------------------------------- |
 | [request-random](#iris-tx-random-request-random) | Request a random number                                          |
-| [query-random](#iris-query-random-random)        | Query the generated random number by the request id              |
-| [query-queue](#iris-query-random-queue)          | Query the pending random number requests with an optional height |
+| [random](#iris-query-random-random)              | Query the generated random number by the request id              |
+| [queue](#iris-query-random-queue)                | Query the pending random number requests with an optional height |
 
 ## iris tx random request-random
 
