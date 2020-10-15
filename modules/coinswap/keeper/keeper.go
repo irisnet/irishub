@@ -98,7 +98,7 @@ func (k Keeper) AddLiquidity(ctx sdk.Context, msg *types.MsgAddLiquidity) error 
 	reservePool := k.GetReservePool(ctx, uniDenom)
 	standardReserveAmt := reservePool.AmountOf(standardDenom)
 	tokenReserveAmt := reservePool.AmountOf(msg.MaxToken.Denom)
-	liquidity := k.bk.GetBalance(ctx, k.ak.GetModuleAddress(types.ModuleName), uniDenom).Amount
+	liquidity := k.bk.GetSupply(ctx).GetTotal().AmountOf(uniDenom)
 
 	var mintLiquidityAmt sdk.Int
 	var depositToken sdk.Coin

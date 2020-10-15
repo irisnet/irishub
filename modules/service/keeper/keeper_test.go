@@ -401,7 +401,7 @@ func (suite *KeeperTestSuite) TestKeeperRequestService() {
 
 	// service fees will change due to the increased volume
 	_, totalServiceFees, _, _ = suite.keeper.FilterServiceProviders(ctx, testServiceName, providers, testTimeout, testServiceFeeCap, consumer)
-	suite.Equal("2stake", totalServiceFees.String())
+	suite.Equal("4stake", totalServiceFees.String())
 
 	// satifying providers will change due to the condition changed
 	newTimeout := int64(40)
