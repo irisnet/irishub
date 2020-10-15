@@ -11771,9 +11771,176 @@ paths:
                   properties:
                     type_url:
                       type: string
+                      description: >-
+                        A URL/resource name that uniquely identifies the type of
+                        the serialized
+
+                        protocol buffer message. This string must contain at
+                        least
+
+                        one "/" character. The last segment of the URL's path
+                        must represent
+
+                        the fully qualified name of the type (as in
+
+                        `path/google.protobuf.Duration`). The name should be in
+                        a canonical form
+
+                        (e.g., leading "." is not accepted).
+
+
+                        In practice, teams usually precompile into the binary
+                        all types that they
+
+                        expect it to use in the context of Any. However, for
+                        URLs which use the
+
+                        scheme `http`, `https`, or no scheme, one can optionally
+                        set up a type
+
+                        server that maps type URLs to message definitions as
+                        follows:
+
+
+                        * If no scheme is provided, `https` is assumed.
+
+                        * An HTTP GET on the URL must yield a
+                        [google.protobuf.Type][]
+                          value in binary format, or produce an error.
+                        * Applications are allowed to cache lookup results based
+                        on the
+                          URL, or have them precompiled into a binary to avoid any
+                          lookup. Therefore, binary compatibility needs to be preserved
+                          on changes to types. (Use versioned type names to manage
+                          breaking changes.)
+
+                        Note: this functionality is not currently available in
+                        the official
+
+                        protobuf release, and it is not used for type URLs
+                        beginning with
+
+                        type.googleapis.com.
+
+
+                        Schemes other than `http`, `https` (or the empty scheme)
+                        might be
+
+                        used with implementation specific semantics.
                     value:
                       type: string
                       format: byte
+                      description: >-
+                        Must be a valid serialized protocol buffer of the above
+                        specified type.
+                  description: >-
+                    `Any` contains an arbitrary serialized protocol buffer
+                    message along with a
+
+                    URL that describes the type of the serialized message.
+
+
+                    Protobuf library provides support to pack/unpack Any values
+                    in the form
+
+                    of utility functions or additional generated methods of the
+                    Any type.
+
+
+                    Example 1: Pack and unpack a message in C++.
+
+                        Foo foo = ...;
+                        Any any;
+                        any.PackFrom(foo);
+                        ...
+                        if (any.UnpackTo(&foo)) {
+                          ...
+                        }
+
+                    Example 2: Pack and unpack a message in Java.
+
+                        Foo foo = ...;
+                        Any any = Any.pack(foo);
+                        ...
+                        if (any.is(Foo.class)) {
+                          foo = any.unpack(Foo.class);
+                        }
+
+                     Example 3: Pack and unpack a message in Python.
+
+                        foo = Foo(...)
+                        any = Any()
+                        any.Pack(foo)
+                        ...
+                        if any.Is(Foo.DESCRIPTOR):
+                          any.Unpack(foo)
+                          ...
+
+                     Example 4: Pack and unpack a message in Go
+
+                         foo := &pb.Foo{...}
+                         any, err := ptypes.MarshalAny(foo)
+                         ...
+                         foo := &pb.Foo{}
+                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                           ...
+                         }
+
+                    The pack methods provided by protobuf library will by
+                    default use
+
+                    'type.googleapis.com/full.type.name' as the type URL and the
+                    unpack
+
+                    methods only use the fully qualified type name after the
+                    last '/'
+
+                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    type
+
+                    name "y.z".
+
+
+
+                    JSON
+
+                    ====
+
+                    The JSON representation of an `Any` value uses the regular
+
+                    representation of the deserialized, embedded message, with
+                    an
+
+                    additional field `@type` which contains the type URL.
+                    Example:
+
+                        package google.profile;
+                        message Person {
+                          string first_name = 1;
+                          string last_name = 2;
+                        }
+
+                        {
+                          "@type": "type.googleapis.com/google.profile.Person",
+                          "firstName": <string>,
+                          "lastName": <string>
+                        }
+
+                    If the embedded message type is well-known and has a custom
+                    JSON
+
+                    representation, that representation will be embedded adding
+                    a field
+
+                    `value` which holds the custom JSON in addition to the
+                    `@type`
+
+                    field. Example (for message [google.protobuf.Duration][]):
+
+                        {
+                          "@type": "type.googleapis.com/google.protobuf.Duration",
+                          "value": "1.212s"
+                        }
       parameters:
         - name: name
           description: name is the name of the applied plan to query for.
@@ -11840,6 +12007,195 @@ paths:
 
                       such as a git commit that validators could automatically
                       upgrade to
+                  upgraded_client_state:
+                    title: >-
+                      IBC-enabled chains can opt-in to including the upgraded
+                      client state in its upgrade plan
+
+                      This will make the chain commit to the correct upgraded
+                      (self) client state before the upgrade occurs,
+
+                      so that connecting chains can verify that the new upgraded
+                      client is valid by verifying a proof on the
+
+                      previous version of the chain.
+
+                      This will allow IBC connections to persist smoothly across
+                      planned chain upgrades
+                    type: object
+                    properties:
+                      type_url:
+                        type: string
+                        description: >-
+                          A URL/resource name that uniquely identifies the type
+                          of the serialized
+
+                          protocol buffer message. This string must contain at
+                          least
+
+                          one "/" character. The last segment of the URL's path
+                          must represent
+
+                          the fully qualified name of the type (as in
+
+                          `path/google.protobuf.Duration`). The name should be
+                          in a canonical form
+
+                          (e.g., leading "." is not accepted).
+
+
+                          In practice, teams usually precompile into the binary
+                          all types that they
+
+                          expect it to use in the context of Any. However, for
+                          URLs which use the
+
+                          scheme `http`, `https`, or no scheme, one can
+                          optionally set up a type
+
+                          server that maps type URLs to message definitions as
+                          follows:
+
+
+                          * If no scheme is provided, `https` is assumed.
+
+                          * An HTTP GET on the URL must yield a
+                          [google.protobuf.Type][]
+                            value in binary format, or produce an error.
+                          * Applications are allowed to cache lookup results
+                          based on the
+                            URL, or have them precompiled into a binary to avoid any
+                            lookup. Therefore, binary compatibility needs to be preserved
+                            on changes to types. (Use versioned type names to manage
+                            breaking changes.)
+
+                          Note: this functionality is not currently available in
+                          the official
+
+                          protobuf release, and it is not used for type URLs
+                          beginning with
+
+                          type.googleapis.com.
+
+
+                          Schemes other than `http`, `https` (or the empty
+                          scheme) might be
+
+                          used with implementation specific semantics.
+                      value:
+                        type: string
+                        format: byte
+                        description: >-
+                          Must be a valid serialized protocol buffer of the
+                          above specified type.
+                    description: >-
+                      `Any` contains an arbitrary serialized protocol buffer
+                      message along with a
+
+                      URL that describes the type of the serialized message.
+
+
+                      Protobuf library provides support to pack/unpack Any
+                      values in the form
+
+                      of utility functions or additional generated methods of
+                      the Any type.
+
+
+                      Example 1: Pack and unpack a message in C++.
+
+                          Foo foo = ...;
+                          Any any;
+                          any.PackFrom(foo);
+                          ...
+                          if (any.UnpackTo(&foo)) {
+                            ...
+                          }
+
+                      Example 2: Pack and unpack a message in Java.
+
+                          Foo foo = ...;
+                          Any any = Any.pack(foo);
+                          ...
+                          if (any.is(Foo.class)) {
+                            foo = any.unpack(Foo.class);
+                          }
+
+                       Example 3: Pack and unpack a message in Python.
+
+                          foo = Foo(...)
+                          any = Any()
+                          any.Pack(foo)
+                          ...
+                          if any.Is(Foo.DESCRIPTOR):
+                            any.Unpack(foo)
+                            ...
+
+                       Example 4: Pack and unpack a message in Go
+
+                           foo := &pb.Foo{...}
+                           any, err := ptypes.MarshalAny(foo)
+                           ...
+                           foo := &pb.Foo{}
+                           if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                             ...
+                           }
+
+                      The pack methods provided by protobuf library will by
+                      default use
+
+                      'type.googleapis.com/full.type.name' as the type URL and
+                      the unpack
+
+                      methods only use the fully qualified type name after the
+                      last '/'
+
+                      in the type URL, for example "foo.bar.com/x/y.z" will
+                      yield type
+
+                      name "y.z".
+
+
+
+                      JSON
+
+                      ====
+
+                      The JSON representation of an `Any` value uses the regular
+
+                      representation of the deserialized, embedded message, with
+                      an
+
+                      additional field `@type` which contains the type URL.
+                      Example:
+
+                          package google.profile;
+                          message Person {
+                            string first_name = 1;
+                            string last_name = 2;
+                          }
+
+                          {
+                            "@type": "type.googleapis.com/google.profile.Person",
+                            "firstName": <string>,
+                            "lastName": <string>
+                          }
+
+                      If the embedded message type is well-known and has a
+                      custom JSON
+
+                      representation, that representation will be embedded
+                      adding a field
+
+                      `value` which holds the custom JSON in addition to the
+                      `@type`
+
+                      field. Example (for message [google.protobuf.Duration][]):
+
+                          {
+                            "@type": "type.googleapis.com/google.protobuf.Duration",
+                            "value": "1.212s"
+                          }
             description: >-
               QueryCurrentPlanResponse is the response type for the
               Query/CurrentPlan RPC
@@ -11864,9 +12220,176 @@ paths:
                   properties:
                     type_url:
                       type: string
+                      description: >-
+                        A URL/resource name that uniquely identifies the type of
+                        the serialized
+
+                        protocol buffer message. This string must contain at
+                        least
+
+                        one "/" character. The last segment of the URL's path
+                        must represent
+
+                        the fully qualified name of the type (as in
+
+                        `path/google.protobuf.Duration`). The name should be in
+                        a canonical form
+
+                        (e.g., leading "." is not accepted).
+
+
+                        In practice, teams usually precompile into the binary
+                        all types that they
+
+                        expect it to use in the context of Any. However, for
+                        URLs which use the
+
+                        scheme `http`, `https`, or no scheme, one can optionally
+                        set up a type
+
+                        server that maps type URLs to message definitions as
+                        follows:
+
+
+                        * If no scheme is provided, `https` is assumed.
+
+                        * An HTTP GET on the URL must yield a
+                        [google.protobuf.Type][]
+                          value in binary format, or produce an error.
+                        * Applications are allowed to cache lookup results based
+                        on the
+                          URL, or have them precompiled into a binary to avoid any
+                          lookup. Therefore, binary compatibility needs to be preserved
+                          on changes to types. (Use versioned type names to manage
+                          breaking changes.)
+
+                        Note: this functionality is not currently available in
+                        the official
+
+                        protobuf release, and it is not used for type URLs
+                        beginning with
+
+                        type.googleapis.com.
+
+
+                        Schemes other than `http`, `https` (or the empty scheme)
+                        might be
+
+                        used with implementation specific semantics.
                     value:
                       type: string
                       format: byte
+                      description: >-
+                        Must be a valid serialized protocol buffer of the above
+                        specified type.
+                  description: >-
+                    `Any` contains an arbitrary serialized protocol buffer
+                    message along with a
+
+                    URL that describes the type of the serialized message.
+
+
+                    Protobuf library provides support to pack/unpack Any values
+                    in the form
+
+                    of utility functions or additional generated methods of the
+                    Any type.
+
+
+                    Example 1: Pack and unpack a message in C++.
+
+                        Foo foo = ...;
+                        Any any;
+                        any.PackFrom(foo);
+                        ...
+                        if (any.UnpackTo(&foo)) {
+                          ...
+                        }
+
+                    Example 2: Pack and unpack a message in Java.
+
+                        Foo foo = ...;
+                        Any any = Any.pack(foo);
+                        ...
+                        if (any.is(Foo.class)) {
+                          foo = any.unpack(Foo.class);
+                        }
+
+                     Example 3: Pack and unpack a message in Python.
+
+                        foo = Foo(...)
+                        any = Any()
+                        any.Pack(foo)
+                        ...
+                        if any.Is(Foo.DESCRIPTOR):
+                          any.Unpack(foo)
+                          ...
+
+                     Example 4: Pack and unpack a message in Go
+
+                         foo := &pb.Foo{...}
+                         any, err := ptypes.MarshalAny(foo)
+                         ...
+                         foo := &pb.Foo{}
+                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                           ...
+                         }
+
+                    The pack methods provided by protobuf library will by
+                    default use
+
+                    'type.googleapis.com/full.type.name' as the type URL and the
+                    unpack
+
+                    methods only use the fully qualified type name after the
+                    last '/'
+
+                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    type
+
+                    name "y.z".
+
+
+
+                    JSON
+
+                    ====
+
+                    The JSON representation of an `Any` value uses the regular
+
+                    representation of the deserialized, embedded message, with
+                    an
+
+                    additional field `@type` which contains the type URL.
+                    Example:
+
+                        package google.profile;
+                        message Person {
+                          string first_name = 1;
+                          string last_name = 2;
+                        }
+
+                        {
+                          "@type": "type.googleapis.com/google.profile.Person",
+                          "firstName": <string>,
+                          "lastName": <string>
+                        }
+
+                    If the embedded message type is well-known and has a custom
+                    JSON
+
+                    representation, that representation will be embedded adding
+                    a field
+
+                    `value` which holds the custom JSON in addition to the
+                    `@type`
+
+                    field. Example (for message [google.protobuf.Duration][]):
+
+                        {
+                          "@type": "type.googleapis.com/google.protobuf.Duration",
+                          "value": "1.212s"
+                        }
       tags:
         - Query
   /ibc/channel/v1beta1/channels:
@@ -11991,17 +12514,17 @@ paths:
                 title: query block height
                 type: object
                 properties:
-                  epoch_number:
+                  version_number:
                     type: string
                     format: uint64
-                    title: the epoch that the client is currently on
-                  epoch_height:
+                    title: the version that the client is currently on
+                  version_height:
                     type: string
                     format: uint64
-                    title: the height within the given epoch
+                    title: the height within the given version
                 description: >-
-                  Normally the EpochHeight is incremented at each height while
-                  keeping epoch
+                  Normally the VersionHeight is incremented at each height while
+                  keeping version
 
                   number the same However some consensus algorithms may choose
                   to reset the
@@ -12009,10 +12532,11 @@ paths:
                   height in certain conditions e.g. hard forks, state-machine
                   breaking changes
 
-                  In these cases, the epoch number is incremented so that height
-                  continues to
+                  In these cases, the version number is incremented so that
+                  height continues to
 
-                  be monitonically increasing even as the EpochHeight gets reset
+                  be monitonically increasing even as the VersionHeight gets
+                  reset
             description: >-
               QueryChannelsResponse is the response type for the Query/Channels
               RPC method.
@@ -12349,17 +12873,17 @@ paths:
                 title: height at which the proof was retrieved
                 type: object
                 properties:
-                  epoch_number:
+                  version_number:
                     type: string
                     format: uint64
-                    title: the epoch that the client is currently on
-                  epoch_height:
+                    title: the version that the client is currently on
+                  version_height:
                     type: string
                     format: uint64
-                    title: the height within the given epoch
+                    title: the height within the given version
                 description: >-
-                  Normally the EpochHeight is incremented at each height while
-                  keeping epoch
+                  Normally the VersionHeight is incremented at each height while
+                  keeping version
 
                   number the same However some consensus algorithms may choose
                   to reset the
@@ -12367,10 +12891,11 @@ paths:
                   height in certain conditions e.g. hard forks, state-machine
                   breaking changes
 
-                  In these cases, the epoch number is incremented so that height
-                  continues to
+                  In these cases, the version number is incremented so that
+                  height continues to
 
-                  be monitonically increasing even as the EpochHeight gets reset
+                  be monitonically increasing even as the VersionHeight gets
+                  reset
             description: >-
               QueryChannelResponse is the response type for the Query/Channel
               RPC method.
@@ -12794,17 +13319,17 @@ paths:
                 title: height at which the proof was retrieved
                 type: object
                 properties:
-                  epoch_number:
+                  version_number:
                     type: string
                     format: uint64
-                    title: the epoch that the client is currently on
-                  epoch_height:
+                    title: the version that the client is currently on
+                  version_height:
                     type: string
                     format: uint64
-                    title: the height within the given epoch
+                    title: the height within the given version
                 description: >-
-                  Normally the EpochHeight is incremented at each height while
-                  keeping epoch
+                  Normally the VersionHeight is incremented at each height while
+                  keeping version
 
                   number the same However some consensus algorithms may choose
                   to reset the
@@ -12812,10 +13337,11 @@ paths:
                   height in certain conditions e.g. hard forks, state-machine
                   breaking changes
 
-                  In these cases, the epoch number is incremented so that height
-                  continues to
+                  In these cases, the version number is incremented so that
+                  height continues to
 
-                  be monitonically increasing even as the EpochHeight gets reset
+                  be monitonically increasing even as the VersionHeight gets
+                  reset
             title: |-
               QueryChannelClientStateResponse is the Response type for the
               Query/QueryChannelClientState RPC method
@@ -13021,7 +13547,7 @@ paths:
           type: string
       tags:
         - Query
-  '/ibc/channel/v1beta1/channels/{channel_id}/ports/{port_id}/consensus_state/epoch/{epoch_number}/height/{epoch_height}':
+  '/ibc/channel/v1beta1/channels/{channel_id}/ports/{port_id}/consensus_state/version/{version_number}/height/{version_height}':
     get:
       summary: |-
         ChannelConsensusState queries for the consensus state for the channel
@@ -13219,17 +13745,17 @@ paths:
                 title: height at which the proof was retrieved
                 type: object
                 properties:
-                  epoch_number:
+                  version_number:
                     type: string
                     format: uint64
-                    title: the epoch that the client is currently on
-                  epoch_height:
+                    title: the version that the client is currently on
+                  version_height:
                     type: string
                     format: uint64
-                    title: the height within the given epoch
+                    title: the height within the given version
                 description: >-
-                  Normally the EpochHeight is incremented at each height while
-                  keeping epoch
+                  Normally the VersionHeight is incremented at each height while
+                  keeping version
 
                   number the same However some consensus algorithms may choose
                   to reset the
@@ -13237,10 +13763,11 @@ paths:
                   height in certain conditions e.g. hard forks, state-machine
                   breaking changes
 
-                  In these cases, the epoch number is incremented so that height
-                  continues to
+                  In these cases, the version number is incremented so that
+                  height continues to
 
-                  be monitonically increasing even as the EpochHeight gets reset
+                  be monitonically increasing even as the VersionHeight gets
+                  reset
             title: |-
               QueryChannelClientStateResponse is the Response type for the
               Query/QueryChannelClientState RPC method
@@ -13444,14 +13971,14 @@ paths:
           in: path
           required: true
           type: string
-        - name: epoch_number
-          description: epoch number of the consensus state
+        - name: version_number
+          description: version number of the consensus state
           in: path
           required: true
           type: string
           format: uint64
-        - name: epoch_height
-          description: epoch height of the consensus state
+        - name: version_height
+          description: version height of the consensus state
           in: path
           required: true
           type: string
@@ -13485,17 +14012,17 @@ paths:
                 title: height at which the proof was retrieved
                 type: object
                 properties:
-                  epoch_number:
+                  version_number:
                     type: string
                     format: uint64
-                    title: the epoch that the client is currently on
-                  epoch_height:
+                    title: the version that the client is currently on
+                  version_height:
                     type: string
                     format: uint64
-                    title: the height within the given epoch
+                    title: the height within the given version
                 description: >-
-                  Normally the EpochHeight is incremented at each height while
-                  keeping epoch
+                  Normally the VersionHeight is incremented at each height while
+                  keeping version
 
                   number the same However some consensus algorithms may choose
                   to reset the
@@ -13503,10 +14030,11 @@ paths:
                   height in certain conditions e.g. hard forks, state-machine
                   breaking changes
 
-                  In these cases, the epoch number is incremented so that height
-                  continues to
+                  In these cases, the version number is incremented so that
+                  height continues to
 
-                  be monitonically increasing even as the EpochHeight gets reset
+                  be monitonically increasing even as the VersionHeight gets
+                  reset
             title: |-
               QuerySequenceResponse is the request type for the
               Query/QueryNextSequenceReceiveResponse RPC method
@@ -13737,17 +14265,17 @@ paths:
                 title: height at which the proof was retrieved
                 type: object
                 properties:
-                  epoch_number:
+                  version_number:
                     type: string
                     format: uint64
-                    title: the epoch that the client is currently on
-                  epoch_height:
+                    title: the version that the client is currently on
+                  version_height:
                     type: string
                     format: uint64
-                    title: the height within the given epoch
+                    title: the height within the given version
                 description: >-
-                  Normally the EpochHeight is incremented at each height while
-                  keeping epoch
+                  Normally the VersionHeight is incremented at each height while
+                  keeping version
 
                   number the same However some consensus algorithms may choose
                   to reset the
@@ -13755,10 +14283,11 @@ paths:
                   height in certain conditions e.g. hard forks, state-machine
                   breaking changes
 
-                  In these cases, the epoch number is incremented so that height
-                  continues to
+                  In these cases, the version number is incremented so that
+                  height continues to
 
-                  be monitonically increasing even as the EpochHeight gets reset
+                  be monitonically increasing even as the VersionHeight gets
+                  reset
             title: >-
               QueryPacketAcknowledgementResponse defines the client query
               response for a
@@ -14045,17 +14574,17 @@ paths:
                 title: query block height
                 type: object
                 properties:
-                  epoch_number:
+                  version_number:
                     type: string
                     format: uint64
-                    title: the epoch that the client is currently on
-                  epoch_height:
+                    title: the version that the client is currently on
+                  version_height:
                     type: string
                     format: uint64
-                    title: the height within the given epoch
+                    title: the height within the given version
                 description: >-
-                  Normally the EpochHeight is incremented at each height while
-                  keeping epoch
+                  Normally the VersionHeight is incremented at each height while
+                  keeping version
 
                   number the same However some consensus algorithms may choose
                   to reset the
@@ -14063,10 +14592,11 @@ paths:
                   height in certain conditions e.g. hard forks, state-machine
                   breaking changes
 
-                  In these cases, the epoch number is incremented so that height
-                  continues to
+                  In these cases, the version number is incremented so that
+                  height continues to
 
-                  be monitonically increasing even as the EpochHeight gets reset
+                  be monitonically increasing even as the VersionHeight gets
+                  reset
             title: |-
               QueryPacketCommitmentsResponse is the request type for the
               Query/QueryPacketCommitments RPC method
@@ -14342,17 +14872,17 @@ paths:
                 title: query block height
                 type: object
                 properties:
-                  epoch_number:
+                  version_number:
                     type: string
                     format: uint64
-                    title: the epoch that the client is currently on
-                  epoch_height:
+                    title: the version that the client is currently on
+                  version_height:
                     type: string
                     format: uint64
-                    title: the height within the given epoch
+                    title: the height within the given version
                 description: >-
-                  Normally the EpochHeight is incremented at each height while
-                  keeping epoch
+                  Normally the VersionHeight is incremented at each height while
+                  keeping version
 
                   number the same However some consensus algorithms may choose
                   to reset the
@@ -14360,10 +14890,11 @@ paths:
                   height in certain conditions e.g. hard forks, state-machine
                   breaking changes
 
-                  In these cases, the epoch number is incremented so that height
-                  continues to
+                  In these cases, the version number is incremented so that
+                  height continues to
 
-                  be monitonically increasing even as the EpochHeight gets reset
+                  be monitonically increasing even as the VersionHeight gets
+                  reset
             title: |-
               QueryUnreceivedPacketsResponse is the response type for the
               Query/UnreceivedPacketCommitments RPC method
@@ -14603,17 +15134,17 @@ paths:
                 title: query block height
                 type: object
                 properties:
-                  epoch_number:
+                  version_number:
                     type: string
                     format: uint64
-                    title: the epoch that the client is currently on
-                  epoch_height:
+                    title: the version that the client is currently on
+                  version_height:
                     type: string
                     format: uint64
-                    title: the height within the given epoch
+                    title: the height within the given version
                 description: >-
-                  Normally the EpochHeight is incremented at each height while
-                  keeping epoch
+                  Normally the VersionHeight is incremented at each height while
+                  keeping version
 
                   number the same However some consensus algorithms may choose
                   to reset the
@@ -14621,10 +15152,11 @@ paths:
                   height in certain conditions e.g. hard forks, state-machine
                   breaking changes
 
-                  In these cases, the epoch number is incremented so that height
-                  continues to
+                  In these cases, the version number is incremented so that
+                  height continues to
 
-                  be monitonically increasing even as the EpochHeight gets reset
+                  be monitonically increasing even as the VersionHeight gets
+                  reset
             title: |-
               QueryUnrelayedAcksResponse is the response type for the
               Query/UnrelayedAcks RPC method
@@ -14865,17 +15397,17 @@ paths:
                 title: height at which the proof was retrieved
                 type: object
                 properties:
-                  epoch_number:
+                  version_number:
                     type: string
                     format: uint64
-                    title: the epoch that the client is currently on
-                  epoch_height:
+                    title: the version that the client is currently on
+                  version_height:
                     type: string
                     format: uint64
-                    title: the height within the given epoch
+                    title: the height within the given version
                 description: >-
-                  Normally the EpochHeight is incremented at each height while
-                  keeping epoch
+                  Normally the VersionHeight is incremented at each height while
+                  keeping version
 
                   number the same However some consensus algorithms may choose
                   to reset the
@@ -14883,10 +15415,11 @@ paths:
                   height in certain conditions e.g. hard forks, state-machine
                   breaking changes
 
-                  In these cases, the epoch number is incremented so that height
-                  continues to
+                  In these cases, the version number is incremented so that
+                  height continues to
 
-                  be monitonically increasing even as the EpochHeight gets reset
+                  be monitonically increasing even as the VersionHeight gets
+                  reset
             title: >-
               QueryPacketCommitmentResponse defines the client query response
               for a packet
@@ -15227,17 +15760,17 @@ paths:
                 title: query block height
                 type: object
                 properties:
-                  epoch_number:
+                  version_number:
                     type: string
                     format: uint64
-                    title: the epoch that the client is currently on
-                  epoch_height:
+                    title: the version that the client is currently on
+                  version_height:
                     type: string
                     format: uint64
-                    title: the height within the given epoch
+                    title: the height within the given version
                 description: >-
-                  Normally the EpochHeight is incremented at each height while
-                  keeping epoch
+                  Normally the VersionHeight is incremented at each height while
+                  keeping version
 
                   number the same However some consensus algorithms may choose
                   to reset the
@@ -15245,10 +15778,11 @@ paths:
                   height in certain conditions e.g. hard forks, state-machine
                   breaking changes
 
-                  In these cases, the epoch number is incremented so that height
-                  continues to
+                  In these cases, the version number is incremented so that
+                  height continues to
 
-                  be monitonically increasing even as the EpochHeight gets reset
+                  be monitonically increasing even as the VersionHeight gets
+                  reset
             title: |-
               QueryConnectionChannelsResponse is the Response type for the
               Query/QueryConnectionChannels RPC method
@@ -16161,17 +16695,17 @@ paths:
                 title: height at which the proof was retrieved
                 type: object
                 properties:
-                  epoch_number:
+                  version_number:
                     type: string
                     format: uint64
-                    title: the epoch that the client is currently on
-                  epoch_height:
+                    title: the version that the client is currently on
+                  version_height:
                     type: string
                     format: uint64
-                    title: the height within the given epoch
+                    title: the height within the given version
                 description: >-
-                  Normally the EpochHeight is incremented at each height while
-                  keeping epoch
+                  Normally the VersionHeight is incremented at each height while
+                  keeping version
 
                   number the same However some consensus algorithms may choose
                   to reset the
@@ -16179,10 +16713,11 @@ paths:
                   height in certain conditions e.g. hard forks, state-machine
                   breaking changes
 
-                  In these cases, the epoch number is incremented so that height
-                  continues to
+                  In these cases, the version number is incremented so that
+                  height continues to
 
-                  be monitonically increasing even as the EpochHeight gets reset
+                  be monitonically increasing even as the VersionHeight gets
+                  reset
             description: >-
               QueryClientStateResponse is the response type for the
               Query/ClientState RPC
@@ -16409,17 +16944,17 @@ paths:
                       title: consensus state height
                       type: object
                       properties:
-                        epoch_number:
+                        version_number:
                           type: string
                           format: uint64
-                          title: the epoch that the client is currently on
-                        epoch_height:
+                          title: the version that the client is currently on
+                        version_height:
                           type: string
                           format: uint64
-                          title: the height within the given epoch
+                          title: the height within the given version
                       description: >-
-                        Normally the EpochHeight is incremented at each height
-                        while keeping epoch
+                        Normally the VersionHeight is incremented at each height
+                        while keeping version
 
                         number the same However some consensus algorithms may
                         choose to reset the
@@ -16427,11 +16962,11 @@ paths:
                         height in certain conditions e.g. hard forks,
                         state-machine breaking changes
 
-                        In these cases, the epoch number is incremented so that
-                        height continues to
+                        In these cases, the version number is incremented so
+                        that height continues to
 
-                        be monitonically increasing even as the EpochHeight gets
-                        reset
+                        be monitonically increasing even as the VersionHeight
+                        gets reset
                     consensus_state:
                       title: consensus state
                       type: object
@@ -16888,7 +17423,7 @@ paths:
           type: boolean
       tags:
         - Query
-  '/ibc/client/v1beta1/consensus_states/{client_id}/epoch/{epoch_number}/height/{epoch_height}':
+  '/ibc/client/v1beta1/consensus_states/{client_id}/version/{version_number}/height/{version_height}':
     get:
       summary: >-
         ConsensusState queries a consensus state associated with a client state
@@ -17087,17 +17622,17 @@ paths:
                 title: height at which the proof was retrieved
                 type: object
                 properties:
-                  epoch_number:
+                  version_number:
                     type: string
                     format: uint64
-                    title: the epoch that the client is currently on
-                  epoch_height:
+                    title: the version that the client is currently on
+                  version_height:
                     type: string
                     format: uint64
-                    title: the height within the given epoch
+                    title: the height within the given version
                 description: >-
-                  Normally the EpochHeight is incremented at each height while
-                  keeping epoch
+                  Normally the VersionHeight is incremented at each height while
+                  keeping version
 
                   number the same However some consensus algorithms may choose
                   to reset the
@@ -17105,10 +17640,11 @@ paths:
                   height in certain conditions e.g. hard forks, state-machine
                   breaking changes
 
-                  In these cases, the epoch number is incremented so that height
-                  continues to
+                  In these cases, the version number is incremented so that
+                  height continues to
 
-                  be monitonically increasing even as the EpochHeight gets reset
+                  be monitonically increasing even as the VersionHeight gets
+                  reset
             title: >-
               QueryConsensusStateResponse is the response type for the
               Query/ConsensusState
@@ -17309,14 +17845,14 @@ paths:
           in: path
           required: true
           type: string
-        - name: epoch_number
-          description: consensus state epoch number
+        - name: version_number
+          description: consensus state version number
           in: path
           required: true
           type: string
           format: uint64
-        - name: epoch_height
-          description: consensus state epoch height
+        - name: version_height
+          description: consensus state version height
           in: path
           required: true
           type: string
@@ -17360,17 +17896,17 @@ paths:
                 title: height at which the proof was generated
                 type: object
                 properties:
-                  epoch_number:
+                  version_number:
                     type: string
                     format: uint64
-                    title: the epoch that the client is currently on
-                  epoch_height:
+                    title: the version that the client is currently on
+                  version_height:
                     type: string
                     format: uint64
-                    title: the height within the given epoch
+                    title: the height within the given version
                 description: >-
-                  Normally the EpochHeight is incremented at each height while
-                  keeping epoch
+                  Normally the VersionHeight is incremented at each height while
+                  keeping version
 
                   number the same However some consensus algorithms may choose
                   to reset the
@@ -17378,10 +17914,11 @@ paths:
                   height in certain conditions e.g. hard forks, state-machine
                   breaking changes
 
-                  In these cases, the epoch number is incremented so that height
-                  continues to
+                  In these cases, the version number is incremented so that
+                  height continues to
 
-                  be monitonically increasing even as the EpochHeight gets reset
+                  be monitonically increasing even as the VersionHeight gets
+                  reset
             title: |-
               QueryClientConnectionsResponse is the response type for the
               Query/ClientConnections RPC method
@@ -17684,17 +18221,17 @@ paths:
                 title: query block height
                 type: object
                 properties:
-                  epoch_number:
+                  version_number:
                     type: string
                     format: uint64
-                    title: the epoch that the client is currently on
-                  epoch_height:
+                    title: the version that the client is currently on
+                  version_height:
                     type: string
                     format: uint64
-                    title: the height within the given epoch
+                    title: the height within the given version
                 description: >-
-                  Normally the EpochHeight is incremented at each height while
-                  keeping epoch
+                  Normally the VersionHeight is incremented at each height while
+                  keeping version
 
                   number the same However some consensus algorithms may choose
                   to reset the
@@ -17702,10 +18239,11 @@ paths:
                   height in certain conditions e.g. hard forks, state-machine
                   breaking changes
 
-                  In these cases, the epoch number is incremented so that height
-                  continues to
+                  In these cases, the version number is incremented so that
+                  height continues to
 
-                  be monitonically increasing even as the EpochHeight gets reset
+                  be monitonically increasing even as the VersionHeight gets
+                  reset
             description: >-
               QueryConnectionsResponse is the response type for the
               Query/Connections RPC
@@ -18028,17 +18566,17 @@ paths:
                 title: height at which the proof was retrieved
                 type: object
                 properties:
-                  epoch_number:
+                  version_number:
                     type: string
                     format: uint64
-                    title: the epoch that the client is currently on
-                  epoch_height:
+                    title: the version that the client is currently on
+                  version_height:
                     type: string
                     format: uint64
-                    title: the height within the given epoch
+                    title: the height within the given version
                 description: >-
-                  Normally the EpochHeight is incremented at each height while
-                  keeping epoch
+                  Normally the VersionHeight is incremented at each height while
+                  keeping version
 
                   number the same However some consensus algorithms may choose
                   to reset the
@@ -18046,10 +18584,11 @@ paths:
                   height in certain conditions e.g. hard forks, state-machine
                   breaking changes
 
-                  In these cases, the epoch number is incremented so that height
-                  continues to
+                  In these cases, the version number is incremented so that
+                  height continues to
 
-                  be monitonically increasing even as the EpochHeight gets reset
+                  be monitonically increasing even as the VersionHeight gets
+                  reset
             description: >-
               QueryConnectionResponse is the response type for the
               Query/Connection RPC
@@ -18466,17 +19005,17 @@ paths:
                 title: height at which the proof was retrieved
                 type: object
                 properties:
-                  epoch_number:
+                  version_number:
                     type: string
                     format: uint64
-                    title: the epoch that the client is currently on
-                  epoch_height:
+                    title: the version that the client is currently on
+                  version_height:
                     type: string
                     format: uint64
-                    title: the height within the given epoch
+                    title: the height within the given version
                 description: >-
-                  Normally the EpochHeight is incremented at each height while
-                  keeping epoch
+                  Normally the VersionHeight is incremented at each height while
+                  keeping version
 
                   number the same However some consensus algorithms may choose
                   to reset the
@@ -18484,10 +19023,11 @@ paths:
                   height in certain conditions e.g. hard forks, state-machine
                   breaking changes
 
-                  In these cases, the epoch number is incremented so that height
-                  continues to
+                  In these cases, the version number is incremented so that
+                  height continues to
 
-                  be monitonically increasing even as the EpochHeight gets reset
+                  be monitonically increasing even as the VersionHeight gets
+                  reset
             title: |-
               QueryConnectionClientStateResponse is the response type for the
               Query/ConnectionClientState RPC method
@@ -18688,7 +19228,7 @@ paths:
           type: string
       tags:
         - Query
-  '/ibc/connection/v1beta1/connections/{connection_id}/consensus_state/epoch/{epoch_number}/height/{epoch_height}':
+  '/ibc/connection/v1beta1/connections/{connection_id}/consensus_state/version/{version_number}/height/{version_height}':
     get:
       summary: |-
         ConnectionConsensusState queries the consensus state associated with the
@@ -18886,17 +19426,17 @@ paths:
                 title: height at which the proof was retrieved
                 type: object
                 properties:
-                  epoch_number:
+                  version_number:
                     type: string
                     format: uint64
-                    title: the epoch that the client is currently on
-                  epoch_height:
+                    title: the version that the client is currently on
+                  version_height:
                     type: string
                     format: uint64
-                    title: the height within the given epoch
+                    title: the height within the given version
                 description: >-
-                  Normally the EpochHeight is incremented at each height while
-                  keeping epoch
+                  Normally the VersionHeight is incremented at each height while
+                  keeping version
 
                   number the same However some consensus algorithms may choose
                   to reset the
@@ -18904,10 +19444,11 @@ paths:
                   height in certain conditions e.g. hard forks, state-machine
                   breaking changes
 
-                  In these cases, the epoch number is incremented so that height
-                  continues to
+                  In these cases, the version number is incremented so that
+                  height continues to
 
-                  be monitonically increasing even as the EpochHeight gets reset
+                  be monitonically increasing even as the VersionHeight gets
+                  reset
             title: |-
               QueryConnectionConsensusStateResponse is the response type for the
               Query/ConnectionConsensusState RPC method
@@ -19106,12 +19647,12 @@ paths:
           in: path
           required: true
           type: string
-        - name: epoch_number
+        - name: version_number
           in: path
           required: true
           type: string
           format: uint64
-        - name: epoch_height
+        - name: version_height
           in: path
           required: true
           type: string
@@ -29109,6 +29650,179 @@ definitions:
         title: |-
           Any application specific upgrade info to be included on-chain
           such as a git commit that validators could automatically upgrade to
+      upgraded_client_state:
+        title: >-
+          IBC-enabled chains can opt-in to including the upgraded client state
+          in its upgrade plan
+
+          This will make the chain commit to the correct upgraded (self) client
+          state before the upgrade occurs,
+
+          so that connecting chains can verify that the new upgraded client is
+          valid by verifying a proof on the
+
+          previous version of the chain.
+
+          This will allow IBC connections to persist smoothly across planned
+          chain upgrades
+        type: object
+        properties:
+          type_url:
+            type: string
+            description: >-
+              A URL/resource name that uniquely identifies the type of the
+              serialized
+
+              protocol buffer message. This string must contain at least
+
+              one "/" character. The last segment of the URL's path must
+              represent
+
+              the fully qualified name of the type (as in
+
+              `path/google.protobuf.Duration`). The name should be in a
+              canonical form
+
+              (e.g., leading "." is not accepted).
+
+
+              In practice, teams usually precompile into the binary all types
+              that they
+
+              expect it to use in the context of Any. However, for URLs which
+              use the
+
+              scheme `http`, `https`, or no scheme, one can optionally set up a
+              type
+
+              server that maps type URLs to message definitions as follows:
+
+
+              * If no scheme is provided, `https` is assumed.
+
+              * An HTTP GET on the URL must yield a [google.protobuf.Type][]
+                value in binary format, or produce an error.
+              * Applications are allowed to cache lookup results based on the
+                URL, or have them precompiled into a binary to avoid any
+                lookup. Therefore, binary compatibility needs to be preserved
+                on changes to types. (Use versioned type names to manage
+                breaking changes.)
+
+              Note: this functionality is not currently available in the
+              official
+
+              protobuf release, and it is not used for type URLs beginning with
+
+              type.googleapis.com.
+
+
+              Schemes other than `http`, `https` (or the empty scheme) might be
+
+              used with implementation specific semantics.
+          value:
+            type: string
+            format: byte
+            description: >-
+              Must be a valid serialized protocol buffer of the above specified
+              type.
+        description: >-
+          `Any` contains an arbitrary serialized protocol buffer message along
+          with a
+
+          URL that describes the type of the serialized message.
+
+
+          Protobuf library provides support to pack/unpack Any values in the
+          form
+
+          of utility functions or additional generated methods of the Any type.
+
+
+          Example 1: Pack and unpack a message in C++.
+
+              Foo foo = ...;
+              Any any;
+              any.PackFrom(foo);
+              ...
+              if (any.UnpackTo(&foo)) {
+                ...
+              }
+
+          Example 2: Pack and unpack a message in Java.
+
+              Foo foo = ...;
+              Any any = Any.pack(foo);
+              ...
+              if (any.is(Foo.class)) {
+                foo = any.unpack(Foo.class);
+              }
+
+           Example 3: Pack and unpack a message in Python.
+
+              foo = Foo(...)
+              any = Any()
+              any.Pack(foo)
+              ...
+              if any.Is(Foo.DESCRIPTOR):
+                any.Unpack(foo)
+                ...
+
+           Example 4: Pack and unpack a message in Go
+
+               foo := &pb.Foo{...}
+               any, err := ptypes.MarshalAny(foo)
+               ...
+               foo := &pb.Foo{}
+               if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                 ...
+               }
+
+          The pack methods provided by protobuf library will by default use
+
+          'type.googleapis.com/full.type.name' as the type URL and the unpack
+
+          methods only use the fully qualified type name after the last '/'
+
+          in the type URL, for example "foo.bar.com/x/y.z" will yield type
+
+          name "y.z".
+
+
+
+          JSON
+
+          ====
+
+          The JSON representation of an `Any` value uses the regular
+
+          representation of the deserialized, embedded message, with an
+
+          additional field `@type` which contains the type URL. Example:
+
+              package google.profile;
+              message Person {
+                string first_name = 1;
+                string last_name = 2;
+              }
+
+              {
+                "@type": "type.googleapis.com/google.profile.Person",
+                "firstName": <string>,
+                "lastName": <string>
+              }
+
+          If the embedded message type is well-known and has a custom JSON
+
+          representation, that representation will be embedded adding a field
+
+          `value` which holds the custom JSON in addition to the `@type`
+
+          field. Example (for message [google.protobuf.Duration][]):
+
+              {
+                "@type": "type.googleapis.com/google.protobuf.Duration",
+                "value": "1.212s"
+              }
     description: >-
       Plan specifies information about a planned upgrade and when it should
       occur.
@@ -29172,12 +29886,191 @@ definitions:
 
               such as a git commit that validators could automatically upgrade
               to
+          upgraded_client_state:
+            title: >-
+              IBC-enabled chains can opt-in to including the upgraded client
+              state in its upgrade plan
+
+              This will make the chain commit to the correct upgraded (self)
+              client state before the upgrade occurs,
+
+              so that connecting chains can verify that the new upgraded client
+              is valid by verifying a proof on the
+
+              previous version of the chain.
+
+              This will allow IBC connections to persist smoothly across planned
+              chain upgrades
+            type: object
+            properties:
+              type_url:
+                type: string
+                description: >-
+                  A URL/resource name that uniquely identifies the type of the
+                  serialized
+
+                  protocol buffer message. This string must contain at least
+
+                  one "/" character. The last segment of the URL's path must
+                  represent
+
+                  the fully qualified name of the type (as in
+
+                  `path/google.protobuf.Duration`). The name should be in a
+                  canonical form
+
+                  (e.g., leading "." is not accepted).
+
+
+                  In practice, teams usually precompile into the binary all
+                  types that they
+
+                  expect it to use in the context of Any. However, for URLs
+                  which use the
+
+                  scheme `http`, `https`, or no scheme, one can optionally set
+                  up a type
+
+                  server that maps type URLs to message definitions as follows:
+
+
+                  * If no scheme is provided, `https` is assumed.
+
+                  * An HTTP GET on the URL must yield a [google.protobuf.Type][]
+                    value in binary format, or produce an error.
+                  * Applications are allowed to cache lookup results based on
+                  the
+                    URL, or have them precompiled into a binary to avoid any
+                    lookup. Therefore, binary compatibility needs to be preserved
+                    on changes to types. (Use versioned type names to manage
+                    breaking changes.)
+
+                  Note: this functionality is not currently available in the
+                  official
+
+                  protobuf release, and it is not used for type URLs beginning
+                  with
+
+                  type.googleapis.com.
+
+
+                  Schemes other than `http`, `https` (or the empty scheme) might
+                  be
+
+                  used with implementation specific semantics.
+              value:
+                type: string
+                format: byte
+                description: >-
+                  Must be a valid serialized protocol buffer of the above
+                  specified type.
+            description: >-
+              `Any` contains an arbitrary serialized protocol buffer message
+              along with a
+
+              URL that describes the type of the serialized message.
+
+
+              Protobuf library provides support to pack/unpack Any values in the
+              form
+
+              of utility functions or additional generated methods of the Any
+              type.
+
+
+              Example 1: Pack and unpack a message in C++.
+
+                  Foo foo = ...;
+                  Any any;
+                  any.PackFrom(foo);
+                  ...
+                  if (any.UnpackTo(&foo)) {
+                    ...
+                  }
+
+              Example 2: Pack and unpack a message in Java.
+
+                  Foo foo = ...;
+                  Any any = Any.pack(foo);
+                  ...
+                  if (any.is(Foo.class)) {
+                    foo = any.unpack(Foo.class);
+                  }
+
+               Example 3: Pack and unpack a message in Python.
+
+                  foo = Foo(...)
+                  any = Any()
+                  any.Pack(foo)
+                  ...
+                  if any.Is(Foo.DESCRIPTOR):
+                    any.Unpack(foo)
+                    ...
+
+               Example 4: Pack and unpack a message in Go
+
+                   foo := &pb.Foo{...}
+                   any, err := ptypes.MarshalAny(foo)
+                   ...
+                   foo := &pb.Foo{}
+                   if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                     ...
+                   }
+
+              The pack methods provided by protobuf library will by default use
+
+              'type.googleapis.com/full.type.name' as the type URL and the
+              unpack
+
+              methods only use the fully qualified type name after the last '/'
+
+              in the type URL, for example "foo.bar.com/x/y.z" will yield type
+
+              name "y.z".
+
+
+
+              JSON
+
+              ====
+
+              The JSON representation of an `Any` value uses the regular
+
+              representation of the deserialized, embedded message, with an
+
+              additional field `@type` which contains the type URL. Example:
+
+                  package google.profile;
+                  message Person {
+                    string first_name = 1;
+                    string last_name = 2;
+                  }
+
+                  {
+                    "@type": "type.googleapis.com/google.profile.Person",
+                    "firstName": <string>,
+                    "lastName": <string>
+                  }
+
+              If the embedded message type is well-known and has a custom JSON
+
+              representation, that representation will be embedded adding a
+              field
+
+              `value` which holds the custom JSON in addition to the `@type`
+
+              field. Example (for message [google.protobuf.Duration][]):
+
+                  {
+                    "@type": "type.googleapis.com/google.protobuf.Duration",
+                    "value": "1.212s"
+                  }
     description: >-
       QueryCurrentPlanResponse is the response type for the Query/CurrentPlan
       RPC
 
       method.
-  ibc.channel.Channel:
+  ibc.core.channel.v1.Channel:
     type: object
     properties:
       state:
@@ -29240,7 +30133,7 @@ definitions:
       Channel defines pipeline for exactly-once packet delivery between specific
       modules on separate blockchains, which has at least one end capable of
       sending packets and one end capable of receiving packets.
-  ibc.channel.Counterparty:
+  ibc.core.channel.v1.Counterparty:
     type: object
     properties:
       port_id:
@@ -29252,7 +30145,7 @@ definitions:
         type: string
         title: channel end on the counterparty chain
     title: Counterparty defines a channel end counterparty
-  ibc.channel.IdentifiedChannel:
+  ibc.core.channel.v1.IdentifiedChannel:
     type: object
     properties:
       state:
@@ -29320,7 +30213,7 @@ definitions:
     description: |-
       IdentifiedChannel defines a channel with additional port and channel
       identifier fields.
-  ibc.channel.Order:
+  ibc.core.channel.v1.Order:
     type: string
     enum:
       - ORDER_NONE_UNSPECIFIED
@@ -29333,7 +30226,7 @@ definitions:
       which they were sent.
        - ORDER_ORDERED: packets are delivered exactly in the order which they were sent
     title: Order defines if a channel is ORDERED or UNORDERED
-  ibc.channel.PacketAckCommitment:
+  ibc.core.channel.v1.PacketAckCommitment:
     type: object
     properties:
       port_id:
@@ -29355,7 +30248,7 @@ definitions:
       store
 
       acknowlegements.
-  ibc.channel.QueryChannelClientStateResponse:
+  ibc.core.channel.v1.QueryChannelClientStateResponse:
     type: object
     properties:
       identified_client_state:
@@ -29545,17 +30438,17 @@ definitions:
         title: height at which the proof was retrieved
         type: object
         properties:
-          epoch_number:
+          version_number:
             type: string
             format: uint64
-            title: the epoch that the client is currently on
-          epoch_height:
+            title: the version that the client is currently on
+          version_height:
             type: string
             format: uint64
-            title: the height within the given epoch
+            title: the height within the given version
         description: >-
-          Normally the EpochHeight is incremented at each height while keeping
-          epoch
+          Normally the VersionHeight is incremented at each height while keeping
+          version
 
           number the same However some consensus algorithms may choose to reset
           the
@@ -29563,14 +30456,14 @@ definitions:
           height in certain conditions e.g. hard forks, state-machine breaking
           changes
 
-          In these cases, the epoch number is incremented so that height
+          In these cases, the version number is incremented so that height
           continues to
 
-          be monitonically increasing even as the EpochHeight gets reset
+          be monitonically increasing even as the VersionHeight gets reset
     title: |-
       QueryChannelClientStateResponse is the Response type for the
       Query/QueryChannelClientState RPC method
-  ibc.channel.QueryChannelConsensusStateResponse:
+  ibc.core.channel.v1.QueryChannelConsensusStateResponse:
     type: object
     properties:
       consensus_state:
@@ -29747,17 +30640,17 @@ definitions:
         title: height at which the proof was retrieved
         type: object
         properties:
-          epoch_number:
+          version_number:
             type: string
             format: uint64
-            title: the epoch that the client is currently on
-          epoch_height:
+            title: the version that the client is currently on
+          version_height:
             type: string
             format: uint64
-            title: the height within the given epoch
+            title: the height within the given version
         description: >-
-          Normally the EpochHeight is incremented at each height while keeping
-          epoch
+          Normally the VersionHeight is incremented at each height while keeping
+          version
 
           number the same However some consensus algorithms may choose to reset
           the
@@ -29765,14 +30658,14 @@ definitions:
           height in certain conditions e.g. hard forks, state-machine breaking
           changes
 
-          In these cases, the epoch number is incremented so that height
+          In these cases, the version number is incremented so that height
           continues to
 
-          be monitonically increasing even as the EpochHeight gets reset
+          be monitonically increasing even as the VersionHeight gets reset
     title: |-
       QueryChannelClientStateResponse is the Response type for the
       Query/QueryChannelClientState RPC method
-  ibc.channel.QueryChannelResponse:
+  ibc.core.channel.v1.QueryChannelResponse:
     type: object
     properties:
       channel:
@@ -29855,17 +30748,17 @@ definitions:
         title: height at which the proof was retrieved
         type: object
         properties:
-          epoch_number:
+          version_number:
             type: string
             format: uint64
-            title: the epoch that the client is currently on
-          epoch_height:
+            title: the version that the client is currently on
+          version_height:
             type: string
             format: uint64
-            title: the height within the given epoch
+            title: the height within the given version
         description: >-
-          Normally the EpochHeight is incremented at each height while keeping
-          epoch
+          Normally the VersionHeight is incremented at each height while keeping
+          version
 
           number the same However some consensus algorithms may choose to reset
           the
@@ -29873,10 +30766,10 @@ definitions:
           height in certain conditions e.g. hard forks, state-machine breaking
           changes
 
-          In these cases, the epoch number is incremented so that height
+          In these cases, the version number is incremented so that height
           continues to
 
-          be monitonically increasing even as the EpochHeight gets reset
+          be monitonically increasing even as the VersionHeight gets reset
     description: >-
       QueryChannelResponse is the response type for the Query/Channel RPC
       method.
@@ -29884,7 +30777,7 @@ definitions:
       Besides the Channel end, it includes a proof and the height from which the
 
       proof was retrieved.
-  ibc.channel.QueryChannelsResponse:
+  ibc.core.channel.v1.QueryChannelsResponse:
     type: object
     properties:
       channels:
@@ -29992,17 +30885,17 @@ definitions:
         title: query block height
         type: object
         properties:
-          epoch_number:
+          version_number:
             type: string
             format: uint64
-            title: the epoch that the client is currently on
-          epoch_height:
+            title: the version that the client is currently on
+          version_height:
             type: string
             format: uint64
-            title: the height within the given epoch
+            title: the height within the given version
         description: >-
-          Normally the EpochHeight is incremented at each height while keeping
-          epoch
+          Normally the VersionHeight is incremented at each height while keeping
+          version
 
           number the same However some consensus algorithms may choose to reset
           the
@@ -30010,14 +30903,14 @@ definitions:
           height in certain conditions e.g. hard forks, state-machine breaking
           changes
 
-          In these cases, the epoch number is incremented so that height
+          In these cases, the version number is incremented so that height
           continues to
 
-          be monitonically increasing even as the EpochHeight gets reset
+          be monitonically increasing even as the VersionHeight gets reset
     description: >-
       QueryChannelsResponse is the response type for the Query/Channels RPC
       method.
-  ibc.channel.QueryConnectionChannelsResponse:
+  ibc.core.channel.v1.QueryConnectionChannelsResponse:
     type: object
     properties:
       channels:
@@ -30125,17 +31018,17 @@ definitions:
         title: query block height
         type: object
         properties:
-          epoch_number:
+          version_number:
             type: string
             format: uint64
-            title: the epoch that the client is currently on
-          epoch_height:
+            title: the version that the client is currently on
+          version_height:
             type: string
             format: uint64
-            title: the height within the given epoch
+            title: the height within the given version
         description: >-
-          Normally the EpochHeight is incremented at each height while keeping
-          epoch
+          Normally the VersionHeight is incremented at each height while keeping
+          version
 
           number the same However some consensus algorithms may choose to reset
           the
@@ -30143,14 +31036,14 @@ definitions:
           height in certain conditions e.g. hard forks, state-machine breaking
           changes
 
-          In these cases, the epoch number is incremented so that height
+          In these cases, the version number is incremented so that height
           continues to
 
-          be monitonically increasing even as the EpochHeight gets reset
+          be monitonically increasing even as the VersionHeight gets reset
     title: |-
       QueryConnectionChannelsResponse is the Response type for the
       Query/QueryConnectionChannels RPC method
-  ibc.channel.QueryNextSequenceReceiveResponse:
+  ibc.core.channel.v1.QueryNextSequenceReceiveResponse:
     type: object
     properties:
       next_sequence_receive:
@@ -30168,17 +31061,17 @@ definitions:
         title: height at which the proof was retrieved
         type: object
         properties:
-          epoch_number:
+          version_number:
             type: string
             format: uint64
-            title: the epoch that the client is currently on
-          epoch_height:
+            title: the version that the client is currently on
+          version_height:
             type: string
             format: uint64
-            title: the height within the given epoch
+            title: the height within the given version
         description: >-
-          Normally the EpochHeight is incremented at each height while keeping
-          epoch
+          Normally the VersionHeight is incremented at each height while keeping
+          version
 
           number the same However some consensus algorithms may choose to reset
           the
@@ -30186,14 +31079,14 @@ definitions:
           height in certain conditions e.g. hard forks, state-machine breaking
           changes
 
-          In these cases, the epoch number is incremented so that height
+          In these cases, the version number is incremented so that height
           continues to
 
-          be monitonically increasing even as the EpochHeight gets reset
+          be monitonically increasing even as the VersionHeight gets reset
     title: |-
       QuerySequenceResponse is the request type for the
       Query/QueryNextSequenceReceiveResponse RPC method
-  ibc.channel.QueryPacketAcknowledgementResponse:
+  ibc.core.channel.v1.QueryPacketAcknowledgementResponse:
     type: object
     properties:
       acknowledgement:
@@ -30211,17 +31104,17 @@ definitions:
         title: height at which the proof was retrieved
         type: object
         properties:
-          epoch_number:
+          version_number:
             type: string
             format: uint64
-            title: the epoch that the client is currently on
-          epoch_height:
+            title: the version that the client is currently on
+          version_height:
             type: string
             format: uint64
-            title: the height within the given epoch
+            title: the height within the given version
         description: >-
-          Normally the EpochHeight is incremented at each height while keeping
-          epoch
+          Normally the VersionHeight is incremented at each height while keeping
+          version
 
           number the same However some consensus algorithms may choose to reset
           the
@@ -30229,15 +31122,15 @@ definitions:
           height in certain conditions e.g. hard forks, state-machine breaking
           changes
 
-          In these cases, the epoch number is incremented so that height
+          In these cases, the version number is incremented so that height
           continues to
 
-          be monitonically increasing even as the EpochHeight gets reset
+          be monitonically increasing even as the VersionHeight gets reset
     title: |-
       QueryPacketAcknowledgementResponse defines the client query response for a
       packet which also includes a proof, its path and the height form which the
       proof was retrieved
-  ibc.channel.QueryPacketCommitmentResponse:
+  ibc.core.channel.v1.QueryPacketCommitmentResponse:
     type: object
     properties:
       commitment:
@@ -30255,17 +31148,17 @@ definitions:
         title: height at which the proof was retrieved
         type: object
         properties:
-          epoch_number:
+          version_number:
             type: string
             format: uint64
-            title: the epoch that the client is currently on
-          epoch_height:
+            title: the version that the client is currently on
+          version_height:
             type: string
             format: uint64
-            title: the height within the given epoch
+            title: the height within the given version
         description: >-
-          Normally the EpochHeight is incremented at each height while keeping
-          epoch
+          Normally the VersionHeight is incremented at each height while keeping
+          version
 
           number the same However some consensus algorithms may choose to reset
           the
@@ -30273,10 +31166,10 @@ definitions:
           height in certain conditions e.g. hard forks, state-machine breaking
           changes
 
-          In these cases, the epoch number is incremented so that height
+          In these cases, the version number is incremented so that height
           continues to
 
-          be monitonically increasing even as the EpochHeight gets reset
+          be monitonically increasing even as the VersionHeight gets reset
     title: >-
       QueryPacketCommitmentResponse defines the client query response for a
       packet
@@ -30285,7 +31178,7 @@ definitions:
       was
 
       retrieved
-  ibc.channel.QueryPacketCommitmentsResponse:
+  ibc.core.channel.v1.QueryPacketCommitmentsResponse:
     type: object
     properties:
       commitments:
@@ -30342,17 +31235,17 @@ definitions:
         title: query block height
         type: object
         properties:
-          epoch_number:
+          version_number:
             type: string
             format: uint64
-            title: the epoch that the client is currently on
-          epoch_height:
+            title: the version that the client is currently on
+          version_height:
             type: string
             format: uint64
-            title: the height within the given epoch
+            title: the height within the given version
         description: >-
-          Normally the EpochHeight is incremented at each height while keeping
-          epoch
+          Normally the VersionHeight is incremented at each height while keeping
+          version
 
           number the same However some consensus algorithms may choose to reset
           the
@@ -30360,14 +31253,14 @@ definitions:
           height in certain conditions e.g. hard forks, state-machine breaking
           changes
 
-          In these cases, the epoch number is incremented so that height
+          In these cases, the version number is incremented so that height
           continues to
 
-          be monitonically increasing even as the EpochHeight gets reset
+          be monitonically increasing even as the VersionHeight gets reset
     title: |-
       QueryPacketCommitmentsResponse is the request type for the
       Query/QueryPacketCommitments RPC method
-  ibc.channel.QueryUnreceivedPacketsResponse:
+  ibc.core.channel.v1.QueryUnreceivedPacketsResponse:
     type: object
     properties:
       sequences:
@@ -30380,17 +31273,17 @@ definitions:
         title: query block height
         type: object
         properties:
-          epoch_number:
+          version_number:
             type: string
             format: uint64
-            title: the epoch that the client is currently on
-          epoch_height:
+            title: the version that the client is currently on
+          version_height:
             type: string
             format: uint64
-            title: the height within the given epoch
+            title: the height within the given version
         description: >-
-          Normally the EpochHeight is incremented at each height while keeping
-          epoch
+          Normally the VersionHeight is incremented at each height while keeping
+          version
 
           number the same However some consensus algorithms may choose to reset
           the
@@ -30398,14 +31291,14 @@ definitions:
           height in certain conditions e.g. hard forks, state-machine breaking
           changes
 
-          In these cases, the epoch number is incremented so that height
+          In these cases, the version number is incremented so that height
           continues to
 
-          be monitonically increasing even as the EpochHeight gets reset
+          be monitonically increasing even as the VersionHeight gets reset
     title: |-
       QueryUnreceivedPacketsResponse is the response type for the
       Query/UnreceivedPacketCommitments RPC method
-  ibc.channel.QueryUnrelayedAcksResponse:
+  ibc.core.channel.v1.QueryUnrelayedAcksResponse:
     type: object
     properties:
       sequences:
@@ -30418,17 +31311,17 @@ definitions:
         title: query block height
         type: object
         properties:
-          epoch_number:
+          version_number:
             type: string
             format: uint64
-            title: the epoch that the client is currently on
-          epoch_height:
+            title: the version that the client is currently on
+          version_height:
             type: string
             format: uint64
-            title: the height within the given epoch
+            title: the height within the given version
         description: >-
-          Normally the EpochHeight is incremented at each height while keeping
-          epoch
+          Normally the VersionHeight is incremented at each height while keeping
+          version
 
           number the same However some consensus algorithms may choose to reset
           the
@@ -30436,14 +31329,14 @@ definitions:
           height in certain conditions e.g. hard forks, state-machine breaking
           changes
 
-          In these cases, the epoch number is incremented so that height
+          In these cases, the version number is incremented so that height
           continues to
 
-          be monitonically increasing even as the EpochHeight gets reset
+          be monitonically increasing even as the VersionHeight gets reset
     title: |-
       QueryUnrelayedAcksResponse is the response type for the
       Query/UnrelayedAcks RPC method
-  ibc.channel.State:
+  ibc.core.channel.v1.State:
     type: string
     enum:
       - STATE_UNINITIALIZED_UNSPECIFIED
@@ -30463,29 +31356,30 @@ definitions:
       ready to send and receive packets.
        - STATE_CLOSED: A channel has been closed and can no longer be used to send or receive
       packets.
-  ibc.client.Height:
+  ibc.core.client.v1.Height:
     type: object
     properties:
-      epoch_number:
+      version_number:
         type: string
         format: uint64
-        title: the epoch that the client is currently on
-      epoch_height:
+        title: the version that the client is currently on
+      version_height:
         type: string
         format: uint64
-        title: the height within the given epoch
+        title: the height within the given version
     description: >-
-      Normally the EpochHeight is incremented at each height while keeping epoch
+      Normally the VersionHeight is incremented at each height while keeping
+      version
 
       number the same However some consensus algorithms may choose to reset the
 
       height in certain conditions e.g. hard forks, state-machine breaking
       changes
 
-      In these cases, the epoch number is incremented so that height continues
+      In these cases, the version number is incremented so that height continues
       to
 
-      be monitonically increasing even as the EpochHeight gets reset
+      be monitonically increasing even as the VersionHeight gets reset
     title: >-
       Height is a monotonically increasing data type
 
@@ -30493,7 +31387,7 @@ definitions:
       and
 
       freezing clients
-  ibc.client.IdentifiedClientState:
+  ibc.core.client.v1.IdentifiedClientState:
     type: object
     properties:
       client_id:
@@ -30662,24 +31556,24 @@ definitions:
     description: |-
       IdentifiedClientState defines a client state with an additional client
       identifier field.
-  ibc.client.ConsensusStateWithHeight:
+  ibc.core.client.v1.ConsensusStateWithHeight:
     type: object
     properties:
       height:
         title: consensus state height
         type: object
         properties:
-          epoch_number:
+          version_number:
             type: string
             format: uint64
-            title: the epoch that the client is currently on
-          epoch_height:
+            title: the version that the client is currently on
+          version_height:
             type: string
             format: uint64
-            title: the height within the given epoch
+            title: the height within the given version
         description: >-
-          Normally the EpochHeight is incremented at each height while keeping
-          epoch
+          Normally the VersionHeight is incremented at each height while keeping
+          version
 
           number the same However some consensus algorithms may choose to reset
           the
@@ -30687,10 +31581,10 @@ definitions:
           height in certain conditions e.g. hard forks, state-machine breaking
           changes
 
-          In these cases, the epoch number is incremented so that height
+          In these cases, the version number is incremented so that height
           continues to
 
-          be monitonically increasing even as the EpochHeight gets reset
+          be monitonically increasing even as the VersionHeight gets reset
       consensus_state:
         title: consensus state
         type: object
@@ -30854,7 +31748,7 @@ definitions:
     description: >-
       ConsensusStateWithHeight defines a consensus state with an additional
       height field.
-  ibc.client.QueryClientStateResponse:
+  ibc.core.client.v1.QueryClientStateResponse:
     type: object
     properties:
       client_state:
@@ -31028,17 +31922,17 @@ definitions:
         title: height at which the proof was retrieved
         type: object
         properties:
-          epoch_number:
+          version_number:
             type: string
             format: uint64
-            title: the epoch that the client is currently on
-          epoch_height:
+            title: the version that the client is currently on
+          version_height:
             type: string
             format: uint64
-            title: the height within the given epoch
+            title: the height within the given version
         description: >-
-          Normally the EpochHeight is incremented at each height while keeping
-          epoch
+          Normally the VersionHeight is incremented at each height while keeping
+          version
 
           number the same However some consensus algorithms may choose to reset
           the
@@ -31046,10 +31940,10 @@ definitions:
           height in certain conditions e.g. hard forks, state-machine breaking
           changes
 
-          In these cases, the epoch number is incremented so that height
+          In these cases, the version number is incremented so that height
           continues to
 
-          be monitonically increasing even as the EpochHeight gets reset
+          be monitonically increasing even as the VersionHeight gets reset
     description: >-
       QueryClientStateResponse is the response type for the Query/ClientState
       RPC
@@ -31057,7 +31951,7 @@ definitions:
       method. Besides the client state, it includes a proof and the height from
 
       which the proof was retrieved.
-  ibc.client.QueryClientStatesResponse:
+  ibc.core.client.v1.QueryClientStatesResponse:
     type: object
     properties:
       client_states:
@@ -31275,7 +32169,7 @@ definitions:
       RPC
 
       method.
-  ibc.client.QueryConsensusStateResponse:
+  ibc.core.client.v1.QueryConsensusStateResponse:
     type: object
     properties:
       consensus_state:
@@ -31451,17 +32345,17 @@ definitions:
         title: height at which the proof was retrieved
         type: object
         properties:
-          epoch_number:
+          version_number:
             type: string
             format: uint64
-            title: the epoch that the client is currently on
-          epoch_height:
+            title: the version that the client is currently on
+          version_height:
             type: string
             format: uint64
-            title: the height within the given epoch
+            title: the height within the given version
         description: >-
-          Normally the EpochHeight is incremented at each height while keeping
-          epoch
+          Normally the VersionHeight is incremented at each height while keeping
+          version
 
           number the same However some consensus algorithms may choose to reset
           the
@@ -31469,16 +32363,16 @@ definitions:
           height in certain conditions e.g. hard forks, state-machine breaking
           changes
 
-          In these cases, the epoch number is incremented so that height
+          In these cases, the version number is incremented so that height
           continues to
 
-          be monitonically increasing even as the EpochHeight gets reset
+          be monitonically increasing even as the VersionHeight gets reset
     title: >-
       QueryConsensusStateResponse is the response type for the
       Query/ConsensusState
 
       RPC method
-  ibc.client.QueryConsensusStatesResponse:
+  ibc.core.client.v1.QueryConsensusStatesResponse:
     type: object
     properties:
       consensus_states:
@@ -31490,17 +32384,17 @@ definitions:
               title: consensus state height
               type: object
               properties:
-                epoch_number:
+                version_number:
                   type: string
                   format: uint64
-                  title: the epoch that the client is currently on
-                epoch_height:
+                  title: the version that the client is currently on
+                version_height:
                   type: string
                   format: uint64
-                  title: the height within the given epoch
+                  title: the height within the given version
               description: >-
-                Normally the EpochHeight is incremented at each height while
-                keeping epoch
+                Normally the VersionHeight is incremented at each height while
+                keeping version
 
                 number the same However some consensus algorithms may choose to
                 reset the
@@ -31508,10 +32402,10 @@ definitions:
                 height in certain conditions e.g. hard forks, state-machine
                 breaking changes
 
-                In these cases, the epoch number is incremented so that height
+                In these cases, the version number is incremented so that height
                 continues to
 
-                be monitonically increasing even as the EpochHeight gets reset
+                be monitonically increasing even as the VersionHeight gets reset
             consensus_state:
               title: consensus state
               type: object
@@ -31715,7 +32609,7 @@ definitions:
     title: |-
       QueryConsensusStatesResponse is the response type for the
       Query/ConsensusStates RPC method
-  ibc.commitment.MerklePrefix:
+  ibc.core.commitment.v1.MerklePrefix:
     type: object
     properties:
       key_prefix:
@@ -31725,7 +32619,7 @@ definitions:
       MerklePrefix is merkle path prefixed to the key.
       The constructed key from the Path and the key will be append(Path.KeyPath,
       append(Path.KeyPrefix, key...))
-  ibc.connection.ConnectionEnd:
+  ibc.core.connection.v1.ConnectionEnd:
     type: object
     properties:
       client_id:
@@ -31781,7 +32675,7 @@ definitions:
       establish
 
       a connection between two chains.
-  ibc.connection.Counterparty:
+  ibc.core.connection.v1.Counterparty:
     type: object
     properties:
       client_id:
@@ -31808,7 +32702,7 @@ definitions:
     description: >-
       Counterparty defines the counterparty chain associated with a connection
       end.
-  ibc.connection.IdentifiedConnection:
+  ibc.core.connection.v1.IdentifiedConnection:
     type: object
     properties:
       id:
@@ -31863,7 +32757,7 @@ definitions:
     description: |-
       IdentifiedConnection defines a connection with additional connection
       identifier field.
-  ibc.connection.QueryClientConnectionsResponse:
+  ibc.core.connection.v1.QueryClientConnectionsResponse:
     type: object
     properties:
       connection_paths:
@@ -31882,17 +32776,17 @@ definitions:
         title: height at which the proof was generated
         type: object
         properties:
-          epoch_number:
+          version_number:
             type: string
             format: uint64
-            title: the epoch that the client is currently on
-          epoch_height:
+            title: the version that the client is currently on
+          version_height:
             type: string
             format: uint64
-            title: the height within the given epoch
+            title: the height within the given version
         description: >-
-          Normally the EpochHeight is incremented at each height while keeping
-          epoch
+          Normally the VersionHeight is incremented at each height while keeping
+          version
 
           number the same However some consensus algorithms may choose to reset
           the
@@ -31900,14 +32794,14 @@ definitions:
           height in certain conditions e.g. hard forks, state-machine breaking
           changes
 
-          In these cases, the epoch number is incremented so that height
+          In these cases, the version number is incremented so that height
           continues to
 
-          be monitonically increasing even as the EpochHeight gets reset
+          be monitonically increasing even as the VersionHeight gets reset
     title: |-
       QueryClientConnectionsResponse is the response type for the
       Query/ClientConnections RPC method
-  ibc.connection.QueryConnectionClientStateResponse:
+  ibc.core.connection.v1.QueryConnectionClientStateResponse:
     type: object
     properties:
       identified_client_state:
@@ -32097,17 +32991,17 @@ definitions:
         title: height at which the proof was retrieved
         type: object
         properties:
-          epoch_number:
+          version_number:
             type: string
             format: uint64
-            title: the epoch that the client is currently on
-          epoch_height:
+            title: the version that the client is currently on
+          version_height:
             type: string
             format: uint64
-            title: the height within the given epoch
+            title: the height within the given version
         description: >-
-          Normally the EpochHeight is incremented at each height while keeping
-          epoch
+          Normally the VersionHeight is incremented at each height while keeping
+          version
 
           number the same However some consensus algorithms may choose to reset
           the
@@ -32115,14 +33009,14 @@ definitions:
           height in certain conditions e.g. hard forks, state-machine breaking
           changes
 
-          In these cases, the epoch number is incremented so that height
+          In these cases, the version number is incremented so that height
           continues to
 
-          be monitonically increasing even as the EpochHeight gets reset
+          be monitonically increasing even as the VersionHeight gets reset
     title: |-
       QueryConnectionClientStateResponse is the response type for the
       Query/ConnectionClientState RPC method
-  ibc.connection.QueryConnectionConsensusStateResponse:
+  ibc.core.connection.v1.QueryConnectionConsensusStateResponse:
     type: object
     properties:
       consensus_state:
@@ -32299,17 +33193,17 @@ definitions:
         title: height at which the proof was retrieved
         type: object
         properties:
-          epoch_number:
+          version_number:
             type: string
             format: uint64
-            title: the epoch that the client is currently on
-          epoch_height:
+            title: the version that the client is currently on
+          version_height:
             type: string
             format: uint64
-            title: the height within the given epoch
+            title: the height within the given version
         description: >-
-          Normally the EpochHeight is incremented at each height while keeping
-          epoch
+          Normally the VersionHeight is incremented at each height while keeping
+          version
 
           number the same However some consensus algorithms may choose to reset
           the
@@ -32317,14 +33211,14 @@ definitions:
           height in certain conditions e.g. hard forks, state-machine breaking
           changes
 
-          In these cases, the epoch number is incremented so that height
+          In these cases, the version number is incremented so that height
           continues to
 
-          be monitonically increasing even as the EpochHeight gets reset
+          be monitonically increasing even as the VersionHeight gets reset
     title: |-
       QueryConnectionConsensusStateResponse is the response type for the
       Query/ConnectionConsensusState RPC method
-  ibc.connection.QueryConnectionResponse:
+  ibc.core.connection.v1.QueryConnectionResponse:
     type: object
     properties:
       connection:
@@ -32396,17 +33290,17 @@ definitions:
         title: height at which the proof was retrieved
         type: object
         properties:
-          epoch_number:
+          version_number:
             type: string
             format: uint64
-            title: the epoch that the client is currently on
-          epoch_height:
+            title: the version that the client is currently on
+          version_height:
             type: string
             format: uint64
-            title: the height within the given epoch
+            title: the height within the given version
         description: >-
-          Normally the EpochHeight is incremented at each height while keeping
-          epoch
+          Normally the VersionHeight is incremented at each height while keeping
+          version
 
           number the same However some consensus algorithms may choose to reset
           the
@@ -32414,10 +33308,10 @@ definitions:
           height in certain conditions e.g. hard forks, state-machine breaking
           changes
 
-          In these cases, the epoch number is incremented so that height
+          In these cases, the version number is incremented so that height
           continues to
 
-          be monitonically increasing even as the EpochHeight gets reset
+          be monitonically increasing even as the VersionHeight gets reset
     description: >-
       QueryConnectionResponse is the response type for the Query/Connection RPC
 
@@ -32425,7 +33319,7 @@ definitions:
       from
 
       which the proof was retrieved.
-  ibc.connection.QueryConnectionsResponse:
+  ibc.core.connection.v1.QueryConnectionsResponse:
     type: object
     properties:
       connections:
@@ -32516,17 +33410,17 @@ definitions:
         title: query block height
         type: object
         properties:
-          epoch_number:
+          version_number:
             type: string
             format: uint64
-            title: the epoch that the client is currently on
-          epoch_height:
+            title: the version that the client is currently on
+          version_height:
             type: string
             format: uint64
-            title: the height within the given epoch
+            title: the height within the given version
         description: >-
-          Normally the EpochHeight is incremented at each height while keeping
-          epoch
+          Normally the VersionHeight is incremented at each height while keeping
+          version
 
           number the same However some consensus algorithms may choose to reset
           the
@@ -32534,16 +33428,16 @@ definitions:
           height in certain conditions e.g. hard forks, state-machine breaking
           changes
 
-          In these cases, the epoch number is incremented so that height
+          In these cases, the version number is incremented so that height
           continues to
 
-          be monitonically increasing even as the EpochHeight gets reset
+          be monitonically increasing even as the VersionHeight gets reset
     description: >-
       QueryConnectionsResponse is the response type for the Query/Connections
       RPC
 
       method.
-  ibc.connection.State:
+  ibc.core.connection.v1.State:
     type: string
     enum:
       - STATE_UNINITIALIZED_UNSPECIFIED
@@ -32560,7 +33454,7 @@ definitions:
        - STATE_TRYOPEN: A connection end has acknowledged the handshake step on the counterparty
       chain.
        - STATE_OPEN: A connection end has completed the handshake.
-  ibc.transfer.DenomTrace:
+  ibc.applications.transfer.v1.DenomTrace:
     type: object
     properties:
       path:
@@ -32578,7 +33472,7 @@ definitions:
       the
 
       source tracing information path.
-  ibc.transfer.Params:
+  ibc.applications.transfer.v1.Params:
     type: object
     properties:
       send_enabled:
@@ -32604,7 +33498,7 @@ definitions:
       SendEnabled
 
       parameter for the denomination to false.
-  ibc.transfer.QueryDenomTraceResponse:
+  ibc.applications.transfer.v1.QueryDenomTraceResponse:
     type: object
     properties:
       denom_trace:
@@ -32624,7 +33518,7 @@ definitions:
     description: |-
       QueryDenomTraceResponse is the response type for the Query/DenomTrace RPC
       method.
-  ibc.transfer.QueryDenomTracesResponse:
+  ibc.applications.transfer.v1.QueryDenomTracesResponse:
     type: object
     properties:
       denom_traces:
@@ -32671,7 +33565,7 @@ definitions:
       RPC
 
       method.
-  ibc.transfer.QueryParamsResponse:
+  ibc.applications.transfer.v1.QueryParamsResponse:
     type: object
     properties:
       params:
