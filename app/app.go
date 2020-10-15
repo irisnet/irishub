@@ -402,7 +402,7 @@ func NewIrisApp(
 
 	app.serviceKeeper = servicekeeper.NewKeeper(
 		appCodec, keys[servicetypes.StoreKey], app.accountKeeper, app.bankKeeper,
-		WrapToken(app.tokenKeeper), app.GetSubspace(servicetypes.ModuleName), authtypes.FeeCollectorName,
+		app.GetSubspace(servicetypes.ModuleName), authtypes.FeeCollectorName,
 	)
 
 	app.oracleKeeper = oraclekeeper.NewKeeper(
@@ -584,7 +584,7 @@ func (app *IrisApp) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 	var serviceGenState servicetypes.GenesisState
 	app.appCodec.MustUnmarshalJSON(genesisState[servicetypes.ModuleName], &serviceGenState)
 	serviceGenState.Definitions = append(serviceGenState.Definitions, servicetypes.GenOraclePriceSvcDefinition())
-	serviceGenState.Bindings = append(serviceGenState.Bindings, servicetypes.GenOraclePriceSvcBinding(nativeToken.Symbol))
+	serviceGenState.Bindings = append(serviceGenState.Bindings, servicetypes.GenOraclePriceSvcBinding(nativeToken.MinUnit))
 	serviceGenState.Definitions = append(serviceGenState.Definitions, randomtypes.GetSvcDefinition())
 	genesisState[servicetypes.ModuleName] = app.appCodec.MustMarshalJSON(&serviceGenState)
 
