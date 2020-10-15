@@ -63,6 +63,12 @@ func (k Keeper) AddServiceBinding(
 		return err
 	}
 
+	for i, token := range parsedPricing.Price {
+		if total := k.bankKeeper.GetSupply(ctx).GetTotal().AmountOf(token.Denom); !total.IsPositive() {
+			return sdkerrors.Wrapf(types.ErrInvalidPricing, "invalid denom: %s", parsedPricing.Price[i].Denom)
+		}
+	}
+
 	minDeposit := k.getMinDeposit(ctx, parsedPricing)
 	if !deposit.IsAllGTE(minDeposit) {
 		return sdkerrors.Wrapf(
@@ -171,6 +177,12 @@ func (k Keeper) UpdateServiceBinding(
 
 		if err := types.ValidatePricing(parsedPricing); err != nil {
 			return err
+		}
+
+		for i, token := range parsedPricing.Price {
+			if total := k.bankKeeper.GetSupply(ctx).GetTotal().AmountOf(token.Denom); !total.IsPositive() {
+				return sdkerrors.Wrapf(types.ErrInvalidPricing, "invalid denom: %s", parsedPricing.Price[i].Denom)
+			}
 		}
 
 		binding.Pricing = pricing
@@ -442,30 +454,12 @@ func (k Keeper) ParsePricing(ctx sdk.Context, pricing string) (p types.Pricing, 
 		return p, sdkerrors.Wrapf(types.ErrInvalidPricing, "failed to unmarshal the pricing: %s", err.Error())
 	}
 
-	token, err := sdk.ParseDecCoin(rawPricing.Price)
-	if err != nil {
-		tokenPrice, err := sdk.ParseCoin(rawPricing.Price)
-		if err != nil {
-			return p, sdkerrors.Wrapf(types.ErrInvalidPricing, "invalid price: %s", err.Error())
-		}
-		token = sdk.NewDecCoinFromCoin(tokenPrice)
-	}
-	ft, err := k.tokenKeeper.GetToken(ctx, token.Denom)
+	tokenPrice, err := sdk.ParseCoin(rawPricing.Price)
 	if err != nil {
 		return p, sdkerrors.Wrapf(types.ErrInvalidPricing, "invalid price: %s", err.Error())
 	}
 
-	priceCoin, err := ft.ToMinCoin(token)
-	if err != nil {
-		return p, sdkerrors.Wrapf(types.ErrInvalidPricing, "invalid price: %s", err.Error())
-	}
-
-	if priceCoin.IsZero() {
-		p.Price = sdk.Coins{sdk.NewCoin(priceCoin.Denom, sdk.NewInt(0))}
-	} else {
-		p.Price = sdk.NewCoins(priceCoin)
-	}
-
+	p.Price = sdk.Coins{tokenPrice}
 	p.PromotionsByTime = rawPricing.PromotionsByTime
 	p.PromotionsByVolume = rawPricing.PromotionsByVolume
 
@@ -588,12 +582,7 @@ func (k Keeper) getMinDeposit(ctx sdk.Context, pricing types.Pricing) sdk.Coins 
 func (k Keeper) validateDeposit(ctx sdk.Context, deposit sdk.Coins) error {
 	baseDenom := k.BaseDenom(ctx)
 
-	token, err := k.tokenKeeper.GetToken(ctx, deposit[0].Denom)
-	if err != nil {
-		return sdkerrors.Wrap(types.ErrInvalidPricing, err.Error())
-	}
-
-	if len(deposit) != 1 || token.GetMinUnit() != baseDenom {
+	if len(deposit) != 1 || deposit[0].Denom != baseDenom {
 		return sdkerrors.Wrapf(types.ErrInvalidDeposit, "deposit only accepts %s", baseDenom)
 	}
 

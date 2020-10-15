@@ -459,7 +459,7 @@ func (k Keeper) buildRequest(
 
 	if !superMode {
 		binding, _ := k.GetServiceBinding(ctx, serviceName, provider)
-		serviceFee, _, _ = k.GetExchangedPrice(ctx, consumer, binding)
+		serviceFee = k.GetPrice(ctx, consumer, binding)
 	}
 
 	return types.NewCompactRequest(
@@ -799,12 +799,13 @@ func (k Keeper) FilterServiceProviders(
 
 		if found && binding.Available {
 			if binding.QoS <= uint64(timeout) {
-				price, rawDenom, err := k.GetExchangedPrice(ctx, consumer, binding)
+				exchangedPrice, rawDenom, err := k.GetExchangedPrice(ctx, consumer, binding)
 				if err != nil {
 					return nil, nil, rawDenom, err
 				}
 
-				if price.IsAllLTE(serviceFeeCap) {
+				price := k.GetPricing(ctx, binding.ServiceName, binding.Provider).Price
+				if exchangedPrice.IsAllLTE(serviceFeeCap) {
 					newProviders = append(newProviders, provider)
 					totalPrices = totalPrices.Add(price...)
 				}
@@ -818,6 +819,28 @@ func (k Keeper) FilterServiceProviders(
 // DeductServiceFees deducts the given service fees from the specified consumer
 func (k Keeper) DeductServiceFees(ctx sdk.Context, consumer sdk.AccAddress, serviceFees sdk.Coins) error {
 	return k.bankKeeper.SendCoinsFromAccountToModule(ctx, consumer, types.RequestAccName, serviceFees)
+}
+
+func (k Keeper) GetPrice(
+	ctx sdk.Context,
+	consumer sdk.AccAddress,
+	binding types.ServiceBinding,
+) sdk.Coins {
+	pricing := k.GetPricing(ctx, binding.ServiceName, binding.Provider)
+
+	// get discounts
+	discountByTime := types.GetDiscountByTime(pricing, ctx.BlockTime())
+	discountByVolume := types.GetDiscountByVolume(
+		pricing, k.GetRequestVolume(ctx, consumer, binding.ServiceName, binding.Provider),
+	)
+
+	price := []sdk.Coin{}
+	for _, token := range pricing.Price {
+		priceAmount := sdk.NewDecFromInt(token.Amount).Mul(discountByTime).Mul(discountByVolume)
+		price = append(price, sdk.NewCoin(token.Denom, priceAmount.TruncateInt()))
+	}
+
+	return sdk.NewCoins(price...)
 }
 
 // AddResponse adds the response for the specified request ID

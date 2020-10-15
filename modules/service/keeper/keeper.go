@@ -20,9 +20,8 @@ type Keeper struct {
 
 	accountKeeper types.AccountKeeper
 	// The bankKeeper to reduce the supply of the network
-	bankKeeper  types.BankKeeper
-	tokenKeeper types.TokenKeeper
-	paramSpace  paramstypes.Subspace
+	bankKeeper types.BankKeeper
+	paramSpace paramstypes.Subspace
 
 	// name of the FeeCollector ModuleAccount
 	feeCollectorName string
@@ -43,7 +42,6 @@ func NewKeeper(
 	key sdk.StoreKey,
 	accountKeeper types.AccountKeeper,
 	bankKeeper types.BankKeeper,
-	tokenKeeper types.TokenKeeper,
 	paramSpace paramstypes.Subspace,
 	feeCollectorName string,
 ) Keeper {
@@ -66,7 +64,6 @@ func NewKeeper(
 		cdc:              cdc,
 		accountKeeper:    accountKeeper,
 		bankKeeper:       bankKeeper,
-		tokenKeeper:      tokenKeeper,
 		feeCollectorName: feeCollectorName,
 		paramSpace:       paramSpace,
 	}

@@ -27,8 +27,3 @@ type AccountKeeper interface {
 	GetModuleAddress(name string) sdk.AccAddress
 	GetModuleAccount(ctx sdk.Context, name string) authtypes.ModuleAccountI
 }
-
-// TokenKeeper defines the expected token keeper (noalias)
-type TokenKeeper interface {
-	GetToken(ctx sdk.Context, denom string) (TokenI, error)
-}
