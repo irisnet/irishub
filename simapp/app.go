@@ -377,8 +377,7 @@ func NewSimApp(
 
 	app.ServiceKeeper = servicekeeper.NewKeeper(
 		appCodec, keys[servicetypes.StoreKey], app.AccountKeeper, app.BankKeeper,
-		servicekeeper.MockTokenKeeper{}, app.GetSubspace(servicetypes.ModuleName),
-		authtypes.FeeCollectorName,
+		app.GetSubspace(servicetypes.ModuleName), authtypes.FeeCollectorName,
 	)
 
 	app.OracleKeeper = oracleKeeper.NewKeeper(

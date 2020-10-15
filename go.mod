@@ -8,7 +8,7 @@ require (
 	github.com/golang/protobuf v1.4.2
 	github.com/gorilla/mux v1.8.0
 	github.com/grpc-ecosystem/grpc-gateway v1.15.0
-	github.com/irisnet/irismod v1.1.1-0.20201014072931-cfb6e5adbf84
+	github.com/irisnet/irismod v1.1.1-0.20201015063111-aa6725ffb200
 	github.com/olebedev/config v0.0.0-20190528211619-364964f3a8e4
 	github.com/pkg/errors v0.9.1
 	github.com/rakyll/statik v0.1.7
