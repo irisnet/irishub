@@ -2,7 +2,7 @@
 
 set -eo pipefail
 
-IRISMOD_VERSION=9d21ec6ad6fce9807b4001f443fcf82890f21c6a
+IRISMOD_VERSION=v1.1.1-0.20201015064111-9d21ec6ad6fc
 SDK_VERSION=v0.34.4-0.20201014023301-f172e47973d0
 
 chmod -R 755 ${GOPATH}/pkg/mod/github.com/irisnet/irismod@${IRISMOD_VERSION}/proto

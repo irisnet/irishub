@@ -2,7 +2,7 @@ swagger: '2.0'
 info:
   title: IRISHub - Legacy REST and gRPC Gateway docs
   description: 'A REST interface for state queries, legacy transactions'
-  version: 1.0.0
+  version: 1.0.0-beta
 paths:
   /node_info:
     get:
@@ -5287,6 +5287,7 @@ paths:
           in: query
           required: false
           type: boolean
+          format: boolean
       tags:
         - Query
   '/cosmos/bank/v1beta1/balances/{address}/{denom}':
@@ -5367,6 +5368,7 @@ paths:
                           type: string
                         enabled:
                           type: boolean
+                          format: boolean
                       description: >-
                         SendEnabled maps coin denom to a send_enabled status
                         (whether a denom is
@@ -5374,6 +5376,7 @@ paths:
                         sendable).
                   default_send_enabled:
                     type: boolean
+                    format: boolean
                 description: Params defines the parameters for the bank module.
             description: >-
               QueryParamsResponse defines the response type for querying x/bank
@@ -5846,6 +5849,7 @@ paths:
                     type: string
                   withdraw_addr_enabled:
                     type: boolean
+                    format: boolean
             description: >-
               QueryParamsResponse is the response type for the Query/Params RPC
               method.
@@ -6152,6 +6156,7 @@ paths:
           in: query
           required: false
           type: boolean
+          format: boolean
       tags:
         - Query
   /cosmos/evidence/v1beta1/evidence:
@@ -6601,6 +6606,7 @@ paths:
           in: query
           required: false
           type: boolean
+          format: boolean
       tags:
         - Query
   '/cosmos/evidence/v1beta1/evidence/{evidence_hash}':
@@ -7716,6 +7722,7 @@ paths:
           in: query
           required: false
           type: boolean
+          format: boolean
       tags:
         - Query
   '/cosmos/gov/v1beta1/proposals/{proposal_id}':
@@ -8487,6 +8494,7 @@ paths:
           in: query
           required: false
           type: boolean
+          format: boolean
       tags:
         - Query
   '/cosmos/gov/v1beta1/proposals/{proposal_id}/deposits/{depositor}':
@@ -9263,6 +9271,7 @@ paths:
           in: query
           required: false
           type: boolean
+          format: boolean
       tags:
         - Query
   '/cosmos/gov/v1beta1/proposals/{proposal_id}/votes/{voter}':
@@ -9658,6 +9667,7 @@ paths:
                       title: timestamp validator cannot be unjailed until
                     tombstoned:
                       type: boolean
+                      format: boolean
                       title: >-
                         whether or not a validator has been tombstoned (killed
                         out of validator
@@ -9776,6 +9786,7 @@ paths:
           in: query
           required: false
           type: boolean
+          format: boolean
       tags:
         - Query
   '/cosmos/slashing/v1beta1/signing_infos/{cons_address}':
@@ -9812,6 +9823,7 @@ paths:
                     title: timestamp validator cannot be unjailed until
                   tombstoned:
                     type: boolean
+                    format: boolean
                     title: >-
                       whether or not a validator has been tombstoned (killed out
                       of validator
@@ -10016,6 +10028,7 @@ paths:
           in: query
           required: false
           type: boolean
+          format: boolean
       tags:
         - Query
   '/cosmos/staking/v1beta1/delegators/{delegator_addr}/redelegations':
@@ -10212,6 +10225,7 @@ paths:
           in: query
           required: false
           type: boolean
+          format: boolean
       tags:
         - Query
   '/cosmos/staking/v1beta1/delegators/{delegator_addr}/unbonding_delegations':
@@ -10357,6 +10371,7 @@ paths:
           in: query
           required: false
           type: boolean
+          format: boolean
       tags:
         - Query
   '/cosmos/staking/v1beta1/delegators/{delegator_addr}/validators':
@@ -10382,6 +10397,7 @@ paths:
                       type: string
                     jailed:
                       type: boolean
+                      format: boolean
                     status:
                       type: integer
                       format: int32
@@ -10553,6 +10569,7 @@ paths:
           in: query
           required: false
           type: boolean
+          format: boolean
       tags:
         - Query
   '/cosmos/staking/v1beta1/delegators/{delegator_addr}/validators/{validator_addr}':
@@ -10577,6 +10594,7 @@ paths:
                     type: string
                   jailed:
                     type: boolean
+                    format: boolean
                   status:
                     type: integer
                     format: int32
@@ -10769,6 +10787,7 @@ paths:
                           type: string
                         jailed:
                           type: boolean
+                          format: boolean
                         status:
                           type: integer
                           format: int32
@@ -10998,6 +11017,7 @@ paths:
                       type: string
                     jailed:
                       type: boolean
+                      format: boolean
                     status:
                       type: integer
                       format: int32
@@ -11169,6 +11189,7 @@ paths:
           in: query
           required: false
           type: boolean
+          format: boolean
       tags:
         - Query
   '/cosmos/staking/v1beta1/validators/{validator_addr}':
@@ -11191,6 +11212,7 @@ paths:
                     type: string
                   jailed:
                     type: boolean
+                    format: boolean
                   status:
                     type: integer
                     format: int32
@@ -11424,6 +11446,7 @@ paths:
           in: query
           required: false
           type: boolean
+          format: boolean
       tags:
         - Query
   '/cosmos/staking/v1beta1/validators/{validator_addr}/delegations/{delegator_addr}':
@@ -11731,6 +11754,7 @@ paths:
           in: query
           required: false
           type: boolean
+          format: boolean
       tags:
         - Query
   '/cosmos/upgrade/v1beta1/applied_plan/{name}':
@@ -12776,6 +12800,7 @@ paths:
           in: query
           required: false
           type: boolean
+          format: boolean
       tags:
         - Query
   '/ibc/channel/v1beta1/channels/{channel_id}/ports/{port_id}':
@@ -14846,6 +14871,7 @@ paths:
           in: query
           required: false
           type: boolean
+          format: boolean
       tags:
         - Query
   '/ibc/channel/v1beta1/channels/{channel_id}/ports/{port_id}/packet_commitments/{packet_commitment_sequences}/unreceived_packets':
@@ -16027,6 +16053,7 @@ paths:
           in: query
           required: false
           type: boolean
+          format: boolean
       tags:
         - Query
   /ibc/client/v1beta1/client_states:
@@ -16500,6 +16527,7 @@ paths:
           in: query
           required: false
           type: boolean
+          format: boolean
       tags:
         - Query
   '/ibc/client/v1beta1/client_states/{client_id}':
@@ -17421,6 +17449,7 @@ paths:
           in: query
           required: false
           type: boolean
+          format: boolean
       tags:
         - Query
   '/ibc/client/v1beta1/consensus_states/{client_id}/version/{version_number}/height/{version_height}':
@@ -17866,6 +17895,7 @@ paths:
           in: query
           required: false
           type: boolean
+          format: boolean
       tags:
         - Query
   '/ibc/connection/v1beta1/client_connections/{client_id}':
@@ -18485,6 +18515,7 @@ paths:
           in: query
           required: false
           type: boolean
+          format: boolean
       tags:
         - Query
   '/ibc/connection/v1beta1/connections/{connection_id}':
@@ -19949,6 +19980,7 @@ paths:
           in: query
           required: false
           type: boolean
+          format: boolean
       tags:
         - Query
   '/ibc_transfer/v1beta1/denom_traces/{hash}':
@@ -20195,6 +20227,7 @@ paths:
                 properties:
                   send_enabled:
                     type: boolean
+                    format: boolean
                     description: >-
                       send_enabled enables or disables all cross-chain token
                       transfers from this
@@ -20202,6 +20235,7 @@ paths:
                       chain.
                   receive_enabled:
                     type: boolean
+                    format: boolean
                     description: >-
                       receive_enabled enables or disables all cross-chain token
                       transfers to this
@@ -21255,6 +21289,7 @@ paths:
                       format: byte
                     oracle:
                       type: boolean
+                      format: boolean
                     service_fee_cap:
                       type: array
                       items:
@@ -21476,6 +21511,7 @@ paths:
                       type: string
                     available:
                       type: boolean
+                      format: boolean
                     disabled_time:
                       type: string
                       format: date-time
@@ -21563,6 +21599,7 @@ paths:
                     type: string
                   available:
                     type: boolean
+                    format: boolean
                   disabled_time:
                     type: string
                     format: date-time
@@ -21656,8 +21693,10 @@ paths:
                     format: int64
                   super_mode:
                     type: boolean
+                    format: boolean
                   repeated:
                     type: boolean
+                    format: boolean
                   repeated_frequency:
                     type: string
                     format: uint64
@@ -22014,6 +22053,7 @@ paths:
                           signatures required by gogoproto.
                     super_mode:
                       type: boolean
+                      format: boolean
                     request_height:
                       type: string
                       format: int64
@@ -22110,6 +22150,7 @@ paths:
                         signatures required by gogoproto.
                   super_mode:
                     type: boolean
+                    format: boolean
                   request_height:
                     type: string
                     format: int64
@@ -22204,6 +22245,7 @@ paths:
                           signatures required by gogoproto.
                     super_mode:
                       type: boolean
+                      format: boolean
                     request_height:
                       type: string
                       format: int64
@@ -23508,6 +23550,7 @@ paths:
             properties:
               exist:
                 type: boolean
+                format: boolean
               issue_fee:
                 type: object
                 properties:
@@ -25782,6 +25825,7 @@ definitions:
               type: string
             enabled:
               type: boolean
+              format: boolean
           description: >-
             SendEnabled maps coin denom to a send_enabled status (whether a
             denom is
@@ -25789,6 +25833,7 @@ definitions:
             sendable).
       default_send_enabled:
         type: boolean
+        format: boolean
     description: Params defines the parameters for the bank module.
   cosmos.bank.v1beta1.QueryAllBalancesResponse:
     type: object
@@ -25860,6 +25905,7 @@ definitions:
                   type: string
                 enabled:
                   type: boolean
+                  format: boolean
               description: >-
                 SendEnabled maps coin denom to a send_enabled status (whether a
                 denom is
@@ -25867,6 +25913,7 @@ definitions:
                 sendable).
           default_send_enabled:
             type: boolean
+            format: boolean
         description: Params defines the parameters for the bank module.
     description: >-
       QueryParamsResponse defines the response type for querying x/bank
@@ -25915,6 +25962,7 @@ definitions:
         type: string
       enabled:
         type: boolean
+        format: boolean
     description: |-
       SendEnabled maps coin denom to a send_enabled status (whether a denom is
       sendable).
@@ -25945,6 +25993,7 @@ definitions:
           If left empty it will default to a value to be set by each app.
       count_total:
         type: boolean
+        format: boolean
         description: >-
           count_total is set to true  to indicate that the result set should
           include
@@ -26043,6 +26092,7 @@ definitions:
         type: string
       withdraw_addr_enabled:
         type: boolean
+        format: boolean
     description: Params defines the set of params for the distribution module.
   cosmos.distribution.v1beta1.QueryCommunityPoolResponse:
     type: object
@@ -26173,6 +26223,7 @@ definitions:
             type: string
           withdraw_addr_enabled:
             type: boolean
+            format: boolean
     description: QueryParamsResponse is the response type for the Query/Params RPC method.
   cosmos.distribution.v1beta1.QueryValidatorCommissionResponse:
     type: object
@@ -27829,6 +27880,7 @@ definitions:
             title: timestamp validator cannot be unjailed until
           tombstoned:
             type: boolean
+            format: boolean
             title: >-
               whether or not a validator has been tombstoned (killed out of
               validator
@@ -27872,6 +27924,7 @@ definitions:
               title: timestamp validator cannot be unjailed until
             tombstoned:
               type: boolean
+              format: boolean
               title: >-
                 whether or not a validator has been tombstoned (killed out of
                 validator
@@ -27936,6 +27989,7 @@ definitions:
         title: timestamp validator cannot be unjailed until
       tombstoned:
         type: boolean
+        format: boolean
         title: >-
           whether or not a validator has been tombstoned (killed out of
           validator
@@ -28134,6 +28188,7 @@ definitions:
               type: string
             jailed:
               type: boolean
+              format: boolean
             status:
               type: integer
               format: int32
@@ -28421,6 +28476,7 @@ definitions:
             type: string
           jailed:
             type: boolean
+            format: boolean
           status:
             type: integer
             format: int32
@@ -28488,6 +28544,7 @@ definitions:
               type: string
             jailed:
               type: boolean
+              format: boolean
             status:
               type: integer
               format: int32
@@ -28676,6 +28733,7 @@ definitions:
                   type: string
                 jailed:
                   type: boolean
+                  format: boolean
                 status:
                   type: integer
                   format: int32
@@ -29004,6 +29062,7 @@ definitions:
             type: string
           jailed:
             type: boolean
+            format: boolean
           status:
             type: integer
             format: int32
@@ -29125,6 +29184,7 @@ definitions:
               type: string
             jailed:
               type: boolean
+              format: boolean
             status:
               type: integer
               format: int32
@@ -29419,6 +29479,7 @@ definitions:
         type: string
       jailed:
         type: boolean
+        format: boolean
       status:
         type: integer
         format: int32
@@ -33477,6 +33538,7 @@ definitions:
     properties:
       send_enabled:
         type: boolean
+        format: boolean
         description: >-
           send_enabled enables or disables all cross-chain token transfers from
           this
@@ -33484,6 +33546,7 @@ definitions:
           chain.
       receive_enabled:
         type: boolean
+        format: boolean
         description: >-
           receive_enabled enables or disables all cross-chain token transfers to
           this
@@ -33574,6 +33637,7 @@ definitions:
         properties:
           send_enabled:
             type: boolean
+            format: boolean
             description: >-
               send_enabled enables or disables all cross-chain token transfers
               from this
@@ -33581,6 +33645,7 @@ definitions:
               chain.
           receive_enabled:
             type: boolean
+            format: boolean
             description: >-
               receive_enabled enables or disables all cross-chain token
               transfers to this
@@ -34264,6 +34329,7 @@ definitions:
               format: byte
             oracle:
               type: boolean
+              format: boolean
             service_fee_cap:
               type: array
               items:
@@ -34330,6 +34396,7 @@ definitions:
         format: byte
       oracle:
         type: boolean
+        format: boolean
       service_fee_cap:
         type: array
         items:
@@ -34508,6 +34575,7 @@ definitions:
             type: string
           available:
             type: boolean
+            format: boolean
           disabled_time:
             type: string
             format: date-time
@@ -34554,6 +34622,7 @@ definitions:
               type: string
             available:
               type: boolean
+              format: boolean
             disabled_time:
               type: string
               format: date-time
@@ -34724,8 +34793,10 @@ definitions:
             format: int64
           super_mode:
             type: boolean
+            format: boolean
           repeated:
             type: boolean
+            format: boolean
           repeated_frequency:
             type: string
             format: uint64
@@ -34815,6 +34886,7 @@ definitions:
                 signatures required by gogoproto.
           super_mode:
             type: boolean
+            format: boolean
           request_height:
             type: string
             format: int64
@@ -34869,6 +34941,7 @@ definitions:
                   signatures required by gogoproto.
             super_mode:
               type: boolean
+              format: boolean
             request_height:
               type: string
               format: int64
@@ -34925,6 +34998,7 @@ definitions:
                   signatures required by gogoproto.
             super_mode:
               type: boolean
+              format: boolean
             request_height:
               type: string
               format: int64
@@ -35036,6 +35110,7 @@ definitions:
             signatures required by gogoproto.
       super_mode:
         type: boolean
+        format: boolean
       request_height:
         type: string
         format: int64
@@ -35085,8 +35160,10 @@ definitions:
         format: int64
       super_mode:
         type: boolean
+        format: boolean
       repeated:
         type: boolean
+        format: boolean
       repeated_frequency:
         type: string
         format: uint64
@@ -35197,6 +35274,7 @@ definitions:
         type: string
       available:
         type: boolean
+        format: boolean
       disabled_time:
         type: string
         format: date-time
@@ -35248,6 +35326,7 @@ definitions:
     properties:
       exist:
         type: boolean
+        format: boolean
       issue_fee:
         type: object
         properties:
