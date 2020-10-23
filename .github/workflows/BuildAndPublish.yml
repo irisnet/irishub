@@ -1,5 +1,6 @@
 name: BuildAndPublish
 on:
+  create:
   push:
     branches:
       - master
