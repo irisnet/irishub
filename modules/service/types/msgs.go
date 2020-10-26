@@ -1044,8 +1044,8 @@ func ValidateInput(input string) error {
 		return sdkerrors.Wrap(ErrInvalidRequestInput, "input missing")
 	}
 
-	if !json.Valid([]byte(input)) {
-		return sdkerrors.Wrap(ErrInvalidRequestInput, "input is not valid JSON")
+	if ValidateRequestInput(input) != nil {
+		return sdkerrors.Wrap(ErrInvalidRequestInput, "invalid input")
 	}
 
 	return nil
@@ -1060,8 +1060,8 @@ func ValidateOutput(code uint16, output string) error {
 		return sdkerrors.Wrap(ErrInvalidResponse, "output should not be specified when the result code is not 200")
 	}
 
-	if len(output) > 0 && !json.Valid([]byte(output)) {
-		return sdkerrors.Wrap(ErrInvalidResponse, "output is not valid JSON")
+	if len(output) > 0 && ValidateResponseOutput(output) != nil {
+		return sdkerrors.Wrap(ErrInvalidResponse, "invalid output")
 	}
 
 	return nil

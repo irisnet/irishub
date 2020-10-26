@@ -76,29 +76,19 @@ func Setup(isCheckTx bool) *SimApp {
 	return app
 }
 
+func NewConfig() network.Config {
+	cfg := network.DefaultConfig()
+	cfg.AppConstructor = SimAppConstructor
+	cfg.GenesisState = NewDefaultGenesisState()
+	return cfg
+}
+
 func SimAppConstructor(val network.Validator) servertypes.Application {
-	app := NewSimApp(
+	return NewSimApp(
 		val.Ctx.Logger, dbm.NewMemDB(), nil, true, make(map[int64]bool), val.Ctx.Config.RootDir, 0, MakeEncodingConfig(),
 		baseapp.SetPruning(storetypes.NewPruningOptionsFromString(val.AppConfig.Pruning)),
 		baseapp.SetMinGasPrices(val.AppConfig.MinGasPrices),
 	)
-
-	genesisState := NewDefaultGenesisState()
-	stateBytes, err := json.MarshalIndent(genesisState, "", " ")
-	if err != nil {
-		panic(err)
-	}
-
-	// Initialize the chain
-	app.InitChain(
-		abci.RequestInitChain{
-			Validators:      []abci.ValidatorUpdate{},
-			ConsensusParams: DefaultConsensusParams,
-			AppStateBytes:   stateBytes,
-		},
-	)
-
-	return app
 }
 
 // SetupWithGenesisValSet initializes a new SimApp with a validator set and genesis accounts

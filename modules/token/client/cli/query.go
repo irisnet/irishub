@@ -23,17 +23,17 @@ func GetQueryCmd() *cobra.Command {
 	}
 
 	queryCmd.AddCommand(
-		getCmdQueryToken(),
-		getCmdQueryTokens(),
-		getCmdQueryFee(),
-		getCmdQueryParams(),
+		GetCmdQueryToken(),
+		GetCmdQueryTokens(),
+		GetCmdQueryFee(),
+		GetCmdQueryParams(),
 	)
 
 	return queryCmd
 }
 
-// getCmdQueryToken implements the query token command.
-func getCmdQueryToken() *cobra.Command {
+// GetCmdQueryToken implements the query token command.
+func GetCmdQueryToken() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "token [denom]",
 		Long:    "Query a token by symbol or minUnit.",
@@ -69,8 +69,8 @@ func getCmdQueryToken() *cobra.Command {
 	return cmd
 }
 
-// getCmdQueryTokens implements the query tokens command.
-func getCmdQueryTokens() *cobra.Command {
+// GetCmdQueryTokens implements the query tokens command.
+func GetCmdQueryTokens() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "tokens [owner]",
 		Long:    "Query token by the owner.",
@@ -118,8 +118,8 @@ func getCmdQueryTokens() *cobra.Command {
 	return cmd
 }
 
-// getCmdQueryFee implements the query token related fees command.
-func getCmdQueryFee() *cobra.Command {
+// GetCmdQueryFee implements the query token related fees command.
+func GetCmdQueryFee() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "fee [symbol]",
 		Args:    cobra.ExactArgs(1),
@@ -157,8 +157,8 @@ func getCmdQueryFee() *cobra.Command {
 	return cmd
 }
 
-// getCmdQueryParams implements the query token related param command.
-func getCmdQueryParams() *cobra.Command {
+// GetCmdQueryParams implements the query token related param command.
+func GetCmdQueryParams() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "params",
 		Long:    "Query values set as token parameters.",

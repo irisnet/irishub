@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -74,8 +73,12 @@ func GetCmdQueryFeeds() *cobra.Command {
 			}
 
 			queryClient := types.NewQueryClient(clientCtx)
+			feedState, err := cmd.Flags().GetString(FlagFeedState)
+			if err != nil {
+				return err
+			}
 
-			res, err := queryClient.Feeds(context.Background(), &types.QueryFeedsRequest{State: viper.GetString(FlagFeedState)})
+			res, err := queryClient.Feeds(context.Background(), &types.QueryFeedsRequest{State: feedState})
 			if err != nil {
 				return err
 			}

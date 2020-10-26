@@ -1,14 +1,9 @@
 package cli
 
 import (
-	"crypto/rand"
 	"encoding/hex"
 	"fmt"
-
-	"strings"
-
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -66,52 +61,59 @@ func GetCmdCreateHTLC() *cobra.Command {
 
 			sender := clientCtx.GetFromAddress()
 
-			to, err := sdk.AccAddressFromBech32(viper.GetString(FlagTo))
+			toAddr, err := cmd.Flags().GetString(FlagTo)
 			if err != nil {
 				return err
 			}
 
-			receiverOnOtherChain := viper.GetString(FlagReceiverOnOtherChain)
-
-			amount, err := sdk.ParseCoins(viper.GetString(FlagAmount))
+			to, err := sdk.AccAddressFromBech32(toAddr)
 			if err != nil {
 				return err
 			}
 
-			timestamp := viper.GetInt64(FlagTimestamp)
-			timeLock := viper.GetInt64(FlagTimeLock)
+			receiverOnOtherChain, err := cmd.Flags().GetString(FlagReceiverOnOtherChain)
+			if err != nil {
+				return err
+			}
+			amountStr, err := cmd.Flags().GetString(FlagAmount)
+			if err != nil {
+				return err
+			}
+
+			amount, err := sdk.ParseCoins(amountStr)
+			if err != nil {
+				return err
+			}
+
+			timestamp, err := cmd.Flags().GetUint64(FlagTimestamp)
+			if err != nil {
+				return err
+			}
+			timeLock, err := cmd.Flags().GetUint64(FlagTimeLock)
+			if err != nil {
+				return err
+			}
 
 			secret := make([]byte, 32)
 			var hashLock []byte
 
 			flags := cmd.Flags()
 			if flags.Changed(FlagHashLock) {
-				hashLockStr := strings.TrimSpace(viper.GetString(FlagHashLock))
-				if hashLock, err = hex.DecodeString(hashLockStr); err != nil {
+				hashLock, err = cmd.Flags().GetBytesHex(FlagHashLock)
+				if err != nil {
 					return err
 				}
 			} else {
-				secretStr := strings.TrimSpace(viper.GetString(FlagSecret))
-				if len(secretStr) > 0 {
-					if len(secretStr) != 2*types.SecretLength {
-						return fmt.Errorf("length of the secret must be %d in bytes", types.SecretLength)
-					}
-
-					if secret, err = hex.DecodeString(secretStr); err != nil {
-						return err
-					}
-				} else {
-					if _, err := rand.Read(secret); err != nil {
-						return err
-					}
+				secret, err = cmd.Flags().GetBytesHex(FlagSecret)
+				if err != nil {
+					return err
 				}
-
-				hashLock = types.GetHashLock(secret, uint64(timestamp))
+				hashLock = types.GetHashLock(secret, timestamp)
 			}
 
 			msg := types.NewMsgCreateHTLC(
 				sender, to, receiverOnOtherChain, amount,
-				hashLock, uint64(timestamp), uint64(timeLock),
+				hashLock, timestamp, timeLock,
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err

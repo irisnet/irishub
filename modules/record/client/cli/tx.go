@@ -39,8 +39,14 @@ func GetCmdCreateRecord() *cobra.Command {
 			}
 
 			fromAddr := clientCtx.GetFromAddress()
-			uri, _ := cmd.Flags().GetString(FlagURI)
-			meta, _ := cmd.Flags().GetString(FlagMeta)
+			uri, err := cmd.Flags().GetString(FlagURI)
+			if err != nil {
+				return err
+			}
+			meta, err := cmd.Flags().GetString(FlagMeta)
+			if err != nil {
+				return err
+			}
 
 			content := types.Content{
 				Digest:     args[0],
