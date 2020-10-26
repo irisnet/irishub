@@ -28,8 +28,7 @@ type IntegrationTestSuite struct {
 func (s *IntegrationTestSuite) SetupSuite() {
 	s.T().Log("setting up integration test suite")
 
-	cfg := network.DefaultConfig()
-	cfg.AppConstructor = simapp.SimAppConstructor
+	cfg := simapp.NewConfig()
 	cfg.NumValidators = 1
 
 	s.cfg = cfg
