@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -51,8 +50,11 @@ func GetCmdQuerySupply() *cobra.Command {
 			}
 
 			var owner sdk.AccAddress
-
-			ownerStr := strings.TrimSpace(viper.GetString(FlagOwner))
+			rawOwner, err := cmd.Flags().GetString(FlagOwner)
+			if err != nil {
+				return err
+			}
+			ownerStr := strings.TrimSpace(rawOwner)
 			if len(ownerStr) > 0 {
 				owner, err = sdk.AccAddressFromBech32(ownerStr)
 				if err != nil {
@@ -101,7 +103,10 @@ func GetCmdQueryOwner() *cobra.Command {
 				return err
 			}
 
-			denom := viper.GetString(FlagDenom)
+			denom, err := cmd.Flags().GetString(FlagDenom)
+			if err != nil {
+				return err
+			}
 			queryClient := types.NewQueryClient(clientCtx)
 			resp, err := queryClient.Owner(context.Background(), &types.QueryOwnerRequest{
 				Denom: denom,

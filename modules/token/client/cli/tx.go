@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -66,15 +65,43 @@ func getCmdIssueToken() *cobra.Command {
 			}
 
 			owner := clientCtx.GetFromAddress()
+			symbol, err := cmd.Flags().GetString(FlagSymbol)
+			if err != nil {
+				return err
+			}
+			name, err := cmd.Flags().GetString(FlagName)
+			if err != nil {
+				return err
+			}
+			minUnit, err := cmd.Flags().GetString(FlagMinUnit)
+			if err != nil {
+				return err
+			}
+			scale, err := cmd.Flags().GetUint32(FlagScale)
+			if err != nil {
+				return err
+			}
+			initialSupply, err := cmd.Flags().GetUint64(FlagInitialSupply)
+			if err != nil {
+				return err
+			}
+			maxSupply, err := cmd.Flags().GetUint64(FlagMaxSupply)
+			if err != nil {
+				return err
+			}
+			mintable, err := cmd.Flags().GetBool(FlagMintable)
+			if err != nil {
+				return err
+			}
 
 			msg := &types.MsgIssueToken{
-				Symbol:        viper.GetString(FlagSymbol),
-				Name:          viper.GetString(FlagName),
-				MinUnit:       viper.GetString(FlagMinUnit),
-				Scale:         uint32(viper.GetInt(FlagScale)),
-				InitialSupply: uint64(viper.GetInt(FlagInitialSupply)),
-				MaxSupply:     uint64(viper.GetInt(FlagMaxSupply)),
-				Mintable:      viper.GetBool(FlagMintable),
+				Symbol:        symbol,
+				Name:          name,
+				MinUnit:       minUnit,
+				Scale:         scale,
+				InitialSupply: initialSupply,
+				MaxSupply:     maxSupply,
+				Mintable:      mintable,
 				Owner:         owner,
 			}
 
@@ -84,7 +111,11 @@ func getCmdIssueToken() *cobra.Command {
 
 			var prompt = "The token issue transaction will consume extra fee"
 
-			if !viper.GetBool(flags.FlagGenerateOnly) {
+			generateOnly, err := cmd.Flags().GetBool(flags.FlagGenerateOnly)
+			if err != nil {
+				return err
+			}
+			if !generateOnly {
 				// query fee
 				fee, err1 := queryTokenFees(clientCtx, msg.Symbol)
 				if err1 != nil {
@@ -147,10 +178,19 @@ func getCmdEditToken() *cobra.Command {
 
 			owner := clientCtx.GetFromAddress()
 
-			name := viper.GetString(FlagName)
-			maxSupply := uint64(viper.GetInt(FlagMaxSupply))
-
-			mintable, err := types.ParseBool(viper.GetString(FlagMintable))
+			name, err := cmd.Flags().GetString(FlagName)
+			if err != nil {
+				return err
+			}
+			maxSupply, err := cmd.Flags().GetUint64(FlagMaxSupply)
+			if err != nil {
+				return err
+			}
+			rawMintable, err := cmd.Flags().GetString(FlagMintable)
+			if err != nil {
+				return err
+			}
+			mintable, err := types.ParseBool(rawMintable)
 			if err != nil {
 				return err
 			}
@@ -193,10 +233,16 @@ func getCmdMintToken() *cobra.Command {
 
 			owner := clientCtx.GetFromAddress()
 
-			amount := uint64(viper.GetInt64(FlagAmount))
+			amount, err := cmd.Flags().GetUint64(FlagAmount)
+			if err != nil {
+				return err
+			}
 
 			var to sdk.AccAddress
-			addr := viper.GetString(FlagTo)
+			addr, err := cmd.Flags().GetString(FlagTo)
+			if err != nil {
+				return err
+			}
 			if len(strings.TrimSpace(addr)) > 0 {
 				to, err = sdk.AccAddressFromBech32(addr)
 				if err != nil {
@@ -214,7 +260,11 @@ func getCmdMintToken() *cobra.Command {
 
 			var prompt = "The token mint transaction will consume extra fee"
 
-			if !viper.GetBool(flags.FlagGenerateOnly) {
+			generateOnly, err := cmd.Flags().GetBool(flags.FlagGenerateOnly)
+			if err != nil {
+				return err
+			}
+			if !generateOnly {
 				// query fee
 				fee, err1 := queryTokenFees(clientCtx, args[0])
 				if err1 != nil {
@@ -271,7 +321,11 @@ func getCmdTransferTokenOwner() *cobra.Command {
 
 			owner := clientCtx.GetFromAddress()
 
-			to, err := sdk.AccAddressFromBech32(viper.GetString(FlagTo))
+			rawTo, err := cmd.Flags().GetString(FlagTo)
+			if err != nil {
+				return err
+			}
+			to, err := sdk.AccAddressFromBech32(rawTo)
 			if err != nil {
 				return err
 			}
