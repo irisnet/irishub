@@ -1,20 +1,20 @@
-package cli_test
+package rest
 
 import (
-	"fmt"
-	nfttypes "github.com/irisnet/irismod/modules/nft/types"
-	"github.com/tidwall/gjson"
-	"testing"
+"fmt"
+nfttypes "github.com/irisnet/irismod/modules/nft/types"
+"github.com/tidwall/gjson"
+"testing"
 
-	"github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/cosmos/cosmos-sdk/testutil/network"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/gogo/protobuf/proto"
-	"github.com/stretchr/testify/suite"
+"github.com/cosmos/cosmos-sdk/client/flags"
+"github.com/cosmos/cosmos-sdk/testutil/network"
+sdk "github.com/cosmos/cosmos-sdk/types"
+"github.com/gogo/protobuf/proto"
+"github.com/stretchr/testify/suite"
 
-	nftcli "github.com/irisnet/irismod/modules/nft/client/cli"
-	nfttestutil "github.com/irisnet/irismod/modules/nft/client/testutil"
-	"github.com/irisnet/irismod/simapp"
+nftcli "github.com/irisnet/irismod/modules/nft/client/cli"
+nfttestutil "github.com/irisnet/irismod/modules/nft/client/testutil"
+"github.com/irisnet/irismod/simapp"
 )
 
 type IntegrationTestSuite struct {
