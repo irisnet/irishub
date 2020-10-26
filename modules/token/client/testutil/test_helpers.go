@@ -78,7 +78,6 @@ func QueryFeeExec(clientCtx client.Context, symbol string, extraArgs ...string) 
 	return clitestutil.ExecTestCLICmd(clientCtx, tokencli.GetCmdQueryFee(), args)
 }
 
-
 func QueryParamsExec(clientCtx client.Context, extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
