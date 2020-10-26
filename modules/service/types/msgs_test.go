@@ -34,14 +34,14 @@ var (
 
 	testConsumer      = sdk.AccAddress([]byte("test-consumer"))
 	testProviders     = []sdk.AccAddress{testProvider}
-	testInput         = `{"pair":"iris-usdt"}`
+	testInput         = `{"header":{},"body":{"pair":"iris-usdt"}}`
 	testServiceFeeCap = sdk.NewCoins(testCoin2)
 	testTimeout       = int64(100)
 	testRepeatedFreq  = uint64(120)
 	testRepeatedTotal = int64(100)
 
 	testResult = `{"code":200,"message":""}`
-	testOutput = `{"last":"100"}`
+	testOutput = `{"header":{},"body":{"last":"100"}}`
 
 	testRequestContextID = GenerateRequestContextID(tmhash.Sum([]byte("test-request-context-id")), 0)
 	testRequestID        = GenerateRequestID(testRequestContextID, 1, 1, 1)
@@ -720,7 +720,7 @@ func TestMsgCallServiceGetSignBytes(t *testing.T) {
 	)
 	res := msg.GetSignBytes()
 
-	expected := `{"type":"irismod/service/MsgCallService","value":{"consumer":"cosmos1w3jhxapdvdhkuum4d4jhyt34ks5","input":"{\"pair\":\"iris-usdt\"}","providers":["cosmos1w3jhxapdwpex7anfv3jhy8anr90"],"repeated":true,"repeated_frequency":"120","repeated_total":"100","service_fee_cap":[{"amount":"100","denom":"stake"}],"service_name":"test-service","super_mode":true,"timeout":"100"}}`
+	expected := `{"type":"irismod/service/MsgCallService","value":{"consumer":"cosmos1w3jhxapdvdhkuum4d4jhyt34ks5","input":"{\"header\":{},\"body\":{\"pair\":\"iris-usdt\"}}","providers":["cosmos1w3jhxapdwpex7anfv3jhy8anr90"],"repeated":true,"repeated_frequency":"120","repeated_total":"100","service_fee_cap":[{"amount":"100","denom":"stake"}],"service_name":"test-service","super_mode":true,"timeout":"100"}}`
 	require.Equal(t, expected, string(res))
 }
 
@@ -811,7 +811,7 @@ func TestMsgRespondServiceGetSignBytes(t *testing.T) {
 	msg := NewMsgRespondService(testRequestID, testProvider, testResult, testOutput)
 	res := msg.GetSignBytes()
 
-	expected := `{"type":"irismod/service/MsgRespondService","value":{"output":"{\"last\":\"100\"}","provider":"cosmos1w3jhxapdwpex7anfv3jhy8anr90","request_id":"3DB0FA99DCB058BC86041BADBD614D6839F8FA20E17CF8AD3BA14C3F1BF613BD0000000000000000000000000000000100000000000000010001","result":"{\"code\":200,\"message\":\"\"}"}}`
+	expected := `{"type":"irismod/service/MsgRespondService","value":{"output":"{\"header\":{},\"body\":{\"last\":\"100\"}}","provider":"cosmos1w3jhxapdwpex7anfv3jhy8anr90","request_id":"3DB0FA99DCB058BC86041BADBD614D6839F8FA20E17CF8AD3BA14C3F1BF613BD0000000000000000000000000000000100000000000000010001","result":"{\"code\":200,\"message\":\"\"}"}}`
 	require.Equal(t, expected, string(res))
 }
 
