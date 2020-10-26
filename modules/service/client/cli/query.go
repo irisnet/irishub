@@ -7,7 +7,6 @@ import (
 	"strconv"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -148,7 +147,10 @@ func GetCmdQueryServiceBindings() *cobra.Command {
 			}
 
 			var owner sdk.AccAddress
-			ownerStr := viper.GetString(FlagOwner)
+			ownerStr, err := cmd.Flags().GetString(FlagOwner)
+			if err != nil {
+				return err
+			}
 			if len(ownerStr) > 0 {
 				owner, err = sdk.AccAddressFromBech32(ownerStr)
 				if err != nil {

@@ -7,7 +7,6 @@ import (
 	"io/ioutil"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -64,9 +63,13 @@ func GetCmdCreateFeed() *cobra.Command {
 			}
 
 			creator := clientCtx.GetFromAddress()
+			rawProviders, err := cmd.Flags().GetStringSlice(FlagProviders)
+			if err != nil {
+				return err
+			}
 
 			var providers []sdk.AccAddress
-			for _, addr := range viper.GetStringSlice(FlagProviders) {
+			for _, addr := range rawProviders {
 				provider, err := sdk.AccAddressFromBech32(addr)
 				if err != nil {
 					return err
@@ -74,13 +77,19 @@ func GetCmdCreateFeed() *cobra.Command {
 				providers = append(providers, provider)
 			}
 
-			serviceFeeCap, err := sdk.ParseCoins(viper.GetString(FlagServiceFeeCap))
+			rawServiceFeeCap, err := cmd.Flags().GetString(FlagServiceFeeCap)
+			if err != nil {
+				return err
+			}
+			serviceFeeCap, err := sdk.ParseCoins(rawServiceFeeCap)
 			if err != nil {
 				return err
 			}
 
-			input := viper.GetString(FlagInput)
-
+			input, err := cmd.Flags().GetString(FlagInput)
+			if err != nil {
+				return err
+			}
 			if !json.Valid([]byte(input)) {
 				inputContent, err := ioutil.ReadFile(input)
 				if err != nil {
@@ -101,19 +110,55 @@ func GetCmdCreateFeed() *cobra.Command {
 
 			input = buf.String()
 
+			feedName, err := cmd.Flags().GetString(FlagFeedName)
+			if err != nil {
+				return err
+			}
+			aggregateFunc, err := cmd.Flags().GetString(FlagAggregateFunc)
+			if err != nil {
+				return err
+			}
+			valueJsonPath, err := cmd.Flags().GetString(FlagValueJsonPath)
+			if err != nil {
+				return err
+			}
+			latestHistory, err := cmd.Flags().GetUint64(FlagLatestHistory)
+			if err != nil {
+				return err
+			}
+			description, err := cmd.Flags().GetString(FlagDescription)
+			if err != nil {
+				return err
+			}
+			serviceName, err := cmd.Flags().GetString(FlagServiceName)
+			if err != nil {
+				return err
+			}
+			timeout, err := cmd.Flags().GetInt64(FlagTimeout)
+			if err != nil {
+				return err
+			}
+			frequency, err := cmd.Flags().GetUint64(FlagFrequency)
+			if err != nil {
+				return err
+			}
+			threshold, err := cmd.Flags().GetUint32(FlagThreshold)
+			if err != nil {
+				return err
+			}
 			msg := &types.MsgCreateFeed{
-				FeedName:          viper.GetString(FlagFeedName),
-				AggregateFunc:     viper.GetString(FlagAggregateFunc),
-				ValueJsonPath:     viper.GetString(FlagValueJsonPath),
-				LatestHistory:     uint64(viper.GetInt64(FlagLatestHistory)),
-				Description:       viper.GetString(FlagDescription),
-				ServiceName:       viper.GetString(FlagServiceName),
+				FeedName:          feedName,
+				AggregateFunc:     aggregateFunc,
+				ValueJsonPath:     valueJsonPath,
+				LatestHistory:     latestHistory,
+				Description:       description,
+				ServiceName:       serviceName,
 				Providers:         providers,
 				Input:             input,
-				Timeout:           viper.GetInt64(FlagTimeout),
+				Timeout:           timeout,
 				ServiceFeeCap:     serviceFeeCap,
-				RepeatedFrequency: uint64(viper.GetInt64(FlagFrequency)),
-				ResponseThreshold: uint32(viper.GetInt32(FlagThreshold)),
+				RepeatedFrequency: frequency,
+				ResponseThreshold: threshold,
 				Creator:           creator,
 			}
 			if err := msg.ValidateBasic(); err != nil {
@@ -229,8 +274,12 @@ func GetCmdEditFeed() *cobra.Command {
 			}
 
 			creator := clientCtx.GetFromAddress()
+			rawProviders, err := cmd.Flags().GetStringSlice(FlagProviders)
+			if err != nil {
+				return err
+			}
 			var providers []sdk.AccAddress
-			for _, addr := range viper.GetStringSlice(FlagProviders) {
+			for _, addr := range rawProviders {
 				provider, err := sdk.AccAddressFromBech32(addr)
 				if err != nil {
 					return err
@@ -238,20 +287,44 @@ func GetCmdEditFeed() *cobra.Command {
 				providers = append(providers, provider)
 			}
 
-			serviceFeeCap, err := sdk.ParseCoins(viper.GetString(FlagServiceFeeCap))
+			rawServiceFeeCap, err := cmd.Flags().GetString(FlagServiceFeeCap)
+			if err != nil {
+				return err
+			}
+			serviceFeeCap, err := sdk.ParseCoins(rawServiceFeeCap)
 			if err != nil {
 				return err
 			}
 
+			latestHistory, err := cmd.Flags().GetUint64(FlagLatestHistory)
+			if err != nil {
+				return err
+			}
+			description, err := cmd.Flags().GetString(FlagDescription)
+			if err != nil {
+				return err
+			}
+			timeout, err := cmd.Flags().GetInt64(FlagTimeout)
+			if err != nil {
+				return err
+			}
+			frequency, err := cmd.Flags().GetUint64(FlagFrequency)
+			if err != nil {
+				return err
+			}
+			threshold, err := cmd.Flags().GetUint32(FlagThreshold)
+			if err != nil {
+				return err
+			}
 			msg := &types.MsgEditFeed{
 				FeedName:          args[0],
-				Description:       viper.GetString(FlagDescription),
-				LatestHistory:     uint64(viper.GetInt64(FlagLatestHistory)),
+				Description:       description,
+				LatestHistory:     latestHistory,
 				Providers:         providers,
-				Timeout:           viper.GetInt64(FlagTimeout),
+				Timeout:           timeout,
 				ServiceFeeCap:     serviceFeeCap,
-				RepeatedFrequency: uint64(viper.GetInt64(FlagFrequency)),
-				ResponseThreshold: uint32(viper.GetInt(FlagThreshold)),
+				RepeatedFrequency: frequency,
+				ResponseThreshold: threshold,
 				Creator:           creator,
 			}
 			if err := msg.ValidateBasic(); err != nil {

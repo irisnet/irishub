@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -49,14 +48,25 @@ func GetCmdRequestRandom() *cobra.Command {
 			consumer := clientCtx.GetFromAddress()
 
 			var serviceFeeCap sdk.Coins
-			oracle := viper.GetBool(FlagOracle)
+			oracle, err := cmd.Flags().GetBool(FlagOracle)
+			if err != nil {
+				return err
+			}
+			rawServiceFeeCap, err := cmd.Flags().GetString(FlagServiceFeeCap)
+			if err != nil {
+				return err
+			}
 			if oracle {
-				if serviceFeeCap, err = sdk.ParseCoins(viper.GetString(FlagServiceFeeCap)); err != nil {
+				if serviceFeeCap, err = sdk.ParseCoins(rawServiceFeeCap); err != nil {
 					return err
 				}
 			}
 
-			msg := types.NewMsgRequestRandom(consumer, uint64(viper.GetInt64(FlagBlockInterval)), oracle, serviceFeeCap)
+			blockInterval, err := cmd.Flags().GetUint64(FlagBlockInterval)
+			if err != nil {
+				return err
+			}
+			msg := types.NewMsgRequestRandom(consumer, blockInterval, oracle, serviceFeeCap)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}

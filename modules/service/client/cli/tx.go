@@ -8,7 +8,6 @@ import (
 	"io/ioutil"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -73,11 +72,26 @@ func GetCmdDefineService() *cobra.Command {
 			}
 
 			author := clientCtx.GetFromAddress()
-			name := viper.GetString(FlagName)
-			description := viper.GetString(FlagDescription)
-			authorDescription := viper.GetString(FlagAuthorDescription)
-			tags := viper.GetStringSlice(FlagTags)
-			schemas := viper.GetString(FlagSchemas)
+			name, err := cmd.Flags().GetString(FlagName)
+			if err != nil {
+				return err
+			}
+			description, err := cmd.Flags().GetString(FlagDescription)
+			if err != nil {
+				return err
+			}
+			authorDescription, err := cmd.Flags().GetString(FlagAuthorDescription)
+			if err != nil {
+				return err
+			}
+			tags, err := cmd.Flags().GetStringSlice(FlagTags)
+			if err != nil {
+				return err
+			}
+			schemas, err := cmd.Flags().GetString(FlagSchemas)
+			if err != nil {
+				return err
+			}
 
 			if !json.Valid([]byte(schemas)) {
 				schemasContent, err := ioutil.ReadFile(schemas)
@@ -142,7 +156,10 @@ func GetCmdBindService() *cobra.Command {
 
 			owner := clientCtx.GetFromAddress()
 			var provider sdk.AccAddress
-			providerStr := viper.GetString(FlagProvider)
+			providerStr, err := cmd.Flags().GetString(FlagProvider)
+			if err != nil {
+				return err
+			}
 
 			if len(providerStr) > 0 {
 				provider, err = sdk.AccAddressFromBech32(providerStr)
@@ -153,9 +170,18 @@ func GetCmdBindService() *cobra.Command {
 				provider = owner
 			}
 
-			serviceName := viper.GetString(FlagServiceName)
-			qos := uint64(viper.GetInt64(FlagQoS))
-			options := viper.GetString(FlagOptions)
+			serviceName, err := cmd.Flags().GetString(FlagServiceName)
+			if err != nil {
+				return err
+			}
+			qos, err := cmd.Flags().GetUint64(FlagQoS)
+			if err != nil {
+				return err
+			}
+			options, err := cmd.Flags().GetString(FlagOptions)
+			if err != nil {
+				return err
+			}
 			if !json.Valid([]byte(options)) {
 				optionsContent, err := ioutil.ReadFile(options)
 				if err != nil {
@@ -169,13 +195,19 @@ func GetCmdBindService() *cobra.Command {
 				options = string(optionsContent)
 			}
 
-			depositStr := viper.GetString(FlagDeposit)
+			depositStr, err := cmd.Flags().GetString(FlagDeposit)
+			if err != nil {
+				return err
+			}
 			deposit, err := sdk.ParseCoins(depositStr)
 			if err != nil {
 				return err
 			}
 
-			pricing := viper.GetString(FlagPricing)
+			pricing, err := cmd.Flags().GetString(FlagPricing)
+			if err != nil {
+				return err
+			}
 			if !json.Valid([]byte(pricing)) {
 				pricingContent, err := ioutil.ReadFile(pricing)
 				if err != nil {
@@ -250,7 +282,10 @@ func GetCmdUpdateServiceBinding() *cobra.Command {
 			}
 
 			var deposit sdk.Coins
-			depositStr := viper.GetString(FlagDeposit)
+			depositStr, err := cmd.Flags().GetString(FlagDeposit)
+			if err != nil {
+				return err
+			}
 			if len(depositStr) != 0 {
 				deposit, err = sdk.ParseCoins(depositStr)
 				if err != nil {
@@ -258,7 +293,10 @@ func GetCmdUpdateServiceBinding() *cobra.Command {
 				}
 			}
 
-			pricing := viper.GetString(FlagPricing)
+			pricing, err := cmd.Flags().GetString(FlagPricing)
+			if err != nil {
+				return err
+			}
 			if len(pricing) != 0 {
 				if !json.Valid([]byte(pricing)) {
 					pricingContent, err := ioutil.ReadFile(pricing)
@@ -281,8 +319,14 @@ func GetCmdUpdateServiceBinding() *cobra.Command {
 				pricing = buf.String()
 			}
 
-			qos := uint64(viper.GetInt64(FlagQoS))
-			options := viper.GetString(FlagOptions)
+			qos, err := cmd.Flags().GetUint64(FlagQoS)
+			if err != nil {
+				return err
+			}
+			options, err := cmd.Flags().GetString(FlagOptions)
+			if err != nil {
+				return err
+			}
 			if !json.Valid([]byte(options)) {
 				optionsContent, err := ioutil.ReadFile(options)
 				if err != nil {
@@ -412,7 +456,10 @@ func GetCmdEnableServiceBinding() *cobra.Command {
 
 			var deposit sdk.Coins
 
-			depositStr := viper.GetString(FlagDeposit)
+			depositStr, err := cmd.Flags().GetString(FlagDeposit)
+			if err != nil {
+				return err
+			}
 			if len(depositStr) != 0 {
 				deposit, err = sdk.ParseCoins(depositStr)
 				if err != nil {
@@ -501,10 +548,16 @@ func GetCmdCallService() *cobra.Command {
 			}
 
 			consumer := clientCtx.GetFromAddress()
-			serviceName := viper.GetString(FlagServiceName)
+			serviceName, err := cmd.Flags().GetString(FlagServiceName)
+			if err != nil {
+				return err
+			}
 
 			var providers []sdk.AccAddress
-			providerList := viper.GetStringSlice(FlagProviders)
+			providerList, err := cmd.Flags().GetStringSlice(FlagProviders)
+			if err != nil {
+				return err
+			}
 
 			for _, p := range providerList {
 				provider, err := sdk.AccAddressFromBech32(p)
@@ -515,12 +568,16 @@ func GetCmdCallService() *cobra.Command {
 				providers = append(providers, provider)
 			}
 
-			serviceFeeCap, err := sdk.ParseCoins(viper.GetString(FlagServiceFeeCap))
+			rawServiceFeeCap, err := cmd.Flags().GetString(FlagServiceFeeCap)
+			if err != nil {
+				return err
+			}
+			serviceFeeCap, err := sdk.ParseCoins(rawServiceFeeCap)
 			if err != nil {
 				return err
 			}
 
-			input := viper.GetString(FlagData)
+			input, _ := cmd.Flags().GetString(FlagData)
 
 			if !json.Valid([]byte(input)) {
 				inputContent, err := ioutil.ReadFile(input)
@@ -541,16 +598,31 @@ func GetCmdCallService() *cobra.Command {
 			}
 
 			input = buf.String()
-			timeout := viper.GetInt64(FlagTimeout)
-			superMode := viper.GetBool(FlagSuperMode)
-			repeated := viper.GetBool(FlagRepeated)
+			timeout, err := cmd.Flags().GetInt64(FlagTimeout)
+			if err != nil {
+				return err
+			}
+			superMode, err := cmd.Flags().GetBool(FlagSuperMode)
+			if err != nil {
+				return err
+			}
+			repeated, err := cmd.Flags().GetBool(FlagRepeated)
+			if err != nil {
+				return err
+			}
 
 			frequency := uint64(0)
 			total := int64(0)
 
 			if repeated {
-				frequency = uint64(viper.GetInt64(FlagFrequency))
-				total = viper.GetInt64(FlagTotal)
+				frequency, err = cmd.Flags().GetUint64(FlagFrequency)
+				if err != nil {
+					return err
+				}
+				total, err = cmd.Flags().GetInt64(FlagTotal)
+				if err != nil {
+					return err
+				}
 			}
 
 			msg := types.NewMsgCallService(
@@ -599,14 +671,23 @@ func GetCmdRespondService() *cobra.Command {
 
 			provider := clientCtx.GetFromAddress()
 
-			requestIDStr := viper.GetString(FlagRequestID)
+			requestIDStr, err := cmd.Flags().GetString(FlagRequestID)
+			if err != nil {
+				return err
+			}
 			requestID, err := types.ConvertRequestID(requestIDStr)
 			if err != nil {
 				return err
 			}
 
-			result := viper.GetString(FlagResult)
-			output := viper.GetString(FlagData)
+			result, err := cmd.Flags().GetString(FlagResult)
+			if err != nil {
+				return err
+			}
+			output, err := cmd.Flags().GetString(FlagData)
+			if err != nil {
+				return err
+			}
 
 			if len(result) > 0 {
 				if !json.Valid([]byte(result)) {
@@ -806,7 +887,10 @@ func GetCmdUpdateRequestContext() *cobra.Command {
 			}
 
 			var providers []sdk.AccAddress
-			providerList := viper.GetStringSlice(FlagProviders)
+			providerList, err := cmd.Flags().GetStringSlice(FlagProviders)
+			if err != nil {
+				return err
+			}
 
 			for _, p := range providerList {
 				provider, err := sdk.AccAddressFromBech32(p)
@@ -818,7 +902,10 @@ func GetCmdUpdateRequestContext() *cobra.Command {
 			}
 
 			var serviceFeeCap sdk.Coins
-			serviceFeeCapStr := viper.GetString(FlagServiceFeeCap)
+			serviceFeeCapStr, err := cmd.Flags().GetString(FlagServiceFeeCap)
+			if err != nil {
+				return err
+			}
 			if len(serviceFeeCapStr) != 0 {
 				serviceFeeCap, err = sdk.ParseCoins(serviceFeeCapStr)
 				if err != nil {
@@ -826,9 +913,18 @@ func GetCmdUpdateRequestContext() *cobra.Command {
 				}
 			}
 
-			timeout := viper.GetInt64(FlagTimeout)
-			frequency := uint64(viper.GetInt64(FlagFrequency))
-			total := viper.GetInt64(FlagTotal)
+			timeout, err := cmd.Flags().GetInt64(FlagTimeout)
+			if err != nil {
+				return err
+			}
+			frequency, err := cmd.Flags().GetUint64(FlagFrequency)
+			if err != nil {
+				return err
+			}
+			total, err := cmd.Flags().GetInt64(FlagTotal)
+			if err != nil {
+				return err
+			}
 
 			msg := types.NewMsgUpdateRequestContext(
 				requestContextID, providers, serviceFeeCap,
