@@ -9,7 +9,7 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v1
       - name: Run unit tests
-        uses: cedrickring/golang-action/go1.14@1.5.2
+        uses: cedrickring/golang-action/go1.15@1.6.0
         env:
           GO111MODULE: "on"
         with:
