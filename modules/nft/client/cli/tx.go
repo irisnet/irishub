@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/spf13/cobra"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/version"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 
 	"github.com/irisnet/irismod/modules/nft/types"
 )
@@ -59,9 +59,19 @@ func GetCmdIssueDenom() *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgIssueDenom(args[0],
-				viper.GetString(FlagDenomName),
-				viper.GetString(FlagSchema),
+			denomName, err := cmd.Flags().GetString(FlagDenomName)
+			if err != nil {
+				return err
+			}
+			schema, err := cmd.Flags().GetString(FlagSchema)
+			if err != nil {
+				return err
+			}
+
+			msg := types.NewMsgIssueDenom(
+				args[0],
+				denomName,
+				schema,
 				clientCtx.GetFromAddress(),
 			)
 			if err := msg.ValidateBasic(); err != nil {
@@ -99,8 +109,12 @@ func GetCmdMintNFT() *cobra.Command {
 			}
 
 			var recipient = clientCtx.GetFromAddress()
+			rawRecipient, err := cmd.Flags().GetString(FlagRecipient)
+			if err != nil {
+				return err
+			}
 
-			recipientStr := strings.TrimSpace(viper.GetString(FlagRecipient))
+			recipientStr := strings.TrimSpace(rawRecipient)
 			if len(recipientStr) > 0 {
 				recipient, err = sdk.AccAddressFromBech32(recipientStr)
 				if err != nil {
@@ -108,12 +122,25 @@ func GetCmdMintNFT() *cobra.Command {
 				}
 			}
 
+			tokenName, err := cmd.Flags().GetString(FlagTokenName)
+			if err != nil {
+				return err
+			}
+			tokenURI, err := cmd.Flags().GetString(FlagTokenURI)
+			if err != nil {
+				return err
+			}
+			tokenData, err := cmd.Flags().GetString(FlagTokenData)
+			if err != nil {
+				return err
+			}
+
 			msg := types.NewMsgMintNFT(
 				args[1],
 				args[0],
-				viper.GetString(FlagTokenName),
-				viper.GetString(FlagTokenURI),
-				viper.GetString(FlagTokenData),
+				tokenName,
+				tokenURI,
+				tokenData,
 				clientCtx.GetFromAddress(),
 				recipient,
 			)
@@ -150,12 +177,24 @@ func GetCmdEditNFT() *cobra.Command {
 				return err
 			}
 
+			tokenName, err := cmd.Flags().GetString(FlagTokenName)
+			if err != nil {
+				return err
+			}
+			tokenURI, err := cmd.Flags().GetString(FlagTokenURI)
+			if err != nil {
+				return err
+			}
+			tokenData, err := cmd.Flags().GetString(FlagTokenData)
+			if err != nil {
+				return err
+			}
 			msg := types.NewMsgEditNFT(
 				args[1],
 				args[0],
-				viper.GetString(FlagTokenName),
-				viper.GetString(FlagTokenURI),
-				viper.GetString(FlagTokenData),
+				tokenName,
+				tokenURI,
+				tokenData,
 				clientCtx.GetFromAddress(),
 			)
 			if err := msg.ValidateBasic(); err != nil {
@@ -196,12 +235,24 @@ func GetCmdTransferNFT() *cobra.Command {
 				return err
 			}
 
+			tokenName, err := cmd.Flags().GetString(FlagTokenName)
+			if err != nil {
+				return err
+			}
+			tokenURI, err := cmd.Flags().GetString(FlagTokenURI)
+			if err != nil {
+				return err
+			}
+			tokenData, err := cmd.Flags().GetString(FlagTokenData)
+			if err != nil {
+				return err
+			}
 			msg := types.NewMsgTransferNFT(
 				args[2],
 				args[1],
-				viper.GetString(FlagTokenName),
-				viper.GetString(FlagTokenURI),
-				viper.GetString(FlagTokenData),
+				tokenName,
+				tokenURI,
+				tokenData,
 				clientCtx.GetFromAddress(),
 				recipient,
 			)
