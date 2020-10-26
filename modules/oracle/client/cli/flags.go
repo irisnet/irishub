@@ -43,7 +43,7 @@ func init() {
 	FsCreateFeed.Int64(FlagTimeout, 0, "The maximum number of blocks to wait for a response since a request is sent, beyond which the request will be ignored")
 	FsCreateFeed.String(FlagServiceFeeCap, "", "Only providers charging a fee lower than the cap will be invoked")
 	FsCreateFeed.Uint64(FlagFrequency, 0, "The invocation frequency of sending repeated requests")
-	FsCreateFeed.Uint16(FlagThreshold, 0, "The minimum number of responses needed for aggregation, range [1, Length(providers)]")
+	FsCreateFeed.Uint32(FlagThreshold, 0, "The minimum number of responses needed for aggregation, range [1, Length(providers)]")
 	FsCreateFeed.String(FlagCreator, "", "Address of the feed creator")
 
 	FsStartFeed.String(FlagFeedName, "", "The unique identifier of the feed")

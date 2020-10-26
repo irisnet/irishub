@@ -1,11 +1,8 @@
 package cli
 
 import (
-	"crypto/rand"
 	"encoding/hex"
 	"fmt"
-	"strings"
-
 	"github.com/spf13/cobra"
 
 	"github.com/cosmos/cosmos-sdk/client"
@@ -88,11 +85,11 @@ func GetCmdCreateHTLC() *cobra.Command {
 				return err
 			}
 
-			timestamp, err := cmd.Flags().GetInt64(FlagTimestamp)
+			timestamp, err := cmd.Flags().GetUint64(FlagTimestamp)
 			if err != nil {
 				return err
 			}
-			timeLock, err := cmd.Flags().GetInt64(FlagTimeLock)
+			timeLock, err := cmd.Flags().GetUint64(FlagTimeLock)
 			if err != nil {
 				return err
 			}
@@ -102,40 +99,21 @@ func GetCmdCreateHTLC() *cobra.Command {
 
 			flags := cmd.Flags()
 			if flags.Changed(FlagHashLock) {
-				rawHashLock, err := cmd.Flags().GetString(FlagHashLock)
+				hashLock, err = cmd.Flags().GetBytesHex(FlagHashLock)
 				if err != nil {
-					return err
-				}
-				hashLockStr := strings.TrimSpace(rawHashLock)
-				if hashLock, err = hex.DecodeString(hashLockStr); err != nil {
 					return err
 				}
 			} else {
-				rawSecret, err := cmd.Flags().GetString(FlagSecret)
+				secret, err = cmd.Flags().GetBytesHex(FlagSecret)
 				if err != nil {
 					return err
 				}
-				secretStr := strings.TrimSpace(rawSecret)
-				if len(secretStr) > 0 {
-					if len(secretStr) != 2*types.SecretLength {
-						return fmt.Errorf("length of the secret must be %d in bytes", types.SecretLength)
-					}
-
-					if secret, err = hex.DecodeString(secretStr); err != nil {
-						return err
-					}
-				} else {
-					if _, err := rand.Read(secret); err != nil {
-						return err
-					}
-				}
-
-				hashLock = types.GetHashLock(secret, uint64(timestamp))
+				hashLock = types.GetHashLock(secret, timestamp)
 			}
 
 			msg := types.NewMsgCreateHTLC(
 				sender, to, receiverOnOtherChain, amount,
-				hashLock, uint64(timestamp), uint64(timeLock),
+				hashLock, timestamp, timeLock,
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err

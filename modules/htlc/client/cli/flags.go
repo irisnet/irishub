@@ -26,5 +26,5 @@ func init() {
 	FsCreateHTLC.BytesHex(FlagSecret, nil, "The secret for generating the hash lock, randomly generated if omitted")
 	FsCreateHTLC.BytesHex(FlagHashLock, nil, "The sha256 hash generated from secret (and timestamp if provided), generated according to the secret flag if omitted")
 	FsCreateHTLC.Uint64(FlagTimestamp, 0, "The timestamp in seconds for generating the hash lock if provided")
-	FsCreateHTLC.String(FlagTimeLock, "", "The number of blocks to wait before tokens may be refunded")
+	FsCreateHTLC.Uint64(FlagTimeLock, 0, "The number of blocks to wait before tokens may be refunded")
 }

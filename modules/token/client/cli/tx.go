@@ -29,17 +29,17 @@ func NewTxCmd() *cobra.Command {
 	}
 
 	txCmd.AddCommand(
-		getCmdIssueToken(),
-		getCmdEditToken(),
-		getCmdMintToken(),
-		getCmdTransferTokenOwner(),
+		GetCmdIssueToken(),
+		GetCmdEditToken(),
+		GetCmdMintToken(),
+		GetCmdTransferTokenOwner(),
 	)
 
 	return txCmd
 }
 
-// getCmdIssueToken implements the issue token command
-func getCmdIssueToken() *cobra.Command {
+// GetCmdIssueToken implements the issue token command
+func GetCmdIssueToken() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:  "issue",
 		Long: "Issue a new token.",
@@ -153,8 +153,8 @@ func getCmdIssueToken() *cobra.Command {
 	return cmd
 }
 
-// getCmdEditToken implements the edit token command
-func getCmdEditToken() *cobra.Command {
+// GetCmdEditToken implements the edit token command
+func GetCmdEditToken() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:  "edit [symbol]",
 		Long: "Edit an existing token.",
@@ -210,7 +210,7 @@ func getCmdEditToken() *cobra.Command {
 	return cmd
 }
 
-func getCmdMintToken() *cobra.Command {
+func GetCmdMintToken() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:  "mint [symbol]",
 		Long: "Mint tokens to a specified address.",
@@ -298,8 +298,8 @@ func getCmdMintToken() *cobra.Command {
 	return cmd
 }
 
-// getCmdTransferTokenOwner implements the transfer token owner command
-func getCmdTransferTokenOwner() *cobra.Command {
+// GetCmdTransferTokenOwner implements the transfer token owner command
+func GetCmdTransferTokenOwner() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:  "transfer [symbol]",
 		Long: "Transfer the owner of a token to a new owner.",
