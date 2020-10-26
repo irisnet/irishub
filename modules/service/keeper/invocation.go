@@ -868,15 +868,11 @@ func (k Keeper) AddResponse(
 		return request, response, sdkerrors.Wrap(types.ErrInvalidResponse, "request is not active")
 	}
 
-	if len(output) > 0 && types.ValidateResponseOutput(output) != nil {
-		if err = k.Slash(ctx, requestID); err != nil {
-			panic(err)
-		}
+	if err := types.ValidateResponseOutput(output); err != nil {
+		return request, response, sdkerrors.Wrap(types.ErrInvalidResponseOutput, err.Error())
+	}
 
-		if err := k.RefundServiceFee(ctx, request.Consumer, request.ServiceFee); err != nil {
-			panic(err)
-		}
-	} else if err := k.AddEarnedFee(ctx, provider, request.ServiceFee); err != nil {
+	if err := k.AddEarnedFee(ctx, provider, request.ServiceFee); err != nil {
 		return request, response, err
 	}
 

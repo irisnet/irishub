@@ -450,7 +450,7 @@ func (suite *KeeperTestSuite) TestKeeper_Respond_Service() {
 	suite.Equal(uint64(1), volume)
 
 	// respond request 2
-	_, _, err = suite.keeper.AddResponse(ctx, requestID2, provider, testOutput, "")
+	_, _, err = suite.keeper.AddResponse(ctx, requestID2, provider, testResult, testOutput)
 	suite.NoError(err)
 
 	requestContext, _ = suite.keeper.GetRequestContext(ctx, requestContextID)
