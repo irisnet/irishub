@@ -2,17 +2,18 @@ package cli_test
 
 import (
 	"fmt"
-	tokentypes "github.com/irisnet/irismod/modules/token/types"
-	"github.com/tidwall/gjson"
-	"strings"
 	"testing"
 
+	"github.com/tidwall/gjson"
+
 	"github.com/cosmos/cosmos-sdk/client/flags"
+	"github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/testutil/network"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/gogo/protobuf/proto"
 	tokencli "github.com/irisnet/irismod/modules/token/client/cli"
 	tokentestutil "github.com/irisnet/irismod/modules/token/client/testutil"
+	tokentypes "github.com/irisnet/irismod/modules/token/types"
 	"github.com/stretchr/testify/suite"
 
 	"github.com/irisnet/irismod/simapp"
@@ -89,18 +90,17 @@ func (s *IntegrationTestSuite) TestToken() {
 
 	tokentypes.RegisterLegacyAminoCodec(clientCtx.LegacyAmino)
 	tokentypes.RegisterInterfaces(clientCtx.InterfaceRegistry)
-	bz, err = tokentestutil.QueryTokensExec(clientCtx,from.String())
+	bz, err = tokentestutil.QueryTokensExec(clientCtx, from.String())
 	s.Require().NoError(err)
 	s.Require().NoError(clientCtx.LegacyAmino.UnmarshalJSON(bz.Bytes(), tokens))
 
-	respType = proto.Message(&tokentypes.Token{})
+	var token tokentypes.TokenI
+	respType = proto.Message(&types.Any{})
 	bz, err = tokentestutil.QueryTokenExec(clientCtx, tokenSymbol)
 	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.LegacyAmino.UnmarshalJSON(bz.Bytes(), respType))
-	token := respType.(*tokentypes.Token)
-	s.Require().Equal(name,token.Name)
-	s.Require().Equal(strings.ToLower(symbol),token.Symbol)
-
+	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType))
+	err = clientCtx.InterfaceRegistry.UnpackAny(respType.(*types.Any), &token)
+	s.Require().NoError(err)
 
 	//
 	//args = []string{
