@@ -15,9 +15,9 @@ import (
 
 func registerQueryRoutes(cliCtx client.Context, r *mux.Router) {
 	// query random by the request id
-	r.HandleFunc(fmt.Sprintf("/random/randoms/{%s}", RestRequestID), queryRandomHandlerFn(cliCtx)).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/%s/randoms/{%s}", types.ModuleName, RestRequestID), queryRandomHandlerFn(cliCtx)).Methods("GET")
 	// query random request queue by an optional heigth
-	r.HandleFunc("/random/queue", queryQueueHandlerFn(cliCtx)).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/%s/queue", types.ModuleName), queryQueueHandlerFn(cliCtx)).Methods("GET")
 }
 
 // HTTP request handler to query random by the request id.

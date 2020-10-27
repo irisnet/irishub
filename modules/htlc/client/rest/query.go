@@ -15,7 +15,7 @@ import (
 
 func registerQueryRoutes(cliCtx client.Context, r *mux.Router) {
 	// query an HTLC
-	r.HandleFunc(fmt.Sprintf("/htlc/htlcs/{%s}", RestHashLock), queryHTLCHandlerFn(cliCtx)).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/%s/htlcs/{%s}", types.ModuleName, RestHashLock), queryHTLCHandlerFn(cliCtx)).Methods("GET")
 }
 
 func queryHTLCHandlerFn(cliCtx client.Context) http.HandlerFunc {

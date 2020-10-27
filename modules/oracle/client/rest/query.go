@@ -15,11 +15,11 @@ import (
 
 func registerQueryRoutes(cliCtx client.Context, r *mux.Router) {
 	// query a feed definition
-	r.HandleFunc(fmt.Sprintf("/oracle/feeds/{%s}", FeedName), queryFeedHandlerFn(cliCtx)).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/%s/feeds/{%s}", types.ModuleName, FeedName), queryFeedHandlerFn(cliCtx)).Methods("GET")
 	// query a feed list by condition
-	r.HandleFunc("/oracle/feeds", queryFeedsHandlerFn(cliCtx)).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/%s/feeds", types.ModuleName), queryFeedsHandlerFn(cliCtx)).Methods("GET")
 	// query a feed value by feed name
-	r.HandleFunc(fmt.Sprintf("/oracle/feeds/{%s}/values", FeedName), queryFeedValuesHandlerFn(cliCtx)).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/%s/feeds/{%s}/values", types.ModuleName, FeedName), queryFeedValuesHandlerFn(cliCtx)).Methods("GET")
 }
 
 func queryFeedHandlerFn(cliCtx client.Context) http.HandlerFunc {
