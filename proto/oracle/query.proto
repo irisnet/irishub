@@ -23,7 +23,7 @@ service Query {
 
     // FeedValue queries the feed value
     rpc FeedValue(QueryFeedValueRequest) returns (QueryFeedValueResponse) {
-        option (google.api.http).get = "/irismod/oracle/feeds/{feed_name}/value";
+        option (google.api.http).get = "/irismod/oracle/feeds/{feed_name}/values";
     }
 }
 

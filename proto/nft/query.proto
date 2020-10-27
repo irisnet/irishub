@@ -11,7 +11,7 @@ option go_package = "github.com/irisnet/irismod/modules/nft/types";
 service Query {
     // Supply queries the total supply of a given denom or owner
     rpc Supply(QuerySupplyRequest) returns (QuerySupplyResponse) {
-      option (google.api.http).get = "/irismod/nft/supplies/{denom}";
+      option (google.api.http).get = "/irismod/nft/collections/{denom}/supply";
     }
 
     // Owner queries the NFTs of the specified owner

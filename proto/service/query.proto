@@ -28,7 +28,7 @@ service Query {
 
     // WithdrawAddress returns the withdraw address of the binding owner
     rpc WithdrawAddress(QueryWithdrawAddressRequest) returns (QueryWithdrawAddressResponse) {
-        option (google.api.http).get = "/irismod/service/{owner}/withdraw-address";
+        option (google.api.http).get = "/irismod/service/owners/{owner}/withdraw-address";
     }
 
     // RequestContext returns the request context
