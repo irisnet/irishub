@@ -17,17 +17,17 @@ import (
 
 func registerQueryRoutes(cliCtx client.Context, r *mux.Router, queryRoute string) {
 	// Get the total supply of a collection or owner
-	r.HandleFunc(fmt.Sprintf("/nft/nfts/supplies/{%s}", RestParamDenom), querySupply(cliCtx, queryRoute)).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/%s/nfts/supplies/{%s}", types.ModuleName, RestParamDenom), querySupply(cliCtx, queryRoute)).Methods("GET")
 	// Get the collections of NFTs owned by an address
-	r.HandleFunc(fmt.Sprintf("/nft/nfts/owners/{%s}", RestParamOwner), queryOwner(cliCtx, queryRoute)).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/%s/nfts/owners/{%s}", types.ModuleName, RestParamOwner), queryOwner(cliCtx, queryRoute)).Methods("GET")
 	// Get all the NFT from a given collection
-	r.HandleFunc(fmt.Sprintf("/nft/nfts/collections/{%s}", RestParamDenom), queryCollection(cliCtx, queryRoute)).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/%s/nfts/collections/{%s}", types.ModuleName, RestParamDenom), queryCollection(cliCtx, queryRoute)).Methods("GET")
 	// Query all denoms
-	r.HandleFunc("/nft/nfts/denoms", queryDenoms(cliCtx, queryRoute)).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/%s/nfts/denoms", types.ModuleName), queryDenoms(cliCtx, queryRoute)).Methods("GET")
 	// Query the denom
-	r.HandleFunc(fmt.Sprintf("/nft/nfts/denom/{%s}", RestParamDenom), queryDenom(cliCtx, queryRoute)).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/%s/nfts/denoms/{%s}", types.ModuleName, RestParamDenom), queryDenom(cliCtx, queryRoute)).Methods("GET")
 	// Query a single NFT
-	r.HandleFunc(fmt.Sprintf("/nft/nfts/{%s}/{%s}", RestParamDenom, RestParamTokenID), queryNFT(cliCtx, queryRoute)).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/%s/nfts/{%s}/{%s}", types.ModuleName, RestParamDenom, RestParamTokenID), queryNFT(cliCtx, queryRoute)).Methods("GET")
 }
 
 func querySupply(cliCtx client.Context, queryRoute string) http.HandlerFunc {

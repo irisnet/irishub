@@ -18,29 +18,29 @@ import (
 
 func registerQueryRoutes(cliCtx client.Context, r *mux.Router) {
 	// query a service definition
-	r.HandleFunc(fmt.Sprintf("/service/definitions/{%s}", RestServiceName), queryDefinitionHandlerFn(cliCtx)).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/%s/definitions/{%s}", types.ModuleName, RestServiceName), queryDefinitionHandlerFn(cliCtx)).Methods("GET")
 	// query a service binding
-	r.HandleFunc(fmt.Sprintf("/service/bindings/{%s}/{%s}", RestServiceName, RestProvider), queryBindingHandlerFn(cliCtx)).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/%s/bindings/{%s}/{%s}", types.ModuleName, RestServiceName, RestProvider), queryBindingHandlerFn(cliCtx)).Methods("GET")
 	// query all bindings of a service definition with an optional owner
-	r.HandleFunc(fmt.Sprintf("/service/bindings/{%s}", RestServiceName), queryBindingsHandlerFn(cliCtx)).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/%s/bindings/{%s}", types.ModuleName, RestServiceName), queryBindingsHandlerFn(cliCtx)).Methods("GET")
 	// query the withdrawal address of an owner
-	r.HandleFunc(fmt.Sprintf("/service/owners/{%s}/withdraw-address", RestOwner), queryWithdrawAddrHandlerFn(cliCtx)).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/%s/owners/{%s}/withdraw-address", types.ModuleName, RestOwner), queryWithdrawAddrHandlerFn(cliCtx)).Methods("GET")
 	// query a request by ID
-	r.HandleFunc(fmt.Sprintf("/service/requests/{%s}", RestRequestID), queryRequestHandlerFn(cliCtx)).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/%s/requests/{%s}", types.ModuleName, RestRequestID), queryRequestHandlerFn(cliCtx)).Methods("GET")
 	// query active requests by the service binding or request context ID
-	r.HandleFunc(fmt.Sprintf("/service/requests/{%s}/{%s}", RestArg1, RestArg2), queryRequestsHandlerFn(cliCtx)).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/%s/requests/{%s}/{%s}", types.ModuleName, RestArg1, RestArg2), queryRequestsHandlerFn(cliCtx)).Methods("GET")
 	// query a response
-	r.HandleFunc(fmt.Sprintf("/service/responses/{%s}", RestRequestID), queryResponseHandlerFn(cliCtx)).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/%s/responses/{%s}", types.ModuleName, RestRequestID), queryResponseHandlerFn(cliCtx)).Methods("GET")
 	// query a request context
-	r.HandleFunc(fmt.Sprintf("/service/contexts/{%s}", RestRequestContextID), queryRequestContextHandlerFn(cliCtx)).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/%s/contexts/{%s}", types.ModuleName, RestRequestContextID), queryRequestContextHandlerFn(cliCtx)).Methods("GET")
 	// query active responses by the request context ID and batch counter
-	r.HandleFunc(fmt.Sprintf("/service/responses/{%s}/{%s}", RestRequestContextID, RestBatchCounter), queryResponsesHandlerFn(cliCtx)).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/%s/responses/{%s}/{%s}", types.ModuleName, RestRequestContextID, RestBatchCounter), queryResponsesHandlerFn(cliCtx)).Methods("GET")
 	// query the earned fees of a provider
-	r.HandleFunc(fmt.Sprintf("/service/fees/{%s}", RestProvider), queryEarnedFeesHandlerFn(cliCtx)).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/%s/fees/{%s}", types.ModuleName, RestProvider), queryEarnedFeesHandlerFn(cliCtx)).Methods("GET")
 	// query the system schema by the schema name
-	r.HandleFunc(fmt.Sprintf("/service/schemas/{%s}", RestSchemaName), querySchemaHandlerFn(cliCtx)).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/%s/schemas/{%s}", types.ModuleName, RestSchemaName), querySchemaHandlerFn(cliCtx)).Methods("GET")
 	// query the current service parameter values
-	r.HandleFunc("/service/parameters", queryParamsHandlerFn(cliCtx)).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/%s/params", types.ModuleName), queryParamsHandlerFn(cliCtx)).Methods("GET")
 }
 
 func queryDefinitionHandlerFn(cliCtx client.Context) http.HandlerFunc {

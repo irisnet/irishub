@@ -14,7 +14,7 @@ import (
 )
 
 func registerQueryRoutes(cliCtx client.Context, r *mux.Router) {
-	r.HandleFunc(fmt.Sprintf("/record/records/{%s}", RestRecordID), queryRecordHandlerFn(cliCtx)).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/%s/records/{%s}", types.ModuleName, RestRecordID), queryRecordHandlerFn(cliCtx)).Methods("GET")
 }
 
 func queryRecordHandlerFn(cliCtx client.Context) http.HandlerFunc {

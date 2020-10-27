@@ -21,7 +21,7 @@ func registerQueryRoutes(cliCtx client.Context, r *mux.Router) {
 	// Query token fees
 	r.HandleFunc(fmt.Sprintf("/%s/tokens/{%s}/fee", types.ModuleName, RestParamSymbol), queryTokenFeesHandlerFn(cliCtx)).Methods("GET")
 	// Query token params
-	r.HandleFunc(fmt.Sprintf("/%s/tokens/params", types.ModuleName), queryTokenParamsHandlerFn(cliCtx)).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/%s/params", types.ModuleName), queryTokenParamsHandlerFn(cliCtx)).Methods("GET")
 }
 
 // queryTokenHandlerFn is the HTTP request handler to query token
