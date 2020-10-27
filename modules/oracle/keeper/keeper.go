@@ -196,10 +196,12 @@ func (k Keeper) EditFeed(ctx sdk.Context, msg *types.MsgEditFeed) error {
 
 // HandlerResponse is responsible for processing the data returned from the servicetypes module,
 // processed by the aggregate function, and then saved
-func (k Keeper) HandlerResponse(ctx sdk.Context,
+func (k Keeper) HandlerResponse(
+	ctx sdk.Context,
 	requestContextID tmbytes.HexBytes,
 	responseOutput []string,
-	err error) {
+	err error,
+) {
 	if len(responseOutput) == 0 || err != nil {
 		ctx.Logger().Error(
 			"Oracle feed failed",
@@ -235,7 +237,7 @@ func (k Keeper) HandlerResponse(ctx sdk.Context,
 
 	var data []types.ArgsType
 	for _, jsonStr := range responseOutput {
-		result := gjson.Get(jsonStr, feed.ValueJsonPath)
+		result := gjson.Get(jsonStr, servicetypes.PATH_BODY).Get(feed.ValueJsonPath)
 		data = append(data, result)
 	}
 
@@ -304,7 +306,7 @@ func (k Keeper) GetRequestContext(ctx sdk.Context, requestContextID tmbytes.HexB
 }
 
 func (k Keeper) ModuleServiceRequest(ctx sdk.Context, input string) (result string, output string) {
-	feedName := gjson.Get(input, "body").Get("pair").String()
+	feedName := gjson.Get(input, servicetypes.PATH_BODY).Get("pair").String()
 	if _, found := k.GetFeed(ctx, feedName); !found {
 		result = `{"code":"400","message":"feed not found"}`
 		return

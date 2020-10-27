@@ -47,7 +47,7 @@ func (k Keeper) GetExchangedPrice(
 		if code, msg := CheckResult(result); code != "200" {
 			return nil, rawDenom, sdkerrors.Wrapf(types.ErrInvalidModuleService, msg)
 		}
-		outputBody := gjson.Get(output, "body").String()
+		outputBody := gjson.Get(output, types.PATH_BODY).String()
 		if err := types.ValidateResponseOutputBody(types.OraclePriceSchemas, outputBody); err != nil {
 			return nil, rawDenom, err
 		}

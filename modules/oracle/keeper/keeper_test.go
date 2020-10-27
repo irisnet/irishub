@@ -27,10 +27,10 @@ var (
 
 	mockReqCtxID = []byte("mockRequest")
 	responses    = []string{
-		`{"last":100,"high":100,"low":50}`,
-		`{"last":100,"high":200,"low":50}`,
-		`{"last":100,"high":300,"low":50}`,
-		`{"last":100,"high":400,"low":50}`,
+		`{"header":{},"body":{"last":100,"high":100,"low":50}}`,
+		`{"header":{},"body":{"last":100,"high":200,"low":50}}`,
+		`{"header":{},"body":{"last":100,"high":300,"low":50}}`,
+		`{"header":{},"body":{"last":100,"high":400,"low":50}}`,
 	}
 )
 

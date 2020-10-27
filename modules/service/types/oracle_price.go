@@ -20,7 +20,7 @@ const (
 		"input": {
 			"$schema": "http://json-schema.org/draft-04/schema#",
 			"title": "iservice-oracle-price-input-body",
-			"description": "Interchain Service Oracle Price Input BOdy Schema",
+			"description": "Interchain Service Oracle Price Input Body Schema",
 			"type": "object",
 			"properties": {
 				"pair": {
