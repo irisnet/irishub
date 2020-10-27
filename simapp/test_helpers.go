@@ -19,7 +19,6 @@ import (
 	tmtypes "github.com/tendermint/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
 
-	"github.com/cosmos/cosmos-sdk/baseapp"
 	bam "github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
@@ -86,8 +85,8 @@ func NewConfig() network.Config {
 func SimAppConstructor(val network.Validator) servertypes.Application {
 	return NewSimApp(
 		val.Ctx.Logger, dbm.NewMemDB(), nil, true, make(map[int64]bool), val.Ctx.Config.RootDir, 0, MakeEncodingConfig(),
-		baseapp.SetPruning(storetypes.NewPruningOptionsFromString(val.AppConfig.Pruning)),
-		baseapp.SetMinGasPrices(val.AppConfig.MinGasPrices),
+		bam.SetPruning(storetypes.NewPruningOptionsFromString(val.AppConfig.Pruning)),
+		bam.SetMinGasPrices(val.AppConfig.MinGasPrices),
 	)
 }
 
