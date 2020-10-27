@@ -88,6 +88,7 @@ func QueryCollectionExec(clientCtx client.Context, denomID string, extraArgs ...
 
 	return clitestutil.ExecTestCLICmd(clientCtx, nftcli.GetCmdQueryCollection(), args)
 }
+
 func QueryDenomsExec(clientCtx client.Context, extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
@@ -96,6 +97,7 @@ func QueryDenomsExec(clientCtx client.Context, extraArgs ...string) (testutil.Bu
 
 	return clitestutil.ExecTestCLICmd(clientCtx, nftcli.GetCmdQueryDenoms(), args)
 }
+
 func QuerySupplyExec(clientCtx client.Context, recordID string, extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
 		recordID,
@@ -105,6 +107,7 @@ func QuerySupplyExec(clientCtx client.Context, recordID string, extraArgs ...str
 
 	return clitestutil.ExecTestCLICmd(clientCtx, nftcli.GetCmdQuerySupply(), args)
 }
+
 func QueryOwnerExec(clientCtx client.Context, denomID string, extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
 		denomID,
@@ -114,6 +117,7 @@ func QueryOwnerExec(clientCtx client.Context, denomID string, extraArgs ...strin
 
 	return clitestutil.ExecTestCLICmd(clientCtx, nftcli.GetCmdQueryOwner(), args)
 }
+
 func QueryNFTExec(clientCtx client.Context, denomID string, tokenID string, extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
 		denomID,

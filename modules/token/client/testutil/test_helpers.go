@@ -21,6 +21,7 @@ func IssueTokenExec(clientCtx client.Context, from string, extraArgs ...string) 
 
 	return clitestutil.ExecTestCLICmd(clientCtx, tokencli.GetCmdIssueToken(), args)
 }
+
 func EditTokenExec(clientCtx client.Context, from string, symbol string, extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
 		symbol,
@@ -30,6 +31,7 @@ func EditTokenExec(clientCtx client.Context, from string, symbol string, extraAr
 
 	return clitestutil.ExecTestCLICmd(clientCtx, tokencli.GetCmdEditToken(), args)
 }
+
 func MintTokenExec(clientCtx client.Context, from string, symbol string, extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
 		symbol,
@@ -39,6 +41,7 @@ func MintTokenExec(clientCtx client.Context, from string, symbol string, extraAr
 
 	return clitestutil.ExecTestCLICmd(clientCtx, tokencli.GetCmdMintToken(), args)
 }
+
 func TransferTokenOwnerExec(clientCtx client.Context, from string, symbol string, extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
 		symbol,
@@ -58,6 +61,7 @@ func QueryTokenExec(clientCtx client.Context, denom string, extraArgs ...string)
 
 	return clitestutil.ExecTestCLICmd(clientCtx, tokencli.GetCmdQueryToken(), args)
 }
+
 func QueryTokensExec(clientCtx client.Context, owner string, extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
 		owner,
