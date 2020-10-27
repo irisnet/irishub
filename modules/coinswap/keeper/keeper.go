@@ -77,8 +77,8 @@ func (k Keeper) Swap(ctx sdk.Context, msg *types.MsgSwapOrder) error {
 		sdk.NewEvent(
 			types.EventTypeSwap,
 			sdk.NewAttribute(types.AttributeValueAmount, amount.String()),
-			sdk.NewAttribute(types.AttributeValueSender, msg.Input.Address.String()),
-			sdk.NewAttribute(types.AttributeValueRecipient, msg.Output.Address.String()),
+			sdk.NewAttribute(types.AttributeValueSender, msg.Input.Address),
+			sdk.NewAttribute(types.AttributeValueRecipient, msg.Output.Address),
 			sdk.NewAttribute(types.AttributeValueIsBuyOrder, strconv.FormatBool(msg.IsBuyOrder)),
 			sdk.NewAttribute(types.AttributeValueTokenPair, types.GetTokenPairByDenom(msg.Input.Coin.Denom, msg.Output.Coin.Denom)),
 		),
@@ -122,15 +122,20 @@ func (k Keeper) AddLiquidity(ctx sdk.Context, msg *types.MsgAddLiquidity) error 
 		}
 	}
 
+	sender, err := sdk.AccAddressFromBech32(msg.Sender)
+	if err != nil {
+		return err
+	}
+
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
 			types.EventTypeAddLiquidity,
-			sdk.NewAttribute(types.AttributeValueSender, msg.Sender.String()),
+			sdk.NewAttribute(types.AttributeValueSender, msg.Sender),
 			sdk.NewAttribute(types.AttributeValueTokenPair, types.GetTokenPairByDenom(msg.MaxToken.Denom, standardDenom)),
 		),
 	)
 
-	return k.addLiquidity(ctx, msg.Sender, standardCoin, depositToken, uniDenom, mintLiquidityAmt)
+	return k.addLiquidity(ctx, sender, standardCoin, depositToken, uniDenom, mintLiquidityAmt)
 }
 
 func (k Keeper) addLiquidity(ctx sdk.Context, sender sdk.AccAddress, standardCoin, token sdk.Coin, uniDenom string, mintLiquidityAmt sdk.Int) error {
@@ -201,12 +206,17 @@ func (k Keeper) RemoveLiquidity(ctx sdk.Context, msg *types.MsgRemoveLiquidity) 
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
 			types.EventTypeRemoveLiquidity,
-			sdk.NewAttribute(types.AttributeValueSender, msg.Sender.String()),
+			sdk.NewAttribute(types.AttributeValueSender, msg.Sender),
 			sdk.NewAttribute(types.AttributeValueTokenPair, types.GetTokenPairByDenom(minTokenDenom, standardDenom)),
 		),
 	)
 
-	return k.removeLiquidity(ctx, poolAddr, msg.Sender, deductUniCoin, irisWithdrawCoin, tokenWithdrawCoin)
+	sender, err := sdk.AccAddressFromBech32(msg.Sender)
+	if err != nil {
+		return err
+	}
+
+	return k.removeLiquidity(ctx, poolAddr, sender, deductUniCoin, irisWithdrawCoin, tokenWithdrawCoin)
 }
 
 func (k Keeper) removeLiquidity(ctx sdk.Context, poolAddr, sender sdk.AccAddress, deductUniCoin, irisWithdrawCoin, tokenWithdrawCoin sdk.Coin) error {

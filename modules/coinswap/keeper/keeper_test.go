@@ -7,6 +7,7 @@ import (
 
 	"github.com/stretchr/testify/suite"
 
+	"github.com/tendermint/tendermint/crypto/tmhash"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -70,8 +71,8 @@ func initVars(suite *TestSuite) {
 	amountInitStandard, _ := sdk.NewIntFromString("30000000000000000000")
 	amountInitBTC, _ := sdk.NewIntFromString("3000000000")
 
-	addrSender1 = sdk.AccAddress("addrSender1")
-	addrSender2 = sdk.AccAddress("addrSender2")
+	addrSender1 = tmhash.SumTruncated([]byte("addrSender1"))
+	addrSender2 = tmhash.SumTruncated([]byte("addrSender2"))
 	_ = suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, addrSender1)
 	_ = suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, addrSender2)
 	_ = suite.app.BankKeeper.SetBalances(

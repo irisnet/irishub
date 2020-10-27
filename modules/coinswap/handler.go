@@ -43,7 +43,7 @@ func handleMsgSwapOrder(ctx sdk.Context, k keeper.Keeper, msg *types.MsgSwapOrde
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Input.Address.String()),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.Input.Address),
 		),
 	)
 
@@ -66,7 +66,7 @@ func handleMsgAddLiquidity(ctx sdk.Context, k keeper.Keeper, msg *types.MsgAddLi
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Sender.String()),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.Sender),
 		),
 	)
 
@@ -88,7 +88,7 @@ func handleMsgRemoveLiquidity(ctx sdk.Context, k keeper.Keeper, msg *types.MsgRe
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Sender.String()),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.Sender),
 		),
 	)
 
