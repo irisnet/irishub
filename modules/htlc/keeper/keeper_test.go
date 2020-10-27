@@ -81,11 +81,11 @@ func (suite *KeeperTestSuite) TestCreateHTLC() {
 	htlc, found := suite.keeper.GetHTLC(suite.ctx, hashLock)
 	suite.True(found)
 
-	suite.Equal(sender, htlc.Sender)
-	suite.Equal(recipient, htlc.To)
+	suite.Equal(sender.String(), htlc.Sender)
+	suite.Equal(recipient.String(), htlc.To)
 	suite.Equal(receiverOnOtherChain, htlc.ReceiverOnOtherChain)
 	suite.Equal(amount, htlc.Amount)
-	suite.Equal(tmbytes.HexBytes(nil), htlc.Secret)
+	suite.Equal("", htlc.Secret)
 	suite.Equal(timestamp, htlc.Timestamp)
 	suite.Equal(uint64(suite.ctx.BlockHeight())+timeLock, htlc.ExpirationHeight)
 	suite.Equal(types.Open, htlc.State)
@@ -119,7 +119,7 @@ func (suite *KeeperTestSuite) TestClaimHTLC() {
 	htlc, found := suite.keeper.GetHTLC(suite.ctx, hashLock)
 	suite.True(found)
 
-	suite.Equal(secret, htlc.Secret)
+	suite.Equal(secret.String(), htlc.Secret)
 	suite.Equal(timestamp, htlc.Timestamp)
 	suite.Equal(types.Completed, htlc.State)
 

@@ -7,6 +7,8 @@ import (
 
 	"github.com/spf13/cobra"
 
+	tmbytes "github.com/tendermint/tendermint/libs/bytes"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/version"
@@ -53,7 +55,7 @@ func GetCmdQueryHTLC() *cobra.Command {
 			}
 
 			queryClient := types.NewQueryClient(clientCtx)
-			param := types.QueryHTLCRequest{HashLock: hashLock}
+			param := types.QueryHTLCRequest{HashLock: tmbytes.HexBytes(hashLock).String()}
 			response, err := queryClient.HTLC(context.Background(), &param)
 			if err != nil {
 				return err

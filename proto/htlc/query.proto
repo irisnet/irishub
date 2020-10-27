@@ -9,19 +9,19 @@ option go_package = "github.com/irisnet/irismod/modules/htlc/types";
 
 // Query provides defines the gRPC querier service
 service Query {
-  // Balance queries the balance of a single coin for a single account
-  rpc HTLC(QueryHTLCRequest) returns (QueryHTLCResponse) {
-    option (google.api.http).get = "/irismod/htlc/htlcs/{hash_lock}";
-  }
+    // Balance queries the balance of a single coin for a single account
+    rpc HTLC (QueryHTLCRequest) returns (QueryHTLCResponse) {
+        option (google.api.http).get = "/irismod/htlc/htlcs/{hash_lock}";
+    }
 }
 
 // QueryHTLCRequest is the request type for the Query/HTLC RPC method
 message QueryHTLCRequest {
-  // address is the address to query balances for
-  bytes hash_lock = 1 [(gogoproto.casttype) = "github.com/tendermint/tendermint/libs/bytes.HexBytes"];
+    // address is the address to query balances for
+    string hash_lock = 1;
 }
 
 // QueryBalanceResponse is the response type for the Query/HTLC RPC method
 message QueryHTLCResponse {
-  HTLC htlc = 1;
+    HTLC htlc = 1;
 }

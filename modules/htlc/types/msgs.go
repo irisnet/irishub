@@ -1,6 +1,8 @@
 package types
 
 import (
+	"encoding/hex"
+
 	tmbytes "github.com/tendermint/tendermint/libs/bytes"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -17,8 +19,8 @@ const (
 	// TypeMsgRefundHTLC is the type for MsgRefundHTLC
 	TypeMsgRefundHTLC = "refund_htlc"
 
-	SecretLength                    = 32    // length for the secret in bytes
-	HashLockLength                  = 32    // length for the hash lock in bytes
+	SecretLength                    = 64    // length for the secret in bytes
+	HashLockLength                  = 64    // length for the hash lock in bytes
 	MaxLengthForAddressOnOtherChain = 128   // maximum length for the address on other chains
 	MinTimeLock                     = 50    // minimum time span for HTLC
 	MaxTimeLock                     = 25480 // maximum time span for HTLC
@@ -41,11 +43,11 @@ func NewMsgCreateHTLC(
 	timeLock uint64,
 ) MsgCreateHTLC {
 	return MsgCreateHTLC{
-		Sender:               sender,
-		To:                   to,
+		Sender:               sender.String(),
+		To:                   to.String(),
 		ReceiverOnOtherChain: receiverOnOtherChain,
 		Amount:               amount,
-		HashLock:             hashLock,
+		HashLock:             hashLock.String(),
 		Timestamp:            timestamp,
 		TimeLock:             timeLock,
 	}
@@ -59,8 +61,9 @@ func (msg MsgCreateHTLC) Type() string { return TypeMsgCreateHTLC }
 
 // ValidateBasic implements Msg
 func (msg MsgCreateHTLC) ValidateBasic() error {
-	if msg.Sender.Empty() {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "sender missing")
+	_, err := sdk.AccAddressFromBech32(msg.Sender)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
 
 	if len(msg.To) == 0 {
@@ -75,6 +78,10 @@ func (msg MsgCreateHTLC) ValidateBasic() error {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, "the transferred amount must be valid")
 	}
 
+	_, err = hex.DecodeString(msg.HashLock)
+	if err != nil {
+		return sdkerrors.Wrapf(ErrInvalidHashLock, "hash lock must be a hex encoded string")
+	}
 	if len(msg.HashLock) != HashLockLength {
 		return sdkerrors.Wrapf(ErrInvalidHashLock, "length of the hash lock must be %d in bytes", HashLockLength)
 	}
@@ -94,7 +101,11 @@ func (msg MsgCreateHTLC) GetSignBytes() []byte {
 
 // GetSigners implements Msg
 func (msg MsgCreateHTLC) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{msg.Sender}
+	from, err := sdk.AccAddressFromBech32(msg.Sender)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{from}
 }
 
 // -----------------------------------------------------------------------------
@@ -106,9 +117,9 @@ func NewMsgClaimHTLC(
 	secret tmbytes.HexBytes,
 ) MsgClaimHTLC {
 	return MsgClaimHTLC{
-		Sender:   sender,
-		HashLock: hashLock,
-		Secret:   secret,
+		Sender:   sender.String(),
+		HashLock: hashLock.String(),
+		Secret:   secret.String(),
 	}
 }
 
@@ -120,14 +131,23 @@ func (msg MsgClaimHTLC) Type() string { return TypeMsgClaimHTLC }
 
 // ValidateBasic implements Msg.
 func (msg MsgClaimHTLC) ValidateBasic() error {
-	if msg.Sender.Empty() {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "sender missing")
+	_, err := sdk.AccAddressFromBech32(msg.Sender)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
 
+	_, err = hex.DecodeString(msg.HashLock)
+	if err != nil {
+		return sdkerrors.Wrapf(ErrInvalidHashLock, "hash lock must be a hex encoded string")
+	}
 	if len(msg.HashLock) != HashLockLength {
 		return sdkerrors.Wrapf(ErrInvalidHashLock, "length of the hash lock must be %d in bytes", HashLockLength)
 	}
 
+	_, err = hex.DecodeString(msg.Secret)
+	if err != nil {
+		return sdkerrors.Wrapf(ErrInvalidSecret, "secret must be a hex encoded string")
+	}
 	if len(msg.Secret) != SecretLength {
 		return sdkerrors.Wrapf(ErrInvalidSecret, "length of the secret must be %d in bytes", SecretLength)
 	}
@@ -143,7 +163,11 @@ func (msg MsgClaimHTLC) GetSignBytes() []byte {
 
 // GetSigners implements Msg
 func (msg MsgClaimHTLC) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{msg.Sender}
+	from, err := sdk.AccAddressFromBech32(msg.Sender)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{from}
 }
 
 // -----------------------------------------------------------------------------
@@ -154,8 +178,8 @@ func NewMsgRefundHTLC(
 	hashLock tmbytes.HexBytes,
 ) MsgRefundHTLC {
 	return MsgRefundHTLC{
-		Sender:   sender,
-		HashLock: hashLock,
+		Sender:   sender.String(),
+		HashLock: hashLock.String(),
 	}
 }
 
@@ -167,8 +191,14 @@ func (msg MsgRefundHTLC) Type() string { return TypeMsgRefundHTLC }
 
 // ValidateBasic implements Msg
 func (msg MsgRefundHTLC) ValidateBasic() error {
-	if msg.Sender.Empty() {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "sender missing")
+	_, err := sdk.AccAddressFromBech32(msg.Sender)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
+	}
+
+	_, err = hex.DecodeString(msg.HashLock)
+	if err != nil {
+		return sdkerrors.Wrapf(ErrInvalidHashLock, "hash lock must be a hex encoded string")
 	}
 
 	if len(msg.HashLock) != HashLockLength {
@@ -186,5 +216,9 @@ func (msg MsgRefundHTLC) GetSignBytes() []byte {
 
 // GetSigners implements Msg
 func (msg MsgRefundHTLC) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{msg.Sender}
+	from, err := sdk.AccAddressFromBech32(msg.Sender)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{from}
 }
