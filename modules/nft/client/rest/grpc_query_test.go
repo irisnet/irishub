@@ -1,20 +1,21 @@
-package rest
+package rest_test
 
 import (
-"fmt"
-nfttypes "github.com/irisnet/irismod/modules/nft/types"
-"github.com/tidwall/gjson"
-"testing"
+	"fmt"
+	"testing"
 
-"github.com/cosmos/cosmos-sdk/client/flags"
-"github.com/cosmos/cosmos-sdk/testutil/network"
-sdk "github.com/cosmos/cosmos-sdk/types"
-"github.com/gogo/protobuf/proto"
-"github.com/stretchr/testify/suite"
+	nfttypes "github.com/irisnet/irismod/modules/nft/types"
+	"github.com/tidwall/gjson"
 
-nftcli "github.com/irisnet/irismod/modules/nft/client/cli"
-nfttestutil "github.com/irisnet/irismod/modules/nft/client/testutil"
-"github.com/irisnet/irismod/simapp"
+	"github.com/cosmos/cosmos-sdk/client/flags"
+	"github.com/cosmos/cosmos-sdk/testutil/network"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/gogo/protobuf/proto"
+	"github.com/stretchr/testify/suite"
+
+	nftcli "github.com/irisnet/irismod/modules/nft/client/cli"
+	nfttestutil "github.com/irisnet/irismod/modules/nft/client/testutil"
+	"github.com/irisnet/irismod/simapp"
 )
 
 type IntegrationTestSuite struct {
@@ -27,8 +28,7 @@ type IntegrationTestSuite struct {
 func (s *IntegrationTestSuite) SetupSuite() {
 	s.T().Log("setting up integration test suite")
 
-	cfg := network.DefaultConfig()
-	cfg.AppConstructor = simapp.SimAppConstructor
+	cfg := simapp.NewConfig()
 	cfg.NumValidators = 1
 
 	s.cfg = cfg

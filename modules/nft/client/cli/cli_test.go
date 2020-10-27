@@ -2,9 +2,10 @@ package cli_test
 
 import (
 	"fmt"
+	"testing"
+
 	nfttypes "github.com/irisnet/irismod/modules/nft/types"
 	"github.com/tidwall/gjson"
-	"testing"
 
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/testutil/network"
@@ -27,8 +28,7 @@ type IntegrationTestSuite struct {
 func (s *IntegrationTestSuite) SetupSuite() {
 	s.T().Log("setting up integration test suite")
 
-	cfg := network.DefaultConfig()
-	cfg.AppConstructor = simapp.SimAppConstructor
+	cfg := simapp.NewConfig()
 	cfg.NumValidators = 1
 
 	s.cfg = cfg

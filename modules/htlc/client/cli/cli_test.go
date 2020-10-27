@@ -10,9 +10,9 @@ import (
 	"github.com/gogo/protobuf/proto"
 	"github.com/stretchr/testify/suite"
 
-	htlctypes "github.com/irisnet/irismod/modules/htlc/types"
 	htlccli "github.com/irisnet/irismod/modules/htlc/client/cli"
 	htlctestutil "github.com/irisnet/irismod/modules/htlc/client/testutil"
+	htlctypes "github.com/irisnet/irismod/modules/htlc/types"
 	"github.com/irisnet/irismod/simapp"
 )
 
@@ -25,8 +25,7 @@ type IntegrationTestSuite struct {
 func (s *IntegrationTestSuite) SetupSuite() {
 	s.T().Log("setting up integration test suite")
 
-	cfg := network.DefaultConfig()
-	cfg.AppConstructor = simapp.SimAppConstructor
+	cfg := simapp.NewConfig()
 	cfg.NumValidators = 2
 
 	s.cfg = cfg
@@ -67,8 +66,8 @@ func (s *IntegrationTestSuite) TestNft() {
 		fmt.Sprintf("--%s=%s", htlccli.FlagReceiverOnOtherChain, receiverOnOtherChain),
 		fmt.Sprintf("--%s=%s", htlccli.FlagHashLock, hashLock),
 		fmt.Sprintf("--%s=%s", htlccli.FlagSecret, secretHex),
-		fmt.Sprintf("--%s=%s", htlccli.FlagTimeLock, timeLock),
-		fmt.Sprintf("--%s=%s", htlccli.FlagTimestamp, timestamp),
+		fmt.Sprintf("--%s=%d", htlccli.FlagTimeLock, timeLock),
+		fmt.Sprintf("--%s=%d", htlccli.FlagTimestamp, timestamp),
 
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),

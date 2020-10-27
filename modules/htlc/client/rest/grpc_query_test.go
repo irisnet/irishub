@@ -4,15 +4,16 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/cosmos/cosmos-sdk/testutil/network"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/gogo/protobuf/proto"
 	"github.com/stretchr/testify/suite"
 
-	htlctypes "github.com/irisnet/irismod/modules/htlc/types"
+	"github.com/cosmos/cosmos-sdk/client/flags"
+	"github.com/cosmos/cosmos-sdk/testutil/network"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+
 	htlccli "github.com/irisnet/irismod/modules/htlc/client/cli"
 	htlctestutil "github.com/irisnet/irismod/modules/htlc/client/testutil"
+	htlctypes "github.com/irisnet/irismod/modules/htlc/types"
 	"github.com/irisnet/irismod/simapp"
 )
 
@@ -22,6 +23,7 @@ type IntegrationTestSuite struct {
 	cfg     network.Config
 	network *network.Network
 }
+
 func (s *IntegrationTestSuite) SetupSuite() {
 	s.T().Log("setting up integration test suite")
 
@@ -47,7 +49,7 @@ func TestIntegrationTestSuite(t *testing.T) {
 
 func (s *IntegrationTestSuite) TestNft() {
 	val := s.network.Validators[0]
-	val2:=s.network.Validators[1]
+	val2 := s.network.Validators[1]
 	clientCtx := val.ClientCtx
 
 	// ---------------------------------------------------------------------------
@@ -67,8 +69,8 @@ func (s *IntegrationTestSuite) TestNft() {
 		fmt.Sprintf("--%s=%s", htlccli.FlagReceiverOnOtherChain, receiverOnOtherChain),
 		fmt.Sprintf("--%s=%s", htlccli.FlagHashLock, hashLock),
 		fmt.Sprintf("--%s=%s", htlccli.FlagSecret, secretHex),
-		fmt.Sprintf("--%s=%s", htlccli.FlagTimeLock, timeLock),
-		fmt.Sprintf("--%s=%s", htlccli.FlagTimestamp, timestamp),
+		fmt.Sprintf("--%s=%d", htlccli.FlagTimeLock, timeLock),
+		fmt.Sprintf("--%s=%d", htlccli.FlagTimestamp, timestamp),
 
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
@@ -92,7 +94,7 @@ func (s *IntegrationTestSuite) TestNft() {
 
 	respType = proto.Message(&sdk.TxResponse{})
 
-	bz, err = htlctestutil.ClaimHTLCExec(clientCtx, from.String(), hashLock,secretHex,args...)
+	bz, err = htlctestutil.ClaimHTLCExec(clientCtx, from.String(), hashLock, secretHex, args...)
 	s.Require().NoError(err)
 	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType), bz.String())
 	txResp = respType.(*sdk.TxResponse)
@@ -115,10 +117,9 @@ func (s *IntegrationTestSuite) TestNft() {
 	// ---------------------------------------------------------------------------
 
 	respType = proto.Message(&htlctypes.HTLC{})
-	bz, err = htlctestutil.QueryHTLCExec( val.ClientCtx, hashLock)
+	bz, err = htlctestutil.QueryHTLCExec(val.ClientCtx, hashLock)
 	s.Require().NoError(err)
 	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType))
-	htlcItem:=respType.(*htlctypes.HTLC)
-	s.Require().Equal(amount,htlcItem.Amount)
+	htlcItem := respType.(*htlctypes.HTLC)
+	s.Require().Equal(amount, htlcItem.Amount)
 }
-

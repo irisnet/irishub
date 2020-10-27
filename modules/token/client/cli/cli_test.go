@@ -27,8 +27,7 @@ type IntegrationTestSuite struct {
 func (s *IntegrationTestSuite) SetupSuite() {
 	s.T().Log("setting up integration test suite")
 
-	cfg := network.DefaultConfig()
-	cfg.AppConstructor = simapp.SimAppConstructor
+	cfg := simapp.NewConfig()
 	cfg.NumValidators = 2
 
 	s.cfg = cfg
@@ -105,7 +104,7 @@ func (s *IntegrationTestSuite) TestToken() {
 
 	args = []string{
 		fmt.Sprintf("--%s=%s", tokencli.FlagTo, to),
-		fmt.Sprintf("--%s=%s", tokencli.FlagAmount, mintAmount),
+		fmt.Sprintf("--%s=%d", tokencli.FlagAmount, mintAmount),
 
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
