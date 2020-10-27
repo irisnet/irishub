@@ -1,6 +1,6 @@
 module github.com/irisnet/irishub
 
-go 1.14
+go 1.15
 
 require (
 	github.com/cosmos/cosmos-sdk v0.40.0-rc0
@@ -8,7 +8,7 @@ require (
 	github.com/golang/protobuf v1.4.2
 	github.com/gorilla/mux v1.8.0
 	github.com/grpc-ecosystem/grpc-gateway v1.15.0
-	github.com/irisnet/irismod v1.1.1-0.20201015064111-9d21ec6ad6fc
+	github.com/irisnet/irismod v1.1.1-0.20201027032543-7ba3e809e2f3
 	github.com/olebedev/config v0.0.0-20190528211619-364964f3a8e4
 	github.com/pkg/errors v0.9.1
 	github.com/rakyll/statik v0.1.7
