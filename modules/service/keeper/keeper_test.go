@@ -7,7 +7,7 @@ import (
 	gogotypes "github.com/gogo/protobuf/types"
 	"github.com/stretchr/testify/suite"
 
-	"github.com/tendermint/tendermint/crypto/tmhash"
+	abci "github.com/tendermint/tendermint/abci/types"
 	tmbytes "github.com/tendermint/tendermint/libs/bytes"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 
@@ -256,9 +256,8 @@ func (suite *KeeperTestSuite) TestKeeperRequestContext() {
 	suite.setServiceDefinition()
 
 	blockHeight := int64(1000)
-	ctx := suite.ctx.WithBlockHeight(blockHeight).
-		WithValue(types.TxHash, tmhash.Sum([]byte("tx_hash"))).
-		WithValue(types.MsgIndex, int64(0))
+	ctx := suite.ctx.WithBlockHeight(blockHeight)
+	suite.app.BeginBlocker(ctx, abci.RequestBeginBlock{})
 
 	// create
 	requestContextID, err := suite.keeper.CreateRequestContext(
@@ -345,9 +344,8 @@ func (suite *KeeperTestSuite) TestKeeperRequestService() {
 	}
 
 	blockHeight := int64(1000)
-	ctx := suite.ctx.WithBlockHeight(blockHeight).
-		WithValue(types.TxHash, tmhash.Sum([]byte("tx_hash"))).
-		WithValue(types.MsgIndex, int64(0))
+	ctx := suite.ctx.WithBlockHeight(blockHeight)
+	suite.app.BeginBlocker(ctx, abci.RequestBeginBlock{})
 
 	requestContextID, requestContext := suite.setRequestContext(ctx, consumer, providers, types.RUNNING, 0, "")
 
@@ -411,7 +409,7 @@ func (suite *KeeperTestSuite) TestKeeperRequestService() {
 }
 
 func (suite *KeeperTestSuite) TestKeeper_Respond_Service() {
-	ctx := suite.ctx.WithValue(types.TxHash, tmhash.Sum([]byte("tx_hash")))
+	ctx := suite.ctx
 
 	provider := testProvider
 	consumer := testConsumer
@@ -476,7 +474,7 @@ func (suite *KeeperTestSuite) TestKeeper_Respond_Service() {
 }
 
 func (suite *KeeperTestSuite) TestRequestServiceFromModule() {
-	ctx := suite.ctx.WithValue(types.TxHash, tmhash.Sum([]byte("tx_hash")))
+	ctx := suite.ctx
 
 	provider1 := testProvider
 	provider2 := testProvider1
@@ -539,7 +537,7 @@ func (suite *KeeperTestSuite) setRequestContext(
 		state, threshold, moduleName,
 	)
 
-	requestContextID := types.GenerateRequestContextID(ctx.Value(types.TxHash).([]byte), 0)
+	requestContextID := types.GenerateRequestContextID(keeper.TxHash(ctx), 0)
 	suite.keeper.SetRequestContext(ctx, requestContextID, requestContext)
 
 	return requestContextID, requestContext

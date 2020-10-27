@@ -25,12 +25,6 @@ const (
 
 	// RequestAccName is the root string for the service request account address
 	RequestAccName = "service_request_account"
-
-	// TxHash is the context key for tx hash
-	TxHash = "tx_hash"
-
-	// MsgIndex is the context key for msg index
-	MsgIndex = "msg_index"
 )
 
 var (
@@ -57,6 +51,7 @@ var (
 	RequestVolumeKey             = []byte{0x17} // prefix for request volume
 	EarnedFeesKey                = []byte{0x18} // prefix for provider earned fees
 	OwnerEarnedFeesKey           = []byte{0x19} // prefix for owner earned fees
+	InternalCounterKey           = []byte{0x20} // prefix for internal counter key
 )
 
 // GetServiceDefinitionKey gets the key for the service definition with the specified service name

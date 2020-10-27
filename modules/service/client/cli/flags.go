@@ -79,7 +79,7 @@ func init() {
 
 	FsUpdateRequestContext.StringSlice(FlagProviders, []string{}, "provider list to request, not updated if empty")
 	FsUpdateRequestContext.String(FlagServiceFeeCap, "", "maximum service fee to pay for a single request, not updated if empty")
-	FsUpdateRequestContext.Uint64(FlagTimeout, 0, "request timeout, not updated if set to 0")
+	FsUpdateRequestContext.Int64(FlagTimeout, 0, "request timeout, not updated if set to 0")
 	FsUpdateRequestContext.Uint64(FlagFrequency, 0, "request frequency, not updated if set to 0")
 	FsUpdateRequestContext.Int64(FlagTotal, 0, "request count, not updated if set to 0")
 
