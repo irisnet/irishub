@@ -56,9 +56,9 @@ func GetCmdDefineService() *cobra.Command {
 		Long:  "Define a new service based on the given params.",
 		Example: fmt.Sprintf(
 			"$ %s tx service define "+
-				"--name=<service name> "+
-				"--description=<service description> "+
-				"--author-description=<author description> "+
+				"--name=<service-name> "+
+				"--description=<service-description> "+
+				"--author-description=<author-description> "+
 				"--tags=<tag1,tag2,...> "+
 				"--schemas=<schemas content or path/to/schemas.json> "+
 				"--from mykey",
@@ -539,7 +539,7 @@ func GetCmdCallService() *cobra.Command {
 		Example: fmt.Sprintf(
 			"$ %s tx service call "+
 				"--service-name=<service-name> "+
-				"--providers=<provider list> "+
+				"--providers=<provider-list> "+
 				"--service-fee-cap=1stake "+
 				"--data=<input content or path/to/input.json> "+
 				"--timeout=100 "+

@@ -42,7 +42,7 @@ func GetCmdIssueDenom() *cobra.Command {
 		Use:  "issue [denom]",
 		Long: "Issue a new denom.",
 		Example: fmt.Sprintf(
-			"$ %s tx nft issue <denomID> "+
+			"$ %s tx nft issue <denom> "+
 				"--from=<key-name> "+
 				"--name=<name> "+
 				"--schema=<schema> "+
@@ -89,10 +89,10 @@ func GetCmdIssueDenom() *cobra.Command {
 // GetCmdMintNFT is the CLI command for a MintNFT transaction
 func GetCmdMintNFT() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:  "mint [denomID] [tokenID]",
+		Use:  "mint [denom] [token-id]",
 		Long: "Mint an NFT and set the owner to the recipient.",
 		Example: fmt.Sprintf(
-			"$ %s tx nft mint <denomID> <tokenID> "+
+			"$ %s tx nft mint <denom> <token-id> "+
 				"--uri=<uri> "+
 				"--recipient=<recipient> "+
 				"--from=<key-name> "+
@@ -159,10 +159,10 @@ func GetCmdMintNFT() *cobra.Command {
 // GetCmdEditNFT is the CLI command for sending an MsgEditNFT transaction
 func GetCmdEditNFT() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:  "edit [denomID] [tokenID]",
+		Use:  "edit [denom] [token-id]",
 		Long: "Edit the tokenData of an NFT.",
 		Example: fmt.Sprintf(
-			"$ %s tx nft edit <denomID> <tokenID> "+
+			"$ %s tx nft edit <denom> <token-id> "+
 				"--uri=<uri> "+
 				"--from=<key-name> "+
 				"--chain-id=<chain-id> "+
@@ -212,10 +212,10 @@ func GetCmdEditNFT() *cobra.Command {
 // GetCmdTransferNFT is the CLI command for sending a TransferNFT transaction
 func GetCmdTransferNFT() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:  "transfer [recipient] [denomID] [tokenID]",
+		Use:  "transfer [recipient] [denom] [token-id]",
 		Long: "Transfer a NFT to a recipient.",
 		Example: fmt.Sprintf(
-			"$ %s tx nft transfer <recipient> <denomID> <tokenID> "+
+			"$ %s tx nft transfer <recipient> <denom> <token-id> "+
 				"--uri=<uri> "+
 				"--from=<key-name> "+
 				"--chain-id=<chain-id> "+
@@ -271,10 +271,10 @@ func GetCmdTransferNFT() *cobra.Command {
 // GetCmdBurnNFT is the CLI command for sending a BurnNFT transaction
 func GetCmdBurnNFT() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:  "burn [denomID] [tokenID]",
+		Use:  "burn [denom] [token-id]",
 		Long: "Burn an NFT.",
 		Example: fmt.Sprintf(
-			"$ %s tx nft burn <denomID> <tokenID> "+
+			"$ %s tx nft burn <denom> <token-id> "+
 				"--from=<key-name> "+
 				"--chain-id=<chain-id> "+
 				"--fees=<fee>",
