@@ -10,40 +10,40 @@ option go_package = "github.com/irisnet/irismod/modules/nft/types";
 // Query defines the gRPC querier service for nft module
 service Query {
     // Supply queries the total supply of a given denom or owner
-    rpc Supply(QuerySupplyRequest) returns (QuerySupplyResponse) {
-      option (google.api.http).get = "/irismod/nft/collections/{denom}/supply";
+    rpc Supply (QuerySupplyRequest) returns (QuerySupplyResponse) {
+        option (google.api.http).get = "/irismod/nft/collections/{denom}/supply";
     }
 
     // Owner queries the NFTs of the specified owner
-    rpc Owner(QueryOwnerRequest) returns (QueryOwnerResponse) {
-      option (google.api.http).get = "/irismod/nft/owners/{owner}";
+    rpc Owner (QueryOwnerRequest) returns (QueryOwnerResponse) {
+        option (google.api.http).get = "/irismod/nft/owners/{owner}";
     }
 
     // Collection queries the NFTs of the specified denom
-    rpc Collection(QueryCollectionRequest) returns (QueryCollectionResponse) {
-      option (google.api.http).get = "/irismod/nft/collections/{denom}";
+    rpc Collection (QueryCollectionRequest) returns (QueryCollectionResponse) {
+        option (google.api.http).get = "/irismod/nft/collections/{denom}";
     }
 
     // Denom queries the definition of a given denom
-    rpc Denom(QueryDenomRequest) returns (QueryDenomResponse) {
-      option (google.api.http).get = "/irismod/nft/denoms/{denom}";
+    rpc Denom (QueryDenomRequest) returns (QueryDenomResponse) {
+        option (google.api.http).get = "/irismod/nft/denoms/{denom}";
     }
 
     // Denoms queries all the denoms
-    rpc Denoms(QueryDenomsRequest) returns (QueryDenomsResponse) {
-      option (google.api.http).get = "/irismod/nft/denoms";
+    rpc Denoms (QueryDenomsRequest) returns (QueryDenomsResponse) {
+        option (google.api.http).get = "/irismod/nft/denoms";
     }
 
     // NFT queries the NFT for the given denom and token ID
-    rpc NFT(QueryNFTRequest) returns (QueryNFTResponse) {
-      option (google.api.http).get = "/irismod/nft/nfts/{denom}/{id}";
+    rpc NFT (QueryNFTRequest) returns (QueryNFTResponse) {
+        option (google.api.http).get = "/irismod/nft/nfts/{denom}/{id}";
     }
 }
 
 // QuerySupplyRequest is the request type for the Query/HTLC RPC method
 message QuerySupplyRequest {
     string denom = 1;
-    bytes owner = 2 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
+    string owner = 2;
 }
 
 // QuerySupplyResponse is the response type for the Query/Supply RPC method
@@ -54,7 +54,7 @@ message QuerySupplyResponse {
 // QueryOwnerRequest is the request type for the Query/Owner RPC method
 message QueryOwnerRequest {
     string denom = 1;
-    bytes owner = 2 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
+    string owner = 2;
 }
 
 // QueryOwnerResponse is the response type for the Query/Owner RPC method
@@ -83,7 +83,8 @@ message QueryDenomResponse {
 }
 
 // QueryDenomsRequest is the request type for the Query/Denoms RPC method
-message QueryDenomsRequest {}
+message QueryDenomsRequest {
+}
 
 // QueryDenomsResponse is the response type for the Query/Denoms RPC method
 message QueryDenomsResponse {

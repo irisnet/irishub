@@ -111,7 +111,7 @@ func (k Keeper) TransferOwner(
 		return err
 	}
 
-	nft.Owner = dstOwner
+	nft.Owner = dstOwner.String()
 
 	if tokenNm != types.DoNotModify {
 		nft.Name = tokenNm

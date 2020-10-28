@@ -69,7 +69,7 @@ func (idcs IDCollections) String() string {
 // NewOwner creates a new Owner
 func NewOwner(owner sdk.AccAddress, idCollections ...IDCollection) Owner {
 	return Owner{
-		Address:       owner,
+		Address:       owner.String(),
 		IDCollections: idCollections,
 	}
 }

@@ -70,7 +70,7 @@ func GetCmdQuerySupply() *cobra.Command {
 			queryClient := types.NewQueryClient(clientCtx)
 			resp, err := queryClient.Supply(context.Background(), &types.QuerySupplyRequest{
 				Denom: denom,
-				Owner: owner,
+				Owner: owner.String(),
 			})
 			if err != nil {
 				return err
@@ -110,7 +110,7 @@ func GetCmdQueryOwner() *cobra.Command {
 			queryClient := types.NewQueryClient(clientCtx)
 			resp, err := queryClient.Owner(context.Background(), &types.QueryOwnerRequest{
 				Denom: denom,
-				Owner: address,
+				Owner: address.String(),
 			})
 			if err != nil {
 				return err

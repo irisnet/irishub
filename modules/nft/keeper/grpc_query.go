@@ -4,6 +4,9 @@ import (
 	"context"
 	"strings"
 
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
@@ -18,17 +21,27 @@ func (k Keeper) Supply(c context.Context, request *types.QuerySupplyRequest) (*t
 
 	var supply uint64
 	switch {
-	case request.Owner.Empty() && len(denom) > 0:
+	case len(request.Owner) == 0 && len(denom) > 0:
 		supply = k.GetTotalSupply(ctx, denom)
 	default:
-		supply = k.GetTotalSupplyOfOwner(ctx, denom, request.Owner)
+		owner, err := sdk.AccAddressFromBech32(request.Owner)
+		if err != nil {
+			return nil, status.Errorf(codes.InvalidArgument, "invalid owner address %s", request.Owner)
+		}
+		supply = k.GetTotalSupplyOfOwner(ctx, denom, owner)
 	}
 	return &types.QuerySupplyResponse{Amount: supply}, nil
 }
 
 func (k Keeper) Owner(c context.Context, request *types.QueryOwnerRequest) (*types.QueryOwnerResponse, error) {
 	ctx := sdk.UnwrapSDKContext(c)
-	owner := k.GetOwner(ctx, request.Owner, request.Denom)
+
+	ownerAddress, err := sdk.AccAddressFromBech32(request.Owner)
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "invalid owner address %s", request.Owner)
+	}
+
+	owner := k.GetOwner(ctx, ownerAddress, request.Denom)
 	return &types.QueryOwnerResponse{Owner: &owner}, nil
 }
 
