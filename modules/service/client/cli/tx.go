@@ -343,7 +343,7 @@ func GetCmdUpdateServiceBinding() *cobra.Command {
 
 				buf := bytes.NewBuffer([]byte{})
 				if err := json.Compact(buf, []byte(options)); err != nil {
-					return fmt.Errorf("failed to compact the pricing")
+					return fmt.Errorf("failed to compact the options")
 				}
 
 				options = buf.String()
