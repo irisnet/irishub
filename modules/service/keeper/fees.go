@@ -204,8 +204,13 @@ func (k Keeper) RefundServiceFees(ctx sdk.Context) error {
 
 		request, _ := k.GetRequest(ctx, requestID.Value)
 
+		consumer, err := sdk.AccAddressFromBech32(request.Consumer)
+		if err != nil {
+			return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid consumer address (%s)", err)
+		}
+
 		if err := k.bankKeeper.SendCoinsFromModuleToAccount(
-			ctx, types.RequestAccName, request.Consumer, request.ServiceFee,
+			ctx, types.RequestAccName, consumer, request.ServiceFee,
 		); err != nil {
 			return err
 		}

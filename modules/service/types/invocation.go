@@ -35,10 +35,15 @@ func NewRequestContext(
 	responseThreshold uint32,
 	moduleName string,
 ) RequestContext {
+	pds := make([]string, len(providers))
+	for i, provider := range providers {
+		pds[i] = provider.String()
+	}
+
 	return RequestContext{
 		ServiceName:            serviceName,
-		Providers:              providers,
-		Consumer:               consumer,
+		Providers:              pds,
+		Consumer:               consumer.String(),
 		Input:                  input,
 		ServiceFeeCap:          serviceFeeCap,
 		Timeout:                timeout,
@@ -63,11 +68,20 @@ func (rc RequestContext) Validate() error {
 		return err
 	}
 
-	if err := ValidateProvidersNoEmpty(rc.Providers); err != nil {
+	pds := make([]sdk.AccAddress, len(rc.Providers))
+	for i, provider := range rc.Providers {
+		pd, err := sdk.AccAddressFromBech32(provider)
+		if err != nil {
+			return err
+		}
+		pds[i] = pd
+	}
+
+	if err := ValidateProviders(pds); err != nil {
 		return err
 	}
 
-	if err := ValidateConsumer((rc.Consumer)); err != nil {
+	if err := ValidateConsumer(rc.Consumer); err != nil {
 		return err
 	}
 
@@ -94,9 +108,9 @@ func NewCompactRequest(
 	expirationHeight int64,
 ) CompactRequest {
 	return CompactRequest{
-		RequestContextId:           requestContextID,
+		RequestContextId:           requestContextID.String(),
 		RequestContextBatchCounter: batchCounter,
-		Provider:                   provider,
+		Provider:                   provider.String(),
 		ServiceFee:                 serviceFee,
 		RequestHeight:              requestHeight,
 		ExpirationHeight:           expirationHeight,
@@ -118,16 +132,16 @@ func NewRequest(
 	batchCounter uint64,
 ) Request {
 	return Request{
-		Id:                         id,
+		Id:                         id.String(),
 		ServiceName:                serviceName,
-		Provider:                   provider,
-		Consumer:                   consumer,
+		Provider:                   provider.String(),
+		Consumer:                   consumer.String(),
 		Input:                      input,
 		ServiceFee:                 serviceFee,
 		SuperMode:                  superMode,
 		RequestHeight:              requestHeight,
 		ExpirationHeight:           expirationHeight,
-		RequestContextId:           requestContextID,
+		RequestContextId:           requestContextID.String(),
 		RequestContextBatchCounter: batchCounter,
 	}
 }
@@ -147,11 +161,11 @@ func NewResponse(
 	batchCounter uint64,
 ) Response {
 	return Response{
-		Provider:                   provider,
-		Consumer:                   consumer,
+		Provider:                   provider.String(),
+		Consumer:                   consumer.String(),
 		Result:                     result,
 		Output:                     output,
-		RequestContextId:           requestContextID,
+		RequestContextId:           requestContextID.String(),
 		RequestContextBatchCounter: batchCounter,
 	}
 }
@@ -323,8 +337,8 @@ type ResponseCallback func(ctx sdk.Context, requestContextID tmbytes.HexBytes, r
 type StateCallback func(ctx sdk.Context, requestContextID tmbytes.HexBytes, cause string)
 
 const (
-	RequestIDLen = 58
-	ContextIDLen = 40
+	RequestIDLen = 116
+	ContextIDLen = 80
 )
 
 // ConvertRequestID converts the given string to request ID
@@ -352,7 +366,7 @@ func GenerateRequestContextID(txHash []byte, msgIndex int64) tmbytes.HexBytes {
 
 // SplitRequestContextID splits the given contextID to txHash and msgIndex
 func SplitRequestContextID(contextID tmbytes.HexBytes) (tmbytes.HexBytes, int64, error) {
-	if len(contextID) != ContextIDLen {
+	if len(contextID) != ContextIDLen/2 {
 		return nil, 0, errors.New("invalid request context ID")
 	}
 
@@ -378,7 +392,7 @@ func GenerateRequestID(requestContextID tmbytes.HexBytes, requestContextBatchCou
 
 // SplitRequestID splits the given requestID to contextID, batchCounter, requestHeight, batchRequestIndex
 func SplitRequestID(requestID tmbytes.HexBytes) (tmbytes.HexBytes, uint64, int64, int16, error) {
-	if len(requestID) != RequestIDLen {
+	if len(requestID) != RequestIDLen/2 {
 		return nil, 0, 0, 0, errors.New("invalid request ID")
 	}
 

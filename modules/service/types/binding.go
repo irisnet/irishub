@@ -21,14 +21,14 @@ func NewServiceBinding(
 ) ServiceBinding {
 	return ServiceBinding{
 		ServiceName:  serviceName,
-		Provider:     provider,
+		Provider:     provider.String(),
 		Deposit:      deposit,
 		Pricing:      pricing,
 		QoS:          qos,
 		Options:      options,
 		Available:    available,
 		DisabledTime: disabledTime,
-		Owner:        owner,
+		Owner:        owner.String(),
 	}
 }
 

@@ -120,7 +120,7 @@ func (suite *KeeperTestSuite) TestDefineService() {
 	suite.Equal(testServiceName, svcDef.Name)
 	suite.Equal(testServiceDesc, svcDef.Description)
 	suite.Equal(testServiceTags, svcDef.Tags)
-	suite.Equal(testAuthor, svcDef.Author)
+	suite.Equal(testAuthor.String(), svcDef.Author)
 	suite.Equal(testAuthorDesc, svcDef.AuthorDescription)
 	suite.Equal(testSchemas, svcDef.Schemas)
 }
@@ -135,13 +135,13 @@ func (suite *KeeperTestSuite) TestBindService() {
 	suite.True(found)
 
 	suite.Equal(testServiceName, svcBinding.ServiceName)
-	suite.Equal(testProvider, svcBinding.Provider)
+	suite.Equal(testProvider.String(), svcBinding.Provider)
 	suite.Equal(testDeposit, svcBinding.Deposit)
 	suite.Equal(testPricing, svcBinding.Pricing)
 	suite.Equal(testQoS, svcBinding.QoS)
 	suite.True(svcBinding.Available)
 	suite.True(svcBinding.DisabledTime.IsZero())
-	suite.Equal(testOwner, svcBinding.Owner)
+	suite.Equal(testOwner.String(), svcBinding.Owner)
 
 	svcBindings := suite.keeper.GetOwnerServiceBindings(suite.ctx, testOwner, testServiceName)
 	suite.Equal(1, len(svcBindings))
@@ -163,10 +163,11 @@ func (suite *KeeperTestSuite) TestBindService() {
 	newQoS := uint64(80)
 	newOptions := "{}"
 
-	err = suite.keeper.UpdateServiceBinding(suite.ctx, svcBinding.ServiceName, svcBinding.Provider, testAddedDeposit, newPricing, newQoS, newOptions, testOwner)
+	provider, _ := sdk.AccAddressFromBech32(svcBinding.Provider)
+	err = suite.keeper.UpdateServiceBinding(suite.ctx, svcBinding.ServiceName, provider, testAddedDeposit, newPricing, newQoS, newOptions, testOwner)
 	suite.NoError(err)
 
-	updatedSvcBinding, found := suite.keeper.GetServiceBinding(suite.ctx, svcBinding.ServiceName, svcBinding.Provider)
+	updatedSvcBinding, found := suite.keeper.GetServiceBinding(suite.ctx, svcBinding.ServiceName, provider)
 	suite.True(found)
 
 	suite.True(updatedSvcBinding.Deposit.IsEqual(svcBinding.Deposit.Add(testAddedDeposit...)))
@@ -273,8 +274,12 @@ func (suite *KeeperTestSuite) TestKeeperRequestContext() {
 	suite.True(found)
 
 	suite.Equal(testServiceName, requestContext.ServiceName)
-	suite.Equal(providers, requestContext.Providers)
-	suite.Equal(consumer, requestContext.Consumer)
+	pds := make([]string, len(providers))
+	for i, provider := range providers {
+		pds[i] = provider.String()
+	}
+	suite.Equal(pds, requestContext.Providers)
+	suite.Equal(consumer.String(), requestContext.Consumer)
 	suite.Equal(testServiceFeeCap, requestContext.ServiceFeeCap)
 	suite.Equal(testTimeout, requestContext.Timeout)
 	suite.True(requestContext.Repeated)
@@ -296,8 +301,8 @@ func (suite *KeeperTestSuite) TestKeeperRequestContext() {
 	suite.True(found)
 
 	suite.Equal(testServiceName, requestContext.ServiceName)
-	suite.Equal(providers, requestContext.Providers)
-	suite.Equal(consumer, requestContext.Consumer)
+	suite.Equal(pds, requestContext.Providers)
+	suite.Equal(consumer.String(), requestContext.Consumer)
 	suite.Equal(newServiceFeeCap, requestContext.ServiceFeeCap)
 	suite.Equal(newTimeout, requestContext.Timeout)
 	suite.True(requestContext.Repeated)
@@ -371,7 +376,7 @@ func (suite *KeeperTestSuite) TestKeeperRequestService() {
 
 	suite.True(iterator.Valid())
 
-	requestProviders := []sdk.AccAddress{}
+	var requestProviders []sdk.AccAddress
 	for ; iterator.Valid(); iterator.Next() {
 		var requestIDBz gogotypes.BytesValue
 		suite.cdc.MustUnmarshalBinaryBare(iterator.Value(), &requestIDBz)
@@ -383,12 +388,13 @@ func (suite *KeeperTestSuite) TestKeeperRequestService() {
 		suite.Equal(requestContext.ServiceName, request.ServiceName)
 		suite.Equal(requestContext.Consumer, request.Consumer)
 
-		requestProviders = append(requestProviders, request.Provider)
+		provider, _ := sdk.AccAddressFromBech32(request.Provider)
+		requestProviders = append(requestProviders, provider)
 
 		suite.Equal(blockHeight, request.RequestHeight)
 		suite.Equal(blockHeight+testTimeout, request.ExpirationHeight)
 		suite.Equal(requestContext.BatchCounter, request.RequestContextBatchCounter)
-		suite.Equal(requestContextID, request.RequestContextId)
+		suite.Equal(requestContextID.String(), request.RequestContextId)
 	}
 
 	suite.Equal(newProviders, requestProviders)
@@ -439,9 +445,9 @@ func (suite *KeeperTestSuite) TestKeeper_Respond_Service() {
 	response, found := suite.keeper.GetResponse(ctx, requestID1)
 	suite.True(found)
 
-	suite.Equal(provider, response.Provider)
-	suite.Equal(consumer, response.Consumer)
-	suite.Equal(requestContextID, response.RequestContextId)
+	suite.Equal(provider.String(), response.Provider)
+	suite.Equal(consumer.String(), response.Consumer)
+	suite.Equal(requestContextID.String(), response.RequestContextId)
 	suite.Equal(requestContext.BatchCounter, response.RequestContextBatchCounter)
 
 	volume := suite.keeper.GetRequestVolume(ctx, consumer, requestContext.ServiceName, provider)

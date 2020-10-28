@@ -8,6 +8,8 @@ import (
 
 	"github.com/spf13/cobra"
 
+	tmbytes "github.com/tendermint/tendermint/libs/bytes"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -112,7 +114,7 @@ func GetCmdQueryServiceBinding() *cobra.Command {
 				context.Background(),
 				&types.QueryBindingRequest{
 					ServiceName: args[0],
-					Provider:    provider,
+					Provider:    provider.String(),
 				},
 			)
 			if err != nil {
@@ -163,7 +165,7 @@ func GetCmdQueryServiceBindings() *cobra.Command {
 				context.Background(),
 				&types.QueryBindingsRequest{
 					ServiceName: args[0],
-					Owner:       owner,
+					Owner:       owner.String(),
 				},
 			)
 			if err != nil {
@@ -204,7 +206,7 @@ func GetCmdQueryWithdrawAddr() *cobra.Command {
 			res, err := queryClient.WithdrawAddress(
 				context.Background(),
 				&types.QueryWithdrawAddressRequest{
-					Owner: owner,
+					Owner: owner.String(),
 				},
 			)
 			if err != nil {
@@ -244,7 +246,7 @@ func GetCmdQueryServiceRequest() *cobra.Command {
 			res, err := queryClient.Request(
 				context.Background(),
 				&types.QueryRequestRequest{
-					RequestId: requestID,
+					RequestId: requestID.String(),
 				},
 			)
 			if err != nil {
@@ -297,7 +299,7 @@ func GetCmdQueryServiceRequests() *cobra.Command {
 			if queryByBinding {
 				res, err := queryClient.Requests(context.Background(), &types.QueryRequestsRequest{
 					ServiceName: args[0],
-					Provider:    provider,
+					Provider:    provider.String(),
 				})
 				if err != nil {
 					return err
@@ -318,7 +320,7 @@ func GetCmdQueryServiceRequests() *cobra.Command {
 			res, err := queryClient.RequestsByReqCtx(
 				context.Background(),
 				&types.QueryRequestsByReqCtxRequest{
-					RequestContextId: requestContextID,
+					RequestContextId: tmbytes.HexBytes(requestContextID).String(),
 					BatchCounter:     batchCounter,
 				},
 			)
@@ -358,7 +360,7 @@ func GetCmdQueryServiceResponse() *cobra.Command {
 			res, err := queryClient.Response(
 				context.Background(),
 				&types.QueryResponseRequest{
-					RequestId: requestID,
+					RequestId: requestID.String(),
 				},
 			)
 			if err != nil {
@@ -415,7 +417,7 @@ func GetCmdQueryServiceResponses() *cobra.Command {
 			res, err := queryClient.Responses(
 				context.Background(),
 				&types.QueryResponsesRequest{
-					RequestContextId: requestContextID,
+					RequestContextId: tmbytes.HexBytes(requestContextID).String(),
 					BatchCounter:     batchCounter,
 				},
 			)
@@ -455,7 +457,7 @@ func GetCmdQueryRequestContext() *cobra.Command {
 				clientCtx,
 				types.QuerierRoute,
 				types.QueryRequestContextRequest{
-					RequestContextId: requestContextID,
+					RequestContextId: tmbytes.HexBytes(requestContextID).String(),
 				},
 			)
 			if err != nil {
@@ -494,7 +496,7 @@ func GetCmdQueryEarnedFees() *cobra.Command {
 			res, err := queryClient.EarnedFees(
 				context.Background(),
 				&types.QueryEarnedFeesRequest{
-					Provider: provider,
+					Provider: provider.String(),
 				},
 			)
 			if err != nil {

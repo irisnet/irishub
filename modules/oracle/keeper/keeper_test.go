@@ -256,10 +256,15 @@ func (m MockServiceKeeper) CreateRequestContext(
 	respThreshold uint32,
 	moduleName string,
 ) (tmbytes.HexBytes, error) {
+	pds := make([]string, len(providers))
+	for i, provider := range providers {
+		pds[i] = provider.String()
+	}
+
 	reqCtx := exported.RequestContext{
 		ServiceName:       serviceName,
-		Providers:         providers,
-		Consumer:          consumer,
+		Providers:         pds,
+		Consumer:          consumer.String(),
 		Input:             input,
 		ServiceFeeCap:     serviceFeeCap,
 		Timeout:           timeout,
