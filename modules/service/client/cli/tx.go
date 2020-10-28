@@ -327,17 +327,26 @@ func GetCmdUpdateServiceBinding() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			if !json.Valid([]byte(options)) {
-				optionsContent, err := ioutil.ReadFile(options)
-				if err != nil {
-					return fmt.Errorf("invalid options: neither JSON input nor path to .json file were provided")
+			if len(options) != 0 {
+				if !json.Valid([]byte(options)) {
+					optionsContent, err := ioutil.ReadFile(options)
+					if err != nil {
+						return fmt.Errorf("invalid options: neither JSON input nor path to .json file were provided")
+					}
+
+					if !json.Valid(optionsContent) {
+						return fmt.Errorf("invalid options: .json file content is invalid JSON")
+					}
+
+					options = string(optionsContent)
 				}
 
-				if !json.Valid(optionsContent) {
-					return fmt.Errorf("invalid options: .json file content is invalid JSON")
+				buf := bytes.NewBuffer([]byte{})
+				if err := json.Compact(buf, []byte(options)); err != nil {
+					return fmt.Errorf("failed to compact the pricing")
 				}
 
-				options = string(optionsContent)
+				options = buf.String()
 			}
 
 			msg := types.NewMsgUpdateServiceBinding(args[0], provider, deposit, pricing, qos, options, owner)

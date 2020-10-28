@@ -191,6 +191,15 @@ func (k Keeper) UpdateServiceBinding(
 		updated = true
 	}
 
+	// update options
+	if len(options) != 0 {
+		if err := types.ValidateOptions(options); err != nil {
+			return err
+		}
+		binding.Options = options
+		updated = true
+	}
+
 	// only check deposit when the binding is available and updated
 	if binding.Available && updated {
 		minDeposit := k.getMinDeposit(ctx, parsedPricing)

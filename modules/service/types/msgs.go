@@ -259,8 +259,10 @@ func (msg MsgUpdateServiceBinding) ValidateBasic() error {
 		}
 	}
 
-	if err := ValidateOptions(msg.Options); err != nil {
-		return err
+	if len(msg.Options) != 0 {
+		if err := ValidateOptions(msg.Options); err != nil {
+			return err
+		}
 	}
 
 	if len(msg.Pricing) != 0 {
