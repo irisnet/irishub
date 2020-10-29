@@ -1,7 +1,9 @@
 package cli_test
 
 import (
+	"encoding/json"
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/tidwall/gjson"
@@ -58,11 +60,11 @@ func (s *IntegrationTestSuite) TestToken() {
 	name := "Kitty Token"
 	minUnit := "kitty"
 	scale := 0
-	initialSupply := 100000000
-	maxSupply := 100000000
+	initialSupply := int64(100000000)
+	maxSupply := int64(200000000)
 	mintable := true
-	//mintAmount := 50000000
 
+	//------test GetCmdIssueDenom()-------------
 	args := []string{
 		fmt.Sprintf("--%s=%s", tokencli.FlagSymbol, symbol),
 		fmt.Sprintf("--%s=%s", tokencli.FlagName, name),
@@ -86,6 +88,7 @@ func (s *IntegrationTestSuite) TestToken() {
 	s.Require().Equal(expectedCode, txResp.Code)
 	tokenSymbol := gjson.Get(txResp.RawLog, "0.events.0.attributes.0.value").String()
 
+	//------test GetCmdQueryTokens()-------------
 	tokens := &[]tokentypes.TokenI{}
 
 	tokentypes.RegisterLegacyAminoCodec(clientCtx.LegacyAmino)
@@ -93,7 +96,11 @@ func (s *IntegrationTestSuite) TestToken() {
 	bz, err = tokentestutil.QueryTokensExec(clientCtx, from.String())
 	s.Require().NoError(err)
 	s.Require().NoError(clientCtx.LegacyAmino.UnmarshalJSON(bz.Bytes(), tokens))
+	s.Require().Equal(1,len(*tokens))
+	res1,_:=json.Marshal(tokens)
+	println(string(res1))
 
+	//------test GetCmdQueryToken()-------------
 	var token tokentypes.TokenI
 	respType = proto.Message(&types.Any{})
 	bz, err = tokentestutil.QueryTokenExec(clientCtx, tokenSymbol)
@@ -101,40 +108,102 @@ func (s *IntegrationTestSuite) TestToken() {
 	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType))
 	err = clientCtx.InterfaceRegistry.UnpackAny(respType.(*types.Any), &token)
 	s.Require().NoError(err)
+	s.Require().Equal(name,token.GetName())
+	s.Require().Equal(strings.ToLower(symbol),token.GetSymbol())
+	s.Require().Equal(uint64(initialSupply),token.GetInitialSupply())
 
-	//
-	//args = []string{
-	//	fmt.Sprintf("--%s=%s", tokencli.FlagName, name),
-	//	fmt.Sprintf("--%s=%d", tokencli.FlagMaxSupply, maxSupply),
-	//	fmt.Sprintf("--%s=%t", tokencli.FlagMintable, mintable),
-	//
-	//	fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
-	//	fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
-	//	fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(10))).String()),
-	//}
-	//respType = proto.Message(&sdk.TxResponse{})
-	//bz, err = tokentestutil.EditTokenExec(clientCtx, from.String(), symbol, args...)
-	//
-	//s.Require().NoError(err)
-	//s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType), bz.String())
-	//txResp = respType.(*sdk.TxResponse)
-	//s.Require().Equal(expectedCode, txResp.Code)
-	//
-	//args = []string{
-	//	fmt.Sprintf("--%s=%s", tokencli.FlagTo, to),
-	//	fmt.Sprintf("--%s=%d", tokencli.FlagAmount, mintAmount),
-	//
-	//	fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
-	//	fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
-	//	fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(10))).String()),
-	//}
-	//respType = proto.Message(&sdk.TxResponse{})
-	//bz, err = tokentestutil.MintTokenExec(clientCtx, from.String(), symbol, args...)
-	//
-	//s.Require().NoError(err)
-	//s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType), bz.String())
-	//txResp = respType.(*sdk.TxResponse)
-	//s.Require().Equal(expectedCode, txResp.Code)
+	//------test GetCmdQueryFee()-------------
+	respType = proto.Message(&tokentypes.QueryFeesResponse{})
+	bz, err = tokentestutil.QueryFeeExec(clientCtx, symbol)
+	s.Require().NoError(err)
+	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType))
+	feeResp := respType.(*tokentypes.QueryFeesResponse)
+	s.Require().NoError(err)
+	expectedFeeResp:="{\"exist\":true,\"issue_fee\":{\"denom\":\"stake\",\"amount\":\"13015\"},\"mint_fee\":{\"denom\":\"stake\",\"amount\":\"1301\"}}"
+	result,_:=json.Marshal(feeResp)
+	s.Require().Equal(expectedFeeResp,string(result))
+
+	//------test GetCmdQueryParams()-------------
+	respType = proto.Message(&tokentypes.Params{})
+	bz, err = tokentestutil.QueryParamsExec(clientCtx)
+	s.Require().NoError(err)
+	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType))
+	params := respType.(*tokentypes.Params)
+	s.Require().NoError(err)
+	expectedParams:="{\"token_tax_rate\":\"0.400000000000000000\",\"issue_token_base_fee\":{\"denom\":\"stake\",\"amount\":\"60000\"},\"mint_token_fee_ratio\":\"0.100000000000000000\"}"
+	result,_ =json.Marshal(params)
+	s.Require().Equal(expectedParams,string(result))
+
+	//------test GetCmdMintToken()-------------
+	coinType := proto.Message(&sdk.Coin{})
+	out, err := simapp.QueryBalancesExec(clientCtx, from.String(), strings.ToLower(symbol))
+	s.Require().NoError(err)
+	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(out.Bytes(), coinType))
+	balance:= coinType.(*sdk.Coin)
+	println(balance.Amount.Int64())
+	initAmount:=balance.Amount.Int64()
+	mintAmount := int64(50000000)
+
+	args = []string{
+		fmt.Sprintf("--%s=%s", tokencli.FlagTo, from.String()),
+		fmt.Sprintf("--%s=%d", tokencli.FlagAmount, mintAmount),
+
+		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
+		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
+		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(10))).String()),
+	}
+	respType = proto.Message(&sdk.TxResponse{})
+	bz, err = tokentestutil.MintTokenExec(clientCtx, from.String(), symbol, args...)
+
+	s.Require().NoError(err)
+	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType), bz.String())
+	txResp = respType.(*sdk.TxResponse)
+	s.Require().Equal(expectedCode, txResp.Code)
+
+	out, err = simapp.QueryBalancesExec(clientCtx, from.String(), strings.ToLower(symbol))
+	s.Require().NoError(err)
+	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(out.Bytes(), coinType))
+	balance = coinType.(*sdk.Coin)
+	exceptedAmount:=initAmount+mintAmount
+	s.Require().Equal(exceptedAmount,balance.Amount.Int64())
+
+	//------test GetCmdEditToken()-------------
+	newName:="Wd Token"
+	newMaxSupply := 200000000
+	newMintable := false
+
+	args = []string{
+		fmt.Sprintf("--%s=%s", tokencli.FlagName, newName),
+		fmt.Sprintf("--%s=%d", tokencli.FlagMaxSupply, newMaxSupply),
+		fmt.Sprintf("--%s=%t", tokencli.FlagMintable, newMintable),
+
+		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
+		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
+		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(10))).String()),
+	}
+
+	respType = proto.Message(&sdk.TxResponse{})
+	bz, err = tokentestutil.EditTokenExec(clientCtx, from.String(), symbol, args...)
+
+	s.Require().NoError(err)
+	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType), bz.String())
+	txResp = respType.(*sdk.TxResponse)
+	s.Require().Equal(expectedCode, txResp.Code)
+
+
+	var token2 tokentypes.TokenI
+	respType = proto.Message(&types.Any{})
+	bz, err = tokentestutil.QueryTokenExec(clientCtx, tokenSymbol)
+	s.Require().NoError(err)
+	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType))
+	err = clientCtx.InterfaceRegistry.UnpackAny(respType.(*types.Any), &token2)
+	s.Require().NoError(err)
+	s.Require().Equal(newName,token2.GetName())
+	s.Require().Equal(uint64(newMaxSupply),token2.GetMaxSupply())
+	s.Require().Equal(newMintable,token2.GetMintable())
+
+	//------test GetCmdTransferTokenOwner()-------------
+	//to:=""
 	//
 	//args = []string{
 	//	fmt.Sprintf("--%s=%s", tokencli.FlagTo, to),
@@ -150,32 +219,6 @@ func (s *IntegrationTestSuite) TestToken() {
 	//s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType), bz.String())
 	//txResp = respType.(*sdk.TxResponse)
 	//s.Require().Equal(expectedCode, txResp.Code)
-	//
-	//// ---------------------------------------------------------------------------
-	//
 
-	//
-	//respType = proto.Message(&sdk.TxResponse{})
-	//bz, err = tokentestutil.QueryTokensExec(clientCtx, from.String())
-	//
-	//s.Require().NoError(err)
-	//s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType), bz.String())
-	//txResp = respType.(*sdk.TxResponse)
-	//s.Require().Equal(expectedCode, txResp.Code)
-	//
-	//respType = proto.Message(&sdk.TxResponse{})
-	//bz, err = tokentestutil.QueryFeeExec(clientCtx, from.String())
-	//
-	//s.Require().NoError(err)
-	//s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType), bz.String())
-	//txResp = respType.(*sdk.TxResponse)
-	//s.Require().Equal(expectedCode, txResp.Code)
-	//
-	//respType = proto.Message(&sdk.TxResponse{})
-	//bz, err = tokentestutil.QueryParamsExec(clientCtx, from.String())
-	//
-	//s.Require().NoError(err)
-	//s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType), bz.String())
-	//txResp = respType.(*sdk.TxResponse)
-	//s.Require().Equal(expectedCode, txResp.Code)
+	// ---------------------------------------------------------------------------
 }

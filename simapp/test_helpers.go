@@ -5,6 +5,10 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"github.com/cosmos/cosmos-sdk/testutil"
+	clitestutil "github.com/cosmos/cosmos-sdk/testutil/cli"
+	bankcli "github.com/cosmos/cosmos-sdk/x/bank/client/cli"
+	"github.com/tendermint/tendermint/libs/cli"
 	"strconv"
 	"testing"
 	"time"
@@ -442,4 +446,16 @@ func NewPubKeyFromHex(pk string) (res crypto.PubKey) {
 	pkEd := make(ed25519.PubKey, ed25519.PubKeySize)
 	copy(pkEd, pkBytes)
 	return pkEd
+}
+
+
+func QueryBalancesExec(clientCtx client.Context, address string, denom string, extraArgs ...string) (testutil.BufferWriter, error) {
+	args := []string{
+		address,
+		fmt.Sprintf("--%s=%s", bankcli.FlagDenom, denom),
+		fmt.Sprintf("--%s=json", cli.OutputFlag),
+	}
+	args = append(args, extraArgs...)
+
+	return clitestutil.ExecTestCLICmd(clientCtx, bankcli.GetBalancesCmd(), args)
 }

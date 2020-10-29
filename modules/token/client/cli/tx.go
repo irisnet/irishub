@@ -128,15 +128,15 @@ func GetCmdIssueToken() *cobra.Command {
 			}
 
 			// a confirmation is needed
-			//prompt += "\nAre you sure to proceed?"
-			//confirmed, err := input.GetConfirmation(prompt, bufio.NewReader(os.Stdin), cmd.ErrOrStderr())
-			//if err != nil {
-			//	return err
-			//}
-			//
-			//if !confirmed {
-			//	return fmt.Errorf("operation aborted")
-			//}
+			prompt += "\nAre you sure to proceed?"
+			confirmed, err := input.GetConfirmation(prompt, bufio.NewReader(os.Stdin), cmd.ErrOrStderr())
+			if err != nil {
+				return err
+			}
+
+			if !confirmed {
+				return fmt.Errorf("operation aborted")
+			}
 
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
