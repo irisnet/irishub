@@ -45,7 +45,7 @@ func issueTokenHandlerFn(cliCtx client.Context) http.HandlerFunc {
 			InitialSupply: req.InitialSupply,
 			MaxSupply:     req.MaxSupply,
 			Mintable:      req.Mintable,
-			Owner:         req.Owner,
+			Owner:         req.Owner.String(),
 		}
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())

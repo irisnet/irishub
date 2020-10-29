@@ -51,7 +51,7 @@ func NewMsgIssueToken(
 		InitialSupply: initialSupply,
 		MaxSupply:     maxSupply,
 		Mintable:      mintable,
-		Owner:         owner,
+		Owner:         owner.String(),
 	}
 }
 
@@ -61,6 +61,10 @@ func (msg MsgIssueToken) Type() string  { return TypeMsgIssueToken }
 
 // Implements Msg.
 func (msg MsgIssueToken) ValidateBasic() error {
+	owner, err := sdk.AccAddressFromBech32(msg.Owner)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
+	}
 	return ValidateToken(
 		NewToken(msg.Symbol,
 			msg.Name,
@@ -69,7 +73,7 @@ func (msg MsgIssueToken) ValidateBasic() error {
 			msg.InitialSupply,
 			msg.MaxSupply,
 			msg.Mintable,
-			msg.Owner),
+			owner),
 	)
 }
 
@@ -85,15 +89,19 @@ func (msg MsgIssueToken) GetSignBytes() []byte {
 
 // Implements Msg.
 func (msg MsgIssueToken) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{msg.Owner}
+	from, err := sdk.AccAddressFromBech32(msg.Owner)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{from}
 }
 
 func NewMsgTransferTokenOwner(srcOwner, dstOwner sdk.AccAddress, symbol string) *MsgTransferTokenOwner {
 	symbol = strings.TrimSpace(symbol)
 
 	return &MsgTransferTokenOwner{
-		SrcOwner: srcOwner,
-		DstOwner: dstOwner,
+		SrcOwner: srcOwner.String(),
+		DstOwner: dstOwner.String(),
 		Symbol:   symbol,
 	}
 }
@@ -110,23 +118,27 @@ func (msg MsgTransferTokenOwner) GetSignBytes() []byte {
 
 // GetSigners implements Msg
 func (msg MsgTransferTokenOwner) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{msg.SrcOwner}
+	from, err := sdk.AccAddressFromBech32(msg.SrcOwner)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{from}
 }
 
 func (msg MsgTransferTokenOwner) ValidateBasic() error {
-	// check the SrcOwner
-	if len(msg.SrcOwner) == 0 {
-		return sdkerrors.Wrapf(ErrInvalidAddress, "the owner of the token must be specified")
+	srcOwner, err := sdk.AccAddressFromBech32(msg.SrcOwner)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid source owner address (%s)", err)
 	}
 
-	// check if the `DstOwner` is empty
-	if len(msg.DstOwner) == 0 {
-		return sdkerrors.Wrapf(ErrInvalidAddress, "the new owner of the token must be specified")
+	dstOwner, err := sdk.AccAddressFromBech32(msg.DstOwner)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid destination owner address (%s)", err)
 	}
 
 	// check if the `DstOwner` is same as the original owner
-	if msg.SrcOwner.Equals(msg.DstOwner) {
-		return sdkerrors.Wrapf(ErrInvalidToAddress, "the new owner must not be same as the original owner")
+	if srcOwner.Equals(dstOwner) {
+		return ErrInvalidToAddress
 	}
 
 	// check the symbol
@@ -152,7 +164,7 @@ func NewMsgEditToken(name, symbol string, maxSupply uint64, mintable Bool, owner
 		Symbol:    symbol,
 		MaxSupply: maxSupply,
 		Mintable:  mintable,
-		Owner:     owner,
+		Owner:     owner.String(),
 	}
 }
 
@@ -165,8 +177,9 @@ func (msg MsgEditToken) Type() string { return TypeMsgEditToken }
 // ValidateBasic implements Msg
 func (msg MsgEditToken) ValidateBasic() error {
 	// check owner
-	if msg.Owner.Empty() {
-		return sdkerrors.Wrapf(ErrNilOwner, "the owner of the token must be specified")
+	_, err := sdk.AccAddressFromBech32(msg.Owner)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
 	}
 
 	nameLen := len(msg.Name)
@@ -199,7 +212,11 @@ func (msg MsgEditToken) GetSignBytes() []byte {
 
 // GetSigners implements Msg
 func (msg MsgEditToken) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{msg.Owner}
+	from, err := sdk.AccAddressFromBech32(msg.Owner)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{from}
 }
 
 // NewMsgMintToken creates a MsgMintToken
@@ -208,8 +225,8 @@ func NewMsgMintToken(symbol string, owner, to sdk.AccAddress, amount uint64) *Ms
 
 	return &MsgMintToken{
 		Symbol: symbol,
-		Owner:  owner,
-		To:     to,
+		Owner:  owner.String(),
+		To:     to.String(),
 		Amount: amount,
 	}
 }
@@ -231,14 +248,27 @@ func (msg MsgMintToken) GetSignBytes() []byte {
 
 // GetSigners implements Msg
 func (msg MsgMintToken) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{msg.Owner}
+	from, err := sdk.AccAddressFromBech32(msg.Owner)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{from}
 }
 
 // ValidateBasic implements Msg
 func (msg MsgMintToken) ValidateBasic() error {
 	// check the owner
-	if len(msg.Owner) == 0 {
-		return sdkerrors.Wrapf(ErrInvalidAddress, "the owner of the token must be specified")
+	_, err := sdk.AccAddressFromBech32(msg.Owner)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
+	}
+
+	// check the reception
+	if len(msg.To) > 0 {
+		_, err := sdk.AccAddressFromBech32(msg.To)
+		if err != nil {
+			return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid mint reception address (%s)", err)
+		}
 	}
 
 	if msg.Amount == 0 || msg.Amount > MaximumMaxSupply {

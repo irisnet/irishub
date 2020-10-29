@@ -102,7 +102,7 @@ func GetCmdIssueToken() *cobra.Command {
 				InitialSupply: initialSupply,
 				MaxSupply:     maxSupply,
 				Mintable:      mintable,
-				Owner:         owner,
+				Owner:         owner.String(),
 			}
 
 			if err := msg.ValidateBasic(); err != nil {

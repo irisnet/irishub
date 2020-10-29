@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 
+	"github.com/tendermint/tendermint/crypto/tmhash"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -24,7 +25,7 @@ const (
 
 var (
 	denom    = types.GetNativeToken().Symbol
-	owner    = sdk.AccAddress([]byte("tokenTest"))
+	owner    = sdk.AccAddress(tmhash.SumTruncated([]byte("tokenTest")))
 	initAmt  = sdk.NewIntWithDecimal(100000000, int(6))
 	initCoin = sdk.Coins{sdk.NewCoin(denom, initAmt)}
 )
@@ -74,7 +75,7 @@ func (suite *KeeperTestSuite) TestIssueToken() {
 	require.NoError(suite.T(), err)
 
 	suite.Equal(msg.MinUnit, token.GetMinUnit())
-	suite.Equal(msg.Owner, token.GetOwner())
+	suite.Equal(msg.Owner, token.GetOwner().String())
 
 	ftJson, _ := json.Marshal(msg)
 	tokenJson, _ := json.Marshal(token)
@@ -125,10 +126,10 @@ func (suite *KeeperTestSuite) TestTransferToken() {
 
 	suite.TestIssueToken()
 
-	dstOwner := sdk.AccAddress([]byte("TokenDstOwner"))
+	dstOwner := sdk.AccAddress(tmhash.SumTruncated([]byte("TokenDstOwner")))
 	msg := types.MsgTransferTokenOwner{
-		SrcOwner: owner,
-		DstOwner: dstOwner,
+		SrcOwner: owner.String(),
+		DstOwner: dstOwner.String(),
 		Symbol:   "btc",
 	}
 	err := suite.keeper.TransferTokenOwner(suite.ctx, msg)

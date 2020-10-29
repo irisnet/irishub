@@ -17,7 +17,7 @@ func TestToken_ToMinCoin(t *testing.T) {
 		InitialSupply: 1000000,
 		MaxSupply:     10000000,
 		Mintable:      true,
-		Owner:         nil,
+		Owner:         "",
 	}
 
 	amt, err := sdk.NewDecFromStr("1.500000000000000001")

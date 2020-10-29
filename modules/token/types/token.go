@@ -60,7 +60,7 @@ func NewToken(
 		InitialSupply: initialSupply,
 		MaxSupply:     maxSupply,
 		Mintable:      mintable,
-		Owner:         owner,
+		Owner:         owner.String(),
 	}
 }
 
@@ -101,7 +101,8 @@ func (t Token) GetMintable() bool {
 
 // GetOwner implements exported.TokenI
 func (t Token) GetOwner() sdk.AccAddress {
-	return t.Owner
+	owner, _ := sdk.AccAddressFromBech32(t.Owner)
+	return owner
 }
 
 func (t Token) String() string {
@@ -154,8 +155,9 @@ func (t Token) ToMinCoin(coin sdk.DecCoin) (newCoin sdk.Coin, err error) {
 }
 
 func ValidateToken(token Token) error {
-	if token.Owner.Empty() {
-		return ErrNilOwner
+	_, err := sdk.AccAddressFromBech32(token.Owner)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
 	}
 
 	nameLen := len(strings.TrimSpace(token.Name))
