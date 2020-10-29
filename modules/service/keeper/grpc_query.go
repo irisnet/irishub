@@ -58,7 +58,7 @@ func (k Keeper) Bindings(c context.Context, req *types.QueryBindingsRequest) (*t
 
 	ctx := sdk.UnwrapSDKContext(c)
 	bindings := make([]*types.ServiceBinding, 0)
-	if len(req.Owner) > 0 {
+	if len(req.Owner) == 0 {
 		iterator := k.ServiceBindingsIterator(ctx, req.ServiceName)
 		defer iterator.Close()
 

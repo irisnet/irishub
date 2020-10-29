@@ -51,7 +51,7 @@ func (k Keeper) Tokens(c context.Context, req *types.QueryTokensRequest) (*types
 	if len(req.Owner) > 0 {
 		owner, err = sdk.AccAddressFromBech32(req.Owner)
 		if err != nil {
-			return nil, status.Errorf(codes.InvalidArgument, fmt.Sprintf("invalid source owner address (%s)", err))
+			return nil, status.Errorf(codes.InvalidArgument, fmt.Sprintf("invalid owner address (%s)", err))
 		}
 	}
 

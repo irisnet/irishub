@@ -245,7 +245,7 @@ func QueryResponseByTxQuery(
 			}
 			provider, err := sdk.AccAddressFromBech32(responseMsg.Provider)
 			if err != nil {
-				return response, fmt.Errorf("invalid consumer address: %s", provider)
+				return response, fmt.Errorf("invalid provider address: %s", provider)
 			}
 			consumer, err := sdk.AccAddressFromBech32(requestContext.Consumer)
 			if err != nil {
