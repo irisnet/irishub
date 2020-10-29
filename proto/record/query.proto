@@ -16,7 +16,7 @@ service Query {
 
 // QueryRecordRequest is the request type for the Query/Record RPC method
 message QueryRecordRequest {
-    bytes record_id = 1;
+    string record_id = 1;
 }
 
 // QueryRecordResponse is the response type for the Query/Record RPC method

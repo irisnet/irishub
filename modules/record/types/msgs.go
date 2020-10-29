@@ -15,7 +15,7 @@ var _ sdk.Msg = &MsgCreateRecord{}
 func NewMsgCreateRecord(contents []Content, Creator sdk.AccAddress) *MsgCreateRecord {
 	return &MsgCreateRecord{
 		Contents: contents,
-		Creator:  Creator,
+		Creator:  Creator.String(),
 	}
 }
 
@@ -39,8 +39,9 @@ func (msg MsgCreateRecord) ValidateBasic() error {
 	if len(msg.Contents) == 0 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "contents missing")
 	}
-	if msg.Creator.Empty() {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "creator missing")
+	_, err := sdk.AccAddressFromBech32(msg.Creator)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
 	for i, content := range msg.Contents {
@@ -56,5 +57,9 @@ func (msg MsgCreateRecord) ValidateBasic() error {
 
 // GetSigners implements Msg.
 func (msg MsgCreateRecord) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{msg.Creator}
+	from, err := sdk.AccAddressFromBech32(msg.Creator)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{from}
 }
