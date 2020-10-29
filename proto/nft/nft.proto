@@ -13,7 +13,7 @@ message MsgIssueDenom {
     string id = 1;
     string name = 2;
     string schema = 3;
-    bytes sender = 4 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
+    string sender = 4;
 }
 
 // MsgTransferNFT defines an SDK message for transferring an NFT to recipient.
@@ -25,8 +25,8 @@ message MsgTransferNFT {
     string name = 3;
     string uri = 4 [(gogoproto.customname) = "URI"];
     string data = 5;
-    bytes sender = 6 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
-    bytes recipient = 7 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
+    string sender = 6;
+    string recipient = 7;
 }
 
 // MsgEditNFT defines an SDK message for editing a nft.
@@ -38,7 +38,7 @@ message MsgEditNFT {
     string name = 3;
     string uri = 4 [(gogoproto.customname) = "URI"];
     string data = 5;
-    bytes sender = 6 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
+    string sender = 6;
 }
 
 // MsgMintNFT defines an SDK message for creating a new NFT.
@@ -50,8 +50,8 @@ message MsgMintNFT {
     string name = 3;
     string uri = 4 [(gogoproto.customname) = "URI"];
     string data = 5;
-    bytes sender = 6 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
-    bytes recipient = 7 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
+    string sender = 6;
+    string recipient = 7;
 }
 
 // MsgBurnNFT defines an SDK message for burning a NFT.
@@ -60,7 +60,7 @@ message MsgBurnNFT {
 
     string id = 1;
     string denom = 2;
-    bytes sender = 3 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
+    string sender = 3;
 }
 
 // BaseNFT defines a non fungible token.
@@ -71,7 +71,7 @@ message BaseNFT {
     string name = 2;
     string uri = 3 [(gogoproto.customname) = "URI"];
     string data = 4;
-    bytes owner = 5 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
+    string owner = 5;
 }
 
 // Denom defines a type of NFT.
@@ -81,7 +81,7 @@ message Denom {
     string id = 1;
     string name = 2;
     string schema = 3;
-    bytes creator = 4 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
+    string creator = 4;
 }
 
 message IDCollection {
@@ -94,7 +94,7 @@ message IDCollection {
 message Owner {
     option (gogoproto.equal) = true;
 
-    bytes address = 1 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
+    string address = 1;
     repeated IDCollection id_collections = 2 [(gogoproto.moretags) = "yaml:\"idcs\"", (gogoproto.customname) = "IDCollections", (gogoproto.nullable) = false];
 }
 

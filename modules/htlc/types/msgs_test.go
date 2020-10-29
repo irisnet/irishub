@@ -14,8 +14,8 @@ import (
 )
 
 var (
-	sender               = sdk.AccAddress([]byte("sender"))
-	recipient            = sdk.AccAddress([]byte("recipient"))
+	sender               = sdk.AccAddress(tmhash.SumTruncated([]byte("sender")))
+	recipient            = sdk.AccAddress(tmhash.SumTruncated([]byte("recipient")))
 	receiverOnOtherChain = "receiverOnOtherChain"
 	amount               = sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(10)))
 	secret               = tmbytes.HexBytes(tmhash.Sum([]byte("secret")))
@@ -28,11 +28,11 @@ var (
 func TestNewMsgCreateHTLC(t *testing.T) {
 	msg := NewMsgCreateHTLC(sender, recipient, receiverOnOtherChain, amount, hashLock, timestamp, timeLock)
 
-	require.Equal(t, sender, msg.Sender)
-	require.Equal(t, recipient, msg.To)
+	require.Equal(t, sender.String(), msg.Sender)
+	require.Equal(t, recipient.String(), msg.To)
 	require.Equal(t, receiverOnOtherChain, msg.ReceiverOnOtherChain)
 	require.Equal(t, amount, msg.Amount)
-	require.Equal(t, hashLock, msg.HashLock)
+	require.Equal(t, hashLock.String(), msg.HashLock)
 	require.Equal(t, timestamp, msg.Timestamp)
 	require.Equal(t, timeLock, msg.TimeLock)
 }
@@ -100,7 +100,7 @@ func TestMsgCreateHTLCGetSignBytes(t *testing.T) {
 	msg := NewMsgCreateHTLC(sender, recipient, receiverOnOtherChain, amount, hashLock, timestamp, timeLock)
 	res := msg.GetSignBytes()
 
-	expected := `{"type":"irismod/htlc/MsgCreateHTLC","value":{"amount":[{"amount":"10","denom":"stake"}],"hash_lock":"6F4ECE9B22CFC1CF39C9C73DD2D35867A8EC97C48A9C2F664FE5287865A18C2E","receiver_on_other_chain":"receiverOnOtherChain","sender":"cosmos1wdjkuer9wgh76ts6","time_lock":"50","timestamp":"1580000000","to":"cosmos1wfjkx6tsd9jkuaqhtdv59"}}`
+	expected := `{"type":"irismod/htlc/MsgCreateHTLC","value":{"amount":[{"amount":"10","denom":"stake"}],"hash_lock":"6F4ECE9B22CFC1CF39C9C73DD2D35867A8EC97C48A9C2F664FE5287865A18C2E","receiver_on_other_chain":"receiverOnOtherChain","sender":"cosmos1pgm8hyk0pvphmlvfjc8wsvk4daluz5tgmr4lac","time_lock":"50","timestamp":"1580000000","to":"cosmos1vewsdxxmeraett7ztsaym88jsrv85kzm8ekjsg"}}`
 	require.Equal(t, expected, string(res))
 }
 
@@ -109,7 +109,7 @@ func TestMsgCreateHTLCGetSigners(t *testing.T) {
 	msg := NewMsgCreateHTLC(sender, recipient, receiverOnOtherChain, amount, hashLock, timestamp, timeLock)
 	res := msg.GetSigners()
 
-	expected := "[73656E646572]"
+	expected := "[0A367B92CF0B037DFD89960EE832D56F7FC15168]"
 	require.Equal(t, expected, fmt.Sprintf("%v", res))
 }
 
@@ -117,9 +117,9 @@ func TestMsgCreateHTLCGetSigners(t *testing.T) {
 func TestNewMsgClaimHTLC(t *testing.T) {
 	msg := NewMsgClaimHTLC(sender, hashLock, secret)
 
-	require.Equal(t, sender, msg.Sender)
-	require.Equal(t, secret, msg.Secret)
-	require.Equal(t, hashLock, msg.HashLock)
+	require.Equal(t, sender.String(), msg.Sender)
+	require.Equal(t, secret.String(), msg.Secret)
+	require.Equal(t, hashLock.String(), msg.HashLock)
 }
 
 // TestMsgClaimHTLCRoute tests Route for MsgClaimHTLC
@@ -174,7 +174,7 @@ func TestMsgClaimHTLCGetSignBytes(t *testing.T) {
 	msg := NewMsgClaimHTLC(sender, hashLock, secret)
 	res := msg.GetSignBytes()
 
-	expected := `{"type":"irismod/htlc/MsgClaimHTLC","value":{"hash_lock":"6F4ECE9B22CFC1CF39C9C73DD2D35867A8EC97C48A9C2F664FE5287865A18C2E","secret":"2BB80D537B1DA3E38BD30361AA855686BDE0EACD7162FEF6A25FE97BF527A25B","sender":"cosmos1wdjkuer9wgh76ts6"}}`
+	expected := `{"type":"irismod/htlc/MsgClaimHTLC","value":{"hash_lock":"6F4ECE9B22CFC1CF39C9C73DD2D35867A8EC97C48A9C2F664FE5287865A18C2E","secret":"2BB80D537B1DA3E38BD30361AA855686BDE0EACD7162FEF6A25FE97BF527A25B","sender":"cosmos1pgm8hyk0pvphmlvfjc8wsvk4daluz5tgmr4lac"}}`
 	require.Equal(t, expected, string(res))
 }
 
@@ -183,7 +183,7 @@ func TestMsgClaimHTLCGetSigners(t *testing.T) {
 	msg := NewMsgClaimHTLC(sender, hashLock, secret)
 	res := msg.GetSigners()
 
-	expected := "[73656E646572]"
+	expected := "[0A367B92CF0B037DFD89960EE832D56F7FC15168]"
 	require.Equal(t, expected, fmt.Sprintf("%v", res))
 }
 
@@ -191,8 +191,8 @@ func TestMsgClaimHTLCGetSigners(t *testing.T) {
 func TestNewMsgRefundHTLC(t *testing.T) {
 	msg := NewMsgRefundHTLC(sender, hashLock)
 
-	require.Equal(t, sender, msg.Sender)
-	require.Equal(t, hashLock, msg.HashLock)
+	require.Equal(t, sender.String(), msg.Sender)
+	require.Equal(t, hashLock.String(), msg.HashLock)
 }
 
 // TestMsgRefundHTLCRoute tests Route for MsgRefundHTLC
@@ -244,7 +244,7 @@ func TestMsgRefundHTLCGetSignBytes(t *testing.T) {
 	msg := NewMsgRefundHTLC(sender, hashLock)
 	res := msg.GetSignBytes()
 
-	expected := `{"type":"irismod/htlc/MsgRefundHTLC","value":{"hash_lock":"6F4ECE9B22CFC1CF39C9C73DD2D35867A8EC97C48A9C2F664FE5287865A18C2E","sender":"cosmos1wdjkuer9wgh76ts6"}}`
+	expected := `{"type":"irismod/htlc/MsgRefundHTLC","value":{"hash_lock":"6F4ECE9B22CFC1CF39C9C73DD2D35867A8EC97C48A9C2F664FE5287865A18C2E","sender":"cosmos1pgm8hyk0pvphmlvfjc8wsvk4daluz5tgmr4lac"}}`
 	require.Equal(t, expected, string(res))
 }
 
@@ -253,6 +253,6 @@ func TestMsgRefundHTLCGetSigners(t *testing.T) {
 	msg := NewMsgRefundHTLC(sender, hashLock)
 	res := msg.GetSigners()
 
-	expected := "[73656E646572]"
+	expected := "[0A367B92CF0B037DFD89960EE832D56F7FC15168]"
 	require.Equal(t, expected, fmt.Sprintf("%v", res))
 }

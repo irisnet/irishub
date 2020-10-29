@@ -94,7 +94,7 @@ func GetCmdQueryTokens() *cobra.Command {
 			res, err := queryClient.Tokens(
 				context.Background(),
 				&types.QueryTokensRequest{
-					Owner: owner,
+					Owner: owner.String(),
 				},
 			)
 			if err != nil {

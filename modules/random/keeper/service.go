@@ -39,11 +39,11 @@ func (k Keeper) RequestService(ctx sdk.Context, consumer sdk.AccAddress, service
 	}
 
 	rand.Seed(time.Now().UnixNano())
-	provider := []sdk.AccAddress{bindings[rand.Intn(len(bindings))].Provider}
+	provider, _ := sdk.AccAddressFromBech32(bindings[rand.Intn(len(bindings))].Provider)
 	timeout := k.serviceKeeper.GetParams(ctx).MaxRequestTimeout
 
 	return k.serviceKeeper.CreateRequestContext(
-		ctx, types.ServiceName, provider, consumer, `{"header":{}}`, serviceFeeCap,
+		ctx, types.ServiceName, []sdk.AccAddress{provider}, consumer, `{"header":{}}`, serviceFeeCap,
 		timeout, false, false, 0, 0, exported.PAUSED, 1, types.ModuleName,
 	)
 }

@@ -52,9 +52,13 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 
 // IssueToken issues a new token
 func (k Keeper) IssueToken(ctx sdk.Context, msg types.MsgIssueToken) error {
+	owner, err := sdk.AccAddressFromBech32(msg.Owner)
+	if err != nil {
+		return err
+	}
 	token := types.NewToken(
 		msg.Symbol, msg.Name, msg.MinUnit, msg.Scale, msg.InitialSupply,
-		msg.MaxSupply, msg.Mintable, msg.Owner,
+		msg.MaxSupply, msg.Mintable, owner,
 	)
 
 	if err := k.AddToken(ctx, token); err != nil {
@@ -74,7 +78,7 @@ func (k Keeper) IssueToken(ctx sdk.Context, msg types.MsgIssueToken) error {
 	}
 
 	// sent coins to owner's account
-	return k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, token.Owner, mintCoins)
+	return k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, owner, mintCoins)
 }
 
 // EditToken edits the specified token
@@ -87,8 +91,8 @@ func (k Keeper) EditToken(ctx sdk.Context, msg types.MsgEditToken) error {
 
 	token := tokenI.(*types.Token)
 
-	if !msg.Owner.Equals(token.Owner) {
-		return sdkerrors.Wrapf(types.ErrInvalidOwner, "the address %d is not the owner of the token %s", msg.Owner, msg.Symbol)
+	if msg.Owner != token.Owner {
+		return sdkerrors.Wrapf(types.ErrInvalidOwner, "the address %s is not the owner of the token %s", msg.Owner, msg.Symbol)
 	}
 
 	if msg.MaxSupply > 0 {
@@ -121,8 +125,8 @@ func (k Keeper) TransferTokenOwner(ctx sdk.Context, msg types.MsgTransferTokenOw
 
 	token := tokenI.(*types.Token)
 
-	if !msg.SrcOwner.Equals(token.Owner) {
-		return sdkerrors.Wrapf(types.ErrInvalidOwner, "the address %s is not the owner of the token %s", msg.SrcOwner.String(), msg.Symbol)
+	if msg.SrcOwner != token.Owner {
+		return sdkerrors.Wrapf(types.ErrInvalidOwner, "the address %s is not the owner of the token %s", msg.SrcOwner, msg.Symbol)
 	}
 
 	token.Owner = msg.DstOwner
@@ -144,8 +148,8 @@ func (k Keeper) MintToken(ctx sdk.Context, msg types.MsgMintToken) error {
 
 	token := tokenI.(*types.Token)
 
-	if !msg.Owner.Equals(token.Owner) {
-		return sdkerrors.Wrapf(types.ErrInvalidOwner, "the address %s is not the owner of the token %s", msg.Owner.String(), msg.Symbol)
+	if msg.Owner != token.Owner {
+		return sdkerrors.Wrapf(types.ErrInvalidOwner, "the address %s is not the owner of the token %s", msg.Owner, msg.Symbol)
 	}
 
 	if !token.Mintable {
@@ -172,9 +176,14 @@ func (k Keeper) MintToken(ctx sdk.Context, msg types.MsgMintToken) error {
 		return err
 	}
 
-	mintAcc := msg.To
-	if mintAcc.Empty() {
-		mintAcc = token.Owner
+	mintAddr := msg.To
+	if len(mintAddr) == 0 {
+		mintAddr = token.Owner
+	}
+
+	mintAcc, err := sdk.AccAddressFromBech32(mintAddr)
+	if err != nil {
+		return err
 	}
 
 	// sent coins to owner's account

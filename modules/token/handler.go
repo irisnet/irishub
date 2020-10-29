@@ -32,8 +32,12 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 
 // handleIssueToken handles MsgIssueToken
 func handleIssueToken(ctx sdk.Context, k keeper.Keeper, msg *types.MsgIssueToken) (*sdk.Result, error) {
+	owner, err := sdk.AccAddressFromBech32(msg.Owner)
+	if err != nil {
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
+	}
 	// handle fee for token
-	if err := k.DeductIssueTokenFee(ctx, msg.Owner, msg.Symbol); err != nil {
+	if err := k.DeductIssueTokenFee(ctx, owner, msg.Symbol); err != nil {
 		return nil, err
 	}
 
@@ -49,7 +53,7 @@ func handleIssueToken(ctx sdk.Context, k keeper.Keeper, msg *types.MsgIssueToken
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Owner.String()),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.Owner),
 		),
 	})
 	return &sdk.Result{Events: ctx.EventManager().ABCIEvents()}, nil
@@ -69,7 +73,7 @@ func handleMsgEditToken(ctx sdk.Context, k keeper.Keeper, msg *types.MsgEditToke
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Owner.String()),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.Owner),
 		),
 	})
 	return &sdk.Result{Events: ctx.EventManager().ABCIEvents()}, nil
@@ -89,7 +93,7 @@ func handleMsgTransferTokenOwner(ctx sdk.Context, k keeper.Keeper, msg *types.Ms
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.SrcOwner.String()),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.SrcOwner),
 		),
 	})
 
@@ -98,7 +102,11 @@ func handleMsgTransferTokenOwner(ctx sdk.Context, k keeper.Keeper, msg *types.Ms
 
 // handleMsgMintToken handles MsgMintToken
 func handleMsgMintToken(ctx sdk.Context, k keeper.Keeper, msg *types.MsgMintToken) (*sdk.Result, error) {
-	if err := k.DeductMintTokenFee(ctx, msg.Owner, msg.Symbol); err != nil {
+	owner, err := sdk.AccAddressFromBech32(msg.Owner)
+	if err != nil {
+		return nil, err
+	}
+	if err := k.DeductMintTokenFee(ctx, owner, msg.Symbol); err != nil {
 		return nil, err
 	}
 
@@ -115,7 +123,7 @@ func handleMsgMintToken(ctx sdk.Context, k keeper.Keeper, msg *types.MsgMintToke
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Owner.String()),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.Owner),
 		),
 	})
 

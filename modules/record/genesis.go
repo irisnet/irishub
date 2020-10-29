@@ -1,6 +1,7 @@
 package record
 
 import (
+	"errors"
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -36,17 +37,20 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 func ValidateGenesis(data types.GenesisState) error {
 	for _, record := range data.Records {
 		if len(record.Contents) == 0 {
-			return fmt.Errorf("contents missing")
+			return errors.New("contents missing")
 		}
-		if record.Creator.Empty() {
-			return fmt.Errorf("Creator missing")
+
+		_, err := sdk.AccAddressFromBech32(record.Creator)
+		if err != nil {
+			return fmt.Errorf("invalid record creator address (%s)", err)
 		}
+
 		for _, content := range record.Contents {
 			if len(content.Digest) == 0 {
-				return fmt.Errorf("Digest missing")
+				return errors.New("digest missing")
 			}
 			if len(content.DigestAlgo) == 0 {
-				return fmt.Errorf("DigestAlgo missing")
+				return errors.New("digest algo missing")
 			}
 		}
 	}

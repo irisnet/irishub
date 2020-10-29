@@ -17,7 +17,7 @@ func NewServiceDefinition(
 		Name:              name,
 		Description:       description,
 		Tags:              tags,
-		Author:            author,
+		Author:            author.String(),
 		AuthorDescription: authorDescription,
 		Schemas:           schemas,
 	}

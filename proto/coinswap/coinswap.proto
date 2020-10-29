@@ -13,7 +13,7 @@ message MsgAddLiquidity {
     string exact_standard_amt = 2 [(gogoproto.moretags) = "yaml:\"exact_standard_amt\"", (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false];
     string min_liquidity = 3 [(gogoproto.moretags) = "yaml:\"min_liquidity\"", (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false];
     int64 deadline = 4;
-    bytes sender = 5 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
+    string sender = 5;
 }
 
 // MsgRemoveLiquidity - struct for removing liquidity from a reserve pool
@@ -22,7 +22,7 @@ message MsgRemoveLiquidity {
     string min_token = 2 [(gogoproto.moretags) = "yaml:\"min_token\"", (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false];
     string min_standard_amt = 3 [(gogoproto.moretags) = "yaml:\"min_standard_amt\"", (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false];
     int64 deadline = 4;
-    bytes sender = 5 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
+    string sender = 5;
 }
 
 // MsgSwapOrder represents a msg for swap order
@@ -35,13 +35,13 @@ message MsgSwapOrder {
 
 // Input defines the properties of order's input
 message Input {
-    bytes address = 1 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
+    string address = 1;
     cosmos.base.v1beta1.Coin coin = 2 [(gogoproto.nullable) = false];
 }
 
 // Output defines the properties of order's output
 message Output {
-    bytes address = 1 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
+    string address = 1;
     cosmos.base.v1beta1.Coin coin = 2 [(gogoproto.nullable) = false];
 }
 

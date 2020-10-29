@@ -18,12 +18,13 @@ func (k Keeper) GetExchangedPrice(
 ) (
 	sdk.Coins, string, error,
 ) {
-	pricing := k.GetPricing(ctx, binding.ServiceName, binding.Provider)
+	provider, _ := sdk.AccAddressFromBech32(binding.Provider)
+	pricing := k.GetPricing(ctx, binding.ServiceName, provider)
 
 	// get discounts
 	discountByTime := types.GetDiscountByTime(pricing, ctx.BlockTime())
 	discountByVolume := types.GetDiscountByVolume(
-		pricing, k.GetRequestVolume(ctx, consumer, binding.ServiceName, binding.Provider),
+		pricing, k.GetRequestVolume(ctx, consumer, binding.ServiceName, provider),
 	)
 
 	baseDenom := k.BaseDenom(ctx)

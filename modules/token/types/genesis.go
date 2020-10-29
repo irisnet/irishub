@@ -40,5 +40,5 @@ var nativeToken = Token{
 	InitialSupply: 2000000000,
 	MaxSupply:     10000000000,
 	Mintable:      true,
-	Owner:         sdk.AccAddress(crypto.AddressHash([]byte(ModuleName))),
+	Owner:         sdk.AccAddress(crypto.AddressHash([]byte(ModuleName))).String(),
 }

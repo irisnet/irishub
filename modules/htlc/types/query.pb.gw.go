@@ -47,7 +47,7 @@ func request_Query_HTLC_0(ctx context.Context, marshaler runtime.Marshaler, clie
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "hash_lock")
 	}
 
-	protoReq.HashLock, err = runtime.Bytes(val)
+	protoReq.HashLock, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "hash_lock", err)
@@ -74,7 +74,7 @@ func local_request_Query_HTLC_0(ctx context.Context, marshaler runtime.Marshaler
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "hash_lock")
 	}
 
-	protoReq.HashLock, err = runtime.Bytes(val)
+	protoReq.HashLock, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "hash_lock", err)

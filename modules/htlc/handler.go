@@ -1,6 +1,7 @@
 package htlc
 
 import (
+	"encoding/hex"
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -33,13 +34,28 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 
 // handleMsgCreateHTLC handles MsgCreateHTLC
 func handleMsgCreateHTLC(ctx sdk.Context, k keeper.Keeper, msg *types.MsgCreateHTLC) (*sdk.Result, error) {
+	sender, err := sdk.AccAddressFromBech32(msg.Sender)
+	if err != nil {
+		return nil, err
+	}
+
+	to, err := sdk.AccAddressFromBech32(msg.To)
+	if err != nil {
+		return nil, err
+	}
+
+	hashLock, err := hex.DecodeString(msg.HashLock)
+	if err != nil {
+		return nil, err
+	}
+
 	if err := k.CreateHTLC(
 		ctx,
-		msg.Sender,
-		msg.To,
+		sender,
+		to,
 		msg.ReceiverOnOtherChain,
 		msg.Amount,
-		msg.HashLock,
+		hashLock,
 		msg.Timestamp,
 		msg.TimeLock,
 	); err != nil {
@@ -49,17 +65,17 @@ func handleMsgCreateHTLC(ctx sdk.Context, k keeper.Keeper, msg *types.MsgCreateH
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			types.EventTypeCreateHTLC,
-			sdk.NewAttribute(types.AttributeKeySender, msg.Sender.String()),
-			sdk.NewAttribute(types.AttributeKeyReceiver, msg.To.String()),
+			sdk.NewAttribute(types.AttributeKeySender, msg.Sender),
+			sdk.NewAttribute(types.AttributeKeyReceiver, msg.To),
 			sdk.NewAttribute(types.AttributeKeyReceiverOnOtherChain, msg.ReceiverOnOtherChain),
 			sdk.NewAttribute(types.AttributeKeyAmount, msg.Amount.String()),
-			sdk.NewAttribute(types.AttributeKeyHashLock, msg.HashLock.String()),
+			sdk.NewAttribute(types.AttributeKeyHashLock, msg.HashLock),
 			sdk.NewAttribute(types.AttributeKeyTimeLock, fmt.Sprintf("%d", msg.TimeLock)),
 		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Sender.String()),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.Sender),
 		),
 	})
 
@@ -68,21 +84,31 @@ func handleMsgCreateHTLC(ctx sdk.Context, k keeper.Keeper, msg *types.MsgCreateH
 
 // handleMsgClaimHTLC handles MsgClaimHTLC
 func handleMsgClaimHTLC(ctx sdk.Context, k keeper.Keeper, msg *types.MsgClaimHTLC) (*sdk.Result, error) {
-	if err := k.ClaimHTLC(ctx, msg.HashLock, msg.Secret); err != nil {
+	hashLock, err := hex.DecodeString(msg.HashLock)
+	if err != nil {
+		return nil, err
+	}
+
+	secret, err := hex.DecodeString(msg.Secret)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := k.ClaimHTLC(ctx, hashLock, secret); err != nil {
 		return nil, err
 	}
 
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			types.EventTypeClaimHTLC,
-			sdk.NewAttribute(types.AttributeKeySender, msg.Sender.String()),
-			sdk.NewAttribute(types.AttributeKeyHashLock, msg.HashLock.String()),
-			sdk.NewAttribute(types.AttributeKeySecret, msg.Secret.String()),
+			sdk.NewAttribute(types.AttributeKeySender, msg.Sender),
+			sdk.NewAttribute(types.AttributeKeyHashLock, msg.HashLock),
+			sdk.NewAttribute(types.AttributeKeySecret, msg.Secret),
 		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Sender.String()),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.Sender),
 		),
 	})
 
@@ -91,20 +117,25 @@ func handleMsgClaimHTLC(ctx sdk.Context, k keeper.Keeper, msg *types.MsgClaimHTL
 
 // handleMsgRefundHTLC handles MsgRefundHTLC
 func handleMsgRefundHTLC(ctx sdk.Context, k keeper.Keeper, msg *types.MsgRefundHTLC) (*sdk.Result, error) {
-	if err := k.RefundHTLC(ctx, msg.HashLock); err != nil {
+	hashLock, err := hex.DecodeString(msg.HashLock)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := k.RefundHTLC(ctx, hashLock); err != nil {
 		return nil, err
 	}
 
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			types.EventTypeRefundHTLC,
-			sdk.NewAttribute(types.AttributeKeySender, msg.Sender.String()),
-			sdk.NewAttribute(types.AttributeKeyHashLock, msg.HashLock.String()),
+			sdk.NewAttribute(types.AttributeKeySender, msg.Sender),
+			sdk.NewAttribute(types.AttributeKeyHashLock, msg.HashLock),
 		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Sender.String()),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.Sender),
 		),
 	})
 

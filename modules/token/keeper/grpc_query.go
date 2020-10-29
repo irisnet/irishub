@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"fmt"
 	"strings"
 
 	"github.com/gogo/protobuf/proto"
@@ -45,7 +46,16 @@ func (k Keeper) Tokens(c context.Context, req *types.QueryTokensRequest) (*types
 	}
 
 	ctx := sdk.UnwrapSDKContext(c)
-	tokens := k.GetTokens(ctx, req.Owner)
+	var owner sdk.AccAddress
+	var err error
+	if len(req.Owner) > 0 {
+		owner, err = sdk.AccAddressFromBech32(req.Owner)
+		if err != nil {
+			return nil, status.Errorf(codes.InvalidArgument, fmt.Sprintf("invalid owner address (%s)", err))
+		}
+	}
+
+	tokens := k.GetTokens(ctx, owner)
 
 	result := make([]*codectypes.Any, len(tokens))
 	for i, token := range tokens {

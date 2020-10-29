@@ -65,7 +65,7 @@ func GenOraclePriceSvcDefinition() ServiceDefinition {
 		Name:              OraclePriceServiceName,
 		Description:       OraclePriceAuthorDescription,
 		Tags:              OraclePriceServiceTags,
-		Author:            OraclePriceServiceAuthor,
+		Author:            OraclePriceServiceAuthor.String(),
 		AuthorDescription: OraclePriceAuthorDescription,
 		Schemas:           OraclePriceSchemas,
 	}
@@ -74,13 +74,13 @@ func GenOraclePriceSvcDefinition() ServiceDefinition {
 func GenOraclePriceSvcBinding(baseDenom string) ServiceBinding {
 	return ServiceBinding{
 		ServiceName:  OraclePriceServiceName,
-		Provider:     OraclePriceServiceProvider,
+		Provider:     OraclePriceServiceProvider.String(),
 		Deposit:      sdk.NewCoins(sdk.NewCoin(baseDenom, sdk.NewInt(0))),
 		Pricing:      fmt.Sprintf(`{"price": "0%s"}`, baseDenom),
 		QoS:          1,
 		Options:      `{}`,
 		Available:    true,
 		DisabledTime: time.Time{},
-		Owner:        OraclePriceServiceProvider,
+		Owner:        OraclePriceServiceProvider.String(),
 	}
 }

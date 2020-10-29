@@ -48,13 +48,24 @@ func (k Keeper) RequestModuleService(
 		return sdkerrors.Wrap(types.ErrUnknownRequestContext, reqContextID.String())
 	}
 
+	requestContextConsumer, _ := sdk.AccAddressFromBech32(requestContext.Consumer)
+
+	pds := make([]sdk.AccAddress, len(requestContext.Providers))
+	for i, provider := range requestContext.Providers {
+		pd, err := sdk.AccAddressFromBech32(provider)
+		if err != nil {
+			return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid provider address: %s", provider)
+		}
+		pds[i] = pd
+	}
+
 	_, totalPrices, _, err := k.FilterServiceProviders(
 		ctx,
 		requestContext.ServiceName,
-		requestContext.Providers,
+		pds,
 		requestContext.Timeout,
 		requestContext.ServiceFeeCap,
-		requestContext.Consumer,
+		requestContextConsumer,
 	)
 	if err != nil {
 		return err
@@ -80,10 +91,10 @@ func (k Keeper) RequestModuleService(
 			sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
 			sdk.NewAttribute(sdk.AttributeKeySender, moduleService.Provider.String()),
-			sdk.NewAttribute(types.AttributeKeyRequestContextID, request.RequestContextId.String()),
+			sdk.NewAttribute(types.AttributeKeyRequestContextID, request.RequestContextId),
 			sdk.NewAttribute(types.AttributeKeyRequestID, requestIDs[0].String()),
 			sdk.NewAttribute(types.AttributeKeyServiceName, request.ServiceName),
-			sdk.NewAttribute(types.AttributeKeyConsumer, request.Consumer.String()),
+			sdk.NewAttribute(types.AttributeKeyConsumer, request.Consumer),
 		),
 	})
 

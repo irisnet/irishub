@@ -12,7 +12,7 @@ func (suite *KeeperSuite) TestSupply() {
 
 	response, err := suite.queryClient.Supply(gocontext.Background(), &types.QuerySupplyRequest{
 		Denom: denomID,
-		Owner: address,
+		Owner: address.String(),
 	})
 
 	suite.NoError(err)
@@ -25,7 +25,7 @@ func (suite *KeeperSuite) TestOwner() {
 
 	response, err := suite.queryClient.Owner(gocontext.Background(), &types.QueryOwnerRequest{
 		Denom: denomID,
-		Owner: nil,
+		Owner: address.String(),
 	})
 
 	suite.NoError(err)

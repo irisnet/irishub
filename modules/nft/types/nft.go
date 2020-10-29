@@ -16,7 +16,7 @@ func NewBaseNFT(id, name string, owner sdk.AccAddress, tokenURI, tokenData strin
 	return BaseNFT{
 		Id:    strings.ToLower(strings.TrimSpace(id)),
 		Name:  strings.TrimSpace(name),
-		Owner: owner,
+		Owner: owner.String(),
 		URI:   strings.TrimSpace(tokenURI),
 		Data:  strings.TrimSpace(tokenData),
 	}
@@ -31,7 +31,8 @@ func (bnft BaseNFT) GetName() string {
 }
 
 func (bnft BaseNFT) GetOwner() sdk.AccAddress {
-	return bnft.Owner
+	owner, _ := sdk.AccAddressFromBech32(bnft.Owner)
+	return owner
 }
 
 func (bnft BaseNFT) GetURI() string {

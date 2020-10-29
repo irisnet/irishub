@@ -19,20 +19,20 @@ var (
 	testServiceName = "test-service"
 	testServiceDesc = "test-service-desc"
 	testServiceTags = []string{"tag1", "tag2"}
-	testAuthor      = sdk.AccAddress([]byte("test-author"))
+	testAuthor      = sdk.AccAddress(tmhash.SumTruncated([]byte("test-author")))
 	testAuthorDesc  = "test-author-desc"
 	testSchemas     = `{"input":{"type":"object"},"output":{"type":"object"}}`
 
-	testOwner        = sdk.AccAddress([]byte("test-owner"))
-	testProvider     = sdk.AccAddress([]byte("test-provider"))
+	testOwner        = sdk.AccAddress(tmhash.SumTruncated([]byte("test-owner")))
+	testProvider     = sdk.AccAddress(tmhash.SumTruncated([]byte("test-provider")))
 	testDeposit      = sdk.NewCoins(testCoin1)
 	testPricing      = `{"price":"1stake"}`
 	testQoS          = uint64(50)
 	testOptions      = "{}"
-	testWithdrawAddr = sdk.AccAddress([]byte("test-withdrawal-address"))
+	testWithdrawAddr = sdk.AccAddress(tmhash.SumTruncated([]byte("test-withdrawal-address")))
 	testAddedDeposit = sdk.NewCoins(testCoin2)
 
-	testConsumer      = sdk.AccAddress([]byte("test-consumer"))
+	testConsumer      = sdk.AccAddress(tmhash.SumTruncated([]byte("test-consumer")))
 	testProviders     = []sdk.AccAddress{testProvider}
 	testInput         = `{"header":{},"body":{"pair":"iris-usdt"}}`
 	testServiceFeeCap = sdk.NewCoins(testCoin2)
@@ -129,7 +129,7 @@ func TestMsgDefineServiceGetSignBytes(t *testing.T) {
 	msg := NewMsgDefineService(testServiceName, testServiceDesc, testServiceTags, testAuthor, testAuthorDesc, testSchemas)
 	res := msg.GetSignBytes()
 
-	expected := `{"type":"irismod/service/MsgDefineService","value":{"author":"cosmos1w3jhxapdv96hg6r0wg0dldpe","author_description":"test-author-desc","description":"test-service-desc","name":"test-service","schemas":"{\"input\":{\"type\":\"object\"},\"output\":{\"type\":\"object\"}}","tags":["tag1","tag2"]}}`
+	expected := `{"type":"irismod/service/MsgDefineService","value":{"author":"cosmos1tkelht5u9ywfaww3fehvdtvncwwhf539w406rh","author_description":"test-author-desc","description":"test-service-desc","name":"test-service","schemas":"{\"input\":{\"type\":\"object\"},\"output\":{\"type\":\"object\"}}","tags":["tag1","tag2"]}}`
 	require.Equal(t, expected, string(res))
 }
 
@@ -138,7 +138,7 @@ func TestMsgDefineServiceGetSigners(t *testing.T) {
 	msg := NewMsgDefineService(testServiceName, testServiceDesc, testServiceTags, testAuthor, testAuthorDesc, testSchemas)
 	res := msg.GetSigners()
 
-	expected := "[746573742D617574686F72]"
+	expected := "[5DB3FBAE9C291C9EB9D14E6EC6AD93C39D74D225]"
 	require.Equal(t, expected, fmt.Sprintf("%v", res))
 }
 
@@ -219,7 +219,7 @@ func TestMsgBindServiceGetSignBytes(t *testing.T) {
 	msg := NewMsgBindService(testServiceName, testProvider, testDeposit, testPricing, testQoS, testOptions, testOwner)
 	res := msg.GetSignBytes()
 
-	expected := `{"type":"irismod/service/MsgBindService","value":{"deposit":[{"amount":"10000","denom":"stake"}],"options":"{}","owner":"cosmos1w3jhxapddamkuetjkkyjud","pricing":"{\"price\":\"1stake\"}","provider":"cosmos1w3jhxapdwpex7anfv3jhy8anr90","qos":"50","service_name":"test-service"}}`
+	expected := `{"type":"irismod/service/MsgBindService","value":{"deposit":[{"amount":"10000","denom":"stake"}],"options":"{}","owner":"cosmos1dtrajkx72qwf8gesp2z4rjz6p7klycmmh2lnvn","pricing":"{\"price\":\"1stake\"}","provider":"cosmos10yajkmnug9d2nvccgs7ul3xkur0l9as348gmwe","qos":"50","service_name":"test-service"}}`
 	require.Equal(t, expected, string(res))
 }
 
@@ -227,7 +227,7 @@ func TestMsgBindServiceGetSignBytes(t *testing.T) {
 func TestMsgBindServiceGetSigners(t *testing.T) {
 	msg := NewMsgBindService(testServiceName, testProvider, testDeposit, testPricing, testQoS, "", testOwner)
 	res := msg.GetSigners()
-	require.Equal(t, "[746573742D6F776E6572]", fmt.Sprintf("%v", res))
+	require.Equal(t, "[6AC7D958DE501C93A3300A8551C85A0FADF2637B]", fmt.Sprintf("%v", res))
 }
 
 // TestMsgUpdateServiceBindingRoute tests Route for MsgUpdateServiceBinding
@@ -308,7 +308,7 @@ func TestMsgUpdateServiceBindingGetSignBytes(t *testing.T) {
 	msg := NewMsgUpdateServiceBinding(testServiceName, testProvider, testAddedDeposit, "{\"price\":\"1\"}", 1, "", testOwner)
 	res := msg.GetSignBytes()
 
-	expected := `{"type":"irismod/service/MsgUpdateServiceBinding","value":{"deposit":[{"amount":"100","denom":"stake"}],"owner":"cosmos1w3jhxapddamkuetjkkyjud","pricing":"{\"price\":\"1\"}","provider":"cosmos1w3jhxapdwpex7anfv3jhy8anr90","qos":"1","service_name":"test-service"}}`
+	expected := `{"type":"irismod/service/MsgUpdateServiceBinding","value":{"deposit":[{"amount":"100","denom":"stake"}],"owner":"cosmos1dtrajkx72qwf8gesp2z4rjz6p7klycmmh2lnvn","pricing":"{\"price\":\"1\"}","provider":"cosmos10yajkmnug9d2nvccgs7ul3xkur0l9as348gmwe","qos":"1","service_name":"test-service"}}`
 	require.Equal(t, expected, string(res))
 }
 
@@ -316,7 +316,7 @@ func TestMsgUpdateServiceBindingGetSignBytes(t *testing.T) {
 func TestMsgUpdateServiceBindingGetSigners(t *testing.T) {
 	msg := NewMsgUpdateServiceBinding(testServiceName, testProvider, testAddedDeposit, "", 0, testOptions, testOwner)
 	res := msg.GetSigners()
-	require.Equal(t, "[746573742D6F776E6572]", fmt.Sprintf("%v", res))
+	require.Equal(t, "[6AC7D958DE501C93A3300A8551C85A0FADF2637B]", fmt.Sprintf("%v", res))
 }
 
 // TestMsgSetWithdrawAddressRoute tests Route for MsgSetWithdrawAddress
@@ -368,7 +368,7 @@ func TestMsgSetWithdrawAddressGetSignBytes(t *testing.T) {
 	msg := NewMsgSetWithdrawAddress(testOwner, testWithdrawAddr)
 	res := msg.GetSignBytes()
 
-	expected := `{"type":"irismod/service/MsgSetWithdrawAddress","value":{"owner":"cosmos1w3jhxapddamkuetjkkyjud","withdraw_address":"cosmos1w3jhxapdwa5hg6rywfshwctv94skgerjv4ehxd4yrry"}}`
+	expected := `{"type":"irismod/service/MsgSetWithdrawAddress","value":{"owner":"cosmos1dtrajkx72qwf8gesp2z4rjz6p7klycmmh2lnvn","withdraw_address":"cosmos19zz7wpde40ed545384w0xsrgkydq4pvzdwrupn"}}`
 	require.Equal(t, expected, string(res))
 }
 
@@ -376,7 +376,7 @@ func TestMsgSetWithdrawAddressGetSignBytes(t *testing.T) {
 func TestMsgSetWithdrawAddressGetSigners(t *testing.T) {
 	msg := NewMsgSetWithdrawAddress(testOwner, testWithdrawAddr)
 	res := msg.GetSigners()
-	require.Equal(t, "[746573742D6F776E6572]", fmt.Sprintf("%v", res))
+	require.Equal(t, "[6AC7D958DE501C93A3300A8551C85A0FADF2637B]", fmt.Sprintf("%v", res))
 }
 
 // TestMsgDisableServiceBindingRoute tests Route for MsgDisableServiceBinding
@@ -434,7 +434,7 @@ func TestMsgDisableServiceBindingGetSignBytes(t *testing.T) {
 	msg := NewMsgDisableServiceBinding(testServiceName, testProvider, testOwner)
 	res := msg.GetSignBytes()
 
-	expected := `{"type":"irismod/service/MsgDisableServiceBinding","value":{"owner":"cosmos1w3jhxapddamkuetjkkyjud","provider":"cosmos1w3jhxapdwpex7anfv3jhy8anr90","service_name":"test-service"}}`
+	expected := `{"type":"irismod/service/MsgDisableServiceBinding","value":{"owner":"cosmos1dtrajkx72qwf8gesp2z4rjz6p7klycmmh2lnvn","provider":"cosmos10yajkmnug9d2nvccgs7ul3xkur0l9as348gmwe","service_name":"test-service"}}`
 	require.Equal(t, expected, string(res))
 }
 
@@ -442,7 +442,7 @@ func TestMsgDisableServiceBindingGetSignBytes(t *testing.T) {
 func TestMsgDisableServiceBindingGetSigners(t *testing.T) {
 	msg := NewMsgDisableServiceBinding(testServiceName, testProvider, testOwner)
 	res := msg.GetSigners()
-	require.Equal(t, "[746573742D6F776E6572]", fmt.Sprintf("%v", res))
+	require.Equal(t, "[6AC7D958DE501C93A3300A8551C85A0FADF2637B]", fmt.Sprintf("%v", res))
 }
 
 // TestMsgEnableServiceBindingRoute tests Route for MsgEnableServiceBinding
@@ -503,7 +503,7 @@ func TestMsgEnableServiceBindingGetSignBytes(t *testing.T) {
 	msg := NewMsgEnableServiceBinding(testServiceName, testProvider, testAddedDeposit, testOwner)
 	res := msg.GetSignBytes()
 
-	expected := `{"type":"irismod/service/MsgEnableServiceBinding","value":{"deposit":[{"amount":"100","denom":"stake"}],"owner":"cosmos1w3jhxapddamkuetjkkyjud","provider":"cosmos1w3jhxapdwpex7anfv3jhy8anr90","service_name":"test-service"}}`
+	expected := `{"type":"irismod/service/MsgEnableServiceBinding","value":{"deposit":[{"amount":"100","denom":"stake"}],"owner":"cosmos1dtrajkx72qwf8gesp2z4rjz6p7klycmmh2lnvn","provider":"cosmos10yajkmnug9d2nvccgs7ul3xkur0l9as348gmwe","service_name":"test-service"}}`
 	require.Equal(t, expected, string(res))
 }
 
@@ -511,7 +511,7 @@ func TestMsgEnableServiceBindingGetSignBytes(t *testing.T) {
 func TestMsgEnableServiceBindingGetSigners(t *testing.T) {
 	msg := NewMsgEnableServiceBinding(testServiceName, testProvider, testAddedDeposit, testOwner)
 	res := msg.GetSigners()
-	require.Equal(t, "[746573742D6F776E6572]", fmt.Sprintf("%v", res))
+	require.Equal(t, "[6AC7D958DE501C93A3300A8551C85A0FADF2637B]", fmt.Sprintf("%v", res))
 }
 
 // TestMsgRefundServiceDepositRoute tests Route for MsgRefundServiceDeposit
@@ -569,7 +569,7 @@ func TestMsgRefundServiceDepositGetSignBytes(t *testing.T) {
 	msg := NewMsgRefundServiceDeposit(testServiceName, testProvider, testOwner)
 	res := msg.GetSignBytes()
 
-	expected := `{"type":"irismod/service/MsgRefundServiceDeposit","value":{"owner":"cosmos1w3jhxapddamkuetjkkyjud","provider":"cosmos1w3jhxapdwpex7anfv3jhy8anr90","service_name":"test-service"}}`
+	expected := `{"type":"irismod/service/MsgRefundServiceDeposit","value":{"owner":"cosmos1dtrajkx72qwf8gesp2z4rjz6p7klycmmh2lnvn","provider":"cosmos10yajkmnug9d2nvccgs7ul3xkur0l9as348gmwe","service_name":"test-service"}}`
 	require.Equal(t, expected, string(res))
 }
 
@@ -577,7 +577,7 @@ func TestMsgRefundServiceDepositGetSignBytes(t *testing.T) {
 func TestMsgRefundServiceDepositGetSigners(t *testing.T) {
 	msg := NewMsgRefundServiceDeposit(testServiceName, testProvider, testOwner)
 	res := msg.GetSigners()
-	require.Equal(t, "[746573742D6F776E6572]", fmt.Sprintf("%v", res))
+	require.Equal(t, "[6AC7D958DE501C93A3300A8551C85A0FADF2637B]", fmt.Sprintf("%v", res))
 }
 
 // TestMsgCallServiceRoute tests Route for MsgCallService
@@ -720,7 +720,7 @@ func TestMsgCallServiceGetSignBytes(t *testing.T) {
 	)
 	res := msg.GetSignBytes()
 
-	expected := `{"type":"irismod/service/MsgCallService","value":{"consumer":"cosmos1w3jhxapdvdhkuum4d4jhyt34ks5","input":"{\"header\":{},\"body\":{\"pair\":\"iris-usdt\"}}","providers":["cosmos1w3jhxapdwpex7anfv3jhy8anr90"],"repeated":true,"repeated_frequency":"120","repeated_total":"100","service_fee_cap":[{"amount":"100","denom":"stake"}],"service_name":"test-service","super_mode":true,"timeout":"100"}}`
+	expected := `{"type":"irismod/service/MsgCallService","value":{"consumer":"cosmos1d8ydkv60gkj3sc98lvnxpddlfwwluvp6jc59a0","input":"{\"header\":{},\"body\":{\"pair\":\"iris-usdt\"}}","providers":["cosmos10yajkmnug9d2nvccgs7ul3xkur0l9as348gmwe"],"repeated":true,"repeated_frequency":"120","repeated_total":"100","service_fee_cap":[{"amount":"100","denom":"stake"}],"service_name":"test-service","super_mode":true,"timeout":"100"}}`
 	require.Equal(t, expected, string(res))
 }
 
@@ -732,7 +732,7 @@ func TestMsgCallServiceGetSigners(t *testing.T) {
 		false, true, testRepeatedFreq, testRepeatedTotal,
 	)
 	res := msg.GetSigners()
-	require.Equal(t, "[746573742D636F6E73756D6572]", fmt.Sprintf("%v", res))
+	require.Equal(t, "[69C8DB334F45A51860A7FB2660B5BF4B9DFE303A]", fmt.Sprintf("%v", res))
 }
 
 // TestMsgRespondServiceRoute tests Route for MsgRespondService
@@ -811,7 +811,7 @@ func TestMsgRespondServiceGetSignBytes(t *testing.T) {
 	msg := NewMsgRespondService(testRequestID, testProvider, testResult, testOutput)
 	res := msg.GetSignBytes()
 
-	expected := `{"type":"irismod/service/MsgRespondService","value":{"output":"{\"header\":{},\"body\":{\"last\":\"100\"}}","provider":"cosmos1w3jhxapdwpex7anfv3jhy8anr90","request_id":"3DB0FA99DCB058BC86041BADBD614D6839F8FA20E17CF8AD3BA14C3F1BF613BD0000000000000000000000000000000100000000000000010001","result":"{\"code\":200,\"message\":\"\"}"}}`
+	expected := `{"type":"irismod/service/MsgRespondService","value":{"output":"{\"header\":{},\"body\":{\"last\":\"100\"}}","provider":"cosmos10yajkmnug9d2nvccgs7ul3xkur0l9as348gmwe","request_id":"3DB0FA99DCB058BC86041BADBD614D6839F8FA20E17CF8AD3BA14C3F1BF613BD0000000000000000000000000000000100000000000000010001","result":"{\"code\":200,\"message\":\"\"}"}}`
 	require.Equal(t, expected, string(res))
 }
 
@@ -820,7 +820,7 @@ func TestMsgRespondServiceGetSigners(t *testing.T) {
 	msg := NewMsgRespondService(testRequestID, testProvider, testResult, testOutput)
 	res := msg.GetSigners()
 
-	expected := "[746573742D70726F7669646572]"
+	expected := "[793B2B6E7C415AA9B318443DCFC4D6E0DFF2F611]"
 	require.Equal(t, expected, fmt.Sprintf("%v", res))
 }
 
@@ -874,7 +874,7 @@ func TestMsgPauseRequestContextGetSignBytes(t *testing.T) {
 	msg := NewMsgPauseRequestContext(testRequestContextID, testConsumer)
 	res := msg.GetSignBytes()
 
-	expected := `{"type":"irismod/service/MsgPauseRequestContext","value":{"consumer":"cosmos1w3jhxapdvdhkuum4d4jhyt34ks5","request_context_id":"3DB0FA99DCB058BC86041BADBD614D6839F8FA20E17CF8AD3BA14C3F1BF613BD0000000000000000"}}`
+	expected := `{"type":"irismod/service/MsgPauseRequestContext","value":{"consumer":"cosmos1d8ydkv60gkj3sc98lvnxpddlfwwluvp6jc59a0","request_context_id":"3DB0FA99DCB058BC86041BADBD614D6839F8FA20E17CF8AD3BA14C3F1BF613BD0000000000000000"}}`
 	require.Equal(t, expected, string(res))
 }
 
@@ -882,7 +882,7 @@ func TestMsgPauseRequestContextGetSignBytes(t *testing.T) {
 func TestMsgPauseRequestContextGetSigners(t *testing.T) {
 	msg := NewMsgPauseRequestContext(testRequestContextID, testConsumer)
 	res := msg.GetSigners()
-	require.Equal(t, "[746573742D636F6E73756D6572]", fmt.Sprintf("%v", res))
+	require.Equal(t, "[69C8DB334F45A51860A7FB2660B5BF4B9DFE303A]", fmt.Sprintf("%v", res))
 }
 
 // TestMsgStartRequestContextRoute tests Route for MsgStartRequestContext
@@ -935,7 +935,7 @@ func TestMsgStartRequestContextGetSignBytes(t *testing.T) {
 	msg := NewMsgStartRequestContext(testRequestContextID, testConsumer)
 	res := msg.GetSignBytes()
 
-	expected := `{"type":"irismod/service/MsgStartRequestContext","value":{"consumer":"cosmos1w3jhxapdvdhkuum4d4jhyt34ks5","request_context_id":"3DB0FA99DCB058BC86041BADBD614D6839F8FA20E17CF8AD3BA14C3F1BF613BD0000000000000000"}}`
+	expected := `{"type":"irismod/service/MsgStartRequestContext","value":{"consumer":"cosmos1d8ydkv60gkj3sc98lvnxpddlfwwluvp6jc59a0","request_context_id":"3DB0FA99DCB058BC86041BADBD614D6839F8FA20E17CF8AD3BA14C3F1BF613BD0000000000000000"}}`
 	require.Equal(t, expected, string(res))
 }
 
@@ -943,7 +943,7 @@ func TestMsgStartRequestContextGetSignBytes(t *testing.T) {
 func TestMsgStartRequestContextGetSigners(t *testing.T) {
 	msg := NewMsgStartRequestContext(testRequestContextID, testConsumer)
 	res := msg.GetSigners()
-	require.Equal(t, "[746573742D636F6E73756D6572]", fmt.Sprintf("%v", res))
+	require.Equal(t, "[69C8DB334F45A51860A7FB2660B5BF4B9DFE303A]", fmt.Sprintf("%v", res))
 }
 
 // TestMsgKillRequestContextRoute tests Route for MsgKillRequestContext
@@ -996,7 +996,7 @@ func TestMsgKillRequestContextGetSignBytes(t *testing.T) {
 	msg := NewMsgKillRequestContext(testRequestContextID, testConsumer)
 	res := msg.GetSignBytes()
 
-	expected := `{"type":"irismod/service/MsgKillRequestContext","value":{"consumer":"cosmos1w3jhxapdvdhkuum4d4jhyt34ks5","request_context_id":"3DB0FA99DCB058BC86041BADBD614D6839F8FA20E17CF8AD3BA14C3F1BF613BD0000000000000000"}}`
+	expected := `{"type":"irismod/service/MsgKillRequestContext","value":{"consumer":"cosmos1d8ydkv60gkj3sc98lvnxpddlfwwluvp6jc59a0","request_context_id":"3DB0FA99DCB058BC86041BADBD614D6839F8FA20E17CF8AD3BA14C3F1BF613BD0000000000000000"}}`
 	require.Equal(t, expected, string(res))
 }
 
@@ -1004,7 +1004,7 @@ func TestMsgKillRequestContextGetSignBytes(t *testing.T) {
 func TestMsgKillRequestContextGetSigners(t *testing.T) {
 	msg := NewMsgKillRequestContext(testRequestContextID, testConsumer)
 	res := msg.GetSigners()
-	require.Equal(t, "[746573742D636F6E73756D6572]", fmt.Sprintf("%v", res))
+	require.Equal(t, "[69C8DB334F45A51860A7FB2660B5BF4B9DFE303A]", fmt.Sprintf("%v", res))
 }
 
 // TestMsgUpdateRequestContextRoute tests Route for MsgUpdateRequestContext
@@ -1075,7 +1075,7 @@ func TestMsgUpdateRequestContextGetSignBytes(t *testing.T) {
 	msg := NewMsgUpdateRequestContext(testRequestContextID, testProviders, testServiceFeeCap, testTimeout, testRepeatedFreq, testRepeatedTotal, testConsumer)
 	res := msg.GetSignBytes()
 
-	expected := `{"type":"irismod/service/MsgUpdateRequestContext","value":{"consumer":"cosmos1w3jhxapdvdhkuum4d4jhyt34ks5","providers":["cosmos1w3jhxapdwpex7anfv3jhy8anr90"],"repeated_frequency":"120","repeated_total":"100","request_context_id":"3DB0FA99DCB058BC86041BADBD614D6839F8FA20E17CF8AD3BA14C3F1BF613BD0000000000000000","service_fee_cap":[{"amount":"100","denom":"stake"}],"timeout":"100"}}`
+	expected := `{"type":"irismod/service/MsgUpdateRequestContext","value":{"consumer":"cosmos1d8ydkv60gkj3sc98lvnxpddlfwwluvp6jc59a0","providers":["cosmos10yajkmnug9d2nvccgs7ul3xkur0l9as348gmwe"],"repeated_frequency":"120","repeated_total":"100","request_context_id":"3DB0FA99DCB058BC86041BADBD614D6839F8FA20E17CF8AD3BA14C3F1BF613BD0000000000000000","service_fee_cap":[{"amount":"100","denom":"stake"}],"timeout":"100"}}`
 	require.Equal(t, expected, string(res))
 }
 
@@ -1083,7 +1083,7 @@ func TestMsgUpdateRequestContextGetSignBytes(t *testing.T) {
 func TestMsgUpdateRequestContextGetSigners(t *testing.T) {
 	msg := NewMsgUpdateRequestContext(testRequestContextID, testProviders, testServiceFeeCap, testTimeout, testRepeatedFreq, testRepeatedTotal, testConsumer)
 	res := msg.GetSigners()
-	require.Equal(t, "[746573742D636F6E73756D6572]", fmt.Sprintf("%v", res))
+	require.Equal(t, "[69C8DB334F45A51860A7FB2660B5BF4B9DFE303A]", fmt.Sprintf("%v", res))
 }
 
 // TestMsgWithdrawEarnedFeesRoute tests Route for MsgWithdrawEarnedFees
@@ -1135,7 +1135,7 @@ func TestMsgWithdrawEarnedFeesGetSignBytes(t *testing.T) {
 	msg := NewMsgWithdrawEarnedFees(testOwner, testProvider)
 	res := msg.GetSignBytes()
 
-	expected := `{"type":"irismod/service/MsgWithdrawEarnedFees","value":{"owner":"cosmos1w3jhxapddamkuetjkkyjud","provider":"cosmos1w3jhxapdwpex7anfv3jhy8anr90"}}`
+	expected := `{"type":"irismod/service/MsgWithdrawEarnedFees","value":{"owner":"cosmos1dtrajkx72qwf8gesp2z4rjz6p7klycmmh2lnvn","provider":"cosmos10yajkmnug9d2nvccgs7ul3xkur0l9as348gmwe"}}`
 	require.Equal(t, expected, string(res))
 }
 
@@ -1143,5 +1143,5 @@ func TestMsgWithdrawEarnedFeesGetSignBytes(t *testing.T) {
 func TestMsgWithdrawEarnedFeesGetSigners(t *testing.T) {
 	msg := NewMsgWithdrawEarnedFees(testOwner, testProvider)
 	res := msg.GetSigners()
-	require.Equal(t, "[746573742D6F776E6572]", fmt.Sprintf("%v", res))
+	require.Equal(t, "[6AC7D958DE501C93A3300A8551C85A0FADF2637B]", fmt.Sprintf("%v", res))
 }

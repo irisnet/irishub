@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"encoding/hex"
 	"strings"
 
 	"google.golang.org/grpc/codes"
@@ -35,10 +36,16 @@ func (k Keeper) Binding(c context.Context, req *types.QueryBindingRequest) (*typ
 		return nil, status.Errorf(codes.InvalidArgument, "empty request")
 	}
 
+	provider, err := sdk.AccAddressFromBech32(req.Provider)
+	if err != nil {
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid provider address (%s)", err)
+	}
+
 	ctx := sdk.UnwrapSDKContext(c)
-	binding, found := k.GetServiceBinding(ctx, req.ServiceName, req.Provider)
+
+	binding, found := k.GetServiceBinding(ctx, req.ServiceName, provider)
 	if !found {
-		return nil, sdkerrors.Wrapf(types.ErrUnknownServiceBinding, "service: %s, provider: %s", req.ServiceName, req.Provider.String())
+		return nil, sdkerrors.Wrapf(types.ErrUnknownServiceBinding, "service: %s, provider: %s", req.ServiceName, req.Provider)
 	}
 
 	return &types.QueryBindingResponse{ServiceBinding: &binding}, nil
@@ -51,7 +58,7 @@ func (k Keeper) Bindings(c context.Context, req *types.QueryBindingsRequest) (*t
 
 	ctx := sdk.UnwrapSDKContext(c)
 	bindings := make([]*types.ServiceBinding, 0)
-	if req.Owner.Empty() {
+	if len(req.Owner) == 0 {
 		iterator := k.ServiceBindingsIterator(ctx, req.ServiceName)
 		defer iterator.Close()
 
@@ -62,7 +69,11 @@ func (k Keeper) Bindings(c context.Context, req *types.QueryBindingsRequest) (*t
 			bindings = append(bindings, &binding)
 		}
 	} else {
-		bindings = k.GetOwnerServiceBindings(ctx, req.Owner, req.ServiceName)
+		owner, err := sdk.AccAddressFromBech32(req.Owner)
+		if err != nil {
+			return nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
+		}
+		bindings = k.GetOwnerServiceBindings(ctx, owner, req.ServiceName)
 	}
 
 	return &types.QueryBindingsResponse{ServiceBindings: bindings}, nil
@@ -73,10 +84,16 @@ func (k Keeper) WithdrawAddress(c context.Context, req *types.QueryWithdrawAddre
 		return nil, status.Errorf(codes.InvalidArgument, "empty request")
 	}
 
-	ctx := sdk.UnwrapSDKContext(c)
-	withdrawAddr := k.GetWithdrawAddress(ctx, req.Owner)
+	owner, err := sdk.AccAddressFromBech32(req.Owner)
+	if err != nil {
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
+	}
 
-	return &types.QueryWithdrawAddressResponse{WithdrawAddress: withdrawAddr}, nil
+	ctx := sdk.UnwrapSDKContext(c)
+
+	withdrawAddr := k.GetWithdrawAddress(ctx, owner)
+
+	return &types.QueryWithdrawAddressResponse{WithdrawAddress: withdrawAddr.String()}, nil
 }
 
 func (k Keeper) RequestContext(c context.Context, req *types.QueryRequestContextRequest) (*types.QueryRequestContextResponse, error) {
@@ -84,8 +101,17 @@ func (k Keeper) RequestContext(c context.Context, req *types.QueryRequestContext
 		return nil, status.Errorf(codes.InvalidArgument, "empty request")
 	}
 
+	if len(req.RequestContextId) != types.ContextIDLen {
+		return nil, sdkerrors.Wrapf(types.ErrInvalidRequestContextID, "length of the request context ID must be %d in bytes", types.ContextIDLen)
+	}
+	requestContextId, err := hex.DecodeString(req.RequestContextId)
+	if err != nil {
+		return nil, sdkerrors.Wrap(types.ErrInvalidRequestContextID, "request context ID must be a hex encoded string")
+	}
+
 	ctx := sdk.UnwrapSDKContext(c)
-	requestContext, _ := k.GetRequestContext(ctx, req.RequestContextId)
+
+	requestContext, _ := k.GetRequestContext(ctx, requestContextId)
 
 	return &types.QueryRequestContextResponse{RequestContext: &requestContext}, nil
 }
@@ -95,7 +121,6 @@ func (k Keeper) Request(c context.Context, req *types.QueryRequestRequest) (*typ
 		return nil, status.Errorf(codes.InvalidArgument, "empty request")
 	}
 
-	ctx := sdk.UnwrapSDKContext(c)
 	if len(req.RequestId) != types.RequestIDLen {
 		return nil, sdkerrors.Wrapf(
 			types.ErrInvalidRequestID,
@@ -104,7 +129,13 @@ func (k Keeper) Request(c context.Context, req *types.QueryRequestRequest) (*typ
 		)
 	}
 
-	request, _ := k.GetRequest(ctx, req.RequestId)
+	requestId, err := hex.DecodeString(req.RequestId)
+	if err != nil {
+		return nil, sdkerrors.Wrap(types.ErrInvalidRequestContextID, "request ID must be a hex encoded string")
+	}
+
+	ctx := sdk.UnwrapSDKContext(c)
+	request, _ := k.GetRequest(ctx, requestId)
 
 	return &types.QueryRequestResponse{Request: &request}, nil
 }
@@ -114,9 +145,14 @@ func (k Keeper) Requests(c context.Context, req *types.QueryRequestsRequest) (*t
 		return nil, status.Errorf(codes.InvalidArgument, "empty request")
 	}
 
+	provider, err := sdk.AccAddressFromBech32(req.Provider)
+	if err != nil {
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid provider address (%s)", err)
+	}
+
 	ctx := sdk.UnwrapSDKContext(c)
 
-	iterator := k.ActiveRequestsIterator(ctx, req.ServiceName, req.Provider)
+	iterator := k.ActiveRequestsIterator(ctx, req.ServiceName, provider)
 	defer iterator.Close()
 
 	requests := make([]*types.Request, 0)
@@ -138,8 +174,17 @@ func (k Keeper) RequestsByReqCtx(c context.Context, req *types.QueryRequestsByRe
 		return nil, status.Errorf(codes.InvalidArgument, "empty request")
 	}
 
+	if len(req.RequestContextId) != types.ContextIDLen {
+		return nil, sdkerrors.Wrapf(types.ErrInvalidRequestContextID, "length of the request context ID must be %d in bytes", types.ContextIDLen)
+	}
+	requestContextId, err := hex.DecodeString(req.RequestContextId)
+	if err != nil {
+		return nil, sdkerrors.Wrap(types.ErrInvalidRequestContextID, "request context ID must be a hex encoded string")
+	}
+
 	ctx := sdk.UnwrapSDKContext(c)
-	iterator := k.RequestsIteratorByReqCtx(ctx, req.RequestContextId, req.BatchCounter)
+
+	iterator := k.RequestsIteratorByReqCtx(ctx, requestContextId, req.BatchCounter)
 	defer iterator.Close()
 
 	requests := make([]*types.Request, 0)
@@ -167,7 +212,11 @@ func (k Keeper) Response(c context.Context, req *types.QueryResponseRequest) (*t
 		)
 	}
 
-	response, _ := k.GetResponse(ctx, req.RequestId)
+	requestId, err := hex.DecodeString(req.RequestId)
+	if err != nil {
+		return nil, sdkerrors.Wrap(types.ErrInvalidRequestContextID, "request ID must be a hex encoded string")
+	}
+	response, _ := k.GetResponse(ctx, requestId)
 
 	return &types.QueryResponseResponse{Response: &response}, nil
 }
@@ -177,8 +226,16 @@ func (k Keeper) Responses(c context.Context, req *types.QueryResponsesRequest) (
 		return nil, status.Errorf(codes.InvalidArgument, "empty request")
 	}
 
+	if len(req.RequestContextId) != types.ContextIDLen {
+		return nil, sdkerrors.Wrapf(types.ErrInvalidRequestContextID, "length of the request context ID must be %d in bytes", types.ContextIDLen)
+	}
+	requestContextId, err := hex.DecodeString(req.RequestContextId)
+	if err != nil {
+		return nil, sdkerrors.Wrap(types.ErrInvalidRequestContextID, "request context ID must be a hex encoded string")
+	}
+
 	ctx := sdk.UnwrapSDKContext(c)
-	iterator := k.ResponsesIteratorByReqCtx(ctx, req.RequestContextId, req.BatchCounter)
+	iterator := k.ResponsesIteratorByReqCtx(ctx, requestContextId, req.BatchCounter)
 	defer iterator.Close()
 
 	responses := make([]*types.Response, 0)
@@ -197,11 +254,16 @@ func (k Keeper) EarnedFees(c context.Context, req *types.QueryEarnedFeesRequest)
 		return nil, status.Errorf(codes.InvalidArgument, "empty request")
 	}
 
+	provider, err := sdk.AccAddressFromBech32(req.Provider)
+	if err != nil {
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid provider address (%s)", err)
+	}
+
 	ctx := sdk.UnwrapSDKContext(c)
-	fees, found := k.GetEarnedFees(ctx, req.Provider)
+	fees, found := k.GetEarnedFees(ctx, provider)
 	if !found {
 		return nil, sdkerrors.Wrapf(
-			types.ErrNoEarnedFees, "no earned fees for %s", req.Provider.String(),
+			types.ErrNoEarnedFees, "no earned fees for %s", req.Provider,
 		)
 	}
 

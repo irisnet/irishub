@@ -92,8 +92,13 @@ func queryFeedValue(ctx sdk.Context, req abci.RequestQuery, k Keeper, legacyQuer
 
 func BuildFeedContext(ctx sdk.Context, k Keeper, feed types.Feed) (feedCtx types.FeedContext) {
 	reqCtx, found := k.sk.GetRequestContext(ctx, feed.RequestContextID)
+	pds := make([]sdk.AccAddress, len(reqCtx.Providers))
+	for i, provider := range reqCtx.Providers {
+		pd, _ := sdk.AccAddressFromBech32(provider)
+		pds[i] = pd
+	}
 	if found {
-		feedCtx.Providers = reqCtx.Providers
+		feedCtx.Providers = pds
 		feedCtx.ResponseThreshold = reqCtx.ResponseThreshold
 		feedCtx.ServiceName = reqCtx.ServiceName
 		feedCtx.Input = reqCtx.Input

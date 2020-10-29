@@ -3,6 +3,8 @@ package token_test
 import (
 	"testing"
 
+	"github.com/tendermint/tendermint/crypto/tmhash"
+
 	"github.com/stretchr/testify/require"
 
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
@@ -34,7 +36,7 @@ func TestInitGenesis(t *testing.T) {
 	ctx := app.BaseApp.NewContext(false, tmproto.Header{})
 
 	// add token
-	addr := sdk.AccAddress([]byte("addr1"))
+	addr := sdk.AccAddress(tmhash.SumTruncated([]byte("addr1")))
 	ft := types.NewToken("btc", "Bitcoin Network", "satoshi", 1, 1, 1, true, addr)
 
 	genesis := types.GenesisState{

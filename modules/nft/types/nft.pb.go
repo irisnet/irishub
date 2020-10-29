@@ -4,9 +4,7 @@
 package types
 
 import (
-	bytes "bytes"
 	fmt "fmt"
-	github_com_cosmos_cosmos_sdk_types "github.com/cosmos/cosmos-sdk/types"
 	_ "github.com/gogo/protobuf/gogoproto"
 	proto "github.com/gogo/protobuf/proto"
 	io "io"
@@ -27,10 +25,10 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 // MsgIssueDenom defines an SDK message for creating a new denom.
 type MsgIssueDenom struct {
-	Id     string                                        `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name   string                                        `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Schema string                                        `protobuf:"bytes,3,opt,name=schema,proto3" json:"schema,omitempty"`
-	Sender github_com_cosmos_cosmos_sdk_types.AccAddress `protobuf:"bytes,4,opt,name=sender,proto3,casttype=github.com/cosmos/cosmos-sdk/types.AccAddress" json:"sender,omitempty"`
+	Id     string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name   string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Schema string `protobuf:"bytes,3,opt,name=schema,proto3" json:"schema,omitempty"`
+	Sender string `protobuf:"bytes,4,opt,name=sender,proto3" json:"sender,omitempty"`
 }
 
 func (m *MsgIssueDenom) Reset()         { *m = MsgIssueDenom{} }
@@ -68,13 +66,13 @@ var xxx_messageInfo_MsgIssueDenom proto.InternalMessageInfo
 
 // MsgTransferNFT defines an SDK message for transferring an NFT to recipient.
 type MsgTransferNFT struct {
-	Id        string                                        `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Denom     string                                        `protobuf:"bytes,2,opt,name=denom,proto3" json:"denom,omitempty"`
-	Name      string                                        `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
-	URI       string                                        `protobuf:"bytes,4,opt,name=uri,proto3" json:"uri,omitempty"`
-	Data      string                                        `protobuf:"bytes,5,opt,name=data,proto3" json:"data,omitempty"`
-	Sender    github_com_cosmos_cosmos_sdk_types.AccAddress `protobuf:"bytes,6,opt,name=sender,proto3,casttype=github.com/cosmos/cosmos-sdk/types.AccAddress" json:"sender,omitempty"`
-	Recipient github_com_cosmos_cosmos_sdk_types.AccAddress `protobuf:"bytes,7,opt,name=recipient,proto3,casttype=github.com/cosmos/cosmos-sdk/types.AccAddress" json:"recipient,omitempty"`
+	Id        string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Denom     string `protobuf:"bytes,2,opt,name=denom,proto3" json:"denom,omitempty"`
+	Name      string `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	URI       string `protobuf:"bytes,4,opt,name=uri,proto3" json:"uri,omitempty"`
+	Data      string `protobuf:"bytes,5,opt,name=data,proto3" json:"data,omitempty"`
+	Sender    string `protobuf:"bytes,6,opt,name=sender,proto3" json:"sender,omitempty"`
+	Recipient string `protobuf:"bytes,7,opt,name=recipient,proto3" json:"recipient,omitempty"`
 }
 
 func (m *MsgTransferNFT) Reset()         { *m = MsgTransferNFT{} }
@@ -112,12 +110,12 @@ var xxx_messageInfo_MsgTransferNFT proto.InternalMessageInfo
 
 // MsgEditNFT defines an SDK message for editing a nft.
 type MsgEditNFT struct {
-	Id     string                                        `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Denom  string                                        `protobuf:"bytes,2,opt,name=denom,proto3" json:"denom,omitempty"`
-	Name   string                                        `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
-	URI    string                                        `protobuf:"bytes,4,opt,name=uri,proto3" json:"uri,omitempty"`
-	Data   string                                        `protobuf:"bytes,5,opt,name=data,proto3" json:"data,omitempty"`
-	Sender github_com_cosmos_cosmos_sdk_types.AccAddress `protobuf:"bytes,6,opt,name=sender,proto3,casttype=github.com/cosmos/cosmos-sdk/types.AccAddress" json:"sender,omitempty"`
+	Id     string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Denom  string `protobuf:"bytes,2,opt,name=denom,proto3" json:"denom,omitempty"`
+	Name   string `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	URI    string `protobuf:"bytes,4,opt,name=uri,proto3" json:"uri,omitempty"`
+	Data   string `protobuf:"bytes,5,opt,name=data,proto3" json:"data,omitempty"`
+	Sender string `protobuf:"bytes,6,opt,name=sender,proto3" json:"sender,omitempty"`
 }
 
 func (m *MsgEditNFT) Reset()         { *m = MsgEditNFT{} }
@@ -155,13 +153,13 @@ var xxx_messageInfo_MsgEditNFT proto.InternalMessageInfo
 
 // MsgMintNFT defines an SDK message for creating a new NFT.
 type MsgMintNFT struct {
-	Id        string                                        `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Denom     string                                        `protobuf:"bytes,2,opt,name=denom,proto3" json:"denom,omitempty"`
-	Name      string                                        `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
-	URI       string                                        `protobuf:"bytes,4,opt,name=uri,proto3" json:"uri,omitempty"`
-	Data      string                                        `protobuf:"bytes,5,opt,name=data,proto3" json:"data,omitempty"`
-	Sender    github_com_cosmos_cosmos_sdk_types.AccAddress `protobuf:"bytes,6,opt,name=sender,proto3,casttype=github.com/cosmos/cosmos-sdk/types.AccAddress" json:"sender,omitempty"`
-	Recipient github_com_cosmos_cosmos_sdk_types.AccAddress `protobuf:"bytes,7,opt,name=recipient,proto3,casttype=github.com/cosmos/cosmos-sdk/types.AccAddress" json:"recipient,omitempty"`
+	Id        string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Denom     string `protobuf:"bytes,2,opt,name=denom,proto3" json:"denom,omitempty"`
+	Name      string `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	URI       string `protobuf:"bytes,4,opt,name=uri,proto3" json:"uri,omitempty"`
+	Data      string `protobuf:"bytes,5,opt,name=data,proto3" json:"data,omitempty"`
+	Sender    string `protobuf:"bytes,6,opt,name=sender,proto3" json:"sender,omitempty"`
+	Recipient string `protobuf:"bytes,7,opt,name=recipient,proto3" json:"recipient,omitempty"`
 }
 
 func (m *MsgMintNFT) Reset()         { *m = MsgMintNFT{} }
@@ -199,9 +197,9 @@ var xxx_messageInfo_MsgMintNFT proto.InternalMessageInfo
 
 // MsgBurnNFT defines an SDK message for burning a NFT.
 type MsgBurnNFT struct {
-	Id     string                                        `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Denom  string                                        `protobuf:"bytes,2,opt,name=denom,proto3" json:"denom,omitempty"`
-	Sender github_com_cosmos_cosmos_sdk_types.AccAddress `protobuf:"bytes,3,opt,name=sender,proto3,casttype=github.com/cosmos/cosmos-sdk/types.AccAddress" json:"sender,omitempty"`
+	Id     string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Denom  string `protobuf:"bytes,2,opt,name=denom,proto3" json:"denom,omitempty"`
+	Sender string `protobuf:"bytes,3,opt,name=sender,proto3" json:"sender,omitempty"`
 }
 
 func (m *MsgBurnNFT) Reset()         { *m = MsgBurnNFT{} }
@@ -239,11 +237,11 @@ var xxx_messageInfo_MsgBurnNFT proto.InternalMessageInfo
 
 // BaseNFT defines a non fungible token.
 type BaseNFT struct {
-	Id    string                                        `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name  string                                        `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	URI   string                                        `protobuf:"bytes,3,opt,name=uri,proto3" json:"uri,omitempty"`
-	Data  string                                        `protobuf:"bytes,4,opt,name=data,proto3" json:"data,omitempty"`
-	Owner github_com_cosmos_cosmos_sdk_types.AccAddress `protobuf:"bytes,5,opt,name=owner,proto3,casttype=github.com/cosmos/cosmos-sdk/types.AccAddress" json:"owner,omitempty"`
+	Id    string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name  string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	URI   string `protobuf:"bytes,3,opt,name=uri,proto3" json:"uri,omitempty"`
+	Data  string `protobuf:"bytes,4,opt,name=data,proto3" json:"data,omitempty"`
+	Owner string `protobuf:"bytes,5,opt,name=owner,proto3" json:"owner,omitempty"`
 }
 
 func (m *BaseNFT) Reset()         { *m = BaseNFT{} }
@@ -281,10 +279,10 @@ var xxx_messageInfo_BaseNFT proto.InternalMessageInfo
 
 // Denom defines a type of NFT.
 type Denom struct {
-	Id      string                                        `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name    string                                        `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Schema  string                                        `protobuf:"bytes,3,opt,name=schema,proto3" json:"schema,omitempty"`
-	Creator github_com_cosmos_cosmos_sdk_types.AccAddress `protobuf:"bytes,4,opt,name=creator,proto3,casttype=github.com/cosmos/cosmos-sdk/types.AccAddress" json:"creator,omitempty"`
+	Id      string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name    string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Schema  string `protobuf:"bytes,3,opt,name=schema,proto3" json:"schema,omitempty"`
+	Creator string `protobuf:"bytes,4,opt,name=creator,proto3" json:"creator,omitempty"`
 }
 
 func (m *Denom) Reset()         { *m = Denom{} }
@@ -359,8 +357,8 @@ func (m *IDCollection) XXX_DiscardUnknown() {
 var xxx_messageInfo_IDCollection proto.InternalMessageInfo
 
 type Owner struct {
-	Address       github_com_cosmos_cosmos_sdk_types.AccAddress `protobuf:"bytes,1,opt,name=address,proto3,casttype=github.com/cosmos/cosmos-sdk/types.AccAddress" json:"address,omitempty"`
-	IDCollections []IDCollection                                `protobuf:"bytes,2,rep,name=id_collections,json=idCollections,proto3" json:"id_collections" yaml:"idcs"`
+	Address       string         `protobuf:"bytes,1,opt,name=address,proto3" json:"address,omitempty"`
+	IDCollections []IDCollection `protobuf:"bytes,2,rep,name=id_collections,json=idCollections,proto3" json:"id_collections" yaml:"idcs"`
 }
 
 func (m *Owner) Reset()         { *m = Owner{} }
@@ -450,46 +448,42 @@ func init() {
 func init() { proto.RegisterFile("nft/nft.proto", fileDescriptor_fe8ab7e15b7f0646) }
 
 var fileDescriptor_fe8ab7e15b7f0646 = []byte{
-	// 611 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xec, 0x95, 0x3f, 0x6f, 0xd3, 0x4e,
-	0x18, 0xc7, 0x73, 0xb6, 0x93, 0x28, 0x97, 0x3f, 0xfa, 0xc9, 0x8a, 0x7e, 0x72, 0x19, 0xec, 0x28,
-	0x62, 0xc8, 0x40, 0x6d, 0x51, 0x24, 0x86, 0x8a, 0xa5, 0xa6, 0x14, 0x05, 0x94, 0x56, 0xb2, 0xc2,
-	0xc2, 0x82, 0x5c, 0xdf, 0xd9, 0x3d, 0x11, 0xdf, 0x45, 0xbe, 0x8b, 0x50, 0x59, 0x79, 0x03, 0x4c,
-	0x30, 0xc0, 0xc0, 0xce, 0xbb, 0x60, 0x40, 0x19, 0x3b, 0x32, 0x45, 0x90, 0x2c, 0xcc, 0x8c, 0x4c,
-	0xc8, 0xf6, 0xa5, 0x71, 0x44, 0x85, 0x50, 0xc2, 0x82, 0xc4, 0x94, 0xbb, 0x27, 0xcf, 0x3d, 0xcf,
-	0xe7, 0xf9, 0x7e, 0xad, 0x3b, 0xd8, 0xa4, 0xa1, 0x70, 0x68, 0x28, 0xec, 0x71, 0xc2, 0x04, 0xd3,
-	0xeb, 0x24, 0x21, 0x3c, 0x66, 0xc8, 0xa6, 0xa1, 0xb8, 0xd6, 0x8e, 0x58, 0xc4, 0xb2, 0xb8, 0x93,
-	0xae, 0xf2, 0x94, 0xee, 0x5b, 0x00, 0x9b, 0x03, 0x1e, 0xf5, 0x39, 0x9f, 0xe0, 0x43, 0x4c, 0x59,
-	0xac, 0xb7, 0xa0, 0x42, 0x90, 0x01, 0x3a, 0xa0, 0x57, 0xf3, 0x14, 0x82, 0x74, 0x1d, 0x6a, 0xd4,
-	0x8f, 0xb1, 0xa1, 0x64, 0x91, 0x6c, 0xad, 0xff, 0x0f, 0x2b, 0x3c, 0x38, 0xc3, 0xb1, 0x6f, 0xa8,
-	0x59, 0x54, 0xee, 0xf4, 0x3e, 0xac, 0x70, 0x4c, 0x11, 0x4e, 0x0c, 0xad, 0x03, 0x7a, 0x0d, 0xf7,
-	0xe6, 0xf7, 0x99, 0xb5, 0x1b, 0x11, 0x71, 0x36, 0x39, 0xb5, 0x03, 0x16, 0x3b, 0x01, 0xe3, 0x31,
-	0xe3, 0xf2, 0x67, 0x97, 0xa3, 0xa7, 0x8e, 0x38, 0x1f, 0x63, 0x6e, 0x1f, 0x04, 0xc1, 0x01, 0x42,
-	0x09, 0xe6, 0xdc, 0x93, 0x05, 0xf6, 0xb5, 0xaf, 0xef, 0x2c, 0xd0, 0x7d, 0xa3, 0xc0, 0xd6, 0x80,
-	0x47, 0xc3, 0xc4, 0xa7, 0x3c, 0xc4, 0xc9, 0xf1, 0xd1, 0xf0, 0x27, 0xbe, 0x36, 0x2c, 0xa3, 0x14,
-	0x5c, 0x02, 0xe6, 0x9b, 0x4b, 0x6a, 0xb5, 0x40, 0xbd, 0x03, 0xd5, 0x49, 0x42, 0x32, 0xb4, 0x9a,
-	0x5b, 0x9d, 0xcf, 0x2c, 0xf5, 0x91, 0xd7, 0xf7, 0xd2, 0x58, 0x9a, 0x8e, 0x7c, 0xe1, 0x1b, 0xe5,
-	0x3c, 0x3d, 0x5d, 0x17, 0x86, 0xa9, 0x6c, 0x39, 0x8c, 0x7e, 0x02, 0x6b, 0x09, 0x0e, 0xc8, 0x98,
-	0x60, 0x2a, 0x8c, 0xea, 0xa6, 0xd5, 0x56, 0x35, 0xa4, 0x3a, 0x1f, 0x01, 0x84, 0x03, 0x1e, 0xdd,
-	0x43, 0x44, 0xfc, 0xa5, 0xca, 0xc8, 0x41, 0x5e, 0x2b, 0xd9, 0x20, 0x03, 0x42, 0xc5, 0x3f, 0x8b,
-	0xd7, 0x2c, 0x7e, 0x91, 0x5b, 0xec, 0x4e, 0x12, 0xfa, 0xfb, 0xca, 0xac, 0xc6, 0x52, 0xff, 0x8c,
-	0x3f, 0xef, 0x01, 0xac, 0xba, 0x3e, 0xc7, 0x57, 0x21, 0x5c, 0x75, 0x3f, 0x48, 0x1b, 0xd4, 0x5f,
-	0xd8, 0xa0, 0x15, 0x6c, 0xb8, 0x0f, 0xcb, 0xec, 0x19, 0xc5, 0x49, 0xe6, 0xcd, 0x46, 0xb8, 0xf9,
-	0x79, 0x49, 0xfb, 0x0a, 0xc0, 0xf2, 0xf6, 0x77, 0xd9, 0x43, 0x58, 0x0d, 0x12, 0xec, 0x0b, 0xb6,
-	0xc5, 0x65, 0xb6, 0xac, 0x20, 0xc1, 0xee, 0xc0, 0x46, 0xff, 0xf0, 0x2e, 0x1b, 0x8d, 0x70, 0x20,
-	0x08, 0xa3, 0x2b, 0xf7, 0x40, 0xd1, 0xbd, 0xff, 0xa0, 0x4a, 0x10, 0x37, 0x94, 0x8e, 0xda, 0xab,
-	0x79, 0xe9, 0x52, 0x9e, 0xfe, 0x00, 0x60, 0xf9, 0x24, 0x1d, 0x33, 0x45, 0xf3, 0xf3, 0x0e, 0xd9,
-	0xc9, 0xcd, 0xd0, 0x64, 0x05, 0x3d, 0x84, 0x2d, 0x82, 0x9e, 0x04, 0x97, 0x54, 0x79, 0xe7, 0xfa,
-	0xde, 0x8e, 0x5d, 0x78, 0x3d, 0xec, 0x22, 0xb7, 0x7b, 0x7d, 0x3a, 0xb3, 0x4a, 0xf3, 0x99, 0xd5,
-	0x2c, 0x46, 0xf9, 0xb7, 0x99, 0x55, 0x3f, 0xf7, 0xe3, 0xd1, 0x7e, 0x97, 0xa0, 0x80, 0x77, 0xbd,
-	0x26, 0x41, 0x85, 0x7f, 0xe5, 0x10, 0xcf, 0x21, 0x2c, 0x08, 0x60, 0x17, 0x05, 0xa8, 0xef, 0xe9,
-	0x6b, 0x2d, 0x33, 0x0b, 0x5d, 0x2d, 0xed, 0xb5, 0x94, 0xe6, 0x36, 0xd4, 0x68, 0x28, 0x96, 0x84,
-	0xed, 0xb5, 0x74, 0xf9, 0x7d, 0xba, 0x0d, 0x09, 0xa7, 0x1d, 0x1f, 0x0d, 0xb9, 0x97, 0xe5, 0xe7,
-	0xbd, 0xdd, 0x07, 0xd3, 0x2f, 0x66, 0x69, 0x3a, 0x37, 0xc1, 0xc5, 0xdc, 0x04, 0x9f, 0xe7, 0x26,
-	0x78, 0xb9, 0x30, 0x4b, 0x17, 0x0b, 0xb3, 0xf4, 0x69, 0x61, 0x96, 0x1e, 0xdf, 0x28, 0xe8, 0x97,
-	0xd6, 0xa5, 0x58, 0x38, 0xb2, 0xbe, 0x13, 0x33, 0x34, 0x19, 0x61, 0x9e, 0x3e, 0xad, 0xb9, 0x92,
-	0xa7, 0x95, 0xec, 0xf9, 0xbc, 0xf5, 0x23, 0x00, 0x00, 0xff, 0xff, 0xc1, 0x6f, 0x5b, 0x24, 0x72,
-	0x07, 0x00, 0x00,
+	// 554 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xd4, 0x94, 0x41, 0x8b, 0xd3, 0x40,
+	0x14, 0xc7, 0x9b, 0x26, 0x6d, 0xe9, 0xeb, 0xb6, 0x48, 0x28, 0x92, 0x15, 0x49, 0x97, 0xe2, 0x61,
+	0x0f, 0x92, 0xc0, 0x0a, 0x1e, 0x16, 0x4f, 0x71, 0x5d, 0xa8, 0xd0, 0x55, 0x42, 0xbd, 0x78, 0x91,
+	0x6c, 0x66, 0x92, 0x1d, 0x68, 0x66, 0x4a, 0x66, 0x8a, 0xae, 0x5f, 0x42, 0xc1, 0x2f, 0xe0, 0x57,
+	0xf0, 0xe0, 0x77, 0xe8, 0x71, 0x8f, 0x9e, 0x8a, 0xb6, 0x17, 0xcf, 0x7e, 0x02, 0x99, 0xc9, 0x74,
+	0x3b, 0x8b, 0x45, 0x04, 0x2f, 0x7a, 0x7b, 0xef, 0x9f, 0x97, 0xf7, 0xff, 0xbd, 0xc7, 0xcc, 0x40,
+	0x97, 0x66, 0x22, 0xa4, 0x99, 0x08, 0x66, 0x25, 0x13, 0xcc, 0xed, 0x90, 0x92, 0xf0, 0x82, 0xa1,
+	0x80, 0x66, 0xe2, 0x4e, 0x3f, 0x67, 0x39, 0x53, 0x7a, 0x28, 0xa3, 0xaa, 0x64, 0x48, 0xa0, 0x3b,
+	0xe6, 0xf9, 0x88, 0xf3, 0x39, 0x3e, 0xc1, 0x94, 0x15, 0x6e, 0x0f, 0xea, 0x04, 0x79, 0xd6, 0x81,
+	0x75, 0xd8, 0x8e, 0xeb, 0x04, 0xb9, 0x2e, 0x38, 0x34, 0x29, 0xb0, 0x57, 0x57, 0x8a, 0x8a, 0xdd,
+	0xdb, 0xd0, 0xe4, 0xe9, 0x05, 0x2e, 0x12, 0xcf, 0x56, 0xaa, 0xce, 0x94, 0x8e, 0x29, 0xc2, 0xa5,
+	0xe7, 0x68, 0x5d, 0x65, 0xc7, 0xce, 0xf7, 0x8f, 0x03, 0x6b, 0xf8, 0xd9, 0x82, 0xde, 0x98, 0xe7,
+	0x93, 0x32, 0xa1, 0x3c, 0xc3, 0xe5, 0xd9, 0xe9, 0xe4, 0x17, 0xb3, 0x3e, 0x34, 0x90, 0xa4, 0xd0,
+	0x6e, 0x55, 0x72, 0x8d, 0x60, 0x1b, 0x08, 0xfb, 0x60, 0xcf, 0x4b, 0x52, 0xf9, 0x44, 0xad, 0xd5,
+	0x72, 0x60, 0xbf, 0x88, 0x47, 0xb1, 0xd4, 0x64, 0x39, 0x4a, 0x44, 0xe2, 0x35, 0xaa, 0x72, 0x19,
+	0x1b, 0x64, 0x4d, 0x93, 0xcc, 0xbd, 0x0b, 0xed, 0x12, 0xa7, 0x64, 0x46, 0x30, 0x15, 0x5e, 0x4b,
+	0x7d, 0xda, 0x0a, 0x9a, 0xfb, 0x83, 0x05, 0x30, 0xe6, 0xf9, 0x13, 0x44, 0xc4, 0xbf, 0xc0, 0xac,
+	0xa9, 0x3e, 0x55, 0x54, 0x63, 0x42, 0xc5, 0x7f, 0xb3, 0xc9, 0xe7, 0x0a, 0x39, 0x9a, 0x97, 0xf4,
+	0xcf, 0x91, 0xb7, 0x7e, 0xf6, 0x8e, 0x2d, 0xbc, 0x81, 0x56, 0x94, 0x70, 0xbc, 0xab, 0xdd, 0xae,
+	0x83, 0xab, 0x67, 0xb5, 0x7f, 0x33, 0xab, 0x63, 0xcc, 0xda, 0x87, 0x06, 0x7b, 0x4d, 0x71, 0xa9,
+	0x17, 0x50, 0x25, 0xda, 0x39, 0x85, 0xc6, 0xdf, 0x5f, 0x18, 0x0f, 0x5a, 0x69, 0x89, 0x13, 0xc1,
+	0x36, 0x37, 0x66, 0x93, 0x6a, 0x93, 0x47, 0xb0, 0x37, 0x3a, 0x79, 0xcc, 0xa6, 0x53, 0x9c, 0x0a,
+	0xc2, 0xe8, 0x76, 0x45, 0x96, 0xb9, 0xa2, 0x5b, 0x60, 0x13, 0xc4, 0xbd, 0xfa, 0x81, 0x7d, 0xd8,
+	0x8e, 0x65, 0xa8, 0xff, 0x7e, 0x67, 0x41, 0xe3, 0x99, 0x44, 0x96, 0x3e, 0x09, 0x42, 0x25, 0xe6,
+	0x5c, 0xff, 0xb9, 0x49, 0xdd, 0x0c, 0x7a, 0x04, 0xbd, 0x4a, 0xaf, 0x2d, 0xaa, 0x36, 0x9d, 0xa3,
+	0xfd, 0xc0, 0x78, 0x3b, 0x02, 0x13, 0x22, 0xba, 0xb7, 0x58, 0x0e, 0x6a, 0xab, 0xe5, 0xa0, 0x6b,
+	0xaa, 0xfc, 0xc7, 0x72, 0xd0, 0xb9, 0x4c, 0x8a, 0xe9, 0xf1, 0x90, 0xa0, 0x94, 0x0f, 0xe3, 0x2e,
+	0x41, 0xc6, 0x57, 0x4d, 0xf4, 0x16, 0xc0, 0x98, 0x26, 0x30, 0xa7, 0xe9, 0x1c, 0xb9, 0x37, 0x2c,
+	0xd5, 0x72, 0x23, 0x47, 0x7a, 0x6d, 0xe6, 0x7c, 0x08, 0x0e, 0xcd, 0xc4, 0x86, 0xb0, 0x7f, 0xa3,
+	0x5c, 0x9f, 0x82, 0x68, 0x4f, 0xc3, 0x39, 0x67, 0xa7, 0x13, 0x1e, 0xab, 0xfa, 0xca, 0x3b, 0x7a,
+	0xba, 0xf8, 0xe6, 0xd7, 0x16, 0x2b, 0xdf, 0xba, 0x5a, 0xf9, 0xd6, 0xd7, 0x95, 0x6f, 0xbd, 0x5f,
+	0xfb, 0xb5, 0xab, 0xb5, 0x5f, 0xfb, 0xb2, 0xf6, 0x6b, 0x2f, 0xef, 0xe7, 0x44, 0x5c, 0xcc, 0xcf,
+	0x83, 0x94, 0x15, 0xa1, 0xec, 0x4b, 0xb1, 0x08, 0x75, 0xff, 0xb0, 0x60, 0x68, 0x3e, 0xc5, 0x5c,
+	0x3e, 0xac, 0xa1, 0xb8, 0x9c, 0x61, 0x7e, 0xde, 0x54, 0x8f, 0xe7, 0x83, 0x9f, 0x01, 0x00, 0x00,
+	0xff, 0xff, 0x31, 0xbb, 0xfe, 0x14, 0x70, 0x05, 0x00, 0x00,
 }
 
 func (this *MsgIssueDenom) Equal(that interface{}) bool {
@@ -520,7 +514,7 @@ func (this *MsgIssueDenom) Equal(that interface{}) bool {
 	if this.Schema != that1.Schema {
 		return false
 	}
-	if !bytes.Equal(this.Sender, that1.Sender) {
+	if this.Sender != that1.Sender {
 		return false
 	}
 	return true
@@ -559,10 +553,10 @@ func (this *MsgTransferNFT) Equal(that interface{}) bool {
 	if this.Data != that1.Data {
 		return false
 	}
-	if !bytes.Equal(this.Sender, that1.Sender) {
+	if this.Sender != that1.Sender {
 		return false
 	}
-	if !bytes.Equal(this.Recipient, that1.Recipient) {
+	if this.Recipient != that1.Recipient {
 		return false
 	}
 	return true
@@ -601,7 +595,7 @@ func (this *MsgEditNFT) Equal(that interface{}) bool {
 	if this.Data != that1.Data {
 		return false
 	}
-	if !bytes.Equal(this.Sender, that1.Sender) {
+	if this.Sender != that1.Sender {
 		return false
 	}
 	return true
@@ -640,10 +634,10 @@ func (this *MsgMintNFT) Equal(that interface{}) bool {
 	if this.Data != that1.Data {
 		return false
 	}
-	if !bytes.Equal(this.Sender, that1.Sender) {
+	if this.Sender != that1.Sender {
 		return false
 	}
-	if !bytes.Equal(this.Recipient, that1.Recipient) {
+	if this.Recipient != that1.Recipient {
 		return false
 	}
 	return true
@@ -673,7 +667,7 @@ func (this *MsgBurnNFT) Equal(that interface{}) bool {
 	if this.Denom != that1.Denom {
 		return false
 	}
-	if !bytes.Equal(this.Sender, that1.Sender) {
+	if this.Sender != that1.Sender {
 		return false
 	}
 	return true
@@ -709,7 +703,7 @@ func (this *BaseNFT) Equal(that interface{}) bool {
 	if this.Data != that1.Data {
 		return false
 	}
-	if !bytes.Equal(this.Owner, that1.Owner) {
+	if this.Owner != that1.Owner {
 		return false
 	}
 	return true
@@ -742,7 +736,7 @@ func (this *Denom) Equal(that interface{}) bool {
 	if this.Schema != that1.Schema {
 		return false
 	}
-	if !bytes.Equal(this.Creator, that1.Creator) {
+	if this.Creator != that1.Creator {
 		return false
 	}
 	return true
@@ -798,7 +792,7 @@ func (this *Owner) Equal(that interface{}) bool {
 	} else if this == nil {
 		return false
 	}
-	if !bytes.Equal(this.Address, that1.Address) {
+	if this.Address != that1.Address {
 		return false
 	}
 	if len(this.IDCollections) != len(that1.IDCollections) {
@@ -1794,7 +1788,7 @@ func (m *MsgIssueDenom) Unmarshal(dAtA []byte) error {
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Sender", wireType)
 			}
-			var byteLen int
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowNft
@@ -1804,25 +1798,23 @@ func (m *MsgIssueDenom) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				byteLen |= int(b&0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			if byteLen < 0 {
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
 				return ErrInvalidLengthNft
 			}
-			postIndex := iNdEx + byteLen
+			postIndex := iNdEx + intStringLen
 			if postIndex < 0 {
 				return ErrInvalidLengthNft
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Sender = append(m.Sender[:0], dAtA[iNdEx:postIndex]...)
-			if m.Sender == nil {
-				m.Sender = []byte{}
-			}
+			m.Sender = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -2041,7 +2033,7 @@ func (m *MsgTransferNFT) Unmarshal(dAtA []byte) error {
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Sender", wireType)
 			}
-			var byteLen int
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowNft
@@ -2051,31 +2043,29 @@ func (m *MsgTransferNFT) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				byteLen |= int(b&0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			if byteLen < 0 {
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
 				return ErrInvalidLengthNft
 			}
-			postIndex := iNdEx + byteLen
+			postIndex := iNdEx + intStringLen
 			if postIndex < 0 {
 				return ErrInvalidLengthNft
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Sender = append(m.Sender[:0], dAtA[iNdEx:postIndex]...)
-			if m.Sender == nil {
-				m.Sender = []byte{}
-			}
+			m.Sender = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 7:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Recipient", wireType)
 			}
-			var byteLen int
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowNft
@@ -2085,25 +2075,23 @@ func (m *MsgTransferNFT) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				byteLen |= int(b&0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			if byteLen < 0 {
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
 				return ErrInvalidLengthNft
 			}
-			postIndex := iNdEx + byteLen
+			postIndex := iNdEx + intStringLen
 			if postIndex < 0 {
 				return ErrInvalidLengthNft
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Recipient = append(m.Recipient[:0], dAtA[iNdEx:postIndex]...)
-			if m.Recipient == nil {
-				m.Recipient = []byte{}
-			}
+			m.Recipient = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -2322,7 +2310,7 @@ func (m *MsgEditNFT) Unmarshal(dAtA []byte) error {
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Sender", wireType)
 			}
-			var byteLen int
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowNft
@@ -2332,25 +2320,23 @@ func (m *MsgEditNFT) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				byteLen |= int(b&0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			if byteLen < 0 {
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
 				return ErrInvalidLengthNft
 			}
-			postIndex := iNdEx + byteLen
+			postIndex := iNdEx + intStringLen
 			if postIndex < 0 {
 				return ErrInvalidLengthNft
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Sender = append(m.Sender[:0], dAtA[iNdEx:postIndex]...)
-			if m.Sender == nil {
-				m.Sender = []byte{}
-			}
+			m.Sender = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -2569,7 +2555,7 @@ func (m *MsgMintNFT) Unmarshal(dAtA []byte) error {
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Sender", wireType)
 			}
-			var byteLen int
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowNft
@@ -2579,31 +2565,29 @@ func (m *MsgMintNFT) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				byteLen |= int(b&0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			if byteLen < 0 {
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
 				return ErrInvalidLengthNft
 			}
-			postIndex := iNdEx + byteLen
+			postIndex := iNdEx + intStringLen
 			if postIndex < 0 {
 				return ErrInvalidLengthNft
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Sender = append(m.Sender[:0], dAtA[iNdEx:postIndex]...)
-			if m.Sender == nil {
-				m.Sender = []byte{}
-			}
+			m.Sender = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 7:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Recipient", wireType)
 			}
-			var byteLen int
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowNft
@@ -2613,25 +2597,23 @@ func (m *MsgMintNFT) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				byteLen |= int(b&0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			if byteLen < 0 {
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
 				return ErrInvalidLengthNft
 			}
-			postIndex := iNdEx + byteLen
+			postIndex := iNdEx + intStringLen
 			if postIndex < 0 {
 				return ErrInvalidLengthNft
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Recipient = append(m.Recipient[:0], dAtA[iNdEx:postIndex]...)
-			if m.Recipient == nil {
-				m.Recipient = []byte{}
-			}
+			m.Recipient = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -2754,7 +2736,7 @@ func (m *MsgBurnNFT) Unmarshal(dAtA []byte) error {
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Sender", wireType)
 			}
-			var byteLen int
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowNft
@@ -2764,25 +2746,23 @@ func (m *MsgBurnNFT) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				byteLen |= int(b&0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			if byteLen < 0 {
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
 				return ErrInvalidLengthNft
 			}
-			postIndex := iNdEx + byteLen
+			postIndex := iNdEx + intStringLen
 			if postIndex < 0 {
 				return ErrInvalidLengthNft
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Sender = append(m.Sender[:0], dAtA[iNdEx:postIndex]...)
-			if m.Sender == nil {
-				m.Sender = []byte{}
-			}
+			m.Sender = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -2969,7 +2949,7 @@ func (m *BaseNFT) Unmarshal(dAtA []byte) error {
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Owner", wireType)
 			}
-			var byteLen int
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowNft
@@ -2979,25 +2959,23 @@ func (m *BaseNFT) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				byteLen |= int(b&0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			if byteLen < 0 {
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
 				return ErrInvalidLengthNft
 			}
-			postIndex := iNdEx + byteLen
+			postIndex := iNdEx + intStringLen
 			if postIndex < 0 {
 				return ErrInvalidLengthNft
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Owner = append(m.Owner[:0], dAtA[iNdEx:postIndex]...)
-			if m.Owner == nil {
-				m.Owner = []byte{}
-			}
+			m.Owner = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -3152,7 +3130,7 @@ func (m *Denom) Unmarshal(dAtA []byte) error {
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
 			}
-			var byteLen int
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowNft
@@ -3162,25 +3140,23 @@ func (m *Denom) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				byteLen |= int(b&0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			if byteLen < 0 {
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
 				return ErrInvalidLengthNft
 			}
-			postIndex := iNdEx + byteLen
+			postIndex := iNdEx + intStringLen
 			if postIndex < 0 {
 				return ErrInvalidLengthNft
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Creator = append(m.Creator[:0], dAtA[iNdEx:postIndex]...)
-			if m.Creator == nil {
-				m.Creator = []byte{}
-			}
+			m.Creator = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -3356,7 +3332,7 @@ func (m *Owner) Unmarshal(dAtA []byte) error {
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Address", wireType)
 			}
-			var byteLen int
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowNft
@@ -3366,25 +3342,23 @@ func (m *Owner) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				byteLen |= int(b&0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			if byteLen < 0 {
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
 				return ErrInvalidLengthNft
 			}
-			postIndex := iNdEx + byteLen
+			postIndex := iNdEx + intStringLen
 			if postIndex < 0 {
 				return ErrInvalidLengthNft
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Address = append(m.Address[:0], dAtA[iNdEx:postIndex]...)
-			if m.Address == nil {
-				m.Address = []byte{}
-			}
+			m.Address = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {

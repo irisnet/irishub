@@ -20,11 +20,11 @@ func NewHTLC(
 	state HTLCState,
 ) HTLC {
 	return HTLC{
-		Sender:               sender,
-		To:                   to,
+		Sender:               sender.String(),
+		To:                   to.String(),
 		ReceiverOnOtherChain: receiverOnOtherChain,
 		Amount:               amount,
-		Secret:               secret,
+		Secret:               secret.String(),
 		Timestamp:            timestamp,
 		ExpirationHeight:     expirationHeight,
 		State:                state,
@@ -33,8 +33,9 @@ func NewHTLC(
 
 // Validate validates the HTLC
 func (h HTLC) Validate() error {
-	if h.Sender.Empty() {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "sender missing")
+	_, err := sdk.AccAddressFromBech32(h.Sender)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
 
 	if len(h.To) == 0 {

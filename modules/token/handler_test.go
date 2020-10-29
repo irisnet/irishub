@@ -5,6 +5,7 @@ import (
 
 	"github.com/stretchr/testify/suite"
 
+	"github.com/tendermint/tendermint/crypto/tmhash"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -24,7 +25,7 @@ const (
 var (
 	nativeToken = types.GetNativeToken()
 	denom       = nativeToken.Symbol
-	owner       = sdk.AccAddress([]byte("tokenTest"))
+	owner       = sdk.AccAddress(tmhash.SumTruncated([]byte("tokenTest")))
 	initAmt     = sdk.NewIntWithDecimal(100000000, int(6))
 	initCoin    = sdk.Coins{sdk.NewCoin(denom, initAmt)}
 )

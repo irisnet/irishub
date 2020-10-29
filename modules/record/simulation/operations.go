@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"math/rand"
 
+	tmbytes "github.com/tendermint/tendermint/libs/bytes"
+
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/simapp/helpers"
@@ -53,14 +55,15 @@ func SimulateCreateRecord(ak types.AccountKeeper, bk types.BankKeeper) simtypes.
 			return simtypes.NoOpMsg(types.ModuleName, types.EventTypeCreateRecord, err.Error()), nil, err
 		}
 
-		msg := types.NewMsgCreateRecord(record.Contents, record.Creator)
+		creator, _ := sdk.AccAddressFromBech32(record.Creator)
+		msg := types.NewMsgCreateRecord(record.Contents, creator)
 
-		simAccount, found := simtypes.FindAccount(accs, record.Creator)
+		simAccount, found := simtypes.FindAccount(accs, creator)
 		if !found {
 			return simtypes.NoOpMsg(types.ModuleName, types.EventTypeCreateRecord, err.Error()), nil, fmt.Errorf("account %s not found", record.Creator)
 		}
 
-		account := ak.GetAccount(ctx, msg.Creator)
+		account := ak.GetAccount(ctx, creator)
 		spendable := bk.SpendableCoins(ctx, account.GetAddress())
 
 		fees, err := simtypes.RandomFees(r, ctx, spendable)
@@ -94,7 +97,7 @@ func genRecord(r *rand.Rand, accs []simtypes.Account) (types.Record, error) {
 		return record, err
 	}
 
-	record.TxHash = txHash
+	record.TxHash = tmbytes.HexBytes(txHash).String()
 
 	for i := 0; i <= r.Intn(10); i++ {
 		record.Contents = append(record.Contents, types.Content{
@@ -106,7 +109,7 @@ func genRecord(r *rand.Rand, accs []simtypes.Account) (types.Record, error) {
 	}
 
 	acc, _ := simtypes.RandomAcc(r, accs)
-	record.Creator = acc.Address
+	record.Creator = acc.Address.String()
 
 	return record, nil
 }

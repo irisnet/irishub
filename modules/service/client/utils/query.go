@@ -36,7 +36,7 @@ func QueryRequestContext(
 	}
 
 	if requestContext.Empty() {
-		return requestContext, fmt.Errorf("unknown request context: %s", hex.EncodeToString(params.RequestContextId))
+		return requestContext, fmt.Errorf("unknown request context: %s", params.RequestContextId)
 	}
 
 	return requestContext, nil
@@ -45,7 +45,12 @@ func QueryRequestContext(
 // QueryRequestContextByTxQuery will query for a single request context via a direct txs tags query.
 func QueryRequestContextByTxQuery(cliCtx client.Context, queryRoute string, params types.QueryRequestContextRequest) (
 	requestContext types.RequestContext, err error) {
-	txHash, _, err := types.SplitRequestContextID(params.RequestContextId)
+	requestContextId, err := hex.DecodeString(params.RequestContextId)
+	if err != nil {
+		return requestContext, err
+	}
+
+	txHash, _, err := types.SplitRequestContextID(requestContextId)
 	if err != nil {
 		return requestContext, err
 	}
@@ -64,7 +69,7 @@ I:
 			if event.Type == sdk.EventTypeMessage {
 				for _, attribute := range event.Attributes {
 					if attribute.Key == types.AttributeKeyRequestContextID &&
-						attribute.Value == params.RequestContextId.String() {
+						attribute.Value == params.RequestContextId {
 						msgIndex = i
 						found = true
 						break I
@@ -75,14 +80,27 @@ I:
 	}
 
 	if !found {
-		return requestContext, fmt.Errorf("unknown request context: %s", hex.EncodeToString(params.RequestContextId))
+		return requestContext, fmt.Errorf("unknown request context: %s", params.RequestContextId)
 	}
 
 	if len(txInfo.GetTx().GetMsgs()) > msgIndex {
 		if msg := txInfo.GetTx().GetMsgs()[msgIndex]; msg.Type() == types.TypeMsgCallService {
 			requestMsg := msg.(*types.MsgCallService)
+			consumer, err := sdk.AccAddressFromBech32(requestMsg.Consumer)
+			if err != nil {
+				return requestContext, fmt.Errorf("invalid consumer address: %s", consumer)
+			}
+			pds := make([]sdk.AccAddress, len(requestMsg.Providers))
+			for i, provider := range requestMsg.Providers {
+				pd, err := sdk.AccAddressFromBech32(provider)
+				if err != nil {
+					return requestContext, fmt.Errorf("invalid provider address: %s", provider)
+				}
+				pds[i] = pd
+			}
+
 			return types.NewRequestContext(
-				requestMsg.ServiceName, requestMsg.Providers, requestMsg.Consumer,
+				requestMsg.ServiceName, pds, consumer,
 				requestMsg.Input, requestMsg.ServiceFeeCap, requestMsg.Timeout,
 				requestMsg.SuperMode, requestMsg.Repeated, requestMsg.RepeatedFrequency,
 				requestMsg.RepeatedTotal, uint64(requestMsg.RepeatedTotal),
@@ -110,7 +128,7 @@ func QueryRequestByTxQuery(
 	requestContext, err := QueryRequestContext(
 		cliCtx,
 		queryRoute,
-		types.QueryRequestContextRequest{RequestContextId: contextID},
+		types.QueryRequestContextRequest{RequestContextId: contextID.String()},
 	)
 	if err != nil {
 		return request, err
@@ -148,17 +166,29 @@ func QueryRequestByTxQuery(
 
 				if len(requests) > int(batchRequestIndex) {
 					compactRequest := requests[batchRequestIndex]
+					provider, err := sdk.AccAddressFromBech32(compactRequest.Provider)
+					if err != nil {
+						return request, fmt.Errorf("invalid provider address: %s", provider)
+					}
+					consumer, err := sdk.AccAddressFromBech32(requestContext.Consumer)
+					if err != nil {
+						return request, fmt.Errorf("invalid consumer address: %s", consumer)
+					}
+					requestContextId, err := hex.DecodeString(compactRequest.RequestContextId)
+					if err != nil {
+						return request, err
+					}
 					return types.NewRequest(
 						requestID,
 						requestContext.ServiceName,
-						compactRequest.Provider,
-						requestContext.Consumer,
+						provider,
+						consumer,
 						requestContext.Input,
 						compactRequest.ServiceFee,
 						requestContext.SuperMode,
 						compactRequest.RequestHeight,
 						compactRequest.ExpirationHeight,
-						compactRequest.RequestContextId,
+						requestContextId,
 						compactRequest.RequestContextBatchCounter,
 					), nil
 				}
@@ -201,7 +231,7 @@ func QueryResponseByTxQuery(
 	requestContext, err := QueryRequestContext(
 		cliCtx,
 		queryRoute,
-		types.QueryRequestContextRequest{RequestContextId: contextID},
+		types.QueryRequestContextRequest{RequestContextId: contextID.String()},
 	)
 	if err != nil {
 		return response, err
@@ -210,11 +240,19 @@ func QueryResponseByTxQuery(
 	for _, msg := range result.Txs[0].GetTx().GetMsgs() {
 		if msg.Type() == types.TypeMsgRespondService {
 			responseMsg := msg.(*types.MsgRespondService)
-			if responseMsg.RequestId.String() != requestID.String() {
+			if responseMsg.RequestId != requestID.String() {
 				continue
 			}
+			provider, err := sdk.AccAddressFromBech32(responseMsg.Provider)
+			if err != nil {
+				return response, fmt.Errorf("invalid provider address: %s", provider)
+			}
+			consumer, err := sdk.AccAddressFromBech32(requestContext.Consumer)
+			if err != nil {
+				return response, fmt.Errorf("invalid consumer address: %s", consumer)
+			}
 			return types.NewResponse(
-				responseMsg.Provider, requestContext.Consumer,
+				provider, consumer,
 				responseMsg.Result, responseMsg.Output,
 				contextID, batchCounter,
 			), nil

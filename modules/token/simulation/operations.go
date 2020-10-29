@@ -96,13 +96,15 @@ func SimulateIssueToken(k keeper.Keeper, ak authkeeper.AccountKeeper, bk types.B
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
 
 		token, maxFees := genToken(ctx, r, k, ak, bk, accs)
-		msg := types.NewMsgIssueToken(token.Symbol, token.MinUnit, token.Name, token.Scale, token.InitialSupply, token.MaxSupply, token.Mintable, token.Owner)
+		msg := types.NewMsgIssueToken(token.Symbol, token.MinUnit, token.Name, token.Scale, token.InitialSupply, token.MaxSupply, token.Mintable, token.GetOwner())
 
-		simAccount, found := simtypes.FindAccount(accs, token.Owner)
+		simAccount, found := simtypes.FindAccount(accs, token.GetOwner())
 		if !found {
 			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), fmt.Sprintf("account %s not found", token.Owner)), nil, fmt.Errorf("account %s not found", token.Owner)
 		}
-		account := ak.GetAccount(ctx, msg.Owner)
+
+		owner, _ := sdk.AccAddressFromBech32(msg.Owner)
+		account := ak.GetAccount(ctx, owner)
 		fees, err := simtypes.RandomFees(r, ctx, maxFees)
 		if err != nil {
 			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to generate fees"), nil, err
@@ -146,7 +148,8 @@ func SimulateEditToken(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKee
 			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), fmt.Sprintf("account %s not found", token.GetOwner())), nil, fmt.Errorf("account %s not found", token.GetOwner())
 		}
 
-		account := ak.GetAccount(ctx, msg.Owner)
+		owner, _ := sdk.AccAddressFromBech32(msg.Owner)
+		account := ak.GetAccount(ctx, owner)
 		spendable := bk.SpendableCoins(ctx, account.GetAddress())
 
 		fees, err := simtypes.RandomFees(r, ctx, spendable)
@@ -193,7 +196,8 @@ func SimulateMintToken(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKee
 			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), fmt.Sprintf("account %s not found", token.GetOwner())), nil, fmt.Errorf("account %s not found", token.GetOwner())
 		}
 
-		account := ak.GetAccount(ctx, msg.Owner)
+		owner, _ := sdk.AccAddressFromBech32(msg.Owner)
+		account := ak.GetAccount(ctx, owner)
 		fees, err := simtypes.RandomFees(r, ctx, maxFee)
 		if err != nil {
 			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "unable to generate fees"), nil, err
@@ -242,7 +246,8 @@ func SimulateTransferTokenOwner(k keeper.Keeper, ak types.AccountKeeper, bk type
 			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), fmt.Sprintf("account %s not found", token.GetOwner())), nil, fmt.Errorf("account %s not found", token.GetOwner())
 		}
 
-		account := ak.GetAccount(ctx, msg.SrcOwner)
+		srcOwner, _ := sdk.AccAddressFromBech32(msg.SrcOwner)
+		account := ak.GetAccount(ctx, srcOwner)
 		spendable := bk.SpendableCoins(ctx, account.GetAddress())
 
 		fees, err := simtypes.RandomFees(r, ctx, spendable)
@@ -331,7 +336,7 @@ func genToken(ctx sdk.Context,
 	issueFee := k.GetTokenIssueFee(ctx, token.Symbol)
 
 	account, maxFees := filterAccount(ctx, r, ak, bk, accs, issueFee)
-	token.Owner = account
+	token.Owner = account.String()
 
 	return token, maxFees
 }
@@ -373,6 +378,6 @@ func randToken(r *rand.Rand, accs []simtypes.Account) types.Token {
 		InitialSupply: uint64(initialSupply),
 		MaxSupply:     uint64(maxSupply),
 		Mintable:      true,
-		Owner:         simAccount.Address,
+		Owner:         simAccount.Address.String(),
 	}
 }
