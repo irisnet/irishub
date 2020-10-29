@@ -18,12 +18,13 @@ func (k Keeper) GetExchangedPrice(
 ) (
 	sdk.Coins, string, error,
 ) {
-	pricing := k.GetPricing(ctx, binding.ServiceName, binding.Provider)
+	provider, _ := sdk.AccAddressFromBech32(binding.Provider)
+	pricing := k.GetPricing(ctx, binding.ServiceName, provider)
 
 	// get discounts
 	discountByTime := types.GetDiscountByTime(pricing, ctx.BlockTime())
 	discountByVolume := types.GetDiscountByVolume(
-		pricing, k.GetRequestVolume(ctx, consumer, binding.ServiceName, binding.Provider),
+		pricing, k.GetRequestVolume(ctx, consumer, binding.ServiceName, provider),
 	)
 
 	baseDenom := k.BaseDenom(ctx)
@@ -47,7 +48,7 @@ func (k Keeper) GetExchangedPrice(
 		if code, msg := CheckResult(result); code != "200" {
 			return nil, rawDenom, sdkerrors.Wrapf(types.ErrInvalidModuleService, msg)
 		}
-		outputBody := gjson.Get(output, "body").String()
+		outputBody := gjson.Get(output, types.PATH_BODY).String()
 		if err := types.ValidateResponseOutputBody(types.OraclePriceSchemas, outputBody); err != nil {
 			return nil, rawDenom, err
 		}

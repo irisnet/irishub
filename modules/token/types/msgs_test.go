@@ -5,19 +5,21 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/tendermint/tendermint/crypto/tmhash"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 var (
 	emptyAddr sdk.AccAddress
 
-	addr1 = sdk.AccAddress([]byte("addr1"))
-	addr2 = sdk.AccAddress([]byte("addr2"))
+	addr1 = sdk.AccAddress(tmhash.SumTruncated([]byte("addr1")))
+	addr2 = sdk.AccAddress(tmhash.SumTruncated([]byte("addr2")))
 )
 
 // test ValidateBasic for MsgIssueToken
 func TestMsgIssueAsset(t *testing.T) {
-	addr := sdk.AccAddress("test")
+	addr := sdk.AccAddress(tmhash.SumTruncated([]byte("test")))
 
 	tests := []struct {
 		testCase string
@@ -50,7 +52,7 @@ func TestMsgIssueAsset(t *testing.T) {
 
 // test ValidateBasic for MsgIssueToken
 func TestMsgEditToken(t *testing.T) {
-	owner := sdk.AccAddress([]byte("owner"))
+	owner := sdk.AccAddress(tmhash.SumTruncated([]byte("owner")))
 	mintable := False
 
 	tests := []struct {
@@ -92,7 +94,7 @@ func TestMsgEditTokenGetSignBytes(t *testing.T) {
 
 	var msg = MsgEditToken{
 		Name:      "BTC TOKEN",
-		Owner:     sdk.AccAddress([]byte("owner")),
+		Owner:     sdk.AccAddress(tmhash.SumTruncated([]byte("owner"))).String(),
 		Symbol:    "btc",
 		MaxSupply: 21000000,
 		Mintable:  mintable,
@@ -100,7 +102,7 @@ func TestMsgEditTokenGetSignBytes(t *testing.T) {
 
 	res := msg.GetSignBytes()
 
-	expected := `{"type":"irismod/token/MsgEditToken","value":{"max_supply":"21000000","mintable":"false","name":"BTC TOKEN","owner":"cosmos1damkuetjzyud4a","symbol":"btc"}}`
+	expected := `{"type":"irismod/token/MsgEditToken","value":{"max_supply":"21000000","mintable":"false","name":"BTC TOKEN","owner":"cosmos1fsgzj6t7udv8zhf6zj32mkqhcjcpv52ygswxa5","symbol":"btc"}}`
 	require.Equal(t, expected, string(res))
 }
 

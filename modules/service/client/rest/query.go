@@ -8,6 +8,8 @@ import (
 
 	"github.com/gorilla/mux"
 
+	tmbytes "github.com/tendermint/tendermint/libs/bytes"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/rest"
@@ -373,7 +375,7 @@ func queryRequestContextHandlerFn(cliCtx client.Context) http.HandlerFunc {
 		}
 
 		params := types.QueryRequestContextRequest{
-			RequestContextId: requestContextID,
+			RequestContextId: tmbytes.HexBytes(requestContextID).String(),
 		}
 
 		requestContext, err := serviceutils.QueryRequestContext(cliCtx, types.RouterKey, params)

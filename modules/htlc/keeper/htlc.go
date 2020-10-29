@@ -64,14 +64,19 @@ func (k Keeper) ClaimHTLC(ctx sdk.Context, hashLock tmbytes.HexBytes, secret tmb
 		return sdkerrors.Wrap(types.ErrInvalidSecret, secret.String())
 	}
 
+	to, err := sdk.AccAddressFromBech32(htlc.To)
+	if err != nil {
+		return err
+	}
+
 	// do the claim
-	err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, htlc.To, htlc.Amount)
+	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, to, htlc.Amount)
 	if err != nil {
 		return err
 	}
 
 	// update the secret and state of the HTLC
-	htlc.Secret = secret
+	htlc.Secret = secret.String()
 	htlc.State = types.Completed
 	k.SetHTLC(ctx, htlc, hashLock)
 
@@ -94,8 +99,13 @@ func (k Keeper) RefundHTLC(ctx sdk.Context, hashLock tmbytes.HexBytes) error {
 		return sdkerrors.Wrap(types.ErrHTLCNotExpired, hashLock.String())
 	}
 
+	sender, err := sdk.AccAddressFromBech32(htlc.Sender)
+	if err != nil {
+		return err
+	}
+
 	// do the refund
-	err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, htlc.Sender, htlc.Amount)
+	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, sender, htlc.Amount)
 	if err != nil {
 		return err
 	}

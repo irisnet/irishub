@@ -14,7 +14,7 @@ func (suite *KeeperSuite) TestSetCollection() {
 		Id:      denomID,
 		Name:    denomNm,
 		Schema:  schema,
-		Creator: address,
+		Creator: address.String(),
 	}
 
 	collection2 := types.Collection{

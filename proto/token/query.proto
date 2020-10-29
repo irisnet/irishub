@@ -14,20 +14,20 @@ option go_package = "github.com/irisnet/irismod/modules/token/types";
 // Query creates service with token as rpc
 service Query {
     // Token returns token with token name
-    rpc Token (QueryTokenRequest) returns (QueryTokenResponse) {
-      option (google.api.http).get = "/irismod/token/tokens/{denom}";
+    rpc Token(QueryTokenRequest) returns (QueryTokenResponse) {
+        option (google.api.http).get = "/irismod/token/tokens/{denom}";
     }
     // Tokens returns the token list
-    rpc Tokens (QueryTokensRequest) returns (QueryTokensResponse) {
-      option (google.api.http).get = "/irismod/token/tokens";
+    rpc Tokens(QueryTokensRequest) returns (QueryTokensResponse) {
+        option (google.api.http).get = "/irismod/token/tokens";
     }
     // Fees returns the fees to issue or mint a token
-    rpc Fees (QueryFeesRequest) returns (QueryFeesResponse) {
-      option (google.api.http).get = "/irismod/token/{symbol}/fees";
+    rpc Fees(QueryFeesRequest) returns (QueryFeesResponse) {
+        option (google.api.http).get = "/irismod/token/tokens/{symbol}/fees";
     }
     // Params queries the token parameters
-    rpc Params (QueryParamsRequest) returns (QueryParamsResponse) {
-      option (google.api.http).get = "/irismod/token/params";
+    rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
+        option (google.api.http).get = "/irismod/token/params";
     }
 }
 
@@ -43,7 +43,7 @@ message QueryTokenResponse {
 
 // QueryTokensRequest is request type for the Query/Tokens RPC method
 message QueryTokensRequest {
-    bytes owner = 1 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
+    string owner = 1;
 }
 
 // QueryTokensResponse is response type for the Query/Tokens RPC method

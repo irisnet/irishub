@@ -74,8 +74,9 @@ func (msg MsgSwapOrder) ValidateBasic() error {
 	if msg.Deadline <= 0 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, fmt.Sprintf("deadline %d must be greater than 0", msg.Deadline))
 	}
-	if msg.Input.Address.Empty() {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "input address missing")
+	_, err := sdk.AccAddressFromBech32(msg.Input.Address)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid input address (%s)", err)
 	}
 	return nil
 }
@@ -87,7 +88,11 @@ func (msg MsgSwapOrder) GetSignBytes() []byte {
 
 // GetSigners implements Msg.
 func (msg MsgSwapOrder) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{msg.Input.Address}
+	from, err := sdk.AccAddressFromBech32(msg.Input.Address)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{from}
 }
 
 /* --------------------------------------------------------------------------- */
@@ -107,7 +112,7 @@ func NewMsgAddLiquidity(
 		ExactStandardAmt: exactStandardAmt,
 		MinLiquidity:     minLiquidity,
 		Deadline:         deadline,
-		Sender:           sender,
+		Sender:           sender.String(),
 	}
 }
 
@@ -137,8 +142,9 @@ func (msg MsgAddLiquidity) ValidateBasic() error {
 	if msg.Deadline <= 0 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, fmt.Sprintf("deadline %d must be greater than 0", msg.Deadline))
 	}
-	if msg.Sender.Empty() {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "sender address missing")
+	_, err := sdk.AccAddressFromBech32(msg.Sender)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
 	return nil
 }
@@ -150,7 +156,11 @@ func (msg MsgAddLiquidity) GetSignBytes() []byte {
 
 // GetSigners implements Msg.
 func (msg MsgAddLiquidity) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{msg.Sender}
+	from, err := sdk.AccAddressFromBech32(msg.Sender)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{from}
 }
 
 /* --------------------------------------------------------------------------- */
@@ -170,7 +180,7 @@ func NewMsgRemoveLiquidity(
 		WithdrawLiquidity: withdrawLiquidity,
 		MinStandardAmt:    minStandardAmt,
 		Deadline:          deadline,
-		Sender:            sender,
+		Sender:            sender.String(),
 	}
 }
 
@@ -197,8 +207,9 @@ func (msg MsgRemoveLiquidity) ValidateBasic() error {
 	if msg.Deadline <= 0 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, fmt.Sprintf("deadline %d must be greater than 0", msg.Deadline))
 	}
-	if msg.Sender.Empty() {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "sender address missing")
+	_, err := sdk.AccAddressFromBech32(msg.Sender)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
 	return nil
 }
@@ -210,5 +221,9 @@ func (msg MsgRemoveLiquidity) GetSignBytes() []byte {
 
 // GetSigners implements Msg.
 func (msg MsgRemoveLiquidity) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{msg.Sender}
+	from, err := sdk.AccAddressFromBech32(msg.Sender)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{from}
 }

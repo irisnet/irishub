@@ -35,7 +35,7 @@ func queryRecord(ctx sdk.Context, k Keeper, req abci.RequestQuery, legacyQuerier
 	}
 
 	recordOutput := types.RecordOutput{
-		TxHash:   record.TxHash.String(),
+		TxHash:   record.TxHash,
 		Contents: record.Contents,
 		Creator:  record.Creator,
 	}

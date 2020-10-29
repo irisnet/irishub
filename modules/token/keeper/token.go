@@ -84,7 +84,7 @@ func (k Keeper) AddToken(ctx sdk.Context, token types.Token) error {
 	}
 
 	// Set token to be prefixed with owner
-	if err := k.setWithOwner(ctx, token.Owner, token.Symbol); err != nil {
+	if err := k.setWithOwner(ctx, token.GetOwner(), token.Symbol); err != nil {
 		return err
 	}
 
@@ -156,11 +156,21 @@ func (k Keeper) getToken(ctx sdk.Context, symbol string) (token types.Token, err
 func (k Keeper) resetStoreKeyForQueryToken(ctx sdk.Context, msg types.MsgTransferTokenOwner, token types.Token) error {
 	store := ctx.KVStore(k.storeKey)
 
+	srcOwner, err := sdk.AccAddressFromBech32(msg.SrcOwner)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid source owner address (%s)", err)
+	}
+
+	dstOwner, err := sdk.AccAddressFromBech32(msg.DstOwner)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid destination owner address (%s)", err)
+	}
+
 	// delete the old key
-	store.Delete(types.KeyTokens(msg.SrcOwner, token.Symbol))
+	store.Delete(types.KeyTokens(srcOwner, token.Symbol))
 
 	// add the new key
-	return k.setWithOwner(ctx, msg.DstOwner, token.Symbol)
+	return k.setWithOwner(ctx, dstOwner, token.Symbol)
 }
 
 // getTokenSupply query issued tokens supply from the total supply

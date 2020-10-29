@@ -28,18 +28,23 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 
 // handleMsgCreateRecord handles MsgCreateRecord
 func handleMsgCreateRecord(ctx sdk.Context, k keeper.Keeper, msg *types.MsgCreateRecord) (*sdk.Result, error) {
-	record := types.NewRecord(tmhash.Sum(ctx.TxBytes()), msg.Contents, msg.Creator)
+	creator, err := sdk.AccAddressFromBech32(msg.Creator)
+	if err != nil {
+		return nil, err
+	}
+
+	record := types.NewRecord(tmhash.Sum(ctx.TxBytes()), msg.Contents, creator)
 	recordId := k.AddRecord(ctx, record)
 
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator.String()),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
 		),
 		sdk.NewEvent(
 			types.EventTypeCreateRecord,
-			sdk.NewAttribute(types.AttributeKeyCreator, msg.Creator.String()),
+			sdk.NewAttribute(types.AttributeKeyCreator, msg.Creator),
 			sdk.NewAttribute(types.AttributeKeyRecordID, hex.EncodeToString(recordId)),
 		),
 	})

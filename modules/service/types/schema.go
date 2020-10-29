@@ -10,6 +10,8 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
+const PATH_BODY = "body"
+
 // ServiceSchemas defines the service schemas
 type ServiceSchemas struct {
 	Input  map[string]interface{} `json:"input"`

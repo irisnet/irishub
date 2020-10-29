@@ -1,11 +1,13 @@
 package keeper
 
 import (
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 
 	gogotypes "github.com/gogo/protobuf/types"
 
+	"github.com/tendermint/tendermint/crypto/tmhash"
 	tmbytes "github.com/tendermint/tendermint/libs/bytes"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -116,9 +118,7 @@ func (k Keeper) CreateRequestContext(
 		batchState, state, responseThreshold, moduleName,
 	)
 
-	txHash := ctx.Context().Value(types.TxHash).([]byte)
-	msgIndex := ctx.Context().Value(types.MsgIndex).(int64)
-	requestContextID := types.GenerateRequestContextID(txHash, msgIndex)
+	requestContextID := types.GenerateRequestContextID(TxHash(ctx), k.GetInternalIndex(ctx))
 	k.SetRequestContext(ctx, requestContextID, requestContext)
 
 	if requestContext.State == types.RUNNING {
@@ -140,6 +140,10 @@ func (k Keeper) UpdateRequestContext(
 	repeatedTotal int64,
 	consumer sdk.AccAddress,
 ) error {
+	pds := make([]string, len(providers))
+	for i, provider := range providers {
+		pds[i] = provider.String()
+	}
 	requestContext, found := k.GetRequestContext(ctx, requestContextID)
 	if !found {
 		return sdkerrors.Wrap(types.ErrUnknownRequestContext, requestContextID.String())
@@ -165,8 +169,8 @@ func (k Keeper) UpdateRequestContext(
 			respThreshold = requestContext.ResponseThreshold
 		}
 
-		if len(providers) == 0 {
-			providers = requestContext.Providers
+		if len(pds) == 0 {
+			pds = requestContext.Providers
 		}
 
 		if respThreshold > uint32(len(providers)) {
@@ -208,7 +212,7 @@ func (k Keeper) UpdateRequestContext(
 	}
 
 	if len(providers) > 0 {
-		requestContext.Providers = providers
+		requestContext.Providers = pds
 	}
 
 	if timeout > 0 {
@@ -382,14 +386,16 @@ func (k Keeper) InitiateRequests(
 	requestContext, _ := k.GetRequestContext(ctx, requestContextID)
 	requestContext.BatchCounter++
 
-	requests := []types.CompactRequest{}
-	requestIDs := []tmbytes.HexBytes{}
+	var requests []types.CompactRequest
+	var requestIDs []tmbytes.HexBytes
+
+	consumer, _ := sdk.AccAddressFromBech32(requestContext.Consumer)
 
 	for providerIndex, provider := range providers {
 		request := k.buildRequest(
 			ctx, requestContextID, requestContext.BatchCounter,
 			requestContext.ServiceName, provider, requestContext.SuperMode,
-			requestContext.Consumer, requestContext.Timeout,
+			consumer, requestContext.Timeout,
 		)
 
 		requestID := types.GenerateRequestID(requestContextID, requestContext.BatchCounter, ctx.BlockHeight(), int16(providerIndex))
@@ -507,22 +513,37 @@ func (k Keeper) GetRequest(ctx sdk.Context, requestID tmbytes.HexBytes) (request
 		return request, false
 	}
 
-	requestContext, found := k.GetRequestContext(ctx, compactRequest.RequestContextId)
+	provider, err := sdk.AccAddressFromBech32(compactRequest.Provider)
+	if err != nil {
+		return request, false
+	}
+
+	requestContextId, err := hex.DecodeString(compactRequest.RequestContextId)
+	if err != nil {
+		return request, false
+	}
+
+	requestContext, found := k.GetRequestContext(ctx, requestContextId)
 	if !found {
+		return request, false
+	}
+
+	consumer, err := sdk.AccAddressFromBech32(requestContext.Consumer)
+	if err != nil {
 		return request, false
 	}
 
 	return types.NewRequest(
 		requestID,
 		requestContext.ServiceName,
-		compactRequest.Provider,
-		requestContext.Consumer,
+		provider,
+		consumer,
 		requestContext.Input,
 		compactRequest.ServiceFee,
 		requestContext.SuperMode,
 		compactRequest.RequestHeight,
 		compactRequest.ExpirationHeight,
-		compactRequest.RequestContextId,
+		requestContextId,
 		compactRequest.RequestContextBatchCounter,
 	), true
 }
@@ -804,7 +825,12 @@ func (k Keeper) FilterServiceProviders(
 					return nil, nil, rawDenom, err
 				}
 
-				price := k.GetPricing(ctx, binding.ServiceName, binding.Provider).Price
+				provider, err := sdk.AccAddressFromBech32(binding.Provider)
+				if err != nil {
+					return nil, nil, rawDenom, fmt.Errorf("invalid provider address: %s", provider)
+				}
+
+				price := k.GetPricing(ctx, binding.ServiceName, provider).Price
 				if exchangedPrice.IsAllLTE(serviceFeeCap) {
 					newProviders = append(newProviders, provider)
 					totalPrices = totalPrices.Add(price...)
@@ -826,15 +852,16 @@ func (k Keeper) GetPrice(
 	consumer sdk.AccAddress,
 	binding types.ServiceBinding,
 ) sdk.Coins {
-	pricing := k.GetPricing(ctx, binding.ServiceName, binding.Provider)
+	provider, _ := sdk.AccAddressFromBech32(binding.Provider)
+	pricing := k.GetPricing(ctx, binding.ServiceName, provider)
 
 	// get discounts
 	discountByTime := types.GetDiscountByTime(pricing, ctx.BlockTime())
 	discountByVolume := types.GetDiscountByVolume(
-		pricing, k.GetRequestVolume(ctx, consumer, binding.ServiceName, binding.Provider),
+		pricing, k.GetRequestVolume(ctx, consumer, binding.ServiceName, provider),
 	)
 
-	price := []sdk.Coin{}
+	var price []sdk.Coin
 	for _, token := range pricing.Price {
 		priceAmount := sdk.NewDecFromInt(token.Amount).Mul(discountByTime).Mul(discountByVolume)
 		price = append(price, sdk.NewCoin(token.Denom, priceAmount.TruncateInt()))
@@ -860,7 +887,8 @@ func (k Keeper) AddResponse(
 		return request, response, sdkerrors.Wrap(types.ErrUnknownRequest, requestID.String())
 	}
 
-	if !provider.Equals(request.Provider) {
+	requestProvider, _ := sdk.AccAddressFromBech32(request.Provider)
+	if !provider.Equals(requestProvider) {
 		return request, response, sdkerrors.Wrap(types.ErrInvalidResponse, "provider does not match")
 	}
 
@@ -876,13 +904,14 @@ func (k Keeper) AddResponse(
 		return request, response, err
 	}
 
-	requestContextID := request.RequestContextId
+	requestContextID, _ := hex.DecodeString(request.RequestContextId)
+	consumer, _ := sdk.AccAddressFromBech32(request.Consumer)
 
-	response = types.NewResponse(provider, request.Consumer, result, output, requestContextID, request.RequestContextBatchCounter)
+	response = types.NewResponse(provider, consumer, result, output, requestContextID, request.RequestContextBatchCounter)
 	k.SetResponse(ctx, requestID, response)
 
 	k.DeleteActiveRequest(ctx, request.ServiceName, provider, request.ExpirationHeight, requestID)
-	k.IncreaseRequestVolume(ctx, request.Consumer, request.ServiceName, provider)
+	k.IncreaseRequestVolume(ctx, consumer, request.ServiceName, provider)
 
 	requestContext, _ := k.GetRequestContext(ctx, requestContextID)
 	requestContext.BatchResponseCount++
@@ -1039,7 +1068,8 @@ func (k Keeper) GetRequestVolume(
 // Note: ensure that the request is valid
 func (k Keeper) Slash(ctx sdk.Context, requestID tmbytes.HexBytes) error {
 	request, _ := k.GetRequest(ctx, requestID)
-	binding, _ := k.GetServiceBinding(ctx, request.ServiceName, request.Provider)
+	provider, _ := sdk.AccAddressFromBech32(request.Provider)
+	binding, _ := k.GetServiceBinding(ctx, request.ServiceName, provider)
 
 	slashFraction := k.SlashFraction(ctx)
 	baseDenom := k.BaseDenom(ctx)
@@ -1059,7 +1089,7 @@ func (k Keeper) Slash(ctx sdk.Context, requestID tmbytes.HexBytes) error {
 
 	binding.Deposit = deposit
 	if binding.Available {
-		minDeposit := k.getMinDeposit(ctx, k.GetPricing(ctx, binding.ServiceName, binding.Provider))
+		minDeposit := k.getMinDeposit(ctx, k.GetPricing(ctx, binding.ServiceName, provider))
 		if !binding.Deposit.IsAllGTE(minDeposit) {
 			binding.Available = false
 			binding.DisabledTime = ctx.BlockHeader().Time
@@ -1072,7 +1102,7 @@ func (k Keeper) Slash(ctx sdk.Context, requestID tmbytes.HexBytes) error {
 		sdk.NewEvent(
 			types.EventTypeServiceSlash,
 			sdk.NewAttribute(types.AttributeKeyRequestID, requestID.String()),
-			sdk.NewAttribute(types.AttributeKeyProvider, request.Provider.String()),
+			sdk.NewAttribute(types.AttributeKeyProvider, request.Provider),
 			sdk.NewAttribute(types.AttributeKeySlashedCoins, slashedCoins.String()),
 		),
 	})
@@ -1092,7 +1122,9 @@ func (k Keeper) CheckAuthority(
 		return sdkerrors.Wrap(types.ErrUnknownRequestContext, requestContextID.String())
 	}
 
-	if !consumer.Equals(requestContext.Consumer) {
+	consumer, _ = sdk.AccAddressFromBech32(requestContext.Consumer)
+
+	if !consumer.Equals(consumer) {
 		return sdkerrors.Wrapf(types.ErrNotAuthorized, "consumer not matching")
 	}
 
@@ -1151,4 +1183,32 @@ func (k Keeper) validateServiceFeeCap(ctx sdk.Context, serviceFeeCap sdk.Coins) 
 	}
 
 	return nil
+}
+
+func TxHash(ctx sdk.Context) []byte {
+	return tmhash.Sum(ctx.TxBytes())
+}
+
+//  GetInternalIndex sets the internal index
+func (k Keeper) SetInternalIndex(ctx sdk.Context, index int64) {
+	store := ctx.KVStore(k.storeKey)
+
+	bz := k.cdc.MustMarshalBinaryBare(&gogotypes.Int64Value{
+		Value: index,
+	})
+	store.Set(types.InternalCounterKey, bz)
+}
+
+// GetInternalIndex returns the internal index and increases the internal index + 1
+func (k Keeper) GetInternalIndex(ctx sdk.Context) int64 {
+	store := ctx.KVStore(k.storeKey)
+	bz := store.Get(types.InternalCounterKey)
+	if bz == nil {
+		return 0
+	}
+
+	var index gogotypes.Int64Value
+	k.cdc.MustUnmarshalBinaryBare(bz, &index)
+	k.SetInternalIndex(ctx, index.Value+1)
+	return index.Value
 }

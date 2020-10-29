@@ -205,8 +205,8 @@ func swapOrderHandlerFn(cliCtx client.Context, isBuyOrder bool) http.HandlerFunc
 			return
 		}
 
-		input := types.Input{Address: senderAddress, Coin: req.Input.Coin}
-		output := types.Output{Address: recipientAddress, Coin: req.Output.Coin}
+		input := types.Input{Address: senderAddress.String(), Coin: req.Input.Coin}
+		output := types.Output{Address: recipientAddress.String(), Coin: req.Output.Coin}
 
 		status, e := cliCtx.Client.Status(context.Background())
 		if e != nil {

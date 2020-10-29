@@ -4,78 +4,63 @@ package irismod.htlc;
 import "cosmos_proto/coin.proto";
 import "gogoproto/gogo.proto";
 
-option go_package                       = "github.com/irisnet/irismod/modules/htlc/types";
-option (gogoproto.goproto_getters_all)  = false;
+option go_package = "github.com/irisnet/irismod/modules/htlc/types";
+option (gogoproto.goproto_getters_all) = false;
 
 // MsgCreateHTLC defines a message to create an HTLC
 message MsgCreateHTLC {
-  option (gogoproto.equal) = true;
+    option (gogoproto.equal) = true;
 
-  bytes  sender                  = 1 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
-  bytes  to                      = 2 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
-  string receiver_on_other_chain = 3 [(gogoproto.moretags) = "yaml:\"receiver_on_other_chain\""];
-  repeated cosmos.base.v1beta1.Coin amount = 4 [
-    (gogoproto.nullable)     = false,
-    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
-  ];
-  bytes hash_lock = 5 [
-    (gogoproto.casttype) = "github.com/tendermint/tendermint/libs/bytes.HexBytes",
-    (gogoproto.moretags) = "yaml:\"hash_lock\""
-  ];
-  uint64 timestamp = 6;
-  uint64 time_lock = 7 [(gogoproto.moretags) = "yaml:\"time_lock\""];
+    string sender = 1;
+    string to = 2;
+    string receiver_on_other_chain = 3 [(gogoproto.moretags) = "yaml:\"receiver_on_other_chain\""];
+    repeated cosmos.base.v1beta1.Coin amount = 4 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
+    string hash_lock = 5 [(gogoproto.moretags) = "yaml:\"hash_lock\""];
+    uint64 timestamp = 6;
+    uint64 time_lock = 7 [(gogoproto.moretags) = "yaml:\"time_lock\""];
 }
 
 // MsgClaimHTLC defines a message to claim an HTLC
 message MsgClaimHTLC {
-  option (gogoproto.equal) = true;
+    option (gogoproto.equal) = true;
 
-  bytes sender    = 1 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
-  bytes hash_lock = 2 [
-    (gogoproto.casttype) = "github.com/tendermint/tendermint/libs/bytes.HexBytes",
-    (gogoproto.moretags) = "yaml:\"hash_lock\""
-  ];
-  bytes secret = 3 [(gogoproto.casttype) = "github.com/tendermint/tendermint/libs/bytes.HexBytes"];
+    string sender = 1;
+    string hash_lock = 2 [(gogoproto.moretags) = "yaml:\"hash_lock\""];
+    string secret = 3;
 }
 
 // MsgRefundHTLC defines a message to refund an HTLC
 message MsgRefundHTLC {
-  option (gogoproto.equal) = true;
+    option (gogoproto.equal) = true;
 
-  bytes sender    = 1 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
-  bytes hash_lock = 2 [
-    (gogoproto.casttype) = "github.com/tendermint/tendermint/libs/bytes.HexBytes",
-    (gogoproto.moretags) = "yaml:\"hash_lock\""
-  ];
+    string sender = 1;
+    string hash_lock = 2 [(gogoproto.moretags) = "yaml:\"hash_lock\""];
 }
 
 // HTLC defines a struct for an HTLC
 message HTLC {
-  option (gogoproto.equal) = true;
+    option (gogoproto.equal) = true;
 
-  bytes  sender                  = 1 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
-  bytes  to                      = 2 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
-  string receiver_on_other_chain = 3 [(gogoproto.moretags) = "yaml:\"receiver_on_other_chain\""];
-  repeated cosmos.base.v1beta1.Coin amount = 4 [
-    (gogoproto.nullable)     = false,
-    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
-  ];
-  bytes     secret            = 5 [(gogoproto.casttype) = "github.com/tendermint/tendermint/libs/bytes.HexBytes"];
-  uint64    timestamp         = 6;
-  uint64    expiration_height = 7 [(gogoproto.moretags) = "yaml:\"expiration_height\""];
-  HTLCState state             = 8;
+    string sender = 1;
+    string to = 2;
+    string receiver_on_other_chain = 3 [(gogoproto.moretags) = "yaml:\"receiver_on_other_chain\""];
+    repeated cosmos.base.v1beta1.Coin amount = 4 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
+    string secret = 5;
+    uint64 timestamp = 6;
+    uint64 expiration_height = 7 [(gogoproto.moretags) = "yaml:\"expiration_height\""];
+    HTLCState state = 8;
 }
 
 // HTLCState defines a state for an HTLC
 enum HTLCState {
-  option (gogoproto.goproto_enum_prefix)   = false;
+    option (gogoproto.goproto_enum_prefix) = false;
 
-  // HTLC_STATE_OPEN defines an open state.
-  HTLC_STATE_OPEN = 0 [(gogoproto.enumvalue_customname) = "Open"];
-  // HTLC_STATE_COMPLETED defines a completed state.
-  HTLC_STATE_COMPLETED = 1 [(gogoproto.enumvalue_customname) = "Completed"];
-  // HTLC_STATE_EXPIRED defines an expired state.
-  HTLC_STATE_EXPIRED = 2 [(gogoproto.enumvalue_customname) = "Expired"];
-  // HTLC_STATE_REFUNDED defines a refunded state.
-  HTLC_STATE_REFUNDED = 3 [(gogoproto.enumvalue_customname) = "Refunded"];
+    // HTLC_STATE_OPEN defines an open state.
+    HTLC_STATE_OPEN = 0 [(gogoproto.enumvalue_customname) = "Open"];
+    // HTLC_STATE_COMPLETED defines a completed state.
+    HTLC_STATE_COMPLETED = 1 [(gogoproto.enumvalue_customname) = "Completed"];
+    // HTLC_STATE_EXPIRED defines an expired state.
+    HTLC_STATE_EXPIRED = 2 [(gogoproto.enumvalue_customname) = "Expired"];
+    // HTLC_STATE_REFUNDED defines a refunded state.
+    HTLC_STATE_REFUNDED = 3 [(gogoproto.enumvalue_customname) = "Refunded"];
 }

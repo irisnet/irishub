@@ -12,6 +12,12 @@ import (
 	"github.com/irisnet/irismod/modules/service/types"
 )
 
+// BeginBlocker handles block beginning logic for service
+func BeginBlocker(ctx sdk.Context, k keeper.Keeper) {
+	ctx = ctx.WithLogger(ctx.Logger().With("handler", "endBlock").With("module", "irismod/service"))
+	k.SetInternalIndex(ctx, 0)
+}
+
 // EndBlocker handles block ending logic for service
 func EndBlocker(ctx sdk.Context, k keeper.Keeper) {
 	ctx = ctx.WithLogger(ctx.Logger().With("handler", "endBlock").With("module", "irismod/service"))
@@ -20,10 +26,12 @@ func EndBlocker(ctx sdk.Context, k keeper.Keeper) {
 	expiredRequestHandler := func(requestID tmbytes.HexBytes, request types.Request) {
 		if !request.SuperMode {
 			_ = k.Slash(ctx, requestID)
-			_ = k.RefundServiceFee(ctx, request.Consumer, request.ServiceFee)
+			consumer, _ := sdk.AccAddressFromBech32(request.Consumer)
+			_ = k.RefundServiceFee(ctx, consumer, request.ServiceFee)
 		}
 
-		k.DeleteActiveRequest(ctx, request.ServiceName, request.Provider, request.ExpirationHeight, requestID)
+		provider, _ := sdk.AccAddressFromBech32(request.Provider)
+		k.DeleteActiveRequest(ctx, request.ServiceName, provider, request.ExpirationHeight, requestID)
 	}
 
 	// handler for the expired request batch
@@ -56,14 +64,21 @@ func EndBlocker(ctx sdk.Context, k keeper.Keeper) {
 
 	// handler for the new request batch
 	newRequestBatchHandler := func(requestContextID tmbytes.HexBytes, requestContext *types.RequestContext) {
+		consumer, _ := sdk.AccAddressFromBech32(requestContext.Consumer)
+		providers := make([]sdk.AccAddress, len(requestContext.Providers))
+		for i, provider := range requestContext.Providers {
+			pd, _ := sdk.AccAddressFromBech32(provider)
+			providers[i] = pd
+		}
+
 		if requestContext.State == types.RUNNING {
 			providers, totalPrices, rawDenom, err := k.FilterServiceProviders(
 				ctx,
 				requestContext.ServiceName,
-				requestContext.Providers,
+				providers,
 				requestContext.Timeout,
 				requestContext.ServiceFeeCap,
-				requestContext.Consumer,
+				consumer,
 			)
 			if err != nil {
 				ctx.EventManager().EmitEvents(sdk.Events{
@@ -77,7 +92,7 @@ func EndBlocker(ctx sdk.Context, k keeper.Keeper) {
 
 			if len(providers) > 0 && len(providers) >= int(requestContext.ResponseThreshold) {
 				if !requestContext.SuperMode {
-					if err := k.DeductServiceFees(ctx, requestContext.Consumer, totalPrices); err != nil {
+					if err := k.DeductServiceFees(ctx, consumer, totalPrices); err != nil {
 						k.OnRequestContextPaused(ctx, requestContext, requestContextID, "insufficient balances")
 					}
 				}

@@ -7,6 +7,8 @@ import (
 
 	"github.com/spf13/cobra"
 
+	tmbytes "github.com/tendermint/tendermint/libs/bytes"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 
@@ -49,7 +51,7 @@ func GetCmdQueryRecord() *cobra.Command {
 			queryClient := types.NewQueryClient(clientCtx)
 			res, err := queryClient.Record(
 				context.Background(),
-				&types.QueryRecordRequest{RecordId: recordID},
+				&types.QueryRecordRequest{RecordId: tmbytes.HexBytes(recordID).String()},
 			)
 			if err != nil {
 				return err

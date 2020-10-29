@@ -12,11 +12,9 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
-	servicetypes "github.com/irisnet/irismod/modules/service/types"
-
-	"github.com/irisnet/irismod/modules/service/exported"
-
 	"github.com/irisnet/irismod/modules/random/types"
+	"github.com/irisnet/irismod/modules/service/exported"
+	servicetypes "github.com/irisnet/irismod/modules/service/types"
 )
 
 // RequestService request the service for oracle seed
@@ -41,11 +39,11 @@ func (k Keeper) RequestService(ctx sdk.Context, consumer sdk.AccAddress, service
 	}
 
 	rand.Seed(time.Now().UnixNano())
-	provider := []sdk.AccAddress{bindings[rand.Intn(len(bindings))].Provider}
+	provider, _ := sdk.AccAddressFromBech32(bindings[rand.Intn(len(bindings))].Provider)
 	timeout := k.serviceKeeper.GetParams(ctx).MaxRequestTimeout
 
 	return k.serviceKeeper.CreateRequestContext(
-		ctx, types.ServiceName, provider, consumer, `{"header":{}}`, serviceFeeCap,
+		ctx, types.ServiceName, []sdk.AccAddress{provider}, consumer, `{"header":{}}`, serviceFeeCap,
 		timeout, false, false, 0, 0, exported.PAUSED, 1, types.ModuleName,
 	)
 }
@@ -104,9 +102,18 @@ func (k Keeper) HandlerResponse(ctx sdk.Context, requestContextID tmbytes.HexByt
 		return
 	}
 
-	result := gjson.Get(responseOutput[0], types.ServiceValueJSONPath)
+	outputBody := gjson.Get(responseOutput[0], servicetypes.PATH_BODY).String()
+	if err := servicetypes.ValidateResponseOutputBody(types.ServiceSchemas, outputBody); err != nil {
+		ctx.Logger().Error(
+			"invalid output body",
+			"body", outputBody,
+			"err", err.Error(),
+		)
+		return
+	}
 
-	seed, err := hex.DecodeString(result.String())
+	seedStr := gjson.Get(outputBody, types.ServiceValueJSONPath).String()
+	seed, err := hex.DecodeString(seedStr)
 	if err != nil || len(seed) != types.SeedBytesLength {
 		ctx.Logger().Error(
 			"invalid seed",

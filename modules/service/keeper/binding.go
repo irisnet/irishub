@@ -105,17 +105,26 @@ func (k Keeper) SetServiceBindingForGenesis(
 	ctx sdk.Context,
 	svcBinding types.ServiceBinding,
 ) error {
+	provider, err := sdk.AccAddressFromBech32(svcBinding.Provider)
+	if err != nil {
+		return err
+	}
+	owner, err := sdk.AccAddressFromBech32(svcBinding.Owner)
+	if err != nil {
+		return err
+	}
+
 	k.SetServiceBinding(ctx, svcBinding)
 	k.SetOwnerServiceBinding(ctx, svcBinding)
-	k.SetOwner(ctx, svcBinding.Provider, svcBinding.Owner)
-	k.SetOwnerProvider(ctx, svcBinding.Owner, svcBinding.Provider)
+	k.SetOwner(ctx, provider, owner)
+	k.SetOwnerProvider(ctx, owner, provider)
 
 	pricing, err := k.ParsePricing(ctx, svcBinding.Pricing)
 	if err != nil {
 		return err
 	}
 
-	k.SetPricing(ctx, svcBinding.ServiceName, svcBinding.Provider, pricing)
+	k.SetPricing(ctx, svcBinding.ServiceName, provider, pricing)
 
 	return nil
 }
@@ -136,7 +145,12 @@ func (k Keeper) UpdateServiceBinding(
 		return sdkerrors.Wrap(types.ErrUnknownServiceBinding, "")
 	}
 
-	if !owner.Equals(binding.Owner) {
+	bindingOwner, err := sdk.AccAddressFromBech32(binding.Owner)
+	if err != nil {
+		return err
+	}
+
+	if !owner.Equals(bindingOwner) {
 		return sdkerrors.Wrap(types.ErrNotAuthorized, "owner not matching")
 	}
 
@@ -191,6 +205,15 @@ func (k Keeper) UpdateServiceBinding(
 		updated = true
 	}
 
+	// update options
+	if len(options) != 0 {
+		if err := types.ValidateOptions(options); err != nil {
+			return err
+		}
+		binding.Options = options
+		updated = true
+	}
+
 	// only check deposit when the binding is available and updated
 	if binding.Available && updated {
 		minDeposit := k.getMinDeposit(ctx, parsedPricing)
@@ -229,7 +252,12 @@ func (k Keeper) DisableServiceBinding(
 		return sdkerrors.Wrap(types.ErrUnknownServiceBinding, "")
 	}
 
-	if !owner.Equals(binding.Owner) {
+	bindingOwner, err := sdk.AccAddressFromBech32(binding.Owner)
+	if err != nil {
+		return err
+	}
+
+	if !owner.Equals(bindingOwner) {
 		return sdkerrors.Wrap(types.ErrNotAuthorized, "owner not matching")
 	}
 
@@ -258,7 +286,12 @@ func (k Keeper) EnableServiceBinding(
 		return sdkerrors.Wrap(types.ErrUnknownServiceBinding, "")
 	}
 
-	if !owner.Equals(binding.Owner) {
+	bindingOwner, err := sdk.AccAddressFromBech32(binding.Owner)
+	if err != nil {
+		return err
+	}
+
+	if !owner.Equals(bindingOwner) {
 		return sdkerrors.Wrap(types.ErrNotAuthorized, "owner not matching")
 	}
 
@@ -308,7 +341,12 @@ func (k Keeper) RefundDeposit(ctx sdk.Context, serviceName string, provider, own
 		return sdkerrors.Wrap(types.ErrUnknownServiceBinding, "")
 	}
 
-	if !owner.Equals(binding.Owner) {
+	bindingOwner, err := sdk.AccAddressFromBech32(binding.Owner)
+	if err != nil {
+		return err
+	}
+
+	if !owner.Equals(bindingOwner) {
 		return sdkerrors.Wrap(types.ErrNotAuthorized, "owner not matching")
 	}
 
@@ -329,7 +367,7 @@ func (k Keeper) RefundDeposit(ctx sdk.Context, serviceName string, provider, own
 
 	// Send coins from the deposit module account to the owner's account
 	if err := k.bankKeeper.SendCoinsFromModuleToAccount(
-		ctx, types.DepositAccName, binding.Owner, binding.Deposit,
+		ctx, types.DepositAccName, bindingOwner, binding.Deposit,
 	); err != nil {
 		return err
 	}
@@ -349,8 +387,13 @@ func (k Keeper) RefundDeposits(ctx sdk.Context) error {
 		var binding types.ServiceBinding
 		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &binding)
 
+		bindingOwner, err := sdk.AccAddressFromBech32(binding.Owner)
+		if err != nil {
+			return err
+		}
+
 		if err := k.bankKeeper.SendCoinsFromModuleToAccount(
-			ctx, types.DepositAccName, binding.Owner, binding.Deposit,
+			ctx, types.DepositAccName, bindingOwner, binding.Deposit,
 		); err != nil {
 			return err
 		}
@@ -363,8 +406,9 @@ func (k Keeper) RefundDeposits(ctx sdk.Context) error {
 func (k Keeper) SetServiceBinding(ctx sdk.Context, svcBinding types.ServiceBinding) {
 	store := ctx.KVStore(k.storeKey)
 
+	provider, _ := sdk.AccAddressFromBech32(svcBinding.Provider)
 	bz := k.cdc.MustMarshalBinaryBare(&svcBinding)
-	store.Set(types.GetServiceBindingKey(svcBinding.ServiceName, svcBinding.Provider), bz)
+	store.Set(types.GetServiceBindingKey(svcBinding.ServiceName, provider), bz)
 }
 
 // GetServiceBinding retrieves the specified service binding
@@ -387,7 +431,9 @@ func (k Keeper) GetServiceBinding(
 // SetOwnerServiceBinding sets the owner service binding
 func (k Keeper) SetOwnerServiceBinding(ctx sdk.Context, svcBinding types.ServiceBinding) {
 	store := ctx.KVStore(k.storeKey)
-	store.Set(types.GetOwnerServiceBindingKey(svcBinding.Owner, svcBinding.ServiceName, svcBinding.Provider), []byte{})
+	owner, _ := sdk.AccAddressFromBech32(svcBinding.Owner)
+	provider, _ := sdk.AccAddressFromBech32(svcBinding.Provider)
+	store.Set(types.GetOwnerServiceBindingKey(owner, svcBinding.ServiceName, provider), []byte{})
 }
 
 // GetOwnerServiceBindings retrieves the service bindings with the specified service name and owner

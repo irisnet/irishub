@@ -27,10 +27,10 @@ var (
 
 	mockReqCtxID = []byte("mockRequest")
 	responses    = []string{
-		`{"last":100,"high":100,"low":50}`,
-		`{"last":100,"high":200,"low":50}`,
-		`{"last":100,"high":300,"low":50}`,
-		`{"last":100,"high":400,"low":50}`,
+		`{"header":{},"body":{"last":100,"high":100,"low":50}}`,
+		`{"header":{},"body":{"last":100,"high":200,"low":50}}`,
+		`{"header":{},"body":{"last":100,"high":300,"low":50}}`,
+		`{"header":{},"body":{"last":100,"high":400,"low":50}}`,
 	}
 )
 
@@ -256,10 +256,15 @@ func (m MockServiceKeeper) CreateRequestContext(
 	respThreshold uint32,
 	moduleName string,
 ) (tmbytes.HexBytes, error) {
+	pds := make([]string, len(providers))
+	for i, provider := range providers {
+		pds[i] = provider.String()
+	}
+
 	reqCtx := exported.RequestContext{
 		ServiceName:       serviceName,
-		Providers:         providers,
-		Consumer:          consumer,
+		Providers:         pds,
+		Consumer:          consumer.String(),
 		Input:             input,
 		ServiceFeeCap:     serviceFeeCap,
 		Timeout:           timeout,

@@ -56,9 +56,9 @@ func GetCmdDefineService() *cobra.Command {
 		Long:  "Define a new service based on the given params.",
 		Example: fmt.Sprintf(
 			"$ %s tx service define "+
-				"--name=<service name> "+
-				"--description=<service description> "+
-				"--author-description=<author description> "+
+				"--name=<service-name> "+
+				"--description=<service-description> "+
+				"--author-description=<author-description> "+
 				"--tags=<tag1,tag2,...> "+
 				"--schemas=<schemas content or path/to/schemas.json> "+
 				"--from mykey",
@@ -327,17 +327,26 @@ func GetCmdUpdateServiceBinding() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			if !json.Valid([]byte(options)) {
-				optionsContent, err := ioutil.ReadFile(options)
-				if err != nil {
-					return fmt.Errorf("invalid options: neither JSON input nor path to .json file were provided")
+			if len(options) != 0 {
+				if !json.Valid([]byte(options)) {
+					optionsContent, err := ioutil.ReadFile(options)
+					if err != nil {
+						return fmt.Errorf("invalid options: neither JSON input nor path to .json file were provided")
+					}
+
+					if !json.Valid(optionsContent) {
+						return fmt.Errorf("invalid options: .json file content is invalid JSON")
+					}
+
+					options = string(optionsContent)
 				}
 
-				if !json.Valid(optionsContent) {
-					return fmt.Errorf("invalid options: .json file content is invalid JSON")
+				buf := bytes.NewBuffer([]byte{})
+				if err := json.Compact(buf, []byte(options)); err != nil {
+					return fmt.Errorf("failed to compact the options")
 				}
 
-				options = string(optionsContent)
+				options = buf.String()
 			}
 
 			msg := types.NewMsgUpdateServiceBinding(args[0], provider, deposit, pricing, qos, options, owner)
@@ -530,7 +539,7 @@ func GetCmdCallService() *cobra.Command {
 		Example: fmt.Sprintf(
 			"$ %s tx service call "+
 				"--service-name=<service-name> "+
-				"--providers=<provider list> "+
+				"--providers=<provider-list> "+
 				"--service-fee-cap=1stake "+
 				"--data=<input content or path/to/input.json> "+
 				"--timeout=100 "+

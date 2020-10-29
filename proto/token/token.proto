@@ -12,23 +12,17 @@ message MsgIssueToken {
     string symbol = 1;
     string name = 2;
     uint32 scale = 3;
-    string min_unit = 4 [ (gogoproto.moretags) = "yaml:\"min_unit\"" ];
-    uint64 initial_supply = 5 [ (gogoproto.moretags) = "yaml:\"initial_supply\"" ];
-    uint64 max_supply = 6 [ (gogoproto.moretags) = "yaml:\"max_supply\"" ];
+    string min_unit = 4 [(gogoproto.moretags) = "yaml:\"min_unit\""];
+    uint64 initial_supply = 5 [(gogoproto.moretags) = "yaml:\"initial_supply\""];
+    uint64 max_supply = 6 [(gogoproto.moretags) = "yaml:\"max_supply\""];
     bool mintable = 7;
-    bytes owner = 8 [ (gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress" ];
+    string owner = 8;
 }
 
 // MsgMintToken defines an SDK message for transferring the token owner.
 message MsgTransferTokenOwner {
-    bytes src_owner = 1 [
-        (gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress",
-        (gogoproto.moretags) = "yaml:\"src_owner\""
-    ];
-    bytes dst_owner = 2 [
-        (gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress",
-        (gogoproto.moretags) = "yaml:\"dst_owner\""
-    ];
+    string src_owner = 1 [(gogoproto.moretags) = "yaml:\"src_owner\""];
+    string dst_owner = 2 [(gogoproto.moretags) = "yaml:\"dst_owner\""];
     string symbol = 3;
 }
 
@@ -36,17 +30,17 @@ message MsgTransferTokenOwner {
 message MsgEditToken {
     string symbol = 1;
     string name = 2;
-    uint64 max_supply = 3 [ (gogoproto.moretags) = "yaml:\"max_supply\"" ];
-    string mintable = 4 [ (gogoproto.casttype) = "Bool" ];
-    bytes owner = 5 [ (gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress" ];
+    uint64 max_supply = 3 [(gogoproto.moretags) = "yaml:\"max_supply\""];
+    string mintable = 4 [(gogoproto.casttype) = "Bool"];
+    string owner = 5;
 }
 
 // MsgMintToken defines an SDK message for minting a new token.
 message MsgMintToken {
     string symbol = 1;
     uint64 amount = 2;
-    bytes to = 3 [ (gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress" ];
-    bytes owner = 4 [ (gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress" ];
+    string to = 3;
+    string owner = 4;
 }
 
 // Token defines a standard for the fungible token
@@ -57,11 +51,11 @@ message Token {
     string symbol = 1;
     string name = 2;
     uint32 scale = 3;
-    string min_unit = 4 [ (gogoproto.moretags) = "yaml:\"min_unit\"" ];
-    uint64 initial_supply = 5 [ (gogoproto.moretags) = "yaml:\"initial_supply\"" ];
-    uint64 max_supply = 6 [ (gogoproto.moretags) = "yaml:\"max_supply\"" ];
+    string min_unit = 4 [(gogoproto.moretags) = "yaml:\"min_unit\""];
+    uint64 initial_supply = 5 [(gogoproto.moretags) = "yaml:\"initial_supply\""];
+    uint64 max_supply = 6 [(gogoproto.moretags) = "yaml:\"max_supply\""];
     bool mintable = 7;
-    bytes owner = 8 [ (gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress" ];
+    string owner = 8;
 }
 
 // token parameters
@@ -69,20 +63,9 @@ message Params {
     option (gogoproto.equal) = true;
     option (gogoproto.goproto_stringer) = false;
 
-    string token_tax_rate = 1 [
-        (gogoproto.moretags) = "yaml:\"token_tax_rate\"",
-        (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
-        (gogoproto.nullable) = false
-    ];
+    string token_tax_rate = 1 [(gogoproto.moretags) = "yaml:\"token_tax_rate\"", (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
 
-    cosmos.base.v1beta1.Coin issue_token_base_fee = 2 [
-        (gogoproto.moretags) = "yaml:\"issue_token_base_fee\"",
-        (gogoproto.nullable) = false
-    ];
+    cosmos.base.v1beta1.Coin issue_token_base_fee = 2 [(gogoproto.moretags) = "yaml:\"issue_token_base_fee\"", (gogoproto.nullable) = false];
 
-    string mint_token_fee_ratio = 3 [
-        (gogoproto.moretags) = "yaml:\"mint_token_fee_ratio\"",
-        (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
-        (gogoproto.nullable) = false
-    ];
+    string mint_token_fee_ratio = 3 [(gogoproto.moretags) = "yaml:\"mint_token_fee_ratio\"", (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
 }

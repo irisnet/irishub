@@ -36,7 +36,7 @@ func GetCmdQueryRandom() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "random [request-id]",
 		Short:   "Query a random number by the request id",
-		Example: fmt.Sprintf("%s query random random <request id>", version.AppName),
+		Example: fmt.Sprintf("%s query random random <request-id>", version.AppName),
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)

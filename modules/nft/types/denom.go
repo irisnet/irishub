@@ -13,7 +13,7 @@ func NewDenom(id, name, schema string, creator sdk.AccAddress) Denom {
 		Id:      id,
 		Name:    name,
 		Schema:  schema,
-		Creator: creator,
+		Creator: creator.String(),
 	}
 }
 
