@@ -49,8 +49,8 @@ func GetCmdCreateFeed() *cobra.Command {
 				`--providers=<provide1_address>,<provider2_address> `+
 				`--service-fee-cap=1iris `+
 				`--timeout=2 `+
-				`--total=10 `+
 				`--threshold=1 `+
+				`--frequency=12 `+
 				`--aggregate-func="avg" `+
 				`--value-json-path="high"`,
 			version.AppName,
@@ -263,7 +263,6 @@ func GetCmdEditFeed() *cobra.Command {
 				`--timeout=2 `+
 				`--frequency=10 `+
 				`--threshold=5 `+
-				`--threshold=1`,
 			version.AppName,
 		),
 		RunE: func(cmd *cobra.Command, args []string) error {
