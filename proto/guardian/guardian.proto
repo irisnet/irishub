@@ -5,53 +5,33 @@ import "gogoproto/gogo.proto";
 
 option go_package = "github.com/irisnet/irishub/modules/guardian/types";
 
-// MsgAddProfiler defines an sdk.Msg type that supports adding profiler
-message MsgAddProfiler {
-    AddGuardian add_guardian = 1 [ (gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"add_guardian\"" ];
-}
-
-// MsgDeleteProfiler defines an sdk.Msg type that supports deleting profiler
-message MsgDeleteProfiler {
-    DeleteGuardian delete_guardian = 1 [ (gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"delete_guardian\"" ];
-}
-
-// MsgAddTrustee defines an sdk.Msg type that supports adding trustee
-message MsgAddTrustee {
-    AddGuardian add_guardian = 1 [ (gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"add_guardian\"" ];
-}
-
-// MsgDeleteTrustee defines an sdk.Msg type that supports deleting trustee
-message MsgDeleteTrustee {
-    DeleteGuardian delete_guardian = 1 [ (gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"delete_guardian\"" ];
-}
-
-// AddGuardian defines the properties of add guardian message
-message AddGuardian {
+// AddSuper defines the properties of add super account message
+message MsgAddSuper {
     string description = 1;
-    bytes address = 2 [ (gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress" ];
-    bytes added_by = 3 [ (gogoproto.moretags) = "yaml:\"added_by\"", (gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress" ];
+    string address = 2;
+    string added_by = 3;
 }
 
-// DeleteGuardian defines the properties of delete guardian message
-message DeleteGuardian {
-    bytes address = 2 [ (gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress" ];
-    bytes deleted_by = 3 [ (gogoproto.moretags) = "yaml:\"deleted_by\"", (gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress" ];
+// DeleteSuper defines the properties of delete super account message
+message MsgDeleteSuper {
+    string address = 2;
+    string deleted_by = 3;
 }
 
-// Guardian defines the guardian standard
-message Guardian {
+// Super defines the super standard
+message Super {
     string description = 1;
-    AccountType account_type = 2 [ (gogoproto.moretags) = "yaml:\"account_type\"" ];
-    bytes address = 3 [ (gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress" ];
-    bytes added_by = 4 [ (gogoproto.moretags) = "yaml:\"added_by\"", (gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress" ];
+    AccountType account_type = 2 [(gogoproto.moretags) = "yaml:\"account_type\""];
+    string address = 3;
+    string added_by = 4;
 }
 
-// AccountType defines the guardian account type
+// AccountType defines the super account type
 enum AccountType {
     option (gogoproto.goproto_enum_prefix) = false;
 
     // GENESIS defines a genesis account type
-    GENESIS = 0 [ (gogoproto.enumvalue_customname) = "Genesis" ];
+    GENESIS = 0 [(gogoproto.enumvalue_customname) = "Genesis"];
     // ORDINARY defines a ordinary account type
-    ORDINARY = 1 [ (gogoproto.enumvalue_customname) = "Ordinary" ];
+    ORDINARY = 1 [(gogoproto.enumvalue_customname) = "Ordinary"];
 }
