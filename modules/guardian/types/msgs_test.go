@@ -32,50 +32,51 @@ func init() {
 }
 
 // ----------------------------------------------
-// test MsgAddProfiler
+// test MsgAddSuper
 // ----------------------------------------------
 
-func TestNewMsgAddProfiler(t *testing.T) {
-	addGuardian := AddGuardian{description, testAddr, sender}
-	msg := NewMsgAddProfiler(description, testAddr, sender)
-	require.Equal(t, addGuardian, msg.AddGuardian)
+func TestNewMsgAddSuper(t *testing.T) {
+	msg := NewMsgAddSuper(description, testAddr, sender)
+	require.Equal(t, description, msg.Description)
+	require.Equal(t, testAddr.String(), msg.Address)
+	require.Equal(t, sender.String(), msg.AddedBy)
 }
 
-func TestMsgAddProfilerRoute(t *testing.T) {
-	msg := NewMsgAddProfiler(description, testAddr, sender)
+func TestMsgAddSuperRoute(t *testing.T) {
+	msg := NewMsgAddSuper(description, testAddr, sender)
 	require.Equal(t, RouterKey, msg.Route())
 }
 
-func TestMsgAddProfilerType(t *testing.T) {
-	msg := NewMsgAddProfiler(description, testAddr, sender)
-	require.Equal(t, TypeMsgAddProfiler, msg.Type())
+func TestMsgAddSuperType(t *testing.T) {
+	msg := NewMsgAddSuper(description, testAddr, sender)
+	require.Equal(t, TypeMsgAddSuper, msg.Type())
 }
 
-func TestMsgAddProfilerGetSignBytes(t *testing.T) {
-	msg := NewMsgAddProfiler(description, testAddr, sender)
+func TestMsgAddSuperGetSignBytes(t *testing.T) {
+	msg := NewMsgAddSuper(description, testAddr, sender)
 	res := msg.GetSignBytes()
-	expected := `{"type":"irishub/guardian/MsgAddProfiler","value":{"add_guardian":{"added_by":"iaa1pgm8hyk0pvphmlvfjc8wsvk4daluz5tgwp4wlf","address":"iaa1n7rdpqvgf37ktx30a2sv2kkszk3m7ncmakdj4g","description":"description"}}}`
+	expected := `{"type":"irishub/guardian/MsgAddSuper","value":{"added_by":"iaa1pgm8hyk0pvphmlvfjc8wsvk4daluz5tgwp4wlf","address":"iaa1n7rdpqvgf37ktx30a2sv2kkszk3m7ncmakdj4g","description":"description"}}`
 	require.Equal(t, expected, string(res))
 }
 
-func TestMsgAddProfilerGetSigners(t *testing.T) {
-	msg := NewMsgAddProfiler(description, testAddr, sender)
+func TestMsgAddSuperGetSigners(t *testing.T) {
+	msg := NewMsgAddSuper(description, testAddr, sender)
 	res := msg.GetSigners()
 	expected := "[0A367B92CF0B037DFD89960EE832D56F7FC15168]"
 	require.Equal(t, expected, fmt.Sprintf("%v", res))
 }
 
-// test ValidateBasic for MsgAddProfiler
-func TestMsgAddProfilerValidation(t *testing.T) {
+// test ValidateBasic for MsgAddSuper
+func TestMsgAddSuperValidation(t *testing.T) {
 	tests := []struct {
 		name       string
 		expectPass bool
-		msg        *MsgAddProfiler
+		msg        *MsgAddSuper
 	}{
-		{"pass", true, NewMsgAddProfiler(description, testAddr, sender)},
-		{"invalid Description", false, NewMsgAddProfiler(nilDescription, testAddr, sender)},
-		{"invalid Address", false, NewMsgAddProfiler(description, nilAddr, sender)},
-		{"invalid AddedBy", false, NewMsgAddProfiler(description, testAddr, nilAddr)},
+		{"pass", true, NewMsgAddSuper(description, testAddr, sender)},
+		{"invalid Description", false, NewMsgAddSuper(nilDescription, testAddr, sender)},
+		{"invalid Address", false, NewMsgAddSuper(description, nilAddr, sender)},
+		{"invalid AddedBy", false, NewMsgAddSuper(description, testAddr, nilAddr)},
 	}
 
 	for _, tc := range tests {
@@ -91,166 +92,49 @@ func TestMsgAddProfilerValidation(t *testing.T) {
 }
 
 // ----------------------------------------------
-// test MsgDeleteProfiler
+// test MsgDeleteSuper
 // ----------------------------------------------
 
-func TestNewMsgDeleteProfiler(t *testing.T) {
-	deleteGuardian := DeleteGuardian{testAddr, sender}
-	msg := NewMsgDeleteProfiler(testAddr, sender)
-	require.Equal(t, deleteGuardian, msg.DeleteGuardian)
+func TestNewMsgDeleteSuper(t *testing.T) {
+	msg := NewMsgDeleteSuper(testAddr, sender)
+	require.Equal(t, testAddr.String(), msg.Address)
+	require.Equal(t, sender.String(), msg.DeletedBy)
 }
 
-func TestMsgDeleteProfilerRoute(t *testing.T) {
-	msg := NewMsgDeleteProfiler(testAddr, sender)
+func TestMsgDeleteSuperRoute(t *testing.T) {
+	msg := NewMsgDeleteSuper(testAddr, sender)
 	require.Equal(t, RouterKey, msg.Route())
 }
 
-func TestMsgDeleteProfilerType(t *testing.T) {
-	msg := NewMsgDeleteProfiler(testAddr, sender)
-	require.Equal(t, TypeMsgDeleteProfiler, msg.Type())
+func TestMsgDeleteSuperType(t *testing.T) {
+	msg := NewMsgDeleteSuper(testAddr, sender)
+	require.Equal(t, TypeMsgDeleteSuper, msg.Type())
 }
 
-func TestMsgDeleteProfilerGetSignBytes(t *testing.T) {
-	msg := NewMsgDeleteProfiler(testAddr, sender)
+func TestMsgDeleteSuperGetSignBytes(t *testing.T) {
+	msg := NewMsgDeleteSuper(testAddr, sender)
 	res := msg.GetSignBytes()
-	expected := `{"type":"irishub/guardian/MsgDeleteProfiler","value":{"delete_guardian":{"address":"iaa1n7rdpqvgf37ktx30a2sv2kkszk3m7ncmakdj4g","deleted_by":"iaa1pgm8hyk0pvphmlvfjc8wsvk4daluz5tgwp4wlf"}}}`
+	expected := `{"type":"irishub/guardian/MsgDeleteSuper","value":{"address":"iaa1n7rdpqvgf37ktx30a2sv2kkszk3m7ncmakdj4g","deleted_by":"iaa1pgm8hyk0pvphmlvfjc8wsvk4daluz5tgwp4wlf"}}`
 	require.Equal(t, expected, string(res))
 }
 
-func TestMsgDeleteProfilerGetSigners(t *testing.T) {
-	msg := NewMsgDeleteProfiler(testAddr, sender)
+func TestMsgDeleteSuperGetSigners(t *testing.T) {
+	msg := NewMsgDeleteSuper(testAddr, sender)
 	res := msg.GetSigners()
 	expected := "[0A367B92CF0B037DFD89960EE832D56F7FC15168]"
 	require.Equal(t, expected, fmt.Sprintf("%v", res))
 }
 
-// test ValidateBasic for MsgDeleteProfiler
-func TestMsgDeleteProfilerValidation(t *testing.T) {
+// test ValidateBasic for MsgDeleteSuper
+func TestMsgDeleteSuperValidation(t *testing.T) {
 	tests := []struct {
 		name       string
 		expectPass bool
-		msg        *MsgDeleteProfiler
+		msg        *MsgDeleteSuper
 	}{
-		{"pass", true, NewMsgDeleteProfiler(testAddr, sender)},
-		{"invalid Address", false, NewMsgDeleteProfiler(nilAddr, sender)},
-		{"invalid DeletedBy", false, NewMsgDeleteProfiler(testAddr, nilAddr)},
-	}
-
-	for _, tc := range tests {
-		t.Run(tc.name, func(t *testing.T) {
-			err := tc.msg.ValidateBasic()
-			if tc.expectPass {
-				require.NoError(t, err)
-			} else {
-				require.Error(t, err)
-			}
-		})
-	}
-}
-
-// ----------------------------------------------
-// test MsgAddTrustee
-// ----------------------------------------------
-
-func TestNewMsgAddTrustee(t *testing.T) {
-	addGuardian := AddGuardian{description, testAddr, sender}
-	msg := NewMsgAddTrustee(description, testAddr, sender)
-	require.Equal(t, addGuardian, msg.AddGuardian)
-}
-
-func TestMsgAddTrusteeRoute(t *testing.T) {
-	msg := NewMsgAddTrustee(description, testAddr, sender)
-	require.Equal(t, RouterKey, msg.Route())
-}
-
-func TestMsgAddTrusteeType(t *testing.T) {
-	msg := NewMsgAddTrustee(description, testAddr, sender)
-	require.Equal(t, TypeMsgAddTrustee, msg.Type())
-}
-
-func TestMsgAddTrusteeGetSignBytes(t *testing.T) {
-	msg := NewMsgAddTrustee(description, testAddr, sender)
-	res := msg.GetSignBytes()
-	expected := `{"type":"irishub/guardian/MsgAddTrustee","value":{"add_guardian":{"added_by":"iaa1pgm8hyk0pvphmlvfjc8wsvk4daluz5tgwp4wlf","address":"iaa1n7rdpqvgf37ktx30a2sv2kkszk3m7ncmakdj4g","description":"description"}}}`
-	require.Equal(t, expected, string(res))
-}
-
-func TestMsgAddTrusteeGetSigners(t *testing.T) {
-	msg := NewMsgAddTrustee(description, testAddr, sender)
-	res := msg.GetSigners()
-	expected := "[0A367B92CF0B037DFD89960EE832D56F7FC15168]"
-	require.Equal(t, expected, fmt.Sprintf("%v", res))
-}
-
-// test ValidateBasic for MsgAddTrustee
-func TestMsgAddTrusteeValidation(t *testing.T) {
-	tests := []struct {
-		name       string
-		expectPass bool
-		msg        *MsgAddTrustee
-	}{
-		{"pass", true, NewMsgAddTrustee(description, testAddr, sender)},
-		{"invalid Description", false, NewMsgAddTrustee(nilDescription, testAddr, sender)},
-		{"invalid Address", false, NewMsgAddTrustee(description, nilAddr, sender)},
-		{"invalid AddedBy", false, NewMsgAddTrustee(description, testAddr, nilAddr)},
-	}
-
-	for _, tc := range tests {
-		t.Run(tc.name, func(t *testing.T) {
-			err := tc.msg.ValidateBasic()
-			if tc.expectPass {
-				require.NoError(t, err)
-			} else {
-				require.Error(t, err)
-			}
-		})
-	}
-}
-
-// ----------------------------------------------
-// test MsgDeleteTrustee
-// ----------------------------------------------
-
-func TestNewMsgDeleteTrustee(t *testing.T) {
-	deleteGuardian := DeleteGuardian{testAddr, sender}
-	msg := NewMsgDeleteTrustee(testAddr, sender)
-	require.Equal(t, deleteGuardian, msg.DeleteGuardian)
-}
-
-func TestMsgDeleteTrusteeRoute(t *testing.T) {
-	msg := NewMsgDeleteTrustee(testAddr, sender)
-	require.Equal(t, RouterKey, msg.Route())
-}
-
-func TestMsgDeleteTrusteeType(t *testing.T) {
-	msg := NewMsgDeleteTrustee(testAddr, sender)
-	require.Equal(t, TypeMsgDeleteTrustee, msg.Type())
-}
-
-func TestMsgDeleteTrusteeGetSignBytes(t *testing.T) {
-	msg := NewMsgDeleteTrustee(testAddr, sender)
-	res := msg.GetSignBytes()
-	expected := `{"type":"irishub/guardian/MsgDeleteTrustee","value":{"delete_guardian":{"address":"iaa1n7rdpqvgf37ktx30a2sv2kkszk3m7ncmakdj4g","deleted_by":"iaa1pgm8hyk0pvphmlvfjc8wsvk4daluz5tgwp4wlf"}}}`
-	require.Equal(t, expected, string(res))
-}
-
-func TestMsgDeleteTrusteeGetSigners(t *testing.T) {
-	msg := NewMsgDeleteTrustee(testAddr, sender)
-	res := msg.GetSigners()
-	expected := "[0A367B92CF0B037DFD89960EE832D56F7FC15168]"
-	require.Equal(t, expected, fmt.Sprintf("%v", res))
-}
-
-// test ValidateBasic for MsgDeleteTrustee
-func TestMsgDeleteTrusteeValidation(t *testing.T) {
-	tests := []struct {
-		name       string
-		expectPass bool
-		msg        *MsgDeleteTrustee
-	}{
-		{"pass", true, NewMsgDeleteTrustee(testAddr, sender)},
-		{"invalid Address", false, NewMsgDeleteTrustee(nilAddr, sender)},
-		{"invalid DeletedBy", false, NewMsgDeleteTrustee(testAddr, nilAddr)},
+		{"pass", true, NewMsgDeleteSuper(testAddr, sender)},
+		{"invalid Address", false, NewMsgDeleteSuper(nilAddr, sender)},
+		{"invalid DeletedBy", false, NewMsgDeleteSuper(testAddr, nilAddr)},
 	}
 
 	for _, tc := range tests {

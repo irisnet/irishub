@@ -54,101 +54,55 @@ func TestKeeperTestSuite(t *testing.T) {
 	suite.Run(t, new(KeeperTestSuite))
 }
 
-func (suite *KeeperTestSuite) TestAddProfiler() {
-	profiler := types.NewGuardian("test", types.Genesis, addrs[0], addrs[1])
+func (suite *KeeperTestSuite) TestAddSuper() {
+	super := types.NewSuper("test", types.Genesis, addrs[0], addrs[1])
 
-	suite.keeper.AddProfiler(suite.ctx, profiler)
-	addedProfiler, found := suite.keeper.GetProfiler(suite.ctx, addrs[0])
+	suite.keeper.AddSuper(suite.ctx, super)
+	addedSuper, found := suite.keeper.GetSuper(suite.ctx, addrs[0])
 	suite.True(found)
-	suite.True(profiler.Equal(addedProfiler))
+	suite.True(super.Equal(addedSuper))
 
-	var profilers []types.Guardian
-	suite.keeper.IterateProfilers(
+	var supers []types.Super
+	suite.keeper.IterateSupers(
 		suite.ctx,
-		func(profiler types.Guardian) bool {
-			profilers = append(profilers, profiler)
+		func(super types.Super) bool {
+			supers = append(supers, super)
 			return false
 		},
 	)
 
-	suite.Equal(1, len(profilers))
-	suite.Contains(profilers, profiler)
+	suite.Equal(1, len(supers))
+	suite.Contains(supers, super)
 }
 
-func (suite *KeeperTestSuite) TestDeleteProfiler() {
-	profiler := types.NewGuardian("test", types.Genesis, addrs[0], addrs[1])
+func (suite *KeeperTestSuite) TestDeleteSuper() {
+	super := types.NewSuper("test", types.Genesis, addrs[0], addrs[1])
 
-	suite.keeper.AddProfiler(suite.ctx, profiler)
-	addedProfiler, found := suite.keeper.GetProfiler(suite.ctx, addrs[0])
+	suite.keeper.AddSuper(suite.ctx, super)
+	addedSuper, found := suite.keeper.GetSuper(suite.ctx, addrs[0])
 	suite.True(found)
-	suite.True(profiler.Equal(addedProfiler))
+	suite.True(super.Equal(addedSuper))
 
-	suite.keeper.DeleteProfiler(suite.ctx, profiler.Address)
+	address, _ := sdk.AccAddressFromBech32(super.Address)
+	suite.keeper.DeleteSuper(suite.ctx, address)
 
-	_, found = suite.keeper.GetProfiler(suite.ctx, addrs[0])
+	_, found = suite.keeper.GetSuper(suite.ctx, addrs[0])
 	suite.False(found)
 }
 
-func (suite *KeeperTestSuite) TestAddTrustee() {
-	trustee := types.NewGuardian("test", types.Genesis, addrs[0], addrs[1])
-	suite.keeper.AddTrustee(suite.ctx, trustee)
-	addedTrustee, found := suite.keeper.GetTrustee(suite.ctx, addrs[0])
-	suite.True(found)
-	suite.True(trustee.Equal(addedTrustee))
+func (suite *KeeperTestSuite) TestQuerySupers() {
+	super := types.NewSuper("test", types.Genesis, addrs[0], addrs[1])
+	suite.keeper.AddSuper(suite.ctx, super)
 
-	var trustees []types.Guardian
-	suite.keeper.IterateTrustees(
-		suite.ctx,
-		func(trustee types.Guardian) bool {
-			trustees = append(trustees, trustee)
-			return false
-		},
-	)
-	suite.Equal(1, len(trustees))
-	suite.Contains(trustees, trustee)
-}
-
-func (suite *KeeperTestSuite) TestDeleteTrustee() {
-	trustee := types.NewGuardian("test", types.Genesis, addrs[0], addrs[1])
-	suite.keeper.AddTrustee(suite.ctx, trustee)
-	addedTrustee, found := suite.keeper.GetTrustee(suite.ctx, addrs[0])
-	suite.True(found)
-	suite.True(trustee.Equal(addedTrustee))
-
-	suite.keeper.DeleteTrustee(suite.ctx, trustee.Address)
-	_, found = suite.keeper.GetProfiler(suite.ctx, trustee.Address)
-	suite.False(found)
-
-}
-
-func (suite *KeeperTestSuite) TestQueryProfilers() {
-	profiler := types.NewGuardian("test", types.Genesis, addrs[0], addrs[1])
-	suite.keeper.AddProfiler(suite.ctx, profiler)
-
-	var profilers []types.Guardian
+	var supers []types.Super
 	querier := keeper.NewQuerier(suite.keeper, suite.cdc)
-	res, sdkErr := querier(suite.ctx, []string{types.QueryProfilers}, abci.RequestQuery{})
+	res, sdkErr := querier(suite.ctx, []string{types.QuerySupers}, abci.RequestQuery{})
 	suite.NoError(sdkErr)
 
-	err := suite.cdc.UnmarshalJSON(res, &profilers)
+	err := suite.cdc.UnmarshalJSON(res, &supers)
 	suite.NoError(err)
-	suite.Len(profilers, 1)
-	suite.Contains(profilers, profiler)
-}
-
-func (suite *KeeperTestSuite) TestQueryTrustees() {
-	trustee := types.NewGuardian("test", types.Genesis, addrs[0], addrs[1])
-	suite.keeper.AddTrustee(suite.ctx, trustee)
-
-	var trustees []types.Guardian
-	querier := keeper.NewQuerier(suite.keeper, suite.cdc)
-	res, sdkErr := querier(suite.ctx, []string{types.QueryTrustees}, abci.RequestQuery{})
-	suite.NoError(sdkErr)
-
-	err := suite.cdc.UnmarshalJSON(res, &trustees)
-	suite.NoError(err)
-	suite.Len(trustees, 1)
-	suite.Contains(trustees, trustee)
+	suite.Len(supers, 1)
+	suite.Contains(supers, super)
 }
 
 func newPubKey(pk string) (res crypto.PubKey) {

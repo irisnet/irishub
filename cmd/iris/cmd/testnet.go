@@ -281,12 +281,11 @@ func initGenFiles(
 	clientCtx.JSONMarshaler.MustUnmarshalJSON(appGenState[guardiantypes.ModuleName], &guardianGenState)
 
 	for _, account := range genAccounts {
-		guardian := guardiantypes.NewGuardian(
+		guardian := guardiantypes.NewSuper(
 			"genesis", guardiantypes.Genesis,
 			account.GetAddress(), account.GetAddress(),
 		)
-		guardianGenState.Profilers = append(guardianGenState.Profilers, guardian)
-		guardianGenState.Trustees = append(guardianGenState.Trustees, guardian)
+		guardianGenState.Supers = append(guardianGenState.Supers, guardian)
 	}
 	appGenState[guardiantypes.ModuleName] = clientCtx.JSONMarshaler.MustMarshalJSON(&guardianGenState)
 
