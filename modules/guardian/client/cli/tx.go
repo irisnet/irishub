@@ -25,21 +25,19 @@ func NewTxCmd() *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 	txCmd.AddCommand(
-		GetCmdCreateProfiler(),
-		GetCmdDeleteProfiler(),
-		GetCmdCreateTrustee(),
-		GetCmdDeleteTrustee(),
+		GetCmdCreateSuper(),
+		GetCmdDeleteSuper(),
 	)
 	return txCmd
 }
 
-// GetCmdCreateProfiler implements the create profiler command.
-func GetCmdCreateProfiler() *cobra.Command {
+// GetCmdCreateSuper implements the create super command.
+func GetCmdCreateSuper() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "add-profiler",
-		Short: "Add a new profiler",
+		Use:   "add-super",
+		Short: "Add a new super",
 		Example: fmt.Sprintf(
-			"%s tx guardian add-profiler --chain-id=<chain-id> --from=<key-name> --fees=0.3iris --address=<added address> --description=<name>",
+			"%s tx guardian add-super --chain-id=<chain-id> --from=<key-name> --fees=0.3iris --address=<added address> --description=<name>",
 			version.AppName,
 		),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -60,7 +58,7 @@ func GetCmdCreateProfiler() *cobra.Command {
 				return err
 			}
 			description := viper.GetString(FlagDescription)
-			msg := types.NewMsgAddProfiler(description, pAddr, fromAddr)
+			msg := types.NewMsgAddSuper(description, pAddr, fromAddr)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -75,13 +73,13 @@ func GetCmdCreateProfiler() *cobra.Command {
 	return cmd
 }
 
-// GetCmdDeleteProfiler implements the delete profiler command.
-func GetCmdDeleteProfiler() *cobra.Command {
+// GetCmdDeleteSuper implements the delete super command.
+func GetCmdDeleteSuper() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "delete-profiler",
-		Short: "Delete a profiler",
+		Use:   "delete-super",
+		Short: "Delete a super",
 		Example: fmt.Sprintf(
-			"%s tx guardian delete-profiler --chain-id=<chain-id> --from=<key-name> --fees=0.3iris --address=<deleted address>",
+			"%s tx guardian delete-super --chain-id=<chain-id> --from=<key-name> --fees=0.3iris --address=<deleted address>",
 			version.AppName,
 		),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -97,83 +95,7 @@ func GetCmdDeleteProfiler() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			msg := types.NewMsgDeleteProfiler(pAddr, fromAddr)
-			if err := msg.ValidateBasic(); err != nil {
-				return err
-			}
-
-			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
-		},
-	}
-	cmd.Flags().AddFlagSet(FsDeleteGuardian)
-	_ = cmd.MarkFlagRequired(FlagAddress)
-	flags.AddTxFlagsToCmd(cmd)
-	return cmd
-}
-
-// GetCmdCreateTrustee implements the create trustee command.
-func GetCmdCreateTrustee() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "add-trustee",
-		Short: "Add a new trustee",
-		Example: fmt.Sprintf(
-			"%s tx guardian add-trustee --chain-id=<chain-id> --from=<key-name> --fees=0.3iris --address=<added address> --description=<name>",
-			version.AppName,
-		),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := client.GetClientContextFromCmd(cmd)
-			clientCtx, err := client.ReadTxCommandFlags(clientCtx, cmd.Flags())
-			if err != nil {
-				return err
-			}
-
-			fromAddr := clientCtx.GetFromAddress()
-			taStr := viper.GetString(FlagAddress)
-			if len(taStr) == 0 {
-				return fmt.Errorf("must use --address flag")
-			}
-			tAddr, err := sdk.AccAddressFromBech32(taStr)
-			if err != nil {
-				return err
-			}
-			description := viper.GetString(FlagDescription)
-			msg := types.NewMsgAddTrustee(description, tAddr, fromAddr)
-			if err := msg.ValidateBasic(); err != nil {
-				return err
-			}
-
-			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
-		},
-	}
-	cmd.Flags().AddFlagSet(FsAddGuardian)
-	_ = cmd.MarkFlagRequired(FlagDescription)
-	flags.AddTxFlagsToCmd(cmd)
-	return cmd
-}
-
-// GetCmdDeleteTrustee implements the delete trustee command.
-func GetCmdDeleteTrustee() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "delete-trustee",
-		Short: "Delete a trustee",
-		Example: fmt.Sprintf(
-			"%s tx guardian delete-trustee --chain-id=<chain-id> --from=<key-name> --fees=0.3iris --address=<deleted address>",
-			version.AppName,
-		),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := client.GetClientContextFromCmd(cmd)
-			clientCtx, err := client.ReadTxCommandFlags(clientCtx, cmd.Flags())
-			if err != nil {
-				return err
-			}
-
-			fromAddr := clientCtx.GetFromAddress()
-			taStr := viper.GetString(FlagAddress)
-			tAddr, err := sdk.AccAddressFromBech32(taStr)
-			if err != nil {
-				return err
-			}
-			msg := types.NewMsgDeleteTrustee(tAddr, fromAddr)
+			msg := types.NewMsgDeleteSuper(pAddr, fromAddr)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}

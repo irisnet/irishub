@@ -3,15 +3,12 @@ package types
 
 // guardian module event types
 const (
-	EventTypeAddProfiler    = "add_profiler"
-	EventTypeAddTrustee     = "add_trustee"
-	EventTypeDeleteProfiler = "delete_profiler"
-	EventTypeDeleteTrustee  = "delete_trustee"
+	EventTypeAddSuper    = "add_super"
+	EventTypeDeleteSuper = "delete_super"
 
-	AttributeKeyProfilerAddress = "address"
-	AttributeKeyTrusteeAddress  = "address"
-	AttributeKeyAddedBy         = "added_by"
-	AttributeKeyDeletedBy       = "deleted_by"
+	AttributeKeySuperAddress = "address"
+	AttributeKeyAddedBy      = "added_by"
+	AttributeKeyDeletedBy    = "deleted_by"
 
 	AttributeValueCategory = ModuleName
 )

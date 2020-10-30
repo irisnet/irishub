@@ -6,38 +6,32 @@ import (
 )
 
 const (
-	TypeMsgAddProfiler    = "add_profiler"    // type for MsgAddProfiler
-	TypeMsgDeleteProfiler = "delete_profiler" // type for MsgDeleteProfiler
-	TypeMsgAddTrustee     = "add_trustee"     // type for MsgAddTrustee
-	TypeMsgDeleteTrustee  = "delete_trustee"  // type for MsgDeleteTrustee
+	TypeMsgAddSuper    = "add_super"    // type for MsgAddSuper
+	TypeMsgDeleteSuper = "delete_super" // type for MsgDeleteSuper
 )
 
 var (
-	_ sdk.Msg = &MsgAddProfiler{}
-	_ sdk.Msg = &MsgAddTrustee{}
-	_ sdk.Msg = &MsgDeleteProfiler{}
-	_ sdk.Msg = &MsgDeleteTrustee{}
+	_ sdk.Msg = &MsgAddSuper{}
+	_ sdk.Msg = &MsgDeleteSuper{}
 )
 
-// NewMsgAddProfiler constructs a MsgAddProfiler
-func NewMsgAddProfiler(description string, address, addedBy sdk.AccAddress) *MsgAddProfiler {
-	return &MsgAddProfiler{
-		AddGuardian: AddGuardian{
-			Description: description,
-			Address:     address,
-			AddedBy:     addedBy,
-		},
+// NewMsgAddSuper constructs a MsgAddSuper
+func NewMsgAddSuper(description string, address, addedBy sdk.AccAddress) *MsgAddSuper {
+	return &MsgAddSuper{
+		Description: description,
+		Address:     address.String(),
+		AddedBy:     addedBy.String(),
 	}
 }
 
 // Route implements Msg.
-func (msg MsgAddProfiler) Route() string { return RouterKey }
+func (msg MsgAddSuper) Route() string { return RouterKey }
 
 // Type implements Msg.
-func (msg MsgAddProfiler) Type() string { return TypeMsgAddProfiler }
+func (msg MsgAddSuper) Type() string { return TypeMsgAddSuper }
 
 // GetSignBytes implements Msg.
-func (msg MsgAddProfiler) GetSignBytes() []byte {
+func (msg MsgAddSuper) GetSignBytes() []byte {
 	b, err := ModuleCdc.MarshalJSON(&msg)
 	if err != nil {
 		panic(err)
@@ -46,35 +40,49 @@ func (msg MsgAddProfiler) GetSignBytes() []byte {
 }
 
 // ValidateBasic implements Msg.
-func (msg MsgAddProfiler) ValidateBasic() error {
-	return msg.AddGuardian.ValidateBasic()
+func (msg MsgAddSuper) ValidateBasic() error {
+	if len(msg.Description) == 0 {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "description missing")
+	}
+	if len(msg.Address) == 0 {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "added address missing")
+	}
+	if len(msg.AddedBy) == 0 {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "operator address missing")
+	}
+	if err := msg.EnsureLength(); err != nil {
+		return err
+	}
+	return nil
 }
 
 // GetSigners implements Msg.
-func (msg MsgAddProfiler) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{msg.AddGuardian.AddedBy}
+func (msg MsgAddSuper) GetSigners() []sdk.AccAddress {
+	from, err := sdk.AccAddressFromBech32(msg.AddedBy)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{from}
 }
 
 // ______________________________________________________________________
 
-// NewMsgDeleteProfiler constructs a MsgDeleteProfiler
-func NewMsgDeleteProfiler(address, deletedBy sdk.AccAddress) *MsgDeleteProfiler {
-	return &MsgDeleteProfiler{
-		DeleteGuardian: DeleteGuardian{
-			Address:   address,
-			DeletedBy: deletedBy,
-		},
+// NewMsgDeleteSuper constructs a MsgDeleteSuper
+func NewMsgDeleteSuper(address, deletedBy sdk.AccAddress) *MsgDeleteSuper {
+	return &MsgDeleteSuper{
+		Address:   address.String(),
+		DeletedBy: deletedBy.String(),
 	}
 }
 
 // Route implements Msg.
-func (msg MsgDeleteProfiler) Route() string { return RouterKey }
+func (msg MsgDeleteSuper) Route() string { return RouterKey }
 
 // Type implements Msg.
-func (msg MsgDeleteProfiler) Type() string { return TypeMsgDeleteProfiler }
+func (msg MsgDeleteSuper) Type() string { return TypeMsgDeleteSuper }
 
 // GetSignBytes implements Msg.
-func (msg MsgDeleteProfiler) GetSignBytes() []byte {
+func (msg MsgDeleteSuper) GetSignBytes() []byte {
 	b, err := ModuleCdc.MarshalJSON(&msg)
 	if err != nil {
 		panic(err)
@@ -83,124 +91,29 @@ func (msg MsgDeleteProfiler) GetSignBytes() []byte {
 }
 
 // RoValidateBasicute implements Msg.
-func (msg MsgDeleteProfiler) ValidateBasic() error {
-	return msg.DeleteGuardian.ValidateBasic()
-}
-
-// GetSigners implements Msg.
-func (msg MsgDeleteProfiler) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{msg.DeleteGuardian.DeletedBy}
-}
-
-// ______________________________________________________________________
-
-// NewMsgAddTrustee constructs a MsgAddTrustee
-func NewMsgAddTrustee(description string, address, addedAddress sdk.AccAddress) *MsgAddTrustee {
-	return &MsgAddTrustee{
-		AddGuardian: AddGuardian{
-			Description: description,
-			Address:     address,
-			AddedBy:     addedAddress,
-		},
-	}
-}
-
-// Route implements Msg.
-func (msg MsgAddTrustee) Route() string { return RouterKey }
-
-// Type implements Msg.
-func (msg MsgAddTrustee) Type() string { return TypeMsgAddTrustee }
-
-// GetSignBytes implements Msg.
-func (msg MsgAddTrustee) GetSignBytes() []byte {
-	b, err := ModuleCdc.MarshalJSON(&msg)
-	if err != nil {
-		panic(err)
-	}
-	return sdk.MustSortJSON(b)
-}
-
-// ValidateBasic implements Msg.
-func (msg MsgAddTrustee) ValidateBasic() error {
-	return msg.AddGuardian.ValidateBasic()
-}
-
-// GetSigners implements Msg.
-func (msg MsgAddTrustee) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{msg.AddGuardian.AddedBy}
-}
-
-// ______________________________________________________________________
-
-// NewMsgDeleteTrustee constructs a MsgDeleteTrustee
-func NewMsgDeleteTrustee(address, deletedBy sdk.AccAddress) *MsgDeleteTrustee {
-	return &MsgDeleteTrustee{
-		DeleteGuardian: DeleteGuardian{
-			Address:   address,
-			DeletedBy: deletedBy,
-		},
-	}
-}
-
-// Route implements Msg.
-func (msg MsgDeleteTrustee) Route() string { return RouterKey }
-
-// Type implements Msg.
-func (msg MsgDeleteTrustee) Type() string { return TypeMsgDeleteTrustee }
-
-// GetSignBytes implements Msg.
-func (msg MsgDeleteTrustee) GetSignBytes() []byte {
-	b, err := ModuleCdc.MarshalJSON(&msg)
-	if err != nil {
-		panic(err)
-	}
-	return sdk.MustSortJSON(b)
-}
-
-// ValidateBasic implements Msg.
-func (msg MsgDeleteTrustee) ValidateBasic() error {
-	return msg.DeleteGuardian.ValidateBasic()
-}
-
-// GetSigners implements Msg.
-func (msg MsgDeleteTrustee) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{msg.DeleteGuardian.DeletedBy}
-}
-
-// ______________________________________________________________________
-
-// ValidateBasic validate the AddGuardian
-func (g AddGuardian) ValidateBasic() error {
-	if len(g.Description) == 0 {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "description missing")
-	}
-	if len(g.Address) == 0 {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "added address missing")
-	}
-	if len(g.AddedBy) == 0 {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "operator address missing")
-	}
-	if err := g.EnsureLength(); err != nil {
-		return err
-	}
-	return nil
-}
-
-// ValidateBasic validate the DeleteGuardian
-func (g DeleteGuardian) ValidateBasic() error {
-	if len(g.Address) == 0 {
+func (msg MsgDeleteSuper) ValidateBasic() error {
+	if len(msg.Address) == 0 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "deleted address missing")
 	}
-	if len(g.DeletedBy) == 0 {
+	if len(msg.DeletedBy) == 0 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "operator address missing")
 	}
 	return nil
+}
+
+// GetSigners implements Msg.
+func (msg MsgDeleteSuper) GetSigners() []sdk.AccAddress {
+	from, err := sdk.AccAddressFromBech32(msg.DeletedBy)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{from}
 }
 
 // EnsureLength validate the length of AddGuardian
-func (g AddGuardian) EnsureLength() error {
-	if len(g.Description) > 70 {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid website length; got: %d, max: %d", len(g.Description), 70)
+func (msg MsgAddSuper) EnsureLength() error {
+	if len(msg.Description) > 70 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid website length; got: %d, max: %d", len(msg.Description), 70)
 	}
 	return nil
 }
