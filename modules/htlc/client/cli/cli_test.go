@@ -22,6 +22,7 @@ type IntegrationTestSuite struct {
 	cfg     network.Config
 	network *network.Network
 }
+
 func (s *IntegrationTestSuite) SetupSuite() {
 	s.T().Log("setting up integration test suite")
 
@@ -46,7 +47,7 @@ func TestIntegrationTestSuite(t *testing.T) {
 
 func (s *IntegrationTestSuite) TestNft() {
 	val := s.network.Validators[0]
-	val2:=s.network.Validators[1]
+	val2 := s.network.Validators[1]
 	clientCtx := val.ClientCtx
 
 	// ---------------------------------------------------------------------------
@@ -91,7 +92,7 @@ func (s *IntegrationTestSuite) TestNft() {
 
 	respType = proto.Message(&sdk.TxResponse{})
 
-	bz, err = htlctestutil.ClaimHTLCExec(clientCtx, from.String(), hashLock,secretHex,args...)
+	bz, err = htlctestutil.ClaimHTLCExec(clientCtx, from.String(), hashLock, secretHex, args...)
 	s.Require().NoError(err)
 	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType), bz.String())
 	txResp = respType.(*sdk.TxResponse)
@@ -114,9 +115,9 @@ func (s *IntegrationTestSuite) TestNft() {
 	// ---------------------------------------------------------------------------
 
 	respType = proto.Message(&htlctypes.HTLC{})
-	bz, err = htlctestutil.QueryHTLCExec( val.ClientCtx, hashLock)
+	bz, err = htlctestutil.QueryHTLCExec(val.ClientCtx, hashLock)
 	s.Require().NoError(err)
 	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType))
-	htlcItem:=respType.(*htlctypes.HTLC)
-	s.Require().Equal(amount,htlcItem.Amount)
+	htlcItem := respType.(*htlctypes.HTLC)
+	s.Require().Equal(amount, htlcItem.Amount)
 }

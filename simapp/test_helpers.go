@@ -5,13 +5,14 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"strconv"
+	"testing"
+	"time"
+
 	"github.com/cosmos/cosmos-sdk/testutil"
 	clitestutil "github.com/cosmos/cosmos-sdk/testutil/cli"
 	bankcli "github.com/cosmos/cosmos-sdk/x/bank/client/cli"
 	"github.com/tendermint/tendermint/libs/cli"
-	"strconv"
-	"testing"
-	"time"
 
 	"github.com/stretchr/testify/require"
 
@@ -447,7 +448,6 @@ func NewPubKeyFromHex(pk string) (res crypto.PubKey) {
 	copy(pkEd, pkBytes)
 	return pkEd
 }
-
 
 func QueryBalancesExec(clientCtx client.Context, address string, denom string, extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{

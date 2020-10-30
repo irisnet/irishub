@@ -13,10 +13,11 @@ import (
 	"github.com/cosmos/cosmos-sdk/testutil/network"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/gogo/protobuf/proto"
+	"github.com/stretchr/testify/suite"
+
 	tokencli "github.com/irisnet/irismod/modules/token/client/cli"
 	tokentestutil "github.com/irisnet/irismod/modules/token/client/testutil"
 	tokentypes "github.com/irisnet/irismod/modules/token/types"
-	"github.com/stretchr/testify/suite"
 
 	"github.com/irisnet/irismod/simapp"
 )
@@ -96,8 +97,8 @@ func (s *IntegrationTestSuite) TestToken() {
 	bz, err = tokentestutil.QueryTokensExec(clientCtx, from.String())
 	s.Require().NoError(err)
 	s.Require().NoError(clientCtx.LegacyAmino.UnmarshalJSON(bz.Bytes(), tokens))
-	s.Require().Equal(1,len(*tokens))
-	res1,_:=json.Marshal(tokens)
+	s.Require().Equal(1, len(*tokens))
+	res1, _ := json.Marshal(tokens)
 	println(string(res1))
 
 	//------test GetCmdQueryToken()-------------
@@ -108,9 +109,9 @@ func (s *IntegrationTestSuite) TestToken() {
 	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType))
 	err = clientCtx.InterfaceRegistry.UnpackAny(respType.(*types.Any), &token)
 	s.Require().NoError(err)
-	s.Require().Equal(name,token.GetName())
-	s.Require().Equal(strings.ToLower(symbol),token.GetSymbol())
-	s.Require().Equal(uint64(initialSupply),token.GetInitialSupply())
+	s.Require().Equal(name, token.GetName())
+	s.Require().Equal(strings.ToLower(symbol), token.GetSymbol())
+	s.Require().Equal(uint64(initialSupply), token.GetInitialSupply())
 
 	//------test GetCmdQueryFee()-------------
 	respType = proto.Message(&tokentypes.QueryFeesResponse{})
@@ -119,9 +120,9 @@ func (s *IntegrationTestSuite) TestToken() {
 	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType))
 	feeResp := respType.(*tokentypes.QueryFeesResponse)
 	s.Require().NoError(err)
-	expectedFeeResp:="{\"exist\":true,\"issue_fee\":{\"denom\":\"stake\",\"amount\":\"13015\"},\"mint_fee\":{\"denom\":\"stake\",\"amount\":\"1301\"}}"
-	result,_:=json.Marshal(feeResp)
-	s.Require().Equal(expectedFeeResp,string(result))
+	expectedFeeResp := "{\"exist\":true,\"issue_fee\":{\"denom\":\"stake\",\"amount\":\"13015\"},\"mint_fee\":{\"denom\":\"stake\",\"amount\":\"1301\"}}"
+	result, _ := json.Marshal(feeResp)
+	s.Require().Equal(expectedFeeResp, string(result))
 
 	//------test GetCmdQueryParams()-------------
 	respType = proto.Message(&tokentypes.Params{})
@@ -130,18 +131,18 @@ func (s *IntegrationTestSuite) TestToken() {
 	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType))
 	params := respType.(*tokentypes.Params)
 	s.Require().NoError(err)
-	expectedParams:="{\"token_tax_rate\":\"0.400000000000000000\",\"issue_token_base_fee\":{\"denom\":\"stake\",\"amount\":\"60000\"},\"mint_token_fee_ratio\":\"0.100000000000000000\"}"
-	result,_ =json.Marshal(params)
-	s.Require().Equal(expectedParams,string(result))
+	expectedParams := "{\"token_tax_rate\":\"0.400000000000000000\",\"issue_token_base_fee\":{\"denom\":\"stake\",\"amount\":\"60000\"},\"mint_token_fee_ratio\":\"0.100000000000000000\"}"
+	result, _ = json.Marshal(params)
+	s.Require().Equal(expectedParams, string(result))
 
 	//------test GetCmdMintToken()-------------
 	coinType := proto.Message(&sdk.Coin{})
 	out, err := simapp.QueryBalancesExec(clientCtx, from.String(), strings.ToLower(symbol))
 	s.Require().NoError(err)
 	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(out.Bytes(), coinType))
-	balance:= coinType.(*sdk.Coin)
+	balance := coinType.(*sdk.Coin)
 	println(balance.Amount.Int64())
-	initAmount:=balance.Amount.Int64()
+	initAmount := balance.Amount.Int64()
 	mintAmount := int64(50000000)
 
 	args = []string{
@@ -164,11 +165,11 @@ func (s *IntegrationTestSuite) TestToken() {
 	s.Require().NoError(err)
 	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(out.Bytes(), coinType))
 	balance = coinType.(*sdk.Coin)
-	exceptedAmount:=initAmount+mintAmount
-	s.Require().Equal(exceptedAmount,balance.Amount.Int64())
+	exceptedAmount := initAmount + mintAmount
+	s.Require().Equal(exceptedAmount, balance.Amount.Int64())
 
 	//------test GetCmdEditToken()-------------
-	newName:="Wd Token"
+	newName := "Wd Token"
 	newMaxSupply := 200000000
 	newMintable := false
 
@@ -190,7 +191,6 @@ func (s *IntegrationTestSuite) TestToken() {
 	txResp = respType.(*sdk.TxResponse)
 	s.Require().Equal(expectedCode, txResp.Code)
 
-
 	var token2 tokentypes.TokenI
 	respType = proto.Message(&types.Any{})
 	bz, err = tokentestutil.QueryTokenExec(clientCtx, tokenSymbol)
@@ -198,9 +198,9 @@ func (s *IntegrationTestSuite) TestToken() {
 	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType))
 	err = clientCtx.InterfaceRegistry.UnpackAny(respType.(*types.Any), &token2)
 	s.Require().NoError(err)
-	s.Require().Equal(newName,token2.GetName())
-	s.Require().Equal(uint64(newMaxSupply),token2.GetMaxSupply())
-	s.Require().Equal(newMintable,token2.GetMintable())
+	s.Require().Equal(newName, token2.GetName())
+	s.Require().Equal(uint64(newMaxSupply), token2.GetMaxSupply())
+	s.Require().Equal(newMintable, token2.GetMintable())
 
 	//------test GetCmdTransferTokenOwner()-------------
 	//to:=""

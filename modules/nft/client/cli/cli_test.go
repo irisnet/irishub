@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"testing"
 
-	nfttypes "github.com/irisnet/irismod/modules/nft/types"
 	"github.com/tidwall/gjson"
+
+	nfttypes "github.com/irisnet/irismod/modules/nft/types"
 
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/testutil/network"
@@ -55,14 +56,14 @@ func (s *IntegrationTestSuite) TestNft() {
 
 	from := val.Address
 	tokenName := "name"
-	tokenURI  := "uri"
+	tokenURI := "uri"
 	tokenData := "data"
 	recipient := "recipient"
 	//owner     := "owner"
 	denomName := "name"
-	denom     := "denom"
-	schema    := "schema"
-	recordID  := "record"
+	denom := "denom"
+	schema := "schema"
+	recordID := "record"
 
 	args := []string{
 		fmt.Sprintf("--%s=%s", nftcli.FlagDenomName, denomName),
@@ -97,7 +98,7 @@ func (s *IntegrationTestSuite) TestNft() {
 
 	respType = proto.Message(&sdk.TxResponse{})
 
-	bz, err = nfttestutil.MintNFTExec(clientCtx, from.String(), denomID, tokenURI,args...)
+	bz, err = nfttestutil.MintNFTExec(clientCtx, from.String(), denomID, tokenURI, args...)
 	s.Require().NoError(err)
 	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType), bz.String())
 	txResp = respType.(*sdk.TxResponse)
@@ -115,7 +116,7 @@ func (s *IntegrationTestSuite) TestNft() {
 
 	respType = proto.Message(&sdk.TxResponse{})
 
-	bz, err = nfttestutil.EditNFTExec(clientCtx, from.String(), denomID, tokenURI,args...)
+	bz, err = nfttestutil.EditNFTExec(clientCtx, from.String(), denomID, tokenURI, args...)
 	s.Require().NoError(err)
 	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType), bz.String())
 	txResp = respType.(*sdk.TxResponse)
@@ -133,7 +134,7 @@ func (s *IntegrationTestSuite) TestNft() {
 
 	respType = proto.Message(&sdk.TxResponse{})
 
-	bz, err = nfttestutil.TransferNFTExec(clientCtx, from.String(), recipient, denomID, tokenURI,args...)
+	bz, err = nfttestutil.TransferNFTExec(clientCtx, from.String(), recipient, denomID, tokenURI, args...)
 	s.Require().NoError(err)
 	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType), bz.String())
 	txResp = respType.(*sdk.TxResponse)
@@ -147,7 +148,7 @@ func (s *IntegrationTestSuite) TestNft() {
 
 	respType = proto.Message(&sdk.TxResponse{})
 
-	bz, err = nfttestutil.BurnNFTExec(clientCtx, from.String(), denomID, tokenURI,args...)
+	bz, err = nfttestutil.BurnNFTExec(clientCtx, from.String(), denomID, tokenURI, args...)
 	s.Require().NoError(err)
 	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType), bz.String())
 	txResp = respType.(*sdk.TxResponse)
@@ -159,7 +160,7 @@ func (s *IntegrationTestSuite) TestNft() {
 	bz, err = nfttestutil.QueryDenomExec(val.ClientCtx, denomID)
 	s.Require().NoError(err)
 	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType))
-	denomItem:=respType.(*nfttypes.Denom)
+	denomItem := respType.(*nfttypes.Denom)
 	s.Require().Equal(denomName, denomItem.Name)
 	s.Require().Equal(schema, denomItem.Schema)
 
@@ -167,25 +168,25 @@ func (s *IntegrationTestSuite) TestNft() {
 	bz, err = nfttestutil.QueryDenomsExec(val.ClientCtx)
 	s.Require().NoError(err)
 	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType))
-	denomItem=respType.(*nfttypes.Denom)
+	denomItem = respType.(*nfttypes.Denom)
 	s.Require().Equal(denomName, denomItem.Name)
 	s.Require().Equal(schema, denomItem.Schema)
 
 	respType = proto.Message(&nfttypes.Collection{})
-	bz, err = nfttestutil.QueryCollectionExec(val.ClientCtx,denomID)
+	bz, err = nfttestutil.QueryCollectionExec(val.ClientCtx, denomID)
 	s.Require().NoError(err)
 	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType))
 	//collectionItem :=respType.(*nfttypes.Collection)
 
 	respType = proto.Message(&nfttypes.BaseNFT{})
-	bz, err = nfttestutil.QueryNFTExec(val.ClientCtx,denomID,tokenURI)
+	bz, err = nfttestutil.QueryNFTExec(val.ClientCtx, denomID, tokenURI)
 	s.Require().NoError(err)
 	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType))
 	//denomItem=respType.(*nfttypes.Denom)
 	//s.Require().Equal(denomName, denomItem.Name)
 	//s.Require().Equal(schema, denomItem.Schema)
 
-	bz, err = nfttestutil.QuerySupplyExec(val.ClientCtx,recordID)
+	bz, err = nfttestutil.QuerySupplyExec(val.ClientCtx, recordID)
 	s.Require().NoError(err)
 	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType))
 	//denomItem=respType.(*nfttypes.Denom)
@@ -193,7 +194,7 @@ func (s *IntegrationTestSuite) TestNft() {
 	//s.Require().Equal(schema, denomItem.Schema)
 
 	respType = proto.Message(&nfttypes.Owner{})
-	bz, err = nfttestutil.QueryOwnerExec(val.ClientCtx,denomID)
+	bz, err = nfttestutil.QueryOwnerExec(val.ClientCtx, denomID)
 	s.Require().NoError(err)
 	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType))
 	//denomItem=respType.(*nfttypes.Denom)

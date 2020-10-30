@@ -2,6 +2,7 @@ package testutil
 
 import (
 	"fmt"
+
 	"github.com/tendermint/tendermint/libs/cli"
 
 	"github.com/cosmos/cosmos-sdk/client"
@@ -42,7 +43,6 @@ func RefundHTLCExec(clientCtx client.Context, from string, hashLock string, extr
 
 	return clitestutil.ExecTestCLICmd(clientCtx, htlccli.GetCmdRefundHTLC(), args)
 }
-
 
 func QueryHTLCExec(clientCtx client.Context, hashLock string, extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{

@@ -72,7 +72,6 @@ func QueryFeedsExec(clientCtx client.Context, extraArgs ...string) (testutil.Buf
 	return clitestutil.ExecTestCLICmd(clientCtx, oraclecli.GetCmdQueryFeeds(), args)
 }
 
-
 func QueryFeedValueExec(clientCtx client.Context, feedName string, extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
 		feedName,

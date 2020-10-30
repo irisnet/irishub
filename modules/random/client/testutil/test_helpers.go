@@ -33,7 +33,6 @@ func QueryRandomExec(clientCtx client.Context, requestID string, extraArgs ...st
 	return clitestutil.ExecTestCLICmd(clientCtx, randomcli.GetCmdQueryRandom(), args)
 }
 
-
 func QueryRandomRequestQueueExec(clientCtx client.Context, genHeight string, extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
 		genHeight,
@@ -43,4 +42,3 @@ func QueryRandomRequestQueueExec(clientCtx client.Context, genHeight string, ext
 
 	return clitestutil.ExecTestCLICmd(clientCtx, randomcli.GetCmdQueryRandomRequestQueue(), args)
 }
-
