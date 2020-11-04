@@ -66,7 +66,7 @@ func (s *IntegrationTestSuite) TestToken() {
 	maxSupply := int64(200000000)
 	mintable := true
 
-	//------test GetCmdIssueDenom()-------------
+	//------test GetCmdIssueToken()-------------
 	args := []string{
 		fmt.Sprintf("--%s=%s", tokencli.FlagSymbol, symbol),
 		fmt.Sprintf("--%s=%s", tokencli.FlagName, name),

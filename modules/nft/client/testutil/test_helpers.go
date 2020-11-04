@@ -98,9 +98,9 @@ func QueryDenomsExec(clientCtx client.Context, extraArgs ...string) (testutil.Bu
 	return clitestutil.ExecTestCLICmd(clientCtx, nftcli.GetCmdQueryDenoms(), args)
 }
 
-func QuerySupplyExec(clientCtx client.Context, recordID string, extraArgs ...string) (testutil.BufferWriter, error) {
+func QuerySupplyExec(clientCtx client.Context, denom string, extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
-		recordID,
+		denom,
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
 	}
 	args = append(args, extraArgs...)
@@ -108,9 +108,9 @@ func QuerySupplyExec(clientCtx client.Context, recordID string, extraArgs ...str
 	return clitestutil.ExecTestCLICmd(clientCtx, nftcli.GetCmdQuerySupply(), args)
 }
 
-func QueryOwnerExec(clientCtx client.Context, denomID string, extraArgs ...string) (testutil.BufferWriter, error) {
+func QueryOwnerExec(clientCtx client.Context, address string, extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
-		denomID,
+		address,
 		fmt.Sprintf("--%s=json", cli.OutputFlag),
 	}
 	args = append(args, extraArgs...)
