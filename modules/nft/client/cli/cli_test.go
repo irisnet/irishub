@@ -2,9 +2,11 @@ package cli_test
 
 import (
 	"fmt"
-	nfttypes "github.com/irisnet/irismod/modules/nft/types"
-	"github.com/tendermint/tendermint/crypto"
 	"testing"
+
+	"github.com/tendermint/tendermint/crypto"
+
+	nfttypes "github.com/irisnet/irismod/modules/nft/types"
 
 	"github.com/tidwall/gjson"
 
@@ -64,7 +66,6 @@ func (s *IntegrationTestSuite) TestNft() {
 	denom := "denom"
 	schema := "schema"
 
-
 	//------test GetCmdIssueDenom()-------------
 	args := []string{
 		fmt.Sprintf("--%s=%s", nftcli.FlagDenomName, denomName),
@@ -102,7 +103,7 @@ func (s *IntegrationTestSuite) TestNft() {
 	s.Require().NoError(val.ClientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType))
 	denomsResp := respType.(*nfttypes.QueryDenomsResponse)
 	s.Require().Equal(1, len(denomsResp.Denoms))
-	s.Require().Equal(denomID,denomsResp.Denoms[0].Id)
+	s.Require().Equal(denomID, denomsResp.Denoms[0].Id)
 
 	//------test GetCmdMintNFT()-------------
 	args = []string{
@@ -129,7 +130,7 @@ func (s *IntegrationTestSuite) TestNft() {
 	bz, err = nfttestutil.QuerySupplyExec(val.ClientCtx, denomID)
 	s.Require().NoError(err)
 	s.Require().NoError(val.ClientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType))
-	supplyResp :=respType.(*nfttypes.QuerySupplyResponse)
+	supplyResp := respType.(*nfttypes.QuerySupplyResponse)
 	s.Require().Equal(uint64(1), supplyResp.Amount)
 
 	//------test GetCmdQueryNFT()-------------
@@ -137,19 +138,19 @@ func (s *IntegrationTestSuite) TestNft() {
 	bz, err = nfttestutil.QueryNFTExec(val.ClientCtx, denomID, tokenID)
 	s.Require().NoError(err)
 	s.Require().NoError(val.ClientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType))
-	nftItem:=respType.(*nfttypes.BaseNFT)
+	nftItem := respType.(*nfttypes.BaseNFT)
 	s.Require().Equal(tokenID, nftItem.Id)
 	s.Require().Equal(tokenName, nftItem.Name)
 	s.Require().Equal(tokenURI, nftItem.URI)
 	s.Require().Equal(tokenData, nftItem.Data)
-	s.Require().Equal(from.String(),nftItem.Owner)
+	s.Require().Equal(from.String(), nftItem.Owner)
 
 	//------test GetCmdQueryOwner()-------------
 	respType = proto.Message(&nfttypes.Owner{})
 	bz, err = nfttestutil.QueryOwnerExec(val.ClientCtx, from.String())
 	s.Require().NoError(err)
 	s.Require().NoError(val.ClientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType))
-	owner:=respType.(*nfttypes.Owner)
+	owner := respType.(*nfttypes.Owner)
 	s.Require().Equal(from.String(), owner.Address)
 	s.Require().Equal(denom, owner.IDCollections[0].Denom)
 	s.Require().Equal(tokenID, owner.IDCollections[0].Ids[0])
@@ -159,11 +160,11 @@ func (s *IntegrationTestSuite) TestNft() {
 	bz, err = nfttestutil.QueryCollectionExec(val.ClientCtx, denomID)
 	s.Require().NoError(err)
 	s.Require().NoError(val.ClientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType))
-	collectionItem :=respType.(*nfttypes.Collection)
+	collectionItem := respType.(*nfttypes.Collection)
 	s.Require().Equal(1, len(collectionItem.NFTs))
 
 	//------test GetCmdEditNFT()-------------
-	newTokenDate:="newdata"
+	newTokenDate := "newdata"
 	newTokenURI := "newuri"
 	newTokenName := "new Kitty Token"
 	args = []string{
@@ -188,7 +189,7 @@ func (s *IntegrationTestSuite) TestNft() {
 	bz, err = nfttestutil.QueryNFTExec(val.ClientCtx, denomID, tokenID)
 	s.Require().NoError(err)
 	s.Require().NoError(val.ClientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType))
-	newNftItem:=respType.(*nfttypes.BaseNFT)
+	newNftItem := respType.(*nfttypes.BaseNFT)
 	s.Require().Equal(newTokenName, newNftItem.Name)
 	s.Require().Equal(newTokenURI, newNftItem.URI)
 	s.Require().Equal(newTokenDate, newNftItem.Data)
@@ -218,16 +219,15 @@ func (s *IntegrationTestSuite) TestNft() {
 	bz, err = nfttestutil.QueryNFTExec(val.ClientCtx, denomID, tokenID)
 	s.Require().NoError(err)
 	s.Require().NoError(val.ClientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType))
-	nftItem =respType.(*nfttypes.BaseNFT)
+	nftItem = respType.(*nfttypes.BaseNFT)
 	s.Require().Equal(tokenID, nftItem.Id)
 	s.Require().Equal(tokenName, nftItem.Name)
 	s.Require().Equal(tokenURI, nftItem.URI)
 	s.Require().Equal(tokenData, nftItem.Data)
-	s.Require().Equal(recipient.String(),nftItem.Owner)
-
+	s.Require().Equal(recipient.String(), nftItem.Owner)
 
 	//------test GetCmdBurnNFT()-------------
-	newTokenID:="dgsbl"
+	newTokenID := "dgsbl"
 	args = []string{
 		fmt.Sprintf("--%s=%s", nftcli.FlagTokenData, newTokenDate),
 		fmt.Sprintf("--%s=%s", nftcli.FlagRecipient, from.String()),
@@ -251,7 +251,7 @@ func (s *IntegrationTestSuite) TestNft() {
 	bz, err = nfttestutil.QuerySupplyExec(val.ClientCtx, denomID)
 	s.Require().NoError(err)
 	s.Require().NoError(val.ClientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType))
-	supplyResp =respType.(*nfttypes.QuerySupplyResponse)
+	supplyResp = respType.(*nfttypes.QuerySupplyResponse)
 	s.Require().Equal(uint64(2), supplyResp.Amount)
 
 	args = []string{
@@ -266,11 +266,10 @@ func (s *IntegrationTestSuite) TestNft() {
 	txResp = respType.(*sdk.TxResponse)
 	s.Require().Equal(expectedCode, txResp.Code)
 
-
 	respType = proto.Message(&nfttypes.QuerySupplyResponse{})
 	bz, err = nfttestutil.QuerySupplyExec(val.ClientCtx, denomID)
 	s.Require().NoError(err)
 	s.Require().NoError(val.ClientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType))
-	supplyResp =respType.(*nfttypes.QuerySupplyResponse)
+	supplyResp = respType.(*nfttypes.QuerySupplyResponse)
 	s.Require().Equal(uint64(1), supplyResp.Amount)
 }

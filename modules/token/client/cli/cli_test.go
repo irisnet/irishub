@@ -3,9 +3,10 @@ package cli_test
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/tendermint/tendermint/crypto"
 	"strings"
 	"testing"
+
+	"github.com/tendermint/tendermint/crypto"
 
 	"github.com/tidwall/gjson"
 
@@ -201,8 +202,7 @@ func (s *IntegrationTestSuite) TestToken() {
 	s.Require().Equal(newMintable, token2.GetMintable())
 
 	//------test GetCmdTransferTokenOwner()-------------
-	to:=sdk.AccAddress(crypto.AddressHash([]byte("dgsbl")))
-
+	to := sdk.AccAddress(crypto.AddressHash([]byte("dgsbl")))
 
 	args = []string{
 		fmt.Sprintf("--%s=%s", tokencli.FlagTo, to.String()),
