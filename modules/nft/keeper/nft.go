@@ -39,9 +39,7 @@ func (k Keeper) GetNFTs(ctx sdk.Context, denom string) (nfts []exported.NFT) {
 }
 
 //Authorize check if the sender is the issuer of nft, if it returns nft, if not, return an error
-func (k Keeper) Authorize(ctx sdk.Context,
-	denomID, tokenID string,
-	owner sdk.AccAddress) (types.BaseNFT, error) {
+func (k Keeper) Authorize(ctx sdk.Context, denomID, tokenID string, owner sdk.AccAddress) (types.BaseNFT, error) {
 	nft, err := k.GetNFT(ctx, denomID, tokenID)
 	if err != nil {
 		return types.BaseNFT{}, err

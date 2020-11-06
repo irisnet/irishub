@@ -16,6 +16,12 @@ const (
 	MaxDenomLen = 64
 
 	MaxTokenURILen = 256
+
+	TypeMsgIssueDenom  = "issue_denom"
+	TypeMsgTransferNFT = "transfer_nft"
+	TypeMsgEditNFT     = "edit_nft"
+	TypeMsgMintNFT     = "mint_nft"
+	TypeMsgBurnNFT     = "burn_nft"
 )
 
 var (
@@ -23,6 +29,12 @@ var (
 	IsAlphaNumeric   = regexp.MustCompile(`^[a-zA-Z0-9]+$`).MatchString
 	IsBeginWithAlpha = regexp.MustCompile(`^[a-zA-Z].*`).MatchString
 )
+
+var _ sdk.Msg = &MsgIssueDenom{}
+var _ sdk.Msg = &MsgTransferNFT{}
+var _ sdk.Msg = &MsgEditNFT{}
+var _ sdk.Msg = &MsgMintNFT{}
+var _ sdk.Msg = &MsgBurnNFT{}
 
 // NewMsgIssueDenom is a constructor function for MsgSetName
 func NewMsgIssueDenom(id, name, schema string, sender sdk.AccAddress) *MsgIssueDenom {
@@ -38,7 +50,7 @@ func NewMsgIssueDenom(id, name, schema string, sender sdk.AccAddress) *MsgIssueD
 func (msg MsgIssueDenom) Route() string { return RouterKey }
 
 // Type Implements Msg
-func (msg MsgIssueDenom) Type() string { return "issue_denom" }
+func (msg MsgIssueDenom) Type() string { return TypeMsgIssueDenom }
 
 // ValidateBasic Implements Msg.
 func (msg MsgIssueDenom) ValidateBasic() error {
@@ -94,7 +106,7 @@ func NewMsgTransferNFT(
 func (msg MsgTransferNFT) Route() string { return RouterKey }
 
 // Type Implements Msg
-func (msg MsgTransferNFT) Type() string { return "transfer_nft" }
+func (msg MsgTransferNFT) Type() string { return TypeMsgTransferNFT }
 
 // ValidateBasic Implements Msg.
 func (msg MsgTransferNFT) ValidateBasic() error {
@@ -111,6 +123,7 @@ func (msg MsgTransferNFT) ValidateBasic() error {
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid recipient address (%s)", err)
 	}
+
 	return ValidateTokenID(msg.Id)
 }
 
@@ -146,7 +159,7 @@ func NewMsgEditNFT(
 func (msg MsgEditNFT) Route() string { return RouterKey }
 
 // Type Implements Msg
-func (msg MsgEditNFT) Type() string { return "edit_nft" }
+func (msg MsgEditNFT) Type() string { return TypeMsgEditNFT }
 
 // ValidateBasic Implements Msg.
 func (msg MsgEditNFT) ValidateBasic() error {
@@ -162,6 +175,7 @@ func (msg MsgEditNFT) ValidateBasic() error {
 	if err := ValidateTokenURI(msg.URI); err != nil {
 		return err
 	}
+
 	return ValidateTokenID(msg.Id)
 }
 
@@ -199,7 +213,7 @@ func NewMsgMintNFT(
 func (msg MsgMintNFT) Route() string { return RouterKey }
 
 // Type Implements Msg
-func (msg MsgMintNFT) Type() string { return "mint_nft" }
+func (msg MsgMintNFT) Type() string { return TypeMsgMintNFT }
 
 // ValidateBasic Implements Msg.
 func (msg MsgMintNFT) ValidateBasic() error {
@@ -220,6 +234,7 @@ func (msg MsgMintNFT) ValidateBasic() error {
 	if err := ValidateTokenURI(msg.URI); err != nil {
 		return err
 	}
+
 	return ValidateTokenID(msg.Id)
 }
 
@@ -251,7 +266,7 @@ func NewMsgBurnNFT(sender sdk.AccAddress, id string, denom string) *MsgBurnNFT {
 func (msg MsgBurnNFT) Route() string { return RouterKey }
 
 // Type Implements Msg
-func (msg MsgBurnNFT) Type() string { return "burn_nft" }
+func (msg MsgBurnNFT) Type() string { return TypeMsgBurnNFT }
 
 // ValidateBasic Implements Msg.
 func (msg MsgBurnNFT) ValidateBasic() error {
@@ -263,6 +278,7 @@ func (msg MsgBurnNFT) ValidateBasic() error {
 	if err := ValidateDenomID(msg.Denom); err != nil {
 		return err
 	}
+
 	return ValidateTokenID(msg.Id)
 }
 

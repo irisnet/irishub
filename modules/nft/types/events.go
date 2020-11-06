@@ -13,7 +13,7 @@ var (
 	AttributeKeySender    = "sender"
 	AttributeKeyRecipient = "recipient"
 	AttributeKeyOwner     = "owner"
-	AttributeKeyTokenID   = "token-id"
-	AttributeKeyTokenURI  = "token-uri"
+	AttributeKeyTokenID   = "token_id"
+	AttributeKeyTokenURI  = "token_uri"
 	AttributeKeyDenom     = "denom"
 )
