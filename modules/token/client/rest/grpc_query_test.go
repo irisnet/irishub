@@ -3,9 +3,10 @@ package rest_test
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/cosmos/cosmos-sdk/types/rest"
 	"strings"
 	"testing"
+
+	"github.com/cosmos/cosmos-sdk/types/rest"
 
 	"github.com/tidwall/gjson"
 
@@ -91,16 +92,16 @@ func (s *IntegrationTestSuite) TestToken() {
 	tokenSymbol := gjson.Get(txResp.RawLog, "0.events.0.attributes.0.value").String()
 
 	//------test GetCmdQueryTokens()-------------
-	url :=fmt.Sprintf("%s/irismod/token/tokens", baseURL)
+	url := fmt.Sprintf("%s/irismod/token/tokens", baseURL)
 	resp, err := rest.GetRequest(url)
 	respType = proto.Message(&tokentypes.QueryTokensResponse{})
 	s.Require().NoError(err)
 	s.Require().NoError(clientCtx.LegacyAmino.UnmarshalJSON(resp, respType))
-	tokensResp:=respType.(*tokentypes.QueryTokensResponse)
+	tokensResp := respType.(*tokentypes.QueryTokensResponse)
 	s.Require().Equal(2, len(tokensResp.Tokens))
 
 	//------test GetCmdQueryToken()-------------
-	url =fmt.Sprintf("%s/irismod/token/tokens/%s", baseURL, tokenSymbol)
+	url = fmt.Sprintf("%s/irismod/token/tokens/%s", baseURL, tokenSymbol)
 	resp, err = rest.GetRequest(url)
 	respType = proto.Message(&tokentypes.QueryTokenResponse{})
 	var token tokentypes.TokenI
@@ -116,7 +117,7 @@ func (s *IntegrationTestSuite) TestToken() {
 	s.Require().Equal(uint64(initialSupply), token.GetInitialSupply())
 
 	//------test GetCmdQueryFee()-------------
-	url =fmt.Sprintf("%s/irismod/token/tokens/%s/fees", baseURL, tokenSymbol)
+	url = fmt.Sprintf("%s/irismod/token/tokens/%s/fees", baseURL, tokenSymbol)
 	resp, err = rest.GetRequest(url)
 	respType = proto.Message(&tokentypes.QueryFeesResponse{})
 	s.Require().NoError(err)
