@@ -45,7 +45,6 @@ func (s *IntegrationTestSuite) SetupSuite() {
 
 	serviceGenesisState.Params.ArbitrationTimeLimit = time.Duration(time.Second)
 	serviceGenesisState.Params.ComplaintRetrospect = time.Duration(time.Second)
-	// serviceGenesisState.Params.ServiceFeeTax = sdk.NewDecWithPrec(1, 1)
 	cfg.GenesisState[servicetypes.ModuleName] = cfg.Codec.MustMarshalJSON(&serviceGenesisState)
 
 	s.cfg = cfg

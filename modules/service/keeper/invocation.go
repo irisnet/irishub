@@ -173,8 +173,8 @@ func (k Keeper) UpdateRequestContext(
 			pds = requestContext.Providers
 		}
 
-		if respThreshold > uint32(len(providers)) {
-			return sdkerrors.Wrapf(types.ErrInvalidResponseThreshold, "response threshold [%d] must be between [1,%d]", respThreshold, len(providers))
+		if respThreshold > uint32(len(pds)) {
+			return sdkerrors.Wrapf(types.ErrInvalidResponseThreshold, "response threshold [%d] must be between [1,%d]", respThreshold, len(pds))
 		}
 
 		if respThreshold > 0 {
@@ -211,7 +211,7 @@ func (k Keeper) UpdateRequestContext(
 		return sdkerrors.Wrapf(types.ErrInvalidRepeatedTotal, "updated repeated total [%d] must not be less than the current batch counter [%d]", repeatedTotal, requestContext.BatchCounter)
 	}
 
-	if len(providers) > 0 {
+	if len(pds) > 0 {
 		requestContext.Providers = pds
 	}
 
