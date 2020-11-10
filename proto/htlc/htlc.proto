@@ -7,36 +7,6 @@ import "gogoproto/gogo.proto";
 option go_package = "github.com/irisnet/irismod/modules/htlc/types";
 option (gogoproto.goproto_getters_all) = false;
 
-// MsgCreateHTLC defines a message to create an HTLC
-message MsgCreateHTLC {
-    option (gogoproto.equal) = true;
-
-    string sender = 1;
-    string to = 2;
-    string receiver_on_other_chain = 3 [(gogoproto.moretags) = "yaml:\"receiver_on_other_chain\""];
-    repeated cosmos.base.v1beta1.Coin amount = 4 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
-    string hash_lock = 5 [(gogoproto.moretags) = "yaml:\"hash_lock\""];
-    uint64 timestamp = 6;
-    uint64 time_lock = 7 [(gogoproto.moretags) = "yaml:\"time_lock\""];
-}
-
-// MsgClaimHTLC defines a message to claim an HTLC
-message MsgClaimHTLC {
-    option (gogoproto.equal) = true;
-
-    string sender = 1;
-    string hash_lock = 2 [(gogoproto.moretags) = "yaml:\"hash_lock\""];
-    string secret = 3;
-}
-
-// MsgRefundHTLC defines a message to refund an HTLC
-message MsgRefundHTLC {
-    option (gogoproto.equal) = true;
-
-    string sender = 1;
-    string hash_lock = 2 [(gogoproto.moretags) = "yaml:\"hash_lock\""];
-}
-
 // HTLC defines a struct for an HTLC
 message HTLC {
     option (gogoproto.equal) = true;

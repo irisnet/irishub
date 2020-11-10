@@ -7,32 +7,6 @@ import "gogoproto/gogo.proto";
 option go_package = "github.com/irisnet/irismod/modules/coinswap/types";
 option (gogoproto.goproto_getters_all) = false;
 
-// MsgAddLiquidity represents a msg for adding liquidity to a reserve pool
-message MsgAddLiquidity {
-    cosmos.base.v1beta1.Coin max_token = 1 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"max_token\""];
-    string exact_standard_amt = 2 [(gogoproto.moretags) = "yaml:\"exact_standard_amt\"", (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false];
-    string min_liquidity = 3 [(gogoproto.moretags) = "yaml:\"min_liquidity\"", (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false];
-    int64 deadline = 4;
-    string sender = 5;
-}
-
-// MsgRemoveLiquidity - struct for removing liquidity from a reserve pool
-message MsgRemoveLiquidity {
-    cosmos.base.v1beta1.Coin withdraw_liquidity = 1 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"withdraw_liquidity\""];
-    string min_token = 2 [(gogoproto.moretags) = "yaml:\"min_token\"", (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false];
-    string min_standard_amt = 3 [(gogoproto.moretags) = "yaml:\"min_standard_amt\"", (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false];
-    int64 deadline = 4;
-    string sender = 5;
-}
-
-// MsgSwapOrder represents a msg for swap order
-message MsgSwapOrder {
-    Input input = 1 [(gogoproto.nullable) = false];
-    Output output = 2 [(gogoproto.nullable) = false];
-    int64 deadline = 3;
-    bool is_buy_order = 4 [(gogoproto.moretags) = "yaml:\"is_buy_order\""];
-}
-
 // Input defines the properties of order's input
 message Input {
     string address = 1;

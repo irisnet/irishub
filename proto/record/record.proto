@@ -6,14 +6,6 @@ import "gogoproto/gogo.proto";
 option go_package = "github.com/irisnet/irismod/modules/record/types";
 option (gogoproto.goproto_getters_all) = false;
 
-// MsgCreateValidator defines an SDK message for creating a new validator.
-message MsgCreateRecord {
-    option (gogoproto.equal) = true;
-
-    repeated Content contents = 1 [(gogoproto.nullable) = false];
-    string creator = 2;
-}
-
 // Content defines the detailed information for a record.
 message Content {
     option (gogoproto.equal) = true;

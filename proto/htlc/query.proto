@@ -1,7 +1,6 @@
 syntax = "proto3";
 package irismod.htlc;
 
-import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "htlc/htlc.proto";
 

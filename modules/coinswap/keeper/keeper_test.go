@@ -107,7 +107,7 @@ func (suite *TestSuite) TestLiquidity() {
 	deadline := time.Now().Add(1 * time.Minute)
 
 	msg := types.NewMsgAddLiquidity(depositCoin, standardAmt, minReward, deadline.Unix(), addrSender1)
-	err := suite.app.CoinswapKeeper.AddLiquidity(suite.ctx, msg)
+	_,err := suite.app.CoinswapKeeper.AddLiquidity(suite.ctx, msg)
 	suite.NoError(err)
 
 	moduleAccountBalances := suite.app.BankKeeper.GetSupply(suite.ctx).GetTotal()
@@ -128,7 +128,7 @@ func (suite *TestSuite) TestLiquidity() {
 	deadline = time.Now().Add(1 * time.Minute)
 
 	msg = types.NewMsgAddLiquidity(depositCoin, standardAmt, minReward, deadline.Unix(), addrSender2)
-	err = suite.app.CoinswapKeeper.AddLiquidity(suite.ctx, msg)
+	_,err = suite.app.CoinswapKeeper.AddLiquidity(suite.ctx, msg)
 	suite.NoError(err)
 
 	moduleAccountBalances = suite.app.BankKeeper.GetSupply(suite.ctx).GetTotal()
@@ -148,7 +148,7 @@ func (suite *TestSuite) TestLiquidity() {
 		addrSender1,
 	)
 
-	err = suite.app.CoinswapKeeper.RemoveLiquidity(suite.ctx, msgRemove)
+	_,err = suite.app.CoinswapKeeper.RemoveLiquidity(suite.ctx, msgRemove)
 	suite.NoError(err)
 
 	moduleAccountBalances = suite.app.BankKeeper.GetSupply(suite.ctx).GetTotal()
@@ -168,7 +168,7 @@ func (suite *TestSuite) TestLiquidity() {
 		addrSender2,
 	)
 
-	err = suite.app.CoinswapKeeper.RemoveLiquidity(suite.ctx, msgRemove)
+	_,err = suite.app.CoinswapKeeper.RemoveLiquidity(suite.ctx, msgRemove)
 	suite.NoError(err)
 
 	moduleAccountBalances = suite.app.BankKeeper.GetSupply(suite.ctx).GetTotal()

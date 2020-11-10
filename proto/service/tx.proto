@@ -1,0 +1,217 @@
+syntax = "proto3";
+package irismod.service;
+
+import "cosmos_proto/coin.proto";
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/irisnet/irismod/modules/service/types";
+option (gogoproto.goproto_getters_all) = false;
+
+
+// Msg defines the oracle Msg service.
+service Msg {
+    // DefineService defines a method for define a new service.
+    rpc DefineService(MsgDefineService) returns (MsgDefineServiceResponse);
+
+    // BindService defines a method for bind a server.
+    rpc BindService(MsgBindService) returns (MsgBindServiceResponse);
+
+    // UpdateServiceBinding defines a method for update a service binding.
+    rpc UpdateServiceBinding(MsgUpdateServiceBinding) returns (MsgUpdateServiceBindingResponse);
+
+    // SetWithdrawAddress defines a method for setting a withdraw address.
+    rpc SetWithdrawAddress(MsgSetWithdrawAddress) returns (MsgSetWithdrawAddressResponse);
+
+    // EnableServiceBinding defines a method for enabling a service binding.
+    rpc EnableServiceBinding(MsgEnableServiceBinding) returns (MsgEnableServiceBindingResponse);
+
+    // DisableServiceBinding defines a method for disabling a service binding.
+    rpc DisableServiceBinding(MsgDisableServiceBinding) returns (MsgDisableServiceBindingResponse);
+
+    // RefundServiceDeposit defines a method for refunding a fee.
+    rpc RefundServiceDeposit(MsgRefundServiceDeposit) returns (MsgRefundServiceDepositResponse);
+
+    // CallService defines a method for calling a service.
+    rpc CallService(MsgCallService) returns (MsgCallServiceResponse);
+
+    // RespondService defines a method for responding a service.
+    rpc RespondService(MsgRespondService) returns (MsgRespondServiceResponse);
+
+    // PauseRequestContext defines a method for pausing a service call.
+    rpc PauseRequestContext(MsgPauseRequestContext) returns (MsgPauseRequestContextResponse);
+
+    // StartRequestContext defines a method for starting a service call.
+    rpc StartRequestContext(MsgStartRequestContext) returns (MsgStartRequestContextResponse);
+
+    // KillRequestContext defines a method for killing a service call.
+    rpc KillRequestContext(MsgKillRequestContext) returns (MsgKillRequestContextResponse);
+
+    // UpdateRequestContext defines a method for updating a service call.
+    rpc UpdateRequestContext(MsgUpdateRequestContext) returns (MsgUpdateRequestContextResponse);
+
+    // WithdrawEarnedFees defines a method for Withdrawing a earned fees.
+    rpc WithdrawEarnedFees(MsgWithdrawEarnedFees) returns (MsgWithdrawEarnedFeesResponse);
+}
+
+// MsgDefineService defines an SDK message for defining a new service.
+message MsgDefineService {
+    string name = 1;
+    string description = 2;
+    repeated string tags = 3;
+    string author = 4;
+    string author_description = 5 [(gogoproto.moretags) = "yaml:\"author_description\""];
+    string schemas = 6;
+}
+
+
+// MsgDefineServiceResponse defines the Msg/DefineService response type.
+message MsgDefineServiceResponse {}
+
+// MsgBindService defines an SDK message for binding to an existing service.
+message MsgBindService {
+    string service_name = 1 [(gogoproto.moretags) = "yaml:\"service_name\""];
+    string provider = 2;
+    repeated cosmos.base.v1beta1.Coin deposit = 3 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
+    string pricing = 4;
+    uint64 qos = 5 [(gogoproto.customname) = "QoS"];
+    string options = 6;
+    string owner = 7;
+}
+
+// MsgBindServiceResponse defines the Msg/BindService response type.
+message MsgBindServiceResponse {}
+
+// MsgUpdateServiceBinding defines an SDK message for updating an existing service binding.
+message MsgUpdateServiceBinding {
+    string service_name = 1 [(gogoproto.moretags) = "yaml:\"service_name\""];
+    string provider = 2;
+    repeated cosmos.base.v1beta1.Coin deposit = 3 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
+    string pricing = 4;
+    uint64 qos = 5 [(gogoproto.customname) = "QoS"];
+    string options = 6;
+    string owner = 7;
+}
+
+// MsgUpdateServiceBindingResponse defines the Msg/UpdateServiceBinding response type.
+message MsgUpdateServiceBindingResponse {}
+
+// MsgSetWithdrawAddress defines an SDK message to set the withdrawal address for a provider.
+message MsgSetWithdrawAddress {
+    string owner = 1;
+    string withdraw_address = 2 [(gogoproto.moretags) = "yaml:\"withdraw_address\""];
+}
+
+// MsgSetWithdrawAddressResponse defines the Msg/SetWithdrawAddress response type.
+message MsgSetWithdrawAddressResponse {}
+
+// MsgDisableServiceBinding defines an SDK message to disable a service binding.
+message MsgDisableServiceBinding {
+    string service_name = 1 [(gogoproto.moretags) = "yaml:\"service_name\""];
+    string provider = 2;
+    string owner = 3;
+}
+
+// MsgDisableServiceBindingResponse defines the Msg/DisableServiceBinding response type.
+message MsgDisableServiceBindingResponse {}
+
+// MsgEnableServiceBinding defines an SDK message to enable a service binding.
+message MsgEnableServiceBinding {
+    string service_name = 1 [(gogoproto.moretags) = "yaml:\"service_name\""];
+    string provider = 2;
+    repeated cosmos.base.v1beta1.Coin deposit = 3 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
+    string owner = 4;
+}
+
+// MsgEnableServiceBindingResponse defines the Msg/EnableServiceBinding response type.
+message MsgEnableServiceBindingResponse {}
+
+// MsgRefundServiceDeposit defines an SDK message to refund deposit from a service binding.
+message MsgRefundServiceDeposit {
+    string service_name = 1 [(gogoproto.moretags) = "yaml:\"service_name\""];
+    string provider = 2;
+    string owner = 3;
+}
+
+// MsgRefundServiceDepositResponse defines the Msg/RefundServiceDeposit response type.
+message MsgRefundServiceDepositResponse {}
+
+
+// MsgCallService defines an SDK message to initiate a service request context.
+message MsgCallService {
+    string service_name = 1 [(gogoproto.moretags) = "yaml:\"service_name\""];
+    repeated string providers = 2;
+    string consumer = 3;
+    string input = 4;
+    repeated cosmos.base.v1beta1.Coin service_fee_cap = 5 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "yaml:\"service_fee_cap\""];
+    int64 timeout = 6;
+    bool super_mode = 7 [(gogoproto.moretags) = "yaml:\"super_mode\""];
+    bool repeated = 8;
+    uint64 repeated_frequency = 9 [(gogoproto.moretags) = "yaml:\"repeated_frequency\""];
+    int64 repeated_total = 10 [(gogoproto.moretags) = "yaml:\"repeated_total\""];
+}
+
+// MsgCallServiceResponse defines the Msg/CallService response type.
+message MsgCallServiceResponse {
+    string request_context_id = 1 [(gogoproto.moretags) = "yaml:\"request_context_id\""];
+}
+
+// MsgRespondService defines an SDK message to respond a service request.
+message MsgRespondService {
+    string request_id = 1 [(gogoproto.moretags) = "yaml:\"request_id\""];
+    string provider = 2;
+    string result = 3;
+    string output = 4;
+}
+
+// MsgRespondService defines the Msg/RespondService response type.
+message MsgRespondServiceResponse {}
+
+// MsgPauseRequestContext defines an SDK message to pause a service request.
+message MsgPauseRequestContext {
+    string request_context_id = 1 [(gogoproto.moretags) = "yaml:\"request_context_id\""];
+    string consumer = 2;
+}
+
+// MsgPauseRequestContextResponse defines the Msg/PauseRequestContext response type.
+message MsgPauseRequestContextResponse {}
+
+// MsgStartRequestContext defines an SDK message to resume a service request.
+message MsgStartRequestContext {
+    string request_context_id = 1 [(gogoproto.moretags) = "yaml:\"request_context_id\""];
+    string consumer = 2;
+}
+
+// MsgStartRequestContextResponse defines the Msg/StartRequestContext response type.
+message MsgStartRequestContextResponse {}
+
+// MsgKillRequestContext defines an SDK message to terminate a service request.
+message MsgKillRequestContext {
+    string request_context_id = 1 [(gogoproto.moretags) = "yaml:\"request_context_id\""];
+    string consumer = 2;
+}
+
+// MsgKillRequestContextResponse defines the Msg/KillRequestContext response type.
+message MsgKillRequestContextResponse {}
+
+// MsgUpdateRequestContext defines an SDK message to update a service request context.
+message MsgUpdateRequestContext {
+    string request_context_id = 1 [(gogoproto.moretags) = "yaml:\"request_context_id\""];
+    repeated string providers = 2;
+    string consumer = 3;
+    repeated cosmos.base.v1beta1.Coin service_fee_cap = 4 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "yaml:\"service_fee_cap\""];
+    int64 timeout = 5;
+    uint64 repeated_frequency = 6 [(gogoproto.moretags) = "yaml:\"repeated_frequency\""];
+    int64 repeated_total = 7 [(gogoproto.moretags) = "yaml:\"repeated_total\""];
+}
+
+// MsgUpdateRequestContextResponse defines the Msg/UpdateRequestContext response type.
+message MsgUpdateRequestContextResponse {}
+
+// MsgWithdrawEarnedFees defines an SDK message to withdraw the fees earned by the provider or owner.
+message MsgWithdrawEarnedFees {
+    string owner = 1;
+    string provider = 2;
+}
+
+// MsgWithdrawEarnedFeesResponse defines the Msg/WithdrawEarnedFees response type.
+message MsgWithdrawEarnedFeesResponse {}

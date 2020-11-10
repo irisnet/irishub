@@ -7,42 +7,6 @@ import "gogoproto/gogo.proto";
 option go_package = "github.com/irisnet/irismod/modules/token/types";
 option (gogoproto.goproto_getters_all) = false;
 
-// MsgIssueToken defines an SDK message for issuing a new token.
-message MsgIssueToken {
-    string symbol = 1;
-    string name = 2;
-    uint32 scale = 3;
-    string min_unit = 4 [(gogoproto.moretags) = "yaml:\"min_unit\""];
-    uint64 initial_supply = 5 [(gogoproto.moretags) = "yaml:\"initial_supply\""];
-    uint64 max_supply = 6 [(gogoproto.moretags) = "yaml:\"max_supply\""];
-    bool mintable = 7;
-    string owner = 8;
-}
-
-// MsgMintToken defines an SDK message for transferring the token owner.
-message MsgTransferTokenOwner {
-    string src_owner = 1 [(gogoproto.moretags) = "yaml:\"src_owner\""];
-    string dst_owner = 2 [(gogoproto.moretags) = "yaml:\"dst_owner\""];
-    string symbol = 3;
-}
-
-// MsgEditToken defines an SDK message for editing a new token.
-message MsgEditToken {
-    string symbol = 1;
-    string name = 2;
-    uint64 max_supply = 3 [(gogoproto.moretags) = "yaml:\"max_supply\""];
-    string mintable = 4 [(gogoproto.casttype) = "Bool"];
-    string owner = 5;
-}
-
-// MsgMintToken defines an SDK message for minting a new token.
-message MsgMintToken {
-    string symbol = 1;
-    uint64 amount = 2;
-    string to = 3;
-    string owner = 4;
-}
-
 // Token defines a standard for the fungible token
 message Token {
     option (gogoproto.goproto_stringer) = false;
