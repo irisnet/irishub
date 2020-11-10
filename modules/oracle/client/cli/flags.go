@@ -58,7 +58,7 @@ func init() {
 	FsEditFeed.Int64(FlagTimeout, 0, "The maximum number of blocks to wait for a response since a request is sent, beyond which the request will be ignored")
 	FsEditFeed.String(FlagServiceFeeCap, "", "Only providers charging a fee lower than the cap will be invoked")
 	FsEditFeed.Uint64(FlagFrequency, 0, "The invocation frequency of sending repeated requests")
-	FsEditFeed.Uint16(FlagThreshold, 0, "The minimum number of responses needed for aggregation, range [1, Length(providers)]")
+	FsEditFeed.Uint32(FlagThreshold, 0, "The minimum number of responses needed for aggregation, range [1, Length(providers)]")
 	FsEditFeed.String(FlagCreator, "", "Address of the feed creator")
 
 	FsQueryFeeds.String(FlagFeedState, "", "The state of the feed,paused|running")
