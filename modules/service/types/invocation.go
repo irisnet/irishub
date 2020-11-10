@@ -343,7 +343,7 @@ const (
 
 // ConvertRequestID converts the given string to request ID
 func ConvertRequestID(requestIDStr string) (tmbytes.HexBytes, error) {
-	if len(requestIDStr) != 2*RequestIDLen {
+	if len(requestIDStr) != RequestIDLen {
 		return nil, errors.New("invalid request id")
 	}
 

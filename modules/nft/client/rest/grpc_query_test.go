@@ -2,8 +2,9 @@ package rest_test
 
 import (
 	"fmt"
-	"github.com/cosmos/cosmos-sdk/types/rest"
 	"testing"
+
+	"github.com/cosmos/cosmos-sdk/types/rest"
 
 	nfttypes "github.com/irisnet/irismod/modules/nft/types"
 
@@ -63,7 +64,7 @@ func (s *IntegrationTestSuite) TestNft() {
 	denomName := "name"
 	denom := "denom"
 	schema := "schema"
-	baseURL:=val.APIAddress
+	baseURL := val.APIAddress
 
 	//------test GetCmdIssueDenom()-------------
 	args := []string{
@@ -87,7 +88,7 @@ func (s *IntegrationTestSuite) TestNft() {
 	denomID := gjson.Get(txResp.RawLog, "0.events.0.attributes.0.value").String()
 
 	//------test GetCmdQueryDenom()-------------
-	url :=fmt.Sprintf("%s/irismod/nft/denoms/%s", baseURL,denomID)
+	url := fmt.Sprintf("%s/irismod/nft/denoms/%s", baseURL, denomID)
 	resp, err := rest.GetRequest(url)
 	respType = proto.Message(&nfttypes.QueryDenomResponse{})
 	s.Require().NoError(err)
@@ -97,7 +98,7 @@ func (s *IntegrationTestSuite) TestNft() {
 	s.Require().Equal(schema, denomItem.Denom.Schema)
 
 	//------test GetCmdQueryDenoms()-------------
-	url =fmt.Sprintf("%s/irismod/nft/denoms", baseURL)
+	url = fmt.Sprintf("%s/irismod/nft/denoms", baseURL)
 	resp, err = rest.GetRequest(url)
 	respType = proto.Message(&nfttypes.QueryDenomsResponse{})
 	s.Require().NoError(err)
@@ -127,7 +128,7 @@ func (s *IntegrationTestSuite) TestNft() {
 	s.Require().Equal(expectedCode, txResp.Code)
 
 	//------test GetCmdQuerySupply()-------------
-	url =fmt.Sprintf("%s/irismod/nft/collections/%s/supply", baseURL,denomID)
+	url = fmt.Sprintf("%s/irismod/nft/collections/%s/supply", baseURL, denomID)
 	resp, err = rest.GetRequest(url)
 	respType = proto.Message(&nfttypes.QuerySupplyResponse{})
 	s.Require().NoError(err)
@@ -136,7 +137,7 @@ func (s *IntegrationTestSuite) TestNft() {
 	s.Require().Equal(uint64(1), supplyResp.Amount)
 
 	//------test GetCmdQueryNFT()-------------
-	url =fmt.Sprintf("%s/irismod/nft/nfts/%s/%s", baseURL,denomID,tokenID)
+	url = fmt.Sprintf("%s/irismod/nft/nfts/%s/%s", baseURL, denomID, tokenID)
 	resp, err = rest.GetRequest(url)
 	respType = proto.Message(&nfttypes.QueryNFTResponse{})
 	s.Require().NoError(err)
@@ -149,7 +150,7 @@ func (s *IntegrationTestSuite) TestNft() {
 	s.Require().Equal(from.String(), nftItem.NFT.Owner)
 
 	//------test GetCmdQueryOwner()-------------
-	url =fmt.Sprintf("%s/irismod/nft/owners/%s", baseURL,from.String())
+	url = fmt.Sprintf("%s/irismod/nft/owners/%s", baseURL, from.String())
 	resp, err = rest.GetRequest(url)
 	respType = proto.Message(&nfttypes.QueryOwnerResponse{})
 	s.Require().NoError(err)
@@ -160,7 +161,7 @@ func (s *IntegrationTestSuite) TestNft() {
 	s.Require().Equal(tokenID, ownerResp.Owner.IDCollections[0].Ids[0])
 
 	//------test GetCmdQueryCollection()-------------
-	url =fmt.Sprintf("%s/irismod/nft/collections/%s", baseURL,denomID)
+	url = fmt.Sprintf("%s/irismod/nft/collections/%s", baseURL, denomID)
 	resp, err = rest.GetRequest(url)
 	respType = proto.Message(&nfttypes.QueryCollectionResponse{})
 	s.Require().NoError(err)

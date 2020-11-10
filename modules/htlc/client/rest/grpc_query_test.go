@@ -2,6 +2,8 @@ package rest_test
 
 import (
 	"fmt"
+	"testing"
+
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/testutil/network"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -9,7 +11,6 @@ import (
 	"github.com/gogo/protobuf/proto"
 	"github.com/stretchr/testify/suite"
 	"github.com/tendermint/tendermint/crypto"
-	"testing"
 
 	htlctypes "github.com/irisnet/irismod/modules/htlc/types"
 
@@ -51,7 +52,7 @@ func (s *IntegrationTestSuite) TestHtlc() {
 	val := s.network.Validators[0]
 
 	//------test GetCmdCreateHTLC()-------------
-	baseURL:=val.APIAddress
+	baseURL := val.APIAddress
 	from := val.Address
 	to := sdk.AccAddress(crypto.AddressHash([]byte("dgsbl")))
 	amount := "1000" + sdk.DefaultBondDenom
@@ -84,7 +85,7 @@ func (s *IntegrationTestSuite) TestHtlc() {
 	s.Require().Equal(expectedCode, txResp.Code)
 
 	//------test GetCmdQueryHTLC()-------------
-	url :=fmt.Sprintf("%s/irismod/htlc/htlcs/%s", baseURL,hashLock)
+	url := fmt.Sprintf("%s/irismod/htlc/htlcs/%s", baseURL, hashLock)
 	resp, err := rest.GetRequest(url)
 	respType = proto.Message(&htlctypes.QueryHTLCResponse{})
 	s.Require().NoError(err)
