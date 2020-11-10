@@ -1,8 +1,6 @@
 package rest_test
 
 import (
-	"encoding/base64"
-	"encoding/hex"
 	"fmt"
 	"testing"
 
@@ -80,16 +78,12 @@ func (s *IntegrationTestSuite) TestQueryRecordGRPC() {
 	txResp := respType.(*sdk.TxResponse)
 	s.Require().Equal(expectedCode, txResp.Code)
 
-	recordIDStr := gjson.Get(txResp.RawLog, "0.events.0.attributes.1.value").String()
+	recordID := gjson.Get(txResp.RawLog, "0.events.0.attributes.1.value").String()
 
 	// ---------------------------------------------------------------------------
 
 	baseURL := val.APIAddress
-	recordID, _ := hex.DecodeString(recordIDStr)
-	// XXX to refactor, use hex instead of base64
-	url := fmt.Sprintf("%s/irismod/record/records/%s", baseURL, base64.StdEncoding.EncodeToString(recordID))
-	// XXX
-	println(url)
+	url := fmt.Sprintf("%s/irismod/record/records/%s", baseURL, recordID)
 
 	respType = proto.Message(&recordtypes.QueryRecordResponse{})
 	expectedContents := []recordtypes.Content{{
