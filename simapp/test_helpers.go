@@ -9,6 +9,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/cosmos/cosmos-sdk/testutil"
+	clitestutil "github.com/cosmos/cosmos-sdk/testutil/cli"
+	authcli "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
+	bankcli "github.com/cosmos/cosmos-sdk/x/bank/client/cli"
+	"github.com/tendermint/tendermint/libs/cli"
+
 	"github.com/stretchr/testify/require"
 
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -19,7 +25,6 @@ import (
 	tmtypes "github.com/tendermint/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
 
-	"github.com/cosmos/cosmos-sdk/baseapp"
 	bam "github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
@@ -86,8 +91,8 @@ func NewConfig() network.Config {
 func SimAppConstructor(val network.Validator) servertypes.Application {
 	return NewSimApp(
 		val.Ctx.Logger, dbm.NewMemDB(), nil, true, make(map[int64]bool), val.Ctx.Config.RootDir, 0, MakeEncodingConfig(),
-		baseapp.SetPruning(storetypes.NewPruningOptionsFromString(val.AppConfig.Pruning)),
-		baseapp.SetMinGasPrices(val.AppConfig.MinGasPrices),
+		bam.SetPruning(storetypes.NewPruningOptionsFromString(val.AppConfig.Pruning)),
+		bam.SetMinGasPrices(val.AppConfig.MinGasPrices),
 	)
 }
 
@@ -443,4 +448,25 @@ func NewPubKeyFromHex(pk string) (res crypto.PubKey) {
 	pkEd := make(ed25519.PubKey, ed25519.PubKeySize)
 	copy(pkEd, pkBytes)
 	return pkEd
+}
+
+func QueryBalancesExec(clientCtx client.Context, address string, denom string, extraArgs ...string) (testutil.BufferWriter, error) {
+	args := []string{
+		address,
+		fmt.Sprintf("--%s=%s", bankcli.FlagDenom, denom),
+		fmt.Sprintf("--%s=json", cli.OutputFlag),
+	}
+	args = append(args, extraArgs...)
+
+	return clitestutil.ExecTestCLICmd(clientCtx, bankcli.GetBalancesCmd(), args)
+}
+
+func QueryAccountExec(clientCtx client.Context, address string, extraArgs ...string) (testutil.BufferWriter, error) {
+	args := []string{
+		address,
+		fmt.Sprintf("--%s=json", cli.OutputFlag),
+	}
+	args = append(args, extraArgs...)
+
+	return clitestutil.ExecTestCLICmd(clientCtx, authcli.GetAccountCmd(), args)
 }

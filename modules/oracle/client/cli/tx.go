@@ -49,8 +49,8 @@ func GetCmdCreateFeed() *cobra.Command {
 				`--providers=<provide1_address>,<provider2_address> `+
 				`--service-fee-cap=1iris `+
 				`--timeout=2 `+
-				`--total=10 `+
 				`--threshold=1 `+
+				`--frequency=12 `+
 				`--aggregate-func="avg" `+
 				`--value-json-path="high"`,
 			version.AppName,
@@ -256,15 +256,14 @@ func GetCmdEditFeed() *cobra.Command {
 		Short: "Modify the feed information and update service invocation parameters by feed creator.",
 		Args:  cobra.ExactArgs(1),
 		Example: fmt.Sprintf(
-			`%s tx oracle edit <feed-name> --chain-id=<chain-id> --from=<key-name> --fees=0.3iris `+
-				`--latest-history=10 `+
-				`--providers=<provide1_address>,<provider2_address> `+
-				`--service-fee-cap=1iris `+
-				`--timeout=2 `+
-				`--frequency=10 `+
-				`--threshold=5 `+
-				`--threshold=1`,
-			version.AppName,
+			`%s tx oracle edit <feed-name> --chain-id=<chain-id> --from=<key-name> --fees=0.3iris ` +
+				`--latest-history=10 ` +
+				`--providers=<provide1_address>,<provider2_address> ` +
+				`--service-fee-cap=1iris ` +
+				`--timeout=2 ` +
+				`--frequency=10 ` +
+				`--threshold=5 ` +
+				version.AppName,
 		),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)

@@ -46,7 +46,6 @@ func GetCmdIssueDenom() *cobra.Command {
 				"--from=<key-name> "+
 				"--name=<name> "+
 				"--schema=<schema> "+
-				"--name=<name> "+
 				"--chain-id=<chain-id> "+
 				"--fees=<fee>",
 			version.AppName,

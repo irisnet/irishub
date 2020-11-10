@@ -228,7 +228,7 @@ message PromotionByVolume {
 
 // RequestContextBatchState is a type alias that represents a request batch status as a byte
 enum RequestContextBatchState {
-    option (gogoproto.enum_stringer) = false;
+    option (gogoproto.enum_stringer) = true;
     option (gogoproto.goproto_enum_stringer) = false;
     option (gogoproto.goproto_enum_prefix) = false;
 
@@ -240,7 +240,7 @@ enum RequestContextBatchState {
 
 // RequestContextState is a type alias that represents a request status as a byte
 enum RequestContextState {
-    option (gogoproto.enum_stringer) = false;
+    option (gogoproto.enum_stringer) = true;
     option (gogoproto.goproto_enum_stringer) = false;
     option (gogoproto.goproto_enum_prefix) = false;
 

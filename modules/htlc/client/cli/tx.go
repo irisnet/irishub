@@ -45,7 +45,6 @@ func GetCmdCreateHTLC() *cobra.Command {
 				"--to=<recipient> "+
 				"--receiver-on-other-chain=<receiver-on-other-chain> "+
 				"--amount=<amount> "+
-				"--secret=<secret> "+
 				"--hash-lock=<hash-lock> "+
 				"--timestamp=<timestamp> "+
 				"--time-lock=<time-lock> "+

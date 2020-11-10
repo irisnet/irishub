@@ -192,37 +192,11 @@ func ParseResult(result string) (Result, error) {
 	return r, nil
 }
 
-var (
-	RequestContextStateToStringMap = map[RequestContextState]string{
-		RUNNING:   "running",
-		PAUSED:    "paused",
-		COMPLETED: "completed",
-	}
-	StringToRequestContextStateMap = map[string]RequestContextState{
-		"running":   RUNNING,
-		"paused":    PAUSED,
-		"completed": COMPLETED,
-	}
-)
-
 func RequestContextStateFromString(str string) (RequestContextState, error) {
-	if state, ok := StringToRequestContextStateMap[strings.ToLower(str)]; ok {
-		return state, nil
+	if state, ok := RequestContextState_value[strings.ToUpper(str)]; ok {
+		return RequestContextState(state), nil
 	}
 	return RequestContextState(0xff), fmt.Errorf("'%s' is not a valid request context state", str)
-}
-
-func (state RequestContextState) Format(s fmt.State, verb rune) {
-	switch verb {
-	case 's':
-		s.Write([]byte(state.String()))
-	default:
-		s.Write([]byte(fmt.Sprintf("%v", byte(state))))
-	}
-}
-
-func (state RequestContextState) String() string {
-	return RequestContextStateToStringMap[state]
 }
 
 // Marshal needed for protobuf compatibility
@@ -236,63 +210,6 @@ func (state *RequestContextState) Unmarshal(data []byte) error {
 	return nil
 }
 
-// MarshalJSON returns the JSON representation
-func (state RequestContextState) MarshalJSON() ([]byte, error) {
-	return json.Marshal(state.String())
-}
-
-// UnmarshalJSON unmarshals raw JSON bytes into a RequestContextState.
-func (state *RequestContextState) UnmarshalJSON(data []byte) error {
-	var s string
-	if err := json.Unmarshal(data, &s); err != nil {
-		return nil
-	}
-
-	bz, err := RequestContextStateFromString(s)
-	if err != nil {
-		return err
-	}
-
-	*state = bz
-	return nil
-}
-
-// MarshalYAML returns the YAML representation
-func (state RequestContextState) MarshalYAML() (interface{}, error) {
-	return state.String(), nil
-}
-
-var (
-	RequestContextBatchStateToStringMap = map[RequestContextBatchState]string{
-		BATCHRUNNING:   "running",
-		BATCHCOMPLETED: "completed",
-	}
-	StringToRequestContextBatchStateMap = map[string]RequestContextBatchState{
-		"running":   BATCHRUNNING,
-		"completed": BATCHCOMPLETED,
-	}
-)
-
-func RequestContextBatchStateFromString(str string) (RequestContextBatchState, error) {
-	if state, ok := StringToRequestContextBatchStateMap[strings.ToLower(str)]; ok {
-		return state, nil
-	}
-	return RequestContextBatchState(0xff), fmt.Errorf("'%s' is not a valid request context batch state", str)
-}
-
-func (state RequestContextBatchState) Format(s fmt.State, verb rune) {
-	switch verb {
-	case 's':
-		s.Write([]byte(state.String()))
-	default:
-		s.Write([]byte(fmt.Sprintf("%v", byte(state))))
-	}
-}
-
-func (state RequestContextBatchState) String() string {
-	return RequestContextBatchStateToStringMap[state]
-}
-
 // Marshal needed for protobuf compatibility
 func (state RequestContextBatchState) Marshal() ([]byte, error) {
 	return []byte{byte(state)}, nil
@@ -302,32 +219,6 @@ func (state RequestContextBatchState) Marshal() ([]byte, error) {
 func (state *RequestContextBatchState) Unmarshal(data []byte) error {
 	*state = RequestContextBatchState(data[0])
 	return nil
-}
-
-// MarshalJSON returns the JSON representation
-func (state RequestContextBatchState) MarshalJSON() ([]byte, error) {
-	return json.Marshal(state.String())
-}
-
-// UnmarshalJSON unmarshals raw JSON bytes into a RequestContextBatchState
-func (state *RequestContextBatchState) UnmarshalJSON(data []byte) error {
-	var s string
-	if err := json.Unmarshal(data, &s); err != nil {
-		return nil
-	}
-
-	bz, err := RequestContextBatchStateFromString(s)
-	if err != nil {
-		return err
-	}
-
-	*state = bz
-	return nil
-}
-
-// MarshalYAML returns the YAML representation
-func (state RequestContextBatchState) MarshalYAML() (interface{}, error) {
-	return state.String(), nil
 }
 
 // ResponseCallback defines the response callback interface
@@ -343,7 +234,7 @@ const (
 
 // ConvertRequestID converts the given string to request ID
 func ConvertRequestID(requestIDStr string) (tmbytes.HexBytes, error) {
-	if len(requestIDStr) != 2*RequestIDLen {
+	if len(requestIDStr) != RequestIDLen {
 		return nil, errors.New("invalid request id")
 	}
 
