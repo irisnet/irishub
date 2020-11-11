@@ -55,6 +55,7 @@ ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=iris \
 		  -X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
 		  -X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
 		  -X "github.com/cosmos/cosmos-sdk/version.BuildTags=$(build_tags_comma_sep)" \
+		  -X github.com/cosmos/cosmos-sdk/types.reDnmString=[a-zA-Z][a-zA-Z0-9/:]{2,127}
 
 ifeq ($(WITH_CLEVELDB),yes)
   ldflags += -X github.com/cosmos/cosmos-sdk/types.DBBackend=cleveldb
@@ -92,7 +93,7 @@ install: go.sum
 	go install $(BUILD_FLAGS) ./cmd/iris
 
 update-swagger-docs: statik
-	$(BINDIR)/statik -src=lite/grpc-gateway -dest=lite/grpc-gateway -f -m
+	$(BINDIR)/statik -src=lite/swagger-ui -dest=lite -f -m
 	@if [ -n "$(git status --porcelain)" ]; then \
         echo "\033[91mSwagger docs are out of sync!!!\033[0m";\
         exit 1;\
@@ -118,7 +119,7 @@ draw-deps:
 	@goviz -i ./cmd/iris -d 2 | dot -Tpng -o dependency-graph.png
 
 clean:
-	rm -rf snapcraft-local.yaml build/
+	rm -rf snapcraft-local.yaml build/ tmp-swagger-gen/
 
 distclean: clean
 	rm -rf vendor/

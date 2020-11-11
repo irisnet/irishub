@@ -19,31 +19,19 @@ const (
 	QuerierRoute = StoreKey
 
 	// Query endpoints supported by the guardian querier
-	QueryProfilers = "profilers"
-	QueryTrustees  = "trustees"
+	QuerySupers = "supers"
 )
 
 var (
-	ProfilerKey = []byte{0x00} // profiler key
-	TrusteeKey  = []byte{0x01} // trustee key
+	SuperKey = []byte{0x00} // super key
 )
 
-// GetProfilerKey returns profiler key bytes
-func GetProfilerKey(addr sdk.AccAddress) []byte {
-	return append(ProfilerKey, addr.Bytes()...)
+// GetSuperKey returns super key bytes
+func GetSuperKey(addr sdk.AccAddress) []byte {
+	return append(SuperKey, addr.Bytes()...)
 }
 
-// GetTrusteeKey returns trustee key bytes
-func GetTrusteeKey(addr sdk.AccAddress) []byte {
-	return append(TrusteeKey, addr.Bytes()...)
-}
-
-// GetProfilersSubspaceKey returns the key for getting all profilers from the store
-func GetProfilersSubspaceKey() []byte {
-	return ProfilerKey
-}
-
-// GetProfilersSubspaceKey returns the key for getting all profilers from the store
-func GetTrusteesSubspaceKey() []byte {
-	return TrusteeKey
+// GetSupersSubspaceKey returns the key for getting all supers from the store
+func GetSupersSubspaceKey() []byte {
+	return SuperKey
 }

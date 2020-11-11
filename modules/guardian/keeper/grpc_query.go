@@ -13,40 +13,21 @@ import (
 
 var _ types.QueryServer = Keeper{}
 
-// Profilers implements the Query/Profilers gRPC method
-func (k Keeper) Profilers(c context.Context, req *types.QueryProfilersRequest) (*types.QueryProfilersResponse, error) {
+// Supers implements the Query/Supers gRPC method
+func (k Keeper) Supers(c context.Context, req *types.QuerySupersRequest) (*types.QuerySupersResponse, error) {
 	if req == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "empty request")
 	}
 
 	ctx := sdk.UnwrapSDKContext(c)
-	var profilers []types.Guardian
-	k.IterateProfilers(
+	var supers []types.Super
+	k.IterateSupers(
 		ctx,
-		func(profiler types.Guardian) bool {
-			profilers = append(profilers, profiler)
+		func(super types.Super) bool {
+			supers = append(supers, super)
 			return false
 		},
 	)
 
-	return &types.QueryProfilersResponse{Profilers: profilers}, nil
-}
-
-// Trustees implements the Query/Trustees gRPC method
-func (k Keeper) Trustees(c context.Context, req *types.QueryTrusteesRequest) (*types.QueryTrusteesResponse, error) {
-	if req == nil {
-		return nil, status.Errorf(codes.InvalidArgument, "empty request")
-	}
-
-	ctx := sdk.UnwrapSDKContext(c)
-	var trustees []types.Guardian
-	k.IterateTrustees(
-		ctx,
-		func(trustee types.Guardian) bool {
-			trustees = append(trustees, trustee)
-			return false
-		},
-	)
-
-	return &types.QueryTrusteesResponse{Trustees: trustees}, nil
+	return &types.QuerySupersResponse{Supers: supers}, nil
 }

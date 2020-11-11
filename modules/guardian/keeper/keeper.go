@@ -31,93 +31,51 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 	return ctx.Logger().With("module", fmt.Sprintf("%s", types.ModuleName))
 }
 
-// Add a profiler, only a existing profiler can add a new and the profiler is not existed
-func (k Keeper) AddProfiler(ctx sdk.Context, guardian types.Guardian) {
+// Add a super, only a existing super can add a new and the super is not existed
+func (k Keeper) AddSuper(ctx sdk.Context, super types.Super) {
 	store := ctx.KVStore(k.storeKey)
-	bz := k.cdc.MustMarshalBinaryBare(&guardian)
-	store.Set(types.GetProfilerKey(guardian.Address), bz)
+	bz := k.cdc.MustMarshalBinaryBare(&super)
+	address, _ := sdk.AccAddressFromBech32(super.Address)
+	store.Set(types.GetSuperKey(address), bz)
 }
 
-// DeleteProfiler delete the stored profiler
-func (k Keeper) DeleteProfiler(ctx sdk.Context, address sdk.AccAddress) {
+// DeleteSuper delete the stored super
+func (k Keeper) DeleteSuper(ctx sdk.Context, address sdk.AccAddress) {
 	store := ctx.KVStore(k.storeKey)
-	store.Delete(types.GetProfilerKey(address))
+	store.Delete(types.GetSuperKey(address))
 }
 
-// GetProfiler retrieves the profiler by specified address
-func (k Keeper) GetProfiler(ctx sdk.Context, addr sdk.AccAddress) (guardian types.Guardian, found bool) {
+// GetSuper retrieves the super by specified address
+func (k Keeper) GetSuper(ctx sdk.Context, addr sdk.AccAddress) (super types.Super, found bool) {
 	store := ctx.KVStore(k.storeKey)
-	if bz := store.Get(types.GetProfilerKey(addr)); bz != nil {
-		k.cdc.MustUnmarshalBinaryBare(bz, &guardian)
-		return guardian, true
+	if bz := store.Get(types.GetSuperKey(addr)); bz != nil {
+		k.cdc.MustUnmarshalBinaryBare(bz, &super)
+		return super, true
 	}
-	return guardian, false
+	return super, false
 }
 
-// IterateProfilers iterates through all profilers
-func (k Keeper) IterateProfilers(
+// IterateSupers iterates through all supers
+func (k Keeper) IterateSupers(
 	ctx sdk.Context,
-	op func(profiler types.Guardian) (stop bool),
+	op func(super types.Super) (stop bool),
 ) {
 	store := ctx.KVStore(k.storeKey)
 
-	iterator := sdk.KVStorePrefixIterator(store, types.GetProfilersSubspaceKey())
+	iterator := sdk.KVStorePrefixIterator(store, types.GetSupersSubspaceKey())
 	defer iterator.Close()
 
 	for ; iterator.Valid(); iterator.Next() {
-		var profiler types.Guardian
-		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &profiler)
+		var super types.Super
+		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &super)
 
-		if stop := op(profiler); stop {
-			break
-		}
-	}
-}
-
-// AddTrustee add a trustee
-func (k Keeper) AddTrustee(ctx sdk.Context, guardian types.Guardian) {
-	store := ctx.KVStore(k.storeKey)
-	bz := k.cdc.MustMarshalBinaryBare(&guardian)
-	store.Set(types.GetTrusteeKey(guardian.GetAddress()), bz)
-}
-
-// DeleteTrustee delete the stored trustee
-func (k Keeper) DeleteTrustee(ctx sdk.Context, address sdk.AccAddress) {
-	store := ctx.KVStore(k.storeKey)
-	store.Delete(types.GetTrusteeKey(address))
-}
-
-// GetTrustee retrieves the trustee by specified address
-func (k Keeper) GetTrustee(ctx sdk.Context, addr sdk.AccAddress) (guardian types.Guardian, found bool) {
-	store := ctx.KVStore(k.storeKey)
-	if bz := store.Get(types.GetTrusteeKey(addr)); bz != nil {
-		k.cdc.MustUnmarshalBinaryBare(bz, &guardian)
-		return guardian, true
-	}
-	return guardian, false
-}
-
-// IterateTrustees iterates through all trustees
-func (k Keeper) IterateTrustees(
-	ctx sdk.Context,
-	op func(trustee types.Guardian) (stop bool),
-) {
-	store := ctx.KVStore(k.storeKey)
-
-	iterator := sdk.KVStorePrefixIterator(store, types.GetTrusteesSubspaceKey())
-	defer iterator.Close()
-
-	for ; iterator.Valid(); iterator.Next() {
-		var trustee types.Guardian
-		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &trustee)
-
-		if stop := op(trustee); stop {
+		if stop := op(super); stop {
 			break
 		}
 	}
 }
 
 func (k Keeper) Authorized(ctx sdk.Context, addr sdk.AccAddress) bool {
-	_, found := k.GetProfiler(ctx, addr)
+	_, found := k.GetSuper(ctx, addr)
 	return found
 }
