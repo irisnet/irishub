@@ -8,7 +8,8 @@ const (
 	EventTypeRefundHTLC  = "refund_htlc"
 	EventTypeHTLCExpired = "htlc_expired"
 
-	AttributeValueCategory           = ModuleName
+	AttributeValueCategory = ModuleName
+
 	AttributeKeySender               = "sender"
 	AttributeKeyReceiver             = "receiver"
 	AttributeKeyReceiverOnOtherChain = "receiver_on_other_chain"

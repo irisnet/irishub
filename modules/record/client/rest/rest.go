@@ -4,7 +4,6 @@ import (
 	"github.com/gorilla/mux"
 
 	"github.com/cosmos/cosmos-sdk/client"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/rest"
 
 	"github.com/irisnet/irismod/modules/record/types"
@@ -25,5 +24,5 @@ func RegisterHandlers(cliCtx client.Context, r *mux.Router) {
 type RecordCreateReq struct {
 	BaseReq  rest.BaseReq    `json:"base_req" yaml:"base_req"` // base req
 	Contents []types.Content `json:"contents" yaml:"contents"`
-	Creator  sdk.AccAddress  `json:"creator" yaml:"creator"`
+	Creator  string          `json:"creator" yaml:"creator"`
 }

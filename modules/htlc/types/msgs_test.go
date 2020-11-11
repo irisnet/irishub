@@ -1,6 +1,7 @@
 package types
 
 import (
+	"encoding/hex"
 	"fmt"
 	"strings"
 	"testing"
@@ -14,13 +15,14 @@ import (
 )
 
 var (
-	sender               = sdk.AccAddress(tmhash.SumTruncated([]byte("sender")))
-	recipient            = sdk.AccAddress(tmhash.SumTruncated([]byte("recipient")))
+	emptyAddr            = ""
+	sender               = sdk.AccAddress(tmhash.SumTruncated([]byte("sender"))).String()
+	recipient            = sdk.AccAddress(tmhash.SumTruncated([]byte("recipient"))).String()
 	receiverOnOtherChain = "receiverOnOtherChain"
 	amount               = sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(10)))
 	secret               = tmbytes.HexBytes(tmhash.Sum([]byte("secret")))
 	timestamp            = uint64(1580000000)
-	hashLock             = tmbytes.HexBytes(tmhash.Sum(append(secret, sdk.Uint64ToBigEndian(timestamp)...)))
+	hashLock             = tmbytes.HexBytes(tmhash.Sum(append(secret, sdk.Uint64ToBigEndian(timestamp)...))).String()
 	timeLock             = uint64(50)
 )
 
@@ -28,11 +30,11 @@ var (
 func TestNewMsgCreateHTLC(t *testing.T) {
 	msg := NewMsgCreateHTLC(sender, recipient, receiverOnOtherChain, amount, hashLock, timestamp, timeLock)
 
-	require.Equal(t, sender.String(), msg.Sender)
-	require.Equal(t, recipient.String(), msg.To)
+	require.Equal(t, sender, msg.Sender)
+	require.Equal(t, recipient, msg.To)
 	require.Equal(t, receiverOnOtherChain, msg.ReceiverOnOtherChain)
 	require.Equal(t, amount, msg.Amount)
-	require.Equal(t, hashLock.String(), msg.HashLock)
+	require.Equal(t, hashLock, msg.HashLock)
 	require.Equal(t, timestamp, msg.Timestamp)
 	require.Equal(t, timeLock, msg.TimeLock)
 }
@@ -51,11 +53,9 @@ func TestMsgCreateHTLCType(t *testing.T) {
 
 // TestMsgCreateHTLCValidation tests ValidateBasic for MsgCreateHTLC
 func TestMsgCreateHTLCValidation(t *testing.T) {
-	emptyAddr := sdk.AccAddress{}
-
 	invalidReceiverOnOtherChain := strings.Repeat("r", 129)
 	invalidAmount := sdk.Coins{}
-	invalidHashLock := []byte("0x")
+	invalidHashLock := "0x"
 	invalidSmallTimeLock := uint64(49)
 	invalidLargeTimeLock := uint64(25481)
 
@@ -115,37 +115,35 @@ func TestMsgCreateHTLCGetSigners(t *testing.T) {
 
 // TestNewMsgClaimHTLC tests constructor for MsgClaimHTLC
 func TestNewMsgClaimHTLC(t *testing.T) {
-	msg := NewMsgClaimHTLC(sender, hashLock, secret)
+	msg := NewMsgClaimHTLC(sender, hashLock, secret.String())
 
-	require.Equal(t, sender.String(), msg.Sender)
+	require.Equal(t, sender, msg.Sender)
 	require.Equal(t, secret.String(), msg.Secret)
-	require.Equal(t, hashLock.String(), msg.HashLock)
+	require.Equal(t, hashLock, msg.HashLock)
 }
 
 // TestMsgClaimHTLCRoute tests Route for MsgClaimHTLC
 func TestMsgClaimHTLCRoute(t *testing.T) {
-	msg := NewMsgClaimHTLC(sender, hashLock, secret)
+	msg := NewMsgClaimHTLC(sender, hashLock, secret.String())
 	require.Equal(t, "htlc", msg.Route())
 }
 
 // TestMsgClaimHTLCType tests Type for MsgClaimHTLC
 func TestMsgClaimHTLCType(t *testing.T) {
-	msg := NewMsgClaimHTLC(sender, hashLock, secret)
+	msg := NewMsgClaimHTLC(sender, hashLock, secret.String())
 	require.Equal(t, "claim_htlc", msg.Type())
 }
 
 // TestMsgClaimHTLCValidation tests ValidateBasic for MsgClaimHTLC
 func TestMsgClaimHTLCValidation(t *testing.T) {
-	emptyAddr := sdk.AccAddress{}
-
-	invalidHashLock := []byte("0x")
-	invalidSecret := []byte("0x")
+	invalidHashLock := "0x"
+	invalidSecret := "0x"
 
 	testMsgs := []MsgClaimHTLC{
-		NewMsgClaimHTLC(sender, hashLock, secret),        // valid msg
-		NewMsgClaimHTLC(emptyAddr, hashLock, secret),     // missing sender
-		NewMsgClaimHTLC(sender, invalidHashLock, secret), // invalid hash lock
-		NewMsgClaimHTLC(sender, hashLock, invalidSecret), // invalid secret
+		NewMsgClaimHTLC(sender, hashLock, secret.String()),        // valid msg
+		NewMsgClaimHTLC(emptyAddr, hashLock, secret.String()),     // missing sender
+		NewMsgClaimHTLC(sender, invalidHashLock, secret.String()), // invalid hash lock
+		NewMsgClaimHTLC(sender, hashLock, invalidSecret),          // invalid secret
 	}
 
 	testCases := []struct {
@@ -171,7 +169,7 @@ func TestMsgClaimHTLCValidation(t *testing.T) {
 
 // TestMsgClaimHTLCGetSignBytes tests GetSignBytes for MsgClaimHTLC
 func TestMsgClaimHTLCGetSignBytes(t *testing.T) {
-	msg := NewMsgClaimHTLC(sender, hashLock, secret)
+	msg := NewMsgClaimHTLC(sender, hashLock, secret.String())
 	res := msg.GetSignBytes()
 
 	expected := `{"type":"irismod/htlc/MsgClaimHTLC","value":{"hash_lock":"6F4ECE9B22CFC1CF39C9C73DD2D35867A8EC97C48A9C2F664FE5287865A18C2E","secret":"2BB80D537B1DA3E38BD30361AA855686BDE0EACD7162FEF6A25FE97BF527A25B","sender":"cosmos1pgm8hyk0pvphmlvfjc8wsvk4daluz5tgmr4lac"}}`
@@ -180,7 +178,7 @@ func TestMsgClaimHTLCGetSignBytes(t *testing.T) {
 
 // TestMsgClaimHTLCGetSigners tests GetSigners for MsgClaimHTLC
 func TestMsgClaimHTLCGetSigners(t *testing.T) {
-	msg := NewMsgClaimHTLC(sender, hashLock, secret)
+	msg := NewMsgClaimHTLC(sender, hashLock, secret.String())
 	res := msg.GetSigners()
 
 	expected := "[0A367B92CF0B037DFD89960EE832D56F7FC15168]"
@@ -191,8 +189,8 @@ func TestMsgClaimHTLCGetSigners(t *testing.T) {
 func TestNewMsgRefundHTLC(t *testing.T) {
 	msg := NewMsgRefundHTLC(sender, hashLock)
 
-	require.Equal(t, sender.String(), msg.Sender)
-	require.Equal(t, hashLock.String(), msg.HashLock)
+	require.Equal(t, sender, msg.Sender)
+	require.Equal(t, hashLock, msg.HashLock)
 }
 
 // TestMsgRefundHTLCRoute tests Route for MsgRefundHTLC
@@ -209,9 +207,7 @@ func TestMsgRefundHTLCType(t *testing.T) {
 
 // TestMsgRefundHTLCValidation tests ValidateBasic for MsgRefundHTLC
 func TestMsgRefundHTLCValidation(t *testing.T) {
-	emptyAddr := sdk.AccAddress{}
-
-	invalidHashLock := []byte("0x")
+	invalidHashLock := hex.EncodeToString([]byte("0x"))
 
 	testMsgs := []MsgRefundHTLC{
 		NewMsgRefundHTLC(sender, hashLock),        // valid msg

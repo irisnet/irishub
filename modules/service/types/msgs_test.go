@@ -13,27 +13,29 @@ import (
 )
 
 var (
+	emptyAddress = ""
+
 	testCoin1 = sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(10000))
 	testCoin2 = sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100))
 
 	testServiceName = "test-service"
 	testServiceDesc = "test-service-desc"
 	testServiceTags = []string{"tag1", "tag2"}
-	testAuthor      = sdk.AccAddress(tmhash.SumTruncated([]byte("test-author")))
+	testAuthor      = sdk.AccAddress(tmhash.SumTruncated([]byte("test-author"))).String()
 	testAuthorDesc  = "test-author-desc"
 	testSchemas     = `{"input":{"type":"object"},"output":{"type":"object"}}`
 
-	testOwner        = sdk.AccAddress(tmhash.SumTruncated([]byte("test-owner")))
-	testProvider     = sdk.AccAddress(tmhash.SumTruncated([]byte("test-provider")))
+	testOwner        = sdk.AccAddress(tmhash.SumTruncated([]byte("test-owner"))).String()
+	testProvider     = sdk.AccAddress(tmhash.SumTruncated([]byte("test-provider"))).String()
 	testDeposit      = sdk.NewCoins(testCoin1)
 	testPricing      = `{"price":"1stake"}`
 	testQoS          = uint64(50)
 	testOptions      = "{}"
-	testWithdrawAddr = sdk.AccAddress(tmhash.SumTruncated([]byte("test-withdrawal-address")))
+	testWithdrawAddr = sdk.AccAddress(tmhash.SumTruncated([]byte("test-withdrawal-address"))).String()
 	testAddedDeposit = sdk.NewCoins(testCoin2)
 
-	testConsumer      = sdk.AccAddress(tmhash.SumTruncated([]byte("test-consumer")))
-	testProviders     = []sdk.AccAddress{testProvider}
+	testConsumer      = sdk.AccAddress(tmhash.SumTruncated([]byte("test-consumer"))).String()
+	testProviders     = []string{testProvider}
 	testInput         = `{"header":{},"body":{"pair":"iris-usdt"}}`
 	testServiceFeeCap = sdk.NewCoins(testCoin2)
 	testTimeout       = int64(100)
@@ -43,8 +45,9 @@ var (
 	testResult = `{"code":200,"message":""}`
 	testOutput = `{"header":{},"body":{"last":"100"}}`
 
-	testRequestContextID = GenerateRequestContextID(tmhash.Sum([]byte("test-request-context-id")), 0)
-	testRequestID        = GenerateRequestID(testRequestContextID, 1, 1, 1)
+	rawTestRequestContextID = GenerateRequestContextID(tmhash.Sum([]byte("test-request-context-id")), 0)
+	testRequestContextID    = rawTestRequestContextID.String()
+	testRequestID           = GenerateRequestID(rawTestRequestContextID, 1, 1, 1).String()
 
 	// -------------
 
@@ -65,8 +68,6 @@ func TestMsgDefineServiceType(t *testing.T) {
 
 // TestMsgDefineServiceValidation tests ValidateBasic for MsgDefineService
 func TestMsgDefineServiceValidation(t *testing.T) {
-	emptyAddress := sdk.AccAddress{}
-
 	invalidLongName := strings.Repeat("s", MaxNameLength+1)
 	invalidLongDesc := strings.Repeat("d", MaxDescriptionLength+1)
 	invalidMoreTags := strings.Split("t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11", ",")
@@ -156,8 +157,6 @@ func TestMsgBindServiceType(t *testing.T) {
 
 // TestMsgBindServiceValidation tests ValidateBasic for MsgBindService
 func TestMsgBindServiceValidation(t *testing.T) {
-	emptyAddress := sdk.AccAddress{}
-
 	invalidLongName := strings.Repeat("s", MaxNameLength+1)
 	invalidDeposit := sdk.Coins{sdk.Coin{Denom: "stake", Amount: sdk.NewInt(-1)}}
 	invalidQoS := uint64(0)
@@ -244,7 +243,6 @@ func TestMsgUpdateServiceBindingType(t *testing.T) {
 
 // TestMsgUpdateServiceBindingValidation tests ValidateBasic for MsgUpdateServiceBinding
 func TestMsgUpdateServiceBindingValidation(t *testing.T) {
-	emptyAddress := sdk.AccAddress{}
 	emptyAddedDeposit := sdk.Coins{}
 
 	invalidLongName := strings.Repeat("s", MaxNameLength+1)
@@ -335,8 +333,6 @@ func TestMsgSetWithdrawAddressType(t *testing.T) {
 
 // TestMsgSetWithdrawAddressValidation tests ValidateBasic for MsgSetWithdrawAddress
 func TestMsgSetWithdrawAddressValidation(t *testing.T) {
-	emptyAddress := sdk.AccAddress{}
-
 	testMsgs := []*MsgSetWithdrawAddress{
 		NewMsgSetWithdrawAddress(testOwner, testWithdrawAddr),    // valid msg
 		NewMsgSetWithdrawAddress(emptyAddress, testWithdrawAddr), // missing owner address
@@ -395,8 +391,6 @@ func TestMsgDisableServiceBindingType(t *testing.T) {
 
 // TestMsgDisableServiceBindingValidation tests ValidateBasic for MsgDisableServiceBinding
 func TestMsgDisableServiceBindingValidation(t *testing.T) {
-	emptyAddress := sdk.AccAddress{}
-
 	invalidLongName := strings.Repeat("s", MaxNameLength+1)
 
 	testMsgs := []*MsgDisableServiceBinding{
@@ -461,7 +455,6 @@ func TestMsgEnableServiceBindingType(t *testing.T) {
 
 // TestMsgEnableServiceBindingValidation tests ValidateBasic for MsgEnableServiceBinding
 func TestMsgEnableServiceBindingValidation(t *testing.T) {
-	emptyAddress := sdk.AccAddress{}
 	emptyAddedDeposit := sdk.Coins{}
 
 	invalidLongName := strings.Repeat("s", MaxNameLength+1)
@@ -530,8 +523,6 @@ func TestMsgRefundServiceDepositType(t *testing.T) {
 
 // TestMsgRefundServiceDepositValidation tests ValidateBasic for MsgRefundServiceDeposit
 func TestMsgRefundServiceDepositValidation(t *testing.T) {
-	emptyAddress := sdk.AccAddress{}
-
 	invalidLongName := strings.Repeat("s", MaxNameLength+1)
 
 	testMsgs := []*MsgRefundServiceDeposit{
@@ -604,12 +595,10 @@ func TestMsgCallServiceType(t *testing.T) {
 
 // TestMsgCallServiceValidation tests ValidateBasic for MsgCallService
 func TestMsgCallServiceValidation(t *testing.T) {
-	emptyAddress := sdk.AccAddress{}
-
 	invalidLongName := strings.Repeat("s", MaxNameLength+1)
 	invalidDenomCoins := sdk.Coins{sdk.Coin{Denom: "eth-min", Amount: sdk.NewInt(1000)}}
 
-	invalidDuplicateProviders := []sdk.AccAddress{testProvider, testProvider}
+	invalidDuplicateProviders := []string{testProvider, testProvider}
 	invalidInput := "iris-usdt"
 	invalidTimeout := int64(0)
 	invalidLessRepeatedFreq := uint64(testTimeout) - 10
@@ -751,9 +740,7 @@ func TestMsgRespondServiceType(t *testing.T) {
 
 // TestMsgRespondServiceValidation tests ValidateBasic for MsgRespondService
 func TestMsgRespondServiceValidation(t *testing.T) {
-	emptyAddress := sdk.AccAddress{}
-
-	invalidRequestID := []byte("invalidRequestID")
+	invalidRequestID := "invalidRequestID"
 	invalidOutput := "invalidOutput"
 
 	validResult400 := `{"code":400,"message":"invalid parameters"}`
@@ -840,8 +827,7 @@ func TestMsgPauseRequestContextType(t *testing.T) {
 
 // TestMsgPauseRequestContextValidation tests ValidateBasic for MsgPauseRequestContext
 func TestMsgPauseRequestContextValidation(t *testing.T) {
-	emptyAddress := sdk.AccAddress{}
-	invalidRequestContextID := []byte("invalid-request-context-id")
+	invalidRequestContextID := "invalid-request-context-id"
 
 	testMsgs := []*MsgPauseRequestContext{
 		NewMsgPauseRequestContext(testRequestContextID, testConsumer),    // valid msg
@@ -901,8 +887,7 @@ func TestMsgStartRequestContextType(t *testing.T) {
 
 // TestMsgStartRequestContextValidation tests ValidateBasic for MsgStartRequestContext
 func TestMsgStartRequestContextValidation(t *testing.T) {
-	emptyAddress := sdk.AccAddress{}
-	invalidRequestContextID := []byte("invalid-request-context-id")
+	invalidRequestContextID := "invalid-request-context-id"
 
 	testMsgs := []*MsgStartRequestContext{
 		NewMsgStartRequestContext(testRequestContextID, testConsumer),    // valid msg
@@ -962,8 +947,7 @@ func TestMsgKillRequestContextType(t *testing.T) {
 
 // TestMsgKillRequestContextValidation tests ValidateBasic for MsgKillRequestContext
 func TestMsgKillRequestContextValidation(t *testing.T) {
-	emptyAddress := sdk.AccAddress{}
-	invalidRequestContextID := []byte("invalid-request-context-id")
+	invalidRequestContextID := "invalid-request-context-id"
 
 	testMsgs := []*MsgKillRequestContext{
 		NewMsgKillRequestContext(testRequestContextID, testConsumer),    // valid msg
@@ -1023,10 +1007,8 @@ func TestMsgUpdateRequestContextType(t *testing.T) {
 
 // TestMsgUpdateRequestContextValidation tests ValidateBasic for MsgUpdateRequestContext
 func TestMsgUpdateRequestContextValidation(t *testing.T) {
-	emptyAddress := sdk.AccAddress{}
-
-	invalidRequestContextID := []byte("invalid-request-context-id")
-	invalidDuplicateProviders := []sdk.AccAddress{testProvider, testProvider}
+	invalidRequestContextID := "invalid-request-context-id"
+	invalidDuplicateProviders := []string{testProvider, testProvider}
 	invalidTimeout := int64(-1)
 	invalidLessRepeatedFreq := uint64(testTimeout) - 10
 	invalidRepeatedTotal := int64(-2)
@@ -1102,8 +1084,6 @@ func TestMsgWithdrawEarnedFeesType(t *testing.T) {
 
 // TestMsgWithdrawEarnedFeesValidation tests ValidateBasic for MsgWithdrawEarnedFees
 func TestMsgWithdrawEarnedFeesValidation(t *testing.T) {
-	emptyAddress := sdk.AccAddress{}
-
 	testMsgs := []*MsgWithdrawEarnedFees{
 		NewMsgWithdrawEarnedFees(testOwner, testProvider),    // valid msg
 		NewMsgWithdrawEarnedFees(testOwner, emptyAddress),    // empty provider is allowed

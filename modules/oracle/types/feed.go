@@ -24,7 +24,7 @@ func (fv FeedValues) String() string {
 func (f FeedContext) String() string {
 	var bf bytes.Buffer
 	for _, addr := range f.Providers {
-		bf.WriteString(addr.String())
+		bf.WriteString(addr)
 		bf.WriteString(",")
 	}
 	return fmt.Sprintf(` FeedContext:

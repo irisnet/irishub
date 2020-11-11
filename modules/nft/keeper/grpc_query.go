@@ -16,7 +16,7 @@ import (
 var _ types.QueryServer = Keeper{}
 
 func (k Keeper) Supply(c context.Context, request *types.QuerySupplyRequest) (*types.QuerySupplyResponse, error) {
-	denom := strings.ToLower(strings.TrimSpace(request.Denom))
+	denom := strings.ToLower(strings.TrimSpace(request.DenomId))
 	ctx := sdk.UnwrapSDKContext(c)
 
 	var supply uint64
@@ -41,12 +41,12 @@ func (k Keeper) Owner(c context.Context, request *types.QueryOwnerRequest) (*typ
 		return nil, status.Errorf(codes.InvalidArgument, "invalid owner address %s", request.Owner)
 	}
 
-	owner := k.GetOwner(ctx, ownerAddress, request.Denom)
+	owner := k.GetOwner(ctx, ownerAddress, request.DenomId)
 	return &types.QueryOwnerResponse{Owner: &owner}, nil
 }
 
 func (k Keeper) Collection(c context.Context, request *types.QueryCollectionRequest) (*types.QueryCollectionResponse, error) {
-	denom := strings.ToLower(strings.TrimSpace(request.Denom))
+	denom := strings.ToLower(strings.TrimSpace(request.DenomId))
 	ctx := sdk.UnwrapSDKContext(c)
 
 	collection, err := k.GetCollection(ctx, denom)
@@ -57,7 +57,7 @@ func (k Keeper) Collection(c context.Context, request *types.QueryCollectionRequ
 }
 
 func (k Keeper) Denom(c context.Context, request *types.QueryDenomRequest) (*types.QueryDenomResponse, error) {
-	denom := strings.ToLower(strings.TrimSpace(request.Denom))
+	denom := strings.ToLower(strings.TrimSpace(request.DenomId))
 	ctx := sdk.UnwrapSDKContext(c)
 
 	denomObject, err := k.GetDenom(ctx, denom)
@@ -77,18 +77,18 @@ func (k Keeper) Denoms(c context.Context, request *types.QueryDenomsRequest) (*t
 }
 
 func (k Keeper) NFT(c context.Context, request *types.QueryNFTRequest) (*types.QueryNFTResponse, error) {
-	denom := strings.ToLower(strings.TrimSpace(request.Denom))
-	tokenID := strings.ToLower(strings.TrimSpace(request.Id))
+	denom := strings.ToLower(strings.TrimSpace(request.DenomId))
+	tokenID := strings.ToLower(strings.TrimSpace(request.TokenId))
 	ctx := sdk.UnwrapSDKContext(c)
 
 	nft, err := k.GetNFT(ctx, denom, tokenID)
 	if err != nil {
-		return nil, sdkerrors.Wrapf(types.ErrUnknownNFT, "invalid NFT %s from collection %s", request.Id, request.Denom)
+		return nil, sdkerrors.Wrapf(types.ErrUnknownNFT, "invalid NFT %s from collection %s", request.TokenId, request.DenomId)
 	}
 
 	baseNFT, ok := nft.(types.BaseNFT)
 	if !ok {
-		return nil, sdkerrors.Wrapf(types.ErrUnknownNFT, "invalid type NFT %s from collection %s", request.Id, request.Denom)
+		return nil, sdkerrors.Wrapf(types.ErrUnknownNFT, "invalid type NFT %s from collection %s", request.TokenId, request.DenomId)
 	}
 
 	return &types.QueryNFTResponse{NFT: &baseNFT}, nil

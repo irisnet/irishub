@@ -6,6 +6,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+
 	"github.com/irisnet/irismod/modules/coinswap/types"
 )
 
@@ -69,6 +70,7 @@ func (m msgServer) RemoveLiquidity(goCtx context.Context, msg *types.MsgRemoveLi
 	for _, coin := range withdrawCoins {
 		coins = append(coins, &coin)
 	}
+
 	return &types.MsgRemoveLiquidityResponse{
 		WithdrawCoins: coins,
 	}, nil

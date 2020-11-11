@@ -45,7 +45,7 @@ func GetCmdRequestRandom() *cobra.Command {
 				return err
 			}
 
-			consumer := clientCtx.GetFromAddress()
+			consumer := clientCtx.GetFromAddress().String()
 
 			var serviceFeeCap sdk.Coins
 			oracle, err := cmd.Flags().GetBool(FlagOracle)

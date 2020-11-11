@@ -67,10 +67,10 @@ func (k Keeper) RequestRandom(
 		}
 
 		// build request
-		request = types.NewRequest(currentHeight, consumer, txHash, oracle, serviceFeeCap, requestContextID)
+		request = types.NewRequest(currentHeight, consumer.String(), hex.EncodeToString(txHash), oracle, serviceFeeCap, requestContextID.String())
 	} else {
 		// build request
-		request = types.NewRequest(currentHeight, consumer, txHash, oracle, nil, nil)
+		request = types.NewRequest(currentHeight, consumer.String(), hex.EncodeToString(txHash), oracle, nil, "")
 	}
 
 	// generate the request id

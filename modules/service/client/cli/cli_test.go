@@ -9,8 +9,9 @@ import (
 
 	"github.com/gogo/protobuf/proto"
 	"github.com/stretchr/testify/suite"
-	"github.com/tendermint/tendermint/crypto"
 	"github.com/tidwall/gjson"
+
+	"github.com/tendermint/tendermint/crypto"
 
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/crypto/hd"
@@ -111,7 +112,6 @@ func (s *IntegrationTestSuite) TestService() {
 	respType := proto.Message(&sdk.TxResponse{})
 	expectedCode := uint32(0)
 	bz, err := servicetestutil.DefineServiceExec(clientCtx, author.String(), args...)
-
 	s.Require().NoError(err)
 	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType), bz.String())
 	txResp := respType.(*sdk.TxResponse)
@@ -193,7 +193,6 @@ func (s *IntegrationTestSuite) TestService() {
 	respType = proto.Message(&sdk.TxResponse{})
 	expectedCode = uint32(0)
 	bz, err = servicetestutil.RefundDepositExec(clientCtx, serviceName, provider.String(), provider.String(), args...)
-
 	s.Require().NoError(err)
 	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType), bz.String())
 	txResp = respType.(*sdk.TxResponse)
@@ -217,7 +216,6 @@ func (s *IntegrationTestSuite) TestService() {
 	respType = proto.Message(&sdk.TxResponse{})
 	expectedCode = uint32(0)
 	bz, err = servicetestutil.EnableServiceExec(clientCtx, serviceName, provider.String(), provider.String(), args...)
-
 	s.Require().NoError(err)
 	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType), bz.String())
 	txResp = respType.(*sdk.TxResponse)
@@ -243,7 +241,6 @@ func (s *IntegrationTestSuite) TestService() {
 	respType = proto.Message(&sdk.TxResponse{})
 	expectedCode = uint32(0)
 	bz, err = banktestutil.MsgSendExec(clientCtx, provider, consumer, amount, args...)
-
 	s.Require().NoError(err)
 	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType), bz.String())
 	txResp = respType.(*sdk.TxResponse)
@@ -264,12 +261,11 @@ func (s *IntegrationTestSuite) TestService() {
 	respType = proto.Message(&sdk.TxResponse{})
 	expectedCode = uint32(0)
 	bz, err = servicetestutil.CallServiceExec(clientCtx, consumer.String(), args...)
-
 	s.Require().NoError(err)
 	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType), bz.String())
 	txResp = respType.(*sdk.TxResponse)
 	s.Require().Equal(expectedCode, txResp.Code)
-	requestContextId := gjson.Get(txResp.RawLog, "0.events.0.attributes.3.value").String()
+	requestContextId := gjson.Get(txResp.RawLog, "0.events.0.attributes.0.value").String()
 	requestHeight := txResp.Height
 
 	blockResult, err := clientCtx.Client.BlockResults(context.Background(), &requestHeight)
@@ -323,7 +319,6 @@ func (s *IntegrationTestSuite) TestService() {
 	respType = proto.Message(&sdk.TxResponse{})
 	expectedCode = uint32(0)
 	bz, err = servicetestutil.RespondServiceExec(clientCtx, provider.String(), args...)
-
 	s.Require().NoError(err)
 	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType), bz.String())
 	txResp = respType.(*sdk.TxResponse)
@@ -346,7 +341,6 @@ func (s *IntegrationTestSuite) TestService() {
 	respType = proto.Message(&sdk.TxResponse{})
 	expectedCode = uint32(0)
 	bz, err = servicetestutil.SetWithdrawAddrExec(clientCtx, withdrawalAddress.String(), provider.String(), args...)
-
 	s.Require().NoError(err)
 	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType), bz.String())
 	txResp = respType.(*sdk.TxResponse)
@@ -361,7 +355,6 @@ func (s *IntegrationTestSuite) TestService() {
 	respType = proto.Message(&sdk.TxResponse{})
 	expectedCode = uint32(0)
 	bz, err = servicetestutil.WithdrawEarnedFeesExec(clientCtx, provider.String(), provider.String(), args...)
-
 	s.Require().NoError(err)
 	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType), bz.String())
 	txResp = respType.(*sdk.TxResponse)

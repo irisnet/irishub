@@ -32,16 +32,16 @@ var (
 )
 
 // SplitKeyOwner return the address,denom,id from the key of stored owner
-func SplitKeyOwner(key []byte) (address sdk.AccAddress, denom, id string, err error) {
+func SplitKeyOwner(key []byte) (address sdk.AccAddress, denomID, tokenID string, err error) {
 	key = key[len(PrefixOwners)+len(delimiter):]
 	keys := bytes.Split(key, delimiter)
 	if len(keys) != 3 {
-		return address, denom, id, errors.New("wrong KeyOwner")
+		return address, denomID, tokenID, errors.New("wrong KeyOwner")
 	}
 
 	address, _ = sdk.AccAddressFromBech32(string(keys[0]))
-	denom = string(keys[1])
-	id = string(keys[2])
+	denomID = string(keys[1])
+	tokenID = string(keys[2])
 	return
 }
 

@@ -12,10 +12,10 @@ const (
 var _ sdk.Msg = &MsgCreateRecord{}
 
 // NewMsgCreateRecord constructs a MsgCreateRecord
-func NewMsgCreateRecord(contents []Content, Creator sdk.AccAddress) *MsgCreateRecord {
+func NewMsgCreateRecord(contents []Content, Creator string) *MsgCreateRecord {
 	return &MsgCreateRecord{
 		Contents: contents,
-		Creator:  Creator.String(),
+		Creator:  Creator,
 	}
 }
 
@@ -39,11 +39,9 @@ func (msg MsgCreateRecord) ValidateBasic() error {
 	if len(msg.Contents) == 0 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "contents missing")
 	}
-	_, err := sdk.AccAddressFromBech32(msg.Creator)
-	if err != nil {
+	if _, err := sdk.AccAddressFromBech32(msg.Creator); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
-
 	for i, content := range msg.Contents {
 		if len(content.Digest) == 0 {
 			return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "content[%d] digest missing", i)

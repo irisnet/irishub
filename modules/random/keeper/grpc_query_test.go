@@ -14,7 +14,7 @@ import (
 func (suite *KeeperTestSuite) TestGRPCQueryRandom() {
 	app, ctx := suite.app, suite.ctx
 	reqID := []byte("test")
-	random := types.NewRandom(reqID, 1, "test")
+	random := types.NewRandom(hex.EncodeToString(reqID), 1, "test")
 
 	queryHelper := baseapp.NewQueryServerTestHelper(ctx, app.InterfaceRegistry())
 	types.RegisterQueryServer(queryHelper, app.RandomKeeper)
@@ -36,7 +36,7 @@ func (suite *KeeperTestSuite) TestGRPCRandomRequestQueue() {
 	_, _, addr := testdata.KeyTestPubAddr()
 	reqID := []byte("test_req_id")
 	txHash := []byte("test_hash")
-	request := types.NewRequest(1, addr, txHash, false, sdk.NewCoins(), nil)
+	request := types.NewRequest(1, addr.String(), string(txHash), false, sdk.NewCoins(), "")
 
 	queryHelper := baseapp.NewQueryServerTestHelper(ctx, app.InterfaceRegistry())
 	types.RegisterQueryServer(queryHelper, app.RandomKeeper)

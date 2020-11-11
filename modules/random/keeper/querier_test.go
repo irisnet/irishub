@@ -32,7 +32,7 @@ func (suite *KeeperTestSuite) TestNewQuerier() {
 
 	// init random
 	random := types.NewRandom(
-		types.SHA256(testTxBytes),
+		hex.EncodeToString(types.SHA256(testTxBytes)),
 		testHeight,
 		big.NewRat(testRandomNumerator, testRandomDenomiator).FloatString(types.RandPrec),
 	)

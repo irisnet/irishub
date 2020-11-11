@@ -71,7 +71,7 @@ func GetCmdDefineService() *cobra.Command {
 				return err
 			}
 
-			author := clientCtx.GetFromAddress()
+			author := clientCtx.GetFromAddress().String()
 			name, err := cmd.Flags().GetString(FlagName)
 			if err != nil {
 				return err
@@ -154,16 +154,15 @@ func GetCmdBindService() *cobra.Command {
 				return err
 			}
 
-			owner := clientCtx.GetFromAddress()
-			var provider sdk.AccAddress
-			providerStr, err := cmd.Flags().GetString(FlagProvider)
+			owner := clientCtx.GetFromAddress().String()
+
+			provider, err := cmd.Flags().GetString(FlagProvider)
 			if err != nil {
 				return err
 			}
 
-			if len(providerStr) > 0 {
-				provider, err = sdk.AccAddressFromBech32(providerStr)
-				if err != nil {
+			if len(provider) > 0 {
+				if _, err = sdk.AccAddressFromBech32(provider); err != nil {
 					return err
 				}
 			} else {
@@ -270,15 +269,14 @@ func GetCmdUpdateServiceBinding() *cobra.Command {
 				return err
 			}
 
-			owner := clientCtx.GetFromAddress()
-			var provider sdk.AccAddress
+			owner := clientCtx.GetFromAddress().String()
+			provider := owner
+
 			if len(args) > 1 {
-				provider, err = sdk.AccAddressFromBech32(args[1])
-				if err != nil {
+				if _, err = sdk.AccAddressFromBech32(args[1]); err != nil {
 					return err
 				}
-			} else {
-				provider = owner
+				provider = args[1]
 			}
 
 			var deposit sdk.Coins
@@ -379,13 +377,12 @@ func GetCmdSetWithdrawAddr() *cobra.Command {
 				return err
 			}
 
-			owner := clientCtx.GetFromAddress()
-			withdrawAddr, err := sdk.AccAddressFromBech32(args[0])
-			if err != nil {
+			owner := clientCtx.GetFromAddress().String()
+			if _, err := sdk.AccAddressFromBech32(args[0]); err != nil {
 				return err
 			}
 
-			msg := types.NewMsgSetWithdrawAddress(owner, withdrawAddr)
+			msg := types.NewMsgSetWithdrawAddress(owner, args[0])
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -413,15 +410,14 @@ func GetCmdDisableServiceBinding() *cobra.Command {
 				return err
 			}
 
-			owner := clientCtx.GetFromAddress()
-			var provider sdk.AccAddress
+			owner := clientCtx.GetFromAddress().String()
+			provider := owner
+
 			if len(args) > 1 {
-				provider, err = sdk.AccAddressFromBech32(args[1])
-				if err != nil {
+				if _, err = sdk.AccAddressFromBech32(args[1]); err != nil {
 					return err
 				}
-			} else {
-				provider = owner
+				provider = args[1]
 			}
 
 			msg := types.NewMsgDisableServiceBinding(args[0], provider, owner)
@@ -452,19 +448,15 @@ func GetCmdEnableServiceBinding() *cobra.Command {
 				return err
 			}
 
-			owner := clientCtx.GetFromAddress()
-			var provider sdk.AccAddress
+			owner := clientCtx.GetFromAddress().String()
+			provider := owner
 			if len(args) > 1 {
-				provider, err = sdk.AccAddressFromBech32(args[1])
-				if err != nil {
+				if _, err = sdk.AccAddressFromBech32(args[1]); err != nil {
 					return err
 				}
-			} else {
-				provider = owner
+				provider = args[1]
 			}
-
 			var deposit sdk.Coins
-
 			depositStr, err := cmd.Flags().GetString(FlagDeposit)
 			if err != nil {
 				return err
@@ -506,15 +498,14 @@ func GetCmdRefundServiceDeposit() *cobra.Command {
 				return err
 			}
 
-			owner := clientCtx.GetFromAddress()
-			var provider sdk.AccAddress
+			owner := clientCtx.GetFromAddress().String()
+			provider := owner
+
 			if len(args) > 1 {
-				provider, err = sdk.AccAddressFromBech32(args[1])
-				if err != nil {
+				if _, err = sdk.AccAddressFromBech32(args[1]); err != nil {
 					return err
 				}
-			} else {
-				provider = owner
+				provider = args[1]
 			}
 
 			msg := types.NewMsgRefundServiceDeposit(args[0], provider, owner)
@@ -556,25 +547,21 @@ func GetCmdCallService() *cobra.Command {
 				return err
 			}
 
-			consumer := clientCtx.GetFromAddress()
+			consumer := clientCtx.GetFromAddress().String()
 			serviceName, err := cmd.Flags().GetString(FlagServiceName)
 			if err != nil {
 				return err
 			}
 
-			var providers []sdk.AccAddress
-			providerList, err := cmd.Flags().GetStringSlice(FlagProviders)
+			providers, err := cmd.Flags().GetStringSlice(FlagProviders)
 			if err != nil {
 				return err
 			}
 
-			for _, p := range providerList {
-				provider, err := sdk.AccAddressFromBech32(p)
-				if err != nil {
+			for _, p := range providers {
+				if _, err := sdk.AccAddressFromBech32(p); err != nil {
 					return err
 				}
-
-				providers = append(providers, provider)
 			}
 
 			rawServiceFeeCap, err := cmd.Flags().GetString(FlagServiceFeeCap)
@@ -678,14 +665,13 @@ func GetCmdRespondService() *cobra.Command {
 				return err
 			}
 
-			provider := clientCtx.GetFromAddress()
+			provider := clientCtx.GetFromAddress().String()
 
-			requestIDStr, err := cmd.Flags().GetString(FlagRequestID)
+			requestID, err := cmd.Flags().GetString(FlagRequestID)
 			if err != nil {
 				return err
 			}
-			requestID, err := types.ConvertRequestID(requestIDStr)
-			if err != nil {
+			if _, err := types.ConvertRequestID(requestID); err != nil {
 				return err
 			}
 
@@ -774,14 +760,13 @@ func GetCmdPauseRequestContext() *cobra.Command {
 				return err
 			}
 
-			consumer := clientCtx.GetFromAddress()
+			consumer := clientCtx.GetFromAddress().String()
 
-			requestContextID, err := hex.DecodeString(args[0])
-			if err != nil {
+			if _, err := hex.DecodeString(args[0]); err != nil {
 				return err
 			}
 
-			msg := types.NewMsgPauseRequestContext(requestContextID, consumer)
+			msg := types.NewMsgPauseRequestContext(args[0], consumer)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -809,14 +794,13 @@ func GetCmdStartRequestContext() *cobra.Command {
 				return err
 			}
 
-			consumer := clientCtx.GetFromAddress()
+			consumer := clientCtx.GetFromAddress().String()
 
-			requestContextID, err := hex.DecodeString(args[0])
-			if err != nil {
+			if _, err := hex.DecodeString(args[0]); err != nil {
 				return err
 			}
 
-			msg := types.NewMsgStartRequestContext(requestContextID, consumer)
+			msg := types.NewMsgStartRequestContext(args[0], consumer)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -844,14 +828,13 @@ func GetCmdKillRequestContext() *cobra.Command {
 				return err
 			}
 
-			consumer := clientCtx.GetFromAddress()
+			consumer := clientCtx.GetFromAddress().String()
 
-			requestContextID, err := hex.DecodeString(args[0])
-			if err != nil {
+			if _, err := hex.DecodeString(args[0]); err != nil {
 				return err
 			}
 
-			msg := types.NewMsgKillRequestContext(requestContextID, consumer)
+			msg := types.NewMsgKillRequestContext(args[0], consumer)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -888,26 +871,21 @@ func GetCmdUpdateRequestContext() *cobra.Command {
 				return err
 			}
 
-			consumer := clientCtx.GetFromAddress()
+			consumer := clientCtx.GetFromAddress().String()
 
-			requestContextID, err := hex.DecodeString(args[0])
+			if _, err := hex.DecodeString(args[0]); err != nil {
+				return err
+			}
+
+			providers, err := cmd.Flags().GetStringSlice(FlagProviders)
 			if err != nil {
 				return err
 			}
 
-			var providers []sdk.AccAddress
-			providerList, err := cmd.Flags().GetStringSlice(FlagProviders)
-			if err != nil {
-				return err
-			}
-
-			for _, p := range providerList {
-				provider, err := sdk.AccAddressFromBech32(p)
-				if err != nil {
+			for _, p := range providers {
+				if _, err := sdk.AccAddressFromBech32(p); err != nil {
 					return err
 				}
-
-				providers = append(providers, provider)
 			}
 
 			var serviceFeeCap sdk.Coins
@@ -936,7 +914,7 @@ func GetCmdUpdateRequestContext() *cobra.Command {
 			}
 
 			msg := types.NewMsgUpdateRequestContext(
-				requestContextID, providers, serviceFeeCap,
+				args[0], providers, serviceFeeCap,
 				timeout, frequency, total, consumer,
 			)
 			if err := msg.ValidateBasic(); err != nil {
@@ -968,16 +946,14 @@ func GetCmdWithdrawEarnedFees() *cobra.Command {
 				return err
 			}
 
-			owner := clientCtx.GetFromAddress()
+			owner := clientCtx.GetFromAddress().String()
+			provider := owner
 
-			var provider sdk.AccAddress
 			if len(args) == 1 {
-				provider, err = sdk.AccAddressFromBech32(args[0])
-				if err != nil {
+				if _, err = sdk.AccAddressFromBech32(args[0]); err != nil {
 					return err
 				}
-			} else {
-				provider = owner
+				provider = args[0]
 			}
 
 			msg := types.NewMsgWithdrawEarnedFees(owner, provider)

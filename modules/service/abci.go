@@ -85,6 +85,9 @@ func EndBlocker(ctx sdk.Context, k keeper.Keeper) {
 					sdk.NewEvent(
 						types.EventTypeNoExchangeRate,
 						sdk.NewAttribute(types.AttributeKeyPriceDenom, rawDenom),
+						sdk.NewAttribute(types.AttributeKeyRequestContextID, requestContextID.String()),
+						sdk.NewAttribute(types.AttributeKeyServiceName, requestContext.ServiceName),
+						sdk.NewAttribute(types.AttributeKeyConsumer, requestContext.Consumer),
 					),
 				})
 				return

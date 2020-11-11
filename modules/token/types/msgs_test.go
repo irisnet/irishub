@@ -11,15 +11,15 @@ import (
 )
 
 var (
-	emptyAddr sdk.AccAddress
+	emptyAddr string
 
-	addr1 = sdk.AccAddress(tmhash.SumTruncated([]byte("addr1")))
-	addr2 = sdk.AccAddress(tmhash.SumTruncated([]byte("addr2")))
+	addr1 = sdk.AccAddress(tmhash.SumTruncated([]byte("addr1"))).String()
+	addr2 = sdk.AccAddress(tmhash.SumTruncated([]byte("addr2"))).String()
 )
 
 // test ValidateBasic for MsgIssueToken
 func TestMsgIssueAsset(t *testing.T) {
-	addr := sdk.AccAddress(tmhash.SumTruncated([]byte("test")))
+	addr := sdk.AccAddress(tmhash.SumTruncated([]byte("test"))).String()
 
 	tests := []struct {
 		testCase string
@@ -52,7 +52,7 @@ func TestMsgIssueAsset(t *testing.T) {
 
 // test ValidateBasic for MsgIssueToken
 func TestMsgEditToken(t *testing.T) {
-	owner := sdk.AccAddress(tmhash.SumTruncated([]byte("owner")))
+	owner := sdk.AccAddress(tmhash.SumTruncated([]byte("owner"))).String()
 	mintable := False
 
 	tests := []struct {
@@ -63,7 +63,7 @@ func TestMsgEditToken(t *testing.T) {
 		{"native basic good", NewMsgEditToken("BTC Token", "btc", 10000, mintable, owner), true},
 		{"wrong symbol", NewMsgEditToken("BTC Token", "BT", 10000, mintable, owner), false},
 		{"wrong max_supply", NewMsgEditToken("BTC Token", "btc", 10000000000000, mintable, owner), false},
-		{"loss owner", NewMsgEditToken("BTC Token", "btc", 10000, mintable, nil), false},
+		{"loss owner", NewMsgEditToken("BTC Token", "btc", 10000, mintable, ""), false},
 	}
 
 	for _, tc := range tests {
@@ -110,8 +110,8 @@ func TestMsgMintTokenValidateBasic(t *testing.T) {
 	testData := []struct {
 		msg        string
 		symbol     string
-		owner      sdk.AccAddress
-		to         sdk.AccAddress
+		owner      string
+		to         string
 		amount     uint64
 		expectPass bool
 	}{
@@ -138,9 +138,9 @@ func TestMsgMintTokenValidateBasic(t *testing.T) {
 func TestMsgTransferTokenOwnerValidation(t *testing.T) {
 	testData := []struct {
 		name       string
-		srcOwner   sdk.AccAddress
+		srcOwner   string
 		symbol     string
-		dstOwner   sdk.AccAddress
+		dstOwner   string
 		expectPass bool
 	}{
 		{"empty srcOwner", emptyAddr, "btc", addr1, false},

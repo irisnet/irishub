@@ -115,7 +115,7 @@ func (s *IntegrationTestSuite) TestRandom() {
 	txResp = respType.(*sdk.TxResponse)
 	s.Require().Equal(expectedCode, txResp.Code)
 	requestID := gjson.Get(txResp.RawLog, "0.events.1.attributes.0.value").String()
-	requestHeight := gjson.Get(txResp.RawLog, "0.events.1.attributes.1.value").Int()
+	requestHeight := gjson.Get(txResp.RawLog, "0.events.1.attributes.2.value").Int()
 
 	// ------test GetCmdQueryRandomRequestQueue()-------------
 	respType = proto.Message(&randomtypes.QueryRandomRequestQueueResponse{})
@@ -169,7 +169,6 @@ func (s *IntegrationTestSuite) TestRandom() {
 	respType = proto.Message(&sdk.TxResponse{})
 	expectedCode = uint32(0)
 	bz, err = servicetestutil.RespondServiceExec(clientCtx, provider.String(), args...)
-
 	s.Require().NoError(err)
 	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType), bz.String())
 	txResp = respType.(*sdk.TxResponse)

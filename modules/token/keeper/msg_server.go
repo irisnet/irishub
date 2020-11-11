@@ -6,6 +6,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+
 	"github.com/irisnet/irismod/modules/token/types"
 )
 
@@ -41,6 +42,7 @@ func (m msgServer) IssueToken(goCtx context.Context, msg *types.MsgIssueToken) (
 		sdk.NewEvent(
 			types.EventTypeIssueToken,
 			sdk.NewAttribute(types.AttributeKeySymbol, msg.Symbol),
+			sdk.NewAttribute(types.AttributeKeyCreator, msg.Owner),
 		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
@@ -48,6 +50,7 @@ func (m msgServer) IssueToken(goCtx context.Context, msg *types.MsgIssueToken) (
 			sdk.NewAttribute(sdk.AttributeKeySender, msg.Owner),
 		),
 	})
+
 	return &types.MsgIssueTokenResponse{}, nil
 }
 
@@ -61,6 +64,7 @@ func (m msgServer) EditToken(goCtx context.Context, msg *types.MsgEditToken) (*t
 		sdk.NewEvent(
 			types.EventTypeEditToken,
 			sdk.NewAttribute(types.AttributeKeySymbol, msg.Symbol),
+			sdk.NewAttribute(types.AttributeKeyOwner, msg.Owner),
 		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
@@ -68,6 +72,7 @@ func (m msgServer) EditToken(goCtx context.Context, msg *types.MsgEditToken) (*t
 			sdk.NewAttribute(sdk.AttributeKeySender, msg.Owner),
 		),
 	})
+
 	return &types.MsgEditTokenResponse{}, nil
 }
 
@@ -91,6 +96,7 @@ func (m msgServer) MintToken(goCtx context.Context, msg *types.MsgMintToken) (*t
 			types.EventTypeMintToken,
 			sdk.NewAttribute(types.AttributeKeySymbol, msg.Symbol),
 			sdk.NewAttribute(types.AttributeKeyAmount, strconv.FormatUint(msg.Amount, 10)),
+			sdk.NewAttribute(types.AttributeKeyRecipient, msg.To),
 		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
@@ -98,6 +104,7 @@ func (m msgServer) MintToken(goCtx context.Context, msg *types.MsgMintToken) (*t
 			sdk.NewAttribute(sdk.AttributeKeySender, msg.Owner),
 		),
 	})
+
 	return &types.MsgMintTokenResponse{}, nil
 }
 
@@ -111,6 +118,8 @@ func (m msgServer) TransferTokenOwner(goCtx context.Context, msg *types.MsgTrans
 		sdk.NewEvent(
 			types.EventTypeTransferTokenOwner,
 			sdk.NewAttribute(types.AttributeKeySymbol, msg.Symbol),
+			sdk.NewAttribute(types.AttributeKeyOwner, msg.SrcOwner),
+			sdk.NewAttribute(types.AttributeKeyDstOwner, msg.DstOwner),
 		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
@@ -118,5 +127,6 @@ func (m msgServer) TransferTokenOwner(goCtx context.Context, msg *types.MsgTrans
 			sdk.NewAttribute(sdk.AttributeKeySender, msg.SrcOwner),
 		),
 	})
+
 	return &types.MsgTransferTokenOwnerResponse{}, nil
 }

@@ -4,18 +4,19 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/gogo/protobuf/proto"
+	"github.com/stretchr/testify/suite"
+
+	"github.com/tendermint/tendermint/crypto"
+
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/testutil/network"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/rest"
-	"github.com/gogo/protobuf/proto"
-	"github.com/stretchr/testify/suite"
-	"github.com/tendermint/tendermint/crypto"
-
-	htlctypes "github.com/irisnet/irismod/modules/htlc/types"
 
 	htlccli "github.com/irisnet/irismod/modules/htlc/client/cli"
 	htlctestutil "github.com/irisnet/irismod/modules/htlc/client/testutil"
+	htlctypes "github.com/irisnet/irismod/modules/htlc/types"
 	"github.com/irisnet/irismod/simapp"
 )
 

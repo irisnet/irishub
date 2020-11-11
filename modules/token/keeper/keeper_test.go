@@ -64,7 +64,7 @@ func TestKeeperSuite(t *testing.T) {
 }
 
 func (suite *KeeperTestSuite) TestIssueToken() {
-	msg := types.NewMsgIssueToken("btc", "satoshi", "Bitcoin Network", 18, 21000000, 21000000, false, owner)
+	msg := types.NewMsgIssueToken("btc", "satoshi", "Bitcoin Network", 18, 21000000, 21000000, false, owner.String())
 
 	err := suite.keeper.IssueToken(suite.ctx, *msg)
 	require.NoError(suite.T(), err)
@@ -87,7 +87,7 @@ func (suite *KeeperTestSuite) TestEditToken() {
 	suite.TestIssueToken()
 
 	mintable := types.True
-	msgEditToken := types.NewMsgEditToken("Bitcoin Token", "btc", 22000000, mintable, owner)
+	msgEditToken := types.NewMsgEditToken("Bitcoin Token", "btc", 22000000, mintable, owner.String())
 	err := suite.keeper.EditToken(suite.ctx, *msgEditToken)
 	require.NoError(suite.T(), err)
 
@@ -104,7 +104,7 @@ func (suite *KeeperTestSuite) TestEditToken() {
 
 func (suite *KeeperTestSuite) TestMintToken() {
 
-	msg := types.NewMsgIssueToken("btc", "satoshi", "Bitcoin Network", 18, 1000, 2000, true, owner)
+	msg := types.NewMsgIssueToken("btc", "satoshi", "Bitcoin Network", 18, 1000, 2000, true, owner.String())
 
 	err := suite.keeper.IssueToken(suite.ctx, *msg)
 	require.NoError(suite.T(), err)
@@ -114,7 +114,7 @@ func (suite *KeeperTestSuite) TestMintToken() {
 	amt := suite.bk.GetBalance(suite.ctx, owner, msg.MinUnit)
 	suite.Equal("1000000000000000000000satoshi", amt.String())
 
-	msgMintToken := types.NewMsgMintToken(msg.Symbol, owner, nil, 1000)
+	msgMintToken := types.NewMsgMintToken(msg.Symbol, owner.String(), "", 1000)
 	err = suite.keeper.MintToken(suite.ctx, *msgMintToken)
 	require.NoError(suite.T(), err)
 

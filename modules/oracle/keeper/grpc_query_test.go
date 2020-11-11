@@ -29,7 +29,7 @@ func (suite *KeeperTestSuite) TestGRPCQueryFeed() {
 
 	// Add feed
 	feedName := "test"
-	feed := types.Feed{FeedName: feedName, Creator: addr}
+	feed := types.Feed{FeedName: feedName, Creator: addr.String()}
 	app.OracleKeeper.SetFeed(ctx, feed)
 
 	// Query feed

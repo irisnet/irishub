@@ -88,12 +88,11 @@ func (k Keeper) RequestModuleService(
 
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, moduleService.Provider.String()),
+			types.EventTypeRespondService,
 			sdk.NewAttribute(types.AttributeKeyRequestContextID, request.RequestContextId),
 			sdk.NewAttribute(types.AttributeKeyRequestID, requestIDs[0].String()),
 			sdk.NewAttribute(types.AttributeKeyServiceName, request.ServiceName),
+			sdk.NewAttribute(types.AttributeKeyProvider, request.Provider),
 			sdk.NewAttribute(types.AttributeKeyConsumer, request.Consumer),
 		),
 	})

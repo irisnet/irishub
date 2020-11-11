@@ -8,21 +8,21 @@ import (
 )
 
 // NewIDCollection creates a new IDCollection instance
-func NewIDCollection(denom string, ids []string) IDCollection {
+func NewIDCollection(denomID string, tokenIDs []string) IDCollection {
 	return IDCollection{
-		Denom: strings.TrimSpace(denom),
-		Ids:   ids,
+		DenomId:  strings.TrimSpace(denomID),
+		TokenIds: tokenIDs,
 	}
 }
 
 // Supply return the amount of the denom
 func (idc IDCollection) Supply() int {
-	return len(idc.Ids)
+	return len(idc.TokenIds)
 }
 
-// AddID adds an ID to the idCollection
-func (idc IDCollection) AddID(id string) IDCollection {
-	idc.Ids = append(idc.Ids, id)
+// AddID adds an tokenID to the idCollection
+func (idc IDCollection) AddID(tokenID string) IDCollection {
+	idc.TokenIds = append(idc.TokenIds, tokenID)
 	return idc
 }
 
@@ -31,16 +31,16 @@ func (idc IDCollection) AddID(id string) IDCollection {
 type IDCollections []IDCollection
 
 // Add adds an ID to the idCollection
-func (idcs IDCollections) Add(denom, id string) IDCollections {
+func (idcs IDCollections) Add(denomID, tokenID string) IDCollections {
 	for i, idc := range idcs {
-		if idc.Denom == denom {
-			idcs[i] = idc.AddID(id)
+		if idc.DenomId == denomID {
+			idcs[i] = idc.AddID(tokenID)
 			return idcs
 		}
 	}
 	return append(idcs, IDCollection{
-		Denom: denom,
-		Ids:   []string{id},
+		DenomId:  denomID,
+		TokenIds: []string{tokenID},
 	})
 }
 

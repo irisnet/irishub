@@ -22,9 +22,9 @@ func RegisterHandlers(cliCtx client.Context, r *mux.Router) {
 
 // RequestRandomReq defines the properties of a request random request's body
 type RequestRandomReq struct {
-	BaseReq       rest.BaseReq   `json:"base_req" yaml:"base_req"` // base req
-	Consumer      sdk.AccAddress `json:"consumer"`                 // request address
-	BlockInterval uint64         `json:"block_interval"`           // block interval
-	Oracle        bool           `json:"oracle"`                   // oracle method
-	ServiceFeeCap sdk.Coins      `json:"service_fee_cap"`          // service fee cap
+	BaseReq       rest.BaseReq `json:"base_req" yaml:"base_req"` // base req
+	Consumer      string       `json:"consumer"`                 // request address
+	BlockInterval uint64       `json:"block_interval"`           // block interval
+	Oracle        bool         `json:"oracle"`                   // oracle method
+	ServiceFeeCap sdk.Coins    `json:"service_fee_cap"`          // service fee cap
 }

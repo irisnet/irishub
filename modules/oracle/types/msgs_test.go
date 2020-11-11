@@ -5,14 +5,15 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/tendermint/tendermint/crypto/tmhash"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 var (
-	emptyAddr sdk.AccAddress
-
-	addr1 = sdk.AccAddress([]byte("addr1"))
-	addr2 = sdk.AccAddress([]byte("addr2"))
+	emptyAddr = ""
+	addr1     = sdk.AccAddress(tmhash.SumTruncated([]byte("addr1"))).String()
+	addr2     = sdk.AccAddress(tmhash.SumTruncated([]byte("addr2"))).String()
 )
 
 func TestMsgCreateFeed_ValidateBasic(t *testing.T) {
@@ -29,7 +30,7 @@ func TestMsgCreateFeed_ValidateBasic(t *testing.T) {
 			LatestHistory:     10,
 			Description:       "feed eth price",
 			ServiceName:       "GetEthPrice",
-			Providers:         []sdk.AccAddress{addr1, addr2},
+			Providers:         []string{addr1, addr2},
 			Input:             "eth",
 			Timeout:           5,
 			ServiceFeeCap:     sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100))),
@@ -47,7 +48,7 @@ func TestMsgCreateFeed_ValidateBasic(t *testing.T) {
 			LatestHistory:     10,
 			Description:       "feed eth price",
 			ServiceName:       "GetEthPrice",
-			Providers:         []sdk.AccAddress{addr1, addr2},
+			Providers:         []string{addr1, addr2},
 			Input:             "eth",
 			Timeout:           5,
 			ServiceFeeCap:     sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100))),
@@ -65,7 +66,7 @@ func TestMsgCreateFeed_ValidateBasic(t *testing.T) {
 			LatestHistory:     10,
 			Description:       "feed eth price",
 			ServiceName:       "GetEthPrice",
-			Providers:         []sdk.AccAddress{addr1, addr2},
+			Providers:         []string{addr1, addr2},
 			Input:             "eth",
 			Timeout:           5,
 			ServiceFeeCap:     sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100))),
@@ -82,7 +83,7 @@ func TestMsgCreateFeed_ValidateBasic(t *testing.T) {
 			LatestHistory:     10,
 			Description:       "feed eth price",
 			ServiceName:       "GetEthPrice",
-			Providers:         []sdk.AccAddress{addr1, addr2},
+			Providers:         []string{addr1, addr2},
 			Input:             "eth",
 			Timeout:           5,
 			ServiceFeeCap:     sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100))),
@@ -100,7 +101,7 @@ func TestMsgCreateFeed_ValidateBasic(t *testing.T) {
 			LatestHistory:     10,
 			Description:       "feed eth price",
 			ServiceName:       "GetEthPrice",
-			Providers:         []sdk.AccAddress{addr1, addr2},
+			Providers:         []string{addr1, addr2},
 			Input:             "eth",
 			Timeout:           5,
 			ServiceFeeCap:     sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100))),
@@ -118,7 +119,7 @@ func TestMsgCreateFeed_ValidateBasic(t *testing.T) {
 			LatestHistory:     0,
 			Description:       "feed eth price",
 			ServiceName:       "GetEthPrice",
-			Providers:         []sdk.AccAddress{addr1, addr2},
+			Providers:         []string{addr1, addr2},
 			Input:             "eth",
 			Timeout:           5,
 			ServiceFeeCap:     sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100))),
@@ -136,7 +137,7 @@ func TestMsgCreateFeed_ValidateBasic(t *testing.T) {
 			LatestHistory:     101,
 			Description:       "feed eth price",
 			ServiceName:       "GetEthPrice",
-			Providers:         []sdk.AccAddress{addr1, addr2},
+			Providers:         []string{addr1, addr2},
 			Input:             "eth",
 			Timeout:           5,
 			ServiceFeeCap:     sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100))),
@@ -154,7 +155,7 @@ func TestMsgCreateFeed_ValidateBasic(t *testing.T) {
 			LatestHistory:     10,
 			Description:       "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
 			ServiceName:       "GetEthPrice",
-			Providers:         []sdk.AccAddress{addr1, addr2},
+			Providers:         []string{addr1, addr2},
 			Input:             "eth",
 			Timeout:           5,
 			ServiceFeeCap:     sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100))),
@@ -172,7 +173,7 @@ func TestMsgCreateFeed_ValidateBasic(t *testing.T) {
 			LatestHistory:     10,
 			Description:       "feed eth price",
 			ServiceName:       "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-			Providers:         []sdk.AccAddress{addr1, addr2},
+			Providers:         []string{addr1, addr2},
 			Input:             "eth",
 			Timeout:           5,
 			ServiceFeeCap:     sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100))),
@@ -190,7 +191,7 @@ func TestMsgCreateFeed_ValidateBasic(t *testing.T) {
 			LatestHistory:     10,
 			Description:       "feed eth price",
 			ServiceName:       "$GetEthPrice",
-			Providers:         []sdk.AccAddress{addr1, addr2},
+			Providers:         []string{addr1, addr2},
 			Input:             "eth",
 			Timeout:           5,
 			ServiceFeeCap:     sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100))),
@@ -207,7 +208,7 @@ func TestMsgCreateFeed_ValidateBasic(t *testing.T) {
 			LatestHistory:     10,
 			Description:       "feed eth price",
 			ServiceName:       "GetEthPrice",
-			Providers:         []sdk.AccAddress{},
+			Providers:         []string{},
 			Input:             "eth",
 			Timeout:           5,
 			ServiceFeeCap:     sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100))),
@@ -225,7 +226,7 @@ func TestMsgCreateFeed_ValidateBasic(t *testing.T) {
 			LatestHistory:     10,
 			Description:       "feed eth price",
 			ServiceName:       "GetEthPrice",
-			Providers:         []sdk.AccAddress{addr1, addr2},
+			Providers:         []string{addr1, addr2},
 			Input:             "eth",
 			Timeout:           5,
 			ServiceFeeCap:     sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100))),
@@ -243,7 +244,7 @@ func TestMsgCreateFeed_ValidateBasic(t *testing.T) {
 			LatestHistory:     10,
 			Description:       "feed eth price",
 			ServiceName:       "GetEthPrice",
-			Providers:         []sdk.AccAddress{addr1, addr2},
+			Providers:         []string{addr1, addr2},
 			Input:             "eth",
 			Timeout:           5,
 			ServiceFeeCap:     sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100))),
@@ -360,7 +361,7 @@ func TestMsgEditFeed_ValidateBasic(t *testing.T) {
 		MsgEditFeed{
 			FeedName:          "feedEthPrice",
 			LatestHistory:     10,
-			Providers:         []sdk.AccAddress{addr1, addr2},
+			Providers:         []string{addr1, addr2},
 			ServiceFeeCap:     sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100))),
 			RepeatedFrequency: 5,
 			ResponseThreshold: 1,
@@ -372,7 +373,7 @@ func TestMsgEditFeed_ValidateBasic(t *testing.T) {
 		MsgEditFeed{
 			FeedName:          "$feedEthPrice",
 			LatestHistory:     10,
-			Providers:         []sdk.AccAddress{addr1, addr2},
+			Providers:         []string{addr1, addr2},
 			ServiceFeeCap:     sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100))),
 			RepeatedFrequency: 5,
 			ResponseThreshold: 1,
@@ -384,7 +385,7 @@ func TestMsgEditFeed_ValidateBasic(t *testing.T) {
 		MsgEditFeed{
 			FeedName:          "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
 			LatestHistory:     10,
-			Providers:         []sdk.AccAddress{addr1, addr2},
+			Providers:         []string{addr1, addr2},
 			ServiceFeeCap:     sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100))),
 			RepeatedFrequency: 5,
 			ResponseThreshold: 1,
@@ -396,7 +397,7 @@ func TestMsgEditFeed_ValidateBasic(t *testing.T) {
 		MsgEditFeed{
 			FeedName:          "feedEthPrice",
 			LatestHistory:     101,
-			Providers:         []sdk.AccAddress{addr1, addr2},
+			Providers:         []string{addr1, addr2},
 			ServiceFeeCap:     sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100))),
 			RepeatedFrequency: 5,
 			ResponseThreshold: 1,
@@ -408,7 +409,7 @@ func TestMsgEditFeed_ValidateBasic(t *testing.T) {
 		MsgEditFeed{
 			FeedName:          "feedEthPrice",
 			LatestHistory:     10,
-			Providers:         []sdk.AccAddress{addr1, addr2},
+			Providers:         []string{addr1, addr2},
 			ServiceFeeCap:     sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100))),
 			RepeatedFrequency: 5,
 			ResponseThreshold: 3,
@@ -420,7 +421,7 @@ func TestMsgEditFeed_ValidateBasic(t *testing.T) {
 		MsgEditFeed{
 			FeedName:          "feedEthPrice",
 			LatestHistory:     10,
-			Providers:         []sdk.AccAddress{addr1, addr2},
+			Providers:         []string{addr1, addr2},
 			ServiceFeeCap:     sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100))),
 			RepeatedFrequency: 5,
 			ResponseThreshold: 1,

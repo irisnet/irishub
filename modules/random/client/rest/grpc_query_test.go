@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/cosmos/cosmos-sdk/types/rest"
 	"testing"
 	"time"
 
@@ -15,6 +14,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/testutil/network"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/rest"
 
 	randomcli "github.com/irisnet/irismod/modules/random/client/cli"
 	randomtestutil "github.com/irisnet/irismod/modules/random/client/testutil"
@@ -116,7 +116,7 @@ func (s *IntegrationTestSuite) TestRandom() {
 	txResp = respType.(*sdk.TxResponse)
 	s.Require().Equal(expectedCode, txResp.Code)
 	requestID := gjson.Get(txResp.RawLog, "0.events.1.attributes.0.value").String()
-	requestHeight := gjson.Get(txResp.RawLog, "0.events.1.attributes.1.value").Int()
+	requestHeight := gjson.Get(txResp.RawLog, "0.events.1.attributes.2.value").Int()
 
 	// ------test GetCmdQueryRandomRequestQueue()-------------
 	url := fmt.Sprintf("%s/irismod/random/queue", baseURL)

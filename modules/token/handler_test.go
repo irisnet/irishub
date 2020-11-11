@@ -65,7 +65,7 @@ func (suite *HandlerSuite) TestIssueToken() {
 
 	nativeTokenAmt1 := suite.bk.GetBalance(suite.ctx, owner, denom).Amount
 
-	msg := types.NewMsgIssueToken("btc", "satoshi", "Bitcoin Network", 18, 21000000, 21000000, false, owner)
+	msg := types.NewMsgIssueToken("btc", "satoshi", "Bitcoin Network", 18, 21000000, 21000000, false, owner.String())
 
 	_, err := h(suite.ctx, msg)
 	suite.NoError(err)
@@ -83,7 +83,7 @@ func (suite *HandlerSuite) TestIssueToken() {
 }
 
 func (suite *HandlerSuite) TestMintToken() {
-	msg := types.NewMsgIssueToken("btc", "satoshi", "Bitcoin Network", 18, 1000, 2000, true, owner)
+	msg := types.NewMsgIssueToken("btc", "satoshi", "Bitcoin Network", 18, 1000, 2000, true, owner.String())
 
 	err := suite.keeper.IssueToken(suite.ctx, *msg)
 	suite.NoError(err)
@@ -97,7 +97,7 @@ func (suite *HandlerSuite) TestMintToken() {
 
 	h := token.NewHandler(suite.keeper)
 
-	msgMintToken := types.NewMsgMintToken(msg.Symbol, owner, nil, 1000)
+	msgMintToken := types.NewMsgMintToken(msg.Symbol, owner.String(), "", 1000)
 	_, err = h(suite.ctx, msgMintToken)
 	suite.NoError(err)
 

@@ -166,7 +166,7 @@ func GetCmdEditToken() *cobra.Command {
 				return err
 			}
 
-			owner := clientCtx.GetFromAddress()
+			owner := clientCtx.GetFromAddress().String()
 
 			name, err := cmd.Flags().GetString(FlagName)
 			if err != nil {
@@ -185,7 +185,7 @@ func GetCmdEditToken() *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgEditToken(name, args[0], maxSupply, mintable, owner)
+			msg := types.NewMsgEditToken(strings.TrimSpace(name), args[0], maxSupply, mintable, owner)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -221,27 +221,25 @@ func GetCmdMintToken() *cobra.Command {
 				return err
 			}
 
-			owner := clientCtx.GetFromAddress()
+			owner := clientCtx.GetFromAddress().String()
 
 			amount, err := cmd.Flags().GetUint64(FlagAmount)
 			if err != nil {
 				return err
 			}
 
-			var to sdk.AccAddress
 			addr, err := cmd.Flags().GetString(FlagTo)
 			if err != nil {
 				return err
 			}
 			if len(strings.TrimSpace(addr)) > 0 {
-				to, err = sdk.AccAddressFromBech32(addr)
-				if err != nil {
+				if _, err = sdk.AccAddressFromBech32(addr); err != nil {
 					return err
 				}
 			}
 
 			msg := types.NewMsgMintToken(
-				args[0], owner, to, amount,
+				strings.TrimSpace(args[0]), owner, addr, amount,
 			)
 
 			if err := msg.ValidateBasic(); err != nil {
@@ -302,18 +300,17 @@ func GetCmdTransferTokenOwner() *cobra.Command {
 				return err
 			}
 
-			owner := clientCtx.GetFromAddress()
+			owner := clientCtx.GetFromAddress().String()
 
-			rawTo, err := cmd.Flags().GetString(FlagTo)
+			toAddr, err := cmd.Flags().GetString(FlagTo)
 			if err != nil {
 				return err
 			}
-			to, err := sdk.AccAddressFromBech32(rawTo)
-			if err != nil {
+			if _, err := sdk.AccAddressFromBech32(toAddr); err != nil {
 				return err
 			}
 
-			msg := types.NewMsgTransferTokenOwner(owner, to, args[0])
+			msg := types.NewMsgTransferTokenOwner(owner, toAddr, strings.TrimSpace(args[0]))
 
 			if err := msg.ValidateBasic(); err != nil {
 				return err

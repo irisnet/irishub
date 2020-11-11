@@ -2,13 +2,17 @@
 package types
 
 const (
-	AttributeValueCategory = ModuleName
-
 	EventTypeIssueToken         = "issue_token"
 	EventTypeEditToken          = "edit_token"
 	EventTypeMintToken          = "mint_token"
 	EventTypeTransferTokenOwner = "transfer_token_owner"
 
-	AttributeKeySymbol = "symbol"
-	AttributeKeyAmount = "amount"
+	AttributeValueCategory = ModuleName
+
+	AttributeKeyCreator   = "creator"
+	AttributeKeySymbol    = "symbol"
+	AttributeKeyAmount    = "amount"
+	AttributeKeyOwner     = "owner"
+	AttributeKeyDstOwner  = "dst_owner"
+	AttributeKeyRecipient = "recipient"
 )

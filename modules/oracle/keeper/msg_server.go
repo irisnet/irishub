@@ -22,18 +22,24 @@ func NewMsgServerImpl(keeper Keeper) types.MsgServer {
 
 func (m msgServer) CreateFeed(goCtx context.Context, msg *types.MsgCreateFeed) (*types.MsgCreateFeedResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	err := m.Keeper.CreateFeed(ctx, msg)
-	if err != nil {
+	if err := m.Keeper.CreateFeed(ctx, msg); err != nil {
 		return nil, err
 	}
 
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
+			types.EventTypeCreateFeed,
+			sdk.NewAttribute(types.AttributeKeyFeedName, msg.FeedName),
+			sdk.NewAttribute(types.AttributeKeyServiceName, msg.ServiceName),
+			sdk.NewAttribute(types.AttributeKeyCreator, msg.Creator),
+		),
+		sdk.NewEvent(
 			sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator.String()),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
 		),
 	})
+
 	return &types.MsgCreateFeedResponse{}, nil
 }
 
@@ -44,11 +50,17 @@ func (m msgServer) EditFeed(goCtx context.Context, msg *types.MsgEditFeed) (*typ
 	}
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
+			types.EventTypeEditFeed,
+			sdk.NewAttribute(types.AttributeKeyFeedName, msg.FeedName),
+			sdk.NewAttribute(types.AttributeKeyCreator, msg.Creator),
+		),
+		sdk.NewEvent(
 			sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator.String()),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
 		),
 	})
+
 	return &types.MsgEditFeedResponse{}, nil
 }
 
@@ -57,13 +69,20 @@ func (m msgServer) StartFeed(goCtx context.Context, msg *types.MsgStartFeed) (*t
 	if err := m.Keeper.StartFeed(ctx, msg); err != nil {
 		return nil, err
 	}
+
 	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			types.EventTypeStartFeed,
+			sdk.NewAttribute(types.AttributeKeyFeedName, msg.FeedName),
+			sdk.NewAttribute(types.AttributeKeyCreator, msg.Creator),
+		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator.String()),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
 		),
 	})
+
 	return &types.MsgStartFeedResponse{}, nil
 }
 
@@ -72,12 +91,19 @@ func (m msgServer) PauseFeed(goCtx context.Context, msg *types.MsgPauseFeed) (*t
 	if err := m.Keeper.PauseFeed(ctx, msg); err != nil {
 		return nil, err
 	}
+
 	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			types.EventTypePauseFeed,
+			sdk.NewAttribute(types.AttributeKeyFeedName, msg.FeedName),
+			sdk.NewAttribute(types.AttributeKeyCreator, msg.Creator),
+		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator.String()),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
 		),
 	})
+
 	return &types.MsgPauseFeedResponse{}, nil
 }

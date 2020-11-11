@@ -4,8 +4,6 @@ import (
 	"encoding/hex"
 	"fmt"
 
-	tmbytes "github.com/tendermint/tendermint/libs/bytes"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
@@ -13,11 +11,11 @@ import (
 // NewRequest constructs a request
 func NewRequest(
 	height int64,
-	consumer sdk.AccAddress,
-	txHash tmbytes.HexBytes,
+	consumer string,
+	txHash string,
 	oracle bool,
 	serviceFeeCap sdk.Coins,
-	serviceContextID tmbytes.HexBytes,
+	serviceContextID string,
 ) Request {
 	return Request{
 		Height:           height,

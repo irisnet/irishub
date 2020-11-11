@@ -99,8 +99,8 @@ func SimulateMsgTransferNFT(k keeper.Keeper, ak types.AccountKeeper, bk types.Ba
 			"",
 			"",
 			simtypes.RandStringOfLength(r, 10), // tokenData
-			ownerAddr,                          // sender
-			recipientAccount.Address,           // recipient
+			ownerAddr.String(),                 // sender
+			recipientAccount.Address.String(),  // recipient
 		)
 		account := ak.GetAccount(ctx, ownerAddr)
 
@@ -158,7 +158,7 @@ func SimulateMsgEditNFT(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKe
 			"",
 			simtypes.RandStringOfLength(r, 45), // tokenURI
 			simtypes.RandStringOfLength(r, 10), // tokenData
-			ownerAddr,
+			ownerAddr.String(),
 		)
 
 		account := ak.GetAccount(ctx, ownerAddr)
@@ -213,8 +213,8 @@ func SimulateMsgMintNFT(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKe
 			"",
 			simtypes.RandStringOfLength(r, 45), // tokenURI
 			simtypes.RandStringOfLength(r, 10), // tokenData
-			randomSender.Address,               // sender
-			randomRecipient.Address,            // recipient
+			randomSender.Address.String(),      // sender
+			randomRecipient.Address.String(),   // recipient
 		)
 
 		account := ak.GetAccount(ctx, randomSender.Address)
@@ -266,7 +266,7 @@ func SimulateMsgBurnNFT(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKe
 			return simtypes.NoOpMsg(types.ModuleName, types.EventTypeBurnNFT, err.Error()), nil, err
 		}
 
-		msg := types.NewMsgBurnNFT(ownerAddr, nftID, denom)
+		msg := types.NewMsgBurnNFT(ownerAddr.String(), nftID, denom)
 
 		account := ak.GetAccount(ctx, ownerAddr)
 		spendable := bk.SpendableCoins(ctx, account.GetAddress())
@@ -304,7 +304,7 @@ func SimulateMsgBurnNFT(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKe
 	}
 }
 
-func getRandomNFTFromOwner(ctx sdk.Context, k keeper.Keeper, r *rand.Rand) (address sdk.AccAddress, denom, nftID string) {
+func getRandomNFTFromOwner(ctx sdk.Context, k keeper.Keeper, r *rand.Rand) (address sdk.AccAddress, denomID, tokenID string) {
 	owners := k.GetOwners(ctx)
 
 	ownersLen := len(owners)
@@ -323,20 +323,20 @@ func getRandomNFTFromOwner(ctx sdk.Context, k keeper.Keeper, r *rand.Rand) (addr
 
 	// get random collection from owner's balance
 	i = r.Intn(idCollectionsLen)
-	idsCollection := owner.IDCollections[i] // nfts IDs
-	denom = idsCollection.Denom
+	idCollection := owner.IDCollections[i] // nfts IDs
+	denomID = idCollection.DenomId
 
-	idsLen := len(idsCollection.Ids)
+	idsLen := len(idCollection.TokenIds)
 	if idsLen == 0 {
 		return nil, "", ""
 	}
 
 	// get random nft from collection
 	i = r.Intn(idsLen)
-	nftID = idsCollection.Ids[i]
+	tokenID = idCollection.TokenIds[i]
 
 	ownerAddress, _ := sdk.AccAddressFromBech32(owner.Address)
-	return ownerAddress, denom, nftID
+	return ownerAddress, denomID, tokenID
 }
 
 func getRandomDenom(ctx sdk.Context, k keeper.Keeper, r *rand.Rand) string {

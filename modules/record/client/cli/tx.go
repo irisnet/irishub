@@ -38,7 +38,7 @@ func GetCmdCreateRecord() *cobra.Command {
 				return err
 			}
 
-			fromAddr := clientCtx.GetFromAddress()
+			from := clientCtx.GetFromAddress().String()
 			uri, err := cmd.Flags().GetString(FlagURI)
 			if err != nil {
 				return err
@@ -55,7 +55,7 @@ func GetCmdCreateRecord() *cobra.Command {
 				Meta:       meta,
 			}
 
-			msg := types.NewMsgCreateRecord([]types.Content{content}, fromAddr)
+			msg := types.NewMsgCreateRecord([]types.Content{content}, from)
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}

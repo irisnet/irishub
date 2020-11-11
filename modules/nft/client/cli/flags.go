@@ -12,7 +12,7 @@ const (
 	FlagOwner     = "owner"
 
 	FlagDenomName = "name"
-	FlagDenom     = "denom"
+	FlagDenomID   = "denom-id"
 	FlagSchema    = "schema"
 )
 
@@ -44,5 +44,5 @@ func init() {
 
 	FsQuerySupply.String(FlagOwner, "", "The owner of a nft")
 
-	FsQueryOwner.String(FlagDenom, "", "The name of a collection")
+	FsQueryOwner.String(FlagDenomID, "", "The name of a collection")
 }

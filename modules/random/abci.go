@@ -27,19 +27,22 @@ func BeginBlocker(ctx sdk.Context, k keeper.Keeper) {
 		var request types.Request
 		k.GetCdc().MustUnmarshalBinaryBare(rqIterator.Value(), &request)
 
+		consumer, _ := sdk.AccAddressFromBech32(request.Consumer)
+		serviceContextID, _ := hex.DecodeString(request.ServiceContextID)
+
 		if request.Oracle {
 			// get the request id
 			reqID := types.GenerateRequestID(request)
 
-			if err := k.StartRequestContext(ctx, request.ServiceContextID, request.Consumer); err == nil {
-				k.SetOracleRandRequest(ctx, request.ServiceContextID, request)
+			if err := k.StartRequestContext(ctx, serviceContextID, consumer); err == nil {
+				k.SetOracleRandRequest(ctx, serviceContextID, request)
 				requestedOracleRandNum++
 
 				ctx.EventManager().EmitEvent(
 					sdk.NewEvent(
-						types.EventTypeGenerateRandom,
+						types.EventTypeRequestService,
 						sdk.NewAttribute(types.AttributeKeyRequestID, hex.EncodeToString(reqID)),
-						sdk.NewAttribute(types.AttributeKeyRequestContextID, request.ServiceContextID.String()),
+						sdk.NewAttribute(types.AttributeKeyRequestContextID, request.ServiceContextID),
 					),
 				)
 			} else {
@@ -52,7 +55,7 @@ func BeginBlocker(ctx sdk.Context, k keeper.Keeper) {
 			reqID := types.GenerateRequestID(request)
 
 			// generate a random number
-			random := types.MakePRNG(lastBlockHash, currentTimestamp, request.Consumer, nil, false).GetRand()
+			random := types.MakePRNG(lastBlockHash, currentTimestamp, consumer, nil, false).GetRand()
 			k.SetRandom(ctx, reqID, types.NewRandom(request.TxHash, lastBlockHeight, random.FloatString(types.RandPrec)))
 
 			// remove the request

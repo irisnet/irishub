@@ -11,9 +11,11 @@ var (
 	AttributeValueCategory = ModuleName
 
 	AttributeKeySender    = "sender"
+	AttributeKeyCreator   = "creator"
 	AttributeKeyRecipient = "recipient"
 	AttributeKeyOwner     = "owner"
 	AttributeKeyTokenID   = "token_id"
 	AttributeKeyTokenURI  = "token_uri"
-	AttributeKeyDenom     = "denom"
+	AttributeKeyDenomID   = "denom_id"
+	AttributeKeyDenomName = "denom_name"
 )

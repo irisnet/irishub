@@ -1,6 +1,7 @@
 package keeper_test
 
 import (
+	"encoding/hex"
 	"encoding/json"
 	"math/big"
 	"testing"
@@ -52,8 +53,9 @@ func TestKeeperTestSuite(t *testing.T) {
 }
 
 func (suite *KeeperTestSuite) TestSetRandom() {
+
 	random := types.NewRandom(
-		types.SHA256(testTxBytes),
+		hex.EncodeToString(types.SHA256(testTxBytes)),
 		testHeight,
 		big.NewRat(testRandomNumerator, testRandomDenomiator).FloatString(types.RandPrec),
 	)
@@ -72,7 +74,7 @@ func (suite *KeeperTestSuite) TestRequestRandom() {
 	request, err := suite.keeper.RequestRandom(suite.ctx, testConsumer, testBlockInterval, false, nil)
 	suite.NoError(err)
 
-	expectedRequest := types.NewRequest(testHeight, testConsumer, types.SHA256(testTxBytes), false, nil, nil)
+	expectedRequest := types.NewRequest(testHeight, testConsumer.String(), hex.EncodeToString(types.SHA256(testTxBytes)), false, nil, "")
 	suite.Equal(request, expectedRequest)
 
 	iterator := suite.keeper.IterateRandomRequestQueueByHeight(suite.ctx, testHeight+int64(testBlockInterval))

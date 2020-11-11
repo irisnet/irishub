@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"regexp"
 
-	tmbytes "github.com/tendermint/tendermint/libs/bytes"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
@@ -61,10 +59,10 @@ var (
 
 // NewMsgDefineService creates a new MsgDefineService instance
 func NewMsgDefineService(
-	name,
+	name string,
 	description string,
 	tags []string,
-	author sdk.AccAddress,
+	author string,
 	authorDescription,
 	schemas string,
 ) *MsgDefineService {
@@ -72,7 +70,7 @@ func NewMsgDefineService(
 		Name:              name,
 		Description:       description,
 		Tags:              tags,
-		Author:            author.String(),
+		Author:            author,
 		AuthorDescription: authorDescription,
 		Schemas:           schemas,
 	}
@@ -86,32 +84,22 @@ func (msg MsgDefineService) Type() string { return TypeMsgDefineService }
 
 // ValidateBasic implements Msg
 func (msg MsgDefineService) ValidateBasic() error {
-	_, err := sdk.AccAddressFromBech32(msg.Author)
-	if err != nil {
+	if _, err := sdk.AccAddressFromBech32(msg.Author); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid author address (%s)", err)
 	}
-
 	if err := ValidateServiceName(msg.Name); err != nil {
 		return err
 	}
-
 	if err := ValidateServiceDescription(msg.Description); err != nil {
 		return err
 	}
-
 	if err := ValidateAuthorDescription(msg.AuthorDescription); err != nil {
 		return err
 	}
-
 	if err := ValidateTags(msg.Tags); err != nil {
 		return err
 	}
-
-	if err := ValidateServiceSchemas(msg.Schemas); err != nil {
-		return err
-	}
-
-	return nil
+	return ValidateServiceSchemas(msg.Schemas)
 }
 
 // GetSignBytes implements Msg
@@ -138,21 +126,21 @@ func (msg MsgDefineService) GetSigners() []sdk.AccAddress {
 // NewMsgBindService creates a new MsgBindService instance
 func NewMsgBindService(
 	serviceName string,
-	provider sdk.AccAddress,
+	provider string,
 	deposit sdk.Coins,
 	pricing string,
 	qos uint64,
 	options string,
-	owner sdk.AccAddress,
+	owner string,
 ) *MsgBindService {
 	return &MsgBindService{
 		ServiceName: serviceName,
-		Provider:    provider.String(),
+		Provider:    provider,
 		Deposit:     deposit,
 		Pricing:     pricing,
 		QoS:         qos,
 		Options:     options,
-		Owner:       owner.String(),
+		Owner:       owner,
 	}
 }
 
@@ -177,27 +165,21 @@ func (msg MsgBindService) ValidateBasic() error {
 	if err := ValidateProvider(msg.Provider); err != nil {
 		return err
 	}
-
 	if err := ValidateOwner(msg.Owner); err != nil {
 		return err
 	}
-
 	if err := ValidateServiceName(msg.ServiceName); err != nil {
 		return err
 	}
-
 	if err := ValidateServiceDeposit(msg.Deposit); err != nil {
 		return err
 	}
-
 	if err := ValidateQoS(msg.QoS); err != nil {
 		return err
 	}
-
 	if err := ValidateOptions(msg.Options); err != nil {
 		return err
 	}
-
 	return ValidateBindingPricing(msg.Pricing)
 }
 
@@ -215,21 +197,21 @@ func (msg MsgBindService) GetSigners() []sdk.AccAddress {
 // NewMsgUpdateServiceBinding creates a new MsgUpdateServiceBinding instance
 func NewMsgUpdateServiceBinding(
 	serviceName string,
-	provider sdk.AccAddress,
+	provider string,
 	deposit sdk.Coins,
 	pricing string,
 	qos uint64,
 	options string,
-	owner sdk.AccAddress,
+	owner string,
 ) *MsgUpdateServiceBinding {
 	return &MsgUpdateServiceBinding{
 		ServiceName: serviceName,
-		Provider:    provider.String(),
+		Provider:    provider,
 		Deposit:     deposit,
 		Pricing:     pricing,
 		QoS:         qos,
 		Options:     options,
-		Owner:       owner.String(),
+		Owner:       owner,
 	}
 }
 
@@ -254,31 +236,25 @@ func (msg MsgUpdateServiceBinding) ValidateBasic() error {
 	if err := ValidateProvider(msg.Provider); err != nil {
 		return err
 	}
-
 	if err := ValidateOwner(msg.Owner); err != nil {
 		return err
 	}
-
 	if err := ValidateServiceName(msg.ServiceName); err != nil {
 		return err
 	}
-
 	if !msg.Deposit.Empty() {
 		if err := ValidateServiceDeposit(msg.Deposit); err != nil {
 			return err
 		}
 	}
-
 	if len(msg.Options) != 0 {
 		if err := ValidateOptions(msg.Options); err != nil {
 			return err
 		}
 	}
-
 	if len(msg.Pricing) != 0 {
 		return ValidateBindingPricing(msg.Pricing)
 	}
-
 	return nil
 }
 
@@ -294,10 +270,10 @@ func (msg MsgUpdateServiceBinding) GetSigners() []sdk.AccAddress {
 // ______________________________________________________________________
 
 // NewMsgSetWithdrawAddress creates a new MsgSetWithdrawAddress instance
-func NewMsgSetWithdrawAddress(owner, withdrawAddr sdk.AccAddress) *MsgSetWithdrawAddress {
+func NewMsgSetWithdrawAddress(owner, withdrawAddr string) *MsgSetWithdrawAddress {
 	return &MsgSetWithdrawAddress{
-		Owner:           owner.String(),
-		WithdrawAddress: withdrawAddr.String(),
+		Owner:           owner,
+		WithdrawAddress: withdrawAddr,
 	}
 }
 
@@ -318,7 +294,6 @@ func (msg MsgSetWithdrawAddress) ValidateBasic() error {
 	if err := ValidateOwner(msg.Owner); err != nil {
 		return err
 	}
-
 	return ValidateWithdrawAddress(msg.WithdrawAddress)
 }
 
@@ -334,15 +309,11 @@ func (msg MsgSetWithdrawAddress) GetSigners() []sdk.AccAddress {
 // ______________________________________________________________________
 
 // NewMsgDisableServiceBinding creates a new MsgDisableServiceBinding instance
-func NewMsgDisableServiceBinding(
-	serviceName string,
-	provider,
-	owner sdk.AccAddress,
-) *MsgDisableServiceBinding {
+func NewMsgDisableServiceBinding(serviceName, provider, owner string) *MsgDisableServiceBinding {
 	return &MsgDisableServiceBinding{
 		ServiceName: serviceName,
-		Provider:    provider.String(),
-		Owner:       owner.String(),
+		Provider:    provider,
+		Owner:       owner,
 	}
 }
 
@@ -363,11 +334,9 @@ func (msg MsgDisableServiceBinding) ValidateBasic() error {
 	if err := ValidateProvider(msg.Provider); err != nil {
 		return err
 	}
-
 	if err := ValidateOwner(msg.Owner); err != nil {
 		return err
 	}
-
 	return ValidateServiceName(msg.ServiceName)
 }
 
@@ -385,15 +354,15 @@ func (msg MsgDisableServiceBinding) GetSigners() []sdk.AccAddress {
 // NewMsgEnableServiceBinding creates a new MsgEnableServiceBinding instance
 func NewMsgEnableServiceBinding(
 	serviceName string,
-	provider sdk.AccAddress,
+	provider string,
 	deposit sdk.Coins,
-	owner sdk.AccAddress,
+	owner string,
 ) *MsgEnableServiceBinding {
 	return &MsgEnableServiceBinding{
 		ServiceName: serviceName,
-		Provider:    provider.String(),
+		Provider:    provider,
 		Deposit:     deposit,
-		Owner:       owner.String(),
+		Owner:       owner,
 	}
 }
 
@@ -418,21 +387,17 @@ func (msg MsgEnableServiceBinding) ValidateBasic() error {
 	if err := ValidateProvider(msg.Provider); err != nil {
 		return err
 	}
-
 	if err := ValidateOwner(msg.Owner); err != nil {
 		return err
 	}
-
 	if err := ValidateServiceName(msg.ServiceName); err != nil {
 		return err
 	}
-
 	if !msg.Deposit.Empty() {
 		if err := ValidateServiceDeposit(msg.Deposit); err != nil {
 			return err
 		}
 	}
-
 	return nil
 }
 
@@ -448,15 +413,11 @@ func (msg MsgEnableServiceBinding) GetSigners() []sdk.AccAddress {
 // ______________________________________________________________________
 
 // NewMsgRefundServiceDeposit creates a new MsgRefundServiceDeposit instance
-func NewMsgRefundServiceDeposit(
-	serviceName string,
-	provider,
-	owner sdk.AccAddress,
-) *MsgRefundServiceDeposit {
+func NewMsgRefundServiceDeposit(serviceName, provider, owner string) *MsgRefundServiceDeposit {
 	return &MsgRefundServiceDeposit{
 		ServiceName: serviceName,
-		Provider:    provider.String(),
-		Owner:       owner.String(),
+		Provider:    provider,
+		Owner:       owner,
 	}
 }
 
@@ -477,11 +438,9 @@ func (msg MsgRefundServiceDeposit) ValidateBasic() error {
 	if err := ValidateProvider(msg.Provider); err != nil {
 		return err
 	}
-
 	if err := ValidateOwner(msg.Owner); err != nil {
 		return err
 	}
-
 	return ValidateServiceName(msg.ServiceName)
 }
 
@@ -499,8 +458,8 @@ func (msg MsgRefundServiceDeposit) GetSigners() []sdk.AccAddress {
 // NewMsgCallService creates a new MsgCallService instance
 func NewMsgCallService(
 	serviceName string,
-	providers []sdk.AccAddress,
-	consumer sdk.AccAddress,
+	providers []string,
+	consumer string,
 	input string,
 	serviceFeeCap sdk.Coins,
 	timeout int64,
@@ -511,12 +470,12 @@ func NewMsgCallService(
 ) *MsgCallService {
 	pds := make([]string, len(providers))
 	for i, provider := range providers {
-		pds[i] = provider.String()
+		pds[i] = provider
 	}
 	return &MsgCallService{
 		ServiceName:       serviceName,
 		Providers:         pds,
-		Consumer:          consumer.String(),
+		Consumer:          consumer,
 		Input:             input,
 		ServiceFeeCap:     serviceFeeCap,
 		Timeout:           timeout,
@@ -587,15 +546,10 @@ func (msg MsgCallService) GetSigners() []sdk.AccAddress {
 // ______________________________________________________________________
 
 // NewMsgRespondService creates a new MsgRespondService instance
-func NewMsgRespondService(
-	requestID tmbytes.HexBytes,
-	provider sdk.AccAddress,
-	result string,
-	output string,
-) *MsgRespondService {
+func NewMsgRespondService(requestID, provider, result, output string) *MsgRespondService {
 	return &MsgRespondService{
-		RequestId: requestID.String(),
-		Provider:  provider.String(),
+		RequestId: requestID,
+		Provider:  provider,
 		Result:    result,
 		Output:    output,
 	}
@@ -618,20 +572,16 @@ func (msg MsgRespondService) ValidateBasic() error {
 	if err := ValidateProvider(msg.Provider); err != nil {
 		return err
 	}
-
 	if err := ValidateRequestID(msg.RequestId); err != nil {
 		return err
 	}
-
 	if err := ValidateResponseResult(msg.Result); err != nil {
 		return err
 	}
-
 	result, err := ParseResult(msg.Result)
 	if err != nil {
 		return err
 	}
-
 	return ValidateOutput(result.Code, msg.Output)
 }
 
@@ -647,10 +597,10 @@ func (msg MsgRespondService) GetSigners() []sdk.AccAddress {
 // ______________________________________________________________________
 
 // NewMsgPauseRequestContext creates a new MsgPauseRequestContext instance
-func NewMsgPauseRequestContext(requestContextID tmbytes.HexBytes, consumer sdk.AccAddress) *MsgPauseRequestContext {
+func NewMsgPauseRequestContext(requestContextID, consumer string) *MsgPauseRequestContext {
 	return &MsgPauseRequestContext{
-		RequestContextId: requestContextID.String(),
-		Consumer:         consumer.String(),
+		RequestContextId: requestContextID,
+		Consumer:         consumer,
 	}
 }
 
@@ -686,10 +636,10 @@ func (msg MsgPauseRequestContext) GetSigners() []sdk.AccAddress {
 // ______________________________________________________________________
 
 // NewMsgStartRequestContext creates a new MsgStartRequestContext instance
-func NewMsgStartRequestContext(requestContextID tmbytes.HexBytes, consumer sdk.AccAddress) *MsgStartRequestContext {
+func NewMsgStartRequestContext(requestContextID, consumer string) *MsgStartRequestContext {
 	return &MsgStartRequestContext{
-		RequestContextId: requestContextID.String(),
-		Consumer:         consumer.String(),
+		RequestContextId: requestContextID,
+		Consumer:         consumer,
 	}
 }
 
@@ -725,10 +675,10 @@ func (msg MsgStartRequestContext) GetSigners() []sdk.AccAddress {
 // ______________________________________________________________________
 
 // NewMsgKillRequestContext creates a new MsgKillRequestContext instance
-func NewMsgKillRequestContext(requestContextID tmbytes.HexBytes, consumer sdk.AccAddress) *MsgKillRequestContext {
+func NewMsgKillRequestContext(requestContextID, consumer string) *MsgKillRequestContext {
 	return &MsgKillRequestContext{
-		RequestContextId: requestContextID.String(),
-		Consumer:         consumer.String(),
+		RequestContextId: requestContextID,
+		Consumer:         consumer,
 	}
 }
 
@@ -765,27 +715,27 @@ func (msg MsgKillRequestContext) GetSigners() []sdk.AccAddress {
 
 // NewMsgUpdateRequestContext creates a new MsgUpdateRequestContext instance
 func NewMsgUpdateRequestContext(
-	requestContextID tmbytes.HexBytes,
-	providers []sdk.AccAddress,
+	requestContextID string,
+	providers []string,
 	serviceFeeCap sdk.Coins,
 	timeout int64,
 	repeatedFrequency uint64,
 	repeatedTotal int64,
-	consumer sdk.AccAddress,
+	consumer string,
 ) *MsgUpdateRequestContext {
 	pds := make([]string, len(providers))
 	for i, provider := range providers {
-		pds[i] = provider.String()
+		pds[i] = provider
 	}
 
 	return &MsgUpdateRequestContext{
-		RequestContextId:  requestContextID.String(),
+		RequestContextId:  requestContextID,
 		Providers:         pds,
 		ServiceFeeCap:     serviceFeeCap,
 		Timeout:           timeout,
 		RepeatedFrequency: repeatedFrequency,
 		RepeatedTotal:     repeatedTotal,
-		Consumer:          consumer.String(),
+		Consumer:          consumer,
 	}
 }
 
@@ -850,10 +800,10 @@ func (msg MsgUpdateRequestContext) GetSigners() []sdk.AccAddress {
 // ______________________________________________________________________
 
 // NewMsgWithdrawEarnedFees creates a new MsgWithdrawEarnedFees instance
-func NewMsgWithdrawEarnedFees(owner, provider sdk.AccAddress) *MsgWithdrawEarnedFees {
+func NewMsgWithdrawEarnedFees(owner, provider string) *MsgWithdrawEarnedFees {
 	return &MsgWithdrawEarnedFees{
-		Owner:    owner.String(),
-		Provider: provider.String(),
+		Owner:    owner,
+		Provider: provider,
 	}
 }
 
@@ -884,11 +834,9 @@ func (msg MsgWithdrawEarnedFees) GetSigners() []sdk.AccAddress {
 }
 
 func ValidateAuthor(author string) error {
-	_, err := sdk.AccAddressFromBech32(author)
-	if err != nil {
+	if _, err := sdk.AccAddressFromBech32(author); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid author address (%s)", err)
 	}
-
 	return nil
 }
 
@@ -897,7 +845,6 @@ func ValidateServiceName(name string) error {
 	if !reServiceName.MatchString(name) || len(name) > MaxNameLength {
 		return sdkerrors.Wrap(ErrInvalidServiceName, name)
 	}
-
 	return nil
 }
 
@@ -905,21 +852,17 @@ func ValidateTags(tags []string) error {
 	if len(tags) > MaxTagsNum {
 		return sdkerrors.Wrap(ErrInvalidTags, fmt.Sprintf("invalid tags size; got: %d, max: %d", len(tags), MaxTagsNum))
 	}
-
 	if HasDuplicate(tags) {
 		return sdkerrors.Wrap(ErrInvalidTags, "duplicate tag")
 	}
-
 	for i, tag := range tags {
 		if len(tag) == 0 {
 			return sdkerrors.Wrap(ErrInvalidTags, fmt.Sprintf("invalid tag[%d] length: tag must not be empty", i))
 		}
-
 		if len(tag) > MaxTagLength {
 			return sdkerrors.Wrap(ErrInvalidTags, fmt.Sprintf("invalid tag[%d] length; got: %d, max: %d", i, len(tag), MaxTagLength))
 		}
 	}
-
 	return nil
 }
 
@@ -927,7 +870,6 @@ func ValidateServiceDescription(svcDescription string) error {
 	if len(svcDescription) > MaxDescriptionLength {
 		return sdkerrors.Wrap(ErrInvalidDescription, fmt.Sprintf("invalid service description length; got: %d, max: %d", len(svcDescription), MaxDescriptionLength))
 	}
-
 	return nil
 }
 
@@ -935,25 +877,20 @@ func ValidateAuthorDescription(authorDescription string) error {
 	if len(authorDescription) > MaxDescriptionLength {
 		return sdkerrors.Wrap(ErrInvalidDescription, fmt.Sprintf("invalid author description length; got: %d, max: %d", len(authorDescription), MaxDescriptionLength))
 	}
-
 	return nil
 }
 
 func ValidateProvider(provider string) error {
-	_, err := sdk.AccAddressFromBech32(provider)
-	if err != nil {
+	if _, err := sdk.AccAddressFromBech32(provider); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid provider address (%s)", err)
 	}
-
 	return nil
 }
 
 func ValidateOwner(owner string) error {
-	_, err := sdk.AccAddressFromBech32(owner)
-	if err != nil {
+	if _, err := sdk.AccAddressFromBech32(owner); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
 	}
-
 	return nil
 }
 
@@ -961,11 +898,9 @@ func ValidateServiceDeposit(deposit sdk.Coins) error {
 	if !deposit.IsValid() {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, "invalid deposit")
 	}
-
 	if deposit.IsAnyNegative() {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, "invalid deposit")
 	}
-
 	return nil
 }
 
@@ -973,7 +908,6 @@ func ValidateQoS(qos uint64) error {
 	if qos == 0 {
 		return sdkerrors.Wrap(ErrInvalidQoS, "qos must be greater than 0")
 	}
-
 	return nil
 }
 
@@ -981,16 +915,13 @@ func ValidateOptions(options string) error {
 	if !json.Valid([]byte(options)) {
 		return sdkerrors.Wrap(ErrInvalidOptions, "options is not valid JSON")
 	}
-
 	return nil
 }
 
 func ValidateWithdrawAddress(withdrawAddress string) error {
-	_, err := sdk.AccAddressFromBech32(withdrawAddress)
-	if err != nil {
+	if _, err := sdk.AccAddressFromBech32(withdrawAddress); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid withdrawal address (%s)", err)
 	}
-
 	return nil
 }
 
@@ -1010,33 +941,26 @@ func ValidateRequest(
 	if err := ValidateServiceName(serviceName); err != nil {
 		return err
 	}
-
 	if err := ValidateServiceFeeCap(serviceFeeCap); err != nil {
 		return err
 	}
-
 	if err := ValidateProviders(providers); err != nil {
 		return err
 	}
-
 	if err := ValidateInput(input); err != nil {
 		return err
 	}
-
 	if timeout <= 0 {
 		return sdkerrors.Wrapf(ErrInvalidTimeout, "timeout [%d] must be greater than 0", timeout)
 	}
-
 	if repeated {
 		if repeatedFrequency > 0 && repeatedFrequency < uint64(timeout) {
 			return sdkerrors.Wrapf(ErrInvalidRepeatedFreq, "repeated frequency [%d] must not be less than timeout [%d]", repeatedFrequency, timeout)
 		}
-
 		if repeatedTotal < -1 || repeatedTotal == 0 {
 			return sdkerrors.Wrapf(ErrInvalidRepeatedTotal, "repeated total number [%d] must be greater than 0 or equal to -1", repeatedTotal)
 		}
 	}
-
 	return nil
 }
 
@@ -1051,31 +975,25 @@ func ValidateRequestContextUpdating(
 	if err := ValidateProvidersCanEmpty(providers); err != nil {
 		return err
 	}
-
 	if !serviceFeeCap.Empty() {
 		if err := ValidateServiceFeeCap(serviceFeeCap); err != nil {
 			return err
 		}
 	}
-
 	if timeout < 0 {
 		return sdkerrors.Wrapf(ErrInvalidTimeout, "timeout must not be less than 0: %d", timeout)
 	}
-
 	if timeout != 0 && repeatedFrequency != 0 && repeatedFrequency < uint64(timeout) {
 		return sdkerrors.Wrapf(ErrInvalidRepeatedFreq, "frequency [%d] must not be less than timeout [%d]", repeatedFrequency, timeout)
 	}
-
 	if repeatedTotal < -1 {
 		return sdkerrors.Wrapf(ErrInvalidRepeatedFreq, "repeated total number must not be less than -1: %d", repeatedTotal)
 	}
-
 	return nil
 }
 
 func ValidateConsumer(consumer string) error {
-	_, err := sdk.AccAddressFromBech32(consumer)
-	if err != nil {
+	if _, err := sdk.AccAddressFromBech32(consumer); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid consumer address (%s)", err)
 	}
 	return nil
@@ -1085,15 +1003,12 @@ func ValidateProviders(providers []sdk.AccAddress) error {
 	if len(providers) == 0 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "providers missing")
 	}
-
 	if len(providers) > MaxProvidersNum {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "total number of the providers must not be greater than %d", MaxProvidersNum)
 	}
-
 	if err := checkDuplicateProviders(providers); err != nil {
 		return err
 	}
-
 	return nil
 }
 
@@ -1101,13 +1016,11 @@ func ValidateProvidersCanEmpty(providers []sdk.AccAddress) error {
 	if len(providers) > MaxProvidersNum {
 		return sdkerrors.Wrapf(ErrInvalidProviders, "total number of the providers must not be greater than %d", MaxProvidersNum)
 	}
-
 	if len(providers) > 0 {
 		if err := checkDuplicateProviders(providers); err != nil {
 			return err
 		}
 	}
-
 	return nil
 }
 

@@ -11,8 +11,7 @@ import (
 )
 
 // CompleteBatch completes a running batch
-func (k Keeper) CompleteBatch(ctx sdk.Context, requestContext types.RequestContext, requestContextID tmbytes.HexBytes,
-) types.RequestContext {
+func (k Keeper) CompleteBatch(ctx sdk.Context, requestContext types.RequestContext, requestContextID tmbytes.HexBytes) types.RequestContext {
 	requestContext.BatchState = types.BATCHCOMPLETED
 
 	if len(requestContext.ModuleName) != 0 {
@@ -35,6 +34,7 @@ func (k Keeper) CompleteBatch(ctx sdk.Context, requestContext types.RequestConte
 			sdk.NewAttribute(types.AttributeKeyRequestContextState, string(stateJSON)),
 		),
 	})
+
 	return requestContext
 }
 

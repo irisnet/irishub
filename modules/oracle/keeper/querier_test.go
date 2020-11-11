@@ -17,7 +17,7 @@ func (suite *KeeperTestSuite) TestNewQuerier() {
 		AggregateFunc:     "avg",
 		ValueJsonPath:     "high",
 		LatestHistory:     5,
-		Providers:         []sdk.AccAddress{addrs[1]},
+		Providers:         []string{addrs[1]},
 		Input:             "xxxx",
 		Timeout:           10,
 		ServiceFeeCap:     sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100))),

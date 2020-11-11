@@ -1,6 +1,8 @@
 package keeper_test
 
 import (
+	"encoding/hex"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/suite"
@@ -23,10 +25,11 @@ var (
 	testAddr1, _ = sdk.AccAddressFromHex(crypto.AddressHash([]byte("test1")).String())
 	testAddr2, _ = sdk.AccAddressFromHex(crypto.AddressHash([]byte("test2")).String())
 
-	addrs = []sdk.AccAddress{testAddr1, testAddr2}
+	addrs = []string{testAddr1.String(), testAddr2.String()}
 
-	mockReqCtxID = []byte("mockRequest")
-	responses    = []string{
+	mockReqCtxIDBytes = []byte("mockRequest")
+	mockReqCtxID      = strings.ToUpper(hex.EncodeToString(mockReqCtxIDBytes))
+	responses         = []string{
 		`{"header":{},"body":{"last":100,"high":100,"low":50}}`,
 		`{"header":{},"body":{"last":100,"high":200,"low":50}}`,
 		`{"header":{},"body":{"last":100,"high":300,"low":50}}`,
@@ -50,8 +53,7 @@ func (suite *KeeperTestSuite) SetupTest() {
 	suite.ctx = app.BaseApp.NewContext(false, tmproto.Header{})
 	suite.app = app
 
-	serviceKeeper := NewMockServiceKeeper()
-	suite.keeper = keeper.NewKeeper(app.AppCodec(), app.GetKey(types.StoreKey), app.GetSubspace(types.ModuleName), serviceKeeper)
+	suite.keeper = keeper.NewKeeper(app.AppCodec(), app.GetKey(types.StoreKey), app.GetSubspace(types.ModuleName), NewMockServiceKeeper())
 }
 
 func TestKeeperTestSuite(t *testing.T) {
@@ -65,11 +67,11 @@ func (suite *KeeperTestSuite) TestFeed() {
 		AggregateFunc:     "avg",
 		ValueJsonPath:     "high",
 		LatestHistory:     5,
-		Providers:         []sdk.AccAddress{addrs[1]},
-		Input:             "xxxx",
+		Providers:         []string{addrs[1]},
+		Input:             `{"header":{},"body":{}}`,
 		Timeout:           10,
 		ServiceFeeCap:     sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100))),
-		RepeatedFrequency: 1,
+		RepeatedFrequency: 11,
 		ResponseThreshold: 1,
 		Creator:           addrs[0],
 	}
@@ -107,6 +109,7 @@ func (suite *KeeperTestSuite) TestFeed() {
 		FeedName: msg.FeedName,
 		Creator:  addrs[0],
 	})
+	suite.NoError(err)
 
 	// check feed result
 	result := suite.keeper.GetFeedValues(suite.ctx, msg.FeedName)
@@ -134,7 +137,7 @@ func (suite *KeeperTestSuite) TestFeed() {
 	err = suite.keeper.EditFeed(suite.ctx, &types.MsgEditFeed{
 		FeedName:          msg.FeedName,
 		LatestHistory:     latestHistory,
-		Providers:         []sdk.AccAddress{addrs[0]},
+		Providers:         []string{addrs[0]},
 		ServiceFeeCap:     sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100))),
 		RepeatedFrequency: 1,
 		ResponseThreshold: 1,
@@ -165,7 +168,8 @@ func (suite *KeeperTestSuite) TestFeed() {
 	})
 	suite.NoError(err)
 
-	reqCtx, existed := suite.keeper.GetRequestContext(suite.ctx, feed.RequestContextID)
+	requestContextID, _ := hex.DecodeString(feed.RequestContextID)
+	reqCtx, existed := suite.keeper.GetRequestContext(suite.ctx, requestContextID)
 	suite.True(existed)
 	suite.Equal(exported.PAUSED, reqCtx.State)
 
@@ -236,7 +240,7 @@ func (m MockServiceKeeper) RegisterModuleService(moduleName string, moduleServic
 }
 
 func (m MockServiceKeeper) GetRequestContext(ctx sdk.Context, requestContextID tmbytes.HexBytes) (exported.RequestContext, bool) {
-	reqCtx, ok := m.cxtMap[string(requestContextID)]
+	reqCtx, ok := m.cxtMap[strings.ToUpper(hex.EncodeToString(requestContextID))]
 	return reqCtx, ok
 }
 
@@ -277,8 +281,8 @@ func (m MockServiceKeeper) CreateRequestContext(
 		ResponseThreshold: respThreshold,
 		ModuleName:        moduleName,
 	}
-	m.cxtMap[string(mockReqCtxID)] = reqCtx
-	return mockReqCtxID, nil
+	m.cxtMap[mockReqCtxID] = reqCtx
+	return mockReqCtxIDBytes, nil
 }
 
 func (m MockServiceKeeper) UpdateRequestContext(
@@ -296,17 +300,17 @@ func (m MockServiceKeeper) UpdateRequestContext(
 }
 
 func (m MockServiceKeeper) StartRequestContext(ctx sdk.Context, requestContextID tmbytes.HexBytes, consumer sdk.AccAddress) error {
-	reqCtx := m.cxtMap[string(requestContextID)]
+	reqCtx := m.cxtMap[strings.ToUpper(hex.EncodeToString(requestContextID))]
 	callback := m.callbackMap[reqCtx.ModuleName]
 	reqCtx.State = servicetypes.RUNNING
 	callback(ctx, requestContextID, responses, nil)
-	m.cxtMap[string(requestContextID)] = reqCtx
+	m.cxtMap[strings.ToUpper(hex.EncodeToString(requestContextID))] = reqCtx
 	return nil
 }
 
 func (m MockServiceKeeper) PauseRequestContext(ctx sdk.Context, requestContextID tmbytes.HexBytes, consumer sdk.AccAddress) error {
-	reqCtx := m.cxtMap[string(requestContextID)]
+	reqCtx := m.cxtMap[strings.ToUpper(hex.EncodeToString(requestContextID))]
 	reqCtx.State = exported.PAUSED
-	m.cxtMap[string(requestContextID)] = reqCtx
+	m.cxtMap[strings.ToUpper(hex.EncodeToString(requestContextID))] = reqCtx
 	return nil
 }

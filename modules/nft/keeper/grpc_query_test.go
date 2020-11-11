@@ -11,8 +11,8 @@ func (suite *KeeperSuite) TestSupply() {
 	suite.NoError(err)
 
 	response, err := suite.queryClient.Supply(gocontext.Background(), &types.QuerySupplyRequest{
-		Denom: denomID,
-		Owner: address.String(),
+		DenomId: denomID,
+		Owner:   address.String(),
 	})
 
 	suite.NoError(err)
@@ -24,13 +24,13 @@ func (suite *KeeperSuite) TestOwner() {
 	suite.NoError(err)
 
 	response, err := suite.queryClient.Owner(gocontext.Background(), &types.QueryOwnerRequest{
-		Denom: denomID,
-		Owner: address.String(),
+		DenomId: denomID,
+		Owner:   address.String(),
 	})
 
 	suite.NoError(err)
 	suite.NotNil(response.Owner)
-	suite.Contains(response.Owner.IDCollections[0].Ids, tokenID)
+	suite.Contains(response.Owner.IDCollections[0].TokenIds, tokenID)
 }
 
 func (suite *KeeperSuite) TestCollection() {
@@ -38,7 +38,7 @@ func (suite *KeeperSuite) TestCollection() {
 	suite.NoError(err)
 
 	response, err := suite.queryClient.Collection(gocontext.Background(), &types.QueryCollectionRequest{
-		Denom: denomID,
+		DenomId: denomID,
 	})
 
 	suite.NoError(err)
@@ -52,7 +52,7 @@ func (suite *KeeperSuite) TestDenom() {
 	suite.NoError(err)
 
 	response, err := suite.queryClient.Denom(gocontext.Background(), &types.QueryDenomRequest{
-		Denom: denomID,
+		DenomId: denomID,
 	})
 
 	suite.NoError(err)
@@ -76,8 +76,8 @@ func (suite *KeeperSuite) TestNFT() {
 	suite.NoError(err)
 
 	response, err := suite.queryClient.NFT(gocontext.Background(), &types.QueryNFTRequest{
-		Denom: denomID,
-		Id:    tokenID,
+		DenomId: denomID,
+		TokenId: tokenID,
 	})
 
 	suite.NoError(err)

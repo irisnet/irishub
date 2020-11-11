@@ -13,12 +13,12 @@ message Feed {
     string aggregate_func = 3 [ (gogoproto.moretags) = "yaml:\"aggregate_func\"" ];
     string value_json_path = 4 [ (gogoproto.moretags) = "yaml:\"value_json_path\"" ];
     uint64 latest_history = 5 [ (gogoproto.moretags) = "yaml:\"latest_history\"" ];
-    bytes request_context_id = 6 [ (gogoproto.customname) = "RequestContextID", (gogoproto.casttype) = "github.com/tendermint/tendermint/libs/bytes.HexBytes", (gogoproto.moretags) = "yaml:\"request_context_id\"" ];
-    bytes creator = 7 [ (gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress" ];
+    string request_context_id = 6 [ (gogoproto.customname) = "RequestContextID", (gogoproto.moretags) = "yaml:\"request_context_id\"" ];
+    string creator = 7;
 }
 
 // FeedValue defines the feed result standard
 message FeedValue {
     string data = 1;
-    google.protobuf.Timestamp timestamp = 6 [ (gogoproto.stdtime) = true, (gogoproto.nullable) = false ];
+    google.protobuf.Timestamp timestamp = 2 [ (gogoproto.stdtime) = true, (gogoproto.nullable) = false ];
 }

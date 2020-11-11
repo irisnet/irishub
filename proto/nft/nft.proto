@@ -12,7 +12,7 @@ message BaseNFT {
 
     string id = 1;
     string name = 2;
-    string uri = 3 [(gogoproto.customname) = "URI"];
+    string uri = 3 [ (gogoproto.customname) = "URI" ];
     string data = 4;
     string owner = 5;
 }
@@ -30,20 +30,20 @@ message Denom {
 message IDCollection {
     option (gogoproto.equal) = true;
 
-    string denom = 1;
-    repeated string ids = 2;
+    string denom_id = 1 [ (gogoproto.moretags) = "yaml:\"denom_id\"" ];
+    repeated string token_ids = 2 [ (gogoproto.moretags) = "yaml:\"token_ids\"" ];
 }
 
 message Owner {
     option (gogoproto.equal) = true;
 
     string address = 1;
-    repeated IDCollection id_collections = 2 [(gogoproto.moretags) = "yaml:\"idcs\"", (gogoproto.customname) = "IDCollections", (gogoproto.nullable) = false];
+    repeated IDCollection id_collections = 2 [ (gogoproto.moretags) = "yaml:\"idcs\"", (gogoproto.customname) = "IDCollections", (gogoproto.nullable) = false ];
 }
 
 message Collection {
     option (gogoproto.equal) = true;
 
-    Denom denom = 1 [(gogoproto.nullable) = false];
-    repeated BaseNFT nfts = 2 [(gogoproto.customname) = "NFTs", (gogoproto.nullable) = false];
+    Denom denom = 1 [ (gogoproto.nullable) = false ];
+    repeated BaseNFT nfts = 2 [ (gogoproto.customname) = "NFTs", (gogoproto.nullable) = false ];
 }

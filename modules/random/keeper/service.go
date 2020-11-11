@@ -132,10 +132,19 @@ func (k Keeper) HandlerResponse(ctx sdk.Context, requestContextID tmbytes.HexByt
 	reqID := types.GenerateRequestID(request)
 
 	// generate a random number
-	random := types.MakePRNG(lastBlockHash, currentTimestamp, request.Consumer, seed, true).GetRand()
+	consumer, _ := sdk.AccAddressFromBech32(request.Consumer)
+	random := types.MakePRNG(lastBlockHash, currentTimestamp, consumer, seed, true).GetRand()
 	k.SetRandom(ctx, reqID, types.NewRandom(request.TxHash, lastBlockHeight, random.FloatString(types.RandPrec)))
 
 	k.DeleteOracleRandRequest(ctx, requestContextID)
+
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			types.EventTypeGenerateRandom,
+			sdk.NewAttribute(types.AttributeKeyRequestID, hex.EncodeToString(reqID)),
+			sdk.NewAttribute(types.AttributeKeyRandom, random.String()),
+		),
+	)
 }
 
 // GetRequestContext retrieves the request context by the specified request context id

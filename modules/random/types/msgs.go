@@ -6,7 +6,7 @@ import (
 )
 
 const (
-	TypeMsgRequestRandom = "request_rand" // type for MsgRequestRandom
+	TypeMsgRequestRandom = "request_random" // type for MsgRequestRandom
 
 	DefaultBlockInterval = uint64(10) // DefaultBlockInterval is the default block interval
 )
@@ -15,7 +15,7 @@ var _ sdk.Msg = &MsgRequestRandom{}
 
 // NewMsgRequestRandom constructs a MsgRequestRandom
 func NewMsgRequestRandom(
-	consumer sdk.AccAddress,
+	consumer string,
 	blockInterval uint64,
 	oracle bool,
 	serviceFeeCap sdk.Coins,
@@ -36,8 +36,8 @@ func (msg MsgRequestRandom) Type() string { return TypeMsgRequestRandom }
 
 // ValidateBasic implements Msg.
 func (msg MsgRequestRandom) ValidateBasic() error {
-	if len(msg.Consumer) == 0 {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "the consumer address must be specified")
+	if _, err := sdk.AccAddressFromBech32(msg.Consumer); err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid consumer address (%s)", err)
 	}
 	return nil
 }
@@ -53,5 +53,9 @@ func (msg MsgRequestRandom) GetSignBytes() []byte {
 
 // GetSigners implements Msg.
 func (msg MsgRequestRandom) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{msg.Consumer}
+	consumer, err := sdk.AccAddressFromBech32(msg.Consumer)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{consumer}
 }

@@ -6,12 +6,14 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/tendermint/tendermint/crypto/tmhash"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 var (
-	emptyAddr     sdk.AccAddress
-	testAddr      = sdk.AccAddress([]byte("testAddr"))
+	emptyAddr     = ""
+	testAddr      = sdk.AccAddress(tmhash.SumTruncated([]byte("testAddr"))).String()
 	blockInterval = uint64(10)
 	serviceFeeCap = sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(1000000000000000000)))
 )
@@ -33,7 +35,7 @@ func TestMsgRequestRandomRoute(t *testing.T) {
 func TestMsgRequestRandomValidation(t *testing.T) {
 	testData := []struct {
 		name          string
-		consumer      sdk.AccAddress
+		consumer      string
 		blockInterval uint64
 		oracle        bool
 		serviceFeeCap sdk.Coins
@@ -57,7 +59,7 @@ func TestMsgRequestRandomGetSignBytes(t *testing.T) {
 	var msg = NewMsgRequestRandom(testAddr, blockInterval, true, serviceFeeCap)
 	res := msg.GetSignBytes()
 
-	expected := fmt.Sprintf("{\"type\":\"irismod/random/MsgRequestRandom\",\"value\":{\"block_interval\":\"10\",\"consumer\":\"cosmos1w3jhxazpv3j8y5jww2c\",\"oracle\":true,\"service_fee_cap\":[{\"amount\":\"1000000000000000000\",\"denom\":\"%s\"}]}}", sdk.DefaultBondDenom)
+	expected := fmt.Sprintf("{\"type\":\"irismod/random/MsgRequestRandom\",\"value\":{\"block_interval\":\"10\",\"consumer\":\"cosmos133ee7f22kzn7khtdw8d72dgyre0txe5zll7d5w\",\"oracle\":true,\"service_fee_cap\":[{\"amount\":\"1000000000000000000\",\"denom\":\"%s\"}]}}", sdk.DefaultBondDenom)
 	require.Equal(t, expected, string(res))
 }
 
@@ -65,6 +67,6 @@ func TestMsgRequestRandomGetSigners(t *testing.T) {
 	var msg = NewMsgRequestRandom(testAddr, blockInterval, false, serviceFeeCap)
 	res := msg.GetSigners()
 
-	expected := "[7465737441646472]"
+	expected := "[8C739F254AB0A7EB5D6D71DBE535041E5EB36682]"
 	require.Equal(t, expected, fmt.Sprintf("%v", res))
 }

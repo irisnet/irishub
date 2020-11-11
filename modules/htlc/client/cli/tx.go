@@ -66,8 +66,7 @@ func GetCmdCreateHTLC() *cobra.Command {
 				return err
 			}
 
-			to, err := sdk.AccAddressFromBech32(toAddr)
-			if err != nil {
+			if _, err := sdk.AccAddressFromBech32(toAddr); err != nil {
 				return err
 			}
 
@@ -112,8 +111,8 @@ func GetCmdCreateHTLC() *cobra.Command {
 			}
 
 			msg := types.NewMsgCreateHTLC(
-				sender, to, receiverOnOtherChain, amount,
-				hashLock, timestamp, timeLock,
+				sender.String(), toAddr, receiverOnOtherChain, amount,
+				hex.EncodeToString(hashLock), timestamp, timeLock,
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
@@ -156,19 +155,17 @@ func GetCmdClaimHTLC() *cobra.Command {
 				return err
 			}
 
-			sender := clientCtx.GetFromAddress()
+			sender := clientCtx.GetFromAddress().String()
 
-			hashLock, err := hex.DecodeString(args[0])
-			if err != nil {
+			if _, err := hex.DecodeString(args[0]); err != nil {
 				return err
 			}
 
-			secret, err := hex.DecodeString(args[1])
-			if err != nil {
+			if _, err := hex.DecodeString(args[1]); err != nil {
 				return err
 			}
 
-			msg := types.NewMsgClaimHTLC(sender, hashLock, secret)
+			msg := types.NewMsgClaimHTLC(sender, args[0], args[1])
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -196,14 +193,13 @@ func GetCmdRefundHTLC() *cobra.Command {
 				return err
 			}
 
-			sender := clientCtx.GetFromAddress()
+			sender := clientCtx.GetFromAddress().String()
 
-			hashLock, err := hex.DecodeString(args[0])
-			if err != nil {
+			if _, err := hex.DecodeString(args[0]); err != nil {
 				return err
 			}
 
-			msg := types.NewMsgRefundHTLC(sender, hashLock)
+			msg := types.NewMsgRefundHTLC(sender, args[0])
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}

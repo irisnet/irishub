@@ -74,8 +74,7 @@ func (msg MsgSwapOrder) ValidateBasic() error {
 	if msg.Deadline <= 0 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, fmt.Sprintf("deadline %d must be greater than 0", msg.Deadline))
 	}
-	_, err := sdk.AccAddressFromBech32(msg.Input.Address)
-	if err != nil {
+	if _, err := sdk.AccAddressFromBech32(msg.Input.Address); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid input address (%s)", err)
 	}
 	return nil
@@ -105,14 +104,14 @@ func NewMsgAddLiquidity(
 	exactStandardAmt sdk.Int,
 	minLiquidity sdk.Int,
 	deadline int64,
-	sender sdk.AccAddress,
+	sender string,
 ) *MsgAddLiquidity {
 	return &MsgAddLiquidity{
 		MaxToken:         maxToken,
 		ExactStandardAmt: exactStandardAmt,
 		MinLiquidity:     minLiquidity,
 		Deadline:         deadline,
-		Sender:           sender.String(),
+		Sender:           sender,
 	}
 }
 
@@ -142,8 +141,7 @@ func (msg MsgAddLiquidity) ValidateBasic() error {
 	if msg.Deadline <= 0 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, fmt.Sprintf("deadline %d must be greater than 0", msg.Deadline))
 	}
-	_, err := sdk.AccAddressFromBech32(msg.Sender)
-	if err != nil {
+	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
 	return nil
@@ -173,14 +171,14 @@ func NewMsgRemoveLiquidity(
 	withdrawLiquidity sdk.Coin,
 	minStandardAmt sdk.Int,
 	deadline int64,
-	sender sdk.AccAddress,
+	sender string,
 ) *MsgRemoveLiquidity {
 	return &MsgRemoveLiquidity{
 		MinToken:          minToken,
 		WithdrawLiquidity: withdrawLiquidity,
 		MinStandardAmt:    minStandardAmt,
 		Deadline:          deadline,
-		Sender:            sender.String(),
+		Sender:            sender,
 	}
 }
 
@@ -207,8 +205,7 @@ func (msg MsgRemoveLiquidity) ValidateBasic() error {
 	if msg.Deadline <= 0 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, fmt.Sprintf("deadline %d must be greater than 0", msg.Deadline))
 	}
-	_, err := sdk.AccAddressFromBech32(msg.Sender)
-	if err != nil {
+	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
 	return nil

@@ -1,6 +1,7 @@
 package simulation_test
 
 import (
+	"encoding/hex"
 	"fmt"
 	"math/big"
 	"testing"
@@ -19,9 +20,9 @@ func TestDecodeStore(t *testing.T) {
 	cdc, _ := simapp.MakeCodecs()
 	dec := simulation.NewDecodeStore(cdc)
 
-	request := types.NewRequest(50, sdk.AccAddress("consumer"), []byte("txHash"), false, nil, nil)
+	request := types.NewRequest(50, sdk.AccAddress("consumer").String(), hex.EncodeToString([]byte("txHash")), false, nil, "")
 	reqID := types.GenerateRequestID(request)
-	random := types.NewRandom([]byte("requestTxHash"), 100, big.NewRat(10, 1000).FloatString(types.RandPrec))
+	random := types.NewRandom(hex.EncodeToString([]byte("requestTxHash")), 100, big.NewRat(10, 1000).FloatString(types.RandPrec))
 
 	kvPairs := kv.Pairs{
 		Pairs: []kv.Pair{

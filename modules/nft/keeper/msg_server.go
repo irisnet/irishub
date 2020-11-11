@@ -23,8 +23,8 @@ func NewMsgServerImpl(keeper Keeper) types.MsgServer {
 
 // IssueDenom issue a new denom.
 func (m msgServer) IssueDenom(goCtx context.Context, msg *types.MsgIssueDenom) (*types.MsgIssueDenomResponse, error) {
-	id := strings.ToLower(strings.TrimSpace(msg.Id))
-	name := strings.ToLower(strings.TrimSpace(msg.Name))
+	denomID := strings.ToLower(strings.TrimSpace(msg.Id))
+	denomName := strings.ToLower(strings.TrimSpace(msg.Name))
 
 	sender, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
@@ -32,14 +32,16 @@ func (m msgServer) IssueDenom(goCtx context.Context, msg *types.MsgIssueDenom) (
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	if err := m.Keeper.IssueDenom(ctx, id, name, msg.Schema, sender); err != nil {
+	if err := m.Keeper.IssueDenom(ctx, denomID, denomName, msg.Schema, sender); err != nil {
 		return nil, err
 	}
 
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			types.EventTypeIssueDenom,
-			sdk.NewAttribute(types.AttributeKeyDenom, id),
+			sdk.NewAttribute(types.AttributeKeyDenomID, denomID),
+			sdk.NewAttribute(types.AttributeKeyDenomName, denomID),
+			sdk.NewAttribute(types.AttributeKeyCreator, msg.Sender),
 		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
@@ -47,12 +49,13 @@ func (m msgServer) IssueDenom(goCtx context.Context, msg *types.MsgIssueDenom) (
 			sdk.NewAttribute(sdk.AttributeKeySender, msg.Sender),
 		),
 	})
+
 	return &types.MsgIssueDenomResponse{}, nil
 }
 
 func (m msgServer) MintNFT(goCtx context.Context, msg *types.MsgMintNFT) (*types.MsgMintNFTResponse, error) {
-	id := strings.ToLower(strings.TrimSpace(msg.Id))
-	denom := strings.ToLower(strings.TrimSpace(msg.Denom))
+	tokenID := strings.ToLower(strings.TrimSpace(msg.Id))
+	denomID := strings.ToLower(strings.TrimSpace(msg.DenomId))
 
 	recipient, err := sdk.AccAddressFromBech32(msg.Recipient)
 	if err != nil {
@@ -61,7 +64,7 @@ func (m msgServer) MintNFT(goCtx context.Context, msg *types.MsgMintNFT) (*types
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	if err := m.Keeper.MintNFT(
-		ctx, denom, id,
+		ctx, denomID, tokenID,
 		strings.TrimSpace(msg.Name),
 		strings.TrimSpace(msg.URI),
 		msg.Data,
@@ -73,10 +76,10 @@ func (m msgServer) MintNFT(goCtx context.Context, msg *types.MsgMintNFT) (*types
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			types.EventTypeMintNFT,
-			sdk.NewAttribute(types.AttributeKeyRecipient, msg.Recipient),
-			sdk.NewAttribute(types.AttributeKeyDenom, denom),
-			sdk.NewAttribute(types.AttributeKeyTokenID, id),
+			sdk.NewAttribute(types.AttributeKeyTokenID, tokenID),
+			sdk.NewAttribute(types.AttributeKeyDenomID, denomID),
 			sdk.NewAttribute(types.AttributeKeyTokenURI, msg.URI),
+			sdk.NewAttribute(types.AttributeKeyRecipient, msg.Recipient),
 		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
@@ -84,12 +87,13 @@ func (m msgServer) MintNFT(goCtx context.Context, msg *types.MsgMintNFT) (*types
 			sdk.NewAttribute(sdk.AttributeKeySender, msg.Sender),
 		),
 	})
+
 	return &types.MsgMintNFTResponse{}, nil
 }
 
 func (m msgServer) EditNFT(goCtx context.Context, msg *types.MsgEditNFT) (*types.MsgEditNFTResponse, error) {
-	id := strings.ToLower(strings.TrimSpace(msg.Id))
-	denom := strings.ToLower(strings.TrimSpace(msg.Denom))
+	tokenID := strings.ToLower(strings.TrimSpace(msg.Id))
+	denomID := strings.ToLower(strings.TrimSpace(msg.DenomId))
 
 	sender, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
@@ -98,7 +102,7 @@ func (m msgServer) EditNFT(goCtx context.Context, msg *types.MsgEditNFT) (*types
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	if err := m.Keeper.EditNFT(
-		ctx, denom, id,
+		ctx, denomID, tokenID,
 		strings.TrimSpace(msg.Name),
 		strings.TrimSpace(msg.URI),
 		msg.Data,
@@ -110,9 +114,10 @@ func (m msgServer) EditNFT(goCtx context.Context, msg *types.MsgEditNFT) (*types
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			types.EventTypeEditNFT,
-			sdk.NewAttribute(types.AttributeKeyDenom, denom),
-			sdk.NewAttribute(types.AttributeKeyTokenID, id),
+			sdk.NewAttribute(types.AttributeKeyTokenID, tokenID),
+			sdk.NewAttribute(types.AttributeKeyDenomID, denomID),
 			sdk.NewAttribute(types.AttributeKeyTokenURI, msg.URI),
+			sdk.NewAttribute(types.AttributeKeyOwner, msg.Sender),
 		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
@@ -120,12 +125,13 @@ func (m msgServer) EditNFT(goCtx context.Context, msg *types.MsgEditNFT) (*types
 			sdk.NewAttribute(sdk.AttributeKeySender, msg.Sender),
 		),
 	})
+
 	return &types.MsgEditNFTResponse{}, nil
 }
 
 func (m msgServer) TransferNFT(goCtx context.Context, msg *types.MsgTransferNFT) (*types.MsgTransferNFTResponse, error) {
-	id := strings.ToLower(strings.TrimSpace(msg.Id))
-	denom := strings.ToLower(strings.TrimSpace(msg.Denom))
+	tokenID := strings.ToLower(strings.TrimSpace(msg.Id))
+	denomID := strings.ToLower(strings.TrimSpace(msg.DenomId))
 
 	sender, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
@@ -139,7 +145,7 @@ func (m msgServer) TransferNFT(goCtx context.Context, msg *types.MsgTransferNFT)
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	if err := m.Keeper.TransferOwner(
-		ctx, denom, id,
+		ctx, denomID, tokenID,
 		strings.TrimSpace(msg.Name),
 		strings.TrimSpace(msg.URI),
 		msg.Data,
@@ -152,9 +158,10 @@ func (m msgServer) TransferNFT(goCtx context.Context, msg *types.MsgTransferNFT)
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			types.EventTypeTransfer,
+			sdk.NewAttribute(types.AttributeKeyTokenID, tokenID),
+			sdk.NewAttribute(types.AttributeKeyDenomID, denomID),
+			sdk.NewAttribute(types.AttributeKeySender, msg.Sender),
 			sdk.NewAttribute(types.AttributeKeyRecipient, msg.Recipient),
-			sdk.NewAttribute(types.AttributeKeyDenom, denom),
-			sdk.NewAttribute(types.AttributeKeyTokenID, id),
 		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
@@ -162,12 +169,13 @@ func (m msgServer) TransferNFT(goCtx context.Context, msg *types.MsgTransferNFT)
 			sdk.NewAttribute(sdk.AttributeKeySender, msg.Sender),
 		),
 	})
+
 	return &types.MsgTransferNFTResponse{}, nil
 }
 
 func (m msgServer) BurnNFT(goCtx context.Context, msg *types.MsgBurnNFT) (*types.MsgBurnNFTResponse, error) {
-	id := strings.ToLower(strings.TrimSpace(msg.Id))
-	denom := strings.ToLower(strings.TrimSpace(msg.Denom))
+	tokenID := strings.ToLower(strings.TrimSpace(msg.Id))
+	denomID := strings.ToLower(strings.TrimSpace(msg.DenomId))
 
 	sender, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
@@ -175,15 +183,16 @@ func (m msgServer) BurnNFT(goCtx context.Context, msg *types.MsgBurnNFT) (*types
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	if err := m.Keeper.BurnNFT(ctx, denom, id, sender); err != nil {
+	if err := m.Keeper.BurnNFT(ctx, denomID, tokenID, sender); err != nil {
 		return nil, err
 	}
 
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			types.EventTypeBurnNFT,
-			sdk.NewAttribute(types.AttributeKeyDenom, denom),
-			sdk.NewAttribute(types.AttributeKeyTokenID, id),
+			sdk.NewAttribute(types.AttributeKeyDenomID, denomID),
+			sdk.NewAttribute(types.AttributeKeyTokenID, tokenID),
+			sdk.NewAttribute(types.AttributeKeyOwner, msg.Sender),
 		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
@@ -191,5 +200,6 @@ func (m msgServer) BurnNFT(goCtx context.Context, msg *types.MsgBurnNFT) (*types
 			sdk.NewAttribute(sdk.AttributeKeySender, msg.Sender),
 		),
 	})
+
 	return &types.MsgBurnNFTResponse{}, nil
 }

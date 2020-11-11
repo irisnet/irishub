@@ -4,20 +4,18 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/cosmos/cosmos-sdk/types/rest"
-
-	nfttypes "github.com/irisnet/irismod/modules/nft/types"
-
+	"github.com/gogo/protobuf/proto"
+	"github.com/stretchr/testify/suite"
 	"github.com/tidwall/gjson"
 
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/testutil/network"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/gogo/protobuf/proto"
-	"github.com/stretchr/testify/suite"
+	"github.com/cosmos/cosmos-sdk/types/rest"
 
 	nftcli "github.com/irisnet/irismod/modules/nft/client/cli"
 	nfttestutil "github.com/irisnet/irismod/modules/nft/client/testutil"
+	nfttypes "github.com/irisnet/irismod/modules/nft/types"
 	"github.com/irisnet/irismod/simapp"
 )
 
@@ -157,8 +155,8 @@ func (s *IntegrationTestSuite) TestNft() {
 	s.Require().NoError(val.ClientCtx.JSONMarshaler.UnmarshalJSON(resp, respType))
 	ownerResp := respType.(*nfttypes.QueryOwnerResponse)
 	s.Require().Equal(from.String(), ownerResp.Owner.Address)
-	s.Require().Equal(denom, ownerResp.Owner.IDCollections[0].Denom)
-	s.Require().Equal(tokenID, ownerResp.Owner.IDCollections[0].Ids[0])
+	s.Require().Equal(denom, ownerResp.Owner.IDCollections[0].DenomId)
+	s.Require().Equal(tokenID, ownerResp.Owner.IDCollections[0].TokenIds[0])
 
 	//------test GetCmdQueryCollection()-------------
 	url = fmt.Sprintf("%s/irismod/nft/collections/%s", baseURL, denomID)

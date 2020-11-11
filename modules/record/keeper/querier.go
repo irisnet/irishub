@@ -24,8 +24,7 @@ func NewQuerier(k Keeper, legacyQuerierCdc *codec.LegacyAmino) sdk.Querier {
 
 func queryRecord(ctx sdk.Context, k Keeper, req abci.RequestQuery, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
 	var params types.QueryRecordParams
-	err := legacyQuerierCdc.UnmarshalJSON(req.Data, &params)
-	if err != nil {
+	if err := legacyQuerierCdc.UnmarshalJSON(req.Data, &params); err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, err.Error())
 	}
 
@@ -34,13 +33,7 @@ func queryRecord(ctx sdk.Context, k Keeper, req abci.RequestQuery, legacyQuerier
 		return nil, types.ErrUnknownRecord
 	}
 
-	recordOutput := types.RecordOutput{
-		TxHash:   record.TxHash,
-		Contents: record.Contents,
-		Creator:  record.Creator,
-	}
-
-	bz, err := codec.MarshalJSONIndent(legacyQuerierCdc, recordOutput)
+	bz, err := codec.MarshalJSONIndent(legacyQuerierCdc, types.RecordOutput(record))
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
 	}

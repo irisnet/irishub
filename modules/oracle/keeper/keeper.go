@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"strings"
@@ -61,11 +62,18 @@ func (k Keeper) CreateFeed(ctx sdk.Context, msg *types.MsgCreateFeed) error {
 		return sdkerrors.Wrapf(types.ErrExistedFeedName, msg.FeedName)
 	}
 
+	providers := make([]sdk.AccAddress, len(msg.Providers))
+	for i, provider := range msg.Providers {
+		pd, _ := sdk.AccAddressFromBech32(provider)
+		providers[i] = pd
+	}
+
+	creator, _ := sdk.AccAddressFromBech32(msg.Creator)
 	requestContextID, err := k.sk.CreateRequestContext(
 		ctx,
 		msg.ServiceName,
-		msg.Providers,
-		msg.Creator,
+		providers,
+		creator,
 		msg.Input,
 		msg.ServiceFeeCap,
 		msg.Timeout,
@@ -86,7 +94,7 @@ func (k Keeper) CreateFeed(ctx sdk.Context, msg *types.MsgCreateFeed) error {
 		AggregateFunc:    msg.AggregateFunc,
 		ValueJsonPath:    msg.ValueJsonPath,
 		LatestHistory:    msg.LatestHistory,
-		RequestContextID: requestContextID,
+		RequestContextID: requestContextID.String(),
 		Description:      msg.Description,
 		Creator:          msg.Creator,
 	})
@@ -102,11 +110,14 @@ func (k Keeper) StartFeed(ctx sdk.Context, msg *types.MsgStartFeed) error {
 		return sdkerrors.Wrapf(types.ErrUnknownFeedName, msg.FeedName)
 	}
 
-	if !msg.Creator.Equals(feed.Creator) {
-		return sdkerrors.Wrapf(types.ErrUnauthorized, msg.Creator.String())
+	requestContextID, _ := hex.DecodeString(feed.RequestContextID)
+	creator, _ := sdk.AccAddressFromBech32(msg.Creator)
+
+	if msg.Creator != feed.Creator {
+		return sdkerrors.Wrapf(types.ErrUnauthorized, msg.Creator)
 	}
 
-	reqCtx, existed := k.sk.GetRequestContext(ctx, feed.RequestContextID)
+	reqCtx, existed := k.sk.GetRequestContext(ctx, requestContextID)
 	if !existed {
 		return sdkerrors.Wrapf(types.ErrUnknownFeedName, msg.FeedName)
 	}
@@ -116,7 +127,7 @@ func (k Keeper) StartFeed(ctx sdk.Context, msg *types.MsgStartFeed) error {
 		return sdkerrors.Wrapf(types.ErrInvalidFeedState, msg.FeedName)
 	}
 
-	if err := k.sk.StartRequestContext(ctx, feed.RequestContextID, feed.Creator); err != nil {
+	if err := k.sk.StartRequestContext(ctx, requestContextID, creator); err != nil {
 		return err
 	}
 
@@ -131,11 +142,14 @@ func (k Keeper) PauseFeed(ctx sdk.Context, msg *types.MsgPauseFeed) error {
 		return sdkerrors.Wrapf(types.ErrUnknownFeedName, msg.FeedName)
 	}
 
-	if !msg.Creator.Equals(feed.Creator) {
-		return sdkerrors.Wrapf(types.ErrUnauthorized, msg.Creator.String())
+	requestContextID, _ := hex.DecodeString(feed.RequestContextID)
+	creator, _ := sdk.AccAddressFromBech32(msg.Creator)
+
+	if msg.Creator != feed.Creator {
+		return sdkerrors.Wrapf(types.ErrUnauthorized, msg.Creator)
 	}
 
-	reqCtx, existed := k.sk.GetRequestContext(ctx, feed.RequestContextID)
+	reqCtx, existed := k.sk.GetRequestContext(ctx, requestContextID)
 	if !existed {
 		return sdkerrors.Wrapf(types.ErrUnknownFeedName, msg.FeedName)
 	}
@@ -145,7 +159,7 @@ func (k Keeper) PauseFeed(ctx sdk.Context, msg *types.MsgPauseFeed) error {
 		return sdkerrors.Wrapf(types.ErrInvalidFeedState, msg.FeedName)
 	}
 
-	if err := k.sk.PauseRequestContext(ctx, feed.RequestContextID, feed.Creator); err != nil {
+	if err := k.sk.PauseRequestContext(ctx, requestContextID, creator); err != nil {
 		return err
 	}
 
@@ -160,20 +174,29 @@ func (k Keeper) EditFeed(ctx sdk.Context, msg *types.MsgEditFeed) error {
 		return sdkerrors.Wrapf(types.ErrUnknownFeedName, msg.FeedName)
 	}
 
-	if !msg.Creator.Equals(feed.Creator) {
-		return sdkerrors.Wrapf(types.ErrUnauthorized, msg.Creator.String())
+	if msg.Creator != feed.Creator {
+		return sdkerrors.Wrapf(types.ErrUnauthorized, msg.Creator)
+	}
+
+	requestContextID, _ := hex.DecodeString(feed.RequestContextID)
+	creator, _ := sdk.AccAddressFromBech32(msg.Creator)
+
+	providers := make([]sdk.AccAddress, len(msg.Providers))
+	for i, provider := range msg.Providers {
+		pd, _ := sdk.AccAddressFromBech32(provider)
+		providers[i] = pd
 	}
 
 	if err := k.sk.UpdateRequestContext(
 		ctx,
-		feed.RequestContextID,
-		msg.Providers,
+		requestContextID,
+		providers,
 		msg.ResponseThreshold,
 		msg.ServiceFeeCap,
 		msg.Timeout,
 		msg.RepeatedFrequency,
 		-1,
-		msg.Creator,
+		creator,
 	); err != nil {
 		return err
 	}
@@ -252,7 +275,7 @@ func (k Keeper) HandlerResponse(
 
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
-			types.EventTypeSetFeed,
+			types.EventTypeSetFeedValue,
 			sdk.NewAttribute(types.AttributeKeyFeedName, feed.FeedName),
 			sdk.NewAttribute(types.AttributeKeyFeedValue, string(bz)),
 		),

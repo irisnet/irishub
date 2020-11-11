@@ -2,7 +2,6 @@ package rest_test
 
 import (
 	"fmt"
-	"github.com/cosmos/cosmos-sdk/types/rest"
 	"testing"
 
 	"github.com/gogo/protobuf/proto"
@@ -11,6 +10,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/testutil/network"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/rest"
 
 	oraclecli "github.com/irisnet/irismod/modules/oracle/client/cli"
 	oracletestutil "github.com/irisnet/irismod/modules/oracle/client/testutil"
@@ -179,7 +179,7 @@ func (s *IntegrationTestSuite) TestOracle() {
 	s.Require().Equal(feedResp.Feed, feedsResp.Feeds[0])
 
 	// ------test GetCmdQueryFeedValue()-------------
-	url = fmt.Sprintf("%s/irismod/oracle/feeds/%s/values", baseURL,feedName)
+	url = fmt.Sprintf("%s/irismod/oracle/feeds/%s/values", baseURL, feedName)
 	resp, err = rest.GetRequest(url)
 	respType = proto.Message(&oracletypes.QueryFeedValueResponse{})
 	s.Require().NoError(err)

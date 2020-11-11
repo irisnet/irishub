@@ -20,9 +20,7 @@ import (
 const (
 	denomStandard = types.StandardDenom
 	denomBTC      = "btc"
-	denomETH      = "eth"
 	unidenomBTC   = types.FormatUniABSPrefix + denomBTC
-	unidenomETH   = types.FormatUniABSPrefix + denomETH
 )
 
 var (
@@ -106,8 +104,8 @@ func (suite *TestSuite) TestLiquidity() {
 	minReward := sdk.NewInt(1)
 	deadline := time.Now().Add(1 * time.Minute)
 
-	msg := types.NewMsgAddLiquidity(depositCoin, standardAmt, minReward, deadline.Unix(), addrSender1)
-	_,err := suite.app.CoinswapKeeper.AddLiquidity(suite.ctx, msg)
+	msg := types.NewMsgAddLiquidity(depositCoin, standardAmt, minReward, deadline.Unix(), addrSender1.String())
+	_, err := suite.app.CoinswapKeeper.AddLiquidity(suite.ctx, msg)
 	suite.NoError(err)
 
 	moduleAccountBalances := suite.app.BankKeeper.GetSupply(suite.ctx).GetTotal()
@@ -127,8 +125,8 @@ func (suite *TestSuite) TestLiquidity() {
 	minReward = sdk.NewInt(1)
 	deadline = time.Now().Add(1 * time.Minute)
 
-	msg = types.NewMsgAddLiquidity(depositCoin, standardAmt, minReward, deadline.Unix(), addrSender2)
-	_,err = suite.app.CoinswapKeeper.AddLiquidity(suite.ctx, msg)
+	msg = types.NewMsgAddLiquidity(depositCoin, standardAmt, minReward, deadline.Unix(), addrSender2.String())
+	_, err = suite.app.CoinswapKeeper.AddLiquidity(suite.ctx, msg)
 	suite.NoError(err)
 
 	moduleAccountBalances = suite.app.BankKeeper.GetSupply(suite.ctx).GetTotal()
@@ -145,10 +143,10 @@ func (suite *TestSuite) TestLiquidity() {
 		sdk.NewCoin(unidenomBTC, withdraw),
 		sdk.NewInt(1),
 		suite.ctx.BlockHeader().Time.Unix(),
-		addrSender1,
+		addrSender1.String(),
 	)
 
-	_,err = suite.app.CoinswapKeeper.RemoveLiquidity(suite.ctx, msgRemove)
+	_, err = suite.app.CoinswapKeeper.RemoveLiquidity(suite.ctx, msgRemove)
 	suite.NoError(err)
 
 	moduleAccountBalances = suite.app.BankKeeper.GetSupply(suite.ctx).GetTotal()
@@ -165,10 +163,10 @@ func (suite *TestSuite) TestLiquidity() {
 		sdk.NewCoin(unidenomBTC, withdraw),
 		sdk.NewInt(1),
 		suite.ctx.BlockHeader().Time.Unix(),
-		addrSender2,
+		addrSender2.String(),
 	)
 
-	_,err = suite.app.CoinswapKeeper.RemoveLiquidity(suite.ctx, msgRemove)
+	_, err = suite.app.CoinswapKeeper.RemoveLiquidity(suite.ctx, msgRemove)
 	suite.NoError(err)
 
 	moduleAccountBalances = suite.app.BankKeeper.GetSupply(suite.ctx).GetTotal()

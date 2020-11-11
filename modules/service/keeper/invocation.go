@@ -1122,8 +1122,6 @@ func (k Keeper) CheckAuthority(
 		return sdkerrors.Wrap(types.ErrUnknownRequestContext, requestContextID.String())
 	}
 
-	consumer, _ = sdk.AccAddressFromBech32(requestContext.Consumer)
-
 	if !consumer.Equals(consumer) {
 		return sdkerrors.Wrapf(types.ErrNotAuthorized, "consumer not matching")
 	}

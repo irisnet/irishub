@@ -19,20 +19,20 @@ func (k Keeper) GetOwner(ctx sdk.Context, address sdk.AccAddress, denom string) 
 	idsMap := make(map[string][]string)
 
 	for ; iterator.Valid(); iterator.Next() {
-		_, denom, tokenID, _ := types.SplitKeyOwner(iterator.Key())
-		if ids, ok := idsMap[denom]; ok {
-			idsMap[denom] = append(ids, tokenID)
+		_, denomID, tokenID, _ := types.SplitKeyOwner(iterator.Key())
+		if ids, ok := idsMap[denomID]; ok {
+			idsMap[denomID] = append(ids, tokenID)
 		} else {
-			idsMap[denom] = []string{tokenID}
+			idsMap[denomID] = []string{tokenID}
 			owner.IDCollections = append(
 				owner.IDCollections,
-				types.IDCollection{Denom: denom},
+				types.IDCollection{DenomId: denomID},
 			)
 		}
 	}
 
 	for i := 0; i < len(owner.IDCollections); i++ {
-		owner.IDCollections[i].Ids = idsMap[owner.IDCollections[i].Denom]
+		owner.IDCollections[i].TokenIds = idsMap[owner.IDCollections[i].DenomId]
 	}
 
 	return owner

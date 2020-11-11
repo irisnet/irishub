@@ -102,7 +102,11 @@ func (msg MsgCreateFeed) GetSignBytes() []byte {
 
 // GetSigners implements Msg.
 func (msg MsgCreateFeed) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{msg.Creator}
+	creator, err := sdk.AccAddressFromBech32(msg.Creator)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{creator}
 }
 
 // _____________________________________________________________________
@@ -132,7 +136,11 @@ func (msg MsgStartFeed) GetSignBytes() []byte {
 
 // GetSigners implements Msg.
 func (msg MsgStartFeed) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{msg.Creator}
+	creator, err := sdk.AccAddressFromBech32(msg.Creator)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{creator}
 }
 
 // ______________________________________________________________________
@@ -162,7 +170,11 @@ func (msg MsgPauseFeed) GetSignBytes() []byte {
 
 // GetSigners implements Msg.
 func (msg MsgPauseFeed) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{msg.Creator}
+	creator, err := sdk.AccAddressFromBech32(msg.Creator)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{creator}
 }
 
 // ______________________________________________________________________
@@ -182,33 +194,27 @@ func (msg MsgEditFeed) ValidateBasic() error {
 	if err := ValidateFeedName(msg.FeedName); err != nil {
 		return err
 	}
-
 	if err := ValidateDescription(msg.Description); err != nil {
 		return err
 	}
-
 	if msg.LatestHistory != 0 {
 		if err := ValidateLatestHistory(msg.LatestHistory); err != nil {
 			return err
 		}
 	}
-
 	if msg.ServiceFeeCap != nil && !msg.ServiceFeeCap.IsValid() {
 		return sdkerrors.Wrapf(ErrInvalidServiceFeeCap, msg.ServiceFeeCap.String())
 	}
-
 	if msg.Timeout != 0 && msg.RepeatedFrequency != 0 {
 		if err := validateTimeout(msg.Timeout, msg.RepeatedFrequency); err != nil {
 			return err
 		}
 	}
-
 	if msg.ResponseThreshold != 0 {
 		if err := validateResponseThreshold(msg.ResponseThreshold, len(msg.Providers)); err != nil {
 			return err
 		}
 	}
-
 	return ValidateCreator(msg.Creator)
 }
 
@@ -225,7 +231,11 @@ func (msg MsgEditFeed) GetSignBytes() []byte {
 
 // GetSigners implements Msg.
 func (msg MsgEditFeed) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{msg.Creator}
+	creator, err := sdk.AccAddressFromBech32(msg.Creator)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{creator}
 }
 
 func ValidateFeedName(feedName string) error {
@@ -273,9 +283,9 @@ func ValidateLatestHistory(latestHistory uint64) error {
 	return nil
 }
 
-func ValidateCreator(creator sdk.AccAddress) error {
-	if len(creator) == 0 {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "creator missing")
+func ValidateCreator(creator string) error {
+	if _, err := sdk.AccAddressFromBech32(creator); err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator")
 	}
 	return nil
 }

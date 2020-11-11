@@ -54,9 +54,8 @@ func addLiquidityHandlerFn(cliCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		senderAddress, e := sdk.AccAddressFromBech32(req.Sender)
-		if e != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, e.Error())
+		if _, err := sdk.AccAddressFromBech32(req.Sender); err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
@@ -91,7 +90,7 @@ func addLiquidityHandlerFn(cliCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgAddLiquidity(sdk.NewCoin(tokenDenom, maxToken), exactStandardAmt, minLiquidity, deadline.Unix(), senderAddress)
+		msg := types.NewMsgAddLiquidity(sdk.NewCoin(tokenDenom, maxToken), exactStandardAmt, minLiquidity, deadline.Unix(), req.Sender)
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -122,9 +121,8 @@ func removeLiquidityHandlerFn(cliCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		senderAddress, e := sdk.AccAddressFromBech32(req.Sender)
-		if e != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, e.Error())
+		if _, err := sdk.AccAddressFromBech32(req.Sender); err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
@@ -160,7 +158,7 @@ func removeLiquidityHandlerFn(cliCtx client.Context) http.HandlerFunc {
 		}
 
 		msg := types.NewMsgRemoveLiquidity(
-			minToken, sdk.NewCoin(uniDenom, liquidityAmt), minStandard, deadline.Unix(), senderAddress,
+			minToken, sdk.NewCoin(uniDenom, liquidityAmt), minStandard, deadline.Unix(), req.Sender,
 		)
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())

@@ -36,16 +36,17 @@ func (m msgServer) CreateRecord(goCtx context.Context, msg *types.MsgCreateRecor
 	hexID := hex.EncodeToString(recordId)
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
+			types.EventTypeCreateRecord,
+			sdk.NewAttribute(types.AttributeKeyCreator, msg.Creator),
+			sdk.NewAttribute(types.AttributeKeyRecordID, hex.EncodeToString(recordId)),
+		),
+		sdk.NewEvent(
 			sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
 			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
 		),
-		sdk.NewEvent(
-			types.EventTypeCreateRecord,
-			sdk.NewAttribute(types.AttributeKeyCreator, msg.Creator),
-			sdk.NewAttribute(types.AttributeKeyRecordID, hexID),
-		),
 	})
+
 	return &types.MsgCreateRecordResponse{
 		Id: hexID,
 	}, nil

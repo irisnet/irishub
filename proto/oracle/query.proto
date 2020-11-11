@@ -63,7 +63,7 @@ message FeedContext {
 
     Feed feed = 1;
     string service_name = 2 [ (gogoproto.moretags) = "yaml:\"service_name\"" ];
-    repeated bytes providers = 3 [ (gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress" ];
+    repeated string providers = 3;
     string input = 4;
     int64 timeout = 5;
     repeated cosmos.base.v1beta1.Coin service_fee_cap = 6 [ (gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "yaml:\"service_fee_cap\"" ];

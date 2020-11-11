@@ -3,10 +3,9 @@ package token_test
 import (
 	"testing"
 
-	"github.com/tendermint/tendermint/crypto/tmhash"
-
 	"github.com/stretchr/testify/require"
 
+	"github.com/tendermint/tendermint/crypto/tmhash"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"

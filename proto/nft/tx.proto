@@ -42,9 +42,9 @@ message MsgTransferNFT {
     option (gogoproto.equal) = true;
 
     string id = 1;
-    string denom = 2;
+    string denom_id = 2 [ (gogoproto.moretags) = "yaml:\"denom_id\"" ];
     string name = 3;
-    string uri = 4 [(gogoproto.customname) = "URI"];
+    string uri = 4 [ (gogoproto.customname) = "URI" ];
     string data = 5;
     string sender = 6;
     string recipient = 7;
@@ -58,9 +58,9 @@ message MsgEditNFT {
     option (gogoproto.equal) = true;
 
     string id = 1;
-    string denom = 2;
+    string denom_id = 2 [ (gogoproto.moretags) = "yaml:\"denom_id\"" ];
     string name = 3;
-    string uri = 4 [(gogoproto.customname) = "URI"];
+    string uri = 4 [ (gogoproto.customname) = "URI" ];
     string data = 5;
     string sender = 6;
 }
@@ -73,9 +73,9 @@ message MsgMintNFT {
     option (gogoproto.equal) = true;
 
     string id = 1;
-    string denom = 2;
+    string denom_id = 2 [ (gogoproto.moretags) = "yaml:\"denom_id\"" ];
     string name = 3;
-    string uri = 4 [(gogoproto.customname) = "URI"];
+    string uri = 4 [ (gogoproto.customname) = "URI" ];
     string data = 5;
     string sender = 6;
     string recipient = 7;
@@ -89,7 +89,7 @@ message MsgBurnNFT {
     option (gogoproto.equal) = true;
 
     string id = 1;
-    string denom = 2;
+    string denom_id = 2 [ (gogoproto.moretags) = "yaml:\"denom_id\"" ];
     string sender = 3;
 }
 

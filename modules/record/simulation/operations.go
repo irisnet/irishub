@@ -56,7 +56,7 @@ func SimulateCreateRecord(ak types.AccountKeeper, bk types.BankKeeper) simtypes.
 		}
 
 		creator, _ := sdk.AccAddressFromBech32(record.Creator)
-		msg := types.NewMsgCreateRecord(record.Contents, creator)
+		msg := types.NewMsgCreateRecord(record.Contents, creator.String())
 
 		simAccount, found := simtypes.FindAccount(accs, creator)
 		if !found {

@@ -62,19 +62,16 @@ func GetCmdCreateFeed() *cobra.Command {
 				return err
 			}
 
-			creator := clientCtx.GetFromAddress()
-			rawProviders, err := cmd.Flags().GetStringSlice(FlagProviders)
+			creator := clientCtx.GetFromAddress().String()
+			providers, err := cmd.Flags().GetStringSlice(FlagProviders)
 			if err != nil {
 				return err
 			}
 
-			var providers []sdk.AccAddress
-			for _, addr := range rawProviders {
-				provider, err := sdk.AccAddressFromBech32(addr)
-				if err != nil {
+			for _, addr := range providers {
+				if _, err := sdk.AccAddressFromBech32(addr); err != nil {
 					return err
 				}
-				providers = append(providers, provider)
 			}
 
 			rawServiceFeeCap, err := cmd.Flags().GetString(FlagServiceFeeCap)
@@ -198,7 +195,7 @@ func GetCmdStartFeed() *cobra.Command {
 				return err
 			}
 
-			creator := clientCtx.GetFromAddress()
+			creator := clientCtx.GetFromAddress().String()
 			msg := &types.MsgStartFeed{
 				FeedName: args[0],
 				Creator:  creator,
@@ -232,7 +229,7 @@ func GetCmdPauseFeed() *cobra.Command {
 				return err
 			}
 
-			creator := clientCtx.GetFromAddress()
+			creator := clientCtx.GetFromAddress().String()
 			msg := &types.MsgPauseFeed{
 				FeedName: args[0],
 				Creator:  creator,
@@ -272,18 +269,15 @@ func GetCmdEditFeed() *cobra.Command {
 				return err
 			}
 
-			creator := clientCtx.GetFromAddress()
-			rawProviders, err := cmd.Flags().GetStringSlice(FlagProviders)
+			creator := clientCtx.GetFromAddress().String()
+			providers, err := cmd.Flags().GetStringSlice(FlagProviders)
 			if err != nil {
 				return err
 			}
-			var providers []sdk.AccAddress
-			for _, addr := range rawProviders {
-				provider, err := sdk.AccAddressFromBech32(addr)
-				if err != nil {
+			for _, addr := range providers {
+				if _, err := sdk.AccAddressFromBech32(addr); err != nil {
 					return err
 				}
-				providers = append(providers, provider)
 			}
 
 			rawServiceFeeCap, err := cmd.Flags().GetString(FlagServiceFeeCap)

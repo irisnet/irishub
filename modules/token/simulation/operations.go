@@ -96,7 +96,7 @@ func SimulateIssueToken(k keeper.Keeper, ak authkeeper.AccountKeeper, bk types.B
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
 
 		token, maxFees := genToken(ctx, r, k, ak, bk, accs)
-		msg := types.NewMsgIssueToken(token.Symbol, token.MinUnit, token.Name, token.Scale, token.InitialSupply, token.MaxSupply, token.Mintable, token.GetOwner())
+		msg := types.NewMsgIssueToken(token.Symbol, token.MinUnit, token.Name, token.Scale, token.InitialSupply, token.MaxSupply, token.Mintable, token.GetOwner().String())
 
 		simAccount, found := simtypes.FindAccount(accs, token.GetOwner())
 		if !found {
@@ -141,7 +141,7 @@ func SimulateEditToken(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKee
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
 
 		token, _ := selectOneToken(ctx, k, ak, bk, false)
-		msg := types.NewMsgEditToken(token.GetName(), token.GetSymbol(), token.GetMaxSupply(), types.True, token.GetOwner())
+		msg := types.NewMsgEditToken(token.GetName(), token.GetSymbol(), token.GetMaxSupply(), types.True, token.GetOwner().String())
 
 		simAccount, found := simtypes.FindAccount(accs, token.GetOwner())
 		if !found {
@@ -189,7 +189,7 @@ func SimulateMintToken(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKee
 
 		token, maxFee := selectOneToken(ctx, k, ak, bk, true)
 		simToAccount, _ := simtypes.RandomAcc(r, accs)
-		msg := types.NewMsgMintToken(token.GetSymbol(), token.GetOwner(), simToAccount.Address, 100)
+		msg := types.NewMsgMintToken(token.GetSymbol(), token.GetOwner().String(), simToAccount.Address.String(), 100)
 
 		ownerAccount, found := simtypes.FindAccount(accs, token.GetOwner())
 		if !found {
@@ -239,7 +239,7 @@ func SimulateTransferTokenOwner(k keeper.Keeper, ak types.AccountKeeper, bk type
 			simToAccount, _ = simtypes.RandomAcc(r, accs)
 		}
 
-		msg := types.NewMsgTransferTokenOwner(token.GetOwner(), simToAccount.Address, token.GetSymbol())
+		msg := types.NewMsgTransferTokenOwner(token.GetOwner().String(), simToAccount.Address.String(), token.GetSymbol())
 
 		simAccount, found := simtypes.FindAccount(accs, token.GetOwner())
 		if !found {

@@ -136,7 +136,7 @@ func SimulateMsgDefineService(ak types.AccountKeeper, bk types.BankKeeper, k kee
 		account := ak.GetAccount(ctx, simAccount.Address)
 		spendable := bk.SpendableCoins(ctx, account.GetAddress())
 
-		msg := types.NewMsgDefineService(serviceName, serviceDescription, tags, simAccount.Address, authorDescription, schemas)
+		msg := types.NewMsgDefineService(serviceName, serviceDescription, tags, simAccount.Address.String(), authorDescription, schemas)
 
 		fees, err := simtypes.RandomFees(r, ctx, spendable)
 		if err != nil {
@@ -184,7 +184,7 @@ func SimulateMsgBindService(ak types.AccountKeeper, bk types.BankKeeper, k keepe
 		account := ak.GetAccount(ctx, simAccount.Address)
 		spendable := bk.SpendableCoins(ctx, account.GetAddress())
 
-		msg := types.NewMsgBindService(serviceName, simAccount.Address, deposit, pricing, qos, options, simAccount.Address)
+		msg := types.NewMsgBindService(serviceName, simAccount.Address.String(), deposit, pricing, qos, options, simAccount.Address.String())
 
 		fees, err := simtypes.RandomFees(r, ctx, spendable)
 		if err != nil {
@@ -232,7 +232,7 @@ func SimulateMsgUpdateServiceBinding(ak types.AccountKeeper, bk types.BankKeeper
 		account := ak.GetAccount(ctx, simAccount.Address)
 		spendable := bk.SpendableCoins(ctx, account.GetAddress())
 
-		msg := types.NewMsgUpdateServiceBinding(serviceName, simAccount.Address, deposit, pricing, qos, options, simAccount.Address)
+		msg := types.NewMsgUpdateServiceBinding(serviceName, simAccount.Address.String(), deposit, pricing, qos, options, simAccount.Address.String())
 
 		fees, err := simtypes.RandomFees(r, ctx, spendable)
 		if err != nil {
@@ -274,7 +274,7 @@ func SimulateMsgSetWithdrawAddress(ak types.AccountKeeper, bk types.BankKeeper, 
 		account := ak.GetAccount(ctx, simAccount.Address)
 		spendable := bk.SpendableCoins(ctx, account.GetAddress())
 
-		msg := types.NewMsgSetWithdrawAddress(simAccount.Address, withdrawalAccount.Address)
+		msg := types.NewMsgSetWithdrawAddress(simAccount.Address.String(), withdrawalAccount.Address.String())
 
 		fees, err := simtypes.RandomFees(r, ctx, spendable)
 		if err != nil {
@@ -316,7 +316,7 @@ func SimulateMsgDisableServiceBinding(ak types.AccountKeeper, bk types.BankKeepe
 		account := ak.GetAccount(ctx, simAccount.Address)
 		spendable := bk.SpendableCoins(ctx, account.GetAddress())
 
-		msg := types.NewMsgDisableServiceBinding(serviceName, simAccount.Address, simAccount.Address)
+		msg := types.NewMsgDisableServiceBinding(serviceName, simAccount.Address.String(), simAccount.Address.String())
 
 		fees, err := simtypes.RandomFees(r, ctx, spendable)
 		if err != nil {
@@ -360,7 +360,7 @@ func SimulateMsgEnableServiceBinding(ak types.AccountKeeper, bk types.BankKeeper
 		account := ak.GetAccount(ctx, simAccount.Address)
 		spendable := bk.SpendableCoins(ctx, account.GetAddress())
 
-		msg := types.NewMsgEnableServiceBinding(serviceName, simAccount.Address, deposit, simAccount.Address)
+		msg := types.NewMsgEnableServiceBinding(serviceName, simAccount.Address.String(), deposit, simAccount.Address.String())
 
 		fees, err := simtypes.RandomFees(r, ctx, spendable)
 		if err != nil {
@@ -402,7 +402,7 @@ func SimulateMsgRefundServiceDeposit(ak types.AccountKeeper, bk types.BankKeeper
 		account := ak.GetAccount(ctx, simAccount.Address)
 		spendable := bk.SpendableCoins(ctx, account.GetAddress())
 
-		msg := types.NewMsgRefundServiceDeposit(serviceName, simAccount.Address, simAccount.Address)
+		msg := types.NewMsgRefundServiceDeposit(serviceName, simAccount.Address.String(), simAccount.Address.String())
 
 		fees, err := simtypes.RandomFees(r, ctx, spendable)
 		if err != nil {

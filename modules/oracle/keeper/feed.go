@@ -1,6 +1,8 @@
 package keeper
 
 import (
+	"encoding/hex"
+
 	gogotypes "github.com/gogo/protobuf/types"
 
 	tmbytes "github.com/tendermint/tendermint/libs/bytes"
@@ -69,7 +71,8 @@ func (k Keeper) SetFeed(ctx sdk.Context, feed types.Feed) {
 	store.Set(types.GetFeedKey(feed.FeedName), bz)
 
 	bz = k.cdc.MustMarshalBinaryBare(&gogotypes.StringValue{Value: feed.FeedName})
-	store.Set(types.GetReqCtxIDKey(feed.RequestContextID), bz)
+	requestContextID, _ := hex.DecodeString(feed.RequestContextID)
+	store.Set(types.GetReqCtxIDKey(requestContextID), bz)
 }
 
 // SetFeedValue will save a feed result to store

@@ -6,20 +6,18 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/cosmos/cosmos-sdk/types/rest"
-
+	"github.com/gogo/protobuf/proto"
+	"github.com/stretchr/testify/suite"
 	"github.com/tidwall/gjson"
 
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/testutil/network"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/gogo/protobuf/proto"
-	"github.com/stretchr/testify/suite"
+	"github.com/cosmos/cosmos-sdk/types/rest"
 
 	tokencli "github.com/irisnet/irismod/modules/token/client/cli"
 	tokentestutil "github.com/irisnet/irismod/modules/token/client/testutil"
 	tokentypes "github.com/irisnet/irismod/modules/token/types"
-
 	"github.com/irisnet/irismod/simapp"
 )
 

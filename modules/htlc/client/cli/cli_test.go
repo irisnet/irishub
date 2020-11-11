@@ -5,17 +5,17 @@ import (
 	"testing"
 	"time"
 
-	"github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/cosmos/cosmos-sdk/testutil/network"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/gogo/protobuf/proto"
 	"github.com/stretchr/testify/suite"
 	"github.com/tendermint/tendermint/crypto"
 
-	htlctypes "github.com/irisnet/irismod/modules/htlc/types"
+	"github.com/cosmos/cosmos-sdk/client/flags"
+	"github.com/cosmos/cosmos-sdk/testutil/network"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	htlccli "github.com/irisnet/irismod/modules/htlc/client/cli"
 	htlctestutil "github.com/irisnet/irismod/modules/htlc/client/testutil"
+	htlctypes "github.com/irisnet/irismod/modules/htlc/types"
 	"github.com/irisnet/irismod/simapp"
 )
 
@@ -193,7 +193,8 @@ func (s *IntegrationTestSuite) TestHtlc() {
 
 	// refund an htlc and expect success
 	lastHeigth, err := s.network.LatestHeight()
-	s.network.WaitForHeightWithTimeout(lastHeigth+int64(timeLock), 3600*time.Second)
+	s.Require().NoError(err)
+	_, _ = s.network.WaitForHeightWithTimeout(lastHeigth+int64(timeLock), 3600*time.Second)
 	respType = proto.Message(&htlctypes.HTLC{})
 	bz, err = htlctestutil.QueryHTLCExec(val.ClientCtx, hashLock)
 	s.Require().NoError(err)
@@ -213,7 +214,6 @@ func (s *IntegrationTestSuite) TestHtlc() {
 	s.Require().NoError(err)
 	s.Require().NoError(val.ClientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType))
 	htlcItem = respType.(*htlctypes.HTLC)
-	htlcItem.State.String()
 	s.Equal(stateRefunded, htlcItem.State.String())
 	// ---------------------------------------------------------------------------
 }

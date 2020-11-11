@@ -3,6 +3,7 @@ package rest
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/gorilla/mux"
 
@@ -45,7 +46,7 @@ func issueTokenHandlerFn(cliCtx client.Context) http.HandlerFunc {
 			InitialSupply: req.InitialSupply,
 			MaxSupply:     req.MaxSupply,
 			Mintable:      req.Mintable,
-			Owner:         req.Owner.String(),
+			Owner:         req.Owner,
 		}
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -78,7 +79,7 @@ func editTokenHandlerFn(cliCtx client.Context) http.HandlerFunc {
 		}
 
 		// create the MsgEditToken message
-		msg := types.NewMsgEditToken(req.Name, symbol, req.MaxSupply, mintable, req.Owner)
+		msg := types.NewMsgEditToken(strings.TrimSpace(req.Name), symbol, req.MaxSupply, mintable, req.Owner)
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -91,7 +92,7 @@ func editTokenHandlerFn(cliCtx client.Context) http.HandlerFunc {
 func transferOwnerHandlerFn(cliCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		symbol := vars[RestParamSymbol]
+		symbol := strings.TrimSpace(vars[RestParamSymbol])
 
 		var req transferTokenOwnerReq
 		if !rest.ReadRESTReq(w, r, cliCtx.LegacyAmino, &req) {
@@ -117,7 +118,7 @@ func transferOwnerHandlerFn(cliCtx client.Context) http.HandlerFunc {
 func mintTokenHandlerFn(cliCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		symbol := vars[RestParamSymbol]
+		symbol := strings.TrimSpace(vars[RestParamSymbol])
 
 		var req mintTokenReq
 		if !rest.ReadRESTReq(w, r, cliCtx.LegacyAmino, &req) {

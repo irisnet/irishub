@@ -4,20 +4,19 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/tendermint/tendermint/crypto"
-
-	nfttypes "github.com/irisnet/irismod/modules/nft/types"
-
+	"github.com/gogo/protobuf/proto"
+	"github.com/stretchr/testify/suite"
 	"github.com/tidwall/gjson"
+
+	"github.com/tendermint/tendermint/crypto"
 
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/testutil/network"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/gogo/protobuf/proto"
-	"github.com/stretchr/testify/suite"
 
 	nftcli "github.com/irisnet/irismod/modules/nft/client/cli"
 	nfttestutil "github.com/irisnet/irismod/modules/nft/client/testutil"
+	nfttypes "github.com/irisnet/irismod/modules/nft/types"
 	"github.com/irisnet/irismod/simapp"
 )
 
@@ -152,8 +151,8 @@ func (s *IntegrationTestSuite) TestNft() {
 	s.Require().NoError(val.ClientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType))
 	owner := respType.(*nfttypes.Owner)
 	s.Require().Equal(from.String(), owner.Address)
-	s.Require().Equal(denom, owner.IDCollections[0].Denom)
-	s.Require().Equal(tokenID, owner.IDCollections[0].Ids[0])
+	s.Require().Equal(denom, owner.IDCollections[0].DenomId)
+	s.Require().Equal(tokenID, owner.IDCollections[0].TokenIds[0])
 
 	//------test GetCmdQueryCollection()-------------
 	respType = proto.Message(&nfttypes.Collection{})
