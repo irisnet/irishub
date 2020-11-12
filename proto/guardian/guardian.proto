@@ -5,23 +5,10 @@ import "gogoproto/gogo.proto";
 
 option go_package = "github.com/irisnet/irishub/modules/guardian/types";
 
-// AddSuper defines the properties of add super account message
-message MsgAddSuper {
-    string description = 1;
-    string address = 2;
-    string added_by = 3;
-}
-
-// DeleteSuper defines the properties of delete super account message
-message MsgDeleteSuper {
-    string address = 2;
-    string deleted_by = 3;
-}
-
 // Super defines the super standard
 message Super {
     string description = 1;
-    AccountType account_type = 2 [(gogoproto.moretags) = "yaml:\"account_type\""];
+    AccountType account_type = 2 [ (gogoproto.moretags) = "yaml:\"account_type\"" ];
     string address = 3;
     string added_by = 4;
 }
@@ -31,7 +18,7 @@ enum AccountType {
     option (gogoproto.goproto_enum_prefix) = false;
 
     // GENESIS defines a genesis account type
-    GENESIS = 0 [(gogoproto.enumvalue_customname) = "Genesis"];
+    GENESIS = 0 [ (gogoproto.enumvalue_customname) = "Genesis" ];
     // ORDINARY defines a ordinary account type
-    ORDINARY = 1 [(gogoproto.enumvalue_customname) = "Ordinary"];
+    ORDINARY = 1 [ (gogoproto.enumvalue_customname) = "Ordinary" ];
 }

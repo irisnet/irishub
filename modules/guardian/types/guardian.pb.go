@@ -51,120 +51,6 @@ func (AccountType) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_07c8fad859e95e75, []int{0}
 }
 
-// AddSuper defines the properties of add super account message
-type MsgAddSuper struct {
-	Description string `protobuf:"bytes,1,opt,name=description,proto3" json:"description,omitempty"`
-	Address     string `protobuf:"bytes,2,opt,name=address,proto3" json:"address,omitempty"`
-	AddedBy     string `protobuf:"bytes,3,opt,name=added_by,json=addedBy,proto3" json:"added_by,omitempty"`
-}
-
-func (m *MsgAddSuper) Reset()         { *m = MsgAddSuper{} }
-func (m *MsgAddSuper) String() string { return proto.CompactTextString(m) }
-func (*MsgAddSuper) ProtoMessage()    {}
-func (*MsgAddSuper) Descriptor() ([]byte, []int) {
-	return fileDescriptor_07c8fad859e95e75, []int{0}
-}
-func (m *MsgAddSuper) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *MsgAddSuper) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_MsgAddSuper.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *MsgAddSuper) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgAddSuper.Merge(m, src)
-}
-func (m *MsgAddSuper) XXX_Size() int {
-	return m.Size()
-}
-func (m *MsgAddSuper) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgAddSuper.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_MsgAddSuper proto.InternalMessageInfo
-
-func (m *MsgAddSuper) GetDescription() string {
-	if m != nil {
-		return m.Description
-	}
-	return ""
-}
-
-func (m *MsgAddSuper) GetAddress() string {
-	if m != nil {
-		return m.Address
-	}
-	return ""
-}
-
-func (m *MsgAddSuper) GetAddedBy() string {
-	if m != nil {
-		return m.AddedBy
-	}
-	return ""
-}
-
-// DeleteSuper defines the properties of delete super account message
-type MsgDeleteSuper struct {
-	Address   string `protobuf:"bytes,2,opt,name=address,proto3" json:"address,omitempty"`
-	DeletedBy string `protobuf:"bytes,3,opt,name=deleted_by,json=deletedBy,proto3" json:"deleted_by,omitempty"`
-}
-
-func (m *MsgDeleteSuper) Reset()         { *m = MsgDeleteSuper{} }
-func (m *MsgDeleteSuper) String() string { return proto.CompactTextString(m) }
-func (*MsgDeleteSuper) ProtoMessage()    {}
-func (*MsgDeleteSuper) Descriptor() ([]byte, []int) {
-	return fileDescriptor_07c8fad859e95e75, []int{1}
-}
-func (m *MsgDeleteSuper) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *MsgDeleteSuper) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_MsgDeleteSuper.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *MsgDeleteSuper) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgDeleteSuper.Merge(m, src)
-}
-func (m *MsgDeleteSuper) XXX_Size() int {
-	return m.Size()
-}
-func (m *MsgDeleteSuper) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgDeleteSuper.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_MsgDeleteSuper proto.InternalMessageInfo
-
-func (m *MsgDeleteSuper) GetAddress() string {
-	if m != nil {
-		return m.Address
-	}
-	return ""
-}
-
-func (m *MsgDeleteSuper) GetDeletedBy() string {
-	if m != nil {
-		return m.DeletedBy
-	}
-	return ""
-}
-
 // Super defines the super standard
 type Super struct {
 	Description string      `protobuf:"bytes,1,opt,name=description,proto3" json:"description,omitempty"`
@@ -177,7 +63,7 @@ func (m *Super) Reset()         { *m = Super{} }
 func (m *Super) String() string { return proto.CompactTextString(m) }
 func (*Super) ProtoMessage()    {}
 func (*Super) Descriptor() ([]byte, []int) {
-	return fileDescriptor_07c8fad859e95e75, []int{2}
+	return fileDescriptor_07c8fad859e95e75, []int{0}
 }
 func (m *Super) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -236,120 +122,34 @@ func (m *Super) GetAddedBy() string {
 
 func init() {
 	proto.RegisterEnum("irishub.guardian.AccountType", AccountType_name, AccountType_value)
-	proto.RegisterType((*MsgAddSuper)(nil), "irishub.guardian.MsgAddSuper")
-	proto.RegisterType((*MsgDeleteSuper)(nil), "irishub.guardian.MsgDeleteSuper")
 	proto.RegisterType((*Super)(nil), "irishub.guardian.Super")
 }
 
 func init() { proto.RegisterFile("guardian/guardian.proto", fileDescriptor_07c8fad859e95e75) }
 
 var fileDescriptor_07c8fad859e95e75 = []byte{
-	// 374 bytes of a gzipped FileDescriptorProto
+	// 325 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x12, 0x4f, 0x2f, 0x4d, 0x2c,
 	0x4a, 0xc9, 0x4c, 0xcc, 0xd3, 0x87, 0x31, 0xf4, 0x0a, 0x8a, 0xf2, 0x4b, 0xf2, 0x85, 0x04, 0x32,
 	0x8b, 0x32, 0x8b, 0x33, 0x4a, 0x93, 0xf4, 0x60, 0xe2, 0x52, 0x22, 0xe9, 0xf9, 0xe9, 0xf9, 0x60,
-	0x49, 0x7d, 0x10, 0x0b, 0xa2, 0x4e, 0x29, 0x85, 0x8b, 0xdb, 0xb7, 0x38, 0xdd, 0x31, 0x25, 0x25,
-	0xb8, 0xb4, 0x20, 0xb5, 0x48, 0x48, 0x81, 0x8b, 0x3b, 0x25, 0xb5, 0x38, 0xb9, 0x28, 0xb3, 0xa0,
-	0x24, 0x33, 0x3f, 0x4f, 0x82, 0x51, 0x81, 0x51, 0x83, 0x33, 0x08, 0x59, 0x48, 0x48, 0x82, 0x8b,
-	0x3d, 0x31, 0x25, 0xa5, 0x28, 0xb5, 0xb8, 0x58, 0x82, 0x09, 0x2c, 0x0b, 0xe3, 0x0a, 0x49, 0x72,
-	0x71, 0x24, 0xa6, 0xa4, 0xa4, 0xa6, 0xc4, 0x27, 0x55, 0x4a, 0x30, 0xc3, 0xa5, 0x52, 0x53, 0x9c,
-	0x2a, 0x95, 0x3c, 0xb9, 0xf8, 0x7c, 0x8b, 0xd3, 0x5d, 0x52, 0x73, 0x52, 0x4b, 0x52, 0x21, 0x16,
-	0xe1, 0x36, 0x46, 0x96, 0x8b, 0x2b, 0x05, 0xac, 0x10, 0xc9, 0x20, 0x4e, 0xa8, 0x88, 0x53, 0xa5,
-	0xd2, 0x4e, 0x46, 0x2e, 0x56, 0x62, 0xdd, 0x1a, 0xc9, 0xc5, 0x93, 0x98, 0x9c, 0x9c, 0x5f, 0x9a,
-	0x57, 0x12, 0x5f, 0x52, 0x59, 0x90, 0x0a, 0xb6, 0x89, 0xcf, 0x48, 0x56, 0x0f, 0x3d, 0x6c, 0xf4,
-	0x1c, 0x21, 0xaa, 0x42, 0x2a, 0x0b, 0x52, 0x9d, 0xc4, 0x3f, 0xdd, 0x93, 0x17, 0xae, 0x4c, 0xcc,
-	0xcd, 0xb1, 0x52, 0x42, 0xd6, 0xac, 0x14, 0xc4, 0x9d, 0x88, 0x50, 0x85, 0xec, 0x7e, 0x66, 0xdc,
-	0xc1, 0xc0, 0x82, 0x12, 0x0c, 0x5a, 0x9e, 0x5c, 0xdc, 0x8e, 0xa8, 0x66, 0xb8, 0xbb, 0xfa, 0xb9,
-	0x06, 0x7b, 0x06, 0x0b, 0x30, 0x48, 0x71, 0x77, 0xcd, 0x55, 0x60, 0x77, 0x4f, 0xcd, 0x4b, 0x2d,
-	0xce, 0x2c, 0x16, 0x92, 0xe2, 0xe2, 0xf0, 0x0f, 0x72, 0xf1, 0xf4, 0x73, 0x0c, 0x8a, 0x14, 0x60,
-	0x94, 0xe2, 0xe9, 0x9a, 0xab, 0xc0, 0xe1, 0x5f, 0x94, 0x92, 0x99, 0x97, 0x58, 0x54, 0x29, 0xc5,
-	0xd2, 0xb1, 0x58, 0x8e, 0xc1, 0xc9, 0xfb, 0xc4, 0x23, 0x39, 0xc6, 0x0b, 0x8f, 0xe4, 0x18, 0x1f,
-	0x3c, 0x92, 0x63, 0x9c, 0xf0, 0x58, 0x8e, 0xe1, 0xc2, 0x63, 0x39, 0x86, 0x1b, 0x8f, 0xe5, 0x18,
-	0xa2, 0x0c, 0xd3, 0x33, 0x4b, 0x40, 0x9e, 0x4b, 0xce, 0xcf, 0xd5, 0x07, 0x79, 0x34, 0x2f, 0xb5,
-	0x44, 0x1f, 0xea, 0x61, 0xfd, 0xdc, 0xfc, 0x94, 0xd2, 0x9c, 0xd4, 0x62, 0x78, 0x62, 0xd1, 0x07,
-	0xf9, 0xac, 0x38, 0x89, 0x0d, 0x9c, 0x16, 0x8c, 0x01, 0x01, 0x00, 0x00, 0xff, 0xff, 0x41, 0xdf,
-	0x60, 0x4b, 0x4e, 0x02, 0x00, 0x00,
-}
-
-func (m *MsgAddSuper) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *MsgAddSuper) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *MsgAddSuper) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.AddedBy) > 0 {
-		i -= len(m.AddedBy)
-		copy(dAtA[i:], m.AddedBy)
-		i = encodeVarintGuardian(dAtA, i, uint64(len(m.AddedBy)))
-		i--
-		dAtA[i] = 0x1a
-	}
-	if len(m.Address) > 0 {
-		i -= len(m.Address)
-		copy(dAtA[i:], m.Address)
-		i = encodeVarintGuardian(dAtA, i, uint64(len(m.Address)))
-		i--
-		dAtA[i] = 0x12
-	}
-	if len(m.Description) > 0 {
-		i -= len(m.Description)
-		copy(dAtA[i:], m.Description)
-		i = encodeVarintGuardian(dAtA, i, uint64(len(m.Description)))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *MsgDeleteSuper) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *MsgDeleteSuper) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *MsgDeleteSuper) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.DeletedBy) > 0 {
-		i -= len(m.DeletedBy)
-		copy(dAtA[i:], m.DeletedBy)
-		i = encodeVarintGuardian(dAtA, i, uint64(len(m.DeletedBy)))
-		i--
-		dAtA[i] = 0x1a
-	}
-	if len(m.Address) > 0 {
-		i -= len(m.Address)
-		copy(dAtA[i:], m.Address)
-		i = encodeVarintGuardian(dAtA, i, uint64(len(m.Address)))
-		i--
-		dAtA[i] = 0x12
-	}
-	return len(dAtA) - i, nil
+	0x49, 0x7d, 0x10, 0x0b, 0xa2, 0x4e, 0x69, 0x27, 0x23, 0x17, 0x6b, 0x70, 0x69, 0x41, 0x6a, 0x91,
+	0x90, 0x02, 0x17, 0x77, 0x4a, 0x6a, 0x71, 0x72, 0x51, 0x66, 0x41, 0x49, 0x66, 0x7e, 0x9e, 0x04,
+	0xa3, 0x02, 0xa3, 0x06, 0x67, 0x10, 0xb2, 0x90, 0x50, 0x24, 0x17, 0x4f, 0x62, 0x72, 0x72, 0x7e,
+	0x69, 0x5e, 0x49, 0x7c, 0x49, 0x65, 0x41, 0xaa, 0x04, 0x93, 0x02, 0xa3, 0x06, 0x9f, 0x91, 0xac,
+	0x1e, 0xba, 0x55, 0x7a, 0x8e, 0x10, 0x55, 0x21, 0x95, 0x05, 0xa9, 0x4e, 0xe2, 0x9f, 0xee, 0xc9,
+	0x0b, 0x57, 0x26, 0xe6, 0xe6, 0x58, 0x29, 0x21, 0x6b, 0x56, 0x0a, 0xe2, 0x4e, 0x44, 0xa8, 0x12,
+	0x92, 0xe0, 0x62, 0x4f, 0x4c, 0x49, 0x29, 0x4a, 0x2d, 0x2e, 0x96, 0x60, 0x06, 0x5b, 0x0c, 0xe3,
+	0x0a, 0x49, 0x72, 0x71, 0x24, 0xa6, 0xa4, 0xa4, 0xa6, 0xc4, 0x27, 0x55, 0x4a, 0xb0, 0xc0, 0xa5,
+	0x52, 0x53, 0x9c, 0x2a, 0xb5, 0x3c, 0xb9, 0xb8, 0x1d, 0x51, 0xcd, 0x70, 0x77, 0xf5, 0x73, 0x0d,
+	0xf6, 0x0c, 0x16, 0x60, 0x90, 0xe2, 0xee, 0x9a, 0xab, 0xc0, 0xee, 0x9e, 0x9a, 0x97, 0x5a, 0x9c,
+	0x59, 0x2c, 0x24, 0xc5, 0xc5, 0xe1, 0x1f, 0xe4, 0xe2, 0xe9, 0xe7, 0x18, 0x14, 0x29, 0xc0, 0x28,
+	0xc5, 0xd3, 0x35, 0x57, 0x81, 0xc3, 0xbf, 0x28, 0x25, 0x33, 0x2f, 0xb1, 0xa8, 0x52, 0x8a, 0xa5,
+	0x63, 0xb1, 0x1c, 0x83, 0x93, 0xf7, 0x89, 0x47, 0x72, 0x8c, 0x17, 0x1e, 0xc9, 0x31, 0x3e, 0x78,
+	0x24, 0xc7, 0x38, 0xe1, 0xb1, 0x1c, 0xc3, 0x85, 0xc7, 0x72, 0x0c, 0x37, 0x1e, 0xcb, 0x31, 0x44,
+	0x19, 0xa6, 0x67, 0x96, 0x80, 0x3c, 0x97, 0x9c, 0x9f, 0xab, 0x0f, 0xf2, 0x68, 0x5e, 0x6a, 0x89,
+	0x3e, 0xd4, 0xc3, 0xfa, 0xb9, 0xf9, 0x29, 0xa5, 0x39, 0xa9, 0xc5, 0xf0, 0xb0, 0xd7, 0x07, 0xf9,
+	0xac, 0x38, 0x89, 0x0d, 0x1c, 0xb4, 0xc6, 0x80, 0x00, 0x00, 0x00, 0xff, 0xff, 0xa5, 0x96, 0xfb,
+	0xdc, 0x9d, 0x01, 0x00, 0x00,
 }
 
 func (m *Super) Marshal() (dAtA []byte, err error) {
@@ -412,44 +212,6 @@ func encodeVarintGuardian(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
-func (m *MsgAddSuper) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.Description)
-	if l > 0 {
-		n += 1 + l + sovGuardian(uint64(l))
-	}
-	l = len(m.Address)
-	if l > 0 {
-		n += 1 + l + sovGuardian(uint64(l))
-	}
-	l = len(m.AddedBy)
-	if l > 0 {
-		n += 1 + l + sovGuardian(uint64(l))
-	}
-	return n
-}
-
-func (m *MsgDeleteSuper) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.Address)
-	if l > 0 {
-		n += 1 + l + sovGuardian(uint64(l))
-	}
-	l = len(m.DeletedBy)
-	if l > 0 {
-		n += 1 + l + sovGuardian(uint64(l))
-	}
-	return n
-}
-
 func (m *Super) Size() (n int) {
 	if m == nil {
 		return 0
@@ -479,272 +241,6 @@ func sovGuardian(x uint64) (n int) {
 }
 func sozGuardian(x uint64) (n int) {
 	return sovGuardian(uint64((x << 1) ^ uint64((int64(x) >> 63))))
-}
-func (m *MsgAddSuper) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowGuardian
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: MsgAddSuper: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgAddSuper: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Description", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGuardian
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthGuardian
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthGuardian
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Description = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Address", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGuardian
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthGuardian
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthGuardian
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Address = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field AddedBy", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGuardian
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthGuardian
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthGuardian
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.AddedBy = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipGuardian(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthGuardian
-			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthGuardian
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *MsgDeleteSuper) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowGuardian
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: MsgDeleteSuper: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgDeleteSuper: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Address", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGuardian
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthGuardian
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthGuardian
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Address = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field DeletedBy", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGuardian
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthGuardian
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthGuardian
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.DeletedBy = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipGuardian(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthGuardian
-			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthGuardian
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
 }
 func (m *Super) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
