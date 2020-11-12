@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
+
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/crypto"
 	"github.com/tendermint/tendermint/crypto/ed25519"
@@ -20,7 +21,10 @@ import (
 
 	bam "github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
+	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	"github.com/cosmos/cosmos-sdk/simapp/helpers"
+	storetypes "github.com/cosmos/cosmos-sdk/store/types"
+	"github.com/cosmos/cosmos-sdk/testutil/network"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
@@ -69,6 +73,21 @@ func Setup(isCheckTx bool) *SimApp {
 	}
 
 	return app
+}
+
+func NewConfig() network.Config {
+	cfg := network.DefaultConfig()
+	cfg.AppConstructor = SimAppConstructor
+	cfg.GenesisState = NewDefaultGenesisState()
+	return cfg
+}
+
+func SimAppConstructor(val network.Validator) servertypes.Application {
+	return NewSimApp(
+		val.Ctx.Logger, dbm.NewMemDB(), nil, true, make(map[int64]bool), val.Ctx.Config.RootDir, 0, MakeEncodingConfig(),
+		bam.SetPruning(storetypes.NewPruningOptionsFromString(val.AppConfig.Pruning)),
+		bam.SetMinGasPrices(val.AppConfig.MinGasPrices),
+	)
 }
 
 // SetupWithGenesisValSet initializes a new SimApp with a validator set and genesis accounts

@@ -14,7 +14,7 @@ import (
 
 func registerQueryRoutes(cliCtx client.Context, r *mux.Router) {
 	// get the current mint parameter values
-	r.HandleFunc("/mint/parameters", queryParamsHandlerFn(cliCtx)).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/%s/params", types.ModuleName), queryParamsHandlerFn(cliCtx)).Methods("GET")
 }
 
 // HTTP request handler to get the current mint parameter values
