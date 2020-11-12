@@ -4,13 +4,13 @@ on: [pull_request]
 jobs:
   test-unit:
     name: Test Units
-#    runs-on: self-hosted
+    #    runs-on: self-hosted
     runs-on: ubuntu-16.04
     steps:
       - name: Checkout source code
         uses: actions/checkout@v1
       - name: Run unit tests
-        uses: cedrickring/golang-action/go1.14@1.5.2
+        uses: cedrickring/golang-action/go1.15@1.6.0
         env:
           GO111MODULE: "on"
         with:
