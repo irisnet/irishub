@@ -5,7 +5,6 @@ package types
 
 import (
 	fmt "fmt"
-	github_com_cosmos_cosmos_sdk_types "github.com/cosmos/cosmos-sdk/types"
 	_ "github.com/gogo/protobuf/gogoproto"
 	proto "github.com/gogo/protobuf/proto"
 	io "io"
@@ -24,7 +23,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// AccountType defines the guardian account type
+// AccountType defines the super account type
 type AccountType int32
 
 const (
@@ -52,23 +51,25 @@ func (AccountType) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_07c8fad859e95e75, []int{0}
 }
 
-// MsgAddProfiler defines an sdk.Msg type that supports adding profiler
-type MsgAddProfiler struct {
-	AddGuardian AddGuardian `protobuf:"bytes,1,opt,name=add_guardian,json=addGuardian,proto3" json:"add_guardian" yaml:"add_guardian"`
+// AddSuper defines the properties of add super account message
+type MsgAddSuper struct {
+	Description string `protobuf:"bytes,1,opt,name=description,proto3" json:"description,omitempty"`
+	Address     string `protobuf:"bytes,2,opt,name=address,proto3" json:"address,omitempty"`
+	AddedBy     string `protobuf:"bytes,3,opt,name=added_by,json=addedBy,proto3" json:"added_by,omitempty"`
 }
 
-func (m *MsgAddProfiler) Reset()         { *m = MsgAddProfiler{} }
-func (m *MsgAddProfiler) String() string { return proto.CompactTextString(m) }
-func (*MsgAddProfiler) ProtoMessage()    {}
-func (*MsgAddProfiler) Descriptor() ([]byte, []int) {
+func (m *MsgAddSuper) Reset()         { *m = MsgAddSuper{} }
+func (m *MsgAddSuper) String() string { return proto.CompactTextString(m) }
+func (*MsgAddSuper) ProtoMessage()    {}
+func (*MsgAddSuper) Descriptor() ([]byte, []int) {
 	return fileDescriptor_07c8fad859e95e75, []int{0}
 }
-func (m *MsgAddProfiler) XXX_Unmarshal(b []byte) error {
+func (m *MsgAddSuper) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgAddProfiler) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgAddSuper) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgAddProfiler.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgAddSuper.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -78,239 +79,57 @@ func (m *MsgAddProfiler) XXX_Marshal(b []byte, deterministic bool) ([]byte, erro
 		return b[:n], nil
 	}
 }
-func (m *MsgAddProfiler) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgAddProfiler.Merge(m, src)
+func (m *MsgAddSuper) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgAddSuper.Merge(m, src)
 }
-func (m *MsgAddProfiler) XXX_Size() int {
+func (m *MsgAddSuper) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgAddProfiler) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgAddProfiler.DiscardUnknown(m)
+func (m *MsgAddSuper) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgAddSuper.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgAddProfiler proto.InternalMessageInfo
+var xxx_messageInfo_MsgAddSuper proto.InternalMessageInfo
 
-func (m *MsgAddProfiler) GetAddGuardian() AddGuardian {
-	if m != nil {
-		return m.AddGuardian
-	}
-	return AddGuardian{}
-}
-
-// MsgDeleteProfiler defines an sdk.Msg type that supports deleting profiler
-type MsgDeleteProfiler struct {
-	DeleteGuardian DeleteGuardian `protobuf:"bytes,1,opt,name=delete_guardian,json=deleteGuardian,proto3" json:"delete_guardian" yaml:"delete_guardian"`
-}
-
-func (m *MsgDeleteProfiler) Reset()         { *m = MsgDeleteProfiler{} }
-func (m *MsgDeleteProfiler) String() string { return proto.CompactTextString(m) }
-func (*MsgDeleteProfiler) ProtoMessage()    {}
-func (*MsgDeleteProfiler) Descriptor() ([]byte, []int) {
-	return fileDescriptor_07c8fad859e95e75, []int{1}
-}
-func (m *MsgDeleteProfiler) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *MsgDeleteProfiler) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_MsgDeleteProfiler.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *MsgDeleteProfiler) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgDeleteProfiler.Merge(m, src)
-}
-func (m *MsgDeleteProfiler) XXX_Size() int {
-	return m.Size()
-}
-func (m *MsgDeleteProfiler) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgDeleteProfiler.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_MsgDeleteProfiler proto.InternalMessageInfo
-
-func (m *MsgDeleteProfiler) GetDeleteGuardian() DeleteGuardian {
-	if m != nil {
-		return m.DeleteGuardian
-	}
-	return DeleteGuardian{}
-}
-
-// MsgAddTrustee defines an sdk.Msg type that supports adding trustee
-type MsgAddTrustee struct {
-	AddGuardian AddGuardian `protobuf:"bytes,1,opt,name=add_guardian,json=addGuardian,proto3" json:"add_guardian" yaml:"add_guardian"`
-}
-
-func (m *MsgAddTrustee) Reset()         { *m = MsgAddTrustee{} }
-func (m *MsgAddTrustee) String() string { return proto.CompactTextString(m) }
-func (*MsgAddTrustee) ProtoMessage()    {}
-func (*MsgAddTrustee) Descriptor() ([]byte, []int) {
-	return fileDescriptor_07c8fad859e95e75, []int{2}
-}
-func (m *MsgAddTrustee) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *MsgAddTrustee) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_MsgAddTrustee.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *MsgAddTrustee) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgAddTrustee.Merge(m, src)
-}
-func (m *MsgAddTrustee) XXX_Size() int {
-	return m.Size()
-}
-func (m *MsgAddTrustee) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgAddTrustee.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_MsgAddTrustee proto.InternalMessageInfo
-
-func (m *MsgAddTrustee) GetAddGuardian() AddGuardian {
-	if m != nil {
-		return m.AddGuardian
-	}
-	return AddGuardian{}
-}
-
-// MsgDeleteTrustee defines an sdk.Msg type that supports deleting trustee
-type MsgDeleteTrustee struct {
-	DeleteGuardian DeleteGuardian `protobuf:"bytes,1,opt,name=delete_guardian,json=deleteGuardian,proto3" json:"delete_guardian" yaml:"delete_guardian"`
-}
-
-func (m *MsgDeleteTrustee) Reset()         { *m = MsgDeleteTrustee{} }
-func (m *MsgDeleteTrustee) String() string { return proto.CompactTextString(m) }
-func (*MsgDeleteTrustee) ProtoMessage()    {}
-func (*MsgDeleteTrustee) Descriptor() ([]byte, []int) {
-	return fileDescriptor_07c8fad859e95e75, []int{3}
-}
-func (m *MsgDeleteTrustee) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *MsgDeleteTrustee) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_MsgDeleteTrustee.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *MsgDeleteTrustee) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgDeleteTrustee.Merge(m, src)
-}
-func (m *MsgDeleteTrustee) XXX_Size() int {
-	return m.Size()
-}
-func (m *MsgDeleteTrustee) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgDeleteTrustee.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_MsgDeleteTrustee proto.InternalMessageInfo
-
-func (m *MsgDeleteTrustee) GetDeleteGuardian() DeleteGuardian {
-	if m != nil {
-		return m.DeleteGuardian
-	}
-	return DeleteGuardian{}
-}
-
-// AddGuardian defines the properties of add guardian message
-type AddGuardian struct {
-	Description string                                        `protobuf:"bytes,1,opt,name=description,proto3" json:"description,omitempty"`
-	Address     github_com_cosmos_cosmos_sdk_types.AccAddress `protobuf:"bytes,2,opt,name=address,proto3,casttype=github.com/cosmos/cosmos-sdk/types.AccAddress" json:"address,omitempty"`
-	AddedBy     github_com_cosmos_cosmos_sdk_types.AccAddress `protobuf:"bytes,3,opt,name=added_by,json=addedBy,proto3,casttype=github.com/cosmos/cosmos-sdk/types.AccAddress" json:"added_by,omitempty" yaml:"added_by"`
-}
-
-func (m *AddGuardian) Reset()         { *m = AddGuardian{} }
-func (m *AddGuardian) String() string { return proto.CompactTextString(m) }
-func (*AddGuardian) ProtoMessage()    {}
-func (*AddGuardian) Descriptor() ([]byte, []int) {
-	return fileDescriptor_07c8fad859e95e75, []int{4}
-}
-func (m *AddGuardian) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *AddGuardian) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_AddGuardian.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *AddGuardian) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_AddGuardian.Merge(m, src)
-}
-func (m *AddGuardian) XXX_Size() int {
-	return m.Size()
-}
-func (m *AddGuardian) XXX_DiscardUnknown() {
-	xxx_messageInfo_AddGuardian.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_AddGuardian proto.InternalMessageInfo
-
-func (m *AddGuardian) GetDescription() string {
+func (m *MsgAddSuper) GetDescription() string {
 	if m != nil {
 		return m.Description
 	}
 	return ""
 }
 
-func (m *AddGuardian) GetAddress() github_com_cosmos_cosmos_sdk_types.AccAddress {
+func (m *MsgAddSuper) GetAddress() string {
 	if m != nil {
 		return m.Address
 	}
-	return nil
+	return ""
 }
 
-func (m *AddGuardian) GetAddedBy() github_com_cosmos_cosmos_sdk_types.AccAddress {
+func (m *MsgAddSuper) GetAddedBy() string {
 	if m != nil {
 		return m.AddedBy
 	}
-	return nil
+	return ""
 }
 
-// DeleteGuardian defines the properties of delete guardian message
-type DeleteGuardian struct {
-	Address   github_com_cosmos_cosmos_sdk_types.AccAddress `protobuf:"bytes,2,opt,name=address,proto3,casttype=github.com/cosmos/cosmos-sdk/types.AccAddress" json:"address,omitempty"`
-	DeletedBy github_com_cosmos_cosmos_sdk_types.AccAddress `protobuf:"bytes,3,opt,name=deleted_by,json=deletedBy,proto3,casttype=github.com/cosmos/cosmos-sdk/types.AccAddress" json:"deleted_by,omitempty" yaml:"deleted_by"`
+// DeleteSuper defines the properties of delete super account message
+type MsgDeleteSuper struct {
+	Address   string `protobuf:"bytes,2,opt,name=address,proto3" json:"address,omitempty"`
+	DeletedBy string `protobuf:"bytes,3,opt,name=deleted_by,json=deletedBy,proto3" json:"deleted_by,omitempty"`
 }
 
-func (m *DeleteGuardian) Reset()         { *m = DeleteGuardian{} }
-func (m *DeleteGuardian) String() string { return proto.CompactTextString(m) }
-func (*DeleteGuardian) ProtoMessage()    {}
-func (*DeleteGuardian) Descriptor() ([]byte, []int) {
-	return fileDescriptor_07c8fad859e95e75, []int{5}
+func (m *MsgDeleteSuper) Reset()         { *m = MsgDeleteSuper{} }
+func (m *MsgDeleteSuper) String() string { return proto.CompactTextString(m) }
+func (*MsgDeleteSuper) ProtoMessage()    {}
+func (*MsgDeleteSuper) Descriptor() ([]byte, []int) {
+	return fileDescriptor_07c8fad859e95e75, []int{1}
 }
-func (m *DeleteGuardian) XXX_Unmarshal(b []byte) error {
+func (m *MsgDeleteSuper) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *DeleteGuardian) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgDeleteSuper) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_DeleteGuardian.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgDeleteSuper.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -320,52 +139,52 @@ func (m *DeleteGuardian) XXX_Marshal(b []byte, deterministic bool) ([]byte, erro
 		return b[:n], nil
 	}
 }
-func (m *DeleteGuardian) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_DeleteGuardian.Merge(m, src)
+func (m *MsgDeleteSuper) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgDeleteSuper.Merge(m, src)
 }
-func (m *DeleteGuardian) XXX_Size() int {
+func (m *MsgDeleteSuper) XXX_Size() int {
 	return m.Size()
 }
-func (m *DeleteGuardian) XXX_DiscardUnknown() {
-	xxx_messageInfo_DeleteGuardian.DiscardUnknown(m)
+func (m *MsgDeleteSuper) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgDeleteSuper.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_DeleteGuardian proto.InternalMessageInfo
+var xxx_messageInfo_MsgDeleteSuper proto.InternalMessageInfo
 
-func (m *DeleteGuardian) GetAddress() github_com_cosmos_cosmos_sdk_types.AccAddress {
+func (m *MsgDeleteSuper) GetAddress() string {
 	if m != nil {
 		return m.Address
 	}
-	return nil
+	return ""
 }
 
-func (m *DeleteGuardian) GetDeletedBy() github_com_cosmos_cosmos_sdk_types.AccAddress {
+func (m *MsgDeleteSuper) GetDeletedBy() string {
 	if m != nil {
 		return m.DeletedBy
 	}
-	return nil
+	return ""
 }
 
-// Guardian defines the guardian standard
-type Guardian struct {
-	Description string                                        `protobuf:"bytes,1,opt,name=description,proto3" json:"description,omitempty"`
-	AccountType AccountType                                   `protobuf:"varint,2,opt,name=account_type,json=accountType,proto3,enum=irishub.guardian.AccountType" json:"account_type,omitempty" yaml:"account_type"`
-	Address     github_com_cosmos_cosmos_sdk_types.AccAddress `protobuf:"bytes,3,opt,name=address,proto3,casttype=github.com/cosmos/cosmos-sdk/types.AccAddress" json:"address,omitempty"`
-	AddedBy     github_com_cosmos_cosmos_sdk_types.AccAddress `protobuf:"bytes,4,opt,name=added_by,json=addedBy,proto3,casttype=github.com/cosmos/cosmos-sdk/types.AccAddress" json:"added_by,omitempty" yaml:"added_by"`
+// Super defines the super standard
+type Super struct {
+	Description string      `protobuf:"bytes,1,opt,name=description,proto3" json:"description,omitempty"`
+	AccountType AccountType `protobuf:"varint,2,opt,name=account_type,json=accountType,proto3,enum=irishub.guardian.AccountType" json:"account_type,omitempty" yaml:"account_type"`
+	Address     string      `protobuf:"bytes,3,opt,name=address,proto3" json:"address,omitempty"`
+	AddedBy     string      `protobuf:"bytes,4,opt,name=added_by,json=addedBy,proto3" json:"added_by,omitempty"`
 }
 
-func (m *Guardian) Reset()         { *m = Guardian{} }
-func (m *Guardian) String() string { return proto.CompactTextString(m) }
-func (*Guardian) ProtoMessage()    {}
-func (*Guardian) Descriptor() ([]byte, []int) {
-	return fileDescriptor_07c8fad859e95e75, []int{6}
+func (m *Super) Reset()         { *m = Super{} }
+func (m *Super) String() string { return proto.CompactTextString(m) }
+func (*Super) ProtoMessage()    {}
+func (*Super) Descriptor() ([]byte, []int) {
+	return fileDescriptor_07c8fad859e95e75, []int{2}
 }
-func (m *Guardian) XXX_Unmarshal(b []byte) error {
+func (m *Super) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *Guardian) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *Super) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_Guardian.Marshal(b, m, deterministic)
+		return xxx_messageInfo_Super.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -375,98 +194,84 @@ func (m *Guardian) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
-func (m *Guardian) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Guardian.Merge(m, src)
+func (m *Super) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Super.Merge(m, src)
 }
-func (m *Guardian) XXX_Size() int {
+func (m *Super) XXX_Size() int {
 	return m.Size()
 }
-func (m *Guardian) XXX_DiscardUnknown() {
-	xxx_messageInfo_Guardian.DiscardUnknown(m)
+func (m *Super) XXX_DiscardUnknown() {
+	xxx_messageInfo_Super.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_Guardian proto.InternalMessageInfo
+var xxx_messageInfo_Super proto.InternalMessageInfo
 
-func (m *Guardian) GetDescription() string {
+func (m *Super) GetDescription() string {
 	if m != nil {
 		return m.Description
 	}
 	return ""
 }
 
-func (m *Guardian) GetAccountType() AccountType {
+func (m *Super) GetAccountType() AccountType {
 	if m != nil {
 		return m.AccountType
 	}
 	return Genesis
 }
 
-func (m *Guardian) GetAddress() github_com_cosmos_cosmos_sdk_types.AccAddress {
+func (m *Super) GetAddress() string {
 	if m != nil {
 		return m.Address
 	}
-	return nil
+	return ""
 }
 
-func (m *Guardian) GetAddedBy() github_com_cosmos_cosmos_sdk_types.AccAddress {
+func (m *Super) GetAddedBy() string {
 	if m != nil {
 		return m.AddedBy
 	}
-	return nil
+	return ""
 }
 
 func init() {
 	proto.RegisterEnum("irishub.guardian.AccountType", AccountType_name, AccountType_value)
-	proto.RegisterType((*MsgAddProfiler)(nil), "irishub.guardian.MsgAddProfiler")
-	proto.RegisterType((*MsgDeleteProfiler)(nil), "irishub.guardian.MsgDeleteProfiler")
-	proto.RegisterType((*MsgAddTrustee)(nil), "irishub.guardian.MsgAddTrustee")
-	proto.RegisterType((*MsgDeleteTrustee)(nil), "irishub.guardian.MsgDeleteTrustee")
-	proto.RegisterType((*AddGuardian)(nil), "irishub.guardian.AddGuardian")
-	proto.RegisterType((*DeleteGuardian)(nil), "irishub.guardian.DeleteGuardian")
-	proto.RegisterType((*Guardian)(nil), "irishub.guardian.Guardian")
+	proto.RegisterType((*MsgAddSuper)(nil), "irishub.guardian.MsgAddSuper")
+	proto.RegisterType((*MsgDeleteSuper)(nil), "irishub.guardian.MsgDeleteSuper")
+	proto.RegisterType((*Super)(nil), "irishub.guardian.Super")
 }
 
 func init() { proto.RegisterFile("guardian/guardian.proto", fileDescriptor_07c8fad859e95e75) }
 
 var fileDescriptor_07c8fad859e95e75 = []byte{
-	// 532 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x54, 0x3f, 0x6f, 0xd3, 0x40,
-	0x14, 0xb7, 0xdb, 0x8a, 0xa4, 0xe7, 0x90, 0xa6, 0x06, 0xd1, 0xc8, 0x08, 0xdb, 0xf2, 0x54, 0x21,
-	0xd5, 0x56, 0x61, 0x63, 0xb3, 0x95, 0x12, 0x45, 0x55, 0x5b, 0xe4, 0x76, 0x29, 0x12, 0x8a, 0x1c,
-	0xdf, 0x61, 0x4e, 0x24, 0xbe, 0xe8, 0xce, 0x1e, 0x3c, 0xc0, 0x8c, 0x3a, 0xf1, 0x05, 0x3a, 0xf1,
-	0x19, 0xf8, 0x06, 0x0c, 0x1d, 0x3b, 0xb2, 0x60, 0xa1, 0xe4, 0x1b, 0x64, 0x64, 0x42, 0xfe, 0xdb,
-	0x6b, 0x60, 0xa1, 0x6a, 0x99, 0xfc, 0xf4, 0xfc, 0xde, 0xef, 0xf7, 0x7e, 0xbf, 0xf7, 0x74, 0x60,
-	0x2b, 0x88, 0x3d, 0x0a, 0xb1, 0x17, 0x5a, 0x55, 0x60, 0x4e, 0x29, 0x89, 0x88, 0xdc, 0xc1, 0x14,
-	0xb3, 0x77, 0xf1, 0xc8, 0xac, 0xf2, 0xca, 0xc3, 0x80, 0x04, 0x24, 0xff, 0x69, 0x65, 0x51, 0x51,
-	0x67, 0x10, 0xd0, 0x3e, 0x60, 0x81, 0x0d, 0xe1, 0x2b, 0x4a, 0xde, 0xe2, 0x31, 0xa2, 0xf2, 0x1b,
-	0xd0, 0xf2, 0x20, 0x1c, 0x56, 0x7d, 0x5d, 0x51, 0x17, 0xb7, 0xa5, 0x67, 0x4f, 0xcc, 0x65, 0x40,
-	0xd3, 0x86, 0xb0, 0x5f, 0xc6, 0xce, 0xe3, 0x8b, 0x54, 0x13, 0x16, 0xa9, 0xf6, 0x20, 0xf1, 0x26,
-	0xe3, 0x17, 0x06, 0x0f, 0x60, 0xb8, 0x92, 0x77, 0x55, 0x69, 0x7c, 0x04, 0x9b, 0x07, 0x2c, 0xe8,
-	0xa1, 0x31, 0x8a, 0x50, 0xcd, 0x89, 0xc1, 0x06, 0xcc, 0x33, 0xcb, 0xb4, 0xfa, 0x9f, 0xb4, 0x45,
-	0x6b, 0xcd, 0xac, 0x96, 0xcc, 0x8f, 0x0a, 0xe6, 0x25, 0x18, 0xc3, 0x6d, 0xc3, 0x6b, 0xf5, 0x46,
-	0x08, 0xee, 0x17, 0x82, 0x4f, 0x68, 0xcc, 0x22, 0x84, 0xee, 0x5a, 0xef, 0x07, 0xd0, 0xa9, 0xf5,
-	0x56, 0x94, 0xff, 0x51, 0xee, 0x0f, 0x11, 0x48, 0xdc, 0xe0, 0xb2, 0x0e, 0x24, 0x88, 0x98, 0x4f,
-	0xf1, 0x34, 0xc2, 0xa4, 0xa0, 0x5d, 0x77, 0xf9, 0x94, 0xbc, 0x0f, 0x1a, 0x1e, 0x84, 0x14, 0x31,
-	0xd6, 0x5d, 0xd1, 0xc5, 0xed, 0x96, 0xb3, 0xfb, 0x2b, 0xd5, 0x76, 0x02, 0x1c, 0x65, 0x63, 0xf9,
-	0x64, 0x62, 0xf9, 0x84, 0x4d, 0x08, 0x2b, 0x3f, 0x3b, 0x0c, 0xbe, 0xb7, 0xa2, 0x64, 0x8a, 0x98,
-	0x69, 0xfb, 0xbe, 0x5d, 0x34, 0xba, 0x15, 0x82, 0x3c, 0x04, 0x4d, 0x0f, 0x42, 0x04, 0x87, 0xa3,
-	0xa4, 0xbb, 0x9a, 0xa3, 0xf5, 0x16, 0xa9, 0xb6, 0x51, 0xbb, 0x96, 0xff, 0x31, 0x6e, 0x46, 0x80,
-	0xa0, 0x93, 0x18, 0xdf, 0x44, 0xd0, 0xbe, 0x6e, 0xd1, 0xed, 0x0a, 0x40, 0x00, 0x14, 0x8e, 0x72,
-	0x12, 0x5e, 0x2e, 0x52, 0x6d, 0x93, 0xf7, 0xff, 0x86, 0x22, 0xd6, 0xcb, 0x6e, 0x27, 0x31, 0xbe,
-	0xae, 0x80, 0xe6, 0x3f, 0xec, 0xe8, 0x14, 0xb4, 0x3c, 0xdf, 0x27, 0x71, 0x18, 0x0d, 0x33, 0xd4,
-	0x5c, 0x67, 0xfb, 0xaf, 0x37, 0x5b, 0x54, 0x9d, 0x24, 0x53, 0xe4, 0x6c, 0x71, 0xf7, 0xca, 0x35,
-	0x67, 0xf7, 0x7a, 0x55, 0xc5, 0xbb, 0xb7, 0x7a, 0xab, 0xeb, 0x5f, 0xbb, 0x83, 0xf5, 0x3f, 0x1d,
-	0x00, 0x89, 0x93, 0x28, 0x77, 0x41, 0xa3, 0xbf, 0x77, 0xb8, 0x77, 0x3c, 0x38, 0xee, 0x08, 0x8a,
-	0x74, 0x76, 0xae, 0x37, 0xfa, 0x28, 0x44, 0x0c, 0x33, 0x59, 0x01, 0xcd, 0x23, 0xb7, 0x37, 0x38,
-	0xb4, 0xdd, 0xd3, 0x8e, 0xa8, 0xb4, 0xce, 0xce, 0xf5, 0xe6, 0x11, 0x85, 0x38, 0xf4, 0x68, 0xa2,
-	0xac, 0x7d, 0xfa, 0xa2, 0x0a, 0xce, 0xfe, 0xc5, 0x4c, 0x15, 0x2f, 0x67, 0xaa, 0xf8, 0x73, 0xa6,
-	0x8a, 0x9f, 0xe7, 0xaa, 0x70, 0x39, 0x57, 0x85, 0xef, 0x73, 0x55, 0x78, 0xbd, 0xcb, 0x0d, 0x97,
-	0x39, 0x1c, 0xa2, 0xc8, 0x2a, 0x9d, 0xb6, 0x26, 0x04, 0xc6, 0x63, 0xc4, 0xea, 0xe7, 0xb7, 0x98,
-	0x75, 0x74, 0x2f, 0x7f, 0x5d, 0x9f, 0xff, 0x0e, 0x00, 0x00, 0xff, 0xff, 0x2b, 0x54, 0x0a, 0xe9,
-	0xa0, 0x05, 0x00, 0x00,
+	// 374 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x12, 0x4f, 0x2f, 0x4d, 0x2c,
+	0x4a, 0xc9, 0x4c, 0xcc, 0xd3, 0x87, 0x31, 0xf4, 0x0a, 0x8a, 0xf2, 0x4b, 0xf2, 0x85, 0x04, 0x32,
+	0x8b, 0x32, 0x8b, 0x33, 0x4a, 0x93, 0xf4, 0x60, 0xe2, 0x52, 0x22, 0xe9, 0xf9, 0xe9, 0xf9, 0x60,
+	0x49, 0x7d, 0x10, 0x0b, 0xa2, 0x4e, 0x29, 0x85, 0x8b, 0xdb, 0xb7, 0x38, 0xdd, 0x31, 0x25, 0x25,
+	0xb8, 0xb4, 0x20, 0xb5, 0x48, 0x48, 0x81, 0x8b, 0x3b, 0x25, 0xb5, 0x38, 0xb9, 0x28, 0xb3, 0xa0,
+	0x24, 0x33, 0x3f, 0x4f, 0x82, 0x51, 0x81, 0x51, 0x83, 0x33, 0x08, 0x59, 0x48, 0x48, 0x82, 0x8b,
+	0x3d, 0x31, 0x25, 0xa5, 0x28, 0xb5, 0xb8, 0x58, 0x82, 0x09, 0x2c, 0x0b, 0xe3, 0x0a, 0x49, 0x72,
+	0x71, 0x24, 0xa6, 0xa4, 0xa4, 0xa6, 0xc4, 0x27, 0x55, 0x4a, 0x30, 0xc3, 0xa5, 0x52, 0x53, 0x9c,
+	0x2a, 0x95, 0x3c, 0xb9, 0xf8, 0x7c, 0x8b, 0xd3, 0x5d, 0x52, 0x73, 0x52, 0x4b, 0x52, 0x21, 0x16,
+	0xe1, 0x36, 0x46, 0x96, 0x8b, 0x2b, 0x05, 0xac, 0x10, 0xc9, 0x20, 0x4e, 0xa8, 0x88, 0x53, 0xa5,
+	0xd2, 0x4e, 0x46, 0x2e, 0x56, 0x62, 0xdd, 0x1a, 0xc9, 0xc5, 0x93, 0x98, 0x9c, 0x9c, 0x5f, 0x9a,
+	0x57, 0x12, 0x5f, 0x52, 0x59, 0x90, 0x0a, 0xb6, 0x89, 0xcf, 0x48, 0x56, 0x0f, 0x3d, 0x6c, 0xf4,
+	0x1c, 0x21, 0xaa, 0x42, 0x2a, 0x0b, 0x52, 0x9d, 0xc4, 0x3f, 0xdd, 0x93, 0x17, 0xae, 0x4c, 0xcc,
+	0xcd, 0xb1, 0x52, 0x42, 0xd6, 0xac, 0x14, 0xc4, 0x9d, 0x88, 0x50, 0x85, 0xec, 0x7e, 0x66, 0xdc,
+	0xc1, 0xc0, 0x82, 0x12, 0x0c, 0x5a, 0x9e, 0x5c, 0xdc, 0x8e, 0xa8, 0x66, 0xb8, 0xbb, 0xfa, 0xb9,
+	0x06, 0x7b, 0x06, 0x0b, 0x30, 0x48, 0x71, 0x77, 0xcd, 0x55, 0x60, 0x77, 0x4f, 0xcd, 0x4b, 0x2d,
+	0xce, 0x2c, 0x16, 0x92, 0xe2, 0xe2, 0xf0, 0x0f, 0x72, 0xf1, 0xf4, 0x73, 0x0c, 0x8a, 0x14, 0x60,
+	0x94, 0xe2, 0xe9, 0x9a, 0xab, 0xc0, 0xe1, 0x5f, 0x94, 0x92, 0x99, 0x97, 0x58, 0x54, 0x29, 0xc5,
+	0xd2, 0xb1, 0x58, 0x8e, 0xc1, 0xc9, 0xfb, 0xc4, 0x23, 0x39, 0xc6, 0x0b, 0x8f, 0xe4, 0x18, 0x1f,
+	0x3c, 0x92, 0x63, 0x9c, 0xf0, 0x58, 0x8e, 0xe1, 0xc2, 0x63, 0x39, 0x86, 0x1b, 0x8f, 0xe5, 0x18,
+	0xa2, 0x0c, 0xd3, 0x33, 0x4b, 0x40, 0x9e, 0x4b, 0xce, 0xcf, 0xd5, 0x07, 0x79, 0x34, 0x2f, 0xb5,
+	0x44, 0x1f, 0xea, 0x61, 0xfd, 0xdc, 0xfc, 0x94, 0xd2, 0x9c, 0xd4, 0x62, 0x78, 0x62, 0xd1, 0x07,
+	0xf9, 0xac, 0x38, 0x89, 0x0d, 0x9c, 0x16, 0x8c, 0x01, 0x01, 0x00, 0x00, 0xff, 0xff, 0x41, 0xdf,
+	0x60, 0x4b, 0x4e, 0x02, 0x00, 0x00,
 }
 
-func (m *MsgAddProfiler) Marshal() (dAtA []byte, err error) {
+func (m *MsgAddSuper) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -476,144 +281,12 @@ func (m *MsgAddProfiler) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgAddProfiler) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgAddSuper) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgAddProfiler) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	{
-		size, err := m.AddGuardian.MarshalToSizedBuffer(dAtA[:i])
-		if err != nil {
-			return 0, err
-		}
-		i -= size
-		i = encodeVarintGuardian(dAtA, i, uint64(size))
-	}
-	i--
-	dAtA[i] = 0xa
-	return len(dAtA) - i, nil
-}
-
-func (m *MsgDeleteProfiler) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *MsgDeleteProfiler) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *MsgDeleteProfiler) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	{
-		size, err := m.DeleteGuardian.MarshalToSizedBuffer(dAtA[:i])
-		if err != nil {
-			return 0, err
-		}
-		i -= size
-		i = encodeVarintGuardian(dAtA, i, uint64(size))
-	}
-	i--
-	dAtA[i] = 0xa
-	return len(dAtA) - i, nil
-}
-
-func (m *MsgAddTrustee) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *MsgAddTrustee) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *MsgAddTrustee) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	{
-		size, err := m.AddGuardian.MarshalToSizedBuffer(dAtA[:i])
-		if err != nil {
-			return 0, err
-		}
-		i -= size
-		i = encodeVarintGuardian(dAtA, i, uint64(size))
-	}
-	i--
-	dAtA[i] = 0xa
-	return len(dAtA) - i, nil
-}
-
-func (m *MsgDeleteTrustee) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *MsgDeleteTrustee) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *MsgDeleteTrustee) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	{
-		size, err := m.DeleteGuardian.MarshalToSizedBuffer(dAtA[:i])
-		if err != nil {
-			return 0, err
-		}
-		i -= size
-		i = encodeVarintGuardian(dAtA, i, uint64(size))
-	}
-	i--
-	dAtA[i] = 0xa
-	return len(dAtA) - i, nil
-}
-
-func (m *AddGuardian) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *AddGuardian) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *AddGuardian) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgAddSuper) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -642,7 +315,7 @@ func (m *AddGuardian) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *DeleteGuardian) Marshal() (dAtA []byte, err error) {
+func (m *MsgDeleteSuper) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -652,12 +325,12 @@ func (m *DeleteGuardian) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *DeleteGuardian) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgDeleteSuper) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *DeleteGuardian) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgDeleteSuper) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -679,7 +352,7 @@ func (m *DeleteGuardian) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *Guardian) Marshal() (dAtA []byte, err error) {
+func (m *Super) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -689,12 +362,12 @@ func (m *Guardian) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *Guardian) MarshalTo(dAtA []byte) (int, error) {
+func (m *Super) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *Guardian) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *Super) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -739,51 +412,7 @@ func encodeVarintGuardian(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
-func (m *MsgAddProfiler) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = m.AddGuardian.Size()
-	n += 1 + l + sovGuardian(uint64(l))
-	return n
-}
-
-func (m *MsgDeleteProfiler) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = m.DeleteGuardian.Size()
-	n += 1 + l + sovGuardian(uint64(l))
-	return n
-}
-
-func (m *MsgAddTrustee) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = m.AddGuardian.Size()
-	n += 1 + l + sovGuardian(uint64(l))
-	return n
-}
-
-func (m *MsgDeleteTrustee) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = m.DeleteGuardian.Size()
-	n += 1 + l + sovGuardian(uint64(l))
-	return n
-}
-
-func (m *AddGuardian) Size() (n int) {
+func (m *MsgAddSuper) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -804,7 +433,7 @@ func (m *AddGuardian) Size() (n int) {
 	return n
 }
 
-func (m *DeleteGuardian) Size() (n int) {
+func (m *MsgDeleteSuper) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -821,7 +450,7 @@ func (m *DeleteGuardian) Size() (n int) {
 	return n
 }
 
-func (m *Guardian) Size() (n int) {
+func (m *Super) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -851,7 +480,7 @@ func sovGuardian(x uint64) (n int) {
 func sozGuardian(x uint64) (n int) {
 	return sovGuardian(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
-func (m *MsgAddProfiler) Unmarshal(dAtA []byte) error {
+func (m *MsgAddSuper) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -874,354 +503,10 @@ func (m *MsgAddProfiler) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgAddProfiler: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgAddSuper: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgAddProfiler: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field AddGuardian", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGuardian
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGuardian
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthGuardian
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.AddGuardian.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipGuardian(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthGuardian
-			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthGuardian
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *MsgDeleteProfiler) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowGuardian
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: MsgDeleteProfiler: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgDeleteProfiler: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field DeleteGuardian", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGuardian
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGuardian
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthGuardian
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.DeleteGuardian.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipGuardian(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthGuardian
-			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthGuardian
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *MsgAddTrustee) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowGuardian
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: MsgAddTrustee: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgAddTrustee: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field AddGuardian", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGuardian
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGuardian
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthGuardian
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.AddGuardian.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipGuardian(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthGuardian
-			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthGuardian
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *MsgDeleteTrustee) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowGuardian
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: MsgDeleteTrustee: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgDeleteTrustee: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field DeleteGuardian", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGuardian
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGuardian
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthGuardian
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.DeleteGuardian.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipGuardian(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthGuardian
-			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthGuardian
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *AddGuardian) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowGuardian
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: AddGuardian: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: AddGuardian: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgAddSuper: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -1260,7 +545,7 @@ func (m *AddGuardian) Unmarshal(dAtA []byte) error {
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Address", wireType)
 			}
-			var byteLen int
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowGuardian
@@ -1270,31 +555,29 @@ func (m *AddGuardian) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				byteLen |= int(b&0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			if byteLen < 0 {
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
 				return ErrInvalidLengthGuardian
 			}
-			postIndex := iNdEx + byteLen
+			postIndex := iNdEx + intStringLen
 			if postIndex < 0 {
 				return ErrInvalidLengthGuardian
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Address = append(m.Address[:0], dAtA[iNdEx:postIndex]...)
-			if m.Address == nil {
-				m.Address = []byte{}
-			}
+			m.Address = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field AddedBy", wireType)
 			}
-			var byteLen int
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowGuardian
@@ -1304,25 +587,23 @@ func (m *AddGuardian) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				byteLen |= int(b&0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			if byteLen < 0 {
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
 				return ErrInvalidLengthGuardian
 			}
-			postIndex := iNdEx + byteLen
+			postIndex := iNdEx + intStringLen
 			if postIndex < 0 {
 				return ErrInvalidLengthGuardian
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.AddedBy = append(m.AddedBy[:0], dAtA[iNdEx:postIndex]...)
-			if m.AddedBy == nil {
-				m.AddedBy = []byte{}
-			}
+			m.AddedBy = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -1348,7 +629,7 @@ func (m *AddGuardian) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *DeleteGuardian) Unmarshal(dAtA []byte) error {
+func (m *MsgDeleteSuper) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1371,17 +652,17 @@ func (m *DeleteGuardian) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: DeleteGuardian: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgDeleteSuper: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: DeleteGuardian: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgDeleteSuper: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 2:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Address", wireType)
 			}
-			var byteLen int
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowGuardian
@@ -1391,31 +672,29 @@ func (m *DeleteGuardian) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				byteLen |= int(b&0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			if byteLen < 0 {
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
 				return ErrInvalidLengthGuardian
 			}
-			postIndex := iNdEx + byteLen
+			postIndex := iNdEx + intStringLen
 			if postIndex < 0 {
 				return ErrInvalidLengthGuardian
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Address = append(m.Address[:0], dAtA[iNdEx:postIndex]...)
-			if m.Address == nil {
-				m.Address = []byte{}
-			}
+			m.Address = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field DeletedBy", wireType)
 			}
-			var byteLen int
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowGuardian
@@ -1425,25 +704,23 @@ func (m *DeleteGuardian) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				byteLen |= int(b&0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			if byteLen < 0 {
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
 				return ErrInvalidLengthGuardian
 			}
-			postIndex := iNdEx + byteLen
+			postIndex := iNdEx + intStringLen
 			if postIndex < 0 {
 				return ErrInvalidLengthGuardian
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.DeletedBy = append(m.DeletedBy[:0], dAtA[iNdEx:postIndex]...)
-			if m.DeletedBy == nil {
-				m.DeletedBy = []byte{}
-			}
+			m.DeletedBy = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -1469,7 +746,7 @@ func (m *DeleteGuardian) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *Guardian) Unmarshal(dAtA []byte) error {
+func (m *Super) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1492,10 +769,10 @@ func (m *Guardian) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: Guardian: wiretype end group for non-group")
+			return fmt.Errorf("proto: Super: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: Guardian: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: Super: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -1553,7 +830,7 @@ func (m *Guardian) Unmarshal(dAtA []byte) error {
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Address", wireType)
 			}
-			var byteLen int
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowGuardian
@@ -1563,31 +840,29 @@ func (m *Guardian) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				byteLen |= int(b&0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			if byteLen < 0 {
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
 				return ErrInvalidLengthGuardian
 			}
-			postIndex := iNdEx + byteLen
+			postIndex := iNdEx + intStringLen
 			if postIndex < 0 {
 				return ErrInvalidLengthGuardian
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Address = append(m.Address[:0], dAtA[iNdEx:postIndex]...)
-			if m.Address == nil {
-				m.Address = []byte{}
-			}
+			m.Address = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field AddedBy", wireType)
 			}
-			var byteLen int
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowGuardian
@@ -1597,25 +872,23 @@ func (m *Guardian) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				byteLen |= int(b&0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			if byteLen < 0 {
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
 				return ErrInvalidLengthGuardian
 			}
-			postIndex := iNdEx + byteLen
+			postIndex := iNdEx + intStringLen
 			if postIndex < 0 {
 				return ErrInvalidLengthGuardian
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.AddedBy = append(m.AddedBy[:0], dAtA[iNdEx:postIndex]...)
-			if m.AddedBy == nil {
-				m.AddedBy = []byte{}
-			}
+			m.AddedBy = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex

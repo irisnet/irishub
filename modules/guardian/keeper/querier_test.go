@@ -25,29 +25,15 @@ func (suite *KeeperTestSuite) TestNewQuerier() {
 	suite.Error(err)
 	suite.Nil(res)
 
-	// test queryProfilers
-
-	res, err = querier(suite.ctx, []string{types.QueryProfilers}, abci.RequestQuery{})
+	// test querySupers
+	res, err = querier(suite.ctx, []string{types.QuerySupers}, abci.RequestQuery{})
 	suite.NoError(err)
-	var guardianProfilers []types.Guardian
-	e := suite.cdc.UnmarshalJSON(res, &guardianProfilers)
+	var supers []types.Super
+	e := suite.cdc.UnmarshalJSON(res, &supers)
 	suite.NoError(e)
 
-	for i, val := range guardianProfilers {
-		equal := val.Equal(types.DefaultGenesisState().Profilers[i])
-		suite.True(equal)
-	}
-
-	// test queryTrustees
-
-	res, err = querier(suite.ctx, []string{types.QueryTrustees}, abci.RequestQuery{})
-	suite.NoError(err)
-	var guardianTrustees []types.Guardian
-	e = suite.cdc.UnmarshalJSON(res, &guardianTrustees)
-	suite.NoError(e)
-
-	for i, val := range guardianTrustees {
-		equal := val.Equal(types.DefaultGenesisState().Trustees[i])
+	for i, val := range supers {
+		equal := val.Equal(types.DefaultGenesisState().Supers[i])
 		suite.True(equal)
 	}
 }

@@ -9,31 +9,17 @@ option go_package = "github.com/irisnet/irishub/modules/guardian/types";
 
 // Query creates service with guardian as rpc
 service Query {
-    // Profilers returns all profilers
-    rpc Profilers(QueryProfilersRequest) returns (QueryProfilersResponse) {
-        option (google.api.http).get = "/irishub/guardian/profilers";
-    }
-
-    // Trustees returns all trustees
-    rpc Trustees(QueryTrusteesRequest) returns (QueryTrusteesResponse) {
-        option (google.api.http).get = "/irishub/guardian/trustees";
+    // Supers returns all Supers
+    rpc Supers (QuerySupersRequest) returns (QuerySupersResponse) {
+        option (google.api.http).get = "/irishub/guardian/supers";
     }
 }
 
-// QueryProfilersRequest is request type for the Query/Profilers RPC method
-message QueryProfilersRequest {
+// QuerySupersRequest is request type for the Query/Supers RPC method
+message QuerySupersRequest {
 }
 
-// QueryProfilersResponse is response type for the Query/Profilers RPC method
-message QueryProfilersResponse {
-    repeated Guardian profilers = 1 [ (gogoproto.nullable) = false ];
-}
-
-// QueryTrusteesRequest is request type for the Query/Trustees RPC method
-message QueryTrusteesRequest {
-}
-
-// QueryTrusteesResponse is response type for the Query/Trustees RPC method
-message QueryTrusteesResponse {
-    repeated Guardian trustees = 1 [ (gogoproto.nullable) = false ];
+// QuerySupersResponse is response type for the Query/Supers RPC method
+message QuerySupersResponse {
+    repeated Super supers = 1 [(gogoproto.nullable) = false];
 }

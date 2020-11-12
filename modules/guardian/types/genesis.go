@@ -1,10 +1,9 @@
 package types
 
 // NewGenesisState constructs a GenesisState
-func NewGenesisState(profilers, trustees []Guardian) *GenesisState {
+func NewGenesisState(supers []Super) *GenesisState {
 	return &GenesisState{
-		Profilers: profilers,
-		Trustees:  trustees,
+		Supers: supers,
 	}
 }
 
