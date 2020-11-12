@@ -17,7 +17,7 @@ type msgServer struct {
 
 var _ types.MsgServer = msgServer{}
 
-// NewMsgServerImpl returns an implementation of the bank MsgServer interface
+// NewMsgServerImpl returns an implementation of the random MsgServer interface
 // for the provided Keeper.
 func NewMsgServerImpl(keeper Keeper) types.MsgServer {
 	return &msgServer{Keeper: keeper}
