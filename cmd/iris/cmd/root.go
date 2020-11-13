@@ -28,7 +28,6 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 	dbm "github.com/tendermint/tm-db"
 
-	"github.com/irisnet/irishub/address"
 	"github.com/irisnet/irishub/app"
 )
 
@@ -84,12 +83,6 @@ func Execute(rootCmd *cobra.Command) error {
 }
 
 func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
-	config := sdk.GetConfig()
-	config.SetBech32PrefixForAccount(address.Bech32PrefixAccAddr, address.Bech32PrefixAccPub)
-	config.SetBech32PrefixForValidator(address.Bech32PrefixValAddr, address.Bech32PrefixValPub)
-	config.SetBech32PrefixForConsensusNode(address.Bech32PrefixConsAddr, address.Bech32PrefixConsPub)
-	config.Seal()
-
 	authclient.Codec = encodingConfig.Marshaler
 
 	rootCmd.AddCommand(
