@@ -106,7 +106,6 @@ import (
 	tokenkeeper "github.com/irisnet/irismod/modules/token/keeper"
 	tokentypes "github.com/irisnet/irismod/modules/token/types"
 
-	"github.com/irisnet/irishub/address"
 	"github.com/irisnet/irishub/modules/guardian"
 	guardiankeeper "github.com/irisnet/irishub/modules/guardian/keeper"
 	guardiantypes "github.com/irisnet/irishub/modules/guardian/types"
@@ -232,7 +231,6 @@ type SimApp struct {
 }
 
 func init() {
-	address.ConfigureBech32Prefix()
 	userHomeDir, err := os.UserHomeDir()
 	if err != nil {
 		panic(err)
