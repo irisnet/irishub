@@ -9,8 +9,6 @@ import (
 	"github.com/tendermint/tendermint/crypto"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-
-	"github.com/irisnet/irishub/address"
 )
 
 // nolint: deadcode unused
@@ -22,14 +20,6 @@ var (
 	description    = "description"
 	nilDescription = ""
 )
-
-func init() {
-	config := sdk.GetConfig()
-	config.SetBech32PrefixForAccount(address.Bech32PrefixAccAddr, address.Bech32PrefixAccPub)
-	config.SetBech32PrefixForValidator(address.Bech32PrefixValAddr, address.Bech32PrefixValPub)
-	config.SetBech32PrefixForConsensusNode(address.Bech32PrefixConsAddr, address.Bech32PrefixConsPub)
-	config.Seal()
-}
 
 // ----------------------------------------------
 // test MsgAddSuper
