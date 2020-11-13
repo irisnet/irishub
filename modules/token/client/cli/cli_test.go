@@ -136,7 +136,7 @@ func (s *IntegrationTestSuite) TestToken() {
 
 	//------test GetCmdMintToken()-------------
 	coinType := proto.Message(&sdk.Coin{})
-	out, err := simapp.QueryBalancesExec(clientCtx, from.String(), strings.ToLower(symbol))
+	out, err := simapp.QueryBalanceExec(clientCtx, from.String(), strings.ToLower(symbol))
 	s.Require().NoError(err)
 	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(out.Bytes(), coinType))
 	balance := coinType.(*sdk.Coin)
@@ -159,7 +159,7 @@ func (s *IntegrationTestSuite) TestToken() {
 	txResp = respType.(*sdk.TxResponse)
 	s.Require().Equal(expectedCode, txResp.Code)
 
-	out, err = simapp.QueryBalancesExec(clientCtx, from.String(), strings.ToLower(symbol))
+	out, err = simapp.QueryBalanceExec(clientCtx, from.String(), strings.ToLower(symbol))
 	s.Require().NoError(err)
 	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(out.Bytes(), coinType))
 	balance = coinType.(*sdk.Coin)

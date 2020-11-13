@@ -28,7 +28,6 @@ func RegisterHandlers(cliCtx client.Context, r *mux.Router) {
 	registerTxRoutes(cliCtx, r)
 }
 
-
 // DefineServiceReq defines the properties of a define service request's body.
 type DefineServiceReq struct {
 	BaseReq           rest.BaseReq `json:"base_req" yaml:"base_req"`

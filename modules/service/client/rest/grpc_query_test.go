@@ -4,9 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/cosmos/cosmos-sdk/types/rest"
 	"testing"
 	"time"
+
+	"github.com/cosmos/cosmos-sdk/types/rest"
 
 	"github.com/gogo/protobuf/proto"
 	"github.com/stretchr/testify/suite"
@@ -93,7 +94,6 @@ func (s *IntegrationTestSuite) TestService() {
 	timeout := qos
 
 	expectedEarnedFees := fmt.Sprintf("45%s", serviceDenom)
-
 
 	//------test GetCmdDefineService()-------------
 	args := []string{

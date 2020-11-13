@@ -7,6 +7,7 @@ import (
 
 	"github.com/gogo/protobuf/proto"
 	"github.com/stretchr/testify/suite"
+
 	"github.com/tendermint/tendermint/crypto"
 
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -48,7 +49,7 @@ func TestIntegrationTestSuite(t *testing.T) {
 	suite.Run(t, new(IntegrationTestSuite))
 }
 
-func (s *IntegrationTestSuite) TestHtlc() {
+func (s *IntegrationTestSuite) TestHTLC() {
 	val := s.network.Validators[0]
 
 	//------test GetCmdCreateHTLC()-------------
@@ -124,7 +125,7 @@ func (s *IntegrationTestSuite) TestHtlc() {
 	s.Require().Equal(stateCompleted, htlcItem.State.String())
 
 	coinType := proto.Message(&sdk.Coin{})
-	out, err := simapp.QueryBalancesExec(val.ClientCtx, to.String(), sdk.DefaultBondDenom)
+	out, err := simapp.QueryBalanceExec(val.ClientCtx, to.String(), sdk.DefaultBondDenom)
 	s.Require().NoError(err)
 	s.Require().NoError(val.ClientCtx.JSONMarshaler.UnmarshalJSON(out.Bytes(), coinType))
 	balance := coinType.(*sdk.Coin)
