@@ -1,6 +1,5 @@
 #
-# Build mainnet image: docker build -t irisnet/irishub .
-# Build testnet image: docker build -t irisnet/irishub --build-arg NetworkType=testnet .
+# Build image: docker build -t irisnet/irishub .
 #
 FROM golang:1.15.5-alpine3.12 as builder
 
