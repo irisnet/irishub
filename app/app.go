@@ -102,6 +102,7 @@ import (
 	tokenkeeper "github.com/irisnet/irismod/modules/token/keeper"
 	tokentypes "github.com/irisnet/irismod/modules/token/types"
 
+	"github.com/irisnet/irishub/address"
 	"github.com/irisnet/irishub/lite"
 	"github.com/irisnet/irishub/modules/guardian"
 	guardiankeeper "github.com/irisnet/irishub/modules/guardian/keeper"
@@ -170,16 +171,7 @@ var (
 		distrtypes.ModuleName: true,
 	}
 
-	nativeToken = tokentypes.Token{
-		Symbol:        "iris",
-		Name:          "Irishub staking token",
-		Scale:         6,
-		MinUnit:       "uiris",
-		InitialSupply: 2000000000,
-		MaxSupply:     10000000000,
-		Mintable:      true,
-		Owner:         sdk.AccAddress(crypto.AddressHash([]byte(tokentypes.ModuleName))).String(),
-	}
+	nativeToken tokentypes.Token
 )
 
 // Verify app interface at compile time
@@ -240,12 +232,25 @@ type IrisApp struct {
 }
 
 func init() {
+	address.ConfigureBech32Prefix()
+	nativeToken = tokentypes.Token{
+		Symbol:        "iris",
+		Name:          "Irishub staking token",
+		Scale:         6,
+		MinUnit:       "uiris",
+		InitialSupply: 2000000000,
+		MaxSupply:     10000000000,
+		Mintable:      true,
+		Owner:         sdk.AccAddress(crypto.AddressHash([]byte(tokentypes.ModuleName))).String(),
+	}
+
 	userHomeDir, err := os.UserHomeDir()
 	if err != nil {
 		panic(err)
 	}
 
 	DefaultNodeHome = filepath.Join(userHomeDir, ".iris")
+
 	owner, err := sdk.AccAddressFromBech32(nativeToken.Owner)
 	if err != nil {
 		panic(err)
