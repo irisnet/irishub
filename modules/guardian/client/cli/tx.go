@@ -3,14 +3,12 @@ package cli
 import (
 	"fmt"
 
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
-
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/version"
+	"github.com/spf13/cobra"
 
 	"github.com/irisnet/irishub/modules/guardian/types"
 )
@@ -49,7 +47,7 @@ func GetCmdCreateSuper() *cobra.Command {
 
 			fromAddr := clientCtx.GetFromAddress()
 
-			paStr := viper.GetString(FlagAddress)
+			paStr, _ := cmd.Flags().GetString(FlagAddress)
 			if len(paStr) == 0 {
 				return fmt.Errorf("must use --address flag")
 			}
@@ -57,7 +55,7 @@ func GetCmdCreateSuper() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			description := viper.GetString(FlagDescription)
+			description, _ := cmd.Flags().GetString(FlagDescription)
 			msg := types.NewMsgAddSuper(description, pAddr, fromAddr)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
@@ -90,7 +88,7 @@ func GetCmdDeleteSuper() *cobra.Command {
 			}
 
 			fromAddr := clientCtx.GetFromAddress()
-			paStr := viper.GetString(FlagAddress)
+			paStr, _ := cmd.Flags().GetString(FlagAddress)
 			pAddr, err := sdk.AccAddressFromBech32(paStr)
 			if err != nil {
 				return err
