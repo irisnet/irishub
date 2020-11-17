@@ -117,9 +117,6 @@ func (s *IntegrationTestSuite) TestGuardian() {
 	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType))
 	supersResp = respType.(*guardiantypes.QuerySupersResponse)
 	s.Require().Equal(2, len(supersResp.Supers))
-	s.Require().Equal(addr.String(), supersResp.Supers[0].AddedBy)
-	s.Require().Equal(from.String(), supersResp.Supers[0].Address)
-	s.Require().Equal(description, supersResp.Supers[0].Description)
 
 	//------test GetCmdDeleteSuper()-------------
 	args = []string{
