@@ -49,7 +49,7 @@ func GetCmdCreateSuper() *cobra.Command {
 
 			fromAddr := clientCtx.GetFromAddress()
 
-			paStr := viper.GetString(FlagAddress)
+			paStr, _ := cmd.Flags().GetString(FlagAddress)
 			if len(paStr) == 0 {
 				return fmt.Errorf("must use --address flag")
 			}
@@ -57,7 +57,7 @@ func GetCmdCreateSuper() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			description := viper.GetString(FlagDescription)
+			description, _ := cmd.Flags().GetString(FlagDescription)
 			msg := types.NewMsgAddSuper(description, pAddr, fromAddr)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
