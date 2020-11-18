@@ -94,7 +94,7 @@ func (s *IntegrationTestSuite) TestToken() {
 	resp, err := rest.GetRequest(url)
 	respType = proto.Message(&tokentypes.QueryTokensResponse{})
 	s.Require().NoError(err)
-	s.Require().NoError(clientCtx.LegacyAmino.UnmarshalJSON(resp, respType))
+	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(resp, respType))
 	tokensResp := respType.(*tokentypes.QueryTokensResponse)
 	s.Require().Equal(2, len(tokensResp.Tokens))
 
@@ -103,8 +103,6 @@ func (s *IntegrationTestSuite) TestToken() {
 	resp, err = rest.GetRequest(url)
 	respType = proto.Message(&tokentypes.QueryTokenResponse{})
 	var token tokentypes.TokenI
-	tokentypes.RegisterLegacyAminoCodec(clientCtx.LegacyAmino)
-	tokentypes.RegisterInterfaces(clientCtx.InterfaceRegistry)
 	s.Require().NoError(err)
 	s.Require().NoError(clientCtx.JSONMarshaler.UnmarshalJSON(resp, respType))
 	tokenResp := respType.(*tokentypes.QueryTokenResponse)

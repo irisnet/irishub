@@ -29,8 +29,8 @@ func (dtf ValidateOracleAuthDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, si
 
 		switch msg := msg.(type) {
 		case *types.MsgCreateFeed:
-			creater, _ := sdk.AccAddressFromBech32(msg.Creator)
-			if !dtf.ak.Authorized(ctx, creater) {
+			creator, _ := sdk.AccAddressFromBech32(msg.Creator)
+			if !dtf.ak.Authorized(ctx, creator) {
 				return ctx, sdkerrors.Wrapf(types.ErrUnauthorized, msg.Creator)
 			}
 		}

@@ -114,9 +114,6 @@ func (s *IntegrationTestSuite) TestCoinswap() {
 	err = clientCtx.InterfaceRegistry.UnpackAny(respType.(*codectype.Any), &account)
 	s.Require().NoError(err)
 
-	coinswaptypes.RegisterLegacyAminoCodec(clientCtx.LegacyAmino)
-	coinswaptypes.RegisterInterfaces(clientCtx.InterfaceRegistry)
-
 	// test add liquidity (poor not exist)
 	status, err := clientCtx.Client.Status(context.Background())
 	s.Require().NoError(err)

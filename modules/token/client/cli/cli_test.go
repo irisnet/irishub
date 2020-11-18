@@ -92,9 +92,6 @@ func (s *IntegrationTestSuite) TestToken() {
 
 	//------test GetCmdQueryTokens()-------------
 	tokens := &[]tokentypes.TokenI{}
-
-	tokentypes.RegisterLegacyAminoCodec(clientCtx.LegacyAmino)
-	tokentypes.RegisterInterfaces(clientCtx.InterfaceRegistry)
 	bz, err = tokentestutil.QueryTokensExec(clientCtx, from.String())
 	s.Require().NoError(err)
 	s.Require().NoError(clientCtx.LegacyAmino.UnmarshalJSON(bz.Bytes(), tokens))

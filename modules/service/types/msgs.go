@@ -468,13 +468,9 @@ func NewMsgCallService(
 	repeatedFrequency uint64,
 	repeatedTotal int64,
 ) *MsgCallService {
-	pds := make([]string, len(providers))
-	for i, provider := range providers {
-		pds[i] = provider
-	}
 	return &MsgCallService{
 		ServiceName:       serviceName,
-		Providers:         pds,
+		Providers:         providers,
 		Consumer:          consumer,
 		Input:             input,
 		ServiceFeeCap:     serviceFeeCap,
@@ -723,14 +719,9 @@ func NewMsgUpdateRequestContext(
 	repeatedTotal int64,
 	consumer string,
 ) *MsgUpdateRequestContext {
-	pds := make([]string, len(providers))
-	for i, provider := range providers {
-		pds[i] = provider
-	}
-
 	return &MsgUpdateRequestContext{
 		RequestContextId:  requestContextID,
-		Providers:         pds,
+		Providers:         providers,
 		ServiceFeeCap:     serviceFeeCap,
 		Timeout:           timeout,
 		RepeatedFrequency: repeatedFrequency,
