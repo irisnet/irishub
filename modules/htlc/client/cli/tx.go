@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"crypto/rand"
 	"encoding/hex"
 	"fmt"
 
@@ -88,6 +89,7 @@ func GetCmdCreateHTLC() *cobra.Command {
 			if err != nil {
 				return err
 			}
+
 			timeLock, err := cmd.Flags().GetUint64(FlagTimeLock)
 			if err != nil {
 				return err
@@ -102,9 +104,13 @@ func GetCmdCreateHTLC() *cobra.Command {
 				if err != nil {
 					return err
 				}
+			} else if flags.Changed(FlagSecret) {
+				if secret, err = cmd.Flags().GetBytesHex(FlagSecret); err != nil {
+					return err
+				}
+				hashLock = types.GetHashLock(secret, timestamp)
 			} else {
-				secret, err = cmd.Flags().GetBytesHex(FlagSecret)
-				if err != nil {
+				if _, err = rand.Read(secret); err != nil {
 					return err
 				}
 				hashLock = types.GetHashLock(secret, timestamp)
