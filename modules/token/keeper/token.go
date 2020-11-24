@@ -103,6 +103,16 @@ func (k Keeper) HasToken(ctx sdk.Context, denom string) bool {
 	return store.Has(types.KeyMinUint(denom))
 }
 
+// GetOwner returns the owner of the specified token
+func (k Keeper) GetOwner(ctx sdk.Context, denom string) (sdk.AccAddress, error) {
+	token, err := k.GetToken(ctx, denom)
+	if err != nil {
+		return nil, err
+	}
+
+	return token.GetOwner(), nil
+}
+
 // GetParamSet returns token params from the global param store
 func (k Keeper) GetParamSet(ctx sdk.Context) types.Params {
 	var p types.Params
