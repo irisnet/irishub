@@ -66,7 +66,7 @@ func QueryRequestContextByTxQuery(cliCtx client.Context, queryRoute string, para
 I:
 	for i, log := range txInfo.Logs {
 		for _, event := range log.Events {
-			if event.Type == sdk.EventTypeMessage {
+			if event.Type == types.EventTypeCreateContext {
 				for _, attribute := range event.Attributes {
 					if attribute.Key == types.AttributeKeyRequestContextID &&
 						attribute.Value == params.RequestContextId {
@@ -207,8 +207,7 @@ func QueryResponseByTxQuery(
 ) {
 
 	events := []string{
-		fmt.Sprintf("%s.%s='%s'", sdk.EventTypeMessage, sdk.AttributeKeyAction, types.TypeMsgRespondService),
-		fmt.Sprintf("%s.%s='%s'", sdk.EventTypeMessage, types.AttributeKeyRequestID, []byte(fmt.Sprintf("%d", requestID))),
+		fmt.Sprintf("%s.%s='%s'", types.EventTypeRespondService, types.AttributeKeyRequestID, []byte(fmt.Sprintf("%d", requestID))),
 	}
 
 	// NOTE: SearchTxs is used to facilitate the txs query which does not currently

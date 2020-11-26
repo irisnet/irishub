@@ -161,3 +161,33 @@ func QueryEarnedFeesExec(clientCtx client.Context, extraArgs ...string) (testuti
 
 	return clitestutil.ExecTestCLICmd(clientCtx, servicecli.GetCmdQueryEarnedFees(), args)
 }
+
+func QueryRequestContextExec(clientCtx client.Context, contextId string, extraArgs ...string) (testutil.BufferWriter, error) {
+	args := []string{
+		contextId,
+		fmt.Sprintf("--%s=json", cli.OutputFlag),
+	}
+	args = append(args, extraArgs...)
+
+	return clitestutil.ExecTestCLICmd(clientCtx, servicecli.GetCmdQueryRequestContext(), args)
+}
+
+func QueryServiceRequestExec(clientCtx client.Context, requestId string, extraArgs ...string) (testutil.BufferWriter, error) {
+	args := []string{
+		requestId,
+		fmt.Sprintf("--%s=json", cli.OutputFlag),
+	}
+	args = append(args, extraArgs...)
+
+	return clitestutil.ExecTestCLICmd(clientCtx, servicecli.GetCmdQueryServiceRequest(), args)
+}
+
+func QueryServiceResponseExec(clientCtx client.Context, requestId string, extraArgs ...string) (testutil.BufferWriter, error) {
+	args := []string{
+		requestId,
+		fmt.Sprintf("--%s=json", cli.OutputFlag),
+	}
+	args = append(args, extraArgs...)
+
+	return clitestutil.ExecTestCLICmd(clientCtx, servicecli.GetCmdQueryServiceResponse(), args)
+}

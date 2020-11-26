@@ -366,4 +366,32 @@ func (s *IntegrationTestSuite) TestService() {
 	s.Require().NoError(val.ClientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType))
 	withdrawalFees := respType.(*banktypes.QueryAllBalancesResponse).Balances
 	s.Require().Equal(expectedEarnedFees, withdrawalFees.String())
+
+	//------GetCmdQueryRequestContext()-------------
+	contextId := request.RequestContextId
+	respType = proto.Message(&servicetypes.RequestContext{})
+	bz, err = servicetestutil.QueryRequestContextExec(val.ClientCtx, contextId)
+	s.Require().NoError(err)
+	s.Require().NoError(val.ClientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType))
+	contextResp := respType.(*servicetypes.RequestContext)
+	s.Require().False(contextResp.Empty())
+
+	//------GetCmdQueryServiceRequest()-------------
+	requestId := request.Id
+	respType = proto.Message(&servicetypes.Request{})
+	bz, err = servicetestutil.QueryServiceRequestExec(val.ClientCtx, requestId)
+	s.Require().NoError(err)
+	s.Require().NoError(val.ClientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType))
+	requestResp := respType.(*servicetypes.Request)
+	s.Require().False(requestResp.Empty())
+	s.Require().Equal(requestId, requestResp.Id)
+
+	//------GetCmdQueryServiceResponse()-------------
+	respType = proto.Message(&servicetypes.Response{})
+	bz, err = servicetestutil.QueryServiceResponseExec(val.ClientCtx, requestId)
+	s.Require().NoError(err)
+	s.Require().NoError(val.ClientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType))
+	responseResp := respType.(*servicetypes.Response)
+	s.Require().False(responseResp.Empty())
+
 }

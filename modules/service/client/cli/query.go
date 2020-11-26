@@ -253,7 +253,7 @@ func GetCmdQueryServiceRequest() *cobra.Command {
 				return err
 			}
 
-			if res.Request == nil {
+			if res.Request.Empty() {
 				request, err := utils.QueryRequestByTxQuery(clientCtx, types.QuerierRoute, requestID)
 				if err != nil {
 					return err
@@ -367,7 +367,7 @@ func GetCmdQueryServiceResponse() *cobra.Command {
 				return err
 			}
 
-			if res.Response == nil {
+			if res.Response.Empty() {
 				response, err := utils.QueryResponseByTxQuery(clientCtx, types.QuerierRoute, requestID)
 				if err != nil {
 					return err
