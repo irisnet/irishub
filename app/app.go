@@ -83,6 +83,8 @@ import (
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
+	"github.com/CosmWasm/wasmd/x/wasm"
+
 	"github.com/irisnet/irismod/modules/coinswap"
 	coinswapkeeper "github.com/irisnet/irismod/modules/coinswap/keeper"
 	coinswaptypes "github.com/irisnet/irismod/modules/coinswap/types"
@@ -155,6 +157,7 @@ var (
 		service.AppModuleBasic{},
 		oracle.AppModuleBasic{},
 		random.AppModuleBasic{},
+		wasm.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -230,6 +233,7 @@ type IrisApp struct {
 	serviceKeeper  servicekeeper.Keeper
 	oracleKeeper   oraclekeeper.Keeper
 	randomKeeper   randomkeeper.Keeper
+	wasmKeeper     wasm.Keeper
 
 	// the module manager
 	mm *module.Manager
@@ -298,7 +302,7 @@ func NewIrisApp(
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
 		guardiantypes.StoreKey, tokentypes.StoreKey, nfttypes.StoreKey, htlctypes.StoreKey, recordtypes.StoreKey,
-		coinswaptypes.StoreKey, servicetypes.StoreKey, oracletypes.StoreKey, randomtypes.StoreKey,
+		coinswaptypes.StoreKey, servicetypes.StoreKey, oracletypes.StoreKey, randomtypes.StoreKey, wasm.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -370,7 +374,8 @@ func NewIrisApp(
 		AddRoute(paramproposal.RouterKey, params.NewParamChangeProposalHandler(app.paramsKeeper)).
 		AddRoute(distrtypes.RouterKey, distr.NewCommunityPoolSpendProposalHandler(app.distrKeeper)).
 		AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(app.upgradeKeeper)).
-		AddRoute(ibchost.RouterKey, ibcclient.NewClientUpdateProposalHandler(app.ibcKeeper.ClientKeeper))
+		AddRoute(ibchost.RouterKey, ibcclient.NewClientUpdateProposalHandler(app.ibcKeeper.ClientKeeper)).
+		AddRoute(wasm.RouterKey, wasm.NewWasmProposalHandler(app.wasmKeeper, wasm.EnableAllProposals))
 	app.govKeeper = govkeeper.NewKeeper(
 		appCodec, keys[govtypes.StoreKey], app.GetSubspace(govtypes.ModuleName), app.accountKeeper, app.bankKeeper,
 		&stakingKeeper, govRouter,
@@ -427,6 +432,31 @@ func NewIrisApp(
 	)
 
 	app.randomKeeper = randomkeeper.NewKeeper(appCodec, keys[randomtypes.StoreKey], app.bankKeeper, app.serviceKeeper)
+
+	wasmDir := filepath.Join(homePath, "wasm")
+	wasmConfig, err := wasm.ReadWasmConfig(appOpts)
+	if err != nil {
+		panic("error while reading wasm config: " + err.Error())
+	}
+	// The last arguments can contain custom message handlers, and custom query handlers,
+	// if we want to allow any custom callbacks
+	supportedFeatures := "staking"
+	app.wasmKeeper = wasm.NewKeeper(
+		appCodec,
+		keys[wasm.StoreKey],
+		app.GetSubspace(wasm.ModuleName),
+		app.accountKeeper,
+		app.bankKeeper,
+		app.stakingKeeper,
+		app.distrKeeper,
+		bApp.Router(),
+		wasmDir,
+		wasmConfig,
+		supportedFeatures,
+		nil,
+		nil,
+	)
+
 	/****  Module Options ****/
 
 	// NOTE: we may consider parsing `appOpts` inside module constructors. For the moment
@@ -464,6 +494,7 @@ func NewIrisApp(
 		service.NewAppModule(appCodec, app.serviceKeeper, app.accountKeeper, app.bankKeeper),
 		oracle.NewAppModule(appCodec, app.oracleKeeper),
 		random.NewAppModule(appCodec, app.randomKeeper, app.accountKeeper, app.bankKeeper),
+		wasm.NewAppModule(&app.wasmKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -473,11 +504,11 @@ func NewIrisApp(
 	app.mm.SetOrderBeginBlockers(
 		upgradetypes.ModuleName, minttypes.ModuleName, distrtypes.ModuleName,
 		slashingtypes.ModuleName, evidencetypes.ModuleName, stakingtypes.ModuleName,
-		ibchost.ModuleName, htlctypes.ModuleName, randomtypes.ModuleName,
+		ibchost.ModuleName, htlctypes.ModuleName, randomtypes.ModuleName, wasm.ModuleName,
 	)
 	app.mm.SetOrderEndBlockers(
 		crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName,
-		servicetypes.ModuleName,
+		servicetypes.ModuleName, wasm.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -490,7 +521,7 @@ func NewIrisApp(
 		slashingtypes.ModuleName, govtypes.ModuleName, minttypes.ModuleName, crisistypes.ModuleName,
 		ibchost.ModuleName, genutiltypes.ModuleName, evidencetypes.ModuleName, ibctransfertypes.ModuleName,
 		guardiantypes.ModuleName, tokentypes.ModuleName, nfttypes.ModuleName, htlctypes.ModuleName, recordtypes.ModuleName,
-		coinswaptypes.ModuleName, servicetypes.ModuleName, oracletypes.ModuleName, randomtypes.ModuleName,
+		coinswaptypes.ModuleName, servicetypes.ModuleName, oracletypes.ModuleName, randomtypes.ModuleName, wasm.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.crisisKeeper)
@@ -526,6 +557,7 @@ func NewIrisApp(
 		service.NewAppModule(appCodec, app.serviceKeeper, app.accountKeeper, app.bankKeeper),
 		oracle.NewAppModule(appCodec, app.oracleKeeper),
 		random.NewAppModule(appCodec, app.randomKeeper, app.accountKeeper, app.bankKeeper),
+		wasm.NewAppModule(&app.wasmKeeper),
 	)
 
 	app.sm.RegisterStoreDecoders()
@@ -743,6 +775,7 @@ func initParamsKeeper(appCodec codec.BinaryMarshaler, legacyAmino *codec.LegacyA
 	paramsKeeper.Subspace(htlctypes.ModuleName)
 	paramsKeeper.Subspace(coinswaptypes.ModuleName)
 	paramsKeeper.Subspace(servicetypes.ModuleName)
+	paramsKeeper.Subspace(wasm.ModuleName)
 
 	return paramsKeeper
 }

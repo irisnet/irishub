@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+
 	"io"
 	"os"
 
@@ -30,6 +31,8 @@ import (
 	tmcli "github.com/tendermint/tendermint/libs/cli"
 	"github.com/tendermint/tendermint/libs/log"
 	dbm "github.com/tendermint/tm-db"
+
+	"github.com/CosmWasm/wasmd/x/wasm"
 
 	"github.com/irisnet/irishub/app"
 )
@@ -113,6 +116,7 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 
 func addModuleInitFlags(rootCmd *cobra.Command) {
 	crisis.AddModuleInitFlags(rootCmd)
+	wasm.AddModuleInitFlags(rootCmd)
 }
 
 func queryCommand() *cobra.Command {
