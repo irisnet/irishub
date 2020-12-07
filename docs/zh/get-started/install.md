@@ -14,7 +14,7 @@ IRIShub 主网的最新版本是[v0.16.3](https://github.com/irisnet/irishub/rel
 编译安装 IRIShub 软件依赖 **Go 1.14+**。
 :::
 
-按照[官方文档](https://golang.org/doc/install)安装`go`。
+按照[官方文档](https://golang.org/doc/install) 安装`go`。
 
 别忘记设置您的$GOPATH，$GOBIN和$PATH环境变量，例如：
 

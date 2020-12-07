@@ -12,7 +12,7 @@ order: 3
 
 ```bash
 # 初始化节点
-iris init --moniker=<your-custom-name> --chain-id=irishub
+iris init <moniker> --chain-id=irishub
 
 # 下载主网公开的 config.toml 和 genesis.json
 curl -o ~/.iris/config/config.toml https://raw.githubusercontent.com/irisnet/mainnet/master/config/config.toml
@@ -25,7 +25,7 @@ iris start
 :::tip
 您可能会看到一些连接错误，这没关系，P2P网络正在尝试查找可用的连接
 
-可以添加几个[社区公开节点](https://github.com/irisnet/mainnet/blob/master/config/community-peers.md)到`config.toml`中的`persistent_peers`。
+可以添加几个[社区公开节点](https://github.com/irisnet/mainnet/blob/master/config/community-peers.md) 到`config.toml`中的`persistent_peers`。
 :::
 
 :::tip

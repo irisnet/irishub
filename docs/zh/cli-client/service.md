@@ -31,6 +31,7 @@ Service模块允许在IRIS Hub中定义、绑定、调用服务。[了解更多i
 | [fees](#iris-query-service-fees)                        | 查询服务提供者的收益                         |
 | [withdraw-fees](#iris-tx-service-withdraw-fees)         | 提取服务提供者的收益                         |
 | [schema](#iris-query-service-schema)                    | 通过 schema 名称查询系统 schema              |
+| [params](#iris-query-service-params)                    | 查询当前服务参数值                         |
 
 ## iris tx service define
 
@@ -581,4 +582,12 @@ iris query service schema pricing
 
 ```bash
 iris query service schema result
+```
+
+## iris query service params
+
+查询当前服务参数值。
+
+```bash
+iris query service params [flags]
 ```
