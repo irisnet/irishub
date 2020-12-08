@@ -4,6 +4,7 @@ package irishub.guardian;
 import "gogoproto/gogo.proto";
 import "guardian/guardian.proto";
 import "google/api/annotations.proto";
+import "cosmos/query/pagination.proto";
 
 option go_package = "github.com/irisnet/irishub/modules/guardian/types";
 
@@ -17,9 +18,13 @@ service Query {
 
 // QuerySupersRequest is request type for the Query/Supers RPC method
 message QuerySupersRequest {
+    // pagination defines an optional pagination for the request.
+    cosmos.query.PageRequest pagination = 1;
 }
 
 // QuerySupersResponse is response type for the Query/Supers RPC method
 message QuerySupersResponse {
     repeated Super supers = 1 [(gogoproto.nullable) = false];
+
+    cosmos.query.PageResponse pagination = 2;
 }
