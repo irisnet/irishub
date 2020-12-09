@@ -1,106 +1,23 @@
 # Wasm
 
-Wasm module allows you to manage wasm
+Wasm module allows you to manage smart contract
 
 ## Available Commands
 
 | Name                                | Description                        |
 | ----------------------------------- | ---------------------------------- |
-| [clear-contract-admin](#iris-tx-wasm-clear-contract-admin)       | Clears admin for a contract to prevent further migrations                  |
-| [execute](#iris-tx-wasm-execute)         | Execute a command on a wasm contract             |
+| [store](#iris-tx-wasm-store)  | Upload a wasm binary              |
 | [instantiate](#iris-tx-wasm-instantiate) | Instantiate a wasm contract  |
+| [execute](#iris-tx-wasm-execute)         | Execute a command on a wasm contract             |
 | [migrate](#iris-tx-wasm-migrate)         | Migrate a wasm contract to a new code version |
 | [set-contract-admin](#iris-tx-wasm-set-contract-admin)    | Set new admin for a contract            |
-| [store](#iris-tx-wasm-store)  | Upload a wasm binary              |
+| [clear-contract-admin](#iris-tx-wasm-clear-contract-admin)       | Clears admin for a contract to prevent further migrations                  |
 | [code](#iris-query-wasm-code)        | Downloads wasm bytecode for given code id       |
 | [contract](#iris-query-wasm-contract)  | Prints out metadata of a contract given its address     |
 | [contract-history](#iris-query-wasm-contract-history)  | Prints out the code history for a contract given its address     |
-| [contract-state](#iris-query-wasm-contract-state)  | Querying commands for the wasm module     |
 | [list-code](#iris-query-wasm-list-code)  | List all wasm bytecode on the chain     |
 | [list-contract-by-code](#iris-query-wasm-list-contract-by-code)  | List wasm all bytecode on the chain for given code id     |
-
-## iris tx wasm clear-contract-admin
-
-Clears admin for a contract to prevent further migrations
-
-```bash
-iris tx wasm clear-contract-admin [contract_addr_bech32] [flags]
-```
-
-## iris tx wasm execute
-
-Execute a command on a wasm contract
-
-```bash
-iris tx wasm execute [contract_addr_bech32] [json_encoded_send_args] [flags]
-```
-
-### Execute the smart contract
-
-```bash
-iris tx wasm execute iaa18vd8fpwxzck93qlwghaj6arh4p7c5n89fqcgm9 "$Vote" 
-    --from node0 
-    --chain-id=test 
-    --keyring-backend=file 
-    --home ./cschain/node0/cschaincli 
-    --fees 6point 
-    --gas="auto" -b block
-```
-
-## iris tx wasm instantiate
-
-Instantiate a wasm contract
-
-```bash
-iris tx wasm instantiate [code_id_int64] [json_encoded_init_args] --label [text] --admin [address,optional] --amount [coins,optional] [flags]
-```
-**Flags:**
-
-| Name, shorthand    | Type    | Required | Default       | Description                                                                                                                    |
-| -------------------| ------- | -------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| --label            | string  |          |               | A human-readable name for this contract in lists                                   |
-| --admin            | string  |          |               | Address of an admin               |
-| --amount           | string  |          |               | Coins to send to the contract during instantiation. |
-
-
-### Initialize the smart contract
-
-```bash
-iris tx wasm instantiate "$CODE_ID" "$INIT" 
-    --from node0 
-    --label "mint iris" 
-    --chain-id=test 
-    --keyring-backend=file 
-    --home ./cschain/node0/cschaincli 
-    --fees 6point 
-    --gas="auto" -b block
-```
-
-## iris tx wasm migrate
-
-Migrate a wasm contract to a new code version
-
-```bash
-iris tx wasm migrate [contract_addr_bech32] [new_code_id_int64] [json_encoded_migration_args] [flags]
-```
-## iris tx wasm set-contract-admin
-
-Set new admin for a contract
-
-```bash
-iris tx wasm set-contract-admin [contract_addr_bech32] [new_admin_addr_bech32] [flags]
-```
-
-### Set the admin of the smart contract
-
-```bash
-iris tx wasm set-contract-admin iaa18vd8fpwxzck93qlwghaj6arh4p7c5n89fqcgm9 iaa18lwh8r66wf2hc278ncu4mlgqcxh5slhudkuler 
-    --from node0  
-    --chain-id=test 
-    --keyring-backend=file 
-    --home ./cschain/node0/cschaincli 
-    --fees 6point --gas="auto" -b block
-```
+| [contract-state](#iris-query-wasm-contract-state)  | Querying commands for the wasm module     |
 
 ## iris tx wasm store
 
@@ -132,6 +49,103 @@ iris tx wasm store election.wasm
     --gas="auto"
 ```
 
+
+## iris tx wasm instantiate
+
+Instantiate a wasm contract
+
+```bash
+iris tx wasm instantiate [code_id_int64] [json_encoded_init_args] --label [text] --admin [address,optional] --amount [coins,optional] [flags]
+```
+**Flags:**
+
+| Name, shorthand    | Type    | Required | Default       | Description                                                                                                                    |
+| -------------------| ------- | -------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| --label            | string  |          |               | A human-readable name for this contract in lists                                   |
+| --admin            | string  |          |               | Address of an admin               |
+| --amount           | string  |          |               | Coins to send to the contract during instantiation. |
+
+
+### Initialize the smart contract
+
+```bash
+iris tx wasm instantiate "$CODE_ID" "$INIT" 
+    --from node0 
+    --label "mint iris" 
+    --chain-id=test 
+    --keyring-backend=file 
+    --home ./cschain/node0/cschaincli 
+    --fees 6point 
+    --gas="auto" -b block
+```
+
+## iris tx wasm execute
+
+Execute a command on a wasm contract
+
+```bash
+iris tx wasm execute [contract_addr_bech32] [json_encoded_send_args] [flags]
+```
+
+### Execute the smart contract
+
+```bash
+iris tx wasm execute iaa18vd8fpwxzck93qlwghaj6arh4p7c5n89fqcgm9 "$Vote" 
+    --from node0 
+    --chain-id=test 
+    --keyring-backend=file 
+    --home ./cschain/node0/cschaincli 
+    --fees 6point 
+    --gas="auto" -b block
+```
+
+## iris tx wasm migrate
+
+Migrate a wasm contract to a new code version
+
+```bash
+iris tx wasm migrate [contract_addr_bech32] [new_code_id_int64] [json_encoded_migration_args] [flags]
+```
+
+## iris tx wasm set-contract-admin
+
+Set new admin for a contract
+
+```bash
+iris tx wasm set-contract-admin [contract_addr_bech32] [new_admin_addr_bech32] [flags]
+```
+
+### Set the admin of the smart contract
+
+```bash
+iris tx wasm set-contract-admin iaa18vd8fpwxzck93qlwghaj6arh4p7c5n89fqcgm9 iaa18lwh8r66wf2hc278ncu4mlgqcxh5slhudkuler 
+    --from node0  
+    --chain-id=test 
+    --keyring-backend=file 
+    --home ./cschain/node0/cschaincli 
+    --fees 6point --gas="auto" -b block
+```
+
+## iris tx wasm clear-contract-admin
+
+Clears admin for a contract to prevent further migrations
+
+```bash
+iris tx wasm clear-contract-admin [contract_addr_bech32] [flags]
+```
+
+### Clear the admin of the smart contract
+
+```bash
+iris tx wasm clear-contract-admin iaa18vd8fpwxzck93qlwghaj6arh4p7c5n89fqcgm9 
+    --from node0  
+    --chain-id=test 
+    --keyring-backend=file 
+    --home ./cschain/node0/cschaincli 
+    --fees 6point --gas="auto" -b block
+
+```
+
 ## iris query wasm code
 
 Downloads wasm bytecode for given code id
@@ -154,6 +168,12 @@ Prints out metadata of a contract given its address
 iris query wasm contract [bech32_address] [flags]
 ```
 
+### Query information of an smart contract
+
+```bash
+iris query wasm contract iaa18vd8fpwxzck93qlwghaj6arh4p7c5n89fqcgm9
+```
+
 ## iris query wasm contract-history
 
 Prints out the code history for a contract given its address
@@ -162,13 +182,9 @@ Prints out the code history for a contract given its address
 iris query wasm contract-history [bech32_address] [flags]
 ```
 
-## iris query wasm contract-state
-
-Querying commands for the wasm module
-
+### Prints out the code history for a contract
 ```bash
-iris query wasm contract-state [command]
-iris query wasm contract-state [flags]
+iris query wasm contract-history iaa18vd8fpwxzck93qlwghaj6arh4p7c5n89fqcgm9
 ```
 
 ## iris query wasm list-code
@@ -186,3 +202,24 @@ List wasm all bytecode on the chain for given code id
 ```bash
 iris query wasm list-contract-by-code [code_id] [flags]
 ```
+
+## iris query wasm contract-state
+
+Querying commands for the wasm module
+
+```bash
+iris query wasm contract-state [command]
+iris query wasm contract-state [flags]
+```
+### Query all wasm contract-state
+
+```bash
+iris query wasm contract-state all iaa18vd8fpwxzck93qlwghaj6arh4p7c5n89fqcgm9
+```
+
+### Query wasm contract-state by given contract address and key
+
+```bash
+iris query wasm contract-state raw iaa18vd8fpwxzck93qlwghaj6arh4p7c5n89fqcgm9 0006636F6E666967
+```
+
