@@ -36,6 +36,5 @@ func (k Keeper) Supers(c context.Context, req *types.QuerySupersRequest) (*types
 		return nil, status.Errorf(codes.InvalidArgument, "paginate: %v", err)
 	}
 
-
-	return &types.QuerySupersResponse{Supers: supers,Pagination: pageRes}, nil
+	return &types.QuerySupersResponse{Supers: supers, Pagination: pageRes}, nil
 }
