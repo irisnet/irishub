@@ -166,8 +166,7 @@ benchmark:
 ### Local validator nodes using docker and docker-compose
 
 testnet-init:
-	@if ! [ -f build/iris ]; then $(MAKE) build-linux ; fi
-	@if ! [ -f build/nodecluster/node0/iris/config/genesis.json ]; then docker run --rm -v $(CURDIR)/build:/home alpine:3.11 /home/iris testnet --v 4 --output-dir /home/nodecluster --chain-id irishub-test --keyring-backend test --starting-ip-address 192.168.10.2 ; fi
+	@if ! [ -f build/nodecluster/node0/iris/config/genesis.json ]; then docker run --rm -v $(CURDIR)/build:/home irisnet/irishub iris testnet --v 4 --output-dir /home/nodecluster --chain-id irishub-test --keyring-backend test --starting-ip-address 192.168.10.2 ; fi
 	@echo "To install jq command, please refer to this page: https://stedolan.github.io/jq/download/"
 	@jq '.app_state.accounts+= [{"address": "iaa1ljemm0yznz58qxxs8xyak7fashcfxf5lgl4zjx", "coins": [ "1000000000000uiris" ], "sequence_number": "0", "account_number": "0"}]' build/nodecluster/node0/iris/config/genesis.json > build/genesis_temp.json ;
 	@sudo cp build/genesis_temp.json build/nodecluster/node0/iris/config/genesis.json
