@@ -7,6 +7,7 @@ import (
 	"google.golang.org/grpc/status"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/query"
 
 	"github.com/irisnet/irishub/modules/guardian/types"
 )
@@ -18,16 +19,22 @@ func (k Keeper) Supers(c context.Context, req *types.QuerySupersRequest) (*types
 	if req == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "empty request")
 	}
-
 	ctx := sdk.UnwrapSDKContext(c)
 	var supers []types.Super
-	k.IterateSupers(
-		ctx,
-		func(super types.Super) bool {
-			supers = append(supers, super)
-			return false
-		},
-	)
+	store := ctx.KVStore(k.storeKey)
 
-	return &types.QuerySupersResponse{Supers: supers}, nil
+	pageRes, err := query.Paginate(store, req.Pagination, func(key []byte, value []byte) error {
+		var super types.Super
+		err := k.cdc.UnmarshalBinaryBare(value, &super)
+		if err != nil {
+			return err
+		}
+		supers = append(supers, super)
+		return nil
+	})
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "paginate: %v", err)
+	}
+
+	return &types.QuerySupersResponse{Supers: supers, Pagination: pageRes}, nil
 }
