@@ -8,7 +8,7 @@ Tx module allows you to sign or broadcast transactions
 | ------------------------------- | ------------------------------------------------------------------------------------- |
 | [sign](#iris-tx-sign)           | Sign transactions generated offline                                                   |
 | [broadcast](#iris-tx-broadcast) | Broadcast a signed transaction to the network                                         |
-| [multisig](#iris-tx-multisign)  | Sign the same transaction by multiple accounts                                        |
+| [multisign](#iris-tx-multisign)  | Sign the same transaction by multiple accounts                                        |
 | [tx](#iris-query-tx)            | Query for a transaction by hash in a committed block                                  |
 | [txs](#iris-query-txs)          | Search for transactions that match the exact given events where results are paginated |
 

@@ -12,7 +12,7 @@ order: 3
 
 ```bash
 # initialize node configurations
-iris init --moniker=<your-custom-name> --chain-id=irishub
+iris init <moniker> --chain-id=irishub
 
 # download mainnet public config.toml and genesis.json
 curl -o ~/.iris/config/config.toml https://raw.githubusercontent.com/irisnet/mainnet/master/config/config.toml

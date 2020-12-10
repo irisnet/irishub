@@ -6,16 +6,16 @@ Rand模块允许你向IRIS Hub发送随机数请求，查询随机数或待处�
 
 | 名称                                             | 描述                               |
 | ------------------------------------------------ | ---------------------------------- |
-| [request-random](#iris-tx-random-request-random) | 请求一个随机数                     |
+| [request](#iris-tx-random-request)               | 请求具有可选块间隔的随机数                     |
 | [random](#iris-query-random-random)              | 使用ID查询链上生成的随机数         |
 | [queue](#iris-query-random-queue)                | 查询随机数请求队列，支持可选的高度 |
 
-## iris tx random request-random
+## iris tx random request
 
 请求一个随机数。
 
 ```bash
-iris tx random request-random [flags]
+iris tx random request [flags]
 ```
 
 **标志：**
@@ -32,10 +32,10 @@ iris tx random request-random [flags]
 
 ```bash
 # without oracle
-iris tx random request-random --block-interval=100 --from=<key-name> --chain-id=irishub --fees=0.3iris
+iris tx random request --block-interval=100 --from=<key-name> --chain-id=irishub --fees=0.3iris
 
 # with oracle
-iris tx random request-random --block-interval=100 --oracle=true --service-fee-cap=1iris --from=<key-name> --chain-id=irishub --fees=0.3iris
+iris tx random request --block-interval=100 --oracle=true --service-fee-cap=1iris --from=<key-name> --chain-id=irishub --fees=0.3iris
 ```
 
 :::tip
