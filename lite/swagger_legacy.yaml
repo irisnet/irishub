@@ -27,8 +27,6 @@ tags:
     description: Record module APIs
   - name: Service
     description: Service module APIs
-  - name: Identity
-    description: Identity module APIs
   - name: Misc
     description: Query app version
 host: localhost:1317
@@ -2560,118 +2558,6 @@ paths:
           description: Invalid parameters
         "500":
           description: Internal Server Error
-  "/identity/identities":
-    post:
-      deprecated: true
-      summary: Create an identity
-      tags:
-        - Identity
-      consumes:
-        - application/json
-      produces:
-        - application/json
-      parameters:
-        - in: body
-          name: CreateIdentityReq
-          required: true
-          schema:
-            type: object
-            properties:
-              base_req:
-                $ref: "#/definitions/BaseReq"
-              id:
-                type: string
-                example: "2c4355bcceef470b823ca0fe24a2d900"
-              pubkey:
-                type: string
-                example: "02fdf3dde4468dad14138acc85e0152ee1ee08750627df5dd5c17a1013fe5d59ea"
-              pubkey_algo:
-                type: string
-                example: "ECDSA"
-              certificate:
-                type: string
-              credentials:
-                type: string
-                example: "https://kyc.com/user/10001"
-              owner:
-                $ref: "#/definitions/Address"
-      responses:
-        200:
-          description: Unsigned tx was succesfully generated
-        400:
-          description: Invalid parameters
-        500:
-          description: Internal Server Error
-  "/identity/identities/{id}":
-    get:
-      deprecated: true
-      summary: Query an identity
-      tags:
-        - Identity
-      parameters:
-        - in: path
-          name: id
-          description: ID of the identity
-          required: true
-          schema:
-            type: string
-            example: "2c4355bcceef470b823ca0fe24a2d900"
-      responses:
-        200:
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: "#/definitions/Identity"
-        400:
-          description: Invalid ID
-        500:
-          description: Internal Server Error
-    put:
-      deprecated: true
-      summary: Update an identity
-      tags:
-        - Identity
-      consumes:
-        - application/json
-      produces:
-        - application/json
-      parameters:
-        - in: path
-          name: id
-          description: ID of the identity
-          required: true
-          schema:
-            type: string
-            example: "2c4355bcceef470b823ca0fe24a2d900"
-        - in: body
-          name: UpdateIdentityReq
-          required: true
-          schema:
-            type: object
-            properties:
-              base_req:
-                $ref: "#/definitions/BaseReq"
-              pubkey:
-                type: string
-                example: "02fdf3dde4468dad14138acc85e0152ee1ee08750627df5dd5c17a1013fe5d59ea"
-              pubkey_algo:
-                type: string
-                example: "ECDSA"
-              certificate:
-                type: string
-              credentials:
-                type: string
-                example: "https://kyc.com/user/10001"
-              owner:
-                $ref: "#/definitions/Address"
-      responses:
-        200:
-          description: Unsigned tx was succesfully generated
-        400:
-          description: Invalid parameters
-        500:
-          description: Internal Server Error
 definitions:
   CheckTxResult:
     type: object
@@ -3341,29 +3227,3 @@ definitions:
         type: array
         items:
           $ref: "#/definitions/Coin"
-  Identity:
-    type: object
-    properties:
-      id:
-        type: string
-        example: "2c4355bcceef470b823ca0fe24a2d900"
-      pubkeys:
-        type: array
-        items:
-          type: object
-          properties:
-            pubkey:
-              type: string
-              example: "02fdf3dde4468dad14138acc85e0152ee1ee08750627df5dd5c17a1013fe5d59ea"
-            algorithm:
-              type: string
-              example: "ECDSA"
-      certificates:
-        type: array
-        items:
-          type: string
-      credentials:
-        type: string
-        example: "https://kyc.com/user/10001"
-      owner:
-        $ref: "#/definitions/Address"
