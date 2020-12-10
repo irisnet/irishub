@@ -118,10 +118,10 @@
             }
         },
         {
-            "url": "./tmp-swagger-gen/coinswap/query.swagger.json",
+            "url": "./tmp-swagger-gen/token/query.swagger.json",
             "operationIds": {
                 "rename": {
-                    "Params": "CoinswapParams"
+                    "Params": "TokenParams"
                 }
             }
         },
@@ -134,10 +134,26 @@
             }
         },
         {
+            "url": "./tmp-swagger-gen/coinswap/query.swagger.json",
+            "operationIds": {
+                "rename": {
+                    "Params": "CoinswapParams"
+                }
+            }
+        },
+        {
             "url": "./tmp-swagger-gen/nft/query.swagger.json",
             "operationIds": {
                 "rename": {
                     "Params": "NFTParams"
+                }
+            }
+        },
+        {
+            "url": "./tmp-swagger-gen/service/query.swagger.json",
+            "operationIds": {
+                "rename": {
+                    "Params": "ServiceParams"
                 }
             }
         },
@@ -166,22 +182,6 @@
             }
         },
         {
-            "url": "./tmp-swagger-gen/service/query.swagger.json",
-            "operationIds": {
-                "rename": {
-                    "Params": "ServiceParams"
-                }
-            }
-        },
-        {
-            "url": "./tmp-swagger-gen/token/query.swagger.json",
-            "operationIds": {
-                "rename": {
-                    "Params": "TokenParams"
-                }
-            }
-        },
-        {
             "url": "./tmp-swagger-gen/mint/query.swagger.json",
             "operationIds": {
                 "rename": {
@@ -194,6 +194,14 @@
             "operationIds": {
                 "rename": {
                     "Params": "GuardianParams"
+                }
+            }
+        },
+        {
+            "url": "./tmp-swagger-gen/wasm/query.swagger.json",
+            "operationIds": {
+                "rename": {
+                    "Params": "WasmParams"
                 }
             }
         }

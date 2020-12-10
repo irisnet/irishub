@@ -2,16 +2,24 @@
 
 set -eo pipefail
 
-IRISMOD_VERSION=v1.1.1-0.20201126013702-4999558204d6
-SDK_VERSION=v0.40.0-rc3
+SDK_VERSION=v0.34.4-0.20201014023301-f172e47973d0
+IRISMOD_VERSION=v1.1.1-0.20201015064111-9d21ec6ad6fc
+WASMD_VERSION=v0.12.1
+WASMD_PROTO_DIR=x/wasm/internal/types
 
+chmod -R 755 ${GOPATH}/pkg/mod/github.com/irisnet/cosmos-sdk@${SDK_VERSION}/proto/cosmos
+chmod -R 755 ${GOPATH}/pkg/mod/github.com/irisnet/cosmos-sdk@${SDK_VERSION}/proto/ibc
 chmod -R 755 ${GOPATH}/pkg/mod/github.com/irisnet/irismod@${IRISMOD_VERSION}/proto
-chmod -R 755 ${GOPATH}/pkg/mod/github.com/cosmos/cosmos-sdk@${SDK_VERSION}/proto/cosmos
-chmod -R 755 ${GOPATH}/pkg/mod/github.com/cosmos/cosmos-sdk@${SDK_VERSION}/proto/ibc
+chmod -R 755 ${GOPATH}/pkg/mod/github.com/!cosm!wasm/wasmd@${WASMD_VERSION}/${WASMD_PROTO_DIR}
 
+mkdir -p ./proto/wasm
+
+cp -r ${GOPATH}/pkg/mod/github.com/irisnet/cosmos-sdk@${SDK_VERSION}/proto/cosmos ./proto
+cp -r ${GOPATH}/pkg/mod/github.com/irisnet/cosmos-sdk@${SDK_VERSION}/proto/ibc ./proto
 cp -r ${GOPATH}/pkg/mod/github.com/irisnet/irismod@${IRISMOD_VERSION}/proto ./
-cp -r ${GOPATH}/pkg/mod/github.com/cosmos/cosmos-sdk@${SDK_VERSION}/proto/cosmos ./proto
-cp -r ${GOPATH}/pkg/mod/github.com/cosmos/cosmos-sdk@${SDK_VERSION}/proto/ibc ./proto
+cp -r ${GOPATH}/pkg/mod/github.com/!cosm!wasm/wasmd@${WASMD_VERSION}/${WASMD_PROTO_DIR}/*.proto ./proto/wasm
+
+sed -i "" "s@${WASMD_PROTO_DIR}@wasm@g" `find ./proto/wasm -type file`
 
 mkdir -p ./tmp-swagger-gen
 
@@ -51,3 +59,4 @@ rm -rf ./proto/random
 rm -rf ./proto/record
 rm -rf ./proto/service
 rm -rf ./proto/token
+rm -fr ./proto/wasm
