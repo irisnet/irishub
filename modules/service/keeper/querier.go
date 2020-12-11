@@ -153,11 +153,11 @@ func queryRequest(ctx sdk.Context, req abci.RequestQuery, k Keeper, legacyQuerie
 		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, err.Error())
 	}
 
-	if len(params.RequestID) != types.RequestIDLen {
+	if len(params.RequestID) != types.RequestIDLen/2 {
 		return nil, sdkerrors.Wrapf(
 			types.ErrInvalidRequestID,
-			"invalid length, expected: %d, got: %d",
-			types.RequestIDLen, len(params.RequestID),
+			"invalid length in bytes, expected: %d, got: %d",
+			types.RequestIDLen/2, len(params.RequestID),
 		)
 	}
 
@@ -205,9 +205,9 @@ func queryResponse(ctx sdk.Context, req abci.RequestQuery, k Keeper, legacyQueri
 		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, err.Error())
 	}
 
-	if len(params.RequestID) != types.RequestIDLen {
-		return nil, sdkerrors.Wrapf(types.ErrInvalidRequestID, "invalid length, expected: %d, got: %d",
-			types.RequestIDLen, len(params.RequestID))
+	if len(params.RequestID) != types.RequestIDLen/2 {
+		return nil, sdkerrors.Wrapf(types.ErrInvalidRequestID, "invalid length in bytes, expected: %d, got: %d",
+			types.RequestIDLen/2, len(params.RequestID))
 	}
 
 	response, _ := k.GetResponse(ctx, params.RequestID)

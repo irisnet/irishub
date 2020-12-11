@@ -1024,7 +1024,7 @@ func ValidateServiceFeeCap(serviceFeeCap sdk.Coins) error {
 
 func ValidateRequestID(reqID string) error {
 	if len(reqID) != RequestIDLen {
-		return sdkerrors.Wrapf(ErrInvalidRequestID, "length of the request ID must be %d in bytes", RequestIDLen)
+		return sdkerrors.Wrapf(ErrInvalidRequestID, "length of the request ID must be %d", RequestIDLen)
 	}
 	if _, err := hex.DecodeString(reqID); err != nil {
 		return sdkerrors.Wrap(ErrInvalidRequestID, "request ID must be a hex encoded string")
