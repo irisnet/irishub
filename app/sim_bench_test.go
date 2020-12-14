@@ -28,7 +28,7 @@ func BenchmarkFullAppSimulation(b *testing.B) {
 		}
 	}()
 
-	app := NewIrisApp(logger, db, nil, true, map[int64]bool{}, DefaultNodeHome, simapp.FlagPeriodValue, MakeEncodingConfig(), interBlockCacheOpt())
+	app := NewIrisApp(logger, db, nil, true, map[int64]bool{}, DefaultNodeHome, simapp.FlagPeriodValue, MakeEncodingConfig(), EmptyAppOptions{}, interBlockCacheOpt())
 
 	// run randomized simulation
 	_, simParams, simErr := simulation.SimulateFromSeed(
@@ -40,6 +40,7 @@ func BenchmarkFullAppSimulation(b *testing.B) {
 		simapp.SimulationOperations(app, app.AppCodec(), config),
 		app.ModuleAccountAddrs(),
 		config,
+		app.AppCodec(),
 	)
 
 	// export state and simParams before the simulation error is checked
@@ -72,7 +73,7 @@ func BenchmarkInvariants(b *testing.B) {
 		}
 	}()
 
-	app := NewIrisApp(logger, db, nil, true, map[int64]bool{}, DefaultNodeHome, simapp.FlagPeriodValue, MakeEncodingConfig(), interBlockCacheOpt())
+	app := NewIrisApp(logger, db, nil, true, map[int64]bool{}, DefaultNodeHome, simapp.FlagPeriodValue, MakeEncodingConfig(), EmptyAppOptions{}, interBlockCacheOpt())
 
 	// run randomized simulation
 	_, simParams, simErr := simulation.SimulateFromSeed(
@@ -84,6 +85,7 @@ func BenchmarkInvariants(b *testing.B) {
 		simapp.SimulationOperations(app, app.AppCodec(), config),
 		app.ModuleAccountAddrs(),
 		config,
+		app.AppCodec(),
 	)
 
 	// export state and simParams before the simulation error is checked

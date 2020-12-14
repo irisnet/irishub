@@ -15,6 +15,7 @@ This module provides the basic functionalities for [Governance](../features/gove
 | [tally](#iris-query-gov-tally)                  | Get the tally of a proposal vote                                  |
 | [param](#iris-query-gov-param)                  | Query the parameters (voting                                      |
 | [params](#iris-query-gov-params)                | Query the parameters of the governance process                    |
+| [proposer](#iris-query-gov-proposer)            | Query which address proposed a proposal with a given ID.                                    |
 | [submit-proposal](#iris-tx-gov-submit-proposal) | Submit a proposal along with an initial deposit                   |
 | [deposit](#iris-tx-gov-deposit)                 | Deposit tokens for an active proposal                             |
 | [vote](#iris-tx-gov-vote)                       | Vote for an active proposal, options: yes/no/no_with_veto/abstain |
@@ -155,6 +156,14 @@ Query the all the parameters for the governance process.
 
 ```bash
 iris query gov param [param-type] [flags]
+```
+
+## iris query gov proposer
+
+Query which address proposed a proposal with a given ID.
+
+```bash
+iris query gov proposer [proposal-id] [flags]
 ```
 
 ## iris tx gov submit-proposal

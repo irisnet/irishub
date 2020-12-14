@@ -10,7 +10,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	"github.com/cosmos/cosmos-sdk/x/staking"
-	"github.com/cosmos/cosmos-sdk/x/staking/exported"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 )
 
@@ -36,13 +35,13 @@ func (app *IrisApp) ExportAppStateAndValidators(
 		return servertypes.ExportedApp{}, err
 	}
 
-	validators := staking.WriteValidators(ctx, app.stakingKeeper)
+	validators, err := staking.WriteValidators(ctx, app.stakingKeeper)
 	return servertypes.ExportedApp{
 		AppState:        appState,
 		Validators:      validators,
 		Height:          height,
 		ConsensusParams: app.BaseApp.GetConsensusParams(ctx),
-	}, nil
+	}, err
 }
 
 // prepare for fresh start at zero height
@@ -72,7 +71,7 @@ func (app *IrisApp) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs [
 	/* Handle fee distribution state. */
 
 	// withdraw all validator commission
-	app.stakingKeeper.IterateValidators(ctx, func(_ int64, val exported.ValidatorI) (stop bool) {
+	app.stakingKeeper.IterateValidators(ctx, func(_ int64, val stakingtypes.ValidatorI) (stop bool) {
 		_, _ = app.distrKeeper.WithdrawValidatorCommission(ctx, val.GetOperator())
 		return false
 	})
@@ -96,7 +95,7 @@ func (app *IrisApp) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs [
 	ctx = ctx.WithBlockHeight(0)
 
 	// reinitialize all validators
-	app.stakingKeeper.IterateValidators(ctx, func(_ int64, val exported.ValidatorI) (stop bool) {
+	app.stakingKeeper.IterateValidators(ctx, func(_ int64, val stakingtypes.ValidatorI) (stop bool) {
 		// donate any unwithdrawn outstanding reward fraction tokens to the community pool
 		scraps := app.distrKeeper.GetValidatorOutstandingRewardsCoins(ctx, val.GetOperator())
 		feePool := app.distrKeeper.GetFeePool(ctx)
@@ -162,7 +161,10 @@ func (app *IrisApp) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs [
 
 	iter.Close()
 
-	_ = app.stakingKeeper.ApplyAndReturnValidatorSetUpdates(ctx)
+	_, err := app.stakingKeeper.ApplyAndReturnValidatorSetUpdates(ctx)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	/* Handle slashing state. */
 

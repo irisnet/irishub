@@ -2,8 +2,12 @@ package cmd
 
 import (
 	"context"
+
 	"io"
 	"os"
+
+	"github.com/spf13/cast"
+	"github.com/spf13/cobra"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
@@ -21,14 +25,15 @@ import (
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	"github.com/cosmos/cosmos-sdk/x/crisis"
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
-	"github.com/spf13/cast"
-	"github.com/spf13/cobra"
+
 	tmcli "github.com/tendermint/tendermint/libs/cli"
 	"github.com/tendermint/tendermint/libs/log"
 	dbm "github.com/tendermint/tm-db"
 
-	"github.com/irisnet/irishub/address"
+	"github.com/CosmWasm/wasmd/x/wasm"
+
 	"github.com/irisnet/irishub/app"
 	"github.com/irisnet/irishub/migrate"
 )
@@ -85,12 +90,6 @@ func Execute(rootCmd *cobra.Command) error {
 }
 
 func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
-	config := sdk.GetConfig()
-	config.SetBech32PrefixForAccount(address.Bech32PrefixAccAddr, address.Bech32PrefixAccPub)
-	config.SetBech32PrefixForValidator(address.Bech32PrefixValAddr, address.Bech32PrefixValPub)
-	config.SetBech32PrefixForConsensusNode(address.Bech32PrefixConsAddr, address.Bech32PrefixConsPub)
-	config.Seal()
-
 	authclient.Codec = encodingConfig.Marshaler
 
 	rootCmd.AddCommand(
@@ -105,7 +104,7 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 		debug.Cmd(),
 	)
 
-	server.AddCommands(rootCmd, app.DefaultNodeHome, newApp, createIrisappAndExport)
+	server.AddCommands(rootCmd, app.DefaultNodeHome, newApp, createIrisappAndExport, addModuleInitFlags)
 
 	// add keybase, auxiliary RPC, query, and tx child commands
 	rootCmd.AddCommand(
@@ -114,6 +113,11 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 		txCommand(),
 		keys.Commands(app.DefaultNodeHome),
 	)
+}
+
+func addModuleInitFlags(rootCmd *cobra.Command) {
+	crisis.AddModuleInitFlags(rootCmd)
+	wasm.AddModuleInitFlags(rootCmd)
 }
 
 func queryCommand() *cobra.Command {
@@ -189,6 +193,7 @@ func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, appOpts serverty
 		cast.ToString(appOpts.Get(flags.FlagHome)),
 		cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod)),
 		app.MakeEncodingConfig(), // Ideally, we would reuse the one created by NewRootCmd.
+		appOpts,
 		baseapp.SetPruning(pruningOpts),
 		baseapp.SetMinGasPrices(cast.ToString(appOpts.Get(server.FlagMinGasPrices))),
 		baseapp.SetHaltHeight(cast.ToUint64(appOpts.Get(server.FlagHaltHeight))),
@@ -203,18 +208,18 @@ func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, appOpts serverty
 // and exports state.
 func createIrisappAndExport(
 	logger log.Logger, db dbm.DB, traceStore io.Writer, height int64, forZeroHeight bool, jailAllowedAddrs []string,
-) (servertypes.ExportedApp, error) {
+	appOpts servertypes.AppOptions) (servertypes.ExportedApp, error) {
 	encCfg := app.MakeEncodingConfig() // Ideally, we would reuse the one created by NewRootCmd.
 	encCfg.Marshaler = codec.NewProtoCodec(encCfg.InterfaceRegistry)
 	var irisApp *app.IrisApp
 	if height != -1 {
-		irisApp = app.NewIrisApp(logger, db, traceStore, false, map[int64]bool{}, "", uint(1), encCfg)
+		irisApp = app.NewIrisApp(logger, db, traceStore, false, map[int64]bool{}, "", uint(1), encCfg, appOpts)
 
 		if err := irisApp.LoadHeight(height); err != nil {
 			return servertypes.ExportedApp{}, err
 		}
 	} else {
-		irisApp = app.NewIrisApp(logger, db, traceStore, true, map[int64]bool{}, "", uint(1), encCfg)
+		irisApp = app.NewIrisApp(logger, db, traceStore, true, map[int64]bool{}, "", uint(1), encCfg, appOpts)
 	}
 
 	return irisApp.ExportAppStateAndValidators(forZeroHeight, jailAllowedAddrs)

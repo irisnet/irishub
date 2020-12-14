@@ -5,6 +5,12 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/spf13/cast"
+
+	"github.com/cosmos/cosmos-sdk/client"
+	servertypes "github.com/cosmos/cosmos-sdk/server/types"
+	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
+
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/crypto"
 	"github.com/tendermint/tendermint/libs/log"
@@ -77,6 +83,8 @@ import (
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
+	"github.com/CosmWasm/wasmd/x/wasm"
+
 	"github.com/irisnet/irismod/modules/coinswap"
 	coinswapkeeper "github.com/irisnet/irismod/modules/coinswap/keeper"
 	coinswaptypes "github.com/irisnet/irismod/modules/coinswap/types"
@@ -102,6 +110,7 @@ import (
 	tokenkeeper "github.com/irisnet/irismod/modules/token/keeper"
 	tokentypes "github.com/irisnet/irismod/modules/token/types"
 
+	"github.com/irisnet/irishub/address"
 	"github.com/irisnet/irishub/lite"
 	"github.com/irisnet/irishub/modules/guardian"
 	guardiankeeper "github.com/irisnet/irishub/modules/guardian/keeper"
@@ -138,6 +147,7 @@ var (
 		upgrade.AppModuleBasic{},
 		evidence.AppModuleBasic{},
 		transfer.AppModuleBasic{},
+		vesting.AppModuleBasic{},
 		guardian.AppModuleBasic{},
 		token.AppModuleBasic{},
 		record.AppModuleBasic{},
@@ -147,6 +157,7 @@ var (
 		service.AppModuleBasic{},
 		oracle.AppModuleBasic{},
 		random.AppModuleBasic{},
+		wasm.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -170,16 +181,7 @@ var (
 		distrtypes.ModuleName: true,
 	}
 
-	nativeToken = tokentypes.Token{
-		Symbol:        "iris",
-		Name:          "Irishub staking token",
-		Scale:         6,
-		MinUnit:       "uiris",
-		InitialSupply: 2000000000,
-		MaxSupply:     10000000000,
-		Mintable:      true,
-		Owner:         sdk.AccAddress(crypto.AddressHash([]byte(tokentypes.ModuleName))),
-	}
+	nativeToken tokentypes.Token
 )
 
 // Verify app interface at compile time
@@ -231,6 +233,7 @@ type IrisApp struct {
 	serviceKeeper  servicekeeper.Keeper
 	oracleKeeper   oraclekeeper.Keeper
 	randomKeeper   randomkeeper.Keeper
+	wasmKeeper     wasm.Keeper
 
 	// the module manager
 	mm *module.Manager
@@ -240,12 +243,29 @@ type IrisApp struct {
 }
 
 func init() {
+	address.ConfigureBech32Prefix()
+	nativeToken = tokentypes.Token{
+		Symbol:        "iris",
+		Name:          "Irishub staking token",
+		Scale:         6,
+		MinUnit:       "uiris",
+		InitialSupply: 2000000000,
+		MaxSupply:     10000000000,
+		Mintable:      true,
+		Owner:         sdk.AccAddress(crypto.AddressHash([]byte(tokentypes.ModuleName))).String(),
+	}
+
 	userHomeDir, err := os.UserHomeDir()
 	if err != nil {
 		panic(err)
 	}
 
 	DefaultNodeHome = filepath.Join(userHomeDir, ".iris")
+
+	owner, err := sdk.AccAddressFromBech32(nativeToken.Owner)
+	if err != nil {
+		panic(err)
+	}
 
 	tokentypes.SetNativeToken(
 		nativeToken.Symbol,
@@ -255,14 +275,15 @@ func init() {
 		nativeToken.InitialSupply,
 		nativeToken.MaxSupply,
 		nativeToken.Mintable,
-		nativeToken.Owner,
+		owner,
 	)
 }
 
 // NewIrisApp returns a reference to an initialized IrisApp.
 func NewIrisApp(
 	logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bool, skipUpgradeHeights map[int64]bool,
-	homePath string, invCheckPeriod uint, encodingConfig simappparams.EncodingConfig, baseAppOptions ...func(*baseapp.BaseApp),
+	homePath string, invCheckPeriod uint, encodingConfig simappparams.EncodingConfig,
+	appOpts servertypes.AppOptions, baseAppOptions ...func(*baseapp.BaseApp),
 ) *IrisApp {
 
 	// TODO: Remove cdc in favor of appCodec once all modules are migrated.
@@ -273,8 +294,7 @@ func NewIrisApp(
 	bApp := baseapp.NewBaseApp(appName, logger, db, encodingConfig.TxConfig.TxDecoder(), baseAppOptions...)
 	bApp.SetCommitMultiStoreTracer(traceStore)
 	bApp.SetAppVersion(version.Version)
-	bApp.GRPCQueryRouter().SetInterfaceRegistry(interfaceRegistry)
-	bApp.GRPCQueryRouter().RegisterSimulateService(bApp.Simulate, interfaceRegistry)
+	bApp.SetInterfaceRegistry(interfaceRegistry)
 
 	keys := sdk.NewKVStoreKeys(
 		authtypes.StoreKey, banktypes.StoreKey, stakingtypes.StoreKey,
@@ -282,7 +302,7 @@ func NewIrisApp(
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
 		guardiantypes.StoreKey, tokentypes.StoreKey, nfttypes.StoreKey, htlctypes.StoreKey, recordtypes.StoreKey,
-		coinswaptypes.StoreKey, servicetypes.StoreKey, oracletypes.StoreKey, randomtypes.StoreKey,
+		coinswaptypes.StoreKey, servicetypes.StoreKey, oracletypes.StoreKey, randomtypes.StoreKey, wasm.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -354,7 +374,8 @@ func NewIrisApp(
 		AddRoute(paramproposal.RouterKey, params.NewParamChangeProposalHandler(app.paramsKeeper)).
 		AddRoute(distrtypes.RouterKey, distr.NewCommunityPoolSpendProposalHandler(app.distrKeeper)).
 		AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(app.upgradeKeeper)).
-		AddRoute(ibchost.RouterKey, ibcclient.NewClientUpdateProposalHandler(app.ibcKeeper.ClientKeeper))
+		AddRoute(ibchost.RouterKey, ibcclient.NewClientUpdateProposalHandler(app.ibcKeeper.ClientKeeper)).
+		AddRoute(wasm.RouterKey, wasm.NewWasmProposalHandler(app.wasmKeeper, wasm.EnableAllProposals))
 	app.govKeeper = govkeeper.NewKeeper(
 		appCodec, keys[govtypes.StoreKey], app.GetSubspace(govtypes.ModuleName), app.accountKeeper, app.bankKeeper,
 		&stakingKeeper, govRouter,
@@ -412,6 +433,36 @@ func NewIrisApp(
 
 	app.randomKeeper = randomkeeper.NewKeeper(appCodec, keys[randomtypes.StoreKey], app.bankKeeper, app.serviceKeeper)
 
+	wasmDir := filepath.Join(homePath, "wasm")
+	wasmConfig, err := wasm.ReadWasmConfig(appOpts)
+	if err != nil {
+		panic("error while reading wasm config: " + err.Error())
+	}
+	// The last arguments can contain custom message handlers, and custom query handlers,
+	// if we want to allow any custom callbacks
+	supportedFeatures := "staking"
+	app.wasmKeeper = wasm.NewKeeper(
+		appCodec,
+		keys[wasm.StoreKey],
+		app.GetSubspace(wasm.ModuleName),
+		app.accountKeeper,
+		app.bankKeeper,
+		app.stakingKeeper,
+		app.distrKeeper,
+		bApp.Router(),
+		wasmDir,
+		wasmConfig,
+		supportedFeatures,
+		nil,
+		nil,
+	)
+
+	/****  Module Options ****/
+
+	// NOTE: we may consider parsing `appOpts` inside module constructors. For the moment
+	// we prefer to be more strict in what arguments the modules expect.
+	var skipGenesisInvariants = cast.ToBool(appOpts.Get(crisis.FlagSkipGenesisInvariants))
+
 	// NOTE: Any module instantiated in the module manager that is later modified
 	// must be passed by reference here.
 	app.mm = module.NewManager(
@@ -423,7 +474,7 @@ func NewIrisApp(
 		vesting.NewAppModule(app.accountKeeper, app.bankKeeper),
 		bank.NewAppModule(appCodec, app.bankKeeper, app.accountKeeper),
 		capability.NewAppModule(appCodec, *app.capabilityKeeper),
-		crisis.NewAppModule(&app.crisisKeeper),
+		crisis.NewAppModule(&app.crisisKeeper, skipGenesisInvariants),
 		gov.NewAppModule(appCodec, app.govKeeper, app.accountKeeper, app.bankKeeper),
 		mint.NewAppModule(appCodec, app.mintKeeper),
 		slashing.NewAppModule(appCodec, app.slashingKeeper, app.accountKeeper, app.bankKeeper, app.stakingKeeper),
@@ -443,6 +494,7 @@ func NewIrisApp(
 		service.NewAppModule(appCodec, app.serviceKeeper, app.accountKeeper, app.bankKeeper),
 		oracle.NewAppModule(appCodec, app.oracleKeeper),
 		random.NewAppModule(appCodec, app.randomKeeper, app.accountKeeper, app.bankKeeper),
+		wasm.NewAppModule(&app.wasmKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -452,11 +504,11 @@ func NewIrisApp(
 	app.mm.SetOrderBeginBlockers(
 		upgradetypes.ModuleName, minttypes.ModuleName, distrtypes.ModuleName,
 		slashingtypes.ModuleName, evidencetypes.ModuleName, stakingtypes.ModuleName,
-		ibchost.ModuleName, htlctypes.ModuleName, randomtypes.ModuleName,
+		ibchost.ModuleName, htlctypes.ModuleName, randomtypes.ModuleName, wasm.ModuleName,
 	)
 	app.mm.SetOrderEndBlockers(
 		crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName,
-		servicetypes.ModuleName,
+		servicetypes.ModuleName, wasm.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -469,15 +521,15 @@ func NewIrisApp(
 		slashingtypes.ModuleName, govtypes.ModuleName, minttypes.ModuleName, crisistypes.ModuleName,
 		ibchost.ModuleName, genutiltypes.ModuleName, evidencetypes.ModuleName, ibctransfertypes.ModuleName,
 		guardiantypes.ModuleName, tokentypes.ModuleName, nfttypes.ModuleName, htlctypes.ModuleName, recordtypes.ModuleName,
-		coinswaptypes.ModuleName, servicetypes.ModuleName, oracletypes.ModuleName, randomtypes.ModuleName,
+		coinswaptypes.ModuleName, servicetypes.ModuleName, oracletypes.ModuleName, randomtypes.ModuleName, wasm.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.crisisKeeper)
 	app.mm.RegisterRoutes(app.Router(), app.QueryRouter(), encodingConfig.Amino)
-	app.mm.RegisterQueryServices(app.GRPCQueryRouter())
+	app.mm.RegisterServices(module.NewConfigurator(app.MsgServiceRouter(), app.GRPCQueryRouter()))
 
 	// add test gRPC service for testing gRPC queries in isolation
-	testdata.RegisterTestServiceServer(app.GRPCQueryRouter(), testdata.TestServiceImpl{})
+	testdata.RegisterQueryServer(app.GRPCQueryRouter(), testdata.QueryImpl{})
 
 	// create the simulation manager and define the order of the modules for deterministic simulations
 	//
@@ -505,6 +557,7 @@ func NewIrisApp(
 		service.NewAppModule(appCodec, app.serviceKeeper, app.accountKeeper, app.bankKeeper),
 		oracle.NewAppModule(appCodec, app.oracleKeeper),
 		random.NewAppModule(appCodec, app.randomKeeper, app.accountKeeper, app.bankKeeper),
+		wasm.NewAppModule(&app.wasmKeeper),
 	)
 
 	app.sm.RegisterStoreDecoders()
@@ -677,13 +730,22 @@ func (app *IrisApp) SimulationManager() *module.SimulationManager {
 func (app *IrisApp) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APIConfig) {
 	clientCtx := apiSvr.ClientCtx
 	rpc.RegisterRoutes(clientCtx, apiSvr.Router)
+	// Register legacy tx routes.
 	authrest.RegisterTxRoutes(clientCtx, apiSvr.Router)
+	// Register new tx routes from grpc-gateway.
+	authtx.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCRouter)
+	// Register legacy and grpc-gateway routes for all modules.
 	ModuleBasics.RegisterRESTRoutes(clientCtx, apiSvr.Router)
-	ModuleBasics.RegisterGRPCRoutes(apiSvr.ClientCtx, apiSvr.GRPCRouter)
+	ModuleBasics.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCRouter)
 
 	if apiConfig.Swagger {
 		lite.RegisterSwaggerAPI(clientCtx, apiSvr.Router)
 	}
+}
+
+// RegisterTxService implements the Application.RegisterTxService method.
+func (app *IrisApp) RegisterTxService(clientCtx client.Context) {
+	authtx.RegisterTxService(app.BaseApp.GRPCQueryRouter(), clientCtx, app.BaseApp.Simulate, app.interfaceRegistry)
 }
 
 // GetMaccPerms returns a copy of the module account permissions
@@ -713,6 +775,7 @@ func initParamsKeeper(appCodec codec.BinaryMarshaler, legacyAmino *codec.LegacyA
 	paramsKeeper.Subspace(htlctypes.ModuleName)
 	paramsKeeper.Subspace(coinswaptypes.ModuleName)
 	paramsKeeper.Subspace(servicetypes.ModuleName)
+	paramsKeeper.Subspace(wasm.ModuleName)
 
 	return paramsKeeper
 }

@@ -1,3 +1,1 @@
-*.go linguist-language=go
-*.sh linguist-language=go
-*.md linguist-language=go
+lite/swagger-ui/* linguist-vendored
