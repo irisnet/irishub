@@ -25,10 +25,7 @@ func (k Keeper) Supers(c context.Context, req *types.QuerySupersRequest) (*types
 
 	pageRes, err := query.Paginate(store, req.Pagination, func(key []byte, value []byte) error {
 		var super types.Super
-		err := k.cdc.UnmarshalBinaryBare(value, &super)
-		if err != nil {
-			return err
-		}
+		k.cdc.MustUnmarshalBinaryBare(value, &super)
 		supers = append(supers, super)
 		return nil
 	})
