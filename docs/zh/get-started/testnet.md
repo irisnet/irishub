@@ -12,7 +12,7 @@ order: 4
 
 ## 安装
 
-我们使用不同的bech32前缀来区分主网和测试网，您所需要做的就是在[构建或安装](install.md) iris二进制文件之前在[irishub](https://github.com/irisnet/irishub)源码根目录中执行以下命令：
+我们使用不同的bech32前缀来区分主网和测试网，您所需要做的就是在[构建或安装](install.md) iris二进制文件之前在[irishub](https://github.com/irisnet/irishub) 源码根目录中执行以下命令：
 
 ```bash
 source scripts/setTestEnv.sh # 用于构建和安装测试网版本

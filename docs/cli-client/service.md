@@ -31,6 +31,7 @@ Service module allows you to define, bind, invoke services on the IRIS Hub. [Rea
 | [fees](#iris-query-service-fees)                        | Query the earned fees of a provider                                |
 | [withdraw-fees](#iris-tx-service-withdraw-fees)         | Withdraw the earned fees of a provider                             |
 | [schema](#iris-query-service-schema)                    | Query the system schema by the schema name                         |
+| [params](#iris-query-service-params)                    | Query values set as service parameters.                      |
 
 ## iris tx service define
 
@@ -583,4 +584,12 @@ iris query service schema pricing
 
 ```bash
 iris query service schema result
+```
+
+## iris query service params
+
+Query values set as service parameters.
+
+```bash
+iris query service params [flags]
 ```
