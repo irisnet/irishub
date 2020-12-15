@@ -101,25 +101,29 @@ func GetCmdQueryOwner() *cobra.Command {
 			if _, err := sdk.AccAddressFromBech32(args[0]); err != nil {
 				return err
 			}
-
+			pageReq, err := client.ReadPageRequest(cmd.Flags())
+			if err != nil {
+				return err
+			}
 			denomID, err := cmd.Flags().GetString(FlagDenomID)
 			if err != nil {
 				return err
 			}
 			queryClient := types.NewQueryClient(clientCtx)
 			resp, err := queryClient.Owner(context.Background(), &types.QueryOwnerRequest{
-				DenomId: denomID,
-				Owner:   args[0],
+				DenomId:    denomID,
+				Owner:      args[0],
+				Pagination: pageReq,
 			})
 			if err != nil {
 				return err
 			}
-
-			return clientCtx.PrintOutput(resp.Owner)
+			return clientCtx.PrintOutput(resp)
 		},
 	}
 	cmd.Flags().AddFlagSet(FsQueryOwner)
 	flags.AddQueryFlagsToCmd(cmd)
+	flags.AddPaginationFlagsToCmd(cmd, "nfts")
 
 	return cmd
 }
@@ -142,19 +146,26 @@ func GetCmdQueryCollection() *cobra.Command {
 			if err := types.ValidateDenomID(denomID); err != nil {
 				return err
 			}
-
+			pageReq, err := client.ReadPageRequest(cmd.Flags())
+			if err != nil {
+				return err
+			}
 			queryClient := types.NewQueryClient(clientCtx)
 			resp, err := queryClient.Collection(
 				context.Background(),
-				&types.QueryCollectionRequest{DenomId: denomID},
+				&types.QueryCollectionRequest{
+					DenomId:    denomID,
+					Pagination: pageReq,
+				},
 			)
 			if err != nil {
 				return err
 			}
-			return clientCtx.PrintOutput(resp.Collection)
+			return clientCtx.PrintOutput(resp)
 		},
 	}
 	flags.AddQueryFlagsToCmd(cmd)
+	flags.AddPaginationFlagsToCmd(cmd, "nfts")
 
 	return cmd
 }
@@ -172,8 +183,12 @@ func GetCmdQueryDenoms() *cobra.Command {
 				return err
 			}
 
+			pageReq, err := client.ReadPageRequest(cmd.Flags())
+			if err != nil {
+				return err
+			}
 			queryClient := types.NewQueryClient(clientCtx)
-			resp, err := queryClient.Denoms(context.Background(), &types.QueryDenomsRequest{})
+			resp, err := queryClient.Denoms(context.Background(), &types.QueryDenomsRequest{Pagination: pageReq})
 			if err != nil {
 				return err
 			}
@@ -181,7 +196,7 @@ func GetCmdQueryDenoms() *cobra.Command {
 		},
 	}
 	flags.AddQueryFlagsToCmd(cmd)
-
+	flags.AddPaginationFlagsToCmd(cmd, "all denoms")
 	return cmd
 }
 

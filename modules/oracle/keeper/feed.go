@@ -37,7 +37,7 @@ func (k Keeper) GetFeedByReqCtxID(ctx sdk.Context, requestContextID tmbytes.HexB
 // IteratorFeeds will foreach all feeds
 func (k Keeper) IteratorFeeds(ctx sdk.Context, fn func(feed types.Feed)) {
 	store := ctx.KVStore(k.storeKey)
-	iterator := sdk.KVStoreReversePrefixIterator(store, types.GetFeedPrefixKey())
+	iterator := sdk.KVStorePrefixIterator(store, types.GetFeedPrefixKey())
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
 		var res types.Feed

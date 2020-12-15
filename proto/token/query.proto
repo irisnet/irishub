@@ -44,11 +44,15 @@ message QueryTokenResponse {
 // QueryTokensRequest is request type for the Query/Tokens RPC method
 message QueryTokensRequest {
     string owner = 1;
+    // pagination defines an optional pagination for the request.
+    cosmos.query.PageRequest pagination = 2;
 }
 
 // QueryTokensResponse is response type for the Query/Tokens RPC method
 message QueryTokensResponse {
     repeated google.protobuf.Any Tokens = 1 [(cosmos_proto.accepts_interface) = "ContentI"];
+
+    cosmos.query.PageResponse pagination = 2;
 }
 
 // QueryFeesRequest is request type for the Query/Fees RPC method

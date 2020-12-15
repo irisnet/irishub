@@ -145,22 +145,22 @@ func (s *IntegrationTestSuite) TestNft() {
 	s.Require().Equal(from.String(), nftItem.Owner)
 
 	//------test GetCmdQueryOwner()-------------
-	respType = proto.Message(&nfttypes.Owner{})
+	respType = proto.Message(&nfttypes.QueryOwnerResponse{})
 	bz, err = nfttestutil.QueryOwnerExec(val.ClientCtx, from.String())
 	s.Require().NoError(err)
 	s.Require().NoError(val.ClientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType))
-	owner := respType.(*nfttypes.Owner)
-	s.Require().Equal(from.String(), owner.Address)
-	s.Require().Equal(denom, owner.IDCollections[0].DenomId)
-	s.Require().Equal(tokenID, owner.IDCollections[0].TokenIds[0])
+	ownerResp := respType.(*nfttypes.QueryOwnerResponse)
+	s.Require().Equal(from.String(), ownerResp.Owner.Address)
+	s.Require().Equal(denom, ownerResp.Owner.IDCollections[0].DenomId)
+	s.Require().Equal(tokenID, ownerResp.Owner.IDCollections[0].TokenIds[0])
 
 	//------test GetCmdQueryCollection()-------------
-	respType = proto.Message(&nfttypes.Collection{})
+	respType = proto.Message(&nfttypes.QueryCollectionResponse{})
 	bz, err = nfttestutil.QueryCollectionExec(val.ClientCtx, denomID)
 	s.Require().NoError(err)
 	s.Require().NoError(val.ClientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType))
-	collectionItem := respType.(*nfttypes.Collection)
-	s.Require().Equal(1, len(collectionItem.NFTs))
+	collectionItem := respType.(*nfttypes.QueryCollectionResponse)
+	s.Require().Equal(1, len(collectionItem.Collection.NFTs))
 
 	//------test GetCmdEditNFT()-------------
 	newTokenDate := "newdata"

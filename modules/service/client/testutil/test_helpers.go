@@ -153,6 +153,17 @@ func QueryServiceRequestsExec(clientCtx client.Context, serviceName, provider st
 	return clitestutil.ExecTestCLICmd(clientCtx, servicecli.GetCmdQueryServiceRequests(), args)
 }
 
+func QueryServiceRequestsByReqCtx(clientCtx client.Context, requestContextID, batchCounter string, extraArgs ...string) (testutil.BufferWriter, error) {
+	args := []string{
+		requestContextID,
+		batchCounter,
+		fmt.Sprintf("--%s=json", cli.OutputFlag),
+	}
+	args = append(args, extraArgs...)
+
+	return clitestutil.ExecTestCLICmd(clientCtx, servicecli.GetCmdQueryServiceRequests(), args)
+}
+
 func QueryEarnedFeesExec(clientCtx client.Context, extraArgs ...string) (testutil.BufferWriter, error) {
 	args := []string{
 		fmt.Sprintf("--%s=json", cli.OutputFlag),

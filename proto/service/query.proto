@@ -102,11 +102,14 @@ message QueryBindingResponse {
 message QueryBindingsRequest {
     string service_name = 1;
     string owner = 2;
+    // pagination defines an optional pagination for the request.
+    cosmos.query.PageRequest pagination = 3;
 }
 
 // QueryDefinitionsResponse is response type for the Query/Bindings RPC method
 message QueryBindingsResponse {
     repeated ServiceBinding service_bindings = 1;
+    cosmos.query.PageResponse pagination = 2;
 }
 
 // QueryWithdrawAddressRequest is request type for the Query/WithdrawAddress RPC method
@@ -143,22 +146,26 @@ message QueryRequestResponse {
 message QueryRequestsRequest {
     string service_name = 1;
     string provider = 2;
+    cosmos.query.PageRequest pagination = 3;
 }
 
 // QueryRequestsResponse is response type for the Query/Requests RPC method
 message QueryRequestsResponse {
     repeated Request requests = 1;
+    cosmos.query.PageResponse pagination = 2;
 }
 
 // QueryRequestsByReqCtxRequest is request type for the Query/RequestsByReqCtx RPC method
 message QueryRequestsByReqCtxRequest {
     string request_context_id = 1;
     uint64 batch_counter = 2;
+    cosmos.query.PageRequest pagination = 3;
 }
 
 // QueryRequestsByReqCtxResponse is response type for the Query/RequestsByReqCtx RPC method
 message QueryRequestsByReqCtxResponse {
     repeated Request requests = 1;
+    cosmos.query.PageResponse pagination = 2;
 }
 
 // QueryResponseRequest is request type for the Query/Response RPC method
@@ -175,11 +182,13 @@ message QueryResponseResponse {
 message QueryResponsesRequest {
     string request_context_id = 1;
     uint64 batch_counter = 2;
+    cosmos.query.PageRequest pagination = 3;
 }
 
 // QueryResponsesResponse is response type for the Query/Responses RPC method
 message QueryResponsesResponse {
     repeated Response responses = 1;
+    cosmos.query.PageResponse pagination = 2;
 }
 
 // QueryEarnedFeesRequest is request type for the Query/EarnedFees RPC method

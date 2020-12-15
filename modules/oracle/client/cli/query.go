@@ -71,14 +71,17 @@ func GetCmdQueryFeeds() *cobra.Command {
 			if err != nil {
 				return err
 			}
-
+			pageReq, err := client.ReadPageRequest(cmd.Flags())
+			if err != nil {
+				return err
+			}
 			queryClient := types.NewQueryClient(clientCtx)
 			feedState, err := cmd.Flags().GetString(FlagFeedState)
 			if err != nil {
 				return err
 			}
 
-			res, err := queryClient.Feeds(context.Background(), &types.QueryFeedsRequest{State: feedState})
+			res, err := queryClient.Feeds(context.Background(), &types.QueryFeedsRequest{State: feedState, Pagination: pageReq})
 			if err != nil {
 				return err
 			}
@@ -87,6 +90,7 @@ func GetCmdQueryFeeds() *cobra.Command {
 		},
 	}
 	cmd.Flags().AddFlagSet(FsQueryFeeds)
+	flags.AddPaginationFlagsToCmd(cmd, "all feeds")
 	flags.AddQueryFlagsToCmd(cmd)
 	return cmd
 }

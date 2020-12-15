@@ -305,6 +305,15 @@ func (s *IntegrationTestSuite) TestService() {
 	s.Require().Len(requests, 1)
 	s.Require().Equal(requestContextId, requests[0].RequestContextId)
 
+	//------test GetCmdQueryServiceRequests()-------------
+	respType = proto.Message(&servicetypes.QueryRequestsResponse{})
+	bz, err = servicetestutil.QueryServiceRequestsByReqCtx(val.ClientCtx, requests[0].RequestContextId, fmt.Sprint(requests[0].RequestContextBatchCounter))
+	s.Require().NoError(err)
+	s.Require().NoError(val.ClientCtx.JSONMarshaler.UnmarshalJSON(bz.Bytes(), respType))
+	requests = respType.(*servicetypes.QueryRequestsResponse).Requests
+	s.Require().Len(requests, 1)
+	s.Require().Equal(requestContextId, requests[0].RequestContextId)
+
 	//------test GetCmdRespondService()-------------
 	request := requests[0]
 	args = []string{

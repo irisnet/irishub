@@ -161,11 +161,16 @@ func GetCmdQueryServiceBindings() *cobra.Command {
 			}
 
 			queryClient := types.NewQueryClient(clientCtx)
+			pageReq, err := client.ReadPageRequest(cmd.Flags())
+			if err != nil {
+				return err
+			}
 			res, err := queryClient.Bindings(
 				context.Background(),
 				&types.QueryBindingsRequest{
 					ServiceName: args[0],
 					Owner:       owner.String(),
+					Pagination:  pageReq,
 				},
 			)
 			if err != nil {
@@ -177,6 +182,7 @@ func GetCmdQueryServiceBindings() *cobra.Command {
 	}
 
 	cmd.Flags().AddFlagSet(FsQueryServiceBindings)
+	flags.AddPaginationFlagsToCmd(cmd, "all bindings")
 	flags.AddQueryFlagsToCmd(cmd)
 
 	return cmd
@@ -295,11 +301,16 @@ func GetCmdQueryServiceRequests() *cobra.Command {
 			}
 
 			queryClient := types.NewQueryClient(clientCtx)
+			pageReq, err := client.ReadPageRequest(cmd.Flags())
+			if err != nil {
+				return err
+			}
 
 			if queryByBinding {
 				res, err := queryClient.Requests(context.Background(), &types.QueryRequestsRequest{
 					ServiceName: args[0],
 					Provider:    provider.String(),
+					Pagination:  pageReq,
 				})
 				if err != nil {
 					return err
@@ -322,6 +333,7 @@ func GetCmdQueryServiceRequests() *cobra.Command {
 				&types.QueryRequestsByReqCtxRequest{
 					RequestContextId: tmbytes.HexBytes(requestContextID).String(),
 					BatchCounter:     batchCounter,
+					Pagination:       pageReq,
 				},
 			)
 			if err != nil {
@@ -332,7 +344,7 @@ func GetCmdQueryServiceRequests() *cobra.Command {
 		},
 	}
 	flags.AddQueryFlagsToCmd(cmd)
-
+	flags.AddPaginationFlagsToCmd(cmd, "all requests")
 	return cmd
 }
 
@@ -414,11 +426,16 @@ func GetCmdQueryServiceResponses() *cobra.Command {
 			}
 
 			queryClient := types.NewQueryClient(clientCtx)
+			pageReq, err := client.ReadPageRequest(cmd.Flags())
+			if err != nil {
+				return err
+			}
 			res, err := queryClient.Responses(
 				context.Background(),
 				&types.QueryResponsesRequest{
 					RequestContextId: tmbytes.HexBytes(requestContextID).String(),
 					BatchCounter:     batchCounter,
+					Pagination:       pageReq,
 				},
 			)
 			if err != nil {
@@ -429,6 +446,7 @@ func GetCmdQueryServiceResponses() *cobra.Command {
 		},
 	}
 	flags.AddQueryFlagsToCmd(cmd)
+	flags.AddPaginationFlagsToCmd(cmd, "all responses")
 
 	return cmd
 }

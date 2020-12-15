@@ -1,9 +1,15 @@
 package keeper
 
 import (
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+
+	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/cosmos/cosmos-sdk/types/query"
 
+	"github.com/irisnet/irismod/modules/nft/exported"
 	"github.com/irisnet/irismod/modules/nft/types"
 )
 
@@ -34,6 +40,27 @@ func (k Keeper) GetCollection(ctx sdk.Context, denomID string) (types.Collection
 
 	nfts := k.GetNFTs(ctx, denomID)
 	return types.NewCollection(denom, nfts), nil
+}
+
+// GetPaginateCollection returns the collection by the specified denomID
+func (k Keeper) GetPaginateCollection(ctx sdk.Context, request *types.QueryCollectionRequest, denomID string) (types.Collection, *query.PageResponse, error) {
+	denom, err := k.GetDenom(ctx, denomID)
+	if err != nil {
+		return types.Collection{}, nil, sdkerrors.Wrapf(types.ErrInvalidDenom, "denomID %s not existed ", denomID)
+	}
+	var nfts []exported.NFT
+	store := ctx.KVStore(k.storeKey)
+	nftStore := prefix.NewStore(store, types.KeyNFT(denomID, ""))
+	pageRes, err := query.Paginate(nftStore, request.Pagination, func(key []byte, value []byte) error {
+		var baseNFT types.BaseNFT
+		k.cdc.MustUnmarshalBinaryBare(value, &baseNFT)
+		nfts = append(nfts, baseNFT)
+		return nil
+	})
+	if err != nil {
+		return types.Collection{}, nil, status.Errorf(codes.InvalidArgument, "paginate: %v", err)
+	}
+	return types.NewCollection(denom, nfts), pageRes, nil
 }
 
 // GetCollections returns all the collection

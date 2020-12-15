@@ -45,6 +45,17 @@ func SplitKeyOwner(key []byte) (address sdk.AccAddress, denomID, tokenID string,
 	return
 }
 
+func SplitKeyDenom(key []byte) (denomID, tokenID string, err error) {
+	keys := bytes.Split(key, delimiter)
+	if len(keys) != 2 {
+		return denomID, tokenID, errors.New("wrong KeyOwner")
+	}
+
+	denomID = string(keys[0])
+	tokenID = string(keys[1])
+	return
+}
+
 // KeyOwner gets the key of a collection owned by an account address
 func KeyOwner(address sdk.AccAddress, denomID, tokenID string) []byte {
 	key := append(PrefixOwners, delimiter...)

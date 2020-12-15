@@ -148,7 +148,7 @@ func (s *IntegrationTestSuite) TestNft() {
 	s.Require().Equal(from.String(), nftItem.NFT.Owner)
 
 	//------test GetCmdQueryOwner()-------------
-	url = fmt.Sprintf("%s/irismod/nft/owners/%s", baseURL, from.String())
+	url = fmt.Sprintf("%s/irismod/nft/nfts?owner=%s", baseURL, from.String())
 	resp, err = rest.GetRequest(url)
 	respType = proto.Message(&nfttypes.QueryOwnerResponse{})
 	s.Require().NoError(err)

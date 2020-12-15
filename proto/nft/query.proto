@@ -4,6 +4,7 @@ package irismod.nft;
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "nft/nft.proto";
+import "cosmos/query/pagination.proto";
 
 option go_package = "github.com/irisnet/irismod/modules/nft/types";
 
@@ -16,7 +17,7 @@ service Query {
 
     // Owner queries the NFTs of the specified owner
     rpc Owner(QueryOwnerRequest) returns (QueryOwnerResponse) {
-        option (google.api.http).get = "/irismod/nft/owners/{owner}";
+        option (google.api.http).get = "/irismod/nft/nfts";
     }
 
     // Collection queries the NFTs of the specified denom
@@ -54,22 +55,28 @@ message QuerySupplyResponse {
 // QueryOwnerRequest is the request type for the Query/Owner RPC method
 message QueryOwnerRequest {
     string denom_id = 1 [ (gogoproto.moretags) = "yaml:\"denom_id\"" ];
-    string owner = 2;
+    string owner = 2 [ (gogoproto.moretags) = "yaml:\"owner\"" ];
+    // pagination defines an optional pagination for the request.
+    cosmos.query.PageRequest pagination = 3;
 }
 
 // QueryOwnerResponse is the response type for the Query/Owner RPC method
 message QueryOwnerResponse {
     Owner owner = 1;
+    cosmos.query.PageResponse pagination = 2;
 }
 
 // QueryCollectionRequest is the request type for the Query/Collection RPC method
 message QueryCollectionRequest {
     string denom_id = 1 [ (gogoproto.moretags) = "yaml:\"denom_id\"" ];
+    // pagination defines an optional pagination for the request.
+    cosmos.query.PageRequest pagination = 2;
 }
 
 // QueryCollectionResponse is the response type for the Query/Collection RPC method
 message QueryCollectionResponse {
     Collection collection = 1;
+    cosmos.query.PageResponse pagination = 2;
 }
 
 // QueryDenomRequest is the request type for the Query/Denom RPC method
@@ -84,11 +91,15 @@ message QueryDenomResponse {
 
 // QueryDenomsRequest is the request type for the Query/Denoms RPC method
 message QueryDenomsRequest {
+    // pagination defines an optional pagination for the request.
+    cosmos.query.PageRequest pagination = 1;
 }
 
 // QueryDenomsResponse is the response type for the Query/Denoms RPC method
 message QueryDenomsResponse {
     repeated Denom denoms = 1 [ (gogoproto.nullable) = false ];
+
+    cosmos.query.PageResponse pagination = 2;
 }
 
 // QueryNFTRequest is the request type for the Query/NFT RPC method

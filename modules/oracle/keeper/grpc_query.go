@@ -2,12 +2,17 @@ package keeper
 
 import (
 	"context"
+
 	"strings"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	gogotypes "github.com/gogo/protobuf/types"
+
+	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/query"
 
 	"github.com/irisnet/irismod/modules/oracle/types"
 )
@@ -37,21 +42,40 @@ func (k Keeper) Feeds(c context.Context, req *types.QueryFeedsRequest) (*types.Q
 
 	state := strings.TrimSpace(req.State)
 	var result types.FeedsContext
+	var pageRes *query.PageResponse
+	var err error
+	store := ctx.KVStore(k.storeKey)
 	if len(state) == 0 {
-		k.IteratorFeeds(ctx, func(feed types.Feed) {
+		feedStore := prefix.NewStore(store, types.GetFeedPrefixKey())
+		pageRes, err = query.Paginate(feedStore, req.Pagination, func(key []byte, value []byte) error {
+			var feed types.Feed
+			k.cdc.MustUnmarshalBinaryBare(value, &feed)
 			result = append(result, BuildFeedContext(ctx, k, feed))
+			return nil
 		})
+		if err != nil {
+			return nil, status.Errorf(codes.InvalidArgument, "paginate: %v", err)
+		}
 	} else {
 		state, err := types.RequestContextStateFromString(req.State)
 		if err != nil {
 			return nil, status.Errorf(codes.InvalidArgument, "invalid request state")
 
 		}
-		k.IteratorFeedsByState(ctx, state, func(feed types.Feed) {
-			result = append(result, BuildFeedContext(ctx, k, feed))
+		feedStore := prefix.NewStore(store, types.GetFeedStatePrefixKey(state))
+		pageRes, err = query.Paginate(feedStore, req.Pagination, func(key []byte, value []byte) error {
+			var feedName gogotypes.StringValue
+			k.cdc.MustUnmarshalBinaryBare(value, &feedName)
+			if feed, found := k.GetFeed(ctx, feedName.Value); found {
+				result = append(result, BuildFeedContext(ctx, k, feed))
+			}
+			return nil
 		})
+		if err != nil {
+			return nil, status.Errorf(codes.InvalidArgument, "paginate: %v", err)
+		}
 	}
-	return &types.QueryFeedsResponse{Feeds: result}, nil
+	return &types.QueryFeedsResponse{Feeds: result, Pagination: pageRes}, nil
 }
 
 func (k Keeper) FeedValue(c context.Context, req *types.QueryFeedValueRequest) (*types.QueryFeedValueResponse, error) {

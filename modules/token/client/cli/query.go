@@ -91,10 +91,15 @@ func GetCmdQueryTokens() *cobra.Command {
 			}
 
 			queryClient := types.NewQueryClient(clientCtx)
+			pageReq, err := client.ReadPageRequest(cmd.Flags())
+			if err != nil {
+				return err
+			}
 			res, err := queryClient.Tokens(
 				context.Background(),
 				&types.QueryTokensRequest{
-					Owner: owner.String(),
+					Owner:      owner.String(),
+					Pagination: pageReq,
 				},
 			)
 			if err != nil {
@@ -114,6 +119,7 @@ func GetCmdQueryTokens() *cobra.Command {
 		},
 	}
 	flags.AddQueryFlagsToCmd(cmd)
+	flags.AddPaginationFlagsToCmd(cmd, "all tokens")
 
 	return cmd
 }

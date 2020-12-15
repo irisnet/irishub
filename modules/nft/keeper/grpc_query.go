@@ -7,8 +7,10 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/cosmos/cosmos-sdk/types/query"
 
 	"github.com/irisnet/irismod/modules/nft/types"
 )
@@ -41,19 +43,45 @@ func (k Keeper) Owner(c context.Context, request *types.QueryOwnerRequest) (*typ
 		return nil, status.Errorf(codes.InvalidArgument, "invalid owner address %s", request.Owner)
 	}
 
-	owner := k.GetOwner(ctx, ownerAddress, request.DenomId)
-	return &types.QueryOwnerResponse{Owner: &owner}, nil
+	owner := types.Owner{
+		Address:       ownerAddress.String(),
+		IDCollections: types.IDCollections{},
+	}
+	idsMap := make(map[string][]string)
+	store := ctx.KVStore(k.storeKey)
+	nftStore := prefix.NewStore(store, types.KeyOwner(ownerAddress, request.DenomId, ""))
+	pageRes, err := query.Paginate(nftStore, request.Pagination, func(key []byte, value []byte) error {
+		denomID := request.DenomId
+		tokenID := string(key)
+		if len(request.DenomId) == 0 {
+			denomID, tokenID, _ = types.SplitKeyDenom(key)
+		}
+		if ids, ok := idsMap[denomID]; ok {
+			idsMap[denomID] = append(ids, tokenID)
+		} else {
+			idsMap[denomID] = []string{tokenID}
+			owner.IDCollections = append(
+				owner.IDCollections,
+				types.IDCollection{DenomId: denomID},
+			)
+		}
+		return nil
+	})
+	for i := 0; i < len(owner.IDCollections); i++ {
+		owner.IDCollections[i].TokenIds = idsMap[owner.IDCollections[i].DenomId]
+	}
+	return &types.QueryOwnerResponse{Owner: &owner, Pagination: pageRes}, nil
 }
 
 func (k Keeper) Collection(c context.Context, request *types.QueryCollectionRequest) (*types.QueryCollectionResponse, error) {
 	denom := strings.ToLower(strings.TrimSpace(request.DenomId))
 	ctx := sdk.UnwrapSDKContext(c)
 
-	collection, err := k.GetCollection(ctx, denom)
+	collection, pageRes, err := k.GetPaginateCollection(ctx, request, denom)
 	if err != nil {
 		return nil, err
 	}
-	return &types.QueryCollectionResponse{Collection: &collection}, nil
+	return &types.QueryCollectionResponse{Collection: &collection, Pagination: pageRes}, nil
 }
 
 func (k Keeper) Denom(c context.Context, request *types.QueryDenomRequest) (*types.QueryDenomResponse, error) {
@@ -68,11 +96,25 @@ func (k Keeper) Denom(c context.Context, request *types.QueryDenomRequest) (*typ
 	return &types.QueryDenomResponse{Denom: &denomObject}, nil
 }
 
-func (k Keeper) Denoms(c context.Context, request *types.QueryDenomsRequest) (*types.QueryDenomsResponse, error) {
+func (k Keeper) Denoms(c context.Context, req *types.QueryDenomsRequest) (*types.QueryDenomsResponse, error) {
 	ctx := sdk.UnwrapSDKContext(c)
-	denoms := k.GetDenoms(ctx)
+
+	var denoms []types.Denom
+	store := ctx.KVStore(k.storeKey)
+	denomStore := prefix.NewStore(store, types.KeyDenomID(""))
+	pageRes, err := query.Paginate(denomStore, req.Pagination, func(key []byte, value []byte) error {
+		var denom types.Denom
+		k.cdc.MustUnmarshalBinaryBare(value, &denom)
+		denoms = append(denoms, denom)
+		return nil
+	})
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "paginate: %v", err)
+	}
+
 	return &types.QueryDenomsResponse{
-		Denoms: denoms,
+		Denoms:     denoms,
+		Pagination: pageRes,
 	}, nil
 }
 
