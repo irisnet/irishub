@@ -1,0 +1,16 @@
+syntax = "proto3";
+package irishub.legacy;
+
+import "gogoproto/gogo.proto";
+import "cosmos_proto/bank.proto";
+
+option go_package = "github.com/irisnet/irishub/modules/legacy/types";
+
+// MsgSend defines the legacy irishub msg send, same as cosmos-sdk/bank/MsgMultiSend
+message MsgSend {
+  option (gogoproto.equal) = false;
+
+  repeated cosmos.bank.v1beta1.Input  inputs  = 1 [(gogoproto.nullable) = false];
+  repeated cosmos.bank.v1beta1.Output outputs = 2 [(gogoproto.nullable) = false];
+}
+
